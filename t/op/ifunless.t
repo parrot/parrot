@@ -1,12 +1,6 @@
-#!perl
+#!parrot
 # Copyright (C) 2001-2005, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 6;
 
 =head1 NAME
 
@@ -22,181 +16,203 @@ Tests the conditional C<if> and C<unless> operations.
 
 =cut
 
-pasm_output_is( <<CODE, <<OUTPUT, "if_i_ic" );
-        set     I0, 2147483647
-        set     I1, -2147483648
-        set     I2, 0
+.const int TESTS = 14
 
-        if      I0, ONE
-        branch  ERROR
-        print   "bad\\n"
+.sub 'test' :main
+    .include 'test_more.pir'
 
-ONE:
-        print   "ok 1\\n"
-        if      I1, TWO
-        branch ERROR
-        print   "bad\\n"
+    plan(TESTS)
 
-TWO:
-        print   "ok 2\\n"
-        if      I2, ERROR
-        branch  THREE
-        print   "bad\\n"
+    if_i_ic_positive()
+    if_i_ic_negative()
+    if_i_ic_zero()
+    if_n_ic_positive()
+    if_n_ic_negative()
+    if_n_ic_zero()
+    if_s_ic_helloworld()
+    if_s_ic_empty()
 
-THREE:
-        print   "ok 3\\n"
-        end
+    unless_i_ic_zero()
+    unless_i_ic_negative()
+    unless_n_ic_zero()
+    unless_n_ic_negative()
+    unless_s_ic_empty()
+    unless_s_ic_helloworld()
 
-ERROR:
-        print   "bad\\n"
-        end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
+.end
 
-pasm_output_is( <<CODE, <<OUTPUT, "if_n_ic" );
-        set     N0, 0.1
-        set     N1, -0.1
-        set     N2, 0.0
+.sub 'if_i_ic_positive'
+    $I0 = 2147483647
 
-        if N0, ONE
-        branch  ERROR
-        print   "bad\\n"
+    $I1 = 0
+    if $I0 goto if_i_ic_positive_ok
+    goto if_i_ic_positive_end
 
-ONE:
-        print   "ok 1\\n"
-        if      N1, TWO
-        branch ERROR
-        print   "bad\\n"
+  if_i_ic_positive_ok:
+    $I1 = 1
+  if_i_ic_positive_end:
+    ok($I1, "if_i_ic with a positive integer")
+.end
 
-TWO:
-        print   "ok 2\\n"
-        if      N2, ERROR
-        branch  THREE
-        print   "bad\\n"
+.sub 'if_i_ic_negative'
+    $I0 = -2147483647
 
-THREE:
-        print   "ok 3\\n"
-        end
+    $I1 = 0
+    if $I0 goto if_i_ic_negative_ok
+    goto if_i_ic_negative_end
 
-ERROR:
-        print   "bad\\n"
-        end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
+  if_i_ic_negative_ok:
+    $I1 = 1
+  if_i_ic_negative_end:
+    ok($I1, "if_i_ic with a negative integer")
+.end
 
-pasm_output_is( <<CODE, <<OUTPUT, "if_s_ic" );
-        set     S0, "Hello World"
-        set     S1, ""
+.sub 'if_i_ic_zero'
+    $I0 = 0
 
-        if      S0, ONE
-        branch  ERROR
-        print   "bad\\n"
+    $I1 = 0
+    if $I0 goto if_i_ic_zero_end
+    $I1 = 1
 
-ONE:
-        print   "ok 1\\n"
-        if      S1, ERROR
-        branch  TWO
-        print   "bad\\n"
+  if_i_ic_zero_end:
+    ok($I1, "if_i_ic with integer zero")
+.end
 
-TWO:
-        print   "ok 2\\n"
-        end
+.sub 'if_n_ic_positive'
+    $N0 = 0.1
 
-ERROR:
-        print   "bad\\n"
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
+    $I1 = 0
+    if $N0 goto if_n_ic_positive_ok
+    goto if_n_ic_positive_end
 
-pasm_output_is( <<CODE, <<OUTPUT, "unless_i_ic" );
-        set     I0, 0
-        set     I1, -2147483648
+  if_n_ic_positive_ok:
+    $I1 = 1
+  if_n_ic_positive_end:
+    ok($I1, "if_n_ic with a positive float")
+.end
 
-        unless  I0, ONE
-        branch  ERROR
-        print   "bad\\n"
+.sub 'if_n_ic_negative'
+    $N0 = -0.1
 
-ONE:
-        print   "ok 1\\n"
-        unless  I1, ERROR
-        branch TWO
-        print   "bad\\n"
+    $I1 = 0
+    if $N0 goto if_n_ic_negative_ok
+    goto if_n_ic_negative_end
 
-TWO:
-        print   "ok 2\\n"
-        end
+  if_n_ic_negative_ok:
+    $I1 = 1
+  if_n_ic_negative_end:
+    ok($I1, "if_n_ic with a negative float")
+.end
 
-ERROR:
-        print   "bad\\n"
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
+.sub 'if_n_ic_zero'
+    $N0 = 0.0
 
-pasm_output_is( <<CODE, <<OUTPUT, "unless_n_ic" );
-        set     N0, 0.0
-        set     N1, -0.1
+    $I1 = 0
+    if $N0 goto if_n_ic_zero_end
+    $I1 = 1
 
-        unless N0, ONE
-        branch  ERROR
-        print   "bad\\n"
+  if_n_ic_zero_end:
+    ok($I1, "if_n_ic with float zero")
+.end
 
-ONE:
-        print   "ok 1\\n"
-        unless  N1, ERROR
-        branch TWO
-        print   "bad\\n"
+.sub 'if_s_ic_helloworld'
+    $S0 = "Hello World"
 
-TWO:
-        print   "ok 2\\n"
-        end
+    $I1 = 0
+    if $S0 goto if_s_ic_helloworld_ok
+    goto if_s_ic_helloworld_end
 
-ERROR:
-        print   "bad\\n"
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
+  if_s_ic_helloworld_ok:
+    $I1 = 1
+  if_s_ic_helloworld_end:
+    ok($I1, "if_s_ic with a non-empty string")
+.end
 
-pasm_output_is( <<CODE, <<OUTPUT, "unless_s_ic" );
-        set     S1, "Hello World"
-        set     S0, ""
+.sub 'if_s_ic_empty'
+    $S0 = ''
 
-        unless S0, ONE
-        branch  ERROR
-        print   "bad\\n"
+    $I1 = 0
+    if $S0 goto if_s_ic_empty_end
+    $I1 = 1
 
-ONE:
-        print   "ok 1\\n"
-        unless  S1, ERROR
-        branch TWO
-        print   "bad\\n"
+  if_s_ic_empty_end:
+    ok($I1, "if_n_ic with the empty string")
+.end
 
-TWO:
-        print   "ok 2\\n"
-        end
+.sub 'unless_i_ic_zero'
+    $I0 = 0
 
-ERROR:
-        print   "bad\\n"
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
+    $I1 = 0
+    unless $I0 goto unless_i_ic_zero_ok
+    goto unless_i_ic_zero_end
+
+  unless_i_ic_zero_ok:
+    $I1 = 1
+  unless_i_ic_zero_end:
+    ok($I1, "unless_i_ic with integer zero")
+.end
+
+.sub 'unless_i_ic_negative'
+    $I0 = -2147483648
+
+    $I1 = 0
+    unless $I0 goto unless_i_ic_negative_end
+    $I1 = 1
+
+  unless_i_ic_negative_end:
+    ok($I1, "unless_i_ic with a negative integer")
+.end
+
+.sub 'unless_n_ic_zero'
+    $N0 = 0.0
+
+    $I1 = 0
+    unless $N0 goto unless_n_ic_zero_ok
+    goto unless_n_ic_zero_end
+
+  unless_n_ic_zero_ok:
+    $I1 = 1
+  unless_n_ic_zero_end:
+    ok($I1, "unless_n_ic with float zero")
+.end
+
+.sub 'unless_n_ic_negative'
+    $N0 = -0.1
+
+    $I1 = 0
+    unless $N0 goto unless_n_ic_negative_end
+    $I1 = 1
+
+  unless_n_ic_negative_end:
+    ok($I1, "unless_n_ic with a negative float")
+.end
+
+.sub 'unless_s_ic_empty'
+    $S0 = ''
+
+    $I1 = 0
+    unless $S0 goto unless_s_ic_empty_ok
+    goto unless_s_ic_empty_end
+
+  unless_s_ic_empty_ok:
+    $I1 = 1
+  unless_s_ic_empty_end:
+    ok($I1, "unless_s_ic with the empty string")
+.end
+
+.sub 'unless_s_ic_helloworld'
+    $S0 = "Hello World"
+
+    $I1 = 0
+    unless $S0 goto unless_s_ic_helloworld_end
+    $I1 = 1
+
+  unless_s_ic_helloworld_end:
+    ok($I1, "unless_s_ic with a non-empty string")
+.end
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
