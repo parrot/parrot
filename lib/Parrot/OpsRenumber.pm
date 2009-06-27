@@ -8,11 +8,10 @@ use base qw( Parrot::Ops2pm::Base );
 
 =head1 NAME
 
-Parrot::OpsRenumber - Methods holding functionality for F<tools/build/opsrenumber.pl>.
+Parrot::OpsRenumber - Methods holding functionality for F<tools/dev/opsrenumber.pl>.
 
 =head1 SYNOPSIS
 
-    use Parrot::Config qw( %PConfig );
     use Parrot::OpsRenumber;
 
     $self = Parrot::OpsRenumber->new( {
