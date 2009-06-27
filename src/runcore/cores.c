@@ -149,7 +149,7 @@ it isn't optimized as aggressively as is possible.
 The precomputed goto core is an amazingly fast optimized core that uses
 the same computed goto feature, but performs the array dereferencing
 before the core even starts. The compiled bytecode is fed into a
-preprocessor that converts the bytecode instruction numbers into lable
+preprocessor that converts the bytecode instruction numbers into label
 pointer values. In the computed goto core, you have this
 operation to move to the next opcode:
 

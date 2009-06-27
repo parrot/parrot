@@ -698,6 +698,7 @@ EOC
     foreach my $method ( @{ $self->{methods} } ) {
         next unless $method->type eq Parrot::Pmc2c::Method::NON_VTABLE;
 
+        #these differ for METHODs
         my $method_name = $method->name;
         my $symbol_name = $method->symbol;
 

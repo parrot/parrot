@@ -85,9 +85,9 @@ suitable ops for a Parrot safe mode.
 
 =item 2 behavior
 
-The presence (or absence) of certain flags will change how the op
-behaviors. For example, the lack of the C<flow> flag will cause the
-op to be implicitly terminated with C<goto NEXT()>. (See next section).
+The presence (or absence) of certain flags will change how the op behaves. For
+example, the lack of the C<flow> flag will cause the op to be implicitly
+terminated with C<goto NEXT()>. (See next section).
 
 The :deprecated flag will generate a diagnostic to standard error at
 runtime when a deprecated opcode is invoked and
