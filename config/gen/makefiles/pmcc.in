@@ -31,32 +31,29 @@ SOURCES := \
 
 # the default target
 pmcc.pbc: $(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir $(SOURCES)
-	$(PARROT) $(PARROT_ARGS) $(PGE_LIBRARY)/Perl6Grammar.pir \
-	    --output=src/parser/gen_grammar.pir src/parser/grammar.pg
 	$(PARROT) -o pmcc.pbc pmcc.pir
 
 src/gen_nodes.pir: $(NQP) $(PCT) src/nodes.pm
 	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/gen_nodes.pir \
 	    --target=pir src/nodes.pm
 
-src/parser/gen_grammar.pir: $(PERL6GRAMMAR) src/parser/grammar.pg
-	$(PARROT) $(PARROT_ARGS) $(PERL6GRAMMAR) \
-	    --output=src/parser/gen_grammar.pir \
-	    src/parser/grammar.pg
+src/parser/gen_grammar.pir: $(PGE_LIBRARY) src/parser/grammar.pg
+	$(PARROT) $(PARROT_ARGS) $(PGE_LIBRARY)/Perl6Grammar.pir \
+	    --output=src/parser/gen_grammar.pir src/parser/grammar.pg
 
-src/parser/gen_actions.pir: $(NQP) $(PCT) src/parser/actions.pm
+src/parser/gen_actions.pir: $(NQP) $(PCT) src/parser/actions.pm src/gen_emitter.pir
 	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/parser/gen_actions.pir \
 	    --target=pir src/parser/actions.pm
 
-src/emitter/gen_pmc.pir: $(NQP) $(PCT) src/emitter/pmc.pm
+src/emitter/gen_pmc.pir: $(NQP) $(PCT) src/emitter/pmc.pm src/gen_emitter.pir
 	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/emitter/gen_pmc.pir \
 	    --target=pir src/emitter/pmc.pm
 
-src/emitter/gen_c.pir: $(NQP) $(PCT) src/emitter/c.pm
+src/emitter/gen_c.pir: $(NQP) $(PCT) src/emitter/c.pm src/gen_emitter.pir
 	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/emitter/gen_c.pir \
 	    --target=pir src/emitter/c.pm
 
-src/emitter/pmc/gen_default.pir: $(NQP) $(PCT) src/emitter/pmc/default.pm
+src/emitter/pmc/gen_default.pir: $(NQP) $(PCT) src/emitter/pmc/default.pm src/emitter/gen_pmc.pir
 	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/emitter/pmc/gen_default.pir \
 	    --target=pir src/emitter/pmc/default.pm
 
