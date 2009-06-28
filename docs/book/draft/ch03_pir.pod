@@ -157,7 +157,7 @@ point values and operations all comply with the IEEE 754 standard.
 Strings (S) are buffers of variable-sized data. The most common use of S
 registers and variables is to store textual data. S registers I<may> also be
 buffers for binary or other non-textual data, though this is rare.N<In general,
-a custom PMC is mroe useful.>  Parrot strings are flexible and powerful, to
+a custom PMC is more useful.>  Parrot strings are flexible and powerful, to
 account for all the complexity of human-readable (and computer-representable)
 textual data.
 
