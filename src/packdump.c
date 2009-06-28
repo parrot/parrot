@@ -37,7 +37,7 @@ static void PackFile_Constant_dump(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void pobj_flag_dump(PARROT_INTERP, ARGIN_NULLOK(long flags))
+static void pobj_flag_dump(PARROT_INTERP, long flags)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_PackFile_Constant_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -88,7 +88,7 @@ Dumps the constant C<self>.
 /* [this desperately needs better abstraction, so we're not duplicating the enum
  * PObj_enum definition in the include/parrot/pobj.h file.  -- rgr, 1-Mar-08.]
  */
-static const char *flag_bit_names[] =
+PARROT_OBSERVER static const char * const flag_bit_names[] =
 {
     "private0",
     "private1",
@@ -135,7 +135,7 @@ followed by individual bits.
 */
 
 static void
-pobj_flag_dump(PARROT_INTERP, ARGIN_NULLOK(long flags))
+pobj_flag_dump(PARROT_INTERP, long flags)
 {
     ASSERT_ARGS(pobj_flag_dump)
     INTVAL idx = 0;
