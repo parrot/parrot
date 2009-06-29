@@ -9,7 +9,8 @@ fetch_languages.pl - A helper to fetch language implementations from the SCM rep
 
     perl fetch_languages.pl
 
-    perl fetch_languages.pl --update
+    perl fetch_languages.pl [--update] [--lang=<hll>]
+
 
 =head1 DESCRIPTION
 
@@ -18,6 +19,8 @@ Creates a directory called 'languages' and checks out the languages.
 =head1 HISTORY
 
 2009-03-14 Salvaged from https:/svn.parrot.org/parrot/trunk/config/gen/makefiles/languages.in@37396.
+
+2009-06-28 --lang=<hll> option added by s1n++.
 
 =cut
 
@@ -29,8 +32,8 @@ use Getopt::Long;
 use Pod::Usage;
 use Cwd;
 
-my ( $update_flag, $checkout_flag ) = ( 0, 1 );
-GetOptions( 'update' => \$update_flag ) or pod2usage();
+my ( $update_flag, $checkout_flag, $lang_flag ) = ( 0, 1, undef );
+GetOptions( 'lang=s' => \$lang_flag, 'update' => \$update_flag ) or pod2usage();
 
 my $languages_dir = 'languages';
 mkdir $languages_dir;
@@ -304,6 +307,7 @@ my @hlls = (
 );
 
 foreach (@hlls) {
+    next if $lang_flag && $_->{name} ne $lang_flag;
     if ($checkout_flag && ! -d $_->{name}) {
         my @cmd = ( @{ $checkout_cmd{ $_->{scm} } }, $_->{repository}, $_->{name} );
         my $dir = getcwd();
