@@ -1,12 +1,6 @@
-#!perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+#!parrot
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 9;
 
 =head1 NAME
 
@@ -22,124 +16,145 @@ Tests the C<get_global> and C<set_global> operations.
 
 =cut
 
-pasm_output_is( <<'CODE', '12', "set/get" );
-        new P0, 'Integer'
-        new P1, 'Integer'
-        set P0, 12
-        set P1, 7
-        set_global "Integer", P0
-        get_global P1, "Integer"
-        print P1
-        end
-CODE
+.const int TESTS = 12
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "get null global" );
-       null S0
-       get_global P1, S0
-       end
-CODE
-/Tried to get null global/
-OUTPUT
+.namespace []
 
-pasm_output_is( <<'CODE', <<OUT, "not found null" );
-        get_global P1, "no_such_global"
-        print "ok 1\n"
-        defined I0, P1
-        unless I0, ok2
-        print "not "
-ok2:    print "ok 2\n"
-        end
-CODE
-ok 1
-ok 2
-OUT
+.sub 'test' :main
+    .include 'test_more.pir'
 
-pir_output_is( <<'CODE', <<OUT, "get/set global with key" );
-.namespace [ "Monkey" ]
-.sub main :main
-        set_it()
-        $P1 = get_hll_global [ "Monkey" ; "Toaster" ], "Explosion"
-        print $P1
+    plan(TESTS)
+
+    root_integer()
+    get_null_global()
+    not_found_null()
+    get_set_global_with_key()
+    fetch_and_store()
+    find_null_global()
+    get_hll_global_not_found()
+    find_store_with_key()
 .end
-.sub set_it
+
+.namespace []
+.sub 'root_integer'
+    $P0 = new ['Integer']
+    $P1 = new ['Integer']
+
+    $P0 = 12
+    $P1 = 7
+
+    set_global "Integer", $P0
+    $P1 = get_global "Integer"
+
+    is($P1, 12, 'root_integer')
+.end
+
+.sub 'get_null_global'
+    $S0 = null
+
+    $I0 = 0
+    push_eh get_null_global_catch
+    $P1 = get_global $S0
+    pop_eh
+    goto get_null_global_end
+
+  get_null_global_catch:
+    $I0 = 1
+
+  get_null_global_end:
+    ok($I0, 'get null global')
+.end
+
+.sub 'not_found_null'
+    $P1 = get_global 'no_such_global'
+    ok(1, 'not_found_null get_global returns')
+
+    $I0 = defined $P1
+    nok($I0, 'not_found_null get_global returns null')
+.end
+
+.sub 'get_set_global_with_key'
+    $P0 = get_global ['Monkey'], 'do_explosion'
+    $I0 = defined $P0
+    ok($I0, 'get_global of a sub with a key')
+    $P0()
+.end
+
+.namespace ['Monkey']
+.sub 'do_explosion'
+    set_it()
+    $P1 = get_hll_global [ "Monkey" ; "Toaster" ], "Explosion"
+    is($P1, "Ook...BANG!\n", 'get/set_global with key')
+.end
+
+.sub 'set_it'
         $P0 = new 'String'
         $P0 = "Ook...BANG!\n"
         set_global [ "Toaster" ], "Explosion", $P0
 .end
-CODE
-Ook...BANG!
-OUT
-
-pir_output_is( <<'CODE', <<OUT, "get/set root global with key" );
-.namespace [ "Monkey" ]
-.sub main :main
-        set_it()
-        $P1 = get_hll_global [ "Monkey" ; "Toaster" ], "Explosion"
-        print $P1
-.end
-.sub set_it
-        $P0 = new 'String'
-        $P0 = "Ook...BANG!\n"
-        set_root_global [ "parrot"; "Monkey"; "Toaster" ], "Explosion", $P0
-.end
-CODE
-Ook...BANG!
-OUT
 
 #----------------------------------------------------------------
 # LEGACY
 #----------------------------------------------------------------
 
-pasm_output_is( <<'CODE', '12', "Fetch and store" );
-        new P0, 'Integer'
-        new P1, 'Integer'
-        set P0, 12
-        set P1, 7
-        set_global "Integer", P0
-        get_hll_global P1, "Integer"
-        print P1
-        end
-CODE
+.namespace []
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "Find null global" );
-       null S0
-       get_hll_global P1, S0
-       end
-CODE
-/Tried to get null global/
-OUTPUT
+.sub 'fetch_and_store'
+    $P0 = new 'Integer'
+    $P1 = new 'Integer'
 
-pasm_output_is( <<'CODE', <<OUT, "not found null" );
-        get_hll_global P1, "no_such_global"
-        print "ok 1\n"
-        defined I0, P1
-        unless I0, ok2
-        print "not "
-ok2:    print "ok 2\n"
-        end
-CODE
-ok 1
-ok 2
-OUT
+    $P0 = 12
+    $P1 = 7
 
-pir_output_is( <<'CODE', <<OUT, "find/store global with key" );
-.sub main :main
-        set_it()
-        $P1 = get_hll_global [ "Monkey" ; "Toaster" ], "Explosion"
-        print $P1
+    set_global 'Integer', $P0
+    $P1 = get_hll_global 'Integer'
+    is($P1, 12, 'Fetch and store')
 .end
-.sub set_it
-        $P0 = new 'String'
-        $P0 = "Ook...BANG!\n"
-        set_hll_global [ "Monkey" ; "Toaster" ], "Explosion", $P0
+
+.sub 'find_null_global'
+    $S0 = null
+    push_eh find_null_global_catch
+    $P1 = get_hll_global $S0
+    pop_eh
+    $I0 = 0
+    goto find_null_global_end
+
+  find_null_global_catch:
+    $I0 = 1
+  find_null_global_end:
+    ok($I0, 'Find null global')
 .end
-CODE
-Ook...BANG!
-OUT
+
+.sub 'get_hll_global_not_found'
+    $P1 = get_hll_global 'no such global'
+    ok(1, 'get_hll_global returns if not found')
+
+    $I0 = defined $P1
+    nok($I0, 'get_hll_global returns null if not found')
+.end
+
+.sub 'find_store_with_key'
+    $P0 = get_global ['Monkey2'], 'do_explosion'
+    $I0 = defined $P0
+    ok($I0, 'get_hll_global of a sub with a key')
+    $P0()
+.end
+
+.namespace ['Monkey2']
+.sub 'do_explosion'
+    set_it()
+    $P1 = get_hll_global [ "Monkey2" ; "Toaster" ], "Explosion"
+    is($P1, "Ook...BANG, again!\n", 'find/store global with key')
+.end
+
+.sub 'set_it'
+    $P0 = new 'String'
+    $P0 = "Ook...BANG, again!\n"
+    set_hll_global [ "Monkey2"; "Toaster" ], "Explosion", $P0
+.end
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
