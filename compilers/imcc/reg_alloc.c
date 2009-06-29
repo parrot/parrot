@@ -237,7 +237,7 @@ ig_get_word(int i, int j, int N, ARGIN(unsigned int *graph),
             ARGMOD(int *bit_ofs))
 {
     ASSERT_ARGS(ig_get_word)
-    unsigned int bit = i * N + j;
+    const unsigned int bit = i * N + j;
     *bit_ofs        = bit % sizeof (*graph);
 
     return &graph[bit / sizeof (*graph)];
@@ -256,7 +256,7 @@ ig_set(int i, int j, int N, ARGIN(unsigned int *graph))
 {
     ASSERT_ARGS(ig_set)
     int bit_ofs;
-    unsigned int *word = ig_get_word(i, j, N, graph, &bit_ofs);
+    unsigned int * const word = ig_get_word(i, j, N, graph, &bit_ofs);
     *word |= (1 << bit_ofs);
 }
 
@@ -812,7 +812,7 @@ static void
 compute_du_chain(ARGMOD(IMC_Unit *unit))
 {
     ASSERT_ARGS(compute_du_chain)
-    Instruction *ins        = unit->instructions;
+    Instruction *ins = unit->instructions;
     Instruction *lastbranch = NULL;
     unsigned int i;
 
@@ -1037,7 +1037,7 @@ try_allocate(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 
     for (i = 0; i < unit->n_symbols; ++i) {
         int     already_allocated, color;
-        SymReg *r = reglist[i];
+        SymReg * const r = reglist[i];
         int     t = -1;
 
         if (r->color >= 0)
@@ -1110,7 +1110,8 @@ map_colors(ARGIN(const IMC_Unit* unit), int x, ARGIN(unsigned int *graph),
 
 /*
 
-=item C<static unsigned int first_avail(const IMC_Unit *unit, int reg_set, Set **avail)>
+=item C<static unsigned int first_avail(const IMC_Unit *unit, int reg_set, Set
+**avail)>
 
 find first available register of the given reg_set
 
@@ -1233,15 +1234,15 @@ static void
 vanilla_reg_alloc(SHIM_INTERP, ARGMOD(IMC_Unit *unit))
 {
     ASSERT_ARGS(vanilla_reg_alloc)
-    char         type[] = "INSP";
+    const char   type[] = "INSP";
     SymHash     *hsh    = &unit->hash;
     Set         *avail;
-    SymReg      *r;
     unsigned int i, j;
     int          reg_set, first_reg;
 
     /* Clear the pre-assigned colors. */
     for (i = 0; i < hsh->size; i++) {
+        SymReg *r;
         for (r = hsh->data[i]; r; r = r->next) {
             /* TODO Ignore non-volatiles */
             if (REG_NEEDS_ALLOC(r) && r->use_count)
@@ -1254,7 +1255,9 @@ vanilla_reg_alloc(SHIM_INTERP, ARGMOD(IMC_Unit *unit))
         reg_set   = type[j];
         first_reg = first_avail(unit, reg_set, &avail);
 
+        /* XXX Use a different loop variable that doesn't shadow outer i */
         for (i = 0; i < hsh->size; i++) {
+            SymReg *r;
             for (r = hsh->data[i]; r; r = r->next) {
                 if (r->set != reg_set)
                     continue;
