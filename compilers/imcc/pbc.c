@@ -66,7 +66,9 @@ PARROT_WARN_UNUSED_RESULT
 static int add_const_num(PARROT_INTERP, ARGIN_NULLOK(const char *buf))
         __attribute__nonnull__(1);
 
-static int add_const_pmc_sub(PARROT_INTERP,
+PARROT_IGNORABLE_RESULT
+static int /*@alt void@*/
+add_const_pmc_sub(PARROT_INTERP,
     ARGMOD(SymReg *r),
     size_t offs,
     size_t end)
@@ -1314,6 +1316,7 @@ end positions.
     (x) = NULL; \
   } while (0);
 
+PARROT_IGNORABLE_RESULT
 static int
 add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
 {
@@ -1323,8 +1326,8 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
     Parrot_sub          *sub, *outer_sub;
 
     const int            k            = add_const_table(interp);
-    PackFile_ConstTable *ct           = interp->code->const_table;
-    PackFile_Constant   *pfc          = ct->constants[k];
+    PackFile_ConstTable * const ct    = interp->code->const_table;
+    PackFile_Constant   * const pfc   = ct->constants[k];
     IMC_Unit            * const unit  =
         IMCC_INFO(interp)->globals->cs->subs->unit;
 
@@ -1756,6 +1759,7 @@ Creates and returns an INTEGER given an integer-like SymReg.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 IMCC_int_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
 {
@@ -1768,16 +1772,16 @@ IMCC_int_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
         r = r->reg;
 
     if (r->name[0] == '0' && (r->name[1] == 'x' || r->name[1] == 'X'))
-        i = strtoul(r->name + 2, 0, 16);
+        i = strtoul(r->name + 2, NULL, 16);
 
     else if (r->name[0] == '0' && (r->name[1] == 'O' || r->name[1] == 'o'))
-        i = strtoul(r->name + 2, 0, 8);
+        i = strtoul(r->name + 2, NULL, 8);
 
     else if (r->name[0] == '0' && (r->name[1] == 'b' || r->name[1] == 'B'))
-        i = strtoul(r->name + 2, 0, 2);
+        i = strtoul(r->name + 2, NULL, 2);
 
     else
-        i = strtol(r->name, 0, 10);
+        i = strtol(r->name, NULL, 10);
 
     /*
      * TODO
@@ -2259,7 +2263,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
 #endif
 
         if ((ins->type & ITBRANCH)
-        &&  (addr = get_branch_reg(ins)) != 0
+        && ((addr = get_branch_reg(ins)) != NULL)
         && !REG_NEEDS_ALLOC(addr)) {
             /* fixup local jumps - calc offset */
             if (addr->color == -1)
