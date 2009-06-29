@@ -422,7 +422,7 @@ free_reglist(ARGMOD(IMC_Unit *unit))
 #endif
     if (unit->interference_graph) {
         free(unit->interference_graph);
-        unit->interference_graph =  0;
+        unit->interference_graph = NULL;
     }
 
     if (unit->reglist) {
@@ -854,8 +854,9 @@ compute_one_du_chain(ARGMOD(SymReg *r), ARGIN(IMC_Unit *unit))
     /* We cannot rely on computing the value of r->first when parsing,
      * since the situation can be changed at any time by the register
      * allocation algorithm */
-    r->first_ins = 0;
-    r->use_count = r->lhs_use_count = 0;
+    r->first_ins     = NULL;
+    r->use_count     = 0;
+    r->lhs_use_count = 0;
 
     for (ins = unit->instructions; ins; ins = ins->next) {
         const int ro = instruction_reads(ins, r);
