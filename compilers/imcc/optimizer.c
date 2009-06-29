@@ -882,7 +882,7 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
 {
     ASSERT_ARGS(IMCC_subst_constants)
     Instruction *tmp;
-    const char * const ops[] = {
+    PARROT_OBSERVER const char * const ops[] = {
         "add", "sub", "mul", "div", "fdiv", "pow",
         "cmod", "mod", "atan",
         "shr", "shl", "lsr",
@@ -892,16 +892,16 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
         "and", "or", "xor",
         "iseq", "isne", "islt", "isle", "isgt", "isge", "cmp", "concat"
     };
-    const char * const ops2[] = {
+    PARROT_OBSERVER const char * const ops2[] = {
         "abs", "neg", "not", "fact", "sqrt", "ceil", "floor"
         "acos", "asec", "asin",
         "atan", "cos", "cosh", "exp", "ln", "log10", "log2", "sec",
         "sech", "sin", "sinh", "tan", "tanh", "fact"
     };
-    const char * const ops3[] = {
+    PARROT_OBSERVER const char * const ops3[] = {
         "eq", "ne", "gt", "ge", "lt", "le"
     };
-    const char * const ops4[] = {
+    PARROT_OBSERVER const char * const ops4[] = {
         "if", "unless"
     };
 
@@ -1002,6 +1002,7 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
         return NULL;
     }
 
+    /* XXX We can get to this point with debug_fmt = NULL */
     IMCC_debug(interp, DEBUG_OPT1, debug_fmt, name);
     /* we construct a parrot instruction
      * here and let parrot do the calculation in a

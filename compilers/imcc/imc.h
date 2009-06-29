@@ -294,12 +294,13 @@ PMC * IMCC_compile_pir_s(PARROT_INTERP,
         FUNC_MODIFIES(*error_message);
 
 int imcc_vfprintf(PARROT_INTERP,
-    ARGIN(PMC *io),
+    ARGMOD(PMC *io),
     ARGIN(const char *format),
     va_list ap)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*io);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
