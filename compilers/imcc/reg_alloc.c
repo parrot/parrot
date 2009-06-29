@@ -859,10 +859,9 @@ compute_one_du_chain(ARGMOD(SymReg *r), ARGIN(IMC_Unit *unit))
     r->lhs_use_count = 0;
 
     for (ins = unit->instructions; ins; ins = ins->next) {
-        const int ro = instruction_reads(ins, r);
         const int rw = instruction_writes(ins, r);
 
-        if (ro || rw) {
+        if (rw || instruction_reads(ins, r)) {
             if (!r->first_ins)
                 r->first_ins = ins;
 
