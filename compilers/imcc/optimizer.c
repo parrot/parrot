@@ -1245,7 +1245,7 @@ branch_cond_loop_swap(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction 
 
         for (count = 1; count != 999; ++count) {
             snprintf(label, size, "%s_post%d", branch->symregs[0]->name, count);
-            if (get_sym(interp, label) == 0) {
+            if (get_sym(interp, label) == NULL) {
                 found = 1;
                 break;
             }
