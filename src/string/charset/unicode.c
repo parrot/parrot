@@ -423,17 +423,11 @@ upcase(PARROT_INTERP, ARGIN(STRING *src))
 
     if (src->bufused  == src->strlen
             && src->encoding == Parrot_utf8_encoding_ptr) {
-        Parrot_ascii_charset_ptr->downcase(interp, src);
-        return;
-    }
-
-#if PARROT_HAS_ICU
-    if (src->bufused  == src->strlen
-    &&  src->encoding == Parrot_utf8_encoding_ptr) {
         Parrot_ascii_charset_ptr->upcase(interp, src);
         return;
     }
 
+#if PARROT_HAS_ICU
     src = Parrot_utf16_encoding_ptr->to_encoding(interp, src, NULL);
     /*
        U_CAPI int32_t U_EXPORT2
