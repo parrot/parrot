@@ -82,6 +82,7 @@ static SymReg * get_sym_by_name(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
 static int int_overflows(ARGIN(const SymReg *r))
         __attribute__nonnull__(1);
 
@@ -847,28 +848,39 @@ _mk_const(ARGMOD(SymHash *hsh), ARGIN(const char *name), int t)
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
 int_overflows(ARGIN(const SymReg *r))
 {
     ASSERT_ARGS(int_overflows)
     INTVAL i;
-    errno = 0;
+    int base;
+    const char *digits;
 
     if (r->type & VT_CONSTP)
         r = r->reg;
 
-    if (r->name[0] == '0' && (r->name[1] == 'x' || r->name[1] == 'X')) {
-        i = strtoul(r->name + 2, 0, 16);
+    /* Refactor this code to hoist common from functionality between
+     * this function and IMCC_int_from_reg in pbc.c */
+    digits = r->name;
+    base   = 10;
+
+    if (digits[0] == '0') {
+        switch (toupper((unsigned char)digits[1])) {
+            case 'B': base =  2; break;
+            case 'O': base =  8; break;
+            case 'X': base = 16; break;
+            default: break;
+        }
     }
 
-    else if (r->name[0] == '0' && (r->name[1] == 'O' || r->name[1] == 'o'))
-        i = strtoul(r->name + 2, 0, 8);
-
-    else if (r->name[0] == '0' && (r->name[1] == 'b' || r->name[1] == 'B'))
-        i = strtoul(r->name + 2, 0, 2);
-
-    else
-        i = strtol(r->name, 0, 10);
+    errno = 0;
+    if (base == 10) {
+        i = strtol(digits, NULL, base);
+    }
+    else {
+        i = strtoul(digits + 2, NULL, base);
+    }
 
     return errno ? 1 : 0;
 }
