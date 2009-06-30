@@ -5,7 +5,6 @@
 Z<CHP-3>
 
 X<PIR syntax>
-
 PIR has a relatively simple syntax. Every line is a comment, a label, a
 statement, or a directive. Each statement or directive stands on its own
 line. There is no end-of-line symbol (such as a semicolon in C).
@@ -37,7 +36,7 @@ block.  A C<=cut> marker signals the end of a Pod block.
 
 =head2 Labels
 
-X<PIR (Parrot intermediate representation);labels> X<labels (PIR)>
+X<labels>
 A label attaches a name to a line of code so other statements can refer to it.
 Labels can contain letters, numbers, and underscores. By convention, labels use
 all capital letters to stand out from the rest of the source code. It's fine to
@@ -62,8 +61,7 @@ Labels on separate lines improve readability, especially when outdented:
 
 Z<CHP-3-SECT-1>
 
-X<statements (PIR)>
-X<PIR (Parrot intermediate representation);statements>
+X<statements>X<opcodes>
 A statement is either an opcode or syntactic sugar for one or more opcodes. An
 opcode is a native instruction for the virtual machine; it consists of the name
 of the instruction followed by zero or more arguments.
@@ -82,6 +80,7 @@ PIR also provides higher-level constructs, including symbolic operators:
 
 =end PIR_FRAGMENT
 
+X<operators>
 These special statement forms are just syntactic sugar for regular opcodes. The
 C<+> symbol corresponds to the C<add> opcode, the C<-> symbol to the C<sub>
 opcode, and so on. The previous example is equivalent to:
@@ -94,9 +93,7 @@ opcode, and so on. The previous example is equivalent to:
 
 =head2 Directives
 
-X<directives (PIR)>
-X<PIR (Parrot intermediate representation);directives>
-
+X<directives>
 Directives resemble opcodes, but they begin with a period (C<.>).  Some
 directives specify actions that occur at compile time. Other directives
 represent complex operations that require the generation of multiple
@@ -110,9 +107,7 @@ instructions.  The C<.local> directive, for example, declares a named variable.
 
 =head2 Literals
 
-X<literals (PIR)>
-X<PIR (Parrot intermediate representation);literals>
-
+X<literals>
 Integers and floating point numbers are numeric literals. They can be positive
 or negative.
 
@@ -123,6 +118,7 @@ or negative.
 
 =end PIR_FRAGMENT
 
+X<integers>
 Integer literals can also be binary, octal, or hexadecimal:
 
 =begin PIR_FRAGMENT
@@ -133,6 +129,7 @@ Integer literals can also be binary, octal, or hexadecimal:
 
 =end PIR_FRAGMENT
 
+X<numbers (floating-point)>
 Floating point number literals have a decimal point and can use scientific
 notation:
 
@@ -143,7 +140,7 @@ notation:
 
 =end PIR_FRAGMENT
 
-X<strings;in PIR>
+X<strings>
 String literals are enclosed in single or double-quotes.N<See the
 section on L<Strings> in Chapter 4 for an explanation of the differences
 between the quoting types.>
@@ -157,10 +154,7 @@ between the quoting types.>
 
 =head2 Variables
 
-X<variables (PIR)>
-X<PIR (Parrot intermediate representation);variables>
-X<PMC; definition>
-
+X<variables>
 PIR variables can store four different kinds of valuesE<mdash>integers,
 numbers (floating point), strings, and objects. Parrot's objects are
 called PMCs, for "I<P>olyI<M>orphic I<C>ontainer".
@@ -178,6 +172,7 @@ not predeclare register variables:
 
 =end PIR_FRAGMENT
 
+X<named variables>
 PIR also has named variables; the C<.local>
 directive declares them. As with register variables, there are four valid types:
 C<int>, C<num>, C<string>, and C<pmc>. You I<must> declare named variables; 
@@ -193,9 +188,7 @@ otherwise they behave exactly the same as register variables.
 
 =head2 Constants
 
-X<PIR (Parrot intermediate representation);constants>
-X<constants (PIR)>
-
+X<constants>
 The C<.const> directive declares a named constant. Named constants are similar
 to named variables, but the values set in the declaration may never change.
 Like C<.local>, C<.const> takes a type and a name. It also requires a literal
@@ -203,9 +196,9 @@ argument to set the value of the constant.
 
 =begin PIR_FRAGMENT
 
-  .const int    frog = 4                       # integer constant
-  .const string name = "Superintendent Parrot" # string constant
-  .const num    pi   = 3.14159                 # floating point constant
+  .const int    frog = 4                       # integer
+  .const string name = "Superintendent Parrot" # string
+  .const num    pi   = 3.14159                 # floating point
 
 =end PIR_FRAGMENT
 
@@ -222,9 +215,7 @@ constant C<hello> and prints the value:
 
 =head2 Keys
 
-X<PIR (Parrot intermediate representation);keys>
-X<keys (PIR)>
-
+X<keys>
 A key is a special kind of constant used for accessing elements in complex
 variables (such as an array). A key is either an integer or a string; and it's
 always enclosed in square brackets (C<[> and C<]>).  You do not have to declare
@@ -249,9 +240,7 @@ PIR supports multi-part keys.  Use a semicolon to separate each part.
 
 =head2 Control Structures
 
-X<PIR (Parrot intermediate representation);control structures>
-X<control structures (PIR)>
-
+X<control structures>X<goto instruction>
 Rather than providing a pre-packaged set of control structures like C<if> and
 C<while>, PIR gives you the building blocks to construct your own.N<PIR has
 many advanced features, but at heart it B<is> an assembly language.> The most
@@ -269,6 +258,7 @@ after the C<goto> statement:
 
 =end PIR_FRAGMENT
 
+X<conditional branch>
 Variations on the basic C<goto> check whether a particular condition is
 true or false before jumping:
 
@@ -282,9 +272,7 @@ You can construct any traditional control structure from PIR's built-in control 
 
 =head2 Subroutines
 
-X<PIR (Parrot intermediate representation);subroutines>
-X<subroutines (PIR)>
-
+X<subroutines>
 A PIR subroutine starts with the C<.sub> directive and ends with the C<.end>
 directive. Parameter declarations use the C<.param> directive; they resemble
 named variable declarations. This example declares a subroutine named

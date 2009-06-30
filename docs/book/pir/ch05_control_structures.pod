@@ -13,10 +13,12 @@ of your software.>
 
 =head2 Conditionals and Unconditionals
 
-X<goto instruction> An unconditional branch always jumps to a specified label.
-PIR has only one unconditional branch instruction, C<goto>. In this example,
-the first C<print> statement never runs because the C<goto> always skips over
-it to the label C<skip_all_that>:
+X<goto instruction>
+X<unconditional branch>
+An unconditional branch always jumps to a specified label.  PIR has only
+one unconditional branch instruction, C<goto>. In this example, the
+first C<print> statement never runs because the C<goto> always skips
+over it to the label C<skip_all_that>:
 
 =begin PIR_FRAGMENT
 
@@ -28,13 +30,14 @@ it to the label C<skip_all_that>:
 
 =end PIR_FRAGMENT
 
+X<conditional branch>
 A conditional branch jumps to a specified label only when a particular
 condition is true. The condition may be as simple as checking the truth of a
 particular variable or as complex as a comparison operation.
 
-In this example, the C<goto> skips to the label C<maybe_skip> only if the value
-stored in C<$I0> is true. If C<$I0> is false, it will print "might be printed"
-and then print "after branch":
+In this example, the C<if/goto>X<if instruction> skips to the label
+C<maybe_skip> only if the value stored in C<$I0> is true. If C<$I0> is
+false, it will print "might be printed" and then print "after branch":
 
 =begin PIR_FRAGMENT
 
@@ -48,20 +51,18 @@ and then print "after branch":
 =head3 Boolean Truth
 
 X<boolean truth>
-X<PIR values; boolean>
-
 Parrot's C<if> and C<unless> instructions evaluate a variable as a boolean to
 decide whether to jump. In PIR, an integer is false if it's 0 and true if it's
 any non-zero value. A number is false if it's 0.0 and true otherwise. A string
 is false if it's the empty string (C<"">) or a string containing only a zero
 (C<"0">), and true otherwise. Evaluating a PMC as a boolean calls the vtable
-function C<get_bool> to check if it's true or false, so each PMC is free to
-determine what its boolean value should be.
+function C<get_bool>X<get_bool vtable function> to check if it's true or
+false, so each PMC is free to determine what its boolean value should
+be.
 
 =head3 Comparisons
 
-X<PIR; comparison operators>
-
+X<comparison operators>
 In addition to a simple check for the truth of a variable, PIR provides a
 collection of comparison operations for conditional branches.  These jump when
 the comparison is true.
@@ -89,10 +90,10 @@ statement.  If you have a more complex condition than a simple truth test or
 comparison, you must build up your condition with a series of instructions that
 produce a final, single truth value.
 
-This example performs two operations, addition and multiplication, then uses
-C<and> to check if the results of both operations were true.  The C<and> opcode
-stores a boolean value (0 or 1) in the integer variable C<$I2>; the code uses
-this value in an ordinary truth test:
+This example performs two operations, addition and multiplication, then
+uses C<and>X<and opcode> to check if the results of both operations were
+true.  The C<and> opcode stores a boolean value (0 or 1) in the integer
+variable C<$I2>; the code uses this value in an ordinary truth test:
 
 =begin PIR_FRAGMENT
 
@@ -108,9 +109,7 @@ this value in an ordinary truth test:
 
 =head2 If/Else Construct
 
-C<PIR; if>
-C<PIR; else>
-
+C<if control structure>
 High-level languages often use the keywords I<if> and I<else> for simple
 conditional control structures. These control structures perform an action when
 a condition is true and skip the action when the condition is false. PIR's
@@ -136,7 +135,8 @@ I<if> often means I<"if the condition is true, run the next few lines of
 code">.  In an assembly language, it's often more straightforward to write
 I<"if the condition is true, B<skip> the next few lines of code">. Because of
 the reversed logic, you may find it easier to build a simple conditional
-construct using the C<unless> instruction instead of C<if>.
+construct using the C<unless>X<unless instruction> instruction instead
+of C<if>.
 
 =begin PIR_FRAGMENT
 
@@ -151,6 +151,7 @@ simpler.  When C<$I0> is true, C<unless> does nothing and the body of the
 conditional runs. When C<$I0> is false, C<unless> skips over the body of the
 conditional by jumping to C<dont_do_it>.
 
+C<else control structure>
 An I<if/else> control structure is easier to build using the C<if> instruction
 than C<unless>.  To build an I<if/else>, insert the body of the else right
 after the first C<if> instruction.
@@ -171,9 +172,7 @@ construct:
 
 =head2 Switch Construct
 
-X<switch>
-X<PIR; switch>
-
+X<switch control structure>
 A I<switch> control structure selects one action from a list of possible
 actions by comparing a single variable to a series of values until it finds one
 that matches. The simplest way to achieve this in PIR is with a series of
@@ -252,15 +251,16 @@ Here's a slightly more complex example that calculates the factorial C<5!>:
 =end PIR_FRAGMENT
 
 Each time through the loop it multiplies C<product> by the current value of the
-C<counter >, decrements the counter, and jumps to the start of the loop. The
+C<counter>, decrements the counter, and jumps to the start of the loop. The
 loop ends when C<counter> has counted down to 0.
 
 =head2 While Loop
 
-X<while-style loop> A I<while> loop tests the condition at the start of the
-loop instead of at the end. This style of loop needs a conditional branch
-combined with an unconditional branch.  This example also calculates a
-factorial, but with a I<while> loop:
+X<while loop>
+A I<while> loop tests the condition at the start of the loop instead of
+at the end. This style of loop needs a conditional branch combined with
+an unconditional branch.  This example also calculates a factorial, but
+with a I<while> loop:
 
 =begin PIR_FRAGMENT
 
@@ -290,7 +290,6 @@ the body of the loop will never execute.
 =head2 For Loop
 
 X<for loop>
-
 A I<for> loop is a counter-controlled loop with three declared components: a
 starting value, a condition to determine when to stop, and an operation to step
 the counter to the next iteration. A I<for> loop in C looks something like:

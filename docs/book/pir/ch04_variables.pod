@@ -4,7 +4,7 @@
 
 Parrot is a register-based virtual machine. It has four typed register sets --
 integers, floating-point numbers, strings, and objects.  All variables in PIR
-are one of these four types. Whether you work with register variables or named
+are one of these four types. When you work with register variables or named
 variables, you're actually working directly with register storage locations in
 the virtual machine.
 
@@ -18,23 +18,20 @@ the same storage location when you use C<$I0> in the same subroutine.
 
 =head2 Assignment
 
-X<variable assignment>
-X<PIR operators; =>
-
+X<assignment>
+X<= operator>
 The most basic operation on a variable is assignment using the C<=>
 operator:
 
 =begin PIR_FRAGMENT
 
   $I0 = 42        # set integer variable to the value 42
-  $N3 = 3.14159   # set number variable to an approximation of pi
+  $N3 = 3.14159   # set number variable to approximation of pi
   $I1 = $I0       # set $I1 to the value of $I0
 
 =end PIR_FRAGMENT
 
-X<exchange>
-X<opcodes; exchange>
-
+X<exchange opcode>
 The C<exchange> opcode swaps the contents of two variables of the same type.
 This example sets C<$I0> to the value of C<$I1> and sets C<$I1> to the value
 of C<$I0>.
@@ -45,9 +42,7 @@ of C<$I0>.
 
 =end PIR_FRAGMENT
 
-X<null>
-X<opcodes; null>
-
+X<null opcode>
 The C<null> opcode sets an integer or number variable to a zero value,
 and undefines a string or object.
 
@@ -62,6 +57,7 @@ and undefines a string or object.
 
 =head2 Working with Numbers
 
+X<integers>X<numbers (floating-point)>
 PIR has an extensive set of instructions that work with integers,
 floating-point numbers, and numeric PMCs. Many of these instructions
 have a variant that modifies the result in place:
@@ -73,6 +69,7 @@ have a variant that modifies the result in place:
 
 =end PIR_FRAGMENT
 
+X<+ operator>
 The first form of C<+> stores the sum of the two arguments in the result
 variable, C<$I0>. The second variant, C<+=>, adds the single argument to
 C<$I0> and stores the sum back in C<$I0>.
@@ -95,17 +92,14 @@ floating-point, or PMC final argument:
 
 =end PIR_FRAGMENT
 
-There are many numeric opcodes; a complete list is available in "PIR Opcodes"
-in Chapter 11.
-
 =head3 Unary numeric opcodes
 
 X<unary numeric opcodes>
-
-Unary opcodes have a single argument.  They either return a result or modify
-the argument in place. Some of the most common unary numeric opcodes are C<inc>
-(increment), C<dec> (decrement), C<abs> (absolute value), C<neg> (negate), and
-C<fact> (factorial):
+Unary opcodes have a single argument.  They either return a result or
+modify the argument in place. Some of the most common unary numeric
+opcodes are C<inc> (increment)X<inc opcode>, C<dec> (decrement)X<dec
+opcode>, C<abs> (absolute value)X<abs opcode>, C<neg> (negate)X<neg
+opcode>, and C<fact> (factorial)X<fact opcode>:
 
 =begin PIR_FRAGMENT
 
@@ -120,11 +114,13 @@ C<fact> (factorial):
 X<binary numeric opcodes>
 
 Binary opcodes have two arguments and a result.  Parrot provides
-addition (C<+> or C<add>), subtraction (C<-> or C<sub>), multiplication
-(C<*> or C<mul>), division (C</> or C<div>), modulus (C<%> or C<mod>),
-and exponent (C<pow>) opcodes, as well as C<gcd>X<gcd opcode>
-(greatest common divisor) and C<lcm>X<lcm opcode> (least common
-multiple).
+addition (C<+>X<+ operator> or C<add>X<add opcode>), subtraction
+(C<->X<- operator> or C<sub>X<sub opcode>), multiplication (C<*>X<*
+operator> or C<mul>X<mul opcode>), division (C</>X</ operator> or
+C<div>X<div opcode>), modulus (C<%>X<% operator> or C<mod>X<mod
+opcode>), and exponent (C<pow>X<pow opcode>) opcodes, as well as
+C<gcd>X<gcd opcode> (greatest common divisor) and C<lcm>X<lcm opcode>
+(least common multiple).
 
 =begin PIR_FRAGMENT
 
@@ -135,16 +131,18 @@ multiple).
 
 =head3 Floating-point operations
 
-X<float opcodes>
-
-The most common floating-point operations are C<ln> (natural log), C<log2> (log
-base 2), C<log10> (log base 10), and C<exp> (I<e>G<x>), as well as a full set
-of trigonometric opcodes such as C<sin> (sine), C<cos> (cosine), C<tan>
-(tangent), C<sec> (secant), C<cosh> (hyperbolic cosine), C<tanh> (hyperbolic
-tangent), C<sech> (hyperbolic secant), C<asin> (arc sine), C<acos> (arc
-cosine), C<atan> (arc tangent), C<asec> (arc secant), C<exsec> (exsecant),
-C<hav> (haversine), and C<vers> (versine). All angle arguments for the
-X<trigonometric functions> trigonometric functions are in radians:
+The most common floating-point operations are C<ln>X<ln opcode> (natural
+log), C<log2>X<log2 opcode> (log base 2), C<log10>X<log10 opcode> (log
+base 10), and C<exp>X<exp opcode> (I<e>G<x>), as well as a full set of
+trigonometric opcodes such as C<sin>X<sin opcode> (sine), C<cos>X<cos
+opcode> (cosine), C<tan>X<tan opcode> (tangent), C<sec>X<sec opcode>
+(secant), C<cosh>X<cosh opcode> (hyperbolic cosine), C<tanh>X<tanh
+opcode> (hyperbolic tangent), C<sech>X<sech opcode> (hyperbolic secant),
+C<asin>X<asin opcode> (arc sine), C<acos>X<acos opcode> (arc cosine),
+C<atan>C<atan opcode> (arc tangent), C<asec>X<asec opcode> (arc secant),
+C<exsec>X<exsec opcode> (exsecant), C<hav>X<hav opcode> (haversine), and
+C<vers>X<vers opcode> (versine).  All angle arguments for the
+X<trigonometric opcodes> trigonometric opcodes are in radians:
 
 =begin PIR_FRAGMENT
 
@@ -160,13 +158,12 @@ many of these opcodes require the result to be a number.
 =head3 Logical and Bitwise Operations
 
 X<logical opcodes>
-
-The logical opcodes evaluate the truth of their arguments.  They're most useful
-to make decisions for control flow.  Integers and numeric PMCs support logical
-are false if they're 0 and true otherwise. Strings are false if they're the
-empty string or a single character "0", and true otherwise. PMCs are true when
-their C<get_bool>X<get_bool vtable method> vtable method returns a nonzero
-value.
+The logical opcodes evaluate the truth of their arguments.  They are most
+useful to make decisions for control flow.  Integers and numeric PMCs
+support logical are false if they're 0 and true otherwise. Strings are
+false if they're the empty string or a single character "0", and true
+otherwise. PMCs are true when their C<get_bool>X<get_bool vtable
+function> vtable function returns a nonzero value.
 
 The C<and>X<and opcode> opcode returns the first argument if
 it's false and the second argument otherwise:
@@ -218,8 +215,7 @@ and a false value if the argument is true:
 
 =end PIR_FRAGMENT
 
-X<bitwise;opcodes>
-
+X<bitwise opcodes>
 The bitwise opcodes operate on their values a single bit at a time.
 C<band>X<band opcode>, C<bor>X<bor opcode>, and C<bxor>X<bxor opcode> return a
 value that is the logical AND, OR, or XOR of each bit in the source arguments.
@@ -250,8 +246,9 @@ C<bnot>X<bnot opcode> is the logical NOT of each bit in the source argument.
 
 =end PIR_FRAGMENT
 
-X<shift opcodes>
-
+X<shl opcode>
+X<shr opcode>
+X<lsr opcode>
 The logical and arithmetic shift operations shift their values by a specified
 number of bits:
 
@@ -265,6 +262,7 @@ number of bits:
 
 =head2 Working with Strings
 
+X<strings>
 Parrot strings are buffers of variable-sized data. The most common use of
 strings is to store text data. Strings can also hold binary or other
 non-textual data, though this is rare.N<In general, a custom PMC is more
@@ -283,7 +281,8 @@ single-quotes only allow escapes for nested quotes:
   $S0 = "This string is \n on two lines"
   $S0 = 'This is a \n one-line string with a slash in it'
 
-Parrot supports several escape sequences in double-quoted strings:
+Table 4.1 shows the escape sequences Parrot supports in double-quoted
+strings.
 
 =begin table String Escapes
 
@@ -398,7 +397,6 @@ Parrot supports several escape sequences in double-quoted strings:
 =head3 Heredocs
 
 X<heredocs>
-
 If you need more flexibility in defining a string, use a heredoc string
 literal. The C<E<lt>E<lt>> operator starts a heredoc.  The string terminator
 immediately follows. All text until the terminator is part of the string. The
@@ -406,16 +404,14 @@ terminator must appear on its own line, must appear at the beginning of the
 line, and may not have any trailing whitespace.
 
   $S2 = << "End_Token"
-
   This is a multi-line string literal. Notice that
   it doesn't use quotation marks.
-
   End_Token
 
 =head3 Concatenating strings
 
-X<concat opcode>
-X<string concatenation>
+X<. operator>
+X<strings;concatenation>
 
 Use the C<.> operator to concatenate strings. The following example
 concatenates the string "cd" onto the string "ab" and stores the result in
@@ -429,6 +425,7 @@ C<$S1>.
 
 =end PIR_FRAGMENT
 
+X<.= operator>
 Concatenation has a C<.=> variant to modify the result in place. In the
 next example, the C<.=> operation appends "xy" onto the string "abcd" in
 C<$S1>.
@@ -442,6 +439,7 @@ C<$S1>.
 
 =head3 Repeating strings
 
+X<repeat opcode>
 The C<repeat> opcode repeats a string a specified number of times:
 
 =begin PIR_FRAGMENT
@@ -457,6 +455,7 @@ times and stores it in C<$S1>.
 
 =head3 Length of a string
 
+X<length opcode>
 The C<length> opcode returns the length of a string in characters. This won't
 be the same as the length in I<bytes> for multibyte encoded strings:
 
@@ -534,7 +533,7 @@ string:
 =begin PIR_FRAGMENT
 
   $S0 = chr 65              # $S0 is "A"
-  $I0 = ord $S0             # $I0 is 65, if $S0 is ASCII or UTF-8
+  $I0 = ord $S0             # $I0 is 65, if $S0 is ASCII/UTF-8
 
 =end PIR_FRAGMENT
 
@@ -559,7 +558,7 @@ the last character.
 
 =head3 Formatting strings
 
-X<string formatting>
+X<strings;formatting>
 
 The C<sprintf>X<sprintf opcode> opcode generates a formatted string from a
 series of values. It takes two arguments: a string specifying the format, and
@@ -575,7 +574,7 @@ result can be either strings or PMCs:
 
 The format string is similar to C's C<sprintf> function with extensions for
 Parrot data types. Each format field in the string starts with a C<%> and ends
-with a character specifying the output format. Table 4-2 lists the available
+with a character specifying the output format. Table 4.2 lists the available
 output format characters.
 
 =begin table Format characters
@@ -690,7 +689,7 @@ lowercase "e").
 =end table
 
 Each format field supports several specifier options: R<flags>, R<width>,
-R<precision>, and R<size>.  Table 4-3 lists the format flags.
+R<precision>, and R<size>.  Table 4.3 lists the format flags.
 
 =begin table Format flags
 
@@ -742,8 +741,9 @@ integers, and the number of decimal places for floating-point fields.
 If either R<width> or R<precision> is an asterisk (C<*>), it takes its
 value from the next argument in the PMC.
 
-The R<size> modifier defines the type of the argument the field takes.  Table
-4-4 lists the size flags.
+The R<size> modifier defines the type of the argument the field takes.
+Table 4.4 lists the size flags. The values in the aggregate PMC must
+have a type compatible with the specified R<size>.
 
 =begin table Size flags
 
@@ -801,15 +801,6 @@ The R<size> modifier defines the type of the argument the field takes.  Table
 
 =end table
 
-The values in the aggregate PMC must have a type compatible with the specified
-R<size>.
-
-The format string of this C<sprintf> example has two format fields. The first,
-C<%#Px>, extracts a PMC argument (C<P>) from the aggregate C<$P2> and formats
-it as a hexadecimal integer (C<x>) with a leading 0x (C<#>). The second format
-field, C<%+2.3Pf>, takes a PMC argument (C<P>) and formats it as a
-floating-point number (C<f>) with a minimum of two whole digits and a maximum
-of three decimal places (C<2.3>) and a leading sign (C<+>):
 
 =begin PIR_FRAGMENT
 
@@ -818,14 +809,22 @@ of three decimal places (C<2.3>) and a leading sign (C<+>):
 
 =end PIR_FRAGMENT
 
+The format string of this C<sprintf> example has two format fields. The first,
+C<%#Px>, extracts a PMC argument (C<P>) from the aggregate C<$P2> and formats
+it as a hexadecimal integer (C<x>) with a leading 0x (C<#>). The second format
+field, C<%+2.3Pf>, takes a PMC argument (C<P>) and formats it as a
+floating-point number (C<f>) with a minimum of two whole digits and a maximum
+of three decimal places (C<2.3>) and a leading sign (C<+>).
+
+
 The test files F<t/op/string.t> and F<t/op/sprintf.t> have many more
 examples of format strings.
 
 =head3 Joining strings
 
-The C<join> opcode joins the elements of an array PMC into a single
-string. The first argument separates the individual elements of the
-PMC in the final string result.
+The C<join>X<join opcode> opcode joins the elements of an array PMC into
+a single string. The first argument separates the individual elements of
+the PMC in the final string result.
 
 =begin PIR_FRAGMENT
 
@@ -882,15 +881,15 @@ of the string. If it fails to find the substring, it returns -1:
 C<index> also has a three-argument version, where the final argument
 defines an offset position for starting the search.
 
-This example finds the second "eb" in "Beeblebrox" instead of the first,
-because the search skips the first three characters in the string:
-
 =begin PIR_FRAGMENT
 
   $I0 = index "Beeblebrox", "eb", 3
   say $I0                           # prints 5
 
 =end PIR_FRAGMENT
+
+This example finds the second "eb" in "Beeblebrox" instead of the first,
+because the search skips the first three characters in the string.
 
 =head3 Bitwise Operations
 
@@ -913,10 +912,10 @@ simple ASCII strings, because Parrot performs bitwise operations per byte.
 
 =head3 Copy-On-Write
 
-Strings use copy-on-write (COW) optimizations. A call to C<$S1 = $S0>
-doesn't immediately make a copy of C<$S0>, it only makes both variables
-point to the same string. Parrot doesn't make a copy of the string until
-one of two strings is modified.
+Strings use copy-on-write (COW)X<copy-on-write>X<COW (copy-on-write)>
+optimizations. A call to C<$S1 = $S0> doesn't immediately make a copy of
+C<$S0>, it only makes both variables point to the same string. Parrot
+doesn't make a copy of the string until one of two strings is modified.
 
 =begin PIR_FRAGMENT
 
@@ -936,27 +935,24 @@ copying strings until the copies are necessary.
 =head3 Encodings and Charsets
 
 X<charset>
-X<ASCII>
-
-Years ago, strings only needed to support the ASCII character set (or charset),
-a mapping of 128 bit patterns to symbols and English-language characters. This
-worked as long as everyone using a computer read and wrote English and only
-used a small handful of punctuation symbols. In other words, it was woefully
-insufficient. A modern string system must manage charsets in order to make
-sense out of all the string data in the world.
-
+X<ASCII character set>
 X<encoding>
+Years ago, strings only needed to support the ASCII character set (or
+charset), a mapping of 128 bit patterns to symbols and English-language
+characters. This worked as long as everyone using a computer read and
+wrote English and only used a small handful of punctuation symbols. In
+other words, it was woefully insufficient. A modern string system must
+manage charsets in order to make sense out of all the string data in the
+world. A modern string system must also handle different encodings --
+ways to represent various charsets in memory and on disk.
 
-A modern string system must also handle different encodings -- ways to
-represent various charsets in memory and on disk.
-
-Every string in Parrot has an associated encoding and charset. The default
+Every string in Parrot has an associated encoding and character set. The default
 charset is 8-bit ASCII, which is almost universally supported.  Double-quoted
 string constants can have an optional prefix specifying the string's encoding
 and charset.N<As you might suspect, single-quoted strings do not support this.>
-Parrot tracks information about encoding and character set internally, and
+Parrot tracks information about encoding and charset internally, and
 automatically converts strings when necessary to preserve these
-characteristics. Strings may have prefixes of the form C<encoding:charset:>.
+characteristics. Strings constants may have prefixes of the form C<encoding:charset:>.
 
 =begin PIR_FRAGMENT
 
@@ -967,6 +963,11 @@ characteristics. Strings may have prefixes of the form C<encoding:charset:>.
 
 =end PIR_FRAGMENT
 
+X<ISO 8859-1 character set>
+X<Latin 1 character set>
+X<UCS-2 encoding>
+X<UTF-8 encoding>
+X<UTF-16 encoding>
 Parrot supports the character sets C<ascii>, C<binary>, C<iso-8859-1>
 (Latin 1), and C<unicode> and the encodings C<fixed_8>, C<ucs2>,
 C<utf8>, and C<utf18>.
@@ -986,6 +987,8 @@ Parrot, so the programmer doesn't need to worry about the details.
 
 =head2 Working with PMCs
 
+X<Polymorphic Containers (PMCs)>
+X<PMCs (Polymorphic Containers)>
 Polymorphic Containers (PMCs) are the basis for complex data types and
 object-oriented behavior in Parrot. In PIR, any variable that isn't a
 low-level integer, number, or string is a PMC. PMC variables act much
@@ -1006,9 +1009,9 @@ variable C<$P0>, assigns it the value "That's a bollard and not a
 parrot", and prints it.
 
 Every PMC has a type that indicates what data it can store and what
-behavior it supports. The C<typeof> opcode reports the type of a PMC.
-When the result is a string variable, C<typeof> returns the name of the
-type:
+behavior it supports. The C<typeof>X<typeof opcode> opcode reports the
+type of a PMC.  When the result is a string variable, C<typeof> returns
+the name of the type:
 
 =begin PIR_FRAGMENT
 
@@ -1023,9 +1026,8 @@ for that object type.
 
 =head3 Scalars
 
-X<scalars>
 X<scalar PMCs>
-
+X<PMCs (Polymorphic Containers);scalar>
 In most of the examples shown so far, PMCs duplicate the behavior of integers,
 numbers, and strings. Parrot provides a set of PMCs for this exact purpose.
 C<Integer>, C<Number>, and C<String> are thin overlays on Parrot's low-level
@@ -1085,7 +1087,6 @@ object from an integer, number, or string literal or variable.
 =end PIR_FRAGMENT
 
 X<unboxing>
-
 In the reverse situation, when assigning a PMC to an integer, number, or
 string variable, the PMC also has the ability to convert its value to
 the low-level type.N<The reverse of "boxing" is "unboxing".>
@@ -1109,8 +1110,9 @@ the low-level type.N<The reverse of "boxing" is "unboxing".>
 
 =end PIR_FRAGMENT
 
-This example creates C<Integer>, C<Number>, and C<String> PMCs, and
-shows the effect of assigning each one back to a low-level type.
+This example creates C<Integer>X<Integer PMC>, C<Number>X<Number PMC>,
+and C<String>X<String PMC> PMCs, and shows the effect of assigning each
+one back to a low-level type.
 
 Converting a string to an integer or number only makes sense when the contents
 of the string are a number. The C<String> PMC will attempt to extract a number
@@ -1118,6 +1120,7 @@ from the beginning of the string, but otherwise will return a false value.
 
 =begin sidebar Type Conversions
 
+X<type conversions>
 Parrot also handles conversions between the low-level types where
 possible, converting integers to strings (C<$S0 = $I1>),
 numbers to strings (C<$S0 = $N1>), numbers to integers (C<$I0 = $N1>),
@@ -1128,9 +1131,8 @@ numbers (C<$I0 = $S1> and C<$N0 = $S1>).
 
 =head3 Aggregates
 
-X<aggregates>
 X<aggregate PMCs>
-
+X<PMCs (Polymorphic Containers);aggregate>
 PMCs can define complex types that hold multiple values, commonly called
 aggregates. Two basic aggregate types are ordered arrays and associative
 arrays. The primary difference between these is that ordered arrays use integer
@@ -1141,10 +1143,12 @@ extensive set of operations for manipulating aggregate data types.
 
 =head4 Ordered Arrays
 
-Parrot provides several ordered array PMCs, differentiated by what the array
-should store -- booleans, integers, numbers, strings, or other PMCs -- and
-whether the array should maintain a fixed size or dynamically resize for the
-number of elements it stores.
+X<arrays>
+X<ordered arrays>
+Parrot provides several ordered array PMCs, differentiated by whether
+the array should store booleans, integers, numbers, strings, or other
+PMCs, and whether the array should maintain a fixed size or dynamically
+resize for the number of elements it stores.
 
 The core array types are C<FixedPMCArray>, C<ResizablePMCArray>,
 C<FixedIntegerArray>, C<ResizableIntegerArray>, C<FixedFloatArray>,
@@ -1212,7 +1216,8 @@ removing the zeroth element, and renumbering all the following elements.
 =head4 Associative Arrays
 
 X<associative arrays>
-
+X<hashes>
+X<dictionaries>
 An associative array is an unordered aggregate that uses string keys to
 identify elements.  You may know them as "hash tables", "hashes", "maps", or
 "dictionaries". Parrot provides one core associative array PMC, called C<Hash>.
@@ -1228,9 +1233,9 @@ the key must always be in single or double quotes.
 
 =end PIR_FRAGMENT
 
-Assigning a C<Hash> PMC (without a key) to an integer result fetches the number
-of elements in the hash.N<You may not set a C<Hash> PMC directly to an integer
-value.>
+Assigning a C<Hash>X<Hash PMC> PMC (without a key) to an integer result
+fetches the number of elements in the hash.N<You may not set a C<Hash>
+PMC directly to an integer value.>
 
 =begin PIR_FRAGMENT
 
@@ -1264,8 +1269,7 @@ array:
 =head4 Iterators
 
 X<iterators>
-X<PMC iterators>
-
+X<PMCs (Polymorphic Containers); iterators>
 An iterator extracts values from an aggregate PMC one at a time.  Iterators are
 most useful in loops which perform an action on every element in an aggregate.
 The C<iter> opcode creates a new iterator from an aggregate PMC. It takes one
@@ -1277,8 +1281,9 @@ argument, the PMC over which to iterate:
 
 =end PIR_FRAGMENT
 
-Alternatively, you can also create an iterator by creating a new C<Iterator>
-PMC, passing the aggregate PMC as an initialization parameter to C<new>:
+Alternatively, you can also create an iterator by creating a new
+C<Iterator>X<Iterator PMC> PMC, passing the aggregate PMC as an
+initialization parameter to C<new>:
 
 =begin PIR_FRAGMENT
 
@@ -1286,7 +1291,7 @@ PMC, passing the aggregate PMC as an initialization parameter to C<new>:
 
 =end PIR_FRAGMENT
 
-The C<shift> opcode extracts the next value from the iterator.
+The C<shift>X<shift opcode> opcode extracts the next value from the iterator.
 
 =begin PIR_FRAGMENT
 
@@ -1309,9 +1314,9 @@ ordered array iterator starts from the beginning or end of the array.  These
 two constants have no effect on associative array iterators, as their elements
 are unordered.
 
-Load the iterator constants with the C<.include> directive to include
-the file F<iterator.pasm>. To use them, set the iterator PMC to the
-value of the constant:
+Load the iterator constants with the C<.include>X<.include directive>
+directive to include the file F<iterator.pasm>. To use them, set the
+iterator PMC to the value of the constant:
 
 =begin PIR_FRAGMENT
 
@@ -1385,6 +1390,8 @@ loop, marked by C<iter_loop>.
 
 =head4 Multi-level Keys
 
+X<keys>
+X<multi-level keys>
 Aggregates can hold any data type, including other aggregates.
 Accessing elements deep within nested data structures is a common
 operation, so PIR provides a way to do it in a single instruction.
@@ -1405,7 +1412,7 @@ individual key separated by a semicolon.
 =end PIR_FRAGMENT
 
 This example builds up a data structure of an associative array
-containing an ordered array. The complex key C<$P0["answer";$I1]>
+containing an ordered array. The complex key C<["answer"; $I1]>
 retrieves an element of the array within the hash. You can also set a
 value using a complex key:
 
@@ -1420,9 +1427,7 @@ integer or string values.
 
 =head3 Copying and Cloning
 
-X<PMCs; copy>
-X<PMCs; clone>
-
+X<PMCs (Polymorphic Containers); copying vs. cloning>
 PMC registers don't directly store the data for a PMC, they only store a
 pointer to the structure that stores the data. As a result, the C<=>
 operator doesn't copy the entire PMC, it only copies the pointer to the
@@ -1446,7 +1451,7 @@ internal data structure.  Setting C<$P1> to the string literal
 C<$P1> refer to the C<String> PMC "Zaphod".
 
 The C<clone> X<clone opcode> opcode makes a deep copy of a PMC, instead
-of copying the pointer like C<=> does.
+of copying the pointer like C<=>X<= operator> does.
 
 =begin PIR_FRAGMENT
 
@@ -1462,8 +1467,8 @@ of copying the pointer like C<=> does.
 This example creates an identical, independent clone of the PMC in
 C<$P0> and puts it in C<$P1>. Later changes to C<$P0> have no effect on
 the PMC in C<$P1>.N<With low-level strings, the copies created by
-C<clone> are copy-on-write exactly the same as the copy created by
-C<=>.>
+C<clone> are copy-on-writeX<copy-on-write> exactly the same as the copy
+created by C<=>.>
 
 To assign the I<value> of one PMC to another PMC that already exists, use the
 C<assign>X<assign opcode> opcode:
@@ -1490,7 +1495,7 @@ the source object (as does C<=>).
 =head3 Properties
 
 X<properties>
-X<PMCs; properties>
+X<PMCs (Polymorphic Containers); properties>
 
 PMCs can have additional values attached to them as "properties" of the
 PMC. Most properties hold extra metadata about the PMC.
@@ -1558,9 +1563,7 @@ Fetching the value of a non-existent property returns an C<Undef> PMC.
 
 =head3 Vtable Functions
 
-X<vtables>
 X<vtable functions>
-
 You may have noticed that a simple operation sometimes has a different effect
 on different PMCs. Assigning a low-level integer value to a C<Integer> PMC sets
 its integer value of the PMC, but assigning that same integer to an ordered
@@ -1574,6 +1577,7 @@ functions. When you perform an assignment like:
 ... Parrot calls the C<set_integer_native> vtable function on the PMC referred
 to by register C<$P0>.
 
+X<polymorphic substitution>
 Parrot has a fixed set of vtable functions, so that any PMC can stand in for
 any other PMC; they're polymorphic.N<Hence the name "Polymorphic Container".>
 Every PMC defines some behavior for every vtable function. The default behavior
@@ -1585,7 +1589,7 @@ vtable set.
 =head2 Namespaces
 
 X<namespaces>
-
+X<global variables>
 Parrot performs operations on variables stored in small register sets local to
 each subroutine. For more complex tasks,N<...and for most high-level languages
 that Parrot supports.> it's also useful to have variables that live beyond the
@@ -1593,7 +1597,8 @@ scope of a single subroutine. These variables may be global to the entire
 program or restricted to a particular library. Parrot stores long-lived
 variables in a hierarchy of namespaces.
 
-The opcodes C<set_global> and C<get_global> store and fetch a variable in a
+The opcodes C<set_global>X<set_global opcode> and
+C<get_global>X<get_global opcode> store and fetch a variable in a
 namespace:
 
 =begin PIR_FRAGMENT
@@ -1665,10 +1670,11 @@ X<namespaces; root>
 
 The C<set_global> and C<get_global> opcode operate on the currently selected
 namespace. The default top-level namespace is the "root" namespace. The
-C<.namespace> directive allows you to declare any namespace for subsequent
-code.  If you select the General Electric namespace, then store or retrieve the
-C<bill> variable without specifying a namespace, you will work with the General
-Electric bill, not the Duck bill.
+C<.namespace>X<.namespace directive> directive allows you to declare any
+namespace for subsequent code.  If you select the General Electric
+namespace, then store or retrieve the C<bill> variable without
+specifying a namespace, you will work with the General Electric bill,
+not the Duck bill.
 
   .namespace ["General";"Electric"]
   #...
@@ -1682,10 +1688,12 @@ key is empty.
   .namespace [ ]
 
 When you need to be absolutely sure you're working with the root namespace
-regardless of what namespace is currently active, use the C<set_root_global>
-and C<get_root_global> opcodes instead of C<set_global> and C<get_global>. This
-example sets and retrieves the variable C<bill> in the Dollar namespace, which
-is directly under the root namespace:
+regardless of what namespace is currently active, use the
+C<set_root_global>X<set_root_global opcode> and
+C<get_root_global>X<get_root_global opcode> opcodes instead of
+C<set_global> and C<get_global>. This example sets and retrieves the
+variable C<bill> in the Dollar namespace, which is directly under the
+root namespace:
 
 =begin PIR_FRAGMENT
 
@@ -1694,17 +1702,22 @@ is directly under the root namespace:
 
 =end PIR_FRAGMENT
 
-To prevent further collisions, each high-level language running on Parrot
-operates within its own virtual namespace root. The default virtual root is
-C<parrot>, and the C<.HLL> directive (for I<H>igh-I<L>evel I<L>anguage) selects
-an alternate virtual root for a particular high-level language:
+X<HLL namespaces>
+X<namespaces; hll>
+To prevent further collisions, each high-level language running on
+Parrot operates within its own virtual namespace root. The default
+virtual root is C<parrot>, and the C<.HLL>X<.HLL directive> directive
+(for I<H>igh-I<L>evel I<L>anguage) selects an alternate virtual root for
+a particular high-level language:
 
   .HLL 'ruby'
 
-The C<set_hll_global> and C<get_hll_global> opcodes are like C<set_root_global>
-and C<get_root_global>, except they always operate on the virtual root for the
-currently selected HLL. This example stores and retrieves a C<bill> variable in
-the Euro namespace, under the Dutch HLL namespace root:
+The C<set_hll_global>X<set_hll_global opcode> and
+C<get_hll_global>X<get_hll_global opcode> opcodes are like
+C<set_root_global> and C<get_root_global>, except they always operate on
+the virtual root for the currently selected HLL. This example stores and
+retrieves a C<bill> variable in the Euro namespace, under the Dutch HLL
+namespace root:
 
   .HLL 'Dutch'
   #...
@@ -1713,15 +1726,17 @@ the Euro namespace, under the Dutch HLL namespace root:
 
 =head3 NameSpace PMC
 
+X<NameSpace PMC>
 Namespaces are just PMCs. They implement the standard vtable functions
-and a few extra methods. The C<get_namespace> opcode retrieves the
-currently selected namespace as a PMC object:
+and a few extra methods. The C<get_namespace>X<get_namespace opcode>
+opcode retrieves the currently selected namespace as a PMC object:
 
   $P0 = get_namespace
 
-The C<get_root_namespace> opcode retrieves the namespace object for the root
-namespace.  The C<get_hll_namespace> opcode retrieves the virtual root for the
-currently selected HLL.
+The C<get_root_namespace>X<get_root_namespace opcode> opcode retrieves
+the namespace object for the root namespace.  The
+C<get_hll_namespace>X<get_hll_namespace opcode> opcode retrieves the
+virtual root for the currently selected HLL.
 
   $P0 = get_root_namespace
   $P0 = get_hll_namespace
@@ -1741,46 +1756,50 @@ from that namespace:
   $P0 = get_hll_namespace ["Euro"]
   $P1 = get_global $P0, "bill"
 
-Namespaces also provide a set of methods to provide more complex behavior than
-the standard vtable functions allow. The C<get_name> method returns the name of
-the namespace as a C<ResizableStringArray>:
+Namespaces also provide a set of methods to provide more complex
+behavior than the standard vtable functions allow. The
+C<get_name>X<get_name method> method returns the name of the namespace
+as a C<ResizableStringArray>:
 
   $P3 = $P0.'get_name'()
 
-The C<get_parent> method retrieves a namespace object for the parent
-namespace that contains this one:
+The C<get_parent>X<get_parent method> method retrieves a namespace
+object for the parent namespace that contains this one:
 
   $P5 = $P0.'get_parent'()
 
-The C<get_class> method retrieves any Class PMC associated with the
-namespace:
+The C<get_class>X<get_class method> method retrieves any Class PMC
+associated with the namespace:
 
   $P6 = $P0.'get_class'()
 
-The C<add_var> and C<find_var> methods store and retrieve variables in a
-namespace in a language-neutral way:
+The C<add_var>X<add_var method> and C<find_var>X<find_var method>
+methods store and retrieve variables in a namespace in a
+language-neutral way:
 
   $P0.'add_var'("bee", $P3)
   $P1 = $P0.'find_var'("bee")
 
-The C<find_namespace> method looks up a namespace, just like the
-C<get_namespace> opcode:
+The C<find_namespace>X<find_namespace method> method looks up a
+namespace, just like the C<get_namespace> opcode:
 
   $P1 = $P0.'find_namespace'("Duck")
 
-The C<add_namespace> method adds a new namespace as a child of the
-namespace object:
+The C<add_namespace>C<add_namespace method> method adds a new namespace
+as a child of the namespace object:
 
   $P0.'add_namespace'($P1)
 
-The C<make_namespace> method looks up a namespace as a child of the
-namespace object and returns it. If the requested namespace doesn't
-exist, C<make_namespace> creates a new one and adds it under that name:
+The C<make_namespace>X<make_namespace method> method looks up a
+namespace as a child of the namespace object and returns it. If the
+requested namespace doesn't exist, C<make_namespace> creates a new one
+and adds it under that name:
 
   $P1 = $P0.'make_namespace'("Duck")
 
 =head3 Aliasing
 
+X<aliasing>
 Just like regular assignment, the various operations to store a variable in a
 namespace only store a pointer to the PMC. If you modify the local PMC after
 storing in a namespace, those changes will also appear in the stored global. To

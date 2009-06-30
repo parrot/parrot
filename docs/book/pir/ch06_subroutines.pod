@@ -2,16 +2,17 @@
 
 =head1 Subroutines
 
-X<subroutine>
+X<subroutines>
 Subroutines in PIR are roughly equivalent to the subroutines or methods
 of a high-level language. They're the most basic building block of code
 reuse in PIR. Each high-level language has different syntax and
 semantics for defining and calling subroutines, so Parrot's subroutines
 need to be flexible enough to handle a broad array of behaviors.
 
-A subroutine declaration starts with the C<.sub> directive and ends with
-the C<.end> directive. This example defines a subroutine named
-C<hello> that prints a string "Hello, Polly.":
+A subroutine declaration starts with the C<.sub>X<.sub directive>
+directive and ends with the C<.end>X<.end directive> directive. This
+example defines a subroutine named C<hello> that prints a string "Hello,
+Polly.":
 
 =begin PIR
 
@@ -35,16 +36,15 @@ C<fact> with two arguments and assigns the result to C<$I0>:
 
 =head2 Modifiers
 
-X<modifier>
-X<subroutines; modifier>
-
+X<modifiers>
+X<subroutines; modifiers>
 A modifier is an annotation to a basic subroutine declarationN<or parameter
 declaration> that selects an optional feature. Modifiers all start with a colon
 (C<:>).  A subroutine can have multiple modifiers.
 
 When you execute a PIR file as a program, Parrot normally runs the first
 subroutine it encounters, but you can mark any subroutine as the first
-one to run with the C<:main> modifier:
+one to run with the C<:main>X<:main subroutine modifier> modifier:
 
 =begin PIR
 
@@ -63,19 +63,23 @@ subroutine is first in the source code, but C<second> has the C<:main> modifier.
 Parrot will never call C<first> in this program. If you remove the C<:main>
 modifier, the code will print "Polly want a cracker?" instead.
 
-The C<:load> modifier tells Parrot to run the subroutine when it loads the
-current file as a library.  The C<:init> modifier tells Parrot to run the
+The C<:load>X<:load subroutine modifier> modifier tells Parrot to run
+the subroutine when it loads the current file as a library.  The
+C<:init>X<:init subroutine modifier> modifier tells Parrot to run the
 subroutine only when it executes the file as a program (and I<not> as a
-library).  The C<:immediate> modifier tells Parrot to run the subroutine as
-soon as it gets compiled. The C<:postcomp> modifier also runs the subroutine
-right after compilation, but only if the subroutine was declared in the main
-program file (when I<not> loaded as a library).
+library).  The C<:immediate>X<:immediate subroutine modifier> modifier
+tells Parrot to run the subroutine as soon as it gets compiled. The
+C<:postcomp>X<:postcomp subroutine modifier> modifier also runs the
+subroutine right after compilation, but only if the subroutine was
+declared in the main program file (when I<not> loaded as a library).
 
-By default, Parrot stores all subroutines in the namespace currently active at
-the point of their declaration. The C<:anon> modifier tells Parrot not to store
-the subroutine in the namespace. The C<:nsentry> modifier stores the subroutine
-in the currenly active namespace with a different name. For example, Parrot
-will store this subroutine in the current namespace as C<bar>, not C<foo>:
+By default, Parrot stores all subroutines in the namespace currently
+active at the point of their declaration. The C<:anon>X<:anon subroutine
+modifier> modifier tells Parrot not to store the subroutine in the
+namespace. The C<:nsentry>X:nsentry subroutine modifier> modifier stores
+the subroutine in the currenly active namespace with a different name.
+For example, Parrot will store this subroutine in the current namespace
+as C<bar>, not C<foo>:
 
 =begin PIR
 
@@ -89,6 +93,7 @@ Chapter 7 on I<"Classes and Objects"> explains other subroutine modifiers.
 
 =head2 Parameters and Arguments
 
+X<subroutines; parameters>
 X<.param directive>
 The C<.param> directive defines the parameters for the subroutine and
 creates local named variables for them (similar to C<.local>):
@@ -141,11 +146,11 @@ and C<fact>:
 
 =end PIR
 
-This example defines two local named variables, C<count> and C<product>, and
-assigns them the values 1 and 5. It calls the C<fact> subroutine with both
-variables as arguments. The C<fact> subroutine uses C<.param> to retrieve
-these parameters and C<.return> to return the result.  The final printed result
-is 120.
+This example defines two local named variables, C<count> and C<product>,
+and assigns them the values 1 and 5. It calls the C<fact> subroutine
+with both variables as arguments. The C<fact> subroutine uses the
+C<.param> directive to retrieve these parameters and the C<.return>
+directive to return the result.  The final printed result is 120.
 
 =head3 Positional Parameters
 
@@ -180,17 +185,18 @@ error.
 
 =head3 Named Parameters
 
-X<named parameters> Named parameters are an alternative to positional
-parameters. Instead of passing parameters by their position in the string,
-Parrot assigns arguments to parameters by their name.  Consequencly you may
-pass named parameters in any order.  Declare named parameters with with the
-C<:named> modifier.
+X<named parameters>
+Named parameters are an alternative to positional parameters. Instead of
+passing parameters by their position in the string, Parrot assigns
+arguments to parameters by their name.  Consequencly you may pass named
+parameters in any order.  Declare named parameters with with the
+C<:named>X<:named parameter modifier> modifier.
 
-This example declares two named parameters in the subroutine C<shoutout> --
-C<name> and C<years> -- each declared with C<:named> and followed by the name
-to use when pass arguments. The string name can match the parameter name (as
-with the C<name> parameter), but it can also be different (as with the C<years>
-parameter):
+This example declares two named parameters in the subroutine C<shoutout>
+-- C<name> and C<years> -- each declared with the C<:named> modifier and
+followed by the name to use when pass arguments. The string name can
+match the parameter name (as with the C<name> parameter), but it can
+also be different (as with the C<years> parameter):
 
 =begin PIR
 
@@ -229,18 +235,20 @@ The order of the arguments does not matter:
 
 =head3 Optional Parameters
 
-X<optional parameters> Another alternative to the required positional
-parameters is optional parameters.  Some parameters are unnecessary for certain
-calls.  Parameters marked with the C<:optional> modifier do not produce errors
-about invalid parameter counts if they are not present.  A subroutine with
-optional parameters should gracefully handle the missing argument, either by
-providing a default value or by performing an alternate action that doesn't
-need that value.
+X<optional parameters>
+Another alternative to the required positional parameters is optional
+parameters.  Some parameters are unnecessary for certain calls.
+Parameters marked with the C<:optional>X<:optional parameter modifier>
+modifier do not produce errors about invalid parameter counts if they
+are not present.  A subroutine with optional parameters should
+gracefully handle the missing argument, either by providing a default
+value or by performing an alternate action that doesn't need that value.
 
-Checking the value of the optional parameter isn't enough to know whether the
-call passed such an argument, because the user might have passed a null or
-false value intentionally. PIR also provides an C<:opt_flag> modifier for a
-boolean check whether the caller passed an argument:
+Checking the value of the optional parameter isn't enough to know
+whether the call passed such an argument, because the user might have
+passed a null or false value intentionally. PIR also provides an
+C<:opt_flag>X<:opt_flag parameter modifier> modifier for a boolean check
+whether the caller passed an argument:
 
 =begin PIR_FRAGMENT
 
@@ -278,8 +286,8 @@ argument list.  It's purely for bookkeeping within the subroutine.
 
 Optional parameters can be positional or named parameters. Optional parameters
 must appear at the end of the list of positional parameters after all the
-required parameters.  An optional I<and> named parameter must immediately
-precede its C<:opt_flag> parameter:
+required parameters.  An optional parameter must immediately
+precede its C<:opt_flag> parameter whether it's named or positional:
 
 =begin PIR
 
@@ -302,13 +310,12 @@ You can call this subroutine with a named argument or with no argument:
 
 =head3 Aggregating Parameters
 
-X<subroutines; aggregate>
-X<slurpy>
-
-Another alternative to a sequence of positional parameters is an aggregating
-parameter which bundles a list of arguments into a single parameter. The
-C<:slurpy> created a single array parameter containing all the provided
-arguments:
+X<aggregating parameters>
+X<:slurpy parameter modifier>
+Another alternative to a sequence of positional parameters is an
+aggregating parameter which bundles a list of arguments into a single
+parameter. The C<:slurpy> modifier creates a single array parameter
+containing all the provided arguments:
 
 =begin PIR_FRAGMENT
 
@@ -348,9 +355,8 @@ subroutine call:
 
 =head3 Flattening Arguments
 
-X<subroutines; flattening>
-X<flattening>
-
+X<flattening arguments>
+X<:flat argument modifier>
 A flattening argument breaks up a single argument to fill multiple parameters.
 It's the complement of an aggregating parameter.  The C<:flat> modifier splits
 arguments (and return values) into a flattened list.  Passing an array PMC to a
@@ -404,8 +410,7 @@ results, access them individually, or even modify them.
 
 =head2 Compiling and Loading Libraries
 
-X<PIR; libraries>
-
+X<libraries>
 In addition to running PIR files on the command-line, you can also load a
 library of pre-compiled bytecode directly into your PIR source file.  The
 C<load_bytecode>X<load_bytecode opcode> opcode takes a single argument: the
@@ -421,7 +426,8 @@ containing a single subroutine:
 
 =end PIR
 
-... and compile it to bytecode using the C<-o> command-line switch:
+... and compile it to bytecode using the C<-o> command-line switchX<-o
+command-line switch>:
 
   $ parrot -o foo_file.pbc foo_file.pir
 
@@ -453,11 +459,10 @@ a compiler registered for that type of file:
 
 =head2 Sub PMC
 
-X<PMCs; Sub>
-
+X<Sub PMC>
 Subroutines are a PMC type in Parrot. You can store them in PMC registers and
 manipulate them just as you do with other PMCs.  Parrot stores subroutines in
-namespaces; retrieve them with the C<get_global> opcode:
+namespaces; retrieve them with the C<get_global>X<get_global opcode> opcode:
 
 =begin PIR_FRAGMENT
 
@@ -492,6 +497,7 @@ You can get or even I<change> its name:
 
 =end PIR_FRAGMENT
 
+X<inspect opcode>
 You can get a hash of the complete metadata for the subroutine:
 
 =begin PIR_FRAGMENT
@@ -539,8 +545,8 @@ individual pieces of metadata:
 
 =end PIR_FRAGMENT
 
-The C<arity> method on the sub object returns the total number of defined
-parameters of all varieties:
+The C<arity>X<arity method> method on the sub object returns the total
+number of defined parameters of all varieties:
 
 =begin PIR_FRAGMENT
 
@@ -548,8 +554,8 @@ parameters of all varieties:
 
 =end PIR_FRAGMENT
 
-The C<get_namespace> method on the sub object fetches the namespace PMC which
-contains the Sub:
+The C<get_namespace>X<get_namespace method> method on the sub object
+fetches the namespace PMC which contains the Sub:
 
 =begin PIR_FRAGMENT
 
@@ -582,8 +588,10 @@ C<generated> and then invokes it as a subroutine:
 =begin PIR_FRAGMENT
 
   .local pmc compiler, generated
-  compiler = compreg "PIR"                
-  generated = compiler(".sub foo\n$S1 = 'in eval'\nprint $S1\n.end")
+  .local string source
+  source    = ".sub foo\n$S1 = 'in eval'\nprint $S1\n.end"
+  compiler  = compreg "PIR"                
+  generated = compiler(source)
   generated()
   say "back again"
 
@@ -615,7 +623,7 @@ C.> In PIR, the section of code between a C<.sub> and a C<.end> defines
 a scope for lexical variables.
 
 While Parrot stores global variables in namespaces, it stores lexical variables
-in lexical padsN<Think of a pad like a house.>.  Each lexical scope has its own
+in lexical padsN<Think of a pad like a box to hold a collection of lexical variables.>.  Each lexical scope has its own
 pad. The C<store_lex> opcode stores a lexical variable in the current pad.  The
 C<find_lex> opcode retrieves a variable from the current pad:
 
@@ -623,15 +631,15 @@ C<find_lex> opcode retrieves a variable from the current pad:
 
   $P0 = new "Integer"       # create a variable
   $P0 = 10                  # assign value to it
-  store_lex "foo", $P0      # store the var with the variable name "foo"
+  store_lex "foo", $P0      # store with lexical name "foo"
   # ...
-  $P1 = find_lex "foo"      # get the var "foo" into $P1
+  $P1 = find_lex "foo"      # get the lexical "foo" into $P1
   say $P1                   # prints 10
 
 =end PIR_FRAGMENT
 
-The C<.lex> command defines a local variable that follows these scoping
-rules:
+The C<.lex>X<.lex directive> directive defines a local variable that
+follows these scoping rules:
 
 =begin PIR_FRAGMENT
 
@@ -642,6 +650,8 @@ rules:
 
 =head3 LexPad and LexInfo PMCs
 
+X<LexPad PMC>
+X<LexInfo PMC>
 Parrot uses two different PMCs to store information about a subroutine's
 lexical variables: the C<LexPad> PMC and the C<LexInfo> PMC.  Neither of these
 PMC types are usable directly from PIR code; Parrot uses them internally to
@@ -662,8 +672,8 @@ C<LexPad> PMC for subs that have a C<LexInfo> PMC already. It does so
 for each invocation of the subroutine, which allows for recursive
 subroutine calls without overwriting lexical variables.
 
-The C<get_lexinfo> method on a sub retrieves its associated C<LexInfo>
-PMC:
+The C<get_lexinfo>X<get_lexinfo method> method on a sub retrieves its
+associated C<LexInfo> PMC:
 
 =begin PIR_FRAGMENT
 
@@ -672,12 +682,15 @@ PMC:
 
 =end PIR_FRAGMENT
 
-The C<LexInfo> PMC supports a few introspection operations:
+The C<LexInfo> PMC supports a few introspection operations. The
+C<elements> opcode retrieves the number of elements it contains.  String
+key access operations retrieve entries from the C<LexInfo> PMC as if it
+were an associative array.
 
 =begin PIR_FRAGMENT
 
-  $I0 = elements $P1    # Get the number of lexical variables from it
-  $P0 = $P1["name"]     # Get the entry for lexical variable "name"
+  $I0 = elements $P1    # number of lexical variables
+  $P0 = $P1["name"]     # lexical variable "name"
 
 =end PIR_FRAGMENT
 
@@ -686,13 +699,14 @@ subroutine, but they are of limited use in PIR.
 
 =head3 Nested Scopes
 
+X<nested lexical scopes>
 PIR has no separate syntax for blocks or lexical scopes; subroutines
 define lexical scopes in PIR. Because PIR disallows nested
 C<.sub>/C<.end> declarations, it needs a way to identify which lexical
-scopes are the parents of inner lexical scopes. The C<:outer> modifier
-declares a subroutine as a nested inner lexical scope of another
-existing subroutine. The modifier takes one argument, the name of the
-outer subroutine:
+scopes are the parents of inner lexical scopes. The C<:outer>X<:outer
+subroutine modifier> modifier declares a subroutine as a nested inner
+lexical scope of another existing subroutine. The modifier takes one
+argument, the name of the outer subroutine:
 
 =begin PIR
 
@@ -707,8 +721,9 @@ outer subroutine:
 =end PIR
 
 Sometimes a name alone isn't sufficient to uniquely identify the outer
-subroutine. The C<:subid> modifier allows the outer subroutine to declare a
-truly unique name usable with C<:outer>:
+subroutine. The C<:subid>X<:subid subroutine modifier> modifier allows
+the outer subroutine to declare a truly unique name usable with
+C<:outer>:
 
 =begin PIR
 
@@ -722,7 +737,8 @@ truly unique name usable with C<:outer>:
 
 =end PIR
 
-The C<get_outer> method on a C<Sub> PMC retrieves its C<:outer> sub.
+The C<get_outer>X<get_outer method> method on a C<Sub> PMC retrieves its
+C<:outer> sub.
 
 =begin PIR_FRAGMENT
 
@@ -813,21 +829,21 @@ Note that you can only store PMCs -- not primitive types -- as lexicals.
 =head2 Multiple Dispatch
 
 X<multiple dispatch>
-X<multis>
-X<signature>
-
+X<subroutines; signatures>
 Multiple dispatch subroutines (or I<multis>) have several variants with the
 same name but different sets of parameters. The set of parameters for a
 subroutine is its I<signature>. When a multi is called, the dispatch operation
 compares the arguments passed in to the signatures of all the variants and
 invokes the subroutine with the best match.
 
-Parrot stores all multiple dispatch subs with the same name in a namespace
-within a single PMC called a C<MultiSub>. The C<MultiSub> is an invokable list
-of subroutines. When a multiple dispatch sub is called, the C<MultiSub> PMC
-searches its list of variants for the best matching candidate.
+Parrot stores all multiple dispatch subs with the same name in a
+namespace within a single PMC called a C<MultiSub>X<MultiSub PMC>. The
+C<MultiSub> is an invokable list of subroutines. When a multiple
+dispatch sub is called, the C<MultiSub> PMC searches its list of
+variants for the best matching candidate.
 
-The C<:multi> modifier on a C<.sub> declares a C<MultiSub>:
+The C<:multi>X<:multi subroutine modifier> modifier on a C<.sub>
+declares a C<MultiSub>:
 
 =begin PIR
 
@@ -876,15 +892,15 @@ to denote a wildcard, and a string which names a PMC type:
 
 =begin PIR
 
-  .sub 'Add' :multi(I, I)          # Two integers
+  .sub 'Add' :multi(I, I)          # two integers
     #...
   .end
 
-  .sub 'Add' :multi(I, 'Float')    # An integer and Float PMC
+  .sub 'Add' :multi(I, 'Float')    # integer and Float PMC
     #...
   .end
 
-  .sub 'Add' :multi('Integer', _)  # An Integer PMC and a wildcard
+  .sub 'Add' :multi('Integer', _)  # Integer PMC and wildcard
     #...
   .end
 
@@ -892,14 +908,13 @@ to denote a wildcard, and a string which names a PMC type:
 
 When you call a C<MultiSub>, Parrot will try to take the most specific
 best-match variant, but will fall back to more general variants if it
-cannot find a perfect match.  If you call C<'Add'(1, 2)>, Parrot will
-dispatch to the C<(I, I)> variant. If you call C<'Add'(1, "hi")>, Parrot
+cannot find a perfect match.  If you call C<Add> with C<(1, 2)>, Parrot will
+dispatch to the C<(I, I)> variant. If you call it with C<(1, "hi")>, Parrot
 will match the C<(I, _)> variant, as the string in the second argument
 doesn't match C<I> or C<Float>.  Parrot can also promote one of the I,
 N, or S values to an Integer, Float, or String PMC.
 
-X<Manhattan distance>
-
+X<Manhattan Distance>
 To make the decision about which multi variant to call, Parrot
 calculates the I<Manhattan Distance> between the argument signature and
 the parameter signature of each variant.  Every difference between each
@@ -915,7 +930,7 @@ multis and a limited number of data types.
 =head2 Continuations
 
 X<continuations>
-
+X<subroutines; continuations>
 Continuations are subroutines that take snapshots of control flow. They are
 frozen images of the current execution state of the VM. Once you have a
 continuation, you can invoke it to return to the point where the continuation
@@ -933,7 +948,7 @@ Continuations are like any other PMC; create one with the C<new> opcode:
 The new continuation starts in an undefined state. If you attempt to invoke a
 new continuation without initializing it, Parrot will throw an exception.  To
 prepare the continuation for use, assign it a destination label with the
-C<set_addr> opcode:
+C<set_addr>X<set_addr opcode> opcode:
 
 =begin PIR_FRAGMENT
 
@@ -959,9 +974,8 @@ the continuation, you cannot pass arguments or obtain return values.
 
 =head3 Continuation Passing Style
 
-X<continuation passing style>
-X<CPS>
-
+X<continuation passing style (CPS)>
+X<CPS (continuation passing style)>
 Parrot uses continuations internally for control flow. When Parrot
 invokes a subroutine, it creates a continuation representing the current
 point in the program.  It passes this continuation as an invisible
@@ -971,7 +985,7 @@ continuation.  If you have a continuation, you can invoke it to return
 to its point of creation any time you want.
 
 This type of flow control -- invoking continuations instead of
-performing bare jumps -- is Continuation Passing Style (CPS).
+performing bare jumps -- is called Continuation Passing Style (CPS).
 
 =head3 Tailcalls
 
@@ -997,7 +1011,6 @@ safe and correct to use the same return continuation that C<add_two> uses. The
 two subroutine calls can share a return continuation.
 
 X<.tailcall directive>
-
 PIR provides the C<.tailcall> directive to identify similar situations.  Use it
 in place of the C<.return> directive. C<.tailcall> performs this optimization
 by reusing the return continuation of the parent subroutine to make the
@@ -1031,9 +1044,8 @@ This example prints the correct value C<7>.
 
 =head2 Coroutines
 
-X<Coroutines>
+X<coroutines>
 X<subroutines; coroutines>
-
 Coroutines are similar to subroutines except that they have an internal
 notion of I<state>.  In addition to performing a normal C<.return> to
 return control flow back to the caller and destroy the execution
@@ -1048,10 +1060,10 @@ environment is the same as it was when the coroutine C<.yield>ed. This
 means that the parameter values don't change, even if the next
 invocation of the coroutine had different arguments passed in.
 
-Coroutines look like ordinary subroutines. They do not require any special
-modifier or any special syntax to mark them as being a coroutine. What sets
-them apart is the use of the C<.yield> directive.  C<.yield> plays several
-roles:
+Coroutines look like ordinary subroutines. They do not require any
+special modifier or any special syntax to mark them as being a
+coroutine. What sets them apart is the use of the C<.yield>X<.yield
+directive> directive. C<.yield> plays several roles:
 
 =over 4
 
@@ -1107,23 +1119,23 @@ environment.  At the next call to the coroutine, it picks up where it left off.
 
 =head2 Native Call Interface
 
-The X<NCI (Native Call Interface)> Native Call Interface (NCI) is a
+The X<NCI (native call interface)> Native Call Interface (NCI) is a
 special version of the Parrot calling conventions for calling functions
-with a known signature in shared C libraries.  This is a simplified
+in shared C libraries with a known signature.  This is a simplified
 version of the first test in F<t/pmc/nci.t>:
 
 =begin PIR_FRAGMENT
 
     .local pmc library
-    library = loadlib "libnci_test"         # get object for a shared lib
+    library = loadlib "libnci_test"         # library object
     say "loaded"
 
     .local pmc ddfunc
-    ddfunc = dlfunc library, "nci_dd", "dd" # obtain the function object
+    ddfunc = dlfunc library, "nci_dd", "dd" # function object
     say "dlfunced"
 
     .local num result
-    result = ddfunc( 4.0 )                  # the functions doubles its arg
+    result = ddfunc( 4.0 )                  # call the function
 
     ne result, 8.0, nok_1
     say "ok 1"
@@ -1135,7 +1147,7 @@ version of the first test in F<t/pmc/nci.t>:
 
 =end PIR_FRAGMENT
 
-This example shows two new instructions: C<loadlib> and C<dlfunc>. The
+This example shows two new opcodes: C<loadlib> and C<dlfunc>. The
 C<loadlib>X<loadlib opcode> opcode obtains a handle for a shared library. It
 searches for the shared library in the current directory, in
 F<runtime/parrot/dynext>, and in a few other configured directories. It also
@@ -1160,7 +1172,7 @@ Z<CHP-6-TABLE-1>
 
 =cell Character
 
-=cell Register set
+=cell Register
 
 =cell C type
 

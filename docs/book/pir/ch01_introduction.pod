@@ -26,6 +26,7 @@ workings of the virtual machine.
 
 =head2 Parrot Resources
 
+X<www.parrot.org website>
 The starting point for all things related to Parrot is the main website
 U<http://www.parrot.org/>. The site lists additional resources, well as recent
 news and information about the project.
@@ -35,28 +36,31 @@ development and community.
 
 =head3 Documentation
 
+X<docs.parrot.org website>
+X<online documentation (docs.parrot.org)>
 Parrot includes extensive documentation in the distribution. The full
 documentation for the latest release is available online at
 U<http://docs.parrot.org/>.
 
 =head3 Mailing Lists
 
-X<parrot-dev (Parrot mailing list)>
+X<parrot-dev mailing list>
 X<mailing lists>
 
-The primary mailing list for Parrot is I<parrot-dev@lists.parrot.org>.  If
+The primary mailing list for Parrot is I<parrot-dev>.N<parrot-dev@lists.parrot.org>  If
 you're interested in developing Parrot, the I<parrot-commits> and
 I<parrot-tickets> lists are useful.  More information on the Parrot mailing
-lists, as well as subscription options, is available at
+lists, as well as subscription options, is available on the mailing list
+info page 
 U<http://lists.parrot.org/mailman/listinfo>.
 
-The archives for I<parrot-dev> are also available on Google Groups at
-U<http://groups.google.com/group/parrot-dev> and via NNTP at
+The archives for I<parrot-dev> are available on Google Groups at
+U<http://groups.google.com/group/parrot-dev> and as NNTP at
 U<nntp://news.gmane.org/gmane.comp.compilers.parrot.devel>.
 
 =head3 IRC
 
-X<#parrot (Parrot IRC channel)>
+X<#parrot (IRC channel)>
 X<IRC channel (#parrot)>
 
 Parrot developers and users congregate on IRC at C<#parrot> on the
@@ -68,10 +72,11 @@ Parrot in real time.
 X<trac.parrot.org website>
 X<issue tracking (trac.parrot.org)>
 
-Parrot developers track issues with a Trac site at U<https://trac.parrot.org/>.
-Users can submit new tickets and track the status of existing tickets.  The
-site also includes a wiki used in project development, a source code browser,
-and the project roadmap.
+Parrot developers track bugs, feature requests, and roadmap tasks at
+U<https://trac.parrot.org/>, the open source Trac issue tracker. Users
+can submit new tickets and track the status of existing tickets.  The
+site also includes a wiki used in project development, a source code
+browser, and the project roadmap.
 
 =head2 Parrot Development
 

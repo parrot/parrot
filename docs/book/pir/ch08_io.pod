@@ -2,18 +2,15 @@
 
 =head1 I/O
 
-X<FileHandle>
-X<PMCs; FileHandle>
-X<Socket>
-X<PMCs; Socket>
+X<FileHandle PMC>
 Parrot handles all I/O in Parrot with a set of PMCs. The C<FileHandle> PMC
 takes care of reading from and writing to files and file-like streams.  The
 C<Socket> PMC takes care of network I/O.
 
 =head2 FileHandle Opcodes
 
-The C<open> opcode opens a new filehandle. It takes a string argument,
-which is the path to the file:
+The C<open>X<open opcode> opcode opens a new filehandle. It takes a
+string argument, which is the path to the file:
 
 =begin PIR_FRAGMENT
 
@@ -38,11 +35,12 @@ You can combine modes; a handle that can read and write uses the mode string
 C<rw>. A handle that can read and write but will not overwrite the existing
 contents uses C<ra> instead.
 
-The C<close> opcode closes a filehandle when it's no longer needed.
-Closing a filehandle doesn't destroy the object, it only makes that
-filehandle object available for opening a different file.N<It's
-generally not a good idea to manually close the standard input, standard
-output, or standard error filehandles, though you can recreate them.>
+The C<close>X<close opcode> opcode closes a filehandle when it's no
+longer needed.  Closing a filehandle doesn't destroy the object, it only
+makes that filehandle object available for opening a different
+file.N<It's generally not a good idea to manually close the standard
+input, standard output, or standard error filehandles, though you can
+recreate them.>
 
 =begin PIR_FRAGMENT
 
@@ -50,8 +48,8 @@ output, or standard error filehandles, though you can recreate them.>
 
 =end PIR_FRAGMENT
 
-The C<print> opcode prints a string argument or the string form of an
-integer, number, or PMC to a filehandle:
+The C<print>X<print opcode> opcode prints a string argument or the
+string form of an integer, number, or PMC to a filehandle:
 
 =begin PIR_FRAGMENT
 
@@ -68,10 +66,10 @@ output:
 
 =end PIR_FRAGMENT
 
-The C<say> opcode also prints to standard output, but it appends a
-trailing newline to whatever it prints. Another opcode worth mentioning
-is the C<printerr> opcode, which prints an argument to the standard
-error instead of standard output:
+The C<say>X<say opcode> opcode also prints to standard output, but it
+appends a trailing newline to whatever it prints. Another opcode worth
+mentioning is the C<printerr>X<printerr opcode> opcode, which prints an
+argument to the standard error instead of standard output:
 
 =begin PIR_FRAGMENT
 
@@ -81,10 +79,11 @@ error instead of standard output:
 
 =end PIR_FRAGMENT
 
-The C<read> and C<readline> opcodes read values from a filehandle.  C<read>
-takes an integer value and returns a string with that many characters (if
-possible). C<readline> reads a line of input from a filehandle and returns the
-string without the trailing newline:
+The C<read>X<read opcode> and C<readline>X<readline opcode> opcodes read
+values from a filehandle.  C<read> takes an integer value and returns a
+string with that many characters (if possible). C<readline> reads a line
+of input from a filehandle and returns the string without the trailing
+newline:
 
 =begin PIR_FRAGMENT
 
@@ -102,9 +101,10 @@ The C<read> opcode has a one-argument variant that reads from standard input:
 
 =end PIR_FRAGMENT
 
-The C<getstdin>, C<getstdout>, and C<getstderr> opcodes fetch the
-filehandle objects for the standard streams: standard input, standard
-output, and standard error:
+The C<getstdin>X<getstdin opcode>, C<getstdout>X<getstdout opcode>, and
+C<getstderr>X<getstderr opcode> opcodes fetch the filehandle objects for
+the standard streams: standard input, standard output, and standard
+error:
 
 =begin PIR_FRAGMENT
 
@@ -152,8 +152,9 @@ is more a matter of style preference than anything else.
 
 =head3 open
 
-The C<open> method opens a stream in an existing filehandle object. It takes
-two optional string arguments: the name of the file to open and the open mode.
+The C<open>X<open method> method opens a stream in an existing
+filehandle object. It takes two optional string arguments: the name of
+the file to open and the open mode.
 
 =begin PIR_FRAGMENT
 
@@ -173,8 +174,9 @@ the mode.
 
 =head3 close
 
-The C<close> method closes the filehandle. This does not destroy the filehandle
-object; you can reopen it with the C<open> method later.
+The C<close>X<close method> method closes the filehandle. This does not
+destroy the filehandle object; you can reopen it with the C<open> method
+later.
 
 =begin PIR_FRAGMENT
 
@@ -184,9 +186,9 @@ object; you can reopen it with the C<open> method later.
 
 =head3 is_closed
 
-The C<is_closed> method checks if the filehandle is closed. It returns
-true if the filehandle has been closed or was never opened, and false if
-it is currently open:
+The C<is_closed>X<is_closed method> method checks if the filehandle is
+closed. It returns true if the filehandle has been closed or was never
+opened, and false if it is currently open:
 
 =begin PIR_FRAGMENT
 
@@ -196,8 +198,8 @@ it is currently open:
 
 =head3 print
 
-The C<print> method prints a given value to the filehandle. The argument
-can be an integer, number, string, or PMC.
+The C<print>X<print method> method prints a given value to the
+filehandle. The argument can be an integer, number, string, or PMC.
 
 =begin PIR_FRAGMENT
 
@@ -207,8 +209,8 @@ can be an integer, number, string, or PMC.
 
 =head3 puts
 
-The C<puts> method is similar to C<print>, but it only takes a string
-argument.
+The C<puts>X<puts method> method is similar to C<print>, but it only
+takes a string argument.
 
 =begin PIR_FRAGMENT
 
@@ -218,7 +220,7 @@ argument.
 
 =head3 read
 
-The C<read> method reads a specified number of bytes from the filehandle
+The C<read>X<read method> method reads a specified number of bytes from the filehandle
 object and returns them in a string.
 
 =begin PIR_FRAGMENT
@@ -232,9 +234,9 @@ number of bytes, returns a string containing the remaining bytes.
 
 =head3 readline
 
-The C<readline> method reads an entire line up to a newline character or
-the end-of-file mark from the filehandle object and returns it in a
-string.
+The C<readline>X<readline method> method reads an entire line up to a
+newline character or the end-of-file mark from the filehandle object and
+returns it in a string.
 
 =begin PIR_FRAGMENT
 
@@ -244,9 +246,9 @@ string.
 
 =head3 readline_interactive
 
-The C<readline_interactive> method is useful for command-line scripts.
-It writes the single argument to the method as a prompt to the screen,
-then reads back a line of input.
+The C<readline_interactive>X<readline_interactive method> method is
+useful for command-line scripts.  It writes the single argument to the
+method as a prompt to the screen, then reads back a line of input.
 
 =begin PIR_FRAGMENT
 
@@ -256,9 +258,9 @@ then reads back a line of input.
 
 =head3 readall
 
-The C<readall> method reads an entire file. If the filehandle is closed,
-it will open the file given by the passed in string argument, read the
-entire file, and then close the filehandle.
+The C<readall>X<readall method> method reads an entire file. If the
+filehandle is closed, it will open the file given by the passed in
+string argument, read the entire file, and then close the filehandle.
 
 =begin PIR_FRAGMENT
 
@@ -278,8 +280,8 @@ argument when working with a file you've already opened.
 
 =head3 mode
 
-The C<mode> method returns the current file access mode for the
-filehandle object.
+The C<mode>X<mode method> method returns the current file access mode
+for the filehandle object.
 
 =begin PIR_FRAGMENT
 
@@ -289,8 +291,8 @@ filehandle object.
 
 =head3 encoding
 
-The C<encoding> method sets or retrieves the string encoding behavior of the
-filehandle.
+The C<encoding>X<encoding method> method sets or retrieves the string
+encoding behavior of the filehandle.
 
 =begin PIR_FRAGMENT
 
@@ -304,11 +306,11 @@ encodings supported in Parrot.
 
 =head3 buffer_type
 
-The C<buffer_type> method sets or retrieves the buffering behavior of the
-filehandle object. The argument or return value is one of: C<unbuffered> to
-disable buffering, C<line-buffered> to read or write when the filehandle
-encounters a line ending, or C<full-buffered> to read or write bytes when the
-buffer is full.
+The C<buffer_type>X<buffer_type method> method sets or retrieves the
+buffering behavior of the filehandle object. The argument or return
+value is one of: C<unbuffered> to disable buffering, C<line-buffered> to
+read or write when the filehandle encounters a line ending, or
+C<full-buffered> to read or write bytes when the buffer is full.
 
 =begin PIR_FRAGMENT
 
@@ -319,8 +321,8 @@ buffer is full.
 
 =head3 buffer_size
 
-The C<buffer_size> method sets or retrieves the buffer size of the
-filehandle object.
+The C<buffer_size>X<buffer_size method> method sets or retrieves the
+buffer size of the filehandle object.
 
 =begin PIR_FRAGMENT
 
@@ -334,8 +336,8 @@ allocate a larger buffer, but it will never allocate a smaller buffer.
 
 =head3 flush
 
-The C<flush> method flushes the buffer if the filehandle object is
-working in a buffered mode.
+The C<flush>X<flush method> method flushes the buffer if the filehandle
+object is working in a buffered mode.
 
 =begin PIR_FRAGMENT
 
@@ -345,9 +347,9 @@ working in a buffered mode.
 
 =head3 eof
 
-The C<eof> method checks whether a filehandle object has reached the end of the
-current file. It returns true if the filehandle is at the end of the current
-file and false otherwise.
+The C<eof>X<eof method> method checks whether a filehandle object has
+reached the end of the current file. It returns true if the filehandle
+is at the end of the current file and false otherwise.
 
 =begin PIR_FRAGMENT
 
@@ -357,8 +359,8 @@ file and false otherwise.
 
 =head3 isatty
 
-The C<isatty> method returns a boolean value whether the filehandle is a
-TTY terminal.
+The C<isatty>X<isatty method> method returns a boolean value whether the
+filehandle is a TTY terminal.
 
 =begin PIR_FRAGMENT
 
@@ -368,9 +370,9 @@ TTY terminal.
 
 =head3 get_fd
 
-The C<get_fd> method returns the integer file descriptor of the current
-filehandle object. Not all operating systems use integer file
-descriptors. Those that don't simply return C<-1>.
+The C<get_fd>X<get_fd method> method returns the integer file descriptor
+of the current filehandle object. Not all operating systems use integer
+file descriptors. Those that don't simply return C<-1>.
 
 =begin PIR_FRAGMENT
 

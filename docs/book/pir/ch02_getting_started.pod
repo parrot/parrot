@@ -5,11 +5,11 @@
 The simplest way to install Parrot is to use a pre-compiled binary for your
 operating system or distribution. Packages are available for many systems,
 including Debian, Ubuntu, Fedora, Mandriva, FreeBSD, Cygwin, and MacPorts. The
-Parrot website lists all known packages at U<http://www.parrot.org/download>. A
-binary installer for Windows is also available at
-U<http://parrotwin32.sourceforge.net/>.
-
-If packages aren't available on your system, download the latest supported
+Parrot website lists all known packages.N<U<http://www.parrot.org/download>> A
+binary installer for Windows is also available from the Parrot Win32
+project on SourceForge.N<U<http://parrotwin32.sourceforge.net/>> 
+If packages aren't available on your system, you can download a source
+tarball for the latest supported
 release from U<http://www.parrot.org/release/supported>.
 
 You need a C compiler and a make utility to build Parrot from source code --
@@ -17,6 +17,7 @@ usually C<gcc> and C<make>, but Parrot can build with standard compiler
 toolchains on different operating systems.  Perl 5.8 is also a prerequiste for
 configuring and building Parrot.
 
+X<compiling>
 If you have these dependencies installed, build the core virtual machine and
 compiler toolkit and run the standard test suite with the commands:
 
@@ -24,6 +25,7 @@ compiler toolkit and run the standard test suite with the commands:
   $ make
   $ make test
 
+X<installation>
 By default, Parrot installs to directories F<bin/>, F<lib/>, and
 F<include/> under F</usr/local>. If you have privileges to
 write to these directories, install Parrot with:
@@ -43,6 +45,7 @@ developer tools as well:
 
   $ make install-dev
 
+X<.pir files>
 Once you've installed Parrot, create a test file called
 F<news.pir>.N<Files containing PIR code use the F<.pir> extension.>
 
@@ -64,6 +67,7 @@ which will print:
 
 =cut
 
+X<tutorial>
 The Parrot source distribution includes copious examples in its F<examples/>
 directory.  In particular, a PIR tutorial is available in
 F<examples/tutorial/>.
