@@ -408,13 +408,13 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                 break;
             case 't':
                 if (opt.opt_arg && is_all_hex_digits(opt.opt_arg))
-                    SET_TRACE(strtoul(opt.opt_arg, 0, 16));
+                    SET_TRACE(strtoul(opt.opt_arg, NULL, 16));
                 else
                     SET_TRACE(PARROT_TRACE_OPS_FLAG);
                 break;
             case 'd':
                 if (opt.opt_arg && is_all_hex_digits(opt.opt_arg)) {
-                    IMCC_INFO(interp)->debug = strtoul(opt.opt_arg, 0, 16);
+                    IMCC_INFO(interp)->debug = strtoul(opt.opt_arg, NULL, 16);
                 }
                 else {
                     IMCC_INFO(interp)->debug++;
@@ -422,7 +422,7 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                 break;
             case 'D':
                 if (opt.opt_arg && is_all_hex_digits(opt.opt_arg)) {
-                    SET_DEBUG(strtoul(opt.opt_arg, 0, 16));
+                    SET_DEBUG(strtoul(opt.opt_arg, NULL, 16));
                 }
                 else
                     SET_DEBUG(PARROT_MEM_STAT_DEBUG_FLAG);
@@ -828,7 +828,7 @@ imcc_write_pbc(PARROT_INTERP, ARGIN(const char *output_file))
     PackFile_pack(interp, interp->code->base.pf, packed);
     if (STREQ(output_file, "-"))
         fp = stdout;
-    else if ((fp = fopen(output_file, "wb")) == 0)
+    else if ((fp = fopen(output_file, "wb")) == NULL)
         IMCC_fatal_standalone(interp, EXCEPTION_EXTERNAL_ERROR,
             "Couldn't open %s\n", output_file);
 
