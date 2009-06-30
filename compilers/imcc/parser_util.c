@@ -1221,8 +1221,8 @@ try_rev_cmp(ARGIN(const char *name), ARGMOD(SymReg **r))
 {
     ASSERT_ARGS(try_rev_cmp)
     static struct br_pairs {
-        ARGIN(const char * const op);
-        ARGIN(const char * const nop);
+        PARROT_OBSERVER const char * const op;
+        PARROT_OBSERVER const char * const nop;
         const int to_swap;
     } br_pairs[] = {
         { "gt",   "lt",   0 },
@@ -1265,6 +1265,7 @@ the given Parrot IO PMC.
 
 */
 
+PARROT_IGNORABLE_RESULT
 int
 imcc_vfprintf(PARROT_INTERP, ARGMOD(PMC *io), ARGIN(const char *format), va_list ap)
 {
