@@ -110,7 +110,7 @@ handler from the list of currently active handlers:
 
 This example creates an exception handler C<my_handler> and then runs a a
 division operation that will throw a "division by zero" exception if C<$I2> is
-0. When C<$I2> is 0, C<div> throws an exceptoin.  The exception handler catches
+0. When C<$I2> is 0, C<div> throws an exception.  The exception handler catches
 it, prints "caught an exception", and then clears itself with C<pop_eh>. When
 C<$I2> is a non-zero value, there is no exception.  The code clears the
 exception handler with C<pop_eh>, then prints "maybe printed".  The C<goto>
