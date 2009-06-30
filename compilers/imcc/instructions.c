@@ -665,7 +665,6 @@ Print details of instruction ins in file fd.
 */
 
 #define REGB_SIZE 256
-PARROT_IGNORABLE_RESULT
 int
 ins_print(PARROT_INTERP, ARGIN(PMC *io), ARGIN(const Instruction *ins))
 {

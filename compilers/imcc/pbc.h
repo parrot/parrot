@@ -31,7 +31,6 @@ int e_pbc_new_sub(PARROT_INTERP, SHIM(void *param), ARGIN(IMC_Unit *unit))
 int e_pbc_open(PARROT_INTERP, SHIM(void *param))
         __attribute__nonnull__(1);
 
-PARROT_WARN_UNUSED_RESULT
 INTVAL IMCC_int_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

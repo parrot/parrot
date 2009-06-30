@@ -61,6 +61,43 @@ typedef struct _IMC_Unit IMC_Unit;
 
 #define N_ELEMENTS(x) (sizeof (x)/sizeof ((x)[0]))
 
+/* HEADERIZER BEGIN: compilers/imcc/imcc.y */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_CANNOT_RETURN_NULL
+Instruction * IMCC_create_itcall_label(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+void IMCC_itcall_sub(PARROT_INTERP, ARGIN(SymReg *sub))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_CANNOT_RETURN_NULL
+Instruction * INS_LABEL(PARROT_INTERP,
+    ARGMOD_NULLOK(IMC_Unit *unit),
+    ARGMOD(SymReg *r0),
+    int emit)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*r0);
+
+#define ASSERT_ARGS_IMCC_create_itcall_label __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_IMCC_itcall_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub)
+#define ASSERT_ARGS_INS_LABEL __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(r0)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: compilers/imcc/imcc.y */
+
+
+/*
+ * imc.c
+ */
+
 /* HEADERIZER BEGIN: compilers/imcc/imc.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -111,7 +148,6 @@ void graph_coloring_reg_alloc(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
-PARROT_WARN_UNUSED_RESULT
 unsigned int ig_test(int i, int j, int N, ARGIN(unsigned int *graph))
         __attribute__nonnull__(4);
 
@@ -257,9 +293,7 @@ PMC * IMCC_compile_pir_s(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*error_message);
 
-PARROT_IGNORABLE_RESULT
-int /*@alt void@*/
-imcc_vfprintf(PARROT_INTERP,
+int imcc_vfprintf(PARROT_INTERP,
     ARGMOD(PMC *io),
     ARGIN(const char *format),
     va_list ap)

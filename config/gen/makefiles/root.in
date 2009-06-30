@@ -2306,7 +2306,7 @@ HEADERIZER_O_FILES := \
     $(PIRC_O_FILES)
 
 headerizer : $(SRC_DIR)/core_pmcs.c
-	$(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl $(HEADERIZER_O_FILES)
+	$(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl $(HEADERIZER_O_FILES) $(IMCC_DIR)/imcc.y
 
 apilist: $(SRC_DIR)/core_pmcs.c
 	$(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl --macro=PARROT_EXPORT $(HEADERIZER_O_FILES)
