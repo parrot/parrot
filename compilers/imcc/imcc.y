@@ -86,15 +86,16 @@ static void add_pcc_named_result(
         FUNC_MODIFIES(*name)
         FUNC_MODIFIES(*value);
 
-static void add_pcc_named_return(PARROT_INTERP,
+static void add_pcc_named_return(
     ARGMOD(SymReg *cur_call),
-    ARGIN(SymReg *name),
-    ARGIN(SymReg *value))
+    ARGMOD(SymReg *name),
+    ARGMOD(SymReg *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*cur_call);
+        FUNC_MODIFIES(*cur_call)
+        FUNC_MODIFIES(*name)
+        FUNC_MODIFIES(*value);
 
 static void adv_named_set(PARROT_INTERP, ARGIN(const char *name))
         __attribute__nonnull__(1)
@@ -265,8 +266,7 @@ static void set_lexical(PARROT_INTERP,
     || PARROT_ASSERT_ARG(name) \
     || PARROT_ASSERT_ARG(value)
 #define ASSERT_ARGS_add_pcc_named_return __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(cur_call) \
+       PARROT_ASSERT_ARG(cur_call) \
     || PARROT_ASSERT_ARG(name) \
     || PARROT_ASSERT_ARG(value)
 #define ASSERT_ARGS_adv_named_set __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -970,17 +970,17 @@ add_pcc_named_param(ARGMOD(SymReg *cur_call),
 
 /*
 
-=item C<static void add_pcc_named_return(PARROT_INTERP, SymReg *cur_call, SymReg
-*name, SymReg *value)>
+=item C<static void add_pcc_named_return(SymReg *cur_call, SymReg *name, SymReg
+*value)>
 
 =cut
 
 */
 
 static void
-add_pcc_named_return(PARROT_INTERP, ARGMOD(SymReg *cur_call),
-        ARGIN(SymReg *name),
-        ARGIN(SymReg *value))
+add_pcc_named_return(ARGMOD(SymReg *cur_call),
+        ARGMOD(SymReg *name),
+        ARGMOD(SymReg *value))
 {
     ASSERT_ARGS(add_pcc_named_return)
     name->type         |= VT_NAMED;
@@ -1775,7 +1775,7 @@ var_returns:
    | arg
          {
            if (IMCC_INFO(interp)->adv_named_id) {
-               add_pcc_named_return(interp, IMCC_INFO(interp)->sr_return,
+               add_pcc_named_return(IMCC_INFO(interp)->sr_return,
                                     IMCC_INFO(interp)->adv_named_id, $1);
                IMCC_INFO(interp)->adv_named_id = NULL;
            }
@@ -1785,12 +1785,12 @@ var_returns:
    | STRINGC ADV_ARROW var
          {
             SymReg * const name = mk_const(interp, $1, 'S');
-            add_pcc_named_return(interp, IMCC_INFO(interp)->sr_return, name, $3);
+            add_pcc_named_return(IMCC_INFO(interp)->sr_return, name, $3);
          }
    | var_returns COMMA arg
          {
            if (IMCC_INFO(interp)->adv_named_id) {
-               add_pcc_named_return(interp, IMCC_INFO(interp)->sr_return,
+               add_pcc_named_return(IMCC_INFO(interp)->sr_return,
                                     IMCC_INFO(interp)->adv_named_id, $3);
                IMCC_INFO(interp)->adv_named_id = NULL;
              }
@@ -1799,8 +1799,8 @@ var_returns:
          }
    | var_returns COMMA STRINGC ADV_ARROW var
          {
-           SymReg *name = mk_const(interp, $3, 'S');
-           add_pcc_named_return(interp, IMCC_INFO(interp)->sr_return, name, $5);
+           SymReg * const name = mk_const(interp, $3, 'S');
+           add_pcc_named_return(IMCC_INFO(interp)->sr_return, name, $5);
          }
    ;
 
