@@ -623,9 +623,9 @@ C.> In PIR, the section of code between a C<.sub> and a C<.end> defines
 a scope for lexical variables.
 
 While Parrot stores global variables in namespaces, it stores lexical variables
-in lexical padsN<Think of a pad like a box to hold a collection of lexical variables.>.  Each lexical scope has its own
-pad. The C<store_lex> opcode stores a lexical variable in the current pad.  The
-C<find_lex> opcode retrieves a variable from the current pad:
+in lexical padsN<Think of a pad like a box to hold a collection of lexical variables.>.
+Each lexical scope has its own pad. The C<store_lex> opcode stores a lexical variable
+in the current pad.  The C<find_lex> opcode retrieves a variable from the current pad:
 
 =begin PIR_FRAGMENT
 
