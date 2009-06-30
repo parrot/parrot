@@ -1765,23 +1765,31 @@ IMCC_int_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
 {
     ASSERT_ARGS(IMCC_int_from_reg)
     INTVAL i;
-
-    errno = 0;
+    const char *digits;
+    int base;
 
     if (r->type & VT_CONSTP)
         r = r->reg;
 
-    if (r->name[0] == '0' && (r->name[1] == 'x' || r->name[1] == 'X'))
-        i = strtoul(r->name + 2, NULL, 16);
+    digits = r->name;
+    base   = 10;
+    errno  = 0;
 
-    else if (r->name[0] == '0' && (r->name[1] == 'O' || r->name[1] == 'o'))
-        i = strtoul(r->name + 2, NULL, 8);
+    if (digits[0] == '0') {
+        switch (toupper(digits[1])) {
+            case 'B': base =  2; break;
+            case 'O': base =  8; break;
+            case 'X': base = 16; break;
+            default: break;
+        }
+    }
 
-    else if (r->name[0] == '0' && (r->name[1] == 'b' || r->name[1] == 'B'))
-        i = strtoul(r->name + 2, NULL, 2);
-
-    else
-        i = strtol(r->name, NULL, 10);
+    if ( base == 10 ) {
+        i = strtol(digits, NULL, base);
+    }
+    else {
+        i = strtoul(digits + 2, NULL, base);
+    }
 
     /*
      * TODO
@@ -2121,7 +2129,6 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
         ARGIN(const Instruction *ins))
 {
     ASSERT_ARGS(e_pbc_emit)
-    op_info_t *op_info;
     int        ok = 0;
     int        op, i;
 
@@ -2256,6 +2263,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
     }
     else if (ins->opname && *ins->opname) {
         SymReg  *addr, *r;
+        op_info_t *op_info;
         opcode_t last_label = 1;
 
 #if IMC_TRACE_HIGH
