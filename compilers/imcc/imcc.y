@@ -132,6 +132,7 @@ static Instruction* func_ins(PARROT_INTERP,
         FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(*r);
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static Instruction * iINDEXFETCH(PARROT_INTERP,
     ARGMOD(IMC_Unit *unit),
@@ -145,6 +146,7 @@ static Instruction * iINDEXFETCH(PARROT_INTERP,
         __attribute__nonnull__(5)
         FUNC_MODIFIES(*unit);
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static Instruction * iINDEXSET(PARROT_INTERP,
     ARGMOD(IMC_Unit *unit),
@@ -158,6 +160,7 @@ static Instruction * iINDEXSET(PARROT_INTERP,
         __attribute__nonnull__(5)
         FUNC_MODIFIES(*unit);
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static Instruction * iLABEL(PARROT_INTERP,
     ARGMOD_NULLOK(IMC_Unit *unit),
@@ -172,6 +175,7 @@ PARROT_CAN_RETURN_NULL
 static const char * inv_op(ARGIN(const char *op))
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static Instruction * iSUBROUTINE(PARROT_INTERP,
     ARGMOD_NULLOK(IMC_Unit *unit),
@@ -223,11 +227,13 @@ static Instruction* mk_pmc_const_named(PARROT_INTERP,
         FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(*left);
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static SymReg * mk_sub_address_fromc(PARROT_INTERP, ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static SymReg * mk_sub_address_u(PARROT_INTERP, ARGIN(const char *name))
         __attribute__nonnull__(1)
@@ -385,7 +391,7 @@ MK_I(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *fmt), int n, ...)
 
     for (p = opname, q = fmt; *q && *q != ' ';)
         *p++ = *q++;
-    *p = 0;
+    *p = '\0';
     if (!*q)
         fmt = NULL;
     else
@@ -585,6 +591,7 @@ emit)>
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Instruction *
 INS_LABEL(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), ARGMOD(SymReg *r0), int emit)
@@ -609,6 +616,7 @@ INS_LABEL(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), ARGMOD(SymReg *r0), int 
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static Instruction *
 iLABEL(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), ARGMOD(SymReg *r0))
@@ -630,7 +638,7 @@ iLABEL(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), ARGMOD(SymReg *r0))
 
 */
 
-
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static Instruction *
 iSUBROUTINE(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), ARGMOD(SymReg *r))
@@ -659,6 +667,7 @@ substr or X = P[key]
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static Instruction *
 iINDEXFETCH(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(SymReg *r0), ARGIN(SymReg *r1),
@@ -680,6 +689,7 @@ substr or P[key] = X
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static Instruction *
 iINDEXSET(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(SymReg *r0), ARGIN(SymReg *r1),
@@ -723,6 +733,7 @@ inv_op(ARGIN(const char *op))
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Instruction *
 IMCC_create_itcall_label(PARROT_INTERP)
@@ -752,6 +763,7 @@ IMCC_create_itcall_label(PARROT_INTERP)
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static SymReg *
 mk_sub_address_fromc(PARROT_INTERP, ARGIN(const char *name))
@@ -776,6 +788,7 @@ mk_sub_address_fromc(PARROT_INTERP, ARGIN(const char *name))
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static SymReg *
 mk_sub_address_u(PARROT_INTERP, ARGIN(const char *name))
@@ -1771,7 +1784,7 @@ var_returns:
          }
    | STRINGC ADV_ARROW var
          {
-            SymReg *name = mk_const(interp, $1, 'S');
+            SymReg * const name = mk_const(interp, $1, 'S');
             add_pcc_named_return(interp, IMCC_INFO(interp)->sr_return, name, $3);
          }
    | var_returns COMMA arg
@@ -1832,7 +1845,7 @@ _labels:
 label:
      LABEL
          {
-             Instruction *i = iLABEL(interp, IMCC_INFO(interp)->cur_unit, mk_local_label(interp, $1));
+             Instruction * const i = iLABEL(interp, IMCC_INFO(interp)->cur_unit, mk_local_label(interp, $1));
              mem_sys_free($1);
              $$ = i;
          }
@@ -1855,14 +1868,14 @@ instruction:
 id_list :
      id_list_id
          {
-           IdList* l = $1;
+           IdList* const l = $1;
            l->next = NULL;
            $$ = l;
          }
 
    | id_list COMMA id_list_id
          {
-           IdList* l = $3;
+           IdList* const l = $3;
            l->next = $1;
            $$ = l;
          }
@@ -1905,13 +1918,13 @@ labeled_inst:
          }
    | LEXICAL STRINGC COMMA target
          {
-           SymReg *n = mk_const(interp, $2, 'S');
+           SymReg * const n = mk_const(interp, $2, 'S');
            set_lexical(interp, $4, n); $$ = 0;
            mem_sys_free($2);
          }
    | LEXICAL USTRINGC COMMA target
          {
-           SymReg *n = mk_const(interp, $2, 'U');
+           SymReg * const n = mk_const(interp, $2, 'U');
            set_lexical(interp, $4, n); $$ = 0;
            mem_sys_free($2);
          }

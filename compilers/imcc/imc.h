@@ -64,6 +64,7 @@ typedef struct _IMC_Unit IMC_Unit;
 /* HEADERIZER BEGIN: compilers/imcc/imcc.y */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Instruction * IMCC_create_itcall_label(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -72,6 +73,7 @@ void IMCC_itcall_sub(PARROT_INTERP, ARGIN(SymReg *sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Instruction * INS_LABEL(PARROT_INTERP,
     ARGMOD_NULLOK(IMC_Unit *unit),
@@ -148,6 +150,7 @@ void graph_coloring_reg_alloc(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
+PARROT_WARN_UNUSED_RESULT
 unsigned int ig_test(int i, int j, int N, ARGIN(unsigned int *graph))
         __attribute__nonnull__(4);
 
@@ -293,7 +296,9 @@ PMC * IMCC_compile_pir_s(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*error_message);
 
-int imcc_vfprintf(PARROT_INTERP,
+PARROT_IGNORABLE_RESULT
+int /*@alt void@*/
+imcc_vfprintf(PARROT_INTERP,
     ARGMOD(PMC *io),
     ARGIN(const char *format),
     va_list ap)

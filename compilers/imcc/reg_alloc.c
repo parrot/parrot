@@ -72,6 +72,7 @@ static void compute_one_du_chain(ARGMOD(SymReg *r), ARGIN(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*r);
 
+PARROT_WARN_UNUSED_RESULT
 static unsigned int first_avail(
     ARGIN(const IMC_Unit *unit),
     int reg_set,
@@ -79,9 +80,12 @@ static unsigned int first_avail(
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*avail);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static unsigned int* ig_allocate(int N);
 
+PARROT_WARN_UNUSED_RESULT
 static int ig_find_color(
     ARGIN(const IMC_Unit *unit),
     ARGIN(const char *avail))
@@ -145,6 +149,7 @@ static void rebuild_reglist(ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*unit);
 
+PARROT_WARN_UNUSED_RESULT
 static int reg_sort_f(ARGIN(const void *a), ARGIN(const void *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -153,6 +158,7 @@ static void sort_reglist(ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*unit);
 
+PARROT_WARN_UNUSED_RESULT
 static int try_allocate(PARROT_INTERP, ARGIN(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -268,6 +274,7 @@ ig_set(int i, int j, int N, ARGIN(unsigned int *graph))
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 unsigned int
 ig_test(int i, int j, int N, ARGIN(unsigned int *graph))
 {
@@ -285,6 +292,8 @@ ig_test(int i, int j, int N, ARGIN(unsigned int *graph))
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static unsigned int*
 ig_allocate(int N)
@@ -594,6 +603,7 @@ sort list by line  nr
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
 reg_sort_f(ARGIN(const void *a), ARGIN(const void *b))
 {
@@ -987,6 +997,7 @@ find available color for register #x in available colors
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
 ig_find_color(ARGIN(const IMC_Unit *unit), ARGIN(const char *avail))
 {
@@ -1015,6 +1026,7 @@ If we run out of colors, then we need to spill the top node.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
 try_allocate(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 {
@@ -1119,6 +1131,7 @@ find first available register of the given reg_set
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static unsigned int
 first_avail(ARGIN(const IMC_Unit *unit), int reg_set, ARGOUT_NULLOK(Set **avail))
 {
