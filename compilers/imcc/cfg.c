@@ -644,7 +644,7 @@ bb_add_edge(ARGMOD(IMC_Unit *unit), ARGIN(Basic_block  *from),
     /* memory housekeeping */
     e->next = NULL;
 
-    if (unit->edge_list == 0)
+    if (unit->edge_list == NULL)
         unit->edge_list = e;
     else {
         e->next         = unit->edge_list;
@@ -1555,7 +1555,7 @@ free_loops(ARGMOD(IMC_Unit *unit))
     mem_sys_free(unit->loop_info);
 
     unit->n_loops   = 0;
-    unit->loop_info = 0;
+    unit->loop_info = NULL;
 }
 
 
