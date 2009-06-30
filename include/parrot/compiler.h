@@ -126,8 +126,12 @@
 #define PARROT_IGNORABLE_RESULT
 #define PARROT_WARN_UNUSED_RESULT   __attribute__warn_unused_result__
 
+/* Pure functions have no side-effects, and depend only on parms or globals. e.g. strlen() */
 #define PARROT_PURE_FUNCTION                __attribute__pure__  __attribute__warn_unused_result__
+
+/* Const functions are pure functions, and do not examine targets of pointers. e.g. sqrt() */
 #define PARROT_CONST_FUNCTION               __attribute__const__ __attribute__warn_unused_result__
+
 #define PARROT_DOES_NOT_RETURN              /*@noreturn@*/ __attribute__noreturn__
 #define PARROT_DOES_NOT_RETURN_WHEN_FALSE   /*@noreturnwhenfalse@*/
 #define PARROT_MALLOC                       /*@only@*/ __attribute__malloc__ __attribute__warn_unused_result__
