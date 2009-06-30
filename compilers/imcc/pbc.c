@@ -1776,7 +1776,7 @@ IMCC_int_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
     errno  = 0;
 
     if (digits[0] == '0') {
-        switch (toupper(digits[1])) {
+        switch (toupper((unsigned char)digits[1])) {
             case 'B': base =  2; break;
             case 'O': base =  8; break;
             case 'X': base = 16; break;
@@ -1784,7 +1784,7 @@ IMCC_int_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
         }
     }
 
-    if ( base == 10 ) {
+    if (base == 10) {
         i = strtol(digits, NULL, base);
     }
     else {
