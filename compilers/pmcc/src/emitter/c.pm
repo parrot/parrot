@@ -21,9 +21,6 @@ method rewrite_op($pmclass, $past) {
 
 method rewrite_macro($pmclass, $past) {
     my $res;
-    if $past<is_self> {
-        $res := "VTABLE_" ~ $past.name ~ '(' ~ arguments($past) ~')';
-    }
 
     $res;
 }

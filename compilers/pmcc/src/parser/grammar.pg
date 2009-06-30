@@ -140,36 +140,11 @@ rule method_attr {
 
 # Nested list of something
 rule c_body {
-    '{' <c_body_statement>* '}' {*}
+    '{' <c_body_statement>+? '}' {*}
 }
 
 rule c_body_statement {
-    | <c_body_macro> {*}        #= macro
-    | <-[{}]>+       {*}        #= characters
-    | <c_body>       {*}        #= body
-}
-
-# Various macros for VTABLE body
-rule c_body_macro {
-    | 'SELF.' :: [ <identifier> '(' <c_parameters>? ')' || <.panic: "Syntax error in SELF macro"> ]
-      {*} #= SELF
-    | 'SUPER' :: '(' <c_parameters>? ')'
-      {*} #= SUPER
-}
-
-# We don't parse parameters. We are PMC, not C99 compiler (yet).
-# FIXME Instead of "<-[()]>" it should be something meaningful.
-rule c_parameters {
-    [ <c_parameter> [ ',' <c_parameter> ]* ]
-}
-
-rule c_parameter {
-    <-[()]>+ <c_parameters_parens>?
-    {*}
-}
-
-rule c_parameters_parens {
-    '(' <c_parameters>? ')'
+    <-[{}]>+  | <c_body>
 }
 
 # It's really bad signature

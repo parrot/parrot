@@ -253,12 +253,10 @@ sub cleanup_type($type) {
 
 method c_body($/) {
     #say("c_body: " ~ $/);
-    my $past := PAST::Stmts.new(
+    my $past := PAST::Block.new(
         :node($/),
+        ~$/
     );
-    for $<c_body_statement> {
-        $past.push($_.ast);
-    }
     make $past;
 }
 
@@ -278,62 +276,6 @@ method c_argument($/) {
         :returns(~$<c_type>)
     );
     make $past;
-}
-
-method c_body_statement($/, $key) {
-    my $past;
-    #say("body " ~ $key);
-    if ($key eq 'characters') {
-        $past := PAST::Op.new(
-            :node($/),
-            :pasttype('inline'),
-            :inline(~$/)
-        );
-    }
-    elsif ($key eq 'macro') {
-        $past := $<c_body_macro>.ast;
-    }
-    elsif ($key eq 'body') {
-        $past := $<c_body>.ast;
-    }
-    else {
-        $/.panic("Unknown key " ~ $key);
-    }
-
-    make $past;
-}
-
-method c_body_macro($/, $key) {
-    my $past;
-    $past := PAST::Op.new(
-        :name(~$<identifier>),
-        :pasttype('call'),
-        :node($/)
-    );
-
-    $past<is_macro> := 1;
-    $past<is_self>  := $key eq 'SELF';
-    $past<is_super> := $key eq 'SUPER';
-
-    my $params := ~$<c_parameters><c_parameter>;
-    #say("PARAMS " ~ $params);
-    if $params {
-        $past.push(
-            PAST::Val.new(
-                :value($params)
-            )
-        );
-    }
-
-    make $past;
-}
-
-method c_parameter($/) {
-    #say("c_parameters " ~ $/);
-    make PAST::Val.new(
-        :node($/),
-        :value(~$/)
-    );
 }
 
 # Local Variables:
