@@ -72,6 +72,7 @@ static void compute_one_du_chain(ARGMOD(SymReg *r), ARGIN(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*r);
 
+PARROT_WARN_UNUSED_RESULT
 static unsigned int first_avail(
     ARGIN(const IMC_Unit *unit),
     int reg_set,
@@ -268,6 +269,7 @@ ig_set(int i, int j, int N, ARGIN(unsigned int *graph))
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 unsigned int
 ig_test(int i, int j, int N, ARGIN(unsigned int *graph))
 {
@@ -1119,6 +1121,7 @@ find first available register of the given reg_set
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static unsigned int
 first_avail(ARGIN(const IMC_Unit *unit), int reg_set, ARGOUT_NULLOK(Set **avail))
 {
