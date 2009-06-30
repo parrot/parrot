@@ -1,12 +1,6 @@
-#!perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+#!parrot
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 56;
 
 =head1 NAME
 
@@ -22,1359 +16,1099 @@ Tests the use of Parrot integer registers.
 
 =cut
 
-pasm_output_is( <<CODE, <<OUTPUT, "set_i_ic" );
-        # XXX: Need a test for writing outside the set of available
-        # registers.  Parrot doesn't check for this at the moment.
-        set     I0, 0
-        set     I1, 1
-        set     I2, 2
-        set     I3, 3
-        set     I4, 4
-        set     I5, 5
-        set     I6, 6
-        set     I7, 7
-        set     I8, 8
-        set     I9, 9
-        set     I10, 10
-        set     I11, 11
-        set     I12, 12
-        set     I13, 13
-        set     I14, 14
-        set     I15, 15
-        set     I16, 16
-        set     I17, 17
-        set     I18, 18
-        set     I19, 19
-        set     I20, 20
-        set     I21, 21
-        set     I22, 22
-        set     I23, 23
-        set     I24, 24
-        set     I25, 25
-        set     I26, 26
-        set     I27, 27
-        set     I28, 28
-        set     I29, 29
-        set     I30, 30
-        set     I31, 31
+.const int TESTS = 202
 
-        print   I0
-        print   "\\n"
-        print   I1
-        print   "\\n"
-        print   I2
-        print   "\\n"
-        print   I3
-        print   "\\n"
-        print   I4
-        print   "\\n"
-        print   I5
-        print   "\\n"
-        print   I6
-        print   "\\n"
-        print   I7
-        print   "\\n"
-        print   I8
-        print   "\\n"
-        print   I9
-        print   "\\n"
-        print   I10
-        print   "\\n"
-        print   I11
-        print   "\\n"
-        print   I12
-        print   "\\n"
-        print   I13
-        print   "\\n"
-        print   I14
-        print   "\\n"
-        print   I15
-        print   "\\n"
-        print   I16
-        print   "\\n"
-        print   I17
-        print   "\\n"
-        print   I18
-        print   "\\n"
-        print   I19
-        print   "\\n"
-        print   I20
-        print   "\\n"
-        print   I21
-        print   "\\n"
-        print   I22
-        print   "\\n"
-        print   I23
-        print   "\\n"
-        print   I24
-        print   "\\n"
-        print   I25
-        print   "\\n"
-        print   I26
-        print   "\\n"
-        print   I27
-        print   "\\n"
-        print   I28
-        print   "\\n"
-        print   I29
-        print   "\\n"
-        print   I30
-        print   "\\n"
-        print   I31
-        print   "\\n"
-        end
-        set     I0, 0
-        end
-CODE
-0
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-OUTPUT
+.sub 'test' :main
+    .include 'test_more.pir'
 
-pasm_output_is( <<CODE, <<OUTPUT, "set_i" );
-        set     I0, 42
-        set     I1, I0
-        print   I1
-        print   "\\n"
-        end
-CODE
-42
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "add_i" );
-        set     I0, 0x11223344
-        add     I1, I0, I0
-        print   I1
-        print   "\\n"
-
-        add     I2, I0, I1
-        print   I2
-        print   "\\n"
-
-        add     I2, I2, I2
-        print   I2
-        print   "\\n"
-
-        end
-CODE
-574908040
-862362060
-1724724120
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "abs(i, i|ic|n|nc)" );
-        set     I0, 1
-        abs     I1, -1
-        abs     I0, I0
-        set     I2, -1
-        abs     I2, I2
-        print   I0
-        print   "\n"
-        print   I1
-        print   "\n"
-        print   I2
-        print   "\n"
-
-        end
-CODE
-1
-1
-1
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "sub_(i|ic, i|ic)" );
-        set     I0, 0x12345678
-        set     I1, 0x01234567
-        sub     I2, I0, I1
-        print   I2
-        print   "\\n"
-
-        set     I1, 1234
-        sub     I0, I1, 1230
-        print   I0
-        sub     I0, 1244, I1
-        print   I0
-        sub     I0, 13, 12
-        print   I0
-        print   "\\n"
-        end
-CODE
-286331153
-4101
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "mul_i" );
-        set     I0, 7
-        set     I1, 29
-        mul     I2, I0, I1
-        print   I2
-        print   "\\n"
-
-        mul     I2, I0, 29
-        print   I2
-        print   "\\n"
-        end
-CODE
-203
-203
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "div_i" );
-        set     I0, 0x33333333
-        set     I1, 0x11111111
-        div     I2, I0, I1
-        print   I2
-        print   "\\n"
-
-        set     I0, 11
-        set     I1, 2
-        div     I2, I0, I1
-        print   I2
-        print   "\\n"
-
-        set     I0, 9
-        set     I1, -4
-        div     I2, I0, I1
-        print   I2
-        print   "\\n"
-
-        set     I0, 12
-        div     I1, 144, I0
-        print   I1
-        div     I1, I0, 3
-        print   I1
-        div     I1, 120, 12
-        print   I1
-        print   "\\n"
-
-        end
-CODE
-3
-5
--2
-12410
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "mod_i" );
-        set     I0, 5
-        set     I1, 0
-        mod     I2, I0, I1
-        print   I2
-        print   "\\n"
-
-        set     I0, 0
-        set     I1, 3
-        mod     I2, I0, I1
-        print   I2
-        print   "\\n"
-
-        set     I0, 5
-        set     I1, 3
-        mod     I2, I0, I1
-        print   I2
-        print   "\\n"
-
-        set     I0, 5
-        set     I1, -3
-        mod     I2, I0, I1
-        print   I2
-        print   "\\n"
-
-        set     I0, -5
-        set     I1, 3
-        mod     I2, I0, I1
-        print   I2
-        print   "\\n"
-
-        set     I0, -5
-        set     I1, -3
-        mod     I2, I0, I1
-        print   I2
-        print   "\\n"
-
-        set     I0, 12
-        mod     I1, I0, 10
-        print   I1
-        mod     I1, 14, I0
-        print   I1
-        mod     I1, 13, 11
-        print   I1
-        print   "\\n"
-
-        end
-CODE
-5
-0
-2
--1
-1
--2
-222
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "mod - negative, zero rest (#36003)" );
-.sub test :main
-
-   $I1 = mod 3, 3
-   print "3 mod 3 = "
-   print $I1
-   print "\n"
-
-   $I1 = mod -3, 3
-   print "-3 mod 3 = "
-   print $I1
-   print "\n"
-
-   $I1 = mod 3, -3
-   print "3 mod -3 = "
-   print $I1
-   print "\n"
-
-   $I1 = mod -3, -3
-   print "-3 mod -3 = "
-   print $I1
-   print "\n"
-
-   end
+    plan(TESTS)
+    test_set_ic()
+    test_set()
+    test_add_i_i_i()
+    test_add_i_i()
+    test_abs()
+    test_sub()
+    test_mul()
+    test_div()
+    test_mod()
+    mod_negative_zero_rest()
+    test_cmod()
+    test_eq()
+    test_ne()
+    test_lt()
+    test_le()
+    test_gt()
+    test_ge()
+    test_not()
+    test_and()
+    test_or()
+    test_xor()
+    test_inc()
+    test_dec()
+    test_sub_i_i()
+    test_set_n()
+    test_cleari()
+    test_neg()
+    test_fact()
+    test_mul_i_i()
+    test_exchange()
+    test_null()
+    test_div_i_i_by_zero()
+    test_div_i_ic_by_zero()
+    test_div_i_i_i_by_zero()
+    test_div_i_ic_i_by_zero()
+    test_div_i_i_ic_by_zero()
+    test_fdiv_i_i_by_zero()
+    test_fdiv_i_ic_by_zero()
+    test_fdiv_i_i_i_by_zero()
+    test_fdiv_i_ic_i_by_zero()
+    test_fdiv_i_i_ic_by_zero()
+    test_cmod_i_i_i_by_zero()
+    test_cmod_i_ic_i_by_zero()
+    test_cmod_i_i_ic_by_zero()
+    test_mod_i_i_i_by_zero()
+    test_mod_i_ic_i_by_zero()
+    test_mod_i_i_ic_by_zero()
 .end
-CODE
-3 mod 3 = 0
--3 mod 3 = 0
-3 mod -3 = 0
--3 mod -3 = 0
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "cmod_i" );
-        set     I0, 5
-        set     I1, 3
-        cmod    I2, I0, I1
-        print   I2
-        print   "\\n"
-        print   I0
-        print   "\\n"
-        print   I1
-        print   "\\n"
-
-        set     I0, 12
-        cmod    I1, I0, 10
-        print   I1
-        cmod    I1, 14, I0
-        print   I1
-        cmod    I1, 13, 11
-        print   I1
-        print   "\\n"
-        end
-CODE
-2
-5
-3
-222
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "eq_i_ic" );
-        set     I0, 0x12345678
-        set     I1, 0x12345678
-        set     I2, 0x76543210
-
-        eq      I0, I1, ONE
-        branch  ERROR
-        print   "bad\\n"
-
-ONE:
-        print   "ok 1\\n"
-        eq      I1, I2, ERROR
-        branch TWO
-        print   "bad\\n"
-
-TWO:
-        print   "ok 2\\n"
-        end
-
-ERROR:
-        print   "bad\\n"
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "eq_ic_ic" );
-        set     I0, -42
-
-        eq      I0, 42, ERROR
-        branch  ONE
-        print   "bad\\n"
-
-ONE:
-        print   "ok 1\\n"
-        eq      I0, -42, TWO
-        branch ERROR
-        print   "bad\\n"
-
-TWO:
-        print   "ok 2\\n"
-
-        set     I0, 12
-        eq      I0, 12, THREE
-        print   "not good three "
-THREE:  print   "ok 3\\n"
-
-        eq      12, 12, FOUR
-        print   "12 not 12, what? "
-FOUR:   print   "ok 4\\n"
-
-        end
-
-ERROR:
-        print   "bad\\n"
-        end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "ne_i_ic" );
-        set     I0, 0xa0b0c0d
-        set     I1, 0xa0b0c0d
-        set     I2, 0
-
-        ne      I0, I2, ONE
-        branch  ERROR
-        print   "bad\\n"
-
-ONE:
-        print   "ok 1\\n"
-        ne      I0, I1, ERROR
-        branch  TWO
-        print   "bad\\n"
-
-TWO:
-        print   "ok 2\\n"
-        end
-
-ERROR:
-        print   "bad\\n"
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "ne_ic_ic" );
-        set     I0, 427034409
-
-        ne      I0, 427034409, ERROR
-        branch  ONE
-        print   "bad\\n"
-
-ONE:
-        print   "ok 1\\n"
-        ne      I0, 427034408, TWO
-        branch  ERROR
-        print   "bad\\n"
-
-TWO:
-        print   "ok 2\\n"
-        end
-
-ERROR:
-        print   "bad\\n"
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "lt_i_ic" );
-        set     I0, 2147483647
-        set     I1, -2147483648
-        set     I2, 0
-        set     I3, 0
-
-        lt      I1, I0, ONE
-        branch  ERROR
-        print   "bad\\n"
-
-ONE:
-        print   "ok 1\\n"
-        lt      I0, I1, ERROR
-        branch  TWO
-        print   "bad\\n"
-
-TWO:
-        print   "ok 2\\n"
-        lt      I2, I3, ERROR
-        branch  THREE
-        print   "bad\\n"
-
-THREE:
-        print   "ok 3\\n"
-        end
-
-ERROR:
-        print "bad\\n"
-        end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "lt_ic_ic" );
-        set     I0, 2147483647
-        set     I1, -2147483648
-        set     I2, 0
-
-        lt      I0, -2147483648, ERROR
-        branch  ONE
-        print   "bad\\n"
-
-ONE:
-        print   "ok 1\\n"
-        lt      I1, 2147483647, TWO
-        branch  ERROR
-        print   "bad\\n"
-
-TWO:
-        print   "ok 2\\n"
-        lt      I0, 0, ERROR
-        branch  THREE
-        print   "bad\\n"
-
-THREE:
-        print   "ok 3\\n"
-        end
-
-ERROR:
-        print   "bad\\n"
-        end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "le_i_ic" );
-        set     I0, 2147483647
-        set     I1, -2147483648
-        set     I2, 0
-        set     I3, 0
-
-        le      I1, I0, ONE
-        branch  ERROR
-        print   "bad\\n"
-
-ONE:
-        print   "ok 1\\n"
-        le      I0, I1, ERROR
-        branch  TWO
-        print   "bad\\n"
-
-TWO:
-        print   "ok 2\\n"
-        le      I2, I3, THREE
-        branch  ERROR
-        print   "bad\\n"
-
-THREE:
-        print   "ok 3\\n"
-        end
-
-ERROR:
-        print "bad\\n"
-        end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "le_ic_ic" );
-        set     I0, 2147483647
-        set     I1, -2147483648
-        set     I2, 0
-
-        le      I0, -2147483648, ERROR
-        branch  ONE
-        print   "bad\\n"
-
-ONE:
-        print   "ok 1\\n"
-        le      I1, 2147483647, TWO
-        branch  ERROR
-        print   "bad\\n"
-
-TWO:
-        print   "ok 2\\n"
-        le      I2, 0, THREE
-        branch  ERROR
-        print   "bad\\n"
-
-THREE:
-        print   "ok 3\\n"
-        end
-
-ERROR:
-        print   "bad\\n"
-        end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "gt_i_ic" );
-        set     I0, -2147483648
-        set     I1, 2147483647
-        set     I2, 0
-        set     I3, 0
-
-        gt      I1, I0, ONE
-        branch  ERROR
-        print   "bad\\n"
-
-ONE:
-        print   "ok 1\\n"
-        gt      I0, I1, ERROR
-        branch  TWO
-        print   "bad\\n"
-
-TWO:
-        print   "ok 2\\n"
-        gt      I2, I3, ERROR
-        branch  THREE
-        print   "bad\\n"
-
-THREE:
-        print   "ok 3\\n"
-        end
-
-ERROR:
-        print "bad\\n"
-        end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "gt_ic_ic" );
-        set     I0, -2147483648
-        set     I1, 2147483647
-        set     I2, 0
-
-        gt      I0, 2147483647, ERROR
-        branch  ONE
-        print   "bad\\n"
-
-ONE:
-        print   "ok 1\\n"
-        gt      I1, -2147483648, TWO
-        branch  ERROR
-        print   "bad\\n"
-
-TWO:
-        print   "ok 2\\n"
-        gt      I0, 0, ERROR
-        branch  THREE
-        print   "bad\\n"
-
-THREE:
-        print   "ok 3\\n"
-        end
-
-ERROR:
-        print   "bad\\n"
-        end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "ge_i_ic" );
-        set     I0, -2147483648
-        set     I1, 2147483647
-        set     I2, 0
-        set     I3, 0
-
-        ge      I1, I0, ONE
-        branch  ERROR
-        print   "bad\\n"
-
-ONE:
-        print   "ok 1\\n"
-        ge      I0, I1, ERROR
-        branch  TWO
-        print   "bad\\n"
-
-TWO:
-        print   "ok 2\\n"
-        ge      I2, I3, THREE
-        branch  ERROR
-        print   "bad\\n"
-
-THREE:
-        print   "ok 3\\n"
-        end
-
-ERROR:
-        print "bad\\n"
-        end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "ge_ic_ic" );
-        set     I0, -2147483648
-        set     I1, 2147483647
-        set     I2, 0
-
-        ge      I0, 2147483647, ERROR
-        branch  ONE
-        print   "bad\\n"
-
-ONE:
-        print   "ok 1\\n"
-        ge      I1, -2147483648, TWO
-        branch  ERROR
-        print   "bad\\n"
-
-TWO:
-        print   "ok 2\\n"
-        ge      I2, 0, THREE
-        branch  ERROR
-        print   "bad\\n"
-
-THREE:
-        print   "ok 3\\n"
-        end
-
-ERROR:
-        print   "bad\\n"
-        end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "not_i_i" );
-        set I0, 1
-        not I1, I0
-        print I1
-        print "\n"
-
-        not I2, I1
-        print I2
-        print "\n"
-
-        set I3, 12345
-        not I4, I3
-        print I4
-        print "\n"
-
-        set I5, -1
-        not I6, I5
-        print I6
-        print "\n"
-
-        not I7, 0
-        print I7
-        print "\n"
-        not I7, 1
-        print I7
-        print "\n"
-
-        end
-CODE
-0
-1
-0
-0
-1
-0
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "and" );
-        set I0, 0
-        set I1, 10
-
-        set I2, 1
-        and I2, I1, I0
-        print I2
-        print "\n"
-
-        set I2, 1
-        and I2, I0, I1
-        print I2
-        print "\n"
-
-        set I2, 1
-        and I2, I0, I0
-        print I2
-        print "\n"
-
-        set I2, 1
-        and I2, I2, I1
-        print I2
-        print "\n"
-
-        end
-CODE
-0
-0
-0
-10
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "or" );
-        set I0, 0
-        set I1, 10
-
-        set I2, 42
-        or I2, I1, I0
-        print I2
-        print "\n"
-
-        set I2, 42
-        or I2, I0, I1
-        print I2
-        print "\n"
-
-        or I2, I0, I0
-        print I2
-        print "\n"
-
-        or I2, I2, I1
-        print I2
-        print "\n"
-
-        end
-CODE
-10
-10
-0
-10
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "xor" );
-        set I0, 0
-        set I1, 2
-
-        set I2, 42
-        xor I2, I1, I0
-        print I2
-        print "\n"
-
-        set I2, 42
-        xor I2, I0, I1
-        print I2
-        print "\n"
-
-        xor I2, I0, I0
-        print I2
-        print "\n"
-
-        xor I2, I1, I1
-        print I2
-        print "\n"
-
-        set I2, 1
-        xor I2, I2, I2
-        print I2
-        print "\n"
-
-        end
-CODE
-2
-2
-0
-0
-0
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "inc_i" );
-        set     I0, 0
-
-        inc     I0
-        print   I0
-        print   "\\n"
-
-        inc     I0
-        inc     I0
-        inc     I0
-        inc     I0
-        print   I0
-        print   "\\n"
-
-        end
-CODE
-1
-5
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "add_i_i" );
-        set     I0, 0
-        set     I1, 2
-        set     I2, -2
-
-        add     I0, I1
-        print   I0
-        print   "\\n"
-
-        add     I0, I2
-        print   I0
-        print   "\\n"
-        end
-CODE
-2
-0
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "add_i_ic" );
-        set     I0, 0
-
-        add     I0, 5
-        print   I0
-        print   "\\n"
-
-        add     I0, -10
-        print   I0
-        print   "\\n"
-        end
-CODE
-5
--5
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "dec_i" );
-        set     I0, 0
-
-        dec     I0
-        print   I0
-        print   "\\n"
-
-        dec     I0
-        dec     I0
-        dec     I0
-        dec     I0
-        print   I0
-        print   "\\n"
-
-        end
-CODE
--1
--5
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "sub_i_i" );
-        set     I0, 0
-        set     I1, 3
-        set     I2, -3
-
-        sub     I0, I1
-        print   I0
-        print   "\\n"
-
-        sub     I0, I2
-        print   I0
-        print   "\\n"
-        end
-CODE
--3
-0
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "sub_i_ic" );
-        set     I0, 0
-
-        sub     I0, 5
-        print   I0
-        print   "\\n"
-
-        sub     I0, -10
-        print   I0
-        print   "\\n"
-        end
-CODE
--5
-5
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "set_n_i" );
-        set     I0, 0
-        set     N0, I0
-        print   N0
-        print   "\\n"
-
-        set     I1, 2147483647
-        set     N1, I1
-        print   N1
-        print   "\\n"
-
-        set     I2, -2147483648
-        set     N2, I2
-        print   N2
-        print   "\\n"
-        end
-CODE
-0
-2147483647
--2147483648
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "cleari" );
-        set     I0, 0xdeadbee
-        set     I1, 0xdeadbee
-        set     I2, 0xdeadbee
-        set     I3, 0xdeadbee
-        set     I4, 0xdeadbee
-        set     I5, 0xdeadbee
-        set     I6, 0xdeadbee
-        set     I7, 0xdeadbee
-        set     I8, 0xdeadbee
-        set     I9, 0xdeadbee
-        set     I10, 0xdeadbee
-        set     I11, 0xdeadbee
-        set     I12, 0xdeadbee
-        set     I13, 0xdeadbee
-        set     I14, 0xdeadbee
-        set     I15, 0xdeadbee
-        set     I16, 0xdeadbee
-        set     I17, 0xdeadbee
-        set     I18, 0xdeadbee
-        set     I19, 0xdeadbee
-        set     I20, 0xdeadbee
-        set     I21, 0xdeadbee
-        set     I22, 0xdeadbee
-        set     I23, 0xdeadbee
-        set     I24, 0xdeadbee
-        set     I25, 0xdeadbee
-        set     I26, 0xdeadbee
-        set     I27, 0xdeadbee
-        set     I28, 0xdeadbee
-        set     I29, 0xdeadbee
-        set     I30, 0xdeadbee
-        set     I31, 0xdeadbee
-        cleari
-        print   I0
-        print   I1
-        print   I2
-        print   I3
-        print   I4
-        print   I5
-        print   I6
-        print   I7
-        print   I8
-        print   I9
-        print   I10
-        print   I11
-        print   I12
-        print   I13
-        print   I14
-        print   I15
-        print   I16
-        print   I17
-        print   I18
-        print   I19
-        print   I20
-        print   I21
-        print   I22
-        print   I23
-        print   I24
-        print   I25
-        print   I26
-        print   I27
-        print   I28
-        print   I29
-        print   I30
-        print   I31
-        print   "\\n"
-        end
-CODE
-00000000000000000000000000000000
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "neg_i" );
-    neg I0,3
-    neg I0,I0
-    neg I0
-    print I0
-    print "\\n"
-    end
-CODE
--3
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "mul_i_i" );
-    set I0,3
-    set I1,4
-    mul I0,I1
-    print I0
-    print "\\n"
-    end
-CODE
-12
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "fact_i_i" );
-    set I0, 3
-    set I1, 11
-    set I2, 0
-    set I3, -563
-    fact I5, I0
-    print I5
-    print "\\n"
-    fact I6, I1
-    print I6
-    print "\\n"
-    fact I7, I2
-    print I7
-    print "\\n"
-    fact I8, I3
-    print I8
-    print "\\n"
-    end
-CODE
-6
-39916800
-1
-1
-OUTPUT
-
-pasm_output_is( <<CODE, <<OUTPUT, "fact_i_ic" );
-    fact I5, 3
-    print I5
-    print "\\n"
-    fact I6, 11
-    print I6
-    print "\\n"
-    fact I7, 0
-    print I7
-    print "\\n"
-    fact I8, -563
-    print I8
-    print "\\n"
-    end
-CODE
-6
-39916800
-1
-1
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "exchange" );
-    set I10, 10
-    set I20, 20
-    exchange I10, I20
-    print I10
-    print "\n"
-    print I20
-    print "\n"
-
-    set I30, 30
-    exchange I30, I30
-    print I30
-    print "\n"
-    end
-CODE
-20
-10
-30
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "null" );
-    set I1, 1000
-    print I1
-    print "\n"
-
-    null I1
-    print I1
-    print "\n"
-
-    end
-CODE
-1000
-0
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<OUTPUT, "div_i_i by zero" );
-        set I0, 0
-        set I1, 10
-        div I1, I0
-        end
-CODE
-/.*Divide by zero.*/
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<OUTPUT, "div_i_ic by zero" );
-        set I1, 10
-        div I1, 0
-        end
-CODE
-/.*Divide by zero.*/
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<OUTPUT, "div_i_i_i by zero" );
-        set I0, 0
-        set I1, 10
-        div I2, I1, I0
-        end
-CODE
-/.*Divide by zero.*/
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<OUTPUT, "div_i_ic_i by zero" );
-        set I0, 0
-        div I2, 10, I0
-        end
-CODE
-/.*Divide by zero.*/
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<OUTPUT, "div_i_i_ic by zero" );
-        set I1, 10
-        div I2, I1, 0
-        end
-CODE
-/.*Divide by zero.*/
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<OUTPUT, "fdiv_i_i by zero" );
-        set I0, 0
-        set I1, 10
-        fdiv I1, I0
-        end
-CODE
-/.*Divide by zero.*/
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<OUTPUT, "fdiv_i_ic by zero" );
-        set I1, 10
-        fdiv I1, 0
-        end
-CODE
-/.*Divide by zero.*/
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<OUTPUT, "fdiv_i_i_i by zero" );
-        set I0, 0
-        set I1, 10
-        fdiv I2, I1, I0
-        end
-CODE
-/.*Divide by zero.*/
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<OUTPUT, "fdiv_i_ic_i by zero" );
-        set I0, 0
-        fdiv I2, 10, I0
-        end
-CODE
-/.*Divide by zero.*/
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<OUTPUT, "fdiv_i_i_ic by zero" );
-        set I1, 10
-        fdiv I2, I1, 0
-        end
-CODE
-/.*Divide by zero.*/
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<OUTPUT, "cmod_i_i_i by zero" );
-        set I0, 0
-        set I1, 10
-        cmod I2, I1, I0
-        end
-CODE
-/.*Divide by zero.*/
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<OUTPUT, "cmod_i_ic_i by zero" );
-        set I0, 0
-        cmod I2, 10, I0
-        end
-CODE
-/.*Divide by zero.*/
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<OUTPUT, "cmod_i_i_ic by zero" );
-        set I1, 10
-        cmod I2, I1, 0
-        end
-CODE
-/.*Divide by zero.*/
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "mod_i_i_i by zero" );
-        set I0, 0
-        set I1, 10
-        mod I2, I1, I0
-        print I2
-        print "\n"
-        end
-CODE
-10
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "mod_i_ic_i by zero" );
-        set I0, 0
-        mod I2, 10, I0
-        print I2
-        print "\n"
-        end
-CODE
-10
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "mod_i_i_ic by zero" );
-        set I1, 10
-        mod I2, I1, 0
-        print I2
-        print "\n"
-        end
-CODE
-10
-OUTPUT
+
+.sub 'test_set_ic'
+    $I0 = 0
+    $I1 = 1
+    $I2 = 2
+    $I3 = 3
+    $I4 = 4
+    $I5 = 5
+    $I6 = 6
+    $I7 = 7
+    $I8 = 8
+    $I9 = 9
+    $I10 = 10
+    $I11 = 11
+    $I12 = 12
+    $I13 = 13
+    $I14 = 14
+    $I15 = 15
+    $I16 = 16
+    $I17 = 17
+    $I18 = 18
+    $I19 = 19
+    $I20 = 20
+    $I21 = 21
+    $I22 = 22
+    $I23 = 23
+    $I24 = 24
+    $I25 = 25
+    $I26 = 26
+    $I27 = 27
+    $I28 = 28
+    $I29 = 29
+    $I30 = 30
+    $I31 = 31
+
+    $S0 = $I0
+    is($S0, "0", "set_i_ic with 0")
+    $S0 = $I1
+    is($S0, "1", "set_i_ic with 1")
+    $S0 = $I2
+    is($S0, "2", "set_i_ic with 2")
+    $S0 = $I3
+    is($S0, "3", "set_i_ic with 3")
+    $S0 = $I4
+    is($S0, "4", "set_i_ic with 4")
+    $S0 = $I5
+    is($S0, "5", "set_i_ic with 5")
+    $S0 = $I6
+    is($S0, "6", "set_i_ic with 6")
+    $S0 = $I7
+    is($S0, "7", "set_i_ic with 7")
+    $S0 = $I8
+    is($S0, "8", "set_i_ic with 8")
+    $S0 = $I9
+    is($S0, "9", "set_i_ic with 9")
+    $S0 = $I10
+    is($S0, "10", "set_i_ic with 10")
+    $S0 = $I11
+    is($S0, "11", "set_i_ic with 11")
+    $S0 = $I12
+    is($S0, "12", "set_i_ic with 12")
+    $S0 = $I13
+    is($S0, "13", "set_i_ic with 13")
+    $S0 = $I14
+    is($S0, "14", "set_i_ic with 14")
+    $S0 = $I15
+    is($S0, "15", "set_i_ic with 15")
+    $S0 = $I16
+    is($S0, "16", "set_i_ic with 16")
+    $S0 = $I17
+    is($S0, "17", "set_i_ic with 17")
+    $S0 = $I18
+    is($S0, "18", "set_i_ic with 18")
+    $S0 = $I19
+    is($S0, "19", "set_i_ic with 19")
+    $S0 = $I20
+    is($S0, "20", "set_i_ic with 20")
+    $S0 = $I21
+    is($S0, "21", "set_i_ic with 21")
+    $S0 = $I22
+    is($S0, "22", "set_i_ic with 22")
+    $S0 = $I23
+    is($S0, "23", "set_i_ic with 23")
+    $S0 = $I24
+    is($S0, "24", "set_i_ic with 24")
+    $S0 = $I25
+    is($S0, "25", "set_i_ic with 25")
+    $S0 = $I26
+    is($S0, "26", "set_i_ic with 26")
+    $S0 = $I27
+    is($S0, "27", "set_i_ic with 27")
+    $S0 = $I28
+    is($S0, "28", "set_i_ic with 28")
+    $S0 = $I29
+    is($S0, "29", "set_i_ic with 29")
+    $S0 = $I30
+    is($S0, "30", "set_i_ic with 30")
+    $S0 = $I31
+    is($S0, "31", "set_i_ic with 31")
+.end
+
+.sub 'test_set'
+    $I0 = 42
+    $I1 = $I0
+    $S0 = $I1
+    is($S0, '42', 'set_i')
+.end
+
+.sub 'test_add_i_i_i'
+    $I0 = 0x11223344
+    $I1 = $I0 + $I0
+    is($I1, 574908040, 'add_i_i - first')
+
+    $I2 = $I0 + $I1
+    is($I2, 862362060, 'add_i_i - second')
+
+    $I2 = $I2 + $I2
+    is($I2, 1724724120, 'add_i_i - third')
+.end
+
+.sub 'test_add_i_i'
+    $I0 = 0
+    $I1 = 2
+    $I2 = -2
+
+    add $I0, $I1
+    is($I0, 2, 'add_i_i - zero is neutral')
+
+    add $I0, $I2
+    is($I0, 0, 'add_i_i - inverse')
+
+    $I0 = 0
+    add $I0, 5
+    is($I0, 5, 'add_i_ic - zero is neutral')
+
+    add $I0, -10
+    is($I0, -5, 'add_i_ic')
+.end
+
+.sub 'test_abs'
+    $I0 = abs 1
+
+    $I1 = 1
+    $I1 = abs $I1
+
+    $I2 = abs -1
+
+    $I3 = -1
+    $I3 = abs $I3
+
+    is($I0, 1, 'abs_i_ic')
+    is($I1, 1, 'abs_i_i')
+    is($I2, 1, 'abs_i_nc')
+    is($I3, 1, 'abs_i_n')
+.end
+
+.sub 'test_sub'
+    $I0 = 0x12345678
+    $I1 = 0x01234567
+    $I2 = $I0 - $I1
+    is($I2, 286331153, 'sub_i_i_i')
+
+    $I1 = 1234
+
+    $I0 = $I1 - 1230
+    is($I0, 4, 'sub_i_i_ic')
+
+    $I0 = 1244 - $I1
+    is($I0, 10, 'sub_i_ic_i')
+
+    $I0 = 13 - 12
+    is($I0, 1, 'sub_i_ic_ic')
+.end
+
+.sub 'test_mul'
+    $I0 = 7
+    $I1 = 29
+
+    $I2 = $I0 * $I1
+    is($I2, 203, 'mul_i_i_i')
+
+    $I2 = $I0 * 29
+    is($I2, 203, 'mul_i_i_ic')
+.end
+
+.sub 'test_div'
+    $I0 = 0x33333333
+    $I1 = 0x11111111
+    $I2 = $I0 / $I1
+    is($I2, 3, 'div_i_i_i - exact')
+
+    $I0 = 11
+    $I1 = 2
+    $I2 = $I0 / $I1
+    is($I2, 5, 'div_i_i_i - quotient with positive integers')
+
+    $I0 = 9
+    $I1 = -4
+    $I2 = $I0 / $I1
+    is($I2, -2, 'div_i_i_i - quotient with negative divisor')
+
+    $I0 = 12
+
+    $I1 = 144 / $I0
+    is($I1, 12, 'div_i_ic_i')
+
+    $I1 = $I0 / 3
+    is($I1, 4, 'div_i_i_ic')
+
+    $I1 = 120 / 12
+    is($I1, 10, 'div_i_ic_ic')
+.end
+
+.sub 'test_mod'
+    $I0 = 5
+    $I1 = 0
+    $I2 = mod $I0, $I1
+    is($I2, 5, 'mod_i_i_i by 0')
+
+    $I0 = 0
+    $I1 = 3
+    $I2 = mod $I0, $I1
+    is($I2, 0, 'mod_i_i_i of 0')
+
+    $I0 = 5
+    $I1 = 3
+    $I2 = mod $I0, $I1
+    is($I2, 2, 'mod_i_i_i - remainder of 5 / 3')
+
+    $I0 = 5
+    $I1 = -3
+    $I2 = mod $I0, $I1
+    is($I2, -1, 'mod_i_i_i - remainder of 5 / -3')
+
+    $I0 = -5
+    $I1 = 3
+    $I2 = mod $I0, $I1
+    is($I2, 1, 'mod_i_i_i - remainder of -5 / 3')
+
+    $I0 = -5
+    $I1 = -3
+    $I2 = mod $I0, $I1
+    is($I2, -2, 'mod_i_i_i - remainder of -5 / -3')
+
+    $I0 = 12
+
+    $I1 = mod $I0, 10
+    is($I1, 2, 'mod_i_i_ic')
+
+    $I1 = mod 14, $I0
+    is($I1, 2, 'mod_i_ic_i')
+
+    $I1 = mod 13, 11
+    is($I1, 2, 'mod_i_ic_ic')
+.end
+
+.sub 'mod_negative_zero_rest'
+    $I1 = mod 3, 3
+    is($I1, 0, 'mod - negative, zero rest (#36003), 3 mod 3 = 0')
+
+    $I1 = mod -3, 3
+    is($I1, 0, 'mod - negative, zero rest (#36003), -3 mod 3 = 0')
+
+    $I1 = mod 3, -3
+    is($I1, 0, 'mod - negative, zero rest (#36003), 3 mod -3 = 0')
+
+    $I1 = mod -3, -3
+    is($I1, 0, 'mod - negative, zero rest (#36003), -3 mod -3 = 0')
+.end
+
+.sub 'test_cmod'
+    $I0 = 5
+    $I1 = 3
+    $I2 = cmod $I0, $I1
+    is($I2, 2, 'cmod_i_i_i')
+    is($I0, 5, 'cmod_i_i_i - dividend unchanged')
+    is($I1, 3, 'cmod_i_i_i - divisor unchanged')
+
+    $I0 = 12
+
+    $I1 = cmod $I0, 10
+    is($I1, 2, 'cmod_i_i_ic')
+
+    $I1 = cmod 14, $I0
+    is($I1, 2, 'cmod_i_ic_i')
+
+    $I1 = cmod 13, 11
+    is($I1, 2, 'cmod_i_ic_ic')
+.end
+
+.sub 'test_eq'
+    $I0 = 0x12345678
+    $I1 = 0x12345678
+    $I2 = 0x76543210
+
+    $I3 = 1
+    if $I0 == $I1 goto test_eq_1
+    $I3 = 0
+  test_eq_1:
+    ok($I3, 'eq_i_i - equal')
+
+    $I3 = 1
+    unless $I1 == $I2 goto test_eq_2
+    $I3 = 0
+  test_eq_2:
+    ok($I3, 'eq_i_i - different')
+
+    $I0 = -42
+    $I3 = 0
+    if $I0 == 42 goto test_eq_3
+    $I3 = 1
+  test_eq_3:
+    ok($I3, 'eq_i_ic - different')
+
+    $I3 = 0
+    unless $I0 == -42 goto test_eq_4
+    $I3 = 1
+  test_eq_4:
+    ok($I3, 'eq_i_ic - equal')
+
+    $I0 = 12
+    $I3 = 0
+    unless $I0 == 12 goto test_eq_5
+    $I3 = 1
+  test_eq_5:
+    ok($I3, 'eq_i_ic - 12 == 12')
+
+    $I3 = 0
+    unless 12 == 12 goto test_eq_6
+    $I3 = 1
+  test_eq_6:
+    ok($I3, 'eq_ic_ic - equal')
+
+    $I3 = 1
+    unless 12 == 21 goto test_eq_7
+    $I3 = 0
+  test_eq_7:
+    ok($I3, 'eq_ic_ic - different')
+.end
+
+.sub 'test_ne'
+    $I0 = 0xa0b0c0d
+    $I1 = 0xa0b0c0d
+    $I2 = 0
+
+    $I3 = 0
+    unless $I0 != $I2 goto test_ne_1
+    $I3 = 1
+  test_ne_1:
+    ok($I3, 'ne_i_i - different')
+
+    $I3 = 0
+    if $I0 != $I1 goto test_ne_2
+    $I3 = 1
+  test_ne_2:
+    ok($I3, 'ne_i_i - equal')
+
+    $I0 = 427034409
+    $I3 = 0
+    if $I0 != 427034409 goto test_ne_3
+    $I3 = 1
+  test_ne_3:
+    ok($I3, 'ne_i_ic - equal')
+
+    $I3 = 0
+    unless $I0 != 427034408 goto test_ne_4
+    $I3 = 1
+  test_ne_4:
+    ok($I3, 'ne_i_ic - different')
+.end
+
+.sub 'test_lt'
+    $I0 = 2147483647
+    $I1 = -2147483648
+    $I2 = 0
+    $I3 = 0
+
+    $I4 = 0
+    unless $I1 < $I0 goto test_lt_1
+    $I4 = 1
+  test_lt_1:
+    ok($I4, 'lt_i_i - true inequality')
+
+    $I4 = 0
+    if $I0 < $I1 goto test_lt_2
+    $I4 = 1
+  test_lt_2:
+    ok($I4, 'lt_i_i - false inequality')
+
+    $I4 = 0
+    if $I2 < $I3 goto test_lt_3
+    $I4 = 1
+  test_lt_3:
+    ok($I4, 'lt_i_i - irreflexivity')
+
+    $I4 = 0
+    if $I0 < -2147483648 goto test_lt_4
+    $I4 = 1
+  test_lt_4:
+    ok($I4, 'lt_i_ic - false inequality')
+
+    $I4 = 0
+    unless $I1 < 2147483647 goto test_lt_5
+    $I4 = 1
+  test_lt_5:
+    ok($I4, 'lt_i_ic - true inequality')
+
+    $I4 = 0
+    if $I0 < 0 goto test_lt_6
+    $I4 = 1
+  test_lt_6:
+    ok($I4, 'lt_i_ic - irreflexivity')
+.end
+
+.sub 'test_le'
+    $I0 = 2147483647
+    $I1 = -2147483648
+    $I2 = 0
+    $I3 = 0
+
+    $I4 = 0
+    unless $I1 <= $I0 goto test_le_1
+    $I4 = 1
+  test_le_1:
+    ok($I4, 'le_i_i - true inequality')
+
+    $I4 = 0
+    if $I0 <= $I1 goto test_le_2
+    $I4 = 1
+  test_le_2:
+    ok($I4, 'le_i_i - false inequality')
+
+    $I4 = 0
+    unless $I2 <= $I3 goto test_le_3
+    $I4 = 1
+  test_le_3:
+    ok($I4, 'le_i_i - reflexive')
+
+    $I4 = 0
+    if $I0 <= -2147483648 goto test_le_4
+    $I4 = 1
+  test_le_4:
+    ok($I4, 'le_i_ic - false inequality')
+
+    $I4 = 0
+    unless $I1 <= 2147483647 goto test_le_5
+    $I4 = 1
+  test_le_5:
+    ok($I4, 'le_i_ic - true inequality')
+
+    $I4 = 0
+    unless $I2 <= 0 goto test_le_6
+    $I4 = 1
+  test_le_6:
+    ok($I4, 'le_i_ic - reflexivity')
+.end
+
+.sub 'test_gt'
+    $I0 = -2147483648
+    $I1 = 2147483647
+    $I2 = 0
+    $I3 = 0
+
+    $I4 = 0
+    unless $I1 > $I0 goto test_gt_1
+    $I4 = 1
+  test_gt_1:
+    ok($I4, 'gt_i_i - true inequality')
+
+    $I4 = 0
+    if $I0 > $I1 goto test_gt_2
+    $I4 = 1
+  test_gt_2:
+    ok($I4, 'gt_i_i - false inequality')
+
+    $I4 = 0
+    if $I2 > $I3 goto test_gt_3
+    $I4 = 1
+  test_gt_3:
+    ok($I4, 'gt_i_i - irreflexive')
+
+    $I4 = 0
+    if $I0 > 2147483647 goto test_gt_4
+    $I4 = 1
+  test_gt_4:
+    ok($I4, 'gt_i_ic - false inequality')
+
+    $I4 = 0
+    unless $I1 > -2147483648 goto test_gt_5
+    $I4 = 1
+  test_gt_5:
+    ok($I4, 'gt_i_ic - true inequality')
+
+    $I4 = 0
+    if $I0 > 0 goto test_gt_6
+    $I4 = 1
+  test_gt_6:
+    ok($I4, 'gt_i_ic - another false inequality')
+.end
+
+.sub 'test_ge'
+    $I0 = -2147483648
+    $I1 = 2147483647
+    $I2 = 0
+    $I3 = 0
+
+    $I4 = 0
+    unless $I1 >= $I0 goto test_ge_1
+    $I4 = 1
+  test_ge_1:
+    ok($I4, 'ge_i_i - true inequality')
+
+    $I4 = 0
+    if $I0 >= $I1 goto test_ge_2
+    $I4 = 1
+  test_ge_2:
+    ok($I4, 'ge_i_i - false inequality')
+
+    $I4 = 0
+    unless $I2 >= $I3 goto test_ge_3
+    $I4 = 1
+  test_ge_3:
+    ok($I4, 'ge_i_i - reflexive')
+
+    $I4 = 0
+    if $I0 >= 2147483647 goto test_ge_4
+    $I4 = 1
+  test_ge_4:
+    ok($I4, 'ge_i_ic - false inequality')
+
+    $I4 = 0
+    unless $I1 >= -2147483648 goto test_ge_5
+    $I4 = 1
+  test_ge_5:
+    ok($I4, 'ge_i_ic - true inequality')
+
+    $I4 = 0
+    unless $I2 >= 0 goto test_ge_6
+    $I4 = 1
+  test_ge_6:
+    ok($I4, 'ge_i_ic - reflexivity')
+.end
+
+.sub 'test_not'
+    $I0 = 1
+    $I1 = not $I0
+    is($I1, 0, 'not_i_i - not 1')
+
+    $I2 = not $I1
+    is($I2, 1, 'not_i_i - not (not 1)')
+
+    $I3 = 12345
+    $I4 = not $I3
+    is($I4, 0, 'not_i_i of a positive integer')
+
+    $I5 = -1
+    $I6 = not $I5
+    is($I6, 0, 'not_i_i of a negative integer')
+
+    $I7 = 1
+    $I7 = not 1
+    is($I7, 0, 'not_i_ic')
+.end
+
+.sub 'test_and'
+    $I0 = 0
+    $I1 = 10
+
+    $I2 = 1
+    $I2 = and $I1, $I0
+    is($I2, 0, 'and - zero is right absorbing')
+
+    $I2 = 1
+    $I2 = and $I0, $I1
+    is($I2, 0, 'and - zero is left absorbing')
+
+    $I2 = 1
+    $I2 = and $I0, $I0
+    is($I2, 0, 'and - diagonal zero')
+
+    $I2 = 1
+    $I2 = and $I2, $I1
+    is($I2, 10, 'and - true operands')
+.end
+
+.sub 'test_or'
+    $I0 = 0
+    $I1 = 10
+
+    $I2 = 42
+    $I2 = or $I1, $I0
+    is($I2, 10, 'or_i_i')
+
+    $I2 = 42
+    $I2 = or $I0, $I1
+    is($I2, 10, 'or_i_i - symmetric case')
+
+    $I2 = or $I0, $I0
+    is($I2, 0, 'or_i_i - false arguments')
+
+    $I2 = or $I2, $I1
+    is($I2, 10, 'or_i_i - reflexive')
+.end
+
+.sub 'test_xor'
+    $I0 = 0
+    $I1 = 2
+
+    $I2 = 42
+    $I2 = xor $I1, $I0
+    is($I2, 2, 'xor - zero is right neutral')
+
+    $I2 = 42
+    $I2 = xor $I0, $I1
+    is($I2, 2, 'xor - zero is left neutral')
+
+    $I2 = xor $I0, $I0
+    is($I2, 0, 'xor - nilpotent on zero')
+
+    $I2 = xor $I1, $I1
+    is($I2, 0, 'xor - nilpotent on 2')
+    
+    $I2 = xor $I2, $I2
+    is($I2, 0, 'xor - nilpotent on other')
+.end
+
+.sub 'test_inc'
+    $I0 = 0
+    inc $I0
+    is($I0, 1, 'inc_i (first)')
+    inc $I0
+    inc $I0
+    inc $I0
+    inc $I0
+    is($I0, 5, 'inc_i (second)')
+.end
+
+.sub 'test_dec'
+    $I0 = 0
+    dec $I0
+    is($I0, -1, 'dec_i (first)')
+    dec $I0
+    dec $I0
+    dec $I0
+    dec $I0
+    is($I0, -5, 'dec_i (second)')
+.end
+
+.sub 'test_sub_i_i'
+    $I0 = 0
+    $I1 = 3
+    $I2 = -3
+
+    sub $I0, $I1
+    is($I0, -3, 'sub_i_i')
+
+    sub $I0, $I2
+    is($I0, 0, 'sub_i_i - inverse')
+
+    $I0 = 0
+    sub $I0, 5
+    is($I0, -5, 'sub_i_ic - first')
+
+    sub $I0, -10
+    is($I0, 5, 'sub_i_ic - second')
+.end
+
+.sub 'test_set_n'
+    $I0 = 0
+    $N0 = $I0
+    is($N0, 0.0, 'set_n_i -zero')
+
+    $I1 = 2147483647
+    $N1 = $I1
+    is($N1, 2147483647.0, 'set_n_i - positive integer')
+
+    $I2 = -2147483648
+    $N2 = $I2
+    is($N2, -2147483648.0, 'set_n_i - negative integer')
+.end
+
+.sub 'test_cleari'
+    $I0 = 0xdeadbee
+    $I1 = 0xdeadbee
+    $I2 = 0xdeadbee
+    $I3 = 0xdeadbee
+    $I4 = 0xdeadbee
+    $I5 = 0xdeadbee
+    $I6 = 0xdeadbee
+    $I7 = 0xdeadbee
+    $I8 = 0xdeadbee
+    $I9 = 0xdeadbee
+    $I10 = 0xdeadbee
+    $I11 = 0xdeadbee
+    $I12 = 0xdeadbee
+    $I13 = 0xdeadbee
+    $I14 = 0xdeadbee
+    $I15 = 0xdeadbee
+    $I16 = 0xdeadbee
+    $I17 = 0xdeadbee
+    $I18 = 0xdeadbee
+    $I19 = 0xdeadbee
+    $I20 = 0xdeadbee
+    $I21 = 0xdeadbee
+    $I22 = 0xdeadbee
+    $I23 = 0xdeadbee
+    $I24 = 0xdeadbee
+    $I25 = 0xdeadbee
+    $I26 = 0xdeadbee
+    $I27 = 0xdeadbee
+    $I28 = 0xdeadbee
+    $I29 = 0xdeadbee
+    $I30 = 0xdeadbee
+    $I31 = 0xdeadbee
+
+    cleari
+
+    is($I0, 0, 'cleari - $I0 cleared')
+    is($I1, 0, 'cleari - $I1 cleared')
+    is($I2, 0, 'cleari - $I2 cleared')
+    is($I3, 0, 'cleari - $I3 cleared')
+    is($I4, 0, 'cleari - $I4 cleared')
+    is($I5, 0, 'cleari - $I5 cleared')
+    is($I6, 0, 'cleari - $I6 cleared')
+    is($I7, 0, 'cleari - $I7 cleared')
+    is($I8, 0, 'cleari - $I8 cleared')
+    is($I9, 0, 'cleari - $I9 cleared')
+    is($I10, 0, 'cleari - $I10 cleared')
+    is($I11, 0, 'cleari - $I11 cleared')
+    is($I12, 0, 'cleari - $I12 cleared')
+    is($I13, 0, 'cleari - $I13 cleared')
+    is($I14, 0, 'cleari - $I14 cleared')
+    is($I15, 0, 'cleari - $I15 cleared')
+    is($I16, 0, 'cleari - $I16 cleared')
+    is($I17, 0, 'cleari - $I17 cleared')
+    is($I18, 0, 'cleari - $I18 cleared')
+    is($I19, 0, 'cleari - $I19 cleared')
+    is($I20, 0, 'cleari - $I20 cleared')
+    is($I21, 0, 'cleari - $I21 cleared')
+    is($I22, 0, 'cleari - $I22 cleared')
+    is($I23, 0, 'cleari - $I23 cleared')
+    is($I24, 0, 'cleari - $I24 cleared')
+    is($I25, 0, 'cleari - $I25 cleared')
+    is($I26, 0, 'cleari - $I26 cleared')
+    is($I27, 0, 'cleari - $I27 cleared')
+    is($I28, 0, 'cleari - $I28 cleared')
+    is($I29, 0, 'cleari - $I29 cleared')
+    is($I30, 0, 'cleari - $I30 cleared')
+    is($I31, 0, 'cleari - $I31 cleared')
+.end
+
+.sub 'test_neg'
+    $I0 = neg 3
+    $I0 = neg $I0
+    neg $I0
+
+    is($I0, -3, 'neg_i')
+.end
+
+.sub 'test_mul_i_i'
+    $I0 = 3
+    $I1 = 4
+    mul $I0, $I1
+
+    is($I0, 12, 'mul_i_i')
+.end
+
+.sub 'test_fact'
+    $I0 = 3
+    $I1 = 11
+    $I2 = 0
+    $I3 = -563
+
+    $I5 = fact $I0
+    is($I5, 6, 'fact_i_i - first')
+
+    $I6 = fact $I1
+    is($I6, 39916800, 'fact_i_i - second')
+
+    $I7 = fact $I2
+    is($I7, 1, 'fact_i_i on zero')
+
+    $I8 = fact $I3
+    is($I8, 1, 'fact_i_i on a negative integer')
+
+    # Now run the same tests, with constants instead
+    $I5 = fact 3
+    is($I5, 6, 'fact_i_ic - first')
+
+    $I6 = fact 11
+    is($I6, 39916800, 'fact_i_ic - second')
+
+    $I7 = fact 0
+    is($I7, 1, 'fact_i_ic on zero')
+
+    $I8 = fact -563
+    is($I8, 1, 'fact_i_ic on a negative integer')
+.end
+
+.sub 'test_exchange'
+    $I10 = 10
+    $I20 = 20
+    exchange $I10, $I20
+    is($I10, 20, 'exchange - first operand ok')
+    is($I20, 10, 'exchange - second operand ok')
+
+    $I30 = 30
+    exchange $I30, $I30
+    is($I30, 30, 'exchange - reflexive')
+.end
+
+.sub 'test_null'
+    $I1 = 1000
+    is($I1, 1000, 'null_i - before null')
+    null $I1
+    is($I1, 0, 'null_i - after null')
+.end
+
+.sub 'test_div_i_i_by_zero'
+    $I0 = 0
+    $I1 = 10
+    push_eh test_div_i_i_by_zero_catch
+    div $I1, $I0
+    pop_eh
+    $I2 = 0
+    goto test_div_i_i_by_zero_end
+
+  test_div_i_i_by_zero_catch:
+    $I2 = 1
+
+  test_div_i_i_by_zero_end:
+    ok($I2, 'div_i_i by zero')
+.end
+
+.sub 'test_div_i_ic_by_zero'
+    $I1 = 10
+    push_eh test_div_i_ic_by_zero_catch
+    div $I1, 0
+    pop_eh
+    $I2 = 0
+    goto test_div_i_ic_by_zero_end
+
+  test_div_i_ic_by_zero_catch:
+    $I2 = 1
+
+  test_div_i_ic_by_zero_end:
+    ok($I2, 'div_i_ic by zero')
+.end
+
+.sub 'test_div_i_i_i_by_zero'
+    $I0 = 0
+    $I1 = 10
+    push_eh test_div_i_i_i_by_zero_catch
+    $I2 = div $I1, $I0
+    pop_eh
+    $I3 = 0
+    goto test_div_i_i_i_by_zero_end
+
+  test_div_i_i_i_by_zero_catch:
+    $I3 = 1
+
+  test_div_i_i_i_by_zero_end:
+    ok($I3, 'div_i_i_i by zero')
+.end
+
+.sub 'test_div_i_ic_i_by_zero'
+    $I0 = 0
+    push_eh test_div_i_ic_i_by_zero_catch
+    $I2 = div 10, $I0
+    pop_eh
+    $I3 = 0
+    goto test_div_i_ic_i_by_zero_end
+
+  test_div_i_ic_i_by_zero_catch:
+    $I3 = 1
+
+  test_div_i_ic_i_by_zero_end:
+    ok($I3, 'div_i_ic_i by zero')
+.end
+
+.sub 'test_div_i_i_ic_by_zero'
+    $I1 = 10
+    push_eh test_div_i_i_ic_by_zero_catch
+    $I2 = div $I1, 0
+    pop_eh
+    $I3 = 0
+    goto test_div_i_i_ic_by_zero_end
+
+  test_div_i_i_ic_by_zero_catch:
+    $I3 = 1
+
+  test_div_i_i_ic_by_zero_end:
+    ok($I3, 'div_i_i_ic by zero')
+.end
+
+.sub 'test_fdiv_i_i_by_zero'
+    $I0 = 0
+    $I1 = 10
+    push_eh test_fdiv_i_i_by_zero_catch
+    fdiv $I1, $I0
+    pop_eh
+    $I2 = 0
+    goto test_fdiv_i_i_by_zero_end
+
+  test_fdiv_i_i_by_zero_catch:
+    $I2 = 1
+
+  test_fdiv_i_i_by_zero_end:
+    ok($I2, 'fdiv_i_i by zero')
+.end
+
+.sub 'test_fdiv_i_ic_by_zero'
+    $I1 = 10
+    push_eh test_fdiv_i_ic_by_zero_catch
+    fdiv $I1, 0
+    pop_eh
+    $I2 = 0
+    goto test_fdiv_i_ic_by_zero_end
+
+  test_fdiv_i_ic_by_zero_catch:
+    $I2 = 1
+
+  test_fdiv_i_ic_by_zero_end:
+    ok($I2, 'fdiv_i_ic by zero')
+.end
+
+.sub 'test_fdiv_i_i_i_by_zero'
+    $I0 = 0
+    $I1 = 10
+    push_eh test_fdiv_i_i_i_by_zero_catch
+    $I2 = fdiv $I1, $I0
+    pop_eh
+    $I3 = 0
+    goto test_fdiv_i_i_i_by_zero_end
+
+  test_fdiv_i_i_i_by_zero_catch:
+    $I3 = 1
+
+  test_fdiv_i_i_i_by_zero_end:
+    ok($I3, 'fdiv_i_i_i by zero')
+.end
+
+.sub 'test_fdiv_i_ic_i_by_zero'
+    $I0 = 0
+    push_eh test_fdiv_i_ic_i_by_zero_catch
+    $I2 = fdiv 10, $I0
+    pop_eh
+    $I3 = 0
+    goto test_fdiv_i_ic_i_by_zero_end
+
+  test_fdiv_i_ic_i_by_zero_catch:
+    $I3 = 1
+
+  test_fdiv_i_ic_i_by_zero_end:
+    ok($I3, 'fdiv_i_ic_i by zero')
+.end
+
+.sub 'test_fdiv_i_i_ic_by_zero'
+    $I1 = 10
+    push_eh test_fdiv_i_i_ic_by_zero_catch
+    $I2 = fdiv $I1, 0
+    pop_eh
+    $I3 = 0
+    goto test_fdiv_i_i_ic_by_zero_end
+
+  test_fdiv_i_i_ic_by_zero_catch:
+    $I3 = 1
+
+  test_fdiv_i_i_ic_by_zero_end:
+    ok($I3, 'fdiv_i_i_ic by zero')
+.end
+
+.sub 'test_cmod_i_i_i_by_zero'
+    $I0 = 0
+    $I1 = 10
+    push_eh test_cmod_i_i_i_by_zero_catch
+    $I2 = cmod $I1, $I0
+    pop_eh
+    $I3 = 0
+    goto test_cmod_i_i_i_by_zero_end
+
+  test_cmod_i_i_i_by_zero_catch:
+    $I3 = 1
+
+  test_cmod_i_i_i_by_zero_end:
+    ok($I3, 'cmod_i_i_i by zero')
+.end
+
+.sub 'test_cmod_i_ic_i_by_zero'
+    $I0 = 0
+    push_eh test_cmod_i_ic_i_by_zero_catch
+    $I2 = cmod 10, $I0
+    pop_eh
+    $I3 = 0
+    goto test_cmod_i_ic_i_by_zero_end
+
+  test_cmod_i_ic_i_by_zero_catch:
+    $I3 = 1
+
+  test_cmod_i_ic_i_by_zero_end:
+    ok($I3, 'cmod_i_ic_i by zero')
+.end
+
+.sub 'test_cmod_i_i_ic_by_zero'
+    $I1 = 10
+    push_eh test_cmod_i_i_ic_by_zero_catch
+    $I2 = cmod $I1, 0
+    pop_eh
+    $I3 = 0
+    goto test_cmod_i_i_ic_by_zero_end
+
+  test_cmod_i_i_ic_by_zero_catch:
+    $I3 = 1
+
+  test_cmod_i_i_ic_by_zero_end:
+    ok($I3, 'cmod_i_i_ic by zero')
+.end
+
+.sub 'test_mod_i_i_i_by_zero'
+    $I0 = 0
+    $I1 = 10
+    $I2 = mod $I1, $I0
+    is($I2, 10, 'mod_i_i_i by zero')
+.end
+
+.sub 'test_mod_i_ic_i_by_zero'
+    $I0 = 0
+    $I2 = mod 10, $I0
+    is($I2, 10, 'mod_i_ic_i by zero')
+.end
+
+.sub 'test_mod_i_i_ic_by_zero'
+    $I1 = 10
+    $I2 = mod $I1, 0
+    is($I2, 10, 'mod_i_i_ic by zero')
+.end
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
