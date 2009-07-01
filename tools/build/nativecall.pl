@@ -511,7 +511,6 @@ SHIM(PMC *pmc_nci), NOTNULL(STRING *signature), SHIM(int *jitted))
 {
     char       *c;
     STRING     *ns, *message;
-    STRING     *jit_key_name;
     PMC        *b;
     PMC        *iglobals;
     PMC        *temp_pmc;
@@ -547,10 +546,7 @@ SHIM(PMC *pmc_nci), NOTNULL(STRING *signature), SHIM(int *jitted))
 
 #if defined(CAN_BUILD_CALL_FRAMES)
     /* Try if JIT code can build that signature. If yes, we are done */
-
-    jit_key_name = CONST_STRING(interp, "_XJIT_");
-    jit_key_name = Parrot_str_concat(interp, jit_key_name, signature, 0);
-    b            = VTABLE_get_pmc_keyed_str(interp, HashPointer, jit_key_name);
+    b            = VTABLE_get_pmc_keyed_str(interp, HashPointer, signature);
 
     PARROT_ASSERT(PMC_IS_NULL(b) || b->vtable);
 
@@ -575,7 +571,7 @@ SHIM(PMC *pmc_nci), NOTNULL(STRING *signature), SHIM(int *jitted))
             SETATTR_ManagedStruct_custom_clone_func(interp, temp_pmc, Parrot_jit_clone_buffer);
             SETATTR_ManagedStruct_custom_clone_priv(interp, temp_pmc, priv);
 #endif /* PARROT_HAS_EXEC_PROTECT */
-            VTABLE_set_pmc_keyed_str(interp, HashPointer, jit_key_name, temp_pmc);
+            VTABLE_set_pmc_keyed_str(interp, HashPointer, signature, temp_pmc);
             return result;
         }
     }
