@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 165;
+use Parrot::Test tests => 166;
 use Parrot::Config;
 
 =head1 NAME
@@ -2631,6 +2631,41 @@ loop:
     if I2, loop
     end
 CODE
+5
+
+foo
+b
+r
+
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'split HLL mapped' );
+.HLL 'foohll'
+.sub main
+    .local pmc RSA, fooRSA
+    RSA = get_class ['ResizableStringArray']
+    fooRSA = subclass ['ResizableStringArray'], 'fooRSA'
+    .local pmc interp
+    interp = getinterp
+    interp.'hll_map'(RSA, fooRSA)
+    .local pmc a
+    split a, "a", "afooabara"
+    .local string t
+    t = typeof a
+    say t
+    .local int n, i
+    n = a
+    say n
+    i = 0
+loop:
+    .local string s
+    s = a[i]
+    say s
+    inc i
+    if i != n goto loop
+.end
+CODE
+fooRSA
 5
 
 foo

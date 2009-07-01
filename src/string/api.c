@@ -3340,8 +3340,8 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
 =item C<PMC* Parrot_str_split(PARROT_INTERP, STRING *delim, STRING *str)>
 
 Splits the string C<str> at the delimiter C<delim>, returning a
-C<ResizableStringArray> of results. Returns PMCNULL if the string or the
-delimiter is NULL.
+C<ResizableStringArray>, or his mapped type in the current HLL,
+of results. Returns PMCNULL if the string or the delimiter is NULL.
 
 =cut
 
@@ -3361,7 +3361,7 @@ Parrot_str_split(PARROT_INTERP,
     if (STRING_IS_NULL(delim) || STRING_IS_NULL(str))
         return PMCNULL;
 
-    res  = pmc_new(interp, enum_class_ResizableStringArray);
+    res  = pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_ResizableStringArray));
     slen = Parrot_str_byte_length(interp, str);
 
     if (!slen)
