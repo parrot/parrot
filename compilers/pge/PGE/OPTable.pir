@@ -614,8 +614,13 @@ Adds (or replaces) a syntactic category's defaults.
     .return (mob)
 
   err_ternary:
-    print "Ternary error\n"
-    end
+    $S1 = pos
+    $S0 = concat 'Ternary error at offset ', $S1
+    $S0 .= ", found '"
+    $S1 = substr target, pos, 1
+    $S0 .= $S1
+    $S0 .= "'"
+    die $S0
 .end
 
 
