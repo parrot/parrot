@@ -542,10 +542,8 @@ SHIM(PMC *pmc_nci), NOTNULL(STRING *signature), SHIM(int *jitted))
         HashPointer = pmc_new(interp, enum_class_Hash);
         VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FUNCS,
                 HashPointer);
-
-$put_pointer
-
     }
+
 
 #if defined(CAN_BUILD_CALL_FRAMES)
     /* Try if JIT code can build that signature. If yes, we are done */
@@ -585,6 +583,12 @@ $put_pointer
 #endif
 
     b = VTABLE_get_pmc_keyed_str(interp, HashPointer, signature);
+
+    if (PMC_IS_NULL(b)) {
+        $put_pointer
+
+        b = VTABLE_get_pmc_keyed_str(interp, HashPointer, signature);
+    }
 
     PARROT_ASSERT(PMC_IS_NULL(b) || b->vtable);
 
