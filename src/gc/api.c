@@ -15,6 +15,73 @@ throughtout Parrot without having to be concerned about the internal operations
 of the GC. This is documented in PDD 9 with supplementary notes in
 F<docs/memory_internals.pod>.
 
+=head1 GC OVERVIEW
+
+The GC is broken into a number of different files that each represent different
+components.
+
+=over 4
+
+=item F<src/gc/api.c>
+
+This is the main API file which provides access to functions which are used by
+the rest of Parrot core. In the long term, only the functions provided in this
+file should be visible to files outside the src/gc/ directory. Because this
+represents a public-facing API, the functions in this file are not related by
+theme.
+
+=item F<src/gc/alloc_memory.c>
+
+This file provides a number of functions and macros for allocating memory from
+the OS. These are typically wrapper functions with error-handling capabilities
+over malloc, calloc, or realloc.
+
+=item F<src/gc/alloc_register.c>
+
+This file implements the custom management and interface logic for
+Parrot_Context structures. The functions in this file are publicly available
+and are used throughout Parrot core for interacting with contexts and registers
+
+=item F<src/gc/alloc_resources.c>
+
+This file implements handling logic for strings and arbitrary-sized memory
+buffers. String storage is managed by special Memory_Pool structures, and use
+a separate compacting garbage collector to keep track of them.
+
+=item F<src/gc/gc_ims.c>
+
+=item F<src/gc/gc_gms.c>
+
+=item F<src/gc/gc_ms.c>
+
+These files are the individual GC cores which implement the primary tracing
+and sweeping logic. gc_ms.c is the mark&sweep collector core which is used in
+Parrot by default. gc_gms.c is an experimental and incomplete generational core.
+gc_ims.c is an experimental and incomplete incremental collector core.
+
+=item F<src/gc/mark_sweep.c>
+
+This file implements some routines that are commonly needed by the various GC
+cores and provide an abstraction layer that a GC core can use to interact with
+some of the architecture of Parrot.
+
+=item F<src/gc/system.c>
+
+This file implements logic for tracing processor registers and the system stack.
+Here there be dragons.
+
+=item F<src/gc/res_lea.c>
+
+=item F<src/gc/malloc.c>
+
+=item F<src/gc/malloc_trace.c>
+
+These three files implement various unused features, including a custom malloc
+implementation, and malloc wrappers for various purposes. These are unused.
+
+=back
+
+
 =head1 FUNCTIONS
 
 =over 4
