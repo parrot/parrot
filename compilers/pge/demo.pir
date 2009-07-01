@@ -58,7 +58,7 @@
   match_result:
     unless match goto match_fail
     print "match succeeded\n"
-    $P0 = find_global "_dumper"
+    $P0 = get_global "_dumper"
     $P0(match, "$/")
     goto read_loop
   match_fail:
@@ -90,7 +90,7 @@
   save_rule:
     if_null rulesub, match_nopattern
     x = substr x, 5
-    store_global x, rulesub
+    set_global x, rulesub
     print "Saved as "
     print x
     print "\n"
@@ -104,7 +104,7 @@
 
   print_exp:
     if_null rulesub, match_nopattern
-    $P0 = find_global "_dumper"
+    $P0 = get_global "_dumper"
     $P0(exp, "exp")
     goto read_loop
 
