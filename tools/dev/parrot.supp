@@ -85,7 +85,8 @@
    fun:trace_active_PMCs
 }
 
-# strip out the system library nonsense
+# strip out GNU/Linux system library nonsense
+# Start with the linker stuff
 {
    gnuld-index-cond
    Memcheck:Cond
@@ -96,6 +97,18 @@
    gnuld-strlen-cond
    Memcheck:Cond
    fun:strlen
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-strlen-value8
+   Memcheck:Value8
+   fun:strlen
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-strcmp-value8
+   Memcheck:Value8
+   fun:strcmp
    obj:/lib*/ld-*.so
 }
 {
@@ -321,18 +334,6 @@
    obj:/lib*/ld-*.so
 }
 {
-   gnuld-dl-fini-cond
-   Memcheck:Cond
-   fun:_dl_fini
-   obj:/lib*/ld-*.so
-}
-{
-   gnuld-dl-fini-value8
-   Memcheck:Value8
-   fun:_dl_fini
-   obj:/lib*/ld-*.so
-}
-{
    gnuld-dl-sort-fini-value8
    Memcheck:Value8
    fun:_dl_sort_fini
@@ -343,4 +344,30 @@
    Memcheck:Cond
    fun:_dl_sort_fini
    obj:/lib*/ld-*.so
+}
+# C Runtime / Linker stub stuff
+{
+   gnucrt-dl-fini-cond
+   Memcheck:Cond
+   fun:_dl_fini
+}
+{
+   gnucrt-dl-fini-value8
+   Memcheck:Value8
+   fun:_dl_fini
+}
+# LibC stuff
+{
+   gnuc-vgnu-freeres-cond
+   Memcheck:Cond
+   obj:/lib*/libc-*.so
+   obj:/lib*/libc-*.so
+   fun:_vgnU_freeres
+}
+{
+   gnuc-vgnu-freeres-value8
+   Memcheck:Value8
+   obj:/lib*/libc-*.so
+   obj:/lib*/libc-*.so
+   fun:_vgnU_freeres
 }
