@@ -1,13 +1,6 @@
-#!perl
+#! parrot
 # Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-
-use Test::More;
-use Parrot::Test tests => 8;
 
 =head1 NAME
 
@@ -24,29 +17,33 @@ a variety of keys and values.
 
 =cut
 
-my $PRE = <<PRE;
+.const int TESTS = 47
+
 .sub 'test' :main
-    .local pmc capt
-    capt = new ['Capture']
-PRE
+    .include 'test_more.pir'
 
-my $POST = <<POST;
-    goto end
-  nok:
-    print 'not '
-  ok:
-    say 'ok'
-  end:
+    plan(TESTS)
+
+    test_new_capture()
+    basic_capture_tests()
+    test_defined_delete_exists()
+    test_hash_list()
+    test_get_integer()
+    test_get_number()
+    test_keyed_int_delegation()
+    test_list_delegation()
 .end
-POST
 
-pir_output_is( $PRE . <<'CODE'. $POST, <<'OUT', 'new' );
-CODE
-OUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "Basic capture tests" );
-.sub main :main
+.sub 'test_new_capture'
     .local pmc capt
+
+    capt = new ['Capture']
+    ok(1, 'new Capture')
+.end
+
+.sub 'basic_capture_tests'
+    .local pmc capt
+
     capt = new ['Capture']
 
     capt[0] = 0
@@ -78,107 +75,90 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Basic capture tests" );
     capt['delta'] = $P0
 
     $I0 = elements capt
-    print $I0
-    print "\n"
+    is($I0, 12, 'elements')
 
     $I0 = capt[11]
-    print $I0
-    print " "
+    is($I0, 7, 'get_integer_keyed_int')
+    
     $P0 = capt[10]
-    print $P0
-    print " "
+    is($P0, 'six', 'get_pmc_keyed_int')
+
     $N0 = capt[9]
-    print $N0
-    print " "
+    is($N0, 5.5, 'get_number_keyed_int')
+
     $S0 = capt[8]
-    say $S0
+    is($S0, '4', 'get_string_keyed_int')
 
     $I0 = pop capt
-    print $I0
-    print " "
+    is($I0, 7, 'pop an integer')
+
     $P0 = pop capt
-    print $P0
-    print " "
+    is($P0, 'six', 'pop a PMC')
+
     $N0 = pop capt
-    print $N0
-    print " "
+    is($N0, 5.5, 'pop a number')
+
     $S0 = pop capt
-    say $S0
+    is($S0, '4', 'pop a string')
 
     $I0 = elements capt
-    print $I0
-    print "\n"
+    is($I0, 8, 'elements after pop')
 
     $I0 = shift capt
-    print $I0
-    print " "
+    is($I0, 11, 'shift an integer')
+    
     $P0 = shift capt
-    print $P0
-    print " "
+    is($P0, 'ten', 'shift a PMC')
+    
     $N0 = shift capt
-    print $N0
-    print " "
+    is($N0, 9.5, 'shift a number')
+    
     $S0 = shift capt
-    say $S0
+    is($S0, '8', 'shift a string')
 
     $I0 = elements capt
-    print $I0
-    print "\n"
+    is($I0, 4, 'elements after shift')
 
-  loop:
-    $I0 = elements capt
-    if $I0 < 1 goto end
     $P0 = pop capt
-    say $P0
-    goto loop
-  end:
+    is($P0, 3, 'pop 1 out of 4')
+
+    $P0 = pop capt
+    is($P0, 'two', 'pop 2 out of 4')
+
+    $P0 = pop capt
+    is($P0, 1.5, 'pop 3 out of 4')
+
+    $P0 = pop capt
+    is($P0, 0, 'pop 4 out of 4')
 
     $I0 = capt['delta']
-    print $I0
-    print " "
-    $P0 = capt['gamma']
-    print $P0
-    print " "
-    $N0 = capt['beta']
-    print $N0
-    print " "
-    $S0 = capt['alpha']
-    say $S0
+    is($I0, 15, 'get_integer_keyed_str')
 
+    $P0 = capt['gamma']
+    is($P0, 'fourteen', 'get_pmc_keyed_str')
+    
+    $N0 = capt['beta']
+    is($N0, 13.5, 'get_number_keyed_str')
+
+    $S0 = capt['alpha']
+    is($S0, '12', 'get_string_keyed_str')
 .end
 
-CODE
-12
-7 six 5.5 4
-7 six 5.5 4
-8
-11 ten 9.5 8
-4
-3
-two
-1.5
-0
-15 fourteen 13.5 12
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "defined, delete, exists" );
-.sub main :main
+.sub 'test_defined_delete_exists'
     .local pmc capt
     capt = new ['Capture']
 
     $I0 = defined capt[2]
+    nok($I0, 'defined_i initially false')
+
     $I1 = exists capt[2]
-    print $I0
-    print " "
-    print $I1
-    print "\n"
+    nok($I1, 'exists_i initially false')
 
     $I0 = defined capt['alpha']
+    nok($I0, 'defined_s initially false')
+
     $I1 = exists capt['alpha']
-    print $I0
-    print " "
-    print $I1
-    print "\n"
+    nok($I1, 'exists_s initially false')
 
     capt[2] = 1
     capt['alpha'] = 1
@@ -186,117 +166,115 @@ pir_output_is( <<'CODE', <<'OUTPUT', "defined, delete, exists" );
     capt['beta'] = $P0
 
     $I0 = defined capt[2]
+    ok($I0, 'defined_i true after set')
+
     $I1 = exists capt[2]
-    print $I0
-    print " "
-    print $I1
-    print "\n"
+    ok($I1, 'exists_i true after set')
 
     $I0 = defined capt['alpha']
+    ok($I0, 'defined_s true after set')
+
     $I1 = exists capt['alpha']
-    print $I0
-    print " "
-    print $I1
-    print "\n"
+    ok($I1, 'exists_s true after set')
 
     $I0 = defined capt[1]
+    nok($I0, 'defined_i - no intermediate element created')
+
     $I1 = exists capt[1]
-    print $I0
-    print " "
-    print $I1
-    print "\n"
+    nok($I1, 'exists_i - no intermediate element created')
 
     $I0 = defined capt['beta']
+    nok($I0, 'defined_s checks for Undef values...')
+
     $I1 = exists capt['beta']
-    print $I0
-    print " "
-    print $I1
-    print "\n"
+    ok($I1, 'but exists_s does not care')
 
     delete capt[2]
     delete capt['alpha']
 
     $I0 = defined capt[2]
+    nok($I0, 'defined_i false after delete')
     $I1 = exists capt[2]
-    print $I0
-    print " "
-    print $I1
-    print "\n"
+    nok($I1, 'exists_i false after delete')
 
     $I0 = defined capt['alpha']
+    nok($I0, 'defined_s false after delete')
     $I1 = exists capt['alpha']
-    print $I0
-    print " "
-    print $I1
-    print "\n"
-
-
+    nok($I1, 'exists_s false after delete')
 .end
-CODE
-0 0
-0 0
-1 1
-1 1
-0 0
-0 1
-0 0
-0 0
-OUTPUT
 
-pir_output_is( $PRE . <<'CODE'. $POST, <<'OUTPUT', "hash, list" );
+.sub 'test_hash_list'
+    .local pmc capt
+
+    capt = new ['Capture']
+
     $P0 = capt.'list'()
     $P1 = capt.'hash'()
 
-    $S0 = typeof $P0
-    $S1 = typeof $P1
+    isa_ok($P0, 'ResizablePMCArray', "capt.'list'")
+    isa_ok($P1, 'Hash', "capt.'hash'")
+.end
 
-    say $S0
-    say $S1
-CODE
-ResizablePMCArray
-Hash
-OUTPUT
+.sub 'test_get_integer'
+    .local pmc capt
 
-pir_error_output_like( $PRE . <<'CODE'. $POST, <<'OUT', 'get_integer not implemented' );
+    capt = new ['Capture']
+    push_eh test_get_integer_catch
     $I0 = capt
-CODE
-/get_integer\(\) not implemented in class 'Capture'/
-OUT
 
-pir_error_output_like( $PRE . <<'CODE'. $POST, <<'OUT', 'get_number not implemented' );
+    nok(1, 'get_integer not implemented')
+    .return ()
+
+  test_get_integer_catch:
+    .local pmc exception
+    .local string message
+    .get_results (exception)
+
+    message = exception['message']
+    like(message, ':s get_integer\(\) not implemented', 'get_integer not implemented')
+    .return ()
+.end
+
+.sub 'test_get_number'
+    .local pmc capt
+
+    capt = new ['Capture']
+    push_eh test_get_number_catch
     $N0 = capt
-CODE
-/get_number\(\) not implemented in class 'Capture'/
-OUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', '*_keyed_int delegation' );
-.sub main :main
-    $P99 = subclass 'Capture', 'Match'
+    nok(1, 'get_number not implemented')
+    .return ()
+
+  test_get_number_catch:
+    .local pmc exception
+    .local string message
+    .get_results (exception)
+
+    message = exception['message']
+    like(message, ':s get_number\(\) not implemented', 'get_number not implemented')
+    .return ()
+.end
+
+
+.sub 'test_keyed_int_delegation'
+    $P99 = subclass ['Capture'], ['Match']
     $P1 = new ['Match']
     $P1[1] = 1
     $I1 = elements $P1
-    print $I1
-    print "\n"
+    is($I1, 2, 'elements - delegated to parent class')
 
-    $P99 = subclass 'Match', 'Exp'
+    $P99 = subclass ['Match'], ['Exp']
     $P2 = new ['Exp']
     $P2[1] = 1
     $I2 = elements $P2
-    print $I2
-    print "\n"
-
+    is($I2, 2, 'elements - delegated twice')
 .end
-CODE
-2
-2
-OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'list method delegation' );
-.sub main :main
-    $P0 = subclass 'Capture', 'Match'
+.sub 'test_list_delegation'
+    $P0 = subclass ['Capture'], ['Match2']
     addattribute $P0, '$.abc'
     addattribute $P0, '$.xyz'
-    $P1 = new ['Match']
+    $P1 = new ['Match2']
     $P1[1] = 1
 
     $P2 = new ['String']
@@ -307,16 +285,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'list method delegation' );
     $P2 = $P1.'list'()
     $P2 = 0
     $I0 = elements $P2
-    print $I0
-    print "\n"
+    is($I0, 0, 'list method delegation')
 .end
-CODE
-0
-OUTPUT
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
