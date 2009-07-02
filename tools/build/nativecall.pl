@@ -96,7 +96,7 @@ for (values %sig_table) {
 
 
 my $temp_cnt = 0;
-my @put_pointer;
+my (@put_pointer, @put_pointer_nci_too, @nci_defs);
 my %seen;
 
 while (<>) {
@@ -141,18 +141,38 @@ while (<>) {
 
     my $ret_sig = $sig_table{$ret};
 
-    print_function(
-        $sig, $ret,
-        $args, [@arg],
-        $ret_sig->{as_return}, $ret_sig->{return_type_decl},
-        $ret_sig->{func_call_assign}, $ret_sig->{other_decl},
-        $ret_sig->{ret_assign}, \@temps,
-        \@extra_preamble, \@extra_postamble,
-        \@put_pointer
-    );
+    if ($args =~ /[234]/) {
+        push @nci_defs, create_function(
+            $sig, $ret,
+            $args, [@arg],
+            $ret_sig->{as_return}, $ret_sig->{return_type_decl},
+            $ret_sig->{func_call_assign}, $ret_sig->{other_decl},
+            $ret_sig->{ret_assign}, \@temps,
+            \@extra_preamble, \@extra_postamble,
+            \@put_pointer_nci_too,
+        );
+    }
+    else {
+        print {$NCI} create_function(
+            $sig, $ret,
+            $args, [@arg],
+            $ret_sig->{as_return}, $ret_sig->{return_type_decl},
+            $ret_sig->{func_call_assign}, $ret_sig->{other_decl},
+            $ret_sig->{ret_assign}, \@temps,
+            \@extra_preamble, \@extra_postamble,
+            \@put_pointer,
+        );
+    }
 }
 
-print_tail( \@put_pointer );
+print {$NCI} <<"END_FUNCS";
+
+#endif
+@nci_defs
+
+END_FUNCS
+
+print_tail( \@put_pointer, \@put_pointer_nci_too );
 
 # append the C code coda
 print $NCI <<"EOC";
@@ -328,6 +348,7 @@ set_nci_P(PARROT_INTERP, ARGOUT(call_state *st), PMC* val)
     }
 }
 
+#ifndef CAN_BUILD_CALL_FRAMES
 /* All our static functions that call in various ways. Yes, terribly
    hackish, but that is just fine */
 
@@ -404,13 +425,15 @@ sub make_arg {
     return;
 }
 
-sub print_function {
+sub create_function {
     my (
         $sig,          $return,        $params,             $args,
         $ret_type,     $ret_type_decl, $return_assign,      $other_decl,
         $final_assign, $temps_ref,     $extra_preamble_ref, $extra_postamble_ref,
         $put_pointer_ref,
     ) = @_;
+
+    my $func = '';
 
     $other_decl ||= "";
 
@@ -429,7 +452,7 @@ sub print_function {
 
         my $call_params = join( ",", @$args );
 
-        print $NCI <<"HEADER";
+        $func = <<"HEADER";
 static void
 pcf_${return}_$fix_params(PARROT_INTERP, PMC *self)
 {
@@ -455,7 +478,7 @@ HEADER
         # Things are more simple, when there are no params
         # call state var not needed if there are no params and a void return
         $call_state = '' if 'v' eq $return;
-        print $NCI <<"HEADER";
+        $func       = <<"HEADER";
 static void
 pcf_${return}_(PARROT_INTERP, PMC *self)
 {
@@ -488,13 +511,15 @@ HEADER
 PUT_POINTER
 
     #        qq|        parrot_hash_put( interp, known_frames, const_cast("$key"), $value );|;
-    return;
+
+    return $func;
 }
 
 sub print_tail {
-    my ($put_pointer_ref) = @_;
+    my ($put_pointer_ref, $put_pointer_nci_ref) = @_;
 
-    my $put_pointer = join( "\n", @{$put_pointer_ref} );
+    my $put_pointer     = join( "\n", @{$put_pointer_ref} );
+    my $put_pointer_nci = join( "\n", @{$put_pointer_nci_ref} );
     print $NCI <<"TAIL";
 
 
@@ -521,8 +546,12 @@ SHIM(PMC *pmc_nci), NOTNULL(STRING *signature), SHIM(int *jitted))
     /* And in here is the platform-independent way. Which is to say
        "here there be hacks" */
     signature_len = Parrot_str_byte_length(interp, signature);
+
+#ifndef CAN_BUILD_CALL_FRAMES
     if (0 == signature_len)
        return F2DPTR(pcf_v_);
+#endif
+
     /* remove deprecated void argument 'v' character */
     if (2 == signature_len && 'v' == Parrot_str_indexed(interp, signature, 1)) {
        Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG, "function signature argument character 'v' ignored");
@@ -542,7 +571,6 @@ SHIM(PMC *pmc_nci), NOTNULL(STRING *signature), SHIM(int *jitted))
         VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FUNCS,
                 HashPointer);
     }
-
 
 #if defined(CAN_BUILD_CALL_FRAMES)
     /* Try if JIT code can build that signature. If yes, we are done */
@@ -581,7 +609,10 @@ SHIM(PMC *pmc_nci), NOTNULL(STRING *signature), SHIM(int *jitted))
     b = VTABLE_get_pmc_keyed_str(interp, HashPointer, signature);
 
     if (PMC_IS_NULL(b)) {
-        $put_pointer
+$put_pointer_nci
+#ifndef CAN_BUILD_CALL_FRAMES
+$put_pointer
+#endif
 
         b = VTABLE_get_pmc_keyed_str(interp, HashPointer, signature);
     }

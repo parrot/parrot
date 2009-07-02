@@ -2525,8 +2525,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "conversion I <-> P" );
     i = new ['Integer']
     i = 2
     j = mult( 21, i )       # call signature is PI
-    print j
-    print "\n"
+    say j
 .end
 CODE
 42
