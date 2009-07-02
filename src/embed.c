@@ -644,7 +644,7 @@ setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
     for (i = 0; i < argc; i++) {
         /* Run through argv, adding everything to @ARGS. */
         STRING * const arg =
-            string_make(interp, argv[i], strlen(argv[i]), NULL,
+            string_make(interp, argv[i], strlen(argv[i]), "unicode",
                 PObj_external_FLAG);
 
         if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG))
