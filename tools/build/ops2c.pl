@@ -155,8 +155,6 @@ contributed to this program:
 
 =item C<Parrot::OpTrans::CGoto>
 
-=item C<Parrot::OpTrans::Compiled>
-
 =item C<Parrot::OpTrans::CGP>
 
 =item C<Parrot::OpTrans::CSwitch>

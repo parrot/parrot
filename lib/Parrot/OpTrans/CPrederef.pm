@@ -130,8 +130,6 @@ sub access_arg {
 
 =item C<Parrot::OpTrans::CSwitch>
 
-=item C<Parrot::OpTrans::Compiled>
-
 =back
 
 =cut

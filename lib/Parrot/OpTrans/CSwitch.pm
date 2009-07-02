@@ -247,8 +247,6 @@ END_C
 
 =item C<Parrot::OpTrans::CPrederef>
 
-=item C<Parrot::OpTrans::Compiled>
-
 =back
 
 =cut

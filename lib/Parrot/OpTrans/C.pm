@@ -184,8 +184,6 @@ sub restart_address {
 
 =item C<Parrot::OpTrans::CSwitch>
 
-=item C<Parrot::OpTrans::Compiled>
-
 =back
 
 =cut

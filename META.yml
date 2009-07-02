@@ -30,7 +30,6 @@ no_index:
         - Parrot::Docs::HTMLPage
         - Parrot::OpTrans::CGP
         - Parrot::OpTrans::CSwitch
-        - Parrot::OpTrans::Compiled
         - Parrot::OpsFile
 requires:
   Storable: 2.12

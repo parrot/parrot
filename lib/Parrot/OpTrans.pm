@@ -16,9 +16,9 @@ to all transforms.
 The subclass hierarchy is as follows:
 
     OpTrans
-       |_________________________
-       |           |             |
-       C         CGoto       Compiled
+       |___________
+       |           |
+       C         CGoto
        |           |
     CPrederef      |
        | |         |
@@ -258,8 +258,6 @@ Called by C<goto_address()>.
 =item C<Parrot::OpTrans::CPrederef>
 
 =item C<Parrot::OpTrans::CSwitch>
-
-=item C<Parrot::OpTrans::Compiled>
 
 =back
 

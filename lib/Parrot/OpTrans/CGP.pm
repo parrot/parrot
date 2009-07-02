@@ -162,8 +162,6 @@ END_C
 
 =item C<Parrot::OpTrans::CSwitch>
 
-=item C<Parrot::OpTrans::Compiled>
-
 =back
 
 =cut
