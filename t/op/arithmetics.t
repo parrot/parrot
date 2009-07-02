@@ -149,12 +149,7 @@ OUTPUT
 # print -0.0 as -0
 #
 
-TODO: {
-    my @todo;
-    @todo = ( todo => '-0.0 not implemented, TT #313' )
-        if $^O =~ m/(?:openbsd)/i;
-
-pasm_output_is( <<'CODE', <<OUTPUT, 'negate -0.0', @todo );
+pasm_output_is( <<'CODE', <<OUTPUT, 'negate -0.0' );
         set N0, 0
         neg N0
         say N0
@@ -176,7 +171,6 @@ CODE
 -0
 OUTPUT
 
-}
 
 
 #

@@ -59,6 +59,7 @@ Tests various io opcodes.
     if $S0 == 'linux' goto tt661_ok
     if $S0 == 'MSWin32' goto tt661_ok
     if $S0 == 'darwin' goto tt661_ok
+    if $S0 == 'openbsd' goto tt661_ok
 
     .return (0)
 
