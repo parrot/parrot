@@ -491,6 +491,8 @@ Marks the sub as live.
             Parrot_gc_mark_PObj_alive(INTERP, (PObj *) sub->ns_entry_name);
         if (!PMC_IS_NULL(sub->namespace_name))
             Parrot_gc_mark_PObj_alive(INTERP, (PObj *) sub->namespace_name);
+        if (!PMC_IS_NULL(sub->namespace_stash))
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *) sub->namespace_stash);
         if (!PMC_IS_NULL(sub->multi_signature))
             Parrot_gc_mark_PObj_alive(INTERP, (PObj *) sub->multi_signature);
         if (!PMC_IS_NULL(sub->lex_info))
