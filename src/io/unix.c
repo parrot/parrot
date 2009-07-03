@@ -43,7 +43,7 @@ APitUE - W. Richard Stevens, AT&T SFIO, Perl 5 (Nick Ing-Simmons)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CONST_FUNCTION
-static INTVAL convert_flags_to_unix(INTVAL flags);
+static int convert_flags_to_unix(INTVAL flags);
 
 static INTVAL io_is_tty_unix(PIOHANDLE fd);
 #define ASSERT_ARGS_convert_flags_to_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
@@ -54,7 +54,7 @@ static INTVAL io_is_tty_unix(PIOHANDLE fd);
 
 /*
 
-=item C<static INTVAL convert_flags_to_unix(INTVAL flags)>
+=item C<static int convert_flags_to_unix(INTVAL flags)>
 
 Returns a UNIX-specific interpretation of C<flags> suitable for passing
 to C<open()> and C<fopen()> in C<Parrot_io_open_unix()> and
@@ -65,11 +65,11 @@ C<Parrot_io_fdopen_unix()> respectively.
 */
 
 PARROT_CONST_FUNCTION
-static INTVAL
+static int
 convert_flags_to_unix(INTVAL flags)
 {
     ASSERT_ARGS(convert_flags_to_unix)
-    INTVAL oflags = 0;
+    int oflags = 0;
 
     if ((flags & (PIO_F_WRITE | PIO_F_READ)) == (PIO_F_WRITE | PIO_F_READ)) {
         oflags |= O_RDWR | O_CREAT;
@@ -149,7 +149,7 @@ Parrot_io_open_unix(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle),
               ARGIN(STRING *path), INTVAL flags)
 {
     ASSERT_ARGS(Parrot_io_open_unix)
-    INTVAL oflags;
+    int oflags;
     PIOHANDLE fd;
     char *spath;
 
@@ -338,8 +338,8 @@ Parrot_io_close_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_close_unix)
     INTVAL result = 0;
-    PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
-    int flags = Parrot_io_get_flags(interp, filehandle);
+    const PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
+    const int flags = Parrot_io_get_flags(interp, filehandle);
 
     /* BSD and Solaris need explicit fsync() */
     if (file_descriptor >= 0) {
@@ -476,7 +476,7 @@ INTVAL
 Parrot_io_flush_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_flush_unix)
-    PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
+    const PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
     return fsync(file_descriptor);
 }
 
@@ -497,7 +497,7 @@ Parrot_io_read_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
               ARGIN(STRING **buf))
 {
     ASSERT_ARGS(Parrot_io_read_unix)
-    PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
+    const PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
     INTVAL file_flags = Parrot_io_get_flags(interp, filehandle);
     STRING * const s = Parrot_io_make_string(interp, buf, 2048);
 
@@ -544,7 +544,7 @@ size_t
 Parrot_io_write_unix(PARROT_INTERP, ARGIN(PMC *filehandle), ARGMOD(STRING *s))
 {
     ASSERT_ARGS(Parrot_io_write_unix)
-    PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
+    const PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
     const char * const buffer = s->strstart;
     const char * ptr          = buffer;
 
@@ -719,8 +719,8 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
         /* C strings for the execv call defined that way to avoid
          * const problems without copying them.
          */
-        static char auxarg0 [] = "/bin/sh";
-        static char auxarg1 [] = "-c";
+        static const char auxarg0[] = "/bin/sh";
+        static const char auxarg1[] = "-c";
 
         if (f_write) {
             /* the other end is writing - we read from the pipe */
