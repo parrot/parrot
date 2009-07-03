@@ -16,6 +16,8 @@ our %defaults = (
 sub runstep {
     my ( $self, $conf ) = @_;
 
+    my $share_ext = $conf->option_or_data('share_ext');
+    my $version   = $conf->option_or_data('VERSION');
     my $verbose = $conf->options->get('verbose');
 
     # The hash referenced by $flagsref is the list of options that have -arch
@@ -61,8 +63,8 @@ sub runstep {
         # of the library.
 
         parrot_is_shared       => 1,
-        libparrot_shared       => 'libparrot.$(SOVERSION)$(SHARE_EXT)',
-        libparrot_shared_alias => 'libparrot$(SHARE_EXT)',
+        libparrot_shared       => "libparrot.$version$share_ext",
+        libparrot_shared_alias => "libparrot$share_ext",
         rpath                  => "-L",
         libparrot_soname       => "-install_name "
             . $lib_dir

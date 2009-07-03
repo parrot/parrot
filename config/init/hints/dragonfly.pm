@@ -9,6 +9,8 @@ use warnings;
 sub runstep {
     my ( $self, $conf ) = @_;
 
+    my $share_ext = $conf->option_or_data('share_ext');
+    my $version   = $conf->option_or_data('VERSION');
     my $libs = $conf->data->get('libs');
 
     $libs .= ' -pthread' unless $libs =~ /pthread/;
@@ -20,9 +22,9 @@ sub runstep {
 
         has_dynamic_linking    => 1,
         parrot_is_shared       => 1,
-        libparrot_shared       => 'libparrot$(SHARE_EXT).$(SOVERSION)',
-        libparrot_shared_alias => 'libparrot$(SHARE_EXT)',
-        libparrot_soname       => '-Wl,-soname=libparrot$(SHARE_EXT).$(SOVERSION)',
+        libparrot_shared       => "libparrot$share_ext.$version",
+        libparrot_shared_alias => "libparrot$share_ext",
+        libparrot_soname       => "-Wl,-soname=libparrot$share_ext.$version",
     );
 }
 

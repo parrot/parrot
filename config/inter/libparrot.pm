@@ -91,9 +91,9 @@ sub runstep {
     $conf->data->set(
         parrot_is_shared => $parrot_is_shared,
 
-        libparrot => $parrot_is_shared
-        ? '$(LIBPARROT_SHARED)'
-        : '$(LIBPARROT_STATIC)',
+        libparrot_for_makefile_only => $parrot_is_shared
+            ? '$(LIBPARROT_SHARED)'
+            : '$(LIBPARROT_STATIC)',
     );
 
     # Set -rpath (or equivalent) for executables to find the

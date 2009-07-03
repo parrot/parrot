@@ -509,7 +509,9 @@ LIBPARROT_STATIC    := @blib_dir@/@libparrot_static@
 #ELSE:LIBPARROT_SHARED  := @blib_dir@/@libparrot_shared@
 
 # This line controls whether a static or shared library is built
-LIBPARROT           := @libparrot@
+# by Parrot's make.  It is not useful otherwise (e.g., in
+# lib/Parrot/Config/Generated.pm or config_lib.pasm).
+LIBPARROT           := @libparrot_for_makefile_only@
 
 #IF(has_icu):ICU_SHARED  := @icu_shared@
 ALL_PARROT_LIBS     := @libparrot_linkflags@ $(ICU_SHARED) $(C_LIBS)

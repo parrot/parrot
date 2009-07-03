@@ -13,6 +13,8 @@ sub runstep {
     my $libs      = $conf->option_or_data('libs');
     my $ccflags   = $conf->option_or_data('ccflags');
     my $cc        = $conf->option_or_data('cc');
+    my $share_ext = $conf->option_or_data('share_ext');
+    my $version   = $conf->option_or_data('VERSION');
 
     # Later in the Parrot::Configure::runsteps() process,
     # inter::progs will merge the command-line overrides with the defaults.
@@ -93,7 +95,7 @@ sub runstep {
             ldflags             => '-nologo -nodefaultlib',
             libs                => 'kernel32.lib ws2_32.lib msvcrt.lib oldnames.lib ',
             libparrot_static    => 'libparrot' . $conf->data->get('a'),
-            libparrot_shared    => 'libparrot$(SHARE_EXT)',
+            libparrot_shared    => "libparrot$share_ext",
             ar_flags            => '',
             ar_out              => '-out:',
             slash               => '\\',
