@@ -88,7 +88,7 @@ sub _evaluate_gcc {
     my $ccwarn = $conf->data->get('ccwarn');
 
     $conf->data->set( sym_export => '__attribute__ ((visibility("default")))' )
-        if $gccversion >= 4.0;
+        if $gccversion >= 4.0 && !$conf->data->get('sym_export');
 
     $conf->data->set(
         ccwarn              => "$ccwarn",
