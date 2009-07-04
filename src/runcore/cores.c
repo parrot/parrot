@@ -489,7 +489,7 @@ runops_gc_debug_core(PARROT_INTERP, ARGIN(opcode_t *pc))
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "attempt to access code outside of current code segment");
 
-        Parrot_gc_mark_and_sweep(interp, 0);
+        Parrot_gc_mark_and_sweep(interp, GC_TRACE_FULL);
         CONTEXT(interp)->current_pc = pc;
 
         DO_OP(pc, interp);
