@@ -20,7 +20,7 @@ for the Rakudo Perl 6 compiler, several other Parrot-based compilers use it
 as well.  It has become a permanent member of PCT, and therefore a permanent
 part of the Parrot code base. 
 
-NQP represets almost the smallest subset of the Perl 6 language necessary to
+NQP represents almost the smallest subset of the Perl 6 language necessary to
 implement parser transformations, plus a few syntactic convenience features
 that developers have requested. NQP's Perl 6 subset shows its Perl 5 roots,
 so existing Perl 5 programmers should find much of it familiar and should be
