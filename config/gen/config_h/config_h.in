@@ -1,5 +1,6 @@
-/* Copyright (C) 2001-2007, Parrot Foundation. */
-/* $Id$ */
+/* Copyright (C) 2001-2009, Parrot Foundation.
+ * $Id$
+ */
 
 /* config.h
  *
@@ -45,17 +46,17 @@ typedef @float8_t@              Parrot_Float8;
 
 #include "parrot/platform_limits.h"
 #ifndef PARROT_INTVAL_MIN
-#define PARROT_INTVAL_MIN              @intvalmin@
+#  define PARROT_INTVAL_MIN              @intvalmin@
 #endif
 #ifndef PARROT_INTVAL_MAX
-#define PARROT_INTVAL_MAX              @intvalmax@
+#  define PARROT_INTVAL_MAX              @intvalmax@
 #endif
 
 #ifndef PARROT_FLOATVAL_MIN
-#define PARROT_FLOATVAL_MIN            @floatvalmin@
+#  define PARROT_FLOATVAL_MIN            @floatvalmin@
 #endif
 #ifndef PARROT_FLOATVAL_MAX
-#define PARROT_FLOATVAL_MAX            @floatvalmax@
+#  define PARROT_FLOATVAL_MAX            @floatvalmax@
 #endif
 
 /* Temporary until we find a way to make it work in the right place. */
@@ -65,21 +66,21 @@ struct PackFile;      typedef struct PackFile * Parrot_PackFile;
  * PARROT_IN_CORE won't always imply !PARROT_IN_EXTENSION. */
 #if defined(PARROT_IN_EXTENSION)
 #if defined(__cplusplus)
-#define PARROT_EXPORT extern "C" @sym_import@
-#define PARROT_DATA extern "C" @sym_import@
-#define PARROT_DYNEXT_EXPORT extern "C" @sym_export@
+#  define PARROT_EXPORT extern "C" @sym_import@
+#  define PARROT_DATA extern "C" @sym_import@
+#  define PARROT_DYNEXT_EXPORT extern "C" @sym_export@
 #else
-#define PARROT_EXPORT @sym_import@
-#define PARROT_DATA extern @sym_import@
-#define PARROT_DYNEXT_EXPORT @sym_export@
+#  define PARROT_EXPORT @sym_import@
+#  define PARROT_DATA extern @sym_import@
+#  define PARROT_DYNEXT_EXPORT @sym_export@
 #endif
 #else
 #if defined(__cplusplus)
-#define PARROT_EXPORT extern "C" @sym_export@
-#define PARROT_DATA extern "C" @sym_export@
+#  define PARROT_EXPORT extern "C" @sym_export@
+#  define PARROT_DATA extern "C" @sym_export@
 #else
-#define PARROT_EXPORT @sym_export@
-#define PARROT_DATA extern @sym_export@
+#  define PARROT_EXPORT @sym_export@
+#  define PARROT_DATA extern @sym_export@
 #endif
 #endif
 
@@ -118,19 +119,19 @@ typedef @hugefloatval@ HUGEFLOATVAL;
 /* We don't have a portable config for 64-bit
  * registers yet. */
 #if 0
-# if INTVAL_SIZE >= 8
+#  if INTVAL_SIZE >= 8
 typedef Parrot_Int   INTVAL64;
 typedef Parrot_Int   Parrot_Int64;
-# else
-#  if HUGEINTVAL_SIZE >= 8
+#  else
+#    if HUGEINTVAL_SIZE >= 8
 typedef HUGEINTVAL   INTVAL64;
 typedef HUGEINTVAL   Parrot_Int64;
-#  else
+#    else
 /* No 64-bit type available? */
 typedef union { unsigned char b[8]; } INTVAL64;
 typedef INTVAL64   Parrot_Int64;
+#    endif
 #  endif
-# endif
 #endif
 
 

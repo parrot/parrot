@@ -404,7 +404,6 @@ This is to exclude automatically generated C-language files Parrot might have.
             config/auto/cpu/i386/memcpy_mmx_in.c
             config/auto/cpu/i386/memcpy_sse.c
             config/auto/cpu/i386/memcpy_sse_in.c
-            config/gen/config_h/config_h.in
             config/gen/config_h/feature_h.in
             compilers/imcc/imclexer.c
             compilers/imcc/imcparser.c
@@ -431,6 +430,7 @@ This is to exclude automatically generated C-language files Parrot might have.
             compilers/pirc/macro/macrolexer.h
             compilers/pirc/macro/macroparser.c
             compilers/pirc/macro/macroparser.h
+            include/parrot/config.h
             src/gc/malloc.c
             } unless @exemptions;
 
