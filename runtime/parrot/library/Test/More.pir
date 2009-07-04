@@ -516,10 +516,10 @@ This handles comparisons of array-like and hash-like structures.
   report_diagnostic:
     ne diagnosis, '', return_it
 
-    .local string left
-    .local string right
-    right = pop position
-    left  = pop position
+    .local string left_value
+    .local string right_value
+    right_value = pop position
+    left_value  = pop position
 
     .local string nested_path
     nested_path = join '][', position
@@ -533,9 +533,9 @@ This handles comparisons of array-like and hash-like structures.
 
   show_expected:
     diagnosis  .= ': expected '
-    diagnosis  .= left
+    diagnosis  .= left_value
     diagnosis  .= ', received '
-    diagnosis  .= right
+    diagnosis  .= right_value
 
   return_it:
     test.'diag'( diagnosis )
