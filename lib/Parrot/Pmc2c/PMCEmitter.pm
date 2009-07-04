@@ -759,6 +759,7 @@ sub update_vtable_func {
 
     my $cout      = "";
     my $classname = $self->name;
+    my $export = $self->is_dynamic ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_EXPORT';
 
     my $vtable_updates = '';
     for my $name ( @{ $self->vtable->names } ) {
@@ -769,7 +770,7 @@ sub update_vtable_func {
 
     $cout .= <<"EOC";
 
-PARROT_EXPORT VTABLE *Parrot_${classname}_update_vtable(VTABLE *vt) {
+$export VTABLE *Parrot_${classname}_update_vtable(VTABLE *vt) {
 $vtable_updates
     return vt;
 }
@@ -793,7 +794,7 @@ EOC
 
     $cout .= <<"EOC";
 
-PARROT_EXPORT VTABLE *Parrot_${classname}_ro_update_vtable(ARGMOD(VTABLE *vt)) {
+$export VTABLE *Parrot_${classname}_ro_update_vtable(ARGMOD(VTABLE *vt)) {
 $vtable_updates
     return vt;
 }
@@ -898,6 +899,7 @@ sub get_vtable_func {
     my $classname = $self->name;
     my @other_parents = reverse @{ $self->direct_parents };
     my $first_parent = shift @other_parents;
+    my $export = $self->is_dynamic ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_EXPORT';
 
     my $get_vtable = '';
 
@@ -915,7 +917,7 @@ sub get_vtable_func {
     $get_vtable .= "    Parrot_${classname}_update_vtable(vt);\n";
 
     $cout .= <<"EOC";
-PARROT_EXPORT
+$export
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 VTABLE* Parrot_${classname}_get_vtable(PARROT_INTERP) {
@@ -942,7 +944,7 @@ EOC
     $get_extra_vtable .= "    Parrot_${classname}_ro_update_vtable(vt);\n";
 
     $cout .= <<"EOC";
-PARROT_EXPORT
+$export
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 VTABLE* Parrot_${classname}_ro_get_vtable(PARROT_INTERP) {
