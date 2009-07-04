@@ -864,6 +864,7 @@ Unregisters the PMC from the interpreter's GC registry.
 
 */
 
+PARROT_EXPORT
 void
 gc_unregister_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 {

@@ -300,8 +300,7 @@ Parrot_oo_clone_object(PARROT_INTERP, ARGIN(PMC *pmc),
     PObj_is_object_SET(cloned);
 
     /* Now create the underlying structure, and clone attributes list.class. */
-    cloned_guts               = mem_allocate_typed(Parrot_Object_attributes);
-    memset(cloned_guts, 0, sizeof(Parrot_Object_attributes));
+    cloned_guts               = mem_allocate_zeroed_typed(Parrot_Object_attributes);
     PMC_data(cloned)          = cloned_guts;
     cloned_guts->_class       = obj->_class;
     cloned_guts->attrib_store = VTABLE_clone(interp, obj->attrib_store);
