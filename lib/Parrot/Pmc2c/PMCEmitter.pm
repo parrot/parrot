@@ -770,7 +770,8 @@ sub update_vtable_func {
 
     $cout .= <<"EOC";
 
-$export VTABLE *Parrot_${classname}_update_vtable(VTABLE *vt) {
+$export
+VTABLE *Parrot_${classname}_update_vtable(VTABLE *vt) {
 $vtable_updates
     return vt;
 }
@@ -794,7 +795,8 @@ EOC
 
     $cout .= <<"EOC";
 
-$export VTABLE *Parrot_${classname}_ro_update_vtable(ARGMOD(VTABLE *vt)) {
+$export
+VTABLE *Parrot_${classname}_ro_update_vtable(ARGMOD(VTABLE *vt)) {
 $vtable_updates
     return vt;
 }
