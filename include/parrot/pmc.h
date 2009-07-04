@@ -45,6 +45,11 @@ void gc_register_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+void gc_unregister_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 void Parrot_create_mro(PARROT_INTERP, INTVAL type)
         __attribute__nonnull__(1);
 
@@ -106,10 +111,6 @@ INTVAL pmc_type_p(PARROT_INTERP, ARGIN(PMC *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void gc_unregister_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 INTVAL get_new_vtable_index(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -129,6 +130,9 @@ PMC * temporary_pmc_new(PARROT_INTERP, INTVAL base_type)
 #define ASSERT_ARGS_constant_pmc_new_noinit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_gc_register_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pmc)
+#define ASSERT_ARGS_gc_unregister_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pmc)
 #define ASSERT_ARGS_Parrot_create_mro __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -156,9 +160,6 @@ PMC * temporary_pmc_new(PARROT_INTERP, INTVAL base_type)
 #define ASSERT_ARGS_pmc_type_p __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(name)
-#define ASSERT_ARGS_gc_unregister_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pmc)
 #define ASSERT_ARGS_get_new_vtable_index __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_temporary_pmc_free __attribute__unused__ int _ASSERT_ARGS_CHECK = \
