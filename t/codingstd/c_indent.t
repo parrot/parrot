@@ -61,7 +61,6 @@ sub check_indent {
         foreach my $line (@source) {
             $state{line_cnt}++;
             chomp $line;
-#            dump_state(\%state, $line);
             next unless $line;
 
             $state{prev_last_char} = $state{last_char};
@@ -70,11 +69,11 @@ sub check_indent {
             # ignore multi-line comments (except the first line)
             $state{in_comment} = 0, next if $state{in_comment} &&
                 $line =~ m{\*/} &&
-                $' !~ m{/\*};
+                $' !~ m{/\*};   #'
             next if $state{in_comment};
             $state{in_comment} = 1
                 if $line =~ m{/\*} &&
-                $' !~ m{\*/};
+                $' !~ m{\*/};   #'
 
             ## preprocessor scan
             if ( $line =~ m/^\s*\#(\s*)(ifndef|ifdef|if)\s+(.*)/ )
@@ -184,8 +183,8 @@ sub check_indent {
             my ($indent) = $line =~ /^(\s+)/ or next;
             $indent = length($indent);
 
-            # Ignore the indentation of the current line if that
-            # previous line's last character was anything but a ;.
+            # Ignore the indentation of the current line if the last 
+            # character of the was anything but a ';'.
             #
             # The indentation of the previous line is not considered.
             # Check sanity by verifying that the indentation of the current line
@@ -222,6 +221,11 @@ sub check_indent {
             . " files:\n@c_indent" );
 }
 
+# dump_state() may be used to diagnose indentation problems.
+#     dump_state(\%state, $line);
+# Takes a list of two arguments:  reference to %state and the current line
+# (once it has been chomped).
+# Prints pipe-delimited list of important features of current state.
 sub dump_state {
     my ($state, $line) = @_;
     print STDERR (join q{|} => (
