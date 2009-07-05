@@ -849,12 +849,12 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 INTVAL Parrot_io_socket(PARROT_INTERP,
-    ARGMOD_NULLOK(PMC * socket),
+    ARGMOD_NULLOK(PMC *socket),
     INTVAL fam,
     INTVAL type,
     INTVAL proto)
         __attribute__nonnull__(1)
-        FUNC_MODIFIES(* socket);
+        FUNC_MODIFIES(*socket);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT

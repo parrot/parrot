@@ -100,11 +100,10 @@ PMC *
 Parrot_io_sockaddr_in(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port)
 {
     ASSERT_ARGS(Parrot_io_sockaddr_in)
-    PMC * sockaddr;
-    char * s;
 
-    s = Parrot_str_to_cstring(interp, addr);
-    sockaddr = pmc_new(interp, enum_class_Sockaddr);
+    char * const s        = Parrot_str_to_cstring(interp, addr);
+    PMC  * const sockaddr = pmc_new(interp, enum_class_Sockaddr);
+
     get_sockaddr_in(interp, sockaddr, s, port);
     free(s);
     return sockaddr;
@@ -131,9 +130,9 @@ INTVAL
 Parrot_io_socket_unix(PARROT_INTERP, ARGIN(PMC *s), int fam, int type, int proto)
 {
     ASSERT_ARGS(Parrot_io_socket_unix)
-    int sock, i = 1;
-    sock = socket(fam, type, proto);
+    const int sock = socket(fam, type, proto);
     if (sock >= 0) {
+        int i = 1;
         setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &i, sizeof (i));
         Parrot_io_set_os_handle(interp, s, sock);
         SOCKADDR_REMOTE(s)->sin_family = fam;
@@ -156,7 +155,7 @@ INTVAL
 Parrot_io_connect_unix(PARROT_INTERP, ARGMOD(PMC *socket), ARGIN(PMC *r))
 {
     ASSERT_ARGS(Parrot_io_connect_unix)
-    Parrot_Socket_attributes * io = PARROT_SOCKET(socket);
+    const Parrot_Socket_attributes * const io = PARROT_SOCKET(socket);
 
     if (!r)
         return -1;
@@ -195,7 +194,7 @@ INTVAL
 Parrot_io_bind_unix(PARROT_INTERP, ARGMOD(PMC *socket), ARGMOD(PMC *sockaddr))
 {
     ASSERT_ARGS(Parrot_io_bind_unix)
-    Parrot_Socket_attributes * io = PARROT_SOCKET(socket);
+    const Parrot_Socket_attributes * const io = PARROT_SOCKET(socket);
     struct sockaddr_in * saddr;
 
     if (!sockaddr)
@@ -228,7 +227,7 @@ INTVAL
 Parrot_io_listen_unix(SHIM_INTERP, ARGMOD(PMC *socket), INTVAL sec)
 {
     ASSERT_ARGS(Parrot_io_listen_unix)
-    Parrot_Socket_attributes * io = PARROT_SOCKET(socket);
+    const Parrot_Socket_attributes * const io = PARROT_SOCKET(socket);
     if ((listen(io->os_handle, sec)) == -1) {
         return -1;
     }
@@ -412,7 +411,7 @@ Parrot_io_poll_unix(SHIM_INTERP, ARGMOD(PMC *socket), int which, int sec,
     ASSERT_ARGS(Parrot_io_poll_unix)
     fd_set r, w, e;
     struct timeval t;
-    Parrot_Socket_attributes * io = PARROT_SOCKET(socket);
+    const Parrot_Socket_attributes * const io = PARROT_SOCKET(socket);
 
     t.tv_sec = sec;
     t.tv_usec = usec;
@@ -454,11 +453,10 @@ get_sockaddr_in(PARROT_INTERP, ARGIN(PMC * sockaddr), ARGIN(const char* host),
             int port)
 {
     ASSERT_ARGS(get_sockaddr_in)
-    struct sockaddr_in *sa;
     /* Hard coded to IPv4 for now */
     const int family = AF_INET;
 
-    sa = (struct sockaddr_in*)VTABLE_get_pointer(interp, sockaddr);
+    struct sockaddr_in * const sa = (struct sockaddr_in*)VTABLE_get_pointer(interp, sockaddr);
 #    ifdef PARROT_DEF_INET_ATON
     if (inet_aton(host, &sa->sin_addr) != 0) {
 #    else

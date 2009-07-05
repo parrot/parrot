@@ -150,7 +150,7 @@ Parrot_io_poll(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL which, INTVAL sec, INTVAL
 
 /*
 
-=item C<INTVAL Parrot_io_socket(PARROT_INTERP, PMC * socket, INTVAL fam, INTVAL
+=item C<INTVAL Parrot_io_socket(PARROT_INTERP, PMC *socket, INTVAL fam, INTVAL
 type, INTVAL proto)>
 
 Creates and returns a socket using the specified address family, socket type,
@@ -165,7 +165,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 INTVAL
-Parrot_io_socket(PARROT_INTERP, ARGMOD_NULLOK(PMC * socket), INTVAL fam,
+Parrot_io_socket(PARROT_INTERP, ARGMOD_NULLOK(PMC *socket), INTVAL fam,
             INTVAL type, INTVAL proto)
 {
     ASSERT_ARGS(Parrot_io_socket)
