@@ -222,7 +222,6 @@ Invokes the subroutine.
         Parrot_sub     *sub;
         Parrot_Context *caller_ctx;
         Parrot_Context *context;
-        Parrot_Context *c;
         PMC            *ccont;
         opcode_t       *pc;
 
@@ -318,6 +317,7 @@ Invokes the subroutine.
         }
         else {
             /* autoclose */
+            Parrot_Context *c;
             for (c = context; !c->outer_ctx; c = c->outer_ctx) {
 
                 PMC         *outer_pmc;
@@ -765,7 +765,7 @@ The number of optional named arguments
         /* If the argument info hasn't been generated yet, generate it. */
         if (!sub->arg_info) {
             /* Get pointer into the bytecode where this sub starts. */
-            opcode_t *pc = sub->seg->base.data + sub->start_offs;
+            const opcode_t *pc = sub->seg->base.data + sub->start_offs;
 
             /* Allocate structure to store argument information in. */
             sub->arg_info = mem_allocate_zeroed_typed(Parrot_sub_arginfo);
