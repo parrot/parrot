@@ -102,10 +102,6 @@
 typedef jmp_buf Parrot_jump_buff;
 #endif /* PARROT_HAS_HEADER_SETJMP */
 
-#ifdef PARROT_HAS_HEADER_PTHREAD
-#  include <pthread.h>
-#endif /* PARROT_HAS_HEADER_PTHREAD */
-
 #ifdef PARROT_HAS_HEADER_LIMITS
 #  include <limits.h>
 #endif /* PARROT_HAS_HEADER_LIMITS */
