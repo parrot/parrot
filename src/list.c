@@ -2128,7 +2128,7 @@ If C<count> is 0 then the items in C<value> will be inserted after C<offset>.
 
 PARROT_EXPORT
 void
-list_splice(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(List *value_list),
+list_splice(PARROT_INTERP, ARGMOD(List *list), ARGMOD_NULLOK(List *value_list),
         INTVAL offset, INTVAL count)
 {
     ASSERT_ARGS(list_splice)

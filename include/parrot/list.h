@@ -192,12 +192,13 @@ void * list_shift(PARROT_INTERP, ARGMOD(List *list), int type)
 PARROT_EXPORT
 void list_splice(PARROT_INTERP,
     ARGMOD(List *list),
-    ARGIN_NULLOK(List *value_list),
+    ARGMOD_NULLOK(List *value_list),
     INTVAL offset,
     INTVAL count)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(*list);
+        FUNC_MODIFIES(*list)
+        FUNC_MODIFIES(*value_list);
 
 PARROT_EXPORT
 void list_unshift(PARROT_INTERP,
