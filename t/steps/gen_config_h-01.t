@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2009, Parrot Foundation.
 # $Id$
 # gen_config_h-01.t
 
@@ -39,10 +39,9 @@ $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
 ok(-f $step->{templates}->{config_h}, "Template for config_h located");
 ok(-f $step->{templates}->{feature_h}, "Template for feature_h located");
+ok(-f $step->{templates}->{has_header_h}, "Template for has_header_h located");
 
 $conf->replenish($serialized);
-
-########## --define; _handle_define_option() ##########
 
 ($args, $step_list_ref) = process_options( {
     argv => [ q{--define=inet_aton} ],
@@ -51,21 +50,6 @@ $conf->replenish($serialized);
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
-
-my $cwd = cwd();
-{
-    my $tdir = tempdir( CLEANUP => 1 );
-    chdir $tdir or croak "Unable to change to temporary directory";
-    my $hh = "has_header.h";
-    open( my $HH, ">", "$hh.tmp" )
-        or die "Can't open has_header.h: $!";
-    gen::config_h::_handle_define_option( $conf, $HH );
-    close $HH or die "Can't close temp file: $!";
-    my $text = _slurp("$hh.tmp");
-    like($text, qr/#define PARROT_DEF_INET_ATON 1/s,
-        "Got expected define");
-    chdir $cwd or croak "Unable to change back to starting directory";
-}
 
 pass("Completed all tests in $0");
 
