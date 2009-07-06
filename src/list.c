@@ -191,9 +191,17 @@ Also all array usage depends on list.
 
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
-static List_chunk * add_chunk(PARROT_INTERP,
+static List_chunk * add_chunk_at_end(PARROT_INTERP,
     ARGMOD(List *list),
-    int where,
+    UINTVAL idx)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*list);
+
+PARROT_IGNORABLE_RESULT
+PARROT_CANNOT_RETURN_NULL
+static List_chunk * add_chunk_at_start(PARROT_INTERP,
+    ARGMOD(List *list),
     UINTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -289,7 +297,10 @@ static void split_chunk(PARROT_INTERP,
         FUNC_MODIFIES(*list)
         FUNC_MODIFIES(*chunk);
 
-#define ASSERT_ARGS_add_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_add_chunk_at_end __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_add_chunk_at_start __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(list)
 #define ASSERT_ARGS_alloc_next_size __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -818,11 +829,10 @@ alloc_next_size(PARROT_INTERP, ARGMOD(List *list), int where, UINTVAL idx)
 
 /*
 
-=item C<static List_chunk * add_chunk(PARROT_INTERP, List *list, int where,
+=item C<static List_chunk * add_chunk_at_start(PARROT_INTERP, List *list,
 UINTVAL idx)>
 
-Adds a new chunk to the C<list>. If C<where> is 0, the chunk is added to
-the front of the list. If 0, it is added to the end of the list.
+Adds a new chunk to the start of C<list>.
 
 =cut
 
@@ -831,27 +841,51 @@ the front of the list. If 0, it is added to the end of the list.
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 static List_chunk *
-add_chunk(PARROT_INTERP, ARGMOD(List *list), int where, UINTVAL idx)
+add_chunk_at_start(PARROT_INTERP, ARGMOD(List *list), UINTVAL idx)
 {
-    ASSERT_ARGS(add_chunk)
-    List_chunk * const chunk     = where ? list->last : list->first;
-    List_chunk * const new_chunk = alloc_next_size(interp, list, where, idx);
+    ASSERT_ARGS(add_chunk_at_start)
+    List_chunk * const chunk     = list->first;
+    List_chunk * const new_chunk = alloc_next_size(interp, list, enum_add_at_start, idx);
 
-    if (where) {                /* at end */
-        if (chunk)
-            chunk->next = new_chunk;
-        if (!list->first)
-            list->first = new_chunk;
+    new_chunk->next = chunk;
+    list->first     = new_chunk;
 
+    if (!list->last)
         list->last = new_chunk;
-    }
-    else {
-        new_chunk->next = chunk;
-        list->first     = new_chunk;
 
-        if (!list->last)
-            list->last = new_chunk;
-    }
+    rebuild_chunk_list(interp, list);
+
+    return new_chunk;
+}
+
+
+/*
+
+=item C<static List_chunk * add_chunk_at_end(PARROT_INTERP, List *list, UINTVAL
+idx)>
+
+Adds a new chunk to the end of C<list>.
+
+=cut
+
+*/
+
+PARROT_IGNORABLE_RESULT
+PARROT_CANNOT_RETURN_NULL
+static List_chunk *
+add_chunk_at_end(PARROT_INTERP, ARGMOD(List *list), UINTVAL idx)
+{
+    ASSERT_ARGS(add_chunk_at_end)
+    List_chunk * const chunk     = list->last;
+    List_chunk * const new_chunk = alloc_next_size(interp, list, enum_add_at_end, idx);
+
+    if (chunk)
+        chunk->next = new_chunk;
+
+    if (!list->first)
+        list->first = new_chunk;
+
+    list->last = new_chunk;
 
     rebuild_chunk_list(interp, list);
 
@@ -1300,13 +1334,13 @@ list_append(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(void *item), int typ
     ASSERT_ARGS(list_append)
     /* initially, list may be empty, also used by assign */
     while (idx >= list->cap)
-        add_chunk(interp, list, enum_add_at_end, idx);
+        add_chunk_at_end(interp, list, idx);
 
     list_set(interp, list, item, type, idx);
 
     /* invariant: prepare for next push */
     if (idx >= list->cap - 1)
-        add_chunk(interp, list, enum_add_at_end, 0);
+        add_chunk_at_end(interp, list, 0);
 }
 
 
@@ -1713,8 +1747,7 @@ list_set_length(PARROT_INTERP, ARGMOD(List *list), INTVAL len)
             /* assume user will fill it, so don't generate sparse chunks */
             if (!list->cap && idx > MAX_ITEMS) {
                 while (idx - MAX_ITEMS >= list->cap) {
-                    add_chunk(interp, list, enum_add_at_end,
-                            list->cap + MAX_ITEMS);
+                    add_chunk_at_end(interp, list, list->cap + MAX_ITEMS);
                 }
             }
 
@@ -1758,7 +1791,7 @@ list_insert(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, INTVAL n_items)
         list->length = idx;
 
         while (idx >= (INTVAL)list->cap)
-            add_chunk(interp, list, enum_add_at_end, idx);
+            add_chunk_at_end(interp, list, idx);
 
         return;
     }
@@ -1947,7 +1980,7 @@ list_unshift(PARROT_INTERP, ARGMOD(List *list), ARGIN(void *item), int type)
     List_chunk *chunk;
 
     if (list->start == 0) {
-        chunk       = add_chunk(interp, list, enum_add_at_start, 0);
+        chunk       = add_chunk_at_start(interp, list, 0);
         list->start = chunk->items;
     }
 
