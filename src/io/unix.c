@@ -716,11 +716,12 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
     else /* (pid == 0) */ {
         /* Child - exec process */
         char * argv[4];
-        /* C strings for the execv call defined that way to avoid
+        /* C strings for the execv call defined without const to avoid
          * const problems without copying them.
+         * Please don't change this without testing with a c++ compiler.
          */
-        static const char auxarg0[] = "/bin/sh";
-        static const char auxarg1[] = "-c";
+        static char auxarg0[] = "/bin/sh";
+        static char auxarg1[] = "-c";
 
         if (f_write) {
             /* the other end is writing - we read from the pipe */
