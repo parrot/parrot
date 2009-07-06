@@ -1,0 +1,41 @@
+/* Copyright (C) 2009, Parrot Foundation.
+ * $Id$
+ */
+
+#ifndef PARROT_HAS_HEADER_H_GUARD
+#define PARROT_HAS_HEADER_H_GUARD
+
+/*
+ * i_\w+ header includes
+ */
+
+@TEMP_header@
+
+#define BUILD_OS_NAME "@osname@"
+
+/*
+ * defines from commandline
+ */
+
+@TEMP_cli_define@
+
+/*
+ * HAS_\w+ config entries
+ */
+
+@TEMP_has_config@
+
+/*
+ * D_\w+ config entries
+ */
+
+@TEMP_d_config@
+
+#endif /* PARROT_HAS_HEADER_H_GUARD */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

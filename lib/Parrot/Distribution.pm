@@ -431,6 +431,7 @@ This is to exclude automatically generated C-language files Parrot might have.
             compilers/pirc/macro/macroparser.c
             compilers/pirc/macro/macroparser.h
             include/parrot/config.h
+            include/parrot/has_header.h
             src/gc/malloc.c
             } unless @exemptions;
 
