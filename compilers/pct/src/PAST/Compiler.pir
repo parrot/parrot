@@ -2224,20 +2224,21 @@ attribute.
     .param pmc node
     .param pmc bindpost
 
-    .local string name
+    .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
+    ops = $P0.'new'('node'=>node)
+    .local string name
     name = node.'name'()
     name = self.'escape'(name)
 
-    .local pmc call_on, ops
+    .local pmc call_on
     call_on = node[0]
     if null call_on goto use_self
     call_on = self.'as_post'(call_on, 'rtype'=>'P')
-    ops = call_on
+    ops.'push'(call_on)
     goto invocant_done
   use_self:
     call_on = box 'self'
-    ops = $P0.'new'('node'=>node)
   invocant_done:
 
     if bindpost goto attribute_bind
