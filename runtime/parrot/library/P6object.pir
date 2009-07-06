@@ -762,7 +762,6 @@ will be used in lieu of this one.)
   normal_check:
     $I0 = can topic, 'HOW'
     unless $I0 goto end
-    topichow = topic.'HOW'()
     topicwhat = topic.'WHAT'()
     $I0 = isa topicwhat, parrotclass
     if $I0 goto end
