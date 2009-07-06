@@ -162,7 +162,7 @@ Throw an exception if we try to make a PAST::Val into an lvalue.
     unless value goto normal
     die "Unable to set lvalue on PAST::Val node"
   normal:
-    .tailcall self.'attr'('value', value, has_value)
+    .tailcall self.'attr'('lvalue', value, has_value)
 .end
 
 =back
