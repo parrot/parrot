@@ -54,7 +54,7 @@ Parrot_setenv(const char *name, const char *value)
         const int value_len = strlen(value);
 
         {
-            char * const envstring = mem_internal_allocate(
+            char * const envstring = (char * const)mem_internal_allocate(
                     name_len     /* name  */
                     + 1          /* '='   */
                     + value_len  /* value */
@@ -106,7 +106,7 @@ Parrot_getenv(ARGIN(const char *name), NOTNULL(int *free_it))
     else {
         *free_it = 1;
     }
-    buffer = mem_sys_allocate(size);
+    buffer = (char *)mem_sys_allocate(size);
     GetEnvironmentVariable(name, buffer, size);
 
     return buffer;

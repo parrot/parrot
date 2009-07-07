@@ -42,7 +42,7 @@ Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
     int free_it = 0;
-    char* cmd = mem_sys_allocate(command->strlen + 4);
+    char* cmd = (char *)mem_sys_allocate(command->strlen + 4);
     char* shell = Parrot_getenv("ComSpec", &free_it);
     char* cmdin = Parrot_str_to_cstring(interp, command);
 
@@ -98,7 +98,7 @@ Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)
     int pmclen;
     int cmdlinelen = 1000;
     int cmdlinepos = 0;
-    char *cmdline = mem_sys_allocate(cmdlinelen);
+    char *cmdline = (char *)mem_sys_allocate(cmdlinelen);
     int i;
 
     /* Ensure there's something in the PMC array. */
@@ -113,7 +113,7 @@ Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)
         char *cs  = Parrot_str_to_cstring(interp, s);
         if (cmdlinepos + (int)s->strlen + 3 > cmdlinelen) {
             cmdlinelen += s->strlen + 4;
-            cmdline = mem_sys_realloc(cmdline, cmdlinelen);
+            cmdline = (char *)mem_sys_realloc(cmdline, cmdlinelen);
         }
         strcpy(cmdline + cmdlinepos, "\"");
         strcpy(cmdline + cmdlinepos + 1, cs);
@@ -164,7 +164,7 @@ Parrot_Exec_OS_Command(PARROT_INTERP, STRING *command)
     int status;
     char *in = Parrot_str_to_cstring(interp, command);
     char *cmd = NULL;
-    const char **argv = mem_sys_allocate_zeroed(2 * sizeof (int));
+    const char **argv = (const char **)mem_sys_allocate_zeroed(2 * sizeof (int));
 
     /* Grab string, extract command and parameters. */
     char *curPos  = in;
@@ -196,7 +196,7 @@ Parrot_Exec_OS_Command(PARROT_INTERP, STRING *command)
             int lenFound = curPos - lastCommandStart;
             if (*(curPos + 1) == 0)
                 lenFound++;
-            tmp = mem_sys_allocate(1 + lenFound);
+            tmp = (char *)mem_sys_allocate(1 + lenFound);
             memcpy(tmp, lastCommandStart, lenFound);
             *(tmp + lenFound) = 0;
 
@@ -210,7 +210,7 @@ Parrot_Exec_OS_Command(PARROT_INTERP, STRING *command)
             {
                 /* Allocate space for another pointer in **argv. */
                 argc++;
-                argv = mem_sys_realloc(argv, (argc + 1) * sizeof (int));
+                argv = (const char **)mem_sys_realloc(argv, (argc + 1) * sizeof (int));
                 *(argv + (argc - 1)) = tmp;
                 *(argv + argc) = NULL;
             }

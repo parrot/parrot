@@ -78,7 +78,7 @@ you would write something similar to:
 void *
 Parrot_dlsym(void *handle, const char *symbol)
 {
-    return (void *)GetProcAddress(handle, symbol);
+    return (void *)GetProcAddress((HINSTANCE)handle, symbol);
 }
 
 /*
@@ -102,7 +102,7 @@ Closes a dynamic library handle.
 int
 Parrot_dlclose(void *handle)
 {
-    return FreeLibrary(handle)? 0: 1;
+    return FreeLibrary((HMODULE)handle)? 0: 1;
 }
 
 /*
