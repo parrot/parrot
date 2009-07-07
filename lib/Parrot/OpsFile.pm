@@ -535,22 +535,24 @@ END_CODE
         # with labels, etc.).
         #
 
-        $branch   ||= $body =~ s/\bgoto\s+OFFSET\(\( (.*?) \)\)/{{+=$1}}/mg;
         $absolute ||= $body =~ s/\bgoto\s+ADDRESS\(\( (.*?) \)\)/{{=$1}}/mg;
-        $body =~ s/\bexpr\s+OFFSET\(\( (.*?) \)\)/{{^+$1}}/mg;
-        $body =~ s/\bexpr\s+ADDRESS\(\( (.*?) \)\)/{{^$1}}/mg;
-        $body =~ s/\bOP_SIZE\b/{{^$op_size}}/mg;
-
-        $branch ||= $body =~ s/\bgoto\s+OFFSET\((.*?)\)/{{+=$1}}/mg;
-        $body =~ s/\bgoto\s+NEXT\(\)/{{+=$op_size}}/mg;
+                      $body =~ s/\bexpr\s+ADDRESS\(\( (.*?) \)\)/{{^$1}}/mg;
         $absolute ||= $body =~ s/\bgoto\s+ADDRESS\((.*?)\)/{{=$1}}/mg;
+                      $body =~ s/\bexpr\s+ADDRESS\((.*?)\)/{{^$1}}/mg;
+
+        $branch   ||= $body =~ s/\bgoto\s+OFFSET\(\( (.*?) \)\)/{{+=$1}}/mg;
+                      $body =~ s/\bexpr\s+OFFSET\(\( (.*?) \)\)/{{^+$1}}/mg;
+        $branch   ||= $body =~ s/\bgoto\s+OFFSET\((.*?)\)/{{+=$1}}/mg;
+                      $body =~ s/\bexpr\s+OFFSET\((.*?)\)/{{^+$1}}/mg;
+
         $pop      ||= $body =~ s/\bgoto\s+POP\(\)/{{=*}}/mg;
-        $body =~ s/\bexpr\s+OFFSET\((.*?)\)/{{^+$1}}/mg;
-        $next ||= $body =~ s/\bexpr\s+NEXT\(\)/{{^+$op_size}}/mg;
-        $body =~ s/\bexpr\s+ADDRESS\((.*?)\)/{{^$1}}/mg;
-        $body =~ s/\bexpr\s+POP\(\)/{{^*}}/mg;
+                      $body =~ s/\bexpr\s+POP\(\)/{{^*}}/mg;
+
+        $next     ||= $body =~ s/\bexpr\s+NEXT\(\)/{{^+$op_size}}/mg;
+                      $body =~ s/\bgoto\s+NEXT\(\)/{{+=$op_size}}/mg;
 
         $body =~ s/\bHALT\(\)/{{=0}}/mg;
+        $body =~ s/\bOP_SIZE\b/{{^$op_size}}/mg;
 
         $branch ||= $short_name =~ /runinterp/;
         $next   ||= $short_name =~ /runinterp/;
@@ -577,7 +579,7 @@ END_CODE
         my $max_arg_num = @$args;
         my @found_args = ($body =~ m/{{@(\d+)}}/g);
         foreach my $arg (@found_args) {
-          die "opcode '$short_name' uses '\$$arg' but only has $max_arg_num parameters.\n" if $arg > $max_arg_num;
+            die "opcode '$short_name' uses '\$$arg' but only has $max_arg_num parameters.\n" if $arg > $max_arg_num;
         }
 
 
