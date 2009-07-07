@@ -229,12 +229,12 @@ parrot_init_library_paths(PARROT_INTERP)
             PARROT_LIB_PATH_DYNEXT, paths);
     entry = CONST_STRING(interp, "runtime/parrot/dynext/");
     VTABLE_push_string(interp, paths, entry);
+    entry = CONST_STRING(interp, "dynext/");
+    VTABLE_push_string(interp, paths, entry);
     if (!STRING_IS_NULL(versionlib)) {
         entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/dynext/"), 0);
         VTABLE_push_string(interp, paths, entry);
     }
-    entry = CONST_STRING(interp, "dynext/");
-    VTABLE_push_string(interp, paths, entry);
 
     /* shared exts */
     paths = pmc_new(interp, enum_class_ResizableStringArray);
