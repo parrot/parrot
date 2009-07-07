@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -343,6 +343,7 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
 
     Parrot_runloop    *return_point = interp->current_runloop;
     RunProfile * const profile      = interp->profile;
+    opcode_t *address;
     PMC        * const handler      =
                              Parrot_cx_find_handler_local(interp, exception);
 
@@ -384,12 +385,13 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
     }
 
     /* Run the handler. */
-    Parrot_runops_fromc_args(interp, handler, "vP", exception);
-
-    /* After handling a C exception, you don't want to resume at the point
-     * where the C exception was thrown.  You want to resume the next outer
-     * runloop.  */
-    longjmp(return_point->resume, 1);
+    address = VTABLE_invoke(interp, handler, NULL);
+    if (PMC_cont(handler)->current_results)
+        address = pass_exception_args(interp, "P", address,
+                CONTEXT(interp), exception);
+    PARROT_ASSERT(return_point->handler_start == NULL);
+    return_point->handler_start = address;
+    longjmp(return_point->resume, 2);
 }
 
 /*

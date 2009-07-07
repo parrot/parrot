@@ -1,5 +1,5 @@
 /* interpreter.h
- *  Copyright (C) 2001-2007, Parrot Foundation.
+ *  Copyright (C) 2001-2009, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -290,8 +290,10 @@ typedef struct _context_mem {
  * runloop ID, so it still needs to be a separate stack for a while longer. */
 
 typedef struct parrot_runloop_t {
-    Parrot_jump_buff resume;     /* jmp_buf */
-    struct parrot_runloop_t *prev; /* interpreter's runloop jump buffer stack */
+    Parrot_jump_buff         resume;        /* jmp_buf */
+    struct parrot_runloop_t *prev;          /* interpreter's runloop
+                                             * jump buffer stack */
+    opcode_t                *handler_start; /* Used in exception handling */
 } parrot_runloop_t;
 
 typedef parrot_runloop_t Parrot_runloop;
