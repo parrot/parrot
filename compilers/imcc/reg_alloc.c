@@ -158,8 +158,7 @@ static void sort_reglist(ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*unit);
 
-PARROT_WARN_UNUSED_RESULT
-static int try_allocate(PARROT_INTERP, ARGIN(IMC_Unit *unit))
+static void try_allocate(PARROT_INTERP, ARGIN(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -1013,7 +1012,7 @@ ig_find_color(ARGIN(const IMC_Unit *unit), ARGIN(const char *avail))
 
 /*
 
-=item C<static int try_allocate(PARROT_INTERP, IMC_Unit *unit)>
+=item C<static void try_allocate(PARROT_INTERP, IMC_Unit *unit)>
 
 Color the graph, assigning registers to each symbol:
 
@@ -1026,8 +1025,7 @@ If we run out of colors, then we need to spill the top node.
 
 */
 
-PARROT_WARN_UNUSED_RESULT
-static int
+static void
 try_allocate(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 {
     ASSERT_ARGS(try_allocate)
@@ -1043,7 +1041,7 @@ try_allocate(PARROT_INTERP, ARGIN(IMC_Unit *unit))
         n = unit->max_color + 1;
 
     if (!n)
-        return -1;
+        return;
 
     avail = mem_allocate_n_typed(n, char);
 
@@ -1073,9 +1071,11 @@ try_allocate(PARROT_INTERP, ARGIN(IMC_Unit *unit))
         map_colors(unit, i, graph, avail, r->set, already_allocated);
         color = ig_find_color(unit, avail);
 
-        if (color == -1)
+        if (color == -1) {
+            mem_sys_free(avail);
             IMCC_fatal(interp, DEBUG_IMC,
                     "# no more colors - this should not happen\n");
+        }
 
         color   += already_allocated;
         r->color = color;
@@ -1085,7 +1085,7 @@ try_allocate(PARROT_INTERP, ARGIN(IMC_Unit *unit))
     }
 
     mem_sys_free(avail);
-    return -1; /* we are totally finished */
+    /* we are totally finished */
 }
 
 /*
