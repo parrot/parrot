@@ -71,7 +71,7 @@ $step = test_step_constructor_and_description($conf);
 my $cwd = cwd();
 {
     my $tdir = tempdir( CLEANUP => 1 );
-    File::Path::mkpath(qq{$tdir/init/hints})
+    File::Path::mkpath( [ qq{$tdir/init/hints} ], 0, 0777 )
         or croak "Unable to create directory for local hints";
     my $localhints = qq{$tdir/init/hints/local.pm};
     open my $FH, '>', $localhints
@@ -114,7 +114,7 @@ $step = test_step_constructor_and_description($conf);
 $cwd = cwd();
 {
     my $tdir = tempdir( CLEANUP => 1 );
-    File::Path::mkpath(qq{$tdir/init/hints})
+    File::Path::mkpath( [ qq{$tdir/init/hints} ], 0, 0777 )
         or croak "Unable to create directory for local hints";
     my $localhints = qq{$tdir/init/hints/local.pm};
     open my $FH, '>', $localhints
