@@ -180,11 +180,9 @@ handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGMOD(STRING *str),
             Parrot_str_chopn_inplace(interp, str, len);
             len = 0;
         }
-        else {
-            if (info->flags & FLAG_PREC && info->prec < len) {
-                Parrot_str_chopn_inplace(interp, str, -(INTVAL)(info->prec));
-                len = info->prec;
-            }
+        else if (info->flags & FLAG_PREC && info->prec < len) {
+            Parrot_str_chopn_inplace(interp, str, -(INTVAL)(info->prec));
+            len = info->prec;
         }
     }
 
