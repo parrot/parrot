@@ -17,6 +17,10 @@ obscure.ops - Obscure Mathmatical Opcodes
 
 Parrot's library of obscure ops.
 
+To use this library of ops, add this directive to your PIR:
+
+ .loadlib 'obscure_ops'
+
 =cut
 
 
