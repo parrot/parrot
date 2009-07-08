@@ -180,11 +180,12 @@ handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGMOD(STRING *str),
             Parrot_str_chopn_inplace(interp, str, len);
             len = 0;
         }
-        else
+        else {
             if (info->flags & FLAG_PREC && info->prec < len) {
                 Parrot_str_chopn_inplace(interp, str, -(INTVAL)(info->prec));
                 len = info->prec;
             }
+        }
     }
 
     if ((info->flags & FLAG_WIDTH) && info->width > len) {
@@ -259,51 +260,53 @@ static void
 gen_sprintf_call(ARGOUT(char *out), ARGMOD(SpfInfo *info), int thingy)
 {
     ASSERT_ARGS(gen_sprintf_call)
-    int i    = 0;
-    out[i++] = '%';
 
-    if (info->flags) {
-        if (info->flags & FLAG_MINUS)
-            out[i++] = '-';
+    const int flags = info->flags;
+    char *p = out;
+    *p++ = '%';
 
-        if (info->flags & FLAG_PLUS)
-            out[i++] = '+';
+    if (flags) {
+        if (flags & FLAG_MINUS)
+            *p++ = '-';
 
-        if (info->flags & FLAG_ZERO)
-            out[i++] = '0';
+        if (flags & FLAG_PLUS)
+            *p++ = '+';
 
-        if (info->flags & FLAG_SPACE)
-            out[i++] = ' ';
+        if (flags & FLAG_ZERO)
+            *p++ = '0';
 
-        if (info->flags & FLAG_SHARP)
-            out[i++] = '#';
-    }
+        if (flags & FLAG_SPACE)
+            *p++ = ' ';
 
-    if (info->flags & FLAG_WIDTH) {
-        if (info->width > PARROT_SPRINTF_BUFFER_SIZE - 1)
-            info->width = PARROT_SPRINTF_BUFFER_SIZE;
+        if (flags & FLAG_SHARP)
+            *p++ = '#';
 
-        i += sprintf(out + i, "%u", (unsigned)info->width);
-    }
+        if (flags & FLAG_WIDTH) {
+            if (info->width > PARROT_SPRINTF_BUFFER_SIZE - 1)
+                info->width = PARROT_SPRINTF_BUFFER_SIZE;
 
-    if (info->flags & FLAG_PREC) {
-        if (info->prec > PARROT_SPRINTF_MAX_PREC)
-            info->prec = PARROT_SPRINTF_MAX_PREC;
+            p += sprintf(p, "%u", (unsigned)info->width);
+        }
 
-        out[i++] = '.';
-        i       += sprintf(out + i, "%u", (unsigned)info->prec);
+        if (flags & FLAG_PREC) {
+            if (info->prec > PARROT_SPRINTF_MAX_PREC)
+                info->prec = PARROT_SPRINTF_MAX_PREC;
+
+            *p++ = '.';
+            p += sprintf(p, "%u", (unsigned)info->prec);
+        }
     }
 
     if (thingy == 'd' || thingy == 'i' ||thingy == 'u') {
         /* the u?int isa HUGEU?INTVAL aka long long
          * the 'll' modifier is specced in susv3 - hopefully all our
          * compilers support it too */
-        out[i++] = 'l';
-        out[i++] = 'l';
+        *p++ = 'l';
+        *p++ = 'l';
     }
 
-    out[i++] = (char)thingy;
-    out[i]   = '\0';
+    *p++ = (char)thingy;
+    *p = '\0';
 }
 
 
@@ -332,7 +335,7 @@ Parrot_sprintf_format(PARROT_INTERP,
     HUGEINTVAL num;
 
     /* start with a buffer; double the pattern length to avoid realloc #1 */
-    STRING *targ = Parrot_str_new_noinit(interp, enum_stringrep_one, pat_len << 1);
+    STRING *targ = Parrot_str_new_noinit(interp, enum_stringrep_one, pat_len * 2);
 
     /* ts is used almost universally as an intermediate target;
      * tc is used as a temporary buffer by Parrot_str_from_uint and
@@ -831,8 +834,8 @@ Parrot_sprintf_format(PARROT_INTERP,
                                                              ((PMC *)obj->data),
                                                              (obj->index));
 
-                                STRING *string = (VTABLE_get_repr(interp, tmp));
-                                STRING *ts     = handle_flags(interp, &info,
+                                STRING * const string = (VTABLE_get_repr(interp, tmp));
+                                STRING * const ts     = handle_flags(interp, &info,
                                                     string, 0, NULL);
                                 obj->index++;
 
