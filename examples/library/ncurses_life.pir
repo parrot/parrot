@@ -884,7 +884,8 @@ key_done:
 =head1 SEE ALSO
 
 F<examples/library/acorn.life>, F<examples/pasm/life.pasm>,
-F<library/ncurses.pasm>, F<library/ncurses.declarations>.
+F<runtime/parrot/library/ncurses.pasm>,
+F<runtime/parrot/library/ncurses.declarations>.
 
 =head1 NOTE
 
