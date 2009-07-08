@@ -692,25 +692,6 @@ Parrot supports dynamic op libraries. These allow for ops specific to one
 language to be used without having to place them into the Parrot core itself.
 For examples of dynamic op libraries, see L<src/dynoplibs>.
 
-To build dynamic op libraries, add something like the following to your
-makefile:
-
-  PERL     = /usr/bin/perl
-  OPSBUILD = $(PERL) /path/to/parrot/tools/build/dynops.pl
-  DESTDIR  = /path/to/parrot/runtime/parrot/dynext
-  LOAD_EXT = .so
-
-  OPSDIR    = ops
-  OPLIBS    = myops
-  OPS_FILES = myops.ops
-
-  dynops : $(OPS_FILES)
-      @cd $(OPSDIR) && $(BUILD) generate $(OPLIBS)
-      @cd $(OPSDIR) && $(BUILD) compile $(OPLIBS)
-      @cd $(OPSDIR) && $(BUILD) linklibs $(OPLIBS)
-      @cd $(OPSDIR) && $(BUILD) copy "--destination=$(DESTDIR)" $(OPLIBS)
-
-
 =head2 How do I use the Native Calling Interface (NCI)?
 
 Using the NCI you can invoke functions written in C from a Parrot script.
