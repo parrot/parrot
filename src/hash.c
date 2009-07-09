@@ -717,13 +717,13 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
 {
     ASSERT_ARGS(expand_hash)
     HashBucket  **old_bi, **new_bi;
-    HashBucket   *bs, *b;
+    HashBucket   *bs, *b, *new_mem;
+    HashBucket   *old_offset = (HashBucket *)((char *)hash + sizeof (Hash));
 
-    void * const  old_mem  = hash->bs;
-    HashBucket *old_offset = (HashBucket*)((char*)hash + sizeof (Hash));
-    const UINTVAL old_size = hash->mask + 1;
-    const UINTVAL new_size = old_size << 1;
-    const UINTVAL old_nb   = N_BUCKETS(old_size);
+    void * const  old_mem    = hash->bs;
+    const UINTVAL old_size   = hash->mask + 1;
+    const UINTVAL new_size   = old_size << 1;
+    const UINTVAL old_nb     = N_BUCKETS(old_size);
     size_t        offset, i, new_loc;
 
     /*
@@ -738,7 +738,6 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
     */
 
     /* resize mem */
-    HashBucket *new_mem;
     if (old_offset != old_mem) {
         /* This buffer has been reallocated at least once before. */
         new_mem = (HashBucket *)mem_sys_realloc(old_mem, HASH_ALLOC_SIZE(new_size));
@@ -757,11 +756,11 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
          | new_mem                 | hash->bi
     */
     bs     = new_mem;
-    old_bi = (HashBucket**) (bs + old_nb);
-    new_bi = (HashBucket**) (bs + N_BUCKETS(new_size));
+    old_bi = (HashBucket **)(bs + old_nb);
+    new_bi = (HashBucket **)(bs + N_BUCKETS(new_size));
 
     /* things can have moved by this offset */
-    offset = (char*)new_mem - (char*)old_mem;
+    offset = (char *)new_mem - (char *)old_mem;
 
     /* relocate the bucket index */
     mem_sys_memmove(new_bi, old_bi, old_size * sizeof (HashBucket *));
@@ -772,7 +771,7 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
     hash->mask = new_size - 1;
 
     /* clear freshly allocated bucket index */
-    memset(new_bi + old_size, 0, sizeof (HashBucket *) * old_size);
+    memset(new_bi + old_size, 0, sizeof (HashBucket *) * (new_size - old_size));
 
     /*
      * reloc pointers - this part would be also needed, if we
@@ -812,12 +811,11 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
 
     /* add new buckets to free_list in reverse order
      * lowest bucket is top on free list and will be used first */
-    for (i = 0, b = (HashBucket*)new_bi - 1; i < old_nb; ++i, --b) {
+    for (i = 0, b = (HashBucket *)new_bi - 1; i < old_nb; ++i, --b) {
         b->next         = hash->free_list;
         b->key          = b->value         = NULL;
         hash->free_list = b;
     }
-
 }
 
 
@@ -984,7 +982,7 @@ parrot_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_
      * - use the bucket store and bi inside this structure
      * - when reallocate copy this part
      */
-    bp = (HashBucket *)((char*)alloc + sizeof (Hash));
+    bp = (HashBucket *)((char *)alloc + sizeof (Hash));
     hash->free_list = NULL;
 
     /* fill free_list from hi addresses so that we can use
