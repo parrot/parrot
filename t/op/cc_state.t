@@ -1,13 +1,13 @@
 #! perl
 
-# Copyright (C) 2006-2007, Parrot Foundation.
+# Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 
 use lib qw/. lib/;
-use Parrot::Test 'no_plan';
+use Parrot::Test tests => 15;
 use Test::More;
 
 ## test description key
@@ -53,7 +53,7 @@ pcc_like(
 ## G
 pcc_error_like(
     { params => ".param pmc abc" },
-    '/too few arguments passed \(0\) - 1 params expected/',
+    '/too few arguments passed \(0\) - 1 param expected/',
     'G1: argument underflow: required param',
 );
 

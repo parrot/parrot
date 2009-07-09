@@ -1415,10 +1415,11 @@ too_few(PARROT_INTERP, ARGIN(const call_state *st), ARGIN(const char *action))
 
     if (st->n_actual_args < min_expected_args) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-            "too few arguments passed (%d) - %s%d %s expected",
+            "too few arguments passed (%d) - %s%d %s%s expected",
             st->n_actual_args,
             (min_expected_args < max_expected_args ? "at least " : ""),
-            min_expected_args, action);
+            min_expected_args, action,
+            (min_expected_args == 1 ? "" : "s"));
     }
 }
 
@@ -1443,10 +1444,11 @@ too_many(PARROT_INTERP, ARGIN(const call_state *st), ARGIN(const char *action))
 
     if (st->n_actual_args > max_expected_args) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-            "too many arguments passed (%d) - %s%d %s expected",
+            "too many arguments passed (%d) - %s%d %s%s expected",
             st->n_actual_args,
             (min_expected_args < max_expected_args ? "at most " : ""),
-            max_expected_args, action);
+            max_expected_args, action,
+            (max_expected_args == 1 ? "" : "s"));
     }
 }
 
@@ -1623,7 +1625,7 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
     call_state_item *src, *dest;
 
     const char * const action = (param_or_result == PARROT_PASS_RESULTS)
-        ? "results" : "params";
+        ? "result" : "param";
 
     /* Check if we should be throwing errors. This can be configured separately
      * for parameters and return values. */
