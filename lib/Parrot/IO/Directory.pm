@@ -131,7 +131,7 @@ sub create_path {
     unless ( -e $self->path ) {
 
         # This dies if it fails.
-        mkpath( $self->path );
+        mkpath( [ $self->path ], 0, 0777 );
     }
 
     return -d $self->path;

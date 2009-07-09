@@ -23,10 +23,10 @@ my $cwd = cwd();
     my $tdir = tempdir( CLEANUP => 1 );
     ok( chdir $tdir, "Changed to temporary directory for testing" );
     my $libdir = qq{$tdir/lib};
-    ok( (File::Path::mkpath( $libdir )), "Able to make libdir");
+    ok( (File::Path::mkpath( [ $libdir ], 0, 0777 )), "Able to make libdir");
     local @INC;
     unshift @INC, $libdir;
-    ok( (File::Path::mkpath( qq{$libdir/Parrot} )), "Able to make Parrot dir");
+    ok( (File::Path::mkpath( [ qq{$libdir/Parrot} ], 0, 0777 )), "Able to make Parrot dir");
     ok( (copy qq{$cwd/lib/Parrot/Revision.pm},
             qq{$libdir/Parrot}), "Able to copy Parrot::Revision");
     require Parrot::Revision;

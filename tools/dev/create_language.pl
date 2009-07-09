@@ -116,7 +116,7 @@ sub start_new_file {
     my $filedir = File::Spec->catpath($volume, $dir);
     unless (-d $filedir) {
         print "creating $filedir\n";
-        mkpath($filedir);
+        mkpath( [ $filedir ], 0, 0777 );
     }
     print "creating $filepath\n";
     open $fh, '>', $filepath;

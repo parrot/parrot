@@ -34,7 +34,7 @@ use IO::CaptureOutput qw( capture );
     $tdir .= '/';
 
     my @dirs = qw(foo/bar foo/bar/baz);
-    my @created = mkpath( "$tdir$dirs[0]" );
+    my @created = mkpath( [ "$tdir$dirs[0]" ], 0, 0777 );
     ok( ( -d $created[0] ),
         "one directory created before create_directories() is called" );
 
@@ -52,7 +52,7 @@ use IO::CaptureOutput qw( capture );
     $tdir .= '/';
 
     my @dirs = qw(foo/bar foo/bar/baz);
-    my @created = mkpath( $tdir . 'foo' );
+    my @created = mkpath( [ $tdir . 'foo' ], 0, 0777 );
     ok( ( -d $created[0] ),
         "one directory created before create_directories() is called" );
 

@@ -115,9 +115,11 @@ my $full_gen_pseudo = File::Spec->catfile( $cwd, $gen_pseudo );
         runtime/parrot/library
         src/pmc
     );
-    my @created =
-        mkpath( ( map { File::Spec->catdir( $builddir, $_ ) } @dirs_needed ),
-            { mode => 0777} );
+    my @created = mkpath(
+        [ map { File::Spec->catdir( $builddir, $_ ) } @dirs_needed ],
+        0,
+        0777
+    );
     print STDERR "dirs created:  @created\n" if $DEBUG;
     foreach my $f ( keys %testfiles ) {
         my $src = File::Spec->catfile( $cwd, $testlibdir, $f );
