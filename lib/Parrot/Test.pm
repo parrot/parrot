@@ -959,22 +959,13 @@ sub _generate_test_functions {
             {
                 my $cfg = File::Spec->join( 'src', "parrot_config$PConfig{o}" );
                 my $iculibs = $PConfig{has_icu} ? $PConfig{icu_shared} : q{};
-                my $libparrot =
-                    $PConfig{parrot_is_shared}
-                      ? ("$PConfig{rpath_blib} "
-                        . (($^O =~ m/MSWin32/ and $PConfig{cc} =~ /\bcl\b/)
-                          ? ""
-                          : "-L$PConfig{blib_dir} "))
-                        . ($^O =~ m/MSWin32/
-                          ? $PConfig{libparrot_linkflags}
-                          : "-lparrot")
-                      : File::Spec->join(
-                          @PConfig{qw/build_dir blib_dir libparrot_static/},
-                      );
                 my $cmd =
-                      "$PConfig{link} $PConfig{linkflags} $PConfig{ld_debug} "
-                    . "$obj_f $cfg $PConfig{ld_out}$exe_f "
-                    . "$libparrot $iculibs $PConfig{libs}";
+                      "$PConfig{link} "
+                    . "$PConfig{ld_out}$exe_f "
+                    . "$obj_f $cfg "
+		    . "$PConfig{libparrot_linkflags} "
+		    . "$PConfig{linkflags} $PConfig{ld_debug} "
+                    . "$iculibs $PConfig{libs}";
                 my $exit_code = run_command(
                     $cmd,
                     'STDOUT' => $build_f,
