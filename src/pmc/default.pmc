@@ -234,7 +234,6 @@ make_prop_hash(PARROT_INTERP, PMC *self) {
     PMC_metadata(self) = prop = pmc_new(interp, enum_class_Hash);
     GC_WRITE_BARRIER(interp, self, NULL, prop);
     propagate_std_props(interp, self, prop);
-    PObj_is_special_PMC_SET(self);
     return prop;
 }
 
