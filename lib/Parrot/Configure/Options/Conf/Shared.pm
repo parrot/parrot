@@ -72,9 +72,10 @@ our @shared_valid_options = qw{
     without-gdbm
     without-gettext
     without-gmp
+    without-icu
     without-opengl
     without-pcre
-    without-icu
+    without-threads
     yacc
 };
 

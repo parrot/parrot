@@ -19,7 +19,7 @@
 
 #  define PARROT_HAS_NATIVE_ATOMIC 1      /* we'll redefine later if need be */
 
-#if (PARROT_HAS_THREADS)
+#ifdef PARROT_HAS_THREADS
 #  if defined(PARROT_HAS_I386_GCC_CMPXCHG)
 #    include "parrot/atomic/gcc_x86.h"
 #  elif defined(PARROT_HAS_PPC_GCC_CMPSET)
@@ -36,12 +36,12 @@ typedef struct Parrot_atomic_pointer {
     void *val;
 } Parrot_atomic_pointer;
 
-typedef Parrot_atomic_integer {
+typedef struct Parrot_atomic_integer {
     INTVAL val;
 } Parrot_atomic_integer;
 
 #  define PARROT_ATOMIC_PTR_INIT(a)
-#  define PARROT_ATOMIC_PTR_GET(result, (a)) (result) = (a).val
+#  define PARROT_ATOMIC_PTR_GET(result, a) (result) = (a).val
 #  define PARROT_ATOMIC_PTR_SET(a, b) (a).val = (b)
 
 /* a is the Parrot_atomic.
@@ -65,7 +65,7 @@ typedef Parrot_atomic_integer {
 #  define PARROT_ATOMIC_PTR_DESTROY(a)
 #  define PARROT_ATOMIC_INT_INIT(a)
 #  define PARROT_ATOMIC_INT_DESTROY(a)
-#  define PARROT_ATOMIC_INT_GET(result, (a)) (result) = (a).val
+#  define PARROT_ATOMIC_INT_GET(result, a) (result) = (a).val
 #  define PARROT_ATOMIC_INT_SET(a, value)  (a).val = (value)
 #  define PARROT_ATOMIC_INT_CAS(result, a, expect, update) \
       do { \

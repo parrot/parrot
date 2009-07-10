@@ -1005,7 +1005,7 @@ opcode_t *
 Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *next))
 {
     ASSERT_ARGS(Parrot_cx_schedule_sleep)
-#if PARROT_HAS_THREADS
+#ifdef PARROT_HAS_THREADS
     Parrot_cond condition;
     Parrot_mutex lock;
     const FLOATVAL timer_end = time + Parrot_floatval_time();

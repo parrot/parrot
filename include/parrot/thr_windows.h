@@ -13,13 +13,9 @@
 #ifndef PARROT_THR_WINDOWS_H_GUARD
 #define PARROT_THR_WINDOWS_H_GUARD
 
-#  undef CONST
-#  include <windows.h>
 #  undef FASTCALL
 #  include <process.h>
 #  include <limits.h>
-
-#  define PARROT_SYNC_PRIMITIVES_DEFINED
 
 typedef CRITICAL_SECTION Parrot_mutex;
 typedef struct Windows_cond
@@ -130,8 +126,6 @@ struct timespec {
     long tv_nsec;
 };
 #endif /* HAVE_STRUCT_TIMESPEC */
-
-#  undef CONST
 
 #endif /* PARROT_THR_WINDOWS_H_GUARD */
 

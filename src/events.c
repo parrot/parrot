@@ -1351,7 +1351,7 @@ opcode_t *
 Parrot_sleep_on_event(PARROT_INTERP, FLOATVAL t, ARGIN_NULLOK(opcode_t *next))
 {
     ASSERT_ARGS(Parrot_sleep_on_event)
-#if PARROT_HAS_THREADS
+#ifdef PARROT_HAS_THREADS
 
     if (interp->sleeping)
         fprintf(stderr, "nested sleep might not work\n");

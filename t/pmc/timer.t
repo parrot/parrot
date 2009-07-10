@@ -7,6 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 6;
+use Parrot::Config;
 
 =head1 NAME
 
@@ -23,19 +24,6 @@ Tests the Timer PMC.
 =cut
 
 $ENV{TEST_PROG_ARGS} ||= '';
-
-my %platforms = map { $_ => 1 } qw/
-    aix
-    cygwin
-    darwin
-    dec_osf
-    freebsd
-    hpux
-    irix
-    linux
-    openbsd
-    MSWin32
-/;
 
 pasm_output_is( <<'CODE', <<'OUT', "Timer setup" );
 .include "timer.pasm"
@@ -100,7 +88,7 @@ ok 3
 OUT
 
 SKIP: {
-    skip( "No thread config yet", 3 ) unless ( $platforms{$^O} );
+    skip( "No thread enabled", 3 ) unless ( $PConfig{HAS_THREADS} );
 
     pasm_output_like( <<'CODE', <<'OUT', "Timer setup - initializer/start" );
 .include "timer.pasm"

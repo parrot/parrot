@@ -7,6 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
+use Parrot::Config;
 
 =head1 NAME
 
@@ -23,21 +24,6 @@ platform.
 
 =cut
 
-my %platforms = map { $_ => 1 } qw/
-    aix
-    cygwin
-    dec_osf
-    freebsd
-    hpux
-    irix
-    linux
-    netbsd
-    openbsd
-    solaris
-    MSWin32
-    darwin
-    /;
-
 if ( $^O eq "cygwin" ) {
     my @uname = split / /, qx'uname -v';
 
@@ -46,13 +32,11 @@ if ( $^O eq "cygwin" ) {
         exit;
     }
 }
-if ( $platforms{$^O} ) {
+if ( $PConfig{HAS_THREADS} ) {
     plan tests => 14;
 }
 else {
-    plan skip_all => "No threading yet or test not enabled for '$^O'";
-
-    # plan skip_all => "Needs COPY for argument passing";
+    plan skip_all => "No threading enabled for '$^O'";
 }
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "interp identity" );

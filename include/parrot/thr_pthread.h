@@ -18,7 +18,6 @@
 
 #  include <pthread.h>
 
-#  define PARROT_SYNC_PRIMITIVES_DEFINED
 #  define LOCK(m) pthread_mutex_lock((pthread_mutex_t*)&(m))
 #  define UNLOCK(m) pthread_mutex_unlock((pthread_mutex_t*)&(m))
 #  define COND_WAIT(c, m) pthread_cond_wait(&(c), &(m))

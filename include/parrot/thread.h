@@ -14,14 +14,9 @@
 #define PARROT_THREAD_H_GUARD
 
 #  include "parrot/parrot.h"
-
-#  define PARROT_HAS_THREADS 1
 #  include "parrot/atomic.h"
 
-#ifndef PARROT_SYNC_PRIMITIVES_DEFINED
-
-#  undef  PARROT_HAS_THREADS
-#  define PARROT_HAS_THREADS 0
+#ifndef PARROT_HAS_THREADS
 
 #  define LOCK(m)
 #  define UNLOCK(m)
@@ -51,15 +46,15 @@
 
 typedef void (*Cleanup_Handler)(void *);
 
-#  ifndef _STRUCT_TIMESPEC
-#    define _STRUCT_TIMESPEC
+#  ifndef __timespec_defined
+#    define __timespec_defined
 struct timespec {
     time_t tv_sec;
     long tv_nsec;
 };
-#  endif /* _STRUCT_TIMESPEC */
+#  endif /* __timespec_defined */
 
-#endif /* PARROT_SYNC_PRIMITIVES_DEFINED */
+#endif /* PARROT_HAS_THREADS */
 
 #ifndef YIELD
 #  define YIELD

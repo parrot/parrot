@@ -52,6 +52,7 @@ my @steps = qw(
     auto::socklen_t
     auto::neg_0
     auto::env
+    auto::thread
     auto::gmp
     auto::readline
     auto::gdbm
