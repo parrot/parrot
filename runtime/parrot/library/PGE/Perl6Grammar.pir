@@ -140,9 +140,9 @@ the output to the correct output file.
     .param pmc source
     .param pmc adverbs         :slurpy :named
 
-    .local pmc nstable, namespace
+    .local pmc nstable, ns
     nstable = new 'Hash'
-    namespace = new 'String'
+    ns = new 'String'
     $P0 = new 'Hash'
     $P1 = new 'CodeString'
     $P0['optable'] = $P1
@@ -165,7 +165,7 @@ the output to the correct output file.
     $S0 = match['cmd']
     concat $S0, '_stmt'
     $P0 = find_name $S0
-    $P0(match, namespace, nstable)
+    $P0(match, ns, nstable)
     goto stmt_loop
   stmt_end:
 
