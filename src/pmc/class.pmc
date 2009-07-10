@@ -1305,10 +1305,6 @@ Returns whether the class is or inherits from C<*class>.
             /* Check if the passed name is the same as the stored short name. */
             INTVAL name_match = Parrot_str_equal(interp, classname, self_name);
 
-            Parrot_str_free(interp, classname);
-            if (is_proxy)
-                Parrot_str_free(interp, self_name);
-
             if (name_match)
                 return 1;
         }
