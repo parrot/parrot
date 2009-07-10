@@ -963,8 +963,8 @@ sub _generate_test_functions {
                       "$PConfig{link} "
                     . "$PConfig{ld_out}$exe_f "
                     . "$obj_f $cfg "
-		    . "$PConfig{libparrot_linkflags} "
-		    . "$PConfig{linkflags} $PConfig{ld_debug} "
+                    . "$PConfig{libparrot_linkflags} "
+                    . "$PConfig{linkflags} $PConfig{ld_debug} "
                     . "$iculibs $PConfig{libs}";
                 my $exit_code = run_command(
                     $cmd,
