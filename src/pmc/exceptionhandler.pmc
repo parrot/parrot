@@ -76,6 +76,7 @@ Mark any active exception handler data as live.
             Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->handled_types);
         if (core_struct->handled_types_except)
             Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->handled_types_except);
+        SUPER();
     }
 
     VTABLE PMC *clone() {
