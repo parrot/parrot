@@ -131,7 +131,7 @@
 /* Function argument instrumentation */
 /* For explanations of the annotations, see http://www.splint.org/manual/manual.html */
 
-#if PARROT_HAS_SAL
+#ifdef PARROT_HAS_MSVC_SAL
 #  define NOTNULL(x)                  /*@notnull@*/ __notnull x
     /* The pointer passed may not be NULL */
 
