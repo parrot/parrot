@@ -323,7 +323,6 @@ sub _substitute {
     local $_ = shift;
     my $trans = shift;
 
-    s/{{([a-z]+)\@([^{]*?)}}/ $trans->access_arg($1, $2, $self); /me;
     s/{{\@([^{]*?)}}/   $trans->access_arg($self->arg_type($1 - 1), $1, $self); /me;
 
     s/{{=0,=([^{]*?)}}/   $trans->restart_address($1) . "; {{=0}}"; /me;
