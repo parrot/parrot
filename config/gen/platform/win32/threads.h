@@ -8,14 +8,13 @@
 
 #undef CONST
 #include <windows.h>
+#undef CONST
 
 #ifdef PARROT_HAS_THREADS
 
 #  include "parrot/thr_windows.h"
 
 #endif /* PARROT_HAS_THREADS */
-
-#undef CONST
 
 #endif /* PARROT_PLATFORM_WIN32_THREADS_H_GUARD */
 
