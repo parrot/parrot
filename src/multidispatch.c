@@ -84,7 +84,8 @@ static PMC* mmd_build_type_tuple_from_type_list(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static STRING * mmd_cache_key_from_types(PARROT_INTERP,
     ARGIN(const char *name),
     ARGIN(PMC *types))
@@ -92,7 +93,8 @@ static STRING * mmd_cache_key_from_types(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static STRING * mmd_cache_key_from_values(PARROT_INTERP,
     ARGIN(const char *name),
     ARGIN(PMC *values))
@@ -100,8 +102,8 @@ static STRING * mmd_cache_key_from_values(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC* mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -141,7 +143,8 @@ PARROT_CANNOT_RETURN_NULL
 static PMC* Parrot_mmd_arg_tuple_func(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC * Parrot_mmd_get_cached_multi_sig(PARROT_INTERP,
     ARGIN(PMC *sub_pmc))
         __attribute__nonnull__(1)
@@ -343,7 +346,7 @@ Currently only searches the global MULTI namespace.
 */
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_mmd_find_multi_from_long_sig(PARROT_INTERP, ARGIN(STRING *name),
@@ -355,8 +358,9 @@ Parrot_mmd_find_multi_from_long_sig(PARROT_INTERP, ARGIN(STRING *name),
                                     interp->root_namespace, multi_str);
     PMC    * const multi_sub = Parrot_get_global(interp, ns, name);
 
-    if (PMC_IS_NULL(multi_sub))
+    if (PMC_IS_NULL(multi_sub)) {
         return PMCNULL;
+    }
     else {
         PMC * const type_tuple = mmd_build_type_tuple_from_long_sig(interp, long_sig);
         return Parrot_mmd_sort_candidates(interp, type_tuple, multi_sub);
@@ -748,8 +752,8 @@ the signature of a multi variant to which you may be able to dispatch.
 
 */
 
-PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC*
 mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
 {
@@ -805,7 +809,8 @@ MMD system expects.
 
 */
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC *
 Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 {
@@ -1401,7 +1406,8 @@ Generates an MMD cache key from an array of values.
 
 */
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static STRING *
 mmd_cache_key_from_values(PARROT_INTERP, ARGIN(const char *name),
     ARGIN(PMC *values))
@@ -1448,7 +1454,8 @@ Takes an array of values for the call and does a lookup in the MMD cache.
 */
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_mmd_cache_lookup_by_values(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
     ARGIN(const char *name), ARGIN(PMC *values))
@@ -1499,7 +1506,8 @@ Generates an MMD cache key from an array of types.
 
 */
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static STRING *
 mmd_cache_key_from_types(PARROT_INTERP, ARGIN(const char *name),
     ARGIN(PMC *types))
@@ -1548,13 +1556,14 @@ Takes an array of types for the call and does a lookup in the MMD cache.
 */
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_mmd_cache_lookup_by_types(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
     ARGIN(const char *name), ARGIN(PMC *types))
 {
     ASSERT_ARGS(Parrot_mmd_cache_lookup_by_types)
-    STRING * const key = mmd_cache_key_from_types(interp, name, types);
+    const STRING * const key = mmd_cache_key_from_types(interp, name, types);
 
     if (key)
         return (PMC *)parrot_hash_get(interp, cache, key);

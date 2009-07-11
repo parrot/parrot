@@ -109,7 +109,8 @@ void Parrot_mmd_cache_destroy(PARROT_INTERP, ARGMOD(MMD_Cache *cache))
         FUNC_MODIFIES(*cache);
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC * Parrot_mmd_cache_lookup_by_types(PARROT_INTERP,
     ARGMOD(MMD_Cache *cache),
     ARGIN(const char *name),
@@ -121,7 +122,8 @@ PMC * Parrot_mmd_cache_lookup_by_types(PARROT_INTERP,
         FUNC_MODIFIES(*cache);
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 PMC * Parrot_mmd_cache_lookup_by_values(PARROT_INTERP,
     ARGMOD(MMD_Cache *cache),
     ARGIN(const char *name),
@@ -165,7 +167,7 @@ void Parrot_mmd_cache_store_by_values(PARROT_INTERP,
         FUNC_MODIFIES(*cache);
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_mmd_find_multi_from_long_sig(PARROT_INTERP,
     ARGIN(STRING *name),
