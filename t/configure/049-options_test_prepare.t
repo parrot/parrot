@@ -93,11 +93,6 @@ my $cwd = cwd();
         like($stderr, qr/No tests exist for configure step $not_expected/,
             "Warning about step class lacking test captured");
     }
-#    foreach my $type ( qw| init inter auto gen | ) {
-#        my $t = $type . q(_sometest-01.t);
-#        ok($tests_seen{$t}, "Found needed test");
-#    }
-
     ok( chdir $cwd, "Able to change back to starting directory");
 }
 
