@@ -18,7 +18,12 @@ no_arg:
     if I11, is_install
     set S1, "@PWD@"
     set P0["prefix"], S1
+    set P0["installed"], "0"
+    branch freeze_config
 is_install:
+    set P0["installed"], "1"
+freeze_config:
+
     freeze S0, P0
     print S0
     end
