@@ -507,16 +507,26 @@ END_OF_FUNCTION
 
     $P0 = '_config'()
     .local string cc, ccflags, cc_o_out, osname, build_dir, slash
+    .local string installed, includepath, versiondir
     cc        = $P0['cc']
     ccflags   = $P0['ccflags']
     cc_o_out  = $P0['cc_o_out']
     osname    = $P0['osname']
     build_dir = $P0['build_dir']
     slash     = $P0['slash']
+    installed = $P0['installed']
+    includepath = $P0['includedir']
+    versiondir = $P0['versiondir']
 
     .local string includedir, pathquote
+    if installed == '1' goto installed_includedir
     includedir = concat build_dir, slash
     includedir = concat includedir, 'include'
+    goto done_includedir
+  installed_includedir:
+    includedir = concat includepath, versiondir
+  done_includedir:
+
     pathquote  = ''
     unless osname == 'MSWin32' goto not_windows
     pathquote  = '"'
