@@ -14,20 +14,6 @@
  * for a given compiler.  They are based on GCC's __attribute__ functionality.
  */
 
-/*
- * Microsoft provides two annotations mechanisms.  __declspec, which has been
- * around for a while, and Microsoft's standard source code annotation
- * language (SAL), introduced with Visual C++ 8.0.
- * See <http://msdn2.microsoft.com/en-us/library/ms235402(VS.80).aspx>,
- * <http://msdn2.microsoft.com/en-us/library/dabb5z75(VS.80).aspx>.
- */
-#if defined(_MSC_VER) && (_MSC_VER >= 1400)
-#  define PARROT_HAS_SAL 1
-#  include <sal.h>
-#else
-#  define PARROT_HAS_SAL 0
-#endif
-
 #ifdef HASATTRIBUTE_NEVER_WORKS
  #  error This attribute can never succeed.  Something has mis-sniffed your configuration.
 #endif
@@ -113,7 +99,8 @@
  */
 #define UNUSED(a) /*@-noeffect*/if (0) (void)(a)/*@=noeffect*/;
 
-#if PARROT_HAS_SAL
+#ifdef PARROT_HAS_MSVC_SAL
+#  include <sal.h>
 #  define PARROT_CAN_RETURN_NULL      /*@null@*/ __maybenull
 #  define PARROT_CANNOT_RETURN_NULL   /*@notnull@*/ __notnull
 #else
