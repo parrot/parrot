@@ -9,7 +9,6 @@ use Carp;
 use Cwd;
 use File::Basename qw( basename fileparse );
 use File::Path qw( mkpath );
-use File::Spec ();
 use File::Temp 0.13 qw| tempdir |;
 use Test::More tests => 10;
 use lib qw( lib );
@@ -56,16 +55,16 @@ my $cwd = cwd();
 
     my ( $steps_tests_simple_ref, $steps_tests_complex_ref )  =
         Parrot::Configure::Options::Test::Prepare::_find_steps_tests($tdir);
-    my $full_bad_test = File::Spec->catfile( $tdir, $bad_test );
+    my $full_bad_test = $tdir . '/' . $bad_test;
     ok( ! exists $steps_tests_simple_ref->{$full_bad_test},
         "File in incorrect directory correctly excluded from list of configuration step tests");
-    my $full_lack_number_test = File::Spec->catfile( $tdir, $lack_number_test );
+    my $full_lack_number_test = $tdir . '/' . $lack_number_test;
     ok( ! exists $steps_tests_simple_ref->{$full_lack_number_test},
         "File lacking 2-digit number correctly excluded from list of configuration step tests");
-    my $full_init_hints_test = File::Spec->catfile( $tdir, $init_hints_test );
+    my $full_init_hints_test = $tdir . '/'. $init_hints_test;
     ok( exists $steps_tests_simple_ref->{$full_init_hints_test},
         "File in second-level directory correctly included in list of configuration step tests");
-    my $full_CamelCase_test = File::Spec->catfile( $tdir, $CamelCase_test );
+    my $full_CamelCase_test = $tdir . '/' . $CamelCase_test;
     ok( ! exists $steps_tests_simple_ref->{$full_CamelCase_test},
         "File containing capital letters in name correctly excluded from list of configuration step tests");
 
