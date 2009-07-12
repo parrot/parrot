@@ -158,8 +158,9 @@ Free hash structure.
         Parrot_Hash_attributes * const attr =
             mem_allocate_typed(Parrot_Hash_attributes);
 
-        PMC_data(SELF) = attr;
-        attr->hash     = parrot_new_hash(INTERP);
+        PMC_data(SELF)        = attr;
+        attr->hash            = parrot_new_hash(INTERP);
+        attr->hash->container = SELF;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
