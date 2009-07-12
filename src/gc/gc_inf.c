@@ -35,6 +35,49 @@ to activate this core.
 /* HEADERIZER HFILE: src/gc/gc_private.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void gc_inf_add_free_object(SHIM_INTERP,
+    ARGMOD(Small_Object_Pool *pool),
+    ARGIN(void *to_add))
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*pool);
+
+static void gc_inf_alloc_objects(SHIM_INTERP,
+    ARGMOD(Small_Object_Pool *pool))
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pool);
+
+PARROT_CANNOT_RETURN_NULL
+static void * gc_inf_get_free_object(SHIM_INTERP,
+    ARGMOD(Small_Object_Pool *pool))
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pool);
+
+static void gc_inf_mark_and_sweep(SHIM_INTERP, UINTVAL flags);
+static void gc_inf_more_traceable_objects(SHIM_INTERP,
+    ARGMOD(Small_Object_Pool *pool))
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pool);
+
+static void gc_inf_pool_init(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pool);
+
+#define ASSERT_ARGS_gc_inf_add_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(to_add)
+#define ASSERT_ARGS_gc_inf_alloc_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_inf_get_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_inf_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_gc_inf_more_traceable_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_inf_pool_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pool)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*
@@ -43,7 +86,7 @@ to activate this core.
 
 =over 4
 
-=item C<void gc_inf_mark_and_sweep(PARROT_INTERP, UINTVAL flags)>
+=item C<static void gc_inf_mark_and_sweep(PARROT_INTERP, UINTVAL flags)>
 
 This function would perform a GC run, if we needed to. Luckily we have
 infinite memory!
@@ -63,12 +106,14 @@ Flags can be a combination of these values:
 static void
 gc_inf_mark_and_sweep(SHIM_INTERP, UINTVAL flags)
 {
+    ASSERT_ARGS(gc_inf_mark_and_sweep)
+    UNUSED(flags);
 }
 
 /*
 
-=item C<void gc_inf_add_free_object(SHIM_INTERP, Small_Object_Pool *pool,
-    void *to_add)>
+=item C<static void gc_inf_add_free_object(PARROT_INTERP, Small_Object_Pool
+*pool, void *to_add)>
 
 Manually frees a chunk of memory. Normally this would return the memory
 to the free list of the pool, but in this case we just return it to the
@@ -86,13 +131,15 @@ static void
 gc_inf_add_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool),
     ARGIN(void *to_add))
 {
+    ASSERT_ARGS(gc_inf_add_free_object)
     if (to_add)
         free(to_add);
 }
 
 /*
 
-=item C<void *gc_inf_get_free_object(PARROT_INTERP, Small_Object_Pool *pool)>
+=item C<static void * gc_inf_get_free_object(PARROT_INTERP, Small_Object_Pool
+*pool)>
 
 Gets a new object from the pool. Each pool specifies an object size in
 C<pool->object_size> so we can use that number to make the allocation. For
@@ -112,15 +159,18 @@ C<Parrot_Gc_get_new_pmc_header>
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static void *
 gc_inf_get_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
+    ASSERTARGS(gc_inf_get_free_object)
     return calloc(pool->object_size, 1);
 }
 
 /*
 
-=item C<void gc_inf_alloc_objects(PARROT_INTERP, Small_Object_Pool *pool)>
+=item C<static void gc_inf_alloc_objects(PARROT_INTERP, Small_Object_Pool
+*pool)>
 
 Allocates a new arena of objects from the system. This function is only
 really used internally by the core, the API functions don't need to call
@@ -136,11 +186,14 @@ for each special case pool.
 static void
 gc_inf_alloc_objects(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
+    ASSERT_ARGS(gc_inf_alloc_objects)
+    UNUSED(pool);
 }
 
 /*
 
-=item C<void gc_inf_more_traceable_objects(PARROT_INTERP, Small_Object_Pool *pool)>
+=item C<static void gc_inf_more_traceable_objects(PARROT_INTERP,
+Small_Object_Pool *pool)>
 
 Would normally try to find new traceable objects by first running a GC sweep
 and then allocating a new arena from the system. Neither of these are
@@ -157,11 +210,13 @@ from the GC API. Different pools may have special requirements so multiple
 static void
 gc_inf_more_traceable_objects(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
+    ASSERT_ARGS(gc_inf_more_traceable_objects)
+    UNUSED(pool);
 }
 
 /*
 
-=item C<void gc_inf_pool_init(PARROT_INTERP, Small_Object_Pool * pool)>
+=item C<static void gc_inf_pool_init(PARROT_INTERP, Small_Object_Pool *pool)>
 
 Initializes the function pointers in a new pool. When a new pool is created
 we assign several function pointers to it for managing memory in the pool.
@@ -179,6 +234,7 @@ in F<src/gc/mark_sweep.c> at Parrot startup.
 static void
 gc_inf_pool_init(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
+    ASSERT_ARGS(gc_inf_pool_init)
     pool->add_free_object = gc_inf_add_free_object;
     pool->get_free_object = gc_inf_get_free_object;
     pool->alloc_objects   = gc_inf_alloc_objects;
@@ -203,6 +259,7 @@ finalization is necessary.
 void
 Parrot_gc_inf_init(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_gc_inf_init)
     Arenas * const arena_base     = interp->arena_base;
 
     arena_base->do_gc_mark         = gc_inf_mark_and_sweep;
