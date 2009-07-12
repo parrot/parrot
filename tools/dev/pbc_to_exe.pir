@@ -568,6 +568,7 @@ END_OF_FUNCTION
     $P0 = '_config'()
     .local string cc, link, link_dynamic, linkflags, ld_out, libparrot, libs, o
     .local string rpath, osname, build_dir, slash, icushared
+    .local string installed, libdir, versiondir
     cc           = $P0['cc']
     link         = $P0['link']
     link_dynamic = $P0['link_dynamic']
@@ -581,18 +582,29 @@ END_OF_FUNCTION
     build_dir    = $P0['build_dir']
     slash        = $P0['slash']
     icushared    = $P0['icu_shared']
+    installed    = $P0['installed']
+    libdir       = $P0['libdir']
+    versiondir   = $P0['versiondir']
 
     .local string config, pathquote, exeprefix
+    if installed == '1' goto config_installed
     exeprefix = substr exefile, 0, 12
     config     = concat build_dir, slash
     config    .= 'src'
     config    .= slash
-    if exeprefix == 'installable_' goto config_install
+    if exeprefix == 'installable_' goto config_to_install
     config    .= 'parrot_config'
     goto config_cont
- config_install:
+ config_to_install:
     config    .= 'install_config'
     rpath     = $P0['rpath_lib']
+    goto config_cont
+ config_installed:
+    rpath      = $P0['rpath_lib']
+    libparrot  = $P0['inst_libparrot_linkflags']
+    config     = concat libdir, versiondir
+    config    .= slash
+    config    .= 'parrot_config'
  config_cont:
     config    .= o
     pathquote  = ''
