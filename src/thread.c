@@ -498,7 +498,7 @@ thread_func(ARGIN_NULLOK(void *arg))
     Parrot_runloop   jump_point;
     int              lo_var_ptr;
     UINTVAL          tid;
-    PMC             *sub_pmc;
+    PMC             * volatile sub_pmc;
     PMC             *sub_arg;
     PMC * const      self    = (PMC*) arg;
     PMC             *ret_val = NULL;
