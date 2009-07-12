@@ -47,6 +47,7 @@ include/parrot/platform_interface.h               [main]include
 include/parrot/platform_limits.h                  [devel]include
 include/parrot/vtable.h                           [main]include
 install_config.fpmc                               [main]lib
+src/install_config.o                              [main]lib
 installable_parrot_config.exe                     [main]bin
 installable_parrot_config                         [main]bin
 installable_parrot_debugger.exe                   [main]bin
