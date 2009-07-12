@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id: gc_ms.c 39537 2009-06-13 19:17:13Z chromatic $
+$Id:
 
 =head1 NAME
 
@@ -17,7 +17,11 @@ tests will fail: Tests for timely destruction, tests involving IO that is
 not manually flushed (the GC never calls the destroy VTABLE, so things never
 get flushed/closed automatically), etc.
 
-To enable this core, change the settings in include/parrot/settings.h
+To enable this core, change the settings in include/parrot/settings.h. Set
+
+ PARROT_GC_SUBSYSEM == 3
+
+to activate this core.
 
 =cut
 
