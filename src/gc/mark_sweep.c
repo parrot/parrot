@@ -1082,6 +1082,8 @@ initialize_header_pools(PARROT_INTERP)
      * Use GS MS pool functions
      */
     gc_ms_pmc_ext_pool_init(arena_base->pmc_ext_pool);
+#elif PARROT_GC_INF
+    arena_base->init_pool(interp, arena_base->pmc_ext_pool);
 #else
     /* rational, consistant behavior (as yet unwritten) */
 #endif

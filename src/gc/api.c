@@ -276,6 +276,9 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
 #if PARROT_GC_GMS
     Parrot_gc_gms_init(interp);
 #endif
+#if PARROT_GC_INF
+    Parrot_gc_inf_init(interp);
+#endif
 
     initialize_memory_pools(interp);
     initialize_header_pools(interp);

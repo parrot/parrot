@@ -199,7 +199,7 @@ mem_allocate(PARROT_INTERP, size_t size, ARGMOD(Memory_Pool *pool))
         if (!interp->arena_base->gc_mark_block_level
         &&   interp->arena_base->mem_allocs_since_last_collect) {
             Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
-#if !PARROT_GC_IMS
+#if !PARROT_GC_IMS && !PARROT_GC_INF
             /* Compact the pool if allowed and worthwhile */
             if (pool->compact) {
                 /* don't bother reclaiming if it's just chicken feed */
