@@ -163,7 +163,7 @@ PARROT_CANNOT_RETURN_NULL
 static void *
 gc_inf_get_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
-    ASSERTARGS(gc_inf_get_free_object)
+    ASSERT_ARGS(gc_inf_get_free_object)
     return calloc(pool->object_size, 1);
 }
 
