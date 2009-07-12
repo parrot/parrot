@@ -1325,7 +1325,7 @@ void
 compile_file(PARROT_INTERP, FILE *file, void *yyscanner)
 {
     yyguts_t * const yyg = (yyguts_t *)yyscanner;
-    YY_BUFFER_STATE  buffer;
+    YY_BUFFER_STATE  volatile buffer;
 
     IMCC_INFO(interp)->frames->s.next = NULL;
     buffer                            = YY_CURRENT_BUFFER;
@@ -1358,7 +1358,7 @@ void
 compile_string(PARROT_INTERP, const char *s, void *yyscanner)
 {
     yyguts_t * const yyg = (yyguts_t *)yyscanner;
-    YY_BUFFER_STATE  buffer;
+    YY_BUFFER_STATE  volatile buffer;
 
     IMCC_INFO(interp)->frames->s.next = NULL;
     buffer                            = YY_CURRENT_BUFFER;
