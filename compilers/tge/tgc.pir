@@ -89,6 +89,12 @@ Send the output to OUTFILE. By default, output is directed to STDOUT.
     .local string compiled_source
     compiled_source = grammar.'precompile'(source, infile)
     print outfh, compiled_source
+    unless ck_output goto END
+
+    # Close the output file and check result
+    $I0 = outfh.'close'()
+    unless $I0 goto END
+    die 'Error: close output failed'
 
   goto END
 
