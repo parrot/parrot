@@ -45,7 +45,7 @@
  * "work").
  */
 
-#define PARROT_GC_SUBSYSTEM 3
+#define PARROT_GC_SUBSYSTEM 0
 
 #if PARROT_GC_SUBSYSTEM == 0
 #  define PARROT_GC_MS      1
