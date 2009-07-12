@@ -216,6 +216,10 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
     /* Now mark the class hash */
     Parrot_gc_mark_PObj_alive(interp, (PObj *)interp->class_hash);
 
+    /* Now mark the HLL stuff */
+    Parrot_gc_mark_PObj_alive(interp, (PObj *)interp->HLL_info);
+    Parrot_gc_mark_PObj_alive(interp, (PObj *)interp->HLL_namespace);
+
     /* Mark the registry */
     PARROT_ASSERT(interp->gc_registry);
     Parrot_gc_mark_PObj_alive(interp, (PObj *)interp->gc_registry);
