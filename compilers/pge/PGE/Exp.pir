@@ -988,6 +988,7 @@ tree as a PIR code object that can be compiled.
     .local string token, test
     token = self.'ast'()
 
+    if token == '<?>' goto anchor_null
     if token == '^' goto anchor_bos
     if token == '$' goto anchor_eos
     if token == '^^' goto anchor_bol
@@ -1001,6 +1002,15 @@ tree as a PIR code object that can be compiled.
     test = '=='
     if token == '\B' goto anchor_word
 
+  anchor_fail:
+    code.'emit'("        %0: # anchor fail %1", label, token)
+    code.'emit'("          goto fail")
+    .return ()
+
+  anchor_null:
+    code.'emit'("        %0: # anchor null %1", label, token)
+    code.'emit'("          goto %0", next)
+    .return ()
 
   anchor_bos:
     code.'emit'("        %0: # anchor bos", label)

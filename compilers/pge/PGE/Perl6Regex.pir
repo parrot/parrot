@@ -324,6 +324,8 @@ needed for compiling regexes.
     optable.'newtok'('term:\B',  'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
     optable.'newtok'('term:<<',  'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
     optable.'newtok'('term:>>',  'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
+    optable.'newtok'('term:<?>', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
+    optable.'newtok'('term:<!>', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
     optable.'newtok'(unicode:"term:\xab", 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
     optable.'newtok'(unicode:"term:\xbb", 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Anchor')
 
