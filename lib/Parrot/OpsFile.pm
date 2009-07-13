@@ -174,7 +174,6 @@ use base qw( Exporter );
 
 use Parrot::Op;
 use Parrot::Config;
-use Data::Dumper;
 
 our %op_body;
 our @EXPORT = qw( %op_body );
@@ -493,8 +492,6 @@ END_CODE
         $body .= "\ngoto NEXT();";
     }
 
-    print "working on '$short_name'\n";
-    print join(',',@$args)."\n";
     foreach my $variant ( expand_args(@$args) ) {
         my (@fixedargs) = split( /,/, $variant );
         my $op =
@@ -601,7 +598,6 @@ END_CODE
             && ( $fixedargs[ @fixedargs - 1 ] )
             && ( $fixedargs[ @fixedargs - 1 ] eq 'i' ) ) {
             or_flag( \$jumps, "PARROT_JUMP_GNEXT" );
-            print "found GNEXT in op $short_name\n";
         }
 
         $op->jump($jumps);
