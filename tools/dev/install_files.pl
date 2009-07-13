@@ -104,7 +104,7 @@ my(%metatransforms) = (
         transform => sub {
             my($filehash) = @_;
             local($_) = $filehash->{Dest};
-            if ( /^install_config.fpmc/ ) {
+            if ( /^install_config\.fpmc/ ) {
                 s/^install_//;     # parrot with different config
                 $filehash->{DestDirs} = [$parrotdir, 'include'];
                 $filehash->{Dest} = $_;
