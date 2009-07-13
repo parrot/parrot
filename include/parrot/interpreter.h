@@ -314,7 +314,6 @@ struct parrot_interp_t {
     int      n_vtable_max;                    /* highest used type */
     int      n_vtable_alloced;                /* alloced vtable space */
 
-    struct _ParrotIOLayer **piolayers;        /* IO registered layers */
     struct _ParrotIOData   *piodata;          /* interpreter's IO system */
 
     op_lib_t  *op_lib;                        /* Opcode library */
