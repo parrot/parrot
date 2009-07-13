@@ -174,6 +174,7 @@ use base qw( Exporter );
 
 use Parrot::Op;
 use Parrot::Config;
+use Data::Dumper;
 
 our %op_body;
 our @EXPORT = qw( %op_body );
@@ -492,6 +493,8 @@ END_CODE
         $body .= "\ngoto NEXT();";
     }
 
+    print "working on '$short_name'\n";
+    print join(',',@$args)."\n";
     foreach my $variant ( expand_args(@$args) ) {
         my (@fixedargs) = split( /,/, $variant );
         my $op =
@@ -518,8 +521,8 @@ END_CODE
         #
         #   HALT()             {{=0}}   PC' = 0       Halts run_ops loop, no resume
         #
-        #   restart OFFSET(X)  {{=0,+=X}}   PC' = 0       Restarts at PC + X
-        #   restart NEXT()     {{=0,+=S}}   PC' = 0       Restarts at PC + S
+        #   restart OFFSET(X)  {{=0,+=X}}   PC' = 0   Restarts at PC + X
+        #   restart NEXT()     {{=0,+=S}}   PC' = 0   Restarts at PC + S
         #
         #   $X                 {{@X}}   Argument X    $0 is opcode, $1 is first arg
         #
@@ -540,6 +543,7 @@ END_CODE
         $absolute ||= $body =~ s/\bgoto\s+ADDRESS\((.*?)\)/{{=$1}}/mg;
                       $body =~ s/\bexpr\s+ADDRESS\((.*?)\)/{{^$1}}/mg;
 
+        $branch   ||= $short_name =~ /runinterp/;
         $branch   ||= $body =~ s/\bgoto\s+OFFSET\(\( (.*?) \)\)/{{+=$1}}/mg;
                       $body =~ s/\bexpr\s+OFFSET\(\( (.*?) \)\)/{{^+$1}}/mg;
         $branch   ||= $body =~ s/\bgoto\s+OFFSET\((.*?)\)/{{+=$1}}/mg;
@@ -548,14 +552,12 @@ END_CODE
         $pop      ||= $body =~ s/\bgoto\s+POP\(\)/{{=*}}/mg;
                       $body =~ s/\bexpr\s+POP\(\)/{{^*}}/mg;
 
+        $next     ||= $short_name =~ /runinterp/;
         $next     ||= $body =~ s/\bexpr\s+NEXT\(\)/{{^+$op_size}}/mg;
                       $body =~ s/\bgoto\s+NEXT\(\)/{{+=$op_size}}/mg;
 
         $body =~ s/\bHALT\(\)/{{=0}}/mg;
         $body =~ s/\bOP_SIZE\b/{{^$op_size}}/mg;
-
-        $branch ||= $short_name =~ /runinterp/;
-        $next   ||= $short_name =~ /runinterp/;
 
         if ( $body =~ s/\brestart\s+OFFSET\((.*?)\)/{{=0,+=$1}}/mg ) {
             $branch  = 1;
@@ -588,17 +590,19 @@ END_CODE
         $op->body( $nolines ? $body : qq{#line $line "$file_escaped"\n$body} );
 
         # Constants here are defined in include/parrot/op.h
-        or_flag( \$jumps, "PARROT_JUMP_RELATIVE" ) if $branch;
         or_flag( \$jumps, "PARROT_JUMP_ADDRESS"  ) if $absolute;
+        or_flag( \$jumps, "PARROT_JUMP_RELATIVE" ) if $branch;
         or_flag( \$jumps, "PARROT_JUMP_POP"      ) if $pop;
         or_flag( \$jumps, "PARROT_JUMP_ENEXT"    ) if $next;
+        or_flag( \$jumps, "PARROT_JUMP_RESTART"  ) if $restart;
 
         # I'm assuming the op branches to the value in the last argument.
-        or_flag( \$jumps, "PARROT_JUMP_GNEXT" )
-            if ( ($jumps)
+        if ( ($jumps)
             && ( $fixedargs[ @fixedargs - 1 ] )
-            && ( $fixedargs[ @fixedargs - 1 ] eq 'i' ) );
-        or_flag( \$jumps, "PARROT_JUMP_RESTART" ) if ($restart);
+            && ( $fixedargs[ @fixedargs - 1 ] eq 'i' ) ) {
+            or_flag( \$jumps, "PARROT_JUMP_GNEXT" );
+            print "found GNEXT in op $short_name\n";
+        }
 
         $op->jump($jumps);
         $self->push_op($op);
