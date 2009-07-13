@@ -67,10 +67,6 @@ OBJS_DIGEST := \
 #ELSIF(win32):LIB_CRYPTO := libcrypto.lib
 #ELSE:LIB_CRYPTO := -lcrypto
 
-# some *.pmc file are generated
-GEN_PMC_DEFINITIONS := \
-#IF(has_crypto):  $(PMCS_DIGEST)
-
 CLEANUPS := \
   "*.c" \
   "pmc_*.h" \
@@ -272,7 +268,7 @@ clean :
 	$(RM_F) $(CLEANUPS)
 
 realclean:
-	$(RM_F)  $(CLEANUPS) Makefile $(GEN_PMC_DEFINITIONS)
+	$(RM_F) $(CLEANUPS) Makefile
 
 distclean: realclean
 

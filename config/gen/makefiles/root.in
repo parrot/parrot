@@ -175,6 +175,22 @@ GEN_CONFIGS := \
 #IF(has_opengl):    config/gen/call_list/opengl.in \
 #IF(has_glut):    $(SRC_DIR)/glut_callbacks.c \
     $(SRC_DIR)/core_pmcs.c \
+#IF(has_crypto):    $(SRC_DIR)/dynpmc/md2.pmc \
+#IF(has_crypto):    $(SRC_DIR)/dynpmc/md4.pmc \
+#IF(has_crypto):    $(SRC_DIR)/dynpmc/md5.pmc \
+#IF(has_crypto):    $(SRC_DIR)/dynpmc/ripemd160.pmc \
+#IF(has_crypto):    $(SRC_DIR)/dynpmc/sha.pmc \
+#IF(has_crypto):    $(SRC_DIR)/dynpmc/sha1.pmc \
+#IF(has_crypto):    $(SRC_DIR)/dynpmc/sha256.pmc \
+#IF(has_crypto):    $(SRC_DIR)/dynpmc/sha512.pmc \
+#IF(has_crypto):    t/dynpmc/md2.t \
+#IF(has_crypto):    t/dynpmc/md4.t \
+#IF(has_crypto):    t/dynpmc/md5.t \
+#IF(has_crypto):    t/dynpmc/ripemd160.t \
+#IF(has_crypto):    t/dynpmc/sha.t \
+#IF(has_crypto):    t/dynpmc/sha1.t \
+#IF(has_crypto):    t/dynpmc/sha256.t \
+#IF(has_crypto):    t/dynpmc/sha512.t \
     CFLAGS \
     $(IMCC_DIR)/CFLAGS \
     config_lib.pasm \
@@ -1799,15 +1815,6 @@ test-clean :
     "t/stress/*.pbc" \
     "t/tools/*.pbc"
 	$(RM_F) \
-	"t/dynpmc/md2.t" \
-	"t/dynpmc/md4.t" \
-	"t/dynpmc/md5.t" \
-	"t/dynpmc/ripemd160.t" \
-	"t/dynpmc/sha.t" \
-	"t/dynpmc/sha1.t" \
-	"t/dynpmc/sha256.t" \
-	"t/dynpmc/sha512.t"
-	$(RM_F) \
     "t/src/*.c" \
     "t/src/*.pdb" \
     "t/src/*.manifest"
@@ -1831,7 +1838,6 @@ imcc-clean:
 # a failing step of cleaning, usually doesn't concern the following steps
 realclean : clean
 	-$(MAKE) compilers/pirc  realclean
-	-$(MAKE) src/dynpmc      realclean
 	$(RM_RF) \
     $(CONFIGURE_GENERATED_FILES) \
     blib \
