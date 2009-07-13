@@ -1246,7 +1246,7 @@ Parse a goal.
     failsub = mob.'new'(mob, 'grammar'=>'PGE::Exp::Subrule')
     failsub.'to'(pos)
     failsub['subname'] = 'FAILGOAL'
-    $S0 = goal.'text'()
+    $S0 = goal.'Str'()
     failsub['arg'] = $S0
     alt = mob.'new'(mob, 'grammar'=>'PGE::Exp::Alt')
     alt.'to'(pos)
