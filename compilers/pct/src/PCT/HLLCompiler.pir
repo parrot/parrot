@@ -471,7 +471,7 @@ resulting ast.
   compile_match:
     #push_eh err_past
     .local pmc ast
-    ast = source.'item'()
+    ast = source.'ast'()
     #pop_eh
     $I0 = isa ast, ['PAST';'Node']
     unless $I0 goto err_past
