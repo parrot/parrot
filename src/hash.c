@@ -1303,6 +1303,20 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key), ARGIN_NULLO
     const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed);
     HashBucket   *bucket  = hash->bi[hashval & hash->mask];
 
+    /* Very complex assert that we'll not put non-constant stuff into constant hash */
+    PARROT_ASSERT(
+        PMC_IS_NULL(hash->container)
+        || !(PObj_constant_TEST(hash->container))
+        || (
+            !(hash->key_type == Hash_key_type_STRING)
+            || PObj_constant_TEST((PObj *)key))
+        && (
+            !((hash->entry_type == enum_type_PMC) || (hash->entry_type == enum_type_STRING))
+            || PObj_constant_TEST((PObj *)value)
+        )
+        || !"Use non-constant key or value in constant hash"
+    );
+
     while (bucket) {
         /* store hash_val or not */
         if ((hash->compare)(interp, key, bucket->key) == 0)
