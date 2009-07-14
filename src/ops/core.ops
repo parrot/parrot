@@ -958,6 +958,8 @@ inline op exit(in INT) :flow {
                                                       $1, NULL);
     VTABLE_set_attr_str(interp, exception,
                         Parrot_str_new_constant(interp, "resume"), resume);
+    VTABLE_set_integer_keyed_str(interp, exception,
+        Parrot_str_new_constant(interp, "exit_code"), $1);
     dest = Parrot_ex_throw_from_op(interp, exception, ret);
     goto ADDRESS(dest);
 }
