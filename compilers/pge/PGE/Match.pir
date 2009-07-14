@@ -235,10 +235,6 @@ Returns the portion of the target string matched by this object.
     .return ('')
 .end
 
-.sub 'text' :method
-    .tailcall self.'Str'()
-.end
-
 
 =item C<orig()>
 
@@ -251,23 +247,6 @@ Return the original item being matched.
     .return ($P0)
 .end
 
-
-=item C<item()>
-
-Returns the scalar value of this match -- the "result object"
-if there is one, otherwise the substring matched by this match
-object.
-
-=cut
-
-.sub 'item' :method
-    .tailcall self.'ast'()
-.end
-
-.sub 'result_object' :method
-    .param pmc obj
-    .tailcall self.'!make'(obj)
-.end
 
 =item C<!make(pmc obj)>
 

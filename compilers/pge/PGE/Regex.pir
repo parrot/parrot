@@ -59,33 +59,6 @@ Match an identifier.
 .end
 
 
-=item C<null()>
-
-Match a null string (always returns true on first match).
-
-=cut
-
-.sub "null" :method
-    .local pmc mob
-    .local int pos
-    $P0 = get_hll_global ['PGE'], 'Match'
-    (mob, pos) = $P0.'new'(self)
-    mob.'to'(pos)
-    .return (mob)
-.end
-
-=item C<fail()>
-
-Force a backtrack.  (Taken from A05.)
-
-=cut
-
-.sub "fail" :method
-    $P0 = get_hll_global ['PGE'], 'Match'
-    .tailcall $P0.'new'(self)
-.end
-
-
 =item C<alpha()>
 
 Match a single alphabetic character.
@@ -226,45 +199,6 @@ Match a single alphanumeric character.
     .tailcall '!cclass'(self, .CCLASS_ALPHANUMERIC)
 .end
 
-=item C<sp()>
-
-Match a single space character.  (Taken from E05.)
-
-=cut
-
-.sub "sp" :method
-    .tailcall '!literal'(self, ' ')
-.end
-
-=item C<lt()>
-
-Match a single left angle bracket.  (Taken from E05.)
-
-=cut
-
-.sub "lt" :method
-    .tailcall '!literal'(self, '<')
-.end
-
-=item C<gt()>
-
-Match a single right angle bracket. (Taken from E05.)
-
-=cut
-
-.sub "gt" :method
-    .tailcall '!literal'(self, '>')
-.end
-
-=item C<dot()>
-
-Match a single dot ('.').  (Taken from E05.)
-
-=cut
-
-.sub "dot" :method
-    .tailcall '!literal'(self, '.')
-.end
 
 =item C<ws()>
 
@@ -373,7 +307,7 @@ success.
     .local pmc mob, cache, rule
 
     if has_pattern goto lookahead
-    mob = 'fail'(self)
+    mob = '!fail'(self)
     .return (mob)
   lookahead:
     cache = get_global '%!cache'
@@ -422,7 +356,7 @@ potentially very inefficient, but it "works" for now.
 
     mob = self
     if has_pattern goto lookbehind
-    mob = fail(mob)
+    mob = '!fail'(mob)
     .return (mob)
   lookbehind:
     pattern = concat '[', pattern
@@ -483,13 +417,27 @@ Throw an exception when parsing fails in goal matching.
 
 =over 4
 
+
+=item C<!fail>
+
+Force a backtrack.  (Taken from A05.)
+
+=cut
+
+.sub "!fail" :anon
+    .param pmc mob
+    $P0 = get_hll_global ['PGE'], 'Match'
+    .tailcall $P0.'new'(mob)
+.end
+
+
 =item C<!cclass(mob, cclass)>
 
 Match according to character class C<cclass>.
 
 =cut
 
-.sub '!cclass'
+.sub '!cclass' :anon
     .param pmc mob
     .param int cclass
 
@@ -510,7 +458,7 @@ Match according to C<literal>.
 
 =cut
 
-.sub '!literal'
+.sub '!literal' :anon
     .param pmc mob
     .param string literal
     .local string target
