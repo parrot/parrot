@@ -575,10 +575,6 @@ collection.
 Terminate and clean up Parrot's string subsystem, including string allocation
 and garbage collection.
 
-=head4 Parrot_str_free (was string_free)
-
-Free the string's header.
-
 =head4 string_max_bytes
 
 Calculate the number of bytes needed to hold a given number of characters in a
@@ -641,6 +637,10 @@ Unsafe, and behavior handled by Parrot_str_to_cstring.
 =head4 Parrot_string_split
 
 Is the same as Parrot_str_split.
+
+=head4 Parrot_str_free (was string_free)
+
+Unsafe and unuseful, let the garbage collector take care.
 
 =head3 String PMC API
 

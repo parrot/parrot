@@ -235,6 +235,8 @@ Frees the given STRING's header, accounting for reference counts for the
 STRING's buffer &c.  Use this only if you I<know> that nothing else has stored
 the STRING elsewhere.
 
+This function has been deprecated.
+
 =cut
 
 */
