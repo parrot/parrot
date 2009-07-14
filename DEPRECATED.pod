@@ -85,6 +85,15 @@ L<https://trac.parrot.org/parrot/ticket/264>
 
 =over 4
 
+=item ops file format [eligible in 1.5]
+
+The ops file format has some cruft in the form of the "VERSION =
+PARROT_VERSION;" line and is hard to parse when several ops files are
+concatenated together.   This item covers the removal of the VERSION line and
+an improved syntax for ops preambles.
+
+L<https://trac.parrot.org/parrot/ticket/836>
+
 =item moved to dynop [eligible in 1.1]
 
 Parts or all of: bit.ops, debug.ops, io.ops, math.ops, set.ops
