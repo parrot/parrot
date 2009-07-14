@@ -678,8 +678,6 @@ CODE
 /No such string attribute/
 OUTPUT
 
-SKIP: {
-    skip( "intermittent segfault, RT #60556", 1 );
 pir_output_is( <<'CODE', <<'OUTPUT', "catch ex from C-level MULTI function" );
 .sub main :main
 
@@ -715,7 +713,6 @@ end:
 CODE
 no segfault
 OUTPUT
-}
 
 pir_output_is( <<'CODE', <<'OUTPUT', "count_eh" );
 .sub main :main
