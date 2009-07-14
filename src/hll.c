@@ -87,11 +87,6 @@ new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
 
     PMC *entry_id;
 
-    /*
-     * ATT: all items that are owned by the HLL_info structure
-     *      have to be created as constant objects, because
-     *      this structure isn't marked by GC
-     */
     PMC * const entry = constant_pmc_new(interp, enum_class_FixedPMCArray);
 
     if (entry_name && !STRING_IS_EMPTY(entry_name)) {
@@ -133,7 +128,7 @@ Parrot_init_HLL(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_init_HLL)
     interp->HLL_info      =
-        constant_pmc_new(interp, enum_class_OrderedHash);
+        pmc_new(interp, enum_class_OrderedHash);
     interp->HLL_namespace =
         constant_pmc_new(interp, enum_class_ResizablePMCArray);
 
