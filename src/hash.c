@@ -1312,10 +1312,8 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key), ARGIN_NULLO
             || PObj_constant_TEST((PObj *)key))
         && (
             !((hash->entry_type == enum_type_PMC) || (hash->entry_type == enum_type_STRING))
-            || PObj_constant_TEST((PObj *)value)
-        )
-        || !"Use non-constant key or value in constant hash"
-    );
+            || PObj_constant_TEST((PObj *)value))
+        || !"Use non-constant key or value in constant hash");
 
     while (bucket) {
         /* store hash_val or not */
