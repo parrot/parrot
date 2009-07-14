@@ -95,7 +95,7 @@ Initializes a PMCProxy PMC.
         _pmc->roles            = pmc_new(interp, enum_class_ResizablePMCArray);
         _pmc->methods          = pmc_new(interp, enum_class_Hash);
         _pmc->vtable_overrides = pmc_new(interp, enum_class_Hash);
-        _pmc->parent_overrides = constant_pmc_new(interp, enum_class_Hash);
+        _pmc->parent_overrides = pmc_new(interp, enum_class_Hash);
         _pmc->attrib_metadata  = pmc_new(interp, enum_class_Hash);
         _pmc->attrib_index     = PMCNULL;
         _pmc->attrib_cache     = PMCNULL;

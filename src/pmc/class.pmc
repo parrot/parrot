@@ -496,7 +496,7 @@ arguments. The class is attached to the current HLL namespace.
         _class->resolve_method  = pmc_new(interp, enum_class_ResizablePMCArray);
 
         _class->vtable_overrides = pmc_new(interp, enum_class_Hash);
-        _class->parent_overrides = constant_pmc_new(interp, enum_class_Hash);
+        _class->parent_overrides = pmc_new(interp, enum_class_Hash);
 
         /* We put ourself on the all parents list. */
         VTABLE_push_pmc(interp, _class->all_parents, SELF);
