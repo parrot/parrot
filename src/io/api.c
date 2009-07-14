@@ -592,7 +592,7 @@ Parrot_io_eof(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 =item C<INTVAL Parrot_io_puts(PARROT_INTERP, PMC *pmc, const char *s)>
 
-Writes C<*s> tp C<*pmc>. C string version.
+Writes C<*s> to C<*pmc>. C string version.
 
 =cut
 
