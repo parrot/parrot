@@ -59,7 +59,7 @@ token afterws {
         .return (1)
       end:
     }}
-    <fail>
+    <!>
 }
 
 
@@ -127,7 +127,7 @@ token statement_end {
             if $P0 != $P2 goto end
             .return (1)
             end:
-        }} <fail>
+        }} <!>
 }
 
 token MARK_STATEMENT_END {
