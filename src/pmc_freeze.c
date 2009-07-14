@@ -1661,6 +1661,11 @@ again:
 
         PARROT_ASSERT(current->vtable);
 
+        /* Workaround for thawing constants. Clear constant flag */
+        /* See src/packfile.c:3999 */
+        if (thawing)
+            PObj_constant_CLEAR(current);
+
         VTABLE_visit(interp, current, info);
 
         if (thawing) {
