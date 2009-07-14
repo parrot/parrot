@@ -202,59 +202,6 @@ Creates an instance of the PMC.
 
 /*
 
-=item C<void destroy()>
-
-Free the memory associated with the object's underlying struct.
-
-=cut
-
-*/
-
-    VTABLE void destroy() {
-        mem_sys_free(PMC_data(SELF));
-    }
-
-/*
-
-=item C<void mark()>
-
-Mark any referenced strings and PMCs in the structure as live.
-
-=cut
-
-*/
-
-    VTABLE void mark() {
-        Parrot_Class_attributes * const _pmc = PARROT_CLASS(SELF);
-
-        if (_pmc->name)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)_pmc->name);
-        if (_pmc->_namespace)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)_pmc->_namespace);
-        if (_pmc->parents)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)_pmc->parents);
-        if (_pmc->all_parents)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)_pmc->all_parents);
-        if (_pmc->roles)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)_pmc->roles);
-        if (_pmc->methods)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)_pmc->methods);
-        if (_pmc->vtable_overrides)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)_pmc->vtable_overrides);
-        if (_pmc->parent_overrides)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)_pmc->parent_overrides);
-        if (_pmc->attrib_metadata)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)_pmc->attrib_metadata);
-        if (_pmc->attrib_index)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)_pmc->attrib_index);
-        if (_pmc->attrib_cache)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)_pmc->attrib_cache);
-        if (_pmc->resolve_method)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)_pmc->resolve_method);
-    }
-
-/*
-
 =item C<INTVAL isa_pmc(PMC *classname)>
 
 Returns whether the class is or inherits from C<*classname>.
