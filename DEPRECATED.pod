@@ -267,32 +267,6 @@ Here is a list of functions in this file which are currently being exported:
 
 =head1 Compiler tools
 
-=head2 Parrot Grammar Engine
-
-=over 4
-
-=item Deprecated rules and methods [eligible in 1.1]
-
-The following "built-in" PGE rules and methods are from previous 
-versions of Synopsis 5.
-
-Deprecated rules:
-    C<null>, C<fail>, C<sp>, C<lt>, C<gt>, C<dot>
-
-Deprecated methods:
-    C<.text>, C<.item>, C<.result_object>
-
-L<https://trac.parrot.org/parrot/ticket/460>
-
-=item Stringification, numification [eligible in 1.1]
-
-C< PGE::Match > objects will stringify or numify based on
-the text that is matched, not the result object.
-
-L<https://trac.parrot.org/parrot/ticket/461>
-
-=back
-
 =head2 Parrot Compiler Toolkit
 
 =over 4
