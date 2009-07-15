@@ -36,6 +36,7 @@ sub _init {
         include/parrot/hash.h
         include/parrot/interpreter.h
         include/parrot/io.h
+        include/parrot/library.h
         include/parrot/longopt.h
         include/parrot/multidispatch.h
         include/parrot/packfile.h

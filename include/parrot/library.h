@@ -25,6 +25,7 @@ typedef enum {
     PARROT_RUNTIME_FT_SOURCE  = 0x0F00
 } enum_runtime_ft;
 
+/* &gen_from_enum(libpaths.pasm) */
 typedef enum {
     PARROT_LIB_PATH_INCLUDE,            /* .include "foo" */
     PARROT_LIB_PATH_LIBRARY,            /* load_bytecode "bar" */
@@ -34,6 +35,7 @@ typedef enum {
     /* must be last: */
     PARROT_LIB_PATH_SIZE
 } enum_lib_paths;
+/* &end_gen */
 
 /* HEADERIZER BEGIN: src/library.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

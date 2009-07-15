@@ -49,6 +49,7 @@ SKIP: {
     pir_output_is( <<"CODE", <<'OUT', 'soup to nuts' );
 
 .include 'iglobals.pasm'
+.include 'libpaths.pasm'
 
 .sub main :main
     .local pmc interp
@@ -57,9 +58,8 @@ SKIP: {
     .local pmc lib_paths
     lib_paths = interp[.IGLOBALS_LIB_PATHS]
 
-    # TT #747 - hard-coded magic constant (should be PARROT_LIB_PATH_DYNEXT)
     .local pmc dynext_path
-    dynext_path = lib_paths[2]
+    dynext_path = lib_paths[.PARROT_LIB_PATH_DYNEXT]
     unshift dynext_path, '$pcre_libpath'
 
     load_bytecode 'pcre.pbc'
