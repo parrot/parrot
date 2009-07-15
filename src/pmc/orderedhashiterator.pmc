@@ -193,7 +193,7 @@ the next one.
         do {
             bucket = attrs->parrot_hash->bs + attrs->pos++;
             attrs->elements--;
-        } while(attrs->elements && !bucket->key);
+        } while (attrs->elements && !bucket->key);
 
         /* Reuse HashIteratorKey */
         ret = pmc_new(INTERP, enum_class_HashIteratorKey);

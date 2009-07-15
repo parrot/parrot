@@ -1309,13 +1309,10 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
         || (
             (
                 !(hash->key_type == Hash_key_type_STRING)
-                || PObj_constant_TEST((PObj *)key)
-            )
+                || PObj_constant_TEST((PObj *)key))
             && (
                 !((hash->entry_type == enum_type_PMC) || (hash->entry_type == enum_type_STRING))
-                || PObj_constant_TEST((PObj *)value)
-            )
-        )
+                || PObj_constant_TEST((PObj *)value)))
         || !"Use non-constant key or value in constant hash");
 
     while (bucket) {
