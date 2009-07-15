@@ -127,12 +127,16 @@ hash_key_from_string(PARROT_INTERP, const Hash * const hash, ARGIN(STRING *key))
     void *ret;
     switch (hash->key_type) {
         case Hash_key_type_int:
-            ret = (void *)Parrot_str_to_int(interp, key);
+        {
+            /* Pacify compiler about casting INVTAL to void */
+            INTVAL int_key  = Parrot_str_to_int(interp, key);
+            ret             = INTVAL2PTR(void *, int_key);
             break;
+        }
         /* Currently PMCs are stringified */
         case Hash_key_type_PMC:
         case Hash_key_type_STRING:
-            ret = (void *)key;
+            ret = key;
             break;
         default:
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
@@ -147,8 +151,11 @@ hash_key_from_pmc(PARROT_INTERP, const Hash * const hash, ARGIN(PMC *key))
     void *ret;
     switch (hash->key_type) {
         case Hash_key_type_int:
-            ret = (void *)VTABLE_get_integer(interp, key);
+        {
+            INTVAL int_key  = VTABLE_get_integer(interp, key);
+            ret             = INTVAL2PTR(void *, int_key);
             break;
+        }
         /* Currently PMCs are stringified */
         case Hash_key_type_PMC:
         case Hash_key_type_STRING:
@@ -176,13 +183,13 @@ hash_value_from_int(PARROT_INTERP, const Hash * const hash, INTVAL value)
     void *ret;
     switch (hash->entry_type) {
         case enum_type_INTVAL:
-            ret = (void*)value;
+            ret = INTVAL2PTR(void *, value);
             break;
         case enum_type_PMC:
             {
                 PMC *tmp = get_integer_pmc(interp);
                 VTABLE_set_integer_native(interp, tmp, value);
-                ret = (void *)tmp;
+                ret = INTVAL2PTR(void *, tmp);
             }
             break;
         case enum_type_STRING:
@@ -201,8 +208,11 @@ hash_value_from_string(PARROT_INTERP, const Hash * const hash, STRING *value)
     void *ret;
     switch (hash->entry_type) {
         case enum_type_INTVAL:
-            ret = (void*)Parrot_str_to_int(interp, value);
+        {
+            INTVAL int_val  = Parrot_str_to_int(interp, value);
+            ret             = INTVAL2PTR(void *, int_val);
             break;
+        }
         case enum_type_STRING:
             ret = (void *)value;
             break;
@@ -226,8 +236,11 @@ hash_value_from_pmc(PARROT_INTERP, const Hash * const hash, PMC *value)
     void *ret;
     switch (hash->entry_type) {
         case enum_type_INTVAL:
-            ret = (void*)VTABLE_get_integer(interp, value);
+        {
+            INTVAL int_val  = VTABLE_get_integer(interp, value);
+            ret             = INTVAL2PTR(void *, int_val);
             break;
+        }
         case enum_type_STRING:
             ret = (void *)VTABLE_get_string(interp, value);
             break;
