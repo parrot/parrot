@@ -136,14 +136,29 @@ C<SDL::Surface> containing the rendered font.
     font_surface = new 'SDL::Surface'
     font_surface.'init'( 'height' => 0, 'width' => 0 )
 
-    .local pmc RenderText_Solid
-    get_hll_global RenderText_Solid, ['SDL::NCI::TTF'], 'RenderText_Solid'
+# RNH use RenderUTF8 in preference to RenderText by default
+    .local pmc RenderUTF8_Solid
+    get_hll_global RenderUTF8_Solid, ['SDL::NCI::TTF'], 'RenderUTF8_Solid'
 
-    .local pmc color
-    color = color_pmc.'color'()
+    .local int color
+# RNH font routine takes color in the order rgb rather than bgr used by surface.pir hence cannot rely on color.get_integer
+    .local int component
+    .local pmc colors
+    colors = color_pmc.'color'()
+
+    component = colors['b']
+    component <<= 16
+    color = component
+
+    component = colors['g']
+    component <<= 8
+    color += component
+
+    component = colors['r']
+    color += component
 
     .local pmc font_surface_struct
-    font_surface_struct = RenderText_Solid( font, text, color )
+    font_surface_struct = RenderUTF8_Solid( font, text, color )
     font_surface.'wrap_surface'( font_surface_struct )
 
     .return( font_surface )

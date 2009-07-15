@@ -219,6 +219,7 @@ SDL::Font library anyway, which calls this for you.
     loadlib ttf_lib, 'libSDL_ttf'
     if ttf_lib goto initialize
     loadlib ttf_lib, 'cygSDL_ttf-2-0-0'
+# RNH this is not trapping a non-existent libSDL_ttf library
     unless ttf_lib goto error
 
   initialize:
@@ -243,15 +244,21 @@ SDL::Font library anyway, which calls this for you.
   success:
     dlfunc nci_sub, ttf_lib, 'TTF_OpenFont', 'pti'
     set_hll_global ['SDL::NCI::TTF'], 'OpenFont', nci_sub
-
-    dlfunc nci_sub, ttf_lib, 'TTF_RenderText_Solid', 'pptp'
+#RNH changes: all text routines expect an integer, not a pmc, for color parameter
+    dlfunc nci_sub, ttf_lib, 'TTF_RenderText_Solid', 'ppti'
     set_hll_global ['SDL::NCI::TTF'], 'RenderText_Solid', nci_sub
-    dlfunc nci_sub, ttf_lib, 'TTF_RenderUTF8_Solid', 'pptp'
+    dlfunc nci_sub, ttf_lib, 'TTF_RenderUTF8_Solid', 'ppti'
     set_hll_global ['SDL::NCI::TTF'], 'RenderUTF8_Solid', nci_sub
 
     # this one could be wrong
-    dlfunc nci_sub, ttf_lib, 'TTF_RenderUNICODE_Solid', 'pptp'
+    dlfunc nci_sub, ttf_lib, 'TTF_RenderUNICODE_Solid', 'ppti'
     set_hll_global ['SDL::NCI::TTF'], 'RenderUNICODE_Solid', nci_sub
+# RNH Additions. Add UTF8_Shaded and FontLine skip
+    dlfunc nci_sub, ttf_lib, 'TTF_RenderUTF8_Shaded', 'pptii'
+    set_hll_global ['SDL::NCI::TTF'], 'RenderUTF8_Shaded', nci_sub
+    dlfunc nci_sub, ttf_lib, 'TTF_FontLineSkip', 'ip'
+    set_hll_global ['SDL::NCI::TTF'], 'FontLineSkip', nci_sub
+#end additions
 
     dlfunc nci_sub, ttf_lib, 'TTF_SizeText', 'ipt33'
     set_hll_global ['SDL::NCI::TTF'], 'SizeText', nci_sub

@@ -227,6 +227,8 @@ i    ppl
 v    pip
 p    pti
 i    ppp
+# added by RNH for the RenderXXX_XXXX text routines 
+p    ptii
 
 # Used by SDL::Font
 p    ti

@@ -788,6 +788,11 @@ U: rurban
 E: rurban@cpan.org
 D: cygwin, 64-bit pbc compat, float converters, bignum.pmc
 
+N: Richard Hainsworth
+U: finanalyst
+E: richard@rusrating.ru
+D: bugfix SDL Font
+
 N: Richard Tibbetts
 D: Divide by zero exceptions in some PMCs
 
