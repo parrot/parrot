@@ -396,7 +396,8 @@ really a public API.
     }
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
-        PMC    *ns = SUPER(key);
+        /* PMC    *ns = SUPER(key); */
+        PMC    *ns = INTERP->vtables[enum_class_Hash]->get_pmc_keyed(INTERP, SELF, key);
 
         if (!PMC_IS_NULL(ns))
             return ns;

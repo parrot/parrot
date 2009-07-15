@@ -33,6 +33,7 @@ sub _init {
         include/parrot/events.h
         include/parrot/scheduler.h
         include/parrot/exceptions.h
+        include/parrot/hash.h
         include/parrot/interpreter.h
         include/parrot/io.h
         include/parrot/longopt.h

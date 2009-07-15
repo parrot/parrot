@@ -1,0 +1,590 @@
+/*
+Copyright (C) 2001-2009, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/arrayiterator.pmc - Implementation of Iterator for Arrays.
+
+=head1 DESCRIPTION
+
+Generic iterator for traversing arrays.
+
+=head1 SYNOPSIS
+
+=head2 default usage
+
+    .local pmc iterator, array, entry
+    iterator = iter array
+  iter_loop:
+    unless iterator, iter_end  # while (more values)
+    entry = shift iterator     # get an entry
+    ...
+    goto iter_loop
+  iter_end:
+
+
+=head2 iterate from the end, for arrays
+
+    .local pmc iterator, array, entry
+    iterator = iter array
+    iterator = .ITERATE_FROM_END
+  iter_loop:
+    unless iterator, iter_end  # while (more values)
+    entry = pop iterator     # get an entry
+    ...
+    goto iter_loop
+  iter_end:
+
+=head2 Warning!
+
+NB: for different direction you have to use different ops!
+
+TODO: Discuss idea of having separate get_iter/get_reverse_iter VTABLE methods
+to avoid this caveat.
+
+=head1 Methods
+
+=over 4
+
+=cut
+
+*/
+
+pmclass ArrayIterator no_ro {
+    ATTR PMC    *array;     /* the array which this Iterator iterates */
+    ATTR INTVAL  pos;       /* Current position of iterator for forward iterator */
+                            /* Previous position of iterator for reverse iterator */
+    ATTR INTVAL  length;    /* Length of C<array> */
+    ATTR INTVAL  reverse;   /* Direction of iteration. 1 - for reverse iteration */
+
+/*
+
+=item C<void init()>
+
+Raises an exception. Use C<init_pmc()>.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "ArrayIterator init without aggregate");
+    }
+
+/*
+
+=item C<void init_pmc(PMC *initializer)>
+
+Initializes the iterator with an aggregate PMC.
+Defaults iteration mode to iterate from start.
+
+=cut
+
+*/
+
+    VTABLE void init_pmc(PMC *array) {
+        Parrot_ArrayIterator_attributes *attrs =
+            mem_allocate_zeroed_typed(Parrot_ArrayIterator_attributes);
+
+        attrs->array     = array;
+        PMC_data(SELF)   = attrs;
+
+        PObj_custom_mark_destroy_SETALL(SELF);
+
+        /* by default, iterate from start */
+        SELF.set_integer_native(ITERATE_FROM_START);
+    }
+
+/*
+
+=item C<void destroy()>
+
+destroys this PMC
+
+=cut
+
+*/
+
+    VTABLE void destroy() {
+        mem_sys_free(PMC_data(SELF));
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the current idx/key and the aggregate as live.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        PMC *array;
+        GET_ATTR_array(INTERP, SELF, array);
+        if (array)
+             Parrot_gc_mark_PObj_alive(INTERP, (PObj *)array);
+    }
+
+/*
+
+=item C<PMC *clone()>
+
+=cut
+
+*/
+    VTABLE PMC* clone() {
+        Parrot_ArrayIterator_attributes *attrs =
+                PARROT_ARRAYITERATOR(SELF);
+        PMC                             *clone =
+                pmc_new_init(INTERP, enum_class_ArrayIterator, attrs->array);
+        Parrot_ArrayIterator_attributes *clone_attrs =
+                PARROT_ARRAYITERATOR(clone);
+
+        clone_attrs->pos     = attrs->pos;
+        clone_attrs->reverse = attrs->reverse;
+        return clone;
+    }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns true if there is more elements to iterate over.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_bool() {
+        return SELF.elements() > 0;
+    }
+
+/*
+
+=item C<INTVAL elements()>
+
+Returns the number of remaining elements in the array.
+
+=cut
+
+*/
+
+    VTABLE INTVAL elements() {
+        Parrot_ArrayIterator_attributes *attrs =
+                PARROT_ARRAYITERATOR(SELF);
+        if (attrs->reverse)
+            return attrs->pos;
+        else
+            return attrs->length - attrs->pos;
+    }
+
+    VTABLE INTVAL get_integer() {
+        return SELF.elements();
+    }
+
+/*
+
+=item C<void set_integer_native(INTVAL value)>
+
+Reset the Iterator. C<value> must be one of
+
+ ITERATE_FROM_START        ... Iterate from start
+ ITERATE_FROM_END          ... Iterate from end
+
+=cut
+
+*/
+
+    VTABLE void set_integer_native(INTVAL value) {
+        Parrot_ArrayIterator_attributes *attrs =
+                PARROT_ARRAYITERATOR(SELF);
+        if (value == ITERATE_FROM_START) {
+            attrs->reverse   = 0;
+            attrs->pos       = 0;
+            attrs->length    = VTABLE_elements(INTERP, attrs->array);
+        }
+        else if (value == ITERATE_FROM_END) {
+            attrs->reverse   = 1;
+            attrs->pos       = attrs->length
+                             = VTABLE_elements(INTERP, attrs->array);
+        }
+        else
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                    "Wrong direction for ArrayIterator");
+    }
+
+/*
+
+=item C<PMC *get_pmc()>
+
+Returns this Iterator's array.
+
+=cut
+
+*/
+
+    VTABLE PMC *get_pmc() {
+        PMC *array;
+        GET_ATTR_array(INTERP, SELF, array);
+        return array ? array : PMCNULL;
+    }
+
+/*
+
+=item C<INTVAL shift_integer()>
+
+Returns the element for the current idx and sets the idx to
+the next one.
+
+=cut
+
+*/
+
+    VTABLE INTVAL shift_integer() {
+        Parrot_ArrayIterator_attributes *attrs =
+                PARROT_ARRAYITERATOR(SELF);
+
+        if (attrs->pos >= attrs->length)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "StopIteration");
+
+        return VTABLE_get_integer_keyed_int(INTERP, attrs->array, attrs->pos++);
+    }
+
+/*
+
+=item C<FLOATVAL shift_float()>
+
+=cut
+
+*/
+
+    VTABLE FLOATVAL shift_float() {
+        Parrot_ArrayIterator_attributes *attrs =
+                PARROT_ARRAYITERATOR(SELF);
+
+        if (!STATICSELF.get_bool())
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "StopIteration");
+
+        return VTABLE_get_number_keyed_int(INTERP, attrs->array, attrs->pos++);
+    }
+
+
+/*
+
+=item C<STRING *shift_string()>
+
+=cut
+
+*/
+
+    VTABLE STRING *shift_string() {
+        Parrot_ArrayIterator_attributes *attrs =
+                PARROT_ARRAYITERATOR(SELF);
+
+        if (!STATICSELF.get_bool())
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "StopIteration");
+
+        return VTABLE_get_string_keyed_int(INTERP, attrs->array, attrs->pos++);
+    }
+
+/*
+
+=item C<PMC *shift_pmc()>
+
+Returns the element for the current idx/key and sets the idx/key to
+the next one.
+
+=cut
+
+*/
+
+    VTABLE PMC *shift_pmc() {
+        Parrot_ArrayIterator_attributes *attrs =
+                PARROT_ARRAYITERATOR(SELF);
+
+        if (!STATICSELF.get_bool())
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "StopIteration");
+
+        return VTABLE_get_pmc_keyed_int(INTERP, attrs->array, attrs->pos++);
+    }
+
+
+/*
+
+=item C<INTVAL pop_integer()>
+
+Returns the element for the current idx and sets the idx to
+the next one.
+
+=cut
+
+*/
+
+    VTABLE INTVAL pop_integer() {
+        Parrot_ArrayIterator_attributes *attrs =
+                PARROT_ARRAYITERATOR(SELF);
+
+        if (!STATICSELF.get_bool())
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "StopIteration");
+
+        return VTABLE_get_integer_keyed_int(INTERP, attrs->array, --attrs->pos);
+    }
+
+/*
+
+=item C<FLOATVAL pop_float()>
+
+=cut
+
+*/
+
+    VTABLE FLOATVAL pop_float() {
+        Parrot_ArrayIterator_attributes *attrs =
+                PARROT_ARRAYITERATOR(SELF);
+
+        if (!STATICSELF.get_bool())
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "StopIteration");
+
+        return VTABLE_get_number_keyed_int(INTERP, attrs->array, --attrs->pos);
+    }
+
+
+/*
+
+=item C<STRING *pop_string()>
+
+=cut
+
+*/
+
+    VTABLE STRING *pop_string() {
+        Parrot_ArrayIterator_attributes *attrs =
+                PARROT_ARRAYITERATOR(SELF);
+
+        if (!STATICSELF.get_bool())
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "StopIteration");
+
+        return VTABLE_get_string_keyed_int(INTERP, attrs->array, --attrs->pos);
+    }
+
+/*
+
+=item C<PMC *pop_pmc()>
+
+Returns the element for the current idx/key and sets the idx/key to
+the next one.
+
+=cut
+
+*/
+
+    VTABLE PMC *pop_pmc() {
+        Parrot_ArrayIterator_attributes *attrs =
+                PARROT_ARRAYITERATOR(SELF);
+
+        if (!STATICSELF.get_bool())
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "StopIteration");
+
+        return VTABLE_get_pmc_keyed_int(INTERP, attrs->array, --attrs->pos);
+    }
+
+/*
+=item C<PMC *get_pmc_keyed(PMC *key)>
+
+Returns the element for C<*key>.
+
+=cut
+
+*/
+
+    VTABLE PMC *get_pmc_keyed(PMC *key) {
+        return STATICSELF.get_pmc_keyed_int(VTABLE_get_integer(INTERP, key));
+    }
+
+/*
+
+=item C<PMC *get_pmc_keyed_int(INTVAL key)>
+
+Returns the element for C<key>.
+
+=cut
+
+*/
+
+    VTABLE PMC *get_pmc_keyed_int(INTVAL idx) {
+        return VTABLE_get_pmc_keyed_int(INTERP, STATICSELF.get_pmc(),
+                PARROT_ARRAYITERATOR(SELF)->pos + idx);
+    }
+/*
+
+=item C<INTVAL get_integer_keyed(PMC *key)>
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer_keyed(PMC *key) {
+        return STATICSELF.get_integer_keyed_int(VTABLE_get_integer(INTERP, key));
+    }
+
+/*
+
+=item C<INTVAL get_integer_keyed_int(INTVAL idx)>
+
+Get integer value of current position plus idx.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer_keyed_int(INTVAL idx) {
+        return VTABLE_get_integer_keyed_int(INTERP, STATICSELF.get_pmc(),
+                PARROT_ARRAYITERATOR(SELF)->pos + idx);
+    }
+
+/*
+
+=item C<FLOATVAL get_number_keyed(PMC *key)>
+
+=cut
+
+*/
+
+    VTABLE FLOATVAL get_number_keyed(PMC *key) {
+        return STATICSELF.get_number_keyed_int(VTABLE_get_integer(INTERP, key));
+    }
+
+/*
+
+=item C<FLOATVAL get_number_keyed_int(INTVAL idx)>
+
+Get number value of current position plus idx.
+
+=cut
+
+*/
+
+    VTABLE FLOATVAL get_number_keyed_int(INTVAL idx) {
+        return VTABLE_get_number_keyed_int(INTERP, STATICSELF.get_pmc(),
+                PARROT_ARRAYITERATOR(SELF)->pos + idx);
+    }
+
+
+
+/*
+
+=item C<STRING *get_string_keyed(PMC *key)>
+
+=cut
+
+*/
+
+    VTABLE STRING *get_string_keyed(PMC *key) {
+        return STATICSELF.get_string_keyed_int(VTABLE_get_integer(INTERP, key));
+    }
+
+/*
+
+=item C<STRING *get_string_keyed_int(INTVAL idx)>
+
+Get string value of current position plus idx.
+
+=cut
+
+*/
+
+    VTABLE STRING *get_string_keyed_int(INTVAL idx) {
+        return VTABLE_get_string_keyed_int(INTERP, STATICSELF.get_pmc(),
+                PARROT_ARRAYITERATOR(SELF)->pos + idx);
+    }
+
+/*
+
+=item C<INTVAL exists_keyed(PMC *key)>
+
+Returns whether an element for C<*key> exists in the array.
+
+=cut
+
+*/
+
+    VTABLE INTVAL exists_keyed(PMC *key) {
+        return STATICSELF.exists_keyed_int(VTABLE_get_integer(INTERP, key));
+    }
+
+/*
+
+=item C<INTVAL exists_keyed_int(INTVAL idx)>
+
+Returns whether an element for C<idx> exists in the aggregate.
+
+=cut
+
+*/
+
+    VTABLE INTVAL exists_keyed_int(INTVAL idx) {
+        Parrot_ArrayIterator_attributes *attrs =
+                PARROT_ARRAYITERATOR(SELF);
+        /* Cheat! */
+        INTVAL final_pos = attrs->pos + idx - attrs->reverse;
+
+        return VTABLE_exists_keyed_int(INTERP, attrs->array, final_pos);
+    }
+
+/*
+
+=item C<INTVAL defined_keyed(PMC *key)>
+
+=cut
+
+*/
+
+    VTABLE INTVAL defined_keyed(PMC *key) {
+        return STATICSELF.defined_keyed_int(VTABLE_get_integer(INTERP, key));
+    }
+
+/*
+
+=item C<INTVAL defined_keyed_int(INTVAL key)>
+
+Returns the result of calling C<defined_keyed(key)> on the aggregate.
+
+=cut
+
+*/
+
+    VTABLE INTVAL defined_keyed_int(INTVAL idx) {
+        Parrot_ArrayIterator_attributes *attrs =
+                PARROT_ARRAYITERATOR(SELF);
+        /* Cheat! */
+        INTVAL final_pos = attrs->pos + idx - attrs->reverse;
+
+        return VTABLE_defined_keyed_int(INTERP, attrs->array, final_pos);
+    }
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

@@ -45,6 +45,24 @@
     .return ()
 .end
 
+.sub '_find_segment_by_prefix'
+    .param pmc pf
+    .param string prefix
+    .local pmc pfdir, it
+
+    pfdir = pf.'get_directory'()
+    it = iter pfdir
+  loop:
+    unless it goto done
+    $S0 = shift it
+    $I0 = index $S0, prefix
+    if $I0 != 0 goto loop
+    $P0 = pfdir[$S0]
+    .return ($P0)
+  done:
+    .return ()
+.end
+
 .sub '_get_fixup_table'
     .param pmc pf
 

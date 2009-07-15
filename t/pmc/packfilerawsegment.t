@@ -34,9 +34,7 @@ Tests the PackfileRawSegment PMC.
     .local pmc pf, pfdir, pfseg
     pf    = _pbc()
     pfdir = pf.'get_directory'()
-    $P0   = iter pfdir
-    $S0   = shift $P0
-    pfseg = pfdir[$S0]
+    pfseg = '_find_segment_by_prefix'(pf, 'BYTECODE')
     $I0   = elements pfseg
     ok($I0, 'PackfileRawSegment contains some data')
 .end
@@ -46,9 +44,7 @@ Tests the PackfileRawSegment PMC.
     .local pmc pf, pfdir, pfseg
     pf    = _pbc()
     pfdir = pf.'get_directory'()
-    $P0   = iter pfdir
-    $S0   = shift $P0
-    pfseg = pfdir[$S0]
+    pfseg = '_find_segment_by_prefix'(pf, 'BYTECODE')
 
     $I0   = 0
     $I1   = pfseg[0]

@@ -322,12 +322,11 @@ Returns a hashed value for an integer key (passed as a void pointer, sadly).
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 size_t
-key_hash_int(SHIM_INTERP, ARGIN(const void *value), size_t seed)
+key_hash_int(SHIM_INTERP, ARGIN_NULLOK(const void *value), size_t seed)
 {
     ASSERT_ARGS(key_hash_int)
     return (size_t)value ^ seed;
 }
-
 
 /*
 
@@ -349,7 +348,6 @@ int_compare(SHIM_INTERP, ARGIN_NULLOK(const void *a), ARGIN_NULLOK(const void *b
     ASSERT_ARGS(int_compare)
     return a != b;
 }
-
 
 /*
 
@@ -823,7 +821,7 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
 
 =item C<Hash* parrot_new_hash(PARROT_INTERP)>
 
-Creates a new Parrot STRING hash in C<hptr>.
+Creates a new Parrot STRING hash.
 
 =cut
 
@@ -1198,7 +1196,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 HashBucket *
-parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(const void *key))
+parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(const void *key))
 {
     ASSERT_ARGS(parrot_hash_get_bucket)
 
@@ -1214,7 +1212,7 @@ parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(const void 
             HashBucket *bucket = hash->bs + i;
 
             /* the hash->compare cost is too high for this fast path */
-            if (bucket->key && bucket->key == key)
+            if (bucket->key == key)
                 return bucket;
         }
     }
@@ -1297,7 +1295,8 @@ PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 HashBucket*
-parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key), ARGIN_NULLOK(void *value))
+parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
+        ARGIN_NULLOK(void *key), ARGIN_NULLOK(void *value))
 {
     ASSERT_ARGS(parrot_hash_put)
     const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed);

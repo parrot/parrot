@@ -533,17 +533,20 @@ pir_output_is( <<'CODE', <<'OUTPUT', "AddrRegistry 2" );
     reg[b] = nil
     reg[c] = nil
 
+    $P1 = new ['ResizablePMCArray']
     it = iter reg
 loop:
     unless it goto done
     $P0 = shift it
-    print $P0
+    $S0 = $P0
+    push $P1, $S0
     goto loop
 done:
+    $P1.'sort'()
+    $S1 = join '', $P1
+    print $S1
     print "\n"
 .end
-# the current hash implementation returns entries in order
-# for a few keys, and if there were no deletes
 CODE
 k1k2k3
 OUTPUT

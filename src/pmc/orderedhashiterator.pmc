@@ -1,0 +1,265 @@
+/*
+Copyright (C) 2001-2009, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/orderedhashiterator.pmc - Implementation of Iterator for OrderedHash.
+
+=head1 DESCRIPTION
+
+=head1 SYNOPSIS
+
+=head1 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "pmc_hash.h"
+#include "pmc_hashiteratorkey.h"
+
+pmclass OrderedHashIterator extends Iterator no_ro {
+    ATTR PMC        *pmc_hash;      /* the Hash which this Iterator iterates */
+    ATTR Hash       *parrot_hash;   /* Underlying implementation of hash */
+    ATTR INTVAL      pos;           /* */
+    ATTR INTVAL      elements;      /* How many elements left to iterate over */
+    ATTR INTVAL      reverse;       /* Direction of iteration. 1 - for reverse iteration */
+
+/*
+
+=item C<void init_pmc(PMC *initializer)>
+
+Initializes the iterator with an aggregate PMC.
+Defaults iteration mode to iterate from start.
+
+=cut
+
+*/
+
+    VTABLE void init_pmc(PMC *hash) {
+        Parrot_OrderedHashIterator_attributes *attrs =
+            mem_allocate_zeroed_typed(Parrot_OrderedHashIterator_attributes);
+
+        attrs->pmc_hash         = hash;
+        attrs->parrot_hash      = (Hash*)VTABLE_get_pointer(INTERP, hash);
+        attrs->pos              = 0;
+        /* Will be decreased on initial advance_to_next */
+        /* XXX Do we really need to support this use-case ? */
+        attrs->elements         = attrs->parrot_hash->entries;
+        PMC_data(SELF)          = attrs;
+
+        PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+/*
+
+=item C<void destroy()>
+
+destroys this PMC
+
+=cut
+
+*/
+
+    VTABLE void destroy() {
+        mem_sys_free(PMC_data(SELF));
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the hash as live.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        PMC *hash = PARROT_ORDEREDHASHITERATOR(SELF)->pmc_hash;
+        if (hash)
+             Parrot_gc_mark_PObj_alive(INTERP, (PObj *)hash);
+    }
+
+/*
+
+=item C<PMC *clone()>
+
+=cut
+
+*/
+    VTABLE PMC* clone() {
+        return PMCNULL;
+    }
+
+/*
+
+=item C<void set_integer_native()>
+
+=cut
+
+*/
+    VTABLE void set_integer_native(INTVAL value) {
+        Parrot_OrderedHashIterator_attributes *attrs =
+                PARROT_ORDEREDHASHITERATOR(SELF);
+
+        /* Restart iterator */
+        attrs->elements         = attrs->parrot_hash->entries;
+        if (value == ITERATE_FROM_START || value == ITERATE_FROM_START_KEYS) {
+            attrs->pos      = 0;
+            attrs->reverse  = 0;
+            return;
+        }
+        else if (value == ITERATE_FROM_END) {
+            attrs->pos      = attrs->elements;
+            attrs->reverse  = 1;
+            return;
+        }
+
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "HashIterator: unknown iterator type");
+    };
+
+/*
+
+=item C<PMC *get_pmc()>
+
+Returns this Iterator's Hash.
+
+=cut
+*/
+    VTABLE PMC* get_pmc() {
+        return PARROT_ORDEREDHASHITERATOR(SELF)->pmc_hash;
+    }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns true if there is more elements to iterate over.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_bool() {
+        return STATICSELF.elements() > 0;
+    }
+
+/*
+
+=item C<INTVAL elements()>
+
+Returns the number of remaining elements in the Hash.
+
+=cut
+
+*/
+
+    VTABLE INTVAL elements() {
+        return PARROT_ORDEREDHASHITERATOR(SELF)->elements;
+    }
+
+    VTABLE INTVAL get_integer() {
+        return SELF.elements();
+    }
+
+/*
+
+=item C<PMC *shift_pmc()>
+
+Returns the HashIteratorKey for the current position and advance
+the next one.
+
+=cut
+
+*/
+
+    VTABLE PMC *shift_pmc() {
+        Parrot_OrderedHashIterator_attributes *attrs =
+                PARROT_ORDEREDHASHITERATOR(SELF);
+
+        PMC        *ret;
+        HashBucket *bucket;
+
+        if (!attrs->elements)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "StopIteration");
+
+        /* Get bucket and move to next bucket */
+        do {
+            bucket = attrs->parrot_hash->bs + attrs->pos++;
+            attrs->elements--;
+        } while(attrs->elements && !bucket->key);
+
+        /* Reuse HashIteratorKey */
+        ret = pmc_new(INTERP, enum_class_HashIteratorKey);
+        /* Poke directly into HIK. We don't want to create any kind of public API for this */
+        PARROT_HASHITERATORKEY(ret)->parrot_hash = attrs->parrot_hash;
+        PARROT_HASHITERATORKEY(ret)->bucket      = bucket;
+
+        return ret;
+    }
+
+/*
+
+=item C<PMC *pop_pmc()>
+
+Returns the HashIteratorKey for the current position and advance
+the next one for reverse iterator.
+
+=cut
+
+*/
+
+    VTABLE PMC *pop_pmc() {
+        Parrot_OrderedHashIterator_attributes *attrs =
+                PARROT_ORDEREDHASHITERATOR(SELF);
+
+        PMC        *ret;
+        HashBucket *bucket;
+
+        if (!attrs->elements)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "StopIteration");
+
+        /* Get bucket and move to next bucket */
+        bucket = attrs->parrot_hash->bs + --attrs->pos;
+        attrs->elements--;
+
+        /* Reuse HashIteratorKey */
+        ret = pmc_new(INTERP, enum_class_HashIteratorKey);
+        /* Poke directly into HIK. We don't want to create any kind of public API for this */
+        PARROT_HASHITERATORKEY(ret)->parrot_hash = attrs->parrot_hash;
+        PARROT_HASHITERATORKEY(ret)->bucket      = bucket;
+
+        return ret;
+    }
+
+/*
+
+*/
+
+    VTABLE STRING* shift_string() {
+        PMC *key = SELF.shift_pmc();
+        return VTABLE_get_string(INTERP, key);
+    }
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

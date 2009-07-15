@@ -50,6 +50,14 @@ static INTVAL pmc_reuse_check_pmc_ext(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(* pmc);
 
+PARROT_CANNOT_RETURN_NULL
+static PMC* pmc_reuse_no_init(PARROT_INTERP,
+    ARGIN(PMC *pmc),
+    INTVAL new_type,
+    SHIM(UINTVAL flags))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 #define ASSERT_ARGS_check_pmc_reuse_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_create_class_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -57,6 +65,9 @@ static INTVAL pmc_reuse_check_pmc_ext(PARROT_INTERP,
 #define ASSERT_ARGS_get_new_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_pmc_reuse_check_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pmc)
+#define ASSERT_ARGS_pmc_reuse_no_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pmc)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -145,9 +156,68 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
 PMC *
 pmc_reuse(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
-          SHIM(UINTVAL flags))
+          UINTVAL flags)
 {
     ASSERT_ARGS(pmc_reuse)
+    pmc = pmc_reuse_no_init(interp, pmc, new_type, flags);
+
+    /* Call the base init for the redone pmc. Warning, this should not
+       be called on Object PMCs. */
+    VTABLE_init(interp, pmc);
+
+    return pmc;
+}
+
+/*
+
+=item C<PMC * pmc_reuse_init(PARROT_INTERP, PMC *pmc, INTVAL new_type, PMC
+*init, UINTVAL flags)>
+
+Reuse an existing PMC, turning it into an PMC of the new type. Any
+required internal structure will be put in place (such as the extension area)
+and the PMC will be inited.
+
+Cannot currently handle converting a non-Object PMC into an Object. Use
+C<pmc_reuse_by_class> for that.
+
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_IGNORABLE_RESULT
+PMC *
+pmc_reuse_init(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type, ARGIN(PMC *init),
+          UINTVAL flags)
+{
+    ASSERT_ARGS(pmc_reuse_init)
+    pmc = pmc_reuse_no_init(interp, pmc, new_type, flags);
+
+    /* Call the base init for the redone pmc. Warning, this should not
+       be called on Object PMCs. */
+    VTABLE_init_pmc(interp, pmc, init);
+
+    return pmc;
+}
+
+/*
+
+=item C<static PMC* pmc_reuse_no_init(PARROT_INTERP, PMC *pmc, INTVAL new_type,
+UINTVAL flags)>
+
+Prepare pmc for reuse. Do all scuffolding except initing.
+
+=cut
+
+*/
+PARROT_CANNOT_RETURN_NULL
+static PMC*
+pmc_reuse_no_init(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
+    SHIM(UINTVAL flags)) {
+
+    ASSERT_ARGS(pmc_reuse_no_init)
     VTABLE *new_vtable;
     INTVAL  has_ext, new_flags = 0;
 
@@ -170,10 +240,6 @@ pmc_reuse(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
 
     /* Set the right vtable */
     pmc->vtable = new_vtable;
-
-    /* Call the base init for the redone pmc. Warning, this should not
-       be called on Object PMCs. */
-    VTABLE_init(interp, pmc);
 
     return pmc;
 }

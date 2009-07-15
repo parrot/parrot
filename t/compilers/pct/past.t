@@ -48,6 +48,11 @@ OUT
 
 }
 
+# Next tests marked as "skip" instead of "todo" to prevent false-positives in case
+# when Hash keys order occationally can be same as in test.
+SKIP: {
+skip('Hash keys order dependency', 4);
+
 pir_output_is( <<'CODE', <<'OUT', 'dump PAST::Val node in visual format' );
 .sub _main :main
     load_bytecode 'PCT.pbc'
@@ -132,6 +137,8 @@ CODE
     <blocktype> => "declaration"
 }
 OUT
+
+}
 
 # Local Variables:
 #   mode: cperl

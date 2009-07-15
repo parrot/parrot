@@ -1699,21 +1699,24 @@ pir_output_is( <<'CODE', <<OUT, "iterate through a NameSpace PMC, RT #39978" );
      $P1 = 0
      set_root_global [ "DUMMY"; "X"; "Y" ], "T0", $P0
 
-     .local pmc dummy_x_y_ns, iter
+     .local pmc dummy_x_y_ns, iter, res
      dummy_x_y_ns = get_root_namespace [ "DUMMY"; "X"; "Y" ]
      iter = new ['Iterator'], dummy_x_y_ns
+     res  = new ['ResizablePMCArray']
 loop:
      unless iter goto loop_end
      $S0 = shift iter
-     print $S0
-     print "\n"
+     push res, $S0
      goto loop
 loop_end:
 
+     res.'sort'()
+     $S0 = join ' ', res
+     say $S0
+
 .end
 CODE
-Explosion
-T0
+Explosion T0
 OUT
 
 pir_error_output_like( <<'CODE', <<OUT, "NameSpace with no class, RT #55620" );
@@ -1730,6 +1733,9 @@ pir_output_is( <<'CODE', <<OUT, "iterate through a NameSpace PMC" );
 .namespace [ 'bar' ]
 
 .sub 'main' :main
+    .local pmc res
+    res = new ['ResizablePMCArray']
+
     $P0 = get_namespace
     say $P0
     $I0 = elements $P0
@@ -1738,9 +1744,13 @@ pir_output_is( <<'CODE', <<OUT, "iterate through a NameSpace PMC" );
   L1:
     unless $P1 goto L2
     $P2 = shift $P1
-    say $P2
+    $S0 = $P2
+    push res, $S0
     goto L1
   L2:
+    res.'sort'()
+    $S0 = join "\n", res
+    say $S0
     say 'OK'
 .end
 
@@ -1750,8 +1760,8 @@ pir_output_is( <<'CODE', <<OUT, "iterate through a NameSpace PMC" );
 CODE
 bar
 2
-main
 foo
+main
 OK
 OUT
 

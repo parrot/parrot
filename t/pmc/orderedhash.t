@@ -94,7 +94,8 @@ pasm_output_is( <<'CODE', <<OUT, "iterate" );
 iter_loop:
     unless P2, end_iter
     shift P3, P2
-    print P3
+    set P4, P0[P3]
+    print P4
     branch iter_loop
 end_iter:
 
@@ -102,7 +103,8 @@ end_iter:
 iter_loop2:
     unless P2, end_iter2
     pop P3, P2
-    print P3
+    set P4, P0[P3]
+    print P4
     branch iter_loop2
 end_iter2:
     end

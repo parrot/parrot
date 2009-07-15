@@ -1,0 +1,118 @@
+/*
+Copyright (C) 2001-2009, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/hashiteratorkey.pmc - accessor for single value during hash iteration.
+
+=head1 DESCRIPTION
+
+Single (key,value) pair.
+
+
+=head1 Methods
+
+=over 4
+
+=cut
+
+*/
+
+pmclass HashIteratorKey no_ro {
+    ATTR Hash        *parrot_hash; /* Underlying parrot's hash */
+    ATTR HashBucket  *bucket;      /* Current bucket from HashItertor */
+
+/*
+
+=item C<void init()>
+
+Initializes the PMC.
+
+Not really part of public API.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        Parrot_HashIteratorKey_attributes *attrs =
+            mem_allocate_zeroed_typed(Parrot_HashIteratorKey_attributes);
+
+        PMC_data(SELF) = attrs;
+
+        PObj_active_destroy_SET(SELF);
+    }
+
+/*
+
+=item C<void destroy()>
+
+Destroys this PMC
+
+=cut
+
+*/
+
+    VTABLE void destroy() {
+        mem_sys_free(PMC_data(SELF));
+    }
+
+/*
+
+=item C<get_pmc()>
+
+Get "key".
+
+=cut
+
+*/
+    VTABLE PMC* get_pmc() {
+        return PMCNULL;
+    }
+
+    VTABLE INTVAL get_integer() {
+        return -1;
+    }
+
+    VTABLE STRING* get_string() {
+        Parrot_HashIteratorKey_attributes *attrs =
+                PARROT_HASHITERATORKEY(SELF);
+
+        switch (attrs->parrot_hash->key_type) {
+            case Hash_key_type_int:
+                return Parrot_str_from_int(INTERP, (INTVAL)attrs->bucket->key);
+
+            case Hash_key_type_STRING:
+                return (STRING*)attrs->bucket->key;
+
+            case Hash_key_type_PMC:
+                return VTABLE_get_string(INTERP, (PMC *)attrs->bucket->key);
+
+            default:
+                /* Horribly die? */
+                break;
+        }
+
+        return NULL;
+    }
+
+
+
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+

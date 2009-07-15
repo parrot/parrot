@@ -2251,6 +2251,26 @@ sort_segs(ARGMOD(PackFile_Directory *dir))
             }
         }
     }
+
+    /* XXX
+     * Temporary? hack to put ConstantTable in front of other segments.
+     * This is useful for Annotations because we ensure that constants used
+     * for keys already available during unpack.
+     */
+    seg = dir->segments[2];
+
+    if (seg->type != PF_CONST_SEG) {
+        size_t i;
+
+        for (i = 3; i < num_segs; i++) {
+            PackFile_Segment * const s2 = dir->segments[i];
+            if (s2->type == PF_CONST_SEG) {
+                dir->segments[2] = s2;
+                dir->segments[i] = seg;
+                break;
+            }
+        }
+    }
 }
 
 

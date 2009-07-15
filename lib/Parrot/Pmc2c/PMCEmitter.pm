@@ -1002,12 +1002,15 @@ sub gen_switch_vtable {
 
         my $multis = $multi_methods{$vt_method_name};
 
+        # Get parameters.      strip type from param
+        my @parameters = map { s/(\s*\S+\s*\*?\s*)//; $_ } split (/,/, $method->parameters);
+
         # Gather "case :"
-        my @cases = map { $self->generate_single_case($vt_method_name, $_) } @$multis;
+        my @cases = map { $self->generate_single_case($vt_method_name, $_, @parameters) } @$multis;
         my $cases = join "\n", @cases;
 
         my $body = <<"BODY";
-    INTVAL type = VTABLE_type(INTERP, value);
+    INTVAL type = VTABLE_type(INTERP, $parameters[0]);
     /* For dynpmc fallback to MMD */
     if ((type >= enum_class_core_max) || (SELF.type() >= enum_class_core_max))
         type = enum_class_core_max;
@@ -1027,13 +1030,12 @@ BODY
 
 # Generate single case for switch VTABLE
 sub generate_single_case {
-    my ($self, $vt_method_name, $multi) = @_;
+    my ($self, $vt_method_name, $multi, @parameters) = @_;
 
     my ($type, $ssig, $fsig, $ns, $func, $impl) = @$multi;
     my $case;
 
     # Gather parameters names
-    my @parameters = map { s/\s*PMC\s*\*\s*//; $_ } split (/,/, $impl->parameters);
     my $parameters = join ', ', @parameters;
     # ISO C forbids return with expression from void functions.
     my $return = $impl->return_type =~ /^void\s*$/
@@ -1082,12 +1084,20 @@ sub gen_defaul_case_wrapping {
             'return retval;',
         );
     }
+    elsif ($letter eq 'S') {
+        return (
+            "PP->" . $letter,
+            "STRING *retval;",
+            ', &retval',
+            'return retval;',
+        );
+    }
     elsif ($letter eq 'P') {
         return (
             'PPP->P',
-            '',
-            ", &$parameters[1]",
-            "return $parameters[1];",
+            'PMC *retval;',
+            ", &retval",
+            "return retval;",
         );
     }
     elsif ($letter eq 'v') {

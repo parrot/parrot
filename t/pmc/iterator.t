@@ -507,7 +507,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Index access for Iterator on ResizablePM
 
     print 'Iterator shift_float: '
     .local num felem_2
-    shift felem_2, iter_2
+    pop felem_2, iter_2
     print felem_2
     print "\n"
 
