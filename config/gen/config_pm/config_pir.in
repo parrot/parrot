@@ -49,7 +49,7 @@ undefined values) is undefined, and may be rather funky.
     $S0 = concat prefix, "/runtime"
     $I0 = stat $S0, .STAT_EXISTS
     if $I0 goto L1
-    conf_file = prefix . "/lib@versiondir@/include/config.fpmc"
+    conf_file = "@libdir@@versiondir@/include/config.fpmc"
     goto L2
   L1:
     conf_file = prefix . "/runtime/parrot/include/config.fpmc"
