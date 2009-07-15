@@ -72,6 +72,9 @@ sub runstep {
     # to their 'use English' names as documented in 'perlvar'.)
     $conf->data->set_p5( OSNAME => $^O );
 
+    my $ccdlflags = $Config{ccdlflags};
+    $ccdlflags =~ s/\s*-Wl,-rpath,\S*//g if $conf->options->get('disable-rpath');
+
     # We need a Glossary somewhere!
     $conf->data->set(
         debugging => $conf->options->get('debugging') ? 1 : 0,
@@ -112,7 +115,7 @@ sub runstep {
         # Linker Flags to have this binary work with the shared and dynamically
         # loadable libraries we're building.  On HP-UX, for example, we need to
         # allow dynamic libraries to access the binary's symbols
-        link_dynamic => $Config{ccdlflags},    # e.g. -Wl,-E on HP-UX
+        link_dynamic => $ccdlflags,    # e.g. -Wl,-E on HP-UX
 
         # ld: Tool used to build shared libraries and dynamically loadable
         # modules. Often $cc on Unix-ish systems, but apparently sometimes
