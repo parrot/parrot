@@ -79,7 +79,7 @@ Marks the hash as live.
 */
 
     VTABLE void mark() {
-        PMC *hash = PARROT_ORDEREDHASHITERATOR(SELF)->pmc_hash;
+        PMC * const hash = PARROT_ORDEREDHASHITERATOR(SELF)->pmc_hash;
         if (hash)
              Parrot_gc_mark_PObj_alive(INTERP, (PObj *)hash);
     }
@@ -103,7 +103,7 @@ Marks the hash as live.
 
 */
     VTABLE void set_integer_native(INTVAL value) {
-        Parrot_OrderedHashIterator_attributes *attrs =
+        Parrot_OrderedHashIterator_attributes * const attrs =
                 PARROT_ORDEREDHASHITERATOR(SELF);
 
         /* Restart iterator */
@@ -179,7 +179,7 @@ the next one.
 */
 
     VTABLE PMC *shift_pmc() {
-        Parrot_OrderedHashIterator_attributes *attrs =
+        Parrot_OrderedHashIterator_attributes * const attrs =
                 PARROT_ORDEREDHASHITERATOR(SELF);
 
         PMC        *ret;
@@ -216,7 +216,7 @@ the next one for reverse iterator.
 */
 
     VTABLE PMC *pop_pmc() {
-        Parrot_OrderedHashIterator_attributes *attrs =
+        Parrot_OrderedHashIterator_attributes * const attrs =
                 PARROT_ORDEREDHASHITERATOR(SELF);
 
         PMC        *ret;
@@ -244,7 +244,7 @@ the next one for reverse iterator.
 */
 
     VTABLE STRING* shift_string() {
-        PMC *key = SELF.shift_pmc();
+        PMC * const key = SELF.shift_pmc();
         return VTABLE_get_string(INTERP, key);
     }
 }
