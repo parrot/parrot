@@ -463,6 +463,7 @@ TEMP_PIR
 
     pir_output_is( <<"CODE", <<'OUT', 'load PIR from added paths, minding slash' );
   .include 'iglobals.pasm'
+  .include 'libpaths.pasm'
 
   .sub main :main
       .local pmc interp
@@ -471,9 +472,8 @@ TEMP_PIR
       .local pmc lib_paths
       lib_paths = interp[.IGLOBALS_LIB_PATHS]
 
-      # XXX - hard-coded magic constant (should be PARROT_LIB_PATH_LIBRARY)
       .local pmc include_paths
-      include_paths = lib_paths[1]
+      include_paths = lib_paths[.PARROT_LIB_PATH_LIBRARY]
 
       unshift include_paths, '$temp_dir'
       load_bytecode 'with_slash.pir'
