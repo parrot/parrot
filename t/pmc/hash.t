@@ -23,7 +23,7 @@ well.
     .include 'except_types.pasm'
     .include 'datatypes.pasm'
 
-    plan(155)
+    plan(161)
 
     initial_hash_tests()
     more_than_one_hash()
@@ -70,6 +70,7 @@ well.
 
     integer_keys()
     value_types_convertion()
+    elements_in_hash()
 .end
 
 .sub initial_hash_tests
@@ -1336,6 +1337,36 @@ postit_end:
     is($I0, 0, 'String casted to int')
 
     # TODO Add tests for String.
+.end
+
+# Check number of elements in Hash
+.sub 'elements_in_hash'
+    .local pmc hash
+    hash = new ['Hash']
+
+    $I0 = elements hash
+    is($I0, 0, "Empty hash has 0 items")
+
+    hash['foo'] = 'FOO'
+    $I0 = elements hash
+    is($I0, 1, "Hash has 1 item")
+
+    hash['foo'] = 'BAR'
+    $I0 = elements hash
+    is($I0, 1, "Hash still has 1 item after update")
+
+    hash['bar'] = 'BAR'
+    $I0 = elements hash
+    is($I0, 2, "Hash has 2 items")
+
+    delete hash['foo']
+    $I0 = elements hash
+    is($I0, 1, "Hash has 1 item after delete")
+
+    delete hash['bar']
+    $I0 = elements hash
+    is($I0, 0, "Hash has 0 items after delete")
+
 .end
 
 # Local Variables:
