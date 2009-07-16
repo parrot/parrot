@@ -51,7 +51,7 @@ to avoid this caveat.
 
 */
 
-pmclass ArrayIterator no_ro {
+pmclass ArrayIterator extends Iterator no_ro {
     ATTR PMC    *array;     /* the array which this Iterator iterates */
     ATTR INTVAL  pos;       /* Current position of iterator for forward iterator */
                             /* Previous position of iterator for reverse iterator */
