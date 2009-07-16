@@ -1,9 +1,16 @@
 parrot (1.0.0-1ubuntu1) karmic; urgency=low
-  * Resynchronize with Debian unstable.
-  * Add a patch to detect the lpia architecture, to correctly configure for
-    unaligned function pointers.
 
- -- Allison Randal <allison@parrot.org>  Thu, 28 May 2009 13:13:12 -0700
+  [ Allison Randal ]
+  * Merge from Debian unstable.
+  * Ubuntu remaining changes:
+   - Add 01-lpia-FTBFS.path : from upstream, fix FTBFS for lpia.
+
+  [ Julien Lavergne ]
+   - Add quilt support for the patch :
+    + debian/control.in : Add quilt as build-depends.
+    + debian/rules : Add quilt support.
+
+ -- Julien Lavergne <julien.lavergne@gmail.com>  Fri, 29 May 2009 01:34:42 +0200
 
 parrot (1.0.0-1) unstable; urgency=low
   * New upstream release
@@ -38,12 +45,6 @@ parrot (1.0.0-1) unstable; urgency=low
 
  -- Allison Randal <allison@parrot.org>  Wed, 25 Mar 2009 00:45:40 -0500
 
-parrot (0.9.0-1ubuntu1) intrepid; urgency=low
-
-  * New upstream release.
-
- -- Allison Randal <allison@parrot.org>  Tue, 03 Feb 2009 23:21:12 +0000
-
 parrot (0.9.0-1) unstable; urgency=low
 
   * New upstream release
@@ -63,12 +64,6 @@ parrot (0.9.0-1) unstable; urgency=low
     - Updated copyright years.
 
  -- Allison Randal <allison@parrot.org>  Fri, 23 Jan 2009 15:16:25 -0800
-
-parrot (0.8.1-0ubuntu1) intrepid; urgency=low
-
-  * New upstream release
-
- -- Allison Randal <allison@parrot.org>  Fri, 12 Dec 2008 16:40:43 +0800
 
 parrot (0.7.0-1) unstable; urgency=low
 
@@ -113,6 +108,12 @@ parrot (0.5.1-1) unstable; urgency=low
     - Removed copyright info for files no longer in distribution.
 
  -- Allison Randal <allison@perl.org>  Sun, 30 Dec 2007 17:21:45 +0000
+
+parrot (0.4.13-1ubuntu4) karmic; urgency=low
+
+  * No-change rebuild for libicu38 -> libicu40 transition.
+
+ -- Steve Kowalik <stevenk@ubuntu.com>  Thu, 04 Jun 2009 08:01:54 +1000
 
 parrot (0.4.13-1ubuntu3) hardy; urgency=low
 
