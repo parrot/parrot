@@ -91,6 +91,7 @@ Tests the C<StringIterator> PMC. Iterate over string in both directions.
     $P0 = shift it
     $I0 = 0
   fail:
+    pop_eh
     ok($I0, "Shifting from finished iterator throws exception")
 .end
 

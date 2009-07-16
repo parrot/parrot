@@ -57,6 +57,7 @@ Tests C<ArrayIterator> PMC. Navigate in both directions, check bounds.
     $P0 = shift it
     $I0 = 0
   fail:
+    pop_eh
     ok($I0, "Shifting from finished iterator throws exception")
 
 .end
@@ -83,6 +84,7 @@ Tests C<ArrayIterator> PMC. Navigate in both directions, check bounds.
     $P0 = shift it
     $I0 = 0
   fail:
+    pop_eh
     ok($I0, "Shifting from finished iterator throws exception")
 .end
 
