@@ -1256,11 +1256,11 @@ say.pir -- simple implementation of a say function
 
 .sub 'say'
     .param pmc args            :slurpy
-    .local pmc iter
-    iter = new 'Iterator', args
+    .local pmc it
+    it = iter args
   iter_loop:
-    unless iter goto iter_end
-    $P0 = shift iter
+    unless it goto iter_end
+    $P0 = shift it
     print $P0
     goto iter_loop
   iter_end:
