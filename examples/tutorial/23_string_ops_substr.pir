@@ -10,7 +10,7 @@ the string between the starting and ending positions. If the ending
 position is left out, C<substr> returns all the characters until the
 end of the string.
 
-An optional fourth argument can be a string that will be used to
+An optional fourth argument is a string that will be used to
 replace the characters between the start and end positions.
 
 =cut

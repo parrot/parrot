@@ -3,7 +3,7 @@
 
 =head1 File Operations
 
-This example demonstrates basic file operations. Note the readmode.
+This example demonstrates basic file operations.
 
 =cut
 
