@@ -283,6 +283,20 @@ garbage collector take care.
 
 =head1 Compiler tools
 
+=head2 Parrot Grammar Engine
+
+=over 4
+
+=item Action methods in rules
+
+Per Synopsis 5, all regexes will have an implied {*} token at the
+end which cause invocation of an action method if a C<:action>
+object is supplied.
+
+L<https://trac.parrot.org/parrot/ticket/843>
+
+=back
+
 =head2 Parrot Compiler Toolkit
 
 =over 4
@@ -320,6 +334,26 @@ object will no longer work.  The new syntax is to invoke the
 C<.ast> method on the Match object.
 
 L<https://trac.parrot.org/parrot/ticket/459>
+
+=item Quoted items [eligible in 1.5]
+
+Double-quoted strings will interpret unescaped $-names
+as interpolated variables in the string.  Bare slashes 
+will introduce regular expressions.  The C<< <foo bar> >>
+syntax will produce an array of strings instead of a single
+string.
+
+L<https://trac.parrot.org/parrot/ticket/837>
+
+=item C<< PIR q:to:<xyz> >> inline PIR [eligible in 1.5]
+
+The C<< PIR q:to:<xyz> >> form of inline PIR in NQP scripts is
+deprecated.  Use C< Q:PIR { ... } >  or C< Q:PIR {{ ... }} >
+instead.
+
+L<https://trac.parrot.org/parrot/ticket/842>
+
+=cut
 
 =back
 
