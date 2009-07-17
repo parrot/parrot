@@ -90,7 +90,7 @@ Defaults iteration mode to iterate from start.
             || VTABLE_does(INTERP, aggregate, CONST_STRING(INTERP, "hash"))
             || VTABLE_does(INTERP, aggregate, CONST_STRING(INTERP, "string"))) {
             /* It's ugly hack... But I cant figure out proper way to do it. */
-            PMC *real_iter = VTABLE_get_iter(INTERP, aggregate);
+            PMC * const real_iter = VTABLE_get_iter(INTERP, aggregate);
             SELF = pmc_reuse_init(INTERP, SELF, VTABLE_type(INTERP, real_iter), aggregate, 0);
             return;
         }
@@ -199,7 +199,7 @@ Returns whether the iterator contains an aggregate.
     /* Make the shift_pmc vtable function available as
      * a method named "next" */
      METHOD next() {
-        PMC *next = VTABLE_shift_pmc(INTERP, SELF);
+        PMC * const next = VTABLE_shift_pmc(INTERP, SELF);
         RETURN(PMC* next);
      }
 

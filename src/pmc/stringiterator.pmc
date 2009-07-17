@@ -39,7 +39,7 @@ Initialize StringIterator.
 
 */
     VTABLE void init_pmc(PMC *string) {
-        Parrot_StringIterator_attributes *attrs =
+        Parrot_StringIterator_attributes * const attrs =
             mem_allocate_zeroed_typed(Parrot_StringIterator_attributes);
 
         attrs->string    = string;
@@ -90,11 +90,11 @@ Marks the current idx/key and the aggregate as live.
 
 */
     VTABLE PMC* clone() {
-        Parrot_StringIterator_attributes *attrs =
+        Parrot_StringIterator_attributes * const attrs =
                 PARROT_STRINGITERATOR(SELF);
-        PMC                              *clone =
+        PMC                              * const clone =
                 pmc_new_init(INTERP, enum_class_StringIterator, attrs->string);
-        Parrot_StringIterator_attributes *clone_attrs =
+        Parrot_StringIterator_attributes * const clone_attrs =
                 PARROT_STRINGITERATOR(clone);
 
         clone_attrs->pos     = attrs->pos;
@@ -127,7 +127,7 @@ Returns the number of remaining elements in the C<string>.
 */
 
     VTABLE INTVAL elements() {
-        Parrot_StringIterator_attributes *attrs =
+        Parrot_StringIterator_attributes * const attrs =
                 PARROT_STRINGITERATOR(SELF);
         if (attrs->reverse)
             return attrs->pos;
@@ -153,7 +153,7 @@ Reset the Iterator. C<value> must be one of
 */
 
     VTABLE void set_integer_native(INTVAL value) {
-        Parrot_StringIterator_attributes *attrs =
+        Parrot_StringIterator_attributes * const attrs =
                 PARROT_STRINGITERATOR(SELF);
         if (value == ITERATE_FROM_START) {
             attrs->reverse   = 0;
@@ -196,7 +196,7 @@ Shift next character from C<string> as PMC.
 
 */
     VTABLE PMC *shift_pmc() {
-        Parrot_StringIterator_attributes *attrs =
+        Parrot_StringIterator_attributes * const attrs =
                 PARROT_STRINGITERATOR(SELF);
         PMC *ret;
 
@@ -220,7 +220,7 @@ Shift next character from C<string>.
 
 */
     VTABLE STRING *shift_string() {
-        Parrot_StringIterator_attributes *attrs =
+        Parrot_StringIterator_attributes * const attrs =
                 PARROT_STRINGITERATOR(SELF);
 
         if (attrs->pos >= attrs->length)
@@ -240,7 +240,7 @@ Shift next character code from C<string>.
 
 */
     VTABLE INTVAL shift_integer() {
-        Parrot_StringIterator_attributes *attrs =
+        Parrot_StringIterator_attributes * const attrs =
                 PARROT_STRINGITERATOR(SELF);
 
         if (attrs->pos >= attrs->length)
@@ -260,7 +260,7 @@ Shift "next" character from C<string> for reverse iterator as PMC.
 
 */
     VTABLE PMC *pop_pmc() {
-        Parrot_StringIterator_attributes *attrs =
+        Parrot_StringIterator_attributes * const attrs =
                 PARROT_STRINGITERATOR(SELF);
         PMC *ret;
 
@@ -284,7 +284,7 @@ Shift "next" character from C<string> for reverse iterator.
 
 */
     VTABLE STRING *pop_string() {
-        Parrot_StringIterator_attributes *attrs =
+        Parrot_StringIterator_attributes * const attrs =
                 PARROT_STRINGITERATOR(SELF);
 
         if (!STATICSELF.get_bool())
@@ -304,7 +304,7 @@ Shift "next" character code from C<string> for reverse iterator.
 
 */
     VTABLE INTVAL pop_integer() {
-        Parrot_StringIterator_attributes *attrs =
+        Parrot_StringIterator_attributes * const attrs =
                 PARROT_STRINGITERATOR(SELF);
 
         if (!STATICSELF.get_bool())

@@ -85,7 +85,7 @@ Defaults iteration mode to iterate from start.
 */
 
     VTABLE void init_pmc(PMC *array) {
-        Parrot_ArrayIterator_attributes *attrs =
+        Parrot_ArrayIterator_attributes * const attrs =
             mem_allocate_zeroed_typed(Parrot_ArrayIterator_attributes);
 
         attrs->array     = array;
@@ -136,11 +136,11 @@ Marks the current idx/key and the aggregate as live.
 
 */
     VTABLE PMC* clone() {
-        Parrot_ArrayIterator_attributes *attrs =
+        Parrot_ArrayIterator_attributes * const attrs =
                 PARROT_ARRAYITERATOR(SELF);
-        PMC                             *clone =
+        PMC                             * const clone =
                 pmc_new_init(INTERP, enum_class_ArrayIterator, attrs->array);
-        Parrot_ArrayIterator_attributes *clone_attrs =
+        Parrot_ArrayIterator_attributes * const clone_attrs =
                 PARROT_ARRAYITERATOR(clone);
 
         clone_attrs->pos     = attrs->pos;
@@ -173,7 +173,7 @@ Returns the number of remaining elements in the array.
 */
 
     VTABLE INTVAL elements() {
-        Parrot_ArrayIterator_attributes *attrs =
+        Parrot_ArrayIterator_attributes * const attrs =
                 PARROT_ARRAYITERATOR(SELF);
         if (attrs->reverse)
             return attrs->pos;
@@ -199,7 +199,7 @@ Reset the Iterator. C<value> must be one of
 */
 
     VTABLE void set_integer_native(INTVAL value) {
-        Parrot_ArrayIterator_attributes *attrs =
+        Parrot_ArrayIterator_attributes * const attrs =
                 PARROT_ARRAYITERATOR(SELF);
         if (value == ITERATE_FROM_START) {
             attrs->reverse   = 0;
@@ -244,7 +244,7 @@ the next one.
 */
 
     VTABLE INTVAL shift_integer() {
-        Parrot_ArrayIterator_attributes *attrs =
+        Parrot_ArrayIterator_attributes * const attrs =
                 PARROT_ARRAYITERATOR(SELF);
 
         if (attrs->pos >= attrs->length)
@@ -263,7 +263,7 @@ the next one.
 */
 
     VTABLE FLOATVAL shift_float() {
-        Parrot_ArrayIterator_attributes *attrs =
+        Parrot_ArrayIterator_attributes * const attrs =
                 PARROT_ARRAYITERATOR(SELF);
 
         if (!STATICSELF.get_bool())
@@ -283,7 +283,7 @@ the next one.
 */
 
     VTABLE STRING *shift_string() {
-        Parrot_ArrayIterator_attributes *attrs =
+        Parrot_ArrayIterator_attributes * const attrs =
                 PARROT_ARRAYITERATOR(SELF);
 
         if (!STATICSELF.get_bool())
@@ -305,7 +305,7 @@ the next one.
 */
 
     VTABLE PMC *shift_pmc() {
-        Parrot_ArrayIterator_attributes *attrs =
+        Parrot_ArrayIterator_attributes * const attrs =
                 PARROT_ARRAYITERATOR(SELF);
 
         if (!STATICSELF.get_bool())
@@ -328,7 +328,7 @@ the next one.
 */
 
     VTABLE INTVAL pop_integer() {
-        Parrot_ArrayIterator_attributes *attrs =
+        Parrot_ArrayIterator_attributes * const attrs =
                 PARROT_ARRAYITERATOR(SELF);
 
         if (!STATICSELF.get_bool())
@@ -347,7 +347,7 @@ the next one.
 */
 
     VTABLE FLOATVAL pop_float() {
-        Parrot_ArrayIterator_attributes *attrs =
+        Parrot_ArrayIterator_attributes * const attrs =
                 PARROT_ARRAYITERATOR(SELF);
 
         if (!STATICSELF.get_bool())
@@ -367,7 +367,7 @@ the next one.
 */
 
     VTABLE STRING *pop_string() {
-        Parrot_ArrayIterator_attributes *attrs =
+        Parrot_ArrayIterator_attributes * const attrs =
                 PARROT_ARRAYITERATOR(SELF);
 
         if (!STATICSELF.get_bool())
@@ -389,7 +389,7 @@ the next one.
 */
 
     VTABLE PMC *pop_pmc() {
-        Parrot_ArrayIterator_attributes *attrs =
+        Parrot_ArrayIterator_attributes * const attrs =
                 PARROT_ARRAYITERATOR(SELF);
 
         if (!STATICSELF.get_bool())
@@ -534,10 +534,10 @@ Returns whether an element for C<idx> exists in the aggregate.
 */
 
     VTABLE INTVAL exists_keyed_int(INTVAL idx) {
-        Parrot_ArrayIterator_attributes *attrs =
+        Parrot_ArrayIterator_attributes * const attrs =
                 PARROT_ARRAYITERATOR(SELF);
         /* Cheat! */
-        INTVAL final_pos = attrs->pos + idx - attrs->reverse;
+        const INTVAL final_pos = attrs->pos + idx - attrs->reverse;
 
         return VTABLE_exists_keyed_int(INTERP, attrs->array, final_pos);
     }
@@ -565,10 +565,10 @@ Returns the result of calling C<defined_keyed(key)> on the aggregate.
 */
 
     VTABLE INTVAL defined_keyed_int(INTVAL idx) {
-        Parrot_ArrayIterator_attributes *attrs =
+        Parrot_ArrayIterator_attributes * const attrs =
                 PARROT_ARRAYITERATOR(SELF);
         /* Cheat! */
-        INTVAL final_pos = attrs->pos + idx - attrs->reverse;
+        const INTVAL final_pos = attrs->pos + idx - attrs->reverse;
 
         return VTABLE_defined_keyed_int(INTERP, attrs->array, final_pos);
     }

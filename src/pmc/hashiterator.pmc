@@ -56,8 +56,8 @@ Advance to next position. Return found (if any) HashBucket.
 */
 static HashBucket*
 advance_to_next(PARROT_INTERP, PMC *self) {
-    Parrot_HashIterator_attributes *attrs  = PARROT_HASHITERATOR(self);
-    HashBucket                     *bucket = attrs->bucket;
+    Parrot_HashIterator_attributes * const attrs  = PARROT_HASHITERATOR(self);
+    HashBucket                            *bucket = attrs->bucket;
 
     /* Try to advance current bucket */
     if (bucket)
@@ -95,7 +95,7 @@ Defaults iteration mode to iterate from start.
 */
 
     VTABLE void init_pmc(PMC *hash) {
-        Parrot_HashIterator_attributes *attrs =
+        Parrot_HashIterator_attributes * const attrs =
             mem_allocate_zeroed_typed(Parrot_HashIterator_attributes);
 
         attrs->pmc_hash         = hash;
@@ -165,7 +165,7 @@ Marks the hash as live.
 
 */
     VTABLE void set_integer_native(INTVAL value) {
-        Parrot_HashIterator_attributes *attrs =
+        Parrot_HashIterator_attributes * const attrs =
                 PARROT_HASHITERATOR(SELF);
 
         if (value == 0) {
@@ -236,7 +236,7 @@ the next one.
 */
 
     VTABLE PMC *shift_pmc() {
-        Parrot_HashIterator_attributes *attrs =
+        Parrot_HashIterator_attributes * const attrs =
                 PARROT_HASHITERATOR(SELF);
 
         PMC        *ret;
@@ -261,7 +261,7 @@ the next one.
 */
 
     VTABLE STRING* shift_string() {
-        PMC *key = SELF.shift_pmc();
+        PMC * const key = SELF.shift_pmc();
         return VTABLE_get_string(INTERP, key);
     }
 

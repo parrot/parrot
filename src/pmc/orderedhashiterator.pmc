@@ -40,7 +40,7 @@ Defaults iteration mode to iterate from start.
 */
 
     VTABLE void init_pmc(PMC *hash) {
-        Parrot_OrderedHashIterator_attributes *attrs =
+        Parrot_OrderedHashIterator_attributes * const attrs =
             mem_allocate_zeroed_typed(Parrot_OrderedHashIterator_attributes);
 
         attrs->pmc_hash         = hash;
