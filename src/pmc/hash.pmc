@@ -1025,7 +1025,7 @@ Returns the PMC value for the element at C<*key>.
         Hash   * const hash    = (Hash *)SELF.get_pointer();
         void   * const keystr  = hash_key_from_pmc(INTERP, hash, key);
         PMC    * const nextkey = key_next(INTERP, key);
-        PMC    *box = PMCNULL;
+        PMC    *box            = PMCNULL;
         HashBucket *b;
 
 
@@ -1041,7 +1041,7 @@ Returns the PMC value for the element at C<*key>.
             box = hash_value_to_pmc(INTERP, hash, b->value);
 
         /* autovivify an Hash */
-        if (PMCNULL == box)
+        if (PMC_IS_NULL(box))
             box = pmc_new(INTERP, SELF.type());
 
         VTABLE_set_number_keyed(INTERP, box, nextkey, value);
