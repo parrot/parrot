@@ -10,13 +10,11 @@ BUILD_DIR     := @build_dir@
 RECONFIGURE   := $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
 INSTALL_DIR   := $(BUILD_DIR)/runtime/parrot/dynext
 O             := @o@
-CC            := @cc@ -c
+CC            := @cc@
 LD            := @ld@
 LDFLAGS       := @ldflags@ @ld_debug@ @rpath_blib@ @linkflags@
 LD_LOAD_FLAGS := @ld_load_flags@
 CFLAGS        := @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@
-CC_OUT        := @cc_o_out@
-LD_OUT        := @ld_out@
 LIBPARROT     := @libparrot_ldflags@
 
 BUILD_TOOLS_DIR := $(BUILD_DIR)@slash@tools@slash@build
@@ -52,37 +50,37 @@ Makefile: ../../config/gen/makefiles/dynoplibs.in
 	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::makefiles --target=src/dynoplibs/Makefile
 
 obscure_ops$(LOAD_EXT): obscure_ops$(O)
-	$(LD) $(LD_OUT)obscure_ops$(LOAD_EXT) obscure_ops$(O) $(LINKARGS)
+	$(LD) @ld_out@obscure_ops$(LOAD_EXT) obscure_ops$(O) $(LINKARGS)
 
 obscure_ops$(O): obscure_ops.c
-	$(CC) $(CC_OUT)obscure_ops$(O) $(INCLUDES) $(CFLAGS) obscure_ops.c
+	$(CC) -c @cc_o_out@obscure_ops$(O) $(INCLUDES) $(CFLAGS) obscure_ops.c
 
 obscure_ops.c: obscure.ops
 	$(OPS2C) C --dynamic obscure.ops
 
 obscure_ops_switch$(LOAD_EXT): obscure_ops_switch$(O)
-	$(LD) $(LD_OUT)obscure_ops_switch$(LOAD_EXT) obscure_ops_switch$(O) $(LINKARGS)
+	$(LD) @ld_out@obscure_ops_switch$(LOAD_EXT) obscure_ops_switch$(O) $(LINKARGS)
 
 obscure_ops_switch$(O): obscure_ops_switch.c
-	$(CC) $(CC_OUT)obscure_ops_switch$(O) $(INCLUDES) $(CFLAGS) obscure_ops_switch.c
+	$(CC) -c @cc_o_out@obscure_ops_switch$(O) $(INCLUDES) $(CFLAGS) obscure_ops_switch.c
 
 obscure_ops_switch.c: obscure.ops
 	$(OPS2C) CSwitch --dynamic obscure.ops
 
 obscure_ops_cg$(LOAD_EXT): obscure_ops_cg$(O)
-	$(LD) $(LD_OUT)obscure_ops_cg$(LOAD_EXT) obscure_ops_cg$(O) $(LINKARGS)
+	$(LD) @ld_out@obscure_ops_cg$(LOAD_EXT) obscure_ops_cg$(O) $(LINKARGS)
 
 obscure_ops_cg$(O): obscure_ops_cg.c
-	$(CC) $(CC_OUT)obscure_ops_cg$(O) $(INCLUDES) $(CFLAGS) obscure_ops_cg.c
+	$(CC) -c @cc_o_out@obscure_ops_cg$(O) $(INCLUDES) $(CFLAGS) obscure_ops_cg.c
 
 obscure_ops_cg.c: obscure.ops
 	$(OPS2C) CGoto --dynamic obscure.ops
 
 obscure_ops_cgp$(LOAD_EXT): obscure_ops_cgp$(O)
-	$(LD) $(LD_OUT)obscure_ops_cgp$(LOAD_EXT) obscure_ops_cgp$(O) $(LINKARGS)
+	$(LD) @ld_out@obscure_ops_cgp$(LOAD_EXT) obscure_ops_cgp$(O) $(LINKARGS)
 
 obscure_ops_cgp$(O): obscure_ops_cgp.c
-	$(CC) $(CC_OUT)obscure_ops_cgp$(O) $(INCLUDES) $(CFLAGS) obscure_ops_cgp.c
+	$(CC) -c @cc_o_out@obscure_ops_cgp$(O) $(INCLUDES) $(CFLAGS) obscure_ops_cgp.c
 
 obscure_ops_cgp.c: obscure.ops
 	$(OPS2C) CGP --dynamic obscure.ops

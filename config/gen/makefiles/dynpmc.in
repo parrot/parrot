@@ -10,13 +10,11 @@ BUILD_DIR     := @build_dir@
 RECONFIGURE   := $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
 INSTALL_DIR   := $(BUILD_DIR)@slash@runtime@slash@parrot@slash@dynext
 O             := @o@
-CC            := @cc@ -c
+CC            := @cc@
 LD            := @ld@
 LDFLAGS       := @ldflags@ @ld_debug@ @rpath_blib@
 LD_LOAD_FLAGS := @ld_load_flags@
 CFLAGS        := @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@
-CC_OUT        := @cc_o_out@
-LD_OUT        := @ld_out@
 LIBPARROT     := @libparrot_ldflags@
 
 BUILD_TOOLS_DIR := $(BUILD_DIR)@slash@tools@slash@build
@@ -93,10 +91,10 @@ Makefile: ../../config/gen/makefiles/dynpmc.in
 	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::makefiles --target=src/dynpmc/Makefile
 
 dynlexpad$(LOAD_EXT): dynlexpad$(O)
-	$(LD) $(LD_OUT)dynlexpad$(LOAD_EXT) dynlexpad$(O) $(LINKARGS)
+	$(LD) @ld_out@dynlexpad$(LOAD_EXT) dynlexpad$(O) $(LINKARGS)
 
 dynlexpad$(O): dynlexpad.c
-	$(CC) $(CC_OUT)dynlexpad$(O) $(INCLUDES) $(CFLAGS) dynlexpad.c
+	$(CC) -c @cc_o_out@dynlexpad$(O) $(INCLUDES) $(CFLAGS) dynlexpad.c
 
 dynlexpad.c: dynlexpad.dump
 	$(PMC2CC) dynlexpad.pmc
@@ -105,10 +103,10 @@ dynlexpad.dump: dynlexpad.pmc
 	$(PMC2CD) dynlexpad.pmc
 
 foo$(LOAD_EXT): foo$(O)
-	$(LD) $(LD_OUT)foo$(LOAD_EXT) foo$(O) $(LINKARGS)
+	$(LD) @ld_out@foo$(LOAD_EXT) foo$(O) $(LINKARGS)
 
 foo$(O): foo.c
-	$(CC) $(CC_OUT)foo$(O) $(INCLUDES) $(CFLAGS) foo.c
+	$(CC) -c @cc_o_out@foo$(O) $(INCLUDES) $(CFLAGS) foo.c
 
 foo.c: foo.dump
 	$(PMC2CC) foo.pmc
@@ -117,10 +115,10 @@ foo.dump: foo.pmc
 	$(PMC2CD) foo.pmc
 
 pair$(LOAD_EXT): pair$(O)
-	$(LD) $(LD_OUT)pair$(LOAD_EXT) pair$(O) $(LINKARGS)
+	$(LD) @ld_out@pair$(LOAD_EXT) pair$(O) $(LINKARGS)
 
 pair$(O): pair.c
-	$(CC) $(CC_OUT)pair$(O) $(INCLUDES) $(CFLAGS) pair.c
+	$(CC) -c @cc_o_out@pair$(O) $(INCLUDES) $(CFLAGS) pair.c
 
 pair.c: pair.dump
 	$(PMC2CC) pair.pmc
@@ -129,10 +127,10 @@ pair.dump: pair.pmc
 	$(PMC2CD) pair.pmc
 
 rotest$(LOAD_EXT): rotest$(O)
-	$(LD) $(LD_OUT)rotest$(LOAD_EXT) rotest$(O) $(LINKARGS)
+	$(LD) @ld_out@rotest$(LOAD_EXT) rotest$(O) $(LINKARGS)
 
 rotest$(O): rotest.c
-	$(CC) $(CC_OUT)rotest$(O) $(INCLUDES) $(CFLAGS) rotest.c
+	$(CC) -c @cc_o_out@rotest$(O) $(INCLUDES) $(CFLAGS) rotest.c
 
 rotest.c: rotest.dump
 	$(PMC2CC) rotest.pmc
@@ -141,10 +139,10 @@ rotest.dump: rotest.pmc
 	$(PMC2CD) rotest.pmc
 
 gdbmhash$(LOAD_EXT): gdbmhash$(O)
-	$(LD) $(LD_OUT)gdbmhash$(LOAD_EXT) gdbmhash$(O) $(LINKARGS) $(LIB_GDBM)
+	$(LD) @ld_out@gdbmhash$(LOAD_EXT) gdbmhash$(O) $(LINKARGS) $(LIB_GDBM)
 
 gdbmhash$(O): gdbmhash.c
-	$(CC) $(CC_OUT)gdbmhash$(O) $(INCLUDES) $(CFLAGS) gdbmhash.c
+	$(CC) -c @cc_o_out@gdbmhash$(O) $(INCLUDES) $(CFLAGS) gdbmhash.c
 
 gdbmhash.c: gdbmhash.dump
 	$(PMC2CC) gdbmhash.pmc
@@ -153,10 +151,10 @@ gdbmhash.dump: gdbmhash.pmc
 	$(PMC2CD) gdbmhash.pmc
 
 rational$(LOAD_EXT): rational$(O)
-	$(LD) $(LD_OUT)rational$(LOAD_EXT) rational$(O) $(LINKARGS)
+	$(LD) @ld_out@rational$(LOAD_EXT) rational$(O) $(LINKARGS)
 
 rational$(O): rational.c
-	$(CC) $(CC_OUT)rational$(O) $(INCLUDES) $(CFLAGS) rational.c
+	$(CC) -c @cc_o_out@rational$(O) $(INCLUDES) $(CFLAGS) rational.c
 
 rational.c: rational.dump
 	$(PMC2CC) rational.pmc
@@ -165,16 +163,16 @@ rational.dump: rational.pmc
 	$(PMC2CD) rational.pmc
 
 digest_group$(LOAD_EXT): $(OBJS_DIGEST) lib-digest_group$(O)
-	$(LD) $(LD_OUT)digest_group$(LOAD_EXT) lib-digest_group$(O) $(OBJS_DIGEST) $(LINKARGS) $(LIB_CRYPTO)
+	$(LD) @ld_out@digest_group$(LOAD_EXT) lib-digest_group$(O) $(OBJS_DIGEST) $(LINKARGS) $(LIB_CRYPTO)
 
 lib-digest_group$(O): digest_group.c
-	$(CC) $(CC_OUT)lib-digest_group$(O) $(INCLUDES) $(CFLAGS) digest_group.c
+	$(CC) -c @cc_o_out@lib-digest_group$(O) $(INCLUDES) $(CFLAGS) digest_group.c
 
 digest_group.c: $(OBJS_DIGEST)
 	$(PMC2C) --library digest_group --c $(PMCS_DIGEST)
 
 md2$(O): md2.c
-	$(CC) $(CC_OUT)md2$(O) $(INCLUDES) $(CFLAGS) md2.c
+	$(CC) -c @cc_o_out@md2$(O) $(INCLUDES) $(CFLAGS) md2.c
 
 md2.c: md2.dump
 	$(PMC2CC) md2.pmc
@@ -183,7 +181,7 @@ md2.dump: md2.pmc
 	$(PMC2CD) md2.pmc
 
 md4$(O): md4.c
-	$(CC) $(CC_OUT)md4$(O) $(INCLUDES) $(CFLAGS) md4.c
+	$(CC) -c @cc_o_out@md4$(O) $(INCLUDES) $(CFLAGS) md4.c
 
 md4.c: md4.dump
 	$(PMC2CC) md4.pmc
@@ -192,7 +190,7 @@ md4.dump: md4.pmc
 	$(PMC2CD) md4.pmc
 
 md5$(O): md5.c
-	$(CC) $(CC_OUT)md5$(O) $(INCLUDES) $(CFLAGS) md5.c
+	$(CC) -c @cc_o_out@md5$(O) $(INCLUDES) $(CFLAGS) md5.c
 
 md5.c: md5.dump
 	$(PMC2CC) md5.pmc
@@ -201,7 +199,7 @@ md5.dump: md5.pmc
 	$(PMC2CD) md5.pmc
 
 ripemd160$(O): ripemd160.c
-	$(CC) $(CC_OUT)ripemd160$(O) $(INCLUDES) $(CFLAGS) ripemd160.c
+	$(CC) -c @cc_o_out@ripemd160$(O) $(INCLUDES) $(CFLAGS) ripemd160.c
 
 ripemd160.c: ripemd160.dump
 	$(PMC2CC) ripemd160.pmc
@@ -210,7 +208,7 @@ ripemd160.dump: ripemd160.pmc
 	$(PMC2CD) ripemd160.pmc
 
 sha$(O): sha.c
-	$(CC) $(CC_OUT)sha$(O) $(INCLUDES) $(CFLAGS) sha.c
+	$(CC) -c @cc_o_out@sha$(O) $(INCLUDES) $(CFLAGS) sha.c
 
 sha.c: sha.dump
 	$(PMC2CC) sha.pmc
@@ -219,7 +217,7 @@ sha.dump: sha.pmc
 	$(PMC2CD) sha.pmc
 
 sha1$(O): sha1.c
-	$(CC) $(CC_OUT)sha1$(O) $(INCLUDES) $(CFLAGS) sha1.c
+	$(CC) -c @cc_o_out@sha1$(O) $(INCLUDES) $(CFLAGS) sha1.c
 
 sha1.c: sha1.dump
 	$(PMC2CC) sha1.pmc
@@ -228,7 +226,7 @@ sha1.dump: sha1.pmc
 	$(PMC2CD) sha1.pmc
 
 sha256$(O): sha256.c
-	$(CC) $(CC_OUT)sha256$(O) $(INCLUDES) $(CFLAGS) sha256.c
+	$(CC) -c @cc_o_out@sha256$(O) $(INCLUDES) $(CFLAGS) sha256.c
 
 sha256.c: sha256.dump
 	$(PMC2CC) sha256.pmc
@@ -237,7 +235,7 @@ sha256.dump: sha256.pmc
 	$(PMC2CD) sha256.pmc
 
 sha512$(O): sha512.c
-	$(CC) $(CC_OUT)sha512$(O) $(INCLUDES) $(CFLAGS) sha512.c
+	$(CC) -c @cc_o_out@sha512$(O) $(INCLUDES) $(CFLAGS) sha512.c
 
 sha512.c: sha512.dump
 	$(PMC2CC) sha512.pmc
@@ -246,10 +244,10 @@ sha512.dump: sha512.pmc
 	$(PMC2CD) sha512.pmc
 
 subproxy$(LOAD_EXT): subproxy$(O)
-	$(LD) $(LD_OUT)subproxy$(LOAD_EXT) subproxy$(O) $(LINKARGS)
+	$(LD) @ld_out@subproxy$(LOAD_EXT) subproxy$(O) $(LINKARGS)
 
 subproxy$(O): subproxy.c
-	$(CC) $(CC_OUT)subproxy$(O) $(INCLUDES) $(CFLAGS) subproxy.c
+	$(CC) -c @cc_o_out@subproxy$(O) $(INCLUDES) $(CFLAGS) subproxy.c
 
 subproxy.c: subproxy.dump
 	$(PMC2CC) subproxy.pmc
