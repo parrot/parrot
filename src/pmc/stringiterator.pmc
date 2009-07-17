@@ -188,6 +188,30 @@ Returns this Iterator's string.
 
 /*
 
+=item C<STRING *shift_pmc()>
+
+Shift next character from C<string> as PMC.
+
+=cut
+
+*/
+    VTABLE PMC *shift_pmc() {
+        Parrot_StringIterator_attributes *attrs =
+                PARROT_STRINGITERATOR(SELF);
+        PMC *ret;
+
+        if (attrs->pos >= attrs->length)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "StopIteration");
+
+        ret = pmc_new(INTERP, enum_class_String);
+        VTABLE_set_string_native(INTERP, ret,
+                VTABLE_get_string_keyed_int(INTERP, attrs->string, attrs->pos++));
+        return ret;
+    }
+
+/*
+
 =item C<STRING *shift_string()>
 
 Shift next character from C<string>.
@@ -224,6 +248,30 @@ Shift next character code from C<string>.
                 "StopIteration");
 
         return VTABLE_get_integer_keyed_int(INTERP, attrs->string, attrs->pos++);
+    }
+
+/*
+
+=item C<STRING *pop_pmc()>
+
+Shift "next" character from C<string> for reverse iterator as PMC.
+
+=cut
+
+*/
+    VTABLE PMC *pop_pmc() {
+        Parrot_StringIterator_attributes *attrs =
+                PARROT_STRINGITERATOR(SELF);
+        PMC *ret;
+
+        if (!STATICSELF.get_bool())
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "StopIteration");
+
+        ret = pmc_new(INTERP, enum_class_String);
+        VTABLE_set_string_native(INTERP, ret,
+                VTABLE_get_string_keyed_int(INTERP, attrs->string, --attrs->pos));
+        return ret;
     }
 
 /*

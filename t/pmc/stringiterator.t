@@ -51,9 +51,9 @@ Tests the C<StringIterator> PMC. Iterate over string in both directions.
     ok(it, "Can shift 2nd character")
     is($S0, 'a', "With correct value")
 
-    $S0 = shift it
+    $P0 = shift it
     nok(it, "Iterator is finished after 3rd shift")
-    is($S0, 'r', "3rd character has correct value")
+    is($P0, 'r', "3rd character has correct value as PMC")
 
     $I0 = 1
     push_eh fail
@@ -83,13 +83,13 @@ Tests the C<StringIterator> PMC. Iterate over string in both directions.
     ok(it, "Can shift 2nd character")
     is($S0, 'A', "With expected value")
 
-    $S0 = pop it
+    $P0 = pop it
     nok(it, "Iterator is finished after third shift")
-    is($S0, 'B', "3rd element has correct value")
+    is($P0, 'B', "3rd element has correct value as PMC")
 
     $I0 = 1
     push_eh fail
-    $P0 = shift it
+    $P0 = pop it
     $I0 = 0
   fail:
     pop_eh
