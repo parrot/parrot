@@ -144,6 +144,15 @@ automatically converted to backslashes for MSWin32 and C<\n> is
 converted to C<\r\n> for MSWin32 nmake. See
 L<Parrot::Configure::Compiler>.
 
+=head3 Packaging and Distribution
+
+Each language, operating system, or distribution is free to package
+modules in their own way, using their own usual build and install tools.
+The default distribution format is a tarball containing the source files
+and a cross-platform build infrastructure (the 'make' variants are a
+good choice, and can be combined with Autoconf, CMake, Perl, Python,
+etc. for more complex conditional builds).
+
 =head2 Attachments
 
 None.
