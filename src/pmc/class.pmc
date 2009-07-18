@@ -137,7 +137,7 @@ build_attrib_index(PARROT_INTERP, PMC *self)
                 STRING * const attrib_name = VTABLE_get_string_keyed_str(
                     interp, cur_attrib, name_str);
 
-                STRING *full_key           = Parrot_str_append(interp, fq_class, attrib_name);
+                STRING * const full_key    = Parrot_str_append(interp, fq_class, attrib_name);
 
                 /* Insert into hash, along with index. */
                 VTABLE_set_integer_keyed_str(interp, attrib_index, full_key, cur_index);
@@ -164,7 +164,6 @@ init_class_from_hash(PARROT_INTERP, PMC *self, PMC *info)
     STRING       * const attrs_str   = CONST_STRING(interp, "attributes");
     PMC          *old_ns;
     STRING       *resolve_method_str;
-    INTVAL        type_num;
 
     /* Ensure we actually have some initialization info. */
     if (PMC_IS_NULL(info))
@@ -179,6 +178,7 @@ init_class_from_hash(PARROT_INTERP, PMC *self, PMC *info)
         PMC    *new_namespace;
         PMC    *name_arg = VTABLE_get_pmc_keyed_str(interp, info, name_str);
         VTABLE *new_vtable;
+        INTVAL type_num;
 
         /* If we were passed a namespace PMC, set the namespace attribute
          * directly. Otherwise, lookup or create the appropriate namespace. */
@@ -335,7 +335,7 @@ initialize_parents(PARROT_INTERP, PMC *object, PMC *all_parents)
 
         if (!PMC_IS_NULL(meth)) {
             /* build an empty signature; it has an invocant but no args/retvals */
-            PMC *sig_obj = pmc_new(interp, enum_class_CallSignature);
+            PMC * const sig_obj = pmc_new(interp, enum_class_CallSignature);
             VTABLE_set_string_native(interp, sig_obj, CONST_STRING(interp, "Pi->"));
             /* add the invocant */
             VTABLE_unshift_pmc(interp, sig_obj, object);
@@ -348,7 +348,7 @@ initialize_parents(PARROT_INTERP, PMC *object, PMC *all_parents)
 static void
 initialize_parents_pmc(PARROT_INTERP, PMC *object, PMC *all_parents, PMC *init)
 {
-    INTVAL  parent_index = VTABLE_elements(interp, all_parents) - 1;
+    INTVAL parent_index = VTABLE_elements(interp, all_parents) - 1;
     STRING * const name  = CONST_STRING(interp, "init_pmc");
 
     /* Loop through the parents in reverse MRO order. */
@@ -415,13 +415,13 @@ calculate_mro(PARROT_INTERP, PMC *SELF, INTVAL num_parents)
         return _class->all_parents;
 
     if (num_parents == 1) {
-            STRING *ap         = CONST_STRING(interp, "all_parents");
-            PMC    *parent     = VTABLE_get_pmc_keyed_int(interp,
-                                    _class->parents, 0);
-            PMC    *parent_mro = VTABLE_inspect_str(interp, parent, ap);
-            PMC    *mro        = VTABLE_clone(interp, parent_mro);
-            VTABLE_unshift_pmc(interp, mro, SELF);
-            return mro;
+        STRING * const ap         = CONST_STRING(interp, "all_parents");
+        PMC    * const parent     = VTABLE_get_pmc_keyed_int(interp,
+                _class->parents, 0);
+        PMC    * const parent_mro = VTABLE_inspect_str(interp, parent, ap);
+        PMC    * const mro        = VTABLE_clone(interp, parent_mro);
+        VTABLE_unshift_pmc(interp, mro, SELF);
+        return mro;
     }
 
     return Parrot_ComputeMRO_C3(interp, SELF);
@@ -927,7 +927,7 @@ no conflicts.
 
 */
     VTABLE void add_role(PMC *role) {
-        Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
+        const Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
 
         /* Do the composition. */
         Parrot_ComposeRole(interp, role,
@@ -1033,8 +1033,8 @@ Array of Class PMCs representing the direct parents of this class.
             PMC * const hash  = pmc_new(interp, enum_class_Hash);
             PMC * const iter  = VTABLE_get_iter(interp, found);
             while (VTABLE_get_bool(interp, iter)) {
-                STRING *key   = VTABLE_shift_string(interp, iter);
-                PMC    *value = VTABLE_get_pmc_keyed_str(interp, found, key);
+                STRING * const key   = VTABLE_shift_string(interp, iter);
+                PMC    * const value = VTABLE_get_pmc_keyed_str(interp, found, key);
                 VTABLE_set_pmc_keyed_str(interp, hash, key, value);
             }
 
@@ -1293,17 +1293,16 @@ Returns whether the class is or inherits from C<*class>.
         if (VTABLE_is_same(interp, SELF, classobj))
             return 1;
         else {
-            STRING *classname = VTABLE_get_string(interp, classobj);
-            INTVAL  is_proxy  = SELF->vtable->base_type == enum_class_PMCProxy
-                               ? 1 : 0;
+            STRING * const classname = VTABLE_get_string(interp, classobj);
+            const INTVAL is_proxy    = (SELF->vtable->base_type == enum_class_PMCProxy);
 
             /* avoid the expensive string copy, if possible */
-            STRING *self_name = is_proxy
+            STRING * const self_name = is_proxy
                                ? VTABLE_get_string(interp, SELF)
                                : make_class_name(interp, SELF);
 
             /* Check if the passed name is the same as the stored short name. */
-            INTVAL name_match = Parrot_str_equal(interp, classname, self_name);
+            const INTVAL name_match = Parrot_str_equal(interp, classname, self_name);
 
             if (name_match)
                 return 1;
@@ -1413,12 +1412,8 @@ Returns whether the class does the given C<*role>.
         role_count = VTABLE_elements(interp, role_list);
 
         for (i = 0; i < role_count; i++) {
-            INTVAL  role_does;
             PMC    * const test_role = VTABLE_get_pmc_keyed_int(interp, role_list, i);
-
-            role_does = VTABLE_does_pmc(interp, test_role, role);
-
-            if (role_does)
+            if (VTABLE_does_pmc(interp, test_role, role))
                 return 1;
         }
 
@@ -1512,7 +1507,7 @@ Used to archive the class.
     VTABLE void freeze(visit_info *info) {
         IMAGE_IO     * const io         = info->image_io;
         Parrot_Class_attributes * const class_data = PARROT_CLASS(SELF);
-        STRING       *serial_namespace  = CONST_STRING(interp, "");
+        STRING       *serial_namespace = CONST_STRING(interp, "");
 
         /* 1) freeze class id */
         VTABLE_push_integer(INTERP, io, class_data->id);
@@ -1977,7 +1972,7 @@ false otherwise.
 
 */
     METHOD does(STRING *role_name) {
-        INTVAL does = VTABLE_does(interp, SELF, role_name);
+        const INTVAL does = VTABLE_does(interp, SELF, role_name);
         RETURN(INTVAL does);
     }
 
