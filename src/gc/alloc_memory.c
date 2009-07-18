@@ -360,8 +360,8 @@ mem_sys_strdup(ARGIN(const char *src))
 {
     ASSERT_ARGS(mem_sys_strdup)
 
-    size_t l = strlen(src);
-    char *result = (char *)mem_sys_allocate(l + 1);
+    const size_t l = strlen(src);
+    char * const result = (char *)mem_sys_allocate(l + 1);
     memcpy(result, src, l);
     result[l] = '\0';
     return result;
