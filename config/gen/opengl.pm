@@ -1074,7 +1074,7 @@ glutcbTimerFunc(PARROT_INTERP, PMC *sub, unsigned int milliseconds, int data)
     callback_data[GLUT_CB_TIMER].interp = interp;
     callback_data[GLUT_CB_TIMER].sub    = sub;
 
-    if (sub == PMCNULL)
+    if (PMC_IS_NULL(sub))
         glutTimerFunc(0, NULL, 0);
     else
         glutTimerFunc(milliseconds, glut_timer_func, data);
@@ -1109,7 +1109,7 @@ glutcbJoystickFunc(PARROT_INTERP, PMC *sub, int pollinterval)
     callback_data[GLUT_CB_JOYSTICK].interp = interp;
     callback_data[GLUT_CB_JOYSTICK].sub    = sub;
 
-    if (sub == PMCNULL)
+    if (PMC_IS_NULL(sub))
         glutJoystickFunc(NULL, 0);
     else
         glutJoystickFunc(glut_joystick_func, pollinterval);
@@ -1149,7 +1149,7 @@ $_->{glutcb}(PARROT_INTERP, PMC *sub)
     callback_data[$_->{enum}].interp = interp;
     callback_data[$_->{enum}].sub    = sub;
 
-    if (sub == PMCNULL)
+    if (PMC_IS_NULL(sub))
         $_->{glut}(NULL);
     else
         $_->{glut}($_->{thunk});
