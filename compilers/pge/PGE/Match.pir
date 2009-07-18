@@ -299,9 +299,13 @@ then simply return the first key found.
     .return ($S0)
   first_key:
     $P0 = self.'hash'()
-    $P1 = new 'Iterator', $P0
+    $P1 = iter $P0
     unless $P1 goto not_found
+  next:
     $S0 = shift $P1
+    $P2 = $P0[$S0]
+    $I0 = isa $P2, 'Capture'
+    unless $I0 goto next
     .return ($S0)
   not_found:
     .return ('')
