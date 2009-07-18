@@ -283,7 +283,7 @@ garbage collector take care.
 
 =head1 Compiler tools
 
-=head2 Parrot Grammar Engine
+=head2 Parrot Grammar Engine (PGE)
 
 =over 4
 
@@ -294,6 +294,12 @@ end which cause invocation of an action method if a C<:action>
 object is supplied.
 
 L<https://trac.parrot.org/parrot/ticket/843>
+
+=item C<find_key> method on PGE::Match [eligible in 1.5]
+
+The C<find_key> method on PGE::Match objects will be removed.
+
+L<https://trac.parrot.org/parrot/ticket/851>
 
 =back
 
