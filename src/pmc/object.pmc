@@ -646,7 +646,6 @@ Creates a clone of the object.
     Parrot_Object_attributes * const obj = PARROT_OBJECT(pmc);
         Parrot_Class_attributes  * const _class    = PARROT_CLASS(obj->_class);
         STRING        * const meth_name = CONST_STRING(interp, "clone");
-        PMC           * cloned;
 
         /* See if we have a custom override of the method first. */
         const int num_classes = VTABLE_elements(interp, _class->all_parents);
