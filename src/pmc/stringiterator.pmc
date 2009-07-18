@@ -204,7 +204,7 @@ Shift next character from C<string> as PMC.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        ret = pmc_new(INTERP, enum_class_String);
+        ret = pmc_new(INTERP, Parrot_get_ctx_HLL_type(interp, enum_class_String));
         VTABLE_set_string_native(INTERP, ret,
                 VTABLE_get_string_keyed_int(INTERP, attrs->string, attrs->pos++));
         return ret;
@@ -268,7 +268,7 @@ Shift "next" character from C<string> for reverse iterator as PMC.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        ret = pmc_new(INTERP, enum_class_String);
+        ret = pmc_new(INTERP, Parrot_get_ctx_HLL_type(interp, enum_class_String));
         VTABLE_set_string_native(INTERP, ret,
                 VTABLE_get_string_keyed_int(INTERP, attrs->string, --attrs->pos));
         return ret;
