@@ -471,7 +471,7 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
     size_t l;
     unsigned char *out_buf;
     unsigned char *buf_start;
-    INTVAL         buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
+    const INTVAL   buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
     unsigned char *buffer_next;
     unsigned char *buffer_end;
     size_t len;

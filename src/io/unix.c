@@ -233,7 +233,7 @@ Parrot_io_open_unix(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle),
             flags |= PIO_F_CONSOLE;
 
         if (PMC_IS_NULL(filehandle)) {
-            PMC *io = Parrot_io_new_pmc(interp, flags);
+            PMC * const io = Parrot_io_new_pmc(interp, flags);
             Parrot_io_set_os_handle(interp, io, fd);
             return io;
         }
@@ -268,8 +268,8 @@ INTVAL
 Parrot_io_async_unix(PARROT_INTERP, ARGMOD(PMC *filehandle), INTVAL b)
 {
     ASSERT_ARGS(Parrot_io_async_unix)
-    int rflags;
 #    if defined(linux)
+    int rflags;
     PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
 
     if ((rflags = fcntl(file_descriptor, F_GETFL, 0)) >= 0) {
@@ -498,7 +498,7 @@ Parrot_io_read_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
 {
     ASSERT_ARGS(Parrot_io_read_unix)
     const PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
-    INTVAL file_flags = Parrot_io_get_flags(interp, filehandle);
+    const INTVAL file_flags = Parrot_io_get_flags(interp, filehandle);
     STRING * const s = Parrot_io_make_string(interp, buf, 2048);
 
     const size_t len = s->bufused;
