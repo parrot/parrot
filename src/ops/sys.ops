@@ -31,8 +31,12 @@ Spawn a subprocess whose program name and arguments are contained in the array
 $2 and wait for it to finish. The return status, which is very
 system-dependent, goes in $1.
 
-RT#36619: spawnw should return something less system-dependent, and more
-object-like. see RT ticket [perl #36619] for more info.
+TT #847: C<spawnw()> should itself handle splitting up command-line arguments,
+rather than depending on the shell to do so in potentially unsafe manner.
+See https://trac.parrot.org/parrot/ticket/847.
+
+TT #848: C<spawnw()> should return something less system-dependent, and more
+object-like. See https://trac.parrot.org/parrot/ticket/848.
 
 =cut
 
