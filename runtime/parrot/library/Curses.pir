@@ -1,6 +1,12 @@
 # Copyright (C) 2004-2009, Parrot Foundation.
 # $Id$
 
+.macro export_dl_func(lib, name, sig)
+    .local pmc edlftmp
+    dlfunc edlftmp, .lib, .name, .sig
+    set_global .name, edlftmp
+.endm
+
 .namespace ['Curses']
 .sub __ncurses_init :load
 
@@ -124,6 +130,29 @@ dlfunc $P2, $P1, 'data_ahead', 'lp'
 set_global 'data_ahead', $P2
 dlfunc $P2, $P1, 'data_behind', 'lp'
 set_global 'data_behind', $P2
+
+loadlib $P1, 'libpanel'
+if $P1 goto has_panel_lib
+loadlib $P1, 'cygpanel-8'
+if $P1 goto has_panel_lib
+goto no_panel_lib
+has_panel_lib:
+.export_dl_func($P1, 'new_panel', 'pp')
+.export_dl_func($P1, 'bottom_panel', 'ip')
+.export_dl_func($P1, 'top_panel', 'ip')
+.export_dl_func($P1, 'show_panel', 'ip')
+.export_dl_func($P1, 'update_panels', 'v')
+.export_dl_func($P1, 'hide_panel', 'ip')
+.export_dl_func($P1, 'panel_window', 'pp')
+.export_dl_func($P1, 'replace_panel', 'ipp')
+.export_dl_func($P1, 'move_panel', 'ipii')
+.export_dl_func($P1, 'panel_hidden', 'ip')
+.export_dl_func($P1, 'panel_above', 'pp')
+.export_dl_func($P1, 'panel_below', 'pp')
+.export_dl_func($P1, 'set_panel_userptr', 'ipp')
+.export_dl_func($P1, 'panel_userptr', 'vp')
+.export_dl_func($P1, 'del_panel', 'ip')
+no_panel_lib:
 
 loadlib $P1, 'libncurses'
 if $P1 goto has_lib1
