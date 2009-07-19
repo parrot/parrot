@@ -246,9 +246,7 @@ sub runstep {
     );
 
     # add profiling if needed
-    # RT#41497 gcc syntax
-    # we should have this in the hints files e.g. cc_profile
-    # RT#41496 move profiling to it's own step
+    # RT #41497 gcc syntax
     if ( $conf->options->get('profile') ) {
         $conf->data->set(
             cc_debug => " -pg ",
