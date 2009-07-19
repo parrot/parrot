@@ -99,6 +99,17 @@
  */
 #define UNUSED(a) /*@-noeffect*/if (0) (void)(a)/*@=noeffect*/;
 
+/* 64-bit CL has some problems, so this section here is going to try to fix them */
+#ifdef PARROT_HAS_MSVC_SAL
+#  ifdef _WIN64
+	/* CL64 can't seem to find sal.h, so take that out of the equation */
+#    undef PARROT_HAS_MSVC_SAL
+	/* CL64 complains about not finding _iob, so this might fix it */
+
+
+#  endif
+#endif
+
 #ifdef PARROT_HAS_MSVC_SAL
 #  include <sal.h>
 #  define PARROT_CAN_RETURN_NULL      /*@null@*/ __maybenull

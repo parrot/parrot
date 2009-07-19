@@ -37,10 +37,10 @@ INTVAL
 Parrot_intval_time(void)
 {
 #if defined(_MSC_VER) && _MSC_VER >= 1400
-#  if INTVAL_SIZE <= 4
-    return _time32(NULL);
+#  ifdef _WIN64
+    return (INTVAL)_time64(NULL);
 #  else
-    return _time64(NULL);
+    return _time32(NULL);
 #  endif
 #else
     return time(NULL);
