@@ -412,6 +412,10 @@ L<https://trac.parrot.org/parrot/ticket/753>
 
 L<https://trac.parrot.org/parrot/ticket/754>
 
+=item OpenGL bindings and libraries [experimental]
+
+L<https://trac.parrot.org/parrot/ticket/852>
+
 =back
 
 =head1 Footnotes
