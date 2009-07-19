@@ -43,11 +43,16 @@ sub new {
 
     my $self = bless Parrot::Pmc2c::PMC->new(
         {
-            parents => [ $parent->name, @{ $parent->parents } ],    # prepend self to parrent
-            flags => { ( %{ $parent->get_flags } ), 'is_ro' => 1 }, # copy flags, set is_ro
-            name       => $parent->name . "_ro",                    # set pmcname
-            vtable     => $parent->vtable,                          # and alias vtable
-            parentname => $parent->name,                            # set parentname
+            # prepend self to parent
+            parents => [ $parent->name, @{ $parent->parents } ],
+            # copy flags, set is_ro
+            flags => { ( %{ $parent->get_flags } ), 'is_ro' => 1 },
+            # set pmcname
+            name       => $parent->name . "_ro",
+            # and alias vtable
+            vtable     => $parent->vtable,
+            # set parentname
+            parentname => $parent->name,
         }
     ), $classname;
 
@@ -56,7 +61,8 @@ sub new {
     {
 
       # autogenerate for nonstandard types
-      # (RT#44433 is this appropriate or do we want them to each be explicitly cleared to have RO ?)
+      # (RT#44433: is this appropriate or do we want them to each be 
+      # explicitly cleared to have RO ?)
         no strict 'refs';
         if ( !@{ ref($self) . '::ISA' } ) {
             @{ ref($self) . '::ISA' } = "Parrot::Pmc2c::PMC::RO";
@@ -66,7 +72,8 @@ sub new {
     foreach my $vt_method ( @{ $self->vtable->methods } ) {
         my $name = $vt_method->name;
 
-        # Generate ro variant only iff we override method constantness with ":write"
+        # Generate RO variant only if we override method constantness 
+        # with ":write"
         next unless $parent->{has_method}{$name}
                     && $parent->vtable_method_does_write($name)
                     && !$parent->vtable->attrs($name)->{write};
