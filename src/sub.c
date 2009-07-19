@@ -575,7 +575,7 @@ Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
 {
     ASSERT_ARGS(Parrot_capture_lex)
     Parrot_Context * const ctx          = CONTEXT(interp);
-    Parrot_sub            *current_sub, *outer_sub;
+    Parrot_sub            *current_sub;
     Parrot_sub            *sub;
     Parrot_Context        *old;
 
