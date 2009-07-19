@@ -219,6 +219,9 @@ Stats a file, and returns a 13 position array as in Perl:
 
 =cut
 
+TT #849:  Provide a mechanism for setting 'mtime' and 'atime':
+https://trac.parrot.org/parrot/ticket/849
+
 */
 
     METHOD stat(STRING *path) {
@@ -509,6 +512,7 @@ This method is a wrapper for rename(2). On error a SystemError exception is
 thrown.
 
 =cut
+
 */
     METHOD rename(STRING *oldpath, STRING *newpath) {
         char * const coldpath = Parrot_str_to_cstring(interp, oldpath);
