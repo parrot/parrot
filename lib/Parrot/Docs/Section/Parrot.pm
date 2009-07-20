@@ -101,7 +101,6 @@ sub new {
             '',
             $self->new_item( 'Chapter 1 Introduction', 'docs/book/draft/ch01_introduction.pod'),
             $self->new_item( 'Chapter 2 Getting Started', 'docs/book/draft/ch02_getting_started.pod'),
-            $self->new_item( 'Chapter 3 Parrot Intermediate Representation', 'docs/book/draft/ch03_pir.pod'),
             $self->new_item( 'Chapter 4 Parrot Compiler Tools', 'docs/book/draft/ch04_compiler_tools.pod'),
             $self->new_item( 'Chapter 5 Parrot Grammar Engine', 'docs/book/draft/ch05_pge.pod'),
             $self->new_item( 'Chapter 6 Not Quite Perl', 'docs/book/draft/ch06_nqp.pod'),
