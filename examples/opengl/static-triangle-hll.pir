@@ -33,11 +33,11 @@ keyboard handling has been removed.
     load_bytecode 'OpenGL.pbc'
     load_bytecode 'NCI/Utils.pbc'
 
-    # Import all OpenGL/GLU/GLUT functions
+    # Import all OpenGL/GLU/GLUT functions to current namespace
+    # (in this example, the HLL namespace).
     .local pmc import_gl
     import_gl = get_root_global ['parrot';'OpenGL'], '_export_all_functions'
-    $P0 = get_namespace
-    import_gl($P0)
+    import_gl()
 
     # Initialize GLUT
     .local pmc call_toolkit_init
