@@ -1250,7 +1250,12 @@ C3_merge(PARROT_INTERP, ARGIN(PMC *merge_list))
 
 =item C<PMC* Parrot_ComputeMRO_C3(PARROT_INTERP, PMC *_class)>
 
-Computes the C3 linearization for the given class.
+Computes the C3 linearization for the given class. C3 is an algorithm to
+compute the method resolution order (MRO) of a class that is inheriting
+from multiple parent classes (multiple inheritance). C3 was first described
+by Barrett et al at:
+
+F<http://192.220.96.201/dylan/linearization-oopsla96.html>
 
 =cut
 

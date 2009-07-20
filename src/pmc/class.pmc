@@ -46,8 +46,8 @@ An empty ResizablePMCArray PMC is allocated during initialization.
 
 =item C<all_parents>
 
-A cached array of ourself and all parent classes, in MRO order.
-A ResizablePMCArray PMC is allocated during initialization,
+A cached array of ourself and all parent classes, in method resolution
+order (MRO). A ResizablePMCArray PMC is allocated during initialization,
 and is populated with the current class.
 
 =item C<roles>
@@ -403,8 +403,11 @@ make_class_name(PARROT_INTERP, PMC *SELF)
     return _class->name;
 }
 
-/* calculates the C3 method resolution order for this class --
- * working hard *not* to recalculate MRO when unnecessary */
+/* calculates the C3 method resolution order for this class. C3 is the
+ * name of an algorithm used to calculate the method resolution order
+ * (MRO) to use in a system with multiple inheritance. For more information
+ * see the documentation associated with C<Parrot_ComputeMRO_C3>.
+ */
 static PMC *
 calculate_mro(PARROT_INTERP, PMC *SELF, INTVAL num_parents)
 {
