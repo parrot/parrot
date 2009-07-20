@@ -1,5 +1,19 @@
 # $Id$
 
+New in 1.4.0
+- Core
+  + Key and Iterator refactor
+  + major pbc_to_exe generated code speed improvement
+  + new "Infinite Memory" GC core for demonstration purposes
+  + gc_debug runcore and GC-related heisenbug fixes
+  + elimination of variable expansion in parrot_config
+  + CLI arguments are processed as Unicode by default
+  + substantial optimizations in NCI
+  + Win64 build builds (?)
+  + Thread leaks plugs
+  + C indentation coding standards test improvement
+
+
 New in 1.3.0
 - Core
   + Optimized parts of the IO system
