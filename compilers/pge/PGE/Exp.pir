@@ -862,7 +862,7 @@ tree as a PIR code object that can be compiled.
         %L_1:
           $P0 = find_name '%0'
           unless null $P0 goto %L_2
-          say "Unable to find regex '%0'"
+          die "Unable to find regex '%0'"
         %L_2:
         CODE
 
