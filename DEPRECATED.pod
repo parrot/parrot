@@ -79,6 +79,27 @@ L<https://trac.parrot.org/parrot/ticket/679>
 
 L<https://trac.parrot.org/parrot/ticket/264>
 
+=item Direct creation of Iterator [eligible in 1.5]
+
+Iterator PMC became pure interface class and direct creation of them is
+deprecated. Use C<iter> opcode instead.
+
+Code will become runtime error:
+
+  $P0 = new 'Iterator', aggr
+
+Proper invocation:
+
+  $P0 = iter arrg
+
+L<https://trac.parrot.org/parrot/ticket/811>
+
+=item VTABLE nomenclature. [eligible in 1.5]
+
+Current list of VTABLE functions will be reviewed and cleaned.
+
+L<https://trac.parrot.org/parrot/ticket/866>
+
 =back
 
 =head1 Opcodes
