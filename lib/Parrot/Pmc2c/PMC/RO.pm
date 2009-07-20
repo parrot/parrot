@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2008, Parrot Foundation.
+# Copyright (C) 2004-2009, Parrot Foundation.
 
 # $Id$
 
@@ -61,7 +61,7 @@ sub new {
     {
 
       # autogenerate for nonstandard types
-      # (RT#44433: is this appropriate or do we want them to each be 
+      # (RT #44433: is this appropriate or do we want them to each be
       # explicitly cleared to have RO ?)
         no strict 'refs';
         if ( !@{ ref($self) . '::ISA' } ) {
@@ -72,7 +72,7 @@ sub new {
     foreach my $vt_method ( @{ $self->vtable->methods } ) {
         my $name = $vt_method->name;
 
-        # Generate RO variant only if we override method constantness 
+        # Generate RO variant only if we override method constantness
         # with ":write"
         next unless $parent->{has_method}{$name}
                     && $parent->vtable_method_does_write($name)
@@ -80,8 +80,8 @@ sub new {
 
         # All parameters passed in are shims, because we're
         # creating an exception-thrower.
-        my @parameters = split( /\s*,\s*/, $vt_method->parameters );
-        @parameters = map { "SHIM($_)" } @parameters;
+        my @parameters = map { "SHIM($_)" }
+                         split( /\s*,\s*/, $vt_method->parameters );
 
         my $ro_method = Parrot::Pmc2c::Method->new(
             {
