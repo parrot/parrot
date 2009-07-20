@@ -14,7 +14,7 @@ Platform                     B8    Runloops      Feature Comp Test Inst YYYYMMDD
                                 CGoto JIT EXEC   Thr Sig
 --------------------------------------------------------------------------------
 cygwin1.5.25-x86-gcc3.4.4     4   Y    Y    -     -   -   Y    Y     Y  20090315
-darwin8.11.1-x86-gcc4.0.1    ??   ?    N    ?     ?   ?   Y    Y*3   Y  20090420
+darwin8.11.1-x86-gcc4.0.1    ??   ?    N    ?     ?   ?   Y    Y     Y  20090720
 linux-x86-gcc4.1.2                Y    Y    ?     Y   Y   Y    Y     ?  20090419
 linux-x86-gcc4.1.3                Y    Y    ?     Y   Y   Y    Y     ?  20080414
 linux-x86-gcc4.2.3                Y    Y    ?     Y   Y   Y    Y     ?  20080715
@@ -94,9 +94,6 @@ Remarks:
 *1 gcc and cc defaults to 32bits on solaris, for 64bit use
    --ccflags='-m64' --ldflags='-m64' --linkflags='-m64'
 *2 http://rt.perl.org/rt3/Ticket/Display.html?id=60926
-*3 failures in 'make examples_tests' (part of 'make fulltest')
-*4 compiles with --ccflags=-U__APPLE_CC__ --without-gmp
-   See http://lists.parrot.org/pipermail/parrot-dev/2009-June/002407.html
 
 The following configurations are also working on x86/linux (and possibly
 other platforms):
