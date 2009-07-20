@@ -1053,12 +1053,12 @@ comprehensive list of asynchronous I/O implementation options.
 
 =head2 References
 
-  F<src/io/io.c>
+  F<src/io/core.c>
   F<src/ops/io.ops>
   F<include/parrot/io.h>
   F<runtime/parrot/library/Stream/*>
-  F<src/io/io_unix.c>
-  F<src/io/io_win32.c>
+  F<src/io/unix.c>
+  F<src/io/win32.c>
   Perl 5's IO::AIO
   Perl 5's POE
 
