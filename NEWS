@@ -12,7 +12,8 @@ New in 1.4.0
   + Win64 build builds (?)
   + Thread leaks plugs
   + C indentation coding standards test improvement
-
+  + Hashes can use native types as keys and values
+  + Beginnings of OpenGL::Math library; OpenGL bindings and library marked experimental
 
 New in 1.3.0
 - Core
