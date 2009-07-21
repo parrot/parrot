@@ -23,9 +23,11 @@ Tests the C<Iterator> PMC.
 
 =cut
 
+# XXX Split this test into aggregate specific one.
+
 pasm_output_is( <<'CODE', <<'OUTPUT', "new iter" );
     new P2, ['ResizablePMCArray']
-    new P1, ['Iterator'], P2
+    iter P1, P2
     print "ok 1\n"
     end
 CODE
@@ -39,19 +41,19 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "int test" );
     push P2, 10
     push P2, 20
     set I0, P2
-    new P1, ['Iterator'], P2
+    iter P1, P2
     print "ok 1\n"
     set I1, P1
     eq I0, I1, ok2        # iter.length() == array.length()
     print "not "
 ok2:    print "ok 2\n"
-    new P1, ['Iterator'], P0
+    iter P1, P0
     set P1, .ITERATE_FROM_START
     print "ok 3\n"
     unless P1, ok4        # if(iter) == false on empty
     print "not "
 ok4:    print "ok 4\n"
-    new P1, ['Iterator'], P2
+    iter P1, P2
     set P1, .ITERATE_FROM_START
     if P1, ok5        # if(iter) == true on non empty
     print "not "
@@ -115,19 +117,19 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Hash iter 1" );
     set P2["ab"], 100
     set P2["xy"], "value"
     set I0, P2
-    new P1, ['Iterator'], P2
+    iter P1, P2
     print "ok 1\n"
     set I1, P1
     eq I0, I1, ok2        # iter.length() == hash.length()
     print "not "
 ok2:    print "ok 2\n"
-    new P1, ['Iterator'], P0
+    iter P1, P0
     set P1, .ITERATE_FROM_START
     print "ok 3\n"
     unless P1, ok4        # if(iter) == false on empty
     print "not "
 ok4:    print "ok 4\n"
-    new P1, ['Iterator'], P2
+    iter P1, P2
     set P1, .ITERATE_FROM_START
     if P1, ok5        # if(iter) == true on non empty
     print "not "
@@ -169,19 +171,19 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Hash iter 1" );
     set P2["ab"], 100
     set P2["xy"], "value"
     set I0, P2
-    new P1, ['Iterator'], P2
+    iter P1, P2
     print "ok 1\n"
     set I1, P1
     eq I0, I1, ok2        # iter.length() == hash.length()
     print "not "
 ok2:    print "ok 2\n"
-    new P1, ['Iterator'], P0
+    iter P1, P0
     set P1, .ITERATE_FROM_START
     print "ok 3\n"
     unless P1, ok4        # if(iter) == false on empty
     print "not "
 ok4:    print "ok 4\n"
-    new P1, ['Iterator'], P2
+    iter P1, P2
     set P1, .ITERATE_FROM_START
     if P1, ok5        # if(iter) == true on non empty
     print "not "
@@ -231,7 +233,7 @@ fill:
     dec I1
     if I1, fill
 
-    new P1, ['Iterator'], P0
+    iter P1, P0
     set I0, P1
     eq I0, I10, ok1
     print "not "
@@ -260,7 +262,7 @@ pasm_output_is( <<'CODE', <<OUTPUT, "string iteration forward" );
     .include "iterator.pasm"
     new P2, ['String']
     set P2, "parrot"
-    new P1, ['Iterator'], P2
+    iter P1, P2
     set P1, .ITERATE_FROM_START
 iter_loop:
         unless P1, iter_end        # while (entries) ...
@@ -281,7 +283,7 @@ pasm_output_is( <<'CODE', <<OUTPUT, "string iteration backward" );
     .include "iterator.pasm"
     new P2, ['String']
     set P2, "parrot"
-    new P1, ['Iterator'], P2
+    iter P1, P2
     set P1, .ITERATE_FROM_END
 iter_loop:
         unless P1, iter_end        # while (entries) ...
@@ -302,7 +304,7 @@ pasm_output_is( <<'CODE', <<OUTPUT, "string iteration forward get ord" );
     .include "iterator.pasm"
     new P2, ['String']
     set P2, "ABC"
-    new P1, ['Iterator'], P2
+    iter P1, P2
     set P1, .ITERATE_FROM_START
 iter_loop:
         unless P1, iter_end        # while (entries) ...
@@ -323,7 +325,7 @@ pasm_output_is( <<'CODE', <<OUTPUT, "string iteration backward get ord" );
 .include "iterator.pasm"
     new P2, ['String']
     set P2, "ABC"
-    new P1, ['Iterator'], P2
+    iter P1, P2
     set P1, .ITERATE_FROM_END
 iter_loop:
         unless P1, iter_end        # while (entries) ...
@@ -351,7 +353,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "String iterator in PIR" );
     print "\n"
 
     .local pmc iter_1
-    iter_1 = new ['Iterator'], string_1
+    iter_1 = iter string_1
     iter_1 = .ITERATE_FROM_START
 
     .local int code_point_1
@@ -389,7 +391,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Index access for Iterator on String" );
     print "\n"
 
     .local pmc iter_1
-    iter_1 = new ['Iterator'], string_1
+    iter_1 = iter string_1
     iter_1 = .ITERATE_FROM_START
 
     .local int    code_point_1
@@ -447,7 +449,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Index access for Iterator on ResizablePM
     print "\n"
 
     .local pmc iter_1
-    iter_1 = new ['Iterator'], array_1
+    iter_1 = iter array_1
     iter_1 = .ITERATE_FROM_START
 
     .local string elem_1
@@ -502,7 +504,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Index access for Iterator on ResizablePM
     print "\n"
 
     .local pmc iter_2
-    iter_2 = new ['Iterator'], array_1
+    iter_2 = iter array_1
     iter_2 = .ITERATE_FROM_END
 
     print 'Iterator shift_float: '
@@ -543,7 +545,7 @@ TODO: {
     push P2, 20
     push P2, 30
     push P2, 40
-    new P1, ['Iterator'], P2
+    iter P1, P2
     set P1, .ITERATE_FROM_START
 
     set I0, P1        # arr.length
@@ -713,7 +715,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "iterator can be cloned" );
     .local pmc ar, i1, i2
     ar = new ['ResizableIntegerArray']
     push ar, 17
-    new i1, ['Iterator'], ar
+    i1 = iter ar
     clone i2, i1
 .end
 CODE
@@ -726,7 +728,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "cloned iterator independent of original"
     push ar, 17
     push ar, 42
 
-    new i1, ['Iterator'], ar
+    i1 = iter ar
     clone i2, i1
 
     .local pmc temp
@@ -759,7 +761,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "clone of partly-advanced iterator" );
     ar = new ['ResizableIntegerArray']
     push ar, 1
     push ar, 2
-    new i1, ['Iterator'], ar
+    i1 = iter ar
 
     shift temp, i1
     unless temp == 1 goto fail
@@ -790,7 +792,7 @@ TODO: {
     temp = new ['Integer']
     ar   = new ['ResizableIntegerArray']
     push ar, 1
-    new i1, ['Iterator'], ar
+    i1 = iter ar
 
     # i1 and i2 now "point" to the same element of the same array.
     clone i2, i1

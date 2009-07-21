@@ -430,7 +430,7 @@ to traits in the grammar.
     .param pmc hash
 
     $P0 = split ' ', "pasttype pirop inline lvalue"
-    $P1 = new 'Iterator', $P0
+    $P1 = iter $P0
   iter_loop:
     unless $P1 goto iter_end
     $S0 = shift $P1

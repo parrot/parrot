@@ -39,13 +39,13 @@ of the match.
     .param pmc mob                                 # match object
     .param pmc list            :slurpy             # message arguments
 
-    .local pmc iter
+    .local pmc it
     .local string message
     message = ''
-    iter = new 'Iterator', list
+    it = iter list
   iter_loop:
-    unless iter goto iter_end
-    $S0 = shift iter
+    unless it goto iter_end
+    $S0 = shift it
     message .= $S0
     goto iter_loop
   iter_end:
@@ -100,13 +100,13 @@ Emits the list of messages to stderr.
     .param pmc mob                                 # match object
     .param pmc list            :slurpy             # message arguments
 
-    .local pmc iter
+    .local pmc it
     .local string message
     message = ''
-    iter = new 'Iterator', list
+    it = iter list
   iter_loop:
-    unless iter goto iter_end
-    $S0 = shift iter
+    unless it goto iter_end
+    $S0 = shift it
     message .= $S0
     goto iter_loop
   iter_end:

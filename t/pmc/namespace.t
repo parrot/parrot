@@ -1699,13 +1699,13 @@ pir_output_is( <<'CODE', <<OUT, "iterate through a NameSpace PMC, RT #39978" );
      $P1 = 0
      set_root_global [ "DUMMY"; "X"; "Y" ], "T0", $P0
 
-     .local pmc dummy_x_y_ns, iter, res
+     .local pmc dummy_x_y_ns, it, res
      dummy_x_y_ns = get_root_namespace [ "DUMMY"; "X"; "Y" ]
-     iter = new ['Iterator'], dummy_x_y_ns
+     it   = iter dummy_x_y_ns
      res  = new ['ResizablePMCArray']
 loop:
-     unless iter goto loop_end
-     $S0 = shift iter
+     unless it goto loop_end
+     $S0 = shift it
      push res, $S0
      goto loop
 loop_end:
@@ -1740,7 +1740,7 @@ pir_output_is( <<'CODE', <<OUT, "iterate through a NameSpace PMC" );
     say $P0
     $I0 = elements $P0
     say $I0
-    new $P1 , 'Iterator', $P0
+    $P1 = iter $P0
   L1:
     unless $P1 goto L2
     $P2 = shift $P1

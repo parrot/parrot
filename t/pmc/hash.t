@@ -1204,18 +1204,18 @@ lp:
   thash["c"] = "d"
   thash["e"] = "f"
 
-  .local pmc iter
-  iter = new ['Iterator'], thash
-  iter = .ITERATE_FROM_START
+  .local pmc it
+  it = iter thash
+  it = .ITERATE_FROM_START
 
   .local pmc keys, key
   keys = new ['ResizablePMCArray']
 
   # go through the hash, print out all the keys: should be a c and e
 preit_loop:
-  unless iter goto preit_end
+  unless it goto preit_end
 
-  key = shift iter
+  key = shift it
   $S0 = key
   push keys, $S0
 
@@ -1233,15 +1233,15 @@ preit_end:
   # what do we have after deletion?
   result = ""
 
-  iter = new ['Iterator'], thash
-  iter = .ITERATE_FROM_START
+  it = iter thash
+  it = .ITERATE_FROM_START
 
   # go through the hash, print out all the keys... I believe it should be a and e?
   # it actually outputs a, c and e.
 postit_loop:
-  unless iter goto postit_end
+  unless it goto postit_end
 
-  key = shift iter
+  key = shift it
   $S0 = key
   push keys, $S0
 

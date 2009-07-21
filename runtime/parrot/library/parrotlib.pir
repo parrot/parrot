@@ -165,16 +165,15 @@ END:
     .param string name
     .param pmc array
     .local string ret
-    .local pmc iter
+    .local pmc it
 
-    iter = new 'Iterator', array
-    iter = 0 #ITERATE_FROM_START
+    it = iter array
 
 NEXT:
     null ret
-    unless iter goto END
+    unless it goto END
 
-    $P0 = shift iter
+    $P0 = shift it
     ret = $P0( name )
     if_null ret, NEXT
 END:

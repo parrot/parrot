@@ -140,7 +140,7 @@ Return an iterator for the symbol lookup table.
 
 .sub 'symbol_iter' :method
     $P1 = getattribute self, 'symbols'
-    $P2 = new 'Iterator', $P1
+    $P2 = iter $P1
 
     .return($P2)
 .end

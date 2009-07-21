@@ -577,8 +577,8 @@ This handles comparisons of array-like and hash-like structures.
     .local pmc r_iter
     .local int count
 
-    l_iter = new 'Iterator', l_array
-    r_iter = new 'Iterator', r_array
+    l_iter = iter l_array
+    r_iter = iter r_array
     l_iter = 0
     r_iter = 0
     count  = 0
@@ -641,7 +641,7 @@ This handles comparisons of array-like and hash-like structures.
     .local pmc l_iter
     .local int count
 
-    l_iter = new 'Iterator', l_hash
+    l_iter = iter l_hash
     l_iter = 0
     count  = 0
 

@@ -87,7 +87,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
 
     .local pmc file_iterator # iterate over list of files..
-               file_iterator = new 'Iterator', test_files
+               file_iterator = iter test_files
 
     .local int test_number   # the number of the test we're running
                test_number = 0
@@ -478,16 +478,16 @@ tag C<all> is allowed for todo tests that should fail on any system.
     .local pmc skip_os
     skip_os = split ' ', skip_list
 
-    .local pmc iter
-    iter = new 'Iterator', skip_os
+    .local pmc it
+    it = iter skip_os
 
     .local string osname
     osname = sysinfo .SYSINFO_PARROT_OS
 
   iter_loop:
-    unless iter goto iter_end
+    unless it goto iter_end
     .local string os_name
-    os_name = shift iter
+    os_name = shift it
     eq os_name, osname, skip_it
     goto iter_loop
   iter_end:

@@ -169,15 +169,15 @@ the output to the correct output file.
     goto stmt_loop
   stmt_end:
 
-    .local pmc initpir, rulepir, iter, ns
+    .local pmc initpir, rulepir, it, ns
     .local string namespace
     initpir = new 'CodeString'
     rulepir = new 'CodeString'
-    iter = new 'Iterator', nstable
+    it = iter nstable
   iter_loop:
-    unless iter goto iter_end
-    namespace = shift iter
-    ns = iter[namespace]
+    unless it goto iter_end
+    namespace = shift it
+    ns  = it[namespace]
     $P0 = ns['rule']
     rulepir .= $P0
     if namespace == 'PGE::Grammar' goto ns_optable
@@ -353,15 +353,15 @@ the output to the correct output file.
     optable = $P0['optable']
 
     ##   build the list of traits
-    .local pmc iter
+    .local pmc it
     .local string traitlist
     $P0 = stmt[0]
-    iter = new 'Iterator', $P0
+    it = iter $P0
     traitlist = ''
   trait_loop:
-    unless iter goto trait_end
+    unless it goto trait_end
     .local pmc t
-    t = shift iter
+    t = shift it
     .local string trait, arg
     trait = t['trait']
     $P0 = t['arg']

@@ -293,11 +293,11 @@ the sub.
     .local pmc paramlist
     paramlist = node['paramlist']
     if null paramlist goto paramlist_done
-    .local pmc iter
-    iter = new 'Iterator', paramlist
+    .local pmc it
+    it = iter paramlist
   param_loop:
-    unless iter goto paramlist_done
-    $P0 = shift iter
+    unless it goto paramlist_done
+    $P0 = shift it
     if null $P0 goto param_loop
     subpir .= $P0
     goto param_loop

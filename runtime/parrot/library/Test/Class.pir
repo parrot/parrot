@@ -258,13 +258,13 @@ everything.
     .local pmc attribute
     attribute = getattribute self, name
 
-    .local pmc iter
-    iter = new 'Iterator', attribute
+    .local pmc it
+    it = iter attribute
 
     .local string meth_name
   iter_loop:
-    unless iter goto loop_end
-    meth_name = shift iter
+    unless it goto loop_end
+    meth_name = shift it
     self.meth_name()
     goto iter_loop
   loop_end:
@@ -276,14 +276,14 @@ everything.
     .local pmc tests
     tests = getattribute self, 'tests'
 
-    .local pmc iter
-    iter = new 'Iterator', tests
+    .local pmc it
+    it = iter tests
 
     .local string meth_name
   iter_loop:
-    unless iter goto loop_end
+    unless it goto loop_end
     self.'loop_over_methods'( 'setup' )
-    meth_name = shift iter
+    meth_name = shift it
     self.meth_name()
     self.'loop_over_methods'( 'teardown' )
     goto iter_loop

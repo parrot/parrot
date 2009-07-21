@@ -150,18 +150,16 @@ END:
     .param pmc oldVal
     .param pmc newVal
     .param pmc cache
-    .local pmc iter
+    .local pmc it
     .local string key
     .local pmc val
 
-    new iter, 'Iterator', where
-    set iter, 0
+    it = iter where
 
 LOOP:
-    unless iter, END
+    unless it goto END
 
-    shift key, iter
-
+    key = shift it
     val = where[key]
 
     ne_addr val, oldVal, SKIP
@@ -184,18 +182,16 @@ END:
     .param pmc oldVal
     .param pmc newVal
     .param pmc cache
-    .local pmc iter
+    .local pmc it
     .local string key
     .local pmc val
 
-    new iter, 'Iterator', where
-    set iter, 0
+    it = iter where
 
 LOOP:
-    unless iter, END
+    unless it goto END
 
-    shift key, iter
-
+    key = shift it
     val = where[key]
 
     ne_addr val, oldVal, SKIP

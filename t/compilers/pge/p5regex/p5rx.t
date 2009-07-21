@@ -81,7 +81,7 @@ Column 6, if present, contains a description of what is being tested.
     push test_files, 're_tests'
 
     .local pmc file_iterator # iterate over list of files..
-               file_iterator = new 'Iterator', test_files
+               file_iterator = iter test_files
 
     .local int test_number   # the number of the test we're running
                test_number = 0

@@ -262,14 +262,13 @@ done:
 
   .local pmc keys
   keys = new 'ResizablePMCArray'
-  .local pmc iter
-  iter = new 'Iterator', thing
-  iter = 0
+  .local pmc it
+  it = iter thing
   .local string key
 
 iter_loop:
-  unless iter, done_iter
-  shift key, iter
+  unless it, done_iter
+  shift key, it
   push keys, key
   goto iter_loop
 

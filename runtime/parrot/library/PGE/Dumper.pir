@@ -26,7 +26,7 @@ This method enables Data::Dumper to work on Match objects.
     .param pmc dumper
     .param string label
     .local string indent, subindent
-    .local pmc iter, val
+    .local pmc it, val
     .local string key
     .local pmc hash, array
     .local int hascapts
@@ -41,16 +41,16 @@ This method enables Data::Dumper to work on Match objects.
     hascapts = 0
     hash = self.'hash'()
     if_null hash, dump_array
-    iter = new 'Iterator', hash
+    it = iter hash
   dump_hash_1:
-    unless iter goto dump_array
+    unless it goto dump_array
     if hascapts goto dump_hash_2
     print " {"
     hascapts = 1
   dump_hash_2:
     print "\n"
     print subindent
-    key = shift iter
+    key = shift it
     val = hash[key]
     print "<"
     print key
@@ -102,7 +102,7 @@ An alternate dump output for a Match object and all of its subcaptures.
 
     .local pmc capt
     .local int spi, spc
-    .local pmc iter
+    .local pmc it
     .local string prefix1, prefix2
 
     if has_b2 goto start
@@ -147,10 +147,10 @@ An alternate dump output for a Match object and all of its subcaptures.
   subrules:
     capt = self.'hash'()
     if_null capt, end
-    iter = new 'Iterator', capt
+    it = iter capt
   subrules_1:
-    unless iter goto end
-    $S0 = shift iter
+    unless it goto end
+    $S0 = shift it
     prefix1 = concat prefix, '<'
     concat prefix1, $S0
     concat prefix1, ">"
@@ -462,7 +462,7 @@ This method enables Data::Dumper to work on PGE::OPTable objects.
     .param pmc dumper
     .param string label
     .local string indent, subindent
-    .local pmc iter, val
+    .local pmc it, val
     .local string key
     .local pmc hash, array
 
@@ -470,12 +470,12 @@ This method enables Data::Dumper to work on PGE::OPTable objects.
     print " {"
     hash = self
     if_null hash, dump_rest
-    iter = new 'Iterator', hash
+    it = iter hash
   dump_hash:
-    unless iter goto dump_rest
+    unless it goto dump_rest
     print "\n"
     print subindent
-    key = shift iter
+    key = shift it
     val = hash[key]
     print "<"
     print key

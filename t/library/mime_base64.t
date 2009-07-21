@@ -332,7 +332,7 @@ END_JSON
     .local pmc test_iterator, test_case
     .local string plain, base64, comment, comment_cnt
 
-    test_iterator = new 'Iterator', encode_decode_tests
+    test_iterator = iter encode_decode_tests
     enc_dec_loop:
         unless test_iterator goto enc_dec_loop_end
         test_case   = shift test_iterator
@@ -350,7 +350,7 @@ END_JSON
     goto enc_dec_loop
     enc_dec_loop_end:
 
-    test_iterator = new 'Iterator', decode_tests
+    test_iterator = iter decode_tests
     dec_loop:
         unless test_iterator goto dec_loop_end
         test_case   = shift test_iterator

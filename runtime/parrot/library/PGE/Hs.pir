@@ -164,7 +164,7 @@ END:
     .local int ari, arc
     .local int tmpi, cond
     .local string tmps, key
-    .local pmc capt, iter, subelm, elm
+    .local pmc capt, it, subelm, elm
 
     out = ""
 
@@ -204,11 +204,10 @@ END:
     out .= "] ["
     capt = self.'hash'()
     if_null capt, end
-    iter = new 'Iterator', capt
-    iter = 0
-    unless iter goto end
+    it = iter capt
+    unless it goto end
   subrules_body:
-    key = shift iter
+    key = shift it
     cond = defined capt[key]
     unless cond goto subrules_fail
     elm = capt[key]
@@ -218,13 +217,13 @@ END:
     out .= '", '
     bsr dumper
     out .= ")"
-    unless iter goto end
+    unless it goto end
     out .= ", "
     goto subrules_body
   subrules_fail:
     out .= PGE_FAIL
-    key = shift iter
-    unless iter goto end
+    key = shift it
+    unless it goto end
     goto subrules_body
 
   dumper:

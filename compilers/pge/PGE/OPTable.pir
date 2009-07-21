@@ -110,7 +110,7 @@ Adds (or replaces) a syntactic category's defaults.
     if $I0 goto end
     tokentable[name] = token
 
-    $P0 = new 'Iterator', args
+    $P0 = iter args
   args_loop:
     unless $P0 goto args_end
     $S1 = shift $P0
@@ -239,7 +239,7 @@ Adds (or replaces) a syntactic category's defaults.
     .local pmc ws
     .local string key
     .local pmc token, top, oper
-    .local pmc iter
+    .local pmc it
     .local int tokencat, topcat
     .local int circumnest
     .local pmc cstack
@@ -367,10 +367,10 @@ Adds (or replaces) a syntactic category's defaults.
     if oper goto oper_found
     goto key_next
   key_array:
-    iter = new 'Iterator', token
+    it = iter token
   key_array_1:
-    unless iter goto key_next
-    token = shift iter
+    unless it goto key_next
+    token = shift it
     local_branch cstack, token_match
     if_null oper, key_array_1
     if oper goto oper_found

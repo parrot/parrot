@@ -703,7 +703,7 @@ loop:
 .sub get_array_string
     .param pmc p
     $S0 = ''
-    $P3 = new ['Iterator'], p
+    $P3 = iter p
 loop:
     unless $P3 goto loop_end
     $P4 = shift $P3
@@ -833,7 +833,7 @@ loop_end:
 
 #RT #40958 - can't iterate subclass of ResizablePMCArray
 .sub iterate_subclass_of_rpa
-    .local pmc arr, iter
+    .local pmc arr, it
     $P0 = subclass 'ResizablePMCArray', 'MyArray'
 
     arr = new ['MyArray']
@@ -844,10 +844,10 @@ loop_end:
     is($I0, 3, "RPA subclass has correct element count")
 
     $S1 = ''
-    iter = new ['Iterator'], arr
+    it = iter arr
 loop:
-    unless iter goto end
-    $P2 = shift iter
+    unless it goto end
+    $P2 = shift it
     $S0 = $P2
     concat $S1, $S0
     concat $S1, ","

@@ -120,7 +120,7 @@ Dumps a 'generic' Hash.
 .sub genericHash :method
     .param string name
     .param pmc hash
-    .local pmc iter
+    .local pmc it
     .local string key
     .local pmc val
     .local pmc keys
@@ -133,13 +133,12 @@ Dumps a 'generic' Hash.
     print " {"
 
     new keys, "ResizablePMCArray"
-    new iter, "Iterator", hash
-    set iter, 0
+    it = iter hash
 
   iter_loop:
-    unless iter, iter_end
+    unless it, iter_end
 
-    shift key, iter
+    shift key, it
     push keys, key
     branch iter_loop
 

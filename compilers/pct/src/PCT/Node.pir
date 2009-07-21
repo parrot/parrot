@@ -57,20 +57,20 @@ And returns the node.
     .param pmc children        :slurpy
     .param pmc adverbs         :slurpy :named
 
-    .local pmc iter
-    iter = new 'Iterator', children
+    .local pmc it
+    it = iter children
   children_loop:
-    unless iter goto children_end
-    $P0 = shift iter
+    unless it goto children_end
+    $P0 = shift it
     push self, $P0
     goto children_loop
   children_end:
 
-    iter = new 'Iterator', adverbs
+    it = iter adverbs
   adverbs_loop:
-    unless iter goto adverbs_end
-    $S0 = shift iter
-    $P0 = iter[$S0]
+    unless it goto adverbs_end
+    $S0 = shift it
+    $P0 = it[$S0]
     $P1 = find_method self, $S0
     self.$P1($P0)
     goto adverbs_loop
@@ -180,11 +180,10 @@ children.
 =cut
 
 .sub 'iterator' :method
-    .local pmc iter
+    .local pmc it
     $P0 = self.'list'()
-    iter = new 'Iterator', $P0
-    iter = 0
-    .return (iter)
+    it = iter $P0
+    .return (it)
 .end
 
 

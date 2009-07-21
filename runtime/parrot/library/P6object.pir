@@ -227,12 +227,12 @@ Deprecated; use add_parent(class, parentclass)
     .local pmc parrotclassns, mroiter, methods, methoditer
     parrotclassns = parrotclass.'get_namespace'()
     $P0 = parentclass.'inspect'('all_parents')
-    mroiter = new 'Iterator', $P0
+    mroiter = iter $P0
   mro_loop:
     unless mroiter goto mro_end
     $P0 = shift mroiter
     methods = $P0.'methods'()
-    methoditer = new 'Iterator', methods
+    methoditer = iter methods
   method_loop:
     unless methoditer goto mro_loop
     $S0 = shift methoditer
@@ -400,11 +400,11 @@ or 'Object').
     $S0 = parentclass
     parentclass = split ' ', $S0
   parent_array:
-    .local pmc iter, item
-    iter = new 'Iterator', parentclass
+    .local pmc it, item
+    it = iter parentclass
   parent_loop:
-    unless iter goto parent_done
-    item = shift iter
+    unless it goto parent_done
+    item = shift it
     $S0 = item
     $P0 = split ';', $S0
     $I0 = elements $P0
@@ -469,10 +469,10 @@ or 'Object').
     methodname = shift protooverrides
     unless methodname goto override_loop
     $P0 = parrotclass.'inspect'('all_parents')
-    iter = new 'Iterator', $P0
+    it = iter $P0
   method_loop:
-    unless iter goto method_end
-    $P0 = shift iter
+    unless it goto method_end
+    $P0 = shift it
     $P0 = $P0.'methods'()
     $P0 = $P0[methodname]
     if null $P0 goto method_loop
@@ -576,7 +576,7 @@ of names separated by spaces.
     goto have_parrotclass
   have_parrotclass:
 
-    .local pmc attrlist, iter
+    .local pmc attrlist, it
     attrlist = options['attr']
     if null attrlist goto attr_done
     $I0 = does attrlist, 'array'
@@ -584,10 +584,10 @@ of names separated by spaces.
     $S0 = attrlist
     attrlist = split ' ', $S0
   have_attrlist:
-    iter = new 'Iterator', attrlist
+    it = iter attrlist
   iter_loop:
-    unless iter goto iter_end
-    $S0 = shift iter
+    unless it goto iter_end
+    $S0 = shift it
     unless $S0 goto iter_loop
     addattribute parrotclass, $S0
     goto iter_loop

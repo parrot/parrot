@@ -228,7 +228,7 @@ pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "dynlexpad - iterator" );
     dlp    = interp['lexpad']
 
     say "Getting iterator"
-    it = new 'Iterator', dlp
+    it = iter dlp
     say "Have iterator"
 iter_loop:
     unless it goto iter_done

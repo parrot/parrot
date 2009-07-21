@@ -143,12 +143,12 @@ pir_output_is( <<'END_CODE', <<'END_OUT', 'new_subclass with attrs' );
     attrs = split ' ', '$a $b $c $d'
     protomaker.'new_subclass'(hashclass, 'Foo::Bar', attrs :flat)
 
-    .local pmc object, iter
+    .local pmc object, it
     object = new 'Foo::Bar'
-    iter = new 'Iterator', attrs
+    it = iter attrs
   iter_loop:
-    unless iter goto iter_end
-    $P0 = shift iter
+    unless it goto iter_end
+    $P0 = shift it
     $S0 = $P0
     setattribute object, $S0, $P0
     $P1 = getattribute object, $S0

@@ -159,17 +159,16 @@ sub optable_output_is {
     if type == 'term:' goto print_term
     if type == 'term:->' goto print_term_arrow
     print '('
-    .local pmc iter
+    .local pmc it
     $P0 = match.'list'()
     if null $P0 goto iter_end
     unless $P0 goto iter_end
-    iter = new 'Iterator', $P0
-    iter = 0
-    unless iter goto iter_end
+    it = iter $P0
+    unless it goto iter_end
   iter_loop:
-    $P0 = shift iter
+    $P0 = shift it
     tree($P0)
-    unless iter goto iter_end
+    unless it goto iter_end
     print ', '
     goto iter_loop
   iter_end:

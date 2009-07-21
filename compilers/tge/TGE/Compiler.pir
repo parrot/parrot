@@ -89,12 +89,11 @@ err_no_tree:
 
     # Iterate over the list of statements, and generate a processed tree for
     # each statement.  Return an array of all the processed statements.
-    .local pmc iter
-    iter = new 'Iterator', node # loop over the array
-    iter = 0 # start at the beginning
+    .local pmc it
+    it = iter node # loop over the array
 loop_start:
-    unless iter goto loop_end
-    $P1 = shift iter
+    unless it goto loop_end
+    $P1 = shift it
     $P2 = tree.'get'('result', $P1, 'statement')
     push statements, $P2
     goto loop_start
@@ -111,14 +110,13 @@ err_no_tree:
     .param pmc node
     .local pmc result
 
-    .local pmc iter
+    .local pmc it
     $P0 = node.'hash'()
-    iter = new 'Iterator', $P0    # setup iterator for node
-    iter = 0
+    it  = iter $P0    # setup iterator for node
   iter_loop:
-    unless iter, iter_end         # while (entries) ...
-      shift $S1, iter           # get the key of the iterator
-      $P2 = iter[$S1]
+    unless it, iter_end         # while (entries) ...
+      shift $S1, it           # get the key of the iterator
+      $P2 = it[$S1]
 
       result = tree.'get'('result', $P2, $S1)
 
@@ -134,15 +132,14 @@ err_no_tree:
     .local pmc rule
     rule = new 'Hash'
 
-    .local pmc iter
+    .local pmc it
     $P0 = node.'hash'()
-    iter = new 'Iterator', $P0    # setup iterator for node
-    iter = 0
+    it  = iter $P0    # setup iterator for node
   iter_loop:
-    unless iter, iter_end         # while (entries) ...
+    unless it, iter_end         # while (entries) ...
       $P3 = new 'Undef'
-      shift $S1, iter           # get the key of the iterator
-      $P2 = iter[$S1]
+      shift $S1, it           # get the key of the iterator
+      $P2 = it[$S1]
 
       $P3 = tree.'get'('value', $P2, $S1)
 
@@ -169,15 +166,14 @@ err_no_rule:
     .local pmc decl
     decl = new 'Hash'
 
-    .local pmc iter
+    .local pmc it
     $P0 = node.'hash'()
-    iter = new 'Iterator', $P0    # setup iterator for node
-    iter = 0
+    it  = iter $P0    # setup iterator for node
   iter_loop:
-    unless iter, iter_end         # while (entries) ...
+    unless it, iter_end         # while (entries) ...
       $P3 = new 'Undef'
-      shift $S1, iter           # get the key of the iterator
-      $P2 = iter[$S1]
+      shift $S1, it           # get the key of the iterator
+      $P2 = it[$S1]
 
       $P3 = tree.'get'('value', $P2, $S1)
 
@@ -296,12 +292,11 @@ Compile a grammar from a source string.
 
     # Construct grammar rules from the data structure of rule info
     .local pmc statement
-    .local pmc iter
-    iter = new 'Iterator', rule_data # loop over the rule info
-    iter = 0 # start at the beginning
+    .local pmc it
+    it = iter rule_data # loop over the rule info
 loop_start:
-    unless iter goto loop_end
-        statement = shift iter
+    unless it goto loop_end
+        statement = shift it
         $S0 = statement['build']
       unless $S0 == 'rule' goto grammar_build
           $S1 = self.'rule_string'(statement)

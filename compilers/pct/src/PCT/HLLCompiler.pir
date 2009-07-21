@@ -41,11 +41,11 @@ running compilers from a command line.
   Options:
     USAGE
 
-    .local pmc iter
-    iter = new 'Iterator', $P0
+    .local pmc it
+    it = iter $P0
   options_loop:
-    unless iter goto options_end
-    $P3  = shift iter
+    unless it goto options_end
+    $P3  = shift it
     $P1 .= "    "
     $P1 .= $P3
     $P1 .= "\n"
@@ -193,15 +193,15 @@ Delete a stage from the compilation process queue.
 .sub 'removestage' :method
     .param string stagename
 
-    .local pmc stages, iter, newstages
+    .local pmc stages, it, newstages
     stages = getattribute self, '@stages'
     newstages = new 'ResizableStringArray'
 
-    iter = new 'Iterator', stages
+    it = iter stages
   iter_loop:
-    unless iter goto iter_end
+    unless it goto iter_end
     .local pmc current
-    current = shift iter
+    current = shift it
     if current == stagename goto iter_loop
       push newstages, current
     goto iter_loop
@@ -245,14 +245,14 @@ be added at every instance of the repeated stage.
       target = adverbs['after']
 
   positional_insert:
-    .local pmc iter, newstages
+    .local pmc it, newstages
     newstages = new 'ResizableStringArray'
 
-    iter = new 'Iterator', stages
+    it = iter stages
   iter_loop:
-    unless iter goto iter_end
+    unless it goto iter_end
     .local pmc current
-    current = shift iter
+    current = shift it
     unless current == target goto no_insert_before
       unless position == 'before' goto no_insert_before
         push newstages, stagename
@@ -293,14 +293,14 @@ when the stage corresponding to target has been reached.
     target = adverbs['target']
     target = downcase target
 
-    .local pmc stages, result, iter
+    .local pmc stages, result, it
     result = source
     stages = getattribute self, '@stages'
-    iter = new 'Iterator', stages
+    it = iter stages
   iter_loop:
-    unless iter goto iter_end
+    unless it goto iter_end
     .local string stagename
-    stagename = shift iter
+    stagename = shift it
     result = self.stagename(result, adverbs :flat :named)
     if target == stagename goto have_result
     goto iter_loop
@@ -690,13 +690,13 @@ options are passed to the evaluator.
   have_files_array:
     .local string code
     code = ''
-    .local pmc iter
-    iter = new 'Iterator', files
+    .local pmc it
+    it = iter files
   iter_loop:
-    unless iter goto iter_end
+    unless it goto iter_end
     .local string iname
     .local pmc ifh
-    iname = shift iter
+    iname = shift it
     ifh = new 'FileHandle'
     unless encoding == 'utf8' goto iter_loop_1
     ifh.'encoding'(encoding)
@@ -738,11 +738,11 @@ Performs option processing of command-line args
     getopts = new 'Getopt::Obj'
     getopts.'notOptStop'(1)
     $P0 = getattribute self, '@cmdoptions'
-    .local pmc iter
-    iter = new 'Iterator', $P0
+    .local pmc it
+    it = iter $P0
   getopts_loop:
-    unless iter goto getopts_end
-    $S0 = shift iter
+    unless it goto getopts_end
+    $S0 = shift it
     push getopts, $S0
     goto getopts_loop
   getopts_end:
@@ -783,11 +783,11 @@ Generic method for compilers invoked from a shell command line.
     opts = self.'process_args'(args)
 
     ##   merge command-line args with defaults passed in from caller
-    .local pmc iter
-    iter = new 'Iterator', opts
+    .local pmc it
+    it = iter opts
   mergeopts_loop:
-    unless iter goto mergeopts_end
-    $S0 = shift iter
+    unless it goto mergeopts_end
+    $S0 = shift it
     $P0 = opts[$S0]
     adverbs[$S0] = $P0
     goto mergeopts_loop

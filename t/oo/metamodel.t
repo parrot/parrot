@@ -109,13 +109,12 @@ get_attr:
 .sub init_pmc :vtable :method
     .param pmc init_args
   # Iterate over the constructor arguments, calling the accessor for each
-    .local pmc iter
-    iter = new 'Iterator', init_args
-    iter = 0
+    .local pmc it
+    it = iter init_args
   iter_loop:
-    unless iter goto iter_end
-    $S1 = shift iter
-    $P1 = iter[$S1]
+    unless it goto iter_end
+    $S1 = shift it
+    $P1 = it[$S1]
     self.$S1($P1)
     goto iter_loop
   iter_end:

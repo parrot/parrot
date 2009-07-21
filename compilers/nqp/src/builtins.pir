@@ -13,12 +13,12 @@ Implementing a Perl 6 style print statement.
 
 .sub 'print'
     .param pmc list            :slurpy
-    .local pmc iter
+    .local pmc it
 
-    iter = new 'Iterator', list
+    it = iter list
   iter_loop:
-    unless iter goto iter_end
-    $P0 = shift iter
+    unless it goto iter_end
+    $P0 = shift it
     print $P0
     goto iter_loop
   iter_end:
