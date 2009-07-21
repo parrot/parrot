@@ -732,7 +732,6 @@ Files included in the =parrot-devel= package:
  /usr/lib/parrot/1.0.0/include/iotypes.pasm
  /usr/lib/parrot/1.0.0/include/iterator.pasm
  /usr/lib/parrot/1.0.0/include/longopt.pasm
- /usr/lib/parrot/1.0.0/include/mmd.pasm
  /usr/lib/parrot/1.0.0/include/opengl_defines.pasm
  /usr/lib/parrot/1.0.0/include/parrotlib.pbc
  /usr/lib/parrot/1.0.0/include/pmctypes.pasm
