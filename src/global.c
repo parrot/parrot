@@ -542,36 +542,6 @@ Parrot_find_global_cur(PARROT_INTERP, ARGIN_NULLOK(STRING *globalname))
 
 /*
 
-=item C<PMC * Parrot_find_global_k(PARROT_INTERP, PMC *pmc_key, STRING
-*globalname)>
-
-Search the namespace designated by C<pmc_key>, which may be a key PMC,
-an array of namespace name strings, or a string PMC, for an object
-with name C<globalname>.  Return the object, or NULL if not found.
-
-RT #46161 - For now this function prefers non-namespaces, it will eventually
-entirely use the untyped interface.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PMC *
-Parrot_find_global_k(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc_key), ARGIN(STRING *globalname))
-{
-    ASSERT_ARGS(Parrot_find_global_k)
-    PMC * const ns =
-        Parrot_get_namespace_keyed(interp,
-                                   Parrot_get_ctx_HLL_namespace(interp),
-                                   pmc_key);
-    return Parrot_find_global_n(interp, ns, globalname);
-}
-
-/*
-
 =item C<PMC * Parrot_find_global_s(PARROT_INTERP, STRING *str_key, STRING
 *globalname)>
 
