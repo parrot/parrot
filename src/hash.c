@@ -843,26 +843,6 @@ parrot_new_hash(PARROT_INTERP)
 
 /*
 
-=item C<void parrot_new_pmc_hash(PARROT_INTERP, PMC *container)>
-
-Creates a new Parrot STRING hash in C<container>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-parrot_new_pmc_hash(PARROT_INTERP, ARGOUT(PMC *container))
-{
-    ASSERT_ARGS(parrot_new_pmc_hash)
-    Hash * const hash = parrot_new_hash(interp);
-    VTABLE_set_pointer(interp, container, hash);
-}
-
-
-/*
-
 =item C<Hash* parrot_new_cstring_hash(PARROT_INTERP)>
 
 Creates a new C string hash in C<hptr>.
