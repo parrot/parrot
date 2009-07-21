@@ -42,20 +42,20 @@
 {
    trace_system_stack_2
    Memcheck:Cond
-   fun:pobject_lives
+   fun:Parrot_gc_mark_PObj_alive
    fun:trace_mem_block
 }
 {
    trace_system_stack_3
    Memcheck:Value4
-   fun:pobject_lives
+   fun:Parrot_gc_mark_PObj_alive
    fun:trace_mem_block
 }
 {
    trace_system_stack_4
    Memcheck:Value4
    fun:mark_special
-   fun:pobject_lives
+   fun:Parrot_gc_mark_PObj_alive
    fun:trace_mem_block
 }
 {

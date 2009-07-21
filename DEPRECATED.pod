@@ -257,10 +257,6 @@ L<https://trac.parrot.org/parrot/ticket/494>
 
 L<https://trac.parrot.org/parrot/ticket/625>
 
-=item pobject_lives [eligible in 1.5]
-
-L<https://trac.parrot.org/parrot/ticket/664>
-
 =item functions in src/stack.c [eligible in 1.5]
 
 L<https://trac.parrot.org/parrot/ticket/702>
