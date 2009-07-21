@@ -134,7 +134,6 @@ src/jit/i386/exec_dep.c
 src/jit/ppc/exec_dep.c
 src/nci_test.c
 src/pbc_dump.c
-src/pbc_info.c
 src/pic.c
 src/pic_jit.c
 src/string/charset/ascii.c

@@ -99,18 +99,6 @@ sub update_fp {
     return;
 }
 
-sub pbc_info {
-    for my $f (@ARGV) {
-        open my $F, "<", "$f" or die "Can't open $f: $!";
-        binmode $F;
-        print "$f\n";
-
-        show_pbc_file_info($F);
-    }
-
-    return;
-}
-
 my @pbc_header_type_names;
 BEGIN {
     @pbc_header_type_names = qw( directory default fixup constant

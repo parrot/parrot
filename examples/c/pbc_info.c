@@ -28,8 +28,7 @@ over the main directory.
 
 /*
 
-=item C<static INTVAL iter(PARROT_INTERP, PackFile_Segment *seg, void
- *user_data)>
+=item C<static INTVAL iter(PARROT_INTERP, PackFile_Segment *seg, void *user_data)>
 
 This function is passed the callback to PackFile_map_segments() to print out
 the name of each segment in the directory.

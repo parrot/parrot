@@ -58,8 +58,6 @@ installable_pbc_disassemble.exe                   [main]bin
 installable_pbc_disassemble                       [main]bin
 installable_pbc_dump.exe                          [main]bin
 installable_pbc_dump                              [main]bin
-installable_pbc_info.exe                          [main]bin
-installable_pbc_info                              [main]bin
 installable_pbc_merge.exe                         [main]bin
 installable_pbc_merge                             [main]bin
 installable_pbc_to_exe.exe                        [main]bin

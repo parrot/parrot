@@ -55,7 +55,7 @@
 /*
 ** Parrot_pbc_read() options:
 **   parrot, pbc_merge, parrot_debugger use 0
-**   pbc_dump, pbc_disassemble, pbc_info use 1 to skip the version check
+**   pbc_dump, pbc_disassemble use 1 to skip the version check
 **   pbc_dump -h requires 2
 **   The rest is for TRACE_PACKFILE debugging with switch -D in pbc_dump
 */

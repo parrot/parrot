@@ -502,7 +502,6 @@ PARROT              := $(CUR_DIR)/@test_prog@$(EXE)
 MINIPARROT          := $(CUR_DIR)/miniparrot$(EXE)
 DIS                 := $(CUR_DIR)/pbc_disassemble$(EXE)
 PDUMP               := $(CUR_DIR)/pbc_dump$(EXE)
-PINFO               := $(CUR_DIR)/pbc_info$(EXE)
 PBCMERGE            := $(CUR_DIR)/pbc_merge$(EXE)
 PDB                 := $(CUR_DIR)/parrot_debugger$(EXE)
 PBC_TO_EXE          := $(CUR_DIR)/pbc_to_exe$(EXE)
@@ -513,7 +512,6 @@ PIRC                := $(CUR_DIR)/pirc$(EXE)
 INSTALLABLEPARROT   := $(CUR_DIR)/installable_parrot$(EXE)
 INSTALLABLEDIS      := $(CUR_DIR)/installable_pbc_disassemble$(EXE)
 INSTALLABLEPDUMP    := $(CUR_DIR)/installable_pbc_dump$(EXE)
-INSTALLABLEPINFO    := $(CUR_DIR)/installable_pbc_info$(EXE)
 INSTALLABLEPBCMERGE := $(CUR_DIR)/installable_pbc_merge$(EXE)
 INSTALLABLEPBCTOEXE := $(CUR_DIR)/installable_pbc_to_exe$(EXE)
 INSTALLABLEPDB      := $(CUR_DIR)/installable_parrot_debugger$(EXE)
@@ -606,7 +604,6 @@ all : \
     $(PBCMERGE) \
     $(PDB) \
     $(PDUMP) \
-    $(PINFO) \
 
 $(GEN_LIBRARY) : $(PARROT)
 
@@ -677,13 +674,11 @@ help :
 	@echo "  world:             'all' and 'parrot_utils'."
 	@echo "  installable:       same as 'world', but targets for installation"
 	@echo ""
-	@echo "  parrot_utils:      $(PDUMP), $(DIS), $(PINFO), $(PDB), $(PBCMERGE) and $(PBC_TO_EXE) $(PARROT_CONFIG)"
+	@echo "  parrot_utils:      $(PDUMP), $(DIS), $(PDB), $(PBCMERGE) and $(PBC_TO_EXE) $(PARROT_CONFIG)"
 	@echo " $(PDUMP):"
 	@echo "                     Parrot Dumper"
 	@echo " $(DIS):"
 	@echo "                     Parrot Disassembler"
-	@echo " $(PINFO):"
-	@echo "                     Information about Parrot Byte Code"
 	@echo " $(PDB):"
 	@echo "                     Parrot Debugger"
 	@echo " $(PBCMERGE):"
@@ -781,9 +776,9 @@ help :
 
 world : all parrot_utils
 
-parrot_utils : $(PDUMP) $(DIS) $(PINFO) $(PDB) $(PBCMERGE) $(PBC_TO_EXE) $(PARROT_CONFIG)
+parrot_utils : $(PDUMP) $(DIS) $(PDB) $(PBCMERGE) $(PBC_TO_EXE) $(PARROT_CONFIG)
 
-installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPINFO) $(INSTALLABLEPDB) $(INSTALLABLEPBCMERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG)
+installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPDB) $(INSTALLABLEPBCMERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG)
 
 
 flags_dummy :
@@ -980,20 +975,6 @@ $(INSTALLABLEPDUMP) : $(SRC_DIR)/pbc_dump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARRO
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 
-# pbc_info
-$(PINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
-	$(LINK) @ld_out@$@ \
-    $(SRC_DIR)/pbc_info$(O) \
-    @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
-#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
-
-$(SRC_DIR)/pbc_info$(O) : $(INC_DIR)/parrot.h $(GEN_HEADERS)
-
-$(INSTALLABLEPINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
-	$(LINK) @ld_out@$@ \
-    $(SRC_DIR)/pbc_info$(O) \
-    @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
-#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 #
 # Parrot Bytecode File Merger
@@ -1694,7 +1675,6 @@ prog-clean :
     $(INSTALLABLEPARROT) \
     $(INSTALLABLEDIS) \
     $(INSTALLABLEPDUMP) \
-    $(INSTALLABLEPINFO) \
     $(INSTALLABLEPBCMERGE) \
     $(INSTALLABLEPBCTOEXE) \
     $(INSTALLABLEPDB) \
@@ -1703,7 +1683,6 @@ prog-clean :
     parrot_config$(EXE) parrot_config.c parrot_config$(O) parrot_config.pbc \
     $(IMCC_DIR)/main$(O) \
     $(PDUMP) $(SRC_DIR)/pbc_dump$(O) $(SRC_DIR)/packdump$(O) \
-    $(SRC_DIR)/pbc_info$(O) $(PINFO) \
     $(PDB) $(SRC_DIR)/parrot_debugger$(O) \
     $(PBCMERGE) $(SRC_DIR)/pbc_merge$(O) \
     $(DIS) $(SRC_DIR)/pbc_disassemble$(O)
@@ -1734,13 +1713,11 @@ archclean: dynoplibs-clean dynpmc-clean dynext-clean
     $(INSTALLABLEPARROT) \
     $(INSTALLABLEDIS) \
     $(INSTALLABLEPDUMP) \
-    $(INSTALLABLEPINFO) \
     $(INSTALLABLEPBCMERGE) \
     $(INSTALLABLEPDB) \
     $(INSTALLABLECONFIG) \
     $(IMCC_DIR)/main$(O) \
     $(PDUMP) $(SRC_DIR)/pbc_dump$(O) $(SRC_DIR)/packdump$(O) \
-    $(PINFO) $(SRC_DIR)/pbc_info$(O) \
     $(PDB) $(SRC_DIR)/parrot_debugger$(O) \
     $(PBCMERGE) $(SRC_DIR)/pbc_merge$(O) \
     $(DIS) $(SRC_DIR)/pbc_disassemble$(O) \

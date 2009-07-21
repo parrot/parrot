@@ -133,9 +133,7 @@ L<https://trac.parrot.org/parrot/ticket/451>
 
 =head1 Class Features
 
-=over 4
-
-=back
+[Nothing at this time.]
 
 =head1 PIR syntax
 

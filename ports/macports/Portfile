@@ -55,7 +55,7 @@ post-destroot {
 
         set executables {
             parrot parrot_config parrot_debugger
-            pbc_disassemble pbc_info pbc_merge pbc_to_exe pbc_dump
+            pbc_disassemble pbc_merge pbc_to_exe pbc_dump
         }
 
         foreach exe $executables { 
