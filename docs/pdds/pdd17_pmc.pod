@@ -1062,15 +1062,6 @@ Check if the element indexed by a PMC, integer, or string key is defined.
 
 Delete the element indexed by a PMC, integer, or string key.
 
-=item nextkey_keyed
-
-  PMC* nextkey_keyed(INTERP, PMC *self, PMC *key, INTVAL what)
-  PMC* nextkey_keyed_int(INTERP, PMC *self, INTVAL key, INTVAL what)
-  PMC* nextkey_keyed_str(INTERP, PMC *self, STRING *key, INTVAL what)
-
-Advance to the next position while iterating through an aggregate. [NOTE: this
-feature needs review together with the Iterator PMC.]
-
 =back
 
 =head4 Math Vtable Functions

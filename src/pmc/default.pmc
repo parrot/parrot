@@ -829,22 +829,6 @@ Converts C<key> to a PMC key and calls C<delete_keyed()> with it.
 
 /*
 
-=item C<PMC *nextkey_keyed_int(INTVAL key, INTVAL w)>
-
-Converts C<key> to a PMC key and returns the result of calling
-C<nextkey_keyed()> with it.
-
-=cut
-
-*/
-
-    VTABLE PMC *nextkey_keyed_int(INTVAL key, INTVAL w) {
-        PMC *const r_key = INT2KEY(INTERP, key);
-        return SELF.nextkey_keyed(r_key, w);
-    }
-
-/*
-
 =item C<INTVAL can(STRING *method)>
 
 Reports whether the PMC "can" perform C<method>.

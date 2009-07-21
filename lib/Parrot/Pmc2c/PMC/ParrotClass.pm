@@ -43,7 +43,6 @@ our @dont_delegate = qw(
     getprops
     is_same
     morph
-    nextkey_keyed_int
     set_integer_keyed_int
     set_number_keyed_int
     set_pmc_keyed_int
