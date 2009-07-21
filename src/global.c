@@ -389,35 +389,6 @@ Parrot_make_namespace_autobase(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
 
 /*
 
-=item C<PMC * Parrot_get_namespace_autobase(PARROT_INTERP, PMC *key)>
-
-Find a namespace with the key C<key>, which may be a String, a Key, or an
-array of strings. If it is a String, then the lookup is relative to the
-current namespace. Otherwise, it is relative to the current HLL root
-namespace. Return the namespace, or NULL if not found.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PMC *
-Parrot_get_namespace_autobase(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
-{
-    ASSERT_ARGS(Parrot_get_namespace_autobase)
-    PMC *base_ns;
-    if (VTABLE_isa(interp, key, CONST_STRING(interp, "String")))
-        base_ns = CONTEXT(interp)->current_namespace;
-    else
-        base_ns = VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace,
-            CONTEXT(interp)->current_HLL);
-    return Parrot_get_namespace_keyed(interp, base_ns, key);
-}
-
-/*
-
 =item C<PMC * Parrot_ns_get_name(PARROT_INTERP, PMC *_namespace)>
 
 Retrieve an array of names from a namespace object.
