@@ -64,6 +64,7 @@ win32-x86-mingw_gcc4.3.0          Y    Y    -     -   -   Y    Y/88  ?  20081203
 win32-x86-msvc_6.0            4   -    Y    -     -   -   Y    Y/8   ?  20090315
 win32-x64-msvc_9.0            8   -    -    -     -   -   Y    Y/51  ?  20081203
 win32-x64-mingw_gcc3.4.5      8   Y    Y    ?     ?   ?   Y    Y     ?  20090210
+win64-amd64-msvc_9.0          8   N    N    N     ?   ?   Y*3  N     ?  20090720
 
 Legend:
 ?   ... unknown or untested
@@ -94,6 +95,8 @@ Remarks:
 *1 gcc and cc defaults to 32bits on solaris, for 64bit use
    --ccflags='-m64' --ldflags='-m64' --linkflags='-m64'
 *2 http://rt.perl.org/rt3/Ticket/Display.html?id=60926
+*3 64-bit MSVC uses 32-bit int and long values. For 64-bit use
+   --ccflags="-GS- -MD" --intval="long long" --opcode="long long"
 
 The following configurations are also working on x86/linux (and possibly
 other platforms):
