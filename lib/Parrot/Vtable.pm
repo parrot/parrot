@@ -275,25 +275,6 @@ EOM
 #define NUM_VTABLE_FUNCTIONS $num_vtable_funcs
 
 #endif /* PARROT_IN_OBJECTS_C */
-
-#ifdef PARROT_IN_OBJECTS_C
-static PARROT_OBSERVER const char * const Parrot_mmd_func_names[] = {
-EOM
-
-    for my $entry ( @{$vtable} ) {
-        next unless ( $entry->[4] =~ /MMD_/ );
-        next if ( $entry->[4] =~ /_INT$/ );
-        next if ( $entry->[4] =~ /_STR$/ );
-        next if ( $entry->[4] =~ /_FLOAT$/ );
-        $macros .= <<"EOM";
-        \"$entry->[1]\",
-EOM
-    }
-    $macros .= <<"EOM";
-    NULL
-};
-
-#endif /* PARROT_IN_OBJECTS_C */
 EOM
 
     $macros;
