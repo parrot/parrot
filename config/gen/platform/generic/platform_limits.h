@@ -16,14 +16,10 @@
    try to define them here. */
 #ifdef _MSC_VER
 #  ifndef LLONG_MAX
-#    ifdef _I64_MAX
-#      define LLONG_MAX _I64_MAX
-#    endif
+#    define LLONG_MAX _I64_MAX
 #  endif
 #  ifndef LLONG_MIN
-#    ifdef _I64_MIN
-#      define LLONG_MIN _I64_MIN
-#    endif
+#    define LLONG_MIN _I64_MIN
 #  endif
 #endif
 
