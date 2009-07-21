@@ -230,10 +230,6 @@ Registers an exit handler to be called from C<Parrot_exit()> in LIFO order.
 The handler function should accept as arguments an interpreter, an integer
 exit code, and an argument (which can be NULL).
 
-=item C<void imcc_init(PARROT_INTERP)>
-
-Initializes the IMCC subsystem.  Required for compiling PIR.
-
 =back
 
 =head2 Loading and running bytecode
@@ -329,18 +325,19 @@ or risk memory leaks.
 Find and return a global called C<name> in the current namespace.  Returns
 C<PMCNULL> if not found.
 
-=item C<Parrot_PMC Parrot_find_global_n(PARROT_INTERP, Parrot_String namespace, Parrot_String name)>
+=item C<Parrot_PMC Parrot_find_global_n(PARROT_INTERP, PMC namespace, Parrot_String name)>
 
-Not documented yet.
+Search the namespace PMC C<namespace> for an object with name C<globalname>.
+Return the object, or NULL if not found.
 
 =item C<Parrot_PMC Parrot_find_global_s(PARROT_INTERP, Parrot_String namespace, Parrot_String name)>
 
 Find and return a global called C<name> in the namespace C<namespace>.  Returns
 C<PMCNULL> if not found.
 
-=item C<void Parrot_store_global_n(PARROT_INTERP, Parrot_String namespace, Parrot_String name, Parrot_PMC val)>
+=item C<void Parrot_store_global_n(PARROT_INTERP, PMC namespace, Parrot_String name, Parrot_PMC val)>
 
-Not documented yet.
+Store the PMC C<val> into the namespace PMC C<namespace> with name C<globalname>.
 
 =item C<void Parrot_store_global_s(PARROT_INTERP, Parrot_String namespace, Parrot_String name, Parrot_PMC val)>
 
@@ -386,7 +383,7 @@ Call a Parrot subroutine that returns an float using the supplied signature.
 
 Returns the class corresponding to the supplied namespace.
 
-=item C<Parrot_PMC VTABLE_instantiate(PARROT_INTERP, Parrot_PMC the_class Parrot_PMC arg)>
+=item C<Parrot_PMC Parrot_PMC_instantiate(PARROT_INTERP, Parrot_PMC the_class, Parrot_PMC arg)>
 
 Instantiates a new object of class C<the_class>, which can be obtained from
 C<Parrot_oo_get_class()>.  Passes an optional PMC argument C<arg> to the
@@ -514,6 +511,1384 @@ future.
 
         return(0);
     }
+
+=head1 EXPORTED FUNCTIONS
+
+The Parrot embedding API is not finalized, and it will go through several
+deprecation cycles before stabilizing.  Below is the comprehensive list of
+candidates for inclusion in the Parrot embedding API.  It includes the
+following types of functions:
+
+=over 4
+
+=item * The core functions documented above
+
+=item * Functions required by macros
+
+=item * Parrot_PMC_* VTABLE wrappers
+
+=item * Miscellaneous functions whose utility outside of the core is
+uncertain.  This includes functions used by HLLs.
+
+=item * Functions that should be removed in a future deprecation cycle.  A
+good example of this is most of the internal string_* functions, which now
+have formal Parrot_str_* wrappers.
+
+=back
+
+The list may also be augmented if additional functionality is required.
+
+=over 4
+
+=item C<disable_event_checking>
+
+=item C<enable_event_checking>
+
+=item C<interpinfo>
+
+=item C<interpinfo_p>
+
+=item C<interpinfo_s>
+
+=item C<mem_allocate_n_typed>
+
+=item C<mem_allocate_n_zeroed_typed>
+
+=item C<mem_allocate_zeroed_typed>
+
+=item C<mem_sys_allocate>
+
+=item C<mem_sys_allocate_zeroed>
+
+=item C<mem_sys_free>
+
+=item C<mem_sys_realloc>
+
+=item C<mem_sys_realloc_zeroed>
+
+=item C<PackFile_Constant_pack>
+
+=item C<PackFile_ConstTable_pack>
+
+=item C<PackFile_ConstTable_pack_size>
+
+=item C<PackFile_destroy>
+
+=item C<PackFile_find_in_const>
+
+=item C<PackFile_fixup_subs>
+
+=item C<PackFile_new>
+
+=item C<PackFile_new_dummy>
+
+=item C<PackFile_pack>
+
+=item C<PackFile_pack_size>
+
+=item C<Parrot_assert>
+
+=item C<Parrot_block_GC_mark>
+
+=item C<Parrot_block_GC_sweep>
+
+=item C<Parrot_byte_index>
+
+=item C<Parrot_byte_rindex>
+
+=item C<Parrot_callback_C>
+
+=item C<Parrot_callback_D>
+
+=item C<Parrot_call_method>
+
+=item C<Parrot_call_method_ret_float>
+
+=item C<Parrot_call_method_ret_int>
+
+=item C<Parrot_call_sub>
+
+=item C<Parrot_call_sub_ret_float>
+
+=item C<Parrot_call_sub_ret_int>
+
+=item C<Parrot_char_digit_value>
+
+=item C<Parrot_charset_c_name>
+
+=item C<Parrot_charset_name>
+
+=item C<Parrot_charset_number>
+
+=item C<Parrot_charset_number_of_str>
+
+=item C<Parrot_charsets_encodings_deinit>
+
+=item C<Parrot_charsets_encodings_init>
+
+=item C<Parrot_clear_debug>
+
+=item C<Parrot_clear_flag>
+
+=item C<Parrot_clear_i>
+
+=item C<Parrot_clear_n>
+
+=item C<Parrot_clear_p>
+
+=item C<Parrot_clear_s>
+
+=item C<Parrot_clear_trace>
+
+=item C<Parrot_clone>
+
+=item C<Parrot_compile_file>
+
+=item C<Parrot_compile_string>
+
+=item C<Parrot_ComposeRole>
+
+=item C<Parrot_compreg>
+
+=item C<Parrot_ComputeMRO_C3>
+
+=item C<Parrot_confess>
+
+=item C<Parrot_context_ref_trace>
+
+=item C<Parrot_cx_add_handler>
+
+=item C<Parrot_cx_add_handler_local>
+
+=item C<Parrot_cx_broadcast_message>
+
+=item C<Parrot_cx_count_handlers_local>
+
+=item C<Parrot_cx_count_handlers_typed>
+
+=item C<Parrot_cx_delete_handler_local>
+
+=item C<Parrot_cx_delete_handler_typed>
+
+=item C<Parrot_cx_delete_suspend_for_gc>
+
+=item C<Parrot_cx_delete_task>
+
+=item C<Parrot_cx_find_handler_for_task>
+
+=item C<Parrot_cx_find_handler_local>
+
+=item C<Parrot_cx_handle_tasks>
+
+=item C<Parrot_cx_peek_task>
+
+=item C<Parrot_cx_request_suspend_for_gc>
+
+=item C<Parrot_cx_runloop_end>
+
+=item C<Parrot_cx_schedule_callback>
+
+=item C<Parrot_cx_schedule_repeat>
+
+=item C<Parrot_cx_schedule_sleep>
+
+=item C<Parrot_cx_schedule_task>
+
+=item C<Parrot_cx_schedule_timer>
+
+=item C<Parrot_cx_send_message>
+
+=item C<Parrot_default_charset>
+
+=item C<Parrot_default_encoding>
+
+=item C<Parrot_del_timer_event>
+
+=item C<Parrot_destroy>
+
+=item C<Parrot_disassemble>
+
+=item C<Parrot_do_check_events>
+
+=item C<Parrot_do_handle_events>
+
+=item C<Parrot_dump_dynamic_environment>
+
+=item C<Parrot_encoding_c_name>
+
+=item C<Parrot_encoding_name>
+
+=item C<Parrot_encoding_number>
+
+=item C<Parrot_encoding_number_of_str>
+
+=item C<Parrot_eprintf>
+
+=item C<Parrot_event_add_io_event>
+
+=item C<Parrot_ex_add_c_handler>
+
+=item C<Parrot_ex_build_exception>
+
+=item C<Parrot_ex_calc_handler_offset>
+
+=item C<Parrot_exit>
+
+=item C<Parrot_ex_mark_unhandled>
+
+=item C<Parrot_ex_rethrow_from_c>
+
+=item C<Parrot_ex_rethrow_from_op>
+
+=item C<Parrot_ex_throw_from_c>
+
+=item C<Parrot_ex_throw_from_c_args>
+
+=item C<Parrot_ex_throw_from_op>
+
+=item C<Parrot_ex_throw_from_op_args>
+
+=item C<Parrot_find_charset>
+
+=item C<Parrot_find_charset_converter>
+
+=item C<Parrot_find_encoding>
+
+=item C<Parrot_find_encoding_converter>
+
+=item C<Parrot_find_global_cur>
+
+=item C<Parrot_find_global_k>
+
+=item C<Parrot_find_global_n>
+
+=item C<Parrot_find_global_op>
+
+=item C<Parrot_find_global_s>
+
+=item C<Parrot_find_language>
+
+=item C<Parrot_find_method_direct>
+
+=item C<Parrot_find_method_with_cache>
+
+=item C<Parrot_find_name_op>
+
+=item C<Parrot_float_rand>
+
+=item C<Parrot_fprintf>
+
+=item C<Parrot_free_context>
+
+=item C<Parrot_free_cstring>
+
+=item C<Parrot_freeze>
+
+=item C<Parrot_freeze_at_destruct>
+
+=item C<Parrot_full_sub_name>
+
+=item C<parrot_gc_context>
+
+=item C<Parrot_gc_gms_init>
+
+=item C<parrot_gc_gms_Parrot_gc_mark_PObj_alive>
+
+=item C<Parrot_gc_mark_PObj_alive>
+
+=item C<Parrot_get_charset>
+
+=item C<Parrot_get_ctx_HLL_namespace>
+
+=item C<Parrot_get_ctx_HLL_type>
+
+=item C<Parrot_get_datatype_enum>
+
+=item C<Parrot_get_datatype_name>
+
+=item C<Parrot_get_encoding>
+
+=item C<Parrot_get_global>
+
+=item C<Parrot_get_HLL_id>
+
+=item C<Parrot_get_HLL_name>
+
+=item C<Parrot_get_HLL_namespace>
+
+=item C<Parrot_get_HLL_type>
+
+=item C<Parrot_get_intreg>
+
+=item C<Parrot_get_namespace_autobase>
+
+=item C<Parrot_get_namespace_keyed>
+
+=item C<Parrot_get_namespace_keyed_str>
+
+=item C<Parrot_get_numreg>
+
+=item C<Parrot_get_pmcreg>
+
+=item C<Parrot_get_root_namespace>
+
+=item C<Parrot_get_runtime_path>
+
+=item C<Parrot_get_runtime_prefix>
+
+=item C<Parrot_get_strreg>
+
+=item C<Parrot_get_vtable>
+
+=item C<Parrot_get_vtable_index>
+
+=item C<Parrot_get_vtable_name>
+
+=item C<Parrot_init_events>
+
+=item C<Parrot_init_signals>
+
+=item C<Parrot_init_stacktop>
+
+=item C<Parrot_int_rand>
+
+=item C<Parrot_invalidate_method_cache>
+
+=item C<Parrot_io_accept>
+
+=item C<Parrot_io_bind>
+
+=item C<Parrot_io_close>
+
+=item C<Parrot_io_close_filehandle>
+
+=item C<Parrot_io_close_piohandle>
+
+=item C<Parrot_io_connect>
+
+=item C<Parrot_IOData_mark>
+
+=item C<Parrot_io_eof>
+
+=item C<Parrot_io_eprintf>
+
+=item C<Parrot_io_fdopen>
+
+=item C<Parrot_io_finish>
+
+=item C<Parrot_io_flush>
+
+=item C<Parrot_io_flush_filehandle>
+
+=item C<Parrot_io_fprintf>
+
+=item C<Parrot_io_get_buffer_end>
+
+=item C<Parrot_io_get_buffer_next>
+
+=item C<Parrot_io_get_buffer_start>
+
+=item C<Parrot_io_getfd>
+
+=item C<Parrot_io_get_file_position>
+
+=item C<Parrot_io_get_file_size>
+
+=item C<Parrot_io_get_flags>
+
+=item C<Parrot_io_get_last_file_position>
+
+=item C<Parrot_io_get_os_handle>
+
+=item C<Parrot_io_init>
+
+=item C<Parrot_io_is_closed>
+
+=item C<Parrot_io_is_closed_filehandle>
+
+=item C<Parrot_io_is_encoding>
+
+=item C<Parrot_io_is_tty>
+
+=item C<Parrot_io_listen>
+
+=item C<Parrot_io_make_offset>
+
+=item C<Parrot_io_new_pmc>
+
+=item C<Parrot_io_new_socket_pmc>
+
+=item C<Parrot_io_open>
+
+=item C<Parrot_io_parse_open_flags>
+
+=item C<Parrot_io_peek>
+
+=item C<Parrot_io_poll>
+
+=item C<Parrot_io_printf>
+
+=item C<Parrot_io_putps>
+
+=item C<Parrot_io_puts>
+
+=item C<Parrot_io_readline>
+
+=item C<Parrot_io_reads>
+
+=item C<Parrot_io_recv>
+
+=item C<Parrot_io_seek>
+
+=item C<Parrot_io_send>
+
+=item C<Parrot_io_set_file_position>
+
+=item C<Parrot_io_set_file_size>
+
+=item C<Parrot_io_set_flags>
+
+=item C<Parrot_io_set_os_handle>
+
+=item C<Parrot_io_socket>
+
+=item C<Parrot_io_socket_is_closed>
+
+=item C<Parrot_io_STDERR>
+
+=item C<Parrot_io_stdhandle>
+
+=item C<Parrot_io_STDIN>
+
+=item C<Parrot_io_STDOUT>
+
+=item C<Parrot_io_tell>
+
+=item C<Parrot_io_write>
+
+=item C<Parrot_is_blocked_GC_mark>
+
+=item C<Parrot_is_blocked_GC_sweep>
+
+=item C<Parrot_kill_event_loop>
+
+=item C<Parrot_lib_add_path>
+
+=item C<Parrot_lib_add_path_from_cstring>
+
+=item C<Parrot_load_bytecode>
+
+=item C<Parrot_load_charset>
+
+=item C<Parrot_load_encoding>
+
+=item C<Parrot_load_language>
+
+=item C<Parrot_load_lib>
+
+=item C<Parrot_locate_runtime_file>
+
+=item C<Parrot_locate_runtime_file_str>
+
+=item C<Parrot_make_cb>
+
+=item C<Parrot_make_default_charset>
+
+=item C<Parrot_make_default_encoding>
+
+=item C<Parrot_make_namespace_autobase>
+
+=item C<Parrot_make_namespace_keyed>
+
+=item C<Parrot_make_namespace_keyed_str>
+
+=item C<Parrot_mmd_cache_create>
+
+=item C<Parrot_mmd_cache_destroy>
+
+=item C<Parrot_mmd_cache_lookup_by_values>
+
+=item C<Parrot_mmd_cache_mark>
+
+=item C<Parrot_mmd_cache_store_by_values>
+
+=item C<Parrot_MMD_method_name>
+
+=item C<Parrot_new>
+
+=item C<Parrot_new_cb_event>
+
+=item C<Parrot_new_charset>
+
+=item C<Parrot_new_encoding>
+
+=item C<Parrot_new_string>
+
+=item C<Parrot_new_suspend_for_gc_event>
+
+=item C<Parrot_new_terminate_event>
+
+=item C<Parrot_new_timer_event>
+
+=item C<Parrot_ns_get_name>
+
+=item C<Parrot_on_exit>
+
+=item C<Parrot_oo_get_class>
+
+=item C<Parrot_oo_get_class_str>
+
+=item C<Parrot_pbc_load>
+
+=item C<Parrot_pbc_read>
+
+=item C<Parrot_PMC_absolute>
+
+=item C<Parrot_PMC_add>
+
+=item C<Parrot_PMC_add_attribute>
+
+=item C<Parrot_PMC_add_float>
+
+=item C<Parrot_PMC_add_int>
+
+=item C<Parrot_PMC_add_method>
+
+=item C<Parrot_PMC_add_parent>
+
+=item C<Parrot_PMC_add_role>
+
+=item C<Parrot_PMC_add_vtable_override>
+
+=item C<Parrot_PMC_assign_pmc>
+
+=item C<Parrot_PMC_assign_string_native>
+
+=item C<Parrot_PMC_bitwise_and>
+
+=item C<Parrot_PMC_bitwise_and_int>
+
+=item C<Parrot_PMC_bitwise_ands>
+
+=item C<Parrot_PMC_bitwise_ands_str>
+
+=item C<Parrot_PMC_bitwise_lsr>
+
+=item C<Parrot_PMC_bitwise_lsr_int>
+
+=item C<Parrot_PMC_bitwise_not>
+
+=item C<Parrot_PMC_bitwise_nots>
+
+=item C<Parrot_PMC_bitwise_or>
+
+=item C<Parrot_PMC_bitwise_or_int>
+
+=item C<Parrot_PMC_bitwise_ors>
+
+=item C<Parrot_PMC_bitwise_ors_str>
+
+=item C<Parrot_PMC_bitwise_shl>
+
+=item C<Parrot_PMC_bitwise_shl_int>
+
+=item C<Parrot_PMC_bitwise_shr>
+
+=item C<Parrot_PMC_bitwise_shr_int>
+
+=item C<Parrot_PMC_bitwise_xor>
+
+=item C<Parrot_PMC_bitwise_xor_int>
+
+=item C<Parrot_PMC_bitwise_xors>
+
+=item C<Parrot_PMC_bitwise_xors_str>
+
+=item C<Parrot_PMC_can>
+
+=item C<Parrot_PMC_clone>
+
+=item C<Parrot_PMC_clone_pmc>
+
+=item C<Parrot_PMC_cmp>
+
+=item C<Parrot_PMC_cmp_num>
+
+=item C<Parrot_PMC_cmp_pmc>
+
+=item C<Parrot_PMC_cmp_string>
+
+=item C<Parrot_PMC_concatenate>
+
+=item C<Parrot_PMC_concatenate_str>
+
+=item C<Parrot_PMC_decrement>
+
+=item C<Parrot_PMC_defined>
+
+=item C<Parrot_PMC_defined_keyed>
+
+=item C<Parrot_PMC_defined_keyed_int>
+
+=item C<Parrot_PMC_defined_keyed_str>
+
+=item C<Parrot_PMC_delete_keyed>
+
+=item C<Parrot_PMC_delete_keyed_int>
+
+=item C<Parrot_PMC_delete_keyed_str>
+
+=item C<Parrot_PMC_delete_pmckey>
+
+=item C<Parrot_PMC_delprop>
+
+=item C<Parrot_PMC_destroy>
+
+=item C<Parrot_PMC_divide>
+
+=item C<Parrot_PMC_divide_float>
+
+=item C<Parrot_PMC_divide_int>
+
+=item C<Parrot_PMC_does>
+
+=item C<Parrot_PMC_does_pmc>
+
+=item C<Parrot_PMC_elements>
+
+=item C<Parrot_PMC_exists_keyed>
+
+=item C<Parrot_PMC_exists_keyed_int>
+
+=item C<Parrot_PMC_exists_keyed_str>
+
+=item C<Parrot_PMC_find_method>
+
+=item C<Parrot_PMC_floor_divide>
+
+=item C<Parrot_PMC_floor_divide_float>
+
+=item C<Parrot_PMC_floor_divide_int>
+
+=item C<Parrot_PMC_get_attr_keyed>
+
+=item C<Parrot_PMC_get_attr_str>
+
+=item C<Parrot_PMC_get_bignum>
+
+=item C<Parrot_PMC_get_bool>
+
+=item C<Parrot_PMC_get_class>
+
+=item C<Parrot_PMC_get_cstring>
+
+=item C<Parrot_PMC_get_cstring_intkey>
+
+=item C<Parrot_PMC_get_cstringn>
+
+=item C<Parrot_PMC_get_cstringn_intkey>
+
+=item C<Parrot_PMC_get_integer>
+
+=item C<Parrot_PMC_get_integer_keyed>
+
+=item C<Parrot_PMC_get_integer_keyed_int>
+
+=item C<Parrot_PMC_get_integer_keyed_str>
+
+=item C<Parrot_PMC_get_intval>
+
+=item C<Parrot_PMC_get_intval_intkey>
+
+=item C<Parrot_PMC_get_intval_pmckey>
+
+=item C<Parrot_PMC_get_iter>
+
+=item C<Parrot_PMC_get_namespace>
+
+=item C<Parrot_PMC_get_number>
+
+=item C<Parrot_PMC_get_number_keyed>
+
+=item C<Parrot_PMC_get_number_keyed_int>
+
+=item C<Parrot_PMC_get_number_keyed_str>
+
+=item C<Parrot_PMC_get_numval>
+
+=item C<Parrot_PMC_get_numval_intkey>
+
+=item C<Parrot_PMC_get_pmc>
+
+=item C<Parrot_PMC_get_pmc_intkey>
+
+=item C<Parrot_PMC_get_pmc_keyed>
+
+=item C<Parrot_PMC_get_pmc_keyed_int>
+
+=item C<Parrot_PMC_get_pmc_keyed_str>
+
+=item C<Parrot_PMC_get_pmc_strkey>
+
+=item C<Parrot_PMC_get_pointer>
+
+=item C<Parrot_PMC_get_pointer_intkey>
+
+=item C<Parrot_PMC_get_pointer_keyed>
+
+=item C<Parrot_PMC_get_pointer_keyed_int>
+
+=item C<Parrot_PMC_get_pointer_keyed_str>
+
+=item C<Parrot_PMC_getprop>
+
+=item C<Parrot_PMC_getprops>
+
+=item C<Parrot_PMC_get_repr>
+
+=item C<Parrot_PMC_get_string>
+
+=item C<Parrot_PMC_get_string_intkey>
+
+=item C<Parrot_PMC_get_string_keyed>
+
+=item C<Parrot_PMC_get_string_keyed_int>
+
+=item C<Parrot_PMC_get_string_keyed_str>
+
+=item C<Parrot_PMC_i_absolute>
+
+=item C<Parrot_PMC_i_add>
+
+=item C<Parrot_PMC_i_add_float>
+
+=item C<Parrot_PMC_i_add_int>
+
+=item C<Parrot_PMC_i_bitwise_and>
+
+=item C<Parrot_PMC_i_bitwise_and_int>
+
+=item C<Parrot_PMC_i_bitwise_ands>
+
+=item C<Parrot_PMC_i_bitwise_ands_str>
+
+=item C<Parrot_PMC_i_bitwise_lsr>
+
+=item C<Parrot_PMC_i_bitwise_lsr_int>
+
+=item C<Parrot_PMC_i_bitwise_not>
+
+=item C<Parrot_PMC_i_bitwise_nots>
+
+=item C<Parrot_PMC_i_bitwise_or>
+
+=item C<Parrot_PMC_i_bitwise_or_int>
+
+=item C<Parrot_PMC_i_bitwise_ors>
+
+=item C<Parrot_PMC_i_bitwise_ors_str>
+
+=item C<Parrot_PMC_i_bitwise_shl>
+
+=item C<Parrot_PMC_i_bitwise_shl_int>
+
+=item C<Parrot_PMC_i_bitwise_shr>
+
+=item C<Parrot_PMC_i_bitwise_shr_int>
+
+=item C<Parrot_PMC_i_bitwise_xor>
+
+=item C<Parrot_PMC_i_bitwise_xor_int>
+
+=item C<Parrot_PMC_i_bitwise_xors>
+
+=item C<Parrot_PMC_i_bitwise_xors_str>
+
+=item C<Parrot_PMC_i_concatenate>
+
+=item C<Parrot_PMC_i_concatenate_str>
+
+=item C<Parrot_PMC_i_divide>
+
+=item C<Parrot_PMC_i_divide_float>
+
+=item C<Parrot_PMC_i_divide_int>
+
+=item C<Parrot_PMC_i_floor_divide>
+
+=item C<Parrot_PMC_i_floor_divide_float>
+
+=item C<Parrot_PMC_i_floor_divide_int>
+
+=item C<Parrot_PMC_i_logical_not>
+
+=item C<Parrot_PMC_i_modulus>
+
+=item C<Parrot_PMC_i_modulus_float>
+
+=item C<Parrot_PMC_i_modulus_int>
+
+=item C<Parrot_PMC_i_multiply>
+
+=item C<Parrot_PMC_i_multiply_float>
+
+=item C<Parrot_PMC_i_multiply_int>
+
+=item C<Parrot_PMC_increment>
+
+=item C<Parrot_PMC_i_neg>
+
+=item C<Parrot_PMC_init>
+
+=item C<Parrot_PMC_init_pmc>
+
+=item C<Parrot_PMC_inspect>
+
+=item C<Parrot_PMC_inspect_str>
+
+=item C<Parrot_PMC_instantiate>
+
+=item C<Parrot_PMC_instantiate_str>
+
+=item C<Parrot_PMC_invoke>
+
+=item C<Parrot_PMC_i_pow>
+
+=item C<Parrot_PMC_i_pow_float>
+
+=item C<Parrot_PMC_i_pow_int>
+
+=item C<Parrot_PMC_i_repeat>
+
+=item C<Parrot_PMC_i_repeat_int>
+
+=item C<Parrot_PMC_isa>
+
+=item C<Parrot_PMC_isa_pmc>
+
+=item C<Parrot_PMC_is_equal>
+
+=item C<Parrot_PMC_is_equal_num>
+
+=item C<Parrot_PMC_is_equal_string>
+
+=item C<Parrot_PMC_is_same>
+
+=item C<Parrot_PMC_i_subtract>
+
+=item C<Parrot_PMC_i_subtract_float>
+
+=item C<Parrot_PMC_i_subtract_int>
+
+=item C<Parrot_PMC_logical_and>
+
+=item C<Parrot_PMC_logical_not>
+
+=item C<Parrot_PMC_logical_or>
+
+=item C<Parrot_PMC_logical_xor>
+
+=item C<Parrot_PMC_mark>
+
+=item C<Parrot_PMC_modulus>
+
+=item C<Parrot_PMC_modulus_float>
+
+=item C<Parrot_PMC_modulus_int>
+
+=item C<Parrot_PMC_morph>
+
+=item C<Parrot_PMC_multiply>
+
+=item C<Parrot_PMC_multiply_float>
+
+=item C<Parrot_PMC_multiply_int>
+
+=item C<Parrot_PMC_name>
+
+=item C<Parrot_PMC_neg>
+
+=item C<Parrot_PMC_new>
+
+=item C<Parrot_PMC_newclass>
+
+=item C<Parrot_PMC_nextkey_keyed>
+
+=item C<Parrot_PMC_nextkey_keyed_int>
+
+=item C<Parrot_PMC_nextkey_keyed_str>
+
+=item C<Parrot_PMC_null>
+
+=item C<Parrot_PMC_pop_float>
+
+=item C<Parrot_PMC_pop_integer>
+
+=item C<Parrot_PMC_pop_pmc>
+
+=item C<Parrot_PMC_pop_string>
+
+=item C<Parrot_PMC_pow>
+
+=item C<Parrot_PMC_pow_float>
+
+=item C<Parrot_PMC_pow_int>
+
+=item C<Parrot_PMC_push_float>
+
+=item C<Parrot_PMC_push_integer>
+
+=item C<Parrot_PMC_push_intval>
+
+=item C<Parrot_PMC_push_numval>
+
+=item C<Parrot_PMC_push_pmc>
+
+=item C<Parrot_PMC_push_pmcval>
+
+=item C<Parrot_PMC_push_string>
+
+=item C<Parrot_PMC_remove_attribute>
+
+=item C<Parrot_PMC_remove_method>
+
+=item C<Parrot_PMC_remove_parent>
+
+=item C<Parrot_PMC_remove_role>
+
+=item C<Parrot_PMC_remove_vtable_override>
+
+=item C<Parrot_PMC_repeat>
+
+=item C<Parrot_PMC_repeat_int>
+
+=item C<Parrot_PMC_set_attr_keyed>
+
+=item C<Parrot_PMC_set_attr_str>
+
+=item C<Parrot_PMC_set_bignum_int>
+
+=item C<Parrot_PMC_set_bignum_num>
+
+=item C<Parrot_PMC_set_bignum_str>
+
+=item C<Parrot_PMC_set_bool>
+
+=item C<Parrot_PMC_set_cstring>
+
+=item C<Parrot_PMC_set_cstring_intkey>
+
+=item C<Parrot_PMC_set_cstringn>
+
+=item C<Parrot_PMC_set_cstringn_intkey>
+
+=item C<Parrot_PMC_set_integer_keyed>
+
+=item C<Parrot_PMC_set_integer_keyed_int>
+
+=item C<Parrot_PMC_set_integer_keyed_str>
+
+=item C<Parrot_PMC_set_integer_native>
+
+=item C<Parrot_PMC_set_integer_same>
+
+=item C<Parrot_PMC_set_intval>
+
+=item C<Parrot_PMC_set_intval_intkey>
+
+=item C<Parrot_PMC_set_number_keyed>
+
+=item C<Parrot_PMC_set_number_keyed_int>
+
+=item C<Parrot_PMC_set_number_keyed_str>
+
+=item C<Parrot_PMC_set_number_native>
+
+=item C<Parrot_PMC_set_number_same>
+
+=item C<Parrot_PMC_set_numval>
+
+=item C<Parrot_PMC_set_numval_intkey>
+
+=item C<Parrot_PMC_set_pmc>
+
+=item C<Parrot_PMC_set_pmc_intkey>
+
+=item C<Parrot_PMC_set_pmc_keyed>
+
+=item C<Parrot_PMC_set_pmc_keyed_int>
+
+=item C<Parrot_PMC_set_pmc_keyed_str>
+
+=item C<Parrot_PMC_set_pmc_pmckey>
+
+=item C<Parrot_PMC_set_pmc_strkey>
+
+=item C<Parrot_PMC_set_pointer>
+
+=item C<Parrot_PMC_set_pointer_intkey>
+
+=item C<Parrot_PMC_set_pointer_keyed>
+
+=item C<Parrot_PMC_set_pointer_keyed_int>
+
+=item C<Parrot_PMC_set_pointer_keyed_str>
+
+=item C<Parrot_PMC_setprop>
+
+=item C<Parrot_PMC_set_string>
+
+=item C<Parrot_PMC_set_string_intkey>
+
+=item C<Parrot_PMC_set_string_keyed>
+
+=item C<Parrot_PMC_set_string_keyed_int>
+
+=item C<Parrot_PMC_set_string_keyed_str>
+
+=item C<Parrot_PMC_set_string_native>
+
+=item C<Parrot_PMC_set_string_same>
+
+=item C<Parrot_PMC_set_vtable>
+
+=item C<Parrot_PMC_share>
+
+=item C<Parrot_PMC_share_ro>
+
+=item C<Parrot_PMC_shift_float>
+
+=item C<Parrot_PMC_shift_integer>
+
+=item C<Parrot_PMC_shift_pmc>
+
+=item C<Parrot_PMC_shift_string>
+
+=item C<Parrot_PMC_slice>
+
+=item C<Parrot_PMC_splice>
+
+=item C<Parrot_PMC_substr>
+
+=item C<Parrot_PMC_substr_str>
+
+=item C<Parrot_PMC_subtract>
+
+=item C<Parrot_PMC_subtract_float>
+
+=item C<Parrot_PMC_subtract_int>
+
+=item C<Parrot_PMC_type_keyed>
+
+=item C<Parrot_PMC_typenum>
+
+=item C<Parrot_PMC_unshift_float>
+
+=item C<Parrot_PMC_unshift_integer>
+
+=item C<Parrot_PMC_unshift_pmc>
+
+=item C<Parrot_PMC_unshift_string>
+
+=item C<Parrot_pop_context>
+
+=item C<Parrot_pop_mark>
+
+=item C<Parrot_printf>
+
+=item C<Parrot_psprintf>
+
+=item C<Parrot_push_action>
+
+=item C<Parrot_push_context>
+
+=item C<Parrot_push_mark>
+
+=item C<Parrot_range_rand>
+
+=item C<Parrot_regenerate_HLL_namespaces>
+
+=item C<Parrot_register_charset>
+
+=item C<Parrot_register_charset_converter>
+
+=item C<Parrot_register_encoding>
+
+=item C<Parrot_register_HLL>
+
+=item C<Parrot_register_HLL_lib>
+
+=item C<Parrot_register_HLL_type>
+
+=item C<Parrot_register_move>
+
+=item C<Parrot_register_pmc>
+
+=item C<Parrot_run_callback>
+
+=item C<Parrot_runcode>
+
+=item C<Parrot_run_meth_fromc>
+
+=item C<Parrot_run_meth_fromc_arglist>
+
+=item C<Parrot_run_meth_fromc_arglist_retf>
+
+=item C<Parrot_run_meth_fromc_arglist_reti>
+
+=item C<Parrot_run_meth_fromc_args>
+
+=item C<Parrot_run_meth_fromc_args_retf>
+
+=item C<Parrot_run_meth_fromc_args_reti>
+
+=item C<Parrot_run_native>
+
+=item C<Parrot_runops_fromc>
+
+=item C<Parrot_runops_fromc_arglist>
+
+=item C<Parrot_runops_fromc_arglist_retf>
+
+=item C<Parrot_runops_fromc_arglist_reti>
+
+=item C<Parrot_runops_fromc_args>
+
+=item C<Parrot_runops_fromc_args_event>
+
+=item C<Parrot_runops_fromc_args_retf>
+
+=item C<Parrot_runops_fromc_args_reti>
+
+=item C<Parrot_schedule_event>
+
+=item C<Parrot_schedule_interp_qentry>
+
+=item C<Parrot_secret_snprintf>
+
+=item C<Parrot_set_config_hash_internal>
+
+=item C<Parrot_set_context_threshold>
+
+=item C<Parrot_set_debug>
+
+=item C<Parrot_set_executable_name>
+
+=item C<Parrot_set_flag>
+
+=item C<Parrot_set_global>
+
+=item C<Parrot_set_intreg>
+
+=item C<Parrot_set_numreg>
+
+=item C<Parrot_set_pmcreg>
+
+=item C<Parrot_set_run_core>
+
+=item C<Parrot_set_strreg>
+
+=item C<Parrot_set_trace>
+
+=item C<Parrot_setwarnings>
+
+=item C<Parrot_shared_gc_block>
+
+=item C<Parrot_shared_gc_unblock>
+
+=item C<Parrot_sleep_on_event>
+
+=item C<Parrot_snprintf>
+
+=item C<Parrot_sprintf_c>
+
+=item C<Parrot_sprintf_s>
+
+=item C<Parrot_srand>
+
+=item C<Parrot_store_global_n>
+
+=item C<Parrot_store_global_s>
+
+=item C<Parrot_store_sub_in_namespace>
+
+=item C<Parrot_str_append>
+
+=item C<Parrot_str_bitwise_and>
+
+=item C<Parrot_str_bitwise_not>
+
+=item C<Parrot_str_bitwise_or>
+
+=item C<Parrot_str_bitwise_xor>
+
+=item C<Parrot_str_boolean>
+
+=item C<Parrot_str_byte_length>
+
+=item C<Parrot_str_change_charset>
+
+=item C<Parrot_str_change_encoding>
+
+=item C<Parrot_str_chopn>
+
+=item C<Parrot_str_chopn_inplace>
+
+=item C<Parrot_str_compare>
+
+=item C<Parrot_str_compose>
+
+=item C<Parrot_str_concat>
+
+=item C<Parrot_str_copy>
+
+=item C<Parrot_str_downcase>
+
+=item C<Parrot_str_downcase_inplace>
+
+=item C<Parrot_str_equal>
+
+=item C<Parrot_str_escape>
+
+=item C<Parrot_str_escape_truncate>
+
+=item C<Parrot_str_find_cclass>
+
+=item C<Parrot_str_find_index>
+
+=item C<Parrot_str_find_not_cclass>
+
+=item C<Parrot_str_finish>
+
+=item C<Parrot_str_format_data>
+
+=item C<Parrot_str_free_cstring>
+
+=item C<Parrot_str_from_int>
+
+=item C<Parrot_str_from_num>
+
+=item C<Parrot_str_indexed>
+
+=item C<Parrot_string_cstring>
+
+=item C<Parrot_str_init>
+
+=item C<Parrot_str_is_cclass>
+
+=item C<Parrot_str_join>
+
+=item C<Parrot_str_length>
+
+=item C<Parrot_str_new>
+
+=item C<Parrot_str_new_constant>
+
+=item C<Parrot_str_new_COW>
+
+=item C<Parrot_str_new_init>
+
+=item C<Parrot_str_new_noinit>
+
+=item C<Parrot_str_not_equal>
+
+=item C<Parrot_str_pin>
+
+=item C<Parrot_str_repeat>
+
+=item C<Parrot_str_replace>
+
+=item C<Parrot_str_resize>
+
+=item C<Parrot_str_reuse_COW>
+
+=item C<Parrot_str_set>
+
+=item C<Parrot_str_split>
+
+=item C<Parrot_str_substr>
+
+=item C<Parrot_str_titlecase>
+
+=item C<Parrot_str_titlecase_inplace>
+
+=item C<Parrot_str_to_cstring>
+
+=item C<Parrot_str_to_hashval>
+
+=item C<Parrot_str_to_int>
+
+=item C<Parrot_str_to_num>
+
+=item C<Parrot_str_unescape>
+
+=item C<Parrot_str_unpin>
+
+=item C<Parrot_str_upcase>
+
+=item C<Parrot_str_upcase_inplace>
+
+=item C<Parrot_str_write_COW>
+
+=item C<Parrot_sub_new_from_c_func>
+
+=item C<Parrot_test_debug>
+
+=item C<Parrot_test_flag>
+
+=item C<Parrot_test_trace>
+
+=item C<Parrot_thaw>
+
+=item C<Parrot_thaw_constants>
+
+=item C<Parrot_uint_rand>
+
+=item C<Parrot_unblock_GC_mark>
+
+=item C<Parrot_unblock_GC_sweep>
+
+=item C<Parrot_unregister_pmc>
+
+=item C<Parrot_vfprintf>
+
+=item C<Parrot_vsnprintf>
+
+=item C<Parrot_vsprintf_c>
+
+=item C<Parrot_vsprintf_s>
+
+=item C<Parrot_warn>
+
+=item C<PMC_is_null>
+
+=item C<pmc_new>
+
+=item C<pmc_type>
+
+=item C<PObj_active_destroy_SET>
+
+=item C<PObj_custom_mark_SET>
+
+=item C<string_capacity>
+
+=item C<string_chr>
+
+=item C<string_make>
+
+=item C<string_make_from_charset>
+
+=item C<string_max_bytes>
+
+=item C<string_ord>
+
+=item C<string_primary_encoding_for_representation>
+
+=item C<string_rep_compatible>
+
+=item C<string_to_cstring_nullable>
+
+=back
 
 =head1 SEE ALSO
 
