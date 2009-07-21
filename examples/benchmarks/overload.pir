@@ -3,7 +3,6 @@
 
 .sub bench :main
 .include "pmctypes.pasm"
-.include "mmd.pasm"
    .local int i
    .local pmc r
    .local pmc a
