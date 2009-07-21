@@ -288,21 +288,7 @@ trace_op_dump(PARROT_INTERP,
 
     s = 1;
     len = Parrot_io_eprintf(debugger, "%6vu ", (UINTVAL)(pc - code_start));
-    if (STREQ(info->name, "infix")) {
-        /* this should rather be MMD_opcode_name, which doesn't
-         * exit yet
-         */
-        len += Parrot_io_eprintf(debugger, "%s",
-                Parrot_MMD_method_name(interp, pc[1]) + 2);
-        s = 2;
-    }
-    else if (STREQ(info->name, "n_infix")) {
-        len += Parrot_io_eprintf(debugger, "n_%s",
-                Parrot_MMD_method_name(interp, pc[1]) + 2);
-        s = 2;
-    }
-    else
-        len += Parrot_io_eprintf(debugger, "%s", info->name);
+    len += Parrot_io_eprintf(debugger, "%s", info->name);
 
     n = info->op_count;
     var_args = 0;

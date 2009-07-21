@@ -1012,8 +1012,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_mmd_cache_store_by_values>
 
-=item C<Parrot_MMD_method_name>
-
 =item C<Parrot_new>
 
 =item C<Parrot_new_cb_event>

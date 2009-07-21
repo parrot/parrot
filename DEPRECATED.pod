@@ -232,16 +232,6 @@ check in 1.4 or 2.0 for the new names.
 
 L<https://trac.parrot.org/parrot/ticket/443>
 
-=item parrot_new_pmc_hash [eligible in 1.5]
-
-This function will be removed.  parrot_new_hash should be used in its place.
-
-L<https://trac.parrot.org/parrot/ticket/494>
-
-=item Parrot_MMD_method_name [eligible in 1.5]
-
-L<https://trac.parrot.org/parrot/ticket/625>
-
 =item functions in src/stack.c [eligible in 1.5]
 
 L<https://trac.parrot.org/parrot/ticket/702>

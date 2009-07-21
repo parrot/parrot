@@ -2578,17 +2578,6 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
 
             size += sprintf(&dest[size], INTVAL_FMT, i);
 
-            /* If this is a constant dispatch arg to an "infix" op, then show
-               the corresponding symbolic op name. */
-            if (j == 1 && info->types[j - 1] == PARROT_ARG_IC
-                && (STREQ(info->name, "infix") || STREQ(info->name, "n_infix"))) {
-                PARROT_ASSERT(size + 20 < space);
-
-                size += sprintf(&dest[size], " [%s]",
-                        /* [kludge: the "2+" skips the leading underscores.  --
-                           rgr, 6-May-07.] */
-                        2 + Parrot_MMD_method_name(interp, op[j]));
-            }
             break;
         case PARROT_ARG_NC:
             {

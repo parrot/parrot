@@ -104,11 +104,6 @@ void Parrot_invalidate_method_cache(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-PARROT_PURE_FUNCTION
-PARROT_CAN_RETURN_NULL
-const char* Parrot_MMD_method_name(SHIM_INTERP, INTVAL idx);
-
-PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
@@ -215,7 +210,6 @@ INTVAL Parrot_oo_register_type(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_invalidate_method_cache \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_Parrot_MMD_method_name __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_Parrot_oo_get_class __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(key)
