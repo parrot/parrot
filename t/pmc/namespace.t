@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 67;
+use Parrot::Test tests => 68;
 use Parrot::Config;
 
 =head1 NAME
@@ -1806,6 +1806,35 @@ CODE
 /
 ok 1
 Could not find non-existent sub nok/
+OUT
+
+
+pir_output_is( <<'CODE', <<'OUT', 'HLL_map on namespace', todo => 'TT #867');
+.HLL 'tcl'
+
+.sub 'foo' :anon :init
+  $P1 = get_class 'NameSpace'
+  $P2 = subclass $P1, 'BSNS'
+  $P0 = getinterp
+  $P0.'hll_map'($P1, $P2)
+.end
+
+.namespace ['a';'b';'c']
+
+.sub 'hi'
+  noop
+.end
+
+.namespace []
+
+.sub 'blah' :main
+  $P1 = get_hll_namespace ['a';'b';'c']
+  $S0 = typeof $P1
+  print 'ok 1 - '
+  say $S0
+.end
+CODE
+ok 1 - BSNS
 OUT
 
 # Local Variables:
