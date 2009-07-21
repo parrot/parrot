@@ -93,4 +93,6 @@ Francois Perrad.
  Infinoid    1.2.0          2009-May-19     "Bird Brain"
  Whiteknight 1.3.0          2009-Jun-16     "Andean Swift"
 
+ cotto       1.4.0          2009-Jul-21     "Mundo Cani"
+
 =cut

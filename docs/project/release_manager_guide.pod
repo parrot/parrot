@@ -125,6 +125,9 @@ as these are only used in development and not relevant to the bytecode support
 policy. (Those changes are all included within the major version number
 increase for the supported release.)
 
+Once you've updated PBC_COMPAT, run C<tools/dev/mk_native_pbc> to update the
+pbc files used in the native pbc tests.
+
 =item h
 
 Make sure everything works:
@@ -361,7 +364,6 @@ the 3rd Tuesday of each month.
 The starred releases are Parrot's twice-yearly supported releases, see
 F<docs/project/support_policy.pod>.
 
- - July 21, 2009     - 1.4* - cotto
  - August 18, 2009   - 1.5  - rgrjr
  - Sept 15, 2009     - 1.6  - particle
  - Oct 20, 2009      - 1.7  -
