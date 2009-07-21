@@ -141,7 +141,7 @@ while (<>) {
 
     my $ret_sig = $sig_table{$ret};
 
-    if ($args =~ /[234]/) {
+    if ($args =~ /[234V]/) {
         push @nci_defs, create_function(
             $sig, $ret,
             $args, [@arg],

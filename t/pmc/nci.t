@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -2646,11 +2646,6 @@ CODE
 3
 OUTPUT
 
-{
-    local $TODO = 0;
-    if ($PConfig{jitcapable}){
-        $TODO = "TT #551 - jitted NCI sig with V is broken";
-    }
 pir_output_is( << 'CODE', << 'OUTPUT', "nci_vVi - void** out parameter" );
 .sub test :main
     .local string library_name
@@ -2673,7 +2668,6 @@ pir_output_is( << 'CODE', << 'OUTPUT', "nci_vVi - void** out parameter" );
 CODE
 got 10
 OUTPUT
-}
 
 pir_output_is( << 'CODE', << 'OUTPUT', "nci_ttt - t_tt parameter" );
 .sub test :main
@@ -2711,11 +2705,6 @@ CODE
 1
 OUTPUT
 
-{
-    local $TODO = 0;
-    if ($PConfig{jitcapable}){
-        $TODO = "TT #551 - jitted NCI sig with V is broken";
-    }
 pir_output_is( << 'CODE', << 'OUTPUT', "nci_vV - char** out parameter" );
 .sub test :main
     .local string library_name
@@ -2763,7 +2752,6 @@ Hello bright new world!
 It is a beautiful day!
 Go suck a lemon.
 OUTPUT
-}
 
 # Local Variables:
 #   mode: cperl

@@ -2265,15 +2265,6 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
                 break;
             case 'v':
                 break;
-            case 'V':
-                emitm_call_cfunc(pc, get_nci_P);
-                emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
-                /* Call the get_pointer VTABLE on the Pointer PMC to get the returned pointer */
-                emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, offsetof(PMC, vtable));
-                emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, offsetof(VTABLE, get_pointer));
-                emitm_callr(pc, emit_EAX);
-                emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
-                break;
             case 'b':   /* buffer (void*) pass PObj_bufstart(SReg) */
                 emitm_call_cfunc(pc, get_nci_S);
                 emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1,
@@ -2296,6 +2287,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
             case '2':
             case '3':
             case '4':
+            case 'V':
                 mem_free_executable(jit_info.native_ptr, JIT_ALLOC_SIZE);
                 return NULL;
                 break;
