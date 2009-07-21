@@ -30,7 +30,6 @@ PMC2CC := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --c
 PMC_TARGETS := \
   dynlexpad$(LOAD_EXT) \
   foo$(LOAD_EXT) \
-  pair$(LOAD_EXT) \
   rotest$(LOAD_EXT) \
 #IF(has_gdbm):  gdbmhash$(LOAD_EXT) \
   rational$(LOAD_EXT) \
@@ -113,18 +112,6 @@ foo.c: foo.dump
 
 foo.dump: foo.pmc
 	$(PMC2CD) foo.pmc
-
-pair$(LOAD_EXT): pair$(O)
-	$(LD) @ld_out@pair$(LOAD_EXT) pair$(O) $(LINKARGS)
-
-pair$(O): pair.c
-	$(CC) -c @cc_o_out@pair$(O) $(INCLUDES) $(CFLAGS) pair.c
-
-pair.c: pair.dump
-	$(PMC2CC) pair.pmc
-
-pair.dump: pair.pmc
-	$(PMC2CD) pair.pmc
 
 rotest$(LOAD_EXT): rotest$(O)
 	$(LD) @ld_out@rotest$(LOAD_EXT) rotest$(O) $(LINKARGS)
