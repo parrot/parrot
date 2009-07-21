@@ -3,19 +3,32 @@
 New in 1.4.0
 - Core
   + Key and Iterator refactor
-  + major pbc_to_exe generated code speed improvement
-  + new "Infinite Memory" GC core for demonstration purposes
+  + Major pbc_to_exe generated code speed improvement
+  + New "Infinite Memory" GC core for demonstration purposes
   + gc_debug runcore and GC-related heisenbug fixes
-  + elimination of variable expansion in parrot_config
+  + Elimination of variable expansion in parrot_config
   + CLI arguments are processed as Unicode by default
-  + substantial optimizations in NCI
-  + Win64 build builds (?)
-  + Thread leaks plugs
-  + C indentation coding standards test improvement
+  + Substantial optimizations in NCI
+  + Parrot builds on Win64
   + Hashes can use native types as keys and values
-  + Beginnings of OpenGL::Math library; OpenGL bindings and library marked experimental
+  + Fixed installed pbc_to_exe
+  + Simplification of PMC generation code
+  + Improved GC encapsulation and API documentation
 - Documentation
-  + Listed candidates for embedding API (docs/embed.pod)
+  + List of candidates for embedding API (docs/embed.pod)
+  + PIR book sent to publisher
+- Testing
+  + Several conversions of Perl test to pure PIR.
+  + C indentation coding standards test improvement
+  + Improved test coverage of example code
+- Deprecations
+  + Removal of PGE rules: <null> <fail> <sp> <lt> <gt> <dot>
+  + Removal of PGE methods: .text .item .result_object
+  + Deprecation of most dynops
++ Miscellaneous
+  + Beginnings of OpenGL::Math library; OpenGL bindings and library marked experimental
+  + Localizing and consting fixes
+  + Many memory and thread-related leaks plugged
 
 New in 1.3.0
 - Core
