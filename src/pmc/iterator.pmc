@@ -86,18 +86,8 @@ Defaults iteration mode to iterate from start.
 */
 
     VTABLE void init_pmc(PMC *aggregate) {
-        if (VTABLE_does(INTERP, aggregate, CONST_STRING(INTERP, "array"))
-            || VTABLE_does(INTERP, aggregate, CONST_STRING(INTERP, "hash"))
-            || VTABLE_does(INTERP, aggregate, CONST_STRING(INTERP, "string"))) {
-            /* It's ugly hack... But I cant figure out proper way to do it. */
-            PMC * const real_iter = VTABLE_get_iter(INTERP, aggregate);
-            SELF = pmc_reuse_init(INTERP, SELF, VTABLE_type(INTERP, real_iter), aggregate, 0);
-            return;
-        }
-        else {
-            /* Die horribly */
-            PARROT_ASSERT(!"Unsupported Aggregate for Iterator");
-        }
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "Direct creation of Iterator");
     }
 
 
