@@ -239,6 +239,8 @@ sub read_ops {
 
     open my $OPS, '<', $file or die "Can't open $file, $!/$^E";
 
+    $self->version( $PConfig{VERSION} );
+
     if ( !( $file =~ s/\.ops$/.c/ ) ) {
         $file .= ".c";
     }
@@ -257,36 +259,24 @@ sub read_ops {
     my @argdirs;
     my $seen_pod;
     my $seen_op;
+    my $in_preamble;
     my $line;
     my $flags;
     my @labels;
 
     while (<$OPS>) {
-        $seen_pod = 1 if m|^=|;
+        $seen_pod    = 1 if m|^=|;
+        $in_preamble = 1 if s|^BEGIN_OPS_PREAMBLE||;
 
         unless ( $seen_op or m|^(inline\s+)?op\s+| ) {
-            if (m/^\s*VERSION\s*=\s*"(\d+\.\d+\.\d+)"\s*;\s*$/)
-            {
-                if ( exists $self->{VERSION} ) {
 
-                    #die "VERSION MULTIPLY DEFINED!";
-                }
-
-                $self->version($1);
+            if (m|^END_OPS_PREAMBLE|) {
                 $_ = '';
+                $in_preamble = 0;
             }
-            elsif (m/^\s*VERSION\s*=\s*PARROT_VERSION\s*;\s*$/) {
-                if ( exists $self->{VERSION} ) {
-
-                    #die "VERSION MULTIPLY DEFINED!";
-                }
-
-                $self->version( $PConfig{VERSION} );
-                $_ = '';
+            elsif ($in_preamble) {
+                $self->{PREAMBLE} .= $_;
             }
-
-            $self->{PREAMBLE} .= $_
-                unless $seen_pod or $count;    # Lines up to first op def.
 
             next;
         }

@@ -222,8 +222,6 @@ ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
 ** dummy.ops
 */
 
-VERSION = PARROT_VERSION;
-
 inline op zzzzzz(inout INT, in INT) :base_core {
   goto NEXT();
 }

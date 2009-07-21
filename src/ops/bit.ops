@@ -3,6 +3,7 @@
 ** bit.ops
 */
 
+BEGIN_OPS_PREAMBLE
  /* Signed shift operator that is compatible with PMC shifts.  This is
   * guaranteed to produce the same result as bitwise_left_shift_internal modulo
   * word size, ignoring the fact that Parrot integers are always signed.  This
@@ -18,7 +19,7 @@
      : (bits) > -8*INTVAL_SIZE   ? (number) >> -(bits)   \
      : 0)
 
-VERSION = PARROT_VERSION;
+END_OPS_PREAMBLE
 
 =head1 NAME
 

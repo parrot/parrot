@@ -3,8 +3,6 @@
 ** var.ops
 */
 
-VERSION = PARROT_VERSION;
-
 =head1 NAME
 
 var.ops - Variable Opcodes

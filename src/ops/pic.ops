@@ -3,12 +3,12 @@
 ** pic.ops
 */
 
+BEGIN_OPS_PREAMBLE
 #include "parrot/oplib/ops.h"
 #include "../src/pmc/pmc_fixedintegerarray.h"
 
 typedef opcode_t* (*interface_f)(Interp*, INTVAL*, void **);
-
-VERSION = PARROT_VERSION;
+END_OPS_PREAMBLE
 
 =head1 NAME
 

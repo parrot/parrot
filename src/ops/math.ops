@@ -3,8 +3,6 @@
 ** math.ops
 */
 
-VERSION = PARROT_VERSION;
-
 =head1 NAME
 
 math.ops - Mathematical Opcodes

@@ -3,13 +3,15 @@
 ** core.ops
 */
 
+BEGIN_OPS_PREAMBLE
+
 #include "parrot/dynext.h"
 #include "parrot/embed.h"
 #include "parrot/runcore_api.h"
 #include "../pmc/pmc_continuation.h"
 #include "../pmc/pmc_parrotlibrary.h"
 
-VERSION = PARROT_VERSION;
+END_OPS_PREAMBLE
 
 =head1 NAME
 

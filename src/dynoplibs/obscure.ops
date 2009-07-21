@@ -3,9 +3,11 @@
 ** obscure.ops
 */
 
+BEGIN_OPS_PREAMBLE
+
 #include <math.h>
 
-VERSION = PARROT_VERSION;
+END_OPS_PREAMBLE
 
 =head1 NAME
 

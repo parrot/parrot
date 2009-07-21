@@ -3,8 +3,6 @@
 ** set.ops
 */
 
-VERSION = PARROT_VERSION;
-
 =head1 NAME
 
 set.ops - Assignment Opcodes

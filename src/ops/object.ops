@@ -6,9 +6,6 @@ object.ops
 
 */
 
-
-VERSION = PARROT_VERSION;
-
 =head1 NAME
 
 object.ops - Class and Object Opcodes

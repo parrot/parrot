@@ -17,11 +17,13 @@ $core = q{
 ** pseudo-core.ops
 */
 
+BEGIN_OPS_PREAMBLE
+
 #include "parrot/dynext.h"
 #include "parrot/embed.h"
 #include "../interp/interp_guts.h"
 
-VERSION = PARROT_VERSION;
+END_OPS_PREAMBLE
 
 =head1 NAME
 
@@ -151,8 +153,6 @@ as the Parrot interpreter itself.
 ** pseudo-debug.ops
 */
 
-VERSION = PARROT_VERSION;
-
 =head1 NAME
 
 pseudo-debug.ops
@@ -269,8 +269,6 @@ $string = q{
  * $Id$
 ** pseudo-string.ops
 */
-
-VERSION = PARROT_VERSION;
 
 =head1 NAME
 

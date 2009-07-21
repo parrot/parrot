@@ -4,8 +4,9 @@
 ** io.ops
 */
 
-VERSION = PARROT_VERSION;
+BEGIN_OPS_PREAMBLE
 #include "../io/io_private.h"
+END_OPS_PREAMBLE
 
 
 =head1 NAME

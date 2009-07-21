@@ -7,8 +7,6 @@
 ** debug.ops
 */
 
-VERSION = PARROT_VERSION;
-
 =head1 NAME
 
 debug.ops - Debugging Opcodes

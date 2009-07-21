@@ -6,8 +6,6 @@ pmc.ops
 
 */
 
-VERSION = PARROT_VERSION;
-
 =head1 NAME
 
 pmc.ops - PMC Opcodes

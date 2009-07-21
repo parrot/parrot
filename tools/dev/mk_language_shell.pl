@@ -1228,8 +1228,11 @@ __src/ops/@lclang@.ops__
  * Copyright (C) 20xx, Parrot Foundation.
  */
 
+BEGIN_OPS_PREAMBLE
+
 #include "parrot/dynext.h"
-VERSION = PARROT_VERSION;
+
+END_OPS_PREAMBLE
 
 /* Op to get the address of a PMC. */
 inline op @lclang@_pmc_addr(out INT, invar PMC) :base_core {
