@@ -239,13 +239,6 @@ Here is a list of functions in this file which are currently being exported:
 
 * = item may be kept but reimplemented.
 
-=item Parrot_str_free [eligible in 1.5]
-
-L<https://trac.parrot.org/parrot/ticket/826>
-
-This function was an attempt of optimization, but is error prone. Let the
-garbage collector take care.
-
 =back
 
 =head1 Compiler tools

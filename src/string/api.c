@@ -229,27 +229,6 @@ Parrot_str_set(PARROT_INTERP, ARGIN_NULLOK(STRING *dest), ARGMOD(STRING *src))
 
 /*
 
-=item C<void Parrot_str_free(PARROT_INTERP, STRING *s)>
-
-Frees the given STRING's header, accounting for reference counts for the
-STRING's buffer &c.  Use this only if you I<know> that nothing else has stored
-the STRING elsewhere.
-
-This function has been deprecated.
-
-=cut
-
-*/
-
-void
-Parrot_str_free(PARROT_INTERP, ARGIN(STRING *s))
-{
-    ASSERT_ARGS(Parrot_str_free)
-    Parrot_gc_free_string_header(interp, s);
-}
-
-/*
-
 =back
 
 =head2 Basic String Functions
