@@ -318,7 +318,6 @@ GEN_LIBRARY := \
     $(LIBRARY_DIR)/YAML/Parser/Syck.pbc \
     $(LIBRARY_DIR)/STM.pbc \
     $(LIBRARY_DIR)/libpcre.pbc \
-    $(LIBRARY_DIR)/Data/Replace.pbc \
     $(LIBRARY_DIR)/postgres.pbc
 
 # the dependencies of $(SRC_DIR)/jit_emit.h are done explicitly
