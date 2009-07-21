@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  61;
+use Test::More tests =>  31;
 use Carp;
 use Cwd;
 use File::Spec;
@@ -102,63 +102,8 @@ is($step->_select_lib( {
    '-lgmp',
    "_select_lib() returned expected value");
 
-########### _handle_darwin_for_fink() ###########
-
 my ($flagsbefore, $flagsafter);
-$osname = 'foobar';
-$flagsbefore = $conf->data->get( 'linkflags' );
-ok($step->_handle_darwin_for_fink($conf, $osname, 'gmp.h'),
-    "handle_darwin_for_fink() returned true value");
-$flagsafter = $conf->data->get( 'linkflags' );
-is($flagsbefore, $flagsafter, "No change in linkflags, as expected");
-
 my $cwd = cwd();
-{
-    my $tdir = tempdir( CLEANUP => 1 );
-    ok(chdir $tdir, "Able to change to temporary directory");
-    ok( (mkdir 'lib'), "Able to make lib directory");
-    ok( (mkdir 'include'), "Able to make include directory");
-    my $libdir = File::Spec->catdir( $tdir, 'lib' );
-    my $includedir = File::Spec->catdir( $tdir, 'include' );
-    $conf->data->set('fink_lib_dir' => $libdir);
-    $conf->data->set('fink_include_dir' => $includedir);
-    $osname = 'darwin';
-    $flagsbefore = $conf->data->get( 'linkflags' );
-    ok($step->_handle_darwin_for_fink($conf, $osname, 'gmp.h'),
-        "handle_darwin_for_fink() returned true value");
-    $flagsafter = $conf->data->get( 'linkflags' );
-    is($flagsbefore, $flagsafter, "No change in linkflags, as expected");
-
-    ok(chdir $cwd, "Able to change back to original directory after testing");
-}
-
-{
-    my $tdir2 = tempdir( CLEANUP => 1 );
-    ok(chdir $tdir2, "Able to change to temporary directory");
-    ok( (mkdir 'lib'), "Able to make lib directory");
-    ok( (mkdir 'include'), "Able to make include directory");
-    my $libdir = File::Spec->catdir( $tdir2, 'lib' );
-    my $includedir = File::Spec->catdir( $tdir2, 'include' );
-    $conf->data->set('fink_lib_dir' => $libdir);
-    $conf->data->set('fink_include_dir' => $includedir);
-    my $foo = File::Spec->catfile( $includedir, 'gmp.h' );
-    open my $FH, ">", $foo or croak "Could not open for writing";
-    print $FH "Hello world\n";
-    close $FH or croak "Could not close after writing";
-
-    $osname = 'darwin';
-    $flagsbefore = $conf->data->get( 'linkflags' );
-    ok($step->_handle_darwin_for_fink($conf, $osname, 'gmp.h'),
-        "handle_darwin_for_fink() returned true value");
-    $flagsafter = $conf->data->get( 'linkflags' );
-    isnt($flagsbefore, $flagsafter, "Change in linkflags, as expected");
-    like($conf->data->get( 'linkflags' ), qr/-L\Q$libdir\E/,
-        "'linkflags' modified as expected");
-
-    ok(chdir $cwd, "Able to change back to original directory after testing");
-}
-
-$conf->replenish($serialized);
 
 ########### _evaluate_cc_run() ###########
 
@@ -208,66 +153,6 @@ is($has_gmp, 0, "gmp status unchanged");
     $conf->data->set('gmp' => undef);
     $conf->data->set('HAS_GMP' => undef);
     $step->set_result(undef);
-}
-
-########### _handle_darwin_for_fink() ###########
-
-($args, $step_list_ref) = process_options( {
-    argv => [ ],
-    mode => q{configure},
-} );
-$conf->options->set( %{$args} );
-$step = test_step_constructor_and_description($conf);
-# Mock values for OS
-$osname = 'darwin';
-$conf->data->set( 'linkflags'  => 'foobar' );
-$flagsbefore = $conf->data->get( 'linkflags' );
-$conf->data->set( fink_lib_dir  => undef );
-$conf->data->set( fink_include_dir  => undef );
-ok($step->_handle_darwin_for_fink($conf, $osname, 'gmp.h'),
-    "handle_darwin_for_fink() returned true value");
-$flagsafter = $conf->data->get( 'linkflags' );
-is($flagsbefore, $flagsafter, "No change in linkflags, as expected");
-
-$cwd = cwd();
-{
-    my $tdir = tempdir( CLEANUP => 1 );
-    ok(chdir $tdir, "Able to change to temporary directory");
-    ok( (mkdir 'lib'), "Able to make lib directory");
-#    ok( (mkdir 'include'), "Able to make include directory");
-    my $libdir = File::Spec->catdir( $tdir, 'lib' );
-    my $includedir = File::Spec->catdir( $tdir, 'include' );
-    $conf->data->set('fink_lib_dir' => $libdir);
-    $conf->data->set('fink_include_dir' => $includedir);
-    $osname = 'darwin';
-    $conf->data->set( 'linkflags'  => 'foobar' );
-    $flagsbefore = $conf->data->get( 'linkflags' );
-    ok($step->_handle_darwin_for_fink($conf, $osname, 'gmp.h'),
-        "handle_darwin_for_fink() returned true value");
-    $flagsafter = $conf->data->get( 'linkflags' );
-    is($flagsbefore, $flagsafter, "No change in linkflags, as expected");
-
-    ok(chdir $cwd, "Able to change back to original directory after testing");
-}
-
-{
-    my $tdir1 = tempdir( CLEANUP => 1 );
-    ok(chdir $tdir1, "Able to change to temporary directory");
-#    ok( (mkdir 'lib'), "Able to make lib directory");
-    ok( (mkdir 'include'), "Able to make include directory");
-    my $libdir = File::Spec->catdir( $tdir1, 'lib' );
-    my $includedir = File::Spec->catdir( $tdir1, 'include' );
-    $conf->data->set('fink_lib_dir' => $libdir);
-    $conf->data->set('fink_include_dir' => $includedir);
-    $osname = 'darwin';
-    $conf->data->set( 'linkflags'  => 'foobar' );
-    $flagsbefore = $conf->data->get( 'linkflags' );
-    ok($step->_handle_darwin_for_fink($conf, $osname, 'gmp.h'),
-        "handle_darwin_for_fink() returned true value");
-    $flagsafter = $conf->data->get( 'linkflags' );
-    is($flagsbefore, $flagsafter, "No change in linkflags, as expected");
-
-    ok(chdir $cwd, "Able to change back to original directory after testing");
 }
 
 pass("Completed all tests in $0");

@@ -61,10 +61,6 @@ sub runstep {
         default         => '-lgdbm',
     } );
 
-    # On OS X check the presence of the gdbm header in the standard
-    # Fink location.
-    $self->_handle_darwin_for_fink($conf, $osname, 'gdbm.h');
-
     $conf->cc_gen('config/auto/gdbm/gdbm_c.in');
     eval { $conf->cc_build( q{}, $extra_libs ); };
     my $has_gdbm = 0;

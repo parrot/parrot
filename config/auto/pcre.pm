@@ -56,11 +56,6 @@ sub runstep {
         default         => '-lpcre',
     } );
 
-    # On OS X check the presence of the pcre headers in the standard
-    # Fink/macports locations.
-    $self->_handle_darwin_for_fink    ($conf, $osname, 'pcre.h');
-    $self->_handle_darwin_for_macports($conf, $osname, 'pcre.h');
-
     $conf->cc_gen('config/auto/pcre/pcre_c.in');
     eval { $conf->cc_build( q{}, $extra_libs ) };
     my $has_pcre = 0;

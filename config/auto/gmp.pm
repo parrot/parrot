@@ -66,11 +66,6 @@ sub runstep {
         default         => '-lgmp',
     } );
 
-    # On OS X check the presence of the gmp header in the standard
-    # Fink location.
-    $self->_handle_darwin_for_fink($conf, $osname, 'gmp.h');
-    $self->_handle_darwin_for_macports($conf, $osname, 'gmp.h');
-
     $conf->cc_gen('config/auto/gmp/gmp_c.in');
     eval { $conf->cc_build( q{}, $extra_libs); };
     my $has_gmp = 0;

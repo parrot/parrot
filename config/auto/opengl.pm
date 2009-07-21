@@ -179,12 +179,6 @@ sub runstep {
             default         => '-lglut -lGLU -lGL',
     } );
 
-    # On OS X check the presence of the OpenGL headers in the standard
-    # Fink/macports locations.
-    # Mindlessly morphed from readline ... may need to be fixed
-    $self->_handle_darwin_for_fink    ($conf, $osname, 'GL/glut.h');
-    $self->_handle_darwin_for_macports($conf, $osname, 'GL/glut.h');
-
     $conf->cc_gen('config/auto/opengl/opengl_c.in');
     my $has_glut = 0;
     eval { $conf->cc_build( q{}, $extra_libs ) };

@@ -196,6 +196,25 @@ run the tests described in C<--test=build>.
 
 =back
 
+=item C<--configure_trace>
+
+Store the results of each configuration step in a Storable F<.sto> file on
+disk, for later analysis by F<Parrot::Configure::Trace> methods.
+
+=item Operating system-specific configuration options
+
+=over 4
+
+=item C<--darwin_no_fink>
+
+On Darwin, do not probe for Fink libraries.
+
+=item C<--darwin_no_macports>
+
+On Darwin, do not probe for Macports libraries.
+
+=back
+
 =back
 
 =head2 Compile Options

@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  47;
+use Test::More tests =>  40;
 use Carp;
 use Cwd;
 use File::Spec;
@@ -56,7 +56,7 @@ is($step->result(), q{no}, "Expected result was set");
 
 $conf->replenish($serialized);
 
-########## --without-gdbm; _handle_darwin_for_fink() ##########
+########## --without-gdbm ##########
 
 ($args, $step_list_ref) = process_options( {
     argv => [ q{--without-gdbm} ],
@@ -69,11 +69,6 @@ $step = test_step_constructor_and_description($conf);
 my $osname;
 my ($flagsbefore, $flagsafter);
 $osname = 'foobar';
-$flagsbefore = $conf->data->get( 'linkflags' );
-ok($step->_handle_darwin_for_fink($conf, $osname, 'gdbm.h'),
-    "handle_darwin_for_fink() returned true value");
-$flagsafter = $conf->data->get( 'linkflags' );
-is($flagsbefore, $flagsafter, "No change in linkflags, as expected");
 my $cwd = cwd();
 {
     my $tdir = tempdir( CLEANUP => 1 );
@@ -84,12 +79,6 @@ my $cwd = cwd();
     my $includedir = File::Spec->catdir( $tdir, 'include' );
     $conf->data->set('fink_lib_dir' => $libdir);
     $conf->data->set('fink_include_dir' => $includedir);
-    $osname = 'darwin';
-    $flagsbefore = $conf->data->get( 'linkflags' );
-    ok($step->_handle_darwin_for_fink($conf, $osname, 'gdbm.h'),
-        "handle_darwin_for_fink() returned true value");
-    $flagsafter = $conf->data->get( 'linkflags' );
-    is($flagsbefore, $flagsafter, "No change in linkflags, as expected");
 
     ok(chdir $cwd, "Able to change back to original directory after testing");
 }
@@ -106,15 +95,6 @@ my $cwd = cwd();
     open my $FH, ">", $foo or croak "Could not open for writing";
     print $FH "Hello world\n";
     close $FH or croak "Could not close after writing";
-
-    $osname = 'darwin';
-    $flagsbefore = $conf->data->get( 'linkflags' );
-    ok($step->_handle_darwin_for_fink($conf, $osname, 'gdbm.h'),
-        "handle_darwin_for_fink() returned true value");
-    $flagsafter = $conf->data->get( 'linkflags' );
-    isnt($flagsbefore, $flagsafter, "Change in linkflags, as expected");
-    like($conf->data->get( 'linkflags' ), qr/-L\Q$libdir\E/,
-        "'linkflags' modified as expected");
 
     ok(chdir $cwd, "Able to change back to original directory after testing");
 }

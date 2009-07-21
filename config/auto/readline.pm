@@ -49,11 +49,6 @@ sub runstep {
         default         => '-lreadline',
     } );
 
-    # On OS X check the presence of the readline header in the standard
-    # Fink/macports locations.
-    $self->_handle_darwin_for_fink($conf, $osname, 'readline/readline.h');
-    $self->_handle_darwin_for_macports($conf, $osname, q{readline/readline.h});
-
     $conf->cc_gen('config/auto/readline/readline_c.in');
     my $has_readline = 0;
     eval { $conf->cc_build( q{}, $extra_libs ) };
