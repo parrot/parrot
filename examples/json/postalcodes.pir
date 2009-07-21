@@ -78,12 +78,12 @@ END:
     unless null $P3 goto bad_code
 
     $P2 = $P2['postalCodes']
-    .local pmc iter, code
-    iter = new 'Iterator', $P2
+    .local pmc it, code
+    it = iter $P2
 
  code_loop:
     push_eh code_end
-      code = shift iter
+      code = shift it
     pop_eh
     unless code goto code_end
 

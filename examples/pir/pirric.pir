@@ -2452,7 +2452,7 @@ endline:
 .sub begin :method
     .local pmc text
     text = getattribute self, 'lines'
-    new $P0, 'Iterator', text
+    iter $P0, text
     set $P0, .ITERATE_FROM_START
     .return($P0)
 .end

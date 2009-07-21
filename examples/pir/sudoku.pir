@@ -339,7 +339,7 @@ some:
     if name goto sel_name
 
 list_names:
-    new it, 'Iterator', b
+    it = iter b
     it = .ITERATE_FROM_START
 loop:
     unless it goto fin
@@ -901,7 +901,7 @@ ret_0:
 .sub check_seen
     .param pmc seen
     .local pmc it
-    new it, 'Iterator', seen
+    it = iter seen
     it = .ITERATE_FROM_START
 loop:
     unless it goto ok

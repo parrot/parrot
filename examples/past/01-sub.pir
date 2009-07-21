@@ -100,11 +100,11 @@ roughly represents following Perl 6 code:
 .sub 'say'
     .param pmc args :slurpy
     if null args goto end
-    .local pmc iter
-    iter = new 'Iterator', args
+    .local pmc it
+    it = iter args
   loop:
-    unless iter goto end
-    $P0 = shift iter
+    unless it goto end
+    $P0 = shift it
     print $P0
     goto loop
   end:

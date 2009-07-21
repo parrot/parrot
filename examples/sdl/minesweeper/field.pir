@@ -290,11 +290,11 @@ Draws the field, then the LCDs and the smiley button.
     .local pmc status
 
     getattribute field, self, 'field'
-    field   = new "Iterator", field
+    field   = iter field
     field   = .ITERATE_FROM_START
 
     cache   = getattribute self, 'cache'
-    cacheit = new "Iterator", cache
+    cacheit = iter cache
     cacheit = .ITERATE_FROM_START
 
     screen  = getattribute self, 'screen'
@@ -839,7 +839,7 @@ Checks if you have won.
     .local pmc field
 
     field = getattribute self, 'field'
-    field = new 'Iterator', field
+    field = iter field
     field = .ITERATE_FROM_START
 LOOP:
     unless field goto WON
@@ -910,7 +910,7 @@ Counts the unrevealed mines and updates the LCD.
     mines_lcd = getattribute self, 'mines_lcd'
 
     size  = field
-    field = new 'Iterator', field
+    field = iter field
     field = .ITERATE_FROM_START
     count = new 'ResizablePMCArray'
 

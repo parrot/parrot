@@ -65,13 +65,13 @@ endfor:
 	$I0 = elements table
 	array = $I0
 
-	.local pmc iter
-   	iter = new 'Iterator', table
-	set iter, .ITERATE_FROM_START
+	.local pmc it
+    it = iter table
+	set it, .ITERATE_FROM_START
 	i = 0
 iter_loop_1:
-	unless iter goto iter_end_1
-	$S0 = shift iter
+	unless it goto iter_end_1
+	$S0 = shift it
 	$I0 = table[$S0]
 	$P0 = new 'FixedPMCArray'
 	$P0 = 2
