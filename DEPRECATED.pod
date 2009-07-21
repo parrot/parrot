@@ -348,6 +348,14 @@ use a different detection mechanism or eliminate it altogether.
 
 L<https://trac.parrot.org/parrot/ticket/463>
 
+=item PAST::Val node generation [eligible in 1.5]
+
+The PAST::Compiler may generate the code for PAST::Val nodes
+(i.e., constants) at the beginning of the block (Parrot sub) instead
+of the location where they occur in the PAST tree.
+
+L<https://trac.parrot.org/parrot/ticket/868>
+
 =back
 
 =head2 Not Quite Perl (NQP)
