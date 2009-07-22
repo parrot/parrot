@@ -236,31 +236,6 @@ inline op branch_cs(in STR) :base_loop :check_event :flow {
 
 ########################################
 
-=item B<bsr>(in LABEL)
-
-Branch to the location specified by $1. Push the current location onto the call
-stack for later returning.
-
-=cut
-
-inline op bsr(in LABEL) :base_core :check_event :flow {
-    stack_push(interp, &interp->dynamic_env,
-             expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
-    goto OFFSET($1);
-}
-
-=item B<ret>()
-
-Pop the location off the top of the call stack and go there.
-
-=cut
-
-inline op ret() :flow {
-    goto POP();
-}
-
-########################################
-
 =item B<local_branch>(invar PMC, in LABEL)
 
 Go to the location specified by the label in $2. Push the current location onto
