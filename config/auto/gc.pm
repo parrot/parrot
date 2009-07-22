@@ -15,7 +15,7 @@ F<src/gc/alloc_resources.c>.
 In the future, we will have a C<--gc> command-line option which will enable
 the configurer to choose among the default and:
 
-=over4
+=over 4
 
 =item C<libc>
 
