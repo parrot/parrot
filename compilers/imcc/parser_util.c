@@ -555,7 +555,6 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         ||  STREQ(name, "returncc"))
             ins->type |= IF_goto;
         else if (STREQ(fullname, "jump_i")
-             ||  STREQ(fullname, "jsr_i")
              ||  STREQ(fullname, "branch_i")
              ||  STREQ(fullname, "bsr_i"))
             IMCC_INFO(interp)->dont_optimize = 1;
