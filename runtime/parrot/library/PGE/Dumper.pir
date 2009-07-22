@@ -139,7 +139,7 @@ An alternate dump output for a Match object and all of its subcaptures.
     $I0 = defined capt[spi]
     unless $I0 goto subpats_2
     $P0 = capt[spi]
-    bsr dumper
+    (out, prefix1, prefix2, b1, b2) = _do_the_dump($P0, out, prefix1, prefix2, b1, b2)
   subpats_2:
     inc spi
     goto subpats_1
@@ -157,15 +157,27 @@ An alternate dump output for a Match object and all of its subcaptures.
     $I0 = defined capt[$S0]
     unless $I0 goto subrules_1
     $P0 = capt[$S0]
-    bsr dumper
+    (out, prefix1, prefix2, b1, b2) = _do_the_dump($P0, out, prefix1, prefix2, b1, b2)
     goto subrules_1
+  end:
+    .return (out)
+.end
 
+.sub _do_the_dump
+    .param pmc matchobj
+    .param string out
+    .param string prefix1
+    .param string prefix2
+    .param string b1
+    .param string b2
+
+    $P0 = matchobj
   dumper:
     $I0 = isa $P0, ['PGE';'Match']
     unless $I0 goto dumper_0
     $S0 = $P0.'dump_str'(prefix1, b1, b2)
     out .= $S0
-    ret
+    .return(out, prefix1, prefix2, b1, b2)
   dumper_0:
     $I0 = does $P0, 'array'
     unless $I0 goto dumper_3
@@ -183,19 +195,15 @@ An alternate dump output for a Match object and all of its subcaptures.
     inc $I0
     goto dumper_1
   dumper_2:
-    ret
+    .return(out, prefix1, prefix2, b1, b2)
   dumper_3:
     out .= prefix1
     out .= ': '
     $S0 = $P0
     out .= $S0
     out .= "\n"
-    ret
-
-  end:
-    .return (out)
+    .return(out)
 .end
-
 
 =item C<dump()>
 
