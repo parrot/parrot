@@ -1188,10 +1188,10 @@ a 'pasttype' of if/unless.
     exprpost = self.'as_post'(exprpast, 'rtype'=>exprrtype)
 
     childpast = thenpast
-    childpost = self.'make_childpost'(childpast, exprpost, childrtype, opsclass, rtype, result)
+    bsr make_childpost
     thenpost = childpost
     childpast = elsepast
-    childpost = self.'make_childpost'(childpast, exprpost, childrtype, opsclass, rtype, result)
+    bsr make_childpost
     elsepost = childpost
 
     if null elsepost goto no_elsepost
@@ -1221,18 +1221,8 @@ a 'pasttype' of if/unless.
   no_elsepost_2:
     ops.'push'(endlabel)
     .return (ops)
-.end
 
-.sub 'make_childpost' :method
-    .param pmc childpast
-    .param pmc exprpost
-    .param pmc childrtype
-    .param pmc opsclass
-    .param string rtype
-    .param string result
-
-    .local pmc childpost
-
+  make_childpost:
     null childpost
     $I0 = defined childpast
     unless $I0 goto no_childpast
@@ -1251,7 +1241,7 @@ a 'pasttype' of if/unless.
     unless result goto ret_childpost
     childpost = self.'coerce'(childpost, result)
   ret_childpost:
-    .return(childpost)
+    ret
 .end
 
 .sub 'unless' :method :multi(_, ['PAST';'Op'])
