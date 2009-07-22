@@ -318,25 +318,6 @@ inline op local_return(invar PMC) :flow {
     goto ADDRESS(next);
 }
 
-
-
-########################################
-
-=item B<jsr>(in LABEL)
-
-Jump to the location specified by register $1. Push the current
-location onto the call stack for later returning.
-
-=cut
-
-inline op jsr(in LABEL) :base_core :check_event :flow {
-    opcode_t * loc;
-    stack_push(interp, &interp->dynamic_env,
-             expr NEXT(),  STACK_ENTRY_DESTINATION, STACK_CLEANUP_NULL);
-    loc = INTVAL2PTR(opcode_t *, $1);
-    goto ADDRESS(loc);
-}
-
 ########################################
 
 =item B<jump>(in LABEL)

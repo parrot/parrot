@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 62;
+use Parrot::Test tests => 61;
 
 =head1 NAME
 
@@ -927,19 +927,6 @@ FOO:   print "Jump succeeded\n"
        end
 CODE
 Jump succeeded
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "jsr" );
-     set_addr I1, FOO
-     jsr I1
-     print "and back again\n"
-     end
-
-FOO: print "There "
-     ret
-
-CODE
-There and back again
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "last is branch" );
