@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 35;
+use Test::More tests =>  8;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::gc');
 use Parrot::Configure;
@@ -48,94 +48,13 @@ my $step = test_step_constructor_and_description($conf);
         "Got expected value for 'gc_flag'");
 }
 
-$conf->replenish($serialized);
-
-########### --gc=gc ###########
-
-($args, $step_list_ref) = process_options( {
-    argv => [ q{--gc=gc} ],
-    mode => q{configure},
-} );
-$conf->options->set( %{$args} );
-$step = test_step_constructor_and_description($conf);
-my $ret = $step->runstep($conf);
-ok( $ret, "runstep() returned true value" );
-is($conf->data->get('gc_flag'), q{},
-    "Got expected value for 'gc_flag'");
-
-$conf->replenish($serialized);
-
-########### --gc=libc ###########
-
-($args, $step_list_ref) = process_options( {
-    argv => [ q{--gc=libc} ],
-    mode => q{configure},
-} );
-$conf->options->set( %{$args} );
-$step = test_step_constructor_and_description($conf);
-$conf->data->set('i_malloc' => 1);
-$ret = $step->runstep($conf);
-ok( $ret, "runstep() returned true value" );
-is($conf->data->get('gc_flag'), '-DGC_IS_MALLOC',
-    "Got expected value for 'gc_flag'");
-is($conf->data->get('malloc_header'), 'malloc.h',
-    "Got expected value for 'malloc_header'");
-
-$conf->replenish($serialized);
-
-########### --gc=libc ###########
-
-($args, $step_list_ref) = process_options( {
-    argv => [ q{--gc=libc} ],
-    mode => q{configure},
-} );
-$conf->options->set( %{$args} );
-$step = test_step_constructor_and_description($conf);
-$conf->data->set('i_malloc' => undef);
-$ret = $step->runstep($conf);
-ok( $ret, "runstep() returned true value" );
-is($conf->data->get('gc_flag'), '-DGC_IS_MALLOC',
-    "Got expected value for 'gc_flag'");
-is($conf->data->get('malloc_header'), 'stdlib.h',
-    "Got expected value for 'malloc_header'");
-
-$conf->replenish($serialized);
-
-########### --gc=malloc ###########
-
-($args, $step_list_ref) = process_options( {
-    argv => [ q{--gc=malloc} ],
-    mode => q{configure},
-} );
-$conf->options->set( %{$args} );
-$step = test_step_constructor_and_description($conf);
-$ret = $step->runstep($conf);
-ok( $ret, "runstep() returned true value" );
-is($conf->data->get('gc_flag'), '-DGC_IS_MALLOC',
-    "Got expected value for 'gc_flag'");
-
-$conf->replenish($serialized);
-
-########### --gc=malloc-trace ###########
-
-($args, $step_list_ref) = process_options( {
-    argv => [ q{--gc=malloc-trace} ],
-    mode => q{configure},
-} );
-$conf->options->set( %{$args} );
-$step = test_step_constructor_and_description($conf);
-$ret = $step->runstep($conf);
-ok( $ret, "runstep() returned true value" );
-is($conf->data->get('gc_flag'), '-DGC_IS_MALLOC',
-    "Got expected value for 'gc_flag'");
-
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
 
 =head1 NAME
 
-auto/gc-01.t - test auto::gc
+auto_gc-01.t - test auto::gc
 
 =head1 SYNOPSIS
 

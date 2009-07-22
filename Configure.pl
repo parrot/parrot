@@ -355,11 +355,6 @@ Use JIT system.
 
 Use JIT to emit a native executable.
 
-=item C<--gc=(type)>
-
-Determine the type of garbage collection. The value for C<type> should be one
-of: C<gc>, C<libc>, C<malloc> or C<malloc-trace>. The default is C<gc>.
-
 =back
 
 =head2 International Components For Unicode (ICU) Options
