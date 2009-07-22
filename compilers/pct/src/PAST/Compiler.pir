@@ -1187,11 +1187,13 @@ a 'pasttype' of if/unless.
 
     exprpost = self.'as_post'(exprpast, 'rtype'=>exprrtype)
 
+    .local pmc jmpstack
+    jmpstack = new 'ResizableIntegerArray'
     childpast = thenpast
-    bsr make_childpost
+    local_branch jmpstack, make_childpost
     thenpost = childpost
     childpast = elsepast
-    bsr make_childpost
+    local_branch jmpstack, make_childpost
     elsepost = childpost
 
     if null elsepost goto no_elsepost
@@ -1241,7 +1243,7 @@ a 'pasttype' of if/unless.
     unless result goto ret_childpost
     childpost = self.'coerce'(childpost, result)
   ret_childpost:
-    ret
+    local_return jmpstack
 .end
 
 .sub 'unless' :method :multi(_, ['PAST';'Op'])

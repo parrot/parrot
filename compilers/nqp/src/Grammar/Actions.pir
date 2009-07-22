@@ -152,10 +152,12 @@
     .param pmc match
     .local pmc expr, block, past
     .local int cond
+    .local pmc jmpstack
+    jmpstack = new 'ResizableIntegerArray'
     cond = match['EXPR']
     cond -= 1
-    bsr get_expr
-    bsr get_block
+    local_branch jmpstack, get_expr
+    local_branch jmpstack, get_block
     $P2 = get_hll_global ['PAST'], 'Op'
     past = $P2.'new'(expr, block, 'pasttype'=>'if', 'node'=>match)
 
@@ -169,8 +171,8 @@
   while:
     unless cond != 0 goto end_while
     cond -= 1
-    bsr get_expr
-    bsr get_block
+    local_branch jmpstack, get_expr
+    local_branch jmpstack, get_block
     past = $P2.'new'(expr, block, past, 'pasttype'=>'if', 'node'=>match)
     goto while
 
@@ -181,12 +183,12 @@
     expr = match['EXPR']
     expr = expr[cond]
     expr = expr.'ast'()
-    ret
+    local_return jmpstack
   get_block:
     block = match['block']
     block = block[cond]
     block = block.'ast'()
-    ret
+    local_return jmpstack
   end:
     match.'!make'(past)
 .end
