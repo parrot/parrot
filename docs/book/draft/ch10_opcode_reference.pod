@@ -225,17 +225,6 @@ Intersegment branch to the location of the given fixup table entry.
 
 I<Arguments: S>
 
-=head3 bsr
-
-X<bsr opcode (PASM)>
-
-  bsr R<LABEL>
-
-Branch to a label, like C<branch>, but also push the current location
-onto the call stack so C<ret> can return to it.
-
-I<Arguments: I>
-
 =head3 bxor
 
 X<bxor opcode (PASM)>
@@ -2045,15 +2034,6 @@ X<restoretop opcode (PASM)>
 Restore registers 16..31. Does a C<pop>R<X> for every type.
 
 See also: C<savetop>.
-
-=head3 ret
-
-X<ret opcode (PASM)>
-
-  ret
-
-Pop a location off the top of the call stack, and go there.
-Often used with C<bsr> and C<jsr>.
 
 =head3 rethrow
 

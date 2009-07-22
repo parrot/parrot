@@ -462,7 +462,8 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "constructor - diamond parents" );
 
     subclass P6, P3, "F"
     addparent P6, P4
-    bsr _check_isa
+    new P10, 'ResizableIntegerArray'
+    local_branch P10, _check_isa
 
     print "new F\n"
     new P16, ['F']
@@ -527,7 +528,7 @@ _check_isa:
     isa I0, P1, "D"
     print I0
     print "\n"
-    ret
+    local_return P10
 
 
 .namespace ["A"]

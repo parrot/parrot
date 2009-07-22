@@ -203,20 +203,6 @@ Jump to the address held in register x (Px, Sx, or Ix).
 Branch forward or backward by the amount in register x. (X may be either Ix,
 Nx, or Px) Branch offset may also be an integer constant.
 
-=item jsr tx
-
-Jump to the location specified by register X. Push the current location onto
-the call stack for later returning.
-
-=item bsr ix
-
-Branch to the location specified by X (either register or label). Push the
-current location onto the call stack for later returning.
-
-=item ret
-
-Pop the location off the top of the stack and go there.
-
 =back
 
 =head3 Data manipulation
