@@ -99,12 +99,20 @@ Parrot documentation files, generally raw Pod, but possibly also
 formatted HTML. Has subdirectories for each format of documentation:
 F<pod/>, F<html/>, etc.
 
+=item F</usr/include/parrot/E<lt>versionE<gt>/>
+
+C header files for Parrot.  
+
+=item F</usr/src/parrot/E<lt>versionE<gt>/>
+
+PMC source files needed for building dynamic PMCs.  
+
 =back
 
 =head2 Dependencies
 
-Building core Parrot depends on Perl (including perldoc, which may be a
-separate package), libgdm and libreadline.
+Building core Parrot depends on Perl (including F<perldoc>, which may be a
+separate package), F<libgdm> and F<libreadline>.
 
 Building a language depends on a series of Parrot build tools, installed in
 F</usr/lib/parrot/E<lt>version/tools>. These tools will generally not be
