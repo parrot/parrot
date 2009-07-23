@@ -71,9 +71,10 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC * Parrot_get_namespace_keyed(PARROT_INTERP,
     ARGIN(PMC *base_ns),
-    ARGIN_NULLOK(PMC *pmc_key))
+    ARGIN(PMC *pmc_key))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -95,9 +96,10 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC * Parrot_make_namespace_keyed(PARROT_INTERP,
     ARGIN(PMC *base_ns),
-    ARGIN_NULLOK(PMC *pmc_key))
+    ARGIN(PMC *pmc_key))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -158,7 +160,8 @@ void Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub_pmc))
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_get_namespace_keyed __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(base_ns)
+    || PARROT_ASSERT_ARG(base_ns) \
+    || PARROT_ASSERT_ARG(pmc_key)
 #define ASSERT_ARGS_Parrot_get_namespace_keyed_str \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
@@ -168,7 +171,8 @@ void Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub_pmc))
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_make_namespace_keyed __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(base_ns)
+    || PARROT_ASSERT_ARG(base_ns) \
+    || PARROT_ASSERT_ARG(pmc_key)
 #define ASSERT_ARGS_Parrot_make_namespace_keyed_str \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
