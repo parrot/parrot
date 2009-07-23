@@ -346,7 +346,8 @@ Add C<role> to C<class>.
 .end
 
 
-=item register(parrotclass [, 'name'=>name] [, 'protoobject'=>proto] [, 'parent'=>parentclass] [, 'hll'=>hll])
+=item register(parrotclass [, 'name'=>name] [, 'protoobject'=>proto]
+               [, 'parent'=>parentclass] [, 'hll'=>hll] [, 'how'=>how)
 
 Sets objects of type C<parrotclass> to use C<protoobject>,
 and verifies that C<parrotclass> has P6object methods defined
@@ -358,6 +359,9 @@ The C<name> parameter causes objects to be registered using a name
 that differs from the parrotclass name.  This is useful when needing
 to map to a class name that already exists in Parrot (e.g., 'Hash'
 or 'Object').
+
+The C<how> parameter allows you to specify an already-existing metaclass
+instance to be used for this class rather than creating a new one.
 
 =cut
 
@@ -441,16 +445,20 @@ or 'Object').
     ns = split '::', name
   have_ns:
 
-    ##  get the metaclass (how) from :protoobject, or create one
+    ##  get the metaclass (how) from :how, or :protoobject, or create one
     .local pmc how
+    how = options['how']
+    unless null how goto have_how
     $P0 = options['protoobject']
     if null $P0 goto make_how
     how = $P0.'HOW'()
-    goto have_how
+    goto how_setup
   make_how:
     ##  create a metaclass for parrotclass
-    how = new 'P6metaclass'
+    $P0 = typeof self
+    how = new $P0
     setattribute how, 'parrotclass', parrotclass
+  have_how:
 
     ##  create an anonymous class for the protoobject
     .local pmc protoclass, protoobject
@@ -506,7 +514,7 @@ or 'Object').
     push ns, 'EXPORT'
     push ns, 'ALL'
     set_root_global ns, $S0, protoobject
-    goto have_how
+    goto how_setup
 
     ##  anonymous classes have empty strings for shortname and longname
   anonymous_class:
@@ -515,7 +523,7 @@ or 'Object').
     setattribute how, 'longname', longname
     setattribute how, 'shortname', shortname
 
-  have_how:
+  how_setup:
     ##  attach the metaclass object to the parrotclass
     setprop parrotclass, 'metaclass', how
 
