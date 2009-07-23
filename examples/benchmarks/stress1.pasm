@@ -19,12 +19,13 @@ GC runs made.
 # Our master loop, I20 times
 	set I20, 10
 	time N0
+        new P10, 'ResizableIntegerArray'
 mloop:
 
 	set I0, 10
 	new P0, 'ResizablePMCArray'
 
-ol:	bsr buildarray
+ol:	local_branch P10,  buildarray
 	set P0[I0], P1
 	dec I0
 	if I0, ol
@@ -32,7 +33,7 @@ ol:	bsr buildarray
 	set I0, 20
 	new P2, 'ResizablePMCArray'
 
-ol1:	bsr buildarray
+ol1:	local_branch P10,  buildarray
 	set P2[I0], P1
 	dec I0
 	if I0, ol1
@@ -40,7 +41,7 @@ ol1:	bsr buildarray
 	set I0, 20
 	new P3, 'ResizablePMCArray'
 
-ol2:	bsr buildarray
+ol2:	local_branch P10,  buildarray
 	set P3[I0], P1
 	dec I0
 	if I0, ol2
@@ -71,7 +72,7 @@ loop1:	new P9, 'Integer'
 	set P1[I1], P9
 	dec I1
 	if I1, loop1
-	ret
+	local_return P10
 
 =head1 SEE ALSO
 
