@@ -291,7 +291,9 @@ Column 6, if present, contains a description of what is being tested.
     .local string test_file
 
     test_file = 're_tests'
-    bsr reset_todo_info
+    .local pmc jmpstack
+               jmpstack = new 'ResizableIntegerArray'
+    local_branch jmpstack,  reset_todo_info
 
     $S0 = 'character class in enumeration'
     todo_info[116] = $S0
@@ -505,7 +507,7 @@ Column 6, if present, contains a description of what is being tested.
     $I0 += 1
     goto set_todo_loop
   end_loop:
-    ret
+    local_return jmpstack
 .end
 
 
@@ -520,51 +522,53 @@ Column 6, if present, contains a description of what is being tested.
     .local string test_file
 
     test_file = 're_tests'
-    bsr reset_skip_info
+    .local pmc jmpstack
+               jmpstack = new 'ResizableIntegerArray'
+    local_branch jmpstack,  reset_skip_info
 
     $S0 = 'trailing modifiers'
     $I0 = 264
     $I1 = 395
-    bsr set_range
+    local_branch jmpstack,  set_range
     $I0 = 458
     $I1 = 480
-    bsr set_range
+    local_branch jmpstack,  set_range
     skip_info[483] = $S0
     skip_info[484] = $S0
     skip_info[496] = $S0
     $I0 = 609
     $I1 = 617
-    bsr set_range
+    local_branch jmpstack,  set_range
     $I0 = 627
     $I1 = 635
-    bsr set_range
+    local_branch jmpstack,  set_range
     $I0 = 645
     $I1 = 653
-    bsr set_range
+    local_branch jmpstack,  set_range
     $I0 = 663
     $I1 = 671
-    bsr set_range
+    local_branch jmpstack,  set_range
     $I0 = 681
     $I1 = 689
-    bsr set_range
+    local_branch jmpstack,  set_range
     $I0 = 699
     $I1 = 707
-    bsr set_range
+    local_branch jmpstack,  set_range
     $I0 = 717
     $I1 = 725
-    bsr set_range
+    local_branch jmpstack,  set_range
     $I0 = 735
     $I1 = 743
-    bsr set_range
+    local_branch jmpstack,  set_range
     $I0 = 753
     $I1 = 761
-    bsr set_range
+    local_branch jmpstack,  set_range
     $I0 = 771
     $I1 = 779
-    bsr set_range
+    local_branch jmpstack,  set_range
     $I0 = 789
     $I1 = 797
-    bsr set_range
+    local_branch jmpstack,  set_range
     skip_info[802] = $S0
     skip_info[803] = $S0
     skip_info[805] = $S0
@@ -626,7 +630,7 @@ Column 6, if present, contains a description of what is being tested.
     skip_info[557] = $S0
     $I0 = 568
     $I1 = 592
-    bsr set_range
+    local_branch jmpstack,  set_range
     skip_info[800] = $S0
     skip_info[828] = $S0
     skip_info[829] = $S0
@@ -637,7 +641,7 @@ Column 6, if present, contains a description of what is being tested.
     $S0 = 'hangs a parrot'
     $I0 = 806
     $I1 = 823
-    bsr set_range
+    local_branch jmpstack,  set_range
     skip_info[924] = $S0
 
     $S0 = 'unknown reason'
@@ -661,7 +665,7 @@ Column 6, if present, contains a description of what is being tested.
 
   reset_skip_info:
     skip_info = new 'Hash'
-    ret
+    local_return jmpstack
 
   set_range:                         # for setting a range of tests
     if $I0 > $I1 goto end_loop       # put range min in $I0, max in $I1
@@ -673,7 +677,7 @@ Column 6, if present, contains a description of what is being tested.
     goto set_range
   end_loop:
     $S0 = ''
-    ret
+    local_return jmpstack
 .end
 
 

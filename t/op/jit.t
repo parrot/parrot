@@ -876,13 +876,14 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "2 non jit, non JITed branch to JIT" );
         set I0, 42
         print I0
         print "\n"
-        bsr sub
+        new P0, 'ResizableIntegerArray'
+        local_branch P0, sub
         end
 sub:
         set I0, 43
         print I0
         print "\n"
-        ret
+        local_return P0
 CODE
 42
 43
@@ -907,11 +908,12 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "2 non jit, non JITed branch to non JIT" )
         set I0, 42
         print I0
         print "\n"
-        bsr sub
+        new P0, 'ResizableIntegerArray'
+        local_branch P0, sub
         end
 sub:
         print "ok\n"
-        ret
+        local_return P0
 CODE
 42
 ok
