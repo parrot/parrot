@@ -27,7 +27,7 @@ setup function to initialize the memory pools.
 PARROT_DOES_NOT_RETURN
 static void failed_allocation(unsigned int line, unsigned long size) /* HEADERIZER SKIP */
 {
-    fprintf(stderr, "Failed allocation of %ul bytes\n", size);
+    fprintf(stderr, "Failed allocation of %lu bytes\n", size);
     do_panic(NULL, "Out of mem", __FILE__, line);
 }
 
