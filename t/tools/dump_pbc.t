@@ -1,10 +1,10 @@
 #! perl
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
 
-t/tools/dumb_pbc.t - test the script tools/utils/dump_pbc.t
+t/tools/dumb_pbc.t - test the script tools/utils/dump_pbc.pl
 
 =head1 SYNOPSIS
 
