@@ -26,7 +26,7 @@ sub compreg {
 
 sub mktempfile($prefix) {
     sub nonce() { ".{$*PID}." ~ int 1000.rand }
-    $prefix ~ nonce; 
+    $prefix ~ nonce;
 }
 
 sub gen_preamble($nsname, $libname) {
