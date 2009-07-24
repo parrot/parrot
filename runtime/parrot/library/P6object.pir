@@ -427,7 +427,10 @@ instance to be used for this class rather than creating a new one.
     self.'add_parent'(item, 'to'=>parrotclass)
     goto parent_loop
   parent_done:
+    $I0 = isa parrotclass, 'P6object'
+    if $I0 goto isa_p6object_already
     self.'add_parent'('P6object', 'to'=>parrotclass)
+  isa_p6object_already:
 
     ##  determine parrotclass' canonical p6-name
     .local string name
