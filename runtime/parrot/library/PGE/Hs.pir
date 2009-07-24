@@ -165,6 +165,8 @@ END:
     .local int tmpi, cond
     .local string tmps, key
     .local pmc capt, it, subelm, elm
+    .local pmc jmpstack
+    jmpstack = new 'ResizableIntegerArray'
 
     out = ""
 
@@ -192,8 +194,6 @@ END:
     cond = defined capt[spi]
     unless cond goto subpats_fail
     elm = capt[spi]
-    .local pmc jmpstack
-    jmpstack = new 'ResizableIntegerArray'
     local_branch jmpstack, dumper
     inc spi
     goto subpats_loop
@@ -245,7 +245,7 @@ END:
     local_return jmpstack
   dumper_fail:
     out .= PGE_FAIL
-    ret
+    local_return jmpstack
   dumper_done:
     out .= "]"
     local_return jmpstack

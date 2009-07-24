@@ -308,7 +308,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
   reset_todo_info:
     todo_info = new 'Hash'
-    ret
+    local_return jmpstack
 
   set_todo_loop:
     if $I0 > $I1 goto end_loop
@@ -316,7 +316,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
     $I0 += 1
     goto set_todo_loop
   end_loop:
-    ret
+    local_return jmpstack
 .end
 
 
@@ -386,7 +386,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
   reset_skip_info:
     skip_info = new 'Hash'
-    ret
+    local_return jmpstack
 
   set_skip_loop:
     if $I0 > $I1 goto end_loop
@@ -398,7 +398,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
     goto set_skip_loop
   end_loop:
     $S0 = ''
-    ret
+    local_return jmpstack
 .end
 
 

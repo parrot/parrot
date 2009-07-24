@@ -1783,23 +1783,23 @@ pasm_output_is( <<'CODE', <<'OUTPUT', 'sprintf' );
 NEWARYP:
     new P1, 'ResizablePMCArray'
     set P1[0], P0
-    ret
+    local_return P4
 NEWARYS:
     new P1, 'ResizablePMCArray'
     set P1[0], S0
-    ret
+    local_return P4
 NEWARYI:
     new P1, 'ResizablePMCArray'
     set P1[0], I0
-    ret
+    local_return P4
 NEWARYN:
     new P1, 'ResizablePMCArray'
     set P1[0], N0
-    ret
+    local_return P4
 PRINTF:
     sprintf S2, S1, P1
     print S2
-    ret
+    local_return P4
 
 MAIN:
     new P4, 'ResizableIntegerArray'
@@ -1928,7 +1928,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', 'other form of sprintf op' );
 PRINTF:
     sprintf P3, P2, P1
     print P3
-    ret
+    local_return P4
 
 MAIN:
     new P4, 'ResizableIntegerArray'
