@@ -499,7 +499,7 @@ Column 6, if present, contains a description of what is being tested.
 
   reset_todo_info:
     todo_info = new 'Hash'
-    ret
+    local_return jmpstack
 
   set_todo_loop: # for developer testing. not used normally
     if $I0 > $I1 goto end_loop
