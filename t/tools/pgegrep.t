@@ -20,9 +20,11 @@ use lib qw( . lib ../lib ../../lib );
 
 use Fatal qw{open close};
 use Test::More;
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 use Parrot::Config;
 use File::Spec   ();
+
+my $testdata = File::Spec->catfile(qw{. t tools testdata });
 
 sub pgegrep_output_like {
     my ($options, $snippet, $desc)  = @_;
@@ -41,6 +43,13 @@ pgegrep_output_like(
     qr!\Qpgegrep v0.0.1\E!,
     'pge reports correct version'
 );
+
+pgegrep_output_like(
+    "cat $testdata",
+    qr!keyboardcat!,
+    'basic sanity of matching a literal'
+);
+
 
 # Local Variables:
 #   mode: cperl
