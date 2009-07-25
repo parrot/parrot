@@ -673,7 +673,10 @@ store_fixup(PARROT_INTERP, ARGIN(const SymReg *r), int pc, int offset)
         fixup->type |= VT_ENCODED;
 
     if (r->usage & U_SUBID_LOOKUP)
-      fixup->usage = U_SUBID_LOOKUP;
+        fixup->usage = U_SUBID_LOOKUP;
+
+    if (r->usage & U_LEXICAL)
+        fixup->usage |= U_LEXICAL;
 
     /* set_p_pc   = 2  */
     fixup->color  = pc;
@@ -867,7 +870,9 @@ fixup_globals(PARROT_INTERP)
                 subs_t *s1;
 
                 /* check in matching namespace */
-                if (fixup->usage & U_SUBID_LOOKUP) {
+                if (fixup->usage & U_LEXICAL)
+                    s1 = NULL;
+                else if (fixup->usage & U_SUBID_LOOKUP) {
                     subid_lookup = 1;
                     /* s1 = find_sub_by_subid(interp, fixup->name, &pc); */
                     s1 = find_sub_by_subid(interp, fixup->name, s, &pc);

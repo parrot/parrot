@@ -300,9 +300,10 @@ Parrot_oo_clone_object(PARROT_INTERP, ARGIN(PMC *pmc),
     PObj_is_object_SET(cloned);
 
     /* Now create the underlying structure, and clone attributes list.class. */
-    cloned_guts               = mem_allocate_zeroed_typed(Parrot_Object_attributes);
+    cloned_guts               = mem_allocate_typed(Parrot_Object_attributes);
     PMC_data(cloned)          = cloned_guts;
     cloned_guts->_class       = obj->_class;
+    cloned_guts->attrib_store = NULL;
     cloned_guts->attrib_store = VTABLE_clone(interp, obj->attrib_store);
     num_attrs                 = VTABLE_elements(interp, cloned_guts->attrib_store);
     for (i = 0; i < num_attrs; i++) {
@@ -515,8 +516,9 @@ Parrot_oo_find_vtable_override(PARROT_INTERP,
     PMC                            *result =
         VTABLE_get_pmc_keyed_str(interp, _class->parent_overrides, name);
 
-    if (!PMC_IS_NULL(result))
+    if (!PMC_IS_NULL(result)) {
         return result;
+    }
     else if (VTABLE_exists_keyed_str(interp, _class->parent_overrides, name))
         return PMCNULL;
     else {

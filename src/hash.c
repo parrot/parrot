@@ -769,7 +769,7 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
     hash->mask = new_size - 1;
 
     /* clear freshly allocated bucket index */
-    memset(new_bi + old_size, 0, sizeof (HashBucket *) * (new_size - old_size));
+    memset(new_bi + old_size, 0, sizeof (HashBucket *) * old_size);
 
     /*
      * reloc pointers - this part would be also needed, if we

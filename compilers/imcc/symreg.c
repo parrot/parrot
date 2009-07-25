@@ -735,8 +735,8 @@ mk_pmc_const_2(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(SymReg *left),
     switch (rhs->pmc_type) {
         case enum_class_Sub:
         case enum_class_Coroutine:
-            r[1]       = rhs;
-            rhs->usage = U_FIXUP;
+            r[1]        = rhs;
+            rhs->usage |= U_FIXUP;
             INS(interp, unit, "set_p_pc", "", r, 2, 0, 1);
             return NULL;
         default:
@@ -976,10 +976,19 @@ _mk_address(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int un
     SymReg *r;
 
     if (uniq == U_add_all) {
+        int is_lexical = 0;
+        r = get_sym_by_name(&IMCC_INFO(interp)->ghash, name);
+
+        if (r && r->usage & U_LEXICAL)
+            is_lexical = 1;
+
         r       = mem_allocate_zeroed_typed(SymReg);
         r->type = VTADDRESS;
         r->name = mem_sys_strdup(name);
         _store_symreg(hsh, r);
+
+        if (is_lexical)
+            r->usage |= U_LEXICAL;
     }
     else {
         /* Aux var to avoid the need of const casts */

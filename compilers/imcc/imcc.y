@@ -458,7 +458,7 @@ mk_pmc_const(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *type),
             if (!ascii)
                 rhs->type |= VT_ENCODED;
 
-            rhs->usage    = U_FIXUP | U_SUBID_LOOKUP;;
+            rhs->usage    |= U_FIXUP | U_SUBID_LOOKUP;
             break;
         default:
             rhs = mk_const(interp, name, 'P');
@@ -524,7 +524,7 @@ mk_pmc_const_named(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
         if (!ascii)
             rhs->type |= VT_ENCODED;
 
-        rhs->usage    = U_FIXUP | U_SUBID_LOOKUP;
+        rhs->usage    |= U_FIXUP | U_SUBID_LOOKUP;
     }
     else {
         rhs = mk_const(interp, const_name, 'P');
@@ -880,8 +880,9 @@ set_lexical(PARROT_INTERP, ARGMOD(SymReg *r), ARGMOD(SymReg *name))
             "register %s already declared as lexical %s", r->name, name->name);
 
     /* chain all names in r->reg */
-    name->reg = r->reg;
-    r->reg = name;
+    name->reg    = r->reg;
+    r->reg       = name;
+    name->usage |= U_LEXICAL;
     r->use_count++;
 }
 
@@ -1290,8 +1291,11 @@ pasm_inst:                     { clear_state(interp); }
          }
    | LEXICAL STRINGC COMMA REG
          {
-           SymReg *r = mk_pasm_reg(interp, $4);
-           SymReg *n = mk_const(interp, $2, 'S');
+           char   *name = mem_sys_strdup( $2 + 1 );
+           SymReg *r    = mk_pasm_reg(interp, $4);
+           SymReg *n;
+           name[strlen(name) - 1] = 0;
+           n = mk_const(interp, name, 'S');
            set_lexical(interp, r, n);
            $$ = 0;
            mem_sys_free($2);
@@ -1918,13 +1922,17 @@ labeled_inst:
          }
    | LEXICAL STRINGC COMMA target
          {
-           SymReg * const n = mk_const(interp, $2, 'S');
+           SymReg *n;
+           char   *name = mem_sys_strdup( $2 + 1 );
+           name[strlen(name) - 1] = 0;
+           n = mk_const(interp, name, 'S');
            set_lexical(interp, $4, n); $$ = 0;
            mem_sys_free($2);
+           mem_sys_free(name);
          }
    | LEXICAL USTRINGC COMMA target
          {
-           SymReg * const n = mk_const(interp, $2, 'U');
+           SymReg *n = mk_const(interp, $2, 'U');
            set_lexical(interp, $4, n); $$ = 0;
            mem_sys_free($2);
          }
