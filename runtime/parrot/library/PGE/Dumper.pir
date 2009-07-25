@@ -104,6 +104,8 @@ An alternate dump output for a Match object and all of its subcaptures.
     .local int spi, spc
     .local pmc it
     .local string prefix1, prefix2
+    .local pmc jmpstack
+    jmpstack = new 'ResizableIntegerArray'
 
     if has_b2 goto start
     b2 = "]"
@@ -139,8 +141,6 @@ An alternate dump output for a Match object and all of its subcaptures.
     $I0 = defined capt[spi]
     unless $I0 goto subpats_2
     $P0 = capt[spi]
-    .local pmc jmpstack
-    jmpstack = new 'ResizableIntegerArray'
     local_branch jmpstack, dumper
   subpats_2:
     inc spi
