@@ -27,6 +27,8 @@ use Parrot::Config;
 use File::Spec   ();
 
 my $testdata = File::Spec->catfile(qw{. t tools testdata });
+my $testdata_escaped = $testdata;
+$testdata_escaped =~ s!\\!\\\\!g;
 
 sub pgegrep_output_like {
     my ($options, $snippet, $desc)  = @_;
@@ -66,13 +68,13 @@ pgegrep_output_like(
 
 pgegrep_output_like(
     "-H cat $testdata",
-    qr!$testdata:keyboardcat!,
+    qr!$testdata_escaped:keyboardcat!,
     'matching a literal with file name'
 );
 
 pgegrep_output_like(
     "--with-filename cat $testdata",
-    qr!$testdata:keyboardcat!,
+    qr!$testdata_escaped:keyboardcat!,
     'matching a literal with file name with long option'
 );
 
@@ -91,15 +93,16 @@ pgegrep_output_like(
 
 pgegrep_output_like(
     "-l cat $testdata",
-    qr!$testdata!,
+    qr!$testdata_escaped!,
     'find files that match'
 );
 
 pgegrep_output_like(
     "--files-with-matches cat $testdata",
-    qr!$testdata!,
+    qr!$testdata_escaped!,
     'find files that match with long option'
 );
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
