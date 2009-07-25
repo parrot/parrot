@@ -150,7 +150,7 @@ print the filename for each match
 		$I1 = File.'is_file'(filename)
 		.IfElse($I1, {
 			# Is a file
-			handle = open filename, '<'
+			handle = open filename, 'r'
 		},{
 			# Not a file, hopefully a directory
 			$I1 = File.'is_dir'(filename)

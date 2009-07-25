@@ -687,6 +687,8 @@ dlfunc $P2, $P1, 'mcprint', 'iti'
 set_global 'mcprint', $P2
 dlfunc $P2, $P1, 'has_key', 'ii'
 set_global 'has_key', $P2
+.export_dl_func($P1, 'getmaxx', 'ip')
+.export_dl_func($P1, 'getmaxy', 'ip')
 
 .begin_return
 .end_return

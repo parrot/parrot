@@ -205,20 +205,15 @@ internal_ns_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN(PMC *pmc_key), int f
         PMC *ns = base_ns;
 
         for (i = 0; i < n; ++i) {
-            if (!pmc_key)
-                Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "Passed a NULL pmc_key into VTABLE_get_string_keyed_int");
-            else {
-                STRING * const part = VTABLE_get_string_keyed_int(interp, pmc_key, i);
-                PMC *sub_ns = VTABLE_get_pmc_keyed_str(interp, ns, part);
+            STRING * const part = VTABLE_get_string_keyed_int(interp, pmc_key, i);
+            PMC *sub_ns = VTABLE_get_pmc_keyed_str(interp, ns, part);
 
-                if (PMC_IS_NULL(sub_ns) || !VTABLE_isa(interp, sub_ns, isans)) {
-                    sub_ns = internal_ns_maybe_create(interp, ns, part, flags);
-                    if (PMC_IS_NULL(sub_ns))
-                        return PMCNULL;
-                }
-                ns = sub_ns;
+            if (PMC_IS_NULL(sub_ns) || !VTABLE_isa(interp, sub_ns, isans)) {
+                sub_ns = internal_ns_maybe_create(interp, ns, part, flags);
+                if (PMC_IS_NULL(sub_ns))
+                    return PMCNULL;
             }
+            ns = sub_ns;
         }
         return ns;
     }
@@ -280,7 +275,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_get_namespace_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN_NULLOK(PMC *pmc_key))
+Parrot_get_namespace_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN(PMC *pmc_key))
 {
     ASSERT_ARGS(Parrot_get_namespace_keyed)
     return internal_ns_keyed(interp, base_ns, pmc_key, 0);
@@ -327,7 +322,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_make_namespace_keyed(PARROT_INTERP, ARGIN(PMC *base_ns),
-        ARGIN_NULLOK(PMC *pmc_key))
+        ARGIN(PMC *pmc_key))
 {
     ASSERT_ARGS(Parrot_make_namespace_keyed)
     return internal_ns_keyed(interp, base_ns, pmc_key, INTERN_NS_CREAT);

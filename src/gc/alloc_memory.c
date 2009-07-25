@@ -24,6 +24,15 @@ setup function to initialize the memory pools.
 #include "parrot/parrot.h"
 #include "parrot/memory.h"
 
+PARROT_DOES_NOT_RETURN
+static void failed_allocation(unsigned int line, unsigned long size) /* HEADERIZER SKIP */
+{
+    fprintf(stderr, "Failed allocation of %lu bytes\n", size);
+    do_panic(NULL, "Out of mem", __FILE__, line);
+}
+
+#define PANIC_OUT_OF_MEM(size) failed_allocation(__LINE__, (size))
+
 /* HEADERIZER HFILE: include/parrot/memory.h */
 
 /*
@@ -49,7 +58,7 @@ mem_sys_allocate(size_t size)
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
     if (!ptr)
-        PANIC(NULL, "Out of mem");
+        PANIC_OUT_OF_MEM(size);
     return ptr;
 }
 
@@ -80,7 +89,7 @@ mem__internal_allocate(size_t size, ARGIN(const char *file), int line)
     UNUSED(line);
 #endif
     if (!ptr)
-        PANIC(NULL, "Out of mem");
+        PANIC_OUT_OF_MEM(size);
     return ptr;
 }
 
@@ -107,7 +116,7 @@ mem_sys_allocate_zeroed(size_t size)
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
     if (!ptr)
-        PANIC(NULL, "Out of mem");
+        PANIC_OUT_OF_MEM(size);
     return ptr;
 }
 
@@ -139,7 +148,7 @@ mem__internal_allocate_zeroed(size_t size, ARGIN(const char *file), int line)
     UNUSED(line);
 #endif
     if (!ptr)
-        PANIC(NULL, "Out of mem");
+        PANIC_OUT_OF_MEM(size);
     return ptr;
 }
 
@@ -174,7 +183,7 @@ mem_sys_realloc(ARGFREE(void *from), size_t size)
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
     if (!ptr)
-         PANIC(NULL, "Out of mem");
+        PANIC_OUT_OF_MEM(size);
     return ptr;
 }
 
@@ -207,7 +216,7 @@ mem_sys_realloc_zeroed(ARGFREE(void *from), size_t size, size_t old_size)
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
     if (!ptr)
-         PANIC(NULL, "Out of mem");
+        PANIC_OUT_OF_MEM(size);
 
     if (size > old_size)
         memset((char*)ptr + old_size, 0, size - old_size);
@@ -247,7 +256,7 @@ mem__internal_realloc(ARGFREE(void *from), size_t size,
     UNUSED(line);
 #endif
     if (!ptr)
-        PANIC(NULL, "Out of mem");
+        PANIC_OUT_OF_MEM(size);
     return ptr;
 }
 
@@ -285,7 +294,7 @@ mem__internal_realloc_zeroed(ARGFREE(void *from), size_t size, size_t old_size,
     UNUSED(line);
 #  endif
     if (!ptr)
-        PANIC(NULL, "Out of mem");
+        PANIC_OUT_OF_MEM(size);
     if (size > old_size)
         memset((char*)ptr + old_size, 0, size - old_size);
 

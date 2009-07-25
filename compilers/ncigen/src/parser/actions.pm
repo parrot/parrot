@@ -183,12 +183,12 @@ sub settype($/, $ast) {
         if $struct_or_union {
             my $ident := $<struct_or_union_specifier><identifier><identifier>;
             if $ident {
-                $ident := strip_spaces($ident.text());
+                $ident := strip_spaces(~$ident);
             }
             else {
                 $ident := $<struct_or_union_specifier><identifier>;
                 if $ident {
-                    $ident := strip_spaces($ident.text());
+                    $ident := strip_spaces(~$ident);
                 }
                 else {
                     $ident := "anonymous_" ~~ $struct_or_union~~ "1";
@@ -232,7 +232,7 @@ sub build_struct_or_union($/, $ast) {
         for $_<struct_declarator_list> {
             my $sm := $smt.clone();
             my $declarator := $_<struct_declarator><declarator>;
-            $sm.name(strip_spaces($declarator.text()));
+            $sm.name(strip_spaces(~$declarator));
             ispointer($declarator, $sm);
             $ast.push($sm);
         }

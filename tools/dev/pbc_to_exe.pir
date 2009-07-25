@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-pbc_to_exe
+pbc_to_exe - compile bytecode to executable
 
 =head2 SYNOPSIS
 

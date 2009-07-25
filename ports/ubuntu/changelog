@@ -1,3 +1,19 @@
+parrot (1.4.0-1ubuntu1) karmic; urgency=low
+  * Merge from Debian unstable.
+  * Remove lpia patch, upstream fix included in new release.
+
+ -- Allison Randal <allison@parrot.org>  Sat, 25 Jul 2009 08:37:52 -0700
+
+parrot (1.4.0-1) unstable; urgency=low
+  * New upstream release
+  * debian/rules:
+    - New upstream configuration option --disable-rpath allows packages to
+      be built without rpath.
+  * parrot-devel.install.in
+    - Install pbc_to_exe binary and supporting library.
+
+ -- Allison Randal <allison@parrot.org>  Fri, 24 Jul 2009 23:54:07 -0700
+
 parrot (1.0.0-1ubuntu1) karmic; urgency=low
 
   [ Allison Randal ]

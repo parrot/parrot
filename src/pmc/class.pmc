@@ -728,7 +728,7 @@ Adds the given sub PMC as a method with the given name.
 
 /*
 
-=item C<void remove_method(STRING *name, PMC *sub)>
+=item C<void remove_method(STRING *name)>
 
 Removes the method with the given name.
 

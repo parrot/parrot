@@ -4,6 +4,8 @@
 # Copyright (C) 2008, Parrot Foundation.
 
 use v6;
+class NCIGENAST::FuncDecl {
+}
 
 evalfile('./ncigen.pbc', lang => 'Parrot');
 
@@ -12,9 +14,9 @@ sub parse_ast($fn) {
 
     run("gcc -x c -E $fn > $pp_fn");
     my $compiler = compreg('NCIGEN');
-    my $ast = $compiler.parse(slurp($pp_fn));
+    my $match = $compiler.parse(slurp($pp_fn));
     unlink $pp_fn;
-    $ast.item();
+    $match.ast;
 }
 
 sub compreg {

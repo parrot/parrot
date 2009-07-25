@@ -1,3 +1,13 @@
+parrot (1.4.0-1) unstable; urgency=low
+  * New upstream release
+  * debian/rules:
+    - New upstream configuration option --disable-rpath allows packages to
+      be built without rpath.
+  * parrot-devel.install.in
+    - Install pbc_to_exe binary and supporting library.
+
+ -- Allison Randal <allison@parrot.org>  Fri, 24 Jul 2009 23:54:07 -0700
+
 parrot (1.0.0-1) unstable; urgency=low
   * New upstream release
   * debian/control.in:

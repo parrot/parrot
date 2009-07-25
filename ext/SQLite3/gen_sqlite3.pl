@@ -17,17 +17,17 @@ print preamble();
 
 for (parse_ast($fn).hash().kv) -> $k,$v {
     #dump_node($v);
-    if ($v.WHAT eq "FuncDecl") {
+    if ($v.WHAT eq "NCIGENAST::FuncDecl()") {
         my @result = pir($v);
         my $cname       = @result[0];
         my $signature   = @result[1];
         my $source      = @result[2];
         my $suffix_name = @result[0];
-        my $suffix_name .= subst( /sqlite3_/, '' );
+        $suffix_name .= subst( /sqlite3_/, '' );
 
         my $pirname = %rename_table{$suffix_name} || $suffix_name;
 
-        say "    '_nci_init_symbol_'(lib, '$pirname', '$cname', '$signature') #$source";
+        say "    '_nci_init_symbol_'(lib, '$pirname', '$cname', '$signature')";
     }
 }
 print postamble();
