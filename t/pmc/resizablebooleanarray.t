@@ -393,6 +393,8 @@ end:
 .end
 
 .sub aerobics
+    .local pmc jmpstack
+    jmpstack = new 'ResizableIntegerArray'
     new $P0, ['ResizableBooleanArray']
     set $I10, 10000
 
@@ -470,27 +472,27 @@ end:
     .return()
   errFirstPop:
     print "FAILED: first pop\n"
-    bsr info
+    local_branch jmpstack, info
     .return()
   errSecondPop:
     print "FAILED: second pop\n"
-    bsr info
+    local_branch jmpstack, info
     .return()
   errBuildLen:
     print "FAILED: buildup length\n"
-    bsr info
+    local_branch jmpstack, info
     .return()
   errLeftGet:
     print "FAILED: left get\n"
-    bsr info
+    local_branch jmpstack, info
     .return()
   errRightGet:
     print "FAILED: right get\n"
-    bsr info
+    local_branch jmpstack, info
     .return()
   errTearDown:
     print "FAILED: tear down cap\n"
-    bsr info
+    local_branch jmpstack, info
     .return()
   info:
     ok(0, "aerobics goof:")
@@ -499,7 +501,7 @@ end:
     print "\n#Wanted: "
     print $I3
     print "\n"
-    ret
+    local_return jmpstack
 .end
 
 

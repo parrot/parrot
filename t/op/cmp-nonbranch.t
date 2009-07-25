@@ -22,15 +22,15 @@ Tests all non-branching conditional operators.
 .macro EXP()
   exp_nok:
     exp = 0
-    ret
+    local_return jmpstack
   exp_ok:
     exp = 1
-    ret
+    local_return jmpstack
 .endm
 
 .macro TEST()
     is( res, exp, desc )
-    ret
+    local_return jmpstack
 .endm
 
 .macro SET_DESC(op)
@@ -72,22 +72,24 @@ Tests all non-branching conditional operators.
 
 .sub 'issame'
     .local int exp, res
+    .local pmc jmpstack
+               jmpstack = new 'ResizableIntegerArray'
     .SET_DESC('issame')
 
   init:
     $P0 = new 'Integer'
     $P1 = new 'String'
-    bsr exp_nok
-    bsr test_it   # not ok
+    local_branch jmpstack,  exp_nok
+    local_branch jmpstack,  test_it   # not ok
     $P0 = new 'String'
-    bsr test_it   # not ok
-    bsr exp_ok
+    local_branch jmpstack,  test_it   # not ok
+    local_branch jmpstack,  exp_ok
     $P1 = $P0
-    bsr test_it   # ok
+    local_branch jmpstack,  test_it   # ok
     $P0 = new 'Null'
     $P1 = new 'Null'
-    bsr test_it   # ok -- Null is a singleton
-    .return ()
+    local_branch jmpstack,  test_it   # ok -- Null is a singleton
+    .return()
 
     .EXP()
   test_it:
@@ -98,22 +100,24 @@ Tests all non-branching conditional operators.
 
 .sub 'isntsame'
     .local int exp, res
+    .local pmc jmpstack
+               jmpstack = new 'ResizableIntegerArray'
     .SET_DESC('isntsame')
 
   init:
     $P0 = new 'Integer'
     $P1 = new 'String'
-    bsr exp_ok
-    bsr test_it   # ok
+    local_branch jmpstack,  exp_ok
+    local_branch jmpstack,  test_it   # ok
     $P0 = new 'String'
-    bsr test_it   # ok
+    local_branch jmpstack,  test_it   # ok
     $P1 = $P0
-    bsr exp_nok
-    bsr test_it   # not ok
+    local_branch jmpstack,  exp_nok
+    local_branch jmpstack,  test_it   # not ok
     $P0 = new 'Null'
     $P1 = new 'Null'
-    bsr test_it   # not ok -- Null is a singleton
-    .return ()
+    local_branch jmpstack,  test_it   # not ok -- Null is a singleton
+    .return()
 
     .EXP()
   test_it:
@@ -124,17 +128,19 @@ Tests all non-branching conditional operators.
 
 .sub 'istrue'
     .local int exp, res
+    .local pmc jmpstack
+               jmpstack = new 'ResizableIntegerArray'
     .SET_DESC('istrue')
 
   init:
     $P0 = new 'Integer'
     $P0 = 0
-    bsr exp_nok
-    bsr test_it   # not ok
+    local_branch jmpstack,  exp_nok
+    local_branch jmpstack,  test_it   # not ok
     $P0 = 1
-    bsr exp_ok
-    bsr test_it   # ok
-    .return ()
+    local_branch jmpstack,  exp_ok
+    local_branch jmpstack,  test_it   # ok
+    .return()
 
     .EXP()
   test_it:
@@ -145,17 +151,19 @@ Tests all non-branching conditional operators.
 
 .sub 'isfalse'
     .local int exp, res
+    .local pmc jmpstack
+               jmpstack = new 'ResizableIntegerArray'
     .SET_DESC('isfalse')
 
   init:
     $P0 = new 'Integer'
     $P0 = 0
-    bsr exp_ok
-    bsr test_it   # ok
+    local_branch jmpstack,  exp_ok
+    local_branch jmpstack,  test_it   # ok
     $P0 = 1
-    bsr exp_nok
-    bsr test_it   # not ok
-    .return ()
+    local_branch jmpstack,  exp_nok
+    local_branch jmpstack,  test_it   # not ok
+    .return()
 
     .EXP()
   test_it:
@@ -166,18 +174,20 @@ Tests all non-branching conditional operators.
 
 .sub 'isnull_pmc'
     .local int exp, res
+    .local pmc jmpstack
+               jmpstack = new 'ResizableIntegerArray'
     .SET_DESC('isnull pmc')
 
   init:
     $S0 = 'FUBAR'
-    bsr exp_ok
-    bsr test_it
+    local_branch jmpstack,  exp_ok
+    local_branch jmpstack,  test_it
     $S0 = 'Null' # this is a valid pmc type -- you can't trick parrot :)
-    bsr exp_nok
-    bsr test_it
+    local_branch jmpstack,  exp_nok
+    local_branch jmpstack,  test_it
     $S0 = 'Integer'
-    bsr test_it
-    .return ()
+    local_branch jmpstack,  test_it
+    .return()
 
     .EXP()
   test_it:

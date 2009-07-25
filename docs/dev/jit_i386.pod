@@ -34,7 +34,8 @@ opcode gets executed:
 	set I0, 10           # set_i_ic
 	print I0             # (call)               print_i
 	print "\n"           #                      print_sc
-	bsr inc              # (call)     bsr_ic    cpu_ret
+        new P1, 'ResizableIntegerArray'
+	local_branch P0, inc # (call) local_branch_p_ic  cpu_ret
 	end                  # (jmp) HALT           end (ret)
 	                     # end (ret)
   inc:
@@ -43,7 +44,7 @@ opcode gets executed:
 	set P0, I0           # set_p_i
 	print P0             # (call)               print_p
 	print "\n"           #                      print_sc
-	ret                  # (call)     ret       cpu_ret
+	local_return P1      # (call) local_return_p     cpu_ret
 
 =end PASM
 

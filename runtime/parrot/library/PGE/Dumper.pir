@@ -104,6 +104,8 @@ An alternate dump output for a Match object and all of its subcaptures.
     .local int spi, spc
     .local pmc it
     .local string prefix1, prefix2
+    .local pmc jmpstack
+    jmpstack = new 'ResizableIntegerArray'
 
     if has_b2 goto start
     b2 = "]"
@@ -139,7 +141,7 @@ An alternate dump output for a Match object and all of its subcaptures.
     $I0 = defined capt[spi]
     unless $I0 goto subpats_2
     $P0 = capt[spi]
-    bsr dumper
+    local_branch jmpstack, dumper
   subpats_2:
     inc spi
     goto subpats_1
@@ -157,7 +159,7 @@ An alternate dump output for a Match object and all of its subcaptures.
     $I0 = defined capt[$S0]
     unless $I0 goto subrules_1
     $P0 = capt[$S0]
-    bsr dumper
+    local_branch jmpstack, dumper
     goto subrules_1
 
   dumper:
@@ -165,7 +167,7 @@ An alternate dump output for a Match object and all of its subcaptures.
     unless $I0 goto dumper_0
     $S0 = $P0.'dump_str'(prefix1, b1, b2)
     out .= $S0
-    ret
+    local_return jmpstack
   dumper_0:
     $I0 = does $P0, 'array'
     unless $I0 goto dumper_3
@@ -183,14 +185,14 @@ An alternate dump output for a Match object and all of its subcaptures.
     inc $I0
     goto dumper_1
   dumper_2:
-    ret
+    local_return jmpstack
   dumper_3:
     out .= prefix1
     out .= ': '
     $S0 = $P0
     out .= $S0
     out .= "\n"
-    ret
+    local_return jmpstack
 
   end:
     .return (out)

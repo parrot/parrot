@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 23;
 
 =head1 NAME
 
@@ -96,22 +96,6 @@ three:
         print   I4
         end
 CODE
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "bsr_i" );
-        print   "start\n"
-
-        bsr     LAB1
-
-        print   "done\n"
-        end
-
-LAB1:   print   "lab 1\n"
-        ret
-CODE
-start
-lab 1
-done
-OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "local_branch_c_i" );
         print    "start\n"

@@ -27,6 +27,8 @@ F<examples/library/ncurses_life.pir>.
 .sub 'life' :main
         .param pmc argv
         .local int max_generations
+        .local pmc jmpstack
+                   jmpstack = new 'ResizableIntegerArray'
 
 	# First the generation count
         $I15 = argv
@@ -78,7 +80,7 @@ MAX_GENERATIONS_IS_NOW_KNOWN:
 	concat $S15, $S12
 	concat $S15, $S13
 	concat $S15, $S14
-	bsr dump
+	local_branch jmpstack,  dump
 	set $I0, 0
 loop:	ge $I0, $I2, getout
 	inc $I0
@@ -87,9 +89,9 @@ loop:	ge $I0, $I2, getout
 	printerr "."
 skip:
 
-	bsr generate
+	local_branch jmpstack,  generate
 
-	bsr dump
+	local_branch jmpstack,  dump
 	branch loop
 getout:	time $N6
 	sub $N7, $N6, $N5
@@ -246,7 +248,7 @@ done:
 	$I2 = save_I2
 	$I1 = save_I1
 	$I0 = save_I0
-	ret
+	local_return jmpstack
 
 # $S15 has the incoming string, $S0 is scratch
 dump:
@@ -267,7 +269,7 @@ printloop:
 	ge $I11, 0, printloop
 	sleep 1
 dumpend:
-	ret
+	local_return jmpstack
 
 .end
 

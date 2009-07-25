@@ -165,6 +165,8 @@ END:
     .local int tmpi, cond
     .local string tmps, key
     .local pmc capt, it, subelm, elm
+    .local pmc jmpstack
+    jmpstack = new 'ResizableIntegerArray'
 
     out = ""
 
@@ -192,7 +194,7 @@ END:
     cond = defined capt[spi]
     unless cond goto subpats_fail
     elm = capt[spi]
-    bsr dumper
+    local_branch jmpstack, dumper
     inc spi
     goto subpats_loop
   subpats_fail:
@@ -215,7 +217,7 @@ END:
     tmps = escape key
     out .= tmps
     out .= '", '
-    bsr dumper
+    local_branch jmpstack, dumper
     out .= ")"
     unless it goto end
     out .= ", "
@@ -233,20 +235,20 @@ END:
     unless $I0 goto dumper_string
     tmps = elm."dump_hs"()
     out .= tmps
-    ret
+    local_return jmpstack
   dumper_string:
     $S0 = elm
     tmps = escape $S0
     out .= 'PGE_String "'
     out .= tmps
     out .= '"'
-    ret
+    local_return jmpstack
   dumper_fail:
     out .= PGE_FAIL
-    ret
+    local_return jmpstack
   dumper_done:
     out .= "]"
-    ret
+    local_return jmpstack
   dumper_array:
     ari = 0
     arc = elements elm

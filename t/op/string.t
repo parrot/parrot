@@ -1783,120 +1783,121 @@ pasm_output_is( <<'CODE', <<'OUTPUT', 'sprintf' );
 NEWARYP:
     new P1, 'ResizablePMCArray'
     set P1[0], P0
-    ret
+    local_return P4
 NEWARYS:
     new P1, 'ResizablePMCArray'
     set P1[0], S0
-    ret
+    local_return P4
 NEWARYI:
     new P1, 'ResizablePMCArray'
     set P1[0], I0
-    ret
+    local_return P4
 NEWARYN:
     new P1, 'ResizablePMCArray'
     set P1[0], N0
-    ret
+    local_return P4
 PRINTF:
     sprintf S2, S1, P1
     print S2
-    ret
+    local_return P4
 
 MAIN:
+    new P4, 'ResizableIntegerArray'
     set S1, "Hello, %s\n"
     set S0, "Parrot!"
-    bsr NEWARYS
-    bsr PRINTF
+    local_branch P4, NEWARYS
+    local_branch P4, PRINTF
 
     set S1, "Hash[0x%x]\n"
     set I0, 256
-    bsr NEWARYI
-    bsr PRINTF
+    local_branch P4, NEWARYI
+    local_branch P4, PRINTF
 
     set S1, "Hash[0x%lx]\n"
     set I0, 256
-    bsr NEWARYI
-    bsr PRINTF
+    local_branch P4, NEWARYI
+    local_branch P4, PRINTF
 
     set S1, "Hello, %.2s!\n"
     set S0, "Parrot"
-    bsr NEWARYS
-    bsr PRINTF
+    local_branch P4, NEWARYS
+    local_branch P4, PRINTF
 
     set S1, "Hello, %Ss"
     set S0, S2
-    bsr NEWARYS
-    bsr PRINTF
+    local_branch P4, NEWARYS
+    local_branch P4, PRINTF
 
     set S1, "1 == %Pd\n"
     new P0, 'Integer'
     set P0, 1
-    bsr NEWARYP
-    bsr PRINTF
+    local_branch P4, NEWARYP
+    local_branch P4, PRINTF
 
     set S1, "-255 == %vd\n"
     set I0, -255
-    bsr NEWARYI
-    bsr PRINTF
+    local_branch P4, NEWARYI
+    local_branch P4, PRINTF
 
     set S1, "+123 == %+vd\n"
     set I0, 123
-    bsr NEWARYI
-    bsr PRINTF
+    local_branch P4, NEWARYI
+    local_branch P4, PRINTF
 
     set S1, "256 == %vu\n"
     set I0, 256
-    bsr NEWARYI
-    bsr PRINTF
+    local_branch P4, NEWARYI
+    local_branch P4, PRINTF
 
     set S1, "1 == %+vu\n"
     set I0, 1
-    bsr NEWARYI
-    bsr PRINTF
+    local_branch P4, NEWARYI
+    local_branch P4, PRINTF
 
     set S1, "001 == %0.3u\n"
     set I0, 1
-    bsr NEWARYI
-    bsr PRINTF
+    local_branch P4, NEWARYI
+    local_branch P4, PRINTF
 
     set S1, "001 == %+0.3u\n"
     set I0, 1
-    bsr NEWARYI
-    bsr PRINTF
+    local_branch P4, NEWARYI
+    local_branch P4, PRINTF
 
     set S1, "0.500000 == %f\n"
     set N0, 0.5
-    bsr NEWARYN
-    bsr PRINTF
+    local_branch P4, NEWARYN
+    local_branch P4, PRINTF
 
     set S1, "0.500 == %5.3f\n"
     set N0, 0.5
-    bsr NEWARYN
-    bsr PRINTF
+    local_branch P4, NEWARYN
+    local_branch P4, PRINTF
 
     set S1, "0.001 == %g\n"
     set N0, 0.001
-    bsr NEWARYN
-    bsr PRINTF
+    local_branch P4, NEWARYN
+    local_branch P4, PRINTF
 
     set S1, "1e+06 == %g\n"
     set N0, 1.0e6
-    bsr NEWARYN
-    bsr PRINTF
+    local_branch P4, NEWARYN
+    local_branch P4, PRINTF
 
     set S1, "0.5 == %3.3g\n"
     set N0, 0.5
-    bsr NEWARYN
-    bsr PRINTF
+    local_branch P4, NEWARYN
+    local_branch P4, PRINTF
 
     set S1, "%% == %%\n"
     set I0, 0
-    bsr NEWARYI
-    bsr PRINTF
+    local_branch P4, NEWARYI
+    local_branch P4, PRINTF
 
     set S1, "That's all, %s\n"
     set S0, "folks!"
-    bsr NEWARYS
-    bsr PRINTF
+    local_branch P4, NEWARYS
+    local_branch P4, PRINTF
 
     end
 CODE
@@ -1927,22 +1928,23 @@ pasm_output_is( <<'CODE', <<'OUTPUT', 'other form of sprintf op' );
 PRINTF:
     sprintf P3, P2, P1
     print P3
-    ret
+    local_return P4
 
 MAIN:
+    new P4, 'ResizableIntegerArray'
     new P3, 'String'
 
     new P2, 'String'
     set P2, "15 is %b\n"
     new P1, 'ResizablePMCArray'
     set P1[0], 15
-    bsr PRINTF
+    local_branch P4, PRINTF
 
     new P2, 'String'
     set P2, "128 is %o\n"
     new P1, 'ResizablePMCArray'
     set P1[0], 128
-    bsr PRINTF
+    local_branch P4, PRINTF
 
     end
 CODE

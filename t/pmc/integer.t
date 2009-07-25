@@ -434,47 +434,50 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "get_as_base(various)" );
 .sub main :main
+    .local pmc jmpstack
+    jmpstack = new 'ResizableIntegerArray'
+
     $P0 = new ['Integer']
     $P0 = 42
 
     $S0 = $P0.'get_as_base'(2)
-    bsr PRINT
+    local_branch jmpstack, PRINT
 
     $S0 = $P0.'get_as_base'(3)
-    bsr PRINT
+    local_branch jmpstack, PRINT
 
     $S0 = $P0.'get_as_base'(5)
-    bsr PRINT
+    local_branch jmpstack, PRINT
 
     $S0 = $P0.'get_as_base'(7)
-    bsr PRINT
+    local_branch jmpstack, PRINT
 
     $S0 = $P0.'get_as_base'(11)
-    bsr PRINT
+    local_branch jmpstack, PRINT
 
     $S0 = $P0.'get_as_base'(13)
-    bsr PRINT
+    local_branch jmpstack, PRINT
 
     $S0 = $P0.'get_as_base'(17)
-    bsr PRINT
+    local_branch jmpstack, PRINT
 
     $S0 = $P0.'get_as_base'(19)
-    bsr PRINT
+    local_branch jmpstack, PRINT
 
     $S0 = $P0.'get_as_base'(23)
-    bsr PRINT
+    local_branch jmpstack, PRINT
 
     $S0 = $P0.'get_as_base'(29)
-    bsr PRINT
+    local_branch jmpstack, PRINT
 
     $S0 = $P0.'get_as_base'(31)
-    bsr PRINT
+    local_branch jmpstack, PRINT
     goto END
 
 PRINT:
     print $S0
     print "\n"
-    ret
+    local_return jmpstack
 END:
 .end
 CODE

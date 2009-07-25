@@ -20,21 +20,24 @@ F<docs/pdds/pdd03_calling_conventions.pod>
 
 =cut
 
-MAIN:	print "Main\n"
-	bsr TESTSUB
-	print "Main: Return from TestSub\n"
-END:	end
+MAIN:
+    new P1, 'ResizableIntegerArray'
+    print "Main\n"
+    local_branch P1, TESTSUB
+    print "Main: Return from TestSub\n"
+END:
+    end
 
 
 TESTSUB:
-	print "TestSub\n"
-	bsr NESTSUB
-	print "TestSub: Ret from NestSub\n"
-	ret
+    print "TestSub\n"
+    local_branch P1, NESTSUB
+    print "TestSub: Ret from NestSub\n"
+    local_return P1
 
 NESTSUB:
-	print "NestSub\n"
-	ret
+    print "NestSub\n"
+    local_return P1
 
 # Local Variables:
 #   mode: pir

@@ -284,10 +284,12 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
     .local pmc todo_info
                todo_info = new 'Hash'
+    .local pmc jmpstack
+               jmpstack = new 'ResizableIntegerArray'
 
     .local string test_file
 
-    bsr reset_todo_info
+    local_branch jmpstack,  reset_todo_info
     test_file = 'sprintf_tests'
     # TODOs
     todo_info[64] = 'undecided perl5 vs. posix behavior'
@@ -306,7 +308,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
   reset_todo_info:
     todo_info = new 'Hash'
-    ret
+    local_return jmpstack
 
   set_todo_loop:
     if $I0 > $I1 goto end_loop
@@ -314,7 +316,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
     $I0 += 1
     goto set_todo_loop
   end_loop:
-    ret
+    local_return jmpstack
 .end
 
 
@@ -325,10 +327,12 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
     .local pmc skip_info
                skip_info = new 'Hash'
+    .local pmc jmpstack
+               jmpstack = new 'ResizableIntegerArray'
 
     .local string test_file
 
-    bsr reset_skip_info
+    local_branch jmpstack,  reset_skip_info
     test_file = 'sprintf_tests'
     skip_info[5] = 'parrot extension (%B)'
     skip_info[7] = 'perl5-specific extension (%D)'
@@ -343,7 +347,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
     $S0 = 'perl5-specific extension (%v...)'
     $I0 = 71
     $I1 = 99
-    bsr set_skip_loop
+    local_branch jmpstack,  set_skip_loop
 
     skip_info[114] = 'harness needs support for * modifier'
     skip_info[144] = 'perl5 expresssion as test value'
@@ -366,12 +370,12 @@ tag C<all> is allowed for todo tests that should fail on any system.
     $S0 = 'perl5-specific test'
     $I0 = 238
     $I1 = 251
-    bsr set_skip_loop
+    local_branch jmpstack,  set_skip_loop
 
     $S0 = 'perl5-specific extension (%v...)'
     $I0 = 252
     $I1 = 298
-    bsr set_skip_loop
+    local_branch jmpstack,  set_skip_loop
 
     skip_info[307] = 'perl5-specific extension (%v...)'
     skip_info[308] = 'perl5-specific extension (%v...)'
@@ -382,7 +386,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
   reset_skip_info:
     skip_info = new 'Hash'
-    ret
+    local_return jmpstack
 
   set_skip_loop:
     if $I0 > $I1 goto end_loop
@@ -394,7 +398,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
     goto set_skip_loop
   end_loop:
     $S0 = ''
-    ret
+    local_return jmpstack
 .end
 
 

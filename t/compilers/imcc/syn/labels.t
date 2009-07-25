@@ -42,15 +42,13 @@ OUT
 ##############################
 pir_error_output_like( <<'CODE', <<'OUT', "illegal label" );
 .sub bogus
-         bsr _function
-         print "never\n"
-         end
+    goto _function
+    print "never\n"
+    end
 .end
 .sub _function
-         bsr FOO
-         ret
-FOO:    print "in function\n"
-         ret
+    print "in function\n"
+    .return()
 .end
 CODE
 /no label offset defined/

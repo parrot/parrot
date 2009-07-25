@@ -16,28 +16,32 @@ Creates 200 arrays of 10000 elements each.
 =cut
 
     set I3, 20
-ol:	set I0, 10
-	new P0, 'ResizablePMCArray'
+    new P10, 'ResizableIntegerArray'
+ol:
+    set I0, 10
+    new P0, 'ResizablePMCArray'
 
-ol1: bsr buildarray
-	set P0[I0], P1
-	dec I0
-	if I0, ol1
+ol1:
+    local_branch P10, buildarray
+    set P0[I0], P1
+    dec I0
+    if I0, ol1
 
-	dec I3
-	if I3, ol
+    dec I3
+    if I3, ol
 
-	end
+    end
 
 buildarray:
-	set I1, 10000
-	new P1, 'ResizablePMCArray'
-loop1:	new P2, 'Integer'
-	set P2, I1
-	set P1[I1], P2
-	dec I1
-	if I1, loop1
-	ret
+    set I1, 10000
+    new P1, 'ResizablePMCArray'
+loop1:
+    new P2, 'Integer'
+    set P2, I1
+    set P1[I1], P2
+    dec I1
+    if I1, loop1
+    local_return P10
 
 =head1 SEE ALSO
 

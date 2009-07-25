@@ -37,11 +37,12 @@ at the moment:
 	#lt I10, 2, noarg
 	#set I11, P5[1]
 	set I11, 0
+        new P10, 'ResizableIntegerArray'
 noarg:
 	set I0, 100
 	new P0, 'ResizablePMCArray'
 
-ol:	bsr buildarray
+ol:	local_branch P10, buildarray
 	set P0[I0], P1
 	dec I0
 	if I0, ol
@@ -81,7 +82,7 @@ loop1:	new P9, 'Integer'
 	set P1[I1], P9
 	dec I1
 	if I1, loop1
-	ret
+	local_return P10
 
 =head1 SEE ALSO
 
