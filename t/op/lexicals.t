@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -14,7 +14,7 @@ $ENV{TEST_PROG_ARGS} ||= '';
 plan( skip_all => 'lexicals not thawed properly from PBC, RT #60652' )
     if $ENV{TEST_PROG_ARGS} =~ /--run-pbc/;
 
-plan( tests => 47 );
+plan( tests => 48 );
 
 =head1 NAME
 
@@ -1463,6 +1463,34 @@ CODE
 #     ]
 #     script
 # ]
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'TT #536: lexical sub lookup' );
+.sub 'main'
+    .const 'Sub' $P0 = 'lexfoo'
+    .lex 'foo1', $P0
+    .lex 'foo2', $P0
+
+    'foo1'(1)
+    'foo2'(2)
+.end
+
+.sub 'lexfoo'
+    .param int count
+    print 'ok '
+    print count
+    say ' - looking up lexical sub'
+.end
+
+.sub 'foo2'
+    .param int count
+    print 'not ok '
+    print count
+    say ' - looked up global sub, not lexical'
+.end
+CODE
+ok 1 - looking up lexical sub
+ok 2 - looking up lexical sub
 OUTPUT
 
 # Local Variables:
