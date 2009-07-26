@@ -3439,7 +3439,7 @@ yyreduce:
   case 41:
 #line 1293 "compilers/imcc/imcc.y"
     {
-           char   *name = mem_sys_strdup( (yyvsp[(2) - (4)].s) + 1 );
+           char   *name = mem_sys_strdup((yyvsp[(2) - (4)].s) + 1);
            SymReg *r    = mk_pasm_reg(interp, (yyvsp[(4) - (4)].s));
            SymReg *n;
            name[strlen(name) - 1] = 0;
@@ -4294,7 +4294,7 @@ yyreduce:
 #line 1924 "compilers/imcc/imcc.y"
     {
            SymReg *n;
-           char   *name = mem_sys_strdup( (yyvsp[(2) - (4)].s) + 1 );
+           char   *name = mem_sys_strdup((yyvsp[(2) - (4)].s) + 1);
            name[strlen(name) - 1] = 0;
            n = mk_const(interp, name, 'S');
            set_lexical(interp, (yyvsp[(4) - (4)].sr), n); (yyval.i) = 0;
