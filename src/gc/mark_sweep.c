@@ -195,7 +195,7 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
     mark_context(interp, ctx);
 
     /* mark the dynamic environment. */
-    mark_stack(interp, interp->dynamic_env);
+    Parrot_gc_mark_PObj_alive(interp, (PObj*)interp->dynamic_env);
 
     /* mark the vtables: the data, Class PMCs, etc. */
     mark_vtables(interp);
