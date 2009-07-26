@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2006-2008, Parrot Foundation.
+# Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -53,7 +53,7 @@ Tests the Packfile PMC.
     pf = new ['Packfile']
     $S0 = pf["uuid"]
     ok(1, 'get_string(uuid)')
-    
+
     # Requesting unknown key should throw exception
     push_eh unknown_key
     $S0 = pf["foo"]
@@ -81,7 +81,7 @@ Tests the Packfile PMC.
     $S1 = pf["uuid"]
     $I1 = length $S1
     is($I1, 1, "Fetched length is 1")
-    
+
     # Requesting unknown key should throw exception
     push_eh unknown_key
     pf["foo"] = "fe9ab64082e0f6bbbd7b1e8264127908"
@@ -172,7 +172,7 @@ Tests the Packfile PMC.
 # Helper sub to check fields in Packfile header
 .sub '_check_header'
     .param pmc pf
-    
+
     # wordsize always greater than 0
     $I0 = pf["wordsize"]
     ok($I0, "Wordsize set")
@@ -217,7 +217,7 @@ Tests the Packfile PMC.
     # Set uuid_type
     pf['uuid_type'] = 1
     $S0 = pf
-    
+
     # Pack it
     ok(1, "PackFile packed")
 
@@ -278,7 +278,7 @@ Tests the Packfile PMC.
     .local string second
     # Pack
     second = packfile
-    
+
     $I0 = cmp first, second
     $I0 = not $I0
     todo($I0, 'pack produced same result twice')

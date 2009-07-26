@@ -5,7 +5,6 @@
 
 t/pmc/packfileannotation.t - test the PackfileAnnotation PMC
 
-
 =head1 SYNOPSIS
 
     % prove t/pmc/packfileannotation.t
@@ -48,3 +47,10 @@ Tests the PackfileAnnotation PMC.
     ok($I0, "Can't fetch wrong value from Annotation")
 
 .end
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

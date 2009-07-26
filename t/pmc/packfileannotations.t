@@ -6,7 +6,6 @@
 
 t/pmc/packfileannotations.t - test the PackfileAnnotations PMC
 
-
 =head1 SYNOPSIS
 
     % prove t/pmc/packfileannotations.t
@@ -154,4 +153,4 @@ Tests the PackfileAnnotations PMC.
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

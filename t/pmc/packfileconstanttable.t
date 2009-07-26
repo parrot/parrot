@@ -6,7 +6,6 @@
 
 t/pmc/packfileconstanttable.t - test the PackfileConstantTable PMC
 
-
 =head1 SYNOPSIS
 
     % prove t/pmc/packfileconstanttable.t
@@ -120,7 +119,7 @@ Tests the PackfileConstantTable PMC.
     ct[0] = "string"
     $I0 = elements ct
     is($I0, 1, "String element added")
-    
+
     ct[1] = 1.0
     $I0 = elements ct
     is($I0, 2, "Number elements added")
@@ -147,7 +146,7 @@ Tests the PackfileConstantTable PMC.
     $I1 = pfc.'get_or_create_constant'('foo')
     $I2 = pfc.'get_or_create_constant'('foo')
     is($I1, $I2, "get_or_create_constant returs same string value for same key")
-    
+
     $I2 = pfc.'get_or_create_constant'('bar')
     $I0 = $I1 != $I2
     ok($I0, "get_or_create_constant returs different string values for different keys")
@@ -156,7 +155,7 @@ Tests the PackfileConstantTable PMC.
     $I1 = pfc.'get_or_create_constant'(1.0)
     $I2 = pfc.'get_or_create_constant'(1.0)
     is($I1, $I2, "get_or_create_constant returs same number value for same key")
-    
+
     $I2 = pfc.'get_or_create_constant'(42.1)
     $I0 = $I1 != $I2
     ok($I0, "get_or_create_constant returs different number values for different keys")
@@ -184,4 +183,4 @@ Tests the PackfileConstantTable PMC.
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
