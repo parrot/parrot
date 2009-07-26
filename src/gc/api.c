@@ -538,8 +538,7 @@ Parrot_gc_free_string_header(PARROT_INTERP, ARGMOD(STRING *s))
 Returns a new buffer-like header from the appropriate sized pool.
 A "bufferlike object" is an object that is considered to be isomorphic to the
 PObj, so it will participate in normal GC. At the moment these are only used
-to create ListChunk objects in src/list.c and Stack_Chunk objects in
-src/stacks.c.
+to create ListChunk objects in src/list.c.
 
 =cut
 

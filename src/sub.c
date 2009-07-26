@@ -192,7 +192,6 @@ new_continuation(PARROT_INTERP, ARGIN_NULLOK(const Parrot_cont *to))
 
     cc->to_ctx        = to_ctx;
     cc->from_ctx      = Parrot_context_ref(interp, CONTEXT(interp));
-    cc->dynamic_state = NULL;
     cc->runloop_id    = 0;
     if (to) {
         cc->seg       = to->seg;
@@ -227,7 +226,6 @@ new_ret_continuation(PARROT_INTERP)
 
     cc->to_ctx          = CONTEXT(interp);
     cc->from_ctx        = CONTEXT(interp);    /* filled in during a call */
-    cc->dynamic_state   = NULL;
     cc->runloop_id      = 0;
     cc->seg             = interp->code;
     cc->current_results = NULL;
@@ -257,7 +255,6 @@ new_coroutine(PARROT_INTERP)
 
     co->seg                = interp->code;
     co->ctx                = NULL;
-    co->dynamic_state      = NULL;
 
     return co;
 }
