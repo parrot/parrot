@@ -20,7 +20,7 @@ total number of GC runs made.
 	set I0, 10
 	new P0, 'ResizablePMCArray'
 
-ol:	local_branch jmpstack,  buildarray
+ol:	local_branch P10,  buildarray
 	set P0[I0], P1
 	dec I0
 #	print I0
@@ -30,7 +30,7 @@ ol:	local_branch jmpstack,  buildarray
 	set I0, 20
 	new P2, 'ResizablePMCArray'
 
-ol1:	local_branch jmpstack,  buildarray
+ol1:	local_branch P10,  buildarray
 	set P2[I0], P1
 	dec I0
 #	print I0
@@ -40,7 +40,7 @@ ol1:	local_branch jmpstack,  buildarray
 	set I0, 20
 	new P3, 'ResizablePMCArray'
 
-ol2:	local_branch jmpstack,  buildarray
+ol2:	local_branch P10,  buildarray
 	set P3[I0], P1
 	dec I0
 #	print I0
