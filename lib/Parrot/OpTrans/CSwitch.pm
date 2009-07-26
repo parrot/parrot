@@ -117,20 +117,6 @@ sub goto_offset {
     return "{ cur_opcode += $offset; goto SWITCH_AGAIN; }";
 }
 
-=item C<goto_pop()>
-
-Transforms the C<goto POP()> macro in an ops file into the relevant C
-code.
-
-=cut
-
-sub goto_pop {
-    my ($self) = @_;
-    return "{ opcode_t *dest = (opcode_t*)pop_dest(interp);
-              cur_opcode = opcode_to_prederef(interp, dest);
-              goto SWITCH_AGAIN; }";
-}
-
 =item C<init_func_init1($base)>
 
 Returns the C code for the init function.

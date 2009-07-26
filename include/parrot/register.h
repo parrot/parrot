@@ -15,7 +15,6 @@
 
 #include "parrot/string.h"
 #include "parrot/compiler.h"
-#include "parrot/stacks.h"
 
 /*
  * Macros to make accessing registers more convenient/readable.
@@ -57,7 +56,6 @@
 #define REG_OFFS_STR(x) (sizeof (STRING*) * (x) + _SIZEOF_INTS + _SIZEOF_PMCS)
 
 
-struct Stack_Chunk;
 typedef struct Parrot_Context Parrot_Context; /* parrot/interpreter.h */
 
 /* HEADERIZER BEGIN: src/gc/alloc_register.c */

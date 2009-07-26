@@ -150,7 +150,6 @@ Swaps the "context".
             ctx        = Parrot_set_new_context(INTERP, co->n_regs_used);
 
             co->ctx                   = Parrot_context_ref(interp, ctx);
-            co->dynamic_state         = interp->dynamic_env;
 
             ctx->caller_ctx           = caller_ctx;
             PMC_cont(ccont)->from_ctx = ctx;
@@ -179,7 +178,6 @@ Swaps the "context".
         /* if calling the Coro we need the segment of the Coro */
         else if (!(PObj_get_FLAGS(SELF) & SUB_FLAG_CORO_FF)) {
             PMC *ccont;
-            Stack_Chunk_t    *state;
             Parrot_Context   *ctx;
 
             PObj_get_FLAGS(SELF) |= SUB_FLAG_CORO_FF;
@@ -195,16 +193,12 @@ Swaps the "context".
                                   = CONTEXT(interp);
 
             /* set context to coro context */
-            state                 = interp->dynamic_env;
-            interp->dynamic_env   = co->dynamic_state;
-            co->dynamic_state     = state;
             CONTEXT(interp)       = ctx;
             INTERP->ctx.bp        = ctx->bp;
             INTERP->ctx.bp_ps     = ctx->bp_ps;
         }
         else {
             PMC *ccont;
-            Stack_Chunk_t    *state;
             Parrot_Context   *ctx;
 
             PObj_get_FLAGS(SELF) &= ~SUB_FLAG_CORO_FF;
@@ -224,9 +218,6 @@ Swaps the "context".
                                "Cannot resume dead coroutine.");
             }
 
-            state                = interp->dynamic_env;
-            interp->dynamic_env  = co->dynamic_state;
-            co->dynamic_state    = state;
             CONTEXT(interp)      = ctx;
             INTERP->ctx.bp       = ctx->bp;
             INTERP->ctx.bp_ps    = ctx->bp_ps;
@@ -258,9 +249,6 @@ Marks the coroutine as live.
 
         /* co->ctx marked in SUPER(), so do not mark here */
         if (co) {
-            if (co->dynamic_state)
-                mark_stack(INTERP, co->dynamic_state);
-
             SUPER();
         }
     }

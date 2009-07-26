@@ -111,20 +111,6 @@ sub goto_offset {
     .      "goto **(void **)(cur_opcode += $offset);\n} while (1)";
 }
 
-=item C<goto_pop()>
-
-Transforms the C<goto POP()> macro in an ops file into the relevant C
-code.
-
-=cut
-
-sub goto_pop {
-    my ($self) = @_;
-
-    return "goto **(void **)(cur_opcode = opcode_to_prederef(interp,
-        (opcode_t*)pop_dest(interp)))";
-}
-
 sub run_core_func_start {
     my $type = __PACKAGE__;
     return <<END_C;

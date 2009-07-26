@@ -460,7 +460,6 @@ INTERP_O_FILES := \
     $(SRC_DIR)/scheduler$(O) \
     $(SRC_DIR)/spf_render$(O) \
     $(SRC_DIR)/spf_vtable$(O) \
-    $(SRC_DIR)/stacks$(O) \
     $(SRC_DIR)/string/primitives$(O) \
     $(SRC_DIR)/sub$(O) \
     $(SRC_DIR)/thread$(O) \
@@ -636,7 +635,6 @@ STR_FILES := \
     $(SRC_DIR)/spf_vtable.str \
     $(SRC_DIR)/string/api.str \
     $(SRC_DIR)/sub.str \
-    $(SRC_DIR)/stacks.str \
     \
     $(CLASS_STR_FILES)
 
@@ -1195,8 +1193,6 @@ $(SRC_DIR)/parrot$(O) : $(GENERAL_H_FILES)
 $(SRC_DIR)/gc/alloc_register$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h
 
 $(SRC_DIR)/runcore/cores$(O) : $(GENERAL_H_FILES)
-
-$(SRC_DIR)/stacks$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/tsq$(O) : $(GENERAL_H_FILES)
 

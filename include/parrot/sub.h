@@ -214,7 +214,6 @@ typedef struct Parrot_coro {
 
     PackFile_ByteCode *caller_seg;  /* bytecode segment */
     opcode_t *address;           /* next address to run - toggled each time */
-    struct Stack_Chunk *dynamic_state; /* next dynamic state */
 } Parrot_coro;
 
 typedef struct Parrot_cont {
@@ -222,7 +221,6 @@ typedef struct Parrot_cont {
     PackFile_ByteCode *seg;          /* bytecode segment */
     opcode_t *address;               /* start of bytecode, addr to continue */
     struct Parrot_Context *to_ctx;   /* pointer to dest context */
-    struct Stack_Chunk *dynamic_state; /* dest dynamic state */
     /* a Continuation keeps the from_ctx alive */
     struct Parrot_Context *from_ctx; /* sub, this cont is returning from */
     opcode_t *current_results;       /* ptr into code with get_results opcode

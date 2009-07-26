@@ -206,13 +206,6 @@ Jumps to the address given as an offset from the current address.
 Here, C<x> is an offset in C<size_t> units that represents how far forward
 (positive) or how far backwards (negative) to jump to.
 
-=item * POP()
-
-C<POP> pops the next opcode address off the control stack. To put an address
-onto the control stack, use the C<PUSH> keyword instead. C<PUSH> takes a single
-C<opcode_t *> argument to store, and C<POP> returns a single C<opcode_ *>
-value.
-
 =back
 
 =head2 The Opcode Compiler

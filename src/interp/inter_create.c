@@ -210,12 +210,6 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     PARROT_ERRORS_on(interp, PARROT_ERRORS_RESULT_COUNT_FLAG);
 #endif
 
-    /* allocate stack chunk cache */
-    stack_system_init(interp);
-
-    /* And a dynamic environment stack */
-    interp->dynamic_env = new_stack(interp, "DynamicEnv");
-
     /* clear context introspection vars */
     CONTEXT(interp)->current_sub    = NULL;
     CONTEXT(interp)->current_cont   = NULL;
@@ -234,6 +228,10 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 
     /* create the root set registry */
     interp->gc_registry     = pmc_new(interp, enum_class_AddrRegistry);
+
+    /* And a dynamic environment stack */
+    /* TODO: We should really consider removing this (TT #876) */
+    interp->dynamic_env = pmc_new(interp, enum_class_ResizablePMCArray);
 
     /* create exceptions list */
     interp->current_runloop_id    = 0;

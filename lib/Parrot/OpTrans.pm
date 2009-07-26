@@ -220,19 +220,6 @@ sub goto_offset {
     return $self->gen_goto( $self->expr_offset(@_) );
 }
 
-=item C<goto_pop()>
-
-Transforms the C<goto POP($address)> macro in an ops file into the
-relevant C code.
-
-=cut
-
-sub goto_pop {
-    my ($self) = @_;
-
-    return $self->gen_goto( $self->expr_pop(@_) );
-}
-
 =item C<expr_offset($offset)>
 
 Implemented in subclasses to return the C code for C<OFFSET($offset)>.
