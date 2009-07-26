@@ -1,6 +1,6 @@
 parrot (1.4.0-1ubuntu1) karmic; urgency=low
-  * Merge from Debian unstable.
-  * Remove lpia patch, upstream fix included in new release.
+  * Synchronize with Debian unstable.
+  * Removes lpia patch, upstream fix included in new release.
 
  -- Allison Randal <allison@parrot.org>  Sat, 25 Jul 2009 08:37:52 -0700
 
