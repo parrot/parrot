@@ -1291,7 +1291,7 @@ pasm_inst:                     { clear_state(interp); }
          }
    | LEXICAL STRINGC COMMA REG
          {
-           char   *name = mem_sys_strdup( $2 + 1 );
+           char   *name = mem_sys_strdup($2 + 1);
            SymReg *r    = mk_pasm_reg(interp, $4);
            SymReg *n;
            name[strlen(name) - 1] = 0;
@@ -1923,7 +1923,7 @@ labeled_inst:
    | LEXICAL STRINGC COMMA target
          {
            SymReg *n;
-           char   *name = mem_sys_strdup( $2 + 1 );
+           char   *name = mem_sys_strdup($2 + 1);
            name[strlen(name) - 1] = 0;
            n = mk_const(interp, name, 'S');
            set_lexical(interp, $4, n); $$ = 0;
