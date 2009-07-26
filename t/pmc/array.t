@@ -146,7 +146,7 @@ end:
 .sub defined_sub
     .local pmc foo, bar, baz
     .local int ival
-    
+
     foo = new ['Array']
     defined ival, foo
     is(ival, 1, 'newed array is defined')
@@ -218,7 +218,7 @@ end:
     .local int ival
     .local num nval
     .local string sval, inner
-   
+
     foo = new ['Array']
     foo = 4
     bar = new ['Key']
@@ -387,7 +387,7 @@ end:
 
     p = new ['Array']
     is(p, 0, 'newed array is not true correctly')
-    
+
     p = 4
     is(p, 4, 'resized array is true correctly')
 
@@ -497,4 +497,4 @@ end:
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
