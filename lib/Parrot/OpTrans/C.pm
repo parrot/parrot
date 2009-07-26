@@ -100,18 +100,6 @@ sub expr_offset {
     return "cur_opcode + $offset";
 }
 
-=item C<expr_pop()>
-
-Returns the C code for C<POP()>. Called by C<goto_offset()>.
-
-=cut
-
-sub expr_pop {
-    my ($self) = @_;
-
-    return "pop_dest(interp)";
-}
-
 our %arg_maps = (
     'op' => "cur_opcode[%ld]",
 

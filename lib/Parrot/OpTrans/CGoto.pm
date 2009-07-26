@@ -174,20 +174,6 @@ sub goto_offset {
     return "goto *ops_addr[*(cur_opcode += $offset)]";
 }
 
-=item C<goto_pop()>
-
-Transforms the C<goto POP()> macro in an ops file into the relevant C
-code.
-
-=cut
-
-sub goto_pop {
-    my ($self) = @_;
-
-    return
-"opcode_t* pop_addr = (opcode_t*)pop_dest(interp);\ncur_opcode = pop_addr;goto *ops_addr[*(pop_addr)]";
-}
-
 my %arg_maps = (
     'op' => "cur_opcode[%ld]",
 
