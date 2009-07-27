@@ -46,7 +46,14 @@ sub runstep {
 
     my $lib_dir = $conf->data->get('build_dir') . "/blib/lib";
     $flagsref->{ldflags} .= " -L$lib_dir";
-    $flagsref->{ccflags} .= " -pipe -fno-common -Wno-long-double ";
+
+    if ($ENV{'MACOSX_DEPLOYMENT_TARGET'} eq '10.6') {
+        $flagsref->{ccflags} .= ' -pipe -fno-common ';
+    }
+    else {
+        $flagsref->{ccflags} .= ' -pipe -fno-common -Wno-long-double ';
+    }
+
     $flagsref->{linkflags} .= " -undefined dynamic_lookup";
 
     _probe_for_libraries($conf, $flagsref, 'fink');
