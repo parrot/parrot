@@ -762,21 +762,25 @@ will be used in lieu of this one.)
     $P0 = self.'HOW'()
     parrotclass = $P0.'get_parrotclass'(self)
 
+    # Perl6Object accepts anything.
     $S0 = parrotclass
     if $S0 == 'Perl6Object' goto accept_anyway
-
-    $I0 = isa topic, 'Junction'
-    if $I0 goto normal_check
-
-    if $S0 == 'Any' goto accept_anyway
-
-  normal_check:
+    
+    # Otherwise, just try a normal check.
     $I0 = can topic, 'HOW'
     unless $I0 goto end
     topicwhat = topic.'WHAT'()
     $I0 = isa topicwhat, parrotclass
     if $I0 goto end
     $I0 = does topic, parrotclass
+    if $I0 goto end
+    
+    # If this fails, and we want Any, and it's something form outside
+    # of the Perl 6 world, we'd best just accept it.
+    unless $S0 == 'Any' goto end
+    $I0 = isa topicwhat, 'Perl6Object'
+    unless $I0 goto accept_anyway
+    $I0 = 0
     goto end
 
   accept_anyway:
