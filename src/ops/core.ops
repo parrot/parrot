@@ -707,27 +707,6 @@ inline op get_addr(out INT, invar PMC) {
     $1        = (INTVAL)ptr;
 }
 
-=item B<set_label>(invar PMC, invar LABEL)
-
-Sets the opcode_t* label value for the given PMC. This is basically only
-useful for PMCs such as Sub, Continuation, ExceptionHandler and derivatives
-
-=item B<get_label>(out INT, invar PMC)
-
-Gets the opcode_t* label value from the given PMC. This is basically only
-useful for PMCs such as Sub, Continuation, ExceptionHandler and derivatives
-
-=cut
-
-inline op set_label(invar PMC, inconst LABEL) {
-    VTABLE_set_pointer(interp, $1, (CUR_OPCODE + $2));
-}
-
-inline op get_label(out INT, invar PMC) {
-    void * ptr = VTABLE_get_pointer(interp, $2);
-    $1         =  (INTVAL)ptr;
-}
-
 =back
 
 =cut
