@@ -304,9 +304,13 @@ Experimental: return caller PMC or PMCNULL if none.
         PMC         *caller = cc->to_ctx->current_sub;
         Parrot_sub  *sub;
 
-        PMC_get_sub(INTERP, caller, sub);
-        if (!caller || !sub->seg)
+        if (!caller)
             caller = PMCNULL;
+        else {
+            PMC_get_sub(INTERP, caller, sub);
+            if (!sub->seg)
+                caller = PMCNULL;
+        }
 
         RETURN(PMC *caller);
 
