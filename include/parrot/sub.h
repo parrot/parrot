@@ -301,11 +301,6 @@ void mark_context(PARROT_INTERP, ARGMOD(Parrot_Context* ctx))
 void mark_context_start(void);
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-Parrot_sub * new_closure(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
 Parrot_cont * new_continuation(PARROT_INTERP,
     ARGIN_NULLOK(const Parrot_cont *to))
         __attribute__nonnull__(1);
@@ -377,8 +372,6 @@ PMC* Parrot_find_pad(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(ctx)
 #define ASSERT_ARGS_mark_context_start __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
-#define ASSERT_ARGS_new_closure __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_new_continuation __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_new_coroutine __attribute__unused__ int _ASSERT_ARGS_CHECK = \

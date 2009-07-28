@@ -149,28 +149,6 @@ new_sub(PARROT_INTERP)
 
 /*
 
-=item C<Parrot_sub * new_closure(PARROT_INTERP)>
-
-Returns a new C<Parrot_sub> with its own scratchpad.
-
-XXX: Need to document semantics in detail.
-
-=cut
-
-*/
-
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Parrot_sub *
-new_closure(PARROT_INTERP)
-{
-    ASSERT_ARGS(new_closure)
-    Parrot_sub * const newsub = new_sub(interp);
-    return newsub;
-}
-
-/*
-
 =item C<Parrot_cont * new_continuation(PARROT_INTERP, const Parrot_cont *to)>
 
 Returns a new C<Parrot_cont> to the context of C<to> with its own copy of the
