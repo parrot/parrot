@@ -3630,7 +3630,7 @@ GDB_P(PARROT_INTERP, ARGIN(const char *s))
 
 =head1 SEE ALSO
 
-F<include/parrot/debugger.h>, F<src/pdb.c> and F<ops/debug.ops>.
+F<include/parrot/debugger.h>, F<src/parrot_debugger.c> and F<ops/debug.ops>.
 
 =head1 HISTORY
 

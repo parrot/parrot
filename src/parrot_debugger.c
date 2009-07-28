@@ -122,7 +122,7 @@ static void PDB_run_code(PARROT_INTERP, int argc, char *argv[]);
 
 =item C<int main(int argc, char *argv[])>
 
-Reads the PASM or PBC file from argv[1], loads it, and then calls
+Reads the PIR, PASM or PBC file from argv[1], loads it, and then calls
 Parrot_debug().
 
 =cut
