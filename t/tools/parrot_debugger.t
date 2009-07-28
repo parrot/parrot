@@ -56,14 +56,57 @@ pdb_output_like( <<PIR, "pir", "help", qr/List of commands:/, 'help page');
     print "\\n"
 .end
 PIR
-pdb_output_like( <<PIR, "pir", "r", qr/3\.14159/, 'running the program');
+pdb_output_like( <<PIR, "pir", "r", qr/3\.14159/, 'running the program (pir)');
 .sub main :main
     \$N3 = 3.14159
     print \$N3
     print "\\n"
 .end
 PIR
-BEGIN { $tests += 2 }
+pdb_output_like( <<PASM, "pasm", "run", qr/42/, 'running the program (long,pasm)');
+    set I1,42
+    print I1
+    print "\\n"
+PASM
+pdb_output_like( <<PASM, "pasm", "r", qr/42/, 'running the program (pasm)');
+    set I1,42
+    print I1
+    print "\\n"
+PASM
+pdb_output_like( <<PASM, "pasm", "n", qr/one more time/, 'next instruction (pasm)');
+    print "one more time\\n"
+PASM
+pdb_output_like( <<PASM, "pasm", "next", qr/one more time/, 'next instruction (long,pasm)');
+    print "one more time\\n"
+PASM
+pdb_output_like( <<PIR, "pir", "n", qr/one more time/, 'next instruction (pir)');
+.sub main :main
+    print "one more time\\n"
+.end
+PIR
+pdb_output_like( <<PIR, "pir", "next", qr/one more time/, 'next instruction (long,pir)');
+.sub main :main
+    print "one more time\\n"
+.end
+PIR
+pdb_output_like( <<PIR, "pir", "s", qr/current instr.: 'main'/, 'show stack (pir)');
+.sub main :main
+    \$I1 = 242
+.end
+PIR
+pdb_output_like( <<PIR, "pir", "stack", qr/current instr.: 'main'/, 'show stack (long,pir)');
+.sub main :main
+    \$I1 = 242
+.end
+PIR
+pdb_output_like( <<PASM, "pasm", "s", qr/current instr.: '\(null\)'/, 'show stack (pasm)');
+    set I1, 242
+PASM
+pdb_output_like( <<PASM, "pasm", "info", qr/Total memory allocated =/, 'info (pasm)');
+    set I1, 242
+PASM
+
+BEGIN { $tests += 12 }
 
 BEGIN { plan tests => $tests; }
 
