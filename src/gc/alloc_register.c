@@ -668,11 +668,12 @@ Parrot_context_ref_trace(PARROT_INTERP, ARGMOD(Parrot_Context *ctx),
     ASSERT_ARGS(Parrot_context_ref_trace)
     if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
         const char *name = "unknown";
-        Parrot_sub *sub;
 
-        PMC_get_sub(interp, ctx->current_sub, sub);
-        if (ctx->current_sub)
+        if (ctx->current_sub) {
+            Parrot_sub *sub;
+            PMC_get_sub(interp, ctx->current_sub, sub);
             name = (char *)(sub->name->strstart);
+        }
 
         fprintf(stderr, "[reference to context %p ('%s') taken at %s:%d]\n",
                 (void *)ctx, name, file, line);
