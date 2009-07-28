@@ -29,7 +29,7 @@ PMC2CC := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --c
 # add your dynamic pmcs here
 PMC_TARGETS := \
   dynlexpad$(LOAD_EXT) \
-  foo$(LOAD_EXT) \
+  foo_group$(LOAD_EXT) \
   rotest$(LOAD_EXT) \
 #IF(has_gdbm):  gdbmhash$(LOAD_EXT) \
   rational$(LOAD_EXT) \
@@ -55,6 +55,14 @@ OBJS_DIGEST := \
   sha1$(O) \
   sha256$(O) \
   sha512$(O)
+
+PMCS_FOO := \
+  foo.pmc \
+  foo2.pmc
+
+OBJS_FOO := \
+  foo$(O) \
+  foo2$(O)
 
 #IF(win32 and cc==gcc):LIB_GDBM := -llibgdbm
 #ELSIF(win32):LIB_GDBM := libgdbm.lib
@@ -101,8 +109,14 @@ dynlexpad.c: dynlexpad.dump
 dynlexpad.dump: dynlexpad.pmc
 	$(PMC2CD) dynlexpad.pmc
 
-foo$(LOAD_EXT): foo$(O)
-	$(LD) @ld_out@foo$(LOAD_EXT) foo$(O) $(LINKARGS)
+foo_group$(LOAD_EXT): $(OBJS_FOO) lib-foo_group$(O)
+	$(LD) @ld_out@foo_group$(LOAD_EXT) lib-foo_group$(O) $(OBJS_FOO) $(LINKARGS)
+
+lib-foo_group$(O): foo_group.c
+	$(CC) -c @cc_o_out@lib-foo_group$(O) $(INCLUDES) $(CFLAGS) foo_group.c
+
+foo_group.c: $(OBJS_FOO)
+	$(PMC2C) --library foo_group --c $(PMCS_FOO)
 
 foo$(O): foo.c
 	$(CC) -c @cc_o_out@foo$(O) $(INCLUDES) $(CFLAGS) foo.c
@@ -112,6 +126,15 @@ foo.c: foo.dump
 
 foo.dump: foo.pmc
 	$(PMC2CD) foo.pmc
+
+foo2$(O): foo2.c
+	$(CC) -c @cc_o_out@foo2$(O) $(INCLUDES) $(CFLAGS) foo2.c
+
+foo2.c: foo2.dump foo.pmc
+	$(PMC2CC) foo2.pmc
+
+foo2.dump: foo2.pmc foo.dump
+	$(PMC2CD) foo2.pmc
 
 rotest$(LOAD_EXT): rotest$(O)
 	$(LD) @ld_out@rotest$(LOAD_EXT) rotest$(O) $(LINKARGS)

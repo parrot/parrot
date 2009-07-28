@@ -267,7 +267,16 @@ sub rewrite_vtable_method {
             \bSUPER\b         # Macro: SUPER
             \(\s*(.*?)\)      # capture argument list
           }x,
-            sub { "interp->vtables[$supertype]->$name(" . full_arguments($1) . ')' }
+            sub {
+              if($pmc->is_dynamic($super)) {
+                return "Parrot_" . $super .
+                  "_get_vtable(interp)->$name(" . full_arguments($1) .
+                  ')';
+              }
+              else {
+                return "interp->vtables[$supertype]->$name(" . full_arguments($1) . ')';
+              }
+            }
         );
     }
 

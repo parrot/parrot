@@ -8,7 +8,7 @@
  * proper inheritance - for testing only
  */
 
-pmclass Foo dynpmc provides scalar extends Integer {
+pmclass Foo dynpmc group foo_group provides scalar extends Integer {
 
     VTABLE INTVAL get_integer() {
         return 42;
