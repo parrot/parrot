@@ -417,7 +417,6 @@ build_cfg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
     for (i = 0; i < unit->n_basic_blocks; i++) {
         Basic_block * const bb = unit->bb_list[i];
-        Edge               *pred;
         SymReg             *addr;
 
         /* if the block can fall-through */
