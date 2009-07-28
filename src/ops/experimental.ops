@@ -51,7 +51,9 @@ op trap() :deprecated {
 #endif
 }
 
-=item B<set_label>(invar PMC, invar LABEL)
+=over 4
+
+=item B<set_label>(invar PMC, inconst LABEL)
 
 Sets the opcode_t* label value for the given PMC. This is basically only
 useful for PMCs such as Sub, Continuation, ExceptionHandler and derivatives
@@ -60,6 +62,8 @@ useful for PMCs such as Sub, Continuation, ExceptionHandler and derivatives
 
 Gets the opcode_t* label value from the given PMC. This is basically only
 useful for PMCs such as Sub, Continuation, ExceptionHandler and derivatives
+
+=back
 
 =cut
 

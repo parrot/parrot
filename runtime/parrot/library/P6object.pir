@@ -765,7 +765,7 @@ will be used in lieu of this one.)
     # Perl6Object accepts anything.
     $S0 = parrotclass
     if $S0 == 'Perl6Object' goto accept_anyway
-    
+
     # Otherwise, just try a normal check.
     $I0 = can topic, 'HOW'
     unless $I0 goto end
@@ -774,7 +774,7 @@ will be used in lieu of this one.)
     if $I0 goto end
     $I0 = does topic, parrotclass
     if $I0 goto end
-    
+
     # If this fails, and we want Any, and it's something form outside
     # of the Perl 6 world, we'd best just accept it.
     unless $S0 == 'Any' goto end
@@ -810,4 +810,3 @@ Copyright (C) 2008, Parrot Foundation.
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4 ft=pir:
-
