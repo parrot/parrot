@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2004-2008, Parrot Foundation.
+ * Copyright (C) 2004-2009, Parrot Foundation.
  */
 
 /*
@@ -48,24 +48,25 @@ Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)
     /* Are we the parent or child? */
     if (child) {
         /* parent */
-        int status;
-        pid_t returnstat;
-        returnstat = waitpid(child, &status, 0);
+        int   status;
+        pid_t returnstat = waitpid(child, &status, 0);
         UNUSED(returnstat);
         return status;
     }
     else {
-        /* child. Be horribly profligate with memory, since we're
-           about to be something else */
-        int status;
-        status = execlp("sh", "sh", "-c",
-            Parrot_str_to_cstring(interp, command), (void *)NULL);
-        /* if we get here, something's horribly wrong... */
-        if (status) {
+        /* child */
+        char *cmd    = Parrot_str_to_cstring(interp, command);
+        int   status = execlp("sh", "sh", "-c", cmd, (void *)NULL);
+
+        /* if we get here, something's horribly wrong, but free anyway... */
+        mem_sys_free(cmd);
+
+        if (status)
             exit(status);
-        }
     }
-    return 1;    /* make gcc happy */
+
+    /* make gcc happy */
+    return 1;
 }
 
 /*
