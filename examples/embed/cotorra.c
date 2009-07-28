@@ -3,7 +3,6 @@ Copyright (C) 2009, Parrot Foundation.
 $Id$
 
 A parrot embedding test
-'lorito' is 'little parrot' in spanish
 */
 
 
@@ -21,7 +20,7 @@ unsigned int getuintval(const char *s);
 Parrot_Run_core_t getruncore(const char *name);
 
 Parrot_String create_string(Parrot_Interp interp, const char *name);
-int lorito_main(Parrot_Interp interp, int argc, char **argv);
+int cotorra_main(Parrot_Interp interp, int argc, char **argv);
 
 /**********************************************************************/
 
@@ -29,7 +28,7 @@ int lorito_main(Parrot_Interp interp, int argc, char **argv);
 
 void fail(const char *msg)
 {
-    fprintf(stderr, "lorito failed: %s\n", msg);
+    fprintf(stderr, "cotorra failed: %s\n", msg);
     exit(EXIT_FAILURE);
 }
 
@@ -79,7 +78,7 @@ Parrot_String create_string(Parrot_Interp interp, const char *name)
 
 /**********************************************************************/
 
-int lorito_main(Parrot_Interp interp, int argc, char **argv)
+int cotorra_main(Parrot_Interp interp, int argc, char **argv)
 {
     char *source;
     Parrot_PackFile pf;
@@ -170,7 +169,7 @@ int main(int argc, char **argv)
 
     Parrot_set_executable_name(interp, create_string(interp, argv[0]));
 
-    r = lorito_main(interp, argc, argv);
+    r = cotorra_main(interp, argc, argv);
 
     Parrot_destroy(interp);
     return r;

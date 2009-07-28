@@ -21,17 +21,17 @@ EXE = $(shell parrot_config exe)
 INCLUDEDIR = $(shell parrot_config prefix)/include
 CONFIG = $(shell parrot_config prefix)/src/parrot_config
 
-all: lorito$(EXE)
+all: cotorra$(EXE)
 
 #-----------------------------------------------------------------------
 
-lorito$(O): lorito.c
-	$(CC) $(CCFLAGS) -c -I $(INCLUDEDIR) lorito.c
+cotorra$(O): cotorra.c
+	$(CC) $(CCFLAGS) -c -I $(INCLUDEDIR) cotorra.c
 
-lorito$(EXE): lorito$(O)
-	$(LD) $(LD_OUT)lorito$(EXE) lorito$(O) $(CONFIG)$(O) $(LDFLAGS)
+cotorra$(EXE): cotorra$(O)
+	$(LD) $(LD_OUT)cotorra$(EXE) cotorra$(O) $(CONFIG)$(O) $(LDFLAGS)
 
 #-----------------------------------------------------------------------
 
 clean:
-	rm -f lorito$(EXE) lorito$(O)
+	rm -f cotorra$(EXE) cotorra$(O)
