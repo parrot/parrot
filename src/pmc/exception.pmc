@@ -175,10 +175,11 @@ Destroys the exception.
 
     VTABLE void destroy() {
         Parrot_Exception_attributes * const core_struct = PARROT_EXCEPTION(SELF);
-        if (core_struct->thrower)
-            Parrot_free_context(interp, core_struct->thrower, 1);
-        if (core_struct)
+        if (core_struct) {
+            if (core_struct->thrower)
+                Parrot_free_context(interp, core_struct->thrower, 1);
             mem_sys_free(core_struct);
+        }
     }
 
 /*
