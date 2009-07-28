@@ -72,8 +72,8 @@ inline op set_label(invar PMC, inconst LABEL) {
 }
 
 inline op get_label(out INT, invar PMC) {
-    void * ptr = VTABLE_get_pointer(interp, $2);
-    $1         =  (INTVAL)ptr;
+    void * const ptr = VTABLE_get_pointer(interp, $2);
+    $1 =  PTR2INTVAL(ptr);
 }
 
 =head1 COPYRIGHT
