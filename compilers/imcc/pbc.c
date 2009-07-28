@@ -2231,7 +2231,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
             /* Create segment. "_ANN" is added to the name */
             const               size_t len  = strlen(interp->code->base.name) + 5;
             char               * const name = (char *) mem_sys_allocate(len);
-            int                        add  = interp->code && interp->code->base.dir;
+            int                        add  = interp->code->base.dir ? 1 : 0;
             PackFile_Directory * const dir  = add ? interp->code->base.dir :
                     &interp->initial_pf->directory;
             strcpy(name, interp->code->base.name);
