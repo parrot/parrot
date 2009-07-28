@@ -185,11 +185,7 @@ C<OtherClass>.
 =item C<SUPER(a,b,c)>
 
 Calls the overridden implementation of the current method in the nearest
-superclass, using the static type of C<SELF>.
-
-=item C<DYNSUPER(a,b,c)>
-
-As above, but uses the actual dynamic type of C<SELF>.
+superclass, using the type of C<SELF>.
 
 =back
 

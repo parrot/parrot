@@ -189,7 +189,7 @@ sub rewrite_nci_method {
     # Rewrite SELF.other_method(args...)
     $body->subst(
         qr{
-    \bSELF\b         # Macro: SELF
+      \bSELF\b       # Macro: SELF
       \.(\w+)        # other_method
       \(\s*(.*?)\)   # capture argument list
       }x,
@@ -199,7 +199,7 @@ sub rewrite_nci_method {
     # Rewrite STATICSELF.other_method(args...)
     $body->subst(
         qr{
-      \bSTATICSELF\b          # Macro STATICSELF
+      \bSTATICSELF\b    # Macro STATICSELF
       \.(\w+)           # other_method
       \(\s*(.*?)\)      # capture argument list
       }x,
@@ -241,15 +241,6 @@ sub rewrite_vtable_method {
         my $supertype = "enum_class_$super";
         die "$pmcname defines unknown vtable method '$name'\n" unless defined $super_table->{$name};
         my $supermethod = "Parrot_" . $super_table->{$name} . "_$name";
-
-        # Rewrite DYNSUPER(args)
-        $body->subst(
-            qr{
-            \bDYNSUPER\b      # Macro: DYNSUPER
-            \(\s*(.*?)\)      # capture argument list
-          }x,
-            sub { "interp->vtables[$supertype]->$name(" . full_arguments($1) . ')' }
-        );
 
         # Rewrite OtherClass.SUPER(args...)
         $body->subst(
