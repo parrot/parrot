@@ -25,12 +25,6 @@ INTVAL Parrot_char_digit_value(SHIM_INTERP, UINTVAL character);
 PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-char * str_dup(ARGIN(const char *old))
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
 char * str_dup_remove_quotes(ARGIN(const char *old))
         __attribute__nonnull__(1);
 
@@ -50,8 +44,6 @@ Parrot_UInt4 string_unescape_one(PARROT_INTERP,
         FUNC_MODIFIES(*string);
 
 #define ASSERT_ARGS_Parrot_char_digit_value __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
-#define ASSERT_ARGS_str_dup __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(old)
 #define ASSERT_ARGS_str_dup_remove_quotes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(old)
 #define ASSERT_ARGS_string_set_data_directory __attribute__unused__ int _ASSERT_ARGS_CHECK = \

@@ -337,33 +337,6 @@ Parrot_char_digit_value(SHIM_INTERP, UINTVAL character)
 
 /*
 
-=item C<char * str_dup(const char *old)>
-
-Duplicate a C string.  Just like strdup(), except it dies if it runs
-out of memory.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-char *
-str_dup(ARGIN(const char *old))
-{
-    ASSERT_ARGS(str_dup)
-    const size_t bytes = strlen(old) + 1;
-    char * const copy = (char *)mem_sys_allocate(bytes);
-    memcpy(copy, old, bytes);
-#ifdef MEMDEBUG
-    debug(interp, 1, "line %d str_dup %s [%x]\n", line, old, copy);
-#endif
-    return copy;
-}
-
-/*
-
 =item C<char * str_dup_remove_quotes(const char *old)>
 
 Duplicates a C string (minus the wrapping quotes).  Similar to strdup(),
