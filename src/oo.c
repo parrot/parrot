@@ -330,6 +330,10 @@ Parrot_oo_clone_object(PARROT_INTERP, ARGIN(PMC *pmc),
         }
     }
 
+    /* free object attributes if created directly */
+    if (!PMC_IS_NULL(dest))
+        mem_sys_free(obj);
+
     /* And we have ourselves a clone. */
     return cloned;
 }
@@ -338,10 +342,9 @@ Parrot_oo_clone_object(PARROT_INTERP, ARGIN(PMC *pmc),
 
 =item C<void * Parrot_oo_new_object_attrs(PARROT_INTERP, PMC * class_)>
 
-Create a new C<Parrot_Object_attributes> structure, which is the thing that
-holds data for an Object PMC. We need this for places where a new Object
-is being created without being instantiated by it's associated class, such
-as in C<Parrot_oo_clone_object>.
+Create a new C<Parrot_Object_attributes> structure to hold data for an Object
+PMC. We need this for places which create a new Object without instantiating it
+through its associated class, such as in C<Parrot_oo_clone_object>.
 
 =cut
 
