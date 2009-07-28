@@ -112,6 +112,7 @@ LDFLAGS          := @ldflags@ @ld_debug@
 RECONFIGURE      := $(PERL) tools/dev/reconfigure.pl
 INNO_SETUP       := iscc
 JIT_BUILD_TOOL   := $(BUILD_TOOLS_DIR)/jit2c.pl
+TEMPDIR          := @tempdir@
 #IF(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
 
 ###############################################################################
@@ -1907,7 +1908,7 @@ SPLINT := splint
 
 # Temp directory for splint.  Add +keep to splintflags if you want work files
 # kept in there after completion.
-SPLINT_TMP := $(TMP)/splint
+SPLINT_TMP := $(TEMPDIR)/splint
 
 # Splint flags: http://splint.org/manual/html/appB.html
 # The dashes in the names don't make any difference to Splint, but I've

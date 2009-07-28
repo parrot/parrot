@@ -243,6 +243,8 @@ sub runstep {
         # generate #line directives. These can confuse
         # debugging internals.
         no_lines_flag => $conf->options->get('no-line-directives') ? '--no-lines' : '',
+
+        tempdir => File::Spec->tmpdir,
     );
 
     # add profiling if needed
