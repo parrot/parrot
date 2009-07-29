@@ -118,7 +118,27 @@ pdb_output_like( <<PIR, "pir", "b\nb\nL", qr/Breakpoint 1 at pos 0\nBreakpoint 2
 .end
 PIR
 
-BEGIN { $tests += 15 }
+pdb_output_like( <<PASM, "pasm", "t", qr/set I0, 242/, 'trace');
+    set I0, 242
+PASM
+
+pdb_output_like( <<PIR, "pir", "t", qr/set I0, 242/, 'trace (pir)');
+.sub main :main
+    \$I0 = 242
+.end
+PIR
+
+pdb_output_like( <<PASM, "pasm", "t\np I0", qr/242/, 'print a register');
+    set I0, 242
+PASM
+
+pdb_output_like( <<PIR, "pir", "t\np \$I0", qr/242/, 'print a register (pir)');
+.sub main :main
+    \$I0 = 242
+.end
+PIR
+
+BEGIN { $tests += 19 }
 
 BEGIN { plan tests => $tests; }
 
