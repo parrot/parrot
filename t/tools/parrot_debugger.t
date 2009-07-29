@@ -108,8 +108,17 @@ PASM
 pdb_output_like( <<PASM, "pasm", "b", qr/Breakpoint 1 at pos 0/, 'set breakpoint');
     set I1, 242
 PASM
+pdb_output_like( <<PASM, "pasm", "b\nb\nL", qr/Breakpoint 1 at pos 0\nBreakpoint 2 at pos 0/, 'list breakpoints');
+    set I1, 242
+PASM
 
-BEGIN { $tests += 13 }
+pdb_output_like( <<PIR, "pir", "b\nb\nL", qr/Breakpoint 1 at pos 0\nBreakpoint 2 at pos 0/, 'list breakpoints (pir)');
+.sub main :main
+    \$I1 = 242
+.end
+PIR
+
+BEGIN { $tests += 15 }
 
 BEGIN { plan tests => $tests; }
 
