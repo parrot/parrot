@@ -1354,9 +1354,6 @@ PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
             if (pdb->script_file)
                 Parrot_io_eprintf(pdb->debugger, " in line %lu", pdb->script_line);
             Parrot_io_eprintf(pdb->debugger, ".  Try \"help\".");
-#if TRACE_DEBUGGER
-            fprintf(stderr, " (parse_command result: %li)", c);
-#endif
             close_script_file(interp);
             return 1;
         }
@@ -1740,10 +1737,18 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 
     TRACEDEB_MSG("PDB_set_break");
 
-
     /* If there is a source file use line number, else opcode position */
 
+
     if (pdb->file) {
+        TRACEDEB_MSG("PDB_set_break file");
+
+        if (!pdb->file->size) {
+            Parrot_io_eprintf(pdb->debugger,
+                "Can't set a breakpoint in empty file\n");
+            return;
+        }
+
         /* If no line number was specified, set it at the current line */
         if (ln != 0) {
             unsigned long i;
@@ -1765,6 +1770,7 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
             /* Get the line to set it */
             line = pdb->file->line;
 
+            TRACEDEB_MSG("PDB_set_break reading ops");
             while (line->opcode != pdb->cur_opcode) {
                 line = line->next;
                 if (!line) {
@@ -1787,9 +1793,11 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         breakpos = line->opcode;
     }
     else {
+        TRACEDEB_MSG("PDB_set_break no file");
         breakpos = interp->code->base.data + ln;
     }
 
+    TRACEDEB_MSG("PDB_set_break allocate breakpoint");
     /* Allocate the new break point */
     newbreak = mem_allocate_zeroed_typed(PDB_breakpoint_t);
 
