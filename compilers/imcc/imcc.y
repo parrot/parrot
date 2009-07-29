@@ -1298,6 +1298,7 @@ pasm_inst:                     { clear_state(interp); }
            n = mk_const(interp, name, 'S');
            set_lexical(interp, r, n);
            $$ = 0;
+           mem_sys_free(name);
            mem_sys_free($2);
            mem_sys_free($4);
          }
