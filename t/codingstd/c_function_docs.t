@@ -122,7 +122,7 @@ config/gen/platform/solaris/time.c
 examples/c/nanoparrot.c
 examples/c/pbc_info.c
 examples/compilers/japhc.c
-examples/embed/lorito.c
+examples/embed/cotorra.c
 src/atomic/gcc_x86.c
 src/debug.c
 src/gc/gc_malloc.c
