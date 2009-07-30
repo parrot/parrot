@@ -122,6 +122,12 @@ pdb_output_like( <<PASM, "pasm", "t", qr/set I0, 242/, 'trace');
     set I0, 242
 PASM
 
+pdb_output_like( <<PIR, "pir", "t", qr/set I0, 242/, 'trace (pir)');
+.sub main :main
+    \$I0 = 242
+.end
+PIR
+
 pdb_output_like( <<PASM, "pasm", "t 2", qr/\d+ set I0, 242\s*I0=0\s*\d+ set I1, 1982/, 'trace multiple statements');
     set I0, 242
     set I1, 1982
@@ -134,15 +140,45 @@ pdb_output_like( <<PIR, "pir", "t 2", qr/\d+ set I0, 242\s*I0=0\s*\d+ set I1, 19
 .end
 PIR
 
-pdb_output_like( <<PIR, "pir", "t", qr/set I0, 242/, 'trace (pir)');
+pdb_output_like( <<PASM, "pasm", "t\np I0", qr/^242/m, 'print an integer register');
+    set I0, 242
+PASM
+
+pdb_output_like( <<PIR, "pir", "t\np I0", qr/^242/m, 'print an integer register (pir)');
 .sub main :main
     \$I0 = 242
 .end
 PIR
 
-pdb_output_like( <<PASM, "pasm", "t\np I0", qr/242/, 'print a register');
-    set I0, 242
+pdb_output_like( <<PASM, "pasm", "t\np N0", qr/^3.14159/m, 'print a numeric register');
+    set N0, 3.14159
 PASM
+
+pdb_output_like( <<PIR, "pir", "t\np N0", qr/^3.14159/m, 'print a numeric register (pir)');
+.sub main :main
+    \$N0 = 3.14159
+.end
+PIR
+
+pdb_output_like( <<PASM, "pasm", "t\np P0", qr/^ResizablePMCArray/m, 'print a PMC register');
+    new P0, 'ResizablePMCArray'
+PASM
+
+pdb_output_like( <<PIR, "pir", "t\np P0", qr/^ResizablePMCArray=PMC/m, 'print a PMC register (pir)');
+.sub main :main
+    \$P0 = new 'ResizablePMCArray'
+.end
+PIR
+
+pdb_output_like( <<PASM, "pasm", "t\np S0", qr/^ceiling cat/m, 'print a string register');
+    set S0, "ceiling cat"
+PASM
+
+pdb_output_like( <<PIR, "pir", "t\np S0", qr/^ceiling cat/m, 'print a string register (pir)');
+.sub main :main
+    \$S0 = "ceiling cat"
+.end
+PIR
 
 pdb_output_like( <<PASM, "pasm", "t 2\np I", qr/I0 = 242\s*I1 = 1982/, 'print all integer registers');
     set I0, 242
@@ -153,12 +189,6 @@ pdb_output_like( <<PIR, "pir","t 2\np I", qr/I0 = 242\s*I1 = 1982/, 'print all i
 .sub main :main
     \$I0 = 242
     \$I1 = 1982
-.end
-PIR
-
-pdb_output_like( <<PIR, "pir", "t\np \$I0", qr/242/, 'print a register (pir)');
-.sub main :main
-    \$I0 = 242
 .end
 PIR
 
@@ -176,7 +206,7 @@ PIR
 
 }
 
-BEGIN { $tests += 25 }
+BEGIN { $tests += 31 }
 
 BEGIN { plan tests => $tests; }
 
