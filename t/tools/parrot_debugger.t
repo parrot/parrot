@@ -105,7 +105,7 @@ PASM
 pdb_output_like( <<PASM, "pasm", "info", qr/Total memory allocated =/, 'info (pasm)');
     set I1, 242
 PASM
-pdb_output_like( <<PASM, "pasm", "b", qr/Breakpoint 1 at pos 0/, 'set breakpoint');
+pdb_output_like( <<PASM, "pasm", "b", qr/Breakpoint 1 at.*pos 0/, 'set breakpoint');
     set I1, 242
 PASM
 pdb_output_like( <<PASM, "pasm", "b\nb\nL", qr/Breakpoint 1 at pos 0\nBreakpoint 2 at pos 0/, 'list breakpoints');
