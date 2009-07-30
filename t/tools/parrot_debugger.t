@@ -218,7 +218,7 @@ BEGIN { plan tests => $tests; }
 
 Takes 4 arguments: a file to run, the filename-extension of the file
 (probably "pir" or "pasm"), the command or commands to provide to
-parrot_debugger as input, and a regex string to match within
+parrot_debugger as script file, and a regex string to match within
 parrot_debugger's output.
 
 =cut
@@ -238,7 +238,7 @@ sub pdb_output_like {
     $f->print($input);
     $f->print("\nquit\n");
     $f->close();
-    system("$path_to_pdb $codefn <$stdinfn >$stdoutfn 2>&1");
+    system("$path_to_pdb --script $stdinfn $codefn >$stdoutfn 2>&1");
     $f = IO::File->new($stdoutfn);
 
     my $output = join( '', <$f> );
