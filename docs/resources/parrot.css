@@ -90,8 +90,8 @@ div#footer {
 
 /* =item constructs no <dt><dd> just <dt>, so we fake it */
 dt {
-	padding-top: 0.5em;
-	padding-bottom: 1em;
+	margin-top: 1em;
+	margin-bottom: 0.5em;
 	font-weight: bold;
 }
 
