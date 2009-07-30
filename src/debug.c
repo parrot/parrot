@@ -3090,7 +3090,7 @@ PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
 
                 /* don't walk off the end of the program into neverland */
                 if (pc >= interp->code->base.data + interp->code->base.size)
-                    return;
+                    break;
             }
 
             newline->number      = pline->number + 1;
