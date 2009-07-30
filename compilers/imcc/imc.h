@@ -603,6 +603,7 @@ typedef struct _imc_info_t {
     char                 *heredoc_end;
     char                 *heredoc_content;
     char                 *cur_macro_name;
+    int                  is_def;
 
     struct macro_frame_t *frames;
     imcc_globals         *globals;

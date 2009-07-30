@@ -14,9 +14,6 @@ typedef struct _IdList {
 
 #include "imcparser.h"
 
-/* short ranged globals for lexer state */
-extern int pesky_global__is_def;
-
 #define KEY_BIT(argnum) (1 << (argnum))
 
 /* An opaque pointer. */

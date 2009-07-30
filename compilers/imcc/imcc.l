@@ -60,9 +60,6 @@ typedef struct macro_frame_t {
     YY_BUFFER_STATE buffer;
 } macro_frame_t;
 
-/* short ranged globals for lexer state */
-int pesky_global__is_def = 0;
-
 /* static function declarations */
 static void pop_parser_state(PARROT_INTERP, ARGMOD(void *yyscanner));
 
@@ -640,7 +637,7 @@ SP              [ ]
     }
 
 <emit,INITIAL>{ID} {
-        if (!pesky_global__is_def) {
+        if (!IMCC_INFO(interp)->is_def) {
             SymReg *r = find_sym(interp, yytext);
 
             if (r && (r->type & (VTIDENTIFIER|VT_CONSTP))) {
@@ -664,7 +661,7 @@ SP              [ ]
         }
 
         valp->s = mem_sys_strdup(yytext);
-        return (!pesky_global__is_def && is_op(interp, valp->s) ? PARROT_OP : IDENTIFIER);
+        return (!IMCC_INFO(interp)->is_def && is_op(interp, valp->s) ? PARROT_OP : IDENTIFIER);
     }
 
 
