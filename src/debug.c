@@ -2055,10 +2055,13 @@ PDB_delete_breakpoint(PARROT_INTERP, ARGIN(const char *command))
 {
     ASSERT_ARGS(PDB_delete_breakpoint)
     PDB_breakpoint_t * const breakpoint = PDB_find_breakpoint(interp, command);
+    const PDB_line_t *line;
 
     if (breakpoint) {
-        const PDB_line_t *line = interp->pdb->file->line;
+        if (!interp->pdb->file)
+            Parrot_ex_throw_from_c_args(interp, NULL, 0, "No file loaded");
 
+        line = interp->pdb->file->line;
         while (line->opcode != breakpoint->pc)
             line = line->next;
 

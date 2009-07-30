@@ -138,7 +138,21 @@ pdb_output_like( <<PIR, "pir", "t\np \$I0", qr/242/, 'print a register (pir)');
 .end
 PIR
 
-BEGIN { $tests += 19 }
+TODO: {
+    local $TODO = 'TT#889 - deleting breakpoints does not currently work';
+pdb_output_like( <<PASM, "pasm", "b\n d 1", qr/Breakpoint 1 deleted/, 'Delete a breakpoint');
+    set I0, 242
+PASM
+
+pdb_output_like( <<PIR, "pir", "b\nd 1", qr/Breakpoint 1 deleted/, 'Delete a breakpoint (pir)');
+.sub main :main
+    \$I0 = 242
+.end
+PIR
+
+}
+
+BEGIN { $tests += 21 }
 
 BEGIN { plan tests => $tests; }
 
