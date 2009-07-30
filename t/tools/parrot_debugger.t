@@ -140,7 +140,7 @@ pdb_output_like( <<PIR, "pir", "t 2", qr/\d+ set I0, 242\s*I0=\d+\s*\d+ set I1, 
 .end
 PIR
 
-pdb_output_like( <<PASM, "pasm", "t\np I0", qr/^\242/m, 'print an integer register');
+pdb_output_like( <<PASM, "pasm", "t\np I0", qr/^242/m, 'print an integer register');
     set I0, 242
 PASM
 
