@@ -29,10 +29,6 @@ and SymbolTable (see symbol.h and symbol.c)
 
 #include "imc.h"
 
-/* Globals: */
-
-static Namespace * pesky_global__namespace;
-
 /* Code: */
 
 /* HEADERIZER HFILE: compilers/imcc/symreg.h */
@@ -140,14 +136,14 @@ Begins a new namespace in PASM/PIR, named after the given C<name>.
 */
 
 void
-push_namespace(SHIM_INTERP, ARGIN(const char *name))
+push_namespace(PARROT_INTERP, ARGIN(const char *name))
 {
     ASSERT_ARGS(push_namespace)
     Namespace * const ns = mem_allocate_zeroed_typed(Namespace);
 
-    ns->parent = pesky_global__namespace;
+    ns->parent = IMCC_INFO(interp)->namespace_stack;
     ns->name   = mem_sys_strdup(name);
-    pesky_global__namespace = ns;
+    IMCC_INFO(interp)->namespace_stack = ns;
 }
 
 
@@ -166,7 +162,7 @@ void
 pop_namespace(PARROT_INTERP, ARGIN(const char *name))
 {
     ASSERT_ARGS(pop_namespace)
-    Namespace * const ns = pesky_global__namespace;
+    Namespace * const ns = IMCC_INFO(interp)->namespace_stack;
 
     if (!ns)
         IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "pop() on empty namespace stack\n");
@@ -181,7 +177,7 @@ pop_namespace(PARROT_INTERP, ARGIN(const char *name))
         mem_sys_free(ident);
     }
 
-    pesky_global__namespace = ns->parent;
+    IMCC_INFO(interp)->namespace_stack = ns->parent;
     mem_sys_free(ns);
 }
 
@@ -640,7 +636,7 @@ SymReg *
 mk_ident(PARROT_INTERP, ARGIN(const char *name), int t)
 {
     ASSERT_ARGS(mk_ident)
-    char   * const fullname = _mk_fullname(pesky_global__namespace, name);
+    char   * const fullname = _mk_fullname(IMCC_INFO(interp)->namespace_stack, name);
     SymReg *r = get_sym_by_name(&(IMCC_INFO(interp)->last_unit->hash), name);
     if (r && r->set != t)
         IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
@@ -650,12 +646,12 @@ mk_ident(PARROT_INTERP, ARGIN(const char *name), int t)
     r->type = VTIDENTIFIER;
 
 
-    if (pesky_global__namespace) {
+    if (IMCC_INFO(interp)->namespace_stack) {
         Identifier * const ident = mem_allocate_zeroed_typed(Identifier);
 
         ident->name        = fullname;
-        ident->next        = pesky_global__namespace->idents;
-        pesky_global__namespace->idents = ident;
+        ident->next        = IMCC_INFO(interp)->namespace_stack->idents;
+        IMCC_INFO(interp)->namespace_stack->idents = ident;
     }
     else
         mem_sys_free(fullname);
@@ -1560,7 +1556,7 @@ find_sym(PARROT_INTERP, ARGIN(const char *name))
 {
     ASSERT_ARGS(find_sym)
     if (IMCC_INFO(interp)->cur_unit)
-        return _find_sym(interp, pesky_global__namespace,
+        return _find_sym(interp, IMCC_INFO(interp)->namespace_stack,
             &IMCC_INFO(interp)->cur_unit->hash, name);
 
     return NULL;

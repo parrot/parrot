@@ -595,6 +595,7 @@ typedef struct _imc_info_t {
     STRING                *error_message;   /* The Error message */
 
     /* some values that were global... */
+    Namespace            *namespace_stack;
     SymReg               *cur_call;
     SymReg               *cur_obj;
     SymReg               *adv_named_id;
