@@ -75,19 +75,14 @@ typedef enum {
 } Instruction_Flags;
 #undef INSTRUCTION_BIT
 
-
-/* Forward decl */
-struct _IMC_Unit;
-
-
 /* Functions */
 /* Globals */
 
 typedef struct _emittert {
     int (*open)(PARROT_INTERP, void *param);
-    int (*emit)(PARROT_INTERP, void *param, const struct _IMC_Unit *, const Instruction *ins);
-    int (*new_sub)(PARROT_INTERP, void *param, struct _IMC_Unit *);
-    int (*end_sub)(PARROT_INTERP, void *param, struct _IMC_Unit *);
+    int (*emit)(PARROT_INTERP, void *param, const IMC_Unit *, const Instruction *ins);
+    int (*new_sub)(PARROT_INTERP, void *param, IMC_Unit *);
+    int (*end_sub)(PARROT_INTERP, void *param, IMC_Unit *);
     int (*close)(PARROT_INTERP, void *param);
 } Emitter;
 

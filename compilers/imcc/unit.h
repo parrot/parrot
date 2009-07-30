@@ -32,7 +32,7 @@ struct imcc_ostat {
     int used_once;
 } ;
 
-struct _IMC_Unit {
+struct IMC_Unit {
     INTVAL            type;
     Instruction      *instructions;
     Instruction      *last_ins;
@@ -52,8 +52,8 @@ struct _IMC_Unit {
     SymReg          **reglist;
     unsigned int      n_symbols;
     int               max_color;
-    struct _IMC_Unit *prev;
-    struct _IMC_Unit *next;
+    IMC_Unit         *prev;
+    IMC_Unit         *next;
 
     SymReg           *_namespace;
     int               owns_namespace;   /* should this unit free *_namespace */

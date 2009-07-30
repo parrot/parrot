@@ -41,7 +41,7 @@
  * that won't collide with high level compiler generated names.  */
 #define IMCC_INTERNAL_CHAR '@'
 
-typedef struct _IMC_Unit IMC_Unit;
+typedef struct IMC_Unit IMC_Unit;
 
 #include "symreg.h"
 #include "instructions.h"

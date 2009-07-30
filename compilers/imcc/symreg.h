@@ -108,8 +108,6 @@ struct namespace_t {
     Identifier *idents;
 };
 
-struct _IMC_Unit;
-
 /* functions */
 
 /* HEADERIZER BEGIN: compilers/imcc/symreg.c */

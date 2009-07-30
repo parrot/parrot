@@ -45,7 +45,6 @@ typedef struct _loop_info {
 
 
 /* Functions: */
-struct _IMC_Unit;
 
 /* HEADERIZER BEGIN: compilers/imcc/cfg.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
