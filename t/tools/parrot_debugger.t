@@ -122,6 +122,18 @@ pdb_output_like( <<PASM, "pasm", "t", qr/set I0, 242/, 'trace');
     set I0, 242
 PASM
 
+pdb_output_like( <<PASM, "pasm", "t 2", qr/\d+ set I0, 242\s*I0=0\s*\d+ set I1, 1982/, 'trace multiple statements');
+    set I0, 242
+    set I1, 1982
+PASM
+
+pdb_output_like( <<PIR, "pir", "t 2", qr/\d+ set I0, 242\s*I0=0\s*\d+ set I1, 1982/, 'trace multiple statements (pir)');
+.sub main :main
+    \$I0 = 242
+    \$I1 = 1982
+.end
+PIR
+
 pdb_output_like( <<PIR, "pir", "t", qr/set I0, 242/, 'trace (pir)');
 .sub main :main
     \$I0 = 242
@@ -131,6 +143,18 @@ PIR
 pdb_output_like( <<PASM, "pasm", "t\np I0", qr/242/, 'print a register');
     set I0, 242
 PASM
+
+pdb_output_like( <<PASM, "pasm", "t 2\np I", qr/I0 = 242\s*I1 = 1982/, 'print all integer registers');
+    set I0, 242
+    set I1, 1982
+PASM
+
+pdb_output_like( <<PIR, "pir","t 2\np I", qr/I0 = 242\s*I1 = 1982/, 'print all integer registers (pir)');
+.sub main :main
+    \$I0 = 242
+    \$I1 = 1982
+.end
+PIR
 
 pdb_output_like( <<PIR, "pir", "t\np \$I0", qr/242/, 'print a register (pir)');
 .sub main :main
@@ -152,7 +176,7 @@ PIR
 
 }
 
-BEGIN { $tests += 21 }
+BEGIN { $tests += 25 }
 
 BEGIN { plan tests => $tests; }
 
