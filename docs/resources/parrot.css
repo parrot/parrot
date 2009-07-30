@@ -92,6 +92,7 @@ div#footer {
 dt {
 	padding-top: 0.5em;
 	padding-bottom: 1em;
+	font-weight: bold;
 }
 
 pre {
