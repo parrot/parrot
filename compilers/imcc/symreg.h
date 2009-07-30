@@ -315,7 +315,8 @@ void pop_namespace(PARROT_INTERP, ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void push_namespace(SHIM_INTERP, ARGIN(const char *name))
+void push_namespace(PARROT_INTERP, ARGIN(const char *name))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void store_symreg(PARROT_INTERP, ARGMOD(SymReg *r))
@@ -427,7 +428,8 @@ char * symreg_to_str(ARGIN(const SymReg *s))
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(name)
 #define ASSERT_ARGS_push_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(name)
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(name)
 #define ASSERT_ARGS_store_symreg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(r)
