@@ -852,6 +852,11 @@ D: Pythonic and OO patches
 N: Sam Vilain
 D: Prototype object model and tests
 
+N: Samuel Harrington
+E: samuel.harrington@mines.sdsmt.edu
+U: samlh
+D: css patch
+
 N: Sean O'Rourke
 E: educated_foo@yahoo.com
 U: educated_foo
