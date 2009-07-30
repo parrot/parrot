@@ -36,16 +36,16 @@ function and parrot is made.
 
 =head3 Function signatures
 
-The following list are the valid letters in the function signatures for
-Parrot's NCI. Note that only letters and numbers are valid, and each letter
-represents a single parameter passed into the NCI. Note that the letters are
+The following list are the valid symbols in the function signatures for
+Parrot's NCI. Note that only letters and numbers are valid, and each symbol
+represents a single parameter passed into the NCI. Note that the symbols are
 case-sensitive, and must be within the base 7-bit ASCII character set.
 
 At some point punctuation may be used as modifiers on the function
 parameters, in which case each parameter may be represented by multiple
-letters.
+symbols.
 
-In I<no> case should the signature letters be separated by whitespace. This
+In I<no> case should the signature symbols be separated by whitespace. This
 restriction may be lifted in the future, but for now remains as an avenue
 for adding additional functionality.
 
