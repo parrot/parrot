@@ -188,12 +188,12 @@ sub rewrite_RETURNs {
     my $regs_used      = [];
     my $qty_returns    = 0;
 
-    my $signature_re   = qr{
+    my $signature_re   = qr/
       (RETURN       #method name
       \s*              #optional whitespace
       \( ([^\(]*) \)   #returns ( stuff ... )
       ;?)              #optional semicolon
-    }sx;
+    /sx;
 
     croak "return not allowed in pccmethods, use RETURN instead $body"
         if $body and $body =~ m/\breturn\b.*?;\z/s;
