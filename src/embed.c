@@ -51,6 +51,9 @@ static int prof_sort_f(ARGIN(const void *a), ARGIN(const void *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void runcode_print_start_info(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 PARROT_CANNOT_RETURN_NULL
 static PMC* set_current_sub(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -73,6 +76,8 @@ static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
 #define ASSERT_ARGS_prof_sort_f __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(a) \
     || PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_runcode_print_start_info __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_set_current_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_setup_argv __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -942,53 +947,9 @@ Parrot_runcode(PARROT_INTERP, int argc, ARGIN(char **argv))
 {
     PMC *userargv, *main_sub;
 
-    if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG))
-        Parrot_io_eprintf(interp,
-                "*** Parrot VM: Setting stack top. ***\n");
-
     /* Debugging mode nonsense. */
-    if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
-        if (Interp_flags_TEST(interp, PARROT_BOUNDS_FLAG)) {
-            Parrot_io_eprintf(interp,
-                    "*** Parrot VM: Bounds checking enabled. ***\n");
-        }
-
-        if (Interp_trace_TEST(interp, PARROT_TRACE_OPS_FLAG))
-            Parrot_io_eprintf(interp, "*** Parrot VM: Tracing enabled. ***\n");
-
-        Parrot_io_eprintf(interp, "*** Parrot VM: ");
-
-        switch (interp->run_core) {
-            case PARROT_SLOW_CORE:
-                Parrot_io_eprintf(interp, "Slow core");
-                break;
-            case PARROT_FAST_CORE:
-                Parrot_io_eprintf(interp, "Fast core");
-                break;
-            case PARROT_SWITCH_CORE:
-            case PARROT_SWITCH_JIT_CORE:
-                Parrot_io_eprintf(interp, "Switch core");
-                break;
-            case PARROT_CGP_CORE:
-            case PARROT_CGP_JIT_CORE:
-                Parrot_io_eprintf(interp, "CGP core");
-                break;
-            case PARROT_CGOTO_CORE:
-                Parrot_io_eprintf(interp, "CGoto core");
-                break;
-            case PARROT_JIT_CORE:
-                Parrot_io_eprintf(interp, "JIT core");
-                break;
-            case PARROT_EXEC_CORE:
-                Parrot_io_eprintf(interp, "EXEC core");
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                     "Unknown run core");
-        }
-
-        Parrot_io_eprintf(interp, " ***\n");
-    }
+    if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG))
+        runcode_print_start_info(interp);
 
     /* Set up @ARGS (or whatever this language calls it) in userargv. */
     userargv = setup_argv(interp, argc, argv);
@@ -1329,6 +1290,60 @@ Parrot_compile_string(PARROT_INTERP, Parrot_String type,
     return NULL;
 }
 
+/*
+
+=item C<static void runcode_print_start_info(PARROT_INTERP)>
+
+Show runcore info at stat,
+
+=cut
+
+*/
+
+static void
+runcode_print_start_info(PARROT_INTERP)
+{
+    ASSERT_ARGS(runcode_print_start_info)
+
+    const char * corename;
+
+    Parrot_io_eprintf(interp,
+            "*** Parrot VM: Setting stack top. ***\n");
+
+    if (Interp_flags_TEST(interp, PARROT_BOUNDS_FLAG)) {
+        Parrot_io_eprintf(interp,
+                "*** Parrot VM: Bounds checking enabled. ***\n");
+    }
+
+    if (Interp_trace_TEST(interp, PARROT_TRACE_OPS_FLAG)) {
+        Parrot_io_eprintf(interp,
+                "*** Parrot VM: Tracing enabled. ***\n");
+    }
+
+    switch (interp->run_core) {
+        case PARROT_SLOW_CORE:
+            corename = "Slow";   break;
+        case PARROT_FAST_CORE:
+            corename = "Fast";   break;
+        case PARROT_SWITCH_CORE:
+        case PARROT_SWITCH_JIT_CORE:
+            corename = "Switch"; break;
+        case PARROT_CGP_CORE:
+        case PARROT_CGP_JIT_CORE:
+            corename = "CGP";    break;
+        case PARROT_CGOTO_CORE:
+            corename = "CGoto";  break;
+        case PARROT_JIT_CORE:
+            corename = "JIT";    break;
+        case PARROT_EXEC_CORE:
+            corename = "EXEC";   break;
+        default:
+            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                 "Unknown run core");
+    }
+
+    Parrot_io_eprintf(interp, "*** Parrot VM: %s core ***\n", corename);
+}
 
 /*
 
