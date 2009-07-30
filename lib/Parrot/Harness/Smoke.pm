@@ -169,7 +169,7 @@ sub collect_test_environment_data {
             $devel .= (" ".@mods." mods");
         }
         my $info = `svn info .`;
-        ($branch) = $info =~ m{URL: .+/parrot/(\w+)$}m;
+        ($branch) = $info =~ m{URL: .+/parrot/(?:branches/)?(\w+)$}m;
     }
     my $me = $^O eq 'MSWin32' ? $ENV{'USERNAME'}
            : $ENV{'LOGNAME'} || eval { getpwuid($<) };
