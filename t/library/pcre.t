@@ -7,7 +7,7 @@ use warnings;
 use lib qw( t . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 
 =head1 NAME
 
@@ -46,6 +46,61 @@ SKIP: {
         unless $has_pcre;
 
 ## 1
+## Check that the library can be loaded and initialized,
+## diganose the failure otherwise.
+    pir_output_is(<<"CODE", <<'OUT', 'libpcre loading');
+
+.include 'iglobals.pasm'
+.include 'libpaths.pasm'
+
+.sub main :main
+    .local pmc interp
+    getinterp interp
+
+    .local pmc lib_paths
+    lib_paths = interp[.IGLOBALS_LIB_PATHS]
+
+    .local pmc dynext_path
+    dynext_path = lib_paths[.PARROT_LIB_PATH_DYNEXT]
+    unshift dynext_path, '$pcre_libpath'
+
+    load_bytecode 'pcre.pbc'
+    .local pmc pcre_init
+    .local pmc pcre_lib
+
+    get_global pcre_init, ['PCRE'], 'init'
+    if null pcre_init goto NOINIT
+    push_eh CATCH
+    pcre_lib = pcre_init()
+    pop_eh
+    if null pcre_lib goto NULLINIT
+    unless pcre_lib goto FALSEINIT
+    say 'Loaded'
+    .return()
+CATCH:
+    .local pmc exception
+    .get_results(exception)
+    .local string message
+    message = exception['message']
+    pop_eh
+    say message
+    .return()
+NOINIT:
+   say 'No init function'
+    .return()
+NULLINIT:
+    say 'init returned null value'
+    .return()
+FALSEINIT:
+    say 'init returned false value'
+    .return()
+.end
+
+CODE
+Loaded
+OUT
+
+## 2
     pir_output_is( <<"CODE", <<'OUT', 'soup to nuts' );
 
 .include 'iglobals.pasm'
