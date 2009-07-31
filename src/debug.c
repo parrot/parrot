@@ -709,8 +709,8 @@ static void
 chop_newline(ARGMOD(char * buf))
 {
     ASSERT_ARGS(chop_newline)
-    size_t l;
-    l = strlen(buf);
+    const size_t l = strlen(buf);
+
     if (l > 0 && buf [l - 1] == '\n')
         buf [l - 1] = '\0';
 }
