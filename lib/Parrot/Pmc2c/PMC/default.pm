@@ -79,8 +79,8 @@ sub _generate_default_method {
         $param =~ s/.*\b(\w+)/$1/;
         $body .= "    UNUSED($param)\n";
     }
-    my $vt_method_name = $method->name;
-    $body .= qq{    $stub_func(interp, pmc, "$vt_method_name");\n};
+    my $vt_method_name = uc $method->name;
+    $body .= qq{    $stub_func(interp, pmc, PARROT_VTABLE_SLOT_$vt_method_name);\n};
 
     $clone->body( Parrot::Pmc2c::Emitter->text($body));
 

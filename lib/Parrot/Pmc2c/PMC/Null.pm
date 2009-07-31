@@ -47,10 +47,10 @@ EOC
             $param =~ s/.*\b(\w+)/$1/;
             $body .= "    UNUSED($param)\n";
         }
+        my $vtname = uc $vt_method_name;
         $body .= <<"EOC";
 
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NULL_REG_ACCESS,
-        "Null PMC access in $vt_method_name()");
+    null_pmc_access(interp, PARROT_VTABLE_SLOT_$vtname);
 EOC
 
         $new_default_method->body( Parrot::Pmc2c::Emitter->text($body) );

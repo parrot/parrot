@@ -238,6 +238,16 @@ EOM
 
 EOM
 
+    # Slot numbers
+    my $vtable_slot_num = 9;
+    for my $entry ( @{$vtable} ) {
+        my $uc_meth = uc $entry->[1];
+        $macros .= <<"EOM";
+#define PARROT_VTABLE_SLOT_${uc_meth} ${vtable_slot_num}
+EOM
+        ++$vtable_slot_num;
+    }
+
     # finally the name mapping
     $macros .= <<'EOM';
 /*
