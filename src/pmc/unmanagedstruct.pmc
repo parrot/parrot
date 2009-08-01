@@ -691,6 +691,7 @@ Destroys the subroutine.
 
     VTABLE void destroy() {
         mem_sys_free(PMC_data(SELF));
+        PMC_data(SELF) = NULL;
     }
 
 

@@ -409,6 +409,7 @@ Free hash structure.
             parrot_hash_destroy(INTERP, hash);
 
         mem_sys_free(PMC_data(SELF));
+        PMC_data(SELF) = NULL;
     }
 /*
 

@@ -87,6 +87,7 @@ Destroys the array.
             mem_sys_free(PMC_array(SELF));
         }
         mem_sys_free(PMC_data(SELF));
+        PMC_data(SELF) = NULL;
     }
 
 /*

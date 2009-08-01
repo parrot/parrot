@@ -34,8 +34,8 @@ Initializes the number to zero.
     VTABLE void init() {
         Parrot_Float_attributes * const fattr = mem_allocate_zeroed_typed(Parrot_Float_attributes);
 
-        fattr->fv      = 0.0;
         PMC_data(SELF) = fattr;
+        SET_ATTR_fv(INTERP, SELF, 0.0);
 
         PObj_active_destroy_SET(SELF);
     }
@@ -51,6 +51,7 @@ Destroy this PMC.
 
     VTABLE void destroy() {
         mem_sys_free(PMC_data(SELF));
+        PMC_data(SELF) = NULL;
     }
 /*
 
