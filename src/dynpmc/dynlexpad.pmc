@@ -189,6 +189,7 @@ Return the LexInfo PMC, if any or a Null PMC.
             PARROT_DYNLEXPAD(SELF)->hash = NULL;
         }
         mem_sys_free(PMC_data(SELF));
+        PMC_data(SELF) = NULL;
     }
 /*
 

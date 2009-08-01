@@ -302,6 +302,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
         mpq_clear(RT(SELF));
         mem_sys_free(RT(SELF));
         mem_sys_free(PMC_data(SELF));
+        PMC_data(SELF) = NULL;
       #else
         RAISE_EXCEPTION
       #endif

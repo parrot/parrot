@@ -114,6 +114,7 @@ So we do a bit of cheating here, and load it during class initialization.
         mem_sys_free(
                 ((Parrot_GDBMHash_attributes *)PMC_data(SELF))->db_handle);
         mem_sys_free(PMC_data(SELF));
+        PMC_data(SELF) = NULL;
     }
 
     VTABLE void* get_pointer() {
