@@ -44,20 +44,20 @@ sub typedef($/) {
 }
 
 method declaration($/) {
-    my $ast := NCIGENAST::VarDecl.new( :node($/) );
+    my $ast := NCIGENAST::VarDecl.new() ;
     my $type := "";
 
-    #say("=================================================================================================");
-    #_dumper($/);
+#    say("=================================================================================================");
+#    _dumper($/);
 #    make $decls;
 #    return 1;
     my $decl_specs := $<declaration_specifiers><repeatable_declaration_specifiers>;
     if typedef($decl_specs) {
-        $ast := NCIGENAST::TypeDef.new( :node($/) );
+        $ast := NCIGENAST::TypeDef.new( );
         $type := "TypeDef";
     }
     elsif $/<init_declarator><init_declarator><declarator><direct_declarator><declarator_suffix><declarator_suffix><parameter_type_list> {
-        $ast := NCIGENAST::FuncDecl.new( :node($/) );
+        $ast := NCIGENAST::FuncDecl.new( );
         $type := "FuncDecl";
     }
 #    elsif $<declaration_specifiers><type_specifier><type> {
@@ -65,7 +65,7 @@ method declaration($/) {
 #        $type := "Struct";
 #    }
     else {
-        $ast := NCIGENAST::VarDecl.new( :node($/) );
+        $ast := NCIGENAST::VarDecl.new( );
         $type := "VarDecl";
     }
     parse_decl_specs( $<declaration_specifiers><repeatable_declaration_specifiers>, $ast );
@@ -81,7 +81,7 @@ method declaration($/) {
         #assert(+$<init_declarator><declarator><direct_declarator><declarator_suffix>  == 1);
         my $params := $<init_declarator><declarator><declarator><direct_declarator><declarator_suffix><parameter_type_list><parameter_type_list><parameter_list><parameter_declaration>;
         for $params {
-            my $param := NCIGENAST::Param.new( :node( $_ ) );
+            my $param := NCIGENAST::Param.new( );
 
             settype($_<declaration_specifiers><type_specifier>, $param);
             my $param_ident := $_<declarator>;
@@ -199,10 +199,10 @@ sub settype($/, $ast) {
             if $s_or_u {
                 my $su;
                 if ($struct_or_union eq "struct" ) {
-                    $su := NCIGENAST::Struct.new( :node($/) );
+                    $su := NCIGENAST::Struct.new( );
                 }
                 else {
-                    $su := NCIGENAST::Union.new( :node($/) );
+                    $su := NCIGENAST::Union.new( );
                 }
                 $su.name($ident);
                 build_struct_or_union($s_or_u, $su);
@@ -227,7 +227,7 @@ sub strip_spaces($_) {
 
 sub build_struct_or_union($/, $ast) {
     for $/ {
-        my $smt := NCIGENAST::VarDecl.new( :node($_) );
+        my $smt := NCIGENAST::VarDecl.new( );
         settype( $_<specifier_qualifier_list><type_specifier>, $smt );
         for $_<struct_declarator_list> {
             my $sm := $smt.clone();
