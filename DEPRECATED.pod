@@ -202,6 +202,14 @@ check in 1.4 or 2.0 for the new names.
 
 L<https://trac.parrot.org/parrot/ticket/443>
 
+=item PMC Attributes Allocation Functions [experimental]
+
+ Parrot_gc_allocate_pmc_attributes
+ Parrot_gc_free_pmc_attributes
+
+These items and related helper functions are added as experimental support
+for TT #895
+
 =back
 
 =head1 Compiler tools
