@@ -861,6 +861,7 @@ BigNum object.
         mem_sys_free(attrs->bn);
 #endif
         mem_sys_free(attrs);
+        PMC_data(SELF) = NULL;
     }
 
 /*

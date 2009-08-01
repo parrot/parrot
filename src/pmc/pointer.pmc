@@ -51,6 +51,7 @@ Destroy the Pointer and free associated memory
 
     VTABLE void destroy() {
         mem_sys_free(PARROT_POINTER(SELF));
+        PMC_data(SELF) = NULL;
     }
 
 

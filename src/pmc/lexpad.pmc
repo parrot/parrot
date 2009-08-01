@@ -89,6 +89,7 @@ Return the LexInfo PMC, if any or a Null PMC.
 
     VTABLE void destroy() {
         mem_sys_free(PMC_data(SELF));
+        PMC_data(SELF) = NULL;
     }
 
     VTABLE void set_pointer(void *ctx) {

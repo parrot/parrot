@@ -68,6 +68,7 @@ Destroys the array.
         if (bit_array)
             mem_sys_free(bit_array);
         mem_sys_free(PMC_data(SELF));
+        PMC_data(SELF) = NULL;
     }
 
 /*

@@ -92,6 +92,7 @@ Otherwise, mem_sys_free() is used.
                 mem_sys_free(ptr);
         }
         mem_sys_free(PMC_data(SELF));
+        PMC_data(SELF) = NULL;
     }
 
 /*

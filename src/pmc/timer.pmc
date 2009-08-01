@@ -180,6 +180,7 @@ Destroys the timer.
     VTABLE void destroy() {
         Parrot_cx_delete_task(INTERP, SELF);
         mem_sys_free(PMC_data(SELF));
+        PMC_data(SELF) = NULL;
     }
 
 /*

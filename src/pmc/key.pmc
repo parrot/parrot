@@ -59,6 +59,7 @@ Destroy this Key, but not in the way anyone reading its code would want.
 */
     VTABLE void destroy() {
         mem_sys_free(PMC_data(SELF));
+        PMC_data(SELF) = NULL;
     }
 
 /*

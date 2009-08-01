@@ -119,6 +119,7 @@ Free structures.
                 Parrot_io_close_piohandle(interp, data_struct->os_handle);
             data_struct->os_handle = PIO_INVALID_HANDLE;
         }
+        PMC_data(SELF) = NULL;
     }
 
 /*

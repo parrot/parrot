@@ -67,6 +67,7 @@ Destroys the library, closing the shared library.
         if (dl_handle)
             Parrot_dlclose(dl_handle);
         mem_sys_free(PMC_data(SELF));
+        PMC_data(SELF) = NULL;
     }
 
 

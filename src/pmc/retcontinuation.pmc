@@ -57,6 +57,7 @@ Initializes the continuation.
             mem_sys_free(cc);
 
         mem_sys_free(PMC_data(SELF));
+        PMC_data(SELF) = NULL;
     }
 /*
 

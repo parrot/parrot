@@ -645,6 +645,7 @@ BigInt object.
         attrs = (Parrot_BigInt_attributes*)PMC_data(SELF);
         mem_sys_free(attrs->bi);
         mem_sys_free(attrs);
+        PMC_data(SELF) = NULL;
     }
 
 /*

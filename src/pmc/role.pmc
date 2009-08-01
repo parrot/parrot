@@ -256,6 +256,7 @@ Free the memory associated with the object's underlying struct.
 
     VTABLE void destroy() {
         mem_sys_free(PMC_data(SELF));
+        PMC_data(SELF) = NULL;
     }
 
 /*
