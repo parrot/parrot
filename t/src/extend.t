@@ -731,6 +731,7 @@ main(int argc, char *argv[]) {
 
     for (i = 1; i <= niter; i++) {
         printf("Starting interp %d\n", i);
+        fflush(stdout);
         interp = Parrot_new(NULL);
         if (!interp)
             return 1;
@@ -738,6 +739,7 @@ main(int argc, char *argv[]) {
         Parrot_set_flag(interp, PARROT_DESTROY_FLAG);
 
         printf("Destroying interp %d\n", i);
+        fflush(stdout);
         interp_cleanup(interp, 0);
     }
 
