@@ -416,6 +416,11 @@ REGISTER       "$"[SNIP]{DIGITS}
                     char *str = Parrot_str_to_cstring(lexer->interp, pstr);
 
                     yylval->sval = str;
+                    
+                    /* store the STRING in lexer's sval buffer; once PIRC is doing
+                    only STRINGs, it can be stored in yylval.sval. */
+                    lexer->sval = pstr;
+                    
                     return TK_STRINGC;
                   }
 
