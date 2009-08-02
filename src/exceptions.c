@@ -130,8 +130,8 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
         if (use_perr)
             Parrot_io_eprintf(interp, "%S\n", message);
         else {
-            fflush(stderr);
             char * const msg = Parrot_str_to_cstring(interp, message);
+            fflush(stderr);
             fprintf(stderr, "\n%s\n", msg);
             Parrot_str_free_cstring(msg);
         }
