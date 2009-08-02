@@ -1664,9 +1664,6 @@ Parrot_gc_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
 =item C<void * Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, PMC *pmc, size_t
 size)>
 
-=item C<void Parrot_gc_free_pmc_attributes(PARROT_INTERP, PMC *pmc, size_t
-item_size)>
-
 EXPERIMENTAL!!!
 
 Allocation and deallocation function for PMC Attribute structures.
@@ -1693,6 +1690,15 @@ Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc), size_t size)
     return attrs;
 }
 
+/*
+
+=item C<void Parrot_gc_free_pmc_attributes(PARROT_INTERP, PMC *pmc, size_t
+item_size)>
+
+EXPERIMENTAL!!!  See above.
+
+*/
+
 void
 Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc), size_t item_size)
 {
@@ -1707,6 +1713,15 @@ Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc), size_t item_size)
     }
 }
 
+/*
+
+=item C<void * Parrot_gc_allocate_fixed_size_storage(PARROT_INTERP, size_t
+size)>
+
+EXPERIMENTAL!!!  See above.
+
+*/
+
 PARROT_CANNOT_RETURN_NULL
 void *
 Parrot_gc_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
@@ -1717,6 +1732,15 @@ Parrot_gc_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
     return Parrot_gc_get_attributes_from_pool(interp, pool);
 }
 
+/*
+
+=item C<void Parrot_gc_free_fixed_size_storage(PARROT_INTERP, size_t size, void
+* data)>
+
+EXPERIMENTAL!!!  See above.
+
+*/
+
 void
 Parrot_gc_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGMOD(void * data))
 {
@@ -1725,6 +1749,7 @@ Parrot_gc_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGMOD(void * data
         size);
     Parrot_gc_free_attributes_from_pool(interp, pool, data);
 }
+
 /*
 
 =back
