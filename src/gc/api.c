@@ -1687,6 +1687,7 @@ Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc), size_t size)
     PMC_Attribute_Pool * pool = Parrot_gc_get_attribute_pool(interp, attr_size);
     void * attrs = Parrot_gc_get_attributes_from_pool(interp, pool);
     PMC_data(pmc) = attrs;
+    pool->num_free_objects--;
     return attrs;
 }
 
@@ -1703,6 +1704,7 @@ Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc), size_t item_size)
         PMC_Attribute_Free_List * const item = (PMC_Attribute_Free_List *)data;
         item->next = pool->free_list;
         pool->free_list = item;
+        pool->num_free_objects++;
         PMC_data(pmc) = NULL;
     }
 }

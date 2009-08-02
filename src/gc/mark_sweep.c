@@ -1219,7 +1219,7 @@ void
 Parrot_gc_allocate_new_attributes_arena(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool *pool))
 {
     ASSERT_ARGS(Parrot_gc_allocate_new_attributes_arena)
-    size_t const num_items = GC_ATTRIBS_INITIAL_ALLOC;
+    size_t const num_items = pool->objects_per_alloc;
     size_t const item_size = pool->attr_size;
     size_t i;
     PMC_Attribute_Free_List * list;
@@ -1231,16 +1231,16 @@ Parrot_gc_allocate_new_attributes_arena(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool
     new_arena->prev = NULL;
     new_arena->next = pool->top_arena;
     pool->top_arena = new_arena;
-    next = (PMC_Attribute_Free_List *)(pool + 1);
-    new_arena->start_objects = list;
+    next = (PMC_Attribute_Free_List *)(new_arena + 1);
+    new_arena->start_objects = next;
     for (i = 0; i < num_items; i++) {
         list = next;
         list->next = (PMC_Attribute_Free_List *)((char *)list + item_size);
         next = list->next;
     }
-    fprintf(stderr, "arena %d: %p - %p\n", item_size, new_arena->start_objects, list);
     list->next = pool->free_list;
     pool->free_list = (PMC_Attribute_Free_List *)new_arena->start_objects;
+    pool->total_objects += num_items;
 }
 
 PARROT_CANNOT_RETURN_NULL
@@ -1283,7 +1283,7 @@ Parrot_gc_create_attrib_pool(PARROT_INTERP, size_t attrib_size)
     PMC_Attribute_Pool * const newpool = mem_internal_allocate_typed(PMC_Attribute_Pool);
     newpool->attr_size = attrib_size;
     newpool->total_objects = 0;
-    newpool->objects_per_alloc = 0;
+    newpool->objects_per_alloc = GC_ATTRIBS_INITIAL_ALLOC;
     newpool->num_free_objects = 0;
     newpool->free_list = NULL;
     newpool->top_arena = NULL;
