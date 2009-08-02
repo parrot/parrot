@@ -189,6 +189,11 @@ void Parrot_gc_allocate_buffer_storage_aligned(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*buffer);
 
+PARROT_CANNOT_RETURN_NULL
+void * Parrot_gc_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
+        __attribute__nonnull__(1);
+
+PARROT_CANNOT_RETURN_NULL
 void * Parrot_gc_allocate_pmc_attributes(PARROT_INTERP,
     ARGMOD(PMC *pmc),
     size_t size)
@@ -240,7 +245,13 @@ void Parrot_gc_free_bufferlike_header(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*obj);
 
-PARROT_CANNOT_RETURN_NULL
+void Parrot_gc_free_fixed_size_storage(PARROT_INTERP,
+    size_t size,
+    ARGMOD(void * data))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* data);
+
 void Parrot_gc_free_pmc_attributes(PARROT_INTERP,
     ARGMOD(PMC *pmc),
     size_t item_size)
@@ -375,6 +386,9 @@ int Parrot_gc_total_sized_buffers(PARROT_INTERP)
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(buffer)
+#define ASSERT_ARGS_Parrot_gc_allocate_fixed_size_storage \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_allocate_pmc_attributes \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
@@ -410,6 +424,10 @@ int Parrot_gc_total_sized_buffers(PARROT_INTERP)
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(obj)
+#define ASSERT_ARGS_Parrot_gc_free_fixed_size_storage \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(data)
 #define ASSERT_ARGS_Parrot_gc_free_pmc_attributes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pmc)

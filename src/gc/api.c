@@ -1678,6 +1678,7 @@ the PMC allocation/deallocation mechanisms. See TT #895 for details.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 void *
 Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc), size_t size)
 {
@@ -1691,7 +1692,6 @@ Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc), size_t size)
     return attrs;
 }
 
-PARROT_CANNOT_RETURN_NULL
 void
 Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc), size_t item_size)
 {
@@ -1722,7 +1722,7 @@ Parrot_gc_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGMOD(void * data
     ASSERT_ARGS(Parrot_gc_free_fixed_size_storage)
     PMC_Attribute_Pool * const pool = Parrot_gc_get_attribute_pool(interp,
         size);
-    Parrot_gc_free_atributes_from_pool(interp, pool, data);
+    Parrot_gc_free_attributes_from_pool(interp, pool, data);
 }
 /*
 

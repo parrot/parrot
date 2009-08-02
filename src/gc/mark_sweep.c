@@ -79,6 +79,17 @@ PARROT_CANNOT_RETURN_NULL
 static Small_Object_Pool * new_string_pool(PARROT_INTERP, INTVAL constant)
         __attribute__nonnull__(1);
 
+static void Parrot_gc_allocate_new_attributes_arena(PARROT_INTERP,
+    ARGMOD(PMC_Attribute_Pool *pool))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pool);
+
+PARROT_CANNOT_RETURN_NULL
+static PMC_Attribute_Pool * Parrot_gc_create_attrib_pool(PARROT_INTERP,
+    size_t attrib_size)
+        __attribute__nonnull__(1);
+
 #define ASSERT_ARGS_free_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pool) \
     || PARROT_ASSERT_ARG(b)
@@ -95,6 +106,12 @@ static Small_Object_Pool * new_string_pool(PARROT_INTERP, INTVAL constant)
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_new_small_object_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_new_string_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_gc_allocate_new_attributes_arena \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_Parrot_gc_create_attrib_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -1194,12 +1211,13 @@ PMC_Attribute_Pool * pool)>
 Get a new fixed-size storage space from the given pool. The pool contains
 information on the size of the item to allocate already.
 
-=item C<void Parrot_gc_allocate_new_attributes_arena(PARROT_INTERP,
+=item C<static void Parrot_gc_allocate_new_attributes_arena(PARROT_INTERP,
 PMC_Attribute_Pool *pool)>
 
 Allocate a new arena of fixed-sized data structures for the given pool.
 
-=item C<void Parrot_gc_free_attributes_from_pool(PARROT_INTERP, PMC_Attribute_Pool *pool, void *data)>
+=item C<void Parrot_gc_free_attributes_from_pool(PARROT_INTERP,
+PMC_Attribute_Pool * pool, void *data)>
 
 Frees a fixed-size data item back to the pool for later reallocation
 
@@ -1209,8 +1227,8 @@ attrib_size)>
 Find a fixed-sized data structure pool given the size of the object to
 allocate. If the pool does not exist, create it.
 
-=item C<PMC_Attribute_Pool * Parrot_gc_create_attrib_pool(PARROT_INTERP, size_t
-attrib_size)>
+=item C<static PMC_Attribute_Pool * Parrot_gc_create_attrib_pool(PARROT_INTERP,
+size_t attrib_size)>
 
 Create a new pool for fixed-sized data items with the given C<attrib_size>.
 
@@ -1235,7 +1253,7 @@ Parrot_gc_get_attributes_from_pool(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool * po
 }
 
 void
-Parrot_gc_free_attributes_from_pool(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool * pool)
+Parrot_gc_free_attributes_from_pool(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool * pool),
     ARGMOD(void *data))
 {
     PMC_Attribute_Free_List * const item = (PMC_Attribute_Free_List *)data;

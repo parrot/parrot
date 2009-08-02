@@ -382,21 +382,19 @@ void Parrot_append_arena_in_pool(PARROT_INTERP,
         FUNC_MODIFIES(*pool)
         FUNC_MODIFIES(*new_arena);
 
-void Parrot_gc_allocate_new_attributes_arena(PARROT_INTERP,
-    ARGMOD(PMC_Attribute_Pool *pool))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pool);
-
 void Parrot_gc_clear_live_bits(PARROT_INTERP,
     ARGIN(const Small_Object_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_CANNOT_RETURN_NULL
-PMC_Attribute_Pool * Parrot_gc_create_attrib_pool(PARROT_INTERP,
-    size_t attrib_size)
-        __attribute__nonnull__(1);
+void Parrot_gc_free_attributes_from_pool(PARROT_INTERP,
+    ARGMOD(PMC_Attribute_Pool * pool),
+    ARGMOD(void *data))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* pool)
+        FUNC_MODIFIES(*data);
 
 PARROT_CANNOT_RETURN_NULL
 PMC_Attribute_Pool * Parrot_gc_get_attribute_pool(PARROT_INTERP,
@@ -451,15 +449,14 @@ int Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pool) \
     || PARROT_ASSERT_ARG(new_arena)
-#define ASSERT_ARGS_Parrot_gc_allocate_new_attributes_arena \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_Parrot_gc_clear_live_bits __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pool)
-#define ASSERT_ARGS_Parrot_gc_create_attrib_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_gc_free_attributes_from_pool \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(data)
 #define ASSERT_ARGS_Parrot_gc_get_attribute_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_get_attributes_from_pool \
