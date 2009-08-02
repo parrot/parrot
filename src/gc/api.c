@@ -1661,9 +1661,11 @@ Parrot_gc_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<void Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, PMC *pmc)>
+=item C<void * Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, PMC *pmc, size_t
+size)>
 
-=item C<void Parrot_gc_free_pmc_attributes(PARROT_INTERP, PMC *pmc)>
+=item C<void Parrot_gc_free_pmc_attributes(PARROT_INTERP, PMC *pmc, size_t
+item_size)>
 
 EXPERIMENTAL!!!
 
@@ -1676,23 +1678,26 @@ the PMC allocation/deallocation mechanisms. See TT #895 for details.
 
 */
 
-void
-Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
+void *
+Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc), size_t size)
 {
     ASSERT_ARGS(Parrot_gc_allocate_pmc_attributes)
-    const size_t attr_size = 0; /*pmc->vtable->attr_size; */
+    /* const size_t attr_size = pmc->vtable->attr_size; */
+    const size_t attr_size = size;
     PMC_Attribute_Pool * pool = Parrot_gc_get_attribute_pool(interp, attr_size);
     void * attrs = Parrot_gc_get_attributes_from_pool(interp, pool);
     PMC_data(pmc) = attrs;
+    return attrs;
 }
 
 PARROT_CANNOT_RETURN_NULL
 void
-Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
+Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc), size_t item_size)
 {
     ASSERT_ARGS(Parrot_gc_free_pmc_attributes)
     void * const data = PMC_data(pmc);
-    const size_t size = 0; /* pmc->vtable->attr_size; */
+    /* const size_t size = pmc->vtable->attr_size; */
+    const size_t size = item_size;
     if (data != NULL) {
         PMC_Attribute_Pool * const pool = Parrot_gc_get_attribute_pool(interp, size);
         PMC_Attribute_Free_List * const item = (PMC_Attribute_Free_List *)data;

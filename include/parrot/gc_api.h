@@ -189,7 +189,9 @@ void Parrot_gc_allocate_buffer_storage_aligned(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*buffer);
 
-void Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
+void * Parrot_gc_allocate_pmc_attributes(PARROT_INTERP,
+    ARGMOD(PMC *pmc),
+    size_t size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
@@ -239,7 +241,9 @@ void Parrot_gc_free_bufferlike_header(PARROT_INTERP,
         FUNC_MODIFIES(*obj);
 
 PARROT_CANNOT_RETURN_NULL
-void Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
+void Parrot_gc_free_pmc_attributes(PARROT_INTERP,
+    ARGMOD(PMC *pmc),
+    size_t item_size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
