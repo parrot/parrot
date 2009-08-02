@@ -106,6 +106,10 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
     STRING * const message     = VTABLE_get_string(interp, exception);
     INTVAL         exit_status = 1;
     const INTVAL   severity    = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
+
+    /* In some cases we have a fatal exception before the IO system
+     * is completely initialized. Do some attempt to output the
+     * message to stderr, to help diagnosing. */
     int use_perr = !PMC_IS_NULL(Parrot_io_STDERR(interp));
 
     /* flush interpreter output to get things printed in order */
@@ -126,8 +130,10 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
         if (use_perr)
             Parrot_io_eprintf(interp, "%S\n", message);
         else {
+            fflush(stderr);
             char * const msg = Parrot_str_to_cstring(interp, message);
-            fprintf(stderr, "%s\n", msg);
+            fprintf(stderr, "\n%s\n", msg);
+            Parrot_str_free_cstring(msg);
         }
 
         /* caution against output swap (with PDB_backtrace) */
