@@ -1329,7 +1329,6 @@ Parrot_gc_create_attrib_pool(PARROT_INTERP, size_t attrib_size)
         (GC_FIXED_SIZE_POOL_SIZE - sizeof (PMC_Attribute_Arena)) / attrib_size;
     const size_t num_objs = (num_objs_raw == 0)?(1):(num_objs_raw);
     PMC_Attribute_Pool * const newpool = mem_internal_allocate_typed(PMC_Attribute_Pool);
-    fprintf(stderr, "Pool %d: %d objs\n", attrib_size, num_objs);
     newpool->attr_size = attrib_size;
     newpool->total_objects = 0;
     newpool->objects_per_alloc = num_objs;
