@@ -144,16 +144,20 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
         MUTEX_INIT(interpreter_array_mutex);
     }
 
+    /* Must initialize flags before Parrot_gc_initialize() is called
+     * so the GC_DEBUG stuff is available. */
+    interp->flags = flags;
+    /* Set up the memory allocation system */
+    Parrot_gc_initialize(interp, (void*)&stacktop);
+    Parrot_block_GC_mark(interp);
+    Parrot_block_GC_sweep(interp);
+
     create_initial_context(interp);
     interp->resume_flag = RESUME_INITIAL;
 
     /* main is called as a Sub too - this will get depth 0 then */
     CONTEXT(interp)->recursion_depth = (UINTVAL)-1;
     interp->recursion_limit = RECURSION_LIMIT;
-
-    /* Must initialize flags here so the GC_DEBUG stuff is available before
-     * Parrot_gc_initialize() is called. */
-    interp->flags = flags;
 
     /* PANIC will fail until this is done */
     interp->piodata = NULL;
@@ -167,11 +171,6 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
                 "with DISABLE_GC_DEBUG.\n");
 #endif
     }
-
-    /* Set up the memory allocation system */
-    Parrot_gc_initialize(interp, (void*)&stacktop);
-    Parrot_block_GC_mark(interp);
-    Parrot_block_GC_sweep(interp);
 
     /*
      * Set up the string subsystem
