@@ -38,7 +38,7 @@ extern void *flush_reg_store(void);
 
 /* these values are used for the attribute allocator */
 #define GC_ATTRIB_POOLS_HEADROOM 8
-#define GC_ATTRIBS_INITIAL_ALLOC 128
+#define GC_FIXED_SIZE_POOL_SIZE 4096
 
 /* We're using this here to add an additional pointer to a PObj without
    having to actually add an entire pointer to every PObj-alike structure
@@ -65,11 +65,8 @@ typedef struct PMC_Attribute_Free_List {
 } PMC_Attribute_Free_List;
 
 typedef struct PMC_Attribute_Arena {
-    size_t used;
-    size_t total_objects;
     struct PMC_Attribute_Arena * next;
     struct PMC_Attribute_Arena * prev;
-    void *start_objects;
 } PMC_Attribute_Arena;
 
 #if PARROT_GC_GMS

@@ -1688,6 +1688,7 @@ Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc), size_t size)
     PMC_Attribute_Pool * const pool = Parrot_gc_get_attribute_pool(interp,
         attr_size);
     void * const attrs = Parrot_gc_get_attributes_from_pool(interp, pool);
+    memset(attrs, 0, size);
     PMC_data(pmc) = attrs;
     return attrs;
 }
