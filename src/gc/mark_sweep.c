@@ -1186,6 +1186,8 @@ header_pools_iterate_callback(PARROT_INTERP, int flag, ARGIN_NULLOK(void *arg),
 
 /*
 
+=over 4
+
 =item C<void * Parrot_gc_get_attributes_from_pool(PARROT_INTERP,
 PMC_Attribute_Pool * pool)>
 
@@ -1197,6 +1199,8 @@ attrib_size)>
 
 =item C<PMC_Attribute_Pool * Parrot_gc_create_attrib_pool(PARROT_INTERP, size_t
 attrib_size)>
+
+=back
 
 =cut
 
@@ -1256,7 +1260,8 @@ Parrot_gc_get_attribute_pool(PARROT_INTERP, size_t attrib_size)
         size_t total_size = idx + GC_ATTRIB_POOLS_HEADROOM;
         /* Allocate more then we strictly need, hoping that we can reduce the
            number of resizes. 8 is just an arbitrary number */
-        pools = (PMC_Attribute_Pool **)mem_internal_allocate(total_size * sizeof (PMC_Attribute_Pool *));
+        pools = (PMC_Attribute_Pool **)mem_internal_allocate(total_size
+                                                             * sizeof (PMC_Attribute_Pool *));
         memset(pools, 0, total_size * sizeof (void*));
         arenas->attrib_pools = pools;
         arenas->num_attribs = total_size;
@@ -1265,7 +1270,8 @@ Parrot_gc_get_attribute_pool(PARROT_INTERP, size_t attrib_size)
         size_t total_size = idx + GC_ATTRIB_POOLS_HEADROOM;
         size_t current_size = arenas->num_attribs;
         size_t diff = total_size - current_size;
-        pools = (PMC_Attribute_Pool **)mem_internal_realloc(pools, total_size * sizeof (PMC_Attribute_Pool *));
+        pools = (PMC_Attribute_Pool **)mem_internal_realloc(pools, total_size
+                                                            * sizeof (PMC_Attribute_Pool *));
         memset(pools + current_size, 0, diff * sizeof (void *));
         arenas->attrib_pools = pools;
         arenas->num_attribs = total_size;
