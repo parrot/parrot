@@ -146,6 +146,12 @@ typedef struct lexer_state {
 
     annotation               *annotations;
     unsigned                  num_annotations;
+    
+    /* XXX Temporary STRING pointer, for the conversion of all lexer code to use
+    STRINGs instead of c strings (char pointers). Cannot change yylval union yet,
+    as it's better to have duplicated functionality, then removing the old c strings 
+    stuff*/
+    STRING    *sval;
 
 } lexer_state;
 
