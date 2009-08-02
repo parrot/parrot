@@ -1684,10 +1684,10 @@ Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc), size_t size)
     ASSERT_ARGS(Parrot_gc_allocate_pmc_attributes)
     /* const size_t attr_size = pmc->vtable->attr_size; */
     const size_t attr_size = size;
-    PMC_Attribute_Pool * pool = Parrot_gc_get_attribute_pool(interp, attr_size);
-    void * attrs = Parrot_gc_get_attributes_from_pool(interp, pool);
+    PMC_Attribute_Pool * const pool = Parrot_gc_get_attribute_pool(interp,
+        attr_size);
+    void * const attrs = Parrot_gc_get_attributes_from_pool(interp, pool);
     PMC_data(pmc) = attrs;
-    pool->num_free_objects--;
     return attrs;
 }
 
@@ -1701,14 +1701,29 @@ Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc), size_t item_size)
     const size_t size = item_size;
     if (data != NULL) {
         PMC_Attribute_Pool * const pool = Parrot_gc_get_attribute_pool(interp, size);
-        PMC_Attribute_Free_List * const item = (PMC_Attribute_Free_List *)data;
-        item->next = pool->free_list;
-        pool->free_list = item;
-        pool->num_free_objects++;
+        Parrot_gc_free_attributes_from_pool(interp, pool, data);
         PMC_data(pmc) = NULL;
     }
 }
 
+PARROT_CANNOT_RETURN_NULL
+void *
+Parrot_gc_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
+{
+    ASSERT_ARGS(Parrot_gc_allocate_fixed_size_storage)
+    PMC_Attribute_Pool * const pool = Parrot_gc_get_attribute_pool(interp,
+        size);
+    return Parrot_gc_get_attributes_from_pool(interp, pool);
+}
+
+void
+Parrot_gc_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGMOD(void * data))
+{
+    ASSERT_ARGS(Parrot_gc_free_fixed_size_storage)
+    PMC_Attribute_Pool * const pool = Parrot_gc_get_attribute_pool(interp,
+        size);
+    Parrot_gc_free_atributes_from_pool(interp, pool, data);
+}
 /*
 
 =back

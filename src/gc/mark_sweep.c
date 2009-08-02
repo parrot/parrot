@@ -1191,14 +1191,28 @@ header_pools_iterate_callback(PARROT_INTERP, int flag, ARGIN_NULLOK(void *arg),
 =item C<void * Parrot_gc_get_attributes_from_pool(PARROT_INTERP,
 PMC_Attribute_Pool * pool)>
 
+Get a new fixed-size storage space from the given pool. The pool contains
+information on the size of the item to allocate already.
+
 =item C<void Parrot_gc_allocate_new_attributes_arena(PARROT_INTERP,
 PMC_Attribute_Pool *pool)>
+
+Allocate a new arena of fixed-sized data structures for the given pool.
+
+=item C<void Parrot_gc_free_attributes_from_pool(PARROT_INTERP, PMC_Attribute_Pool *pool, void *data)>
+
+Frees a fixed-size data item back to the pool for later reallocation
 
 =item C<PMC_Attribute_Pool * Parrot_gc_get_attribute_pool(PARROT_INTERP, size_t
 attrib_size)>
 
+Find a fixed-sized data structure pool given the size of the object to
+allocate. If the pool does not exist, create it.
+
 =item C<PMC_Attribute_Pool * Parrot_gc_create_attrib_pool(PARROT_INTERP, size_t
 attrib_size)>
+
+Create a new pool for fixed-sized data items with the given C<attrib_size>.
 
 =back
 
@@ -1216,10 +1230,21 @@ Parrot_gc_get_attributes_from_pool(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool * po
         Parrot_gc_allocate_new_attributes_arena(interp, pool);
     item = pool->free_list;
     pool->free_list = item->next;
+    pool->num_free_objects--;
     return (void *)item;
 }
 
 void
+Parrot_gc_free_attributes_from_pool(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool * pool)
+    ARGMOD(void *data))
+{
+    PMC_Attribute_Free_List * const item = (PMC_Attribute_Free_List *)data;
+    item->next = pool->free_list;
+    pool->free_list = item;
+    pool->num_free_objects++;
+}
+
+static void
 Parrot_gc_allocate_new_attributes_arena(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool *pool))
 {
     ASSERT_ARGS(Parrot_gc_allocate_new_attributes_arena)
@@ -1282,7 +1307,7 @@ Parrot_gc_get_attribute_pool(PARROT_INTERP, size_t attrib_size)
 }
 
 PARROT_CANNOT_RETURN_NULL
-PMC_Attribute_Pool *
+static PMC_Attribute_Pool *
 Parrot_gc_create_attrib_pool(PARROT_INTERP, size_t attrib_size)
 {
     ASSERT_ARGS(Parrot_gc_create_attrib_pool)
