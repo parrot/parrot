@@ -1267,8 +1267,8 @@ static void
 Parrot_gc_allocate_new_attributes_arena(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool *pool))
 {
     ASSERT_ARGS(Parrot_gc_allocate_new_attributes_arena)
-    size_t const num_items = pool->objects_per_alloc;
-    size_t const item_size = pool->attr_size;
+    const size_t num_items = pool->objects_per_alloc;
+    const size_t item_size = pool->attr_size;
     size_t i;
     PMC_Attribute_Free_List *list, *next, *first;
     PMC_Attribute_Arena * const new_arena = (PMC_Attribute_Arena *)mem_internal_allocate(
@@ -1294,10 +1294,11 @@ Parrot_gc_get_attribute_pool(PARROT_INTERP, size_t attrib_size)
     ASSERT_ARGS(Parrot_gc_get_attribute_pool)
     Arenas * const arenas = interp->arena_base;
     PMC_Attribute_Pool ** pools = arenas->attrib_pools;
-    size_t size = (attrib_size < sizeof (void *))?(sizeof (void *)):(attrib_size);
-    size_t idx = size - sizeof (void *);
+    const size_t size = (attrib_size < sizeof (void *))?(sizeof (void *)):(attrib_size);
+    const size_t idx  = size - sizeof (void *);
+
     if (pools == NULL) {
-        size_t total_size = idx + GC_ATTRIB_POOLS_HEADROOM;
+        const size_t total_size = idx + GC_ATTRIB_POOLS_HEADROOM;
         /* Allocate more then we strictly need, hoping that we can reduce the
            number of resizes. 8 is just an arbitrary number */
         pools = (PMC_Attribute_Pool **)mem_internal_allocate(total_size
@@ -1307,9 +1308,10 @@ Parrot_gc_get_attribute_pool(PARROT_INTERP, size_t attrib_size)
         arenas->num_attribs = total_size;
     }
     if (arenas->num_attribs < idx) {
-        size_t total_size = idx + GC_ATTRIB_POOLS_HEADROOM;
-        size_t current_size = arenas->num_attribs;
-        size_t diff = total_size - current_size;
+        const size_t total_size   = idx + GC_ATTRIB_POOLS_HEADROOM;
+        const size_t current_size = arenas->num_attribs;
+        const size_t diff         = total_size - current_size;
+
         pools = (PMC_Attribute_Pool **)mem_internal_realloc(pools, total_size
                                                             * sizeof (PMC_Attribute_Pool *));
         memset(pools + current_size, 0, diff * sizeof (void *));
