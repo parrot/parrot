@@ -144,7 +144,7 @@ Returns whether the Socket is currently open.
 
 =over 4
 
-=item C<socket>
+=item C<socket(INTVAL fam, INTVAL type, INTVAL proto)>
 
 =cut
 
@@ -159,7 +159,25 @@ Returns whether the Socket is currently open.
 
 /*
 
-=item C<sockaddr>
+=item C<poll(INTVAL which, INTVAL sec, INTVAL usec)>
+
+Watches the socket for C<sec> seconds and C<usec> milliseconds.  C<which>
+is a bitmask representing the states you want to watch for.  Or together 1
+for readable, two for writeable, and four for exceptions.
+
+=cut
+
+*/
+
+
+    METHOD poll(INTVAL which, INTVAL sec, INTVAL usec) {
+        INTVAL poll = Parrot_io_poll(INTERP, SELF, which, sec, usec);
+        RETURN(INTVAL poll);
+    }
+
+/*
+
+=item C<sockaddr(STRING * address, INTVAL port)>
 
 C<sockaddr> returns an object representing a socket address, generated
 from a port number (integer) and an address (string).
@@ -175,7 +193,7 @@ from a port number (integer) and an address (string).
 
 /*
 
-=item C<connect>
+=item C<connect(PMC * address)>
 
 Connects a socket object to an address.
 
@@ -197,7 +215,7 @@ connected socket object.]
 
 /*
 
-=item C<close>
+=item C<close()>
 
 Close a socket.
 
@@ -219,7 +237,7 @@ Close a socket.
 
 /*
 
-=item C<recv>
+=item C<recv()>
 
 Receives a message from a connected socket object. It returns
 the message in a string.
@@ -241,7 +259,7 @@ string containing the received message.
 
 /*
 
-=item C<send>
+=item C<send(STRING *buf)>
 
 Sends a message string to a connected socket object.
 
@@ -260,7 +278,7 @@ complete, it invokes the callback, passing it a status object.
 
 /*
 
-=item C<bind>
+=item C<bind(PMC *host)>
 
 C<bind> binds a socket object to the port and address specified by an
 address object (the packed result of C<sockaddr>).
@@ -283,7 +301,7 @@ bound socket object.]
 
 /*
 
-=item C<listen>
+=item C<listen(INTVAL backlog)>
 
 C<listen> specifies that a socket object is willing to accept incoming
 connections. The integer argument gives the maximum size of the queue
@@ -303,7 +321,7 @@ the socket object.
 
 /*
 
-=item C<accept>
+=item C<accept()>
 
 C<accept> accepts a new connection on a given socket object, and returns
 a newly created socket object for the connection.
