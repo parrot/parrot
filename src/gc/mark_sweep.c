@@ -1244,10 +1244,29 @@ Parrot_gc_get_attributes_from_pool(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool * po
 {
     ASSERT_ARGS(Parrot_gc_get_attributes_from_pool)
     PMC_Attribute_Free_List * item;
-    if (pool->top_arena == NULL || pool->free_list == NULL)
+    if (pool->top_arena == NULL
+#if GC_USE_LAZY_ALLOCATOR
+     || (pool->newfree == NULL && pool->free_list == NULL)
+#else
+     || pool->free_list == NULL
+#endif
+     )
         Parrot_gc_allocate_new_attributes_arena(interp, pool);
+#if GC_USE_LAZY_ALLOCATOR
+    if(pool->newfree != NULL) {
+        item = pool->newfree;
+        pool->newfree = (PMC_Attribute_Free_List*)((char*)(pool->newfree) + pool->attr_size);
+        if(pool->newfree >= pool->newlast)
+            pool->newfree = NULL;
+    }
+    else {
+        item = pool->free_list;
+        pool->free_list = item->next;
+    }
+#else
     item = pool->free_list;
     pool->free_list = item->next;
+#endif
     pool->num_free_objects--;
     return (void *)item;
 }
@@ -1269,14 +1288,19 @@ Parrot_gc_allocate_new_attributes_arena(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool
     ASSERT_ARGS(Parrot_gc_allocate_new_attributes_arena)
     const size_t num_items = pool->objects_per_alloc;
     const size_t item_size = pool->attr_size;
+    const size_t total_size = sizeof (PMC_Attribute_Arena) + (pool->attr_size * num_items);
     size_t i;
     PMC_Attribute_Free_List *list, *next, *first;
     PMC_Attribute_Arena * const new_arena = (PMC_Attribute_Arena *)mem_internal_allocate(
-        sizeof (PMC_Attribute_Arena) + (pool->attr_size * num_items));
+        total_size);
     new_arena->prev = NULL;
     new_arena->next = pool->top_arena;
     pool->top_arena = new_arena;
     first = next = (PMC_Attribute_Free_List *)(new_arena + 1);
+#if GC_USE_LAZY_ALLOCATOR
+    pool->newfree = first;
+    pool->newlast = (PMC_Attribute_Free_List*)((char*)first + (item_size * num_items));
+#else
     for (i = 0; i < num_items; i++) {
         list = next;
         list->next = (PMC_Attribute_Free_List *)((char *)list + item_size);
@@ -1284,6 +1308,7 @@ Parrot_gc_allocate_new_attributes_arena(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool
     }
     list->next = pool->free_list;
     pool->free_list = first;
+#endif
     pool->total_objects += num_items;
 }
 

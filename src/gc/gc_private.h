@@ -124,13 +124,19 @@ typedef struct _gc_gms_gen {
 
 #endif /* PARROT_GC_GMS */
 
+#define GC_USE_LAZY_ALLOCATOR 1
+
 typedef struct PMC_Attribute_Pool {
     size_t attr_size;
     size_t total_objects;
     size_t objects_per_alloc;
     size_t num_free_objects;
     PMC_Attribute_Free_List * free_list;
-    PMC_Attribute_Arena * top_arena;
+    PMC_Attribute_Arena     * top_arena;
+#if GC_USE_LAZY_ALLOCATOR
+    PMC_Attribute_Free_List * newfree;
+    PMC_Attribute_Free_List * newlast;
+#endif
 } PMC_Attribute_Pool;
 
 /* Tracked resource pool */
