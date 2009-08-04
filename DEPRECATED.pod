@@ -343,10 +343,6 @@ L<https://trac.parrot.org/parrot/ticket/108>
 
 L<https://trac.parrot.org/parrot/ticket/508>
 
-=item NCI::call_toolkit_init [eligible in 1.5]
-
-L<https://trac.parrot.org/parrot/ticket/753>
-
 =item Cross-HLL library loading [experimental]
 
 L<https://trac.parrot.org/parrot/ticket/754>
