@@ -259,7 +259,7 @@ sub rewrite_vtable_method {
             \(\s*(.*?)\)      # capture argument list
           }x,
             sub {
-              if($pmc->is_dynamic($super)) {
+              if ($pmc->is_dynamic($super)) {
                 return "Parrot_" . $super .
                   "_get_vtable(interp)->$name(" . full_arguments($1) .
                   ')';

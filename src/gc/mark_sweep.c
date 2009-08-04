@@ -1243,30 +1243,33 @@ void *
 Parrot_gc_get_attributes_from_pool(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool * pool))
 {
     ASSERT_ARGS(Parrot_gc_get_attributes_from_pool)
-    PMC_Attribute_Free_List * item;
+    PMC_Attribute_Free_List *item;
+
     if (pool->top_arena == NULL
 #if GC_USE_LAZY_ALLOCATOR
-     || (pool->newfree == NULL && pool->free_list == NULL)
+     || (pool->newfree == NULL && pool->free_list == NULL))
 #else
-     || pool->free_list == NULL
+     || pool->free_list == NULL)
 #endif
-     )
         Parrot_gc_allocate_new_attributes_arena(interp, pool);
+
 #if GC_USE_LAZY_ALLOCATOR
-    if(pool->newfree != NULL) {
-        item = pool->newfree;
-        pool->newfree = (PMC_Attribute_Free_List*)((char*)(pool->newfree) + pool->attr_size);
-        if(pool->newfree >= pool->newlast)
+    if (pool->newfree) {
+        item          = pool->newfree;
+        pool->newfree = (PMC_Attribute_Free_List *)
+                            ((char *)(pool->newfree) + pool->attr_size);
+        if (pool->newfree >= pool->newlast)
             pool->newfree = NULL;
     }
     else {
-        item = pool->free_list;
+        item            = pool->free_list;
         pool->free_list = item->next;
     }
 #else
-    item = pool->free_list;
+    item            = pool->free_list;
     pool->free_list = item->next;
 #endif
+
     pool->num_free_objects--;
     return (void *)item;
 }
