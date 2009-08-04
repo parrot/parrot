@@ -19,7 +19,7 @@ F<examples/opengl/triangle.pir>.
 
     # Load OpenGL libary and a helper library for calling glutInit
     load_bytecode 'OpenGL.pbc'
-    load_bytecode 'NCI/call_toolkit_init.pbc'
+    load_bytecode 'NCI/Utils.pbc'
 
     # Import all OpenGL/GLU/GLUT functions
     .local pmc import_gl
@@ -28,7 +28,7 @@ F<examples/opengl/triangle.pir>.
 
     # Initialize GLUT
     .local pmc call_toolkit_init
-    call_toolkit_init = get_global ['NCI'], 'call_toolkit_init'
+    call_toolkit_init = get_global ['NCI';'Utils'], 'call_toolkit_init'
 
     .const 'Sub' glutInit = 'glutInit'
     argv = call_toolkit_init(glutInit, argv)
