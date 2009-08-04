@@ -86,19 +86,20 @@ Initializes the exception with default values.
         Parrot_Exception_attributes * const core_struct =
             mem_allocate_zeroed_typed(Parrot_Exception_attributes);
 
+        /* Set up the core struct and default values for the exception object. */
+        PMC_data(SELF)            = core_struct;
+
         /* Set flags for custom GC mark and destroy. */
         PObj_custom_mark_SET(SELF);
         PObj_active_destroy_SET(SELF);
 
-        /* Set up the core struct and default values for the exception object. */
-        PMC_data(SELF)            = core_struct;
-        core_struct->severity     = EXCEPT_error;
-        core_struct->handled      = 0;
-        core_struct->message      = CONST_STRING(interp, "");
-        core_struct->payload      = PMCNULL;
-        core_struct->resume       = PMCNULL;
-        core_struct->backtrace    = PMCNULL;
-        core_struct->handler_iter = PMCNULL;
+        SET_ATTR_severity(INTERP, SELF, EXCEPT_error);
+        SET_ATTR_handled(INTERP, SELF, 0);
+        SET_ATTR_message(INTERP, SELF, NULL);
+        SET_ATTR_payload(INTERP, SELF, PMCNULL);
+        SET_ATTR_resume(INTERP, SELF, PMCNULL);
+        SET_ATTR_backtrace(INTERP, SELF, PMCNULL);
+        SET_ATTR_handler_iter(INTERP, SELF, PMCNULL);
     }
 
 /*
@@ -112,31 +113,40 @@ Initializes the exception with supplied values.
 */
 
     VTABLE void init_pmc(PMC *values) {
-        STRING * const severity = CONST_STRING(interp, "severity");
-        STRING * const message  = CONST_STRING(interp, "message");
+        INTVAL severity_val;
+        STRING *message_val;
 
         Parrot_Exception_attributes * const core_struct =
             mem_allocate_zeroed_typed(Parrot_Exception_attributes);
 
         INTVAL ishash = VTABLE_isa(interp, values, CONST_STRING(interp, 'Hash'));
 
+        if (ishash) {
+            STRING * const severity = CONST_STRING(interp, "severity");
+            STRING * const message  = CONST_STRING(interp, "message");
+            severity_val = VTABLE_get_integer_keyed_str(interp, values, severity);
+            message_val = VTABLE_get_string_keyed_str(interp, values, message);
+        }
+        else {
+            severity_val = EXCEPT_error;
+            message_val  = VTABLE_get_string(interp, values);
+        }
+
+        PMC_data(SELF)            = core_struct;
         /* Set flags for custom GC mark and destroy. */
         PObj_custom_mark_SET(SELF);
         PObj_active_destroy_SET(SELF);
 
         /* Set up the core struct and default values for the exception object. */
-        PMC_data(SELF)            = core_struct;
-        core_struct->severity     = ishash
-            ? VTABLE_get_integer_keyed_str(interp, values, severity)
-            : (INTVAL) EXCEPT_error;
-        core_struct->handled      = 0;
-        core_struct->message      = ishash
-            ? VTABLE_get_string_keyed_str(interp, values, message)
-            : VTABLE_get_string(interp, values);
-        core_struct->payload      = PMCNULL;
-        core_struct->resume       = PMCNULL;
-        core_struct->backtrace    = PMCNULL;
-        core_struct->handler_iter = PMCNULL;
+
+        SET_ATTR_severity(INTERP, SELF, severity_val);
+        SET_ATTR_handled(INTERP, SELF, 0);
+        SET_ATTR_message(INTERP, SELF, message_val);
+        SET_ATTR_payload(INTERP, SELF, PMCNULL);
+        SET_ATTR_resume(INTERP, SELF, PMCNULL);
+        SET_ATTR_backtrace(INTERP, SELF, PMCNULL);
+        SET_ATTR_handler_iter(INTERP, SELF, PMCNULL);
+
     }
 
 /*
@@ -209,6 +219,8 @@ Return the exception message.
     VTABLE STRING *get_string() {
         STRING *message;
         GET_ATTR_message(interp, SELF, message);
+        if (STRING_IS_NULL(message))
+            message = CONST_STRING(interp, "");
         return message;
     }
 
@@ -243,7 +255,7 @@ C<key> is "message".
         STRING *message;
 
         if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "message"))) {
-            GET_ATTR_message(interp, SELF, message);
+            message = SELF.get_string();
         }
         else {
             /* If unknown attribute name, throw an exception. */
@@ -397,7 +409,7 @@ Sets the Parrot string value for C<*key>.
         STRING *name = VTABLE_get_string(INTERP, key);
 
         if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "message"))) {
-            SET_ATTR_message(interp, SELF, value);
+            SELF.set_string_native(value);
         }
         else {
             /* If unknown attribute name, throw an exception. */
@@ -589,8 +601,7 @@ Retrieve an attribute value for the exception object.
                 VTABLE_set_integer_native(interp, value, handled);
         }
         else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "message"))) {
-                STRING *message;
-                GET_ATTR_message(interp, SELF, message);
+                STRING *message = SELF.get_string();
                 value = pmc_new(interp, enum_class_String);
                 VTABLE_set_string_native(interp, value, message);
         }
@@ -644,7 +655,7 @@ Set an attribute value for the exception object.
         }
         else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "message"))) {
             STRING *message = VTABLE_get_string(interp, value);
-            SET_ATTR_message(interp, SELF, message);
+            SELF.set_string_native(message);
         }
         else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "payload"))) {
             SET_ATTR_payload(interp, SELF, value);
