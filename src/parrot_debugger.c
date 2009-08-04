@@ -111,6 +111,11 @@ Examine the stack.
 Print interpreter information relating to memory allocation and garbage
 collection.
 
+=item C<gcdebug>
+
+Toggle garbage collection debugging mode.  In gcdebug mode a garbage collection
+cycle is run before each opcocde, which is the same as using the gcdebug core.
+
 =item C<quit> or C<q>
 
 Exit the debugger.

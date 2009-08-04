@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -192,8 +192,6 @@ pdb_output_like( <<PIR, "pir","t 2\np I", qr/I0 = 242\s*I1 = 1982/, 'print all i
 .end
 PIR
 
-TODO: {
-    local $TODO = 'TT#889 - deleting breakpoints does not currently work';
 pdb_output_like( <<PASM, "pasm", "b\n d 1", qr/Breakpoint 1 deleted/, 'Delete a breakpoint');
     set I0, 242
 PASM
@@ -204,9 +202,33 @@ pdb_output_like( <<PIR, "pir", "b\nd 1", qr/Breakpoint 1 deleted/, 'Delete a bre
 .end
 PIR
 
-}
+pdb_output_like( <<PIR, "pir", "l", qr/\.sub main :main/, 'list source');
+.sub main :main
+    \$I0 = 242
+.end
+PIR
 
-BEGIN { $tests += 31 }
+pdb_output_like( <<PIR, "pir", "l 2", qr/N4 = 6.28/, 'list source with start line');
+.sub main :main
+    \$N3 = 3.14
+    \$N4 = 6.28
+    print "\\n"
+.end
+PIR
+
+pdb_output_like( <<PIR, "pir", "d 42", qr/No breakpoint number 42/, 'delete invalid breakpoint');
+.sub main :main
+    \$I0 = 242
+.end
+PIR
+
+pdb_output_like( <<PIR, "pir", "e ", qr/Must give a command to eval/, 'eval nothing');
+.sub main :main
+    \$I0 = 242
+.end
+PIR
+
+BEGIN { $tests += 35 }
 
 BEGIN { plan tests => $tests; }
 

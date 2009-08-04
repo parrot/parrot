@@ -2056,6 +2056,7 @@ PDB_delete_breakpoint(PARROT_INTERP, ARGIN(const char *command))
     ASSERT_ARGS(PDB_delete_breakpoint)
     PDB_breakpoint_t * const breakpoint = PDB_find_breakpoint(interp, command);
     const PDB_line_t *line;
+    long bp_id;
 
     if (breakpoint) {
         if (!interp->pdb->file)
@@ -2086,9 +2087,11 @@ PDB_delete_breakpoint(PARROT_INTERP, ARGIN(const char *command))
         else {
             interp->pdb->breakpoint = NULL;
         }
-
+        bp_id = breakpoint->id;
         /* Kill the breakpoint */
         mem_sys_free(breakpoint);
+
+        Parrot_io_eprintf(interp->pdb->debugger, "Breakpoint %li deleted\n", bp_id);
     }
 }
 
@@ -3239,12 +3242,22 @@ C<eval>s an instruction.
 void
 PDB_eval(PARROT_INTERP, ARGIN(const char *command))
 {
+    opcode_t *run;
     ASSERT_ARGS(PDB_eval)
+    TRACEDEB_MSG("PDB_eval");
     /* This code is almost certainly wrong. The Parrot debugger needs love. */
-    opcode_t *run = PDB_compile(interp, command);
 
-    if (run)
+    if(!strlen(command)) {
+        fprintf(stderr, "Must give a command to eval\n");
+        return;
+    }
+    TRACEDEB_MSG("PDB_eval  compiling code");
+    run = PDB_compile(interp, command);
+
+    if (run) {
+        TRACEDEB_MSG("PDB_eval running compiled code");
         DO_OP(run, interp);
+    }
 }
 
 /*
@@ -3274,13 +3287,16 @@ PDB_compile(PARROT_INTERP, ARGIN(const char *command))
             interp->iglobals, IGLOBALS_COMPREG_HASH);
     PMC        *compiler = VTABLE_get_pmc_keyed_str(interp, compreg_hash, key);
 
+    TRACEDEB_MSG("PDB_compile");
     if (!VTABLE_defined(interp, compiler)) {
         fprintf(stderr, "Couldn't find PASM compiler");
         return NULL;
     }
 
+    TRACEDEB_MSG("PDB_compile creating code string");
     buf = Parrot_sprintf_c(interp, "%s%s", command, end);
 
+    TRACEDEB_MSG("PDB_compile invoking code");
     return VTABLE_invoke(interp, compiler, buf);
 }
 
