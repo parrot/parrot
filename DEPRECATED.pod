@@ -210,9 +210,33 @@ L<https://trac.parrot.org/parrot/ticket/443>
 These items and related helper functions are added as experimental support
 for TT #895
 
+=item PDB_compile and PDB_eval [eligible in 2.1]
+
+The function PDB_compile doesn't work since some time, and his implementation
+was a hack. His functionality may be reimplemented in another way. Until the
+end of deprecation cycle it just throws an excpetion.
+
+The PDB_eval function, that used in the debugger to support the eval
+command, was using PDB_compile. His functionality must be reimplemented
+in another way and with a name that follows current conventions, in the
+meantime and until the end of the deprecation cycle it just shows a
+diagnostic message.
+
+L<https://trac.parrot.org/parrot/ticket/872>
+
 =back
 
 =head1 Compiler tools
+
+=head2 PASM1 compiler
+
+=over 4
+
+=item C<PASM1 compiler> [eligible in 2.1]
+
+See PDB_compile.
+
+=back
 
 =head2 Parrot Grammar Engine (PGE)
 

@@ -3242,22 +3242,14 @@ C<eval>s an instruction.
 void
 PDB_eval(PARROT_INTERP, ARGIN(const char *command))
 {
-    opcode_t *run;
     ASSERT_ARGS(PDB_eval)
+
+    PDB_t         *pdb = interp->pdb;
+    Interp *warninterp = (interp->pdb && interp->pdb->debugger) ?
+        interp->pdb->debugger : interp;
     TRACEDEB_MSG("PDB_eval");
-    /* This code is almost certainly wrong. The Parrot debugger needs love. */
-
-    if(!strlen(command)) {
-        fprintf(stderr, "Must give a command to eval\n");
-        return;
-    }
-    TRACEDEB_MSG("PDB_eval  compiling code");
-    run = PDB_compile(interp, command);
-
-    if (run) {
-        TRACEDEB_MSG("PDB_eval running compiled code");
-        DO_OP(run, interp);
-    }
+    UNUSED(command);
+    Parrot_eprintf(warninterp, "The eval command is currently unimplemeneted\n");
 }
 
 /*
@@ -3280,24 +3272,11 @@ opcode_t *
 PDB_compile(PARROT_INTERP, ARGIN(const char *command))
 {
     ASSERT_ARGS(PDB_compile)
-    STRING     *buf;
-    const char *end      = "\nend\n";
-    STRING     *key      = CONST_STRING(interp, "PASM");
-    PMC *compreg_hash    = VTABLE_get_pmc_keyed_int(interp,
-            interp->iglobals, IGLOBALS_COMPREG_HASH);
-    PMC        *compiler = VTABLE_get_pmc_keyed_str(interp, compreg_hash, key);
 
-    TRACEDEB_MSG("PDB_compile");
-    if (!VTABLE_defined(interp, compiler)) {
-        fprintf(stderr, "Couldn't find PASM compiler");
-        return NULL;
-    }
-
-    TRACEDEB_MSG("PDB_compile creating code string");
-    buf = Parrot_sprintf_c(interp, "%s%s", command, end);
-
-    TRACEDEB_MSG("PDB_compile invoking code");
-    return VTABLE_invoke(interp, compiler, buf);
+    UNUSED(command);
+    Parrot_ex_throw_from_c_args(interp, NULL,
+        EXCEPTION_UNIMPLEMENTED,
+	"PDB_compile ('PASM1' compiler) has been deprecated");
 }
 
 /*
