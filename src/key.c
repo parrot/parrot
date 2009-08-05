@@ -619,9 +619,11 @@ key_mark(PARROT_INTERP, ARGIN(PMC *key))
     }
 
     /* Mark next key */
-    GETATTR_Key_next_key(interp, key, next_key);
-    if (next_key)
-        Parrot_gc_mark_PObj_alive(interp, (PObj *)next_key);
+    if (flags == KEY_string_FLAG || flags == KEY_pmc_FLAG) {
+        GETATTR_Key_next_key(interp, key, next_key);
+        if (next_key)
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)next_key);
+    }
 
 }
 
