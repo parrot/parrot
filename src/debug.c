@@ -3276,7 +3276,7 @@ PDB_compile(PARROT_INTERP, ARGIN(const char *command))
     UNUSED(command);
     Parrot_ex_throw_from_c_args(interp, NULL,
         EXCEPTION_UNIMPLEMENTED,
-	"PDB_compile ('PASM1' compiler) has been deprecated");
+        "PDB_compile ('PASM1' compiler) has been deprecated");
 }
 
 /*
