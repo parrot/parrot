@@ -15,29 +15,28 @@
 
 #include "parrot/parrot.h"
 
+/*
+ Type of Keys.
+ C<KEY_register_FLAG> used for indirect referencing. E.g.
+   $S0 = "foo"
+   $P1 = $P0[$S0]
+ In this case C<[$S0]> will have type C<KEY_string_FLAG | KEY_register_FLAG>
+ and store I<integer> value of string register number.
+*/
 typedef enum {
     KEY_integer_FLAG        = PObj_private0_FLAG,
     KEY_number_FLAG         = PObj_private1_FLAG,
-    KEY_hash_iterator_FLAGS = PObj_private0_FLAG | PObj_private1_FLAG,
     KEY_string_FLAG         = PObj_private2_FLAG,
     KEY_pmc_FLAG            = PObj_private3_FLAG,
     KEY_register_FLAG       = PObj_private4_FLAG,
-
-    KEY_start_slice_FLAG    = PObj_private5_FLAG,
-    KEY_end_slice_FLAG      = PObj_private6_FLAG,
-    KEY_inf_slice_FLAG      = PObj_private7_FLAG,
 
     KEY_type_FLAGS          = KEY_integer_FLAG         |
                               KEY_number_FLAG          |
                               KEY_string_FLAG          |
                               KEY_pmc_FLAG             |
-                              KEY_register_FLAG        |
-                              KEY_hash_iterator_FLAGS
+                              KEY_register_FLAG
 
 } KEY_flags;
-
-#define KEY_IS_HASH_ITERATOR(k) \
-    ((PObj_get_FLAGS((k)) & KEY_type_FLAGS) == KEY_hash_iterator_FLAGS)
 
 /* HEADERIZER BEGIN: src/key.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

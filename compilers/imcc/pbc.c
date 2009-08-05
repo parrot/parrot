@@ -183,11 +183,6 @@ PARROT_WARN_UNUSED_RESULT
 static int old_blocks(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_CONST_FUNCTION
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static const char * slice_deb(int bits);
-
 static void store_fixup(PARROT_INTERP,
     ARGIN(const SymReg *r),
     int pc,
@@ -277,7 +272,6 @@ static void verify_signature(PARROT_INTERP,
     || PARROT_ASSERT_ARG(r)
 #define ASSERT_ARGS_old_blocks __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_slice_deb __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_store_fixup __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(r)
@@ -1588,42 +1582,6 @@ add_const_key(PARROT_INTERP, ARGIN(const opcode_t *key), int size, ARGIN(const c
 
 /*
 
-=item C<static const char * slice_deb(int bits)>
-
-Returns debugging information for the indicated slice type.
-
-=cut
-
-*/
-
-PARROT_CONST_FUNCTION
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static const char *
-slice_deb(int bits)
-{
-    ASSERT_ARGS(slice_deb)
-    if ((bits & VT_SLICE_BITS) == (VT_START_SLICE|VT_END_SLICE))
-        return "start+end";
-
-    if ((bits & VT_SLICE_BITS) == (VT_START_ZERO|VT_END_SLICE))
-        return "..end";
-
-    if ((bits & VT_SLICE_BITS) == (VT_START_SLICE|VT_END_INF))
-        return "start..";
-
-    if (bits & VT_START_SLICE)
-        return "start";
-
-    if (bits & VT_END_SLICE)
-        return "end";
-
-    return "";
-}
-
-
-/*
-
 =item C<static opcode_t build_key(PARROT_INTERP, SymReg *key_reg)>
 
 Builds a Key PMC from the given SymReg.
@@ -1660,7 +1618,7 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
 
     for (key_length = 0; reg ; reg = reg->nextkey, key_length++) {
         SymReg *r = reg;
-        int     var_type, slice_bits, type;
+        int     type;
 
         if ((pc - key - 2) >= KEYLEN)
             IMCC_fatal(interp, 1, "build_key:"
@@ -1672,17 +1630,14 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
         if (r->reg)
             r = r->reg;
 
-        var_type   = type & ~VT_SLICE_BITS;
-        slice_bits = type &  VT_SLICE_BITS;
-
-        switch (var_type) {
+        switch (type) {
             case VTIDENTIFIER:       /* P[S0] */
             case VTPASM:             /* P[S0] */
             case VTREG:              /* P[S0] */
                 if (r->set == 'I')
-                    *pc++ = PARROT_ARG_I | slice_bits;    /* register type */
+                    *pc++ = PARROT_ARG_I;    /* register type */
                 else if (r->set == 'S')
-                    *pc++ = PARROT_ARG_S | slice_bits;
+                    *pc++ = PARROT_ARG_S;
                 else
                     IMCC_fatal(interp, 1, "build_key: wrong register set\n");
 
@@ -1695,9 +1650,8 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
                 sprintf(s+strlen(s), "%c%d", r->set, (int)r->color);
 
                 IMCC_debug(interp, DEBUG_PBC_CONST,
-                        " keypart reg %s %c%d slice %s\n",
-                        r->name, r->set, (int)r->color,
-                        slice_deb(slice_bits));
+                        " keypart reg %s %c%d\n",
+                        r->name, r->set, (int)r->color);
                 break;
             case VT_CONSTP:
             case VTCONST:
@@ -1705,27 +1659,25 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
                 switch (r->set) {
                     case 'S':                       /* P["key"] */
                         /* str constant */
-                        *pc++ = PARROT_ARG_SC | slice_bits;
+                        *pc++ = PARROT_ARG_SC;
 
                         /* constant idx */
                         *pc++ = r->color;
 
                         IMCC_debug(interp, DEBUG_PBC_CONST,
-                                " keypart SC %s #%d slice %s\n",
-                                r->name, r->color,
-                                slice_deb(slice_bits));
+                                " keypart SC %s #%d\n",
+                                r->name, r->color);
                         break;
                     case 'I':                       /* P[;42;..] */
                         /* int constant */
-                        *pc++ = PARROT_ARG_IC | slice_bits;
+                        *pc++ = PARROT_ARG_IC;
 
                         /* value */
                         *pc++ = r->color = atol(r->name);
 
                         IMCC_debug(interp, DEBUG_PBC_CONST,
-                                " keypart IC %s #%d slice %s\n",
-                                r->name, r->color,
-                                slice_deb(slice_bits));
+                                " keypart IC %s #%d\n",
+                                r->name, r->color);
                         break;
                     default:
                         IMCC_fatal(interp, 1, "build_key: unknown set\n");
@@ -1734,7 +1686,7 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
                 break;
             default:
                 IMCC_fatal(interp, 1, "build_key: "
-                    "unknown type 0x%x on %s\n", var_type, r->name);
+                    "unknown type 0x%x on %s\n", type, r->name);
         }
     }
 

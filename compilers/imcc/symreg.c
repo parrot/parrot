@@ -1195,7 +1195,6 @@ link_keys(PARROT_INTERP, int nargs, ARGMOD(SymReg **keys), int force)
     SymReg *key;
     SymReg *keychain;
     int     i;
-    int     any_slice = 0;
     size_t  len       = 0;
 
     /* namespace keys are global consts - no cur_unit */
@@ -1207,7 +1206,7 @@ link_keys(PARROT_INTERP, int nargs, ARGMOD(SymReg **keys), int force)
         IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "link_keys: huh? no keys\n");
 
     /* short-circuit simple key unless we've been told not to */
-    if (nargs == 1 && !force && !(keys[0]->type & VT_SLICE_BITS))
+    if (nargs == 1 && !force)
         return keys[0];
 
     /* calc len of key_str
@@ -1215,12 +1214,7 @@ link_keys(PARROT_INTERP, int nargs, ARGMOD(SymReg **keys), int force)
      * have the slice flag set */
     for (i = 0; i < nargs; i++) {
         len += 1 + strlen(keys[i]->name);
-        if (keys[i]->type & VT_SLICE_BITS)
-            any_slice = 1;
     }
-
-    if (any_slice && !(keys[0]->type & VT_SLICE_BITS))
-        keys[0]->type |= (VT_START_SLICE|VT_END_SLICE);
 
     key_str  = (char *)mem_sys_allocate(len);
     *key_str = '\0';
@@ -1233,7 +1227,7 @@ link_keys(PARROT_INTERP, int nargs, ARGMOD(SymReg **keys), int force)
             strcat(key_str, ";");
     }
 
-    if (!any_slice && ((keychain = _get_sym(h, key_str)) != NULL)) {
+    if ((keychain = _get_sym(h, key_str)) != NULL) {
         mem_sys_free(key_str);
         return keychain;
     }

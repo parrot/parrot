@@ -144,24 +144,6 @@ reaches 0, delete the entry.
         }
     }
 
-/*
-
-=item C<PMC *get_pmc_keyed(PMC *key)>
-
-If called from iteration, return the key PMC, else PMCNULL is returned.
-
-=cut
-
-*/
-
-    VTABLE PMC *get_pmc_keyed(PMC *key) {
-        Hash * const hash = (Hash *)SELF.get_pointer();
-
-        if (KEY_IS_HASH_ITERATOR(key))
-            return (PMC *)parrot_hash_get_idx(INTERP, hash, key);
-
-        return PMCNULL;
-    }
 }
 
 /*

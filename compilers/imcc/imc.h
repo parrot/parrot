@@ -635,7 +635,6 @@ typedef struct _imc_info_t {
     int                   has_compile;
     int                   imcc_warn;
     int                   in_pod;
-    int                   in_slice;
     int                   ins_line;
     int                   keyvec;
     int                   line;                   /* current line number */

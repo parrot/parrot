@@ -4106,15 +4106,6 @@ PackFile_Constant_unpack_key(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
             default:
                 return NULL;
         }
-
-        if (slice_bits) {
-            if (slice_bits & PF_VT_START_SLICE)
-                PObj_get_FLAGS(tail) |= KEY_start_slice_FLAG;
-            if (slice_bits & PF_VT_END_SLICE)
-                PObj_get_FLAGS(tail) |= KEY_end_slice_FLAG;
-            if (slice_bits & (PF_VT_START_ZERO | PF_VT_END_INF))
-                PObj_get_FLAGS(tail) |= KEY_inf_slice_FLAG;
-        }
     }
 
     self->type  = PFC_KEY;

@@ -21,11 +21,6 @@ enum VARTYPE {              /* variable type can be */
     VT_FLAT         = VARTYPE_BIT(8),   /* var :flat */
     VT_OPTIONAL     = VARTYPE_BIT(9),   /* var :optional */
     /* include/parrot/packfile.h */
-    VT_START_SLICE  = PF_VT_START_SLICE, /* x .. y slice range */
-    VT_END_SLICE    = PF_VT_END_SLICE,
-    VT_START_ZERO   = PF_VT_START_ZERO, /* .. y 0..start */
-    VT_END_INF      = PF_VT_END_INF,    /* x..  start..inf */
-    VT_SLICE_BITS   = PF_VT_SLICE_BITS,
     VT_ENCODED      = VARTYPE_BIT(16),  /* unicode string constant */
     VT_OPT_FLAG     = VARTYPE_BIT(17),  /* var :opt_flag */
     VT_NAMED        = VARTYPE_BIT(18),  /* var :named(name) */

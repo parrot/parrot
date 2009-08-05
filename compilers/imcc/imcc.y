@@ -1345,10 +1345,6 @@ class_namespace:
 maybe_ns:
      '[' keylist ']'
         {
-            if (IMCC_INFO(interp)->in_slice)
-                IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
-                    "Slice not allowed in namespace.");
-
             $$ = $2;
         }
    | '[' ']'                   { $$ = NULL; }
@@ -2380,7 +2376,6 @@ var:
 keylist:
          {
            IMCC_INFO(interp)->nkeys    = 0;
-           IMCC_INFO(interp)->in_slice = 0;
          }
      _keylist
          {
@@ -2393,7 +2388,6 @@ keylist:
 keylist_force:
          {
            IMCC_INFO(interp)->nkeys = 0;
-           IMCC_INFO(interp)->in_slice = 0;
          }
      _keylist
          {
@@ -2415,8 +2409,6 @@ _keylist:
 key:
      var
          {
-           if (IMCC_INFO(interp)->in_slice)
-               $1->type |= VT_START_SLICE | VT_END_SLICE;
            $$ = $1;
          }
    ;

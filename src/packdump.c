@@ -194,16 +194,6 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
             opcode_t type = PObj_get_FLAGS(key);
 
             Parrot_io_printf(interp, "       {\n");
-            if ((type & (KEY_start_slice_FLAG|KEY_inf_slice_FLAG)) ==
-                (KEY_start_slice_FLAG|KEY_inf_slice_FLAG))
-                Parrot_io_printf(interp, "        SLICE_BITS  => PF_VT_END_INF\n");
-            if ((type & (KEY_end_slice_FLAG|KEY_inf_slice_FLAG)) ==
-                (KEY_end_slice_FLAG|KEY_inf_slice_FLAG))
-                Parrot_io_printf(interp, "        SLICE_BITS  => PF_VT_START_ZERO\n");
-            if (type & KEY_start_slice_FLAG)
-                Parrot_io_printf(interp, "        SLICE_BITS  => PF_VT_START_SLICE\n");
-            if (type & KEY_end_slice_FLAG)
-                Parrot_io_printf(interp, "        SLICE_BITS  => PF_VT_END_SLICE\n");
 
             type &= KEY_type_FLAGS;
             pobj_flag_dump(interp, (long)PObj_get_FLAGS(key));
