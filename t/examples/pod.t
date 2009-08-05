@@ -159,7 +159,7 @@ underscore).
 
 =item * FRAGMENT
 
-For PIR, wraps the code in a C<.sub> block to
+For PIR, wraps the code in a C<.sub> block.
 
 =item * TODO
 
