@@ -222,11 +222,17 @@ pdb_output_like( <<PIR, "pir", "d 42", qr/No breakpoint number 42/, 'delete inva
 .end
 PIR
 
+TODO: {
+
+local $TODO = 'eval support functions deprecated, TT #872, pending eval reworking';
+
 pdb_output_like( <<PIR, "pir", "e ", qr/Must give a command to eval/, 'eval nothing');
 .sub main :main
     \$I0 = 242
 .end
 PIR
+
+}
 
 BEGIN { $tests += 35 }
 
