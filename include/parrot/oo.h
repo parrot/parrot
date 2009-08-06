@@ -106,6 +106,16 @@ void Parrot_invalidate_method_cache(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
+PMC * Parrot_oo_find_vtable_override_for_class(PARROT_INTERP,
+    ARGIN(PMC *classobj),
+    ARGIN(STRING *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -146,16 +156,6 @@ void Parrot_oo_extract_methods_from_namespace(PARROT_INTERP,
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_oo_find_vtable_override(PARROT_INTERP,
-    ARGIN(PMC *classobj),
-    ARGIN(STRING *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PARROT_EXPORT
-PMC * Parrot_oo_find_vtable_override_for_class(PARROT_INTERP,
     ARGIN(PMC *classobj),
     ARGIN(STRING *name))
         __attribute__nonnull__(1)
@@ -211,6 +211,11 @@ INTVAL Parrot_oo_register_type(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_invalidate_method_cache \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_oo_find_vtable_override_for_class \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(classobj) \
+    || PARROT_ASSERT_ARG(name)
 #define ASSERT_ARGS_Parrot_oo_get_class __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(key)
@@ -232,11 +237,6 @@ INTVAL Parrot_oo_register_type(PARROT_INTERP,
     || PARROT_ASSERT_ARG(self) \
     || PARROT_ASSERT_ARG(ns)
 #define ASSERT_ARGS_Parrot_oo_find_vtable_override \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(classobj) \
-    || PARROT_ASSERT_ARG(name)
-#define ASSERT_ARGS_Parrot_oo_find_vtable_override_for_class \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(classobj) \
