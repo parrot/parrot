@@ -215,16 +215,6 @@ Branch to a label. The label is calculated as a relative offset.
 
 I<Arguments: I>
 
-=head3 branch_cs
-
-X<branch_cs opcode (PASM)>
-
-  branch_cs R<FIXUP_ENTRY>
-
-Intersegment branch to the location of the given fixup table entry.
-
-I<Arguments: S>
-
 =head3 bxor
 
 X<bxor opcode (PASM)>

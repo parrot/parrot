@@ -419,7 +419,6 @@ class PMCTypeGenerator:
 class OpfuncGenerator:
     opfunc_list = []
     opfunc_blacklist = [
-            'branch_cs', # TT# 470 - known to segfault
             'check_events', #only for testing
             'check_events__', #not for direct use
             'clears', #clearing all [SPIN] registers isn't useful

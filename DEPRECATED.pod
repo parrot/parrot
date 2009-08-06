@@ -96,12 +96,6 @@ address of the PMC. Uses of get_addr and set_addr that would set label values
 for Sub, Exception, and related PMC types will instead be handled by
 get_label and set_label.
 
-=item C<branch_cs> [eligible in 1.5]
-
-L<https://trac.parrot.org/parrot/ticket/470>
-
-=back
-
 =head1 Bytecode
 
 =over 4

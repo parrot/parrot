@@ -546,9 +546,6 @@ END_CODE
             $restart = 1;
             $next    = 1;
         }
-        elsif ( $short_name eq 'branch_cs' || $short_name eq 'returncc' ) {
-            $restart = 1;    # dest may be NULL to leave run-loop
-        }
         elsif ( $body =~ s/\brestart\s+ADDRESS\((.*?)\)/{{=$1}}/mg ) {
             $next    = 0;
             $restart = 1;

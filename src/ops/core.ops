@@ -205,35 +205,6 @@ inline op branch(in LABEL) :base_loop :flow {
 }
 
 
-=item B<branch_cs>(in STR)
-
-Intersegment branch to location in fixup table named $1.
-
-=cut
-
-inline op branch_cs(in STR) :base_loop :check_event :flow {
-    PackFile_FixupEntry * fe;
-    {
-        char * const label = Parrot_str_to_cstring(interp, $1);
-        fe = PackFile_find_fixup_entry(interp, enum_fixup_label, label);
-        Parrot_str_free_cstring(label);
-    }
-
-    if (!fe) {
-        opcode_t * handler= Parrot_ex_throw_from_op_args(interp, NULL,
-            EXCEPTION_INVALID_OPERATION,
-            "branch_cs: fixup for '%Ss' not found", $1);
-        goto ADDRESS(handler);
-    }
-    else {
-        interp->resume_offset = fe->offset;
-        Parrot_switch_to_cs(interp, fe->seg, 1);
-        mem_sys_free(fe);
-    }
-    interp->resume_flag = 2;
-    goto ADDRESS(0);
-}
-
 ########################################
 
 =item B<local_branch>(invar PMC, in LABEL)
