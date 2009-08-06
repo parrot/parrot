@@ -250,12 +250,6 @@ object is supplied.
 
 L<https://trac.parrot.org/parrot/ticket/843>
 
-=item C<find_key> method on PGE::Match [eligible in 1.5]
-
-The C<find_key> method on PGE::Match objects will be removed.
-
-L<https://trac.parrot.org/parrot/ticket/851>
-
 =back
 
 =head2 Parrot Compiler Toolkit
