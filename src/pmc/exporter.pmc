@@ -152,9 +152,9 @@ Mark referenced strings and PMCs in the structure as live.
         PMC *ns_src;
         PMC *ns_dest;
         PMC *globals;
-	GET_ATTR_ns_src(INTERP, SELF, ns_src);
-	GET_ATTR_ns_dest(INTERP, SELF, ns_dest);
-	GET_ATTR_globals(INTERP, SELF, globals);
+        GET_ATTR_ns_src(INTERP, SELF, ns_src);
+        GET_ATTR_ns_dest(INTERP, SELF, ns_dest);
+        GET_ATTR_globals(INTERP, SELF, globals);
 
         if (ns_src)
             Parrot_gc_mark_PObj_alive(interp, (PObj *)ns_src);
