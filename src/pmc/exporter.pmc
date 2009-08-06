@@ -109,12 +109,12 @@ Initializes an Exporter PMC.
     VTABLE void init() {
         Parrot_Exporter_attributes * const exp =
             mem_allocate_zeroed_typed(Parrot_Exporter_attributes);
+        PMC_data(SELF)       = exp;
 
         /* Set up the object. */
-        exp->ns_src          = PMCNULL;
-        exp->ns_dest         = CONTEXT(interp)->current_namespace;
-        exp->globals         = PMCNULL;
-        PMC_data(SELF)       = exp;
+        SET_ATTR_ns_src(INTERP, SELF, PMCNULL);
+        SET_ATTR_ns_dest(INTERP, SELF, CONTEXT(interp)->current_namespace);
+        SET_ATTR_globals(INTERP, SELF, PMCNULL);
 
         /* Set flags for custom GC mark and destroy. */
         PObj_custom_mark_SET(SELF);
@@ -149,14 +149,19 @@ Mark referenced strings and PMCs in the structure as live.
 */
 
     VTABLE void mark() {
-        Parrot_Exporter_attributes * const exp = PARROT_EXPORTER(SELF);
+        PMC *ns_src;
+        PMC *ns_dest;
+        PMC *globals;
+	GET_ATTR_ns_src(INTERP, SELF, ns_src);
+	GET_ATTR_ns_dest(INTERP, SELF, ns_dest);
+	GET_ATTR_globals(INTERP, SELF, globals);
 
-        if (exp->ns_src)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)exp->ns_src);
-        if (exp->ns_dest)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)exp->ns_dest);
-        if (exp->globals)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)exp->globals);
+        if (ns_src)
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)ns_src);
+        if (ns_dest)
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)ns_dest);
+        if (globals)
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)globals);
     }
 
 
