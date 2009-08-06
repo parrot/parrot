@@ -481,6 +481,7 @@ Lookup a vtable override in a specific class object.
 
 */
 
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *

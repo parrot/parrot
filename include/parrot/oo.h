@@ -154,6 +154,7 @@ PMC * Parrot_oo_find_vtable_override(PARROT_INTERP,
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
+PARROT_EXPORT
 PMC * Parrot_oo_find_vtable_override_for_class(PARROT_INTERP,
     ARGIN(PMC *classobj),
     ARGIN(STRING *name))
