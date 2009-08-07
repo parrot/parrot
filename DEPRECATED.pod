@@ -33,12 +33,6 @@ specifically by including this C<PIR> code:
  .include 'warnings.pasm'
  warningson .PARROT_WARNINGS_DEPRECATED_FLAG
 
-=head1 Configuration
-
-=over 4
-
-=back
-
 =head1 PMCS
 
 =over 4
@@ -95,6 +89,8 @@ These opcodes are being repurposed. They will always return a unique memory
 address of the PMC. Uses of get_addr and set_addr that would set label values
 for Sub, Exception, and related PMC types will instead be handled by
 get_label and set_label.
+
+=back
 
 =head1 Bytecode
 
@@ -310,11 +306,7 @@ instead.
 
 L<https://trac.parrot.org/parrot/ticket/842>
 
-=cut
-
 =back
-
-=cut
 
 =head1 build tools
 
