@@ -180,8 +180,6 @@ parrot_init_library_paths(PARROT_INTERP)
             PARROT_LIB_PATH_INCLUDE, paths);
     entry = CONST_STRING(interp, "runtime/parrot/include/");
     VTABLE_push_string(interp, paths, entry);
-    entry = CONST_STRING(interp, "runtime/parrot/");
-    VTABLE_push_string(interp, paths, entry);
     entry = CONST_STRING(interp, "./");
     VTABLE_push_string(interp, paths, entry);
     if (VTABLE_elements(interp, config_hash)) {
@@ -200,8 +198,6 @@ parrot_init_library_paths(PARROT_INTERP)
     VTABLE_set_pmc_keyed_int(interp, lib_paths,
             PARROT_LIB_PATH_LIBRARY, paths);
     entry = CONST_STRING(interp, "runtime/parrot/library/");
-    VTABLE_push_string(interp, paths, entry);
-    entry = CONST_STRING(interp, "runtime/parrot/");
     VTABLE_push_string(interp, paths, entry);
     entry = CONST_STRING(interp, "./");
     VTABLE_push_string(interp, paths, entry);
