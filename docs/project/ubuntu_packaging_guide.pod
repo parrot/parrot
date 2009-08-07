@@ -67,7 +67,7 @@ use the target Ubuntu distribution ('intrepid').
 
 The changelog entry for the Ubuntu release is generally:
 
-  * Resynchronize with Debian unstable.
+  * Synchronize with Debian unstable.
 
 Add any custom changes for Ubuntu packaging (rare). The final line gives the
 maintainer's name, email address, and the date. The date must be in RFC822
