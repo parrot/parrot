@@ -120,21 +120,7 @@ L<https://trac.parrot.org/parrot/ticket/451>
 
 =item Assignment syntax with opcodes [eligible in 1.1]
 
-When the first argument of an opcode is C<OUT>, then
-the assignment syntax will be allowed, as it is today.
-
-In any other case (i.e. C<INOUT>, C<IN>), this will become
-a syntax error. For example:
-
-    $S0 = print
-    $P0 = substr 1, 2, "x"
-
-Will have to be:
-
-    print $S0
-    substr $P0, 1, 2, "x"
-
-L<http://rt.perl.org/rt3/Ticket/Display.html?id=36283>
+L<https://trac.parrot.org/parrot/ticket/906>
 
 =item named class/pmc lookup in pir syntax such as new, isa, subclass, 
     get_class, etc [eligible in 1.1]
