@@ -48,6 +48,11 @@ the Parrot debugger, and the C<debug> ops.
 /* Length of command line buffers */
 #define DEBUG_CMD_BUFFER_LENGTH 255
 
+/* Easier register access */
+#define IREG(i) REG_INT(interp, (i))
+#define NREG(i) REG_NUM(interp, (i))
+#define SREG(i) REG_STR(interp, (i))
+#define PREG(i) REG_PMC(interp, (i))
 
 typedef struct DebuggerCmd DebuggerCmd;
 typedef struct DebuggerCmdList DebuggerCmdList;
@@ -205,6 +210,13 @@ static int nomoreargs(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
         Parrot_eprintf(pdb->debugger, "Spurious arg\n");
         return 0;
     }
+}
+
+static void dbg_assign(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+{
+    TRACEDEB_MSG("dbg_assign");
+
+    PDB_assign(pdb->debugee, cmd);
 }
 
 static void dbg_break(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
@@ -395,6 +407,14 @@ struct DebuggerCmd {
 };
 
 static const DebuggerCmd
+    cmd_assign = {
+        & dbg_assign,
+        "assign to a register",
+"Assign a value to a register. For example:\n\
+    a I0 42\n\
+    a N1 3.14\n\
+The first command sets I0 to 42 and the second sets N1 to 3.14."
+    },
     cmd_break = {
         & dbg_break,
         "add a breakpoint",
@@ -549,6 +569,7 @@ struct DebuggerCmdList {
 };
 
 DebuggerCmdList DebCmdList [] = {
+    { "assign",      'a',  &cmd_assign },
     { "break",       '\0', &cmd_break },
     { "continue",    '\0', &cmd_continue },
     { "delete",      'd',  &cmd_delete },
@@ -3162,6 +3183,59 @@ PDB_hasinstruction(ARGIN(const char *c))
 
 /*
 
+=item C<void PDB_assign(PARROT_INTERP, const char *command)>
+
+Assign to registers.
+
+=cut
+
+*/
+
+void
+PDB_assign(PARROT_INTERP, ARGIN(const char *command))
+{
+    ASSERT_ARGS(PDB_assign)
+    unsigned long register_num;
+    char reg_type;
+    char *string;
+    int t;
+
+    /* smallest valid commad length is 4, i.e. "I0 1" */
+    if (strlen(command) < 4) {
+        fprintf(stderr, "Must give a register number and value to assign\n");
+        return;
+    }
+    reg_type = (char) command[0];
+    command++;
+    register_num   = get_ulong(&command, 0);
+
+    switch (reg_type) {
+        case 'I':
+                t                  = REGNO_INT;
+                IREG(register_num) = get_ulong(&command, 0);
+                break;
+        case 'N':
+                t                  = REGNO_NUM;
+                NREG(register_num) = atof(command);
+                break;
+        case 'S':
+                t                  = REGNO_STR;
+                SREG(register_num) = Parrot_str_new(interp, command, strlen(command));
+                break;
+        case 'P':
+                t = REGNO_PMC;
+                fprintf(stderr, "Assigning to PMCs is not currently supported\n");
+                return;
+        default:
+            fprintf(stderr, "Invalid register type %c\n", reg_type);
+            return;
+    }
+    Parrot_io_eprintf(interp, "\n  %c%u = ", reg_type, register_num);
+    Parrot_io_eprintf(interp, "%s\n", GDB_print_reg(interp, t, register_num));
+}
+
+/*
+
 =item C<void PDB_list(PARROT_INTERP, const char *command)>
 
 Show lines from the source code file.
@@ -3321,6 +3395,8 @@ PDB_print(PARROT_INTERP, ARGIN(const char *command))
 {
     ASSERT_ARGS(PDB_print)
     const char * const s = GDB_P(interp->pdb->debugee, command);
+
+    TRACEDEB_MSG("PDB_print");
     Parrot_io_eprintf(interp, "%s\n", s);
 }
 
@@ -3554,24 +3630,32 @@ static const char*
 GDB_print_reg(PARROT_INTERP, int t, int n)
 {
     ASSERT_ARGS(GDB_print_reg)
+    char * string;
 
     if (n >= 0 && n < CONTEXT(interp)->n_regs_used[t]) {
         switch (t) {
             case REGNO_INT:
-                return Parrot_str_from_int(interp, REG_INT(interp, n))->strstart;
+                return Parrot_str_from_int(interp, IREG(n))->strstart;
             case REGNO_NUM:
-                return Parrot_str_from_num(interp, REG_NUM(interp, n))->strstart;
+                return Parrot_str_from_num(interp, NREG(n))->strstart;
             case REGNO_STR:
-                return REG_STR(interp, n)->strstart;
+                /* This hack is needed because we occasionally are told
+                that we have string registers when we actually don't */
+                string = (char *) SREG(n);
+
+                if (string == '\0')
+                    return "";
+                else
+                    return SREG(n)->strstart;
             case REGNO_PMC:
                 /* prints directly */
-                trace_pmc_dump(interp, REG_PMC(interp, n));
+                trace_pmc_dump(interp, PREG(n));
                 return "";
             default:
                 break;
         }
     }
-    return "no such reg";
+    return "no such register";
 }
 
 /*
@@ -3597,11 +3681,13 @@ GDB_P(PARROT_INTERP, ARGIN(const char *s))
     int t;
     char reg_type;
 
+    TRACEDEB_MSG("GDB_P");
     /* Skip leading whitespace. */
     while (isspace((unsigned char)*s))
         s++;
 
     reg_type = (unsigned char) toupper((unsigned char)*s);
+
     switch (reg_type) {
         case 'I': t = REGNO_INT; break;
         case 'N': t = REGNO_NUM; break;
@@ -3626,7 +3712,7 @@ GDB_P(PARROT_INTERP, ARGIN(const char *s))
         return GDB_print_reg(interp, t, n);
     }
     else
-        return "no such reg";
+        return "no such register";
 
 }
 

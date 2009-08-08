@@ -1,9 +1,9 @@
 /*
- * Copyright (C) 2002-2008, Parrot Foundation.
+ * Copyright (C) 2002-2009, Parrot Foundation.
  */
 
 /*
- * debug.h
+ * debugger.h
  *
  * SVN Info
  *    $Id$
@@ -222,6 +222,10 @@ long PDB_add_label(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*file);
 
+void PDB_assign(PARROT_INTERP, ARGIN(const char *command))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 void PDB_backtrace(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -377,6 +381,9 @@ void PDB_watchpoint(PARROT_INTERP, ARGIN(const char *command))
 #define ASSERT_ARGS_PDB_add_label __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(file) \
     || PARROT_ASSERT_ARG(cur_opcode)
+#define ASSERT_ARGS_PDB_assign __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(command)
 #define ASSERT_ARGS_PDB_backtrace __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_PDB_break __attribute__unused__ int _ASSERT_ARGS_CHECK = \

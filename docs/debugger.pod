@@ -381,10 +381,10 @@ If C<COMMAND> is omitted, prints a list of the available commands.
 
 =over 4
 
-=item src/pdb.c
+=item src/parrot_debugger.c
 
-This is the file that will produce the executable.  Nothing fancy here, only
-the C<main> function.
+This is the file that will produce the executable.  Nothing fancy here, it
+mostly consists of the C<main> function.
 
 =item src/debug.c
 
@@ -395,7 +395,7 @@ C<PDB_run_command> function and go down from there for the real meat.
 
 C<Parrot_debug>, the function which launches the debugger, is implemented here.
 
-=item include/parrot/debug.h
+=item include/parrot/debugger.h
 
 This defines all the PDB structures, which hold data used by the debugger.
 

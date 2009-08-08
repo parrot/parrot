@@ -234,7 +234,43 @@ PIR
 
 }
 
-BEGIN { $tests += 35 }
+pdb_output_like( <<PIR, "pir", "t\na I0 17", qr/I0 = 17/, 'assign to an integer register');
+.sub main :main
+    \$I0 = 242
+.end
+PIR
+
+pdb_output_like( <<PIR, "pir", "a Z0 42", qr/Invalid register type Z/, 'assign to an invalid register');
+.sub main :main
+    \$I0 = 242
+.end
+PIR
+
+pdb_output_like( <<PIR, "pir", "a foo", qr/Must give a register number and value to assign/, 'invalid assignment command');
+.sub main :main
+    \$I0 = 242
+.end
+PIR
+
+pdb_output_like( <<PIR, "pir", "t\na N0 3.14", qr/N0 = 3.14/, 'assign to a numeric register');
+.sub main :main
+    \$N0 = 9.99
+.end
+PIR
+
+pdb_output_like( <<PIR, "pir", "t\np S", qr/S0 = foobar/, 'print string registers');
+.sub main :main
+    \$S0 = "foobar"
+.end
+PIR
+
+pdb_output_like( <<PIR, "pir", "t\na S0 foobar", qr/S0 = no such register/, 'print string registers when none exist');
+.sub main :main
+    new \$P0, 'ResizableIntegerArray'
+.end
+PIR
+
+BEGIN { $tests += 41 }
 
 BEGIN { plan tests => $tests; }
 
