@@ -276,7 +276,7 @@ is unclear.
 Returns the internal type number corresponding to C<type>.  Useful for
 instantiating various Parrot data types.
 
-=item C<char *Parrot_str_to_cstring(PARROT_INTERP)>
+=item C<char *Parrot_str_to_cstring(PARROT_INTERP, const STRING *s)>
 
 XXX needs to be a formal Parrot_* API.
 Returns the C string representation of a Parrot string.
