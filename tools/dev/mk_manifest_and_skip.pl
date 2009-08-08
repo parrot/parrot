@@ -10,6 +10,12 @@ use Parrot::Manifest;
 
 my $script = $0;
 
+if (-e '.git') {
+    print "Sorry, this script is not compatible with git-svn\n";
+    print "Patches Welcome!\n";
+    exit 1;
+}
+
 my $mani = Parrot::Manifest->new( { script => $script, } );
 
 my $manifest_lines_ref = $mani->prepare_manifest();
