@@ -13,9 +13,11 @@ Perl 6 rule features implemented
 * capturing and non-capturing groups
 * modifiers :i, :ignorecase, :s, :sigspace (with synonyms :w and :words)
 * enumerated character lists (<[abcdef]>, <-[a..f]>)
+* composed character classes (<+alpha-[aeiou]>)
 * character classes (., \d, \w, \s, \n, \e, \f, \r, \t, \x[hhh], \o[nnn])
 * anchors (^, $, ^^, $$, \b, \b)
 * negated character classes 
+* \c[...] and \C[...]
 * capturing subrules (<expr>)
 * non-capturing subrules  (<.expr>)
 * negated subrules (<!expr>)
@@ -34,7 +36,6 @@ Perl 6 rule features implemented
 
 Perl 6 rule features to-do
 --------------------------
-* rule composition (<+alpha-[aeiou]>)
 * lookbehind according to S05 definition 
 * <cut> assertion
 * versions of <commit> and cuts that release backtracking state
@@ -42,7 +43,6 @@ Perl 6 rule features to-do
 * literal assertions (<'literal'>)
 * interpolated assertions (<"literal">)
 * array and hash aliasing (@<foo>:=(...), %<foo>:=(...))
-* \c[...] and \C[...]
 * don't generate unneeded internal data structures (e.g., gpad)
 
 
