@@ -45,13 +45,13 @@ our %second_analysis_subs = (
                 if ($full_file =~ m{
                         t/tools/dev/searchops/samples\.pm
                         | languages/pod/test\.pod
-                        | xconf/samples/yourfoobar
+                        | examples/config/file/configcompiler
                         | t/configure/testlib/verbosefoobar
                         | t/configure/testlib/ddefectivefoobar
                         | t/configure/testlib/adefectivefoobar
                         | t/configure/testlib/cdefectivefoobar
                         | t/configure/testlib/bdefectivefoobar
-                        | xconf/samples/testfoobar
+                        | examples/config/file/configwithfatalstep
                     }x
                 ) {
                     delete $files_needing_analysis->{ $file };

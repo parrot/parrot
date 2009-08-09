@@ -652,11 +652,11 @@ configuration file.
 
 You may see how this works in practice by calling:
 
-    perl Configure.pl --file=xconf/samples/yourfoobar
+    perl Configure.pl --file=examples/config/file/configcompiler
 
 or
 
-    perl Configure.pl --file=xconf/samples/testfoobar
+    perl Configure.pl --file=examples/config/file/configwithfatalstep
 
 =head1 SEE ALSO
 
