@@ -287,7 +287,15 @@ PIR
 
 }
 
-BEGIN { $tests += 43 }
+pdb_output_like( <<PIR, "pir", "t\nw I0 == 2\nt", qr/Adding watchpoint/, 'watchpoint');
+.sub main :main
+    \$I0 = 1
+    \$I0 = 2
+    \$I0 = 3
+.end
+PIR
+
+BEGIN { $tests += 44 }
 
 BEGIN { plan tests => $tests; }
 

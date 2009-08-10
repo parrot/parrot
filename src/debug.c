@@ -1729,8 +1729,8 @@ PDB_watchpoint(PARROT_INTERP, ARGIN(const char *command))
     /* Add it to the head of the list */
     if (pdb->watchpoint)
         condition->next = pdb->watchpoint;
-
     pdb->watchpoint = condition;
+    fprintf(stderr, "Adding watchpoint\n");
 }
 
 /*
