@@ -1,13 +1,6 @@
-#! perl
+#! parrot
 # Copyright (C) 2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 4;
-use Parrot::Config;
 
 =head1 NAME
 
@@ -23,48 +16,55 @@ Tests obscure.ops
 
 =cut
 
-pir_output_like( <<CODE, qr/^42/, "loadlib obscure ops" );
 .loadlib 'obscure_ops'
 .sub main :main
-    print 42
+    .include 'fp_equality.pasm'
+    .include 'test_more.pir'
+    plan(9)
+    ok(1,"load obscure_ops")
+
+    test_covers()
+    test_vers()
 .end
-CODE
 
-
-pir_output_like( <<CODE, qr/^1/, "covers of 0" );
-.loadlib 'obscure_ops'
-.sub main :main
-    .local num x
-    covers x, 0
-    print x
-.end
-CODE
-
-pir_output_like( <<CODE, qr/^1/, "covers of pi" );
-.loadlib 'obscure_ops'
-.sub main :main
-    .local num x, pi
-    pi = atan 1.0, 1.0
-    pi *= 4
-    covers x, pi
-    print x
-.end
-CODE
-
-pir_output_like( <<CODE, qr/^0/, "covers of pi/2" );
-.loadlib 'obscure_ops'
-.sub main :main
-    .local num x, halfpi
-    halfpi = atan 1.0, 1.0
+.sub test_covers
+    .local num x, pi, halfpi, y
+    y      = atan 1.0, 1.0
+    halfpi = y
     halfpi *= 2
+    pi     = halfpi
+    pi     *= 2
+    covers x, 0
+    .fp_eq_ok(x,1,"covers of 0")
     covers x, halfpi
-    print x
+    .fp_eq_ok(x,0,'covers of pi/2')
+    covers x, pi
+    .fp_eq_ok(x,1,'covers of pi')
+    covers x, y
+    .fp_eq_ok(x, 0.292893218813453, 'covers of pi/4')
 .end
-CODE
+
+.sub test_vers
+    .local num x, pi, halfpi, y
+    y      = atan 1.0, 1.0
+    halfpi = y
+    halfpi *= 2
+    pi     = halfpi
+    pi     *= 2
+    vers x, 0
+    .fp_eq_ok(x,0,"vers of 0")
+    vers x, halfpi
+    .fp_eq_ok(x,1,'vers of pi/2')
+    vers x, pi
+    .fp_eq_ok(x,2,'vers of pi')
+    vers x, y
+    .fp_eq_ok(x, 0.292893218813453, 'covers of pi/4')
+.end
+
 
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 filetype=pir:
