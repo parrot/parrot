@@ -674,6 +674,11 @@ N: Michael Cartmell
 E: Michael.Cartmell@thomson.com
 D: README.win32 spelling patch
 
+N: Michael H. Hind
+U: mikehh
+D: codingstd patches
+E: mike.hind@gmail.com
+
 N: Michael G. Schwern
 
 N: Michael Scott
@@ -683,9 +688,6 @@ D: HTML documentation for Parrot
 E: michael_scott@mac.com
 U: mikescott
 W: http://xrl.us/sml
-
-U: mikehh
-D: codingstd patches
 
 N: Michael Stevens
 D: Remove an unused variable in C-land
