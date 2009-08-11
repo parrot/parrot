@@ -7,7 +7,7 @@ fp_equality.pasm - floating point equivalency macros
 
 =head1 DESCRIPTION
 
-This file provides two PIR macros to determine if a pair of floating point numbers are equivalent.
+This file provides PIR macros to determine if a pair of floating point numbers are equivalent.
 The same macros are also provided for PASM.
 
 =cut
@@ -23,6 +23,18 @@ The same macros are also provided for PASM.
 .label $FPEQNOK:
 .endm
 
+.macro fp_eq_ok (  J, K, L )
+    set $N10, .J
+    set $N11, .K
+    sub $N12, $N11, $N10
+    abs $N12, $N12
+
+    set $I0, 0
+    gt  $N12, 0.000001, .$FPEQNOK
+    set $I0, 1
+.label $FPEQNOK:
+    ok( $I0, .L )
+.endm
 
 .macro fp_ne ( J, K, L )
     set $N10, .J

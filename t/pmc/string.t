@@ -131,21 +131,6 @@ Tests the C<String> PMC.
         is( $I0, 0, 'string "foo" -> int' )
 .end
 
-# Macro to ease testing of floating point comparisons
-# borrowed from fp_eq in fp_equality.pasm
-.macro fp_eq_ok (  J, K, L )
-    set $N10, .J
-    set $N11, .K
-    sub $N12, $N11, $N10
-    abs $N12, $N12
-
-    set $I0, 0
-    gt  $N12, 0.000001, .$FPEQNOK
-    set $I0, 1
-.label $FPEQNOK:
-    ok( $I0, .L )
-.endm
-
 .sub setting_numbers
         .include 'fp_equality.pasm'
         new $P0, ['String']

@@ -91,19 +91,6 @@ Tests the Complex PMC.
     is( message, .M, .M )
 .endm
 
-.macro fp_eq_ok( J, K, L )
-    set $N10, .J
-    set $N11, .K
-    sub $N12, $N11, $N10
-    abs $N12, $N12
-
-    set $I0, 0
-    gt  $N12, 0.000001, .$FPEQNOK
-    set $I0, 1
-.label $FPEQNOK:
-    ok( $I0, .L )
-.endm
-
 .sub string_parsing
     $P0 = new ['Complex']
     $P1 = new ['String']
