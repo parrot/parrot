@@ -1823,6 +1823,7 @@ t/perl/README                                               []doc
 t/perl/testlib/answer.pir                                   [test]
 t/perl/testlib/hello                                        [test]
 t/perl/testlib/hello.pasm                                   [test]
+t/pir/macro.t                                               [test]
 t/pharness/01-default_tests.t                               [test]
 t/pharness/02-get_test_prog_args.t                          [test]
 t/pharness/03-handle_long_options.t                         [test]
