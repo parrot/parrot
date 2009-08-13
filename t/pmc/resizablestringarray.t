@@ -1354,7 +1354,8 @@ bad_type:
     .get_results (exception)
     message = exception
 still_ok:
-    like(message, 'illegal\ type\ for\ splice', "splice with a different type")
+    message = substr message, 22, 23
+    is(message, 'illegal type for splice', "splice with a different type")
 .end
 
 #
