@@ -1076,7 +1076,7 @@ Parrot_gc_destroy_header_pools(PARROT_INTERP)
     mem_internal_free(interp->arena_base->sized_header_pools);
     if (interp->arena_base->attrib_pools)
         mem_internal_free(interp->arena_base->attrib_pools);
-    interp->arena_base->attrib_pools;
+    interp->arena_base->attrib_pools = NULL;
     interp->arena_base->sized_header_pools = NULL;
 }
 
