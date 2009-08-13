@@ -1,19 +1,25 @@
 Name:           parrot
-Version:        1.0.0
-Release:        6%{?dist}
+Version:        1.4.0
+Release:        9%{?dist}
 Summary:        Parrot is a virtual machine
 License:        Artistic 2.0
 Group:          Development/Libraries
 URL:            http://www.parrot.org/
 
 Source0:        ftp://ftp.parrot.org/pub/parrot/releases/stable/%{version}/parrot-%{version}.tar.gz
-# Without Patch0 %{_libdir}/libparrot.so would not be a symbolic link to
+
+Patch0:         parrot-1.x.0.patch
+# patches file:           tools/dev/install_files.pl
+# It is responsible to have no subdirectory under pkgconfig.
+#
+# patches file:           config/gen/makefiles/parrot_pc.in
+# So "pkg-config parrot --cflags" works correct
+#
+# see for upstream:       https://trac.parrot.org/parrot/ticket/509
+# patched file:           lib/Parrot/Install.pm
+# is to have the symlink:    libparrot.so  ->  libparrot.so.%{version}
+# Without this %{_libdir}/libparrot.so would not be a symbolic link to
 # %{_libdir}/libparrot.so.%{version}  
-# Symlink:  libparrot.so ->  libparrot.so.%{version}
-# See for upstream: https://trac.parrot.org/parrot/ticket/509
-# Extended for the package to have no subdirectory under pkgconfig
-Patch0:         parrot-install_files.patch
-Patch1:         parrot-1.0.0-rpath-removal.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  readline-devel
@@ -25,6 +31,7 @@ BuildRequires:  perl(Test::Harness)
 BuildRequires:  perl(Test::Simple)
 BuildRequires:  ctags
 BuildRequires:  openssl-devel
+BuildRequires:  flex
  
 
 %package docs
@@ -32,6 +39,9 @@ Summary:        Parrot Virtual Machine documentation
 Group:          Documentation
 Requires:       perl(strict)
 Requires:       perl(warnings)
+BuildArch:      noarch
+
+#--
 
 %package devel
 Summary:        Parrot Virtual Machine development headers and libraries
@@ -39,47 +49,56 @@ Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
 Requires:       pkgconfig
 
+#--
+
 %package tools
 Summary:        Parrot Virtual Machine development for languages
 Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
 Requires:       perl(Pod::Simple)
-Requires:       perl(File::Which) = 0.05
+Requires:       perl(File::Which) >= 0.05
+Requires:       perl(Parrot::OpLib::core)
 # It is necessary to have installed the package "perl-Perl-Critic" to install
 # the parrot-tools
 Provides:       perl(Parrot::Pmc2c::MethodEmitter) = %{version}
 Provides:       perl(Parrot::Pmc2c::PCCMETHOD_BITS) = %{version}
 Provides:       perl(Parrot::Pmc2c::PMCEmitter) = %{version}
+Provides:       perl(Parrot::OpLib::core) = %{version}
+
 
 %description
 Parrot is a virtual machine designed to efficiently compile and execute
 bytecode for dynamic languages. Parrot is the target for Rakudo Perl 6,
 as well as variety of other languages.
 
+#--
+
 %description docs
 Documentation in text-, POD- and HTML-format (docs/html-subdirectory) and also
 examples about the Parrot Virtual Machine.
 
+#--
+
 %description devel
 Parrot Virtual Machine development headers and libraries.
+
+#--
 
 %description tools
 Parrot Virtual Machine development files for building languages.
 
+
 %prep
 %setup -q
 %patch0 -p0
-%patch1 -b .rpatch
 
-%{__perl} -pi -e 's,"lib/,"%{_lib}/, if (/CONST_STRING\(interp,/)' \
-    src/library.c
-%{__perl} -pi -e "s,'/usr/lib','%{_libdir}',;s,runtime/lib/,runtime/%{_lib}/," \
-    tools/dev/install_files.pl
+%{__perl} -pi -e "s,'/usr/lib','%{_libdir}'," tools/dev/install_files.pl
 
 
 cat << \EOF > %{name}-prov
 #!/bin/sh
-%{__perl_provides} $* | %{__sed} -e '/perl(A)/d' -e '/perl(B)/d' -e '/perl(DB)/d'
+%{__perl_provides} $* | %{__sed} -e '/perl(A)/d' -e '/perl(B)/d' \
+                            -e '/perl(DB)/d' -e '/perl(Parrot::OpLib::core)/d'
 EOF
 
 %global __perl_provides %{_builddir}/%{name}-%{version}/%{name}-prov
@@ -88,6 +107,13 @@ chmod +x %{__perl_provides}
 
 %build
 %ifarch %{ix86} x86_64
+    RPM_OPT_FLAGS="$RPM_OPT_FLAGS -maccumulate-outgoing-args"
+%else
+# The PowerPC-architecture do not build with the '-maccumulate-outgoing-args'
+# option.
+    RPM_OPT_FLAGS="$RPM_OPT_FLAGS"
+%endif
+
 %{__perl} Configure.pl \
     --prefix=%{_usr} \
     --libdir=%{_libdir} \
@@ -96,18 +122,12 @@ chmod +x %{__perl_provides}
     --mandir=%{_mandir} \
     --cc="%{__cc}" \
     --cxx=%{__cxx} \
-    --optimize="$RPM_OPT_FLAGS -maccumulate-outgoing-args" \
+    --optimize="$RPM_OPT_FLAGS" \
     --parrot_is_shared \
+    --disable-rpath \
     --lex=%{_bindir}/flex \
     --yacc=%{_bindir}/yacc \
     --libs='-lcurses -lm'
-%else
-# PowerPC, not all options work with the PowerPC-architecture, I do not test
-# which is not working   (Gerd)
-%{__perl} Configure.pl \
-    --prefix=%{_usr} \
-    --libdir=%{_libdir}
-%endif
 
 # The LDD_LIBRARY_PATH hack is needed for "miniparrot"
 # to find his parrot-library in "blib/lib" 
@@ -157,14 +177,13 @@ find %{RPM_PAR_LIB_DIR}tools -type f -name "*.pl" -exec chmod 755 {} \; \
 find %{RPM_PAR_LIB_DIR}tools/dev -type f -name "pbc_to_exe.pir" \
     -exec %{__sed} -i -e '1 s&#! parrot&#!/usr/bin/parrot&' {} \; \
     -exec chmod 755 {} \;
-# This module is only needed for building and should not be installed (I think)
-# module "Parrot::OpLib::core"
-rm -rf %{RPM_PAR_LIB_DIR}tools/lib/Parrot/OpLib
 
 # Remove doc-files with zero-length
 find docs/html -type f -size 0 -exec rm -f {} \;
 
 # Set path for installed programs in docs package
+find examples/json -type f -name "*.pir" \
+    -exec %{__sed} -i -e '1 s&#!../../parrot&#!/usr/bin/parrot&' {} \;
 find examples -type f -name "*.pl" \
     -exec %{__sed} -i -e '1 s&#! perl&#!/usr/bin/perl&' {} \;
 find examples -wholename 'examples/pir/befunge/t/basic.t' \
@@ -189,22 +208,21 @@ find examples -wholename 'examples/languages/abc/t/harness' \
 
 find examples/languages -type f -name harness \
     -exec %{__sed} -i -e '1 s&#! perl&#!/usr/bin/perl&' {} \;
-for file in docs/book/ch09_pct.pod docs/memory_internals.pod; do
+for file in docs/book/draft/ch05_pge.pod docs/memory_internals.pod; do
         %{__mv} $file timestamp
         iconv -f ISO-8859-1 -t UTF-8 -o $file timestamp
         touch -r timestamp $file
 done
 %{__rm} -f timestamp
 
-# These files *probably* aren't needed.
-rm -rf $RPM_BUILD_ROOT%{_usr}/config \
-    $RPM_BUILD_ROOT%{_includedir}/src \
-    $RPM_BUILD_ROOT%{_usr}/src 
 
 %check
+# 'make fulltest' is done by default; it take a lot of time
 export LD_LIBRARY_PATH=$( pwd )/blib/lib
-make test
-%{?_with_fulltest: make fulltest}
+FULL='full'
+%{?_without_fulltest: FULL=''}
+%{?!_without_tests: make ${FULL}test}
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -217,10 +235,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %doc ChangeLog CREDITS NEWS PBC_COMPAT PLATFORMS README
 %doc RESPONSIBLE_PARTIES TODO LICENSE
-%exclude %{_bindir}/parrot_config
-%exclude %{_bindir}/parrot_debugger
-%exclude %{_bindir}/pbc_*
-%{_bindir}/*
+%{_bindir}/parrot
 %{_libdir}/parrot/
 %exclude %{_libdir}/parrot/%{version}/tools
 %exclude %{_libdir}/parrot/%{version}/VERSION
@@ -235,12 +250,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/parrot_config
 %{_bindir}/parrot_debugger
 %{_bindir}/pbc_disassemble
+%{_bindir}/pbc_info
 %{_bindir}/pbc_merge
 %{_bindir}/pbc_to_exe
 %{_bindir}/pbc_dump
 %{_includedir}/parrot
 %{_libdir}/libparrot.so
-%{_libdir}/libparrot.a
+%exclude %{_libdir}/libparrot.a
 %{_libdir}/pkgconfig/*
 
 %files tools
@@ -248,18 +264,27 @@ rm -rf $RPM_BUILD_ROOT
 # Files for building languages
 %{_libdir}/parrot/%{version}/tools/*
 %{_libdir}/parrot/%{version}/VERSION
-
+%{_usr}/src/parrot/*
 
 
 %changelog
-* Thu Apr 23 2009 Gerd Pokorra <gp@zimt.uni-siegen.de> 1.0.0-6
+* Sat Aug 1 2009 Gerd Pokorra <gp@zimt.uni-siegen.de> 1.4.0-9
+- ppc test included again
+- include the necessary module Parrot::Oplib::core
+- change the place of header files to /usr/include/parrrot/<version>
+- install the files /usr/src/parrot/*
+
+* Sat Jul 25 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.4.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
+
+* Tue Jul 21 2009 Gerd Pokorra <gp@zimt.uni-siegen.de> 1.4.0-1
+- add the new disable-rpath configure option
+
+* Wed Mar 25 2009 Gerd Pokorra <gp@zimt.uni-siegen.de> 1.0.0-6
 - add a list of changes from Lubomir Rintel
-- add patch to remove rpath
 - add filtering Provides
 - change requires for docs-subpackage
 - enable test suite
-
-* Wed Mar 25 2009 Gerd Pokorra <gp@zimt.uni-siegen.de> 1.0.0-5
 - change the group of the subpackage "-docs" to Documentation
 - put the main-documentation from the docs-package to the main package
 - LICENSE file added
@@ -270,6 +295,7 @@ rm -rf $RPM_BUILD_ROOT
 - define RPM_PAR_LIB_DIR added
 - add subpackage "tools"
 - exclude tools directory from main-package
+- added make html
 
 * Sun Mar 22 2009 Fabien Georget <fabien.georget@gmail.com> 1.0.0-4
 - add tools
@@ -277,10 +303,6 @@ rm -rf $RPM_BUILD_ROOT
 * Sun Mar 22 2009 David Fetter <david@fetter.org> 1.0.0-3
 - Removed wrong prefix from pkgconfig per Christoph Wickert
 - Changed i386 to ix86 per Christoph Wickert
-
-* Sun Mar 22 2009 David Fetter <david@fetter.org> 1.0.0-2
-- Changed hard-coded path requirement to perl.
-
 
 * Tue Mar 17 2009 Allison Randal <allison@parrot.org> 1.0.0
 - updated to 1.0.0
@@ -290,36 +312,8 @@ rm -rf $RPM_BUILD_ROOT
 - added parrot_utils to devel
 - fixed Source0 url
 
-* Tue Jan 23 2009 Gerd Pokorra <gp@zimt.uni-siegen.de> 0.9.0
-- added make html
-- make reallyinstall => make install
-
-* Tue Jan 20 2009 chromatic <chromatic@wgz.org> 0.9.0
-- updated to 0.9.0
-
 * Tue Dec 16 2008 Whiteknight <wknight8111@gmail.com> 0.8.2
 - updated to 0.8.2
-
-* Tue Nov 18 2008 chromatic <chromatic@parrot.org> 0.8.1
-- updated to 0.8.1
-
-* Tue Oct 21 2008 particle <particle@parrot.org> 0.8.0
-- updated to 0.8.0
-
-* Tue Sep 16 2008 pmichaud <pmichaud@pobox.com> 0.7.1
-- updated to 0.7.1
-
-* Wed Sep  3 2008 chromatic <chromatic@wgz.org> 0.7.0
-- install parrot_config (not parrot-config)
-
-* Tue Jun 17 2008 Nuno Carvalho <smash@cpan.org> 0.6.3
-- updated to 0.6.3
-
-* Tue May 20 2008 chromatic <chromatic@wgz.org>> 0.6.2
-- updated to 0.6.2
-
-* Mon Apr 28 2008 chromatic <chromatic@wgz.org> 0.6.1
-- minor fixes; tested with Fedora 7, 8, and 9-beta
 
 * Tue Mar 18 2008 Bernhard Schmalhofer <Bernhard.Schmalhofer@gmx.de> 0.6.0
 - Update to 0.5.3.
@@ -327,54 +321,22 @@ rm -rf $RPM_BUILD_ROOT
 * Wed Feb 20 2008 Patrick Michaud <pmichaud@pobox.com> 0.5.3
 - Update to 0.5.3.
 
-* Tue Jan 15 2008 Bob Rogers <rogers@rgrjr.dyndns.org> 0.5.2
-- Update to 0.5.2.
-
-* Tue Dec 18 2007 Jonathan Worthington <jnthn@jnthn.net> 0.5.1
-- Update to 0.5.1.
-
-* Tue Nov 20 2007 chromatic <chromatic@wgz.org> 0.5.0
-- Update to 0.5.0.
-
-* Fri May 25 2007 David Fetter <david@fetter.org> 0.4.12-1
-- Update to 0.4.12.
-
-* Wed Apr 18 2007 Steven Pritchard <steve@kspei.com> 0.4.11-1
-- Update to 0.4.11.
-
-* Wed Mar 21 2007 Steven Pritchard <steve@kspei.com> 0.4.10-1
-- Update to 0.4.10.
-
 * Sat Mar 10 2007 Steven Pritchard <steve@kspei.com> 0.4.9-1
 - Update to 0.4.9.
-- BR ncurses-devel.
+- BuildRequires ncurses-devel.
 - For some reason now I need to force -lm too.
 - Remove some files/directories that shouldn't be included.
-
-* Wed Jan 17 2007 Steven Pritchard <steve@kspei.com> 0.4.8-1
-- Attempt update to 0.4.8.
-
-* Fri Jun 30 2006 Steven Pritchard <steve@kspei.com> 0.4.5-5
 - Override lib_dir and make various substitutions to try to fix multilib.
 - Remove rpath use from Makefile.
 - Fix a pod error in src/ops/experimental.ops.
 - Enable "make test" since t/doc/pod.t won't fail now.
-
-* Wed Jun 28 2006 Steven Pritchard <steve@kspei.com> 0.4.5-4
 - Force permissions on shared libraries so rpmbuild strips them.
-
-* Wed Jun 28 2006 Steven Pritchard <steve@kspei.com> 0.4.5-3
 - Fix URL, description, summary, etc.
 - Add post/postun.
 - Move parrot-config to the devel sub-package.
 - Force permissions on the doc directories.
-
-* Tue Jun 27 2006 Steven Pritchard <steve@kspei.com> 0.4.5-2
 - Add -lcurses to get readline detection to work.
-- BR libicu-devel.
-
-* Tue Jun 27 2006 Steven Pritchard <steve@kspei.com> 0.4.5-1
-- Initial packaging attempt.
+- Add BuildRequires libicu-devel.
 
 * Tue Mar 18 2003 Steve Fink <sfink@foxglove.localdomain> 0.0.11
 - first .spec file created
