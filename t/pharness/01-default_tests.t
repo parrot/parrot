@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2009, Parrot Foundation.
 # $Id$
 # 01-default_tests.t
 
@@ -23,6 +23,8 @@ use Parrot::Harness::DefaultTests;
 @Parrot::Harness::DefaultTests::configure_tests = qw( gamma.t );
 @Parrot::Harness::DefaultTests::standard_tests = qw( delta.t );
 @Parrot::Harness::DefaultTests::developing_tests = qw( epsilon.t );
+@Parrot::Harness::DefaultTests::library_tests = qw( zeta.t );
+
 
 my ($core_tests_only, $runcore_tests_only);
 my (@default_tests, $default_tests_ref);
@@ -54,16 +56,16 @@ my $cwd = cwd();
     ok(@default_tests =
         get_default_tests($core_tests_only, $runcore_tests_only),
         "get_default_tests() returned successfully");
-    is(scalar(@default_tests), 3, "Got expected 3 tests");
+    is(scalar(@default_tests), 4, "Got expected 4 tests");
     is($default_tests[0], q{gamma.t}, "Start with configure_tests as expected");
-    is($default_tests[2], q{beta.t}, "End with core_tests as expected");
+    is($default_tests[3], q{zeta.t}, "End with library_tests as expected");
 
     @default_tests = ();
     ($core_tests_only, $runcore_tests_only) = (0,0);
     ok($default_tests_ref =
         get_default_tests($core_tests_only, $runcore_tests_only),
         "get_default_tests() returned successfully");
-    is(scalar(@{ $default_tests_ref }), 3, "Got expected 3 tests");
+    is(scalar(@{ $default_tests_ref }), 4, "Got expected 4 tests");
 
     ok(chdir $cwd, "Able to change back to starting directory after testing");
 }
@@ -101,9 +103,9 @@ my $cwd = cwd();
     ok(@default_tests =
         get_default_tests($core_tests_only, $runcore_tests_only),
         "get_default_tests() returned successfully");
-    is(scalar(@default_tests), 3, "Got expected 3 tests");
+    is(scalar(@default_tests), 4, "Got expected 4 tests");
     is($default_tests[0], q{gamma.t}, "Start with configure_tests as expected");
-    is($default_tests[2], q{beta.t}, "End with core_tests as expected");
+    is($default_tests[3], q{zeta.t}, "End with library_tests as expected");
     is(scalar(@Parrot::Harness::DefaultTests::standard_tests),
         2, "Got expected 2 coding standards tests");
     # reset for subsequent tests
@@ -114,7 +116,7 @@ my $cwd = cwd();
     ok($default_tests_ref =
         get_default_tests($core_tests_only, $runcore_tests_only),
         "get_default_tests() returned successfully");
-    is(scalar(@{ $default_tests_ref }), 3, "Got expected 3 tests");
+    is(scalar(@{ $default_tests_ref }), 4, "Got expected 4 tests");
     # reset for subsequent tests
     @Parrot::Harness::DefaultTests::standard_tests = qw( delta.t );
 
