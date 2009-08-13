@@ -1224,38 +1224,6 @@ CODE
 ok
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'load_bytecode with .pir (RT #39807)' );
-.sub main :main
-    load_bytecode 'PGE.pbc'
-    load_bytecode 'dumper.pir'
-    load_bytecode 'PGE/Dumper.pir'
-
-    $P0 = compreg 'PGE::P5Regex'
-    $P1 = $P0('aabb*')
-    $P2 = $P1('fooaabbbar')
-
-    _dumper($P2)
-.end
-CODE
-"VAR1" => PMC 'PGE;Match' => "aabbb" @ 3
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', 'load_bytecode with .pbc (RT #39807)' );
-.sub main :main
-    load_bytecode 'PGE.pbc'
-    load_bytecode 'dumper.pbc'
-    load_bytecode 'PGE/Dumper.pbc'
-
-    $P0 = compreg 'PGE::P5Regex'
-    $P1 = $P0('aabb*')
-    $P2 = $P1('fooaabbbar')
-
-    _dumper($P2)
-.end
-CODE
-"VAR1" => PMC 'PGE;Match' => "aabbb" @ 3
-OUTPUT
-
 pir_error_output_like( <<'CODE', qr/Null PMC access in invoke()/, 'invoking null pmc' );
 .sub main :main
     null $P0
