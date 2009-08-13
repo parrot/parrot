@@ -96,7 +96,8 @@ Tests various io opcodes.
     unless pipe goto open_pipe_for_reading_failed
     .local string line
     line = readline pipe
-    like('This is Parrot', ":s This is Parrot", 'open pipe for reading')
+    line = substr line, 0, 14
+    is('This is Parrot', line, 'open pipe for reading')
     .return ()
 
   open_pipe_for_reading_failed:
