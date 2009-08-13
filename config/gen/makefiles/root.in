@@ -585,17 +585,9 @@ MAKE := @make_c@
 ###############################################################################
 
 all : \
-    flags_dummy \
-    PARROT_LIBS \
-    $(PARROT) \
-    runtime/parrot/include/parrotlib.pbc \
-    runtime/parrot/include/config.fpmc \
+    corevm \
     docs \
-    $(LIBNCI_TEST_SO) \
 #IF(has_glut):    $(LIBGLUTCB_SO) \
-    $(GEN_LIBRARY) \
-    dynpmc \
-    dynoplibs \
     compilers \
     $(DIS) \
     $(PARROT_CONFIG) \
@@ -603,6 +595,17 @@ all : \
     $(PBCMERGE) \
     $(PDB) \
     $(PDUMP) \
+
+corevm : \
+    flags_dummy \
+    PARROT_LIBS \
+    $(PARROT) \
+    runtime/parrot/include/parrotlib.pbc \
+    runtime/parrot/include/config.fpmc \
+    $(LIBNCI_TEST_SO) \
+    $(GEN_LIBRARY) \
+    dynpmc \
+    dynoplibs \
 
 $(GEN_LIBRARY) : $(PARROT)
 
@@ -1506,7 +1509,7 @@ smolder_coretest : test_prep
 smoke : smolder_test
 
 # "core tests" -- test basic functionality but not ancillaries
-coretest : test_prep
+coretest : corevm
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) --core-tests
 
 # automake compatibility

@@ -10,10 +10,11 @@ Parrot::Harness::DefaultTests - Tests run by default by F<t/harness>
 This file exports by default a single subroutine, C<get_default_tests()>,
 which is the list of tests run by F<t/harness> by default.
 
-Upon request, this package exports five arrays holding various sets of tests:
+Upon request, this package exports six arrays holding various sets of tests:
 
     @runcore_tests
     @core_tests
+    @library_tests
     @configure_tests
     @standard_tests
     @developing_tests
@@ -31,6 +32,7 @@ use warnings;
 our (
     @runcore_tests,
     @core_tests,
+    @library_tests,
     @configure_tests,
     @standard_tests,
     @developing_tests
@@ -40,6 +42,7 @@ our @EXPORT = qw( get_default_tests );
 our @EXPORT_OK = qw(
     @runcore_tests
     @core_tests
+    @library_tests
     @configure_tests
     @standard_tests
     @developing_tests
@@ -54,12 +57,6 @@ our @EXPORT_OK = qw(
     t/native_pbc/*.t
     t/dynpmc/*.t
     t/dynoplibs/*.t
-    t/compilers/pct/*.t
-    t/compilers/pge/*.t
-    t/compilers/pge/p5regex/*.t
-    t/compilers/pge/perl6regex/*.t
-    t/compilers/tge/*.t
-    t/library/*.t
 );
 
 # core tests are run unless --runcore-tests is present.  Typically
@@ -67,9 +64,18 @@ our @EXPORT_OK = qw(
 @core_tests = qw(
     t/run/*.t
     t/src/*.t
-    t/tools/*.t
     t/perl/*.t
-    t/stm/*.t
+);
+
+# library tests are run unless --runcore-tests or --core-tests is present.
+@library_tests = qw(
+    t/compilers/pct/*.t
+    t/compilers/pge/*.t
+    t/compilers/pge/p5regex/*.t
+    t/compilers/pge/perl6regex/*.t
+    t/compilers/tge/*.t
+    t/library/*.t
+    t/tools/*.t
 );
 
 # configure tests are tests to be run at the beginning of 'make test';
@@ -107,6 +113,7 @@ sub get_default_tests {
     unless ($runcore_tests_only) {
        push @default_tests, @core_tests;
        unless ($core_tests_only) {
+           push @default_tests, @library_tests;
            unshift @default_tests, @configure_tests;
        }
     }
