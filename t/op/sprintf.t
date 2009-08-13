@@ -61,8 +61,6 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
 .sub main :main
     load_bytecode 'Test/Builder.pbc'
-    load_bytecode 'PGE.pbc'
-    load_bytecode 'PGE/Dumper.pbc'
     .include "iglobals.pasm"
     .include "sysinfo.pasm"
 
