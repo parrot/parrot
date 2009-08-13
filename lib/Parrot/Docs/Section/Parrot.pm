@@ -60,7 +60,7 @@ sub new {
             'Introduction',
             '',
             $self->new_item( 'Introduction to Parrot', 'docs/intro.pod'),
-            $self->new_item( 'Getting Started', 'docs/book/draft/ch02_getting_started.pod'),
+            $self->new_item( 'Getting Started', 'docs/book/pct/ch02_getting_started.pod'),
             $self->new_item( 'Navigating the Docs', 'docs/parrot.pod'),
             $self->new_item( 'Roles & Responsibilities', 'docs/project/roles_responsibilities.pod'),
             $self->new_item( 'Release History', 'docs/parrothist.pod'),
@@ -80,9 +80,9 @@ sub new {
         $self->new_group(
             'Implementing Languages on Parrot',
             '',
-            $self->new_item( 'Parrot Compiler Tools', 'docs/book/draft/ch04_compiler_tools.pod'),
-            $self->new_item( 'Parrot Grammar Engine', 'docs/book/draft/ch05_pge.pod'),
-            $self->new_item( 'Not Quite Perl', 'docs/book/draft/ch06_nqp.pod'),
+            $self->new_item( 'Parrot Compiler Tools', 'docs/book/pct/ch03_compiler_tools.pod'),
+            $self->new_item( 'Parrot Grammar Engine', 'docs/book/pct/ch04_pge.pod'),
+            $self->new_item( 'Not Quite Perl', 'docs/book/pct/ch05_nqp.pod'),
             $self->new_item( 'Compiler FAQ', 'docs/compiler_faq.pod'),
         ),
         $self->new_group(
@@ -109,6 +109,16 @@ sub new {
             $self->new_item( 'Chapter 7 Objects', 'docs/book/pir/ch07_objects.pod'),
             $self->new_item( 'Chapter 8 IO', 'docs/book/pir/ch08_io.pod'),
             $self->new_item( 'Chapter 9 Exceptions', 'docs/book/pir/ch09_exceptions.pod'),
+        ),
+
+        $self->new_group(
+            'PCT Book',
+            '',
+            $self->new_item( 'Chapter 1 Introduction', 'docs/book/pct/ch01_introduction.pod'),
+            $self->new_item( 'Chapter 2 Getting Started', 'docs/book/pct/ch02_getting_started.pod'),
+            $self->new_item( 'Chapter 3 Compiler Tools', 'docs/book/pct/ch03_compiler_tools.pod'),
+            $self->new_item( 'Chapter 4 Grammar Engine', 'docs/book/pct/ch04_pge.pod'),
+            $self->new_item( 'Chapter 5 Grammar Actions', 'docs/book/pct/ch05_nqp.pod'),
         ),
 
 #        Parrot::Docs::Section::C->new,
