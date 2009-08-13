@@ -114,6 +114,8 @@ sub runstep {
         # Unclear if it's needed both for ld and link.
         $conf->data->set( libparrot_ldflags   => "\"$build_dir\\libparrot.lib\"" );
         $conf->data->set( libparrot_linkflags   => "\"$build_dir\\libparrot.lib\"" );
+        $conf->data->set( inst_libparrot_ldflags   => "\"$bindir\\libparrot.lib\"" );
+        $conf->data->set( inst_libparrot_linkflags   => "\"$bindir\\libparrot.lib\"" );
 
         # 'link' needs to be link.exe, not cl.exe.
         # This makes 'link' and 'ld' the same.

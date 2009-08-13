@@ -48,6 +48,7 @@ include/parrot/platform_limits.h                  [devel]include
 include/parrot/vtable.h                           [main]include
 install_config.fpmc                               [main]lib
 src/install_config.o                              [main]lib
+src/install_config.obj                            [main]lib
 installable_parrot_config.exe                     [main]bin
 installable_parrot_config                         [main]bin
 installable_parrot_debugger.exe                   [main]bin
@@ -64,6 +65,7 @@ installable_pbc_to_exe.exe                        [main]bin
 installable_pbc_to_exe                            [main]bin
 lib/Parrot/Config/Generated.pm                    [devel]lib
 libparrot.dll                                     [main]bin
+libparrot.lib                                     [main]bin
 lib/Parrot/OpLib/core.pm                          [devel]lib
 lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm                [devel]lib
 lib/Parrot/PMC.pm                                 [devel]lib
