@@ -26,7 +26,11 @@ OPS_TARGETS := \
 #IF(cg_flag):  obscure_ops_cg$(LOAD_EXT) \
 #IF(cg_flag):  obscure_ops_cgp$(LOAD_EXT) \
   obscure_ops$(LOAD_EXT) \
-  obscure_ops_switch$(LOAD_EXT)
+  obscure_ops_switch$(LOAD_EXT) \
+#IF(cg_flag):  math_ops_cg$(LOAD_EXT) \
+#IF(cg_flag):  math_ops_cgp$(LOAD_EXT) \
+  math_ops$(LOAD_EXT) \
+  math_ops_switch$(LOAD_EXT)
 
 CLEANUPS := \
   "*.c" \
@@ -84,6 +88,42 @@ obscure_ops_cgp$(O): obscure_ops_cgp.c
 
 obscure_ops_cgp.c: obscure.ops
 	$(OPS2C) CGP --dynamic obscure.ops
+
+math_ops$(LOAD_EXT): math_ops$(O)
+	$(LD) @ld_out@math_ops$(LOAD_EXT) math_ops$(O) $(LINKARGS)
+
+math_ops$(O): math_ops.c
+	$(CC) -c @cc_o_out@math_ops$(O) $(INCLUDES) $(CFLAGS) math_ops.c
+
+math_ops.c: math.ops
+	$(OPS2C) C --dynamic math.ops
+
+math_ops_switch$(LOAD_EXT): math_ops_switch$(O)
+	$(LD) @ld_out@math_ops_switch$(LOAD_EXT) math_ops_switch$(O) $(LINKARGS)
+
+math_ops_switch$(O): math_ops_switch.c
+	$(CC) -c @cc_o_out@math_ops_switch$(O) $(INCLUDES) $(CFLAGS) math_ops_switch.c
+
+math_ops_switch.c: math.ops
+	$(OPS2C) CSwitch --dynamic math.ops
+
+math_ops_cg$(LOAD_EXT): math_ops_cg$(O)
+	$(LD) @ld_out@math_ops_cg$(LOAD_EXT) math_ops_cg$(O) $(LINKARGS)
+
+math_ops_cg$(O): math_ops_cg.c
+	$(CC) -c @cc_o_out@math_ops_cg$(O) $(INCLUDES) $(CFLAGS) math_ops_cg.c
+
+math_ops_cg.c: math.ops
+	$(OPS2C) CGoto --dynamic math.ops
+
+math_ops_cgp$(LOAD_EXT): math_ops_cgp$(O)
+	$(LD) @ld_out@math_ops_cgp$(LOAD_EXT) math_ops_cgp$(O) $(LINKARGS)
+
+math_ops_cgp$(O): math_ops_cgp.c
+	$(CC) -c @cc_o_out@math_ops_cgp$(O) $(INCLUDES) $(CFLAGS) math_ops_cgp.c
+
+math_ops_cgp.c: math.ops
+	$(OPS2C) CGP --dynamic math.ops
 
 test : all
 	cd ../.. && $(PERL) -Ilib t/harness t/dynoplibs/*.t
