@@ -30,7 +30,7 @@ The Parrot Virtual Machine was originally conceived of as the engine for
 executing the new Perl 6 language, when specifications for that were first
 starting to be drafted. However, as time went on it was decided that Parrot
 would benefit from having a clean abstraction layer between it's internals
-and the Perl 6 language syntax. Thisclean abstraction layer brough with it
+and the Perl 6 language syntax. This clean abstraction layer brough with it
 the side effect that Parrot could be used to host a wide variety of dynamic
 languages, not just Perl 6. And beyond just hosting them, it could
 facilitate their advancement, interaction, and code sharing.
@@ -65,7 +65,7 @@ Parrot also has a number of other benefits for compiler writers to tap into:
 
 =over 4
 
-=item* Write Once and Share
+=item * Write Once and Share
 
 All HLLs on Parrot ultimately compile down to Parrot's platform-independent
 bytecode which Parrot can execute natively. This means at the lowest level
@@ -76,7 +76,7 @@ in Ruby? A mathematics library that only has C bindings? Want to plug all
 of these things into a web application you are writing in PHP? Parrot
 supports this and more.
 
-=item* Native Library Support
+=item * Native Library Support
 
 Parrot has a robust system for interfacing with external native code
 libraries, such as those commonly written in C, C++, Fortran and other
@@ -125,17 +125,17 @@ PCT is broken down into three separate tools:
 
 =over 4
 
-=item* Not Quite Perl (NQP)
+=item * Not Quite Perl (NQP)
 
 NQP a subset of the Perl 6 language that requires no runtime library to
 execute.
 
-=item* Perl Grammar Engine (PGE)
+=item * Perl Grammar Engine (PGE)
 
 PGE is an implementation of Perl 6's powerful regular expression and grammar
 tools.
 
-=item* HLLCompiler
+=item * HLLCompiler
 
 The HLLCompiler compiler helps to manage and encapsulate the compilation
 process. An HLLCompiler object, once created, enables the user to use the

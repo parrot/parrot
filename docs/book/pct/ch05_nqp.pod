@@ -27,7 +27,7 @@ so existing Perl 5 programmers should find much of it familiar and should be
 able to leverage their existing skills for writing compilers.
 
 In PGE, at the time of a match the grammar we can invoke an action using the
-special <code>{*}</code> symbol. In general, these action methods are
+special C<{*}> symbol. In general, these action methods are
 written in NQP, although it is possible for them to be written in PIR N<In
 fact, this is how the NQP compiler itself is written>. We won't discuss the
 PIR case here because it's uncommon and needlessly difficult. NQP is the
