@@ -49,8 +49,7 @@ subroutine.
     void class_init() {
 
         /* there is no pmclass const_pmc flag yet */
-        if (pass == 1)
-            interp->vtables[entry]->flags |= VTABLE_IS_CONST_PMC_FLAG;
+        interp->vtables[entry]->flags |= VTABLE_IS_CONST_PMC_FLAG;
 
     }
 

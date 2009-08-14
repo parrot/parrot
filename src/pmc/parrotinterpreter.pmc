@@ -209,15 +209,13 @@ Class initialization.
     void class_init() {
         const int typ = enum_class_ParrotInterpreter;
 
-        if (pass) {
-            /* TODO unify and fix signatures */
-            register_nci_method(INTERP, typ,
-                    F2DPTR(pt_thread_yield), "yield", "v");
+        /* TODO unify and fix signatures */
+        register_nci_method(INTERP, typ,
+                F2DPTR(pt_thread_yield), "yield", "v");
 
-            /* misc functions */
-            register_nci_method(INTERP, typ,
-                    F2DPTR(recursion_limit), "recursion_limit", "iJOi");
-        }
+        /* misc functions */
+        register_nci_method(INTERP, typ,
+                F2DPTR(recursion_limit), "recursion_limit", "iJOi");
     }
 
 /*

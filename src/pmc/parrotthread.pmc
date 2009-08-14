@@ -103,14 +103,12 @@ Equivalent to calling run with PARROT_CLONE_DEFAULT.
     void class_init() {
         const int typ = enum_class_ParrotThread;
 
-        if (pass) {
-            register_nci_method(INTERP, typ,
-                    F2DPTR(do_thread_run), "run", "IJOIP@");
+        register_nci_method(INTERP, typ,
+                F2DPTR(do_thread_run), "run", "IJOIP@");
 
-            /* XXX appropriate name given that this won't clone globals? */
-            register_nci_method(INTERP, typ,
-                    F2DPTR(do_thread_run_clone_default), "run_clone", "IJOP@");
-        }
+        /* XXX appropriate name given that this won't clone globals? */
+        register_nci_method(INTERP, typ,
+                F2DPTR(do_thread_run_clone_default), "run_clone", "IJOP@");
     }
 
 /*
