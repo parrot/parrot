@@ -19,11 +19,13 @@ Tests math.ops
 .loadlib 'math_ops'
 .sub main :main
     .include 'test_more.pir'
-    plan(7)
+    .include 'fp_equality.pasm'
+    plan(10)
     ok(1, "load math_ops")
     basic_test_1_arg()
     basic_test_2_arg()
     basic_test_3_arg()
+    test_srand()
 .end
 
 .sub basic_test_1_arg
@@ -72,6 +74,19 @@ upper:
 fail2:
     ok(0, 'rand returns a number less than or equal to 25')
 finish:
+.end
+
+.sub test_srand
+    srand 42
+    ok(1, 'call srand with int')
+    srand 42.0
+    ok(1, 'call srand with num')
+    rand $N0
+    srand 5
+    rand $N2
+    srand 42.0
+    rand $N1
+    .fp_eq_ok($N0, $N1, 'having the same seed generates the same numbers')
 .end
 
 # Local Variables:

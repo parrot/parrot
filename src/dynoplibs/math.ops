@@ -57,6 +57,27 @@ inline op rand(out NUM, in NUM, in NUM) {
   $1 = $2 + ($3 - $2) * Parrot_float_rand(0);
 }
 
+=item B<srand>(in NUM)
+
+Set the random number seed to $1.
+
+=cut
+
+inline op srand(in NUM) {
+    Parrot_srand((FLOATVAL)$1);
+}
+
+=item B<srand>(in INT)
+
+Set the random number seed to $1.
+
+=cut
+
+inline op srand(in INT) {
+    Parrot_srand((INTVAL)$1);
+}
+
+
 =back
 
 =head1 COPYRIGHT
