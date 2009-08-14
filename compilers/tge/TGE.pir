@@ -115,12 +115,16 @@ applies to a child of the current node (generally inherited attributes).
 
 .namespace [ 'PGE';'Match' ]
 
+=over 4
+
 =item C<find_key([ key1, key2, ... ])>
 
 Find the first of C<key1>, C<key2>, etc. in the current
 Match object, and return it.  Returns '' if none of
 the specified keys are found.  If no keys are specified,
 then simply return the first key found.
+
+=back
 
 =cut
 
