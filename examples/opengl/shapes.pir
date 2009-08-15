@@ -405,15 +405,15 @@ ASCII key.
     random  = rand 0, 0.1
     z      += random
 
-    rand random
+    random  = rand
     random -= .5
     random *= .01
     vx     += random
-    random  = random
+    random  = rand
     random -= .5
     random *= .01
     vy     += random
-    random  = random
+    random  = rand
     random -= .5
     random *= .01
     vz     += random
