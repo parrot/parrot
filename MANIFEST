@@ -1445,7 +1445,6 @@ src/pmc/pccmethod_test.pmc                                  [devel]src
 src/pmc/pmc.num                                             []
 src/pmc/pmcproxy.pmc                                        [devel]src
 src/pmc/pointer.pmc                                         [devel]src
-src/pmc/random.pmc                                          [devel]src
 src/pmc/resizablebooleanarray.pmc                           [devel]src
 src/pmc/resizablefloatarray.pmc                             [devel]src
 src/pmc/resizableintegerarray.pmc                           [devel]src
@@ -1910,7 +1909,6 @@ t/pmc/pmc.t                                                 [test]
 t/pmc/pmcproxy.t                                            [test]
 t/pmc/pointer.t                                             [test]
 t/pmc/prop.t                                                [test]
-t/pmc/random.t                                              [test]
 t/pmc/resizablebooleanarray.t                               [test]
 t/pmc/resizablefloatarray.t                                 [test]
 t/pmc/resizableintegerarray.t                               [test]

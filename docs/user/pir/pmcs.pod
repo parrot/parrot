@@ -60,7 +60,6 @@ several interesting and useful PMC types:
     Iterator        iterate over aggregates such as arrays or hashes
     Array           A generic, resizable array
     Hash            A generic, resizable hash
-    Random          Obtain a random number
     String          Similar to a string register but in PMC form
     Integer         Similar to an int register but in PMC form
     Float           Similar to a num register but in PMC form
@@ -304,23 +303,7 @@ documentation to find out more about these (and other) PMCs.
 A good place to start is the docs directory in the Parrot
 distribution (parrot/docs)
 
-=head3 Example 7: Output random numbers
-
-=begin PIR
-
-    .sub _ :main
-        $P0 = new 'Random'
-        $N0 = $P0
-        print $N0
-        print "\n"
-        $N0 = $P0
-        print $N0
-        print "\n"
-    .end
-
-=end PIR
-
-=head3 Example 8: Triggering an exception
+=head3 Example 7: Triggering an exception
 
 =begin PIR
 
@@ -332,7 +315,7 @@ distribution (parrot/docs)
 
 =end PIR
 
-=head3 Example 9: Setting a timer
+=head3 Example 8: Setting a timer
 
 =begin PIR
 

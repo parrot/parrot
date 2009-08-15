@@ -142,9 +142,9 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Random PMCs are singletons" );
-    new P0, ['Random']
-    new P1, ['Random']
+pasm_output_is( <<'CODE', <<'OUTPUT', "Env PMCs are singletons" );
+    new P0, ['Env']
+    new P1, ['Env']
     eq_addr P0, P1, ok
     print "not the same "
 ok: print "ok\n"

@@ -24,6 +24,7 @@ ASCII key.
 =cut
 
 
+.loadlib 'math_ops'
 .include 'datatypes.pasm'
 .include 'opengl_defines.pasm'
 
@@ -396,31 +397,26 @@ ASCII key.
     vy = 0.135
     vz = 0.0
 
-    .local pmc random
-    .local num rand
-    random = new 'Random'
-    rand  = random
-    rand *= .1
-    x    += rand
-    rand  = random
-    rand *= .1
-    y    += rand
-    rand  = random
-    rand *= .1
-    z    += rand
+    .local num random
+    random  = rand 0, 0.1
+    x      += random
+    random  = rand 0, 0.1
+    y      += random
+    random  = rand 0, 0.1
+    z      += random
 
-    rand  = random
-    rand -= .5
-    rand *= .01
-    vx   += rand
-    rand  = random
-    rand -= .5
-    rand *= .01
-    vy   += rand
-    rand  = random
-    rand -= .5
-    rand *= .01
-    vz   += rand
+    rand random
+    random -= .5
+    random *= .01
+    vx     += random
+    random  = random
+    random -= .5
+    random *= .01
+    vy     += random
+    random  = random
+    random -= .5
+    random *= .01
+    vz     += random
 
     .local pmc pos
     pos = new 'FixedFloatArray'
@@ -457,12 +453,9 @@ ASCII key.
     .local int count
     count = pfx_pos
     if count > 1000 goto update_particles
-    .local pmc random
-    .local num rand
-    random = new 'Random'
-    rand   = random
-    rand  *= 4
-    if rand > dt goto update_particles
+    .local num random
+    random = rand 0, 4
+    if random > dt goto update_particles
     new_particle(count, pfx_pos, pfx_vel)
 
     # Update all particles

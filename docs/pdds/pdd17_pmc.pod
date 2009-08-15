@@ -1703,11 +1703,6 @@ when assigning a PMC using a WeakRegisterRef PMC, the register will be updated
 to reference that PMC rather than calling the assign v-table call on the PMC
 in that register. This is not the same behaviour as the Ref PMC.
 
-=item Random
-
-A singleton PMC that generates a random number. {{ NOTE: Why do we have
-this? }}
-
 =item Exception
 
 The base class for all exceptions. Currently based on

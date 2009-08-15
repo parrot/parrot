@@ -1,5 +1,5 @@
 ;;; pir-mode.el --- pir-mode.el --- editing IMCC source files under Emacs
-
+;;; $Id $
 ;;; Commentary:
 
 ;; This package provides Emacs support for PIR.
@@ -153,7 +153,7 @@ newline or semicolon after an end keyword."
     "ManagedStruct" "MultiSub" "NCI" "NameSpace" "Null"
     "OS" "Object" "OrderedHash" "PMCProxy" "ParrotClass"
     "ParrotIO" "ParrotInterpreter" "ParrotLibrary" "ParrotObject"
-    "ParrotRunningThread" "ParrotThread" "Pointer" "Random"
+    "ParrotRunningThread" "ParrotThread" "Pointer"
     "ResizableBooleanArray" "ResizableFloatArray" "ResizableIntegerArray"
     "ResizablePMCArray" "ResizableStringArray" "RetContinuation"
     "Role" "Scalar" "String" "Sub" "Super"

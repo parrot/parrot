@@ -123,6 +123,9 @@ CODE
 1
 OUTPUT
 
+{
+local $TODO = 'this tests singletons but was tied to the now-gone Random PMC';
+
 pasm_output_is( <<'CODE', <<OUTPUT, "vanishing slingleton PMC" );
 _main:
     .const 'Sub' P0 = "_rand"
@@ -152,6 +155,7 @@ err:
 CODE
 ok
 OUTPUT
+}
 
 pir_output_is( <<'CODE', <<OUTPUT, "vanishing return continuation in method calls" );
 .sub main :main
