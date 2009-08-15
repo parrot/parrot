@@ -124,7 +124,7 @@ typedef struct _gc_gms_gen {
 
 #endif /* PARROT_GC_GMS */
 
-#define GC_USE_LAZY_ALLOCATOR 1
+#define GC_USE_LAZY_ALLOCATOR 0
 
 typedef struct PMC_Attribute_Pool {
     size_t attr_size;
@@ -165,6 +165,10 @@ typedef struct Small_Object_Pool {
     size_t start_arena_memory;
     size_t end_arena_memory;
     PARROT_OBSERVER const char *name;
+#if GC_USE_LAZY_ALLOCATOR
+    void *newfree;
+    void *newlast;
+#endif
 #if PARROT_GC_GMS
     struct _gc_gms_hdr marker;          /* limit of list */
     struct _gc_gms_hdr *black;          /* alive */

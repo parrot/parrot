@@ -303,11 +303,12 @@ Parrot_gc_sweep_pool(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
     /* Run through all the buffer header pools and mark */
     for (cur_arena = pool->last_Arena; cur_arena; cur_arena = cur_arena->prev) {
+        const size_t objects_end = cur_arena->used;
         Buffer *b = (Buffer *)cur_arena->start_objects;
         UINTVAL i;
 
         /* loop only while there are objects in the arena */
-        for (i = cur_arena->total_objects; i; i--) {
+        for (i = objects_end; i; i--) {
 
             if (PObj_on_free_list_TEST(b))
                 ; /* if it's on free list, do nothing */
@@ -614,16 +615,24 @@ Parrot_add_to_free_list(PARROT_INTERP,
     const UINTVAL num_objects = pool->objects_per_alloc;
 
     pool->total_objects += num_objects;
-    arena->used          = num_objects;
-
-    /* Move all the new objects into the free list */
     object = (void *)arena->start_objects;
-
+#if GC_USE_LAZY_ALLOCATOR
+    /* Don't move anything onto the free list. Set the pointers and do it
+       lazily when we allocate. */
+    {
+        const size_t total_size = num_objects * pool->object_size;
+        pool->newfree = arena->start_objects;
+        pool->newlast = (void*)((char*)object + total_size);
+        arena->used = 0;
+    }
+#else
+    /* Move all the new objects into the free list */
+    arena->used          = num_objects;
     for (i = 0; i < num_objects; i++) {
         pool->add_free_object(interp, pool, object);
         object = (void *)((char *)object + pool->object_size);
     }
-
+#endif
     pool->num_free_objects += num_objects;
 }
 
@@ -868,6 +877,10 @@ new_small_object_pool(size_t object_size, size_t objects_per_alloc)
     pool->mem_pool          = NULL;
     pool->object_size       = object_size;
     pool->objects_per_alloc = objects_per_alloc;
+#if GC_USE_LAZY_ALLOCATOR
+    pool->newfree           = NULL;
+    pool->newlast           = NULL;
+#endif
 
     return pool;
 }
