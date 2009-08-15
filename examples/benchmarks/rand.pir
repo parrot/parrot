@@ -51,7 +51,7 @@ no_arg:
     if i > 0 goto null_loop_top
     tn1 = time
     tnull = tn1 - tn0
-    
+
     t0 = time
     i = count
   t0_top:

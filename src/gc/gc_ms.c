@@ -429,7 +429,7 @@ gc_ms_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
         ptr = (PObj *)pool->newfree;
         pool->newfree = (void *)((char *)pool->newfree + pool->object_size);
         arena->used++;
-        if(pool->newfree >= pool->newlast)
+        if (pool->newfree >= pool->newlast)
             pool->newfree = NULL;
         PARROT_ASSERT(ptr < pool->newlast);
     }
@@ -587,7 +587,7 @@ gc_ms_get_free_pmc_ext(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
         Small_Object_Arena * const arena = pool->last_Arena;
         ptr = (PMC_EXT *)pool->newfree;
         pool->newfree = (void *)((char *)pool->newfree + pool->object_size);
-        if(pool->newfree >= pool->newlast)
+        if (pool->newfree >= pool->newlast)
             pool->newfree = NULL;
         arena->used++;
         PARROT_ASSERT(ptr < pool->newlast);

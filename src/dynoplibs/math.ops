@@ -64,7 +64,7 @@ Set $1 to a integer between 0 and and $2, inclusive.
 =cut
 
 inline op rand(out INT, in INT) {
-  $1 = Parrot_range_rand(0,$2,0);
+  $1 = Parrot_range_rand(0, $2, 0);
 }
 
 =item B<rand>(out NUM, in NUM, in NUM)
@@ -104,7 +104,7 @@ Set $1 to a integer between $2 and and $3, inclusive.
 =cut
 
 inline op rand(out INT, in INT, in INT) {
-  $1 = Parrot_range_rand($2,$3,0);
+  $1 = Parrot_range_rand($2, $3, 0);
 }
 
 =back
