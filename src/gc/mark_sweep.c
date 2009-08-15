@@ -731,21 +731,6 @@ Parrot_gc_profile_end(PARROT_INTERP, int what)
     }
 }
 
-#ifndef GC_IS_MALLOC
-#  define PMC_HEADERS_PER_ALLOC    10240 / sizeof (PMC)
-#  define BUFFER_HEADERS_PER_ALLOC  5120 / sizeof (Buffer)
-#  define STRING_HEADERS_PER_ALLOC  5120 / sizeof (STRING)
-#else /* GC_IS_MALLOC */
-#  define PMC_HEADERS_PER_ALLOC    10240 / sizeof (PMC)
-#  define BUFFER_HEADERS_PER_ALLOC 10240 / sizeof (Buffer)
-#  define STRING_HEADERS_PER_ALLOC 10240 / sizeof (STRING)
-#endif /* GC_IS_MALLOC */
-
-#define CONSTANT_PMC_HEADERS_PER_ALLOC 64
-#define GET_SIZED_POOL_IDX(x) ((x) / sizeof (void *))
-
-
-
 /*
 
 =back

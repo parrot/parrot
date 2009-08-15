@@ -123,16 +123,6 @@ static int gc_ms_trace_active_PMCs(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-/* the percent of used Arena items at which to trace next time through */
-#define GC_DEBUG_REPLENISH_LEVEL_FACTOR        0.0
-#define GC_DEBUG_UNITS_PER_ALLOC_GROWTH_FACTOR 1
-#define REPLENISH_LEVEL_FACTOR                 0.3
-
-/* this factor is totally arbitrary, but gives good timings for stress.pasm */
-#define UNITS_PER_ALLOC_GROWTH_FACTOR          1.75
-
-#define POOL_MAX_BYTES                         65536 * 128
-
 /*
 
 =head2 Primary MS Functions
