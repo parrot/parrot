@@ -20,7 +20,7 @@ Tests math.ops
 .sub main :main
     .include 'test_more.pir'
     .include 'fp_equality.pasm'
-    plan(14)
+    plan(20)
     ok(1, "load math_ops")
     rand $I0
     test_2_arg_int()
@@ -29,6 +29,9 @@ Tests math.ops
     test_2_arg_num()
     test_3_arg_num()
     test_srand()
+    test_local_nums()
+    test_local_nums_2_arg()
+    test_local_ints()
 .end
 
 .sub test_2_arg_int
@@ -122,6 +125,57 @@ finish:
     srand 42.0
     rand $N1
     .fp_eq_ok($N0, $N1, 'having the same seed generates the same numbers')
+.end
+
+.sub test_local_nums_2_arg
+    .local num foo, bar
+    foo = rand 5.0, 25.0
+    lt foo, 5, fail1
+    ok(1, 'rand returns a number greater than or equal to 5')
+    goto upper
+fail1:
+    ok(0, 'rand returns a number greater than or equal to 5')
+upper:
+    gt foo, 25, fail2
+    ok(1, 'rand returns a number less than or equal to 25')
+    goto finish
+fail2:
+    ok(0, 'rand returns a number less than or equal to 25')
+finish:
+.end
+
+.sub test_local_nums
+    .local num foo, bar
+    foo = rand
+    lt foo, 0, fail1
+    ok(1, 'rand returns a number greater than or equal to 0')
+    goto upper
+fail1:
+    ok(0, 'rand returns a number greater than or equal to 0')
+upper:
+    gt foo, 1, fail2
+    ok(1, 'rand returns a number less than or equal to 1')
+    goto finish
+fail2:
+    ok(0, 'rand returns a number less than or equal to 1')
+finish:
+.end
+
+.sub test_local_ints
+    .local int foo, bar
+    foo = rand 5, 25
+    lt foo, 5, fail1
+    ok(1, 'rand returns a number greater than or equal to 5')
+    goto upper
+fail1:
+    ok(0, 'rand returns a number greater than or equal to 5')
+upper:
+    gt foo, 25, fail2
+    ok(1, 'rand returns a number less than or equal to 25')
+    goto finish
+fail2:
+    ok(0, 'rand returns a number less than or equal to 25')
+finish:
 .end
 
 # Local Variables:
