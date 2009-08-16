@@ -21,11 +21,13 @@ The vtable functions for the native C call functions.
 typedef INTVAL (*nci_sub_t)(PARROT_INTERP, PMC *);
 typedef INTVAL (*nci_jit_sub_t)(PARROT_INTERP, PMC *, char *);
 
-void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_info);
-void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_info) {
-    size_t  sig_length = Parrot_str_byte_length(interp, sig);
-    char   *param_sig  = mem_allocate_n_typed(sig_length, char);
-    size_t  j          = 0;
+void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_info, size_t sig_length);
+void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_info, size_t sig_length) {
+    char    param_buf[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    char   *param_sig    = sig_length <= 7
+                         ? param_buf
+                         : mem_allocate_n_typed(sig_length, char);
+    size_t  j            = 0;
     size_t  i;
 
     for (i = 1; i < sig_length; i++) {
@@ -73,6 +75,8 @@ void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_in
                 param_sig[j++] = 'S';
                 break;
             default:
+                if (sig_length > 7)
+                    mem_sys_free(param_sig);
                 Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_JIT_ERROR,
                     "Unknown param Signature %c\n", (char)c);
@@ -90,7 +94,8 @@ void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_in
     else
         nci_info->pcc_params_signature = CONST_STRING(interp, "");
 
-    mem_sys_free(param_sig);
+    if (sig_length > 7)
+        mem_sys_free(param_sig);
 }
 
 
@@ -176,8 +181,9 @@ Sets the specified function pointer and signature (C<*key>).
     }
 
     VTABLE void set_pointer_keyed_str(STRING *key, void *func) {
-        Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
-        int                             jitted = 0;
+        Parrot_NCI_attributes * const nci_info   = PARROT_NCI(SELF);
+        int                           jitted     = 0;
+        size_t                        key_length = Parrot_str_byte_length(interp, key);
 
         /* Store the original function and signature. */
         SET_ATTR_orig_func(INTERP, SELF, func);
@@ -185,21 +191,21 @@ Sets the specified function pointer and signature (C<*key>).
         /* ensure that the STRING signature is constant */
         if (!PObj_constant_TEST(key)) {
             char * const key_c = Parrot_str_to_cstring(INTERP, key);
-            key                = string_make(interp, key_c, strlen(key_c),
+            key                = string_make(interp, key_c, key_length,
                                     NULL, PObj_constant_FLAG);
             Parrot_str_free_cstring(key_c);
         }
 
         nci_info->signature  = key;
-        pcc_params(INTERP, key, nci_info);
+        pcc_params(INTERP, key, nci_info, key_length);
 
         /* Arity is length of that string minus one (the return type). */
-        nci_info->arity      = Parrot_str_byte_length(INTERP, key) - 1;
+        nci_info->arity      = key_length - 1;
 
         /* Build call function. */
         nci_info->func       = (PMC *)(build_call_func(INTERP, SELF,
                                             key, &jitted));
-        nci_info->jitted = jitted;
+        nci_info->jitted     = jitted;
     }
 
 /*
