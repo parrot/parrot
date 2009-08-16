@@ -46,14 +46,30 @@ BEGIN {
         plan skip_all => "pbc_dump hasn't been built. Run make parrot_utils";
         exit(0);
     }
-    plan tests => 4;
+    plan tests => 7;
 }
 
-dump_output_like( <<PIR, "pir", [qr/FIXUP_t/, qr/PIC_idx/, qr/CONSTANT_t/, qr/BYTECODE_t/], 'pbc_dump numeric');
+dump_output_like( <<PIR, "pir", [qr/FIXUP_t/, qr/PIC_idx/, qr/CONSTANT_t/, qr/BYTECODE_t/], 'pbc_dump basic sanity');
 .sub main :main
-    \$N3 = 3.14159
-    print \$N3
-    print "\\n"
+    \$I0 = 42
+.end
+PIR
+
+dump_output_like( <<PIR, "pir", qr/HEADER\s*=>\s*\[.*wordsize.*byteorder.*floattype.*parrot-version.*bytecode-version.*UUID.*\]/ms, 'pbc_dump HEADER sanity');
+.sub main :main
+    \$I0 = 42
+.end
+PIR
+
+dump_output_like( <<PIR, "pir", qr/DIRECTORY\s*=>\s*\[.*offs.*op_count.*itype.*id.*size.*segments/ms, 'pbc_dump DIRECTORY sanity');
+.sub main :main
+    \$I0 = 42
+.end
+PIR
+
+dump_output_like( <<PIR, "pir", qr/BYTECODE_t.*=>.*\[.*offs.*op_count.*itype.*id.*size.*mappings/ms, 'pbc_dump BYTECODE sanity');
+.sub main :main
+    \$I0 = 42
 .end
 PIR
 
