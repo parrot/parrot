@@ -275,7 +275,7 @@ require Exporter;
 require Test::Builder;
 require Test::More;
 
-our @EXPORT = qw( plan run_command skip slurp_file);
+our @EXPORT = qw( plan run_command skip slurp_file pbc_postprocess_output_like );
 
 use base qw( Exporter );
 
@@ -490,6 +490,59 @@ sub generate_languages_functions {
 
         *{ $package . '::' . $func } = $test_sub;
     }
+}
+
+=over
+
+=item "pbc_postprocess_output_like"
+
+Takes a path to binary which will post process PBC, a file to run, the extension
+of the file, one regex or an array reference of regexes,  and an optional
+diagnostic message. This function generates PBC for the input file, then post
+processes this with the binary and captures the output. The output is then
+verified to match the single or multiple regular expressions given.
+
+    my $postprocess = File::Spec->catfile( ".", "pbc_dump" );
+    my $file  = 'foo.pir';
+    my $ext   = 'pir';
+    my $check = [ qr/has a foo/, qr/and a bar/ ];
+    pbc_postprocess_output_like ( $postprocess,
+                                  $file, $ext, $check,
+                                  "checking pbc_dump"
+                                );
+
+=back
+
+=cut
+
+sub pbc_postprocess_output_like {
+    my ( $postprocess, $file, $ext, $check, $diag ) = @_;
+    my $testno   = $builder->current_test() + 1;
+    my $codefn   = "$0.$testno.$ext";
+    my $pbcfn    = "$0.$testno.pbc";
+    my $stdoutfn = "$0.$testno.stdout";
+    my $f        = IO::File->new(">$codefn");
+    my $parrot   = File::Spec->catfile( ".", $PConfig{test_prog} );
+    $f->print($file);
+    $f->close();
+    system("$parrot -o $pbcfn $codefn 2>&1");
+    system("$postprocess $pbcfn >$stdoutfn 2>&1");
+    $f = IO::File->new($stdoutfn);
+
+    my $output = join( '', <$f> );
+
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    unlink ($codefn, $pbcfn, $stdoutfn);
+    if (ref $check eq 'ARRAY') {
+        for my $regex (@$check) {
+            Test::More::like( $output, $regex, $diag );
+            $testno++;
+        }
+    }
+    else {
+        Test::More::like( $output, $check, $diag );
+    }
+
 }
 
 # The following methods are private.  They should not be used by modules
