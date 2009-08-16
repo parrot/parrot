@@ -344,11 +344,6 @@ Store the PMC C<val> into the namespace PMC C<namespace> with name C<globalname>
 Sets the value of a global called C<name> in the namespace C<namespace>.  Does
 nothing if the global is not found.
 
-=item C<Parrot_PMC Parrot_find_global_k(PARROT_INTERP, Parrot_PMC namespace_key, Parrot_String name)>
-
-Find and return a global called C<name> in the keyed namespace C<namespace>.
-Returns C<PMCNULL> if not found.
-
 =back
 
 =head3 Lexicals
