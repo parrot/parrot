@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 26;
 
 # test for GMP
 use Parrot::Config;
@@ -600,9 +600,73 @@ pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - basic arith" );
     say $N0
     $N0 -= $N0
     say $N0
+    $N0 *= -1
+    say $N0
+    $N0 *= 0
+    say $N0
+    $N0 += 5
+    say $N0
+    $N0 -= 42
+    say $N0
 .end
 CODE
 Inf
+NaN
+NaN
+NaN
+NaN
+NaN
+OUTPUT
+
+pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - exp" );
+.sub 'test' :main
+    $N0 = 'Inf'
+    $N1 = exp $N0
+    say $N1
+    $N0 = '-Inf'
+    $N1 = exp $N0
+    say $N1
+    $N0 = 'NaN'
+    $N1 = exp $N0
+    say $N1
+.end
+CODE
+Inf
+0
+NaN
+OUTPUT
+
+pir_output_is( <<'CODE', <<OUTPUT, "Inf - ln" );
+.sub 'test' :main
+    $N0 = 'Inf'
+    $N1 = ln $N0
+    say $N1
+    $N0 = '-Inf'
+    $N1 = ln $N0
+    say $N1
+.end
+CODE
+Inf
+NaN
+OUTPUT
+
+pir_output_is( <<'CODE', <<OUTPUT, "Mixing NaN and Inf should give NaN" );
+.sub 'test' :main
+    $N0 = 'NaN'
+    $N1 = 'Inf'
+    $N0 *= $N1
+    say $N0
+    $N0 /= $N1
+    say $N0
+    $N0 -= $N1
+    say $N0
+    $N0 += $N1
+    say $N0
+.end
+CODE
+NaN
+NaN
+NaN
 NaN
 OUTPUT
 
