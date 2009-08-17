@@ -1169,7 +1169,7 @@ dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
          * if we are running a different core, entries are
          * changed below
          */
-        new_evc_func_table[i] = interp->op_func_table[CORE_OPS_check_events__];
+        new_evc_func_table[i] = new_func_table[CORE_OPS_check_events__];
     }
 
     interp->evc_func_table  = new_evc_func_table;
@@ -1287,7 +1287,7 @@ dynop_register_xx(PARROT_INTERP,
         /* if not install wrappers */
         /* fill new entries with the wrapper op */
         for (i = n_old; i < n_tot; ++i)
-            ops_addr[i] = (cg_lib->op_func_table)[CORE_OPS_wrapper__];
+            ops_addr[i] = ops_addr[CORE_OPS_wrapper__];
     }
 
     /* if we are running this core, update event check ops */
