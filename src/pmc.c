@@ -242,18 +242,18 @@ pmc_reuse_no_init(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
     pmc->vtable = new_vtable;
 
     if (PMC_data(pmc) && pmc->vtable->attr_size) {
-#if 0
-        mem_sys_free(PMC_data(pmc));
-#else
+#if GC_USE_FIXED_SIZE_ALLOCATOR
         Parrot_gc_free_pmc_attributes(interp, pmc, pmc->vtable->attr_size);
+#else
+        mem_sys_free(PMC_data(pmc));
 #endif
     }
 
     if (new_vtable->attr_size) {
-#if 0
-        PMC_data(pmc) = mem_sys_allocate_zeroed(new_vtable->attr_size);
-#else
+#if GC_USE_FIXED_SIZE_ALLOCATOR
         Parrot_gc_allocate_pmc_attributes(interp, pmc, pmc->vtable->attr_size);
+#else
+        PMC_data(pmc) = mem_sys_allocate_zeroed(new_vtable->attr_size);
 #endif
 }
     else
@@ -380,10 +380,10 @@ pmc_reuse_check_pmc_ext(PARROT_INTERP, ARGMOD(PMC * pmc),
     INTVAL const has_ext = (PObj_is_PMC_EXT_TEST(pmc) && pmc->pmc_ext);
 
     if (PMC_data(pmc) && pmc->vtable->attr_size) {
-#if 0
-        mem_sys_free(PMC_data(pmc));
-#else
+#if GC_USE_FIXED_SIZE_ALLOCATOR
         Parrot_gc_free_pmc_attributes(interp, pmc, pmc->vtable->attr_size);
+#else
+        mem_sys_free(PMC_data(pmc));
 #endif
     }
 
@@ -492,10 +492,10 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
     pmc->vtable    = vtable;
 
     if (vtable->attr_size) {
-#if 0
-        PMC_data(pmc) = mem_sys_allocate_zeroed(vtable->attr_size);
-#else
+#if GC_USE_FIXED_SIZE_ALLOCATOR
         Parrot_gc_allocate_pmc_attributes(interp, pmc, pmc->vtable->attr_size);
+#else
+        PMC_data(pmc) = mem_sys_allocate_zeroed(vtable->attr_size);
 #endif
     }
 

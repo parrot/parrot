@@ -17,6 +17,10 @@
 
 #include "parrot/parrot.h"
 
+/* Set to 1 if we want to use the fixed-size allocator. Set to 0 if we want
+   to allocate these things using mem_sys_allocate instead */
+#define GC_USE_FIXED_SIZE_ALLOCATOR 1
+
 /*
  * we need an alignment that is the same as malloc(3) have for
  * allocating Buffer items like FLOATVAL (double)
