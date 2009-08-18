@@ -75,14 +75,12 @@ sub runstep {
     my $ccdlflags = $Config{ccdlflags};
     $ccdlflags =~ s/\s*-Wl,-rpath,\S*//g if $conf->options->get('disable-rpath');
 
-    (my $build_dir = abs_path($FindBin::Bin)) =~ s/([^-A-Za-z0-9_\/])/\\$1/g;
-
     # We need a Glossary somewhere!
     $conf->data->set(
         debugging => $conf->options->get('debugging') ? 1 : 0,
         optimize  => '',
         verbose   => $conf->options->get('verbose'),
-        build_dir => $build_dir,
+        build_dir => abs_path($FindBin::Bin),
         configured_from_file =>
             $conf->options->get('configured_from_file') || '',
         configuration_steps => ( join q{ } => $conf->get_list_of_steps() ),
