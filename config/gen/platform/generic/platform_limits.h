@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2008, Parrot Foundation.
+ * Copyright (C) 2009, Parrot Foundation.
  */
 
 #ifndef PARROT_PLATFORM_GENERIC_PLATFORM_LIMITS_GUARD
@@ -14,6 +14,11 @@
 
 /* LLONG_MAX doesn't appear to be provided for some compilers of Win64, so
    try to define them here. */
+#include "parrot/has_header.h"
+#if PARROT_HAS_HEADER_LIMITS
+#    include <limits.h>
+#endif
+
 #ifdef _MSC_VER
 #  ifndef LLONG_MAX
 #    define LLONG_MAX _I64_MAX
