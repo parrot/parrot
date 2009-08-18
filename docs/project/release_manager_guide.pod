@@ -365,7 +365,7 @@ The starred releases are Parrot's twice-yearly supported releases, see
 F<docs/project/support_policy.pod>.
 
  - Sept 15, 2009     - 1.6  - particle
- - Oct 20, 2009      - 1.7  -
+ - Oct 20, 2009      - 1.7  - dukeleto
  - Nov 17, 2009      - 1.8  -
  - Dec 15, 2009      - 1.9  -
  - Jan 19, 2010      - 2.0* -
