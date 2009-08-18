@@ -1,5 +1,33 @@
 # $Id$
 
+New in 1.5.0
+- Core
+  + Removed several deprecated functions and features
+  + Removed bsr, jsr, branch_cs, and ret opcodes
+  + Removed global stacks system
+  + Changed OPS file format to include explicit preamble
+  + Changed all "new 'Iterator'" instructions into 'iter' instructions
+  + Removed Configure.pl options for specifying non-working GC cores
+  + Removed unexecuting code as found by Coverity
+  + Improvements to the Parrot Debugger
+  + Added experimental fixed-size structure allocator to the GC
+  + Added experimental lazy arena allocation to the GC
+  + Removed the defunct PASM1 compiler object
+  + Refactored hashes, keys, and iterators
+  + Added "corevm" make target to build Parrot without all the supporting libraries
+  + Removed Random PMC type and added in a "rand" dynop
+  + Optimization and Improvements to the NCI thunk generator
+- Platforms
+  + Improved support for detecting Fink and Macports
+  + Updated search directories for libraries
+- Documentation
+  + "Parrot Developers Guide: PIR" released to publisher and available to purchase
+  + Improved documentation about Parrot Debugger
+  + Update PGE Documentation
+- Miscellaneous
+  + Added tests
+  + Fixes to code, documentation, and standards
+
 New in 1.4.0
 - Core
   + Key and Iterator refactor
