@@ -424,18 +424,21 @@ gc_ms_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
         (*pool->more_objects)(interp, pool);
         free_list = (PObj *)pool->free_list;
     }
+
     if (!free_list) {
         Small_Object_Arena * const arena = pool->last_Arena;
-        ptr = (PObj *)pool->newfree;
+        ptr           = (PObj *)pool->newfree;
         pool->newfree = (void *)((char *)pool->newfree + pool->object_size);
         arena->used++;
+
         if (pool->newfree >= pool->newlast)
             pool->newfree = NULL;
-        PARROT_ASSERT(ptr < pool->newlast);
+
+        PARROT_ASSERT(ptr < (PObj *)pool->newlast);
     }
     else {
-        ptr = free_list;
-        pool->free_list = ((GC_MS_PObj_Wrapper*)ptr)->next_ptr;
+        ptr             = free_list;
+        pool->free_list = ((GC_MS_PObj_Wrapper *)ptr)->next_ptr;
     }
 #else
     /* if we don't have any objects */
@@ -454,6 +457,7 @@ gc_ms_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
     return ptr;
 }
+
 
 /*
 
@@ -581,20 +585,23 @@ gc_ms_get_free_pmc_ext(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 #if GC_USE_LAZY_ALLOCATOR
     if (!free_list && !pool->newfree) {
         (*pool->more_objects)(interp, pool);
-        free_list = (PObj *)pool->free_list;
+        free_list = (PMC_EXT *)pool->free_list;
     }
+
     if (!free_list) {
         Small_Object_Arena * const arena = pool->last_Arena;
-        ptr = (PMC_EXT *)pool->newfree;
+
+        ptr           = (PMC_EXT *)pool->newfree;
         pool->newfree = (void *)((char *)pool->newfree + pool->object_size);
+
         if (pool->newfree >= pool->newlast)
             pool->newfree = NULL;
         arena->used++;
-        PARROT_ASSERT(ptr < pool->newlast);
+        PARROT_ASSERT(ptr < (PMC_EXT *)pool->newlast);
     }
     else {
-        ptr = free_list;
-        pool->free_list = ptr->_next_for_GC;
+        ptr               = free_list;
+        pool->free_list   = ptr->_next_for_GC;
         ptr->_next_for_GC = NULL;
     }
 #else
@@ -603,6 +610,7 @@ gc_ms_get_free_pmc_ext(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
         (*pool->more_objects)(interp, pool);
         free_list = (PMC_EXT *)pool->free_list;
     }
+
     ptr               = free_list;
     pool->free_list   = ptr->_next_for_GC;
     ptr->_next_for_GC = NULL;
@@ -612,6 +620,7 @@ gc_ms_get_free_pmc_ext(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
     return ptr;
 }
+
 
 /*
 
