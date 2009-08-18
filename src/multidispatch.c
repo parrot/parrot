@@ -816,8 +816,8 @@ Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 {
     ASSERT_ARGS(Parrot_mmd_get_cached_multi_sig)
     if (VTABLE_isa(interp, sub_pmc, CONST_STRING(interp, "Sub"))) {
-        Parrot_sub *sub;
-        PMC        *multi_sig;
+        Parrot_Sub_attributes *sub;
+        PMC                   *multi_sig;
 
         PMC_get_sub(interp, sub_pmc, sub);
         multi_sig = sub->multi_signature;
@@ -856,7 +856,7 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
 {
     ASSERT_ARGS(mmd_distance)
     PMC        *multi_sig, *mro;
-    Parrot_sub *sub;
+    Parrot_Sub_attributes *sub;
     INTVAL      args, dist, i, j, n, m;
 
     /* has to be a builtin multi method */
@@ -1261,7 +1261,7 @@ Parrot_mmd_add_multi_from_long_sig(PARROT_INTERP,
         ARGIN(STRING *sub_name), ARGIN(STRING *long_sig), ARGIN(PMC *sub_obj))
 {
     ASSERT_ARGS(Parrot_mmd_add_multi_from_long_sig)
-    Parrot_sub *sub;
+    Parrot_Sub_attributes *sub;
     STRING     *sub_str     = CONST_STRING(interp, "Sub");
     STRING     *closure_str = CONST_STRING(interp, "Closure");
     PMC        *type_list   = Parrot_str_split(interp, CONST_STRING(interp, ","), long_sig);

@@ -105,7 +105,7 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
 {
     ASSERT_ARGS(trace_pmc_dump)
     Interp * const debugger = debugger_or_interp(interp);
-    Parrot_sub    *sub;
+    Parrot_Sub_attributes    *sub;
 
     if (!pmc) {
         Parrot_io_eprintf(debugger, "(null)");

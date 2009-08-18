@@ -457,7 +457,7 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                     case enum_class_Sub:
                     case enum_class_Coroutine:
                         {
-                        Parrot_sub *sub;
+                        Parrot_Sub_attributes *sub;
                         PMC_get_sub(interp, copy->u.key, sub);
                         sub->start_offs += inputs[i]->code_start;
                         sub->end_offs += inputs[i]->code_start;

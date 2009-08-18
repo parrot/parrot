@@ -781,7 +781,7 @@ sub, or for the point of the call a level deeper for the rest.
             while (cur_ctx) {
                 PMC        *frame       = pmc_new(interp, enum_class_Hash);
                 PMC        *annotations = NULL;
-                Parrot_sub *sub;
+                Parrot_Sub_attributes *sub;
 
                 /* Get sub and put it in the hash. */
                 PMC *sub_pmc = cur_ctx->current_sub;

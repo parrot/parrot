@@ -50,7 +50,7 @@ ns_insert_sub_keyed_str(PARROT_INTERP, PMC *self, STRING *key, PMC *value)
     PMC              *       vtable   = nsinfo->vtable;
     PMC              * const classobj = VTABLE_get_class(interp, self);
     STRING           * vtable_key     = NULL;
-    Parrot_sub              *sub;
+    Parrot_Sub_attributes *sub;
 
     PMC_get_sub(interp, value, sub);
 
@@ -276,7 +276,7 @@ really a public API.
 
                 /* Extract the first alternate and check if it is a method */
                 PMC *pmc_sub = VTABLE_get_pmc_keyed_int(interp, value, 0);
-                Parrot_sub *sub;
+                Parrot_Sub_attributes *sub;
                 PMC_get_sub(INTERP, pmc_sub, sub);
 
                 if (sub->comp_flags & SUB_COMP_FLAG_METHOD) {

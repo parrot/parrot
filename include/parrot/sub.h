@@ -136,37 +136,6 @@ typedef struct Parrot_sub_arginfo {
     Parrot_UInt1 named_slurpy;
 } Parrot_sub_arginfo;
 
-
-typedef struct Parrot_sub {
-    PackFile_ByteCode *seg;     /* bytecode segment */
-    size_t   start_offs;        /* sub entry in ops from seg->base.data */
-    size_t   end_offs;
-
-    INTVAL   HLL_id;             /* see src/hll.c XXX or per segment? */
-    PMC      *namespace_name;    /* where this Sub is in - this is either
-                                  * a String or a [Key] and describes
-                                  * the relative path in the NameSpace
-                                  */
-    PMC      *namespace_stash;   /* the actual hash, HLL::namespace */
-    STRING   *name;              /* name of the sub */
-    STRING   *method_name;       /* method name of the sub */
-    STRING   *ns_entry_name;     /* ns entry name of the sub */
-    STRING   *subid;             /* The ID of the sub. */
-    INTVAL   vtable_index;       /* index in Parrot_vtable_slot_names */
-    PMC      *multi_signature;   /* list of types for MMD */
-    INTVAL   n_regs_used[4];     /* INSP in PBC */
-
-    PMC      *lex_info;          /* LexInfo PMC */
-    PMC      *outer_sub;         /* :outer for closures */
-    PMC      *eval_pmc;          /* eval container / NULL */
-    Parrot_Context *ctx;         /* the context this sub is in */
-    UINTVAL  comp_flags;         /* compile time and additional flags */
-    Parrot_sub_arginfo *arg_info;/* Argument counts and flags. */
-
-    /* - end common */
-    struct Parrot_Context *outer_ctx;   /* outer context, if a closure */
-} Parrot_sub;
-
 #define PMC_get_sub(interp, pmc, sub) \
     do { \
         const INTVAL type = (pmc)->vtable->base_type; \
@@ -174,47 +143,13 @@ typedef struct Parrot_sub {
             type == enum_class_Coroutine || \
             type == enum_class_Eval)  \
         {\
-            GETATTR_Sub_sub((interp), (pmc), (sub)); \
+            (sub) = PARROT_SUB((pmc)); \
         } \
         else { \
-            (sub) = Parrot_get_sub_pmc_from_subclass((interp), (pmc)); \
+            (sub) = (Parrot_Sub_attributes*)Parrot_get_sub_pmc_from_subclass((interp), (pmc)); \
         } \
     } while (0)
 
-/* the first entries must match Parrot_sub, so we can cast
- * these two to the other type
- */
-typedef struct Parrot_coro {
-    PackFile_ByteCode *seg;      /* bytecode segment */
-    size_t   start_offs;         /* sub entry in ops from seg->base.data */
-    size_t   end_offs;
-
-    INTVAL   HLL_id;             /* see src/hll.c XXX or per segment? */
-    PMC      *_namespace;        /* where this Sub is in - this is either
-                                  * a String or a [Key] and describes
-                                  * the relative path in the NameSpace
-                                  */
-    PMC      *namespace_stash;   /* the actual hash, HLL::namespace */
-    STRING   *name;              /* name of the sub */
-    STRING   *method_name;       /* method name of the sub */
-    STRING   *ns_entry_name;     /* ns entry name of the sub */
-    STRING   *subid;             /* The ID of the sub. */
-    INTVAL   vtable_index;       /* index in Parrot_vtable_slot_names */
-    PMC      *multi_signature;   /* list of types for MMD */
-    INTVAL   n_regs_used[4];     /* INSP in PBC */
-
-    PMC      *lex_info;          /* LexInfo PMC */
-    PMC      *outer_sub;         /* :outer for closures */
-    PMC      *eval_pmc;          /* eval container / NULL */
-    struct Parrot_Context  *ctx; /* coroutine context */
-    UINTVAL  comp_flags;         /* compile time and additional flags */
-    Parrot_sub_arginfo arg_info; /* Argument counts and flags. */
-
-    /* - end common */
-
-    PackFile_ByteCode *caller_seg;  /* bytecode segment */
-    opcode_t *address;           /* next address to run - toggled each time */
-} Parrot_coro;
 
 typedef struct Parrot_cont {
     /* continuation destination */
@@ -276,8 +211,7 @@ STRING* Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub_pmc))
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-Parrot_sub * Parrot_get_sub_pmc_from_subclass(PARROT_INTERP,
-    ARGIN(PMC *subclass))
+void * Parrot_get_sub_pmc_from_subclass(PARROT_INTERP, ARGIN(PMC *subclass))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -307,17 +241,7 @@ Parrot_cont * new_continuation(PARROT_INTERP,
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-Parrot_coro * new_coroutine(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
 Parrot_cont * new_ret_continuation(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Parrot_sub * new_sub(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 void Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
@@ -374,11 +298,7 @@ PMC* Parrot_find_pad(PARROT_INTERP,
 #define ASSERT_ARGS_mark_context_start __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_new_continuation __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_new_coroutine __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_new_ret_continuation __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_new_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_capture_lex __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \

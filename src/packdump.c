@@ -269,7 +269,7 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
         Parrot_io_printf(interp, "    [ 'PFC_PMC', {\n");
         {
             PMC * const pmc = self->u.key;
-            Parrot_sub *sub;
+            Parrot_Sub_attributes *sub;
             STRING * const null = Parrot_str_new_constant(interp, "(null)");
             STRING *namespace_description;
 

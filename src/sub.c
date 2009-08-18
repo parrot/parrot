@@ -127,28 +127,6 @@ mark_context(PARROT_INTERP, ARGMOD(Parrot_Context* ctx))
 
 /*
 
-=item C<Parrot_sub * new_sub(PARROT_INTERP)>
-
-Returns a new C<Parrot_sub>.
-
-=cut
-
-*/
-
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Parrot_sub *
-new_sub(PARROT_INTERP)
-{
-    ASSERT_ARGS(new_sub)
-    /* Using system memory until I figure out GC issues */
-    Parrot_sub * const newsub = mem_allocate_zeroed_typed(Parrot_sub);
-    newsub->seg               = interp->code;
-    return newsub;
-}
-
-/*
-
 =item C<Parrot_cont * new_continuation(PARROT_INTERP, const Parrot_cont *to)>
 
 Returns a new C<Parrot_cont> to the context of C<to> with its own copy of the
@@ -209,32 +187,6 @@ new_ret_continuation(PARROT_INTERP)
     cc->current_results = NULL;
     cc->address         = NULL;
     return cc;
-}
-
-/*
-
-=item C<Parrot_coro * new_coroutine(PARROT_INTERP)>
-
-Returns a new C<Parrot_coro>.
-
-XXX: Need to document semantics in detail.
-
-=cut
-
-*/
-
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-Parrot_coro *
-new_coroutine(PARROT_INTERP)
-{
-    ASSERT_ARGS(new_coroutine)
-    Parrot_coro * const co = mem_allocate_zeroed_typed(Parrot_coro);
-
-    co->seg                = interp->code;
-    co->ctx                = NULL;
-
-    return co;
 }
 
 /*
@@ -312,7 +264,7 @@ Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub_pmc))
 {
     ASSERT_ARGS(Parrot_full_sub_name)
     if (sub_pmc && VTABLE_defined(interp, sub_pmc)) {
-        Parrot_sub *sub;
+        Parrot_Sub_attributes *sub;
 
         PMC_get_sub(interp, sub_pmc, sub);
 
@@ -381,7 +333,7 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(const Parrot_Context *ctx),
                     ARGOUT(Parrot_Context_info *info))
 {
     ASSERT_ARGS(Parrot_Context_get_info)
-    Parrot_sub *sub;
+    Parrot_Sub_attributes *sub;
 
     /* set file/line/pc defaults */
     info->file     = CONST_STRING(interp, "(unknown file)");
@@ -550,8 +502,8 @@ Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
 {
     ASSERT_ARGS(Parrot_capture_lex)
     Parrot_Context * const ctx          = CONTEXT(interp);
-    Parrot_sub            *current_sub;
-    Parrot_sub            *sub;
+    Parrot_Sub_attributes *current_sub;
+    Parrot_Sub_attributes *sub;
     Parrot_Context        *old;
 
     PMC_get_sub(interp, ctx->current_sub, current_sub);
@@ -564,7 +516,7 @@ Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
         while (VTABLE_get_bool(interp, iter)) {
 
             PMC        * const child_pmc = VTABLE_shift_pmc(interp, iter);
-            Parrot_sub        *child_sub, *child_outer_sub;
+            Parrot_Sub_attributes *child_sub, *child_outer_sub;
 
             PMC_get_sub(interp, child_pmc, child_sub);
 
@@ -702,8 +654,7 @@ Parrot_continuation_rewind_environment(PARROT_INTERP, SHIM(PMC *pmc),
 
 /*
 
-=item C<Parrot_sub * Parrot_get_sub_pmc_from_subclass(PARROT_INTERP, PMC
-*subclass)>
+=item C<void * Parrot_get_sub_pmc_from_subclass(PARROT_INTERP, PMC *subclass)>
 
 Gets a Parrot_sub structure from something that isn't a Sub PMC, but rather a
 subclass.
@@ -714,19 +665,18 @@ subclass.
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-Parrot_sub *
+void *
 Parrot_get_sub_pmc_from_subclass(PARROT_INTERP, ARGIN(PMC *subclass)) {
     ASSERT_ARGS(Parrot_get_sub_pmc_from_subclass)
     PMC        *key, *sub_pmc;
-    Parrot_sub *sub;
+    Parrot_Sub_attributes *sub;
 
     /* Ensure we really do have a subclass of sub. */
     if (VTABLE_isa(interp, subclass, CONST_STRING(interp, "Sub"))) {
         /* If it's actually a PMC still, probably does the same structure
          * underneath. */
         if (!PObj_is_object_TEST(subclass)) {
-            GETATTR_Sub_sub(interp, subclass, sub);
-            return sub;
+            return PARROT_SUB(subclass);
         }
 
         /* Get the Sub PMC itself. */
@@ -734,8 +684,7 @@ Parrot_get_sub_pmc_from_subclass(PARROT_INTERP, ARGIN(PMC *subclass)) {
         VTABLE_set_string_native(interp, key, CONST_STRING(interp, "Sub"));
         sub_pmc = VTABLE_get_attr_keyed(interp, subclass, key, CONST_STRING(interp, "proxy"));
         if (sub_pmc->vtable->base_type == enum_class_Sub) {
-            GETATTR_Sub_sub(interp, sub_pmc, sub);
-            return sub;
+            return PARROT_SUB(sub_pmc);
         }
     }
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,

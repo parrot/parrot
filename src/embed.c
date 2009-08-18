@@ -885,7 +885,7 @@ static PMC*
 set_current_sub(PARROT_INTERP)
 {
     ASSERT_ARGS(set_current_sub)
-    Parrot_sub *sub_pmc_sub;
+    Parrot_Sub_attributes *sub_pmc_sub;
     PMC        *sub_pmc;
 
     PackFile_ByteCode   * const cur_cs = interp->code;
@@ -903,7 +903,7 @@ set_current_sub(PARROT_INTERP)
         if (ft->fixups[i]->type == enum_fixup_sub) {
             const opcode_t ci      = ft->fixups[i]->offset;
             PMC           *sub_pmc = ct->constants[ci]->u.key;
-            Parrot_sub    *sub;
+            Parrot_Sub_attributes *sub;
 
             PMC_get_sub(interp, sub_pmc, sub);
             if (sub->seg == cur_cs) {

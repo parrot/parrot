@@ -585,7 +585,7 @@ Parrot_free_context(PARROT_INTERP, ARGMOD(Parrot_Context *ctx), int deref)
         if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)
             && ctx->current_sub) {
             /* can't probably Parrot_io_eprintf here */
-            Parrot_sub *doomed;
+            Parrot_Sub_attributes *doomed;
             PMC_get_sub(interp, ctx->current_sub, doomed);
 
             if (doomed) {
@@ -670,7 +670,7 @@ Parrot_context_ref_trace(PARROT_INTERP, ARGMOD(Parrot_Context *ctx),
         const char *name = "unknown";
 
         if (ctx->current_sub) {
-            Parrot_sub *sub;
+            Parrot_Sub_attributes *sub;
             PMC_get_sub(interp, ctx->current_sub, sub);
             name = (char *)(sub->name->strstart);
         }

@@ -693,7 +693,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
     IMCC_pop_parser_state(interp, yyscanner);
 
     if (!IMCC_INFO(interp)->error_code) {
-        Parrot_sub *sub_data;
+        Parrot_Sub_attributes *sub_data;
 
         /*
          * create sub PMC

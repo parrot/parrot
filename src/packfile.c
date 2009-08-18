@@ -618,7 +618,7 @@ sub_pragma(PARROT_INTERP, pbc_action_enum_t action, ARGIN(const PMC *sub_pmc))
      * These casts are a quick fix to allow parrot build with c++,
      * a refactor of the macros will be a cleaner solution.  */
     DECL_CONST_CAST;
-    Parrot_sub *sub;
+    Parrot_Sub_attributes *sub;
     int         todo    = 0;
     const int   pragmas = PObj_get_FLAGS(sub_pmc) &  SUB_FLAG_PF_MASK
                                                   & ~SUB_FLAG_IS_OUTER;
@@ -707,7 +707,7 @@ static PMC*
 do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), pbc_action_enum_t action)
 {
     ASSERT_ARGS(do_1_sub_pragma)
-    Parrot_sub *sub;
+    Parrot_Sub_attributes *sub;
     PMC_get_sub(interp, sub_pmc, sub);
 
     switch (action) {
@@ -922,7 +922,7 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
             {
                 /* offset is an index into const_table holding the Sub PMC */
                 PMC           *sub_pmc;
-                Parrot_sub    *sub;
+                Parrot_Sub_attributes    *sub;
                 const opcode_t ci = ft->fixups[i]->offset;
 
                 if (ci < 0 || ci >= ct->const_count)
@@ -3119,7 +3119,7 @@ clone_constant(PARROT_INTERP, ARGIN(PackFile_Constant *old_const))
     if (old_const->type == PFC_PMC
     &&  VTABLE_isa(interp, old_const->u.key, _sub)) {
         PMC        *old_sub_pmc, *new_sub_pmc;
-        Parrot_sub *old_sub,     *new_sub;
+        Parrot_Sub_attributes *old_sub,     *new_sub;
         PackFile_Constant * const ret = mem_allocate_typed(PackFile_Constant);
 
         ret->type = old_const->type;

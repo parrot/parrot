@@ -718,7 +718,7 @@ static PMC *
 get_namespace_pmc(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 {
     ASSERT_ARGS(get_namespace_pmc)
-    Parrot_sub *sub;
+    Parrot_Sub_attributes *sub;
     PMC        *nsname, *nsroot;
 
     PMC_get_sub(interp, sub_pmc, sub);
@@ -752,7 +752,7 @@ static void
 store_sub_in_multi(PARROT_INTERP, ARGIN(PMC *sub_pmc), ARGIN(PMC *ns))
 {
     ASSERT_ARGS(store_sub_in_multi)
-    Parrot_sub *sub;
+    Parrot_Sub_attributes *sub;
     STRING     *ns_entry_name;
     PMC        *multisub;
 
@@ -791,7 +791,7 @@ Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub_pmc))
     const INTVAL cur_id = CONTEXT(interp)->current_HLL;
 
     PMC        *ns;
-    Parrot_sub *sub;
+    Parrot_Sub_attributes *sub;
 
     /* PF structures aren't fully constructed yet */
     Parrot_block_GC_mark(interp);

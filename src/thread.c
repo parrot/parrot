@@ -201,7 +201,7 @@ make_local_copy(PARROT_INTERP, ARGIN(Parrot_Interp from), ARGIN(PMC *arg))
          * working as one might expect mainly because the segment is
          * not correctly copied
          */
-        Parrot_sub     *ret_val_sub, *arg_sub;
+        Parrot_Sub_attributes *ret_val_sub, *arg_sub;
 
         ret_val               = Parrot_clone(interp, arg);
         PMC_get_sub(interp, ret_val, ret_val_sub);
@@ -632,7 +632,7 @@ pt_ns_clone(PARROT_INTERP, ARGOUT(Parrot_Interp d), ARGOUT(PMC *dest_ns),
 
             if (PMC_IS_NULL(dval)) {
                 PMC * const copy = make_local_copy(d, s, val);
-                Parrot_sub *val_sub;
+                Parrot_Sub_attributes *val_sub;
 
                 if (val->vtable->base_type == enum_class_Sub)
                     PMC_get_sub(interp, val, val_sub);

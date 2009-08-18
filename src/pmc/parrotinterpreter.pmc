@@ -540,9 +540,9 @@ Introspection interface. C<key> can be:
             }
             if (!PMC_IS_NULL(sub_pmc)
             &&   sub_pmc->vtable->base_type == enum_class_Sub) {
-                Parrot_sub        *sub;
-                PackFile_ByteCode *seg;
-                opcode_t          *pc  = ctx->current_pc;
+                Parrot_Sub_attributes *sub;
+                PackFile_ByteCode     *seg;
+                opcode_t              *pc  = ctx->current_pc;
 
                 PMC_get_sub(interp, sub_pmc, sub);
                 seg = sub->seg;
