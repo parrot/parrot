@@ -17,6 +17,9 @@ New in 1.5.0
   + Added "corevm" make target to build Parrot without all the supporting libraries
   + Removed Random PMC type and added in a "rand" dynop
   + Optimization and Improvements to the NCI thunk generator
+  + New include file libpaths.pasm
+- Compilers
+  + Multiple .local with same name and different type is now an error on IMCC.
 - Platforms
   + Improved support for detecting Fink and Macports
   + Updated search directories for libraries
