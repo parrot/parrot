@@ -186,6 +186,10 @@ EOF
         $struct .= "    $entry->[1]_method_t $entry->[1];\n";
     }
 
+    $struct .= <<'EOF';
+    UINTVAL attr_size;      /* Size of the attributes struct */
+EOF
+
     $struct .= "} _vtable;\n";
 
     return $struct;

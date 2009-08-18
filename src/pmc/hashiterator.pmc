@@ -75,7 +75,7 @@ advance_to_next(PARROT_INTERP, PMC *self) {
     return bucket;
 }
 
-pmclass HashIterator extends Iterator no_ro {
+pmclass HashIterator extends Iterator no_ro auto_attrs {
     ATTR PMC        *pmc_hash;      /* the Hash which this Iterator iterates */
     ATTR Hash       *parrot_hash;   /* Underlying implementation of hash */
     ATTR HashBucket *bucket;        /* Current bucket */
@@ -96,7 +96,7 @@ Defaults iteration mode to iterate from start.
 
     VTABLE void init_pmc(PMC *hash) {
         Parrot_HashIterator_attributes * const attrs =
-            mem_allocate_zeroed_typed(Parrot_HashIterator_attributes);
+            (Parrot_HashIterator_attributes *) PMC_data(SELF);
 
         attrs->pmc_hash         = hash;
         attrs->parrot_hash      = (Hash*)VTABLE_get_pointer(INTERP, hash);
@@ -106,28 +106,12 @@ Defaults iteration mode to iterate from start.
         /* Will be decreased on initial advance_to_next */
         /* XXX Do we really need to support this use-case ? */
         attrs->elements         = attrs->parrot_hash->entries + 1;
-        PMC_data(SELF)          = attrs;
 
-        PObj_custom_mark_destroy_SETALL(SELF);
+        PObj_custom_mark_SET(SELF);
 
         /* Initial state of iterator is "before start" */
         /* So, advance to first element */
         advance_to_next(INTERP, SELF);
-    }
-
-/*
-
-=item C<void destroy()>
-
-destroys this PMC
-
-=cut
-
-*/
-
-    VTABLE void destroy() {
-        mem_sys_free(PMC_data(SELF));
-        PMC_data(SELF) = NULL;
     }
 
 /*

@@ -20,24 +20,8 @@ conversions.
 
 */
 
-pmclass ResizableIntegerArray extends FixedIntegerArray need_ext provides array {
+pmclass ResizableIntegerArray extends FixedIntegerArray need_ext auto_attrs provides array {
     ATTR INTVAL resize_threshold; /* max size before array needs to be resized */
-
-/*
-
-=item C<void init()>
-
-Initializes the array.
-
-=cut
-
-*/
-    VTABLE void init() {
-        Parrot_ResizableIntegerArray_attributes* attrs =
-            mem_allocate_zeroed_typed(Parrot_ResizableIntegerArray_attributes);
-        PMC_data(SELF) = attrs;
-        PObj_active_destroy_SET(SELF);
-    }
 
 /*
 

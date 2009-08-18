@@ -22,7 +22,7 @@ C<struct> values that Parrot is responsible for disposing of.
 typedef void (*custom_free_func_t)(PARROT_INTERP, void *ptr, void *priv);
 typedef PMC * (*custom_clone_func_t)(PARROT_INTERP, PMC *ptr, void *priv);
 
-pmclass ManagedStruct extends UnManagedStruct need_ext {
+pmclass ManagedStruct extends UnManagedStruct need_ext auto_attrs {
     /* if custom_free_func and ptr (inherited from UnManagedStruct) are both set,
      * custom_free_func is called before the normal destroy() function does any
      * work.
@@ -46,11 +46,7 @@ Initializes an empty struct.
 */
 
     VTABLE void init() {
-        Parrot_ManagedStruct_attributes *attrs =
-            mem_allocate_zeroed_typed(Parrot_ManagedStruct_attributes);
         PObj_active_destroy_SET(SELF);
-        PMC_data(SELF) = attrs;
-
     }
 
 /*
@@ -91,8 +87,6 @@ Otherwise, mem_sys_free() is used.
             } else
                 mem_sys_free(ptr);
         }
-        mem_sys_free(PMC_data(SELF));
-        PMC_data(SELF) = NULL;
     }
 
 /*

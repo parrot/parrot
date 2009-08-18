@@ -443,7 +443,7 @@ calculate_mro(PARROT_INTERP, PMC *SELF, INTVAL num_parents)
 */
 
 pmclass Class
-    need_ext {
+    need_ext auto_attrs {
 
     ATTR INTVAL id;             /* The type number of the PMC. [deprecated: See RT #48024] */
     ATTR STRING *name;          /* The name of the class. */
@@ -479,14 +479,13 @@ arguments. The class is attached to the current HLL namespace.
 */
 
     VTABLE void init() {
-        Parrot_Class_attributes * const _class = mem_allocate_zeroed_typed(Parrot_Class_attributes);
+        Parrot_Class_attributes * const _class =
+                (Parrot_Class_attributes *) PMC_data(SELF);
 
-        /* Set flags for custom GC mark and destroy. */
+        /* Set flag for custom GC mark. */
         PObj_custom_mark_SET(SELF);
-        PObj_active_destroy_SET(SELF);
 
         /* Set up the object. */
-        PMC_data(SELF)          = _class;
         _class->name            = CONST_STRING(interp, "");
         _class->_namespace      = PMCNULL;
         _class->parents         = pmc_new(interp, enum_class_ResizablePMCArray);
@@ -555,21 +554,6 @@ arguments. The class is attached to the current HLL namespace.
 
         /* Initialize the class with the supplied data. */
         init_class_from_hash(interp, SELF, arg);
-    }
-
-/*
-
-=item C<void destroy()>
-
-Frees the memory associated with the class's underlying struct.
-
-=cut
-
-*/
-
-    VTABLE void destroy() {
-        mem_sys_free(PMC_data(SELF));
-        PMC_data(SELF) = NULL;
     }
 
 /*

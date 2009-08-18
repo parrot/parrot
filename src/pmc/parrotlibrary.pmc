@@ -31,7 +31,7 @@ a ParrotLibrary PMC.
 #define PMC_dlhandle(x) ((Parrot_ParrotLibrary_attributes*)PMC_data(x))->dl_handle
 #define PMC_oplib_init(x) ((Parrot_ParrotLibrary_attributes*)PMC_data(x))->oplib_init
 
-pmclass ParrotLibrary need_ext provides library {
+pmclass ParrotLibrary need_ext auto_attrs provides library {
     ATTR void * dl_handle;  /* DLL handle */
     ATTR void * oplib_init; /* oplib init function */
 
@@ -46,9 +46,6 @@ Initializes the library with a C<NULL> oplib init function.
 */
 
     VTABLE void init() {
-        Parrot_ParrotLibrary_attributes * const attrs =
-            mem_allocate_zeroed_typed(Parrot_ParrotLibrary_attributes);
-        PMC_data(SELF) = attrs;
         PObj_active_destroy_SET(SELF);
     }
 
@@ -66,8 +63,6 @@ Destroys the library, closing the shared library.
         void *dl_handle = PMC_dlhandle(SELF);
         if (dl_handle)
             Parrot_dlclose(dl_handle);
-        mem_sys_free(PMC_data(SELF));
-        PMC_data(SELF) = NULL;
     }
 
 

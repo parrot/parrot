@@ -241,6 +241,24 @@ pmc_reuse_no_init(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
     /* Set the right vtable */
     pmc->vtable = new_vtable;
 
+    if (PMC_data(pmc) && pmc->vtable->attr_size) {
+#if 0
+        mem_sys_free(PMC_data(pmc));
+#else
+        Parrot_gc_free_pmc_attributes(interp, pmc, pmc->vtable->attr_size);
+#endif
+    }
+
+    if (new_vtable->attr_size) {
+#if 0
+        PMC_data(pmc) = mem_sys_allocate_zeroed(new_vtable->attr_size);
+#else
+        Parrot_gc_allocate_pmc_attributes(interp, pmc, pmc->vtable->attr_size);
+#endif
+}
+    else
+        PMC_data(pmc) = NULL;
+
     return pmc;
 }
 
@@ -361,6 +379,14 @@ pmc_reuse_check_pmc_ext(PARROT_INTERP, ARGMOD(PMC * pmc),
     /* Do we have an extension area? */
     INTVAL const has_ext = (PObj_is_PMC_EXT_TEST(pmc) && pmc->pmc_ext);
 
+    if (PMC_data(pmc) && pmc->vtable->attr_size) {
+#if 0
+        mem_sys_free(PMC_data(pmc));
+#else
+        Parrot_gc_free_pmc_attributes(interp, pmc, pmc->vtable->attr_size);
+#endif
+    }
+
     /* Do we need one? */
     if (flags & VTABLE_PMC_NEEDS_EXT) {
         /* If we need an ext area, go allocate one */
@@ -464,6 +490,14 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
 
     pmc            = Parrot_gc_new_pmc_header(interp, flags);
     pmc->vtable    = vtable;
+
+    if (vtable->attr_size) {
+#if 0
+        PMC_data(pmc) = mem_sys_allocate_zeroed(vtable->attr_size);
+#else
+        Parrot_gc_allocate_pmc_attributes(interp, pmc, pmc->vtable->attr_size);
+#endif
+    }
 
 #if GC_VERBOSE
     if (Interp_flags_TEST(interp, PARROT_TRACE_FLAG)) {

@@ -27,7 +27,7 @@ information for a multiple dispatch call.
     if (!PARROT_CAPTURE(obj)->hash) \
         PARROT_CAPTURE(obj)->hash = pmc_new((i), enum_class_Hash);
 
-pmclass CallSignature extends Capture need_ext provides array provides hash {
+pmclass CallSignature extends Capture need_ext auto_attrs provides array provides hash {
     ATTR PMC    *returns;    /* Result PMCs, if they were passed with the call */
     ATTR PMC    *type_tuple; /* Cached argument types for multiple dispatch */
     ATTR STRING *short_sig;  /* Simple string signature args & returns */
@@ -44,16 +44,10 @@ Initializes a newly created CallSignature object.
 
     VTABLE void init() {
         Parrot_CallSignature_attributes * const sig_struct =
-            mem_allocate_typed(Parrot_CallSignature_attributes);
-        PMC_data(SELF)         = sig_struct;
-        sig_struct->short_sig  = NULL;
+            (Parrot_CallSignature_attributes *) PMC_data(SELF);
+        SUPER();
         sig_struct->type_tuple = PMCNULL;
         sig_struct->returns    = PMCNULL;
-        sig_struct->array      = NULL;
-        sig_struct->hash       = NULL;
-        sig_struct->data_size  = CAPTURE_DATA_SIZE;
-        PObj_active_destroy_SET(SELF);
-        PObj_custom_mark_SET(SELF);
     }
 
 /*
@@ -182,15 +176,9 @@ Mark any referenced strings and PMCs.
 
 */
     VTABLE void mark() {
-        PMC ** const data = PMC_data_typed(SELF, PMC **);
         Parrot_CallSignature_attributes * const attrs = PARROT_CALLSIGNATURE(SELF);
 
         if (attrs) {
-
-            if (attrs->array)
-                Parrot_gc_mark_PObj_alive(interp, (PObj*)attrs->array);
-            if (attrs->hash)
-                Parrot_gc_mark_PObj_alive(interp, (PObj*)attrs->hash);
             if (attrs->returns)
                 Parrot_gc_mark_PObj_alive(interp, (PObj*)attrs->returns);
             if (attrs->type_tuple)
@@ -198,13 +186,7 @@ Mark any referenced strings and PMCs.
             if (attrs->short_sig)
                 Parrot_gc_mark_PObj_alive(interp, (PObj*)attrs->short_sig);
         }
-
-        if (data) {
-            INTVAL i;
-            for (i = attrs->data_size - 1; i >= 0; --i)
-                if (data[i])
-                    Parrot_gc_mark_PObj_alive(interp, (PObj *)data[i]);
-        }
+        SUPER();
     }
 
 

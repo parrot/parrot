@@ -101,7 +101,7 @@ void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_in
 }
 
 
-pmclass NCI need_ext {
+pmclass NCI need_ext auto_attrs {
     ATTR STRING    *signature;              /* The signature. */
     ATTR void      *func;                   /* Function pointer to call. */
     ATTR void      *orig_func;              /* Function pointer
@@ -155,12 +155,9 @@ Initializes the NCI with a C<NULL> function pointer.
 */
 
     VTABLE void init() {
-        PMC_data(SELF) = mem_allocate_zeroed_typed(Parrot_NCI_attributes);
-
         /* Mark that we're not a raw NCI. */
         PObj_flag_CLEAR(private2, SELF);
         PObj_custom_mark_SET(SELF);
-        PObj_active_destroy_SET(SELF);
     }
 
 /*
@@ -227,25 +224,6 @@ Mark any referenced strings and PMCs.
                 Parrot_gc_mark_PObj_alive(interp, (PObj*)nci_info->signature);
             if (nci_info->pcc_params_signature)
                 Parrot_gc_mark_PObj_alive(interp, (PObj*)nci_info->pcc_params_signature);
-        }
-    }
-
-/*
-
-=item C<void destroy()>
-
-Destroys the NCI, freeing any allocated memory.
-
-=cut
-
-*/
-
-    VTABLE void destroy() {
-        if (PMC_data(SELF)) {
-            Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
-
-            mem_sys_free(nci_info);
-            PMC_data(SELF) = NULL;
         }
     }
 

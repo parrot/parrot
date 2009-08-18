@@ -23,7 +23,7 @@ PMC.
 
 #define BITS_PER_CHAR 8
 
-pmclass FixedBooleanArray need_ext provides array {
+pmclass FixedBooleanArray need_ext auto_attrs provides array {
     ATTR UINTVAL         size;             /* # of bits this fba holds */
     ATTR UINTVAL         resize_threshold; /* max capacity before resizing */
     ATTR unsigned char * bit_array;        /* where the bits go */
@@ -45,10 +45,6 @@ Initializes the array.
 */
 
     VTABLE void init() {
-        Parrot_FixedBooleanArray_attributes* attrs =
-            mem_allocate_zeroed_typed(Parrot_FixedBooleanArray_attributes);
-
-        PMC_data(SELF) = attrs;
         PObj_active_destroy_SET(SELF);
     }
 
@@ -67,8 +63,6 @@ Destroys the array.
         GET_ATTR_bit_array(INTERP, SELF, bit_array);
         if (bit_array)
             mem_sys_free(bit_array);
-        mem_sys_free(PMC_data(SELF));
-        PMC_data(SELF) = NULL;
     }
 
 /*

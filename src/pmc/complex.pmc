@@ -217,7 +217,7 @@ complex_check_divide_zero(PARROT_INTERP, PMC *value) {
 }
 
 
-pmclass Complex need_ext {
+pmclass Complex need_ext auto_attrs {
 
     ATTR FLOATVAL re; /* real part */
     ATTR FLOATVAL im; /* imaginary part */
@@ -327,10 +327,6 @@ Initializes the complex number with the value 0+0i.
 Initializes the complex number with the specified initializer.
 The initializer can be a string PMC or a numeric array with (real, imag)
 
-=item C<void destroy()>
-
-Cleans up.
-
 =item C<PMC *clone()>
 
 Creates an identical copy of the complex number.
@@ -340,12 +336,8 @@ Creates an identical copy of the complex number.
 */
 
     VTABLE void init() {
-        /* XXX should check if mem_sys_allocate failed */
-        PMC_data(SELF) = mem_allocate_typed(Parrot_Complex_attributes);
         SET_ATTR_re(INTERP, SELF, 0.0);
         SET_ATTR_im(INTERP, SELF, 0.0);
-
-        PObj_active_destroy_SET(SELF);
     }
 
     VTABLE void init_pmc(PMC *initializer) {
@@ -378,11 +370,6 @@ Creates an identical copy of the complex number.
                         "Invalid Complex initializer");
                 }
         }
-    }
-
-    VTABLE void destroy() {
-        mem_sys_free(PMC_data(SELF));
-        PMC_data(SELF) = NULL;
     }
 
     VTABLE PMC *clone() {

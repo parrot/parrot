@@ -18,7 +18,7 @@ method called.
 
 */
 
-pmclass ResizableStringArray extends FixedStringArray need_ext provides array {
+pmclass ResizableStringArray extends FixedStringArray need_ext auto_attrs provides array {
     ATTR UINTVAL resize_threshold; /*max capacity before resizing */
 
 /*
@@ -26,25 +26,6 @@ pmclass ResizableStringArray extends FixedStringArray need_ext provides array {
 =head2 Functions
 
 =over 4
-
-=item C<void init()>
-
-Initializes the array.
-
-=cut
-
-*/
-
-    VTABLE void init() {
-        Parrot_ResizableStringArray_attributes *attrs =
-            mem_allocate_zeroed_typed(Parrot_ResizableStringArray_attributes);
-
-        PMC_data(SELF)   = attrs;
-
-        PObj_custom_mark_destroy_SETALL(SELF);
-    }
-
-/*
 
 =item C<STRING *get_string_keyed_int(INTVAL key)>
 

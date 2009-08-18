@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -26,7 +26,7 @@ These are the vtable functions for the Capture PMC.
     if (!PARROT_CAPTURE(obj)->hash) \
         PARROT_CAPTURE(obj)->hash = pmc_new((i), enum_class_Hash);
 
-pmclass Capture need_ext {
+pmclass Capture need_ext auto_attrs {
     ATTR PMC    *array;
     ATTR PMC    *hash;
     ATTR INTVAL  data_size;
@@ -37,29 +37,15 @@ pmclass Capture need_ext {
 
 Initializes the Capture instance.
 
-=item C<void destroy()>
-
-Free structures.
-
 =cut
 
 */
 
     VTABLE void init() {
-        Parrot_Capture_attributes *capture = mem_allocate_typed(Parrot_Capture_attributes);
-        PMC_data(SELF)          = capture;
-        capture->array          = NULL;
-        capture->hash           = NULL;
+        Parrot_Capture_attributes *capture =
+                (Parrot_Capture_attributes *) PMC_data(SELF);
         capture->data_size      = CAPTURE_DATA_SIZE;
-        PObj_active_destroy_SET(SELF);
         PObj_custom_mark_SET(SELF);
-    }
-
-    VTABLE void destroy() {
-        if (PARROT_CAPTURE(SELF)) {
-            mem_sys_free(PARROT_CAPTURE(SELF));
-            PMC_data(SELF) = NULL;
-        }
     }
 
 /*

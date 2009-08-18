@@ -327,6 +327,19 @@ With a null C<initializer>, calls C<init()>, else throws an exception.
 
 /*
 
+=item C<void destroy()>
+
+Does nothing.
+
+=cut
+
+*/
+
+    VTABLE void destroy() {
+    }
+
+/*
+
 =item C<PMC *instantiate(PMC *init)>
 
 Default fallback. Creates a new PMC of the type of the class SELF and

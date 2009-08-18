@@ -19,7 +19,7 @@ INTVALs.  It uses Integer PMCs for all of the conversions.
 
 */
 
-pmclass FixedIntegerArray need_ext provides array {
+pmclass FixedIntegerArray need_ext auto_attrs provides array {
     ATTR INTVAL   size;  /* number of INTVALs stored in this array */
     ATTR INTVAL * int_array; /* INTVALs are stored here */
 
@@ -40,9 +40,6 @@ Initializes the array.
 */
 
     VTABLE void init() {
-        Parrot_FixedIntegerArray_attributes* attrs =
-            mem_allocate_zeroed_typed(Parrot_FixedIntegerArray_attributes);
-        PMC_data(SELF) = attrs;
         PObj_active_destroy_SET(SELF);
     }
 
@@ -154,8 +151,6 @@ Destroys the array.
         GET_ATTR_int_array(INTERP, SELF, int_array);
         if (int_array)
             mem_sys_free(int_array);
-        mem_sys_free(PMC_data(SELF));
-        PMC_data(SELF) = NULL;
     }
 
 /*

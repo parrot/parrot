@@ -20,7 +20,7 @@ The Socket PMC performs network I/O operations.
 
 #include "../src/io/io_private.h"
 
-pmclass Socket extends Handle {
+pmclass Socket extends Handle auto_attrs {
     ATTR PMC *local;           /* Local addr                   */
     ATTR PMC *remote;          /* Remote addr                  */
 
@@ -36,9 +36,8 @@ Initializes a newly created Socket object.
 
     VTABLE void init() {
         Parrot_Socket_attributes *data_struct =
-                mem_allocate_zeroed_typed(Parrot_Socket_attributes);
+                (Parrot_Socket_attributes *) PMC_data(SELF);
 
-        PMC_data(SELF)      = data_struct;
         data_struct->local  = PMCNULL;
         data_struct->remote = PMCNULL;
 
@@ -119,7 +118,6 @@ Free structures.
                 Parrot_io_close_piohandle(interp, data_struct->os_handle);
             data_struct->os_handle = PIO_INVALID_HANDLE;
         }
-        PMC_data(SELF) = NULL;
     }
 
 /*

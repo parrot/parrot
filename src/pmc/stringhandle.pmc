@@ -46,7 +46,7 @@ static int encoding_is_utf8(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
         return Parrot_str_equal(interp, s, CONST_STRING(interp, "utf8"));
 }
 
-pmclass StringHandle extends Handle need_ext {
+pmclass StringHandle extends Handle need_ext auto_attrs {
     ATTR INTVAL  flags;               /* Filehandle flags             */
     ATTR STRING *stringhandle;        /* The string data              */
     ATTR STRING *mode;                /* The mode string used in open */
@@ -70,9 +70,8 @@ Initializes a newly created StringHandle object.
 
     VTABLE void init() {
         Parrot_StringHandle_attributes *data_struct =
-                mem_allocate_typed(Parrot_StringHandle_attributes);
+                (Parrot_StringHandle_attributes *) PMC_data(SELF);
 
-        PMC_data(SELF)            = data_struct;
         data_struct->flags        = 0;
         data_struct->stringhandle = NULL;
         data_struct->mode         = NULL;
@@ -81,7 +80,6 @@ Initializes a newly created StringHandle object.
         data_struct->read_offset  = 0;
 
         PObj_custom_mark_SET(SELF);
-        PObj_active_destroy_SET(SELF);
     }
 
 /*
@@ -130,22 +128,6 @@ Mark active stringhandle data as live.
             Parrot_gc_mark_PObj_alive(interp, (PObj *)data_struct->encoding);
         if (data_struct->filename)
             Parrot_gc_mark_PObj_alive(interp, (PObj *)data_struct->filename);
-    }
-
-/*
-
-=item C<void destroy()>
-
-Free structures.
-
-=cut
-
-*/
-    VTABLE void destroy() {
-        if (PARROT_STRINGHANDLE(SELF)) {
-            mem_sys_free(PARROT_STRINGHANDLE(SELF));
-            PMC_data(SELF) = NULL;
-        }
     }
 
 /*

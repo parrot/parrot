@@ -57,7 +57,6 @@ appropriate type.
             VTABLE_destroy(interp, clone);
 
             PObj_is_object_SET(SELF);
-            PObj_active_destroy_SET(SELF);
 
         }
     }

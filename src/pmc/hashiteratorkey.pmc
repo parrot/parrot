@@ -19,45 +19,9 @@ Single (key,value) pair.
 
 */
 
-pmclass HashIteratorKey no_ro {
+pmclass HashIteratorKey no_ro auto_attrs {
     ATTR Hash        *parrot_hash; /* Underlying parrot's hash */
     ATTR HashBucket  *bucket;      /* Current bucket from HashItertor */
-
-/*
-
-=item C<void init()>
-
-Initializes the PMC.
-
-Not really part of public API.
-
-=cut
-
-*/
-
-    VTABLE void init() {
-        Parrot_HashIteratorKey_attributes *attrs =
-            mem_allocate_zeroed_typed(Parrot_HashIteratorKey_attributes);
-
-        PMC_data(SELF) = attrs;
-
-        PObj_active_destroy_SET(SELF);
-    }
-
-/*
-
-=item C<void destroy()>
-
-Destroys this PMC
-
-=cut
-
-*/
-
-    VTABLE void destroy() {
-        mem_sys_free(PMC_data(SELF));
-        PMC_data(SELF) = NULL;
-    }
 
 /*
 

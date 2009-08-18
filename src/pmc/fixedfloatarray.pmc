@@ -19,7 +19,7 @@ stored FLOATVALs.  It uses Float PMCs to do all necessary conversions.
 
 */
 
-pmclass FixedFloatArray need_ext provides array {
+pmclass FixedFloatArray need_ext auto_attrs provides array {
     ATTR INTVAL    size;
     ATTR FLOATVAL *float_array;
 
@@ -40,9 +40,6 @@ Initializes the array.
 */
 
     VTABLE void init() {
-        Parrot_FixedFloatArray_attributes* attrs =
-            mem_allocate_zeroed_typed(Parrot_FixedFloatArray_attributes);
-        PMC_data(SELF) = attrs;
     }
 
 /*
@@ -60,9 +57,6 @@ Destroys the array.
         GET_ATTR_float_array(INTERP, SELF, float_array);
         if (float_array)
             mem_sys_free(float_array);
-
-        mem_sys_free(PMC_data(SELF));
-        PMC_data(SELF) = NULL;
     }
 
 /*

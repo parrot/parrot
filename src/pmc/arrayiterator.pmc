@@ -51,7 +51,7 @@ to avoid this caveat.
 
 */
 
-pmclass ArrayIterator extends Iterator no_ro {
+pmclass ArrayIterator extends Iterator no_ro auto_attrs {
     ATTR PMC    *array;     /* the array which this Iterator iterates */
     ATTR INTVAL  pos;       /* Current position of iterator for forward iterator */
                             /* Previous position of iterator for reverse iterator */
@@ -86,30 +86,14 @@ Defaults iteration mode to iterate from start.
 
     VTABLE void init_pmc(PMC *array) {
         Parrot_ArrayIterator_attributes * const attrs =
-            mem_allocate_zeroed_typed(Parrot_ArrayIterator_attributes);
+            (Parrot_ArrayIterator_attributes *) PMC_data(SELF);
 
         attrs->array     = array;
-        PMC_data(SELF)   = attrs;
 
-        PObj_custom_mark_destroy_SETALL(SELF);
+        PObj_custom_mark_SET(SELF);
 
         /* by default, iterate from start */
         SELF.set_integer_native(ITERATE_FROM_START);
-    }
-
-/*
-
-=item C<void destroy()>
-
-destroys this PMC
-
-=cut
-
-*/
-
-    VTABLE void destroy() {
-        mem_sys_free(PMC_data(SELF));
-        PMC_data(SELF) = NULL;
     }
 
 /*

@@ -64,7 +64,7 @@ NOTE: No doubt we will need other things later; this is a start.
 */
 
 
-pmclass PMCProxy extends Class need_ext {
+pmclass PMCProxy extends Class need_ext auto_attrs {
 
 /*
 
@@ -77,14 +77,13 @@ Initializes a PMCProxy PMC.
 */
 
     VTABLE void init() {
-        Parrot_Class_attributes * const _pmc = mem_allocate_zeroed_typed(Parrot_Class_attributes);
+        Parrot_Class_attributes * const _pmc =
+                (Parrot_Class_attributes *) PMC_data(SELF);
         PMC          * const new_attribute   = pmc_new(interp, enum_class_Hash);
         STRING       * const name            = CONST_STRING(interp, "proxy");
-        PMC_data(SELF)                       = _pmc;
 
-        /* Set flags for custom GC mark and destroy. */
+        /* Set flag for custom GC mark. */
         PObj_custom_mark_SET(SELF);
-        PObj_active_destroy_SET(SELF);
 
         /* Set up the object. */
         _pmc->id               = 0;

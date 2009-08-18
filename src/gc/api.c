@@ -374,6 +374,16 @@ Parrot_gc_free_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
     if (PObj_active_destroy_TEST(pmc))
         VTABLE_destroy(interp, pmc);
 
+    if (PMC_data(pmc) && pmc->vtable->attr_size) {
+#if 0
+        mem_sys_free(PMC_data(pmc));
+        PMC_data(pmc) = NULL;
+#else
+        Parrot_gc_free_pmc_attributes(interp, pmc, pmc->vtable->attr_size);
+#endif
+    }
+    PARROT_ASSERT(NULL == PMC_data(pmc));
+
     if (PObj_is_PMC_EXT_TEST(pmc))
         Parrot_gc_free_pmc_ext(interp, pmc);
 

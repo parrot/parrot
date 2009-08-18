@@ -22,7 +22,7 @@ Implementation of Iterator for String PMC.
 */
 
 
-pmclass StringIterator extends Iterator {
+pmclass StringIterator auto_attrs extends Iterator {
     ATTR PMC    *string;    /* String to iterate over */
     ATTR INTVAL  pos;       /* Current position of iterator for forward iterator */
                             /* Previous position of iterator for reverse iterator */
@@ -39,31 +39,11 @@ Initialize StringIterator.
 
 */
     VTABLE void init_pmc(PMC *string) {
-        Parrot_StringIterator_attributes * const attrs =
-            mem_allocate_zeroed_typed(Parrot_StringIterator_attributes);
-
-        attrs->string    = string;
-        PMC_data(SELF)   = attrs;
-
-        PObj_custom_mark_destroy_SETALL(SELF);
+        SET_ATTR_string(INTERP, SELF, string);
 
         /* by default, iterate from start */
         SELF.set_integer_native(ITERATE_FROM_START);
-    }
-
-/*
-
-=item C<void destroy()>
-
-destroys this PMC
-
-=cut
-
-*/
-
-    VTABLE void destroy() {
-        mem_sys_free(PMC_data(SELF));
-        PMC_data(SELF) = NULL;
+        PObj_custom_mark_SET(SELF);
     }
 
 /*

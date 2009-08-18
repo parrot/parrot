@@ -31,7 +31,7 @@ extern "C" {
 #endif
 #endif
 
-pmclass FileHandle extends Handle {
+pmclass FileHandle extends Handle auto_attrs {
     ATTR INTVAL flags;                /* Filehandle flags             */
     ATTR STRING *filename;            /* The opened path and filename */
     ATTR STRING *mode;                /* The mode string used in open */
@@ -64,9 +64,8 @@ Initializes a newly created FileHandle object.
 
     VTABLE void init() {
         Parrot_FileHandle_attributes * const data_struct =
-                mem_allocate_typed(Parrot_FileHandle_attributes);
+                (Parrot_FileHandle_attributes *) PMC_data(SELF);
 
-        PMC_data(SELF)             = data_struct;
         data_struct->flags         = 0;
         data_struct->filename      = NULL;
         data_struct->mode          = NULL;
@@ -150,9 +149,6 @@ Free structures.
 
             if (data_struct->buffer_start)
                 mem_sys_free(data_struct->buffer_start);
-
-            mem_sys_free(PARROT_FILEHANDLE(SELF));
-            PMC_data(SELF) = NULL;
         }
     }
 

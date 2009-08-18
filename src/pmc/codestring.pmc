@@ -34,17 +34,9 @@ C<emit> method.
 #  include <unicode/uchar.h>
 #endif
 
-pmclass CodeString extends String provides string {
+pmclass CodeString extends String provides string auto_attrs {
     ATTR INTVAL last_line_number; /* most recent line number seen   */
     ATTR INTVAL last_pos;         /* most recent byte position seen */
-
-    VTABLE void init() {
-        Parrot_CodeString_attributes *attrs =
-            mem_allocate_zeroed_typed(Parrot_CodeString_attributes);
-        attrs->str_val = Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
-        PMC_data(SELF) = attrs;
-        PObj_custom_mark_destroy_SETALL(SELF);
-    }
 
 /*
 

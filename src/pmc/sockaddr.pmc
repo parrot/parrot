@@ -29,7 +29,7 @@ extern "C" {
 }
 #endif
 
-pmclass Sockaddr need_ext {
+pmclass Sockaddr need_ext auto_attrs {
     ATTR void   *pointer; /* The stored pointer. */
 
 /*
@@ -44,10 +44,10 @@ Initializes the pointer object.
 
     VTABLE void init() {
         Parrot_Sockaddr_attributes * const pdata_struct =
-            mem_allocate_typed(Parrot_Sockaddr_attributes);
+            (Parrot_Sockaddr_attributes *) PMC_data(SELF);
 
-        PMC_data(SELF)        = pdata_struct;
         pdata_struct->pointer = mem_allocate_zeroed_typed(struct sockaddr_in);
+        PObj_active_destroy_SET(SELF);
     }
 
 /*
@@ -65,8 +65,7 @@ Destroys the PMC and frees all allocated memory.
 
         if (data) {
             mem_sys_free(data->pointer);
-            mem_sys_free(data);
-            PMC_data(SELF) = NULL;
+            data->pointer = NULL;
         }
     }
 

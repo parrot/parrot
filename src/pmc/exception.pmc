@@ -52,7 +52,7 @@ These arguments can be retrieved with the C<get_results> opcode.
 #include "parrot/exceptions.h"
 #include "pmc_sub.h"
 
-pmclass Exception {
+pmclass Exception auto_attrs {
 
     ATTR INTVAL          id;           /* The task ID in the scheduler. */
     ATTR FLOATVAL        birthtime;    /* The creation time stamp of the exception. */
@@ -83,15 +83,9 @@ Initializes the exception with default values.
 */
 
     VTABLE void init() {
-        Parrot_Exception_attributes * const core_struct =
-            mem_allocate_zeroed_typed(Parrot_Exception_attributes);
-
-        /* Set up the core struct and default values for the exception object. */
-        PMC_data(SELF)            = core_struct;
-
         /* Set flags for custom GC mark and destroy. */
-        PObj_custom_mark_SET(SELF);
         PObj_active_destroy_SET(SELF);
+        PObj_custom_mark_SET(SELF);
 
         SET_ATTR_severity(INTERP, SELF, EXCEPT_error);
         SET_ATTR_handled(INTERP, SELF, 0);
@@ -116,9 +110,6 @@ Initializes the exception with supplied values.
         INTVAL severity_val;
         STRING *message_val;
 
-        Parrot_Exception_attributes * const core_struct =
-            mem_allocate_zeroed_typed(Parrot_Exception_attributes);
-
         INTVAL ishash = VTABLE_isa(interp, values, CONST_STRING(interp, 'Hash'));
 
         if (ishash) {
@@ -132,10 +123,9 @@ Initializes the exception with supplied values.
             message_val  = VTABLE_get_string(interp, values);
         }
 
-        PMC_data(SELF)            = core_struct;
-        /* Set flags for custom GC mark and destroy. */
-        PObj_custom_mark_SET(SELF);
+        /* Set flags for custom GC mark. */
         PObj_active_destroy_SET(SELF);
+        PObj_custom_mark_SET(SELF);
 
         /* Set up the core struct and default values for the exception object. */
 
@@ -185,11 +175,8 @@ Destroys the exception.
 
     VTABLE void destroy() {
         Parrot_Exception_attributes * const core_struct = PARROT_EXCEPTION(SELF);
-        if (core_struct) {
-            if (core_struct->thrower)
-                Parrot_free_context(interp, core_struct->thrower, 1);
-            mem_sys_free(core_struct);
-        }
+        if (core_struct && core_struct->thrower)
+            Parrot_free_context(interp, core_struct->thrower, 1);
     }
 
 /*

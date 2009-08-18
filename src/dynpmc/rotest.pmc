@@ -8,7 +8,7 @@
  * generation.  For testing only.
  */
 
-pmclass ROTest dynpmc provides scalar extends Integer {
+pmclass ROTest dynpmc provides scalar extends Integer auto_attrs {
     VTABLE void set_integer_native(INTVAL value) :read {
     }
     VTABLE INTVAL get_integer() :write {

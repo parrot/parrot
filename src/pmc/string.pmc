@@ -20,7 +20,7 @@ functions in F<src/string.c>.
 
 */
 
-pmclass String extends scalar provides string provides scalar {
+pmclass String extends scalar provides string provides scalar auto_attrs {
     ATTR STRING * str_val;
 
 /*
@@ -34,30 +34,11 @@ Initializes the string.
 */
 
     VTABLE void init() {
-        Parrot_String_attributes *attrs =
-            mem_allocate_typed(Parrot_String_attributes);
         STRING *str_val = Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
-        PMC_data(SELF) = attrs;
         SET_ATTR_str_val(INTERP, SELF, str_val);
 
-        PObj_custom_mark_destroy_SETALL(SELF);
+        PObj_custom_mark_SET(SELF);
     }
-
-/*
-
-=item C<void destroy()>
-
-Destroys this String PMC.
-
-=cut
-
-*/
-
-    VTABLE void destroy() {
-        mem_sys_free(PMC_data(SELF));
-        PMC_data(SELF) = NULL;
-    }
-
 
 /*
 
@@ -111,7 +92,6 @@ Creates a copy of the string.
 
     VTABLE PMC *clone() {
         PMC * const dest = pmc_new(INTERP, SELF->vtable->base_type);
-        PObj_custom_mark_destroy_SETALL(dest);
         VTABLE_set_string_native(INTERP, dest, Parrot_str_copy(INTERP, SELF.get_string()));
         return dest;
     }

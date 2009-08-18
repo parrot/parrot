@@ -57,7 +57,7 @@ initializer.
 
 #include "parrot/scheduler_private.h"
 
-pmclass Timer extends Task provides event need_ext {
+pmclass Timer extends Task provides event need_ext auto_attrs {
     ATTR FLOATVAL      duration;  /* The duration of the timer pause */
     ATTR FLOATVAL      interval;  /* How often to repeat */
     ATTR INTVAL        repeat;    /* Whether to repeat:
@@ -75,14 +75,13 @@ Initializes the timer.
 
     VTABLE void init() {
         Parrot_Timer_attributes * const core_struct =
-            mem_allocate_zeroed_typed(Parrot_Timer_attributes);
+            (Parrot_Timer_attributes *) PMC_data(SELF);
 
         /* Set flags for custom GC mark and destroy. */
         PObj_custom_mark_SET(SELF);
         PObj_active_destroy_SET(SELF);
 
         /* Set up the core struct. */
-        PMC_data(SELF)           = core_struct;
         core_struct->id          = 0;
         core_struct->type        = CONST_STRING(interp, "timer");
         core_struct->subtype     = CONST_STRING(interp, "");
@@ -179,8 +178,6 @@ Destroys the timer.
 
     VTABLE void destroy() {
         Parrot_cx_delete_task(INTERP, SELF);
-        mem_sys_free(PMC_data(SELF));
-        PMC_data(SELF) = NULL;
     }
 
 /*

@@ -26,7 +26,7 @@ These are the vtable functions for the lexpad PMC.
  * pmc_val    ... LexInfo
  */
 
-pmclass LexPad provides hash no_ro {
+pmclass LexPad provides hash no_ro auto_attrs {
     ATTR PMC                   *lexinfo;
     ATTR struct Parrot_Context *ctx;
 
@@ -78,18 +78,7 @@ Return the LexInfo PMC, if any or a Null PMC.
 
 */
     VTABLE void init_pmc(PMC *lexinfo) {
-        Parrot_LexPad_attributes * const attrs =
-            mem_allocate_zeroed_typed(Parrot_LexPad_attributes);
-
-        PObj_active_destroy_SET(SELF);
-
-        attrs->lexinfo = lexinfo;
-        PMC_data(SELF) = attrs;
-    }
-
-    VTABLE void destroy() {
-        mem_sys_free(PMC_data(SELF));
-        PMC_data(SELF) = NULL;
+        SET_ATTR_lexinfo(INTERP, SELF, lexinfo);
     }
 
     VTABLE void set_pointer(void *ctx) {

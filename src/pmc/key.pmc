@@ -18,7 +18,7 @@ These are the vtable functions for the Key PMC class.
 
 */
 
-pmclass Key need_ext {
+pmclass Key need_ext auto_attrs {
     ATTR PMC      *next_key; /* Sometimes it's the next key, sometimes it's
                                 not.  The Key code is like that. */
     ATTR INTVAL    int_key;  /* int value of this key, or something magical if
@@ -40,26 +40,7 @@ Initializes the key.
 */
 
     VTABLE void init() {
-
-        Parrot_Key_attributes * const attrs =
-            mem_allocate_zeroed_typed(Parrot_Key_attributes);
-
-        PMC_data(SELF) = attrs;
-        PObj_custom_mark_destroy_SETALL(SELF);
-    }
-
-/*
-
-=item C<void destroy()>
-
-Destroy this Key, but not in the way anyone reading its code would want.
-
-=cut
-
-*/
-    VTABLE void destroy() {
-        mem_sys_free(PMC_data(SELF));
-        PMC_data(SELF) = NULL;
+        PObj_custom_mark_SET(SELF);
     }
 
 /*
@@ -76,8 +57,6 @@ Creates and returns a clone of the key.
         PMC * const dest = pmc_new(INTERP, SELF->vtable->base_type);
         PMC *dkey        = dest;
         PMC *key         = SELF;
-
-        PObj_custom_mark_destroy_SETALL(dest);
 
         for (; key ;) {
             switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {

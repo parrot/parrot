@@ -45,7 +45,7 @@ more information.
  * need the next_for_GC pointer in the pmc_ext area.
  */
 
-pmclass Continuation need_ext {
+pmclass Continuation need_ext auto_attrs {
     ATTR struct Parrot_cont *cont; /* the continuation struct */
 
 /*
@@ -60,8 +60,7 @@ Initializes the continuation.
 
     VTABLE void init() {
         Parrot_Continuation_attributes *attrs =
-            mem_allocate_zeroed_typed(Parrot_Continuation_attributes);
-        PMC_data(SELF) = attrs;
+            (Parrot_Continuation_attributes *) PMC_data(SELF);
 
         PMC_cont(SELF) = new_continuation(INTERP, NULL);
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -120,8 +119,6 @@ Destroys the continuation.
 
             mem_sys_free(cc);
         }
-        mem_sys_free(PMC_data(SELF));
-        PMC_data(SELF) = NULL;
     }
 /*
 

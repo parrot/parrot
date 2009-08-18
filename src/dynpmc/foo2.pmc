@@ -8,7 +8,7 @@
  * proper inheritance - for testing only
  */
 
-pmclass Foo2 dynpmc group foo_group provides scalar extends Foo {
+pmclass Foo2 dynpmc group foo_group provides scalar extends Foo auto_attrs {
 
     VTABLE INTVAL get_integer() {
         INTVAL i = SUPER();
