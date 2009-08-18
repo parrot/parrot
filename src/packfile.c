@@ -1005,7 +1005,7 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     /* Ensure the bytecode version is one we can read. Currently, we only
      * support bytecode versions matching the current one.
      *
-     * tools/dev/pbc_header.pl --upd t/native_pbc/ *.pbc
+     * tools/dev/pbc_header.pl --upd t/native_pbc/*.pbc
      * stamps version and fingerprint in the native tests. */
     if (header->bc_major != PARROT_PBC_MAJOR
     ||  header->bc_minor != PARROT_PBC_MINOR) {
