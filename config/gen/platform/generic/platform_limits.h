@@ -16,7 +16,7 @@
    try to define them here. */
 #include "parrot/has_header.h"
 #if PARROT_HAS_HEADER_LIMITS
-#    include <limits.h>
+#  include <limits.h>
 #endif
 
 #ifdef _MSC_VER
