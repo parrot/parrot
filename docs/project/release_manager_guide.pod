@@ -364,7 +364,6 @@ the 3rd Tuesday of each month.
 The starred releases are Parrot's twice-yearly supported releases, see
 F<docs/project/support_policy.pod>.
 
- - August 18, 2009   - 1.5  - Whiteknight
  - Sept 15, 2009     - 1.6  - particle
  - Oct 20, 2009      - 1.7  -
  - Nov 17, 2009      - 1.8  -
