@@ -12,7 +12,6 @@ New in 1.5.0
   + Improvements to the Parrot Debugger
   + Added experimental fixed-size structure allocator to the GC
   + Added experimental lazy arena allocation to the GC
-  + Removed the defunct PASM1 compiler object
   + Refactored hashes, keys, and iterators
   + Added "corevm" make target to build Parrot without all the supporting libraries
   + Removed Random PMC type and added in a "rand" dynop
@@ -28,6 +27,7 @@ New in 1.5.0
   + Improved documentation about Parrot Debugger
   + Update PGE Documentation
 - Miscellaneous
+  + Deprecate 'PASM1' compiler object, update to warn instead of segfault
   + Added tests
   + Fixes to code, documentation, and standards
 
