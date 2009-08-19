@@ -19,12 +19,33 @@ Event.
 
 */
 
-pmclass EventHandler extends Sub need_ext auto_attrs {
+pmclass EventHandler extends Sub need_ext {
 
     ATTR STRING *type;          /* the type of the event to handle */
     ATTR PMC    *code;          /* the code object to execute */
     ATTR PMC    *interp;        /* the registered interpreter */
     ATTR INTVAL  priority;      /* the minimum priority threshhold of events */
+
+/*
+
+=item C<void init()>
+
+Initializes an empty C<EventHandler>.  Add attributes to it if you want it to
+do anything.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        Parrot_EventHandler_attributes *e =
+            mem_allocate_zeroed_typed(Parrot_EventHandler_attributes);
+
+        PObj_custom_mark_SET(SELF);
+        PObj_active_destroy_SET(SELF);
+
+        PMC_data(SELF) = e;
+    }
 
 /*
 
@@ -63,8 +84,7 @@ handler to care
         PMC                 *interpreter = PMCNULL;
         STRING              *type        = NULL;
         INTVAL               priority    = 0;
-        Parrot_EventHandler_attributes *e =
-                (Parrot_EventHandler_attributes *) PMC_data(SELF);
+        Parrot_EventHandler_attributes *e           = NULL;
 
         if (VTABLE_isa(INTERP, data, CONST_STRING(INTERP, "Sub"))) {
             code = data;
@@ -84,10 +104,12 @@ handler to care
             interpreter = VTABLE_get_pmc_keyed_int(INTERP,
                     INTERP->iglobals, IGLOBALS_INTERPRETER);
 
+        e = mem_allocate_zeroed_typed(Parrot_EventHandler_attributes);
 
         PObj_custom_mark_SET(SELF);
         PObj_active_destroy_SET(SELF);
 
+        PMC_data(SELF) = e;
         e->type        = type;
         e->code        = code;
         e->interp      = interpreter;

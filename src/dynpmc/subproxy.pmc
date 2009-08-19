@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2003-2009, Parrot Foundation.
+ * Copyright (C) 2003-2008, Parrot Foundation.
  */
 
 /*
@@ -14,7 +14,7 @@
  */
 #define enum_class_SubProxy -1
 
-pmclass SubProxy dynpmc need_ext auto_attrs extends Sub {
+pmclass SubProxy dynpmc need_ext extends Sub {
 
     VTABLE void init() {
         SUPER();
