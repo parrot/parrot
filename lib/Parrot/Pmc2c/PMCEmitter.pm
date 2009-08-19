@@ -582,14 +582,6 @@ EOC
     $cout .= "\";\n";
 
     my $const = ( $self->{flags}{dynpmc} ) ? " " : " const ";
-    if ( @$multi_funcs ) {
-        $cout .= $multi_strings . <<"EOC";
-
-   $const multi_func_list _temp_multi_func_list[] = {
-        $multi_list
-    };
-EOC
-    }
 
     my $flags = $self->vtable_flags;
     $cout .= <<"EOC";
@@ -730,7 +722,11 @@ EOC
 
 
     if ( @$multi_funcs ) {
-        $cout .= <<"EOC";
+        $cout .= $multi_strings . <<"EOC";
+
+            $const multi_func_list _temp_multi_func_list[] = {
+                $multi_list
+            };
 #define N_MULTI_LIST (sizeof(_temp_multi_func_list)/sizeof(_temp_multi_func_list[0]))
             Parrot_mmd_add_multi_list_from_c_args(interp,
                 _temp_multi_func_list, N_MULTI_LIST);
