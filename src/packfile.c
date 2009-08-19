@@ -1005,8 +1005,9 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     /* Ensure the bytecode version is one we can read. Currently, we only
      * support bytecode versions matching the current one.
      *
-     * tools/dev/pbc_header.pl --upd t/native_pbc/*.pbc
-     * stamps version and fingerprint in the native tests. */
+     * tools/dev/pbc_header.pl --upd t/native_pbc/(ASTERISK).pbc
+     * stamps version and fingerprint in the native tests.
+     * NOTE: (ASTERISK) is *, we don't want to fool the C preprocessor. */
     if (header->bc_major != PARROT_PBC_MAJOR
     ||  header->bc_minor != PARROT_PBC_MINOR) {
         Parrot_io_eprintf(NULL, "PackFile_unpack: This Parrot cannot read "
