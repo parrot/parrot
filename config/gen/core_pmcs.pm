@@ -116,26 +116,20 @@ void Parrot_register_core_pmcs(PARROT_INTERP, NOTNULL(PMC *registry))
     __attribute__nonnull__(1)
     __attribute__nonnull__(2);
 
-extern void Parrot_initialize_core_pmcs(PARROT_INTERP)
+extern void Parrot_initialize_core_pmcs(PARROT_INTERP, int pass)
     __attribute__nonnull__(1);
 
-void Parrot_initialize_core_pmcs(PARROT_INTERP)
+void Parrot_initialize_core_pmcs(PARROT_INTERP, int pass)
 {
-    int pass;
-    for (pass = 0; pass <= 1; ++pass) {
-        /* first the PMC with the highest enum
-         * this reduces MMD table resize action */
+    /* first the PMC with the highest enum
+     * this reduces MMD table resize action */
 END_C
 
-    print {$OUT} "        Parrot_${_}_class_init(interp, enum_class_${_}, pass);\n"
+    print {$OUT} "    Parrot_${_}_class_init(interp, enum_class_${_}, pass);\n"
         foreach ( @pmcs[ -1 .. -1 ] );
-    print {$OUT} "        Parrot_${_}_class_init(interp, enum_class_${_}, pass);\n"
+    print {$OUT} "    Parrot_${_}_class_init(interp, enum_class_${_}, pass);\n"
         foreach ( @pmcs[ 0 .. $#pmcs - 1 ] );
     print {$OUT} <<'END_C';
-        if (!pass) {
-            parrot_global_setup_2(interp);
-        }
-    }
 }
 
 static void register_pmc(PARROT_INTERP, NOTNULL(PMC *registry), int pmc_id)

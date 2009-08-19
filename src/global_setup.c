@@ -27,7 +27,7 @@ I<What are these global variables?>
 
 /* These functions are defined in the auto-generated file core_pmcs.c */
 /* XXX Get it into some public place */
-extern void Parrot_initialize_core_pmcs(PARROT_INTERP);
+extern void Parrot_initialize_core_pmcs(PARROT_INTERP, int pass);
 void Parrot_register_core_pmcs(PARROT_INTERP, PMC* registry);
 
 static const unsigned char* parrot_config_stored = NULL;
@@ -38,9 +38,14 @@ static unsigned int parrot_config_size_stored = 0;
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void parrot_global_setup_2(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 static void parrot_set_config_hash_interpreter(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_parrot_global_setup_2 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_parrot_set_config_hash_interpreter \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
@@ -162,7 +167,9 @@ init_world(PARROT_INTERP)
     parrot_alloc_vtables(interp);
 
     /* Call base vtable class constructor methods */
-    Parrot_initialize_core_pmcs(interp);
+    Parrot_initialize_core_pmcs(interp, 0);
+    parrot_global_setup_2(interp);
+    Parrot_initialize_core_pmcs(interp, 1);
 
     iglobals = interp->iglobals;
     VTABLE_set_pmc_keyed_int(interp, iglobals,
@@ -190,7 +197,7 @@ init_world(PARROT_INTERP)
 
 /*
 
-=item C<void parrot_global_setup_2(PARROT_INTERP)>
+=item C<static void parrot_global_setup_2(PARROT_INTERP)>
 
 called from inmidst of PMC bootstrapping between pass 0 and 1
 
@@ -198,7 +205,7 @@ called from inmidst of PMC bootstrapping between pass 0 and 1
 
 */
 
-void
+static void
 parrot_global_setup_2(PARROT_INTERP)
 {
     ASSERT_ARGS(parrot_global_setup_2)
