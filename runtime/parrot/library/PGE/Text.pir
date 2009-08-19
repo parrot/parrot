@@ -50,7 +50,6 @@ of the extraction.
     .local int balanced                            # in balanced match
     .local pmc stack                               # lookket backtracking
 
-    stack = new 'ResizableStringArray'
     $P0 = get_hll_global ['PGE'], 'Match'
     (mob, pos, target) = $P0.'new'(tgt)
     from = pos
@@ -88,6 +87,7 @@ of the extraction.
     if $I0 < 0 goto end                            # no leading delim fails
     lookket = ''
     balanced = 1
+    stack = new 'ResizableStringArray'
   next:
     $S0 = substr target, pos, 1                    # check current pos
     if $S0 == '' goto fail                         # end of string -> fail
