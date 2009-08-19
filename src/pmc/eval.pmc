@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -125,7 +125,7 @@ mark_subs(PARROT_INTERP, PMC *self)
     }
 }
 
-pmclass Eval extends Sub need_ext {
+pmclass Eval extends Sub need_ext auto_attrs {
 
     VTABLE void init() {
         Parrot_Sub_attributes *sub_data;
