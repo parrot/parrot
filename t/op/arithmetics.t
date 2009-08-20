@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 27;
 
 # test for GMP
 use Parrot::Config;
@@ -696,6 +696,33 @@ Inf
 -Inf
 -Inf
 OUTPUT
+
+TODO: {
+
+local $TODO = 'rounding nan/inf gives something like -2147483648';
+pir_output_is(<<CODE,<<OUTPUT, "TT #370 Rounding inf/nan");
+.sub 'main'
+        \$N0 = 'Inf'
+        \$I0 = floor \$N0
+        say \$I0
+        \$N0 = 'NaN'
+        \$I0 = floor \$N0
+        say \$I0
+        \$N0 = 'Inf'
+        \$I0 = ceil \$N0
+        say \$I0
+        \$N0 = 'NaN'
+        \$I0 = ceil \$N0
+        say \$I0
+    .end
+CODE
+Inf
+NaN
+Inf
+NaN
+OUTPUT
+
+}
 
 # Local Variables:
 #   mode: cperl
