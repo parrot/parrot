@@ -164,10 +164,7 @@ init_world(PARROT_INTERP)
     Parrot_platform_init_code();
 #endif
 
-    parrot_alloc_vtables(interp);
-
     /* Call base vtable class constructor methods */
-    Parrot_initialize_core_pmcs(interp, 0);
     parrot_global_setup_2(interp);
     Parrot_initialize_core_pmcs(interp, 1);
 
