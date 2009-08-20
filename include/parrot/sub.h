@@ -150,6 +150,8 @@ typedef struct Parrot_sub_arginfo {
         } \
     } while (0)
 
+typedef struct Parrot_Sub_attributes Parrot_sub;
+typedef struct Parrot_Coroutine_attributes Parrot_coro;
 
 typedef struct Parrot_cont {
     /* continuation destination */
