@@ -910,7 +910,7 @@ find_outer_sub(ARGIN(bytecode * const bc), ARGIN_NULLOK(char const * const outer
 {
     ASSERT_ARGS(find_outer_sub)
     PMC          *current;
-    Parrot_sub   *sub;
+    Parrot_Sub_attributes *sub;
     STRING       *cur_name;
     size_t        len;
     global_label *outersub;
@@ -1131,7 +1131,7 @@ add_sub_pmc(ARGIN(bytecode * const bc), ARGIN(sub_info * const info), int needle
 {
     ASSERT_ARGS(add_sub_pmc)
     PMC                   *sub_pmc;        /* the "Sub" pmc, or a variant, such as "Coroutine" */
-    Parrot_sub            *sub;
+    Parrot_Sub_attributes *sub;
     int                    subconst_index; /* index in const table for the sub pmc */
     int                    subname_index;
     int                    i;              /* for loop iterator */
