@@ -145,10 +145,11 @@ Sets the name of the subroutine.
 
     VTABLE STRING *get_string() {
         STRING *name;
-        GET_ATTR_name(INTERP, SELF, name);
+        Parrot_Sub_attributes *sub;
+        PMC_get_sub(INTERP, SELF, sub);
 
-        if (name)
-            return Parrot_str_copy(INTERP, name);
+        if (sub->name)
+            return Parrot_str_copy(INTERP, sub->name);
 
         return NULL;
     }
@@ -951,30 +952,30 @@ slurpy arguments).
 
     METHOD get_lexinfo() {
         PMC        *lexinfo;
-        GET_ATTR_lex_info(INTERP, SELF, lexinfo);
+        Parrot_Sub_attributes *sub;
+        PMC_get_sub(INTERP, SELF, sub);
 
-        if (!lexinfo)
-            lexinfo = PMCNULL;
+        lexinfo = sub->lex_info ? sub->lex_info: PMCNULL;
 
         RETURN(PMC *lexinfo);
     }
 
     METHOD get_subid() {
         STRING     *subid;
-        GET_ATTR_subid(INTERP, SELF, subid);
+        Parrot_Sub_attributes *sub;
+        PMC_get_sub(INTERP, SELF, sub);
 
-        if (!subid)
-            subid = CONST_STRING(interp, "");
+        subid = sub->subid ? sub->subid : CONST_STRING(interp, "");
 
         RETURN(STRING *subid);
     }
 
     METHOD get_outer() {
-        PMC        *outersub;
-        GET_ATTR_outer_sub(INTERP, SELF, outersub);
+        PMC                   *outersub;
+        Parrot_Sub_attributes *sub;
+        PMC_get_sub(INTERP, SELF, sub);
 
-        if (!outersub)
-            outersub = PMCNULL;
+        outersub = sub->outer_sub ? sub->outer_sub : PMCNULL;
 
         RETURN(PMC *outersub);
     }
@@ -1005,11 +1006,11 @@ slurpy arguments).
     }
 
     METHOD get_multisig() {
-        PMC *multisig;
-        GET_ATTR_multi_signature(INTERP, SELF, multisig);
+        PMC                 *multisig;
+        Parrot_Sub_attributes *sub;
+        PMC_get_sub(INTERP, SELF, sub);
 
-        if (!multisig)
-            multisig = PMCNULL;
+        multisig = sub->multi_signature ? sub->multi_signature : PMCNULL;
 
         RETURN(PMC *multisig);
     }
