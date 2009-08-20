@@ -85,6 +85,13 @@ By default, this installs in /usr/local, with the Parrot executable in
 But please note that dynamic libs will not be found for non-standard
 locations unless you set LD_LIBRARY_PATH or similar.
 
+If you want to build high level languages on top of Parrot, you should
+also run
+
+    make install-dev
+
+to install development files which compilers need in their build process.
+
 Look at docs/parrot.pod and docs/intro.pod for where to go from here.  If you
 have any problems, see the section "How To Submit A Bug Report" in
 docs/submissions.pod.  These documents are in POD format. You can view these
