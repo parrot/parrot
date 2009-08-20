@@ -145,7 +145,7 @@ Sets the name of the subroutine.
 
     VTABLE STRING *get_string() {
         STRING *name;
-        GETATTR_Sub_name(INTERP, SELF, name);
+        GET_ATTR_name(INTERP, SELF, name);
 
         if (name)
             return Parrot_str_copy(INTERP, name);
@@ -908,7 +908,14 @@ slurpy arguments).
 
     METHOD get_namespace() {
         PMC *_namespace;
-        GETATTR_Sub_namespace_stash(INTERP, SELF, _namespace);
+        Parrot_Sub_attributes *sub;
+        PMC_get_sub(INTERP, SELF, sub);
+        /*
+        XXX Rakudo's failing with with this code on ASSERT. Why???
+        GET_ATTR_namespace_stash(INTERP, SELF, _namespace);
+        PARROT_ASSERT(_namespace == sub->namespace_stash || !"consistency!!!");
+        */
+        _namespace = sub->namespace_stash;
         RETURN(PMC *_namespace);
     }
 
@@ -944,7 +951,7 @@ slurpy arguments).
 
     METHOD get_lexinfo() {
         PMC        *lexinfo;
-        GETATTR_Sub_lex_info(INTERP, SELF, lexinfo);
+        GET_ATTR_lex_info(INTERP, SELF, lexinfo);
 
         if (!lexinfo)
             lexinfo = PMCNULL;
@@ -954,7 +961,7 @@ slurpy arguments).
 
     METHOD get_subid() {
         STRING     *subid;
-        GETATTR_Sub_subid(INTERP, SELF, subid);
+        GET_ATTR_subid(INTERP, SELF, subid);
 
         if (!subid)
             subid = CONST_STRING(interp, "");
@@ -964,7 +971,7 @@ slurpy arguments).
 
     METHOD get_outer() {
         PMC        *outersub;
-        GETATTR_Sub_outer_sub(INTERP, SELF, outersub);
+        GET_ATTR_outer_sub(INTERP, SELF, outersub);
 
         if (!outersub)
             outersub = PMCNULL;
@@ -999,7 +1006,7 @@ slurpy arguments).
 
     METHOD get_multisig() {
         PMC *multisig;
-        GETATTR_Sub_multi_signature(INTERP, SELF, multisig);
+        GET_ATTR_multi_signature(INTERP, SELF, multisig);
 
         if (!multisig)
             multisig = PMCNULL;
