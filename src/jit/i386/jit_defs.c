@@ -1214,55 +1214,6 @@ Parrot_jit_vtable_ifp_op(Parrot_jit_info_t *jit_info,
        jit_info->native_ptr, (f)); \
        emitm_calll(jit_info->native_ptr, EXEC_CALLDISP);
 
-/* new_p_ic */
-void
-Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
-                     PARROT_INTERP)
-{
-    int p1, i2;
-    op_info_t *op_info = &interp->op_info_table[*jit_info->cur_op];
-    size_t offset = offsetof(VTABLE, init);
-
-    PARROT_ASSERT(op_info->types[0] == PARROT_ARG_P);
-    p1 = *(jit_info->cur_op + 1);
-    i2 = *(jit_info->cur_op + 2);
-
-    if (i2 <= 0 || i2 >= interp->n_vtable_max)
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
-            "Illegal PMC enum (%d) in new", i2);
-
-    /* get interpreter */
-    Parrot_jit_emit_get_INTERP(interp, jit_info->native_ptr, emit_ECX);
-
-    /* push pmc enum and interpreter */
-    emitm_pushl_i(jit_info->native_ptr, i2);
-    emitm_pushl_r(jit_info->native_ptr, emit_ECX);
-#if EXEC_CAPABLE
-    if (jit_info->objfile) {
-        CALL("pmc_new_noinit");
-    }
-    else
-#endif
-    {
-        call_func(jit_info, (void (*) (void))pmc_new_noinit);
-    }
-    /* result = eax push pmc */
-    emitm_pushl_r(jit_info->native_ptr, emit_EAX);
-    /* store in PMC too */
-    emitm_movl_r_m(interp, jit_info->native_ptr,
-            emit_EAX, emit_EBX, emit_None, 1, REG_OFFS_PMC(p1));
-    /* push interpreter */
-    Parrot_jit_emit_get_INTERP(interp, jit_info->native_ptr, emit_ECX);
-    emitm_pushl_r(jit_info->native_ptr, emit_ECX);
-    /* mov (offs)%eax, %eax i.e. $1->vtable */
-    emitm_movl_m_r(interp, jit_info->native_ptr, emit_EAX, emit_EAX, emit_None, 1,
-            offsetof(struct PMC, vtable));
-    /* call *(offset)eax */
-    emitm_callm(jit_info->native_ptr, emit_EAX, emit_None, emit_None, offset);
-    /* adjust 4 args pushed */
-    emitm_addb_i_r(jit_info->native_ptr, 16, emit_ESP);
-}
-
 #  undef IREG
 #  undef NREG
 #  undef SREG

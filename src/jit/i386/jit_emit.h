@@ -1661,9 +1661,6 @@ void Parrot_jit_vtable_unlessp_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 /* if_p_ic */
 void Parrot_jit_vtable_ifp_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 
-/* new_p_ic */
-void Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
 #endif /* JIT_VTABLE_OPS */
 
 #if EXEC_CAPABLE
