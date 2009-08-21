@@ -94,6 +94,43 @@ An empty ResizablePMCArray PMC is allocated during initialization.
 #include "pmc_object.h"
 #include "pmc_namespace.h"
 
+static int
+cache_class_attribs(PARROT_INTERP, PMC *cur_class, PMC *attrib_index,
+    PMC *cache, int cur_index)
+{
+    /* The attribute metadata hash. */
+    Parrot_Class_attributes * const class_info = PARROT_CLASS(cur_class);
+    PMC          * const attribs     = class_info->attrib_metadata;
+    PMC          * const iter        = VTABLE_get_iter(interp, attribs);
+
+    /* Build a string representing the fully qualified class name. */
+    /* Retrieve the fully qualified class name for the class. */
+    STRING       * const fq_class    = VTABLE_get_string(interp, cur_class);
+    PMC          * const class_cache = pmc_new(interp, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(interp, cache, fq_class, class_cache);
+
+    /* Iterate over the attributes. */
+    while (VTABLE_get_bool(interp, iter)) {
+        /* Get attribute. */
+        PMC    * const cur_attrib  = VTABLE_get_pmc_keyed_str(interp,
+                attribs, VTABLE_shift_string(interp, iter));
+
+        /* Get attribute name and append it to the key. */
+        STRING * const name_str    = CONST_STRING(interp, "name");
+        STRING * const attrib_name = VTABLE_get_string_keyed_str(
+            interp, cur_attrib, name_str);
+
+        STRING * const full_key    = Parrot_str_append(interp, fq_class, attrib_name);
+
+        /* Insert into hash, along with index. */
+        VTABLE_set_integer_keyed_str(interp, attrib_index, full_key, cur_index);
+        VTABLE_set_integer_keyed_str(interp, class_cache, attrib_name, cur_index);
+        cur_index++;
+    }
+
+    return cur_index;
+}
+
 /* This function builds the attribute index (table to map class name and
  * attribute name to an index) for the current class. */
 static void
@@ -106,7 +143,7 @@ build_attrib_index(PARROT_INTERP, PMC *self)
     const int            num_classes  = VTABLE_elements(interp, _class->all_parents);
     int                  i;
 
-    /* We will go over the list of all parents to construct the attribute index. */
+    /* Go over the list of all parents to construct the attribute index. */
     for (i = 0; i < num_classes; i++) {
        /* Get the class and check that it respects the standard class interface
         * (if not we don't know how it stores its attributes, so we'll have to
@@ -114,44 +151,15 @@ build_attrib_index(PARROT_INTERP, PMC *self)
         PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp,
                                     _class->all_parents, i);
 
-        if (PObj_is_class_TEST(cur_class)) {
-            /* The attribute metadata hash. */
-            Parrot_Class_attributes * const class_info = PARROT_CLASS(cur_class);
-            PMC          * const attribs     = class_info->attrib_metadata;
-            PMC          * const iter        = VTABLE_get_iter(interp, attribs);
-
-            /* Build a string representing the fully qualified class name. */
-            /* Retrieve the fully qualified class name for the class. */
-            STRING       * const fq_class    = VTABLE_get_string(interp, cur_class);
-            PMC          * const class_cache = pmc_new(interp, enum_class_Hash);
-            VTABLE_set_pmc_keyed_str(interp, cache, fq_class, class_cache);
-
-            /* Iterate over the attributes. */
-            while (VTABLE_get_bool(interp, iter)) {
-                /* Get attribute. */
-                PMC    * const cur_attrib  = VTABLE_get_pmc_keyed_str(interp,
-                        attribs, VTABLE_shift_string(interp, iter));
-
-                /* Get attribute name and append it to the key. */
-                STRING * const name_str    = CONST_STRING(interp, "name");
-                STRING * const attrib_name = VTABLE_get_string_keyed_str(
-                    interp, cur_attrib, name_str);
-
-                STRING * const full_key    = Parrot_str_append(interp, fq_class, attrib_name);
-
-                /* Insert into hash, along with index. */
-                VTABLE_set_integer_keyed_str(interp, attrib_index, full_key, cur_index);
-                VTABLE_set_integer_keyed_str(interp, class_cache, attrib_name, cur_index);
-                cur_index++;
-            }
-        }
+        if (PObj_is_class_TEST(cur_class))
+            cur_index = cache_class_attribs(interp, cur_class,
+                attrib_index, cache, cur_index);
     }
 
     /* Store built attribute index and invalidate cache. */
     _class->attrib_index = attrib_index;
     _class->attrib_cache = cache;
 }
-
 /* Takes a hash and initializes the class based on it. */
 static void
 init_class_from_hash(PARROT_INTERP, PMC *self, PMC *info)
@@ -969,7 +977,13 @@ Array of Class PMCs representing the direct parents of this class.
         /* What should we return? */
         PMC *found;
 
-        if (Parrot_str_equal(interp, what, CONST_STRING(interp, "name"))) {
+        if (Parrot_str_equal(interp, what, CONST_STRING(interp, "attributes"))) {
+            found = _class->attrib_metadata;
+        }
+        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "parents"))) {
+            found = _class->parents;
+        }
+        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "name"))) {
             found = pmc_new(interp, enum_class_String);
             VTABLE_set_string_native(interp, found, _class->name);
         }
@@ -981,9 +995,6 @@ Array of Class PMCs representing the direct parents of this class.
             /* Should not clone this. */
             return _class->_namespace;
         }
-        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "attributes"))) {
-            found = _class->attrib_metadata;
-        }
         else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "attrib_index"))) {
             found = _class->attrib_index;
         }
@@ -992,9 +1003,6 @@ Array of Class PMCs representing the direct parents of this class.
         }
         else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "vtable_overrides"))) {
             found = _class->vtable_overrides;
-        }
-        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "parents"))) {
-            found = _class->parents;
         }
         else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "all_parents"))) {
             found = _class->all_parents;
