@@ -700,20 +700,20 @@ OUTPUT
 TODO: {
 
 local $TODO = 'rounding nan/inf gives something like -2147483648';
-pir_output_is(<<CODE,<<OUTPUT, "TT #370 Rounding inf/nan");
+pir_output_is(<<'CODE',<<OUTPUT, "TT #370 Rounding inf/nan");
 .sub 'main'
-        \$N0 = 'Inf'
-        \$I0 = floor \$N0
-        say \$I0
-        \$N0 = 'NaN'
-        \$I0 = floor \$N0
-        say \$I0
-        \$N0 = 'Inf'
-        \$I0 = ceil \$N0
-        say \$I0
-        \$N0 = 'NaN'
-        \$I0 = ceil \$N0
-        say \$I0
+        $N0 = 'Inf'
+        $I0 = floor $N0
+        say $I0
+        $N0 = 'NaN'
+        $I0 = floor $N0
+        say $I0
+        $N0 = 'Inf'
+        $I0 = ceil $N0
+        say $I0
+        $N0 = 'NaN'
+        $I0 = ceil $N0
+        say $I0
     .end
 CODE
 Inf
