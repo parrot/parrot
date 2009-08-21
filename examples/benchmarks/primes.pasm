@@ -48,7 +48,7 @@ LOOP:
     branch  NEXT
 OK:
     inc     P3
-    le      P3, P4, LOOP
+    lt      P3, P4, LOOP
     # We haven't found a factor so it must be a prime
     inc     P6
     set     P7, P1
