@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 31;
 
 # test for GMP
 use Parrot::Config;
@@ -636,7 +636,61 @@ Inf
 NaN
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "Inf - ln" );
+pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - sin" );
+.sub 'test' :main
+    $N0 = 'Inf'
+    $N1 = sin $N0
+    say $N1
+    $N0 = '-Inf'
+    $N1 = sin $N0
+    say $N1
+    $N0 = 'NaN'
+    $N1 = sin $N0
+    say $N1
+.end
+CODE
+NaN
+NaN
+NaN
+OUTPUT
+
+pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - tan" );
+.sub 'test' :main
+    $N0 = 'Inf'
+    $N1 = tan $N0
+    say $N1
+    $N0 = '-Inf'
+    $N1 = tan $N0
+    say $N1
+    $N0 = 'NaN'
+    $N1 = tan $N0
+    say $N1
+.end
+CODE
+NaN
+NaN
+NaN
+OUTPUT
+
+pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - cos" );
+.sub 'test' :main
+    $N0 = 'Inf'
+    $N1 = cos $N0
+    say $N1
+    $N0 = '-Inf'
+    $N1 = cos $N0
+    say $N1
+    $N0 = 'NaN'
+    $N1 = cos $N0
+    say $N1
+.end
+CODE
+NaN
+NaN
+NaN
+OUTPUT
+
+pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - ln" );
 .sub 'test' :main
     $N0 = 'Inf'
     $N1 = ln $N0
@@ -644,9 +698,33 @@ pir_output_is( <<'CODE', <<OUTPUT, "Inf - ln" );
     $N0 = '-Inf'
     $N1 = ln $N0
     say $N1
+    $N0 = 'NaN'
+    $N1 = ln $N0
+    say $N1
 .end
 CODE
 Inf
+NaN
+NaN
+OUTPUT
+
+pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - pow" );
+.sub 'test' :main
+    $N0 = 'Inf'
+    pow $N1, $N0, 2
+    say $N1
+    pow $N1, 2, $N0
+    say $N1
+    $N0 = 'NaN'
+    pow $N1, $N0, 2
+    say $N1
+    pow $N1, 2, $N0
+    say $N1
+.end
+CODE
+Inf
+Inf
+NaN
 NaN
 OUTPUT
 
