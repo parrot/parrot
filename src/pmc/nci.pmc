@@ -106,7 +106,6 @@ static nci_sub_t build_func(PARROT_INTERP, PMC *, Parrot_NCI_attributes *);
 static
 nci_sub_t build_func(PARROT_INTERP, PMC *pmc, Parrot_NCI_attributes *nci_info)
 {
-    nci_sub_t  func;
     STRING    *key        = nci_info->signature;
     size_t     key_length = Parrot_str_byte_length(interp, key);
     int       jitted      = 0;
@@ -117,10 +116,10 @@ nci_sub_t build_func(PARROT_INTERP, PMC *pmc, Parrot_NCI_attributes *nci_info)
     nci_info->arity       = key_length - 1;
 
     /* Build call function. */
-    func = nci_info->func = (PMC *)(build_call_func(interp, pmc, key, &jitted));
+    nci_info->func        = (PMC *)(build_call_func(interp, pmc, key, &jitted));
     nci_info->jitted      = jitted;
 
-    return func;
+    return (nci_sub_t)nci_info->func;
 }
 
 
