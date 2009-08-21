@@ -19,7 +19,12 @@
 
 /* Set to 1 if we want to use the fixed-size allocator. Set to 0 if we want
    to allocate these things using mem_sys_allocate instead */
+/* Disabled on Windows platforms until problems get fixed, TT #940 */
+#if defined(_WIN32) || defined(_WIN64)
+#define GC_USE_FIXED_SIZE_ALLOCATOR 0
+#else
 #define GC_USE_FIXED_SIZE_ALLOCATOR 1
+#endif
 
 /*
  * we need an alignment that is the same as malloc(3) have for
