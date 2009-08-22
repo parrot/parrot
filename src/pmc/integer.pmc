@@ -55,10 +55,6 @@ Create a new Integer with arguments passed according to pdd03.
 
 Initializes the integer with a default value of C<0>.
 
-=item C<void destroy()>
-
-Destroys this PMC.
-
 =cut
 
 */
@@ -94,10 +90,6 @@ Destroys this PMC.
             (Parrot_Integer_attributes *)PMC_data(SELF);
 
         attrs->iv      = 0;
-        PObj_active_destroy_SET(SELF);
-    }
-
-    VTABLE void destroy() {
     }
 
 /*
