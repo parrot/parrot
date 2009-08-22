@@ -1771,6 +1771,7 @@ test-clean :
     "t/op/*.pbc" \
     "t/oo/*.pbc" \
     "t/pmc/*.pbc" \
+    "t/dynpmc/*.pbc" \
     "t/stress/*.pbc" \
     "t/tools/*.pbc"
 	$(RM_F) \
