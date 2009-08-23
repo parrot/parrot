@@ -3371,12 +3371,12 @@ dump_string(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
     if (!s)
         return;
 
-    Parrot_io_eprintf(interp, "\tBuflen  =\t%12ld\n", PObj_buflen(s));
+    Parrot_io_eprintf(interp, "\tBuflen  =\t%12ld\n", Buffer_buflen(s));
     Parrot_io_eprintf(interp, "\tFlags   =\t%12ld\n", PObj_get_FLAGS(s));
     Parrot_io_eprintf(interp, "\tBufused =\t%12ld\n", s->bufused);
     Parrot_io_eprintf(interp, "\tStrlen  =\t%12ld\n", s->strlen);
     Parrot_io_eprintf(interp, "\tOffset  =\t%12ld\n",
-                    (char*) s->strstart - (char*) PObj_bufstart(s));
+                    (char*) s->strstart - (char*) Buffer_bufstart(s));
     Parrot_io_eprintf(interp, "\tString  =\t%S\n", s);
 }
 

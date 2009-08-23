@@ -106,6 +106,7 @@ Writes the types to C<stabs>.
 static void
 write_types(FILE *stabs, PARROT_INTERP)
 {
+    /* It would be create if this function would be auto generated */
     int i, j;
     /* borrowed from mono */
     static BaseTypes base_types[] = {
@@ -152,14 +153,14 @@ write_types(FILE *stabs, PARROT_INTERP)
     ++i;
     fprintf(stabs, ".stabs \"Parrot_String:T(0,%d)=s%d"
                 "bufstart:(0,14),%d,%d;"
-                "buflen:(0,6),%d,%d;"   /* XXX type */
+                "buflen:(0,6),%d,%d;"
                 "flags:(0,12),%d,%d;"
                 "bufused:(0,12),%d,%d;"
-                "strstart:(0,15),%d,%d;"        /* fake a char* */
+                "strstart:(0,15),%d,%d;"
                 ";\""
                 "," N_LSYM ",0,0,0\n", i++, BYTE_SIZE(STRING),
-                BIT_OFFSET(STRING, cache._b._bufstart), BIT_SIZE(void*),
-                BIT_OFFSET(STRING, cache._b._buflen), BIT_SIZE(size_t),
+                BIT_OFFSET(STRING, _bufstart), BIT_SIZE(void*),
+                BIT_OFFSET(STRING, _buflen), BIT_SIZE(size_t),
                 BIT_OFFSET(STRING, flags), BIT_SIZE(UINTVAL),
                 BIT_OFFSET(STRING, bufused), BIT_SIZE(UINTVAL),
                 BIT_OFFSET(STRING, strstart), BIT_SIZE(void*));
@@ -177,35 +178,30 @@ write_types(FILE *stabs, PARROT_INTERP)
 
     fprintf(stabs, ";\"," N_LSYM ",0,0,0\n");
 
-    /* PMC type */
-    fprintf(stabs, ".stabs \"PMC:T(0,%d)=s%d", i, BYTE_SIZE(PMC));
-    fprintf(stabs, "cache:(0,%d),%d,%d;",
-            i + 1, BIT_OFFSET(PMC, cache), BIT_SIZE(UnionVal));
-    fprintf(stabs, "flags:(0,%d),%d,%d;",
-            i + 1, BIT_OFFSET(PMC, flags), BIT_SIZE(Parrot_UInt));
-    fprintf(stabs, "vtable:*(0,%d),%d,%d;",
-            i + 3, BIT_OFFSET(PMC, vtable), BIT_SIZE(void*));
-    fprintf(stabs, "data:(0,14),%d,%d;",
-            BIT_OFFSET(PMC, data), BIT_SIZE(void*));
-    fprintf(stabs, "pmc_ext:*(0,%d),%d,%d;",
-            i, BIT_OFFSET(PMC, pmc_ext), BIT_SIZE(void*));
-    fprintf(stabs, ";\"");
-    fprintf(stabs, "," N_LSYM ",0,0,0\n");
-
-    fprintf(stabs, ".stabs \"UnionVal:T(0,%d)=u%d"
-                "int_val:(0,12),%d,%d;"
-                "pmc_val:*(0,%d),%d,%d;"
+    fprintf(stabs, ".stabs \"PMC:T(0,%d)=s%d"
+                "flags:(0,12),%d,%d;"
+                "vtable:*(0,%d),%d,%d;"
+                "data:(0,14),%d,%d;"
+                "_metadata:*(0,%d),%d,%d;"
+                "_next_for_GC:*(0,%d),%d,%d;"
                 ";\""
-                "," N_LSYM ",0,0,0\n", i + 2, BYTE_SIZE(UnionVal),
-                BIT_OFFSET(UnionVal, _i._int_val), BIT_SIZE(INTVAL),
-                i, BIT_OFFSET(UnionVal, _ptrs._pmc_val), BIT_SIZE(void*));
+                "," N_LSYM ",0,0,0\n", i, BYTE_SIZE(PMC),
+                BIT_OFFSET(PMC, flags), BIT_SIZE(UINTVAL),
+                i + 1, BIT_OFFSET(PMC, vtable), BIT_SIZE(void*),
+                BIT_OFFSET(PMC, data), BIT_SIZE(void*),
+                i, BIT_OFFSET(PMC, _metadata), BIT_SIZE(void*),
+                i, BIT_OFFSET(PMC, _next_for_GC), BIT_SIZE(void*));
+
+    i++;
+
+    /* someone can add some field to this one */
     fprintf(stabs, ".stabs \"VTABLE:T(0,%d)=s%d"
-                "base_type:(0,%d),%d,%d;"
+                "base_type:(0,12),%d,%d;"
                 ";\""
-                "," N_LSYM ",0,0,0\n", i + 3, BYTE_SIZE(UnionVal),
-                i - 1, BIT_OFFSET(VTABLE, base_type), BIT_SIZE(INTVAL));
-    i += 4;
+                "," N_LSYM ",0,0,0\n", i, BYTE_SIZE(_vtable),
+                BIT_OFFSET(VTABLE, base_type), BIT_SIZE(INTVAL));
 
+    i++;
 }
 
 /*

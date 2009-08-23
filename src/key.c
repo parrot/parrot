@@ -544,7 +544,7 @@ key_next(PARROT_INTERP, ARGIN(PMC *key))
     ASSERT_ARGS(key_next)
     PMC *next_key;
 
-    if (VTABLE_isa(interp, key, CONST_STRING(interp, "Key")) && key->pmc_ext) {
+    if (VTABLE_isa(interp, key, CONST_STRING(interp, "Key"))) {
         GETATTR_Key_next_key(interp, key, next_key);
         return next_key;
     }

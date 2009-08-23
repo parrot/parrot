@@ -1665,7 +1665,7 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
              * RT #54860 and others
              * Save current value while setting the optional
              */
-            const UnionVal old_value = st->val;
+            const UnionCallStateVal old_value = st->val;
 
             while (dest->sig & PARROT_ARG_OPTIONAL) {
                 null_val(st->dest.sig, st);

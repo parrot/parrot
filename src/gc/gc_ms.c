@@ -29,13 +29,6 @@ static void gc_ms_add_free_object(SHIM_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pool);
 
-static void gc_ms_add_free_pmc_ext(SHIM_INTERP,
-    ARGMOD(Small_Object_Pool *pool),
-    ARGIN(void *to_add))
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*pool);
-
 static void gc_ms_alloc_objects(PARROT_INTERP,
     ARGMOD(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
@@ -49,14 +42,6 @@ static void gc_ms_finalize(PARROT_INTERP, ARGIN(Arenas * const arena_base))
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static void * gc_ms_get_free_object(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pool);
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static void * gc_ms_get_free_pmc_ext(PARROT_INTERP,
     ARGMOD(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -92,9 +77,6 @@ static int gc_ms_trace_active_PMCs(PARROT_INTERP,
 #define ASSERT_ARGS_gc_ms_add_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pool) \
     || PARROT_ASSERT_ARG(to_add)
-#define ASSERT_ARGS_gc_ms_add_free_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pool) \
-    || PARROT_ASSERT_ARG(to_add)
 #define ASSERT_ARGS_gc_ms_alloc_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pool)
@@ -102,9 +84,6 @@ static int gc_ms_trace_active_PMCs(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(arena_base)
 #define ASSERT_ARGS_gc_ms_get_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pool)
-#define ASSERT_ARGS_gc_ms_get_free_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_gc_ms_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -355,6 +334,7 @@ static void
 gc_ms_more_traceable_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
     ASSERT_ARGS(gc_ms_more_traceable_objects)
+
     if (pool->skip)
         pool->skip = 0;
     else {
@@ -388,12 +368,12 @@ gc_ms_add_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool),
     ARGIN(void *to_add))
 {
     ASSERT_ARGS(gc_ms_add_free_object)
-    PObj *object           = (PObj *)to_add;
+    GC_MS_PObj_Wrapper *object           = (GC_MS_PObj_Wrapper *)to_add;
 
     PObj_flags_SETTO(object, PObj_on_free_list_FLAG);
 
-    ((GC_MS_PObj_Wrapper*)object)->next_ptr = (PObj *)pool->free_list;
-    pool->free_list        = object;
+    object->next_ptr = pool->free_list;
+    pool->free_list  = object;
 }
 
 /*
@@ -451,7 +431,8 @@ gc_ms_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
     pool->free_list = ((GC_MS_PObj_Wrapper*)ptr)->next_ptr;
 #endif
 
-    PObj_flags_SETTO(ptr, 0);
+    /* PObj_flags_SETTO(ptr, 0); */
+    memset(ptr, 0, pool->object_size);
 
     --pool->num_free_objects;
 
@@ -476,6 +457,7 @@ gc_ms_alloc_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
     ASSERT_ARGS(gc_ms_alloc_objects)
     /* Setup memory for the new objects */
+
     Small_Object_Arena * const new_arena =
         mem_internal_allocate_typed(Small_Object_Arena);
 
@@ -509,118 +491,6 @@ gc_ms_alloc_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
     if (alloc_size > POOL_MAX_BYTES)
         pool->objects_per_alloc = POOL_MAX_BYTES / pool->object_size;
 }
-
-/*
-
-=back
-
-=head2 MS PMC_EXT Pool functions
-
-=over 4
-
-=item C<void gc_ms_pmc_ext_pool_init(Small_Object_Pool *pool)>
-
-Initialize the PMC_EXT pool functions. This is done separately from other
-pools.
-
-=cut
-
-*/
-
-void
-gc_ms_pmc_ext_pool_init(ARGMOD(Small_Object_Pool *pool))
-{
-    ASSERT_ARGS(gc_ms_pmc_ext_pool_init)
-    pool->add_free_object = gc_ms_add_free_pmc_ext;
-    pool->get_free_object = gc_ms_get_free_pmc_ext;
-    pool->alloc_objects   = gc_ms_alloc_objects;
-    pool->more_objects    = gc_ms_alloc_objects;
-}
-
-
-/*
-
-=item C<static void gc_ms_add_free_pmc_ext(PARROT_INTERP, Small_Object_Pool
-*pool, void *to_add)>
-
-Add a freed PMC_EXT structure to the free list in the PMC_EXT pool. Objects
-on the free list can be reused later.
-
-=cut
-
-*/
-
-static void
-gc_ms_add_free_pmc_ext(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(void *to_add))
-{
-    ASSERT_ARGS(gc_ms_add_free_pmc_ext)
-    PMC_EXT * const object = (PMC_EXT *)to_add;
-    object->_metadata      = NULL;
-
-    /* yes, this cast is a hack for now, but a pointer is a pointer */
-    object->_next_for_GC   = (PMC *)pool->free_list;
-    pool->free_list        = object;
-}
-
-/*
-
-=item C<static void * gc_ms_get_free_pmc_ext(PARROT_INTERP, Small_Object_Pool
-*pool)>
-
-Get a new PMC_EXT structure from the free pool and return it.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static void *
-gc_ms_get_free_pmc_ext(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
-{
-    ASSERT_ARGS(gc_ms_get_free_pmc_ext)
-    PMC_EXT *ptr;
-    PMC_EXT *free_list = (PMC_EXT *)pool->free_list;
-
-#if GC_USE_LAZY_ALLOCATOR
-    if (!free_list && !pool->newfree) {
-        (*pool->more_objects)(interp, pool);
-        free_list = (PMC_EXT *)pool->free_list;
-    }
-
-    if (!free_list) {
-        Small_Object_Arena * const arena = pool->last_Arena;
-
-        ptr           = (PMC_EXT *)pool->newfree;
-        pool->newfree = (void *)((char *)pool->newfree + pool->object_size);
-
-        if (pool->newfree >= pool->newlast)
-            pool->newfree = NULL;
-        arena->used++;
-        PARROT_ASSERT(ptr < (PMC_EXT *)pool->newlast);
-    }
-    else {
-        ptr               = free_list;
-        pool->free_list   = ptr->_next_for_GC;
-        ptr->_next_for_GC = NULL;
-    }
-#else
-    /* if we don't have any objects */
-    if (!free_list) {
-        (*pool->more_objects)(interp, pool);
-        free_list = (PMC_EXT *)pool->free_list;
-    }
-
-    ptr               = free_list;
-    pool->free_list   = ptr->_next_for_GC;
-    ptr->_next_for_GC = NULL;
-#endif
-
-    --pool->num_free_objects;
-
-    return ptr;
-}
-
 
 /*
 

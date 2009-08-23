@@ -15,7 +15,7 @@
 #define PARROT_LIST_H_GUARD
 
 typedef struct List_chunk {
-    Buffer             data;        /* item store */
+    Buffer             data;        /* item store, Buffer must be first element in struct*/
     struct List_chunk *next;
     struct List_chunk *prev;
     UINTVAL            flags;       /* chunk flags */

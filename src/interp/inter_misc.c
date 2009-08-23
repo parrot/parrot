@@ -252,9 +252,6 @@ interpinfo(PARROT_INTERP, INTVAL what)
         case IMPATIENT_PMCS:
             ret = Parrot_gc_impatient_pmcs(interp);
             break;
-        case EXTENDED_PMCS:
-            ret = Parrot_gc_extended_pmcs(interp);
-            break;
         case CURRENT_RUNCORE:
             ret = interp->run_core;
             break;

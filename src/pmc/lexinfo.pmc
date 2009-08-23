@@ -23,8 +23,7 @@ These are the vtable functions for the lexinfo PMC.
 
 /*
  * LexInfo contains a constant Hash with constant string
- * keys and integer indices - no marking and no pmc_ext
- * needed (except for freeze/thaw
+ * keys and integer indices
  */
 
 pmclass LexInfo extends Hash need_ext provides hash no_ro {

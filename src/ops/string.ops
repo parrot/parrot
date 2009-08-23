@@ -392,7 +392,7 @@ inline op stringinfo(out INT, in STR, in INT) :base_core {
                 $1 = PTR2UINTVAL($2->strstart);
                 break;
             case STRINGINFO_BUFLEN:
-                $1 = PObj_buflen($2);
+                $1 = Buffer_buflen($2);
                 break;
             case STRINGINFO_FLAGS:
                 $1 = PObj_get_FLAGS($2);

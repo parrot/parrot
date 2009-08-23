@@ -257,9 +257,6 @@ chain.
     VTABLE PMC *shift_pmc() {
         PMC *next_key;
 
-        if (!SELF->pmc_ext)
-            return NULL;
-
         GET_ATTR_next_key(INTERP, SELF, next_key);
         return next_key;
     }

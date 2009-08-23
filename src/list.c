@@ -342,11 +342,11 @@ static void split_chunk(PARROT_INTERP,
 /* HEADERIZER END: static */
 
 #define chunk_list_size(list) \
-                (PObj_buflen(&(list)->chunk_list) / sizeof (List_chunk *))
+                (Buffer_buflen(&(list)->chunk_list) / sizeof (List_chunk *))
 
 /* hide the ugly cast somehow: */
 #define chunk_list_ptr(list, idx) \
-        ((List_chunk**) PObj_bufstart(&(list)->chunk_list))[(idx)]
+        ((List_chunk**) Buffer_bufstart(&(list)->chunk_list))[(idx)]
 
 /*
 
@@ -381,7 +381,7 @@ allocate_chunk(PARROT_INTERP, ARGIN(List *list), UINTVAL items, UINTVAL size)
     chunk->next     = NULL;
     chunk->prev     = NULL;
     Parrot_gc_allocate_buffer_storage_aligned(interp, (Buffer *)chunk, size);
-    memset(PObj_bufstart((Buffer*)chunk), 0, size);
+    memset(Buffer_bufstart((Buffer*)chunk), 0, size);
 
     /* see also src/hash.c */
     if (list->container)
@@ -520,13 +520,13 @@ rebuild_other(PARROT_INTERP, ARGMOD(List *list))
                 }
 
                 mem_sys_memmove(
-                        (char *) PObj_bufstart(&prev->data) +
+                        (char *) Buffer_bufstart(&prev->data) +
                         prev->items * list->item_size,
-                        (const char *) PObj_bufstart(&chunk->data),
+                        (const char *) Buffer_bufstart(&chunk->data),
                         (MAX_ITEMS - prev->items) * list->item_size);
                 mem_sys_memmove(
-                        (char *) PObj_bufstart(&chunk->data),
-                        (const char *) PObj_bufstart(&chunk->data) +
+                        (char *) Buffer_bufstart(&chunk->data),
+                        (const char *) Buffer_bufstart(&chunk->data) +
                         (MAX_ITEMS - prev->items) * list->item_size,
                         (chunk->items - (MAX_ITEMS - prev->items))
                                                         * list->item_size);
@@ -540,9 +540,9 @@ rebuild_other(PARROT_INTERP, ARGMOD(List *list))
                     GC_WRITE_BARRIER(interp, list->container, 0, prev);
                 }
                 mem_sys_memmove(
-                        (char *) PObj_bufstart(&prev->data) +
+                        (char *) Buffer_bufstart(&prev->data) +
                         prev->items * list->item_size,
-                        (const char *) PObj_bufstart(&chunk->data),
+                        (const char *) Buffer_bufstart(&chunk->data),
                         chunk->items * list->item_size);
                 prev->items += chunk->items;
                 chunk->items = 0;
@@ -583,8 +583,8 @@ rebuild_fix_ends(ARGMOD(List *list))
 
         chunk->flags      = 0;
         list->grow_policy = enum_grow_unknown;
-        list->cap        += PObj_buflen(&chunk->data) / list->item_size - chunk->items;
-        chunk->items      = PObj_buflen(&chunk->data) / list->item_size;
+        list->cap        += Buffer_buflen(&chunk->data) / list->item_size - chunk->items;
+        chunk->items      = Buffer_buflen(&chunk->data) / list->item_size;
     }
 
     /* XXX - still needed? - if last is empty and last->prev not full then
@@ -1227,34 +1227,34 @@ list_set(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(void *item),
     switch (type) {
     case enum_type_sized:
         /* copy data into list */
-        memcpy(&((char *) PObj_bufstart(&chunk->data))[idx * list->item_size],
+        memcpy(&((char *) Buffer_bufstart(&chunk->data))[idx * list->item_size],
                 item, list->item_size);
         break;
     case enum_type_char:
-        ((char *) PObj_bufstart(&chunk->data))[idx] = (char)PTR2INTVAL(item);
+        ((char *) Buffer_bufstart(&chunk->data))[idx] = (char)PTR2INTVAL(item);
         break;
     case enum_type_short:
-        ((short *) PObj_bufstart(&chunk->data))[idx] = (short)PTR2INTVAL(item);
+        ((short *) Buffer_bufstart(&chunk->data))[idx] = (short)PTR2INTVAL(item);
         break;
     case enum_type_int:
-        ((int *) PObj_bufstart(&chunk->data))[idx] = (int)PTR2INTVAL(item);
+        ((int *) Buffer_bufstart(&chunk->data))[idx] = (int)PTR2INTVAL(item);
         break;
     case enum_type_INTVAL:
-        ((INTVAL *) PObj_bufstart(&chunk->data))[idx] = PTR2INTVAL(item);
+        ((INTVAL *) Buffer_bufstart(&chunk->data))[idx] = PTR2INTVAL(item);
         break;
     case enum_type_FLOATVAL:
-        ((FLOATVAL *) PObj_bufstart(&chunk->data))[idx] = *(FLOATVAL *)item;
+        ((FLOATVAL *) Buffer_bufstart(&chunk->data))[idx] = *(FLOATVAL *)item;
         break;
     case enum_type_PMC:
         if (list->container) {
             GC_WRITE_BARRIER(interp, list->container,
-                    ((PMC **) PObj_bufstart(&chunk->data))[idx],
+                    ((PMC **) Buffer_bufstart(&chunk->data))[idx],
                     (PMC *)item);
         }
-        ((PMC **) PObj_bufstart(&chunk->data))[idx] = (PMC *)item;
+        ((PMC **) Buffer_bufstart(&chunk->data))[idx] = (PMC *)item;
         break;
     case enum_type_STRING:
-        ((STRING **) PObj_bufstart(&chunk->data))[idx] = (STRING *)item;
+        ((STRING **) Buffer_bufstart(&chunk->data))[idx] = (STRING *)item;
         break;
     default:
         Parrot_ex_throw_from_c_args(interp, NULL, 1, "Unknown list entry type\n");
@@ -1296,21 +1296,21 @@ list_item(PARROT_INTERP, ARGMOD(List *list), int type, INTVAL idx)
     switch (type) {
         case enum_type_sized:
             return (void *)&((char *)
-                PObj_bufstart(&chunk->data))[idx * list->item_size];
+                Buffer_bufstart(&chunk->data))[idx * list->item_size];
         case enum_type_char:
-            return (void *)&((char *) PObj_bufstart(&chunk->data))[idx];
+            return (void *)&((char *) Buffer_bufstart(&chunk->data))[idx];
         case enum_type_short:
-            return (void *)&((short *) PObj_bufstart(&chunk->data))[idx];
+            return (void *)&((short *) Buffer_bufstart(&chunk->data))[idx];
         case enum_type_int:
-            return (void *)&((int *) PObj_bufstart(&chunk->data))[idx];
+            return (void *)&((int *) Buffer_bufstart(&chunk->data))[idx];
         case enum_type_INTVAL:
-            return (void *)&((INTVAL *) PObj_bufstart(&chunk->data))[idx];
+            return (void *)&((INTVAL *) Buffer_bufstart(&chunk->data))[idx];
         case enum_type_FLOATVAL:
-            return (void *)&((FLOATVAL *) PObj_bufstart(&chunk->data))[idx];
+            return (void *)&((FLOATVAL *) Buffer_bufstart(&chunk->data))[idx];
         case enum_type_PMC:
-            return (void *)&((PMC **) PObj_bufstart(&chunk->data))[idx];
+            return (void *)&((PMC **) Buffer_bufstart(&chunk->data))[idx];
         case enum_type_STRING:
-            return (void *)&((STRING **) PObj_bufstart(&chunk->data))[idx];
+            return (void *)&((STRING **) Buffer_bufstart(&chunk->data))[idx];
         default:
             Parrot_ex_throw_from_c_args(interp, NULL, 1, "Unknown list entry type\n");
     }
@@ -1569,12 +1569,12 @@ list_clone(PARROT_INTERP, ARGIN(const List *other))
     l = list_new(interp, other->item_type);
 
     STRUCT_COPY(l, other);
-    PObj_buflen(&l->chunk_list)   = 0;
-    PObj_bufstart(&l->chunk_list) = NULL;
+    Buffer_buflen(&l->chunk_list)   = 0;
+    Buffer_bufstart(&l->chunk_list) = NULL;
 
     for (chunk = other->first, prev = NULL; chunk; chunk = chunk->next) {
         List_chunk * const new_chunk = allocate_chunk(interp, l,
-                chunk->items, PObj_buflen(&chunk->data));
+                chunk->items, Buffer_buflen(&chunk->data));
 
         new_chunk->flags = chunk->flags;
 
@@ -1589,24 +1589,24 @@ list_clone(PARROT_INTERP, ARGIN(const List *other))
             switch (l->item_type) {
             case enum_type_PMC:
                 for (i = 0; i < chunk->items; i++) {
-                    PMC * const op = ((PMC **) PObj_bufstart(&chunk->data))[i];
+                    PMC * const op = ((PMC **) Buffer_bufstart(&chunk->data))[i];
 
                     if (op)
-                        ((PMC **) PObj_bufstart(&new_chunk->data))[i] =
+                        ((PMC **) Buffer_bufstart(&new_chunk->data))[i] =
                             VTABLE_clone(interp, op);
                 }
                 break;
             case enum_type_STRING:
                 for (i = 0; i < chunk->items; i++) {
-                    STRING *s = ((STRING **) PObj_bufstart(&chunk->data))[i];
+                    STRING *s = ((STRING **) Buffer_bufstart(&chunk->data))[i];
                     if (s)
-                        ((STRING **) PObj_bufstart(&new_chunk->data))[i] =
+                        ((STRING **) Buffer_bufstart(&new_chunk->data))[i] =
                                 Parrot_str_copy(interp, s);
                 }
                 break;
             default:
-                mem_sys_memcopy(PObj_bufstart(&new_chunk->data),
-                        PObj_bufstart(&chunk->data), PObj_buflen(&chunk->data));
+                mem_sys_memcopy(Buffer_bufstart(&new_chunk->data),
+                        Buffer_bufstart(&chunk->data), Buffer_buflen(&chunk->data));
                 break;
             }
         }
@@ -1643,7 +1643,7 @@ list_mark(PARROT_INTERP, ARGMOD(List *list))
         if (list->item_type == enum_type_PMC
         ||  list->item_type == enum_type_STRING) {
             if (!(chunk->flags & sparse)) {
-                PObj **p = ((PObj **) PObj_bufstart(&chunk->data));
+                PObj **p = ((PObj **) Buffer_bufstart(&chunk->data));
                 UINTVAL i;
 
                 for (i = 0; i < chunk->items; i++, ++p) {
@@ -1688,7 +1688,7 @@ list_visit(PARROT_INTERP, ARGIN(List *list), ARGMOD(void *pinfo))
         if (!(chunk->flags & sparse)) {
             UINTVAL i;
             for (i = 0; i < chunk->items && idx < n; i++, idx++) {
-                PMC ** const pos = ((PMC **) PObj_bufstart(&chunk->data)) + i;
+                PMC ** const pos = ((PMC **) Buffer_bufstart(&chunk->data)) + i;
                 info->thaw_ptr   = pos;
                 (info->visit_pmc_now)(interp, *pos, info);
             }
@@ -1830,8 +1830,8 @@ list_insert(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, INTVAL n_items)
 
             /* copy data over */
             mem_sys_memmove(
-                    (char *)PObj_bufstart(&rest->data),
-                    (char *)PObj_bufstart(&chunk->data) + idx * list->item_size,
+                    (char *)Buffer_bufstart(&rest->data),
+                    (char *)Buffer_bufstart(&chunk->data) + idx * list->item_size,
                     items * list->item_size);
         }
         else {
@@ -1895,15 +1895,15 @@ list_delete(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, INTVAL n_items)
                             list->item_size;
 
                     mem_sys_memmove(
-                            (char *) PObj_bufstart(&chunk->data) +
+                            (char *) Buffer_bufstart(&chunk->data) +
                             idx * list->item_size,
-                            (char *) PObj_bufstart(&chunk->data) +
+                            (char *) Buffer_bufstart(&chunk->data) +
                             (idx + n_items) * list->item_size, tmp_size);
 #else
                     mem_sys_memmove(
-                            (char *) PObj_bufstart(&chunk->data) +
+                            (char *) Buffer_bufstart(&chunk->data) +
                             idx * list->item_size,
-                            (char *) PObj_bufstart(&chunk->data) +
+                            (char *) Buffer_bufstart(&chunk->data) +
                             (idx + n_items) * list->item_size,
                             (chunk->items - idx - n_items) * list->item_size);
 #endif

@@ -440,7 +440,7 @@ upcase(PARROT_INTERP, ARGIN(STRING *src))
 
     /* use all available space - see below XXX */
     /* TODO downcase, titlecase too */
-    dest_len = PObj_buflen(src) / sizeof (UChar);
+    dest_len = Buffer_buflen(src) / sizeof (UChar);
     src_len  = src->bufused     / sizeof (UChar);
 
     /*

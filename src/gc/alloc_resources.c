@@ -54,7 +54,18 @@ static const char* buffer_location(PARROT_INTERP, ARGIN(const PObj *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void debug_print_buf(PARROT_INTERP, ARGIN(const PObj *b))
+static void check_memory_pool(ARGMOD(Memory_Pool *pool))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*pool);
+
+static void check_memory_system(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+static void check_small_object_pool(ARGMOD(Small_Object_Pool * pool))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(* pool);
+
+static void debug_print_buf(PARROT_INTERP, ARGIN(const Buffer *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -71,6 +82,12 @@ static Memory_Pool * new_memory_pool(
 #define ASSERT_ARGS_buffer_location __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_check_memory_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_check_memory_system __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_check_small_object_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_debug_print_buf __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(b)
@@ -277,7 +294,7 @@ buffer_location(PARROT_INTERP, ARGIN(const PObj *b))
 
 /*
 
-=item C<static void debug_print_buf(PARROT_INTERP, const PObj *b)>
+=item C<static void debug_print_buf(PARROT_INTERP, const Buffer *b)>
 
 Prints a debug statement with information about the given PObj C<b>.
 =cut
@@ -285,11 +302,11 @@ Prints a debug statement with information about the given PObj C<b>.
 */
 
 static void
-debug_print_buf(PARROT_INTERP, ARGIN(const PObj *b))
+debug_print_buf(PARROT_INTERP, ARGIN(const Buffer *b))
 {
     ASSERT_ARGS(debug_print_buf)
     fprintf(stderr, "found %p, len %d, flags 0x%08x at %s\n",
-            b, (int)PObj_buflen(b), (uint)PObj_get_FLAGS(b),
+            b, (int)Buffer_buflen(b), (uint)PObj_get_FLAGS(b),
             buffer_location(interp, b));
 }
 #endif
@@ -408,21 +425,21 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
                 INTVAL *ref_count = NULL;
 
                 /* ! (on_free_list | constant | external | sysmem) */
-                if (PObj_buflen(b) && PObj_is_movable_TESTALL(b)) {
+                if (Buffer_buflen(b) && PObj_is_movable_TESTALL(b)) {
                     ptrdiff_t offset = 0;
 #if RESOURCE_DEBUG
-                    if (PObj_buflen(b) >= RESOURCE_DEBUG_SIZE)
+                    if (Buffer_buflen(b) >= RESOURCE_DEBUG_SIZE)
                         debug_print_buf(interp, b);
 #endif
 
                     /* we can't perform the math all the time, because
                      * strstart might be in unallocated memory */
                     if (PObj_is_COWable_TEST(b)) {
-                        ref_count = PObj_bufrefcountptr(b);
+                        ref_count = Buffer_bufrefcountptr(b);
 
                         if (PObj_is_string_TEST(b)) {
                             offset = (ptrdiff_t)((STRING *)b)->strstart -
-                                (ptrdiff_t)PObj_bufstart(b);
+                                (ptrdiff_t)Buffer_bufstart(b);
                         }
                     }
 
@@ -430,7 +447,8 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
                     if (PObj_COW_TEST(b) &&
                         (ref_count && *ref_count & Buffer_moved_FLAG)) {
                         /* Find out who else references our data */
-                        Buffer * const hdr = *(Buffer **)(PObj_bufstart(b));
+                        Buffer * const hdr = *((Buffer **)Buffer_bufstart(b));
+
 
                         PARROT_ASSERT(PObj_is_COWable_TEST(b));
 
@@ -439,13 +457,13 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
 
                         /* TODO incr ref_count, after fixing string too
                          * Now make sure we point to where the other guy does */
-                        PObj_bufstart(b) = PObj_bufstart(hdr);
+                        Buffer_bufstart(b) = Buffer_bufstart(hdr);
 
                         /* And if we're a string, update strstart */
                         /* Somewhat of a hack, but if we get per-pool
                          * collections, it should help ease the pain */
                         if (PObj_is_string_TEST(b)) {
-                            ((STRING *)b)->strstart = (char *)PObj_bufstart(b) +
+                            ((STRING *)b)->strstart = (char *)Buffer_bufstart(b) +
                                     offset;
                         }
                     }
@@ -458,14 +476,14 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
                         }
 
                         /* Copy our memory to the new pool */
-                        memcpy(cur_spot, PObj_bufstart(b), PObj_buflen(b));
+                        memcpy(cur_spot, Buffer_bufstart(b), Buffer_buflen(b));
 
                         /* If we're COW */
                         if (PObj_COW_TEST(b)) {
                             PARROT_ASSERT(PObj_is_COWable_TEST(b));
 
                             /* Let the old buffer know how to find us */
-                            *(Buffer **)(PObj_bufstart(b)) = b;
+                            *((Buffer **)Buffer_bufstart(b)) = b;
 
                             /* No guarantees that our data is still COW, so
                              * assume not, and let the above code fix-up */
@@ -478,14 +496,14 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
                                 *ref_count |= Buffer_moved_FLAG;
                         }
 
-                        PObj_bufstart(b) = cur_spot;
+                        Buffer_bufstart(b) = cur_spot;
 
                         if (PObj_is_string_TEST(b)) {
-                            ((STRING *)b)->strstart = (char *)PObj_bufstart(b) +
+                            ((STRING *)b)->strstart = (char *)Buffer_bufstart(b) +
                                     offset;
                         }
 
-                        cur_spot += PObj_buflen(b);
+                        cur_spot += Buffer_buflen(b);
                     }
                 }
                 b = (Buffer *)((char *)b + object_size);
@@ -677,7 +695,6 @@ initialize_memory_pools(PARROT_INTERP)
 
     /* Constant strings - not compacted */
     arena_base->constant_string_pool = new_memory_pool(POOL_SIZE, NULL);
-
     alloc_new_block(interp, POOL_SIZE, arena_base->constant_string_pool, "init");
 }
 
@@ -705,9 +722,8 @@ merge_pools(ARGMOD(Memory_Pool *dest), ARGMOD(Memory_Pool *source))
     while (cur_block) {
         Memory_Block * const next_block = cur_block->prev;
 
-        if (cur_block->free == cur_block->size) {
+        if (cur_block->free == cur_block->size)
             mem_internal_free(cur_block);
-        }
         else {
             cur_block->next        = NULL;
             cur_block->prev        = dest->top_block;
@@ -725,6 +741,205 @@ merge_pools(ARGMOD(Memory_Pool *dest), ARGMOD(Memory_Pool *source))
     source->total_allocated        = 0;
     source->possibly_reclaimable   = 0;
     source->guaranteed_reclaimable = 0;
+}
+
+/*
+
+=item C<static void check_memory_system(PARROT_INTERP)>
+
+Checks the memory system of parrot on any corruptions, including
+the string system.
+
+=cut
+
+*/
+
+static void
+check_memory_system(PARROT_INTERP)
+{
+    ASSERT_ARGS(check_memory_system)
+    size_t i;
+    Arenas * const arena_base = interp->arena_base;
+
+    check_memory_pool(arena_base->memory_pool);
+    check_memory_pool(arena_base->constant_string_pool);
+    check_small_object_pool(arena_base->pmc_pool);
+    check_small_object_pool(arena_base->constant_pmc_pool);
+    check_small_object_pool(arena_base->string_header_pool);
+    check_small_object_pool(arena_base->constant_string_header_pool);
+
+    for (i = 0; i < arena_base->num_sized; i++) {
+        Small_Object_Pool * pool = arena_base->sized_header_pools[i];
+        if (pool != NULL && pool != arena_base->string_header_pool)
+            check_small_object_pool(pool);
+    }
+}
+
+/*
+
+=item C<static void check_small_object_pool(Small_Object_Pool * pool)>
+
+Checks a small object pool, if it contains buffer it checks the buffers also.
+
+=cut
+
+*/
+
+static void
+check_small_object_pool(ARGMOD(Small_Object_Pool * pool))
+{
+    ASSERT_ARGS(check_small_object_pool)
+    size_t total_objects;
+    size_t last_free_list_count;
+    Small_Object_Arena * arena_walker;
+    size_t free_objects;
+    PObj * object;
+    size_t i;
+    size_t count;
+    GC_MS_PObj_Wrapper * pobj_walker;
+
+    count = 10000000; /*detect unendless loop just use big enough number*/
+
+    total_objects = pool->total_objects;
+    last_free_list_count = 1;
+    free_objects = 0;
+
+    arena_walker = pool->last_Arena;
+    while (arena_walker != NULL) {
+        total_objects -= arena_walker->total_objects;
+        object = (PObj*)arena_walker->start_objects;
+        for (i = 0; i < arena_walker->total_objects; ++i) {
+            if (PObj_on_free_list_TEST(object)) {
+                ++free_objects;
+                pobj_walker = (GC_MS_PObj_Wrapper*)object;
+                if (pobj_walker->next_ptr == NULL)
+                    /* should happen only once at the end */
+                    --last_free_list_count;
+                else {
+                    /* next item on free list should also be flaged as free item */
+                    pobj_walker = (GC_MS_PObj_Wrapper*)pobj_walker->next_ptr;
+                    PARROT_ASSERT(PObj_on_free_list_TEST((PObj*)pobj_walker));
+                }
+            }
+            else if (pool->mem_pool != NULL) {
+                /*then it means we are a buffer*/
+                check_buffer_ptr((Buffer*)object, pool->mem_pool);
+            }
+            object = (PObj*)((char *)object + pool->object_size);
+            PARROT_ASSERT(--count);
+        }
+        /*check the list*/
+        if (arena_walker->prev != NULL)
+            PARROT_ASSERT(arena_walker->prev->next == arena_walker);
+        arena_walker = arena_walker->prev;
+        PARROT_ASSERT(--count);
+    }
+
+    count = 10000000;
+
+    PARROT_ASSERT(free_objects == pool->num_free_objects);
+
+    pobj_walker = (GC_MS_PObj_Wrapper*)pool->free_list;
+    while (pobj_walker != NULL) {
+        PARROT_ASSERT(pool->start_arena_memory <= (size_t)pobj_walker);
+        PARROT_ASSERT(pool->end_arena_memory > (size_t)pobj_walker);
+        PARROT_ASSERT(PObj_on_free_list_TEST((PObj*)pobj_walker));
+        --free_objects;
+        pobj_walker = (GC_MS_PObj_Wrapper*)pobj_walker->next_ptr;
+        PARROT_ASSERT(--count);
+    }
+
+    PARROT_ASSERT(total_objects == 0);
+    PARROT_ASSERT(last_free_list_count == 0 || pool->num_free_objects == 0);
+    PARROT_ASSERT(free_objects == 0);
+}
+
+/*
+
+=item C<static void check_memory_pool(Memory_Pool *pool)>
+
+Checks a memory pool, containing buffer data
+
+=cut
+
+*/
+
+static void
+check_memory_pool(ARGMOD(Memory_Pool *pool))
+{
+    ASSERT_ARGS(check_memory_pool)
+    size_t count;
+    Memory_Block * block_walker;
+    count = 10000000; /*detect unendless loop just use big enough number*/
+
+    block_walker = (Memory_Block *)pool->top_block;
+    while (block_walker != NULL) {
+        PARROT_ASSERT(block_walker->start == (char *)block_walker +
+            sizeof (Memory_Block));
+        PARROT_ASSERT((size_t)(block_walker->top -
+            block_walker->start) == block_walker->size - block_walker->free);
+
+        /*check the list*/
+        if (block_walker->prev != NULL)
+            PARROT_ASSERT(block_walker->prev->next == block_walker);
+        block_walker = block_walker->prev;
+        PARROT_ASSERT(--count);
+    }
+}
+
+/*
+
+=item C<void check_buffer_ptr(Buffer * pobj, Memory_Pool * pool)>
+
+Checks wether the buffer is within the bounds of the memory pool
+
+=cut
+
+*/
+
+void
+check_buffer_ptr(ARGMOD(Buffer * pobj), ARGMOD(Memory_Pool * pool))
+{
+    ASSERT_ARGS(check_buffer_ptr)
+    Memory_Block * cur_block = pool->top_block;
+    char * bufstart;
+
+    bufstart = (char*)Buffer_bufstart(pobj);
+
+    if (bufstart == NULL && Buffer_buflen(pobj) == 0)
+        return;
+
+    if (PObj_external_TEST(pobj) || PObj_sysmem_TEST(pobj)) {
+        /*buffer does not come from the memory pool*/
+        if (PObj_is_string_TEST(pobj)) {
+            PARROT_ASSERT(((STRING *) pobj)->strstart >=
+                (char *) Buffer_bufstart(pobj));
+            PARROT_ASSERT(((STRING *) pobj)->strstart +
+                ((STRING *) pobj)->strlen <=
+                (char *) Buffer_bufstart(pobj) + Buffer_buflen(pobj));
+        }
+        return;
+    }
+
+    if (PObj_is_COWable_TEST(pobj))
+        bufstart -= sizeof (void*);
+
+    while (cur_block) {
+        if ((char *)bufstart >= cur_block->start &&
+            (char *)Buffer_bufstart(pobj) +
+            Buffer_buflen(pobj) < cur_block->start + cur_block->size) {
+            if (PObj_is_string_TEST(pobj)) {
+                PARROT_ASSERT(((STRING *)pobj)->strstart >=
+                    (char *)Buffer_bufstart(pobj));
+                PARROT_ASSERT(((STRING *)pobj)->strstart +
+                    ((STRING *)pobj)->strlen <= (char *)Buffer_bufstart(pobj) +
+                    Buffer_buflen(pobj));
+            }
+            return;
+        }
+        cur_block = cur_block->prev;
+    }
+    PARROT_ASSERT(0);
 }
 
 /*

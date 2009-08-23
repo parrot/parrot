@@ -70,10 +70,30 @@ typedef struct call_state_item {
     INTVAL slurp_n;           /* number of :flat/:slurpy args/params to match */
 } call_state_item;
 
+typedef union UnionCallStateVal {
+    struct _ptrs {               /* or two pointers, both are defines */
+        DPOINTER * _struct_val;
+        PMC *      _pmc_val;
+    } _ptrs;
+    struct _i {
+        INTVAL _int_val;         /* or 2 intvals */
+        INTVAL _int_val2;
+    } _i;
+    FLOATVAL _num_val;                       /* or one float */
+    struct parrot_string_t * _string_val;    /* or a pointer to a string */
+} UnionCallStateVal;
+
+#define UVal_ptr(u)       (u)._ptrs._struct_val
+#define UVal_pmc(u)       (u)._ptrs._pmc_val
+#define UVal_int(u)       (u)._i._int_val
+#define UVal_int2(u)      (u)._i._int_val2
+#define UVal_num(u)       (u)._num_val
+#define UVal_str(u)       (u)._string_val
+
 typedef struct call_state {
     call_state_item src;
     call_state_item dest;
-    UnionVal val;
+    UnionCallStateVal val;
     int n_actual_args;  /* arguments incl. flatten */
     int optionals;      /* sum of optionals */
     int params;         /* sum of params */

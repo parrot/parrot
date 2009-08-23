@@ -405,7 +405,7 @@ sub make_arg {
     /b/ && do {
         push @{$temps_ref},          "STRING *t_$temp_num;";
         push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_S($reg_num);";
-        return "PObj_bufstart(t_$temp_num)";
+        return "Buffer_bufstart(t_$temp_num)";
     };
     /B/ && do {
         push @{$temps_ref}, "char *s_$temp_num;\n    char *t_$temp_num;\n    void** v_$temp_num = (void **) &t_$temp_num;";

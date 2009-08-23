@@ -525,7 +525,7 @@ utf8_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
 
     i->bytepos += (new_pos - pos);
     /* XXX possible buffer overrun exception? */
-    PARROT_ASSERT(i->bytepos <= PObj_buflen(s));
+    PARROT_ASSERT(i->bytepos <= Buffer_buflen(s));
     i->charpos++;
 }
 

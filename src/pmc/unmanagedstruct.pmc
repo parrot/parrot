@@ -382,7 +382,7 @@ ret_pmc(PARROT_INTERP, PMC *pmc, char *p, int type, INTVAL idx)
             ret  = *(PMC**) p;
 
             /* now check if initializer has a signature attached */
-            if (ptr->pmc_ext && PMC_metadata(ptr)) {
+            if (PMC_metadata(ptr)) {
                 STRING *signature_str = CONST_STRING(interp, "_signature");
                 PMC *sig = VTABLE_getprop(interp, ptr, signature_str);
                 if (VTABLE_defined(interp, sig)) {
@@ -398,9 +398,8 @@ ret_pmc(PARROT_INTERP, PMC *pmc, char *p, int type, INTVAL idx)
             /* check the metadata for an initializer */
 
             /* grab the struct from the metadata */
-            if (ptr->pmc_ext && PMC_metadata(ptr)) {
+            if (PMC_metadata(ptr))
                 ret = VTABLE_getprop(interp, ptr, CONST_STRING(interp, "_struct"));
-            }
             else {
                 Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_OPERATION,

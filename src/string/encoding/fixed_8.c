@@ -634,7 +634,7 @@ fixed8_set_position(SHIM_INTERP, ARGMOD(String_iter *iter), UINTVAL pos)
 {
     ASSERT_ARGS(fixed8_set_position)
     iter->bytepos = iter->charpos = pos;
-    PARROT_ASSERT(pos <= PObj_buflen(iter->str));
+    PARROT_ASSERT(pos <= Buffer_buflen(iter->str));
 }
 
 

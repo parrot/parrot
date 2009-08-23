@@ -299,8 +299,7 @@ an Arenas struct.
 The Arenas structure contains pointers to a variety of memory pools, each used
 for a specific purpose. Two are Memory_Pool pointers (memory_pool,
 constant_string_pool), and six are Small_Object_Pool structures (pmc_pool,
-pmc_ext_pool, constant_pmc_pool, buffer_header_pool,
-constant_string_header_pool).
+constant_pmc_pool, constant_string_header_pool).
 
 The Arenas structure holds function pointers for the core defined interface of
 the currently active GC subsystem: C<init_pool>, C<do_gc_mark>,

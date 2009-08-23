@@ -118,63 +118,57 @@ write_types(FILE *stabs, PARROT_INTERP)
     fprintf(stabs, ".stabx \"STRING:t%d=*%d\""
                 ",0," C_DECL ",0\n", i, i+1);
     ++i;
-    fprintf(stabs, ".stabx \"Parrot_String:T%d=s%d"
-                "bufstart:14,%d,%d;"
-                "buflen:6,%d,%d;"   /* XXX type */
-                "flags:12,%d,%d;"
-                "bufused:12,%d,%d;"
-                "strstart:15,%d,%d;"        /* fake a char* */
+    fprintf(stabs, ".stabs \"Parrot_String:T(0,%d)=s%d"
+                "bufstart:(0,14),%d,%d;"
+                "buflen:(0,6),%d,%d;"
+                "flags:(0,12),%d,%d;"
+                "bufused:(0,12),%d,%d;"
+                "strstart:(0,15),%d,%d;"
                 ";\""
-                ",0," C_DECL ",0\n", i++, BYTE_SIZE(STRING),
-                BIT_OFFSET(STRING, cache._b._bufstart), BIT_SIZE(void*),
-                BIT_OFFSET(STRING, cache._b._buflen), BIT_SIZE(size_t),
+                "," N_LSYM ",0,0,0\n", i++, BYTE_SIZE(STRING),
+                BIT_OFFSET(STRING, _bufstart), BIT_SIZE(void*),
+                BIT_OFFSET(STRING, _buflen), BIT_SIZE(size_t),
                 BIT_OFFSET(STRING, flags), BIT_SIZE(UINTVAL),
                 BIT_OFFSET(STRING, bufused), BIT_SIZE(UINTVAL),
                 BIT_OFFSET(STRING, strstart), BIT_SIZE(void*));
 
-    fprintf(stabs, ".stabx \"PMCType:T%d=e", i++);
+    fprintf(stabs, ".stabs \"PMCType:T(0,%d)=e", i++);
     for (j = 0; j < interp->n_vtable_max; ++j) {
         if (interp->vtables[j] && interp->vtables[j]->whoami) {
-            STRING* name = interp->vtables[j]->whoami;
-            fwrite(name->strstart, name->strlen, 1, stabs);
+            STRING *name  = interp->vtables[j]->whoami;
+            size_t  items = fwrite(name->strstart, name->strlen, 1, stabs);
+            if (!items)
+                fprintf(stderr, "Error writing stabs!\n");
             fprintf(stabs, ":%d,", j);
         }
     }
-    fprintf(stabs, ";\",0," C_DECL ",0\n");
 
-    /* PMC type */
-    fprintf(stabs, ".stabx \"PMC:T%d=s%d", i, BYTE_SIZE(PMC));
-    fprintf(stabs, "cache:%d,%d,%d;",
-            i + 1, BIT_OFFSET(PMC, cache), BIT_SIZE(UnionVal));
-    fprintf(stabs, "flags:%d,%d,%d;",
-            i + 1, BIT_OFFSET(PMC, flags), BIT_SIZE(Parrot_UInt));
-    fprintf(stabs, "vtable:*%d,%d,%d;",
-            i + 3, BIT_OFFSET(PMC, vtable), BIT_SIZE(void*));
-    fprintf(stabs, "data:14,%d,%d;",
-            BIT_OFFSET(PMC, data), BIT_SIZE(void*));
-    fprintf(stabs, "pmc_ext:*%d,%d,%d;",
-            i, BIT_OFFSET(PMC, pmc_ext), BIT_SIZE(void*));
-    fprintf(stabs, ";\"");
-    fprintf(stabs, ",0," C_DECL ",0\n");
+    fprintf(stabs, ";\"," N_LSYM ",0,0,0\n");
 
-    fprintf(stabs, ".stabx \"cache:%d,%d,%d;"
-                "flags:12,%d,%d;"
+    fprintf(stabs, ".stabs \"PMC:T(0,%d)=s%d"
+                "flags:(0,12),%d,%d;"
+                "vtable:*(0,%d),%d,%d;"
+                "data:(0,14),%d,%d;"
+                "_metadata:*(0,%d),%d,%d;"
+                "_next_for_GC:*(0,%d),%d,%d;"
                 ";\""
-                ",0," C_DECL ",0\n",
-                i + 2, BIT_SIZE(UnionVal), BIT_SIZE(Parrot_UInt));
-    fprintf(stabs, ".stabx \"UnionVal:T%d=u%d"
-                "int_val:12,%d,%d;"
-                "pmc_val:*%d,%d,%d;"
+                "," N_LSYM ",0,0,0\n", i, BYTE_SIZE(PMC),
+                BIT_OFFSET(PMC, flags), BIT_SIZE(UINTVAL),
+                i + 1, BIT_OFFSET(PMC, vtable), BIT_SIZE(void*),
+                BIT_OFFSET(PMC, data), BIT_SIZE(void*),
+                i, BIT_OFFSET(PMC, _metadata), BIT_SIZE(void*),
+                i, BIT_OFFSET(PMC, _next_for_GC), BIT_SIZE(void*));
+
+    i++;
+
+    /* some one can add some field to this one */
+    fprintf(stabs, ".stabs \"VTABLE:T(0,%d)=s%d"
+                "base_type:(0,12),%d,%d;"
                 ";\""
-                ",0," C_DECL ",0\n", i + 2, BYTE_SIZE(UnionVal),
-                BIT_OFFSET(UnionVal, int_val), BIT_SIZE(INTVAL),
-                i, BIT_OFFSET(UnionVal, pmc_val), BIT_SIZE(void*));
-    fprintf(stabs, ".stabx \"VTABLE:T%d=s%d"
-                "base_type:%d,%d,%d;"
-                ";\""
-                ",0," C_DECL ",0\n", i + 3, BYTE_SIZE(UnionVal),
-                i - 1, BIT_OFFSET(VTABLE, base_type), BIT_SIZE(INTVAL));
-    i += 4;
+                "," N_LSYM ",0,0,0\n", i, BYTE_SIZE(_vtable),
+                BIT_OFFSET(VTABLE, base_type), BIT_SIZE(INTVAL));
+
+    i++;
 
 }
 

@@ -28,11 +28,12 @@ typedef enum {
 
 /*
  * hash_entry is currently unused in the hash structure
- */
+
 typedef struct _hash_entry {
     HashEntryType type;
     UnionVal val;
 } HashEntry;
+*/
 
 /* A BucketIndex is an index into the pool of available buckets. */
 typedef UINTVAL BucketIndex;
@@ -42,7 +43,7 @@ typedef UINTVAL BucketIndex;
 #define HASH_ALLOC_SIZE(n) (N_BUCKETS(n) * sizeof (HashBucket) + \
                                      (n) * sizeof (HashBucket *))
 
-typedef int (*hash_comp_fn)(PARROT_INTERP, const void*const, const void*const);
+typedef int (*hash_comp_fn)(PARROT_INTERP, const void *const, const void *const);
 typedef void (*hash_mark_key_fn)(PARROT_INTERP, PObj *);
 typedef size_t (*hash_hash_key_fn)(PARROT_INTERP, ARGIN(const void *), size_t seed);
 

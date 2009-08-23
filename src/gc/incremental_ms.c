@@ -519,7 +519,7 @@ gc_ims_add_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), ARGOUT(vo
 {
     ASSERT_ARGS(gc_ims_add_free_object)
     *(void **)to_add = pool->free_list;
-    pool->free_list  = to_add;
+    pool->free_list  = (GC_MS_PObj_Wrapper*)to_add;
 #if DISABLE_GC_DEBUG
     UNUSED(interp);
 #else
@@ -561,7 +561,7 @@ gc_ims_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
         (*pool->alloc_objects) (interp, pool);
 
     ptr             = (PObj *)pool->free_list;
-    pool->free_list = *(void **)ptr;
+    pool->free_list = (GC_MS_PObj_Wrapper*)(*(void **)ptr);
 
     /*
      * buffers are born black, PMCs not yet?
@@ -829,7 +829,6 @@ parrot_gc_ims_sweep(PARROT_INTERP)
 
     g_ims->state           = GC_IMS_COLLECT;
     g_ims->n_objects       = n_objects;
-    g_ims->n_extended_PMCs = arena_base->num_extended_PMCs;
 }
 
 

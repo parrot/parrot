@@ -48,7 +48,9 @@ All PMCs have the form:
         Parrot_UInt flags;
         VTABLE *vtable;
         DPOINTER *data;
-        struct PMC_EXT *pmc_ext;
+        PMC *_metadata;
+        struct _Sync *_synchronize; # [Note: may be deprecated, see STM]
+        PMC *_next_for_GC;
     };
 
 where C<cache> is a C<UnionVal> union:
@@ -88,14 +90,6 @@ addition, subtraction, cloning etc.)
 C<data> holds a pointer to the core data associated with the PMC. This
 may be null.
 
-C<pmc_ext> points to an extended PMC structure. This has the form:
-
-    struct PMC_EXT {
-        PMC *_metadata;
-        struct _Sync *_synchronize; # [Note: may be deprecated, see STM]
-        PMC *_next_for_GC;
-    };
-
 C<_metadata> holds internal PMC metadata. The specification for this has not
 yet been finalized.
 
@@ -103,9 +97,6 @@ C<_synchronize> is for access synchronization between shared PMCs.
 
 C<_next_for_GC> determines the next PMC in the 'used' list during dead object
 detection in the GC.
-
-PMCs are not required to have a C<PMC_EXT> structure (i.e. C<pmc_ext> can be
-null).
 
 PMCs are used to implement the basic data types of the high level languages
 running on top of Parrot. For instance, a Perl 5 C<SV> will map onto one (or

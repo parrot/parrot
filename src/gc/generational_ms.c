@@ -1081,7 +1081,7 @@ parrot_gc_gms_wb(PARROT_INTERP, ARGIN(PMC *agg), ARGIN(void *old),
     /* if this may be an aggregate store it in IGP list, thus making
      * it a possible root for this generation
      */
-    if (PObj_is_PMC_TEST((PObj *)_new) && ((PMC *)_new)->pmc_ext)
+    if (PObj_is_PMC_TEST((PObj *)_new))
         gc_gms_store_igp(interp, nh);
 
     /* promote RHS to old generation of aggregate */
@@ -1494,7 +1494,7 @@ parrot_gc_gms_Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
         ++interp->arena_base->num_early_PMCs_seen;
     h = PObj_to_GMSH(obj);
     /* unsnap it from white, put it into gray or black */
-    if (PObj_is_PMC_TEST(obj) && ((PMC*)obj)->pmc_ext)
+    if (PObj_is_PMC_TEST(obj))
         gc_gms_setto_gray(interp, h, priority);
     else
         gc_gms_setto_black(interp, h, priority);
@@ -1693,14 +1693,6 @@ sweep_cb_pmc(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, SHIM(void 
             --arena_base->num_early_gc_PMCs;
         if (PObj_active_destroy_TEST(obj))
             VTABLE_destroy(interp, (PMC *)obj);
-        if (PObj_is_PMC_EXT_TEST(obj) && obj->pmc_ext) {
-            /* if the PMC has a PMC_EXT structure,
-             * return it to the pool
-             */
-            Small_Object_Pool * const ext_pool = arena_base->pmc_ext_pool;
-            ext_pool->add_free_object(interp, ext_pool, obj->pmc_ext);
-        }
-
     }
     pool->free_list = pool->white;
     return 0;
