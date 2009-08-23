@@ -1113,7 +1113,7 @@ sub gen_defaul_case_wrapping {
     elsif ($letter eq 'P') {
         return (
             'PPP->P',
-            'PMC *retval;',
+            'PMC *retval = PMCNULL;',
             ", &retval",
             "return retval;",
         );
