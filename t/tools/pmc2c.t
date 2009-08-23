@@ -28,7 +28,7 @@ use lib qw( . lib ../lib ../../lib );
 
 use Fatal qw{open close};
 use Test::More;
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 12;
 use Parrot::Config;
 
 my $pmc2c = join $PConfig{slash}, qw(. tools build pmc2c.pl);
@@ -133,18 +133,7 @@ END_PMC
 vt_clone->provides_str = CONST_STRING_GEN(interp, "nothing");
 END_C
 
-pmc2c_output_like( <<'END_PMC', <<'END_C', 'need_ext' );
-pmclass a need_ext { }
-END_PMC
-   const VTABLE temp_ro_vtable = {
-        NULL,       /* namespace */
-        enum_class_a, /* base_type */
-        NULL,       /* whoami */
-        0|VTABLE_PMC_NEEDS_EXT|VTABLE_IS_READONLY_FLAG, /* flags */
-END_C
-
 }
-
 
 pmc2c_output_like( <<'END_PMC', <<'END_C', 'maps' );
 pmclass a hll dale maps Integer { }

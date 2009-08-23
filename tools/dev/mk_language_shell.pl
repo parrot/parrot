@@ -1093,7 +1093,6 @@ pmclass @lang@
     provides array
     group   @lclang@_group
 
-    need_ext
     dynpmc
     {
 /*

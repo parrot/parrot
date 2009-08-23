@@ -19,7 +19,7 @@ lexicals at runtime.
 
 */
 
-pmclass DynLexPad dynpmc provides lexpad need_ext auto_attrs {
+pmclass DynLexPad dynpmc provides lexpad auto_attrs {
     ATTR Hash *hash;
     ATTR PMC  *init; /* the PMC used to initialize this DynLexPad */
 

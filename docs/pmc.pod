@@ -30,36 +30,6 @@ provide a limited amount of storage.  The use of this storage encouraged poor
 encapsulation and hidden dependencies between PMCs.  Any new code should not
 use the UnionVal, which will eventually be removed from Parrot.
 
-=head2 PMC_EXT
-
-C<PMC_EXT> is a member of the PMC struct which contains two currently used
-pointers.  PMCs which need C<PMC_EXT> should have C<need_ext> in their
-C<pmclass> declaration.  A PMC should declare C<need_ext> for either of the
-reasons listed below.
-
-Note that the C<_synchronize> member of the C<PMC_EXT> struct is obsolete and
-due to be removed.
-
-=over 4
-
-=item * The PMC needs metadata.
-
-The C<_metadata> member of C<PMC_EXT> is used to store attributes.  If your PMC
-will use attributes (not to be confused with ATTRs), your PMC should declare
-C<need_ext>.  Note that if code attempts to add an attribute to a PMC which
-doesn't have a C<PMC_EXT>, a C<PMC_EXT> with the appropriate C<_metadata> will
-be added dynamically.  In this case, C<need_ext> is a way of telling Parrot to
-take care of this when the PMC is initialized.
-
-=item * The PMC is an aggregate which holds GCable objects.
-
-If the PMC is an aggregate which can contain other GCable object, it needs to
-declare C<need_ext>.  GCable objects include other PMCs and Parrot STRINGs.
-Unlike attribute metadata, all PMCs which contain GCable objects need to
-declare C<need_ext>.
-
-=back
-
 =head2 ATTRs and C<PMC_data()>
 
 If your PMC needs to store more data than will fit into the 8 bits of the PMC

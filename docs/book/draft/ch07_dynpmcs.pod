@@ -88,11 +88,8 @@ in the definition, we can use the C<SUPER> keyword throughout the PMC
 file to refer to the parent type.
 
 The C<FLAGS> are a series of flags that can be specified to determine
-how the PMC behaves and how it's constructed internally. The C<need_ext>
-flag assigns a special C<PMC_EXT> data structure to the PMC structure
-internally. C<PMC_EXT> is necessary to handle data sharing between threads
-or interpreters, storing attributes in the PMC, and a few other uses as
-well. The C<singleton> flag means that there can only be one instantiated
+how the PMC behaves and how it's constructed internally. The C<singleton>
+flag means that there can only be one instantiated
 object of this class. The C<is_ro> and C<has_ro> flags indicate that the
 PMC class is read-only or that it contains read-only data, respectively.
 The C<is_shared> flag indicates that the PMC is intended to be shared

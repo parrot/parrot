@@ -114,10 +114,6 @@ The modifiers specify core features, such as:
 
 =over 4
 
-=item need_ext
-
-Adds the C<PMC_EXT> structure when instantiating the PMC.
-
 =item abstract
 
 The PMC cannot be instantiated. (By convention, abstract classes are given
