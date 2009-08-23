@@ -346,12 +346,14 @@ gc_ms_more_traceable_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
     /* requires that num_free_objects be updated in Parrot_gc_mark_and_sweep.
        If gc is disabled, then we must check the free list directly. */
-    if ((!pool->free_list || pool->num_free_objects < pool->replenish_level)
 #if GC_USE_LAZY_ALLOCATOR
-        && !pool->newfree
-#endif
-    )
+    if ((!pool->free_list || pool->num_free_objects < pool->replenish_level)
+        && !pool->newfree)
         (*pool->alloc_objects) (interp, pool);
+#else
+    if (!pool->free_list || pool->num_free_objects < pool->replenish_level)
+    (*pool->alloc_objects) (interp, pool);
+#endif
 }
 
 /*
@@ -371,7 +373,7 @@ gc_ms_add_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool),
     ARGIN(void *to_add))
 {
     ASSERT_ARGS(gc_ms_add_free_object)
-    GC_MS_PObj_Wrapper *object           = (GC_MS_PObj_Wrapper *)to_add;
+    GC_MS_PObj_Wrapper *object = (GC_MS_PObj_Wrapper *)to_add;
 
     PObj_flags_SETTO(object, PObj_on_free_list_FLAG);
 
