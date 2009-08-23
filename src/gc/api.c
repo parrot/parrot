@@ -229,11 +229,8 @@ Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
         if (PObj_is_special_PMC_TEST(obj))
             mark_special(interp, p);
 
-#  ifndef NDEBUG
         else if (PMC_metadata(p))
-            fprintf(stderr, "GC: error obj %p (%s) has properties\n",
-                    (void *)p, (char*)p->vtable->whoami->strstart);
-#  endif
+            Parrot_gc_mark_PObj_alive(interp, (PObj*)PMC_metadata(p));
     }
 #  if GC_VERBOSE
     /* buffer GC_DEBUG stuff */
