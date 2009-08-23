@@ -298,7 +298,7 @@ Parrot_gc_sweep_pool(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
     /* Run through all the PObj header pools and mark */
     for (cur_arena = pool->last_Arena; cur_arena; cur_arena = cur_arena->prev) {
         const size_t objects_end = cur_arena->used;
-        b = cur_arena->start_objects;
+        b = (PObj *)cur_arena->start_objects;
         UINTVAL i;
 
         /* loop only while there are objects in the arena */
