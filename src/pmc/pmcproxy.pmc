@@ -64,7 +64,7 @@ NOTE: No doubt we will need other things later; this is a start.
 */
 
 
-pmclass PMCProxy extends Class need_ext auto_attrs {
+pmclass PMCProxy extends Class auto_attrs {
 
 /*
 

@@ -19,7 +19,7 @@ INTVALs.  It uses Integer PMCs for all of the conversions.
 
 */
 
-pmclass FixedIntegerArray need_ext auto_attrs provides array {
+pmclass FixedIntegerArray auto_attrs provides array {
     ATTR INTVAL   size;  /* number of INTVALs stored in this array */
     ATTR INTVAL * int_array; /* INTVALs are stored here */
 

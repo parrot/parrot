@@ -26,7 +26,7 @@ These are the vtable functions for the Capture PMC.
     if (!PARROT_CAPTURE(obj)->hash) \
         PARROT_CAPTURE(obj)->hash = pmc_new((i), enum_class_Hash);
 
-pmclass Capture need_ext auto_attrs {
+pmclass Capture auto_attrs {
     ATTR PMC    *array;
     ATTR PMC    *hash;
     ATTR INTVAL  data_size;

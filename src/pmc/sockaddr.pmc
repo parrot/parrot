@@ -29,7 +29,7 @@ extern "C" {
 }
 #endif
 
-pmclass Sockaddr need_ext auto_attrs {
+pmclass Sockaddr auto_attrs {
     ATTR void   *pointer; /* The stored pointer. */
 
 /*

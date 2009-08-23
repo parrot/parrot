@@ -20,7 +20,7 @@ Implements the core concurrency scheduler.
 
 #include "parrot/scheduler_private.h"
 
-pmclass Scheduler need_ext auto_attrs {
+pmclass Scheduler auto_attrs {
 
     ATTR INTVAL        id;         /* The scheduler's ID. */
     ATTR INTVAL        max_tid;    /* The highest assigned task ID. */

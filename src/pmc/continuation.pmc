@@ -45,7 +45,7 @@ more information.
  * need the next_for_GC pointer.
  */
 
-pmclass Continuation need_ext auto_attrs {
+pmclass Continuation auto_attrs {
     ATTR struct Parrot_cont *cont; /* the continuation struct */
 
 /*

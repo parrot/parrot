@@ -90,7 +90,7 @@ A Null PMC is allocated during initialization.
 
 */
 
-pmclass Exporter need_ext auto_attrs {
+pmclass Exporter auto_attrs {
 
     ATTR PMC *ns_src;
     ATTR PMC *ns_dest;

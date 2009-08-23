@@ -20,7 +20,7 @@ The actual pointer is in C<PMC_data>.
 
 */
 
-pmclass Pointer need_ext auto_attrs {
+pmclass Pointer auto_attrs {
     ATTR void * mark_function;
     ATTR void * pointer;
 

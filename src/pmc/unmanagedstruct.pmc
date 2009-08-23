@@ -650,7 +650,7 @@ calc_offsets(PARROT_INTERP, PMC *pmc, PMC *value, size_t toff)
     return toff;
 }
 
-pmclass UnManagedStruct need_ext auto_attrs no_ro {
+pmclass UnManagedStruct auto_attrs no_ro {
     ATTR void   *ptr;   /* the struct that this UnManagedStruct isn't managing */
     ATTR PMC    *init;  /* the initializer used with this UnManagedStruct */
     ATTR INTVAL  size;  /* the size of the struct */

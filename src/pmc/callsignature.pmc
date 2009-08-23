@@ -27,7 +27,7 @@ information for a multiple dispatch call.
     if (!PARROT_CAPTURE(obj)->hash) \
         PARROT_CAPTURE(obj)->hash = pmc_new((i), enum_class_Hash);
 
-pmclass CallSignature extends Capture need_ext auto_attrs provides array provides hash {
+pmclass CallSignature extends Capture auto_attrs provides array provides hash {
     ATTR PMC    *returns;    /* Result PMCs, if they were passed with the call */
     ATTR PMC    *type_tuple; /* Cached argument types for multiple dispatch */
     ATTR STRING *short_sig;  /* Simple string signature args & returns */

@@ -19,7 +19,7 @@ stores Parrot strings.
 
 */
 
-pmclass FixedStringArray need_ext auto_attrs provides array {
+pmclass FixedStringArray auto_attrs provides array {
     ATTR STRING **str_array; /* where the STRINGs are stored */
     ATTR UINTVAL  size;      /* element count */
 

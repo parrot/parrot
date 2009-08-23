@@ -23,7 +23,7 @@ PMC.
 
 #define BITS_PER_CHAR 8
 
-pmclass FixedBooleanArray need_ext auto_attrs provides array {
+pmclass FixedBooleanArray auto_attrs provides array {
     ATTR UINTVAL         size;             /* # of bits this fba holds */
     ATTR UINTVAL         resize_threshold; /* max capacity before resizing */
     ATTR unsigned char * bit_array;        /* where the bits go */

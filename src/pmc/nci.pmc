@@ -123,7 +123,7 @@ nci_sub_t build_func(PARROT_INTERP, PMC *pmc, Parrot_NCI_attributes *nci_info)
 }
 
 
-pmclass NCI need_ext auto_attrs {
+pmclass NCI auto_attrs {
     ATTR STRING    *signature;              /* The signature. */
     ATTR void      *func;                   /* Function pointer to call. */
     ATTR void      *orig_func;              /* Function pointer

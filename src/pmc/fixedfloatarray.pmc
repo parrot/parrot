@@ -19,7 +19,7 @@ stored FLOATVALs.  It uses Float PMCs to do all necessary conversions.
 
 */
 
-pmclass FixedFloatArray need_ext auto_attrs provides array {
+pmclass FixedFloatArray auto_attrs provides array {
     ATTR INTVAL    size;
     ATTR FLOATVAL *float_array;
 

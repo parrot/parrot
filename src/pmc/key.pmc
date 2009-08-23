@@ -18,7 +18,7 @@ These are the vtable functions for the Key PMC class.
 
 */
 
-pmclass Key need_ext auto_attrs {
+pmclass Key auto_attrs {
     ATTR PMC      *next_key; /* Sometimes it's the next key, sometimes it's
                                 not.  The Key code is like that. */
     ATTR INTVAL    int_key;  /* int value of this key, or something magical if

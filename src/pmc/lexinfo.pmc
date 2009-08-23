@@ -26,7 +26,7 @@ These are the vtable functions for the lexinfo PMC.
  * keys and integer indices
  */
 
-pmclass LexInfo extends Hash need_ext provides hash no_ro {
+pmclass LexInfo extends Hash  provides hash no_ro {
 
 /*
 

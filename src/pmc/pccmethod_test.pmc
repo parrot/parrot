@@ -10,7 +10,7 @@ src/pmc/pmethod_test.pmc - METHOD_Test PMC
 
 */
 
-pmclass PCCMETHOD_Test need_ext provides hash {
+pmclass PCCMETHOD_Test provides hash {
 
 
     METHOD test_method()

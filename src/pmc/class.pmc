@@ -450,8 +450,7 @@ calculate_mro(PARROT_INTERP, PMC *SELF, INTVAL num_parents)
 
 */
 
-pmclass Class
-    need_ext auto_attrs {
+pmclass Class auto_attrs {
 
     ATTR INTVAL id;             /* The type number of the PMC. [deprecated: See RT #48024] */
     ATTR STRING *name;          /* The name of the class. */

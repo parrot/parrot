@@ -125,7 +125,7 @@ mark_subs(PARROT_INTERP, PMC *self)
     }
 }
 
-pmclass Eval extends Sub need_ext {
+pmclass Eval extends Sub {
 
     VTABLE void init() {
         Parrot_Sub_attributes *sub_data;

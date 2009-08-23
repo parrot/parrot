@@ -35,11 +35,7 @@ print_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC *sub))
     print_pbc_location(interp);
 }
 
-/*
- * A sub now contains more data like namespace, which makes it
- * effectively a container. Therefore need_ext has to be set
- */
-pmclass Sub need_ext {
+pmclass Sub {
     ATTR PackFile_ByteCode *seg;     /* bytecode segment */
     ATTR size_t   start_offs;        /* sub entry in ops from seg->base.data */
     ATTR size_t   end_offs;

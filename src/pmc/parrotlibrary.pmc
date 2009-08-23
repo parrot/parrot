@@ -31,7 +31,7 @@ a ParrotLibrary PMC.
 #define PMC_dlhandle(x) ((Parrot_ParrotLibrary_attributes*)PMC_data(x))->dl_handle
 #define PMC_oplib_init(x) ((Parrot_ParrotLibrary_attributes*)PMC_data(x))->oplib_init
 
-pmclass ParrotLibrary need_ext auto_attrs provides library {
+pmclass ParrotLibrary auto_attrs provides library {
     ATTR void * dl_handle;  /* DLL handle */
     ATTR void * oplib_init; /* oplib init function */
 

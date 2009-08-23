@@ -82,7 +82,7 @@ static INTVAL do_thread_run_clone_default(PARROT_INTERP,
 }
 
 
-pmclass ParrotThread extends ParrotInterpreter need_ext no_ro {
+pmclass ParrotThread extends ParrotInterpreter no_ro {
 
 /*
 

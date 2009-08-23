@@ -123,7 +123,7 @@ typedef enum {
 
 #define FPA_is_ns_ext PObj_private0_FLAG
 
-pmclass NameSpace extends Hash provides hash need_ext no_ro {
+pmclass NameSpace extends Hash provides hash no_ro {
 
     ATTR STRING *name;     /* Name of this namespace part. */
     ATTR PMC    *_class;   /* The class or role attached to this namespace. */

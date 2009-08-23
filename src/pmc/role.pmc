@@ -198,7 +198,7 @@ static void init_role_from_hash(PARROT_INTERP, PMC *self, PMC *info)
 
 */
 
-pmclass Role need_ext auto_attrs {
+pmclass Role auto_attrs {
     ATTR STRING *name;            /* The name of the role. */
     ATTR PMC    *_namespace;      /* The namespace it's linked to, if any. */
     ATTR PMC    *roles;           /* Roles from which this role is composed. */

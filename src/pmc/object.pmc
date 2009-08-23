@@ -107,7 +107,7 @@ get_attrib_index_keyed(PARROT_INTERP, PMC *self, PMC *key, STRING *name)
     return -1;
 }
 
-pmclass Object need_ext {
+pmclass Object {
     ATTR PMC *_class;       /* The class this is an instance of. */
     ATTR PMC *attrib_store; /* The attributes store - a resizable PMC array. */
 
