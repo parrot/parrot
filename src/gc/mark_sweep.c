@@ -1282,7 +1282,7 @@ Parrot_gc_get_attribute_pool(PARROT_INTERP, size_t attrib_size)
         arenas->num_attribs = total_size;
     }
     if (pools[idx] == NULL)
-        pools[idx] = Parrot_gc_create_attrib_pool(interp, attrib_size);
+        pools[idx] = Parrot_gc_create_attrib_pool(interp, size);
     return pools[idx];
 }
 
