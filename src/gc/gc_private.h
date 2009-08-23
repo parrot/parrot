@@ -68,7 +68,7 @@ extern void *flush_reg_store(void);
    this on at the same time that you increase the size of allocated arenas.
    increase *_HEADERS_PER_ALLOC and GC_FIXED_SIZE_POOL_SIZE to be large
    enough to satisfy most startup costs. */
-#define GC_USE_LAZY_ALLOCATOR 0
+#define GC_USE_LAZY_ALLOCATOR 1
 
 /* We're using this here to add an additional pointer to a PObj without
    having to actually add an entire pointer to every PObj-alike structure

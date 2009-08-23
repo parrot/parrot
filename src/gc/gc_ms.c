@@ -346,8 +346,11 @@ gc_ms_more_traceable_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
     /* requires that num_free_objects be updated in Parrot_gc_mark_and_sweep.
        If gc is disabled, then we must check the free list directly. */
-    if (!pool->free_list
-    ||   pool->num_free_objects < pool->replenish_level)
+    if ((!pool->free_list || pool->num_free_objects < pool->replenish_level)
+#if GC_USE_LAZY_ALLOCATOR
+        && !pool->newfree
+#endif
+    )
         (*pool->alloc_objects) (interp, pool);
 }
 
@@ -468,6 +471,8 @@ gc_ms_alloc_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
     new_arena->start_objects = mem_internal_allocate_zeroed(size);
 
     Parrot_append_arena_in_pool(interp, pool, new_arena, size);
+
+    PARROT_ASSERT(pool->last_Arena);
 
     Parrot_add_to_free_list(interp, pool, new_arena);
 
