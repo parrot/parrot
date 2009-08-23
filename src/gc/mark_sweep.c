@@ -390,10 +390,8 @@ contained_in_pool(ARGIN(const Small_Object_Pool *pool), ARGIN(const void *ptr))
 
 =item C<void mark_special(PARROT_INTERP, PMC *obj)>
 
-Marks the children of a special PMC. Handles the marking necessary
-for shared PMCs, and ensures timely marking of high-priority PMCs.
-Ensures PMC_EXT structures are properly organized for garbage
-collection.
+Handles marking a PMC. Specifically, calls the VTABLE_mark for that PMC
+if one is present. Also handles marking shared PMCs.
 
 =cut
 
@@ -762,8 +760,7 @@ new_pmc_pool(PARROT_INTERP)
 PObj *p)>
 
 Frees a PMC that is no longer being used. Calls a custom C<destroy> VTABLE
-method if one is available. If the PMC uses a PMC_EXT structure, that is freed
-as well.
+method if one is available.
 
 =cut
 
@@ -1011,7 +1008,7 @@ get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
 =item C<void initialize_header_pools(PARROT_INTERP)>
 
 The initialization routine for the interpreter's header pools. Initializes
-pools for string headers, constant string headers, buffers, PMCs, PMC_EXTs, and
+pools for string headers, constant string headers, buffers, PMCs and
 constant PMCs.
 
 The C<string_header_pool> actually lives in the

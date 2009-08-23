@@ -222,7 +222,6 @@ pmc_reuse_no_init(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
     if (PObj_active_destroy_TEST(pmc))
         VTABLE_destroy(interp, pmc);
 
-    /* we are a PMC + maybe is_PMC_EXT */
     PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG | new_flags);
 
     /* Set the right vtable */
@@ -285,7 +284,6 @@ pmc_reuse_by_class(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(PMC *class_),
     if (PObj_active_destroy_TEST(pmc))
         VTABLE_destroy(interp, pmc);
 
-    /* we are a PMC + maybe is_PMC_EXT */
     PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG | new_flags);
 
     /* Set the right vtable */

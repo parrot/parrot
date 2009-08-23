@@ -385,7 +385,7 @@ Parrot_gc_free_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 =item C<void Parrot_gc_free_pmc_sync(PARROT_INTERP, PMC *p)>
 
-Frees the C<PMC_EXT> structure attached to a PMC, if it exists.
+Frees the PMC_sync field of the PMC, if one exists.
 
 =cut
 
