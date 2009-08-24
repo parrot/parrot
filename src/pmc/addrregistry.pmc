@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2008, Parrot Foundation.
+Copyright (C) 2005-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -29,7 +29,7 @@ C<Parrot_register_pmc> if it isn't visible to Parrot.
 #include "parrot/hash.h"
 #include "pmc_hash.h"
 
-pmclass AddrRegistry extends Hash provides hash {
+pmclass AddrRegistry extends Hash provides hash auto_attrs {
 /*
 
 =item C<void init()>
@@ -48,8 +48,8 @@ Initializes the instance.
                 key_hash_int);
 
         Parrot_AddrRegistry_attributes *attrs =
-            mem_allocate_zeroed_typed(Parrot_AddrRegistry_attributes);
-        PMC_data(SELF) = attrs;
+            (Parrot_AddrRegistry_attributes *) PMC_data(SELF);
+
         SELF.set_pointer(registry);
         PObj_custom_mark_destroy_SETALL(SELF);
 

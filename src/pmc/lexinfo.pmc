@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008, Parrot Foundation.
+Copyright (C) 2008-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -26,7 +26,7 @@ These are the vtable functions for the lexinfo PMC.
  * keys and integer indices
  */
 
-pmclass LexInfo extends Hash  provides hash no_ro {
+pmclass LexInfo extends Hash  provides hash no_ro auto_attrs {
 
 /*
 
@@ -60,7 +60,8 @@ subroutine.
     VTABLE void init_pmc(PMC *sub) {
         Hash                      *hash;
         Parrot_LexInfo_attributes *attrs =
-            mem_allocate_zeroed_typed(Parrot_LexInfo_attributes);
+            (Parrot_LexInfo_attributes *) PMC_data(SELF);
+
         PARROT_ASSERT(PObj_constant_TEST(SELF));
 
         hash = parrot_create_hash(INTERP,
@@ -69,7 +70,6 @@ subroutine.
             (hash_comp_fn)Parrot_str_not_equal,     /* STRING compare */
             (hash_hash_key_fn)Parrot_str_to_hashval); /*        hash    */
 
-        PMC_data(SELF) = attrs;
         SELF.set_pointer(hash);
         PObj_active_destroy_SET(SELF);
     }

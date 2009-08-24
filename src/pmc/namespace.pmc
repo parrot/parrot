@@ -123,7 +123,7 @@ typedef enum {
 
 #define FPA_is_ns_ext PObj_private0_FLAG
 
-pmclass NameSpace extends Hash provides hash no_ro {
+pmclass NameSpace extends Hash provides hash no_ro auto_attrs {
 
     ATTR STRING *name;     /* Name of this namespace part. */
     ATTR PMC    *_class;   /* The class or role attached to this namespace. */
@@ -144,8 +144,6 @@ Initialize a C<NameSpace> PMC.
 */
 
     VTABLE void init() {
-        PMC_data(SELF)    =
-                mem_allocate_zeroed_typed(Parrot_NameSpace_attributes);
         PARROT_NAMESPACE(SELF)->vtable = PMCNULL;
         PARROT_NAMESPACE(SELF)->_class = PMCNULL;
         SELF.set_pointer(parrot_new_hash(INTERP));
@@ -174,20 +172,6 @@ Marks the namespace as live.
             Parrot_gc_mark_PObj_alive(INTERP, (PObj *)nsinfo->vtable);
         if (nsinfo->methods)
             Parrot_gc_mark_PObj_alive(INTERP, (PObj *)nsinfo->methods);
-    }
-
-/*
-
-=item C<void destroy()>
-
-Frees the namespace info struct.
-
-=cut
-
-*/
-    VTABLE void destroy() {
-        /* Call Hash.destroy. It will free all memory. */
-        SUPER();
     }
 
 /*
