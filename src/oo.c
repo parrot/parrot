@@ -521,12 +521,7 @@ Parrot_oo_find_vtable_override(PARROT_INTERP,
     PMC                            *result =
         VTABLE_get_pmc_keyed_str(interp, _class->parent_overrides, name);
 
-    if (!PMC_IS_NULL(result)) {
-        return result;
-    }
-    else if (VTABLE_exists_keyed_str(interp, _class->parent_overrides, name))
-        return PMCNULL;
-    else {
+    if (PMC_IS_NULL(result)) {
         /* Walk and search for the vtable method. */
         const INTVAL num_classes = VTABLE_elements(interp, _class->all_parents);
         INTVAL       i;
@@ -542,11 +537,13 @@ Parrot_oo_find_vtable_override(PARROT_INTERP,
             if (!PMC_IS_NULL(result))
                 break;
         }
-
+        if (PMC_IS_NULL(result))
+            result = pmc_new(interp, enum_class_Undef);
         VTABLE_set_pmc_keyed_str(interp, _class->parent_overrides, name, result);
-
-        return result;
     }
+    if (result->vtable->base_type == enum_class_Undef)
+        result = PMCNULL;
+    return result;
 }
 
 
