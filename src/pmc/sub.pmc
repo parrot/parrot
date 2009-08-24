@@ -35,7 +35,7 @@ print_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC *sub))
     print_pbc_location(interp);
 }
 
-pmclass Sub {
+pmclass Sub auto_attrs {
     ATTR PackFile_ByteCode *seg;     /* bytecode segment */
     ATTR size_t   start_offs;        /* sub entry in ops from seg->base.data */
     ATTR size_t   end_offs;
@@ -90,11 +90,10 @@ Initializes the subroutine.
      */
     VTABLE void init() {
         Parrot_Sub_attributes * const attrs =
-            mem_allocate_zeroed_typed(Parrot_Sub_attributes);
+            (Parrot_Sub_attributes *) PMC_data(SELF);
 
         attrs->seg = INTERP->code;
 
-        PMC_data(SELF) = attrs;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -118,11 +117,7 @@ Destroys the subroutine.
                 Parrot_free_context(INTERP, sub->ctx, 1);
             if (sub->outer_ctx)
                 Parrot_free_context(INTERP, sub->outer_ctx, 1);
-
-            mem_sys_free(sub);
         }
-
-        PMC_data(SELF) = NULL;
     }
 
 /*
