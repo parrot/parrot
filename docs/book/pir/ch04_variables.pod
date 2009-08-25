@@ -139,7 +139,7 @@ opcode> (cosine), C<tan>X<tan opcode> (tangent), C<sec>X<sec opcode>
 (secant), C<cosh>X<cosh opcode> (hyperbolic cosine), C<tanh>X<tanh
 opcode> (hyperbolic tangent), C<sech>X<sech opcode> (hyperbolic secant),
 C<asin>X<asin opcode> (arc sine), C<acos>X<acos opcode> (arc cosine),
-C<atan>C<atan opcode> (arc tangent), C<asec>X<asec opcode> (arc secant),
+C<atan>X<atan opcode> (arc tangent), C<asec>X<asec opcode> (arc secant),
 C<exsec>X<exsec opcode> (exsecant), C<hav>X<hav opcode> (haversine), and
 C<vers>X<vers opcode> (versine).  All angle arguments for the
 X<trigonometric opcodes> trigonometric opcodes are in radians:
