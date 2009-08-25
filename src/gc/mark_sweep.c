@@ -781,6 +781,19 @@ free_pmc_in_pool(PARROT_INTERP, SHIM(Small_Object_Pool *pool),
     if (PObj_active_destroy_TEST(p))
         VTABLE_destroy(interp, pmc);
 
+    if (PMC_data(pmc) && pmc->vtable->attr_size) {
+#if GC_USE_FIXED_SIZE_ALLOCATOR
+        Parrot_gc_free_pmc_attributes(interp, pmc, pmc->vtable->attr_size);
+#else
+        mem_sys_free(PMC_data(pmc));
+        PMC_data(pmc) = NULL;
+#endif
+    }
+    else {
+        PMC_data(pmc) = NULL;
+    }
+
+
 #ifndef NDEBUG
 
     pmc->vtable      = (VTABLE  *)0xdeadbeef;
