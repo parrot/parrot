@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 30;
 
 =head1 NAME
 
@@ -568,6 +568,48 @@ pir_output_is(<<'CODE',<<OUTPUT,"Adding NaN to a Complex");
     $N0 = 'NaN'
     set $P1, "1 + i"
     $P1 += $N0
+    say $P1
+.end
+CODE
+NaN
+OUTPUT
+}
+
+{
+local $TODO = 'fdiv does not play nicely with PMCs and NaN';
+pir_output_is(<<'CODE',<<OUTPUT,'fdiv with Integer PMCs and NaN');
+.sub main
+    $P1 = new "Integer"
+    $P2 = new "Integer"
+    $P2 = 1
+    $N0 = 'NaN'
+    fdiv $P1, $P2, $N0
+    say $P1
+.end
+CODE
+NaN
+OUTPUT
+
+pir_output_is(<<'CODE',<<OUTPUT,'fdiv with Float PMCs and NaN');
+.sub main
+    $P1 = new 'Float'
+    $P2 = new 'Float'
+    $P2 = 1
+    $N0 = 'NaN'
+    fdiv $P1, $P2, $N0
+    say $P1
+.end
+CODE
+NaN
+OUTPUT
+
+pir_output_is(<<'CODE',<<OUTPUT,'fdiv with Float and Integer PMCs and NaN');
+.sub main
+    $P1 = new 'Float'
+    $P2 = new 'Integer'
+    $P2 = 1
+    $N0 = 'NaN'
+    fdiv $P1, $P2, $N0
     say $P1
 .end
 CODE
