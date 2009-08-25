@@ -372,11 +372,18 @@ PARROT_WARN_UNUSED_RESULT
 static PMC *
 get_pmc_proxy(PARROT_INTERP, INTVAL type)
 {
+    PMC * type_class;
     ASSERT_ARGS(get_pmc_proxy)
 
     /* Check if not a PMC or invalid type number */
     if (type > interp->n_vtable_max || type <= 0)
         return PMCNULL;
+
+    type_class = interp->vtables[type]->pmc_class;
+    if (type != enum_class_Class
+        && type_class->vtable->base_type == enum_class_Class) {
+        return type_class;
+    }
     else {
         PMC * const parrot_hll = Parrot_get_namespace_keyed_str(interp, interp->root_namespace, CONST_STRING(interp, "parrot"));
         PMC * const pmc_ns =

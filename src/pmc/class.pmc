@@ -1292,21 +1292,6 @@ Returns whether the class is or inherits from C<*class>.
         /* Check if the class object is the same as self's class object */
         if (VTABLE_is_same(interp, SELF, classobj))
             return 1;
-        else {
-            STRING * const classname = VTABLE_get_string(interp, classobj);
-            const INTVAL is_proxy    = (SELF->vtable->base_type == enum_class_PMCProxy);
-
-            /* avoid the expensive string copy, if possible */
-            STRING * const self_name = is_proxy
-                               ? VTABLE_get_string(interp, SELF)
-                               : make_class_name(interp, SELF);
-
-            /* Check if the passed name is the same as the stored short name. */
-            const INTVAL name_match = Parrot_str_equal(interp, classname, self_name);
-
-            if (name_match)
-                return 1;
-        }
 
         /* Iterate over all the parents and check if they respond true
          * for 'isa' on the original comparison. */
