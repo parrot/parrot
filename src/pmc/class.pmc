@@ -1230,7 +1230,7 @@ Creates a new PMC object of the type of the class and calls init().
         /* Initialize the object's underlying structure, pointing it to this
          * class. */
         /* TODO: this has been changed in order to use auto_attrs in the
-	 * Object PMC. Needs to be redone in a cleaner way. */
+         * Object PMC. Needs to be redone in a cleaner way. */
         {
             Parrot_Object_attributes * const objattr =
                     (Parrot_Object_attributes *)PMC_data(object);
