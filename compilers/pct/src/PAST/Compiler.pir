@@ -2254,8 +2254,13 @@ attribute.
     .tailcall self.'vivify'(node, ops, fetchop, storeop)
 
   attribute_bind:
-    $P0 = get_hll_global ['POST'], 'Op'
-    .tailcall $P0.'new'(call_on, name, bindpost, 'pirop'=>'setattribute', 'result'=>bindpost)
+    $P0 = get_hll_global ['POST'], 'Ops'
+    $P0 = $P0.'new'()
+    $P0.'push'(call_on)
+    $P1 = get_hll_global ['POST'], 'Op'
+    $P1 = $P1.'new'(call_on, name, bindpost, 'pirop'=>'setattribute', 'result'=>bindpost)
+    $P0.'push'($P1)
+    .return ($P0)
 .end
 
 
