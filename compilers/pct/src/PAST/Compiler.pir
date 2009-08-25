@@ -83,6 +83,7 @@ any value type.
     piropsig['print']      = 'v*'
     piropsig['set']        = 'PP'
     piropsig['setprop']    = '0P~P'
+    piropsig['setattribute'] = '0P~P'
     set_global '%piropsig', piropsig
 
     ##  %valflags specifies when PAST::Val nodes are allowed to
