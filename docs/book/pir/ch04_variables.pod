@@ -131,18 +131,18 @@ C<gcd>X<gcd opcode> (greatest common divisor) and C<lcm>X<lcm opcode>
 
 =head3 Floating-point operations
 
-The most common floating-point operations are C<ln>X<ln opcode> (natural
-log), C<log2>X<log2 opcode> (log base 2), C<log10>X<log10 opcode> (log
-base 10), and C<exp>X<exp opcode> (I<e>G<x>), as well as a full set of
-trigonometric opcodes such as C<sin>X<sin opcode> (sine), C<cos>X<cos
-opcode> (cosine), C<tan>X<tan opcode> (tangent), C<sec>X<sec opcode>
-(secant), C<cosh>X<cosh opcode> (hyperbolic cosine), C<tanh>X<tanh
+The most common floating-point operations are C<ln>X<ln opcode> (natural log),
+C<log2>X<log2 opcode> (log base 2), C<log10>X<log10 opcode> (log base 10), and
+C<exp>X<exp opcode> (I<e>G<x>), as well as a full set of trigonometric opcodes
+such as C<sin>X<sin opcode> (sine), C<cos>X<cos opcode> (cosine), C<tan>X<tan
+opcode> (tangent), C<sec>X<sec opcode> (secant), C<sinh>X<sinh opcode>
+(hyperbolic sine), C<cosh>X<cosh opcode> (hyperbolic cosine), C<tanh>X<tanh
 opcode> (hyperbolic tangent), C<sech>X<sech opcode> (hyperbolic secant),
 C<asin>X<asin opcode> (arc sine), C<acos>X<acos opcode> (arc cosine),
 C<atan>X<atan opcode> (arc tangent), C<asec>X<asec opcode> (arc secant),
 C<exsec>X<exsec opcode> (exsecant), C<hav>X<hav opcode> (haversine), and
-C<vers>X<vers opcode> (versine).  All angle arguments for the
-X<trigonometric opcodes> trigonometric opcodes are in radians:
+C<vers>X<vers opcode> (versine).  All angle arguments for the X<trigonometric
+opcodes> trigonometric opcodes are in radians:
 
 =begin PIR_FRAGMENT
 
