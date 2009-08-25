@@ -1229,9 +1229,14 @@ Creates a new PMC object of the type of the class and calls init().
 
         /* Initialize the object's underlying structure, pointing it to this
          * class. */
-        PMC_data(object) =
-            (Parrot_Object_attributes *)Parrot_oo_new_object_attrs(interp, SELF);
-
+        /* TODO: this has been changed in order to use auto_attrs in the
+	 * Object PMC. Needs to be redone in a cleaner way. */
+        {
+            Parrot_Object_attributes * const objattr =
+                    (Parrot_Object_attributes *)PMC_data(object);
+            objattr->_class = SELF;
+            objattr->attrib_store = pmc_new(interp, enum_class_ResizablePMCArray);
+        }
         if (!PMC_IS_NULL(init)) {
             /* Initialize attributes with the supplied values. */
             PMC * const iter = VTABLE_get_iter(interp, init);

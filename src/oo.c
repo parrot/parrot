@@ -272,8 +272,7 @@ Parrot_oo_clone_object(PARROT_INTERP, ARGIN(PMC *pmc),
     if (!PMC_IS_NULL(dest)) {
         PARROT_ASSERT(!PMC_IS_NULL(class_));
         PARROT_ASSERT(class_->vtable->base_type == enum_class_Class);
-        obj = (Parrot_Object_attributes *)
-            Parrot_oo_new_object_attrs(interp, class_);
+        obj    = PARROT_OBJECT(pmc);
         cloned = dest;
     }
     else {
@@ -322,10 +321,6 @@ Parrot_oo_clone_object(PARROT_INTERP, ARGIN(PMC *pmc),
             }
         }
     }
-
-    /* free object attributes if created directly */
-    if (!PMC_IS_NULL(dest))
-        mem_sys_free(obj);
 
     /* And we have ourselves a clone. */
     return cloned;

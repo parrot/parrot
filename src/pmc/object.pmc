@@ -107,7 +107,7 @@ get_attrib_index_keyed(PARROT_INTERP, PMC *self, PMC *key, STRING *name)
     return -1;
 }
 
-pmclass Object {
+pmclass Object auto_attrs {
     ATTR PMC *_class;       /* The class this is an instance of. */
     ATTR PMC *attrib_store; /* The attributes store - a resizable PMC array. */
 
@@ -146,14 +146,12 @@ Raises an exception; you can only instantiate objects from a class.
 
 =item C<void destroy()>
 
-Free the object's underlying struct.
+Just to avoid the automatic generation of one.
 
 =cut
 
 */
     VTABLE void destroy() {
-        mem_sys_free(PMC_data(SELF));
-        PMC_data(SELF) = NULL;
     }
 
 /*
