@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 30;
+use Parrot::Test tests => 32;
 
 =head1 NAME
 
@@ -576,7 +576,7 @@ OUTPUT
 }
 
 {
-local $TODO = 'fdiv does not play nicely with PMCs and NaN';
+local $TODO = 'fdiv/mod/cmod do not play nicely with PMCs and NaN';
 pir_output_is(<<'CODE',<<OUTPUT,'fdiv with Integer PMCs and NaN');
 .sub main
     $P1 = new "Integer"
@@ -610,6 +610,32 @@ pir_output_is(<<'CODE',<<OUTPUT,'fdiv with Float and Integer PMCs and NaN');
     $P2 = 1
     $N0 = 'NaN'
     fdiv $P1, $P2, $N0
+    say $P1
+.end
+CODE
+NaN
+OUTPUT
+
+pir_output_is(<<'CODE',<<OUTPUT,'cmod with Float and Integer PMCs and NaN');
+.sub main
+    $P1 = new 'Float'
+    $P2 = new 'Integer'
+    $P2 = 1
+    $N0 = 'NaN'
+    cmod $P1, $P2, $N0
+    say $P1
+.end
+CODE
+NaN
+OUTPUT
+
+pir_output_is(<<'CODE',<<OUTPUT,'mod with Float and Integer PMCs and NaN');
+.sub main
+    $P1 = new 'Float'
+    $P2 = new 'Integer'
+    $P2 = 1
+    $N0 = 'NaN'
+    mod $P1, $P2, $N0
     say $P1
 .end
 CODE
