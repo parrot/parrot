@@ -372,8 +372,8 @@ PARROT_WARN_UNUSED_RESULT
 static PMC *
 get_pmc_proxy(PARROT_INTERP, INTVAL type)
 {
-    PMC * type_class;
     ASSERT_ARGS(get_pmc_proxy)
+    PMC * type_class;
 
     /* Check if not a PMC or invalid type number */
     if (type > interp->n_vtable_max || type <= 0)
