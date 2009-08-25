@@ -243,7 +243,7 @@ Return the original item being matched.
 =cut
 
 .sub 'orig' :method
-    $P0 = getattribute self, '$!target'
+    $P0 = getattribute self, '$.target'
     .return ($P0)
 .end
 
