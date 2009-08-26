@@ -1,12 +1,6 @@
-#!perl
-# Copyright (C) 2006-2007, Parrot Foundation.
+#!parrot
+# Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 2;
 
 =head1 NAME
 
@@ -23,17 +17,20 @@ Tests the default PMC.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', 'new', todo => 'not implemeted' );
-.sub 'test' :main
-    new P0, ['default']
-    print "ok 1\n"
-.end
-CODE
-ok 1
-OUT
+.sub main :main
+    .include 'test_more.pir'
 
-pir_output_is( <<'CODE', <<'OUT', 'inspect vtable function');
-.sub 'test' :main
+    plan(3)
+    test_default()
+    test_inspect_vtable_function()
+.end
+
+.sub test_default
+    #new $P0, ['default']
+    todo(0,'the default PMC does not exist')
+.end
+
+.sub test_inspect_vtable_function
     $P0 = new ['String']
     $P1 = inspect $P0, 'flags'
     $I9 = 1 << 9   # PObj_is_PMC_FLAG
@@ -41,22 +38,11 @@ pir_output_is( <<'CODE', <<'OUT', 'inspect vtable function');
 
     $I0 = $P1
     $I1 = $I0 & $I9
-
-    if $I1 goto ok_1
-      print "not "
-    ok_1:
-    print "ok 1\n"
+    ok($I1)
 
     $I1 = $I0 & $I29
-    unless $I1 goto ok_2
-      print "not "
-    ok_2:
-    print "ok 2\n"
+    nok($I1)
 .end
-CODE
-ok 1
-ok 2
-OUT
 
 # Local Variables:
 #   mode: cperl
