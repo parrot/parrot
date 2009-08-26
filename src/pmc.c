@@ -222,11 +222,6 @@ pmc_reuse_no_init(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
     if (PObj_active_destroy_TEST(pmc))
         VTABLE_destroy(interp, pmc);
 
-    PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG | new_flags);
-
-    /* Set the right vtable */
-    pmc->vtable = new_vtable;
-
     if (PMC_data(pmc) && pmc->vtable->attr_size) {
 #if GC_USE_FIXED_SIZE_ALLOCATOR
         Parrot_gc_free_pmc_attributes(interp, pmc, pmc->vtable->attr_size);
@@ -235,9 +230,14 @@ pmc_reuse_no_init(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
 #endif
     }
 
+    PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG | new_flags);
+
+    /* Set the right vtable */
+    pmc->vtable = new_vtable;
+
     if (new_vtable->attr_size) {
 #if GC_USE_FIXED_SIZE_ALLOCATOR
-        Parrot_gc_allocate_pmc_attributes(interp, pmc, pmc->vtable->attr_size);
+        Parrot_gc_allocate_pmc_attributes(interp, pmc, new_vtable->attr_size);
 #else
         PMC_data(pmc) = mem_sys_allocate_zeroed(new_vtable->attr_size);
 #endif
