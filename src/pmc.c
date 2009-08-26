@@ -91,6 +91,54 @@ PMC_is_null(SHIM_INTERP, ARGIN_NULLOK(const PMC *pmc))
 
 /*
 
+=item C<void Parrot_pmc_destroy(PARROT_INTERP, PMC *pmc)>
+
+Destroy a PMC. Call his destroy vtable function if needed, and deallocate
+his attributes if they are automatically allocated.
+
+For internal usage of the PMC handling functions and garbage collection
+subsystem.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_pmc_destroy(PARROT_INTERP, ARGIN(PMC *pmc))
+{
+    ASSERT_ARGS(Parrot_pmc_destroy)
+
+    if (PObj_active_destroy_TEST(pmc)) {
+        VTABLE_destroy(interp, pmc);
+        /* Prevent repeated calls. */
+        PObj_active_destroy_CLEAR(pmc);
+    }
+
+    if (pmc->vtable->attr_size) {
+        if (PMC_data(pmc)) {
+#if GC_USE_FIXED_SIZE_ALLOCATOR
+            Parrot_gc_free_pmc_attributes(interp, pmc, pmc->vtable->attr_size);
+#else
+            mem_sys_free(PMC_data(pmc));
+            PMC_data(pmc) = NULL;
+#endif
+        }
+    }
+    else {
+        PMC_data(pmc) = NULL;
+    }
+
+#ifndef NDEBUG
+
+    pmc->vtable      = (VTABLE  *)0xdeadbeef;
+
+#endif
+
+}
+
+/*
+
 =item C<PMC * pmc_new(PARROT_INTERP, INTVAL base_type)>
 
 Creates a new PMC of type C<base_type> (which is an index into the list of PMC
@@ -218,17 +266,8 @@ pmc_reuse_no_init(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
     /* Singleton/const PMCs/types are not eligible */
     check_pmc_reuse_flags(interp, pmc->vtable->flags, new_vtable->flags);
 
-    /* Does the old PMC need any resources freed? */
-    if (PObj_active_destroy_TEST(pmc))
-        VTABLE_destroy(interp, pmc);
-
-    if (PMC_data(pmc) && pmc->vtable->attr_size) {
-#if GC_USE_FIXED_SIZE_ALLOCATOR
-        Parrot_gc_free_pmc_attributes(interp, pmc, pmc->vtable->attr_size);
-#else
-        mem_sys_free(PMC_data(pmc));
-#endif
-    }
+    /* Free the old PMC resources. */
+    Parrot_pmc_destroy(interp, pmc);
 
     PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG | new_flags);
 
@@ -280,14 +319,22 @@ pmc_reuse_by_class(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(PMC *class_),
     /* Singleton/const PMCs/types are not eligible */
     check_pmc_reuse_flags(interp, pmc->vtable->flags, new_vtable->flags);
 
-    /* Does the old PMC need any resources freed? */
-    if (PObj_active_destroy_TEST(pmc))
-        VTABLE_destroy(interp, pmc);
+    Parrot_pmc_destroy(interp, pmc);
 
     PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG | new_flags);
 
     /* Set the right vtable */
     pmc->vtable = new_vtable;
+
+    if (new_vtable->attr_size) {
+#if GC_USE_FIXED_SIZE_ALLOCATOR
+        Parrot_gc_allocate_pmc_attributes(interp, pmc, new_vtable->attr_size);
+#else
+        PMC_data(pmc) = mem_sys_allocate_zeroed(new_vtable->attr_size);
+#endif
+}
+    else
+        PMC_data(pmc) = NULL;
 
     return pmc;
 }
