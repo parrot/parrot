@@ -1,12 +1,6 @@
-#!perl
-# Copyright (C) 2006-2007, Parrot Foundation.
+#!parrot
+# Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 2;
 
 =head1 NAME
 
@@ -23,19 +17,23 @@ Tests the ParrotInterpreter PMC.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', 'create new interpreter' );
-.sub 'test' :main
-    new $P0, ['ParrotInterpreter']
-    print "ok 1\n"
-.end
-CODE
-ok 1
-OUT
+.sub main :main
+    .include 'test_more.pir'
 
-pir_output_is( <<'CODE', <<'OUT', 'setting HLL map dynamically' );
+    plan(3)
+    test_new()
+    test_hll_map()
+.end
+
+.sub test_new
+    new $P0, ['ParrotInterpreter']
+    ok(1,'new')
+.end
+
 .HLL 'Perl6'
 
-.sub 'main' :main
+.sub test_hll_map
+    .include 'test_more.pir'
     $P0 = get_class 'Integer'
     $P1 = subclass $P0, 'MyInt'
 
@@ -43,18 +41,14 @@ pir_output_is( <<'CODE', <<'OUT', 'setting HLL map dynamically' );
     $P2.'hll_map'($P0, $P1)
 
     $P3 = 'foo'()
-    say $P3                 # "3\n"
+    is($P3,3)
     $S0 = typeof $P3
-    say $S0                 # "MyInt"
+    is($S0,"MyInt")
 .end
 
-.sub 'foo'
+.sub foo
     .return (3)
 .end
-CODE
-3
-MyInt
-OUT
 
 # Local Variables:
 #   mode: cperl
