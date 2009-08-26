@@ -10,13 +10,13 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $ccflags = $conf->data->get('ccflags');
-    if ( $ccflags !~ /-pthread/ ) {
+    if ( $ccflags !~ /-pthread\b/ ) {
         $ccflags .= ' -pthread';
     }
     $conf->data->set( ccflags => $ccflags );
 
     my $libs = $conf->data->get('libs');
-    if ( $libs !~ /-lpthread/ ) {
+    if ( $libs !~ /-lpthread\b/ ) {
         $libs .= ' -lpthread';
     }
     $conf->data->set( libs => $libs );

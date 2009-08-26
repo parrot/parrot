@@ -21,7 +21,7 @@ sub runstep {
     $conf->data->set( ccflags => $ccflags );
 
     my $libs = $conf->data->get('libs');
-    if ( $libs !~ /-lpthread/ ) {
+    if ( $libs !~ /-lpthread\b/ ) {
         $libs .= ' -lpthread';
     }
     $conf->data->set( libs => $libs );

@@ -13,7 +13,7 @@ sub runstep {
     my $version   = $conf->option_or_data('VERSION');
     my $libs = $conf->data->get('libs');
 
-    $libs .= ' -pthread' unless $libs =~ /pthread/;
+    $libs .= ' -pthread' unless $libs =~ /pthread\b/;
 
     $conf->data->set(
         libs  => $libs,

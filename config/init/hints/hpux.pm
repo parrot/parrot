@@ -10,7 +10,7 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $libs = $conf->data->get('libs');
-    if ( $libs !~ /-lpthread/ ) {
+    if ( $libs !~ /-lpthread\b/ ) {
         $libs .= ' -lpthread';
     }
 
