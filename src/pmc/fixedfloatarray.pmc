@@ -31,19 +31,6 @@ pmclass FixedFloatArray auto_attrs provides array {
 
 =over 4
 
-=item C<void init()>
-
-Initializes the array.
-
-=cut
-
-*/
-
-    VTABLE void init() {
-    }
-
-/*
-
 =item C<void destroy()>
 
 Destroys the array.
