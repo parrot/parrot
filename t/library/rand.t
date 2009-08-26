@@ -1,16 +1,10 @@
-#!perl
+#!parrot
 # Copyright (C) 2009, Parrot Foundation.
 # $Id$
 
-use strict;
-use warnings;
-use lib qw( t . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 2;
-
 =head1 NAME
 
-t/library/rand.t - rand tests
+t/library/rand.t - Test the Math::Rand PBC
 
 =head1 SYNOPSIS
 
@@ -18,47 +12,42 @@ t/library/rand.t - rand tests
 
 =cut
 
-pir_output_is( << 'CODE', << 'OUTPUT', 'rand / srand' );
-.sub test :main
+.sub main :main
+    .include 'test_more.pir'
+
+    plan(7)
+    test_rand_srand()
+    test_rand_max()
+.end
+
+.sub test_rand_srand
     load_bytecode 'Math/Rand.pbc'
     .local pmc rand
     rand = get_global [ 'Math'; 'Rand' ], 'rand'
     .local pmc srand
     srand = get_global [ 'Math'; 'Rand' ], 'srand'
     $I0 = rand()
-    say $I0
+    is($I0,16838)
     $I0 = rand()
-    say $I0
+    is($I0,5758)
     $I0 = rand()
-    say $I0
+    is($I0,10113)
     $I0 = rand()
-    say $I0
+    is($I0,17515)
     srand(1)
     $I0 = rand()
-    say $I0
+    is($I0,16838)
     $I0 = rand()
-    say $I0
+    is($I0,5758)
 .end
-CODE
-16838
-5758
-10113
-17515
-16838
-5758
-OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', 'RAND_MAX' );
-.sub test :main
+.sub test_rand_max
     load_bytecode 'Math/Rand.pbc'
     .local pmc rand_max
     rand_max = get_global [ 'Math'; 'Rand' ], 'RAND_MAX'
     $I0 = rand_max()
-    say $I0
+    is($I0,32767)
 .end
-CODE
-32767
-OUTPUT
 
 
 # Local Variables:
