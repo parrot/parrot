@@ -23,22 +23,26 @@ GC related bugs.
 
 =cut
 
-pasm_output_is( <<'CODE', '1', "sweep 1" );
-      interpinfo I1, 2   # How many GC mark runs have we done already?
+pir_output_is( <<'CODE', '1', "sweep 1" );
+.include 'interpinfo.pasm'
+.sub main :main
+      $I1 = interpinfo .INTERPINFO_GC_MARK_RUNS  # How many GC mark runs have we done already?
       sweep 1
-      interpinfo I2, 2   # Should be one more now
-      sub I3, I2, I1
-      print I3
-      end
+      $I2 = interpinfo .INTERPINFO_GC_MARK_RUNS  # Should be one more now
+      $I3 = $I2 - $I1
+      print $I3
+.end
 CODE
 
-pasm_output_is( <<'CODE', '0', "sweep 0" );
-      interpinfo I1, 2   # How many GC mark runs have we done already?
+pir_output_is( <<'CODE', '0', "sweep 0" );
+.include 'interpinfo.pasm'
+.sub main :main
+      $I1 = interpinfo .INTERPINFO_GC_MARK_RUNS   # How many GC mark runs have we done already?
       sweep 0
-      interpinfo I2, 2   # Should be same
-      sub I3, I2, I1
-      print I3
-      end
+      $I2 = interpinfo .INTERPINFO_GC_MARK_RUNS  # Should be same
+      $I3 = $I2 - $I1
+      print $I3
+.end
 CODE
 
 pasm_output_is( <<'CODE', '1', "sweep 0, with object that need destroy" );
@@ -68,13 +72,15 @@ pasm_output_is( <<'CODE', '10', "sweep 0, with object that need destroy/destroy"
       end
 CODE
 
-pasm_output_is( <<'CODE', '1', "collect" );
-      interpinfo I1, 3   # How many garbage collections have we done already?
+pir_output_is( <<'CODE', '1', "collect" );
+.include 'interpinfo.pasm'
+.sub main :main
+      $I1 = interpinfo .INTERPINFO_GC_COLLECT_RUNS   # How many garbage collections have we done already?
       collect
-      interpinfo I2, 3   # Should be one more now
-      sub I3, I2, I1
-      print I3
-      end
+      $I2 = interpinfo .INTERPINFO_GC_COLLECT_RUNS  # Should be one more now
+      $I3 = $I2 - $I1
+      print $I3
+.end
 CODE
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "collectoff/on" );
@@ -123,33 +129,33 @@ CODE
 1
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "vanishing singleton PMC" );
-_main:
-    .const 'Sub' P0 = "_rand"
-    new P16, 'Env'
-    set P16['Foo'], 'bar'
-    set I16, 100
-    set I17, 0
-loop:
-    sweep 1
-    invokecc P0
-    inc I17
-    lt I17, I16, loop
-    print "ok\n"
-    end
+pir_output_is( <<'CODE', <<OUTPUT, "vanishing singleton PMC" );
+.sub main :main
+    $P16 = new 'Env'
+    $P16['Foo'] = 'bar'
+    $I16 = 100
+    $I17 = 0
 
-.pcc_sub _rand:
-    new P16, 'Env'
-    set P5, P16['Foo']
-    ne P5, 'bar', err
-    returncc
-err:
-    print "singleton destroyed .Env = ."
-    new P16, 'Env'
-    typeof S16, P16
-    print S16
-    print "\n"
-    end
+    loop:
+	sweep 1
+    	_rand()
+    	$I17 += 1
+    	if $I17 <= $I16 goto loop
+   	say "ok"
+.end
+
+.sub _rand
+    $P16 = new 'Env'
+    $P5 = $P16['Foo']
+    if $P5 != 'bar' goto err
+    .return()
+    err:
+	say "singleton destroyed .Env = ."
+    	$P16 = new 'Env'
+    	$S16 = typeof $P16
+    	say $S16
+.end
+
 CODE
 ok
 OUTPUT
