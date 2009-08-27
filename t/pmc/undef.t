@@ -19,7 +19,7 @@ Tests mainly morphing undef to other types.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(21)
+    plan(22)
 
     morph_to_string()
     undef_pmc_is_false()
@@ -169,19 +169,30 @@ Tests mainly morphing undef to other types.
 
 .sub set_undef_to_object
     $P0 = new "Undef"
+    $P1 = get_class 'Integer'
     $P2 = new 'Integer'
     assign $P0, $P2
-    ok( 1, 'Assign Integer to Undef' )
+    $I0 = isa $P0, $P1
+    ok( $I0, 'Assign Integer to Undef' )
 
     $P0 = new "Undef"
     $P1 = newclass "HI"
     $P2 = new $P1
     assign $P0, $P2
-    ok( 1, 'Assign Object to Undef' )
+    $I0 = isa $P0, $P1
+    ok( $I0, 'Assign Object to Undef' )
+
+    $P0 = new "Undef"
+    $P1 = subclass 'ResizablePMCArray', 'FooRPA'
+    $P2 = new $P1
+    assign $P0, $P2
+    $I0 = isa $P0, $P1
+    ok( $I0, 'Assign Object with PMC parent to Undef' )
 
     # TODO: Needs tests to verify that the values and metadata are preserved
     #       across the assignment
 .end
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
