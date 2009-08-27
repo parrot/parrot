@@ -500,8 +500,7 @@ inline op copy(inout PMC, invar PMC) :base_mem {
         PMC   * const meta  = VTABLE_getprops(interp, $1);
 
         /* avoid leaks and unreachable memory by destroying the destination PMC */
-        if (PObj_active_destroy_TEST($1))
-            VTABLE_destroy(interp, $1);
+        Parrot_pmc_destroy(interp, $1);
 
         /* the source PMC knows how to clone itself, but we must reuse the
          * destination header */
@@ -509,6 +508,7 @@ inline op copy(inout PMC, invar PMC) :base_mem {
 
         /* don't let the clone's destruction destroy the destination's data */
         PObj_active_destroy_CLEAR(clone);
+        PMC_data(clone) = NULL;
         PMC_metadata(clone) = NULL;
         PMC_next_for_GC(clone) = NULL;
         PMC_sync(clone) = NULL;
