@@ -45,19 +45,28 @@ appropriate type.
             VTABLE_set_pmc(INTERP, SELF, other);
         }
         else {
-            PMC * const class_ = PARROT_OBJECT(other)->_class;
-            PMC        *clone  = VTABLE_clone(interp, other);
-            void       *attrs;
+            PMC * const class_  = PARROT_OBJECT(other)->_class;
+            PMC        *clone   = VTABLE_clone(interp, other);
+            void       *attrs   = PMC_data(clone);
+            PMC        *meta    = PMC_metadata(clone);
             pmc_reuse_by_class(INTERP, SELF, class_, PObj_is_object_FLAG);
 
             /* now swap memory without leaking it */
-            attrs              = PMC_data(SELF);
-            PMC_data(SELF)     = PMC_data(clone);
-            PMC_data(clone)    = attrs;
-            VTABLE_destroy(interp, clone);
+            PMC_data(clone)     = PMC_data(SELF);
+            PMC_data(SELF)      = attrs;
+
+            /* Restore metadata. */
+            if (!PMC_IS_NULL(meta)) {
+                PMC * const iter = VTABLE_get_iter(interp, meta);
+                while (VTABLE_get_bool(interp, iter)) {
+                    STRING * const key = VTABLE_shift_string(interp, iter);
+                    PMC * const value  = VTABLE_get_pmc_keyed_str(interp, meta, key);
+                    VTABLE_setprop(interp, SELF, key, value);
+                }
+            }
+            PMC_data(clone) = NULL;
 
             PObj_is_object_SET(SELF);
-
         }
     }
 
