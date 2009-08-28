@@ -30,7 +30,7 @@ The Parrot Virtual Machine was originally conceived of as the engine for
 executing the new Perl 6 language, when specifications for that were first
 starting to be drafted. However, as time went on it was decided that Parrot
 would benefit from having a clean abstraction layer between it's internals
-and the Perl 6 language syntax. This clean abstraction layer brough with it
+and the Perl 6 language syntax. This clean abstraction layer brought with it
 the side effect that Parrot could be used to host a wide variety of dynamic
 languages, not just Perl 6. And beyond just hosting them, it could
 facilitate their advancement, interaction, and code sharing.
@@ -42,7 +42,7 @@ feature-full than any single language, and would provide all that power and
 all those features to any languages that wanted them.
 
 Perl 6, under the project name Rakudo N<http://www.rakudo.org>, is still one
-of the primary user of Parrot and therefore one of the primary drivers in
+of the primary users of Parrot and therefore one of the primary drivers in
 its development. However, compilers for other dynamic languages such as
 Python 3, Ruby, Tcl, are under active development. Several compilers exist
 which are not being as actively developed, and many compilers exist for
