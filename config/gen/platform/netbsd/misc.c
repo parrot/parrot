@@ -26,17 +26,23 @@ Miscellaneous helper functions that are specific to NetBSD.
 =item C<void Parrot_platform_init_code(void)>
 
 Initialize Parrot for the NetBSD platform.
-So far only turns off SIGFPE for Alpha.
+So far turns off SIGFPE for Alpha, and
+ensures IEEE floating-point semantics from
+the math library.
 
 =cut
 
 */
 
 #include <signal.h>
+#include <math.h>
 
 void
 Parrot_platform_init_code(void)
 {
+
+    _LIB_VERSION = _IEEE_;	/* force IEEE math semantics and behaviour */
+
 #if defined(__alpha__)
     signal(SIGFPE, SIG_IGN);
 #endif
