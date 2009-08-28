@@ -1,20 +1,14 @@
-#!perl
+#! parrot
 # Copyright (C) 2001-2009, Parrot Foundation.
-# $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 18;
+# $Id: string.t 40481 2009-08-11 06:09:35Z dukeleto $
 
 =head1 NAME
 
-t/op/gc.t - Garbage Collection
+t/op/gc.t - Garbage collection
 
 =head1 SYNOPSIS
 
-        % prove t/op/gc.t
+    % prove t/op/gc.t
 
 =head1 DESCRIPTION
 
@@ -23,117 +17,129 @@ GC related bugs.
 
 =cut
 
-pir_output_is( <<'CODE', '1', "sweep 1" );
 .include 'interpinfo.pasm'
+
 .sub main :main
-      $I1 = interpinfo .INTERPINFO_GC_MARK_RUNS  # How many GC mark runs have we done already?
-      sweep 1
-      $I2 = interpinfo .INTERPINFO_GC_MARK_RUNS  # Should be one more now
-      $I3 = $I2 - $I1
-      print $I3
+    .include 'test_more.pir'
+    plan(140)
+
+    sweep_1()
+    sweep_0()
+    sweep_0_need_destroy_obj()
+    sweep_0_need_destroy_destroy_obj()
+    collect_count()
+    collect_toggle()
+    collect_toggle_nested()
+    vanishing_singleton_PMC()
+    vanishing_ret_continuation()
+    regsave_marked()
+    recursion_and_exceptions()
+    write_barrier_1()
+    write_barrier_2()
+    addr_registry_1()
+    addr_registry_2_int()
+    addr_registry_2_str()
+    pmc_proxy_obj_mark()
+    coro_context_ret_continuation()
+    # END_OF_TESTS
+
 .end
-CODE
 
-pir_output_is( <<'CODE', '0', "sweep 0" );
-.include 'interpinfo.pasm'
-.sub main :main
-      $I1 = interpinfo .INTERPINFO_GC_MARK_RUNS   # How many GC mark runs have we done already?
-      sweep 0
-      $I2 = interpinfo .INTERPINFO_GC_MARK_RUNS  # Should be same
-      $I3 = $I2 - $I1
-      print $I3
+.sub sweep_1
+    $I1 = interpinfo .INTERPINFO_GC_MARK_RUNS  # How many GC mark runs have we done already?
+    sweep 1
+    $I2 = interpinfo .INTERPINFO_GC_MARK_RUNS  # Should be one more now
+    $I3 = $I2 - $I1
+    is($I3,1)
 .end
-CODE
 
-pasm_output_is( <<'CODE', '1', "sweep 0, with object that need destroy" );
-      new P0, 'Undef'
-      interpinfo I1, 2   # How many GC mark runs have we done already?
-      needs_destroy P0
-      sweep 0
-      interpinfo I2, 2   # Should be one more now
-      sub I3, I2, I1
-      print I3
-      end
-CODE
 
-pasm_output_is( <<'CODE', '10', "sweep 0, with object that need destroy/destroy" );
-      new P0, 'Undef'
-      needs_destroy P0
-      interpinfo I1, 2   # How many GC mark runs have we done already?
-      new P0, 'Undef'    # kill object
-      sweep 0
-      interpinfo I2, 2   # Should be one more now
-      sub I3, I2, I1
-      sweep 0
-      interpinfo I4, 2   # Should be same as last
-      sub I5, I4, I2
-      print I3           # These create PMCs that need early GC, so we need
-      print I5           # to put them after the second sweep op.
-      end
-CODE
-
-pir_output_is( <<'CODE', '1', "collect" );
-.include 'interpinfo.pasm'
-.sub main :main
-      $I1 = interpinfo .INTERPINFO_GC_COLLECT_RUNS   # How many garbage collections have we done already?
-      collect
-      $I2 = interpinfo .INTERPINFO_GC_COLLECT_RUNS  # Should be one more now
-      $I3 = $I2 - $I1
-      print $I3
+.sub sweep_0
+    $I1 = interpinfo .INTERPINFO_GC_MARK_RUNS   # How many GC mark runs have we done already?
+    sweep 0
+    $I2 = interpinfo .INTERPINFO_GC_MARK_RUNS  # Should be same
+    $I3 = $I2 - $I1
+    is($I3,0)
 .end
-CODE
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "collectoff/on" );
-      interpinfo I1, 3
-      collectoff
-      collect
-      interpinfo I2, 3
-      sub I3, I2, I1
-      print I3
-      print "\n"
 
-      collecton
-      collect
-      interpinfo I4, 3
-      sub I6, I4, I2
-      print I6
-      print "\n"
+# sweep 0, with object that needs destroy/destroy
+.sub sweep_0_need_destroy_obj
+    $P0 = new 'Undef'
+    $I1 = interpinfo .INTERPINFO_GC_MARK_RUNS   # How many GC mark runs have we done already?
+    needs_destroy $P0
+    sweep 0
+    $I2 = interpinfo .INTERPINFO_GC_MARK_RUNS   # Should be one more now
+    $I3 = $I2 - $I1
+    is($I3,1)
+.end
 
-      end
-CODE
-0
-1
-OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Nested collectoff/collecton" );
-      interpinfo I1, 3
-      collectoff
-      collectoff
-      collecton
-      collect           # This shouldn't do anything...    #'
-      interpinfo I2, 3
-      sub I3, I2, I1
-      print I3
-      print "\n"
+# sweep 0, with object that needs destroy/destroy
+.sub sweep_0_need_destroy_destroy_obj
+    $P0 = new 'Undef'
+    needs_destroy $P0
+    $I1 = interpinfo .INTERPINFO_GC_MARK_RUNS   # How many GC mark runs have we done already?
+    $P0 = new 'Undef'  #kill object
+    sweep 0
+    $I2 = interpinfo .INTERPINFO_GC_MARK_RUNS   # Should be one more now
+    $I3 = $I2 - $I1
+    sweep 0
+    $I4 = interpinfo .INTERPINFO_GC_MARK_RUNS   # Should be same as last
+    $I5 = $I4 - $I2
+    is($I3,1)
+    is($I5,0)
+.end
 
-      collecton
-      collect           # ... but this should
-      interpinfo I4, 3
-      sub I6, I4, I2
-      print I6
-      print "\n"
 
-      end
-CODE
-0
-1
-OUTPUT
+.sub collect_count
+    $I1 = interpinfo .INTERPINFO_GC_COLLECT_RUNS   # How many garbage collections have we done already?
+    collect
+    $I2 = interpinfo .INTERPINFO_GC_COLLECT_RUNS  # Should be one more now
+    $I3 = $I2 - $I1
+    is($I3,1)
+.end
 
-pir_output_is( <<'CODE', <<OUTPUT, "vanishing singleton PMC" );
-.sub main :main
+
+.sub collect_toggle
+    $I1 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
+    collectoff
+    collect
+    $I2 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
+    $I3 = $I2 - $I1
+    is($I3,0)
+
+    collecton
+    collect
+    $I4 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
+    $I6 = $I4 - $I2
+    is($I6,1)
+.end
+
+
+.sub collect_toggle_nested
+    $I1 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
+    collectoff
+    collectoff
+    collecton
+    collect           # This shouldn't do anything...    #'
+    $I2 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
+    $I3 = $I2 - $I1
+    is($I3,0)
+
+    collecton
+    collect           # ... but this should
+    $I4 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
+    $I6 = $I4 - $I2
+    is($I6,1)
+
+.end
+
+
+.sub vanishing_singleton_PMC
     $P16 = new 'Env'
     $P16['Foo'] = 'bar'
-    $I16 = 100
+    $I16 = 100    #Why 100?
     $I17 = 0
 
     loop:
@@ -141,38 +147,27 @@ pir_output_is( <<'CODE', <<OUTPUT, "vanishing singleton PMC" );
     	_rand()
     	$I17 += 1
     	if $I17 <= $I16 goto loop
-   	say "ok"
 .end
 
 .sub _rand
     $P16 = new 'Env'
     $P5 = $P16['Foo']
+    is($P5, 'bar')
     if $P5 != 'bar' goto err
     .return()
     err:
-	say "singleton destroyed .Env = ."
+	print "singleton destroyed .Env = ."
     	$P16 = new 'Env'
     	$S16 = typeof $P16
     	say $S16
 .end
+# END: vanishing_singleton_PMC
 
-CODE
-ok
-OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "vanishing return continuation in method calls" );
-.sub main :main
-    .local pmc o, cl
-    cl = newclass "Foo"
-
-    new o, "Foo"
-    print "ok\n"
-    end
-.end
-
+# vanishing return continuation in method calls
 .namespace ["Foo"]
 .sub init :vtable :method
-    print "init\n"
+    ok(1, "entered init()")
     sweep 1
     new $P6, 'String'
     set $P6, "hi"
@@ -184,105 +179,81 @@ pir_output_is( <<'CODE', <<OUTPUT, "vanishing return continuation in method call
     sweep 1
     inc self
     sweep 1
-    print "back from _inc\n"
+    ok(1, "leaving do_inc")
 .end
 
 .sub __increment :method
-    print "inc\n"
+    ok(1, "in __increment")
     sweep 1
 .end
-CODE
-init
-inc
-back from _inc
-ok
-OUTPUT
+.namespace [ ]
 
-pasm_output_is( <<'CODE', <<OUTPUT, "failing if regsave is not marked" );
-    newclass P9, "Source"
-    newclass P10, "Source::Buffer"
-    new P12, "Source"
+.sub vanishing_ret_continuation
+    .local pmc o, cl
+    cl = newclass 'Foo'
+    o = new 'Foo'
+    ok(1)
+.end
 
-    set S20, P12
-    print S20
-    set S20, P12
-    print S20
-    end
+# END: vanishing_return_continuation
 
+
+
+#Fail if regsave is not marked
 .namespace ["Source"]
-.pcc_sub __get_string:  # buffer
-    get_params "0", P2
-    getprop P12, "buffer", P2
+.sub get_string :method :vtable # buffer
+    $P4  = self
+    $P2 = getprop "buffer", $P4
     sweep 1
-    unless_null P12, buffer_ok
-    new P12, "Source::Buffer"
-    new P14, 'String'
-    set P14, "hello\n"
-    setprop P12, "buf", P14
-    setprop P2, "buffer", P12
+    unless_null $P2, buffer_ok
+    $P2 = new "Source::Buffer"
+    $P3 = new "String"
+    $P3 = "hello"
+    $P2 = setprop "buf", $P3
+    $P4  = setprop "buffer", $P2
 buffer_ok:
-    set_returns "0", P12
-    returncc
+    .return($P2)
+.end
 
 .namespace ["Source::Buffer"]
-.pcc_sub __get_string:
-    get_params "0", P2
+.sub get_string :method :vtable
+    $P4 = self
     sweep 1
-    getprop P12, "buf", P2
-    set S16, P12
-    set_returns "0", S16
-    returncc
-CODE
-hello
-hello
-OUTPUT
+    $P2 = getprop "buf", $P4
+    $S0 = $P2
+    .return($S0)
+.end
 
-# this is a stripped down version of imcc/t/syn/pcc_16
-# s. also src/pmc/retcontinuation.pmc
-pasm_output_is( <<'CODE', <<OUTPUT, "coro context and invalid return continuations" );
-.pcc_sub main:
-    .const 'Sub' P0 = "co1"
-    set I20, 0
-l:
-    get_results ''
-    set_args ''
-    invokecc P0
-    inc I20
-    lt I20, 3, l
-    print "done\n"
-    end
-.pcc_sub co1:
-    get_params ''
-    set P17, P1
-col:
-    print "coro\n"
-    sweep 1
-    yield
-    branch col
+.namespace [ ]
 
-CODE
-coro
-coro
-coro
-done
-OUTPUT
+.sub regsave_marked
+    $P0  = newclass "Source"
+    $P1 = newclass "Source::Buffer"
+    $P2 = new "Source"
 
-pir_output_is( <<'CODE', <<OUTPUT, "Recursion and exceptions" );
+    $S1 = $P2
+    is($S1, "hello")
 
-# this did segfault with GC_DEBUG
+    $S1 = $P2        #why are we doing this twice?
+    is($S1, "hello")
+.end
 
-.sub main :main
+# end regsave_marked()
+
+
+# Recursion and exceptions
+# NOTE: this did segfault with GC_DEBUG
+.sub recursion_and_exceptions
     .local pmc n
     $P0 = getinterp
     $P0."recursion_limit"(10)
-    newclass $P0, "b"
+    $P0 = newclass "b"
     $P0 = new "b"
     $P1 = new 'Integer'
     $P1 = 0
     n = $P0."b11"($P1)
-    print "ok 1\n"
-    print n
-    print "\n"
+    ok(1)
+    is(n,8)
 .end
 .namespace ["b"]
 .sub b11 :method
@@ -292,7 +263,8 @@ pir_output_is( <<'CODE', <<OUTPUT, "Recursion and exceptions" );
     # store_lex -1, "n", n
     n1 = new 'Integer'
     n1 = n + 1
-    push_eh catch
+    push_eh catch    # we're going to catch an exception when recursion_depth
+                     # is too large
     n = self."b11"(n1)
     # store_lex -1, "n", n
     pop_eh
@@ -300,233 +272,176 @@ catch:
     # n = find_lex "n"
     .return(n)
 .end
-CODE
-ok 1
-9
-OUTPUT
+.namespace [ ]
 
-pasm_output_is( <<'CODE', <<OUTPUT, "write barrier 1" );
-    null I2
-    set I3, 100
+# write barrier 1
+.sub write_barrier_1
+    null $I2
+    $I3 = 100
 lp3:
-    null I0
-    set I1, 1000
-    new P1, 'ResizablePMCArray'
+    null $I0
+    $I1 = 1000
+    $P1 = new 'ResizablePMCArray'
 lp1:
-    new P2, 'ResizablePMCArray'
-    new P0, 'Integer'
-    set P0, I0
-    set P2[0], P0
-    set P1[I0], P2
-    if I0, not_0
-    needs_destroy P0
-    # force marking past P2[0]
+    $P2 = new 'ResizablePMCArray'
+    $P0 = new 'Integer'
+    $P0 = $I0
+    $P2[0] = $P0
+    $P1[$I0] = $P2
+    if $I0, not_0
+    needs_destroy $P0
+    # force marking past $P2[0]
     sweep 0
 not_0:
-    new P3, 'Undef'
-    new P4, 'Undef'
-    inc I0
-    lt I0, I1, lp1
+    $P3 = new 'Undef'
+    $P4 = new 'Undef'
+    inc $I0
+    lt $I0, $I1, lp1
 
-    null I0
+    null $I0
     # trace 1
 lp2:
-    set P2, P1[I0]
-    set P2, P2[0]
-    eq P2, I0, ok
+    $P2 = $P1[$I0]
+    $P2 = $P2[0]
+    eq $P2, $I0, ok
     print "nok\n"
     print "I0: "
-    print I0
+    print $I0
     print " P2: "
-    print P2
+    print $P2
     print " type: "
-    typeof S0, P2
-    print S0
+    $S0 = typeof $P2
+    print $S0
     print " I2: "
-    print I2
+    print $I2
     print "\n"
     exit 1
 ok:
-    inc I0
-    lt I0, I1, lp2
-    inc I2
-    lt I2, I3, lp3
-    print "ok\n"
-    end
-CODE
-ok
-OUTPUT
+    inc $I0
+    lt $I0, $I1, lp2
+    inc $I2
+    lt $I2, $I3, lp3
+    ok(1)
+.end
 
-pasm_output_is( <<'CODE', <<OUTPUT, "write barrier 2 - hash" );
-    null I2
-    set I3, 100
+
+# write barrier 2 - hash
+.sub write_barrier_2
+    null $I2
+    $I3 = 100
 lp3:
-    null I0
-    set I1, 100
-    new P1, 'Hash'
+    null $I0
+    $I1 = 100
+    $P1 = new 'Hash'
 lp1:
-    new P2, 'Hash'
-    new P0, 'Integer'
-    set P0, I0
-    set S0, I0
-    set P2["first"], P0
-    set P1[S0], P2
-    if I0, not_0
-    new P0, 'Integer'
-    needs_destroy P0
-    null P0
+    $P2 = new 'Hash'
+    $P0 = new 'Integer'
+    $P0 = $I0
+    $S0 = $I0
+    $P2["first"] = $P0
+    $P1[$S0] = $P2
+    if $I0, not_0
+    $P0 = new 'Integer'
+    needs_destroy $P0
+    null $P0
     # force full sweep
     sweep 0
 not_0:
-    new P3, 'Undef'
-    new P4, 'Undef'
-    inc I0
-    lt I0, I1, lp1
+    $P3 = new 'Undef'
+    $P4 = new 'Undef'
+    inc $I0
+    lt $I0, $I1, lp1
 
-    null I0
+    null $I0
     # trace 1
 lp2:
-    set S0, I0
-    set P2, P1[S0]
-    set P2, P2["first"]
-    eq P2, I0, ok
+    $S0 = $I0
+    $P2 = $P1[$S0]
+    $P2 = $P2["first"]
+    eq $P2, $I0, ok
     print "nok\n"
     print "I0: "
-    print I0
+    print $I0
     print " P2: "
-    print P2
+    print $P2
     print " type: "
-    typeof S0, P2
-    print S0
+    $S0 = typeof $P2
+    print $S0
     print " I2: "
-    print I2
+    print $I2
     print "\n"
     exit 1
 ok:
-    inc I0
-    lt I0, I1, lp2
-    inc I2
-    lt I2, I3, lp3
-    print "ok\n"
-    end
-CODE
-ok
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "verify pmc proxy object marking" );
-.sub main :main
-    .local pmc cl, s, t
-    cl = subclass "String", "X"
-    addattribute cl, "o3"
-    addattribute cl, "o4"
-    s = new "X"
-    $P0 = new 'String'
-    $S0 = "ok" . " 3\n"
-    $P0 = $S0
-    setattribute s, "o3", $P0
-    $P0 = new 'String'
-    $S0 = "ok" . " 4\n"
-    $P0 = $S0
-    setattribute s, "o4", $P0
-    null $P0
-    null $S0
-    null cl
-    sweep 1
-    s = "ok 1\n"
-    print s
-    .local int i
-    i = 0
-lp:
-    t = new "X"
-    inc i
-    if i < 1000 goto lp
-    t = "ok 2\n"
-    print s
-    print t
-    $P0 = getattribute s, "o3"
-    print $P0
-    $P0 = getattribute s, "o4"
-    print $P0
+    inc $I0
+    lt $I0, $I1, lp2
+    inc $I2
+    lt $I2, $I3, lp3
+    ok(1)
 .end
-CODE
-ok 1
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "AddrRegistry 1" );
-.sub main :main
+
+
+# AddrRegistry 1
+.sub addr_registry_1
     .local pmc a, reg, nil
     reg = new 'AddrRegistry'
     a = new 'String'
     null nil
     $I0 = reg[a]
     if $I0 == 0 goto ok1
-    print "not "
+    notok(1)
 ok1:
-    print "ok 1\n"
+    ok(1, "ok 1")
     reg[a] = nil
     $I0 = reg[a]
     if $I0 == 1 goto ok2
-    print "not "
+    notok(1)
 ok2:
-    print "ok 2\n"
+    ok(1, "ok 2")
     reg[a] = nil
     $I0 = reg[a]
     if $I0 == 2 goto ok3
-    print "not "
+    notok(1)
 ok3:
-    print "ok 3\n"
-
+    ok(1, "ok 3")
     delete reg[a]
     $I0 = reg[a]
     if $I0 == 1 goto ok4
-    print "not "
+    notok(1)
 ok4:
-    print "ok 4\n"
+    ok(1, "ok 4")
     delete reg[a]
     $I0 = reg[a]
     if $I0 == 0 goto ok5
-    print "not "
+    notok(1)
 ok5:
-    print "ok 5\n"
+    ok(1, "ok 5")
 .end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-ok 5
-OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "AddrRegistry 2" );
-.sub main :main
+
+# AddrRegistry 2
+.sub addr_registry_2_int
     .local pmc a, b, reg, nil
     null nil
     reg = new 'AddrRegistry'
     a = new 'String'
     b = new 'String'
     $I0 = elements reg
-    print $I0
+    is($I0, 0)
     reg[a] = nil
     $I0 = elements reg
-    print $I0
+    is($I0, 1)
     reg[a] = nil
     $I0 = elements reg
-    print $I0
+    is($I0, 1)
     reg[b] = nil
     $I0 = elements reg
-    print $I0
-    print "\n"
+    is($I0, 2)
 .end
-CODE
-0112
-OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "AddrRegistry 2" );
-.sub main :main
+
+# AddrRegistry 2
+.sub addr_registry_2_str
     .local pmc a, b, c, reg, nil, it
     null nil
     reg = new 'AddrRegistry'
@@ -551,12 +466,71 @@ loop:
 done:
     $P1.'sort'()
     $S1 = join '', $P1
-    print $S1
-    print "\n"
+    is($S1, 'k1k2k3')
 .end
-CODE
-k1k2k3
-OUTPUT
+
+# verify pmc proxy object marking
+.sub pmc_proxy_obj_mark
+    .local pmc cl, s, t
+    cl = subclass "String", "X"
+    addattribute cl, "o3"
+    addattribute cl, "o4"
+    s = new "X"
+    $P0 = new 'String'
+    $S0 = "ok" . " 3"
+    $P0 = $S0
+    setattribute s, "o3", $P0
+    $P0 = new 'String'
+    $S0 = "ok" . " 4"
+    $P0 = $S0
+    setattribute s, "o4", $P0
+    null $P0
+    null $S0
+    null cl
+    sweep 1
+    s = "ok 1"
+    is(s, "ok 1")
+    .local int i
+    i = 0
+lp:
+    t = new "X"
+    inc i
+    if i < 1000 goto lp
+    t = "ok 2"
+    is(s, "ok 1")
+    is(t, "ok 2")
+    $P0 = getattribute s, "o3"
+    is($P0, "ok 3")
+    $P0 = getattribute s, "o4"
+    is($P0, "ok 4")
+.end
+
+
+# coro context and invalid return continuations
+# this is a stripped down version of imcc/t/syn/pcc_16
+# s. also src/pmc/retcontinuation.pmc
+
+.sub coro_context_ret_continuation
+    .const 'Sub' $P0 = "co1"
+    $I20 = 0
+l:
+    get_results ''
+    set_args ''
+    invokecc $P0
+    inc $I20
+    lt $I20, 3, l
+    ok(1, "done\n")
+.end
+
+.sub co1
+    get_params ''
+    $P17 = $P1
+col:
+    ok(1, "coro\n")
+    sweep 1
+    yield
+    branch col
+.end
 
 =head1 SEE ALSO
 
@@ -567,11 +541,9 @@ F<examples/benchmarks/primes2_i.pasm>,
 F<examples/benchmarks/primes2.c>,
 F<examples/benchmarks/primes2.py>.
 
-=cut
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 filetype=pir:
