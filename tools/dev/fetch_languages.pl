@@ -60,6 +60,12 @@ my @hlls = (
     },
 
     {
+        name       => 'blizkost',
+        scm        => 'GIT',
+        repository => 'git://github.com/jnthn/blizkost.git'
+    },
+
+    {
         name       => 'c99',
         scm        => 'SVN',
         repository => 'https://svn.parrot.org/languages/c99/trunk'
