@@ -22,7 +22,6 @@ See L<www.openssl.org>
 
 pmclass @TEMP_md_name@
     dynpmc
-    need_ext
     group digest_group
     lib crypto {
 
