@@ -20,17 +20,16 @@ A good (well, at least some) knowledge of the Parrot internals is obviously
 required to read this document. Some familiarity with debugging principles is
 also mandatory beyond this point.
 
+
 =head1 BUILDING parrot_debugger
 
-The debugger is not built with Parrot, but you should make it with its specific
-target:
+The debugger is built along with Parrot when you run 'make', but if you want to build 
+*only* the debugger, then you can run:
 
   make parrot_debugger
 
-(where C<make> is the same C<make> incarnation you used to build Parrot).
-
-If everything goes well, you should come up with a F<parrot_debugger>
-executable in the same directory as the Parrot program.
+Which will create a new parrot_debugger executable in the same directory as the parrot
+executable.
 
 =head1 THE DEBUGGER SHELL
 

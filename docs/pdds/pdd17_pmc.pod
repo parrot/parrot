@@ -44,39 +44,13 @@ constructed out of these fundamental building blocks.
 All PMCs have the form:
 
     struct PMC {
-        UnionVal cache;
         Parrot_UInt flags;
         VTABLE *vtable;
         DPOINTER *data;
         PMC *_metadata;
-        struct _Sync *_synchronize; # [Note: may be deprecated, see STM]
+        struct _Sync *_synchronize;    # [Note: may be deprecated, see STM]
         PMC *_next_for_GC;
-    };
-
-where C<cache> is a C<UnionVal> union:
-
-    typedef union UnionVal {
-        struct {
-            void  *_bufstart;
-            size_t _buflen;
-        } _b;
-        struct {
-            DPOINTER *_struct_val;
-            PMC      *_pmc_val;
-        } _ptrs;
-        struct _i {
-            INTVAL _int_val;
-            INTVAL _int_val2;
-        } _i;
-        FLOATVAL _num_val;
-        struct parrot_string_t * _string_val;
-    } UnionVal;
-
-C<u> holds data associated with the PMC. This can be in the form of an integer
-value, a floating-point value, a string value, or a pointer to other data.
-C<u> may be empty, since the PMC structure also provides a more general data
-pointer, but is useful for PMCs which hold only a single piece of data (e.g.
-C<PerlInts>).
+    }
 
 C<flags> holds a set of flags associated with the PMC; these are documented
 in F<include/parrot/pobj.h>, and are generally only used within the Parrot
@@ -90,8 +64,8 @@ addition, subtraction, cloning etc.)
 C<data> holds a pointer to the core data associated with the PMC. This
 may be null.
 
-C<_metadata> holds internal PMC metadata. The specification for this has not
-yet been finalized.
+C<_metadata> holds internal PMC metadata (properties). See the setprop/getprop
+ops in F<docs/ops/pmc.pod>.
 
 C<_synchronize> is for access synchronization between shared PMCs.
 
