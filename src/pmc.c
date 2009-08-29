@@ -105,7 +105,7 @@ subsystem.
 
 PARROT_EXPORT
 void
-Parrot_pmc_destroy(PARROT_INTERP, ARGIN(PMC *pmc))
+Parrot_pmc_destroy(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_pmc_destroy)
 
@@ -114,6 +114,8 @@ Parrot_pmc_destroy(PARROT_INTERP, ARGIN(PMC *pmc))
         /* Prevent repeated calls. */
         PObj_active_destroy_CLEAR(pmc);
     }
+
+    Parrot_gc_free_pmc_sync(interp, pmc);
 
     if (pmc->vtable->attr_size) {
         if (PMC_data(pmc)) {

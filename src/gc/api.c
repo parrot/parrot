@@ -361,20 +361,7 @@ Parrot_gc_free_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
     Small_Object_Pool * const pool = (PObj_constant_TEST(pmc)) ?
         interp->arena_base->constant_pmc_pool : interp->arena_base->pmc_pool;
 
-    if (PObj_active_destroy_TEST(pmc))
-        VTABLE_destroy(interp, pmc);
-
-    Parrot_gc_free_pmc_sync(interp, pmc);
-    if (PMC_data(pmc) && pmc->vtable->attr_size) {
-#if GC_USE_FIXED_SIZE_ALLOCATOR
-        Parrot_gc_free_pmc_attributes(interp, pmc, pmc->vtable->attr_size);
-#else
-        mem_sys_free(PMC_data(pmc));
-        PMC_data(pmc) = NULL;
-#endif
-    }
-    PARROT_ASSERT(NULL == PMC_data(pmc));
-
+    Parrot_pmc_destroy(interp, pmc);
 
     PObj_flags_SETTO((PObj *)pmc, PObj_on_free_list_FLAG);
     pool->add_free_object(interp, pool, (PObj *)pmc);
