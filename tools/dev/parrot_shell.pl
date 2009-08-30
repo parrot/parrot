@@ -73,7 +73,8 @@ while(1) {
         if ($line =~ m/^\s*\.\s*$/) { # Run it, baby!
             print eval_snippet($code);
             last;
-        } else {
+        }
+        else {
             $code .= $line;
         }
     }
@@ -140,10 +141,12 @@ sub handle_errors {
     my ($exit_code) = @_;
     if ($exit_code == -1) {
         print "Error: failed to execute: $!\n";
-    } elsif ($exit_code & 127) {
+    }
+    elsif ($exit_code & 127) {
         printf "Error: child died with signal %d, %s coredump\n",
             ($exit_code & 127),  ($exit_code & 128) ? 'with' : 'without';
-    } else {
+    }
+    else {
         printf "Error: child exited with value %d\n", $? >> 8;
     }
 }
@@ -159,7 +162,8 @@ sub normalize_snippet {
     if ($snippet =~ m/^\.sub/) {
         # don't wrap snippet
         return $snippet;
-    } else {
+    }
+    else {
         return <<SNIP;
 .sub main :main
 $snippet
