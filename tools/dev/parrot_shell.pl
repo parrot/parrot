@@ -39,7 +39,7 @@ Example:
     parrot_shell 1> quit
     Thanks for visiting the Parrot Shell, come back soon!
 
-Each numbered Parrot Shell session is run in it's own interpreter, so no registers
+Each numbered Parrot Shell session is run in its own interpreter, so no registers
 or variables are shared/leaked between them.
 
 =cut
