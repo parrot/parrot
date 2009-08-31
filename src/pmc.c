@@ -115,6 +115,7 @@ Parrot_pmc_destroy(PARROT_INTERP, ARGMOD(PMC *pmc))
         PObj_active_destroy_CLEAR(pmc);
     }
 
+    PObj_custom_mark_CLEAR(pmc);
     PObj_live_CLEAR(pmc);
 
     Parrot_gc_free_pmc_sync(interp, pmc);
