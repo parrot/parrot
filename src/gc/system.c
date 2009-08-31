@@ -409,13 +409,6 @@ areas.
 
 */
 
-PARROT_INLINE
-static void alive_mem_item(PARROT_INTERP, void *cur_var_ptr) /* HEADERIZER SKIP */
-{
-    const size_t ptr = *(size_t *)cur_var_ptr;
-    Parrot_gc_mark_PObj_alive(interp, (PObj *)ptr);
-}
-
 static void
 trace_mem_block(PARROT_INTERP, size_t lo_var_ptr, size_t hi_var_ptr)
 {
@@ -461,13 +454,13 @@ trace_mem_block(PARROT_INTERP, size_t lo_var_ptr, size_t hi_var_ptr)
                 /* ...so ensure that Parrot_gc_mark_PObj_alive checks PObj_on_free_list_FLAG
                  * before adding it to the next_for_GC list, to have
                  * vtable->mark() called. */
-                alive_mem_item(interp, cur_var_ptr);
+                Parrot_gc_mark_PObj_alive(interp, (PObj *)ptr);
             }
             else if (buffer_min <= ptr && ptr < buffer_max &&
                     is_buffer_ptr(interp, (void *)ptr)) {
                 /* ...and since Parrot_gc_mark_PObj_alive doesn't care about bufstart, it
                  * doesn't really matter if it sets a flag */
-                alive_mem_item(interp, cur_var_ptr);
+                Parrot_gc_mark_PObj_alive(interp, (PObj *)ptr);
             }
         }
     }
