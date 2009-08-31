@@ -12,6 +12,7 @@ use IO::File ();
 use File::Spec;
 use Parrot::Config;
 use File::Temp qw/ tempfile /;
+use Benchmark qw/timeit timestr :hireswallclock/;
 
 =head1 NAME
 
@@ -124,17 +125,18 @@ sub eval_snippet {
     my $stdoutfn = get_tempfile();
     my $f        = IO::File->new(">$codefn");
 
-    $f->print(normalize_snippet($snippet));
+    $f->print(normalize_snippet($snippet || ''));
     $f->close();
 
-    system("$parrot $codefn >$stdoutfn 2>&1");
+    my $time = timestr(timeit(1, sub { system("$parrot $codefn >$stdoutfn 2>&1") } ));
+    $time =~ s/\(.*//g;
 
     handle_errors($?) if $?;
 
     $f = IO::File->new($stdoutfn);
 
     my $output = join( '', <$f> );
-    return "Output:\n$output";
+    return "Time: $time\nOutput:\n$output";
 }
 
 sub handle_errors {
