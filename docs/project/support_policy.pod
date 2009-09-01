@@ -164,10 +164,27 @@ backwards-incompatible change requires deprecation:
 
 =item * bytecode changes (opcode or core PMC removals, renames)
 
-=item * PARROT_API function changes
+=item * C<PARROT_API> function changes
 
 =item * PIR or PASM syntax changes
 
 =item * API changes in the compiler tools
 
 =back
+
+Please note that these features I<do not> require deprecation notices:
+
+=over 4
+
+=item * Parrot functions I<not> marked with C<PARROT_API>
+
+=item * The layout of Parrot's internal data structures
+
+=item * Parrot internals hidden behind a public API
+
+=back
+
+Note that all pointers passed to and returned from functions marked with
+C<PARROT_API> are considered opaque.  We do not guarantee backwards
+compatibility between monthly releases for the layout of these pointers;
+dereference them at your own risk.
