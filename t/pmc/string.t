@@ -20,7 +20,7 @@ Tests the C<String> PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(165)
+    plan(171)
 
     set_or_get_strings()
     setting_integers()
@@ -71,7 +71,7 @@ Tests the C<String> PMC.
     exception_to_int_2()
     exception_to_int_3()
     assign_null_string()
-
+    access_keyed()
     # END_OF_TESTS
 
 .end
@@ -1016,6 +1016,39 @@ handler:
     inc $I0
 check:
     is( $I0, 0, 'assign null string, TT #729' )
+.end
+
+.sub access_keyed
+    .local pmc s
+    s = new ['String']
+    s = "BAR" # Second character is zero, not 'o'
+
+    # Get
+    $S0 = s[0]
+    is($S0, 'B', 'Get string by index')
+    
+    $I0 = s[1]
+    $I1 = ord 'A'
+    is($I0, $I1, 'Get integer by index')
+    
+    $P0 = s[2]
+    is($P0, 'R', 'Get PMC by index')
+
+    # Set
+    s = new ['String']
+
+    $S0 = 'f'
+    s[0] = $S0
+    is(s, 'f', 'Set string keyed')
+
+    $I0 = ord 'o'
+    s[1] = $I0
+    is(s, 'fo', 'Set integer keyed')
+
+    $P0 = new ['String']
+    $P0 = 'o'
+    s[2] = $P0
+    is(s, 'foo', 'Set PMC keyed')
 .end
 
 # Local Variables:
