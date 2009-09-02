@@ -137,8 +137,7 @@ Tests the PackfileDirectory PMC.
     delete pfdir[$S0]
     dec $I0
     $I1 = elements pfdir
-    $I3 = $I0 == $I1
-    todo($I3, "segment deleted", "OrderedHash delete is borked")
+    is($I0, $I1, "segment deleted")
 
   done:
     .return()
