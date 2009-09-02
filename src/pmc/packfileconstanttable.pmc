@@ -395,6 +395,20 @@ TODO: Add same for PMCs.
         return i;
     }
 
+/*
+
+=item C<METHOD type()>
+
+Set segment type.
+
+=cut
+
+*/
+
+    METHOD type() {
+        RETURN(INTVAL PF_CONST_SEG);
+    }
+
 
 }
 /*

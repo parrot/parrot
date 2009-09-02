@@ -198,6 +198,20 @@ Store a PackfileFixupEntry PMC to the given slot.
     }
 
 
+/*
+
+=item C<METHOD type()>
+
+Set segment type.
+
+=cut
+
+*/
+
+    METHOD type() {
+        RETURN(INTVAL PF_FIXUP_SEG);
+    }
+
 }
 /*
 

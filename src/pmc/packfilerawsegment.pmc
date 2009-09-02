@@ -197,7 +197,7 @@ Set an integer's worth of data in the segment.
 
 /*
 
-=item C<>
+=item C<METHOD type()>
 
 Set of get segment type.
 
@@ -210,12 +210,14 @@ TODO: Don't allow create Directory, Annotations, etc segments.
     METHOD type(INTVAL type :optional, INTVAL got_type :opt_flag) {
         Parrot_PackfileRawSegment_attributes * attrs =
                 PARROT_PACKFILERAWSEGMENT(SELF);
+        INTVAL res;
 
         if (got_type) {
             attrs->type = type;
         }
-            
-        RETURN(INTVAL attrs->type);
+           
+        res = attrs->type;
+        RETURN(INTVAL res);
     }
 
 }
