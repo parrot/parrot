@@ -676,7 +676,7 @@ Replace the string at C<key> with the chr of C<value>.
         Parrot_str_replace(INTERP, s, pos, 1, c, NULL);
         VTABLE_set_string_native(INTERP, SELF, s);
     }
-    
+
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
         SELF.set_pmc_keyed_int(VTABLE_get_integer(INTERP, key), value);
     }
