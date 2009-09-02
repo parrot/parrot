@@ -45,7 +45,7 @@ Create empty PackfileRawSegment.
                 mem_allocate_zeroed_typed(Parrot_PackfileRawSegment_attributes);
 
         attrs->opcodes = pmc_new(interp, enum_class_ResizableIntegerArray);
-        attrs->type    = PF_BYTEC_SEG; 
+        attrs->type    = PF_BYTEC_SEG;
 
         PObj_custom_mark_destroy_SETALL(SELF);
         PMC_data(SELF) = attrs;
@@ -215,7 +215,7 @@ TODO: Don't allow create Directory, Annotations, etc segments.
         if (got_type) {
             attrs->type = type;
         }
-           
+
         res = attrs->type;
         RETURN(INTVAL res);
     }
