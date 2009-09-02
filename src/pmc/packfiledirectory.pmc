@@ -42,7 +42,7 @@ Initialize PackfileDirectory.
         Parrot_PackfileDirectory_attributes * attrs =
                 mem_allocate_zeroed_typed(Parrot_PackfileDirectory_attributes);
 
-        attrs->hash = pmc_new(interp, enum_class_Hash);
+        attrs->hash = pmc_new(interp, enum_class_OrderedHash);
 
         PObj_custom_mark_destroy_SETALL(SELF);
         PMC_data(SELF) = attrs;
