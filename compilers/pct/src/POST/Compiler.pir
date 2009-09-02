@@ -82,6 +82,8 @@ Return generated PIR for C<node> and all of its children.
     pos = cpost['pos']
     if null pos goto done_subline
     source = cpost['source']
+    $I0 = can source, 'lineof'
+    unless $I0 goto done_subline
     line = source.'lineof'(pos)
     inc line
   done_subline:
