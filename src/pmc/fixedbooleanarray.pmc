@@ -554,7 +554,7 @@ Used to unarchive the string.
             const INTVAL    size      = VTABLE_shift_integer(INTERP, io);
             STRING * const  s         = VTABLE_shift_string(INTERP, io);
 
-            bit_array = Parrot_str_to_cstring(INTERP, s);
+            bit_array = (unsigned char *)Parrot_str_to_cstring(INTERP, s);
             threshold = Parrot_str_byte_length(interp, s) * BITS_PER_CHAR;
                     
             SET_ATTR_size(INTERP, SELF, size);
