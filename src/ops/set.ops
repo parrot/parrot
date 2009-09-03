@@ -508,10 +508,10 @@ inline op copy(inout PMC, invar PMC) :base_mem {
 
         /* don't let the clone's destruction destroy the destination's data */
         PObj_active_destroy_CLEAR(clone);
-        PMC_data(clone) = NULL;
-        PMC_metadata(clone) = NULL;
+	PMC_data(clone)        = NULL;
+	PMC_sync(clone)        = NULL;
+	PMC_metadata(clone)    = NULL;
         PMC_next_for_GC(clone) = NULL;
-        PMC_sync(clone) = NULL;
 
         /* Restore metadata. */
         if (!PMC_IS_NULL(meta)) {
