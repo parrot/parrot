@@ -1,5 +1,5 @@
 #!parrot
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -16,7 +16,7 @@ Tests all box operators.
 
 =cut
 
-.const int TESTS = 24
+.const int TESTS = 26
 
 # must set these up before the hll_map calls later
 .sub '__setup' :immediate
@@ -33,6 +33,7 @@ Tests all box operators.
     'box_int'()
     'box_num'()
     'box_string'()
+    'box_null_string'()
 
     .local pmc box_int_hll
     box_int_hll = get_root_global [ 'for_test' ], 'box_int'
@@ -93,7 +94,20 @@ Tests all box operators.
     isa_ok( $P0, 'String', 'string boxed to appropriate base type from reg' )
 .end
 
+.sub 'box_null_string'
+    null $S0
+    $P0 = box $S0
+    $S1 = $P0
+    is( $S1, '', 'NULL STRING boxed to empty String PMC' )
+
+    $P1 = clone $P0
+    $S1 = $P0
+    is( $S1, '', '... and survives clone of boxed PMC (TT #964)' )
+
+.end
+
 .HLL 'for_test'
+
 .sub anon :anon :init
   .local pmc interp
   .local pmc cint, myint

@@ -220,11 +220,16 @@ Sets the value of the string to that of the specified C<string>.
 */
 
     VTABLE void set_string_native(STRING *value) {
+        /* in lieu of a STRINGNULL, promote any NULL STRINGs to empty ones */
+        if (!value)
+            value = Parrot_str_new(INTERP, NULL, 0);
+
         /* Only allow constant PMCs to embed constant strings */
         if (PObj_constant_TEST(SELF) && !PObj_constant_TEST(value)) {
             char *copy = Parrot_str_to_cstring(INTERP, value);
             value      = Parrot_str_new_init(INTERP, copy, strlen(copy),
-                    PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET, PObj_constant_FLAG);
+                PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+                PObj_constant_FLAG);
             Parrot_str_free_cstring(copy);
         }
 
