@@ -556,7 +556,7 @@ Used to unarchive the string.
 
             bit_array = (unsigned char *)Parrot_str_to_cstring(INTERP, s);
             threshold = Parrot_str_byte_length(interp, s) * BITS_PER_CHAR;
-                    
+
             SET_ATTR_size(INTERP, SELF, size);
             SET_ATTR_resize_threshold(INTERP, SELF, threshold);
             SET_ATTR_bit_array(INTERP, SELF, bit_array);

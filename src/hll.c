@@ -53,7 +53,7 @@ static PMC* new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
 #define END_READ_HLL_INFO(interp, hll_info)
 #define START_WRITE_HLL_INFO(interp, hll_info) \
     do { \
-	if (PObj_is_PMC_shared_TEST(hll_info) && PMC_sync((interp)->HLL_info)) { \
+        if (PObj_is_PMC_shared_TEST(hll_info) && PMC_sync((interp)->HLL_info)) { \
             (hll_info) = (interp)->HLL_info = \
                 Parrot_clone((interp), (interp)->HLL_info); \
             if (PMC_sync((interp)->HLL_info)) \
