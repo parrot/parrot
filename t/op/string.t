@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 166;
+use Parrot::Test tests => 167;
 use Parrot::Config;
 
 =head1 NAME
@@ -54,6 +54,17 @@ Foo
 Bar
 Bar
 OUTPUT
+
+TODO: {
+
+local $TODO = 'clone null string broken, TT#964';
+
+pasm_output_is( <<'CODE', <<'OUTPUT', 'clone null' );
+    null S0
+    clone S1, S0
+CODE
+OUTPUT
+}
 
 pasm_output_is( <<'CODE', '4', 'length_i_s' );
     set I4, 0
