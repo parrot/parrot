@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2004, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -117,18 +117,16 @@ longer being used.
 =head2 General structure of a buffer-like item
 
     struct parrot_object_t {
-        UnionVal cache;
         unsigned flags;
         ...
     } PObj;
 
-This does not totally reflect the current implementation, but is the spirit of
-the abstraction of current objects. The C<UnionVal cache> field is a C<union>
-that contains a variety of pointer and data configurations. The flags field
-may contain a series of flags which indicate the type, status, configuration,
-and special requirements of each item. Buffers, C<PMC>s, and C<PObj>s all
-have these basic fields in common, although they also contain a variety of
-other data fields, depending on type.
+The flags field may contain a series of flags which indicate the type, status,
+configuration, and special requirements of each item. C<Buffer>s, C<PMC>s, and
+C<PObj>s all have this basic field in common.
+
+C<PMC>s and C<Buffer>s each have an additional field which contain a pointer
+to a block of data.
 
 =head2 GC-related PObj flags
 
@@ -279,5 +277,3 @@ Leopold Tötsch C<lt@toetsch.at>
 =head1 VERSION
 
 0.1.1 June 2008
-
-

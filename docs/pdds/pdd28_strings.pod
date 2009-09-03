@@ -257,30 +257,29 @@ encoding-aware so your functions don't need to be.
 
 Parrot's internal strings (C<STRING>s) have the following structure:
 
-  struct parrot_string_t {
-      UnionVal                      cache;
-      Parrot_UInt                   flags;
-      UINTVAL                       bufused;
-      UINTVAL                       strlen;
-      UINTVAL                       hashval;
-      const struct _encoding       *encoding;
-      const struct _charset        *charset;
-      const struct _normalization  *normalization;
-  };
+    struct parrot_string_t {
+	Parrot_UInt flags;
+	void *     _bufstart;
+	size_t     _buflen;
+	char       *strstart;
+	UINTVAL     bufused;
+	UINTVAL     strlen;
+	UINTVAL     hashval;
+	const struct _encoding *encoding;
+	const struct _charset  *charset;
+};
 
 The fields are:
 
 =over 4
 
-=item cache
+=item _bufstart
 
-A structure that holds the buffer for the string data and the size of the
-buffer in bytes.
+A pointer to the buffer for the string data.
 
-{{ NOTE: this is currently called "cache" for compatibility with PMC
-structures.  As we eliminate the cache from PMCs, we will flatten out this
-union value in the string structure to two members: a string buffer and the
-size of the buffer used. }}
+=item _buflen
+
+The size of the buffer in bytes.
 
 =item flags
 
@@ -319,13 +318,6 @@ Unicode.
 
 The charset structure specifies the character set (by index number and by
 name) and provides functions for transcoding to and from that character set.
-
-=item normalization
-
-What normalization form the string data is in, one of the four Unicode
-normalization forms or NFG. This structure stores the current normalization
-form, function pointers for composition and decomposition for the current
-normalization form, and a pointer to the grapheme table for NFG.
 
 =back
 

@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 PDD 9: Garbage Collection Subsystem
@@ -619,6 +619,9 @@ None.
 None.
 
 =head2 References
+
+"Uniprocessor Garbage Collection Techniques"
+http://www.cs.rice.edu/~javaplt/311/Readings/wilson92uniprocessor.pdf
 
 "A unified theory of garbage collection":
 http://portal.acm.org/citation.cfm?id=1028982

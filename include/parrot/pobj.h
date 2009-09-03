@@ -38,9 +38,8 @@ typedef struct buffer_t {
                     v                 v
 
 The actual set-up is more involved because of padding.  obj->bufstart must
-be suitably aligned for any UnionVal.  (Perhaps it should be a Buffer
-there instead.)  The start of the memory region (as returned by malloc()
-is also suitably aligned for any use.  If, for example, malloc() returns
+be suitably aligned. The start of the memory region (as returned by malloc())
+is suitably aligned for any use.  If, for example, malloc() returns
 objects aligned on 8-byte boundaries, and obj->bufstart is also aligned
 on 8-byte boundaries, then there should be 4 bytes of padding.  It is
 handled differently in the two files alloc_resources.c and res_lea.c.
