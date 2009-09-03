@@ -68,7 +68,7 @@ sub defines {
     return $pred_def . <<END;
 /* defines - $0 -> $type */
 #  define opcode_to_prederef(i, op)   \\
-     (opcode_t *) (op   - CONTEXT(i)->pred_offset)
+     (opcode_t *) (op   - Parrot_pcc_get_pred_offset(interp, i->ctx))
 END
 }
 
@@ -91,7 +91,7 @@ sub goto_address {
         return "if ($addr == 0)
           return 0;
    Parrot_cx_handle_tasks(interp, interp->scheduler);
-   _reg_base = (char*)interp->ctx.bp.regs_i;
+   _reg_base = (char*)Parrot_pcc_get_regs_ni(interp, CURRENT_CONTEXT(interp))->regs_i;
    goto **(void **)(cur_opcode = opcode_to_prederef(interp, $addr))";
     }
 }
@@ -107,7 +107,7 @@ sub goto_offset {
     my ( $self, $offset ) = @_;
 
     # this must be a single expression, in case it's in a single-statement if
-    return "do {\nCONTEXT(interp)->current_pc = CUR_OPCODE + $offset;\n"
+    return "do {\nParrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), CUR_OPCODE + $offset);\n"
     .      "goto **(void **)(cur_opcode += $offset);\n} while (1)";
 }
 

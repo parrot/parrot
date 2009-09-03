@@ -287,7 +287,7 @@ set_register_usage(PARROT_INTERP,
         int arg_type;
         PMC *sig;
         if (argn >= args) {
-            sig = CONTEXT(interp)->constants[cur_op[1]]->u.key;
+            sig = Parrot_pcc_get_pmc_constant(interp, CURRENT_CONTEXT(interp), cur_op[1]);
             arg_type = VTABLE_get_integer_keyed_int(interp,
                     sig, argn - args);
             arg_type &= (PARROT_ARG_TYPE_MASK | PARROT_ARG_CONSTANT);
@@ -396,8 +396,10 @@ init_regusage(PARROT_INTERP, Parrot_jit_optimizer_section_ptr cur_section)
 {
     int typ;
 
-    cur_section->ru[0].registers_used = CONTEXT(interp)->n_regs_used[REGNO_INT];
-    cur_section->ru[3].registers_used = CONTEXT(interp)->n_regs_used[REGNO_NUM];
+    cur_section->ru[0].registers_used = Parrot_pcc_get_regs_used(interp,
+                                            CURRENT_CONTEXT(interp), REGNO_INT);
+    cur_section->ru[3].registers_used = Parrot_pcc_get_regs_used(interp,
+                                            CURRENT_CONTEXT(interp), REGNO_NUM);
     cur_section->ru[1].registers_used = cur_section->ru[2].registers_used = 0;
 
     for (typ = 0; typ < 4; typ++) {
@@ -1304,7 +1306,8 @@ set_reg_usage(PARROT_INTERP, const opcode_t *pc)
 
             if (offs >= sub->start_offs && offs < sub->end_offs) {
                 for (i = 0; i < 4; i++)
-                    CONTEXT(interp)->n_regs_used[i] = sub->n_regs_used[i];
+                    Parrot_pcc_set_regs_used(interp, CURRENT_CONTEXT(interp),
+                            i, sub->n_regs_used[i]);
 
                 return;
             }
@@ -1425,7 +1428,7 @@ parrot_build_asm(PARROT_INTERP, ARGIN(opcode_t *code_start), ARGIN(opcode_t *cod
 
     /* remember register usage */
     for (i = 0; i < 4; i++)
-        n_regs_used[i] = CONTEXT(interp)->n_regs_used[i];
+        n_regs_used[i] = Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), i);
 
     set_reg_usage(interp, code_start);
 
@@ -1679,7 +1682,7 @@ parrot_build_asm(PARROT_INTERP, ARGIN(opcode_t *code_start), ARGIN(opcode_t *cod
 
     /* restore register usage */
     for (i = 0; i < 4; i++)
-        CONTEXT(interp)->n_regs_used[i] = n_regs_used[i];
+        Parrot_pcc_set_regs_used(interp, CURRENT_CONTEXT(interp), i, n_regs_used[i]);
 
     /* Do fixups before converting offsets */
     (arch_info->jit_dofixup)(jit_info, interp);

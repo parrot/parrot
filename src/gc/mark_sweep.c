@@ -169,9 +169,8 @@ int
 Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
 {
     ASSERT_ARGS(Parrot_gc_trace_root)
-    Arenas           * const arena_base = interp->arena_base;
-    Parrot_Context   *ctx;
-    PObj             *obj;
+    Arenas  * const arena_base = interp->arena_base;
+    PObj    *obj;
 
     /* note: adding locals here did cause increased GC runs */
     mark_context_start();
@@ -200,8 +199,7 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
         Parrot_gc_mark_PObj_alive(interp, obj);
 
     /* mark the current context. */
-    ctx = CONTEXT(interp);
-    mark_context(interp, ctx);
+    Parrot_gc_mark_PObj_alive(interp, (PObj*)CURRENT_CONTEXT(interp));
 
     /* mark the dynamic environment. */
     Parrot_gc_mark_PObj_alive(interp, (PObj*)interp->dynamic_env);

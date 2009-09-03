@@ -951,6 +951,7 @@ include/parrot/call.h                                       [main]include
 include/parrot/cclass.h                                     [main]include
 include/parrot/charset.h                                    [main]include
 include/parrot/compiler.h                                   [main]include
+include/parrot/context.h                                    [main]include
 include/parrot/core_types.h                                 [main]include
 include/parrot/datatypes.h                                  [main]include
 include/parrot/debugger.h                                   [main]include
@@ -1242,6 +1243,7 @@ runtime/parrot/library/yaml_dumper.pir                      [library]
 src/atomic/gcc_x86.c                                        []
 src/atomic/sparc_v9.s                                       []
 src/byteorder.c                                             []
+src/call/context.c                                          []
 src/call/ops.c                                              []
 src/call/pcc.c                                              []
 src/datatypes.c                                             []
@@ -1392,6 +1394,7 @@ src/pmc/capture.pmc                                         [devel]src
 src/pmc/class.pmc                                           [devel]src
 src/pmc/codestring.pmc                                      [devel]src
 src/pmc/complex.pmc                                         [devel]src
+src/pmc/context.pmc                                         [devel]src
 src/pmc/continuation.pmc                                    [devel]src
 src/pmc/coroutine.pmc                                       [devel]src
 src/pmc/cpointer.pmc                                        [devel]src
@@ -1845,6 +1848,7 @@ t/pmc/class.t                                               [test]
 t/pmc/codestring.t                                          [test]
 t/pmc/complex.t                                             [test]
 t/pmc/config.t                                              [test]
+t/pmc/context.t                                             [test]
 t/pmc/continuation.t                                        [test]
 t/pmc/coroutine.t                                           [test]
 t/pmc/cpointer.t                                            [test]

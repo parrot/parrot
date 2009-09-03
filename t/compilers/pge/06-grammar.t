@@ -180,6 +180,7 @@ EOF_SIMPLE_GRAMMAR
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Perl6Grammar.pbc'
 
+    ok        = 1
     match     = parser(expr)
     result    = match
 

@@ -413,8 +413,12 @@ Parrot_jit_bytejump(Parrot_jit_info_t *jit_info,
     emitm_jumpl_i(jit_info->native_ptr, XSR1, 0, XSR1);
 
     /* fixup where we have the Parrot registers - context switches */
-    emitm_ld_i(jit_info->native_ptr, Parrot_jit_intrp, offsetof(Interp, ctx.bp),
-        Parrot_jit_regbase);
+    emitm_ld_i(jit_info->native_ptr, Parrot_jit_intrp, offsetof(Interp, ctx),
+        Parrot_jit_intrp);
+    emitm_ld_i(jit_info->native_ptr, Parrot_jit_intrp, offsetof(PMC, data),
+        Parrot_jit_intrp);
+    emitm_ld_i(jit_info->native_ptr, Parrot_jit_intrp,
+        offsetof(Parrot_Context, bp), Parrot_jit_intrp);
 }
 
 /* Generate conditional branch to offset from current parrot op */

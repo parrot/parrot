@@ -1223,8 +1223,8 @@ Parrot_set_p_pc {
 ; or just JIT (TODO)  the 2 easy ones
 Parrot_set_args_pc {
     if (jit_info->code_type == JIT_CODE_FILE) {
-    jit_emit_mov_ri_i(NATIVECODE, ISR1, jit_info->cur_op);
-    jit_emit_stw(NATIVECODE, ISR1, offsetof(Interp, current_args), r16);
+        jit_emit_mov_ri_i(NATIVECODE, ISR1, jit_info->cur_op);
+        jit_emit_stw(NATIVECODE, ISR1, offsetof(Interp, current_args), r16);
     }
     else  {
         jit_set_args_pc(jit_info, interp,
@@ -1294,10 +1294,12 @@ extern Parrot_get_params_pc {
 
 Parrot_get_results_pc {
     if (jit_info->code_type == JIT_CODE_FILE) {
-    jit_emit_mov_ri_i(NATIVECODE, ISR1, jit_info->cur_op);
-    jit_emit_lwz(NATIVECODE, ISR2, offsetof(Interp, ctx.state), r16);
-    jit_emit_stw(NATIVECODE, ISR1,
-        offsetof(Parrot_Context, current_results), ISR2);
+        jit_emit_mov_ri_i(NATIVECODE, ISR1, jit_info->cur_op);
+        jit_emit_lwz(NATIVECODE, ISR2, offsetof(Interp, ctx), r16);
+        jit_emit_lwz(NATIVECODE, ISR2, offsetof(PMC, data), ISR2);
+        jit_emit_lwz(NATIVECODE, ISR2, offsetof(Parrot_Context, state), ISR2);
+        jit_emit_stw(NATIVECODE, ISR1,
+            offsetof(Parrot_Context, current_results), ISR2);
     }
     else {
     PackFile_Constant **constants  = CONTEXT(interp)->constants;

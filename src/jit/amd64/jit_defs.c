@@ -153,7 +153,9 @@ Parrot_emit_jump_to_rax(Parrot_jit_info_t *jit_info, Interp *interp)
 #endif
     }
     /* Base pointer */
-    emit_mov_r_mr(jit_info->native_ptr, RBX, INTERP, (long)offsetof(Interp, ctx.bp));
+    emit_mov_r_mr(jit_info->native_ptr, RBX, INTERP, (long)offsetof(Interp, ctx));
+    emit_mov_r_mr(jit_info->native_ptr, RBX, RBX, (long)offsetof(PMC, data));
+    emit_mov_r_mr(jit_info->native_ptr, RBX, RBX, (long)offsetof(Parrot_Context, bp));
 
 #ifdef USE_OP_MAP_AND_CODE_START
     emit_jmp_r_r(jit_info->native_ptr, RAX, OP_MAP);

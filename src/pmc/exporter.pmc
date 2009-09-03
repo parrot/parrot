@@ -109,7 +109,7 @@ Initializes an Exporter PMC.
     VTABLE void init() {
         /* Set up the object. */
         SET_ATTR_ns_src(INTERP, SELF, PMCNULL);
-        SET_ATTR_ns_dest(INTERP, SELF, CONTEXT(interp)->current_namespace);
+        SET_ATTR_ns_dest(INTERP, SELF, Parrot_pcc_get_namespace(INTERP, CURRENT_CONTEXT(INTERP)));
         SET_ATTR_globals(INTERP, SELF, PMCNULL);
 
         /* Set flags for custom GC mark and destroy. */

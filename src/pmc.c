@@ -894,7 +894,7 @@ Parrot_create_mro(PARROT_INTERP, INTVAL type)
 
             /* anchor at parent, aka current_namespace, that is 'parrot' */
             VTABLE_set_pmc_keyed_str(interp,
-                    CONTEXT(interp)->current_namespace, class_name, ns);
+                    Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp)), class_name, ns);
         }
 
         _class = vtable->pmc_class;

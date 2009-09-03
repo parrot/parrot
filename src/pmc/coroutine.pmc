@@ -49,7 +49,7 @@ print_sub_name(PARROT_INTERP, PMC *sub_pmc)
     if (co->ctx && (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_CORO_FF)) {
         Parrot_io_eprintf(tracer, " to '%Ss'",
                 Parrot_full_sub_name(interp,
-                    co->ctx->caller_ctx->current_sub));
+                    Parrot_pcc_get_sub(interp, Parrot_pcc_get_caller_ctx(interp, co->ctx))));
     }
 
     Parrot_io_eprintf(tracer, "\n# ");
@@ -128,8 +128,8 @@ Swaps the "context".
             print_sub_name(INTERP, SELF);
 
         if (!co->ctx) {
-            Parrot_Context *caller_ctx;
-            Parrot_Context *ctx;
+            PMC *caller_ctx;
+            PMC *ctx;
             PMC *ccont;
 
             ccont = INTERP->current_cont;
@@ -143,27 +143,27 @@ Swaps the "context".
                         "tail call to coro not allowed");
 
             /* first time set current sub, cont, object */
-            caller_ctx = CONTEXT(interp);
+            caller_ctx = CURRENT_CONTEXT(interp);
             ctx        = Parrot_set_new_context(INTERP, co->n_regs_used);
 
-            co->ctx                   = Parrot_context_ref(interp, ctx);
+            co->ctx                   = ctx;
 
-            ctx->caller_ctx           = caller_ctx;
-            PMC_cont(ccont)->from_ctx = ctx;
-            ctx->current_sub          = SELF;
-            ctx->current_HLL          = co->HLL_id;
-            ctx->current_namespace    = co->namespace_stash;
-            ctx->current_cont         = ccont;
-            ctx->current_object       = NULL;
-            INTERP->current_object    = NULL;
-            INTERP->current_cont      = NULL;
+            Parrot_pcc_set_caller_ctx(INTERP, ctx, caller_ctx);
+            PMC_cont(ccont)->from_ctx                       = ctx;
+            Parrot_pcc_set_sub(INTERP, ctx, SELF);
+            Parrot_pcc_set_HLL(interp, ctx, co->HLL_id);
+            Parrot_pcc_set_namespace(INTERP, ctx, co->namespace_stash);
+            Parrot_pcc_set_continuation(INTERP, ctx, ccont);
+            Parrot_pcc_set_object(interp, ctx, NULL);
+            INTERP->current_object                  = NULL;
+            INTERP->current_cont                    = NULL;
 
             /* create pad if needed */
             if (!PMC_IS_NULL(co->lex_info)) {
-                ctx->lex_pad = pmc_new_init(INTERP,
+                Parrot_pcc_set_lex_pad(INTERP, ctx, pmc_new_init(INTERP,
                         Parrot_get_ctx_HLL_type(interp, enum_class_LexPad),
-                        co->lex_info);
-                VTABLE_set_pointer(INTERP, ctx->lex_pad, ctx);
+                        co->lex_info));
+                VTABLE_set_pointer(INTERP, Parrot_pcc_get_lex_pad(INTERP, ctx), ctx);
             }
 
             PObj_get_FLAGS(SELF) |= SUB_FLAG_CORO_FF;
@@ -175,7 +175,7 @@ Swaps the "context".
         /* if calling the Coro we need the segment of the Coro */
         else if (!(PObj_get_FLAGS(SELF) & SUB_FLAG_CORO_FF)) {
             PMC *ccont;
-            Parrot_Context   *ctx;
+            PMC *ctx;
 
             PObj_get_FLAGS(SELF) |= SUB_FLAG_CORO_FF;
             wanted_seg            = co->seg;
@@ -185,24 +185,22 @@ Swaps the "context".
             ctx                   = co->ctx;
 
             /* and the recent call context */
-            ccont                 = ctx->current_cont;
-            ctx->caller_ctx       = PMC_cont(ccont)->to_ctx
-                                  = CONTEXT(interp);
+            ccont                   = Parrot_pcc_get_continuation(INTERP, ctx);
+            PMC_cont(ccont)->to_ctx = CURRENT_CONTEXT(interp);
+            Parrot_pcc_set_caller_ctx(interp, ctx, CURRENT_CONTEXT(interp));
 
             /* set context to coro context */
-            CONTEXT(interp)       = ctx;
-            INTERP->ctx.bp        = ctx->bp;
-            INTERP->ctx.bp_ps     = ctx->bp_ps;
+            CURRENT_CONTEXT(interp) = ctx;
         }
         else {
             PMC *ccont;
-            Parrot_Context   *ctx;
+            PMC *ctx;
 
             PObj_get_FLAGS(SELF) &= ~SUB_FLAG_CORO_FF;
             /* switch back to last remembered code seg and context */
 
             wanted_seg            = co->caller_seg;
-            ccont                 = co->ctx->current_cont;
+            ccont                 = Parrot_pcc_get_continuation(INTERP, co->ctx);
             ctx                   = PMC_cont(ccont)->to_ctx;
 
             if (! ctx) {
@@ -215,9 +213,7 @@ Swaps the "context".
                                "Cannot resume dead coroutine.");
             }
 
-            CONTEXT(interp)      = ctx;
-            INTERP->ctx.bp       = ctx->bp;
-            INTERP->ctx.bp_ps    = ctx->bp_ps;
+            CURRENT_CONTEXT(interp) = ctx;
         }
 
         /* toggle address */

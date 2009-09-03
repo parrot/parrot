@@ -155,12 +155,12 @@ typedef struct Parrot_Coroutine_attributes Parrot_coro;
 
 typedef struct Parrot_cont {
     /* continuation destination */
-    PackFile_ByteCode *seg;          /* bytecode segment */
-    opcode_t *address;               /* start of bytecode, addr to continue */
-    struct Parrot_Context *to_ctx;   /* pointer to dest context */
+    PackFile_ByteCode   *seg;               /* bytecode segment */
+    opcode_t            *address;           /* start of bytecode, addr to continue */
+    PMC                 *to_ctx;            /* pointer to dest context */
     /* a Continuation keeps the from_ctx alive */
-    struct Parrot_Context *from_ctx; /* sub, this cont is returning from */
-    opcode_t *current_results;       /* ptr into code with get_results opcode
+    PMC                 *from_ctx;          /* sub, this cont is returning from */
+    opcode_t            *current_results;   /* ptr into code with get_results opcode
                                         full continuation only */
     int runloop_id;                  /* id of the creating runloop. */
     int invoked;                     /* flag when a handler has been invoked. */
@@ -190,7 +190,7 @@ PMC * new_ret_continuation_pmc(PARROT_INTERP,
 
 PARROT_EXPORT
 int Parrot_Context_get_info(PARROT_INTERP,
-    ARGIN(const Parrot_Context *ctx),
+    ARGIN(PMC *ctx),
     ARGOUT(Parrot_Context_info *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -200,8 +200,7 @@ int Parrot_Context_get_info(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-STRING* Parrot_Context_infostr(PARROT_INTERP,
-    ARGIN(const Parrot_Context *ctx))
+STRING* Parrot_Context_infostr(PARROT_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -228,11 +227,6 @@ void invalidate_retc_context(PARROT_INTERP, ARGMOD(PMC *cont))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*cont);
-
-void mark_context(PARROT_INTERP, ARGMOD(Parrot_Context* ctx))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(* ctx);
 
 void mark_context_start(void);
 PARROT_MALLOC
@@ -268,7 +262,7 @@ PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC* Parrot_find_pad(PARROT_INTERP,
     ARGIN(STRING *lex_name),
-    ARGIN(const Parrot_Context *ctx))
+    ARGIN(PMC *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -294,9 +288,6 @@ PMC* Parrot_find_pad(PARROT_INTERP,
 #define ASSERT_ARGS_invalidate_retc_context __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(cont)
-#define ASSERT_ARGS_mark_context __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(ctx)
 #define ASSERT_ARGS_mark_context_start __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_new_continuation __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)

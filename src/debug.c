@@ -2211,7 +2211,7 @@ char
 PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
 {
     ASSERT_ARGS(PDB_check_condition)
-    Parrot_Context *ctx = CONTEXT(interp);
+    PMC *ctx = CURRENT_CONTEXT(interp);
 
     TRACEDEB_MSG("PDB_check_condition");
 
@@ -2219,7 +2219,7 @@ PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
 
     if (condition->type & PDB_cond_int) {
         INTVAL   i,  j;
-        if (condition->reg >= ctx->n_regs_used[REGNO_INT])
+        if (condition->reg >= Parrot_pcc_get_regs_used(interp, ctx, REGNO_INT))
             return 0;
         i = CTX_REG_INT(ctx, condition->reg);
 
@@ -2241,7 +2241,7 @@ PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
     else if (condition->type & PDB_cond_num) {
         FLOATVAL k,  l;
 
-        if (condition->reg >= ctx->n_regs_used[REGNO_NUM])
+        if (condition->reg >= Parrot_pcc_get_regs_used(interp, ctx, REGNO_NUM))
             return 0;
         k = CTX_REG_NUM(ctx, condition->reg);
 
@@ -2263,7 +2263,7 @@ PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
     else if (condition->type & PDB_cond_str) {
         STRING  *m, *n;
 
-        if (condition->reg >= ctx->n_regs_used[REGNO_STR])
+        if (condition->reg >= Parrot_pcc_get_regs_used(interp, ctx, REGNO_STR))
             return 0;
         m = CTX_REG_STR(ctx, condition->reg);
 
@@ -2294,7 +2294,7 @@ PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
     else if (condition->type & PDB_cond_pmc) {
         PMC *m;
 
-        if (condition->reg >= ctx->n_regs_used[REGNO_PMC])
+        if (condition->reg >= Parrot_pcc_get_regs_used(interp, ctx, REGNO_PMC))
             return 0;
         m = CTX_REG_PMC(ctx, condition->reg);
 
@@ -3511,8 +3511,8 @@ PDB_backtrace(PARROT_INTERP)
     int               rec_level = 0;
 
     /* information about the current sub */
-    PMC              *sub = interpinfo_p(interp, CURRENT_SUB);
-    Parrot_Context   *ctx = CONTEXT(interp);
+    PMC *sub = interpinfo_p(interp, CURRENT_SUB);
+    PMC *ctx = CURRENT_CONTEXT(interp);
 
     if (!PMC_IS_NULL(sub)) {
         str = Parrot_Context_infostr(interp, ctx);
@@ -3520,7 +3520,7 @@ PDB_backtrace(PARROT_INTERP)
             Parrot_io_eprintf(interp, "%Ss", str);
             if (interp->code->annotations) {
                 PMC *annot = PackFile_Annotations_lookup(interp, interp->code->annotations,
-                        ctx->current_pc - interp->code->base.data + 1, NULL);
+                        Parrot_pcc_get_pc(interp, ctx) - interp->code->base.data + 1, NULL);
                 if (!PMC_IS_NULL(annot)) {
                     PMC *pfile = VTABLE_get_pmc_keyed_str(interp, annot,
                             Parrot_str_new_constant(interp, "file"));
@@ -3540,9 +3540,9 @@ PDB_backtrace(PARROT_INTERP)
     /* backtrace: follow the continuation chain */
     while (1) {
         Parrot_cont *sub_cont;
-        sub = ctx->current_cont;
+        sub = Parrot_pcc_get_continuation(interp, ctx);
 
-        if (!sub)
+        if (PMC_IS_NULL(sub))
             break;
 
         sub_cont = PMC_cont(sub);
@@ -3557,10 +3557,10 @@ PDB_backtrace(PARROT_INTERP)
 
         /* recursion detection */
         if (!PMC_IS_NULL(old) && PMC_cont(old) &&
-            PMC_cont(old)->to_ctx->current_pc ==
-            PMC_cont(sub)->to_ctx->current_pc &&
-            PMC_cont(old)->to_ctx->current_sub ==
-            PMC_cont(sub)->to_ctx->current_sub) {
+            Parrot_pcc_get_pc(interp, PMC_cont(old)->to_ctx) ==
+            Parrot_pcc_get_pc(interp, PMC_cont(sub)->to_ctx) &&
+            Parrot_pcc_get_sub(interp, PMC_cont(old)->to_ctx) ==
+            Parrot_pcc_get_sub(interp, PMC_cont(sub)->to_ctx)) {
                 ++rec_level;
         }
         else if (rec_level != 0) {
@@ -3573,7 +3573,9 @@ PDB_backtrace(PARROT_INTERP)
             Parrot_io_eprintf(interp, "%Ss", str);
             if (interp->code->annotations) {
                 PMC *annot = PackFile_Annotations_lookup(interp, interp->code->annotations,
-                        sub_cont->to_ctx->current_pc - interp->code->base.data + 1, NULL);
+                        Parrot_pcc_get_pc(interp, sub_cont->to_ctx) - interp->code->base.data + 1,
+                        NULL);
+
                 if (!PMC_IS_NULL(annot)) {
                     PMC *pfile = VTABLE_get_pmc_keyed_str(interp, annot,
                             Parrot_str_new_constant(interp, "file"));
@@ -3632,7 +3634,7 @@ GDB_print_reg(PARROT_INTERP, int t, int n)
     ASSERT_ARGS(GDB_print_reg)
     char * string;
 
-    if (n >= 0 && n < CONTEXT(interp)->n_regs_used[t]) {
+    if (n >= 0 && n < Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), t)) {
         switch (t) {
             case REGNO_INT:
                 return Parrot_str_from_int(interp, IREG(n))->strstart;
@@ -3697,7 +3699,7 @@ GDB_P(PARROT_INTERP, ARGIN(const char *s))
     }
     if (! s[1]) {
         /* Print all registers of this type. */
-        const int max_reg = CONTEXT(interp)->n_regs_used[t];
+        const int max_reg = Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), t);
         int n;
 
         for (n = 0; n < max_reg; n++) {

@@ -375,10 +375,10 @@ Parrot_make_namespace_autobase(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
     ASSERT_ARGS(Parrot_make_namespace_autobase)
     PMC *base_ns;
     if (VTABLE_isa(interp, key, CONST_STRING(interp, "String")))
-        base_ns = CONTEXT(interp)->current_namespace;
+        base_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
     else
         base_ns = VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace,
-            CONTEXT(interp)->current_HLL);
+            Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)));
     return Parrot_make_namespace_keyed(interp, base_ns, key);
 }
 
@@ -531,7 +531,7 @@ PMC *
 Parrot_find_global_cur(PARROT_INTERP, ARGIN_NULLOK(STRING *globalname))
 {
     ASSERT_ARGS(Parrot_find_global_cur)
-    PMC * const ns = CONTEXT(interp)->current_namespace;
+    PMC * const ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
     return Parrot_find_global_n(interp, ns, globalname);
 }
 
@@ -678,7 +678,7 @@ PMC *
 Parrot_find_name_op(PARROT_INTERP, ARGIN(STRING *name), SHIM(void *next))
 {
     ASSERT_ARGS(Parrot_find_name_op)
-    Parrot_Context * const ctx = CONTEXT(interp);
+    PMC * const ctx     = CURRENT_CONTEXT(interp);
     PMC * const lex_pad = Parrot_find_pad(interp, name, ctx);
     PMC *g;
 
@@ -788,7 +788,7 @@ void
 Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 {
     ASSERT_ARGS(Parrot_store_sub_in_namespace)
-    const INTVAL cur_id = CONTEXT(interp)->current_HLL;
+    const INTVAL cur_id = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp));
 
     PMC        *ns;
     Parrot_Sub_attributes *sub;
@@ -798,7 +798,7 @@ Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 
     /* store relative to HLL namespace */
     PMC_get_sub(interp, sub_pmc, sub);
-    CONTEXT(interp)->current_HLL = sub->HLL_id;
+    Parrot_pcc_set_HLL(interp, CURRENT_CONTEXT(interp), sub->HLL_id);
 
     ns = get_namespace_pmc(interp, sub_pmc);
 
@@ -824,7 +824,7 @@ Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub_pmc))
     }
 
     /* restore HLL_id */
-    CONTEXT(interp)->current_HLL = cur_id;
+    Parrot_pcc_set_HLL(interp, CURRENT_CONTEXT(interp), cur_id);
     Parrot_unblock_GC_mark(interp);
 }
 

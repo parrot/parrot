@@ -282,19 +282,19 @@ interpinfo_p(PARROT_INTERP, INTVAL what)
     ASSERT_ARGS(interpinfo_p)
     switch (what) {
         case CURRENT_SUB:
-            return CONTEXT(interp)->current_sub;
+            return Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
         case CURRENT_CONT:
             {
-            PMC * const cont = CONTEXT(interp)->current_cont;
+            PMC * const cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
             if (!PMC_IS_NULL(cont) && cont->vtable->base_type ==
                     enum_class_RetContinuation)
                 return VTABLE_clone(interp, cont);
             return cont;
             }
         case CURRENT_OBJECT:
-            return CONTEXT(interp)->current_object;
+            return Parrot_pcc_get_object(interp, CURRENT_CONTEXT(interp));
         case CURRENT_LEXPAD:
-            return CONTEXT(interp)->lex_pad;
+            return Parrot_pcc_get_lex_pad(interp, CURRENT_CONTEXT(interp));
         default:        /* or a warning only? */
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                 "illegal argument in interpinfo");

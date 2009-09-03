@@ -76,7 +76,7 @@ sub defines {
     return $pred_def . <<END;
 /* defines - $0 -> $type */
 #  define opcode_to_prederef(i, op)   (op ? \\
-     (opcode_t*) (op   - CONTEXT(i)->pred_offset) : (opcode_t*)NULL)
+     (opcode_t*) (op   - Parrot_pcc_get_pred_offset(interp, i->ctx)) : (opcode_t*)NULL)
 END
 }
 
@@ -154,7 +154,7 @@ sub run_core_func_start {
 #endif
 
 SWITCH_RELOAD:
-    _reg_base = (char*)interp->ctx.bp.regs_i;
+    _reg_base = (char*)Parrot_pcc_get_regs_ni(interp, CURRENT_CONTEXT(interp))->regs_i;
     do {
 SWITCH_AGAIN:
     Parrot_cx_handle_tasks(interp, interp->scheduler);

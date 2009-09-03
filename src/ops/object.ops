@@ -142,7 +142,7 @@ op tailcallmethod(invar PMC, in STR) :object_base :flow {
         VTABLE_get_string(interp, VTABLE_get_class(interp, object)));
   }
   else {
-    interp->current_cont = CONTEXT(interp)->current_cont;
+    interp->current_cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
     PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL;
     interp->current_object = object;
     dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
@@ -157,7 +157,7 @@ op tailcallmethod(invar PMC, invar PMC) :object_base :flow {
 
   opcode_t *dest;
 
-  interp->current_cont = CONTEXT(interp)->current_cont;
+  interp->current_cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
   PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL;
   interp->current_object = object;
   dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);

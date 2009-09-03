@@ -82,14 +82,13 @@ Transfers control to the calling context and frees the current context.
 
     VTABLE opcode_t *invoke(void *in_next) {
         Parrot_cont       *cc         = PMC_cont(SELF);
-        Parrot_Context    *from_ctx   = cc->from_ctx;
+        PMC               *from_ctx   = cc->from_ctx;
         PackFile_ByteCode * const seg = cc->seg;
         opcode_t          *next       = cc->address;
         UNUSED(in_next)
 
         Parrot_continuation_check(interp, SELF, cc);
         Parrot_continuation_rewind_environment(interp, SELF, cc);
-        Parrot_free_context(INTERP, from_ctx, 1);
 
         /* the continuation is dead - delete and destroy it */
         /* This line causes a failure in t/pmc/packfiledirectory.t. No idea

@@ -38,7 +38,7 @@ sub defines {
 /* defines - $0 -> $type */
 #define REL_PC ((size_t)(cur_opcode - (opcode_t*)interp->code->prederef.code))
 #define CUR_OPCODE \\
-    ((opcode_t*)cur_opcode + CONTEXT(interp)->pred_offset)
+    ((opcode_t*)cur_opcode + Parrot_pcc_get_pred_offset(interp, CURRENT_CONTEXT(interp)))
 #define OP_AS_OFFS(o) (_reg_base + ((opcode_t*)cur_opcode)[o])
 
 END

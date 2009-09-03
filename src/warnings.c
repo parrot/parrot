@@ -53,8 +53,7 @@ print_pbc_location(PARROT_INTERP)
         interp->pdb->debugger :
         interp;
     Parrot_io_eprintf(tracer, "%Ss\n",
-            Parrot_Context_infostr(interp,
-                CONTEXT(interp)));
+            Parrot_Context_infostr(interp, CURRENT_CONTEXT(interp)));
 }
 
 /*

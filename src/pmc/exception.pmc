@@ -65,8 +65,8 @@ pmclass Exception auto_attrs {
     ATTR PMC            *backtrace;    /* The backtrace of an exception. */
     ATTR INTVAL          handled;      /* Whether the exception has been handled. */
     ATTR PMC            *handler_iter; /* An iterator of handlers (for rethrow). */
-    ATTR Parrot_Context *handler_ctx;  /* A stored context for handler iterator. */
-    ATTR Parrot_Context *thrower;      /* The position we were at when thrown. */
+    ATTR PMC            *handler_ctx;  /* A stored context for handler iterator. */
+    ATTR PMC            *thrower;      /* The position we were at when thrown. */
 
 /*
 
@@ -161,22 +161,10 @@ Mark any active exception data as live.
             Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->backtrace);
         if (core_struct->handler_iter)
             Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->handler_iter);
-    }
-
-/*
-
-=item C<void destroy()>
-
-Destroys the exception.
-
-=cut
-
-*/
-
-    VTABLE void destroy() {
-        Parrot_Exception_attributes * const core_struct = PARROT_EXCEPTION(SELF);
-        if (core_struct && core_struct->thrower)
-            Parrot_free_context(interp, core_struct->thrower, 1);
+        if (core_struct->handler_ctx)
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->handler_ctx);
+        if (core_struct->thrower)
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->thrower);
     }
 
 /*
@@ -495,11 +483,7 @@ Store a context for the handler iterator.
     VTABLE void set_pointer(void *context) {
         Parrot_Exception_attributes * const core_struct = PARROT_EXCEPTION(SELF);
 
-        /* contexts are refcounted; increment and decrement appropriately */
-        if (core_struct->handler_ctx)
-            Parrot_free_context(interp, core_struct->handler_ctx, 1);
-        core_struct->handler_ctx = Parrot_context_ref(interp,
-                                       (Parrot_Context *)context);
+        core_struct->handler_ctx = (PMC*)context;
     }
 
 /*
@@ -659,11 +643,9 @@ Set an attribute value for the exception object.
         else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "thrower"))) {
             /* Ensure it's a ret cont, and extract the from_ctx.
              * XXX TT#596 - when we have Context PMCs, just take and set that. */
-
             if (!PMC_IS_NULL(value) && VTABLE_isa(interp, value, CONST_STRING(interp, "Continuation"))) {
-                Parrot_Context *ctx = PMC_cont(value)->from_ctx;
-                if (ctx) {
-                    Parrot_context_ref(interp, ctx);
+                PMC *ctx = PMC_cont(value)->from_ctx;
+                if (!PMC_IS_NULL(ctx)) {
                     SET_ATTR_thrower(interp, SELF, ctx);
                 }
             }
@@ -761,7 +743,7 @@ sub, or for the point of the call a level deeper for the rest.
     METHOD backtrace() {
         PMC *result = pmc_new(interp, enum_class_ResizablePMCArray);
         PMC *resume;
-        Parrot_Context *cur_ctx;
+        PMC *cur_ctx;
         Parrot_cont    *cont;
 
         /* Get starting context, then loop over them. */
@@ -785,7 +767,7 @@ sub, or for the point of the call a level deeper for the rest.
                 Parrot_Sub_attributes *sub;
 
                 /* Get sub and put it in the hash. */
-                PMC *sub_pmc = cur_ctx->current_sub;
+                PMC *sub_pmc = Parrot_pcc_get_sub(interp, cur_ctx);
 
                 if (!sub_pmc)
                     sub_pmc = PMCNULL;
@@ -800,7 +782,7 @@ sub, or for the point of the call a level deeper for the rest.
                         PackFile_ByteCode *seg = sub->seg;
                         opcode_t          *pc  = cont && cur_ctx == cont->to_ctx
                                                ? cont->address
-                                               : cur_ctx->current_pc;
+                                               : Parrot_pcc_get_pc(interp, cur_ctx);
 
                         annotations = PackFile_Annotations_lookup(interp,
                                         seg->annotations, pc - seg->base.data,
@@ -815,7 +797,7 @@ sub, or for the point of the call a level deeper for the rest.
 
                 /* Push frame and go to next caller. */
                 VTABLE_push_pmc(interp, result, frame);
-                cur_ctx = cur_ctx->caller_ctx;
+                cur_ctx = Parrot_pcc_get_caller_ctx(interp, cur_ctx);
             }
         }
 

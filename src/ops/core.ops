@@ -447,7 +447,7 @@ inline op invoke(invar PMC, invar PMC) :flow {
 
 inline op yield() :flow {
     opcode_t *dest = expr NEXT();
-    PMC * const p = CONTEXT(interp)->current_sub;
+    PMC * const p = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
     dest = (opcode_t *)p->vtable->invoke(interp, p, dest);
     goto ADDRESS(dest);
 }
@@ -456,14 +456,14 @@ inline op tailcall(invar PMC) :flow {
     opcode_t *dest;
     PMC * const p = $1;
     dest = expr NEXT();
-    interp->current_cont = CONTEXT(interp)->current_cont;
+    interp->current_cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
     PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL;
     dest = (opcode_t *)p->vtable->invoke(interp, p, dest);
     goto ADDRESS(dest);
 }
 
 inline op returncc() :flow {
-    PMC * const p = CONTEXT(interp)->current_cont;
+    PMC * const p = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
     opcode_t * const dest = (opcode_t *)p->vtable->invoke(interp,
             p, expr NEXT());
     goto ADDRESS(dest);
@@ -527,24 +527,24 @@ op get_results(inconst PMC) :flow {
     PMC * const signature = $1;
     INTVAL argc;
 
-    CONTEXT(interp)->current_results = _this;
+    Parrot_pcc_set_results(interp, CURRENT_CONTEXT(interp), _this);
     argc = VTABLE_elements(interp, signature);
     goto OFFSET(argc + 2);
 }
 
 op get_params(inconst PMC) :flow {
     opcode_t * const _this = CUR_OPCODE;
-    Parrot_Context *caller_ctx, *ctx;
+    PMC *caller_ctx, *ctx;
     PMC * ccont;
     PMC * const signature = $1;
     INTVAL argc;
     opcode_t *src_indexes, *dst_indexes;
 
     interp->current_params = _this;
-    ctx = CONTEXT(interp);
-    ccont = ctx->current_cont;
+    ctx     = CURRENT_CONTEXT(interp);
+    ccont   = Parrot_pcc_get_continuation(interp, ctx);
 
-    caller_ctx = ctx->caller_ctx;
+    caller_ctx  = Parrot_pcc_get_caller_ctx(interp, ctx);
 
     src_indexes = interp->current_args;
     dst_indexes = interp->current_params;
@@ -553,13 +553,11 @@ op get_params(inconst PMC) :flow {
     interp->current_params = NULL;
 
     parrot_pass_args(interp, caller_ctx, ctx, src_indexes, dst_indexes, PARROT_PASS_PARAMS);
+    /* TODO Factor out with Sub.invoke */
     if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
         PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
-        --ctx->recursion_depth;
-        ctx->caller_ctx = caller_ctx->caller_ctx;
-        /* ordinarily, this will free the context immediately, but not if the
-           sub created a closure (or continuation, or . . .).  */
-        Parrot_free_context(interp, caller_ctx, 1);
+        Parrot_pcc_dec_recursion_depth(interp, ctx);
+        Parrot_pcc_set_caller_ctx(interp, ctx, Parrot_pcc_get_caller_ctx(interp, caller_ctx));
         interp->current_args = NULL;
     }
     argc = VTABLE_elements(interp, signature);
@@ -568,37 +566,38 @@ op get_params(inconst PMC) :flow {
 
 op set_returns(inconst PMC) :flow {
     opcode_t * const _this = CUR_OPCODE;
-    Parrot_Context *ctx;
+    PMC *ctx, *caller_ctx;
     PMC *ccont;
     PMC *signature = $1;
     INTVAL argc;
     opcode_t *src_indexes, *dest_indexes;
 
     interp->current_returns = _this;
-    ctx = CONTEXT(interp);
-    ccont = ctx->current_cont;
+    ctx                     = CURRENT_CONTEXT(interp);
+    caller_ctx              = Parrot_pcc_get_caller_ctx(interp, ctx);
+    ccont                   = Parrot_pcc_get_continuation(interp, ctx);
 
     if (PMC_cont(ccont)->address) {
         /* Call is from runops_fromc */
-        Parrot_Context * const caller_ctx = PMC_cont(ccont)->to_ctx;
-        if (! caller_ctx) {
+        caller_ctx = PMC_cont(ccont)->to_ctx;
+        if (PMC_IS_NULL(caller_ctx)) {
             /* there is no point calling Parrot_ex_throw_..., because
                PDB_backtrace can't deal with a missing to_ctx either. */
             exit_fatal(1, "No caller_ctx for continuation %p.", ccont);
         }
 
-        src_indexes = interp->current_returns;
-        dest_indexes = caller_ctx->current_results;
+        src_indexes             = interp->current_returns;
+        dest_indexes            = Parrot_pcc_get_results(interp, caller_ctx);
         interp->current_returns = NULL;
         /* does this need to be here */
         interp->current_args = NULL;
 
         parrot_pass_args(interp, ctx, caller_ctx, src_indexes, dest_indexes, PARROT_PASS_RESULTS);
     }
-    else if (ctx->caller_ctx->results_signature) {
+    else if (Parrot_pcc_get_results_signature(interp, caller_ctx)) {
     /* We have a dynamic result signature, from pcc_invoke */
-        parrot_pass_args(interp, ctx, ctx->caller_ctx, interp->current_returns,
-                ctx->caller_ctx->current_results, PARROT_PASS_RESULTS);
+        parrot_pass_args(interp, ctx, caller_ctx, interp->current_returns,
+                Parrot_pcc_get_results(interp, caller_ctx), PARROT_PASS_RESULTS);
     }
     argc = VTABLE_elements(interp, signature);
     goto OFFSET(argc + 2);
@@ -615,11 +614,11 @@ specified in F<docs/pdds/pdd03_calling_conventions.pod>.
 
 inline op result_info(out PMC) {
     /* Get context of callee from return continuation. */
-    PMC * const cc = CONTEXT(interp)->current_cont;
+    PMC * const cc = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
     PMC *sig = NULL;
     if (cc && PMC_cont(cc)->to_ctx) {
         /* caller context has results */
-        opcode_t * const results = PMC_cont(cc)->to_ctx->current_results;
+        opcode_t * const results = Parrot_pcc_get_results(interp, PMC_cont(cc)->to_ctx);
         if (results) {
             /* get results PMC index and get PMC. */
             sig = PF_CONST(PMC_cont(cc)->seg, results[1])->u.key;
@@ -803,11 +802,7 @@ inline op throw(invar PMC) :flow {
         except = Parrot_ex_build_exception(interp, EXCEPT_fatal,
                 EXCEPTION_UNIMPLEMENTED,
                 Parrot_str_new_constant(interp, "Not a throwable object"));
-    /*
-     * We might return here after handling the exception, so mark the
-     * current context appropriately.
-     */
-    Parrot_context_ref(interp, CONTEXT(interp));
+
     VTABLE_set_attr_str(interp, except, Parrot_str_new_constant(interp, "resume"), resume);
     dest = Parrot_ex_throw_from_op(interp, except, ret);
     goto ADDRESS(dest);
@@ -1471,3 +1466,5 @@ as the Parrot interpreter itself.
  * End:
  * vim: expandtab shiftwidth=4:
  */
+
+

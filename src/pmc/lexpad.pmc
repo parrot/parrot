@@ -22,13 +22,13 @@ These are the vtable functions for the lexpad PMC.
  * LexPad provides a Hash interface for lexical fetch/store
  * needed
  *
- * struct_val ... Parrot_Context *ctx
+ * struct_val ... Context *ctx
  * pmc_val    ... LexInfo
  */
 
 pmclass LexPad provides hash no_ro auto_attrs {
-    ATTR PMC                   *lexinfo;
-    ATTR struct Parrot_Context *ctx;
+    ATTR PMC *lexinfo;
+    ATTR PMC *ctx;
 
     VTABLE void init() {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
@@ -82,7 +82,7 @@ Return the LexInfo PMC, if any or a Null PMC.
     }
 
     VTABLE void set_pointer(void *ctx) {
-        SET_ATTR_ctx(INTERP, SELF, (struct Parrot_Context *)ctx);
+        SET_ATTR_ctx(INTERP, SELF, (PMC *)ctx);
     }
 
     VTABLE INTVAL elements() {
@@ -107,7 +107,7 @@ Return the LexInfo PMC, if any or a Null PMC.
     VTABLE PMC *get_pmc_keyed_str(STRING *name) {
         PMC              * info;
         Hash             * hash;
-        Parrot_Context   * ctx;
+        PMC              * ctx;
         HashBucket       * b;
         INTVAL            regno;
 
@@ -132,7 +132,7 @@ Return the LexInfo PMC, if any or a Null PMC.
     VTABLE void set_pmc_keyed_str(STRING *name, PMC *value) {
         PMC              * info;
         Hash             * hash;
-        Parrot_Context   * ctx;
+        PMC              * ctx;
         HashBucket       * b;
         INTVAL             regno;
 

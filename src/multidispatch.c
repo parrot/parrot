@@ -1229,7 +1229,8 @@ mmd_add_multi_to_namespace(PARROT_INTERP, ARGIN(STRING *ns_name),
 {
     ASSERT_ARGS(mmd_add_multi_to_namespace)
     PMC * const hll_ns = VTABLE_get_pmc_keyed_int(interp,
-                        interp->HLL_namespace, CONTEXT(interp)->current_HLL);
+                        interp->HLL_namespace,
+                        Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)));
     PMC * const ns     = Parrot_make_namespace_keyed_str(interp, hll_ns, ns_name);
     PMC        *multi_sub = Parrot_get_global(interp, ns, sub_name);
 

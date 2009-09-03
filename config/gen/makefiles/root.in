@@ -441,6 +441,7 @@ INTERP_O_FILES := \
     $(SRC_DIR)/interp/inter_create$(O)  \
     $(SRC_DIR)/interp/inter_misc$(O)  \
     $(SRC_DIR)/call/ops$(O)  \
+    $(SRC_DIR)/call/context$(O) \
     $(SRC_DIR)/key$(O) \
     $(SRC_DIR)/library$(O) \
     $(SRC_DIR)/list$(O) \

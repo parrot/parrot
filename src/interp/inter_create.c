@@ -152,11 +152,9 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     Parrot_block_GC_mark(interp);
     Parrot_block_GC_sweep(interp);
 
-    create_initial_context(interp);
+    interp->ctx         = PMCNULL;
     interp->resume_flag = RESUME_INITIAL;
 
-    /* main is called as a Sub too - this will get depth 0 then */
-    CONTEXT(interp)->recursion_depth = (UINTVAL)-1;
     interp->recursion_limit = RECURSION_LIMIT;
 
     /* PANIC will fail until this is done */
@@ -211,10 +209,12 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     PARROT_ERRORS_on(interp, PARROT_ERRORS_RESULT_COUNT_FLAG);
 #endif
 
+    create_initial_context(interp);
+
     /* clear context introspection vars */
-    CONTEXT(interp)->current_sub    = NULL;
-    CONTEXT(interp)->current_cont   = NULL;
-    CONTEXT(interp)->current_object = NULL;
+    Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), NULL);
+    Parrot_pcc_set_continuation(interp, CURRENT_CONTEXT(interp), NULL); /* TODO Use PMCNULL */
+    Parrot_pcc_set_object(interp, CURRENT_CONTEXT(interp), NULL);
 
     /* Load the core op func and info tables */
     interp->op_lib          = PARROT_CORE_OPLIB_INIT(1);
@@ -418,7 +418,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
         interp->profile = NULL;
     }
 
-    destroy_context(interp);
     destroy_runloop_jump_points(interp);
 
     if (interp->evc_func_table) {

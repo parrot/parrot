@@ -209,12 +209,14 @@ parrot_global_setup_2(PARROT_INTERP)
     PMC *classname_hash, *iglobals;
     int  i;
 
+    create_initial_context(interp);
+
     /* create the namespace root stash */
     interp->root_namespace = pmc_new(interp, enum_class_NameSpace);
     Parrot_init_HLL(interp);
 
-    CONTEXT(interp)->current_namespace =
-        VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace, 0);
+    Parrot_pcc_set_namespace(interp, CURRENT_CONTEXT(interp),
+        VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace, 0));
 
     /* We need a class hash */
     interp->class_hash = classname_hash = pmc_new(interp, enum_class_NameSpace);

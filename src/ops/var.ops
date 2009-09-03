@@ -37,9 +37,9 @@ Parrot's LexPad throws an exception for unknown names.
 =cut
 
 op store_lex(in STR, invar PMC) {
-    Parrot_Context   * const ctx      = CONTEXT(interp);
-    STRING           * const lex_name = $1;
-    PMC              * const lex_pad  = Parrot_find_pad(interp, lex_name, ctx);
+    PMC     * const ctx      = CURRENT_CONTEXT(interp);
+    STRING  * const lex_name = $1;
+    PMC     * const lex_pad  = Parrot_find_pad(interp, lex_name, ctx);
 
     if (PMC_IS_NULL(lex_pad)) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
@@ -62,9 +62,9 @@ standard LexPad throws and exception for non-existing names.
 =cut
 
 op find_lex(out PMC, in STR) {
-    Parrot_Context   * const ctx      = CONTEXT(interp);
-    STRING           * const lex_name = $2;
-    PMC              * const lex_pad  = Parrot_find_pad(interp, lex_name, ctx);
+    PMC     * const ctx      = CURRENT_CONTEXT(interp);
+    STRING  * const lex_name = $2;
+    PMC     * const lex_pad  = Parrot_find_pad(interp, lex_name, ctx);
 
     PMC * const result =
         PMC_IS_NULL(lex_pad)
@@ -91,11 +91,14 @@ included in the search (use C<find_lex> above for that).
 =cut
 
 op find_caller_lex(out PMC, in STR) {
-    STRING         * const lex_name = $2;
-    Parrot_Context * ctx            = CONTEXT(interp);
-    PMC            * result         = PMCNULL;
+    STRING  * const lex_name = $2;
+    PMC     * ctx            = CURRENT_CONTEXT(interp);
+    PMC     * result         = PMCNULL;
 
-    for (ctx = ctx->caller_ctx; ctx && PMC_IS_NULL(result); ctx = ctx->caller_ctx) {
+    for (ctx = Parrot_pcc_get_caller_ctx(interp, ctx);
+            !PMC_IS_NULL(ctx) && PMC_IS_NULL(result);
+            ctx = Parrot_pcc_get_caller_ctx(interp, ctx))
+    {
         PMC * const lex_pad = Parrot_find_pad(interp, lex_name, ctx);
         if (!PMC_IS_NULL(lex_pad)) {
             result = VTABLE_get_pmc_keyed_str(interp, lex_pad, lex_name);
@@ -127,12 +130,12 @@ current namespace.  If the namespace doesn't exist, $1 is set to null.
 =cut
 
 op get_namespace(out PMC) {
-    PMC * const cur_ns = CONTEXT(interp)->current_namespace;
+    PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
     $1 = cur_ns;
 }
 
 op get_namespace(out PMC, in PMC) {
-    PMC * const cur_ns = CONTEXT(interp)->current_namespace;
+    PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
     PMC * const ns     = Parrot_get_namespace_keyed(interp, cur_ns, $2);
 
     $1 = PMC_IS_NULL(ns) ? PMCNULL : ns;
@@ -215,12 +218,12 @@ doesn't exist, $1 is set to null.
 =cut
 
 op get_global(out PMC, in STR) {
-    PMC * const cur_ns = CONTEXT(interp)->current_namespace;
+    PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
     $1 = Parrot_find_global_op(interp, cur_ns, $2, expr NEXT());
 }
 
 op get_global(out PMC, in PMC, in STR) {
-    PMC * const cur_ns = CONTEXT(interp)->current_namespace;
+    PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
     if (PMC_IS_NULL(cur_ns)) {
         $1 = PMCNULL;
     }
@@ -319,12 +322,12 @@ it is created.
 =cut
 
 op set_global(in STR, invar PMC) {
-    PMC * const cur_ns = CONTEXT(interp)->current_namespace;
+    PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
     Parrot_set_global(interp, cur_ns, $1, $2);
 }
 
 op set_global(in PMC, in STR, invar PMC) {
-    PMC * const cur_ns = CONTEXT(interp)->current_namespace;
+    PMC * const cur_ns = Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp));
     PMC * const ns     = Parrot_make_namespace_keyed(interp, cur_ns, $1);
 
     Parrot_set_global(interp, ns, $2, $3);

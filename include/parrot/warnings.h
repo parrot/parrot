@@ -35,19 +35,13 @@ typedef enum {
 
 /* &end_gen */
 
-#define PARROT_WARNINGS_on(interp, flag) do { \
-    CONTEXT((interp))->warns |= (flag); } while (0)
-#define PARROT_WARNINGS_off(interp, flag) do { \
-    CONTEXT((interp))->warns &= ~(flag); } while (0)
-#define PARROT_WARNINGS_test(interp, flag)  \
-    (CONTEXT((interp))->warns & (flag))
+#define PARROT_WARNINGS_on(interp, flag)   Parrot_pcc_warnings_on((interp), (interp)->ctx, (flag))
+#define PARROT_WARNINGS_off(interp, flag)  Parrot_pcc_warnings_off((interp), (interp)->ctx, (flag))
+#define PARROT_WARNINGS_test(interp, flag) Parrot_pcc_warnings_test((interp), (interp)->ctx, (flag))
 
-#define PARROT_ERRORS_on(interp, flag) do { \
-    CONTEXT((interp))->errors |= (flag); } while (0)
-#define PARROT_ERRORS_off(interp, flag) do { \
-    CONTEXT((interp))->errors &= ~(flag); } while (0)
-#define PARROT_ERRORS_test(interp, flag)  \
-    (CONTEXT((interp))->errors & (flag))
+#define PARROT_ERRORS_on(interp, flag)   Parrot_pcc_errors_on((interp), (interp)->ctx, (flag))
+#define PARROT_ERRORS_off(interp, flag)  Parrot_pcc_errors_off((interp), (interp)->ctx, (flag))
+#define PARROT_ERRORS_test(interp, flag) Parrot_pcc_errors_test((interp), (interp)->ctx, (flag))
 
 #if defined(PARROT_IN_CORE)
 

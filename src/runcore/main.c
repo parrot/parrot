@@ -188,10 +188,10 @@ prederef_args(ARGMOD(void **pc_prederef), PARROT_INTERP,
     ASSERT_ARGS(prederef_args)
     const PackFile_ConstTable * const const_table = interp->code->const_table;
 
-    const int regs_n = CONTEXT(interp)->n_regs_used[REGNO_NUM];
-    const int regs_i = CONTEXT(interp)->n_regs_used[REGNO_INT];
-    const int regs_p = CONTEXT(interp)->n_regs_used[REGNO_PMC];
-    const int regs_s = CONTEXT(interp)->n_regs_used[REGNO_STR];
+    const int regs_n = Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_NUM);
+    const int regs_i = Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_INT);
+    const int regs_p = Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_PMC);
+    const int regs_s = Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_STR);
 
     /* prederef var part too */
     const int m = opinfo->op_count;
@@ -311,11 +311,6 @@ do_prederef(ARGIN(void **pc_prederef), PARROT_INTERP, int type)
             "Illegal opcode");
 
     opinfo = &interp->op_info_table[*pc];
-
-    /* first arguments - PIC needs it */
-
-    /* check for RT#58044 */
-    PARROT_ASSERT(CONTEXT(interp)->n_regs_used);
 
     prederef_args(pc_prederef, interp, pc, opinfo);
 
@@ -541,7 +536,7 @@ init_prederef(PARROT_INTERP, int which)
                 N * sizeof (void *));
 #endif
         /* calc and remember pred_offset */
-        CONTEXT(interp)->pred_offset = pc - (opcode_t *)temp;
+        Parrot_pcc_set_pred_offset(interp, CURRENT_CONTEXT(interp), pc - (opcode_t *)temp);
 
         /* fill with the prederef__ opcode function */
         if (which == PARROT_SWITCH_CORE || which == PARROT_SWITCH_JIT_CORE)
