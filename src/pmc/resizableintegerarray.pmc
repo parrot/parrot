@@ -294,11 +294,6 @@ Used to unarchive the array.
     }
 
     VTABLE void thaw(visit_info *info) {
-
-        Parrot_ResizableIntegerArray_attributes *attrs =
-            mem_allocate_zeroed_typed(Parrot_ResizableIntegerArray_attributes);
-        PMC_data(SELF) = attrs;
-
         if (info->extra_flags == EXTRA_IS_NULL) {
             IMAGE_IO * const io = info->image_io;
             const INTVAL n = VTABLE_shift_integer(INTERP, io);

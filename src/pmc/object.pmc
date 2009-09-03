@@ -695,10 +695,6 @@ Used to unarchive the object.
         if (info->extra_flags == EXTRA_IS_PROP_HASH) {
             SUPER(info);
         }
-        else if (info->extra_flags == EXTRA_IS_NULL) {
-            /* Allocate the object's core data struct */
-            PMC_data(SELF) = mem_allocate_zeroed_typed(Parrot_Object_attributes);
-        }
     }
 
 /*

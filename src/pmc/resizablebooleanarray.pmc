@@ -454,8 +454,6 @@ Used to unarchive the string.
         STRING * const   s        = VTABLE_shift_string(INTERP, io);
 
         bit_array      = (unsigned char*)Parrot_str_to_cstring(INTERP, s);
-        PMC_data(SELF) =
-            mem_allocate_zeroed_typed(Parrot_ResizableBooleanArray_attributes);
         SET_ATTR_size(INTERP, SELF, tail_pos);
         SET_ATTR_resize_threshold(INTERP, SELF, head_pos);
         SET_ATTR_bit_array(INTERP, SELF, bit_array);

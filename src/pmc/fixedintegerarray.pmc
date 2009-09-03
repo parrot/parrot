@@ -636,10 +636,6 @@ Used to unarchive the array.
     }
 
     VTABLE void thaw(visit_info *info) {
-
-        Parrot_FixedIntegerArray_attributes *attrs =
-            mem_allocate_zeroed_typed(Parrot_FixedIntegerArray_attributes);
-        PMC_data(SELF) = attrs;
         PObj_custom_destroy_SET(SELF);
 
         if (info->extra_flags == EXTRA_IS_NULL) {
