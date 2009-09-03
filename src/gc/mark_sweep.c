@@ -1169,14 +1169,16 @@ Parrot_gc_get_attributes_from_pool(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool * po
 {
     ASSERT_ARGS(Parrot_gc_get_attributes_from_pool)
     PMC_Attribute_Free_List *item;
-
     if (pool->top_arena == NULL
+
 #if GC_USE_LAZY_ALLOCATOR
      || (pool->newfree == NULL && pool->free_list == NULL))
 #else
+
      || pool->free_list == NULL)
 #endif
         Parrot_gc_allocate_new_attributes_arena(interp, pool);
+    
 
 #if GC_USE_LAZY_ALLOCATOR
     if (pool->newfree) {
@@ -1191,6 +1193,7 @@ Parrot_gc_get_attributes_from_pool(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool * po
         pool->free_list = item->next;
     }
 #else
+
     item            = pool->free_list;
     pool->free_list = item->next;
 #endif
@@ -1246,6 +1249,7 @@ PMC_Attribute_Pool *
 Parrot_gc_get_attribute_pool(PARROT_INTERP, size_t attrib_size)
 {
     ASSERT_ARGS(Parrot_gc_get_attribute_pool)
+        
     Arenas * const arenas = interp->arena_base;
     PMC_Attribute_Pool ** pools = arenas->attrib_pools;
     const size_t size = (attrib_size < sizeof (void *))?(sizeof (void *)):(attrib_size);
@@ -1253,7 +1257,7 @@ Parrot_gc_get_attribute_pool(PARROT_INTERP, size_t attrib_size)
 
     if (pools == NULL) {
         const size_t total_length = idx + GC_ATTRIB_POOLS_HEADROOM;
-        const size_t total_size   = total_length * sizeof (void *);
+        const size_t total_size   = (total_length + 1) * sizeof (void *);
         /* Allocate more then we strictly need, hoping that we can reduce the
            number of resizes. 8 is just an arbitrary number */
         pools = (PMC_Attribute_Pool **)mem_internal_allocate(total_size);
@@ -1261,7 +1265,7 @@ Parrot_gc_get_attribute_pool(PARROT_INTERP, size_t attrib_size)
         arenas->attrib_pools = pools;
         arenas->num_attribs = total_length;
     }
-    if (arenas->num_attribs < idx) {
+    if (arenas->num_attribs <= idx) {
         const size_t total_length = idx + GC_ATTRIB_POOLS_HEADROOM;
         const size_t total_size   = total_length * sizeof (void *);
         const size_t current_size = arenas->num_attribs;
