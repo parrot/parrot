@@ -55,17 +55,12 @@ Bar
 Bar
 OUTPUT
 
-TODO: {
-
-local $TODO = 'clone null string broken, TT#964';
-
 pasm_output_is( <<'CODE', <<'OUTPUT', 'clone null' );
     null S0
     clone S1, S0
     end
 CODE
 OUTPUT
-}
 
 pasm_output_is( <<'CODE', '4', 'length_i_s' );
     set I4, 0
