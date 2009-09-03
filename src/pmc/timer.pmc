@@ -79,7 +79,7 @@ Initializes the timer.
 
         /* Set flags for custom GC mark and destroy. */
         PObj_custom_mark_SET(SELF);
-        PObj_active_destroy_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
 
         /* Set up the core struct. */
         core_struct->id          = 0;

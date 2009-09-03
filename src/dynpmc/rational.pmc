@@ -269,7 +269,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
         PMC_data(SELF)     = attrs;
         PMC_rational(SELF) = (RATIONAL *)malloc(sizeof (RATIONAL));
         mpq_init(RT(SELF));
-        PObj_active_destroy_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
       #endif
     }
 

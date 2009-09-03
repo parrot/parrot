@@ -1222,7 +1222,7 @@ Creates a new PMC object of the type of the class and calls init().
 
         /* Set custom GC mark and destroy on the object. */
         PObj_custom_mark_SET(object);
-        PObj_active_destroy_SET(object);
+        PObj_custom_destroy_SET(object);
 
         /* Flag that it is an object */
         PObj_is_object_SET(object);

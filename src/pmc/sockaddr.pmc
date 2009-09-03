@@ -47,7 +47,7 @@ Initializes the pointer object.
             (Parrot_Sockaddr_attributes *) PMC_data(SELF);
 
         pdata_struct->pointer = mem_allocate_zeroed_typed(struct sockaddr_in);
-        PObj_active_destroy_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
     }
 
 /*

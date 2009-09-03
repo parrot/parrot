@@ -627,7 +627,7 @@ BigInt object.
 
     VTABLE void init() {
         bigint_init(INTERP, SELF);
-        PObj_active_destroy_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
     }
 
     VTABLE PMC *clone() {

@@ -191,7 +191,7 @@ typedef enum PObj_enum {
     /* Mark the buffer as needing GC */
     PObj_custom_GC_FLAG         = POBJ_FLAG(21),
     /* Set if the PObj has a destroy method that must be called */
-    PObj_active_destroy_FLAG    = POBJ_FLAG(22),
+    PObj_custom_destroy_FLAG    = POBJ_FLAG(22),
     /* For debugging, report when this buffer gets moved around */
     PObj_report_FLAG            = POBJ_FLAG(23),
 
@@ -289,7 +289,7 @@ typedef enum PObj_enum {
 #define PObj_special_CLEAR(flag, o) do { \
     PObj_flag_CLEAR(flag, o); \
     if ((PObj_get_FLAGS(o) & \
-                (PObj_active_destroy_FLAG | \
+                (PObj_custom_destroy_FLAG | \
                  PObj_custom_mark_FLAG | \
                  PObj_needs_early_gc_FLAG))) \
         gc_flag_SET(is_special_PMC, o); \
@@ -312,9 +312,17 @@ typedef enum PObj_enum {
 #define PObj_custom_mark_CLEAR(o)   PObj_special_CLEAR(custom_mark, o)
 #define PObj_custom_mark_TEST(o)   PObj_flag_TEST(custom_mark, o)
 
-#define PObj_active_destroy_SET(o) PObj_flag_SET(active_destroy, o)
-#define PObj_active_destroy_TEST(o) PObj_flag_TEST(active_destroy, o)
-#define PObj_active_destroy_CLEAR(o) PObj_flag_CLEAR(active_destroy, o)
+#define PObj_custom_destroy_SET(o)   PObj_flag_SET(custom_destroy,   o)
+#define PObj_custom_destroy_TEST(o)  PObj_flag_TEST(custom_destroy,  o)
+#define PObj_custom_destroy_CLEAR(o) PObj_flag_CLEAR(custom_destroy, o)
+
+/*******************************************************
+ * DEPRECATED -- use PObj_custom_destroy_FOO() instead *
+ *******************************************************/
+#define PObj_active_destroy_FLAG     PObj_custom_destroy_FLAG
+#define PObj_active_destroy_SET(o)   PObj_flag_SET(custom_destroy,   o)
+#define PObj_active_destroy_TEST(o)  PObj_flag_TEST(custom_destroy,  o)
+#define PObj_active_destroy_CLEAR(o) PObj_flag_CLEAR(custom_destroy, o)
 
 #define PObj_is_class_SET(o) PObj_flag_SET(is_class, o)
 #define PObj_is_class_TEST(o) PObj_flag_TEST(is_class, o)
@@ -356,7 +364,7 @@ typedef enum PObj_enum {
 
 #define PObj_custom_mark_destroy_SETALL(o) do { \
         PObj_custom_mark_SET(o); \
-        PObj_active_destroy_SET(o); \
+        PObj_custom_destroy_SET(o); \
 } while (0)
 
 #endif /* PARROT_POBJ_H_GUARD */

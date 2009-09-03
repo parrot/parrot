@@ -2410,7 +2410,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
     emitm_ret(pc);
     PARROT_ASSERT(pc - jit_info.arena.start <= JIT_ALLOC_SIZE);
     /* could shrink arena.start here to used size */
-    PObj_active_destroy_SET(pmc_nci);
+    PObj_custom_destroy_SET(pmc_nci);
     if (sizeptr)
         *sizeptr = JIT_ALLOC_SIZE;
     return (void *)D2FPTR(jit_info.arena.start);

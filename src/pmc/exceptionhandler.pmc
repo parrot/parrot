@@ -56,7 +56,7 @@ Initializes the exception handler.
          * context - the stacks can only be deeper in the interpreter - so no
          * mark of context is needed */
         PObj_custom_mark_SET(SELF);
-        PObj_active_destroy_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
     }
 /*
 

@@ -242,7 +242,7 @@ Initializes the interpreter.
         if (!PMC_interp(SELF)) {
             create_interp(SELF, INTERP);
         }
-        PObj_active_destroy_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
     }
 
 /*
@@ -268,7 +268,7 @@ C<parent> and uses that thread.
         if (!PMC_interp(SELF)) {
             create_interp(SELF, p);
         }
-        PObj_active_destroy_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
     }
 
 
@@ -309,7 +309,7 @@ Sets C<struct_val> to C<*value>.
             Parrot_ParrotInterpreter_attributes *attrs =
                 mem_allocate_zeroed_typed(Parrot_ParrotInterpreter_attributes);
             PMC_data(SELF) = attrs;
-            PObj_active_destroy_SET(SELF);
+            PObj_custom_destroy_SET(SELF);
         }
         PMC_interp(SELF) = (struct parrot_interp_t *)value;
     }
@@ -722,7 +722,7 @@ Finish thawing.
                 Parrot_ParrotInterpreter_attributes *attrs =
                     mem_allocate_zeroed_typed(Parrot_ParrotInterpreter_attributes);
                 PMC_data(SELF) = attrs;
-                PObj_active_destroy_SET(SELF);
+                PObj_custom_destroy_SET(SELF);
             }
 
             PMC_interp(SELF) = INTERP;

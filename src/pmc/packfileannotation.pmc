@@ -42,7 +42,7 @@ Create empty PackfileAnnotation.
         Parrot_PackfileAnnotation_attributes * attrs =
                 mem_allocate_zeroed_typed(Parrot_PackfileAnnotation_attributes);
 
-        PObj_active_destroy_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
         PMC_data(SELF) = attrs;
     }
 

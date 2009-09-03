@@ -73,7 +73,7 @@ Creates and returns a copy of the array.
         dest_float_array  = (FLOATVAL*)mem_sys_allocate(mem_size);
         mem_sys_memcopy(dest_float_array, self_float_array, mem_size);
         SET_ATTR_float_array(INTERP, dest, dest_float_array);
-        PObj_active_destroy_SET(dest);
+        PObj_custom_destroy_SET(dest);
 
         return dest;
     }
@@ -290,7 +290,7 @@ Resizes the array to C<size> elements.
         SET_ATTR_size(INTERP, SELF, new_size);
         SET_ATTR_float_array(INTERP, SELF,
                 mem_allocate_n_typed(new_size, FLOATVAL));
-        PObj_active_destroy_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
     }
 
 /*

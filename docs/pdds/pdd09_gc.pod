@@ -560,7 +560,7 @@ Always use these provided macros when you need to test or set these flags.
 
 =over 4
 
-=item PObj_active_destroy_FLAG
+=item PObj_custom_destroy_FLAG
 
 The PMC has some sort of active destructor, and will have that destructor
 called when the PMC is destroyed. The destructor is typically called from

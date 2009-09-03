@@ -84,7 +84,7 @@ Initializes the exception with default values.
 
     VTABLE void init() {
         /* Set flags for custom GC mark and destroy. */
-        PObj_active_destroy_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
         PObj_custom_mark_SET(SELF);
 
         SET_ATTR_severity(INTERP, SELF, EXCEPT_error);
@@ -124,7 +124,7 @@ Initializes the exception with supplied values.
         }
 
         /* Set flags for custom GC mark. */
-        PObj_active_destroy_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
         PObj_custom_mark_SET(SELF);
 
         /* Set up the core struct and default values for the exception object. */

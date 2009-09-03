@@ -45,7 +45,7 @@ Initializes the array.
 */
 
     VTABLE void init() {
-        PObj_active_destroy_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
     }
 
 /*
@@ -97,7 +97,7 @@ Creates and returns a copy of the array.
             SET_ATTR_bit_array(INTERP, dest, clone_bit_array);
         }
 
-        PObj_active_destroy_SET(dest);
+        PObj_custom_destroy_SET(dest);
         return dest;
     }
 

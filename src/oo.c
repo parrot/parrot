@@ -286,7 +286,7 @@ Parrot_oo_clone_object(PARROT_INTERP, ARGIN(PMC *pmc),
 
     /* Set custom GC mark and destroy on the object. */
     PObj_custom_mark_SET(cloned);
-    PObj_active_destroy_SET(cloned);
+    PObj_custom_destroy_SET(cloned);
 
     /* Flag that it is an object */
     PObj_is_object_SET(cloned);

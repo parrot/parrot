@@ -714,7 +714,7 @@ Called after the object has been thawed.
     VTABLE void thawfinish(visit_info *info) {
         /* Set custom GC mark and destroy on the object. */
         PObj_custom_mark_SET(SELF);
-        PObj_active_destroy_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
 
         /* Flag that it is an object */
         PObj_is_object_SET(SELF);

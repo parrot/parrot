@@ -36,7 +36,7 @@ pmclass @TEMP_md_name@
 @TEMP_md_guard@
         @TEMP_md_ctx@ *c    = mem_allocate_zeroed_typed(@TEMP_md_ctx@);
         PMC_data(SELF) = c;
-        PObj_active_destroy_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
 #else
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ILL_INHERIT,
             "@TEMP_md_name@ is disabled");
@@ -75,7 +75,7 @@ pmclass @TEMP_md_name@
         memcpy(c, PMC_data(SELF), sizeof (@TEMP_md_ctx@));
         PMC_data(retval) = c;
 
-        PObj_active_destroy_SET(retval);
+        PObj_custom_destroy_SET(retval);
         return retval;
 #else
         return NULL;

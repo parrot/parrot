@@ -211,7 +211,7 @@ Turn yourself into the specified type.
 =item C<destroy>
 
 Do any data shut-down and finalization you need to do. To have this method
-called, you must set the C<Pobj_active_destroy_FLAG>.
+called, you must set the C<Pobj_custom_destroy_FLAG>.
 
 =item C<get_integer>
 

@@ -42,7 +42,7 @@ more ATTRs, the C<Parrot_x_attributes> struct must be allocated and assigned to
 C<PMC_data> in the PMC's C<init()> and C<init_pmc()> VTABLE functions (if used)
 and it must be destroyed in the C<destroy()> VTABLE function.  PMCs with ATTRs
 also need to indicate that they need active destruction by calling
-C<PObj_active_destroy_SET()> or C<PObj_custom_mark_destroy_SETALL()>.
+C<PObj_custom_destroy_SET()> or C<PObj_custom_mark_destroy_SETALL()>.
 
 If your PMC only needs to store a single pointer, it can use C<PMC_data> directly.
 Note that this may make maintaining your PMC difficult, should more data ever
@@ -80,10 +80,10 @@ implement the B<mark()> VTABLE function and set this flag.  The B<mark()>
 VTABLE function must call B<Parrot_gc_mark_PObj_alive()> on all B<PObj>s which your PMC
 contains.
 
-=item PObj_active_destroy_FLAG
+=item PObj_custom_destroy_FLAG
 
 If your PMC allocates any memory or opens any resources during its lifetime, it
-must set B<PObj_active_destroy> and implement the B<destroy()> VTABLE function to
+must set B<PObj_custom_destroy> and implement the B<destroy()> VTABLE function to
 free those resources.
 
 =item PObj_needs_early_gc_FLAG

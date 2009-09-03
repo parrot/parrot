@@ -71,7 +71,7 @@ subroutine.
             (hash_hash_key_fn)Parrot_str_to_hashval); /*        hash    */
 
         SELF.set_pointer(hash);
-        PObj_active_destroy_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
     }
 
 /*

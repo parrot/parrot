@@ -606,7 +606,7 @@ gc_gms_add_free_object(PARROT_INTERP, SHIM(Small_Object_Pool *pool),
 =item C<static void gc_gms_chain_objects(PARROT_INTERP, Small_Object_Pool *pool,
 Small_Object_Arena *new_arena, size_t real_size)>
 
-TODO: interfere active_destroy and put these items into a
+TODO: interfere custom_destroy and put these items into a
 separate white area, so that a sweep has just to run through these
 objects
 
@@ -1691,7 +1691,7 @@ sweep_cb_pmc(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, SHIM(void 
         PMC * const obj = (PMC*)GMSH_to_PObj(h);
         if (PObj_needs_early_gc_TEST(obj))
             --arena_base->num_early_gc_PMCs;
-        if (PObj_active_destroy_TEST(obj))
+        if (PObj_custom_destroy_TEST(obj))
             VTABLE_destroy(interp, (PMC *)obj);
     }
     pool->free_list = pool->white;

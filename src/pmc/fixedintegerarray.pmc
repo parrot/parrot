@@ -40,7 +40,7 @@ Initializes the array.
 */
 
     VTABLE void init() {
-        PObj_active_destroy_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
     }
 
 /*
@@ -190,7 +190,7 @@ Creates and returns a copy of the array.
             SET_ATTR_int_array(INTERP, dest, dest_int_array);
 
             mem_sys_memcopy(dest_int_array, int_array, size * sizeof (INTVAL));
-            PObj_active_destroy_SET(dest);
+            PObj_custom_destroy_SET(dest);
         }
 
         return dest;
@@ -432,7 +432,7 @@ Resizes the array to C<size> elements.
         GET_ATTR_int_array(INTERP, SELF, int_array);
         SET_ATTR_int_array(INTERP, SELF,
                 mem_realloc_n_typed(int_array, size, INTVAL));
-        PObj_active_destroy_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
     }
 
 /*
@@ -640,7 +640,7 @@ Used to unarchive the array.
         Parrot_FixedIntegerArray_attributes *attrs =
             mem_allocate_zeroed_typed(Parrot_FixedIntegerArray_attributes);
         PMC_data(SELF) = attrs;
-        PObj_active_destroy_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
 
         if (info->extra_flags == EXTRA_IS_NULL) {
             IMAGE_IO * const io = info->image_io;

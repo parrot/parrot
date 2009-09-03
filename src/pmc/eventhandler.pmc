@@ -39,7 +39,7 @@ do anything.
 
     VTABLE void init() {
         PObj_custom_mark_SET(SELF);
-        PObj_active_destroy_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
     }
 
 /*
@@ -101,7 +101,7 @@ handler to care
                     INTERP->iglobals, IGLOBALS_INTERPRETER);
 
         PObj_custom_mark_SET(SELF);
-        PObj_active_destroy_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
 
         e->type        = type;
         e->code        = code;

@@ -111,7 +111,7 @@ PARROT_OBSERVER static const char * const flag_bit_names[] =
     "on_free_list",
     "custom_mark",
     "custom_GC",
-    "active_destroy",
+    "custom_destroy",
     "report",
     "data_is_PMC_array",
     "need_finalize",

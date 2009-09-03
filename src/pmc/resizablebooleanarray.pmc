@@ -392,7 +392,7 @@ Returns a copy of the array.
 
         SET_ATTR_bit_array(INTERP, dest, dest_bit_array);
 
-        PObj_active_destroy_SET(dest);
+        PObj_custom_destroy_SET(dest);
         return dest;
     }
 

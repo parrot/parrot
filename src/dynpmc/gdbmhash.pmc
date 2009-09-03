@@ -105,7 +105,7 @@ So we do a bit of cheating here, and load it during class initialization.
 
         attrs->db_handle = mem_allocate_zeroed_typed(GDBM_FH);
         PMC_data(SELF)   = attrs;
-        PObj_active_destroy_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
     }
 
     VTABLE void destroy() {
