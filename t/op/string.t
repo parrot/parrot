@@ -62,6 +62,7 @@ local $TODO = 'clone null string broken, TT#964';
 pasm_output_is( <<'CODE', <<'OUTPUT', 'clone null' );
     null S0
     clone S1, S0
+    end
 CODE
 OUTPUT
 }
