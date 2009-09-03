@@ -302,6 +302,7 @@ class, the PMC arguments are shifted down.
     VTABLE opcode_t *invoke(void *next) {
         Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         nci_sub_t                     func;
+        char                         *sig_str;
         void                         *orig_func;
         PMC                          *cont;
 
@@ -324,7 +325,9 @@ class, the PMC arguments are shifted down.
             nci_jit_sub_t jit_func = (nci_jit_sub_t) D2FPTR(nci_info->func);
 
             /* Parrot_eprintf(interp, "JITTED %S\n", nci_info->signature); */
-            jit_func(INTERP, SELF, (char *) nci_info->pcc_params_signature->strstart);
+            sig_str = Parrot_str_to_cstring(interp, nci_info->pcc_params_signature);
+            jit_func(INTERP, SELF, sig_str);
+            Parrot_str_free_cstring(sig_str);
         }
         else {
             if (PObj_flag_TEST(private2, SELF)) {

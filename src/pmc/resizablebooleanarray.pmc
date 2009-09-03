@@ -453,8 +453,7 @@ Used to unarchive the string.
         const UINTVAL    tail_pos = VTABLE_shift_integer(INTERP, io);
         STRING * const   s        = VTABLE_shift_string(INTERP, io);
 
-        bit_array      = (unsigned char *)mem_sys_allocate_zeroed(s->bufused);
-        mem_sys_memcopy(bit_array, (unsigned char *)s->strstart, s->bufused);
+        bit_array      = Parrot_str_to_cstring(INTERP, s);
         PMC_data(SELF) =
             mem_allocate_zeroed_typed(Parrot_ResizableBooleanArray_attributes);
 

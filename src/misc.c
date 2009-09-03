@@ -112,6 +112,8 @@ Parrot_vsnprintf(PARROT_INTERP, ARGOUT(char *targ),
                  size_t len, ARGIN(const char *pat), va_list args)
 {
     ASSERT_ARGS(Parrot_vsnprintf)
+    char   *str_ret;
+    size_t  str_len;
     if (len == 0)
         return;
     len--;
@@ -119,12 +121,15 @@ Parrot_vsnprintf(PARROT_INTERP, ARGOUT(char *targ),
         const STRING * const ret = Parrot_vsprintf_c(interp, pat, args);
         /* string_transcode(interp, ret, NULL, NULL, &ret); */
 
-        if (len > ret->bufused) {
-            len = ret->bufused;
+        str_ret = Parrot_str_to_cstring(interp, ret);
+        str_len = strlen(str_ret);
+        if (len > str_len) {
+            len = str_len;
         }
 
         if (len)
-            memcpy(targ, ret->strstart, len);
+            memcpy(targ, str_ret, len);
+        Parrot_str_free_cstring(str_ret);
     }
     targ[len] = 0;
 }

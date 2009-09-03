@@ -214,12 +214,15 @@ Returns true if the hash size is not zero.
         if (!dbf) return;
         keystr = make_hash_key(interp, key);
 
-        key_gdbm.dsize = keystr->strlen;
-        key_gdbm.dptr  = keystr->strstart;
-        val_gdbm.dsize = value->strlen;
-        val_gdbm.dptr  = value->strstart;
+        key_gdbm.dptr  = Parrot_str_to_cstring(interp, keystr);
+        key_gdbm.dsize = strlen(key_gdbm.dptr);
+        val_gdbm.dptr  = Parrot_str_to_cstring(interp, value);
+        val_gdbm.dsize = strlen(val_gdbm.dptr);
 
         gdbm_store(dbf, key_gdbm, val_gdbm, GDBM_REPLACE);
+
+        Parrot_str_free_cstring(key_gdbm.dptr);
+        Parrot_str_free_cstring(val_gdbm.dptr);
 
         return;
     }
