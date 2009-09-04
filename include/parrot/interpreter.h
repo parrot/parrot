@@ -207,21 +207,9 @@ typedef struct _Prederef {
 #define CURRENT_CONTEXT(interp) ((interp)->ctx)
 
 
-#define CHUNKED_CTX_MEM 0           /* no longer works, but will be reinstated
-                                     * some day; see src/register.c for details.
-                                    */
-
 typedef struct _context_mem {
-#if CHUNKED_CTX_MEM
-    char *data;                     /* ctx + register store */
-    char *free;                     /* free to allocate */
-    char *threshold;                /* continuation threshold */
-    struct _context_mem *prev;      /* previous allocated area */
-#else
     void **free_list;               /* array of free-lists, per size free slots */
     int n_free_slots;               /* amount of allocated */
-#endif
-
 } context_mem;
 
 

@@ -77,10 +77,6 @@ void Parrot_clear_s(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void parrot_gc_context(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 FLOATVAL * Parrot_pcc_get_FLOATVAL_reg(PARROT_INTERP,
     ARGIN(PMC *ctx),
@@ -189,8 +185,6 @@ PMC * Parrot_set_new_context(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_clear_p __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_clear_s __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_parrot_gc_context __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_pcc_get_FLOATVAL_reg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \

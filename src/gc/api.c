@@ -793,7 +793,6 @@ Parrot_gc_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(Parrot_gc_mark_and_sweep)
     interp->arena_base->do_gc_mark(interp, flags);
-    parrot_gc_context(interp);
 }
 
 /*

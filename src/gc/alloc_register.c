@@ -78,34 +78,6 @@ The macro CONTEXT() hides these details
 
 */
 
-/*
-=head2 Context and register frame allocation
-
-There are two allocation strategies: chunked memory and malloced with a free
-list.
-
- CHUNKED_CTX_MEM = 1
-
-C<ctx_mem.data> is a pointer to an allocated chunk of memory.  The pointer
-C<ctx_mem.free> holds the next usable location. With (full) continuations the
-C<ctx_mem.free> pointer can't be moved below the C<ctx_mem.threshold>, which is
-the highest context pointer of all active continuations.
-
-[the code for this is incomplete; it had suffered some bit-rot and was
-getting in the way of maintaining the other case.  -- rgr, 4-Feb-06.]
-
-RT #46177 GC has to lower this threshold when collecting continuations.
-
- CHUNKED_CTX_MEM = 0
-
-Context/register memory is malloced. C<ctx_mem.free> is used as a free list of
-reusable items.
-
-=cut
-
-*/
-
-#define CTX_ALLOC_SIZE 0x20000
 
 #define ALIGNED_CTX_SIZE (((sizeof (Parrot_Context) + NUMVAL_SIZE - 1) \
         / NUMVAL_SIZE) * NUMVAL_SIZE)
@@ -129,10 +101,6 @@ an available context is stored corresponds to the size of the context.
 #define ROUND_ALLOC_SIZE(size) ((((size) + SLOT_CHUNK_SIZE - 1) \
         / SLOT_CHUNK_SIZE) * SLOT_CHUNK_SIZE)
 #define CALCULATE_SLOT_NUM(size) ((size) / SLOT_CHUNK_SIZE)
-
-#if CHUNKED_CTX_MEM
- #  error "Non-working code removed."
-#endif
 
 /*
 
@@ -169,36 +137,6 @@ create_initial_context(PARROT_INTERP)
      * other extenders) assume the presence of these registers */
     ignored = Parrot_set_new_context(interp, num_regs);
     UNUSED(ignored);
-}
-
-
-/*
-
-=item C<void parrot_gc_context(PARROT_INTERP)>
-
-Cleans up dead context memory; called by the garbage collector.  This only
-applies in the chunked context memory scheme.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-parrot_gc_context(PARROT_INTERP)
-{
-    ASSERT_ARGS(parrot_gc_context)
-#if CHUNKED_CTX_MEM
-    Parrot_Context ctx;
-    ASSERT_ARGS(parrot_gc_context)
-
-    if (!interp->ctx_mem.threshold)
-        return;
-    LVALUE_CAST(char *, ctx.bp) = interp->ctx_mem.threshold
-                                - sizeof (parrot_regs_t);
-#else
-    UNUSED(interp);
-#endif
 }
 
 
