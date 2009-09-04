@@ -299,6 +299,8 @@ Parrot_run_callback(PARROT_INTERP,
     PMC     *sub;
     STRING  *sig_str;
     char    *p;
+    char     ch;
+    char    *sig_cstr;
     char     pasm_sig[4];
     INTVAL   i_param;
     PMC     *p_param;
@@ -311,7 +313,8 @@ Parrot_run_callback(PARROT_INTERP,
     signature = VTABLE_getprop(interp, user_data, sc);
 
     sig_str   = VTABLE_get_string(interp, signature);
-    p         = sig_str->strstart;
+    sig_cstr  = Parrot_str_to_cstring(interp, sig_str);
+    p         = sig_cstr;
     ++p;     /* Skip return type */
 
     pasm_sig[0] = 'v';  /* no return value supported yet */
@@ -367,9 +370,12 @@ case_I:
             param = Parrot_str_new(interp, external_data, 0);
             break;
         default:
+            ch = *p;
+            Parrot_str_free_cstring(sig_cstr);
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                "unhandled signature char '%c' in run_cb", *p);
+                "unhandled signature char '%c' in run_cb", ch);
     }
+    Parrot_str_free_cstring(sig_cstr);
     pasm_sig[3] = '\0';
     Parrot_runops_fromc_args_event(interp, sub, pasm_sig,
             user_data, param);

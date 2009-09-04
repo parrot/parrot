@@ -224,9 +224,8 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                     ct_index = PackFile_find_in_const(interp, ct, key, PFC_STRING);
                     Parrot_io_printf(interp, "        PFC_OFFSET  => %ld\n", ct_index);
                     detail = ct->constants[ct_index];
-                    Parrot_io_printf(interp, "        DATA        => '%.*s'\n",
-                              (int)detail->u.string->bufused,
-                              (char *)detail->u.string->strstart);
+                    Parrot_io_printf(interp, "        DATA        => '%Ss'\n",
+                              detail->u.string);
                     Parrot_io_printf(interp, "       },\n");
                     }
                     break;

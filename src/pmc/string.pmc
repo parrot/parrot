@@ -734,17 +734,18 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
                         enum_class_Integer));
 
         /* TODO verify encoding */
-        const STRING *me         = VTABLE_get_string(INTERP, SELF);
-        const char   *start      = me->strstart;
-        const char   * const end = start + me->bufused;
-        UINTVAL              i   = 0;
+        const STRING *me  = VTABLE_get_string(INTERP, SELF);
+        char         *str = Parrot_str_to_cstring(INTERP, me);
+        UINTVAL       i   = 0;
+        size_t        j   = 0;
+        size_t        len = strlen(str);
 
         if (base < 2 || base > 36)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "invalid conversion to int - bad base %d", base);
 
-        while (start < end) {
-            const unsigned char c = *start;
+        while ( j < len) {
+            const unsigned char c = str[j];
             int dig;
 
             if (isdigit((unsigned char)c))
@@ -760,13 +761,17 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
                 break;
 
             i = i * base + dig;
-            ++start;
+            j++;
         }
 
-        if (start < end)
+        if (j < len) {
+            char ch = str[j];
+            Parrot_str_free_cstring(str);
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                    "invalid conversion to int - bad char %c", *start);
+                    "invalid conversion to int - bad char %c", ch);
+        }
 
+        Parrot_str_free_cstring(str);
         /* TODO: autopromote to BigInt instead of casting away the high bit */
         VTABLE_set_integer_native(INTERP, result, (INTVAL)i);
         RETURN(PMC *result);

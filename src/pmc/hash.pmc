@@ -620,16 +620,20 @@ Return a representation of the hash contents.
 
         for (j = 0; j < n; ++j) {
             STRING * const key       = VTABLE_shift_string(INTERP, iter);
+            char *         key_str;
+            size_t         i, str_len;
             int            all_digit = 1;
-            int            i;
             PMC           *val;
 
-            for (i = 0; i < (int)key->strlen; ++i) {
-                if (!isdigit((unsigned char)((const char *)key->strstart)[i])) {
+            key_str = Parrot_str_to_cstring(INTERP, key);
+            str_len = strlen(key_str);
+            for (i = 0; i < str_len; ++i) {
+                if (!isdigit(key_str[i])) {
                     all_digit = 0;
                     break;
                 }
             }
+            Parrot_str_free_cstring(key_str);
 
             if (all_digit) {
                 res = Parrot_str_append(INTERP, res, key);
