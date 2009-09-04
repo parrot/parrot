@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw(lib . ../lib ../../lib);
 
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 22;
 use Test::More;
 
 =head1 NAME
@@ -399,6 +399,27 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "Getting unitialized elements" );
 .end
 CODE
 /Null PMC access in name()/
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "Getting null elements");
+
+.sub main :main
+  .local pmc arr1, n
+  .local int i
+  .local string s
+  arr1 = new ['FixedPMCArray']
+  arr1 = 1
+  arr1[0] = n
+  i = arr1[0]
+  say i
+  s = arr1[0]
+  print '"'
+  print s
+  say '"'
+.end
+CODE
+0
+""
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "Multi keys" );
