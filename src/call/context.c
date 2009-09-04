@@ -170,10 +170,12 @@ Parrot_Context*
 Parrot_pcc_get_context_struct(PARROT_INTERP, ARGIN_NULLOK(PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_context_struct)
+
     if (PMC_IS_NULL(ctx))
         return NULL;
 
-    return (Parrot_Context*)(VTABLE_get_pointer(interp, ctx));
+    /* temporarily violate encapsulation; big speedup here */
+    return PMC_data_typed(ctx, Parrot_Context *);
 }
 
 /*
