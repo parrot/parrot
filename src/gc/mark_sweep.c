@@ -1178,7 +1178,7 @@ Parrot_gc_get_attributes_from_pool(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool * po
      || pool->free_list == NULL)
 #endif
         Parrot_gc_allocate_new_attributes_arena(interp, pool);
-    
+
 
 #if GC_USE_LAZY_ALLOCATOR
     if (pool->newfree) {
@@ -1249,7 +1249,7 @@ PMC_Attribute_Pool *
 Parrot_gc_get_attribute_pool(PARROT_INTERP, size_t attrib_size)
 {
     ASSERT_ARGS(Parrot_gc_get_attribute_pool)
-        
+
     Arenas * const arenas = interp->arena_base;
     PMC_Attribute_Pool ** pools = arenas->attrib_pools;
     const size_t size = (attrib_size < sizeof (void *))?(sizeof (void *)):(attrib_size);
