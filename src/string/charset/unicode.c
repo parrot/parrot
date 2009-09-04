@@ -969,6 +969,11 @@ find_not_cclass(PARROT_INTERP, INTVAL flags,
     UINTVAL     end = offset + count;
     int         bit;
 
+    if (pos > source_string->strlen) {
+        /* XXX: Throw in this case? */
+        return offset + count;
+    }
+
     ENCODING_ITER_INIT(interp, source_string, &iter);
 
     if (pos)
