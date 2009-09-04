@@ -44,21 +44,23 @@ Get "key".
         Parrot_HashIteratorKey_attributes *attrs =
                 PARROT_HASHITERATORKEY(SELF);
 
-        switch (attrs->parrot_hash->key_type) {
-            case Hash_key_type_int:
-                return Parrot_str_from_int(INTERP, (INTVAL)attrs->bucket->key);
+        if (attrs->parrot_hash) {
+            switch (attrs->parrot_hash->key_type) {
+                case Hash_key_type_int:
+                    return Parrot_str_from_int(INTERP, (INTVAL)attrs->bucket->key);
 
-            case Hash_key_type_STRING:
-                return (STRING*)attrs->bucket->key;
+                case Hash_key_type_STRING:
+                    return (STRING*)attrs->bucket->key;
 
-            case Hash_key_type_PMC:
-                return VTABLE_get_string(INTERP, (PMC *)attrs->bucket->key);
+                case Hash_key_type_PMC:
+                    return VTABLE_get_string(INTERP, (PMC *)attrs->bucket->key);
 
-            default:
-                /* Horribly die? */
-                break;
+                default:
+                    break;
+            }
         }
 
+        /* Horribly die? */
         return NULL;
     }
 
