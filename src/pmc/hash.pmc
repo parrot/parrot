@@ -628,7 +628,7 @@ Return a representation of the hash contents.
             key_str = Parrot_str_to_cstring(INTERP, key);
             str_len = strlen(key_str);
             for (i = 0; i < str_len; ++i) {
-                if (!isdigit(key_str[i])) {
+                if (!isdigit((unsigned char)key_str[i])) {
                     all_digit = 0;
                     break;
                 }
