@@ -744,7 +744,7 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "invalid conversion to int - bad base %d", base);
 
-        while ( j < len) {
+        while (j < len) {
             const unsigned char c = str[j];
             int dig;
 
