@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 67;
+use Parrot::Test tests => 64;
 use Parrot::Config;
 
 =head1 NAME
@@ -22,52 +22,6 @@ t/pmc/namespace.t - test the NameSpace PMC as described in PDD 21.
 Test the NameSpace PMC as described in PDD21.
 
 =cut
-
-# L<PDD21/Namespace PMC API/=head4 Untyped Interface>
-pir_output_is( <<'CODE', <<'OUT', 'NameSpace does "hash"' );
-.sub 'test' :main
-    new $P0, ['NameSpace']
-    $I0 = does $P0, 'hash'
-    if $I0 goto ok_1
-    print 'not '
-  ok_1:
-    say 'ok 1 - NameSpace does "hash"'
-.end
-CODE
-ok 1 - NameSpace does "hash"
-OUT
-
-# L<PDD21//>
-pir_output_is( <<'CODE', <<'OUTPUT', "get_global bar" );
-.sub 'main' :main
-    $P0 = get_global "bar"
-    print "ok\n"
-    $P0()
-.end
-
-.sub 'bar'
-    print "bar\n"
-.end
-CODE
-ok
-bar
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "verify NameSpace type" );
-.sub 'main' :main
-    $P0 = get_global "Foo"
-    typeof $S0, $P0
-    print $S0
-    print "\n"
-.end
-
-.namespace ["Foo"]
-.sub 'bar'
-    noop
-.end
-CODE
-NameSpace
-OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "get_global Foo::bar" );
 .sub 'main' :main
