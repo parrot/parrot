@@ -18,55 +18,67 @@ Tests the NameSpace PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(4)
+    plan(5)
 
     create_namespace_pmc()
-    namespace_does_hash()
-    get_global_function()
     verify_namespace_type()
-.end
-
-.sub 'create_namespace_pmc'
-    push_eh eh
-    $P0 = new ['NameSpace']
-    pop_eh
-    ok(1, "Create new Namespace PMC")
-    goto end
-  eh:
-    ok(0, "Could not create Namespace PMC")
-  end:
+    get_global_opcode()
 .end
 
 # L<PDD21/Namespace PMC API/=head4 Untyped Interface>
-.sub 'namespace_does_hash'
-    new $P0, ['NameSpace']
+.sub 'create_namespace_pmc'
+    push_eh eh1
+    $P0 = new ['NameSpace']
+    pop_eh
+    ok(1, "Create new Namespace PMC")
     $I0 = does $P0, 'hash'
     ok($I0, "Namespace does hash")
-.end
-
-# L<PDD21//>
-.sub 'get_global_function'
-    push_eh eh
-    $P0 = get_global "get_global_function_bar"
-    $I0 = $P0()
-    ok($I0, "Can get_global a .sub")
     goto _end
-  eh:
-    ok(0, "Cannot get_global a .sub")
+  eh1:
+    ok(0, "Could not create Namespace PMC")
+    ok(0, "NameSpace does not does hash")
   _end:
 .end
 
-.sub 'get_global_function_bar'
-    .return(1)
-.end
-
 .sub 'verify_namespace_type'
-    $P0 = get_global "verify_namespace_Foo"
+    $P0 = get_global "Foo"
     typeof $S0, $P0
     is($S0, "NameSpace", "A NameSpace is a NameSpace")
 .end
 
-.namespace ["verify_namespace_Foo"]
+# L<PDD21//>
+.sub 'get_global_opcode'
+    push_eh eh1
+    $P0 = get_global "bar"
+    $S0 = $P0()
+    pop_eh
+    is($S0, "", "Can get_global a .sub")
+    goto test2
+  eh1:
+    ok(0, "Cannot get_global a .sub")
+
+  test2:
+    push_eh eh2
+    $P0 = get_global ["Foo"], "bar"
+    $S0 = $P0()
+    pop_eh
+    is($S0, "Foo", "Get Sub from NameSpace")
+    goto _end
+  eh2:
+    ok(0, "Cannot get Sub from NameSpace")
+  _end:
+.end
+
+##### TEST NAMESPACES AND FUNCTIONS #####
+# These functions and namespaces are used for the tests above
+
+.namespace []
+
 .sub 'bar'
-    noop
+    .return("")
+.end
+
+.namespace ["Foo"]
+.sub 'bar'
+    .return("Foo")
 .end

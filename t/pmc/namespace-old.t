@@ -23,22 +23,6 @@ Test the NameSpace PMC as described in PDD21.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUTPUT', "get_global Foo::bar" );
-.sub 'main' :main
-    $P0 = get_global ["Foo"], "bar"
-    print "ok\n"
-    $P0()
-.end
-
-.namespace ["Foo"]
-.sub 'bar'
-    print "bar\n"
-.end
-CODE
-ok
-bar
-OUTPUT
-
 pir_output_is( <<'CODE', <<'OUTPUT', "get_namespace Foo::bar" );
 .sub 'main' :main
     $P0 = get_global ["Foo"], "bar"
