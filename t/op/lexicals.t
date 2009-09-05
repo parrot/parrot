@@ -14,7 +14,7 @@ $ENV{TEST_PROG_ARGS} ||= '';
 plan( skip_all => 'lexicals not thawed properly from PBC, RT #60652' )
     if $ENV{TEST_PROG_ARGS} =~ /--run-pbc/;
 
-plan( tests => 48 );
+plan( tests => 51 );
 
 =head1 NAME
 
@@ -1491,6 +1491,71 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'TT #536: lexical sub lookup' );
 CODE
 ok 1 - looking up lexical sub
 ok 2 - looking up lexical sub
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'find_dynamic_lex basic' );
+.sub 'main'
+    $P0 = box 'main'
+    .lex '$*VAR', $P0
+    'foo'()
+    $P1 = find_dynamic_lex '$*VAR'
+    if null $P1 goto p1_null
+    print 'not '
+  p1_null:
+    say 'null'
+.end
+
+.sub 'foo'
+    $P1 = find_dynamic_lex '$*VAR'
+    say $P1
+.end
+CODE
+main
+null
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "find_dynamic_lex doesn't search outer" );
+.sub 'main'
+    $P0 = box 'main'
+    .lex '$*VAR', $P0
+    'bar'()
+.end
+
+.sub 'bar'
+    $P0 = box 'bar'
+    .lex '$*VAR', $P0
+    'foo'()
+.end
+
+.sub 'foo' :outer('main')
+    $P1 = find_dynamic_lex '$*VAR'
+    say $P1
+    $P1 = find_lex '$*VAR'
+    say $P1
+.end
+CODE
+bar
+main
+OUTPUT
+
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'find_dynamic_lex two levels deep' );
+.sub 'main'
+    $P0 = box 'main'
+    .lex '$*VAR', $P0
+    'bar'()
+.end
+
+.sub 'bar'
+    'foo'()
+.end
+
+.sub 'foo'
+    $P1 = find_dynamic_lex '$*VAR'
+    say $P1
+.end
+CODE
+main
 OUTPUT
 
 # Local Variables:

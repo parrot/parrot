@@ -1275,3 +1275,7 @@ find_name_p_s                  1250
 find_name_p_sc                 1251
 find_sub_not_null_p_s          1252
 find_sub_not_null_p_sc         1253
+store_dynamic_lex_s_p          1254
+store_dynamic_lex_sc_p         1255
+find_dynamic_lex_p_s           1256
+find_dynamic_lex_p_sc          1257

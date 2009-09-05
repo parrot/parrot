@@ -380,7 +380,7 @@ Parrot_find_pad(PARROT_INTERP, ARGIN(STRING *lex_name), ARGIN(PMC *ctx))
     ASSERT_ARGS(Parrot_find_pad)
     while (1) {
         PMC * const lex_pad = Parrot_pcc_get_lex_pad(interp, ctx);
-        PMC        *outer   = Parrot_pcc_get_outer_ctx(interp, ctx);
+        PMC * outer         = Parrot_pcc_get_outer_ctx(interp, ctx);
 
         if (!outer)
             return lex_pad;
@@ -390,6 +390,39 @@ Parrot_find_pad(PARROT_INTERP, ARGIN(STRING *lex_name), ARGIN(PMC *ctx))
                 return lex_pad;
 
         ctx = outer;
+    }
+}
+
+
+/*
+
+=item C<PMC* Parrot_find_dynamic_pad(PARROT_INTERP, STRING *lex_name, PMC *ctx)>
+
+Locate the LexPad containing the given C<lex_name> in C<ctx> and
+its caller pads.  Return PMCNULL on failure.
+
+=cut
+
+*/
+
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC*
+Parrot_find_dynamic_pad(PARROT_INTERP, ARGIN(STRING *lex_name), ARGIN(PMC *ctx))
+{
+    ASSERT_ARGS(Parrot_find_dynamic_pad)
+    while (1) {
+        PMC * const lex_pad = Parrot_pcc_get_lex_pad(interp, ctx);
+        PMC * caller        = Parrot_pcc_get_caller_ctx(interp, ctx);
+
+        if (!caller)
+            return lex_pad;
+
+        if (!PMC_IS_NULL(lex_pad))
+            if (VTABLE_exists_keyed_str(interp, lex_pad, lex_name))
+                return lex_pad;
+
+        ctx = caller;
     }
 }
 

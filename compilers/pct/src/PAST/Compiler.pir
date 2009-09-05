@@ -989,6 +989,8 @@ the node's "pasttype" attribute.
     unless $I0 goto have_lvalue
     $P0 = node[0]
     if null $P0 goto have_lvalue
+    $I1 = exists $P0['lvalue']
+    if $I1 goto have_lvalue
     $P0.'lvalue'($I0)
   have_lvalue:
 
