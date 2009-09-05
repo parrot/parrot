@@ -16,9 +16,11 @@ Tests the NameSpace PMC.
 
 =cut
 
+.namespace []
+
 .sub main :main
     .include 'test_more.pir'
-    plan(18)
+    plan(23)
 
     create_namespace_pmc()
     verify_namespace_type()
@@ -93,10 +95,29 @@ Tests the NameSpace PMC.
     $P0 = get_global ["Foo";"Bar"], "SUB_THAT_DOES_NOT_EXIST"
     $P0()
     ok(0, "Found and invoked a non-existant sub")
-    goto _end
+    goto test6
   eh5:
     # Should we check the exact error message here?
     ok(1, "Cannot invoke a Sub that doesn't exist")
+
+  test6:
+    push_eh eh6
+    $P0 = get_global [ iso-8859-1:"François" ], "baz"
+    $S0 = $P0()
+    is($S0, iso-8859-1:"François", "Found sub in ISO-8859 NameSpace")
+    goto test7
+  eh6:
+    ok(0, "Cannot find sub in ISO-8859 NameSpace")
+
+  test7:
+    push_eh eh7
+    $P0 = get_global [ "Foo";iso-8859-1:"François" ], "baz"
+    $S0 = $P0()
+    is($S0, iso-8859-1:"Foo::François", "Found sub in nested ISO-8859 NameSpace")
+    goto _end
+  eh7:
+    ok(0, "Cannot find sub in ISO-8859 NameSpace")
+
   _end:
 .end
 
@@ -127,6 +148,21 @@ Tests the NameSpace PMC.
     set_global "TopBar", $P1
     $P2 = get_global ["TopBar"], "baz"
     is($S0, "Foo::Bar", "Alias namespace")
+
+    # Get nested NameSpace with ISO-8859 name
+    $P1 = $P0[ iso-8859-1:"François" ]
+    $P2 = $P1["baz"]
+    $S0 = $P2()
+    is($S0, iso-8859-1:"Foo::François", "Hash-get nested ISO-8859 NameSpace")
+
+    $P1 = $P0[ iso-8859-1:"François";"baz" ]
+    $S0 = $P1()
+    is($S0, iso-8859-1:"Foo::François", "Hash-get nested ISO-8859 NameSpace Sub")
+
+    $P0 = get_global iso-8859-1:"François"
+    $P1 = $P0[ "baz" ]
+    $S0 = $P1()
+    is($S0, iso-8859-1:"François", "Hash-get ISO-8859 NameSpace")
 .end
 
 .sub 'access_sub_in_namespace'
@@ -188,4 +224,14 @@ Tests the NameSpace PMC.
 .namespace ["Foo";"Bar"]
 .sub 'baz'
     .return("Foo::Bar")
+.end
+
+.namespace [ iso-8859-1:"François" ]
+.sub 'baz'
+    .return(iso-8859-1:"François")
+.end
+
+.namespace [ "Foo"; iso-8859-1:"François" ]
+.sub 'baz'
+    .return(iso-8859-1:"Foo::François")
 .end

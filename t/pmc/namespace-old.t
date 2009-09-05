@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 51;
+use Parrot::Test tests => 50;
 use Parrot::Config;
 
 =head1 NAME
@@ -50,23 +50,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "segv in get_name" );
 CODE
 ok
 OUTPUT
-
-pir_output_is( <<'CODE', <<'OUT', "latin1 namespace, global" );
-.namespace [ iso-8859-1:"François" ]
-
-.sub 'test'
-    print "latin1 namespaces are fun\n"
-.end
-
-.namespace []
-
-.sub 'main' :main
-    $P0 = get_global [iso-8859-1:"François"], 'test'
-    $P0()
-.end
-CODE
-latin1 namespaces are fun
-OUT
 
 pir_output_is( <<'CODE', <<'OUT', "unicode namespace, global" );
 .namespace [ unicode:"Fran\xe7ois" ]
