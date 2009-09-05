@@ -63,9 +63,9 @@ use C<store_lex> above.)
 
 op store_dynamic_lex(in STR, invar PMC) {
     STRING  * const lex_name = $1;
-    PMC     * const ctx      = 
+    PMC     * const ctx      =
         Parrot_pcc_get_caller_ctx(interp, CURRENT_CONTEXT(interp));
-    PMC     * const lex_pad  = 
+    PMC     * const lex_pad  =
         PMC_IS_NULL(ctx)
             ? PMCNULL
             : Parrot_find_dynamic_pad(interp, lex_name, ctx);
@@ -112,7 +112,7 @@ op find_lex(out PMC, in STR) {
 
 =item B<find_dynamic_lex>(out PMC, in STR)
 
-Search through caller lexpads for a lexical variable named $2 
+Search through caller lexpads for a lexical variable named $2
 and store it in $1.  Return a Null PMC if the lexical variable
 is not found.  (To search the current lexpad, use C<find_lex>
 above.)
@@ -121,9 +121,9 @@ above.)
 
 op find_dynamic_lex(out PMC, in STR) {
     STRING  * const lex_name = $2;
-    PMC     * const ctx      = 
+    PMC     * const ctx      =
         Parrot_pcc_get_caller_ctx(interp, CURRENT_CONTEXT(interp));
-    PMC     * const lex_pad  = 
+    PMC     * const lex_pad  =
         PMC_IS_NULL(ctx)
             ? PMCNULL
             : Parrot_find_dynamic_pad(interp, lex_name, ctx);
