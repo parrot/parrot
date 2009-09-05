@@ -118,7 +118,8 @@ Parrot_pmc_destroy(PARROT_INTERP, ARGMOD(PMC *pmc))
     PObj_custom_mark_CLEAR(pmc);
     PObj_live_CLEAR(pmc);
 
-    Parrot_gc_free_pmc_sync(interp, pmc);
+    if (PObj_is_PMC_shared_TEST(pmc) && PMC_sync(pmc))
+        Parrot_gc_free_pmc_sync(interp, pmc);
 
     if (pmc->vtable->attr_size) {
         if (PMC_data(pmc)) {
