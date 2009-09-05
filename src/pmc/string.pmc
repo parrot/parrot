@@ -906,7 +906,7 @@ Translate ascii string C<src> with entries from C<trans_table>.
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
                 "Can't translate non-ascii");
 
-        p = (unsigned char *)src->strstart;
+        p = (unsigned char *)Buffer_bufstart(src);
         /* TODO verify trans table */
 
         GETATTR_FixedIntegerArray_int_array(INTERP, table, tr_data);
@@ -940,7 +940,7 @@ Reverse the ascii STRING C<src> in place.
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
                 "Can't reverse non-ascii");
 
-        p = (unsigned char *)src->strstart;
+        p = (unsigned char *)Buffer_bufstart(src);
 
         for (i = 0, --len; i < len; ++i, --len) {
             const unsigned char ch = p[len];
@@ -973,7 +973,7 @@ Checks if the ascii STRING C<str> is just an integer.
                 "Can't is_integer non-ascii");
 
         i = 0;
-        p = (unsigned char *)src->strstart;
+        p = (unsigned char *)Buffer_bufstart(src);
 
         if (p[i] == '-' || p[i] == '+' ||
             (p[i] >= '0' && p[i] <= '9')) {

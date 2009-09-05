@@ -206,7 +206,7 @@ STRING_compare(PARROT_INTERP, ARGIN(const void *search_key), ARGIN_NULLOK(const 
         return 1;
 
     /* COWed strings */
-    if (s1->strstart == s2->strstart && s1->bufused == s2->bufused)
+    if (Buffer_bufstart(s1) == Buffer_bufstart(s2) && s1->bufused == s2->bufused)
         return 0;
 
     return CHARSET_COMPARE(interp, s1, s2);

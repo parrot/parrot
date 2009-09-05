@@ -2084,8 +2084,9 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
     const int ST_SIZE_OF           = 124;
     const int JIT_ALLOC_SIZE       = 1024;
 
+    char      *signature_str      = Parrot_str_to_cstring(interp, signature);
     /* skip over the result */
-    char      *sig                = (char *)signature->strstart + 1;
+    char      *sig                = signature_str + 1;
     size_t     stack_space_needed = calc_signature_needs(sig,
                                         &string_buffer_count);
 
@@ -2240,6 +2241,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
             case '4':
             case 'V':
                 mem_free_executable(jit_info.native_ptr, JIT_ALLOC_SIZE);
+                Parrot_str_free_cstring(signature_str);
                 return NULL;
                 break;
             default:
@@ -2250,6 +2252,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
                  * cleanup and try nci.c
                  */
                 mem_free_executable(jit_info.native_ptr, JIT_ALLOC_SIZE);
+                Parrot_str_free_cstring(signature_str);
                 return NULL;
         }
         args_offset +=4;
@@ -2294,7 +2297,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
 
     /* now place return value in registers */
     /* first in signature is the return value */
-    sig = (char *)signature->strstart; /* the result */
+    sig = signature_str; /* the result */
     switch (*sig) {
         /* I have no idea how to handle these */
         case '2':
@@ -2393,6 +2396,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
              * oops unknown signature:
              * cleanup and try nci.c
              */
+            Parrot_str_free_cstring(signature_str);
             mem_free_executable(jit_info.native_ptr, JIT_ALLOC_SIZE);
             return NULL;
     }
@@ -2413,6 +2417,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
     PObj_custom_destroy_SET(pmc_nci);
     if (sizeptr)
         *sizeptr = JIT_ALLOC_SIZE;
+    Parrot_str_free_cstring(signature_str);
     return (void *)D2FPTR(jit_info.arena.start);
 }
 
