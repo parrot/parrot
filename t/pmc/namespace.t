@@ -140,6 +140,9 @@ Tests the NameSpace PMC.
 #       string if it is iso-8895-1 and we are Unicode
 #    push_eh eh8
 #    $P0 = get_global [ unicode:"François" ], "baz"
+#    $I0 = isnull $P0
+#    is($I0, 0, "Find Sub in an ISO-8859-1 NameSpace looked up by a Unicode name")
+
 #    $S0 = $P0()
 #    say $S0
 #    is($S0, iso-8859-1:"François", "ISO-8859 NameSpace with Unicode name")
