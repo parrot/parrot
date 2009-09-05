@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 61;
+use Parrot::Test tests => 56;
 use Parrot::Config;
 
 =head1 NAME
@@ -22,74 +22,6 @@ t/pmc/namespace.t - test the NameSpace PMC as described in PDD 21.
 Test the NameSpace PMC as described in PDD21.
 
 =cut
-
-pir_output_is( <<'CODE', <<'OUTPUT', "get_global Foo::bar hash" );
-.sub 'main' :main
-.end
-
-.namespace ["Foo"]
-.sub 'bar'
-    print "bar\n"
-.end
-CODE
-ok
-bar
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "get_global Foo::Bar::baz" );
-.sub 'main' :main
-    $P2 = get_global ["Foo";"Bar"], "baz"
-    print "ok\n"
-    $P2()
-.end
-
-.namespace ["Foo" ; "Bar"]
-.sub 'baz'
-    print "baz\n"
-.end
-CODE
-ok
-baz
-OUTPUT
-
-pir_error_output_like( <<'CODE', <<'OUTPUT', "get_global Foo::bazz not found" );
-.sub 'main' :main
-    $P2 = get_global ["Foo"], "bazz"
-    $P2()
-    print "ok\n"
-.end
-CODE
-/Null PMC access in invoke\(\)/
-OUTPUT
-
-# [this used to behave differently from the previous case.]
-pir_error_output_like( <<'CODE', <<'OUTPUT', "get_global Foo::Bar::bazz not found" );
-.sub 'main' :main
-    $P2 = get_global ["Foo";"Bar"], "bazz"
-    $P2()
-    print "ok\n"
-.end
-CODE
-/Null PMC access in invoke\(\)/
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "get_global Foo::Bar::baz hash" );
-.sub 'main' :main
-    $P0 = get_global "Foo"
-    $P1 = $P0["Bar"]
-    $P2 = $P1["baz"]
-    print "ok\n"
-    $P2()
-.end
-
-.namespace ["Foo"; "Bar"]
-.sub 'baz'
-    print "baz\n"
-.end
-CODE
-ok
-baz
-OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "get_global Foo::Bar::baz hash 2" );
 .sub 'main' :main

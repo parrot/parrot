@@ -18,7 +18,7 @@ Tests the NameSpace PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(8)
+    plan(12)
 
     create_namespace_pmc()
     verify_namespace_type()
@@ -33,12 +33,9 @@ Tests the NameSpace PMC.
     $P0 = new ['NameSpace']
     pop_eh
     ok(1, "Create new Namespace PMC")
-    $I0 = does $P0, 'hash'
-    ok($I0, "Namespace does hash")
     goto _end
   eh1:
     ok(0, "Could not create Namespace PMC")
-    ok(0, "NameSpace does not does hash")
   _end:
 .end
 
@@ -51,7 +48,7 @@ Tests the NameSpace PMC.
 # L<PDD21//>
 .sub 'get_global_opcode'
     push_eh eh1
-    $P0 = get_global "bar"
+    $P0 = get_global "baz"
     $S0 = $P0()
     pop_eh
     is($S0, "", "Can get_global a .sub")
@@ -61,33 +58,72 @@ Tests the NameSpace PMC.
 
   test2:
     push_eh eh2
-    $P0 = get_global ["Foo"], "bar"
+    $P0 = get_global ["Foo"], "baz"
     $S0 = $P0()
     pop_eh
     is($S0, "Foo", "Get Sub from NameSpace")
-    goto _end
+    goto test3
   eh2:
-    ok(0, "Cannot get Sub from NameSpace")
+    ok(0, "Cannot get Sub from NameSpace Foo")
+
+  test3:
+    push_eh eh3
+    $P0 = get_global ["Foo";"Bar"], "baz"
+    $S0 = $P0()
+    pop_eh
+    is($S0, "Foo::Bar", "Get Sub from nested NameSpace")
+    goto test4
+  eh3:
+    ok(0, "Cannot get Sub from NameSpace Foo::Bar")
+
+  test4:
+    push_eh eh4
+    $P0 = get_global ["Foo"], "SUB_THAT_DOES_NOT_EXIST"
+    $P0()
+    ok(0, "Found and invoked a non-existant sub")
+    goto test5
+  eh4:
+    # Should we check the exact error message here?
+    ok(1, "Cannot invoke a Sub that doesn't exist")
+
+  test5:
+    # this used to behave differently from the previous case.
+    push_eh eh5
+    $P0 = get_global ["Foo";"Bar"], "SUB_THAT_DOES_NOT_EXIST"
+    $P0()
+    ok(0, "Found and invoked a non-existant sub")
+    goto _end
+  eh5:
+    # Should we check the exact error message here?
+    ok(1, "Cannot invoke a Sub that doesn't exist")
   _end:
 .end
 
 .sub 'get_sub_from_namespace_hash'
     $P0 = get_global "Foo"
-    $P1 = $P0["bar"]
+    $I0 = does $P0, 'hash'
+    ok($I0, "Namespace does hash")
+
+    $P1 = $P0["baz"]
     $S0 = $P1()
     is($S0, "Foo", "Get the Sub from the NameSpace as a Hash")
+
+    $P1 = $P0["Bar"]
+    $P2 = $P1["baz"]
+    $S0 = $P2()
+    is($S0, "Foo::Bar", "Get the Sub from the nested NameSpace as a Hash")
 .end
 
 .sub 'get_namespace_from_sub'
-    $P0 = get_global ["Foo"], "bar"
-    $P1 = $P0."get_namespace"()
-    $S0 = $P1
-    is($S0, "Foo", "Get the namespace from a Sub in the NameSpace")
-
-    $P0 = get_global "bar"
+    $P0 = get_global "baz"
     $P1 = $P0."get_namespace"()
     $S0 = $P1
     is($S0, "parrot", "Get the root namespace from a sub in the root namespace")
+
+    $P0 = get_global ["Foo"], "baz"
+    $P1 = $P0."get_namespace"()
+    $S0 = $P1
+    is($S0, "Foo", "Get the namespace from a Sub in the NameSpace")
 .end
 
 
@@ -96,11 +132,16 @@ Tests the NameSpace PMC.
 
 .namespace []
 
-.sub 'bar'
+.sub 'baz'
     .return("")
 .end
 
 .namespace ["Foo"]
-.sub 'bar'
+.sub 'baz'
     .return("Foo")
+.end
+
+.namespace ["Foo";"Bar"]
+.sub 'baz'
+    .return("Foo::Bar")
 .end
