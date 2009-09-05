@@ -20,7 +20,7 @@ Tests the NameSpace PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(30)
+    plan(44)
 
     create_namespace_pmc()
     verify_namespace_type()
@@ -30,6 +30,7 @@ Tests the NameSpace PMC.
     get_namespace_from_sub()
     build_namespaces_at_runtime()
     hll_namespaces()
+    namespace_methods()
 .end
 
 # L<PDD21/Namespace PMC API/=head4 Untyped Interface>
@@ -265,6 +266,77 @@ Tests the NameSpace PMC.
     $P1 = $P0["baz"]
     $S0 = $P1()
     is($S0, "Foo", "get a Sub from a HLL namespace")
+.end
+
+.sub 'namespace_methods'
+    $P0 = get_namespace
+
+    # make_namespace returns the existing namespace if it exists
+    $P1 = $P0.'make_namespace'("Foo")
+    $P2 = $P1["baz"]
+    $S0 = $P2()
+    is($S0, "Foo", "make_namespace does not overwrite existing NS")
+
+    # First we don't have it...
+    $P1 = $P0["NewNamespace1"]
+    $I0 = isnull $P1
+    is($I0, 1, "something that doesn't exist really doesn't")
+
+    # ...now we do!
+    $P1 = $P0.'make_namespace'("NewNamespace1")
+    $P2 = $P1["baz"]    
+    $I0 = isnull $P2
+    is($I0, 1, "make_namespace also creates new namespaces")
+
+    $P1 = new ["NameSpace"]
+    $P0.'add_namespace'("NewNamespace2", $P1)
+    $P2 = $P0["NewNamespace2"]
+    is($P1, $P2, "add_namespace adds a new namespace")
+
+    # test add_sub
+
+    $P1 = new 'Integer'
+    $P1 = 25
+    $P0.'add_var'("My_Integer", $P1)
+    $P2 = $P0["My_Integer"]
+    is($P1, $P2, "add_var adds a variable to the namespace")
+
+    # We've already tested NameSpace."get_name" elsewhere in this file
+
+    $P1 = $P0.'find_namespace'("Foo")
+    $P2 = $P1["baz"]
+    $S0 = $P2()
+    is($S0, "Foo", "find_namespace finds a .namespace constant")
+
+    $P1 = $P0.'find_namespace'("NewNamespace1")
+    $S0 = typeof $P1
+    is($S0, "NameSpace", "find_namespace finds a namespace added at runtime")
+
+    $P1 = $P0.'find_sub'("baz")
+    $S0 = $P1()
+    is($S0, "", "find_sub finds a sub like it should")
+
+    $P1 = $P0.'find_sub'("NewNamespace1")
+    $I0 = isnull $P1
+    is($I0, 1, "find_sub won't find a non-sub")
+
+    $P1 = $P0.'find_sub'("DOESNT EXIST")
+    $I0 = isnull $P1
+    is($I0, 1, "find_sub won't find something that doesn't exist")
+
+    $P1 = $P0.'find_var'("My_Integer")
+    $I0 = $P1
+    is($I0, 25, "find_var finds a variable we've saved in a namespace")
+
+    $P1 = $P0.'find_var'("ALSO DOESNT EXIST")
+    $I0 = isnull $P1
+    is($I0, 1, "find_var won't find something that doesn't exist")
+
+    $P1 = $P0.'find_var'("baz")
+    $S0 = typeof $P1
+    is($S0, "Sub", "find_var also finds subs")
+    $S0 = $P1()
+    is($S0, "", "find_var finds the correct sub")
 .end
 
 ##### TEST NAMESPACES AND FUNCTIONS #####
