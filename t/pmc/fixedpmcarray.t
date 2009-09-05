@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw(lib . ../lib ../../lib);
 
-use Parrot::Test tests => 22;
+use Parrot::Test tests => 25;
 use Test::More;
 
 =head1 NAME
@@ -42,6 +42,53 @@ OK_2:    print "ok 2\n"
 CODE
 ok 1
 ok 2
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "Assign from other FPA");
+.sub main
+    .local pmc arr1, arr2
+    .local int n
+    arr1 = new ['FixedPMCArray']
+    arr1 = 32
+    arr2 = new ['FixedPMCArray']
+    arr2 = 15
+    assign arr1, arr2
+    n = arr1
+    say n
+.end
+CODE
+15
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "Assign to self");
+.sub main
+    .local pmc arr
+    arr = new ['FixedPMCArray']
+    assign arr, arr
+    say 'Done'
+.end
+CODE
+Done
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "Assign from non-array");
+.sub main
+    .local pmc arr, other
+    .local int n
+    arr = new ['FixedPMCArray']
+    other = new ['Integer']
+    push_eh catch
+    say 'Assign'
+    assign arr, other
+    say 'Never here!'
+    goto done
+catch:
+    say 'Catched'
+done:
+.end
+CODE
+Assign
+Catched
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Resetting array size (and getting an exception)" );
