@@ -1661,7 +1661,7 @@ Parrot_gc_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
 /*
 
 =item C<void Parrot_gc_free_fixed_size_storage(PARROT_INTERP, size_t size, void
-* data)>
+*data)>
 
 EXPERIMENTAL!!!  See above.
 
