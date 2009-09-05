@@ -23,14 +23,14 @@ This code implements the default mark and sweep garbage collector.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void gc_ms_add_free_object(SHIM_INTERP,
-    ARGMOD(Small_Object_Pool *pool),
+    ARGMOD(Fixed_Size_Obj_Pool *pool),
     ARGIN(void *to_add))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pool);
 
 static void gc_ms_alloc_objects(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool))
+    ARGMOD(Fixed_Size_Obj_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
@@ -42,7 +42,7 @@ static void gc_ms_finalize(PARROT_INTERP, ARGIN(Arenas * const arena_base))
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static void * gc_ms_get_free_object(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool))
+    ARGMOD(Fixed_Size_Obj_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
@@ -51,17 +51,17 @@ static void gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
 static void gc_ms_more_traceable_objects(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool))
+    ARGMOD(Fixed_Size_Obj_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
-static void gc_ms_pool_init(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
+static void gc_ms_pool_init(SHIM_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
 static int gc_ms_sweep_cb(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool),
+    ARGMOD(Fixed_Size_Obj_Pool *pool),
     int flag,
     ARGMOD(void *arg))
         __attribute__nonnull__(1)
@@ -263,7 +263,7 @@ gc_ms_trace_active_PMCs(PARROT_INTERP, Parrot_gc_trace_type trace)
 
 /*
 
-=item C<static int gc_ms_sweep_cb(PARROT_INTERP, Small_Object_Pool *pool, int
+=item C<static int gc_ms_sweep_cb(PARROT_INTERP, Fixed_Size_Obj_Pool *pool, int
 flag, void *arg)>
 
 Sweeps the given pool for the MS collector. This function also ends
@@ -275,7 +275,7 @@ of objects freed.
 */
 
 static int
-gc_ms_sweep_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag,
+gc_ms_sweep_cb(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool), int flag,
     ARGMOD(void *arg))
 {
     ASSERT_ARGS(gc_ms_sweep_cb)
@@ -299,7 +299,7 @@ gc_ms_sweep_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag,
 
 =over 4
 
-=item C<static void gc_ms_pool_init(PARROT_INTERP, Small_Object_Pool *pool)>
+=item C<static void gc_ms_pool_init(PARROT_INTERP, Fixed_Size_Obj_Pool *pool)>
 
 Initialize a memory pool for the MS garbage collector system. Sets the
 function pointers necessary to perform basic operations on a pool, such
@@ -310,7 +310,7 @@ as object allocation.
 */
 
 static void
-gc_ms_pool_init(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
+gc_ms_pool_init(SHIM_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
 {
     ASSERT_ARGS(gc_ms_pool_init)
     pool->add_free_object = gc_ms_add_free_object;
@@ -322,7 +322,7 @@ gc_ms_pool_init(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
 /*
 
 =item C<static void gc_ms_more_traceable_objects(PARROT_INTERP,
-Small_Object_Pool *pool)>
+Fixed_Size_Obj_Pool *pool)>
 
 We're out of traceable objects. First we try a GC run to free some up. If
 that doesn't work, allocate a new arena.
@@ -332,14 +332,14 @@ that doesn't work, allocate a new arena.
 */
 
 static void
-gc_ms_more_traceable_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
+gc_ms_more_traceable_objects(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
 {
     ASSERT_ARGS(gc_ms_more_traceable_objects)
 
     if (pool->skip)
         pool->skip = 0;
     else {
-        Small_Object_Arena * const arena = pool->last_Arena;
+        Fixed_Size_Obj_Arena * const arena = pool->last_Arena;
         if (arena
         &&  arena->used == arena->total_objects)
                 Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
@@ -359,7 +359,7 @@ gc_ms_more_traceable_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
 /*
 
-=item C<static void gc_ms_add_free_object(PARROT_INTERP, Small_Object_Pool
+=item C<static void gc_ms_add_free_object(PARROT_INTERP, Fixed_Size_Obj_Pool
 *pool, void *to_add)>
 
 Add an unused object back to the pool's free list for later reuse. Set
@@ -370,7 +370,7 @@ the PObj flags to indicate that the item is free.
 */
 
 static void
-gc_ms_add_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool),
+gc_ms_add_free_object(SHIM_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool),
     ARGIN(void *to_add))
 {
     ASSERT_ARGS(gc_ms_add_free_object)
@@ -384,7 +384,7 @@ gc_ms_add_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool),
 
 /*
 
-=item C<static void * gc_ms_get_free_object(PARROT_INTERP, Small_Object_Pool
+=item C<static void * gc_ms_get_free_object(PARROT_INTERP, Fixed_Size_Obj_Pool
 *pool)>
 
 Free object allocator for the MS garbage collector system. If there are no
@@ -399,7 +399,7 @@ free list, pop it off and return it.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static void *
-gc_ms_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
+gc_ms_get_free_object(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
 {
     ASSERT_ARGS(gc_ms_get_free_object)
     PObj *ptr;
@@ -412,7 +412,7 @@ gc_ms_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
     }
 
     if (!free_list) {
-        Small_Object_Arena * const arena = pool->last_Arena;
+        Fixed_Size_Obj_Arena * const arena = pool->last_Arena;
         ptr           = (PObj *)pool->newfree;
         pool->newfree = (void *)((char *)pool->newfree + pool->object_size);
         arena->used++;
@@ -448,7 +448,7 @@ gc_ms_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
 /*
 
-=item C<static void gc_ms_alloc_objects(PARROT_INTERP, Small_Object_Pool *pool)>
+=item C<static void gc_ms_alloc_objects(PARROT_INTERP, Fixed_Size_Obj_Pool *pool)>
 
 New arena allocator function for the MS garbage collector system. Allocates
 and initializes a new memory arena in the given pool. Adds all the new
@@ -459,13 +459,13 @@ objects to the pool's free list for later allocation.
 */
 
 static void
-gc_ms_alloc_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
+gc_ms_alloc_objects(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
 {
     ASSERT_ARGS(gc_ms_alloc_objects)
     /* Setup memory for the new objects */
 
-    Small_Object_Arena * const new_arena =
-        mem_internal_allocate_typed(Small_Object_Arena);
+    Fixed_Size_Obj_Arena * const new_arena =
+        mem_internal_allocate_typed(Fixed_Size_Obj_Arena);
 
     const size_t size = pool->object_size * pool->objects_per_alloc;
     size_t alloc_size;

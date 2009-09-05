@@ -32,7 +32,7 @@ throughout the rest of Parrot.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void free_buffer(SHIM_INTERP,
-    ARGMOD(Small_Object_Pool *pool),
+    ARGMOD(Fixed_Size_Obj_Pool *pool),
     ARGMOD(Buffer *b))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -40,13 +40,13 @@ static void free_buffer(SHIM_INTERP,
         FUNC_MODIFIES(*b);
 
 static void free_buffer_malloc(SHIM_INTERP,
-    SHIM(Small_Object_Pool *pool),
+    SHIM(Fixed_Size_Obj_Pool *pool),
     ARGMOD(Buffer *b))
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*b);
 
 static void free_pmc_in_pool(PARROT_INTERP,
-    SHIM(Small_Object_Pool *pool),
+    SHIM(Fixed_Size_Obj_Pool *pool),
     ARGMOD(PObj *p))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
@@ -54,24 +54,24 @@ static void free_pmc_in_pool(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static Small_Object_Pool * new_bufferlike_pool(PARROT_INTERP,
+static Fixed_Size_Obj_Pool * new_bufferlike_pool(PARROT_INTERP,
     size_t actual_buffer_size)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static Small_Object_Pool * new_pmc_pool(PARROT_INTERP)
+static Fixed_Size_Obj_Pool * new_pmc_pool(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-static Small_Object_Pool * new_small_object_pool(
+static Fixed_Size_Obj_Pool * new_fixed_size_obj_pool(
     size_t object_size,
     size_t objects_per_alloc);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static Small_Object_Pool * new_string_pool(PARROT_INTERP, INTVAL constant)
+static Fixed_Size_Obj_Pool * new_string_pool(PARROT_INTERP, INTVAL constant)
         __attribute__nonnull__(1);
 
 static void Parrot_gc_allocate_new_attributes_arena(PARROT_INTERP,
@@ -97,7 +97,7 @@ static PMC_Attribute_Pool * Parrot_gc_create_attrib_pool(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_new_pmc_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_new_small_object_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_new_fixed_size_obj_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_new_string_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_allocate_new_attributes_arena \
@@ -257,7 +257,7 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
 
 /*
 
-=item C<void Parrot_gc_sweep_pool(PARROT_INTERP, Small_Object_Pool *pool)>
+=item C<void Parrot_gc_sweep_pool(PARROT_INTERP, Fixed_Size_Obj_Pool *pool)>
 
 Puts any buffers/PMCs that are marked as "dead" or "black" onto the pool
 free list. If C<GC_IS_MALLOC>, bufstart gets freed too, if possible. Avoids
@@ -268,7 +268,7 @@ buffers that are immune from collection (i.e. constant).
 */
 
 void
-Parrot_gc_sweep_pool(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
+Parrot_gc_sweep_pool(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
 {
     ASSERT_ARGS(Parrot_gc_sweep_pool)
     PObj *b;
@@ -276,7 +276,7 @@ Parrot_gc_sweep_pool(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
     UINTVAL total_used        = 0;
     const UINTVAL object_size = pool->object_size;
 
-    Small_Object_Arena *cur_arena;
+    Fixed_Size_Obj_Arena *cur_arena;
     gc_object_fn_type   gc_object = pool->gc_object;
 
 #if GC_VERBOSE
@@ -352,7 +352,7 @@ next:
 
 /*
 
-=item C<INTVAL contained_in_pool(PARROT_INTERP, const Small_Object_Pool *pool,
+=item C<INTVAL contained_in_pool(PARROT_INTERP, const Fixed_Size_Obj_Pool *pool,
 const void *ptr)>
 
 Returns whether the given C<*ptr> points to a location in C<pool>.
@@ -363,10 +363,10 @@ Returns whether the given C<*ptr> points to a location in C<pool>.
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-contained_in_pool(PARROT_INTERP, ARGIN(const Small_Object_Pool *pool), ARGIN(const void *ptr))
+contained_in_pool(PARROT_INTERP, ARGIN(const Fixed_Size_Obj_Pool *pool), ARGIN(const void *ptr))
 {
     ASSERT_ARGS(contained_in_pool)
-    const Small_Object_Arena *arena;
+    const Fixed_Size_Obj_Arena *arena;
 
     if (interp->gc_sys->PObj_to_Arena){
         ptr = interp->gc_sys->PObj_to_Arena(ptr);
@@ -475,7 +475,7 @@ mark_special(PARROT_INTERP, ARGIN(PMC *obj))
 
 /*
 
-=item C<void Parrot_gc_clear_live_bits(PARROT_INTERP, const Small_Object_Pool
+=item C<void Parrot_gc_clear_live_bits(PARROT_INTERP, const Fixed_Size_Obj_Pool
 *pool)>
 
 Resets the PMC pool, so all objects are marked as "White". This
@@ -487,10 +487,10 @@ next mark phase.
 */
 
 void
-Parrot_gc_clear_live_bits(PARROT_INTERP, ARGIN(const Small_Object_Pool *pool))
+Parrot_gc_clear_live_bits(PARROT_INTERP, ARGIN(const Fixed_Size_Obj_Pool *pool))
 {
     ASSERT_ARGS(Parrot_gc_clear_live_bits)
-    Small_Object_Arena *arena;
+    Fixed_Size_Obj_Arena *arena;
     const UINTVAL object_size = pool->object_size;
 
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
@@ -584,8 +584,8 @@ Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)
 
 /*
 
-=item C<void Parrot_add_to_free_list(PARROT_INTERP, Small_Object_Pool *pool,
-Small_Object_Arena *arena)>
+=item C<void Parrot_add_to_free_list(PARROT_INTERP, Fixed_Size_Obj_Pool *pool,
+Fixed_Size_Obj_Arena *arena)>
 
 Adds the objects in the newly allocated C<arena> to the free list of the pool.
 
@@ -595,8 +595,8 @@ Adds the objects in the newly allocated C<arena> to the free list of the pool.
 
 void
 Parrot_add_to_free_list(PARROT_INTERP,
-        ARGMOD(Small_Object_Pool  *pool),
-        ARGMOD(Small_Object_Arena *arena))
+        ARGMOD(Fixed_Size_Obj_Pool  *pool),
+        ARGMOD(Fixed_Size_Obj_Arena *arena))
 {
     ASSERT_ARGS(Parrot_add_to_free_list)
     UINTVAL  i;
@@ -628,8 +628,8 @@ Parrot_add_to_free_list(PARROT_INTERP,
 
 /*
 
-=item C<void Parrot_append_arena_in_pool(PARROT_INTERP, Small_Object_Pool *pool,
-Small_Object_Arena *new_arena, size_t size)>
+=item C<void Parrot_append_arena_in_pool(PARROT_INTERP, Fixed_Size_Obj_Pool *pool,
+Fixed_Size_Obj_Arena *new_arena, size_t size)>
 
 Insert the new arena into the pool's structure. Arenas are stored in a
 linked list, so add the new arena to the list. Set information in the
@@ -641,8 +641,8 @@ arenas structure, such as the number of objects allocated in it.
 
 void
 Parrot_append_arena_in_pool(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool),
-    ARGMOD(Small_Object_Arena *new_arena), size_t size)
+    ARGMOD(Fixed_Size_Obj_Pool *pool),
+    ARGMOD(Fixed_Size_Obj_Arena *new_arena), size_t size)
 {
     ASSERT_ARGS(Parrot_append_arena_in_pool)
 
@@ -728,7 +728,7 @@ Parrot_gc_profile_end(PARROT_INTERP, int what)
 
 =over 4
 
-=item C<static Small_Object_Pool * new_pmc_pool(PARROT_INTERP)>
+=item C<static Fixed_Size_Obj_Pool * new_pmc_pool(PARROT_INTERP)>
 
 Creates and initializes a new pool for PMCs and returns it.
 
@@ -738,13 +738,13 @@ Creates and initializes a new pool for PMCs and returns it.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static Small_Object_Pool *
+static Fixed_Size_Obj_Pool *
 new_pmc_pool(PARROT_INTERP)
 {
     ASSERT_ARGS(new_pmc_pool)
     const int num_headers = PMC_HEADERS_PER_ALLOC;
-    Small_Object_Pool * const pmc_pool =
-        new_small_object_pool(sizeof (PMC), num_headers);
+    Fixed_Size_Obj_Pool * const pmc_pool =
+        new_fixed_size_obj_pool(sizeof (PMC), num_headers);
 
     pmc_pool->mem_pool   = NULL;
     pmc_pool->gc_object  = free_pmc_in_pool;
@@ -755,7 +755,7 @@ new_pmc_pool(PARROT_INTERP)
 
 /*
 
-=item C<static void free_pmc_in_pool(PARROT_INTERP, Small_Object_Pool *pool,
+=item C<static void free_pmc_in_pool(PARROT_INTERP, Fixed_Size_Obj_Pool *pool,
 PObj *p)>
 
 Frees a PMC that is no longer being used. Calls a custom C<destroy> VTABLE
@@ -766,7 +766,7 @@ method if one is available.
 */
 
 static void
-free_pmc_in_pool(PARROT_INTERP, SHIM(Small_Object_Pool *pool),
+free_pmc_in_pool(PARROT_INTERP, SHIM(Fixed_Size_Obj_Pool *pool),
         ARGMOD(PObj *p))
 {
     ASSERT_ARGS(free_pmc_in_pool)
@@ -783,7 +783,7 @@ free_pmc_in_pool(PARROT_INTERP, SHIM(Small_Object_Pool *pool),
 
 /*
 
-=item C<static Small_Object_Pool * new_bufferlike_pool(PARROT_INTERP, size_t
+=item C<static Fixed_Size_Obj_Pool * new_bufferlike_pool(PARROT_INTERP, size_t
 actual_buffer_size)>
 
 Creates a new pool for buffer-like structures. This is called from
@@ -795,15 +795,15 @@ C<get_bufferlike_pool()>, and should probably not be called directly.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static Small_Object_Pool *
+static Fixed_Size_Obj_Pool *
 new_bufferlike_pool(PARROT_INTERP, size_t actual_buffer_size)
 {
     ASSERT_ARGS(new_bufferlike_pool)
     const int num_headers          = BUFFER_HEADERS_PER_ALLOC;
     const size_t buffer_size       =
             (actual_buffer_size + sizeof (void *) - 1) & ~(sizeof (void *) - 1);
-    Small_Object_Pool * const pool =
-            new_small_object_pool(buffer_size, num_headers);
+    Fixed_Size_Obj_Pool * const pool =
+            new_fixed_size_obj_pool(buffer_size, num_headers);
 
 #ifdef GC_IS_MALLOC
     pool->gc_object = free_buffer_malloc;
@@ -818,10 +818,10 @@ new_bufferlike_pool(PARROT_INTERP, size_t actual_buffer_size)
 
 /*
 
-=item C<static Small_Object_Pool * new_small_object_pool(size_t object_size,
+=item C<static Fixed_Size_Obj_Pool * new_fixed_size_obj_pool(size_t object_size,
 size_t objects_per_alloc)>
 
-Creates a new C<Small_Object_Pool> and returns a pointer to it.
+Creates a new C<Fixed_Size_Obj_Pool> and returns a pointer to it.
 Initializes the pool structure based on the size of objects in the
 pool and the number of items to allocate in each arena.
 
@@ -831,12 +831,12 @@ pool and the number of items to allocate in each arena.
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-static Small_Object_Pool *
-new_small_object_pool(size_t object_size, size_t objects_per_alloc)
+static Fixed_Size_Obj_Pool *
+new_fixed_size_obj_pool(size_t object_size, size_t objects_per_alloc)
 {
-    ASSERT_ARGS(new_small_object_pool)
-    Small_Object_Pool * const pool =
-        mem_internal_allocate_zeroed_typed(Small_Object_Pool);
+    ASSERT_ARGS(new_fixed_size_obj_pool)
+    Fixed_Size_Obj_Pool * const pool =
+        mem_internal_allocate_zeroed_typed(Fixed_Size_Obj_Pool);
 
     pool->last_Arena        = NULL;
     pool->free_list         = NULL;
@@ -853,7 +853,7 @@ new_small_object_pool(size_t object_size, size_t objects_per_alloc)
 
 /*
 
-=item C<static Small_Object_Pool * new_string_pool(PARROT_INTERP, INTVAL
+=item C<static Fixed_Size_Obj_Pool * new_string_pool(PARROT_INTERP, INTVAL
 constant)>
 
 Creates a new pool for C<STRING>s and returns it. This calls
@@ -865,11 +865,11 @@ C<get_bufferlike_pool> internally, which in turn calls C<new_bufferlike_pool>.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static Small_Object_Pool *
+static Fixed_Size_Obj_Pool *
 new_string_pool(PARROT_INTERP, INTVAL constant)
 {
     ASSERT_ARGS(new_string_pool)
-    Small_Object_Pool *pool;
+    Fixed_Size_Obj_Pool *pool;
     if (constant) {
         pool           = new_bufferlike_pool(interp, sizeof (STRING));
         pool->gc_object = NULL;
@@ -885,7 +885,7 @@ new_string_pool(PARROT_INTERP, INTVAL constant)
 
 /*
 
-=item C<static void free_buffer_malloc(PARROT_INTERP, Small_Object_Pool *pool,
+=item C<static void free_buffer_malloc(PARROT_INTERP, Fixed_Size_Obj_Pool *pool,
 Buffer *b)>
 
 Frees the given buffer, returning the storage space to the operating system
@@ -897,7 +897,7 @@ The buffer is not freed if the reference count is greater then 1.
 */
 
 static void
-free_buffer_malloc(SHIM_INTERP, SHIM(Small_Object_Pool *pool),
+free_buffer_malloc(SHIM_INTERP, SHIM(Fixed_Size_Obj_Pool *pool),
         ARGMOD(Buffer *b))
 {
     ASSERT_ARGS(free_buffer_malloc)
@@ -921,7 +921,7 @@ free_buffer_malloc(SHIM_INTERP, SHIM(Small_Object_Pool *pool),
 
 /*
 
-=item C<static void free_buffer(PARROT_INTERP, Small_Object_Pool *pool, Buffer
+=item C<static void free_buffer(PARROT_INTERP, Fixed_Size_Obj_Pool *pool, Buffer
 *b)>
 
 Frees a buffer, returning it to the memory pool for Parrot to possibly
@@ -932,10 +932,10 @@ reuse later.
 */
 
 static void
-free_buffer(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGMOD(Buffer *b))
+free_buffer(SHIM_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool), ARGMOD(Buffer *b))
 {
     ASSERT_ARGS(free_buffer)
-    Memory_Pool * const mem_pool = (Memory_Pool *)pool->mem_pool;
+    Var_Size_Obj_Pool * const mem_pool = (Var_Size_Obj_Pool *)pool->mem_pool;
 
     /* XXX Jarkko reported that on irix pool->mem_pool was NULL, which really
      * shouldn't happen */
@@ -952,7 +952,7 @@ free_buffer(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGMOD(Buffer *b))
 
 /*
 
-=item C<Small_Object_Pool * get_bufferlike_pool(PARROT_INTERP, size_t
+=item C<Fixed_Size_Obj_Pool * get_bufferlike_pool(PARROT_INTERP, size_t
 buffer_size)>
 
 Makes and return a bufferlike header pool for objects of a given size. If a
@@ -965,11 +965,11 @@ the pointer to the existing pool is returned.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-Small_Object_Pool *
+Fixed_Size_Obj_Pool *
 get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
 {
     ASSERT_ARGS(get_bufferlike_pool)
-    Small_Object_Pool **sized_pools = interp->arena_base->sized_header_pools;
+    Fixed_Size_Obj_Pool **sized_pools = interp->arena_base->sized_header_pools;
     const UINTVAL       num_old     = interp->arena_base->num_sized;
     const UINTVAL       idx         = GET_SIZED_POOL_IDX(buffer_size);
 
@@ -980,7 +980,7 @@ get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
                 same debugging behavior as mem_internal_realloc, we would
                 need to add a new function/macro for
                 mem_internal_realloc_zeroed, to mirror mem_sys_realloc_zeroed. */
-        sized_pools = (Small_Object_Pool **)mem_internal_realloc(sized_pools,
+        sized_pools = (Fixed_Size_Obj_Pool **)mem_internal_realloc(sized_pools,
                                            num_new * sizeof (void *));
         memset(sized_pools + num_old, 0, sizeof (void *) * (num_new - num_old));
 
@@ -1072,7 +1072,7 @@ This argument is passed on to the iteration function.
 
 =item pool_iter_fn
 
-Called with C<(Parrot_Interp, Small_Object_Pool *, int flag, void *arg)>.  If
+Called with C<(Parrot_Interp, Fixed_Size_Obj_Pool *, int flag, void *arg)>.  If
 the function returns a non-zero value, iteration will stop.
 
 =back
@@ -1090,7 +1090,7 @@ header_pools_iterate_callback(PARROT_INTERP, int flag, ARGIN_NULLOK(void *arg),
     Arenas * const arena_base = interp->arena_base;
 
     if (flag & POOL_PMC) {
-        Small_Object_Pool *pool = flag & POOL_CONST
+        Fixed_Size_Obj_Pool *pool = flag & POOL_CONST
             ? arena_base->constant_pmc_pool
             : arena_base->pmc_pool;
 
@@ -1114,7 +1114,7 @@ header_pools_iterate_callback(PARROT_INTERP, int flag, ARGIN_NULLOK(void *arg),
         }
 
         for (i = interp->arena_base->num_sized - 1; i >= 0; --i) {
-            Small_Object_Pool * const pool = arena_base->sized_header_pools[i];
+            Fixed_Size_Obj_Pool * const pool = arena_base->sized_header_pools[i];
 
             if (pool) {
                 const int ret_val = (func)(interp, pool, POOL_BUFFER, arg);

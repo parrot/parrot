@@ -52,11 +52,11 @@ typedef enum {
     POOL_ALL    = 0x07
 } pool_iter_enum;
 
-struct Small_Object_Pool;
-struct Small_Object_Arena;
+struct Fixed_Size_Obj_Pool;
+struct Fixed_Size_Obj_Arena;
 struct Arenas;
 
-typedef int (*pool_iter_fn)(PARROT_INTERP, struct Small_Object_Pool *, int, void*);
+typedef int (*pool_iter_fn)(PARROT_INTERP, struct Fixed_Size_Obj_Pool *, int, void*);
 
 typedef struct Memory_Block {
     size_t free;
@@ -67,16 +67,16 @@ typedef struct Memory_Block {
     char *top;
 } Memory_Block;
 
-typedef struct Memory_Pool {
+typedef struct Var_Size_Obj_Pool {
     Memory_Block *top_block;
-    void (*compact)(PARROT_INTERP, struct Memory_Pool *);
+    void (*compact)(PARROT_INTERP, struct Var_Size_Obj_Pool *);
     size_t minimum_block_size;
     size_t total_allocated; /* total bytes allocated to this pool */
     size_t guaranteed_reclaimable;     /* bytes that can definitely be reclaimed*/
     size_t possibly_reclaimable;     /* bytes that can possibly be reclaimed
                                       * (above plus COW-freed bytes) */
     FLOATVAL reclaim_factor; /* minimum percentage we will reclaim */
-} Memory_Pool;
+} Var_Size_Obj_Pool;
 
 typedef enum {
     GC_TRACE_FULL        = 1,
@@ -84,10 +84,10 @@ typedef enum {
     GC_TRACE_SYSTEM_ONLY = 3
 } Parrot_gc_trace_type;
 
-typedef void (*add_free_object_fn_type)(PARROT_INTERP, struct Small_Object_Pool *, void *);
-typedef void * (*get_free_object_fn_type)(PARROT_INTERP, struct Small_Object_Pool *);
-typedef void (*alloc_objects_fn_type)(PARROT_INTERP, struct Small_Object_Pool *);
-typedef void (*gc_object_fn_type)(PARROT_INTERP, struct Small_Object_Pool *, PObj *);
+typedef void (*add_free_object_fn_type)(PARROT_INTERP, struct Fixed_Size_Obj_Pool *, void *);
+typedef void * (*get_free_object_fn_type)(PARROT_INTERP, struct Fixed_Size_Obj_Pool *);
+typedef void (*alloc_objects_fn_type)(PARROT_INTERP, struct Fixed_Size_Obj_Pool *);
+typedef void (*gc_object_fn_type)(PARROT_INTERP, struct Fixed_Size_Obj_Pool *, PObj *);
 
 
 /* &gen_from_enum(interpinfo.pasm) prefix(INTERPINFO_) */

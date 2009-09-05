@@ -338,7 +338,7 @@ a sleep opcode.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static int collect_cb(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool),
+    ARGMOD(Fixed_Size_Obj_Pool *pool),
     SHIM(int flag),
     ARGIN(void *arg))
         __attribute__nonnull__(1)
@@ -347,7 +347,7 @@ static int collect_cb(PARROT_INTERP,
         FUNC_MODIFIES(*pool);
 
 static void gc_ims_add_free_object(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool),
+    ARGMOD(Fixed_Size_Obj_Pool *pool),
     ARGOUT(void *to_add))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -356,7 +356,7 @@ static void gc_ims_add_free_object(PARROT_INTERP,
         FUNC_MODIFIES(*to_add);
 
 static void gc_ims_alloc_objects(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool))
+    ARGMOD(Fixed_Size_Obj_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
@@ -364,12 +364,12 @@ static void gc_ims_alloc_objects(PARROT_INTERP,
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static void * gc_ims_get_free_object(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool))
+    ARGMOD(Fixed_Size_Obj_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
-static void gc_ims_pool_init(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
+static void gc_ims_pool_init(SHIM_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
@@ -395,7 +395,7 @@ static void parrot_gc_ims_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 static int sweep_cb(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool),
+    ARGMOD(Fixed_Size_Obj_Pool *pool),
     int flag,
     ARGIN(void *arg))
         __attribute__nonnull__(1)
@@ -504,7 +504,7 @@ typedef struct Gc_ims_private {
 
 /*
 
-=item C<static void gc_ims_add_free_object(PARROT_INTERP, Small_Object_Pool
+=item C<static void gc_ims_add_free_object(PARROT_INTERP, Fixed_Size_Obj_Pool
 *pool, void *to_add)>
 
 Add object C<to_add> to the free_list in the given pool.
@@ -515,7 +515,7 @@ C<pool->num_free_objects> has to be updated by the caller.
 */
 
 static void
-gc_ims_add_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), ARGOUT(void *to_add))
+gc_ims_add_free_object(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool), ARGOUT(void *to_add))
 {
     ASSERT_ARGS(gc_ims_add_free_object)
     *(void **)to_add = pool->free_list;
@@ -532,7 +532,7 @@ gc_ims_add_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), ARGOUT(vo
 
 /*
 
-=item C<static void * gc_ims_get_free_object(PARROT_INTERP, Small_Object_Pool
+=item C<static void * gc_ims_get_free_object(PARROT_INTERP, Fixed_Size_Obj_Pool
 *pool)>
 
 Get a new object off the free_list in the given pool.
@@ -544,7 +544,7 @@ Get a new object off the free_list in the given pool.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static void *
-gc_ims_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
+gc_ims_get_free_object(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
 {
     ASSERT_ARGS(gc_ims_get_free_object)
     PObj *ptr;
@@ -576,7 +576,7 @@ gc_ims_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
 /*
 
-=item C<static void gc_ims_alloc_objects(PARROT_INTERP, Small_Object_Pool
+=item C<static void gc_ims_alloc_objects(PARROT_INTERP, Fixed_Size_Obj_Pool
 *pool)>
 
 Allocate new objects for the given pool.
@@ -586,16 +586,16 @@ Allocate new objects for the given pool.
 */
 
 static void
-gc_ims_alloc_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
+gc_ims_alloc_objects(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
 {
     ASSERT_ARGS(gc_ims_alloc_objects)
-    Small_Object_Arena *new_arena;
+    Fixed_Size_Obj_Arena *new_arena;
     size_t size;
 
     pool->objects_per_alloc  = ALLOCATION_BLOCK_SIZE / pool->object_size;
 
     /* Setup memory for the new objects */
-    new_arena                = mem_allocate_typed(Small_Object_Arena);
+    new_arena                = mem_allocate_typed(Fixed_Size_Obj_Arena);
     size                     = ALLOCATION_BLOCK_SIZE;
     new_arena->start_objects = mem_sys_allocate(size);
 
@@ -607,7 +607,7 @@ gc_ims_alloc_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
 /*
 
-=item C<static void gc_ims_pool_init(PARROT_INTERP, Small_Object_Pool *pool)>
+=item C<static void gc_ims_pool_init(PARROT_INTERP, Fixed_Size_Obj_Pool *pool)>
 
 Initializes a pool by setting the appropriate function pointers to add, get,
 and allocate objects.
@@ -617,7 +617,7 @@ and allocate objects.
 */
 
 static void
-gc_ims_pool_init(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
+gc_ims_pool_init(SHIM_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
 {
     ASSERT_ARGS(gc_ims_pool_init)
     pool->add_free_object = gc_ims_add_free_object;
@@ -756,7 +756,7 @@ parrot_gc_ims_mark(PARROT_INTERP)
 
 /*
 
-=item C<static int sweep_cb(PARROT_INTERP, Small_Object_Pool *pool, int flag,
+=item C<static int sweep_cb(PARROT_INTERP, Fixed_Size_Obj_Pool *pool, int flag,
 void *arg)>
 
 Callback to sweep a header pool (see header_pools_iterate_callback).
@@ -766,7 +766,7 @@ Callback to sweep a header pool (see header_pools_iterate_callback).
 */
 
 static int
-sweep_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag, ARGIN(void *arg))
+sweep_cb(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool), int flag, ARGIN(void *arg))
 {
     ASSERT_ARGS(sweep_cb)
     int * const n_obj = (int *)arg;
@@ -834,7 +834,7 @@ parrot_gc_ims_sweep(PARROT_INTERP)
 
 /*
 
-=item C<static int collect_cb(PARROT_INTERP, Small_Object_Pool *pool, int flag,
+=item C<static int collect_cb(PARROT_INTERP, Fixed_Size_Obj_Pool *pool, int flag,
 void *arg)>
 
 Callback to collect a header pool (see header_pools_iterate_callback).
@@ -846,11 +846,11 @@ Callback to collect a header pool (see header_pools_iterate_callback).
 #if !defined(GC_IS_MALLOC) || !GC_IS_MALLOC
 
 static int
-collect_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), SHIM(int flag), ARGIN(void *arg))
+collect_cb(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool), SHIM(int flag), ARGIN(void *arg))
 {
     ASSERT_ARGS(collect_cb)
     const int           check_only = (int)(INTVAL)arg;
-    Memory_Pool * const mem_pool   = pool->mem_pool;
+    Var_Size_Obj_Pool * const mem_pool   = pool->mem_pool;
 
     /* check if there is an associated memory pool */
     if (!mem_pool)

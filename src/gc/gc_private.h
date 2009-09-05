@@ -114,13 +114,13 @@ typedef struct GC_Subsystem {
     size_t header_size;
 } GC_Subsystem;
 
-typedef struct Small_Object_Arena {
+typedef struct Fixed_Size_Obj_Arena {
     size_t                     used;
     size_t                     total_objects;
-    struct Small_Object_Arena *prev;
-    struct Small_Object_Arena *next;
+    struct Fixed_Size_Obj_Arena *prev;
+    struct Fixed_Size_Obj_Arena *next;
     void                      *start_objects;
-} Small_Object_Arena;
+} Fixed_Size_Obj_Arena;
 
 typedef struct PMC_Attribute_Free_List {
     struct PMC_Attribute_Free_List * next;
@@ -145,8 +145,8 @@ typedef struct PMC_Attribute_Pool {
 } PMC_Attribute_Pool;
 
 /* Tracked resource pool */
-typedef struct Small_Object_Pool {
-    Small_Object_Arena *last_Arena;
+typedef struct Fixed_Size_Obj_Pool {
+    Fixed_Size_Obj_Arena *last_Arena;
     /* Size in bytes of an individual pool item. This size may include
      * a GC-system specific GC header.
      * See the macros below.
@@ -171,7 +171,7 @@ typedef struct Small_Object_Pool {
 
 
     
-    struct Memory_Pool *mem_pool;
+    struct Var_Size_Obj_Pool *mem_pool;
     size_t start_arena_memory;
     size_t end_arena_memory;
     PARROT_OBSERVER const char *name;
@@ -186,16 +186,16 @@ typedef struct Small_Object_Pool {
     void *newlast;
 #endif
 
-} Small_Object_Pool;
+} Fixed_Size_Obj_Pool;
 
 typedef struct Arenas {
-    Memory_Pool *memory_pool;
-    Memory_Pool *constant_string_pool;
-    struct Small_Object_Pool *string_header_pool;
-    struct Small_Object_Pool *pmc_pool;
-    struct Small_Object_Pool *constant_pmc_pool;
-    struct Small_Object_Pool *constant_string_header_pool;
-    struct Small_Object_Pool **sized_header_pools;
+    Var_Size_Obj_Pool *memory_pool;
+    Var_Size_Obj_Pool *constant_string_pool;
+    struct Fixed_Size_Obj_Pool *string_header_pool;
+    struct Fixed_Size_Obj_Pool *pmc_pool;
+    struct Fixed_Size_Obj_Pool *constant_pmc_pool;
+    struct Fixed_Size_Obj_Pool *constant_string_header_pool;
+    struct Fixed_Size_Obj_Pool **sized_header_pools;
     size_t num_sized;
 
     PMC_Attribute_Pool **attrib_pools;
@@ -206,7 +206,7 @@ typedef struct Arenas {
      */
     void (*do_gc_mark)(PARROT_INTERP, UINTVAL flags);
     void (*finalize_gc_system) (PARROT_INTERP);
-    void (*init_pool)(PARROT_INTERP, struct Small_Object_Pool *);
+    void (*init_pool)(PARROT_INTERP, struct Fixed_Size_Obj_Pool *);
     /*
      * statistics for GC
      */
@@ -346,7 +346,7 @@ void Parrot_gc_ims_wb(PARROT_INTERP, ARGMOD(PMC *agg), ARGMOD(PMC *_new))
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL contained_in_pool(PARROT_INTERP,
-    ARGIN(const Small_Object_Pool *pool),
+    ARGIN(const Fixed_Size_Obj_Pool *pool),
     ARGIN(const void *ptr))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -354,7 +354,7 @@ INTVAL contained_in_pool(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-Small_Object_Pool * get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
+Fixed_Size_Obj_Pool * get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
         __attribute__nonnull__(1);
 
 PARROT_IGNORABLE_RESULT
@@ -374,8 +374,8 @@ void mark_special(PARROT_INTERP, ARGIN(PMC *obj))
         __attribute__nonnull__(2);
 
 void Parrot_add_to_free_list(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool),
-    ARGMOD(Small_Object_Arena *arena))
+    ARGMOD(Fixed_Size_Obj_Pool *pool),
+    ARGMOD(Fixed_Size_Obj_Arena *arena))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -383,8 +383,8 @@ void Parrot_add_to_free_list(PARROT_INTERP,
         FUNC_MODIFIES(*arena);
 
 void Parrot_append_arena_in_pool(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool),
-    ARGMOD(Small_Object_Arena *new_arena),
+    ARGMOD(Fixed_Size_Obj_Pool *pool),
+    ARGMOD(Fixed_Size_Obj_Arena *new_arena),
     size_t size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -393,7 +393,7 @@ void Parrot_append_arena_in_pool(PARROT_INTERP,
         FUNC_MODIFIES(*new_arena);
 
 void Parrot_gc_clear_live_bits(PARROT_INTERP,
-    ARGIN(const Small_Object_Pool *pool))
+    ARGIN(const Fixed_Size_Obj_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -427,7 +427,7 @@ void Parrot_gc_profile_start(PARROT_INTERP)
 void Parrot_gc_run_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void Parrot_gc_sweep_pool(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
+void Parrot_gc_sweep_pool(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
@@ -495,7 +495,7 @@ int Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-Small_Object_Pool * get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
+Fixed_Size_Obj_Pool * get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
         __attribute__nonnull__(1);
 
 PARROT_IGNORABLE_RESULT
@@ -538,13 +538,13 @@ PARROT_CONST_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 size_t aligned_string_size(size_t len);
 
-void check_buffer_ptr(ARGMOD(Buffer * pobj), ARGMOD(Memory_Pool * pool))
+void check_buffer_ptr(ARGMOD(Buffer * pobj), ARGMOD(Var_Size_Obj_Pool * pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(* pobj)
         FUNC_MODIFIES(* pool);
 
-void compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
+void compact_pool(PARROT_INTERP, ARGMOD(Var_Size_Obj_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
@@ -554,12 +554,12 @@ void initialize_memory_pools(PARROT_INTERP)
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-void * mem_allocate(PARROT_INTERP, size_t size, ARGMOD(Memory_Pool *pool))
+void * mem_allocate(PARROT_INTERP, size_t size, ARGMOD(Var_Size_Obj_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pool);
 
-void merge_pools(ARGMOD(Memory_Pool *dest), ARGMOD(Memory_Pool *source))
+void merge_pools(ARGMOD(Var_Size_Obj_Pool *dest), ARGMOD(Var_Size_Obj_Pool *source))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*dest)

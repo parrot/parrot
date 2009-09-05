@@ -297,8 +297,8 @@ an Arenas struct.
 =head4 The Arenas structure
 
 The Arenas structure contains pointers to a variety of memory pools, each used
-for a specific purpose. Two are Memory_Pool pointers (memory_pool,
-constant_string_pool), and six are Small_Object_Pool structures (pmc_pool,
+for a specific purpose. Two are Var_Size_Obj_Pool pointers (memory_pool,
+constant_string_pool), and six are Fixed_Size_Obj_Pool structures (pmc_pool,
 constant_pmc_pool, constant_string_header_pool).
 
 The Arenas structure holds function pointers for the core defined interface of
@@ -312,19 +312,19 @@ and sweep phases is stored in the Arenas structure. (See L<Blocking GC>.)
 The pointer C<void *gc_private> is reserved for use by the currently active GC
 subsystem (with freedom for variation between GC implementations).
 
-=head4 The Memory_Pool structure
+=head4 The Var_Size_Obj_Pool structure
 
-The Memory_Pool structure is a simple memory pool. It contains a pointer to
+The Var_Size_Obj_Pool structure is a simple memory pool. It contains a pointer to
 the top block of the allocated pool, the total allocated size of the pool, the
 block size, and some details on the reclamation characteristics of the pool.
 
-=head4 The Small_Object_Pool structure
+=head4 The Fixed_Size_Obj_Pool structure
 
-The Small_Object_Pool structure is a richer memory pool for object allocation.
+The Fixed_Size_Obj_Pool structure is a richer memory pool for object allocation.
 It tracks details like the number of allocated and free objects in the pool, a
 list of free objects, and for the generational GC implementation maintains
 linked lists of white, black, and gray PMCs. It contains a pointer to a simple
-Memory_Pool (the base storage of the pool). It holds function pointers for
+Var_Size_Obj_Pool (the base storage of the pool). It holds function pointers for
 adding and retrieving free objects in the pool, and for allocating objects.
 
 =head3 Internal API
@@ -432,23 +432,23 @@ Called during interpreter destruction. Free used resources and memory pools.
 All PMCs must be swept, and PMCs with custom destroy VTABLE methods must have
 those called.
 
-=item C<void (*init_pool) (Interp *, Small_Object_Pool *)>
+=item C<void (*init_pool) (Interp *, Fixed_Size_Obj_Pool *)>
 
-Initialize the given pool. Populates the C<Small_Object_Pool> structure with
+Initialize the given pool. Populates the C<Fixed_Size_Obj_Pool> structure with
 initial values, and sets a series of function pointers for working with the
 pool. The function pointers used with the pool are discussed next.
 
 =back
 
-=head4 Small_Object_Pool function pointers
+=head4 Fixed_Size_Obj_Pool function pointers
 
-Each GC core defines 4 function pointers stored in the C<Small_Object_Pool>
+Each GC core defines 4 function pointers stored in the C<Fixed_Size_Obj_Pool>
 structures. These function pointers are used throughout Parrot to implement
 basic behaviors for the pool.
 
 =over 4
 
-=item C<PObj * (*get_free_object) (Interp *, Small_Object_Pool*)>
+=item C<PObj * (*get_free_object) (Interp *, Fixed_Size_Obj_Pool*)>
 
 Get a free object from the pool. This function returns one free object from
 the given pool and removes that object from the pool's free list. PObject
@@ -456,20 +456,20 @@ flags are returned clear, except flags that are used by the garbage collector
 itself, if any. If the pool is a buffer header pool all other object memory
 is zeroed.
 
-=item C<void (*add_free_object) (Interp *, Small_Object_Pool *, PObj *);>
+=item C<void (*add_free_object) (Interp *, Fixed_Size_Obj_Pool *, PObj *);>
 
 Add a freed object to the pool's free list. This function is most often called
 internally to the GC itself to add items to the free list after a sweep, or
 when a new arena is created to add the new items to the free list. It does
 not need to be used in this way, however.
 
-=item C<void (*alloc_objects) (Interp *, Small_Object_Pool *);>
+=item C<void (*alloc_objects) (Interp *, Fixed_Size_Obj_Pool *);>
 
 Allocate a new arena of objects for the pool. Initialize the new arena and add
 all new objects to the pool's free list. Some collectors implement a growth
 factor which increases the size of each new allocated arena.
 
-=item C<void (*more_objects) (Interp *, Small_Object_Pool *);>
+=item C<void (*more_objects) (Interp *, Fixed_Size_Obj_Pool *);>
 
 Reallocation for additional objects. It has the same signature as
 C<alloc_objects>, and in some GC cores the same function pointer is used for

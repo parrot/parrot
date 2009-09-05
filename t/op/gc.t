@@ -1,6 +1,6 @@
 #! parrot
 # Copyright (C) 2001-2009, Parrot Foundation.
-# $Id: string.t 40481 2009-08-11 06:09:35Z dukeleto $
+# $Id$
 
 =head1 NAME
 

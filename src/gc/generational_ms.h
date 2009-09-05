@@ -45,7 +45,7 @@ typedef struct _gc_gms_gen {
     struct _gc_gms_hdr *first;          /* first header in this generation */
     struct _gc_gms_hdr *last;           /* last header in this generation */
     struct _gc_gms_hdr *fin;            /* need destruction/finalization */
-    struct Small_Object_Pool *pool;     /* where this generation belongs to */
+    struct Fixed_Size_Obj_Pool *pool;     /* where this generation belongs to */
     Gc_gms_hdr_list igp;                /* IGPs for this generation */
     UINTVAL n_possibly_dead;            /* overwritten count */
     UINTVAL n_objects;                  /* live objects count */
@@ -53,7 +53,7 @@ typedef struct _gc_gms_gen {
     struct _gc_gms_gen *next;
 } Gc_gms_gen;
 
-/* System-specific data for the Small_Object_Pool struct's gc_sys_private_data field. */
+/* System-specific data for the Fixed_Size_Obj_Pool struct's gc_sys_private_data field. */
 struct gc_gms_smallobjpool_data {
     Gc_gms_hdr marker;          /* limit of list ... also the anchor of the "header chain"
 				   -- see gc_gms_chain_objects() */

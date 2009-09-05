@@ -65,17 +65,17 @@ C<struct Arenas> holds pointers to a variety of different kinds of managed
 memory. A simplification looks similar to this:
 
     typedef struct Arenas {
-        struct Memory_Pool *memory_pool;
+        struct Var_Size_Obj_Pool *memory_pool;
         ...
-        struct Small_Object_Pool * header_pool;
-        struct Small_Object_Pool ** sized_pools;
+        struct Fixed_Size_Obj_Pool * header_pool;
+        struct Fixed_Size_Obj_Pool ** sized_pools;
     } Arenas;
 
 C<memory_pool> and C<header_pool> are variable and fixed sized pool pointers
-respectively. These are just two examples, there are other C<Memory_Pool>s
-and C<Small_Object_Pool>s in the Parrot system. Pools of type
-C<struct Memory_Pool> are for variable-size objects, such as constant string
-buffers. Pools of type C<struct Small_Object_Pool> are for fixed-size objects
+respectively. These are just two examples, there are other C<Var_Size_Obj_Pool>s
+and C<Fixed_Size_Obj_Pool>s in the Parrot system. Pools of type
+C<struct Var_Size_Obj_Pool> are for variable-size objects, such as constant string
+buffers. Pools of type C<struct Fixed_Size_Obj_Pool> are for fixed-size objects
 such as headers or PMCs.
 
 =head1 Fixed sized items

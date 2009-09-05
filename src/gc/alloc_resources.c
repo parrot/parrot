@@ -32,7 +32,7 @@ Functions to manage non-PObj memory, including strings and buffers.
 
 #define POOL_SIZE 65536 * 2
 
-typedef void (*compact_f) (Interp *, Memory_Pool *);
+typedef void (*compact_f) (Interp *, Var_Size_Obj_Pool *);
 
 /* HEADERIZER HFILE: src/gc/gc_private.h */
 
@@ -41,7 +41,7 @@ typedef void (*compact_f) (Interp *, Memory_Pool *);
 
 static void alloc_new_block(PARROT_INTERP,
     size_t size,
-    ARGMOD(Memory_Pool *pool),
+    ARGMOD(Var_Size_Obj_Pool *pool),
     ARGIN(const char *why))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
@@ -54,14 +54,14 @@ static const char* buffer_location(PARROT_INTERP, ARGIN(const PObj *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void check_memory_pool(ARGMOD(Memory_Pool *pool))
+static void check_var_size_obj_pool(ARGMOD(Var_Size_Obj_Pool *pool))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*pool);
 
 static void check_memory_system(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void check_small_object_pool(ARGMOD(Small_Object_Pool * pool))
+static void check_fixed_size_obj_pool(ARGMOD(Fixed_Size_Obj_Pool * pool))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(* pool);
 
@@ -71,7 +71,7 @@ static void debug_print_buf(PARROT_INTERP, ARGIN(const Buffer *b))
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-static Memory_Pool * new_memory_pool(
+static Var_Size_Obj_Pool * new_memory_pool(
     size_t min_block,
     NULLOK(compact_f compact));
 
@@ -82,11 +82,11 @@ static Memory_Pool * new_memory_pool(
 #define ASSERT_ARGS_buffer_location __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(b)
-#define ASSERT_ARGS_check_memory_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_check_var_size_obj_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_check_memory_system __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_check_small_object_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_check_fixed_size_obj_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_debug_print_buf __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
@@ -98,7 +98,7 @@ static Memory_Pool * new_memory_pool(
 
 /*
 
-=item C<static void alloc_new_block(PARROT_INTERP, size_t size, Memory_Pool
+=item C<static void alloc_new_block(PARROT_INTERP, size_t size, Var_Size_Obj_Pool
 *pool, const char *why)>
 
 Allocate a new memory block. We allocate either the requested size or the
@@ -110,7 +110,7 @@ pool. The given C<char *why> text is used for debugging.
 */
 
 static void
-alloc_new_block(PARROT_INTERP, size_t size, ARGMOD(Memory_Pool *pool),
+alloc_new_block(PARROT_INTERP, size_t size, ARGMOD(Var_Size_Obj_Pool *pool),
         ARGIN(const char *why))
 {
     ASSERT_ARGS(alloc_new_block)
@@ -158,7 +158,7 @@ alloc_new_block(PARROT_INTERP, size_t size, ARGMOD(Memory_Pool *pool),
 
 /*
 
-=item C<void * mem_allocate(PARROT_INTERP, size_t size, Memory_Pool *pool)>
+=item C<void * mem_allocate(PARROT_INTERP, size_t size, Var_Size_Obj_Pool *pool)>
 
 Allocates memory for headers.
 
@@ -196,7 +196,7 @@ Buffer memory layout:
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void *
-mem_allocate(PARROT_INTERP, size_t size, ARGMOD(Memory_Pool *pool))
+mem_allocate(PARROT_INTERP, size_t size, ARGMOD(Var_Size_Obj_Pool *pool))
 {
     ASSERT_ARGS(mem_allocate)
     void *return_val;
@@ -319,7 +319,7 @@ debug_print_buf(PARROT_INTERP, ARGIN(const Buffer *b))
 
 =over 4
 
-=item C<void compact_pool(PARROT_INTERP, Memory_Pool *pool)>
+=item C<void compact_pool(PARROT_INTERP, Var_Size_Obj_Pool *pool)>
 
 Compact the string buffer pool. Does not perform a GC scan, or mark items
 as being alive in any way.
@@ -329,7 +329,7 @@ as being alive in any way.
 */
 
 void
-compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
+compact_pool(PARROT_INTERP, ARGMOD(Var_Size_Obj_Pool *pool))
 {
     ASSERT_ARGS(compact_pool)
     INTVAL        j;
@@ -338,7 +338,7 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
     Memory_Block *new_block;     /* A pointer to our working block */
     char         *cur_spot;      /* Where we're currently copying to */
 
-    Small_Object_Arena *cur_buffer_arena;
+    Fixed_Size_Obj_Arena *cur_buffer_arena;
     Arenas * const      arena_base = interp->arena_base;
 
     /* Bail if we're blocked */
@@ -406,7 +406,7 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
 
     /* Run through all the Buffer header pools and copy */
     for (j = (INTVAL)arena_base->num_sized - 1; j >= 0; --j) {
-        Small_Object_Pool * const header_pool = arena_base->sized_header_pools[j];
+        Fixed_Size_Obj_Pool * const header_pool = arena_base->sized_header_pools[j];
         UINTVAL       object_size;
 
         if (!header_pool)
@@ -653,10 +653,10 @@ aligned_string_size(size_t len)
 
 =over 4
 
-=item C<static Memory_Pool * new_memory_pool(size_t min_block, compact_f
+=item C<static Var_Size_Obj_Pool * new_memory_pool(size_t min_block, compact_f
 compact)>
 
-Allocate a new C<Memory_Pool> structures, and set some initial values.
+Allocate a new C<Var_Size_Obj_Pool> structures, and set some initial values.
 return a pointer to the new pool.
 
 =cut
@@ -665,11 +665,11 @@ return a pointer to the new pool.
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-static Memory_Pool *
+static Var_Size_Obj_Pool *
 new_memory_pool(size_t min_block, NULLOK(compact_f compact))
 {
     ASSERT_ARGS(new_memory_pool)
-    Memory_Pool * const pool = mem_internal_allocate_typed(Memory_Pool);
+    Var_Size_Obj_Pool * const pool = mem_internal_allocate_typed(Var_Size_Obj_Pool);
 
     pool->top_block              = NULL;
     pool->compact                = compact;
@@ -686,7 +686,7 @@ new_memory_pool(size_t min_block, NULLOK(compact_f compact))
 
 =item C<void initialize_memory_pools(PARROT_INTERP)>
 
-Initialize the managed memory pools. Parrot maintains two C<Memory_Pool>
+Initialize the managed memory pools. Parrot maintains two C<Var_Size_Obj_Pool>
 structures, the general memory pool and the constant string pool. Create
 and initialize both pool structures, and allocate initial blocks of memory
 for both.
@@ -712,7 +712,7 @@ initialize_memory_pools(PARROT_INTERP)
 
 /*
 
-=item C<void merge_pools(Memory_Pool *dest, Memory_Pool *source)>
+=item C<void merge_pools(Var_Size_Obj_Pool *dest, Var_Size_Obj_Pool *source)>
 
 Merge two memory pools together. Do this by moving all memory blocks
 from the C<*source> pool into the C<*dest> pool. The C<source> pool
@@ -723,7 +723,7 @@ is emptied, but is not destroyed here.
 */
 
 void
-merge_pools(ARGMOD(Memory_Pool *dest), ARGMOD(Memory_Pool *source))
+merge_pools(ARGMOD(Var_Size_Obj_Pool *dest), ARGMOD(Var_Size_Obj_Pool *source))
 {
     ASSERT_ARGS(merge_pools)
     Memory_Block *cur_block;
@@ -772,23 +772,23 @@ check_memory_system(PARROT_INTERP)
     size_t i;
     Arenas * const arena_base = interp->arena_base;
 
-    check_memory_pool(arena_base->memory_pool);
-    check_memory_pool(arena_base->constant_string_pool);
-    check_small_object_pool(arena_base->pmc_pool);
-    check_small_object_pool(arena_base->constant_pmc_pool);
-    check_small_object_pool(arena_base->string_header_pool);
-    check_small_object_pool(arena_base->constant_string_header_pool);
+    check_var_size_obj_pool(arena_base->memory_pool);
+    check_var_size_obj_pool(arena_base->constant_string_pool);
+    check_fixed_size_obj_pool(arena_base->pmc_pool);
+    check_fixed_size_obj_pool(arena_base->constant_pmc_pool);
+    check_fixed_size_obj_pool(arena_base->string_header_pool);
+    check_fixed_size_obj_pool(arena_base->constant_string_header_pool);
 
     for (i = 0; i < arena_base->num_sized; i++) {
-        Small_Object_Pool * pool = arena_base->sized_header_pools[i];
+        Fixed_Size_Obj_Pool * pool = arena_base->sized_header_pools[i];
         if (pool != NULL && pool != arena_base->string_header_pool)
-            check_small_object_pool(pool);
+            check_fixed_size_obj_pool(pool);
     }
 }
 
 /*
 
-=item C<static void check_small_object_pool(Small_Object_Pool * pool)>
+=item C<static void check_fixed_size_obj_pool(Fixed_Size_Obj_Pool * pool)>
 
 Checks a small object pool, if it contains buffer it checks the buffers also.
 
@@ -797,12 +797,12 @@ Checks a small object pool, if it contains buffer it checks the buffers also.
 */
 
 static void
-check_small_object_pool(ARGMOD(Small_Object_Pool * pool))
+check_fixed_size_obj_pool(ARGMOD(Fixed_Size_Obj_Pool * pool))
 {
-    ASSERT_ARGS(check_small_object_pool)
+    ASSERT_ARGS(check_fixed_size_obj_pool)
     size_t total_objects;
     size_t last_free_list_count;
-    Small_Object_Arena * arena_walker;
+    Fixed_Size_Obj_Arena * arena_walker;
     size_t free_objects;
     PObj * object;
     size_t i;
@@ -867,7 +867,7 @@ check_small_object_pool(ARGMOD(Small_Object_Pool * pool))
 
 /*
 
-=item C<static void check_memory_pool(Memory_Pool *pool)>
+=item C<static void check_var_size_obj_pool(Var_Size_Obj_Pool *pool)>
 
 Checks a memory pool, containing buffer data
 
@@ -876,9 +876,9 @@ Checks a memory pool, containing buffer data
 */
 
 static void
-check_memory_pool(ARGMOD(Memory_Pool *pool))
+check_var_size_obj_pool(ARGMOD(Var_Size_Obj_Pool *pool))
 {
-    ASSERT_ARGS(check_memory_pool)
+    ASSERT_ARGS(check_var_size_obj_pool)
     size_t count;
     Memory_Block * block_walker;
     count = 10000000; /*detect unendless loop just use big enough number*/
@@ -900,7 +900,7 @@ check_memory_pool(ARGMOD(Memory_Pool *pool))
 
 /*
 
-=item C<void check_buffer_ptr(Buffer * pobj, Memory_Pool * pool)>
+=item C<void check_buffer_ptr(Buffer * pobj, Var_Size_Obj_Pool * pool)>
 
 Checks wether the buffer is within the bounds of the memory pool
 
@@ -909,7 +909,7 @@ Checks wether the buffer is within the bounds of the memory pool
 */
 
 void
-check_buffer_ptr(ARGMOD(Buffer * pobj), ARGMOD(Memory_Pool * pool))
+check_buffer_ptr(ARGMOD(Buffer * pobj), ARGMOD(Var_Size_Obj_Pool * pool))
 {
     ASSERT_ARGS(check_buffer_ptr)
     Memory_Block * cur_block = pool->top_block;

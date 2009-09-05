@@ -38,30 +38,30 @@ to activate this core.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void gc_inf_add_free_object(SHIM_INTERP,
-    ARGMOD(Small_Object_Pool *pool),
+    ARGMOD(Fixed_Size_Obj_Pool *pool),
     ARGIN(void *to_add))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pool);
 
 static void gc_inf_alloc_objects(SHIM_INTERP,
-    ARGMOD(Small_Object_Pool *pool))
+    ARGMOD(Fixed_Size_Obj_Pool *pool))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
 PARROT_CANNOT_RETURN_NULL
 static void * gc_inf_get_free_object(SHIM_INTERP,
-    ARGMOD(Small_Object_Pool *pool))
+    ARGMOD(Fixed_Size_Obj_Pool *pool))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
 static void gc_inf_mark_and_sweep(SHIM_INTERP, UINTVAL flags);
 static void gc_inf_more_traceable_objects(SHIM_INTERP,
-    ARGMOD(Small_Object_Pool *pool))
+    ARGMOD(Fixed_Size_Obj_Pool *pool))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
-static void gc_inf_pool_init(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
+static void gc_inf_pool_init(SHIM_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
@@ -112,7 +112,7 @@ gc_inf_mark_and_sweep(SHIM_INTERP, UINTVAL flags)
 
 /*
 
-=item C<static void gc_inf_add_free_object(PARROT_INTERP, Small_Object_Pool
+=item C<static void gc_inf_add_free_object(PARROT_INTERP, Fixed_Size_Obj_Pool
 *pool, void *to_add)>
 
 Manually frees a chunk of memory. Normally this would return the memory
@@ -128,7 +128,7 @@ add items to the freelist from a freshly allocated arena.
 */
 
 static void
-gc_inf_add_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool),
+gc_inf_add_free_object(SHIM_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool),
     ARGIN(void *to_add))
 {
     ASSERT_ARGS(gc_inf_add_free_object)
@@ -138,7 +138,7 @@ gc_inf_add_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool),
 
 /*
 
-=item C<static void * gc_inf_get_free_object(PARROT_INTERP, Small_Object_Pool
+=item C<static void * gc_inf_get_free_object(PARROT_INTERP, Fixed_Size_Obj_Pool
 *pool)>
 
 Gets a new object from the pool. Each pool specifies an object size in
@@ -161,7 +161,7 @@ C<Parrot_Gc_get_new_pmc_header>
 
 PARROT_CANNOT_RETURN_NULL
 static void *
-gc_inf_get_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
+gc_inf_get_free_object(SHIM_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
 {
     ASSERT_ARGS(gc_inf_get_free_object)
     return calloc(pool->object_size, 1);
@@ -169,7 +169,7 @@ gc_inf_get_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
 
 /*
 
-=item C<static void gc_inf_alloc_objects(PARROT_INTERP, Small_Object_Pool
+=item C<static void gc_inf_alloc_objects(PARROT_INTERP, Fixed_Size_Obj_Pool
 *pool)>
 
 Allocates a new arena of objects from the system. This function is only
@@ -184,7 +184,7 @@ for each special case pool.
 */
 
 static void
-gc_inf_alloc_objects(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
+gc_inf_alloc_objects(SHIM_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
 {
     ASSERT_ARGS(gc_inf_alloc_objects)
     UNUSED(pool);
@@ -193,7 +193,7 @@ gc_inf_alloc_objects(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
 /*
 
 =item C<static void gc_inf_more_traceable_objects(PARROT_INTERP,
-Small_Object_Pool *pool)>
+Fixed_Size_Obj_Pool *pool)>
 
 Would normally try to find new traceable objects by first running a GC sweep
 and then allocating a new arena from the system. Neither of these are
@@ -208,7 +208,7 @@ from the GC API. Different pools may have special requirements so multiple
 */
 
 static void
-gc_inf_more_traceable_objects(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
+gc_inf_more_traceable_objects(SHIM_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
 {
     ASSERT_ARGS(gc_inf_more_traceable_objects)
     UNUSED(pool);
@@ -216,7 +216,7 @@ gc_inf_more_traceable_objects(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
 
 /*
 
-=item C<static void gc_inf_pool_init(PARROT_INTERP, Small_Object_Pool *pool)>
+=item C<static void gc_inf_pool_init(PARROT_INTERP, Fixed_Size_Obj_Pool *pool)>
 
 Initializes the function pointers in a new pool. When a new pool is created
 we assign several function pointers to it for managing memory in the pool.
@@ -231,7 +231,7 @@ in F<src/gc/mark_sweep.c> at Parrot startup.
 */
 
 static void
-gc_inf_pool_init(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
+gc_inf_pool_init(SHIM_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
 {
     ASSERT_ARGS(gc_inf_pool_init)
     pool->add_free_object = gc_inf_add_free_object;
