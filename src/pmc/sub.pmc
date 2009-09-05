@@ -324,10 +324,9 @@ Invokes the subroutine.
         }
         else {
             /* autoclose */
-            PMC *c;
-            for (c = context;
-                 PMC_IS_NULL(Parrot_pcc_get_outer_ctx(interp, c));
-                 c = Parrot_pcc_get_outer_ctx(interp, c)) {
+            PMC *c = context;
+            PMC *outer_c = Parrot_pcc_get_outer_ctx(interp, c);
+            for (c = context; PMC_IS_NULL(outer_c); c = outer_c) {
 
                 PMC         *outer_pmc;
                 Parrot_Sub_attributes *current_sub, *outer_sub;
@@ -358,6 +357,7 @@ Invokes the subroutine.
                 }
 
                 Parrot_pcc_set_outer_ctx(interp, c, outer_sub->ctx);
+                outer_c = outer_sub->ctx;
             }
         }
 
