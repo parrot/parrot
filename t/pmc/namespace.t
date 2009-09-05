@@ -18,11 +18,13 @@ Tests the NameSpace PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(5)
+    plan(8)
 
     create_namespace_pmc()
     verify_namespace_type()
     get_global_opcode()
+    get_sub_from_namespace_hash()
+    get_namespace_from_sub()
 .end
 
 # L<PDD21/Namespace PMC API/=head4 Untyped Interface>
@@ -68,6 +70,26 @@ Tests the NameSpace PMC.
     ok(0, "Cannot get Sub from NameSpace")
   _end:
 .end
+
+.sub 'get_sub_from_namespace_hash'
+    $P0 = get_global "Foo"
+    $P1 = $P0["bar"]
+    $S0 = $P1()
+    is($S0, "Foo", "Get the Sub from the NameSpace as a Hash")
+.end
+
+.sub 'get_namespace_from_sub'
+    $P0 = get_global ["Foo"], "bar"
+    $P1 = $P0."get_namespace"()
+    $S0 = $P1
+    is($S0, "Foo", "Get the namespace from a Sub in the NameSpace")
+
+    $P0 = get_global "bar"
+    $P1 = $P0."get_namespace"()
+    $S0 = $P1
+    is($S0, "parrot", "Get the root namespace from a sub in the root namespace")
+.end
+
 
 ##### TEST NAMESPACES AND FUNCTIONS #####
 # These functions and namespaces are used for the tests above

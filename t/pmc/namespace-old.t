@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 63;
+use Parrot::Test tests => 61;
 use Parrot::Config;
 
 =head1 NAME
@@ -23,45 +23,8 @@ Test the NameSpace PMC as described in PDD21.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUTPUT', "get_namespace Foo::bar" );
-.sub 'main' :main
-    $P0 = get_global ["Foo"], "bar"
-    print "ok\n"
-    $P1 = $P0."get_namespace"()
-    print $P1
-    print "\n"
-.end
-
-.namespace ["Foo"]
-.sub 'bar'
-.end
-CODE
-ok
-Foo
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "get_global Foo::bar ns" );
-.sub 'main' :main
-    $P1 = get_global ["Foo"], "bar"
-    print "ok\n"
-    $P1()
-.end
-
-.namespace ["Foo"]
-.sub 'bar'
-    print "bar\n"
-.end
-CODE
-ok
-bar
-OUTPUT
-
 pir_output_is( <<'CODE', <<'OUTPUT', "get_global Foo::bar hash" );
 .sub 'main' :main
-    $P0 = get_global "Foo"
-    $P1 = $P0["bar"]
-    print "ok\n"
-    $P1()
 .end
 
 .namespace ["Foo"]
