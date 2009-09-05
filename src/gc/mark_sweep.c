@@ -1250,10 +1250,12 @@ Parrot_gc_get_attribute_pool(PARROT_INTERP, size_t attrib_size)
 {
     ASSERT_ARGS(Parrot_gc_get_attribute_pool)
 
-    Arenas * const arenas = interp->arena_base;
-    PMC_Attribute_Pool ** pools = arenas->attrib_pools;
-    const size_t size = (attrib_size < sizeof (void *))?(sizeof (void *)):(attrib_size);
-    const size_t idx  = size - sizeof (void *);
+    Arenas             * const arenas = interp->arena_base;
+    PMC_Attribute_Pool       **pools  = arenas->attrib_pools;
+    const size_t               size   = (attrib_size < sizeof (void *))
+                                      ? sizeof (void *)
+                                      : attrib_size;
+    const size_t               idx    = size - sizeof (void *);
 
     if (pools == NULL) {
         const size_t total_length = idx + GC_ATTRIB_POOLS_HEADROOM;
