@@ -248,10 +248,10 @@ void Parrot_gc_free_bufferlike_header(PARROT_INTERP,
 
 void Parrot_gc_free_fixed_size_storage(PARROT_INTERP,
     size_t size,
-    ARGMOD(void * data))
+    ARGMOD(void *data))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(* data);
+        FUNC_MODIFIES(*data);
 
 void Parrot_gc_free_pmc_attributes(PARROT_INTERP,
     ARGMOD(PMC *pmc),
