@@ -1304,18 +1304,34 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
 
     if (bucket) {
         if (hash->entry_type == enum_type_PMC && hash->container) {
-            GC_WRITE_BARRIER_KEY(interp, hash->container,
-                    (PMC *)bucket->value, bucket->key, (PMC *)value, key);
+        
+        /*JT: can't get this to work right now ...
+        if (interp->gc_sys->write_barrier_key) {
+            Parrot_gc_write_barrier_key(interp,
+                                              hash->container,
+                                              (PMC *)bucket->value, 
+                                              bucket->key, 
+                                              (PMC *)value, 
+                                              key);
         }
-
+        */
+        }
         bucket->value = value;
     }
     else {
         if (hash->entry_type == enum_type_PMC && hash->container) {
-            GC_WRITE_BARRIER_KEY(interp, hash->container,
-                    NULL, NULL, (PMC *)value, key);
-        }
 
+        /*JT: can't get this to work right now ...
+        if (interp->gc_sys->write_barrier_key){
+            Parrot_gc_write_barrier_key(interp, 
+                                              hash->container,
+                                              NULL, 
+                                              NULL, 
+                                              (PMC *)value, 
+                                              key);
+        }
+        */
+        }
         bucket = hash->free_list;
 
         if (!bucket) {
@@ -1422,8 +1438,9 @@ parrot_hash_clone(PARROT_INTERP, ARGIN(const Hash *hash), ARGOUT(Hash *dest))
                     "hash corruption: type = %d\n", hash->entry_type);
         };
 
-        if (key)
+        if (key){
             parrot_hash_put(interp, dest, key, valtmp);
+        }
     }
 }
 

@@ -1337,8 +1337,11 @@ do_thaw(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc), ARGIN(visit_info *info))
 #endif
         /*
          * that's a duplicate
-         if (info->container)
-         GC_WRITE_BARRIER(interp, info->container, NULL, pmc);
+         if (info->container){
+           if (interp->gc_sys->write_barrier){
+             Parrot_gc_write_barrier(interp, info->container, NULL, pmc);
+           }
+         }
          */
         *info->thaw_ptr = pmc;
         return;
@@ -1357,15 +1360,19 @@ do_thaw(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc), ARGIN(visit_info *info))
         info->thaw_result = pmc;
     else {
         if (info->container) {
-            GC_WRITE_BARRIER(interp, info->container, NULL, pmc);
+            /*JT: not working now ... GMS only anyway            
+            if (interp->gc_sys->write_barrier){
+                Parrot_gc_write_barrier(interp, info->container, NULL, pmc);
+            }
+            */
         }
         *info->thaw_ptr = pmc;
     }
     list_assign(interp, (List *)PMC_data(info->id_list), id, pmc, enum_type_PMC);
+
     /* remember nested aggregates depth first */
     list_unshift(interp, (List *)PMC_data(info->todo), pmc, enum_type_PMC);
 }
-
 
 /*
 

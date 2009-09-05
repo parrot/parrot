@@ -543,7 +543,11 @@ Sets the PMC value of the element at index C<key> to C<*src>.
                 _("FixedPMCArray: index out of bounds!"));
 
         data      = PMC_array(SELF);
-        GC_WRITE_BARRIER(INTERP, SELF, data[key], src);
+        /*JT: not working now ... GMS only anyway
+        if (interp->gc_sys->write_barrier){
+            Parrot_gc_write_barrier(INTERP, SELF, data[key], src);
+        }
+        */
         data[key] = src;
     }
 

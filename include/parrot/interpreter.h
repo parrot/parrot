@@ -212,7 +212,6 @@ typedef struct _context_mem {
     int n_free_slots;               /* amount of allocated */
 } context_mem;
 
-
 struct _handler_node_t; /* forward def - exit.h */
 
 /* The actual interpreter structure */
@@ -221,6 +220,11 @@ struct parrot_interp_t {
 
     struct Arenas *arena_base;                /* Pointer to this interpreter's
                                                * arena */
+
+    struct GC_Subsystem *gc_sys;              /*functions and data specific 
+                                                  to current GC subsystem*/
+
+    PMC *gc_registry;                         /* root set of registered PMCs */
 
     PMC     *class_hash;                      /* Hash of classes */
     VTABLE **vtables;                         /* array of vtable ptrs */
@@ -293,7 +297,6 @@ struct parrot_interp_t {
     /* 8:   PMC *PBC_Libs                Hash of load_bytecode cde */
     /* 9:   PMC *Executable              String PMC with name from argv[0]. */
 
-    PMC *gc_registry;                         /* root set of registered PMCs */
 
     PMC *HLL_info;                            /* HLL names and types */
     PMC *HLL_namespace;                       /* cache of HLL toplevel ns */
@@ -324,7 +327,6 @@ struct parrot_interp_t {
 
     UINTVAL recursion_limit;                  /* Sub call resursion limit */
 
-    UINTVAL gc_generation;                    /* GC generation number */
 
     opcode_t *current_args;                   /* ptr into code w/ set_args op */
     opcode_t *current_params;                 /* ... w/ get_params op */

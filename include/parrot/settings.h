@@ -44,7 +44,7 @@
  * Please note that only 0 and 3 currently work (and INF doesn't really
  * "work").
  */
-
+#define PARROT_GC_DEFAULT_TYPE MS
 #define PARROT_GC_SUBSYSTEM 0
 
 #if PARROT_GC_SUBSYSTEM == 0

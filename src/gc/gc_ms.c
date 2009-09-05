@@ -128,6 +128,7 @@ Parrot_gc_ms_init(PARROT_INTERP)
     arena_base->do_gc_mark         = gc_ms_mark_and_sweep;
     arena_base->finalize_gc_system = NULL;
     arena_base->init_pool          = gc_ms_pool_init;
+
 }
 
 /*

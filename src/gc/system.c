@@ -489,7 +489,7 @@ is_buffer_ptr(PARROT_INTERP, ARGIN(const void *ptr))
 
     for (i = 0; i < arena_base->num_sized; i++) {
         if (arena_base->sized_header_pools[i]
-        &&  contained_in_pool(arena_base->sized_header_pools[i], ptr))
+            &&  contained_in_pool(interp, arena_base->sized_header_pools[i], ptr))
             return 1;
     }
 
@@ -512,7 +512,7 @@ static int
 is_pmc_ptr(PARROT_INTERP, ARGIN(const void *ptr))
 {
     ASSERT_ARGS(is_pmc_ptr)
-    return contained_in_pool(interp->arena_base->pmc_pool, ptr);
+        return contained_in_pool(interp, interp->arena_base->pmc_pool, ptr);
 }
 
 

@@ -352,8 +352,8 @@ next:
 
 /*
 
-=item C<INTVAL contained_in_pool(const Small_Object_Pool *pool, const void
-*ptr)>
+=item C<INTVAL contained_in_pool(PARROT_INTERP, const Small_Object_Pool *pool,
+const void *ptr)>
 
 Returns whether the given C<*ptr> points to a location in C<pool>.
 
@@ -363,13 +363,14 @@ Returns whether the given C<*ptr> points to a location in C<pool>.
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-contained_in_pool(ARGIN(const Small_Object_Pool *pool), ARGIN(const void *ptr))
+contained_in_pool(PARROT_INTERP, ARGIN(const Small_Object_Pool *pool), ARGIN(const void *ptr))
 {
     ASSERT_ARGS(contained_in_pool)
     const Small_Object_Arena *arena;
 
-    ptr = PObj_to_ARENA(ptr);
-
+    if (interp->gc_sys->PObj_to_Arena){
+        ptr = interp->gc_sys->PObj_to_Arena(ptr);
+    }
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
         const ptrdiff_t ptr_diff =
             (ptrdiff_t)ptr - (ptrdiff_t)arena->start_objects;

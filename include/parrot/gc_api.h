@@ -89,20 +89,6 @@ typedef void * (*get_free_object_fn_type)(PARROT_INTERP, struct Small_Object_Poo
 typedef void (*alloc_objects_fn_type)(PARROT_INTERP, struct Small_Object_Pool *);
 typedef void (*gc_object_fn_type)(PARROT_INTERP, struct Small_Object_Pool *, PObj *);
 
-/*
- * macros used in arena scan code to convert from object pointers
- * to arena pointers ...
- */
-
-#if PARROT_GC_GMS
-#  define GC_HEADER_SIZE (sizeof (Gc_gms_hdr))
-#  define PObj_to_ARENA(o) PObj_to_GMSH(o)
-#  define ARENA_to_PObj(p) GMSH_to_PObj((Gc_gms_hdr*)(p))
-#else
-#  define GC_HEADER_SIZE 0
-#  define PObj_to_ARENA(o) (o)
-#  define ARENA_to_PObj(p) (p)
-#endif
 
 /* &gen_from_enum(interpinfo.pasm) prefix(INTERPINFO_) */
 
@@ -357,6 +343,17 @@ int Parrot_gc_total_pmcs(PARROT_INTERP)
 int Parrot_gc_total_sized_buffers(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+void  Parrot_gc_write_barrier(PARROT_INTERP, PMC *agg, PMC *old, PMC *new)
+        __attribute__nonnull__(1);
+
+void  Parrot_gc_write_barrier_key(PARROT_INTERP,
+    PMC *agg,
+    PMC *old,
+    PObj *old_key,
+    PMC *_new,
+    PObj *new_key)
+        __attribute__nonnull__(1);
+
 #define ASSERT_ARGS_Parrot_block_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_block_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -489,45 +486,14 @@ int Parrot_gc_total_sized_buffers(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_total_sized_buffers __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_gc_write_barrier __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_gc_write_barrier_key __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/api.c */
 
 void Parrot_gc_inf_init(PARROT_INTERP);
-
-/* write barrier */
-#if PARROT_GC_MS
-#  define GC_WRITE_BARRIER(interp, agg, old, _new) do { } while (0)
-#  define GC_WRITE_BARRIER_KEY(interp, agg, old, old_key, _new, new_key) do { } while (0)
-#endif
-
-#if PARROT_GC_GMS
-#  define GC_WRITE_BARRIER(interp, agg, old, _new) do { \
-    UINTVAL gen_agg, gen_new; \
-    if (!(_new) || PMC_IS_NULL(_new)) \
-        break; \
-    gen_agg = PObj_to_GMSH(agg)->gen->gen_no; \
-    gen_new = PObj_to_GMSH(_new)->gen->gen_no; \
-    if (gen_agg < gen_new) \
-        parrot_gc_gms_wb((interp), (agg), (old), (_new)); \
-} while (0)
-
-#  define GC_WRITE_BARRIER_KEY(interp, agg, old, old_key, _new, new_key) do { \
-    UINTVAL gen_agg, gen_new, gen_key; \
-    if (!(_new) || PMC_IS_NULL(_new)) \
-        break; \
-    gen_agg = PObj_to_GMSH(agg)->gen->gen_no; \
-    gen_new = PObj_to_GMSH(_new)->gen->gen_no; \
-    gen_key = PObj_to_GMSH(new_key)->gen->gen_no; \
-    if (gen_agg < gen_new || gen_agg < gen_key) \
-        parrot_gc_gms_wb_key((interp), (agg), (old), (old_key), (_new), (new_key)); \
-} while (0)
-
-#endif
-
-#if PARROT_GC_INF
-#  define GC_WRITE_BARRIER(interp, agg, old, _new) do { } while (0)
-#  define GC_WRITE_BARRIER_KEY(interp, agg, old, old_key, _new, new_key) do { } while (0)
-#endif
 
 #endif /* PARROT_GC_API_H_GUARD */
 
