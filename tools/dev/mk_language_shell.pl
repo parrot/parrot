@@ -298,7 +298,8 @@ VERSION_DIR   := @versiondir@
 INCLUDE_DIR   := @includedir@$(VERSION_DIR)
 LIB_DIR       := @libdir@$(VERSION_DIR)
 STAGING_DIR   := ../../dynext
-INSTALL_DIR   := $(LIB_DIR)/languages/@lclang@/dynext
+#INSTALL_DIR   := $(LIB_DIR)/languages/@lclang@/dynext
+INSTALL_DIR   := $(LIB_DIR)/dynext
 
 # Set up extensions
 LOAD_EXT      := @load_ext@
@@ -390,7 +391,8 @@ LIB_DIR       := @libdir@$(VERSION_DIR)
 SRC_DIR       := @srcdir@$(VERSION_DIR)
 TOOLS_DIR     := @libdir@$(VERSION_DIR)/tools/lib
 STAGING_DIR   := ../../dynext
-INSTALL_DIR   := $(LIB_DIR)/languages/@lclang@/dynext
+#INSTALL_DIR   := $(LIB_DIR)/languages/@lclang@/dynext
+INSTALL_DIR   := $(LIB_DIR)/dynext
 
 # Set up extensions
 LOAD_EXT      := @load_ext@
