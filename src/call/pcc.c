@@ -552,7 +552,7 @@ Parrot_init_arg_indexes_and_sig_pmc(PARROT_INTERP, ARGIN(PMC *ctx),
         ARGMOD(call_state_item *sti))
 {
     ASSERT_ARGS(Parrot_init_arg_indexes_and_sig_pmc)
-    if (!sig_pmc && indexes) {
+    if (PMC_IS_NULL(sig_pmc) && indexes) {
         ++indexes;
         sig_pmc = Parrot_pcc_get_pmc_constant(interp, ctx, *indexes);
         ASSERT_SIG_PMC(sig_pmc);
