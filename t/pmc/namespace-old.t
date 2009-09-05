@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 56;
+use Parrot::Test tests => 51;
 use Parrot::Config;
 
 =head1 NAME
@@ -23,93 +23,7 @@ Test the NameSpace PMC as described in PDD21.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUTPUT', "get_global Foo::Bar::baz hash 2" );
-.sub 'main' :main
-    $P0 = get_global "Foo"
-    $P1 = $P0["Bar" ; "baz"]
-    print "ok\n"
-    $P1()
-.end
-
-.namespace ["Foo"; "Bar"]
-.sub 'baz'
-    print "baz\n"
-.end
-CODE
-ok
-baz
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "get_global Foo::Bar::baz alias" );
-.sub 'main' :main
-    $P0 = get_global "Foo"
-    $P1 = $P0["Bar"]
-    set_global "TopBar", $P1
-    $P2 = get_global ["TopBar"], "baz"
-    print "ok\n"
-    $P2()
-.end
-
-.namespace ["Foo"; "Bar"]
-.sub 'baz'
-    print "baz\n"
-.end
-CODE
-ok
-baz
-OUTPUT
-
-pir_error_output_like( <<'CODE', <<'OUTPUT', "func() namespace resolution" );
-.sub 'main' :main
-    print "calling foo\n"
-    foo()
-    print "calling Foo::foo\n"
-    $P0 = get_global ["Foo"], "foo"
-    $P0()
-    print "calling baz\n"
-    baz()
-.end
-
-.sub 'foo'
-    print "  foo\n"
-    bar()
-.end
-
-.sub 'bar'
-    print "  bar\n"
-.end
-
-.sub 'fie'
-    print "  fie\n"
-.end
-
-.namespace ["Foo"]
-
-.sub 'foo'
-    print "  Foo::foo\n"
-    bar()
-    fie()
-.end
-
-.sub 'bar'
-    print "  Foo::bar\n"
-.end
-
-.sub 'baz'
-    print "  Foo::baz\n"
-.end
-CODE
-/calling foo
-  foo
-  bar
-calling Foo::foo
-  Foo::foo
-  Foo::bar
-  fie
-calling baz
-Could not find non-existent sub baz/
-OUTPUT
-
+# How do we convert this to PIR?
 pir_output_is( <<'CODE', <<'OUTPUT', 'get namespace of :anon .sub' );
 .namespace ['lib']
 .sub main :main :anon
@@ -123,55 +37,7 @@ CODE
 parrot::lib
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "get namespace in Foo::bar" );
-.sub 'main' :main
-    $P0 = get_global ["Foo"], "bar"
-    print "ok\n"
-    $P0()
-.end
-
-.namespace ["Foo"]
-.sub 'bar'
-    print "bar\n"
-    .include "interpinfo.pasm"
-    $P0 = interpinfo .INTERPINFO_CURRENT_SUB
-    $P1 = $P0."get_namespace"()
-    print $P1
-    print "\n"
-.end
-CODE
-ok
-bar
-Foo
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "get namespace in Foo::Bar::baz" );
-.sub 'main' :main
-    $P0 = get_global "Foo"
-    $P1 = $P0["Bar"]
-    $P2 = $P1["baz"]
-    print "ok\n"
-    $P2()
-.end
-
-.namespace ["Foo" ; "Bar"]
-.sub 'baz'
-    print "baz\n"
-    .include "interpinfo.pasm"
-    .include "pmctypes.pasm"
-    $P0 = interpinfo .INTERPINFO_CURRENT_SUB
-    $P1 = $P0."get_namespace"()
-    $P2 = $P1.'get_name'()
-    $S0 = join '::', $P2
-    print $S0
-    print "\n"
-.end
-CODE
-ok
-baz
-parrot::Foo::Bar
-OUTPUT
-
+# How do we convert this to PIR?
 pir_output_is( <<'CODE', <<'OUTPUT', "segv in get_name" );
 .namespace ['pugs';'main']
 .sub 'main' :main
