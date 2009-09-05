@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 50;
+use Parrot::Test tests => 45;
 use Parrot::Config;
 
 =head1 NAME
@@ -67,119 +67,6 @@ pir_output_is( <<'CODE', <<'OUT', "unicode namespace, global" );
 CODE
 unicode namespaces are fun
 OUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "verify root and parrot namespaces" );
-# name may change though
-.sub main :main
-    # root namespace
-    $P0 = get_root_namespace
-    typeof $S0, $P0
-    print $S0
-    print "\n"
-    print $P0
-    print "\n"
-    # parrot namespace
-    $P1 = $P0["parrot"]
-    print $P1
-    print "\n"
-    typeof $S0, $P1
-    print $S0
-    print "\n"
-.end
-CODE
-NameSpace
-
-parrot
-NameSpace
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "ns.name()" );
-.sub main :main
-    .include "interpinfo.pasm"
-    $P0 = get_root_namespace
-    $P1 = $P0["parrot"]
-    $P3 = new ['NameSpace']
-    $P1["Foo"] = $P3
-    $P2 = $P3.'get_name'()
-    $I2 = elements $P2
-    print $I2
-    print "\n"
-    $S0 = join '::', $P2
-    print $S0
-    print "\n"
-.end
-CODE
-2
-parrot::Foo
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "get_namespace_p_p, getnamespace_p_kc" );
-.sub main :main
-    .include "interpinfo.pasm"
-    $P3 = new ['NameSpace']
-    set_hll_global "Foo", $P3
-    # fetch w array
-    $P4 = new ['FixedStringArray']
-    $P4 = 1
-    $P4[0] = 'Foo'
-    $P0 = get_hll_namespace $P4
-    $P2 = $P0.'get_name'()
-    $I2 = elements $P2
-    print $I2
-    print "\n"
-    $S0 = join '::', $P2
-    print $S0
-    print "\n"
-    # fetch w key
-    $P2 = get_hll_namespace ["Foo"]
-    $P2 = $P2.'get_name'()
-    $I2 = elements $P2
-    print $I2
-    print "\n"
-    $S0 = join '::', $P2
-    print $S0
-    print "\n"
-.end
-CODE
-2
-parrot::Foo
-2
-parrot::Foo
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "Sub.get_namespace, get_namespace" );
-.sub 'main' :main
-    $P0 = get_global ["Foo"], "bar"
-    print "ok\n"
-    $P1 = $P0."get_namespace"()
-    $P2 = $P1.'get_name'()
-    $S0 = join '::', $P2
-    print $S0
-    print "\n"
-    $P0()
-.end
-
-.namespace ["Foo"]
-.sub 'bar'
-    $P1 = get_namespace
-    print $P1
-    print "\n"
-.end
-CODE
-ok
-parrot::Foo
-Foo
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "check parrot ns" );
-.sub 'main' :main
-    $P0 = get_global ["String"], "lower"
-    $S0 = $P0("OK\n")
-    print $S0
-.end
-CODE
-ok
-OUTPUT
 
 my $temp_a = "temp_a";
 my $temp_b = "temp_b";

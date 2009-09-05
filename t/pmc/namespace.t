@@ -20,7 +20,7 @@ Tests the NameSpace PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(23)
+    plan(30)
 
     create_namespace_pmc()
     verify_namespace_type()
@@ -28,6 +28,8 @@ Tests the NameSpace PMC.
     get_sub_from_namespace_hash()
     access_sub_in_namespace()
     get_namespace_from_sub()
+    build_namespaces_at_runtime()
+    hll_namespaces()
 .end
 
 # L<PDD21/Namespace PMC API/=head4 Untyped Interface>
@@ -46,6 +48,20 @@ Tests the NameSpace PMC.
     $P0 = get_global "Foo"
     typeof $S0, $P0
     is($S0, "NameSpace", "A NameSpace is a NameSpace")
+
+    # root namespace
+    $P0 = get_root_namespace
+    typeof $S0, $P0
+    is($S0, "NameSpace", "Root NameSpace is a NameSpace")
+
+    # parrot namespace
+    $P1 = $P0["parrot"]
+    typeof $S0, $P1
+    is($S0, "NameSpace", "::parrot NameSpace is a NameSpace")
+
+    $P0 = get_namespace
+    typeof $S0, $P1
+    is($S0, "NameSpace", "Current NameSpace is a NameSpace")
 .end
 
 # L<PDD21//>
@@ -114,9 +130,21 @@ Tests the NameSpace PMC.
     $P0 = get_global [ "Foo";iso-8859-1:"François" ], "baz"
     $S0 = $P0()
     is($S0, iso-8859-1:"Foo::François", "Found sub in nested ISO-8859 NameSpace")
-    goto _end
+    goto test8
   eh7:
     ok(0, "Cannot find sub in ISO-8859 NameSpace")
+
+  test8:
+# TODO: This should probably be possible. We should be able to look up a
+#       string if it is iso-8895-1 and we are Unicode
+#    push_eh eh8
+#    $P0 = get_global [ unicode:"François" ], "baz"
+#    $S0 = $P0()
+#    say $S0
+#    is($S0, iso-8859-1:"François", "ISO-8859 NameSpace with Unicode name")
+#    goto _end
+#  eh8:
+#    ok(0, "Cannot find ISO-8859 NameSpace using Unicode name")
 
   _end:
 .end
@@ -206,6 +234,38 @@ Tests the NameSpace PMC.
     is($S0, "Sub", "Get the current sub from namespace from current sub")
 .end
 
+.sub 'build_namespaces_at_runtime'
+    $P0 = get_root_namespace
+    $P1 = $P0["parrot"]
+    $P3 = new ['NameSpace']
+    $P1["Temp1"] = $P3
+    $P2 = $P3.'get_name'()
+    $S0 = join '::', $P2
+    is($S0, "parrot::Temp1", "Add a NameSpace with a given name")
+.end
+
+.sub 'hll_namespaces'
+    # Fetch HLL Global using an RSA. Current HLL == parrot
+    $P4 = new ['FixedStringArray']
+    $P4 = 1
+    $P4[0] = 'Foo'
+    $P0 = get_hll_namespace $P4
+    $P2 = $P0.'get_name'()
+    $S0 = join '::', $P2
+    is($S0, "parrot::Foo", "get_hll_namespace_p")
+
+    # Get an HLL namespace using a key. Current HLL == parrot
+    $P2 = get_hll_namespace ["Foo"]
+    $P2 = $P2.'get_name'()
+    $S0 = join '::', $P2
+    is($S0, "parrot::Foo", "get_hll_namespace_kc")
+
+    # Get a sub from an HLL Namespace using a key. Current HLL == parrot
+    $P0 = get_hll_namespace ["Foo"]
+    $P1 = $P0["baz"]
+    $S0 = $P1()
+    is($S0, "Foo", "get a Sub from a HLL namespace")
+.end
 
 ##### TEST NAMESPACES AND FUNCTIONS #####
 # These functions and namespaces are used for the tests above
