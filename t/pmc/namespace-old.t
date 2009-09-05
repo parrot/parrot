@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 68;
+use Parrot::Test tests => 67;
 use Parrot::Config;
 
 =head1 NAME
@@ -22,16 +22,6 @@ t/pmc/namespace.t - test the NameSpace PMC as described in PDD 21.
 Test the NameSpace PMC as described in PDD21.
 
 =cut
-
-# L<PDD21/Namespace PMC API/>
-pir_output_is( <<'CODE', <<'OUT', 'new' );
-.sub 'test' :main
-    new $P0, ['NameSpace']
-    say "ok 1 - $P0 = new ['NameSpace']"
-.end
-CODE
-ok 1 - $P0 = new ['NameSpace']
-OUT
 
 # L<PDD21/Namespace PMC API/=head4 Untyped Interface>
 pir_output_is( <<'CODE', <<'OUT', 'NameSpace does "hash"' );
