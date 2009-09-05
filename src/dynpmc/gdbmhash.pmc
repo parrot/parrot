@@ -250,11 +250,12 @@ Returns the string value for the element at C<*key>.
 
         keystr         = make_hash_key(interp, key);
 
-        key_gdbm.dsize = keystr->strlen;
-        key_gdbm.dptr  = keystr->strstart;
+        key_gdbm.dptr  = Parrot_str_to_cstring(interp, keystr);
+        key_gdbm.dsize = strlen(key_gdbm.dptr);
         val_gdbm       = gdbm_fetch(dbf, key_gdbm);
 
         val = Parrot_str_new(interp, val_gdbm.dptr, val_gdbm.dsize);
+        Parrot_str_free_cstring(key_gdbm.dptr);
         free(val_gdbm.dptr);
 
         return val;
