@@ -318,7 +318,7 @@ Invokes the subroutine.
             VTABLE_set_pointer(INTERP, Parrot_pcc_get_lex_pad(interp, context), context);
         }
 
-        if (sub->outer_ctx) {
+        if (!PMC_IS_NULL(sub->outer_ctx)) {
             /* set outer context */
             Parrot_pcc_set_outer_ctx(interp, context, sub->outer_ctx);
         }
@@ -339,7 +339,7 @@ Invokes the subroutine.
 
                 PMC_get_sub(INTERP, outer_pmc, outer_sub);
 
-                if (!outer_sub->ctx) {
+                if (PMC_IS_NULL(outer_sub->ctx)) {
                     PMC * const dummy = Parrot_alloc_context(INTERP,
                                                 outer_sub->n_regs_used, NULL);
                     Parrot_pcc_set_sub(interp, dummy, outer_pmc);
