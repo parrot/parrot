@@ -337,6 +337,14 @@ Tests the NameSpace PMC.
     is($S0, "Sub", "find_var also finds subs")
     $S0 = $P1()
     is($S0, "", "find_var finds the correct sub")
+
+    # Test del_namespace. Test that it deletes an existing namespace, and that
+    # it won't delete something that isn't a namespace
+
+    # Test del_sub. Test that it deletes an existing sub and that it
+    # won't delete something that isn't a sub
+
+    # Test del_var. It will delete any type of thing
 .end
 
 ##### TEST NAMESPACES AND FUNCTIONS #####
