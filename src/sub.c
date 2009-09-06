@@ -99,7 +99,6 @@ invalidate_retc_context(PARROT_INTERP, ARGMOD(PMC *cont))
         ctx  = Parrot_pcc_get_caller_ctx(interp, ctx);
         cont = Parrot_pcc_get_continuation(interp, ctx);
     }
-
 }
 
 /*
@@ -186,7 +185,7 @@ Used by Parrot_Context_infostr.
 PARROT_EXPORT
 int
 Parrot_Context_get_info(PARROT_INTERP, ARGIN(PMC *ctx),
-                    ARGOUT(Parrot_Context_info *info))
+    ARGOUT(Parrot_Context_info *info))
 {
     ASSERT_ARGS(Parrot_Context_get_info)
     Parrot_Sub_attributes *sub;
@@ -450,7 +449,7 @@ PMC*
 parrot_new_closure(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 {
     ASSERT_ARGS(parrot_new_closure)
-    PMC        * const clos_pmc = VTABLE_clone(interp, sub_pmc);
+    PMC * const clos_pmc = VTABLE_clone(interp, sub_pmc);
     Parrot_capture_lex(interp, clos_pmc);
     return clos_pmc;
 }
@@ -470,15 +469,11 @@ void
 Parrot_continuation_check(PARROT_INTERP, ARGIN(const PMC *pmc))
 {
     ASSERT_ARGS(Parrot_continuation_check)
-
-    PMC *to_ctx       = PARROT_CONTINUATION(pmc)->to_ctx;
-    PMC *from_ctx     = CURRENT_CONTEXT(interp);
-
+    PMC * const to_ctx       = PARROT_CONTINUATION(pmc)->to_ctx;
     if (PMC_IS_NULL(to_ctx))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                        "Continuation invoked after deactivation.");
 }
-
 
 /*
 
@@ -527,8 +522,7 @@ PARROT_CANNOT_RETURN_NULL
 void *
 Parrot_get_sub_pmc_from_subclass(PARROT_INTERP, ARGIN(PMC *subclass)) {
     ASSERT_ARGS(Parrot_get_sub_pmc_from_subclass)
-    PMC        *key, *sub_pmc;
-    Parrot_Sub_attributes *sub;
+    PMC *key, *sub_pmc;
 
     /* Ensure we really do have a subclass of sub. */
     if (VTABLE_isa(interp, subclass, CONST_STRING(interp, "Sub"))) {
