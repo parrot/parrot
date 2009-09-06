@@ -75,9 +75,10 @@ Transfers control to the calling context and frees the current context.
 */
 
     VTABLE opcode_t *invoke(void *in_next) {
-        PMC               *from_ctx   = PARROT_CONTINUATION(SELF)->from_ctx;
-        PackFile_ByteCode * const seg = PARROT_CONTINUATION(SELF)->seg;
-        opcode_t          *next       = PARROT_CONTINUATION(SELF)->address;
+        Parrot_Continuation_attributes *data = PARROT_CONTINUATION(SELF);
+        PMC               *from_ctx   = data->from_ctx;
+        PackFile_ByteCode * const seg = data->seg;
+        opcode_t          *next       = data->address;
         UNUSED(in_next)
 
         Parrot_continuation_check(interp, SELF);
@@ -86,7 +87,7 @@ Transfers control to the calling context and frees the current context.
         /* the continuation is dead - delete and destroy it */
         /* This line causes a failure in t/pmc/packfiledirectory.t. No idea
            what the relationship is between this line of code and that test
-           failure. Will look into it later */
+           failure. */
         /* Parrot_gc_free_pmc_header(interp, SELF); */
 
         if (INTERP->code != seg)
