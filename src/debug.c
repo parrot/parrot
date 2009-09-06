@@ -117,6 +117,11 @@ PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const char * nextarg(ARGIN_NULLOK(const char *command));
 
+static void no_such_register(PARROT_INTERP,
+    char register_type,
+    UINTVAL register_num)
+        __attribute__nonnull__(1);
+
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const char * parse_int(ARGIN(const char *str), ARGOUT(int *intP))
@@ -178,6 +183,8 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
 #define ASSERT_ARGS_list_breakpoints __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pdb)
 #define ASSERT_ARGS_nextarg __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_no_such_register __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_parse_int __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(str) \
     || PARROT_ASSERT_ARG(intP)
@@ -207,7 +214,7 @@ static int nomoreargs(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
     if (*skip_whitespace(cmd) == '\0')
         return 1;
     else {
-        Parrot_eprintf(pdb->debugger, "Spurious arg\n");
+        Parrot_io_eprintf(pdb->debugger, "Spurious arg\n");
         return 0;
     }
 }
@@ -1239,7 +1246,7 @@ PDB_get_command(PARROT_INTERP)
        } while (*ptr == '\0' || *ptr == '#');
 
         if (pdb->state & PDB_ECHO)
-            Parrot_eprintf(pdb->debugger, "[%lu %s]\n", pdb->script_line, buf);
+            Parrot_io_eprintf(pdb->debugger, "[%lu %s]\n", pdb->script_line, buf);
 
 #if TRACE_DEBUGGER
         fprintf(stderr, "(script) %s\n", buf);
@@ -1436,7 +1443,7 @@ PDB_next(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 
     new_runloop_jump_point(debugee);
     if (setjmp(debugee->current_runloop->resume)) {
-        Parrot_eprintf(pdb->debugger, "Unhandled exception while tracing\n");
+        Parrot_io_eprintf(pdb->debugger, "Unhandled exception while tracing\n");
         pdb->state |= PDB_STOPPED;
         return;
     }
@@ -1482,7 +1489,7 @@ PDB_trace(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     /* execute n ops */
     new_runloop_jump_point(debugee);
     if (setjmp(debugee->current_runloop->resume)) {
-        Parrot_eprintf(pdb->debugger, "Unhandled exception while tracing\n");
+        Parrot_io_eprintf(pdb->debugger, "Unhandled exception while tracing\n");
         pdb->state |= PDB_STOPPED;
         return;
     }
@@ -1960,7 +1967,7 @@ PDB_continue(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     pdb->debugee->run_core = PARROT_DEBUGGER_CORE;
     new_internal_exception(pdb->debugee);
     if (setjmp(pdb->debugee->exceptions->destination)) {
-        Parrot_eprintf(pdb->debugee, "Unhandled exception while debugging: %Ss\n",
+        Parrot_io_eprintf(pdb->debugee, "Unhandled exception while debugging: %Ss\n",
             pdb->debugee->exceptions->msg);
         pdb->state |= PDB_STOPPED;
         return;
@@ -3183,6 +3190,26 @@ PDB_hasinstruction(ARGIN(const char *c))
 
 /*
 
+=item C<static void no_such_register(PARROT_INTERP, char register_type, UINTVAL
+register_num)>
+
+Auxiliar error message function.
+
+=cut
+
+*/
+
+static void
+no_such_register(PARROT_INTERP, char register_type, UINTVAL register_num)
+{
+    ASSERT_ARGS(no_such_register)
+
+    Parrot_io_eprintf(interp, "%c%u = no such register\n",
+        register_type, register_num);
+}
+
+/*
+
 =item C<void PDB_assign(PARROT_INTERP, const char *command)>
 
 Assign to registers.
@@ -3195,58 +3222,59 @@ void
 PDB_assign(PARROT_INTERP, ARGIN(const char *command))
 {
     ASSERT_ARGS(PDB_assign)
-    unsigned long register_num;
-    char reg_type;
-    char *string;
-    int t;
+    UINTVAL register_num;
+    char reg_type_id;
+    int reg_type;
+    PDB_t *pdb       = interp->pdb;
+    Interp *debugger = pdb ? pdb->debugger : interp;
+    Interp *debugee  = pdb ? pdb->debugee : interp;
 
     /* smallest valid commad length is 4, i.e. "I0 1" */
     if (strlen(command) < 4) {
-        fprintf(stderr, "Must give a register number and value to assign\n");
+        Parrot_io_eprintf(debugger, "Must give a register number and value to assign\n");
         return;
     }
-    reg_type = (char) command[0];
+    reg_type_id = (char) command[0];
     command++;
-    register_num   = get_ulong(&command, 0);
+    register_num = get_ulong(&command, 0);
 
-    switch (reg_type) {
+    switch (reg_type_id) {
         case 'I':
-                if (register_num >= Parrot_pcc_get_regs_used(interp,
-                                            CURRENT_CONTEXT(interp), REGNO_INT)) {
-                    fprintf(stderr, "I%ld = no such register\n", register_num);
-                    return;
-                }
-                t                  = REGNO_INT;
-                IREG(register_num) = get_ulong(&command, 0);
-                break;
+            reg_type = REGNO_INT;
+            break;
         case 'N':
-                if (register_num >= Parrot_pcc_get_regs_used(interp,
-                                            CURRENT_CONTEXT(interp), REGNO_NUM)) {
-                    fprintf(stderr, "N%ld = no such register\n", register_num);
-                    return;
-                }
-                t                  = REGNO_NUM;
-                NREG(register_num) = atof(command);
-                break;
+            reg_type = REGNO_NUM;
+            break;
         case 'S':
-                if (register_num >= Parrot_pcc_get_regs_used(interp,
-                                            CURRENT_CONTEXT(interp), REGNO_NUM)) {
-                    fprintf(stderr, "S%ld = no such register\n", register_num);
-                    return;
-                }
-                t                  = REGNO_STR;
-                SREG(register_num) = Parrot_str_new(interp, command, strlen(command));
-                break;
+            reg_type = REGNO_STR;
+            break;
         case 'P':
-                t = REGNO_PMC;
-                fprintf(stderr, "Assigning to PMCs is not currently supported\n");
-                return;
+            reg_type = REGNO_PMC;
+            Parrot_io_eprintf(debugger, "Assigning to PMCs is not currently supported\n");
+            return;
         default:
-            fprintf(stderr, "Invalid register type %c\n", reg_type);
+            Parrot_io_eprintf(debugger, "Invalid register type %c\n", reg_type_id);
             return;
     }
-    Parrot_io_eprintf(interp, "\n  %c%u = ", reg_type, register_num);
-    Parrot_io_eprintf(interp, "%s\n", GDB_print_reg(interp, t, register_num));
+    if (register_num >= Parrot_pcc_get_regs_used(debugee,
+                                CURRENT_CONTEXT(debugee), reg_type)) {
+        no_such_register(debugger, reg_type_id, register_num);
+        return;
+    }
+    switch (reg_type) {
+        case REGNO_INT:
+            IREG(register_num) = get_ulong(&command, 0);
+            break;
+        case REGNO_NUM:
+            NREG(register_num) = atof(command);
+            break;
+        case REGNO_STR:
+            SREG(register_num) = Parrot_str_new(debugee, command, strlen(command));
+            break;
+        default: ; /* Must never come here */
+    }
+    Parrot_io_eprintf(debugger, "\n  %c%u = ", reg_type_id, register_num);
+    Parrot_io_eprintf(debugger, "%s\n", GDB_print_reg(debugee, reg_type, register_num));
 }
 
 /*
@@ -3338,7 +3366,7 @@ PDB_eval(PARROT_INTERP, ARGIN(const char *command))
         interp->pdb->debugger : interp;
     TRACEDEB_MSG("PDB_eval");
     UNUSED(command);
-    Parrot_eprintf(warninterp, "The eval command is currently unimplemeneted\n");
+    Parrot_io_eprintf(warninterp, "The eval command is currently unimplemeneted\n");
 }
 
 /*
