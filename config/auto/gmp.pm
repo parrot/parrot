@@ -76,6 +76,7 @@ sub runstep {
     if ($has_gmp) {
         $conf->data->add( ' ', libs => $extra_libs );
     }
+    $self->set_result($has_gmp ? 'yes' : 'no');
 
     return 1;
 }

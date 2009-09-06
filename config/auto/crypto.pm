@@ -65,6 +65,7 @@ sub runstep {
         $has_crypto = $self->_evaluate_cc_run($conf, $test, $has_crypto, $verbose);
     }
     $conf->data->set( has_crypto => $has_crypto );    # for dynpmc.in & digest.t
+    $self->set_result($has_crypto ? 'yes' : 'no');
 
     return 1;
 }
