@@ -294,6 +294,25 @@ Parrot_pop_context(PARROT_INTERP)
     CURRENT_CONTEXT(interp) = old;
 }
 
+/*
+
+=item C<size_t Parrot_pcc_calculate_context_size(PARROT_INTERP, const UINTVAL
+*number_regs_used)>
+
+Calculate size of Context.
+
+=cut
+
+*/
+size_t
+Parrot_pcc_calculate_context_size(SHIM_INTERP, ARGIN(const UINTVAL *number_regs_used))
+{
+    return ALIGNED_CTX_SIZE + ROUND_ALLOC_SIZE(
+            sizeof (INTVAL)   * number_regs_used[REGNO_INT] +
+            sizeof (FLOATVAL) * number_regs_used[REGNO_NUM] +
+            sizeof (STRING *) * number_regs_used[REGNO_STR] +
+            sizeof (PMC *)    * number_regs_used[REGNO_PMC]);
+}
 
 /*
 
@@ -330,7 +349,12 @@ Parrot_alloc_context(PARROT_INTERP, ARGIN(const INTVAL *number_regs_used),
     const size_t reg_alloc     = ROUND_ALLOC_SIZE(all_regs_size);
 
     const size_t to_alloc = reg_alloc + ALIGNED_CTX_SIZE;
-    ctx                   = (Parrot_Context *)mem_sys_allocate(to_alloc);
+
+#ifdef GC_USE_FIXED_SIZE_ALLOCATOR
+    ctx  = (Parrot_Context *)Parrot_gc_allocate_fixed_size_storage(interp, to_alloc);
+#else
+    ctx  = (Parrot_Context *)mem_sys_allocate(to_alloc);
+#endif
 
     ctx->n_regs_used[REGNO_INT] = number_regs_used[REGNO_INT];
     ctx->n_regs_used[REGNO_NUM] = number_regs_used[REGNO_NUM];

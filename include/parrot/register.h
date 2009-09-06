@@ -171,6 +171,10 @@ PMC * Parrot_alloc_context(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+size_t Parrot_pcc_calculate_context_size(SHIM_INTERP,
+    ARGIN(const UINTVAL *number_regs_used))
+        __attribute__nonnull__(2);
+
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_set_new_context(PARROT_INTERP,
@@ -228,6 +232,9 @@ PMC * Parrot_set_new_context(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_alloc_context __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(number_regs_used)
+#define ASSERT_ARGS_Parrot_pcc_calculate_context_size \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(number_regs_used)
 #define ASSERT_ARGS_Parrot_set_new_context __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(number_regs_used)
