@@ -27,7 +27,7 @@ struct Parrot_Context {
     Regs_ps  bp_ps;           /* pointers to PMC & STR */
 
     /* end common header */
-    INTVAL   n_regs_used[4];   /* INSP in PBC points to Sub */
+    UINTVAL  n_regs_used[4];   /* INSP in PBC points to Sub */
     PMC      *lex_pad;         /* LexPad PMC */
     PMC      *outer_ctx;       /* outer context, if a closure */
 

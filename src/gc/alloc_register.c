@@ -156,7 +156,7 @@ static void
 clear_regs(PARROT_INTERP, ARGMOD(PMC *pmcctx))
 {
     ASSERT_ARGS(clear_regs)
-    int i;
+    UINTVAL i;
     Parrot_Context *ctx = Parrot_pcc_get_context_struct(interp, pmcctx);
 
     /* NULL out registers - P/S have to be NULL for GC
@@ -405,7 +405,7 @@ void
 Parrot_clear_i(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_clear_i)
-    int i;
+    UINTVAL i;
     for (i = 0; i < Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_INT); ++i)
         REG_INT(interp, i) = 0;
 }
@@ -426,7 +426,7 @@ void
 Parrot_clear_s(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_clear_s)
-    int i;
+    UINTVAL i;
     for (i = 0; i < Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_STR); ++i)
         REG_STR(interp, i) = NULL;
 }
@@ -447,7 +447,7 @@ void
 Parrot_clear_p(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_clear_p)
-    int i;
+    UINTVAL i;
     for (i = 0; i < Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_PMC); ++i)
         REG_PMC(interp, i) = PMCNULL;
 }
@@ -468,14 +468,15 @@ void
 Parrot_clear_n(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_clear_n)
-    int i;
+    UINTVAL i;
     for (i = 0; i < Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_NUM); ++i)
         REG_NUM(interp, i) = 0.0;
 }
 
 /*
 
-=item C<INTVAL * Parrot_pcc_get_INTVAL_reg(PARROT_INTERP, PMC *ctx, INTVAL idx)>
+=item C<INTVAL * Parrot_pcc_get_INTVAL_reg(PARROT_INTERP, PMC *ctx, UINTVAL
+idx)>
 
 Get pointer to INTVAL register.
 
@@ -486,7 +487,7 @@ Get pointer to INTVAL register.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 INTVAL *
-Parrot_pcc_get_INTVAL_reg(PARROT_INTERP, ARGIN(PMC *ctx), INTVAL idx)
+Parrot_pcc_get_INTVAL_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_INTVAL_reg)
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_INT) > idx);
@@ -495,7 +496,7 @@ Parrot_pcc_get_INTVAL_reg(PARROT_INTERP, ARGIN(PMC *ctx), INTVAL idx)
 
 /*
 
-=item C<FLOATVAL * Parrot_pcc_get_FLOATVAL_reg(PARROT_INTERP, PMC *ctx, INTVAL
+=item C<FLOATVAL * Parrot_pcc_get_FLOATVAL_reg(PARROT_INTERP, PMC *ctx, UINTVAL
 idx)>
 
 Get pointer to FLOATVAL register.
@@ -507,7 +508,7 @@ Get pointer to FLOATVAL register.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 FLOATVAL *
-Parrot_pcc_get_FLOATVAL_reg(PARROT_INTERP, ARGIN(PMC *ctx), INTVAL idx)
+Parrot_pcc_get_FLOATVAL_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_FLOATVAL_reg)
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_NUM) > idx);
@@ -516,7 +517,7 @@ Parrot_pcc_get_FLOATVAL_reg(PARROT_INTERP, ARGIN(PMC *ctx), INTVAL idx)
 
 /*
 
-=item C<STRING ** Parrot_pcc_get_STRING_reg(PARROT_INTERP, PMC *ctx, INTVAL
+=item C<STRING ** Parrot_pcc_get_STRING_reg(PARROT_INTERP, PMC *ctx, UINTVAL
 idx)>
 
 Get pointer to STRING register.
@@ -528,7 +529,7 @@ Get pointer to STRING register.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING **
-Parrot_pcc_get_STRING_reg(PARROT_INTERP, ARGIN(PMC *ctx), INTVAL idx)
+Parrot_pcc_get_STRING_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_STRING_reg)
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_STR) > idx);
@@ -537,7 +538,7 @@ Parrot_pcc_get_STRING_reg(PARROT_INTERP, ARGIN(PMC *ctx), INTVAL idx)
 
 /*
 
-=item C<PMC ** Parrot_pcc_get_PMC_reg(PARROT_INTERP, PMC *ctx, INTVAL idx)>
+=item C<PMC ** Parrot_pcc_get_PMC_reg(PARROT_INTERP, PMC *ctx, UINTVAL idx)>
 
 Get pointer to PMC register.
 
@@ -548,7 +549,7 @@ Get pointer to PMC register.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC **
-Parrot_pcc_get_PMC_reg(PARROT_INTERP, ARGIN(PMC *ctx), INTVAL idx)
+Parrot_pcc_get_PMC_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_PMC_reg)
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_PMC) > idx);
@@ -557,7 +558,7 @@ Parrot_pcc_get_PMC_reg(PARROT_INTERP, ARGIN(PMC *ctx), INTVAL idx)
 
 /*
 
-=item C<int Parrot_pcc_get_regs_used(PARROT_INTERP, PMC *ctx, int type)>
+=item C<UINTVAL Parrot_pcc_get_regs_used(PARROT_INTERP, PMC *ctx, int type)>
 
 Return number of used registers of particular type.
 
@@ -565,7 +566,7 @@ Return number of used registers of particular type.
 
 */
 PARROT_EXPORT
-int
+UINTVAL
 Parrot_pcc_get_regs_used(PARROT_INTERP, ARGIN(PMC *ctx), int type)
 {
     ASSERT_ARGS(Parrot_pcc_get_regs_used)

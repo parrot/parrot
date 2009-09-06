@@ -53,8 +53,8 @@ Mark Context as alive.
     VTABLE void mark()
     {
         Parrot_Context * const ctx = PMC_data_typed(SELF, Parrot_Context*);
-        PObj *obj;
-        int   i;
+        PObj   *obj;
+        UINTVAL i;
 
         /* If Context wasn't initialised just return */
         if (!ctx)

@@ -80,7 +80,7 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 FLOATVAL * Parrot_pcc_get_FLOATVAL_reg(PARROT_INTERP,
     ARGIN(PMC *ctx),
-    INTVAL idx)
+    UINTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -88,13 +88,13 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 INTVAL * Parrot_pcc_get_INTVAL_reg(PARROT_INTERP,
     ARGIN(PMC *ctx),
-    INTVAL idx)
+    UINTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PMC ** Parrot_pcc_get_PMC_reg(PARROT_INTERP, ARGIN(PMC *ctx), INTVAL idx)
+PMC ** Parrot_pcc_get_PMC_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -111,7 +111,7 @@ Regs_ps* Parrot_pcc_get_regs_ps(PARROT_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-int Parrot_pcc_get_regs_used(PARROT_INTERP, ARGIN(PMC *ctx), int type)
+UINTVAL Parrot_pcc_get_regs_used(PARROT_INTERP, ARGIN(PMC *ctx), int type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -119,7 +119,7 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING ** Parrot_pcc_get_STRING_reg(PARROT_INTERP,
     ARGIN(PMC *ctx),
-    INTVAL idx)
+    UINTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
