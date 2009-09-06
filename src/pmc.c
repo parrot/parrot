@@ -121,19 +121,10 @@ Parrot_pmc_destroy(PARROT_INTERP, ARGMOD(PMC *pmc))
     if (PObj_is_PMC_shared_TEST(pmc) && PMC_sync(pmc))
         Parrot_gc_free_pmc_sync(interp, pmc);
 
-    if (pmc->vtable->attr_size) {
-        if (PMC_data(pmc)) {
-#if GC_USE_FIXED_SIZE_ALLOCATOR
-            Parrot_gc_free_pmc_attributes(interp, pmc, pmc->vtable->attr_size);
-#else
-            mem_sys_free(PMC_data(pmc));
-            PMC_data(pmc) = NULL;
-#endif
-        }
-    }
-    else {
+    if (pmc->vtable->attr_size)
+        Parrot_gc_free_pmc_attributes(interp, pmc);
+    else
         PMC_data(pmc) = NULL;
-    }
 
 #ifndef NDEBUG
 
@@ -280,13 +271,9 @@ pmc_reuse_no_init(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
     /* Set the right vtable */
     pmc->vtable = new_vtable;
 
-    if (new_vtable->attr_size) {
-#if GC_USE_FIXED_SIZE_ALLOCATOR
-        Parrot_gc_allocate_pmc_attributes(interp, pmc, new_vtable->attr_size);
-#else
-        PMC_data(pmc) = mem_sys_allocate_zeroed(new_vtable->attr_size);
-#endif
-}
+    if (new_vtable->attr_size)
+        Parrot_gc_allocate_pmc_attributes(interp, pmc);
+
     else
         PMC_data(pmc) = NULL;
 
@@ -332,13 +319,8 @@ pmc_reuse_by_class(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(PMC *class_),
     /* Set the right vtable */
     pmc->vtable = new_vtable;
 
-    if (new_vtable->attr_size) {
-#if GC_USE_FIXED_SIZE_ALLOCATOR
-        Parrot_gc_allocate_pmc_attributes(interp, pmc, new_vtable->attr_size);
-#else
-        PMC_data(pmc) = mem_sys_allocate_zeroed(new_vtable->attr_size);
-#endif
-}
+    if (new_vtable->attr_size)
+        Parrot_gc_allocate_pmc_attributes(interp, pmc);
     else
         PMC_data(pmc) = NULL;
 
@@ -476,13 +458,8 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
     pmc            = Parrot_gc_new_pmc_header(interp, flags);
     pmc->vtable    = vtable;
 
-    if (vtable->attr_size) {
-#if GC_USE_FIXED_SIZE_ALLOCATOR
-        Parrot_gc_allocate_pmc_attributes(interp, pmc, pmc->vtable->attr_size);
-#else
-        PMC_data(pmc) = mem_sys_allocate_zeroed(vtable->attr_size);
-#endif
-    }
+    if (vtable->attr_size)
+        Parrot_gc_allocate_pmc_attributes(interp, pmc);
 
 #if GC_VERBOSE
     if (Interp_flags_TEST(interp, PARROT_TRACE_FLAG)) {

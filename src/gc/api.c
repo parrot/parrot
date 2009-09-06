@@ -1586,15 +1586,10 @@ Parrot_gc_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<void * Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, PMC *pmc, size_t
-size)>
+=item C<void * Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, PMC *pmc)>
 
-EXPERIMENTAL!!!
-
-Allocation and deallocation function for PMC Attribute structures.
-
-These functions are not currently used. They are waiting for changes to
-the PMC allocation/deallocation mechanisms. See TT #895 for details.
+Allocates a new attribute structure for a PMC if it has the auto_attrs flag
+set.
 
 =cut
 
@@ -1602,40 +1597,50 @@ the PMC allocation/deallocation mechanisms. See TT #895 for details.
 
 PARROT_CANNOT_RETURN_NULL
 void *
-Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc), size_t size)
+Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_gc_allocate_pmc_attributes)
-    /* const size_t attr_size = pmc->vtable->attr_size; */
-    const size_t attr_size = size;
+#if GC_USE_FIXED_SIZE_ALLOCATOR
+    const size_t attr_size = pmc->vtable->attr_size;
     PMC_Attribute_Pool * const pool = Parrot_gc_get_attribute_pool(interp,
         attr_size);
     void * const attrs = Parrot_gc_get_attributes_from_pool(interp, pool);
-    memset(attrs, 0, size);
+    memset(attrs, 0, attr_size);
     PMC_data(pmc) = attrs;
     return attrs;
+#else
+    void * const data =  mem_sys_allocate_zeroed(new_vtable->attr_size);
+    PMC_data(pmc) = data;
+    return data;
+#endif
 }
 
 /*
 
-=item C<void Parrot_gc_free_pmc_attributes(PARROT_INTERP, PMC *pmc, size_t
-item_size)>
+=item C<void Parrot_gc_free_pmc_attributes(PARROT_INTERP, PMC *pmc)>
 
-EXPERIMENTAL!!!  See above.
+Deallocates an attibutes structure from a PMC if it has the auto_attrs
+flag set.
 
 */
 
 void
-Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc), size_t item_size)
+Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_gc_free_pmc_attributes)
     void * const data = PMC_data(pmc);
 
     if (data) {
-        PMC_Attribute_Pool       **pools = interp->arena_base->attrib_pools;
-        const size_t               idx   = item_size - sizeof (void *);
-        PMC_Attribute_Pool * const pool  = pools[idx];
-        Parrot_gc_free_attributes_from_pool(interp, pool, data);
+#if GC_USE_FIXED_SIZE_ALLOCATOR
+        const size_t attr_size = pmc->vtable->attr_size;
+        const size_t item_size = attr_size < sizeof (void *) ? sizeof (void *) : attr_size;
+        PMC_Attribute_Pool ** const pools = interp->arena_base->attrib_pools;
+        const size_t idx = item_size - sizeof (void *);
+        Parrot_gc_free_attributes_from_pool(interp, pools[idx], data);
+#else
+        mem_sys_free(PMC_data(pmc));
         PMC_data(pmc) = NULL;
+#endif
     }
 }
 
@@ -1644,7 +1649,8 @@ Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc), size_t item_size)
 =item C<void * Parrot_gc_allocate_fixed_size_storage(PARROT_INTERP, size_t
 size)>
 
-EXPERIMENTAL!!!  See above.
+Allocates a fixed-size chunk of memory for use. This memory is not manually
+managed and needs to be freed with C<Parrot_gc_free_fixed_size_storage>
 
 */
 
@@ -1663,7 +1669,8 @@ Parrot_gc_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
 =item C<void Parrot_gc_free_fixed_size_storage(PARROT_INTERP, size_t size, void
 *data)>
 
-EXPERIMENTAL!!!  See above.
+Manually deallocates fixed size storage allocated with
+C<Parrot_gc_allocate_fixed_size_storage>
 
 */
 
@@ -1671,11 +1678,10 @@ void
 Parrot_gc_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGMOD(void *data))
 {
     ASSERT_ARGS(Parrot_gc_free_fixed_size_storage)
-    PMC_Attribute_Pool       **pools = interp->arena_base->attrib_pools;
-    const size_t               idx   = size - sizeof (void *);
-    PMC_Attribute_Pool * const pool  = pools[idx];
-
-    Parrot_gc_free_attributes_from_pool(interp, pool, data);
+    const size_t item_size = size < sizeof (void *) ? sizeof (void *) : size;
+    const size_t idx   = size - sizeof (void *);
+    PMC_Attribute_Pool ** const pools = interp->arena_base->attrib_pools;
+    Parrot_gc_free_attributes_from_pool(interp, pools[idx], data);
 }
 
 /*
