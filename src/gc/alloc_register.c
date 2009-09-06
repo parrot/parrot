@@ -307,6 +307,8 @@ Calculate size of Context.
 size_t
 Parrot_pcc_calculate_context_size(SHIM_INTERP, ARGIN(const UINTVAL *number_regs_used))
 {
+    ASSERT_ARGS(Parrot_pcc_calculate_context_size)
+
     return ALIGNED_CTX_SIZE + ROUND_ALLOC_SIZE(
             sizeof (INTVAL)   * number_regs_used[REGNO_INT] +
             sizeof (FLOATVAL) * number_regs_used[REGNO_NUM] +
