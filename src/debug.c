@@ -3211,14 +3211,29 @@ PDB_assign(PARROT_INTERP, ARGIN(const char *command))
 
     switch (reg_type) {
         case 'I':
+                if (register_num >= Parrot_pcc_get_regs_used(interp,
+                                            CURRENT_CONTEXT(interp), REGNO_INT)) {
+                    fprintf(stderr, "I%ld = no such register\n", register_num);
+                    return;
+                }
                 t                  = REGNO_INT;
                 IREG(register_num) = get_ulong(&command, 0);
                 break;
         case 'N':
+                if (register_num >= Parrot_pcc_get_regs_used(interp,
+                                            CURRENT_CONTEXT(interp), REGNO_NUM)) {
+                    fprintf(stderr, "N%ld = no such register\n", register_num);
+                    return;
+                }
                 t                  = REGNO_NUM;
                 NREG(register_num) = atof(command);
                 break;
         case 'S':
+                if (register_num >= Parrot_pcc_get_regs_used(interp,
+                                            CURRENT_CONTEXT(interp), REGNO_NUM)) {
+                    fprintf(stderr, "S%ld = no such register\n", register_num);
+                    return;
+                }
                 t                  = REGNO_STR;
                 SREG(register_num) = Parrot_str_new(interp, command, strlen(command));
                 break;
@@ -3634,7 +3649,7 @@ GDB_print_reg(PARROT_INTERP, int t, int n)
     ASSERT_ARGS(GDB_print_reg)
     char * string;
 
-    if (n >= 0 && n < Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), t)) {
+    if (n >= 0 && (UINTVAL)n < Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), t)) {
         switch (t) {
             case REGNO_INT:
                 return Parrot_str_from_int(interp, IREG(n))->strstart;

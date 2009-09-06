@@ -210,6 +210,7 @@ init_context(PARROT_INTERP, ARGMOD(PMC *pmcctx),
     ctx->current_object    = NULL;
     ctx->handlers          = PMCNULL;
     ctx->caller_ctx        = NULL;
+    ctx->pred_offset       = 0;
 
     if (old) {
         /* some items should better be COW copied */
@@ -488,6 +489,7 @@ INTVAL *
 Parrot_pcc_get_INTVAL_reg(PARROT_INTERP, ARGIN(PMC *ctx), INTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_INTVAL_reg)
+    PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_INT) > idx);
     return &(Parrot_pcc_get_context_struct(interp, ctx)->bp.regs_i[idx]);
 }
 
@@ -508,6 +510,7 @@ FLOATVAL *
 Parrot_pcc_get_FLOATVAL_reg(PARROT_INTERP, ARGIN(PMC *ctx), INTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_FLOATVAL_reg)
+    PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_NUM) > idx);
     return &(Parrot_pcc_get_context_struct(interp, ctx)->bp.regs_n[-1L - idx]);
 }
 
@@ -528,6 +531,7 @@ STRING **
 Parrot_pcc_get_STRING_reg(PARROT_INTERP, ARGIN(PMC *ctx), INTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_STRING_reg)
+    PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_STR) > idx);
     return &(Parrot_pcc_get_context_struct(interp, ctx)->bp_ps.regs_s[idx]);
 }
 
@@ -547,6 +551,7 @@ PMC **
 Parrot_pcc_get_PMC_reg(PARROT_INTERP, ARGIN(PMC *ctx), INTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_PMC_reg)
+    PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_PMC) > idx);
     return &(Parrot_pcc_get_context_struct(interp, ctx)->bp_ps.regs_p[-1L - idx]);
 }
 

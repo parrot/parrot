@@ -1194,22 +1194,28 @@ clone_key_arg(PARROT_INTERP, ARGMOD(call_state *st))
     for (; key; key = VTABLE_shift_pmc(interp, key)) {
         /* register keys have to be cloned */
         if (PObj_get_FLAGS(key) & KEY_register_FLAG) {
+            INTVAL  n_regs_used[4];
             Regs_ni bp;
             Regs_ps bp_ps;
 
             /* clone sets key values according to refered register items */
             bp    = *Parrot_pcc_get_regs_ni(interp, CURRENT_CONTEXT(interp));
             bp_ps = *Parrot_pcc_get_regs_ps(interp, CURRENT_CONTEXT(interp));
+            memcpy(n_regs_used, CONTEXT(interp)->n_regs_used, 4 * sizeof (INTVAL));
 
             Parrot_pcc_set_regs_ni(interp, CURRENT_CONTEXT(interp),
                     Parrot_pcc_get_regs_ni(interp, st->src.ctx));
             Parrot_pcc_set_regs_ps(interp, CURRENT_CONTEXT(interp),
                     Parrot_pcc_get_regs_ps(interp, st->src.ctx));
+            memcpy(CONTEXT(interp)->n_regs_used,
+                    Parrot_pcc_get_context_struct(interp, st->src.ctx),
+                    4 * sizeof (INTVAL));
 
             UVal_pmc(st->val) = VTABLE_clone(interp, key);
 
             Parrot_pcc_set_regs_ni(interp, CURRENT_CONTEXT(interp), &bp);
             Parrot_pcc_set_regs_ps(interp, CURRENT_CONTEXT(interp), &bp_ps);
+            memcpy(CONTEXT(interp)->n_regs_used, n_regs_used, 4 * sizeof (INTVAL));
 
             return;
         }
