@@ -1,5 +1,30 @@
 # $Id$
 
+New in 1.6.0
+- Core
+  + PMC allocator now automatically allocates ATTR structures
+  + Added fixed-size structure allocator to GC
+  + Contexts are not garbage-collectable
+  + Created a new Context API
+  + Op definitions cache the current Context for subsequent lookups
+  + Unified Continuation PMC and Parrot_cont structure
+  + Unified Sub PMC and Parrot_sub structure
+  + Began proper encapsulation of STRING API
+  + Modify PMC structure to remove UnionVal
+  + Removed PMC_EXT structure
+  + Removed PMC_Sync from PMC
+  + Added a "Lazy" mode to the PObj and Fixed-Size allocators
+  + Reduce string comparisons in VTABLE_isa
+  + Unified all PMC destruction functions
+  + Added several fixes for stack-walking GC code
+  + Copying a NULL string now returns an empty STRING structure
+  + Add find_dynamic_lex and store_dynamic_lex opcodes
+- Tests
+  + Convert several Perl5 tests to PIR
+  + Expand test coverage of NameSpace PMC
+- Compilers
+  + PCT is now included in "make install"
+
 New in 1.5.0
 - Core
   + Removed several deprecated functions and features
