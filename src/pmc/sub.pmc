@@ -288,7 +288,7 @@ Invokes the subroutine.
                     "maximum recursion depth exceeded");
 
         /* and copy set context variables */
-        PMC_cont(ccont)->from_ctx = context;
+        PARROT_CONTINUATION(ccont)->from_ctx = context;
 
         /* if this is an outer sub, then we need to set sub->ctx
          * to the new context (refcounted) and convert the

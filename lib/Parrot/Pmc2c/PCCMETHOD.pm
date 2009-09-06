@@ -412,7 +412,7 @@ $set_params
     }
 
     Parrot_pcc_set_continuation(interp, _ctx, _ret_cont);
-    PMC_cont(_ret_cont)->from_ctx       = _ctx;
+    PARROT_CONTINUATION(_ret_cont)->from_ctx       = _ctx;
 
     _current_args                       = interp->current_args;
     interp->current_args                = NULL;

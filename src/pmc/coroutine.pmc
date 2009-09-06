@@ -149,7 +149,7 @@ Swaps the "context".
             co->ctx                   = ctx;
 
             Parrot_pcc_set_caller_ctx(INTERP, ctx, caller_ctx);
-            PMC_cont(ccont)->from_ctx                       = ctx;
+            PARROT_CONTINUATION(ccont)->from_ctx = ctx;
             Parrot_pcc_set_sub(INTERP, ctx, SELF);
             Parrot_pcc_set_HLL(interp, ctx, co->HLL_id);
             Parrot_pcc_set_namespace(INTERP, ctx, co->namespace_stash);
@@ -201,7 +201,7 @@ Swaps the "context".
 
             wanted_seg            = co->caller_seg;
             ccont                 = Parrot_pcc_get_continuation(INTERP, co->ctx);
-            ctx                   = PMC_cont(ccont)->to_ctx;
+            ctx                   = PARROT_CONTINUATION(ccont)->to_ctx;
 
             if (! ctx) {
                 /* This still isn't quite right, but it beats segfaulting.  See

@@ -40,23 +40,20 @@ Initializes the exception handler.
 */
 
     VTABLE void init() {
-        Parrot_ExceptionHandler_attributes * const core_struct =
+        Parrot_ExceptionHandler_attributes * const attrs =
             (Parrot_ExceptionHandler_attributes *)PMC_data(SELF);
-        Parrot_cont * const cc     = new_continuation(INTERP, NULL);
-
-        cc->invoked                = 0;
-        PMC_cont(SELF)             = cc;
-        core_struct->min_severity  = 0;
-        core_struct->max_severity  = 0;
-        core_struct->handled_types = PMCNULL;
-        core_struct->handled_types_except = PMCNULL;
+        SUPER();
+        attrs->invoked      = 0;
+        attrs->min_severity  = 0;
+        attrs->max_severity  = 0;
+        attrs->handled_types = PMCNULL;
+        attrs->handled_types_except = PMCNULL;
 
         /* an exception handler has no separate context; it's only a snapshot
          * of an "earlier" context, which is contained in the interpreter's
          * context - the stacks can only be deeper in the interpreter - so no
          * mark of context is needed */
-        PObj_custom_mark_SET(SELF);
-        PObj_custom_destroy_SET(SELF);
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 /*
 
@@ -69,12 +66,25 @@ Mark any active exception handler data as live.
 */
 
     VTABLE void mark() {
-        Parrot_ExceptionHandler_attributes * const core_struct =
+        Parrot_ExceptionHandler_attributes * const attrs =
             PARROT_EXCEPTIONHANDLER(SELF);
-        if (core_struct->handled_types)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->handled_types);
-        if (core_struct->handled_types_except)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->handled_types_except);
+        if (attrs->handled_types)
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->handled_types);
+        if (attrs->handled_types_except)
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->handled_types_except);
+        SUPER();
+    }
+
+    VTABLE void destroy(){
+
+        Parrot_ExceptionHandler_attributes *attrs = PARROT_EXCEPTIONHANDLER(SELF);
+
+        if (attrs->handled_types){
+            PObj_on_free_list_SET((PObj *) attrs->handled_types);
+        }
+        if (attrs->handled_types_except){
+            PObj_on_free_list_SET((PObj *) attrs->handled_types_except);
+        }
         SUPER();
     }
 
@@ -95,8 +105,7 @@ Mark whether the handler has been invoked.
 */
 
     VTABLE void set_integer_native(INTVAL value) {
-        Parrot_cont * const cc = (Parrot_cont *)PMC_cont(SELF);
-        cc->invoked = value;
+        PARROT_CONTINUATION(SELF)->invoked = value;
     }
 
 /*
@@ -110,8 +119,7 @@ Check whether the handler has been invoked.
 */
 
     VTABLE INTVAL get_integer() {
-        const Parrot_cont * const cc = (Parrot_cont *)PMC_cont(SELF);
-        return cc->invoked;
+        return PARROT_CONTINUATION(SELF)->invoked;
     }
 
 /*
@@ -125,15 +133,14 @@ Set up the environment for the exception handler to be invoked.
 */
 
     VTABLE opcode_t *invoke(void *next) {
-        Parrot_cont * const cc = (Parrot_cont *)PMC_cont(SELF);
-        opcode_t    * const pc = cc->address;
+        opcode_t    * const pc = PARROT_CONTINUATION(SELF)->address;
 
-        Parrot_continuation_check(interp, SELF, cc);
-        Parrot_continuation_rewind_environment(interp, SELF, cc);
+        Parrot_continuation_check(interp, SELF);
+        Parrot_continuation_rewind_environment(interp, SELF);
 
         /* switch code segment if needed */
-        if (INTERP->code != cc->seg)
-            Parrot_switch_to_cs(INTERP, cc->seg, 1);
+        if (INTERP->code != PARROT_CONTINUATION(SELF)->seg)
+            Parrot_switch_to_cs(INTERP, PARROT_CONTINUATION(SELF)->seg, 1);
 
         return pc;
     }
@@ -232,13 +239,13 @@ Set or get the minimum severity of the exception handler.
 */
 
     METHOD min_severity(INTVAL severity :optional, INTVAL have_severity :opt_flag) {
-        Parrot_ExceptionHandler_attributes * const core_struct =
+        Parrot_ExceptionHandler_attributes * const attrs =
                     PARROT_EXCEPTIONHANDLER(SELF);
 
         if (have_severity)
-            core_struct->min_severity = severity;
+            attrs->min_severity = severity;
         else
-            severity = core_struct->min_severity;
+            severity = attrs->min_severity;
 
         RETURN(INTVAL severity);
     }
@@ -254,13 +261,13 @@ Set or get the maximum severity of the exception handler.
 */
 
     METHOD max_severity(INTVAL severity :optional, INTVAL have_severity :opt_flag) {
-        Parrot_ExceptionHandler_attributes * const core_struct =
+        Parrot_ExceptionHandler_attributes * const attrs =
                     PARROT_EXCEPTIONHANDLER(SELF);
 
         if (have_severity)
-            core_struct->max_severity = severity;
+            attrs->max_severity = severity;
         else
-            severity = core_struct->max_severity;
+            severity = attrs->max_severity;
 
         RETURN(INTVAL severity);
     }
@@ -276,9 +283,9 @@ Set the exception types that the ExceptionHandler will handle.
 */
 
     METHOD handle_types(PMC *types :slurpy) {
-        Parrot_ExceptionHandler_attributes * const core_struct =
+        Parrot_ExceptionHandler_attributes * const attrs =
                     PARROT_EXCEPTIONHANDLER(SELF);
-        core_struct->handled_types =
+        attrs->handled_types =
             VTABLE_elements(interp, types) > 0
                 ? types
                 : PMCNULL;
@@ -295,9 +302,9 @@ Set the exception types that the ExceptionHandler will not handle.
 */
 
     METHOD handle_types_except(PMC *types :slurpy) {
-        Parrot_ExceptionHandler_attributes * const core_struct =
+        Parrot_ExceptionHandler_attributes * const attrs =
                     PARROT_EXCEPTIONHANDLER(SELF);
-        core_struct->handled_types_except =
+        attrs->handled_types_except =
             VTABLE_elements(interp, types) > 0
                 ? types
                 : PMCNULL;

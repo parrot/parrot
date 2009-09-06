@@ -251,7 +251,7 @@ Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void 
            passed properly. */
     }
     /* Set up the continuation context of the handler in the interpreter. */
-    else if (PMC_cont(handler)->current_results)
+    else if (PARROT_CONTINUATION(handler)->current_results)
         address = pass_exception_args(interp, "P", address,
                 CURRENT_CONTEXT(interp), exception);
 
@@ -401,7 +401,7 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
 
     /* Run the handler. */
     address = VTABLE_invoke(interp, handler, NULL);
-    if (PMC_cont(handler)->current_results)
+    if (PARROT_CONTINUATION(handler)->current_results)
         address = pass_exception_args(interp, "P", address,
                 CURRENT_CONTEXT(interp), exception);
     PARROT_ASSERT(return_point->handler_start == NULL);
