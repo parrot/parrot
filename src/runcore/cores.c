@@ -1254,14 +1254,14 @@ ARGIN(opcode_t *pc))
                                   VTABLE_get_string(interp, preop_ctx->current_namespace));
 
                 fprintf(runcore->profile_fd,
-                        "CS:{x{ns:%s;%s}x}{x{file:%s}x}{x{sub:0x%X}x}{x{ctx:0x%X}x}\n",
+                        "CS:{x{ns:%s;%s}x}{x{file:%s}x}{x{sub:0x%p}x}{x{ctx:0x%p}x}\n",
                         ns_cstr, sub_cstr, filename_cstr,
-                        (unsigned int) preop_ctx->current_sub,
-                        (unsigned int) preop_ctx);
+                        preop_ctx->current_sub,
+                        preop_ctx);
 
-                mem_sys_free(sub_cstr);
-                mem_sys_free(filename_cstr);
-                mem_sys_free(ns_cstr);
+                Parrot_str_free_cstring(sub_cstr);
+                Parrot_str_free_cstring(filename_cstr);
+                Parrot_str_free_cstring(ns_cstr);
             }
 
             runcore->prev_ctx = preop_ctx;
@@ -1272,8 +1272,8 @@ ARGIN(opcode_t *pc))
          * but it gives me obviously incorrect results while postop_info.line
          * works.  It might be an imcc bug or it might just be me
          * misunderstanding something. */
-        fprintf(runcore->profile_fd, "OP:{x{line:%d}x}{x{time:%lli}x}{x{op:%s}x}\n",
-                postop_info.line, op_time,
+        fprintf(runcore->profile_fd, "OP:{x{line:%d}x}{x{time:%li}x}{x{op:%s}x}\n",
+                postop_info.line, (unsigned long)op_time,
                 (interp->op_info_table)[*preop_pc].name);
 
     } /* while (pc) */
