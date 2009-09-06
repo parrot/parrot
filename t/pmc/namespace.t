@@ -33,13 +33,26 @@ do.
 
 =back
 
+Items that need to be tested according to PDD21, or the current source code
+of the NameSpace PMC:
+
+=over 4
+
+=item* methods: add_sub, del_sub, del_var, del_namespace
+
+=item* Typed and Untyped interfaces
+
+=item* Subclassing NameSpace (If it's possible)
+
+=back
+
 =cut
 
 .namespace []
 
 .sub main :main
     .include 'test_more.pir'
-    plan(58)
+    plan(59)
 
     create_namespace_pmc()
     verify_namespace_type()
@@ -74,6 +87,10 @@ do.
     $P0 = get_root_namespace
     typeof $S0, $P0
     is($S0, "NameSpace", "Root NameSpace is a NameSpace")
+
+    # While we're here. Prove that the root namespace stringifies to ""
+    $S0 = $P0
+    is($S0, "", "Root NameSpace stringifies to empty string")
 
     # parrot namespace
     $P1 = $P0["parrot"]
