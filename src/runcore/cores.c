@@ -1105,11 +1105,11 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
 
     if (!runcore->profile_fd) {
         fprintf(stderr, "unable to open %s for writing", profile_filename);
-        mem_sys_free(profile_filename);
+        Parrot_str_free_cstring(profile_filename);
         exit(1);
     }
 
-    mem_sys_free(profile_filename);
+    Parrot_str_free_cstring(profile_filename);
 
     return runops_profiling_core(interp, runcore, pc);
 }
@@ -1175,8 +1175,8 @@ ARGIN(opcode_t *pc))
         /* The CLI line won't reflect any options passed to the parrot binary. */
         fprintf(runcore->profile_fd, "CLI:%s %s\n", exec_cstr, command_line_cstr);
 
-        mem_sys_free(exec_cstr);
-        mem_sys_free(command_line_cstr);
+        Parrot_str_free_cstring(exec_cstr);
+        Parrot_str_free_cstring(command_line_cstr);
 
         Profiling_have_printed_cli_SET(runcore);
     }
@@ -1314,7 +1314,7 @@ destroy_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore)
 
     char *filename_cstr = Parrot_str_to_cstring(interp, runcore->profile_filename);
     fprintf(stderr, "\nPROFILING RUNCORE: Wrote profile to %s .\n", filename_cstr);
-    mem_sys_free(filename_cstr);
+    Parrot_str_free_cstring(filename_cstr);
 
     fclose(runcore->profile_fd);
     mem_sys_free(runcore->time);
