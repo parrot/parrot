@@ -3,7 +3,7 @@
 # $Id$
 
 .sub 'main'
-load_bytecode 'SQLite3'
+load_bytecode 'SQLite3.pir'
 
 $P0 = get_global [ 'SQLite' ], 'open'
 $P1 = $P0("test.db")

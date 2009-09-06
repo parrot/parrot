@@ -1,7 +1,7 @@
 # Copyright (C) 2008-2009, Parrot Foundation.
 # $Id$
 
-.namespace ['SQLite']
+.namespace ['SQLite3']
 
 .const int SQLITE_OK         =   0   # Successful result
 # beginning-of-error-codes
