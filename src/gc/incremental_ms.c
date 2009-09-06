@@ -502,6 +502,114 @@ typedef struct Gc_ims_private {
 } Gc_ims_private;
 
 
+
+/*
+
+=item C<void Parrot_gc_ims_init(PARROT_INTERP)>
+
+Initialize the state structures of the gc system. Called immediately before
+creation of memory pools. This function must set the function pointers
+for C<add_free_object_fn>, C<get_free_object_fn>, C<alloc_objects_fn>, and
+C<more_objects_fn>.
+
+=cut
+
+*/
+
+void
+Parrot_gc_ims_init(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_gc_ims_init)
+    Arenas * const arena_base = interp->arena_base;
+    arena_base->gc_private    = mem_allocate_zeroed_typed(Gc_ims_private);
+
+    /* set function hooks according to pdd09 */
+
+    interp->gc_sys->do_gc_mark         = parrot_gc_ims_run;
+    interp->gc_sys->finalize_gc_system = parrot_gc_ims_deinit;
+    interp->gc_sys->init_pool          = gc_ims_pool_init;
+
+    /* run init state */
+    parrot_gc_ims_run_increment(interp);
+}
+
+
+/*
+
+=item C<static void gc_ims_pool_init(PARROT_INTERP, Fixed_Size_Obj_Pool *pool)>
+
+Initializes a pool by setting the appropriate function pointers to add, get,
+and allocate objects.
+
+=cut
+
+*/
+
+static void
+gc_ims_pool_init(SHIM_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
+{
+    ASSERT_ARGS(gc_ims_pool_init)
+    pool->add_free_object = gc_ims_add_free_object;
+    pool->get_free_object = gc_ims_get_free_object;
+    pool->alloc_objects   = gc_ims_alloc_objects;
+    pool->more_objects    = pool->alloc_objects;
+}
+
+
+/*
+
+=item C<static void parrot_gc_ims_deinit(PARROT_INTERP)>
+
+Shuts down this GC system.
+
+=cut
+
+*/
+
+static void
+parrot_gc_ims_deinit(PARROT_INTERP)
+{
+    ASSERT_ARGS(parrot_gc_ims_deinit)
+    Arenas * const arena_base = interp->arena_base;
+
+    mem_sys_free(arena_base->gc_private);
+    arena_base->gc_private = NULL;
+}
+
+
+
+/*
+
+=item C<static void parrot_gc_ims_reinit(PARROT_INTERP)>
+
+Reinitialize the collector for the next collection cycle.
+
+=cut
+
+*/
+
+static void
+parrot_gc_ims_reinit(PARROT_INTERP)
+{
+    ASSERT_ARGS(parrot_gc_ims_reinit)
+    Gc_ims_private *g_ims;
+    Arenas * const  arena_base = interp->arena_base;
+
+    arena_base->lazy_gc = 0;
+    Parrot_gc_run_init(interp);
+
+    /*
+     * trace root set w/o system areas
+     * TODO also skip volatile roots
+     */
+    Parrot_gc_trace_root(interp, GC_TRACE_ROOT_ONLY);
+
+    g_ims        = (Gc_ims_private *)arena_base->gc_private;
+    g_ims->state = GC_IMS_MARKING;
+
+}
+
+
 /*
 
 =item C<static void gc_ims_add_free_object(PARROT_INTERP, Fixed_Size_Obj_Pool
@@ -602,112 +710,6 @@ gc_ims_alloc_objects(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
     Parrot_append_arena_in_pool(interp, pool, new_arena, size);
 
     Parrot_add_to_free_list(interp, pool, new_arena);
-}
-
-
-/*
-
-=item C<static void gc_ims_pool_init(PARROT_INTERP, Fixed_Size_Obj_Pool *pool)>
-
-Initializes a pool by setting the appropriate function pointers to add, get,
-and allocate objects.
-
-=cut
-
-*/
-
-static void
-gc_ims_pool_init(SHIM_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
-{
-    ASSERT_ARGS(gc_ims_pool_init)
-    pool->add_free_object = gc_ims_add_free_object;
-    pool->get_free_object = gc_ims_get_free_object;
-    pool->alloc_objects   = gc_ims_alloc_objects;
-    pool->more_objects    = pool->alloc_objects;
-}
-
-
-/*
-
-=item C<static void parrot_gc_ims_deinit(PARROT_INTERP)>
-
-Shuts down this GC system.
-
-=cut
-
-*/
-
-static void
-parrot_gc_ims_deinit(PARROT_INTERP)
-{
-    ASSERT_ARGS(parrot_gc_ims_deinit)
-    Arenas * const arena_base = interp->arena_base;
-
-    mem_sys_free(arena_base->gc_private);
-    arena_base->gc_private = NULL;
-}
-
-
-/*
-
-=item C<void Parrot_gc_ims_init(PARROT_INTERP)>
-
-Initialize the state structures of the gc system. Called immediately before
-creation of memory pools. This function must set the function pointers
-for C<add_free_object_fn>, C<get_free_object_fn>, C<alloc_objects_fn>, and
-C<more_objects_fn>.
-
-=cut
-
-*/
-
-void
-Parrot_gc_ims_init(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_gc_ims_init)
-    Arenas * const arena_base = interp->arena_base;
-    arena_base->gc_private    = mem_allocate_zeroed_typed(Gc_ims_private);
-
-    /* set function hooks according to pdd09 */
-
-    arena_base->do_gc_mark         = parrot_gc_ims_run;
-    arena_base->finalize_gc_system = parrot_gc_ims_deinit;
-    arena_base->init_pool          = gc_ims_pool_init;
-
-    /* run init state */
-    parrot_gc_ims_run_increment(interp);
-}
-
-
-/*
-
-=item C<static void parrot_gc_ims_reinit(PARROT_INTERP)>
-
-Reinitialize the collector for the next collection cycle.
-
-=cut
-
-*/
-
-static void
-parrot_gc_ims_reinit(PARROT_INTERP)
-{
-    ASSERT_ARGS(parrot_gc_ims_reinit)
-    Gc_ims_private *g_ims;
-    Arenas * const  arena_base = interp->arena_base;
-
-    arena_base->lazy_gc = 0;
-    Parrot_gc_run_init(interp);
-
-    /*
-     * trace root set w/o system areas
-     * TODO also skip volatile roots
-     */
-    Parrot_gc_trace_root(interp, GC_TRACE_ROOT_ONLY);
-
-    g_ims        = (Gc_ims_private *)arena_base->gc_private;
-    g_ims->state = GC_IMS_MARKING;
-
 }
 
 

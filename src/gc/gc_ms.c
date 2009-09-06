@@ -123,11 +123,10 @@ void
 Parrot_gc_ms_init(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_gc_ms_init)
-    Arenas * const arena_base     = interp->arena_base;
 
-    arena_base->do_gc_mark         = gc_ms_mark_and_sweep;
-    arena_base->finalize_gc_system = NULL;
-    arena_base->init_pool          = gc_ms_pool_init;
+    interp->gc_sys->do_gc_mark         = gc_ms_mark_and_sweep;
+    interp->gc_sys->finalize_gc_system = NULL;
+    interp->gc_sys->init_pool          = gc_ms_pool_init;
 
 }
 

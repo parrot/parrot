@@ -749,7 +749,7 @@ new_pmc_pool(PARROT_INTERP)
     pmc_pool->mem_pool   = NULL;
     pmc_pool->gc_object  = free_pmc_in_pool;
 
-    (interp->arena_base->init_pool)(interp, pmc_pool);
+    (interp->gc_sys->init_pool)(interp, pmc_pool);
     return pmc_pool;
 }
 
@@ -812,7 +812,7 @@ new_bufferlike_pool(PARROT_INTERP, size_t actual_buffer_size)
 #endif
 
     pool->mem_pool  = interp->arena_base->memory_pool;
-    (interp->arena_base->init_pool)(interp, pool);
+    (interp->gc_sys->init_pool)(interp, pool);
     return pool;
 }
 

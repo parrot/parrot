@@ -325,8 +325,8 @@ void
 Parrot_gc_finalize(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_gc_finalize)
-    if (interp->arena_base->finalize_gc_system)
-        interp->arena_base->finalize_gc_system(interp);
+    if (interp->gc_sys->finalize_gc_system)
+        interp->gc_sys->finalize_gc_system(interp);
 }
 
 
@@ -817,7 +817,7 @@ void
 Parrot_gc_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(Parrot_gc_mark_and_sweep)
-    interp->arena_base->do_gc_mark(interp, flags);
+    interp->gc_sys->do_gc_mark(interp, flags);
 }
 
 /*

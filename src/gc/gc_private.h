@@ -98,15 +98,19 @@ typedef struct GC_Subsystem {
     union {                     /* Holds system-specific data structures*/
         struct gc_gms_sys_data gms_data;
     } gc_sys_data;
+ 
+    /** Function hooks that each subsystem MUST provide */
+    void (*do_gc_mark)(PARROT_INTERP, UINTVAL flags);
+    void (*finalize_gc_system) (PARROT_INTERP);
+    void (*init_pool)(PARROT_INTERP, struct Fixed_Size_Obj_Pool *);
 
-    /*Function hooks that GC systems can choose if they want
-     *These will be called from the GC API function  */
+    /*Function hooks that GC systems can CHOOSE to provide
+     *These will be called from the GC API function Parrot_gc_func_name */
     void (*write_barrier)(PARROT_INTERP, PMC *, PMC *, PMC *);
     void (*write_barrier_key)(PARROT_INTERP, PMC *, PMC *, PObj *, PMC *, PObj *);
 
     /* functions used in arena scan code to convert from object pointers
      * to arena pointers ... GMS only I think ...*/
-
     void * (*PObj_to_Arena)(const void *);
     PObj * (*Arena_to_PObj)(void *);
 
@@ -201,15 +205,8 @@ typedef struct Arenas {
     PMC_Attribute_Pool **attrib_pools;
     size_t num_attribs;
 
-    /*
-     * function slots that each subsystem must provide
-     */
-    void (*do_gc_mark)(PARROT_INTERP, UINTVAL flags);
-    void (*finalize_gc_system) (PARROT_INTERP);
-    void (*init_pool)(PARROT_INTERP, struct Fixed_Size_Obj_Pool *);
-    /*
-     * statistics for GC
-     */
+
+    /** statistics for GC **/
     size_t  gc_mark_runs;       /* Number of times we've done a mark run*/
     size_t  gc_lazy_mark_runs;  /* Number of successful lazy mark runs */
     size_t  gc_collect_runs;    /* Number of times we've done a memory

@@ -569,9 +569,9 @@ Parrot_gc_gms_init(PARROT_INTERP)
     /*
      * set function hooks according to pdd09
      */
-    arena_base->do_gc_mark         = parrot_gc_gms_run;
-    arena_base->finalize_gc_system = parrot_gc_gms_deinit;
-    arena_base->init_pool          = gc_gms_pool_init;
+    interp->gc_sys->do_gc_mark         = parrot_gc_gms_run;
+    interp->gc_sys->finalize_gc_system = parrot_gc_gms_deinit;
+    interp->gc_sys->init_pool          = gc_gms_pool_init;
 
 }
 
