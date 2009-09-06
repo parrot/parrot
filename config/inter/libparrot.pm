@@ -56,7 +56,7 @@ sub runstep {
     if ($^O eq 'cygwin') {
         @libs = ('libparrot.dll.a');
     }
-    if ($^O eq 'darwin' {
+    if ($^O eq 'darwin'){
         @libs = qw/libparrot.dylib libparrot.a/;
     }
     if (defined $ENV{LD_LIBRARY_PATH}) {
