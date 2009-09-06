@@ -180,9 +180,6 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
         return 0;
     }
 
-    if (interp->profile)
-        Parrot_gc_profile_start(interp);
-
     /* We have to start somewhere; the interpreter globals is a good place */
     if (!arena_base->gc_mark_start) {
         arena_base->gc_mark_start
@@ -247,9 +244,6 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
     if (arena_base->lazy_gc
     &&  arena_base->num_early_PMCs_seen >= arena_base->num_early_gc_PMCs)
         return 0;
-
-    if (interp->profile)
-        Parrot_gc_profile_end(interp, PARROT_PROF_GC_p1);
 
     return 1;
 }
@@ -533,9 +527,6 @@ Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)
      * If there is a count of shared PMCs and we have already seen
      * all these, we could skip that.
      */
-    if (interp->profile)
-        Parrot_gc_profile_start(interp);
-
     pt_gc_mark_root_finished(interp);
 
     do {
@@ -574,9 +565,6 @@ Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)
 
     arena_base->gc_mark_start = current;
     arena_base->gc_trace_ptr  = NULL;
-
-    if (interp->profile)
-        Parrot_gc_profile_end(interp, PARROT_PROF_GC_p2);
 
     return 1;
 }
@@ -664,59 +652,6 @@ Parrot_append_arena_in_pool(PARROT_INTERP,
 
     pool->last_Arena = new_arena;
     interp->arena_base->header_allocs_since_last_collect++;
-}
-
-/*
-
-=item C<void Parrot_gc_profile_start(PARROT_INTERP)>
-
-Records the start time of a GC mark run when profiling is enabled.
-
-=cut
-
-*/
-
-void
-Parrot_gc_profile_start(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_gc_profile_start)
-    if (Interp_flags_TEST(interp, PARROT_PROFILE_FLAG))
-        interp->profile->gc_time = Parrot_floatval_time();
-}
-
-/*
-
-=item C<void Parrot_gc_profile_end(PARROT_INTERP, int what)>
-
-Records the end time of the GC mark run part C<what> run when profiling is
-enabled. Also record start time of next part.
-
-=cut
-
-*/
-
-void
-Parrot_gc_profile_end(PARROT_INTERP, int what)
-{
-    ASSERT_ARGS(Parrot_gc_profile_end)
-    if (Interp_flags_TEST(interp, PARROT_PROFILE_FLAG)) {
-        RunProfile * const profile = interp->profile;
-        const FLOATVAL     now     = Parrot_floatval_time();
-
-        profile->data[what].numcalls++;
-        profile->data[what].time += now - profile->gc_time;
-
-        /*
-         * we've recorded the time of a GC piece from
-         * gc_time until now, so add this to the start of the
-         * currently executing opcode, which hasn't run this
-         * interval.
-         */
-        profile->starttime += now - profile->gc_time;
-
-        /* prepare start for next step */
-        profile->gc_time    = now;
-    }
 }
 
 /*

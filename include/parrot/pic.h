@@ -13,6 +13,8 @@
 #ifndef PARROT_PIC_H_GUARD
 #define PARROT_PIC_H_GUARD
 
+#include "parrot/runcore_api.h"
+
 /*
  * one cache slot
  *
@@ -125,9 +127,10 @@ void * parrot_pic_opcode(PARROT_INTERP, INTVAL op)
 void parrot_PIC_prederef(PARROT_INTERP,
     opcode_t op,
     ARGOUT(void **pc_pred),
-    int core)
+    ARGIN(Parrot_runcore_t *core))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
         FUNC_MODIFIES(*pc_pred);
 
 #define ASSERT_ARGS_parrot_PIC_alloc_mic __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
@@ -153,7 +156,8 @@ void parrot_PIC_prederef(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_parrot_PIC_prederef __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pc_pred)
+    || PARROT_ASSERT_ARG(pc_pred) \
+    || PARROT_ASSERT_ARG(core)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/pic.c */
 

@@ -37,6 +37,7 @@ sub runstep {
         $conf->data->set( as => 'as -mregnames' );
     }
 
+    $conf->data->set( clock_best => '-DCLOCK_BEST=CLOCK_MONOTONIC' );
 }
 
 1;

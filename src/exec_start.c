@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -97,7 +97,7 @@ main(int argc, char * argv[])
 #if defined(JIT_CGP)
     exec_init_prederef(interp, &exec_prederef_code);
 #endif
-    /* Parrot_set_run_core(interp, PARROT_EXEC_CORE);
+    /* Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "exec"));
     interp->code->base.data =
         (opcode_t *)&((&program_code)[bytecode_offset]);
     Parrot_exec_run = 0; */

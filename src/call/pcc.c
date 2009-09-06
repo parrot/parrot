@@ -19,6 +19,7 @@ subroutines.
 
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
+#include "parrot/runcore_api.h"
 #include "pcc.str"
 #include "../pmc/pmc_key.h"
 #include "../pmc/pmc_continuation.h"
@@ -3023,17 +3024,15 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
     /* Invoke the function */
     dest = VTABLE_invoke(interp, sub_obj, NULL);
 
-    /* PIR Subs need runops to run their opcodes. Methods and NCI subs
-     * don't. */
+    /* PIR Subs need runops to run their opcodes. Methods and NCI subs don't. */
     if (sub_obj->vtable->base_type == enum_class_Sub
-            && PMC_IS_NULL(interp->current_object)) {
-        const INTVAL old_core = interp->run_core;
-        const opcode_t offset = dest - interp->code->base.data;
+    &&  PMC_IS_NULL(interp->current_object)) {
+        Parrot_runcore_t *old_core = interp->run_core;
+        const opcode_t    offset   = dest - interp->code->base.data;
 
         /* can't re-enter the runloop from here with PIC cores: RT #60048 */
-        if (interp->run_core == PARROT_CGP_CORE
-        ||  interp->run_core == PARROT_SWITCH_CORE)
-            interp->run_core = PARROT_SLOW_CORE;
+        if (PARROT_RUNCORE_PREDEREF_OPS_TEST(interp->run_core))
+            Parrot_runcore_switch(interp, CONST_STRING(interp, "slow"));
 
         runops(interp, offset);
         interp->run_core = old_core;

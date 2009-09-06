@@ -28,6 +28,7 @@ These are the vtable functions for the ParrotInterpreter base class
 #include "parrot/embed.h"
 #include "parrot/dynext.h"
 #include "parrot/io.h"
+#include "parrot/runcore_api.h"
 #include "pmc_class.h"
 #include "pmc_sub.h"
 
@@ -55,8 +56,9 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
     d->scheduler = pmc_new(d, enum_class_Scheduler);
     d->scheduler = VTABLE_share_ro(d, d->scheduler);
 
+    /* can't copy directly, unless you want double-frees */
     if (flags & PARROT_CLONE_RUNOPS)
-        d->run_core = s->run_core;
+        Parrot_runcore_switch(d, s->run_core->name);
 
     if (flags & PARROT_CLONE_INTERP_FLAGS) {
         /* XXX setting of IS_THREAD? */

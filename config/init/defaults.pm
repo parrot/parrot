@@ -256,6 +256,9 @@ sub runstep {
         );
     }
 
+    #clock_id used to call the clock_gettime() in the profiling runcore.
+    $conf->data->set( clock_best => '-DCLOCK_BEST=CLOCK_PROF' );
+
     $conf->data->set( 'archname', $Config{archname});
     # adjust archname, cc and libs for e.g. --m=32
     # RT#41499 this is maybe gcc only

@@ -113,7 +113,7 @@ inline op cpu_ret() {
        we want to throw an error. Seriously people: Do not use this opcode
        directly in PIR. Ever. It absolutely makes no sense and it doesn't do
        anything productive. You've been warned. */
-    if (interp->run_core & PARROT_JIT_CORE) {
+   if (PARROT_RUNCORE_JIT_OPS_TEST(interp->run_core)) {
 #ifdef __GNUC__
 #  ifdef I386
         __asm__("ret");
@@ -150,12 +150,12 @@ inline op wrapper__() :internal :flow {
 
 inline op prederef__() :internal :flow {
     opcode_t * const _this = CUR_OPCODE;
-    if (interp->run_core & PARROT_CGOTO_CORE) {
+    if (PARROT_RUNCORE_CGOTO_OPS_TEST(interp->run_core)) {
         /* must be CGP then - check for events in not yet prederefed code */
         Parrot_cx_runloop_wake(interp, interp->scheduler);
     /*    _this = CHECK_EVENTS(interp, _this); */
     }
-    do_prederef((void**)cur_opcode, interp, op_lib.core_type);
+    do_prederef((void**)cur_opcode, interp, interp->run_core);
     goto ADDRESS(_this); /* force this being a branch op */
 }
 

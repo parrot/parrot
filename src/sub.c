@@ -188,6 +188,7 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(PMC *ctx),
     ARGOUT(Parrot_Context_info *info))
 {
     ASSERT_ARGS(Parrot_Context_get_info)
+    PMC                   *subpmc;
     Parrot_Sub_attributes *sub;
 
     /* set file/line/pc defaults */
@@ -198,8 +199,10 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(PMC *ctx),
     info->subname  = NULL;
     info->fullname = NULL;
 
+    subpmc = Parrot_pcc_get_sub(interp, ctx);
+
     /* is the current sub of the specified context valid? */
-    if (PMC_IS_NULL(Parrot_pcc_get_sub(interp, ctx))) {
+    if (PMC_IS_NULL(subpmc)) {
         info->subname  = Parrot_str_new(interp, "???", 3);
         info->nsname   = info->subname;
         info->fullname = Parrot_str_new(interp, "??? :: ???", 10);
@@ -208,10 +211,10 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(PMC *ctx),
     }
 
     /* fetch Parrot_sub of the current sub in the given context */
-    if (!VTABLE_isa(interp, Parrot_pcc_get_sub(interp, ctx), CONST_STRING(interp, "Sub")))
+    if (!VTABLE_isa(interp, subpmc, CONST_STRING(interp, "Sub")))
         return 1;
 
-    PMC_get_sub(interp, Parrot_pcc_get_sub(interp, ctx), sub);
+    PMC_get_sub(interp, subpmc, sub);
     /* set the sub name */
     info->subname = sub->name;
 
@@ -222,7 +225,7 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(PMC *ctx),
     }
     else {
         info->nsname   = VTABLE_get_string(interp, sub->namespace_name);
-        info->fullname = Parrot_full_sub_name(interp, Parrot_pcc_get_sub(interp, ctx));
+        info->fullname = Parrot_full_sub_name(interp, subpmc);
     }
 
     /* return here if there is no current pc */

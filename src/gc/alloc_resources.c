@@ -347,9 +347,6 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
 
     ++arena_base->gc_sweep_block_level;
 
-    if (interp->profile)
-        Parrot_gc_profile_start(interp);
-
     /* We're collecting */
     arena_base->mem_allocs_since_last_collect    = 0;
     arena_base->header_allocs_since_last_collect = 0;
@@ -549,9 +546,6 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
 
     pool->guaranteed_reclaimable = 0;
     pool->possibly_reclaimable   = 0;
-
-    if (interp->profile)
-        Parrot_gc_profile_end(interp, PARROT_PROF_GC);
 
     --arena_base->gc_sweep_block_level;
 }

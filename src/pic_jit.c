@@ -34,6 +34,7 @@ TODO:
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 #include "pmc/pmc_sub.h"
+#include "parrot/runcore_api.h"
 
 /* HEADERIZER HFILE: include/parrot/pic.h */
 
@@ -488,7 +489,7 @@ parrot_pic_is_safe_to_jit(PARROT_INTERP, ARGIN(PMC *sub_pmc), ARGIN(PMC *sig_arg
      * 0) if runcore setting doesn't contain JIT
      *    forget it
      */
-    if (!(interp->run_core & PARROT_JIT_CORE))
+    if (!(PARROT_RUNCORE_JIT_OPS_TEST(interp->run_core)))
         return 0;
 
     /* 1) if the JIT system can't JIT_CODE_SUB_REGS_ONLY

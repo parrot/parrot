@@ -28,6 +28,7 @@ about the structure of the frozen bytecode.
 #include "parrot/embed.h"
 #include "parrot/extend.h"
 #include "parrot/packfile.h"
+#include "parrot/runcore_api.h"
 #include "jit.h"
 #include "../compilers/imcc/imc.h"
 #include "packfile.str"
@@ -672,21 +673,20 @@ static PMC*
 run_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 {
     ASSERT_ARGS(run_sub)
-    const INTVAL old = interp->run_core;
-    PMC *retval;
+    Parrot_runcore_t *old_core = interp->run_core;
+    PMC              *retval;
 
     /* turn off JIT and prederef - both would act on the whole
      * PackFile which probably isn't worth the effort */
-    if (interp->run_core != PARROT_CGOTO_CORE
-    &&  interp->run_core != PARROT_SLOW_CORE
-    &&  interp->run_core != PARROT_FAST_CORE)
-            interp->run_core = PARROT_FAST_CORE;
+    if (PARROT_RUNCORE_JIT_OPS_TEST(interp->run_core)
+    ||  PARROT_RUNCORE_PREDEREF_OPS_TEST(interp->run_core))
+        Parrot_runcore_switch(interp, CONST_STRING(interp, "fast"));
 
     Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp),
             interp->code->const_table->constants);
 
     retval           = (PMC *)Parrot_runops_fromc_args(interp, sub_pmc, "P");
-    interp->run_core = old;
+    interp->run_core = old_core;
 
     return retval;
 }

@@ -126,6 +126,13 @@ int get_sys_timer_ms(void *handle);
 
 #endif
 
+/*
+ * high-resolution timer support
+ */
+
+UHUGEINTVAL Parrot_hires_get_time(void);
+UINTVAL     Parrot_hires_get_tick_duration(void);
+
 
 struct parrot_string_t;
 INTVAL Parrot_Run_OS_Command(Interp*, struct parrot_string_t *);

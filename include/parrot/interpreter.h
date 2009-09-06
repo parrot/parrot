@@ -72,7 +72,8 @@ typedef enum {
     PARROT_SWITCH_JIT_CORE  = 0x12,         /* J P                */
     PARROT_EXEC_CORE        = 0x20,         /* TODO Parrot_exec_run variants */
     PARROT_GC_DEBUG_CORE    = 0x40,         /* run GC before each op */
-    PARROT_DEBUGGER_CORE    = 0x80          /* used by parrot debugger */
+    PARROT_DEBUGGER_CORE    = 0x80,         /* used by parrot debugger */
+    PARROT_PROFILING_CORE   = 0x160         /* used by parrot debugger */
 } Parrot_Run_core_t;
 /* &end_gen */
 
@@ -145,33 +146,6 @@ typedef Parrot_Run_core_t Run_Cores;
 typedef struct warnings_t {
     Warnings_classes classes;
 } *Warnings;
-
-/* ProfData have these extra items in front followed by
- * one entry per op at (op + extra) */
-
-typedef enum {
-     PARROT_PROF_GC_p1,        /* pass 1 mark root set */
-     PARROT_PROF_GC_p2,        /* pass 2 mark next_for_GC */
-     PARROT_PROF_GC_cp,        /* collect PMCs */
-     PARROT_PROF_GC_cb,        /* collect buffers */
-     PARROT_PROF_GC,
-     PARROT_PROF_EXCEPTION,
-     PARROT_PROF_EXTRA
-} profile_extra_enum;
-
-/* data[op_count] is time spent for exception handling */
-typedef struct ProfData {
-    int op;
-    UINTVAL numcalls;
-    FLOATVAL time;
-} ProfData;
-
-typedef struct _RunProfile {
-    FLOATVAL starttime;
-    FLOATVAL gc_time;
-    opcode_t cur_op;
-    ProfData *data;
-} RunProfile;
 
 /* Forward declaration for imc_info_t -- the actual struct is
  * defined in imcc/imc.h */
@@ -252,10 +226,9 @@ struct parrot_interp_t {
 
     UINTVAL debug_flags;                      /* debug settings */
 
-    INTVAL run_core;                          /* type of core to run the ops */
-
-    /* TODO profile per code segment or global */
-    RunProfile *profile;                      /* profile counters */
+    struct runcore_t  *run_core;              /* type of core to run the ops */
+    struct runcore_t **cores;                 /* array of known runcores */
+    UINTVAL            num_cores;             /* number of known runcores */
 
     INTVAL resume_flag;
     size_t resume_offset;
@@ -609,8 +582,7 @@ void exec_init_prederef(PARROT_INTERP,
     void *prederef_arena);
 void prepare_for_run(PARROT_INTERP);
 void *init_jit(PARROT_INTERP, opcode_t *pc);
-PARROT_EXPORT void dynop_register(PARROT_INTERP, PMC* op_lib);
-void do_prederef(void **pc_prederef, PARROT_INTERP, int type);
+PARROT_EXPORT void dynop_register(PARROT_INTERP, PMC *op_lib);
 
 /* interpreter.pmc */
 void clone_interpreter(Parrot_Interp dest, Parrot_Interp self, INTVAL flags);

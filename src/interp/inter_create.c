@@ -216,6 +216,9 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     Parrot_pcc_set_continuation(interp, CURRENT_CONTEXT(interp), NULL); /* TODO Use PMCNULL */
     Parrot_pcc_set_object(interp, CURRENT_CONTEXT(interp), NULL);
 
+    /* initialize built-in runcores */
+    Parrot_runcore_init(interp);
+
     /* Load the core op func and info tables */
     interp->op_lib          = PARROT_CORE_OPLIB_INIT(1);
     interp->op_count        = interp->op_lib->op_count;
@@ -225,7 +228,6 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     interp->evc_func_table  = NULL;
     interp->save_func_table = NULL;
     interp->code            = NULL;
-    interp->profile         = NULL;
 
     /* create the root set registry */
     interp->gc_registry     = pmc_new(interp, enum_class_AddrRegistry);
@@ -363,6 +365,10 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     /* Now the PIOData gets also cleared */
     Parrot_io_finish(interp);
 
+    /* deinit runcores and dynamic op_libs */
+    if (!interp->parent_interpreter)
+        Parrot_runcore_destroy(interp);
+
     /*
      * now all objects that need timely destruction should be finalized
      * so terminate the event loop
@@ -411,13 +417,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     if (interp->initial_pf)
         PackFile_destroy(interp, interp->initial_pf);
 
-    if (interp->profile) {
-        mem_sys_free(interp->profile->data);
-        interp->profile->data = NULL;
-        mem_sys_free(interp->profile);
-        interp->profile = NULL;
-    }
-
     destroy_runloop_jump_points(interp);
 
     if (interp->evc_func_table) {
@@ -436,15 +435,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 
         /* free vtables */
         parrot_free_vtables(interp);
-
-        /* dynop libs */
-        if (interp->n_libs > 0) {
-            mem_sys_free(interp->op_info_table);
-            mem_sys_free(interp->op_func_table);
-
-            /* deinit op_lib */
-            Parrot_runcore_destroy(interp);
-        }
 
         MUTEX_DESTROY(interpreter_array_mutex);
         mem_sys_free(interp);

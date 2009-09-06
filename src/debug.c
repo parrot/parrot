@@ -1447,8 +1447,9 @@ PDB_next(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         pdb->state |= PDB_STOPPED;
         return;
     }
+
     pdb->tracing = n;
-    pdb->debugee->run_core = PARROT_DEBUGGER_CORE;
+    Parrot_runcore_switch(pdb->debugee, CONST_STRING(interp, "debugger"));
 
     TRACEDEB_MSG("PDB_next finished");
 }
@@ -1494,8 +1495,8 @@ PDB_trace(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         return;
     }
     pdb->tracing = n;
-    pdb->debugee->run_core = PARROT_DEBUGGER_CORE;
-    pdb->state |= PDB_TRACING;
+    pdb->state  |= PDB_TRACING;
+    Parrot_runcore_switch(pdb->debugee, CONST_STRING(interp, "debugger"));
 
     /* Clear the following when done some testing */
 
@@ -1963,8 +1964,9 @@ PDB_continue(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     */
 
     #if 0
-    pdb->tracing = 0;
-    pdb->debugee->run_core = PARROT_DEBUGGER_CORE;
+    pdb->tracing           = 0;
+    Parrot_runcore_switch(pdb->debugee, CONST_STRING(interp, "debugger"));
+
     new_internal_exception(pdb->debugee);
     if (setjmp(pdb->debugee->exceptions->destination)) {
         Parrot_io_eprintf(pdb->debugee, "Unhandled exception while debugging: %Ss\n",

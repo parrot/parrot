@@ -22,6 +22,7 @@ This file implements the Parrot embedding interface.
 #include "parrot/embed.h"
 #include "parrot/oplib/ops.h"
 #include "pmc/pmc_sub.h"
+#include "parrot/runcore_api.h"
 
 #include "../compilers/imcc/imc.h"
 
@@ -29,9 +30,6 @@ This file implements the Parrot embedding interface.
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-static FLOATVAL calibrate(PARROT_INTERP)
-        __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_OBSERVER
@@ -44,16 +42,6 @@ static void print_constant_table(PARROT_INTERP)
 static void print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
         __attribute__nonnull__(1);
 
-static void print_profile(PARROT_INTERP, SHIM(int status), SHIM(void *p))
-        __attribute__nonnull__(1);
-
-static int prof_sort_f(ARGIN(const void *a), ARGIN(const void *b))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void runcode_print_start_info(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 PARROT_CANNOT_RETURN_NULL
 static PMC* set_current_sub(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -63,20 +51,11 @@ static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-#define ASSERT_ARGS_calibrate __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_op_name __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_print_constant_table __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_print_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_print_profile __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_prof_sort_f __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(a) \
-    || PARROT_ASSERT_ARG(b)
-#define ASSERT_ARGS_runcode_print_start_info __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_set_current_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
@@ -172,7 +151,7 @@ Parrot_set_flag(PARROT_INTERP, INTVAL flag)
     switch (flag) {
         case PARROT_BOUNDS_FLAG:
         case PARROT_PROFILE_FLAG:
-            Interp_core_SET(interp, PARROT_SLOW_CORE);
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
             break;
         default:
             break;
@@ -235,7 +214,7 @@ void
 Parrot_set_trace(PARROT_INTERP, UINTVAL flag)
 {
     Parrot_pcc_trace_flags_on(interp, interp->ctx, flag);
-    Interp_core_SET(interp, PARROT_SLOW_CORE);
+    Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
 }
 
 
@@ -361,7 +340,47 @@ PARROT_EXPORT
 void
 Parrot_set_run_core(PARROT_INTERP, Parrot_Run_core_t core)
 {
-    Interp_core_SET(interp, core);
+    switch (core) {
+        case PARROT_SLOW_CORE:
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
+            break;
+        case PARROT_FAST_CORE:
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "fast"));
+            break;
+        case PARROT_SWITCH_CORE:
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "switch"));
+            break;
+        case PARROT_CGP_CORE:
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "cgp"));
+            break;
+        case PARROT_CGOTO_CORE:
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "cgoto"));
+            break;
+        case PARROT_JIT_CORE:
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "jit"));
+            break;
+        case PARROT_CGP_JIT_CORE:
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "cgp_jit"));
+            break;
+        case PARROT_SWITCH_JIT_CORE:
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "switch_jit"));
+            break;
+        case PARROT_EXEC_CORE:
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "exec"));
+            break;
+        case PARROT_GC_DEBUG_CORE:
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "gc_debug"));
+            break;
+        case PARROT_DEBUGGER_CORE:
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "debugger"));
+            break;
+        case PARROT_PROFILING_CORE:
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "profiling"));
+            break;
+        default:
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+                "Invalid runcore requested\n");
+    }
 }
 
 
@@ -665,33 +684,6 @@ setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
 
 /*
 
-=item C<static int prof_sort_f(const void *a, const void *b)>
-
-Sort function for profile data, by time.
-
-=cut
-
-*/
-
-static int
-prof_sort_f(ARGIN(const void *a), ARGIN(const void *b))
-{
-    ASSERT_ARGS(prof_sort_f)
-    const FLOATVAL timea = ((const ProfData *)a)->time;
-    const FLOATVAL timeb = ((const ProfData *)b)->time;
-
-    if (timea < timeb)
-        return 1;
-
-    if (timea > timeb)
-        return -1;
-
-    return 0;
-}
-
-
-/*
-
 =item C<static const char * op_name(PARROT_INTERP, int k)>
 
 Returns the name of the opcode.
@@ -706,140 +698,7 @@ static const char *
 op_name(PARROT_INTERP, int k)
 {
     ASSERT_ARGS(op_name)
-    switch (k) {
-        case PARROT_PROF_GC_p1:
-            return "GC_mark_root";
-        case PARROT_PROF_GC_p2:
-            return "GC_mark_next";
-        case PARROT_PROF_GC_cp:
-            return "GC_collect_PMC";
-        case PARROT_PROF_GC_cb:
-            return "GC_collect_buffers";
-        case PARROT_PROF_GC:
-            return "GC";
-        case PARROT_PROF_EXCEPTION:
-            return "EXCEPTION";
-        default:
-            break;
-    }
-
-    return interp->op_info_table[k - PARROT_PROF_EXTRA].full_name;
-}
-
-
-/*
-
-=item C<static FLOATVAL calibrate(PARROT_INTERP)>
-
-With this calibration, reported times of C<parrot -p> almost match those
-measured with time C<parrot -R bounds>.
-
-=cut
-
-*/
-
-static FLOATVAL
-calibrate(PARROT_INTERP)
-{
-    ASSERT_ARGS(calibrate)
-    opcode_t code[] = { 1 };      /* noop */
-    opcode_t *pc    = code;
-    const size_t   count  = 1000000;
-    size_t   n      = count;
-    const FLOATVAL start  = Parrot_floatval_time();
-    FLOATVAL now    = start;
-
-    /* op timing isn't free; it requires at least one time fetch per op */
-    for (; n; --n) {
-        pc = (interp->op_func_table[*code])(pc, interp);
-        now = Parrot_floatval_time();
-    }
-
-    return (now - start) / (FLOATVAL) count;
-}
-
-
-/*
-
-=item C<static void print_profile(PARROT_INTERP, int status, void *p)>
-
-Prints out a profile listing.
-
-=cut
-
-*/
-
-static void
-print_profile(PARROT_INTERP, SHIM(int status), SHIM(void *p))
-{
-    ASSERT_ARGS(print_profile)
-    RunProfile * const profile = interp->profile;
-
-    if (profile) {
-        UINTVAL        j;
-        int            k, jit;
-        UINTVAL        op_count   = 0;
-        UINTVAL        call_count = 0;
-        FLOATVAL       sum_time   = 0.0;
-        const FLOATVAL empty      = calibrate(interp);
-
-        Parrot_io_printf(interp,
-                   "Calibration: overhead = %.6f ms/op\n", 1000.0 * empty);
-
-        Parrot_io_printf(interp,
-                   " Code J Name                         "
-                   "Calls  Total/s       Avg/ms\n");
-
-        for (j = 0; j < interp->op_count + PARROT_PROF_EXTRA; j++) {
-            const UINTVAL n     = profile->data[j].numcalls;
-            profile->data[j].op = j;
-
-            if (j >= PARROT_PROF_EXTRA) {
-                profile->data[j].time -= empty * n;
-
-                /* faster than noop */
-                if (profile->data[j].time < 0.0)
-                    profile->data[j].time = 0.0;
-            }
-        }
-
-        qsort(profile->data, interp->op_count + PARROT_PROF_EXTRA,
-                sizeof (ProfData), prof_sort_f);
-
-        for (j = 0; j < interp->op_count + PARROT_PROF_EXTRA; j++) {
-            const UINTVAL n = profile->data[j].numcalls;
-
-            if (n > 0) {
-                const FLOATVAL t = profile->data[j].time;
-
-                op_count++;
-                call_count += n;
-                sum_time   += t;
-
-                k   = profile->data[j].op;
-                jit = '-';
-#if JIT_CAPABLE
-                if (k >= PARROT_PROF_EXTRA &&
-                    op_jit[k - PARROT_PROF_EXTRA].extcall != 1)
-                    jit = 'j';
-#endif
-                Parrot_io_printf(interp, " %4d %c %-25s %8vu  %10vf  %10.6vf\n",
-                        k - PARROT_PROF_EXTRA,
-                        jit,
-                        op_name(interp, k),
-                        n,
-                        t,
-                        (FLOATVAL)(t * 1000.0 / (FLOATVAL)n));
-            }
-        }
-
-        Parrot_io_printf(interp, " %4vu - %-25s %8vu  %10vf  %10.6vf\n",
-                op_count,
-                "-",
-                call_count,
-                sum_time,
-                (FLOATVAL)(sum_time * 1000.0 / (FLOATVAL)call_count));
-    }
+    return interp->op_info_table[k].full_name;
 }
 
 
@@ -948,8 +807,18 @@ Parrot_runcode(PARROT_INTERP, int argc, ARGIN(char **argv))
     PMC *userargv, *main_sub;
 
     /* Debugging mode nonsense. */
-    if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG))
-        runcode_print_start_info(interp);
+    if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
+        if (Interp_flags_TEST(interp, PARROT_BOUNDS_FLAG)) {
+            Parrot_io_eprintf(interp,
+                    "*** Parrot VM: Bounds checking enabled. ***\n");
+        }
+
+        if (Interp_trace_TEST(interp, PARROT_TRACE_OPS_FLAG))
+            Parrot_io_eprintf(interp, "*** Parrot VM: Tracing enabled. ***\n");
+
+        Parrot_io_eprintf(interp, "*** Parrot VM: %Ss core ***\n",
+                interp->run_core->name);
+    }
 
     /* Set up @ARGS (or whatever this language calls it) in userargv. */
     userargv = setup_argv(interp, argc, argv);
@@ -957,7 +826,8 @@ Parrot_runcode(PARROT_INTERP, int argc, ARGIN(char **argv))
 #if EXEC_CAPABLE
 
     /* s. runops_exec interpreter.c */
-    if (Interp_core_TEST(interp, PARROT_EXEC_CORE))
+    if (Parrot_str_equal(interp, interp->run_core->name,
+        Parrot_str_new_constant(interp, "exec")))
         Parrot_exec_run = 1;
 
 #endif
@@ -967,7 +837,6 @@ Parrot_runcode(PARROT_INTERP, int argc, ARGIN(char **argv))
      * before exiting, then print debug infos if turned on.
      */
     Parrot_on_exit(interp, print_debug,   NULL);
-    Parrot_on_exit(interp, print_profile, NULL);
 
     /* Let's kick the tires and light the fires--call interpreter.c:runops. */
     main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
@@ -1290,60 +1159,6 @@ Parrot_compile_string(PARROT_INTERP, Parrot_String type,
     return NULL;
 }
 
-/*
-
-=item C<static void runcode_print_start_info(PARROT_INTERP)>
-
-Show runcore info at stat,
-
-=cut
-
-*/
-
-static void
-runcode_print_start_info(PARROT_INTERP)
-{
-    ASSERT_ARGS(runcode_print_start_info)
-
-    const char * corename;
-
-    Parrot_io_eprintf(interp,
-            "*** Parrot VM: Setting stack top. ***\n");
-
-    if (Interp_flags_TEST(interp, PARROT_BOUNDS_FLAG)) {
-        Parrot_io_eprintf(interp,
-                "*** Parrot VM: Bounds checking enabled. ***\n");
-    }
-
-    if (Interp_trace_TEST(interp, PARROT_TRACE_OPS_FLAG)) {
-        Parrot_io_eprintf(interp,
-                "*** Parrot VM: Tracing enabled. ***\n");
-    }
-
-    switch (interp->run_core) {
-        case PARROT_SLOW_CORE:
-            corename = "Slow";   break;
-        case PARROT_FAST_CORE:
-            corename = "Fast";   break;
-        case PARROT_SWITCH_CORE:
-        case PARROT_SWITCH_JIT_CORE:
-            corename = "Switch"; break;
-        case PARROT_CGP_CORE:
-        case PARROT_CGP_JIT_CORE:
-            corename = "CGP";    break;
-        case PARROT_CGOTO_CORE:
-            corename = "CGoto";  break;
-        case PARROT_JIT_CORE:
-            corename = "JIT";    break;
-        case PARROT_EXEC_CORE:
-            corename = "EXEC";   break;
-        default:
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                 "Unknown run core");
-    }
-
-    Parrot_io_eprintf(interp, "*** Parrot VM: %s core ***\n", corename);
-}
 
 /*
 

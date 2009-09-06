@@ -356,24 +356,12 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
     ASSERT_ARGS(Parrot_ex_throw_from_c)
 
     Parrot_runloop    *return_point = interp->current_runloop;
-    RunProfile * const profile      = interp->profile;
     opcode_t *address;
     PMC        * const handler      =
                              Parrot_cx_find_handler_local(interp, exception);
 
     if (PMC_IS_NULL(handler))
         die_from_exception(interp, exception);
-
-    /* If profiling, remember end time of lastop and generate entry for
-     * exception. */
-    if (profile && Interp_flags_TEST(interp, PARROT_PROFILE_FLAG)) {
-        const FLOATVAL now = Parrot_floatval_time();
-
-        profile->data[profile->cur_op].time += now - profile->starttime;
-        profile->cur_op                      = PARROT_PROF_EXCEPTION;
-        profile->starttime                   = now;
-        profile->data[PARROT_PROF_EXCEPTION].numcalls++;
-    }
 
     if (Interp_debug_TEST(interp, PARROT_BACKTRACE_DEBUG_FLAG)) {
         STRING * const exit_code = CONST_STRING(interp, "exit_code");
