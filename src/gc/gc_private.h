@@ -104,10 +104,11 @@ typedef struct GC_Subsystem {
     void (*finalize_gc_system) (PARROT_INTERP);
     void (*init_pool)(PARROT_INTERP, struct Fixed_Size_Obj_Pool *);
 
-    /*Function hooks that GC systems can CHOOSE to provide
+    /*Function hooks that GC systems can CHOOSE to provide if they need them
      *These will be called from the GC API function Parrot_gc_func_name */
     void (*write_barrier)(PARROT_INTERP, PMC *, PMC *, PMC *);
     void (*write_barrier_key)(PARROT_INTERP, PMC *, PMC *, PObj *, PMC *, PObj *);
+    /*read_barrier hooks can go here later*/
 
     /* functions used in arena scan code to convert from object pointers
      * to arena pointers ... GMS only I think ...*/
@@ -117,6 +118,26 @@ typedef struct GC_Subsystem {
     /*JT: this is only used by GMS afaict, but we'll keep it here for now ...*/
     size_t header_size;
 } GC_Subsystem;
+
+typedef struct Memory_Block {
+    size_t free;
+    size_t size;
+    struct Memory_Block *prev;
+    struct Memory_Block *next;
+    char *start;
+    char *top;
+} Memory_Block;
+
+typedef struct Var_Size_Obj_Pool {
+    Memory_Block *top_block;
+    void (*compact)(PARROT_INTERP, struct Var_Size_Obj_Pool *);
+    size_t minimum_block_size;
+    size_t total_allocated; /* total bytes allocated to this pool */
+    size_t guaranteed_reclaimable;     /* bytes that can definitely be reclaimed*/
+    size_t possibly_reclaimable;     /* bytes that can possibly be reclaimed
+                                      * (above plus COW-freed bytes) */
+    FLOATVAL reclaim_factor; /* minimum percentage we will reclaim */
+} Var_Size_Obj_Pool;
 
 typedef struct Fixed_Size_Obj_Arena {
     size_t                     used;
@@ -150,20 +171,27 @@ typedef struct PMC_Attribute_Pool {
 
 /* Tracked resource pool */
 typedef struct Fixed_Size_Obj_Pool {
+
+    struct Var_Size_Obj_Pool *mem_pool;
+   /* Size in bytes of an individual pool item. This size may include
+    * a GC-system specific GC header. (e.g. GMS headers) */
+    size_t object_size; 
+
+    size_t start_arena_memory;
+    size_t end_arena_memory;
+
     Fixed_Size_Obj_Arena *last_Arena;
-    /* Size in bytes of an individual pool item. This size may include
-     * a GC-system specific GC header.
-     * See the macros below.
-     */
-    size_t object_size;
-    size_t objects_per_alloc;
-    size_t total_objects;
+    GC_MS_PObj_Wrapper * free_list;
     size_t num_free_objects;    /* number of resources in the free pool */
+    size_t total_objects;
+
+    PARROT_OBSERVER const char *name;
+
+    size_t objects_per_alloc;
+
     int skip;
     size_t replenish_level;
-    GC_MS_PObj_Wrapper * free_list;
 
-    
     add_free_object_fn_type     add_free_object; /* adds a free object to 
                                                     the pool's free list  */
     get_free_object_fn_type     get_free_object; /* gets and removes a free 
@@ -172,13 +200,6 @@ typedef struct Fixed_Size_Obj_Pool {
     alloc_objects_fn_type       alloc_objects;  /* allocates more objects */
     alloc_objects_fn_type       more_objects;
     gc_object_fn_type           gc_object;
-
-
-    
-    struct Var_Size_Obj_Pool *mem_pool;
-    size_t start_arena_memory;
-    size_t end_arena_memory;
-    PARROT_OBSERVER const char *name;
 
     /*Contains GC system-specific data structures*/
     union {

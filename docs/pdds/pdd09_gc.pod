@@ -49,18 +49,6 @@ into smaller stages.
 In this GC scheme, after all reachable objects are marked as live, a sweep
 through the object arenas collects all unmarked objects.
 
-=head3 Mark-and-don't-sweep
-
-In this scheme, all objects are marked black (live) when created. White
-objects are free memory available for allocation. When no white objects remain
-(out of memory), the black objects are all changed to white, and a marking
-process runs to mark all reachable objects as live. Any unreachable objects
-are left white, and available for allocation.
-
-In some implementations, the change from black to white is made by simply
-changing the interpretation of the mark bit, for example, from 1 == black to 1
-== white.
-
 =head3 Copying collection
 
 In this scheme, live objects are copied into a new memory region. The entire
@@ -162,11 +150,11 @@ tri-color incremental marking scheme, combined with a concurrent sweep scheme.
 =head3 Terminology
 
 A GC run is composed of two distinct operations: Finding objects which are
-dead (the "trace" phase) and freeing dead objects for later reuse (the
-"sweep" phase). The sweep phase is also known as the collection phase. The
-trace phase is also known as the "mark phase" and less frequently as the
-"dead object detection" phase. The use of the term "dead object detection"
-and its acronym DOD has been deprecated.
+dead (the "trace" or "mark" phase) and freeing dead objects for later reuse
+(the "sweep" phase). The sweep phase is also known as the collection phase.
+The trace phase is less frequently known as the "dead object detection" phase.
+The use of the term "dead object detection" and its acronym DOD has been
+deprecated.
 
 =head3 Initial Marking
 
@@ -314,18 +302,20 @@ subsystem (with freedom for variation between GC implementations).
 
 =head4 The Var_Size_Obj_Pool structure
 
-The Var_Size_Obj_Pool structure is a simple memory pool. It contains a pointer to
-the top block of the allocated pool, the total allocated size of the pool, the
-block size, and some details on the reclamation characteristics of the pool.
+The Var_Size_Obj_Pool structure is a simple memory pool. It contains a pointer 
+to the top block of the allocated pool, the total allocated size of the pool,
+the block size, and some details on the reclamation characteristics of the 
+pool.
 
 =head4 The Fixed_Size_Obj_Pool structure
 
-The Fixed_Size_Obj_Pool structure is a richer memory pool for object allocation.
-It tracks details like the number of allocated and free objects in the pool, a
-list of free objects, and for the generational GC implementation maintains
-linked lists of white, black, and gray PMCs. It contains a pointer to a simple
-Var_Size_Obj_Pool (the base storage of the pool). It holds function pointers for
-adding and retrieving free objects in the pool, and for allocating objects.
+The Fixed_Size_Obj_Pool structure is a richer memory pool for object 
+allocation. It tracks details like the number of allocated and free objects 
+in the pool, a list of free objects, and for the generational GC 
+implementation maintains linked lists of white, black, and gray PMCs. It 
+contains a pointer to a simple Var_Size_Obj_Pool (the base storage of the 
+pool). It holds function pointers for adding and retrieving free objects in
+the pool, and for allocating objects.
 
 =head3 Internal API
 

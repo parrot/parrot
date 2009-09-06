@@ -202,9 +202,9 @@ Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
     if (interp->gc_sys->sys_type == GMS) {
         /*
         do {
-            if (!PObj_live_TEST(obj) &&  
+            if (!PObj_live_TEST(obj) &&
                  PObj_to_GMSH(obj)->gen->gen_no >=
-                 interp->gc_sys->gc_sys_data.gms_data->gc_generation) 
+                 interp->gc_sys->gc_sys_data.gms_data->gc_generation)
                 parrot_gc_gms_Parrot_gc_mark_PObj_alive(interp, obj);
         } while (0);
         break;
@@ -214,26 +214,26 @@ Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
         /* if object is live or on free list return */
         if (PObj_is_live_or_free_TESTALL(obj))
             return;
-        
+
 #  if ! DISABLE_GC_DEBUG
 #    if GC_VERBOSE
         if (CONSERVATIVE_POINTER_CHASING)
             fprintf(stderr, "GC Warning! Unanchored %s %p found in system areas \n",
                     PObj_is_PMC_TEST(obj) ? "PMC" : "Buffer", obj);
-        
+
 #    endif
 #  endif
         /* mark it live */
         PObj_live_SET(obj);
-        
+
         /* if object is a PMC and contains buffers or PMCs, then attach the PMC
          * to the chained mark list. */
         if (PObj_is_PMC_TEST(obj)) {
             PMC * const p = (PMC *)obj;
-            
+
             if (PObj_is_special_PMC_TEST(obj))
                 mark_special(interp, p);
-            
+
             else if (PMC_metadata(p))
                 Parrot_gc_mark_PObj_alive(interp, (PObj*)PMC_metadata(p));
         }
@@ -275,19 +275,19 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
 
     interp->gc_sys = mem_allocate_zeroed_typed(GC_Subsystem);
 
-    /*JT: This is set at compile time ... what we need to do next is 
+    /*JT: This is set at compile time ... what we need to do next is
      *    add a command-line switch --gc that will enable us to choose
      *    a different one ... if --gc is set, we use it, otherwise use
-     *    the default  */  
+     *    the default  */
     interp->gc_sys->sys_type = PARROT_GC_DEFAULT_TYPE;
 
     /* Set the sys_type here if we got a --gc command line switch
-     * ... we need some sort of set_gc_sys_type_from_command_line_switch() 
+     * ... we need some sort of set_gc_sys_type_from_command_line_switch()
      * function ...
      */
 
     /*Call appropriate initialization function for GC subsystem*/
-    switch(interp->gc_sys->sys_type) {
+    switch (interp->gc_sys->sys_type) {
       case MS:
         Parrot_gc_ms_init(interp);
         break;
@@ -300,7 +300,7 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
         break;
       case INF:
         Parrot_gc_inf_init(interp);
-        break;  
+        break;
        */
       default:
         break;  /*What SHOULD we be doing if we get here?*/
@@ -1621,7 +1621,7 @@ Wrapper around write_barrier hook for currently active GC system ...
 
 */
 
-void 
+void
 Parrot_gc_write_barrier(PARROT_INTERP, PMC *agg, PMC *old, PMC *new){
     interp->gc_sys->write_barrier(interp, agg, old, new);
 }
@@ -1636,7 +1636,7 @@ Wrapper around write_barrier_key hook for currently active GC system ...
 
 */
 
-void 
+void
 Parrot_gc_write_barrier_key(PARROT_INTERP, PMC *agg, PMC *old, PObj *old_key, PMC *_new, PObj *new_key){
     interp->gc_sys->write_barrier_key(interp, agg, old, old_key, _new, new_key);
 }

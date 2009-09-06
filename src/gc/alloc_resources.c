@@ -216,17 +216,18 @@ mem_allocate(PARROT_INTERP, size_t size, ARGMOD(Var_Size_Obj_Pool *pool))
         if (!interp->arena_base->gc_mark_block_level
         &&   interp->arena_base->mem_allocs_since_last_collect) {
             Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
-#if !PARROT_GC_IMS && !PARROT_GC_INF
-            /* Compact the pool if allowed and worthwhile */
-            if (pool->compact) {
-                /* don't bother reclaiming if it's just chicken feed */
-                if ((pool->possibly_reclaimable * pool->reclaim_factor +
-                            pool->guaranteed_reclaimable) > size) {
-                    (*pool->compact) (interp, pool);
-                }
 
+            if ((interp->gc_sys->sys_type != IMS) &&
+                (interp->gc_sys->sys_type != INF)) {
+                /* Compact the pool if allowed and worthwhile */
+                if (pool->compact) {
+                    /* don't bother reclaiming if it's only a small amount */
+                    if ((pool->possibly_reclaimable * pool->reclaim_factor +
+                         pool->guaranteed_reclaimable) > size) {
+                        (*pool->compact) (interp, pool);
+                    }
+                }
             }
-#endif
         }
         if (pool->top_block->free < size) {
             if (pool->minimum_block_size < 65536 * 16)
@@ -417,16 +418,16 @@ compact_pool(PARROT_INTERP, ARGMOD(Var_Size_Obj_Pool *pool))
         for (cur_buffer_arena = header_pool->last_Arena;
                 cur_buffer_arena;
                 cur_buffer_arena = cur_buffer_arena->prev) {
-            /*JT: Something like this is what we really want ... 
+            /*JT: Something like this is what we really want ...
              *JT: if only I knew how to program C ...
             if (interp->gc_sys->Arena_to_PObj){
-                Buffer *b = 
-                    (Buffer *) 
+                Buffer *b =
+                    (Buffer *)
                     interp->gc_sys->Arena_to_PObj(cur_buffer_arena->start_objects);
             }
             */
 
-            /*JT: but for now, we'll just cheat, since it's only GMS 
+            /*JT: but for now, we'll just cheat, since it's only GMS
                   that needs that stuff anyway*/
             Buffer *b = (Buffer *) cur_buffer_arena->start_objects;
             UINTVAL i;

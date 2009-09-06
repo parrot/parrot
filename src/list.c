@@ -399,7 +399,7 @@ allocate_chunk(PARROT_INTERP, ARGIN(List *list), UINTVAL items, UINTVAL size)
 
 
 /*
-  
+
 =item C<static void rebuild_chunk_ptrs(List *list, int cut)>
 
 Rebuilds C<list> and updates/optimizes chunk usage. Deletes empty chunks,
@@ -1273,8 +1273,8 @@ list_set(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(void *item),
         if (list->container) {
             /*JT: not working now ... GMS only anyway
             if (interp->gc_sys->write_barrier){
-                Parrot_gc_write_barrier(interp, 
-                                              list->container, 
+                Parrot_gc_write_barrier(interp,
+                                              list->container,
                                               ((PMC **) Buffer_bufstart(&chunk->data))[idx],
                                               (PMC *)item);
             }

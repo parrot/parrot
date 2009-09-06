@@ -1304,14 +1304,14 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
 
     if (bucket) {
         if (hash->entry_type == enum_type_PMC && hash->container) {
-        
+
         /*JT: can't get this to work right now ...
         if (interp->gc_sys->write_barrier_key) {
             Parrot_gc_write_barrier_key(interp,
                                               hash->container,
-                                              (PMC *)bucket->value, 
-                                              bucket->key, 
-                                              (PMC *)value, 
+                                              (PMC *)bucket->value,
+                                              bucket->key,
+                                              (PMC *)value,
                                               key);
         }
         */
@@ -1323,11 +1323,11 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
 
         /*JT: can't get this to work right now ...
         if (interp->gc_sys->write_barrier_key){
-            Parrot_gc_write_barrier_key(interp, 
+            Parrot_gc_write_barrier_key(interp,
                                               hash->container,
-                                              NULL, 
-                                              NULL, 
-                                              (PMC *)value, 
+                                              NULL,
+                                              NULL,
+                                              (PMC *)value,
                                               key);
         }
         */
