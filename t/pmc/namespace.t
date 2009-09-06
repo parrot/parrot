@@ -39,10 +39,11 @@ do.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(51)
+    plan(58)
 
     create_namespace_pmc()
     verify_namespace_type()
+    get_namespace_class()
     get_global_opcode()
     get_sub_from_namespace_hash()
     access_sub_in_namespace()
@@ -97,6 +98,48 @@ do.
     $P0 = get_root_namespace ["myhll"]
     $S0 = typeof $P0
     is($S0, "NameSpace", "HLL NameSpaces are NameSpaces too")
+
+.end
+
+.sub 'get_namespace_class'
+    # First, prove that we don't have a class until it's created
+    $P0 = get_global "Foo"
+    $P1 = get_class $P0
+    $I0 = isnull $P1
+    is($I0, 1, "NameSpace doesn't have a Class till it's created")
+
+    # Can create a new class from a NameSpace
+    $P1 = newclass $P0
+    $I0 = isnull $P1
+    is($I0, 0, "Create Class from NameSpace")
+
+    # New Class is a Class
+    $S0 = typeof $P1
+    is($S0, "Class", "get_class on a NameSpace returns a Class")
+
+    # Class has same name as namespace
+    $S0 = $P0
+    $S1 = $P1
+    is($S0, $S1, "Class has same name as NameSpace")
+
+    # Now, we do have a class
+    $P1 = get_class $P0
+    $I0 = isnull $P1
+    is($I0, 0, "get_class on a NameSpace returns something")
+
+    # Create object from class from NameSpace
+    push_eh eh
+    $P2 = new $P1
+    pop_eh
+    ok(1, "Can create a new object from a namespace")
+    goto pmc_is_created
+  eh:
+    ok(0, "Cannot create a new object from a namespace")
+  pmc_is_created:
+
+    # Object from Class from NameSpace has right type
+    $S0 = typeof $P2
+    is($S0, "Foo", "Object created from class has name of NameSpace")
 
 .end
 
