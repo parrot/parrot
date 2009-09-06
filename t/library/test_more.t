@@ -15,7 +15,7 @@
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
     test_namespace = get_namespace [ 'Test'; 'More' ]
-    exports = split " ", "ok is diag like skip todo is_deeply isa_ok isnt pir_error_output_like"
+    exports = split " ", "ok is diag like skip todo is_deeply isa_ok isnt throws_like"
     test_namespace.'export_to'(curr_namespace, exports)
 
     test_namespace = get_namespace [ 'Test'; 'Builder'; 'Tester' ]
@@ -32,43 +32,43 @@
     test_like()
     test_is_deeply()
     test_diagnostics()
-    test_pir_error_output_like()
+    test_throws_like()
     test_isa_ok()
 
     test.'finish'()
 .end
 
-.sub test_pir_error_output_like
+.sub test_throws_like
 
-    test_fail('pir_error_output_like fails when there is no error')
+    test_fail('throws_like fails when there is no error')
 
-    pir_error_output_like( <<'CODE', 'somejunk', 'pir_error_output_like fails when there is no error')
+    throws_like( <<'CODE', 'somejunk', 'throws_like fails when there is no error')
 .sub main
     $I0 = 42
 .end
 CODE
 
     test_diag( 'no error thrown' )
-    test_test( 'pir_error_output_like fails when there is no error')
-    test_pass('pir_error_output_like passes when error matches pattern')
+    test_test( 'throws_like fails when there is no error')
+    test_pass('throws_like passes when error matches pattern')
 
-    pir_error_output_like( <<'CODE', '<[for the lulz]>','pir_error_output_like passes when error matches pattern')
+    throws_like( <<'CODE', '<[for the lulz]>','throws_like passes when error matches pattern')
 .sub main
     die 'I did it for the lulz'
 .end
 CODE
 
-    test_test( 'pir_error_output_like passes when error matches pattern' )
+    test_test( 'throws_like passes when error matches pattern' )
 
-    test_fail( 'pir_error_output_like fails when error does not match pattern' )
+    test_fail( 'throws_like fails when error does not match pattern' )
 
-    pir_error_output_like( <<'CODE', '<[for the lulz]>','pir_error_output_like fails when error does not match pattern')
+    throws_like( <<'CODE', '<[for the lulz]>','throws_like fails when error does not match pattern')
 .sub main
     die 'DO NOT WANT'
 .end
 CODE
     test_diag( 'match failed' )
-    test_test('pir_error_output_like fails when error does not match pattern' )
+    test_test('throws_like fails when error does not match pattern' )
 .end
 
 .sub test_ok

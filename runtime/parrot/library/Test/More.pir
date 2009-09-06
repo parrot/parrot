@@ -13,7 +13,7 @@ Test::More - Parrot extension for testing modules
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
     test_namespace = get_namespace [ 'Test'; 'More' ]
-    exports        = split ' ', 'plan diag ok nok is is_deeply like isa_ok skip isnt todo pir_error_output_like'
+    exports        = split ' ', 'plan diag ok nok is is_deeply like isa_ok skip isnt todo throws_like'
 
     test_namespace.'export_to'(curr_namespace, exports)
 
@@ -814,7 +814,7 @@ This handles comparisons of array-like and hash-like structures.
     .return( equal )
 .end
 
-=item C<pir_error_output_like( codestring, pattern, description )>
+=item C<throws_like( codestring, pattern, description )>
 
 Takes PIR code in C<codestring> and a PGE pattern to match in C<pattern>, as
 well as an optional message in C<description>. Passes a test if the PIR throws
@@ -822,7 +822,7 @@ an exception that matches the pattern, fails the test otherwise.
 
 =cut
 
-.sub pir_error_output_like
+.sub throws_like
     .param string target
     .param string pattern
     .param string description :optional
