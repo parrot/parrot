@@ -56,7 +56,7 @@ Although NameSpace.'export_to'() is used in test_more.pir.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(63)
+    plan(64)
 
     create_namespace_pmc()
     verify_namespace_type()
@@ -68,6 +68,7 @@ Although NameSpace.'export_to'() is used in test_more.pir.
     build_namespaces_at_runtime()
     hll_namespaces()
     anon_function_namespace()
+    find_name_opcode()
     namespace_methods()
 .end
 
@@ -417,6 +418,33 @@ CODE
     $P3 = $P2.'get_name'()
     $S0 = join "::", $P3
     is($S0, "parrot::anon_test_internal_ns", "get_namespace name from anon sub")
+.end
+
+.sub 'find_name_opcode'
+
+    $S0 = <<'CODE'
+        .namespace ['pugs';'main']
+        .sub 'main' :main
+            push_eh just_in_case
+            $P0 = find_name "&say"
+            $P0()
+            $I0 = 1
+            goto the_end
+          just_in_case:
+            $I0 = 0
+          the_end:
+            pop_eh
+            .return($I0)
+        .end
+
+        .sub "&say"
+            noop
+        .end
+CODE
+    $P0 = compreg "PIR"
+    $P1 = $P0($S0)
+    $I0 = $P1()
+    is($I0, 1, "find_name sub with sigil in namespace")
 .end
 
 .sub 'namespace_methods'

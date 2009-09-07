@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 44;
+use Parrot::Test tests => 43;
 use Parrot::Config;
 
 =head1 NAME
@@ -22,20 +22,6 @@ t/pmc/namespace.t - test the NameSpace PMC as described in PDD 21.
 Test the NameSpace PMC as described in PDD21.
 
 =cut
-
-# How do we convert this to PIR?
-pir_output_is( <<'CODE', <<'OUTPUT', "segv in get_name" );
-.namespace ['pugs';'main']
-.sub 'main' :main
-    $P0 = find_name "&say"
-    $P0()
-.end
-.sub "&say"
-    say "ok"
-.end
-CODE
-ok
-OUTPUT
 
 pir_output_is( <<'CODE', <<'OUT', "unicode namespace, global" );
 .namespace [ unicode:"Fran\xe7ois" ]
