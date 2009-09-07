@@ -2,10 +2,9 @@
 
 New in 1.6.0
 - Core
-  + Profiling runcore can now be used to generate Callgrind-compatible output
   + PMC allocator now automatically allocates ATTR structures
   + Added fixed-size structure allocator to GC
-  + Contexts are not garbage-collectable
+  + Contexts are now garbage-collectable
   + Created a new Context API
   + Op definitions cache the current Context for subsequent lookups
   + Unified Continuation PMC and Parrot_cont structure
