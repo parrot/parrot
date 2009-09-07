@@ -8,10 +8,6 @@ src/context.c - Parrot_Context functions.
 
 =head1 DESCRIPTION
 
-=head2 Functions
-
-=over 4
-
 =cut
 
 */
@@ -23,7 +19,6 @@ src/context.c - Parrot_Context functions.
 #include "parrot/register.h"
 #include "../pmc/pmc_sub.h"
 
-
 /* set CTX_LEAK_DEBUG_FULL to 1 for enhanced context debugging.
  * When set (1) freed contexts are "poisoned" so that any dangling
  * references produce segfaults, and (2) contexts are not recycled
@@ -32,8 +27,8 @@ src/context.c - Parrot_Context functions.
  */
 #define CTX_LEAK_DEBUG_FULL 0
 
-
 /*
+
 =head2 Context and register frame layout
 
     +----------++----+------+------------+----+
@@ -52,13 +47,12 @@ The macro CONTEXT() hides these details
 
 */
 
-
 #define ALIGNED_CTX_SIZE (((sizeof (Parrot_Context) + NUMVAL_SIZE - 1) \
         / NUMVAL_SIZE) * NUMVAL_SIZE)
 
 /*
 
-=pod
+=head2 Allocation Size
 
 Round register allocation size up to the nearest multiple of 8. A granularity
 of 8 is arbitrary, it could have been some bigger power of 2. A "slot" is an
@@ -104,6 +98,10 @@ static void init_context(PARROT_INTERP,
 /* HEADERIZER END: static */
 
 /*
+
+=head2 Context API Functions
+
+=over 4
 
 =item C<void Parrot_pcc_set_constants(PARROT_INTERP, PMC *ctx, struct
 PackFile_Constant **constants)>
@@ -1016,16 +1014,11 @@ Parrot_pcc_trace_flags_test(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL flags)
 
 /*
 
+=back
+
 =head2 Context and Register Allocation Functions
 
 =over 4
-
-=cut
-
-*/
-
-
-/*
 
 =item C<void create_initial_context(PARROT_INTERP)>
 

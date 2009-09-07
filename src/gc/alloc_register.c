@@ -21,8 +21,6 @@ is determined by the PASM/PIR compiler in the register allocation pass
 
 /*
 
-=back
-
 =head1 SEE ALSO
 
 F<include/parrot/register.h> and F<src/stacks.c>.

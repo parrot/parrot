@@ -9,6 +9,49 @@
 #ifndef PARROT_CONTEXT_H_GUARD
 #define PARROT_CONTEXT_H_GUARD
 
+#include "parrot/string.h"
+#include "parrot/compiler.h"
+
+/*
+ * Macros to make accessing registers more convenient/readable.
+ */
+
+#define CTX_REG_NUM(p, x) (*Parrot_pcc_get_FLOATVAL_reg(interp, (p), (x)))
+#define CTX_REG_INT(p, x) (*Parrot_pcc_get_INTVAL_reg(interp, (p), (x)))
+#define CTX_REG_PMC(p, x) (*Parrot_pcc_get_PMC_reg(interp, (p), (x)))
+#define CTX_REG_STR(p, x) (*Parrot_pcc_get_STRING_reg(interp, (p), (x)))
+
+#define REG_NUM(interp, x) (*Parrot_pcc_get_FLOATVAL_reg((interp), (interp)->ctx, (x)))
+#define REG_INT(interp, x) (*Parrot_pcc_get_INTVAL_reg((interp), (interp)->ctx, (x)))
+#define REG_PMC(interp, x) (*Parrot_pcc_get_PMC_reg((interp), (interp)->ctx, (x)))
+#define REG_STR(interp, x) (*Parrot_pcc_get_STRING_reg((interp), (interp)->ctx, (x)))
+
+/*
+ * and a set of macros to access a register by offset, used
+ * in JIT emit prederef code
+ * The offsets are relative to interp->ctx.bp.
+ *
+ * Reg order in imcc/reg_alloc.c is "INSP"   TODO make defines
+ */
+
+#define REGNO_INT 0
+#define REGNO_NUM 1
+#define REGNO_STR 2
+#define REGNO_PMC 3
+
+#define __CTX Parrot_pcc_get_context_struct(interp, interp->ctx)
+#define _SIZEOF_INTS    (sizeof (INTVAL) * __CTX->n_regs_used[REGNO_INT])
+#define _SIZEOF_NUMS    (sizeof (FLOATVAL) * __CTX->n_regs_used[REGNO_NUM])
+#define _SIZEOF_PMCS    (sizeof (PMC*) * __CTX->n_regs_used[REGNO_PMC])
+#define _SIZEOF_STRS    (sizeof (STRING*) * __CTX->n_regs_used[REGNO_STR])
+
+#define REG_OFFS_NUM(x) (sizeof (FLOATVAL) * (-1L - (x)))
+#define REG_OFFS_INT(x) (sizeof (INTVAL) * (x))
+#define REG_OFFS_PMC(x) (_SIZEOF_INTS + sizeof (PMC*) * \
+        (__CTX->n_regs_used[REGNO_PMC] - 1L - (x)))
+#define REG_OFFS_STR(x) (sizeof (STRING*) * (x) + _SIZEOF_INTS + _SIZEOF_PMCS)
+
+
 struct PackFile_Constant;
 
 typedef union {
