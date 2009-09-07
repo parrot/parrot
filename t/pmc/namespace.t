@@ -56,7 +56,7 @@ Although NameSpace.'export_to'() is used in test_more.pir.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(64)
+    plan(66)
 
     create_namespace_pmc()
     verify_namespace_type()
@@ -252,6 +252,28 @@ CODE
   eh8:
     ok(0, "Cannot find ISO-8859 NameSpace using Unicode name")
   end_test8:
+    pop_eh
+
+  test9:
+    push_eh eh9
+    $P0 = get_global [ unicode:"\x{20AC}uros" ], "baz"
+    $S0 = $P0()
+    is($S0, unicode:"\x{20AC}uros", "Found sub in Unicode NameSpace")
+    goto end_test9
+  eh9:
+    ok(0, "Cannot find sub in Unicode NameSpace")
+  end_test9:
+    pop_eh
+
+  test10:
+    push_eh eh10
+    $P0 = get_global [ "Foo";unicode:"\x{20AC}uros" ], "baz"
+    $S0 = $P0()
+    is($S0, unicode:"Foo::\x{20AC}uros", "Found sub in nested Unicode NameSpace")
+    goto end_test10
+  eh10:
+    ok(0, "Cannot find sub in nested Unicode NameSpace")
+  end_test10:
     pop_eh
 
 .end
@@ -529,34 +551,49 @@ CODE
 ##### TEST NAMESPACES AND FUNCTIONS #####
 # These functions and namespaces are used for the tests above
 
+# The current namespace
 .namespace []
-
 .sub 'baz'
     .return("")
 .end
 
+# NameSpace "Foo"
 .namespace ["Foo"]
 .sub 'baz'
     .return("Foo")
 .end
 
+# NameSpace "Foo";"Bar". Nested namespace
 .namespace ["Foo";"Bar"]
 .sub 'baz'
     .return("Foo::Bar")
 .end
 
+# Namespace specified in ISO-8859-1
 .namespace [ iso-8859-1:"Fran\x{E7}ois" ]
 .sub 'baz'
     .return(iso-8859-1:"Fran\x{E7}ois")
 .end
 
+# Nested namespace specified in ISO-8859
 .namespace [ "Foo"; iso-8859-1:"Fran\x{E7}ois" ]
 .sub 'baz'
     .return(iso-8859-1:"Foo::Fran\x{E7}ois")
 .end
 
-.HLL "MyHLL"
+# Namesace specified in Unicode
+.namespace [ unicode:"\x{20AC}uros" ]
+.sub 'baz'
+    .return(unicode:"\x{20AC}uros")
+.end
 
+# Nested namespace specified in Unicode
+.namespace [ "Foo";unicode:"\x{20AC}uros" ]
+.sub 'baz'
+    .return(unicode:"Foo::\x{20AC}uros")
+.end
+
+.HLL "MyHLL"
 .sub 'baz'
     .return("MyHLL")
 .end

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 43;
+use Parrot::Test tests => 42;
 use Parrot::Config;
 
 =head1 NAME
@@ -22,23 +22,6 @@ t/pmc/namespace.t - test the NameSpace PMC as described in PDD 21.
 Test the NameSpace PMC as described in PDD21.
 
 =cut
-
-pir_output_is( <<'CODE', <<'OUT', "unicode namespace, global" );
-.namespace [ unicode:"Fran\xe7ois" ]
-
-.sub 'test'
-    print "unicode namespaces are fun\n"
-.end
-
-.namespace []
-
-.sub 'main' :main
-    $P0 = get_global [unicode:"Fran\xe7ois"], 'test'
-    $P0()
-.end
-CODE
-unicode namespaces are fun
-OUT
 
 my $temp_a = "temp_a";
 my $temp_b = "temp_b";
