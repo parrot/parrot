@@ -35,11 +35,13 @@ Check out your branch for working:
 
 =head3 SVN
 
-On a regular basis (at least weekly, more often for heavy changes), synchronize
-your branch with the changes in trunk. For this you will need the revision
-number of your most recent synchronization (or the revision number of the
-initial branch creation if this is the first synchronization), and the current
-highest revision in trunk (you can get this by running C<svn update>).
+If your branch touches many source code files or is expected to be long-lived,
+you may wish to consider synchronizing your branch with changes in trunk on a
+regular basis (at least weekly, more often for heavy changes). For this you
+will need the revision number of your most recent synchronization (or the
+revision number of the initial branch creation if this is the first
+synchronization), and the current highest revision in trunk (you can get this
+by running C<svn update>).
 
 Make sure you don't have any outstanding changes in your working copy (use
 C<svn status>).
