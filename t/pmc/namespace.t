@@ -192,25 +192,21 @@ of the NameSpace PMC:
     ok(0, "Cannot get Sub from NameSpace Foo::Bar")
 
   test4:
-    push_eh eh4
+    throws_like( <<'CODE', 'Null\ PMC\ access\ in\ invoke', 'Invoking a non-existent sub')
+.sub main
     $P0 = get_global ["Foo"], "SUB_THAT_DOES_NOT_EXIST"
     $P0()
-    ok(0, "Found and invoked a non-existant sub")
-    goto test5
-  eh4:
-    # Should we check the exact error message here?
-    ok(1, "Cannot invoke a Sub that doesn't exist")
+.end
+CODE
 
   test5:
     # this used to behave differently from the previous case.
-    push_eh eh5
+    throws_like( <<'CODE', 'Null\ PMC\ access\ in\ invoke', 'Invoking a non-existent sub')
+.sub main
     $P0 = get_global ["Foo";"Bar"], "SUB_THAT_DOES_NOT_EXIST"
     $P0()
-    ok(0, "Found and invoked a non-existant sub")
-    goto test6
-  eh5:
-    # Should we check the exact error message here?
-    ok(1, "Cannot invoke a Sub that doesn't exist")
+.end
+CODE
 
   test6:
     push_eh eh6
