@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 45;
+use Parrot::Test tests => 44;
 use Parrot::Config;
 
 =head1 NAME
@@ -22,20 +22,6 @@ t/pmc/namespace.t - test the NameSpace PMC as described in PDD 21.
 Test the NameSpace PMC as described in PDD21.
 
 =cut
-
-# How do we convert this to PIR?
-pir_output_is( <<'CODE', <<'OUTPUT', 'get namespace of :anon .sub' );
-.namespace ['lib']
-.sub main :main :anon
-    $P0 = get_namespace
-    $P0 = $P0.'get_name'()
-    $S0 = join "::", $P0
-    say $S0
-    end
-.end
-CODE
-parrot::lib
-OUTPUT
 
 # How do we convert this to PIR?
 pir_output_is( <<'CODE', <<'OUTPUT', "segv in get_name" );

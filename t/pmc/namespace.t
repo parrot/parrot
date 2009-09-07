@@ -56,7 +56,7 @@ Although NameSpace.'export_to'() is used in test_more.pir.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(61)
+    plan(63)
 
     create_namespace_pmc()
     verify_namespace_type()
@@ -67,6 +67,7 @@ Although NameSpace.'export_to'() is used in test_more.pir.
     get_namespace_from_sub()
     build_namespaces_at_runtime()
     hll_namespaces()
+    anon_function_namespace()
     namespace_methods()
 .end
 
@@ -239,8 +240,6 @@ CODE
     pop_eh
 
   test8:
-#     todo(0, "Lookup NameSpace with ISO-8859-1 Name using Unicode Key")
-#     todo(0, "Find sub in ISO-8859-1 NameSpace using Unicode Key")
     push_eh eh8
     $P0 = get_global [ unicode:"Fran\x{00E7}ois" ], "baz"
     $I0 = isnull $P0
@@ -399,6 +398,25 @@ CODE
     $P0 = get_root_namespace ["myhll";"baz"]
     $I0 = isnull $P0
     is($I0, 1, "get_root_namespace only returns NameSpace PMCs")
+.end
+
+.sub 'anon_function_namespace'
+
+    $S0 = <<"CODE"
+        .namespace ["anon_test_internal_ns"]
+        .sub anon_test_internal :main :anon
+            $P0 = get_namespace
+            .return($P0)
+        .end
+CODE
+    $P0 = compreg "PIR"
+    $P1 = $P0($S0)
+    $P2 = $P1()
+    $S0 = typeof $P2
+    is($S0, "NameSpace", "get_namespace from anon sub")
+    $P3 = $P2.'get_name'()
+    $S0 = join "::", $P3
+    is($S0, "parrot::anon_test_internal_ns", "get_namespace name from anon sub")
 .end
 
 .sub 'namespace_methods'
