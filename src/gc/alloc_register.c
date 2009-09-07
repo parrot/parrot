@@ -165,20 +165,21 @@ clear_regs(PARROT_INTERP, ARGMOD(PMC *pmcctx))
      */
 
     for (i = 0; i < ctx->n_regs_used[REGNO_PMC]; i++) {
-        CTX_REG_PMC(pmcctx, i) = PMCNULL;
+        ctx->bp_ps.regs_p[-1L - i] = PMCNULL;
     }
 
     for (i = 0; i < ctx->n_regs_used[REGNO_STR]; i++) {
-        CTX_REG_STR(pmcctx, i) = NULL;
+        ctx->bp_ps.regs_s[i] = NULL;
     }
 
     if (Interp_debug_TEST(interp, PARROT_REG_DEBUG_FLAG)) {
-        /* depending on -D40 we set int and num to be identifiable garbage values */
+        /* depending on -D40, set int and num to identifiable garbage values */
         for (i = 0; i < ctx->n_regs_used[REGNO_INT]; i++) {
-            CTX_REG_INT(pmcctx, i) = -999;
+            ctx->bp.regs_i[i] = -999;
         }
+
         for (i = 0; i < ctx->n_regs_used[REGNO_NUM]; i++) {
-            CTX_REG_NUM(pmcctx, i) = -99.9;
+            ctx->bp.regs_n[-1L - i] = -99.9;
         }
     }
 }
@@ -195,8 +196,7 @@ Initializes a freshly allocated or recycled context.
 */
 
 static void
-init_context(PARROT_INTERP, ARGMOD(PMC *pmcctx),
-        ARGIN_NULLOK(PMC *pmcold))
+init_context(PARROT_INTERP, ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
 {
     ASSERT_ARGS(init_context)
     Parrot_Context *ctx = Parrot_pcc_get_context_struct(interp, pmcctx);
