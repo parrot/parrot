@@ -450,6 +450,7 @@ Parrot_runcore_slow_init(PARROT_INTERP)
     coredata->runops           = runops_slow_core;
     coredata->prepare_run      = NULL;
     coredata->destroy          = NULL;
+    coredata->flags            = 0;
 
     PARROT_RUNCORE_FUNC_TABLE_SET(coredata);
 
@@ -482,6 +483,7 @@ Parrot_runcore_fast_init(PARROT_INTERP)
     coredata->runops           = runops_fast_core;
     coredata->destroy          = NULL;
     coredata->prepare_run      = NULL;
+    coredata->flags            = 0;
 
     PARROT_RUNCORE_FUNC_TABLE_SET(coredata);
 
@@ -511,6 +513,7 @@ Parrot_runcore_switch_init(PARROT_INTERP)
     coredata->runops           = runops_switch_core;
     coredata->prepare_run      = init_prederef;
     coredata->destroy          = NULL;
+    coredata->flags            = 0;
 
     PARROT_RUNCORE_PREDEREF_OPS_SET(coredata);
 
@@ -540,6 +543,7 @@ Parrot_runcore_jit_init(PARROT_INTERP)
     coredata->prepare_run      = init_jit_run;
     coredata->runops           = runops_jit_core;
     coredata->destroy          = NULL;
+    coredata->flags            = 0;
 
     PARROT_RUNCORE_JIT_OPS_SET(coredata);
 
@@ -569,6 +573,7 @@ Parrot_runcore_switch_jit_init(PARROT_INTERP)
     coredata->destroy          = NULL;
     coredata->prepare_run      = init_prederef;
     coredata->runops           = runops_switch_core;
+    coredata->flags            = 0;
 
     PARROT_RUNCORE_PREDEREF_OPS_SET(coredata);
     PARROT_RUNCORE_JIT_OPS_SET(coredata);
@@ -599,6 +604,7 @@ Parrot_runcore_exec_init(PARROT_INTERP)
     coredata->runops           = runops_exec_core;
     coredata->destroy          = NULL;
     coredata->prepare_run      = NULL;
+    coredata->flags            = 0;
 
     Parrot_runcore_register(interp, coredata);
 }
@@ -626,6 +632,7 @@ Parrot_runcore_gc_debug_init(PARROT_INTERP)
     coredata->runops           = runops_gc_debug_core;
     coredata->destroy          = NULL;
     coredata->prepare_run      = NULL;
+    coredata->flags            = 0;
 
     PARROT_RUNCORE_FUNC_TABLE_SET(coredata);
 
@@ -655,6 +662,7 @@ Parrot_runcore_debugger_init(PARROT_INTERP)
     coredata->prepare_run      = init_prederef;
     coredata->runops           = runops_debugger_core;
     coredata->destroy          = NULL;
+    coredata->flags            = 0;
 
     PARROT_RUNCORE_FUNC_TABLE_SET(coredata);
 
@@ -685,6 +693,7 @@ Parrot_runcore_cgp_init(PARROT_INTERP)
     coredata->opinit           = PARROT_CORE_CGP_OPLIB_INIT;
     coredata->prepare_run      = init_prederef;
     coredata->runops           = runops_cgp_core;
+    coredata->flags            = 0;
 
     coredata->destroy          = NULL;
 
@@ -718,6 +727,7 @@ Parrot_runcore_cgoto_init(PARROT_INTERP)
     coredata->runops           = runops_cgoto_core;
     coredata->destroy          = NULL;
     coredata->prepare_run      = NULL;
+    coredata->flags            = 0;
 
     PARROT_RUNCORE_FUNC_TABLE_SET(coredata);
     PARROT_RUNCORE_CGOTO_OPS_SET(coredata);
@@ -749,6 +759,7 @@ Parrot_runcore_cgp_jit_init(PARROT_INTERP)
     coredata->prepare_run      = init_prederef;
     coredata->runops           = runops_cgp_core;
     coredata->destroy          = NULL;
+    coredata->flags            = 0;
 
     PARROT_RUNCORE_JIT_OPS_SET(coredata);
     PARROT_RUNCORE_CGOTO_OPS_SET(coredata);
@@ -783,6 +794,7 @@ Parrot_runcore_profiling_init(PARROT_INTERP)
     coredata->runops           = (Parrot_runcore_runops_fn_t) init_profiling_core;
     coredata->destroy          = NULL;
     coredata->prepare_run      = NULL;
+    coredata->flags            = 0;
 
     PARROT_RUNCORE_FUNC_TABLE_SET(coredata);
 
