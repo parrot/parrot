@@ -70,12 +70,12 @@ of the NameSpace PMC:
 .sub 'create_namespace_pmc'
     push_eh eh1
     $P0 = new ['NameSpace']
-    pop_eh
     ok(1, "Create new Namespace PMC")
     goto _end
   eh1:
     ok(0, "Could not create Namespace PMC")
   _end:
+    pop_eh
 .end
 
 .sub 'verify_namespace_type'
@@ -147,12 +147,12 @@ of the NameSpace PMC:
     # Create object from class from NameSpace
     push_eh eh
     $P2 = new $P1
-    pop_eh
     ok(1, "Can create a new object from a namespace")
     goto pmc_is_created
   eh:
     ok(0, "Cannot create a new object from a namespace")
   pmc_is_created:
+    pop_eh
 
     # Object from Class from NameSpace has right type
     $S0 = typeof $P2
@@ -162,50 +162,54 @@ of the NameSpace PMC:
 
 # L<PDD21//>
 .sub 'get_global_opcode'
+  test1:
     push_eh eh1
     $P0 = get_global "baz"
     $S0 = $P0()
-    pop_eh
     is($S0, "", "Can get_global a .sub")
-    goto test2
+    goto end_test1
   eh1:
     ok(0, "Cannot get_global a .sub")
+  end_test1:
+    pop_eh
 
   test2:
     push_eh eh2
     $P0 = get_global ["Foo"], "baz"
     $S0 = $P0()
-    pop_eh
     is($S0, "Foo", "Get Sub from NameSpace")
-    goto test3
+    goto end_test2
   eh2:
     ok(0, "Cannot get Sub from NameSpace Foo")
+  end_test2:
+    pop_eh
 
   test3:
     push_eh eh3
     $P0 = get_global ["Foo";"Bar"], "baz"
     $S0 = $P0()
-    pop_eh
     is($S0, "Foo::Bar", "Get Sub from nested NameSpace")
-    goto test4
+    goto end_test3
   eh3:
     ok(0, "Cannot get Sub from NameSpace Foo::Bar")
+  end_test3:
+    pop_eh
 
   test4:
     throws_like( <<'CODE', 'Null\ PMC\ access\ in\ invoke', 'Invoking a non-existent sub')
-.sub main
-    $P0 = get_global ["Foo"], "SUB_THAT_DOES_NOT_EXIST"
-    $P0()
-.end
+        .sub main
+            $P0 = get_global ["Foo"], "SUB_THAT_DOES_NOT_EXIST"
+            $P0()
+        .end
 CODE
 
   test5:
     # this used to behave differently from the previous case.
     throws_like( <<'CODE', 'Null\ PMC\ access\ in\ invoke', 'Invoking a non-existent sub')
-.sub main
-    $P0 = get_global ["Foo";"Bar"], "SUB_THAT_DOES_NOT_EXIST"
-    $P0()
-.end
+        .sub main
+            $P0 = get_global ["Foo";"Bar"], "SUB_THAT_DOES_NOT_EXIST"
+            $P0()
+        .end
 CODE
 
   test6:
@@ -213,18 +217,22 @@ CODE
     $P0 = get_global [ iso-8859-1:"François" ], "baz"
     $S0 = $P0()
     is($S0, iso-8859-1:"François", "Found sub in ISO-8859 NameSpace")
-    goto test7
+    goto end_test6
   eh6:
     ok(0, "Cannot find sub in ISO-8859 NameSpace")
+  end_test6:
+    pop_eh
 
   test7:
     push_eh eh7
     $P0 = get_global [ "Foo";iso-8859-1:"François" ], "baz"
     $S0 = $P0()
     is($S0, iso-8859-1:"Foo::François", "Found sub in nested ISO-8859 NameSpace")
-    goto test8
+    goto end_test7
   eh7:
     ok(0, "Cannot find sub in ISO-8859 NameSpace")
+  end_test7:
+    pop_eh
 
   test8:
 # TODO: This should probably be possible. We should be able to look up a
@@ -233,15 +241,15 @@ CODE
 #    $P0 = get_global [ unicode:"François" ], "baz"
 #    $I0 = isnull $P0
 #    is($I0, 0, "Find Sub in an ISO-8859-1 NameSpace looked up by a Unicode name")
-
 #    $S0 = $P0()
 #    say $S0
 #    is($S0, iso-8859-1:"François", "ISO-8859 NameSpace with Unicode name")
-#    goto _end
+#    goto end_test8:
 #  eh8:
 #    ok(0, "Cannot find ISO-8859 NameSpace using Unicode name")
+#  end_test8:
+#    pop_eh
 
-  _end:
 .end
 
 .sub 'get_sub_from_namespace_hash'
@@ -303,6 +311,7 @@ CODE
   eh:
     ok(1, "Can't direct call a sub that doesn't exist")
   _end:
+    pop_eh
 .end
 
 .sub 'get_namespace_from_sub'
@@ -375,13 +384,14 @@ CODE
     $P0 = get_root_namespace ["myhll"]
     $P1 = $P0["baz"]
     $S0 = $P1()
-    pop_eh
     is($S0, "MyHLL", "Found Sub in HLL namespace by key")
-    goto test2
+    goto end_test1
   eh1:
     ok(0, "Cannot find sub in HLL NameSpace by key")
+  end_test1:
+    pop_eh
 
-  test2:
+    # get_root_namespace won't return something not a namespace
     $P0 = get_root_namespace ["myhll";"baz"]
     $I0 = isnull $P0
     is($I0, 1, "get_root_namespace only returns NameSpace PMCs")
