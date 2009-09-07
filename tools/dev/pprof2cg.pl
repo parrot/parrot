@@ -146,7 +146,7 @@ sub main {
 
 =item C<process_line>
 
-This function takes string containing a single line from a Parrot profile, a
+This function takes a string containing a single line from a Parrot profile, a
 reference to a hash of fine-grained statistics about the current PIR program
 and a reference to the current context stack.  It modifies the statistics and
 context stack according to the information from the Parrot profile.
