@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 42;
+use Parrot::Test tests => 38;
 use Parrot::Config;
 
 =head1 NAME
@@ -192,78 +192,6 @@ print $S <<'EOF';
 EOF
 close $S;
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', 'export_to() with null destination throws exception' );
-.sub 'test' :main
-    .local pmc nsa, nsb, ar
-
-    ar = new ['ResizableStringArray']
-    push ar, 'foo'
-    nsa = new ['Null']
-    nsb = get_namespace ['B']
-    nsb.'export_to'(nsa, ar)
-.end
-
-.namespace ['B']
-.sub 'foo' :anon
-.end
-CODE
-/^destination namespace not specified\n/
-OUTPUT
-
-pir_error_output_like(
-    <<'CODE', <<'OUTPUT', 'export_to() with null exports default object set !!!UNSPECIFIED!!!' );
-.sub 'test' :main
-    .local pmc nsa, nsb, ar
-
-    ar = new ['Null']
-    nsa = get_namespace
-    nsb = get_namespace ['B']
-    nsb.'export_to'(nsa, ar)
-.end
-
-.namespace ['B']
-.sub 'foo'
-.end
-CODE
-/^exporting default object set not yet implemented\n/
-OUTPUT
-
-pir_error_output_like(
-    <<'CODE', <<'OUTPUT', 'export_to() with empty array exports default object set !!!UNSPECIFIED!!!' );
-.sub 'test' :main
-    .local pmc nsa, nsb, ar
-
-    ar = new ['ResizableStringArray']
-    nsa = get_namespace
-    nsb = get_namespace ['B']
-    nsb.'export_to'(nsa, ar)
-.end
-
-.namespace ['B']
-.sub 'foo'
-.end
-CODE
-/^exporting default object set not yet implemented\n/
-OUTPUT
-
-pir_error_output_like(
-    <<'CODE', <<'OUTPUT', 'export_to() with empty hash exports default object set !!!UNSPECIFIED!!!' );
-.sub 'test' :main
-    .local pmc nsa, nsb, ar
-
-    ar = new ['Hash']
-    nsa = get_namespace
-    nsb = get_namespace ['B']
-    nsb.'export_to'(nsa, ar)
-.end
-
-.namespace ['B']
-.sub 'foo'
-.end
-CODE
-/^exporting default object set not yet implemented\n/
-OUTPUT
-
 pir_output_is( <<"CODE", <<'OUTPUT', "export_to -- success with array" );
 .HLL 'A'
 .sub main :main
@@ -358,6 +286,7 @@ CODE
 b_foo
 Could not find non-existent sub b_foo/
 OUTPUT
+
 
 pir_output_is( <<'CODE', <<'OUTPUT', "get_parent" );
 .sub main :main

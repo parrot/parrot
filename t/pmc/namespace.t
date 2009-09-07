@@ -56,7 +56,7 @@ Although NameSpace.'export_to'() is used in test_more.pir.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(66)
+    plan(70)
 
     create_namespace_pmc()
     verify_namespace_type()
@@ -70,6 +70,7 @@ Although NameSpace.'export_to'() is used in test_more.pir.
     anon_function_namespace()
     find_name_opcode()
     namespace_methods()
+    export_to_method()
 .end
 
 # L<PDD21/Namespace PMC API/=head4 Untyped Interface>
@@ -546,6 +547,68 @@ CODE
     # won't delete something that isn't a sub
 
     # Test del_var. It will delete any type of thing
+.end
+
+.sub 'export_to_method'
+    .local string errormsg, description
+
+    errormsg = ":s destination namespace not specified"
+    description = "export_to() Null NameSpace"
+    throws_like(<<"CODE", errormsg, description)
+        .sub 'test' :main
+            .local pmc nsa, nsb, ar
+
+            ar = new ['ResizableStringArray']
+            push ar, 'baz'
+            nsa = new ['Null']
+            nsb = get_namespace ['Foo']
+            nsb.'export_to'(nsa, ar)
+        .end
+CODE
+
+    errormsg = ":s exporting default object set not yet implemented"
+    description = 'export_to() with null exports default object set !!!UNSPECIFIED!!!'
+    throws_like(<<'CODE', errormsg, description)
+        .sub 'test' :main
+            .local pmc nsa, nsb, ar
+
+            ar = new ['Null']
+            nsa = get_namespace
+            nsb = get_namespace ['Foo']
+            nsb.'export_to'(nsa, ar)
+        .end
+CODE
+
+
+    errormsg = ":s exporting default object set not yet implemented"
+    description = 'export_to() with empty array exports default object set !!!UNSPECIFIED!!!'
+    throws_like(<<'CODE', errormsg, description)
+        .sub 'test' :main
+            .local pmc nsa, nsb, ar
+
+            ar = new ['ResizableStringArray']
+            nsa = get_namespace
+            nsb = get_namespace ['Foo']
+            nsb.'export_to'(nsa, ar)
+        .end
+CODE
+
+    errormsg = ":s exporting default object set not yet implemented"
+    description = 'export_to() with empty hash exports default object set !!!UNSPECIFIED!!!'
+    throws_like(<<'CODE', errormsg, description)
+        .sub 'test' :main
+            .local pmc nsa, nsb, ar
+
+            ar = new ['Hash']
+            nsa = get_namespace
+            nsb = get_namespace ['Foo']
+            nsb.'export_to'(nsa, ar)
+        .end
+CODE
+
+# Things to add: successful export_to with non-empty array, successful
+# export_to with non-empty hash. both of these things across HLL boundaries
+
 .end
 
 ##### TEST NAMESPACES AND FUNCTIONS #####
