@@ -132,7 +132,6 @@ typedef Parrot_Run_core_t Run_Cores;
 #define Interp_core_SET(interp, core)   ((interp)->run_core = (core))
 #define Interp_core_TEST(interp, core)  ((interp)->run_core == (core))
 
-#include "parrot/register.h"
 #include "parrot/context.h"
 #include "parrot/parrot.h"
 #include "parrot/warnings.h"

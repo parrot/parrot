@@ -14,9 +14,6 @@ src/context.c - Parrot_Context functions.
 
 #include "parrot/parrot.h"
 #include "parrot/call.h"
-
-#include "parrot/parrot.h"
-#include "parrot/register.h"
 #include "../pmc/pmc_sub.h"
 
 /* set CTX_LEAK_DEBUG_FULL to 1 for enhanced context debugging.

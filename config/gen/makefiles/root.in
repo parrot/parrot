@@ -424,7 +424,6 @@ INTERP_O_FILES := \
     $(SRC_DIR)/extend$(O) \
     $(SRC_DIR)/extend_vtable$(O) \
     $(SRC_DIR)/gc/alloc_memory$(O) \
-    $(SRC_DIR)/gc/alloc_register$(O) \
     $(SRC_DIR)/gc/api$(O) \
     $(SRC_DIR)/gc/generational_ms$(O) \
     $(SRC_DIR)/gc/incremental_ms$(O) \
@@ -1195,8 +1194,6 @@ $(PF_DIR)/pf_items$(O) : $(GENERAL_H_FILES)
 $(SRC_DIR)/packout$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_key.h
 
 $(SRC_DIR)/parrot$(O) : $(GENERAL_H_FILES)
-
-$(SRC_DIR)/gc/alloc_register$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h
 
 $(SRC_DIR)/runcore/cores$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/runcore/cores.str \
 	$(SRC_DIR)/pmc/pmc_sub.h
