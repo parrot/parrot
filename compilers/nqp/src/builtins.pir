@@ -140,8 +140,6 @@ test counter to 0 and outputs the TAP plan line.
     lang = downcase lang
     load_language lang
     c = compreg lang
-    print 'evaling in language: '
-    say lang
     code = c.'compile'(text)
     $P0 = code()
     .return ($P0)
