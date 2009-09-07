@@ -902,7 +902,11 @@ optional test description in C<description>.
   match_success:
     goto pass_it
   match_fail:
-    diagnostic = "match failed"
+    diagnostic = "match failed: target '"
+    diagnostic .= target
+    diagnostic .= "' does not match pattern '"
+    diagnostic .= pattern
+    diagnostic .= "'"
     goto report
   rule_fail:
     diagnostic = "rule error"

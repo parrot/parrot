@@ -67,7 +67,7 @@ CODE
     die 'DO NOT WANT'
 .end
 CODE
-    test_diag( 'match failed' )
+    test_diag( "match failed: target 'DO NOT WANT' does not match pattern '<[for the lulz]>'" )
     test_test('throws_like fails when error does not match pattern' )
 .end
 
@@ -297,12 +297,13 @@ CODE
     test_test( 'passing test like() with description' )
 
     test_fail()
-    test_diag( 'match failed' )
+
+    test_diag( "match failed: target 'abcdef' does not match pattern '<[g]>'" )
     like( 'abcdef', '<[g]>' )
     test_test( 'failing test like()' )
 
     test_fail( 'testing like()' )
-    test_diag( 'match failed' )
+    test_diag( "match failed: target 'abcdef' does not match pattern '<[g]>'" )
     like( 'abcdef', '<[g]>', 'testing like()' )
     test_test( 'failing test like() with description' )
 
