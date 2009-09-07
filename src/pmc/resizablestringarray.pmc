@@ -86,11 +86,6 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
             SELF.set_integer_native(key+1);
 
         GET_ATTR_str_array(INTERP, SELF, str_array);
-        /*JT: not working now ... GMS only anyway
-        if (interp->gc_sys->write_barrier){
-            Parrot_gc_write_barrier(INTERP, SELF, str_array[key], value);
-        }
-        */
         str_array[key] = value;
     }
 

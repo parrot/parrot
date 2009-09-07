@@ -231,11 +231,6 @@ make_prop_hash(PARROT_INTERP, PMC *self) {
     PMC *prop;
 
     PMC_metadata(self) = prop = pmc_new(interp, enum_class_Hash);
-    /*JT: not working now ... GMS only anyway
-    if (interp->gc_sys->write_barrier){
-        Parrot_gc_write_barrier(interp, self, NULL, prop);
-    }
-    */
     propagate_std_props(interp, self, prop);
     return prop;
 }

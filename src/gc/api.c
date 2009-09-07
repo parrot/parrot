@@ -198,52 +198,40 @@ Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
     /* TODO: Have each core register a ->pobject_lives function pointer in the
        Memory_Pools struct, and call that pointer directly instead of having a messy
        set of #if preparser conditions. */
-
-    if (interp->gc_sys->sys_type == GMS) {
-        /*
-        do {
-            if (!PObj_live_TEST(obj) &&
-                 PObj_to_GMSH(obj)->gen->gen_no >=
-                 interp->gc_sys->gc_sys_data.gms_data->gc_generation)
-                parrot_gc_gms_Parrot_gc_mark_PObj_alive(interp, obj);
-        } while (0);
-        break;
-        */
-    }
-    else {
-        /* if object is live or on free list return */
-        if (PObj_is_live_or_free_TESTALL(obj))
-            return;
+        
+    /* if object is live or on free list return */
+    if (PObj_is_live_or_free_TESTALL(obj))
+        return;
 
 #  if ! DISABLE_GC_DEBUG
 #    if GC_VERBOSE
-        if (CONSERVATIVE_POINTER_CHASING)
-            fprintf(stderr, "GC Warning! Unanchored %s %p found in system areas \n",
-                    PObj_is_PMC_TEST(obj) ? "PMC" : "Buffer", obj);
-
+    if (CONSERVATIVE_POINTER_CHASING)
+        fprintf(stderr, "GC Warning! Unanchored %s %p found in system areas \n",
+                PObj_is_PMC_TEST(obj) ? "PMC" : "Buffer", obj);
+    
 #    endif
 #  endif
-        /* mark it live */
-        PObj_live_SET(obj);
-
-        /* if object is a PMC and contains buffers or PMCs, then attach the PMC
-         * to the chained mark list. */
-        if (PObj_is_PMC_TEST(obj)) {
-            PMC * const p = (PMC *)obj;
-
-            if (PObj_is_special_PMC_TEST(obj))
-                mark_special(interp, p);
-
-            else if (PMC_metadata(p))
-                Parrot_gc_mark_PObj_alive(interp, (PObj*)PMC_metadata(p));
-        }
-#  if GC_VERBOSE
-        /* buffer GC_DEBUG stuff */
-        if (GC_DEBUG(interp) && PObj_report_TEST(obj))
-            fprintf(stderr, "GC: buffer %p pointing to %p marked live\n",
-                    obj, Buffer_bufstart((Buffer *)obj));
-#  endif
+    /* mark it live */
+    PObj_live_SET(obj);
+    
+    /* if object is a PMC and contains buffers or PMCs, then attach the PMC
+     * to the chained mark list. */
+    if (PObj_is_PMC_TEST(obj)) {
+        PMC * const p = (PMC *)obj;
+        
+        if (PObj_is_special_PMC_TEST(obj))
+            mark_special(interp, p);
+        
+        else if (PMC_metadata(p))
+            Parrot_gc_mark_PObj_alive(interp, (PObj*)PMC_metadata(p));
     }
+#  if GC_VERBOSE
+    /* buffer GC_DEBUG stuff */
+    if (GC_DEBUG(interp) && PObj_report_TEST(obj))
+        fprintf(stderr, "GC: buffer %p pointing to %p marked live\n",
+                obj, Buffer_bufstart((Buffer *)obj));
+#  endif
+    
 }
 
 /*
@@ -275,23 +263,17 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
 
     interp->gc_sys = mem_allocate_zeroed_typed(GC_Subsystem);
 
-    /*JT: This is set at compile time ... what we need to do next is
-     *    add a command-line switch --gc that will enable us to choose
-     *    a different one ... if --gc is set, we use it, otherwise use
-     *    the default  */
-    interp->gc_sys->sys_type = PARROT_GC_DEFAULT_TYPE;
-
-    /* Set the sys_type here if we got a --gc command line switch
-     * ... we need some sort of set_gc_sys_type_from_command_line_switch()
-     * function ...
-     */
-
+    /*TODO: add ability to specify GC core at command line w/ --gc= */
+    if(0) /*If they chose sys_type with the --gc command line switch,*/
+        ; /* set sys_type to value they gave */
+    else
+        interp->gc_sys->sys_type = PARROT_GC_DEFAULT_TYPE;
+    
     /*Call appropriate initialization function for GC subsystem*/
     switch (interp->gc_sys->sys_type) {
       case MS:
         Parrot_gc_ms_init(interp);
         break;
-      /* These currently don't work
       case IMS:
         Parrot_gc_ims_init(interp);
         break;
@@ -301,9 +283,9 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
       case INF:
         Parrot_gc_inf_init(interp);
         break;
-       */
       default:
-        break;  /*What SHOULD we be doing if we get here?*/
+        /*die horribly because of invalid GC core specified*/
+        break;
     }
 
     initialize_var_size_pools(interp);
@@ -550,9 +532,9 @@ get_free_buffer(PARROT_INTERP, ARGIN(Fixed_Size_Pool *pool))
     Buffer_bufstart(buffer) = NULL;
     Buffer_buflen(buffer)   = 0;
 
-    if (pool->object_size - interp->gc_sys->header_size > sizeof (Buffer))
+    if (pool->object_size > sizeof (Buffer))
         memset(buffer + 1, 0,
-                pool->object_size - sizeof (Buffer) - interp->gc_sys->header_size);
+                pool->object_size - sizeof (Buffer));
 
     return buffer;
 }
@@ -979,7 +961,7 @@ fix_pmc_syncs(ARGMOD(Interp *dest_interp), ARGIN(Fixed_Size_Pool *pool))
     const UINTVAL       object_size = pool->object_size;
 
     for (cur_arena = pool->last_Arena; cur_arena; cur_arena = cur_arena->prev) {
-        PMC   *p = (PMC *)((char*)cur_arena->start_objects + dest_interp->gc_sys->header_size);
+        PMC   *p = (PMC *)((char*)cur_arena->start_objects);
         size_t i;
 
         for (i = 0; i < cur_arena->used; i++) {
@@ -1233,9 +1215,6 @@ Parrot_gc_get_pmc_index(PARROT_INTERP, ARGIN(PMC* pmc))
     Fixed_Size_Arena *arena;
     Fixed_Size_Pool *pool;
 
-    if (interp->gc_sys->PObj_to_Arena){
-        pmc = (PMC*) interp->gc_sys->PObj_to_Arena(pmc);
-    }
     pool = interp->mem_pools->pmc_pool;
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
         const ptrdiff_t ptr_diff = (ptrdiff_t)pmc - (ptrdiff_t)arena->start_objects;
@@ -1609,36 +1588,6 @@ Parrot_gc_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
     ASSERT_ARGS(Parrot_gc_pmc_needs_early_collection)
     PObj_needs_early_gc_SET(pmc);
     ++interp->mem_pools->num_early_gc_PMCs;
-}
-
-/*
-=item C<void Parrot_gc_write_barrier(PARROT_INTERP, PMC *agg, PMC *old, PMC
-*new)>
-
-Wrapper around write_barrier hook for currently active GC system ...
-
-=cut
-
-*/
-
-void
-Parrot_gc_write_barrier(PARROT_INTERP, PMC *agg, PMC *old, PMC *new){
-    interp->gc_sys->write_barrier(interp, agg, old, new);
-}
-
-/*
-=item C<void Parrot_gc_write_barrier_key(PARROT_INTERP, PMC *agg, PMC *old, PObj
-*old_key, PMC *_new, PObj *new_key)>
-
-Wrapper around write_barrier_key hook for currently active GC system ...
-
-=cut
-
-*/
-
-void
-Parrot_gc_write_barrier_key(PARROT_INTERP, PMC *agg, PMC *old, PObj *old_key, PMC *_new, PObj *new_key){
-    interp->gc_sys->write_barrier_key(interp, agg, old, old_key, _new, new_key);
 }
 
 

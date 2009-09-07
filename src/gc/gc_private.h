@@ -105,18 +105,9 @@ typedef struct GC_Subsystem {
     void (*init_pool)(PARROT_INTERP, struct Fixed_Size_Pool *);
 
     /*Function hooks that GC systems can CHOOSE to provide if they need them
-     *These will be called from the GC API function Parrot_gc_func_name */
-    void (*write_barrier)(PARROT_INTERP, PMC *, PMC *, PMC *);
-    void (*write_barrier_key)(PARROT_INTERP, PMC *, PMC *, PObj *, PMC *, PObj *);
-    /*read_barrier hooks can go here later*/
+     *These will be called via the GC API functions Parrot_gc_func_name
+     *e.g. read barrier && write barrier hooks can go here later ...*/
 
-    /* functions used in arena scan code to convert from object pointers
-     * to arena pointers ... GMS only I think ...*/
-    void * (*PObj_to_Arena)(const void *);
-    PObj * (*Arena_to_PObj)(void *);
-
-    /*JT: this is only used by GMS afaict, but we'll keep it here for now ...*/
-    size_t header_size;
 } GC_Subsystem;
 
 typedef struct Memory_Block {

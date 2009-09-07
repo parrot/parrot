@@ -383,14 +383,6 @@ allocate_chunk(PARROT_INTERP, ARGIN(List *list), UINTVAL items, UINTVAL size)
     Parrot_gc_allocate_buffer_storage_aligned(interp, (Buffer *)chunk, size);
     memset(Buffer_bufstart((Buffer*)chunk), 0, size);
 
-    /* see also src/hash.c */
-    if (list->container) {
-        /*JT: not working now ... GMS only anyway
-        if (interp->gc_sys->write_barrier){
-            Parrot_gc_write_barrier(interp, list->container, 0, chunk);
-        }
-        */
-    }
     Parrot_unblock_GC_mark(interp);
 
     /* Parrot_unblock_GC_sweep(interp); */
@@ -519,14 +511,6 @@ rebuild_other(PARROT_INTERP, ARGMOD(List *list))
                 Parrot_gc_reallocate_buffer_storage(interp, (Buffer *)prev,
                         MAX_ITEMS * list->item_size);
 
-                if (list->container) {
-                    /*JT: not working now ... GMS only anyway
-                    if (interp->gc_sys->write_barrier){
-                        Parrot_gc_write_barrier(interp, list->container, 0, prev);
-                    }
-                    */
-                }
-
                 mem_sys_memmove(
                         (char *) Buffer_bufstart(&prev->data) +
                         prev->items * list->item_size,
@@ -544,13 +528,7 @@ rebuild_other(PARROT_INTERP, ARGMOD(List *list))
             else {
                 Parrot_gc_reallocate_buffer_storage(interp, (Buffer *)prev,
                         (prev->items + chunk->items) * list->item_size);
-                if (list->container) {
-                    /*JT: not working now ... GMS only anyway
-                    if (interp->gc_sys->write_barrier){
-                        Parrot_gc_write_barrier(interp, list->container, 0, prev);
-                    }
-                    */
-                }
+
                 mem_sys_memmove(
                         (char *) Buffer_bufstart(&prev->data) +
                         prev->items * list->item_size,
@@ -647,14 +625,6 @@ rebuild_chunk_list(PARROT_INTERP, ARGMOD(List *list))
 
         Parrot_gc_reallocate_buffer_storage(interp, (Buffer *)list,
                 len * sizeof (List_chunk *));
-
-        if (list->container) {
-            /*JT: not working now ... GMS only anyway
-            if (interp->gc_sys->write_barrier){
-                Parrot_gc_write_barrier(interp, list->container, 0, list);
-            }
-            */
-        }
 
         list->collect_runs = Parrot_gc_count_collect_runs(interp);
     }
@@ -1151,14 +1121,6 @@ split_chunk(PARROT_INTERP, ARGMOD(List *list), ARGMOD(List_chunk *chunk), UINTVA
         Parrot_gc_reallocate_buffer_storage(interp, (Buffer *)chunk,
                 chunk->items * list->item_size);
 
-        if (list->container) {
-            /*JT: not working now ... GMS only anyway
-            if (interp->gc_sys->write_barrier){
-                Parrot_gc_write_barrier(interp, list->container, 0, chunk);
-            }
-            */
-        }
-
         chunk->flags |= no_power_2;
         chunk->flags &= ~sparse;
     }
@@ -1174,14 +1136,6 @@ split_chunk(PARROT_INTERP, ARGMOD(List *list), ARGMOD(List_chunk *chunk), UINTVA
 
         Parrot_gc_reallocate_buffer_storage(interp, (Buffer *)chunk,
                 chunk->items * list->item_size);
-
-        if (list->container) {
-            /*JT: not working now ... GMS only anyway
-            if (interp->gc_sys->write_barrier){
-                Parrot_gc_write_barrier(interp, list->container, 0, chunk);
-            }
-            */
-        }
 
         chunk->flags &= ~sparse;
 
@@ -1270,16 +1224,6 @@ list_set(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(void *item),
         ((FLOATVAL *) Buffer_bufstart(&chunk->data))[idx] = *(FLOATVAL *)item;
         break;
     case enum_type_PMC:
-        if (list->container) {
-            /*JT: not working now ... GMS only anyway
-            if (interp->gc_sys->write_barrier){
-                Parrot_gc_write_barrier(interp,
-                                              list->container,
-                                              ((PMC **) Buffer_bufstart(&chunk->data))[idx],
-                                              (PMC *)item);
-            }
-            */
-        }
         ((PMC **) Buffer_bufstart(&chunk->data))[idx] = (PMC *)item;
         break;
     case enum_type_STRING:

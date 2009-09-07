@@ -418,17 +418,6 @@ compact_pool(PARROT_INTERP, ARGMOD(Variable_Size_Pool *pool))
         for (cur_buffer_arena = header_pool->last_Arena;
                 cur_buffer_arena;
                 cur_buffer_arena = cur_buffer_arena->prev) {
-            /*JT: Something like this is what we really want ...
-             *JT: if only I knew how to program C ...
-            if (interp->gc_sys->Arena_to_PObj){
-                Buffer *b =
-                    (Buffer *)
-                    interp->gc_sys->Arena_to_PObj(cur_buffer_arena->start_objects);
-            }
-            */
-
-            /*JT: but for now, we'll just cheat, since it's only GMS
-                  that needs that stuff anyway*/
             Buffer *b = (Buffer *) cur_buffer_arena->start_objects;
             UINTVAL i;
             const size_t objects_end = cur_buffer_arena->used;

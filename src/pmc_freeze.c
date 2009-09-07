@@ -1358,16 +1358,9 @@ do_thaw(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc), ARGIN(visit_info *info))
     }
     if (!info->thaw_result)
         info->thaw_result = pmc;
-    else {
-        if (info->container) {
-            /*JT: not working now ... GMS only anyway            
-            if (interp->gc_sys->write_barrier){
-                Parrot_gc_write_barrier(interp, info->container, NULL, pmc);
-            }
-            */
-        }
+    else
         *info->thaw_ptr = pmc;
-    }
+
     list_assign(interp, (List *)PMC_data(info->id_list), id, pmc, enum_type_PMC);
 
     /* remember nested aggregates depth first */

@@ -368,9 +368,6 @@ contained_in_pool(PARROT_INTERP, ARGIN(const Fixed_Size_Pool *pool), ARGIN(const
     ASSERT_ARGS(contained_in_pool)
     const Fixed_Size_Arena *arena;
 
-    if (interp->gc_sys->PObj_to_Arena){
-        ptr = interp->gc_sys->PObj_to_Arena(ptr);
-    }
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
         const ptrdiff_t ptr_diff =
             (ptrdiff_t)ptr - (ptrdiff_t)arena->start_objects;
