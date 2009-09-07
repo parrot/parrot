@@ -169,7 +169,7 @@ typedef struct _vtable {
     PMC    *_namespace;     /* Pointer to namespace for this class */
     INTVAL  base_type;      /* 'type' value for MMD */
     STRING *whoami;         /* Name of class this vtable is for */
-    UINTVAL flags;          /* Flags. Duh */
+    UINTVAL flags;          /* VTABLE flags (constant, is_ro, etc). */
     STRING *provides_str;   /* space-separated list of interfaces */
     Hash   *isa_hash;       /* Hash of class names */
     PMC    *pmc_class;      /* for PMCs: a PMC of that type
@@ -265,7 +265,7 @@ static PARROT_OBSERVER const char * const Parrot_vtable_slot_names[] = {
     "",   /* Pointer to namespace for this class */
     "",   /* 'type' value for MMD */
     "",   /* Name of class this vtable is for */
-    "",   /* Flags. Duh */
+    "",   /* VTABLE flags (constant, is_ro, etc). */
     "",   /* space-separated list of interfaces */
     "",   /* space-separated list of classes */
     "",   /* class */
