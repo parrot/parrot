@@ -8,33 +8,115 @@ use warnings;
 
 use Data::Dumper;
 
-=head1 NAME
+=head1 Name
 
 tools/dev/pprof2cg.pl
 
-=head1 DESCRIPTION
+=head1 Description
 
 Convert the output of Parrot's profiling runcore to a Callgrind-compatible
 format.
 
-=head1 USAGE
+=head1 Synopsis
+
+perl tools/dev/pprof2cg.pl parrot.pprof.1234
+
+=head1 Usage
 
 Generate a profile by passing C<-Rprofiling> to parrot, for example C<./parrot
--Rprofiling perl6.pbc hello.p6>.  Once execution completes, parrot will print a
-message specifying the location of profile.  The profile will usually be named
-parrot.pprof.XXXX, where XXXX is the PID of the parrot process.
+-Rprofiling perl6.pbc hello.p6>.  Once execution completes, C<parrot> will
+print a message specifying the location of the parrot profile (pprof).  The
+profile will be named parrot.pprof.XXXX, where XXXX is the PID of the parrot
+process unless another name is specified by the B<PARROT_PROFILING_OUTPUT>
+environment variable.
 
 To generate a Callgrind-compatible profile, run this script with the pprof
-filename as the first argument.  The output file will be in parrot.out.XXXX,
-where XXXX again is the PID of the original parrot process.
+filename as the first argument.  The output file usable by kcachegrind will be
+in parrot.out.XXXX, where XXXX again is the PID of the original parrot process.
 
-XXX: document $stats format
+=head1 Environment Variables
+
+=head2 PARROT_PROFILING_OUTPUT
+
+If the environment variable PARROT_PROFILING_OUTPUT is set, the profiling
+runcore will attempt to use its value as the profile filename.  Note that it
+does not check whether the file already exists and will happily overwrite
+existing files.
 
 =cut
 
-
-
 main(\@ARGV);
+
+=head1 Internal Data Structures
+
+=over 4
+
+=item notes
+
+Parrot's execution model is built on continuation-passing style and does not
+precisely fit the straightforward function-based format that
+Callgrind-compatible tools expect.  For this reason, the profiling runcore
+captures information about context switches (CS lines in the pprof file) and
+pprof2cg.pl maintains a context stack that functions similarly to a typical
+call stack.  pprof2cg.pl then maps these context switches as if they were
+function calls and returns.  See C<$ctx_stack> for more information.
+
+=item C<$ctx_stack>
+
+Variables which are named C<$ctx_stack> hold a reference to an array of hashes
+which contain information about the currently active contexts.  When collecting
+timing information about an op, it is necessary to add that inforation to all
+function calls on the stack because Callgrind-compatible tools expect the cost
+of a function call to include the cost of all calls made by that funcion, etc.
+
+When a context switch is detected, C<process_line> looks at the context stack
+to determine if the context switch looks like a function call (if the context
+hasn't been seen before) or a return (if the context is somewhere on the
+stack).  There are some other cases that the code handles, but these can be
+ignored for now in the interst of simplicity.  If the context has been seen,
+C<process_line> shifts contexts off the stack until it finds the context that
+has been switched to.  When C<process_line> detects a new context, it adds a
+fake op representing a function call to C<$stats> and unshifts a new context
+onto the stack.
+
+Each element of C<@$ctx_stack> contains the information needed to uniquely
+identify the site of the original context switch.
+
+=item C<$stats>
+
+Variables which are named C<$stats> contain a reference to a deeply nested
+HoHoH.. which contains all information gathered about a profiled PIR program.
+The nested hashes and arrays refer to the file, namespace, line of source code
+and op number, respectively.   The op number is used to allow multiple
+instructions per line because PIR instructions often represent multiple
+low-level instructions.  This also makes it easy to inject pseudo-ops to
+represent function calls.
+
+Each op always has a time value representing the total amount of time spent in
+that op.  Ops may also have an op_name value that gives the name of the op.
+When control flow similar to a function call is detected, a pseudo-op
+representing a function call is injected.  These pseudo-ops have zero cost when
+initialized and are used to determine the total time spent between when the
+context becomes active and when control flow returns to or past the context.
+Although they're not exactly like functions calls, they're close enough that it
+may help to think of them as such.
+
+Uncomment the print_stats line in main to see a representation of the data
+contained in C<$stats>.
+
+=back
+
+=head1 Functions
+
+=over 4
+
+=item C<main>
+
+This function is minimal driver for the other functions in this file, taking
+the name of a Parrot profile and writing a Callgrind-compatible profile to a
+similarly-named file.
+
+=cut
 
 sub main {
     my $argv      = shift;
@@ -51,7 +133,7 @@ sub main {
 
     #print_stats($stats);
 
-    unless ($filename =~ s/\.pprof\./.out./) {
+    unless ($filename =~ s/pprof/out/) {
         $filename = "$filename.out";
     }
 
@@ -59,8 +141,17 @@ sub main {
     my $cg_profile = get_cg_profile($stats);
     print $out_fh $cg_profile;
     close($out_fh) or die "couldn't close $filename: $!";
+    print "$filename can now be used with kcachegrind or other callgrind-compatible tools.\n";
 }
 
+=item C<process_line>
+
+This function takes string containing a single line from a Parrot profile, a
+reference to a hash of fine-grained statistics about the current PIR program
+and a reference to the current context stack.  It modifies the statistics and
+context stack according to the information from the Parrot profile.
+
+=cut
 
 sub process_line {
 
@@ -148,6 +239,15 @@ sub process_line {
     }
 }
 
+=item C<print_stats>
+
+This function prints a complete, human-readable representation of the
+statistical data that have been collected into the C<$stats> argument to
+stdout.  It is primarily intended to ease debugging and is not necessary to
+create a Callgrind-compatible profile.
+
+=cut
+
 sub print_stats {
     my $stats = shift;
 
@@ -169,6 +269,14 @@ sub print_stats {
     }
 }
 
+=item C<split_vars>
+
+This function takes a string specifying 1 or more key/value mappings and
+returns a reference to a hash containing those keys and values.  The string
+must be in the format C<{x{key1:value1}x}{x{key2:value2}x}>.
+
+=cut
+
 sub split_vars {
     my $href;
     my $str = shift;
@@ -179,6 +287,17 @@ sub split_vars {
     }
     return $href;
 }
+
+=item C<store_stats>
+
+This function adds statistical data to the C<$stats> hash reference.  The
+C<$locator> argument specifies information such as the namespace, file, line
+and op number where the data should go.  C<$time> is an integer representing
+the amount of time spent at the specified location.  C<$extra> contains any
+ancillary data that should be stored in the hash.  This includes data on
+(faked) subroutine calls and op names.
+
+=cut
 
 sub store_stats {
     my $stats   = shift;
@@ -212,6 +331,15 @@ sub store_stats {
     }
 }
 
+=item C<get_cg_profile>
+
+This function takes a reference to a hash of statistical information about a
+PIR program and returns a string containing a Callgrind-compatible profile.
+Although some informtion in the profile may not be accurate (namely PID and
+creator), tools such as kcachegrind are able to consume files generated by this
+function.
+
+=cut
 
 sub get_cg_profile {
 
@@ -280,6 +408,10 @@ HEADER
     push @output, "totals: $stats->{'global_stats'}{'total_time'}";
     return join("\n", @output);
 }
+
+=back
+
+=cut
 
 # Local Variables:
 #   mode: cperl
