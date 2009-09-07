@@ -73,6 +73,7 @@ sub runstep {
         $conf->data->set(cc => 'gcc-4') unless $conf->options->get('cc');
         $conf->data->set(ld => 'g++-4') unless $conf->options->get('ld');
     }
+    $conf->data->set( clock_best => '-DCLOCK_BEST=CLOCK_REALTIME' );
 }
 
 1;
