@@ -218,9 +218,9 @@ CODE
 
   test6:
     push_eh eh6
-    $P0 = get_global [ iso-8859-1:"François" ], "baz"
+    $P0 = get_global [ iso-8859-1:"Fran\x{E7}ois" ], "baz"
     $S0 = $P0()
-    is($S0, iso-8859-1:"François", "Found sub in ISO-8859 NameSpace")
+    is($S0, iso-8859-1:"Fran\x{E7}ois", "Found sub in ISO-8859 NameSpace")
     goto end_test6
   eh6:
     ok(0, "Cannot find sub in ISO-8859 NameSpace")
@@ -229,9 +229,9 @@ CODE
 
   test7:
     push_eh eh7
-    $P0 = get_global [ "Foo";iso-8859-1:"François" ], "baz"
+    $P0 = get_global [ "Foo";iso-8859-1:"Fran\x{E7}ois" ], "baz"
     $S0 = $P0()
-    is($S0, iso-8859-1:"Foo::François", "Found sub in nested ISO-8859 NameSpace")
+    is($S0, iso-8859-1:"Foo::Fran\x{E7}ois", "Found sub in nested ISO-8859 NameSpace")
     goto end_test7
   eh7:
     ok(0, "Cannot find sub in ISO-8859 NameSpace")
@@ -239,23 +239,20 @@ CODE
     pop_eh
 
   test8:
-# TODO: This should probably be possible. We should be able to look up a
-#       string if it is iso-8895-1 and we are Unicode
-# TT #990
-     todo(0, "Lookup NameSpace with ISO-8859-1 Name using Unicode Key")
-     todo(0, "Find sub in ISO-8859-1 NameSpace using Unicode Key")
-#    push_eh eh8
-#    $P0 = get_global [ unicode:"François" ], "baz"
-#    $I0 = isnull $P0
-#    is($I0, 0, "Find Sub in an ISO-8859-1 NameSpace looked up by a Unicode name")
-#    $S0 = $P0()
-#    say $S0
-#    is($S0, iso-8859-1:"François", "ISO-8859 NameSpace with Unicode name")
-#    goto end_test8
-#  eh8:
-#    ok(0, "Cannot find ISO-8859 NameSpace using Unicode name")
-#  end_test8:
-#    pop_eh
+#     todo(0, "Lookup NameSpace with ISO-8859-1 Name using Unicode Key")
+#     todo(0, "Find sub in ISO-8859-1 NameSpace using Unicode Key")
+    push_eh eh8
+    $P0 = get_global [ unicode:"Fran\x{00E7}ois" ], "baz"
+    $I0 = isnull $P0
+    is($I0, 0, "Find Sub in an ISO-8859-1 NameSpace looked up by a Unicode name")
+    $S0 = $P0()
+    say $S0
+    is($S0, iso-8859-1:"Fran\x{E7}ois", "ISO-8859 NameSpace with Unicode name")
+    goto end_test8
+  eh8:
+    ok(0, "Cannot find ISO-8859 NameSpace using Unicode name")
+  end_test8:
+    pop_eh
 
 .end
 
@@ -288,19 +285,19 @@ CODE
     is($S0, "Foo::Bar", "Alias namespace")
 
     # Get nested NameSpace with ISO-8859 name
-    $P1 = $P0[ iso-8859-1:"François" ]
+    $P1 = $P0[ iso-8859-1:"Fran\x{E7}ois" ]
     $P2 = $P1["baz"]
     $S0 = $P2()
-    is($S0, iso-8859-1:"Foo::François", "Hash-get nested ISO-8859 NameSpace")
+    is($S0, iso-8859-1:"Foo::Fran\x{E7}ois", "Hash-get nested ISO-8859 NameSpace")
 
-    $P1 = $P0[ iso-8859-1:"François";"baz" ]
+    $P1 = $P0[ iso-8859-1:"Fran\x{E7}ois";"baz" ]
     $S0 = $P1()
-    is($S0, iso-8859-1:"Foo::François", "Hash-get nested ISO-8859 NameSpace Sub")
+    is($S0, iso-8859-1:"Foo::Fran\x{E7}ois", "Hash-get nested ISO-8859 NameSpace Sub")
 
-    $P0 = get_global iso-8859-1:"François"
+    $P0 = get_global iso-8859-1:"Fran\x{E7}ois"
     $P1 = $P0[ "baz" ]
     $S0 = $P1()
-    is($S0, iso-8859-1:"François", "Hash-get ISO-8859 NameSpace")
+    is($S0, iso-8859-1:"Fran\x{E7}ois", "Hash-get ISO-8859 NameSpace")
 .end
 
 .sub 'access_sub_in_namespace'
@@ -502,14 +499,14 @@ CODE
     .return("Foo::Bar")
 .end
 
-.namespace [ iso-8859-1:"François" ]
+.namespace [ iso-8859-1:"Fran\x{E7}ois" ]
 .sub 'baz'
-    .return(iso-8859-1:"François")
+    .return(iso-8859-1:"Fran\x{E7}ois")
 .end
 
-.namespace [ "Foo"; iso-8859-1:"François" ]
+.namespace [ "Foo"; iso-8859-1:"Fran\x{E7}ois" ]
 .sub 'baz'
-    .return(iso-8859-1:"Foo::François")
+    .return(iso-8859-1:"Foo::Fran\x{E7}ois")
 .end
 
 .HLL "MyHLL"
