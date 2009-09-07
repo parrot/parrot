@@ -2,6 +2,7 @@
 
 New in 1.6.0
 - Core
+  + Profiling runcore can now be used to generate Callgrind-compatible output
   + PMC allocator now automatically allocates ATTR structures
   + Added fixed-size structure allocator to GC
   + Contexts are now garbage-collectable
