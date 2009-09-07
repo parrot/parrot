@@ -22,7 +22,7 @@
     exports = split " ", "plan test_out test_diag test_fail test_pass test_test"
     test_namespace.'export_to'(curr_namespace, exports)
 
-    plan( 80 )
+    plan( 81 )
 
     test_skip()
     test_todo()
@@ -314,6 +314,10 @@ CODE
     test_pass( 'like() can match partial literal strings' )
     like( 'foobar()', 'foobar', 'like() can match partial literal strings' )
     test_test( 'like() can match partial literal strings' )
+
+    test_pass( 'like() can match partial literal strings with spaces' )
+    like( 'foo bar()', 'foo\ bar', 'like() can match partial literal strings with spaces' )
+    test_test( 'like() can match partial literal strings with spaces' )
 .end
 
 .sub test_is_deeply
