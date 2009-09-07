@@ -263,14 +263,14 @@ static size_t
 get_max_buffer_address(PARROT_INTERP)
 {
     ASSERT_ARGS(get_max_buffer_address)
-    Arenas * const arena_base = interp->arena_base;
+    Memory_Pools * const mem_pools = interp->mem_pools;
     size_t         max        = 0;
     UINTVAL        i;
 
-    for (i = 0; i < arena_base->num_sized; i++) {
-        if (arena_base->sized_header_pools[i]) {
-            if (arena_base->sized_header_pools[i]->end_arena_memory > max)
-                max = arena_base->sized_header_pools[i]->end_arena_memory;
+    for (i = 0; i < mem_pools->num_sized; i++) {
+        if (mem_pools->sized_header_pools[i]) {
+            if (mem_pools->sized_header_pools[i]->end_arena_memory > max)
+                max = mem_pools->sized_header_pools[i]->end_arena_memory;
         }
     }
 
@@ -298,15 +298,15 @@ static size_t
 get_min_buffer_address(PARROT_INTERP)
 {
     ASSERT_ARGS(get_min_buffer_address)
-    Arenas * const arena_base = interp->arena_base;
+    Memory_Pools * const mem_pools = interp->mem_pools;
     size_t         min        = (size_t) -1;
     UINTVAL        i;
 
-    for (i = 0; i < arena_base->num_sized; i++) {
-        if (arena_base->sized_header_pools[i]
-        &&  arena_base->sized_header_pools[i]->start_arena_memory) {
-            if (arena_base->sized_header_pools[i]->start_arena_memory < min)
-                min = arena_base->sized_header_pools[i]->start_arena_memory;
+    for (i = 0; i < mem_pools->num_sized; i++) {
+        if (mem_pools->sized_header_pools[i]
+        &&  mem_pools->sized_header_pools[i]->start_arena_memory) {
+            if (mem_pools->sized_header_pools[i]->start_arena_memory < min)
+                min = mem_pools->sized_header_pools[i]->start_arena_memory;
         }
     }
 
@@ -329,7 +329,7 @@ static size_t
 get_max_pmc_address(PARROT_INTERP)
 {
     ASSERT_ARGS(get_max_pmc_address)
-    return interp->arena_base->pmc_pool->end_arena_memory;
+    return interp->mem_pools->pmc_pool->end_arena_memory;
 }
 
 
@@ -350,7 +350,7 @@ static size_t
 get_min_pmc_address(PARROT_INTERP)
 {
     ASSERT_ARGS(get_min_pmc_address)
-    return interp->arena_base->pmc_pool->start_arena_memory;
+    return interp->mem_pools->pmc_pool->start_arena_memory;
 }
 
 
@@ -484,12 +484,12 @@ static int
 is_buffer_ptr(PARROT_INTERP, ARGIN(const void *ptr))
 {
     ASSERT_ARGS(is_buffer_ptr)
-    Arenas * const arena_base = interp->arena_base;
+    Memory_Pools * const mem_pools = interp->mem_pools;
     UINTVAL        i;
 
-    for (i = 0; i < arena_base->num_sized; i++) {
-        if (arena_base->sized_header_pools[i]
-            &&  contained_in_pool(interp, arena_base->sized_header_pools[i], ptr))
+    for (i = 0; i < mem_pools->num_sized; i++) {
+        if (mem_pools->sized_header_pools[i]
+            &&  contained_in_pool(interp, mem_pools->sized_header_pools[i], ptr))
             return 1;
     }
 
@@ -512,7 +512,7 @@ static int
 is_pmc_ptr(PARROT_INTERP, ARGIN(const void *ptr))
 {
     ASSERT_ARGS(is_pmc_ptr)
-        return contained_in_pool(interp, interp->arena_base->pmc_pool, ptr);
+        return contained_in_pool(interp, interp->mem_pools->pmc_pool, ptr);
 }
 
 

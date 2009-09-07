@@ -28,14 +28,14 @@ convenient place.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void clear_cow(PARROT_INTERP,
-    ARGMOD(Fixed_Size_Obj_Pool *pool),
+    ARGMOD(Fixed_Size_Pool *pool),
     int cleanup)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
 static int sweep_cb(PARROT_INTERP,
-    ARGMOD(Fixed_Size_Obj_Pool *pool),
+    ARGMOD(Fixed_Size_Pool *pool),
     int flag,
     ARGMOD(void *arg))
         __attribute__nonnull__(1)
@@ -45,7 +45,7 @@ static int sweep_cb(PARROT_INTERP,
         FUNC_MODIFIES(*arg);
 
 static void used_cow(PARROT_INTERP,
-    ARGMOD(Fixed_Size_Obj_Pool *pool),
+    ARGMOD(Fixed_Size_Pool *pool),
     int cleanup)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -58,7 +58,7 @@ static void used_cow(PARROT_INTERP,
 
 /*
 
-=item C<static int sweep_cb(PARROT_INTERP, Fixed_Size_Obj_Pool *pool, int flag, void *arg)>
+=item C<static int sweep_cb(PARROT_INTERP, Fixed_Size_Pool *pool, int flag, void *arg)>
 
 Sweeps the given pool for the MS collector. This function also ends
 the profiling timer, if profiling is enabled. Returns the total number
@@ -69,7 +69,7 @@ of objects freed.
 */
 
 static int
-sweep_cb(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool), int flag,
+sweep_cb(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool), int flag,
     ARGMOD(void *arg))
 {
     int * const total_free = (int *) arg;
@@ -93,7 +93,7 @@ sweep_cb(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool), int flag,
 
 /*
 
-=item C<static void clear_cow(PARROT_INTERP, Fixed_Size_Obj_Pool *pool, int cleanup)>
+=item C<static void clear_cow(PARROT_INTERP, Fixed_Size_Pool *pool, int cleanup)>
 
 Clears the COW ref count.
 
@@ -102,7 +102,7 @@ Clears the COW ref count.
 */
 
 static void
-clear_cow(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool), int cleanup)
+clear_cow(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool), int cleanup)
 {
     const UINTVAL object_size = pool->object_size;
     Fixed_Size_Obj_Arena *cur_arena;
@@ -139,7 +139,7 @@ clear_cow(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool), int cleanup)
 
 /*
 
-=item C<static void used_cow(PARROT_INTERP, Fixed_Size_Obj_Pool *pool, int cleanup)>
+=item C<static void used_cow(PARROT_INTERP, Fixed_Size_Pool *pool, int cleanup)>
 
 Finds other users of COW's C<bufstart>.
 
@@ -148,7 +148,7 @@ Finds other users of COW's C<bufstart>.
 */
 
 static void
-used_cow(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool), int cleanup)
+used_cow(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool), int cleanup)
 {
     const UINTVAL object_size = pool->object_size;
     Fixed_Size_Obj_Arena *cur_arena;

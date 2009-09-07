@@ -401,8 +401,8 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     Parrot_gc_destroy_memory_pools(interp);
 
     /* mem subsystem is dead now */
-    mem_sys_free(interp->arena_base);
-    interp->arena_base = NULL;
+    mem_sys_free(interp->mem_pools);
+    interp->mem_pools = NULL;
 
     /* cache structure */
     destroy_object_cache(interp);

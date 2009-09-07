@@ -53,10 +53,10 @@ typedef enum {
 } pool_iter_enum;
 
 struct Memory_Block;
-struct Var_Size_Obj_Pool;
-struct Fixed_Size_Obj_Pool;
-struct Fixed_Size_Obj_Arena;
-struct Arenas;
+struct Var_Size_Pool;
+struct Fixed_Size_Pool;
+struct Fixed_Size_Arena;
+struct Memory_Pools;
 
 typedef enum {
     GC_TRACE_FULL        = 1,
@@ -64,11 +64,11 @@ typedef enum {
     GC_TRACE_SYSTEM_ONLY = 3
 } Parrot_gc_trace_type;
 
-typedef int (*pool_iter_fn)(PARROT_INTERP, struct Fixed_Size_Obj_Pool *, int, void*);
-typedef void (*add_free_object_fn_type)(PARROT_INTERP, struct Fixed_Size_Obj_Pool *, void *);
-typedef void * (*get_free_object_fn_type)(PARROT_INTERP, struct Fixed_Size_Obj_Pool *);
-typedef void (*alloc_objects_fn_type)(PARROT_INTERP, struct Fixed_Size_Obj_Pool *);
-typedef void (*gc_object_fn_type)(PARROT_INTERP, struct Fixed_Size_Obj_Pool *, PObj *);
+typedef int (*pool_iter_fn)(PARROT_INTERP, struct Fixed_Size_Pool *, int, void*);
+typedef void (*add_free_object_fn_type)(PARROT_INTERP, struct Fixed_Size_Pool *, void *);
+typedef void * (*get_free_object_fn_type)(PARROT_INTERP, struct Fixed_Size_Pool *);
+typedef void (*alloc_objects_fn_type)(PARROT_INTERP, struct Fixed_Size_Pool *);
+typedef void (*gc_object_fn_type)(PARROT_INTERP, struct Fixed_Size_Pool *, PObj *);
 
 
 /* &gen_from_enum(interpinfo.pasm) prefix(INTERPINFO_) */

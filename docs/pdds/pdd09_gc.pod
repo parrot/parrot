@@ -279,41 +279,42 @@ The different GC cores are independent, but they share some code and
 resources.  The arena structures and arena creation routines are common across
 most GC cores, and some GC cores also share mark routines.
 
-The main interpreter structure has an arena_base member, which is a pointer to
-an Arenas struct.
+The main interpreter structure has an mem_pools member, which is a pointer to
+an Memory_Pools struct.
 
-=head4 The Arenas structure
+=head4 The Memory_Pools structure
 
-The Arenas structure contains pointers to a variety of memory pools, each used
-for a specific purpose. Two are Var_Size_Obj_Pool pointers (memory_pool,
-constant_string_pool), and six are Fixed_Size_Obj_Pool structures (pmc_pool,
+The C<Memory_Pools> structure contains pointers to a variety of memory pools,
+each used for a specific purpose. Two are Var_Size_Pool pointers (memory_pool,
+constant_string_pool), and six are Fixed_Size_Pool structures (pmc_pool,
 constant_pmc_pool, constant_string_header_pool).
 
-The Arenas structure holds function pointers for the core defined interface of
-the currently active GC subsystem: C<init_pool>, C<do_gc_mark>,
+The C<Memory_Pools> structure holds function pointers for the core defined
+interface of the currently active GC subsystem: C<init_pool>, C<do_gc_mark>,
 C<finalize_gc_system>. It holds various accounting information for the GC
 subsystem, including how many GC runs have been completed, amount of memory
 allocated since the last run, and total memory allocated. This accounting
 information is updated by the GC system. The current block level for GC mark
-and sweep phases is stored in the Arenas structure. (See L<Blocking GC>.)
+and sweep phases is stored in the C<Memory_Pools> structure. 
+(See L<Blocking GC>.)
 
 The pointer C<void *gc_private> is reserved for use by the currently active GC
 subsystem (with freedom for variation between GC implementations).
 
-=head4 The Var_Size_Obj_Pool structure
+=head4 The Var_Size_Pool structure
 
-The Var_Size_Obj_Pool structure is a simple memory pool. It contains a pointer 
+The C<Var_Size_Pool> structure is a simple memory pool. It contains a pointer 
 to the top block of the allocated pool, the total allocated size of the pool,
 the block size, and some details on the reclamation characteristics of the 
 pool.
 
-=head4 The Fixed_Size_Obj_Pool structure
+=head4 The Fixed_Size_Pool structure
 
-The Fixed_Size_Obj_Pool structure is a richer memory pool for object 
+The C<Fixed_Size_Pool> structure is a richer memory pool for object 
 allocation. It tracks details like the number of allocated and free objects 
 in the pool, a list of free objects, and for the generational GC 
 implementation maintains linked lists of white, black, and gray PMCs. It 
-contains a pointer to a simple Var_Size_Obj_Pool (the base storage of the 
+contains a pointer to a simple C<Var_Size_Pool> (the base storage of the 
 pool). It holds function pointers for adding and retrieving free objects in
 the pool, and for allocating objects.
 
@@ -333,7 +334,7 @@ Each GC core provides a standard interface for interaction with the core.
 
 Each GC core declares an initialization routine as a function pointer,
 which is installed in F<src/memory.c:mem_setup_allocator()> after
-creating C<arena_base> in the interpreter struct.
+creating C<mem_pools> in the interpreter struct.
 
 =over 4
 
@@ -342,22 +343,22 @@ creating C<arena_base> in the interpreter struct.
 A routine to initialize the GC system named C<XXX>.
 
 The initialization code is responsible for the creation of the header pools
-and fills the function pointer slots in the interpreter's C<arena_base>
+and fills the function pointer slots in the interpreter's C<mem_pools>
 member.
 
 =back
 
-=head4 Arenas structure function pointers
+=head4 Memory_Pools structure function pointers
 
-Each GC system declares 3 function pointers, stored in the Arenas structure.
+Each GC system declares 3 function pointers, stored in the Memory_Pools structure.
 
 =over 4
 
 =item C<void (*init_gc_system) (Interp *)>
 
 Initialize the GC system. Install the additional function pointers into
-the Arenas structure, and prepare any private storage to be used by
-the GC in the Arenas->gc_private field.
+the Memory_Pools structure, and prepare any private storage to be used by
+the GC in the Memory_Pools->gc_private field.
 
 =item C<void (*do_gc_mark) (Interp *, int flags)>
 
@@ -422,23 +423,23 @@ Called during interpreter destruction. Free used resources and memory pools.
 All PMCs must be swept, and PMCs with custom destroy VTABLE methods must have
 those called.
 
-=item C<void (*init_pool) (Interp *, Fixed_Size_Obj_Pool *)>
+=item C<void (*init_pool) (Interp *, Fixed_Size_Pool *)>
 
-Initialize the given pool. Populates the C<Fixed_Size_Obj_Pool> structure with
+Initialize the given pool. Populates the C<Fixed_Size_Pool> structure with
 initial values, and sets a series of function pointers for working with the
 pool. The function pointers used with the pool are discussed next.
 
 =back
 
-=head4 Fixed_Size_Obj_Pool function pointers
+=head4 Fixed_Size_Pool function pointers
 
-Each GC core defines 4 function pointers stored in the C<Fixed_Size_Obj_Pool>
+Each GC core defines 4 function pointers stored in the C<Fixed_Size_Pool>
 structures. These function pointers are used throughout Parrot to implement
 basic behaviors for the pool.
 
 =over 4
 
-=item C<PObj * (*get_free_object) (Interp *, Fixed_Size_Obj_Pool*)>
+=item C<PObj * (*get_free_object) (Interp *, Fixed_Size_Pool*)>
 
 Get a free object from the pool. This function returns one free object from
 the given pool and removes that object from the pool's free list. PObject
@@ -446,20 +447,20 @@ flags are returned clear, except flags that are used by the garbage collector
 itself, if any. If the pool is a buffer header pool all other object memory
 is zeroed.
 
-=item C<void (*add_free_object) (Interp *, Fixed_Size_Obj_Pool *, PObj *);>
+=item C<void (*add_free_object) (Interp *, Fixed_Size_Pool *, PObj *);>
 
 Add a freed object to the pool's free list. This function is most often called
 internally to the GC itself to add items to the free list after a sweep, or
 when a new arena is created to add the new items to the free list. It does
 not need to be used in this way, however.
 
-=item C<void (*alloc_objects) (Interp *, Fixed_Size_Obj_Pool *);>
+=item C<void (*alloc_objects) (Interp *, Fixed_Size_Pool *);>
 
 Allocate a new arena of objects for the pool. Initialize the new arena and add
 all new objects to the pool's free list. Some collectors implement a growth
 factor which increases the size of each new allocated arena.
 
-=item C<void (*more_objects) (Interp *, Fixed_Size_Obj_Pool *);>
+=item C<void (*more_objects) (Interp *, Fixed_Size_Pool *);>
 
 Reallocation for additional objects. It has the same signature as
 C<alloc_objects>, and in some GC cores the same function pointer is used for

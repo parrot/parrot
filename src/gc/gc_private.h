@@ -102,7 +102,7 @@ typedef struct GC_Subsystem {
     /** Function hooks that each subsystem MUST provide */
     void (*do_gc_mark)(PARROT_INTERP, UINTVAL flags);
     void (*finalize_gc_system) (PARROT_INTERP);
-    void (*init_pool)(PARROT_INTERP, struct Fixed_Size_Obj_Pool *);
+    void (*init_pool)(PARROT_INTERP, struct Fixed_Size_Pool *);
 
     /*Function hooks that GC systems can CHOOSE to provide if they need them
      *These will be called from the GC API function Parrot_gc_func_name */
@@ -128,16 +128,16 @@ typedef struct Memory_Block {
     char *top;
 } Memory_Block;
 
-typedef struct Var_Size_Obj_Pool {
+typedef struct Variable_Size_Pool {
     Memory_Block *top_block;
-    void (*compact)(PARROT_INTERP, struct Var_Size_Obj_Pool *);
+    void (*compact)(PARROT_INTERP, struct Variable_Size_Pool *);
     size_t minimum_block_size;
     size_t total_allocated; /* total bytes allocated to this pool */
     size_t guaranteed_reclaimable;     /* bytes that can definitely be reclaimed*/
     size_t possibly_reclaimable;     /* bytes that can possibly be reclaimed
                                       * (above plus COW-freed bytes) */
     FLOATVAL reclaim_factor; /* minimum percentage we will reclaim */
-} Var_Size_Obj_Pool;
+} Variable_Size_Pool;
 
 typedef struct Fixed_Size_Obj_Arena {
     size_t                     used;
@@ -170,9 +170,9 @@ typedef struct PMC_Attribute_Pool {
 } PMC_Attribute_Pool;
 
 /* Tracked resource pool */
-typedef struct Fixed_Size_Obj_Pool {
+typedef struct Fixed_Size_Pool {
 
-    struct Var_Size_Obj_Pool *mem_pool;
+    struct Variable_Size_Pool *mem_pool;
    /* Size in bytes of an individual pool item. This size may include
     * a GC-system specific GC header. (e.g. GMS headers) */
     size_t object_size; 
@@ -211,16 +211,16 @@ typedef struct Fixed_Size_Obj_Pool {
     void *newlast;
 #endif
 
-} Fixed_Size_Obj_Pool;
+} Fixed_Size_Pool;
 
-typedef struct Arenas {
-    Var_Size_Obj_Pool *memory_pool;
-    Var_Size_Obj_Pool *constant_string_pool;
-    struct Fixed_Size_Obj_Pool *string_header_pool;
-    struct Fixed_Size_Obj_Pool *pmc_pool;
-    struct Fixed_Size_Obj_Pool *constant_pmc_pool;
-    struct Fixed_Size_Obj_Pool *constant_string_header_pool;
-    struct Fixed_Size_Obj_Pool **sized_header_pools;
+typedef struct Memory_Pools {
+    Variable_Size_Pool *memory_pool;
+    Variable_Size_Pool *constant_string_pool;
+    struct Fixed_Size_Pool *string_header_pool;
+    struct Fixed_Size_Pool *pmc_pool;
+    struct Fixed_Size_Pool *constant_pmc_pool;
+    struct Fixed_Size_Pool *constant_string_header_pool;
+    struct Fixed_Size_Pool **sized_header_pools;
     size_t num_sized;
 
     PMC_Attribute_Pool **attrib_pools;
@@ -266,7 +266,7 @@ typedef struct Arenas {
      * private data for the GC subsystem
      */
     void *  gc_private;           /* gc subsystem data */
-} Arenas;
+} Memory_Pools;
 
 
 /* HEADERIZER BEGIN: src/gc/system.c */
@@ -364,7 +364,7 @@ void Parrot_gc_ims_wb(PARROT_INTERP, ARGMOD(PMC *agg), ARGMOD(PMC *_new))
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL contained_in_pool(PARROT_INTERP,
-    ARGIN(const Fixed_Size_Obj_Pool *pool),
+    ARGIN(const Fixed_Size_Pool *pool),
     ARGIN(const void *ptr))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -372,7 +372,7 @@ INTVAL contained_in_pool(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-Fixed_Size_Obj_Pool * get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
+Fixed_Size_Pool * get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
         __attribute__nonnull__(1);
 
 PARROT_IGNORABLE_RESULT
@@ -384,7 +384,7 @@ header_pools_iterate_callback(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(4);
 
-void initialize_header_pools(PARROT_INTERP)
+void initialize_fixed_size_pools(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 void mark_special(PARROT_INTERP, ARGIN(PMC *obj))
@@ -392,7 +392,7 @@ void mark_special(PARROT_INTERP, ARGIN(PMC *obj))
         __attribute__nonnull__(2);
 
 void Parrot_add_to_free_list(PARROT_INTERP,
-    ARGMOD(Fixed_Size_Obj_Pool *pool),
+    ARGMOD(Fixed_Size_Pool *pool),
     ARGMOD(Fixed_Size_Obj_Arena *arena))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -401,7 +401,7 @@ void Parrot_add_to_free_list(PARROT_INTERP,
         FUNC_MODIFIES(*arena);
 
 void Parrot_append_arena_in_pool(PARROT_INTERP,
-    ARGMOD(Fixed_Size_Obj_Pool *pool),
+    ARGMOD(Fixed_Size_Pool *pool),
     ARGMOD(Fixed_Size_Obj_Arena *new_arena),
     size_t size)
         __attribute__nonnull__(1)
@@ -411,7 +411,7 @@ void Parrot_append_arena_in_pool(PARROT_INTERP,
         FUNC_MODIFIES(*new_arena);
 
 void Parrot_gc_clear_live_bits(PARROT_INTERP,
-    ARGIN(const Fixed_Size_Obj_Pool *pool))
+    ARGIN(const Fixed_Size_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -445,7 +445,7 @@ void Parrot_gc_profile_start(PARROT_INTERP)
 void Parrot_gc_run_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void Parrot_gc_sweep_pool(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
+void Parrot_gc_sweep_pool(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
@@ -465,7 +465,7 @@ int Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
 #define ASSERT_ARGS_header_pools_iterate_callback __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(func)
-#define ASSERT_ARGS_initialize_header_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_initialize_fixed_size_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_mark_special __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
@@ -513,7 +513,7 @@ int Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-Fixed_Size_Obj_Pool * get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
+Fixed_Size_Pool * get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
         __attribute__nonnull__(1);
 
 PARROT_IGNORABLE_RESULT
@@ -525,7 +525,7 @@ header_pools_iterate_callback(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(4);
 
-void initialize_header_pools(PARROT_INTERP)
+void initialize_fixed_size_pools(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_get_bufferlike_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -533,7 +533,7 @@ void initialize_header_pools(PARROT_INTERP)
 #define ASSERT_ARGS_header_pools_iterate_callback __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(func)
-#define ASSERT_ARGS_initialize_header_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_initialize_fixed_size_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/pools.c */
@@ -556,28 +556,28 @@ PARROT_CONST_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 size_t aligned_string_size(size_t len);
 
-void check_buffer_ptr(ARGMOD(Buffer * pobj), ARGMOD(Var_Size_Obj_Pool * pool))
+void check_buffer_ptr(ARGMOD(Buffer * pobj), ARGMOD(Variable_Size_Pool * pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(* pobj)
         FUNC_MODIFIES(* pool);
 
-void compact_pool(PARROT_INTERP, ARGMOD(Var_Size_Obj_Pool *pool))
+void compact_pool(PARROT_INTERP, ARGMOD(Variable_Size_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
-void initialize_memory_pools(PARROT_INTERP)
+void initialize_var_size_pools(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-void * mem_allocate(PARROT_INTERP, size_t size, ARGMOD(Var_Size_Obj_Pool *pool))
+void * mem_allocate(PARROT_INTERP, size_t size, ARGMOD(Variable_Size_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pool);
 
-void merge_pools(ARGMOD(Var_Size_Obj_Pool *dest), ARGMOD(Var_Size_Obj_Pool *source))
+void merge_pools(ARGMOD(Variable_Size_Pool *dest), ARGMOD(Variable_Size_Pool *source))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*dest)
@@ -595,7 +595,7 @@ void merge_pools(ARGMOD(Var_Size_Obj_Pool *dest), ARGMOD(Var_Size_Obj_Pool *sour
 #define ASSERT_ARGS_compact_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pool)
-#define ASSERT_ARGS_initialize_memory_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_initialize_var_size_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_mem_allocate __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \

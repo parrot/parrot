@@ -134,7 +134,7 @@ can be better, if a sequence of such stores would happen.
 =head2 Data structure overview
 
 The incremental mark and sweep collector has an additional structure in
-the arena_base that keeps track of the collector's state. Pool and arena
+the mem_pools that keeps track of the collector's state. Pool and arena
 structures are unchanged. Only the allocation of new arena blocks is done
 much more fine grained in e.g. 8K blocks.
 
@@ -338,7 +338,7 @@ a sleep opcode.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static int collect_cb(PARROT_INTERP,
-    ARGMOD(Fixed_Size_Obj_Pool *pool),
+    ARGMOD(Fixed_Size_Pool *pool),
     SHIM(int flag),
     ARGIN(void *arg))
         __attribute__nonnull__(1)
@@ -347,7 +347,7 @@ static int collect_cb(PARROT_INTERP,
         FUNC_MODIFIES(*pool);
 
 static void gc_ims_add_free_object(PARROT_INTERP,
-    ARGMOD(Fixed_Size_Obj_Pool *pool),
+    ARGMOD(Fixed_Size_Pool *pool),
     ARGOUT(void *to_add))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -356,7 +356,7 @@ static void gc_ims_add_free_object(PARROT_INTERP,
         FUNC_MODIFIES(*to_add);
 
 static void gc_ims_alloc_objects(PARROT_INTERP,
-    ARGMOD(Fixed_Size_Obj_Pool *pool))
+    ARGMOD(Fixed_Size_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
@@ -364,12 +364,12 @@ static void gc_ims_alloc_objects(PARROT_INTERP,
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static void * gc_ims_get_free_object(PARROT_INTERP,
-    ARGMOD(Fixed_Size_Obj_Pool *pool))
+    ARGMOD(Fixed_Size_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
-static void gc_ims_pool_init(SHIM_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
+static void gc_ims_pool_init(SHIM_INTERP, ARGMOD(Fixed_Size_Pool *pool))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
@@ -395,7 +395,7 @@ static void parrot_gc_ims_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 static int sweep_cb(PARROT_INTERP,
-    ARGMOD(Fixed_Size_Obj_Pool *pool),
+    ARGMOD(Fixed_Size_Pool *pool),
     int flag,
     ARGIN(void *arg))
         __attribute__nonnull__(1)
@@ -520,8 +520,8 @@ void
 Parrot_gc_ims_init(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_gc_ims_init)
-    Arenas * const arena_base = interp->arena_base;
-    arena_base->gc_private    = mem_allocate_zeroed_typed(Gc_ims_private);
+    Memory_Pools * const mem_pools = interp->mem_pools;
+    mem_pools->gc_private    = mem_allocate_zeroed_typed(Gc_ims_private);
 
     /* set function hooks according to pdd09 */
 
@@ -536,7 +536,7 @@ Parrot_gc_ims_init(PARROT_INTERP)
 
 /*
 
-=item C<static void gc_ims_pool_init(PARROT_INTERP, Fixed_Size_Obj_Pool *pool)>
+=item C<static void gc_ims_pool_init(PARROT_INTERP, Fixed_Size_Pool *pool)>
 
 Initializes a pool by setting the appropriate function pointers to add, get,
 and allocate objects.
@@ -546,7 +546,7 @@ and allocate objects.
 */
 
 static void
-gc_ims_pool_init(SHIM_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
+gc_ims_pool_init(SHIM_INTERP, ARGMOD(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(gc_ims_pool_init)
     pool->add_free_object = gc_ims_add_free_object;
@@ -570,10 +570,10 @@ static void
 parrot_gc_ims_deinit(PARROT_INTERP)
 {
     ASSERT_ARGS(parrot_gc_ims_deinit)
-    Arenas * const arena_base = interp->arena_base;
+    Memory_Pools * const mem_pools = interp->mem_pools;
 
-    mem_sys_free(arena_base->gc_private);
-    arena_base->gc_private = NULL;
+    mem_sys_free(mem_pools->gc_private);
+    mem_pools->gc_private = NULL;
 }
 
 
@@ -593,9 +593,9 @@ parrot_gc_ims_reinit(PARROT_INTERP)
 {
     ASSERT_ARGS(parrot_gc_ims_reinit)
     Gc_ims_private *g_ims;
-    Arenas * const  arena_base = interp->arena_base;
+    Memory_Pools * const  mem_pools = interp->mem_pools;
 
-    arena_base->lazy_gc = 0;
+    mem_pools->lazy_gc = 0;
     Parrot_gc_run_init(interp);
 
     /*
@@ -604,7 +604,7 @@ parrot_gc_ims_reinit(PARROT_INTERP)
      */
     Parrot_gc_trace_root(interp, GC_TRACE_ROOT_ONLY);
 
-    g_ims        = (Gc_ims_private *)arena_base->gc_private;
+    g_ims        = (Gc_ims_private *)mem_pools->gc_private;
     g_ims->state = GC_IMS_MARKING;
 
 }
@@ -612,7 +612,7 @@ parrot_gc_ims_reinit(PARROT_INTERP)
 
 /*
 
-=item C<static void gc_ims_add_free_object(PARROT_INTERP, Fixed_Size_Obj_Pool
+=item C<static void gc_ims_add_free_object(PARROT_INTERP, Fixed_Size_Pool
 *pool, void *to_add)>
 
 Add object C<to_add> to the free_list in the given pool.
@@ -623,7 +623,7 @@ C<pool->num_free_objects> has to be updated by the caller.
 */
 
 static void
-gc_ims_add_free_object(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool), ARGOUT(void *to_add))
+gc_ims_add_free_object(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool), ARGOUT(void *to_add))
 {
     ASSERT_ARGS(gc_ims_add_free_object)
     *(void **)to_add = pool->free_list;
@@ -631,7 +631,7 @@ gc_ims_add_free_object(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool), ARGOUT(
 #if DISABLE_GC_DEBUG
     UNUSED(interp);
 #else
-    if (GC_DEBUG(interp)  && pool == interp->arena_base->pmc_pool) {
+    if (GC_DEBUG(interp)  && pool == interp->mem_pools->pmc_pool) {
         PMC * const p = (PMC *)to_add;
         p->vtable     = interp->vtables[enum_class_Null];
     }
@@ -640,7 +640,7 @@ gc_ims_add_free_object(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool), ARGOUT(
 
 /*
 
-=item C<static void * gc_ims_get_free_object(PARROT_INTERP, Fixed_Size_Obj_Pool
+=item C<static void * gc_ims_get_free_object(PARROT_INTERP, Fixed_Size_Pool
 *pool)>
 
 Get a new object off the free_list in the given pool.
@@ -652,12 +652,12 @@ Get a new object off the free_list in the given pool.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static void *
-gc_ims_get_free_object(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
+gc_ims_get_free_object(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(gc_ims_get_free_object)
     PObj *ptr;
-    Arenas * const arena_base    = interp->arena_base;
-    Gc_ims_private * const g_ims = (Gc_ims_private *)arena_base->gc_private;
+    Memory_Pools * const mem_pools    = interp->mem_pools;
+    Gc_ims_private * const g_ims = (Gc_ims_private *)mem_pools->gc_private;
 
     if (++g_ims->allocations >= g_ims->alloc_trigger) {
         g_ims->allocations = 0;
@@ -676,7 +676,7 @@ gc_ims_get_free_object(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
      * XXX this does not solve the problem of storing keys in hashes
      *     in the next mark phase (if the key isn't marked elsewhere ?)
      */
-    PObj_flags_SETTO(ptr, pool == arena_base->pmc_pool ? 0 : PObj_live_FLAG);
+    PObj_flags_SETTO(ptr, pool == mem_pools->pmc_pool ? 0 : PObj_live_FLAG);
     --pool->num_free_objects;
     return (void *)ptr;
 }
@@ -684,7 +684,7 @@ gc_ims_get_free_object(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
 
 /*
 
-=item C<static void gc_ims_alloc_objects(PARROT_INTERP, Fixed_Size_Obj_Pool
+=item C<static void gc_ims_alloc_objects(PARROT_INTERP, Fixed_Size_Pool
 *pool)>
 
 Allocate new objects for the given pool.
@@ -694,7 +694,7 @@ Allocate new objects for the given pool.
 */
 
 static void
-gc_ims_alloc_objects(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool))
+gc_ims_alloc_objects(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(gc_ims_alloc_objects)
     Fixed_Size_Obj_Arena *new_arena;
@@ -734,8 +734,8 @@ parrot_gc_ims_mark(PARROT_INTERP)
     double work_factor;
     PMC   *next;
 
-    Arenas * const arena_base    = (Arenas *)interp->arena_base;
-    Gc_ims_private * const g_ims = (Gc_ims_private *)arena_base->gc_private;
+    Memory_Pools * const mem_pools    = (Memory_Pools *)interp->mem_pools;
+    Gc_ims_private * const g_ims = (Gc_ims_private *)mem_pools->gc_private;
 
     /* use statistics from the previous run */
     if (g_ims->n_objects)
@@ -745,11 +745,11 @@ parrot_gc_ims_mark(PARROT_INTERP)
 
     todo = (size_t)(g_ims->alloc_trigger * g_ims->throttle * work_factor);
 
-    PARROT_ASSERT(arena_base->lazy_gc == 0);
+    PARROT_ASSERT(mem_pools->lazy_gc == 0);
     Parrot_gc_trace_children(interp, todo);
 
     /* check if we are finished with marking -- the end is self-referential */
-    next = arena_base->gc_mark_start;
+    next = mem_pools->gc_mark_start;
 
     if (next == PMC_next_for_GC(next))
         g_ims->state = GC_IMS_START_SWEEP;
@@ -758,7 +758,7 @@ parrot_gc_ims_mark(PARROT_INTERP)
 
 /*
 
-=item C<static int sweep_cb(PARROT_INTERP, Fixed_Size_Obj_Pool *pool, int flag,
+=item C<static int sweep_cb(PARROT_INTERP, Fixed_Size_Pool *pool, int flag,
 void *arg)>
 
 Callback to sweep a header pool (see header_pools_iterate_callback).
@@ -768,7 +768,7 @@ Callback to sweep a header pool (see header_pools_iterate_callback).
 */
 
 static int
-sweep_cb(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool), int flag, ARGIN(void *arg))
+sweep_cb(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool), int flag, ARGIN(void *arg))
 {
     ASSERT_ARGS(sweep_cb)
     int * const n_obj = (int *)arg;
@@ -800,8 +800,8 @@ static void
 parrot_gc_ims_sweep(PARROT_INTERP)
 {
     ASSERT_ARGS(parrot_gc_ims_sweep)
-    Arenas * const  arena_base = interp->arena_base;
-    Gc_ims_private *g_ims      = (Gc_ims_private *)arena_base->gc_private;
+    Memory_Pools * const  mem_pools = interp->mem_pools;
+    Gc_ims_private *g_ims      = (Gc_ims_private *)mem_pools->gc_private;
     size_t          n_objects;
     int             ignored;
 
@@ -836,7 +836,7 @@ parrot_gc_ims_sweep(PARROT_INTERP)
 
 /*
 
-=item C<static int collect_cb(PARROT_INTERP, Fixed_Size_Obj_Pool *pool, int flag,
+=item C<static int collect_cb(PARROT_INTERP, Fixed_Size_Pool *pool, int flag,
 void *arg)>
 
 Callback to collect a header pool (see header_pools_iterate_callback).
@@ -848,11 +848,11 @@ Callback to collect a header pool (see header_pools_iterate_callback).
 #if !defined(GC_IS_MALLOC) || !GC_IS_MALLOC
 
 static int
-collect_cb(PARROT_INTERP, ARGMOD(Fixed_Size_Obj_Pool *pool), SHIM(int flag), ARGIN(void *arg))
+collect_cb(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool), SHIM(int flag), ARGIN(void *arg))
 {
     ASSERT_ARGS(collect_cb)
     const int           check_only = (int)(INTVAL)arg;
-    Var_Size_Obj_Pool * const mem_pool   = pool->mem_pool;
+    Variable_Size_Pool * const mem_pool   = pool->mem_pool;
 
     /* check if there is an associated memory pool */
     if (!mem_pool)
@@ -903,14 +903,14 @@ parrot_gc_ims_collect(PARROT_INTERP, int check_only)
     UNUSED(interp);
     UNUSED(check_only);
 #else
-    Arenas * const  arena_base = interp->arena_base;
+    Memory_Pools * const  mem_pools = interp->mem_pools;
     Gc_ims_private *g_ims;
     int             ret;
 
     if (!check_only && interp->profile)
         Parrot_gc_profile_start(interp);
 
-    g_ims = (Gc_ims_private *)arena_base->gc_private;
+    g_ims = (Gc_ims_private *)mem_pools->gc_private;
 
     ret   = header_pools_iterate_callback(interp, POOL_BUFFER,
             (void *)(long)check_only, collect_cb);
@@ -945,10 +945,10 @@ static void
 parrot_gc_ims_run_increment(PARROT_INTERP)
 {
     ASSERT_ARGS(parrot_gc_ims_run_increment)
-    Arenas * const arena_base    = interp->arena_base;
-    Gc_ims_private * const g_ims = (Gc_ims_private *)arena_base->gc_private;
+    Memory_Pools * const mem_pools    = interp->mem_pools;
+    Gc_ims_private * const g_ims = (Gc_ims_private *)mem_pools->gc_private;
 
-    if (arena_base->gc_mark_block_level || g_ims->state == GC_IMS_DEAD)
+    if (mem_pools->gc_mark_block_level || g_ims->state == GC_IMS_DEAD)
         return;
 
     ++g_ims->increments;
@@ -981,7 +981,7 @@ parrot_gc_ims_run_increment(PARROT_INTERP)
             (void)parrot_gc_ims_collect(interp, 0);
             break;
         case GC_IMS_FINISHED:
-            ++arena_base->gc_mark_runs;
+            ++mem_pools->gc_mark_runs;
             g_ims->state = GC_IMS_CONSUMING;
             /* fall through */
         case GC_IMS_CONSUMING:
@@ -990,12 +990,12 @@ parrot_gc_ims_run_increment(PARROT_INTERP)
              * There shouldn't be other pools that could run out of
              * headers independent of PMCs
              */
-            if (arena_base->pmc_pool->num_free_objects <
-                    arena_base->pmc_pool->total_objects * REFILL_FACTOR) {
+            if (mem_pools->pmc_pool->num_free_objects <
+                    mem_pools->pmc_pool->total_objects * REFILL_FACTOR) {
                 g_ims->state = GC_IMS_STARTING;
             }
-            else if (arena_base->string_header_pool->num_free_objects <
-                    arena_base->string_header_pool->total_objects *
+            else if (mem_pools->string_header_pool->num_free_objects <
+                    mem_pools->string_header_pool->total_objects *
                     REFILL_FACTOR) {
                 g_ims->state = GC_IMS_STARTING;
             }
@@ -1026,10 +1026,10 @@ parrot_gc_ims_run(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(parrot_gc_ims_run)
     int                    lazy;
-    Arenas * const         arena_base = interp->arena_base;
-    Gc_ims_private * const g_ims      = (Gc_ims_private *)arena_base->gc_private;
+    Memory_Pools * const         mem_pools = interp->mem_pools;
+    Gc_ims_private * const g_ims      = (Gc_ims_private *)mem_pools->gc_private;
 
-    if (arena_base->gc_mark_block_level || g_ims->state == GC_IMS_DEAD)
+    if (mem_pools->gc_mark_block_level || g_ims->state == GC_IMS_DEAD)
         return;
 
     if (flags & GC_finish_FLAG) {
@@ -1041,16 +1041,16 @@ parrot_gc_ims_run(PARROT_INTERP, UINTVAL flags)
          * Be sure live bits are clear.
          */
         if (g_ims->state >= GC_IMS_RE_INIT || g_ims->state < GC_IMS_FINISHED)
-            Parrot_gc_clear_live_bits(interp, arena_base->pmc_pool);
+            Parrot_gc_clear_live_bits(interp, mem_pools->pmc_pool);
 
-        Parrot_gc_sweep_pool(interp, interp->arena_base->pmc_pool);
+        Parrot_gc_sweep_pool(interp, interp->mem_pools->pmc_pool);
         g_ims->state = GC_IMS_DEAD;
 
         return;
     }
 
     /* make the test happy that checks the count ;) */
-    arena_base->gc_mark_runs++;
+    mem_pools->gc_mark_runs++;
 
     lazy = flags & GC_lazy_FLAG;
 
@@ -1083,7 +1083,7 @@ parrot_gc_ims_run(PARROT_INTERP, UINTVAL flags)
 
     if (g_ims->state >= GC_IMS_COLLECT) {
         /* we are beyond sweep, timely destruction is done */
-        if (arena_base->num_early_PMCs_seen >= arena_base->num_early_gc_PMCs)
+        if (mem_pools->num_early_PMCs_seen >= mem_pools->num_early_gc_PMCs)
             return;
 
         /* when not all seen, start a fresh cycle */
@@ -1097,7 +1097,7 @@ parrot_gc_ims_run(PARROT_INTERP, UINTVAL flags)
      *  run through all steps until we see enough PMCs that need timely
      *  destruction or we finished sweeping
      */
-    while (arena_base->num_early_PMCs_seen < arena_base->num_early_gc_PMCs) {
+    while (mem_pools->num_early_PMCs_seen < mem_pools->num_early_gc_PMCs) {
         parrot_gc_ims_run_increment(interp);
         if (g_ims->state >= GC_IMS_COLLECT)
             break;
@@ -1105,7 +1105,7 @@ parrot_gc_ims_run(PARROT_INTERP, UINTVAL flags)
 
     /* if we stopped early, the lazy run was successful */
     if (g_ims->state < GC_IMS_COLLECT)
-        ++arena_base->gc_lazy_mark_runs;
+        ++mem_pools->gc_lazy_mark_runs;
 
     g_ims->lazy = 0;
 }
@@ -1131,7 +1131,7 @@ Parrot_gc_ims_wb(PARROT_INTERP, ARGMOD(PMC *agg), ARGMOD(PMC *_new))
     ASSERT_ARGS(Parrot_gc_ims_wb)
 #if GC_IMS_GREY_NEW
     IMS_DEBUG((stderr, "%d agg %p mark %p\n",
-                ((Gc_ims_private *)interp->arena_base->
+                ((Gc_ims_private *)interp->mem_pools->
                 gc_private)->state, agg, _new));
     Parrot_gc_mark_PObj_alive(interp, (PObj*)_new);
 #else

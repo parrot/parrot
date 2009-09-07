@@ -218,7 +218,7 @@ struct _handler_node_t; /* forward def - exit.h */
 struct parrot_interp_t {
     PMC           *ctx;                       /* current Context */
 
-    struct Arenas *arena_base;                /* Pointer to this interpreter's
+    struct Memory_Pools *mem_pools;                /* Pointer to this interpreter's
                                                * arena */
 
     struct GC_Subsystem *gc_sys;              /*functions and data specific 
