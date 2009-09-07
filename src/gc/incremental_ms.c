@@ -775,9 +775,6 @@ sweep_cb(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool), int flag, ARGIN(void *arg
 
     Parrot_gc_sweep_pool(interp, pool);
 
-    if (interp->profile && (flag & POOL_PMC))
-        Parrot_gc_profile_end(interp, PARROT_PROF_GC_cp);
-
     *n_obj += pool->total_objects - pool->num_free_objects;
 
     return 0;
@@ -825,9 +822,6 @@ parrot_gc_ims_sweep(PARROT_INTERP)
     ignored   = header_pools_iterate_callback(interp, POOL_BUFFER | POOL_PMC,
             (void*)&n_objects, sweep_cb);
     UNUSED(ignored);
-
-    if (interp->profile)
-        Parrot_gc_profile_end(interp, PARROT_PROF_GC_cb);
 
     g_ims->state           = GC_IMS_COLLECT;
     g_ims->n_objects       = n_objects;
@@ -907,9 +901,6 @@ parrot_gc_ims_collect(PARROT_INTERP, int check_only)
     Gc_ims_private *g_ims;
     int             ret;
 
-    if (!check_only && interp->profile)
-        Parrot_gc_profile_start(interp);
-
     g_ims = (Gc_ims_private *)mem_pools->gc_private;
 
     ret   = header_pools_iterate_callback(interp, POOL_BUFFER,
@@ -920,9 +911,6 @@ parrot_gc_ims_collect(PARROT_INTERP, int check_only)
 
     if (check_only)
         return 0;
-
-    if (interp->profile)
-        Parrot_gc_profile_end(interp, PARROT_PROF_GC);
 
     g_ims->state = GC_IMS_FINISHED;
 #endif

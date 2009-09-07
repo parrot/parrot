@@ -58,10 +58,10 @@ initializer.
 #include "parrot/scheduler_private.h"
 
 pmclass Timer extends Task provides event auto_attrs {
-    ATTR FLOATVAL      duration;  /* The duration of the timer pause */
-    ATTR FLOATVAL      interval;  /* How often to repeat */
-    ATTR INTVAL        repeat;    /* Whether to repeat:
-                                   * 0 = run once (no repeat), -1 = forever */
+    ATTR FLOATVAL duration;  /* The duration of the timer pause */
+    ATTR FLOATVAL interval;  /* How often to repeat */
+    ATTR INTVAL   repeat;    /* Whether to repeat:
+                              * 0 = run once (no repeat), -1 = forever */
 
 /*
 
@@ -74,8 +74,7 @@ Initializes the timer.
 */
 
     VTABLE void init() {
-        Parrot_Timer_attributes * const core_struct =
-            (Parrot_Timer_attributes *) PMC_data(SELF);
+        Parrot_Timer_attributes * const core_struct = PARROT_TIMER(SELF);
 
         /* Set flags for custom GC mark and destroy. */
         PObj_custom_mark_SET(SELF);
@@ -155,7 +154,7 @@ Create a copy of the timer, resetting status, id, and birthtime.
 */
 
     VTABLE PMC *clone() {
-        PMC          * const copy       = SUPER();
+        PMC * const copy = SUPER();
         Parrot_Timer_attributes * const new_struct = PARROT_TIMER(copy);
         Parrot_Timer_attributes * const old_struct = PARROT_TIMER(SELF);
 
@@ -240,7 +239,7 @@ Returns the number associated with C<key>.
 */
 
     VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
-        const Parrot_Timer_attributes * const core_struct = PARROT_TIMER(SELF);
+        Parrot_Timer_attributes * const core_struct = PARROT_TIMER(SELF);
 
         switch (key) {
             case PARROT_TIMER_NSEC:

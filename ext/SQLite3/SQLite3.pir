@@ -1,7 +1,7 @@
 # Copyright (C) 2008-2009, Parrot Foundation.
 # $Id$
 
-.namespace ['SQLite']
+.namespace ['SQLite3']
 
 .const int SQLITE_OK         =   0   # Successful result
 # beginning-of-error-codes
@@ -61,6 +61,14 @@
     push sqlite_funcs, 'ipitii'
     push sqlite_funcs, 'column_name'
     push sqlite_funcs, 'tpi'
+    push sqlite_funcs, 'column_count'
+    push sqlite_funcs, 'ip'
+    push sqlite_funcs, 'column_type'
+    push sqlite_funcs, 'ipi'
+    push sqlite_funcs, 'column_int'
+    push sqlite_funcs, 'ipi'
+    push sqlite_funcs, 'column_double'
+    push sqlite_funcs, 'lpi'
     push sqlite_funcs, 'column_text'
     push sqlite_funcs, 'tpi'
 

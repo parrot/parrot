@@ -1,5 +1,5 @@
-#!./parrot
-# Copyright (C) 2005-2008, Parrot Foundation.
+#!parrot
+# Copyright (C) 2005-2009, Parrot Foundation.
 # $Id$
 
 .sub _main :main
@@ -15,14 +15,14 @@
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
     test_namespace = get_namespace [ 'Test'; 'More' ]
-    exports = split " ", "ok is diag like skip todo is_deeply isa_ok isnt"
+    exports = split " ", "ok is diag like skip todo is_deeply isa_ok isnt throws_like"
     test_namespace.'export_to'(curr_namespace, exports)
 
     test_namespace = get_namespace [ 'Test'; 'Builder'; 'Tester' ]
     exports = split " ", "plan test_out test_diag test_fail test_pass test_test"
     test_namespace.'export_to'(curr_namespace, exports)
 
-    plan( 75 )
+    plan( 81 )
 
     test_skip()
     test_todo()
@@ -32,9 +32,44 @@
     test_like()
     test_is_deeply()
     test_diagnostics()
+    test_throws_like()
     test_isa_ok()
 
     test.'finish'()
+.end
+
+.sub test_throws_like
+
+    test_fail('throws_like fails when there is no error')
+    throws_like( <<'CODE', 'somejunk', 'throws_like fails when there is no error')
+.sub main
+    $I0 = 42
+.end
+CODE
+    test_diag( 'no error thrown' )
+    test_test( 'throws_like fails when there is no error')
+
+    test_pass('throws_like passes when error matches pattern')
+    throws_like( <<'CODE', 'for\ the\ lulz','throws_like passes when error matches pattern')
+.sub main
+    die 'I did it for the lulz'
+.end
+CODE
+    test_test( 'throws_like passes when error matches pattern' )
+
+    test_fail( 'throws_like fails when error does not match pattern' )
+    throws_like( <<'CODE', 'for\ the\ lulz','throws_like fails when error does not match pattern')
+.sub main
+    die 'DO NOT WANT'
+.end
+CODE
+    .local string diagnostic
+    diagnostic  = "match failed: target 'DO NOT WANT' does not match pattern '"
+    diagnostic .= 'for\ the\ lulz'
+    diagnostic .= "'"
+    test_diag( diagnostic )
+    test_test('throws_like fails when error does not match pattern' )
+
 .end
 
 .sub test_ok
@@ -263,14 +298,27 @@
     test_test( 'passing test like() with description' )
 
     test_fail()
-    test_diag( 'match failed' )
+
+    test_diag( "match failed: target 'abcdef' does not match pattern '<[g]>'" )
     like( 'abcdef', '<[g]>' )
     test_test( 'failing test like()' )
 
     test_fail( 'testing like()' )
-    test_diag( 'match failed' )
+    test_diag( "match failed: target 'abcdef' does not match pattern '<[g]>'" )
     like( 'abcdef', '<[g]>', 'testing like()' )
     test_test( 'failing test like() with description' )
+
+    test_pass( 'like() can match literal strings' )
+    like( 'foobar', 'foobar', 'like() can match literal strings' )
+    test_test( 'like() can match literal strings' )
+
+    test_pass( 'like() can match partial literal strings' )
+    like( 'foobar()', 'foobar', 'like() can match partial literal strings' )
+    test_test( 'like() can match partial literal strings' )
+
+    test_pass( 'like() can match partial literal strings with spaces' )
+    like( 'foo bar()', 'foo\ bar', 'like() can match partial literal strings with spaces' )
+    test_test( 'like() can match partial literal strings with spaces' )
 .end
 
 .sub test_is_deeply

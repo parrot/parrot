@@ -4,15 +4,15 @@
 
 =head1 NAME
 
-postalcodes.pir
+postalcodes.pir - Show info about a postal code
 
 =head1 SYNOPSIS
 
-    % ./parrot postalcodes.pir <postal>
+    % parrot postalcodes.pir <postal>
 
 =head1 DESCRIPTION
 
-Given a postal code (like, '06382'), print some information about various
+Given a postal code (e.g. '06382'), print some information about various
 places with that code from around the world.
 
 =cut
@@ -70,16 +70,15 @@ END:
     $I0 = index json_result, "\r\n\r\n"
     substr json_result, 0, $I0, ""
 
-    load_bytecode 'compilers/json/JSON.pbc'
-    $P1 = compreg 'JSON'
-    $P2 = $P1(json_result)
-
-    $P3 = $P2['error']
-    unless null $P3 goto bad_code
-
-    $P2 = $P2['postalCodes']
+    load_language 'data_json'
+    $P1 = compreg 'data_json'
+    push_eh bad_code
+    $P2 = $P1.'compile'(json_result)
+    pop_eh
+    $P3 = $P2()
+    $P4 = $P3['postalCodes']
     .local pmc it, code
-    it = iter $P2
+    it = iter $P4
 
  code_loop:
     push_eh code_end
@@ -108,7 +107,7 @@ bad_args:
     .return()
 
 bad_code:
-    say $P3
+    say $P2
 .end
 
 # Local Variables:

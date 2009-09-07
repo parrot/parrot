@@ -30,9 +30,9 @@ unrelated thread.
 
 #include "parrot/embed.h"
 
-#define PMC_tid(x) ((Parrot_ParrotRunningThread_attributes *)PMC_data(x))->tid
+#define PMC_tid(x) (PARROT_PARROTRUNNINGTHREAD(x))->tid
 
-pmclass ParrotRunningThread no_ro {
+pmclass ParrotRunningThread no_ro auto_attrs {
     ATTR INTVAL tid; /* thread id */
 
 /*
@@ -46,26 +46,7 @@ Create a new, invalid handle to a running thread.
 */
 
     VTABLE void init() {
-        Parrot_ParrotRunningThread_attributes *attrs =
-            mem_allocate_zeroed_typed(Parrot_ParrotRunningThread_attributes);
-        attrs->tid = -1;
-        PMC_data(SELF) = attrs;
-        PObj_custom_destroy_SET(SELF);
-    }
-
-/*
-
-=item C<void destroy()>
-
-Destroy this PMC.
-
-=cut
-
-*/
-
-    VTABLE void destroy() {
-        mem_sys_free(PMC_data(SELF));
-        PMC_data(SELF) = NULL;
+        PMC_tid(SELF) = -1;
     }
 
 /*

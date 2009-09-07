@@ -184,15 +184,11 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         header_pools_iterate_callback(interp, POOL_BUFFER | POOL_PMC,
             (void*)&total_free, gc_ms_sweep_cb);
 
-        if (interp->profile)
-            Parrot_gc_profile_end(interp, PARROT_PROF_GC_cb);
     }
     else {
         ++mem_pools->gc_lazy_mark_runs;
 
         Parrot_gc_clear_live_bits(interp, mem_pools->pmc_pool);
-        if (interp->profile)
-            Parrot_gc_profile_end(interp, PARROT_PROF_GC_p2);
     }
 
     pt_gc_stop_mark(interp);
@@ -281,9 +277,6 @@ gc_ms_sweep_cb(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool), int flag,
     int * const total_free = (int *) arg;
 
     Parrot_gc_sweep_pool(interp, pool);
-
-    if (interp->profile && (flag & POOL_PMC))
-        Parrot_gc_profile_end(interp, PARROT_PROF_GC_cp);
 
     *total_free += pool->num_free_objects;
 

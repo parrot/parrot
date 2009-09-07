@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 45;
+use Parrot::Test tests => 38;
 use Parrot::Config;
 
 =head1 NAME
@@ -22,51 +22,6 @@ t/pmc/namespace.t - test the NameSpace PMC as described in PDD 21.
 Test the NameSpace PMC as described in PDD21.
 
 =cut
-
-# How do we convert this to PIR?
-pir_output_is( <<'CODE', <<'OUTPUT', 'get namespace of :anon .sub' );
-.namespace ['lib']
-.sub main :main :anon
-    $P0 = get_namespace
-    $P0 = $P0.'get_name'()
-    $S0 = join "::", $P0
-    say $S0
-    end
-.end
-CODE
-parrot::lib
-OUTPUT
-
-# How do we convert this to PIR?
-pir_output_is( <<'CODE', <<'OUTPUT', "segv in get_name" );
-.namespace ['pugs';'main']
-.sub 'main' :main
-    $P0 = find_name "&say"
-    $P0()
-.end
-.sub "&say"
-    say "ok"
-.end
-CODE
-ok
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUT', "unicode namespace, global" );
-.namespace [ unicode:"Fran\xe7ois" ]
-
-.sub 'test'
-    print "unicode namespaces are fun\n"
-.end
-
-.namespace []
-
-.sub 'main' :main
-    $P0 = get_global [unicode:"Fran\xe7ois"], 'test'
-    $P0()
-.end
-CODE
-unicode namespaces are fun
-OUT
 
 my $temp_a = "temp_a";
 my $temp_b = "temp_b";
@@ -237,78 +192,6 @@ print $S <<'EOF';
 EOF
 close $S;
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', 'export_to() with null destination throws exception' );
-.sub 'test' :main
-    .local pmc nsa, nsb, ar
-
-    ar = new ['ResizableStringArray']
-    push ar, 'foo'
-    nsa = new ['Null']
-    nsb = get_namespace ['B']
-    nsb.'export_to'(nsa, ar)
-.end
-
-.namespace ['B']
-.sub 'foo' :anon
-.end
-CODE
-/^destination namespace not specified\n/
-OUTPUT
-
-pir_error_output_like(
-    <<'CODE', <<'OUTPUT', 'export_to() with null exports default object set !!!UNSPECIFIED!!!' );
-.sub 'test' :main
-    .local pmc nsa, nsb, ar
-
-    ar = new ['Null']
-    nsa = get_namespace
-    nsb = get_namespace ['B']
-    nsb.'export_to'(nsa, ar)
-.end
-
-.namespace ['B']
-.sub 'foo'
-.end
-CODE
-/^exporting default object set not yet implemented\n/
-OUTPUT
-
-pir_error_output_like(
-    <<'CODE', <<'OUTPUT', 'export_to() with empty array exports default object set !!!UNSPECIFIED!!!' );
-.sub 'test' :main
-    .local pmc nsa, nsb, ar
-
-    ar = new ['ResizableStringArray']
-    nsa = get_namespace
-    nsb = get_namespace ['B']
-    nsb.'export_to'(nsa, ar)
-.end
-
-.namespace ['B']
-.sub 'foo'
-.end
-CODE
-/^exporting default object set not yet implemented\n/
-OUTPUT
-
-pir_error_output_like(
-    <<'CODE', <<'OUTPUT', 'export_to() with empty hash exports default object set !!!UNSPECIFIED!!!' );
-.sub 'test' :main
-    .local pmc nsa, nsb, ar
-
-    ar = new ['Hash']
-    nsa = get_namespace
-    nsb = get_namespace ['B']
-    nsb.'export_to'(nsa, ar)
-.end
-
-.namespace ['B']
-.sub 'foo'
-.end
-CODE
-/^exporting default object set not yet implemented\n/
-OUTPUT
-
 pir_output_is( <<"CODE", <<'OUTPUT', "export_to -- success with array" );
 .HLL 'A'
 .sub main :main
@@ -403,6 +286,7 @@ CODE
 b_foo
 Could not find non-existent sub b_foo/
 OUTPUT
+
 
 pir_output_is( <<'CODE', <<'OUTPUT', "get_parent" );
 .sub main :main

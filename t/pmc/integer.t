@@ -19,7 +19,7 @@ Tests the Integer PMC.
 .sub 'test' :main
     .include 'test_more.pir'
 
-    plan(58)
+    plan(60)
     test_basic_math()
     test_truthiness_and_definedness()
     test_set_string_native()
@@ -35,10 +35,29 @@ Tests the Integer PMC.
     test_get_as_base()
     test_get_as_base10()
     test_get_as_base_various()
+    test_get_as_base_bounds_check()
     test_cmp_subclass()
     test_cmp_RT59336()
 .end
 
+.sub test_get_as_base_bounds_check
+    throws_like(<<'CODE', ':s get_as_base\: base out of bounds', 'get_as_base lower bound check')
+    .sub main
+        $P0 = new ['Integer']
+        $P0 = 42
+        $S0 = $P0.'get_as_base'(1)
+        say $S0
+    .end
+CODE
+    throws_like(<<'CODE', ':s get_as_base\: base out of bounds', 'get_as_base upper bound check')
+    .sub main
+        $P0 = new ['Integer']
+        $P0 = 42
+        $S0 = $P0.'get_as_base'(37)
+        say $S0
+    .end
+CODE
+.end
 
 .sub test_basic_math
     .local pmc int_1
@@ -303,40 +322,6 @@ fin:
     $I0 = can $P0, 'get_as_base'
     ok($I0,'Integers can get_as_base')
 .end
-
-=pod
-
-pir_error_output_like( <<'CODE',qr/get_as_base: base out of bounds/ms, "get_as_base() bounds check" );
-.sub main :main
-    $P0 = new ['Integer']
-    $P0 = 42
-
-    $S0 = $P0.'get_as_base'(1)
-
-    print $S0
-    print "\n"
-.end
-CODE
-/get_as_base: base out of bounds
-.*/
-OUTPUT
-
-pir_error_output_like( <<'CODE', <<'OUTPUT', "get_as_base() bounds check" );
-.sub main :main
-    $P0 = new ['Integer']
-    $P0 = 42
-
-    $S0 = $P0.'get_as_base'(37)
-
-    print $S0
-    print "\n"
-.end
-CODE
-/get_as_base: base out of bounds
-.*/
-OUTPUT
-
-=cut
 
 .sub test_get_as_base10
     $P0 = new ['Integer']

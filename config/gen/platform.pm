@@ -223,6 +223,7 @@ sub _set_implementations {
         memexec.c
         exec.c
         misc.c
+        hires_timer.c
         /;
 
     my $plat_c = q{src/platform.c};

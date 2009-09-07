@@ -244,7 +244,7 @@ struct _charset {
 #define CHARSET_COMPARE(interp, lhs, rhs) ((const CHARSET *)(lhs)->charset)->compare((interp), (lhs), (rhs))
 #define CHARSET_INDEX(interp, source, search, offset) ((source)->charset)->index((interp), (source), (search), (offset))
 #define CHARSET_RINDEX(interp, source, search, offset) ((source)->charset)->rindex((interp), (source), (search), (offset))
-#define CHARSET_VALIDATE(interp, source, offset) ((source)->charset)->validate((interp), (source))
+#define CHARSET_VALIDATE(interp, source) ((source)->charset)->validate((interp), (source))
 #define CHARSET_IS_CCLASS(interp, flags, source, offset) ((source)->charset)->is_cclass((interp), (flags), (source), (offset))
 #define CHARSET_FIND_CCLASS(interp, flags, source, offset, count) ((source)->charset)->find_cclass((interp), (flags), (source), (offset), (count))
 #define CHARSET_FIND_NOT_CCLASS(interp, flags, source, offset, count) ((source)->charset)->find_not_cclass((interp), (flags), (source), (offset), (count))

@@ -17,15 +17,6 @@
 
 #include "parrot/parrot.h"
 
-/* Set to 1 if we want to use the fixed-size allocator. Set to 0 if we want
-   to allocate these things using mem_sys_allocate instead */
-/* Disabled on Windows platforms until problems get fixed, TT #940 */
-#if defined(_WIN32) || defined(_WIN64)
-#  define GC_USE_FIXED_SIZE_ALLOCATOR 1
-#else
-#  define GC_USE_FIXED_SIZE_ALLOCATOR 1
-#endif
-
 /*
  * we need an alignment that is the same as malloc(3) have for
  * allocating Buffer items like FLOATVAL (double)
@@ -165,9 +156,7 @@ void * Parrot_gc_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
-void * Parrot_gc_allocate_pmc_attributes(PARROT_INTERP,
-    ARGMOD(PMC *pmc),
-    size_t size)
+void * Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
@@ -220,9 +209,7 @@ void Parrot_gc_free_fixed_size_storage(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*data);
 
-void Parrot_gc_free_pmc_attributes(PARROT_INTERP,
-    ARGMOD(PMC *pmc),
-    size_t item_size)
+void Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);

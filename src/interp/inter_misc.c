@@ -253,8 +253,35 @@ interpinfo(PARROT_INTERP, INTVAL what)
             ret = Parrot_gc_impatient_pmcs(interp);
             break;
         case CURRENT_RUNCORE:
-            ret = interp->run_core;
+        {
+            STRING *name = interp->run_core->name;
+
+            if (Parrot_str_equal(interp, name, CONST_STRING(interp, "slow")))
+                ret = PARROT_SLOW_CORE;
+            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "fast")))
+                ret = PARROT_FAST_CORE;
+            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "switch")))
+                ret = PARROT_SWITCH_CORE;
+            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "cgp")))
+                ret = PARROT_CGP_CORE;
+            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "cgoto")))
+                ret = PARROT_CGOTO_CORE;
+            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "jit")))
+                ret = PARROT_JIT_CORE;
+            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "cgp_jit")))
+                ret = PARROT_CGP_JIT_CORE;
+            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "switch_jit")))
+                ret = PARROT_SWITCH_JIT_CORE;
+            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "exec")))
+                ret = PARROT_EXEC_CORE;
+            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "gc_debug")))
+                ret = PARROT_GC_DEBUG_CORE;
+            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "debugger")))
+                ret = PARROT_DEBUGGER_CORE;
+            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "profiling")))
+                ret = PARROT_PROFILING_CORE;
             break;
+        }
         default:        /* or a warning only? */
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                 "illegal argument in interpinfo");

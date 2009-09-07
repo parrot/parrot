@@ -88,7 +88,7 @@ is( `"$PARROT" --trace "$first_pir_file" "$second_pir_file" $redir`,
     is( qx{$cmd}, "second\n", "-r option <$cmd>" );
 
     $cmd = qq{"$PARROT" -D 8 -R slow "$second_pir_file" 2>&1};
-    like( qx{$cmd}, qr/Parrot VM: Slow core/, "-r option <$cmd>" );
+    like( qx{$cmd}, qr/Parrot VM: slow core/, "-r option <$cmd>" );
 }
 
 ## RT#46815 test remaining options

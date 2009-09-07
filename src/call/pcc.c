@@ -19,6 +19,7 @@ subroutines.
 
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
+#include "parrot/runcore_api.h"
 #include "pcc.str"
 #include "../pmc/pmc_key.h"
 #include "../pmc/pmc_continuation.h"
@@ -511,7 +512,7 @@ Parrot_init_ret_nci(PARROT_INTERP, ARGOUT(call_state *st), ARGIN(const char *sig
     /* if this NCI call was a taicall, return results to caller's get_results
      * this also means that we pass the caller's register base pointer */
     if (SUB_FLAG_TAILCALL_ISSET(current_cont))
-        ctx = PMC_cont(current_cont)->to_ctx;
+        ctx = PARROT_CONTINUATION(current_cont)->to_ctx;
 
     /* TODO simplify all */
     Parrot_init_arg_sig(interp, CURRENT_CONTEXT(interp), sig, NULL, &st->src);
@@ -1194,22 +1195,28 @@ clone_key_arg(PARROT_INTERP, ARGMOD(call_state *st))
     for (; key; key = VTABLE_shift_pmc(interp, key)) {
         /* register keys have to be cloned */
         if (PObj_get_FLAGS(key) & KEY_register_FLAG) {
+            INTVAL  n_regs_used[4];
             Regs_ni bp;
             Regs_ps bp_ps;
 
             /* clone sets key values according to refered register items */
             bp    = *Parrot_pcc_get_regs_ni(interp, CURRENT_CONTEXT(interp));
             bp_ps = *Parrot_pcc_get_regs_ps(interp, CURRENT_CONTEXT(interp));
+            memcpy(n_regs_used, CONTEXT(interp)->n_regs_used, 4 * sizeof (INTVAL));
 
             Parrot_pcc_set_regs_ni(interp, CURRENT_CONTEXT(interp),
                     Parrot_pcc_get_regs_ni(interp, st->src.ctx));
             Parrot_pcc_set_regs_ps(interp, CURRENT_CONTEXT(interp),
                     Parrot_pcc_get_regs_ps(interp, st->src.ctx));
+            memcpy(CONTEXT(interp)->n_regs_used,
+                    Parrot_pcc_get_context_struct(interp, st->src.ctx),
+                    4 * sizeof (INTVAL));
 
             UVal_pmc(st->val) = VTABLE_clone(interp, key);
 
             Parrot_pcc_set_regs_ni(interp, CURRENT_CONTEXT(interp), &bp);
             Parrot_pcc_set_regs_ps(interp, CURRENT_CONTEXT(interp), &bp_ps);
+            memcpy(CONTEXT(interp)->n_regs_used, n_regs_used, 4 * sizeof (INTVAL));
 
             return;
         }
@@ -3017,17 +3024,15 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
     /* Invoke the function */
     dest = VTABLE_invoke(interp, sub_obj, NULL);
 
-    /* PIR Subs need runops to run their opcodes. Methods and NCI subs
-     * don't. */
+    /* PIR Subs need runops to run their opcodes. Methods and NCI subs don't. */
     if (sub_obj->vtable->base_type == enum_class_Sub
-            && PMC_IS_NULL(interp->current_object)) {
-        const INTVAL old_core = interp->run_core;
-        const opcode_t offset = dest - interp->code->base.data;
+    &&  PMC_IS_NULL(interp->current_object)) {
+        Parrot_runcore_t *old_core = interp->run_core;
+        const opcode_t    offset   = dest - interp->code->base.data;
 
         /* can't re-enter the runloop from here with PIC cores: RT #60048 */
-        if (interp->run_core == PARROT_CGP_CORE
-        ||  interp->run_core == PARROT_SWITCH_CORE)
-            interp->run_core = PARROT_SLOW_CORE;
+        if (PARROT_RUNCORE_PREDEREF_OPS_TEST(interp->run_core))
+            Parrot_runcore_switch(interp, CONST_STRING(interp, "slow"));
 
         runops(interp, offset);
         interp->run_core = old_core;

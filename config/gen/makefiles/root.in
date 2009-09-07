@@ -103,7 +103,7 @@ CC               := @cc@
 CC_INC           := @cc_inc@
 C_LIBS           := @libs@
 CC_SHARED        := @cc_shared@
-CFLAGS           := $(CC_INC) @ccflags@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@ $(CC_SHARED)
+CFLAGS           := $(CC_INC) @ccflags@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@ @clock_best@ $(CC_SHARED)
 LINK_DYNAMIC     := @link_dynamic@
 LINK             := @link@
 LINKFLAGS        := @linkflags@ @link_debug@ @ld_debug@
@@ -147,6 +147,7 @@ NONGEN_HEADERS   := @TEMP_nongen_headers@
 GEN_MAKEFILES := \
     Makefile \
     docs/Makefile \
+    compilers/data_json/Makefile \
     compilers/json/Makefile \
     compilers/ncigen/Makefile \
     compilers/nqp/Makefile \
@@ -424,7 +425,6 @@ INTERP_O_FILES := \
     $(SRC_DIR)/extend$(O) \
     $(SRC_DIR)/extend_vtable$(O) \
     $(SRC_DIR)/gc/alloc_memory$(O) \
-    $(SRC_DIR)/gc/alloc_register$(O) \
     $(SRC_DIR)/gc/api$(O) \
     $(SRC_DIR)/gc/generational_ms$(O) \
     $(SRC_DIR)/gc/incremental_ms$(O) \
@@ -635,6 +635,7 @@ STR_FILES := \
     $(SRC_DIR)/pmc.str \
     $(SRC_DIR)/pmc_freeze.str \
     $(SRC_DIR)/oo.str \
+    $(SRC_DIR)/runcore/cores.str \
     $(SRC_DIR)/scheduler.str \
     $(SRC_DIR)/spf_render.str \
     $(SRC_DIR)/spf_vtable.str \
@@ -1150,6 +1151,9 @@ $(SRC_DIR)/call/pcc$(O) : $(SRC_DIR)/call/pcc.c $(GENERAL_H_FILES) \
 	$(SRC_DIR)/call/pcc.str $(SRC_DIR)/pmc/pmc_fixedintegerarray.h \
 	$(SRC_DIR)/pmc/pmc_key.h $(SRC_DIR)/pmc/pmc_continuation.h
 
+$(SRC_DIR)/call/context$(O) : $(SRC_DIR)/call/context.c $(GENERAL_H_FILES) \
+	$(SRC_DIR)/pmc/pmc_sub.h
+
 $(SRC_DIR)/interp/inter_cb$(O) : $(SRC_DIR)/interp/inter_cb.c \
 	$(GENERAL_H_FILES) $(SRC_DIR)/interp/inter_cb.str
 
@@ -1195,9 +1199,8 @@ $(SRC_DIR)/packout$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_key.h
 
 $(SRC_DIR)/parrot$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/gc/alloc_register$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h
-
-$(SRC_DIR)/runcore/cores$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/runcore/cores$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/runcore/cores.str \
+	$(SRC_DIR)/pmc/pmc_sub.h
 
 $(SRC_DIR)/tsq$(O) : $(GENERAL_H_FILES)
 
@@ -1411,6 +1414,7 @@ compilers.dummy : $(PARROT) $(GEN_LIBRARY)
 	$(MAKE) compilers/tge
 	$(MAKE) compilers/nqp
 	$(MAKE) compilers/json
+	$(MAKE) compilers/data_json
 
 compilers-clean :
 	$(MAKE) compilers/pct clean
@@ -1418,6 +1422,7 @@ compilers-clean :
 	$(MAKE) compilers/tge clean
 	$(MAKE) compilers/nqp clean
 	$(MAKE) compilers/json clean
+	$(MAKE) compilers/data_json clean
 	$(MAKE) compilers/pirc clean
 
 ###############################################################################

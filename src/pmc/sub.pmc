@@ -288,7 +288,7 @@ Invokes the subroutine.
                     "maximum recursion depth exceeded");
 
         /* and copy set context variables */
-        PMC_cont(ccont)->from_ctx = context;
+        PARROT_CONTINUATION(ccont)->from_ctx = context;
 
         /* if this is an outer sub, then we need to set sub->ctx
          * to the new context (refcounted) and convert the
@@ -463,7 +463,7 @@ Marks the sub as live.
 */
 
     VTABLE void mark() {
-        Parrot_Sub_attributes *sub = PARROT_SUB(SELF);
+        Parrot_Sub_attributes * const sub = PARROT_SUB(SELF);
 
         if (!sub)
             return;
@@ -671,13 +671,13 @@ Returns the full set of meta-data about the sub.
     {
         /* Create a hash, then use inspect_str to get all of the data to
          * fill it up with. */
-        PMC    * const metadata          = pmc_new(interp, enum_class_Hash);
-        STRING * const pos_required_str  = CONST_STRING(interp, "pos_required");
-        STRING * const pos_optional_str  = CONST_STRING(interp, "pos_optional");
+        PMC    * const metadata           = pmc_new(interp, enum_class_Hash);
+        STRING * const pos_required_str   = CONST_STRING(interp, "pos_required");
+        STRING * const pos_optional_str   = CONST_STRING(interp, "pos_optional");
         STRING * const named_required_str = CONST_STRING(interp, "named_required");
         STRING * const named_optional_str = CONST_STRING(interp, "named_optional");
-        STRING * const pos_slurpy_str    = CONST_STRING(interp, "pos_slurpy");
-        STRING * const named_slurpy_str  = CONST_STRING(interp, "named_slurpy");
+        STRING * const pos_slurpy_str     = CONST_STRING(interp, "pos_slurpy");
+        STRING * const named_slurpy_str   = CONST_STRING(interp, "named_slurpy");
 
         VTABLE_set_pmc_keyed_str(interp, metadata, pos_required_str,
             VTABLE_inspect_str(interp, SELF, pos_required_str));

@@ -43,8 +43,7 @@ Initialize a concurrency task object.
 */
 
     VTABLE void init() {
-        Parrot_Task_attributes * const core_struct =
-            (Parrot_Task_attributes *) PMC_data(SELF);
+        Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
 
         /* Set flags for custom GC mark. */
         PObj_custom_mark_SET(SELF);
@@ -285,7 +284,7 @@ Retrieves the task ID for this task.
 
 */
     VTABLE INTVAL get_integer() {
-        const Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
+        Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
         return core_struct->id;
     }
 

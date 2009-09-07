@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw(lib . ../lib ../../lib);
 
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 26;
 use Test::More;
 
 =head1 NAME
@@ -798,6 +798,22 @@ pir_error_output_like(<<'CODE', <<'OUTPUT', 'splice out of bounds, big offset');
 .end
 CODE
 /FixedPMCArray: index out of bounds!/
+OUTPUT
+
+pir_output_like( <<'CODE', <<'OUTPUT', 'get_repr');
+.sub 'main'
+    .local pmc fpa, n
+    .local string s
+    fpa = new ['FixedPMCArray']
+    fpa = 2
+    n = box 1
+    fpa[0] = n
+    fpa[1] = n
+    s = get_repr fpa
+    say s
+.end
+CODE
+/(1,\s*1)/
 OUTPUT
 
 # Local Variables:

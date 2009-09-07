@@ -45,6 +45,8 @@ sub runstep {
         $conf->data->set( bindir => Win32::GetShortPathName($bindir) );
     }
 
+    $conf->data->set( clock_best => ' ' );
+
     if ($is_msvc) {
         my $msvcversion = $conf->data->get('msvcversion');
 

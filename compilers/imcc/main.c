@@ -33,6 +33,7 @@ IMCC helpers.
 #include "parrot/embed.h"
 #include "parrot/longopt.h"
 #include "parrot/imcc.h"
+#include "parrot/runcore_api.h"
 #include "pbc.h"
 #include "parser.h"
 
@@ -147,7 +148,7 @@ usage(ARGMOD(FILE *fp))
     ASSERT_ARGS(usage)
     fprintf(fp,
             "parrot -[acEGhprtvVwy.] [-d [FLAGS]] [-D [FLAGS]]"
-            "[-O [level]] [-o FILE] <file>\n");
+            "[-O [level]] [-R runcore] [-o FILE] <file>\n");
 }
 
 /*
@@ -220,8 +221,7 @@ help(void)
     "    -X --dynext add path to dynamic extension search\n"
     "   <Run core options>\n"
     "    -R --runcore slow|bounds|fast|jit|cgoto|cgp|cgp-jit\n"
-    "    -R --runcore switch|switch-jit|trace|exec|gcdebug\n"
-    "    -p --profile\n"
+    "    -R --runcore switch|switch-jit|trace|profiling|gcdebug\n"
     "    -t --trace [flags]\n"
     "   <VM options>\n"
     "    -D --parrot-debug[=HEXFLAGS]\n"
@@ -279,7 +279,6 @@ included in the Parrot source tree.\n\n");
 #define SET_FLAG(flag)   Parrot_set_flag(interp, (flag))
 #define SET_DEBUG(flag)  Parrot_set_debug(interp, (flag))
 #define SET_TRACE(flag)  Parrot_set_trace(interp, (flag))
-#define SET_CORE(core)   interp->run_core |= (core)
 
 #define OPT_GC_DEBUG       128
 #define OPT_DESTROY_FLAG   129
@@ -308,7 +307,6 @@ static struct longopt_opt_decl options[] = {
     { 'h', 'h', (OPTION_flags)0, { "--help" } },
     { 'o', 'o', OPTION_required_FLAG, { "--output" } },
     { '\0', OPT_PBC_OUTPUT, (OPTION_flags)0, { "--output-pbc" } },
-    { 'p', 'p', (OPTION_flags)0, { "--profile" } },
     { 'r', 'r', (OPTION_flags)0, { "--run-pbc" } },
     { '\0', OPT_RUNTIME_PREFIX, (OPTION_flags)0, { "--runtime-prefix" } },
     { 't', 't', OPTION_optional_FLAG, { "--trace" } },
@@ -356,8 +354,10 @@ PARROT_CAN_RETURN_NULL
 const char *
 parseflags(PARROT_INTERP, int *argc, char **argv[])
 {
-    struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
-    int   status;
+    struct longopt_opt_info opt  = LONGOPT_OPT_INFO_INIT;
+    INTVAL                  core = 0;
+    int                     status;
+
     if (*argc == 1) {
         usage(stderr);
         exit(EXIT_SUCCESS);
@@ -370,41 +370,33 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
         switch (opt.opt_id) {
             case 'R':
                 if (STREQ(opt.opt_arg, "slow") || STREQ(opt.opt_arg, "bounds"))
-                    SET_CORE(PARROT_SLOW_CORE);
+                    core |= PARROT_SLOW_CORE;
                 else if (STREQ(opt.opt_arg, "fast") || STREQ(opt.opt_arg, "function"))
-                    SET_CORE(PARROT_FAST_CORE);
+                    core |= PARROT_FAST_CORE;
                 else if (STREQ(opt.opt_arg, "switch"))
-                    SET_CORE(PARROT_SWITCH_CORE);
+                    core |= PARROT_SWITCH_CORE;
                 else if (STREQ(opt.opt_arg, "cgp"))
-                    SET_CORE(PARROT_CGP_CORE);
+                    core |= PARROT_CGP_CORE;
                 else if (STREQ(opt.opt_arg, "cgoto"))
-                    SET_CORE(PARROT_CGOTO_CORE);
+                    core |= PARROT_CGOTO_CORE;
                 else if (STREQ(opt.opt_arg, "jit"))
-                    SET_CORE(PARROT_JIT_CORE);
+                    core |= PARROT_JIT_CORE;
                 else if (STREQ(opt.opt_arg, "cgp-jit"))
-                    SET_CORE(PARROT_CGP_JIT_CORE);
+                    core |= PARROT_CGP_JIT_CORE;
                 else if (STREQ(opt.opt_arg, "switch-jit"))
-                    SET_CORE(PARROT_SWITCH_JIT_CORE);
+                    core |= PARROT_SWITCH_JIT_CORE;
                 else if (STREQ(opt.opt_arg, "exec"))
-                    SET_CORE(PARROT_EXEC_CORE);
-                else if (STREQ(opt.opt_arg, "trace")) {
-                    SET_CORE(PARROT_SLOW_CORE);
-#ifdef HAVE_COMPUTED_GOTO
-                    SET_CORE(PARROT_CGP_CORE);
-#endif
-#if JIT_CAPABLE
-                    SET_CORE(PARROT_JIT_CORE);
-#endif
-                }
+                    core |= PARROT_EXEC_CORE;
+                else if (STREQ(opt.opt_arg, "trace"))
+                    core |= PARROT_SLOW_CORE;
+                else if (STREQ(opt.opt_arg, "profiling"))
+                    core  = PARROT_PROFILING_CORE;
                 else if (STREQ(opt.opt_arg, "gcdebug"))
-                    SET_CORE(PARROT_GC_DEBUG_CORE);
+                    core |= PARROT_GC_DEBUG_CORE;
                 else
                     Parrot_ex_throw_from_c_args(interp, NULL, 1,
                         "main: Unrecognized runcore '%s' specified."
                         "\n\nhelp: parrot -h\n", opt.opt_arg);
-                break;
-            case 'p':
-                SET_FLAG(PARROT_PROFILE_FLAG);
                 break;
             case 't':
                 if (opt.opt_arg && is_all_hex_digits(opt.opt_arg))
@@ -498,7 +490,7 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                 IMCC_INFO(interp)->allocator = IMCC_GRAPH_ALLOCATOR;
                 /* currently not ok due to different register allocation */
                 if (strchr(opt.opt_arg, 'j')) {
-                    SET_CORE(PARROT_JIT_CORE);
+                    core |= PARROT_JIT_CORE;
                 }
                 if (strchr(opt.opt_arg, '1')) {
                     IMCC_INFO(interp)->optimizer_level |= OPT_PRE;
@@ -507,12 +499,12 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                     IMCC_INFO(interp)->optimizer_level |= (OPT_PRE | OPT_CFG);
                 }
                 if (strchr(opt.opt_arg, 't')) {
-                    SET_CORE(PARROT_SWITCH_CORE);
+                    core |= PARROT_SWITCH_CORE;
 #ifdef HAVE_COMPUTED_GOTO
-                    SET_CORE(PARROT_CGP_CORE);
+                    core |= PARROT_CGP_CORE;
 #endif
 #if JIT_CAPABLE
-                    SET_CORE(PARROT_JIT_CORE);
+                    core |= PARROT_JIT_CORE;
 #endif
                 }
                 break;
@@ -546,11 +538,13 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                     (*argv)[0]);
         }
     }
+
     if (status == -1) {
         fprintf(stderr, "%s\n", opt.opt_error);
         usage(stderr);
         exit(EX_USAGE);
     }
+
     /* reached the end of the option list and consumed all of argv */
     if (*argc == opt.opt_index) {
         if (interp->output_file) {
@@ -563,9 +557,11 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
         usage(stderr);
         exit(EX_USAGE);
     }
+
     *argc -= opt.opt_index;
     *argv += opt.opt_index;
 
+    Parrot_set_run_core(interp, (Parrot_Run_core_t) core);
     return (*argv)[0];
 }
 
@@ -719,10 +715,10 @@ imcc_get_optimization_description(const PARROT_INTERP, int opt_level, ARGMOD(cha
     if (opt_level & OPT_SUB)
         opt_desc[i++] = 'c';
 
-    if (interp->run_core & PARROT_JIT_CORE)
+    if (PARROT_RUNCORE_JIT_OPS_TEST(interp->run_core))
         opt_desc[i++] = 'j';
 
-    if (interp->run_core & PARROT_SWITCH_CORE)
+    if (PARROT_RUNCORE_PREDEREF_OPS_TEST(interp->run_core))
         opt_desc[i++] = 't';
 
     opt_desc[i] = '\0';

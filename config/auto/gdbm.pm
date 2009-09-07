@@ -70,6 +70,7 @@ sub runstep {
         $has_gdbm = $self->_evaluate_cc_run($test, $has_gdbm, $verbose);
     }
     $conf->data->set( has_gdbm => $has_gdbm );    # for gdbmhash.t and dynpmc.in
+    $self->set_result($has_gdbm ? 'yes' : 'no');
 
     return 1;
 }

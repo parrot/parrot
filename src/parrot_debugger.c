@@ -263,9 +263,8 @@ main(int argc, char *argv[])
     else
         PDB_printwelcome();
 
-    interp->run_core = PARROT_DEBUGGER_CORE;
+    Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "debugger"));
     PDB_run_code(interp, argc - nextarg, argv + nextarg);
-
 
     Parrot_exit(interp, 0);
 }

@@ -196,7 +196,9 @@ Returns the boolean value of the Integer.
 
 */
     VTABLE INTVAL get_bool() {
-        return SELF.get_integer() ? 1 : 0;
+        INTVAL iv;
+        GET_ATTR_iv(INTERP, SELF, iv);
+        return iv ? 1 : 0;
     }
 
 /*
@@ -210,7 +212,9 @@ Returns the floating-point value of the integer.
 
 */
     VTABLE FLOATVAL get_number() {
-        return SELF.get_integer();
+        INTVAL iv;
+        GET_ATTR_iv(INTERP, SELF, iv);
+        return (FLOATVAL)iv;
     }
 
 
@@ -1182,17 +1186,24 @@ Returns the result of comparing the integer with C<*value>.
 
 
     MULTI INTVAL cmp(Float value) {
-        const FLOATVAL diff = SELF.get_number() - VTABLE_get_number(INTERP, value);
-        return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+        INTVAL iv;
+        GET_ATTR_iv(interp, SELF, iv);
+
+        {
+            const FLOATVAL diff = (FLOATVAL)iv - VTABLE_get_number(INTERP, value);
+            return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+        }
     }
 
 
     MULTI INTVAL cmp(DEFAULT value) {
         /* int or undef */
-        const INTVAL selfint  = SELF.get_integer();
-        const INTVAL valueint = VTABLE_get_integer(INTERP, value);
-
-        return selfint > valueint ? 1 : selfint < valueint ? -1 : 0;
+        INTVAL selfint;
+        GET_ATTR_iv(interp, SELF, selfint);
+        {
+            const INTVAL valueint = VTABLE_get_integer(INTERP, value);
+            return selfint > valueint ? 1 : selfint < valueint ? -1 : 0;
+        }
     }
 
 
@@ -1243,15 +1254,16 @@ Increments the integer.
 */
 
     VTABLE void increment() {
-        const INTVAL a = VTABLE_get_integer(INTERP, SELF);
-        const INTVAL c = a + 1;
+        INTVAL a, c;
+        GET_ATTR_iv(interp, SELF, a);
+        c = a + 1;
 
         /* did not overflow */
         if ((c^a) >= 0 || (c^1) >= 0)
-            VTABLE_set_integer_native(interp, SELF, c);
+            SET_ATTR_iv(interp, SELF, c);
         else {
-            pmc_reuse(INTERP, SELF, enum_class_BigInt, 0);
-            VTABLE_set_integer_native(INTERP, SELF, a);
+            pmc_reuse(interp, SELF, enum_class_BigInt, 0);
+            VTABLE_set_integer_native(interp, SELF, a);
             VTABLE_increment(interp, SELF);
         }
     }

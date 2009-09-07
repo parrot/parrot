@@ -184,7 +184,7 @@ inline op pic_set_returns__(inconst PMC) :pic :flow {
     opcode_t *dest_pc;
     void **dest_pred;
     PMC *caller_ctx, *ctx;
-    Parrot_cont *cc;
+    Parrot_Continuation_attributes *cc;
     int n;
 
     ctx     = CURRENT_CONTEXT(interp);

@@ -645,9 +645,8 @@ Set an attribute value for the exception object.
              * XXX TT#596 - when we have Context PMCs, just take and set that. */
             if (!PMC_IS_NULL(value) && VTABLE_isa(interp, value, CONST_STRING(interp, "Continuation"))) {
                 PMC *ctx = PMC_cont(value)->from_ctx;
-                if (!PMC_IS_NULL(ctx)) {
+                if (!PMC_IS_NULL(ctx))
                     SET_ATTR_thrower(interp, SELF, ctx);
-                }
             }
         }
         else {
@@ -710,7 +709,7 @@ annotation. If not, returns a Hash of all of them.
         /* Get resume continuation, to find location we failed at. */
         GET_ATTR_resume(interp, SELF, resume);
         if (!PMC_IS_NULL(resume)) {
-            Parrot_cont *cont = PMC_cont(resume);
+            Parrot_Continuation_attributes *cont = PARROT_CONTINUATION(resume);
             if (cont->seg != NULL && cont->seg->annotations != NULL)
                 result = PackFile_Annotations_lookup(interp, cont->seg->annotations,
                         cont->address - cont->seg->base.data, name);
@@ -744,14 +743,14 @@ sub, or for the point of the call a level deeper for the rest.
         PMC *result = pmc_new(interp, enum_class_ResizablePMCArray);
         PMC *resume;
         PMC *cur_ctx;
-        Parrot_cont    *cont;
+        Parrot_Continuation_attributes    *cont;
 
         /* Get starting context, then loop over them. */
         GET_ATTR_resume(interp, SELF, resume);
         if (!PMC_IS_NULL(resume)) {
             /* We have a resume continuation, so we can get the address from
              * that. */
-            cont    = PMC_cont(resume);
+            cont    = PARROT_CONTINUATION(resume);
             cur_ctx = cont->to_ctx;
         }
         else {

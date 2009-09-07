@@ -2836,7 +2836,7 @@ Parrot_str_unescape(PARROT_INTERP,
     if (encoding != result->encoding)
         Parrot_str_length(interp, result);
 
-    if (!CHARSET_VALIDATE(interp, result, 0))
+    if (!CHARSET_VALIDATE(interp, result))
         Parrot_ex_throw_from_c_args(interp, NULL,
             EXCEPTION_INVALID_STRING_REPRESENTATION, "Malformed string");
 

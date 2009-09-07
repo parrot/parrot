@@ -65,8 +65,6 @@ Initializes the array.
 */
 
     VTABLE void init() {
-        Parrot_FixedPMCArray_attributes *attrs =
-            (Parrot_FixedPMCArray_attributes *) PMC_data(SELF);
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -81,9 +79,8 @@ Destroys the array.
 */
 
     VTABLE void destroy() {
-        if (PMC_array(SELF)) {
+        if (PMC_array(SELF))
             mem_sys_free(PMC_array(SELF));
-        }
     }
 
 /*
@@ -101,8 +98,8 @@ Creates and returns a copy of the array.
         const INTVAL size = PMC_size(SELF);
 
         if (size) {
-            PMC_size(dest) = size;
-            PMC_array(dest)    = mem_allocate_n_typed(size, PMC *);
+            PMC_size(dest)  = size;
+            PMC_array(dest) = mem_allocate_n_typed(size, PMC *);
             mem_copy_n_typed(PMC_array(dest), PMC_array(SELF), size, PMC *);
             PObj_custom_mark_destroy_SETALL(dest);
         }

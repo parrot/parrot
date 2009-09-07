@@ -348,9 +348,6 @@ compact_pool(PARROT_INTERP, ARGMOD(Variable_Size_Pool *pool))
 
     ++mem_pools->gc_sweep_block_level;
 
-    if (interp->profile)
-        Parrot_gc_profile_start(interp);
-
     /* We're collecting */
     mem_pools->mem_allocs_since_last_collect    = 0;
     mem_pools->header_allocs_since_last_collect = 0;
@@ -550,9 +547,6 @@ compact_pool(PARROT_INTERP, ARGMOD(Variable_Size_Pool *pool))
 
     pool->guaranteed_reclaimable = 0;
     pool->possibly_reclaimable   = 0;
-
-    if (interp->profile)
-        Parrot_gc_profile_end(interp, PARROT_PROF_GC);
 
     --mem_pools->gc_sweep_block_level;
 }

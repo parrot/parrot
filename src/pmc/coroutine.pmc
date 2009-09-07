@@ -75,11 +75,10 @@ Clone the coroutine.
 */
 
     VTABLE void init() {
-        Parrot_Coroutine_attributes *attrs =
-            (Parrot_Coroutine_attributes *) PMC_data(SELF);
+        Parrot_Coroutine_attributes *attrs = PARROT_COROUTINE(SELF);
 
         attrs->seg = INTERP->code;
-        attrs->ctx = NULL;
+        attrs->ctx = PMCNULL;
 
         PObj_custom_mark_destroy_SETALL(SELF);
     }
@@ -96,15 +95,15 @@ Clones the coroutine.
 */
 
     VTABLE PMC *clone() {
-        PMC         * const ret      = pmc_new(INTERP, SELF->vtable->base_type);
-        Parrot_Coroutine_attributes *sub = PARROT_COROUTINE(SELF);
-        Parrot_Coroutine_attributes *coro_sub = PARROT_COROUTINE(ret);
+        PMC * const ret = pmc_new(INTERP, SELF->vtable->base_type);
+        Parrot_Coroutine_attributes * const sub      = PARROT_COROUTINE(SELF);
+        Parrot_Coroutine_attributes * const coro_sub = PARROT_COROUTINE(ret);
 
         PObj_custom_mark_destroy_SETALL(ret);
 
         memcpy(coro_sub, sub, sizeof (Parrot_Coroutine_attributes));
 
-        coro_sub->name      = Parrot_str_copy(INTERP, coro_sub->name);
+        coro_sub->name = Parrot_str_copy(INTERP, coro_sub->name);
 
         return ret;
     }
@@ -120,50 +119,47 @@ Swaps the "context".
 */
 
     VTABLE opcode_t *invoke(void *next) {
-        PackFile_ByteCode  *wanted_seg;
-        Parrot_Coroutine_attributes *co = PARROT_COROUTINE(SELF);
-        opcode_t    * dest     = co->address;
+        PackFile_ByteCode *wanted_seg;
+        Parrot_Coroutine_attributes * const co = PARROT_COROUTINE(SELF);
+        opcode_t * dest = co->address;
+        opcode_t * const next_op = (opcode_t *)next;
 
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG))
             print_sub_name(INTERP, SELF);
 
-        if (!co->ctx) {
-            PMC *caller_ctx;
+        if (PMC_IS_NULL(co->ctx)) {
+            PMC * const caller_ctx = CURRENT_CONTEXT(interp);
             PMC *ctx;
-            PMC *ccont;
-
-            ccont = INTERP->current_cont;
+            PMC *ccont = INTERP->current_cont;
 
             if (ccont == NEED_CONTINUATION)
-                ccont = (PMC *)new_ret_continuation_pmc(interp,
-                                                       (opcode_t *)next);
+                ccont = (PMC *)new_ret_continuation_pmc(interp, next_op);
 
             if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL)
                 Parrot_ex_throw_from_c_args(INTERP, NULL, CONTROL_ERROR,
                         "tail call to coro not allowed");
 
             /* first time set current sub, cont, object */
-            caller_ctx = CURRENT_CONTEXT(interp);
-            ctx        = Parrot_set_new_context(INTERP, co->n_regs_used);
+            ctx     = Parrot_set_new_context(INTERP, co->n_regs_used);
 
-            co->ctx                   = ctx;
+            co->ctx = ctx;
 
             Parrot_pcc_set_caller_ctx(INTERP, ctx, caller_ctx);
-            PMC_cont(ccont)->from_ctx                       = ctx;
+            PARROT_CONTINUATION(ccont)->from_ctx = ctx;
             Parrot_pcc_set_sub(INTERP, ctx, SELF);
             Parrot_pcc_set_HLL(interp, ctx, co->HLL_id);
             Parrot_pcc_set_namespace(INTERP, ctx, co->namespace_stash);
             Parrot_pcc_set_continuation(INTERP, ctx, ccont);
-            Parrot_pcc_set_object(interp, ctx, NULL);
-            INTERP->current_object                  = NULL;
-            INTERP->current_cont                    = NULL;
+            Parrot_pcc_set_object(interp, ctx, PMCNULL);
+            INTERP->current_object = PMCNULL;
+            INTERP->current_cont   = PMCNULL;
 
             /* create pad if needed */
             if (!PMC_IS_NULL(co->lex_info)) {
-                Parrot_pcc_set_lex_pad(INTERP, ctx, pmc_new_init(INTERP,
-                        Parrot_get_ctx_HLL_type(interp, enum_class_LexPad),
-                        co->lex_info));
-                VTABLE_set_pointer(INTERP, Parrot_pcc_get_lex_pad(INTERP, ctx), ctx);
+                const INTVAL hlltype = Parrot_get_ctx_HLL_type(interp, enum_class_LexPad);
+                PMC * const lexpad = pmc_new_init(INTERP, hlltype, co->lex_info);
+                Parrot_pcc_set_lex_pad(INTERP, ctx, lexpad);
+                VTABLE_set_pointer(INTERP, lexpad, ctx);
             }
 
             PObj_get_FLAGS(SELF) |= SUB_FLAG_CORO_FF;
@@ -174,36 +170,32 @@ Swaps the "context".
 
         /* if calling the Coro we need the segment of the Coro */
         else if (!(PObj_get_FLAGS(SELF) & SUB_FLAG_CORO_FF)) {
-            PMC *ccont;
-            PMC *ctx;
+            PMC * const ctx   = co->ctx;
+            PMC * const ccont = Parrot_pcc_get_continuation(INTERP, ctx);
 
             PObj_get_FLAGS(SELF) |= SUB_FLAG_CORO_FF;
             wanted_seg            = co->seg;
 
             /* remember segment of caller */
             co->caller_seg        = INTERP->code;
-            ctx                   = co->ctx;
 
             /* and the recent call context */
-            ccont                   = Parrot_pcc_get_continuation(INTERP, ctx);
-            PMC_cont(ccont)->to_ctx = CURRENT_CONTEXT(interp);
+            PARROT_CONTINUATION(ccont)->to_ctx = CURRENT_CONTEXT(interp);
             Parrot_pcc_set_caller_ctx(interp, ctx, CURRENT_CONTEXT(interp));
 
             /* set context to coro context */
             CURRENT_CONTEXT(interp) = ctx;
         }
         else {
-            PMC *ccont;
-            PMC *ctx;
+            PMC * const ccont = Parrot_pcc_get_continuation(INTERP, co->ctx);
+            PMC * const ctx   = PARROT_CONTINUATION(ccont)->to_ctx;
 
             PObj_get_FLAGS(SELF) &= ~SUB_FLAG_CORO_FF;
             /* switch back to last remembered code seg and context */
 
             wanted_seg            = co->caller_seg;
-            ccont                 = Parrot_pcc_get_continuation(INTERP, co->ctx);
-            ctx                   = PMC_cont(ccont)->to_ctx;
 
-            if (! ctx) {
+            if (PMC_IS_NULL(ctx)) {
                 /* This still isn't quite right, but it beats segfaulting.  See
                    the "Call an exited coroutine" case in t/pmc/coroutine.t; the
                    problem is that the defunct coroutine yields up one more
@@ -226,24 +218,6 @@ Swaps the "context".
         return dest;
     }
 
-/*
-
-=item C<void mark()>
-
-Marks the coroutine as live.
-
-=cut
-
-*/
-
-    VTABLE void mark() {
-        Parrot_Coroutine_attributes *co = PARROT_COROUTINE(SELF);
-
-        /* co->ctx marked in SUPER(), so do not mark here */
-        if (co) {
-            SUPER();
-        }
-    }
 }
 
 /*

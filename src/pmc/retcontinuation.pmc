@@ -36,24 +36,18 @@ Initializes the continuation.
 */
 
     VTABLE void init() {
-        Parrot_RetContinuation_attributes * const attrs =
-            (Parrot_RetContinuation_attributes *) PMC_data(SELF);
-        PMC_cont(SELF) = new_ret_continuation(INTERP);
+        Parrot_RetContinuation_attributes * const attrs = PARROT_RETCONTINUATION(SELF);
 
-        PObj_custom_mark_destroy_SETALL(SELF);
+        attrs->to_ctx          = CURRENT_CONTEXT(interp);
+        attrs->from_ctx        = CURRENT_CONTEXT(interp);    /* filled in during a call */
+        attrs->runloop_id      = 0;
+        attrs->seg             = interp->code;
+        attrs->current_results = NULL;
+        attrs->address         = NULL;
+
     }
 
-    /*
-     * XXX when reusing SUPER.destroy() RetContinuations
-     *     have to set ref_count initially to 1
-     */
 
-    VTABLE void destroy() {
-        Parrot_cont * const cc = PMC_cont(SELF);
-
-        if (cc)
-            mem_sys_free(cc);
-    }
 /*
 
 =item C<PMC *clone>
@@ -81,19 +75,19 @@ Transfers control to the calling context and frees the current context.
 */
 
     VTABLE opcode_t *invoke(void *in_next) {
-        Parrot_cont       *cc         = PMC_cont(SELF);
-        PMC               *from_ctx   = cc->from_ctx;
-        PackFile_ByteCode * const seg = cc->seg;
-        opcode_t          *next       = cc->address;
+        Parrot_Continuation_attributes *data = PARROT_CONTINUATION(SELF);
+        PMC               *from_ctx   = data->from_ctx;
+        PackFile_ByteCode * const seg = data->seg;
+        opcode_t          *next       = data->address;
         UNUSED(in_next)
 
-        Parrot_continuation_check(interp, SELF, cc);
-        Parrot_continuation_rewind_environment(interp, SELF, cc);
+        Parrot_continuation_check(interp, SELF);
+        Parrot_continuation_rewind_environment(interp, SELF);
 
         /* the continuation is dead - delete and destroy it */
         /* This line causes a failure in t/pmc/packfiledirectory.t. No idea
            what the relationship is between this line of code and that test
-           failure. Will look into it later */
+           failure. */
         /* Parrot_gc_free_pmc_header(interp, SELF); */
 
         if (INTERP->code != seg)

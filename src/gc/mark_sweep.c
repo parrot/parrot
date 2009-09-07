@@ -180,9 +180,6 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
         return 0;
     }
 
-    if (interp->profile)
-        Parrot_gc_profile_start(interp);
-
     /* We have to start somewhere; the interpreter globals is a good place */
     if (!mem_pools->gc_mark_start) {
         mem_pools->gc_mark_start
@@ -247,9 +244,6 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
     if (mem_pools->lazy_gc
     &&  mem_pools->num_early_PMCs_seen >= mem_pools->num_early_gc_PMCs)
         return 0;
-
-    if (interp->profile)
-        Parrot_gc_profile_end(interp, PARROT_PROF_GC_p1);
 
     return 1;
 }
@@ -531,9 +525,6 @@ Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)
      * If there is a count of shared PMCs and we have already seen
      * all these, we could skip that.
      */
-    if (interp->profile)
-        Parrot_gc_profile_start(interp);
-
     pt_gc_mark_root_finished(interp);
 
     do {
@@ -572,9 +563,6 @@ Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)
 
     mem_pools->gc_mark_start = current;
     mem_pools->gc_trace_ptr  = NULL;
-
-    if (interp->profile)
-        Parrot_gc_profile_end(interp, PARROT_PROF_GC_p2);
 
     return 1;
 }
@@ -662,59 +650,6 @@ Parrot_append_arena_in_pool(PARROT_INTERP,
 
     pool->last_Arena = new_arena;
     interp->mem_pools->header_allocs_since_last_collect++;
-}
-
-/*
-
-=item C<void Parrot_gc_profile_start(PARROT_INTERP)>
-
-Records the start time of a GC mark run when profiling is enabled.
-
-=cut
-
-*/
-
-void
-Parrot_gc_profile_start(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_gc_profile_start)
-    if (Interp_flags_TEST(interp, PARROT_PROFILE_FLAG))
-        interp->profile->gc_time = Parrot_floatval_time();
-}
-
-/*
-
-=item C<void Parrot_gc_profile_end(PARROT_INTERP, int what)>
-
-Records the end time of the GC mark run part C<what> run when profiling is
-enabled. Also record start time of next part.
-
-=cut
-
-*/
-
-void
-Parrot_gc_profile_end(PARROT_INTERP, int what)
-{
-    ASSERT_ARGS(Parrot_gc_profile_end)
-    if (Interp_flags_TEST(interp, PARROT_PROFILE_FLAG)) {
-        RunProfile * const profile = interp->profile;
-        const FLOATVAL     now     = Parrot_floatval_time();
-
-        profile->data[what].numcalls++;
-        profile->data[what].time += now - profile->gc_time;
-
-        /*
-         * we've recorded the time of a GC piece from
-         * gc_time until now, so add this to the start of the
-         * currently executing opcode, which hasn't run this
-         * interval.
-         */
-        profile->starttime += now - profile->gc_time;
-
-        /* prepare start for next step */
-        profile->gc_time    = now;
-    }
 }
 
 /*
@@ -1211,36 +1146,45 @@ Parrot_gc_free_attributes_from_pool(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool * p
     pool->num_free_objects++;
 }
 
+
 static void
 Parrot_gc_allocate_new_attributes_arena(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool *pool))
 {
     ASSERT_ARGS(Parrot_gc_allocate_new_attributes_arena)
-    const size_t num_items = pool->objects_per_alloc;
-    const size_t item_size = pool->attr_size;
-    const size_t total_size = sizeof (PMC_Attribute_Arena) + (item_size * num_items);
-    size_t i;
     PMC_Attribute_Free_List *list, *next, *first;
+
+    size_t       i;
+    const size_t num_items  = pool->objects_per_alloc;
+    const size_t item_size  = pool->attr_size;
+    const size_t total_size = sizeof (PMC_Attribute_Arena)
+                            + (item_size * num_items);
+
     PMC_Attribute_Arena * const new_arena = (PMC_Attribute_Arena *)mem_internal_allocate(
         total_size);
+
     new_arena->prev = NULL;
     new_arena->next = pool->top_arena;
     pool->top_arena = new_arena;
-    first = next = (PMC_Attribute_Free_List *)(new_arena + 1);
+    first           = next = (PMC_Attribute_Free_List *)(new_arena + 1);
+
 #if GC_USE_LAZY_ALLOCATOR
-    pool->newfree = first;
-    pool->newlast = (PMC_Attribute_Free_List*)((char*)first + (item_size * num_items));
+    pool->newfree   = first;
+    pool->newlast   = (PMC_Attribute_Free_List *)((char *)first + (item_size * num_items));
 #else
     for (i = 0; i < num_items; i++) {
-        list = next;
+        list       = next;
         list->next = (PMC_Attribute_Free_List *)((char *)list + item_size);
-        next = list->next;
+        next       = list->next;
     }
-    list->next = pool->free_list;
+
+    list->next      = pool->free_list;
     pool->free_list = first;
 #endif
+
     pool->num_free_objects += num_items;
     pool->total_objects    += num_items;
 }
+
 
 PARROT_CANNOT_RETURN_NULL
 PMC_Attribute_Pool *
@@ -1255,16 +1199,18 @@ Parrot_gc_get_attribute_pool(PARROT_INTERP, size_t attrib_size)
                                       : attrib_size;
     const size_t               idx    = size - sizeof (void *);
 
-    if (pools == NULL) {
+    if (!pools) {
         const size_t total_length = idx + GC_ATTRIB_POOLS_HEADROOM;
         const size_t total_size   = (total_length + 1) * sizeof (void *);
         /* Allocate more then we strictly need, hoping that we can reduce the
            number of resizes. 8 is just an arbitrary number */
         pools = (PMC_Attribute_Pool **)mem_internal_allocate(total_size);
         memset(pools, 0, total_size);
+
         mem_pools->attrib_pools = pools;
         mem_pools->num_attribs = total_length;
     }
+
     if (mem_pools->num_attribs <= idx) {
         const size_t total_length = idx + GC_ATTRIB_POOLS_HEADROOM;
         const size_t total_size   = total_length * sizeof (void *);
@@ -1276,8 +1222,10 @@ Parrot_gc_get_attribute_pool(PARROT_INTERP, size_t attrib_size)
         mem_pools->attrib_pools = pools;
         mem_pools->num_attribs = total_length;
     }
-    if (pools[idx] == NULL)
+
+    if (!pools[idx])
         pools[idx] = Parrot_gc_create_attrib_pool(interp, size);
+
     return pools[idx];
 }
 
@@ -1290,12 +1238,14 @@ Parrot_gc_create_attrib_pool(PARROT_INTERP, size_t attrib_size)
         (GC_FIXED_SIZE_POOL_SIZE - sizeof (PMC_Attribute_Arena)) / attrib_size;
     const size_t num_objs = (num_objs_raw == 0)?(1):(num_objs_raw);
     PMC_Attribute_Pool * const newpool = mem_internal_allocate_typed(PMC_Attribute_Pool);
-    newpool->attr_size = attrib_size;
-    newpool->total_objects = 0;
+
+    newpool->attr_size         = attrib_size;
+    newpool->total_objects     = 0;
     newpool->objects_per_alloc = num_objs;
-    newpool->num_free_objects = 0;
-    newpool->free_list = NULL;
-    newpool->top_arena = NULL;
+    newpool->num_free_objects  = 0;
+    newpool->free_list         = NULL;
+    newpool->top_arena         = NULL;
+
     return newpool;
 }
 

@@ -77,6 +77,7 @@ sub runstep {
         }
     }
     $conf->data->set( HAS_READLINE => $has_readline );
+    $self->set_result($has_readline ? 'yes' : 'no');
 
     return 1;
 }
