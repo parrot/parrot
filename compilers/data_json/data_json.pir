@@ -24,12 +24,6 @@ the documentation at L<http://www.json.org/>.
 
 =cut
 
-.include 'compilers/data_json/data_json/grammar.pir'
-.include 'compilers/data_json/data_json/pge2pir.pir'
-# .include 'data_json/grammar.pir'
-# .include 'data_json/pge2pir.pir'
-
-
 .HLL 'data_json'
 
 .sub '__onload' :load
@@ -84,6 +78,13 @@ the documentation at L<http://www.json.org/>.
     $P0[0] = "Invalid JSON value"
     throw $P0
 .end
+
+
+.HLL 'parrot'
+
+.include 'compilers/data_json/data_json/grammar.pir'
+.include 'compilers/data_json/data_json/pge2pir.pir'
+
 
 # Local Variables:
 #   mode: pir
