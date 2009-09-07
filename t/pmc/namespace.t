@@ -44,6 +44,10 @@ of the NameSpace PMC:
 
 =item* Subclassing NameSpace (If it's possible)
 
+=item* .'export_to'()
+
+Although NameSpace.'export_to'() is used in test_more.pir.
+
 =back
 
 =cut
@@ -52,7 +56,7 @@ of the NameSpace PMC:
 
 .sub main :main
     .include 'test_more.pir'
-    plan(59)
+    plan(61)
 
     create_namespace_pmc()
     verify_namespace_type()
@@ -237,6 +241,9 @@ CODE
   test8:
 # TODO: This should probably be possible. We should be able to look up a
 #       string if it is iso-8895-1 and we are Unicode
+# TT #990
+     todo(0, "Lookup NameSpace with ISO-8859-1 Name using Unicode Key")
+     todo(0, "Find sub in ISO-8859-1 NameSpace using Unicode Key")
 #    push_eh eh8
 #    $P0 = get_global [ unicode:"François" ], "baz"
 #    $I0 = isnull $P0
@@ -244,7 +251,7 @@ CODE
 #    $S0 = $P0()
 #    say $S0
 #    is($S0, iso-8859-1:"François", "ISO-8859 NameSpace with Unicode name")
-#    goto end_test8:
+#    goto end_test8
 #  eh8:
 #    ok(0, "Cannot find ISO-8859 NameSpace using Unicode name")
 #  end_test8:
