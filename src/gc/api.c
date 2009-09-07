@@ -260,13 +260,13 @@ void
 Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
 {
     ASSERT_ARGS(Parrot_gc_initialize)
-    interp->arena_base = mem_allocate_zeroed_typed(Arenas);
-    interp->arena_base->sized_header_pools = NULL;
-    interp->arena_base->num_sized = 0;
-    interp->arena_base->attrib_pools = NULL;
-    interp->arena_base->num_attribs = 0;
 
-    interp->lo_var_ptr = stacktop;
+    interp->arena_base                     = mem_allocate_zeroed_typed(Arenas);
+    interp->arena_base->num_sized          = 0;
+    interp->arena_base->num_attribs        = 0;
+    interp->arena_base->attrib_pools       = NULL;
+    interp->arena_base->sized_header_pools = NULL;
+    interp->lo_var_ptr                     = stacktop;
 
 #if PARROT_GC_MS
     Parrot_gc_ms_init(interp);
@@ -1014,9 +1014,30 @@ Parrot_gc_destroy_header_pools(PARROT_INTERP)
     }
 
     mem_internal_free(interp->arena_base->sized_header_pools);
-    if (interp->arena_base->attrib_pools)
+
+    if (interp->arena_base->attrib_pools) {
+        unsigned int i;
+        for (i = 0; i < interp->arena_base->num_attribs; i++) {
+            PMC_Attribute_Pool  *pool  = interp->arena_base->attrib_pools[i];
+            PMC_Attribute_Arena *arena;
+
+            if (!pool)
+                continue;
+
+            arena = pool->top_arena;
+
+            while (arena) {
+                PMC_Attribute_Arena *next = arena->next;
+                mem_internal_free(arena);
+                arena = next;
+            }
+            mem_internal_free(pool);
+        }
+
         mem_internal_free(interp->arena_base->attrib_pools);
-    interp->arena_base->attrib_pools = NULL;
+    }
+
+    interp->arena_base->attrib_pools       = NULL;
     interp->arena_base->sized_header_pools = NULL;
 }
 
