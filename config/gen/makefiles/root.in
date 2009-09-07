@@ -1150,6 +1150,9 @@ $(SRC_DIR)/call/pcc$(O) : $(SRC_DIR)/call/pcc.c $(GENERAL_H_FILES) \
 	$(SRC_DIR)/call/pcc.str $(SRC_DIR)/pmc/pmc_fixedintegerarray.h \
 	$(SRC_DIR)/pmc/pmc_key.h $(SRC_DIR)/pmc/pmc_continuation.h
 
+$(SRC_DIR)/call/context$(O) : $(SRC_DIR)/call/context.c $(GENERAL_H_FILES) \
+	$(SRC_DIR)/pmc/pmc_sub.h
+
 $(SRC_DIR)/interp/inter_cb$(O) : $(SRC_DIR)/interp/inter_cb.c \
 	$(GENERAL_H_FILES) $(SRC_DIR)/interp/inter_cb.str
 
