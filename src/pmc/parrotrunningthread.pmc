@@ -46,9 +46,7 @@ Create a new, invalid handle to a running thread.
 */
 
     VTABLE void init() {
-        Parrot_ParrotRunningThread_attributes *attrs = PARROT_PARROTRUNNINGTHREAD(SELF);
-        attrs->tid = -1;
-        PObj_custom_destroy_SET(SELF);
+        PMC_tid(SELF) = -1;
     }
 
 /*
