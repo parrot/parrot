@@ -543,7 +543,7 @@ push_ascii_string(PARROT_INTERP, ARGIN(IMAGE_IO *io), ARGIN(const STRING *s))
     const UINTVAL length = Parrot_str_byte_length(interp, s);
 
     /* XXX Why 4?  What does that mean? */
-    char  * const buffer = mem_allocate_n_typed(4 * length, char *);
+    char  * const buffer = mem_allocate_n_typed(4 * length, char);
     char         *cursor = buffer;
     UINTVAL       idx    = 0;
 
@@ -2041,7 +2041,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC*
-Parrot_clone(PARROT_INTERP, ARGIN(PMC* pmc))
+Parrot_clone(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_clone)
     return VTABLE_clone(interp, pmc);
