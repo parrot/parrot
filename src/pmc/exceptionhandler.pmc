@@ -40,13 +40,12 @@ Initializes the exception handler.
 */
 
     VTABLE void init() {
-        Parrot_ExceptionHandler_attributes * const attrs =
-            (Parrot_ExceptionHandler_attributes *)PMC_data(SELF);
+        Parrot_ExceptionHandler_attributes * const attrs = PARROT_EXCEPTIONHANDLER(SELF);
         SUPER();
-        attrs->invoked      = 0;
-        attrs->min_severity  = 0;
-        attrs->max_severity  = 0;
-        attrs->handled_types = PMCNULL;
+        attrs->invoked              = 0;
+        attrs->min_severity         = 0;
+        attrs->max_severity         = 0;
+        attrs->handled_types        = PMCNULL;
         attrs->handled_types_except = PMCNULL;
 
         /* an exception handler has no separate context; it's only a snapshot
@@ -75,8 +74,7 @@ Mark any active exception handler data as live.
         SUPER();
     }
 
-    VTABLE void destroy(){
-
+    VTABLE void destroy() {
         Parrot_ExceptionHandler_attributes *attrs = PARROT_EXCEPTIONHANDLER(SELF);
 
         if (attrs->handled_types){
@@ -90,6 +88,7 @@ Mark any active exception handler data as live.
 
     VTABLE PMC *clone() {
         PMC * const result = SUPER();
+        /* This looks wrong, why wouldn't we want to mark the clone? */
         PObj_custom_mark_CLEAR(result);
         return result;
     }

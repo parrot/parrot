@@ -120,7 +120,7 @@ Marks this PMC and any of its contents as live.
 */
 
     VTABLE void mark() {
-        Parrot_EventHandler_attributes *e = PMC_data_typed(SELF, Parrot_EventHandler_attributes *);
+        Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
 
         if (e) {
             if (e->type)
@@ -147,7 +147,7 @@ Sets the C<type> attribute of this event handler to the passed-in string.
 */
 
     VTABLE void set_string(STRING *type) {
-        Parrot_EventHandler_attributes *e = PMC_data_typed(SELF, Parrot_EventHandler_attributes *);
+        Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
 
         if (e)
             e->type = type;
@@ -164,8 +164,7 @@ Retrieves the C<type> attribute of this event handler.
 */
 
     VTABLE STRING *get_string() {
-        Parrot_EventHandler_attributes *e =
-            PMC_data_typed(SELF, Parrot_EventHandler_attributes *);
+        Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
 
         if (e)
             return Parrot_str_copy(INTERP, e->type);
@@ -183,7 +182,7 @@ Sets the minimum interesting priority for this event handler.
 
 */
     VTABLE void set_integer_native(INTVAL priority) {
-        Parrot_EventHandler_attributes *e = PMC_data_typed(SELF, Parrot_EventHandler_attributes *);
+        Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
 
         if (e)
             e->priority = priority;
@@ -200,8 +199,7 @@ handle the registered events.
 
 */
     VTABLE void set_pmc(PMC *interpreter) {
-        Parrot_EventHandler_attributes *e =
-            PMC_data_typed(SELF, Parrot_EventHandler_attributes *);
+        Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
 
         if (e)
             e->interp = interpreter;
@@ -216,12 +214,11 @@ handle the registered events.
 */
 
     VTABLE PMC *get_attr_str(STRING *name) {
-        Parrot_EventHandler_attributes *core_struct
-            = PMC_data_typed(SELF, Parrot_EventHandler_attributes *);
+        Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
         PMC *value = PMCNULL;
 
         if (Parrot_str_equal(interp, name, CONST_STRING(interp, "code"))) {
-            value = core_struct->code;
+            value = e->code;
         }
 
         return value;
@@ -237,8 +234,8 @@ Runs the contained code, if any; this is what handles the event.
 
 */
     VTABLE opcode_t *invoke(void *next) {
-        Parrot_EventHandler_attributes *e = PMC_data_typed(SELF, Parrot_EventHandler_attributes *);
-        void                *unused;
+        Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
+        void *unused;
 
         /* can't invoke on INTERP and can't return its result; this may not be
          * the right interpreter */
@@ -274,8 +271,7 @@ Report whether the event handler can handle a particular type of event.
 */
 
     METHOD can_handle(PMC *event) {
-        Parrot_EventHandler_attributes *handler_struct =
-            PMC_data_typed(SELF, Parrot_EventHandler_attributes *);
+        Parrot_EventHandler_attributes * const handler_struct = PARROT_EVENTHANDLER(SELF);
         if (event->vtable->base_type == enum_class_Task) {
             PMC *type = VTABLE_get_attr_str(interp, event, CONST_STRING(interp, "type"));
             STRING *type_str = VTABLE_get_string(interp, type);
