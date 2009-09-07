@@ -16,15 +16,35 @@
  * Macros to make accessing registers more convenient/readable.
  */
 
-#define CTX_REG_NUM(p, x) (*Parrot_pcc_get_FLOATVAL_reg(interp, (p), (x)))
-#define CTX_REG_INT(p, x) (*Parrot_pcc_get_INTVAL_reg(interp, (p), (x)))
-#define CTX_REG_PMC(p, x) (*Parrot_pcc_get_PMC_reg(interp, (p), (x)))
-#define CTX_REG_STR(p, x) (*Parrot_pcc_get_STRING_reg(interp, (p), (x)))
+#ifndef NDEBUG
 
-#define REG_NUM(interp, x) (*Parrot_pcc_get_FLOATVAL_reg((interp), (interp)->ctx, (x)))
-#define REG_INT(interp, x) (*Parrot_pcc_get_INTVAL_reg((interp), (interp)->ctx, (x)))
-#define REG_PMC(interp, x) (*Parrot_pcc_get_PMC_reg((interp), (interp)->ctx, (x)))
-#define REG_STR(interp, x) (*Parrot_pcc_get_STRING_reg((interp), (interp)->ctx, (x)))
+#  define CTX_REG_NUM(p, x) (*Parrot_pcc_get_FLOATVAL_reg(interp, (p), (x)))
+#  define CTX_REG_INT(p, x) (*Parrot_pcc_get_INTVAL_reg(interp, (p), (x)))
+#  define CTX_REG_PMC(p, x) (*Parrot_pcc_get_PMC_reg(interp, (p), (x)))
+#  define CTX_REG_STR(p, x) (*Parrot_pcc_get_STRING_reg(interp, (p), (x)))
+
+#  define REG_NUM(interp, x) (*Parrot_pcc_get_FLOATVAL_reg((interp), (interp)->ctx, (x)))
+#  define REG_INT(interp, x) (*Parrot_pcc_get_INTVAL_reg((interp), (interp)->ctx, (x)))
+#  define REG_PMC(interp, x) (*Parrot_pcc_get_PMC_reg((interp), (interp)->ctx, (x)))
+#  define REG_STR(interp, x) (*Parrot_pcc_get_STRING_reg((interp), (interp)->ctx, (x)))
+
+#else /* NDEBUG */
+
+/* Manually inlined macros. Used in optimised builds */
+
+#  define __C(c) (PMC_data_typed(c, Parrot_Context*))
+
+#  define CTX_REG_NUM(p, x) (__C(p)->bp.regs_n[-1L - (x)])
+#  define CTX_REG_INT(p, x) (__C(p)->bp.regs_i[(x)])
+#  define CTX_REG_PMC(p, x) (__C(p)->bp_ps.regs_p[-1L - (x)])
+#  define CTX_REG_STR(p, x) (__C(p)->bp_ps.regs_s[(x)])
+
+#  define REG_NUM(interp, x) CTX_REG_NUM((interp)->ctx, (x))
+#  define REG_INT(interp, x) CTX_REG_INT((interp)->ctx, (x))
+#  define REG_PMC(interp, x) CTX_REG_PMC((interp)->ctx, (x))
+#  define REG_STR(interp, x) CTX_REG_STR((interp)->ctx, (x))
+
+#endif
 
 /*
  * and a set of macros to access a register by offset, used
