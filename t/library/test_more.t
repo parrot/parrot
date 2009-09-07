@@ -41,34 +41,35 @@
 .sub test_throws_like
 
     test_fail('throws_like fails when there is no error')
-
     throws_like( <<'CODE', 'somejunk', 'throws_like fails when there is no error')
 .sub main
     $I0 = 42
 .end
 CODE
-
     test_diag( 'no error thrown' )
     test_test( 'throws_like fails when there is no error')
-    test_pass('throws_like passes when error matches pattern')
 
-    throws_like( <<'CODE', '<[for the lulz]>','throws_like passes when error matches pattern')
+    test_pass('throws_like passes when error matches pattern')
+    throws_like( <<'CODE', 'for\ the\ lulz','throws_like passes when error matches pattern')
 .sub main
     die 'I did it for the lulz'
 .end
 CODE
-
     test_test( 'throws_like passes when error matches pattern' )
 
     test_fail( 'throws_like fails when error does not match pattern' )
-
-    throws_like( <<'CODE', '<[for the lulz]>','throws_like fails when error does not match pattern')
+    throws_like( <<'CODE', 'for\ the\ lulz','throws_like fails when error does not match pattern')
 .sub main
     die 'DO NOT WANT'
 .end
 CODE
-    test_diag( "match failed: target 'DO NOT WANT' does not match pattern '<[for the lulz]>'" )
+    .local string diagnostic
+    diagnostic  = "match failed: target 'DO NOT WANT' does not match pattern '"
+    diagnostic .= 'for\ the\ lulz'
+    diagnostic .= "'"
+    test_diag( diagnostic )
     test_test('throws_like fails when error does not match pattern' )
+
 .end
 
 .sub test_ok
