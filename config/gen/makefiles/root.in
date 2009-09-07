@@ -147,6 +147,7 @@ NONGEN_HEADERS   := @TEMP_nongen_headers@
 GEN_MAKEFILES := \
     Makefile \
     docs/Makefile \
+    compilers/data_json/Makefile \
     compilers/json/Makefile \
     compilers/ncigen/Makefile \
     compilers/nqp/Makefile \
@@ -1413,6 +1414,7 @@ compilers.dummy : $(PARROT) $(GEN_LIBRARY)
 	$(MAKE) compilers/tge
 	$(MAKE) compilers/nqp
 	$(MAKE) compilers/json
+	$(MAKE) compilers/data_json
 
 compilers-clean :
 	$(MAKE) compilers/pct clean
@@ -1420,6 +1422,7 @@ compilers-clean :
 	$(MAKE) compilers/tge clean
 	$(MAKE) compilers/nqp clean
 	$(MAKE) compilers/json clean
+	$(MAKE) compilers/data_json clean
 	$(MAKE) compilers/pirc clean
 
 ###############################################################################
