@@ -148,7 +148,7 @@ usage(ARGMOD(FILE *fp))
     ASSERT_ARGS(usage)
     fprintf(fp,
             "parrot -[acEGhprtvVwy.] [-d [FLAGS]] [-D [FLAGS]]"
-            "[-O [level]] [-o FILE] <file>\n");
+            "[-O [level]] [-R runcore] [-o FILE] <file>\n");
 }
 
 /*
@@ -221,8 +221,7 @@ help(void)
     "    -X --dynext add path to dynamic extension search\n"
     "   <Run core options>\n"
     "    -R --runcore slow|bounds|fast|jit|cgoto|cgp|cgp-jit\n"
-    "    -R --runcore switch|switch-jit|trace|exec|gcdebug\n"
-    "    -p --profile\n"
+    "    -R --runcore switch|switch-jit|trace|profiling|gcdebug\n"
     "    -t --trace [flags]\n"
     "   <VM options>\n"
     "    -D --parrot-debug[=HEXFLAGS]\n"
@@ -308,7 +307,6 @@ static struct longopt_opt_decl options[] = {
     { 'h', 'h', (OPTION_flags)0, { "--help" } },
     { 'o', 'o', OPTION_required_FLAG, { "--output" } },
     { '\0', OPT_PBC_OUTPUT, (OPTION_flags)0, { "--output-pbc" } },
-    { 'p', 'p', (OPTION_flags)0, { "--profile" } },
     { 'r', 'r', (OPTION_flags)0, { "--run-pbc" } },
     { '\0', OPT_RUNTIME_PREFIX, (OPTION_flags)0, { "--runtime-prefix" } },
     { 't', 't', OPTION_optional_FLAG, { "--trace" } },
@@ -399,9 +397,6 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                     Parrot_ex_throw_from_c_args(interp, NULL, 1,
                         "main: Unrecognized runcore '%s' specified."
                         "\n\nhelp: parrot -h\n", opt.opt_arg);
-                break;
-            case 'p':
-                SET_FLAG(PARROT_PROFILE_FLAG);
                 break;
             case 't':
                 if (opt.opt_arg && is_all_hex_digits(opt.opt_arg))

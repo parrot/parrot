@@ -1313,7 +1313,9 @@ destroy_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore)
     ASSERT_ARGS(destroy_profiling_core)
 
     char *filename_cstr = Parrot_str_to_cstring(interp, runcore->profile_filename);
-    fprintf(stderr, "\nPROFILING RUNCORE: Wrote profile to %s .\n", filename_cstr);
+    fprintf(stderr, "\nPROFILING RUNCORE: wrote profile to %s\n", filename_cstr);
+    fprintf(stderr, "Use tools/dev/pprof2cg.pl to generate Callgrind-compatible "
+            "output from this file.\n");
     Parrot_str_free_cstring(filename_cstr);
 
     fclose(runcore->profile_fd);
