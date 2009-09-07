@@ -323,40 +323,6 @@ fin:
     ok($I0,'Integers can get_as_base')
 .end
 
-=pod
-
-pir_error_output_like( <<'CODE',qr/get_as_base: base out of bounds/ms, "get_as_base() bounds check" );
-.sub main :main
-    $P0 = new ['Integer']
-    $P0 = 42
-
-    $S0 = $P0.'get_as_base'(1)
-
-    print $S0
-    print "\n"
-.end
-CODE
-/get_as_base: base out of bounds
-.*/
-OUTPUT
-
-pir_error_output_like( <<'CODE', <<'OUTPUT', "get_as_base() bounds check" );
-.sub main :main
-    $P0 = new ['Integer']
-    $P0 = 42
-
-    $S0 = $P0.'get_as_base'(37)
-
-    print $S0
-    print "\n"
-.end
-CODE
-/get_as_base: base out of bounds
-.*/
-OUTPUT
-
-=cut
-
 .sub test_get_as_base10
     $P0 = new ['Integer']
     $P0 = 42
