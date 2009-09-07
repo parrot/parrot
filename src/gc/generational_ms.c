@@ -145,7 +145,7 @@ static void gc_gms_alloc_objects(PARROT_INTERP,
 
 static void gc_gms_chain_objects(PARROT_INTERP,
     ARGMOD(Fixed_Size_Pool *pool),
-    ARGIN(Fixed_Size_Obj_Arena *new_arena),
+    ARGIN(Fixed_Size_Arena *new_arena),
     size_t real_size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -604,7 +604,7 @@ gc_gms_add_free_object(PARROT_INTERP, SHIM(Fixed_Size_Pool *pool),
 /*
 
 =item C<static void gc_gms_chain_objects(PARROT_INTERP, Fixed_Size_Pool *pool,
-Fixed_Size_Obj_Arena *new_arena, size_t real_size)>
+Fixed_Size_Arena *new_arena, size_t real_size)>
 
 TODO: interfere custom_destroy and put these items into a
 separate white area, so that a sweep has just to run through these
@@ -645,7 +645,7 @@ Header chain layout:
 
 static void
 gc_gms_chain_objects(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool),
-        ARGIN(Fixed_Size_Obj_Arena *new_arena), size_t real_size)
+        ARGIN(Fixed_Size_Arena *new_arena), size_t real_size)
 {
     ASSERT_ARGS(gc_gms_chain_objects)
     Gc_gms_hdr *next, *prev;
@@ -708,7 +708,7 @@ gc_gms_alloc_objects(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(gc_gms_alloc_objects)
     const size_t real_size = pool->object_size;
-    Fixed_Size_Obj_Arena * const new_arena = mem_internal_allocate(sizeof (Fixed_Size_Obj_Arena));
+    Fixed_Size_Arena * const new_arena = mem_internal_allocate(sizeof (Fixed_Size_Arena));
     const size_t size = real_size * pool->objects_per_alloc;
 
     new_arena->start_objects = mem_internal_allocate(size);

@@ -697,13 +697,13 @@ static void
 gc_ims_alloc_objects(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(gc_ims_alloc_objects)
-    Fixed_Size_Obj_Arena *new_arena;
+    Fixed_Size_Arena *new_arena;
     size_t size;
 
     pool->objects_per_alloc  = ALLOCATION_BLOCK_SIZE / pool->object_size;
 
     /* Setup memory for the new objects */
-    new_arena                = mem_allocate_typed(Fixed_Size_Obj_Arena);
+    new_arena                = mem_allocate_typed(Fixed_Size_Arena);
     size                     = ALLOCATION_BLOCK_SIZE;
     new_arena->start_objects = mem_sys_allocate(size);
 

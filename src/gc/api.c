@@ -911,7 +911,7 @@ Parrot_gc_merge_buffer_pools(PARROT_INTERP,
         ARGMOD(Fixed_Size_Pool *dest), ARGMOD(Fixed_Size_Pool *source))
 {
     ASSERT_ARGS(Parrot_gc_merge_buffer_pools)
-    Fixed_Size_Obj_Arena  *cur_arena;
+    Fixed_Size_Arena  *cur_arena;
     GC_MS_PObj_Wrapper  *free_list_end;
 
     PARROT_ASSERT(dest->object_size == source->object_size);
@@ -938,7 +938,7 @@ Parrot_gc_merge_buffer_pools(PARROT_INTERP,
 
     while (cur_arena) {
         size_t                     total_objects;
-        Fixed_Size_Obj_Arena * const next_arena = cur_arena->prev;
+        Fixed_Size_Arena * const next_arena = cur_arena->prev;
 
         cur_arena->next = cur_arena->prev = NULL;
 
@@ -975,7 +975,7 @@ static void
 fix_pmc_syncs(ARGMOD(Interp *dest_interp), ARGIN(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(fix_pmc_syncs)
-    Fixed_Size_Obj_Arena *cur_arena;
+    Fixed_Size_Arena *cur_arena;
     const UINTVAL       object_size = pool->object_size;
 
     for (cur_arena = pool->last_Arena; cur_arena; cur_arena = cur_arena->prev) {
@@ -1118,10 +1118,10 @@ static void
 free_pool(ARGMOD(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(free_pool)
-    Fixed_Size_Obj_Arena *cur_arena;
+    Fixed_Size_Arena *cur_arena;
 
     for (cur_arena = pool->last_Arena; cur_arena;) {
-        Fixed_Size_Obj_Arena * const next = cur_arena->prev;
+        Fixed_Size_Arena * const next = cur_arena->prev;
         mem_internal_free(cur_arena->start_objects);
         mem_internal_free(cur_arena);
         cur_arena = next;
@@ -1230,7 +1230,7 @@ Parrot_gc_get_pmc_index(PARROT_INTERP, ARGIN(PMC* pmc))
 {
     ASSERT_ARGS(Parrot_gc_get_pmc_index)
     UINTVAL id = 1;     /* first PMC in first arena */
-    Fixed_Size_Obj_Arena *arena;
+    Fixed_Size_Arena *arena;
     Fixed_Size_Pool *pool;
 
     if (interp->gc_sys->PObj_to_Arena){
@@ -1296,7 +1296,7 @@ static void
 cleanup_next_for_GC_pool(ARGIN(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(cleanup_next_for_GC_pool)
-    Fixed_Size_Obj_Arena *arena;
+    Fixed_Size_Arena *arena;
 
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
         PMC *p = (PMC *)arena->start_objects;

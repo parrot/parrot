@@ -105,7 +105,7 @@ static void
 clear_cow(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool), int cleanup)
 {
     const UINTVAL object_size = pool->object_size;
-    Fixed_Size_Obj_Arena *cur_arena;
+    Fixed_Size_Arena *cur_arena;
 
     /* clear refcount for COWable objects. */
     for (cur_arena = pool->last_Arena;
@@ -151,7 +151,7 @@ static void
 used_cow(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool), int cleanup)
 {
     const UINTVAL object_size = pool->object_size;
-    Fixed_Size_Obj_Arena *cur_arena;
+    Fixed_Size_Arena *cur_arena;
 
     for (cur_arena = pool->last_Arena;
             NULL != cur_arena; cur_arena = cur_arena->prev) {

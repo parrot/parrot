@@ -276,7 +276,7 @@ Parrot_gc_sweep_pool(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool))
     UINTVAL total_used        = 0;
     const UINTVAL object_size = pool->object_size;
 
-    Fixed_Size_Obj_Arena *cur_arena;
+    Fixed_Size_Arena *cur_arena;
     gc_object_fn_type   gc_object = pool->gc_object;
 
 #if GC_VERBOSE
@@ -366,7 +366,7 @@ INTVAL
 contained_in_pool(PARROT_INTERP, ARGIN(const Fixed_Size_Pool *pool), ARGIN(const void *ptr))
 {
     ASSERT_ARGS(contained_in_pool)
-    const Fixed_Size_Obj_Arena *arena;
+    const Fixed_Size_Arena *arena;
 
     if (interp->gc_sys->PObj_to_Arena){
         ptr = interp->gc_sys->PObj_to_Arena(ptr);
@@ -490,7 +490,7 @@ void
 Parrot_gc_clear_live_bits(PARROT_INTERP, ARGIN(const Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(Parrot_gc_clear_live_bits)
-    Fixed_Size_Obj_Arena *arena;
+    Fixed_Size_Arena *arena;
     const UINTVAL object_size = pool->object_size;
 
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
@@ -585,7 +585,7 @@ Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)
 /*
 
 =item C<void Parrot_add_to_free_list(PARROT_INTERP, Fixed_Size_Pool *pool,
-Fixed_Size_Obj_Arena *arena)>
+Fixed_Size_Arena *arena)>
 
 Adds the objects in the newly allocated C<arena> to the free list of the pool.
 
@@ -596,7 +596,7 @@ Adds the objects in the newly allocated C<arena> to the free list of the pool.
 void
 Parrot_add_to_free_list(PARROT_INTERP,
         ARGMOD(Fixed_Size_Pool  *pool),
-        ARGMOD(Fixed_Size_Obj_Arena *arena))
+        ARGMOD(Fixed_Size_Arena *arena))
 {
     ASSERT_ARGS(Parrot_add_to_free_list)
     UINTVAL  i;
@@ -629,9 +629,9 @@ Parrot_add_to_free_list(PARROT_INTERP,
 /*
 
 =item C<void Parrot_append_arena_in_pool(PARROT_INTERP, Fixed_Size_Pool *pool,
-Fixed_Size_Obj_Arena *new_arena, size_t size)>
+Fixed_Size_Arena *new_arena, size_t size)>
 
-Insert the new arena into the pool's structure. Memory_Pools are stored in a
+Insert the new arena into the pool's structure. Arenas are stored in a
 linked list, so add the new arena to the list. Set information in the
 arenas structure, such as the number of objects allocated in it.
 
@@ -642,7 +642,7 @@ arenas structure, such as the number of objects allocated in it.
 void
 Parrot_append_arena_in_pool(PARROT_INTERP,
     ARGMOD(Fixed_Size_Pool *pool),
-    ARGMOD(Fixed_Size_Obj_Arena *new_arena), size_t size)
+    ARGMOD(Fixed_Size_Arena *new_arena), size_t size)
 {
     ASSERT_ARGS(Parrot_append_arena_in_pool)
 
@@ -1251,8 +1251,8 @@ Parrot_gc_get_attribute_pool(PARROT_INTERP, size_t attrib_size)
 {
     ASSERT_ARGS(Parrot_gc_get_attribute_pool)
 
-    Memory_Pools             * const arenas = interp->mem_pools;
-    PMC_Attribute_Pool       **pools  = arenas->attrib_pools;
+    Memory_Pools             * const mem_pools = interp->mem_pools;
+    PMC_Attribute_Pool       **pools  = mem_pools->attrib_pools;
     const size_t               size   = (attrib_size < sizeof (void *))
                                       ? sizeof (void *)
                                       : attrib_size;
@@ -1265,19 +1265,19 @@ Parrot_gc_get_attribute_pool(PARROT_INTERP, size_t attrib_size)
            number of resizes. 8 is just an arbitrary number */
         pools = (PMC_Attribute_Pool **)mem_internal_allocate(total_size);
         memset(pools, 0, total_size);
-        arenas->attrib_pools = pools;
-        arenas->num_attribs = total_length;
+        mem_pools->attrib_pools = pools;
+        mem_pools->num_attribs = total_length;
     }
-    if (arenas->num_attribs <= idx) {
+    if (mem_pools->num_attribs <= idx) {
         const size_t total_length = idx + GC_ATTRIB_POOLS_HEADROOM;
         const size_t total_size   = total_length * sizeof (void *);
-        const size_t current_size = arenas->num_attribs;
+        const size_t current_size = mem_pools->num_attribs;
         const size_t diff         = total_length - current_size;
 
         pools = (PMC_Attribute_Pool **)mem_internal_realloc(pools, total_size);
         memset(pools + current_size, 0, diff * sizeof (void *));
-        arenas->attrib_pools = pools;
-        arenas->num_attribs = total_length;
+        mem_pools->attrib_pools = pools;
+        mem_pools->num_attribs = total_length;
     }
     if (pools[idx] == NULL)
         pools[idx] = Parrot_gc_create_attrib_pool(interp, size);

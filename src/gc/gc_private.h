@@ -139,13 +139,13 @@ typedef struct Variable_Size_Pool {
     FLOATVAL reclaim_factor; /* minimum percentage we will reclaim */
 } Variable_Size_Pool;
 
-typedef struct Fixed_Size_Obj_Arena {
+typedef struct Fixed_Size_Arena {
     size_t                     used;
     size_t                     total_objects;
-    struct Fixed_Size_Obj_Arena *prev;
-    struct Fixed_Size_Obj_Arena *next;
+    struct Fixed_Size_Arena *prev;
+    struct Fixed_Size_Arena *next;
     void                      *start_objects;
-} Fixed_Size_Obj_Arena;
+} Fixed_Size_Arena;
 
 typedef struct PMC_Attribute_Free_List {
     struct PMC_Attribute_Free_List * next;
@@ -180,7 +180,7 @@ typedef struct Fixed_Size_Pool {
     size_t start_arena_memory;
     size_t end_arena_memory;
 
-    Fixed_Size_Obj_Arena *last_Arena;
+    Fixed_Size_Arena *last_Arena;
     GC_MS_PObj_Wrapper * free_list;
     size_t num_free_objects;    /* number of resources in the free pool */
     size_t total_objects;
@@ -393,7 +393,7 @@ void mark_special(PARROT_INTERP, ARGIN(PMC *obj))
 
 void Parrot_add_to_free_list(PARROT_INTERP,
     ARGMOD(Fixed_Size_Pool *pool),
-    ARGMOD(Fixed_Size_Obj_Arena *arena))
+    ARGMOD(Fixed_Size_Arena *arena))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -402,7 +402,7 @@ void Parrot_add_to_free_list(PARROT_INTERP,
 
 void Parrot_append_arena_in_pool(PARROT_INTERP,
     ARGMOD(Fixed_Size_Pool *pool),
-    ARGMOD(Fixed_Size_Obj_Arena *new_arena),
+    ARGMOD(Fixed_Size_Arena *new_arena),
     size_t size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

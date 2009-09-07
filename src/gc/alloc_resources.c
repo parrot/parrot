@@ -339,7 +339,7 @@ compact_pool(PARROT_INTERP, ARGMOD(Variable_Size_Pool *pool))
     Memory_Block *new_block;     /* A pointer to our working block */
     char         *cur_spot;      /* Where we're currently copying to */
 
-    Fixed_Size_Obj_Arena *cur_buffer_arena;
+    Fixed_Size_Arena *cur_buffer_arena;
     Memory_Pools * const      mem_pools = interp->mem_pools;
 
     /* Bail if we're blocked */
@@ -803,7 +803,7 @@ check_fixed_size_obj_pool(ARGMOD(Fixed_Size_Pool * pool))
     ASSERT_ARGS(check_fixed_size_obj_pool)
     size_t total_objects;
     size_t last_free_list_count;
-    Fixed_Size_Obj_Arena * arena_walker;
+    Fixed_Size_Arena * arena_walker;
     size_t free_objects;
     PObj * object;
     size_t i;

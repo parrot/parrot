@@ -338,7 +338,7 @@ gc_ms_more_traceable_objects(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool))
     if (pool->skip)
         pool->skip = 0;
     else {
-        Fixed_Size_Obj_Arena * const arena = pool->last_Arena;
+        Fixed_Size_Arena * const arena = pool->last_Arena;
         if (arena
         &&  arena->used == arena->total_objects)
                 Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
@@ -411,7 +411,7 @@ gc_ms_get_free_object(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool))
     }
 
     if (!free_list) {
-        Fixed_Size_Obj_Arena * const arena = pool->last_Arena;
+        Fixed_Size_Arena * const arena = pool->last_Arena;
         ptr           = (PObj *)pool->newfree;
         pool->newfree = (void *)((char *)pool->newfree + pool->object_size);
         arena->used++;
@@ -463,8 +463,8 @@ gc_ms_alloc_objects(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool))
     ASSERT_ARGS(gc_ms_alloc_objects)
     /* Setup memory for the new objects */
 
-    Fixed_Size_Obj_Arena * const new_arena =
-        mem_internal_allocate_typed(Fixed_Size_Obj_Arena);
+    Fixed_Size_Arena * const new_arena =
+        mem_internal_allocate_typed(Fixed_Size_Arena);
 
     const size_t size = pool->object_size * pool->objects_per_alloc;
     size_t alloc_size;
