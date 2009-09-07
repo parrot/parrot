@@ -4711,6 +4711,13 @@ compile_or_load_file(PARROT_INTERP, ARGIN(STRING *path),
     ASSERT_ARGS(compile_or_load_file)
     char * const filename = Parrot_str_to_cstring(interp, path);
 
+    INTVAL regs_used[] = { 2, 2, 2, 2 }; /* Arbitrary values */
+    const int parrot_hll_id = 0;
+    PMC * context = Parrot_push_context(interp, regs_used);
+    Parrot_pcc_set_HLL(interp, context, parrot_hll_id);
+    Parrot_pcc_set_namespace(interp, context,
+            Parrot_get_HLL_namespace(interp, parrot_hll_id));
+
     if (file_type == PARROT_RUNTIME_FT_PBC) {
         PackFile * const pf = PackFile_append_pbc(interp, filename);
         Parrot_str_free_cstring(filename);
@@ -4738,6 +4745,8 @@ compile_or_load_file(PARROT_INTERP, ARGIN(STRING *path),
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
                 "compiler returned NULL ByteCode '%Ss' - %Ss", path, err);
     }
+
+    Parrot_pop_context(interp);
 }
 
 /*
