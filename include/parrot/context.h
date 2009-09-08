@@ -32,7 +32,7 @@
 
 /* Manually inlined macros. Used in optimised builds */
 
-#  define __C(c) (PMC_data_typed(c, Parrot_Context*))
+#  define __C(c) (PMC_data_typed((c), Parrot_Context*))
 
 #  define CTX_REG_NUM(p, x) (__C(p)->bp.regs_n[-1L - (x)])
 #  define CTX_REG_INT(p, x) (__C(p)->bp.regs_i[(x)])
