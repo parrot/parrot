@@ -488,7 +488,7 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(STRING *a),
 {
     ASSERT_ARGS(Parrot_str_concat)
     if (a && a->strlen) {
-	if (b && b->strlen) {
+        if (b && b->strlen) {
             const ENCODING *enc;
             const CHARSET  *cs = string_rep_compatible(interp, a, b, &enc);
             STRING         *result;
