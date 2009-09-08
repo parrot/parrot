@@ -1399,14 +1399,6 @@ do_thaw(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info))
 #else
         PARROT_ASSERT(must_have_seen);
 #endif
-        /*
-         * that's a duplicate
-         if (info->container){
-           if (interp->gc_sys->write_barrier){
-             Parrot_gc_write_barrier(interp, info->container, NULL, pmc);
-           }
-         }
-         */
         *info->thaw_ptr = pmc;
         return;
     }

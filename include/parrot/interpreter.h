@@ -195,7 +195,7 @@ struct parrot_interp_t {
     struct Memory_Pools *mem_pools;                /* Pointer to this interpreter's
                                                * arena */
 
-    struct GC_Subsystem *gc_sys;              /*functions and data specific 
+    struct GC_Subsystem *gc_sys;              /*functions and data specific
                                                   to current GC subsystem*/
 
     PMC *gc_registry;                         /* root set of registered PMCs */

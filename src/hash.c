@@ -1302,11 +1302,8 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
         bucket = bucket->next;
     }
 
-    if (bucket) {
-        if (hash->entry_type == enum_type_PMC && hash->container) {
-        }
+    if (bucket)
         bucket->value = value;
-    }
     else {
 
         bucket = hash->free_list;

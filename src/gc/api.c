@@ -198,40 +198,40 @@ Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
     /* TODO: Have each core register a ->pobject_lives function pointer in the
        Memory_Pools struct, and call that pointer directly instead of having a messy
        set of #if preparser conditions. */
-        
+
     /* if object is live or on free list return */
     if (PObj_is_live_or_free_TESTALL(obj))
         return;
 
-#  if ! DISABLE_GC_DEBUG
-#    if GC_VERBOSE
+#if ! DISABLE_GC_DEBUG
+#  if GC_VERBOSE
     if (CONSERVATIVE_POINTER_CHASING)
         fprintf(stderr, "GC Warning! Unanchored %s %p found in system areas \n",
                 PObj_is_PMC_TEST(obj) ? "PMC" : "Buffer", obj);
-    
-#    endif
+
 #  endif
+#endif
     /* mark it live */
     PObj_live_SET(obj);
-    
+
     /* if object is a PMC and contains buffers or PMCs, then attach the PMC
      * to the chained mark list. */
     if (PObj_is_PMC_TEST(obj)) {
         PMC * const p = (PMC *)obj;
-        
+
         if (PObj_is_special_PMC_TEST(obj))
             mark_special(interp, p);
-        
+
         else if (PMC_metadata(p))
             Parrot_gc_mark_PObj_alive(interp, (PObj*)PMC_metadata(p));
     }
-#  if GC_VERBOSE
+#if GC_VERBOSE
     /* buffer GC_DEBUG stuff */
     if (GC_DEBUG(interp) && PObj_report_TEST(obj))
         fprintf(stderr, "GC: buffer %p pointing to %p marked live\n",
                 obj, Buffer_bufstart((Buffer *)obj));
-#  endif
-    
+#endif
+
 }
 
 /*
@@ -265,11 +265,11 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
     interp->gc_sys = mem_allocate_zeroed_typed(GC_Subsystem);
 
     /*TODO: add ability to specify GC core at command line w/ --gc= */
-    if(0) /*If they chose sys_type with the --gc command line switch,*/
+    if (0) /*If they chose sys_type with the --gc command line switch,*/
         ; /* set sys_type to value they gave */
     else
         interp->gc_sys->sys_type = PARROT_GC_DEFAULT_TYPE;
-    
+
     /*Call appropriate initialization function for GC subsystem*/
     switch (interp->gc_sys->sys_type) {
       case MS:

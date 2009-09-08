@@ -311,17 +311,6 @@ int Parrot_gc_total_pmcs(PARROT_INTERP)
 int Parrot_gc_total_sized_buffers(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void  Parrot_gc_write_barrier(PARROT_INTERP, PMC *agg, PMC *old, PMC *new)
-        __attribute__nonnull__(1);
-
-void  Parrot_gc_write_barrier_key(PARROT_INTERP,
-    PMC *agg,
-    PMC *old,
-    PObj *old_key,
-    PMC *_new,
-    PObj *new_key)
-        __attribute__nonnull__(1);
-
 #define ASSERT_ARGS_Parrot_block_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_block_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -453,10 +442,6 @@ void  Parrot_gc_write_barrier_key(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_gc_total_pmcs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_total_sized_buffers __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_Parrot_gc_write_barrier __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_Parrot_gc_write_barrier_key __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/api.c */

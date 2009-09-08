@@ -350,7 +350,8 @@ member.
 
 =head4 Memory_Pools structure function pointers
 
-Each GC system declares 3 function pointers, stored in the Memory_Pools structure.
+Each GC system declares 3 function pointers, stored in the Memory_Pools 
+structure.
 
 =over 4
 

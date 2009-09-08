@@ -107,7 +107,7 @@ typedef struct GC_Subsystem {
     union {                     /* Holds system-specific data structures*/
         struct gc_gms_sys_data gms_data;
     } gc_sys_data;
- 
+
     /** Function hooks that each subsystem MUST provide */
     void (*do_gc_mark)(PARROT_INTERP, UINTVAL flags);
     void (*finalize_gc_system) (PARROT_INTERP);
@@ -175,7 +175,7 @@ typedef struct Fixed_Size_Pool {
     struct Variable_Size_Pool *mem_pool;
    /* Size in bytes of an individual pool item. This size may include
     * a GC-system specific GC header. (e.g. GMS headers) */
-    size_t object_size; 
+    size_t object_size;
 
     size_t start_arena_memory;
     size_t end_arena_memory;
@@ -192,10 +192,10 @@ typedef struct Fixed_Size_Pool {
     int skip;
     size_t replenish_level;
 
-    add_free_object_fn_type     add_free_object; /* adds a free object to 
+    add_free_object_fn_type     add_free_object; /* adds a free object to
                                                     the pool's free list  */
-    get_free_object_fn_type     get_free_object; /* gets and removes a free 
-                                                    object from the pool's 
+    get_free_object_fn_type     get_free_object; /* gets and removes a free
+                                                    object from the pool's
                                                     free list */
     alloc_objects_fn_type       alloc_objects;  /* allocates more objects */
     alloc_objects_fn_type       more_objects;
