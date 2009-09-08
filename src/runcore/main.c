@@ -34,6 +34,7 @@ have the same number of elements because there is a one-to-one mapping.
 
 #include "parrot/parrot.h"
 #include "parrot/runcore_api.h"
+#include "parrot/runcore_profiling.h"
 #include "parrot/oplib/core_ops.h"
 #include "parrot/oplib/core_ops_switch.h"
 #include "parrot/oplib/ops.h"

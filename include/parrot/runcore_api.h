@@ -12,9 +12,6 @@
 struct runcore_t;
 typedef struct runcore_t Parrot_runcore_t;
 
-struct profiling_runcore_t;
-typedef struct profiling_runcore_t Parrot_profiling_runcore_t;
-
 #include "parrot/parrot.h"
 #include "parrot/op.h"
 
@@ -38,39 +35,6 @@ struct runcore_t {
     INTVAL                   flags;
 };
 
-
-typedef enum Parrot_profiling_flags {
-    PROFILING_EXIT_CHECK_FLAG       = 1 << 0,
-    PROFILING_FIRST_LOOP_FLAG       = 1 << 1,
-    PROFILING_HAVE_PRINTED_CLI_FLAG = 1 << 2
-} Parrot_profiling_flags;
-
-struct profiling_runcore_t {
-    STRING                      *name;
-    int                          id;
-    oplib_init_f                 opinit;
-    Parrot_runcore_runops_fn_t   runops;
-    Parrot_runcore_destroy_fn_t  destroy;
-    Parrot_runcore_prepare_fn_t  prepare_run;
-    INTVAL                       flags;
-
-    /* end of common members */
-    UHUGEINTVAL     runcore_start;
-    UHUGEINTVAL     op_start;
-    UHUGEINTVAL     op_finish;
-    UHUGEINTVAL     runcore_finish;
-    INTVAL          profiling_flags;
-    INTVAL          runloop_count;
-    FILE           *profile_fd;
-    STRING         *profile_filename;
-    PMC            *prev_sub;
-    Parrot_Context *prev_ctx;
-    UINTVAL         level;      /* how many nested runloops */
-    UINTVAL         time_size;  /* how big is the following array */
-    UHUGEINTVAL    *time;       /* time spent between DO_OP and start/end of a runcore */
-};
-
-
 typedef enum Parrot_runcore_flags {
     RUNCORE_REENTRANT_FLAG    = 1 << 0,
     RUNCORE_FUNC_TABLE_FLAG   = 1 << 1,
@@ -80,34 +44,6 @@ typedef enum Parrot_runcore_flags {
     RUNCORE_JIT_OPS_FLAG      = 1 << 5
 } Parrot_runcore_flags;
 
-
-#define Profiling_flag_SET(runcore, flag) \
-    ((runcore)->profiling_flags |= flag)
-#define Profiling_flag_TEST(runcore, flag) \
-    ((runcore)->profiling_flags & flag)
-#define Profiling_flag_CLEAR(runcore, flag) \
-    ((runcore)->profiling_flags &= ~(flag))
-
-#define Profiling_exit_check_TEST(o) \
-    Profiling_flag_TEST(o, PROFILING_EXIT_CHECK_FLAG)
-#define Profiling_exit_check_SET(o) \
-    Profiling_flag_SET(o, PROFILING_EXIT_CHECK_FLAG)
-#define Profiling_exit_check_CLEAR(o) \
-    Profiling_flag_CLEAR(o, PROFILING_EXIT_CHECK_FLAG)
-
-#define Profiling_first_loop_TEST(o) \
-    Profiling_flag_TEST(o, PROFILING_FIRST_LOOP_FLAG)
-#define Profiling_first_loop_SET(o) \
-    Profiling_flag_SET(o, PROFILING_FIRST_LOOP_FLAG)
-#define Profiling_first_loop_CLEAR(o) \
-    Profiling_flag_CLEAR(o, PROFILING_FIRST_LOOP_FLAG)
-
-#define Profiling_have_printed_cli_TEST(o) \
-    Profiling_flag_TEST(o, PROFILING_HAVE_PRINTED_CLI_FLAG)
-#define Profiling_have_printed_cli_SET(o) \
-    Profiling_flag_SET(o, PROFILING_HAVE_PRINTED_CLI_FLAG)
-#define Profiling_have_printed_cli_CLEAR(o) \
-    Profiling_flag_CLEAR(o, PROFILING_HAVE_PRINTED_CLI_FLAG)
 
 #define Runcore_flag_SET(runcore, flag) \
     ((runcore)->flags |= flag)
@@ -235,12 +171,6 @@ void runops_int(PARROT_INTERP, size_t offset)
 /* HEADERIZER BEGIN: src/runcore/cores.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_CAN_RETURN_NULL
-void * destroy_profiling_core(PARROT_INTERP,
-    ARGIN(Parrot_profiling_runcore_t *runcore))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 oplib_init_f get_core_op_lib_init(PARROT_INTERP,
@@ -287,9 +217,6 @@ void Parrot_runcore_gc_debug_init(PARROT_INTERP)
 void Parrot_runcore_jit_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void Parrot_runcore_profiling_init(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 void Parrot_runcore_slow_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -299,9 +226,6 @@ void Parrot_runcore_switch_init(PARROT_INTERP)
 void Parrot_runcore_switch_jit_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_destroy_profiling_core __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(runcore)
 #define ASSERT_ARGS_get_core_op_lib_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(runcore)
@@ -329,8 +253,6 @@ void Parrot_runcore_switch_jit_init(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_runcore_gc_debug_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_runcore_jit_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_Parrot_runcore_profiling_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_runcore_slow_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)

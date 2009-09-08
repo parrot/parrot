@@ -459,6 +459,7 @@ INTERP_O_FILES := \
     $(SRC_DIR)/pmc$(O) \
     $(SRC_DIR)/runcore/main$(O)  \
     $(SRC_DIR)/runcore/cores$(O) \
+    $(SRC_DIR)/runcore/profiling$(O) \
     $(SRC_DIR)/scheduler$(O) \
     $(SRC_DIR)/spf_render$(O) \
     $(SRC_DIR)/spf_vtable$(O) \
@@ -636,6 +637,7 @@ STR_FILES := \
     $(SRC_DIR)/pmc_freeze.str \
     $(SRC_DIR)/oo.str \
     $(SRC_DIR)/runcore/cores.str \
+    $(SRC_DIR)/runcore/profiling.str \
     $(SRC_DIR)/scheduler.str \
     $(SRC_DIR)/spf_render.str \
     $(SRC_DIR)/spf_vtable.str \
@@ -1146,6 +1148,9 @@ $(SRC_DIR)/extend$(O) : $(GENERAL_H_FILES) $(INC_DIR)/extend.h \
 
 $(SRC_DIR)/runcore/main$(O) : $(SRC_DIR)/runcore/main.c $(GENERAL_H_FILES) \
 	$(SRC_DIR)/pmc/pmc_parrotlibrary.h
+
+$(SRC_DIR)/runcore/profiling$(O) : $(SRC_DIR)/runcore/profiling.str $(GENERAL_H_FILES) \
+	$(SRC_DIR)/pmc/pmc_sub.h
 
 $(SRC_DIR)/call/pcc$(O) : $(SRC_DIR)/call/pcc.c $(GENERAL_H_FILES) \
 	$(SRC_DIR)/call/pcc.str $(SRC_DIR)/pmc/pmc_fixedintegerarray.h \
