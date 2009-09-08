@@ -38,6 +38,8 @@ have the same number of elements because there is a one-to-one mapping.
 #include "parrot/oplib/core_ops.h"
 #include "parrot/oplib/core_ops_switch.h"
 #include "parrot/oplib/ops.h"
+#include "main.str"
+
 #if JIT_CAPABLE
 #  include "parrot/exec.h"
 #  include "../jit.h"
@@ -126,9 +128,14 @@ void
 Parrot_runcore_init(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_runcore_init)
+#ifdef NDEBUG
+    STRING * const default_core = CONST_STRING(interp, "slow");
+#else
+    STRING * const default_core = CONST_STRING(interp, "fast");
+#endif
 
-    interp->cores     = NULL;
-    interp->num_cores = 0;
+    interp->cores        = NULL;
+    interp->num_cores    = 0;
 
     Parrot_runcore_slow_init(interp);
     Parrot_runcore_fast_init(interp);
@@ -141,6 +148,9 @@ Parrot_runcore_init(PARROT_INTERP)
     Parrot_runcore_debugger_init(interp);
 
     Parrot_runcore_profiling_init(interp);
+
+    /* set the default runcore */
+    Parrot_runcore_switch(interp, default_core);
 
 #ifdef HAVE_COMPUTED_GOTO
     Parrot_runcore_cgp_init(interp);

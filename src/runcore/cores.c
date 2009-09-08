@@ -430,9 +430,6 @@ Parrot_runcore_slow_init(PARROT_INTERP)
     PARROT_RUNCORE_FUNC_TABLE_SET(coredata);
 
     Parrot_runcore_register(interp, coredata);
-
-    /* it's the first runcore and the default runcore */
-    Parrot_runcore_switch(interp, coredata->name);
 }
 
 
