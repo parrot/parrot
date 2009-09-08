@@ -6,12 +6,14 @@
     .local int argc
     argc = argv
     .local pmc N
-    N = new 'Integer'
-    N = 24
     if argc <= 1 goto noarg
     $S0 = argv[1]
     N = $S0
 noarg:
+    N = new 'Integer'
+    N = 24
+    goto begin
+begin:
     .local num start
     time start
 
@@ -51,13 +53,10 @@ rec:
     .local pmc n2
     .local pmc r1
     .local pmc r2
-    n1 = new 'Integer'
-    n2 = new 'Integer'
     n1 = n - 1
     n2 = n - 2
     r1 = self."fibA"(n1)
     r2 = self."fibB"(n2)
-    n = new 'Integer'
     n = r1 + r2
     .return (n)
 .end
@@ -71,13 +70,10 @@ rec:
     .local pmc n2
     .local pmc r1
     .local pmc r2
-    n1 = new 'Integer'
-    n2 = new 'Integer'
     n1 = n - 1
     n2 = n - 2
     r1 = self."fib"(n1)
     r2 = self."fibB"(n2)
-    n = new 'Integer'
     n = r1 + r2
     .return (n)
 .end
@@ -93,13 +89,10 @@ rec:
     .local pmc n2
     .local pmc r1
     .local pmc r2
-    n1 = new 'Integer'
-    n2 = new 'Integer'
     n1 = n - 1
     n2 = n - 2
     r1 = self."fib"(n1)
     r2 = self."fibA"(n2)
-    n = new 'Integer'
     n = r1 + r2
     .return (n)
 .end
