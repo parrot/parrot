@@ -17,8 +17,6 @@ Parrot.
 #define PARROT_GC_PRIVATE_H_GUARD
 
 #include "parrot/settings.h"
-#include "generational_ms.h"
-
 
 #if ! DISABLE_GC_DEBUG
 /* Set when walking the system stack. Defined in src/gc/system.c */
@@ -96,17 +94,13 @@ typedef struct GC_MS_PObj_Wrapper {
 
 typedef enum _gc_sys_type_enum {
     MS,  /*mark and sweep*/
-    IMS, /*incremental mark and sweep*/
-    GMS, /*generational mark and sweep*/
     INF /*infinite memory core*/
 } gc_sys_type_enum;
 
 typedef struct GC_Subsystem {
-    gc_sys_type_enum sys_type;  /* Which GC subsystem are we using? */
-
-    union {                     /* Holds system-specific data structures*/
-        struct gc_gms_sys_data gms_data;
-    } gc_sys_data;
+    /* Which GC subsystem are we using? See PARROT_GC_DEFAULT_TYPE in
+     * include/parrot/settings.h for possible values */
+    gc_sys_type_enum sys_type;
 
     /** Function hooks that each subsystem MUST provide */
     void (*do_gc_mark)(PARROT_INTERP, UINTVAL flags);
@@ -117,6 +111,11 @@ typedef struct GC_Subsystem {
      *These will be called via the GC API functions Parrot_gc_func_name
      *e.g. read barrier && write barrier hooks can go here later ...*/
 
+    /* Holds system-specific data structures
+     * unused right now, but this is where it should go if we need them ...
+      union {
+      } gc_private;
+     */
 } GC_Subsystem;
 
 typedef struct Memory_Block {
@@ -174,7 +173,7 @@ typedef struct Fixed_Size_Pool {
 
     struct Variable_Size_Pool *mem_pool;
    /* Size in bytes of an individual pool item. This size may include
-    * a GC-system specific GC header. (e.g. GMS headers) */
+    * a GC-system specific GC header. */
     size_t object_size;
 
     size_t start_arena_memory;
@@ -201,10 +200,11 @@ typedef struct Fixed_Size_Pool {
     alloc_objects_fn_type       more_objects;
     gc_object_fn_type           gc_object;
 
-    /*Contains GC system-specific data structures*/
+    /* Contains GC system-specific data structures ... unused at the moment,
+     * but this is where it should go when we need it ...
     union {
-        struct gc_gms_smallobjpool_data *gms; /*generational mark and sweep*/
-    } gc_sys_priv_data;
+    } gc_private;
+    */
 
 #if GC_USE_LAZY_ALLOCATOR
     void *newfree;

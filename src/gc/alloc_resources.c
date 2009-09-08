@@ -217,8 +217,7 @@ mem_allocate(PARROT_INTERP, size_t size, ARGMOD(Variable_Size_Pool *pool))
         &&   interp->mem_pools->mem_allocs_since_last_collect) {
             Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 
-            if ((interp->gc_sys->sys_type != IMS) &&
-                (interp->gc_sys->sys_type != INF)) {
+            if (interp->gc_sys->sys_type != INF) {
                 /* Compact the pool if allowed and worthwhile */
                 if (pool->compact) {
                     /* don't bother reclaiming if it's only a small amount */

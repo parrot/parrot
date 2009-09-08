@@ -275,12 +275,6 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
       case MS:
         Parrot_gc_ms_init(interp);
         break;
-      case IMS:
-        Parrot_gc_ims_init(interp);
-        break;
-      case GMS:
-        Parrot_gc_gms_init(interp);
-        break;
       case INF:
         Parrot_gc_inf_init(interp);
         break;

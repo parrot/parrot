@@ -35,42 +35,11 @@
 #endif /* DISABLE_GC_DEBUG */
 
 /*
- * GC_SUBSYSTEM selection
- * 0 ... MS  stop-the-world mark & sweep
- * 1 ... IMS incremental mark & sweep
- * 2 ... GMS generational mark & sweep
- * 3 ... INF infinite memory "collector"
- *
- * Please note that only 0 and 3 currently work (and INF doesn't really
- * "work").
+ * GC_DEFAULT_TYPE selection
+ * MS  -- stop-the-world mark & sweep
+ * INF -- infinite memory "collector"
  */
 #define PARROT_GC_DEFAULT_TYPE MS
-#define PARROT_GC_SUBSYSTEM 0
-
-#if PARROT_GC_SUBSYSTEM == 0
-#  define PARROT_GC_MS      1
-#  define PARROT_GC_IMS     0
-#  define PARROT_GC_GMS     0
-#  define PARROT_GC_INF     0
-#endif
-#if PARROT_GC_SUBSYSTEM == 1
-#  define PARROT_GC_MS      0
-#  define PARROT_GC_IMS     1
-#  define PARROT_GC_GMS     0
-#  define PARROT_GC_INF     0
-#endif
-#if PARROT_GC_SUBSYSTEM == 2
-#  define PARROT_GC_MS      0
-#  define PARROT_GC_IMS     0
-#  define PARROT_GC_GMS     1
-#  define PARROT_GC_INF     0
-#endif
-#if PARROT_GC_SUBSYSTEM == 3
-#  define PARROT_GC_MS      0
-#  define PARROT_GC_IMS     0
-#  define PARROT_GC_GMS     0
-#  define PARROT_GC_INF     1
-#endif
 
 /*
  * JIT/i386 can use the CGP run core for external functions instead
