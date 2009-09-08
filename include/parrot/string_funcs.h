@@ -523,18 +523,6 @@ const char* string_primary_encoding_for_representation(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-const CHARSET * string_rep_compatible(SHIM_INTERP,
-    ARGIN(const STRING *a),
-    ARGIN(const STRING *b),
-    ARGOUT(const ENCODING **e))
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*e);
-
-PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 char * string_to_cstring_nullable(SHIM_INTERP,
@@ -725,10 +713,6 @@ STRING* Parrot_str_from_uint(PARROT_INTERP,
 #define ASSERT_ARGS_string_primary_encoding_for_representation \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_string_rep_compatible __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(a) \
-    || PARROT_ASSERT_ARG(b) \
-    || PARROT_ASSERT_ARG(e)
 #define ASSERT_ARGS_string_to_cstring_nullable __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_Parrot_str_from_int_base __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \

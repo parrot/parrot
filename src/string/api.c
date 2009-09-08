@@ -48,9 +48,24 @@ static void make_writable(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*s);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static const CHARSET * string_rep_compatible(SHIM_INTERP,
+    ARGIN(const STRING *a),
+    ARGIN(const STRING *b),
+    ARGOUT(const ENCODING **e))
+	__attribute__nonnull__(2)
+	__attribute__nonnull__(3)
+	__attribute__nonnull__(4)
+	FUNC_MODIFIES(*e);
+
 #define ASSERT_ARGS_make_writable __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(s)
+#define ASSERT_ARGS_string_rep_compatible __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(a) \
+    || PARROT_ASSERT_ARG(b) \
+    || PARROT_ASSERT_ARG(e)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -378,8 +393,8 @@ Parrot_str_new_noinit(PARROT_INTERP,
 
 /*
 
-=item C<const CHARSET * string_rep_compatible(PARROT_INTERP, const STRING *a,
-const STRING *b, const ENCODING **e)>
+=item C<static const CHARSET * string_rep_compatible(PARROT_INTERP, const STRING
+*a, const STRING *b, const ENCODING **e)>
 
 Find the "lowest" possible charset and encoding for the given string. E.g.
 
@@ -392,10 +407,9 @@ Returs NULL, if no compatible string representation can be found.
 
 */
 
-PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-const CHARSET *
+static const CHARSET *
 string_rep_compatible(SHIM_INTERP,
     ARGIN(const STRING *a), ARGIN(const STRING *b), ARGOUT(const ENCODING **e))
 {
@@ -406,8 +420,8 @@ string_rep_compatible(SHIM_INTERP,
     }
 
     /* a table could possibly simplify the logic */
-    if (a->encoding == Parrot_utf8_encoding_ptr &&
-            b->charset == Parrot_ascii_charset_ptr) {
+    if (a->encoding == Parrot_utf8_encoding_ptr
+    &&  b->charset == Parrot_ascii_charset_ptr) {
         if (a->strlen == a->bufused) {
             *e = Parrot_fixed_8_encoding_ptr;
             return b->charset;
@@ -415,8 +429,9 @@ string_rep_compatible(SHIM_INTERP,
         *e = a->encoding;
         return a->charset;
     }
-    if (b->encoding == Parrot_utf8_encoding_ptr &&
-            a->charset == Parrot_ascii_charset_ptr) {
+
+    if (b->encoding == Parrot_utf8_encoding_ptr
+    &&  a->charset == Parrot_ascii_charset_ptr) {
         if (b->strlen == b->bufused) {
             *e = Parrot_fixed_8_encoding_ptr;
             return a->charset;
@@ -424,11 +439,15 @@ string_rep_compatible(SHIM_INTERP,
         *e = b->encoding;
         return b->charset;
     }
+
     if (a->encoding != b->encoding)
         return NULL;
+
     if (a->encoding != Parrot_fixed_8_encoding_ptr)
         return NULL;
+
     *e = Parrot_fixed_8_encoding_ptr;
+
     if (a->charset == b->charset)
         return a->charset;
     if (b->charset == Parrot_ascii_charset_ptr)
@@ -439,8 +458,10 @@ string_rep_compatible(SHIM_INTERP,
         return a->charset;
     if (b->charset == Parrot_binary_charset_ptr)
         return b->charset;
+
     return NULL;
 }
+
 
 /*
 
@@ -464,8 +485,8 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(STRING *a),
             ARGIN_NULLOK(STRING *b), UINTVAL Uflags)
 {
     ASSERT_ARGS(Parrot_str_concat)
-    if (a != NULL && a->strlen != 0) {
-        if (b != NULL && b->strlen != 0) {
+    if (a && a->strlen) {
+	if (b && b->strlen) {
             const ENCODING *enc;
             const CHARSET  *cs = string_rep_compatible(interp, a, b, &enc);
             STRING         *result;
@@ -536,6 +557,7 @@ Parrot_str_append(PARROT_INTERP, ARGMOD_NULLOK(STRING *a), ARGIN_NULLOK(STRING *
         return Parrot_str_concat(interp, a, b, 0);
 
     cs = string_rep_compatible(interp, a, b, &enc);
+
     if (cs) {
         a->charset  = cs;
         a->encoding = enc;
