@@ -416,9 +416,6 @@ static void visit_todo_list_thaw(PARROT_INTERP,
 #  define FREEZE_ASCII 0
 #endif
 
-/* normal freeze can use next_for_GC ptrs or a seen hash */
-#define FREEZE_USE_NEXT_FOR_GC 0
-
 /* when thawing a string longer then this size, we first do a GC run and then
  * block GC - the system can't give us more headers */
 
@@ -1385,20 +1382,8 @@ do_thaw(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info))
 
         /* else maybe VTABLE_thaw ... but there is no other extra stuff */
 
-#if FREEZE_USE_NEXT_FOR_GC
-        /*
-         * the next_for_GC method doesn't keep track of repeated scalars
-         * and such, as these are lacking the next_for_GC pointer, so
-         * these are just duplicated with their data.
-         * But we track these when thawing, so that we don't create dups
-         */
-        if (!must_have_seen) {
-            /* so we must consume the bytecode */
-            VTABLE_thaw(interp, pmc, info);
-        }
-#else
         PARROT_ASSERT(must_have_seen);
-#endif
+
         /*
          * that's a duplicate
          if (info->container)
@@ -1431,92 +1416,6 @@ do_thaw(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info))
     list_assign(interp, (List *)PMC_data(info->id_list), id, pmc, enum_type_PMC);
     /* remember nested aggregates depth first */
     list_unshift(interp, (List *)PMC_data(info->todo), pmc, enum_type_PMC);
-}
-
-
-/*
-
-=item C<static UINTVAL id_from_pmc(PARROT_INTERP, PMC* pmc)>
-
-Finds a PMC in an arena and returns an id (left-shifted 2 bits), based on its
-position.
-
-If not found, throws an exception.
-
-=cut
-
-*/
-
-static UINTVAL
-id_from_pmc(PARROT_INTERP, ARGIN(PMC* pmc))
-{
-    ASSERT_ARGS(id_from_pmc)
-    return Parrot_gc_get_pmc_index(interp, pmc) << 2;
-}
-
-
-/*
-
-=item C<static void add_pmc_next_for_GC(PARROT_INTERP, PMC *pmc, visit_info
-*info)>
-
-Remembers the PMC for later processing.
-
-=cut
-
-*/
-
-static void
-add_pmc_next_for_GC(SHIM_INTERP, ARGIN(PMC *pmc), ARGOUT(visit_info *info))
-{
-    ASSERT_ARGS(add_pmc_next_for_GC)
-    PMC_next_for_GC(info->mark_ptr) = pmc;
-    info->mark_ptr                  = PMC_next_for_GC(pmc) = pmc;
-
-}
-
-
-/*
-
-=item C<static int next_for_GC_seen(PARROT_INTERP, PMC *pmc, visit_info *info,
-UINTVAL *id)>
-
-Remembers next child to visit via the C<next_for_GC pointer>. Generates a
-unique ID per PMC and freezes the ID (not the PMC address) so that in thaw, the
-hash-lookup can be replaced by an array lookup.
-
-=cut
-
-*/
-
-PARROT_INLINE
-static int
-next_for_GC_seen(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
-        ARGIN(visit_info *info), ARGOUT(UINTVAL *id))
-{
-    ASSERT_ARGS(next_for_GC_seen)
-    int seen = 0;
-
-    if (PMC_IS_NULL(pmc)) {
-        *id = 0;
-        return 1;
-    }
-
-    /* already seen? */
-    if (!PMC_IS_NULL(PMC_next_for_GC(pmc))) {
-        seen = 1;
-        goto skip;
-    }
-
-    /* put pmc at the end of the list */
-    PMC_next_for_GC(info->mark_ptr) = pmc;
-
-    /* make end self-referential */
-    info->mark_ptr = PMC_next_for_GC(pmc) = pmc;
-
-skip:
-    *id = id_from_pmc(interp, pmc);
-    return seen;
 }
 
 
@@ -1584,42 +1483,6 @@ todo_list_seen(PARROT_INTERP, ARGIN(PMC *pmc), ARGMOD(visit_info *info),
 
 /*
 
-=item C<static void visit_next_for_GC(PARROT_INTERP, PMC* pmc, visit_info*
-info)>
-
-C<visit_child> callbacks:
-
-Checks if the PMC was seen.  If not, generates an ID for it.
-
-=cut
-
-*/
-
-static void
-visit_next_for_GC(PARROT_INTERP, ARGIN(PMC* pmc), ARGIN(visit_info* info))
-{
-    ASSERT_ARGS(visit_next_for_GC)
-    UINTVAL   id;
-    const int seen = next_for_GC_seen(interp, pmc, info, &id);
-    UNUSED(seen);
-
-    Parrot_ex_throw_from_c_args(interp, NULL, 1, "todo convert to depth first");
-    /* do_action(interp, pmc, info, seen, id); UNCOMMENT WHEN TODO IS DONE*/
-    /*
-     * TODO probe for class methods that override the default.
-     * To avoid overhead, we could have an array[class_enums]
-     * which (after first find_method) has a bit, if a user
-     * callback is there.
-     */
-    /* UNCOMMENT WHEN TODO IS DONE
-    if (!seen)
-        (info->visit_action)(interp, pmc, info);
-    */
-}
-
-
-/*
-
 =item C<static void visit_todo_list(PARROT_INTERP, PMC* pmc, visit_info* info)>
 
 Checks the seen PMC via the todo list.
@@ -1667,34 +1530,6 @@ visit_todo_list_thaw(PARROT_INTERP, ARGIN_NULLOK(PMC* old), ARGIN(visit_info* in
 {
     ASSERT_ARGS(visit_todo_list_thaw)
     do_thaw(interp, old, info);
-}
-
-
-/*
-
-=item C<static void visit_loop_next_for_GC(PARROT_INTERP, PMC *current,
-visit_info *info)>
-
-Put first item on todo list, then run as long as there are items to be
-done.
-
-=cut
-
-*/
-
-static void
-visit_loop_next_for_GC(PARROT_INTERP, ARGIN(PMC *current),
-        ARGIN(visit_info *info))
-{
-    ASSERT_ARGS(visit_loop_next_for_GC)
-    PMC *prev = NULL;
-    visit_next_for_GC(interp, current, info);
-
-    while (current != prev) {
-        VTABLE_visit(interp, current, info);
-        prev    = current;
-        current = PMC_next_for_GC(current);
-    }
 }
 
 
@@ -1900,48 +1735,6 @@ run_thaw(PARROT_INTERP, ARGIN(STRING* image), visit_enum_type what)
 
 =over 4
 
-=item C<STRING* Parrot_freeze_at_destruct(PARROT_INTERP, PMC* pmc)>
-
-This function must not consume any resources (except the image itself).  It
-uses the C<next_for_GC> pointer, so it's not reentrant and must not be
-interrupted by a GC run.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-STRING*
-Parrot_freeze_at_destruct(PARROT_INTERP, ARGIN(PMC* pmc))
-{
-    ASSERT_ARGS(Parrot_freeze_at_destruct)
-    visit_info info;
-
-    Parrot_block_GC_mark(interp);
-    Parrot_gc_cleanup_next_for_GC(interp);
-
-    info.what            = VISIT_FREEZE_AT_DESTRUCT;
-    info.mark_ptr        = pmc;
-    info.thaw_ptr        = NULL;
-    info.visit_pmc_now   = visit_next_for_GC;
-    info.visit_pmc_later = add_pmc_next_for_GC;
-
-    create_image(interp, pmc, &info);
-    ft_init(interp, &info);
-
-    visit_loop_next_for_GC(interp, pmc, &info);
-
-    Parrot_unblock_GC_mark(interp);
-    PackFile_destroy(interp, info.image_io->pf);
-    mem_sys_free(info.image_io);
-    return info.image;
-}
-
-
-/*
-
 =item C<STRING* Parrot_freeze(PARROT_INTERP, PMC *pmc)>
 
 Freeze using either method.
@@ -1957,13 +1750,6 @@ STRING*
 Parrot_freeze(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_freeze)
-#if FREEZE_USE_NEXT_FOR_GC
-    ASSERT_ARGS(Parrot_freeze)
-    /*
-     * we could do a GC run here before, to free resources
-     */
-    return Parrot_freeze_at_destruct(interp, pmc);
-#else
     /*
      * freeze using a todo list and seen hash
      * Please note that both have to be PMCs, so that trace_system_stack
@@ -1980,7 +1766,6 @@ Parrot_freeze(PARROT_INTERP, ARGIN(PMC *pmc))
     PackFile_destroy(interp, info.image_io->pf);
     mem_sys_free(info.image_io);
     return info.image;
-#endif
 }
 
 
