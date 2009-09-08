@@ -38,13 +38,6 @@ C<STRING> with a vtable.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void add_pmc_next_for_GC(SHIM_INTERP,
-    ARGIN(PMC *pmc),
-    ARGOUT(visit_info *info))
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*info);
-
 static void add_pmc_todo_list(PARROT_INTERP,
     ARGIN_NULLOK(PMC *pmc),
     ARGIN(visit_info *info))
@@ -86,20 +79,6 @@ static void freeze_pmc(PARROT_INTERP,
 static void ft_init(PARROT_INTERP, ARGIN(visit_info *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
-
-static UINTVAL id_from_pmc(PARROT_INTERP, ARGIN(PMC* pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_INLINE
-static int next_for_GC_seen(PARROT_INTERP,
-    ARGIN_NULLOK(PMC *pmc),
-    ARGIN(visit_info *info),
-    ARGOUT(UINTVAL *id))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*id);
 
 static void op_append(PARROT_INTERP,
     ARGIN(STRING *s),
@@ -253,24 +232,10 @@ static int todo_list_seen(PARROT_INTERP,
         FUNC_MODIFIES(*info)
         FUNC_MODIFIES(*id);
 
-static void visit_loop_next_for_GC(PARROT_INTERP,
-    ARGIN(PMC *current),
-    ARGIN(visit_info *info))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
 static void visit_loop_todo_list(PARROT_INTERP,
     ARGIN_NULLOK(PMC *current),
     ARGIN(visit_info *info))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
-static void visit_next_for_GC(PARROT_INTERP,
-    ARGIN(PMC* pmc),
-    ARGIN(visit_info* info))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 static void visit_todo_list(PARROT_INTERP,
@@ -285,9 +250,6 @@ static void visit_todo_list_thaw(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-#define ASSERT_ARGS_add_pmc_next_for_GC __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pmc) \
-    || PARROT_ASSERT_ARG(info)
 #define ASSERT_ARGS_add_pmc_todo_list __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(info)
@@ -306,13 +268,6 @@ static void visit_todo_list_thaw(PARROT_INTERP,
 #define ASSERT_ARGS_ft_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(info)
-#define ASSERT_ARGS_id_from_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pmc)
-#define ASSERT_ARGS_next_for_GC_seen __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(info) \
-    || PARROT_ASSERT_ARG(id)
 #define ASSERT_ARGS_op_append __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(s)
@@ -389,16 +344,8 @@ static void visit_todo_list_thaw(PARROT_INTERP,
     || PARROT_ASSERT_ARG(pmc) \
     || PARROT_ASSERT_ARG(info) \
     || PARROT_ASSERT_ARG(id)
-#define ASSERT_ARGS_visit_loop_next_for_GC __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(current) \
-    || PARROT_ASSERT_ARG(info)
 #define ASSERT_ARGS_visit_loop_todo_list __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(info)
-#define ASSERT_ARGS_visit_next_for_GC __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pmc) \
     || PARROT_ASSERT_ARG(info)
 #define ASSERT_ARGS_visit_todo_list __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
