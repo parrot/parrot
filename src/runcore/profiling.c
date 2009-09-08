@@ -197,7 +197,7 @@ ARGIN(opcode_t *pc))
     /* if we're in a nested runloop, */
     if (runcore->level != 0) {
 
-        if (runcore->level > runcore->time_size) {
+        if (runcore->level >= runcore->time_size) {
             runcore->time_size *= 2;
             runcore->time =
                 mem_realloc_n_typed(runcore->time, runcore->time_size+1, UHUGEINTVAL);
