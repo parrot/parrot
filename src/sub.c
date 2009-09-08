@@ -166,6 +166,7 @@ Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub_pmc))
             return res;
         }
     }
+    return NULL;
 }
 
 /*
