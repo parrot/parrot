@@ -48,16 +48,17 @@ static void make_writable(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*s);
 
+PARROT_INLINE
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static const CHARSET * string_rep_compatible(SHIM_INTERP,
     ARGIN(const STRING *a),
     ARGIN(const STRING *b),
     ARGOUT(const ENCODING **e))
-	__attribute__nonnull__(2)
-	__attribute__nonnull__(3)
-	__attribute__nonnull__(4)
-	FUNC_MODIFIES(*e);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*e);
 
 #define ASSERT_ARGS_make_writable __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
@@ -407,6 +408,7 @@ Returs NULL, if no compatible string representation can be found.
 
 */
 
+PARROT_INLINE
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static const CHARSET *
