@@ -38,7 +38,8 @@ Returns the Parrot string value of the element at index C<key>.
     VTABLE STRING *get_string_keyed_int(INTVAL key) {
 
         STRING **str_array;
-        INTVAL size = SELF.elements();
+	INTVAL size;
+	GET_ATTR_size(interp, SELF, size);
 
         if (key < 0) {
             if (key < -size)
@@ -72,7 +73,8 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
     VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
 
         STRING **str_array;
-        INTVAL size = SELF.elements();
+	INTVAL   size;
+	GET_ATTR_size(interp, SELF, size);
 
         if (key < 0) {
             if (key < -size)
@@ -102,7 +104,8 @@ the array.
 */
 
     VTABLE void push_string(STRING *value) {
-        INTVAL next_idx = SELF.elements();
+	INTVAL next_idx;
+	GET_ATTR_size(interp, SELF, next_idx);
         SELF.set_string_keyed_int(next_idx, value);
     }
 
@@ -117,8 +120,9 @@ Removes and returns the last element in the array.
 */
 
     VTABLE STRING *pop_string() {
-        INTVAL  size = SELF.elements();
         STRING *value;
+	INTVAL  size;
+	GET_ATTR_size(interp, SELF, size);
 
         if (size == 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
@@ -214,7 +218,8 @@ Resizes the array to C<size> elements.
         else if (new_size <= resize_threshold) {
             /* zero out anything that was previously allocated
              * if we're growing the array */
-            INTVAL old_size = SELF.elements();
+	    INTVAL old_size;
+	    GET_ATTR_size(interp, SELF, old_size);
             if (new_size > old_size) {
                 INTVAL i;
                 for (i = old_size; i < new_size; i++)
@@ -261,8 +266,10 @@ Creates and returns a copy of the array.
 
     VTABLE PMC *clone() {
         PMC *copy = SUPER();
+	INTVAL size;
+	GET_ATTR_size(interp, SELF, size);
         /* copy trimmed extra space */
-        SET_ATTR_resize_threshold(INTERP, copy, SELF.elements());
+	SET_ATTR_resize_threshold(INTERP, copy, size);
         return copy;
     }
 
@@ -277,8 +284,9 @@ Removes and returns an item from the start of the array.
 */
 
     VTABLE STRING *shift_string() {
-        INTVAL  size = SELF.elements();
         STRING *value;
+	INTVAL  size;
+	GET_ATTR_size(interp, SELF, size);
 
         if (size == 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
