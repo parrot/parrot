@@ -19,15 +19,14 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(75)
+    plan(76)
     test_setting_array_size()
     test_assign_from_another()
     test_assign_self()
     test_assign_non_array()
     test_resize_exception()
     test_truthiness()
-    # This test currently makes Parrot dump core
-    # test_tt991()
+    test_tt991()
     test_setting_first_elem()
     test_setting_second_elem()
     test_negative_index()
@@ -529,7 +528,7 @@ CODE
 .end
 
 .sub test_tt991
-    throws_like(<<'CODE',':s invalid size','invalid size')
+    throws_like(<<'CODE',':s FixedPMCArray\: Cannot set array size to a negative number','cannot create a negative length array')
         .sub main
             new $P0, ['FixedPMCArray']
             set $P0, -1

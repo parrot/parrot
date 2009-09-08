@@ -366,6 +366,10 @@ array.
         if (!size)
             return;
 
+        if (size < 0)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                    _("FixedPMCArray: Cannot set array size to a negative number"));
+
         PMC_size(SELF) = size;
         data           = mem_allocate_n_typed(size, PMC *);
 
