@@ -992,8 +992,10 @@ Checks if the ascii STRING C<str> is just an integer.
         PMC   * const ret    = SUPER();
 
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        /* prevent wrong garbage collection */
-        PObj_is_shared_SET(str_val);
+        if (!STRING_IS_NULL(str_val)) {
+            /* prevent wrong garbage collection */
+            PObj_is_shared_SET(str_val);
+        }
         return ret;
     }
 
