@@ -40,7 +40,7 @@
 #  ifdef _MSC_VER
 #    define __attribute__noreturn__         __declspec(noreturn)
 #  else
-#    if __clang__
+#    ifdef __clang__
 #      define __attribute__noreturn__         __attribute__((analyzer_noreturn))
 #    else
 #      define __attribute__noreturn__         __attribute__((__noreturn__))
