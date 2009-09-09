@@ -92,30 +92,6 @@ static void op_check_size(PARROT_INTERP, ARGIN(STRING *s), size_t len)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void push_ascii_integer(PARROT_INTERP, ARGIN(IMAGE_IO *io), INTVAL v)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void push_ascii_number(PARROT_INTERP,
-    ARGIN(const IMAGE_IO *io),
-    FLOATVAL v)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void push_ascii_pmc(PARROT_INTERP,
-    ARGIN(IMAGE_IO *io),
-    ARGIN(const PMC* v))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-static void push_ascii_string(PARROT_INTERP,
-    ARGIN(IMAGE_IO *io),
-    ARGIN(const STRING *s))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
 static void push_opcode_integer(PARROT_INTERP,
     ARGIN(IMAGE_IO *io),
     INTVAL v)
@@ -150,23 +126,6 @@ static PMC* run_thaw(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static INTVAL shift_ascii_integer(SHIM_INTERP, ARGIN(IMAGE_IO *io))
-        __attribute__nonnull__(2);
-
-static FLOATVAL shift_ascii_number(SHIM_INTERP, ARGIN(IMAGE_IO *io))
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PMC* shift_ascii_pmc(SHIM_INTERP, ARGIN(IMAGE_IO *io))
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static STRING* shift_ascii_string(PARROT_INTERP, ARGIN(IMAGE_IO *io))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static INTVAL shift_opcode_integer(SHIM_INTERP, ARGIN(IMAGE_IO *io))
         __attribute__nonnull__(2);
 
@@ -184,15 +143,6 @@ PARROT_CANNOT_RETURN_NULL
 static STRING* shift_opcode_string(PARROT_INTERP, ARGIN(IMAGE_IO *io))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
-
-static void str_append(PARROT_INTERP,
-    ARGMOD(STRING *s),
-    ARGIN(const void *b),
-    size_t len)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*s);
 
 PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
@@ -274,20 +224,6 @@ static void visit_todo_list_thaw(PARROT_INTERP,
 #define ASSERT_ARGS_op_check_size __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(s)
-#define ASSERT_ARGS_push_ascii_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(io)
-#define ASSERT_ARGS_push_ascii_number __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(io)
-#define ASSERT_ARGS_push_ascii_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(io) \
-    || PARROT_ASSERT_ARG(v)
-#define ASSERT_ARGS_push_ascii_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(io) \
-    || PARROT_ASSERT_ARG(s)
 #define ASSERT_ARGS_push_opcode_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(io)
@@ -305,15 +241,6 @@ static void visit_todo_list_thaw(PARROT_INTERP,
 #define ASSERT_ARGS_run_thaw __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(image)
-#define ASSERT_ARGS_shift_ascii_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(io)
-#define ASSERT_ARGS_shift_ascii_number __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(io)
-#define ASSERT_ARGS_shift_ascii_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(io)
-#define ASSERT_ARGS_shift_ascii_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(io)
 #define ASSERT_ARGS_shift_opcode_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(io)
 #define ASSERT_ARGS_shift_opcode_number __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -324,10 +251,6 @@ static void visit_todo_list_thaw(PARROT_INTERP,
 #define ASSERT_ARGS_shift_opcode_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(io)
-#define ASSERT_ARGS_str_append __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(s) \
-    || PARROT_ASSERT_ARG(b)
 #define ASSERT_ARGS_thaw_create_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(info)
@@ -356,311 +279,13 @@ static void visit_todo_list_thaw(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-/*
- * define this to 1 for testing. TODO: 1 is broken.
- */
-#ifndef FREEZE_ASCII
-#  define FREEZE_ASCII 0
-#endif
-
 /* when thawing a string longer then this size, we first do a GC run and then
  * block GC - the system can't give us more headers */
 
 #define THAW_BLOCK_GC_SIZE 100000
 
 /* preallocate freeze image for aggregates with this estimation */
-#if FREEZE_ASCII
-#  define FREEZE_BYTES_PER_ITEM 17
-#else
-#  define FREEZE_BYTES_PER_ITEM 9
-#endif
-
-/*
-
-=head2 Image Stream Functions
-
-=over 4
-
-=item C<static void str_append(PARROT_INTERP, STRING *s, const void *b, size_t
-len)>
-
-Appends C<len> bytes from buffer C<*b> to string C<*s>.
-
-Plain ascii - for testing only:
-
-For speed reasons we mess around with the string buffers directly.
-
-No encoding of strings, no transcoding.
-
-=cut
-
-*/
-
-static void
-str_append(PARROT_INTERP, ARGMOD(STRING *s), ARGIN(const void *b), size_t len)
-{
-    ASSERT_ARGS(str_append)
-
-    const size_t used      = s->bufused;
-    const int    need_free = (int)Buffer_buflen(s) - used - len;
-
-    /* grow by factor 1.5 or such */
-    if (need_free <= 16) {
-        size_t new_size = (size_t) (Buffer_buflen(s) * 1.5);
-        if (new_size < Buffer_buflen(s) - need_free + 512)
-            new_size = Buffer_buflen(s) - need_free + 512;
-
-        Parrot_gc_reallocate_string_storage(interp, s, new_size);
-        PARROT_ASSERT(Buffer_buflen(s) - used - len >= 15);
-    }
-
-    mem_sys_memcopy((void *)((ptrcast_t)s->strstart + used), b, len);
-
-    s->bufused += len;
-    s->strlen  += len;
-}
-
-
-/*
-
-=item C<static void push_ascii_integer(PARROT_INTERP, IMAGE_IO *io, INTVAL v)>
-
-Pushes an ASCII version of the integer C<v> onto the end of the C<*io>
-"stream".
-
-=cut
-
-*/
-
-static void
-push_ascii_integer(PARROT_INTERP, ARGIN(IMAGE_IO *io), INTVAL v)
-{
-    ASSERT_ARGS(push_ascii_integer)
-    char buffer[20];
-    const size_t len = snprintf(buffer, sizeof (buffer), "%d ", (int) v);
-    str_append(interp, io->image, buffer, len);
-}
-
-
-/*
-
-=item C<static void push_ascii_number(PARROT_INTERP, const IMAGE_IO *io,
-FLOATVAL v)>
-
-Pushes an ASCII version of the number C<v> onto the end of the C<*io>
-"stream".
-
-=cut
-
-*/
-
-static void
-push_ascii_number(PARROT_INTERP, ARGIN(const IMAGE_IO *io), FLOATVAL v)
-{
-    ASSERT_ARGS(push_ascii_number)
-    char buffer[40];
-    const size_t len = snprintf(buffer, sizeof (buffer), "%g ", (double) v);
-    str_append(interp, io->image, buffer, len);
-}
-
-
-/*
-
-=item C<static void push_ascii_string(PARROT_INTERP, IMAGE_IO *io, const STRING
-*s)>
-
-Pushes an ASCII version of the string C<*s> onto the end of the C<*io>
-"stream".
-
-For testing only - no encodings and such.
-
-XXX no string delimiters - so no space allowed.
-
-=cut
-
-*/
-
-static void
-push_ascii_string(PARROT_INTERP, ARGIN(IMAGE_IO *io), ARGIN(const STRING *s))
-{
-    ASSERT_ARGS(push_ascii_string)
-    const UINTVAL length = Parrot_str_byte_length(interp, s);
-
-    /* XXX Why 4?  What does that mean? */
-    char  * const buffer = mem_allocate_n_typed(4 * length, char);
-    char         *cursor = buffer;
-    UINTVAL       idx    = 0;
-
-    /* temporary--write out in UTF-8 */
-    for (idx = 0; idx < length; ++idx) {
-        *cursor++ = (unsigned char)Parrot_str_indexed(interp, s, idx);
-    }
-
-    str_append(interp, io->image, buffer, cursor - buffer);
-    str_append(interp, io->image, " ", 1);
-
-    mem_sys_free(buffer);
-}
-
-
-/*
-
-=item C<static void push_ascii_pmc(PARROT_INTERP, IMAGE_IO *io, const PMC* v)>
-
-Pushes an ASCII version of the PMC C<*v> onto the end of the C<*io>
-"stream".
-
-=cut
-
-*/
-
-static void
-push_ascii_pmc(PARROT_INTERP, ARGIN(IMAGE_IO *io), ARGIN(const PMC* v))
-{
-    ASSERT_ARGS(push_ascii_pmc)
-    char buffer[20];
-    const size_t len = snprintf(buffer, sizeof (buffer), "%p ", (const void *)v);
-    str_append(interp, io->image, buffer, len);
-}
-
-
-/*
-
-=item C<static INTVAL shift_ascii_integer(PARROT_INTERP, IMAGE_IO *io)>
-
-Removes and returns an integer from the start of the C<*io> "stream".
-
-=cut
-
-*/
-
-static INTVAL
-shift_ascii_integer(SHIM_INTERP, ARGIN(IMAGE_IO *io))
-{
-    ASSERT_ARGS(shift_ascii_integer)
-
-    char * const start = (char *)io->image->strstart;
-    char        *p     = start;
-    const INTVAL i     = strtoul(p, &p, 10);
-
-    ++p;
-    PARROT_ASSERT(p <= start + io->image->bufused);
-
-    io->image->strstart = p;
-    io->image->bufused -= (p - start);
-    io->image->strlen  -= (p - start);
-
-    PARROT_ASSERT((int)io->image->bufused >= 0);
-
-    return i;
-}
-
-
-/*
-
-=item C<static FLOATVAL shift_ascii_number(PARROT_INTERP, IMAGE_IO *io)>
-
-Removes and returns an number from the start of the C<*io> "stream".
-
-=cut
-
-*/
-
-static FLOATVAL
-shift_ascii_number(SHIM_INTERP, ARGIN(IMAGE_IO *io))
-{
-    ASSERT_ARGS(shift_ascii_number)
-
-    char * const   start = (char *)io->image->strstart;
-    char          *p     = start;
-    const FLOATVAL f     = (FLOATVAL) strtod(p, &p);
-
-    ++p;
-    PARROT_ASSERT(p <= start + io->image->bufused);
-
-    io->image->strstart = p;
-    io->image->bufused -= (p - start);
-    io->image->strlen  -= (p - start);
-
-    PARROT_ASSERT((int)io->image->bufused >= 0);
-
-    return f;
-}
-
-
-/*
-
-=item C<static STRING* shift_ascii_string(PARROT_INTERP, IMAGE_IO *io)>
-
-Removes and returns an string from the start of the C<*io> "stream".
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static STRING*
-shift_ascii_string(PARROT_INTERP, ARGIN(IMAGE_IO *io))
-{
-    ASSERT_ARGS(shift_ascii_string)
-    STRING *s;
-
-    char * const start = (char *)io->image->strstart;
-    char        *p     = start;
-
-    while (*p != ' ')
-        ++p;
-
-    ++p;
-    PARROT_ASSERT(p <= start + io->image->bufused);
-
-    io->image->strstart = p;
-    io->image->bufused -= (p - start);
-    io->image->strlen  -= (p - start);
-
-    PARROT_ASSERT((int)io->image->bufused >= 0);
-    /* probably should be UTF-8 */
-    s = string_make(interp, start, p - start - 1, "iso-8859-1", 0);
-
-    return s;
-}
-
-
-/*
-
-=item C<static PMC* shift_ascii_pmc(PARROT_INTERP, IMAGE_IO *io)>
-
-Removes and returns a PMC from the start of the C<*io> "stream".
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PMC*
-shift_ascii_pmc(SHIM_INTERP, ARGIN(IMAGE_IO *io))
-{
-    ASSERT_ARGS(shift_ascii_pmc)
-
-    char * const        start = (char *)io->image->strstart;
-    char               *p     = start;
-    const unsigned long i     = strtoul(p, &p, 16);
-
-    ++p;
-
-    PARROT_ASSERT(p <= start + io->image->bufused);
-
-    io->image->strstart = p;
-    io->image->bufused -= (p - start);
-    io->image->strlen  -= (p - start);
-
-    PARROT_ASSERT((int)io->image->bufused >= 0);
-
-    return (PMC *)i;
-}
-
+#define FREEZE_BYTES_PER_ITEM 9
 
 /*
 
@@ -956,18 +581,6 @@ shift_opcode_string(PARROT_INTERP, ARGIN(IMAGE_IO *io))
  * TODO add read/write header functions, e.g. vtable->init_pmc
  */
 
-#if FREEZE_ASCII
-static image_funcs ascii_funcs = {
-    push_ascii_integer,
-    push_ascii_pmc,
-    push_ascii_string,
-    push_ascii_number,
-    shift_ascii_integer,
-    shift_ascii_pmc,
-    shift_ascii_string,
-    shift_ascii_number
-};
-#else
 static image_funcs opcode_funcs = {
     push_opcode_integer,
     push_opcode_pmc,
@@ -978,7 +591,6 @@ static image_funcs opcode_funcs = {
     shift_opcode_string,
     shift_opcode_number
 };
-#endif
 
 /*
 
