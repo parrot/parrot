@@ -129,6 +129,10 @@ Marks the continuation as live.
     VTABLE void mark() {
         Parrot_Continuation_attributes * const cc = PARROT_CONTINUATION(SELF);
 
+        /* If Continuation wasn't fully constructed yet */
+        if (!cc)
+            return;
+
         if (cc->seg)
             Parrot_gc_mark_PObj_alive(interp, (PObj *)cc->seg);
         if (cc->to_ctx)
