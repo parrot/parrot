@@ -289,8 +289,6 @@ static void visit_todo_list_thaw(PARROT_INTERP,
 
 /*
 
-=back
-
 =head2 C<opcode_t> IO Functions
 
 =over 4
