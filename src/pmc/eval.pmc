@@ -185,6 +185,12 @@ Invokes the first subroutine in the eval code.
             return;
         }
 
+        /* Quick and dirty fix for TT #995 */
+        if (cur_cs == interp->initial_pf) {
+            SUPER();
+            return;
+        }
+
         /* RT#46685 create PF API, move it there */
         seg = (PackFile_Segment *)cur_cs->const_table;
         if (seg)
