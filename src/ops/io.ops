@@ -445,7 +445,15 @@ op stat(out INT, in INT, in INT) {
 
 seek:
 Set file position to offset $2 on IO stream $1. 'whence' is
-indicated by the value in $3.
+indicated by the value in $3. The valid values for 'whence' are:
+
+ Value      Meaning
+ 0          Seek from the beginning of the file
+ 1          Seek from the current position
+ 2          Seek from the end of the file
+
+[ Note: the above values for 'whence' is just an educated guess
+at this point ]
 
 =item B<seek>(invar PMC, in INT, in INT, in INT)
 
