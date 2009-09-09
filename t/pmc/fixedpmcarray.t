@@ -302,15 +302,34 @@ out-of-bounds test. Checks INT and PMC keys.
 .end
 
 .sub test_get_repr
-    .local pmc fpa, n
+    .local string s, aux
+    s = get_repr_fpa_n(0)
+    aux = get_repr_fpa_n(1)
+    concat s, aux
+    aux = get_repr_fpa_n(2)
+    concat s, aux
+    aux = get_repr_fpa_n(3)
+    concat s, aux
+    like(s,'\(\)\(0\)\(0\,\s*1\)\(0\,\s*1\,\s*2\)','get_repr')
+.end
+
+.sub get_repr_fpa_n
+    .param int n
+    .local int i
+    .local pmc fpa, p
     .local string s
     fpa = new ['FixedPMCArray']
-    fpa = 2
-    n = box 1
-    fpa[0] = n
-    fpa[1] = n
+    fpa = n
+    i = 0
+next:
+    if i == n goto done
+    p = box i
+    fpa[i] = p
+    inc i
+    goto next
+done:
     s = get_repr fpa
-    like(s,'1\,\s*1','get_repr')
+    .return(s)
 .end
 
 .sub test_splice_oob
