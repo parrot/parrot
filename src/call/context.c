@@ -1055,7 +1055,8 @@ create_initial_context(PARROT_INTERP)
 
 /*
 
-=item C<Parrot_Context* get_context_struct_fast(PARROT_INTERP, PMC *ctx)>
+=item C<static Parrot_Context * get_context_struct_fast(PARROT_INTERP, PMC
+*ctx)>
 
 Fetches Parrot_Context from Context PMC.  This is a static, inlineable function
 so it only works within this file.  It also only works if you *know* that ctx
