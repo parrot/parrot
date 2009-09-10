@@ -195,8 +195,7 @@ extern struct mallinfo mallinfo(void);
 
 =item C<INTVAL interpinfo(PARROT_INTERP, INTVAL what)>
 
-C<what> specifies the type of information you want about the
-interpreter.
+C<what> specifies the type of information you want about the interpreter.
 
 =cut
 
@@ -283,6 +282,7 @@ interpinfo(PARROT_INTERP, INTVAL what)
             break;
         }
         default:        /* or a warning only? */
+            ret = -1;
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                 "illegal argument in interpinfo");
     }
