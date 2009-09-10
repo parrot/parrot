@@ -9,7 +9,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 67;
+use Parrot::Test tests => 68;
 use Parrot::Config;
 
 =head1 NAME
@@ -1589,6 +1589,47 @@ bar
 bazsubid
 OUTPUT
 
+pir_output_is( <<'CODE', <<'OUTPUT', 'Thaw PIR subclass', todo => 'See TT#132' );
+.sub main :main
+
+  $P0 = get_class 'Sub'
+  $P1 = subclass $P0, 'myProc'
+
+  .local pmc pirC
+  pirC = compreg 'PIR'
+
+  .local string code
+  code = <<"END_CODE"
+
+.sub bar
+  say "hi"
+.end
+END_CODE
+
+  .local pmc compiled
+  compiled = pirC(code)
+  compiled = compiled[0] # just want the first executable sub here.
+
+  compiled() # works
+
+  .local pmc sub
+  sub = new 'myProc'
+  assign sub, compiled
+  sub() # works
+
+  $S0 = freeze sub
+  say "frozen"
+  $P2 = thaw $S0
+  say "thawed"
+  $P2()
+.end
+CODE
+hi
+hi
+frozen
+thawed
+hi
+OUTPUT
 
 # Local Variables:
 #   mode: cperl
