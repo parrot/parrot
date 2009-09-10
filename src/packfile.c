@@ -4808,6 +4808,8 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
             PARROT_LIB_PATH_INCLUDE);
     Parrot_lib_add_path(interp, Parrot_str_append(interp, found_path, CONST_STRING(interp, "dynext/")),
             PARROT_LIB_PATH_DYNEXT);
+    Parrot_lib_add_path(interp, Parrot_str_append(interp, found_path, CONST_STRING(interp, "library/")),
+            PARROT_LIB_PATH_LIBRARY);
 
 
     /* Check if the file found was actually a bytecode file (.pbc extension) or
