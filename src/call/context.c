@@ -224,13 +224,14 @@ Get reference to constants.
 =cut
 
 */
+
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 struct PackFile_Constant **
 Parrot_pcc_constants(PARROT_INTERP, ARGIN(PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_constants)
-    return ((Parrot_Context*)(VTABLE_get_pointer(interp, ctx)))->constants;
+    return get_context_struct_fast(interp, ctx)->constants;
 }
 
 
@@ -1137,10 +1138,12 @@ static void
 init_context(PARROT_INTERP, ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
 {
     ASSERT_ARGS(init_context)
-    Parrot_Context *ctx = get_context_struct_fast(interp, pmcctx);
+    Parrot_Context *ctx    = get_context_struct_fast(interp, pmcctx);
 
-    /* pmcold may be null, so use the maybe null case */
-    Parrot_Context *old = Parrot_pcc_get_context_struct(interp, pmcold);
+    /* pmcold may be null */
+    Parrot_Context *old    = PMC_IS_NULL(pmcold)
+                           ? NULL
+                           : get_context_struct_fast(interp, pmcold);
 
     ctx->current_results   = NULL;
     ctx->results_signature = NULL;
