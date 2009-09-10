@@ -190,6 +190,7 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(PMC *ctx),
     ASSERT_ARGS(Parrot_Context_get_info)
     PMC                   *subpmc;
     Parrot_Sub_attributes *sub;
+    opcode_t              *pc;
 
     /* set file/line/pc defaults */
     info->file     = CONST_STRING(interp, "(unknown file)");
@@ -228,15 +229,17 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(PMC *ctx),
         info->fullname = Parrot_full_sub_name(interp, subpmc);
     }
 
+    pc = Parrot_pcc_get_pc(interp, ctx);
+
     /* return here if there is no current pc */
-    if (Parrot_pcc_get_pc(interp, ctx) == NULL)
+    if (!pc)
         return 1;
 
     /* calculate the current pc */
-    info->pc = Parrot_pcc_get_pc(interp, ctx) - sub->seg->base.data;
+    info->pc = pc - sub->seg->base.data;
 
     /* determine the current source file/line */
-    if (Parrot_pcc_get_pc(interp, ctx)) {
+    if (pc) {
         const size_t offs = info->pc;
         size_t i, n;
         opcode_t *pc = sub->seg->base.data;
@@ -261,6 +264,7 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(PMC *ctx),
             pc += op_info->op_count + var_args;
         }
     }
+
     return 1;
 }
 
