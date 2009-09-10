@@ -44,8 +44,15 @@ Sort this array, optionally using the provided cmp_func
     METHOD sort(PMC *cmp_func :optional) {
         const INTVAL n = SELF.elements();
 
-        if (n > 1)
-           Parrot_quicksort(interp, (void **)PMC_array(SELF), n, cmp_func);
+        if (n > 1) {
+           /* XXX Workaround for TT #218 */
+           if (PObj_is_object_TEST(SELF)) {
+              PMC *parent = SELF.get_attr_str(CONST_STRING(interp, "proxy"));
+              Parrot_pcc_invoke_method_from_c_args(interp, parent, CONST_STRING(interp, "sort"), "P->", cmp_func);
+           }
+           else
+               Parrot_quicksort(interp, (void **)PMC_array(SELF), n, cmp_func);
+        }
     }
 
 /*
