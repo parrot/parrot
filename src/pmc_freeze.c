@@ -616,11 +616,7 @@ ft_init(PARROT_INTERP, ARGIN(visit_info *info))
     info->image_io         = mem_allocate_typed(IMAGE_IO);
     info->image_io->image  = s = info->image;
 
-#if FREEZE_ASCII
-    info->image_io->vtable = &ascii_funcs;
-#else
     info->image_io->vtable = &opcode_funcs;
-#endif
 
     pf = info->image_io->pf = PackFile_new(interp, 0);
 
