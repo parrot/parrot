@@ -238,7 +238,7 @@ END
 $returns_accessors
 END
 
-    my $returns_sig  = make_arg_pmc($returns_flags, '_return_sig');
+        my $returns_sig  = make_arg_pmc($returns_flags, '_return_sig');
 
         $e->emit( <<"END", __FILE__, __LINE__ + 1 );
     /*END GENERATED ACCESSORS */
