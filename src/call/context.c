@@ -1066,8 +1066,8 @@ function.
 
 =cut
 
-
 */
+
 
 PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
