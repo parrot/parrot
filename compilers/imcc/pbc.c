@@ -1213,8 +1213,8 @@ create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub_pmc),
 
                     PMC_get_sub(interp, sub_pmc, sub);
                     IMCC_debug(interp, DEBUG_PBC_CONST,
-                            "add lexical '%s' to sub name '%s'\n",
-                            n->name, (char*)sub->name->strstart);
+                            "add lexical '%s' to sub name '%Ss'\n",
+                            n->name, sub->name);
 
                     Parrot_PCCINVOKE(interp, lex_info,
                             string_from_literal(interp, "declare_lex_preg"),
@@ -1255,6 +1255,7 @@ find_outer(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
     subs_t      *s;
     PMC         *current;
     STRING      *cur_name;
+    char        *cur_name_str;
     Parrot_Sub_attributes *sub;
     size_t      len;
 
@@ -1289,10 +1290,13 @@ find_outer(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
     PMC_get_sub(interp, current, sub);
     cur_name = sub->name;
 
-    if (cur_name->strlen == len
-    && (memcmp((char*)cur_name->strstart, unit->outer->name, len) == 0))
+    cur_name_str = Parrot_str_to_cstring(interp,  sub->name);
+    if (strlen(cur_name_str) == len
+    && (memcmp(cur_name_str, unit->outer->name, len) == 0)) {
+        Parrot_str_free_cstring(cur_name_str);
         return current;
-
+    }
+    Parrot_str_free_cstring(cur_name_str);
     return NULL;
 }
 
@@ -1511,14 +1515,13 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
         PMC_get_sub(interp, sub->outer_sub, outer_sub);
 
     IMCC_debug(interp, DEBUG_PBC_CONST,
-            "add_const_pmc_sub '%s' flags %x color %d (%s) "
-            "lex_info %s :outer(%s)\n",
+            "add_const_pmc_sub '%s' flags %x color %d (%Ss) "
+            "lex_info %s :outer(%Ss)\n",
             r->name, r->pcc_sub->pragma, k,
-            (char *) sub_pmc->vtable->whoami->strstart,
+            sub_pmc->vtable->whoami,
             sub->lex_info ? "yes" : "no",
-            sub->outer_sub ?
-                (char *)outer_sub->name->strstart :
-                "*none*");
+            sub->outer_sub? outer_sub->name :
+            Parrot_str_new(interp, "*none*", 0));
 
     /*
      * create entry in our fixup (=symbol) table
