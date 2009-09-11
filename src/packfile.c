@@ -2201,12 +2201,24 @@ directory_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
     PackFile_Directory * const dir = (PackFile_Directory *)self;
     size_t i;
 
-    for (i = 0; i < dir->num_segments; i++)
-        PackFile_Segment_destroy(interp, dir->segments[i]);
+    for (i = 0; i < dir->num_segments; i++) {
+        PackFile_Segment *segment = dir->segments[i];
+        /* Prevent repeated destruction */
+        dir->segments[i] = NULL;
+
+        /* XXX Black magic here.
+         * There are some failures that looks like a segment directory
+         * inserted into another. Until that problems gets fixed,
+         * these checks are a workaround.
+         */
+        if (segment && segment != self && segment->type != PF_DIR_SEG)
+            PackFile_Segment_destroy(interp, segment);
+    }
 
     if (dir->segments) {
         mem_sys_free(dir->segments);
         dir->segments = NULL;
+	dir->num_segments = 0;
     }
 }
 

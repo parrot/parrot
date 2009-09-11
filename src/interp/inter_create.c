@@ -400,6 +400,12 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     /* copies of constant tables */
     Parrot_destroy_constants(interp);
 
+    destroy_runloop_jump_points(interp);
+
+    /* packfile */
+    if (interp->initial_pf)
+        PackFile_destroy(interp, interp->initial_pf);
+
     /* buffer headers, PMCs */
     Parrot_gc_destroy_header_pools(interp);
 
@@ -412,12 +418,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 
     /* cache structure */
     destroy_object_cache(interp);
-
-    /* packfile */
-    if (interp->initial_pf)
-        PackFile_destroy(interp, interp->initial_pf);
-
-    destroy_runloop_jump_points(interp);
 
     if (interp->evc_func_table) {
         mem_sys_free(interp->evc_func_table);
