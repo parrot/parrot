@@ -1316,7 +1316,7 @@ To create a new class C<Foo> which has no parent classes:
 
 =begin PIR_FRAGMENT
 
-   $P0 = newclass, "Foo"
+   $P0 = newclass "Foo"
 
 =end PIR_FRAGMENT
 
