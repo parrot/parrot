@@ -282,11 +282,14 @@ number.
 */
 
 INTVAL
-Parrot_Sub_get_line_from_pc(PARROT_INTERP, ARGIN(PMC *subpmc), ARGIN(opcode_t *pc))
+Parrot_Sub_get_line_from_pc(PARROT_INTERP, ARGIN_NULLOK(PMC *subpmc), ARGIN_NULLOK(opcode_t *pc))
 {
     ASSERT_ARGS(Parrot_Sub_get_line_from_pc)
     Parrot_Sub_attributes *sub;
     int                    position;
+
+    if (!subpmc || !pc)
+        return -1;
 
     PMC_get_sub(interp, subpmc, sub);
     position = pc - sub->seg->base.data;
@@ -309,12 +312,16 @@ name.
 
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_Sub_get_filename_from_pc(PARROT_INTERP, ARGIN(PMC *subpmc), ARGIN(opcode_t *pc))
+Parrot_Sub_get_filename_from_pc(PARROT_INTERP, ARGIN_NULLOK(PMC *subpmc),
+        ARGIN_NULLOK(opcode_t *pc))
 {
     ASSERT_ARGS(Parrot_Sub_get_filename_from_pc)
     Parrot_Sub_attributes *sub;
     PackFile_Debug        *debug;
     int                    position;
+
+    if (!subpmc || !pc)
+        return CONST_STRING(interp, "unknown file");
 
     PMC_get_sub(interp, subpmc, sub);
 

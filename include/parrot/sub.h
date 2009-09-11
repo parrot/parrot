@@ -250,18 +250,14 @@ PMC* Parrot_find_pad(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_Sub_get_filename_from_pc(PARROT_INTERP,
-    ARGIN(PMC *subpmc),
-    ARGIN(opcode_t *pc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+    ARGIN_NULLOK(PMC *subpmc),
+    ARGIN_NULLOK(opcode_t *pc))
+        __attribute__nonnull__(1);
 
 INTVAL Parrot_Sub_get_line_from_pc(PARROT_INTERP,
-    ARGIN(PMC *subpmc),
-    ARGIN(opcode_t *pc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+    ARGIN_NULLOK(PMC *subpmc),
+    ARGIN_NULLOK(opcode_t *pc))
+        __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_new_ret_continuation_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
@@ -305,13 +301,9 @@ INTVAL Parrot_Sub_get_line_from_pc(PARROT_INTERP,
     || PARROT_ASSERT_ARG(ctx)
 #define ASSERT_ARGS_Parrot_Sub_get_filename_from_pc \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(subpmc) \
-    || PARROT_ASSERT_ARG(pc)
+       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_Sub_get_line_from_pc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(subpmc) \
-    || PARROT_ASSERT_ARG(pc)
+       PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/sub.c */
 

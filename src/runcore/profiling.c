@@ -191,7 +191,6 @@ ARGIN(opcode_t *pc))
     opcode_t           *preop_pc;
     STRING             *unknown_file = CONST_STRING(interp, "<unknown file>");
     UHUGEINTVAL         op_time;
-    Parrot_Context_info preop_info, postop_info;
 
     runcore->runcore_start = Parrot_hires_get_time();
 
@@ -210,8 +209,6 @@ ARGIN(opcode_t *pc))
         runcore->time[runcore->level] =
              runcore->runcore_start - runcore->op_start;
     }
-
-    Parrot_Context_get_info(interp, CURRENT_CONTEXT(interp), &postop_info);
 
     argv = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_ARGV_LIST);
 
@@ -256,17 +253,22 @@ ARGIN(opcode_t *pc))
     }
 
     while (pc) {
-        STRING         *postop_file_name;
-        Parrot_Context *preop_ctx;
+        STRING         		*postop_filename;
+        Parrot_Context 		*preop_ctx;
+        INTVAL              preop_line;
+        Parrot_Context_info preop_info;
 
         if (pc < code_start || pc >= code_end)
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
                     "attempt to access code outside of current code segment");
 
-        /* avoid an extra call to Parrot_Context_get_info */
-        mem_sys_memcopy(&preop_info, &postop_info, sizeof (Parrot_Context_info));
+        /* Parrot_Sub_get_line_from_pc doesn't return the same line numbers as
+         * Parrot_Context_get_info, so keep both around to make it easy to see
+         * when they're equivalnet. */
+        Parrot_Context_get_info(interp, CURRENT_CONTEXT(interp), &preop_info);
+        preop_line = Parrot_Sub_get_line_from_pc(interp,
+                Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp)), pc);
 
-        Parrot_Context_get_info(interp, CURRENT_CONTEXT(interp), &postop_info);
 
         CONTEXT(interp)->current_pc = pc;
         preop_sub                   = CONTEXT(interp)->current_sub;
@@ -289,10 +291,8 @@ ARGIN(opcode_t *pc))
             op_time = runcore->op_finish - runcore->op_start;
 
         runcore->level--;
-        postop_file_name = postop_info.file;
-
-        if (!postop_file_name)
-            postop_file_name = unknown_file;
+        postop_filename = Parrot_Sub_get_filename_from_pc(interp,
+                Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp)), pc);
 
         /* if current context changed since the last printing of a CS line... */
         /* Occasionally the ctx stays the same while the sub changes, possible
@@ -307,7 +307,7 @@ ARGIN(opcode_t *pc))
 
                 GETATTR_Sub_name(interp, preop_ctx->current_sub, sub_name);
                 sub_cstr      = Parrot_str_to_cstring(interp, sub_name);
-                filename_cstr = Parrot_str_to_cstring(interp, postop_file_name);
+                filename_cstr = Parrot_str_to_cstring(interp, postop_filename);
                 ns_cstr       = Parrot_str_to_cstring(interp,
                                     VTABLE_get_string(interp,
                                         preop_ctx->current_namespace));
@@ -326,13 +326,11 @@ ARGIN(opcode_t *pc))
             runcore->prev_sub = preop_ctx->current_sub;
         }
 
-        /* I'd expect that preop_info.line would be the right thing to use here
-         * but it gives me obviously incorrect results while postop_info.line
-         * works.  It might be an imcc bug or it might just be me
-         * misunderstanding something. */
+        /* chnage preop_info.line to preop_line to check if
+         * Parrot_Sub_get_line_from_pc dtrt/ */
         fprintf(runcore->profile_fd,
             "OP:{x{line:%d}x}{x{time:%li}x}{x{op:%s}x}\n",
-            postop_info.line, (unsigned long)op_time,
+            (int)preop_info.line, (unsigned long)op_time,
             (interp->op_info_table)[*preop_pc].name);
     }
 
