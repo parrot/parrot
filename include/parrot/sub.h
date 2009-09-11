@@ -250,7 +250,7 @@ PMC* Parrot_find_pad(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_Sub_get_filename_from_pc(PARROT_INTERP,
-    ARGIN(PMC *sub),
+    ARGIN(PMC *subpmc),
     ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -306,7 +306,7 @@ INTVAL Parrot_Sub_get_line_from_pc(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_Sub_get_filename_from_pc \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(sub) \
+    || PARROT_ASSERT_ARG(subpmc) \
     || PARROT_ASSERT_ARG(pc)
 #define ASSERT_ARGS_Parrot_Sub_get_line_from_pc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \

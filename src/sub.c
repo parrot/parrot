@@ -296,7 +296,7 @@ Parrot_Sub_get_line_from_pc(PARROT_INTERP, ARGIN(PMC *subpmc), ARGIN(opcode_t *p
 
 /*
 
-=item C<STRING * Parrot_Sub_get_filename_from_pc(PARROT_INTERP, PMC *sub,
+=item C<STRING * Parrot_Sub_get_filename_from_pc(PARROT_INTERP, PMC *subpmc,
 opcode_t *pc)>
 
 Given a PMC sub and the current opcode, returns the corresponding PIR file
