@@ -2218,7 +2218,7 @@ directory_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
     if (dir->segments) {
         mem_sys_free(dir->segments);
         dir->segments = NULL;
-	dir->num_segments = 0;
+        dir->num_segments = 0;
     }
 }
 

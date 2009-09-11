@@ -187,7 +187,7 @@ Invokes the first subroutine in the eval code.
 
         /* XXX Quick and dirty fix for TT #995 */
         if ((struct PackFile *)cur_cs == interp->initial_pf
-	        || cur_cs == interp->code) {
+                || cur_cs == interp->code) {
             SUPER();
             return;
         }
