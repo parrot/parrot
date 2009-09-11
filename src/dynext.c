@@ -564,7 +564,7 @@ Parrot_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_pmc))
         VTABLE_getprop(s, lib_pmc, filename));
     STRING * const lib_name = clone_string_into(d, s,
         VTABLE_getprop(s, lib_pmc, libname));
-    void * const handle = PMC_data(lib_pmc);
+    void * const handle = VTABLE_get_pointer(s, lib_pmc);
     STRING * const type =
         VTABLE_get_string(s, VTABLE_getprop(s, lib_pmc, type_str));
 
