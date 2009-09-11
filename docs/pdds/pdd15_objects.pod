@@ -130,8 +130,9 @@ method calls)
 
 There are four pieces to the object implementation. There are the PMCs for the
 classes, roles, and objects, the opcodes the engine uses to do objecty things,
-specific vtable functions used to perform some of those objecty things, and the
-supporting code provided by the interpreter engine to do the heavy lifting.
+specific vtable functions used to perform some of those objecty things, and
+the supporting code provided by the interpreter engine to do the heavy
+lifting.
 
 Parrot, in general, doesn't restrict operations on objects and classes. If a
 language has restrictions on what can be done with them, the language is
