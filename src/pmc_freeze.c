@@ -332,10 +332,11 @@ static void
 push_opcode_integer(PARROT_INTERP, ARGIN(IMAGE_IO *io), INTVAL v)
 {
     ASSERT_ARGS(push_opcode_integer)
-    PARROT_ASSERT(sizeof (opcode_t) == sizeof (INTVAL));
     UINTVAL size = sizeof (opcode_t);
     STRING   *op = Parrot_str_new_init(interp, (char *)&v, size,
         Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
+
+    PARROT_ASSERT(sizeof (opcode_t) == sizeof (INTVAL));
     io->image = Parrot_str_append(interp, io->image, op);
 }
 
