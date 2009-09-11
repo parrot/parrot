@@ -80,13 +80,6 @@ static void ft_init(PARROT_INTERP, ARGIN(visit_info *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void op_append(PARROT_INTERP,
-    ARGIN(STRING *s),
-    opcode_t b,
-    size_t len)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 PARROT_INLINE
 static void op_check_size(PARROT_INTERP, ARGIN(STRING *s), size_t len)
         __attribute__nonnull__(1)
@@ -218,9 +211,6 @@ static void visit_todo_list_thaw(PARROT_INTERP,
 #define ASSERT_ARGS_ft_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(info)
-#define ASSERT_ARGS_op_append __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(s)
 #define ASSERT_ARGS_op_check_size __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(s)
@@ -328,32 +318,6 @@ op_check_size(PARROT_INTERP, ARGIN(STRING *s), size_t len)
 
 /*
 
-=item C<static void op_append(PARROT_INTERP, STRING *s, opcode_t b, size_t len)>
-
-Appends the opcode C<b> to the string C<*s>.
-
-=cut
-
-*/
-
-static void
-op_append(PARROT_INTERP, ARGIN(STRING *s), opcode_t b, size_t len)
-{
-    ASSERT_ARGS(op_append)
-    char *str_pos;
-
-    op_check_size(interp, s, len);
-
-    str_pos                  = s->strstart + s->bufused;
-    *((opcode_t *)(str_pos)) = b;
-
-    s->bufused += len;
-    s->strlen  += len;
-}
-
-
-/*
-
 =item C<static void push_opcode_integer(PARROT_INTERP, IMAGE_IO *io, INTVAL v)>
 
 Pushes the integer C<v> onto the end of the C<*io> "stream".
@@ -369,7 +333,10 @@ push_opcode_integer(PARROT_INTERP, ARGIN(IMAGE_IO *io), INTVAL v)
 {
     ASSERT_ARGS(push_opcode_integer)
     PARROT_ASSERT(sizeof (opcode_t) == sizeof (INTVAL));
-    op_append(interp, io->image, (opcode_t)v, sizeof (opcode_t));
+    UINTVAL size = sizeof (opcode_t);
+    STRING   *op = Parrot_str_new_init(interp, (char *)&v, size,
+        Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
+    io->image = Parrot_str_append(interp, io->image, op);
 }
 
 
@@ -445,7 +412,10 @@ static void
 push_opcode_pmc(PARROT_INTERP, ARGIN(IMAGE_IO *io), ARGIN(PMC* v))
 {
     ASSERT_ARGS(push_opcode_pmc)
-    op_append(interp, io->image, (opcode_t)v, sizeof (opcode_t));
+    UINTVAL size = sizeof (opcode_t);
+    STRING   *op = Parrot_str_new_init(interp, (char *)&v, size,
+        Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
+    io->image = Parrot_str_append(interp, io->image, op);
 }
 
 
@@ -1193,7 +1163,8 @@ create_image(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGMOD(visit_info *info))
     else
         len = FREEZE_BYTES_PER_ITEM;
 
-    info->image = Parrot_str_new_noinit(interp, enum_stringrep_one, len);
+    info->image = Parrot_str_new_init(interp, NULL, len,
+         Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
 }
 
 
