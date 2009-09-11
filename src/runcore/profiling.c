@@ -269,7 +269,6 @@ ARGIN(opcode_t *pc))
         preop_line = Parrot_Sub_get_line_from_pc(interp,
                 Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp)), pc);
 
-
         CONTEXT(interp)->current_pc = pc;
         preop_sub                   = CONTEXT(interp)->current_sub;
         preop_pc                    = pc;
