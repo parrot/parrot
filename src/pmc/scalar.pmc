@@ -96,8 +96,8 @@ according to the type of C<*value>.
 */
 
     VTABLE void assign_pmc(PMC *value) {
-        INTVAL  self_type = VTABLE_type(INTERP,SELF);
-        INTVAL  val_type  = VTABLE_type(INTERP,value);
+        INTVAL  self_type = VTABLE_type(INTERP, SELF);
+        INTVAL  val_type  = VTABLE_type(INTERP, value);
 
         if (self_type == enum_class_Boolean)
             /* doesn't morph */
