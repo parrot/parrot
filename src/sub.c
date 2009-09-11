@@ -284,6 +284,7 @@ number.
 INTVAL
 Parrot_Sub_get_line_from_pc(PARROT_INTERP, ARGIN(PMC *subpmc), ARGIN(opcode_t *pc))
 {
+    ASSERT_ARGS(Parrot_Sub_get_line_from_pc)
     Parrot_Sub_attributes *sub;
     int                    position;
 
@@ -310,6 +311,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_Sub_get_filename_from_pc(PARROT_INTERP, ARGIN(PMC *subpmc), ARGIN(opcode_t *pc))
 {
+    ASSERT_ARGS(Parrot_Sub_get_filename_from_pc)
     Parrot_Sub_attributes *sub;
     PackFile_Debug        *debug;
     int                    position;
