@@ -144,11 +144,8 @@ Swaps the "context".
 
             co->ctx = ctx;
 
-            Parrot_pcc_set_caller_ctx(INTERP, ctx, caller_ctx);
             PARROT_CONTINUATION(ccont)->from_ctx = ctx;
             Parrot_pcc_set_sub(INTERP, ctx, SELF);
-            Parrot_pcc_set_HLL(interp, ctx, co->HLL_id);
-            Parrot_pcc_set_namespace(INTERP, ctx, co->namespace_stash);
             Parrot_pcc_set_continuation(INTERP, ctx, ccont);
             Parrot_pcc_set_object(interp, ctx, PMCNULL);
             INTERP->current_object = PMCNULL;

@@ -675,7 +675,17 @@ Parrot_pcc_set_sub(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *sub))
 {
     ASSERT_ARGS(Parrot_pcc_set_sub)
     Parrot_Context *c = get_context_struct_fast(interp, ctx);
-    c->current_sub = sub;
+    c->current_sub    = sub;
+
+    if (sub && !PMC_IS_NULL(sub)) {
+        Parrot_Sub_attributes *subattr;
+
+        PMC_get_sub(interp, sub, subattr);
+
+        c->current_pc        = subattr->seg->base.data + subattr->start_offs;
+        c->current_HLL       = subattr->HLL_id;
+        c->current_namespace = subattr->namespace_stash;
+    }
 }
 
 /*
@@ -1167,6 +1177,7 @@ init_context(PARROT_INTERP, ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
         ctx->current_namespace = old->current_namespace;
         /* end COW */
         ctx->recursion_depth   = old->recursion_depth;
+        ctx->caller_ctx        = pmcold;
     }
     else {
         ctx->constants         = NULL;
@@ -1204,8 +1215,6 @@ Parrot_push_context(PARROT_INTERP, ARGIN(const INTVAL *n_regs_used))
     ASSERT_ARGS(Parrot_push_context)
     PMC * const old = CURRENT_CONTEXT(interp);
     PMC * const ctx = Parrot_set_new_context(interp, n_regs_used);
-
-    Parrot_pcc_set_caller_ctx(interp, ctx, old);
 
     /* doesn't change */
     Parrot_pcc_set_sub(interp, ctx, Parrot_pcc_get_sub(interp, old));
