@@ -1,0 +1,10 @@
+/Makefile
+/*.pbc
+/*.c
+/*.o
+/*.obj
+/*.exe
+/*.iss
+/squaak
+/installable_squaak
+/man

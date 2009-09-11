@@ -1,0 +1,13 @@
+/Makefile
+/*.c
+/*.h
+/*.so
+/*.bundle
+/*.o
+/*.obj
+/*.dll
+/*.pdb
+/*.ilk
+/*.lib
+/*.exp
+/*.manifest

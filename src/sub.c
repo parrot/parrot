@@ -268,6 +268,60 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(PMC *ctx),
     return 1;
 }
 
+
+/*
+
+=item C<INTVAL Parrot_Sub_get_line_from_pc(PARROT_INTERP, PMC *subpmc, opcode_t
+*pc)>
+
+Given a PMC sub and the current opcode, returns the corresponding PIR line
+number.
+
+=cut
+
+*/
+
+INTVAL
+Parrot_Sub_get_line_from_pc(PARROT_INTERP, ARGIN(PMC *subpmc), ARGIN(opcode_t *pc))
+{
+    Parrot_Sub_attributes *sub;
+    int                    position;
+
+    PMC_get_sub(interp, subpmc, sub);
+    position = pc - sub->seg->base.data;
+
+    return (INTVAL)(sub->seg->debugs->base.data[position]);
+}
+
+
+/*
+
+=item C<STRING * Parrot_Sub_get_filename_from_pc(PARROT_INTERP, PMC *sub,
+opcode_t *pc)>
+
+Given a PMC sub and the current opcode, returns the corresponding PIR file
+name.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_Sub_get_filename_from_pc(PARROT_INTERP, ARGIN(PMC *subpmc), ARGIN(opcode_t *pc))
+{
+    Parrot_Sub_attributes *sub;
+    PackFile_Debug        *debug;
+    int                    position;
+
+    PMC_get_sub(interp, subpmc, sub);
+
+    debug    = sub->seg->debugs;
+    position = pc - sub->seg->base.data;
+
+    return Parrot_debug_pc_to_filename(interp, debug, position);
+}
+
 /*
 
 =item C<STRING* Parrot_Context_infostr(PARROT_INTERP, PMC *ctx)>

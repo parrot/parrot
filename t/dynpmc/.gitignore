@@ -1,0 +1,12 @@
+/*.pasm
+/*_pbcexe*
+/*.pbc
+/*.pir
+/md2.t
+/md4.t
+/md5.t
+/ripemd160.t
+/sha1.t
+/sha256.t
+/sha512.t
+/sha.t
