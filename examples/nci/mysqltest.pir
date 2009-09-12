@@ -1,4 +1,4 @@
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008-2009, Parrot Foundation.
 # $Id$
 
 =head1 TITLE
@@ -38,9 +38,11 @@ Connection data and query are hard coded, edit the file to change.
     say $S0
     exit 1
 good:
+    say 'connect...'
 
     m.'connect'('localhost', 'parrot', 'baDworD', 'parrot')
 
+    say 'query...'
     m.'query'('select * from hello;')
 
     .local pmc r
