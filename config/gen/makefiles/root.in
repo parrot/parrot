@@ -919,7 +919,7 @@ $(INSTALLABLECONFIG) : $(SRC_DIR)/install_config$(O) $(PARROT_CONFIG) $(PBC_TO_E
 	$(PARROT) -o parrot_config.pbc tools/util/parrot-config.pir
 	$(PBC_TO_EXE) parrot_config.pbc --install
 
-$(INSTALLABLEPBCTOEXE) : $(PBC_TO_EXE)
+$(INSTALLABLEPBCTOEXE) : $(PBC_TO_EXE) $(SRC_DIR)/install_config$(O)
 	$(PBC_TO_EXE) pbc_to_exe.pbc --install
 
 #
@@ -954,7 +954,8 @@ $(DIS) : $(SRC_DIR)/pbc_disassemble$(O) $(LIBPARROT)
     @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
-$(INSTALLABLEDIS) : $(SRC_DIR)/pbc_disassemble$(O) $(LIBPARROT)
+$(INSTALLABLEDIS) : $(SRC_DIR)/pbc_disassemble$(O) \
+	$(SRC_DIR)/install_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/pbc_disassemble$(O) \
     @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
@@ -973,7 +974,8 @@ $(PDUMP) : $(SRC_DIR)/pbc_dump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
 
 $(SRC_DIR)/pbc_dump$(O) : $(INC_DIR)/parrot.h $(GEN_HEADERS)
 
-$(INSTALLABLEPDUMP) : $(SRC_DIR)/pbc_dump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
+$(INSTALLABLEPDUMP) : $(SRC_DIR)/pbc_dump$(O) $(SRC_DIR)/packdump$(O) \
+	$(SRC_DIR)/install_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/pbc_dump$(O) \
     $(SRC_DIR)/packdump$(O) \
