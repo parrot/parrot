@@ -52,8 +52,9 @@ Initializes the exception handler.
          * of an "earlier" context, which is contained in the interpreter's
          * context - the stacks can only be deeper in the interpreter - so no
          * mark of context is needed */
-        PObj_custom_mark_destroy_SETALL(SELF);
+        PObj_custom_mark_SET(SELF);
     }
+
 /*
 
 =item C<void mark()>
@@ -72,17 +73,6 @@ Mark any active exception handler data as live.
         if (attrs->handled_types_except)
             Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->handled_types_except);
         SUPER();
-    }
-
-    VTABLE void destroy() {
-        Parrot_ExceptionHandler_attributes *attrs = PARROT_EXCEPTIONHANDLER(SELF);
-
-        if (attrs->handled_types){
-            PObj_on_free_list_SET((PObj *) attrs->handled_types);
-        }
-        if (attrs->handled_types_except){
-            PObj_on_free_list_SET((PObj *) attrs->handled_types_except);
-        }
     }
 
     VTABLE PMC *clone() {
