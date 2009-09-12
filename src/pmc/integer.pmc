@@ -258,8 +258,6 @@ Returns the string value of the integer.
 
 /*
 
-=item C<void set_integer_same(PMC *value)>
-
 =item C<void set_integer_native(INTVAL value)>
 
 Sets the value of the integer to the value of the C<Integer> C<*value>.
@@ -267,11 +265,6 @@ Sets the value of the integer to the value of the C<Integer> C<*value>.
 =cut
 
 */
-
-    VTABLE void set_integer_same(PMC *value) {
-        SELF.set_integer_native(VTABLE_get_integer(INTERP, value));
-    }
-
 
     VTABLE void set_integer_native(INTVAL value) {
         SET_ATTR_iv(INTERP, SELF, value);

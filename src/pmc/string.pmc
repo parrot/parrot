@@ -256,22 +256,6 @@ Sets the value of the string to a copy of the specified C<string>.
 
 /*
 
-=item C<VOID set_string_same(PMC *value)>
-
-Sets the value of the string to the value of
-the specified C<String> PMC.
-
-=cut
-
-*/
-
-    VTABLE void set_string_same(PMC *value) {
-        SET_ATTR_str_val(INTERP, SELF,
-            Parrot_str_set(INTERP, SELF.get_string(), VTABLE_get_string(INTERP, value)));
-    }
-
-/*
-
 =item C<VOID set_pmc(PMC *value)>
 
 Sets the value of the string to the string value of

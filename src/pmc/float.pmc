@@ -179,22 +179,6 @@ Sets the value of the number to C<value>.
 
 /*
 
-=item C<void set_number_same(PMC *value)>
-
-Sets the value of the number to the value of C<*value>.
-
-=cut
-
-*/
-
-    VTABLE void set_number_same(PMC *value) {
-        FLOATVAL fv;
-        GET_ATTR_fv(INTERP, value, fv);
-        SET_ATTR_fv(INTERP, SELF, fv);
-    }
-
-/*
-
 =item C<void set_string_native(STRING *value)>
 
 Sets the value of the number to the value of C<*value>.
