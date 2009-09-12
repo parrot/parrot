@@ -4433,7 +4433,7 @@ yyreduce:
 
   case 203:
 #line 2006 "compilers/imcc/imcc.y"
-    { (yyval.i) = MK_I(interp, IMCC_INFO(interp)->cur_unit, (yyvsp[(4) - (5)].s), 3, (yyvsp[(1) - (5)].sr), (yyvsp[(3) - (5)].sr), (yyvsp[(5) - (5)].sr));  }
+    { IMCC_INFO(interp)->line++; (yyval.i) = MK_I(interp, IMCC_INFO(interp)->cur_unit, (yyvsp[(4) - (5)].s), 3, (yyvsp[(1) - (5)].sr), (yyvsp[(3) - (5)].sr), (yyvsp[(5) - (5)].sr)); IMCC_INFO(interp)->line--; }
     break;
 
   case 204:
@@ -4629,7 +4629,7 @@ yyreduce:
   case 242:
 #line 2089 "compilers/imcc/imcc.y"
     {
-           (yyval.i) = MK_I(interp, IMCC_INFO(interp)->cur_unit, (yyvsp[(2) - (3)].s), 2, (yyvsp[(1) - (3)].sr), (yyvsp[(3) - (3)].sr));
+           IMCC_INFO(interp)->line++; (yyval.i) = MK_I(interp, IMCC_INFO(interp)->cur_unit, (yyvsp[(2) - (3)].s), 2, (yyvsp[(1) - (3)].sr), (yyvsp[(3) - (3)].sr)); IMCC_INFO(interp)->line--;
          }
     break;
 
