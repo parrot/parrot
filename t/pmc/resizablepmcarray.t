@@ -21,7 +21,7 @@ out-of-bounds test. Checks INT and PMC keys.
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
 
-    plan(121)
+    plan(122)
 
     resize_tests()
     negative_array_size()
@@ -30,6 +30,7 @@ out-of-bounds test. Checks INT and PMC keys.
     set_keyed_get_keyed_tests()
     interface_check()
     inherited_sort_method()
+    sort_subclass()
     push_pmc()
     push_int()
     push_string()
@@ -325,6 +326,35 @@ lp:
     goto lp
 done:
     is(sorted, "1 2 5 9 10 ", "inherited sort method works")
+.end
+
+
+.sub sort_subclass
+    .local pmc subrpa, arr
+    subrpa = subclass ['ResizablePMCArray'], 'ssRPA'
+    arr = new subrpa
+    arr[0] = 'p'
+    arr[1] = 'a'
+    arr[2] = 'z'
+    # Use a comparator that gives a reverse alphabetical order
+    # to make sure sort is using it, and not some default from
+    # elsewhere.
+    .local pmc comparator
+    comparator = get_global 'compare_reverse'
+    arr.'sort'(comparator)
+    .local string s, aux
+    s = typeof arr
+    concat s, ':'
+    aux = join '-', arr
+    concat s, aux
+    is(s, 'ssRPA:z-p-a', "sort works in a pir subclass, TT #218")
+.end
+
+.sub compare_reverse
+    .param string a
+    .param string b
+    $I0 = cmp_str b, a
+    .return($I0)
 .end
 
 
