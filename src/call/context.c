@@ -16,14 +16,6 @@ src/context.c - Parrot_Context functions.
 #include "parrot/call.h"
 #include "../pmc/pmc_sub.h"
 
-/* set CTX_LEAK_DEBUG_FULL to 1 for enhanced context debugging.
- * When set (1) freed contexts are "poisoned" so that any dangling
- * references produce segfaults, and (2) contexts are not recycled
- * so that later allocations don't suddenly restore a dangling
- * reference to a "working" condition.
- */
-#define CTX_LEAK_DEBUG_FULL 0
-
 /*
 
 =head2 Context and register frame layout
