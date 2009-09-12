@@ -19,8 +19,9 @@ type combinations.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(28)
+    plan(30)
     init_int_tests()
+    instantiate_tests()
     num_tests()
     string_tests()
     pmc_to_pmc_tests()
@@ -44,6 +45,21 @@ type combinations.
     set $P0, -4
     set $I0, $P0
     is($I0, 1, "Boolean converts negative int to true")
+.end
+
+.sub instantiate_tests
+    $P0 = new ['Boolean']
+
+    $P0 = 1
+    $P2 = get_class ['Boolean']
+    $P1 = new $P2, $P0
+    $I0 = $P1
+    is($I0, 1, "Boolean instantiated to true")
+
+    $P0 = 0
+    $P1 = new ['Boolean'], $P0
+    $I0 = $P1
+    is($I0, 0, "Boolean instantiated to false")
 .end
 
 .sub num_tests
