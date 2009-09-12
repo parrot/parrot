@@ -224,63 +224,6 @@ pmclass Complex auto_attrs {
 
 /*
 
-=item C<PMC *instantiate(PMC *sig)>
-
-Create a new complex PMC with passed arguments according to pdd03.
-
-=cut
-
-*/
-
-    VTABLE PMC *instantiate(PMC *sig) {
-        return PMCNULL;
-
-        /* TODO -- really build this thing */
-#if 0
-        PMC *res = pmc_new(INTERP, enum_class_Complex);
-        FLOATVAL re    = 0.0;
-        FLOATVAL im    = 0.0;
-        int      argcI = REG_INT(interp, 1);
-        int      argcS = REG_INT(interp, 2);
-        int      argcP = REG_INT(interp, 3);
-        int      argcN = REG_INT(interp, 4);
-
-        /*
-         * we can only allow 0..2 arguments of one kind. For
-         * mixed (e.g. N, P) args the order of arguments isn't fixed
-         */
-        if (argcP) {
-            re = VTABLE_get_number(INTERP, REG_PMC(interp, 5));
-
-            if (argcP == 2)
-                im = VTABLE_get_number(INTERP, REG_PMC(interp, 6));
-            /* TODO throw exception if argument mismatch */
-        }
-        else if (argcN) {
-            re = REG_NUM(interp, 5);
-
-            if (argcN == 2)
-                im = REG_NUM(interp, 6);
-        }
-        else if (argcI) {
-            re = REG_INT(interp, 5);
-
-            if (argcI == 2)
-                im = REG_INT(interp, 6);
-        }
-        else if (argcS == 1) {
-            complex_parse_string(INTERP, &RE(res), &IM(res), REG_STR(interp, 5));
-            return res;
-        }
-
-        RE(res) = re;
-        IM(res) = im;
-        return res;
-#endif
-    }
-
-/*
-
 =item C<opcode_t *invoke(void *next)>
 
 Pythonic object constructor. SELF is a Complex Class object. Return a new

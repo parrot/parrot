@@ -19,7 +19,8 @@ Tests the Integer PMC.
 .sub 'test' :main
     .include 'test_more.pir'
 
-    plan(60)
+    plan(62)
+    test_init()
     test_basic_math()
     test_truthiness_and_definedness()
     test_set_string_native()
@@ -38,6 +39,15 @@ Tests the Integer PMC.
     test_get_as_base_bounds_check()
     test_cmp_subclass()
     test_cmp_RT59336()
+.end
+
+.sub test_init
+    .local pmc i1, i2
+    i1 = new ['Integer']
+    is(i1, 0, "Default value of Integer is 0")
+    i1 = 42
+    i2 = new ['Integer'], i1
+    is(i2, 42, "Initialize with argument set correct value")
 .end
 
 .sub test_get_as_base_bounds_check

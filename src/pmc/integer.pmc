@@ -47,7 +47,8 @@ pmclass Integer extends scalar provides integer provides scalar auto_attrs {
     ATTR INTVAL iv; /* the value of this Integer */
 
 /*
-=item C<PMC instantiate(PMC *sig)>
+
+=item C<PMC init_pmc(PMC *init)>
 
 Create a new Integer with arguments passed according to pdd03.
 
@@ -59,37 +60,18 @@ Initializes the integer with a default value of C<0>.
 
 */
 
-    VTABLE PMC *instantiate(PMC *sig) {
-        PMC            * const ret    = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        const opcode_t * const arg_op = interp->current_args;
-        INTVAL                 init   = 0;
-
-        if (VTABLE_elements(interp, sig) == 2) {
-            switch (VTABLE_get_integer_keyed_int(INTERP, sig, 1)) {
-                case PARROT_ARG_I:
-                    init = REG_INT(interp, arg_op[3]);
-                    break;
-                case PARROT_ARG_IC:
-                    init = arg_op[3];
-                    break;
-                default:
-                    Parrot_ex_throw_from_c_args(INTERP, NULL,
-                            EXCEPTION_SYNTAX_ERROR,
-                            "Integer.instantiate: unhandled initializer");
-                    break;
-            }
-        }
-
-        VTABLE_set_integer_native(INTERP, ret, init);
-        return ret;
-    }
-
-
     VTABLE void init() {
         Parrot_Integer_attributes * const attrs =
             (Parrot_Integer_attributes *)PMC_data(SELF);
 
         attrs->iv      = 0;
+    }
+
+    VTABLE void init_pmc(PMC *init) {
+        Parrot_Integer_attributes * const attrs =
+            (Parrot_Integer_attributes *)PMC_data(SELF);
+
+        attrs->iv      = VTABLE_get_integer(INTERP, init);
     }
 
 /*
