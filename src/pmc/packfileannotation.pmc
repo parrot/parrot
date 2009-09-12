@@ -19,7 +19,7 @@ PackfileAnnotations segment of the .pbc file.  See PDD13 for a design spec.
 
 */
 
-pmclass PackfileAnnotation {
+pmclass PackfileAnnotation auto_attrs {
     ATTR STRING    *name;
     ATTR INTVAL     offset;
     ATTR INTVAL     value_type;
@@ -40,31 +40,32 @@ Create empty PackfileAnnotation.
 
     VTABLE void init() {
         Parrot_PackfileAnnotation_attributes * attrs =
-                mem_allocate_zeroed_typed(Parrot_PackfileAnnotation_attributes);
+                PMC_data_typed(SELF, Parrot_PackfileAnnotation_attributes*);
 
-        PObj_custom_destroy_SET(SELF);
+        PObj_custom_mark_SET(SELF);
         PMC_data(SELF) = attrs;
     }
 
 /*
 
-=item C<void destroy()>
+=item C<void mark()>
 
-Destroys the PMC and frees all allocated memory.
+Marks the object as live.
 
 =cut
 
 */
 
-    VTABLE void destroy() {
+    VTABLE void mark() {
         Parrot_PackfileAnnotation_attributes * attrs =
                 PARROT_PACKFILEANNOTATION(SELF);
 
-        if (attrs) {
-            mem_sys_free(attrs);
-            PMC_data(SELF) = NULL;
-        }
+        if (attrs->name)
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->name);
+        if ((attrs->value_type == PF_ANNOTATION_KEY_TYPE_STR) && attrs->str_value)
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->str_value);
     }
+
 
 /*
 

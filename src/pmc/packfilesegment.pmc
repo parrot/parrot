@@ -23,7 +23,7 @@ spec.
 
 */
 
-pmclass PackfileSegment {
+pmclass PackfileSegment auto_attrs {
     /*
     Directory which owns this segment. Required for correct pack/unpack
     Annotations.
@@ -42,12 +42,11 @@ Initialize PackfileSegment.
 */
     VTABLE void init() {
         Parrot_PackfileSegment_attributes * attrs =
-                mem_allocate_zeroed_typed(Parrot_PackfileSegment_attributes);
+                PMC_data_typed(SELF, Parrot_PackfileSegment_attributes*);
 
-        attrs->directory = NULL;
+        attrs->directory = PMCNULL;
 
-        PObj_custom_mark_destroy_SETALL(SELF);
-        PMC_data(SELF) = attrs;
+        PObj_custom_mark_SET(SELF);
     }
 
 /*
@@ -64,28 +63,8 @@ Marks the object as live.
         Parrot_PackfileSegment_attributes * attrs =
                 PARROT_PACKFILESEGMENT(SELF);
 
-        if (attrs->directory)
+        if (!PMC_IS_NULL(attrs->directory))
             Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->directory);
-    }
-
-/*
-
-=item C<void destroy()>
-
-Destroys the PMC and frees all allocated memory.
-
-=cut
-
-*/
-
-    VTABLE void destroy() {
-        Parrot_PackfileSegment_attributes * attrs =
-                PARROT_PACKFILESEGMENT(SELF);
-
-        if (attrs) {
-            mem_sys_free(attrs);
-            PMC_data(SELF) = NULL;
-        }
     }
 
 /*

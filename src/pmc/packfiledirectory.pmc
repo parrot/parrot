@@ -25,7 +25,7 @@ PDD13 for the design spec.
 
 */
 
-pmclass PackfileDirectory extends PackfileSegment {
+pmclass PackfileDirectory auto_attrs extends PackfileSegment {
     /* Directory is a hash of Segments */
     ATTR PMC *hash;
 
@@ -40,12 +40,11 @@ Initialize PackfileDirectory.
 */
     VTABLE void init() {
         Parrot_PackfileDirectory_attributes * attrs =
-                mem_allocate_zeroed_typed(Parrot_PackfileDirectory_attributes);
+                PMC_data_typed(SELF, Parrot_PackfileDirectory_attributes*);
 
         attrs->hash = pmc_new(interp, enum_class_Hash);
 
-        PObj_custom_mark_destroy_SETALL(SELF);
-        PMC_data(SELF) = attrs;
+        PObj_custom_mark_SET(SELF);
     }
 
 /*
@@ -62,7 +61,7 @@ Marks the object as live.
         Parrot_PackfileDirectory_attributes * attrs =
                 PARROT_PACKFILEDIRECTORY(SELF);
 
-        if (attrs->hash)
+        if (!PMC_IS_NULL(attrs->hash))
             Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->hash);
 
         SUPER();

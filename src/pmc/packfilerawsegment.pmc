@@ -24,7 +24,7 @@ PDD13 for the design spec.
 
 */
 
-pmclass PackfileRawSegment extends PackfileSegment {
+pmclass PackfileRawSegment auto_attrs extends PackfileSegment {
     /* Type of segment */
     ATTR INTVAL  type;
     /* ResizableIntegerArray of opcodes */
@@ -42,13 +42,12 @@ Create empty PackfileRawSegment.
 
     VTABLE void init() {
         Parrot_PackfileRawSegment_attributes * attrs =
-                mem_allocate_zeroed_typed(Parrot_PackfileRawSegment_attributes);
+                PMC_data_typed(SELF, Parrot_PackfileRawSegment_attributes*);
 
         attrs->opcodes = pmc_new(interp, enum_class_ResizableIntegerArray);
         attrs->type    = PF_BYTEC_SEG;
 
-        PObj_custom_mark_destroy_SETALL(SELF);
-        PMC_data(SELF) = attrs;
+        PObj_custom_mark_SET(SELF);
     }
 
 /*
@@ -65,32 +64,11 @@ Marks the object as live.
         Parrot_PackfileRawSegment_attributes * attrs =
                 PARROT_PACKFILERAWSEGMENT(SELF);
 
-        if (attrs->opcodes)
+        if (!PMC_IS_NULL(attrs->opcodes))
             Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->opcodes);
 
         SUPER();
     }
-
-/*
-
-=item C<void destroy()>
-
-Destroys the PMC and frees all allocated memory.
-
-=cut
-
-*/
-
-    VTABLE void destroy() {
-        Parrot_PackfileRawSegment_attributes * attrs =
-                PARROT_PACKFILERAWSEGMENT(SELF);
-
-        if (attrs) {
-            mem_sys_free(attrs);
-            PMC_data(SELF) = NULL;
-        }
-    }
-
 
 
 /*

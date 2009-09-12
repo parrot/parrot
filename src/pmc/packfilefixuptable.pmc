@@ -24,7 +24,7 @@ PDD13 for the design spec.
 
 */
 
-pmclass PackfileFixupTable extends PackfileSegment {
+pmclass PackfileFixupTable auto_attrs extends PackfileSegment {
     /* RPA of entries */
     ATTR PMC *entries;
 
@@ -40,12 +40,11 @@ Create empty PackfileFixupTable.
 
     VTABLE void init() {
         Parrot_PackfileFixupTable_attributes * attrs =
-                mem_allocate_zeroed_typed(Parrot_PackfileFixupTable_attributes);
+                PMC_data_typed(SELF, Parrot_PackfileFixupTable_attributes*);
 
         attrs->entries = pmc_new(interp, enum_class_ResizablePMCArray);
 
-        PObj_custom_mark_destroy_SETALL(SELF);
-        PMC_data(SELF) = attrs;
+        PObj_custom_mark_SET(SELF);
     }
 
 /*
@@ -62,33 +61,11 @@ Marks the object as live.
         Parrot_PackfileFixupTable_attributes * attrs =
                 PARROT_PACKFILEFIXUPTABLE(SELF);
 
-        if (attrs->entries)
+        if (!PMC_IS_NULL(attrs->entries))
             Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->entries);
 
         SUPER();
     }
-
-/*
-
-=item C<void destroy()>
-
-Destroys the PMC and frees all allocated memory.
-
-=cut
-
-*/
-
-    VTABLE void destroy() {
-        Parrot_PackfileFixupTable_attributes * attrs =
-                PARROT_PACKFILEFIXUPTABLE(SELF);
-
-        if (attrs) {
-            mem_sys_free(attrs);
-            PMC_data(SELF) = NULL;
-        }
-    }
-
-
 
 /*
 
