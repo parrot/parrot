@@ -236,6 +236,10 @@ Mark any referenced strings and PMCs.
                 Parrot_gc_mark_PObj_alive(interp, (PObj*)nci_info->signature);
             if (nci_info->pcc_params_signature)
                 Parrot_gc_mark_PObj_alive(interp, (PObj*)nci_info->pcc_params_signature);
+            if (nci_info->long_signature)
+                Parrot_gc_mark_PObj_alive(interp, (PObj*)nci_info->long_signature);
+            if (nci_info->multi_sig)
+                Parrot_gc_mark_PObj_alive(interp, (PObj*)nci_info->multi_sig);
         }
     }
 
