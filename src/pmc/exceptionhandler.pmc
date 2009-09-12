@@ -83,7 +83,6 @@ Mark any active exception handler data as live.
         if (attrs->handled_types_except){
             PObj_on_free_list_SET((PObj *) attrs->handled_types_except);
         }
-        SUPER();
     }
 
     VTABLE PMC *clone() {

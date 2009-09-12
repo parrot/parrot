@@ -2413,8 +2413,9 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
     jit_emit_stack_frame_leave(pc);
     emitm_ret(pc);
     PARROT_ASSERT(pc - jit_info.arena.start <= JIT_ALLOC_SIZE);
+
     /* could shrink arena.start here to used size */
-    PObj_custom_destroy_SET(pmc_nci);
+
     if (sizeptr)
         *sizeptr = JIT_ALLOC_SIZE;
     Parrot_str_free_cstring(signature_str);

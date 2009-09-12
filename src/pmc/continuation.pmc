@@ -76,8 +76,7 @@ Initializes the continuation.
         attrs->address    = NULL;
         attrs->current_results = Parrot_pcc_get_results(interp, attrs->to_ctx);
 
-        PObj_active_destroy_SET(SELF);
-        PObj_custom_mark_destroy_SETALL(SELF);
+        PObj_custom_mark_SET(SELF);
 
         /* PANIC("don't do that"); */
         /*
@@ -101,8 +100,7 @@ Initializes the continuation.
         attrs->address    = theirs->address;
         attrs->current_results = Parrot_pcc_get_results(interp, attrs->to_ctx);
 
-        PObj_active_destroy_SET(SELF);
-        PObj_custom_mark_destroy_SETALL(SELF);
+        PObj_custom_mark_SET(SELF);
 
         /* PANIC("don't do that"); */
         /*
