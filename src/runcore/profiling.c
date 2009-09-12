@@ -253,21 +253,17 @@ ARGIN(opcode_t *pc))
     }
 
     while (pc) {
-        STRING         		*postop_filename;
-        Parrot_Context 		*preop_ctx;
-        INTVAL              preop_line;
-        Parrot_Context_info preop_info;
+        STRING         *postop_filename;
+        Parrot_Context *preop_ctx;
+        INTVAL          preop_line;
 
         if (pc < code_start || pc >= code_end)
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
                     "attempt to access code outside of current code segment");
 
-        /* Parrot_Sub_get_line_from_pc doesn't return the same line numbers as
-         * Parrot_Context_get_info, so keep both around to make it easy to see
-         * when they're equivalnet. */
-        Parrot_Context_get_info(interp, CURRENT_CONTEXT(interp), &preop_info);
         preop_line = Parrot_Sub_get_line_from_pc(interp,
-                Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp)), pc);
+                Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp)),
+                CONTEXT(interp)->current_pc);
 
         CONTEXT(interp)->current_pc = pc;
         preop_sub                   = CONTEXT(interp)->current_sub;
@@ -325,11 +321,9 @@ ARGIN(opcode_t *pc))
             runcore->prev_sub = preop_ctx->current_sub;
         }
 
-        /* chnage preop_info.line to preop_line to check if
-         * Parrot_Sub_get_line_from_pc dtrt/ */
         fprintf(runcore->profile_fd,
             "OP:{x{line:%d}x}{x{time:%li}x}{x{op:%s}x}\n",
-            (int)preop_info.line, (unsigned long)op_time,
+            (int)preop_line, (unsigned long)op_time,
             (interp->op_info_table)[*preop_pc].name);
     }
 
