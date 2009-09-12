@@ -63,6 +63,11 @@ static INTVAL do_thread_run(PARROT_INTERP, PMC *thread,
                             INTVAL clone_flags, PMC *sub, PMC *args) {
     INTVAL tid = VTABLE_get_integer(interp, thread);
 
+    if (PMC_IS_NULL(sub)) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Invalid thread sub");
+    }
+
     clone_interpreter(PMC_interp(thread), interp, clone_flags);
 
     interp->flags &= ~PARROT_THR_COPY_INTERP; /* XXX */
