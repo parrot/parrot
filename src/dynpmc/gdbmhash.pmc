@@ -349,15 +349,19 @@ Returns whether a key C<*key> exists in the hash.
         STRING* keystr;
         GDBM_FILE dbf = PMC_dbfh(SELF);
         datum key_gdbm;
+        INTVAL ret;
 
         if (!key) return 0;
         if (!dbf) return 0;
         keystr = make_hash_key(interp, key);
 
-        key_gdbm.dsize = keystr->strlen;
-        key_gdbm.dptr  = keystr->strstart;
+        key_gdbm.dptr  = Parrot_str_to_cstring(interp, keystr);
+        key_gdbm.dsize = strlen(key_gdbm.dptr);
 
-        return gdbm_exists(dbf, key_gdbm);
+        ret = gdbm_exists(dbf, key_gdbm);
+        Parrot_str_free_cstring(key_gdbm.dptr);
+
+        return ret;
     }
 
 /*
