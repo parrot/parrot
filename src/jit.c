@@ -1456,6 +1456,9 @@ parrot_build_asm(PARROT_INTERP, ARGIN(opcode_t *code_start), ARGIN(opcode_t *cod
         jit_info->arena.size = jit_info->arena.map_size * 20;
     jit_info->native_ptr     = jit_info->arena.start =
         (char *)mem_alloc_executable((size_t)jit_info->arena.size);
+    if (! jit_info->native_ptr)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
+                "Cannot allocate executable memory");
 
 #  if EXEC_CAPABLE
     if (obj)
@@ -1831,6 +1834,9 @@ Parrot_jit_clone_buffer(PARROT_INTERP, PMC *pmc, void *priv)
         struct jit_buffer_private_data *jit = (struct jit_buffer_private_data*)priv;
         void *ptr = PARROT_MANAGEDSTRUCT(pmc)->ptr;
         void *newptr = mem_alloc_executable(jit->size);
+        if (!newptr)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
+                    "Cannot allocate executable memory");
         memcpy(newptr, ptr, jit->size);
         PARROT_MANAGEDSTRUCT(rv)->ptr = newptr;
     }

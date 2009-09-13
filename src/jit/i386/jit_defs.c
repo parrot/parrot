@@ -2110,6 +2110,9 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
      * should free the function pointer returned here
      */
     pc = jit_info.native_ptr = jit_info.arena.start = (char *)mem_alloc_executable(JIT_ALLOC_SIZE);
+    if (! pc)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
+                "Cannot allocate executable memory");
 
 
     /* this generated jit function will be called as (INTERP (EBP 8), func_ptr
