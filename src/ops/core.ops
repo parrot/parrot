@@ -448,6 +448,7 @@ inline op invoke(invar PMC, invar PMC) :flow {
 inline op yield() :flow {
     opcode_t *dest = expr NEXT();
     PMC * const p = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
+    p->vtable->increment(interp, p);
     dest = (opcode_t *)p->vtable->invoke(interp, p, dest);
     goto ADDRESS(dest);
 }
