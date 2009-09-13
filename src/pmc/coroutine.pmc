@@ -119,7 +119,7 @@ Signals the start of a yield.
 
 */
 
-    VTABLE void increment () {
+    VTABLE void increment() {
         SET_ATTR_yield(INTERP, SELF, 1);
     }
 
