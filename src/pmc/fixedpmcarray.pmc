@@ -594,7 +594,7 @@ The C<==> operation. Compares two array to hold equal elements.
     VTABLE INTVAL is_equal(PMC *value) {
         INTVAL j, n;
 
-        if (value->vtable->base_type != enum_class_FixedPMCArray)
+        if (value->vtable->base_type != SELF->vtable->base_type)
             return 0;
 
         n = SELF.elements();

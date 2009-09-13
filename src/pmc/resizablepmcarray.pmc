@@ -597,45 +597,6 @@ Creates and returns a copy of the array.
 
 /*
 
-=item C<INTVAL is_equal(PMC *value)>
-
-The C<==> operation. Compares two array to hold equal elements.
-
-=cut
-
-*/
-
-    VTABLE INTVAL is_equal(PMC *value) {
-        INTVAL j, n;
-
-        if (value->vtable->base_type != enum_class_ResizablePMCArray)
-            return 0;
-
-        n = SELF.elements();
-
-        if (VTABLE_elements(INTERP, value) != n)
-            return 0;
-
-        for (j = 0; j < n; ++j) {
-            PMC *item1 = SELF.get_pmc_keyed_int(j);
-            PMC *item2 = VTABLE_get_pmc_keyed_int(INTERP, value, j);
-            INTVAL result;
-
-            if (item1 == item2)
-                continue;
-
-            Parrot_mmd_multi_dispatch_from_c_args(INTERP,
-                    "is_equal", "PP->I", item1, item2, &result);
-
-            if (!result)
-                return 0;
-        }
-
-        return 1;
-    }
-
-/*
-
 =item METHOD append(PMC *other)
 
 Append the other array to this array.

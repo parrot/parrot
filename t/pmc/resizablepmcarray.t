@@ -21,7 +21,7 @@ out-of-bounds test. Checks INT and PMC keys.
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
 
-    plan(122)
+    plan(125)
 
     resize_tests()
     negative_array_size()
@@ -49,6 +49,7 @@ out-of-bounds test. Checks INT and PMC keys.
     method_forms_of_unshift_etc()
     sort_with_broken_cmp()
     addr_tests()
+    equality_tests()
 .end
 
 
@@ -942,6 +943,33 @@ end:
     is($I0, $I1, 'Adding element to RPA keeps same addr')
 .end
 
+.sub 'equality_tests'
+    .local pmc array1, array2, array3, array4
+    array1 = new ['ResizablePMCArray']
+    array2 = new ['ResizablePMCArray']
+    array3 = new ['ResizablePMCArray']
+
+    array1[0] = "Hello Parrot!"
+    array1[1] = 1664
+    array1[2] = 2.718
+
+    $P0 = box "Hello Parrot!"
+    array2[0] = $P0
+    $P0 = box 1664
+    array2[1] = $P0
+    $P0 = box 2.718
+    array2[2] = $P0
+
+    array3[0] = "Goodbye Parrot!"
+    array3[1] = 1664
+    array3[2] = 2.718
+
+    array4 = clone array1
+
+    is(array1, array2, 'Physically disjoint, but equal arrays')
+    is(array1, array4, 'Clones are equal')
+    isnt(array1, array3, 'Different arrays')
+.end
 
 # don't forget to change the test plan
 
