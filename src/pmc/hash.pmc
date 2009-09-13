@@ -1330,7 +1330,6 @@ Check if two hashes hold the same keys and values.
         for (j = 0; j < n; ++j) {
             STRING * const key = VTABLE_shift_string(INTERP, iter);
             PMC           *item1, *item2;
-            INTVAL         result;
 
             if (!VTABLE_exists_keyed_str(INTERP, value, key))
                 return 0;
@@ -1341,9 +1340,7 @@ Check if two hashes hold the same keys and values.
             if (item1 == item2)
                 continue;
 
-            Parrot_mmd_multi_dispatch_from_c_args(INTERP, "is_equal",
-                "PP->I", item1, item2, &result);
-            if (!result)
+            if (!VTABLE_is_equal(INTERP, item1, item2))
                 return 0;
         }
 
