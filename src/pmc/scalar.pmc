@@ -108,6 +108,11 @@ according to the type of C<*value>.
             return;
         }
 
+	if (VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "Undef"))) {
+            pmc_reuse(INTERP, SELF, enum_class_Undef, 0);
+            return;
+        }
+
         if (VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "Integer"))) {
             const INTVAL v = VTABLE_get_integer(INTERP, value);
             SELF.set_integer_native(v);
