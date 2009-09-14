@@ -208,6 +208,20 @@ Returns 0.
 
 /*
 
+=item C<INTVAL logical_not()>
+
+Returns 1.
+
+=cut
+
+*/
+
+    VTABLE INTVAL logical_not() {
+        return 1;
+    }
+
+/*
+
 =item C<void share()>
 
 Unknown. (TODO)
