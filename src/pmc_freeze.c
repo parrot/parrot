@@ -786,8 +786,8 @@ thaw_pmc(PARROT_INTERP, ARGMOD(visit_info *info),
 =item C<static void do_action(PARROT_INTERP, PMC *pmc, visit_info *info, int
 seen, UINTVAL id)>
 
-Called from C<visit_next_for_GC()> and C<visit_todo_list()> to perform
-the action specified in C<< info->what >>.
+Called from C<visit_todo_list()> to perform the action specified in
+C<< info->what >>.
 
 Currently only C<VISIT_FREEZE_NORMAL> and C<VISIT_FREEZE_AT_DESTRUCT> are
 implemented.
@@ -1176,15 +1176,11 @@ what)>
 
 Performs thawing. C<what> indicates what to be thawed.
 
-Thaw could use the C<next_for_GC> pointers as todo-list too, but this
-would need 2 runs through the arenas to clean the C<next_for_GC>
-pointers.
-
 For now it seems cheaper to use a list for remembering contained
 aggregates. We could of course decide dynamically, which strategy to
 use, e.g.: given a big image, the first thawed item is a small
 aggregate. This implies, it probably contains (or some big strings) more
-nested containers, for which the C<next_for_GC> approach could be a win.
+nested containers, for which another approach could be a win.
 
 =cut
 
