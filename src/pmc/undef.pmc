@@ -216,8 +216,10 @@ Returns 1.
 
 */
 
-    VTABLE INTVAL logical_not() {
-        return 1;
+    VTABLE PMC *logical_not(PMC *dest) {
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        VTABLE_set_bool(INTERP, dest, 1);
+        return dest;
     }
 
 /*
