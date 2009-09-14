@@ -1406,7 +1406,10 @@ CODE
 ok
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "clone_key_arg" );
+my @todo = ( todo => 'broken with JIT (TT #983)' )
+    if ( defined $ENV{TEST_PROG_ARGS} and
+        $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/ );
+pir_output_is( <<'CODE', <<'OUTPUT', "clone_key_arg", @todo );
 .sub main :main
     foo()
     print "ok\n"

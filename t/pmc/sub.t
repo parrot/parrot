@@ -835,7 +835,10 @@ the_sub
 main
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "caller introspection via interp" );
+my @todo = ( todo => 'broken with JIT (TT #983)' )
+    if ( defined $ENV{TEST_PROG_ARGS} and
+        $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/ );
+pir_output_is( <<'CODE', <<'OUTPUT', "caller introspection via interp", @todo );
 .sub main :main
 .include "interpinfo.pasm"
     # this test will fail when run with -Oc
@@ -1435,7 +1438,7 @@ I can has outer from eval?
 OUTPUT
 
 $ENV{TEST_PROG_ARGS} ||= '';
-my @todo = $ENV{TEST_PROG_ARGS} =~ /--run-pbc/
+@todo = $ENV{TEST_PROG_ARGS} =~ /--run-pbc/
     ? ( todo => 'lexicals not thawed properly from PBC, RT #60652' )
     : ();
 pir_output_is( <<'CODE', <<'OUTPUT', ':outer with identical sub names', @todo );
