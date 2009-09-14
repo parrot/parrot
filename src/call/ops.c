@@ -338,7 +338,7 @@ Parrot_runops_fromc_args(PARROT_INTERP, ARGIN(PMC *sub), ARGIN(const char *sig),
     ctx = runops_args(interp, sub, PMCNULL, NULL, sig, args);
     va_end(args);
     retval = (PMC *)set_retval(interp, *sig, ctx);
-    return retval;
+    return retval ? retval : PMCNULL;
 }
 
 /*

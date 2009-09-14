@@ -602,6 +602,8 @@ Parrot_init_arg_op(PARROT_INTERP, ARGIN(PMC *ctx),
     PMC *sig_pmc = PMCNULL;
 
     if (pc) {
+	if (*pc == 0)
+            return 0;
         ++pc;
         sig_pmc = Parrot_pcc_get_pmc_constant(interp, ctx, *pc);
         ASSERT_SIG_PMC(sig_pmc);
