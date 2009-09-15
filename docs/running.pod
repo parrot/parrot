@@ -137,15 +137,17 @@ may be available on your system:
   slow, bounds  bounds checking core (default)
   cgoto         computed goto core
   cgp           computed goto-predereferenced core
-  cgp-jit       computed goto-predereferenced core with JIT
   exec          exec core (uses JIT at compile time to generate native code)
   fast          fast core (no bounds checking, profiling, or tracing)
   gcdebug       performs a full GC run before every op dispatch (good for
                 debugging GC problems)
-  jit           JIT core
   switch        switch core
-  switch-jit    switch core with JIT
   trace         bounds checking core w/ trace info (see 'parrot --help-debug')
+
+The C<jit>, C<switch-jit>, and C<cgp-jit> options are currently aliases for the
+C<fast>, C<switch>, and C<cgp> options, respectively.  We do not recommend
+their use in new code; they will continue working for existing code per our
+deprecation policy.
 
 =item -p, --profile
 
