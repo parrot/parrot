@@ -43,6 +43,7 @@ while (defined $row) {
     my @row_copy;
     my $i = 0;
     while ($i < $elems) {
+        print $i, ': ';
         print "'", $row[$i], "'";
 	@row_copy.push($row[$i]);
         ++$i;
