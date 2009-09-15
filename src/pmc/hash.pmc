@@ -545,7 +545,7 @@ NB: this method will destroy all old data!
                 break;
             default:
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-                        "Hash: unsupported entry_type");
+                        "Hash: unsupported entry_type %d", type);
         }
 
         PARROT_HASH(SELF)->hash = new_hash;
