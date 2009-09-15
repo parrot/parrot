@@ -21,7 +21,7 @@ Connection data and query are hard coded, edit the file to change.
 
 ########################################################################
 use v6;
-use Mysql::from<parrot>;
+use Mysql:from<parrot>;
 
 say 'mysql client version: ', Mysql::get_client_info();
 
