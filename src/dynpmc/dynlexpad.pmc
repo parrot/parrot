@@ -174,9 +174,9 @@ doesn't exist, it is created.
 
 /*
 
-=item C<METHOD PMC* get_lexinfo()>
+=item C<void destroy()>
 
-Return the LexInfo PMC, if any or a Null PMC.
+Destroy DynLexPad.
 
 =cut
 
