@@ -141,8 +141,6 @@ Parrot_runcore_init(PARROT_INTERP)
     Parrot_runcore_fast_init(interp);
     Parrot_runcore_switch_init(interp);
 
-    Parrot_runcore_jit_init(interp);
-    Parrot_runcore_switch_jit_init(interp);
     Parrot_runcore_exec_init(interp);
     Parrot_runcore_gc_debug_init(interp);
     Parrot_runcore_debugger_init(interp);
@@ -155,7 +153,6 @@ Parrot_runcore_init(PARROT_INTERP)
 #ifdef HAVE_COMPUTED_GOTO
     Parrot_runcore_cgp_init(interp);
     Parrot_runcore_cgoto_init(interp);
-    Parrot_runcore_cgp_jit_init(interp);
 #endif
 }
 

@@ -265,12 +265,6 @@ interpinfo(PARROT_INTERP, INTVAL what)
                 ret = PARROT_CGP_CORE;
             else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "cgoto")))
                 ret = PARROT_CGOTO_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "jit")))
-                ret = PARROT_JIT_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "cgp_jit")))
-                ret = PARROT_CGP_JIT_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "switch_jit")))
-                ret = PARROT_SWITCH_JIT_CORE;
             else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "exec")))
                 ret = PARROT_EXEC_CORE;
             else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "gc_debug")))

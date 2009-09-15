@@ -356,15 +356,6 @@ Parrot_set_run_core(PARROT_INTERP, Parrot_Run_core_t core)
         case PARROT_CGOTO_CORE:
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "cgoto"));
             break;
-        case PARROT_JIT_CORE:
-            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "jit"));
-            break;
-        case PARROT_CGP_JIT_CORE:
-            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "cgp_jit"));
-            break;
-        case PARROT_SWITCH_JIT_CORE:
-            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "switch_jit"));
-            break;
         case PARROT_EXEC_CORE:
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "exec"));
             break;

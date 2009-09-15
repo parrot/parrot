@@ -1538,7 +1538,6 @@ fulltest :
 #IF(cg_flag):	testC \
 	testf \
 #IF(cg_flag):	testg \
-#IF(jitcapable):	testj \
 	testr \
 	testS \
 	src_tests \
@@ -1566,9 +1565,9 @@ testf : test_prep
 testg : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -g $(RUNCORE_TEST_FILES)
 
-# JIT core
+# JIT core - target retained, but falls back to standard core
 testj : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) -j $(RUNCORE_TEST_FILES)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(RUNCORE_TEST_FILES)
 
 # normal core, write and run Parrot Byte Code
 testr : test_prep
@@ -1578,13 +1577,13 @@ testr : test_prep
 testS : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -S $(RUNCORE_TEST_FILES)
 
-# Computed goto jitted core
+# Computed goto jitted core - target retained, but falls back to standard core
 testCj : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) -Cj $(RUNCORE_TEST_FILES)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(RUNCORE_TEST_FILES)
 
-# switched jitted core
+# switched jitted core - target retained, but falls back to standard core
 testSj : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) -Sj $(RUNCORE_TEST_FILES)
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(RUNCORE_TEST_FILES)
 
 # test the EXEC stuff
 testexec: test_prep

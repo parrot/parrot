@@ -325,15 +325,6 @@ static opcode_t * runops_gc_debug_core(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static opcode_t * runops_jit_core(PARROT_INTERP,
-    ARGIN(Parrot_runcore_t *runcore),
-    ARGIN(opcode_t *pc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
 static opcode_t * runops_slow_core(PARROT_INTERP,
     ARGIN(Parrot_runcore_t *runcore),
     ARGIN(opcode_t *pc))
@@ -380,10 +371,6 @@ static opcode_t * runops_trace_core(PARROT_INTERP,
     || PARROT_ASSERT_ARG(runcore) \
     || PARROT_ASSERT_ARG(pc)
 #define ASSERT_ARGS_runops_gc_debug_core __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(runcore) \
-    || PARROT_ASSERT_ARG(pc)
-#define ASSERT_ARGS_runops_jit_core __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(runcore) \
     || PARROT_ASSERT_ARG(pc)
@@ -488,67 +475,6 @@ Parrot_runcore_switch_init(PARROT_INTERP)
     coredata->flags            = 0;
 
     PARROT_RUNCORE_PREDEREF_OPS_SET(coredata);
-
-    Parrot_runcore_register(interp, coredata);
-}
-
-
-/*
-
-=item C<void Parrot_runcore_jit_init(PARROT_INTERP)>
-
-Registers the jit runcore with Parrot.
-
-=cut
-
-*/
-
-void
-Parrot_runcore_jit_init(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_runcore_jit_init)
-
-    Parrot_runcore_t *coredata = mem_allocate_typed(Parrot_runcore_t);
-    coredata->name             = CONST_STRING(interp, "jit");
-    coredata->id               = PARROT_JIT_CORE;
-    coredata->opinit           = PARROT_CORE_OPLIB_INIT;
-    coredata->prepare_run      = init_jit_run;
-    coredata->runops           = runops_jit_core;
-    coredata->destroy          = NULL;
-    coredata->flags            = 0;
-
-    PARROT_RUNCORE_JIT_OPS_SET(coredata);
-
-    Parrot_runcore_register(interp, coredata);
-}
-
-
-/*
-
-=item C<void Parrot_runcore_switch_jit_init(PARROT_INTERP)>
-
-Registers the switch_jit runcore with Parrot.
-
-=cut
-
-*/
-
-void
-Parrot_runcore_switch_jit_init(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_runcore_switch_jit_init)
-
-    Parrot_runcore_t *coredata = mem_allocate_typed(Parrot_runcore_t);
-    coredata->name             = CONST_STRING(interp, "switch_jit");
-    coredata->id               = PARROT_SWITCH_JIT_CORE;
-    coredata->opinit           = PARROT_CORE_SWITCH_OPLIB_INIT;
-    coredata->destroy          = NULL;
-    coredata->prepare_run      = init_prederef;
-    coredata->runops           = runops_switch_core;
-    coredata->flags            = 0;
-
-    PARROT_RUNCORE_PREDEREF_OPS_SET(coredata);
-    PARROT_RUNCORE_JIT_OPS_SET(coredata);
 
     Parrot_runcore_register(interp, coredata);
 }
@@ -707,39 +633,6 @@ Parrot_runcore_cgoto_init(PARROT_INTERP)
     Parrot_runcore_register(interp, coredata);
 }
 
-
-/*
-
-=item C<void Parrot_runcore_cgp_jit_init(PARROT_INTERP)>
-
-Registers the CGP/JIT runcore with Parrot.
-
-=cut
-
-*/
-
-
-void
-Parrot_runcore_cgp_jit_init(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_runcore_cgp_jit_init)
-
-    Parrot_runcore_t *coredata = mem_allocate_typed(Parrot_runcore_t);
-    coredata->name             = CONST_STRING(interp, "cgp_jit");
-    coredata->id               = PARROT_CGP_JIT_CORE;
-    coredata->opinit           = PARROT_CORE_CGP_OPLIB_INIT;
-    coredata->prepare_run      = init_prederef;
-    coredata->runops           = runops_cgp_core;
-    coredata->destroy          = NULL;
-    coredata->flags            = 0;
-
-    PARROT_RUNCORE_JIT_OPS_SET(coredata);
-    PARROT_RUNCORE_CGOTO_OPS_SET(coredata);
-    PARROT_RUNCORE_EVENT_CHECK_SET(coredata);
-    PARROT_RUNCORE_PREDEREF_OPS_SET(coredata);
-
-    Parrot_runcore_register(interp, coredata);
-}
 
 #endif /* #ifdef HAVE_COMPUTED_GOTO */
 
@@ -1210,73 +1103,6 @@ get_core_op_lib_init(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore))
 
 /*
 
-=item C<void * init_jit_run(PARROT_INTERP, Parrot_runcore_t *runcore)>
-
-Initializes JIT function for the specified opcode and runs it.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-void *
-init_jit_run(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore))
-{
-    ASSERT_ARGS(init_jit_run)
-    return init_jit(interp, interp->code->base.data);
-}
-
-
-#ifdef PARROT_EXEC_OS_AIX
-extern void* aix_get_toc();
-#endif
-
-/*
-
-=item C<static opcode_t * runops_jit_core(PARROT_INTERP, Parrot_runcore_t
-*runcore, opcode_t *pc)>
-
-Runs the JIT code for the specified opcode.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static opcode_t *
-runops_jit_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(opcode_t *pc))
-{
-    ASSERT_ARGS(runops_jit_core)
-#if JIT_CAPABLE
-#  ifdef PARROT_EXEC_OS_AIX
-    /* AIX calling convention requires that function-call-by-ptr be made
-       through the following struct: */
-    struct ptrgl_t { jit_f functPtr; void *toc; void *env; } ptrgl_t;
-
-    ptrgl_t.functPtr = (jit_f) D2FPTR(init_jit(interp, pc));
-    ptrgl_t.env      = NULL;
-
-    /* r2 (TOC) needs to point back here so we can return from non-JIT
-       functions */
-    ptrgl_t.toc = aix_get_toc();
-
-    ((jit_f) D2FPTR(&ptrgl_t)) (interp, pc);
-#  else
-    jit_f jit_code = (jit_f)(init_jit(interp, pc));
-    (jit_code) (interp, pc);
-#  endif
-#else
-    UNUSED(interp);
-    UNUSED(pc);
-#endif
-    return NULL;
-}
-
-
-/*
-
 =item C<static opcode_t * runops_exec_core(PARROT_INTERP, Parrot_runcore_t
 *runcore, opcode_t *pc)>
 
@@ -1310,18 +1136,7 @@ runops_exec_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(opcode_t
 #      endif
 #    endif
 #  endif
-    if (Parrot_exec_run == 2) {
-        void *ignored;
-        Parrot_exec_run = 0;
-
-        Parrot_runcore_switch(interp, CONST_STRING(interp, "jit"));
-
-        ignored         = runops_jit_core(interp, runcore, pc);
-        UNUSED(ignored);
-
-        Parrot_runcore_switch(interp, CONST_STRING(interp, "exec"));
-    }
-    else if (Parrot_exec_run == 1)
+    if (Parrot_exec_run == 1)
         Parrot_exec(interp, pc, code_start, code_end);
     else
         run_native(interp, pc, code_start);

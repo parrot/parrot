@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -164,12 +164,6 @@ bytecode.  Valid runcores include:
 =item PARROT_CGP_CORE
 
 =item PARROT_CGOTO_CORE
-
-=item PARROT_JIT_CORE
-
-=item PARROT_CGP_JIT_CORE
-
-=item PARROT_SWITCH_JIT_CORE
 
 =item PARROT_EXEC_CORE
 
