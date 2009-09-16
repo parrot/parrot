@@ -573,7 +573,6 @@ typedef struct code_segment_t {
     struct code_segment_t *prev;          /* previous code segment */
     struct code_segment_t *next;          /* next code segment */
     SymHash                key_consts;    /* this seg's cached key constants */
-    int                    pic_idx;       /* next index of PIC */
 } code_segment_t;
 
 typedef struct _imcc_globals_t {

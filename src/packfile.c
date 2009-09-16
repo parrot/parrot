@@ -583,8 +583,6 @@ make_code_pointers(ARGMOD(PackFile_Segment *seg))
             }
             break;
         case PF_UNKNOWN_SEG:
-            if (memcmp(seg->name, "PIC_idx", 7) == 0)
-                pf->cur_cs->pic_index = seg;
             break;
         case PF_DEBUG_SEG:
             pf->cur_cs->debugs       = (PackFile_Debug *)seg;
@@ -1771,9 +1769,6 @@ PF_create_default_segs(PARROT_INTERP, ARGIN(const char *file_name), int add)
 
     cur_cs->const_table->code = cur_cs;
 
-    cur_cs->pic_index = create_seg(interp, &pf->directory,
-            PF_UNKNOWN_SEG, "PIC_idx", file_name, add);
-
     return cur_cs;
 }
 
@@ -2051,6 +2046,7 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
     size_t                     i;
     int                        offs;
 
+    PARROT_ASSERT(pf);
     dir->num_segments = PF_fetch_opcode(pf, &cursor);
     TRACE_PRINTF(("directory_unpack: %ld num_segments\n", dir->num_segments));
     mem_realloc_n_typed(dir->segments, dir->num_segments, PackFile_Segment *);
@@ -2200,12 +2196,24 @@ directory_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
     PackFile_Directory * const dir = (PackFile_Directory *)self;
     size_t i;
 
-    for (i = 0; i < dir->num_segments; i++)
-        PackFile_Segment_destroy(interp, dir->segments[i]);
+    for (i = 0; i < dir->num_segments; i++) {
+        PackFile_Segment *segment = dir->segments[i];
+        /* Prevent repeated destruction */
+        dir->segments[i] = NULL;
+
+        /* XXX Black magic here.
+         * There are some failures that looks like a segment directory
+         * inserted into another. Until that problems gets fixed,
+         * these checks are a workaround.
+         */
+        if (segment && segment != self && segment->type != PF_DIR_SEG)
+            PackFile_Segment_destroy(interp, segment);
+    }
 
     if (dir->segments) {
         mem_sys_free(dir->segments);
         dir->segments = NULL;
+        dir->num_segments = 0;
     }
 }
 
@@ -2559,7 +2567,6 @@ byte_code_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
 #ifdef HAS_JIT
     Parrot_destroy_jit(byte_code->jit_info);
 #endif
-    parrot_PIC_destroy(byte_code);
     if (byte_code->prederef.code) {
         Parrot_free_memalign(byte_code->prederef.code);
         byte_code->prederef.code = NULL;
@@ -2572,7 +2579,6 @@ byte_code_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
 
     byte_code->fixups      = NULL;
     byte_code->const_table = NULL;
-    byte_code->pic_index   = NULL;
     byte_code->debugs      = NULL;
 }
 
@@ -4807,6 +4813,8 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
             PARROT_LIB_PATH_INCLUDE);
     Parrot_lib_add_path(interp, Parrot_str_append(interp, found_path, CONST_STRING(interp, "dynext/")),
             PARROT_LIB_PATH_DYNEXT);
+    Parrot_lib_add_path(interp, Parrot_str_append(interp, found_path, CONST_STRING(interp, "library/")),
+            PARROT_LIB_PATH_LIBRARY);
 
 
     /* Check if the file found was actually a bytecode file (.pbc extension) or

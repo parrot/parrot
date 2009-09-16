@@ -104,6 +104,16 @@ sub _list_extra_headers {
     if ( $conf->data->get_p5('OSNAME') eq "msys" ) {
         push @extra_headers, qw(sysmman.h netdb.h);
     }
+
+    if ( $conf->data->get_p5('OSNAME') eq "MSWin32" ) {
+        # Microsoft provides two annotations mechanisms.  __declspec, which has been
+        # around for a while, and Microsoft's standard source code annotation
+        # language (SAL), introduced with Visual C++ 8.0.
+        # See <http://msdn2.microsoft.com/en-us/library/ms235402(VS.80).aspx>,
+        # <http://msdn2.microsoft.com/en-us/library/dabb5z75(VS.80).aspx>.
+        push @extra_headers, qw(sal.h);
+    }
+
     return @extra_headers;
 }
 

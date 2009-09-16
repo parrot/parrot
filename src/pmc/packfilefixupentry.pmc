@@ -19,7 +19,7 @@ PackfileFixupTable segment of the .pbc file.  See PDD13 for a design spec.
 
 */
 
-pmclass PackfileFixupEntry {
+pmclass PackfileFixupEntry auto_attrs {
     ATTR INTVAL     type;
     ATTR STRING     *name;
     ATTR INTVAL     offset;
@@ -36,12 +36,11 @@ Initialize PackfileFixupEntry.
 */
     VTABLE void init() {
         Parrot_PackfileFixupEntry_attributes * attrs =
-                mem_allocate_zeroed_typed(Parrot_PackfileFixupEntry_attributes);
+                PMC_data_typed(SELF, Parrot_PackfileFixupEntry_attributes*);
 
         attrs->name = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
 
-        PObj_custom_mark_destroy_SETALL(SELF);
-        PMC_data(SELF) = attrs;
+        PObj_custom_mark_SET(SELF);
     }
 
 /*
@@ -61,27 +60,6 @@ Marks the object as live.
         if (attrs->name)
             Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->name);
     }
-
-/*
-
-=item C<void destroy()>
-
-Destroys the PMC and frees all allocated memory.
-
-=cut
-
-*/
-
-    VTABLE void destroy() {
-        Parrot_PackfileFixupEntry_attributes * attrs =
-                PARROT_PACKFILEFIXUPENTRY(SELF);
-
-        if (attrs) {
-            mem_sys_free(attrs);
-            PMC_data(SELF) = NULL;
-        }
-    }
-
 
 /*
 

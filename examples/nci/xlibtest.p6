@@ -1,4 +1,4 @@
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008-2009, Parrot Foundation.
 # $Id$
 
 use v6;
@@ -22,7 +22,7 @@ Press Esc key to exit the program.
 
 =end pod
 
-use Xlib;
+use Xlib:from<parrot>;
 
 # Event types
 constant KeyPress      =  2;

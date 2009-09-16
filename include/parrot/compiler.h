@@ -40,7 +40,11 @@
 #  ifdef _MSC_VER
 #    define __attribute__noreturn__         __declspec(noreturn)
 #  else
-#    define __attribute__noreturn__         __attribute__((__noreturn__))
+#    ifdef __clang__
+#      define __attribute__noreturn__         __attribute__((analyzer_noreturn))
+#    else
+#      define __attribute__noreturn__         __attribute__((__noreturn__))
+#    endif
 #  endif
 #endif
 #ifdef HASATTRIBUTE_PURE
@@ -99,25 +103,21 @@
  */
 #define UNUSED(a) /*@-noeffect*/if (0) (void)(a)/*@=noeffect*/;
 
-/* 64-bit CL has some problems, so this section here is going to try to fix them */
-#ifdef PARROT_HAS_MSVC_SAL
-#  ifdef _WIN64
-    /* CL64 can't seem to find sal.h, so take that out of the equation */
-#    undef PARROT_HAS_MSVC_SAL
-    /* CL64 complains about not finding _iob, so this might fix it */
-
-
-#  endif
-#endif
-
-#ifdef PARROT_HAS_MSVC_SAL
+#ifdef PARROT_HAS_HEADER_SAL
+/*
+ * Microsoft provides two annotations mechanisms.  __declspec, which has been
+ * around for a while, and Microsoft's standard source code annotation
+ * language (SAL), introduced with Visual C++ 8.0.
+ * See <http://msdn2.microsoft.com/en-us/library/ms235402(VS.80).aspx>,
+ * <http://msdn2.microsoft.com/en-us/library/dabb5z75(VS.80).aspx>.
+ */
 #  include <sal.h>
 #  define PARROT_CAN_RETURN_NULL      /*@null@*/ __maybenull
 #  define PARROT_CANNOT_RETURN_NULL   /*@notnull@*/ __notnull
 #else
 #  define PARROT_CAN_RETURN_NULL      /*@null@*/
 #  define PARROT_CANNOT_RETURN_NULL   /*@notnull@*/
-#endif
+#endif /* PARROT_HAS_HEADER_SAL */
 
 #define PARROT_DEPRECATED           __attribute__deprecated__
 
@@ -142,7 +142,7 @@
 /* Function argument instrumentation */
 /* For explanations of the annotations, see http://www.splint.org/manual/manual.html */
 
-#ifdef PARROT_HAS_MSVC_SAL
+#ifdef PARROT_HAS_HEADER_SAL
 #  define NOTNULL(x)                  /*@notnull@*/ __notnull x
     /* The pointer passed may not be NULL */
 

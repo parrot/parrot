@@ -190,6 +190,7 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(PMC *ctx),
     ASSERT_ARGS(Parrot_Context_get_info)
     PMC                   *subpmc;
     Parrot_Sub_attributes *sub;
+    opcode_t              *pc;
 
     /* set file/line/pc defaults */
     info->file     = CONST_STRING(interp, "(unknown file)");
@@ -228,15 +229,17 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(PMC *ctx),
         info->fullname = Parrot_full_sub_name(interp, subpmc);
     }
 
+    pc = Parrot_pcc_get_pc(interp, ctx);
+
     /* return here if there is no current pc */
-    if (Parrot_pcc_get_pc(interp, ctx) == NULL)
+    if (!pc)
         return 1;
 
     /* calculate the current pc */
-    info->pc = Parrot_pcc_get_pc(interp, ctx) - sub->seg->base.data;
+    info->pc = pc - sub->seg->base.data;
 
     /* determine the current source file/line */
-    if (Parrot_pcc_get_pc(interp, ctx)) {
+    if (pc) {
         const size_t offs = info->pc;
         size_t i, n;
         opcode_t *pc = sub->seg->base.data;
@@ -261,7 +264,91 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(PMC *ctx),
             pc += op_info->op_count + var_args;
         }
     }
+
     return 1;
+}
+
+
+/*
+
+=item C<INTVAL Parrot_Sub_get_line_from_pc(PARROT_INTERP, PMC *subpmc, opcode_t
+*pc)>
+
+Given a PMC sub and the current opcode, returns the corresponding PIR line
+number.
+
+=cut
+
+*/
+
+INTVAL
+Parrot_Sub_get_line_from_pc(PARROT_INTERP, ARGIN_NULLOK(PMC *subpmc), ARGIN_NULLOK(opcode_t *pc))
+{
+    ASSERT_ARGS(Parrot_Sub_get_line_from_pc)
+    Parrot_Sub_attributes *sub;
+    PackFile_Debug        *debug;
+    opcode_t              *base_pc;
+    size_t                 i, n, offs;
+
+    if (!subpmc || !pc)
+        return -1;
+
+    PMC_get_sub(interp, subpmc, sub);
+
+    offs    = pc - sub->seg->base.data;
+    debug   = sub->seg->debugs;
+    base_pc = sub->seg->base.data;
+
+    for (i = n = 0; n < sub->seg->base.size; i++) {
+        op_info_t * const op_info  = &interp->op_info_table[*base_pc];
+        opcode_t          var_args = 0;
+
+        if (i >= debug->base.size)
+            return -1;
+
+        if (n >= offs)
+            return debug->base.data[i];
+
+        ADD_OP_VAR_PART(interp, sub->seg, base_pc, var_args);
+        n       += op_info->op_count + var_args;
+        base_pc += op_info->op_count + var_args;
+    }
+
+    return -1;
+}
+
+
+/*
+
+=item C<STRING * Parrot_Sub_get_filename_from_pc(PARROT_INTERP, PMC *subpmc,
+opcode_t *pc)>
+
+Given a PMC sub and the current opcode, returns the corresponding PIR file
+name.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_Sub_get_filename_from_pc(PARROT_INTERP, ARGIN_NULLOK(PMC *subpmc),
+        ARGIN_NULLOK(opcode_t *pc))
+{
+    ASSERT_ARGS(Parrot_Sub_get_filename_from_pc)
+    Parrot_Sub_attributes *sub;
+    PackFile_Debug        *debug;
+    int                    position;
+
+    if (!subpmc || !pc)
+        return CONST_STRING(interp, "unknown file");
+
+    PMC_get_sub(interp, subpmc, sub);
+
+    debug    = sub->seg->debugs;
+    position = pc - sub->seg->base.data;
+
+    return Parrot_debug_pc_to_filename(interp, debug, position);
 }
 
 /*

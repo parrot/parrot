@@ -57,8 +57,9 @@ print_sub_name(PARROT_INTERP, PMC *sub_pmc)
 }
 
 pmclass Coroutine extends Sub auto_attrs {
-    ATTR PackFile_ByteCode *caller_seg;  /* bytecode segment */
-    ATTR opcode_t *address;           /* next address to run - toggled each time */
+    ATTR PackFile_ByteCode *caller_seg; /* bytecode segment */
+    ATTR opcode_t *address;             /* next address to run - toggled each time */
+    ATTR INTVAL yield;                  /* yield in process */
 
 /*
 
@@ -110,6 +111,20 @@ Clones the coroutine.
 
 /*
 
+=item C<void increment()>
+
+Signals the start of a yield.
+
+=cut
+
+*/
+
+    VTABLE void increment() {
+        SET_ATTR_yield(INTERP, SELF, 1);
+    }
+
+/*
+
 =item C<opcode_t *invoke(void *next)>
 
 Swaps the "context".
@@ -144,11 +159,8 @@ Swaps the "context".
 
             co->ctx = ctx;
 
-            Parrot_pcc_set_caller_ctx(INTERP, ctx, caller_ctx);
             PARROT_CONTINUATION(ccont)->from_ctx = ctx;
             Parrot_pcc_set_sub(INTERP, ctx, SELF);
-            Parrot_pcc_set_HLL(interp, ctx, co->HLL_id);
-            Parrot_pcc_set_namespace(INTERP, ctx, co->namespace_stash);
             Parrot_pcc_set_continuation(INTERP, ctx, ccont);
             Parrot_pcc_set_object(interp, ctx, PMCNULL);
             INTERP->current_object = PMCNULL;
@@ -189,6 +201,12 @@ Swaps the "context".
         else {
             PMC * const ccont = Parrot_pcc_get_continuation(INTERP, co->ctx);
             PMC * const ctx   = PARROT_CONTINUATION(ccont)->to_ctx;
+            INTVAL yield;
+            GET_ATTR_yield(INTERP, SELF, yield);
+            if (! yield)
+                Parrot_ex_throw_from_c_args(INTERP, NULL, CONTROL_ERROR,
+                               "Cannot resume dead coroutine.");
+            SET_ATTR_yield(INTERP, SELF, 0);
 
             PObj_get_FLAGS(SELF) &= ~SUB_FLAG_CORO_FF;
             /* switch back to last remembered code seg and context */
@@ -200,7 +218,8 @@ Swaps the "context".
                    the "Call an exited coroutine" case in t/pmc/coroutine.t; the
                    problem is that the defunct coroutine yields up one more
                    result before we get here.  -- rgr, 7-Oct-06.
-                */
+                 * This may be unneeded after the yield fix, see TT #1003
+                 */
                 Parrot_ex_throw_from_c_args(INTERP, NULL, CONTROL_ERROR,
                                "Cannot resume dead coroutine.");
             }

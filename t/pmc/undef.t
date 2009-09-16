@@ -19,7 +19,7 @@ Tests mainly morphing undef to other types.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(22)
+    plan(23)
 
     morph_to_string()
     undef_pmc_is_false()
@@ -49,9 +49,18 @@ Tests mainly morphing undef to other types.
     pmc1 = new ['Undef']
     if pmc1 goto PMC1_IS
       ok( 1, 'PMC Undef created by new is false' )
-      .return()
+      goto logical_not
     PMC1_IS:
     ok( 0, 'PMC Undef created by new is false' )
+
+  logical_not:
+    unless pmc1 goto logical_not_passed
+    ok( 0, 'logical_not of PMC Undef created by new is false' )
+    goto done
+  logical_not_passed:
+    ok( 1, 'logical_not of PMC Undef created by new is true' )
+
+  done:
 .end
 
 .sub undef_pmc_is_not_defined

@@ -31,9 +31,8 @@ PMC. Attributes are referenced by class name/attribute name pairs.
 Attributes are set on a class-wide basis, and all the objects of a class
 will have the same set of attributes.  Most OO languages don't allow
 attribute changes to existing classes, but Parrot's base attribute
-system does allow it. In order to safely support advanced dynamic
-features in HLLs, attributes are not accessible via fixed attribute
-offsets, but only via named lookup.
+system does allow it (only before the first object is instantiated from
+the class).
 
 =head3 Method
 
@@ -103,8 +102,12 @@ not associated with a namespace.)
 =item - Classes are instances of a meta-class and have their own sets of
 class methods and class attributes
 
-=item - Objects may have an array of attributes. Attribute values may be
-PMCs or a low-level type.
+=item - Classes can be subclassed
+
+=item - High-level classes can subclass low-level PMCs
+
+=item - Objects have a collection (0 or more) of attributes. Attribute
+values may be PMCs or a low-level type.
 
 =item - Objects have an associated class.
 
@@ -121,20 +124,15 @@ method calls)
 
 =item - Objects can set an attribute by name
 
-=item - Objects can be subclassed (note that objects may not necessarily
-be able to have their classes changed arbitrarily, but making a subclass
-and moving the object to it is allowable)
-
-=item - High-level objects can subclass low-level PMCs
-
 =back
 
 =head2 Implementation
 
 There are four pieces to the object implementation. There are the PMCs for the
 classes, roles, and objects, the opcodes the engine uses to do objecty things,
-the specific vtable functions used to perform those objecty things, and the
-supporting code provided by the interpreter engine to do the heavy lifting.
+specific vtable functions used to perform some of those objecty things, and
+the supporting code provided by the interpreter engine to do the heavy
+lifting.
 
 Parrot, in general, doesn't restrict operations on objects and classes. If a
 language has restrictions on what can be done with them, the language is
@@ -149,58 +147,60 @@ class, but currently it doesn't.)
 =head3 Class PMC API
 
 There are two PMC classes, C<Class> and C<Object>.  Class PMCs hold all
-the class-specific information. Instantiating a new OO class creates a
-new Class PMC, and enters the new OO class into Parrot's PMC class
-table, at which point it is indistinguishable from any other PMC class.
+the class-specific information. Instantiating a new high-level class
+creates a new Class PMC, and enters the new high-level class into
+Parrot's PMC class table, at which point it is indistinguishable from
+any other PMC class.
 
 It's important to note that 'standard' classes are Class PMC instances,
 or instances of a subclass of the Class PMC, and 'standard' objects are
 Object PMCs. It isn't necessary to create a brand new low-level PMC
-class for each OO class, and they all share the Class or Object vtable,
-respectively.
+class for each high-level class, and they all share the Class PMC
+vtable functions.
 
-An instance of the Class PMC has eleven internal attributes, which are:
+An instance of the Class PMC has eleven core internal attributes, which
+are:
 
 =over 4
 
-=item 0
+=item 1
 
 The class name
 
-=item 1
+=item 2
 
 A link to the class's associated namespace
 
-=item 2
+=item 3
 
 A "have I been instantiated since I was last modified" flag
 
-=item 3
+=item 4
 
 An array PMC of the immediate parent classes
 
-=item 4
+=item 5
 
 A cached array of all parent PMCs, in search order (this is an optional
 optimization, and can be calculated from the class's rules of inheritance,
 the list of immediate parent classes, and the parent classes' rules of
 inheritance)
 
-=item 5
+=item 6
 
 An array PMC of the composed roles (these are Role PMCs, not string names of
 roles).
 
-=item 6
+=item 7
 
 A hash PMC of the methods defined in the class or composed into the
 class
 
-=item 7
+=item 8
 
 A hash PMC of the overloaded PMC vtable entries for the class.
 
-=item 8
+=item 9
 
 The class attribute metadata hash. Keys are the attribute names and the
 values are a hash of attribute characteristics, including name, type, the
@@ -208,7 +208,7 @@ class they're associated with and any flags (for example, private). Note
 that this only stores metadata for the attributes defined in this class,
 and not for attributes inherited from its parents.
 
-=item 9
+=item 10
 
 The full attribute lookup table. This associates attribute names with an
 index into the object's attribute storage (an array). It includes all
@@ -218,7 +218,7 @@ name of the class where the attribute is defined, along with the
 attribute name. The value is an index into the per-object attribute
 store.
 
-=item 10
+=item 11
 
 The attribute cache. While the attribute lookup table defines every
 attribute, whether it is visible or not with the current method
@@ -243,46 +243,23 @@ The inheritance rules (MRO) for a particular HLL will determine which
 child class attributes override which parent class attributes.  The
 cache is only set on individual accesses to a particular attribute.
 
-(If a parent class changes its set of attributes, should that change
-appear in later instantiations of objects from child classes? If so, all
-of these classes would need to be re-constructed as a result of the
-change; note that any already instantiated objects would refer to the
-old class. NOTE: flag old classes with an "updated" status, to notify
-objects of the old class that they should rebless themselves into the
-new class next time they access the old class?)
-
 Class PMCs also have the "I am a class" flag set on them.
 
 =head4 Classes, Namespaces, and the Class Registry
 
-Extending an existing class that has been instantiated creates a new
-class object that replaces the old class object in the Namespace.
-However, the old class object must be kept, as the old objects still
-point to it and do their method resolution and attribute lookup through
-that class object.
+If a class hasn't been instantiated, adding a method or attribute
+modifies the existing class object. Extending a class that has been
+instantiated is not allowed.
 
-If a class hasn't been instantiated, adding a method or attribute only
-modifies the existing class object instead of creating a new class
-object. Extending a class that has been instantiated only causes the
-creation of a new class object the first time it's extended.  After
-that, methods and attributes added to it will only modify the existing
-class object until it is instantiated again.
+The class registry has a much diminished role in this implementation.
+Its only responsibility is maintaining a mapping of unique IDs to class
+objects throughout the system. It should not be used for looking up
+classes by name.
 
-The Namespace always points to the most current incarnation of the
-class. All the class objects that belong to a particular namespace store
-a pointer to that Namespace object. They keep that pointer even if the
-Namespace object no longer stores a pointer to them.
-
-Since any given class name may have multiple corresponding class
-objects, the class registry has a much diminished role in this
-implementation. Its only responsibility is maintaining a mapping of
-unique IDs to class objects throughout the system.  It can't be used for
-looking up classes by name, because it's possible to have multiple
-classes with the same name in the same namespace. The class registry may
-need to have names removed (since it doesn't care about names anymore).
-Low-level PMC types will also need entries in the namespace hierarchy.
-We may eventually be able to eliminate the registry of class IDs
-altogether.
+The class registry may need to have names removed (since it doesn't care
+about names anymore). We plan to eventually eliminate the registry of
+class IDs altogether. Low-level PMC types also have entries in the
+namespace hierarchy via PMCProxy objects. 
 
 A class can be garbage collected when it has no instantiated objects
 and no Namespace object referencing it (to mark it as live). When a
@@ -334,15 +311,7 @@ Add a role to the class.
 Returns the PMC for the named method. If no method of this name exists, nor
 can be constructed, returns a Null PMC.
 
-Note that for languages which support default fallback methods, such as Perl
-5's AUTOLOAD, this would be the place to return it if a normal lookup fails.
-
-Since the method list and vtable override list are stored in the class
-PMC, method finding is a lookup on the class object and not a lookup in
-the namespace. (This could be handled automatically whenever a class is
-associated with a namespace.) Just adding a sub to a namespace will not
-automatically make it a method of the class, you have to call add_method
-too.
+A class object reports on class methods, not on instance methods.
 
 =item isa(pmc *)
 
@@ -358,19 +327,19 @@ class in the inheritance hierarchy of the object.
 =item can(string *)
 
 Returns true or false if the class can perform the requested method.
-(Including with an AUTOLOAD)
+(Class systems that implement default fallback methods should report
+that they 'can' perform any method.)
 
-A class object only reports on class methods, it does not report on instance
-methods.
+A class object reports on class methods, not on instance methods.
 
 =item does(class *)
 
 Returns true or false to note whether the class in question implements the
 interface passed in.
 
-A class object only reports on interfaces of the class (i.e. roles composed
-into the metaclass), while an instance object only reports on interfaces of
-the instance (i.e. roles composed into the class).
+A class object only reports on interfaces of the class (i.e. roles
+composed into the metaclass), it doesn't report on which interfaces will
+be added to an instance of that class.
 
 =item inspect()
 
@@ -399,20 +368,14 @@ Remove a method from the class.
 
 Remove a parent from the class.
 
-=item remove_role(string *)
-
-Remove a role from the class.
-
 =back
 
-Currently Parrot only supports mutating a class' metainformation for
-Class classes. This is a restriction which will be lifted at some point
-soon.
+Parrot only supports mutating class metainformation for Class classes.
+This restriction may be lifted at some point.
 
 =head4 Class Methods
 
-These methods are just syntactic sugar for the vtable functions. They are
-not included in the Class PMC by default, but added to Class as a role.
+These methods are just syntactic sugar for the vtable functions.
 
 =over 4
 
@@ -429,11 +392,11 @@ the current value for name. When passed an argument, it sets the name of
 the class, and also sets the association with a namespace. With no
 argument it only returns the current value of the name attribute.
 
-=item namespace
+=item get_namespace
 
 =begin PIR_FRAGMENT
 
-    $P1 = $P2.'namespace'()
+    $P1 = $P2.'get_namespace'()
 
 =end PIR_FRAGMENT
 
@@ -462,13 +425,12 @@ Passing attribute names that weren't declared in the class is an error.
 =end PIR_FRAGMENT
 
 Adds a single attribute to the class. It takes a simple string name and,
-optionally, a simple string value or key specifying a type name. (A type
-name just checks C<does>, and doesn't necessarily correspond to a class or
-role namespace.)
+optionally, a simple string value or key specifying a type name. (Types
+are not currently checked by Parrot, and only provided for
+introspection.)
 
-If the class has already been instantiated, adding a new attribute triggers
-the creation of a new class, replacing the old class. See L<Classes,
-Namespaces, and the Class Registry>.
+If the class has already been instantiated, adding a new attribute
+throws an exception.
 
 =item attributes
 
@@ -487,17 +449,11 @@ containing the attribute's metadata. The accessor is read-only.
 =begin PIR_FRAGMENT
 
   $P1.'add_method'($S2, $P3)
-  $P1.'add_method'($S2, $P3, 'vtable' => 1)
 
 =end PIR_FRAGMENT
 
 Adds a method to the class. It takes a simple string name and a method
-PMC.  If the method already exists (and isn't a Multi) it will replace
-the method with the new method and throw a warning.
-
-It also takes named parameters to flag whether the method is a vtable
-override, and whether it is anonymous (no named entry as a method, only
-as a vtable).
+PMC. If the method already exists it will throw an exception.
 
 =item methods
 
@@ -512,6 +468,19 @@ methods, with a key of the method name and a value of an invokable PMC.
 Note that the methods list includes any methods that were composed into
 the class from roles.
 
+=item add_vtable_override
+
+=begin PIR_FRAGMENT
+
+  $P1.'add_vtable_override'($S2, $P3)
+
+=end PIR_FRAGMENT
+
+Adds a vtable override to the class. It takes a simple string name and a
+sub/method PMC. If the vtable override already exists it will throw an
+exception (attempting to add the same sub/method object a second time
+will be silently ignored).
+
 =item add_parent
 
 =begin PIR_FRAGMENT
@@ -520,7 +489,8 @@ the class from roles.
 
 =end PIR_FRAGMENT
 
-Adds a single parent to the class. It takes an instance of the Class PMC.
+Adds a single parent to the class. It takes a Class PMC argument (the
+parent to add).
 
 =item parents
 
@@ -530,7 +500,7 @@ Adds a single parent to the class. It takes an instance of the Class PMC.
 
 =end PIR_FRAGMENT
 
-An accessor for the parents of the class. It returns an Array of all
+An accessor for the parents of the class. It returns an array of all
 parents. The accessor is read-only.
 
 =item roles
@@ -541,7 +511,7 @@ parents. The accessor is read-only.
 
 =end PIR_FRAGMENT
 
-An accessor for the roles of the class. It returns an Array of all
+An accessor for the roles of the class. It returns an array of all
 roles. The accessor is read-only.
 
 =item add_role
@@ -575,8 +545,7 @@ Create a subclass of $P2 with name $S3 and return it in $P1.
 =end PIR_FRAGMENT
 
 Returns true if the class name passed in as a parameter is in the inheritance
-hierarchy of the class (this is not the same as the inheritance hierarchy of
-objects instantiated from the class), false otherwise.
+hierarchy of the class, false otherwise.
 
 =item can
 
@@ -588,8 +557,6 @@ objects instantiated from the class), false otherwise.
 
 Returns true if the class object can perform the requested method, false
 otherwise.
-
-A class object only reports on class methods, not on instance methods.
 
 =item does
 
@@ -624,22 +591,23 @@ Return introspection information for the class.
 C<Object> PMCs are the actual objects, and hold all the per-object
 instance data.
 
-The Object PMC is an array of meta-information and attributes. The
-elements of this array are:
+An instance of the Object PMC has two core internal attributes, which
+are:
 
 =over 4
 
-=item 0
+=item 1
 
 The class PMC
 
-=item 1
+=item 2
 
-The object attribute store. This is simply an array of PMCs that
-provide the values for the attributes. It may be a resizable PMC array
-to provide lazy growth rather than allocating all needed memory for
-all attributes. We find the indexes into this array from the attribute
-cache or lookup table in the class.
+The object attribute store. This is simply an array of PMCs that provide
+the values for the attributes. It may be a resizable PMC array to
+provide lazy growth rather than allocating all needed memory for all
+attributes. The attribute cache and lookup table in the class store the
+indexes into this array, linking the attribute name and meta-information
+with the storage position. 
 
 =back
 
@@ -656,24 +624,6 @@ class. They do have vtable functions providing access to certain low-level
 information about the object, method call functionality, etc. See the
 sections below on L<Objects> and L<Vtables>.
 
-In addition to a value type, objects can have a container type. The
-container type can't be stored in the object itself, because a single
-object may live within multiple containers. So, the container type (when
-it exists) is stored in the LexPad or Namespace entry for a particular
-variable.
-
-In a static language like C#.Net:
-
-  B isa A
-  A o1 = new B();
-  B o2 = new B();
-
-  o1.x; # retrieves A's attribute
-  o2.x; # retrieves B's attribute
-
-  o1.foo(); # calls B's method
-  o2.foo(); # calls B's method
-
 =head4 Object Vtable Entries
 
 All Objects need the following vtable entries.
@@ -683,8 +633,18 @@ All Objects need the following vtable entries.
 =item find_method(string *)
 
 Returns the PMC for the named method. If no method of this name exists,
-nor can be constructed, returns a Null PMC. This only passes the method
-search on to the object's class.
+nor can be constructed, returns a Null PMC.
+
+Note that for languages which support default fallback methods (such as
+Perl 5's AUTOLOAD) this would be the place to return it if a normal
+lookup fails.
+
+Since the method list and vtable override list are stored in the class
+PMC, method finding is a lookup on the class object and not a lookup in
+the namespace. Just adding a sub to a namespace will not automatically
+make it a method of the class, you have to call add_method too.
+
+An instance object reports on instance methods, not on class methods.
 
 =item isa(class *)
 
@@ -694,7 +654,8 @@ inheritance hierarchy of the object.
 =item can(string *)
 
 Returns true or false if the object can perform the requested method.
-(Including with an AUTOLOAD)
+(Class systems that implement default fallback methods should report
+that they 'can' perform any method.)
 
 An instance object only reports on instance methods, not on class methods.
 
@@ -753,32 +714,32 @@ or array) or attribute access.
 
 =head3 Role PMC API
 
-An instance of the Role PMC has five attributes, which are:
+An instance of the Role PMC has five core attributes, which are:
 
 =over 4
 
-=item 0
+=item 1
 
 The role name
 
-=item 1
+=item 2
 
 A link to the role's associated namespace
 
-=item 2
+=item 3
 
 An array PMC of composed roles
 
-=item 3
+=item 4
 
 An array PMC of the methods defined in the role or composed into the
 role
 
-=item 4
+=item 5
 
-The role attribute hash. Keys are the attribute names and the values
-are a hash of attribute characteristics, including name, type, and the
-role they're associated with.
+The role attribute hash, where each key is an attribute name and the
+corresponding value is a hash of attribute characteristics, including
+name, type, and the role they're associated with.
 
 =back
 
@@ -809,10 +770,17 @@ Add a role to the role.
 Returns the PMC for the named method. If no method of this name exists,
 nor can be constructed, returns a Null PMC.
 
+A role object reports on class methods (methods of the metarole), not on
+instance methods.
+
 =item can(string *)
 
 Returns true or false if the role can perform the requested method.
-(Including with an AUTOLOAD)
+(Class systems that implement default fallback methods should report
+that they 'can' perform any method.)
+
+A role object reports on class methods (methods of the metarole), not on
+instance methods.
 
 =item does(class *)
 
@@ -821,7 +789,7 @@ interface passed in.
 
 A role object only reports on interfaces of the role (i.e. roles composed into
 the metarole), it doesn't report on which interfaces will be added to an
-object that composes the role.
+object instantiated from a class that composes the role.
 
 =item clone
 
@@ -846,17 +814,11 @@ Remove an attribute from the role.
 
 Remove a method from the role.
 
-
-=item remove_role(string *)
-
-Remove a role from the role.
-
 =back
 
 =head4 Role Methods
 
-These methods are just syntactic sugar for the vtable functions. They are
-not included in the Role PMC by default, but added to Role as a role.
+These methods are just syntactic sugar for the vtable functions.
 
 =over 4
 
@@ -872,11 +834,11 @@ The accessor for the name attribute. With no argument, it simply returns
 the current value for name. When passed an argument, it sets the name of
 the role, and also sets the association with a namespace.
 
-=item namespace
+=item get_namespace
 
 =begin PIR_FRAGMENT
 
-    $P1 = $P2.'namespace'()
+    $P1 = $P2.'get_namespace'()
 
 =end PIR_FRAGMENT
 
@@ -940,17 +902,23 @@ no role will be mentioned more than once. The accessor is read-only.
 =begin PIR_FRAGMENT
 
   $P1.'add_method'($S2, $P3)
-  $P1.'add_method'($S2, $P3, 'vtable' => 1)
 
 =end PIR_FRAGMENT
 
 Adds a method to the role. It takes a simple string name and a method
-PMC. If the method already exists (and isn't a Multi) it will replace
-the method with the new method and throw a warning.
+PMC. If the method already exists it will throw an exception.
 
-It also takes slurpy named parameters to flag whether the method is a
-vtable override, and whether its anonymous (no named entry as a method,
-only as a vtable).
+=item add_vtable_override
+
+=begin PIR_FRAGMENT
+
+  $P1.'add_vtable_override'($S2, $P3)
+
+=end PIR_FRAGMENT
+
+Adds a vtable override to the role. It takes a simple string name and a
+sub/method PMC. If the vtable override already exists it will throw an
+exception.
 
 =item methods
 
@@ -989,9 +957,8 @@ implement them.
 
 When declaring a composed class, you can optionally supply an array of
 method names that will be defined by the class to resolve a conflict in
-its roles.  This is done using the named parameter C<resolve>. This
-feature supports composition conflict resolution in languages such as
-Perl 6.
+its roles. This is done using the named parameter C<resolve>. This
+feature supports composition conflict resolution.
 
 When adding a role to a class, you can optionally supply an array of
 method names from the role to exclude from the composition process. This
@@ -1015,13 +982,6 @@ role composed into the class. You can C<alias> the method if you want to
 call it from the composed class. (You might use this if you want the
 resolving method to be able to call either of the conflicting methods
 from two composed roles.)
-
-If a method in a role is a MultiSub PMC and there is either no method of
-that name yet OR what is in the method slot with that name is also a
-MultiSub PMC, there will be no error. Instead, the multi-methods from
-the role will be added to the multi-methods of the MultiSub PMC already
-in the class. Any attempt to combine a multi with a non-multi will
-result in an error.
 
 =head3 Opcodes
 
@@ -1074,7 +1034,7 @@ If the attribute doesn't exist, it will throw an exception.
 
 =end PIR_FRAGMENT
 
-Call the method specified in the attribute $S1 using $P1 as the invocant and
+Call the method specified in the string name $S1 using $P1 as the invocant and
 using the continuation passed in $P2. If you need to create a new continuation
 use C<callmethodcc>.
 
@@ -1098,11 +1058,11 @@ use C<callmethodcc>.
 
 =end PIR_FRAGMENT
 
-Call the method specified in the attribute $S1, or in the Sub object $P2,
+Call the method specified in the string name $S1, or in the Sub object $P2,
 using $P1 as the invocant for method lookup and generate a new return
 continuation.
 
-Throws a Method_Not_Found_Exception for a non-existent method.
+Throws an exception for a non-existent method.
 
 =item callmethodsupercc [hypothetical, 2.0 or later]
 
@@ -1113,11 +1073,11 @@ Throws a Method_Not_Found_Exception for a non-existent method.
 
 =end PIR_FRAGMENT_TODO
 
-Call the method specified in the attribute $S1, or in the Sub object $P2,
+Call the method specified in the string name $S1, or in the Sub object $P2,
 using $P1 as the invocant for method lookup and generate a new return
 continuation.  This is a variant of C<callmethodcc> that skips over the
 current class when searching for the method, and only looks in the parent
-classes.  PIR may provide some syntactical sugar for this.
+classes.  PIR may provide some syntactic sugar for this.
 
 =item callmethodnextcc [hypothetical, 2.0 or later]
 
@@ -1128,7 +1088,7 @@ classes.  PIR may provide some syntactical sugar for this.
 
 =end PIR_FRAGMENT_TODO
 
-Call the method specified in the attribute $S1, or in the Sub object $P2,
+Call the method specified in the string name $S1, or in the Sub object $P2,
 using $P1 as the invocant for method lookup and generate a new return
 continuation. A variant of C<callmethodcc> that picks up an existing
 C<find_method> search where it left off for the current call. {{ Note: this
@@ -1335,28 +1295,16 @@ associated namespace.
 
 =head3 Vtable Overriding
 
-Classes may override the vtable functions, allowing objects of a class to
-behave like a primitive PMC. To use these properly at a low-level
-requires a good working knowledge of the way Parrot works--generally for
-higher-level languages the language compiler or runtime will provide
-easier-to-use wrappers. These methods are all prototyped, and take a
-single fixed argument list, and return at most a single value.
+Classes can override vtable functions from PIR, allowing control over
+the low-level behavior of objects similar to PMCs defined in C. The
+vtable functions all take a single fixed argument list, and return at
+most a single value. Calling the overrides directly requires some
+knowledge of the way Parrot works, so higher-level languages will
+generally provide easier-to-use wrappers.
 
 To override a vtable function, either add the :vtable pragma to the
 declaration of the method, or pass a named parameter "vtable" into the
 C<add_method> method on a class or role.
-
-=head3 What The Bytecode Sees
-
-The bytecode is isolated from most of the internal details of the
-implementation. This allows both for flexibility in the implementation and
-forward compatibility, generally good things. It also allows for multiple
-concurrent interoperable object systems. The major thrust is for transparent
-use of objects, though most class activity (including creation of subclasses
-and modifications of existing classes) should be transparent as well.
-
-
-
 
 =head2 Examples
 
@@ -1369,7 +1317,7 @@ To create a new class C<Foo> which has no parent classes:
 
 =begin PIR_FRAGMENT
 
-   newclass $P0, "Foo"
+   $P0 = newclass "Foo"
 
 =end PIR_FRAGMENT
 
@@ -1379,9 +1327,9 @@ To create a class C<Foo> with the parents C<A> and C<B>, the code would be:
 
 =begin PIR_FRAGMENT
 
-   get_class $P0, "A"
-   get_class $P1, "B"
-   subclass $P2, $P0, "Foo"
+   $P0 = get_class "A"
+   $P1 = get_class "B"
+   $P2 = subclass $P0, "Foo"
    addparent $P2, $P1
 
 =end PIR_FRAGMENT
@@ -1416,25 +1364,34 @@ Assuming we want an object of class C<Foo>:
 Calling the method C<Xyzzy> on an object, assuming the PDD03 calling
 conventions are respected:
 
-=begin PIR_FRAGMENT_INVALID
+=begin PASM_FRAGMENT_INVALID
 
   callmethod "Xyzzy"
 
   set S0, "Xyzzy"
   callmethod
 
-=end PIR_FRAGMENT_INVALID
+=end PASM_FRAGMENT_INVALID
 
 Or, if a return continuation needs constructing:
 
-=begin PIR_FRAGMENT_INVALID
+=begin PASM_FRAGMENT_INVALID
 
   callmethodcc "Xyzzy"
 
   set S0, "Xyzzy"
   callmethodcc
 
-=end PIR_FRAGMENT_INVALID
+=end PASM_FRAGMENT_INVALID
+
+Or, calling a method in PIR, where the calling conventions are handled
+automatically.
+
+=begin PIR_FRAGMENT
+
+  $P0.'Xyzzy'($P1)
+
+=end PIR_FRAGMENT
 
 =head3 Accessing attributes from within a class
 
@@ -1442,7 +1399,7 @@ With named access:
 
 =begin PIR_FRAGMENT
 
-  getattribute $P1, $P0, "Foo\x0b"
+  $P1 = getattribute $P0, "b"
 
 =end PIR_FRAGMENT
 
@@ -1474,9 +1431,9 @@ Notes on some of the OO-related needs of various languages.
 
 =head3 PMCs
 
-Ruby: Just like Smalltalk, everything is an object.  I'm hoping to be able to
-implement core Ruby classes (String, Array, Hash, Module, etc)  something like
-this.
+Ruby: Just like Smalltalk, everything is an object.  Core Ruby classes
+(String, Array, Hash, Module, etc) might be implemented something like
+this:
 
  ParrotClass
     |

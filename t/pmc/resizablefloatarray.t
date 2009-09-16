@@ -1,12 +1,6 @@
-#! perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+#! parrot
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 22;
 
 =head1 NAME
 
@@ -23,495 +17,453 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'creation' );
-    new P0, ['ResizableFloatArray']
-    print "ok\n"
-    end
-CODE
-ok
-OUTPUT
+.const int TESTS = 55
+.const num PRECISION = 1e-6
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting array size" );
-    new P0, ['ResizableFloatArray']
+.sub 'test' :main
+    .include 'test_more.pir'
+    .include 'fp_equality.pasm'
 
-    set I0,P0
-    eq I0,0,OK_1
-    print "not "
-OK_1:    print "ok 1\n"
+    plan(TESTS)
 
-    set P0,1
-    set I0,P0
-    eq I0,1,OK_2
-    print "not "
-OK_2:    print "ok 2\n"
+    creation()
+    setting_size()
+    negative_size()
+    setting_first_element()
+    setting_second_element()
+    setting_negative_index()
+    getting_negative_index()
+    setting_out_of_bounds()
+    getting_out_of_bounds()
+    set_pmc_get_int()
+    set_int_get_pmc()
+    basic_push()
+    push_many_values()
+    basic_pop()
+    pop_many_values()
+    push_pop()
+    pop_empty()
+    shift_empty()
+    push_float()
+    shift_float()
+    unshift_float()
+    check_interface()
+    get_iter()
+    'clone'()
+.end
 
-    set P0,5
-    set I0,P0
-    eq I0,5,OK_3
-    print "not "
-OK_3:    print "ok 3\n"
+.sub 'creation'
+    $P0 = new ['ResizableFloatArray']
+    ok(1, 'creation')
+.end
 
-    set P0,9
-    set I0,P0
-    eq I0,9,OK_4
-    print "not "
-OK_4:    print "ok 4\n"
+.sub 'setting_size'
+    $P0 = new ['ResizableFloatArray']
 
-    set P0,7
-    set I0,P0
-    eq I0,7,OK_5
-    print "not "
-OK_5:    print "ok 5\n"
+    $I0 = $P0
+    is($I0, 0, 'size is initially 0')
 
-        end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-ok 5
-OUTPUT
+    $P0 = 1
+    $I0 = $P0
+    is($I0, 1, 'setting size to 1')
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "Setting negative array size" );
-    new P0, ['ResizableFloatArray']
-        set P0, -100
-        end
-CODE
-/ResizableFloatArray: Can't resize to negative value!/
-OUTPUT
+    $P0 = 5
+    $I0 = $P0
+    is($I0, 5, 'resizing to 5')
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting first element" );
-    new P0, ['ResizableFloatArray']
-    set P0, 1
+    $P0 = 9
+    $I0 = $P0
+    is($I0, 9, 'resizing to 9')
 
-    set P0[0],-7
-    set I0,P0[0]
-    eq I0,-7,OK_1
-    print "not "
-OK_1:    print "ok 1\n"
+    $P0 = 7
+    $I0 = $P0
+    is($I0, 7, 'resizing to 7')
+.end
 
-    set P0[0],3.7
-    set N0,P0[0]
-    eq N0,3.7,OK_2
-    print "not "
-OK_2:    print "ok 2\n"
+.sub 'negative_size'
+    $P0 = new ['ResizableFloatArray']
 
-    set P0[0],"17.2"
-    set S0,P0[0]
-    eq S0,"17.2",OK_3
-    print "not "
-OK_3:    print "ok 3\n"
-
-    end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting second element" );
-    new P0, ['ResizableFloatArray']
-
-    set P0[1], -7
-    set I0, P0[1]
-    eq I0,-7,OK_1
-    print "not "
-OK_1:    print "ok 1\n"
-
-    set P0[1], 3.7
-    set N0, P0[1]
-    eq N0,3.7,OK_2
-    print "not "
-OK_2:    print "ok 2\n"
-
-    set P0[1],"17.1"
-    set S0, P0[1]
-    eq S0,"17.1",OK_3
-    print "not "
-OK_3:    print "ok 3\n"
-
-    end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting negatively indexed elements" );
-    new P0, ['ResizableFloatArray']
-    set P0, 1
-
-    push_eh caught
-    set P0[-1], -7
+    push_eh negative_size_handler
+    $P0 = -100
     pop_eh
-    print "no exception\n"
-    end
-caught:
-    say "caught something"
-    end
-CODE
-caught something
-OUTPUT
+    nok(1, 'setting negative array size')
+    .return()
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Getting negatively indexed elements" );
-    new P0, ['ResizableFloatArray']
-    set P0, 1
+  negative_size_handler:
+    .get_results ($P1)
+    $S1 = $P1
+    like($S1, ":s ResizableFloatArray\\: Can\\'t resize to negative value\\!", 'setting negative array size')
+.end
 
-    push_eh caught
-    set I0, P0[-1]
+.sub 'setting_first_element'
+    $P0 = new ['ResizableFloatArray']
+    $P0 = 1
+
+    $P0[0] = -7
+    $I0 = $P0[0]
+    is($I0, -7, 'setting first element from int')
+
+    $P0[0] = 3.7
+    $N0 = $P0[0]
+    is($N0, 3.7, 'setting first element from number')
+
+    $P0[0] = "17.2"
+    $S0 = $P0[0]
+    is($S0, "17.2", 'setting first element from string')
+.end
+
+.sub 'setting_second_element'
+    $P0 = new ['ResizableFloatArray']
+
+    $P0[1] = -7
+    $I0 = $P0[1]
+    is($I0, -7, 'setting second element from int')
+
+    $P0[1] = 3.7
+    $N0 = $P0[1]
+    is($N0, 3.7, 'setting second element from number')
+
+    $P0[1] = "17.1"
+    $S0 = $P0[1]
+    is($S0, "17.1", 'setting second element from string')
+.end
+
+.sub 'setting_negative_index'
+    $P0 = new ['ResizableFloatArray']
+    $P0 = 1
+
+    push_eh setting_negative_index_handler
+    $P0[-1] = -7
     pop_eh
-    say "no exception"
-    end
-caught:
-    say "caught an exception"
-    end
-CODE
-caught an exception
-OUTPUT
+    nok(1, 'setting negatively indexed elements')
+    .return ()
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
-    new P0, ['ResizableFloatArray']
-    set P0, 1
-
-    set P0[1], -7
-    print "ok 1\n"
-
-    end
-CODE
-ok 1
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
-    new P0, ['ResizableFloatArray']
-    set P0, 1
-
-    set I0, P0[1]
-    print "ok 1\n"
-    end
-CODE
-ok 1
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );
-     .include 'fp_equality.pasm'
-     new P0, ['ResizableFloatArray']
-     new P1, ['Key']
-
-     set P1, 0
-     set P0[P1], 25
-
-     set P1, 1
-     set P0[P1], 2.5
-
-     set P1, 2
-     set P0[P1], "17.32"
-
-     set I0, P0[0]
-     eq I0, 25, OK1
-     print "not "
-OK1: print "ok 1\\n"
-
-     set N0, P0[1]
-     .fp_eq_pasm(N0, 2.5, OK2)
-     print "not "
-OK2: print "ok 2\\n"
-
-     set S0, P0[2]
-     eq S0, "17.32", OK3
-     print "not "
-OK3: print "ok 3\\n"
-
-     end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys" );
-     .include 'fp_equality.pasm'
-     new P0, ['ResizableFloatArray']
-     set P0, 1
-
-     set P0[25], 125
-     set P0[128], 10.2
-     set P0[513], "17.3"
-     new P1, ['Integer']
-     set P1, 123456
-     set P0[1023], P1
-
-     new P2, ['Key']
-     set P2, 25
-     set I0, P0[P2]
-     eq I0, 125, OK1
-     print "not "
-OK1: print "ok 1\\n"
-
-     set P2, 128
-     set N0, P0[P2]
-     .fp_eq_pasm(N0, 10.2, OK2)
-     print "not "
-OK2: print "ok 2\\n"
-
-     set P2, 513
-     set S0, P0[P2]
-     eq S0, "17.3", OK3
-     print "not "
-OK3: print "ok 3\\n"
-
-     set P2, 1023
-     set P3, P0[P2]
-     set I1, P3
-     eq I1, 123456, OK4
-     print "not "
-OK4: print "ok 4\\n"
-
-     end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'basic push' );
-     .include 'fp_equality.pasm'
-     new P0, ['ResizableFloatArray']
-     push P0, 1.0
-     push P0, 2.0
-     push P0, 3.0
-     set N0, P0[0]
-     .fp_eq_pasm(N0, 1.0, OK1)
-     print "not "
-OK1: print "ok 1\\n"
-
-     set N0, P0[1]
-     .fp_eq_pasm(N0, 2.0, OK2)
-     print "not "
-OK2: print "ok 2\\n"
-
-     set N0, P0[2]
-     .fp_eq_pasm(N0, 3.0, OK3)
-     print "not "
-OK3: print "ok 3\\n"
-     end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'push many values' );
-     .include 'fp_equality.pasm'
-     new P0, ['ResizableFloatArray']
-     set I0, 0
-L1:  set N0, I0
-     push P0, N0
-     inc I0
-     lt I0, 100000, L1
-
-     set N0, P0[99999]
-     .fp_eq_pasm(N0, 99999.0, OK1)
-     print N0
-     print "not "
-OK1: print "ok 1\\n"
-     end
-CODE
-ok 1
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'basic pop' );
-     .include 'fp_equality.pasm'
-     new P0, ['ResizableFloatArray']
-     set P0[0], 1.0
-     set P0[1], 2.0
-     set P0[2], 3.0
-     pop N0, P0
-     .fp_eq_pasm(N0, 3.0, OK1)
-     print "not "
-OK1: print "ok 1\\n"
-
-     pop N0, P0
-     .fp_eq_pasm(N0, 2.0, OK2)
-     print "not "
-OK2: print "ok 2\\n"
-
-     pop N0, P0
-     .fp_eq_pasm(N0, 1.0, OK3)
-     print "not "
-OK3: print "ok 3\\n"
-     end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'pop many values' );
-     .include 'fp_equality.pasm'
-     new P0, ['ResizableFloatArray']
-     set I0, 0
-L1:  set N0, I0
-     set P0[I0], N0
-     inc I0
-     lt I0, 100000, L1
-
-L2:  dec I0
-     set N1, I0
-     pop N0, P0
-     .fp_eq_pasm(N0, N1, OK)
-     branch NOT_OK
-OK:  gt I0, 0, L2
-     print "ok\\n"
-     end
-
-NOT_OK:
-     print N0
-     print "\\n"
-     print N1
-     print "\\n"
-     end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'push/pop' );
-     .include 'fp_equality.pasm'
-     new P0, ['ResizableFloatArray']
-     push P0, 1.0
-     push P0, 2.0
-     push P0, 3.0
-     pop N0, P0
-     .fp_eq_pasm(N0, 3.0, OK1)
-     print "not "
-OK1: print "ok 1\\n"
-     end
-CODE
-ok 1
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<'OUTPUT', 'pop from empty array' );
-     new P0, ['ResizableFloatArray']
-     pop N0, P0
-     end
-CODE
-/ResizableFloatArray: Can't pop from an empty array!/
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
-
-.sub _main
-    .local pmc pmc1
-    pmc1 = new ['ResizableFloatArray']
-    .local int bool1
-    does bool1, pmc1, "scalar"
-    print bool1
-    print "\n"
-    does bool1, pmc1, "array"
-    print bool1
-    print "\n"
-    does bool1, pmc1, "no_interface"
-    print bool1
-    print "\n"
-    end
+  setting_negative_index_handler:
+    ok(1, 'setting negatively indexed elements')
 .end
-CODE
-0
-1
-0
-OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "push float" );
+.sub 'getting_negative_index'
+    $P0 = new ['ResizableFloatArray']
+    $P0 = 1
 
-.sub _main
-    .local pmc pmc1
-    pmc1 = new ['ResizableFloatArray']
-    pmc1[9999] = 10000.10000
-    push pmc1, 123.123
-    .local int elements
-    elements = pmc1
-    print elements
-    print "\n"
-    .local string last
-    last = pmc1[10000]
-    print last
-    print "\n"
-    end
+    push_eh getting_negative_index_handler
+    $I0 = $P0[-1]
+    pop_eh
+    nok(1, 'getting negatively indexed elements')
+    .return ()
+
+  getting_negative_index_handler:
+    ok(1, 'getting negatively indexed elements')
 .end
-CODE
-10001
-123.123
-OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "shift float" );
-.sub test :main
-    .local pmc ar
-    ar = new ['ResizableFloatArray']
-    ar[0] = 10.1
-    ar[1] = 20.2
-    $I0 = elements ar
-    print $I0
-    print ' '
-    $N0 = shift ar
-    print $N0
-    print ' '
-    $I0 = elements ar
-    print $I0
-    print ' '
-    $N0 = shift ar
-    print $N0
-    print ' '
-    $I0 = elements ar
-    print $I0
-    print "\n"
+.sub 'setting_out_of_bounds'
+    $P0 = new ['ResizableFloatArray']
+    $P0 = 1
+
+    $P0[1] = -7
+    ok(1, 'setting out-of-bounds elements')
 .end
-CODE
-2 10.1 1 20.2 0
-OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "unshift float" );
-.sub test :main
-    .local pmc ar
-    ar = new ['ResizableFloatArray']
-    unshift ar, 10.1
-    unshift ar, 20.2
-    $I0 = elements ar
-    print $I0
-    print ' '
-    $N0 = ar[0]
-    print $N0
-    print ' '
-    $N0 = ar[1]
-    print $N0
-    print "\n"
+.sub 'getting_out_of_bounds'
+    $P0 = new ['ResizableFloatArray']
+    $P0 = 1
+
+    $I0 = $P0[1]
+    ok(1, 'getting out-of-bounds elements')
 .end
-CODE
-2 20.2 10.1
-OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "get_iter" );
-.sub main :main
+.sub 'set_pmc_get_int'
+    $P0 = new ['ResizableFloatArray']
+    $P1 = new ['Key']
+
+    $P1 = 0
+    $P0[$P1] = 25
+
+    $P1 = 1
+    $P0[$P1] = 2.5
+
+    $P1 = 2
+    $P0[$P1] = "17.32"
+
+    $I0 = $P0[0]
+    is($I0, 25, 'Set via PMC keys, access via INTs (1)')
+
+    $N0 = $P0[1]
+    is($N0, 2.5, 'Set via PMC keys, access via INTs (2)', PRECISION)
+
+    $S0 = $P0[2]
+    is($S0, "17.32", 'Set via PMC keys, access via INTs (3)')
+.end
+
+.sub 'set_int_get_pmc'
+    $P0 = new ['ResizableFloatArray']
+    $P0 = 1
+
+    $P0[25] = 125
+    $P0[128] = 10.2
+    $P0[513] = "17.3"
+    $P1 = new ['Integer']
+    $P1 = 123456
+    $P0[1023] = $P1
+
+    $P2 = new ['Key']
+
+    $P2 = 25
+    $I0 = $P0[$P2]
+    is($I0, 125, 'Set via INTs, access via PMC Keys (1)')
+
+    $P2 = 128
+    $N0 = $P0[$P2]
+    is($N0, 10.2, 'Set via INTs, access via PMC Keys (2)', PRECISION)
+
+    $P2 = 513
+    $S0 = $P0[$P2]
+    is($S0, "17.3", 'Set via INTs, access via PMC Keys (3)')
+
+    $P2 = 1023
+    $I0 = $P0[$P2]
+    is($I0, 123456, 'Set via INTs, access via PMC Keys (4)')
+.end
+
+.sub 'basic_push'
+    $P0 = new ['ResizableFloatArray']
+    push $P0, 1.0
+    push $P0, 2.0
+    push $P0, 3.0
+
+    $N0 = $P0[0]
+    is($N0, 1.0, 'basic push (1)', PRECISION)
+
+    $N0 = $P0[1]
+    is($N0, 2.0, 'basic push (2)', PRECISION)
+
+    $N0 = $P0[2]
+    is($N0, 3.0, 'basic push (3)', PRECISION)
+.end
+
+.sub 'push_many_values'
+    $P0 = new ['ResizableFloatArray']
+
+    $I0 = 0
+  push_many_values_fill:
+    $N0 = $I0
+    push $P0, $N0
+    inc $I0
+    if $I0 < 100000 goto push_many_values_fill
+
+  push_many_values_test:
+    dec $I0
+    $N0 = $I0
+    $N1 = $P0[$I0]
+    .fp_ne($N0, $N1, push_many_values_evil)
+    if $I0 > 0 goto push_many_values_test
+
+    ok(1, 'push many values')
+    .return ()
+
+  push_many_values_evil:
+    nok(1, 'push many values is evil')
+.end
+
+.sub 'basic_pop'
+    $P0 = new ['ResizableFloatArray']
+    $P0[0] = 1.0
+    $P0[1] = 2.0
+    $P0[2] = 3.0
+
+    $N0 = pop $P0
+    is($N0, 3.0, 'basic pop (1)', PRECISION)
+
+    $N0 = pop $P0
+    is($N0, 2.0, 'basic pop (2)', PRECISION)
+
+    $N0 = pop $P0
+    is($N0, 1.0, 'basic pop (3)', PRECISION)
+.end
+
+.sub 'pop_many_values'
+    $P0 = new ['ResizableFloatArray']
+
+    $I0 = 0
+  pop_many_values_fill:
+    $N0 = $I0
+    $P0[$I0] = $N0
+    inc $I0
+    if $I0 < 100000 goto pop_many_values_fill
+
+  pop_many_values_test:
+    dec $I0
+    $N0 = $I0
+    $N1 = pop $P0
+    .fp_ne($N0, $N1, pop_many_values_evil)
+    if $I0 > 0 goto pop_many_values_test
+
+    ok(1, 'pop many values')
+    .return ()
+
+  pop_many_values_evil:
+    nok(1, 'pop many values is evil')
+.end
+
+.sub 'push_pop'
+    $P0 = new ['ResizableFloatArray']
+    push $P0, 1.0
+    push $P0, 2.0
+    push $P0, 3.0
+
+    $N0 = pop $P0
+    is($N0, 3.0, 'push/pop (1)')
+
+    $N0 = pop $P0
+    is($N0, 2.0, 'push/pop (2)')
+
+    $N0 = pop $P0
+    is($N0, 1.0, 'push/pop (3)')
+.end
+
+.sub 'pop_empty'
+    $P0 = new ['ResizableFloatArray']
+
+    push_eh pop_empty_handler
+    $N0 = pop $P0
+    pop_eh
+    nok(1, 'pop from empty array')
+    .return()
+
+  pop_empty_handler:
+    .get_results($P0)
+    $S0 = $P0
+    like($S0, ":s ResizableFloatArray\\: Can\\'t pop from an empty array\\!", 'pop from empty array')
+.end
+
+.sub 'shift_empty'
+    $P0 = new ['ResizableFloatArray']
+
+    push_eh shift_empty_handler
+    $N0 = shift $P0
+    pop_eh
+    nok(1, 'shift from empty array')
+    .return()
+
+  shift_empty_handler:
+    .get_results($P0)
+    $S0 = $P0
+    like($S0, ":s ResizableFloatArray\\: Can\\'t shift from an empty array\\!", 'shift from empty array')
+.end
+
+.sub 'check_interface'
+    $P0 = new ['ResizableFloatArray']
+
+    $I0 = does $P0, 'scalar'
+    nok($I0, 'ResizableFloatArray does not scalar')
+
+    $I0 = does $P0, 'array'
+    ok($I0, 'ResizableFloatArray does array')
+
+    $I0 = does $P0, 'no_interface'
+    nok($I0, 'ResizableFloatArray does not no_interface')
+.end
+
+.sub 'push_float'
+    $P0 = new ['ResizableFloatArray']
+    $P0[9999] = 10000.10000
+    push $P0, 123.123
+
+    $I0 = elements $P0
+    is($I0, 10001, 'push float: size')
+
+    $N0 = $P0[10000]
+    is($N0, 123.123, 'push float: test pushed element', PRECISION)
+.end
+
+.sub 'shift_float'
+    $P0 = new ['ResizableFloatArray']
+    $P0[0] = 10.1
+    $P0[1] = 20.2
+
+    $I0 = elements $P0
+    is($I0, 2, 'shift float: size')
+
+    $N0 = shift $P0
+    is($N0, 10.1, 'shift float: first element', PRECISION)
+
+    $N0 = shift $P0
+    is($N0, 20.2, 'shift float: second element', PRECISION)
+
+    $I0 = elements $P0
+    is($I0, 0, 'shift float: array now empty')
+.end
+
+.sub 'unshift_float'
+    $P0 = new ['ResizableFloatArray']
+    unshift $P0, 10.1
+    unshift $P0, 20.2
+
+    $I0 = elements $P0
+    is($I0, 2, 'unshift float: size')
+
+    $N0 = $P0[0]
+    is($N0, 20.2, 'unshift float: first element', PRECISION)
+
+    $N0 = $P0[1]
+    is($N0, 10.1, 'unshift float: second element', PRECISION)
+.end
+
+.sub 'get_iter'
     $P0 = new ['ResizableFloatArray']
     $P0[0] = 1.1
     $P0[1] = 99.99
     $P0[2] = -345.001
+
     $P1 = iter $P0
-loop:
-    unless $P1 goto loop_end
-    $S2 = shift $P1
-    say $S2
-    goto loop
-  loop_end:
+
+    $N0 = shift $P1
+    is($N0, 1.1, 'get_iter: first element ok', PRECISION)
+
+    $N0 = shift $P1
+    is($N0, 99.99, 'get_iter: second element ok', PRECISION)
+
+    $N0 = shift $P1
+    is($N0, -345.001, 'get_iter: third element ok', PRECISION)
+
+    nok($P1, 'get_iter: iterator emptied')
 .end
-CODE
-1.1
-99.99
--345.001
-OUTPUT
+
+.sub 'clone'
+    .local int i
+    $P0 = new ['ResizableFloatArray']
+
+    $I30 = 3000
+    i = 0
+  clone_fill:
+    unless i < $I30 goto clone_filled
+    $N0 = i + 0.01
+    $P0[i] = $N0
+    inc i
+    goto clone_fill
+
+  clone_filled:
+    $P1 = clone $P0
+    $I0 = $P0
+    $I1 = $P1
+    is($I0, $I1, 'clones have the same size')
+
+  clone_iter_loop:
+    dec $I0
+    $N0 = $P1[$I0]
+    $N1 = $I0 + 0.01
+    .fp_ne($N0, $N1, clone_evil)
+    if $I0 > 0 goto clone_iter_loop
+
+    ok(1, 'clone make a good clone')
+    .return()
+
+  clone_evil:
+    nok(0, 'clone made an evil clone')
+.end
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

@@ -9,7 +9,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 67;
+use Parrot::Test tests => 68;
 use Parrot::Config;
 
 =head1 NAME
@@ -835,7 +835,10 @@ the_sub
 main
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "caller introspection via interp" );
+my @todo = ( todo => 'broken with JIT (TT #983)' )
+    if ( defined $ENV{TEST_PROG_ARGS} and
+        $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/ );
+pir_output_is( <<'CODE', <<'OUTPUT', "caller introspection via interp", @todo );
 .sub main :main
 .include "interpinfo.pasm"
     # this test will fail when run with -Oc
@@ -1435,7 +1438,7 @@ I can has outer from eval?
 OUTPUT
 
 $ENV{TEST_PROG_ARGS} ||= '';
-my @todo = $ENV{TEST_PROG_ARGS} =~ /--run-pbc/
+@todo = $ENV{TEST_PROG_ARGS} =~ /--run-pbc/
     ? ( todo => 'lexicals not thawed properly from PBC, RT #60652' )
     : ();
 pir_output_is( <<'CODE', <<'OUTPUT', ':outer with identical sub names', @todo );
@@ -1589,6 +1592,47 @@ bar
 bazsubid
 OUTPUT
 
+pir_output_is( <<'CODE', <<'OUTPUT', 'Thaw PIR subclass', todo => 'See TT#132' );
+.sub main :main
+
+  $P0 = get_class 'Sub'
+  $P1 = subclass $P0, 'myProc'
+
+  .local pmc pirC
+  pirC = compreg 'PIR'
+
+  .local string code
+  code = <<"END_CODE"
+
+.sub bar
+  say "hi"
+.end
+END_CODE
+
+  .local pmc compiled
+  compiled = pirC(code)
+  compiled = compiled[0] # just want the first executable sub here.
+
+  compiled() # works
+
+  .local pmc sub
+  sub = new 'myProc'
+  assign sub, compiled
+  sub() # works
+
+  $S0 = freeze sub
+  say "frozen"
+  $P2 = thaw $S0
+  say "thawed"
+  $P2()
+.end
+CODE
+hi
+hi
+frozen
+thawed
+hi
+OUTPUT
 
 # Local Variables:
 #   mode: cperl

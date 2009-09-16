@@ -1,9 +1,9 @@
 {
-    "release.version"  : "1.5.0",
-    "release.name"     : "TEH PARROTZ!",
+    "release.version"  : "1.6.0",
+    "release.name"     : "half-pie",
     "release.day"      : "Tuesday",
-    "release.date"     : "18 August 2009",
-    "release.nextdate" : "15 September 2009",
+    "release.date"     : "15 September 2009",
+    "release.nextdate" : "20 October 2009",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -11,13 +11,13 @@
     "web.repository"   : "https://svn.parrot.org/parrot/trunk/",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "12 September 2009",
+    "bugday.date"      : "17 October 2009",
 
     "wiki.root"        : "https://trac.parrot.org/parrot/wiki/",
-    "wiki.bugday"      : "bug_day_2009_09_12",
+    "wiki.bugday"      : "bug_day_2009_10_17",
 
     "cpan.search"      : "http://search.cpan.org/dist/parrot",
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/1.5.0/",
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/1.6.0/",
     "subversion.root"  : "http://subversion.tigris.org/",
     "svk.root"         : "http://svk.bestpractical.com/"
 }

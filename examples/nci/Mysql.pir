@@ -1,4 +1,4 @@
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008-2009, Parrot Foundation.
 # $Id$
 
 =head1 TITLE
@@ -81,6 +81,9 @@ This is an initial version, be careful and not expect too much.
     clientlib = loadlib 'libmysqlclient'
     $I0 = defined clientlib
     if $I0 goto libloaded
+    clientlib = loadlib 'libmysqlclient.so.15'
+    $I0 = defined clientlib
+    if $I0 goto libloaded
     fail('Cannot load mysql client lib')
 libloaded:
     set_global 'clientlib', clientlib
@@ -124,7 +127,7 @@ done:
 .end
 
 #-----------------------------------------------------------------------
-.sub init :vtable
+.sub 'init' :vtable
     .local pmc mysql_init
     mysql_init = get_mysql_function('mysql_init', 'pp')
 
@@ -402,7 +405,7 @@ done:
 .namespace ['Mysql';'Result']
 
 #-----------------------------------------------------------------------
-.sub init_pmc :vtable
+.sub 'init_pmc' :vtable
     .param pmc mysql :named
     .param pmc r :named
 
@@ -435,7 +438,7 @@ nextcol:
 .end
 
 #-----------------------------------------------------------------------
-.sub destroy :vtable
+.sub 'destroy' :vtable
     self.'free'()
 .end
 
@@ -454,13 +457,20 @@ done:
 .end
 
 #-----------------------------------------------------------------------
-.sub field_count :method
+.sub 'elements' :vtable
     .local pmc field_count
     field_count = get_mysql_function('mysql_field_count', 'ip')
     .local pmc mysql
     mysql = getattribute self, 'mysql'
     .local int fields
     fields = field_count(mysql)
+    .return(fields)
+.end
+
+#-----------------------------------------------------------------------
+.sub field_count :method
+    .local int fields
+    fields = elements self
     .return(fields)
 .end
 
@@ -516,14 +526,21 @@ nomore:
 .namespace ['Mysql';'Row']
 
 #-----------------------------------------------------------------------
-.sub get_integer :vtable
+.sub 'get_integer' :vtable
     .local pmc data
     data = getattribute self, 'data'
     $I0 = data
     .return($I0)
 .end
 
-.sub get_number :vtable
+.sub 'elements' :vtable
+    .local pmc data
+    data = getattribute self, 'data'
+    $I0 = data
+    .return($I0)
+.end
+
+.sub 'get_number' :vtable
     .local pmc data
     data = getattribute self, 'data'
     $I0 = data
@@ -531,7 +548,7 @@ nomore:
     .return($N0)
 .end
 
-.sub get_string_keyed :vtable
+.sub 'get_string_keyed' :vtable
     .param int n
 
     .local pmc data
@@ -540,7 +557,7 @@ nomore:
     .return($S0)
 .end
 
-.sub get_pmc_keyed :vtable
+.sub 'get_pmc_keyed' :vtable
     .param int n
 
     .local pmc data

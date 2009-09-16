@@ -34,9 +34,12 @@ have the same number of elements because there is a one-to-one mapping.
 
 #include "parrot/parrot.h"
 #include "parrot/runcore_api.h"
+#include "parrot/runcore_profiling.h"
 #include "parrot/oplib/core_ops.h"
 #include "parrot/oplib/core_ops_switch.h"
 #include "parrot/oplib/ops.h"
+#include "main.str"
+
 #if JIT_CAPABLE
 #  include "parrot/exec.h"
 #  include "../jit.h"
@@ -125,26 +128,31 @@ void
 Parrot_runcore_init(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_runcore_init)
+#ifdef NDEBUG
+    STRING * const default_core = CONST_STRING(interp, "slow");
+#else
+    STRING * const default_core = CONST_STRING(interp, "fast");
+#endif
 
-    interp->cores     = NULL;
-    interp->num_cores = 0;
+    interp->cores        = NULL;
+    interp->num_cores    = 0;
 
     Parrot_runcore_slow_init(interp);
     Parrot_runcore_fast_init(interp);
     Parrot_runcore_switch_init(interp);
 
-    Parrot_runcore_jit_init(interp);
-    Parrot_runcore_switch_jit_init(interp);
     Parrot_runcore_exec_init(interp);
     Parrot_runcore_gc_debug_init(interp);
     Parrot_runcore_debugger_init(interp);
 
     Parrot_runcore_profiling_init(interp);
 
+    /* set the default runcore */
+    Parrot_runcore_switch(interp, default_core);
+
 #ifdef HAVE_COMPUTED_GOTO
     Parrot_runcore_cgp_init(interp);
     Parrot_runcore_cgoto_init(interp);
-    Parrot_runcore_cgp_jit_init(interp);
 #endif
 }
 
@@ -357,8 +365,11 @@ do_prederef(ARGIN(void **pc_prederef), PARROT_INTERP, ARGIN(Parrot_runcore_t *ru
 
     prederef_args(pc_prederef, interp, pc, opinfo);
 
-    if (PARROT_RUNCORE_PREDEREF_OPS_TEST(runcore))
-        parrot_PIC_prederef(interp, *pc, pc_prederef, interp->run_core);
+    if (PARROT_RUNCORE_PREDEREF_OPS_TEST(runcore)) {
+        *pc_prederef = PARROT_RUNCORE_CGOTO_OPS_TEST(runcore)
+            ? ((void **)interp->op_lib->op_func_table)[*pc]
+            : (void**)*pc;
+    }
     else
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
             "Tried to prederef wrong core");

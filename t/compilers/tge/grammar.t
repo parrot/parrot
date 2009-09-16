@@ -301,12 +301,12 @@ TODO: {
 GRAMMAR
 
 
-    .local object testing
+    .local pmc testing
     testing = new 'Hash'
 
     # Compile a grammar from the source
     .local pmc grammar
-    $P1 = new 'TGE;Compiler'
+    $P1 = new ['TGE';'Compiler']
     grammar = $P1.'compile'(source)
 
     # Apply the grammar to the test tree

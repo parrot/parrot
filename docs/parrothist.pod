@@ -81,7 +81,7 @@ Francois Perrad.
  Bob         0.7.0          2008-Aug-19     "Severe Macaw"
  Patrick     0.7.1          2008-Sep-16     "Manu Aloha"
 
- particle    0.8.0          2008-Oct-21     "Pareto Principle"
+ Jerry       0.8.0          2008-Oct-21     "Pareto Principle"
  chromatic   0.8.1          2008-Nov-18     "Tio Richie"
  Whiteknight 0.8.2          2008-Dec-16     "Feliz Loro"
 
@@ -92,9 +92,8 @@ Francois Perrad.
  Francois    1.1.0          2009-Apr-21     "Half-moon Conure"
  Infinoid    1.2.0          2009-May-19     "Bird Brain"
  Whiteknight 1.3.0          2009-Jun-16     "Andean Swift"
-
  cotto       1.4.0          2009-Jul-21     "Mundo Cani"
  Whiteknight 1.5.0          2009-Aug-18     "TEH PARROTZ!"
- 
+ Jerry       1.6.0          2009-Sep-15     "half-pie"
 
 =cut

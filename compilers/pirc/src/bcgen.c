@@ -912,6 +912,7 @@ find_outer_sub(ARGIN(bytecode * const bc), ARGIN_NULLOK(char const * const outer
     PMC          *current;
     Parrot_Sub_attributes *sub;
     STRING       *cur_name;
+    STRING       *out_name;
     size_t        len;
     global_label *outersub;
 
@@ -959,8 +960,8 @@ find_outer_sub(ARGIN(bytecode * const bc), ARGIN_NULLOK(char const * const outer
     PMC_get_sub(interp, current, sub);
     cur_name = sub->name;
 
-    /* XXX can't this be a call to Parrot_str_compare() ? */
-    if (cur_name->strlen == len && (memcmp((char *)cur_name->strstart, outername, len) == 0))
+    out_name = Parrot_str_new(interp, outername, len);
+    if (Parrot_str_compare(interp, cur_name, out_name) == 0)
         return current;
 
     return NULL;

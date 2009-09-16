@@ -22,6 +22,7 @@ NCI function setup, compiler registration, C<interpinfo>, and C<sysinfo> opcodes
 #include "parrot/parrot.h"
 #include "inter_misc.str"
 #include "../compilers/imcc/imc.h"
+#include "parrot/runcore_api.h"
 
 #include "parrot/has_header.h"
 
@@ -195,8 +196,7 @@ extern struct mallinfo mallinfo(void);
 
 =item C<INTVAL interpinfo(PARROT_INTERP, INTVAL what)>
 
-C<what> specifies the type of information you want about the
-interpreter.
+C<what> specifies the type of information you want about the interpreter.
 
 =cut
 
@@ -266,12 +266,6 @@ interpinfo(PARROT_INTERP, INTVAL what)
                 ret = PARROT_CGP_CORE;
             else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "cgoto")))
                 ret = PARROT_CGOTO_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "jit")))
-                ret = PARROT_JIT_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "cgp_jit")))
-                ret = PARROT_CGP_JIT_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "switch_jit")))
-                ret = PARROT_SWITCH_JIT_CORE;
             else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "exec")))
                 ret = PARROT_EXEC_CORE;
             else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "gc_debug")))
@@ -283,6 +277,7 @@ interpinfo(PARROT_INTERP, INTVAL what)
             break;
         }
         default:        /* or a warning only? */
+            ret = -1;
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                 "illegal argument in interpinfo");
     }

@@ -185,14 +185,25 @@ Invokes the first subroutine in the eval code.
             return;
         }
 
+        /* XXX Quick and dirty fix for TT #995 */
+        if ((struct PackFile *)cur_cs == interp->initial_pf
+                || cur_cs == interp->code) {
+            SUPER();
+            return;
+        }
+
         /* RT#46685 create PF API, move it there */
         seg = (PackFile_Segment *)cur_cs->const_table;
-        if (seg)
+        if (seg) {
             PackFile_Segment_destroy(INTERP, seg);
+            cur_cs->const_table = NULL;
+        }
 
         seg = (PackFile_Segment *)cur_cs->debugs;
-        if (seg)
+        if (seg) {
             PackFile_Segment_destroy(INTERP, seg);
+            cur_cs->debugs = NULL;
+        }
 
         seg = (PackFile_Segment *)cur_cs->fixups;
         if (seg) {
@@ -200,15 +211,17 @@ Invokes the first subroutine in the eval code.
             cur_cs->fixups = NULL;
         }
 
-        seg = cur_cs->pic_index;
-        if (seg)
-            PackFile_Segment_destroy(INTERP, seg);
+/* XXX Commenting out this to fix TT #995 and related problems.
+ * May leak some memory, need further revision.
 
         seg = (PackFile_Segment *)cur_cs;
         if (seg)
             PackFile_Segment_destroy(INTERP, seg);
+ * XXX End of commented out section.
+ */
 
         sub_data->seg = NULL;
+
         SUPER();
     }
 
@@ -251,10 +264,6 @@ for writing to disc and later loading via C<load_bytecode>.
         if (seg->fixups)
             PackFile_add_segment(INTERP, &pf->directory,
                     (PackFile_Segment *)seg->fixups);
-
-        if (seg->pic_index)
-            PackFile_add_segment(INTERP, &pf->directory,
-                    (PackFile_Segment *)seg->pic_index);
 
         size = PackFile_pack_size(INTERP, pf) * sizeof (opcode_t);
 

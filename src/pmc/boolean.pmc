@@ -25,23 +25,20 @@ pmclass Boolean extends Integer provides boolean provides scalar auto_attrs {
 
 /*
 
-=item C<PMC *instantiate(PMC *sig)>
+=item C<void init_pmc(PMC *value)>
 
-Object constructor. SELF is a Boolean Class object. Return a new
-C<bool> object according to the passed PMC value.
+Initialises SELF value according to the boolean value of the passed PMC.
 
 =cut
 
 */
-    VTABLE PMC *instantiate(PMC *sig) {
-        /* XXX other types */
-        const int argcP = REG_INT(interp, 3);
-        PMC * const res = pmc_new(interp, enum_class_Boolean);
-
-        if (argcP)
-            SELF.set_bool(VTABLE_get_bool(interp, REG_PMC(interp, 5)));
-
-        return PMCNULL; /* TODO */
+    VTABLE void init_pmc(PMC *value) {
+        if (!PMC_IS_NULL(value)) {
+            SELF.set_bool(VTABLE_get_bool(INTERP, value));
+        }
+        else {
+            SELF.set_bool(0);
+        }
     }
 /*
 

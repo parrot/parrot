@@ -508,7 +508,7 @@ TODO: {
     .local pmc thread
     thread = new ['ParrotThread']
     .local pmc _thread_func
-    _thread_func = get_global ['main'], 'thread_test_func'
+    _thread_func = get_hll_global ['main'], 'thread_test_func'
     $I0 = .PARROT_CLONE_CODE
     bor $I0, $I0, .PARROT_CLONE_CLASSES
     print "in thread:\n"

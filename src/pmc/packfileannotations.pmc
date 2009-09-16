@@ -29,7 +29,7 @@ PackfileConstantTable. Otherwise PackfileAnnotationKey can't be created.
 
 #include "pmc_packfileannotation.h"
 
-pmclass PackfileAnnotations extends PackfileSegment {
+pmclass PackfileAnnotations auto_attrs extends PackfileSegment {
     /* ConstantTable used for names lookup */
     ATTR PMC *const_table;
 
@@ -47,12 +47,15 @@ Initialize PackfileAnnotations.
 */
     VTABLE void init() {
         Parrot_PackfileAnnotations_attributes * attrs =
-                mem_allocate_zeroed_typed(Parrot_PackfileAnnotations_attributes);
+                PMC_data_typed(SELF, Parrot_PackfileAnnotations_attributes*);
 
         attrs->annotations = pmc_new(interp, enum_class_ResizablePMCArray);
+        /*
+        Don't initialize C<const_table>. It will be set to NULL bu auto_attrs
+        handling. And should be set to proper PMC in set_directory.
+        */
 
-        PObj_custom_mark_destroy_SETALL(SELF);
-        PMC_data(SELF) = attrs;
+        PObj_custom_mark_SET(SELF);
     }
 
 /*
@@ -69,33 +72,13 @@ Marks the object as live.
         Parrot_PackfileAnnotations_attributes * attrs =
                 PARROT_PACKFILEANNOTATIONS(SELF);
 
-        if (attrs->const_table)
+        if (!PMC_IS_NULL(attrs->const_table))
             Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->const_table);
 
-        if (attrs->annotations)
+        if (!PMC_IS_NULL(attrs->annotations))
             Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->annotations);
 
         SUPER();
-    }
-
-/*
-
-=item C<void destroy()>
-
-Destroys the PMC and frees all allocated memory.
-
-=cut
-
-*/
-
-    VTABLE void destroy() {
-        Parrot_PackfileAnnotations_attributes * attrs =
-                PARROT_PACKFILEANNOTATIONS(SELF);
-
-        if (attrs) {
-            mem_sys_free(attrs);
-            PMC_data(SELF) = NULL;
-        }
     }
 
 

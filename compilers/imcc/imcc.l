@@ -519,9 +519,10 @@ SP              [ ]
     }
 
 <emit,INITIAL>{DOT}{LETTER}{LETTERDIGIT}* {
-        char   * const macro_name = yytext + 1;
-
-        if (!expand_macro(interp, macro_name, yyscanner)) {
+        char   * const macro_name = mem_sys_strdup(yytext + 1);
+        int failed = expand_macro(interp, macro_name, yyscanner);
+        mem_sys_free(macro_name);
+        if (! failed) {
             yyless(1);
             return DOT;
         }

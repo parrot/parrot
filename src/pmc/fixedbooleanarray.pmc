@@ -17,11 +17,23 @@ PMC.
 
 =over 4
 
+=item C<static UINTVAL get_size_in_bytes(UINTVAL size)>
+
+Auxiliar function to avoid repeating the size evaluation.
+
 =cut
 
 */
 
 #define BITS_PER_CHAR 8
+
+PARROT_INLINE
+static UINTVAL
+get_size_in_bytes(UINTVAL size)
+{
+    return (size + BITS_PER_CHAR - 1) / BITS_PER_CHAR;
+}
+
 
 pmclass FixedBooleanArray auto_attrs provides array {
     ATTR UINTVAL         size;             /* # of bits this fba holds */
@@ -32,7 +44,7 @@ pmclass FixedBooleanArray auto_attrs provides array {
 
 =back
 
-=head2 Methods
+=head2 Vtable functions
 
 =over 4
 
@@ -85,12 +97,11 @@ Creates and returns a copy of the array.
         GET_ATTR_resize_threshold(INTERP, SELF, resize_threshold);
 
         if (my_bit_array) {
-            size_t size_in_bytes;
+            const size_t size_in_bytes = get_size_in_bytes(resize_threshold);
 
             SET_ATTR_size(INTERP, dest, size);
             SET_ATTR_resize_threshold(INTERP, dest, resize_threshold);
 
-            size_in_bytes   = resize_threshold / BITS_PER_CHAR;
             clone_bit_array = (unsigned char*)mem_sys_allocate(size_in_bytes);
             mem_sys_memcopy(clone_bit_array, my_bit_array, size_in_bytes);
 
@@ -317,7 +328,7 @@ Resizes the array to C<size> elements.
 */
 
     VTABLE void set_integer_native(INTVAL size) {
-        size_t size_in_bytes;
+        const size_t size_in_bytes = get_size_in_bytes(size);
         UINTVAL old_size;
 
         GET_ATTR_size(INTERP, SELF, old_size);
@@ -326,7 +337,6 @@ Resizes the array to C<size> elements.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "FixedBooleanArray: Can't resize!");
 
-        size_in_bytes = size / BITS_PER_CHAR + 1;
         SET_ATTR_size(INTERP, SELF, size);
         SET_ATTR_resize_threshold(INTERP, SELF, size_in_bytes * BITS_PER_CHAR);
         SET_ATTR_bit_array(INTERP, SELF,
@@ -565,6 +575,12 @@ Used to unarchive the string.
 
 /*
 
+=back
+
+=head2 Methods
+
+=over 4
+
 =item C<METHOD fill(INTVAL fill)>
 
 Sets all of the entires to true if fill is a true value, otherwise
@@ -577,16 +593,14 @@ sets them all to false.
     METHOD fill(INTVAL fill) {
         UINTVAL         size;
         unsigned char * bit_array;
-        size_t          j;
+        size_t          size_in_bytes;
 
         GET_ATTR_bit_array(INTERP, SELF, bit_array);
         GET_ATTR_size(INTERP, SELF, size);
-        j  = size / BITS_PER_CHAR + 1;
+        size_in_bytes  = get_size_in_bytes(size);
 
-        if (fill)
-            memset(bit_array, 0xff, j);
-        else
-            memset(bit_array, 0, j);
+        if (size_in_bytes)
+            memset(bit_array, fill ? 0xff : 0, size_in_bytes);
     }
 }
 

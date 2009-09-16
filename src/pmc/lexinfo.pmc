@@ -58,20 +58,13 @@ subroutine.
     }
 
     VTABLE void init_pmc(PMC *sub) {
-        Hash                      *hash;
         Parrot_LexInfo_attributes *attrs =
             (Parrot_LexInfo_attributes *) PMC_data(SELF);
 
         PARROT_ASSERT(PObj_constant_TEST(SELF));
 
-        hash = parrot_create_hash(INTERP,
-            (PARROT_DATA_TYPE)enum_hash_int,
-            Hash_key_type_STRING,
-            (hash_comp_fn)Parrot_str_not_equal,     /* STRING compare */
-            (hash_hash_key_fn)Parrot_str_to_hashval); /*        hash    */
-
-        SELF.set_pointer(hash);
-        PObj_custom_destroy_SET(SELF);
+        /* Set value type to INTVAL */
+        Parrot_PCCINVOKE(interp, SELF, CONST_STRING(INTERP, "set_value_type"), "I->", (INTVAL)enum_type_INTVAL);
     }
 
 /*
@@ -81,20 +74,12 @@ subroutine.
 Declare a lexical variable that is an alias for a PMC register.  The PIR
 compiler calls this method in response to a ".lex STRING, PREG" directive.
 
-=item C<INTVAL elements()>
-
-Returns the number of elements in the LexInfo hash.
-
 =cut
 
 */
 
     METHOD declare_lex_preg(STRING *name, INTVAL preg) {
-        parrot_hash_put(INTERP, (Hash *)SELF.get_pointer(), name, (void*)preg);
-    }
-
-    VTABLE INTVAL elements() {
-        return parrot_hash_size(INTERP, (Hash *)SELF.get_pointer());
+        VTABLE_set_integer_keyed_str(INTERP, SELF, name, preg);
     }
 
 

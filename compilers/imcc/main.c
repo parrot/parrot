@@ -220,8 +220,8 @@ help(void)
     "    -L --library add path to library search\n"
     "    -X --dynext add path to dynamic extension search\n"
     "   <Run core options>\n"
-    "    -R --runcore slow|bounds|fast|jit|cgoto|cgp|cgp-jit\n"
-    "    -R --runcore switch|switch-jit|trace|profiling|gcdebug\n"
+    "    -R --runcore slow|bounds|fast|cgoto|cgp\n"
+    "    -R --runcore switch|trace|profiling|gcdebug\n"
     "    -t --trace [flags]\n"
     "   <VM options>\n"
     "    -D --parrot-debug[=HEXFLAGS]\n"
@@ -380,11 +380,11 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                 else if (STREQ(opt.opt_arg, "cgoto"))
                     core |= PARROT_CGOTO_CORE;
                 else if (STREQ(opt.opt_arg, "jit"))
-                    core |= PARROT_JIT_CORE;
+                    core |= PARROT_FAST_CORE;
                 else if (STREQ(opt.opt_arg, "cgp-jit"))
-                    core |= PARROT_CGP_JIT_CORE;
+                    core |= PARROT_CGP_CORE;
                 else if (STREQ(opt.opt_arg, "switch-jit"))
-                    core |= PARROT_SWITCH_JIT_CORE;
+                    core |= PARROT_SWITCH_CORE;
                 else if (STREQ(opt.opt_arg, "exec"))
                     core |= PARROT_EXEC_CORE;
                 else if (STREQ(opt.opt_arg, "trace"))
@@ -489,9 +489,6 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
 
                 IMCC_INFO(interp)->allocator = IMCC_GRAPH_ALLOCATOR;
                 /* currently not ok due to different register allocation */
-                if (strchr(opt.opt_arg, 'j')) {
-                    core |= PARROT_JIT_CORE;
-                }
                 if (strchr(opt.opt_arg, '1')) {
                     IMCC_INFO(interp)->optimizer_level |= OPT_PRE;
                 }
@@ -502,9 +499,6 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                     core |= PARROT_SWITCH_CORE;
 #ifdef HAVE_COMPUTED_GOTO
                     core |= PARROT_CGP_CORE;
-#endif
-#if JIT_CAPABLE
-                    core |= PARROT_JIT_CORE;
 #endif
                 }
                 break;

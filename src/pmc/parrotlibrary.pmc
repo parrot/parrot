@@ -120,6 +120,20 @@ Returns the name of the loaded library.
 
 /*
 
+=item C<void *get_pointer()>
+
+Get the pointer to the shared library handle.
+
+=cut
+
+*/
+
+    VTABLE void *get_pointer() {
+        return PMC_dlhandle(SELF);
+    }
+
+/*
+
 =item C<void set_pointer(void *handle)>
 
 Set the pointer to the shared library handle.

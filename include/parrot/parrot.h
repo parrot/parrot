@@ -271,7 +271,6 @@ typedef struct PackFile_ByteCode PackFile_ByteCode;
 #include "parrot/exceptions.h"
 #include "parrot/warnings.h"
 #include "parrot/memory.h"
-#include "parrot/pic.h"
 #include "parrot/packfile.h"
 #include "parrot/io.h"
 #include "parrot/op.h"

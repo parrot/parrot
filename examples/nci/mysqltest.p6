@@ -21,7 +21,7 @@ Connection data and query are hard coded, edit the file to change.
 
 ########################################################################
 use v6;
-use Mysql;
+use Mysql:from<parrot>;
 
 say 'mysql client version: ', Mysql::get_client_info();
 
@@ -43,6 +43,7 @@ while (defined $row) {
     my @row_copy;
     my $i = 0;
     while ($i < $elems) {
+        print $i, ': ';
         print "'", $row[$i], "'";
 	@row_copy.push($row[$i]);
         ++$i;

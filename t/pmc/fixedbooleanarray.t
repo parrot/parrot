@@ -1,12 +1,6 @@
-#! perl
-# Copyright (C) 2001-2007, Parrot Foundation.
+#! parrot
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 14;
 
 =head1 NAME
 
@@ -23,268 +17,214 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting array size" );
-    new P0, ['FixedBooleanArray']
+.const int TESTS = 36
 
-    set I0,P0
-    eq I0,0,OK_1
-    print "not "
-OK_1:    print "ok 1\n"
+.sub 'test' :main
+    .include 'test_more.pir'
 
-    set P0,1
-    set I0,P0
-    eq I0,1,OK_2
-    print "not "
-OK_2:    print "ok 2\n"
+    plan(TESTS)
 
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "Resetting array size (and getting an exception)" );
-    new P0, ['FixedBooleanArray']
-
-    set I0,P0
-    set P0,1
-    set P0,2
-    print "Should have gotten an exception\n"
-
-
-        end
-CODE
-/FixedBooleanArray: Can't resize!
-current instr\.:/
-OUTPUT
-
-#VIM's syntax highlighter needs this line
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting first element" );
-    new P0, ['FixedBooleanArray']
-    set P0, 1
-
-    set P0[0],-7
-    set I0,P0[0]
-    eq I0,1,OK_1
-    print "not "
-OK_1:    print "ok 1\n"
-
-    set P0[0],3.7
-    set N0,P0[0]
-    eq N0,1.0,OK_2
-    print "not "
-OK_2:    print "ok 2\n"
-
-    set P0[0],"17"
-    set S0,P0[0]
-    eq S0,"1",OK_3
-    print "not "
-OK_3:    print "ok 3\n"
-
-    end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting second element" );
-    new P0, ['FixedBooleanArray']
-    set P0, 2
-
-    set P0[1], -7
-    set I0, P0[1]
-    eq I0,1,OK_1
-    print "not "
-OK_1:    print "ok 1\n"
-
-       set P0[1], 3.7
-    set N0, P0[1]
-    eq N0,1.0,OK_2
-    print "not "
-OK_2:    print "ok 2\n"
-
-    set P0[1],"17"
-    set S0, P0[1]
-    eq S0,"1",OK_3
-    print "not "
-OK_3:    print "ok 3\n"
-
-    end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
-    new P0, ['FixedBooleanArray']
-    set P0, 1
-
-    set P0[1], -7
-
-    end
-CODE
-/FixedBooleanArray: index out of bounds!
-current instr\.:/
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
-    new P0, ['FixedBooleanArray']
-    set P0, 1
-
-    set I0, P0[1]
-    end
-CODE
-/FixedBooleanArray: index out of bounds!
-current instr\.:/
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );
-     .include 'fp_equality.pasm'
-     new P0, ['FixedBooleanArray']
-     set P0, 3
-     new P1, ['Key']
-
-     set P1, 0
-     set P0[P1], 25
-
-     set P1, 1
-     set P0[P1], 2.5
-
-     set P1, 2
-     set P0[P1], "17"
-
-     set I0, P0[0]
-     eq I0, 1, OK1
-     print "not "
-OK1: print "ok 1\\n"
-
-     set N0, P0[1]
-     .fp_eq_pasm(N0, 1.0, OK2)
-     print "not "
-OK2: print "ok 2\\n"
-
-     set S0, P0[2]
-     eq S0, "1", OK3
-     print "not "
-OK3: print "ok 3\\n"
-
-     end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys" );
-     .include 'fp_equality.pasm'
-     new P0, ['FixedBooleanArray']
-     set P0, 1024
-
-     set P0[25], 125
-     set P0[128], 10.2
-     set P0[513], "17"
-     new P1, ['Integer']
-     set P1, 123456
-     set P0[1023], P1
-
-     new P2, ['Key']
-     set P2, 25
-     set I0, P0[P2]
-     eq I0, 1, OK1
-     print "not "
-OK1: print "ok 1\\n"
-
-     set P2, 128
-     set N0, P0[P2]
-     .fp_eq_pasm(N0, 1.0, OK2)
-     print "not "
-OK2: print "ok 2\\n"
-
-     set P2, 513
-     set S0, P0[P2]
-     eq S0, "1", OK3
-     print "not "
-OK3: print "ok 3\\n"
-
-     set P2, 1023
-     set P3, P0[P2]
-     set I1, P3
-     eq I1, 1, OK4
-     print "not "
-OK4: print "ok 4\\n"
-
-     end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
-
-.sub _main
-    .local pmc pmc1
-    pmc1 = new ['FixedBooleanArray']
-    .local int bool1
-    does bool1, pmc1, "scalar"
-    print bool1
-    print "\n"
-    does bool1, pmc1, "array"
-    print bool1
-    print "\n"
-    does bool1, pmc1, "no_interface"
-    print bool1
-    print "\n"
-    end
+    setting_array_size()
+    resizing_not_allowed()
+    setting_first_element()
+    setting_second_element()
+    setting_out_of_bounds()
+    getting_out_of_bounds()
+    set_pmc_access_int()
+    set_int_access_pmc()
+    interface()
+    truth()
+    pmc_keys_and_values()
+    freeze_thaw()
+    'clone'()
+    get_iter()
+    fill()
 .end
-CODE
-0
-1
-0
-OUTPUT
 
-pasm_output_is( << 'CODE', << 'OUTPUT', "Truth" );
-     new P0, ['FixedBooleanArray']
-     unless P0, OK1
-     print "not "
-OK1: print "ok 1\n"
-     set P0, 1
-     if P0, OK2
-     print "not "
-OK2: print "ok 2\n"
-     set P0[0], 0
-     if P0, OK3
-     print "not "
-OK3: print "ok 3\n"
-     end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
+.sub 'setting_array_size'
+    $P0 = new ['FixedBooleanArray']
+    $I0 = $P0
+    is($I0, 0, 'size is initially zero')
 
-pasm_output_is( << 'CODE', << 'OUTPUT', "PMC keys & values" );
-     new P0, ['FixedBooleanArray']
-     set P0, 2
-     new P1, ['Key']
-     set P1, 1
-     new P2, ['Integer']
-     set P2, 1
-     set P0[P1], P2
-     set I0, P0[P1]
-     print I0
-     print "\n"
-     end
-CODE
-1
-OUTPUT
+    $P0 = 1
+    $I0 = $P0
+    is($I0, 1, 'size set to 1')
+.end
 
-pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw" );
-.sub main :main
+.sub 'resizing_not_allowed'
+    $P0 = new ['FixedBooleanArray']
+
+    push_eh resizing_not_allowed_handler
+    $P0 = 1
+    $P0 = 2
+    nok(1, 'resizing should not have succeeded')
+    pop_eh
+    .return()
+
+  resizing_not_allowed_handler:
+    .get_results($P0)
+    $S0 = $P0
+    like($S0, ":s FixedBooleanArray\\: Can\\'t resize\\!", 'Resetting array size (and getting an exception)')
+.end
+
+.sub 'setting_first_element'
+    $P0 = new ['FixedBooleanArray']
+    $P0 = 1
+
+    $P0[0] = -7
+    $I0 = $P0[0]
+    is($I0, 1, 'setting first element to a true int value')
+
+    $P0[0] = 3.7
+    $N0 = $P0[0]
+    is($N0, 1.0, 'setting first element to a true num value')
+
+    $P0[0] = "17"
+    $S0 = $P0[0]
+    is($S0, "1", 'setting first element to a true string value')
+.end
+
+.sub 'setting_second_element'
+    $P0 = new ['FixedBooleanArray']
+    $P0 = 2
+
+    $P0[1] = -7
+    $I0 = $P0[1]
+    is($I0, 1, 'setting second element to a true int value')
+
+    $P0[1] = 3.7
+    $N0 = $P0[1]
+    is($N0, 1.0, 'setting second element to a true num value')
+
+    $P0[1] = "17"
+    $S0 = $P0[1]
+    is($S0, "1", 'setting second element to a true string value')
+.end
+
+.sub 'setting_out_of_bounds'
+    $P0 = new ['FixedBooleanArray']
+    $P0 = 1
+
+    push_eh setting_out_of_bounds_handler
+    $P0[1] = -7
+    pop_eh
+    nok(1, "Setting out-of-bounds element wrongly succeeded")
+    .return()
+
+  setting_out_of_bounds_handler:
+    .get_results($P0)
+    $S0 = $P0
+    like($S0, ":s FixedBooleanArray\\: index out of bounds\\!", "Setting out-of-bounds elements")
+.end
+
+.sub 'getting_out_of_bounds'
+    $P0 = new ['FixedBooleanArray']
+    $P0 = 1
+
+    push_eh getting_out_of_bounds_handler
+    $I0 = $P0[1]
+    pop_eh
+    nok(1, "Getting out-of-bounds element wrongly succeeded")
+    .return()
+
+  getting_out_of_bounds_handler:
+    .get_results($P0)
+    $S0 = $P0
+    like($S0, ":s FixedBooleanArray\\: index out of bounds\\!", "Getting out-of-bounds elements")
+.end
+
+.sub 'set_pmc_access_int'
+    $P0 = new ['FixedBooleanArray']
+    $P0 = 3
+    $P1 = new ['Key']
+
+    $P1 = 0
+    $P0[$P1] = 25
+
+    $P1 = 1
+    $P0[$P1] = 2.5
+
+    $P1 = 2
+    $P0[$P1] = "17"
+
+    $I0 = $P0[0]
+    is($I0, 1, "Set via PMC keys, access via INTs: int value")
+
+    $N0 = $P0[1]
+    is($N0, 1.0, "Set via PMC keys, access via INTs: num value")
+
+    $S0 = $P0[0]
+    is($S0, "1", "Set via PMC keys, access via INTs: string value")
+.end
+
+.sub 'set_int_access_pmc'
+    $P0 = new ['FixedBooleanArray']
+    $P0 = 1024
+
+    $P0[25] = 125
+    $P0[128] = 10.2
+    $P0[513] = "17"
+    $P1 = new ['Integer']
+    $P1 = 123456
+    $P0[1023] = $P1
+
+    $P2 = new ['Key']
+
+    $P2 = 25
+    $I0 = $P0[$P2]
+    is($I0, 1, 'Set via INTs, access via PMC Keys: int value')
+
+    $P2 = 128
+    $N0 = $P0[$P2]
+    is($N0, 1.0, 'Set via INTs, access via PMC Keys: num value')
+
+    $P2 = 513
+    $S0 = $P0[$P2]
+    is($S0, '1', 'Set via INTs, access via PMC Keys: string value')
+
+    $P2 = 1023
+    $P3 = $P0[$P2]
+    is($P3, 1, 'Set via INTs, access via PMC Keys: PMC value')
+.end
+
+.sub 'interface'
+    $P0 = new ['FixedBooleanArray']
+
+    $I0 = does $P0, 'scalar'
+    nok($I0, 'FixedBooleanArray does not scalar')
+    $I0 = does $P0, 'array'
+    ok($I0, 'FixedBooleanArray does array')
+    $I0 = does $P0, 'no_interface'
+    nok($I0, 'FixedBooleanArray does not no_interface')
+.end
+
+.sub 'truth'
+    $P0 = new ['FixedBooleanArray']
+
+    nok($P0, 'Empty FixedBooleanArray is false')
+
+    $P0 = 1
+    ok($P0, 'Non-empty FixedBooleanArray is true')
+
+    $P0[0] = 0
+    ok($P0, 'FixedBooleanArray is true, no matter what its values are')
+.end
+
+.sub 'pmc_keys_and_values'
+    $P0 = new ['FixedBooleanArray']
+    $P0 = 2
+
+    $P1 = new ['Key']
+    $P1 = 1
+    $P2 = new ['Integer']
+    $P2 = 1
+    $P0[$P1] = $P2
+
+    $I0 = $P0[$P1]
+    is($I0, 1, 'PMC keys & values')
+.end
+
+.sub 'freeze_thaw'
     .local pmc fba
     .local int i
     .local string s
@@ -298,21 +238,16 @@ pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw" );
     fba[12] = 1
     fba[15] = 1
 
-    say fba
+    $S0 = fba
+    is($S0, '01001000100010010', 'FixedBooleanArray before freeze')
     s = freeze fba
     fba.'fill'(0)
     fba = thaw s
-    say fba
-
+    $S0 = fba
+    is($S0, '01001000100010010', 'FixedBooleanArray after thaw')
 .end
 
-CODE
-01001000100010010
-01001000100010010
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "clone" );
-.sub main :main
+.sub 'clone'
     .local pmc fba1, fba2
     .local int i
     .local string s
@@ -326,40 +261,66 @@ pir_output_is( <<'CODE', <<'OUTPUT', "clone" );
     fba1[12] = 1
     fba1[15] = 1
 
-    say fba1
+    $S0 = fba1
+    is($S0, '01001000100010010', 'FixedBooleanArray before clone')
     fba2 = clone fba1
-    say fba2
-
+    $S1 = fba2
+    is($S0, $S1, "clones have the same string representation")
 .end
 
-CODE
-01001000100010010
-01001000100010010
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "get_iter" );
-.sub 'main' :main
+.sub 'get_iter'
     $P0 = new ['FixedBooleanArray']
     $P0 = 3
     $P0[0] = 1
     $P0[1] = 0
     $P0[2] = 1
+
     $P1 = iter $P0
-loop:
-    unless $P1 goto loop_end
-    $S2 = shift $P1
-    say $S2
-    goto loop
-loop_end:
+    $I2 = shift $P1
+    is($I2, 1, 'get_iter: first element')
+    $I2 = shift $P1
+    is($I2, 0, 'get_iter: second element')
+    $I2 = shift $P1
+    is($I2, 1, 'get_iter: third element')
+
+    nok($P1, 'iterator exhausted')
 .end
-CODE
-1
-0
-1
-OUTPUT
 
+.sub 'fill'
+    $P0 = new ['FixedBooleanArray']
+    $P0.'fill'(0)
+    ok(1, 'Filling empty array')
 
-1;
+    .local int result, i, size
+    size = 1564
+    $P0 = size
+
+    $P0.'fill'(0)
+    i = 0
+    result = 0
+    $I1 = 0
+  fill_false_loop:
+    unless i < size goto fill_false_end
+    $I0 = $P0[i]
+    result = or result, $I0
+    inc i
+    goto fill_false_loop
+  fill_false_end:
+    nok(result, "Fill with 0")
+
+    $P0.'fill'(1)
+    i = 0
+    result = 1
+    $I1 = 0
+  fill_true_loop:
+    unless i < size goto fill_true_end
+    $I0 = $P0[i]
+    result = and result, $I0
+    inc i
+    goto fill_true_loop
+  fill_true_end:
+    ok(result, "Fill with 1")
+.end
 
 
 # Local Variables:

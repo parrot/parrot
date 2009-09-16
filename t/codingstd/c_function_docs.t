@@ -71,7 +71,7 @@ foreach my $path (@files) {
             $missing = 'missing';
         }
         if ($missing) {
-            push @missing_docs, "$path ($missing)\n$function_decl\n";
+            push @missing_docs, "$path ($missing)\n$function_decl\nWant:\n$escaped_decl\n";
         }
     }
 
@@ -79,7 +79,7 @@ foreach my $path (@files) {
         local $TODO = 'Missing function docs' if $todos{$path};
 
     ok ( ! @missing_docs, $path)
-        or diag( scalar @missing_docs
+        or diag( @missing_docs
             . " function(s) lacking documentation:\n"
             . join ("\n", @missing_docs, "\n"));
     }

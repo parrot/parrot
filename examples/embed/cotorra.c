@@ -110,7 +110,6 @@ Parrot_Run_core_t getruncore(const char *name)
         { PARROT_SLOW_CORE,     "slow" },
         { PARROT_FAST_CORE,     "fast" },
         { PARROT_CGOTO_CORE,    "cgoto" },
-        { PARROT_JIT_CORE,      "jit" },
         { PARROT_GC_DEBUG_CORE, "gcdebug" },
         { PARROT_SWITCH_CORE,   "switch" }
     };

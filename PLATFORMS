@@ -40,7 +40,7 @@ dragonfly2.2.0-i386-gcc-4.1.2 4   Y    Y    -     Y   Y   Y    Y     ?  20090427
 freebsd-x86-gcc-4.2.1         4   Y    Y    Y     ?   ?   Y    Y     Y  20090415
 freebsd-amd64-gcc-4.2.1       8   Y    -    -     ?   ?   Y    Y     Y  20090720
 linux-amd64-clang-r73854      8   ?    ?    =     Y   Y   Y/4  Y/1   ?  20090622
-linux-amd64-clang-r75433      8   Y    N    ?     ?   ?   Y    Y     ?  20090712
+linux-amd64-clang-r75433      8   Y    N    ?     ?   ?   Y    Y*4   ?  20090913
 linux-ppc-gcc3.4.5                Y    Y    Y     ?   ?   Y    Y     ?  20080519
 linux-s390x-gcc4.1.2         B4   ?    -    -     Y   Y   Y    Y/2   ?  20080908
 linux-amd64-gcc4.1.2          8   Y    -    -     Y   Y   Y    Y     ?  20080220
@@ -97,6 +97,7 @@ Remarks:
 *2 http://rt.perl.org/rt3/Ticket/Display.html?id=60926
 *3 64-bit MSVC uses 32-bit int and long values. For 64-bit use
    --ccflags="-GS- -MD" --intval="long long" --opcode="long long"
+*4 only builds when configured --without-gmp. See TT #1006
 
 The following configurations are also working on x86/linux (and possibly
 other platforms):

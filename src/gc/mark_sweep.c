@@ -535,6 +535,7 @@ Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)
             return 0;
         }
 
+        PARROT_ASSERT(current);
         mem_pools->gc_trace_ptr = current;
 
         /* short-term hack to color objects black */

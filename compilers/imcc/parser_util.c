@@ -714,13 +714,14 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
     }
 
     if (imc_info) {
+        SymReg *ns                  = IMCC_INFO(interp)->cur_namespace;
         IMCC_INFO(interp)           = imc_info->prev;
         mem_sys_free(imc_info);
         imc_info                    = IMCC_INFO(interp);
         IMCC_INFO(interp)->cur_unit = imc_info->last_unit;
 
-        if (IMCC_INFO(interp)->cur_namespace)
-            free_sym(IMCC_INFO(interp)->cur_namespace);
+        if (ns && ns != imc_info->cur_namespace)
+            free_sym(ns);
 
         IMCC_INFO(interp)->cur_namespace = imc_info->cur_namespace;
     }

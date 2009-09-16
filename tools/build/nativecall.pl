@@ -370,7 +370,7 @@ sub make_arg {
     /p/ && do {
         push @{$temps_ref},          "PMC *t_$temp_num;";
         push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_P($reg_num);";
-        return "VTABLE_get_pointer(interp, t_$temp_num)";
+        return "(PMC_IS_NULL(t_$temp_num) ? NULL : VTABLE_get_pointer(interp, t_$temp_num))";
     };
     /V/ && do {
         push @{$temps_ref},          "PMC *t_$temp_num;";

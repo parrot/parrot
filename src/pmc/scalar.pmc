@@ -96,41 +96,41 @@ according to the type of C<*value>.
 */
 
     VTABLE void assign_pmc(PMC *value) {
-        STRING * const s_int = CONST_STRING(INTERP, "Integer");
-        STRING        *s_num;
-        STRING        *s_str;
+        INTVAL  self_type = VTABLE_type(INTERP, SELF);
+        INTVAL  val_type  = VTABLE_type(INTERP, value);
 
-        if (SELF->vtable->base_type == enum_class_Boolean)
+        if (self_type == enum_class_Boolean)
             /* doesn't morph */
-            pmc_reuse(INTERP, SELF, value->vtable->base_type, 0);
+            pmc_reuse(INTERP, SELF, val_type, 0);
 
-        if (value->vtable->base_type == enum_class_Undef) {
-            pmc_reuse(INTERP, SELF, value->vtable->base_type, 0);
+        if (val_type == enum_class_Undef) {
+            pmc_reuse(INTERP, SELF, val_type, 0);
             return;
         }
 
-        if (VTABLE_isa(INTERP, value, s_int)) {
+        if (VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "Undef"))) {
+            pmc_reuse(INTERP, SELF, enum_class_Undef, 0);
+            return;
+        }
+
+        if (VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "Integer"))) {
             const INTVAL v = VTABLE_get_integer(INTERP, value);
             SELF.set_integer_native(v);
             return;
         }
 
-        s_num = CONST_STRING(INTERP, "Float");
-
-        if (VTABLE_isa(INTERP, value, s_num)) {
+        if (VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "Float"))) {
             const FLOATVAL v = VTABLE_get_number(INTERP, value);
             SELF.set_number_native(v);
             return;
         }
 
-        s_str = CONST_STRING(INTERP, "String");
-
-        if (VTABLE_isa(INTERP, value, s_str)) {
+        if (VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "String"))) {
             STRING * const v = VTABLE_get_string(INTERP, value);
             SELF.set_string_native(v);
             return;
         }
-        pmc_reuse(INTERP, SELF, value->vtable->base_type, 0);
+        pmc_reuse(INTERP, SELF, val_type, 0);
         SELF.set_pmc(value);
     }
 

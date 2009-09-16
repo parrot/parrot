@@ -208,6 +208,22 @@ Returns 0.
 
 /*
 
+=item C<INTVAL logical_not()>
+
+Returns 1.
+
+=cut
+
+*/
+
+    VTABLE PMC *logical_not(PMC *dest) {
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        VTABLE_set_bool(INTERP, dest, 1);
+        return dest;
+    }
+
+/*
+
 =item C<void share()>
 
 Unknown. (TODO)

@@ -43,7 +43,7 @@ copy_packfile_header(PARROT_INTERP, PMC *self, PackFile *pf) {
 
 }
 
-pmclass Packfile {
+pmclass Packfile auto_attrs {
         ATTR INTVAL wordsize;
         ATTR INTVAL byteorder;
         ATTR INTVAL fptype;
@@ -67,38 +67,20 @@ Initialize the structure.  (Create a blank PackFile object.)
 */
     VTABLE void init() {
         Parrot_Packfile_attributes *attrs =
-            mem_allocate_zeroed_typed(Parrot_Packfile_attributes);
+                PMC_data_typed(SELF, Parrot_Packfile_attributes*);
         PackFile                   *pf;
 
         attrs->uuid     = Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
         attrs->directory = pmc_new(INTERP, enum_class_PackfileDirectory);
-        PMC_data(SELF)  = attrs;
 
         /* Create dummy PackFile and copy default attributes to self */
         pf = PackFile_new(interp, 0);
         copy_packfile_header(interp, SELF, pf);
         PackFile_destroy(interp, pf);
 
-        PObj_custom_mark_destroy_SETALL(SELF);
+        PObj_custom_mark_SET(SELF);
     }
 
-
-/*
-
-=item C<void destroy()>
-
-Destroys the PackFile object.
-
-=cut
-
-*/
-
-    VTABLE void destroy() {
-        if (PARROT_PACKFILE(SELF)) {
-            mem_sys_free(PARROT_PACKFILE(SELF));
-            PMC_data(SELF) = NULL;
-        }
-    }
 
 /*
 
@@ -115,7 +97,7 @@ Marks the Packfile as alive.
 
         if (attrs->uuid)
             Parrot_gc_mark_PObj_alive(INTERP, (PObj *)attrs->uuid);
-        if (attrs->directory)
+        if (!PMC_IS_NULL(attrs->directory))
             Parrot_gc_mark_PObj_alive(INTERP, (PObj *)attrs->directory);
     }
 /*

@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2008, Parrot Foundation.
+# Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -88,7 +88,7 @@ sub remap_runcore_opts
     my ($opts_ref) = @_;
 
     my %remap      = (
-        'j' => '-runcore=jit',
+        'j' => '-runcore=fast',
         'g' => '-runcore=cgoto',
         'C' => '-runcore=cgp',
         'S' => '-runcore=switch',

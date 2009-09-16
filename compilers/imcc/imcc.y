@@ -2003,7 +2003,7 @@ assignment:
    | target '=' un_op var
             { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, $3, 2, $1, $4);  }
    | target '=' var bin_op var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, $4, 3, $1, $3, $5);  }
+            { IMCC_INFO(interp)->line++; $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, $4, 3, $1, $3, $5); IMCC_INFO(interp)->line--; }
    | target '=' var '[' keylist ']'
             { $$ = iINDEXFETCH(interp, IMCC_INFO(interp)->cur_unit, $1, $3, $5); }
    | target '[' keylist ']' '=' var
@@ -2087,7 +2087,7 @@ get_results:
 op_assign:
      target assign_op var
          {
-           $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, $2, 2, $1, $3);
+           IMCC_INFO(interp)->line++; $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, $2, 2, $1, $3); IMCC_INFO(interp)->line--;
          }
    ;
 

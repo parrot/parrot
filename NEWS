@@ -1,30 +1,33 @@
 # $Id$
 
 New in 1.6.0
-- Core
-  + Profiling runcore can now be used to generate Callgrind-compatible output
-  + PMC allocator now automatically allocates ATTR structures
-  + Added fixed-size structure allocator to GC
-  + Contexts are now garbage-collectable
+- Functionality
+  + Added a fixed-size structure allocator to the Garbage Collector
+  + Added a "lazy" mode to the PObj and Fixed-Size memory allocators
+  + Added a profiling runcore, which generates Callgrind-compatible output
+  + Added lexical subsystem opcodes: find_dynamic_lex, store_dynamic_lex
+  + Converted Contexts to garbage-collectable PMC structures
   + Created a new Context API
-  + Op definitions cache the current Context for subsequent lookups
+  + Enhanced the PMC allocator to automatically allocate ATTR structures
+- Performance
+  + Optimized opcodes to cache the current Context for subsequent lookups
+  + Reduced string comparisons in VTABLE_isa
+- Maintenance and cleanup
+  + Began proper encapsulation of STRING API
+  + Unified all PMC destruction functions
   + Unified Continuation PMC and Parrot_cont structure
   + Unified Sub PMC and Parrot_sub structure
-  + Began proper encapsulation of STRING API
-  + Modify PMC structure to remove UnionVal
   + Removed PMC_EXT structure
   + Removed PMC_Sync from PMC
-  + Added a "Lazy" mode to the PObj and Fixed-Size allocators
-  + Reduce string comparisons in VTABLE_isa
-  + Unified all PMC destruction functions
-  + Added several fixes for stack-walking GC code
-  + Copying a NULL string now returns an empty STRING structure
-  + Add find_dynamic_lex and store_dynamic_lex opcodes
+  + Removed UnionVal from PMC structure
+- Bugfix
+  + Fixed several stack-walking bugs in Garbage Collector code
+  + Fixed bug when copying a NULL STRING, now returns empty STRING struct
 - Tests
-  + Convert several Perl5 tests to PIR
-  + Expand test coverage of NameSpace PMC
+  + Converted several Perl5 tests to PIR
+  + Expanded test coverage of NameSpace PMC
 - Compilers
-  + PCT is now included in "make install"
+  + Made Parrot Compiler Toolkit available in the base install
 
 New in 1.5.0
 - Core

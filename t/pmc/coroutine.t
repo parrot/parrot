@@ -308,7 +308,7 @@ ex:
 CODE
 
 pir_output_like(
-    <<'CODE', <<'OUTPUT', "Call an exited coroutine", todo => 'goes one iteration too far.' );
+    <<'CODE', <<'OUTPUT', "Call an exited coroutine", todo => 'goes one iteration too far TT #1003' );
 .sub main :main
     .local pmc c
     c = get_global "coro"

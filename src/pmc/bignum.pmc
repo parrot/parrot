@@ -807,38 +807,6 @@ Return GMP version string "x.y.z".
         RETURN(STRING *version);
     }
 
-/*
-
-=item C<PMC *instantiate(PMC *sig)>
-
-Object constructor. SELF is a BigNum Class object. Return a new
-BigNum object.
-
-=cut
-
-*/
-    VTABLE PMC *instantiate(PMC *sig) {
-#ifdef PARROT_HAS_GMP
-        int argcP = REG_INT(interp, 3);
-        int base;
-        PMC *res;
-        STRING *num;
-
-        res = pmc_new(INTERP, enum_class_BigNum);
-        if (!argcP) {
-            return res;
-        }
-        base = 10;
-        if (argcP == 2)
-            base = VTABLE_get_integer(INTERP, REG_PMC(interp, 6));
-        num = VTABLE_get_string(INTERP, REG_PMC(interp, 5));
-        VTABLE_set_string_keyed_int(INTERP, res, base, num);
-        return res;
-#else
-        return PMCNULL;
-#endif
-    }
-
     VTABLE void init() {
         bignum_init(INTERP, SELF);
         PObj_custom_destroy_SET(SELF);

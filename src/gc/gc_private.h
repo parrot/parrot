@@ -72,12 +72,7 @@ extern void *flush_reg_store(void);
 
 /* Set to 1 if we want to use the fixed-size allocator. Set to 0 if we want
    to allocate these things using mem_sys_allocate instead */
-/* Had seen errors on Windows. Appears to be fixed now. TT #940 */
-#if defined(_WIN32) || defined(_WIN64)
-#  define GC_USE_FIXED_SIZE_ALLOCATOR 1
-#else
-#  define GC_USE_FIXED_SIZE_ALLOCATOR 1
-#endif
+#define GC_USE_FIXED_SIZE_ALLOCATOR 1
 
 /* We're using this here to add an additional pointer to a PObj without
    having to actually add an entire pointer to every PObj-alike structure

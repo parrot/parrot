@@ -430,42 +430,46 @@ inline op invokecc(invar PMC) :flow {
 
     interp->current_object = NULL;
     interp->current_cont   = NEED_CONTINUATION;
-    dest                   = (opcode_t *)p->vtable->invoke(interp, p, dest);
+    dest                   = VTABLE_invoke(interp, p, dest);
 
     goto ADDRESS(dest);
 }
 
 inline op invoke(invar PMC, invar PMC) :flow {
-    opcode_t *dest;
-    PMC * const p = $1;
+    opcode_t   *dest       = expr NEXT();
+    PMC * const p          = $1;
 
     interp->current_object = NULL;
-    interp->current_cont = $2;
-    dest = (opcode_t *)p->vtable->invoke(interp, p, expr NEXT());
+    interp->current_cont   = $2;
+
+    dest = VTABLE_invoke(interp, p, dest);
     goto ADDRESS(dest);
 }
 
 inline op yield() :flow {
-    opcode_t *dest = expr NEXT();
-    PMC * const p = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
-    dest = (opcode_t *)p->vtable->invoke(interp, p, dest);
+    opcode_t   *dest = expr NEXT();
+    PMC * const p    = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
+
+    VTABLE_increment(interp, p);
+    dest = VTABLE_invoke(interp, p, dest);
+
     goto ADDRESS(dest);
 }
 
 inline op tailcall(invar PMC) :flow {
-    opcode_t *dest;
-    PMC * const p = $1;
-    dest = expr NEXT();
-    interp->current_cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
-    PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL;
-    dest = (opcode_t *)p->vtable->invoke(interp, p, dest);
+    PMC * const p        = $1;
+    opcode_t   *dest     = expr NEXT();
+    interp->current_cont = Parrot_pcc_get_continuation(interp,
+                                CURRENT_CONTEXT(interp));
+
+    SUB_FLAG_TAILCALL_SET(interp->current_cont);
+    dest = VTABLE_invoke(interp, p, dest);
     goto ADDRESS(dest);
 }
 
 inline op returncc() :flow {
     PMC * const p = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
-    opcode_t * const dest = (opcode_t *)p->vtable->invoke(interp,
-            p, expr NEXT());
+    opcode_t * const dest = VTABLE_invoke(interp, p, expr NEXT());
     goto ADDRESS(dest);
 }
 
