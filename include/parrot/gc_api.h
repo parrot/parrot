@@ -43,31 +43,11 @@ typedef enum {
     POOL_ALL    = 0x07
 } pool_iter_enum;
 
-struct Small_Object_Pool;
-struct Small_Object_Arena;
-struct Arenas;
-
-typedef int (*pool_iter_fn)(PARROT_INTERP, struct Small_Object_Pool *, int, void*);
-
-typedef struct Memory_Block {
-    size_t free;
-    size_t size;
-    struct Memory_Block *prev;
-    struct Memory_Block *next;
-    char *start;
-    char *top;
-} Memory_Block;
-
-typedef struct Memory_Pool {
-    Memory_Block *top_block;
-    void (*compact)(PARROT_INTERP, struct Memory_Pool *);
-    size_t minimum_block_size;
-    size_t total_allocated; /* total bytes allocated to this pool */
-    size_t guaranteed_reclaimable;     /* bytes that can definitely be reclaimed*/
-    size_t possibly_reclaimable;     /* bytes that can possibly be reclaimed
-                                      * (above plus COW-freed bytes) */
-    FLOATVAL reclaim_factor; /* minimum percentage we will reclaim */
-} Memory_Pool;
+struct Memory_Block;
+struct Var_Size_Pool;
+struct Fixed_Size_Pool;
+struct Fixed_Size_Arena;
+struct Memory_Pools;
 
 typedef enum {
     GC_TRACE_FULL        = 1,
@@ -75,25 +55,12 @@ typedef enum {
     GC_TRACE_SYSTEM_ONLY = 3
 } Parrot_gc_trace_type;
 
-typedef void (*add_free_object_fn_type)(PARROT_INTERP, struct Small_Object_Pool *, void *);
-typedef void * (*get_free_object_fn_type)(PARROT_INTERP, struct Small_Object_Pool *);
-typedef void (*alloc_objects_fn_type)(PARROT_INTERP, struct Small_Object_Pool *);
-typedef void (*gc_object_fn_type)(PARROT_INTERP, struct Small_Object_Pool *, PObj *);
+typedef int (*pool_iter_fn)(PARROT_INTERP, struct Fixed_Size_Pool *, int, void*);
+typedef void (*add_free_object_fn_type)(PARROT_INTERP, struct Fixed_Size_Pool *, void *);
+typedef void * (*get_free_object_fn_type)(PARROT_INTERP, struct Fixed_Size_Pool *);
+typedef void (*alloc_objects_fn_type)(PARROT_INTERP, struct Fixed_Size_Pool *);
+typedef void (*gc_object_fn_type)(PARROT_INTERP, struct Fixed_Size_Pool *, PObj *);
 
-/*
- * macros used in arena scan code to convert from object pointers
- * to arena pointers ...
- */
-
-#if PARROT_GC_GMS
-#  define GC_HEADER_SIZE (sizeof (Gc_gms_hdr))
-#  define PObj_to_ARENA(o) PObj_to_GMSH(o)
-#  define ARENA_to_PObj(p) GMSH_to_PObj((Gc_gms_hdr*)(p))
-#else
-#  define GC_HEADER_SIZE 0
-#  define PObj_to_ARENA(o) (o)
-#  define ARENA_to_PObj(p) (p)
-#endif
 
 /* &gen_from_enum(interpinfo.pasm) prefix(INTERPINFO_) */
 
@@ -480,41 +447,6 @@ int Parrot_gc_total_sized_buffers(PARROT_INTERP)
 /* HEADERIZER END: src/gc/api.c */
 
 void Parrot_gc_inf_init(PARROT_INTERP);
-
-/* write barrier */
-#if PARROT_GC_MS
-#  define GC_WRITE_BARRIER(interp, agg, old, _new) do { } while (0)
-#  define GC_WRITE_BARRIER_KEY(interp, agg, old, old_key, _new, new_key) do { } while (0)
-#endif
-
-#if PARROT_GC_GMS
-#  define GC_WRITE_BARRIER(interp, agg, old, _new) do { \
-    UINTVAL gen_agg, gen_new; \
-    if (!(_new) || PMC_IS_NULL(_new)) \
-        break; \
-    gen_agg = PObj_to_GMSH(agg)->gen->gen_no; \
-    gen_new = PObj_to_GMSH(_new)->gen->gen_no; \
-    if (gen_agg < gen_new) \
-        parrot_gc_gms_wb((interp), (agg), (old), (_new)); \
-} while (0)
-
-#  define GC_WRITE_BARRIER_KEY(interp, agg, old, old_key, _new, new_key) do { \
-    UINTVAL gen_agg, gen_new, gen_key; \
-    if (!(_new) || PMC_IS_NULL(_new)) \
-        break; \
-    gen_agg = PObj_to_GMSH(agg)->gen->gen_no; \
-    gen_new = PObj_to_GMSH(_new)->gen->gen_no; \
-    gen_key = PObj_to_GMSH(new_key)->gen->gen_no; \
-    if (gen_agg < gen_new || gen_agg < gen_key) \
-        parrot_gc_gms_wb_key((interp), (agg), (old), (old_key), (_new), (new_key)); \
-} while (0)
-
-#endif
-
-#if PARROT_GC_INF
-#  define GC_WRITE_BARRIER(interp, agg, old, _new) do { } while (0)
-#  define GC_WRITE_BARRIER_KEY(interp, agg, old, old_key, _new, new_key) do { } while (0)
-#endif
 
 #endif /* PARROT_GC_API_H_GUARD */
 

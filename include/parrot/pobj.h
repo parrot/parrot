@@ -316,14 +316,6 @@ typedef enum PObj_enum {
 #define PObj_custom_destroy_TEST(o)  PObj_flag_TEST(custom_destroy,  o)
 #define PObj_custom_destroy_CLEAR(o) PObj_flag_CLEAR(custom_destroy, o)
 
-/*******************************************************
- * DEPRECATED -- use PObj_custom_destroy_FOO() instead *
- *******************************************************/
-#define PObj_active_destroy_FLAG     PObj_custom_destroy_FLAG
-#define PObj_active_destroy_SET(o)   PObj_flag_SET(custom_destroy,   o)
-#define PObj_active_destroy_TEST(o)  PObj_flag_TEST(custom_destroy,  o)
-#define PObj_active_destroy_CLEAR(o) PObj_flag_CLEAR(custom_destroy, o)
-
 #define PObj_is_class_SET(o) PObj_flag_SET(is_class, o)
 #define PObj_is_class_TEST(o) PObj_flag_TEST(is_class, o)
 #define PObj_is_class_CLEAR(o) PObj_flag_CLEAR(is_class, o)
@@ -366,6 +358,15 @@ typedef enum PObj_enum {
         PObj_custom_mark_SET(o); \
         PObj_custom_destroy_SET(o); \
 } while (0)
+
+/*******************************************************
+ * DEPRECATED -- use PObj_custom_destroy_FOO() instead *
+ *******************************************************/
+#define PObj_active_destroy_FLAG     PObj_custom_destroy_FLAG
+#define PObj_active_destroy_SET(o)   PObj_flag_SET(custom_destroy,   o)
+#define PObj_active_destroy_TEST(o)  PObj_flag_TEST(custom_destroy,  o)
+#define PObj_active_destroy_CLEAR(o) PObj_flag_CLEAR(custom_destroy, o)
+
 
 #endif /* PARROT_POBJ_H_GUARD */
 

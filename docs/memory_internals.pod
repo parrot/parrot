@@ -51,31 +51,31 @@ A overall layout of the interpreter's memory management looks like so:
 
     typedef struct Interp {
         ...
-        struct Arenas *arena_base;
+        struct Memory_Pools *mem_pools;
         ...
     } Interp;
 
 All object-like things that get allocated during the execution of parrot
-bytecode are managed from the C<arena_base> member of the interpreter
+bytecode are managed from the C<mem_pools> member of the interpreter
 structure.
 
-=head1 Arenas
+=head1 Memory Pools
 
-C<struct Arenas> holds pointers to a variety of different kinds of managed
+C<struct Memory_Pools> holds pointers to a variety of different kinds of managed
 memory. A simplification looks similar to this:
 
-    typedef struct Arenas {
-        struct Memory_Pool *memory_pool;
+    typedef struct Memory_Pools {
+        struct Var_Size_Pool *memory_pool;
         ...
-        struct Small_Object_Pool * header_pool;
-        struct Small_Object_Pool ** sized_pools;
-    } Arenas;
+        struct Fixed_Size_Pool * header_pool;
+        struct Fixed_Size_Pool ** sized_pools;
+    } Memory_Pools;
 
 C<memory_pool> and C<header_pool> are variable and fixed sized pool pointers
-respectively. These are just two examples, there are other C<Memory_Pool>s
-and C<Small_Object_Pool>s in the Parrot system. Pools of type
-C<struct Memory_Pool> are for variable-size objects, such as constant string
-buffers. Pools of type C<struct Small_Object_Pool> are for fixed-size objects
+respectively. These are just two examples, there are other C<Var_Size_Pool>s
+and C<Fixed_Size_Pool>s in the Parrot system. Pools of type
+C<struct Var_Size_Pool> are for variable-size objects, such as constant string
+buffers. Pools of type C<struct Fixed_Size_Pool> are for fixed-size objects
 such as headers or PMCs.
 
 =head1 Fixed sized items
@@ -135,28 +135,18 @@ C<PObj_on_free_list_FLAG>, and C<PObj_is_special_PMC_FLAG>.  Normally these
 flags are stored in C<PObj-E<gt>flags>, meaning that each PMC must be accessed
 during the mark run.
 
-An alternative approach is to store the GC-Flags together somewhere, such as
-in the individual arenas, as a packed array of bits. This approach, called
-cardmarking, should be indicated by defining the preprocessor variable
-C<ARENA_GC_FLAGS> to 1.
-
-{{ ARENA_GC_FLAGS (nee ARENA_DOD_FLAGS) seems to have been deprecated or
-changed without concomitant update to this document.  Someone should figure out
-what this macro used to be and whether it's still relevant.  -cotto }}
-
 F<pobj.h> provides macros to facilitate referencing individual object flags:
 C<gc_flag_SET>, C<gc_flag_CLEAR> and C<gc_flag_TEST>. They make up a portable
 way of manipulating the GC-relevant object flags.
 
 =head1 Variable sized items
 
-Variable-sized items do not exist by themselves, they are always preceded by
-a buffer structure that contains information about them. These buffer
-structures are described above, and the C<UnionVal cache> item typically
-points to the memory block that contains the data. The variable-sized data
-items are managed in two different pools: the C<memory_pool>, which contains
-a general mish-mash of data types, and the C<constant_string_pool> which
-contains immutable string buffers used by programs running on Parrot.
+Variable-sized items do not exist by themselves, they are always wrapped by
+a buffer structure that contains a pointer to the data information about them.
+The variable-sized data items are managed in two different pools: the
+C<memory_pool>, which contains a general mish-mash of data types, and the
+C<constant_string_pool> which contains immutable string buffers used by
+programs running on Parrot.
 
 Here, different memory allocation schemes jump in:
 
@@ -221,11 +211,6 @@ rendering COW to a noop, nor are you allowed to free this same string more then
 once. Both allocation schemes therefore use a part of the allocated string to
 do this bookkeeping.
 
-Copying GC uses a C<Buffer_Tail> after the end of the actual variable length
-string and marks such COW strings with C<TAIL_moved> and stores the new address
-in the buffer header, so other users of this string can be updated to reuse the
-same string (RT#47764 one or all other users?).
-
 The C<malloc()>/C<free()> approach stores a refcount at C<bufstart>. During the
 mark phase all dead users increment the refcount, living users set it to an
 huge value.  When freeing the buffer, the string is only freed if the refcount
@@ -233,9 +218,9 @@ reaches zero.
 
 =head1 Simplified Figure
 
-                             +--------+
-      +------------------<---| Arenas |<-----------+
-      |                      +--------+-->--+      |
+                         +--------------+
+      +--------------<---| Memory Pools |<---------+
+      |                  +--------------+---+      |
       |                                     |      |
       |         +------+    +-----------+   |  +=============+
       |         | S0   |<---| Registers |<--)--| Interpreter |
@@ -249,8 +234,8 @@ reaches zero.
  +-------+  |   | Buffer 2 |    | ..String...  |<--| Block 2 |
  | .     |  |   +----------+    +--------------+   +---------+
  +-------+  |   | ...      |        ^    ^         | ...     |
- Small Obj  |   +----------+        |    |         +---------+
- Pool       +-->| Buffer N |--------+----+         Memory Pool
+Fixed Size  |   +----------+        |    |         +---------+
+   Pool     +-->| Buffer N |--------+----+        Var Size Pool
                 +----------+
                  Buffer          Memory Block
 
@@ -261,9 +246,9 @@ filled in.
 
 =head1 FILES
 
-mark_sweep.[ch], src/gc/pools.c, resources.[ch], res_lea.c, src/gc/api.c,
-string.[ch], pobj.h. Other garbage collector implementations may use separate
-files as well.
+src/gc/api.c, src/gc/gc_private.h, pobj.h, mark_sweep.[ch],
+alloc_resources.[ch], res_lea.c, string.[ch]. Other garbage collector
+implementations may use separate files as well.
 
 =head1 BUGS
 

@@ -46,10 +46,10 @@ void
 Parrot_gc_compact_memory_pool(PARROT_INTERP)
 {
     ASSERT_ARGS(parrot_go_collect)
-    if (interp->arena_base->gc_sweep_block_level) {
+    if (interp->mem_pools->gc_sweep_block_level) {
         return;
     }
-    interp->arena_base->gc_collect_runs++;        /* fake it */
+    interp->mem_pools->gc_collect_runs++;        /* fake it */
 }
 
 /*
@@ -239,7 +239,7 @@ Parrot_gc_allocate_string_storage(PARROT_INTERP, STRING *str, size_t size)
 
 /*
 
-=item C<void initialize_memory_pools(PARROT_INTERP)>
+=item C<void initialize_var_size_pools(PARROT_INTERP)>
 
 Does nothing.
 
@@ -248,9 +248,9 @@ Does nothing.
 */
 
 void
-initialize_memory_pools(PARROT_INTERP)
+initialize_var_size_pools(PARROT_INTERP)
 {
-    ASSERT_ARGS(parrot_initialize_memory_pools)
+    ASSERT_ARGS(parrot_initialize_var_size_pools)
 }
 
 /*

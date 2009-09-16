@@ -231,7 +231,6 @@ make_prop_hash(PARROT_INTERP, PMC *self) {
     PMC *prop;
 
     PMC_metadata(self) = prop = pmc_new(interp, enum_class_Hash);
-    GC_WRITE_BARRIER(interp, self, NULL, prop);
     propagate_std_props(interp, self, prop);
     return prop;
 }

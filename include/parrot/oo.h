@@ -32,7 +32,7 @@ typedef enum {
 #define get_attrib_num(x, y)    ((PMC **)(x))[(y)]
 #define set_attrib_num(o, x, y, z) \
     do { \
-        GC_WRITE_BARRIER(interp, (o), ((PMC **)(x))[y], (z)); \
+        Parrot_gc_write_barrier(interp, (o), ((PMC **)(x))[y], (z)); \
         ((PMC **)(x))[(y)] = (z); \
     } while (0)
 

@@ -23,26 +23,26 @@ This code implements the default mark and sweep garbage collector.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void gc_ms_add_free_object(SHIM_INTERP,
-    ARGMOD(Small_Object_Pool *pool),
+    ARGMOD(Fixed_Size_Pool *pool),
     ARGIN(void *to_add))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pool);
 
 static void gc_ms_alloc_objects(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool))
+    ARGMOD(Fixed_Size_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
-static void gc_ms_finalize(PARROT_INTERP, ARGIN(Arenas * const arena_base))
+static void gc_ms_finalize(PARROT_INTERP, ARGIN(Memory_Pools * const mem_pools))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static void * gc_ms_get_free_object(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool))
+    ARGMOD(Fixed_Size_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
@@ -51,17 +51,17 @@ static void gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
 static void gc_ms_more_traceable_objects(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool))
+    ARGMOD(Fixed_Size_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
-static void gc_ms_pool_init(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
+static void gc_ms_pool_init(SHIM_INTERP, ARGMOD(Fixed_Size_Pool *pool))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
 static int gc_ms_sweep_cb(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool),
+    ARGMOD(Fixed_Size_Pool *pool),
     int flag,
     ARGMOD(void *arg))
         __attribute__nonnull__(1)
@@ -82,7 +82,7 @@ static int gc_ms_trace_active_PMCs(PARROT_INTERP,
     || PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_gc_ms_finalize __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(arena_base)
+    || PARROT_ASSERT_ARG(mem_pools)
 #define ASSERT_ARGS_gc_ms_get_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pool)
@@ -123,11 +123,11 @@ void
 Parrot_gc_ms_init(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_gc_ms_init)
-    Arenas * const arena_base     = interp->arena_base;
 
-    arena_base->do_gc_mark         = gc_ms_mark_and_sweep;
-    arena_base->finalize_gc_system = NULL;
-    arena_base->init_pool          = gc_ms_pool_init;
+    interp->gc_sys->do_gc_mark         = gc_ms_mark_and_sweep;
+    interp->gc_sys->finalize_gc_system = NULL;
+    interp->gc_sys->init_pool          = gc_ms_pool_init;
+
 }
 
 /*
@@ -144,25 +144,25 @@ static void
 gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(gc_ms_mark_and_sweep)
-    Arenas * const arena_base = interp->arena_base;
+    Memory_Pools * const mem_pools = interp->mem_pools;
     int total_free = 0;
 
-    if (arena_base->gc_mark_block_level)
+    if (mem_pools->gc_mark_block_level)
         return;
 
     if (interp->pdb && interp->pdb->debugger) {
         /* The debugger could have performed a mark. Make sure everything is
            marked dead here, so that when we sweep it all gets collected */
-        Parrot_gc_clear_live_bits(interp, arena_base->pmc_pool);
+        Parrot_gc_clear_live_bits(interp, mem_pools->pmc_pool);
     }
 
     if (flags & GC_finish_FLAG) {
-        gc_ms_finalize(interp, arena_base);
+        gc_ms_finalize(interp, mem_pools);
         return;
     }
 
-    ++arena_base->gc_mark_block_level;
-    arena_base->lazy_gc = flags & GC_lazy_FLAG;
+    ++mem_pools->gc_mark_block_level;
+    mem_pools->lazy_gc = flags & GC_lazy_FLAG;
 
     /* tell the threading system that we're doing GC mark */
     pt_gc_start_mark(interp);
@@ -176,8 +176,8 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     if (gc_ms_trace_active_PMCs(interp, (flags & GC_trace_stack_FLAG)
         ? GC_TRACE_FULL : GC_TRACE_ROOT_ONLY)) {
 
-        arena_base->gc_trace_ptr = NULL;
-        arena_base->gc_mark_ptr  = NULL;
+        mem_pools->gc_trace_ptr = NULL;
+        mem_pools->gc_mark_ptr  = NULL;
 
         /* We've done the mark, now do the sweep. Pass the sweep callback
            function to the PMC pool and all the sized pools. */
@@ -186,23 +186,23 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     }
     else {
-        ++arena_base->gc_lazy_mark_runs;
+        ++mem_pools->gc_lazy_mark_runs;
 
-        Parrot_gc_clear_live_bits(interp, arena_base->pmc_pool);
+        Parrot_gc_clear_live_bits(interp, mem_pools->pmc_pool);
     }
 
     pt_gc_stop_mark(interp);
 
     /* Note it */
-    arena_base->gc_mark_runs++;
-    --arena_base->gc_mark_block_level;
+    mem_pools->gc_mark_runs++;
+    --mem_pools->gc_mark_block_level;
 
     return;
 }
 
 /*
 
-=item C<static void gc_ms_finalize(PARROT_INTERP, Arenas * const arena_base)>
+=item C<static void gc_ms_finalize(PARROT_INTERP, Memory_Pools * const mem_pools)>
 
 Perform the finalization run, freeing all PMCs.
 
@@ -211,23 +211,23 @@ Perform the finalization run, freeing all PMCs.
 */
 
 static void
-gc_ms_finalize(PARROT_INTERP, ARGIN(Arenas * const arena_base))
+gc_ms_finalize(PARROT_INTERP, ARGIN(Memory_Pools * const mem_pools))
 {
     ASSERT_ARGS(gc_ms_finalize)
-    Parrot_gc_clear_live_bits(interp, arena_base->pmc_pool);
-    Parrot_gc_clear_live_bits(interp, arena_base->constant_pmc_pool);
+    Parrot_gc_clear_live_bits(interp, mem_pools->pmc_pool);
+    Parrot_gc_clear_live_bits(interp, mem_pools->constant_pmc_pool);
 
     /* keep the scheduler and its kids alive for Task-like PMCs to destroy
      * themselves; run a sweep to collect them */
     if (interp->scheduler) {
         Parrot_gc_mark_PObj_alive(interp, (PObj *)interp->scheduler);
         VTABLE_mark(interp, interp->scheduler);
-        Parrot_gc_sweep_pool(interp, interp->arena_base->pmc_pool);
+        Parrot_gc_sweep_pool(interp, interp->mem_pools->pmc_pool);
     }
 
     /* now sweep everything that's left */
-    Parrot_gc_sweep_pool(interp, interp->arena_base->pmc_pool);
-    Parrot_gc_sweep_pool(interp, interp->arena_base->constant_pmc_pool);
+    Parrot_gc_sweep_pool(interp, interp->mem_pools->pmc_pool);
+    Parrot_gc_sweep_pool(interp, interp->mem_pools->constant_pmc_pool);
 }
 
 
@@ -258,7 +258,7 @@ gc_ms_trace_active_PMCs(PARROT_INTERP, Parrot_gc_trace_type trace)
 
 /*
 
-=item C<static int gc_ms_sweep_cb(PARROT_INTERP, Small_Object_Pool *pool, int
+=item C<static int gc_ms_sweep_cb(PARROT_INTERP, Fixed_Size_Pool *pool, int
 flag, void *arg)>
 
 Sweeps the given pool for the MS collector. This function also ends
@@ -270,7 +270,7 @@ of objects freed.
 */
 
 static int
-gc_ms_sweep_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag,
+gc_ms_sweep_cb(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool), int flag,
     ARGMOD(void *arg))
 {
     ASSERT_ARGS(gc_ms_sweep_cb)
@@ -291,7 +291,7 @@ gc_ms_sweep_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag,
 
 =over 4
 
-=item C<static void gc_ms_pool_init(PARROT_INTERP, Small_Object_Pool *pool)>
+=item C<static void gc_ms_pool_init(PARROT_INTERP, Fixed_Size_Pool *pool)>
 
 Initialize a memory pool for the MS garbage collector system. Sets the
 function pointers necessary to perform basic operations on a pool, such
@@ -302,7 +302,7 @@ as object allocation.
 */
 
 static void
-gc_ms_pool_init(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
+gc_ms_pool_init(SHIM_INTERP, ARGMOD(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(gc_ms_pool_init)
     pool->add_free_object = gc_ms_add_free_object;
@@ -314,7 +314,7 @@ gc_ms_pool_init(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
 /*
 
 =item C<static void gc_ms_more_traceable_objects(PARROT_INTERP,
-Small_Object_Pool *pool)>
+Fixed_Size_Pool *pool)>
 
 We're out of traceable objects. First we try a GC run to free some up. If
 that doesn't work, allocate a new arena.
@@ -324,14 +324,14 @@ that doesn't work, allocate a new arena.
 */
 
 static void
-gc_ms_more_traceable_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
+gc_ms_more_traceable_objects(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(gc_ms_more_traceable_objects)
 
     if (pool->skip)
         pool->skip = 0;
     else {
-        Small_Object_Arena * const arena = pool->last_Arena;
+        Fixed_Size_Arena * const arena = pool->last_Arena;
         if (arena
         &&  arena->used == arena->total_objects)
                 Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
@@ -351,7 +351,7 @@ gc_ms_more_traceable_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
 /*
 
-=item C<static void gc_ms_add_free_object(PARROT_INTERP, Small_Object_Pool
+=item C<static void gc_ms_add_free_object(PARROT_INTERP, Fixed_Size_Pool
 *pool, void *to_add)>
 
 Add an unused object back to the pool's free list for later reuse. Set
@@ -362,7 +362,7 @@ the PObj flags to indicate that the item is free.
 */
 
 static void
-gc_ms_add_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool),
+gc_ms_add_free_object(SHIM_INTERP, ARGMOD(Fixed_Size_Pool *pool),
     ARGIN(void *to_add))
 {
     ASSERT_ARGS(gc_ms_add_free_object)
@@ -376,7 +376,7 @@ gc_ms_add_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool),
 
 /*
 
-=item C<static void * gc_ms_get_free_object(PARROT_INTERP, Small_Object_Pool
+=item C<static void * gc_ms_get_free_object(PARROT_INTERP, Fixed_Size_Pool
 *pool)>
 
 Free object allocator for the MS garbage collector system. If there are no
@@ -391,7 +391,7 @@ free list, pop it off and return it.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static void *
-gc_ms_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
+gc_ms_get_free_object(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(gc_ms_get_free_object)
     PObj *ptr;
@@ -404,7 +404,7 @@ gc_ms_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
     }
 
     if (!free_list) {
-        Small_Object_Arena * const arena = pool->last_Arena;
+        Fixed_Size_Arena * const arena = pool->last_Arena;
         ptr           = (PObj *)pool->newfree;
         pool->newfree = (void *)((char *)pool->newfree + pool->object_size);
         arena->used++;
@@ -440,7 +440,7 @@ gc_ms_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
 /*
 
-=item C<static void gc_ms_alloc_objects(PARROT_INTERP, Small_Object_Pool *pool)>
+=item C<static void gc_ms_alloc_objects(PARROT_INTERP, Fixed_Size_Pool *pool)>
 
 New arena allocator function for the MS garbage collector system. Allocates
 and initializes a new memory arena in the given pool. Adds all the new
@@ -451,13 +451,13 @@ objects to the pool's free list for later allocation.
 */
 
 static void
-gc_ms_alloc_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
+gc_ms_alloc_objects(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(gc_ms_alloc_objects)
     /* Setup memory for the new objects */
 
-    Small_Object_Arena * const new_arena =
-        mem_internal_allocate_typed(Small_Object_Arena);
+    Fixed_Size_Arena * const new_arena =
+        mem_internal_allocate_typed(Fixed_Size_Arena);
 
     const size_t size = pool->object_size * pool->objects_per_alloc;
     size_t alloc_size;

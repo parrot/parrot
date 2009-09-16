@@ -1122,7 +1122,7 @@ op sweep(inconst INT) {
     if ($1)
         Parrot_do_dod_run(interp, 0);
     else
-        if (interp->arena_base->num_early_DOD_PMCs)
+        if (interp->mem_pools->num_early_DOD_PMCs)
             Parrot_do_dod_run(interp, GC_lazy_FLAG);
 }
 
@@ -1185,7 +1185,7 @@ when unused during the lazy sweep, triggered by C<sweep 0>.
 
 op needs_destroy(invar PMC) {
      PObj_needs_early_DOD_SET($1);
-     ++interp->arena_base->num_early_DOD_PMCs;
+     ++interp->mem_pools->num_early_DOD_PMCs;
 }
 
 =back
