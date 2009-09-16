@@ -90,13 +90,6 @@ sub _evaluate_msvc {
         # To disable deprecation, use _CRT_SECURE_NO_DEPRECATE. See online help
         # for details.
         $conf->data->add( " ", "ccflags", "-D_CRT_SECURE_NO_DEPRECATE" );
-
-        # Microsoft provides two annotations mechanisms.  __declspec, which has been
-        # around for a while, and Microsoft's standard source code annotation
-        # language (SAL), introduced with Visual C++ 8.0.
-        # See <http://msdn2.microsoft.com/en-us/library/ms235402(VS.80).aspx>,
-        # <http://msdn2.microsoft.com/en-us/library/dabb5z75(VS.80).aspx>.
-        $conf->data->set( HAS_MSVC_SAL => 1 );
     }
     return 1;
 }
