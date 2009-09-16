@@ -1030,19 +1030,11 @@ init_prederef(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore))
 
             ADD_OP_VAR_PART(interp, interp->code, pc, n);
 
-            /* count ops that need a PIC */
-            if (parrot_PIC_op_is_cached(*pc))
-                n_pics++;
-
             pc += n;
             i  += n;
         }
 
         interp->code->prederef.code = temp;
-
-        /* allocate pic store, which starts from 1 */
-        if (n_pics)
-            parrot_PIC_alloc_store(interp->code, n_pics + 1);
     }
 
     return NULL;

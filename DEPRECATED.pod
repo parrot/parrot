@@ -153,14 +153,6 @@ L<https://trac.parrot.org/parrot/ticket/511>
 
 L<http://rt.perl.org/rt3/Ticket/Display.html?id=60626>
 
-=item src/pic.c and src/pic_jit.c [eligible in 1.1]
-
-These two files were a thin prototype implementation of Polymorphic Inline
-Caching that only ever applied to 4 opcodes, one of which has now been removed.
-The files (and all functions in them) are deprecated, and will be removed.
-
-L<http://rt.perl.org/rt3/Ticket/Display.html?id=60048>
-
 =item Subs marked with C<:vtable>/C<:method> aren't in namespace [eligible in 1.1]
 
 Subs marked with C<:vtable> or C<:method> flags are no longer given a

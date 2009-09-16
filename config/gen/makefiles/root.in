@@ -452,8 +452,6 @@ INTERP_O_FILES := \
     $(SRC_DIR)/oo$(O) \
     $(SRC_DIR)/packfile$(O) \
     $(SRC_DIR)/packout$(O) \
-    $(SRC_DIR)/pic_jit$(O) \
-    $(SRC_DIR)/pic$(O) \
     $(SRC_DIR)/platform$(O) \
     $(SRC_DIR)/pmc_freeze$(O) \
     $(SRC_DIR)/pmc$(O) \
@@ -1191,11 +1189,6 @@ $(SRC_DIR)/gc/alloc_memory$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/main$(O) : $(SRC_DIR)/main.c $(GENERAL_H_FILES)
 
-$(SRC_DIR)/pic$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_fixedintegerarray.h \
-	$(SRC_DIR)/pmc/pmc_continuation.h
-
-$(SRC_DIR)/pic_jit$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h
-
 $(SRC_DIR)/multidispatch$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/multidispatch.str \
 	$(SRC_DIR)/pmc/pmc_nci.h $(SRC_DIR)/pmc/pmc_sub.h
 
@@ -1255,8 +1248,6 @@ $(IO_DIR)/filehandle$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/pmc/pmc_filehandle.h $
 
 $(OPS_DIR)/core_ops$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops.c \
 	$(SRC_DIR)/pmc/pmc_continuation.h $(SRC_DIR)/pmc/pmc_parrotlibrary.h
-
-$(OPS_DIR)/pic.ops : $(SRC_DIR)/pmc/pmc_fixedintegerarray.h
 
 # core_ops depends upon config.h so that it gets updated along with
 # updates to config.h's version numbers

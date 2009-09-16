@@ -27,6 +27,7 @@
 
 # please insert tab separated entries at the top of the list
 
+5.2	2009.09.16	darbelo	remove pic.ops
 5.2	2009.08.06	dukeleto	remove Random PMC
 5.1	2009.08.06	cotto	remove branch_cs opcode 
 5.0	2009.07.21	cotto	released 1.4.0 

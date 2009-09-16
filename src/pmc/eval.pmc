@@ -211,12 +211,6 @@ Invokes the first subroutine in the eval code.
             cur_cs->fixups = NULL;
         }
 
-        seg = cur_cs->pic_index;
-        if (seg) {
-            PackFile_Segment_destroy(INTERP, seg);
-            cur_cs->pic_index = NULL;
-        }
-
 /* XXX Commenting out this to fix TT #995 and related problems.
  * May leak some memory, need further revision.
 
@@ -270,10 +264,6 @@ for writing to disc and later loading via C<load_bytecode>.
         if (seg->fixups)
             PackFile_add_segment(INTERP, &pf->directory,
                     (PackFile_Segment *)seg->fixups);
-
-        if (seg->pic_index)
-            PackFile_add_segment(INTERP, &pf->directory,
-                    (PackFile_Segment *)seg->pic_index);
 
         size = PackFile_pack_size(INTERP, pf) * sizeof (opcode_t);
 

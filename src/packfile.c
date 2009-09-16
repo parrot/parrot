@@ -583,8 +583,6 @@ make_code_pointers(ARGMOD(PackFile_Segment *seg))
             }
             break;
         case PF_UNKNOWN_SEG:
-            if (memcmp(seg->name, "PIC_idx", 7) == 0)
-                pf->cur_cs->pic_index = seg;
             break;
         case PF_DEBUG_SEG:
             pf->cur_cs->debugs       = (PackFile_Debug *)seg;
@@ -1771,9 +1769,6 @@ PF_create_default_segs(PARROT_INTERP, ARGIN(const char *file_name), int add)
 
     cur_cs->const_table->code = cur_cs;
 
-    cur_cs->pic_index = create_seg(interp, &pf->directory,
-            PF_UNKNOWN_SEG, "PIC_idx", file_name, add);
-
     return cur_cs;
 }
 
@@ -2572,7 +2567,6 @@ byte_code_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
 #ifdef HAS_JIT
     Parrot_destroy_jit(byte_code->jit_info);
 #endif
-    parrot_PIC_destroy(byte_code);
     if (byte_code->prederef.code) {
         Parrot_free_memalign(byte_code->prederef.code);
         byte_code->prederef.code = NULL;
@@ -2585,7 +2579,6 @@ byte_code_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
 
     byte_code->fixups      = NULL;
     byte_code->const_table = NULL;
-    byte_code->pic_index   = NULL;
     byte_code->debugs      = NULL;
 }
 

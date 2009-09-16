@@ -22,6 +22,7 @@ NCI function setup, compiler registration, C<interpinfo>, and C<sysinfo> opcodes
 #include "parrot/parrot.h"
 #include "inter_misc.str"
 #include "../compilers/imcc/imc.h"
+#include "parrot/runcore_api.h"
 
 #include "parrot/has_header.h"
 

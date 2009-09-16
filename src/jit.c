@@ -1628,7 +1628,9 @@ parrot_build_asm(PARROT_INTERP, ARGIN(opcode_t *code_start), ARGIN(opcode_t *cod
                 PARROT_ASSERT(*cur_op == PARROT_OP_get_results_pc);
 
                 /* now emit the call - use special op for this */
-                (op_func[PARROT_OP_pic_callr___pc].fn)(jit_info, interp);
+                /* Don't want to fix it. JIT on chopping block.
+                 * (op_func[PARROT_OP_pic_callr___pc].fn)(jit_info, interp);
+                 */
 
                 /* and the get_results */
                 (op_func[*cur_op].fn)(jit_info, interp);
