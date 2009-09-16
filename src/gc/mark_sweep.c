@@ -58,16 +58,16 @@ static Fixed_Size_Pool * new_bufferlike_pool(PARROT_INTERP,
     size_t actual_buffer_size)
         __attribute__nonnull__(1);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static Fixed_Size_Pool * new_pmc_pool(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static Fixed_Size_Pool * new_fixed_size_obj_pool(
     size_t object_size,
     size_t objects_per_alloc);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static Fixed_Size_Pool * new_pmc_pool(PARROT_INTERP)
+        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -95,9 +95,9 @@ static PMC_Attribute_Pool * Parrot_gc_create_attrib_pool(PARROT_INTERP,
     || PARROT_ASSERT_ARG(p)
 #define ASSERT_ARGS_new_bufferlike_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_new_fixed_size_obj_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_new_pmc_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_new_fixed_size_obj_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_new_string_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_allocate_new_attributes_arena \
@@ -688,8 +688,8 @@ new_pmc_pool(PARROT_INTERP)
 
 /*
 
-=item C<static void free_pmc_in_pool(PARROT_INTERP, Fixed_Size_Pool *pool,
-PObj *p)>
+=item C<static void free_pmc_in_pool(PARROT_INTERP, Fixed_Size_Pool *pool, PObj
+*p)>
 
 Frees a PMC that is no longer being used. Calls a custom C<destroy> VTABLE
 method if one is available.

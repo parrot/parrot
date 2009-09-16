@@ -871,8 +871,8 @@ Parrot_gc_merge_header_pools(ARGMOD(Interp *dest_interp),
 
 /*
 
-=item C<static void Parrot_gc_merge_buffer_pools(PARROT_INTERP,
-Fixed_Size_Pool *dest, Fixed_Size_Pool *source)>
+=item C<static void Parrot_gc_merge_buffer_pools(PARROT_INTERP, Fixed_Size_Pool
+*dest, Fixed_Size_Pool *source)>
 
 Merge pool C<source> into pool C<dest>. Combines the free lists directly,
 moves all arenas to the new pool, and remove the old pool. To merge, the
@@ -1045,8 +1045,8 @@ Parrot_gc_destroy_header_pools(PARROT_INTERP)
 
 /*
 
-=item C<static int sweep_cb_pmc(PARROT_INTERP, Fixed_Size_Pool *pool, int
-flag, void *arg)>
+=item C<static int sweep_cb_pmc(PARROT_INTERP, Fixed_Size_Pool *pool, int flag,
+void *arg)>
 
 Performs a garbage collection sweep of the given pmc pool, then frees it. Calls
 C<Parrot_gc_sweep_pool> to perform the sweep, and C<free_pool> to free the pool and
@@ -1067,8 +1067,8 @@ sweep_cb_pmc(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool),
 
 /*
 
-=item C<static int sweep_cb_buf(PARROT_INTERP, Fixed_Size_Pool *pool, int
-flag, void *arg)>
+=item C<static int sweep_cb_buf(PARROT_INTERP, Fixed_Size_Pool *pool, int flag,
+void *arg)>
 
 Performs a final garbage collection sweep, then frees the pool. Calls
 C<Parrot_gc_sweep_pool> to perform the sweep, and C<free_pool> to free the pool and

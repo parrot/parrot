@@ -44,8 +44,7 @@ static void gc_inf_add_free_object(SHIM_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pool);
 
-static void gc_inf_alloc_objects(SHIM_INTERP,
-    ARGMOD(Fixed_Size_Pool *pool))
+static void gc_inf_alloc_objects(SHIM_INTERP, ARGMOD(Fixed_Size_Pool *pool))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
@@ -112,8 +111,8 @@ gc_inf_mark_and_sweep(SHIM_INTERP, UINTVAL flags)
 
 /*
 
-=item C<static void gc_inf_add_free_object(PARROT_INTERP, Fixed_Size_Pool
-*pool, void *to_add)>
+=item C<static void gc_inf_add_free_object(PARROT_INTERP, Fixed_Size_Pool *pool,
+void *to_add)>
 
 Manually frees a chunk of memory. Normally this would return the memory
 to the free list of the pool, but in this case we just return it to the
@@ -169,8 +168,7 @@ gc_inf_get_free_object(SHIM_INTERP, ARGMOD(Fixed_Size_Pool *pool))
 
 /*
 
-=item C<static void gc_inf_alloc_objects(PARROT_INTERP, Fixed_Size_Pool
-*pool)>
+=item C<static void gc_inf_alloc_objects(PARROT_INTERP, Fixed_Size_Pool *pool)>
 
 Allocates a new arena of objects from the system. This function is only
 really used internally by the core, the API functions don't need to call
@@ -192,8 +190,8 @@ gc_inf_alloc_objects(SHIM_INTERP, ARGMOD(Fixed_Size_Pool *pool))
 
 /*
 
-=item C<static void gc_inf_more_traceable_objects(PARROT_INTERP,
-Fixed_Size_Pool *pool)>
+=item C<static void gc_inf_more_traceable_objects(PARROT_INTERP, Fixed_Size_Pool
+*pool)>
 
 Would normally try to find new traceable objects by first running a GC sweep
 and then allocating a new arena from the system. Neither of these are

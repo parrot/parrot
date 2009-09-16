@@ -541,7 +541,9 @@ PARROT_CONST_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 size_t aligned_string_size(size_t len);
 
-void check_buffer_ptr(ARGMOD(Buffer * pobj), ARGMOD(Variable_Size_Pool * pool))
+void check_buffer_ptr(
+    ARGMOD(Buffer * pobj),
+    ARGMOD(Variable_Size_Pool * pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(* pobj)
@@ -557,12 +559,16 @@ void initialize_var_size_pools(PARROT_INTERP)
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-void * mem_allocate(PARROT_INTERP, size_t size, ARGMOD(Variable_Size_Pool *pool))
+void * mem_allocate(PARROT_INTERP,
+    size_t size,
+    ARGMOD(Variable_Size_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pool);
 
-void merge_pools(ARGMOD(Variable_Size_Pool *dest), ARGMOD(Variable_Size_Pool *source))
+void merge_pools(
+    ARGMOD(Variable_Size_Pool *dest),
+    ARGMOD(Variable_Size_Pool *source))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*dest)

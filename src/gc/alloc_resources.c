@@ -54,16 +54,16 @@ static const char* buffer_location(PARROT_INTERP, ARGIN(const PObj *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void check_var_size_obj_pool(ARGMOD(Variable_Size_Pool *pool))
+static void check_fixed_size_obj_pool(ARGMOD(Fixed_Size_Pool * pool))
         __attribute__nonnull__(1)
-        FUNC_MODIFIES(*pool);
+        FUNC_MODIFIES(* pool);
 
 static void check_memory_system(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void check_fixed_size_obj_pool(ARGMOD(Fixed_Size_Pool * pool))
+static void check_var_size_obj_pool(ARGMOD(Variable_Size_Pool *pool))
         __attribute__nonnull__(1)
-        FUNC_MODIFIES(* pool);
+        FUNC_MODIFIES(*pool);
 
 static void debug_print_buf(PARROT_INTERP, ARGIN(const Buffer *b))
         __attribute__nonnull__(1)
@@ -82,11 +82,11 @@ static Variable_Size_Pool * new_memory_pool(
 #define ASSERT_ARGS_buffer_location __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(b)
-#define ASSERT_ARGS_check_var_size_obj_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_check_fixed_size_obj_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_check_memory_system __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_check_fixed_size_obj_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_check_var_size_obj_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_debug_print_buf __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
@@ -98,8 +98,8 @@ static Variable_Size_Pool * new_memory_pool(
 
 /*
 
-=item C<static void alloc_new_block(PARROT_INTERP, size_t size, Variable_Size_Pool
-*pool, const char *why)>
+=item C<static void alloc_new_block(PARROT_INTERP, size_t size,
+Variable_Size_Pool *pool, const char *why)>
 
 Allocate a new memory block. We allocate either the requested size or the
 default size, whichever is larger. Add the new block to the given memory
@@ -158,7 +158,8 @@ alloc_new_block(PARROT_INTERP, size_t size, ARGMOD(Variable_Size_Pool *pool),
 
 /*
 
-=item C<void * mem_allocate(PARROT_INTERP, size_t size, Variable_Size_Pool *pool)>
+=item C<void * mem_allocate(PARROT_INTERP, size_t size, Variable_Size_Pool
+*pool)>
 
 Allocates memory for headers.
 

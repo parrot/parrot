@@ -35,7 +35,8 @@ static void gc_ms_alloc_objects(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
-static void gc_ms_finalize(PARROT_INTERP, ARGIN(Memory_Pools * const mem_pools))
+static void gc_ms_finalize(PARROT_INTERP,
+    ARGIN(Memory_Pools * const mem_pools))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -202,7 +203,8 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
 /*
 
-=item C<static void gc_ms_finalize(PARROT_INTERP, Memory_Pools * const mem_pools)>
+=item C<static void gc_ms_finalize(PARROT_INTERP, Memory_Pools * const
+mem_pools)>
 
 Perform the finalization run, freeing all PMCs.
 
@@ -313,8 +315,8 @@ gc_ms_pool_init(SHIM_INTERP, ARGMOD(Fixed_Size_Pool *pool))
 
 /*
 
-=item C<static void gc_ms_more_traceable_objects(PARROT_INTERP,
-Fixed_Size_Pool *pool)>
+=item C<static void gc_ms_more_traceable_objects(PARROT_INTERP, Fixed_Size_Pool
+*pool)>
 
 We're out of traceable objects. First we try a GC run to free some up. If
 that doesn't work, allocate a new arena.
@@ -351,8 +353,8 @@ gc_ms_more_traceable_objects(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool))
 
 /*
 
-=item C<static void gc_ms_add_free_object(PARROT_INTERP, Fixed_Size_Pool
-*pool, void *to_add)>
+=item C<static void gc_ms_add_free_object(PARROT_INTERP, Fixed_Size_Pool *pool,
+void *to_add)>
 
 Add an unused object back to the pool's free list for later reuse. Set
 the PObj flags to indicate that the item is free.
