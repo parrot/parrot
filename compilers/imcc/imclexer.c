@@ -3621,7 +3621,7 @@ YY_RULE_SETUP
         char   * const macro_name = mem_sys_strdup(yytext + 1);
         int failed = expand_macro(interp, macro_name, yyscanner);
         mem_sys_free(macro_name);
-	if (! failed) {
+        if (! failed) {
             yyless(1);
             return DOT;
         }
