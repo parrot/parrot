@@ -1060,6 +1060,7 @@ static int
 sweep_cb_pmc(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool),
         SHIM(int flag), SHIM(void *arg))
 {
+    ASSERT_ARGS(sweep_cb_pmc)
     Parrot_gc_sweep_pool(interp, pool);
     free_pool(pool);
     return 0;
@@ -1082,6 +1083,7 @@ static int
 sweep_cb_buf(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool), SHIM(int flag),
         ARGIN(void *arg))
 {
+    ASSERT_ARGS(sweep_cb_buf)
 #ifdef GC_IS_MALLOC
     const int pass = (int)(INTVAL)arg;
 
