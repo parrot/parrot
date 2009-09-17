@@ -93,7 +93,7 @@ CODE
 hello
 OUT
 
-pir_error_output_like( <<'CODE', <<'OUT', 'off by one error message (RT #40204)', todo=>'broken');
+pir_error_output_like( <<'CODE', <<'OUT', 'off by one error message (TT #1016)', todo=>'broken');
 .sub foo :main
   $P0 = new 'Hash'
   $P1 = $P0['x']
