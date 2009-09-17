@@ -940,7 +940,7 @@ Return the start offset of the Sub.
 
 =item C<INTVAL end_offs()>
 
-Return the start offset of the Sub.
+Return the end offset of the Sub.
 
 =item C<PMC *get_namespace()>
 
