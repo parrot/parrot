@@ -201,7 +201,7 @@ surboutine is fully constructed but not attached to interpreter.
         C<eval_pmc> and C<ctx> are not handled here. And shouldn't be handled
         here at all because of run-time nature.
         */
-        
+
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
