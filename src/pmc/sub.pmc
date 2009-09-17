@@ -99,6 +99,89 @@ Initializes the subroutine.
 
 /*
 
+=item C<void init_pmc()>
+
+Initializes the "detached" subroutine from passed Hash. "Detached" means that
+surboutine is fully constructed but not attached to interpreter.
+
+=cut
+
+*/
+
+    VTABLE void init_pmc(PMC* init) {
+        Parrot_Sub_attributes * const attrs =
+            (Parrot_Sub_attributes *) PMC_data(SELF);
+        STRING *field;
+
+        field = CONST_STRING(INTERP, "start_offs");
+        if (VTABLE_exists_keyed_str(INTERP, init, field))
+            attrs->start_offs = VTABLE_get_integer_keyed_str(INTERP, init, field);
+
+        field = CONST_STRING(INTERP, "end_offs");
+        if (VTABLE_exists_keyed_str(INTERP, init, field))
+            attrs->end_offs = VTABLE_get_integer_keyed_str(INTERP, init, field);
+
+        field = CONST_STRING(INTERP, "HLL_id");
+        if (VTABLE_exists_keyed_str(INTERP, init, field))
+            attrs->HLL_id = VTABLE_get_integer_keyed_str(INTERP, init, field);
+
+        field = CONST_STRING(INTERP, "namespace_name");
+        if (VTABLE_exists_keyed_str(INTERP, init, field))
+            attrs->namespace_name = VTABLE_get_pmc_keyed_str(INTERP, init, field);
+
+        field = CONST_STRING(INTERP, "namespace_stash");
+        if (VTABLE_exists_keyed_str(INTERP, init, field))
+            attrs->namespace_stash = VTABLE_get_pmc_keyed_str(INTERP, init, field);
+
+        field = CONST_STRING(INTERP, "name");
+        if (VTABLE_exists_keyed_str(INTERP, init, field))
+            attrs->name = VTABLE_get_string_keyed_str(INTERP, init, field);
+
+        field = CONST_STRING(INTERP, "method_name");
+        if (VTABLE_exists_keyed_str(INTERP, init, field))
+            attrs->method_name = VTABLE_get_string_keyed_str(INTERP, init, field);
+
+        field = CONST_STRING(INTERP, "ns_entry_name");
+        if (VTABLE_exists_keyed_str(INTERP, init, field))
+            attrs->ns_entry_name = VTABLE_get_string_keyed_str(INTERP, init, field);
+
+        field = CONST_STRING(INTERP, "subid");
+        if (VTABLE_exists_keyed_str(INTERP, init, field))
+            attrs->subid = VTABLE_get_string_keyed_str(INTERP, init, field);
+
+        field = CONST_STRING(INTERP, "vtable_index");
+        if (VTABLE_exists_keyed_str(INTERP, init, field))
+            attrs->vtable_index = VTABLE_get_integer_keyed_str(INTERP, init, field);
+
+        field = CONST_STRING(INTERP, "multi_signature");
+        if (VTABLE_exists_keyed_str(INTERP, init, field))
+            attrs->multi_signature = VTABLE_get_pmc_keyed_str(INTERP, init, field);
+
+        field = CONST_STRING(INTERP, "lex_info");
+        if (VTABLE_exists_keyed_str(INTERP, init, field))
+            attrs->lex_info = VTABLE_get_pmc_keyed_str(INTERP, init, field);
+
+        field = CONST_STRING(INTERP, "outer_sub");
+        if (VTABLE_exists_keyed_str(INTERP, init, field))
+            attrs->outer_sub = VTABLE_get_pmc_keyed_str(INTERP, init, field);
+
+        /* comp_flags is actually UINTVAL */
+        field = CONST_STRING(INTERP, "comp_flags");
+        if (VTABLE_exists_keyed_str(INTERP, init, field))
+            attrs->comp_flags = (UINTVAL)VTABLE_get_integer_keyed_str(INTERP, init, field);
+
+        /*
+        C<eval_pmc> and C<ctx> are not handled here. And shouldn't be handled
+        here at all because of run-time nature.
+        */
+        
+        /* TODO Implement initialisation of n_regs_used via FIA */
+        /* TODO Implement initialisation of arg_info via nested Hash */
+        PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+/*
+
 =item C<void destroy()>
 
 Destroys the subroutine.
