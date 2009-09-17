@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 168;
+use Parrot::Test tests => 167;
 use Parrot::Config;
 
 =head1 NAME
@@ -264,23 +264,6 @@ pasm_output_is( <<'CODE', <<'OUTPUT', 'neg substr offset' );
 CODE
 A string of length 21
 length
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', 'neg substr offset', todo => "TT #1007" );
-.sub 'main' :main
-    $S0 = "path_abc/abc"
-    $I0 = length $S0
-    $S1 = "abc"
-    $I1 = length $S1
-    $I2 = - $I1
-    $S2 = substr $S0, $I2, $I1
-    say $S2
-#    $I3 = $I0 - $I1
-#    $S3 = substr $S0, 0, $I3
-#    say $S3
-.end
-CODE
-path_abc/
 OUTPUT
 
 # This asks for substring that shouldn't be allowed...
