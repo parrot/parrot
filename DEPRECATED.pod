@@ -151,7 +151,7 @@ L<https://trac.parrot.org/parrot/ticket/511>
 
 =item mmd_cvt_to_types [eligible in 1.1]
 
-L<http://rt.perl.org/rt3/Ticket/Display.html?id=60626>
+L<https://trac.parrot.org/parrot/ticket/907>
 
 =item Subs marked with C<:vtable>/C<:method> aren't in namespace [eligible in 1.1]
 
