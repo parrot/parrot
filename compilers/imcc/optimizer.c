@@ -209,7 +209,6 @@ pre_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
     if (IMCC_INFO(interp)->optimizer_level & OPT_PRE) {
         IMCC_info(interp, 2, "pre_optimize\n");
-        /* RT #46281 integrate all in one pass */
         changed += strength_reduce(interp, unit);
         if (!IMCC_INFO(interp)->dont_optimize)
             changed += if_branch(interp, unit);
