@@ -170,12 +170,19 @@ surboutine is fully constructed but not attached to interpreter.
         if (VTABLE_exists_keyed_str(INTERP, init, field))
             attrs->comp_flags = (UINTVAL)VTABLE_get_integer_keyed_str(INTERP, init, field);
 
+        field = CONST_STRING(INTERP, "n_regs_used");
+        if (VTABLE_exists_keyed_str(INTERP, init, field)) {
+            PMC   *tmp = VTABLE_get_pmc_keyed_str(INTERP, init, field);
+            INTVAL i;
+            for (i = 0; i < 4; ++i)
+                attrs->n_regs_used[i] = VTABLE_get_integer_keyed_int(INTERP, tmp, i);
+        }
+
         /*
         C<eval_pmc> and C<ctx> are not handled here. And shouldn't be handled
         here at all because of run-time nature.
         */
         
-        /* TODO Implement initialisation of n_regs_used via FIA */
         /* TODO Implement initialisation of arg_info via nested Hash */
         PObj_custom_mark_destroy_SETALL(SELF);
     }

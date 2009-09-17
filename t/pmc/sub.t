@@ -1636,10 +1636,19 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'init_pmc' );
 .sub 'main'
-    .local pmc init, s
+    .local pmc init, s, regs
+    
     init = new ['Hash']
     init['start_offs']  = 42
     init['end_offs']    = 115200
+    
+    regs = new ['FixedIntegerArray']
+    regs = 4
+    regs[0] = 1
+    regs[1] = 2
+    regs[2] = 6
+    regs[3] = 24
+    init['n_regs_used'] = regs
 
     s = new ['Sub'], init
 
@@ -1651,11 +1660,31 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'init_pmc' );
     $I0 = s.'end_offs'()
     say $I0
 
+    $I0 = s.'__get_regs_used'('I')
+    print 'I regs '
+    say $I0
+
+    $I0 = s.'__get_regs_used'('N')
+    print 'N regs '
+    say $I0
+
+    $I0 = s.'__get_regs_used'('S')
+    print 'S regs '
+    say $I0
+
+    $I0 = s.'__get_regs_used'('P')
+    print 'P regs '
+    say $I0
+
     # We need more tests for other fields. And more accessors obviously.
 .end
 CODE
 start_offs 42
 end_offs 115200
+I regs 1
+N regs 2
+S regs 6
+P regs 24
 OUTPUT
 
 # Local Variables:
