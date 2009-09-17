@@ -9,7 +9,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 68;
+use Parrot::Test tests => 69;
 use Parrot::Config;
 
 =head1 NAME
@@ -1632,6 +1632,30 @@ hi
 frozen
 thawed
 hi
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'init_pmc' );
+.sub 'main'
+    .local pmc init, s
+    init = new ['Hash']
+    init['start_offs']  = 42
+    init['end_offs']    = 115200
+
+    s = new ['Sub'], init
+
+    $I0 = s.'start_offs'()
+    print 'start_offs '
+    say $I0
+
+    print 'end_offs '
+    $I0 = s.'end_offs'()
+    say $I0
+
+    # We need more tests for other fields. And more accessors obviously.
+.end
+CODE
+start_offs 42
+end_offs 115200
 OUTPUT
 
 # Local Variables:

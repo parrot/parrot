@@ -909,6 +909,14 @@ The number of optional named arguments
 
 =over 4
 
+=item C<INTVAL start_offs()>
+
+Return the start offset of the Sub.
+
+=item C<INTVAL end_offs()>
+
+Return the start offset of the Sub.
+
 =item C<PMC *get_namespace()>
 
 Return the namespace PMC, where the Sub is defined.
@@ -943,6 +951,21 @@ slurpy arguments).
 =cut
 
 */
+    METHOD start_offs() {
+        Parrot_Sub_attributes  *sub;
+        INTVAL                  start_offs;
+        PMC_get_sub(INTERP, SELF, sub);
+        start_offs = sub->start_offs;
+        RETURN(INTVAL start_offs);
+    }
+
+    METHOD end_offs() {
+        Parrot_Sub_attributes  *sub;
+        INTVAL                  end_offs;
+        PMC_get_sub(INTERP, SELF, sub);
+        end_offs = sub->end_offs;
+        RETURN(INTVAL end_offs);
+    }
 
     METHOD get_namespace() {
         PMC *_namespace;
