@@ -326,8 +326,7 @@ CODE
 /End of file reached/
 OUTPUT
 
-my @todo = (($^O =~ /darwin/i) ? (todo => 'Darwin segfault -- RT #60926') : ());
-pir_error_output_like( <<'CODE', <<'OUTPUT', 'unterminated macro 2', @todo );
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'unterminated macro 2', );
 .sub test :main
 .macro M(A, B)
   print .A
