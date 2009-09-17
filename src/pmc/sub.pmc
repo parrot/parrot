@@ -178,12 +178,30 @@ surboutine is fully constructed but not attached to interpreter.
                 attrs->n_regs_used[i] = VTABLE_get_integer_keyed_int(INTERP, tmp, i);
         }
 
+        field = CONST_STRING(INTERP, "arg_info");
+        if (VTABLE_exists_keyed_str(INTERP, init, field)) {
+            PMC   *tmp = VTABLE_get_pmc_keyed_str(INTERP, init, field);
+            /* Allocate structure to store argument information in. */
+            attrs->arg_info = mem_allocate_zeroed_typed(Parrot_sub_arginfo);
+            /*
+            Hash.get_integer_keyed_str return 0 if key doesn't exists.
+            So, don't check existence of key, just use it.
+            NB: Don't split line. CONST_STRING b0rked.
+            */
+            attrs->arg_info->pos_required = VTABLE_get_integer_keyed_str(INTERP, tmp, CONST_STRING(INTERP, "pos_required"));
+            attrs->arg_info->pos_optional = VTABLE_get_integer_keyed_str(INTERP, tmp, CONST_STRING(INTERP, "pos_optional"));
+            attrs->arg_info->pos_slurpy = VTABLE_get_integer_keyed_str(INTERP, tmp, CONST_STRING(INTERP, "pos_slurpy"));
+            attrs->arg_info->named_required = VTABLE_get_integer_keyed_str(INTERP, tmp, CONST_STRING(INTERP, "named_required"));
+            attrs->arg_info->named_optional = VTABLE_get_integer_keyed_str(INTERP, tmp, CONST_STRING(INTERP, "named_optional"));
+            attrs->arg_info->named_slurpy = VTABLE_get_integer_keyed_str(INTERP, tmp, CONST_STRING(INTERP, "named_slurpy"));
+        }
+
+
         /*
         C<eval_pmc> and C<ctx> are not handled here. And shouldn't be handled
         here at all because of run-time nature.
         */
         
-        /* TODO Implement initialisation of arg_info via nested Hash */
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 

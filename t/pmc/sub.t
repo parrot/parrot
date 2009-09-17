@@ -1636,7 +1636,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'init_pmc' );
 .sub 'main'
-    .local pmc init, s, regs
+    .local pmc init, s, regs, arg_info
     
     init = new ['Hash']
     init['start_offs']  = 42
@@ -1650,6 +1650,15 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'init_pmc' );
     regs[3] = 24
     init['n_regs_used'] = regs
 
+    arg_info = new ['Hash']
+    arg_info['pos_required']    = 1
+    arg_info['pos_optional']    = 1
+    arg_info['pos_slurpy']      = 2
+    arg_info['named_required']  = 3
+    arg_info['named_optional']  = 5
+    arg_info['named_slurpy']    = 8
+    init['arg_info'] = arg_info
+
     s = new ['Sub'], init
 
     $I0 = s.'start_offs'()
@@ -1660,6 +1669,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'init_pmc' );
     $I0 = s.'end_offs'()
     say $I0
 
+    # Check n_regs_used
     $I0 = s.'__get_regs_used'('I')
     print 'I regs '
     say $I0
@@ -1676,6 +1686,31 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'init_pmc' );
     print 'P regs '
     say $I0
 
+    # Check arg_info
+    $P0 = inspect s, 'pos_required'
+    print 'pos_required '
+    say $P0
+
+    $P0 = inspect s, 'pos_optional'
+    print 'pos_optional '
+    say $P0
+    
+    $P0 = inspect s, 'pos_slurpy'
+    print 'pos_slurpy '
+    say $P0
+
+    $P0 = inspect s, 'named_required'
+    print 'named_required '
+    say $P0
+
+    $P0 = inspect s, 'named_optional'
+    print 'named_optional '
+    say $P0
+
+    $P0 = inspect s, 'named_slurpy'
+    print 'named_slurpy '
+    say $P0
+
     # We need more tests for other fields. And more accessors obviously.
 .end
 CODE
@@ -1685,6 +1720,12 @@ I regs 1
 N regs 2
 S regs 6
 P regs 24
+pos_required 1
+pos_optional 1
+pos_slurpy 2
+named_required 3
+named_optional 5
+named_slurpy 8
 OUTPUT
 
 # Local Variables:
