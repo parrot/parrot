@@ -7,7 +7,33 @@ Tcl::Glob - Parse and compile glob notation expressions.
 
 =head1 DESCRIPTION
 
-A parser for Tcl-stype glob notation.
+A PGE-based parser for glob notation. See C<PGE::Glob> for a slightly
+different glob syntax.
+
+The following special characters are supported
+
+=over 4
+
+=item C<?>
+
+Matches any single character
+
+=item C<*>
+
+Matches any number of any characters, including no characters.
+
+=item C<[chars]>
+
+Matches any character in the given set. Sets are either a sequence of explicit
+characters, or a range specified with a dash, e.g. [aeiou] matches lower
+case ASCII vowels, while [a-z] matches any lowercase ASCII letter.
+
+=item C<\x>
+
+Match a literal character, e.g. \* matches the literal C<*>, avoiding its
+special meaning.
+
+=back
 
 =head2 Functions
 
@@ -375,6 +401,9 @@ Compile C<source> (possibly modified by any provided options).
 
 This is basically a cut and paste of PGE::Glob. There should probably be
 much less code duplication here.
+
+While originally implemented based on Tcl's C<[string match]> globbing
+syntax, this code is useful enough to be part of parrot's core.
 
 =head1 AUTHOR
 

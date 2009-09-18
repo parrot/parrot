@@ -7,7 +7,8 @@ Glob - Parse and compile glob notation expressions.
 
 =head1 DESCRIPTION
 
-A parser for shell-stype glob notation.
+A parser for shell-stype glob notation. See C<Tcl::Glob> for a
+slightly different glob syntax.
 
 =head2 Functions
 
