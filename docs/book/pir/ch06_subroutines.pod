@@ -541,7 +541,7 @@ individual pieces of metadata:
 
 =begin PIR_FRAGMENT
 
-  $P0 = inspect $P0, "pos_required"
+  $P1 = inspect $P0, "pos_required"
 
 =end PIR_FRAGMENT
 
