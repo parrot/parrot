@@ -15,18 +15,19 @@
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
     test_namespace = get_namespace [ 'Test'; 'More' ]
-    exports = split " ", "ok is diag like skip todo is_deeply isa_ok isnt throws_like"
+    exports = split " ", "ok nok is diag like skip todo is_deeply isa_ok isnt throws_like"
     test_namespace.'export_to'(curr_namespace, exports)
 
     test_namespace = get_namespace [ 'Test'; 'Builder'; 'Tester' ]
     exports = split " ", "plan test_out test_diag test_fail test_pass test_test"
     test_namespace.'export_to'(curr_namespace, exports)
 
-    plan( 81 )
+    plan( 89 )
 
     test_skip()
     test_todo()
     test_ok()
+    test_nok()
     test_is()
     test_isnt()
     test_like()
@@ -72,6 +73,36 @@ CODE
 
 .end
 
+.namespace ['MyFalseClass']
+
+.sub '' :anon :load :init
+    $P0 = newclass ['MyFalseClass']
+.end
+
+.sub 'get_bool' :vtable
+    .return(0)
+.end
+
+.sub 'get_integer' :vtable
+    .return(1)
+.end
+
+.namespace ['MyTrueClass']
+
+.sub '' :anon :load :init
+    $P0 = newclass ['MyTrueClass']
+.end
+
+.sub 'get_bool' :vtable
+    .return(1)
+.end
+
+.sub 'get_integer' :vtable
+    .return(0)
+.end
+
+.namespace []
+
 .sub test_ok
     test_pass()
     ok( 1 )
@@ -88,6 +119,44 @@ CODE
     test_fail( 'with description' )
     ok( 0, 'with description' )
     test_test( 'failing test ok() with description')
+
+    $P0 = new ['MyFalseClass']
+    test_fail()
+    ok( $P0 )
+    test_test( 'failing ok() calls get_bool')
+
+    $P0 = new ['MyTrueClass']
+    test_pass()
+    ok( $P0 )
+    test_test( 'passing ok() calls get_bool')
+.end
+
+.sub test_nok
+    test_fail()
+    nok( 1 )
+    test_test( 'failing test nok()')
+
+    test_pass()
+    nok( 0 )
+    test_test( 'passing test nok()')
+
+    test_fail( 'with description' )
+    nok( 1, 'with description' )
+    test_test( 'failing test nok() with description')
+
+    test_pass( 'with description' )
+    nok( 0, 'with description' )
+    test_test( 'passing test nok() with description')
+
+    $P0 = new ['MyFalseClass']
+    test_pass()
+    nok( $P0 )
+    test_test( 'passing nok() calls get_bool')
+
+    $P0 = new ['MyTrueClass']
+    test_fail()
+    nok( $P0 )
+    test_test( 'failing nok() calls get_bool')
 .end
 
 .sub test_is

@@ -92,19 +92,20 @@ already declared a plan or if you pass an invalid argument.
 
 =item C<ok( passed, description )>
 
-Records a test as pass or fail depending on the truth of the integer C<passed>,
+Records a test as pass or fail depending on the truth of the PMC C<passed>,
 recording it with the optional test description in C<description>.
 
 =cut
 
 .sub ok
-    .param int    passed
+    .param pmc    passed
     .param string description     :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
 
-    test.'ok'( passed, description )
+    $I0 = istrue passed
+    test.'ok'( $I0, description )
 .end
 
 =item C<nok( passed, description )>
@@ -115,14 +116,14 @@ C<passed>, recording it with the optional test description in C<description>.
 =cut
 
 .sub nok
-    .param int passed
+    .param pmc passed
     .param string description :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local int reverse_passed
-    reverse_passed = not passed
+    reverse_passed = isfalse passed
 
     test.'ok'( reverse_passed, description )
 .end
