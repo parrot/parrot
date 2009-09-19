@@ -3,7 +3,7 @@
  */
 
 /*
- * jit_emit.h
+ * frame_builder.h
  *
  * i386
  *
@@ -23,6 +23,88 @@
 #include "parrot/parrot.h"
 #include "parrot/hash.h"
 #include "parrot/oplib/ops.h"
+
+/*  Parrot_jit_arena_t
+ *      Holds pointers to the native code of one or more sections.
+ *
+ *  start:          Start of current native code segment.
+ *  size:           The size of the arena in bytes
+ *  map_size:       The size of the map in bytes.
+ */
+
+typedef struct Parrot_jit_arena_t {
+    char                            *start;
+    ptrdiff_t                        size;
+    unsigned long                    map_size;
+} Parrot_jit_arena_t;
+
+typedef enum {
+    JIT_CODE_FILE,
+    JIT_CODE_SUB,
+    JIT_CODE_SUB_REGS_ONLY,
+
+    /* size */
+    JIT_CODE_TYPES,
+    /* special cases */
+    JIT_CODE_RECURSIVE     = 0x10,
+    JIT_CODE_SUB_REGS_ONLY_REC = JIT_CODE_SUB_REGS_ONLY|JIT_CODE_RECURSIVE
+} enum_jit_code_type;
+
+/*  Parrot_jit_info_t
+ *      All the information needed to jit the bytecode will be here.
+ *
+ *  native_ptr:     Current pointer to native code.
+ *  arena:          The arena inlined, this will be the only one used in cases
+ *                  where there is a way to load an immediate.
+ */
+
+typedef struct Parrot_jit_info_t {
+    char                         *native_ptr;
+    Parrot_jit_arena_t            arena;
+    INTVAL                        code_type;
+    const struct jit_arch_info_t *arch_info;
+} Parrot_jit_info_t;
+
+typedef struct jit_arch_regs {
+    /*
+     * begin function - emit ABI call prologue
+     */
+
+    int n_mapped_I;
+    int n_preserved_I;
+    const char *map_I;
+    int n_mapped_F;
+    int n_preserved_F;
+    const char *map_F;
+} jit_arch_regs;
+
+typedef void (*mov_RM_f)(PARROT_INTERP, Parrot_jit_info_t *,
+        int cpu_reg, int base_reg, INTVAL offs);
+typedef void (*mov_MR_f)(PARROT_INTERP, Parrot_jit_info_t *,
+        int base_reg, INTVAL offs, int cpu_reg);
+
+typedef struct jit_arch_info_t {
+    /* CPU <- Parrot reg move functions */
+    mov_RM_f mov_RM_i;
+    mov_RM_f mov_RM_n;
+    /* Parrot <- CPU reg move functions */
+    mov_MR_f mov_MR_i;
+    mov_MR_f mov_MR_n;
+
+    /* register mapping info */
+    const jit_arch_regs regs[JIT_CODE_TYPES];
+} jit_arch_info;
+
+/*
+ * NCI interface
+ */
+void *Parrot_jit_build_call_func(Interp *, PMC *, STRING *, int *);
+/* custom pmc callback functions */
+void Parrot_jit_free_buffer(PARROT_INTERP, void *ptr, void *priv);
+PMC* Parrot_jit_clone_buffer(PARROT_INTERP, PMC *pmc, void *priv);
+struct jit_buffer_private_data {
+    int size;
+};
 
 /* Scale factor values */
 #define emit_Scale(scale) ((scale) << 6)
@@ -49,7 +131,6 @@
 INTVAL get_nci_I(PARROT_INTERP, ARGMOD(call_state *st), int n);
 
 FLOATVAL get_nci_N(PARROT_INTERP, ARGMOD(call_state *st), int n);
-;
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -61,6 +142,11 @@ PARROT_CANNOT_RETURN_NULL
 PMC*
 get_nci_P(PARROT_INTERP, ARGMOD(call_state *st), int n);
 
+#define GET_NCI_I(n) get_nci_I(interp, &st, (n))
+#define GET_NCI_S(n) get_nci_S(interp, &st, (n))
+#define GET_NCI_N(n) get_nci_N(interp, &st, (n))
+#define GET_NCI_P(n) get_nci_P(interp, &st, (n))
+
 /*
  * set return value
  */
@@ -71,35 +157,6 @@ void set_nci_N(PARROT_INTERP, ARGOUT(call_state *st), FLOATVAL val);
 void set_nci_S(PARROT_INTERP, ARGOUT(call_state *st), STRING *val);
 
 void set_nci_P(PARROT_INTERP, ARGOUT(call_state *st), PMC* val);
-
-
-#if defined HAVE_COMPUTED_GOTO && defined __GNUC__ && PARROT_I386_JIT_CGP
-#  define JIT_CGP
-#endif
-
-void call_func(Parrot_jit_info_t *jit_info, void (*addr) (void));
-
-void jit_emit_real_exception(Parrot_jit_info_t *jit_info);
-
-/*
- * get the register frame pointer
- */
-#define Parrot_jit_emit_get_base_reg_no(pc) \
-    emit_EBX
-
-/*
- * get the *runtime* interpreter
- */
-
-#define Parrot_jit_emit_get_INTERP(interp, pc, dest) \
-    emitm_movl_m_r((interp), (pc), (dest), emit_EBP, emit_None, 1, INTERP_BP_OFFS)
-
-/* see jit_begin */
-#ifdef JIT_CGP
-#  define INTERP_BP_OFFS todo
-#else
-#  define INTERP_BP_OFFS -16
-#endif
 
 /*
  * if we have a delegated method like typeof_i_p, that returns an INTVAL
@@ -137,8 +194,6 @@ extern UINTVAL ld(UINTVAL);
 #define emit_EBP 6
 #define emit_ESI 7
 #define emit_EDI 8
-
-#define INT_REGISTERS_TO_MAP 4
 
 /* Scratch register. */
 
@@ -218,19 +273,11 @@ char * emit_shift_r_m(PARROT_INTERP, char *pc, int opcode, int reg,
     *(long *)(pc) = (long)(imm); \
     (pc) += 4; }
 
-#if EXEC_CAPABLE
-#  define emitm_pushl_m(pc, mem) { \
+#define emitm_pushl_m(pc, mem) { \
        *((pc)++) = (char) 0xff; \
        *((pc)++) = (char) 0x35; \
        *(long *)(pc) = (long)(mem); \
        (pc) += 4; }
-#else /* EXEC_CAPABLE */
-#  define emitm_pushl_m(pc, mem) { \
-       *((pc)++) = (char) 0xff; \
-       *((pc)++) = (char) 0x35; \
-       *(long *)(pc) = (long)(mem); \
-       (pc) += 4; }
-#endif /* EXEC_CAPABLE */
 
 char * emit_pushl_m(PARROT_INTERP, char *pc, int base, int i, int scale,
     long disp);
@@ -1040,16 +1087,9 @@ extern unsigned char *lastpc;
     *((pc)++) = (char) 0xff; \
     *((pc)++) = (char) 0xd0 | ((reg) - 1); }
 
-#if EXEC_CAPABLE
-#  define emitm_callm(pc, b, i, s, d) { \
-       *((pc)++) = (char) 0xff; \
-       (pc) = emit_r_X((interp), (pc), emit_reg(emit_b010), (b), (i), (s), (d));\
-       }
-#else /* EXEC_CAPABLE */
 #  define emitm_callm(pc, b, i, s, d) { \
        *((pc)++) = (char) 0xff; \
        (pc) = emit_r_X((interp), (pc), emit_reg(emit_b010), (b), (i), (s), (d)); }
-#endif /* EXEC_CAPABLE */
 
 #  define emitm_jumps(pc, disp) { \
     *((pc)++) = (char) 0xeb; \
@@ -1063,16 +1103,9 @@ extern unsigned char *lastpc;
     *((pc)++) = (char) 0xff; \
     *((pc)++) = (char)(0xe0 | ((reg) - 1)); }
 
-#if EXEC_CAPABLE
-#  define emitm_jumpm(pc, b, i, s, d) { \
-       *((pc)++) = (char) 0xff; \
-       (pc) = emit_r_X((interp), (pc), emit_reg(emit_b100), (b), (i), (s), (d)); \
-       }
-#else /* EXEC_CAPABLE */
 #  define emitm_jumpm(pc, b, i, s, d) { \
        *((pc)++) = (char) 0xff; \
        (pc) = emit_r_X((interp), (pc), emit_reg(emit_b100), (b), (i), (s), (d)); }
-#endif /* EXEC_CAPABLE */
 
 /* Conditional jumps */
 
@@ -1558,151 +1591,6 @@ void Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info, PARROT_INTERP);
     emitm_popl_r((pc), emit_EBP); \
 } while (0)
 
-#if JIT_VTABLE_OPS
-
-#  undef Parrot_jit_vtable1_op
-#  undef Parrot_jit_vtable1r_op
-
-#  undef Parrot_jit_vtable_111_op
-#  undef Parrot_jit_vtable_112_op
-#  undef Parrot_jit_vtable_221_op
-#  undef Parrot_jit_vtable_1121_op
-#  undef Parrot_jit_vtable_1123_op
-#  undef Parrot_jit_vtable_2231_op
-
-#  undef Parrot_jit_vtable_1r223_op
-#  undef Parrot_jit_vtable_1r332_op
-
-#  undef Parrot_jit_vtable_ifp_op
-#  undef Parrot_jit_vtable_unlessp_op
-#  undef Parrot_jit_vtable_newp_ic_op
-
-/* emit a call to a vtable func
- * $X->vtable(interp, $X [, $Y...])
- */
-#  define MAP(i) jit_info->optimizer->map_branch[jit_info->op_i + (i)]
-
-#  include "parrot/oplib/ops.h"
-
-INTVAL Parrot_FixedIntegerArray_get_integer_keyed_int(Interp*, PMC*, INTVAL);
-void Parrot_FixedIntegerArray_set_integer_keyed_int(Interp*, PMC*, INTVAL, INTVAL);
-
-char * jit_set_i_p_ki(Parrot_jit_info_t *jit_info, PARROT_INTERP,
-    size_t offset);
-
-char * jit_set_p_ki_i(Parrot_jit_info_t *jit_info, PARROT_INTERP,
-    size_t offset);
-
-/*
- * for vtable calls registers are already saved back
- */
-void Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info, PARROT_INTERP,
-    int n, int *args);
-
-void Parrot_jit_store_retval(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-/* emit a call to a vtable func
- * $1->vtable(interp, $1)
- */
-void Parrot_jit_vtable1_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-/* emit a call to a vtable func
- * $1 = $2->vtable(interp, $2)
- */
-void Parrot_jit_vtable1r_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-/* emit a call to a vtable func
- * $1 = $2->vtable(interp, $2, $3)
- */
-void Parrot_jit_vtable_1r223_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-/* emit a call to a vtable func
- * $1 = $3->vtable(interp, $3, $2)
- */
-void Parrot_jit_vtable_1r332_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-/* emit a call to a vtable func
- * $1->vtable(interp, $1, $2)
- */
-void Parrot_jit_vtable_112_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-/* emit a call to a vtable func
- * $1->vtable(interp, $1, $1)
- */
-void Parrot_jit_vtable_111_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-/* emit a call to a vtable func
- * $2->vtable(interp, $2, $1)
- */
-void Parrot_jit_vtable_221_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-/* emit a call to a vtable func
- * $2->vtable(interp, $2, $3, $1)
- */
-void Parrot_jit_vtable_2231_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-/* emit a call to a vtable func
- * $1->vtable(interp, $1, $2, $3)
- */
-void Parrot_jit_vtable_1123_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-/* emit a call to a vtable func
- * $1->vtable(interp, $1, $2, $1)
- */
-void Parrot_jit_vtable_1121_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-/* if_p_ic, unless_p_ic */
-void Parrot_jit_vtable_if_unless_op(Parrot_jit_info_t *jit_info,
-    PARROT_INTERP, int unless);
-
-/* unless_p_ic */
-void Parrot_jit_vtable_unlessp_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-/* if_p_ic */
-void Parrot_jit_vtable_ifp_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-#endif /* JIT_VTABLE_OPS */
-
-#if EXEC_CAPABLE
-#  ifdef JIT_CGP
-#    ifdef EXEC_SHARED
-#      define exec_emit_end(interp, pc) { \
-           jit_emit_mov_rm_i((pc), c, 2); \
-           Parrot_exec_add_text_rellocation(jit_info->objfile, \
-             jit_info->native_ptr, RTYPE_COM, "cgp_core", 0); \
-           emitm_movl_m_r((interp), jit_info->native_ptr, emit_ESI, emit_ESI, \
-             emit_None, 1, 0); \
-           emitm_addb_i_r(jit_info->native_ptr, \
-             (int)((ptrcast_t)((op_func_t*) \
-               (interp)->op_lib->op_func_table)[0]) - (int)cgp_core, \
-                 emit_ESI); \
-           emitm_jumpr((pc), emit_ESI); \
-         }
-#    else /* EXEC_SHARED */
-#      define exec_emit_end(interp, pc) { \
-           jit_emit_mov_ri_i((interp), (pc), emit_ESI, \
-             (int)((ptrcast_t)((op_func_t*) \
-               (interp)->op_lib->op_func_table)[0]) - (int)cgp_core); \
-           Parrot_exec_add_text_rellocation(jit_info->objfile, \
-             jit_info->native_ptr, RTYPE_COM, "cgp_core", -4); \
-           emitm_jumpr((pc), emit_ESI); \
-         }
-#    endif /* EXEC_SHARED */
-
-#  else /* JIT_CGP */
-
-#    define exec_emit_end(pc) jit_emit_end(pc)
-
-#  endif /* JIT_CGP */
-#endif /* EXEC_CAPABLE */
-
-#ifdef JIT_CGP
-#  define jit_emit_end(interp, pc) { \
-       jit_emit_mov_ri_i((interp), (pc), emit_ESI, \
-         (ptrcast_t)((op_func_t*)(interp)->op_lib->op_func_table) [0]); \
-       emitm_jumpr((pc), emit_ESI); \
-     }
-#else /* JIT_CGP */
 #  define jit_emit_end(pc) { \
        jit_emit_add_ri_i((interp), (pc), emit_ESP, 4); \
        emitm_popl_r((pc), emit_EDI); \
@@ -1711,8 +1599,6 @@ void Parrot_jit_vtable_ifp_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
        emitm_popl_r((pc), emit_EBP); \
        emitm_ret(pc); \
      }
-
-#endif /* JIT_CGP */
 
 void jit_get_params_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 
@@ -1780,97 +1666,6 @@ void jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
 #  define JUMP_ALIGN 0
 #  define SUB_ALIGN 0
 
-#ifdef JIT_EMIT
-#  if JIT_EMIT == 0
-
-extern int control_word;
-
-#    ifdef JIT_CGP
-#      include <parrot/oplib/core_ops_cgp.h>
-#    endif
-
-#    define REQUIRES_CONSTANT_POOL 0
-/*
- * examples/pir/mandel.pir and t/op/jitn_14 show rounding problems
- * due to keeping intermediate results in FP registers
- * When intermediates are written back to parrot regs, rounding to
- * 64 bit is performed, which changes results slightly
- *
- * One method is to just turn off mapped floats. The other one is
- * setting a different control word (with precision control = double)
- * see emitm_fldcw above
- */
-#    define FLOAT_REGISTERS_TO_MAP 4
-
-/* registers are either allocate per section or per basic block
- * set this to 1 or 0 to change allocation scheme
- */
-#    define ALLOCATE_REGISTERS_PER_SECTION 1
-
-/*
- * new style move function using offsets relative to the base_reg
- */
-#    ifdef JIT_CGP
-#      define INTERP_BP_OFFS todo
-#    else
-#      define INTERP_BP_OFFS -16
-#    endif
-
-#  endif /* JIT_EMIT = 0 */
-#endif /* JIT_EMIT */
-
-void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-void Parrot_jit_begin(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-/*
- * create a JITted version of a PIR sub, where everything
- * resided in registers
- *
- * The sub is called as
- *
- *   opcode_t * func(Interp *i, INTVAL *sig_bits, void **args);
- *
- *   args[0] ...    NULL / return value address
- *   args[1..n] ... addresses of n arguments
- *   args[n + 1] .. opcode_t* next - usually just returned
- */
-
-void Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-void Parrot_jit_begin_sub(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-void jit_mov_mr_n_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
-        int base_reg, INTVAL offs, int src_reg);
-
-void jit_mov_mr_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
-        int base_reg, INTVAL offs, int src_reg);
-
-void jit_mov_rm_n_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
-        int dst_reg, int base_reg, INTVAL offs);
-
-void jit_mov_rm_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
-        int dst_reg, int base_reg, INTVAL offs);
-
-void Parrot_jit_emit_finit(Parrot_jit_info_t *jit_info);
-
-void Parrot_jit_normal_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-void Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-#ifdef JIT_EMIT
-#  if JIT_EMIT == 2
-/* generate code just once */
-
-/* autogened inside core.ops */
-static void Parrot_end_jit(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-#    undef Parrot_jit_restart_op
-#  endif /* JIT_EMIT == 2 */
-#endif /* JIT_EMIT */
-
-void Parrot_jit_restart_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
 int count_regs(PARROT_INTERP, char *sig, char *sig_start);
 
 size_t calc_signature_needs(const char *sig, int *strings);
@@ -1886,19 +1681,6 @@ void * Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci,
  * %eax       ... scratch, return value register
  */
 
-extern const char i_map[];
-
-extern const char floatval_map[];
-
-extern const char i_map_sub[];
-
-extern const jit_arch_info arch_info;
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-const jit_arch_info * Parrot_jit_init(PARROT_INTERP);
-
-#undef INT_REGISTERS_TO_MAP
 #endif /* PARROT_I386_JIT_EMIT_H_GUARD */
 
 /*

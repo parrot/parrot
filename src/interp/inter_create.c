@@ -44,14 +44,6 @@ static void setup_default_compreg(PARROT_INTERP)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-#if EXEC_CAPABLE
-    extern int Parrot_exec_run;
-#endif
-
-#if EXEC_CAPABLE
-Interp interpre;
-#endif
-
 #define ATEXIT_DESTROY
 
 /*
@@ -122,12 +114,7 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     Interp *interp;
 
     /* Get an empty interpreter from system memory */
-#if EXEC_CAPABLE
-    if (Parrot_exec_run)
-        interp = &interpre;
-    else
-#endif
-        interp = mem_allocate_zeroed_typed(Interp);
+    interp = mem_allocate_zeroed_typed(Interp);
 
     interp->lo_var_ptr = NULL;
 

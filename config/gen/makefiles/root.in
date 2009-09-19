@@ -103,7 +103,7 @@ CC               := @cc@
 CC_INC           := @cc_inc@
 C_LIBS           := @libs@
 CC_SHARED        := @cc_shared@
-CFLAGS           := $(CC_INC) @ccflags@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@ @clock_best@ $(CC_SHARED)
+CFLAGS           := $(CC_INC) @ccflags@ @cc_build_call_frames@ @cc_debug@ @ccwarn@ @cg_flag@ @gc_flag@ @clock_best@ $(CC_SHARED)
 LINK_DYNAMIC     := @link_dynamic@
 LINK             := @link@
 LINKFLAGS        := @linkflags@ @link_debug@ @ld_debug@
@@ -111,7 +111,6 @@ LD               := @ld@
 LDFLAGS          := @ldflags@ @ld_debug@
 RECONFIGURE      := $(PERL) tools/dev/reconfigure.pl
 INNO_SETUP       := iscc
-JIT_BUILD_TOOL   := $(BUILD_TOOLS_DIR)/jit2c.pl
 TEMPDIR          := @tempdir@
 #IF(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
 
@@ -247,12 +246,9 @@ GEN_SOURCES := \
     $(SRC_DIR)/core_ops.c \
     $(SRC_DIR)/nci.c \
     $(SRC_DIR)/core_ops_switch.c \
-    $(SRC_DIR)/jit_cpu.c \
     $(SRC_DIR)/parrot_config.c \
     $(SRC_DIR)/null_config.c \
     $(SRC_DIR)/install_config.c \
-    $(SRC_DIR)/exec_cpu.c \
-    $(SRC_DIR)/jit_defs.c \
     $(SRC_DIR)/extend_vtable.c
 
 GEN_MODULES := \
@@ -322,14 +318,11 @@ GEN_LIBRARY := \
     $(LIBRARY_DIR)/libpcre.pbc \
     $(LIBRARY_DIR)/postgres.pbc
 
-# the dependencies of $(SRC_DIR)/jit_emit.h are done explicitly
-# including this file in GEN_HEADERS causes unnecessary recompile of all
 FLUID_FILES_1 := \
     $(GEN_OPSFILES) \
     $(GEN_HEADERS) \
     $(GEN_SOURCES) \
     $(GEN_MODULES) \
-    $(SRC_DIR)/jit_emit.h
 
 FLUID_FILES_2 := \
     $(GEN_LIBRARY) \
@@ -446,6 +439,7 @@ INTERP_O_FILES := \
     $(SRC_DIR)/longopt$(O) \
     $(SRC_DIR)/misc$(O) \
     $(SRC_DIR)/multidispatch$(O) \
+    $(SRC_DIR)/frame_builder$(O) \
     $(SRC_DIR)/nci$(O) \
     $(SRC_DIR)/oo$(O) \
     $(SRC_DIR)/packfile$(O) \
@@ -470,11 +464,8 @@ INTERP_O_FILES := \
     \
     $(PF_DIR)/pf_items$(O) \
     \
-    @asmfun_o@ \
     @TEMP_cg_o@ \
-    @TEMP_exec_o@ \
     @TEMP_atomic_o@ \
-    @TEMP_jit_o@ \
     @TEMP_gc_o@ \
 #IF(platform_asm):    $(SRC_DIR)/platform_asm$(O) \
 
@@ -627,6 +618,7 @@ STR_FILES := \
     $(SRC_DIR)/key.str \
     $(SRC_DIR)/library.str \
     $(SRC_DIR)/multidispatch.str \
+    $(SRC_DIR)/frame_builder.str \
     $(SRC_DIR)/nci.str \
     $(SRC_DIR)/packfile.str \
     $(SRC_DIR)/pmc.str \
@@ -1067,29 +1059,8 @@ $(SRC_DIR)/list$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/library$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/jit$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/jit_emit.h $(SRC_DIR)/pmc/pmc_sub.h $(SRC_DIR)/pmc/pmc_managedstruct.h
-
-$(SRC_DIR)/jit_debug$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/debug.str
-
-$(SRC_DIR)/jit_debug_xcoff$(O) : $(GENERAL_H_FILES)
-
-$(SRC_DIR)/jit_cpu$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/jit_emit.h
-
-$(SRC_DIR)/exec$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@ $(SRC_DIR)/jit_emit.h
-
-$(SRC_DIR)/exec_dep$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@ $(SRC_DIR)/jit_emit.h $(SRC_DIR)/pmc/managedstruct.c
-
-$(SRC_DIR)/exec_cpu$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@ $(SRC_DIR)/jit_emit.h
-
-$(SRC_DIR)/jit_defs$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@ $(SRC_DIR)/jit_emit.h \
-	$(SRC_DIR)/pmc/pmc_fixedintegerarray.h $(SRC_DIR)/pmc/pmc_unmanagedstruct.h $(SRC_DIR)/pmc/pmc_pointer.h
-
 $(INC_DIR)/extend_vtable.h $(SRC_DIR)/extend_vtable.c $(SRC_DIR)/vtable.h : src/vtable.tbl $(BUILD_TOOLS_DIR)/vtable_extend.pl lib/Parrot/Vtable.pm
 	$(PERL) $(BUILD_TOOLS_DIR)/vtable_extend.pl
-
-$(SRC_DIR)/exec_start$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@
-
-$(SRC_DIR)/exec_save$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@
 
 $(SRC_DIR)/key$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/key.str $(SRC_DIR)/pmc/pmc_key.h
 
@@ -1208,9 +1179,12 @@ $(SRC_DIR)/dataypes$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/dataypes.c
 $(SRC_DIR)/exit$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/exit.c
 
 $(SRC_DIR)/nci$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/nci.c $(SRC_DIR)/nci.str \
+        $(SRC_DIR)/frame_builder$(O) \
         $(SRC_DIR)/pmc/pmc_managedstruct.h \
         $(SRC_DIR)/pmc/pmc_nci.h \
         $(SRC_DIR)/pmc/pmc_pointer.h
+
+$(SRC_DIR)/frame_builder$(O) : $(SRC_DIR)/frame_builder.h $(GENERAL_H_FILES) $(SRC_DIR)/frame_builder.c $(SRC_DIR)/frame_builder.str
 
 $(SRC_DIR)/vtables$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/vtables.c
 
@@ -1281,21 +1255,6 @@ $(OPS_DIR)/core_ops_switch.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl \
 
 $(INC_DIR)/vtable.h : src/vtable.tbl $(BUILD_TOOLS_DIR)/vtable_h.pl lib/Parrot/Vtable.pm
 	$(PERL) $(BUILD_TOOLS_DIR)/vtable_h.pl
-
-$(SRC_DIR)/jit_emit.h : $(SRC_DIR)/jit/@jitcpuarch@/jit_emit.h
-	$(CP) $(SRC_DIR)/jit/@jitcpuarch@/jit_emit.h $(SRC_DIR)/jit_emit.h
-$(SRC_DIR)/exec_dep.h : $(SRC_DIR)/jit/@jitcpuarch@/exec_dep.h
-	$(CP) $(SRC_DIR)/jit/@jitcpuarch@/exec_dep.h $(SRC_DIR)/exec_dep.h
-$(SRC_DIR)/jit_cpu.c : lib/Parrot/OpLib/core.pm $(SRC_DIR)/jit_emit.h \
-    $(SRC_DIR)/jit/@jitcpuarch@/core.jit $(JIT_BUILD_TOOL)
-	$(PERL) $(JIT_BUILD_TOOL) @jitcpuarch@ $(SRC_DIR)/jit_cpu.c
-$(SRC_DIR)/jit_defs.c : $(SRC_DIR)/jit/@jitcpuarch@/jit_emit.h \
-	$(SRC_DIR)/jit/@jitcpuarch@/jit_defs.c
-	$(CP) $(SRC_DIR)/jit/@jitcpuarch@/jit_defs.c $(SRC_DIR)/jit_defs.c
-$(SRC_DIR)/exec_cpu.c : lib/Parrot/OpLib/core.pm $(SRC_DIR)/jit_emit.h \
-    $(SRC_DIR)/jit/@jitcpuarch@/core.jit @TEMP_exec_h@ $(SRC_DIR)/exec_dep.h $(JIT_BUILD_TOOL)
-	$(PERL) $(JIT_BUILD_TOOL) @jitcpuarch@ $(SRC_DIR)/exec_cpu.c
-@TEMP_exec_dep@
 
 # imcc file dependencies
 #
@@ -1672,7 +1631,6 @@ prog-clean :
     $(SRC_DIR)/null_config$(O) \
     $(SRC_DIR)/parrot_config$(O) \
     $(SRC_DIR)/install_config$(O) \
-    $(SRC_DIR)/exec_start$(O) \
     $(SRC_DIR)/nci_test$(O) \
     $(LIBNCI_TEST_SO) \
     $(SRC_DIR)/glut_callbacks$(O) \
@@ -1708,12 +1666,6 @@ archclean: dynoplibs-clean dynpmc-clean dynext-clean
     $(SRC_DIR)/null_config$(O) \
     $(SRC_DIR)/parrot_config$(O) \
     $(SRC_DIR)/install_config$(O) \
-    $(SRC_DIR)/asmfun.s \
-    $(SRC_DIR)/jit_emit.h \
-    $(SRC_DIR)/jit_cpu.c \
-    $(SRC_DIR)/exec_cpu.c \
-    $(SRC_DIR)/jit_defs.c \
-    $(SRC_DIR)/exec_start$(O) \
     install_config.fpmc \
     $(SRC_DIR)/nci_test$(O) \
     $(LIBNCI_TEST_SO) \
@@ -1884,7 +1836,7 @@ SUNLINTOPTS := \
 
 sunlint :
 	rm -f *.ln
-	$(SUNLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" $(SUNLINTOPTS) $(LINTABLE_CFILES)
+	$(SUNLINT) $(CC_INC) "-Isrc/pmc" $(SUNLINTOPTS) $(LINTABLE_CFILES)
 
 BSD_LINT_FLAGS := -a -aa -b -c -e -h -n -p -r -u -x -z -F -H -V
 
@@ -2044,7 +1996,7 @@ SPLINT_SOURCE := `echo $(O_FILES) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@`
 
 splint-all : $(PARROT)
 	$(MKPATH) $(SPLINT_TMP)
-	$(SPLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
+	$(SPLINT) $(CC_INC) "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
 	$(SPLINT_SOURCE) \
 	$(SPLINT) $(CC_INC) $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) $(IMCC_DIR)/main.c
 
@@ -2055,7 +2007,7 @@ splint-all : $(PARROT)
 
 splint : all
 	$(MKPATH) $(SPLINT_TMP)
-	$(SPLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
+	$(SPLINT) $(CC_INC) "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
 	+partial -DNDEBUG \
 	$(SPLINT_SOURCE) \
 		| grep -v 'Source code error generation point'
@@ -2081,7 +2033,6 @@ cover: \
 #IF(cg_flag):    cover-testC \
     cover-testf \
 #IF(cg_flag):    cover-testg \
-#IF(jitcapable):    cover-testj \
     cover-testr \
     cover-testS \
     cover-src \
@@ -2202,8 +2153,8 @@ win32-inno-installer : world installable
 #
 ###############################################################################
 
-exec : $(SRC_DIR)/exec_start$(O) $(SRC_DIR)/parrot_config$(O) $(LIBPARROT)
-	$(LINK) @ld_out@$(EXEC)$(EXE) $(EXEC)$(O) $(SRC_DIR)/exec_start$(O) $(SRC_DIR)/parrot_config$(O) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
+exec : $(SRC_DIR)/parrot_config$(O) $(LIBPARROT)
+	$(LINK) @ld_out@$(EXEC)$(EXE) $(EXEC)$(O) $(SRC_DIR)/parrot_config$(O) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 
 ###### OS depend targets ##########
 

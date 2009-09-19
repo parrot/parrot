@@ -265,7 +265,6 @@ typedef struct PackFile_ConstTable {
 struct PackFile_ByteCode {
     PackFile_Segment       base;
     Prederef               prederef;    /* The predereferenced code and info */
-    struct Parrot_jit_info_t     *jit_info;    /* JITs data */
     struct PackFile_Debug *debugs;
     PackFile_ConstTable   *const_table;
     PackFile_FixupTable   *fixups;

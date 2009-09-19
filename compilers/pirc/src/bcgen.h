@@ -165,12 +165,6 @@ PARROT_CANNOT_RETURN_NULL
 STRING * get_string_const(ARGIN(bytecode * const bc), unsigned index)
         __attribute__nonnull__(1);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-opcode_t * make_jit_info(PARROT_INTERP, ARGIN(const struct _IMC_Unit *unit))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 PARROT_CANNOT_RETURN_NULL
 bytecode * new_bytecode(PARROT_INTERP, ARGIN(char const * const filename))
         __attribute__nonnull__(1)
@@ -226,9 +220,6 @@ void write_pbc_file(
        PARROT_ASSERT_ARG(bc)
 #define ASSERT_ARGS_get_string_const __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(bc)
-#define ASSERT_ARGS_make_jit_info __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_new_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(filename)

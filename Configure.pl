@@ -351,6 +351,10 @@ Don't build cgoto core. This is recommended when you are short of memory.
 
 Use JIT system.
 
+=item C<--buildframes>
+
+Dynamically build NCI call frames.
+
 =item C<--execcapable>
 
 Use JIT to emit a native executable.
@@ -617,6 +621,7 @@ configuration file.
     auto::isreg
     auto::arch
     auto::jit
+    auto::frames
     auto::cpu
     auto::funcptr
     auto::cgoto

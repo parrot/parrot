@@ -1060,58 +1060,6 @@ create_sub_pmc(ARGIN(bytecode * const bc), int iscoroutine,
     return pmc_new(bc->interp, type);
 }
 
-
-#if 0
-
-/*
-
-=item C<opcode_t * make_jit_info(PARROT_INTERP, const struct _IMC_Unit *unit)>
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-opcode_t *
-make_jit_info(PARROT_INTERP, ARGIN(const struct _IMC_Unit *unit))
-{
-    ASSERT_ARGS(make_jit_info)
-    const size_t old  = old_blocks(interp);
-    const size_t size = unit->n_basic_blocks + old;
-
-    if (!IMCC_INFO(interp)->globals->cs->jit_info) {
-        const size_t len  =
-            strlen(IMCC_INFO(interp)->globals->cs->seg->base.name) + 5;
-        char * const name = mem_allocate_n_typed(len, char);
-
-        snprintf(name, len, "%s_JIT",
-            IMCC_INFO(interp)->globals->cs->seg->base.name);
-
-        IMCC_INFO(interp)->globals->cs->jit_info =
-                PackFile_Segment_new_seg(interp,
-                    interp->code->base.dir, PF_UNKNOWN_SEG, name, 1);
-
-        mem_sys_free(name);
-    }
-
-    /* store current size */
-    IMCC_INFO(interp)->globals->cs->subs->n_basic_blocks = unit->n_basic_blocks;
-
-    /* offset of block start and end, 4 * registers_used */
-    IMCC_INFO(interp)->globals->cs->jit_info->data =
-        mem_realloc_n_typed(IMCC_INFO(interp)->globals->cs->jit_info->data,
-            size * 4, opcode_t);
-
-    IMCC_INFO(interp)->globals->cs->jit_info->size = size * 4;
-
-    return IMCC_INFO(interp)->globals->cs->jit_info->data + old * 4;
-}
-
-#endif /* HAS_JIT */
-
-
-
 /*
 
 =item C<int add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex,

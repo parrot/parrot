@@ -897,16 +897,8 @@ determine_output_file_type(PARROT_INTERP,
         if (STREQ(ext, ".pbc"))
             SET_STATE_WRITE_PBC(interp);
         else if (STREQ(ext, PARROT_OBJ_EXT)) {
-#if EXEC_CAPABLE
-            SET_STATE_LOAD_PBC(interp);
-            SET_STATE_RUN_PBC(interp);
-            UNSET_STATE_WRITE_PBC(interp);
-            *obj_file = 1;
-            Parrot_set_run_core(interp, PARROT_EXEC_CORE);
-#else
             UNUSED(obj_file);
             IMCC_fatal_standalone(interp, 1, "main: can't produce object file");
-#endif
         }
     }
 }

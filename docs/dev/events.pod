@@ -82,15 +82,13 @@ is checked during running the opcodes. When an event is scheduled, the event
 handler replaces backward branches in the opcode image with the
 B<check_events__> opcode.
 
-The JIT core doesn't handle events yet.
-
 After all events are popped off and handled, the opcode dispatch table is
 restored to its original, and the B<check_events__> reexecutes the same
 instruction again, which is now the real one and thus normal execution flow
 continues.
 
 This scheme has zero overhead in the absence of scheduled events for all cores
-except switched and JIT.
+except switched.
 
 =head1 Missing
 

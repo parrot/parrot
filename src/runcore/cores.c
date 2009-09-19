@@ -255,11 +255,6 @@ next opcode, or examine and manipulate data from the executing program.
 #  include "parrot/oplib/core_ops_cgp.h"
 #endif
 
-#if JIT_CAPABLE
-#  include "parrot/exec.h"
-#  include "../jit.h"
-#endif
-
 #ifdef WIN32
 #  define getpid _getpid
 #endif
@@ -1104,39 +1099,15 @@ Runs the native executable version of the specified opcode.
 
 */
 
-#if EXEC_CAPABLE
-    extern int Parrot_exec_run;
-#endif
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t *
 runops_exec_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(opcode_t *pc))
 {
     ASSERT_ARGS(runops_exec_core)
-#if EXEC_CAPABLE
-    opcode_t *code_start = interp->code->base.data;
 
-    /* size in opcodes */
-    UINTVAL   code_size  = interp->code->base.size;
-    opcode_t *code_end   = code_start + code_size;
-
-#  if defined HAVE_COMPUTED_GOTO && defined USE_CGP
-#    ifdef __GNUC__
-#      ifdef PARROT_I386
-    init_prederef(interp, PARROT_CGP_CORE);
-#      endif
-#    endif
-#  endif
-    if (Parrot_exec_run == 1)
-        Parrot_exec(interp, pc, code_start, code_end);
-    else
-        run_native(interp, pc, code_start);
-
-#else
     UNUSED(interp);
     UNUSED(pc);
-#endif
 
     return NULL;
 }

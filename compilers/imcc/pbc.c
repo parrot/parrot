@@ -179,10 +179,6 @@ static PMC* mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_WARN_UNUSED_RESULT
-static int old_blocks(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 static void store_fixup(PARROT_INTERP,
     ARGIN(const SymReg *r),
     int pc,
@@ -270,8 +266,6 @@ static void verify_signature(PARROT_INTERP,
 #define ASSERT_ARGS_mk_multi_sig __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(r)
-#define ASSERT_ARGS_old_blocks __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_store_fixup __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(r)
@@ -286,14 +280,6 @@ static void verify_signature(PARROT_INTERP,
     || PARROT_ASSERT_ARG(pc)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
-
-#ifdef HAS_JIT
-
-PARROT_WARN_UNUSED_RESULT
-static int old_blocks(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-#endif /* HAS_JIT */
 
 /*
 
@@ -481,84 +467,6 @@ e_pbc_open(PARROT_INTERP, SHIM(void *param))
 
     return 0;
 }
-
-
-#ifdef HAS_JIT
-
-/*
-
-=item C<static int old_blocks(PARROT_INTERP)>
-
-Gets the size/line of bytecode in ops at this point.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-static int
-old_blocks(PARROT_INTERP)
-{
-    ASSERT_ARGS(old_blocks)
-    const  subs_t *s;
-    size_t         size = 0;
-
-    for (s = IMCC_INFO(interp)->globals->cs->subs; s; s = s->prev) {
-        size += s->n_basic_blocks;
-    }
-
-    return size;
-}
-
-
-/*
-
-=item C<opcode_t * make_jit_info(PARROT_INTERP, const IMC_Unit *unit)>
-
-Creates JIT information for this compilation unit.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-opcode_t *
-make_jit_info(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
-{
-    ASSERT_ARGS(make_jit_info)
-    const size_t old  = old_blocks(interp);
-    const size_t size = unit->n_basic_blocks + old;
-
-    if (!IMCC_INFO(interp)->globals->cs->jit_info) {
-        const size_t len  = strlen(IMCC_INFO(interp)->globals->cs->seg->base.name) + 5;
-        char * const name = mem_allocate_n_typed(len, char);
-
-        snprintf(name, len, "%s_JIT",
-            IMCC_INFO(interp)->globals->cs->seg->base.name);
-
-        IMCC_INFO(interp)->globals->cs->jit_info =
-                PackFile_Segment_new_seg(interp,
-                    interp->code->base.dir, PF_UNKNOWN_SEG, name, 1);
-
-        mem_sys_free(name);
-    }
-
-    /* store current size */
-    IMCC_INFO(interp)->globals->cs->subs->n_basic_blocks = unit->n_basic_blocks;
-
-    /* offset of block start and end, 4 * registers_used */
-    IMCC_INFO(interp)->globals->cs->jit_info->data =
-        mem_realloc_n_typed(IMCC_INFO(interp)->globals->cs->jit_info->data,
-            size * 4, opcode_t);
-
-    IMCC_INFO(interp)->globals->cs->jit_info->size = size * 4;
-
-    return IMCC_INFO(interp)->globals->cs->jit_info->data + old * 4;
-}
-
-#endif /* HAS_JIT */
-
 
 /*
 

@@ -580,7 +580,6 @@ void runops_int(Interp *, size_t offset);
 void exec_init_prederef(PARROT_INTERP,
     void *prederef_arena);
 void prepare_for_run(PARROT_INTERP);
-void *init_jit(PARROT_INTERP, opcode_t *pc);
 PARROT_EXPORT void dynop_register(PARROT_INTERP, PMC *op_lib);
 
 /* interpreter.pmc */

@@ -81,10 +81,6 @@ implement your own PMC type.
 
 Describes the embedding subsystem in excruciating detail.
 
-=item F<jit.pod>
-
-A brief description of Parrot's Just-In-Time compiler.
-
 =item F<memory_internals.pod>
 
 An introduction to the Parrot GC subsystem

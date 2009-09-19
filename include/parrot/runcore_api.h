@@ -109,15 +109,6 @@ void dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void exec_init_prederef(PARROT_INTERP, ARGIN(void *prederef_arena))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-void * init_jit(PARROT_INTERP, SHIM(opcode_t *pc))
-        __attribute__nonnull__(1);
-
 void Parrot_runcore_destroy(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -150,11 +141,6 @@ void runops_int(PARROT_INTERP, size_t offset)
 #define ASSERT_ARGS_dynop_register __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(lib_pmc)
-#define ASSERT_ARGS_exec_init_prederef __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(prederef_arena)
-#define ASSERT_ARGS_init_jit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_runcore_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_runcore_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \

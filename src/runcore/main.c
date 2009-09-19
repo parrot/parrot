@@ -40,10 +40,6 @@ have the same number of elements because there is a one-to-one mapping.
 #include "parrot/oplib/ops.h"
 #include "main.str"
 
-#if JIT_CAPABLE
-#  include "parrot/exec.h"
-#  include "../jit.h"
-#endif
 #ifdef HAVE_COMPUTED_GOTO
 #  include "parrot/oplib/core_ops_cg.h"
 #  include "parrot/oplib/core_ops_cgp.h"
@@ -493,93 +489,6 @@ stop_prederef(PARROT_INTERP)
     }
 
     Parrot_setup_event_func_ptrs(interp);
-}
-
-
-#if EXEC_CAPABLE
-
-/*
-
-=item C<void exec_init_prederef(PARROT_INTERP, void *prederef_arena)>
-
-C<< interp->op_lib >> = prederefed oplib
-
-The "normal" C<op_lib> has a copy in the interpreter structure - but get
-the C<op_code> lookup function from standard core prederef has no
-C<op_info_table>
-
-=cut
-
-*/
-
-void
-exec_init_prederef(PARROT_INTERP, ARGIN(void *prederef_arena))
-{
-    ASSERT_ARGS(exec_init_prederef)
-    Parrot_runcore_t *old_runcore = interp->run_core;
-    Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "cgp"));
-
-    load_prederef(interp, interp->run_core);
-    interp->run_core = old_runcore;
-
-    if (!interp->code->prederef.code) {
-        void ** const temp = (void **)prederef_arena;
-
-        interp->code->prederef.code = temp;
-        /* TODO */
-    }
-}
-
-#endif
-
-
-/*
-
-=item C<void * init_jit(PARROT_INTERP, opcode_t *pc)>
-
-Initializes JIT function for the specified opcode and returns it.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-void *
-init_jit(PARROT_INTERP, SHIM(opcode_t *pc))
-{
-    ASSERT_ARGS(init_jit)
-#if JIT_CAPABLE
-    opcode_t          *code_start;
-    UINTVAL            code_size;          /* in opcodes */
-    opcode_t          *code_end;
-    Parrot_jit_info_t *jit_info;
-
-    if (interp->code->jit_info)
-        return ((Parrot_jit_info_t *)interp->code->jit_info)->arena.start;
-
-    code_start = interp->code->base.data;
-    code_size  = interp->code->base.size;
-    code_end   = code_start + code_size;
-
-#  if defined HAVE_COMPUTED_GOTO && PARROT_I386_JIT_CGP
-#    ifdef __GNUC__
-#      ifdef PARROT_I386
-    init_prederef(interp, PARROT_CGP_CORE);
-#      endif
-#    endif
-#  endif
-
-    interp->code->jit_info =
-        jit_info = parrot_build_asm(interp, code_start, code_end,
-            NULL, JIT_CODE_FILE);
-
-    return jit_info->arena.start;
-#else
-    UNUSED(interp);
-    return NULL;
-#endif
-
 }
 
 

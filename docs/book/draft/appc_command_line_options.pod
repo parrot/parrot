@@ -152,11 +152,6 @@ source file, even if the input file was also PASM. This can be handy
 to check various optimizations when you run Parrot with the C<-Op>
 switch.
 
-If the extension is F<.o> or equivalent, Parrot generates an object
-file from the JITed program code, which can be used to create a
-standalone executable program. This isn't available on all platforms
-yet; see F<PLATFORMS> for which platforms support this.
-
 =item -r,--run-pbc
 
 Immediately execute bytecode. This is the default unless C<-o> is
@@ -269,30 +264,13 @@ Run with the I<fast core>.
 
 Run the I<computed goto core> (CGoto).
 
-=item -R jit
-
-Run with the I<JIT core> if available.
-
 =item -R cgp
 
 Run with the I<CGoto-Prederefed> core.
 
-=item -R cgp-jit
-
-Run with the I<CGoto-Prederefed with jit> core.
-
 =item -R switch
 
 Run with the I<Switched core>.
-
-=item -R switch-jit
-
-Run with the I<Switched core with jit>.
-
-=item -R exec
-
-Run with the I<exec core>
-(uses JIT at compile time to generate native code)
 
 =item -R gcdebug
 

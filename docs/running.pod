@@ -137,7 +137,6 @@ may be available on your system:
   slow, bounds  bounds checking core (default)
   cgoto         computed goto core
   cgp           computed goto-predereferenced core
-  exec          exec core (uses JIT at compile time to generate native code)
   fast          fast core (no bounds checking, profiling, or tracing)
   gcdebug       performs a full GC run before every op dispatch (good for
                 debugging GC problems)
@@ -217,17 +216,6 @@ assumed to know what to do with these.
 
 =head1 Generated files
 
-If JIT debugging is enabled (e.g. via C<--parrot-debug 04>), the
-following additional output files are generated:
-
-  F<file.stabs.s>     stabsfile for the program
-  F<file.o>           object file with debug information
-  F<EVAL_n>           source of C<compile> op number I<n>
-  F<EVAL_n.stabs.s>   stabsfile for this block
-  F<EVAL_n.o>         object file with debug information
-
-See F<docs/jit.pod> for further information.
-
 =head1 About runcores
 
 The runcore (or runloop) tells Parrot how to find the C code that implements
@@ -281,11 +269,6 @@ starts.  The computed-goto-prederef ("CGP") core takes this one step
 further by replacing opcode numbers in the bytecode with those opfunc
 addresses.  See "Predereferencing" in F<docs/glossary.pod> for a
 fuller explanation.
-
-Finally, the JIT runcore uses the "slow" core, but also creates and
-jumps to JIT-compiled native code for supported opcodes.  "cgp-jit"
-and "switched-jit" are variations that use the CGP or switched core
-but run JIT code when possible.
 
 =head1 Operation table
 

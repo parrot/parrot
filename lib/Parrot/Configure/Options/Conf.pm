@@ -95,6 +95,7 @@ Parrot Options:
    --jitcapable         Use JIT
    --execcapable        Use JIT to emit a native executable
    --without-threads    Build parrot without thread support
+   --buildframes        Dynamically build NCI call frames
 
 External Library Options:
 

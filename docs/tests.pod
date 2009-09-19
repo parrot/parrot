@@ -18,9 +18,6 @@ The easy way to test parrot is running C<make test>. If you have
 updated your code recently and tests began failing, go for a C<make
 realclean> and recompile parrot before complaining.
 
-If your architecture supports JIT, you can test parrot JIT engine using C<make
-testj>. It works just like C<make test>, but uses the JIT engine when possible.
-
 C<make languages-test> runs the test suite for most language implementations
 in the languages directory.
 

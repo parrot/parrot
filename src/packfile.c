@@ -29,7 +29,6 @@ about the structure of the frozen bytecode.
 #include "parrot/extend.h"
 #include "parrot/packfile.h"
 #include "parrot/runcore_api.h"
-#include "jit.h"
 #include "../compilers/imcc/imc.h"
 #include "packfile.str"
 #include "pmc/pmc_sub.h"
@@ -462,10 +461,6 @@ static int sub_pragma(PARROT_INTERP,
     || PARROT_ASSERT_ARG(sub_pmc)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
-
-#if EXEC_CAPABLE
-    extern int Parrot_exec_run;
-#endif
 
 /* offset not in ptr diff, but in byte */
 #define OFFS(pf, cursor) ((pf) ? ((const char *)(cursor) - (const char *)((pf)->src)) : 0)
@@ -2564,9 +2559,6 @@ byte_code_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
     ASSERT_ARGS(byte_code_destroy)
     PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
 
-#ifdef HAS_JIT
-    Parrot_destroy_jit(byte_code->jit_info);
-#endif
     if (byte_code->prederef.code) {
         Parrot_free_memalign(byte_code->prederef.code);
         byte_code->prederef.code = NULL;
@@ -3698,10 +3690,6 @@ PackFile_ConstTable_clear(PARROT_INTERP, ARGMOD(PackFile_ConstTable *self))
 }
 
 
-#if EXEC_CAPABLE
-PackFile_Constant *exec_const_table;
-#endif
-
 /*
 
 =item C<const opcode_t * PackFile_ConstTable_unpack(PARROT_INTERP,
@@ -3753,13 +3741,7 @@ PackFile_ConstTable_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg),
     for (i = 0; i < self->const_count; i++) {
         TRACE_PRINTF(("PackFile_ConstTable_unpack(): Unpacking constant %ld/%ld\n",
             i, self->const_count));
-
-#if EXEC_CAPABLE
-        if (Parrot_exec_run)
-            self->constants[i] = &exec_const_table[i];
-        else
-#endif
-            self->constants[i] = PackFile_Constant_new(interp);
+        self->constants[i] = PackFile_Constant_new(interp);
 
         cursor = PackFile_Constant_unpack(interp, self, self->constants[i],
                     cursor);

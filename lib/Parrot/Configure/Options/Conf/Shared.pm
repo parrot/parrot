@@ -38,6 +38,7 @@ our @shared_valid_options = qw{
     inline
     intval
     jitcapable
+    buildframes
     languages
     ld
     ldflags

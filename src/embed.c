@@ -80,13 +80,6 @@ to get destroyed.
 
 */
 
-#ifdef JIT_CAPABLE
-#  if EXEC_CAPABLE
-#    include "parrot/exec.h"
-#  endif /* EXEC_CAPABLE */
-#  include "jit.h"
-#endif
-
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Interp
@@ -571,8 +564,8 @@ again:
     if (!(pf->options & PFOPT_HEADERONLY))
         do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
 
-    /* JITting and/or prederefing the sub/the bytecode is done
-     * in switch_to_cs before actual usage of the segment */
+    /* Prederefing the sub/the bytecode is done in switch_to_cs before
+     * actual usage of the segment */
 
 #ifdef PARROT_HAS_HEADER_SYSMMAN
     /* the man page states that it's ok to close a mmaped file */
@@ -813,15 +806,6 @@ Parrot_runcode(PARROT_INTERP, int argc, ARGIN(char **argv))
 
     /* Set up @ARGS (or whatever this language calls it) in userargv. */
     userargv = setup_argv(interp, argc, argv);
-
-#if EXEC_CAPABLE
-
-    /* s. runops_exec interpreter.c */
-    if (Parrot_str_equal(interp, interp->run_core->name,
-        Parrot_str_new_constant(interp, "exec")))
-        Parrot_exec_run = 1;
-
-#endif
 
     /*
      * If any profile information was gathered, print it out
