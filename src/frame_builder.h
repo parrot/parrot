@@ -1575,12 +1575,6 @@ char * opt_div_RM(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest,
 
 enum { JIT_X86BRANCH, JIT_X86JUMP, JIT_X86CALL };
 
-void jit_emit_jcc(Parrot_jit_info_t *jit_info, int code, opcode_t disp);
-
-void emit_jump(Parrot_jit_info_t *jit_info, opcode_t disp);
-
-void Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
 #  define jit_emit_stack_frame_enter(pc) do { \
     emitm_pushl_r((pc), emit_EBP); \
     jit_emit_mov_rr_i((pc), emit_EBP, emit_ESP); \
@@ -1601,72 +1595,6 @@ void Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info, PARROT_INTERP);
      }
 
 void jit_get_params_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-/*
- * preserve registers
- * a) all callee saved on function entry
- */
-
-void jit_save_regs(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-/* restore saved regs, see above */
-
-void jit_restore_regs(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-/*
- * preserve registers around a functioncall
- *
- * all used register around a call (skip >= 0 := return result
- *
- * TODO factor out common code
- *      use jit_emit_mov_RM_{in} functions (load/store base indexed)
- *      and a macro to retrieve sp
- */
-
-int jit_save_regs_call(Parrot_jit_info_t *jit_info, PARROT_INTERP, int skip);
-
-void jit_restore_regs_call(Parrot_jit_info_t *jit_info, PARROT_INTERP,
-    int skip);
-
-void jit_set_returns_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
-    int recursive);
-
-void jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
-    int recursive);
-
-/*
- * if jit_emit_noop is defined, it does align a jump target
- * to 1 << JUMP_ALIGN
- * It may emit exactly one byte, or some desired padding.
- * The instructions must perform like a noop.
- *
- * Alignment effects seem to be rather processor specific and
- * it's not quite clear if the branch src or target should be
- * aligned. Turned off for now.
- *
- * s. also info gcc /align-jump
- *
- * noop; mov %esi, %esi; lea 0(%esi), %esi
- * TODO
- * 7 bytes: 8d b4 26 00 00 00 00    lea    0x0(%esi),%esi
- * 6 bytes: 8d b6 00 00 00 00       lea    0x0(%esi),%esi
- * 5 bytes: 90 8d 74 26 00          nop,   lea    0x0(%esi),%esi
- * 4 bytes: 8d 74 26 00             lea    0x0(%esi),%esi
- *
- */
-
-#  define jit_emit_noop(pc) do { \
-     switch (((unsigned long) (pc)) & 3) { \
-       case 1: *(pc)++ = (char) 0x8d; *(pc)++ = (char) 0x76; *(pc)++ = (char) 0x00; break; \
-       case 2: *(pc)++ = (char) 0x89; *(pc)++ = (char) 0xf6; break; \
-       case 3: *(pc)++ = (char) 0x90; break; \
-     } \
-   } while (0)
-
-#  define JUMP_ALIGN 0
-#  define SUB_ALIGN 0
-
-int count_regs(PARROT_INTERP, char *sig, char *sig_start);
 
 size_t calc_signature_needs(const char *sig, int *strings);
 
