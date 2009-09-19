@@ -31,10 +31,10 @@ void *
 Parrot_jit_build_call_func(Interp *, PMC *, STRING *, int *);
 
 /* custom pmc callback functions */
-void 
+void
 Parrot_jit_free_buffer(PARROT_INTERP, void *ptr, void *priv);
 
-PMC* 
+PMC*
 Parrot_jit_clone_buffer(PARROT_INTERP, PMC *pmc, void *priv);
 
 struct jit_buffer_private_data {
