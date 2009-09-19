@@ -25,10 +25,12 @@
  * runloop ID, so it still needs to be a separate stack for a while longer. */
 
 typedef struct parrot_runloop_t {
-    Parrot_jump_buff         resume;        /* jmp_buf */
     struct parrot_runloop_t *prev;          /* interpreter's runloop
                                              * jump buffer stack */
     opcode_t                *handler_start; /* Used in exception handling */
+
+    /* let the biggest element cross the cacheline boundary */
+    Parrot_jump_buff         resume;        /* jmp_buf */
 } parrot_runloop_t;
 
 typedef parrot_runloop_t Parrot_runloop;
