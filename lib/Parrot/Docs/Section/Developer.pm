@@ -1,4 +1,4 @@
-# Copyright (C) 2004, Parrot Foundation.
+# Copyright (C) 2004-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -45,10 +45,8 @@ sub new {
             $self->new_item( 'Bytecode Format (PBC)', 'docs/parrotbyte.pod'),
             $self->new_item( 'Bytecode Packfile API', 'docs/packfile-c.pod'),
             $self->new_item( 'Memory Internals', 'docs/memory_internals.pod'),
-            $self->new_item( 'Just In Time Compilation', 'docs/jit.pod'),
             $self->new_item( 'PMC Vtables', 'docs/vtables.pod'),
             $self->new_item( 'Embedding Parrot', 'docs/embed.pod'),
-            $self->new_item( '', 'docs/native_exec.pod' ),
             $self->new_item( '', 'docs/porting_intro.pod' ),
         ),
         $self->new_group( 'Development Notes',     '', 'docs/dev',

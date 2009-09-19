@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -11,9 +11,9 @@ Parrot::Vtable - Functions for manipulating vtables
 
 =head1 DESCRIPTION
 
-C<Parrot::Vtable> provides a collection of functions for manipulating
-PMC vtables. It is used by F<tools/build/jit2c.pl>, F<tools/build/pmc2c.pl>,
-F<tools/build/vtable_h.pl>, F<tools/dev/gen_class.pl>.
+C<Parrot::Vtable> provides a collection of functions for manipulating PMC
+vtables. It is used by F<tools/build/pmc2c.pl>, F<tools/build/vtable_h.pl>, and
+F<tools/dev/gen_class.pl>.
 
 =head2 Functions
 

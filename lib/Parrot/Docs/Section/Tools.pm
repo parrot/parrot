@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2008, Parrot Foundation.
+# Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -47,7 +47,6 @@ sub new {
             $self->new_item( '', 'tools/dev/as2c.pl' ),
             $self->new_item( '', 'tools/dev/cc_flags.pl' ),
             $self->new_item( '', 'tools/build/nativecall.pl' ),
-            $self->new_item( '', 'tools/build/jit2c.pl' ),
             $self->new_item( '', 'tools/build/vtable_h.pl' ),
             $self->new_item( '', 'tools/build/vtable_extend.pl' ),
         ),
