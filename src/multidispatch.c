@@ -29,9 +29,6 @@ them, with default behaviour.
 
 =head2 Remarks
 
-C<< binop_mmd_funcs->x >> and C<< ->y >> are table sizes
-not highest type in table.
-
 =head2 Functions
 
 =over 4

@@ -165,10 +165,7 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 
     Parrot_initialize_core_vtables(interp);
 
-    /* Set up the MMD struct */
-    interp->binop_mmd_funcs = NULL;
-
-    /* MMD cache for builtins. */
+    /* Set up MMD; MMD cache for builtins. */
     interp->op_mmd_cache = Parrot_mmd_cache_create(interp);
 
     /* create caches structure */
