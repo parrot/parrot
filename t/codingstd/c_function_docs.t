@@ -93,7 +93,6 @@ compilers/imcc/pbc.c
 compilers/imcc/pcc.c
 compilers/imcc/reg_alloc.c
 compilers/imcc/symreg.c
-compilers/pirc/src/bcgen.c
 compilers/pirc/src/pircapi.c
 compilers/pirc/src/pircompiler.c
 compilers/pirc/src/piremit.c
@@ -128,28 +127,14 @@ src/gc/gc_malloc.c
 src/gc/generational_ms.c
 src/gc/res_lea.c
 src/io/io_string.c
-src/jit/amd64/jit_defs.c
-src/jit/arm/exec_dep.c
-src/jit/i386/exec_dep.c
-src/jit/ppc/exec_dep.c
 src/nci_test.c
 src/pbc_dump.c
-src/pic.c
-src/pic_jit.c
 src/string/charset/ascii.c
 src/string/charset/binary.c
 src/string/charset/iso-8859-1.c
 src/string/charset/unicode.c
 src/tsq.c
-src/jit/alpha/jit_emit.h
-src/jit/arm/jit_emit.h
-src/jit/hppa/jit_emit.h
 include/parrot/atomic/gcc_pcc.h
-src/jit/ia64/jit_emit.h
-src/jit/mips/jit_emit.h
-src/jit/ppc/jit_emit.h
-src/jit/skeleton/jit_emit.h
-src/jit/sun4/jit_emit.h
 
 # Local Variables:
 #   mode: cperl
