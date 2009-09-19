@@ -341,8 +341,6 @@ emit_popl_r(char *pc, int reg)
 
 unsigned char *lastpc;
 
-#  define NATIVECODE jit_info->native_ptr
-
 size_t
 calc_signature_needs(const char *sig, int *strings)
 {
@@ -382,8 +380,8 @@ calc_signature_needs(const char *sig, int *strings)
 void *
 Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *sizeptr)
 {
-    Parrot_jit_info_t jit_info;
     char     *pc;
+    char     *execmem;
     int       i                    = 0;
     int       arg_count            = 0;
     int       string_buffer_count  = 0;
@@ -415,7 +413,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
     /* this ought to be enough - the caller of this function
      * should free the function pointer returned here
      */
-    pc = jit_info.native_ptr = jit_info.arena.start = (char *)mem_alloc_executable(JIT_ALLOC_SIZE);
+    pc = execmem = (char *)mem_alloc_executable(JIT_ALLOC_SIZE);
     if (! pc)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
                 "Cannot allocate executable memory");
@@ -549,7 +547,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
             case '3':
             case '4':
             case 'V':
-                mem_free_executable(jit_info.native_ptr, JIT_ALLOC_SIZE);
+                mem_free_executable(execmem, JIT_ALLOC_SIZE);
                 Parrot_str_free_cstring(signature_str);
                 return NULL;
                 break;
@@ -560,7 +558,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
                  * oops unknown signature:
                  * cleanup and try nci.c
                  */
-                mem_free_executable(jit_info.native_ptr, JIT_ALLOC_SIZE);
+                mem_free_executable(execmem, JIT_ALLOC_SIZE);
                 Parrot_str_free_cstring(signature_str);
                 return NULL;
         }
@@ -706,7 +704,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
              * cleanup and try nci.c
              */
             Parrot_str_free_cstring(signature_str);
-            mem_free_executable(jit_info.native_ptr, JIT_ALLOC_SIZE);
+            mem_free_executable(execmem, JIT_ALLOC_SIZE);
             return NULL;
     }
 
@@ -721,14 +719,12 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
 
     jit_emit_stack_frame_leave(pc);
     emitm_ret(pc);
-    PARROT_ASSERT(pc - jit_info.arena.start <= JIT_ALLOC_SIZE);
-
-    /* could shrink arena.start here to used size */
+    PARROT_ASSERT(pc - execmem <= JIT_ALLOC_SIZE);
 
     if (sizeptr)
         *sizeptr = JIT_ALLOC_SIZE;
     Parrot_str_free_cstring(signature_str);
-    return (void *)D2FPTR(jit_info.arena.start);
+    return (void *)D2FPTR(execmem);
 }
 
 /*

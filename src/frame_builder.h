@@ -24,94 +24,22 @@
 #include "parrot/hash.h"
 #include "parrot/oplib/ops.h"
 
-/*  Parrot_jit_arena_t
- *      Holds pointers to the native code of one or more sections.
- *
- *  start:          Start of current native code segment.
- *  size:           The size of the arena in bytes
- *  map_size:       The size of the map in bytes.
- */
-
-typedef struct Parrot_jit_arena_t {
-    char                            *start;
-    ptrdiff_t                        size;
-    unsigned long                    map_size;
-} Parrot_jit_arena_t;
-
-typedef enum {
-    JIT_CODE_FILE,
-    JIT_CODE_SUB,
-    JIT_CODE_SUB_REGS_ONLY,
-
-    /* size */
-    JIT_CODE_TYPES,
-    /* special cases */
-    JIT_CODE_RECURSIVE     = 0x10,
-    JIT_CODE_SUB_REGS_ONLY_REC = JIT_CODE_SUB_REGS_ONLY|JIT_CODE_RECURSIVE
-} enum_jit_code_type;
-
-/*  Parrot_jit_info_t
- *      All the information needed to jit the bytecode will be here.
- *
- *  native_ptr:     Current pointer to native code.
- *  arena:          The arena inlined, this will be the only one used in cases
- *                  where there is a way to load an immediate.
- */
-
-typedef struct Parrot_jit_info_t {
-    char                         *native_ptr;
-    Parrot_jit_arena_t            arena;
-    INTVAL                        code_type;
-    const struct jit_arch_info_t *arch_info;
-} Parrot_jit_info_t;
-
-typedef struct jit_arch_regs {
-    /*
-     * begin function - emit ABI call prologue
-     */
-
-    int n_mapped_I;
-    int n_preserved_I;
-    const char *map_I;
-    int n_mapped_F;
-    int n_preserved_F;
-    const char *map_F;
-} jit_arch_regs;
-
-typedef void (*mov_RM_f)(PARROT_INTERP, Parrot_jit_info_t *,
-        int cpu_reg, int base_reg, INTVAL offs);
-typedef void (*mov_MR_f)(PARROT_INTERP, Parrot_jit_info_t *,
-        int base_reg, INTVAL offs, int cpu_reg);
-
-typedef struct jit_arch_info_t {
-    /* CPU <- Parrot reg move functions */
-    mov_RM_f mov_RM_i;
-    mov_RM_f mov_RM_n;
-    /* Parrot <- CPU reg move functions */
-    mov_MR_f mov_MR_i;
-    mov_MR_f mov_MR_n;
-
-    /* register mapping info */
-    const jit_arch_regs regs[JIT_CODE_TYPES];
-} jit_arch_info;
-
 /*
  * NCI interface
  */
-void *Parrot_jit_build_call_func(Interp *, PMC *, STRING *, int *);
+void *
+Parrot_jit_build_call_func(Interp *, PMC *, STRING *, int *);
+
 /* custom pmc callback functions */
-void Parrot_jit_free_buffer(PARROT_INTERP, void *ptr, void *priv);
-PMC* Parrot_jit_clone_buffer(PARROT_INTERP, PMC *pmc, void *priv);
+void 
+Parrot_jit_free_buffer(PARROT_INTERP, void *ptr, void *priv);
+
+PMC* 
+Parrot_jit_clone_buffer(PARROT_INTERP, PMC *pmc, void *priv);
+
 struct jit_buffer_private_data {
     int size;
 };
-
-/* Scale factor values */
-#define emit_Scale(scale) ((scale) << 6)
-#define emit_Scale_1 emit_Scale(0)
-#define emit_Scale_2 emit_Scale(1)
-#define emit_Scale_4 emit_Scale(2)
-#define emit_Scale_8 emit_Scale(3)
 
 /* Scale factor values */
 #define emit_Scale(scale) ((scale) << 6)
@@ -299,8 +227,6 @@ char * emit_movb_r_r(char *pc, int reg1, int reg2);
 #  define jit_emit_mov_rr_i(pc, reg2, reg1) if ((reg1) != (reg2)) { \
     *((pc)++) = (char) 0x89; \
     *((pc)++) = (char) emit_alu_r_r((reg1), (reg2)); }
-
-char * emit_movb_i_r(char *pc, char imm, int reg);
 
 #  define jit_emit_mov_ri_i(interp, pc, reg, imm) { \
     *((pc)++) = (char)(0xb8 | ((reg) - 1)); \
@@ -634,14 +560,6 @@ char * opt_mul(PARROT_INTERP, char *pc, int dest, INTVAL imm, int src);
 
 #  define jit_emit_ror_ri_i(interp, pc, reg, imm) \
     { (pc) = emit_shift_i_r((interp), (pc), emit_b001, (imm), (reg)); }
-
-int intreg_is_used(Parrot_jit_info_t *jit_info, char reg);
-
-char * opt_shift_rr(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest,
-    int count, int op);
-
-char * opt_shift_rm(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest,
-    int offs, int op);
 
 /* interface, shift r1 by r2 bits */
 
@@ -1435,144 +1353,6 @@ extern unsigned char *lastpc;
     } \
 }
 
-/* ST(r1) /= ST(r2) */
-char * div_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r1);
-
-#  define jit_emit_div_rr_n(interp, pc, r1, r2) \
-    emitm_fld((pc), (r2)); \
-    jit_info->native_ptr = (pc); \
-    (pc) = div_rr_n((interp), jit_info, (r1))
-
-#  define jit_emit_div_ri_n(interp, pc, r, m) \
-    jit_emit_fload_m_n((interp), (pc), (m)); \
-    jit_info->native_ptr = (pc); \
-    (pc) = div_rr_n((interp), jit_info, (r))
-
-#  define jit_emit_div_RM_n(interp, pc, r, o) \
-    jit_emit_fload_mb_n((interp), (pc), emit_EBX, (o)); \
-    jit_info->native_ptr = (pc); \
-    (pc) = div_rr_n((interp), jit_info, (r))
-
-char * mod_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r);
-
-/* ST(i) %= MEM
- * please note the hardcoded jumps */
-#  define jit_emit_cmod_RM_n(interp, pc, r, offs)  \
-    if (r)  \
-      emitm_fxch((pc), (r)); \
-    jit_emit_fload_mb_n((interp), (pc), emit_EBX, (offs)); \
-    (pc) = mod_rr_n((interp), jit_info, (r))
-
-#  define jit_emit_cmod_ri_n(interp, pc, r, mem)  \
-    if (r)  \
-      emitm_fxch((pc), (r)); \
-    jit_emit_fload_m_n((interp), (pc), (mem)); \
-    (pc) = mod_rr_n((interp), jit_info, (r))
-
-/* ST(r1) %= ST(r2) */
-#  define jit_emit_cmod_rr_n(interp, pc, r1, r2)  \
-    if (r1)  \
-      emitm_fxch((pc), (r1)); \
-    emitm_fld((pc), (r2)); \
-    (pc) = mod_rr_n((interp), jit_info, (r1))
-
-/* compare ST(r) <-> mem i.e. constant */
-#  define jit_emit_cmp_ri_n(interp, pc, r, mem) { \
-    jit_emit_fload_m_n((interp), (pc), (mem)); \
-    emitm_fld((pc), ((r)+1)); \
-    emitm_fcompp(pc); \
-    emitm_fstw(pc); \
-    emitm_sahf(pc); \
-}
-
-#  define jit_emit_cmp_RM_n(interp, pc, r, offs) { \
-    jit_emit_fload_mb_n((interp), (pc), emit_EBX, (offs)); \
-    emitm_fld((pc), ((r)+1)); \
-    emitm_fcompp(pc); \
-    emitm_fstw(pc); \
-    emitm_sahf(pc); \
-}
-
-/* compare mem <-> ST(r) */
-#  define jit_emit_cmp_mi_n(interp, pc, mem, r) { \
-    jit_emit_fload_m_n((interp), (pc), (mem)); \
-    emitm_fcomip((pc), ((r)+1)); \
-}
-
-#  define jit_emit_cmp_MR_n(interp, pc, offs, r) { \
-    jit_emit_fload_mb_n((interp), (pc), emit_EBX, (offs)); \
-    emitm_fcomip((pc), ((r)+1)); \
-}
-
-/* compare ST(r1) <-> ST(r2) test FCOMI (=fcom, fstw, sahf) */
-#  define jit_emit_cmp_rr_n(pc, r1, r2) { \
-    if (!(r2) || ((r1)==(r2))) { \
-      emitm_fld((pc), (r1)); \
-      emitm_fcomip((pc), ((r2)+1)); \
-    } \
-    else { \
-      if (r1) { \
-        emitm_fxch((pc), (r1)); \
-        emitm_fcomi((pc), (r2)); \
-        emitm_fxch((pc), (r1)); \
-      } \
-      else { \
-        emitm_fcomi((pc), (r2)); \
-      } \
-    } \
-}
-
-#  define jit_emit_neg_M_i(interp, pc, offs) \
-    emitm_negl_m((pc), emit_EBX, emit_None, 1, (long)(offs))
-
-#  define jit_emit_band_MR_i(interp, pc, offs, reg) \
-    emitm_andl_r_m((pc), (reg), emit_EBX, emit_None, 1, (offs))
-
-#  define jit_emit_band_RM_i(interp, pc, reg, offs) \
-    emitm_andl_m_r((pc), (reg), emit_EBX, emit_None, 1, (offs))
-
-#  define jit_emit_band_MI_i(pc, offs, imm) \
-    emitm_andl_i_m((pc), (imm), emit_EBX, emit_None, 1, (offs))
-
-#  define jit_emit_bor_MR_i(interp, pc, offs, reg) \
-    emitm_orl_r_m((pc), (reg), emit_EBX, emit_None, 1, (offs))
-
-#  define jit_emit_bor_RM_i(interp, pc, reg, offs) \
-    emitm_orl_m_r((pc), (reg), emit_EBX, emit_None, 1, (offs))
-
-#  define jit_emit_bor_MI_i(pc, offs, imm) \
-    emitm_orl_i_m((pc), (imm), emit_EBX, emit_None, 1, (offs))
-
-#  define jit_emit_bxor_MR_i(interp, pc, offs, reg) \
-    emitm_xorl_r_m((pc), (reg), emit_EBX, emit_None, 1, (offs))
-
-#  define jit_emit_bxor_RM_i(interp, pc, reg, offs) \
-    emitm_xorl_m_r((pc), (reg), emit_EBX, emit_None, 1, (offs))
-
-#  define jit_emit_bxor_MI_i(pc, offs, imm) \
-    emitm_xorl_i_m((pc), (imm), emit_EBX, emit_None, 1, (offs))
-
-/* dest /= src
- * edx:eax /= src, quotient => eax, rem => edx
- */
-char * opt_div_rr(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest,
-    int src, int is_div);
-
-#  define jit_emit_div_rr_i(interp, pc, r1, r2) (pc) = opt_div_rr((interp), jit_info, (r1), (r2), 1)
-#  define jit_emit_cmod_rr_i(interp, pc, r1, r2) (pc) = opt_div_rr((interp), jit_info, (r1), (r2), 0)
-
-char * opt_div_ri(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest,
-    INTVAL imm, int is_div);
-
-#  define jit_emit_div_ri_i(pc, r1, imm) (pc) = opt_div_ri(interp, jit_info, (r1), (imm), 1)
-#  define jit_emit_cmod_ri_i(pc, r1, imm) (pc) = opt_div_ri(interp, jit_info, (r1), (imm), 0)
-
-char * opt_div_RM(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest,
-    int offs, int is_div);
-
-#  define jit_emit_div_RM_i(interp, pc, r, m)  (pc) = opt_div_RM((interp), jit_info, (r), (m), 1)
-#  define jit_emit_cmod_RM_i(interp, pc, r, m) (pc) = opt_div_RM((interp), jit_info, (r), (m), 0)
-
 enum { JIT_X86BRANCH, JIT_X86JUMP, JIT_X86CALL };
 
 #  define jit_emit_stack_frame_enter(pc) do { \
@@ -1593,8 +1373,6 @@ enum { JIT_X86BRANCH, JIT_X86JUMP, JIT_X86CALL };
        emitm_popl_r((pc), emit_EBP); \
        emitm_ret(pc); \
      }
-
-void jit_get_params_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 
 size_t calc_signature_needs(const char *sig, int *strings);
 
