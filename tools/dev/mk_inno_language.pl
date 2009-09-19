@@ -59,6 +59,9 @@ my $exe = $lang eq 'rakudo'
 my $pbc = <*.pbc>
         ? qq{Source: ".\\*.pbc"; DestDir: "{app}\\lib\\parrot\\languages\\$lang"; Flags:}
         : '; no .pbc';
+my $lng = -d $lang
+        ? qq{Source: ".\\$lang\\*"; DestDir: "{app}\\lib\\parrot\\languages\\$lang"; Flags: ignoreversion recursesubdirs}
+        : '; no lang';
 my $lib = <library/*.pbc>
 #        ? qq{Source: ".\\library\\*.pbc"; DestDir: "{app}\\lib\\parrot\\languages\\$lang\\library"; Flags: ignoreversion recursesubdirs}
         ? qq{Source: ".\\library\\*.pbc"; DestDir: "{app}\\lib\\parrot\\library\\$lang"; Flags: ignoreversion recursesubdirs}
@@ -109,6 +112,7 @@ Uninstallable=no
 [Files]
 $exe
 $pbc
+$lng
 $lib
 $pmc
 $ops
