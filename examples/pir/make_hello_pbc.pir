@@ -1,3 +1,5 @@
+#Copyright (C) 2009, Parrot Foundation.
+#$Id$
 # Sample creating of "Hello World" program using Packfile PMCs.
 .sub 'main'
     .local pmc pf, pfdir, pffixup, pfbc, pfconst
@@ -89,4 +91,8 @@
 
 .end
 
-# vim: ft=pir
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
