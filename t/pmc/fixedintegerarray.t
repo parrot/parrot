@@ -19,7 +19,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(24)
+    plan(29)
 
     'test_set_size'()       # 2 tests
     'test_reset_size'()     # 1 test
@@ -29,7 +29,8 @@ out-of-bounds test. Checks INT and PMC keys.
     'test_set_via_pmc'()    # 3 tests
     'test_get_via_pmc'()    # 4 tests
     'test_interface_done'() # 4 tests
-    'test_get_iter'()       # 1 tests
+    'test_get_iter'()       # 1 test
+    'test_equality'()       # 5 tests
 .end
 
 .sub 'test_set_size'
@@ -209,6 +210,29 @@ out-of-bounds test. Checks INT and PMC keys.
     goto loop
   loop_end:
     is($S0, "424344", "Iteration works")
+.end
+
+.sub 'test_equality'
+    .local pmc a1, a2
+    a1 = new ['FixedIntegerArray']
+    a2 = new ['FixedIntegerArray']
+
+    is(a1, a2, "Empty arrays are equal")
+    
+    a1 = 3
+    isnt(a1, a2, "Different size arrays aren't equal")
+
+    a2 = 3
+
+    a1[0] = 42
+    a2[0] = 42
+    is(a1, a2, "Equal with first element set")
+
+    a1[1] = 84
+    isnt(a1, a2, "Not equal when second element differ")
+    
+    a2[1] = 84
+    is(a1, a2, "Equal when second element same")
 .end
 
 
