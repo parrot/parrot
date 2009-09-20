@@ -489,6 +489,8 @@ C<value>.
 
 /*
 
+=item C<STRING *get_string()>
+
 =item C<STRING *get_repr()>
 
 Returns the Parrot string representation C<key>.
@@ -496,6 +498,9 @@ Returns the Parrot string representation C<key>.
 =cut
 
 */
+    VTABLE STRING *get_string() {
+        return STATICSELF.get_repr();
+    }
 
     VTABLE STRING *get_repr() {
 
@@ -518,6 +523,43 @@ Returns the Parrot string representation C<key>.
     }
 
 
+/*
+
+=item C<INTVAL is_equal(PMC *value)>
+
+The C<==> operation. Compares two array to hold equal elements.
+
+=cut
+
+*/
+
+    VTABLE INTVAL is_equal(PMC *value) {
+        INTVAL j, n;
+
+        if (value->vtable->base_type != SELF->vtable->base_type)
+            return 0;
+
+        n = SELF.elements();
+
+        if (VTABLE_elements(INTERP, value) != n)
+            return 0;
+
+        for (j = 0; j < n; ++j) {
+            STRING * const item1 = SELF.get_string_keyed_int(j);
+            STRING * const item2 = VTABLE_get_string_keyed_int(INTERP, value, j);
+
+            if (item1 == item2)
+                continue;
+
+            if (item1 == NULL ||  item2 == NULL)
+                return 0;
+
+            if (!Parrot_str_equal(interp, item1, item2))
+                return 0;
+        }
+
+        return 1;
+    }
 
 /*
 

@@ -19,7 +19,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(36)
+    plan(42)
 
     'test_set_size'()       # 2 tests
     'test_reset_size'()     # 1 test
@@ -32,9 +32,11 @@ out-of-bounds test. Checks INT and PMC keys.
     'test_clone'()          # 3 tests
     'test_clone_unitialized'() # 2 tests
     'test_truth'()          # 2 tests
-    'test_gc'()             # 4 tests
     'test_get_iter'()       # 1 test
     'test_freez_thaw'()     # 1 test
+    'test_get_string'()     # 1 test
+    'test_equality'()       # 3 tests
+    'test_gc'()             # 4 tests
 .end
 
 .sub 'test_set_size'
@@ -314,6 +316,38 @@ out-of-bounds test. Checks INT and PMC keys.
   loop_end:
     is($S0, "42434499101", "get_iter works")
 .end
+
+.sub 'test_get_string'
+    $P0 = new ['FixedStringArray']
+    $P0 = 2
+    $P0[0] = "foo"
+    is($P0, '[ "foo", "" ]', "Array stringified properly")
+.end
+
+.sub 'test_equality'
+    .local pmc a1, a2
+    a1 = new ['FixedStringArray']
+    a2 = new ['FixedStringArray']
+
+    is(a1, a2, "Empty arrays are equal")
+    
+    a1 = 3
+    isnt(a1, a2, "Different size arrays aren't equal")
+
+    a2 = 3
+
+    a1[0] = "foo"
+    a2[0] = "foo"
+    is(a1, a2, "Equal with first element set")
+
+    a1[1] = "bar"
+    a2[1] = "BAR"
+    isnt(a1, a2, "Not equal when second element differ")
+    
+    a2[1] = "bar"
+    is(a1, a2, "Equal when second element same")
+.end
+
 
 # Local Variables:
 #   mode: cperl
