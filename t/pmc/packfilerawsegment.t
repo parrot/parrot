@@ -25,9 +25,10 @@ Tests the PackfileRawSegment PMC.
 .include 'packfile_segments.pasm'
 .sub 'main' :main
 .include 'test_more.pir'
-    plan(5)
+    plan(7)
     test_elements()
     test_get_integer()
+    test_push_integer()
     test_type()
 .end
 
@@ -60,6 +61,19 @@ Tests the PackfileRawSegment PMC.
     $I1   = pfseg[4]
     $I0   = $I0 + $I1
     ok($I0, "PackfileRawSegment.get_integer_keyed_int returns some data")
+.end
+
+# PackfileRawSegment.push_integer
+.sub 'test_push_integer'
+    .local pmc pfseg
+    pfseg = new ['PackfileRawSegment']
+
+    push pfseg, 0x1d1
+    push pfseg, 0x002
+    $I0 = pfseg[0]
+    is($I0, 0x1d1, "PackfileRawSegment.push_integer (1)")
+    $I0 = pfseg[1]
+    is($I0, 0x002, "PackfileRawSegment.push_integer (2)")
 .end
 
 # PackfileRawSegment.type

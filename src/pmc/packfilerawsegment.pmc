@@ -175,6 +175,20 @@ Set an integer's worth of data in the segment.
 
 /*
 
+=item C<void push_integer(INTVAL value)>
+
+Append opcode to segment
+
+=cut
+
+*/
+    VTABLE void push_integer(INTVAL value)  {
+        VTABLE_push_integer(interp,
+            PARROT_PACKFILERAWSEGMENT(SELF)->opcodes, value);
+    }
+
+/*
+
 =item C<METHOD type()>
 
 Set of get segment type.
