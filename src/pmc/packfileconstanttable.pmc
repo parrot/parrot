@@ -331,8 +331,6 @@ Get or create constant for passed value.
 
 =cut
 
-TODO: Add same for PMCs.
-
 */
     MULTI INTVAL get_or_create_constant(STRING *value) {
         Parrot_PackfileConstantTable_attributes *attrs =
@@ -371,6 +369,30 @@ TODO: Add same for PMCs.
         }
         /* Constant not found. Add new one */
         VTABLE_set_number_keyed_int(interp, SELF, i, value);
+        return i;
+    }
+
+    MULTI INTVAL get_or_create_constant(PMC *value) {
+        Parrot_PackfileConstantTable_attributes *attrs =
+                PARROT_PACKFILECONSTANTTABLE(SELF);
+        INTVAL   num = VTABLE_elements(interp, attrs->types);
+        INTVAL   i;
+        PMC     *val;
+        INTVAL   val_type = value->vtable->base_type == enum_class_Key
+                            ? PFC_KEY
+                            : PFC_PMC;
+
+        for (i=0; i < num; ++i) {
+            INTVAL type = VTABLE_get_integer_keyed_int(interp, attrs->types, i);
+            if (type != val_type)
+                continue;
+
+            val = VTABLE_get_pmc_keyed_int(interp, attrs->constants, i);
+            if (VTABLE_is_equal(INTERP, value, val))
+                return i;
+        }
+        /* Constant not found. Add new one */
+        VTABLE_set_pmc_keyed_int(interp, SELF, i, value);
         return i;
     }
 
