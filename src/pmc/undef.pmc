@@ -49,11 +49,11 @@ appropriate type.
             PMC        *clone   = VTABLE_clone(interp, other);
             void       *attrs   = PMC_data(clone);
             PMC        *meta    = PMC_metadata(clone);
-            pmc_reuse_by_class(INTERP, SELF, class_, PObj_is_object_FLAG);
 
             /* now swap memory without leaking it */
             PMC_data(clone)     = PMC_data(SELF);
             PMC_data(SELF)      = attrs;
+            SELF->vtable        = clone->vtable;
 
             /* Restore metadata. */
             if (!PMC_IS_NULL(meta)) {

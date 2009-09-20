@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -19,7 +19,7 @@ Tests mainly morphing undef to other types.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(23)
+    plan(24)
 
     morph_to_string()
     undef_pmc_is_false()
@@ -191,6 +191,9 @@ Tests mainly morphing undef to other types.
     $I0 = isa $P0, $P1
     ok( $I0, 'Assign Object to Undef' )
 
+    $S0 = $P0
+    is( $S0, 'A string', '... and the right object' )
+
     $P0 = new "Undef"
     $P1 = subclass 'ResizablePMCArray', 'FooRPA'
     $P2 = new $P1
@@ -200,6 +203,12 @@ Tests mainly morphing undef to other types.
 
     # TODO: Needs tests to verify that the values and metadata are preserved
     #       across the assignment
+.end
+
+.namespace [ 'HI' ]
+
+.sub get_string :vtable :method
+    .return( 'A string' )
 .end
 
 # Local Variables:
