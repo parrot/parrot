@@ -56,16 +56,12 @@ my $exe = $lang eq 'rakudo'
             ? qq{Source: ".\\parrot-*.exe"; DestDir: "{app}\\bin"; Flags:}
             : '; no .exe'
         );
-my $pbc = <*.pbc>
+my $pbc = <*.pbc> && ! -d $lang
         ? qq{Source: ".\\*.pbc"; DestDir: "{app}\\lib\\parrot\\languages\\$lang"; Flags:}
         : '; no .pbc';
 my $lng = -d $lang
-        ? qq{Source: ".\\$lang\\*"; DestDir: "{app}\\lib\\parrot\\languages\\$lang"; Flags: ignoreversion recursesubdirs}
+        ? qq{Source: ".\\$lang\\*.pbc"; DestDir: "{app}\\lib\\parrot\\languages\\$lang"; Flags: ignoreversion recursesubdirs}
         : '; no lang';
-my $lib = <library/*.pbc>
-#        ? qq{Source: ".\\library\\*.pbc"; DestDir: "{app}\\lib\\parrot\\languages\\$lang\\library"; Flags: ignoreversion recursesubdirs}
-        ? qq{Source: ".\\library\\*.pbc"; DestDir: "{app}\\lib\\parrot\\library\\$lang"; Flags: ignoreversion recursesubdirs}
-        : '; no .pbc lib';
 my $pmc = <src/pmc/*.dll>
         ? qq{Source: ".\\src\\pmc\\*.dll"; DestDir: "{app}\\lib\\parrot\\dynext"; Flags:}
         : '; no pmc';
@@ -113,7 +109,6 @@ Uninstallable=no
 $exe
 $pbc
 $lng
-$lib
 $pmc
 $ops
 $dynext
