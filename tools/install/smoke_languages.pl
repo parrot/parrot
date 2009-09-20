@@ -10,7 +10,7 @@ use Cwd;
 use Getopt::Long;
 use File::Spec::Functions;
 
-use Test::More tests => 32;
+use Test::More tests => 33;
 
 =head1 NAME
 
@@ -129,6 +129,27 @@ $out = `$parrot bfc.pbc`;
 ok($out =~ /^usage/, "check bfc");
 $out = `$parrot bfco.pbc`;
 ok($out =~ /^usage/, "check bfco");
+}
+
+SKIP:
+{
+if (-d "$pwd/$langdir/blizkost") {
+    chdir("$pwd/$langdir/blizkost");
+}
+elsif (-d "$pwd/$langdir/perl5") {
+    chdir("$pwd/$langdir/perl5");
+}
+else {
+    skip("blizkost", 1)
+}
+$filename = 'test.pl';
+open $FH, '>', $filename
+        or die "Can't open $filename ($!).\n";
+print $FH "print qq{Hello, World!\n};\n";
+close $FH;
+$out = `$parrot perl5.pbc $filename`;
+ok($out eq "Hello, World!\n" || $out eq "Hello, World!\r\n", "check blizkost");
+unlink($filename);
 }
 
 SKIP:
