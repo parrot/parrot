@@ -3180,7 +3180,7 @@ PDB_hasinstruction(ARGIN(const char *c))
             h = 1;
         }
         else if (*c == ':') {
-            /* this is a label. RT #46137 right? */
+            /* probably a label */
             h = 0;
         }
 
