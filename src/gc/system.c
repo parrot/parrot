@@ -172,18 +172,18 @@ trace_system_areas(PARROT_INTERP)
         struct ucontext ucp;
         void *current_regstore_top;
 
+        /* Trace the memory block for the register backing stack, which
+           is separate from the normal system stack. The register backing
+           stack starts at memory address 0x80000FFF80000000 and ends at
+           current_regstore_top. */
+        size_t base = 0x80000fff80000000;
+
         getcontext(&ucp);
 
         /* flush_reg_store() is defined in config/gen/platforms/ia64/asm.s.
            it calls the flushrs opcode to perform the register flush, and
            returns the address of the register backing stack. */
         current_regstore_top = flush_reg_store();
-
-        /* Trace the memory block for the register backing stack, which
-           is separate from the normal system stack. The register backing
-           stack starts at memory address 0x80000FFF80000000 and ends at
-           current_regstore_top. */
-        size_t base = 0x80000fff80000000;
 
 #  endif /* __hpux */
 
