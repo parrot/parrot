@@ -1,12 +1,6 @@
-#! perl
+#! parrot
 # Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 12;
 
 =head1 NAME
 
@@ -23,275 +17,200 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting array size" );
-    new P0, ['FixedIntegerArray']
+.sub 'main' :main
+    .include 'test_more.pir'
+    plan(24)
 
-    set I0,P0
-    eq I0,0,OK_1
-    print "not "
-OK_1:    print "ok 1\n"
+    'test_set_size'()       # 2 tests
+    'test_reset_size'()     # 1 test
+    'test_set_first'()      # 3 tests
+    'test_set_second'()     # 3 tests
+    'test_out_of_bounds'()  # 4 tests
+    'test_set_via_pmc'()    # 3 tests
+    'test_get_via_pmc'()    # 4 tests
+    'test_interface_done'() # 4 tests
+    'test_get_iter'()       # 1 tests
+.end
 
-    set P0,1
-    set I0,P0
-    eq I0,1,OK_2
-    print "not "
-OK_2:    print "ok 2\n"
+.sub 'test_set_size'
+    $P0 = new ['FixedIntegerArray']
 
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
+    $I0 = $P0
+    is($I0, 0, "Fresh array has 0 elements")
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "Resetting array size (and getting an exception)" );
-    new P0, ['FixedIntegerArray']
+    $P0 = 42
+    $I0 = $P0
+    is($I0, 42, "Size was set correctly")
+.end
 
-    set I0,P0
-    set P0,1
-    set P0,2
-    print "Should have gotten an exception\n "
+.sub 'test_reset_size'
+    $P0 = new ['FixedIntegerArray']
+
+    $I0 = 1
+    $P0 = 1
+    push_eh handled
+    $P0 = 2
+    $I0 = 0
+  handled:
+    pop_eh
+
+    ok($I0, "Can't resize")
+.end
+
+.sub 'test_set_first'
+    $P0 = new ['FixedIntegerArray']
+    $P0 = 1
+
+    $P0[0] = -7
+    $I0 = $P0[0]
+    is($I0, -7, "First element set to integer properly")
+
+    $P0[0] = 3.7
+    $I0 = $P0[0]
+    is($I0, 3, "First element set to number properly")
+
+    $P0[0] = "17"
+    $I0 = $P0[0]
+    is($I0, 17, "First element set to string properly")
+.end
+
+.sub 'test_set_second'
+    $P0 = new ['FixedIntegerArray']
+    $P0 = 2
+
+    $P0[1] = -7
+    $I0 = $P0[1]
+    is($I0, -7, "Second element set to integer properly")
+
+    $P0[1] = 3.7
+    $I0 = $P0[1]
+    is($I0, 3, "Second element set to number properly")
+
+    $P0[1] = "17"
+    $I0 = $P0[1]
+    is($I0, 17, "Second element set to string properly")
+.end
 
 
-        end
-CODE
-/FixedIntegerArray: Can't resize!
-current instr\.:/
-OUTPUT
+.sub 'test_out_of_bounds'
+    $P0 = new ['FixedIntegerArray']
+    $P0 = 1
 
-#VIM's syntax highlighter needs this line
+    $I0 = 1
+    push_eh handle_set
+    $P0[2] = 7
+    $I0 = 0
+  handle_set:
+    ok($I0, "Can't set out-of-bounds element")
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting first element" );
-    new P0, ['FixedIntegerArray']
-    set P0, 1
+    $I0 = 1
+    push_eh handle_set_negative
+    $P0[-42] = 7
+    $I0 = 0
+  handle_set_negative:
+    ok($I0, "Can't set element on negative index")
 
-    set P0[0],-7
-    set I0,P0[0]
-    eq I0,-7,OK_1
-    print "not "
-OK_1:    print "ok 1\n"
+    $I0 = 1
+    push_eh handle_get
+    $I1 = $P0[2]
+    $I0 = 0
+  handle_get:
+    ok($I0, "Can't get out-of-bounds element")
 
-    set P0[0],3.7
-    set N0,P0[0]
-    eq N0,3.0,OK_2
-    print "not "
-OK_2:    print "ok 2\n"
+    $I0 = 1
+    push_eh handle_get_negative
+    $I1 = $P0[-1]
+    $I0 = 0
+  handle_get_negative:
+    ok($I0, "Can't get element with negative index")
 
-    set P0[0],"17"
-    set S0,P0[0]
-    eq S0,"17",OK_3
-    print "not "
-OK_3:    print "ok 3\n"
+.end
 
-    end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
+# Set via PMC keys, access via INTs
+.sub 'test_set_via_pmc'
+    $P0 = new ['FixedIntegerArray']
+    $P0 = 3
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting second element" );
-    new P0, ['FixedIntegerArray']
-    set P0, 2
+    $P1 = new ['Key']
 
-    set P0[1], -7
-    set I0, P0[1]
-    eq I0,-7,OK_1
-    print "not "
-OK_1:    print "ok 1\n"
+    $P1 = 0
+    $P0[$P1] = 25
+    $I0 = $P0[0]
+    is($I0, 25, "Set INTVAL via PMC Key works")
 
-    set P0[1], 3.7
-    set N0, P0[1]
-    eq N0,3.0,OK_2
-    print "not "
-OK_2:    print "ok 2\n"
+    $P1 = 1
+    $P0[$P1] = 2.5
+    $I0 = $P0[1]
+    is($I0, 2, "Set FLOATVAL via PMC Key works")
 
-    set P0[1],"17"
-    set S0, P0[1]
-    eq S0,"17",OK_3
-    print "not "
-OK_3:    print "ok 3\n"
+    $P1 = 2
+    $P0[$P1] = "17"
+    $I0 = $P0[2]
+    is($I0, 17, "Set STRING via PMC Key works")
+.end
 
-    end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
+# Set via INTs, access via PMC Keys
+.sub 'test_get_via_pmc'
+    $P0 = new ['FixedIntegerArray']
+    $P0 = 1024
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
-    new P0, ['FixedIntegerArray']
-    set P0, 1
+    $P0[25]   = 125
+    $P0[128]  = 10.2
+    $P0[513]  = "17"
 
-    set P0[1], -7
+    $P1 = new ['Integer']
+    $P1 = 123456
+    $P0[1023] = $P1
 
-    end
-CODE
-/FixedIntegerArray: index out of bounds!
-current instr\.:/
-OUTPUT
+    $P2 = new ['Key']
+    
+    $P2 = 25
+    $I0 = $P0[$P2]
+    is($I0, 125, "Get INTVAL via Key works")
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
-    new P0, ['FixedIntegerArray']
-    set P0, 1
+    $P2 = 128
+    $N0 = $P0[$P2]
+    is($N0, 10.0, "Get FLOATVAL via Key works")
 
-    set I0, P0[1]
-    end
-CODE
-/FixedIntegerArray: index out of bounds!
-current instr\.:/
-OUTPUT
+    $P2 = 513
+    $S0 = $P0[$P2]
+    is($S0, "17", "Get STRING via Key works")
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements, I" );
-    new P0, ['FixedIntegerArray']
-    set P0, 1
-    set I1, 1
-    set I0, P0[I1]
-    end
-CODE
-/FixedIntegerArray: index out of bounds!
-current instr\.:/
-OUTPUT
+    $P2 = 1023
+    $I0 = $P0[$P2]
+    is($I0, 123456, "Get INTVAL for stored PMC via Key works")
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements, -I" );
-    new P0, ['FixedIntegerArray']
-    set P0, 1
-    set I1, -1
-    set I0, P0[I1]
-    end
-CODE
-/FixedIntegerArray: index out of bounds!
-current instr\.:/
-OUTPUT
+.end
 
-pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );
-     .include 'fp_equality.pasm'
-     new P0, ['FixedIntegerArray']
-     set P0, 3
-     new P1, ['Key']
-
-     set P1, 0
-     set P0[P1], 25
-
-     set P1, 1
-     set P0[P1], 2.5
-
-     set P1, 2
-     set P0[P1], "17"
-
-     set I0, P0[0]
-     eq I0, 25, OK1
-     print "not "
-OK1: print "ok 1\\n"
-
-     set N0, P0[1]
-     .fp_eq_pasm(N0, 2.0, OK2)
-     print "not "
-OK2: print "ok 2\\n"
-
-     set S0, P0[2]
-     eq S0, "17", OK3
-     print "not "
-OK3: print "ok 3\\n"
-
-     end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys" );
-     .include 'fp_equality.pasm'
-     new P0, ['FixedIntegerArray']
-     set P0, 1024
-
-     set P0[25], 125
-     set P0[128], 10.2
-     set P0[513], "17"
-     new P1, ['Integer']
-     set P1, 123456
-     set P0[1023], P1
-
-     new P2, ['Key']
-     set P2, 25
-     set I0, P0[P2]
-     eq I0, 125, OK1
-     print "not "
-OK1: print "ok 1\\n"
-
-     set P2, 128
-     set N0, P0[P2]
-     .fp_eq_pasm(N0, 10.0, OK2)
-     print "not "
-OK2: print "ok 2\\n"
-
-     set P2, 513
-     set S0, P0[P2]
-     eq S0, "17", OK3
-     print "not "
-OK3: print "ok 3\\n"
-
-     set P2, 1023
-     set P3, P0[P2]
-     set I1, P3
-     eq I1, 123456, OK4
-     print "not "
-OK4: print "ok 4\\n"
-
-     end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
-
-.sub _main
+.sub 'test_interface_done'
     .local pmc pmc1
     pmc1 = new ['FixedIntegerArray']
     .local int bool1
     does bool1, pmc1, "scalar"
-    print bool1
-    print "\n"
+    nok(bool1, "Does not scalar")
     does bool1, pmc1, "array"
-    print bool1
-    print "\n"
+    ok(bool1, "Does array")
     does bool1, pmc1, "no_interface"
-    print bool1
-    print "\n"
-    end
+    nok(bool1, "Does not no_interface")
 .end
-CODE
-0
-1
-0
-OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "get_iter" );
-.sub 'main' :main
-    new $P0, ['FixedIntegerArray']
-    set $P0, 3
+.sub 'test_get_iter'
+    $P0 = new ['FixedIntegerArray']
+    $P0 = 3
     $P0[0] = 42
     $P0[1] = 43
     $P0[2] = 44
+    $S0 = ""
     $P1 = iter $P0
-loop:
+  loop:
     unless $P1 goto loop_end
     $S2 = shift $P1
-    say $S2
+    concat $S0, $S2
     goto loop
-loop_end:
+  loop_end:
+    is($S0, "424344", "Iteration works")
 .end
-CODE
-42
-43
-44
-OUTPUT
 
-
-1;
 
 # Local Variables:
 #   mode: cperl
