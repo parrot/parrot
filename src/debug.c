@@ -3146,17 +3146,6 @@ PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
 
 Return true if the line has an instruction.
 
-RT #46129:
-
-=over 4
-
-=item * This should take the line, get an instruction, get the opcode for
-that instruction and check that is the correct one.
-
-=item * Decide what to do with macros if anything.
-
-=back
-
 =cut
 
 */
