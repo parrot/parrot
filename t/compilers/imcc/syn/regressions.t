@@ -37,7 +37,7 @@ ok 1 - caught div_i_ic_ic exception
 ok 2 - caught div_n_nc_nc exception
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'comments before .param(RT #46499)');
+pir_output_is( <<'CODE', <<'OUT', 'comments before .param(TT #1035)');
 .sub main :main
   comments(1,2)
 .end
@@ -51,7 +51,7 @@ CODE
 hello
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'comments between .param(RT #46499)', todo => 'broken');
+pir_output_is( <<'CODE', <<'OUT', 'comments between .param(TT #1035)', todo => 'broken');
 .sub main :main
   comments(1,2)
 .end
@@ -65,7 +65,7 @@ CODE
 hello
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'whitespace before .param(RT #46499)');
+pir_output_is( <<'CODE', <<'OUT', 'whitespace before .param(TT #1035)');
 .sub main :main
   comments(1,2)
 .end
@@ -79,7 +79,7 @@ CODE
 hello
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'whitespace between .param(RT #46499)', todo => 'broken');
+pir_output_is( <<'CODE', <<'OUT', 'whitespace between .param(TT #1035)', todo => 'broken');
 .sub main :main
   comments(1,2)
 .end
