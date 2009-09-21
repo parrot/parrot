@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 16;
 
 pir_error_output_like( <<'CODE', <<'OUT', 'invalid get_results syntax');
 .sub main :main
@@ -199,6 +199,37 @@ pir_error_output_like( <<'CODE', <<'OUT', 'No segfault from syntax error, RT #60
 CODE
 /syntax error.+unexpected/
 OUT
+
+pir_output_like( <<'CODE', <<'OUT', 'Segfault, TT #1027', todo=>'segfaulting');
+.sub main :main
+push_eh handler
+test()
+## NB: This makes sure the sub call PC is sufficiently
+## different from the exception handler PC.
+print "foo\n"
+print "bar\n"
+.return ()
+handler:
+.local pmc exception
+.local string message
+.get_results (exception, message)
+print "Error: "
+print message
+.end
+
+.sub test
+## Throw an exception.
+$P0 = new 'Exception'
+$P0 = 'oops'
+throw $P0
+.end
+CODE
+/.*/
+OUT
+
+
+
+
 
 # Local Variables:
 #   mode: cperl
