@@ -1134,9 +1134,6 @@ debugger and it is the first call, set a breakpoint.
 When you re run/continue the program being debugged it will pay no attention to
 the debug ops.
 
-RT #42377: clone the interpreter to allow people to play into the
-debugger and then continue the normal execution of the program.
-
 =cut
 
 */
