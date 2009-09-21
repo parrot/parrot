@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 24;
 
 ##############################
 # Parrot Calling Conventions
@@ -561,6 +561,37 @@ pir_output_is( <<'CODE', <<'OUT', 'Unicode allowed in method names, TT #730' );
 CODE
 ok 1 - Unicode method names allowed
 ok 2 - Unicode method names allowed
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'named parameters', todo => 'long version fails, TT# 1030');
+.sub main
+.local pmc foo
+foo = get_global 'foo'
+
+foo('x' => 1, 'y' => 2)
+foo(1 :named('x'), 2 :named('y'))
+
+.begin_call
+.set_arg 1 :named('x')
+.set_arg 2 :named('y')
+.call foo
+.end_call
+.end
+
+.sub foo
+.param int i :named('y')
+.param int j :named('x')
+say i
+say j
+.end
+
+CODE
+2
+1
+2
+1
+2
+1
 OUT
 
 # Local Variables:
