@@ -370,29 +370,29 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
         switch (opt.opt_id) {
             case 'R':
                 if (STREQ(opt.opt_arg, "slow") || STREQ(opt.opt_arg, "bounds"))
-                    core |= PARROT_SLOW_CORE;
+                    core = PARROT_SLOW_CORE;
                 else if (STREQ(opt.opt_arg, "fast") || STREQ(opt.opt_arg, "function"))
-                    core |= PARROT_FAST_CORE;
+                    core = PARROT_FAST_CORE;
                 else if (STREQ(opt.opt_arg, "switch"))
-                    core |= PARROT_SWITCH_CORE;
+                    core = PARROT_SWITCH_CORE;
                 else if (STREQ(opt.opt_arg, "cgp"))
-                    core |= PARROT_CGP_CORE;
+                    core = PARROT_CGP_CORE;
                 else if (STREQ(opt.opt_arg, "cgoto"))
-                    core |= PARROT_CGOTO_CORE;
+                    core = PARROT_CGOTO_CORE;
                 else if (STREQ(opt.opt_arg, "jit"))
-                    core |= PARROT_FAST_CORE;
+                    core = PARROT_FAST_CORE;
                 else if (STREQ(opt.opt_arg, "cgp-jit"))
-                    core |= PARROT_CGP_CORE;
+                    core = PARROT_CGP_CORE;
                 else if (STREQ(opt.opt_arg, "switch-jit"))
-                    core |= PARROT_SWITCH_CORE;
+                    core = PARROT_SWITCH_CORE;
                 else if (STREQ(opt.opt_arg, "exec"))
-                    core |= PARROT_EXEC_CORE;
+                    core = PARROT_EXEC_CORE;
                 else if (STREQ(opt.opt_arg, "trace"))
-                    core |= PARROT_SLOW_CORE;
+                    core = PARROT_SLOW_CORE;
                 else if (STREQ(opt.opt_arg, "profiling"))
-                    core  = PARROT_PROFILING_CORE;
+                    core = PARROT_PROFILING_CORE;
                 else if (STREQ(opt.opt_arg, "gcdebug"))
-                    core |= PARROT_GC_DEBUG_CORE;
+                    core = PARROT_GC_DEBUG_CORE;
                 else
                     Parrot_ex_throw_from_c_args(interp, NULL, 1,
                         "main: Unrecognized runcore '%s' specified."
@@ -496,9 +496,10 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                     IMCC_INFO(interp)->optimizer_level |= (OPT_PRE | OPT_CFG);
                 }
                 if (strchr(opt.opt_arg, 't')) {
-                    core |= PARROT_SWITCH_CORE;
 #ifdef HAVE_COMPUTED_GOTO
-                    core |= PARROT_CGP_CORE;
+                    core = PARROT_CGP_CORE;
+#else
+                    core = PARROT_SWITCH_CORE;
 #endif
                 }
                 break;
