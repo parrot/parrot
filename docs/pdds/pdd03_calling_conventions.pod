@@ -238,9 +238,6 @@ the case of underflow are left untouched, rather than being reset to zero or
 null.  Excess registers explicitly marked B<OPTIONAL> are always reset,
 regardless of the error flag settings.
 
-RT#45357 - which exception?  We really could use an exception subsystem.
-Oh, wait, that's my job.  Never mind.  --Chip
-
 =head4 Ordering of named values (outgoing)
 
 Named values (arguments, or values to return) must be listed textually after
