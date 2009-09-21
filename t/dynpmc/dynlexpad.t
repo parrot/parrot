@@ -205,47 +205,55 @@ ok 3
 OUTPUT
 
 TODO: {
-    local $TODO = "iterator not implemented for DynLexPads";
+    local $TODO = "iterator not implemented for DynLexPads; TT #1028";
 
 pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "dynlexpad - iterator" );
-.sub 'test' :main
-    .local pmc dlp, str1, str2, str3, it, key, interp
 
+.loadlib 'dynlexpad'
+.sub 'onload' :immediate
+    .local pmc interp
+    interp = getinterp
+
+    .local pmc core
+    core = get_class 'LexPad'
+    .local pmc hll
+    hll = get_class 'DynLexPad'
+    interp.'hll_map'(core,hll)
+.end
+
+.sub 'test' :main
+
+    .local pmc str1,str2,str3
     .lex 'a', str1
     .lex 'b', str2
     .lex 'c', str3
 
-    str1 = new 'String'
-    str1 = 'happy pants'
+    str1 = box 'pants'
+    str2 = box 'pants'
+    str3 = box 'pants'
 
-    str2 = new 'String'
-    str2 = 'content pants'
-
-    str3 = new 'String'
-    str3 = 'sad pants'
-
+    .local pmc interp
     interp = getinterp
+
+    .local pmc dlp
     dlp    = interp['lexpad']
 
-    say "Getting iterator"
-    it = iter dlp
-    say "Have iterator"
+    .local pmc iterator
+    iterator = iter dlp
 iter_loop:
-    unless it goto iter_done
-    key = shift it
-    $S0 = key
-    print key
-    print ":"
-    key = dlp[key]
-    $S0 = key
-    say key
+    unless iterator goto iter_done
+    .local pmc key
+    key = shift iterator
+    .local string value
+    value = dlp[key]
+    say value
     goto iter_loop
 iter_done:
 .end
 CODE
-a:happy pants
-b:content pants
-c:sad pants
+pants
+pants
+pants
 OUTPUT
 }
 
