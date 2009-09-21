@@ -201,7 +201,7 @@ CODE
 OUT
 
 SKIP: {
-    skip 'Hang on Linux/i386';
+    skip( 'Hang on Linux i386 and amd64', 1 );
 pir_output_like( <<'CODE', <<'OUT', 'Segfault, TT #1027', todo=>'segfaulting');
 .sub main :main
 push_eh handler
