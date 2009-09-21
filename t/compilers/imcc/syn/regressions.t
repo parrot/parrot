@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 17;
 
 pir_error_output_like( <<'CODE', <<'OUT', 'invalid get_results syntax');
 .sub main :main
@@ -230,6 +230,13 @@ CODE
 OUT
 }
 
+# We shouldn't crash (and valgrind shoudn't report invalid reads)
+pir_output_is( <<'CODE', <<'OUT', 'exit is last op in sub (TT#1009)');
+.sub main :main
+    exit 0
+.end
+CODE
+OUT
 
 
 

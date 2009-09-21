@@ -86,6 +86,7 @@ CODE
 _test:
   noop
   exit 0
+  noop
 OUT
 
 ##############################
