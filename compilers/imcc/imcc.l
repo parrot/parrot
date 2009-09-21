@@ -210,7 +210,6 @@ SP              [ ]
             yy_pop_state(yyscanner);
             yy_scan_string(IMCC_INFO(interp)->frames->heredoc_rest, yyscanner);
 
-            /* RT #42382 delete quotes, -> emit, pbc */
             return STRINGC;
         }
         else {
@@ -549,7 +548,6 @@ SP              [ ]
 <*>{STRINGCONSTANT} {
         valp->s = mem_sys_strdup(yytext);
 
-        /* RT #42382 delete quotes, -> emit, pbc */
         return STRINGC;
     }
 
