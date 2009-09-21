@@ -154,7 +154,7 @@ ok 1
 OUT
 
 my $register = "9" x 4096;
-pir_output_is( <<"CODE", <<'OUT', 'long register numbers in PIR (RT #41788)');
+pir_output_is( <<"CODE", <<'OUT', 'long register numbers in PIR (TT #1025)');
 .sub main
       \$P$register = new 'Integer'
       \$P$register = 3
@@ -167,7 +167,7 @@ OUT
 TODO: {
     local $TODO = "works in PIR, not PASM";
 
-pasm_output_is( <<"CODE", <<'OUT', 'long register numbers in PASM (RT #41788)');
+pasm_output_is( <<"CODE", <<'OUT', 'long register numbers in PASM (TT #1025)');
       new P$register, 'Integer'
       assign P$register, 3
   say P$register
