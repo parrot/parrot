@@ -225,7 +225,7 @@ eh_label:
 
 =pod
 
-RT #46821: should this work? 
+TT #1036: should this work? 
 
 .sub resizablepmcarray_recursive
     .local pmc foo
