@@ -365,12 +365,16 @@ done:
     mysql_stmt_prepare = get_mysql_function('mysql_stmt_prepare', 'ipti')
     $I0 = bytelength stmt_str
     $I1 = mysql_stmt_prepare(stmt, stmt_str, $I0)
+    if $I1 goto failed
 
     .local pmc args
     args = new 'Hash'
     args['stmt'] = stmt
     .local pmc stmtobj
     stmtobj = new ['Mysql';'Statement'], args
+    .return(stmtobj)
+failed:
+    null stmtobj
     .return(stmtobj)
 .end
 
