@@ -1653,7 +1653,7 @@ list_visit(PARROT_INTERP, ARGIN(List *list), ARGMOD(void *pinfo))
     visit_info * const info = (visit_info*) pinfo;
     UINTVAL            idx;
 
-    const UINTVAL n = list_length(interp, list);
+    const UINTVAL n = Parrot_array_length(interp, list);
     PARROT_ASSERT(list->item_type == enum_type_PMC);
 
     for (idx = 0, chunk = list->first; chunk; chunk = chunk->next) {
@@ -1675,7 +1675,7 @@ list_visit(PARROT_INTERP, ARGIN(List *list), ARGMOD(void *pinfo))
 
 /*
 
-=item C<INTVAL list_length(PARROT_INTERP, const List *list)>
+=item C<INTVAL Parrot_array_length(PARROT_INTERP, const List *list)>
 
 Returns the length of the list.
 
@@ -1686,9 +1686,9 @@ Returns the length of the list.
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 INTVAL
-list_length(SHIM_INTERP, ARGIN(const List *list))
+Parrot_array_length(SHIM_INTERP, ARGIN(const List *list))
 {
-    ASSERT_ARGS(list_length)
+    ASSERT_ARGS(Parrot_array_length)
     return list->length;
 }
 
@@ -1821,7 +1821,8 @@ list_insert(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, INTVAL n_items)
 
 /*
 
-=item C<void list_delete(PARROT_INTERP, List *list, INTVAL idx, INTVAL n_items)>
+=item C<void Parrot_array_delete(PARROT_INTERP, List *list, INTVAL idx, INTVAL
+n_items)>
 
 Deletes C<n_items> at C<idx>.
 
@@ -1831,9 +1832,9 @@ Deletes C<n_items> at C<idx>.
 
 PARROT_EXPORT
 void
-list_delete(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, INTVAL n_items)
+Parrot_array_delete(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, INTVAL n_items)
 {
-    ASSERT_ARGS(list_delete)
+    ASSERT_ARGS(Parrot_array_delete)
     List_chunk *chunk;
 
     PARROT_ASSERT(idx >= 0);
@@ -2199,7 +2200,7 @@ list_splice(PARROT_INTERP, ARGMOD(List *list), ARGMOD_NULLOK(List *value_list),
     }
     /* else delete the rest */
     else
-        list_delete(interp, list, offset + i, count - i);
+        Parrot_array_delete(interp, list, offset + i, count - i);
 }
 
 

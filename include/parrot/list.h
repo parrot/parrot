@@ -101,15 +101,6 @@ List * list_clone(PARROT_INTERP, ARGIN(const List *other))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void list_delete(PARROT_INTERP,
-    ARGMOD(List *list),
-    INTVAL idx,
-    INTVAL n_items)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*list);
-
-PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 void * list_get(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, int type)
@@ -217,9 +208,18 @@ void list_visit(PARROT_INTERP, ARGIN(List *list), ARGMOD(void *pinfo))
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pinfo);
 
+PARROT_EXPORT
+void Parrot_array_delete(PARROT_INTERP,
+    ARGMOD(List *list),
+    INTVAL idx,
+    INTVAL n_items)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*list);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-INTVAL list_length(SHIM_INTERP, ARGIN(const List *list))
+INTVAL Parrot_array_length(SHIM_INTERP, ARGIN(const List *list))
         __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_ld __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
@@ -229,9 +229,6 @@ INTVAL list_length(SHIM_INTERP, ARGIN(const List *list))
 #define ASSERT_ARGS_list_clone __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     && PARROT_ASSERT_ARG(other)
-#define ASSERT_ARGS_list_delete __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(list)
 #define ASSERT_ARGS_list_get __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     && PARROT_ASSERT_ARG(list)
@@ -276,7 +273,10 @@ INTVAL list_length(SHIM_INTERP, ARGIN(const List *list))
        PARROT_ASSERT_ARG(interp) \
     && PARROT_ASSERT_ARG(list) \
     && PARROT_ASSERT_ARG(pinfo)
-#define ASSERT_ARGS_list_length __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_array_delete __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    && PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_Parrot_array_length __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(list)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/list.c */

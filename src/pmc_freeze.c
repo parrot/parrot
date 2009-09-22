@@ -1118,7 +1118,7 @@ again:
         if (!finished_first)
             list_unshift(interp, finish_list, info->thaw_result, enum_type_PMC);
 
-        n = list_length(interp, finish_list);
+        n = Parrot_array_length(interp, finish_list);
 
         for (i = 0; i < n ; ++i) {
             current = *(PMC**)list_get(interp, finish_list, i, enum_type_PMC);
