@@ -1753,7 +1753,6 @@ realclean : clean
     $(CONFIGURE_GENERATED_FILES) \
     blib \
     cover_db
-	$(RM_F) $(BUILD_DIR)/*.gc??
 
 distclean : realclean
 
@@ -2028,12 +2027,14 @@ COVER_DIRS := \
     $(SRC_DIR)/string \
     $(SRC_DIR)/string/charset \
     $(SRC_DIR)/string/encoding \
+    $(BUILD_DIR) \
     $(BUILD_DIR)/t/perl \
     $(IO_DIR) \
     $(IMCC_DIR)
 
 cover: \
     cover.dummy \
+    cover-test \
     cover-testb \
 #IF(cg_flag):    cover-testC \
     cover-testf \
@@ -2058,6 +2059,9 @@ cover: \
 cover.dummy:
 	$(PERL) Configure.pl --ccflags="$(CC_FLAGS) $(COVER_FLAGS)" \
     --linkflags="$(COVER_FLAGS)" --ldflags="$(COVER_FLAGS)"
+
+cover-test: cover.dummy
+	-@make@ test
 
 cover-testb: cover.dummy
 	-@make@ testb
