@@ -5,12 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  9;
-use Carp;
-use Cwd;
-use File::Path qw( mkpath );
-use File::Temp qw( tempdir );
-use File::Spec;
+use Test::More tests => 17;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
 use_ok('config::auto::frames');
@@ -21,7 +16,6 @@ use Parrot::Configure::Test qw(
     rerun_defaults_for_testing
     test_step_constructor_and_description
 );
-use IO::CaptureOutput qw( capture );
 
 
 my ($args, $step_list_ref) = process_options( {
@@ -39,6 +33,65 @@ my $pkg = q{auto::frames};
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
+
+# To avoid a warning about an unitialized value, we will set nvsize to 8,
+# cpuarch to i386 and osname to linux.
+# This is normally done during earlier configuration steps.
+$conf->data->set( nvsize => 8 );
+$conf->data->set( cpuarch => 'i386' );
+$conf->data->set( osname => 'linux' );
+
+my $ret = $step->runstep($conf);
+ok( $ret, "runstep() returned true value" );
+ok( defined ( $step->result() ),
+    "Got defined result" );
+$conf->cc_clean();
+
+
+$conf->replenish($serialized);
+
+##### _call_frames_buildable() #####
+
+my $can_build_call_frames;
+
+$conf->options->set( buildframes => 1 );
+$can_build_call_frames = auto::frames::_call_frames_buildable($conf);
+ok( $can_build_call_frames,
+    "_call_frames_buildable() returned true value, as expected" );
+
+$conf->options->set( buildframes => 0 );
+$can_build_call_frames = auto::frames::_call_frames_buildable($conf);
+ok( ! $can_build_call_frames,
+    "_call_frames_buildable() returned false value, as expected" );
+
+$conf->options->set( buildframes => undef );
+$conf->data->set( osname =>  'linux' );
+$conf->data->set( cpuarch =>  'i386' );
+$conf->data->set( nvsize =>  8 );
+$can_build_call_frames = auto::frames::_call_frames_buildable($conf);
+ok( $can_build_call_frames,
+    "_call_frames_buildable() returned true value, as expected (i386/non darwin/8)" );
+
+$conf->data->set( osname =>  'darwin' );
+$conf->data->set( cpuarch =>  'i386' );
+$conf->data->set( nvsize =>  8 );
+$can_build_call_frames = auto::frames::_call_frames_buildable($conf);
+ok( ! $can_build_call_frames,
+    "_call_frames_buildable() returned false value, as expected (i386/darwin/8)" );
+
+$conf->data->set( osname =>  'linux' );
+$conf->data->set( cpuarch =>  'ppc' );
+$conf->data->set( nvsize =>  8 );
+$can_build_call_frames = auto::frames::_call_frames_buildable($conf);
+ok( ! $can_build_call_frames,
+    "_call_frames_buildable() returned false value, as expected (ppc/linux/8)" );
+
+$conf->data->set( osname =>  'linux' );
+$conf->data->set( cpuarch =>  'i386' );
+$conf->data->set( nvsize =>  4 );
+$can_build_call_frames = auto::frames::_call_frames_buildable($conf);
+ok( ! $can_build_call_frames,
+    "_call_frames_buildable() returned false value, as expected (i386/linux/4)" );
 
 ################### DOCUMENTATION ###################
 
