@@ -1753,6 +1753,7 @@ realclean : clean
     $(CONFIGURE_GENERATED_FILES) \
     blib \
     cover_db
+	$(RM_F) $(BUILD_DIR)/*.gc??
 
 distclean : realclean
 
@@ -2015,15 +2016,19 @@ splint : all
 COVER_FLAGS := -fprofile-arcs -ftest-coverage
 COVER_DIRS := \
     $(SRC_DIR) \
+    $(SRC_DIR)/call \
     $(SRC_DIR)/dynoplibs \
     $(SRC_DIR)/dynpmc \
     $(SRC_DIR)/gc \
+    $(SRC_DIR)/interp \
     $(SRC_DIR)/ops \
     $(SRC_DIR)/packfile \
     $(SRC_DIR)/pmc \
+    $(SRC_DIR)/runcore \
     $(SRC_DIR)/string \
     $(SRC_DIR)/string/charset \
     $(SRC_DIR)/string/encoding \
+    $(BUILD_DIR)/t/perl \
     $(IO_DIR) \
     $(IMCC_DIR)
 
