@@ -74,9 +74,8 @@ finish:
 
 # Testing prepared statement
 
-# Skipping, still not working
-    .return()
 
+    say 'prepare...'
     .local pmc stmt
     stmt = m.'prepare'('select * from hello where foo = ?')
     $I0 = stmt.'param_count'()
