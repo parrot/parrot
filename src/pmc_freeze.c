@@ -887,7 +887,7 @@ do_thaw(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info))
         return;
     }
 
-    pos = (PMC **)list_get(interp, (List *)PMC_data(info->id_list),
+    pos = (PMC **)Parrot_pmc_array_get(interp, (List *)PMC_data(info->id_list),
         id, enum_type_PMC);
 
     if (pos == (void *)-1)
@@ -929,10 +929,10 @@ do_thaw(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info))
         *info->thaw_ptr = pmc;
 
 
-    list_assign(interp, (List *)PMC_data(info->id_list), id, pmc, enum_type_PMC);
+    Parrot_pmc_array_assign(interp, (List *)PMC_data(info->id_list), id, pmc, enum_type_PMC);
 
     /* remember nested aggregates depth first */
-    list_unshift(interp, (List *)PMC_data(info->todo), pmc, enum_type_PMC);
+    Parrot_pmc_array_unshift(interp, (List *)PMC_data(info->todo), pmc, enum_type_PMC);
 }
 
 /*
@@ -950,7 +950,7 @@ static void
 add_pmc_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info))
 {
     ASSERT_ARGS(add_pmc_todo_list)
-    list_push(interp, (List *)PMC_data(info->todo), pmc, enum_type_PMC);
+    Parrot_pmc_array_push(interp, (List *)PMC_data(info->todo), pmc, enum_type_PMC);
 }
 
 
@@ -991,7 +991,7 @@ todo_list_seen(PARROT_INTERP, ARGIN(PMC *pmc), ARGMOD(visit_info *info),
             (Hash *)VTABLE_get_pointer(interp, info->seen), pmc, (void *)*id);
 
     /* remember containers */
-    list_unshift(interp, (List *)PMC_data(info->todo), pmc, enum_type_PMC);
+    Parrot_pmc_array_unshift(interp, (List *)PMC_data(info->todo), pmc, enum_type_PMC);
 
     return 0;
 }
@@ -1083,7 +1083,7 @@ visit_loop_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC *current),
 
     /* can't cache upper limit, visit may append items */
 again:
-    while ((list_item = (PMC **)list_shift(interp, todo, enum_type_PMC))) {
+    while ((list_item = (PMC **)Parrot_pmc_array_shift(interp, todo, enum_type_PMC))) {
         current = *list_item;
         if (!current)
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
@@ -1102,7 +1102,7 @@ again:
             if (current == info->thaw_result)
                 finished_first = 1;
             if (current->vtable->thawfinish != interp->vtables[enum_class_default]->thawfinish)
-                list_unshift(interp, finish_list, current, enum_type_PMC);
+                Parrot_pmc_array_unshift(interp, finish_list, current, enum_type_PMC);
         }
     }
 
@@ -1116,12 +1116,12 @@ again:
 
         /* on thawing call thawfinish for each processed PMC */
         if (!finished_first)
-            list_unshift(interp, finish_list, info->thaw_result, enum_type_PMC);
+            Parrot_pmc_array_unshift(interp, finish_list, info->thaw_result, enum_type_PMC);
 
-        n = Parrot_array_length(interp, finish_list);
+        n = Parrot_pmc_array_length(interp, finish_list);
 
         for (i = 0; i < n ; ++i) {
-            current = *(PMC**)list_get(interp, finish_list, i, enum_type_PMC);
+            current = *(PMC**)Parrot_pmc_array_get(interp, finish_list, i, enum_type_PMC);
             if (!PMC_IS_NULL(current))
                 VTABLE_thawfinish(interp, current, info);
         }
