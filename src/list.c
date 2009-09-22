@@ -1302,7 +1302,8 @@ Adds one or more chunks to end of list.
 */
 
 static void
-Parrot_pmc_array_append(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(void *item), int type, UINTVAL idx)
+Parrot_pmc_array_append(PARROT_INTERP, ARGMOD(List *list),
+    ARGIN_NULLOK(void *item), int type, UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pmc_array_append)
     /* initially, list may be empty, also used by assign */
@@ -2076,7 +2077,8 @@ Assigns C<item> of type C<type> to index C<idx>.
 
 PARROT_EXPORT
 void
-Parrot_pmc_array_assign(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, ARGIN_NULLOK(void *item), int type)
+Parrot_pmc_array_assign(PARROT_INTERP, ARGMOD(List *list), INTVAL idx,
+    ARGIN_NULLOK(void *item), int type)
 {
     ASSERT_ARGS(Parrot_pmc_array_assign)
     const INTVAL length = list->length;
