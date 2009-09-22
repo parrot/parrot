@@ -408,7 +408,7 @@ sub make_function_decls {
         $assert .= " __attribute__unused__ int _ASSERT_ARGS_CHECK = ";
         if(@asserts) {
             $assert .= "\\\n       ";
-            $assert .= join(" \\\n    || ", @asserts);
+            $assert .= join(" \\\n    && ", @asserts);
         }
         else {
             $assert .= "0";
