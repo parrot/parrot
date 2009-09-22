@@ -447,11 +447,6 @@ expand_pcc_sub(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
         IMCC_debug(interp, DEBUG_IMC, "add sub ret - %I\n", tmp);
         insert_ins(unit, unit->last_ins, tmp);
     }
-    else if (STREQ(unit->last_ins->opname, "exit")) {
-        /* C<exit> builds RetContinuation pointing to next op_code. So insert some */
-        Instruction *tmp = INS(interp, unit, "noop", NULL, regs, 0, 0, 0);
-        insert_ins(unit, unit->last_ins, tmp);
-    }
 }
 
 /*
