@@ -28,20 +28,20 @@ If the data is not valid, an exception will be thrown.
     fh = open filename, 'r'
     if fh goto slurp_file
     $P0 = new 'Exception'
-    $S0 = concat "can't open file: ", filename
+    $S0 = concat "Can't open file: ", filename
     $P0 = $S0
     throw $P0
 
   slurp_file:
     text = fh.'readall'()
 
-    # convert the text to an object and return it.
-    load_bytecode 'compilers/json/JSON.pbc'
+    # Convert the text to an object and return it.
+    .local pmc json, code, config
+    load_language  'data_json'
+    json = compreg 'data_json'
+    code = json.'compile'(text)
 
-    .local pmc JSON, config
-    JSON = compreg "JSON"
-
-    .tailcall JSON(text)
+    .tailcall code()
 .end
 
 =head2 WriteConfig(config, filename, ?:compact)
