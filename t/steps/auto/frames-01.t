@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 17;
+use Test::More tests => 19;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
 use_ok('config::auto::frames');
@@ -92,6 +92,19 @@ $conf->data->set( nvsize =>  4 );
 $can_build_call_frames = auto::frames::_call_frames_buildable($conf);
 ok( ! $can_build_call_frames,
     "_call_frames_buildable() returned false value, as expected (i386/linux/4)" );
+
+$conf->data->set( has_exec_protect => undef );
+my $exec_protect_test;
+
+$exec_protect_test = 1;
+auto::frames::_handle_exec_protect($conf, $exec_protect_test);
+ok( $conf->data->get( 'has_exec_protect' ),
+    "has_exec_protect set, as expected" );
+
+$exec_protect_test = 0;
+auto::frames::_handle_exec_protect($conf, $exec_protect_test);
+ok( ! $conf->data->get( 'has_exec_protect' ),
+    "has_exec_protect not set, as expected" );
 
 ################### DOCUMENTATION ###################
 
