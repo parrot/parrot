@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 31;
+use Parrot::Test tests => 33;
 
 =head1 NAME
 
@@ -167,6 +167,44 @@ just pining
 additional payload
 backtrace line 1
 backtrace line 2
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'Exception initialized with String' );
+.sub main :main
+  .local pmc ex, exr
+  .local pmc msg, msgr
+  msg = new ['String']
+  msg = 'Message'
+  ex = new ['Exception'], msg
+  push_eh handler
+  throw ex
+  say 'Never here'
+handler:
+  .get_results(exr)
+  msgr = exr['message']
+  say msgr
+.end
+CODE
+Message
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'Exception initialized with Hash' );
+.sub main :main
+  .local pmc ex, exr
+  .local pmc h, msgr
+  h = new ['Hash']
+  h['message'] = 'Message'
+  ex = new ['Exception'], h
+  push_eh handler
+  throw ex
+  say 'Never here'
+handler:
+  .get_results(exr)
+  msgr = exr['message']
+  say msgr
+.end
+CODE
+Message
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "get_results - be sure registers are ok" );
