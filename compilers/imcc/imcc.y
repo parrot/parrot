@@ -1357,7 +1357,7 @@ sub:
          }
      sub_label_op_c
          {
-           $$ = iSUBROUTINE(interp, IMCC_INFO(interp)->cur_unit, $3);
+           iSUBROUTINE(interp, IMCC_INFO(interp)->cur_unit, $3);
          }
      sub_proto '\n'
         {
