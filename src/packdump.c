@@ -42,8 +42,8 @@ static void pobj_flag_dump(PARROT_INTERP, long flags)
 
 #define ASSERT_ARGS_PackFile_Constant_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(ct) \
-    || PARROT_ASSERT_ARG(self)
+    && PARROT_ASSERT_ARG(ct) \
+    && PARROT_ASSERT_ARG(self)
 #define ASSERT_ARGS_pobj_flag_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

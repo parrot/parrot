@@ -76,17 +76,17 @@ static int new_pbc_const(ARGIN(bytecode * const bc))
 
 #define ASSERT_ARGS_add_string_const_from_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(bc) \
-    || PARROT_ASSERT_ARG(str)
+    && PARROT_ASSERT_ARG(str)
 #define ASSERT_ARGS_check_requested_constant __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(bc)
 #define ASSERT_ARGS_create_lexinfo __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(bc) \
-    || PARROT_ASSERT_ARG(sub)
+    && PARROT_ASSERT_ARG(sub)
 #define ASSERT_ARGS_create_sub_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(bc)
 #define ASSERT_ARGS_find_outer_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(bc) \
-    || PARROT_ASSERT_ARG(lexer)
+    && PARROT_ASSERT_ARG(lexer)
 #define ASSERT_ARGS_generate_multi_signature __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(bc)
 #define ASSERT_ARGS_get_namespace_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \

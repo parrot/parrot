@@ -126,50 +126,50 @@ size_t Parrot_io_write_unix(PARROT_INTERP,
 
 #define ASSERT_ARGS_Parrot_io_async_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(filehandle)
+    && PARROT_ASSERT_ARG(filehandle)
 #define ASSERT_ARGS_Parrot_io_close_piohandle_unix \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_Parrot_io_close_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(filehandle)
+    && PARROT_ASSERT_ARG(filehandle)
 #define ASSERT_ARGS_Parrot_io_fdopen_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(filehandle)
+    && PARROT_ASSERT_ARG(filehandle)
 #define ASSERT_ARGS_Parrot_io_flush_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(filehandle)
+    && PARROT_ASSERT_ARG(filehandle)
 #define ASSERT_ARGS_Parrot_io_getblksize_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_Parrot_io_init_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_io_is_closed_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(filehandle)
+    && PARROT_ASSERT_ARG(filehandle)
 #define ASSERT_ARGS_Parrot_io_open_pipe_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(filehandle) \
-    || PARROT_ASSERT_ARG(command)
+    && PARROT_ASSERT_ARG(filehandle) \
+    && PARROT_ASSERT_ARG(command)
 #define ASSERT_ARGS_Parrot_io_open_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(path)
+    && PARROT_ASSERT_ARG(path)
 #define ASSERT_ARGS_Parrot_io_peek_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_io_pipe_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(reader) \
-    || PARROT_ASSERT_ARG(writer)
+    && PARROT_ASSERT_ARG(writer)
 #define ASSERT_ARGS_Parrot_io_read_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(filehandle) \
-    || PARROT_ASSERT_ARG(buf)
+    && PARROT_ASSERT_ARG(filehandle) \
+    && PARROT_ASSERT_ARG(buf)
 #define ASSERT_ARGS_Parrot_io_seek_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(filehandle)
+    && PARROT_ASSERT_ARG(filehandle)
 #define ASSERT_ARGS_Parrot_io_tell_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(filehandle)
+    && PARROT_ASSERT_ARG(filehandle)
 #define ASSERT_ARGS_Parrot_io_write_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(filehandle) \
-    || PARROT_ASSERT_ARG(s)
+    && PARROT_ASSERT_ARG(filehandle) \
+    && PARROT_ASSERT_ARG(s)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/unix.c */
 
@@ -248,32 +248,32 @@ INTVAL Parrot_io_socket_unix(PARROT_INTERP,
 
 #define ASSERT_ARGS_Parrot_io_accept_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(socket)
+    && PARROT_ASSERT_ARG(socket)
 #define ASSERT_ARGS_Parrot_io_bind_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(socket) \
-    || PARROT_ASSERT_ARG(sockaddr)
+    && PARROT_ASSERT_ARG(socket) \
+    && PARROT_ASSERT_ARG(sockaddr)
 #define ASSERT_ARGS_Parrot_io_connect_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(socket) \
-    || PARROT_ASSERT_ARG(r)
+    && PARROT_ASSERT_ARG(socket) \
+    && PARROT_ASSERT_ARG(r)
 #define ASSERT_ARGS_Parrot_io_listen_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(socket)
 #define ASSERT_ARGS_Parrot_io_poll_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(socket)
 #define ASSERT_ARGS_Parrot_io_recv_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(socket) \
-    || PARROT_ASSERT_ARG(s)
+    && PARROT_ASSERT_ARG(socket) \
+    && PARROT_ASSERT_ARG(s)
 #define ASSERT_ARGS_Parrot_io_send_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(socket) \
-    || PARROT_ASSERT_ARG(s)
+    && PARROT_ASSERT_ARG(s)
 #define ASSERT_ARGS_Parrot_io_sockaddr_in __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(addr)
+    && PARROT_ASSERT_ARG(addr)
 #define ASSERT_ARGS_Parrot_io_socket_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(s)
+    && PARROT_ASSERT_ARG(s)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/socket_unix.c */
 

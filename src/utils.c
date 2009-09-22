@@ -79,9 +79,9 @@ static void rec_climb_back_and_mark(
 #define ASSERT_ARGS__srand48 __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_COMPARE __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(a) \
-    || PARROT_ASSERT_ARG(b) \
-    || PARROT_ASSERT_ARG(cmp)
+    && PARROT_ASSERT_ARG(a) \
+    && PARROT_ASSERT_ARG(b) \
+    && PARROT_ASSERT_ARG(cmp)
 #define ASSERT_ARGS_next_rand __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_process_cycle_without_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(c)

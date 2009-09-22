@@ -51,8 +51,8 @@ static void get_sockaddr_in(PARROT_INTERP,
 
 #define ASSERT_ARGS_get_sockaddr_in __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(sockaddr) \
-    || PARROT_ASSERT_ARG(host)
+    && PARROT_ASSERT_ARG(sockaddr) \
+    && PARROT_ASSERT_ARG(host)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

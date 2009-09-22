@@ -46,14 +46,14 @@ PackFile_ByteCode * pirc_compile_file(SHIM_INTERP,
 
 #define ASSERT_ARGS_open_file __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(filename) \
-    || PARROT_ASSERT_ARG(mode)
+    && PARROT_ASSERT_ARG(mode)
 #define ASSERT_ARGS_parse_file __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(infile) \
-    || PARROT_ASSERT_ARG(filename)
+    && PARROT_ASSERT_ARG(infile) \
+    && PARROT_ASSERT_ARG(filename)
 #define ASSERT_ARGS_parse_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pirstring)
+    && PARROT_ASSERT_ARG(pirstring)
 #define ASSERT_ARGS_pirc_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/pirc/src/pircapi.c */

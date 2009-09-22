@@ -225,19 +225,19 @@ void subst_ins(
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_emit_flush __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit)
+    && PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_emit_open __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS__delete_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(ins)
+    && PARROT_ASSERT_ARG(ins)
 #define ASSERT_ARGS__mk_instruction __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(op) \
-    || PARROT_ASSERT_ARG(fmt) \
-    || PARROT_ASSERT_ARG(r)
+    && PARROT_ASSERT_ARG(fmt) \
+    && PARROT_ASSERT_ARG(r)
 #define ASSERT_ARGS_delete_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(ins)
+    && PARROT_ASSERT_ARG(ins)
 #define ASSERT_ARGS_emitb __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_free_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -250,30 +250,30 @@ void subst_ins(
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_ins_print __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(io) \
-    || PARROT_ASSERT_ARG(ins)
+    && PARROT_ASSERT_ARG(io) \
+    && PARROT_ASSERT_ARG(ins)
 #define ASSERT_ARGS_ins_writes2 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(ins)
 #define ASSERT_ARGS_insert_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(tmp)
+    && PARROT_ASSERT_ARG(tmp)
 #define ASSERT_ARGS_instruction_reads __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(ins) \
-    || PARROT_ASSERT_ARG(r)
+    && PARROT_ASSERT_ARG(r)
 #define ASSERT_ARGS_instruction_writes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(ins) \
-    || PARROT_ASSERT_ARG(r)
+    && PARROT_ASSERT_ARG(r)
 #define ASSERT_ARGS_move_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(ins) \
-    || PARROT_ASSERT_ARG(to)
+    && PARROT_ASSERT_ARG(ins) \
+    && PARROT_ASSERT_ARG(to)
 #define ASSERT_ARGS_prepend_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(tmp)
+    && PARROT_ASSERT_ARG(tmp)
 #define ASSERT_ARGS_subst_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(ins) \
-    || PARROT_ASSERT_ARG(tmp)
+    && PARROT_ASSERT_ARG(ins) \
+    && PARROT_ASSERT_ARG(tmp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/instructions.c */
 

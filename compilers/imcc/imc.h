@@ -88,10 +88,10 @@ Instruction * INS_LABEL(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_IMCC_itcall_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(sub)
+    && PARROT_ASSERT_ARG(sub)
 #define ASSERT_ARGS_INS_LABEL __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(r0)
+    && PARROT_ASSERT_ARG(r0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/imcc.y */
 
@@ -129,7 +129,7 @@ IMC_Unit * imc_open_unit(PARROT_INTERP, IMC_Unit_Type t)
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_imc_compile_unit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit)
+    && PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_imc_close_unit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_imc_open_unit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -161,7 +161,7 @@ void imc_reg_alloc(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
        PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_graph_coloring_reg_alloc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit)
+    && PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_ig_test __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(graph)
 #define ASSERT_ARGS_imc_reg_alloc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -375,75 +375,75 @@ int try_find_op(PARROT_INTERP,
 
 #define ASSERT_ARGS_do_yylex_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(yyscanner)
+    && PARROT_ASSERT_ARG(yyscanner)
 #define ASSERT_ARGS_imcc_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_imcc_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_check_op __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(fullname) \
-    || PARROT_ASSERT_ARG(name) \
-    || PARROT_ASSERT_ARG(r)
+    && PARROT_ASSERT_ARG(fullname) \
+    && PARROT_ASSERT_ARG(name) \
+    && PARROT_ASSERT_ARG(r)
 #define ASSERT_ARGS_imcc_compile __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(s) \
-    || PARROT_ASSERT_ARG(error_message)
+    && PARROT_ASSERT_ARG(s) \
+    && PARROT_ASSERT_ARG(error_message)
 #define ASSERT_ARGS_IMCC_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(s)
+    && PARROT_ASSERT_ARG(s)
 #define ASSERT_ARGS_IMCC_compile_file_s __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(s) \
-    || PARROT_ASSERT_ARG(error_message)
+    && PARROT_ASSERT_ARG(s) \
+    && PARROT_ASSERT_ARG(error_message)
 #define ASSERT_ARGS_imcc_compile_pasm __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(s)
+    && PARROT_ASSERT_ARG(s)
 #define ASSERT_ARGS_imcc_compile_pasm_ex __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(s)
+    && PARROT_ASSERT_ARG(s)
 #define ASSERT_ARGS_IMCC_compile_pasm_s __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(s) \
-    || PARROT_ASSERT_ARG(error_message)
+    && PARROT_ASSERT_ARG(s) \
+    && PARROT_ASSERT_ARG(error_message)
 #define ASSERT_ARGS_imcc_compile_pir __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(s)
+    && PARROT_ASSERT_ARG(s)
 #define ASSERT_ARGS_imcc_compile_pir_ex __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(s)
+    && PARROT_ASSERT_ARG(s)
 #define ASSERT_ARGS_IMCC_compile_pir_s __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(s) \
-    || PARROT_ASSERT_ARG(error_message)
+    && PARROT_ASSERT_ARG(s) \
+    && PARROT_ASSERT_ARG(error_message)
 #define ASSERT_ARGS_imcc_vfprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(io) \
-    || PARROT_ASSERT_ARG(format)
+    && PARROT_ASSERT_ARG(io) \
+    && PARROT_ASSERT_ARG(format)
 #define ASSERT_ARGS_iNEW __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(r0) \
-    || PARROT_ASSERT_ARG(type)
+    && PARROT_ASSERT_ARG(unit) \
+    && PARROT_ASSERT_ARG(r0) \
+    && PARROT_ASSERT_ARG(type)
 #define ASSERT_ARGS_INS __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(name) \
-    || PARROT_ASSERT_ARG(r)
+    && PARROT_ASSERT_ARG(unit) \
+    && PARROT_ASSERT_ARG(name) \
+    && PARROT_ASSERT_ARG(r)
 #define ASSERT_ARGS_is_op __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(name)
+    && PARROT_ASSERT_ARG(name)
 #define ASSERT_ARGS_op_fullname __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(dest) \
-    || PARROT_ASSERT_ARG(name) \
-    || PARROT_ASSERT_ARG(args)
+    && PARROT_ASSERT_ARG(name) \
+    && PARROT_ASSERT_ARG(args)
 #define ASSERT_ARGS_register_compilers __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_try_find_op __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(name) \
-    || PARROT_ASSERT_ARG(r)
+    && PARROT_ASSERT_ARG(unit) \
+    && PARROT_ASSERT_ARG(name) \
+    && PARROT_ASSERT_ARG(r)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/parser_util.c */
 
@@ -494,22 +494,22 @@ SymReg* get_pasm_reg(PARROT_INTERP, ARGIN(const char *name))
 
 #define ASSERT_ARGS_expand_pcc_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(ins)
+    && PARROT_ASSERT_ARG(unit) \
+    && PARROT_ASSERT_ARG(ins)
 #define ASSERT_ARGS_expand_pcc_sub_call __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(ins)
+    && PARROT_ASSERT_ARG(unit) \
+    && PARROT_ASSERT_ARG(ins)
 #define ASSERT_ARGS_expand_pcc_sub_ret __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(ins)
+    && PARROT_ASSERT_ARG(unit) \
+    && PARROT_ASSERT_ARG(ins)
 #define ASSERT_ARGS_get_const __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(name)
+    && PARROT_ASSERT_ARG(name)
 #define ASSERT_ARGS_get_pasm_reg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(name)
+    && PARROT_ASSERT_ARG(name)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/pcc.c */
 

@@ -172,7 +172,7 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_GDB_P __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(s)
+    && PARROT_ASSERT_ARG(s)
 #define ASSERT_ARGS_GDB_print_reg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_get_cmd __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
@@ -187,15 +187,15 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_parse_int __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(str) \
-    || PARROT_ASSERT_ARG(intP)
+    && PARROT_ASSERT_ARG(intP)
 #define ASSERT_ARGS_parse_key __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(str) \
-    || PARROT_ASSERT_ARG(keyP)
+    && PARROT_ASSERT_ARG(str) \
+    && PARROT_ASSERT_ARG(keyP)
 #define ASSERT_ARGS_parse_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(str) \
-    || PARROT_ASSERT_ARG(strP)
+    && PARROT_ASSERT_ARG(str) \
+    && PARROT_ASSERT_ARG(strP)
 #define ASSERT_ARGS_skip_command __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(str)
 #define ASSERT_ARGS_skip_whitespace __attribute__unused__ int _ASSERT_ARGS_CHECK = \

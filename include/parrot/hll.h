@@ -94,10 +94,10 @@ void Parrot_init_HLL(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_register_HLL __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(hll_name)
+    && PARROT_ASSERT_ARG(hll_name)
 #define ASSERT_ARGS_Parrot_register_HLL_lib __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(hll_lib)
+    && PARROT_ASSERT_ARG(hll_lib)
 #define ASSERT_ARGS_Parrot_register_HLL_type __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_init_HLL __attribute__unused__ int _ASSERT_ARGS_CHECK = \

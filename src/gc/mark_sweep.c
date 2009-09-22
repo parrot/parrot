@@ -87,12 +87,12 @@ static PMC_Attribute_Pool * Parrot_gc_create_attrib_pool(PARROT_INTERP,
 
 #define ASSERT_ARGS_free_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pool) \
-    || PARROT_ASSERT_ARG(b)
+    && PARROT_ASSERT_ARG(b)
 #define ASSERT_ARGS_free_buffer_malloc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(b)
 #define ASSERT_ARGS_free_pmc_in_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(p)
+    && PARROT_ASSERT_ARG(p)
 #define ASSERT_ARGS_new_bufferlike_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_new_fixed_size_obj_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
@@ -103,7 +103,7 @@ static PMC_Attribute_Pool * Parrot_gc_create_attrib_pool(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_gc_allocate_new_attributes_arena \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pool)
+    && PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_Parrot_gc_create_attrib_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

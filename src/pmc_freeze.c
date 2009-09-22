@@ -195,77 +195,77 @@ static void visit_todo_list_thaw(PARROT_INTERP,
 
 #define ASSERT_ARGS_add_pmc_todo_list __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(info)
+    && PARROT_ASSERT_ARG(info)
 #define ASSERT_ARGS_create_image __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(info)
+    && PARROT_ASSERT_ARG(info)
 #define ASSERT_ARGS_do_action __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(info)
+    && PARROT_ASSERT_ARG(info)
 #define ASSERT_ARGS_do_thaw __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(info)
+    && PARROT_ASSERT_ARG(info)
 #define ASSERT_ARGS_freeze_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(info)
+    && PARROT_ASSERT_ARG(info)
 #define ASSERT_ARGS_ft_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(info)
+    && PARROT_ASSERT_ARG(info)
 #define ASSERT_ARGS_op_check_size __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(s)
+    && PARROT_ASSERT_ARG(s)
 #define ASSERT_ARGS_push_opcode_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(io)
+    && PARROT_ASSERT_ARG(io)
 #define ASSERT_ARGS_push_opcode_number __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(io)
+    && PARROT_ASSERT_ARG(io)
 #define ASSERT_ARGS_push_opcode_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(io) \
-    || PARROT_ASSERT_ARG(v)
+    && PARROT_ASSERT_ARG(io) \
+    && PARROT_ASSERT_ARG(v)
 #define ASSERT_ARGS_push_opcode_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(io) \
-    || PARROT_ASSERT_ARG(v)
+    && PARROT_ASSERT_ARG(io) \
+    && PARROT_ASSERT_ARG(v)
 #define ASSERT_ARGS_run_thaw __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(image)
+    && PARROT_ASSERT_ARG(image)
 #define ASSERT_ARGS_shift_opcode_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(io)
 #define ASSERT_ARGS_shift_opcode_number __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(io)
 #define ASSERT_ARGS_shift_opcode_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(io)
+    && PARROT_ASSERT_ARG(io)
 #define ASSERT_ARGS_shift_opcode_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(io)
+    && PARROT_ASSERT_ARG(io)
 #define ASSERT_ARGS_thaw_create_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(info)
+    && PARROT_ASSERT_ARG(info)
 #define ASSERT_ARGS_thaw_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(info) \
-    || PARROT_ASSERT_ARG(id) \
-    || PARROT_ASSERT_ARG(type)
+    && PARROT_ASSERT_ARG(info) \
+    && PARROT_ASSERT_ARG(id) \
+    && PARROT_ASSERT_ARG(type)
 #define ASSERT_ARGS_todo_list_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(info)
+    && PARROT_ASSERT_ARG(info)
 #define ASSERT_ARGS_todo_list_seen __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pmc) \
-    || PARROT_ASSERT_ARG(info) \
-    || PARROT_ASSERT_ARG(id)
+    && PARROT_ASSERT_ARG(pmc) \
+    && PARROT_ASSERT_ARG(info) \
+    && PARROT_ASSERT_ARG(id)
 #define ASSERT_ARGS_visit_loop_todo_list __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(info)
+    && PARROT_ASSERT_ARG(info)
 #define ASSERT_ARGS_visit_todo_list __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(info)
+    && PARROT_ASSERT_ARG(info)
 #define ASSERT_ARGS_visit_todo_list_thaw __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(info)
+    && PARROT_ASSERT_ARG(info)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

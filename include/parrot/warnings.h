@@ -66,7 +66,7 @@ void print_pbc_location(PARROT_INTERP)
 
 #define ASSERT_ARGS_Parrot_warn __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(message)
+    && PARROT_ASSERT_ARG(message)
 #define ASSERT_ARGS_print_pbc_location __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

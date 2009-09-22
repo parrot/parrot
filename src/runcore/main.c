@@ -97,12 +97,12 @@ static void turn_ev_check(PARROT_INTERP, int on)
        PARROT_ASSERT_ARG(lib)
 #define ASSERT_ARGS_notify_func_table __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(table)
+    && PARROT_ASSERT_ARG(table)
 #define ASSERT_ARGS_prederef_args __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pc_prederef) \
-    || PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pc) \
-    || PARROT_ASSERT_ARG(opinfo)
+    && PARROT_ASSERT_ARG(interp) \
+    && PARROT_ASSERT_ARG(pc) \
+    && PARROT_ASSERT_ARG(opinfo)
 #define ASSERT_ARGS_stop_prederef __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_turn_ev_check __attribute__unused__ int _ASSERT_ARGS_CHECK = \

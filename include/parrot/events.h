@@ -171,7 +171,7 @@ void Parrot_schedule_broadcast_qentry(ARGIN(struct QUEUE_ENTRY *entry))
 
 #define ASSERT_ARGS_Parrot_del_timer_event __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(timer)
+    && PARROT_ASSERT_ARG(timer)
 #define ASSERT_ARGS_Parrot_do_check_events __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_do_handle_events __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -185,8 +185,8 @@ void Parrot_schedule_broadcast_qentry(ARGIN(struct QUEUE_ENTRY *entry))
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_new_cb_event __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(cbi) \
-    || PARROT_ASSERT_ARG(ext)
+    && PARROT_ASSERT_ARG(cbi) \
+    && PARROT_ASSERT_ARG(ext)
 #define ASSERT_ARGS_Parrot_new_suspend_for_gc_event \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
@@ -196,10 +196,10 @@ void Parrot_schedule_broadcast_qentry(ARGIN(struct QUEUE_ENTRY *entry))
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_schedule_event __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(ev)
+    && PARROT_ASSERT_ARG(ev)
 #define ASSERT_ARGS_Parrot_schedule_interp_qentry __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(entry)
+    && PARROT_ASSERT_ARG(entry)
 #define ASSERT_ARGS_Parrot_sleep_on_event __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_schedule_broadcast_qentry \

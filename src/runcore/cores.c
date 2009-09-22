@@ -347,40 +347,40 @@ static opcode_t * runops_trace_core(PARROT_INTERP,
 
 #define ASSERT_ARGS_runops_cgoto_core __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(runcore) \
-    || PARROT_ASSERT_ARG(pc)
+    && PARROT_ASSERT_ARG(runcore) \
+    && PARROT_ASSERT_ARG(pc)
 #define ASSERT_ARGS_runops_cgp_core __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(runcore) \
-    || PARROT_ASSERT_ARG(pc)
+    && PARROT_ASSERT_ARG(runcore) \
+    && PARROT_ASSERT_ARG(pc)
 #define ASSERT_ARGS_runops_debugger_core __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(runcore) \
-    || PARROT_ASSERT_ARG(pc)
+    && PARROT_ASSERT_ARG(runcore) \
+    && PARROT_ASSERT_ARG(pc)
 #define ASSERT_ARGS_runops_exec_core __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(runcore) \
-    || PARROT_ASSERT_ARG(pc)
+    && PARROT_ASSERT_ARG(runcore) \
+    && PARROT_ASSERT_ARG(pc)
 #define ASSERT_ARGS_runops_fast_core __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(runcore) \
-    || PARROT_ASSERT_ARG(pc)
+    && PARROT_ASSERT_ARG(runcore) \
+    && PARROT_ASSERT_ARG(pc)
 #define ASSERT_ARGS_runops_gc_debug_core __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(runcore) \
-    || PARROT_ASSERT_ARG(pc)
+    && PARROT_ASSERT_ARG(runcore) \
+    && PARROT_ASSERT_ARG(pc)
 #define ASSERT_ARGS_runops_slow_core __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(runcore) \
-    || PARROT_ASSERT_ARG(pc)
+    && PARROT_ASSERT_ARG(runcore) \
+    && PARROT_ASSERT_ARG(pc)
 #define ASSERT_ARGS_runops_switch_core __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(runcore) \
-    || PARROT_ASSERT_ARG(pc)
+    && PARROT_ASSERT_ARG(runcore) \
+    && PARROT_ASSERT_ARG(pc)
 #define ASSERT_ARGS_runops_trace_core __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(runcore) \
-    || PARROT_ASSERT_ARG(pc)
+    && PARROT_ASSERT_ARG(runcore) \
+    && PARROT_ASSERT_ARG(pc)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

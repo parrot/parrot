@@ -153,41 +153,41 @@ static int used_once(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 #define ASSERT_ARGS_branch_branch __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit)
+    && PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_branch_cond_loop __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit)
+    && PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_branch_cond_loop_swap __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(branch) \
-    || PARROT_ASSERT_ARG(start) \
-    || PARROT_ASSERT_ARG(cond)
+    && PARROT_ASSERT_ARG(unit) \
+    && PARROT_ASSERT_ARG(branch) \
+    && PARROT_ASSERT_ARG(start) \
+    && PARROT_ASSERT_ARG(cond)
 #define ASSERT_ARGS_branch_reorg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit)
+    && PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_constant_propagation __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit)
+    && PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_dead_code_remove __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit)
+    && PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_eval_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(op) \
-    || PARROT_ASSERT_ARG(r)
+    && PARROT_ASSERT_ARG(op) \
+    && PARROT_ASSERT_ARG(r)
 #define ASSERT_ARGS_if_branch __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit)
+    && PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_strength_reduce __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit)
+    && PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_unused_label __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit)
+    && PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_used_once __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit)
+    && PARROT_ASSERT_ARG(unit)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

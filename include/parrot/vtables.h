@@ -54,10 +54,10 @@ void parrot_realloc_vtables(PARROT_INTERP)
 
 #define ASSERT_ARGS_Parrot_clone_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(base_vtable)
+    && PARROT_ASSERT_ARG(base_vtable)
 #define ASSERT_ARGS_Parrot_destroy_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(vtable)
+    && PARROT_ASSERT_ARG(vtable)
 #define ASSERT_ARGS_Parrot_initialize_core_vtables \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)

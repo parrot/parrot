@@ -105,7 +105,7 @@ static opcode_t * wait_for_wakeup(PARROT_INTERP,
 
 #define ASSERT_ARGS_do_event __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(event)
+    && PARROT_ASSERT_ARG(event)
 #define ASSERT_ARGS_dup_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(entry)
 #define ASSERT_ARGS_dup_entry_interval __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -114,7 +114,7 @@ static opcode_t * wait_for_wakeup(PARROT_INTERP,
        PARROT_ASSERT_ARG(data)
 #define ASSERT_ARGS_event_to_exception __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(event)
+    && PARROT_ASSERT_ARG(event)
 #define ASSERT_ARGS_init_events_all __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_init_events_first __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -132,7 +132,7 @@ static opcode_t * wait_for_wakeup(PARROT_INTERP,
 #define ASSERT_ARGS_stop_io_thread __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_store_io_event __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(ios) \
-    || PARROT_ASSERT_ARG(ev)
+    && PARROT_ASSERT_ARG(ev)
 #define ASSERT_ARGS_wait_for_wakeup __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

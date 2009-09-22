@@ -161,7 +161,7 @@ STRING * Parrot_get_datatype_name(PARROT_INTERP, INTVAL type)
 #define ASSERT_ARGS_floatval_divide_by_zero __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_Parrot_get_datatype_enum __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(type_name)
+    && PARROT_ASSERT_ARG(type_name)
 #define ASSERT_ARGS_Parrot_get_datatype_name __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

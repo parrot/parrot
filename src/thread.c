@@ -110,11 +110,11 @@ static void* thread_func(ARGIN_NULLOK(void *arg));
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_make_local_args_copy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(old_interp)
+    && PARROT_ASSERT_ARG(old_interp)
 #define ASSERT_ARGS_make_local_copy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(from) \
-    || PARROT_ASSERT_ARG(arg)
+    && PARROT_ASSERT_ARG(from) \
+    && PARROT_ASSERT_ARG(arg)
 #define ASSERT_ARGS_mutex_unlock __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(arg)
 #define ASSERT_ARGS_pt_check_tid __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -127,17 +127,17 @@ static void* thread_func(ARGIN_NULLOK(void *arg));
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_pt_ns_clone __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(d) \
-    || PARROT_ASSERT_ARG(dest_ns) \
-    || PARROT_ASSERT_ARG(s) \
-    || PARROT_ASSERT_ARG(source_ns)
+    && PARROT_ASSERT_ARG(d) \
+    && PARROT_ASSERT_ARG(dest_ns) \
+    && PARROT_ASSERT_ARG(s) \
+    && PARROT_ASSERT_ARG(source_ns)
 #define ASSERT_ARGS_pt_suspend_all_for_gc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_pt_suspend_one_for_gc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_pt_thread_signal __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(self) \
-    || PARROT_ASSERT_ARG(interp)
+    && PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_pt_thread_wait __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_remove_queued_suspend_gc __attribute__unused__ int _ASSERT_ARGS_CHECK = \

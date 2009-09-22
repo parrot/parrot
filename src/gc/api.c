@@ -151,23 +151,23 @@ static int sweep_cb_pmc(PARROT_INTERP,
        PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_fix_pmc_syncs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(dest_interp) \
-    || PARROT_ASSERT_ARG(pool)
+    && PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_free_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_get_free_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pool)
+    && PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_Parrot_gc_merge_buffer_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(dest) \
-    || PARROT_ASSERT_ARG(source)
+    && PARROT_ASSERT_ARG(dest) \
+    && PARROT_ASSERT_ARG(source)
 #define ASSERT_ARGS_sweep_cb_buf __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pool) \
-    || PARROT_ASSERT_ARG(arg)
+    && PARROT_ASSERT_ARG(pool) \
+    && PARROT_ASSERT_ARG(arg)
 #define ASSERT_ARGS_sweep_cb_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pool)
+    && PARROT_ASSERT_ARG(pool)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

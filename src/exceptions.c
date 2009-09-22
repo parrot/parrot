@@ -50,12 +50,12 @@ static opcode_t * pass_exception_args(PARROT_INTERP,
 
 #define ASSERT_ARGS_build_exception_from_args __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(format)
+    && PARROT_ASSERT_ARG(format)
 #define ASSERT_ARGS_pass_exception_args __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(sig) \
-    || PARROT_ASSERT_ARG(dest) \
-    || PARROT_ASSERT_ARG(old_ctx)
+    && PARROT_ASSERT_ARG(sig) \
+    && PARROT_ASSERT_ARG(dest) \
+    && PARROT_ASSERT_ARG(old_ctx)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

@@ -86,13 +86,13 @@ static void init_context(PARROT_INTERP,
 
 #define ASSERT_ARGS_clear_regs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pmcctx)
+    && PARROT_ASSERT_ARG(pmcctx)
 #define ASSERT_ARGS_get_context_struct_fast __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(ctx)
+    && PARROT_ASSERT_ARG(ctx)
 #define ASSERT_ARGS_init_context __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pmcctx)
+    && PARROT_ASSERT_ARG(pmcctx)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

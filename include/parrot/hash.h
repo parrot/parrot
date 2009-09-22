@@ -239,41 +239,41 @@ Hash * parrot_create_hash(PARROT_INTERP,
 #define ASSERT_ARGS_parrot_dump_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_parrot_hash_clone __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(hash) \
-    || PARROT_ASSERT_ARG(dest)
+    && PARROT_ASSERT_ARG(hash) \
+    && PARROT_ASSERT_ARG(dest)
 #define ASSERT_ARGS_parrot_hash_delete __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(hash) \
-    || PARROT_ASSERT_ARG(key)
+    && PARROT_ASSERT_ARG(hash) \
+    && PARROT_ASSERT_ARG(key)
 #define ASSERT_ARGS_parrot_hash_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(hash)
 #define ASSERT_ARGS_parrot_hash_exists __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(hash) \
-    || PARROT_ASSERT_ARG(key)
+    && PARROT_ASSERT_ARG(hash) \
+    && PARROT_ASSERT_ARG(key)
 #define ASSERT_ARGS_parrot_hash_get __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(hash) \
-    || PARROT_ASSERT_ARG(key)
+    && PARROT_ASSERT_ARG(hash) \
+    && PARROT_ASSERT_ARG(key)
 #define ASSERT_ARGS_parrot_hash_get_bucket __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(hash)
+    && PARROT_ASSERT_ARG(hash)
 #define ASSERT_ARGS_parrot_hash_get_idx __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(hash) \
-    || PARROT_ASSERT_ARG(key)
+    && PARROT_ASSERT_ARG(hash) \
+    && PARROT_ASSERT_ARG(key)
 #define ASSERT_ARGS_parrot_hash_put __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(hash)
+    && PARROT_ASSERT_ARG(hash)
 #define ASSERT_ARGS_parrot_hash_size __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(hash)
 #define ASSERT_ARGS_parrot_hash_visit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(hash) \
-    || PARROT_ASSERT_ARG(pinfo)
+    && PARROT_ASSERT_ARG(hash) \
+    && PARROT_ASSERT_ARG(pinfo)
 #define ASSERT_ARGS_parrot_mark_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(hash)
+    && PARROT_ASSERT_ARG(hash)
 #define ASSERT_ARGS_parrot_new_cstring_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_parrot_new_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -286,15 +286,15 @@ Hash * parrot_create_hash(PARROT_INTERP,
 #define ASSERT_ARGS_key_hash_int __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_parrot_chash_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(hash)
+    && PARROT_ASSERT_ARG(hash)
 #define ASSERT_ARGS_parrot_chash_destroy_values __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(hash) \
-    || PARROT_ASSERT_ARG(func)
+    && PARROT_ASSERT_ARG(hash) \
+    && PARROT_ASSERT_ARG(func)
 #define ASSERT_ARGS_parrot_create_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(compare) \
-    || PARROT_ASSERT_ARG(keyhash)
+    && PARROT_ASSERT_ARG(compare) \
+    && PARROT_ASSERT_ARG(keyhash)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/hash.c */
 

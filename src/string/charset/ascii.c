@@ -132,27 +132,27 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
 
 #define ASSERT_ARGS_compose __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(src)
+    && PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_decompose __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(src)
+    && PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_downcase __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(source_string)
 #define ASSERT_ARGS_downcase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(source_string)
 #define ASSERT_ARGS_find_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(source_string)
+    && PARROT_ASSERT_ARG(source_string)
 #define ASSERT_ARGS_find_not_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(source_string)
+    && PARROT_ASSERT_ARG(source_string)
 #define ASSERT_ARGS_is_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(source_string)
+    && PARROT_ASSERT_ARG(source_string)
 #define ASSERT_ARGS_set_graphemes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(source_string) \
-    || PARROT_ASSERT_ARG(insert_string)
+    && PARROT_ASSERT_ARG(source_string) \
+    && PARROT_ASSERT_ARG(insert_string)
 #define ASSERT_ARGS_string_from_codepoint __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_titlecase __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -161,20 +161,20 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
        PARROT_ASSERT_ARG(source_string)
 #define ASSERT_ARGS_to_ascii __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(src)
+    && PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_to_charset __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(src)
+    && PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_to_unicode __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(src)
+    && PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_upcase __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(source_string)
 #define ASSERT_ARGS_upcase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(source_string)
 #define ASSERT_ARGS_validate __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(src)
+    && PARROT_ASSERT_ARG(src)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

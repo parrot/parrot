@@ -263,42 +263,42 @@ INTVAL Parrot_Sub_get_line_from_pc(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_Context_get_info __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(ctx) \
-    || PARROT_ASSERT_ARG(info)
+    && PARROT_ASSERT_ARG(ctx) \
+    && PARROT_ASSERT_ARG(info)
 #define ASSERT_ARGS_Parrot_Context_infostr __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(ctx)
+    && PARROT_ASSERT_ARG(ctx)
 #define ASSERT_ARGS_Parrot_full_sub_name __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_get_sub_pmc_from_subclass \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(subclass)
+    && PARROT_ASSERT_ARG(subclass)
 #define ASSERT_ARGS_parrot_new_closure __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(sub_pmc)
+    && PARROT_ASSERT_ARG(sub_pmc)
 #define ASSERT_ARGS_invalidate_retc_context __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(cont)
+    && PARROT_ASSERT_ARG(cont)
 #define ASSERT_ARGS_mark_context_start __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_Parrot_capture_lex __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(sub_pmc)
+    && PARROT_ASSERT_ARG(sub_pmc)
 #define ASSERT_ARGS_Parrot_continuation_check __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pmc)
+    && PARROT_ASSERT_ARG(pmc)
 #define ASSERT_ARGS_Parrot_continuation_rewind_environment \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pmc)
+    && PARROT_ASSERT_ARG(pmc)
 #define ASSERT_ARGS_Parrot_find_dynamic_pad __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(lex_name) \
-    || PARROT_ASSERT_ARG(ctx)
+    && PARROT_ASSERT_ARG(lex_name) \
+    && PARROT_ASSERT_ARG(ctx)
 #define ASSERT_ARGS_Parrot_find_pad __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(lex_name) \
-    || PARROT_ASSERT_ARG(ctx)
+    && PARROT_ASSERT_ARG(lex_name) \
+    && PARROT_ASSERT_ARG(ctx)
 #define ASSERT_ARGS_Parrot_Sub_get_filename_from_pc \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)

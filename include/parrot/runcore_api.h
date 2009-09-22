@@ -130,17 +130,17 @@ void runops_int(PARROT_INTERP, size_t offset)
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_runcore_register __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(coredata)
+    && PARROT_ASSERT_ARG(coredata)
 #define ASSERT_ARGS_Parrot_runcore_switch __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(name)
+    && PARROT_ASSERT_ARG(name)
 #define ASSERT_ARGS_do_prederef __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pc_prederef) \
-    || PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(runcore)
+    && PARROT_ASSERT_ARG(interp) \
+    && PARROT_ASSERT_ARG(runcore)
 #define ASSERT_ARGS_dynop_register __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(lib_pmc)
+    && PARROT_ASSERT_ARG(lib_pmc)
 #define ASSERT_ARGS_Parrot_runcore_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_runcore_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -199,13 +199,13 @@ void Parrot_runcore_switch_init(PARROT_INTERP)
 
 #define ASSERT_ARGS_get_core_op_lib_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(runcore)
+    && PARROT_ASSERT_ARG(runcore)
 #define ASSERT_ARGS_init_prederef __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(runcore)
+    && PARROT_ASSERT_ARG(runcore)
 #define ASSERT_ARGS_load_prederef __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(runcore)
+    && PARROT_ASSERT_ARG(runcore)
 #define ASSERT_ARGS_Parrot_runcore_cgoto_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_runcore_cgp_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \

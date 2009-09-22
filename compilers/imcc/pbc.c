@@ -202,82 +202,82 @@ static void verify_signature(PARROT_INTERP,
 
 #define ASSERT_ARGS_add_1_const __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(r)
+    && PARROT_ASSERT_ARG(r)
 #define ASSERT_ARGS_add_const_key __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(key) \
-    || PARROT_ASSERT_ARG(s_key)
+    && PARROT_ASSERT_ARG(key) \
+    && PARROT_ASSERT_ARG(s_key)
 #define ASSERT_ARGS_add_const_num __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_add_const_pmc_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(r)
+    && PARROT_ASSERT_ARG(r)
 #define ASSERT_ARGS_add_const_str __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(r)
+    && PARROT_ASSERT_ARG(r)
 #define ASSERT_ARGS_add_const_table __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_add_const_table_key __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(key)
+    && PARROT_ASSERT_ARG(key)
 #define ASSERT_ARGS_add_const_table_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pmc)
+    && PARROT_ASSERT_ARG(pmc)
 #define ASSERT_ARGS_build_key __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(key_reg)
+    && PARROT_ASSERT_ARG(key_reg)
 #define ASSERT_ARGS_constant_folding __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit)
+    && PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_create_lexinfo __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(sub_pmc)
+    && PARROT_ASSERT_ARG(unit) \
+    && PARROT_ASSERT_ARG(sub_pmc)
 #define ASSERT_ARGS_find_global_label __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(name) \
-    || PARROT_ASSERT_ARG(sym) \
-    || PARROT_ASSERT_ARG(pc)
+    && PARROT_ASSERT_ARG(name) \
+    && PARROT_ASSERT_ARG(sym) \
+    && PARROT_ASSERT_ARG(pc)
 #define ASSERT_ARGS_find_outer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit)
+    && PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_find_sub_by_subid __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(lookup) \
-    || PARROT_ASSERT_ARG(sym) \
-    || PARROT_ASSERT_ARG(pc)
+    && PARROT_ASSERT_ARG(lookup) \
+    && PARROT_ASSERT_ARG(sym) \
+    && PARROT_ASSERT_ARG(pc)
 #define ASSERT_ARGS_fixup_globals __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_get_codesize __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(src_lines)
+    && PARROT_ASSERT_ARG(unit) \
+    && PARROT_ASSERT_ARG(src_lines)
 #define ASSERT_ARGS_get_old_size __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(ins_line)
+    && PARROT_ASSERT_ARG(ins_line)
 #define ASSERT_ARGS_imcc_globals_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_make_new_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit)
+    && PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_make_pmc_const __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(r)
+    && PARROT_ASSERT_ARG(r)
 #define ASSERT_ARGS_mk_multi_sig __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(r)
+    && PARROT_ASSERT_ARG(r)
 #define ASSERT_ARGS_store_fixup __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(r)
+    && PARROT_ASSERT_ARG(r)
 #define ASSERT_ARGS_store_key_const __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(str)
+    && PARROT_ASSERT_ARG(str)
 #define ASSERT_ARGS_store_sub_size __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_verify_signature __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(ins) \
-    || PARROT_ASSERT_ARG(pc)
+    && PARROT_ASSERT_ARG(ins) \
+    && PARROT_ASSERT_ARG(pc)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

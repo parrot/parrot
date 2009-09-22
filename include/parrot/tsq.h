@@ -120,10 +120,10 @@ QUEUE_ENTRY * wait_for_entry(ARGMOD(QUEUE *queue))
 
 #define ASSERT_ARGS_insert_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(queue) \
-    || PARROT_ASSERT_ARG(entry)
+    && PARROT_ASSERT_ARG(entry)
 #define ASSERT_ARGS_nosync_insert_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(queue) \
-    || PARROT_ASSERT_ARG(entry)
+    && PARROT_ASSERT_ARG(entry)
 #define ASSERT_ARGS_nosync_pop_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(queue)
 #define ASSERT_ARGS_peek_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -132,7 +132,7 @@ QUEUE_ENTRY * wait_for_entry(ARGMOD(QUEUE *queue))
        PARROT_ASSERT_ARG(queue)
 #define ASSERT_ARGS_push_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(queue) \
-    || PARROT_ASSERT_ARG(entry)
+    && PARROT_ASSERT_ARG(entry)
 #define ASSERT_ARGS_queue_broadcast __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(queue)
 #define ASSERT_ARGS_queue_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -144,14 +144,14 @@ QUEUE_ENTRY * wait_for_entry(ARGMOD(QUEUE *queue))
        PARROT_ASSERT_ARG(queue)
 #define ASSERT_ARGS_queue_timedwait __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(queue) \
-    || PARROT_ASSERT_ARG(abs_time)
+    && PARROT_ASSERT_ARG(abs_time)
 #define ASSERT_ARGS_queue_unlock __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(queue)
 #define ASSERT_ARGS_queue_wait __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(queue)
 #define ASSERT_ARGS_unshift_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(queue) \
-    || PARROT_ASSERT_ARG(entry)
+    && PARROT_ASSERT_ARG(entry)
 #define ASSERT_ARGS_wait_for_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(queue)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

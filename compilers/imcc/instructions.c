@@ -57,10 +57,10 @@ static int e_file_open(PARROT_INTERP, ARGIN(void *param))
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_e_file_emit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(ins)
+    && PARROT_ASSERT_ARG(ins)
 #define ASSERT_ARGS_e_file_open __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(param)
+    && PARROT_ASSERT_ARG(param)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

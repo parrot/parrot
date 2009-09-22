@@ -102,36 +102,36 @@ const CHARSET * Parrot_charset_ascii_init(PARROT_INTERP)
 
 #define ASSERT_ARGS_ascii_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(lhs) \
-    || PARROT_ASSERT_ARG(rhs)
+    && PARROT_ASSERT_ARG(lhs) \
+    && PARROT_ASSERT_ARG(rhs)
 #define ASSERT_ARGS_ascii_compute_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(source_string)
 #define ASSERT_ARGS_ascii_cs_index __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(source_string) \
-    || PARROT_ASSERT_ARG(search_string)
+    && PARROT_ASSERT_ARG(source_string) \
+    && PARROT_ASSERT_ARG(search_string)
 #define ASSERT_ARGS_ascii_cs_rindex __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(source_string) \
-    || PARROT_ASSERT_ARG(search_string)
+    && PARROT_ASSERT_ARG(source_string) \
+    && PARROT_ASSERT_ARG(search_string)
 #define ASSERT_ARGS_ascii_get_graphemes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(source_string)
+    && PARROT_ASSERT_ARG(source_string)
 #define ASSERT_ARGS_ascii_get_graphemes_inplace __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(source_string) \
-    || PARROT_ASSERT_ARG(dest_string)
+    && PARROT_ASSERT_ARG(source_string) \
+    && PARROT_ASSERT_ARG(dest_string)
 #define ASSERT_ARGS_charset_cvt_ascii_to_binary __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(src)
+    && PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_charset_cvt_ascii_to_iso_8859_1 \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(src)
+    && PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_mixed_cs_index __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(src) \
-    || PARROT_ASSERT_ARG(search)
+    && PARROT_ASSERT_ARG(src) \
+    && PARROT_ASSERT_ARG(search)
 #define ASSERT_ARGS_Parrot_charset_ascii_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

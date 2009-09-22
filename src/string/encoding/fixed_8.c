@@ -173,56 +173,56 @@ static STRING * to_encoding(PARROT_INTERP,
        PARROT_ASSERT_ARG(source_string)
 #define ASSERT_ARGS_codepoints __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(source_string)
+    && PARROT_ASSERT_ARG(source_string)
 #define ASSERT_ARGS_find_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(s) \
-    || PARROT_ASSERT_ARG(typetable)
+    && PARROT_ASSERT_ARG(s) \
+    && PARROT_ASSERT_ARG(typetable)
 #define ASSERT_ARGS_fixed8_get_next __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(iter)
+    && PARROT_ASSERT_ARG(iter)
 #define ASSERT_ARGS_fixed8_set_next __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(iter)
+    && PARROT_ASSERT_ARG(iter)
 #define ASSERT_ARGS_fixed8_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(iter)
 #define ASSERT_ARGS_get_byte __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(source_string)
+    && PARROT_ASSERT_ARG(source_string)
 #define ASSERT_ARGS_get_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(source_string)
+    && PARROT_ASSERT_ARG(source_string)
 #define ASSERT_ARGS_get_bytes_inplace __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(source_string) \
-    || PARROT_ASSERT_ARG(return_string)
+    && PARROT_ASSERT_ARG(source_string) \
+    && PARROT_ASSERT_ARG(return_string)
 #define ASSERT_ARGS_get_codepoint __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(source_string)
+    && PARROT_ASSERT_ARG(source_string)
 #define ASSERT_ARGS_get_codepoints __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(source_string)
+    && PARROT_ASSERT_ARG(source_string)
 #define ASSERT_ARGS_get_codepoints_inplace __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(source_string) \
-    || PARROT_ASSERT_ARG(dest_string)
+    && PARROT_ASSERT_ARG(source_string) \
+    && PARROT_ASSERT_ARG(dest_string)
 #define ASSERT_ARGS_iter_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(src) \
-    || PARROT_ASSERT_ARG(iter)
+    && PARROT_ASSERT_ARG(iter)
 #define ASSERT_ARGS_set_byte __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(source_string)
+    && PARROT_ASSERT_ARG(source_string)
 #define ASSERT_ARGS_set_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(source_string) \
-    || PARROT_ASSERT_ARG(new_bytes)
+    && PARROT_ASSERT_ARG(source_string) \
+    && PARROT_ASSERT_ARG(new_bytes)
 #define ASSERT_ARGS_set_codepoint __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(source_string)
+    && PARROT_ASSERT_ARG(source_string)
 #define ASSERT_ARGS_set_codepoints __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(source_string) \
-    || PARROT_ASSERT_ARG(new_codepoints)
+    && PARROT_ASSERT_ARG(source_string) \
+    && PARROT_ASSERT_ARG(new_codepoints)
 #define ASSERT_ARGS_to_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

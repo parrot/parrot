@@ -48,11 +48,11 @@ Parrot_UInt4 string_unescape_one(PARROT_INTERP,
        PARROT_ASSERT_ARG(old)
 #define ASSERT_ARGS_string_set_data_directory __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(dir)
+    && PARROT_ASSERT_ARG(dir)
 #define ASSERT_ARGS_string_unescape_one __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(offset) \
-    || PARROT_ASSERT_ARG(string)
+    && PARROT_ASSERT_ARG(offset) \
+    && PARROT_ASSERT_ARG(string)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/string/primitives.c */
 

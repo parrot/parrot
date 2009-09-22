@@ -146,31 +146,31 @@ static void sort_loops(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 
 #define ASSERT_ARGS_analyse_life_block __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(bb) \
-    || PARROT_ASSERT_ARG(r)
+    && PARROT_ASSERT_ARG(r)
 #define ASSERT_ARGS_analyse_life_symbol __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(r)
+    && PARROT_ASSERT_ARG(r)
 #define ASSERT_ARGS_bb_add_edge __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(from) \
-    || PARROT_ASSERT_ARG(to)
+    && PARROT_ASSERT_ARG(from) \
+    && PARROT_ASSERT_ARG(to)
 #define ASSERT_ARGS_bb_check_set_addr __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(bb) \
-    || PARROT_ASSERT_ARG(label)
+    && PARROT_ASSERT_ARG(unit) \
+    && PARROT_ASSERT_ARG(bb) \
+    && PARROT_ASSERT_ARG(label)
 #define ASSERT_ARGS_bb_findadd_edge __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(from) \
-    || PARROT_ASSERT_ARG(label)
+    && PARROT_ASSERT_ARG(unit) \
+    && PARROT_ASSERT_ARG(from) \
+    && PARROT_ASSERT_ARG(label)
 #define ASSERT_ARGS_bb_remove_edge __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(edge)
+    && PARROT_ASSERT_ARG(edge)
 #define ASSERT_ARGS_check_invoke_type __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(ins)
+    && PARROT_ASSERT_ARG(unit) \
+    && PARROT_ASSERT_ARG(ins)
 #define ASSERT_ARGS_free_dominance_frontiers __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_free_dominators __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -183,17 +183,17 @@ static void sort_loops(PARROT_INTERP, ARGIN(IMC_Unit *unit))
        PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_make_basic_block __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(ins)
+    && PARROT_ASSERT_ARG(ins)
 #define ASSERT_ARGS_mark_loop __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(e)
+    && PARROT_ASSERT_ARG(unit) \
+    && PARROT_ASSERT_ARG(e)
 #define ASSERT_ARGS_propagate_need __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(bb) \
-    || PARROT_ASSERT_ARG(r)
+    && PARROT_ASSERT_ARG(r)
 #define ASSERT_ARGS_sort_loops __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit)
+    && PARROT_ASSERT_ARG(unit)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

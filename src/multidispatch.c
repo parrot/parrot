@@ -171,66 +171,66 @@ static PMC * Parrot_mmd_sort_candidates(PARROT_INTERP,
 #define ASSERT_ARGS_distance_cmp __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_mmd_add_multi_global __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(sub_name) \
-    || PARROT_ASSERT_ARG(sub_obj)
+    && PARROT_ASSERT_ARG(sub_name) \
+    && PARROT_ASSERT_ARG(sub_obj)
 #define ASSERT_ARGS_mmd_add_multi_to_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(ns_name) \
-    || PARROT_ASSERT_ARG(sub_name) \
-    || PARROT_ASSERT_ARG(sub_obj)
+    && PARROT_ASSERT_ARG(ns_name) \
+    && PARROT_ASSERT_ARG(sub_name) \
+    && PARROT_ASSERT_ARG(sub_obj)
 #define ASSERT_ARGS_mmd_build_type_tuple_from_long_sig \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(long_sig)
+    && PARROT_ASSERT_ARG(long_sig)
 #define ASSERT_ARGS_mmd_build_type_tuple_from_type_list \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(type_list)
+    && PARROT_ASSERT_ARG(type_list)
 #define ASSERT_ARGS_mmd_cache_key_from_types __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(name) \
-    || PARROT_ASSERT_ARG(types)
+    && PARROT_ASSERT_ARG(name) \
+    && PARROT_ASSERT_ARG(types)
 #define ASSERT_ARGS_mmd_cache_key_from_values __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(name) \
-    || PARROT_ASSERT_ARG(values)
+    && PARROT_ASSERT_ARG(name) \
+    && PARROT_ASSERT_ARG(values)
 #define ASSERT_ARGS_mmd_cvt_to_types __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(multi_sig)
+    && PARROT_ASSERT_ARG(multi_sig)
 #define ASSERT_ARGS_mmd_distance __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pmc) \
-    || PARROT_ASSERT_ARG(arg_tuple)
+    && PARROT_ASSERT_ARG(pmc) \
+    && PARROT_ASSERT_ARG(arg_tuple)
 #define ASSERT_ARGS_mmd_search_by_sig_obj __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(name) \
-    || PARROT_ASSERT_ARG(sig_obj) \
-    || PARROT_ASSERT_ARG(candidates)
+    && PARROT_ASSERT_ARG(name) \
+    && PARROT_ASSERT_ARG(sig_obj) \
+    && PARROT_ASSERT_ARG(candidates)
 #define ASSERT_ARGS_mmd_search_global __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(name) \
-    || PARROT_ASSERT_ARG(cl)
+    && PARROT_ASSERT_ARG(name) \
+    && PARROT_ASSERT_ARG(cl)
 #define ASSERT_ARGS_mmd_search_local __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(name) \
-    || PARROT_ASSERT_ARG(candidates)
+    && PARROT_ASSERT_ARG(name) \
+    && PARROT_ASSERT_ARG(candidates)
 #define ASSERT_ARGS_Parrot_mmd_arg_tuple_func __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_mmd_get_cached_multi_sig \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(sub_pmc)
+    && PARROT_ASSERT_ARG(sub_pmc)
 #define ASSERT_ARGS_Parrot_mmd_maybe_candidate __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pmc) \
-    || PARROT_ASSERT_ARG(cl)
+    && PARROT_ASSERT_ARG(pmc) \
+    && PARROT_ASSERT_ARG(cl)
 #define ASSERT_ARGS_Parrot_mmd_search_scopes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(meth)
+    && PARROT_ASSERT_ARG(meth)
 #define ASSERT_ARGS_Parrot_mmd_sort_candidates __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(arg_tuple) \
-    || PARROT_ASSERT_ARG(cl)
+    && PARROT_ASSERT_ARG(arg_tuple) \
+    && PARROT_ASSERT_ARG(cl)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

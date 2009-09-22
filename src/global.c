@@ -79,27 +79,27 @@ static void store_sub_in_multi(PARROT_INTERP,
 
 #define ASSERT_ARGS_get_namespace_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(sub_pmc)
+    && PARROT_ASSERT_ARG(sub_pmc)
 #define ASSERT_ARGS_internal_ns_keyed __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(base_ns) \
-    || PARROT_ASSERT_ARG(pmc_key)
+    && PARROT_ASSERT_ARG(base_ns) \
+    && PARROT_ASSERT_ARG(pmc_key)
 #define ASSERT_ARGS_internal_ns_keyed_key __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(ns) \
-    || PARROT_ASSERT_ARG(key)
+    && PARROT_ASSERT_ARG(ns) \
+    && PARROT_ASSERT_ARG(key)
 #define ASSERT_ARGS_internal_ns_keyed_str __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(base_ns) \
-    || PARROT_ASSERT_ARG(key)
+    && PARROT_ASSERT_ARG(base_ns) \
+    && PARROT_ASSERT_ARG(key)
 #define ASSERT_ARGS_internal_ns_maybe_create __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(ns) \
-    || PARROT_ASSERT_ARG(key)
+    && PARROT_ASSERT_ARG(ns) \
+    && PARROT_ASSERT_ARG(key)
 #define ASSERT_ARGS_store_sub_in_multi __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(sub_pmc) \
-    || PARROT_ASSERT_ARG(ns)
+    && PARROT_ASSERT_ARG(sub_pmc) \
+    && PARROT_ASSERT_ARG(ns)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

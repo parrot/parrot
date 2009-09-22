@@ -101,25 +101,25 @@ static STRING* try_load_path(PARROT_INTERP, ARGMOD(STRING* path))
        PARROT_ASSERT_ARG(file)
 #define ASSERT_ARGS_path_append __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(l_path) \
-    || PARROT_ASSERT_ARG(r_path)
+    && PARROT_ASSERT_ARG(l_path) \
+    && PARROT_ASSERT_ARG(r_path)
 #define ASSERT_ARGS_path_concat __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(l_path) \
-    || PARROT_ASSERT_ARG(r_path)
+    && PARROT_ASSERT_ARG(l_path) \
+    && PARROT_ASSERT_ARG(r_path)
 #define ASSERT_ARGS_path_finalize __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(path)
+    && PARROT_ASSERT_ARG(path)
 #define ASSERT_ARGS_path_guarantee_trailing_separator \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(path)
+    && PARROT_ASSERT_ARG(path)
 #define ASSERT_ARGS_try_bytecode_extensions __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(path)
+    && PARROT_ASSERT_ARG(path)
 #define ASSERT_ARGS_try_load_path __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(path)
+    && PARROT_ASSERT_ARG(path)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

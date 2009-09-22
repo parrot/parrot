@@ -110,7 +110,7 @@ static void upcase_first(PARROT_INTERP, SHIM(STRING *source_string))
 static UINTVAL validate(SHIM_INTERP, SHIM(STRING *source_string));
 #define ASSERT_ARGS_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(lhs) \
-    || PARROT_ASSERT_ARG(rhs)
+    && PARROT_ASSERT_ARG(rhs)
 #define ASSERT_ARGS_compose __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_cs_index __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
@@ -126,8 +126,8 @@ static UINTVAL validate(SHIM_INTERP, SHIM(STRING *source_string));
 #define ASSERT_ARGS_is_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_set_graphemes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(source_string) \
-    || PARROT_ASSERT_ARG(insert_string)
+    && PARROT_ASSERT_ARG(source_string) \
+    && PARROT_ASSERT_ARG(insert_string)
 #define ASSERT_ARGS_string_from_codepoint __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_titlecase __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -136,7 +136,7 @@ static UINTVAL validate(SHIM_INTERP, SHIM(STRING *source_string));
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_to_charset __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(src)
+    && PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_upcase __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_upcase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = \

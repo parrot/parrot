@@ -114,25 +114,25 @@ void dump_symreg(ARGIN(const IMC_Unit *unit))
 
 #define ASSERT_ARGS_IMCC_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(fmt)
+    && PARROT_ASSERT_ARG(fmt)
 #define ASSERT_ARGS_IMCC_fatal __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(fmt)
+    && PARROT_ASSERT_ARG(fmt)
 #define ASSERT_ARGS_IMCC_fatal_standalone __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(fmt)
+    && PARROT_ASSERT_ARG(fmt)
 #define ASSERT_ARGS_IMCC_fataly __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(fmt)
+    && PARROT_ASSERT_ARG(fmt)
 #define ASSERT_ARGS_IMCC_fataly_standalone __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(fmt)
+    && PARROT_ASSERT_ARG(fmt)
 #define ASSERT_ARGS_IMCC_info __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(fmt)
+    && PARROT_ASSERT_ARG(fmt)
 #define ASSERT_ARGS_IMCC_warning __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(fmt)
+    && PARROT_ASSERT_ARG(fmt)
 #define ASSERT_ARGS_dump_cfg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_dump_dominance_frontiers __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -141,7 +141,7 @@ void dump_symreg(ARGIN(const IMC_Unit *unit))
        PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_dump_instructions __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit)
+    && PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_dump_interference_graph __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_dump_labels __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -150,7 +150,7 @@ void dump_symreg(ARGIN(const IMC_Unit *unit))
        PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_dump_liveness_status_var __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(r)
+    && PARROT_ASSERT_ARG(r)
 #define ASSERT_ARGS_dump_loops __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_dump_symreg __attribute__unused__ int _ASSERT_ARGS_CHECK = \

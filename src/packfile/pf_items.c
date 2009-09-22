@@ -163,46 +163,46 @@ static opcode_t fetch_op_mixed_le(ARGIN(const unsigned char *b))
 
 #define ASSERT_ARGS_cvt_num12_num16 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(dest) \
-    || PARROT_ASSERT_ARG(src)
+    && PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_cvt_num12_num16_le __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(dest) \
-    || PARROT_ASSERT_ARG(src)
+    && PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_cvt_num12_num8 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(dest) \
-    || PARROT_ASSERT_ARG(src)
+    && PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_cvt_num12_num8_le __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(dest) \
-    || PARROT_ASSERT_ARG(src)
+    && PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_cvt_num16_num12 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(dest) \
-    || PARROT_ASSERT_ARG(src)
+    && PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_cvt_num16_num12_be __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(dest) \
-    || PARROT_ASSERT_ARG(src)
+    && PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_cvt_num16_num8 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(dest) \
-    || PARROT_ASSERT_ARG(src)
+    && PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_cvt_num16_num8_be __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(dest) \
-    || PARROT_ASSERT_ARG(src)
+    && PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_cvt_num16_num8_le __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(dest) \
-    || PARROT_ASSERT_ARG(src)
+    && PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_cvt_num8_num12 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(dest) \
-    || PARROT_ASSERT_ARG(src)
+    && PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_cvt_num8_num12_be __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(dest) \
-    || PARROT_ASSERT_ARG(src)
+    && PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_cvt_num8_num16 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(dest) \
-    || PARROT_ASSERT_ARG(src)
+    && PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_cvt_num8_num16_be __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(dest) \
-    || PARROT_ASSERT_ARG(src)
+    && PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_cvt_num8_num16_le __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(dest) \
-    || PARROT_ASSERT_ARG(src)
+    && PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_fetch_op_be_4 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(b)
 #define ASSERT_ARGS_fetch_op_be_8 __attribute__unused__ int _ASSERT_ARGS_CHECK = \

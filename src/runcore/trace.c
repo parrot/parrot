@@ -40,7 +40,7 @@ static STRING* trace_class_name(PARROT_INTERP, ARGIN(const PMC* pmc))
 
 #define ASSERT_ARGS_trace_class_name __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pmc)
+    && PARROT_ASSERT_ARG(pmc)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

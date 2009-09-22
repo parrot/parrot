@@ -46,10 +46,10 @@ static void scheduler_process_wait_list(PARROT_INTERP,
 
 #define ASSERT_ARGS_scheduler_process_messages __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(scheduler)
+    && PARROT_ASSERT_ARG(scheduler)
 #define ASSERT_ARGS_scheduler_process_wait_list __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(scheduler)
+    && PARROT_ASSERT_ARG(scheduler)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
