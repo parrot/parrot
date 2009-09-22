@@ -504,6 +504,7 @@ INSTALLABLEPBCMERGE := $(CUR_DIR)/installable_pbc_merge$(EXE)
 INSTALLABLEPBCTOEXE := $(CUR_DIR)/installable_pbc_to_exe$(EXE)
 INSTALLABLEPDB      := $(CUR_DIR)/installable_parrot_debugger$(EXE)
 INSTALLABLECONFIG   := $(CUR_DIR)/installable_parrot_config$(EXE)
+INSTALLABLENQP      := $(CUR_DIR)/installable_parrot_nqp$(EXE)
 
 # Libraries
 LIBPARROT_STATIC    := @blib_dir@/@libparrot_static@
@@ -772,7 +773,7 @@ world : all parrot_utils
 
 parrot_utils : $(PDUMP) $(DIS) $(PDB) $(PBCMERGE) $(PBC_TO_EXE) $(PARROT_CONFIG)
 
-installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPDB) $(INSTALLABLEPBCMERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG)
+installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPDB) $(INSTALLABLEPBCMERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG) $(INSTALLABLENQP)
 
 
 flags_dummy :
@@ -909,6 +910,10 @@ $(INSTALLABLECONFIG) : $(SRC_DIR)/install_config$(O) $(PARROT_CONFIG) $(PBC_TO_E
 
 $(INSTALLABLEPBCTOEXE) : $(PBC_TO_EXE) $(SRC_DIR)/install_config$(O)
 	$(PBC_TO_EXE) pbc_to_exe.pbc --install
+
+$(INSTALLABLENQP) : compilers/nqp/nqp.pbc $(SRC_DIR)/install_config$(O) $(PBC_TO_EXE)
+	$(CP) compilers/nqp/nqp.pbc parrot_nqp.pbc
+	$(PBC_TO_EXE) parrot_nqp.pbc --install
 
 #
 # Parrot Debugger
@@ -1619,6 +1624,7 @@ prog-clean :
     $(INSTALLABLEPBCTOEXE) \
     $(INSTALLABLEPDB) \
     $(INSTALLABLECONFIG) \
+    $(INSTALLABLENQP) \
     pbc_to_exe.pbc pbc_to_exe.c pbc_to_exe$(O) pbc_to_exe$(EXE) \
     parrot_config$(EXE) parrot_config.c parrot_config$(O) parrot_config.pbc \
     $(IMCC_DIR)/main$(O) \
@@ -1655,6 +1661,7 @@ archclean: dynoplibs-clean dynpmc-clean dynext-clean
     $(INSTALLABLEPBCMERGE) \
     $(INSTALLABLEPDB) \
     $(INSTALLABLECONFIG) \
+    $(INSTALLABLENQP) \
     $(IMCC_DIR)/main$(O) \
     $(PDUMP) $(SRC_DIR)/pbc_dump$(O) $(SRC_DIR)/packdump$(O) \
     $(PDB) $(SRC_DIR)/parrot_debugger$(O) \
