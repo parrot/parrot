@@ -128,12 +128,12 @@ pdb_output_like( <<PIR, "pir", "t", qr/set I0, 242/, 'trace (pir)');
 .end
 PIR
 
-pdb_output_like( <<PASM, "pasm", "t 2", qr/\d+ set I0, 242\s*I0=\d+\s*\d+ set I1, 1982/, 'trace multiple statements');
+pdb_output_like( <<PASM, "pasm", "t 2", qr/\d+ set I0, 242\s*I0=-?\d+\s*\d+ set I1, 1982/, 'trace multiple statements');
     set I0, 242
     set I1, 1982
 PASM
 
-pdb_output_like( <<PIR, "pir", "t 2", qr/\d+ set I0, 242\s*I0=\d+\s*\d+ set I1, 1982/, 'trace multiple statements (pir)');
+pdb_output_like( <<PIR, "pir", "t 2", qr/\d+ set I0, 242\s*I0=-?\d+\s*\d+ set I1, 1982/, 'trace multiple statements (pir)');
 .sub main :main
     \$I0 = 242
     \$I1 = 1982
