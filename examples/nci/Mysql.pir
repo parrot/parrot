@@ -374,8 +374,13 @@ done:
     stmtobj = new ['Mysql';'Statement'], args
     .return(stmtobj)
 failed:
-    null stmtobj
-    .return(stmtobj)
+    .local string errmsg
+    errmsg = self.'error'()
+    errmsg = concat 'MySql error: ', errmsg
+    .local pmc ex
+    ex = new ['Exception']
+    ex['message'] = errmsg
+    throw ex
 .end
 
 ########################################################################
