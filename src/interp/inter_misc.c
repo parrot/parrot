@@ -257,24 +257,23 @@ interpinfo(PARROT_INTERP, INTVAL what)
             STRING *name = interp->run_core->name;
 
             if (Parrot_str_equal(interp, name, CONST_STRING(interp, "slow")))
-                ret = PARROT_SLOW_CORE;
+                return PARROT_SLOW_CORE;
             else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "fast")))
-                ret = PARROT_FAST_CORE;
+                return PARROT_FAST_CORE;
             else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "switch")))
-                ret = PARROT_SWITCH_CORE;
+                return PARROT_SWITCH_CORE;
             else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "cgp")))
-                ret = PARROT_CGP_CORE;
+                return PARROT_CGP_CORE;
             else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "cgoto")))
-                ret = PARROT_CGOTO_CORE;
+                return PARROT_CGOTO_CORE;
             else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "exec")))
-                ret = PARROT_EXEC_CORE;
+                return PARROT_EXEC_CORE;
             else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "gc_debug")))
-                ret = PARROT_GC_DEBUG_CORE;
+                return PARROT_GC_DEBUG_CORE;
             else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "debugger")))
-                ret = PARROT_DEBUGGER_CORE;
+                return PARROT_DEBUGGER_CORE;
             else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "profiling")))
-                ret = PARROT_PROFILING_CORE;
-            break;
+                return PARROT_PROFILING_CORE;
         }
         default:        /* or a warning only? */
             ret = -1;
