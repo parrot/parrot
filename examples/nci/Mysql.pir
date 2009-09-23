@@ -362,7 +362,7 @@ done:
     .local pmc stmt
     stmt = mysql_stmt_init(mysql)
     .local pmc mysql_stmt_prepare
-    mysql_stmt_prepare = get_mysql_function('mysql_stmt_prepare', 'ipti')
+    mysql_stmt_prepare = get_mysql_function('mysql_stmt_prepare', 'iptl')
     $I0 = bytelength stmt_str
     $I1 = mysql_stmt_prepare(stmt, stmt_str, $I0)
     if $I1 goto failed
