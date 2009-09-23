@@ -422,7 +422,7 @@ Dump a capture object.
     (subindent, indent) = dumper.'newIndent'()
 
     # Sort hash keys before dump to preseve order
-    # Use RMA instead os RSA because RSA doesn't have 'sort' method
+    # Use RPA instead of RSA because RSA doesn't have 'sort' method
     .local pmc hash, it, keys
     hash = self.'hash'()
     keys = new ['ResizablePMCArray']
