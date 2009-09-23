@@ -37,14 +37,6 @@ sub runstep {
         $conf->data->set(
             cc_build_call_frames  => '-DCAN_BUILD_CALL_FRAMES',
         );
-    }
-    else {
-        $conf->data->set(
-            cc_build_call_frames  => '',
-        );
-    }
-
-    if ( $can_build_call_frames ) {
         # test for executable malloced memory
         my $osname = $conf->data->get( 'osname' );
         if ( -e "config/auto/frames/test_exec_${osname}_c.in" ) {
@@ -57,13 +49,23 @@ sub runstep {
                 my $exec_protect_test = (
                     $conf->cc_run(0) !~ /ok/ && $conf->cc_run(1) =~ /ok/
                 );
-                _handle_exec_protect($conf, $exec_protect_test);
+                if ($exec_protect_test) {
+                    $conf->data->set( has_exec_protect => 1 );
+                }
+                else {
+                    $conf->data->set( has_exec_protect => 0 );
+                }
             }
             $conf->cc_clean();
         }
         else {
             $conf->data->set( has_exec_protect => 0 );
         }
+    }
+    else {
+        $conf->data->set(
+            cc_build_call_frames  => '',
+        );
     }
 
     $self->set_result($can_build_call_frames?'yes':'no');
@@ -85,16 +87,6 @@ sub _call_frames_buildable {
             && $osname ne 'darwin');
     }
     return $can_build_call_frames;
-}
-
-sub _handle_exec_protect {
-    my ($conf, $exec_protect_test) = @_;
-    if ($exec_protect_test) {
-        $conf->data->set( has_exec_protect => 1 );
-    }
-    else {
-        $conf->data->set( has_exec_protect => 0 );
-    }
 }
 
 1;
