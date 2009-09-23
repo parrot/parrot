@@ -156,6 +156,28 @@ get_nci_P(PARROT_INTERP, ARGMOD(call_state *st), int n)
     return UVal_pmc(st->val);
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+void*
+get_nci_p(PARROT_INTERP, ARGMOD(call_state *st), int n)
+{
+    /*
+     * excessive args are passed as NULL
+     * used by e.g. MMD infix like __add
+     */
+    if (n < st->src.n) {
+        PMC *value;
+        Parrot_fetch_arg_nci(interp, st);
+        value = UVal_pmc(st->val);
+        if (PMC_IS_NULL(value))
+            return NULL;
+        else
+            return VTABLE_get_pointer(interp, value);
+    }
+    else
+        return NULL;
+}
+
 /*
  * set return value
  */
@@ -497,18 +519,8 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
                 arg_count--;
                 break;
             case 'p':   /* push pmc->data */
-                emitm_call_cfunc(pc, get_nci_P);
-                /* save off PMC* */
-                emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
-                /* lookup get_pointer in VTABLE */
-                emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, offsetof(PMC, vtable));
-                emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, offsetof(VTABLE, get_pointer));
-                emitm_callr(pc, emit_EAX);
+                emitm_call_cfunc(pc, get_nci_p);
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
-                /* reset ESP(4) */
-                emitm_lea_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, st_offset);
-                emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
-
                 break;
             case 'O':   /* push PMC * object in P2 */
             case 'P':   /* push PMC * */
