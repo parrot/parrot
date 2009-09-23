@@ -140,7 +140,7 @@ get_nci_S(PARROT_INTERP, ARGMOD(call_state *st), int n)
 }
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PMC*
 get_nci_P(PARROT_INTERP, ARGMOD(call_state *st), int n)
 {
@@ -148,12 +148,14 @@ get_nci_P(PARROT_INTERP, ARGMOD(call_state *st), int n)
      * excessive args are passed as NULL
      * used by e.g. MMD infix like __add
      */
-    if (n < st->src.n)
+    if (n < st->src.n) {
+        PMC *value;
         Parrot_fetch_arg_nci(interp, st);
+        value = UVal_pmc(st->val);
+        return PMC_IS_NULL(value) ? (PMC *)NULL : value;
+    }
     else
-        UVal_pmc(st->val) = PMCNULL;
-
-    return UVal_pmc(st->val);
+        return NULL;
 }
 
 PARROT_WARN_UNUSED_RESULT
@@ -169,10 +171,7 @@ get_nci_p(PARROT_INTERP, ARGMOD(call_state *st), int n)
         PMC *value;
         Parrot_fetch_arg_nci(interp, st);
         value = UVal_pmc(st->val);
-        if (PMC_IS_NULL(value))
-            return NULL;
-        else
-            return VTABLE_get_pointer(interp, value);
+        return PMC_IS_NULL(value) ? (PMC *)NULL : VTABLE_get_pointer(interp, value);
     }
     else
         return NULL;
@@ -526,12 +525,6 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
             case 'P':   /* push PMC * */
             case '@':
                 emitm_call_cfunc(pc, get_nci_P);
-#if PARROT_CATCH_NULL
-                /* PMCNULL is a global */
-                jit_emit_cmp_rm_i(pc, emit_EAX, &PMCNULL);
-                emitm_jxs(pc, emitm_jne, 2); /* skip the xor */
-                jit_emit_bxor_rr_i(interp, pc, emit_EAX, emit_EAX);
-#endif
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'v':

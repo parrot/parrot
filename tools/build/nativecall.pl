@@ -304,7 +304,7 @@ sub make_arg {
     /[OP\@]/ && do {
         push @{$temps_ref},          "PMC *t_$temp_num;";
         push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_P($reg_num);";
-        return "PMC_IS_NULL(t_$temp_num) ? NULL : t_$temp_num";
+        return "t_$temp_num";
     };
     return;
 }
