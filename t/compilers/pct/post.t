@@ -47,11 +47,6 @@ OUT
 
 }
 
-SKIP: {
-    skip('Hash keys order dependency', 1);
-
-# Next tests marked as "skip" instead of "todo" to prevent false-positives in case
-# when Hash keys order occationally can be same as in test.
 pir_output_is( <<'CODE', <<'OUT', 'dump POST::Op node in visual format' );
 .sub _main
     load_bytecode 'PCT.pbc'
@@ -66,13 +61,11 @@ pir_output_is( <<'CODE', <<'OUT', 'dump POST::Op node in visual format' );
 .end
 CODE
 "ost" => PMC 'POST;Op'  {
+    <inline> => "%r=1"
     <pirop> => "add"
     <result> => "$P1"
-    <inline> => "%r=1"
 }
 OUT
-
-}
 
 pir_output_is( <<'CODE', <<'OUT', 'dump POST::Label node in visual format' );
 .sub _main
