@@ -187,12 +187,12 @@ address for any returned values.
         cc->address    = pos;
         cc->runloop_id = INTERP->current_runloop_id;
 
-        if ((pos >= cc->seg->base.data)
+        cc->current_results = (cc->seg
+            && (pos >= cc->seg->base.data)
             && (pos < (cc->seg->base.data + cc->seg->base.size)
-            && (*pos == PARROT_OP_get_results_pc)))
-            cc->current_results = pos;
-        else
-            cc->current_results = NULL;
+            && (*pos == PARROT_OP_get_results_pc))) ?
+                pos :
+                (opcode_t *)NULL;
     }
 
 /*
