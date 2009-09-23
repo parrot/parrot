@@ -252,9 +252,9 @@ sub make_arg {
     local $_ = $argtype;
     my $temp_num = ${$temp_cnt_ref}++;
     /p/ && do {
-        push @{$temps_ref},          "PMC *t_$temp_num;";
-        push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_P($reg_num);";
-        return "(PMC_IS_NULL(t_$temp_num) ? NULL : VTABLE_get_pointer(interp, t_$temp_num))";
+        push @{$temps_ref},          "void *t_$temp_num;";
+        push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_p($reg_num);";
+        return "t_$temp_num";
     };
     /V/ && do {
         push @{$temps_ref},          "PMC *t_$temp_num;";
