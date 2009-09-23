@@ -421,9 +421,22 @@ Dump a capture object.
     .local string subindent, indent
     (subindent, indent) = dumper.'newIndent'()
 
-    .local pmc hash, it
+    # Sort hash keys before dump to preseve order
+    # Use RMA instead os RSA because RSA doesn't have 'sort' method
+    .local pmc hash, it, keys
     hash = self.'hash'()
+    keys = new ['ResizablePMCArray']
     it = iter hash
+  dump_hash_keys_loop:
+    unless it goto dump_hash_keys_end
+    .local string key
+    key = shift it
+    push keys, key
+    goto dump_hash_keys_loop
+  dump_hash_keys_end:
+    keys.'sort'()
+
+    it = iter keys
   dump_hash_loop:
     unless it goto dump_hash_end
     if hasstuff goto dump_hash_1
