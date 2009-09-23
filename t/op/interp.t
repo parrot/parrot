@@ -24,26 +24,23 @@ C<interpinfo> opcode.
 
 =cut
 
-SKIP: {
-    skip( "we really shouldn't run just a label - use a sub", 1 );
-
-    pasm_output_is( <<'CODE', <<'OUTPUT', "runinterp - new style" );
+# we probably shouldn't just run a label, but this catches a potential seggie
+pasm_output_is( <<'CODE', <<'OUTPUT', "runinterp - new style" );
     new P0, 'ParrotInterpreter'
-    print "calling\n"
+    say 'calling'
     # set_addr/invoke ?
     runinterp P0, foo
-    print "ending\n"
+    say 'ending'
     end
-    print "bad things!\n"
+    say 'bad things!'
   foo:
-    print "In 2\n"
+    say 'In 2'
     end
 CODE
 calling
 In 2
 ending
 OUTPUT
-}
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'runinterp - works with printing' );
 .sub 'test' :main
@@ -179,7 +176,6 @@ CODE
 ok 1
 ok 2
 OUTPUT
-
 
 # Local Variables:
 #   mode: cperl
