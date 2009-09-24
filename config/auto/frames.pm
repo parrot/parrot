@@ -33,6 +33,30 @@ sub runstep {
 
     my $can_build_call_frames = _call_frames_buildable($conf);
 
+    $self->_handle_can_build_call_frames( $conf, $can_build_call_frames );
+
+    return 1;
+}
+
+sub _call_frames_buildable {
+    my $conf = shift;
+    my $osname  = $conf->data->get('osname');
+    my $cpuarch = $conf->data->get('cpuarch');
+    my $nvsize  = $conf->data->get('nvsize');
+    my $can_build_call_frames;
+
+    if (defined $conf->options->get('buildframes')) {
+        $can_build_call_frames = $conf->options->get('buildframes');
+    }
+    else {
+        $can_build_call_frames = ($nvsize == 8 && $cpuarch eq 'i386'
+            && $osname ne 'darwin');
+    }
+    return $can_build_call_frames;
+}
+
+sub _handle_can_build_call_frames {
+    my ($self, $conf, $can_build_call_frames) = @_;
     if ( $can_build_call_frames ) {
         $conf->data->set(
             cc_build_call_frames  => '-DCAN_BUILD_CALL_FRAMES',
@@ -61,32 +85,13 @@ sub runstep {
         else {
             $conf->data->set( has_exec_protect => 0 );
         }
+        $self->set_result( 'yes' );
     }
     else {
-        $conf->data->set(
-            cc_build_call_frames  => '',
-        );
+        $conf->data->set( cc_build_call_frames  => '');
+        $self->set_result( 'no' );
     }
-
-    $self->set_result($can_build_call_frames?'yes':'no');
     return 1;
-}
-
-sub _call_frames_buildable {
-    my $conf = shift;
-    my $osname  = $conf->data->get('osname');
-    my $cpuarch = $conf->data->get('cpuarch');
-    my $nvsize  = $conf->data->get('nvsize');
-    my $can_build_call_frames;
-
-    if (defined $conf->options->get('buildframes')) {
-        $can_build_call_frames = $conf->options->get('buildframes');
-    }
-    else {
-        $can_build_call_frames = ($nvsize == 8 && $cpuarch eq 'i386'
-            && $osname ne 'darwin');
-    }
-    return $can_build_call_frames;
 }
 
 1;
