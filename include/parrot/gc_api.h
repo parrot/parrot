@@ -112,9 +112,20 @@ void Parrot_block_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+void Parrot_gc_mark_PMC_alive_fun(PARROT_INTERP, ARGMOD_NULLOK(PMC *obj))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*obj);
+
+PARROT_EXPORT
 void Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        FUNC_MODIFIES(*obj);
+
+PARROT_EXPORT
+void Parrot_gc_mark_STRING_alive_fun(PARROT_INTERP,
+    ARGMOD_NULLOK(STRING *obj))
+        __attribute__nonnull__(1)
         FUNC_MODIFIES(*obj);
 
 PARROT_EXPORT
@@ -315,9 +326,14 @@ int Parrot_gc_total_sized_buffers(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_block_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_gc_mark_PMC_alive_fun __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_mark_PObj_alive __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     && PARROT_ASSERT_ARG(obj)
+#define ASSERT_ARGS_Parrot_gc_mark_STRING_alive_fun \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_is_blocked_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_is_blocked_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -447,6 +463,16 @@ int Parrot_gc_total_sized_buffers(PARROT_INTERP)
 /* HEADERIZER END: src/gc/api.c */
 
 void Parrot_gc_inf_init(PARROT_INTERP);
+
+#ifdef NDEBUG
+#  define Parrot_gc_mark_PMC_alive(interp, obj) \
+        do if (! PMC_IS_NULL(obj)) Parrot_gc_mark_PObj_alive((interp), (PObj *)(obj)); while (0)
+#  define Parrot_gc_mark_STRING_alive(interp, obj) \
+        do if (! STRING_IS_NULL(obj)) Parrot_gc_mark_PObj_alive((interp), (PObj *)(obj)); while (0)
+#else
+#  define Parrot_gc_mark_PMC_alive(interp, obj) Parrot_gc_mark_PMC_alive_fun((interp), (obj))
+#  define Parrot_gc_mark_STRING_alive(interp, obj) Parrot_gc_mark_STRING_alive_fun((interp), (obj))
+#endif
 
 #endif /* PARROT_GC_API_H_GUARD */
 

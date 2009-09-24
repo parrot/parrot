@@ -375,10 +375,11 @@ Mark any referenced strings and PMCs.
         if (PARROT_TASK(SELF)) {
             Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
 
-            if (core_struct->codeblock)
-                Parrot_gc_mark_PObj_alive(interp, (PObj*)core_struct->codeblock);
-            if (core_struct->data)
-                Parrot_gc_mark_PObj_alive(interp, (PObj*)core_struct->data);
+            Parrot_gc_mark_STRING_alive(interp, core_struct->type);
+            Parrot_gc_mark_STRING_alive(interp, core_struct->subtype);
+            Parrot_gc_mark_STRING_alive(interp, core_struct->status);
+            Parrot_gc_mark_PMC_alive(interp, core_struct->codeblock);
+            Parrot_gc_mark_PMC_alive(interp, core_struct->data);
         }
     }
 

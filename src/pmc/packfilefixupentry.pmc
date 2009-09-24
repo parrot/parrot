@@ -57,8 +57,7 @@ Marks the object as live.
         Parrot_PackfileFixupEntry_attributes * attrs =
                 PARROT_PACKFILEFIXUPENTRY(SELF);
 
-        if (attrs->name)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->name);
+        Parrot_gc_mark_STRING_alive(interp, attrs->name);
     }
 
 /*

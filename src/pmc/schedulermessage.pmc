@@ -199,8 +199,8 @@ Mark any referenced strings and PMCs.
             Parrot_SchedulerMessage_attributes * const core_struct =
                 PARROT_SCHEDULERMESSAGE(SELF);
 
-            if (core_struct->data)
-                Parrot_gc_mark_PObj_alive(interp, (PObj*)core_struct->data);
+            Parrot_gc_mark_STRING_alive(interp, core_struct->type);
+            Parrot_gc_mark_PMC_alive(interp, core_struct->data);
         }
     }
 

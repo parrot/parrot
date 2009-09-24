@@ -94,11 +94,8 @@ Mark active socket handle data as live.
         Parrot_Socket_attributes * const data = PARROT_SOCKET(SELF);
 
         if (data) {
-            if (data->local)
-                Parrot_gc_mark_PObj_alive(interp, (PObj *)data->local);
-
-            if (data->remote)
-                Parrot_gc_mark_PObj_alive(interp, (PObj *)data->remote);
+            Parrot_gc_mark_PMC_alive(interp, data->local);
+            Parrot_gc_mark_PMC_alive(interp, data->remote);
         }
     }
 /*

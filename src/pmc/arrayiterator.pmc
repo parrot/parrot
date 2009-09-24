@@ -109,8 +109,7 @@ Marks the current idx/key and the aggregate as live.
     VTABLE void mark() {
         PMC *array;
         GET_ATTR_array(INTERP, SELF, array);
-        if (array)
-             Parrot_gc_mark_PObj_alive(INTERP, (PObj *)array);
+        Parrot_gc_mark_PMC_alive(INTERP, array);
     }
 
 /*

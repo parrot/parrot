@@ -68,10 +68,8 @@ Mark any active exception handler data as live.
     VTABLE void mark() {
         Parrot_ExceptionHandler_attributes * const attrs =
             PARROT_EXCEPTIONHANDLER(SELF);
-        if (attrs->handled_types)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->handled_types);
-        if (attrs->handled_types_except)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->handled_types_except);
+        Parrot_gc_mark_PMC_alive(interp, attrs->handled_types);
+        Parrot_gc_mark_PMC_alive(interp, attrs->handled_types_except);
         SUPER();
     }
 

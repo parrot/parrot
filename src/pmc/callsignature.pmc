@@ -179,12 +179,9 @@ Mark any referenced strings and PMCs.
         Parrot_CallSignature_attributes * const attrs = PARROT_CALLSIGNATURE(SELF);
 
         if (attrs) {
-            if (attrs->returns)
-                Parrot_gc_mark_PObj_alive(interp, (PObj*)attrs->returns);
-            if (attrs->type_tuple)
-                Parrot_gc_mark_PObj_alive(interp, (PObj*)attrs->type_tuple);
-            if (attrs->short_sig)
-                Parrot_gc_mark_PObj_alive(interp, (PObj*)attrs->short_sig);
+            Parrot_gc_mark_PMC_alive(interp, attrs->returns);
+            Parrot_gc_mark_PMC_alive(interp, attrs->type_tuple);
+            Parrot_gc_mark_STRING_alive(interp, attrs->short_sig);
         }
         SUPER();
     }

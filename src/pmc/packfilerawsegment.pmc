@@ -64,8 +64,7 @@ Marks the object as live.
         Parrot_PackfileRawSegment_attributes * attrs =
                 PARROT_PACKFILERAWSEGMENT(SELF);
 
-        if (!PMC_IS_NULL(attrs->opcodes))
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->opcodes);
+        Parrot_gc_mark_PMC_alive(interp, attrs->opcodes);
 
         SUPER();
     }

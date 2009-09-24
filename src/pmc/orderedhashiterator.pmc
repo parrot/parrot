@@ -65,8 +65,7 @@ Marks the hash as live.
 
     VTABLE void mark() {
         PMC * const hash = PARROT_ORDEREDHASHITERATOR(SELF)->pmc_hash;
-        if (hash)
-             Parrot_gc_mark_PObj_alive(INTERP, (PObj *)hash);
+        Parrot_gc_mark_PMC_alive(INTERP, hash);
     }
 
 /*

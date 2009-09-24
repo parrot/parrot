@@ -118,8 +118,7 @@ Marks the array as live.
             GET_ATTR_size(INTERP, SELF, size);
 
             for (i = 0; i < size; i++) {
-                if (str_array[i])
-                    Parrot_gc_mark_PObj_alive(INTERP, (PObj *) str_array[i]);
+                Parrot_gc_mark_STRING_alive(INTERP, str_array[i]);
             }
         }
     }

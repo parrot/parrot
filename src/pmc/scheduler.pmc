@@ -266,16 +266,11 @@ Marks any referenced strings and PMCs as live.
         if (PARROT_SCHEDULER(SELF)) {
             Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
 
-            if (core_struct->task_list)
-                Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->task_list);
-            if (core_struct->task_index)
-                Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->task_index);
-            if (core_struct->wait_index)
-                Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->wait_index);
-            if (core_struct->handlers)
-                Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->handlers);
-            if (core_struct->messages)
-                Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->messages);
+            Parrot_gc_mark_PMC_alive(interp, core_struct->task_list);
+            Parrot_gc_mark_PMC_alive(interp, core_struct->task_index);
+            Parrot_gc_mark_PMC_alive(interp, core_struct->wait_index);
+            Parrot_gc_mark_PMC_alive(interp, core_struct->handlers);
+            Parrot_gc_mark_PMC_alive(interp, core_struct->messages);
         }
     }
 

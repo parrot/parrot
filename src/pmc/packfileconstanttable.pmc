@@ -66,10 +66,8 @@ Marks the object as live.
         Parrot_PackfileConstantTable_attributes * attrs =
                 PARROT_PACKFILECONSTANTTABLE(SELF);
 
-        if (!PMC_IS_NULL(attrs->constants))
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->constants);
-        if (!PMC_IS_NULL(attrs->types))
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->types);
+        Parrot_gc_mark_PMC_alive(interp, attrs->constants);
+        Parrot_gc_mark_PMC_alive(interp, attrs->types);
 
         SUPER();
     }

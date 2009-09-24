@@ -60,10 +60,8 @@ Marks the object as live.
         Parrot_PackfileAnnotation_attributes * attrs =
                 PARROT_PACKFILEANNOTATION(SELF);
 
-        if (attrs->name)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->name);
-        if ((attrs->value_type == PF_ANNOTATION_KEY_TYPE_STR) && attrs->str_value)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->str_value);
+        Parrot_gc_mark_STRING_alive(interp, attrs->name);
+        Parrot_gc_mark_STRING_alive(interp, attrs->str_value);
     }
 
 

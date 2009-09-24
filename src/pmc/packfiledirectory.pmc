@@ -61,8 +61,7 @@ Marks the object as live.
         Parrot_PackfileDirectory_attributes * attrs =
                 PARROT_PACKFILEDIRECTORY(SELF);
 
-        if (!PMC_IS_NULL(attrs->hash))
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->hash);
+        Parrot_gc_mark_PMC_alive(interp, attrs->hash);
 
         SUPER();
     }

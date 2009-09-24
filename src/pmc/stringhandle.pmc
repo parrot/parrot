@@ -120,14 +120,10 @@ Mark active stringhandle data as live.
 
     VTABLE void mark() {
         Parrot_StringHandle_attributes * const data_struct = PARROT_STRINGHANDLE(SELF);
-        if (data_struct->stringhandle)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)data_struct->stringhandle);
-        if (data_struct->mode)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)data_struct->mode);
-        if (data_struct->encoding)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)data_struct->encoding);
-        if (data_struct->filename)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)data_struct->filename);
+        Parrot_gc_mark_STRING_alive(interp, data_struct->stringhandle);
+        Parrot_gc_mark_STRING_alive(interp, data_struct->mode);
+        Parrot_gc_mark_STRING_alive(interp, data_struct->encoding);
+        Parrot_gc_mark_STRING_alive(interp, data_struct->filename);
     }
 
 /*

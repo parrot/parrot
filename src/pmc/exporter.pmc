@@ -134,12 +134,9 @@ Mark referenced strings and PMCs in the structure as live.
         GET_ATTR_ns_dest(INTERP, SELF, ns_dest);
         GET_ATTR_globals(INTERP, SELF, globals);
 
-        if (ns_src)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)ns_src);
-        if (ns_dest)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)ns_dest);
-        if (globals)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)globals);
+        Parrot_gc_mark_PMC_alive(interp, ns_src);
+        Parrot_gc_mark_PMC_alive(interp, ns_dest);
+        Parrot_gc_mark_PMC_alive(interp, globals);
     }
 
 

@@ -236,6 +236,48 @@ Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
 
 /*
 
+=item C<void Parrot_gc_mark_PMC_alive_fun(PARROT_INTERP, PMC *obj)>
+
+A type safe wrapper of Parrot_gc_mark_PObj_alive for PMC.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_gc_mark_PMC_alive_fun(PARROT_INTERP, ARGMOD_NULLOK(PMC *obj))
+{
+    ASSERT_ARGS(Parrot_gc_mark_PMC_alive_fun)
+    if (!PMC_IS_NULL(obj)) {
+        PARROT_ASSERT(PObj_is_PMC_TEST(obj));
+        Parrot_gc_mark_PObj_alive(interp, (PObj *)obj);
+    }
+}
+
+/*
+
+=item C<void Parrot_gc_mark_STRING_alive_fun(PARROT_INTERP, STRING *obj)>
+
+A type safe wrapper of Parrot_gc_mark_PObj_alive for STRING.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_gc_mark_STRING_alive_fun(PARROT_INTERP, ARGMOD_NULLOK(STRING *obj))
+{
+    ASSERT_ARGS(Parrot_gc_mark_STRING_alive_fun)
+    if (!STRING_IS_NULL(obj)) {
+        PARROT_ASSERT(PObj_is_string_TEST(obj));
+        Parrot_gc_mark_PObj_alive(interp, (PObj *)obj);
+    }
+}
+
+/*
+
 =item C<void Parrot_gc_initialize(PARROT_INTERP, void *stacktop)>
 
 Initializes the memory allocator and the garbage collection subsystem.

@@ -571,30 +571,18 @@ Marks the sub as live.
         if (!sub)
             return;
 
-        if (sub->name)
-            Parrot_gc_mark_PObj_alive(INTERP, (PObj *) sub->name);
-        if (sub->method_name)
-            Parrot_gc_mark_PObj_alive(INTERP, (PObj *) sub->method_name);
-        if (sub->ns_entry_name)
-            Parrot_gc_mark_PObj_alive(INTERP, (PObj *) sub->ns_entry_name);
-        if (!PMC_IS_NULL(sub->namespace_name))
-            Parrot_gc_mark_PObj_alive(INTERP, (PObj *) sub->namespace_name);
-        if (!PMC_IS_NULL(sub->namespace_stash))
-            Parrot_gc_mark_PObj_alive(INTERP, (PObj *) sub->namespace_stash);
-        if (!PMC_IS_NULL(sub->multi_signature))
-            Parrot_gc_mark_PObj_alive(INTERP, (PObj *) sub->multi_signature);
-        if (!PMC_IS_NULL(sub->lex_info))
-            Parrot_gc_mark_PObj_alive(INTERP, (PObj *) sub->lex_info);
-        if (!PMC_IS_NULL(sub->outer_sub))
-            Parrot_gc_mark_PObj_alive(INTERP, (PObj *) sub->outer_sub);
-        if (!PMC_IS_NULL(sub->eval_pmc))
-            Parrot_gc_mark_PObj_alive(INTERP, (PObj *) sub->eval_pmc);
-        if (sub->subid)
-            Parrot_gc_mark_PObj_alive(INTERP, (PObj *) sub->subid);
-        if (sub->ctx)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *) sub->ctx);
-        if (sub->outer_ctx)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *) sub->outer_ctx);
+        Parrot_gc_mark_STRING_alive(INTERP, sub->name);
+        Parrot_gc_mark_STRING_alive(INTERP, sub->method_name);
+        Parrot_gc_mark_STRING_alive(INTERP, sub->ns_entry_name);
+        Parrot_gc_mark_PMC_alive(INTERP, sub->namespace_name);
+        Parrot_gc_mark_PMC_alive(INTERP, sub->namespace_stash);
+        Parrot_gc_mark_PMC_alive(INTERP, sub->multi_signature);
+        Parrot_gc_mark_PMC_alive(INTERP, sub->lex_info);
+        Parrot_gc_mark_PMC_alive(INTERP, sub->outer_sub);
+        Parrot_gc_mark_PMC_alive(INTERP, sub->eval_pmc);
+        Parrot_gc_mark_STRING_alive(INTERP, sub->subid);
+        Parrot_gc_mark_PMC_alive(interp, sub->ctx);
+        Parrot_gc_mark_PMC_alive(interp, sub->outer_ctx);
     }
 
 /*

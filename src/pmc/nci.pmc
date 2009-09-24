@@ -232,14 +232,10 @@ Mark any referenced strings and PMCs.
         if (PARROT_NCI(SELF)) {
             Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
 
-            if (nci_info->signature)
-                Parrot_gc_mark_PObj_alive(interp, (PObj*)nci_info->signature);
-            if (nci_info->pcc_params_signature)
-                Parrot_gc_mark_PObj_alive(interp, (PObj*)nci_info->pcc_params_signature);
-            if (nci_info->long_signature)
-                Parrot_gc_mark_PObj_alive(interp, (PObj*)nci_info->long_signature);
-            if (nci_info->multi_sig)
-                Parrot_gc_mark_PObj_alive(interp, (PObj*)nci_info->multi_sig);
+            Parrot_gc_mark_STRING_alive(interp, nci_info->signature);
+            Parrot_gc_mark_STRING_alive(interp, nci_info->pcc_params_signature);
+            Parrot_gc_mark_STRING_alive(interp, nci_info->long_signature);
+            Parrot_gc_mark_PMC_alive(interp, nci_info->multi_sig);
         }
     }
 

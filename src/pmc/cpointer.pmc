@@ -84,18 +84,18 @@ pointer.
         if (sig) {
             void *pointer;
             GET_ATTR_pointer(INTERP, SELF, pointer);
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)sig);
+            Parrot_gc_mark_STRING_alive(interp, sig);
 
             if (pointer) {
                 if (Parrot_str_equal(interp, sig, CONST_STRING(interp, "P"))) {
                     PMC ** const pmc_pointer = (PMC **) pointer;
                     PARROT_ASSERT(*pmc_pointer);
-                    Parrot_gc_mark_PObj_alive(interp, (PObj *) *pmc_pointer);
+                    Parrot_gc_mark_PMC_alive(interp, *pmc_pointer);
                 }
                 else if (Parrot_str_equal(interp, sig, CONST_STRING(interp, "S"))) {
                     STRING ** const str_pointer = (STRING **) pointer;
                     PARROT_ASSERT(*str_pointer);
-                    Parrot_gc_mark_PObj_alive(interp, (PObj *) *str_pointer);
+                    Parrot_gc_mark_STRING_alive(interp, *str_pointer);
                 }
             }
         }
