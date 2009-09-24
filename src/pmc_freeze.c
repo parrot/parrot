@@ -38,12 +38,6 @@ C<STRING> with a vtable.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void add_pmc_todo_list(PARROT_INTERP,
-    ARGIN_NULLOK(PMC *pmc),
-    ARGIN(visit_info *info))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
 static void create_image(PARROT_INTERP,
     ARGIN_NULLOK(PMC *pmc),
     ARGMOD(visit_info *info))
@@ -193,9 +187,6 @@ static void visit_todo_list_thaw(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-#define ASSERT_ARGS_add_pmc_todo_list __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(info)
 #define ASSERT_ARGS_create_image __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     && PARROT_ASSERT_ARG(info)
@@ -646,7 +637,6 @@ todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info))
 {
     ASSERT_ARGS(todo_list_init)
     info->visit_pmc_now   = visit_todo_list;
-    info->visit_pmc_later = add_pmc_todo_list;
 
     /* we must use PMCs here so that they get marked properly */
     info->todo = pmc_new(interp, enum_class_Array);
@@ -937,25 +927,6 @@ do_thaw(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info))
 
 /*
 
-=item C<static void add_pmc_todo_list(PARROT_INTERP, PMC *pmc, visit_info
-*info)>
-
-Remembers the PMC to be processed later.
-
-=cut
-
-*/
-
-static void
-add_pmc_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info))
-{
-    ASSERT_ARGS(add_pmc_todo_list)
-    Parrot_pmc_array_push(interp, (List *)PMC_data(info->todo), pmc, enum_type_PMC);
-}
-
-
-/*
-
 =item C<static int todo_list_seen(PARROT_INTERP, PMC *pmc, visit_info *info,
 UINTVAL *id)>
 
@@ -1211,7 +1182,6 @@ run_thaw(PARROT_INTERP, ARGIN(STRING* image), visit_enum_type what)
 
     todo_list_init(interp, &info);
     info.visit_pmc_now   = visit_todo_list_thaw;
-    info.visit_pmc_later = add_pmc_todo_list;
 
     info.thaw_result = NULL;
 

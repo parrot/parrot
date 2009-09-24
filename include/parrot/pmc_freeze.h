@@ -63,7 +63,6 @@ typedef enum {
 
 typedef struct _visit_info {
     visit_f             visit_pmc_now;
-    visit_f             visit_pmc_later;
     visit_f             visit_action;   /* freeze, thaw ... */
     INTVAL              what;
     STRING             *image;

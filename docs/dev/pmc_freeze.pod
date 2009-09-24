@@ -118,9 +118,6 @@ B<visit_pmc_now>. It gets called initially to put the first item on the list
 and is called thereafter from all PMCs for contained PMCs inside the B<visit>
 vtable method.
 
-There is another callback B<visit_pmc_later> which adds PMCs to the todo list
-for later processing, but doesn't do any action on these immediately.
-
 
 =head2 The visit() vtable
 
@@ -290,4 +287,3 @@ Leopold Toetsch C<lt@toetsch.at>
 =cut
 
 # vim: expandtab shiftwidth=2 tw=70:
-
