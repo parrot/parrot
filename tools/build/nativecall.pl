@@ -68,7 +68,7 @@ my %sig_table = (
     I => { as_proto => "INTVAL", sig_char => "I" },
     N => { as_proto => "FLOATVAL", sig_char => "N" },
     b => { as_proto => "void *", as_return => "", sig_char => "S" },
-    B => { as_proto => "void **", as_return => "", sig_char => "S" },
+    B => { as_proto => "char **", as_return => "", sig_char => "S" },
     # These should be replaced by modifiers in the future
     2 => { as_proto => "short *",  sig_char => "P", return_type => "short",
            ret_assign => "set_nci_I(interp, &st, *return_data);" },
@@ -292,7 +292,7 @@ sub make_arg {
         return "Buffer_bufstart(t_$temp_num)";
     };
     /B/ && do {
-        push @{$temps_ref}, "char *s_$temp_num;\n    char *t_$temp_num;\n    void** v_$temp_num = (void **) &t_$temp_num;";
+        push @{$temps_ref}, "char *s_$temp_num;\n    char *t_$temp_num;\n    char** v_$temp_num = &t_$temp_num;";
         push @{$extra_preamble_ref},
             "{STRING * s= GET_NCI_S($reg_num); t_$temp_num = s ? Parrot_str_to_cstring(interp, s) : (char *) NULL; s_$temp_num = t_$temp_num;}";
         push @{$extra_postamble_ref}, "do { if (s_$temp_num) Parrot_str_free_cstring(s_$temp_num); } while (0);";
