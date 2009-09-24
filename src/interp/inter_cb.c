@@ -299,7 +299,9 @@ Parrot_run_callback(PARROT_INTERP,
     PMC     *sub;
     STRING  *sig_str;
     char    *p;
-    char     pasm_sig[5];
+    char     ch;
+    char    *sig_cstr;
+    char     pasm_sig[4];
     INTVAL   i_param;
     PMC     *p_param;
     void    *param = NULL;      /* avoid -Ox warning */
@@ -315,12 +317,13 @@ Parrot_run_callback(PARROT_INTERP,
     p         = sig_cstr;
     ++p;     /* Skip return type */
 
-    pasm_sig[0] = 'P';
+    pasm_sig[0] = 'v';  /* no return value supported yet */
+    pasm_sig[1] = 'P';
     if (*p == 'U') /* user_data Z in pdd16 */
         ++p;       /* p is now type of external data */
     switch (*p) {
         case 'v':
-            pasm_sig[1] = 'v';
+            pasm_sig[2] = 'v';
             break;
 #if 0
         case '2':
@@ -339,7 +342,7 @@ Parrot_run_callback(PARROT_INTERP,
         case 'c':
             i_param = (INTVAL)(char)(long)external_data;
 case_I:
-            pasm_sig[1] = 'I';
+            pasm_sig[2] = 'I';
             param = (void*) i_param;
             break;
 #if 0
@@ -354,16 +357,16 @@ case_I:
             /* created a UnManagedStruct */
             p_param = pmc_new(interp, enum_class_UnManagedStruct);
             VTABLE_set_pointer(interp, p_param, external_data);
-            pasm_sig[1] = 'P';
+            pasm_sig[2] = 'P';
             param = (void*) p_param;
             break;
 #if 0
         case 'P':
-            pasm_sig[1] = 'P';
+            pasm_sig[2] = 'P';
             break;
 #endif
         case 't':
-            pasm_sig[1] = 'S';
+            pasm_sig[2] = 'S';
             param = Parrot_str_new(interp, external_data, 0);
             break;
         default:
@@ -372,10 +375,9 @@ case_I:
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "unhandled signature char '%c' in run_cb", ch);
     }
-    pasm_sig[2] = '-';
-    pasm_sig[3] = '>';  /* no return value supported yet */
-    pasm_sig[4] = '\0';
-    Parrot_pcc_invoke_sub_from_c_args(interp, sub, pasm_sig,
+    Parrot_str_free_cstring(sig_cstr);
+    pasm_sig[3] = '\0';
+    Parrot_runops_fromc_args_event(interp, sub, pasm_sig,
             user_data, param);
 }
 /*

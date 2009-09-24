@@ -1351,7 +1351,6 @@ err_2:
     .local pmc exception
     .local string message
 bad_type:
-    pop_eh
     .get_results (exception)
     message = exception
 still_ok:

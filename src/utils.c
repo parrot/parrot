@@ -906,7 +906,6 @@ static INTVAL
 COMPARE(PARROT_INTERP, ARGIN(void *a), ARGIN(void *b), ARGIN(PMC *cmp))
 {
     ASSERT_ARGS(COMPARE)
-    INTVAL result;
     if (PMC_IS_NULL(cmp))
         return VTABLE_cmp(interp, (PMC *)a, (PMC *)b);
 
@@ -915,8 +914,7 @@ COMPARE(PARROT_INTERP, ARGIN(void *a), ARGIN(void *b), ARGIN(PMC *cmp))
         return f(interp, a, b);
     }
 
-    Parrot_pcc_invoke_sub_from_c_args(interp, cmp, "PP->I", a, b, &result);
-    return result;
+    return Parrot_runops_fromc_args_reti(interp, cmp, "IPP", a, b);
 }
 
 /*

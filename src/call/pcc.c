@@ -118,27 +118,6 @@ static PMC * count_signature_elements(PARROT_INTERP,
         FUNC_MODIFIES(*args_sig)
         FUNC_MODIFIES(*results_sig);
 
-static void dissect_aggregate_arg(PARROT_INTERP,
-    ARGMOD(PMC *call_object),
-    ARGIN(PMC *aggregate))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*call_object);
-
-static void extract_named_arg_from_op(PARROT_INTERP,
-    ARGMOD(PMC *call_object),
-    ARGIN(STRING *name),
-    ARGIN(PMC * const raw_sig),
-    ARGIN(opcode_t * const raw_args),
-    INTVAL arg_index)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
-        FUNC_MODIFIES(*call_object);
-
 static int fetch_arg_op(PARROT_INTERP, ARGMOD(call_state *st))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -171,18 +150,6 @@ static void next_arg_sig(PARROT_INTERP, ARGMOD(call_state_item *sti))
 static void null_val(int sig, ARGMOD(call_state *st))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*st);
-
-PARROT_CAN_RETURN_NULL
-static void parse_signature_string(PARROT_INTERP,
-    ARGIN(const char *signature),
-    ARGMOD(PMC **arg_flags),
-    ARGMOD(PMC **return_flags))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*arg_flags)
-        FUNC_MODIFIES(*return_flags);
 
 PARROT_CAN_RETURN_NULL
 static const char * set_context_sig_params(PARROT_INTERP,
@@ -305,19 +272,9 @@ static void too_many(PARROT_INTERP,
     && PARROT_ASSERT_ARG(st)
 #define ASSERT_ARGS_count_signature_elements __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(signature) \
-    || PARROT_ASSERT_ARG(args_sig) \
-    || PARROT_ASSERT_ARG(results_sig)
-#define ASSERT_ARGS_dissect_aggregate_arg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(call_object) \
-    || PARROT_ASSERT_ARG(aggregate)
-#define ASSERT_ARGS_extract_named_arg_from_op __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(call_object) \
-    || PARROT_ASSERT_ARG(name) \
-    || PARROT_ASSERT_ARG(raw_sig) \
-    || PARROT_ASSERT_ARG(raw_args)
+    && PARROT_ASSERT_ARG(signature) \
+    && PARROT_ASSERT_ARG(args_sig) \
+    && PARROT_ASSERT_ARG(results_sig)
 #define ASSERT_ARGS_fetch_arg_op __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     && PARROT_ASSERT_ARG(st)
@@ -337,11 +294,6 @@ static void too_many(PARROT_INTERP,
     && PARROT_ASSERT_ARG(sti)
 #define ASSERT_ARGS_null_val __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(st)
-#define ASSERT_ARGS_parse_signature_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(signature) \
-    || PARROT_ASSERT_ARG(arg_flags) \
-    || PARROT_ASSERT_ARG(return_flags)
 #define ASSERT_ARGS_set_context_sig_params __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     && PARROT_ASSERT_ARG(signature) \
@@ -390,330 +342,6 @@ static void too_many(PARROT_INTERP,
 
 /*
 
-=item C<PMC* Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, PMC *signature,
-PMC * const raw_sig, opcode_t * const raw_args)>
-
-Take a raw signature and argument list from a set_args opcode and
-convert it to a CallSignature PMC.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC*
-Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
-        ARGIN(PMC * const raw_sig), ARGIN(opcode_t * const raw_args))
-{
-    ASSERT_ARGS(Parrot_pcc_build_sig_object_from_op)
-    PMC            *call_object;
-    INTVAL          arg_index;
-    INTVAL          arg_count  = VTABLE_elements(interp, raw_sig);
-    Parrot_Context *ctx        = CONTEXT(interp);
-    STRING         *string_sig = Parrot_str_new(interp, "", 0);
-
-    if (PMC_IS_NULL(signature)) {
-        call_object = pmc_new(interp, enum_class_CallSignature);
-        gc_register_pmc(interp, call_object);
-    }
-    else
-        call_object = signature;
-
-    VTABLE_set_attr_str(interp, call_object, CONST_STRING(interp, "arg_flags"), raw_sig);
-
-    for (arg_index = 0; arg_index < arg_count; arg_index++) {
-        INTVAL arg_flags = VTABLE_get_integer_keyed_int(interp,
-                    raw_sig, arg_index);
-
-        const INTVAL constant  = PARROT_ARG_CONSTANT_ISSET(arg_flags);
-        const INTVAL raw_index = raw_args[arg_index + 2];
-
-        switch (PARROT_ARG_TYPE_MASK_MASK(arg_flags)) {
-            case PARROT_ARG_INTVAL:
-                string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "I"));
-                if (constant)
-                    VTABLE_push_integer(interp, call_object, raw_index);
-                else
-                    VTABLE_push_integer(interp, call_object, CTX_REG_INT(ctx, raw_index));
-                break;
-            case PARROT_ARG_FLOATVAL:
-                string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "N"));
-                if (constant)
-                    VTABLE_push_float(interp, call_object,
-                            ctx->constants[raw_index]->u.number);
-                else
-                    VTABLE_push_float(interp, call_object, CTX_REG_NUM(ctx, raw_index));
-                break;
-            case PARROT_ARG_STRING:
-            {
-                STRING *string_value;
-                string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "S"));
-                if (constant)
-                    /* ensure that callees don't modify constant caller strings */
-                    string_value = Parrot_str_new_COW(interp,
-                                            ctx->constants[raw_index]->u.string);
-                else
-                    string_value = CTX_REG_STR(ctx, raw_index);
-
-                if (arg_flags & PARROT_ARG_NAME) {
-                    string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "n"));
-                    extract_named_arg_from_op(interp, call_object, string_value,
-                            raw_sig, raw_args, raw_index);
-                }
-                else
-                    VTABLE_push_string(interp, call_object, string_value);
-
-                break;
-            }
-            case PARROT_ARG_PMC:
-            {
-                PMC *pmc_value;
-                string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "P"));
-                if (constant)
-                    pmc_value = ctx->constants[raw_index]->u.key;
-                else
-                    pmc_value = CTX_REG_PMC(ctx, raw_index);
-
-                if (arg_flags & PARROT_ARG_FLATTEN) {
-                    dissect_aggregate_arg(interp, call_object, pmc_value);
-                    string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "f"));
-                }
-                else
-                    VTABLE_push_pmc(interp, call_object, CTX_REG_PMC(ctx, raw_index));
-
-                break;
-            }
-            default:
-                break;
-        }
-
-    }
-
-    VTABLE_set_string_native(interp, call_object, string_sig);
-    return call_object;
-}
-
-/*
-
-=item C<static void extract_named_arg_from_op(PARROT_INTERP, PMC *call_object,
-STRING *name, PMC * const raw_sig, opcode_t * const raw_args, INTVAL arg_index)>
-
-Pulls in the next argument from a set_args opcode, and sets it as the
-value of a named argument in the CallSignature PMC.
-
-=cut
-
-*/
-
-static void
-extract_named_arg_from_op(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(STRING *name),
-        ARGIN(PMC * const raw_sig), ARGIN(opcode_t * const raw_args),
-        INTVAL arg_index)
-{
-    ASSERT_ARGS(extract_named_arg_from_op)
-    Parrot_Context *ctx = CONTEXT(interp);
-    INTVAL arg_flags = VTABLE_get_integer_keyed_int(interp,
-                    raw_sig, arg_index);
-
-    const INTVAL constant  = PARROT_ARG_CONSTANT_ISSET(arg_flags);
-    const INTVAL raw_index = raw_args[arg_index + 2];
-    STRING      *string_sig = VTABLE_get_string(interp, call_object);
-
-    switch (PARROT_ARG_TYPE_MASK_MASK(arg_flags)) {
-        case PARROT_ARG_INTVAL:
-            string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "I"));
-            if (constant)
-                VTABLE_set_integer_keyed_str(interp, call_object, name, raw_index);
-            else
-                VTABLE_set_integer_keyed_str(interp, call_object, name,
-                        CTX_REG_INT(ctx, raw_index));
-            break;
-        case PARROT_ARG_FLOATVAL:
-            string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "N"));
-            if (constant)
-                VTABLE_set_number_keyed_str(interp, call_object, name,
-                        ctx->constants[raw_index]->u.number);
-            else
-                VTABLE_set_number_keyed_str(interp, call_object, name,
-                        CTX_REG_NUM(ctx, raw_index));
-            break;
-        case PARROT_ARG_STRING:
-            string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "S"));
-            if (constant)
-                /* ensure that callees don't modify constant caller strings */
-                VTABLE_set_string_keyed_str(interp, call_object, name,
-                        Parrot_str_new_COW(interp,
-                                        ctx->constants[raw_index]->u.string));
-            else
-                VTABLE_set_string_keyed_str(interp, call_object, name,
-                        CTX_REG_STR(ctx, raw_index));
-            break;
-        case PARROT_ARG_PMC:
-            string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "P"));
-            if (constant)
-                VTABLE_set_pmc_keyed_str(interp, call_object, name,
-                        ctx->constants[raw_index]->u.key);
-            else
-                VTABLE_set_pmc_keyed_str(interp, call_object, name,
-                        CTX_REG_PMC(ctx, raw_index));
-            break;
-        default:
-            break;
-    }
-
-    VTABLE_set_string_native(interp, call_object, string_sig);
-}
-
-/*
-
-=item C<static void dissect_aggregate_arg(PARROT_INTERP, PMC *call_object, PMC
-*aggregate)>
-
-Takes an aggregate PMC and splits it up into individual arguments,
-adding each one to the CallSignature PMC. If the aggregate is an array,
-its elements are added as positional arguments. If the aggregate is a
-hash, its key/value pairs are added as named arguments.
-
-=cut
-
-*/
-
-static void
-dissect_aggregate_arg(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(PMC *aggregate))
-{
-    ASSERT_ARGS(dissect_aggregate_arg)
-
-    if (VTABLE_does(interp, aggregate, CONST_STRING(interp, "array"))) {
-        INTVAL elements = VTABLE_elements(interp, aggregate);
-        INTVAL index;
-        for (index = 0; index < elements; index++) {
-            VTABLE_push_pmc(interp, call_object,
-                    VTABLE_get_pmc_keyed_int(interp, aggregate, index));
-        }
-    }
-    else if (VTABLE_does(interp, aggregate, CONST_STRING(interp, "hash"))) {
-        INTVAL elements = VTABLE_elements(interp, aggregate);
-        INTVAL index;
-        PMC *key = pmc_new(interp, enum_class_Key);
-        VTABLE_set_integer_native(interp, key, 0);
-        SETATTR_Key_next_key(interp, key, (PMC *)INITBucketIndex);
-
-        /* Low-level hash iteration. */
-        for (index = 0; index < elements; index++) {
-            if (!PMC_IS_NULL(key)) {
-                STRING *name = (STRING *)parrot_hash_get_idx(interp,
-                                (Hash *)VTABLE_get_pointer(interp, aggregate), key);
-                PARROT_ASSERT(name);
-                VTABLE_set_pmc_keyed_str(interp, call_object, name,
-                    VTABLE_get_pmc_keyed_str(interp, aggregate, name));
-            }
-        }
-    }
-    else {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                "flattened parameters must be a hash or array");
-    }
-
-}
-
-/*
-
-=item C<PMC* Parrot_pcc_build_sig_object_returns_from_op(PARROT_INTERP, PMC
-*signature, PMC *raw_sig, opcode_t *raw_args)>
-
-Take a raw signature and argument list from a set_results opcode and
-convert it to a CallSignature PMC. Uses an existing CallSignature PMC if
-one was already created for set_args. Otherwise, creates a new one.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PMC*
-Parrot_pcc_build_sig_object_returns_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
-        ARGIN(PMC *raw_sig), ARGIN(opcode_t *raw_args))
-{
-    ASSERT_ARGS(Parrot_pcc_build_sig_object_returns_from_op)
-    PMC            *call_object;
-    STRING         *string_sig;
-    INTVAL          arg_index;
-    INTVAL          arg_count = VTABLE_elements(interp, raw_sig);
-    Parrot_Context *ctx       = CONTEXT(interp);
-    PMC            *returns   = pmc_new(interp, enum_class_ResizablePMCArray);
-
-    if (PMC_IS_NULL(signature)) {
-        call_object = pmc_new(interp, enum_class_CallSignature);
-        gc_register_pmc(interp, call_object);
-    }
-    else
-        call_object = signature;
-
-    string_sig = VTABLE_get_string(interp, call_object);
-
-    /* A hack to support 'get_results' as the way of fetching the
-     * exception object inside an exception handler. The first argument
-     * in the call object is the exception, stick it directly into the
-     * destination register. */
-    if (CALLSIGNATURE_is_exception_TEST(call_object)) {
-        const INTVAL raw_index = raw_args[2];
-        CTX_REG_PMC(ctx, raw_index) = 
-                VTABLE_get_pmc_keyed_int(interp, call_object, 0);
-        return NULL;
-    }
-
-    VTABLE_set_attr_str(interp, call_object, CONST_STRING(interp, "return_flags"), raw_sig);
-    VTABLE_set_attr_str(interp, call_object, CONST_STRING(interp, "returns"), returns);
-    string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "->"));
-
-    for (arg_index = 0; arg_index < arg_count; arg_index++) {
-        STRING * const signature = CONST_STRING(interp, "signature");
-        INTVAL arg_flags = VTABLE_get_integer_keyed_int(interp,
-                    raw_sig, arg_index);
-        const INTVAL raw_index = raw_args[arg_index + 2];
-
-        /* Returns store a pointer to the register, so they can pass
-         * the result back to the caller. */
-        PMC * const val_pointer = pmc_new(interp, enum_class_CPointer);
-        VTABLE_push_pmc(interp, returns, val_pointer);
-
-        switch (PARROT_ARG_TYPE_MASK_MASK(arg_flags)) {
-            case PARROT_ARG_INTVAL:
-                string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "I"));
-                VTABLE_set_pointer(interp, val_pointer, (void *) &(CTX_REG_INT(ctx, raw_index)));
-                VTABLE_set_string_keyed_str(interp, val_pointer, signature, CONST_STRING(interp, "I"));
-                break;
-            case PARROT_ARG_FLOATVAL:
-                string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "N"));
-                VTABLE_set_pointer(interp, val_pointer, (void *) &(CTX_REG_NUM(ctx, raw_index)));
-                VTABLE_set_string_keyed_str(interp, val_pointer, signature, CONST_STRING(interp, "N"));
-                break;
-            case PARROT_ARG_STRING:
-                string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "S"));
-                VTABLE_set_pointer(interp, val_pointer, (void *) &(CTX_REG_STR(ctx, raw_index)));
-                VTABLE_set_string_keyed_str(interp, val_pointer, signature, CONST_STRING(interp, "S"));
-                break;
-            case PARROT_ARG_PMC:
-                string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "P"));
-                VTABLE_set_pointer(interp, val_pointer, (void *) &(CTX_REG_PMC(ctx, raw_index)));
-                VTABLE_set_string_keyed_str(interp, val_pointer, signature, CONST_STRING(interp, "P"));
-                break;
-            default:
-                break;
-        }
-
-    }
-
-    VTABLE_set_string_native(interp, call_object, string_sig);
-    return call_object;
-}
-
-/*
-
 =item C<PMC* Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, PMC *obj,
 const char *sig, va_list args)>
 
@@ -735,8 +363,6 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
     ASSERT_ARGS(Parrot_pcc_build_sig_object_from_varargs)
     PMC         *type_tuple         = PMCNULL;
     PMC         *returns            = PMCNULL;
-    PMC         *arg_flags     = PMCNULL;
-    PMC         *return_flags  = PMCNULL;
     PMC         * const call_object = pmc_new(interp, enum_class_CallSignature);
     STRING      *string_sig         = Parrot_str_new_constant(interp, sig);
     const INTVAL sig_len            = Parrot_str_byte_length(interp, string_sig);
@@ -747,9 +373,6 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
         return call_object;
 
     VTABLE_set_string_native(interp, call_object, string_sig);
-    parse_signature_string(interp, sig, &arg_flags, &return_flags);
-    VTABLE_set_attr_str(interp, call_object, CONST_STRING(interp, "arg_flags"), arg_flags);
-    VTABLE_set_attr_str(interp, call_object, CONST_STRING(interp, "return_flags"), return_flags);
 
     /* Process the varargs list */
     for (i = 0; i < sig_len; ++i) {
@@ -758,7 +381,7 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
         /* Only create the returns array if it's needed */
         if (in_return_sig && PMC_IS_NULL(returns)) {
             returns = pmc_new(interp, enum_class_ResizablePMCArray);
-            VTABLE_set_attr_str(interp, call_object, CONST_STRING(interp, "returns"), returns);
+            VTABLE_set_attr_str(interp, call_object, CONST_STRING(interp, "results"), returns);
         }
 
         if (in_return_sig) {
@@ -788,7 +411,7 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
                 default:
                     Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_INVALID_OPERATION,
-                        "Dispatch: invalid argument type %c!", type);
+                        "Multiple Dispatch: invalid argument type %c!", type);
              }
         }
         else {
@@ -804,17 +427,7 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
                     VTABLE_push_string(interp, call_object, va_arg(args, STRING *));
                     break;
                 case 'P':
-                {
-                    INTVAL type_lookahead = Parrot_str_indexed(interp, string_sig, (i + 1));
-                    PMC * const pmc_arg = va_arg(args, PMC *);
-                    VTABLE_push_pmc(interp, call_object, pmc_arg);
-                    if (type_lookahead == 'i') {
-                        if (i != 0)
-                            Parrot_ex_throw_from_c_args(interp, NULL,
-                                EXCEPTION_INVALID_OPERATION,
-                                "Dispatch: only the first argument can be an invocant");
-                        i++; /* skip 'i' */
-                    }
+                    VTABLE_push_pmc(interp, call_object, va_arg(args, PMC *));
                     break;
                 case '-':
                     i++; /* skip '>' */
@@ -823,7 +436,7 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
                 default:
                     Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_INVALID_OPERATION,
-                        "Dispatch: invalid argument type %c!", type);
+                        "Multiple Dispatch: invalid argument type %c!", type);
             }
         }
     }
@@ -840,719 +453,6 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
     VTABLE_set_pmc(interp, call_object, type_tuple);
 
     return call_object;
-}
-
-/*
-
-=item C<void Parrot_pcc_fill_params_from_op(PARROT_INTERP, PMC *call_object, PMC
-*raw_sig, opcode_t *raw_params)>
-
-Gets args for the current function call and puts them into position.
-First it gets the positional non-slurpy parameters, then the positional
-slurpy parameters, then the named parameters, and finally the named
-slurpy parameters.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_pcc_fill_params_from_op(PARROT_INTERP, ARGMOD(PMC *call_object),
-        ARGIN(PMC *raw_sig), ARGIN(opcode_t *raw_params))
-{
-    ASSERT_ARGS(Parrot_pcc_fill_params_from_op)
-    Parrot_Context *ctx = CONTEXT(interp);
-    INTVAL  positional_elements = VTABLE_elements(interp, call_object);
-    INTVAL  param_count    = VTABLE_elements(interp, raw_sig);
-    STRING *param_name     = NULL;
-    INTVAL  param_index    = 0;
-    INTVAL  positional_index = 0;
-    INTVAL  named_count    = 0;
-    INTVAL  slurpy_count   = 0;
-    INTVAL  optional_count = 0;
-    INTVAL  err_check      = 0;
-    INTVAL  got_optional   = -1;
-
-    /* Check if we should be throwing errors. This is configured separately
-     * for parameters and return values. */
-    if (PARROT_ERRORS_test(interp, PARROT_ERRORS_PARAM_COUNT_FLAG))
-            err_check = 1;
-
-    for (param_index = 0; param_index < param_count; param_index++) {
-        INTVAL param_flags = VTABLE_get_integer_keyed_int(interp,
-                    raw_sig, param_index);
-
-        const INTVAL raw_index = raw_params[param_index + 2];
-
-        /* opt_flag parameter */
-        if (param_flags & PARROT_ARG_OPT_FLAG) {
-            if (optional_count <= 0)
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                        EXCEPTION_INVALID_OPERATION,
-                        "optional flag with no optional parameter");
-            if (got_optional < 0 || got_optional > 1)
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                        EXCEPTION_INVALID_OPERATION,
-                        "unable to determine if optional argument was passed");
-
-            CTX_REG_INT(ctx, raw_index) = got_optional;
-            got_optional = -1;
-            continue; /* on to next parameter */
-        }
-        /* Collected ("slurpy") parameter */
-        else if (param_flags & PARROT_ARG_SLURPY_ARRAY) {
-            /* Collect named arguments into hash */
-            if (param_flags & PARROT_ARG_NAME) {
-                PMC * const collect_named = pmc_new(interp,
-                        Parrot_get_ctx_HLL_type(interp, enum_class_Hash));
-
-                CTX_REG_PMC(ctx, raw_index) = collect_named;
-                named_count += VTABLE_elements(interp, collect_named);
-            }
-            /* Collect positional arguments into array */
-            else {
-                PMC *collect_positional;
-                if (named_count > 0)
-                    Parrot_ex_throw_from_c_args(interp, NULL,
-                            EXCEPTION_INVALID_OPERATION,
-                            "named parameters must follow all positional parameters");
-                collect_positional = pmc_new(interp,
-                        Parrot_get_ctx_HLL_type(interp, enum_class_ResizablePMCArray));
-                for (; positional_index < positional_elements; positional_index++) {
-                    VTABLE_push_pmc(interp, collect_positional,
-                            VTABLE_get_pmc_keyed_int(interp, call_object, positional_index));
-                }
-                CTX_REG_PMC(ctx, raw_index) = collect_positional;
-            }
-
-            continue; /* on to next parameter */
-        }
-        /* Named non-collected */
-        else if (param_flags & PARROT_ARG_NAME) {
-            /* Just store the name for now (this parameter is only the
-             * name). The next parameter is the actual value. */
-            param_name = PARROT_ARG_CONSTANT_ISSET(param_flags)
-                               ? ctx->constants[raw_index]->u.string
-                               : CTX_REG_STR(ctx, raw_index);
-
-            continue;
-        }
-        else if (!STRING_IS_NULL(param_name)) {
-            /* The previous parameter was a parameter name. Now set the
-             * value of the named parameter.*/
-            if (VTABLE_exists_keyed_str(interp, call_object, param_name)) {
-                named_count++;
-
-                switch (PARROT_ARG_TYPE_MASK_MASK(param_flags)) {
-                    case PARROT_ARG_INTVAL:
-                        CTX_REG_INT(ctx, raw_index) =
-                                VTABLE_get_integer_keyed_str(interp, call_object, param_name);
-                        break;
-                    case PARROT_ARG_FLOATVAL:
-                        CTX_REG_NUM(ctx, raw_index) =
-                                VTABLE_get_number_keyed_str(interp, call_object, param_name);
-                        break;
-                    case PARROT_ARG_STRING:
-                        CTX_REG_STR(ctx, raw_index) =
-                                VTABLE_get_string_keyed_str(interp, call_object, param_name);
-                        break;
-                    case PARROT_ARG_PMC:
-                        CTX_REG_PMC(ctx, raw_index) =
-                                VTABLE_get_pmc_keyed_str(interp, call_object, param_name);
-                        break;
-                    default:
-                        Parrot_ex_throw_from_c_args(interp, NULL,
-                                EXCEPTION_INVALID_OPERATION, "invalid parameter type");
-                        break;
-                }
-                param_name = NULL;
-                continue; /* on to next parameter */
-            }
-
-            /* If the named parameter doesn't have a corresponding named
-             * argument, fall through to positional argument handling. */
-            param_name = NULL;
-        }
-
-        /* Positional non-collected */
-        if (named_count > 0)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                    "named parameters must follow all positional parameters");
-        if (slurpy_count > 0)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                    "slurpy parameters must follow ordinary positional parameters");
-
-        /* No more positional arguments available to assign */
-        if (positional_index >= positional_elements) {
-            if (!(param_flags & PARROT_ARG_OPTIONAL))
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                        "too few positional arguments: %d passed, %d (or more) expected",
-                        positional_elements, param_index + 1);
-
-            got_optional = 0;
-            optional_count++;
-            switch (PARROT_ARG_TYPE_MASK_MASK(param_flags)) {
-                case PARROT_ARG_INTVAL:
-                    CTX_REG_INT(ctx, raw_index) = 0;
-                    break;
-                case PARROT_ARG_FLOATVAL:
-                    CTX_REG_NUM(ctx, raw_index) = 0.0;
-                    break;
-                case PARROT_ARG_STRING:
-                    CTX_REG_STR(ctx, raw_index) = NULL;
-                    break;
-                case PARROT_ARG_PMC:
-                    CTX_REG_PMC(ctx, raw_index) = PMCNULL;
-                    break;
-                default:
-                    Parrot_ex_throw_from_c_args(interp, NULL,
-                            EXCEPTION_INVALID_OPERATION, "invalid parameter type");
-                    break;
-            }
-
-            continue; /* on to next parameter */
-        }
-
-        /* Otherwise, we have a positional argument to assign to the
-         * positional parameter, so go ahead and assign it. */
-        if (param_flags & PARROT_ARG_OPTIONAL) {
-            got_optional = 1;
-            optional_count++;
-        }
-
-        switch (PARROT_ARG_TYPE_MASK_MASK(param_flags)) {
-            case PARROT_ARG_INTVAL:
-                CTX_REG_INT(ctx, raw_index) =
-                        VTABLE_get_integer_keyed_int(interp, call_object, positional_index);
-                positional_index++;
-                break;
-            case PARROT_ARG_FLOATVAL:
-                CTX_REG_NUM(ctx, raw_index) =
-                        VTABLE_get_number_keyed_int(interp, call_object, positional_index);
-                positional_index++;
-                break;
-            case PARROT_ARG_STRING:
-                CTX_REG_STR(ctx, raw_index) =
-                        VTABLE_get_string_keyed_int(interp, call_object, positional_index);
-                positional_index++;
-                break;
-            case PARROT_ARG_PMC:
-                CTX_REG_PMC(ctx, raw_index) =
-                        VTABLE_get_pmc_keyed_int(interp, call_object, positional_index);
-                positional_index++;
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                        EXCEPTION_INVALID_OPERATION, "invalid parameter type");
-                break;
-        }
-    }
-
-    if (err_check && (positional_elements > positional_index))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                "too many positional arguments: %d passed, %d expected",
-                positional_elements, param_count);
-
-}
-
-/*
-
-=item C<void Parrot_pcc_fill_params_from_c_args(PARROT_INTERP, PMC *call_object,
-const char *signature, ...)>
-
-Gets args for the current function call and puts them into position.
-First it gets the positional non-slurpy parameters, then the positional
-slurpy parameters, then the named parameters, and finally the named
-slurpy parameters.
-
-The signature is a string in the format used for
-C<Parrot_pcc_invoke_from_sig_object>, but with no return arguments. The
-parameters are passed in as a list of references to the destination
-variables.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_pcc_fill_params_from_c_args(PARROT_INTERP, ARGMOD(PMC *call_object),
-        ARGIN(const char *signature), ...)
-{
-    ASSERT_ARGS(Parrot_pcc_fill_params_from_c_args)
-    va_list args;
-    Parrot_Context *ctx = CONTEXT(interp);
-    INTVAL  positional_elements = VTABLE_elements(interp, call_object);
-    INTVAL  param_count      = 0;
-    STRING *param_name       = NULL;
-    INTVAL  param_index      = 0;
-    INTVAL  positional_index = 0;
-    INTVAL  named_count      = 0;
-    INTVAL  slurpy_count     = 0;
-    INTVAL  optional_count   = 0;
-    INTVAL  err_check        = 0;
-    INTVAL  got_optional     = -1;
-    PMC    *raw_sig  = PMCNULL;
-    PMC    *invalid_sig = PMCNULL;
-
-    parse_signature_string(interp, signature, &raw_sig, &invalid_sig);
-    if (!PMC_IS_NULL(invalid_sig))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                "returns should not be included in the parameter list");
-    param_count = VTABLE_elements(interp, raw_sig);
-
-    /* Check if we should be throwing errors. This is configured separately
-     * for parameters and return values. */
-    if (PARROT_ERRORS_test(interp, PARROT_ERRORS_PARAM_COUNT_FLAG))
-            err_check = 1;
-
-    va_start(args, signature);
-    for (param_index = 0; param_index < param_count; param_index++) {
-        INTVAL param_flags = VTABLE_get_integer_keyed_int(interp,
-                    raw_sig, param_index);
-
-        /* opt_flag parameter */
-        if (param_flags & PARROT_ARG_OPT_FLAG) {
-            if (optional_count <= 0)
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                        EXCEPTION_INVALID_OPERATION,
-                        "optional flag with no optional parameter");
-            if (got_optional < 0 || got_optional > 1)
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                        EXCEPTION_INVALID_OPERATION,
-                        "unable to determine if optional argument was passed");
-
-            {
-                INTVAL * const int_pointer = va_arg(args, INTVAL*);
-                *int_pointer = got_optional;
-            }
-            got_optional = -1;
-            continue; /* on to next parameter */
-        }
-        /* Collected ("slurpy") parameter */
-        else if (param_flags & PARROT_ARG_SLURPY_ARRAY) {
-            /* Collect named arguments into hash */
-            if (param_flags & PARROT_ARG_NAME) {
-                PMC * const collect_named = pmc_new(interp,
-                        Parrot_get_ctx_HLL_type(interp, enum_class_Hash));
-
-                {
-                    PMC ** const pmc_pointer = va_arg(args, PMC**);
-                    *pmc_pointer = collect_named;
-                }
-                named_count += VTABLE_elements(interp, collect_named);
-            }
-            /* Collect positional arguments into array */
-            else {
-                PMC *collect_positional;
-                if (named_count > 0)
-                    Parrot_ex_throw_from_c_args(interp, NULL,
-                            EXCEPTION_INVALID_OPERATION,
-                            "named parameters must follow all positional parameters");
-                collect_positional = pmc_new(interp,
-                        Parrot_get_ctx_HLL_type(interp, enum_class_ResizablePMCArray));
-                for (; positional_index < positional_elements; positional_index++) {
-                    VTABLE_push_pmc(interp, collect_positional,
-                            VTABLE_get_pmc_keyed_int(interp, call_object, positional_index));
-                }
-                {
-                    PMC ** const pmc_pointer = va_arg(args, PMC**);
-                    *pmc_pointer = collect_positional;
-                }
-            }
-
-            continue; /* on to next parameter */
-        }
-        /* Named non-collected */
-        else if (param_flags & PARROT_ARG_NAME) {
-            /* Just store the name for now (this parameter is only the
-             * name). The next parameter is the actual value. */
-            STRING ** const string_pointer = va_arg(args, STRING**);
-            param_name = *string_pointer;
-
-            continue; /* on to next parameter */
-        }
-        else if (!STRING_IS_NULL(param_name)) {
-            /* The previous parameter was a parameter name. Now set the
-             * value of the named parameter.*/
-            if (VTABLE_exists_keyed_str(interp, call_object, param_name)) {
-                named_count++;
-
-                switch (PARROT_ARG_TYPE_MASK_MASK(param_flags)) {
-                    case PARROT_ARG_INTVAL:
-                        {
-                            INTVAL * const int_pointer = va_arg(args, INTVAL*);
-                            *int_pointer =
-                                VTABLE_get_integer_keyed_str(interp, call_object, param_name);
-                        }
-                        break;
-                    case PARROT_ARG_FLOATVAL:
-                        {
-                            FLOATVAL * const float_pointer = va_arg(args, FLOATVAL*);
-                            *float_pointer =
-                                VTABLE_get_number_keyed_str(interp, call_object, param_name);
-                        }
-                        break;
-                    case PARROT_ARG_STRING:
-                        {
-                            STRING ** const string_pointer = va_arg(args, STRING**);
-                            *string_pointer =
-                                VTABLE_get_string_keyed_str(interp, call_object, param_name);
-                        }
-                        break;
-                    case PARROT_ARG_PMC:
-                        {
-                            PMC ** const pmc_pointer = va_arg(args, PMC**);
-                            *pmc_pointer =
-                                VTABLE_get_pmc_keyed_str(interp, call_object, param_name);
-                        }
-                        break;
-                    default:
-                        Parrot_ex_throw_from_c_args(interp, NULL,
-                                EXCEPTION_INVALID_OPERATION, "invalid parameter type");
-                        break;
-                }
-                param_name = NULL;
-                continue; /* on to next parameter */
-            }
-
-            /* If the named parameter doesn't have a corresponding named
-             * argument, fall through to positional argument handling. */
-            param_name = NULL;
-        }
-
-        /* Positional non-collected */
-        if (named_count > 0)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                    "named parameters must follow all positional parameters");
-        if (slurpy_count > 0)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                    "slurpy parameters must follow ordinary positional parameters");
-
-        /* No more positional arguments available to assign */
-        if (positional_index >= positional_elements) {
-            if (!param_flags & PARROT_ARG_OPTIONAL)
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                        "too few positional arguments: %d passed, %d (or more) expected",
-                        positional_elements, param_index + 1);
-
-            got_optional = 0;
-            optional_count++;
-            switch (PARROT_ARG_TYPE_MASK_MASK(param_flags)) {
-                case PARROT_ARG_INTVAL:
-                    {
-                        INTVAL * const int_pointer = va_arg(args, INTVAL*);
-                        *int_pointer = 0;
-                    }
-                    break;
-                case PARROT_ARG_FLOATVAL:
-                    {
-                        FLOATVAL * const float_pointer = va_arg(args, FLOATVAL*);
-                        *float_pointer = 0.0;
-                    }
-                    break;
-                case PARROT_ARG_STRING:
-                    {
-                        STRING ** const string_pointer = va_arg(args, STRING**);
-                        *string_pointer = NULL;
-                    }
-                    break;
-                case PARROT_ARG_PMC:
-                    {
-                        PMC ** const pmc_pointer = va_arg(args, PMC**);
-                        *pmc_pointer = PMCNULL;
-                    }
-                    break;
-                default:
-                    Parrot_ex_throw_from_c_args(interp, NULL,
-                            EXCEPTION_INVALID_OPERATION, "invalid parameter type");
-                    break;
-            }
-
-            continue; /* on to next parameter */
-        }
-
-        /* Otherwise, we have a positional argument to assign to the
-         * positional parameter, so go ahead and assign it. */
-        if (param_flags & PARROT_ARG_OPTIONAL) {
-            got_optional = 1;
-            optional_count++;
-        }
-
-        switch (PARROT_ARG_TYPE_MASK_MASK(param_flags)) {
-            case PARROT_ARG_INTVAL:
-                {
-                    INTVAL * const int_pointer = va_arg(args, INTVAL*);
-                    *int_pointer = 
-                        VTABLE_get_integer_keyed_int(interp, call_object, positional_index);
-                }
-                positional_index++;
-                break;
-            case PARROT_ARG_FLOATVAL:
-                {
-                    FLOATVAL * const float_pointer = va_arg(args, FLOATVAL*);
-                    *float_pointer = 
-                        VTABLE_get_number_keyed_int(interp, call_object, positional_index);
-                }
-                positional_index++;
-                break;
-            case PARROT_ARG_STRING:
-                {
-                    STRING ** const string_pointer = va_arg(args, STRING**);
-                    *string_pointer = 
-                        VTABLE_get_string_keyed_int(interp, call_object, positional_index);
-                }
-                positional_index++;
-                break;
-            case PARROT_ARG_PMC:
-                {
-                    PMC ** const pmc_pointer = va_arg(args, PMC**);
-                    *pmc_pointer = 
-                        VTABLE_get_pmc_keyed_int(interp, call_object, positional_index);
-                }
-                positional_index++;
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                        EXCEPTION_INVALID_OPERATION, "invalid parameter type");
-                break;
-        }
-    }
-    va_end(args);
-}
-
-/*
-
-=item C<void Parrot_pcc_fill_returns_from_op(PARROT_INTERP, PMC *call_object,
-PMC *raw_sig, opcode_t *raw_returns)>
-
-Sets return values for the current function call. First it sets the
-positional returns, then the named returns.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_pcc_fill_returns_from_op(PARROT_INTERP, ARGMOD(PMC *call_object),
-        ARGIN(PMC *raw_sig), ARGIN(opcode_t *raw_returns))
-{
-    ASSERT_ARGS(Parrot_pcc_fill_returns_from_op)
-    INTVAL return_list_elements;
-    Parrot_Context *ctx = CONTEXT(interp);
-    PMC * const return_list = VTABLE_get_attr_str(interp, call_object, CONST_STRING(interp, "returns"));
-    PMC * const caller_return_flags = VTABLE_get_attr_str(interp, call_object, CONST_STRING(interp, "return_flags"));
-    INTVAL raw_return_count     = VTABLE_elements(interp, raw_sig);
-    INTVAL return_index = 0;
-    INTVAL return_list_index = 0;
-    INTVAL err_check      = 0;
-
-    /* Check if we should be throwing errors. This is configured separately
-     * for parameters and return values. */
-    if (PARROT_ERRORS_test(interp, PARROT_ERRORS_RESULT_COUNT_FLAG))
-            err_check = 1;
-
-    if (PMC_IS_NULL(return_list)) {
-        if (err_check)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                    "too many return values: %d passed, 0 expected",
-                    raw_return_count, return_list_elements);
-        return;
-    }
-    else
-        return_list_elements = VTABLE_elements(interp, return_list);
-
-
-    if (raw_return_count > return_list_elements) {
-        if (err_check)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                    "too many return values: %d passed, %d expected",
-                    raw_return_count, return_list_elements);
-    }
-
-    for (return_index = 0; return_index < raw_return_count; return_index++) {
-        INTVAL return_flags = VTABLE_get_integer_keyed_int(interp,
-                    raw_sig, return_index);
-        INTVAL result_flags;
-
-        const INTVAL constant  = PARROT_ARG_CONSTANT_ISSET(return_flags);
-        const INTVAL raw_index = raw_returns[return_index + 2];
-        PMC *result_item = VTABLE_get_pmc_keyed_int(interp, return_list, return_list_index);
-        STRING *item_sig;
-
-        /* Gracefully ignore extra returns when error checking is off. */
-        if (PMC_IS_NULL(result_item))
-            continue; /* Go on to next return arg. */
-
-        result_flags = VTABLE_get_integer_keyed_int(interp, caller_return_flags, return_list_index);
-        item_sig = VTABLE_get_string_keyed_str(interp, result_item, CONST_STRING(interp, ''));
-
-        switch (PARROT_ARG_TYPE_MASK_MASK(return_flags)) {
-            case PARROT_ARG_INTVAL:
-                if (Parrot_str_equal(interp, item_sig, CONST_STRING(interp, "P"))) {
-                    VTABLE_set_pmc(interp, result_item,
-                            pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Integer)));
-                }
-                if (constant)
-                    VTABLE_set_integer_native(interp, result_item, raw_index);
-                else
-                    VTABLE_set_integer_native(interp, result_item, CTX_REG_INT(ctx, raw_index));
-                return_list_index++;
-                break;
-            case PARROT_ARG_FLOATVAL:
-                if (Parrot_str_equal(interp, item_sig, CONST_STRING(interp, "P"))) {
-                    VTABLE_set_pmc(interp, result_item,
-                        pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float)));
-                }
-                if (constant)
-                    VTABLE_set_number_native(interp, result_item,
-                            ctx->constants[raw_index]->u.number);
-                else
-                    VTABLE_set_number_native(interp, result_item, CTX_REG_NUM(ctx, raw_index));
-                return_list_index++;
-                break;
-            case PARROT_ARG_STRING:
-                if (Parrot_str_equal(interp, item_sig, CONST_STRING(interp, "P"))) {
-                    VTABLE_set_pmc(interp, result_item,
-                            pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_String)));
-                }
-                if (constant)
-                    VTABLE_set_string_native(interp, result_item, Parrot_str_new_COW(interp,
-                                        ctx->constants[raw_index]->u.string));
-                else
-                    VTABLE_set_string_native(interp, result_item, CTX_REG_STR(ctx, raw_index));
-                return_list_index++;
-                break;
-            case PARROT_ARG_PMC:
-                if (constant)
-                    VTABLE_set_pmc(interp, result_item, ctx->constants[raw_index]->u.key);
-                else
-                    VTABLE_set_pmc(interp, result_item, CTX_REG_PMC(ctx, raw_index));
-                return_list_index++;
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                        EXCEPTION_INVALID_OPERATION, "invalid parameter type");
-                break;
-        }
-    }
-}
-
-/*
-
-=item C<void Parrot_pcc_fill_returns_from_c_args(PARROT_INTERP, PMC
-*call_object, const char *signature, ...)>
-
-Sets return values for the current function call. First it sets the
-positional returns, then the named returns.
-
-The signature is a string in the format used for
-C<Parrot_pcc_invoke_from_sig_object>, but with only return arguments.
-The parameters are passed in as a list of INTVAL, FLOATVAL, STRING *, or
-PMC * variables.
-
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_pcc_fill_returns_from_c_args(PARROT_INTERP, ARGMOD(PMC *call_object),
-        ARGIN(const char *signature), ...)
-{
-    ASSERT_ARGS(Parrot_pcc_fill_returns_from_c_args)
-    va_list args;
-    INTVAL return_list_elements;
-    Parrot_Context *ctx = CONTEXT(interp);
-    PMC * const return_list = VTABLE_get_attr_str(interp, call_object, CONST_STRING(interp, "returns"));
-    INTVAL raw_return_count = 0;
-    INTVAL return_index = 0;
-    INTVAL return_list_index = 0;
-    INTVAL err_check      = 0;
-
-    PMC *raw_sig = PMCNULL;
-    PMC *invalid_sig = PMCNULL;
-
-    parse_signature_string(interp, signature, &raw_sig, &invalid_sig);
-    if (!PMC_IS_NULL(invalid_sig))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                "parameters should not be included in the return signature");
-    raw_return_count = VTABLE_elements(interp, raw_sig);
-
-    /* Check if we should be throwing errors. This is configured separately
-     * for parameters and return values. */
-    if (PARROT_ERRORS_test(interp, PARROT_ERRORS_RESULT_COUNT_FLAG))
-            err_check = 1;
-
-    if (PMC_IS_NULL(return_list)) {
-        if (err_check)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                    "too many return values: %d passed, 0 expected",
-                    raw_return_count, return_list_elements);
-        return;
-    }
-    else
-        return_list_elements = VTABLE_elements(interp, return_list);
-
-
-    if (raw_return_count > return_list_elements) {
-        if (err_check)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                    "too many return values: %d passed, %d expected",
-                    raw_return_count, return_list_elements);
-    }
-
-    va_start(args, signature);
-    for (return_index = 0; return_index < raw_return_count; return_index++) {
-        STRING *item_sig;
-        INTVAL return_flags = VTABLE_get_integer_keyed_int(interp,
-                    raw_sig, return_index);
-
-        PMC *result_item = VTABLE_get_pmc_keyed_int(interp, return_list, return_list_index);
-
-        /* Gracefully ignore extra returns when error checking is off. */
-        if (PMC_IS_NULL(result_item))
-            continue; /* Go on to next return arg. */
-
-        item_sig = VTABLE_get_string_keyed_str(interp, result_item, CONST_STRING(interp, ''));
-
-        switch (PARROT_ARG_TYPE_MASK_MASK(return_flags)) {
-            case PARROT_ARG_INTVAL:
-                if (Parrot_str_equal(interp, item_sig, CONST_STRING(interp, "P"))) {
-                    VTABLE_set_pmc(interp, result_item, pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Integer)));
-                }
-                VTABLE_set_integer_native(interp, result_item, va_arg(args, INTVAL));
-                return_list_index++;
-                break;
-            case PARROT_ARG_FLOATVAL:
-                if (Parrot_str_equal(interp, item_sig, CONST_STRING(interp, "P"))) {
-                    VTABLE_set_pmc(interp, result_item, pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float)));
-                }
-                VTABLE_set_number_native(interp, result_item, va_arg(args, FLOATVAL));
-                return_list_index++;
-                break;
-            case PARROT_ARG_STRING:
-                if (Parrot_str_equal(interp, item_sig, CONST_STRING(interp, "P"))) {
-                    VTABLE_set_pmc(interp, result_item, pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_String)));
-                }
-                VTABLE_set_string_native(interp, result_item,
-                        Parrot_str_new_COW(interp, va_arg(args, STRING *)));
-                return_list_index++;
-                break;
-            case PARROT_ARG_PMC:
-                VTABLE_set_pmc(interp, result_item, va_arg(args, PMC *));
-                return_list_index++;
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                        EXCEPTION_INVALID_OPERATION, "invalid parameter type");
-                break;
-        }
-    }
-    va_end(args);
 }
 
 
@@ -3311,6 +2211,118 @@ commit_last_arg(PARROT_INTERP, int index, int cur,
 
 /*
 
+=item C<static PMC * count_signature_elements(PARROT_INTERP, const char
+*signature, PMC *args_sig, PMC *results_sig, int flag)>
+
+Counts the number of each type of register in a signature object. Returns
+the total number of parameter arguments, the total number of result
+arguments, and the number of each type needed for register allocation.
+Adds the necessary registers to a new context and returns the context.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+static PMC *
+count_signature_elements(PARROT_INTERP, ARGIN(const char *signature),
+    ARGMOD(PMC *args_sig), ARGMOD(PMC *results_sig), int flag)
+{
+    ASSERT_ARGS(count_signature_elements)
+    const char  *x;
+
+    /*Count of number of each type of arg and result, INSP->INSP */
+    int          max_regs[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    /* variables from PCCINVOKE impl in PCCMETHOD.pm */
+    /* args INSP, returns INSP */
+    INTVAL n_regs_used[]     = { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    /* # of args, # of results */
+    int arg_ret_cnt[2]       = { 0, 0 };
+
+    unsigned int seen_arrow  = 0;
+
+    /* Increment these values if we are not calling from a CallSignature PMC */
+    if (flag) {
+        arg_ret_cnt[seen_arrow]++;
+        max_regs[REGNO_PMC]++;
+    }
+
+    /* Loop through the signature string to count the number of each
+       type of object required. We need to know so we can allocate
+       an appropriate number of registers for it. */
+    for (x = signature; *x != '\0'; x++) {
+        switch (*x) {
+            case '-':
+                /* detect -> separator */
+                seen_arrow = 1;
+                ++x;
+                if (*x != '>')
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_OPERATION,
+                        "PCCINVOKE: invalid signature separator %c!",
+                        *x);
+                break;
+            case 'I':
+                arg_ret_cnt[seen_arrow]++;
+                max_regs[seen_arrow * 4 + REGNO_INT]++;
+                break;
+            case 'N':
+                arg_ret_cnt[seen_arrow]++;
+                max_regs[seen_arrow * 4 + REGNO_NUM]++;
+                break;
+            case 'S':
+                arg_ret_cnt[seen_arrow]++;
+                max_regs[seen_arrow * 4 + REGNO_STR]++;
+                break;
+            case 'P':
+                arg_ret_cnt[seen_arrow]++;
+                {
+                    /* Lookahead to see if PMC is marked as invocant */
+                    if (*(++x) == 'i') {
+                        max_regs[REGNO_PMC]++;
+                    }
+                    else {
+                        x--; /* Undo lookahead */
+                        max_regs[seen_arrow * 4 + REGNO_PMC]++;
+                    }
+                }
+                break;
+            case 'f':
+            case 'n':
+            case 's':
+            case 'o':
+            case 'p':
+            /* case 'l': */ /* lookahead parameter */
+            case 'i':
+                break;
+            default:
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Parrot_PCCINVOKE: invalid reg type %c!", *x);
+        }
+    }
+
+    /* calculate max reg types needed for both args and results */
+    n_regs_used[0] = PARROT_MAX(max_regs[0], max_regs[4]);
+    n_regs_used[1] = PARROT_MAX(max_regs[1], max_regs[5]);
+    n_regs_used[2] = PARROT_MAX(max_regs[2], max_regs[6]);
+    n_regs_used[3] = PARROT_MAX(max_regs[3], max_regs[7]);
+
+    /* initialize arg and return sig FIAs with collected info */
+    if (arg_ret_cnt[0] > 0)
+        VTABLE_set_integer_native(interp, args_sig, arg_ret_cnt[0]);
+
+    if (arg_ret_cnt[1] > 0)
+        VTABLE_set_integer_native(interp, results_sig, arg_ret_cnt[1]);
+
+    return Parrot_push_context(interp, n_regs_used);
+}
+
+
+/*
+
 =item C<static void commit_last_arg_sig_object(PARROT_INTERP, int index, int
 cur, opcode_t *n_regs_used, int seen_arrow, PMC * const *sigs, opcode_t
 **indexes, PMC *ctx, PMC *sig_obj)>
@@ -3468,86 +2480,69 @@ set_context_sig_returns(PARROT_INTERP,
 
 /*
 
-=item C<static void parse_signature_string(PARROT_INTERP, const char *signature,
-PMC **arg_flags, PMC **return_flags)>
+=item C<static void set_context_sig_returns_varargs(PARROT_INTERP, PMC *ctx,
+opcode_t **indexes, const char *ret_x, va_list returns)>
 
-Parses a signature string and creates call and return signature integer
-arrays. The two integer arrays should be passed in as references to a
-PMC.
+Sets the subroutine return arguments in the context C<ctx>. Takes a C string
+for the return signature C<ret_x> and a varargs list of return parameters
+C<returns>.
+
+To unify this function with C<set_context_sig_returns>, C<Parrot_PCCINVOKE>
+needs to be changed to convert the va_list of input arguments into a signature
+object, and the results list from that object needs to be passed to this
+function instead of the va_list itself.
 
 =cut
 
 */
 
-PARROT_CAN_RETURN_NULL
 static void
-parse_signature_string(PARROT_INTERP, ARGIN(const char *signature),
-        ARGMOD(PMC **arg_flags), ARGMOD(PMC **return_flags))
+set_context_sig_returns_varargs(PARROT_INTERP, ARGMOD(PMC *ctx),
+    ARGMOD(opcode_t **indexes), ARGIN(const char *ret_x), va_list returns)
 {
-    ASSERT_ARGS(parse_signature_string)
-    PMC *current_array;
-    const char *x;
-    INTVAL flags = 0;
-    INTVAL set = 0;
+    ASSERT_ARGS(set_context_sig_returns_varargs)
+    const char  *x;
+    unsigned int index      = 0;
+    unsigned int seen_arrow = 1;
 
-    if (PMC_IS_NULL(*arg_flags))
-        *arg_flags = pmc_new(interp, enum_class_ResizableIntegerArray);
-    current_array = *arg_flags;
-
-    for (x = signature; *x != '\0'; x++) {
-
-        /* detect -> separator */
-        if (*x == '-') {
-            /* skip '>' */
-            x++;
-            /* Switch to the return argument flags. */
-            if (PMC_IS_NULL(*return_flags))
-                *return_flags = pmc_new(interp, enum_class_ResizableIntegerArray);
-            current_array = *return_flags;
-        }
-        /* parse arg type */
-        else if (isupper((unsigned char)*x)) {
-            /* Starting a new argument, so store the previous argument,
-             * if there was one. */
-            if (set) {
-                VTABLE_push_integer(interp, current_array, flags);
-                set = 0;
-            }
-
+    /* result_accessors perform the arg accessor function,
+     * assigning the corresponding registers to the result variables */
+    for (x = ret_x; x && *x; x++) {
+        if (isupper((unsigned char)*x)) {
             switch (*x) {
-                case 'I': flags = PARROT_ARG_INTVAL;   set++; break;
-                case 'N': flags = PARROT_ARG_FLOATVAL; set++; break;
-                case 'S': flags = PARROT_ARG_STRING;   set++; break;
-                case 'P': flags = PARROT_ARG_PMC;      set++; break;
-                default:
-                  Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_INVALID_OPERATION,
-                    "invalid signature string element %c!", *x);
-            }
-
-        }
-        /* parse arg adverbs */
-        else if (islower((unsigned char)*x)) {
-            switch (*x) {
-                case 'c': flags |= PARROT_ARG_CONSTANT;     break;
-                case 'f': flags |= PARROT_ARG_FLATTEN;      break;
-                case 'i': flags |= PARROT_ARG_INVOCANT;     break;
-                case 'l': flags |= PARROT_ARG_LOOKAHEAD;    break;
-                case 'n': flags |= PARROT_ARG_NAME;         break;
-                case 'o': flags |= PARROT_ARG_OPTIONAL;     break;
-                case 'p': flags |= PARROT_ARG_OPT_FLAG;     break;
-                case 's': flags |= PARROT_ARG_SLURPY_ARRAY; break;
+                case 'I':
+                    {
+                    INTVAL * const tmpINTVAL = va_arg(returns, INTVAL *);
+                    *tmpINTVAL = CTX_REG_INT(ctx, indexes[seen_arrow][index]);
+                    }
+                    break;
+                case 'N':
+                    {
+                    FLOATVAL * const tmpFLOATVAL = va_arg(returns, FLOATVAL *);
+                    *tmpFLOATVAL = CTX_REG_NUM(ctx, indexes[seen_arrow][index]);
+                    }
+                    break;
+                case 'S':
+                    {
+                    STRING ** const tmpSTRING = va_arg(returns, STRING **);
+                    *tmpSTRING = CTX_REG_STR(ctx, indexes[seen_arrow][index]);
+                    }
+                    break;
+                case 'P':
+                    {
+                    PMC ** const tmpPMC = va_arg(returns, PMC **);
+                    *tmpPMC = CTX_REG_PMC(ctx, indexes[seen_arrow][index]);
+                    }
+                    break;
                 default:
                     Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_INVALID_OPERATION,
-                        "invalid signature string element %c!", *x);
+                        "Parrot_PCCINVOKE: invalid reg type %c!", *x);
             }
         }
     }
 
-    /* Store the final argument, if there was one. */
-    if (set)
-        VTABLE_push_integer(interp, current_array, flags);
+    Parrot_pop_context(interp);
 }
 
 
@@ -3761,23 +2756,166 @@ Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
         ARGIN(const char *signature), ...)
 {
     ASSERT_ARGS(Parrot_PCCINVOKE)
-    PMC *sig_obj;
-    PMC *sub_obj;
-    va_list args;
-    va_start(args, signature);
-    sig_obj = Parrot_pcc_build_sig_object_from_varargs(interp, pmc, signature, args);
-    va_end(args);
+#define PCC_ARG_MAX 1024
+    /* variables from PCCINVOKE impl in PCCMETHOD.pm */
+    /* args INSP, returns INSP */
+    INTVAL n_regs_used[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
-    /* Find the subroutine object as a named method on pmc */
-    sub_obj = VTABLE_find_method(interp, pmc, method_name);
-    if (PMC_IS_NULL(sub_obj))
-         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_METHOD_NOT_FOUND,
-             "Method '%Ss' not found", method_name);
+    /* Each of these is 8K. Do we want 16K on the stack? */
+    opcode_t arg_indexes[PCC_ARG_MAX];
+    opcode_t result_indexes[PCC_ARG_MAX];
 
-    /* Invoke the subroutine object with the given CallSignature object */
-    interp->current_object = pmc;
-    Parrot_pcc_invoke_from_sig_object(interp, sub_obj, sig_obj);
-    gc_unregister_pmc(interp, sig_obj);
+    PMC * const args_sig    = pmc_new(interp, enum_class_FixedIntegerArray);
+    PMC * const results_sig = pmc_new(interp, enum_class_FixedIntegerArray);
+    PMC * const ret_cont    = new_ret_continuation_pmc(interp, NULL);
+
+    PMC         *ctx;              /* The newly created context */
+    PMC         *pccinvoke_meth;
+
+    opcode_t    *save_current_args;
+    PMC         *save_args_signature;
+    PMC         *save_current_object;
+
+    /* temporary state vars for building PCC index and PCC signature arrays. */
+
+    /* arg_indexes, result_indexes */
+    opcode_t   *indexes[2];
+
+    /* args_sig, results_sig */
+    PMC        *sigs[2];
+
+    int         seen_arrow = 0;
+
+    const char *x;
+    const char *ret_x = NULL;
+    int         index = -1;
+    int         cur   =  0;
+
+    va_list list;
+    va_start(list, signature);
+
+    indexes[0] = arg_indexes;
+    indexes[1] = result_indexes;
+    sigs[0]    = args_sig;
+    sigs[1]    = results_sig;
+
+    /* account for passing invocant in-band */
+    if (!pmc)
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            "NULL PMC passed into Parrot_PCCINVOKE");
+
+    ctx = count_signature_elements(interp, signature, args_sig, results_sig, 1);
+
+    /* second loop through signature to build all index and arg_flag
+     * loop also assigns args(up to the ->) to registers */
+
+    /* account for passing invocant in-band */
+    indexes[0][0] = 0;
+
+    VTABLE_set_integer_keyed_int(interp, sigs[0], 0, PARROT_ARG_PMC);
+    CTX_REG_PMC(ctx, 0) = pmc;
+
+    n_regs_used[REGNO_PMC]++;
+    index = 0;
+
+    for (x = signature; *x != '\0'; x++) {
+        /* detect -> separator */
+        if (*x == '-') {
+
+            /* skip '>' */
+            x++;
+
+            /* allows us to jump directly to the result signature portion
+             * during results assignment */
+            ret_x = x;
+
+            /* save off pointer to results */
+            ret_x++;
+
+            if (index >= 0)
+                commit_last_arg(interp, index, cur, n_regs_used, seen_arrow,
+                    sigs, indexes, ctx, pmc, &list);
+
+            /* reset parsing state so we can now handle results */
+            seen_arrow =  1;
+            index      = -1;
+
+            /* reset n_regs_used for reuse during result index allocation */
+            n_regs_used[0] = 0;
+            n_regs_used[1] = 0;
+            n_regs_used[2] = 0;
+            n_regs_used[3] = 0;
+        }
+        /* parse arg type */
+        else if (isupper((unsigned char)*x)) {
+            if (index >= 0)
+                commit_last_arg(interp, index, cur, n_regs_used, seen_arrow,
+                    sigs, indexes, ctx, pmc, &list);
+
+            index++;
+
+            switch (*x) {
+                case 'I': cur = PARROT_ARG_INTVAL;   break;
+                case 'N': cur = PARROT_ARG_FLOATVAL; break;
+                case 'S': cur = PARROT_ARG_STRING;   break;
+                case 'P': cur = PARROT_ARG_PMC;      break;
+                default:
+                  Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Parrot_PCCINVOKE: invalid reg type %c!", *x);
+            }
+
+        }
+        /* parse arg adverbs */
+        else if (islower((unsigned char)*x)) {
+            switch (*x) {
+                case 'n': cur |= PARROT_ARG_NAME;         break;
+                case 'f': cur |= PARROT_ARG_FLATTEN;      break;
+                case 's': cur |= PARROT_ARG_SLURPY_ARRAY; break;
+                case 'o': cur |= PARROT_ARG_OPTIONAL;     break;
+                case 'p': cur |= PARROT_ARG_OPT_FLAG;     break;
+                /* case 'l': cur |= PARROT_ARG_LOOKAHEAD;    break; */
+                default:
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_OPERATION,
+                        "Parrot_PCCINVOKE: invalid adverb type %c!", *x);
+            }
+        }
+    }
+
+    if (index >= 0)
+        commit_last_arg(interp, index, cur, n_regs_used, seen_arrow, sigs,
+            indexes, ctx, pmc, &list);
+
+    /* code from PCCINVOKE impl in PCCMETHOD.pm */
+    save_current_args      = interp->current_args;
+    save_args_signature    = interp->args_signature;
+    save_current_object    = interp->current_object;
+
+    interp->current_args   = arg_indexes;
+    interp->args_signature = args_sig;
+    Parrot_pcc_set_results(interp, ctx, result_indexes);
+    Parrot_pcc_set_results_signature(interp, ctx, results_sig);
+
+    /* arg_accessors assigned in loop above */
+
+    interp->current_object       = pmc;
+    interp->current_cont         = NEED_CONTINUATION;
+    Parrot_pcc_set_continuation(interp, ctx, ret_cont);
+    PMC_cont(ret_cont)->from_ctx = ctx;
+    pccinvoke_meth               = VTABLE_find_method(interp, pmc, method_name);
+
+    if (PMC_IS_NULL(pccinvoke_meth))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_METHOD_NOT_FOUND,
+            "Method '%Ss' not found", method_name);
+    else
+        VTABLE_invoke(interp, pccinvoke_meth, NULL);
+
+    set_context_sig_returns_varargs(interp, ctx, indexes, ret_x, list);
+    interp->current_args   = save_current_args;
+    interp->args_signature = save_args_signature;
+    interp->current_object = save_current_object;
+    va_end(list);
 }
 
 /*
@@ -3820,7 +2958,6 @@ Parrot_pcc_invoke_method_from_c_args(PARROT_INTERP, ARGIN(PMC* pmc),
              "Method '%Ss' not found", method_name);
 
     /* Invoke the subroutine object with the given CallSignature object */
-    interp->current_object = pmc;
     Parrot_pcc_invoke_from_sig_object(interp, sub_obj, sig_obj);
     gc_unregister_pmc(interp, sig_obj);
 
@@ -3830,7 +2967,7 @@ Parrot_pcc_invoke_method_from_c_args(PARROT_INTERP, ARGIN(PMC* pmc),
 /*
 
 =item C<void Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, PMC *sub_obj, PMC
-*call_object)>
+*sig_obj)>
 
 Follows the same conventions as C<Parrot_PCCINVOKE>, but the subroutine object
 to invoke is passed as an argument rather than looked up by name, and the
@@ -3843,19 +2980,75 @@ signature string and call arguments are passed in a CallSignature PMC.
 PARROT_EXPORT
 void
 Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
-        ARGIN(PMC *call_object))
+        ARGIN(PMC *sig_obj))
 {
     ASSERT_ARGS(Parrot_pcc_invoke_from_sig_object)
-
-    opcode_t *dest;
+#define PCC_ARG_MAX 1024
+    /* variables from PCCINVOKE impl in PCCMETHOD.pm */
+    /* args INSP, returns INSP */
     INTVAL n_regs_used[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    Parrot_Context *ctx  = Parrot_push_context(interp, n_regs_used);
-    PMC * const ret_cont = new_ret_continuation_pmc(interp, NULL);
 
-    ctx->current_sig             = call_object;
-    ctx->current_cont            = ret_cont;
-    interp->current_cont         = NEED_CONTINUATION;
-    PMC_cont(ret_cont)->from_ctx = Parrot_context_ref(interp, ctx);
+    /* Each of these is 8K. Do we want 16K on the stack? */
+    opcode_t arg_indexes[PCC_ARG_MAX] = {0};
+    opcode_t result_indexes[PCC_ARG_MAX] = {0};
+
+    /* create the signature string, and the various PMCs that are needed to
+       store all the parameters and parameter counts. */
+    char * const signature  = Parrot_str_to_cstring(interp,
+                                   VTABLE_get_string(interp, sig_obj));
+    PMC * const args_sig    = temporary_pmc_new(interp,
+                                   enum_class_FixedIntegerArray);
+    PMC * const results_sig = temporary_pmc_new(interp,
+                                   enum_class_FixedIntegerArray);
+    PMC * const ret_cont    = new_ret_continuation_pmc(interp, NULL);
+    PMC * const result_list = VTABLE_get_attr_str(interp, sig_obj, CONST_STRING(interp, "returns"));
+
+    PMC         *ctx;
+    opcode_t    *dest;
+    opcode_t    *save_current_args;
+    PMC         *save_args_signature;
+    PMC         *save_current_object;
+
+    /* temporary state vars for building PCC index and PCC signature arrays. */
+
+    /* arg_indexes, result_indexes */
+    opcode_t *indexes[2];
+
+    /* args_sig, results_sig */
+    PMC *sigs[2];
+
+    const char *ret_x  = NULL;
+
+    indexes[0] = arg_indexes;
+    indexes[1] = result_indexes;
+    sigs[0]    = args_sig;
+    sigs[1]    = results_sig;
+
+    /* Count the number of objects of each type that need to be allocated by
+       the caller to perform this function call */
+    ctx = count_signature_elements(interp, signature, args_sig, results_sig, 0);
+
+    /* code from PCCINVOKE impl in PCCMETHOD.pm */
+    /* Save the current values of the interpreter arguments so that additional
+       child sub calls don't kill our call stack. */
+    save_current_args      = interp->current_args;
+    save_args_signature    = interp->args_signature;
+    save_current_object    = interp->current_object;
+
+    /* Set the function input parameters in the context structure, and return
+     * the offset in the signature where the return params start. */
+    ret_x = set_context_sig_params(interp, signature, n_regs_used,
+                                   sigs, indexes, ctx, sig_obj);
+
+    /* Set up the context object for the function invokation */
+    if (strncmp(signature, "Pi", 2) == 0)
+        interp->current_object = VTABLE_get_pmc_keyed_int(interp, sig_obj, 0);
+    else
+        interp->current_object       = PMCNULL;
+
+    interp->current_cont             = NEED_CONTINUATION;
+    Parrot_pcc_set_continuation(interp, ctx, ret_cont);
+    PMC_cont(ret_cont)->from_ctx     = ctx;
 
     /* Invoke the function */
     dest = VTABLE_invoke(interp, sub_obj, NULL);
@@ -3873,9 +3066,18 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
         runops(interp, offset);
         interp->run_core = old_core;
     }
-    gc_unregister_pmc(interp, call_object);
-    ctx->current_sig = NULL;
-    Parrot_pop_context(interp);
+
+    /* Set the return values from the subroutine's context into the
+       caller's context */
+    set_context_sig_returns(interp, ctx, indexes, ret_x, result_list);
+
+    temporary_pmc_free(interp, args_sig);
+    temporary_pmc_free(interp, results_sig);
+
+    interp->current_args   = save_current_args;
+    interp->args_signature = save_args_signature;
+    interp->current_object = save_current_object;
+    Parrot_str_free_cstring(signature);
 }
 
 

@@ -43,7 +43,7 @@ my %sig_table = (
         as_proto => "void *",
         other_decl => "PMC * const final_destination = pmc_new(interp, enum_class_UnManagedStruct);",
         sig_char => "P",
-        ret_assign => "VTABLE_set_pointer(interp, final_destination, return_data);\n    Parrot_pcc_fill_returns_from_c_args(interp, call_object, \"P\", final_destination);",
+        ret_assign => "VTABLE_set_pointer(interp, final_destination, return_data);    set_nci_P(interp, &st, final_destination);",
     },
     i => { as_proto => "int",    sig_char => "I" },
     l => { as_proto => "long",   sig_char => "I" },
@@ -53,7 +53,7 @@ my %sig_table = (
     d => { as_proto => "double", sig_char => "N" },
     t => { as_proto => "char *",
            other_decl => "STRING *final_destination;",
-           ret_assign => "final_destination = Parrot_str_new(interp, return_data, 0);\n    Parrot_pcc_fill_returns_from_c_args(interp, call_object, \"S\", final_destination);",
+           ret_assign => "final_destination = Parrot_str_new(interp, return_data, 0);\n    set_nci_S(interp, &st, final_destination);",
            sig_char => "S" },
     v => { as_proto => "void",
            return_type => "void *",
@@ -71,11 +71,11 @@ my %sig_table = (
     B => { as_proto => "char **", as_return => "", sig_char => "S" },
     # These should be replaced by modifiers in the future
     2 => { as_proto => "short *",  sig_char => "P", return_type => "short",
-           ret_assign => 'Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);' },
+           ret_assign => "set_nci_I(interp, &st, *return_data);" },
     3 => { as_proto => "int *",  sig_char => "P", return_type => "int",
-           ret_assign => 'Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);' },
+           ret_assign => "set_nci_I(interp, &st, *return_data);" },
     4 => { as_proto => "long *",  sig_char => "P", return_type => "long",
-           ret_assign => 'Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);' },
+           ret_assign => "set_nci_I(interp, &st, *return_data);" },
     L => { as_proto => "long *", as_return => "" },
     T => { as_proto => "char **", as_return => "" },
     V => { as_proto => "void **", as_return => "", sig_char => "P" },
@@ -87,8 +87,7 @@ for (values %sig_table) {
     if (not exists $_->{return_type}) { $_->{return_type} = $_->{as_proto} }
     if (not exists $_->{return_type_decl}) { $_->{return_type_decl} = $_->{return_type} }
     if (not exists $_->{ret_assign} and exists $_->{sig_char}) {
-        $_->{ret_assign} = 'Parrot_pcc_fill_returns_from_c_args(interp, call_object, "'
-                           . $_->{sig_char} . '", return_data);';
+        $_->{ret_assign} = "set_nci_".$_->{sig_char}."(interp, &st, return_data);";
     }
     if (not exists $_->{func_call_assign}) {
         $_->{func_call_assign} = "return_data = "
@@ -121,7 +120,6 @@ while (<>) {
         next;
     }
 
-    my @fill_params;
     my @extra_preamble;
     my @extra_postamble;
     my @temps;
@@ -134,8 +132,8 @@ while (<>) {
             die "Invalid argument signature char '$_' on line $. of $ARGV"
                 unless exists $sig_table{$_}{sig_char};
             push @arg,
-                make_arg( $_, $reg_num++, \$temp_cnt, \@temps, \@fill_params,
-                \@extra_preamble, \@extra_postamble );
+                make_arg( $_, $reg_num++, \$temp_cnt, \@temps, \@extra_preamble,
+                \@extra_postamble );
             $sig .= $sig_table{$_}{sig_char};
             $_ eq 'J' && $reg_num--;
         }
@@ -150,7 +148,7 @@ while (<>) {
             $ret_sig->{as_return}, $ret_sig->{return_type_decl},
             $ret_sig->{func_call_assign}, $ret_sig->{other_decl},
             $ret_sig->{ret_assign}, \@temps,
-            \@fill_params, \@extra_preamble, \@extra_postamble,
+            \@extra_preamble, \@extra_postamble,
             \@put_pointer_nci_too,
         );
     }
@@ -161,7 +159,7 @@ while (<>) {
             $ret_sig->{as_return}, $ret_sig->{return_type_decl},
             $ret_sig->{func_call_assign}, $ret_sig->{other_decl},
             $ret_sig->{ret_assign}, \@temps,
-            \@fill_params, \@extra_preamble, \@extra_postamble,
+            \@extra_preamble, \@extra_postamble,
             \@put_pointer,
         );
     }
@@ -203,7 +201,7 @@ sub print_head {
  */
 
 /* nci.c
- *  Copyright (C) 2001-2009, Parrot Foundation.
+ *  Copyright (C) 2001-2007, Parrot Foundation.
  *  SVN Info
  *     \$Id\$
  *  Overview:
@@ -248,78 +246,55 @@ sub make_arg {
     # we have to fetch all to temps, so that the call code
     # can operate in sequence
     #
-    my ( $argtype, $reg_num, $temp_cnt_ref, $temps_ref, $fill_params_ref, $extra_preamble_ref, $extra_postamble_ref )
+    my ( $argtype, $reg_num, $temp_cnt_ref, $temps_ref, $extra_preamble_ref, $extra_postamble_ref )
         = @_;
 
     local $_ = $argtype;
     my $temp_num = ${$temp_cnt_ref}++;
     /p/ && do {
-        push @{$temps_ref},       "PMC *t_$temp_num;";
-        push @{$fill_params_ref}, "&t_$temp_num";
-        return "VTABLE_get_pointer(interp, t_$temp_num)";
+        push @{$temps_ref},          "void *t_$temp_num;";
+        push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_p($reg_num);";
+        return "t_$temp_num";
     };
     /V/ && do {
         push @{$temps_ref},          "PMC *t_$temp_num;";
         push @{$temps_ref},          "void *v_$temp_num;";
-        push @{$fill_params_ref},    "&t_$temp_num";
+        push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_P($reg_num);";
         push @{$extra_preamble_ref}, "v_$temp_num = VTABLE_get_pointer(interp, t_$temp_num);";
         push @{$extra_postamble_ref}, "VTABLE_set_pointer(interp, t_$temp_num, v_$temp_num);";
         return "&v_$temp_num";
     };
-    /[INS]/ && do {
-        my $ret_type = $sig_table{$_}{return_type};
-        push @{$temps_ref},       "$ret_type t_$temp_num;";
-        push @{$fill_params_ref}, "&t_$temp_num";
-        return "t_$temp_num";
-    };
-    /[ilcs]/ && do {
+    /[ilIscfdNS]/ && do {
         my $ret_type = $sig_table{$_}{return_type};
         push @{$temps_ref},          "$ret_type t_$temp_num;";
-        push @{$temps_ref},          "INTVAL ti_$temp_num;";
-        push @{$fill_params_ref},    "&ti_$temp_num";
-        push @{$extra_preamble_ref}, "t_$temp_num = ($ret_type)ti_$temp_num;";
-        return "t_$temp_num";
-    };
-    /[fd]/ && do {
-        my $ret_type = $sig_table{$_}{return_type};
-        push @{$temps_ref},          "$ret_type t_$temp_num;";
-        push @{$temps_ref},          "FLOATVAL tf_$temp_num;";
-        push @{$fill_params_ref},    "&tf_$temp_num";
-        push @{$extra_preamble_ref}, "t_$temp_num = ($ret_type)tf_$temp_num;";
+        push @{$extra_preamble_ref}, "t_$temp_num = ($ret_type)GET_NCI_$sig_table{$_}{sig_char}($reg_num);";
         return "t_$temp_num";
     };
     /[234]/ && do {
         my $ret_type = $sig_table{$_}{return_type};
         push @{$temps_ref},          "PMC *t_$temp_num;";
         push @{$temps_ref},          "$ret_type i_$temp_num;";
-        push @{$fill_params_ref},    "&t_$temp_num";
+        push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_P($reg_num);";
         push @{$extra_preamble_ref}, "i_$temp_num = ($ret_type) VTABLE_get_integer(interp, t_$temp_num);";
         push @{$extra_postamble_ref}, "VTABLE_set_integer_native(interp, t_$temp_num, i_$temp_num);";
         return "&i_$temp_num";
     };
     /t/ && do {
-        push @{$temps_ref},          "char *t_$temp_num;";
-        push @{$temps_ref},          "STRING *ts_$temp_num;";
-        push @{$fill_params_ref},    "&ts_$temp_num";
+        push @{$temps_ref}, "char *t_$temp_num;";
         push @{$extra_preamble_ref},
-            "t_$temp_num = ts_$temp_num ? Parrot_str_to_cstring(interp, ts_$temp_num) : (char *) NULL;";
+            "{STRING * s= GET_NCI_S($reg_num); t_$temp_num = s ? Parrot_str_to_cstring(interp, s) : (char *) NULL;}";
         push @{$extra_postamble_ref}, "do { if (t_$temp_num) Parrot_str_free_cstring(t_$temp_num); } while (0);";
         return "t_$temp_num";
     };
     /b/ && do {
         push @{$temps_ref},          "STRING *t_$temp_num;";
-        push @{$fill_params_ref},    "&t_$temp_num";
-        return "PObj_bufstart(t_$temp_num)";
+        push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_S($reg_num);";
+        return "Buffer_bufstart(t_$temp_num)";
     };
     /B/ && do {
-        push @{$temps_ref},           "char *s_$temp_num;";
-        push @{$temps_ref},           "char *t_$temp_num;";
-        push @{$temps_ref},           "void** v_$temp_num = (void **) &t_$temp_num;";
-        push @{$temps_ref},           "STRING *ts_$temp_num;";
-        push @{$fill_params_ref},     "&ts_$temp_num";
+        push @{$temps_ref}, "char *s_$temp_num;\n    char *t_$temp_num;\n    char** v_$temp_num = &t_$temp_num;";
         push @{$extra_preamble_ref},
-            "t_$temp_num = ts_$temp_num ? Parrot_str_to_cstring(interp, ts_$temp_num) : (char *) NULL;";
-        push @{$extra_preamble_ref},  "s_$temp_num = t_$temp_num;";
+            "{STRING * s= GET_NCI_S($reg_num); t_$temp_num = s ? Parrot_str_to_cstring(interp, s) : (char *) NULL; s_$temp_num = t_$temp_num;}";
         push @{$extra_postamble_ref}, "do { if (s_$temp_num) Parrot_str_free_cstring(s_$temp_num); } while (0);";
         return "v_$temp_num";
     };
@@ -327,19 +302,19 @@ sub make_arg {
         return "interp";
     };
     /[OP\@]/ && do {
-        push @{$temps_ref},       "PMC *t_$temp_num;";
-        push @{$fill_params_ref}, "&t_$temp_num";
-        return "PMC_IS_NULL(t_$temp_num) ? NULL : t_$temp_num";
+        push @{$temps_ref},          "PMC *t_$temp_num;";
+        push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_P($reg_num);";
+        return "t_$temp_num";
     };
     return;
 }
 
 sub create_function {
     my (
-        $sig,                 $return,          $params,          $args,
-        $ret_type,            $ret_type_decl,   $return_assign,   $other_decl,
-        $final_assign,        $temps_ref,       $fill_params_ref, $extra_preamble_ref,
-        $extra_postamble_ref, $put_pointer_ref,
+        $sig,          $return,        $params,             $args,
+        $ret_type,     $ret_type_decl, $return_assign,      $other_decl,
+        $final_assign, $temps_ref,     $extra_preamble_ref, $extra_postamble_ref,
+        $put_pointer_ref,
     ) = @_;
 
     my $func = '';
@@ -347,10 +322,10 @@ sub create_function {
     $other_decl ||= "";
 
     $other_decl .= join( "\n    ", @{$temps_ref} );
-    my $call_object_decl = 'PMC *call_object;';
-    my $extra_preamble   = join( "\n    ", @{$extra_preamble_ref} );
-    my $extra_postamble  = join( "\n    ", @{$extra_postamble_ref} );
-    my $return_data_decl =
+    my $call_state      = 'call_state st;';
+    my $extra_preamble  = join( "\n    ", @{$extra_preamble_ref} );
+    my $extra_postamble = join( "\n    ", @{$extra_postamble_ref} );
+    my $return_data =
         "$return_assign $final_assign" =~ /return_data/
         ? qq{$ret_type_decl return_data;}
         : q{};
@@ -360,8 +335,6 @@ sub create_function {
         my $proto = join ', ', map { $sig_table{$_}{as_proto} } split( m//, $params );
 
         my $call_params = join( ",", @$args );
-        my $fill_params = join( ", ", @$fill_params_ref );
-        $fill_params = ", " . $fill_params if($fill_params);
 
         $func = <<"HEADER";
 static void
@@ -370,10 +343,10 @@ pcf_${return}_$fix_params(PARROT_INTERP, PMC *self)
     typedef $ret_type (*func_t)($proto);
     func_t pointer;
     void *orig_func;
-    $call_object_decl
-    $return_data_decl
+    $call_state
+    $return_data
     $other_decl
-    Parrot_pcc_fill_params_from_c_args(interp, call_object, \"$sig\"$fill_params);
+    Parrot_init_arg_nci(interp, &st, \"$sig\");
     $extra_preamble
 
     GETATTR_NCI_orig_func(interp, self, orig_func);
@@ -387,15 +360,17 @@ HEADER
     else {
 
         # Things are more simple, when there are no params
+        # call state var not needed if there are no params and a void return
+        $call_state = '' if 'v' eq $return;
         $func       = <<"HEADER";
 static void
 pcf_${return}_(PARROT_INTERP, PMC *self)
 {
     $ret_type (*pointer)(void);
     void *orig_func;
-    $return_data_decl
+    $return_data
     $other_decl
-    $call_object_decl
+    $call_state
     $extra_preamble
 
     GETATTR_NCI_orig_func(interp, self, orig_func);

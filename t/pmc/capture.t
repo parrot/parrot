@@ -226,7 +226,6 @@ a variety of keys and values.
     .return ()
 
   test_get_integer_catch:
-    pop_eh
     .local pmc exception
     .local string message
     .get_results (exception)

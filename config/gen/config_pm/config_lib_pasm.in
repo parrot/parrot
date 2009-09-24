@@ -11,7 +11,7 @@
     set I11, 1      # install flag
 no_arg:
     new P0, 'Hash'
-    null P1
+    new P1, 'Undef'
 
     @PCONFIG@
 
