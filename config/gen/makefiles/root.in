@@ -1417,6 +1417,14 @@ SRC_TEST_FILES := \
     t/src/*.t
 TOOLS_TEST_FILES := \
     t/tools/*.t
+EXTRA_TEST_FILES := \
+    t/compilers/pct/*.t \
+    t/compilers/pge/*.t \
+    t/compilers/pge/p5regex/*.t \
+    t/compilers/pge/perl6regex/*.t \
+    t/compilers/tge/*.t \
+    t/library/*.t \
+    t/tools/*.t
 PMC2CUTILS_DIR := t/tools/pmc2cutils
 OPS2PMUTILS_DIR := t/tools/ops2pm
 OPS2CUTILS_DIR := t/tools/ops2cutils
@@ -1492,6 +1500,8 @@ fulltest :
 	src_tests \
 	run_tests \
 	perl_tests \
+	extra_tests \
+	nqp_test \
 	codetest \
 	benchmark_tests \
 	manifest_tests \
@@ -1585,6 +1595,10 @@ distro_tests : test_prep
 # configure tests
 configure_tests :
 	$(PERL) t/harness $(CONFIGURE_TEST_FILES)
+
+# extra tests - tests run by make test but not by make fulltest or make cover
+extra_tests : test_prep
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(EXTRA_TEST_FILES)
 
 ###############################################################################
 #
@@ -2041,7 +2055,6 @@ COVER_DIRS := \
 
 cover: \
     cover.dummy \
-    cover-test \
     cover-testb \
 #IF(cg_flag):    cover-testC \
     cover-testf \
@@ -2049,7 +2062,9 @@ cover: \
     cover-testr \
     cover-testS \
     cover-src \
+    cover-run \
     cover-perl \
+    cover-extra \
     cover-codingstd \
     cover-benchmark \
     cover-distro
@@ -2066,9 +2081,6 @@ cover: \
 cover.dummy:
 	$(PERL) Configure.pl --ccflags="$(CC_FLAGS) $(COVER_FLAGS)" \
     --linkflags="$(COVER_FLAGS)" --ldflags="$(COVER_FLAGS)"
-
-cover-test: cover.dummy
-	-@make@ test
 
 cover-testb: cover.dummy
 	-@make@ testb
@@ -2094,8 +2106,14 @@ cover-testS: cover.dummy
 cover-src: cover.dummy
 	-@make@ src_tests
 
+cover-run: cover.dummy
+	-@make@ run_tests
+
 cover-perl: cover.dummy
 	-@make@ perl_tests
+
+cover-extra: cover.dummy
+	-@make@ extra_tests
 
 cover-codingstd: cover.dummy
 	-@make@ codingstd_tests
