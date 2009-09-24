@@ -1471,8 +1471,8 @@ do_event(PARROT_INTERP, ARGIN(parrot_event* event), ARGIN_NULLOK(opcode_t *next)
             break;
         case EVENT_TYPE_TIMER:
             /* run ops, save registers */
-            Parrot_runops_fromc_args_event(interp,
-                    event->u.timer_event.sub, "v");
+            Parrot_pcc_invoke_sub_from_c_args(interp,
+                    event->u.timer_event.sub, "->");
             break;
         case EVENT_TYPE_CALL_BACK:
             edebug((stderr, "starting user cb\n"));
@@ -1481,9 +1481,9 @@ do_event(PARROT_INTERP, ARGIN(parrot_event* event), ARGIN_NULLOK(opcode_t *next)
             break;
         case EVENT_TYPE_IO:
             edebug((stderr, "starting io handler\n"));
-            Parrot_runops_fromc_args_event(interp,
+            Parrot_pcc_invoke_sub_from_c_args(interp,
                     event->u.io_event.handler,
-                    "vPP",
+                    "PP->",
                     event->u.io_event.pio,
                     event->u.io_event.user_data);
             break;

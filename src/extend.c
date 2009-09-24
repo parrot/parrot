@@ -1038,19 +1038,60 @@ Parrot_call_sub(PARROT_INTERP, Parrot_PMC sub_pmc,
                  ARGIN(const char *signature), ...)
 {
     ASSERT_ARGS(Parrot_call_sub)
-    va_list     ap;
-    void       *result;
-    Parrot_Sub_attributes *sub;
+    va_list args;
+    PMC  *sig_object;
+    void *result;
+    char  return_sig = signature[0];
+    const char *arg_sig = signature;
 
-    PARROT_CALLIN_START(interp);
+    arg_sig++;
+    va_start(args, signature);
+    sig_object = Parrot_pcc_build_sig_object_from_varargs(interp, PMCNULL, arg_sig, args);
+    va_end(args);
 
-    va_start(ap, signature);
-    PMC_get_sub(interp, sub_pmc, sub);
-    Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp), sub->seg->const_table->constants);
-    result = Parrot_runops_fromc_arglist(interp, sub_pmc, signature, ap);
-    va_end(ap);
+    /* Add the return argument onto the call signature object (a bit
+     * hackish, added for backward compatibility in deprecated API function,
+     * see TT #XXX). */
+    switch (return_sig) {
+        case 'v':
+        {
+            Parrot_String full_sig = VTABLE_get_string(interp, sig_object);
+            Parrot_str_concat(interp, full_sig,
+                    Parrot_str_new_constant(interp, "->"), 0);
+            break;
+        }
+        case 'V':
+        case 'P':
+        {
+            Parrot_String full_sig;
+            Parrot_PMC returns;
+            Parrot_PMC return_pointer;
+            Parrot_String return_name = Parrot_str_new_constant(interp, "returns");
+            Parrot_String sig_name = Parrot_str_new_constant(interp, "signature");
+            full_sig = VTABLE_get_string(interp, sig_object);
+            Parrot_str_concat(interp, full_sig,
+                    Parrot_str_new_constant(interp, "->P"), 0);
 
-    PARROT_CALLIN_END(interp);
+            return_pointer = pmc_new(interp, enum_class_CPointer);
+
+            returns = VTABLE_get_attr_str(interp, sig_object, return_name);
+            if (PMC_IS_NULL(returns)) {
+                returns = pmc_new(interp, enum_class_ResizablePMCArray);
+                VTABLE_set_attr_str(interp, sig_object, return_name, returns);
+            }
+            VTABLE_set_pointer(interp, return_pointer, &result);
+            VTABLE_set_string_keyed_str(interp, return_pointer, sig_name,
+                    Parrot_str_new_constant(interp, "P"));
+            VTABLE_push_pmc(interp, returns, return_pointer);
+            break;
+        }
+        default:
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                        "Dispatch: invalid return type %c!", return_sig);
+    }
+
+    Parrot_pcc_invoke_from_sig_object(interp, sub_pmc, sig_object);
+
     return result;
 }
 

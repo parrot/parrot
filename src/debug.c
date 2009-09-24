@@ -3540,6 +3540,7 @@ PDB_backtrace(PARROT_INTERP)
     STRING           *str;
     PMC              *old       = PMCNULL;
     int               rec_level = 0;
+    int               limit_count = 0;
 
     /* information about the current sub */
     PMC *sub = interpinfo_p(interp, CURRENT_SUB);
@@ -3571,6 +3572,11 @@ PDB_backtrace(PARROT_INTERP)
     /* backtrace: follow the continuation chain */
     while (1) {
         Parrot_Continuation_attributes *sub_cont;
+
+        /* Limit the levels dumped, no segfault on infinite recursion */
+        if (++limit_count > RECURSION_LIMIT)
+            break;
+
         sub = Parrot_pcc_get_continuation(interp, ctx);
 
         if (PMC_IS_NULL(sub))
@@ -3581,13 +3587,18 @@ PDB_backtrace(PARROT_INTERP)
         if (!sub_cont)
             break;
 
-        str = Parrot_Context_infostr(interp, sub_cont->to_ctx);
+
+        str = Parrot_Context_infostr(interp, ctx->caller_ctx);
+
 
         if (!str)
             break;
 
-        /* recursion detection */
-        if (!PMC_IS_NULL(old) && PMC_cont(old) &&
+
+        if (ctx == sub_cont->to_ctx) {
+            ++rec_level;
+        }
+        else if (!PMC_IS_NULL(old) && PMC_cont(old) &&
             Parrot_pcc_get_pc(interp, PMC_cont(old)->to_ctx) ==
             Parrot_pcc_get_pc(interp, PMC_cont(sub)->to_ctx) &&
             Parrot_pcc_get_sub(interp, PMC_cont(old)->to_ctx) ==
@@ -3623,7 +3634,7 @@ PDB_backtrace(PARROT_INTERP)
         }
 
         /* get the next Continuation */
-        ctx = PARROT_CONTINUATION(sub)->to_ctx;
+        ctx = Parrot_pcc_get_caller_ctx(interp, ctx);
         old = sub;
 
         if (!ctx)

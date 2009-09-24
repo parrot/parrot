@@ -28,9 +28,11 @@ information for a multiple dispatch call.
         PARROT_CAPTURE(obj)->hash = pmc_new((i), enum_class_Hash);
 
 pmclass CallSignature extends Capture auto_attrs provides array provides hash {
-    ATTR PMC    *returns;    /* Result PMCs, if they were passed with the call */
-    ATTR PMC    *type_tuple; /* Cached argument types for multiple dispatch */
-    ATTR STRING *short_sig;  /* Simple string signature args & returns */
+    ATTR PMC    *returns;      /* Storage for return arguments */
+    ATTR PMC    *type_tuple;   /* Cached argument types for multiple dispatch */
+    ATTR STRING *short_sig;    /* Simple string signature args & returns */
+    ATTR PMC    *arg_flags;    /* Integer array of argument flags */
+    ATTR PMC    *return_flags; /* Integer array of return argument flags */
 
 /*
 
@@ -46,8 +48,10 @@ Initializes a newly created CallSignature object.
         Parrot_CallSignature_attributes * const sig_struct =
             (Parrot_CallSignature_attributes *) PMC_data(SELF);
         SUPER();
-        sig_struct->type_tuple = PMCNULL;
-        sig_struct->returns    = PMCNULL;
+        sig_struct->type_tuple   = PMCNULL;
+        sig_struct->returns      = PMCNULL;
+        sig_struct->arg_flags    = PMCNULL;
+        sig_struct->return_flags = PMCNULL;
     }
 
 /*
@@ -132,6 +136,16 @@ Set a PMC value for an attribute by string name.
 
 Stores the return signature, an array of PMCs.
 
+=item arg_flags
+
+Stores a set of flags for the call signature arguments, an array of
+integers.
+
+=item return_flags
+
+Stores a set of flags for the call signature return arguments, an array
+of integers.
+
 =back
 
 =cut
@@ -139,8 +153,21 @@ Stores the return signature, an array of PMCs.
 */
 
     VTABLE void set_attr_str(STRING *key, PMC *value) {
-        Parrot_CallSignature_attributes * const sig_struct = PARROT_CALLSIGNATURE(SELF);
-        sig_struct->returns = value;
+
+        if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "returns"))) {
+            SET_ATTR_returns(interp, SELF, value);
+        }
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "arg_flags"))) {
+            SET_ATTR_arg_flags(interp, SELF, value);
+        }
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "return_flags"))) {
+            SET_ATTR_return_flags(interp, SELF, value);
+        }
+        else {
+            /* If unknown attribute name, throw an exception. */
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
+                "No such attribute '%S'", key);
+        }
     }
 
 /*
@@ -155,6 +182,16 @@ Get a PMC value for an attribute by string name.
 
 Retrieves the return signature, an array of PMCs.
 
+=item arg_flags
+
+Retrieves the flags for the call signature arguments, an array of
+integers.
+
+=item return_flags
+
+Retrieves the flags for the call signature return arguments, an array of
+integers.
+
 =back
 
 =cut
@@ -162,8 +199,24 @@ Retrieves the return signature, an array of PMCs.
 */
 
     VTABLE PMC *get_attr_str(STRING *key) {
-        Parrot_CallSignature_attributes * const sig_struct = PARROT_CALLSIGNATURE(SELF);
-        return sig_struct->returns;
+        PMC *value = PMCNULL;
+
+        if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "returns"))) {
+            GET_ATTR_returns(interp, SELF, value);
+        }
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "arg_flags"))) {
+            GET_ATTR_arg_flags(interp, SELF, value);
+        }
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "return_flags"))) {
+            GET_ATTR_return_flags(interp, SELF, value);
+        }
+        else {
+            /* If unknown attribute name, throw an exception. */
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
+                "No such attribute '%S'", key);
+        }
+
+        return value;
     }
 
 /*
@@ -182,6 +235,8 @@ Mark any referenced strings and PMCs.
             Parrot_gc_mark_PMC_alive(interp, attrs->returns);
             Parrot_gc_mark_PMC_alive(interp, attrs->type_tuple);
             Parrot_gc_mark_STRING_alive(interp, attrs->short_sig);
+            Parrot_gc_mark_PMC_alive(interp, attrs->arg_flags);
+            Parrot_gc_mark_PMC_alive(interp, attrs->return_flags);
         }
         SUPER();
     }

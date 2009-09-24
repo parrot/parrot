@@ -148,7 +148,6 @@ typedef struct warnings_t {
  * defined in imcc/imc.h */
 struct _imc_info_t;
 
-
 struct _Thread_data;    /* in thread.h */
 struct _Caches;         /* caches .h */
 

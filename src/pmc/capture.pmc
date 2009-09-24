@@ -417,6 +417,90 @@ Retrieves a value from the hash component of the Capture.
 
 /*
 
+=item C<void set_number_keyed_str(STRING *key, FLOATVAL value)>
+
+=item C<void set_integer_keyed_str(STRING *key, INTVAL value)>
+
+=item C<void set_pmc_keyed_str(STRING *key, PMC *value)>
+
+=item C<void set_string_keyed_str(STRING *key, STRING *value)>
+
+Sets a value in the hash component of the Capture.
+
+=cut
+
+*/
+
+    VTABLE void set_number_keyed_str(STRING *key, FLOATVAL value) {
+        CAPTURE_hash_CREATE(INTERP, SELF);
+        VTABLE_set_number_keyed_str(INTERP, PARROT_CAPTURE(SELF)->hash,
+                                    key, value);
+    }
+
+    VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) {
+        CAPTURE_hash_CREATE(INTERP, SELF);
+        VTABLE_set_integer_keyed_str(INTERP, PARROT_CAPTURE(SELF)->hash,
+                                     key, value);
+    }
+
+    VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
+        CAPTURE_hash_CREATE(INTERP, SELF);
+        VTABLE_set_pmc_keyed_str(INTERP, PARROT_CAPTURE(SELF)->hash,
+                                 key, value);
+    }
+
+    VTABLE void set_string_keyed_str(STRING *key, STRING *value) {
+        CAPTURE_hash_CREATE(INTERP, SELF);
+        VTABLE_set_string_keyed_str(INTERP, PARROT_CAPTURE(SELF)->hash,
+                                    key, value);
+    }
+
+/*
+
+=item C<FLOATVAL get_number_keyed_str(STRING *key)>
+
+=item C<INTVAL get_integer_keyed_str(STRING *key)>
+
+=item C<PMC *get_pmc_keyed_str(STRING *key)>
+
+=item C<STRING *get_string_keyed_str(STRING *key)>
+
+Retrieves a value in the hash component of the Capture.
+
+=cut
+
+*/
+
+    VTABLE FLOATVAL get_number_keyed_str(STRING *key) {
+        if (!(PARROT_CAPTURE(SELF)->hash))
+            return 0.0;
+        return VTABLE_get_number_keyed_str(INTERP, PARROT_CAPTURE(SELF)->hash,
+                                           key);
+    }
+
+    VTABLE INTVAL get_integer_keyed_str(STRING *key) {
+        if (!(PARROT_CAPTURE(SELF)->hash))
+            return 0;
+        return VTABLE_get_integer_keyed_str(INTERP, PARROT_CAPTURE(SELF)->hash,
+                                            key);
+    }
+
+    VTABLE PMC *get_pmc_keyed_str(STRING *key) {
+        if (!(PARROT_CAPTURE(SELF)->hash))
+            return PMCNULL;
+        return VTABLE_get_pmc_keyed_str(INTERP, PARROT_CAPTURE(SELF)->hash,
+                                        key);
+    }
+
+    VTABLE STRING *get_string_keyed_str(STRING *key) {
+        if (!(PARROT_CAPTURE(SELF)->hash))
+            return CONST_STRING(INTERP, "");
+        return VTABLE_get_string_keyed_str(INTERP, PARROT_CAPTURE(SELF)->hash,
+                                           key);
+    }
+
+/*
+
 =item C<INTVAL defined_keyed(PMC *key)>
 
 Return true if element C<key> of the hash component is defined.
@@ -446,6 +530,39 @@ Delete the element corresponding to C<key> in the hash component.
     VTABLE void delete_keyed(PMC *key) {
         if (PARROT_CAPTURE(SELF)->hash)
             VTABLE_delete_keyed(INTERP, PARROT_CAPTURE(SELF)->hash, key);
+    }
+
+/*
+
+=item C<INTVAL defined_keyed_str(STRING *key)>
+
+Return true if element C<key> of the hash component is defined.
+
+=item C<INTVAL exists_keyed_str(STRING *key)>
+
+Return true if element C<key> of the hash component exists.
+
+=item C<void delete_keyed_str(STRING *key)>
+
+Delete the element corresponding to C<key> in the hash component.
+
+=cut
+
+*/
+
+    VTABLE INTVAL defined_keyed_str(STRING *key) {
+        if (!PARROT_CAPTURE(SELF)->hash) return 0;
+        return VTABLE_defined_keyed_str(INTERP, PARROT_CAPTURE(SELF)->hash, key);
+    }
+
+    VTABLE INTVAL exists_keyed_str(STRING *key) {
+        if (!PARROT_CAPTURE(SELF)->hash) return 0;
+        return VTABLE_exists_keyed_str(INTERP, PARROT_CAPTURE(SELF)->hash, key);
+    }
+
+    VTABLE void delete_keyed_str(STRING *key) {
+        if (PARROT_CAPTURE(SELF)->hash)
+            VTABLE_delete_keyed_str(INTERP, PARROT_CAPTURE(SELF)->hash, key);
     }
 
 /*

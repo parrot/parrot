@@ -654,25 +654,19 @@ PMC*
 Parrot_mmd_build_type_tuple_from_sig_obj(PARROT_INTERP, ARGIN(PMC *sig_obj))
 {
     ASSERT_ARGS(Parrot_mmd_build_type_tuple_from_sig_obj)
-    PMC * const  type_tuple = pmc_new(interp, enum_class_FixedIntegerArray);
+    PMC * const  type_tuple = pmc_new(interp, enum_class_ResizableIntegerArray);
     STRING      *string_sig = VTABLE_get_string(interp, sig_obj);
-    const INTVAL sig_len    = Parrot_str_byte_length(interp, string_sig);
     INTVAL       tuple_size = 0;
     INTVAL       args_ended = 0;
     INTVAL       i, seen_invocant = 0;
+    INTVAL       sig_len;
 
-    /* First calculate the number of arguments participating in MMD */
-    for (i = 0; i < sig_len; ++i) {
-        INTVAL type = Parrot_str_indexed(interp, string_sig, i);
-        if (type == '-')
-            break;
-        if (type == 'i')
-            continue;
-
-        tuple_size++;
+    if (STRING_IS_NULL(string_sig)) {
+            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                    "Call has no signature, unable to dispatch.\n");
     }
 
-    VTABLE_set_integer_native(interp, type_tuple, tuple_size);
+    sig_len = Parrot_str_byte_length(interp, string_sig);
 
     for (i = 0; i < sig_len; ++i) {
         INTVAL type = Parrot_str_indexed(interp, string_sig, i + seen_invocant);

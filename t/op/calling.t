@@ -447,7 +447,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too few" );
     print $P0
 .end
 CODE
-/too few arguments passed/
+/too few positional arguments/
 OUTPUT
 
 pir_output_like(
@@ -478,7 +478,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many - force ge
     print "nada"
 .end
 CODE
-/too many arguments passed/
+/too many positional arguments/
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many" );
@@ -496,7 +496,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many" );
     print $P0
 .end
 CODE
-/too many arguments passed/
+/too many positional arguments/
 OUTPUT
 
 pir_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many - catch exception" );
@@ -524,7 +524,7 @@ arg_handler:
 #    print $S1
 .end
 CODE
-/^caught: too many arguments passed/
+/^caught: too many positional arguments/
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "argc mismatch, optional" );
@@ -571,7 +571,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, optional" );
     .param int got_k :opt_flag
 .end
 CODE
-/too many arguments passed/
+/too many positional arguments/
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "get_param later" );
@@ -1210,7 +1210,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "too many args via :flat" );
     $P35 = _fn1(1, $P34 :flat)
 .end
 CODE
-/too many arguments passed \(5\) - 4 params expected/
+/too many positional arguments: 5 passed, 4 expected/
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "too few args via :flat" );
@@ -1242,7 +1242,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "too few args via :flat" );
     $P35 = _fn1(1, $P34 :flat)
 .end
 CODE
-/too few arguments passed \(3\) - 4 params expected/
+/too few positional arguments: 3 passed, 4 \(or more\) expected/
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "tailcall to NCI" );
