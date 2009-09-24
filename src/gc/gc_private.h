@@ -47,16 +47,16 @@ extern void *flush_reg_store(void);
 #define POOL_MAX_BYTES                         65536 * 128
 
 #ifndef GC_IS_MALLOC
-#  define PMC_HEADERS_PER_ALLOC    10240 / sizeof (PMC)
-#  define BUFFER_HEADERS_PER_ALLOC  5120 / sizeof (Buffer)
-#  define STRING_HEADERS_PER_ALLOC  5120 / sizeof (STRING)
+#  define PMC_HEADERS_PER_ALLOC     4096 * 10 / sizeof (PMC)
+#  define BUFFER_HEADERS_PER_ALLOC  4096      / sizeof (Buffer)
+#  define STRING_HEADERS_PER_ALLOC  4096 * 20 / sizeof (STRING)
 #else /* GC_IS_MALLOC */
 #  define PMC_HEADERS_PER_ALLOC    10240 / sizeof (PMC)
 #  define BUFFER_HEADERS_PER_ALLOC 10240 / sizeof (Buffer)
 #  define STRING_HEADERS_PER_ALLOC 10240 / sizeof (STRING)
 #endif /* GC_IS_MALLOC */
 
-#define CONSTANT_PMC_HEADERS_PER_ALLOC 64
+#define CONSTANT_PMC_HEADERS_PER_ALLOC 4096 / sizeof (PMC)
 #define GET_SIZED_POOL_IDX(x) ((x) / sizeof (void *))
 
 
