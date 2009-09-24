@@ -507,8 +507,7 @@ Mark the array.
             return;
 
         for (i = PARROT_CAPTURE(SELF)->data_size - 1; i >= 0; --i)
-            if (data[i])
-                Parrot_gc_mark_PObj_alive(interp, (PObj *)data[i]);
+            Parrot_gc_mark_PMC_alive(interp, data[i]);
     }
 
 /*

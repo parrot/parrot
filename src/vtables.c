@@ -212,16 +212,11 @@ mark_vtables(PARROT_INTERP)
         if (!vtable)
             continue;
 
-        if (vtable->mro)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)vtable->mro);
-        if (vtable->_namespace)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)vtable->_namespace);
-        if (vtable->whoami)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)vtable->whoami);
-        if (vtable->provides_str)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)vtable->provides_str);
-        if (vtable->pmc_class)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)vtable->pmc_class);
+        Parrot_gc_mark_PMC_alive(interp, vtable->mro);
+        Parrot_gc_mark_PMC_alive(interp, vtable->_namespace);
+        Parrot_gc_mark_STRING_alive(interp, vtable->whoami);
+        Parrot_gc_mark_STRING_alive(interp, vtable->provides_str);
+        Parrot_gc_mark_PMC_alive(interp, vtable->pmc_class);
     }
 }
 

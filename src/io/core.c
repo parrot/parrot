@@ -125,9 +125,7 @@ Parrot_IOData_mark(PARROT_INTERP, ARGIN(ParrotIOData *piodata))
      * to be kept alive AFAIK -leo
      */
     for (i = 0; i < 3; i++) {
-        if (table[i]) {
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)table[i]);
-        }
+        Parrot_gc_mark_PMC_alive(interp, table[i]);
     }
 }
 

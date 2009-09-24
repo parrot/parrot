@@ -60,41 +60,15 @@ Mark Context as alive.
         if (!ctx)
             return;
 
-        obj = (PObj *)ctx->caller_ctx;
-        if (obj)
-            Parrot_gc_mark_PObj_alive(interp, obj);
-
-        obj = (PObj *)ctx->lex_pad;
-        if (obj)
-            Parrot_gc_mark_PObj_alive(interp, obj);
-
-        obj = (PObj *)ctx->outer_ctx;
-        if (obj)
-            Parrot_gc_mark_PObj_alive(interp, obj);
-
-        obj = (PObj *)ctx->current_sub;
-        if (obj)
-            Parrot_gc_mark_PObj_alive(interp, obj);
-
-        obj = (PObj *)ctx->handlers;
-        if (obj)
-            Parrot_gc_mark_PObj_alive(interp, obj);
-
-        obj = (PObj *)ctx->current_cont;
-        if (obj && !PObj_live_TEST(obj))
-            Parrot_gc_mark_PObj_alive(interp, obj);
-
-        obj = (PObj *)ctx->current_object;
-        if (obj)
-            Parrot_gc_mark_PObj_alive(interp, obj);
-
-        obj = (PObj *)ctx->current_namespace;
-        if (obj)
-            Parrot_gc_mark_PObj_alive(interp, obj);
-
-        obj = (PObj *)ctx->results_signature;
-        if (obj)
-            Parrot_gc_mark_PObj_alive(interp, obj);
+        Parrot_gc_mark_PMC_alive(INTERP, ctx->caller_ctx);
+        Parrot_gc_mark_PMC_alive(INTERP, ctx->lex_pad);
+        Parrot_gc_mark_PMC_alive(INTERP, ctx->outer_ctx);
+        Parrot_gc_mark_PMC_alive(INTERP, ctx->current_sub);
+        Parrot_gc_mark_PMC_alive(INTERP, ctx->handlers);
+        Parrot_gc_mark_PMC_alive(INTERP, ctx->current_cont);
+        Parrot_gc_mark_PMC_alive(INTERP, ctx->current_object);
+        Parrot_gc_mark_PMC_alive(INTERP, ctx->current_namespace);
+        Parrot_gc_mark_PMC_alive(INTERP, ctx->results_signature);
 
         if (!ctx->n_regs_used)
             return;

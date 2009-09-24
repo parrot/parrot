@@ -805,13 +805,11 @@ mark_1_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
             case PFC_PMC:
             case PFC_KEY:
                 pmc = constants[i]->u.key;
-                if (pmc)
-                    Parrot_gc_mark_PObj_alive(interp, (PObj *)pmc);
+                Parrot_gc_mark_PMC_alive(interp, pmc);
                 break;
             case PFC_STRING:
                 string = constants[i]->u.string;
-                if (string)
-                    Parrot_gc_mark_PObj_alive(interp, (PObj *)string);
+                Parrot_gc_mark_STRING_alive(interp, string);
                 break;
             default:
                 /* Do nothing. */

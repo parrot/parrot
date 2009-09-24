@@ -200,8 +200,7 @@ Marks the lexpad hash as live.
 
     VTABLE void mark() {
         PMC *std_pad = PARROT_DYNLEXPAD(SELF)->init;
-        if (std_pad)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)std_pad);
+        Parrot_gc_mark_PMC_alive(INTERP, std_pad);
         if (PARROT_DYNLEXPAD(SELF)->hash)
             parrot_mark_hash(interp, PARROT_DYNLEXPAD(SELF)->hash);
     }

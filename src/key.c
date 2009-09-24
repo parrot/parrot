@@ -612,17 +612,13 @@ key_mark(PARROT_INTERP, ARGIN(PMC *key))
     if (flags == KEY_string_FLAG) {
         STRING *str_key;
         GETATTR_Key_str_key(interp, key, str_key);
-
-        /* XXX str_key can be NULL from GETATTR_Key_str_key, */
-        /* so shouldn't be marked. */
-        Parrot_gc_mark_PObj_alive(interp, (PObj *)str_key);
+        Parrot_gc_mark_STRING_alive(interp, str_key);
     }
 
     /* Mark next key */
     if ((flags == KEY_string_FLAG) || (flags == KEY_pmc_FLAG)) {
         GETATTR_Key_next_key(interp, key, next_key);
-        if (next_key)
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)next_key);
+        Parrot_gc_mark_PMC_alive(interp, next_key);
     }
 
 }

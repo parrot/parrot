@@ -743,7 +743,7 @@ mark_object_cache(PARROT_INTERP)
         for (entry = 0; entry < TBL_SIZE; ++entry) {
             Meth_cache_entry *e = mc->idx[type][entry];
             while (e) {
-                Parrot_gc_mark_PObj_alive(interp, (PObj *)e->pmc);
+                Parrot_gc_mark_PMC_alive(interp, e->pmc);
                 e = e->next;
             }
         }
