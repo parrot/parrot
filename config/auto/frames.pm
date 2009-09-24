@@ -33,40 +33,8 @@ sub runstep {
 
     my $can_build_call_frames = _call_frames_buildable($conf);
 
-    if ( $can_build_call_frames ) {
-        $conf->data->set(
-            cc_build_call_frames  => '-DCAN_BUILD_CALL_FRAMES',
-        );
-    }
-    else {
-        $conf->data->set(
-            cc_build_call_frames  => '',
-        );
-    }
+    $self->_handle_can_build_call_frames( $conf, $can_build_call_frames );
 
-    if ( $can_build_call_frames ) {
-        # test for executable malloced memory
-        my $osname = $conf->data->get( 'osname' );
-        if ( -e "config/auto/frames/test_exec_${osname}_c.in" ) {
-            $conf->cc_gen("config/auto/frames/test_exec_${osname}_c.in");
-            eval { $conf->cc_build(); };
-            if ($@) {
-                $conf->data->set( has_exec_protect => 0 );
-            }
-            else {
-                my $exec_protect_test = (
-                    $conf->cc_run(0) !~ /ok/ && $conf->cc_run(1) =~ /ok/
-                );
-                _handle_exec_protect($conf, $exec_protect_test);
-            }
-            $conf->cc_clean();
-        }
-        else {
-            $conf->data->set( has_exec_protect => 0 );
-        }
-    }
-
-    $self->set_result($can_build_call_frames?'yes':'no');
     return 1;
 }
 
@@ -87,14 +55,43 @@ sub _call_frames_buildable {
     return $can_build_call_frames;
 }
 
-sub _handle_exec_protect {
-    my ($conf, $exec_protect_test) = @_;
-    if ($exec_protect_test) {
-        $conf->data->set( has_exec_protect => 1 );
+sub _handle_can_build_call_frames {
+    my ($self, $conf, $can_build_call_frames) = @_;
+    if ( $can_build_call_frames ) {
+        $conf->data->set(
+            cc_build_call_frames  => '-DCAN_BUILD_CALL_FRAMES',
+        );
+        # test for executable malloced memory
+        my $osname = $conf->data->get( 'osname' );
+        if ( -e "config/auto/frames/test_exec_${osname}_c.in" ) {
+            $conf->cc_gen("config/auto/frames/test_exec_${osname}_c.in");
+            eval { $conf->cc_build(); };
+            if ($@) {
+                $conf->data->set( has_exec_protect => 0 );
+            }
+            else {
+                my $exec_protect_test = (
+                    $conf->cc_run(0) !~ /ok/ && $conf->cc_run(1) =~ /ok/
+                );
+                if ($exec_protect_test) {
+                    $conf->data->set( has_exec_protect => 1 );
+                }
+                else {
+                    $conf->data->set( has_exec_protect => 0 );
+                }
+            }
+            $conf->cc_clean();
+        }
+        else {
+            $conf->data->set( has_exec_protect => 0 );
+        }
+        $self->set_result( 'yes' );
     }
     else {
-        $conf->data->set( has_exec_protect => 0 );
+        $conf->data->set( cc_build_call_frames  => '');
+        $self->set_result( 'no' );
     }
+    return 1;
 }
 
 1;

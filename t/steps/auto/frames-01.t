@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 19;
+use Test::More tests => 23;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
 use_ok('config::auto::frames');
@@ -13,7 +13,6 @@ use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw(
     test_step_thru_runstep
-    rerun_defaults_for_testing
     test_step_constructor_and_description
 );
 
@@ -45,12 +44,13 @@ my $ret = $step->runstep($conf);
 ok( $ret, "runstep() returned true value" );
 ok( defined ( $step->result() ),
     "Got defined result" );
+is( $step->result(), 'yes', "Result is 'yes', as expected" );
 $conf->cc_clean();
-
+$step->set_result( undef );
 
 $conf->replenish($serialized);
 
-##### _call_frames_buildable() #####
+###### _call_frames_buildable() #####
 
 my $can_build_call_frames;
 
@@ -93,18 +93,28 @@ $can_build_call_frames = auto::frames::_call_frames_buildable($conf);
 ok( ! $can_build_call_frames,
     "_call_frames_buildable() returned false value, as expected (i386/linux/4)" );
 
-$conf->data->set( has_exec_protect => undef );
-my $exec_protect_test;
+##### _handle_call_frames_buildable() #####
 
-$exec_protect_test = 1;
-auto::frames::_handle_exec_protect($conf, $exec_protect_test);
-ok( $conf->data->get( 'has_exec_protect' ),
-    "has_exec_protect set, as expected" );
+$conf->data->set( nvsize => 8 );
+$conf->data->set( cpuarch => 'i386' );
+$conf->data->set( osname => 'linux' );
 
-$exec_protect_test = 0;
-auto::frames::_handle_exec_protect($conf, $exec_protect_test);
-ok( ! $conf->data->get( 'has_exec_protect' ),
-    "has_exec_protect not set, as expected" );
+my $rv;
+
+$can_build_call_frames = 0;
+
+$rv = $step->_handle_can_build_call_frames( $conf, $can_build_call_frames );
+ok( $rv, "_handle_can_build_call_frames() returned true value" );
+ok( ! $conf->data->get( 'cc_build_call_frames'),
+    "cc_build_call_frames not set to true, as expected" );
+ok( ! defined( $conf->data->get( 'has_exec_protect' ) ),
+    "has_exec_protect undefined, as expected" );
+is( $step->result(), 'no', "Result is 'no', as expected" );
+
+$conf->data->set( 'cc_build_call_frames' => undef );
+$conf->data->set( 'has_exec_protect' => undef );
+
+pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
 
