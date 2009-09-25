@@ -195,8 +195,8 @@ Returns the integer value of the element at index C<key>.
 */
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
-        PMC * const tempPMC = SELF.get_pmc_keyed_int(key);
-        return VTABLE_get_integer(INTERP, tempPMC);
+        STRING * const element = SELF.get_string_keyed_int(key);
+        return Parrot_str_to_int(interp, element);
     }
 
 /*
@@ -227,8 +227,8 @@ Returns the floating-point value of the element at index C<key>.
 */
 
     VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
-        PMC * const tempPMC = SELF.get_pmc_keyed_int(key);
-        return VTABLE_get_number(INTERP, tempPMC);
+        STRING * const element = SELF.get_string_keyed_int(key);
+        return Parrot_str_to_num(interp, element);
     }
 
 /*
@@ -499,9 +499,9 @@ Returns the Parrot string representation C<key>.
         INTVAL        j;
 
         for (j = 0; j < n; ++j) {
-            PMC * const val = SELF.get_pmc_keyed_int(j);
+            STRING * const val = SELF.get_string_keyed_int(j);
             res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "\""));
-            res = Parrot_str_append(INTERP, res, VTABLE_get_repr(INTERP, val));
+            res = Parrot_str_append(INTERP, res, val);
             res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "\""));
 
             if (j < n - 1)
