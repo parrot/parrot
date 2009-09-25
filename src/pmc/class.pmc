@@ -847,27 +847,23 @@ if the class has been instantiated.
 */
     VTABLE void remove_parent(PMC *parent) {
         Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
-
-        /* get number of direct parents */
-        const int parent_count      = VTABLE_elements(interp, _class->parents);
-
-        int index; /* loop iterator */
+        int parent_count, index;
 
         /* If we've been instantiated already, not allowed. */
-        if (_class->instantiated) {
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        if (_class->instantiated)
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_OPERATION,
                 "Modifications to classes are not allowed after instantiation.");
-        }
 
         /* Ensure it really is a class. */
-        if (!PObj_is_class_TEST(parent)) {
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                "Parent isn't a Class.");
-        }
+        if (!PObj_is_class_TEST(parent))
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_OPERATION, "Parent isn't a Class.");
 
-        /* iterate over all direct parents, looking for
-         * the parent to be removed.
-         */
+        /* get number of direct parents */
+        parent_count = VTABLE_elements(interp, _class->parents);
+
+        /* iterate over all direct parents, looking for the parent to remove */
         for (index = 0; index < parent_count; index++) {
             /* get the next parent */
             PMC * const current_parent = VTABLE_get_pmc_keyed_int(interp,
@@ -875,19 +871,13 @@ if the class has been instantiated.
             if (current_parent == parent)
                 break;
         }
+
         if (index >= parent_count)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_OPERATION,
                 "Can't remove_parent: is not a parent.");
 
-        /* Move up the remaining parents on the list and pops it */
-        for (; index < parent_count - 1; index++) {
-            PMC * const current_parent = VTABLE_get_pmc_keyed_int(interp,
-                _class->parents, index + 1);
-            VTABLE_set_pmc_keyed_int(interp, _class->parents,
-                index, current_parent);
-        }
-
-        VTABLE_pop_pmc(interp, _class->parents);
+        VTABLE_delete_keyed_int(interp, _class->parents, index);
         _class->all_parents = calculate_mro(interp, SELF, parent_count - 1);
 
         /* Anonymous classes have no entry in the vtable array */
