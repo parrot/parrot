@@ -1418,6 +1418,7 @@ SRC_TEST_FILES := \
 TOOLS_TEST_FILES := \
     t/tools/*.t
 EXTRA_TEST_FILES := \
+    t/compilers/json/*.t \
     t/compilers/pct/*.t \
     t/compilers/pge/*.t \
     t/compilers/pge/p5regex/*.t \
@@ -1596,7 +1597,7 @@ distro_tests : test_prep
 configure_tests :
 	$(PERL) t/harness $(CONFIGURE_TEST_FILES)
 
-# extra tests - tests run by make test but not by make fulltest or make cover
+# extra tests - tests needed by make fulltest and make cover for completion
 extra_tests : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(EXTRA_TEST_FILES)
 
