@@ -53,7 +53,6 @@ Mark Context as alive.
     VTABLE void mark()
     {
         Parrot_Context * const ctx = PMC_data_typed(SELF, Parrot_Context*);
-        PObj   *obj;
         UINTVAL i;
 
         /* If Context wasn't initialised just return */
@@ -74,16 +73,16 @@ Mark Context as alive.
             return;
 
         for (i = 0; i < ctx->n_regs_used[REGNO_PMC]; ++i) {
+            PMC *p = ctx->bp_ps.regs_p[-1L-(i)];
             /* Original code from CTX_REG_PMC */
-            obj = (PObj *)ctx->bp_ps.regs_p[-1L-(i)];
-            if (obj)
-                Parrot_gc_mark_PObj_alive(interp, obj);
+            if (p)
+                Parrot_gc_mark_PMC_alive(interp, p);
         }
 
         for (i = 0; i < ctx->n_regs_used[REGNO_STR]; ++i) {
-            obj = (PObj *) ctx->bp_ps.regs_s[i];
-            if (obj)
-                Parrot_gc_mark_PObj_alive(interp, obj);
+            STRING *s = ctx->bp_ps.regs_s[i];
+            if (s)
+                Parrot_gc_mark_STRING_alive(interp, s);
         }
     }
 

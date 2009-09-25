@@ -223,7 +223,7 @@ Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
             mark_special(interp, p);
 
         else if (PMC_metadata(p))
-            Parrot_gc_mark_PObj_alive(interp, (PObj*)PMC_metadata(p));
+            Parrot_gc_mark_PMC_alive(interp, PMC_metadata(p));
     }
 #if GC_VERBOSE
     /* buffer GC_DEBUG stuff */

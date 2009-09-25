@@ -193,7 +193,7 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
     /* mark the current continuation */
     obj = (PObj *)interp->current_cont;
     if (obj && obj != (PObj *)NEED_CONTINUATION)
-        Parrot_gc_mark_PObj_alive(interp, obj);
+        Parrot_gc_mark_PMC_alive(interp, obj);
 
     /* mark the current context. */
     Parrot_gc_mark_PMC_alive(interp, CURRENT_CONTEXT(interp));
