@@ -262,7 +262,6 @@ sub runstep {
     $conf->data->set( 'archname', $Config{archname});
     # adjust archname, cc and libs for e.g. --m=32
     # RT#41499 this is maybe gcc only
-    # RT#41500 adjust lib install-path /lib64 vs. lib
     # remember corrected archname - jit.pm was using $Config('archname')
     _64_bit_adjustments($conf);
 
