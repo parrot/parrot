@@ -2066,8 +2066,11 @@ cover: \
     cover-run \
     cover-perl \
     cover-extra \
+    cover-nqp \
     cover-codingstd \
     cover-benchmark \
+    cover-manifest \
+    cover-examples \
     cover-distro
 	build_dir=$$PWD; \
     for dir in $(COVER_DIRS); \
@@ -2116,11 +2119,20 @@ cover-perl: cover.dummy
 cover-extra: cover.dummy
 	-@make@ extra_tests
 
+cover-nqp: cover.dummy
+	-@make@ nqp_test
+
 cover-codingstd: cover.dummy
 	-@make@ codingstd_tests
 
 cover-benchmark: cover.dummy
 	-@make@ benchmark_tests
+
+cover-manifest: cover.dummy
+	-@make@ manifest_tests
+
+cover-examples: cover.dummy
+	-@make@ examples_tests
 
 cover-distro: cover.dummy
 	-@make@ distro_tests
