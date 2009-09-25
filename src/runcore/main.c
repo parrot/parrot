@@ -124,11 +124,7 @@ void
 Parrot_runcore_init(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_runcore_init)
-#ifdef NDEBUG
-    STRING * const default_core = CONST_STRING(interp, "slow");
-#else
     STRING * const default_core = CONST_STRING(interp, "fast");
-#endif
 
     interp->cores        = NULL;
     interp->num_cores    = 0;
