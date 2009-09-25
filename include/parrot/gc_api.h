@@ -466,7 +466,7 @@ void Parrot_gc_inf_init(PARROT_INTERP);
 
 #ifdef NDEBUG
 #  define Parrot_gc_mark_PMC_alive(interp, obj) \
-        do if (! PMC_IS_NULL(obj) && !PObj_is_live_or_free_TESTALL(obj)) \
+        do if (! PMC_IS_NULL(obj)) \
             Parrot_gc_mark_PMC_alive_fun((interp), (obj)); while (0)
 #  ifdef PARROT_IN_CORE
 #    define Parrot_gc_mark_STRING_alive(interp, obj) \

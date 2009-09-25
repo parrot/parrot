@@ -252,6 +252,9 @@ Parrot_gc_mark_PMC_alive_fun(PARROT_INTERP, ARGMOD_NULLOK(PMC *obj))
     if (!PMC_IS_NULL(obj)) {
         PARROT_ASSERT(PObj_is_PMC_TEST(obj));
 
+        if (PObj_is_live_or_free_TESTALL(obj))
+            return;
+
         /* mark it live */
         PObj_live_SET(obj);
 
