@@ -257,7 +257,6 @@ Returns the Parrot string value of the element at index C<key>.
 */
 
     VTABLE STRING *get_string_keyed_int(INTVAL key) {
-
         STRING **str_array;
         UINTVAL  size;
 
@@ -358,11 +357,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        PMC    *const ret = pmc_new(INTERP, enum_class_String);
-        STRING *val;
-
-        VTABLE_set_integer_native(INTERP, ret, value);
-        val = VTABLE_get_string(INTERP, ret);
+        STRING *val = Parrot_str_from_int(interp, value);
         SELF.set_string_keyed_int(key, val);
     }
 
@@ -393,11 +388,7 @@ C<value>.
 */
 
     VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-        PMC    *const ret = pmc_new(INTERP, enum_class_String);
-        STRING *val;
-
-        VTABLE_set_number_native(INTERP, ret, value);
-        val = VTABLE_get_string(INTERP, ret);
+        STRING *val = Parrot_str_from_num(interp, value);
         SELF.set_string_keyed_int(key, val);
     }
 
