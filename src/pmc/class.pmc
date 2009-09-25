@@ -1186,8 +1186,7 @@ Creates a new PMC object of the type of the class and calls init().
         object = pmc_new_noinit(interp, enum_class_Object);
 
         /* Set custom GC mark and destroy on the object. */
-        PObj_custom_mark_SET(object);
-        PObj_custom_destroy_SET(object);
+        PObj_custom_mark_destroy_SETALL(object);
 
         /* Flag that it is an object */
         PObj_is_object_SET(object);
@@ -1198,31 +1197,30 @@ Creates a new PMC object of the type of the class and calls init().
          * Object PMC. Needs to be redone in a cleaner way. */
         {
             Parrot_Object_attributes * const objattr =
-                    (Parrot_Object_attributes *)PMC_data(object);
-            objattr->_class = SELF;
+                PMC_data_typed(object, Parrot_Object_attributes *);
+            objattr->_class       = SELF;
             objattr->attrib_store = pmc_new(interp, enum_class_ResizablePMCArray);
         }
+
         if (!PMC_IS_NULL(init)) {
             /* Initialize attributes with the supplied values. */
             PMC * const iter = VTABLE_get_iter(interp, init);
 
             while (VTABLE_get_bool(interp, iter)) {
-                /* Get name and value. */
-                STRING * const attr_name  = VTABLE_shift_string(interp, iter);
-                PMC    * const attr_value = VTABLE_get_pmc_keyed_str(interp, init,
-                    attr_name);
+                STRING * const name  = VTABLE_shift_string(interp, iter);
+                PMC    * const value = VTABLE_get_pmc_keyed_str(interp, init,
+                                            name);
 
                 /* Set the attribute. */
-                VTABLE_set_attr_str(interp, object, attr_name, attr_value);
+                VTABLE_set_attr_str(interp, object, name, value);
             }
-        }
 
-        /* Check for overrides on the init or init_pmc vtable function and call
-         * them if they exist */
-        if (PMC_IS_NULL(init))
-            initialize_parents(interp, object, _class->all_parents);
-        else
+            /* Check for overrides on the init_pmc vtable function */
             initialize_parents_pmc(interp, object, _class->all_parents, init);
+        }
+        else
+            /* Check for overrides on the init vtable function */
+            initialize_parents(interp, object, _class->all_parents);
 
         return object;
     }
@@ -1736,8 +1734,7 @@ C<add_method> vtable method.
 =cut
 
 */
-    METHOD add_method(STRING *name, PMC *sub)
-    {
+    METHOD add_method(STRING *name, PMC *sub) {
         SELF.add_method(name, sub);
     }
 
@@ -1764,8 +1761,7 @@ Removes the method with the given name.
 =cut
 
 */
-    METHOD remove_method(STRING *name)
-    {
+    METHOD remove_method(STRING *name) {
         VTABLE_remove_method(interp, SELF, name);
     }
 
