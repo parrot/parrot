@@ -423,7 +423,7 @@ calculate_mro(PARROT_INTERP, PMC *SELF, INTVAL num_parents)
 
     /* SELF is already on the all_parents */
     if (num_parents == 0)
-        return _class->all_parents;
+        return;
 
     if (num_parents == 1) {
         STRING * const ap         = CONST_STRING(interp, "all_parents");
