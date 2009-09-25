@@ -251,7 +251,16 @@ Parrot_gc_mark_PMC_alive_fun(PARROT_INTERP, ARGMOD_NULLOK(PMC *obj))
     ASSERT_ARGS(Parrot_gc_mark_PMC_alive_fun)
     if (!PMC_IS_NULL(obj)) {
         PARROT_ASSERT(PObj_is_PMC_TEST(obj));
-        Parrot_gc_mark_PObj_alive(interp, (PObj *)obj);
+
+        /* mark it live */
+        PObj_live_SET(obj);
+
+        /* if object is a PMC and contains buffers or PMCs, then attach the PMC
+         * to the chained mark list. */
+        if (PObj_is_special_PMC_TEST(obj))
+            mark_special(interp, obj);
+        else if (PMC_metadata(obj))
+            Parrot_gc_mark_PMC_alive(interp, PMC_metadata(obj));
     }
 }
 
@@ -272,7 +281,9 @@ Parrot_gc_mark_STRING_alive_fun(PARROT_INTERP, ARGMOD_NULLOK(STRING *obj))
     ASSERT_ARGS(Parrot_gc_mark_STRING_alive_fun)
     if (!STRING_IS_NULL(obj)) {
         PARROT_ASSERT(PObj_is_string_TEST(obj));
-        Parrot_gc_mark_PObj_alive(interp, (PObj *)obj);
+
+        /* mark it live */
+        PObj_live_SET(obj);
     }
 }
 
