@@ -468,14 +468,14 @@ void Parrot_gc_inf_init(PARROT_INTERP);
 #  define Parrot_gc_mark_PMC_alive(interp, obj) \
         do if (! PMC_IS_NULL(obj)) \
             Parrot_gc_mark_PMC_alive_fun((interp), (obj)); while (0)
-#  ifdef PARROT_IN_CORE
-#    define Parrot_gc_mark_STRING_alive(interp, obj) \
-          do if (! STRING_IS_NULL(obj) ) PObj_live_SET(obj); while (0)
-#  else
-#    define Parrot_gc_mark_STRING_alive(interp, obj) \
+#ifdef PARROT_IN_CORE
+#  define Parrot_gc_mark_STRING_alive(interp, obj) \
+          do if (! STRING_IS_NULL(obj)) PObj_live_SET(obj); while (0)
+#else
+#  define Parrot_gc_mark_STRING_alive(interp, obj) \
           do if (! STRING_IS_NULL(obj) && !PObj_is_live_or_free_TESTALL(obj)) \
               Parrot_gc_mark_STRING_alive_fun((interp), (obj)); while (0)
-#  endif
+#endif
 #else
 #  define Parrot_gc_mark_PMC_alive(interp, obj) Parrot_gc_mark_PMC_alive_fun((interp), (obj))
 #  define Parrot_gc_mark_STRING_alive(interp, obj) Parrot_gc_mark_STRING_alive_fun((interp), (obj))
