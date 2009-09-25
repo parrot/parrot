@@ -45,35 +45,40 @@ begin:
 .namespace ["A"]
 
 .sub fib :method
-    .param pmc n
+    .param int n
     if n >= 2 goto rec
     .return (n)
 rec:
-    .local pmc n1
-    .local pmc n2
-    .local pmc r1
-    .local pmc r2
-    n1 = n - 1
-    n2 = n - 2
-    r1 = self."fibA"(n1)
-    r2 = self."fibB"(n2)
+    .local int prev
+    .local int r1
+    prev = n
+    dec prev
+    r1 = self."fibA"(prev)
+
+    dec prev
+    .local int r2
+    r2 = self."fibB"(prev)
+
     n = r1 + r2
     .return (n)
 .end
 
 .sub fibA :method
-    .param pmc n
+    .param int n
     if n >= 2 goto rec
     .return (n)
 rec:
-    .local pmc n1
-    .local pmc n2
-    .local pmc r1
-    .local pmc r2
-    n1 = n - 1
-    n2 = n - 2
-    r1 = self."fib"(n1)
-    r2 = self."fibB"(n2)
+    .local int prev
+    prev = n
+
+    dec prev
+    .local int r1
+    r1 = self."fib"(prev)
+
+    dec prev
+    .local int r2
+    r2 = self."fibB"(prev)
+
     n = r1 + r2
     .return (n)
 .end
@@ -81,18 +86,21 @@ rec:
 .namespace ["B"]
 
 .sub fibB :method
-    .param pmc n
+    .param int n
     if n >= 2 goto rec
     .return (n)
 rec:
-    .local pmc n1
-    .local pmc n2
-    .local pmc r1
-    .local pmc r2
-    n1 = n - 1
-    n2 = n - 2
-    r1 = self."fib"(n1)
-    r2 = self."fibA"(n2)
+    .local int prev
+    prev = n
+
+    dec prev
+    .local int r1
+    r1 = self."fib"(prev)
+
+    dec prev
+    .local int r2
+    r2 = self."fibA"(prev)
+
     n = r1 + r2
     .return (n)
 .end
