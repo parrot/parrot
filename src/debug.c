@@ -1401,7 +1401,6 @@ void
 PDB_next(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 {
     ASSERT_ARGS(PDB_next)
-    unsigned long  n;
     PDB_t  * const pdb = interp->pdb;
     Interp *debugee;
 
@@ -1412,7 +1411,7 @@ PDB_next(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         PDB_init(interp, command);
 
     /* Get the number of operations to execute if any */
-    n = get_ulong(& command, 1);
+    pdb->tracing = get_ulong(& command, 1);
 
     /* Erase the stopped flag */
     pdb->state &= ~PDB_STOPPED;
@@ -1445,7 +1444,6 @@ PDB_next(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         return;
     }
 
-    pdb->tracing = n;
     Parrot_runcore_switch(pdb->debugee, CONST_STRING(interp, "debugger"));
 
     TRACEDEB_MSG("PDB_next finished");
@@ -1465,7 +1463,6 @@ void
 PDB_trace(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 {
     ASSERT_ARGS(PDB_trace)
-    unsigned long  n;
     PDB_t *  const pdb = interp->pdb;
     Interp        *debugee;
 
@@ -1477,8 +1474,8 @@ PDB_trace(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         PDB_init(interp, command);
     */
 
-    /* ge the number of ops to run, if specified */
-    n = get_ulong(& command, 1);
+    /* get the number of ops to run, if specified */
+    pdb->tracing = get_ulong(& command, 1);
 
     /* clear the PDB_STOPPED flag, we'll be running n ops now */
     pdb->state &= ~PDB_STOPPED;
@@ -1491,8 +1488,8 @@ PDB_trace(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         pdb->state |= PDB_STOPPED;
         return;
     }
-    pdb->tracing = n;
-    pdb->state  |= PDB_TRACING;
+
+    pdb->state |= PDB_TRACING;
     Parrot_runcore_switch(pdb->debugee, CONST_STRING(interp, "debugger"));
 
     /* Clear the following when done some testing */
