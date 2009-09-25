@@ -416,7 +416,7 @@ make_class_name(PARROT_INTERP, PMC *SELF)
  * (MRO) to use in a system with multiple inheritance. For more information
  * see the documentation associated with C<Parrot_ComputeMRO_C3>.
  */
-static PMC *
+static void
 calculate_mro(PARROT_INTERP, PMC *SELF, INTVAL num_parents)
 {
     Parrot_Class_attributes  * const _class = PARROT_CLASS(SELF);
@@ -432,10 +432,13 @@ calculate_mro(PARROT_INTERP, PMC *SELF, INTVAL num_parents)
         PMC    * const parent_mro = VTABLE_inspect_str(interp, parent, ap);
         PMC    * const mro        = VTABLE_clone(interp, parent_mro);
         VTABLE_unshift_pmc(interp, mro, SELF);
-        return mro;
+        _class->all_parents = mro;
     }
+    else
+        _class->all_parents = Parrot_ComputeMRO_C3(interp, SELF);
 
-    return Parrot_ComputeMRO_C3(interp, SELF);
+    if (!CLASS_is_anon_TEST(SELF))
+        interp->vtables[VTABLE_type(interp, SELF)]->mro = _class->all_parents;
 }
 
 /*
@@ -827,11 +830,7 @@ Adds the supplied PMC to the list of parents for the class.
 
         /* Add to the lists of our immediate parents and all parents. */
         VTABLE_push_pmc(interp, _class->parents, parent);
-        _class->all_parents = calculate_mro(interp, SELF, parent_count + 1);
-
-        /* Anonymous classes have no entry in the vtable array */
-        if (!CLASS_is_anon_TEST(SELF))
-            interp->vtables[VTABLE_type(interp, SELF)]->mro = _class->all_parents;
+        calculate_mro(interp, SELF, parent_count + 1);
     }
 
 /*
@@ -878,11 +877,7 @@ if the class has been instantiated.
                 "Can't remove_parent: is not a parent.");
 
         VTABLE_delete_keyed_int(interp, _class->parents, index);
-        _class->all_parents = calculate_mro(interp, SELF, parent_count - 1);
-
-        /* Anonymous classes have no entry in the vtable array */
-        if (!CLASS_is_anon_TEST(SELF))
-            interp->vtables[VTABLE_type(interp, SELF)]->mro = _class->all_parents;
+        calculate_mro(interp, SELF, parent_count - 1);
     }
 
 /*
@@ -1161,11 +1156,7 @@ Creates a new PMC object of the type of the class and calls init().
 
             /* Build full parents list.
              * RT #46101 Need pluggable MRO, for now always do C3. */
-             _class->all_parents = calculate_mro(interp, SELF, num_parents);
-
-            if (!CLASS_is_anon_TEST(SELF))
-                interp->vtables[VTABLE_type(interp, SELF)]->mro = _class->all_parents;
-
+            calculate_mro(interp, SELF, num_parents);
             build_attrib_index(interp, SELF);
 
             if (PMC_IS_NULL(_class->attrib_index))
