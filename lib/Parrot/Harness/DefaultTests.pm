@@ -85,7 +85,6 @@ our @EXPORT_OK = qw(
 @standard_tests = qw(
     t/compilers/json/*.t
     t/examples/*.t
-    t/doc/*.t
     t/distro/manifest.t
 );
 
