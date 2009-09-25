@@ -7,10 +7,8 @@ Parrot::Harness::DefaultTests - Tests run by default by F<t/harness>
 
 =head1 DESCRIPTION
 
-This file exports by default a single subroutine, C<get_default_tests()>,
-which is the list of tests run by F<t/harness> by default.
-
-Upon request, this package exports six arrays holding various sets of tests:
+Upon request, this package exports six arrays holding various sets of paths to
+directories holding test files:
 
     @runcore_tests
     @core_tests
@@ -19,8 +17,23 @@ Upon request, this package exports six arrays holding various sets of tests:
     @standard_tests
     @developing_tests
 
-In list context, C<get_default_tests()> returns the list of default tests.  In
-scalar context it returns a reference to that list.
+Each of these arrays holds a list of paths containing wildcards which are
+expanded by the shell when provided to programs such as F<t/harness>.  The
+paths describe directories holding test files.
+
+Example:
+
+    @core_tests = qw(
+        t/run/*.t
+        t/src/*.t
+        t/perl/*.t
+    );
+
+
+In addition, Parrot::Harness::Default Tests exports B<by default> one
+subroutine:  C<get_default_tests()>.  In list context, C<get_default_tests()>
+returns a list of shell-expandable paths to the most common tests.  In scalar
+context it returns a reference to that list.
 
 =cut
 
