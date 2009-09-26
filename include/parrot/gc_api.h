@@ -464,22 +464,14 @@ int Parrot_gc_total_sized_buffers(PARROT_INTERP)
 
 void Parrot_gc_inf_init(PARROT_INTERP);
 
-#ifdef NDEBUG
-#  define Parrot_gc_mark_PMC_alive(interp, obj) \
-        do if (! PMC_IS_NULL(obj)) \
-            Parrot_gc_mark_PMC_alive_fun((interp), (obj)); while (0)
-#ifdef PARROT_IN_CORE
+#if defined(NDEBUG) && defined(PARROT_IN_CORE)
 #  define Parrot_gc_mark_STRING_alive(interp, obj) \
           do if (! STRING_IS_NULL(obj)) PObj_live_SET(obj); while (0)
 #else
-#  define Parrot_gc_mark_STRING_alive(interp, obj) \
-          do if (! STRING_IS_NULL(obj) && !PObj_is_live_or_free_TESTALL(obj)) \
-              Parrot_gc_mark_STRING_alive_fun((interp), (obj)); while (0)
-#endif
-#else
-#  define Parrot_gc_mark_PMC_alive(interp, obj) Parrot_gc_mark_PMC_alive_fun((interp), (obj))
 #  define Parrot_gc_mark_STRING_alive(interp, obj) Parrot_gc_mark_STRING_alive_fun((interp), (obj))
 #endif
+
+#define Parrot_gc_mark_PMC_alive(interp, obj) Parrot_gc_mark_PMC_alive_fun((interp), (obj))
 
 #endif /* PARROT_GC_API_H_GUARD */
 
