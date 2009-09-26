@@ -17,12 +17,21 @@ Tests the Null PMC.
 =cut
 
 .sub main :main
+    .local int i
     .include 'test_more.pir'
 
-    plan(1)
+    plan(3)
 
     new $P0, ['Null']
     ok(1, 'Instantiated a Null PMC')
+
+    new $P1, ['Null']
+    i = issame $P0, $P1
+    ok (i, 'Null is same as Null')
+
+    new $P2, ['Undef']
+    i = issame $P0, $P2
+    nok(i, 'Null is not same as not Null')
 .end
 
 # Local Variables:
