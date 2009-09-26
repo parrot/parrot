@@ -21,6 +21,11 @@ High-resolution timer support
 
 */
 
+#include "parrot/has_header.h"
+#ifdef PARROT_HAS_HEADER_UNISTD
+#include    <unistd.h>
+#endif
+
 #include <time.h>
 
 #define TIME_IN_NS(n) ((n).tv_sec * 1000*1000*1000 + (n).tv_nsec)
@@ -38,7 +43,15 @@ Return a high-resolution number representing how long Parrot has been running.
 UHUGEINTVAL Parrot_hires_get_time()
 {
     struct timespec ts;
+    #if _POSIX_TIMERS
     clock_gettime(CLOCK_BEST, &ts);
+    #else
+    struct timeval  tv;
+    gettimeofday(&tv, NULL);
+
+    ts.tv_sec = tv.tv_sec;
+    ts.tv_nsec = tv.tv_usec * 1000;
+    #endif
     return TIME_IN_NS(ts);
 }
 
