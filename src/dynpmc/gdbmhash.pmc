@@ -383,12 +383,14 @@ Deletes the element associated with C<*key>.
         if (!dbf) return;
         keystr = make_hash_key(interp, key);
 
-        key_gdbm.dsize = keystr->strlen;
-        key_gdbm.dptr  = keystr->strstart;
+        key_gdbm.dptr  = Parrot_str_to_cstring(interp, keystr);
+        key_gdbm.dsize = strlen(key_gdbm.dptr);
 
         if (gdbm_exists(dbf, key_gdbm)) {
            gdbm_delete(dbf, key_gdbm);
         }
+
+        Parrot_str_free_cstring(key_gdbm.dptr);
 
         return;
     }
