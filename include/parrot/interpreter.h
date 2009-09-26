@@ -416,16 +416,19 @@ void Parrot_really_destroy(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-void Parrot_callback_C(ARGIN(char *external_data), ARGMOD(PMC *user_data))
+void Parrot_callback_C(
+    ARGIN(char *external_data),
+    ARGMOD_NULLOK(PMC *user_data))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         FUNC_MODIFIES(*user_data);
 
 PARROT_EXPORT
-void Parrot_callback_D(ARGMOD(PMC *user_data), ARGIN(char *external_data))
+void Parrot_callback_D(
+    ARGMOD(PMC *user_data),
+    ARGMOD_NULLOK(char *external_data))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*user_data);
+        FUNC_MODIFIES(*user_data)
+        FUNC_MODIFIES(*external_data);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -450,11 +453,9 @@ void Parrot_run_callback(PARROT_INTERP,
         FUNC_MODIFIES(* user_data);
 
 #define ASSERT_ARGS_Parrot_callback_C __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(external_data) \
-    && PARROT_ASSERT_ARG(user_data)
+       PARROT_ASSERT_ARG(external_data)
 #define ASSERT_ARGS_Parrot_callback_D __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(user_data) \
-    && PARROT_ASSERT_ARG(external_data)
+       PARROT_ASSERT_ARG(user_data)
 #define ASSERT_ARGS_Parrot_make_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     && PARROT_ASSERT_ARG(sub) \
