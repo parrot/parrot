@@ -76,8 +76,7 @@ Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
 {
     ASSERT_ARGS(Parrot_make_cb)
     PMC *cb, *cb_sig;
-    int type;
-    char * sig_str;
+    int type = 0;
     STRING *sc;
     char * const signature = Parrot_str_to_cstring(interp, cb_signature);
     /*
@@ -93,32 +92,23 @@ Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
     sc = CONST_STRING(interp, "_sub");
     VTABLE_setprop(interp, user_data, sc, sub);
     /* only ASCII signatures are supported */
-    sig_str = signature;
+    if (strlen(signature) == 3) {
+        /* Callback return type ignored */
 
-    if (strlen(sig_str) != 3) {
-        mem_sys_free(signature);
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
-            "unhandled signature '%Ss' in make_cb", cb_signature);
-    }
-
-    ++sig_str;     /* Skip callback return type */
-
-    if (*sig_str == 'U') {
-        type = 'D';
-    }
-    else {
-        ++sig_str;
-        if (*sig_str == 'U') {
-            type = 'C';
+        if (signature[1] == 'U') {
+            type = 'D';
         }
         else {
-            mem_sys_free(signature);
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                "unhandled signature '%Ss' in make_cb", cb_signature);
+            if (signature[2] == 'U') {
+                type = 'C';
+            }
         }
     }
+    Parrot_str_free_cstring(signature);
+    if (type != 'C' && type != 'D')
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            "unhandled signature '%Ss' in make_cb", cb_signature);
 
-    mem_sys_free(signature);
     cb_sig = pmc_new(interp, enum_class_String);
     VTABLE_set_string_native(interp, cb_sig, cb_signature);
     sc = CONST_STRING(interp, "_signature");
