@@ -192,6 +192,11 @@ U: bdwheele
 N: Brian Wheeler
 E: bdwheele@indiana.edu
 
+U: brianwisti
+N: Brian Wisti
+E: brian.wisti@gmail.com
+D: PIR Test demonstrating that $I1 and $I01 are different variables
+
 N: Bruce Gray
 U: util
 E: bruce.gray@acm.org
