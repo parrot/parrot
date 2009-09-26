@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -19,7 +19,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(42)
+    plan(44)
 
     'test_set_size'()       # 2 tests
     'test_reset_size'()     # 1 test
@@ -28,14 +28,14 @@ out-of-bounds test. Checks INT and PMC keys.
     'test_out_of_bounds'()  # 4 tests
     'test_set_via_pmc'()    # 3 tests
     'test_get_via_pmc'()    # 4 tests
-    'test_interface_done'() # 4 tests
+    'test_interface_done'() # 3 tests
     'test_clone'()          # 3 tests
     'test_clone_unitialized'() # 2 tests
     'test_truth'()          # 2 tests
     'test_get_iter'()       # 1 test
     'test_freez_thaw'()     # 1 test
     'test_get_string'()     # 1 test
-    'test_equality'()       # 3 tests
+    'test_equality'()       # 5 tests
     'test_gc'()             # 4 tests
 .end
 
@@ -325,11 +325,17 @@ out-of-bounds test. Checks INT and PMC keys.
 .end
 
 .sub 'test_equality'
-    .local pmc a1, a2
+    .local pmc a1, a2, other
+    .local int i
+    .local string s
     a1 = new ['FixedStringArray']
     a2 = new ['FixedStringArray']
+    other = new ['Integer']
 
     is(a1, a2, "Empty arrays are equal")
+
+    i = iseq a1, other
+    is(i, 0, "Not equal to other type")
     
     a1 = 3
     isnt(a1, a2, "Different size arrays aren't equal")
@@ -346,6 +352,10 @@ out-of-bounds test. Checks INT and PMC keys.
     
     a2[1] = "bar"
     is(a1, a2, "Equal when second element same")
+
+    null s
+    a2[1] = s
+    isnt(a1, a2, "Not equal when second element is null")
 .end
 
 
