@@ -69,6 +69,7 @@ pirc$(EXE): $(OBJS)
 	$(LINK) @ld_out@$@ \
 	    $(OBJS) \
 	    @rpath_blib@ @libparrot_linkflags@ $(C_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 src/pirparser$(O): src/pirparser.c src/pirparser.h
 src/pirlexer$(O): src/pirlexer.c src/pirlexer.h

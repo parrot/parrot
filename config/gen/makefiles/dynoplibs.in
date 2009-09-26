@@ -55,6 +55,7 @@ Makefile: ../../config/gen/makefiles/dynoplibs.in
 
 obscure_ops$(LOAD_EXT): obscure_ops$(O)
 	$(LD) @ld_out@obscure_ops$(LOAD_EXT) obscure_ops$(O) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 
 obscure_ops$(O): obscure_ops.c
 	$(CC) -c @cc_o_out@obscure_ops$(O) $(INCLUDES) $(CFLAGS) obscure_ops.c
@@ -64,6 +65,7 @@ obscure_ops.c: obscure.ops
 
 obscure_ops_switch$(LOAD_EXT): obscure_ops_switch$(O)
 	$(LD) @ld_out@obscure_ops_switch$(LOAD_EXT) obscure_ops_switch$(O) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 
 obscure_ops_switch$(O): obscure_ops_switch.c
 	$(CC) -c @cc_o_out@obscure_ops_switch$(O) $(INCLUDES) $(CFLAGS) obscure_ops_switch.c
@@ -73,6 +75,7 @@ obscure_ops_switch.c: obscure.ops
 
 obscure_ops_cg$(LOAD_EXT): obscure_ops_cg$(O)
 	$(LD) @ld_out@obscure_ops_cg$(LOAD_EXT) obscure_ops_cg$(O) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 
 obscure_ops_cg$(O): obscure_ops_cg.c
 	$(CC) -c @cc_o_out@obscure_ops_cg$(O) $(INCLUDES) $(CFLAGS) obscure_ops_cg.c
@@ -82,6 +85,7 @@ obscure_ops_cg.c: obscure.ops
 
 obscure_ops_cgp$(LOAD_EXT): obscure_ops_cgp$(O)
 	$(LD) @ld_out@obscure_ops_cgp$(LOAD_EXT) obscure_ops_cgp$(O) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 
 obscure_ops_cgp$(O): obscure_ops_cgp.c
 	$(CC) -c @cc_o_out@obscure_ops_cgp$(O) $(INCLUDES) $(CFLAGS) obscure_ops_cgp.c
@@ -91,6 +95,7 @@ obscure_ops_cgp.c: obscure.ops
 
 math_ops$(LOAD_EXT): math_ops$(O)
 	$(LD) @ld_out@math_ops$(LOAD_EXT) math_ops$(O) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 
 math_ops$(O): math_ops.c
 	$(CC) -c @cc_o_out@math_ops$(O) $(INCLUDES) $(CFLAGS) math_ops.c
@@ -100,6 +105,7 @@ math_ops.c: math.ops
 
 math_ops_switch$(LOAD_EXT): math_ops_switch$(O)
 	$(LD) @ld_out@math_ops_switch$(LOAD_EXT) math_ops_switch$(O) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 
 math_ops_switch$(O): math_ops_switch.c
 	$(CC) -c @cc_o_out@math_ops_switch$(O) $(INCLUDES) $(CFLAGS) math_ops_switch.c
@@ -109,6 +115,7 @@ math_ops_switch.c: math.ops
 
 math_ops_cg$(LOAD_EXT): math_ops_cg$(O)
 	$(LD) @ld_out@math_ops_cg$(LOAD_EXT) math_ops_cg$(O) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 
 math_ops_cg$(O): math_ops_cg.c
 	$(CC) -c @cc_o_out@math_ops_cg$(O) $(INCLUDES) $(CFLAGS) math_ops_cg.c
@@ -118,6 +125,7 @@ math_ops_cg.c: math.ops
 
 math_ops_cgp$(LOAD_EXT): math_ops_cgp$(O)
 	$(LD) @ld_out@math_ops_cgp$(LOAD_EXT) math_ops_cgp$(O) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 
 math_ops_cgp$(O): math_ops_cgp.c
 	$(CC) -c @cc_o_out@math_ops_cgp$(O) $(INCLUDES) $(CFLAGS) math_ops_cgp.c

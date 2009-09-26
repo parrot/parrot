@@ -99,6 +99,7 @@ Makefile: ../../config/gen/makefiles/dynpmc.in
 
 dynlexpad$(LOAD_EXT): dynlexpad$(O)
 	$(LD) @ld_out@dynlexpad$(LOAD_EXT) dynlexpad$(O) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 
 dynlexpad$(O): dynlexpad.c
 	$(CC) -c @cc_o_out@dynlexpad$(O) $(INCLUDES) $(CFLAGS) dynlexpad.c
@@ -111,6 +112,7 @@ dynlexpad.dump: dynlexpad.pmc
 
 foo_group$(LOAD_EXT): $(OBJS_FOO) lib-foo_group$(O)
 	$(LD) @ld_out@foo_group$(LOAD_EXT) lib-foo_group$(O) $(OBJS_FOO) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 
 lib-foo_group$(O): foo_group.c
 	$(CC) -c @cc_o_out@lib-foo_group$(O) $(INCLUDES) $(CFLAGS) foo_group.c
@@ -138,6 +140,7 @@ foo2.dump: foo2.pmc foo.dump
 
 rotest$(LOAD_EXT): rotest$(O)
 	$(LD) @ld_out@rotest$(LOAD_EXT) rotest$(O) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 
 rotest$(O): rotest.c
 	$(CC) -c @cc_o_out@rotest$(O) $(INCLUDES) $(CFLAGS) rotest.c
@@ -150,6 +153,7 @@ rotest.dump: rotest.pmc
 
 gdbmhash$(LOAD_EXT): gdbmhash$(O)
 	$(LD) @ld_out@gdbmhash$(LOAD_EXT) gdbmhash$(O) $(LINKARGS) $(LIB_GDBM)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 
 gdbmhash$(O): gdbmhash.c
 	$(CC) -c @cc_o_out@gdbmhash$(O) $(INCLUDES) $(CFLAGS) gdbmhash.c
@@ -162,6 +166,7 @@ gdbmhash.dump: gdbmhash.pmc
 
 rational$(LOAD_EXT): rational$(O)
 	$(LD) @ld_out@rational$(LOAD_EXT) rational$(O) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 
 rational$(O): rational.c
 	$(CC) -c @cc_o_out@rational$(O) $(INCLUDES) $(CFLAGS) rational.c
@@ -174,6 +179,7 @@ rational.dump: rational.pmc
 
 digest_group$(LOAD_EXT): $(OBJS_DIGEST) lib-digest_group$(O)
 	$(LD) @ld_out@digest_group$(LOAD_EXT) lib-digest_group$(O) $(OBJS_DIGEST) $(LINKARGS) $(LIB_CRYPTO)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 
 lib-digest_group$(O): digest_group.c
 	$(CC) -c @cc_o_out@lib-digest_group$(O) $(INCLUDES) $(CFLAGS) digest_group.c
@@ -255,6 +261,7 @@ sha512.dump: sha512.pmc
 
 subproxy$(LOAD_EXT): subproxy$(O)
 	$(LD) @ld_out@subproxy$(LOAD_EXT) subproxy$(O) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 
 subproxy$(O): subproxy.c
 	$(CC) -c @cc_o_out@subproxy$(O) $(INCLUDES) $(CFLAGS) subproxy.c
