@@ -390,8 +390,6 @@ void
 mark_special(PARROT_INTERP, ARGIN(PMC *obj))
 {
     ASSERT_ARGS(mark_special)
-    int     hi_prio;
-    Memory_Pools *mem_pools;
 
     /*
      * If the object is shared, we have to use the arena and gc
@@ -412,49 +410,12 @@ mark_special(PARROT_INTERP, ARGIN(PMC *obj))
             interp->mem_pools->gc_mark_ptr = obj;
     }
 
-    mem_pools = interp->mem_pools;
+    /* put it on the end of the list */
+    PMC_next_for_GC(interp->mem_pools->gc_mark_ptr) = obj;
 
-    if (PObj_needs_early_gc_TEST(obj))
-        ++mem_pools->num_early_PMCs_seen;
+    /* Explicitly make the tail of the linked list self-referential */
+    interp->mem_pools->gc_mark_ptr = PMC_next_for_GC(obj) = obj;
 
-    if (PObj_high_priority_gc_TEST(obj) && mem_pools->gc_trace_ptr) {
-        /* set obj's parent to high priority */
-        PObj_high_priority_gc_SET(mem_pools->gc_trace_ptr);
-        hi_prio = 1;
-    }
-    else
-        hi_prio = 0;
-
-    {
-        PMC * const tptr = mem_pools->gc_trace_ptr;
-        /*
-         * XXX this basically invalidates the high-priority marking
-         *     of PMCs by putting all PMCs onto the front of the list.
-         *     The reason for this is the by far better cache locality
-         *     when aggregates and their contents are marked "together".
-         *
-         *     To enable high priority marking again we should probably
-         *     use a second pointer chain, which is, when not empty,
-         *     processed first.
-         */
-        if (hi_prio && tptr) {
-            if (PMC_next_for_GC(tptr) == tptr)
-                PMC_next_for_GC(obj) = obj;
-            else
-                /* put it at the head of the list */
-                PMC_next_for_GC(obj) = PMC_next_for_GC(tptr);
-
-            PMC_next_for_GC(tptr)    = (PMC*)obj;
-        }
-        else {
-            /* put it on the end of the list */
-            PMC_next_for_GC(mem_pools->gc_mark_ptr) = obj;
-
-            /* Explicitly make the tail of the linked list be
-             * self-referential */
-            mem_pools->gc_mark_ptr = PMC_next_for_GC(obj) = obj;
-        }
-    }
     if (PObj_custom_mark_TEST(obj)) {
         PObj_get_FLAGS(obj) |= PObj_custom_GC_FLAG;
         if (!PObj_constant_TEST(obj))
