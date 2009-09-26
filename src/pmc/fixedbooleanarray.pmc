@@ -484,22 +484,6 @@ C<value>.
 
 /*
 
-=item C<void push_integer(INTVAL value)>
-
-Extends the array by adding an element of value C<value> to the end of
-the array.
-
-=cut
-
-*/
-
-    VTABLE void push_integer(INTVAL value) {
-        const INTVAL nextix = SELF.elements();
-        SELF.set_integer_keyed_int(nextix, value);
-    }
-
-/*
-
 =item C<PMC *get_iter()>
 
 Return a new iterator for SELF.
