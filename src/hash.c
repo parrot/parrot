@@ -1508,11 +1508,22 @@ There is bunch of functions to convert from passed value to stored keys type and
 stored values type.
 
 void *hash_key_from_TYPE convert to keys type.
+TYPE hash_key_to_TYPE convert from keys type.
 void *hash_value_from_TYPE convert to values type.
 TYPE hash_value_to_TYPE convert from values type.
 
 */
 
+/*
+
+=item C<void* hash_key_from_int(PARROT_INTERP, const Hash * const hash, INTVAL
+key)>
+
+Cast INTVAL to hash key.
+
+=cut
+
+*/
 
 PARROT_CAN_RETURN_NULL
 void*
@@ -1536,6 +1547,17 @@ hash_key_from_int(PARROT_INTERP, ARGIN(const Hash * const hash), INTVAL key)
     }
     return ret;
 }
+
+/*
+
+=item C<void* hash_key_from_string(PARROT_INTERP, const Hash * const hash,
+STRING *key)>
+
+Cast STRING to hash key.
+
+=cut
+
+*/
 
 PARROT_CAN_RETURN_NULL
 void*
@@ -1565,6 +1587,17 @@ hash_key_from_string(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN(STRING
     }
     return ret;
 }
+
+/*
+
+=item C<void* hash_key_from_pmc(PARROT_INTERP, const Hash * const hash, PMC
+*key)>
+
+Cast PMC* to hash key.
+
+=cut
+
+*/
 
 PARROT_CAN_RETURN_NULL
 void*
@@ -1622,6 +1655,16 @@ hash_key_from_pmc(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN(PMC *key)
     return ret;
 }
 
+/*
+
+=item C<INTVAL hash_key_to_int(PARROT_INTERP, const Hash * const hash, void
+*key)>
+
+Cast hash key to INTVAL.
+
+=cut
+
+*/
 
 INTVAL
 hash_key_to_int(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN_NULLOK(void *key))
@@ -1643,6 +1686,17 @@ hash_key_to_int(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN_NULLOK(void
     }
     return ret;
 }
+
+/*
+
+=item C<STRING* hash_key_to_string(PARROT_INTERP, const Hash * const hash, void
+*key)>
+
+Cast hash key to STRING.
+
+=cut
+
+*/
 
 PARROT_CANNOT_RETURN_NULL
 STRING*
@@ -1668,6 +1722,16 @@ hash_key_to_string(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN_NULLOK(v
     }
     return ret;
 }
+
+/*
+
+=item C<PMC* hash_key_to_pmc(PARROT_INTERP, const Hash * const hash, void *key)>
+
+Cast hash key to PMC*.
+
+=cut
+
+*/
 
 PARROT_CANNOT_RETURN_NULL
 PMC*
@@ -1695,6 +1759,18 @@ hash_key_to_pmc(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN(void *key))
 
 /* Second part - convert from stored void* to real type */
 /* TODO: FLOATVALs converted into Float PMC for now */
+
+/*
+
+=item C<void* hash_value_from_int(PARROT_INTERP, const Hash * const hash, INTVAL
+value)>
+
+Cast INTVAL to hash value.
+
+=cut
+
+*/
+
 PARROT_CAN_RETURN_NULL
 void*
 hash_value_from_int(PARROT_INTERP, ARGIN(const Hash * const hash), INTVAL value)
@@ -1719,6 +1795,17 @@ hash_value_from_int(PARROT_INTERP, ARGIN(const Hash * const hash), INTVAL value)
     }
     return ret;
 }
+
+/*
+
+=item C<void* hash_value_from_string(PARROT_INTERP, const Hash * const hash,
+STRING *value)>
+
+Cast STRING to hash value.
+
+=cut
+
+*/
 
 PARROT_CAN_RETURN_NULL
 void*
@@ -1748,6 +1835,17 @@ hash_value_from_string(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN(STRI
     return ret;
 }
 
+/*
+
+=item C<void* hash_value_from_pmc(PARROT_INTERP, const Hash * const hash, PMC
+*value)>
+
+Cast PMC to hash value.
+
+=cut
+
+*/
+
 PARROT_CAN_RETURN_NULL
 void*
 hash_value_from_pmc(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN(PMC *value))
@@ -1772,6 +1870,17 @@ hash_value_from_pmc(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN(PMC *va
     }
     return ret;
 }
+
+/*
+
+=item C<void* hash_value_from_number(PARROT_INTERP, const Hash * const hash,
+FLOATVAL value)>
+
+Cast FLOATVAL to hash value.
+
+=cut
+
+*/
 
 PARROT_CAN_RETURN_NULL
 void*
@@ -1801,6 +1910,17 @@ hash_value_from_number(PARROT_INTERP, ARGIN(const Hash * const hash), FLOATVAL v
     return ret;
 }
 
+/*
+
+=item C<INTVAL hash_value_to_int(PARROT_INTERP, const Hash * const hash, void
+*value)>
+
+Cast hash value to INTVAL.
+
+=cut
+
+*/
+
 INTVAL
 hash_value_to_int(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN_NULLOK(void *value))
 {
@@ -1821,6 +1941,17 @@ hash_value_to_int(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN_NULLOK(vo
     }
     return ret;
 }
+
+/*
+
+=item C<STRING* hash_value_to_string(PARROT_INTERP, const Hash * const hash,
+void *value)>
+
+Cast hash value to STRING.
+
+=cut
+
+*/
 
 PARROT_CANNOT_RETURN_NULL
 STRING*
@@ -1844,6 +1975,17 @@ hash_value_to_string(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN_NULLOK
     return ret;
 }
 
+/*
+
+=item C<PMC* hash_value_to_pmc(PARROT_INTERP, const Hash * const hash, void
+*value)>
+
+Cast hash value to PMC.
+
+=cut
+
+*/
+
 PARROT_CANNOT_RETURN_NULL
 PMC*
 hash_value_to_pmc(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN_NULLOK(void *value))
@@ -1865,6 +2007,17 @@ hash_value_to_pmc(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN_NULLOK(vo
     }
     return ret;
 }
+
+/*
+
+=item C<FLOATVAL hash_value_to_number(PARROT_INTERP, const Hash * const hash,
+void *value)>
+
+Cast hash value to FLOATVAL.
+
+=cut
+
+*/
 
 FLOATVAL
 hash_value_to_number(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN_NULLOK(void *value))
