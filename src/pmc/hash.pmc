@@ -151,16 +151,23 @@ NB: this method will destroy all old data!
             /* new_int_hash set BOTH keys and values to INTVAL */
             new_hash = parrot_create_hash(interp,
                     entry_type,
-                    type,
+                    Hash_key_type_int,
                     int_compare,
                     key_hash_int);
         else if (type == Hash_key_type_PMC)
             /* new_int_hash set BOTH keys and values to INTVAL */
             new_hash = parrot_create_hash(interp,
                     entry_type,
-                    type,
+                    Hash_key_type_PMC,
                     PMC_compare,
                     key_hash_PMC);
+        else if (type == Hash_key_type_STRING)
+            /* new_int_hash set BOTH keys and values to INTVAL */
+            new_hash = parrot_create_hash(interp,
+                    entry_type,
+                    Hash_key_type_STRING,
+                    STRING_compare,
+                    (hash_hash_key_fn)key_hash_STRING);
         else
             /*
                 We probably will not implement other types of keys. They are way

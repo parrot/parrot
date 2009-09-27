@@ -371,6 +371,19 @@ int PMC_compare(PARROT_INTERP,
     ARGIN_NULLOK(const void *b))
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+int pointer_compare(SHIM_INTERP,
+    ARGIN_NULLOK(const void *a),
+    ARGIN_NULLOK(const void *b));
+
+PARROT_WARN_UNUSED_RESULT
+int STRING_compare(PARROT_INTERP,
+    ARGIN(const void *search_key),
+    ARGIN_NULLOK(const void *bucket_key))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 #define ASSERT_ARGS_parrot_dump_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_parrot_hash_clone __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
@@ -491,6 +504,10 @@ int PMC_compare(PARROT_INTERP,
     && PARROT_ASSERT_ARG(keyhash)
 #define ASSERT_ARGS_PMC_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_pointer_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_STRING_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    && PARROT_ASSERT_ARG(search_key)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/hash.c */
 

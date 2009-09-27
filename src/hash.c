@@ -96,19 +96,6 @@ static void parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-static int pointer_compare(SHIM_INTERP,
-    ARGIN_NULLOK(const void *a),
-    ARGIN_NULLOK(const void *b));
-
-PARROT_WARN_UNUSED_RESULT
-static int STRING_compare(PARROT_INTERP,
-    ARGIN(const void *search_key),
-    ARGIN_NULLOK(const void *bucket_key))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 #define ASSERT_ARGS_cstring_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(a) \
     && PARROT_ASSERT_ARG(b)
@@ -136,10 +123,6 @@ static int STRING_compare(PARROT_INTERP,
 #define ASSERT_ARGS_parrot_mark_hash_values __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     && PARROT_ASSERT_ARG(hash)
-#define ASSERT_ARGS_pointer_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
-#define ASSERT_ARGS_STRING_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(search_key)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -171,8 +154,8 @@ key_hash_STRING(PARROT_INTERP, ARGMOD(STRING *s), SHIM(size_t seed))
 
 /*
 
-=item C<static int STRING_compare(PARROT_INTERP, const void *search_key, const
-void *bucket_key)>
+=item C<int STRING_compare(PARROT_INTERP, const void *search_key, const void
+*bucket_key)>
 
 Compares the two strings, returning 0 if they are identical.
 
@@ -181,7 +164,7 @@ Compares the two strings, returning 0 if they are identical.
 */
 
 PARROT_WARN_UNUSED_RESULT
-static int
+int
 STRING_compare(PARROT_INTERP, ARGIN(const void *search_key), ARGIN_NULLOK(const void *bucket_key))
 {
     ASSERT_ARGS(STRING_compare)
@@ -204,7 +187,7 @@ STRING_compare(PARROT_INTERP, ARGIN(const void *search_key), ARGIN_NULLOK(const 
 
 /*
 
-=item C<static int pointer_compare(PARROT_INTERP, const void *a, const void *b)>
+=item C<int pointer_compare(PARROT_INTERP, const void *a, const void *b)>
 
 Compares the two pointers, returning 0 if they are identical
 
@@ -214,7 +197,7 @@ Compares the two pointers, returning 0 if they are identical
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static int
+int
 pointer_compare(SHIM_INTERP, ARGIN_NULLOK(const void *a), ARGIN_NULLOK(const void *b))
 {
     ASSERT_ARGS(pointer_compare)
@@ -1533,6 +1516,7 @@ void *hash_value_from_TYPE convert to values type.
 TYPE hash_value_to_TYPE convert from values type.
 
 */
+
 
 PARROT_CAN_RETURN_NULL
 void*
