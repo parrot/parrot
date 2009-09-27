@@ -1529,6 +1529,7 @@ PARROT_CAN_RETURN_NULL
 void*
 hash_key_from_int(PARROT_INTERP, ARGIN(const Hash * const hash), INTVAL key)
 {
+    ASSERT_ARGS(hash_key_from_int)
     void *ret;
     switch (hash->key_type) {
         case Hash_key_type_int:
@@ -1563,6 +1564,7 @@ PARROT_CAN_RETURN_NULL
 void*
 hash_key_from_string(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN(STRING *key))
 {
+    ASSERT_ARGS(hash_key_from_string)
     void *ret;
     switch (hash->key_type) {
         case Hash_key_type_int:
@@ -1603,6 +1605,7 @@ PARROT_CAN_RETURN_NULL
 void*
 hash_key_from_pmc(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN(PMC *key))
 {
+    ASSERT_ARGS(hash_key_from_pmc)
     void *ret;
     switch (hash->key_type) {
         case Hash_key_type_int:
@@ -1669,6 +1672,7 @@ Cast hash key to INTVAL.
 INTVAL
 hash_key_to_int(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN_NULLOK(void *key))
 {
+    ASSERT_ARGS(hash_key_to_int)
     INTVAL ret;
     switch (hash->key_type) {
         case Hash_key_type_int:
@@ -1702,6 +1706,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING*
 hash_key_to_string(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN_NULLOK(void *key))
 {
+    ASSERT_ARGS(hash_key_to_string)
     STRING *ret;
     switch (hash->key_type) {
         case Hash_key_type_int:
@@ -1737,6 +1742,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC*
 hash_key_to_pmc(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN(void *key))
 {
+    ASSERT_ARGS(hash_key_to_pmc)
     PMC *ret;
     switch (hash->key_type) {
         case Hash_key_type_int:
@@ -1775,6 +1781,7 @@ PARROT_CAN_RETURN_NULL
 void*
 hash_value_from_int(PARROT_INTERP, ARGIN(const Hash * const hash), INTVAL value)
 {
+    ASSERT_ARGS(hash_value_from_int)
     void *ret;
     switch (hash->entry_type) {
         case enum_type_INTVAL:
@@ -1811,6 +1818,7 @@ PARROT_CAN_RETURN_NULL
 void*
 hash_value_from_string(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN(STRING *value))
 {
+    ASSERT_ARGS(hash_value_from_string)
     void *ret;
     switch (hash->entry_type) {
         case enum_type_INTVAL:
@@ -1850,6 +1858,7 @@ PARROT_CAN_RETURN_NULL
 void*
 hash_value_from_pmc(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN(PMC *value))
 {
+    ASSERT_ARGS(hash_value_from_pmc)
     void *ret;
     switch (hash->entry_type) {
         case enum_type_INTVAL:
@@ -1886,6 +1895,7 @@ PARROT_CAN_RETURN_NULL
 void*
 hash_value_from_number(PARROT_INTERP, ARGIN(const Hash * const hash), FLOATVAL value)
 {
+    ASSERT_ARGS(hash_value_from_number)
     void *ret;
     switch (hash->entry_type) {
         case enum_type_INTVAL:
@@ -1924,6 +1934,7 @@ Cast hash value to INTVAL.
 INTVAL
 hash_value_to_int(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN_NULLOK(void *value))
 {
+    ASSERT_ARGS(hash_value_to_int)
     INTVAL ret;
     switch (hash->entry_type) {
         case enum_type_INTVAL:
@@ -1957,6 +1968,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING*
 hash_value_to_string(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN_NULLOK(void *value))
 {
+    ASSERT_ARGS(hash_value_to_string)
     STRING *ret;
     switch (hash->entry_type) {
         case enum_type_INTVAL:
@@ -1990,6 +2002,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC*
 hash_value_to_pmc(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN_NULLOK(void *value))
 {
+    ASSERT_ARGS(hash_value_to_pmc)
     PMC *ret;
     switch (hash->entry_type) {
         case enum_type_INTVAL:
@@ -2022,6 +2035,7 @@ Cast hash value to FLOATVAL.
 FLOATVAL
 hash_value_to_number(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN_NULLOK(void *value))
 {
+    ASSERT_ARGS(hash_value_to_number)
     FLOATVAL ret;
     switch (hash->entry_type) {
         case enum_type_INTVAL:
