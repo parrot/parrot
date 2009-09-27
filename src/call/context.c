@@ -797,8 +797,8 @@ void
 Parrot_pcc_set_results_signature(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *sig))
 {
     ASSERT_ARGS(Parrot_pcc_set_results_signature)
-    PARROT_ASSERT(PMC_IS_NULL(sig) || PObj_is_PMC_TEST(sig));
     Parrot_Context *c = get_context_struct_fast(interp, ctx);
+    PARROT_ASSERT(PMC_IS_NULL(sig) || PObj_is_PMC_TEST(sig));
     c->results_signature = sig;
 }
 
