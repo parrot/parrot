@@ -124,8 +124,6 @@ struct Parrot_Context {
 
 typedef struct Parrot_Context Parrot_Context;
 
-#define PMC_context(pmc) Parrot_cx_get_context(interp, (pmc))
-
 
 #endif /* PARROT_CONTEXT_H_GUARD */
 
