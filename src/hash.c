@@ -283,7 +283,7 @@ cstring_compare(SHIM_INTERP, ARGIN(const char *a), ARGIN(const char *b))
 
 /*
 
-=item C<size_t key_hash_PMC(PARROT_INTERP, const void *value, size_t seed)>
+=item C<size_t key_hash_PMC(PARROT_INTERP, PMC *value, size_t seed)>
 
 Returns a hashed value for an PMC key (passed as a void pointer, sadly).
 
@@ -294,16 +294,15 @@ Returns a hashed value for an PMC key (passed as a void pointer, sadly).
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 size_t
-key_hash_PMC(PARROT_INTERP, ARGIN_NULLOK(const void *value), SHIM(size_t seed))
+key_hash_PMC(PARROT_INTERP, ARGIN(PMC *value), SHIM(size_t seed))
 {
     ASSERT_ARGS(key_hash_PMC)
-    DECL_CONST_CAST;
-    return VTABLE_hashvalue(interp, PARROT_const_cast(PMC *, value));
+    return VTABLE_hashvalue(interp, value);
 }
 
 /*
 
-=item C<int PMC_compare(PARROT_INTERP, const void *a, const void *b)>
+=item C<int PMC_compare(PARROT_INTERP, PMC *a, PMC *b)>
 
 Compares two PMC for equality, returning 0 if the first is equal to second.
 Uses void pointers to store the PMC, sadly.
@@ -315,22 +314,19 @@ Uses void pointers to store the PMC, sadly.
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 int
-PMC_compare(PARROT_INTERP, ARGIN_NULLOK(const void *a), ARGIN_NULLOK(const void *b))
+PMC_compare(PARROT_INTERP, ARGIN(PMC *a), ARGIN_NULLOK(PMC *b))
 {
     ASSERT_ARGS(PMC_compare)
-    DECL_CONST_CAST;
-    PMC * left  = PARROT_const_cast(PMC *, a);
-    PMC * right = PARROT_const_cast(PMC *, b);
 
     /* If pointers are same - PMCs are same */
-    if (left == right)
+    if (a == b)
         return 0;
 
     /* PMCs of different types are differ */
-    if (left->vtable->base_type != right->vtable->base_type)
+    if (a->vtable->base_type != b->vtable->base_type)
         return 1;
 
-    return !VTABLE_is_equal(interp, left, right);
+    return !VTABLE_is_equal(interp, a, b);
 }
 
 /*

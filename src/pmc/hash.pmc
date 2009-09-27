@@ -159,8 +159,8 @@ NB: this method will destroy all old data!
             new_hash = parrot_create_hash(interp,
                     entry_type,
                     Hash_key_type_PMC,
-                    PMC_compare,
-                    key_hash_PMC);
+                    (hash_comp_fn)PMC_compare,
+                    (hash_hash_key_fn)key_hash_PMC);
         else if (type == Hash_key_type_STRING)
             /* new_int_hash set BOTH keys and values to INTVAL */
             new_hash = parrot_create_hash(interp,
