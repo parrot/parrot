@@ -314,7 +314,8 @@ size_t
 key_hash_PMC(PARROT_INTERP, ARGIN_NULLOK(const void *value), SHIM(size_t seed))
 {
     ASSERT_ARGS(key_hash_PMC)
-    return VTABLE_hashvalue(interp, (PMC *)value);
+    DECL_CONST_CAST;
+    return VTABLE_hashvalue(interp, PARROT_const_cast(PMC *, value));
 }
 
 /*
@@ -334,8 +335,9 @@ int
 PMC_compare(PARROT_INTERP, ARGIN_NULLOK(const void *a), ARGIN_NULLOK(const void *b))
 {
     ASSERT_ARGS(PMC_compare)
-    PMC * left  = (PMC *)a;
-    PMC * right = (PMC *)b;
+    DECL_CONST_CAST;
+    PMC * left  = PARROT_const_cast(PMC *, a);
+    PMC * right = PARROT_const_cast(PMC *, b);
 
     /* If pointers are same - PMCs are same */
     if (left == right)
@@ -1612,6 +1614,12 @@ hash_key_from_pmc(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN(PMC *key)
                         break;
                     case KEY_pmc_FLAG:
                         key = key_pmc(interp, key);
+                        break;
+                    default:
+                        /* It's impossible if Keys are same (and they are not) */
+                        /* So throw exception */
+                        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                                "hash: unexpected type of Key");
                         break;
                 }
 
