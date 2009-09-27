@@ -413,7 +413,7 @@ sub make_function_decls {
         else {
             $assert .= "0";
         }
-	$assert .= ")";
+        $assert .= ")";
         push(@decls, $assert);
     }
 
