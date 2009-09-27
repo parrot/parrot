@@ -399,10 +399,10 @@ Read a line from the filehandle and return it in a string.
         }
 #endif
 
-        if (!string_result)
-            string_result = Parrot_str_new(INTERP, NULL, 0);
-
-        RETURN(STRING *string_result);
+        if (string_result)
+            RETURN(STRING *string_result);
+        else
+            RETURN(PMC *PMCNULL);
     }
 
 /*
