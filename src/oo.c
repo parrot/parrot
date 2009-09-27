@@ -327,30 +327,6 @@ Parrot_oo_clone_object(PARROT_INTERP, ARGIN(PMC *pmc),
 
 /*
 
-=item C<void * Parrot_oo_new_object_attrs(PARROT_INTERP, PMC * class_)>
-
-Create a new C<Parrot_Object_attributes> structure to hold data for an Object
-PMC. We need this for places which create a new Object without instantiating it
-through its associated class, such as in C<Parrot_oo_clone_object>.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-void *
-Parrot_oo_new_object_attrs(PARROT_INTERP, ARGIN(PMC * class_))
-{
-    ASSERT_ARGS(Parrot_oo_new_object_attrs)
-    Parrot_Object_attributes * const obj_guts =
-        mem_allocate_typed(Parrot_Object_attributes);
-    obj_guts->_class       = class_;
-    obj_guts->attrib_store = pmc_new(interp, enum_class_ResizablePMCArray);
-    return (void *)obj_guts;
-}
-
-/*
-
 =item C<static PMC * get_pmc_proxy(PARROT_INTERP, INTVAL type)>
 
 Get the PMC proxy for a PMC with the given type, creating it if does not exist.

@@ -168,11 +168,6 @@ PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_oo_get_namespace(SHIM_INTERP, ARGIN(const PMC *classobj))
         __attribute__nonnull__(2);
 
-PARROT_CANNOT_RETURN_NULL
-void * Parrot_oo_new_object_attrs(PARROT_INTERP, ARGIN(PMC * class_))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_oo_newclass_from_str(PARROT_INTERP, ARGIN(STRING *name))
@@ -244,9 +239,6 @@ INTVAL Parrot_oo_register_type(PARROT_INTERP,
     , PARROT_ASSERT_ARG(ns))
 #define ASSERT_ARGS_Parrot_oo_get_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(classobj))
-#define ASSERT_ARGS_Parrot_oo_new_object_attrs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(class_))
 #define ASSERT_ARGS_Parrot_oo_newclass_from_str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))
