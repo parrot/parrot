@@ -20,7 +20,7 @@ out-of-bounds test. Checks INT and PMC keys.
 .sub main :main
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
-    plan(25)
+    plan(26)
 
     array_size_tests()
     element_set_tests()
@@ -175,6 +175,12 @@ after_ok2:
 .sub clone_tests
      set $I30, 2000
      $P0 = new ['FixedFloatArray']
+     $I1 = 0
+     clone $P2, $P0
+     if $P2 goto L0
+     $I1 = 1
+L0:  is($I1, 1, "clone of empty is empty")
+
      set $P0, $I30
      set $I0, 0
 L1:  set $N0, $I0
