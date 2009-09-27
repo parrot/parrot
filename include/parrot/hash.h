@@ -273,18 +273,16 @@ void* hash_value_from_number(PARROT_INTERP,
 PARROT_CAN_RETURN_NULL
 void* hash_value_from_pmc(PARROT_INTERP,
     ARGIN(const Hash * const hash),
-    ARGIN(PMC *value))
+    ARGIN_NULLOK(PMC *value))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 PARROT_CAN_RETURN_NULL
 void* hash_value_from_string(PARROT_INTERP,
     ARGIN(const Hash * const hash),
-    ARGIN(STRING *value))
+    ARGIN_NULLOK(STRING *value))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 INTVAL hash_value_to_int(PARROT_INTERP,
     ARGIN(const Hash * const hash),
@@ -464,12 +462,10 @@ int STRING_compare(PARROT_INTERP,
     && PARROT_ASSERT_ARG(hash)
 #define ASSERT_ARGS_hash_value_from_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(hash) \
-    && PARROT_ASSERT_ARG(value)
+    && PARROT_ASSERT_ARG(hash)
 #define ASSERT_ARGS_hash_value_from_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(hash) \
-    && PARROT_ASSERT_ARG(value)
+    && PARROT_ASSERT_ARG(hash)
 #define ASSERT_ARGS_hash_value_to_int __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     && PARROT_ASSERT_ARG(hash)

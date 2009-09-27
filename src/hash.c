@@ -1816,23 +1816,26 @@ Cast STRING to hash value.
 
 PARROT_CAN_RETURN_NULL
 void*
-hash_value_from_string(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN(STRING *value))
+hash_value_from_string(PARROT_INTERP, ARGIN(const Hash * const hash),
+        ARGIN_NULLOK(STRING *value))
 {
     ASSERT_ARGS(hash_value_from_string)
     void *ret;
     switch (hash->entry_type) {
         case enum_type_INTVAL:
-        {
-            const INTVAL int_val = Parrot_str_to_int(interp, value);
-            ret                  = INTVAL2PTR(void *, int_val);
+            {
+                const INTVAL int_val = STRING_IS_NULL(value) ?
+                        (INTVAL) 0 : Parrot_str_to_int(interp, value);
+                ret = INTVAL2PTR(void *, int_val);
+            }
             break;
-        }
         case enum_type_STRING:
             ret = (void *)value;
             break;
         case enum_type_PMC:
             {
-                PMC * const s = get_string_pmc(interp, value);
+                PMC * const s = STRING_IS_NULL(value) ?
+                        PMCNULL : get_string_pmc(interp, value);
                 ret = (void *)s;
             }
             break;
@@ -1856,19 +1859,22 @@ Cast PMC to hash value.
 
 PARROT_CAN_RETURN_NULL
 void*
-hash_value_from_pmc(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN(PMC *value))
+hash_value_from_pmc(PARROT_INTERP, ARGIN(const Hash * const hash),
+    ARGIN_NULLOK(PMC *value))
 {
     ASSERT_ARGS(hash_value_from_pmc)
     void *ret;
     switch (hash->entry_type) {
         case enum_type_INTVAL:
-        {
-            const INTVAL int_val = VTABLE_get_integer(interp, value);
-            ret                  = INTVAL2PTR(void *, int_val);
+            {
+                const INTVAL int_val = PMC_IS_NULL(value) ?
+                        (INTVAL) 0 : VTABLE_get_integer(interp, value);
+                ret                  = INTVAL2PTR(void *, int_val);
+            }
             break;
-        }
         case enum_type_STRING:
-            ret = (void *)VTABLE_get_string(interp, value);
+            ret = PMC_IS_NULL(value) ?
+                    PMCNULL : (void *)VTABLE_get_string(interp, value);
             break;
         case enum_type_PMC:
             ret = (void *)value;
