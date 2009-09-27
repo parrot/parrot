@@ -31,40 +31,42 @@ my (@default_tests, $default_tests_ref);
 my %default_tests_seen;
 
 my $cwd = cwd();
+my $longopts = {};
 {
     # Simulate non-existence of DEVELOPING
     my $tdir1 = tempdir( CLEANUP => 1 );
     ok( chdir $tdir1, "Able to change to tempdir for testing");
 
-    ($core_tests_only, $runcore_tests_only) = (0,1);
+#    ($core_tests_only, $runcore_tests_only) = (0,1);
+    $longopts = { core_tests_only => 0, runcore_tests_only => 1 };
     ok(@default_tests =
-        get_default_tests($core_tests_only, $runcore_tests_only),
-        "get_default_tests() returned successfully");
+        get_common_tests( $longopts ),
+        "get_common_tests() returned successfully");
     is(scalar(@default_tests), 1, "Got expected 1 test");
     is($default_tests[0], q{alpha.t}, "runcore_tests only as expected");
 
     @default_tests = ();
-    ($core_tests_only, $runcore_tests_only) = (1,0);
+    $longopts = { core_tests_only => 1, runcore_tests_only => 0 };
     ok(@default_tests =
-        get_default_tests($core_tests_only, $runcore_tests_only),
-        "get_default_tests() returned successfully");
+        get_common_tests( $longopts ),
+        "get_common_tests() returned successfully");
     is(scalar(@default_tests), 2, "Got expected 2 tests");
     is($default_tests[1], q{beta.t}, "core_tests only as expected");
 
     @default_tests = ();
-    ($core_tests_only, $runcore_tests_only) = (0,0);
+    $longopts = { core_tests_only => 0, runcore_tests_only => 0 };
     ok(@default_tests =
-        get_default_tests($core_tests_only, $runcore_tests_only),
-        "get_default_tests() returned successfully");
+        get_common_tests( $longopts ),
+        "get_common_tests() returned successfully");
     is(scalar(@default_tests), 4, "Got expected 4 tests");
     is($default_tests[0], q{gamma.t}, "Start with configure_tests as expected");
     is($default_tests[3], q{zeta.t}, "End with library_tests as expected");
 
     @default_tests = ();
-    ($core_tests_only, $runcore_tests_only) = (0,0);
+    $longopts = { core_tests_only => 0, runcore_tests_only => 0 };
     ok($default_tests_ref =
-        get_default_tests($core_tests_only, $runcore_tests_only),
-        "get_default_tests() returned successfully");
+        get_common_tests( $longopts ),
+        "get_common_tests() returned successfully");
     is(scalar(@{ $default_tests_ref }), 4, "Got expected 4 tests");
 
     ok(chdir $cwd, "Able to change back to starting directory after testing");
@@ -79,30 +81,30 @@ my $cwd = cwd();
     print $FH qq{12345\n};
     close $FH or croak "Unable to close file after writing";
 
-    ($core_tests_only, $runcore_tests_only) = (0,1);
+    $longopts = { core_tests_only => 0, runcore_tests_only => 1 };
     ok(@default_tests =
-        get_default_tests($core_tests_only, $runcore_tests_only),
-        "get_default_tests() returned successfully");
+        get_common_tests( $longopts ),
+        "get_common_tests() returned successfully");
     is(scalar(@default_tests), 1, "Got expected 1 test");
     is($default_tests[0], q{alpha.t}, "runcore_tests only as expected");
     # reset for subsequent tests
     @Parrot::Harness::DefaultTests::standard_tests = qw( delta.t );
 
     @default_tests = ();
-    ($core_tests_only, $runcore_tests_only) = (1,0);
+    $longopts = { core_tests_only => 1, runcore_tests_only => 0 };
     ok(@default_tests =
-        get_default_tests($core_tests_only, $runcore_tests_only),
-        "get_default_tests() returned successfully");
+        get_common_tests( $longopts ),
+        "get_common_tests() returned successfully");
     is(scalar(@default_tests), 2, "Got expected 2 tests");
     is($default_tests[1], q{beta.t}, "core_tests only as expected");
     # reset for subsequent tests
     @Parrot::Harness::DefaultTests::standard_tests = qw( delta.t );
 
     @default_tests = ();
-    ($core_tests_only, $runcore_tests_only) = (0,0);
+    $longopts = { core_tests_only => 0, runcore_tests_only => 0 };
     ok(@default_tests =
-        get_default_tests($core_tests_only, $runcore_tests_only),
-        "get_default_tests() returned successfully");
+        get_common_tests( $longopts ),
+        "get_common_tests() returned successfully");
     is(scalar(@default_tests), 4, "Got expected 4 tests");
     is($default_tests[0], q{gamma.t}, "Start with configure_tests as expected");
     is($default_tests[3], q{zeta.t}, "End with library_tests as expected");
@@ -112,10 +114,10 @@ my $cwd = cwd();
     @Parrot::Harness::DefaultTests::standard_tests = qw( delta.t );
 
     @default_tests = ();
-    ($core_tests_only, $runcore_tests_only) = (0,0);
+    $longopts = { core_tests_only => 0, runcore_tests_only => 0 };
     ok($default_tests_ref =
-        get_default_tests($core_tests_only, $runcore_tests_only),
-        "get_default_tests() returned successfully");
+        get_common_tests( $longopts ),
+        "get_common_tests() returned successfully");
     is(scalar(@{ $default_tests_ref }), 4, "Got expected 4 tests");
     # reset for subsequent tests
     @Parrot::Harness::DefaultTests::standard_tests = qw( delta.t );
@@ -137,7 +139,7 @@ pass("Completed all tests in $0");
 
 =head1 DESCRIPTION
 
-This file holds tests for Parrot::Harness::DefaultTests::get_default_tests().
+This file holds tests for Parrot::Harness::DefaultTests::get_common_tests().
 
 =head1 AUTHOR
 

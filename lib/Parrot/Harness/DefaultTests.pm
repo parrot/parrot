@@ -51,7 +51,7 @@ our (
     @developing_tests
 );
 use base qw( Exporter );
-our @EXPORT = qw( get_default_tests );
+our @EXPORT = qw( get_common_tests );
 our @EXPORT_OK = qw(
     @runcore_tests
     @core_tests
@@ -105,33 +105,22 @@ our @EXPORT_OK = qw(
 # Add in all t/codingstd except for a few skips.
 push @developing_tests, glob 't/codingstd/*.t';
 
-sub get_default_tests {
-    my ($core_tests_only, $runcore_tests_only) = @_;
+sub get_common_tests {
+    my ($longopts) = @_;
 
-    # Add metadata.t and coding standards tests only if we're DEVELOPING
+    push @standard_tests, @developing_tests if ( -e "DEVELOPING" );
 
-    # Note:  As of 2008-10-21, we're no longer including @standard_tests in
-    # @default_tests -- which means they're not included in 'make test'.
-    # But, for the time being, at least, we are still making
-    # it an exportable variable.  So we'll test for it in
-    # t/pharness/01-default_tests.t.
-
-    if ( -e "DEVELOPING" ) {
-        push @standard_tests, @developing_tests;
-    }
-
-    # build the list of default tests
-    my @default_tests = @runcore_tests;
-    unless ($runcore_tests_only) {
-       push @default_tests, @core_tests;
-       unless ($core_tests_only) {
-           push @default_tests, @library_tests;
-           unshift @default_tests, @configure_tests;
+    my @common_tests = @runcore_tests;
+    unless ($longopts->{runcore_tests_only}) {
+       push @common_tests, @core_tests;
+       unless ($longopts->{core_tests_only}) {
+           push @common_tests, @library_tests;
+           unshift @common_tests, @configure_tests;
        }
     }
     wantarray
-        ? return @default_tests
-        : return [ @default_tests ];
+        ? return @common_tests
+        : return [ @common_tests ];
 }
 
 1;

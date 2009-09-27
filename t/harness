@@ -4,6 +4,7 @@
 
 use strict;
 use warnings;
+use Data::Dumper;$Data::Dumper::Indent=1;
 use lib qw( lib );
 
 use Getopt::Std;
@@ -13,7 +14,7 @@ use Test::Harness ();
 undef $Test::Harness::Switches;
 
 use Parrot::Harness::DefaultTests qw(
-    get_default_tests
+    get_common_tests
     @developing_tests
 );
 use Parrot::Harness::Options qw(
@@ -50,19 +51,15 @@ my $args = get_test_prog_args(
 );
 $ENV{TEST_PROG_ARGS} = $args;
 
-# now build the list of tests to run, either from the command
-# line or from @default tests
-my @default_tests = get_default_tests(
-    $longopts->{core_tests_only},
-    $longopts->{runcore_tests_only}
-);
-
 my @tests;
 if ($longopts->{code}) {
     @tests = @developing_tests;
 }
 else {
-    @tests = map { glob($_) } (@ARGV ? @ARGV : @default_tests);
+    @tests = map { glob($_) } (@ARGV
+        ? @ARGV
+        : get_common_tests( $longopts )
+    );
 }
 
 my $harness;
