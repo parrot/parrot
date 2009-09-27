@@ -91,9 +91,10 @@ our @EXPORT_OK = qw(
 # configure tests are tests to be run at the beginning of 'make test';
 @configure_tests = qw( t/configure/*.t t/steps/*.t t/postconfigure/*.t );
 
-@developing_tests = ( 't/distro/file_metadata.t' );
-# Add in all t/codingstd except for a few skips.
-push @developing_tests, glob 't/codingstd/*.t';
+@developing_tests = (
+    't/distro/file_metadata.t',
+    ( glob 't/codingstd/*.t' ),
+);
 
 sub get_common_tests {
     my ($longopts) = @_;
