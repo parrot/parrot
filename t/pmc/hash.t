@@ -23,7 +23,7 @@ well.
     .include 'except_types.pasm'
     .include 'datatypes.pasm'
 
-    plan(165)
+    plan(168)
 
     initial_hash_tests()
     more_than_one_hash()
@@ -72,6 +72,8 @@ well.
     value_types_convertion()
     elements_in_hash()
     equality_tests()
+
+    pmc_keys()
 .end
 
 .sub initial_hash_tests
@@ -1402,6 +1404,45 @@ postit_end:
     is(hash1, hash3, 'Equal hashes, physically disjoint')
     isnt(hash1, hash4, 'Different hash values')
     is(hash1, hash5, 'Clones are equal')
+.end
+
+# Switch to use PMC keys instead of strings.
+.sub 'pmc_keys'
+    .include "hash_key_type.pasm"
+    .local pmc hash
+    hash = new ['Hash']
+    hash = .Hash_key_type_PMC
+
+    $P0 = new ['ResizableStringArray']
+    push $P0, "foo"
+    hash[$P0] = 'FOO'
+    # Autoconvert INTVAL to Integer
+    hash[42]  = 'bar'
+    $S0       = 'foo'
+    # Autoconvert STRING to String
+    hash[$S0] = 'BAZ'
+
+    $I0 = elements hash
+    is($I0, 3, "Got 3 elements in Hash")
+
+    # Iterate over keys and get types. We should have 3 different types:
+    # ResizableStringArray, Integer and String
+    .local pmc types, it
+    types = new ['Hash']
+    it = iter hash
+  loop:
+    unless it goto done
+    $P0 = shift it
+    $P1 = $P0.'key'()
+    $S0 = typeof $P1
+    types[$S0] = 1
+    goto loop
+  done:
+    
+    $I0 = elements types
+    is($I0, 3, "Got 3 different types of PMC keys")
+    $I0 = types['ResizableStringArray']
+    ok($I0, "Including ResizableStringArray")
 .end
 
 # Local Variables:

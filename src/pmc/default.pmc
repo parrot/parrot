@@ -720,6 +720,21 @@ and C<value>.
 
 /*
 
+=item C<INTVAL hashvalue()>
+
+Calculate hashvalue for PMC. Default behaviour stringify and use string.
+
+=cut
+
+*/
+
+    INTVAL hashvalue() {
+        STRING *s = SELF.get_string();
+        return key_hash_STRING(INTERP, s, 0);
+    }
+
+/*
+
 =item C<INTVAL is_equal(PMC *value)>
 
 Default fallback. Performs a multiple dispatch call for 'is_equal'.

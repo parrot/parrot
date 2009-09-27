@@ -33,8 +33,23 @@ Get "key".
 
 */
     VTABLE PMC* get_pmc() {
-        return PMCNULL;
+        Parrot_HashIteratorKey_attributes *attrs =
+                PARROT_HASHITERATORKEY(SELF);
+        return hash_key_to_pmc(INTERP, attrs->parrot_hash, attrs->bucket->key);
     }
+
+    METHOD key() {
+        PMC *ret = SELF.get_pmc();
+        RETURN(PMC* ret);
+    }
+
+    METHOD value() {
+        Parrot_HashIteratorKey_attributes *attrs =
+                PARROT_HASHITERATORKEY(SELF);
+        PMC *ret = hash_key_to_pmc(INTERP, attrs->parrot_hash, attrs->bucket->value);
+        RETURN(PMC* ret);
+    }
+
 
     VTABLE INTVAL get_integer() {
         return -1;
@@ -44,26 +59,8 @@ Get "key".
         Parrot_HashIteratorKey_attributes *attrs =
                 PARROT_HASHITERATORKEY(SELF);
 
-        if (attrs->parrot_hash) {
-            switch (attrs->parrot_hash->key_type) {
-                case Hash_key_type_int:
-                    return Parrot_str_from_int(INTERP, (INTVAL)attrs->bucket->key);
-
-                case Hash_key_type_STRING:
-                    return (STRING*)attrs->bucket->key;
-
-                case Hash_key_type_PMC:
-                    return VTABLE_get_string(INTERP, (PMC *)attrs->bucket->key);
-
-                default:
-                    break;
-            }
-        }
-
-        /* Horribly die? */
-        return NULL;
+        return hash_key_to_string(INTERP, attrs->parrot_hash, attrs->bucket->key);
     }
-
 
 
 }
