@@ -14,7 +14,6 @@ directories holding test files:
     @core_tests
     @library_tests
     @configure_tests
-    @standard_tests
     @developing_tests
 
 Each of these arrays holds a list of paths containing wildcards which are
@@ -47,7 +46,6 @@ our (
     @core_tests,
     @library_tests,
     @configure_tests,
-    @standard_tests,
     @developing_tests
 );
 use base qw( Exporter );
@@ -57,7 +55,6 @@ our @EXPORT_OK = qw(
     @core_tests
     @library_tests
     @configure_tests
-    @standard_tests
     @developing_tests
 );
 
@@ -92,14 +89,7 @@ our @EXPORT_OK = qw(
 );
 
 # configure tests are tests to be run at the beginning of 'make test';
-# standard tests are other tests run by default with no core options
-# present
 @configure_tests = qw( t/configure/*.t t/steps/*.t t/postconfigure/*.t );
-@standard_tests = qw(
-    t/compilers/json/*.t
-    t/examples/*.t
-    t/distro/manifest.t
-);
 
 @developing_tests = ( 't/distro/file_metadata.t' );
 # Add in all t/codingstd except for a few skips.
@@ -107,8 +97,6 @@ push @developing_tests, glob 't/codingstd/*.t';
 
 sub get_common_tests {
     my ($longopts) = @_;
-
-    push @standard_tests, @developing_tests if ( -e "DEVELOPING" );
 
     my @common_tests = @runcore_tests;
     unless ($longopts->{runcore_tests_only}) {
