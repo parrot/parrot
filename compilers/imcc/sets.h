@@ -70,32 +70,32 @@ Set * set_union(ARGIN(const Set *s1), ARGIN(const Set *s2))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_set_add __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(s)
-#define ASSERT_ARGS_set_clear __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(s)
-#define ASSERT_ARGS_set_contains __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(s)
-#define ASSERT_ARGS_set_copy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(s)
-#define ASSERT_ARGS_set_equal __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_set_add __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_set_clear __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_set_contains __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_set_copy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_set_equal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s1) \
-    && PARROT_ASSERT_ARG(s2)
-#define ASSERT_ARGS_set_first_zero __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(s)
-#define ASSERT_ARGS_set_free __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(s)
-#define ASSERT_ARGS_set_intersec __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(s2))
+#define ASSERT_ARGS_set_first_zero __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_set_free __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_set_intersec __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s1) \
-    && PARROT_ASSERT_ARG(s2)
-#define ASSERT_ARGS_set_intersec_inplace __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(s2))
+#define ASSERT_ARGS_set_intersec_inplace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s1) \
-    && PARROT_ASSERT_ARG(s2)
-#define ASSERT_ARGS_set_make __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
-#define ASSERT_ARGS_set_make_full __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
-#define ASSERT_ARGS_set_union __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(s2))
+#define ASSERT_ARGS_set_make __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_set_make_full __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_set_union __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s1) \
-    && PARROT_ASSERT_ARG(s2)
+    , PARROT_ASSERT_ARG(s2))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/sets.c */
 

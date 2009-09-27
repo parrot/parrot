@@ -231,62 +231,62 @@ PARROT_PURE_FUNCTION
 INTVAL Parrot_pmc_array_length(SHIM_INTERP, ARGIN(const List *list))
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_ld __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
-#define ASSERT_ARGS_Parrot_pmc_array_assign __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_ld __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_pmc_array_assign __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(list)
-#define ASSERT_ARGS_Parrot_pmc_array_clone __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(list))
+#define ASSERT_ARGS_Parrot_pmc_array_clone __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(other)
-#define ASSERT_ARGS_Parrot_pmc_array_delete __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(other))
+#define ASSERT_ARGS_Parrot_pmc_array_delete __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(list)
-#define ASSERT_ARGS_Parrot_pmc_array_get __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(list))
+#define ASSERT_ARGS_Parrot_pmc_array_get __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(list)
-#define ASSERT_ARGS_Parrot_pmc_array_insert __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(list))
+#define ASSERT_ARGS_Parrot_pmc_array_insert __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(list)
-#define ASSERT_ARGS_Parrot_pmc_array_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(list))
+#define ASSERT_ARGS_Parrot_pmc_array_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(list)
-#define ASSERT_ARGS_Parrot_pmc_array_new __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_Parrot_pmc_array_new_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(list))
+#define ASSERT_ARGS_Parrot_pmc_array_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_pmc_array_new_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(init)
-#define ASSERT_ARGS_Parrot_pmc_array_pmc_new __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(init))
+#define ASSERT_ARGS_Parrot_pmc_array_pmc_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(container)
-#define ASSERT_ARGS_Parrot_pmc_array_pmc_new_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(container))
+#define ASSERT_ARGS_Parrot_pmc_array_pmc_new_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(container) \
-    && PARROT_ASSERT_ARG(init)
-#define ASSERT_ARGS_Parrot_pmc_array_pop __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(container) \
+    , PARROT_ASSERT_ARG(init))
+#define ASSERT_ARGS_Parrot_pmc_array_pop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(list)
-#define ASSERT_ARGS_Parrot_pmc_array_push __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(list))
+#define ASSERT_ARGS_Parrot_pmc_array_push __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(list)
-#define ASSERT_ARGS_Parrot_pmc_array_set_length __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(list))
+#define ASSERT_ARGS_Parrot_pmc_array_set_length __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(list)
-#define ASSERT_ARGS_Parrot_pmc_array_shift __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(list))
+#define ASSERT_ARGS_Parrot_pmc_array_shift __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(list)
-#define ASSERT_ARGS_Parrot_pmc_array_splice __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(list))
+#define ASSERT_ARGS_Parrot_pmc_array_splice __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(list)
-#define ASSERT_ARGS_Parrot_pmc_array_unshift __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(list))
+#define ASSERT_ARGS_Parrot_pmc_array_unshift __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(list) \
-    && PARROT_ASSERT_ARG(item)
-#define ASSERT_ARGS_Parrot_pmc_array_visit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(list) \
+    , PARROT_ASSERT_ARG(item))
+#define ASSERT_ARGS_Parrot_pmc_array_visit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(list) \
-    && PARROT_ASSERT_ARG(pinfo)
-#define ASSERT_ARGS_Parrot_pmc_array_length __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(list)
+    , PARROT_ASSERT_ARG(list) \
+    , PARROT_ASSERT_ARG(pinfo))
+#define ASSERT_ARGS_Parrot_pmc_array_length __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(list))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/list.c */
 

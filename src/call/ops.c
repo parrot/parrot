@@ -38,10 +38,10 @@ static PMC * runops_args(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(5);
 
-#define ASSERT_ARGS_runops_args __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_runops_args __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(sub) \
-    && PARROT_ASSERT_ARG(sig)
+    , PARROT_ASSERT_ARG(sub) \
+    , PARROT_ASSERT_ARG(sig))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

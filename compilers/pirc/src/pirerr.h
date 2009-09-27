@@ -28,12 +28,12 @@ yypirerror(
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-#define ASSERT_ARGS_panic __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_panic __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lexer) \
-    && PARROT_ASSERT_ARG(message)
-#define ASSERT_ARGS_yypirerror __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(message))
+#define ASSERT_ARGS_yypirerror __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lexer) \
-    && PARROT_ASSERT_ARG(message)
+    , PARROT_ASSERT_ARG(message))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/pirc/src/pirerr.c */
 

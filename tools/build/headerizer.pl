@@ -405,14 +405,15 @@ sub make_function_decls {
         if(length($func->{name}) > 29) {
             $assert .= " \\\n    ";
         }
-        $assert .= " __attribute__unused__ int _ASSERT_ARGS_CHECK = ";
+        $assert .= " __attribute__unused__ int _ASSERT_ARGS_CHECK = (";
         if(@asserts) {
             $assert .= "\\\n       ";
-            $assert .= join(" \\\n    && ", @asserts);
+            $assert .= join(" \\\n    , ", @asserts);
         }
         else {
             $assert .= "0";
         }
+	$assert .= ")";
         push(@decls, $assert);
     }
 

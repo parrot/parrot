@@ -180,55 +180,55 @@ void write_pbc_file(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_add_annotation __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(bc)
-#define ASSERT_ARGS_add_key_const __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_add_annotation __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(bc))
+#define ASSERT_ARGS_add_key_const __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(bc) \
-    && PARROT_ASSERT_ARG(key)
-#define ASSERT_ARGS_add_num_const __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(bc)
-#define ASSERT_ARGS_add_pmc_const __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(key))
+#define ASSERT_ARGS_add_num_const __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(bc))
+#define ASSERT_ARGS_add_pmc_const __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(bc) \
-    && PARROT_ASSERT_ARG(pmc)
-#define ASSERT_ARGS_add_string_const __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_add_string_const __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(bc) \
-    && PARROT_ASSERT_ARG(str) \
-    && PARROT_ASSERT_ARG(charset)
-#define ASSERT_ARGS_add_sub_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(str) \
+    , PARROT_ASSERT_ARG(charset))
+#define ASSERT_ARGS_add_sub_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(bc) \
-    && PARROT_ASSERT_ARG(info) \
-    && PARROT_ASSERT_ARG(lexer)
-#define ASSERT_ARGS_create_annotations_segment __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(info) \
+    , PARROT_ASSERT_ARG(lexer))
+#define ASSERT_ARGS_create_annotations_segment __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(bc) \
-    && PARROT_ASSERT_ARG(name)
-#define ASSERT_ARGS_create_codesegment __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(bc)
-#define ASSERT_ARGS_create_debugsegment __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_create_codesegment __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(bc))
+#define ASSERT_ARGS_create_debugsegment __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(bc) \
-    && PARROT_ASSERT_ARG(file)
-#define ASSERT_ARGS_destroy_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(bc)
-#define ASSERT_ARGS_emit_debug_info __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(bc)
-#define ASSERT_ARGS_emit_int_arg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(bc)
-#define ASSERT_ARGS_emit_opcode __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(bc)
-#define ASSERT_ARGS_get_num_const __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(bc)
-#define ASSERT_ARGS_get_pmc_const __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(bc)
-#define ASSERT_ARGS_get_string_const __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(bc)
-#define ASSERT_ARGS_new_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(file))
+#define ASSERT_ARGS_destroy_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(bc))
+#define ASSERT_ARGS_emit_debug_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(bc))
+#define ASSERT_ARGS_emit_int_arg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(bc))
+#define ASSERT_ARGS_emit_opcode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(bc))
+#define ASSERT_ARGS_get_num_const __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(bc))
+#define ASSERT_ARGS_get_pmc_const __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(bc))
+#define ASSERT_ARGS_get_string_const __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(bc))
+#define ASSERT_ARGS_new_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(filename)
-#define ASSERT_ARGS_store_key_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(filename))
+#define ASSERT_ARGS_store_key_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(bc) \
-    && PARROT_ASSERT_ARG(key)
-#define ASSERT_ARGS_write_pbc_file __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(key))
+#define ASSERT_ARGS_write_pbc_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(bc) \
-    && PARROT_ASSERT_ARG(filename)
+    , PARROT_ASSERT_ARG(filename))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/pirc/src/bcgen.c */
 
