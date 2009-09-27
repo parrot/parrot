@@ -19,7 +19,8 @@ type combinations.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(30)
+    plan(31)
+    init_null_tests()
     init_int_tests()
     instantiate_tests()
     num_tests()
@@ -29,6 +30,13 @@ type combinations.
     logic_operations()
     negation_tests()
     interface_check()
+.end
+
+.sub init_null_tests
+    null $P0
+    $P1 = new ['Boolean'], $P0
+    set $I0, $P1
+    is($I0, 0, "init with null pmc gives false")
 .end
 
 .sub init_int_tests
