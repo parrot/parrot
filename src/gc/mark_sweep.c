@@ -410,16 +410,18 @@ mark_special(PARROT_INTERP, ARGIN(PMC *obj))
             interp->mem_pools->gc_mark_ptr = obj;
     }
 
-    /* put it on the end of the list */
-    PMC_next_for_GC(interp->mem_pools->gc_mark_ptr) = obj;
+    PObj_get_FLAGS(obj) |= PObj_custom_GC_FLAG;
 
-    /* Explicitly make the tail of the linked list self-referential */
-    interp->mem_pools->gc_mark_ptr = PMC_next_for_GC(obj) = obj;
+    /* clearing the flag is much more expensive then testing */
+    if (!PObj_needs_early_gc_TEST(obj))
+        PObj_high_priority_gc_CLEAR(obj);
+
+    /* mark properties */
+    Parrot_gc_mark_PMC_alive(interp, PMC_metadata(obj));
 
     if (PObj_custom_mark_TEST(obj)) {
-        PObj_get_FLAGS(obj) |= PObj_custom_GC_FLAG;
-        if (!PObj_constant_TEST(obj))
-            VTABLE_mark(interp, obj);
+        PARROT_ASSERT(!PObj_on_free_list_TEST(obj));
+        VTABLE_mark(interp, obj);
     }
 }
 
@@ -455,77 +457,6 @@ Parrot_gc_clear_live_bits(PARROT_INTERP, ARGIN(const Fixed_Size_Pool *pool))
     }
 }
 
-
-/*
-
-=item C<int Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)>
-
-Traces through the linked list formed by the C<next_for_GC> pointer.
-Returns 0 if this is a lazy GC run and we've found all impatient PMCs.
-Returns 1 if we've traced the entire list.
-
-=cut
-
-*/
-
-int
-Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)
-{
-    ASSERT_ARGS(Parrot_gc_trace_children)
-    Memory_Pools * const mem_pools = interp->mem_pools;
-    const int      lazy_gc    = mem_pools->lazy_gc;
-    PMC           *current    = mem_pools->gc_mark_start;
-
-    /*
-     * First phase of mark is finished. Now if we are the owner
-     * of a shared pool, we must run the mark phase of other
-     * interpreters in our pool, so that live shared PMCs in that
-     * interpreter are appended to our mark_ptrs chain.
-     *
-     * If there is a count of shared PMCs and we have already seen
-     * all these, we could skip that.
-     */
-    pt_gc_mark_root_finished(interp);
-
-    do {
-        PMC *next;
-
-        if (lazy_gc && mem_pools->num_early_PMCs_seen >=
-                mem_pools->num_early_gc_PMCs) {
-            return 0;
-        }
-
-        PARROT_ASSERT(current);
-        mem_pools->gc_trace_ptr = current;
-
-        /* short-term hack to color objects black */
-        PObj_get_FLAGS(current) |= PObj_custom_GC_FLAG;
-
-        /* clearing the flag is much more expensive then testing */
-        if (!PObj_needs_early_gc_TEST(current))
-            PObj_high_priority_gc_CLEAR(current);
-
-        /* mark properties */
-        Parrot_gc_mark_PMC_alive(interp, PMC_metadata(current));
-
-        if (PObj_custom_mark_TEST(current)) {
-            PARROT_ASSERT(!PObj_on_free_list_TEST(current));
-            VTABLE_mark(interp, current);
-        }
-
-        next = PMC_next_for_GC(current);
-
-        if (!PMC_IS_NULL(next) && next == current)
-            break;
-
-        current = next;
-    } while (--how_many > 0);
-
-    mem_pools->gc_mark_start = current;
-    mem_pools->gc_trace_ptr  = NULL;
-
-    return 1;
-}
 
 /*
 

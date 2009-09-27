@@ -179,9 +179,6 @@ void Parrot_gc_allocate_string_storage(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*str);
 
-void Parrot_gc_cleanup_next_for_GC(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 void Parrot_gc_compact_memory_pool(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -365,8 +362,6 @@ int Parrot_gc_total_sized_buffers(PARROT_INTERP)
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     && PARROT_ASSERT_ARG(str)
-#define ASSERT_ARGS_Parrot_gc_cleanup_next_for_GC __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_compact_memory_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_completely_unblock __attribute__unused__ int _ASSERT_ARGS_CHECK = \

@@ -82,26 +82,9 @@ This structure holds all necessary information and function pointers specific
 to the desired functionality. It gets passed on to all vtable methods and
 callback functions.
 
-=head2 Working loops
-
-These are labeled B<visit_loop_*>. There are currently two schemes to handle
-the B<todo_list>.
+=head2 Working loop
 
 =over 4
-
-=item next_for_GC
-
-All PMCs that can contain other PMCs have the B<next_for_GC> pointer in the
-PMC's extended data area. The B<todo_list> gets built by appending (or        
-prepending) the current PMC to a B<mark_ptr>, which then points to the current
-PMC, forming a linked list of items.
-
-This pointer is also used during GC's B<mark()> functionality, so that
-GC has to be turned off during operations using this scheme.
-
-As the B<next_for_GC> pointer is inside the PMC, this scheme isn't thread-safe
-at low-level, because shared PMCs also would share this pointer, so that there
-can be only one operation at a time.
 
 =item todo list
 
@@ -150,41 +133,6 @@ being the address of the PMC and values being a PMC B<id>, which is unique for
 this PMC. While this is straight forward, it consumes 16 bytes per PMC (plus
 overhead, 32-bit system assumed). Hash lookups also take a considerable
 amount of time.
-
-=item B<next_for_GC>
-
-The pointer used for the B<todo_list> handling itself can serve as a marker
-that this item was already processed. There are some issues with this though:
-Plain scalars (not being able to contain other PMCs) don't have a
-B<next_for_GC> pointer. This is an optimization reducing the size of scalars
-and increasing performance considerably.
-
-Second, the B<next_for_GC> pointers have to be cleared beforehand. GC uses
-only a nibble-sized flag area located inside the PMCs arena to manage, if a PMC
-was seen already by checking the live bit. The B<next_for_GC> pointer is just
-set and never cleared to avoid touching a PMCs memory and polluting caches when
-possible.
-
-Finally, generating a PMC's B<id> isn't as simple as just incrementing a
-counter used with the B<seen> hash approach.
-
-=item PMC B<id>s
-
-We could of course use the PMC's address as its own B<id>, since we know it is
-unique. However, this is suboptimal for thawing.  To manage duplicates during
-B<thaw> we basically need a mapping B<PMC_in_image =E<gt>
-newly_constructed_PMC>. When now the B<PMC_in_image> (the B<id>) is the
-address, we have to use a hash again, for B<thaw()> with all the negative
-impact on resources and speed.
-
-So both schemes are using small B<id> values and the seen handling inside
-B<thaw> is done via a list lookup, which is a lot faster and takes less
-resources.
-
-The B<seen> hash approach just has a counter for PMC B<id>s, the B<next_for_GC>
-approach calculates the B<id> from the address of the PMC in its arena, again
-yielding a small and unique number. The two low bits of PMC B<id>s are used as
-flags.
 
 =back
 

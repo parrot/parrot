@@ -1620,8 +1620,7 @@ pt_add_to_interpreters(PARROT_INTERP, ARGIN_NULLOK(Parrot_Interp new_interp))
 =item C<void pt_gc_start_mark(PARROT_INTERP)>
 
 Record that the mark phase of GC is about to begin. In the presence of shared
-PMCs, we can only run one GC run at a time because C<< PMC->next_for_GC >> may
-be changed.
+PMCs, we can only run one GC run at a time.
 
 C<flags> are the GC flags. We check if we need to collect shared objects or
 not.
@@ -1696,8 +1695,7 @@ pt_gc_start_mark(PARROT_INTERP)
 
     DEBUG_ONLY(fprintf(stderr, "actually mark\n"));
     /*
-     * We can't allow parallel running GCs; both would mess with shared PMCs'
-     * next_for_GC pointers
+     * We can't allow parallel running GCs.
      */
     LOCK(interpreter_array_mutex);
     DEBUG_ONLY(fprintf(stderr, "got marking lock\n"));

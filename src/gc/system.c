@@ -451,9 +451,6 @@ trace_mem_block(PARROT_INTERP, size_t lo_var_ptr, size_t hi_var_ptr)
              * free headers... */
             if (pmc_min <= ptr && ptr < pmc_max &&
                     is_pmc_ptr(interp, (void *)ptr)) {
-                /* ...so ensure that Parrot_gc_mark_PObj_alive checks PObj_on_free_list_FLAG
-                 * before adding it to the next_for_GC list, to have
-                 * vtable->mark() called. */
                 Parrot_gc_mark_PObj_alive(interp, (PObj *)ptr);
             }
             else if (buffer_min <= ptr && ptr < buffer_max &&

@@ -49,7 +49,6 @@ All PMCs have the form:
         DPOINTER *data;
         PMC *_metadata;
         struct _Sync *_synchronize;    # [Note: may be deprecated, see STM]
-        PMC *_next_for_GC;
     }
 
 C<flags> holds a set of flags associated with the PMC; these are documented
@@ -68,9 +67,6 @@ C<_metadata> holds internal PMC metadata (properties). See the setprop/getprop
 ops in F<docs/ops/pmc.pod>.
 
 C<_synchronize> is for access synchronization between shared PMCs.
-
-C<_next_for_GC> determines the next PMC in the 'used' list during dead object
-detection in the GC.
 
 PMCs are used to implement the basic data types of the high level languages
 running on top of Parrot. For instance, a Perl 5 C<SV> will map onto one (or

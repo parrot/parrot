@@ -101,9 +101,6 @@ implementation, and malloc wrappers for various purposes. These are unused.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void cleanup_next_for_GC_pool(ARGIN(Fixed_Size_Pool *pool))
-        __attribute__nonnull__(1);
-
 static void fix_pmc_syncs(
     ARGMOD(Interp *dest_interp),
     ARGIN(Fixed_Size_Pool *pool))
@@ -147,8 +144,6 @@ static int sweep_cb_pmc(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
-#define ASSERT_ARGS_cleanup_next_for_GC_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_fix_pmc_syncs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(dest_interp) \
     && PARROT_ASSERT_ARG(pool)
@@ -1314,54 +1309,6 @@ Parrot_gc_get_pmc_index(PARROT_INTERP, ARGIN(PMC* pmc))
     }
 
     Parrot_ex_throw_from_c_args(interp, NULL, 1, "Couldn't find PMC in arenas");
-}
-
-/*
-
-=item C<void Parrot_gc_cleanup_next_for_GC(PARROT_INTERP)>
-
-Cleans up the C<next_for_GC> pointers. Sets all of them in the PMC and Constant
-PMC pools to NULL.
-
-=cut
-
-*/
-
-void
-Parrot_gc_cleanup_next_for_GC(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_gc_cleanup_next_for_GC)
-    cleanup_next_for_GC_pool(interp->mem_pools->pmc_pool);
-    cleanup_next_for_GC_pool(interp->mem_pools->constant_pmc_pool);
-}
-
-/*
-
-=item C<static void cleanup_next_for_GC_pool(Fixed_Size_Pool *pool)>
-
-Sets all the C<next_for_GC> pointers to C<NULL>.
-
-=cut
-
-*/
-
-static void
-cleanup_next_for_GC_pool(ARGIN(Fixed_Size_Pool *pool))
-{
-    ASSERT_ARGS(cleanup_next_for_GC_pool)
-    Fixed_Size_Arena *arena;
-
-    for (arena = pool->last_Arena; arena; arena = arena->prev) {
-        PMC *p = (PMC *)arena->start_objects;
-        UINTVAL i;
-
-        for (i = 0; i < arena->used; i++) {
-            if (!PObj_on_free_list_TEST(p)) {
-                PMC_next_for_GC(p) = PMCNULL;
-            }
-            p++;
-        }
-    }
 }
 
 /*

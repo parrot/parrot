@@ -360,9 +360,6 @@ void Parrot_gc_sweep_pool(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
-int Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)
-        __attribute__nonnull__(1);
-
 int Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
         __attribute__nonnull__(1);
 
@@ -407,8 +404,6 @@ int Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
 #define ASSERT_ARGS_Parrot_gc_sweep_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     && PARROT_ASSERT_ARG(pool)
-#define ASSERT_ARGS_Parrot_gc_trace_children __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_trace_root __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

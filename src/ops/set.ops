@@ -514,7 +514,6 @@ inline op copy(inout PMC, invar PMC) :base_mem {
         PMC_data(clone)        = NULL;
         PMC_sync(clone)        = NULL;
         PMC_metadata(clone)    = NULL;
-        PMC_next_for_GC(clone) = NULL;
 
         /* Restore metadata. */
         if (!PMC_IS_NULL(meta)) {

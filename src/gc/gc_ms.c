@@ -250,12 +250,14 @@ static int
 gc_ms_trace_active_PMCs(PARROT_INTERP, Parrot_gc_trace_type trace)
 {
     ASSERT_ARGS(gc_ms_trace_active_PMCs)
+
     if (!Parrot_gc_trace_root(interp, trace))
         return 0;
 
-    /* Okay, we've marked the whole root set, and should have a good-sized
-     * list of things to look at. Run through it */
-    return Parrot_gc_trace_children(interp, (size_t) -1);
+    pt_gc_mark_root_finished(interp);
+    interp->mem_pools->gc_trace_ptr  = NULL;
+    return 1;
+
 }
 
 /*

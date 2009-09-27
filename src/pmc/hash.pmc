@@ -372,10 +372,6 @@ hash_value_to_number(PARROT_INTERP, const Hash * const hash, void *value)
     return ret;
 }
 
-
-/* Needs ext struct for the next_for_GC pointer
- * We would get recursive marking of a deeply nested HoHoH...
- */
 pmclass Hash provides hash auto_attrs {
     ATTR Hash *hash;
 

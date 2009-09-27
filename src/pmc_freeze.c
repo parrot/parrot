@@ -8,11 +8,6 @@ src/pmc_freeze.c - Freeze and thaw functionality
 
 =head1 DESCRIPTION
 
-Freeze uses the C<next_for_GC pointer()> to remember seen PMCs. PMCs are
-written as IDs (or tags), which are calculated from their arena address.
-This PMC number is multiplied by four. The 2 low bits indicate a seen
-PMC or a PMC of the same type as the previous one respectively.
-
 Thawing PMCs uses a list with (maximum) size of the amount of PMCs to
 keep track of retrieved PMCs.
 
