@@ -156,6 +156,9 @@ Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, ARGIN(PMC *self), ARGIN(
 
 Lookup a namespace object from a class PMC.
 
+This function is deprecated, see TT #1069.
+Use the inspect interface in the Class PMC instead.
+
 =cut
 
 */

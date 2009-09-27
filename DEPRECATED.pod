@@ -192,6 +192,10 @@ diagnostic message.
 
 L<https://trac.parrot.org/parrot/ticket/872>
 
+=item Parrot_oo_get_namespace [eligible in 2.1]
+
+L<https://trac.parrot.org/parrot/ticket/1069>
+
 =back
 
 =head1 Compiler tools
