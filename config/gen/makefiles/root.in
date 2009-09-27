@@ -495,6 +495,7 @@ PDB                 := $(CUR_DIR)/parrot_debugger$(EXE)
 PBC_TO_EXE          := $(CUR_DIR)/pbc_to_exe$(EXE)
 PARROT_CONFIG       := $(CUR_DIR)/parrot_config$(EXE)
 PIRC                := $(CUR_DIR)/pirc$(EXE)
+NQP                 := $(CUR_DIR)/parrot_nqp$(EXE)
 
 # Installable executables
 INSTALLABLEPARROT   := $(CUR_DIR)/installable_parrot$(EXE)
@@ -585,6 +586,7 @@ all : \
     $(PBCMERGE) \
     $(PDB) \
     $(PDUMP) \
+    $(NQP) \
 
 corevm : \
     flags_dummy \
@@ -809,6 +811,10 @@ $(PIRC) : $(PARROT)
 	$(MAKE) compilers/pirc
 	$(CP) compilers/pirc/pirc$(EXE) $(PIRC)
 	$(CHMOD) 0755 $(PIRC)
+
+$(NQP) : $(PBC_TO_EXE) compilers/nqp/nqp.pbc
+	$(CP) compilers/nqp/nqp.pbc parrot_nqp.pbc
+	$(PBC_TO_EXE) parrot_nqp.pbc
 
 $(MINIPARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     lib/Parrot/OpLib/core.pm $(SRC_DIR)/null_config$(O)
