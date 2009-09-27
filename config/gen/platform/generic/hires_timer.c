@@ -32,7 +32,7 @@ High-resolution timer support
 
 /*
 
-=item C<UHUGEINTVAL Parrot_hires_get_time()>
+=item C<UHUGEINTVAL Parrot_hires_get_time(void)>
 
 Return a high-resolution number representing how long Parrot has been running.
 
@@ -40,7 +40,7 @@ Return a high-resolution number representing how long Parrot has been running.
 
 */
 
-UHUGEINTVAL Parrot_hires_get_time()
+UHUGEINTVAL Parrot_hires_get_time(void)
 {
     struct timespec ts;
     #if _POSIX_TIMERS
@@ -57,7 +57,7 @@ UHUGEINTVAL Parrot_hires_get_time()
 
 /*
 
-=item C<UINTVAL Parrot_hires_get_tick_duration()>
+=item C<UINTVAL Parrot_hires_get_tick_duration(void)>
 
 Return the number of ns that each time unit from Parrot_hires_get_time represents.
 
@@ -65,7 +65,7 @@ Return the number of ns that each time unit from Parrot_hires_get_time represent
 
 */
 
-UINTVAL Parrot_hires_get_tick_duration()
+UINTVAL Parrot_hires_get_tick_duration(void)
 {
     return (UINTVAL) 1;
 }

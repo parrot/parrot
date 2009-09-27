@@ -17,7 +17,7 @@ High-resolution timer support for win32
 
 =over 4
 
-=item C<UHUGEINTVAL Parrot_hires_get_time()>
+=item C<UHUGEINTVAL Parrot_hires_get_time(void)>
 
 Return a high-resolution number representing how long Parrot has been running.
 
@@ -25,7 +25,7 @@ Return a high-resolution number representing how long Parrot has been running.
 
 */
 
-UHUGEINTVAL Parrot_hires_get_time()
+UHUGEINTVAL Parrot_hires_get_time(void)
 {
     LARGE_INTEGER ticks;
     QueryPerformanceCounter(&ticks);
@@ -34,7 +34,7 @@ UHUGEINTVAL Parrot_hires_get_time()
 
 /*
 
-=item C<UINTVAL Parrot_hires_get_tick_duration()>
+=item C<UINTVAL Parrot_hires_get_tick_duration(void)>
 
 Return the number of nanoseconds that each time unit from Parrot_hires_get_time represents.
 
@@ -42,7 +42,7 @@ Return the number of nanoseconds that each time unit from Parrot_hires_get_time 
 
 */
 
-UINTVAL Parrot_hires_get_tick_duration()
+UINTVAL Parrot_hires_get_tick_duration(void)
 {
     LARGE_INTEGER ticks;
     /* QueryPerformanceCounter returns ticks per second, so divide 1 billion by
