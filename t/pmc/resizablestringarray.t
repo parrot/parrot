@@ -23,7 +23,7 @@ out-of-bounds test. Checks INT and PMC keys.
     .include 'test_more.pir'
 
     # set a test plan
-    plan(259)
+    plan(261)
 
     'size/resize'()
     'clone'()
@@ -37,6 +37,8 @@ out-of-bounds test. Checks INT and PMC keys.
     'get_string_keyed'()
     'get_integer_keyed'()
     'get_number_keyed'()
+
+    'delete_keyed'()
 
     'push_pmc'()
     'push_string'()
@@ -664,9 +666,30 @@ done:
 .end
 
 #
+# test delete_keyed
+#
+.sub 'delete_keyed'
+    .local pmc array
+    array = new ['ResizableStringArray']
+    array[0] = "one"
+    array[1] = "two"
+    array[2] = "three"
+    $P0 = new ['Integer']
+    $P0 = 1
+    delete array[$P0]
+    $I0 = elements array
+    $S0 = array[1]
+    is($I0, 2,       "delete_keyed - elements")
+    is($S0, "three", "delete_keyed - value")
+.end
+
+#
 # test pushing PMCs onto the array
 #
 .sub 'push_pmc'
+    .local pmc array
+    array = new ['ResizableStringArray']
+
     .local pmc array
     array = new ['ResizableStringArray']
 
