@@ -46,7 +46,7 @@ Get "key".
     METHOD value() {
         Parrot_HashIteratorKey_attributes *attrs =
                 PARROT_HASHITERATORKEY(SELF);
-        PMC *ret = hash_key_to_pmc(INTERP, attrs->parrot_hash, attrs->bucket->value);
+        PMC *ret = hash_value_to_pmc(INTERP, attrs->parrot_hash, attrs->bucket->value);
         RETURN(PMC* ret);
     }
 

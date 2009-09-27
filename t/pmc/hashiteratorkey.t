@@ -20,11 +20,19 @@ iterating over Hash. Just check that we create it.
 .sub 'main'
     .include 'test_more.pir'
 
-    plan(1)
+    plan(3)
 
     $P0 = new ['HashIteratorKey']
     ok(1, "Can create HashIteratorKey directly")
 
+    $P0 = new ['Hash']
+    $P0['foo'] = 'bar'
+    $P1 = iter $P0
+    $P2 = shift $P1
+    $S0 = $P2.'key'()
+    is($S0, 'foo', 'HashIteratorKey.key works')
+    $S0 = $P2.'value'()
+    is($S0, 'bar', 'HashIteratorKey.value works')
 .end
 
 
