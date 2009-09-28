@@ -22,7 +22,7 @@
     exports = split " ", "plan test_out test_diag test_fail test_pass test_test"
     test_namespace.'export_to'(curr_namespace, exports)
 
-    plan( 93 )
+    plan( 94 )
 
     test_skip()
     test_todo()
@@ -529,6 +529,11 @@ CODE
     test_diag( 'Mismatch: expected 3 elements, received 2')
     test_test( 'failing is_deeply() for hashes differing by keys with undef values' )
 
+    right['bar'] = undef1
+    test_fail()
+    is_deeply( left, right )
+    test_diag( 'Mismatch at [foo]: expected (undef), received nonexistent')
+    test_test( 'failing is_deeply() for hashes differing by keys with undef values' )
 .end
 
 .sub test_is_deeply_mismatch
