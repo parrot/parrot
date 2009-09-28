@@ -22,7 +22,7 @@
     exports = split " ", "plan test_out test_diag test_fail test_pass test_test"
     test_namespace.'export_to'(curr_namespace, exports)
 
-    plan( 89 )
+    plan( 93 )
 
     test_skip()
     test_todo()
@@ -393,6 +393,7 @@ CODE
 .sub test_is_deeply
     test_is_deeply_array()
     test_is_deeply_hash()
+    test_is_deeply_hash_tt763()
     test_is_deeply_mismatch()
     test_is_deeply_nested()
 .end
@@ -443,9 +444,13 @@ CODE
 .sub test_is_deeply_hash
     .local pmc left
     .local pmc right
+    .local pmc undef1
+    .local pmc undef2
 
-    left  = new 'Hash'
-    right = new 'Hash'
+    left   = new 'Hash'
+    right  = new 'Hash'
+    undef1 = new 'Undef'
+    undef2 = new 'Undef'
 
     test_pass()
     is_deeply( left, right )
@@ -486,6 +491,44 @@ CODE
     test_pass()
     is_deeply( left, right )
     test_test( 'passing test is_deeply() for hashes created in different orders' )
+.end
+
+.sub test_is_deeply_hash_tt763
+    .local pmc left
+    .local pmc right
+    .local pmc undef1
+    .local pmc undef2
+
+    left   = new 'Hash'
+    right  = new 'Hash'
+    undef1 = new 'Undef'
+    undef2 = new 'Undef'
+    right['undef1'] = undef1
+    left['undef2']  = undef2
+
+    test_fail()
+    is_deeply( left, right )
+    test_diag( 'Mismatch at [undef2]: expected (undef), received nonexistent' )
+    test_test( 'failing is_deeply() for undef in left, nonexistent in right' )
+
+    test_fail()
+    is_deeply( right, left )
+    test_diag( 'Mismatch at [undef1]: expected (undef), received nonexistent' )
+    test_test( 'failing is_deeply() for undef in left, nonexistent in right' )
+
+    right['undef2'] = undef2
+    left['undef1']  = undef1
+
+    test_pass()
+    is_deeply( left, right )
+    test_test( 'passing is_deeply() with undef values' )
+
+    left['foo'] = undef1
+    test_fail()
+    is_deeply( left, right )
+    test_diag( 'Mismatch: expected 3 elements, received 2')
+    test_test( 'failing is_deeply() for hashes differing by keys with undef values' )
+
 .end
 
 .sub test_is_deeply_mismatch

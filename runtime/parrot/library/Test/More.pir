@@ -519,9 +519,32 @@ This handles comparisons of array-like and hash-like structures.
 
     .local string left_value
     .local string right_value
-    right_value = pop position
-    left_value  = pop position
+    .local pmc left, right
 
+    right = pop position
+    left  = pop position
+
+ check_right_null:
+    .local int rnull
+    rnull = isnull right
+    unless rnull goto set_right
+    right_value = 'nonexistent'
+    goto check_left_null
+
+ set_right:
+    right_value = right
+
+ check_left_null:
+    .local int lnull
+    lnull = isnull left
+    unless lnull goto set_left
+    left_value = 'undef'
+    goto create_diag
+
+ set_left:
+    left_value = left
+
+ create_diag:
     .local string nested_path
     nested_path = join '][', position
 
