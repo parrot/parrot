@@ -21,13 +21,13 @@ Tests the ParrotInterpreter PMC.
 .sub main :main
 .include 'test_more.pir'
 
-    plan(10)
+    plan(11)
     test_new()      # 1 test
     test_hll_map()  # 2 tests
 
 # Need for testing
 .annotate 'foo', 'bar'
-    test_inspect()  # 7 tests
+    test_inspect()  # 8 tests
 .end
 
 .sub test_new
@@ -84,6 +84,11 @@ Tests the ParrotInterpreter PMC.
     $P0 = interp['annotations';1]
     $S0 = $P0['foo']
     is($S0, 'bar', 'Got ParrotInterp.annotations')
+
+    $P0 = interp['context';0]
+    $I0 = isa $P0, 'Context'
+    ok($I0, 'Got ParrotInterp.context')
+    # Add more tests for Context. E.g. it is correct Context by inspecting it.
 
     push_eh cought
     $I0 = 1

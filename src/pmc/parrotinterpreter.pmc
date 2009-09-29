@@ -430,6 +430,7 @@ Returns the PMC global value for C<key>.
 
 Introspection interface. C<key> can be:
 
+  "context"                 ... return Context PMC
   "sub"                     ... return Sub object of this subroutine
   "continuation"            ... return Continuation PMC
   "lexpad"                  ... return lexpad PMC for this sub
@@ -508,6 +509,11 @@ Introspection interface. C<key> can be:
 
         if (item == outer)
             return Parrot_pcc_get_sub(interp, ctx);
+
+        s = CONST_STRING(interp, "context");
+
+        if (Parrot_str_equal(interp, item, s))
+            return ctx;
 
         s = CONST_STRING(interp, "sub");
 
