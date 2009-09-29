@@ -18,7 +18,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan( 6 )
+    plan( 7 )
     test_bool()
     test_int()
     test_attrs()
@@ -59,4 +59,18 @@ _handler:
     is($P2,0,'got exit_code')
     getattribute $P4, $P0, 'severity'
     ok(1,'got severity')
+
+    push_eh done
+    $I0 = 1
+    getattribute $P5, $P0, 'foo'
+    $I0 = 0
+  done:
+    ok($I0, "Can't fetch non-existing aattribute")
 .end
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
