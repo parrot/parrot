@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 17;
 
 pir_output_is( <<'CODE', <<'OUT', "if/unless" );
 .sub test :main
@@ -259,6 +259,30 @@ no_such:
 .end
 CODE
 ok
+OUT
+
+pir_error_output_like( <<'CODE', <<'OUT', 'lexical redeclared in sub', todo => 'TT #1073' );
+.sub 'main' :main
+    .lex 'foo', $P0
+    $P1 = box 'ok 1'
+    store_lex 'foo', $P1
+
+    $P2 = find_lex 'foo'
+    say $P2
+
+    .lex 'bar', $P3
+    $P4 = box 'ok 2'
+    store_lex 'bar', $P4
+
+    $P5 = find_lex 'bar'
+    say $P5
+
+    .lex 'foo', $P6
+    $P7 = box 'ok 3'
+    store_lex 'foo', $P7
+.end
+CODE
+/Lexical 'foo' already declared/
 OUT
 
 # Local Variables:
