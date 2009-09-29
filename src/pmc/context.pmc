@@ -234,7 +234,7 @@ sub, or for the point of the call a level deeper for the rest.
 
                 if (sub->seg->annotations) {
                     PackFile_ByteCode *seg = sub->seg;
-                    opcode_t          *pc  = cont && cur_ctx == cont->to_ctx 
+                    opcode_t          *pc  = cont && cur_ctx == cont->to_ctx
                                              ? cont->address
                                              : Parrot_pcc_get_pc(interp, cur_ctx);
 
