@@ -812,7 +812,7 @@ $(PIRC) : $(PARROT)
 	$(CP) compilers/pirc/pirc$(EXE) $(PIRC)
 	$(CHMOD) 0755 $(PIRC)
 
-$(NQP) : $(PBC_TO_EXE) compilers/nqp/nqp.pbc
+$(NQP) : $(PBC_TO_EXE) compilers.dummy
 	$(CP) compilers/nqp/nqp.pbc parrot_nqp.pbc
 	$(PBC_TO_EXE) parrot_nqp.pbc
 
