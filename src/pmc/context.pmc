@@ -139,6 +139,52 @@ Set new Parrot_Context structure.
     VTABLE void set_pointer(void *context) {
         PMC_data(SELF) = context;
     }
+
+/*
+
+=item C<PMC *get_pmc_keyed_str(STRING *key)>
+
+Introspection interface. C<key> can be:
+
+    caller_ctx          ... return Caller Context
+    lex_pad             ... return LexPad
+    outer_ctx           ... return Outer Context
+    current_sub         ... return current Sub
+    handlers            ... return list of ExceptioHandlers
+    current_cont        ... return current Continuation
+    current_object      ... return current Object (if in method call)
+    current_namespace   ... return current Namespace
+=cut
+
+*/
+    VTABLE PMC *get_pmc_keyed_str(STRING *key) {
+        Parrot_Context *ctx = PMC_data_typed(SELF, Parrot_Context*);
+
+        if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "caller_ctx")))
+            return ctx->caller_ctx;
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "lex_pad")))
+            return ctx->lex_pad;
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "outer_ctx")))
+            return ctx->outer_ctx;
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "current_sub")))
+            return ctx->current_sub;
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "current_cont")))
+            return ctx->current_cont;
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "current_object")))
+            return ctx->current_object;
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "current_namespace")))
+            return ctx->current_namespace;
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "handlers")))
+            return ctx->handlers;
+
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
+                "No such item %Ss", key);
+    }
+
+    VTABLE PMC *get_pmc_keyed(PMC *key) {
+        return STATICSELF.get_pmc_keyed_str(VTABLE_get_string(INTERP, key));
+    }
+
 }
 
 /*
