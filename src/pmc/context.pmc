@@ -181,6 +181,8 @@ Introspection interface. C<key> can be:
             /* This function from src/hash.c. */
             /* We probably have to move it to more suitable place */
             return get_integer_pmc(INTERP, ctx->current_HLL);
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "current_hll")))
+            return get_string_pmc(INTERP, Parrot_get_HLL_name(INTERP, ctx->current_HLL));
 
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
                 "No such item %Ss", key);

@@ -30,7 +30,7 @@ TODO: Implement real tests when Context PMC will be migrated to use ATTRibutes.
     $P0 = get_hll_global ['Foo'], 'load'
     $P0()
     $P0 = new ['Foo']
-    $P0.'test_inspect'() # 15 tests
+    $P0.'test_inspect'() # 16 tests
 
     test_backtrace()     # 3 tests
 .end
@@ -121,6 +121,9 @@ TODO: Implement real tests when Context PMC will be migrated to use ATTRibutes.
     $P0 = ctx['current_HLL']
     $I0 = $P0
     ok($I0, 'Got Context.current_HLL')
+    
+    $P0 = ctx['current_hll']
+    ok($P0, 'FOO', 'Got Context.current_hll')
 
   done:
     pop_eh
