@@ -203,14 +203,12 @@ sub, or for the point of the call a level deeper for the rest.
 
 =cut
 
-XXX Stolen from Exception.backtrace. Only one difference in handling C<cont>
-TODO Investigate and implement Exception.backtrace in terms of Context.backtrace.
-
 */
 
-    METHOD backtrace() {
+    METHOD backtrace(PMC *resume :optional, INTVAL has_resume :opt_flag) {
         PMC *result  = pmc_new(interp, enum_class_ResizablePMCArray);
         PMC *cur_ctx = SELF;
+        Parrot_Continuation_attributes *cont = has_resume ? PMC_cont(resume) : NULL;
 
         /* Get starting context, then loop over them. */
         while (cur_ctx) {
@@ -232,7 +230,9 @@ TODO Investigate and implement Exception.backtrace in terms of Context.backtrace
 
                 if (sub->seg->annotations) {
                     PackFile_ByteCode *seg = sub->seg;
-                    opcode_t          *pc  = Parrot_pcc_get_pc(interp, cur_ctx);
+                    opcode_t          *pc  = cont && cur_ctx == cont->to_ctx 
+                                             ? cont->address
+                                             : Parrot_pcc_get_pc(interp, cur_ctx);
 
                     annotations = PackFile_Annotations_lookup(interp,
                         seg->annotations, pc - seg->base.data,
