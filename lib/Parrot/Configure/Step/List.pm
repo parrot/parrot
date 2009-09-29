@@ -42,7 +42,6 @@ my @steps = qw(
     auto::jit
     auto::frames
     auto::cpu
-    auto::funcptr
     auto::cgoto
     auto::inline
     auto::gc
