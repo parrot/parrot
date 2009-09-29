@@ -18,10 +18,12 @@ TODO: Implement real tests when Context PMC will be migrated to use ATTRibutes.
 
 =cut
 
+.HLL 'FOO'
+
 .sub main :main
     .include 'test_more.pir'
 
-    plan(15)
+    plan(16)
 
     test_new()
 
@@ -114,6 +116,10 @@ TODO: Implement real tests when Context PMC will be migrated to use ATTRibutes.
     pop_eh
     ok($I0, "No world domination in this Context")
 
+    # Current HLL shouldn't be zero
+    $P0 = ctx['current_HLL']
+    $I0 = $P0
+    ok($I0, 'Got Context.current_HLL')
 
   done:
     pop_eh
