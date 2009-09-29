@@ -23,15 +23,16 @@ TODO: Implement real tests when Context PMC will be migrated to use ATTRibutes.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(16)
+    plan(19)
 
     test_new()
 
     $P0 = get_hll_global ['Foo'], 'load'
     $P0()
     $P0 = new ['Foo']
-    $P0.'test_inspect'()
+    $P0.'test_inspect'() # 15 tests
 
+    test_backtrace()     # 3 tests
 .end
 
 .sub 'test_new'
@@ -124,6 +125,37 @@ TODO: Implement real tests when Context PMC will be migrated to use ATTRibutes.
   done:
     pop_eh
 
+.end
+
+.namespace []
+
+.sub 'test_backtrace'
+    .local pmc bt
+    bt = 'test_bt1'()
+    $I0 = defined bt
+    ok($I0, "Got Context.backtrace()")
+
+    # We should have more than 3 elements
+    $I0 = elements bt
+    $I1 = $I0 > 3
+    ok($I1, "... got enough elements")
+
+    # First one should be "test_bt2"
+    $P1 = shift bt
+    $P2 = $P1['sub']
+    is($P2, 'test_bt2', "... with correct first element")
+.end
+
+.sub 'test_bt1'
+    $P0 = 'test_bt2'()
+    .return ($P0)
+.end
+
+.sub 'test_bt2'
+    $P0 = getinterp
+    $P1 = $P0['context']
+    $P2 = $P1.'backtrace'()
+    .return ($P2)
 .end
 
 # Local Variables:
