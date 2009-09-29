@@ -177,6 +177,8 @@ Introspection interface. C<key> can be:
             return ctx->current_namespace;
         else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "handlers")))
             return ctx->handlers;
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "results_signature")))
+            return ctx->results_signature;
         else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "current_HLL")))
             /* This function from src/hash.c. */
             /* We probably have to move it to more suitable place */
