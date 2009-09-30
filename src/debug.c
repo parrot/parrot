@@ -80,9 +80,6 @@ static PDB_breakpoint_t * current_breakpoint(ARGIN(PDB_t * pdb))
 static void debugger_cmdline(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void dump_string(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
-        __attribute__nonnull__(1);
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PARROT_OBSERVER
@@ -167,8 +164,6 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
 #define ASSERT_ARGS_current_breakpoint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pdb))
 #define ASSERT_ARGS_debugger_cmdline __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_dump_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_GDB_P __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
