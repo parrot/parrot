@@ -35,6 +35,10 @@ Get "key".
     VTABLE PMC* get_pmc() {
         Parrot_HashIteratorKey_attributes *attrs =
                 PARROT_HASHITERATORKEY(SELF);
+        
+        /* XXX Wallpapering problem with NULL attributes */
+        if (!attrs->parrot_hash || !attrs->bucket)
+            return PMCNULL;
 
         return hash_key_to_pmc(INTERP, attrs->parrot_hash, attrs->bucket->key);
     }
@@ -59,6 +63,10 @@ Get "key".
     VTABLE STRING* get_string() {
         Parrot_HashIteratorKey_attributes *attrs =
                 PARROT_HASHITERATORKEY(SELF);
+
+        /* XXX Wallpapering problem with NULL attributes */
+        if (!attrs->parrot_hash || !attrs->bucket)
+            return CONST_STRING(INTERP, "");
 
         return hash_key_to_string(INTERP, attrs->parrot_hash, attrs->bucket->key);
     }
