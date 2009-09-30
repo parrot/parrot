@@ -18,10 +18,23 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan( 7 )
+    plan( 9 )
     test_bool()
     test_int()
     test_attrs()
+    test_push_pop_eh()
+.end
+
+.sub test_push_pop_eh
+    push_eh handler
+    ok(1,'push_eh works')
+
+    pop_eh
+    ok(1,'pop_eh works')
+    .return()
+
+  handler:
+    say "i am the decider"
 .end
 
 .sub test_bool
