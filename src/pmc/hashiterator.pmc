@@ -230,9 +230,8 @@ the next one.
                 "StopIteration");
 
         ret = pmc_new(INTERP, enum_class_HashIteratorKey);
-        /* Poke directly into HIK. We don't want to create any kind of public API for this */
-        PARROT_HASHITERATORKEY(ret)->parrot_hash = attrs->parrot_hash;
-        PARROT_HASHITERATORKEY(ret)->bucket      = attrs->bucket;
+        VTABLE_set_pointer_keyed_int(INTERP, ret, 0, attrs->parrot_hash);
+        VTABLE_set_pointer_keyed_int(INTERP, ret, 1, attrs->bucket);
 
         /* Move to next bucket */
         advance_to_next(INTERP, SELF);

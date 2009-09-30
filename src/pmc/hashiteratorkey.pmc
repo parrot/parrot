@@ -35,6 +35,7 @@ Get "key".
     VTABLE PMC* get_pmc() {
         Parrot_HashIteratorKey_attributes *attrs =
                 PARROT_HASHITERATORKEY(SELF);
+
         return hash_key_to_pmc(INTERP, attrs->parrot_hash, attrs->bucket->key);
     }
 
@@ -62,6 +63,28 @@ Get "key".
         return hash_key_to_string(INTERP, attrs->parrot_hash, attrs->bucket->key);
     }
 
+/*
+
+=item C<set_pointer_keyed_int()>
+
+Set pointers to Hash and HashBucket. Not really part of public API.
+
+=cut
+
+*/
+    VTABLE void set_pointer_keyed_int(INTVAL key, void *value) {
+        Parrot_HashIteratorKey_attributes *attrs =
+                PARROT_HASHITERATORKEY(SELF);
+
+        PARROT_ASSERT(value || !"Can't set NULL pointer into HashIteratorKey");
+
+        if (key == 0) {
+            attrs->parrot_hash = (Hash*)value;
+        }
+        else if (key == 1) {
+            attrs->bucket = (HashBucket*)value;
+        }
+    }
 
 }
 

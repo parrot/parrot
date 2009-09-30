@@ -181,9 +181,8 @@ the next one.
 
         /* Reuse HashIteratorKey */
         ret = pmc_new(INTERP, enum_class_HashIteratorKey);
-        /* Poke directly into HIK. We don't want to create any kind of public API for this */
-        PARROT_HASHITERATORKEY(ret)->parrot_hash = attrs->parrot_hash;
-        PARROT_HASHITERATORKEY(ret)->bucket      = bucket;
+        VTABLE_set_pointer_keyed_int(INTERP, ret, 0, attrs->parrot_hash);
+        VTABLE_set_pointer_keyed_int(INTERP, ret, 1, bucket);
 
         return ret;
     }
@@ -216,9 +215,8 @@ the next one for reverse iterator.
 
         /* Reuse HashIteratorKey */
         ret = pmc_new(INTERP, enum_class_HashIteratorKey);
-        /* Poke directly into HIK. We don't want to create any kind of public API for this */
-        PARROT_HASHITERATORKEY(ret)->parrot_hash = attrs->parrot_hash;
-        PARROT_HASHITERATORKEY(ret)->bucket      = bucket;
+        VTABLE_set_pointer_keyed_int(INTERP, ret, 0, attrs->parrot_hash);
+        VTABLE_set_pointer_keyed_int(INTERP, ret, 1, bucket);
 
         return ret;
     }
