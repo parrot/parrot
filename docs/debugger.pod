@@ -76,6 +76,20 @@ source code (see L</FILES> below).
 
 =over 4
 
+=item assign
+
+Assign to a Parrot register. For example:
+
+    (pdb)    a I0 42
+
+        I0 = 42
+
+    (pdb)    a N1 3.14
+
+        N1 = 3.14
+
+The first command sets I0 to 42 and the second sets N1 to 3.14.
+
 =item disassemble
 
 Disassemble a loaded bytecode file. This will turn a file loaded with C<load>
