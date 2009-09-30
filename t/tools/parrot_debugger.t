@@ -240,6 +240,12 @@ pdb_output_like( <<PIR, "pir", "t\na I0 17", qr/I0 = 17/, 'assign to an integer 
 .end
 PIR
 
+pdb_output_like( <<PIR, "pir", "t\na i0 17", qr/I0 = 17/, 'assign to an integer register (lowercase)');
+.sub main :main
+    \$I0 = 242
+.end
+PIR
+
 pdb_output_like( <<PIR, "pir", "a Z0 42", qr/Invalid register type Z/, 'assign to an invalid register');
 .sub main :main
     \$I0 = 242
@@ -295,7 +301,7 @@ pdb_output_like( <<PIR, "pir", "t\nw I0 == 2\nt", qr/Adding watchpoint/, 'watchp
 .end
 PIR
 
-BEGIN { $tests += 44 }
+BEGIN { $tests += 45 }
 
 BEGIN { plan tests => $tests; }
 

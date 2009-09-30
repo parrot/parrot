@@ -3221,7 +3221,7 @@ PDB_assign(PARROT_INTERP, ARGIN(const char *command))
         Parrot_io_eprintf(debugger, "Must give a register number and value to assign\n");
         return;
     }
-    reg_type_id = (char) command[0];
+    reg_type_id = (unsigned char) toupper((unsigned char) command[0]);
     command++;
     register_num = get_ulong(&command, 0);
 
