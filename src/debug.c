@@ -86,14 +86,14 @@ static void dump_string(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PARROT_OBSERVER
-static const char* GDB_P(PARROT_INTERP, ARGIN(const char *s))
+static STRING * GDB_P(PARROT_INTERP, ARGIN(const char *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PARROT_OBSERVER
-static const char* GDB_print_reg(PARROT_INTERP, int t, int n)
+static STRING * GDB_print_reg(PARROT_INTERP, int t, int n)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
@@ -2629,16 +2629,18 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
         case PARROT_ARG_SC:
             dest[size++] = '"';
             if (interp->code->const_table->constants[op[j]]-> u.string->strlen) {
+                char * const unescaped =
+                    Parrot_str_to_cstring(interp, interp->code->
+                           const_table->constants[op[j]]->u.string);
                 char * const escaped =
-                    PDB_escape(interp->code->const_table->
-                           constants[op[j]]->u.string->strstart,
-                           interp->code->const_table->
+                    PDB_escape(unescaped, interp->code->const_table->
                            constants[op[j]]->u.string->strlen);
                 if (escaped) {
                     strcpy(&dest[size], escaped);
                     size += strlen(escaped);
                     mem_sys_free(escaped);
                 }
+                Parrot_str_free_cstring(unescaped);
             }
             dest[size++] = '"';
             break;
@@ -3259,7 +3261,7 @@ PDB_assign(PARROT_INTERP, ARGIN(const char *command))
         default: ; /* Must never come here */
     }
     Parrot_io_eprintf(debugger, "\n  %c%u = ", reg_type_id, register_num);
-    Parrot_io_eprintf(debugger, "%s\n", GDB_print_reg(debugee, reg_type, register_num));
+    Parrot_io_eprintf(debugger, "%Ss\n", GDB_print_reg(debugee, reg_type, register_num));
 }
 
 /*
@@ -3422,10 +3424,10 @@ void
 PDB_print(PARROT_INTERP, ARGIN(const char *command))
 {
     ASSERT_ARGS(PDB_print)
-    const char * const s = GDB_P(interp->pdb->debugee, command);
+    const STRING *s = GDB_P(interp->pdb->debugee, command);
 
     TRACEDEB_MSG("PDB_print");
-    Parrot_io_eprintf(interp, "%s\n", s);
+    Parrot_io_eprintf(interp, "%Ss\n", s);
 }
 
 
@@ -3641,7 +3643,7 @@ PDB_backtrace(PARROT_INTERP)
 
 /*
 
-=item C<static const char* GDB_print_reg(PARROT_INTERP, int t, int n)>
+=item C<static STRING * GDB_print_reg(PARROT_INTERP, int t, int n)>
 
 Used by GDB_P to convert register values for display.  Takes register
 type and number as arguments.
@@ -3656,7 +3658,7 @@ print directly and return "").
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PARROT_OBSERVER
-static const char*
+static STRING *
 GDB_print_reg(PARROT_INTERP, int t, int n)
 {
     ASSERT_ARGS(GDB_print_reg)
@@ -3665,32 +3667,32 @@ GDB_print_reg(PARROT_INTERP, int t, int n)
     if (n >= 0 && (UINTVAL)n < Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), t)) {
         switch (t) {
             case REGNO_INT:
-                return Parrot_str_from_int(interp, IREG(n))->strstart;
+                return Parrot_str_from_int(interp, IREG(n));
             case REGNO_NUM:
-                return Parrot_str_from_num(interp, NREG(n))->strstart;
+                return Parrot_str_from_num(interp, NREG(n));
             case REGNO_STR:
                 /* This hack is needed because we occasionally are told
                 that we have string registers when we actually don't */
                 string = (char *) SREG(n);
 
                 if (string == '\0')
-                    return "";
+                    return Parrot_str_new(interp, "", 0);
                 else
-                    return SREG(n)->strstart;
+                    return SREG(n);
             case REGNO_PMC:
                 /* prints directly */
                 trace_pmc_dump(interp, PREG(n));
-                return "";
+                return Parrot_str_new(interp, "", 0);
             default:
                 break;
         }
     }
-    return "no such register";
+    return Parrot_str_new(interp, "no such register", 0);
 }
 
 /*
 
-=item C<static const char* GDB_P(PARROT_INTERP, const char *s)>
+=item C<static STRING * GDB_P(PARROT_INTERP, const char *s)>
 
 Used by PDB_print to print register values.  Takes a pointer to the
 register name(s).
@@ -3704,7 +3706,7 @@ Returns "" or error message.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PARROT_OBSERVER
-static const char*
+static STRING *
 GDB_P(PARROT_INTERP, ARGIN(const char *s))
 {
     ASSERT_ARGS(GDB_P)
@@ -3723,7 +3725,7 @@ GDB_P(PARROT_INTERP, ARGIN(const char *s))
         case 'N': t = REGNO_NUM; break;
         case 'S': t = REGNO_STR; break;
         case 'P': t = REGNO_PMC; break;
-        default: return "Need a register.";
+        default: return Parrot_str_new(interp, "Need a register.", 0);
     }
     if (! s[1]) {
         /* Print all registers of this type. */
@@ -3733,16 +3735,16 @@ GDB_P(PARROT_INTERP, ARGIN(const char *s))
         for (n = 0; n < max_reg; n++) {
             /* this must be done in two chunks because PMC's print directly. */
             Parrot_io_eprintf(interp, "\n  %c%d = ", reg_type, n);
-            Parrot_io_eprintf(interp, "%s", GDB_print_reg(interp, t, n));
+            Parrot_io_eprintf(interp, "%Ss", GDB_print_reg(interp, t, n));
         }
-        return "";
+        return Parrot_str_new(interp, "", 0);
     }
     else if (s[1] && isdigit((unsigned char)s[1])) {
         const int n = atoi(s + 1);
         return GDB_print_reg(interp, t, n);
     }
     else
-        return "no such register";
+        return Parrot_str_new(interp, "no such register", 0);
 
 }
 
