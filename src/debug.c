@@ -3385,33 +3385,6 @@ PDB_compile(PARROT_INTERP, ARGIN(const char *command))
 
 /*
 
-=item C<static void dump_string(PARROT_INTERP, const STRING *s)>
-
-Dumps the buflen, flags, bufused, strlen, and offset associated with a string
-and the string itself.
-
-=cut
-
-*/
-
-static void
-dump_string(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
-{
-    ASSERT_ARGS(dump_string)
-    if (!s)
-        return;
-
-    Parrot_io_eprintf(interp, "\tBuflen  =\t%12ld\n", Buffer_buflen(s));
-    Parrot_io_eprintf(interp, "\tFlags   =\t%12ld\n", PObj_get_FLAGS(s));
-    Parrot_io_eprintf(interp, "\tBufused =\t%12ld\n", s->bufused);
-    Parrot_io_eprintf(interp, "\tStrlen  =\t%12ld\n", s->strlen);
-    Parrot_io_eprintf(interp, "\tOffset  =\t%12ld\n",
-                    (char*) s->strstart - (char*) Buffer_bufstart(s));
-    Parrot_io_eprintf(interp, "\tString  =\t%S\n", s);
-}
-
-/*
-
 =item C<void PDB_print(PARROT_INTERP, const char *command)>
 
 Print interp registers.
