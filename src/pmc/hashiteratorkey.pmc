@@ -35,7 +35,7 @@ Get "key".
     VTABLE PMC* get_pmc() {
         Parrot_HashIteratorKey_attributes *attrs =
                 PARROT_HASHITERATORKEY(SELF);
-        
+
         /* TT#1080 & TT#1081 Wallpapering problem with NULL attributes */
         if (!attrs->parrot_hash || !attrs->bucket)
             return PMCNULL;
