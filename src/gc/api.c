@@ -1051,11 +1051,7 @@ Parrot_gc_destroy_header_pools(PARROT_INTERP)
      * COW refcount is done, in 2. refcounting
      * in 3rd freeing
      */
-#ifdef GC_IS_MALLOC
-    const INTVAL start = 0;
-#else
     const INTVAL start = 2;
-#endif
 
     header_pools_iterate_callback(interp, POOL_PMC, NULL, sweep_cb_pmc);
     header_pools_iterate_callback(interp, POOL_PMC | POOL_CONST, NULL,
@@ -1135,21 +1131,9 @@ sweep_cb_buf(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool), SHIM(int flag),
         ARGIN(void *arg))
 {
     ASSERT_ARGS(sweep_cb_buf)
-#ifdef GC_IS_MALLOC
-    const int pass = (int)(INTVAL)arg;
-
-    if (pass == 0)
-        clear_cow(interp, pool, 1);
-    else if (pass == 1)
-        used_cow(interp, pool, 1);
-    else
-#endif
-
-    {
-        UNUSED(arg);
-        Parrot_gc_sweep_pool(interp, pool);
-        free_pool(pool);
-    }
+    UNUSED(arg);
+    Parrot_gc_sweep_pool(interp, pool);
+    free_pool(pool);
 
     return 0;
 }

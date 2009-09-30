@@ -230,11 +230,6 @@ Parrot_str_set(PARROT_INTERP, ARGIN_NULLOK(STRING *dest), ARGMOD(STRING *src))
         return dest;
     if (dest) { /* && dest != src */
         /* they are different, dest is not an external string */
-#ifdef GC_IS_MALLOC
-        if (!PObj_is_cowed_TESTALL(dest) && Buffer_bufstart(dest)) {
-            mem_sys_free(Buffer_bufallocstart(dest));
-        }
-#endif
         dest = Parrot_str_reuse_COW(interp, src, dest);
     }
     else

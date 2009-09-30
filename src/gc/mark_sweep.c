@@ -253,8 +253,7 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
 =item C<void Parrot_gc_sweep_pool(PARROT_INTERP, Fixed_Size_Pool *pool)>
 
 Puts any buffers/PMCs that are marked as "dead" or "black" onto the pool
-free list. If C<GC_IS_MALLOC>, bufstart gets freed too, if possible. Avoids
-buffers that are immune from collection (i.e. constant).
+free list.
 
 =cut
 
@@ -628,11 +627,7 @@ new_bufferlike_pool(PARROT_INTERP, size_t actual_buffer_size)
     Fixed_Size_Pool * const pool =
             new_fixed_size_obj_pool(buffer_size, num_headers);
 
-#ifdef GC_IS_MALLOC
-    pool->gc_object = free_buffer_malloc;
-#else
     pool->gc_object = (gc_object_fn_type)free_buffer;
-#endif
 
     pool->mem_pool  = interp->mem_pools->memory_pool;
     (interp->gc_sys->init_pool)(interp, pool);

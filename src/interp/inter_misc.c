@@ -173,25 +173,6 @@ Parrot_compile_file(PARROT_INTERP, ARGIN(const char *fullname), ARGOUT(STRING **
     return IMCC_compile_file_s(interp, fullname, error);
 }
 
-#ifdef GC_IS_MALLOC
-#  if 0
-struct mallinfo {
-    int arena;                  /* non-mmapped space allocated from system */
-    int ordblks;                /* number of free chunks */
-    int smblks;                 /* number of fastbin blocks */
-    int hblks;                  /* number of mmapped regions */
-    int hblkhd;                 /* space in mmapped regions */
-    int usmblks;                /* maximum total allocated space */
-    int fsmblks;                /* space available in freed fastbin blocks */
-    int uordblks;               /* total allocated space */
-    int fordblks;               /* total free space */
-    int keepcost;               /* top-most, releasable (via malloc_trim)
-                                 * space */
-};
-#  endif
-extern struct mallinfo mallinfo(void);
-#endif /* GC_IS_MALLOC */
-
 /*
 
 =item C<INTVAL interpinfo(PARROT_INTERP, INTVAL what)>
@@ -212,11 +193,6 @@ interpinfo(PARROT_INTERP, INTVAL what)
 
     switch (what) {
         case TOTAL_MEM_ALLOC:
-#ifdef GC_IS_MALLOC
-#  if 0
-            interp->memory_allocated = mallinfo().uordblks;
-#  endif
-#endif
             ret = Parrot_gc_total_memory_allocated(interp);
             break;
         case GC_MARK_RUNS:

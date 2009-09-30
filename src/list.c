@@ -995,10 +995,8 @@ get_chunk(PARROT_INTERP, ARGMOD(List *list), ARGMOD(UINTVAL *idx))
     List_chunk *chunk;
     UINTVAL i;
 
-#ifndef GC_IS_MALLOC
     if (list->collect_runs != Parrot_gc_count_collect_runs(interp))
         rebuild_chunk_list(interp, list);
-#endif
 #ifdef SLOW_AND_BORING
     /* in SLOW_AND_BORING mode, we loop through each chunk, and determine if
        idx is in the chunk using basic bounds checking. If the loop completes
