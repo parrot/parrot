@@ -64,8 +64,8 @@ may be outdated in respect to the actual debugger, so let it speak for itself).
 Most commands can be shortened to their first letter. When available, this is
 signaled by the letter in parentheses after the command name Thus, C<help (h)>
 means that the command can be given as 'help' or just 'h'. On the other hand,
-C<load> can only be given as 'load', verbatim.  And the debugger is case
-sensitive.
+C<load> can only be given as 'load', verbatim.  Debugger commands are case
+sensitive (LOAD is not a valid command) but Parrot register names are not.
 
 A blank line always repeats the last command entered.
 
@@ -88,7 +88,8 @@ Assign to a Parrot register. For example:
 
         N1 = 3.14
 
-The first command sets I0 to 42 and the second sets N1 to 3.14.
+The first command sets I0 to 42 and the second sets N1 to 3.14. Register names are not
+case sensitive, so you can use either i0 or I0 .
 
 =item disassemble
 
@@ -289,7 +290,7 @@ Example:
 
 =item print (p)
 
-Print the interpreter registers. The syntax is:
+Print the interpreter registers. Register names are not case sensitive. The syntax is:
 
   print VALUE
 
