@@ -220,7 +220,7 @@ A key is a special kind of constant used for accessing elements in complex
 variables (such as an array). A key is either an integer or a string; and it's
 always enclosed in square brackets (C<[> and C<]>).  You do not have to declare
 literal keys.  This code example stores the string "foo" in $P0 as element 5,
-and then retreives it.
+and then retrieves it.
 
 =begin PIR_FRAGMENT
 
