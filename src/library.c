@@ -779,7 +779,7 @@ Parrot_get_runtime_prefix(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_get_runtime_prefix)
     int     free_it;
-    char * const env = Parrot_getenv("PARROT_RUNTIME", &free_it);
+    char * const env = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_RUNTIME"));
 
     if (env)
         return free_it ? env : mem_sys_strdup(env);
@@ -814,7 +814,7 @@ Parrot_get_runtime_path(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_get_runtime_path)
     int     free_it;
-    char * const env = Parrot_getenv("PARROT_RUNTIME", &free_it);
+    char * const env = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_RUNTIME"));
     STRING *result;
 
     if (env)

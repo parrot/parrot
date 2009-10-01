@@ -110,9 +110,8 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
     ASSERT_ARGS(init_profiling_core)
 
     char *profile_filename, *profile_output_var;
-    int free_env_var;
 
-    profile_output_var = Parrot_getenv("PARROT_PROFILING_OUTPUT", &free_env_var);
+    profile_output_var = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_PROFILING_OUTPUT"));
 
     if (profile_output_var) {
         STRING  *lc_filename;
@@ -130,9 +129,6 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
         }
         else
             runcore->profile_fd = fopen(profile_filename, "w");
-
-        if (free_env_var)
-            mem_sys_free(profile_output_var);
     }
     else {
         runcore->profile_filename = Parrot_sprintf_c(interp, "parrot.pprof.%d", getpid());

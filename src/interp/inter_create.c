@@ -31,14 +31,16 @@ Create or destroy a Parrot interpreter
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
-static int is_env_var_set(ARGIN(const char* var))
-        __attribute__nonnull__(1);
+static int is_env_var_set(PARROT_INTERP, ARGIN(STRING* var))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void setup_default_compreg(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_is_env_var_set __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(var))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(var))
 #define ASSERT_ARGS_setup_default_compreg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -48,7 +50,7 @@ static void setup_default_compreg(PARROT_INTERP)
 
 /*
 
-=item C<static int is_env_var_set(const char* var)>
+=item C<static int is_env_var_set(PARROT_INTERP, STRING* var)>
 
 Checks whether the specified environment variable is set.
 
@@ -58,11 +60,11 @@ Checks whether the specified environment variable is set.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-is_env_var_set(ARGIN(const char* var))
+is_env_var_set(PARROT_INTERP, ARGIN(STRING* var))
 {
     ASSERT_ARGS(is_env_var_set)
     int free_it, retval;
-    char* const value = Parrot_getenv(var, &free_it);
+    char* const value = Parrot_getenv(interp, var);
     if (value == NULL)
         retval = 0;
     else if (*value == '\0')
@@ -148,7 +150,13 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     interp->piodata = NULL;
     Parrot_io_init(interp);
 
-    if (is_env_var_set("PARROT_GC_DEBUG")) {
+    /*
+     * Set up the string subsystem
+     * This also generates the constant string tables
+     */
+    Parrot_str_init(interp);
+
+    if (is_env_var_set(interp, CONST_STRING(interp, "PARROT_GC_DEBUG"))) {
 #if ! DISABLE_GC_DEBUG
         Interp_flags_SET(interp, PARROT_GC_DEBUG_FLAG);
 #else
@@ -156,12 +164,6 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
                 "with DISABLE_GC_DEBUG.\n");
 #endif
     }
-
-    /*
-     * Set up the string subsystem
-     * This also generates the constant string tables
-     */
-    Parrot_str_init(interp);
 
     Parrot_initialize_core_vtables(interp);
 
