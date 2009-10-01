@@ -44,8 +44,10 @@ it does exist.
 */
 
 void
-Parrot_setenv(const char *name, const char *value)
+Parrot_setenv(PARROT_INTERP, STRING *str_name, STRING *str_value)
 {
+    const char * name  = Parrot_str_to_cstring(interp, str_name);
+    const char * value = Parrot_str_to_cstring(interp, str_value);
     assert(name  != NULL);
     assert(value != NULL);
 
@@ -65,6 +67,9 @@ Parrot_setenv(const char *name, const char *value)
             strcpy(envstring, name);
             strcpy(envstring + name_len, "=");
             strcpy(envstring + name_len + 1, value);
+
+            Parrot_str_free_cstring(name);
+            Parrot_str_free_cstring(value);
 
             if (_putenv(envstring) == 0) {
                 /* success */
@@ -94,20 +99,19 @@ later.
 */
 
 char *
-Parrot_getenv(ARGIN(const char *name), NOTNULL(int *free_it))
+Parrot_getenv(PARROT_INTERP, ARGIN(STRING *str_name))
 {
+    const char *name = Parrot_str_to_cstring(interp, str_name);
     const DWORD size = GetEnvironmentVariable(name, NULL, 0);
     char *buffer     = NULL;
 
     if (size == 0) {
-        *free_it = 0;
+        Parrot_str_free_cstring(name);
         return NULL;
-    }
-    else {
-        *free_it = 1;
     }
     buffer = (char *)mem_sys_allocate(size);
     GetEnvironmentVariable(name, buffer, size);
+    Parrot_str_free_cstring(name);
 
     return buffer;
 }
@@ -123,13 +127,15 @@ Deletes an environment variable by assigning an empty string to the specified va
 */
 
 void
-Parrot_unsetenv(const char *name)
+Parrot_unsetenv(PARROT_INTERP, STRING *str_name)
 {
 /* You can remove a variable from the environment by specifying an empty
    string -- in other words, by specifying only varname=.
        -- _putenv, _wputenv (CRT) documentation
 */
+    const char *name = Parrot_str_to_cstring(interp, str_name);
     Parrot_setenv(name, "");
+    Parrot_str_free_cstring(name);
 }
 
 /*
