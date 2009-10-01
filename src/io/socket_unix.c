@@ -105,7 +105,7 @@ Parrot_io_sockaddr_in(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port)
     PMC  * const sockaddr = pmc_new(interp, enum_class_Sockaddr);
 
     get_sockaddr_in(interp, sockaddr, s, port);
-    free(s);
+    Parrot_str_free_cstring(s);
     return sockaddr;
 }
 
