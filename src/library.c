@@ -640,9 +640,7 @@ Parrot_lib_add_path_from_cstring(PARROT_INTERP,
 =item C<STRING* Parrot_locate_runtime_file_str(PARROT_INTERP, STRING *file,
 enum_runtime_ft type)>
 
-Locate the full path for C<file_name> and the given file type(s). If
-successful, returns a C-string allocated with C<Parrot_str_to_cstring> or
-NULL otherwise.  Remember to free the string with C<Parrot_str_free_cstring()>.
+Locate the full path for C<file_name> and the given file type(s).
 
 The C<enum_runtime_ft type> is one or more of the types defined in
 F<include/parrot/library.h>.
