@@ -18,11 +18,13 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan( 9 )
+    plan( 12 )
     test_bool()
     test_int()
     test_attrs()
     test_push_pop_eh()
+    test_push_pop_eh_long()
+    test_push_eh_throw()
 .end
 
 .sub test_push_pop_eh
@@ -31,6 +33,30 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
     pop_eh
     ok(1,'pop_eh works')
+    .return()
+
+  handler:
+    say "i am the decider"
+.end
+
+.sub test_push_eh_throw
+    push_eh handler
+    $P0 = new ['Exception']
+    throw $P0
+    ok(0,'throw does not throw')
+
+  handler:
+    ok(1,'throw can throw')
+.end
+
+.sub test_push_pop_eh_long
+    $P0 = new ['ExceptionHandler']
+    set_addr $P0, handler
+    push_eh $P0
+    ok(1,'push_eh works (long)')
+
+    pop_eh
+    ok(1,'pop_eh works (long)')
     .return()
 
   handler:
