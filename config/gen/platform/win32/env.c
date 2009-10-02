@@ -33,9 +33,9 @@ whichever is more convenient.
 
 /*
 
-=item C<void Parrot_setenv(const char *name, const char *value)>
+=item C<void Parrot_setenv(PARROT_INTERP, STRING *str_name, STRING *str_value)>
 
-Sets the environment variable C<name> to the value C<value>. Creates the
+Sets the environment variable C<str_name> to the value C<str_value>. Creates the
 environment variable if it does not exist, and silently overwrite a variable if
 it does exist.
 
@@ -86,13 +86,11 @@ Parrot_setenv(PARROT_INTERP, STRING *str_name, STRING *str_value)
 
 /*
 
-=item C<char * Parrot_getenv(const char *name, int *free_it)>
+=item C<char * Parrot_getenv(PARROT_INTERP, STRING *str_name)>
 
-Gets the environment variable C<name>, if it exists. Returns status in
-C<free_it>. C<free_it> must be a non-null pointer to an integer to receive the
-status. Status code is 1 on success, 0 on failure. Returns the contents of the
-environment variable in a C<malloc>'d memory location that needs to be freed
-later.
+Gets the environment variable C<str_name>, if it exists. Returns the contents
+of the environment variable in a C<malloc>'d memory location that needs to be
+freed later.
 
 =cut
 
@@ -118,7 +116,7 @@ Parrot_getenv(PARROT_INTERP, ARGIN(STRING *str_name))
 
 /*
 
-=item C<void Parrot_unsetenv(const char *name)>
+=item C<void Parrot_unsetenv(PARROT_INTERP, STRING *name)>
 
 Deletes an environment variable by assigning an empty string to the specified variable.
 
