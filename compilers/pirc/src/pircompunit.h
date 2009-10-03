@@ -160,10 +160,10 @@ typedef union value {
 
 /* represent a .const or .globalconst declaration */
 typedef struct constdecl {
-    char const   *name;
-    int           global;
-    value_type    type;
-    value         val;
+    char const   *name;         /* name of the .const/.globalconst */
+    int           global;       /* flag to indicate whether it's a .globalconst or .const */
+    value_type    type;         /* selector for the value union "val" */
+    value         val;          /* the value of this .const/.globalconst */
 
 } constdecl;
 
@@ -176,10 +176,18 @@ typedef struct constant {
 
 } constant;
 
-/* for representing a label operand */
+/* for representing a label operand, as used in the following example:
+  
+  if x > y goto L1
+  
+  L1 is here the label operand, and the "goto L1" part of the above statement
+  will be represented by some offset.
+
+*/
 typedef struct label {
-    int         offset;
-    char const *name;
+    int         offset;        /* the offset that is used as the operand. */
+    char const *name;          /* name of the label that is 
+                                  (perhaps conditionally) being jumped to */
 
 } label;
 
@@ -223,7 +231,7 @@ typedef struct key_entry {
  * by which to pass the key.
  */
 typedef struct key {
-    key_entry *head;
+    key_entry *head;      /* pointer to the first key entry */
     int        keylength; /* number of entries */
 
 } key;
