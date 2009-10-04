@@ -298,7 +298,7 @@ the counter to the next iteration. A I<for> loop in C looks something like:
     ...
   }
 
-where C<i> is the counter, C<i = 1> sets the start value, C<< i <= 10 >> checks
+where C<i> is the counter, C<i = 1> sets the start value, C<<i <= 10>> checks
 the stop condition, and C<i++> steps to the next iteration.  A I<for> loop in
 PIR requires one conditional branch and two unconditional branches.
 

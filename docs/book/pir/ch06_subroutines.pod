@@ -188,7 +188,7 @@ error.
 X<named parameters>
 Named parameters are an alternative to positional parameters. Instead of
 passing parameters by their position in the string, Parrot assigns
-arguments to parameters by their name.  Consequently you may pass named
+arguments to parameters by their name.  Consequencly you may pass named
 parameters in any order.  Declare named parameters with with the
 C<:named>X<:named parameter modifier> modifier.
 
@@ -390,7 +390,7 @@ PMC.  If you call a program F<args.pir>, passing it three arguments:
 
   $ parrot args.pir foo bar baz
 
-... they will be accessible at index 1, 2, and 3 of the PMC parameter.N<Index 0
+... they will be accesible at index 1, 2, and 3 of the PMC parameter.N<Index 0
 is unused.>
 
 =begin PIR
@@ -662,7 +662,7 @@ Parrot generates this read-only information during compilation to represent
 what it knows about lexical variables. Not all subroutines get a C<LexInfo> PMC
 by default; subroutines need to indicate to Parrot that they require a
 C<LexInfo> PMC. One way to do this is with the C<.lex> directive.  Of course,
-the C<.lex> directive only works for languages that know the names of their
+the C<.lex> directive only works for languages that know the names of there
 lexical variables at compile time. Languages where this information is not
 available can mark the subroutine with C<:lex> instead.
 
