@@ -20,8 +20,9 @@ use base qw(Parrot::Configure::Step);
 
 use Config;
 use FindBin;    # see build_dir
-use Parrot::Configure::Step;
 use Parrot::BuildUtil;
+use Parrot::Configure::Step;
+use Parrot::Harness::DefaultTests ();
 use Cwd qw(abs_path);
 use File::Spec;
 
@@ -266,6 +267,8 @@ sub runstep {
     # remember corrected archname - jit.pm was using $Config('archname')
     _64_bit_adjustments($conf);
 
+    _set_default_tests($conf);
+
     return 1;
 }
 
@@ -297,6 +300,20 @@ sub _64_bit_adjustments {
         $conf->data->set( 'archname', $archname );
     }
     return 1;
+}
+
+sub _set_default_tests {
+    my $conf = shift;
+    $conf->data->set( 'runcore_tests' =>
+        ( join ' ' => @Parrot::Harness::DefaultTests::runcore_tests ) );
+    $conf->data->set( 'core_tests' =>
+        ( join ' ' => @Parrot::Harness::DefaultTests::core_tests ) );
+    $conf->data->set( 'library_tests' =>
+        ( join ' ' => @Parrot::Harness::DefaultTests::library_tests ) );
+    $conf->data->set( 'configure_tests' =>
+        ( join ' ' => @Parrot::Harness::DefaultTests::configure_tests ) );
+    $conf->data->set( 'developing_tests' =>
+        ( join ' ' => @Parrot::Harness::DefaultTests::developing_tests ) );
 }
 
 1;
