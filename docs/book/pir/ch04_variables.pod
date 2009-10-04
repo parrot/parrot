@@ -160,7 +160,7 @@ many of these opcodes require the result to be a number.
 X<logical opcodes>
 The logical opcodes evaluate the truth of their arguments.  They are most
 useful to make decisions for control flow.  Integers and numeric PMCs
-support logical are false if they're 0 and true otherwise. Strings are
+support logical, are false if they're 0 and true otherwise. Strings are
 false if they're the empty string or a single character "0", and true
 otherwise. PMCs are true when their C<get_bool>X<get_bool vtable
 function> vtable function returns a nonzero value.
