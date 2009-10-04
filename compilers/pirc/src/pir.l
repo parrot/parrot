@@ -425,7 +425,14 @@ REGISTER       "$"[SNIP]{DIGITS}
                   }
 
 {SQ_STRING}       { /* copy the string, remove the quotes. */
-                    yylval->sval = dupstrn(yyget_extra(yyscanner), yytext + 1, yyleng - 2);
+                    lexer_state * const lexer = yyget_extra(yyscanner);
+                    
+                    STRING *str = Parrot_str_unescape(lexer->interp, yytext + 1, '\'', "ascii");
+                    lexer->sval = str;
+                    
+                    yylval->sval = dupstrn(lexer, yytext + 1, yyleng - 2);
+
+                    
                     return TK_STRINGC;
                   }
 
@@ -512,6 +519,10 @@ REGISTER       "$"[SNIP]{DIGITS}
 "$I"{DIGIT}+      { yylval->ival = atoi(yytext + 2); return TK_IREG; }
 
 {IDENT}":"        { /* make the label Id available in the parser. remove the ":" first. */
+                    lexer_state * const lexer = yget_extra(yyscanner);
+                    STRING *str = Parrot_str_new(lexer->interp, yytext, yyleng - 1);
+                    lexer->sval = str;
+                    
                     yylval->sval = dupstrn(yyget_extra(yyscanner), yytext, yyleng - 1);
                     return TK_LABEL;
                   }
@@ -532,7 +543,7 @@ REGISTER       "$"[SNIP]{DIGITS}
                     lexer_state * const lexer = yyget_extra(yyscanner);
                     constdecl   * const c = find_global_constant(lexer, yytext);
 
-                    if (c) {
+                    if (c) { /* it's  a global const */
                         switch (c->type) {
                             case INT_VAL:
                                 yylval->ival = c->val.ival;
@@ -551,7 +562,8 @@ REGISTER       "$"[SNIP]{DIGITS}
                                 break;
                         }
                     }
-
+                    lexer->sval = Parrot_str_new(lexer->interp, yytext, yyleng);
+                    					
                     yylval->sval = dupstr(lexer, yytext);
                     return TK_IDENT;
                   }
