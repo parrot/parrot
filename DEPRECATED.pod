@@ -132,7 +132,7 @@ Assigning to registers [experimental]
 
 L<https://trac.parrot.org/parrot/ticket/906>
 
-=item named class/pmc lookup in pir syntax such as new, isa, subclass, 
+=item named class/pmc lookup in pir syntax such as new, isa, subclass,
     get_class, etc [eligible in 1.1]
 
 Class PMC name resolution will be the following.
@@ -152,6 +152,10 @@ L<https://trac.parrot.org/parrot/ticket/159>
 [eligible in 1.5]
 
 L<https://trac.parrot.org/parrot/ticket/511>
+
+=item continuation-based ExceptionHandlers [eligible in 2.0]
+
+L<https://trac.parrot.org/parrot/ticket/1091>
 
 =back
 
@@ -241,7 +245,7 @@ L<https://trac.parrot.org/parrot/ticket/843>
 
 =item PCT::HLLCompiler stages [eligible in 1.1]
 
-The interface of various methods for adding, removing, and modifying 
+The interface of various methods for adding, removing, and modifying
 the list stages in a PCT::HLLCompiler object is subject to change.
 The existing actual stages will remain; only the mechanism for specifying
 the order of individual stages is likely to change.
@@ -251,7 +255,7 @@ L<https://trac.parrot.org/parrot/ticket/462>
 =item PCT::HLLCompiler from Perl 5's Test::Harness [eligible in 1.1]
 
 In order to facilitate using PCT::HLLCompiler with test harnesses,
-the C<command_line> method of PCT::HLLCompiler object exits silently 
+the C<command_line> method of PCT::HLLCompiler object exits silently
 if it detects that it is being run in a sample run from Perl's
 Test::Harness.  Currently this detection is done by checking the
 second command line argument for "@INC"; future releases may
@@ -276,7 +280,7 @@ L<https://trac.parrot.org/parrot/ticket/868>
 =item C< $(...) > syntax  [eligible in 1.5]
 
 The C< $(...) > syntax for obtaining a result object from a Match
-object will no longer work.  The new syntax is to invoke the 
+object will no longer work.  The new syntax is to invoke the
 C<.ast> method on the Match object.
 
 L<https://trac.parrot.org/parrot/ticket/459>
@@ -284,7 +288,7 @@ L<https://trac.parrot.org/parrot/ticket/459>
 =item Quoted items [eligible in 1.5]
 
 Double-quoted strings will interpret unescaped $-names
-as interpolated variables in the string.  Bare slashes 
+as interpolated variables in the string.  Bare slashes
 will introduce regular expressions.  The C<< <foo bar> >>
 syntax will produce an array of strings instead of a single
 string.
