@@ -1453,7 +1453,7 @@ test_prep : all
 test : test_core nqp_test
 
 # Test Parrot core.
-test_core: test_prep 
+test_core: test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS)
 
 # Test the NQP compiler
