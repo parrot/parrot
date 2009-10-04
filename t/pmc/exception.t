@@ -18,13 +18,35 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan( 12 )
+    plan( 14 )
     test_bool()
     test_int()
     test_attrs()
     test_push_pop_eh()
     test_push_pop_eh_long()
     test_push_eh_throw()
+    test_die()
+    test_throw_obj()
+.end
+
+.sub test_throw_obj
+    new $P20, ['ExceptionHandler']
+    set_addr $P20, _handler
+    push_eh $P20
+    new $P30, ['Exception']
+    throw $P30
+    say "not reached"
+_handler:
+    ok(1,'caught exception object thrown')
+.end
+
+.sub test_die
+    push_eh handler
+    die 3, 100
+    say "not reached"
+    .return()
+handler:
+    ok(1,'die works')
 .end
 
 .sub test_push_pop_eh

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 30;
+use Parrot::Test tests => 28;
 
 =head1 NAME
 
@@ -22,22 +22,6 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 =cut
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw, PMC exception handler" );
-    print "main\n"
-    new P20, ['ExceptionHandler']
-    set_addr P20, _handler
-    push_eh P20
-    new P30, ['Exception']
-    throw P30
-    print "not reached\n"
-    end
-_handler:
-    print "caught it\n"
-    end
-CODE
-main
-caught it
-OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "get_results" );
     print "main\n"
@@ -340,17 +324,6 @@ caught it in 1
 something happened
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUT, "die" );
-    push_eh _handler
-    die 3, 100
-    print "not reached\n"
-    end
-_handler:
-    print "caught it\n"
-    end
-CODE
-caught it
-OUT
 
 pasm_output_is( <<'CODE', <<OUT, "die, error, severity" );
     push_eh _handler
