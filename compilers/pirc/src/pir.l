@@ -519,7 +519,7 @@ REGISTER       "$"[SNIP]{DIGITS}
 "$I"{DIGIT}+      { yylval->ival = atoi(yytext + 2); return TK_IREG; }
 
 {IDENT}":"        { /* make the label Id available in the parser. remove the ":" first. */
-                    lexer_state * const lexer = yget_extra(yyscanner);
+                    lexer_state * const lexer = yyget_extra(yyscanner);
                     STRING *str = Parrot_str_new(lexer->interp, yytext, yyleng - 1);
                     lexer->sval = str;
                     

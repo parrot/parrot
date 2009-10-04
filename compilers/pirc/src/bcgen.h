@@ -50,6 +50,7 @@ typedef struct multi_type {
  */
 typedef struct lexical {
     char const     *name;     /* name of this lexical */
+    STRING         *name1;
     int            *color;    /* register assigned to the lexical */
     struct lexical *next;
 
@@ -61,11 +62,17 @@ typedef struct lexical {
  */
 typedef struct sub_info {
     char const    *subname;
+    STRING        *subname1;
     char const    *methodname;
+    STRING        *methodname1;
     char const    *nsentry;
+    STRING        *nsentry1;
     char const    *subid;
+    STRING        *subid1;
     char const    *outersub;
+    STRING        *outersub1;
     char const    *instanceof;
+    STRING        *instanceof1;
     int            vtable_index;
     unsigned       regs_used[4];
     int            startoffset;

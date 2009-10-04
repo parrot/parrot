@@ -2726,7 +2726,7 @@ case 118:
 YY_RULE_SETUP
 #line 521 "pir.l"
 { /* make the label Id available in the parser. remove the ":" first. */
-                    lexer_state * const lexer = yget_extra(yyscanner);
+                    lexer_state * const lexer = yypirget_extra(yyscanner);
                     STRING *str = Parrot_str_new(lexer->interp, yytext, yyleng - 1);
                     lexer->sval = str;
                     
