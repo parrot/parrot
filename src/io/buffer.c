@@ -173,9 +173,6 @@ INTVAL
 Parrot_io_flush_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_flush_buffer)
-    long wrote;
-    size_t to_write;
-    STRING fake;
     unsigned char *buffer_start = Parrot_io_get_buffer_start(interp, filehandle);
     unsigned char *buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
     INTVAL         buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
@@ -191,12 +188,10 @@ Parrot_io_flush_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle))
      * Write flush
      */
     if (buffer_flags & PIO_BF_WRITEBUF) {
-        to_write = buffer_next - buffer_start;
-
+        size_t  to_write = buffer_next - buffer_start;
+        STRING *s        = Parrot_str_new(interp, (char *)buffer_start, to_write);
         /* Flush to next layer */
-        fake.strstart = (char *)buffer_start;
-        fake.bufused = to_write;
-        wrote = PIO_WRITE(interp, filehandle, &fake);
+        long wrote = PIO_WRITE(interp, filehandle, s);
         if (wrote == (long)to_write) {
             Parrot_io_set_buffer_next(interp, filehandle, buffer_start);
             /* Release buffer */
