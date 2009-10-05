@@ -1648,6 +1648,7 @@ prog-clean :
     $(INSTALLABLENQP) \
     pbc_to_exe.pbc pbc_to_exe.c pbc_to_exe$(O) pbc_to_exe$(EXE) \
     parrot_config$(EXE) parrot_config.c parrot_config$(O) parrot_config.pbc \
+    parrot_nqp$(EXE) parrot_nqp.c parrot_nqp$(O) parrot_nqp.pbc \
     $(IMCC_DIR)/main$(O) \
     $(PDUMP) $(SRC_DIR)/pbc_dump$(O) $(SRC_DIR)/packdump$(O) \
     $(PDB) $(SRC_DIR)/parrot_debugger$(O) \
