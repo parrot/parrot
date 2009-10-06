@@ -10,7 +10,7 @@ config/auto/opengl.pm - Probe for OpenGL, GLU, and GLUT libraries
 =head1 DESCRIPTION
 
 Determines whether the platform supports OpenGL, GLU and GLUT.  The optimal
-result at this time is to find OpenGL 2.1, GLU 1.3, and GLUT API version 4.
+result at this time is to find OpenGL 3.2, GLU 1.3, and GLUT API version 4.
 
 You will typically need to install the headers and libraries required for
 compiling OpenGL/GLU/GLUT applications as a separate step in addition to
@@ -112,15 +112,15 @@ see L<http://www.transmissionzero.co.uk/computing/using-glut-with-mingw/>.
 
 =head3 Cygwin/X
 
-Requires a X server and F<libglut-devel>, F<libGL-devel>, F<libGLU-devel>,
+Requires an X server and F<libglut-devel>, F<libGL-devel>, F<libGLU-devel>,
 F<freeglut> and its dependencies.
 
 This is tried first.
 
 =head3 Cygwin/w32api
 
-The Cygwin/w32api for native opengl support
-is only tried if F</usr/include/GL> does not exist.
+The Cygwin/w32api for native opengl support is only tried if
+F</usr/include/GL> does not exist.
 
 The problem is that the L<NCI|pdds/draft/pdd16_native_call.pod>
 tries the header files to create the imports and not the libraries,
