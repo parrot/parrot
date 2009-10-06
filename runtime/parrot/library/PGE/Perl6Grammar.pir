@@ -103,6 +103,7 @@ the output to the correct output file.
       | '<' (<-[>]>*:) '>'
       | \xc2\xab (.*?) \xc2\xbb
       | \xab (<-[\xbb]>*:) \xbb
+      | ( 'sym<' <-[>]>*: '>' )
       | (\S+)
       ]
       END_ARG_RULE
