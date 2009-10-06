@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 38;
+use Parrot::Test tests => 41;
 
 # macro tests
 
@@ -23,6 +23,44 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'macro, zero parameters' );
 .end
 CODE
 42
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'macro, zero parameters, line number' );
+.sub test :main
+.macro answer()
+    null  $P1
+    print $P1
+.endm
+    .answer()
+    end
+.end
+CODE
+/(?s:Null PMC access .*current instr.*:4\))/
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'macro, zero parameters, line number' );
+.sub test :main
+.macro answer()
+.endm
+    null $P1
+    print $P1
+    end
+.end
+CODE
+/(?s:Null PMC access .*current instr.*:5\))/
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'macro, zero parameters, line number' );
+.sub test :main
+.macro answer()
+    null $P1
+.endm
+    .answer()
+    print $P1
+    end
+.end
+CODE
+/(?s:Null PMC access .*current instr.*:6\))/
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'macro, one unused parameter, literal term' );

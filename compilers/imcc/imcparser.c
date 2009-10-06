@@ -9,26 +9,27 @@
  */
 /* HEADERIZER HFILE: none */
 /* HEADERIZER STOP */
-
-/* A Bison parser, made by GNU Bison 2.4.1.  */
+/* A Bison parser, made by GNU Bison 2.3.  */
 
 /* Skeleton implementation for Bison's Yacc-like parsers in C
-   
-      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
+
+   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
    Free Software Foundation, Inc.
-   
-   This program is free software: you can redistribute it and/or modify
+
+   This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-   
+   the Free Software Foundation; either version 2, or (at your option)
+   any later version.
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -39,7 +40,7 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-   
+
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
@@ -57,7 +58,7 @@
 #define YYBISON 1
 
 /* Bison version.  */
-#define YYBISON_VERSION "2.4.1"
+#define YYBISON_VERSION "2.3"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -65,20 +66,261 @@
 /* Pure parsers.  */
 #define YYPURE 1
 
-/* Push parsers.  */
-#define YYPUSH 0
-
-/* Pull parsers.  */
-#define YYPULL 1
-
 /* Using locations.  */
 #define YYLSP_NEEDED 0
 
 
 
-/* Copy the first part of user declarations.  */
+/* Tokens.  */
+#ifndef YYTOKENTYPE
+# define YYTOKENTYPE
+   /* Put the tokens into the symbol table, so that GDB and other debuggers
+      know about them.  */
+   enum yytokentype {
+     LOW_PREC = 258,
+     PARAM = 259,
+     HLL = 260,
+     TK_LINE = 261,
+     TK_FILE = 262,
+     GOTO = 263,
+     ARG = 264,
+     IF = 265,
+     UNLESS = 266,
+     PNULL = 267,
+     SET_RETURN = 268,
+     SET_YIELD = 269,
+     ADV_FLAT = 270,
+     ADV_SLURPY = 271,
+     ADV_OPTIONAL = 272,
+     ADV_OPT_FLAG = 273,
+     ADV_NAMED = 274,
+     ADV_ARROW = 275,
+     NEW = 276,
+     ADV_INVOCANT = 277,
+     NAMESPACE = 278,
+     DOT_METHOD = 279,
+     SUB = 280,
+     SYM = 281,
+     LOCAL = 282,
+     LEXICAL = 283,
+     CONST = 284,
+     ANNOTATE = 285,
+     INC = 286,
+     DEC = 287,
+     GLOBAL_CONST = 288,
+     PLUS_ASSIGN = 289,
+     MINUS_ASSIGN = 290,
+     MUL_ASSIGN = 291,
+     DIV_ASSIGN = 292,
+     CONCAT_ASSIGN = 293,
+     BAND_ASSIGN = 294,
+     BOR_ASSIGN = 295,
+     BXOR_ASSIGN = 296,
+     FDIV = 297,
+     FDIV_ASSIGN = 298,
+     MOD_ASSIGN = 299,
+     SHR_ASSIGN = 300,
+     SHL_ASSIGN = 301,
+     SHR_U_ASSIGN = 302,
+     SHIFT_LEFT = 303,
+     SHIFT_RIGHT = 304,
+     INTV = 305,
+     FLOATV = 306,
+     STRINGV = 307,
+     PMCV = 308,
+     LOG_XOR = 309,
+     RELOP_EQ = 310,
+     RELOP_NE = 311,
+     RELOP_GT = 312,
+     RELOP_GTE = 313,
+     RELOP_LT = 314,
+     RELOP_LTE = 315,
+     RESULT = 316,
+     RETURN = 317,
+     TAILCALL = 318,
+     YIELDT = 319,
+     GET_RESULTS = 320,
+     POW = 321,
+     SHIFT_RIGHT_U = 322,
+     LOG_AND = 323,
+     LOG_OR = 324,
+     COMMA = 325,
+     ESUB = 326,
+     DOTDOT = 327,
+     PCC_BEGIN = 328,
+     PCC_END = 329,
+     PCC_CALL = 330,
+     PCC_SUB = 331,
+     PCC_BEGIN_RETURN = 332,
+     PCC_END_RETURN = 333,
+     PCC_BEGIN_YIELD = 334,
+     PCC_END_YIELD = 335,
+     NCI_CALL = 336,
+     METH_CALL = 337,
+     INVOCANT = 338,
+     MAIN = 339,
+     LOAD = 340,
+     INIT = 341,
+     IMMEDIATE = 342,
+     POSTCOMP = 343,
+     METHOD = 344,
+     ANON = 345,
+     OUTER = 346,
+     NEED_LEX = 347,
+     MULTI = 348,
+     VTABLE_METHOD = 349,
+     LOADLIB = 350,
+     SUB_INSTANCE_OF = 351,
+     SUBID = 352,
+     NS_ENTRY = 353,
+     UNIQUE_REG = 354,
+     LABEL = 355,
+     EMIT = 356,
+     EOM = 357,
+     IREG = 358,
+     NREG = 359,
+     SREG = 360,
+     PREG = 361,
+     IDENTIFIER = 362,
+     REG = 363,
+     MACRO = 364,
+     ENDM = 365,
+     STRINGC = 366,
+     INTC = 367,
+     FLOATC = 368,
+     USTRINGC = 369,
+     PARROT_OP = 370,
+     VAR = 371,
+     LINECOMMENT = 372,
+     FILECOMMENT = 373,
+     DOT = 374,
+     CONCAT = 375
+   };
+#endif
+/* Tokens.  */
+#define LOW_PREC 258
+#define PARAM 259
+#define HLL 260
+#define TK_LINE 261
+#define TK_FILE 262
+#define GOTO 263
+#define ARG 264
+#define IF 265
+#define UNLESS 266
+#define PNULL 267
+#define SET_RETURN 268
+#define SET_YIELD 269
+#define ADV_FLAT 270
+#define ADV_SLURPY 271
+#define ADV_OPTIONAL 272
+#define ADV_OPT_FLAG 273
+#define ADV_NAMED 274
+#define ADV_ARROW 275
+#define NEW 276
+#define ADV_INVOCANT 277
+#define NAMESPACE 278
+#define DOT_METHOD 279
+#define SUB 280
+#define SYM 281
+#define LOCAL 282
+#define LEXICAL 283
+#define CONST 284
+#define ANNOTATE 285
+#define INC 286
+#define DEC 287
+#define GLOBAL_CONST 288
+#define PLUS_ASSIGN 289
+#define MINUS_ASSIGN 290
+#define MUL_ASSIGN 291
+#define DIV_ASSIGN 292
+#define CONCAT_ASSIGN 293
+#define BAND_ASSIGN 294
+#define BOR_ASSIGN 295
+#define BXOR_ASSIGN 296
+#define FDIV 297
+#define FDIV_ASSIGN 298
+#define MOD_ASSIGN 299
+#define SHR_ASSIGN 300
+#define SHL_ASSIGN 301
+#define SHR_U_ASSIGN 302
+#define SHIFT_LEFT 303
+#define SHIFT_RIGHT 304
+#define INTV 305
+#define FLOATV 306
+#define STRINGV 307
+#define PMCV 308
+#define LOG_XOR 309
+#define RELOP_EQ 310
+#define RELOP_NE 311
+#define RELOP_GT 312
+#define RELOP_GTE 313
+#define RELOP_LT 314
+#define RELOP_LTE 315
+#define RESULT 316
+#define RETURN 317
+#define TAILCALL 318
+#define YIELDT 319
+#define GET_RESULTS 320
+#define POW 321
+#define SHIFT_RIGHT_U 322
+#define LOG_AND 323
+#define LOG_OR 324
+#define COMMA 325
+#define ESUB 326
+#define DOTDOT 327
+#define PCC_BEGIN 328
+#define PCC_END 329
+#define PCC_CALL 330
+#define PCC_SUB 331
+#define PCC_BEGIN_RETURN 332
+#define PCC_END_RETURN 333
+#define PCC_BEGIN_YIELD 334
+#define PCC_END_YIELD 335
+#define NCI_CALL 336
+#define METH_CALL 337
+#define INVOCANT 338
+#define MAIN 339
+#define LOAD 340
+#define INIT 341
+#define IMMEDIATE 342
+#define POSTCOMP 343
+#define METHOD 344
+#define ANON 345
+#define OUTER 346
+#define NEED_LEX 347
+#define MULTI 348
+#define VTABLE_METHOD 349
+#define LOADLIB 350
+#define SUB_INSTANCE_OF 351
+#define SUBID 352
+#define NS_ENTRY 353
+#define UNIQUE_REG 354
+#define LABEL 355
+#define EMIT 356
+#define EOM 357
+#define IREG 358
+#define NREG 359
+#define SREG 360
+#define PREG 361
+#define IDENTIFIER 362
+#define REG 363
+#define MACRO 364
+#define ENDM 365
+#define STRINGC 366
+#define INTC 367
+#define FLOATC 368
+#define USTRINGC 369
+#define PARROT_OP 370
+#define VAR 371
+#define LINECOMMENT 372
+#define FILECOMMENT 373
+#define DOT 374
+#define CONCAT 375
 
-/* Line 189 of yacc.c  */
+
+
+
+/* Copy the first part of user declarations.  */
 #line 1 "compilers/imcc/imcc.y"
 
 /*
@@ -331,91 +573,91 @@ static void set_lexical(PARROT_INTERP,
         FUNC_MODIFIES(*r)
         FUNC_MODIFIES(*name);
 
-#define ASSERT_ARGS_add_pcc_named_arg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_add_pcc_named_arg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(cur_call) \
-    && PARROT_ASSERT_ARG(name) \
-    && PARROT_ASSERT_ARG(value)
-#define ASSERT_ARGS_add_pcc_named_arg_var __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_add_pcc_named_arg_var __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(cur_call) \
-    && PARROT_ASSERT_ARG(name) \
-    && PARROT_ASSERT_ARG(value)
-#define ASSERT_ARGS_add_pcc_named_param __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_add_pcc_named_param __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(cur_call) \
-    && PARROT_ASSERT_ARG(name) \
-    && PARROT_ASSERT_ARG(value)
-#define ASSERT_ARGS_add_pcc_named_result __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_add_pcc_named_result __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(cur_call) \
-    && PARROT_ASSERT_ARG(name) \
-    && PARROT_ASSERT_ARG(value)
-#define ASSERT_ARGS_add_pcc_named_return __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_add_pcc_named_return __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(cur_call) \
-    && PARROT_ASSERT_ARG(name) \
-    && PARROT_ASSERT_ARG(value)
-#define ASSERT_ARGS_adv_named_set __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_adv_named_set __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(name)
-#define ASSERT_ARGS_adv_named_set_u __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_adv_named_set_u __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(name)
-#define ASSERT_ARGS_begin_return_or_yield __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_clear_state __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_do_loadlib __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_begin_return_or_yield __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_clear_state __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_do_loadlib __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(lib)
-#define ASSERT_ARGS_func_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(lib))
+#define ASSERT_ARGS_func_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(unit) \
-    && PARROT_ASSERT_ARG(lhs) \
-    && PARROT_ASSERT_ARG(op) \
-    && PARROT_ASSERT_ARG(r)
-#define ASSERT_ARGS_iINDEXFETCH __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(unit) \
+    , PARROT_ASSERT_ARG(lhs) \
+    , PARROT_ASSERT_ARG(op) \
+    , PARROT_ASSERT_ARG(r))
+#define ASSERT_ARGS_iINDEXFETCH __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(unit) \
-    && PARROT_ASSERT_ARG(r0) \
-    && PARROT_ASSERT_ARG(r1) \
-    && PARROT_ASSERT_ARG(r2)
-#define ASSERT_ARGS_iINDEXSET __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(unit) \
+    , PARROT_ASSERT_ARG(r0) \
+    , PARROT_ASSERT_ARG(r1) \
+    , PARROT_ASSERT_ARG(r2))
+#define ASSERT_ARGS_iINDEXSET __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(unit) \
-    && PARROT_ASSERT_ARG(r0) \
-    && PARROT_ASSERT_ARG(r1) \
-    && PARROT_ASSERT_ARG(r2)
-#define ASSERT_ARGS_iLABEL __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(unit) \
+    , PARROT_ASSERT_ARG(r0) \
+    , PARROT_ASSERT_ARG(r1) \
+    , PARROT_ASSERT_ARG(r2))
+#define ASSERT_ARGS_iLABEL __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(r0)
-#define ASSERT_ARGS_inv_op __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(op)
-#define ASSERT_ARGS_iSUBROUTINE __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(r0))
+#define ASSERT_ARGS_inv_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(op))
+#define ASSERT_ARGS_iSUBROUTINE __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(r)
-#define ASSERT_ARGS_MK_I __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(r))
+#define ASSERT_ARGS_MK_I __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(unit) \
-    && PARROT_ASSERT_ARG(fmt)
-#define ASSERT_ARGS_mk_pmc_const __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(unit) \
+    , PARROT_ASSERT_ARG(fmt))
+#define ASSERT_ARGS_mk_pmc_const __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(unit) \
-    && PARROT_ASSERT_ARG(type) \
-    && PARROT_ASSERT_ARG(left) \
-    && PARROT_ASSERT_ARG(constant)
-#define ASSERT_ARGS_mk_pmc_const_named __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(unit) \
+    , PARROT_ASSERT_ARG(type) \
+    , PARROT_ASSERT_ARG(left) \
+    , PARROT_ASSERT_ARG(constant))
+#define ASSERT_ARGS_mk_pmc_const_named __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(unit) \
-    && PARROT_ASSERT_ARG(name) \
-    && PARROT_ASSERT_ARG(left) \
-    && PARROT_ASSERT_ARG(constant)
-#define ASSERT_ARGS_mk_sub_address_fromc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(unit) \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(left) \
+    , PARROT_ASSERT_ARG(constant))
+#define ASSERT_ARGS_mk_sub_address_fromc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(name)
-#define ASSERT_ARGS_mk_sub_address_u __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_mk_sub_address_u __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(name)
-#define ASSERT_ARGS_set_lexical __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_set_lexical __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    && PARROT_ASSERT_ARG(r) \
-    && PARROT_ASSERT_ARG(name)
+    , PARROT_ASSERT_ARG(r) \
+    , PARROT_ASSERT_ARG(name))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -1128,9 +1370,6 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 
 
 
-/* Line 189 of yacc.c  */
-#line 1122 "compilers/imcc/imcparser.c"
-
 /* Enabling traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -1149,285 +1388,31 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 # define YYTOKEN_TABLE 0
 #endif
 
-
-/* Tokens.  */
-#ifndef YYTOKENTYPE
-# define YYTOKENTYPE
-   /* Put the tokens into the symbol table, so that GDB and other debuggers
-      know about them.  */
-   enum yytokentype {
-     LOW_PREC = 258,
-     PARAM = 259,
-     HLL = 260,
-     TK_LINE = 261,
-     TK_FILE = 262,
-     GOTO = 263,
-     ARG = 264,
-     IF = 265,
-     UNLESS = 266,
-     PNULL = 267,
-     SET_RETURN = 268,
-     SET_YIELD = 269,
-     ADV_FLAT = 270,
-     ADV_SLURPY = 271,
-     ADV_OPTIONAL = 272,
-     ADV_OPT_FLAG = 273,
-     ADV_NAMED = 274,
-     ADV_ARROW = 275,
-     NEW = 276,
-     ADV_INVOCANT = 277,
-     NAMESPACE = 278,
-     DOT_METHOD = 279,
-     SUB = 280,
-     SYM = 281,
-     LOCAL = 282,
-     LEXICAL = 283,
-     CONST = 284,
-     ANNOTATE = 285,
-     INC = 286,
-     DEC = 287,
-     GLOBAL_CONST = 288,
-     PLUS_ASSIGN = 289,
-     MINUS_ASSIGN = 290,
-     MUL_ASSIGN = 291,
-     DIV_ASSIGN = 292,
-     CONCAT_ASSIGN = 293,
-     BAND_ASSIGN = 294,
-     BOR_ASSIGN = 295,
-     BXOR_ASSIGN = 296,
-     FDIV = 297,
-     FDIV_ASSIGN = 298,
-     MOD_ASSIGN = 299,
-     SHR_ASSIGN = 300,
-     SHL_ASSIGN = 301,
-     SHR_U_ASSIGN = 302,
-     SHIFT_LEFT = 303,
-     SHIFT_RIGHT = 304,
-     INTV = 305,
-     FLOATV = 306,
-     STRINGV = 307,
-     PMCV = 308,
-     LOG_XOR = 309,
-     RELOP_EQ = 310,
-     RELOP_NE = 311,
-     RELOP_GT = 312,
-     RELOP_GTE = 313,
-     RELOP_LT = 314,
-     RELOP_LTE = 315,
-     RESULT = 316,
-     RETURN = 317,
-     TAILCALL = 318,
-     YIELDT = 319,
-     GET_RESULTS = 320,
-     POW = 321,
-     SHIFT_RIGHT_U = 322,
-     LOG_AND = 323,
-     LOG_OR = 324,
-     COMMA = 325,
-     ESUB = 326,
-     DOTDOT = 327,
-     PCC_BEGIN = 328,
-     PCC_END = 329,
-     PCC_CALL = 330,
-     PCC_SUB = 331,
-     PCC_BEGIN_RETURN = 332,
-     PCC_END_RETURN = 333,
-     PCC_BEGIN_YIELD = 334,
-     PCC_END_YIELD = 335,
-     NCI_CALL = 336,
-     METH_CALL = 337,
-     INVOCANT = 338,
-     MAIN = 339,
-     LOAD = 340,
-     INIT = 341,
-     IMMEDIATE = 342,
-     POSTCOMP = 343,
-     METHOD = 344,
-     ANON = 345,
-     OUTER = 346,
-     NEED_LEX = 347,
-     MULTI = 348,
-     VTABLE_METHOD = 349,
-     LOADLIB = 350,
-     SUB_INSTANCE_OF = 351,
-     SUBID = 352,
-     NS_ENTRY = 353,
-     UNIQUE_REG = 354,
-     LABEL = 355,
-     EMIT = 356,
-     EOM = 357,
-     IREG = 358,
-     NREG = 359,
-     SREG = 360,
-     PREG = 361,
-     IDENTIFIER = 362,
-     REG = 363,
-     MACRO = 364,
-     ENDM = 365,
-     STRINGC = 366,
-     INTC = 367,
-     FLOATC = 368,
-     USTRINGC = 369,
-     PARROT_OP = 370,
-     VAR = 371,
-     LINECOMMENT = 372,
-     FILECOMMENT = 373,
-     DOT = 374,
-     CONCAT = 375
-   };
-#endif
-/* Tokens.  */
-#define LOW_PREC 258
-#define PARAM 259
-#define HLL 260
-#define TK_LINE 261
-#define TK_FILE 262
-#define GOTO 263
-#define ARG 264
-#define IF 265
-#define UNLESS 266
-#define PNULL 267
-#define SET_RETURN 268
-#define SET_YIELD 269
-#define ADV_FLAT 270
-#define ADV_SLURPY 271
-#define ADV_OPTIONAL 272
-#define ADV_OPT_FLAG 273
-#define ADV_NAMED 274
-#define ADV_ARROW 275
-#define NEW 276
-#define ADV_INVOCANT 277
-#define NAMESPACE 278
-#define DOT_METHOD 279
-#define SUB 280
-#define SYM 281
-#define LOCAL 282
-#define LEXICAL 283
-#define CONST 284
-#define ANNOTATE 285
-#define INC 286
-#define DEC 287
-#define GLOBAL_CONST 288
-#define PLUS_ASSIGN 289
-#define MINUS_ASSIGN 290
-#define MUL_ASSIGN 291
-#define DIV_ASSIGN 292
-#define CONCAT_ASSIGN 293
-#define BAND_ASSIGN 294
-#define BOR_ASSIGN 295
-#define BXOR_ASSIGN 296
-#define FDIV 297
-#define FDIV_ASSIGN 298
-#define MOD_ASSIGN 299
-#define SHR_ASSIGN 300
-#define SHL_ASSIGN 301
-#define SHR_U_ASSIGN 302
-#define SHIFT_LEFT 303
-#define SHIFT_RIGHT 304
-#define INTV 305
-#define FLOATV 306
-#define STRINGV 307
-#define PMCV 308
-#define LOG_XOR 309
-#define RELOP_EQ 310
-#define RELOP_NE 311
-#define RELOP_GT 312
-#define RELOP_GTE 313
-#define RELOP_LT 314
-#define RELOP_LTE 315
-#define RESULT 316
-#define RETURN 317
-#define TAILCALL 318
-#define YIELDT 319
-#define GET_RESULTS 320
-#define POW 321
-#define SHIFT_RIGHT_U 322
-#define LOG_AND 323
-#define LOG_OR 324
-#define COMMA 325
-#define ESUB 326
-#define DOTDOT 327
-#define PCC_BEGIN 328
-#define PCC_END 329
-#define PCC_CALL 330
-#define PCC_SUB 331
-#define PCC_BEGIN_RETURN 332
-#define PCC_END_RETURN 333
-#define PCC_BEGIN_YIELD 334
-#define PCC_END_YIELD 335
-#define NCI_CALL 336
-#define METH_CALL 337
-#define INVOCANT 338
-#define MAIN 339
-#define LOAD 340
-#define INIT 341
-#define IMMEDIATE 342
-#define POSTCOMP 343
-#define METHOD 344
-#define ANON 345
-#define OUTER 346
-#define NEED_LEX 347
-#define MULTI 348
-#define VTABLE_METHOD 349
-#define LOADLIB 350
-#define SUB_INSTANCE_OF 351
-#define SUBID 352
-#define NS_ENTRY 353
-#define UNIQUE_REG 354
-#define LABEL 355
-#define EMIT 356
-#define EOM 357
-#define IREG 358
-#define NREG 359
-#define SREG 360
-#define PREG 361
-#define IDENTIFIER 362
-#define REG 363
-#define MACRO 364
-#define ENDM 365
-#define STRINGC 366
-#define INTC 367
-#define FLOATC 368
-#define USTRINGC 369
-#define PARROT_OP 370
-#define VAR 371
-#define LINECOMMENT 372
-#define FILECOMMENT 373
-#define DOT 374
-#define CONCAT 375
-
-
-
-
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-{
-
-/* Line 214 of yacc.c  */
 #line 1049 "compilers/imcc/imcc.y"
-
+{
     IdList * idlist;
     int t;
     char * s;
     SymReg * sr;
     Instruction *i;
-
-
-
-/* Line 214 of yacc.c  */
-#line 1408 "compilers/imcc/imcparser.c"
-} YYSTYPE;
-# define YYSTYPE_IS_TRIVIAL 1
+}
+/* Line 187 of yacc.c.  */
+#line 1392 "compilers/imcc/imcparser.c"
+	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
+# define YYSTYPE_IS_TRIVIAL 1
 #endif
+
 
 
 /* Copy the second part of user declarations.  */
 
 
-/* Line 264 of yacc.c  */
-#line 1420 "compilers/imcc/imcparser.c"
+/* Line 216 of yacc.c.  */
+#line 1405 "compilers/imcc/imcparser.c"
 
 #ifdef short
 # undef short
@@ -1502,14 +1487,14 @@ typedef short int yytype_int16;
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static int
-YYID (int yyi)
+YYID (int i)
 #else
 static int
-YYID (yyi)
-    int yyi;
+YYID (i)
+    int i;
 #endif
 {
-  return yyi;
+  return i;
 }
 #endif
 
@@ -1590,9 +1575,9 @@ void free (void *); /* INFRINGES ON USER NAME SPACE */
 /* A type that is properly aligned for any stack member.  */
 union yyalloc
 {
-  yytype_int16 yyss_alloc;
-  YYSTYPE yyvs_alloc;
-};
+  yytype_int16 yyss;
+  YYSTYPE yyvs;
+  };
 
 /* The size of the maximum gap between one aligned stack and the next.  */
 # define YYSTACK_GAP_MAXIMUM (sizeof (union yyalloc) - 1)
@@ -1626,12 +1611,12 @@ union yyalloc
    elements in the stack, and YYPTR gives the new location of the
    stack.  Advance YYPTR to a properly aligned location for the next
    stack.  */
-# define YYSTACK_RELOCATE(Stack_alloc, Stack)				\
+# define YYSTACK_RELOCATE(Stack)					\
     do									\
       {									\
 	YYSIZE_T yynewbytes;						\
-	YYCOPY (&yyptr->Stack_alloc, Stack, yysize);			\
-	Stack = &yyptr->Stack_alloc;					\
+	YYCOPY (&yyptr->Stack, Stack, yysize);				\
+	Stack = &yyptr->Stack;						\
 	yynewbytes = yystacksize * sizeof (*Stack) + YYSTACK_GAP_MAXIMUM; \
 	yyptr += yynewbytes / sizeof (*yyptr);				\
       }									\
@@ -1872,16 +1857,16 @@ static const yytype_uint16 yyrline[] =
     2032,  2033,  2034,  2035,  2043,  2044,  2045,  2049,  2050,  2051,
     2052,  2053,  2054,  2055,  2056,  2057,  2058,  2059,  2060,  2061,
     2062,  2063,  2064,  2065,  2066,  2067,  2068,  2069,  2070,  2071,
-    2077,  2076,  2088,  2095,  2096,  2097,  2098,  2099,  2100,  2101,
-    2102,  2103,  2104,  2105,  2106,  2107,  2112,  2123,  2124,  2125,
-    2126,  2132,  2146,  2152,  2158,  2164,  2163,  2172,  2173,  2183,
-    2193,  2200,  2205,  2215,  2219,  2220,  2224,  2225,  2228,  2229,
-    2233,  2237,  2247,  2253,  2263,  2268,  2272,  2273,  2277,  2281,
-    2285,  2292,  2296,  2300,  2307,  2308,  2312,  2313,  2314,  2315,
-    2316,  2317,  2321,  2322,  2326,  2327,  2331,  2332,  2336,  2337,
-    2344,  2351,  2352,  2353,  2357,  2358,  2362,  2363,  2367,  2368,
-    2372,  2373,  2377,  2377,  2389,  2389,  2401,  2402,  2410,  2417,
-    2418,  2419,  2420,  2421,  2425,  2426,  2427,  2428
+    2077,  2076,  2088,  2093,  2094,  2095,  2096,  2097,  2098,  2099,
+    2100,  2101,  2102,  2103,  2104,  2105,  2110,  2121,  2122,  2123,
+    2124,  2130,  2144,  2150,  2156,  2162,  2161,  2170,  2171,  2181,
+    2191,  2198,  2203,  2213,  2217,  2218,  2222,  2223,  2226,  2227,
+    2231,  2235,  2245,  2251,  2261,  2266,  2270,  2271,  2275,  2279,
+    2283,  2290,  2294,  2298,  2305,  2306,  2310,  2311,  2312,  2313,
+    2314,  2315,  2319,  2320,  2324,  2325,  2329,  2330,  2334,  2335,
+    2342,  2349,  2350,  2351,  2355,  2356,  2360,  2361,  2365,  2366,
+    2370,  2371,  2375,  2375,  2387,  2387,  2399,  2400,  2408,  2415,
+    2416,  2417,  2418,  2419,  2423,  2424,  2425,  2426
 };
 #endif
 
@@ -1910,32 +1895,31 @@ static const char *const yytname[] =
   "NS_ENTRY", "UNIQUE_REG", "LABEL", "EMIT", "EOM", "IREG", "NREG", "SREG",
   "PREG", "IDENTIFIER", "REG", "MACRO", "ENDM", "STRINGC", "INTC",
   "FLOATC", "USTRINGC", "PARROT_OP", "VAR", "LINECOMMENT", "FILECOMMENT",
-  "DOT", "CONCAT", "'='", "'['", "']'", "'('", "')'", "'n'", "'!'", "'~'",
-  "'-'", "'+'", "'*'", "'/'", "'%'", "'&'", "'|'", "';'", "$accept",
+  "DOT", "CONCAT", "'='", "'['", "']'", "'('", "')'", "'new'", "'!'",
+  "'~'", "'-'", "'+'", "'*'", "'/'", "'%'", "'&'", "'|'", "';'", "$accept",
   "program", "compilation_units", "compilation_unit", "pragma",
-  "location_directive", "annotate_directive", "hll_def", "constdef", "$@1",
-  "pmc_const", "$@2", "$@3", "any_string", "pasmcode", "pasmline",
-  "pasm_inst", "$@4", "$@5", "pasm_args", "emit", "$@6", "opt_pasmcode",
-  "class_namespace", "maybe_ns", "sub", "$@7", "$@8", "$@9", "sub_params",
-  "sub_param", "$@10", "sub_param_type_def", "multi", "outer", "vtable",
+  "location_directive", "annotate_directive", "hll_def", "constdef", "@1",
+  "pmc_const", "@2", "@3", "any_string", "pasmcode", "pasmline",
+  "pasm_inst", "@4", "@5", "pasm_args", "emit", "@6", "opt_pasmcode",
+  "class_namespace", "maybe_ns", "sub", "@7", "@8", "@9", "sub_params",
+  "sub_param", "@10", "sub_param_type_def", "multi", "outer", "vtable",
   "method", "ns_entry_name", "instanceof", "subid", "multi_types",
   "multi_type", "sub_body", "pcc_sub_call", "@11", "opt_label",
   "opt_invocant", "sub_proto", "sub_proto_list", "proto", "pcc_call",
-  "pcc_args", "pcc_arg", "pcc_results", "pcc_result", "$@12",
-  "paramtype_list", "paramtype", "pcc_ret", "$@13", "pcc_yield", "$@14",
+  "pcc_args", "pcc_arg", "pcc_results", "pcc_result", "@12",
+  "paramtype_list", "paramtype", "pcc_ret", "@13", "pcc_yield", "@14",
   "pcc_returns", "pcc_yields", "pcc_return", "pcc_set_yield",
-  "pcc_return_many", "$@15", "return_or_yield", "var_returns",
-  "statements", "helper_clear_state", "statement", "labels", "_labels",
-  "label", "instruction", "id_list", "id_list_id", "opt_unique_reg",
-  "labeled_inst", "$@16", "$@17", "$@18", "type", "classname",
-  "assignment", "@19", "un_op", "bin_op", "get_results", "@20",
-  "op_assign", "assign_op", "func_assign", "the_sub", "sub_call", "@21",
-  "arglist", "arg", "argtype_list", "argtype", "result", "targetlist",
-  "conditional_statement", "unless_statement", "if_statement",
-  "comma_or_goto", "relop", "target", "vars", "_vars", "_var_or_i",
-  "sub_label_op_c", "sub_label_op", "label_op", "var_or_i", "var",
-  "keylist", "$@22", "keylist_force", "$@23", "_keylist", "key", "reg",
-  "const", 0
+  "pcc_return_many", "@15", "return_or_yield", "var_returns", "statements",
+  "helper_clear_state", "statement", "labels", "_labels", "label",
+  "instruction", "id_list", "id_list_id", "opt_unique_reg", "labeled_inst",
+  "@16", "@17", "@18", "type", "classname", "assignment", "@19", "un_op",
+  "bin_op", "get_results", "@20", "op_assign", "assign_op", "func_assign",
+  "the_sub", "sub_call", "@21", "arglist", "arg", "argtype_list",
+  "argtype", "result", "targetlist", "conditional_statement",
+  "unless_statement", "if_statement", "comma_or_goto", "relop", "target",
+  "vars", "_vars", "_var_or_i", "sub_label_op_c", "sub_label_op",
+  "label_op", "var_or_i", "var", "keylist", "@22", "keylist_force", "@23",
+  "_keylist", "key", "reg", "const", 0
 };
 #endif
 
@@ -2599,20 +2583,17 @@ yy_symbol_print (yyoutput, yytype, yyvaluep, yyscanner, interp)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_stack_print (yytype_int16 *yybottom, yytype_int16 *yytop)
+yy_stack_print (yytype_int16 *bottom, yytype_int16 *top)
 #else
 static void
-yy_stack_print (yybottom, yytop)
-    yytype_int16 *yybottom;
-    yytype_int16 *yytop;
+yy_stack_print (bottom, top)
+    yytype_int16 *bottom;
+    yytype_int16 *top;
 #endif
 {
   YYFPRINTF (stderr, "Stack now");
-  for (; yybottom <= yytop; yybottom++)
-    {
-      int yybot = *yybottom;
-      YYFPRINTF (stderr, " %d", yybot);
-    }
+  for (; bottom <= top; ++bottom)
+    YYFPRINTF (stderr, " %d", *bottom);
   YYFPRINTF (stderr, "\n");
 }
 
@@ -2648,11 +2629,11 @@ yy_reduce_print (yyvsp, yyrule, yyscanner, interp)
   /* The symbols being reduced.  */
   for (yyi = 0; yyi < yynrhs; yyi++)
     {
-      YYFPRINTF (stderr, "   $%d = ", yyi + 1);
+      fprintf (stderr, "   $%d = ", yyi + 1);
       yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
 		       &(yyvsp[(yyi + 1) - (yynrhs)])
 		       		       , yyscanner, interp);
-      YYFPRINTF (stderr, "\n");
+      fprintf (stderr, "\n");
     }
 }
 
@@ -2936,8 +2917,10 @@ yydestruct (yymsg, yytype, yyvaluep, yyscanner, interp)
 	break;
     }
 }
+
 
 /* Prevent warnings from -Wmissing-prototypes.  */
+
 #ifdef YYPARSE_PARAM
 #if defined __STDC__ || defined __cplusplus
 int yyparse (void *YYPARSE_PARAM);
@@ -2956,9 +2939,10 @@ int yyparse ();
 
 
 
-/*-------------------------.
-| yyparse or yypush_parse.  |
-`-------------------------*/
+
+/*----------.
+| yyparse.  |
+`----------*/
 
 #ifdef YYPARSE_PARAM
 #if (defined __STDC__ || defined __C99__FUNC__ \
@@ -2983,46 +2967,22 @@ yyparse (yyscanner, interp)
 #endif
 #endif
 {
-/* The lookahead symbol.  */
+  /* The look-ahead symbol.  */
 int yychar;
 
-/* The semantic value of the lookahead symbol.  */
+/* The semantic value of the look-ahead symbol.  */
 YYSTYPE yylval;
 
-    /* Number of syntax errors so far.  */
-    int yynerrs;
+/* Number of syntax errors so far.  */
+int yynerrs;
 
-    int yystate;
-    /* Number of tokens to shift before error messages enabled.  */
-    int yyerrstatus;
-
-    /* The stacks and their tools:
-       `yyss': related to states.
-       `yyvs': related to semantic values.
-
-       Refer to the stacks thru separate pointers, to allow yyoverflow
-       to reallocate them elsewhere.  */
-
-    /* The state stack.  */
-    yytype_int16 yyssa[YYINITDEPTH];
-    yytype_int16 *yyss;
-    yytype_int16 *yyssp;
-
-    /* The semantic value stack.  */
-    YYSTYPE yyvsa[YYINITDEPTH];
-    YYSTYPE *yyvs;
-    YYSTYPE *yyvsp;
-
-    YYSIZE_T yystacksize;
-
+  int yystate;
   int yyn;
   int yyresult;
-  /* Lookahead token as an internal (translated) token number.  */
-  int yytoken;
-  /* The variables used to return semantic value and location from the
-     action routines.  */
-  YYSTYPE yyval;
-
+  /* Number of tokens to shift before error messages enabled.  */
+  int yyerrstatus;
+  /* Look-ahead token as an internal (translated) token number.  */
+  int yytoken = 0;
 #if YYERROR_VERBOSE
   /* Buffer for error messages, and its allocated size.  */
   char yymsgbuf[128];
@@ -3030,28 +2990,51 @@ YYSTYPE yylval;
   YYSIZE_T yymsg_alloc = sizeof yymsgbuf;
 #endif
 
+  /* Three stacks and their tools:
+     `yyss': related to states,
+     `yyvs': related to semantic values,
+     `yyls': related to locations.
+
+     Refer to the stacks thru separate pointers, to allow yyoverflow
+     to reallocate them elsewhere.  */
+
+  /* The state stack.  */
+  yytype_int16 yyssa[YYINITDEPTH];
+  yytype_int16 *yyss = yyssa;
+  yytype_int16 *yyssp;
+
+  /* The semantic value stack.  */
+  YYSTYPE yyvsa[YYINITDEPTH];
+  YYSTYPE *yyvs = yyvsa;
+  YYSTYPE *yyvsp;
+
+
+
 #define YYPOPSTACK(N)   (yyvsp -= (N), yyssp -= (N))
+
+  YYSIZE_T yystacksize = YYINITDEPTH;
+
+  /* The variables used to return semantic value and location from the
+     action routines.  */
+  YYSTYPE yyval;
+
 
   /* The number of symbols on the RHS of the reduced rule.
      Keep to zero when no symbol should be popped.  */
   int yylen = 0;
-
-  yytoken = 0;
-  yyss = yyssa;
-  yyvs = yyvsa;
-  yystacksize = YYINITDEPTH;
 
   YYDPRINTF ((stderr, "Starting parse\n"));
 
   yystate = 0;
   yyerrstatus = 0;
   yynerrs = 0;
-  yychar = YYEMPTY; /* Cause a token to be read.  */
+  yychar = YYEMPTY;		/* Cause a token to be read.  */
 
   /* Initialize stack pointers.
      Waste one element of value and location stack
      so that they stay on the same level as the state stack.
      The wasted elements are never initialized.  */
+
   yyssp = yyss;
   yyvsp = yyvs;
 
@@ -3081,6 +3064,7 @@ YYSTYPE yylval;
 	YYSTYPE *yyvs1 = yyvs;
 	yytype_int16 *yyss1 = yyss;
 
+
 	/* Each stack pointer address is followed by the size of the
 	   data in use in that stack, in bytes.  This used to be a
 	   conditional around just the two extra args, but that might
@@ -3088,6 +3072,7 @@ YYSTYPE yylval;
 	yyoverflow (YY_("memory exhausted"),
 		    &yyss1, yysize * sizeof (*yyssp),
 		    &yyvs1, yysize * sizeof (*yyvsp),
+
 		    &yystacksize);
 
 	yyss = yyss1;
@@ -3110,8 +3095,9 @@ YYSTYPE yylval;
 	  (union yyalloc *) YYSTACK_ALLOC (YYSTACK_BYTES (yystacksize));
 	if (! yyptr)
 	  goto yyexhaustedlab;
-	YYSTACK_RELOCATE (yyss_alloc, yyss);
-	YYSTACK_RELOCATE (yyvs_alloc, yyvs);
+	YYSTACK_RELOCATE (yyss);
+	YYSTACK_RELOCATE (yyvs);
+
 #  undef YYSTACK_RELOCATE
 	if (yyss1 != yyssa)
 	  YYSTACK_FREE (yyss1);
@@ -3122,6 +3108,7 @@ YYSTYPE yylval;
       yyssp = yyss + yysize - 1;
       yyvsp = yyvs + yysize - 1;
 
+
       YYDPRINTF ((stderr, "Stack size increased to %lu\n",
 		  (unsigned long int) yystacksize));
 
@@ -3131,9 +3118,6 @@ YYSTYPE yylval;
 
   YYDPRINTF ((stderr, "Entering state %d\n", yystate));
 
-  if (yystate == YYFINAL)
-    YYACCEPT;
-
   goto yybackup;
 
 /*-----------.
@@ -3142,16 +3126,16 @@ YYSTYPE yylval;
 yybackup:
 
   /* Do appropriate processing given the current state.  Read a
-     lookahead token if we need one and don't already have one.  */
+     look-ahead token if we need one and don't already have one.  */
 
-  /* First try to decide what to do without reference to lookahead token.  */
+  /* First try to decide what to do without reference to look-ahead token.  */
   yyn = yypact[yystate];
   if (yyn == YYPACT_NINF)
     goto yydefault;
 
-  /* Not known => get a lookahead token if don't already have one.  */
+  /* Not known => get a look-ahead token if don't already have one.  */
 
-  /* YYCHAR is either YYEMPTY or YYEOF or a valid lookahead symbol.  */
+  /* YYCHAR is either YYEMPTY or YYEOF or a valid look-ahead symbol.  */
   if (yychar == YYEMPTY)
     {
       YYDPRINTF ((stderr, "Reading a token: "));
@@ -3183,16 +3167,20 @@ yybackup:
       goto yyreduce;
     }
 
+  if (yyn == YYFINAL)
+    YYACCEPT;
+
   /* Count tokens shifted since error; after three, turn off error
      status.  */
   if (yyerrstatus)
     yyerrstatus--;
 
-  /* Shift the lookahead token.  */
+  /* Shift the look-ahead token.  */
   YY_SYMBOL_PRINT ("Shifting", yytoken, &yylval, &yylloc);
 
-  /* Discard the shifted token.  */
-  yychar = YYEMPTY;
+  /* Discard the shifted token unless it is eof.  */
+  if (yychar != YYEOF)
+    yychar = YYEMPTY;
 
   yystate = yyn;
   *++yyvsp = yylval;
@@ -3232,29 +3220,21 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-
-/* Line 1455 of yacc.c  */
 #line 1144 "compilers/imcc/imcc.y"
     { if (yynerrs) YYABORT; (yyval.i) = 0; }
     break;
 
   case 5:
-
-/* Line 1455 of yacc.c  */
 #line 1153 "compilers/imcc/imcc.y"
     { (yyval.i) = (yyvsp[(1) - (1)].i); }
     break;
 
   case 6:
-
-/* Line 1455 of yacc.c  */
 #line 1154 "compilers/imcc/imcc.y"
     { (yyval.i) = (yyvsp[(1) - (1)].i); }
     break;
 
   case 7:
-
-/* Line 1455 of yacc.c  */
 #line 1156 "compilers/imcc/imcc.y"
     {
            (yyval.i) = (yyvsp[(1) - (1)].i);
@@ -3264,8 +3244,6 @@ yyreduce:
     break;
 
   case 8:
-
-/* Line 1455 of yacc.c  */
 #line 1162 "compilers/imcc/imcc.y"
     {
            (yyval.i) = (yyvsp[(1) - (1)].i);
@@ -3275,43 +3253,31 @@ yyreduce:
     break;
 
   case 9:
-
-/* Line 1455 of yacc.c  */
 #line 1167 "compilers/imcc/imcc.y"
     { (yyval.i) = 0; }
     break;
 
   case 10:
-
-/* Line 1455 of yacc.c  */
 #line 1168 "compilers/imcc/imcc.y"
     { (yyval.i) = 0; }
     break;
 
   case 11:
-
-/* Line 1455 of yacc.c  */
 #line 1169 "compilers/imcc/imcc.y"
     { (yyval.i) = 0; }
     break;
 
   case 12:
-
-/* Line 1455 of yacc.c  */
 #line 1170 "compilers/imcc/imcc.y"
     { (yyval.i) = 0; }
     break;
 
   case 13:
-
-/* Line 1455 of yacc.c  */
 #line 1174 "compilers/imcc/imcc.y"
     { (yyval.i) = 0; }
     break;
 
   case 14:
-
-/* Line 1455 of yacc.c  */
 #line 1176 "compilers/imcc/imcc.y"
     {
            (yyval.i) = 0;
@@ -3321,8 +3287,6 @@ yyreduce:
     break;
 
   case 15:
-
-/* Line 1455 of yacc.c  */
 #line 1185 "compilers/imcc/imcc.y"
     {
            IMCC_INFO(interp)->line = atoi((yyvsp[(2) - (5)].s));
@@ -3332,8 +3296,6 @@ yyreduce:
     break;
 
   case 16:
-
-/* Line 1455 of yacc.c  */
 #line 1191 "compilers/imcc/imcc.y"
     {
            /* set_filename() frees the STRINGC */
@@ -3342,8 +3304,6 @@ yyreduce:
     break;
 
   case 17:
-
-/* Line 1455 of yacc.c  */
 #line 1199 "compilers/imcc/imcc.y"
     {
           /* We'll want to store an entry while emitting instructions, so just
@@ -3355,8 +3315,6 @@ yyreduce:
     break;
 
   case 18:
-
-/* Line 1455 of yacc.c  */
 #line 1211 "compilers/imcc/imcc.y"
     {
             STRING * const hll_name = Parrot_str_unescape(interp, (yyvsp[(2) - (2)].s) + 1, '"', NULL);
@@ -3370,15 +3328,11 @@ yyreduce:
     break;
 
   case 19:
-
-/* Line 1455 of yacc.c  */
 #line 1223 "compilers/imcc/imcc.y"
     { IMCC_INFO(interp)->is_def = 1; }
     break;
 
   case 20:
-
-/* Line 1455 of yacc.c  */
 #line 1224 "compilers/imcc/imcc.y"
     {
              mk_const_ident(interp, (yyvsp[(4) - (6)].s), (yyvsp[(3) - (6)].t), (yyvsp[(6) - (6)].sr), 1);
@@ -3388,15 +3342,11 @@ yyreduce:
     break;
 
   case 21:
-
-/* Line 1455 of yacc.c  */
 #line 1232 "compilers/imcc/imcc.y"
     { IMCC_INFO(interp)->is_def = 1; }
     break;
 
   case 22:
-
-/* Line 1455 of yacc.c  */
 #line 1233 "compilers/imcc/imcc.y"
     {
            (yyval.i) = mk_pmc_const(interp, IMCC_INFO(interp)->cur_unit, (yyvsp[(3) - (6)].s), (yyvsp[(4) - (6)].sr), (yyvsp[(6) - (6)].s));
@@ -3406,15 +3356,11 @@ yyreduce:
     break;
 
   case 23:
-
-/* Line 1455 of yacc.c  */
 #line 1239 "compilers/imcc/imcc.y"
     { IMCC_INFO(interp)->is_def = 1; }
     break;
 
   case 24:
-
-/* Line 1455 of yacc.c  */
 #line 1240 "compilers/imcc/imcc.y"
     {
            (yyval.i) = mk_pmc_const_named(interp, IMCC_INFO(interp)->cur_unit, (yyvsp[(3) - (6)].s), (yyvsp[(4) - (6)].sr), (yyvsp[(6) - (6)].s));
@@ -3425,50 +3371,36 @@ yyreduce:
     break;
 
   case 29:
-
-/* Line 1455 of yacc.c  */
 #line 1258 "compilers/imcc/imcc.y"
     { (yyval.i) = 0;  }
     break;
 
   case 30:
-
-/* Line 1455 of yacc.c  */
 #line 1259 "compilers/imcc/imcc.y"
     { (yyval.i) = 0;  }
     break;
 
   case 31:
-
-/* Line 1455 of yacc.c  */
 #line 1260 "compilers/imcc/imcc.y"
     { (yyval.i) = 0;  }
     break;
 
   case 32:
-
-/* Line 1455 of yacc.c  */
 #line 1261 "compilers/imcc/imcc.y"
     { (yyval.i) = 0;  }
     break;
 
   case 33:
-
-/* Line 1455 of yacc.c  */
 #line 1262 "compilers/imcc/imcc.y"
     { (yyval.i) = (yyvsp[(1) - (1)].i); }
     break;
 
   case 36:
-
-/* Line 1455 of yacc.c  */
 #line 1267 "compilers/imcc/imcc.y"
     { clear_state(interp); }
     break;
 
   case 37:
-
-/* Line 1455 of yacc.c  */
 #line 1269 "compilers/imcc/imcc.y"
     {
            (yyval.i) = INS(interp, IMCC_INFO(interp)->cur_unit,
@@ -3479,8 +3411,6 @@ yyreduce:
     break;
 
   case 38:
-
-/* Line 1455 of yacc.c  */
 #line 1276 "compilers/imcc/imcc.y"
     {
            imc_close_unit(interp, IMCC_INFO(interp)->cur_unit);
@@ -3489,8 +3419,6 @@ yyreduce:
     break;
 
   case 39:
-
-/* Line 1455 of yacc.c  */
 #line 1281 "compilers/imcc/imcc.y"
     {
            (yyval.i) = iSUBROUTINE(interp,
@@ -3502,8 +3430,6 @@ yyreduce:
     break;
 
   case 40:
-
-/* Line 1455 of yacc.c  */
 #line 1289 "compilers/imcc/imcc.y"
     {
            (yyval.i) = MK_I(interp, IMCC_INFO(interp)->cur_unit, "null", 1, (yyvsp[(2) - (2)].sr));
@@ -3511,8 +3437,6 @@ yyreduce:
     break;
 
   case 41:
-
-/* Line 1455 of yacc.c  */
 #line 1293 "compilers/imcc/imcc.y"
     {
            char   *name = mem_sys_strdup((yyvsp[(2) - (4)].s) + 1);
@@ -3529,22 +3453,16 @@ yyreduce:
     break;
 
   case 42:
-
-/* Line 1455 of yacc.c  */
 #line 1305 "compilers/imcc/imcc.y"
     { (yyval.i) = 0;}
     break;
 
   case 44:
-
-/* Line 1455 of yacc.c  */
 #line 1313 "compilers/imcc/imcc.y"
     { IMCC_INFO(interp)->cur_unit = imc_open_unit(interp, IMC_PASM); }
     break;
 
   case 45:
-
-/* Line 1455 of yacc.c  */
 #line 1316 "compilers/imcc/imcc.y"
     {
            /* if (optimizer_level & OPT_PASM)
@@ -3556,8 +3474,6 @@ yyreduce:
     break;
 
   case 48:
-
-/* Line 1455 of yacc.c  */
 #line 1332 "compilers/imcc/imcc.y"
     {
            int re_open = 0;
@@ -3573,8 +3489,6 @@ yyreduce:
     break;
 
   case 49:
-
-/* Line 1455 of yacc.c  */
 #line 1347 "compilers/imcc/imcc.y"
     {
             (yyval.sr) = (yyvsp[(2) - (3)].sr);
@@ -3582,15 +3496,11 @@ yyreduce:
     break;
 
   case 50:
-
-/* Line 1455 of yacc.c  */
 #line 1350 "compilers/imcc/imcc.y"
     { (yyval.sr) = NULL; }
     break;
 
   case 51:
-
-/* Line 1455 of yacc.c  */
 #line 1355 "compilers/imcc/imcc.y"
     {
            IMCC_INFO(interp)->cur_unit = imc_open_unit(interp, IMC_PCCSUB);
@@ -3598,8 +3508,6 @@ yyreduce:
     break;
 
   case 52:
-
-/* Line 1455 of yacc.c  */
 #line 1359 "compilers/imcc/imcc.y"
     {
            iSUBROUTINE(interp, IMCC_INFO(interp)->cur_unit, (yyvsp[(3) - (3)].sr));
@@ -3607,8 +3515,6 @@ yyreduce:
     break;
 
   case 53:
-
-/* Line 1455 of yacc.c  */
 #line 1363 "compilers/imcc/imcc.y"
     {
           IMCC_INFO(interp)->cur_call->pcc_sub->pragma = (yyvsp[(5) - (6)].t);
@@ -3620,29 +3526,21 @@ yyreduce:
     break;
 
   case 54:
-
-/* Line 1455 of yacc.c  */
 #line 1371 "compilers/imcc/imcc.y"
     { (yyval.i) = 0; IMCC_INFO(interp)->cur_call = NULL; }
     break;
 
   case 55:
-
-/* Line 1455 of yacc.c  */
 #line 1375 "compilers/imcc/imcc.y"
     { (yyval.sr) = 0; }
     break;
 
   case 56:
-
-/* Line 1455 of yacc.c  */
 #line 1376 "compilers/imcc/imcc.y"
     { (yyval.sr) = 0; }
     break;
 
   case 57:
-
-/* Line 1455 of yacc.c  */
 #line 1378 "compilers/imcc/imcc.y"
     {
            if (IMCC_INFO(interp)->adv_named_id) {
@@ -3656,22 +3554,16 @@ yyreduce:
     break;
 
   case 58:
-
-/* Line 1455 of yacc.c  */
 #line 1390 "compilers/imcc/imcc.y"
     { IMCC_INFO(interp)->is_def = 1; }
     break;
 
   case 59:
-
-/* Line 1455 of yacc.c  */
 #line 1390 "compilers/imcc/imcc.y"
     { (yyval.sr) = (yyvsp[(3) - (3)].sr); IMCC_INFO(interp)->is_def = 0; }
     break;
 
   case 60:
-
-/* Line 1455 of yacc.c  */
 #line 1395 "compilers/imcc/imcc.y"
     {
            if ((yyvsp[(3) - (3)].t) & VT_UNIQUE_REG)
@@ -3684,15 +3576,11 @@ yyreduce:
     break;
 
   case 61:
-
-/* Line 1455 of yacc.c  */
 #line 1408 "compilers/imcc/imcc.y"
     { (yyval.t) = 0; }
     break;
 
   case 62:
-
-/* Line 1455 of yacc.c  */
 #line 1413 "compilers/imcc/imcc.y"
     {
            (yyval.t) = 0;
@@ -3702,8 +3590,6 @@ yyreduce:
     break;
 
   case 63:
-
-/* Line 1455 of yacc.c  */
 #line 1419 "compilers/imcc/imcc.y"
     {
            (yyval.t) = 0;
@@ -3713,8 +3599,6 @@ yyreduce:
     break;
 
   case 64:
-
-/* Line 1455 of yacc.c  */
 #line 1428 "compilers/imcc/imcc.y"
     {
            (yyval.t) = P_VTABLE;
@@ -3724,8 +3608,6 @@ yyreduce:
     break;
 
   case 65:
-
-/* Line 1455 of yacc.c  */
 #line 1434 "compilers/imcc/imcc.y"
     {
            (yyval.t) = P_VTABLE;
@@ -3735,8 +3617,6 @@ yyreduce:
     break;
 
   case 66:
-
-/* Line 1455 of yacc.c  */
 #line 1443 "compilers/imcc/imcc.y"
     {
            (yyval.t) = P_METHOD;
@@ -3746,8 +3626,6 @@ yyreduce:
     break;
 
   case 67:
-
-/* Line 1455 of yacc.c  */
 #line 1449 "compilers/imcc/imcc.y"
     {
            (yyval.t) = P_METHOD;
@@ -3757,8 +3635,6 @@ yyreduce:
     break;
 
   case 68:
-
-/* Line 1455 of yacc.c  */
 #line 1458 "compilers/imcc/imcc.y"
     {
            (yyval.t) = 0;
@@ -3768,8 +3644,6 @@ yyreduce:
     break;
 
   case 69:
-
-/* Line 1455 of yacc.c  */
 #line 1464 "compilers/imcc/imcc.y"
     {
            (yyval.t) = 0;
@@ -3779,8 +3653,6 @@ yyreduce:
     break;
 
   case 70:
-
-/* Line 1455 of yacc.c  */
 #line 1473 "compilers/imcc/imcc.y"
     {
            (yyval.t) = 0;
@@ -3789,8 +3661,6 @@ yyreduce:
     break;
 
   case 71:
-
-/* Line 1455 of yacc.c  */
 #line 1481 "compilers/imcc/imcc.y"
     {
            (yyval.t) = 0;
@@ -3799,8 +3669,6 @@ yyreduce:
     break;
 
   case 72:
-
-/* Line 1455 of yacc.c  */
 #line 1486 "compilers/imcc/imcc.y"
     {
            (yyval.t) = 0;
@@ -3811,8 +3679,6 @@ yyreduce:
     break;
 
   case 73:
-
-/* Line 1455 of yacc.c  */
 #line 1496 "compilers/imcc/imcc.y"
     {
            add_pcc_multi(IMCC_INFO(interp)->cur_call, NULL);
@@ -3820,8 +3686,6 @@ yyreduce:
     break;
 
   case 74:
-
-/* Line 1455 of yacc.c  */
 #line 1500 "compilers/imcc/imcc.y"
     {
            (yyval.t) = 0;
@@ -3830,8 +3694,6 @@ yyreduce:
     break;
 
   case 75:
-
-/* Line 1455 of yacc.c  */
 #line 1505 "compilers/imcc/imcc.y"
     {
            (yyval.t) = 0;
@@ -3840,36 +3702,26 @@ yyreduce:
     break;
 
   case 76:
-
-/* Line 1455 of yacc.c  */
 #line 1512 "compilers/imcc/imcc.y"
     { (yyval.sr) = mk_const(interp, "INTVAL",   'S'); }
     break;
 
   case 77:
-
-/* Line 1455 of yacc.c  */
 #line 1513 "compilers/imcc/imcc.y"
     { (yyval.sr) = mk_const(interp, "FLOATVAL", 'S'); }
     break;
 
   case 78:
-
-/* Line 1455 of yacc.c  */
 #line 1514 "compilers/imcc/imcc.y"
     { (yyval.sr) = mk_const(interp, "PMC",      'S'); }
     break;
 
   case 79:
-
-/* Line 1455 of yacc.c  */
 #line 1515 "compilers/imcc/imcc.y"
     { (yyval.sr) = mk_const(interp, "STRING",   'S'); }
     break;
 
   case 80:
-
-/* Line 1455 of yacc.c  */
 #line 1517 "compilers/imcc/imcc.y"
     {
            SymReg *r;
@@ -3884,8 +3736,6 @@ yyreduce:
     break;
 
   case 81:
-
-/* Line 1455 of yacc.c  */
 #line 1528 "compilers/imcc/imcc.y"
     {
            SymReg *r;
@@ -3900,15 +3750,11 @@ yyreduce:
     break;
 
   case 82:
-
-/* Line 1455 of yacc.c  */
 #line 1538 "compilers/imcc/imcc.y"
     { (yyval.sr) = (yyvsp[(2) - (3)].sr); }
     break;
 
   case 85:
-
-/* Line 1455 of yacc.c  */
 #line 1548 "compilers/imcc/imcc.y"
     {
            char name[128];
@@ -3936,113 +3782,81 @@ yyreduce:
     break;
 
   case 86:
-
-/* Line 1455 of yacc.c  */
 #line 1576 "compilers/imcc/imcc.y"
     { (yyval.i) = 0; IMCC_INFO(interp)->cur_call = NULL; }
     break;
 
   case 87:
-
-/* Line 1455 of yacc.c  */
 #line 1580 "compilers/imcc/imcc.y"
     { (yyval.i) = NULL; IMCC_INFO(interp)->cur_call->pcc_sub->label = 0; }
     break;
 
   case 88:
-
-/* Line 1455 of yacc.c  */
 #line 1581 "compilers/imcc/imcc.y"
     { (yyval.i) = NULL; IMCC_INFO(interp)->cur_call->pcc_sub->label = 1; }
     break;
 
   case 89:
-
-/* Line 1455 of yacc.c  */
 #line 1585 "compilers/imcc/imcc.y"
     { (yyval.i) = NULL; }
     break;
 
   case 90:
-
-/* Line 1455 of yacc.c  */
 #line 1586 "compilers/imcc/imcc.y"
     { (yyval.i) = NULL;  IMCC_INFO(interp)->cur_call->pcc_sub->object = (yyvsp[(2) - (3)].sr); }
     break;
 
   case 91:
-
-/* Line 1455 of yacc.c  */
 #line 1590 "compilers/imcc/imcc.y"
     { (yyval.t) = 0; }
     break;
 
   case 93:
-
-/* Line 1455 of yacc.c  */
 #line 1595 "compilers/imcc/imcc.y"
     { (yyval.t) = (yyvsp[(1) - (1)].t); }
     break;
 
   case 94:
-
-/* Line 1455 of yacc.c  */
 #line 1596 "compilers/imcc/imcc.y"
     { (yyval.t) = (yyvsp[(1) - (2)].t) | (yyvsp[(2) - (2)].t); }
     break;
 
   case 95:
-
-/* Line 1455 of yacc.c  */
 #line 1600 "compilers/imcc/imcc.y"
     { (yyval.t) = P_LOAD; }
     break;
 
   case 96:
-
-/* Line 1455 of yacc.c  */
 #line 1601 "compilers/imcc/imcc.y"
     { (yyval.t) = P_INIT; }
     break;
 
   case 97:
-
-/* Line 1455 of yacc.c  */
 #line 1602 "compilers/imcc/imcc.y"
     { (yyval.t) = P_MAIN; }
     break;
 
   case 98:
-
-/* Line 1455 of yacc.c  */
 #line 1603 "compilers/imcc/imcc.y"
     { (yyval.t) = P_IMMEDIATE; }
     break;
 
   case 99:
-
-/* Line 1455 of yacc.c  */
 #line 1604 "compilers/imcc/imcc.y"
     { (yyval.t) = P_POSTCOMP; }
     break;
 
   case 100:
-
-/* Line 1455 of yacc.c  */
 #line 1605 "compilers/imcc/imcc.y"
     { (yyval.t) = P_ANON; }
     break;
 
   case 101:
-
-/* Line 1455 of yacc.c  */
 #line 1606 "compilers/imcc/imcc.y"
     { (yyval.t) = P_NEED_LEX; }
     break;
 
   case 109:
-
-/* Line 1455 of yacc.c  */
 #line 1618 "compilers/imcc/imcc.y"
     {
            add_pcc_sub(IMCC_INFO(interp)->cur_call, (yyvsp[(2) - (5)].sr));
@@ -4051,8 +3865,6 @@ yyreduce:
     break;
 
   case 110:
-
-/* Line 1455 of yacc.c  */
 #line 1623 "compilers/imcc/imcc.y"
     {
            add_pcc_sub(IMCC_INFO(interp)->cur_call, (yyvsp[(2) - (3)].sr));
@@ -4060,8 +3872,6 @@ yyreduce:
     break;
 
   case 111:
-
-/* Line 1455 of yacc.c  */
 #line 1627 "compilers/imcc/imcc.y"
     {
            add_pcc_sub(IMCC_INFO(interp)->cur_call, (yyvsp[(2) - (3)].sr));
@@ -4070,8 +3880,6 @@ yyreduce:
     break;
 
   case 112:
-
-/* Line 1455 of yacc.c  */
 #line 1632 "compilers/imcc/imcc.y"
     {
            add_pcc_sub(IMCC_INFO(interp)->cur_call, (yyvsp[(2) - (3)].sr));
@@ -4079,8 +3887,6 @@ yyreduce:
     break;
 
   case 113:
-
-/* Line 1455 of yacc.c  */
 #line 1636 "compilers/imcc/imcc.y"
     {
            add_pcc_sub(IMCC_INFO(interp)->cur_call, mk_const(interp, (yyvsp[(2) - (3)].s), 'S'));
@@ -4088,8 +3894,6 @@ yyreduce:
     break;
 
   case 114:
-
-/* Line 1455 of yacc.c  */
 #line 1640 "compilers/imcc/imcc.y"
     {
            add_pcc_sub(IMCC_INFO(interp)->cur_call, (yyvsp[(2) - (5)].sr));
@@ -4098,8 +3902,6 @@ yyreduce:
     break;
 
   case 115:
-
-/* Line 1455 of yacc.c  */
 #line 1645 "compilers/imcc/imcc.y"
     {
            add_pcc_sub(IMCC_INFO(interp)->cur_call, mk_const(interp, (yyvsp[(2) - (5)].s), 'S'));
@@ -4108,36 +3910,26 @@ yyreduce:
     break;
 
   case 116:
-
-/* Line 1455 of yacc.c  */
 #line 1653 "compilers/imcc/imcc.y"
     { (yyval.sr) = 0; }
     break;
 
   case 117:
-
-/* Line 1455 of yacc.c  */
 #line 1654 "compilers/imcc/imcc.y"
     { add_pcc_arg(IMCC_INFO(interp)->cur_call, (yyvsp[(2) - (3)].sr)); }
     break;
 
   case 118:
-
-/* Line 1455 of yacc.c  */
 #line 1658 "compilers/imcc/imcc.y"
     { (yyval.sr) = (yyvsp[(2) - (2)].sr); }
     break;
 
   case 119:
-
-/* Line 1455 of yacc.c  */
 #line 1663 "compilers/imcc/imcc.y"
     { (yyval.sr) = 0; }
     break;
 
   case 120:
-
-/* Line 1455 of yacc.c  */
 #line 1665 "compilers/imcc/imcc.y"
     {
            if ((yyvsp[(2) - (3)].sr))
@@ -4146,22 +3938,16 @@ yyreduce:
     break;
 
   case 121:
-
-/* Line 1455 of yacc.c  */
 #line 1672 "compilers/imcc/imcc.y"
     { (yyval.sr) = (yyvsp[(2) - (3)].sr); (yyval.sr)->type |= (yyvsp[(3) - (3)].t); }
     break;
 
   case 122:
-
-/* Line 1455 of yacc.c  */
 #line 1673 "compilers/imcc/imcc.y"
     { IMCC_INFO(interp)->is_def = 1; }
     break;
 
   case 123:
-
-/* Line 1455 of yacc.c  */
 #line 1674 "compilers/imcc/imcc.y"
     {
            IdList * const l = (yyvsp[(4) - (4)].idlist);
@@ -4177,85 +3963,61 @@ yyreduce:
     break;
 
   case 124:
-
-/* Line 1455 of yacc.c  */
 #line 1688 "compilers/imcc/imcc.y"
     { (yyval.t) = 0; }
     break;
 
   case 125:
-
-/* Line 1455 of yacc.c  */
 #line 1689 "compilers/imcc/imcc.y"
     { (yyval.t) = (yyvsp[(1) - (2)].t) | (yyvsp[(2) - (2)].t); }
     break;
 
   case 126:
-
-/* Line 1455 of yacc.c  */
 #line 1693 "compilers/imcc/imcc.y"
     { (yyval.t) = VT_FLAT;   }
     break;
 
   case 127:
-
-/* Line 1455 of yacc.c  */
 #line 1694 "compilers/imcc/imcc.y"
     { (yyval.t) = VT_OPTIONAL; }
     break;
 
   case 128:
-
-/* Line 1455 of yacc.c  */
 #line 1695 "compilers/imcc/imcc.y"
     { (yyval.t) = VT_OPT_FLAG; }
     break;
 
   case 129:
-
-/* Line 1455 of yacc.c  */
 #line 1696 "compilers/imcc/imcc.y"
     { (yyval.t) = VT_NAMED; }
     break;
 
   case 130:
-
-/* Line 1455 of yacc.c  */
 #line 1697 "compilers/imcc/imcc.y"
     { adv_named_set(interp, (yyvsp[(3) - (4)].s));   (yyval.t) = 0; mem_sys_free((yyvsp[(3) - (4)].s)); }
     break;
 
   case 131:
-
-/* Line 1455 of yacc.c  */
 #line 1698 "compilers/imcc/imcc.y"
     { adv_named_set_u(interp, (yyvsp[(3) - (4)].s)); (yyval.t) = 0; mem_sys_free((yyvsp[(3) - (4)].s)); }
     break;
 
   case 132:
-
-/* Line 1455 of yacc.c  */
 #line 1699 "compilers/imcc/imcc.y"
     { (yyval.t) = VT_UNIQUE_REG; }
     break;
 
   case 133:
-
-/* Line 1455 of yacc.c  */
 #line 1704 "compilers/imcc/imcc.y"
     { begin_return_or_yield(interp, 0); }
     break;
 
   case 134:
-
-/* Line 1455 of yacc.c  */
 #line 1706 "compilers/imcc/imcc.y"
     { (yyval.i) = 0; IMCC_INFO(interp)->asm_state = AsmDefault; }
     break;
 
   case 135:
-
-/* Line 1455 of yacc.c  */
 #line 1708 "compilers/imcc/imcc.y"
     {
            IMCC_INFO(interp)->asm_state = AsmDefault;
@@ -4264,29 +4026,21 @@ yyreduce:
     break;
 
   case 136:
-
-/* Line 1455 of yacc.c  */
 #line 1715 "compilers/imcc/imcc.y"
     { begin_return_or_yield(interp, 1); }
     break;
 
   case 137:
-
-/* Line 1455 of yacc.c  */
 #line 1717 "compilers/imcc/imcc.y"
     { (yyval.i) = 0; IMCC_INFO(interp)->asm_state = AsmDefault; }
     break;
 
   case 138:
-
-/* Line 1455 of yacc.c  */
 #line 1721 "compilers/imcc/imcc.y"
     { (yyval.sr) = 0; }
     break;
 
   case 139:
-
-/* Line 1455 of yacc.c  */
 #line 1723 "compilers/imcc/imcc.y"
     {
            if ((yyvsp[(1) - (2)].sr))
@@ -4295,8 +4049,6 @@ yyreduce:
     break;
 
   case 140:
-
-/* Line 1455 of yacc.c  */
 #line 1728 "compilers/imcc/imcc.y"
     {
            if ((yyvsp[(2) - (3)].sr))
@@ -4305,15 +4057,11 @@ yyreduce:
     break;
 
   case 141:
-
-/* Line 1455 of yacc.c  */
 #line 1735 "compilers/imcc/imcc.y"
     { (yyval.sr) = 0; }
     break;
 
   case 142:
-
-/* Line 1455 of yacc.c  */
 #line 1737 "compilers/imcc/imcc.y"
     {
            if ((yyvsp[(1) - (2)].sr))
@@ -4322,8 +4070,6 @@ yyreduce:
     break;
 
   case 143:
-
-/* Line 1455 of yacc.c  */
 #line 1742 "compilers/imcc/imcc.y"
     {
            if ((yyvsp[(2) - (3)].sr))
@@ -4332,22 +4078,16 @@ yyreduce:
     break;
 
   case 144:
-
-/* Line 1455 of yacc.c  */
 #line 1749 "compilers/imcc/imcc.y"
     { (yyval.sr) = (yyvsp[(2) - (3)].sr); (yyval.sr)->type |= (yyvsp[(3) - (3)].t); }
     break;
 
   case 145:
-
-/* Line 1455 of yacc.c  */
 #line 1753 "compilers/imcc/imcc.y"
     { (yyval.sr) = (yyvsp[(2) - (3)].sr); (yyval.sr)->type |= (yyvsp[(3) - (3)].t); }
     break;
 
   case 146:
-
-/* Line 1455 of yacc.c  */
 #line 1758 "compilers/imcc/imcc.y"
     {
           if (IMCC_INFO(interp)->asm_state == AsmDefault)
@@ -4356,8 +4096,6 @@ yyreduce:
     break;
 
   case 147:
-
-/* Line 1455 of yacc.c  */
 #line 1763 "compilers/imcc/imcc.y"
     {
           IMCC_INFO(interp)->asm_state = AsmDefault;
@@ -4366,29 +4104,21 @@ yyreduce:
     break;
 
   case 148:
-
-/* Line 1455 of yacc.c  */
 #line 1770 "compilers/imcc/imcc.y"
     { (yyval.t) = 0; }
     break;
 
   case 149:
-
-/* Line 1455 of yacc.c  */
 #line 1771 "compilers/imcc/imcc.y"
     { (yyval.t) = 1; }
     break;
 
   case 150:
-
-/* Line 1455 of yacc.c  */
 #line 1775 "compilers/imcc/imcc.y"
     { (yyval.i) = 0; }
     break;
 
   case 151:
-
-/* Line 1455 of yacc.c  */
 #line 1777 "compilers/imcc/imcc.y"
     {
            if (IMCC_INFO(interp)->adv_named_id) {
@@ -4402,8 +4132,6 @@ yyreduce:
     break;
 
   case 152:
-
-/* Line 1455 of yacc.c  */
 #line 1787 "compilers/imcc/imcc.y"
     {
             SymReg * const name = mk_const(interp, (yyvsp[(1) - (3)].s), 'S');
@@ -4412,8 +4140,6 @@ yyreduce:
     break;
 
   case 153:
-
-/* Line 1455 of yacc.c  */
 #line 1792 "compilers/imcc/imcc.y"
     {
            if (IMCC_INFO(interp)->adv_named_id) {
@@ -4427,8 +4153,6 @@ yyreduce:
     break;
 
   case 154:
-
-/* Line 1455 of yacc.c  */
 #line 1802 "compilers/imcc/imcc.y"
     {
            SymReg * const name = mk_const(interp, (yyvsp[(3) - (5)].s), 'S');
@@ -4437,64 +4161,46 @@ yyreduce:
     break;
 
   case 157:
-
-/* Line 1455 of yacc.c  */
 #line 1823 "compilers/imcc/imcc.y"
     { clear_state(interp); }
     break;
 
   case 158:
-
-/* Line 1455 of yacc.c  */
 #line 1828 "compilers/imcc/imcc.y"
     { (yyval.i) = (yyvsp[(2) - (2)].i); }
     break;
 
   case 159:
-
-/* Line 1455 of yacc.c  */
 #line 1829 "compilers/imcc/imcc.y"
     { (yyval.i) = 0; }
     break;
 
   case 160:
-
-/* Line 1455 of yacc.c  */
 #line 1830 "compilers/imcc/imcc.y"
     { (yyval.i) = 0; }
     break;
 
   case 161:
-
-/* Line 1455 of yacc.c  */
 #line 1831 "compilers/imcc/imcc.y"
     { (yyval.i) = 0; }
     break;
 
   case 162:
-
-/* Line 1455 of yacc.c  */
 #line 1832 "compilers/imcc/imcc.y"
     { (yyval.i) = 0; }
     break;
 
   case 163:
-
-/* Line 1455 of yacc.c  */
 #line 1833 "compilers/imcc/imcc.y"
     { (yyval.i) = (yyvsp[(1) - (1)].i); }
     break;
 
   case 164:
-
-/* Line 1455 of yacc.c  */
 #line 1837 "compilers/imcc/imcc.y"
     { (yyval.i) = NULL; }
     break;
 
   case 168:
-
-/* Line 1455 of yacc.c  */
 #line 1848 "compilers/imcc/imcc.y"
     {
              Instruction * const i = iLABEL(interp, IMCC_INFO(interp)->cur_unit, mk_local_label(interp, (yyvsp[(1) - (1)].s)));
@@ -4504,15 +4210,11 @@ yyreduce:
     break;
 
   case 169:
-
-/* Line 1455 of yacc.c  */
 #line 1858 "compilers/imcc/imcc.y"
     { (yyval.i) = (yyvsp[(2) - (3)].i); }
     break;
 
   case 170:
-
-/* Line 1455 of yacc.c  */
 #line 1860 "compilers/imcc/imcc.y"
     {
            if (yynerrs >= PARROT_MAX_RECOVER_ERRORS) {
@@ -4524,8 +4226,6 @@ yyreduce:
     break;
 
   case 171:
-
-/* Line 1455 of yacc.c  */
 #line 1871 "compilers/imcc/imcc.y"
     {
            IdList* const l = (yyvsp[(1) - (1)].idlist);
@@ -4535,8 +4235,6 @@ yyreduce:
     break;
 
   case 172:
-
-/* Line 1455 of yacc.c  */
 #line 1878 "compilers/imcc/imcc.y"
     {
            IdList* const l = (yyvsp[(3) - (3)].idlist);
@@ -4546,8 +4244,6 @@ yyreduce:
     break;
 
   case 173:
-
-/* Line 1455 of yacc.c  */
 #line 1887 "compilers/imcc/imcc.y"
     {
            IdList* const l = mem_allocate_n_zeroed_typed(1, IdList);
@@ -4558,29 +4254,21 @@ yyreduce:
     break;
 
   case 174:
-
-/* Line 1455 of yacc.c  */
 #line 1896 "compilers/imcc/imcc.y"
     { (yyval.t) = 0; }
     break;
 
   case 175:
-
-/* Line 1455 of yacc.c  */
 #line 1897 "compilers/imcc/imcc.y"
     { (yyval.t) = 1; }
     break;
 
   case 178:
-
-/* Line 1455 of yacc.c  */
 #line 1904 "compilers/imcc/imcc.y"
     { IMCC_INFO(interp)->is_def = 1; }
     break;
 
   case 179:
-
-/* Line 1455 of yacc.c  */
 #line 1905 "compilers/imcc/imcc.y"
     {
            IdList *l = (yyvsp[(4) - (4)].idlist);
@@ -4600,8 +4288,6 @@ yyreduce:
     break;
 
   case 180:
-
-/* Line 1455 of yacc.c  */
 #line 1921 "compilers/imcc/imcc.y"
     {
            SymReg *n;
@@ -4615,8 +4301,6 @@ yyreduce:
     break;
 
   case 181:
-
-/* Line 1455 of yacc.c  */
 #line 1931 "compilers/imcc/imcc.y"
     {
            SymReg *n = mk_const(interp, (yyvsp[(2) - (4)].s), 'U');
@@ -4626,15 +4310,11 @@ yyreduce:
     break;
 
   case 182:
-
-/* Line 1455 of yacc.c  */
 #line 1936 "compilers/imcc/imcc.y"
     { IMCC_INFO(interp)->is_def = 1; }
     break;
 
   case 183:
-
-/* Line 1455 of yacc.c  */
 #line 1937 "compilers/imcc/imcc.y"
     {
            mk_const_ident(interp, (yyvsp[(4) - (6)].s), (yyvsp[(3) - (6)].t), (yyvsp[(6) - (6)].sr), 0);
@@ -4644,15 +4324,11 @@ yyreduce:
     break;
 
   case 185:
-
-/* Line 1455 of yacc.c  */
 #line 1944 "compilers/imcc/imcc.y"
     { IMCC_INFO(interp)->is_def = 1; }
     break;
 
   case 186:
-
-/* Line 1455 of yacc.c  */
 #line 1945 "compilers/imcc/imcc.y"
     {
            mk_const_ident(interp, (yyvsp[(4) - (6)].s), (yyvsp[(3) - (6)].t), (yyvsp[(6) - (6)].sr), 1);
@@ -4662,8 +4338,6 @@ yyreduce:
     break;
 
   case 187:
-
-/* Line 1455 of yacc.c  */
 #line 1951 "compilers/imcc/imcc.y"
     {
            (yyval.i) = NULL;
@@ -4673,8 +4347,6 @@ yyreduce:
     break;
 
   case 188:
-
-/* Line 1455 of yacc.c  */
 #line 1957 "compilers/imcc/imcc.y"
     {
             (yyval.i) = MK_I(interp, IMCC_INFO(interp)->cur_unit, "branch", 1, (yyvsp[(2) - (2)].sr));
@@ -4682,8 +4354,6 @@ yyreduce:
     break;
 
   case 189:
-
-/* Line 1455 of yacc.c  */
 #line 1961 "compilers/imcc/imcc.y"
     {
            (yyval.i) = INS(interp,
@@ -4699,64 +4369,46 @@ yyreduce:
     break;
 
   case 190:
-
-/* Line 1455 of yacc.c  */
 #line 1972 "compilers/imcc/imcc.y"
     { (yyval.i) = MK_I(interp, IMCC_INFO(interp)->cur_unit, "null", 1, (yyvsp[(2) - (2)].sr)); }
     break;
 
   case 191:
-
-/* Line 1455 of yacc.c  */
 #line 1973 "compilers/imcc/imcc.y"
     { (yyval.i) = 0; IMCC_INFO(interp)->cur_call = NULL; }
     break;
 
   case 192:
-
-/* Line 1455 of yacc.c  */
 #line 1974 "compilers/imcc/imcc.y"
     { (yyval.i) = 0; }
     break;
 
   case 195:
-
-/* Line 1455 of yacc.c  */
 #line 1977 "compilers/imcc/imcc.y"
     { (yyval.i) = 0;}
     break;
 
   case 196:
-
-/* Line 1455 of yacc.c  */
 #line 1981 "compilers/imcc/imcc.y"
     { (yyval.t) = 'I'; }
     break;
 
   case 197:
-
-/* Line 1455 of yacc.c  */
 #line 1982 "compilers/imcc/imcc.y"
     { (yyval.t) = 'N'; }
     break;
 
   case 198:
-
-/* Line 1455 of yacc.c  */
 #line 1983 "compilers/imcc/imcc.y"
     { (yyval.t) = 'S'; }
     break;
 
   case 199:
-
-/* Line 1455 of yacc.c  */
 #line 1984 "compilers/imcc/imcc.y"
     { (yyval.t) = 'P'; }
     break;
 
   case 200:
-
-/* Line 1455 of yacc.c  */
 #line 1989 "compilers/imcc/imcc.y"
     {
            /* there'd normally be a mem_sys_strdup() here, but the lexer already
@@ -4770,50 +4422,36 @@ yyreduce:
     break;
 
   case 201:
-
-/* Line 1455 of yacc.c  */
 #line 2002 "compilers/imcc/imcc.y"
     { (yyval.i) = MK_I(interp, IMCC_INFO(interp)->cur_unit, "set", 2, (yyvsp[(1) - (3)].sr), (yyvsp[(3) - (3)].sr));  }
     break;
 
   case 202:
-
-/* Line 1455 of yacc.c  */
 #line 2004 "compilers/imcc/imcc.y"
     { (yyval.i) = MK_I(interp, IMCC_INFO(interp)->cur_unit, (yyvsp[(3) - (4)].s), 2, (yyvsp[(1) - (4)].sr), (yyvsp[(4) - (4)].sr));  }
     break;
 
   case 203:
-
-/* Line 1455 of yacc.c  */
 #line 2006 "compilers/imcc/imcc.y"
-    { IMCC_INFO(interp)->line++; (yyval.i) = MK_I(interp, IMCC_INFO(interp)->cur_unit, (yyvsp[(4) - (5)].s), 3, (yyvsp[(1) - (5)].sr), (yyvsp[(3) - (5)].sr), (yyvsp[(5) - (5)].sr)); IMCC_INFO(interp)->line--; }
+    { (yyval.i) = MK_I(interp, IMCC_INFO(interp)->cur_unit, (yyvsp[(4) - (5)].s), 3, (yyvsp[(1) - (5)].sr), (yyvsp[(3) - (5)].sr), (yyvsp[(5) - (5)].sr)); }
     break;
 
   case 204:
-
-/* Line 1455 of yacc.c  */
 #line 2008 "compilers/imcc/imcc.y"
     { (yyval.i) = iINDEXFETCH(interp, IMCC_INFO(interp)->cur_unit, (yyvsp[(1) - (6)].sr), (yyvsp[(3) - (6)].sr), (yyvsp[(5) - (6)].sr)); }
     break;
 
   case 205:
-
-/* Line 1455 of yacc.c  */
 #line 2010 "compilers/imcc/imcc.y"
     { (yyval.i) = iINDEXSET(interp, IMCC_INFO(interp)->cur_unit, (yyvsp[(1) - (6)].sr), (yyvsp[(3) - (6)].sr), (yyvsp[(6) - (6)].sr)); }
     break;
 
   case 206:
-
-/* Line 1455 of yacc.c  */
 #line 2015 "compilers/imcc/imcc.y"
     { (yyval.i) = iNEW(interp, IMCC_INFO(interp)->cur_unit, (yyvsp[(1) - (7)].sr), (yyvsp[(4) - (7)].s), (yyvsp[(6) - (7)].sr), 1); }
     break;
 
   case 207:
-
-/* Line 1455 of yacc.c  */
 #line 2018 "compilers/imcc/imcc.y"
     {
            add_pcc_result((yyvsp[(3) - (3)].i)->symregs[0], (yyvsp[(1) - (3)].sr));
@@ -4823,8 +4461,6 @@ yyreduce:
     break;
 
   case 208:
-
-/* Line 1455 of yacc.c  */
 #line 2024 "compilers/imcc/imcc.y"
     {
            (yyval.i) = IMCC_create_itcall_label(interp);
@@ -4832,8 +4468,6 @@ yyreduce:
     break;
 
   case 209:
-
-/* Line 1455 of yacc.c  */
 #line 2028 "compilers/imcc/imcc.y"
     {
            IMCC_itcall_sub(interp, (yyvsp[(6) - (9)].sr));
@@ -4842,8 +4476,6 @@ yyreduce:
     break;
 
   case 213:
-
-/* Line 1455 of yacc.c  */
 #line 2036 "compilers/imcc/imcc.y"
     {
            (yyval.i) = MK_I(interp, IMCC_INFO(interp)->cur_unit, "null", 1, (yyvsp[(1) - (3)].sr));
@@ -4851,190 +4483,136 @@ yyreduce:
     break;
 
   case 214:
-
-/* Line 1455 of yacc.c  */
 #line 2043 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"not"; }
     break;
 
   case 215:
-
-/* Line 1455 of yacc.c  */
 #line 2044 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"bnot"; }
     break;
 
   case 216:
-
-/* Line 1455 of yacc.c  */
 #line 2045 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"neg"; }
     break;
 
   case 217:
-
-/* Line 1455 of yacc.c  */
 #line 2049 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"sub"; }
     break;
 
   case 218:
-
-/* Line 1455 of yacc.c  */
 #line 2050 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"add"; }
     break;
 
   case 219:
-
-/* Line 1455 of yacc.c  */
 #line 2051 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"mul"; }
     break;
 
   case 220:
-
-/* Line 1455 of yacc.c  */
 #line 2052 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"div"; }
     break;
 
   case 221:
-
-/* Line 1455 of yacc.c  */
 #line 2053 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"mod"; }
     break;
 
   case 222:
-
-/* Line 1455 of yacc.c  */
 #line 2054 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"fdiv"; }
     break;
 
   case 223:
-
-/* Line 1455 of yacc.c  */
 #line 2055 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"pow"; }
     break;
 
   case 224:
-
-/* Line 1455 of yacc.c  */
 #line 2056 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"concat"; }
     break;
 
   case 225:
-
-/* Line 1455 of yacc.c  */
 #line 2057 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"iseq"; }
     break;
 
   case 226:
-
-/* Line 1455 of yacc.c  */
 #line 2058 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"isne"; }
     break;
 
   case 227:
-
-/* Line 1455 of yacc.c  */
 #line 2059 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"isgt"; }
     break;
 
   case 228:
-
-/* Line 1455 of yacc.c  */
 #line 2060 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"isge"; }
     break;
 
   case 229:
-
-/* Line 1455 of yacc.c  */
 #line 2061 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"islt"; }
     break;
 
   case 230:
-
-/* Line 1455 of yacc.c  */
 #line 2062 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"isle"; }
     break;
 
   case 231:
-
-/* Line 1455 of yacc.c  */
 #line 2063 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"shl"; }
     break;
 
   case 232:
-
-/* Line 1455 of yacc.c  */
 #line 2064 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"shr"; }
     break;
 
   case 233:
-
-/* Line 1455 of yacc.c  */
 #line 2065 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"lsr"; }
     break;
 
   case 234:
-
-/* Line 1455 of yacc.c  */
 #line 2066 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"and"; }
     break;
 
   case 235:
-
-/* Line 1455 of yacc.c  */
 #line 2067 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"or"; }
     break;
 
   case 236:
-
-/* Line 1455 of yacc.c  */
 #line 2068 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"xor"; }
     break;
 
   case 237:
-
-/* Line 1455 of yacc.c  */
 #line 2069 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"band"; }
     break;
 
   case 238:
-
-/* Line 1455 of yacc.c  */
 #line 2070 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"bor"; }
     break;
 
   case 239:
-
-/* Line 1455 of yacc.c  */
 #line 2071 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"bxor"; }
     break;
 
   case 240:
-
-/* Line 1455 of yacc.c  */
 #line 2077 "compilers/imcc/imcc.y"
     {
            (yyval.i) = IMCC_create_itcall_label(interp);
@@ -5044,116 +4622,82 @@ yyreduce:
     break;
 
   case 241:
-
-/* Line 1455 of yacc.c  */
 #line 2082 "compilers/imcc/imcc.y"
     {  (yyval.i) = 0; }
     break;
 
   case 242:
-
-/* Line 1455 of yacc.c  */
 #line 2089 "compilers/imcc/imcc.y"
-    {
-           IMCC_INFO(interp)->line++; (yyval.i) = MK_I(interp, IMCC_INFO(interp)->cur_unit, (yyvsp[(2) - (3)].s), 2, (yyvsp[(1) - (3)].sr), (yyvsp[(3) - (3)].sr)); IMCC_INFO(interp)->line--;
-         }
+    { (yyval.i) = MK_I(interp, IMCC_INFO(interp)->cur_unit, (yyvsp[(2) - (3)].s), 2, (yyvsp[(1) - (3)].sr), (yyvsp[(3) - (3)].sr)); }
     break;
 
   case 243:
-
-/* Line 1455 of yacc.c  */
-#line 2095 "compilers/imcc/imcc.y"
+#line 2093 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"add"; }
     break;
 
   case 244:
-
-/* Line 1455 of yacc.c  */
-#line 2096 "compilers/imcc/imcc.y"
+#line 2094 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"sub"; }
     break;
 
   case 245:
-
-/* Line 1455 of yacc.c  */
-#line 2097 "compilers/imcc/imcc.y"
+#line 2095 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"mul"; }
     break;
 
   case 246:
-
-/* Line 1455 of yacc.c  */
-#line 2098 "compilers/imcc/imcc.y"
+#line 2096 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"div"; }
     break;
 
   case 247:
-
-/* Line 1455 of yacc.c  */
-#line 2099 "compilers/imcc/imcc.y"
+#line 2097 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"mod"; }
     break;
 
   case 248:
-
-/* Line 1455 of yacc.c  */
-#line 2100 "compilers/imcc/imcc.y"
+#line 2098 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"fdiv"; }
     break;
 
   case 249:
-
-/* Line 1455 of yacc.c  */
-#line 2101 "compilers/imcc/imcc.y"
+#line 2099 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"concat"; }
     break;
 
   case 250:
-
-/* Line 1455 of yacc.c  */
-#line 2102 "compilers/imcc/imcc.y"
+#line 2100 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"band"; }
     break;
 
   case 251:
-
-/* Line 1455 of yacc.c  */
-#line 2103 "compilers/imcc/imcc.y"
+#line 2101 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"bor"; }
     break;
 
   case 252:
-
-/* Line 1455 of yacc.c  */
-#line 2104 "compilers/imcc/imcc.y"
+#line 2102 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"bxor"; }
     break;
 
   case 253:
-
-/* Line 1455 of yacc.c  */
-#line 2105 "compilers/imcc/imcc.y"
+#line 2103 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"shr"; }
     break;
 
   case 254:
-
-/* Line 1455 of yacc.c  */
-#line 2106 "compilers/imcc/imcc.y"
+#line 2104 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"shl"; }
     break;
 
   case 255:
-
-/* Line 1455 of yacc.c  */
-#line 2107 "compilers/imcc/imcc.y"
+#line 2105 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"lsr"; }
     break;
 
   case 256:
-
-/* Line 1455 of yacc.c  */
-#line 2113 "compilers/imcc/imcc.y"
+#line 2111 "compilers/imcc/imcc.y"
     {
         (yyval.i) = func_ins(interp, IMCC_INFO(interp)->cur_unit, (yyvsp[(1) - (4)].sr), (yyvsp[(3) - (4)].s),
                       IMCC_INFO(interp) -> regs,
@@ -5164,30 +4708,22 @@ yyreduce:
     break;
 
   case 257:
-
-/* Line 1455 of yacc.c  */
-#line 2123 "compilers/imcc/imcc.y"
+#line 2121 "compilers/imcc/imcc.y"
     { (yyval.sr) = mk_sub_address(interp, (yyvsp[(1) - (1)].s));       mem_sys_free((yyvsp[(1) - (1)].s)); }
     break;
 
   case 258:
-
-/* Line 1455 of yacc.c  */
-#line 2124 "compilers/imcc/imcc.y"
+#line 2122 "compilers/imcc/imcc.y"
     { (yyval.sr) = mk_sub_address_fromc(interp, (yyvsp[(1) - (1)].s)); mem_sys_free((yyvsp[(1) - (1)].s)); }
     break;
 
   case 259:
-
-/* Line 1455 of yacc.c  */
-#line 2125 "compilers/imcc/imcc.y"
+#line 2123 "compilers/imcc/imcc.y"
     { (yyval.sr) = mk_sub_address_u(interp, (yyvsp[(1) - (1)].s));     mem_sys_free((yyvsp[(1) - (1)].s)); }
     break;
 
   case 260:
-
-/* Line 1455 of yacc.c  */
-#line 2127 "compilers/imcc/imcc.y"
+#line 2125 "compilers/imcc/imcc.y"
     {
            (yyval.sr) = (yyvsp[(1) - (1)].sr);
            if ((yyvsp[(1) - (1)].sr)->set != 'P')
@@ -5196,9 +4732,7 @@ yyreduce:
     break;
 
   case 261:
-
-/* Line 1455 of yacc.c  */
-#line 2133 "compilers/imcc/imcc.y"
+#line 2131 "compilers/imcc/imcc.y"
     {
             /* disallow bareword method names; SREG name constants are fine */
             const char * const name = (yyvsp[(3) - (3)].sr)->name;
@@ -5215,9 +4749,7 @@ yyreduce:
     break;
 
   case 262:
-
-/* Line 1455 of yacc.c  */
-#line 2147 "compilers/imcc/imcc.y"
+#line 2145 "compilers/imcc/imcc.y"
     {
             IMCC_INFO(interp)->cur_obj = (yyvsp[(1) - (3)].sr);
             (yyval.sr)                         = mk_const(interp, (yyvsp[(3) - (3)].s), 'U');
@@ -5226,9 +4758,7 @@ yyreduce:
     break;
 
   case 263:
-
-/* Line 1455 of yacc.c  */
-#line 2153 "compilers/imcc/imcc.y"
+#line 2151 "compilers/imcc/imcc.y"
     {
             IMCC_INFO(interp)->cur_obj = (yyvsp[(1) - (3)].sr);
             (yyval.sr)                         = mk_const(interp, (yyvsp[(3) - (3)].s), 'S');
@@ -5237,16 +4767,12 @@ yyreduce:
     break;
 
   case 264:
-
-/* Line 1455 of yacc.c  */
-#line 2158 "compilers/imcc/imcc.y"
+#line 2156 "compilers/imcc/imcc.y"
     { IMCC_INFO(interp)->cur_obj = (yyvsp[(1) - (3)].sr); (yyval.sr) = (yyvsp[(3) - (3)].sr); }
     break;
 
   case 265:
-
-/* Line 1455 of yacc.c  */
-#line 2164 "compilers/imcc/imcc.y"
+#line 2162 "compilers/imcc/imcc.y"
     {
            (yyval.i) = IMCC_create_itcall_label(interp);
            IMCC_itcall_sub(interp, (yyvsp[(1) - (1)].sr));
@@ -5254,23 +4780,17 @@ yyreduce:
     break;
 
   case 266:
-
-/* Line 1455 of yacc.c  */
-#line 2168 "compilers/imcc/imcc.y"
+#line 2166 "compilers/imcc/imcc.y"
     { (yyval.i) = (yyvsp[(2) - (5)].i); }
     break;
 
   case 267:
-
-/* Line 1455 of yacc.c  */
-#line 2172 "compilers/imcc/imcc.y"
+#line 2170 "compilers/imcc/imcc.y"
     { (yyval.sr) = 0; }
     break;
 
   case 268:
-
-/* Line 1455 of yacc.c  */
-#line 2174 "compilers/imcc/imcc.y"
+#line 2172 "compilers/imcc/imcc.y"
     {
            (yyval.sr) = 0;
            if (IMCC_INFO(interp)->adv_named_id) {
@@ -5283,9 +4803,7 @@ yyreduce:
     break;
 
   case 269:
-
-/* Line 1455 of yacc.c  */
-#line 2184 "compilers/imcc/imcc.y"
+#line 2182 "compilers/imcc/imcc.y"
     {
            (yyval.sr) = 0;
            if (IMCC_INFO(interp)->adv_named_id) {
@@ -5298,9 +4816,7 @@ yyreduce:
     break;
 
   case 270:
-
-/* Line 1455 of yacc.c  */
-#line 2194 "compilers/imcc/imcc.y"
+#line 2192 "compilers/imcc/imcc.y"
     {
            (yyval.sr) = 0;
            add_pcc_named_arg(IMCC_INFO(interp)->cur_call,
@@ -5310,9 +4826,7 @@ yyreduce:
     break;
 
   case 271:
-
-/* Line 1455 of yacc.c  */
-#line 2201 "compilers/imcc/imcc.y"
+#line 2199 "compilers/imcc/imcc.y"
     {
            (yyval.sr) = 0;
            add_pcc_named_arg_var(IMCC_INFO(interp)->cur_call, (yyvsp[(1) - (3)].sr), (yyvsp[(3) - (3)].sr));
@@ -5320,9 +4834,7 @@ yyreduce:
     break;
 
   case 272:
-
-/* Line 1455 of yacc.c  */
-#line 2206 "compilers/imcc/imcc.y"
+#line 2204 "compilers/imcc/imcc.y"
     {
            (yyval.sr) = 0;
            add_pcc_named_arg(IMCC_INFO(interp)->cur_call,
@@ -5332,65 +4844,47 @@ yyreduce:
     break;
 
   case 273:
-
-/* Line 1455 of yacc.c  */
-#line 2215 "compilers/imcc/imcc.y"
+#line 2213 "compilers/imcc/imcc.y"
     { (yyval.sr) = (yyvsp[(1) - (2)].sr); (yyval.sr)->type |= (yyvsp[(2) - (2)].t); }
     break;
 
   case 274:
-
-/* Line 1455 of yacc.c  */
-#line 2219 "compilers/imcc/imcc.y"
+#line 2217 "compilers/imcc/imcc.y"
     { (yyval.t) = 0; }
     break;
 
   case 275:
-
-/* Line 1455 of yacc.c  */
-#line 2220 "compilers/imcc/imcc.y"
+#line 2218 "compilers/imcc/imcc.y"
     { (yyval.t) = (yyvsp[(1) - (2)].t) | (yyvsp[(2) - (2)].t); }
     break;
 
   case 276:
-
-/* Line 1455 of yacc.c  */
-#line 2224 "compilers/imcc/imcc.y"
+#line 2222 "compilers/imcc/imcc.y"
     { (yyval.t) = VT_FLAT; }
     break;
 
   case 277:
-
-/* Line 1455 of yacc.c  */
-#line 2225 "compilers/imcc/imcc.y"
+#line 2223 "compilers/imcc/imcc.y"
     { (yyval.t) = VT_NAMED; }
     break;
 
   case 278:
-
-/* Line 1455 of yacc.c  */
-#line 2228 "compilers/imcc/imcc.y"
+#line 2226 "compilers/imcc/imcc.y"
     { adv_named_set_u(interp, (yyvsp[(3) - (4)].s)); (yyval.t) = 0; }
     break;
 
   case 279:
-
-/* Line 1455 of yacc.c  */
-#line 2229 "compilers/imcc/imcc.y"
+#line 2227 "compilers/imcc/imcc.y"
     { adv_named_set(interp, (yyvsp[(3) - (4)].s));   (yyval.t) = 0; }
     break;
 
   case 280:
-
-/* Line 1455 of yacc.c  */
-#line 2233 "compilers/imcc/imcc.y"
+#line 2231 "compilers/imcc/imcc.y"
     { (yyval.sr) = (yyvsp[(1) - (2)].sr); (yyval.sr)->type |= (yyvsp[(2) - (2)].t); }
     break;
 
   case 281:
-
-/* Line 1455 of yacc.c  */
-#line 2238 "compilers/imcc/imcc.y"
+#line 2236 "compilers/imcc/imcc.y"
     {
            (yyval.sr) = 0;
            if (IMCC_INFO(interp)->adv_named_id) {
@@ -5403,9 +4897,7 @@ yyreduce:
     break;
 
   case 282:
-
-/* Line 1455 of yacc.c  */
-#line 2248 "compilers/imcc/imcc.y"
+#line 2246 "compilers/imcc/imcc.y"
     {
             add_pcc_named_result(IMCC_INFO(interp)->cur_call,
             mk_const(interp, (yyvsp[(3) - (5)].s), 'S'), (yyvsp[(5) - (5)].sr));
@@ -5414,9 +4906,7 @@ yyreduce:
     break;
 
   case 283:
-
-/* Line 1455 of yacc.c  */
-#line 2254 "compilers/imcc/imcc.y"
+#line 2252 "compilers/imcc/imcc.y"
     {
            (yyval.sr) = 0;
            if (IMCC_INFO(interp)->adv_named_id) {
@@ -5429,9 +4919,7 @@ yyreduce:
     break;
 
   case 284:
-
-/* Line 1455 of yacc.c  */
-#line 2264 "compilers/imcc/imcc.y"
+#line 2262 "compilers/imcc/imcc.y"
     {
            add_pcc_named_result(IMCC_INFO(interp)->cur_call, mk_const(interp, (yyvsp[(1) - (3)].s), 'S'), (yyvsp[(3) - (3)].sr));
            mem_sys_free((yyvsp[(1) - (3)].s));
@@ -5439,168 +4927,124 @@ yyreduce:
     break;
 
   case 285:
-
-/* Line 1455 of yacc.c  */
-#line 2268 "compilers/imcc/imcc.y"
+#line 2266 "compilers/imcc/imcc.y"
     { (yyval.sr) = 0; }
     break;
 
   case 286:
-
-/* Line 1455 of yacc.c  */
-#line 2272 "compilers/imcc/imcc.y"
+#line 2270 "compilers/imcc/imcc.y"
     { (yyval.i) = (yyvsp[(1) - (1)].i); }
     break;
 
   case 287:
-
-/* Line 1455 of yacc.c  */
-#line 2273 "compilers/imcc/imcc.y"
+#line 2271 "compilers/imcc/imcc.y"
     { (yyval.i) = (yyvsp[(1) - (1)].i); }
     break;
 
   case 288:
-
-/* Line 1455 of yacc.c  */
-#line 2278 "compilers/imcc/imcc.y"
+#line 2276 "compilers/imcc/imcc.y"
     {
            (yyval.i) =MK_I(interp, IMCC_INFO(interp)->cur_unit, inv_op((yyvsp[(3) - (6)].s)), 3, (yyvsp[(2) - (6)].sr), (yyvsp[(4) - (6)].sr), (yyvsp[(6) - (6)].sr));
          }
     break;
 
   case 289:
-
-/* Line 1455 of yacc.c  */
-#line 2282 "compilers/imcc/imcc.y"
+#line 2280 "compilers/imcc/imcc.y"
     {
            (yyval.i) = MK_I(interp, IMCC_INFO(interp)->cur_unit, "unless_null", 2, (yyvsp[(3) - (5)].sr), (yyvsp[(5) - (5)].sr));
          }
     break;
 
   case 290:
-
-/* Line 1455 of yacc.c  */
-#line 2286 "compilers/imcc/imcc.y"
+#line 2284 "compilers/imcc/imcc.y"
     {
            (yyval.i) = MK_I(interp, IMCC_INFO(interp)->cur_unit, "unless", 2, (yyvsp[(2) - (4)].sr), (yyvsp[(4) - (4)].sr));
          }
     break;
 
   case 291:
-
-/* Line 1455 of yacc.c  */
-#line 2293 "compilers/imcc/imcc.y"
+#line 2291 "compilers/imcc/imcc.y"
     {
            (yyval.i) = MK_I(interp, IMCC_INFO(interp)->cur_unit, "if", 2, (yyvsp[(2) - (4)].sr), (yyvsp[(4) - (4)].sr));
          }
     break;
 
   case 292:
-
-/* Line 1455 of yacc.c  */
-#line 2297 "compilers/imcc/imcc.y"
+#line 2295 "compilers/imcc/imcc.y"
     {
            (yyval.i) =MK_I(interp, IMCC_INFO(interp)->cur_unit, (yyvsp[(3) - (6)].s), 3, (yyvsp[(2) - (6)].sr), (yyvsp[(4) - (6)].sr), (yyvsp[(6) - (6)].sr));
          }
     break;
 
   case 293:
-
-/* Line 1455 of yacc.c  */
-#line 2301 "compilers/imcc/imcc.y"
+#line 2299 "compilers/imcc/imcc.y"
     {
            (yyval.i) = MK_I(interp, IMCC_INFO(interp)->cur_unit, "if_null", 2, (yyvsp[(3) - (5)].sr), (yyvsp[(5) - (5)].sr));
          }
     break;
 
   case 294:
-
-/* Line 1455 of yacc.c  */
-#line 2307 "compilers/imcc/imcc.y"
+#line 2305 "compilers/imcc/imcc.y"
     { (yyval.t) = 0; }
     break;
 
   case 295:
-
-/* Line 1455 of yacc.c  */
-#line 2308 "compilers/imcc/imcc.y"
+#line 2306 "compilers/imcc/imcc.y"
     { (yyval.t) = 0; }
     break;
 
   case 296:
-
-/* Line 1455 of yacc.c  */
-#line 2312 "compilers/imcc/imcc.y"
+#line 2310 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"eq"; }
     break;
 
   case 297:
-
-/* Line 1455 of yacc.c  */
-#line 2313 "compilers/imcc/imcc.y"
+#line 2311 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"ne"; }
     break;
 
   case 298:
-
-/* Line 1455 of yacc.c  */
-#line 2314 "compilers/imcc/imcc.y"
+#line 2312 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"gt"; }
     break;
 
   case 299:
-
-/* Line 1455 of yacc.c  */
-#line 2315 "compilers/imcc/imcc.y"
+#line 2313 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"ge"; }
     break;
 
   case 300:
-
-/* Line 1455 of yacc.c  */
-#line 2316 "compilers/imcc/imcc.y"
+#line 2314 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"lt"; }
     break;
 
   case 301:
-
-/* Line 1455 of yacc.c  */
-#line 2317 "compilers/imcc/imcc.y"
+#line 2315 "compilers/imcc/imcc.y"
     { (yyval.s) = (char *)"le"; }
     break;
 
   case 304:
-
-/* Line 1455 of yacc.c  */
-#line 2326 "compilers/imcc/imcc.y"
+#line 2324 "compilers/imcc/imcc.y"
     { (yyval.sr) = NULL; }
     break;
 
   case 305:
-
-/* Line 1455 of yacc.c  */
-#line 2327 "compilers/imcc/imcc.y"
+#line 2325 "compilers/imcc/imcc.y"
     { (yyval.sr) = (yyvsp[(1) - (1)].sr); }
     break;
 
   case 306:
-
-/* Line 1455 of yacc.c  */
-#line 2331 "compilers/imcc/imcc.y"
+#line 2329 "compilers/imcc/imcc.y"
     { (yyval.sr) = IMCC_INFO(interp)->regs[0]; }
     break;
 
   case 308:
-
-/* Line 1455 of yacc.c  */
-#line 2336 "compilers/imcc/imcc.y"
+#line 2334 "compilers/imcc/imcc.y"
     { IMCC_INFO(interp)->regs[IMCC_INFO(interp)->nargs++] = (yyvsp[(1) - (1)].sr); }
     break;
 
   case 309:
-
-/* Line 1455 of yacc.c  */
-#line 2338 "compilers/imcc/imcc.y"
+#line 2336 "compilers/imcc/imcc.y"
     {
            IMCC_INFO(interp) -> regs[IMCC_INFO(interp)->nargs++] = (yyvsp[(1) - (4)].sr);
            IMCC_INFO(interp) -> keyvec |= KEY_BIT(IMCC_INFO(interp)->nargs);
@@ -5610,9 +5054,7 @@ yyreduce:
     break;
 
   case 310:
-
-/* Line 1455 of yacc.c  */
-#line 2345 "compilers/imcc/imcc.y"
+#line 2343 "compilers/imcc/imcc.y"
     {
            IMCC_INFO(interp) -> regs[IMCC_INFO(interp)->nargs++] = (yyvsp[(2) - (3)].sr);
            (yyval.sr) = (yyvsp[(2) - (3)].sr);
@@ -5620,60 +5062,44 @@ yyreduce:
     break;
 
   case 312:
-
-/* Line 1455 of yacc.c  */
-#line 2352 "compilers/imcc/imcc.y"
+#line 2350 "compilers/imcc/imcc.y"
     { (yyval.sr) = mk_sub_address_fromc(interp, (yyvsp[(1) - (1)].s)); mem_sys_free((yyvsp[(1) - (1)].s)); }
     break;
 
   case 313:
-
-/* Line 1455 of yacc.c  */
-#line 2353 "compilers/imcc/imcc.y"
+#line 2351 "compilers/imcc/imcc.y"
     { (yyval.sr) = mk_sub_address_u(interp, (yyvsp[(1) - (1)].s));  mem_sys_free((yyvsp[(1) - (1)].s)); }
     break;
 
   case 314:
-
-/* Line 1455 of yacc.c  */
-#line 2357 "compilers/imcc/imcc.y"
+#line 2355 "compilers/imcc/imcc.y"
     { (yyval.sr) = mk_sub_address(interp, (yyvsp[(1) - (1)].s)); mem_sys_free((yyvsp[(1) - (1)].s)); }
     break;
 
   case 315:
-
-/* Line 1455 of yacc.c  */
-#line 2358 "compilers/imcc/imcc.y"
+#line 2356 "compilers/imcc/imcc.y"
     { (yyval.sr) = mk_sub_address(interp, (yyvsp[(1) - (1)].s)); mem_sys_free((yyvsp[(1) - (1)].s)); }
     break;
 
   case 316:
-
-/* Line 1455 of yacc.c  */
-#line 2362 "compilers/imcc/imcc.y"
+#line 2360 "compilers/imcc/imcc.y"
     { (yyval.sr) = mk_label_address(interp, (yyvsp[(1) - (1)].s)); mem_sys_free((yyvsp[(1) - (1)].s)); }
     break;
 
   case 317:
-
-/* Line 1455 of yacc.c  */
-#line 2363 "compilers/imcc/imcc.y"
+#line 2361 "compilers/imcc/imcc.y"
     { (yyval.sr) = mk_label_address(interp, (yyvsp[(1) - (1)].s)); mem_sys_free((yyvsp[(1) - (1)].s)); }
     break;
 
   case 322:
-
-/* Line 1455 of yacc.c  */
-#line 2377 "compilers/imcc/imcc.y"
+#line 2375 "compilers/imcc/imcc.y"
     {
            IMCC_INFO(interp)->nkeys    = 0;
          }
     break;
 
   case 323:
-
-/* Line 1455 of yacc.c  */
-#line 2381 "compilers/imcc/imcc.y"
+#line 2379 "compilers/imcc/imcc.y"
     {
            (yyval.sr) = link_keys(interp,
                           IMCC_INFO(interp)->nkeys,
@@ -5682,18 +5108,14 @@ yyreduce:
     break;
 
   case 324:
-
-/* Line 1455 of yacc.c  */
-#line 2389 "compilers/imcc/imcc.y"
+#line 2387 "compilers/imcc/imcc.y"
     {
            IMCC_INFO(interp)->nkeys = 0;
          }
     break;
 
   case 325:
-
-/* Line 1455 of yacc.c  */
-#line 2393 "compilers/imcc/imcc.y"
+#line 2391 "compilers/imcc/imcc.y"
     {
            (yyval.sr) = link_keys(interp,
                           IMCC_INFO(interp)->nkeys,
@@ -5702,16 +5124,12 @@ yyreduce:
     break;
 
   case 326:
-
-/* Line 1455 of yacc.c  */
-#line 2401 "compilers/imcc/imcc.y"
+#line 2399 "compilers/imcc/imcc.y"
     { IMCC_INFO(interp)->keys[IMCC_INFO(interp)->nkeys++] = (yyvsp[(1) - (1)].sr); }
     break;
 
   case 327:
-
-/* Line 1455 of yacc.c  */
-#line 2403 "compilers/imcc/imcc.y"
+#line 2401 "compilers/imcc/imcc.y"
     {
            IMCC_INFO(interp)->keys[IMCC_INFO(interp)->nkeys++] = (yyvsp[(3) - (3)].sr);
            (yyval.sr) = IMCC_INFO(interp)->keys[0];
@@ -5719,81 +5137,60 @@ yyreduce:
     break;
 
   case 328:
-
-/* Line 1455 of yacc.c  */
-#line 2411 "compilers/imcc/imcc.y"
+#line 2409 "compilers/imcc/imcc.y"
     {
            (yyval.sr) = (yyvsp[(1) - (1)].sr);
          }
     break;
 
   case 329:
-
-/* Line 1455 of yacc.c  */
-#line 2417 "compilers/imcc/imcc.y"
+#line 2415 "compilers/imcc/imcc.y"
     { (yyval.sr) = mk_symreg(interp, (yyvsp[(1) - (1)].s), 'I'); }
     break;
 
   case 330:
-
-/* Line 1455 of yacc.c  */
-#line 2418 "compilers/imcc/imcc.y"
+#line 2416 "compilers/imcc/imcc.y"
     { (yyval.sr) = mk_symreg(interp, (yyvsp[(1) - (1)].s), 'N'); }
     break;
 
   case 331:
-
-/* Line 1455 of yacc.c  */
-#line 2419 "compilers/imcc/imcc.y"
+#line 2417 "compilers/imcc/imcc.y"
     { (yyval.sr) = mk_symreg(interp, (yyvsp[(1) - (1)].s), 'S'); }
     break;
 
   case 332:
-
-/* Line 1455 of yacc.c  */
-#line 2420 "compilers/imcc/imcc.y"
+#line 2418 "compilers/imcc/imcc.y"
     { (yyval.sr) = mk_symreg(interp, (yyvsp[(1) - (1)].s), 'P'); }
     break;
 
   case 333:
-
-/* Line 1455 of yacc.c  */
-#line 2421 "compilers/imcc/imcc.y"
+#line 2419 "compilers/imcc/imcc.y"
     { (yyval.sr) = mk_pasm_reg(interp, (yyvsp[(1) - (1)].s)); mem_sys_free((yyvsp[(1) - (1)].s)); }
     break;
 
   case 334:
-
-/* Line 1455 of yacc.c  */
-#line 2425 "compilers/imcc/imcc.y"
+#line 2423 "compilers/imcc/imcc.y"
     { (yyval.sr) = mk_const(interp, (yyvsp[(1) - (1)].s), 'I'); mem_sys_free((yyvsp[(1) - (1)].s)); }
     break;
 
   case 335:
-
-/* Line 1455 of yacc.c  */
-#line 2426 "compilers/imcc/imcc.y"
+#line 2424 "compilers/imcc/imcc.y"
     { (yyval.sr) = mk_const(interp, (yyvsp[(1) - (1)].s), 'N'); mem_sys_free((yyvsp[(1) - (1)].s)); }
     break;
 
   case 336:
-
-/* Line 1455 of yacc.c  */
-#line 2427 "compilers/imcc/imcc.y"
+#line 2425 "compilers/imcc/imcc.y"
     { (yyval.sr) = mk_const(interp, (yyvsp[(1) - (1)].s), 'S'); mem_sys_free((yyvsp[(1) - (1)].s)); }
     break;
 
   case 337:
-
-/* Line 1455 of yacc.c  */
-#line 2428 "compilers/imcc/imcc.y"
+#line 2426 "compilers/imcc/imcc.y"
     { (yyval.sr) = mk_const(interp, (yyvsp[(1) - (1)].s), 'U'); mem_sys_free((yyvsp[(1) - (1)].s)); }
     break;
 
 
-
-/* Line 1455 of yacc.c  */
-#line 5786 "compilers/imcc/imcparser.c"
+/* Line 1267 of yacc.c.  */
+#line 5183 "compilers/imcc/imcparser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -5803,6 +5200,7 @@ yyreduce:
   YY_STACK_PRINT (yyss, yyssp);
 
   *++yyvsp = yyval;
+
 
   /* Now `shift' the result of the reduction.  Determine what state
      that goes to, based on the state we popped back to and the rule
@@ -5868,7 +5266,7 @@ yyerrlab:
 
   if (yyerrstatus == 3)
     {
-      /* If just tried and failed to reuse lookahead token after an
+      /* If just tried and failed to reuse look-ahead token after an
 	 error, discard it.  */
 
       if (yychar <= YYEOF)
@@ -5885,7 +5283,7 @@ yyerrlab:
 	}
     }
 
-  /* Else will try to reuse lookahead token after shifting the error
+  /* Else will try to reuse look-ahead token after shifting the error
      token.  */
   goto yyerrlab1;
 
@@ -5942,6 +5340,9 @@ yyerrlab1:
       YY_STACK_PRINT (yyss, yyssp);
     }
 
+  if (yyn == YYFINAL)
+    YYACCEPT;
+
   *++yyvsp = yylval;
 
 
@@ -5966,7 +5367,7 @@ yyabortlab:
   yyresult = 1;
   goto yyreturn;
 
-#if !defined(yyoverflow) || YYERROR_VERBOSE
+#ifndef yyoverflow
 /*-------------------------------------------------.
 | yyexhaustedlab -- memory exhaustion comes here.  |
 `-------------------------------------------------*/
@@ -5977,7 +5378,7 @@ yyexhaustedlab:
 #endif
 
 yyreturn:
-  if (yychar != YYEMPTY)
+  if (yychar != YYEOF && yychar != YYEMPTY)
      yydestruct ("Cleanup: discarding lookahead",
 		 yytoken, &yylval, yyscanner, interp);
   /* Do not reclaim the symbols of the rule which action triggered
@@ -6003,9 +5404,7 @@ yyreturn:
 }
 
 
-
-/* Line 1675 of yacc.c  */
-#line 2434 "compilers/imcc/imcc.y"
+#line 2432 "compilers/imcc/imcc.y"
 
 
 /* I need this prototype somewhere... */

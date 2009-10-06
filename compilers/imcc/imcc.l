@@ -174,8 +174,7 @@ SP              [ ]
 
 <heredoc2>{EOL} {
         /* heredocs have highest priority
-         * arrange them before all wildcard state matches
-         */
+         * arrange them before all wildcard state matches */
 
         /* Newline in the heredoc. Realloc and cat on. */
         IMCC_INFO(interp)->line++;
@@ -210,6 +209,8 @@ SP              [ ]
             yy_pop_state(yyscanner);
             yy_scan_string(IMCC_INFO(interp)->frames->heredoc_rest, yyscanner);
 
+            /* the EOF rule will increment the line number; decrement here */
+            IMCC_INFO(interp)->line--;
             return STRINGC;
         }
         else {
@@ -282,9 +283,8 @@ SP              [ ]
 
 
 <INITIAL,emit,macro>^"=cut"{EOL} {
-    /* this is a stand-alone =cut, but we're
-     * not in POD mode, so just ignore.
-     */
+    /* this is a stand-alone =cut, but we're not in POD mode, so ignore.  */
+    IMCC_INFO(interp)->line++;
 }
 
 <INITIAL,emit,macro>^"=" {
@@ -521,7 +521,7 @@ SP              [ ]
         char   * const macro_name = mem_sys_strdup(yytext + 1);
         int failed = expand_macro(interp, macro_name, yyscanner);
         mem_sys_free(macro_name);
-        if (! failed) {
+        if (!failed) {
             yyless(1);
             return DOT;
         }
@@ -989,7 +989,7 @@ read_macro(YYSTYPE *valp, PARROT_INTERP, void *yyscanner)
         IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "Macro names must be identifiers");
 
     IMCC_INFO(interp)->cur_macro_name = valp->s;
-    start_line                        = IMCC_INFO(interp)->line++;
+    start_line                        = IMCC_INFO(interp)->line;
 
     memset(&params, 0, sizeof (params_t));
 
@@ -1057,6 +1057,9 @@ read_macro(YYSTYPE *valp, PARROT_INTERP, void *yyscanner)
     mem_sys_free(IMCC_INFO(interp)->macro_buffer);
     IMCC_INFO(interp)->macro_buffer   = NULL;
     IMCC_INFO(interp)->cur_macro_name = NULL;
+
+    /* the ENDM rule doesn't set the line number */
+    IMCC_INFO(interp)->line--;
 
     return MACRO;
 }
@@ -1218,7 +1221,8 @@ expand_macro(PARROT_INTERP, ARGIN(const char *name), void *yyscanner)
             }
         }
 
-        IMCC_INFO(interp)->line = m->line;
+        /* let the normal EOF rules match line numbers */
+        IMCC_INFO(interp)->line = m->line - 1;
         scan_string(frame, m->expansion, yyscanner);
 
         return 1;

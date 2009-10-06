@@ -630,7 +630,7 @@ emitb(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), ARGIN_NULLOK(Instruction *i)
     }
 
     /* lexer is in next line already */
-    i->line = IMCC_INFO(interp)->line - 1;
+    i->line = IMCC_INFO(interp)->line;
 
     return i;
 }
