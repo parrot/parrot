@@ -439,7 +439,7 @@ Parrot_io_read_win32(PARROT_INTERP,
 
     s = Parrot_io_make_string(interp, buf, 2048);
     len = s->bufused;
-    buffer = s->strstart;
+    buffer = Buffer_bufstart(s);
 
     if (ReadFile(Parrot_io_get_os_handle(interp, filehandle),
                 (LPVOID) buffer, (DWORD) len, &countread, NULL)) {

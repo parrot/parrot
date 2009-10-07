@@ -233,10 +233,9 @@ Parrot_io_fill_readbuf(PARROT_INTERP, ARGMOD(PMC *filehandle))
     STRING  *s    = &fake;
     PIOOFF_T pos  = Parrot_io_get_file_position(interp, filehandle);
 
-    fake.strstart = (char *)Parrot_io_get_buffer_start(interp, filehandle);
-    fake.bufused  = Parrot_io_get_buffer_size(interp, filehandle);
-
-    got           = PIO_READ(interp, filehandle, &s);
+    Buffer_bufstart(s) = Parrot_io_get_buffer_start(interp, filehandle);
+    fake.bufused       = Parrot_io_get_buffer_size(interp, filehandle);
+    got                = PIO_READ(interp, filehandle, &s);
 
     /* buffer-filling does not change fileposition */
     Parrot_io_set_file_position(interp, filehandle, pos);
@@ -347,10 +346,10 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
             STRING     fake;
             STRING    *sf = &fake;
 
-            fake.strstart = (char *)out_buf;
-            fake.bufused  = len;
-            got           = PIO_READ(interp, filehandle, &sf);
-            s->strlen     = s->bufused = current + got;
+            Buffer_bufstart(sf) = (char *)out_buf;
+            fake.bufused        = len;
+            got                 = PIO_READ(interp, filehandle, &sf);
+            s->strlen           = s->bufused = current + got;
 
             Parrot_io_set_file_position(interp, filehandle,
                     (got + Parrot_io_get_file_position(interp, filehandle)));

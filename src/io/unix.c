@@ -502,7 +502,7 @@ Parrot_io_read_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
     STRING * const s = Parrot_io_make_string(interp, buf, 2048);
 
     const size_t len = s->bufused;
-    void * const buffer = s->strstart;
+    void * const buffer = Buffer_bufstart(s);
 
     for (;;) {
         const int bytes = read(file_descriptor, buffer, len);

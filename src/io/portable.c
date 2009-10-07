@@ -375,7 +375,7 @@ Parrot_io_read_portable(PARROT_INTERP, SHIM(PMC *filehandle),
     ASSERT_ARGS(Parrot_io_read_portable)
     FILE   * const fptr   = (FILE *)Parrot_io_get_os_handle(interp, filehandle);
     STRING * const s      = Parrot_io_make_string(interp, buf, 2048);
-    void   * const buffer = s->strstart;
+    void   * const buffer = Buffer_bufstart(s);
     const   size_t len    = s->bufused;
     const   size_t bytes  = fread(buffer, 1, len, fptr);
 
