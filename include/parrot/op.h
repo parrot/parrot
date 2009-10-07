@@ -15,7 +15,7 @@
 
 #include "parrot/config.h"
 
-#define PARROT_MAX_ARGS 8
+#define PARROT_MAX_ARGS 16
 
 typedef enum {
     PARROT_INLINE_OP,
