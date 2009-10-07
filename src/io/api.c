@@ -466,17 +466,14 @@ Parrot_io_write(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const void *buffer), size
     ASSERT_ARGS(Parrot_io_write)
     DECL_CONST_CAST;
     INTVAL result;
-    STRING fake;
+    STRING *s;
 
     if (PMC_IS_NULL(pmc))
         return -1;
 
-    fake.strstart = (char *) PARROT_const_cast(void *, buffer);
-    fake.strlen = fake.bufused = length;
-    fake.charset = Parrot_default_charset_ptr;
-    fake.encoding = Parrot_default_encoding_ptr;
+    s = Parrot_str_new(interp, (char *) PARROT_const_cast(void *, buffer), length);
 
-    result = Parrot_io_putps(interp, pmc, &fake);
+    result = Parrot_io_putps(interp, pmc, s);
     return result;
 }
 
