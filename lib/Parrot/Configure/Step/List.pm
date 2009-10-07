@@ -41,6 +41,7 @@ my @steps = qw(
     auto::arch
     auto::jit
     auto::frames
+    auto::llvm
     auto::cpu
     auto::cgoto
     auto::inline
