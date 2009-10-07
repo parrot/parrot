@@ -198,7 +198,7 @@ Removes and returns an item from the start of the array.
 
 =item C<void unshift_integer(INTVAL value)>
 
-Add and integer to the start of the array.
+Add an integer to the start of the array.
 
 =cut
 

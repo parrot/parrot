@@ -1,16 +1,10 @@
-#! perl
-# Copyright (C) 2001-2007, Parrot Foundation.
+#! parrot
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 18;
 
 =head1 NAME
 
-t/pmc/resizableintegerarray.t - ResizableIntegerArray PMC
+t/pmc/resizableintegerarray.t - Tests for the ResizableIntegerArray PMC
 
 =head1 SYNOPSIS
 
@@ -18,438 +12,544 @@ t/pmc/resizableintegerarray.t - ResizableIntegerArray PMC
 
 =head1 DESCRIPTION
 
-Tests C<ResizableIntegerArray> PMC. Checks size, sets various elements, including
-out-of-bounds test. Checks INT and PMC keys.
+This tests the C<ResizableIntegerArray> PMC. It checks size, sets various
+elements, including out-of-bounds test as well as INT and PMC keys.
 
 =cut
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting array size" );
-    new P0, ['ResizableIntegerArray']
+=for notes
 
-    set I0,P0
-    eq I0,0,OK_1
-    print "not "
-OK_1:    print "ok 1\n"
+Coverage plan:
 
-    set P0,1
-    set I0,P0
-    eq I0,1,OK_2
-    print "not "
-OK_2:    print "ok 2\n"
+ * Get & Set Size
 
-    set P0,5
-    set I0,P0
-    eq I0,5,OK_3
-    print "not "
-OK_3:    print "ok 3\n"
+ * Get & Set Element
+     * Type of value (int, num, string, pmc)
+     * Type of index (int, pmc)
+     * index negative/in-range/beyond-end
+     * Set doesn't clobber other elements
 
-    set P0,9
-    set I0,P0
-    eq I0,9,OK_4
-    print "not "
-OK_4:    print "ok 4\n"
+ * Push/Unshift, Pop/Shift
+     * Correct values
+     * Correct sequence
+     * Correctly resized
 
-    set P0,7
-    set I0,P0
-    eq I0,7,OK_5
-    print "not "
-OK_5:    print "ok 5\n"
+ * Iterator
+     * Doesn't change array size
+     * Multiple concurrent iterators don't interfere
 
-        end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-ok 5
-OUTPUT
+=cut
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting first element" );
-    new P0, ['ResizableIntegerArray']
-    set P0, 1
+.sub main :main
+    .include 'test_more.pir'
+    plan(41)
 
-    set P0[0],-7
-    set I0,P0[0]
-    eq I0,-7,OK_1
-    print "not "
-OK_1:    print "ok 1\n"
+    test_does_interfaces()
 
-    set P0[0],3.7
-    set N0,P0[0]
-    eq N0,3.0,OK_2
-    print "not "
-OK_2:    print "ok 2\n"
+    test_get_size()
+    test_resize()
+    test_distinct_storage()
 
-    set P0[0],"17"
-    set S0,P0[0]
-    eq S0,"17",OK_3
-    print "not "
-OK_3:    print "ok 3\n"
+    test_cant_set_negative()
+    test_cant_get_negative()
+    test_set_beyond_end()
+    test_get_beyond_end()
 
-    end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
+    test_conversion()
+    test_conversion_overflow()
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting second element" );
-    new P0, ['ResizableIntegerArray']
+    test_set_pmc_index()
+    test_get_pmc_index()
 
-    set P0[1], -7
-    set I0, P0[1]
-    eq I0,-7,OK_1
-    print "not "
-OK_1:    print "ok 1\n"
-
-    set P0[1], 3.7
-    set N0, P0[1]
-    eq N0,3.0,OK_2
-    print "not "
-OK_2:    print "ok 2\n"
-
-    set P0[1],"17"
-    set S0, P0[1]
-    eq S0,"17",OK_3
-    print "not "
-OK_3:    print "ok 3\n"
-
-    end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting negatively indexed elements" );
-    new P0, ['ResizableIntegerArray']
-    set P0, 1
-
-    push_eh eh
-    set P0[-1], -7
-    pop_eh
-    print "no ex\n"
-    end
-eh:
-    say "got an ex"
-    end
-CODE
-got an ex
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "Getting negatively indexed elements" );
-    new P0, ['ResizableIntegerArray']
-    set P0, 1
-
-    push_eh eh
-    set I0, P0[-1]
-    pop_eh
-    print "no ex\n"
-    end
-eh:
-    say "got an ex"
-    end
-CODE
-got an ex
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
-    new P0, ['ResizableIntegerArray']
-    set P0, 1
-
-    set P0[1], -7
-    print "ok 1\n"
-
-    end
-CODE
-ok 1
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
-    new P0, ['ResizableIntegerArray']
-    set P0, 1
-
-    set I0, P0[1]
-    print "ok 1\n"
-    end
-CODE
-ok 1
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );
-     .include 'fp_equality.pasm'
-     new P0, ['ResizableIntegerArray']
-     new P1, ['Key']
-
-     set P1, 0
-     set P0[P1], 25
-
-     set P1, 1
-     set P0[P1], 2.5
-
-     set P1, 2
-     set P0[P1], "17"
-
-     set I0, P0[0]
-     eq I0, 25, OK1
-     print "not "
-OK1: print "ok 1\\n"
-
-     set N0, P0[1]
-     .fp_eq_pasm(N0, 2.0, OK2)
-     print "not "
-OK2: print "ok 2\\n"
-
-     set S0, P0[2]
-     eq S0, "17", OK3
-     print "not "
-OK3: print "ok 3\\n"
-
-     end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys" );
-     .include 'fp_equality.pasm'
-     new P0, ['ResizableIntegerArray']
-     set P0, 1
-
-     set P0[25], 125
-     set P0[128], 10.2
-     set P0[513], "17"
-     new P1, ['Integer']
-     set P1, 123456
-     set P0[1023], P1
-
-     new P2, ['Key']
-     set P2, 25
-     set I0, P0[P2]
-     eq I0, 125, OK1
-     print "not "
-OK1: print "ok 1\\n"
-
-     set P2, 128
-     set N0, P0[P2]
-     .fp_eq_pasm(N0, 10.0, OK2)
-     print "not "
-OK2: print "ok 2\\n"
-
-     set P2, 513
-     set S0, P0[P2]
-     eq S0, "17", OK3
-     print "not "
-OK3: print "ok 3\\n"
-
-     set P2, 1023
-     set P3, P0[P2]
-     set I1, P3
-     eq I1, 123456, OK4
-     print "not "
-OK4: print "ok 4\\n"
-
-     end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
-
-.sub test :main
-    .local pmc pmc1
-    pmc1 = new ['ResizableIntegerArray']
-    .local int bool1
-    does bool1, pmc1, "scalar"
-    print bool1
-    print "\n"
-    does bool1, pmc1, "array"
-    print bool1
-    print "\n"
-    does bool1, pmc1, "no_interface"
-    print bool1
-    print "\n"
-    end
+    test_push()
+    test_pop()
+    test_pop_many()
+    test_push_many()
+    test_push_pop()
+    test_cant_pop_empty()
+    test_shift()
+    test_unshift()
+    test_iterator()
 .end
-CODE
-0
-1
-0
-OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "push integer" );
-
-.sub test :main
-    .local pmc pmc1
-    pmc1 = new ['ResizableIntegerArray']
-    pmc1[9999] = 0
-    push pmc1, 10001
-    .local int elements
-    elements = pmc1
-    print elements
-    print "\n"
-    .local string last
-    last = pmc1[10000]
-    print last
-    print "\n"
-    end
-.end
-CODE
-10001
-10001
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'basic pop' );
-     new P0, ['ResizableIntegerArray']
-     set P0[0], 4
-     set P0[1], 8
-     set P0[2], 16
-     pop I0, P0
-     eq I0, 16, OK1
-     print "not "
-     print I0
-OK1: print "ok 1\n"
-
-     pop I0, P0
-     eq I0, 8, OK2
-     print "not "
-     print I0
-OK2: print "ok 2\n"
-
-     pop I0, P0
-     eq I0, 4, OK3
-     print "not "
-     print I0
-OK3: print "ok 3\n"
-     end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'pop many values' );
-     new P0, ['ResizableIntegerArray']
-     set I0, 0
-L1:  set P0[I0], I0
-     inc I0
-     lt I0, 100000, L1
-
-L2:  dec I0
-     pop I1, P0
-     eq I0, I1, OK
-     branch NOT_OK
-OK:  gt I0, 0, L2
-     print "ok\n"
-     end
-
-NOT_OK:
-     print I0
-     print "\n"
-     print I1
-     print "\n"
-     end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'push/pop' );
-     new P0, ['ResizableIntegerArray']
-     push P0, 2
-     push P0, 4
-     push P0, 6
-     pop I0, P0
-     eq I0, 6, OK1
-     print "not "
-OK1: print "ok 1\n"
-     end
-CODE
-ok 1
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<'OUTPUT', 'pop from empty array' );
-     new P0, ['ResizableIntegerArray']
-     pop I0, P0
-     end
-CODE
-/ResizableIntegerArray: Can't pop from an empty array!/
-OUTPUT
-
-#'
-pir_output_is( << 'CODE', << 'OUTPUT', "shift integer" );
-.sub test :main
-    .local pmc ar
-    ar = new ['ResizableIntegerArray']
-    ar[0] = 10
-    ar[1] = 20
-    $I0 = elements ar
-    print $I0
-    print ' '
-    $I0 = shift ar
-    print $I0
-    print ' '
-    $I0 = elements ar
-    print $I0
-    print ' '
-    $I0 = shift ar
-    print $I0
-    print ' '
-    $I0 = elements ar
-    say $I0
-.end
-CODE
-2 10 1 20 0
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', "unshift integer" );
-.sub test :main
-    .local pmc ar
-    ar = new ['ResizableIntegerArray']
-    unshift ar, 10
-    unshift ar, 20
-    $I0 = elements ar
-    print $I0
-    print ' '
-    $I0 = ar[0]
-    print $I0
-    print ' '
-    $I0 = ar[1]
-    say $I0
-.end
-CODE
-2 20 10
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "get_iter" );
-.sub 'main' :main
+.sub test_does_interfaces
     $P0 = new ['ResizableIntegerArray']
+    ok( 1, 'Instantiated ResizableIntegerArray PMC' )
+    $I0 = does $P0, 'array'
+    ok( $I0, 'Interface does "array"' )
+    $I0 = does $P0, 'scalar'
+    is( $I0, 0, 'Interface does not do "scalar"' )
+    $I0 = does $P0, 'no_interface'
+    is( $I0, 0, 'Interface does not do "no_interface"' )
+.end
+
+.sub test_get_size
+    $P0 = new ['ResizableIntegerArray']
+    $I0 = $P0
+    is( $I0, 0, 'Initial array size is 0' )
+    $I1 = elements $P0
+    is( $I0, $I1, '... and "elements" opcode agrees' )
+.end
+
+.sub test_resize
+    $P0 = new ['ResizableIntegerArray']
+    $I1 = 0
+
+    $P0 = 1
+    $I0 = $P0
+    ne $I0, 1, X1
+    inc $I1
+
+    $P0 = 9
+    $I0 = $P0
+    ne $I0, 9, X1
+    inc $I1
+
+    $P0 = 5
+    $I0 = $P0
+    ne $I0, 5, X1
+    inc $I1
+
+    $P0 = 99999
+    $I0 = $P0
+    ne $I0, 99999, X1
+    inc $I1
+
+    $P0 = 0
+    $I0 = $P0
+    ne $I0, 0, X1
+    inc $I1
+
+    $P0 = 77
+    $I0 = $P0
+    ne $I0, 77, X1
+    inc $I1
+
+X1:
+    is( $I1, 6, 'Setting array size (four different values, including 0)' )
+
+    $I2 = elements $P0
+    is( $I0, $I2, '... and "elements" opcode still agrees' )
+
+    push_eh E
+    $I1 = 1
+    $P0 = -4
+    $I1 = 0
+E:
+    pop_eh
+    ok( $I1, 'Setting negative size should throw an exception' )
+.end
+
+.sub test_distinct_storage
+    # Walk the array in pseudo-random order
+    # Pick a sample size $I4 and another number $I2, such that
+    #   ∀n: n > 0 ∧ $I2 ⁿ % $I4 = 1 ⇒ n % $I4 = 0
+    $I4 = 17
+    $I2 = 3
+    # Create and fill array in random order
+    $P0 = new ['ResizableIntegerArray']
+    $P0 = $I4
+#   say '\n ... checking that pseudo-random sequence is exhaustive ...'
+    $I0 = 1
+L1:
+#   say $I0
+    $I0 = mul $I0, $I2
+    $I0 = mod $I0, $I4
+    $P0[$I0] = $I0
+    gt $I0, 1, L1
+    $P0[0] = 0
+#   say 0
+    # Read back array and check values match
+    $I0 = 0
+L2:
+    $I1 = $P0[$I0]
+    ne $I1, $I0, X1
+    inc $I0
+    lt $I0, $I4, L2
+X1:
+    is( $I0, $I4, 'All array elements stored separately' )
+.end
+
+.sub test_cant_set_negative
+    $P0 = new ['ResizableIntegerArray']
+    $P0 = 1
+    $I0 = 1
+    push_eh eh
+    $P0[-1] = -7
+    $I0 = 0
+eh:
+    pop_eh
+    ok( $I0, 'Setting with negative index should throw an exception' )
+.end
+
+.sub test_cant_get_negative
+    $P0 = new ['ResizableIntegerArray']
+    $P0 = 1
+    $I0 = 1
+    push_eh eh
+    $I0 = $P0[-1]
+    $I0 = 0
+eh:
+    pop_eh
+    ok( $I0, 'Getting with negative index should throw an exception' )
+.end
+
+.sub test_set_beyond_end
+    $P0 = new ['ResizableIntegerArray']
+    $P0 = 1
+    $I0 = 0
+    push_eh eh
+    $P0[1] = -7
+    $I0 = 1
+eh:
+    pop_eh
+    ok( $I0, 'Setting with too-big index should not throw an exception' )
+
+    $I0 = $P0
+    is( $I0, 2, '... and should extend array' )
+.end
+
+.sub test_get_beyond_end
+    $P0 = new ['ResizableIntegerArray']
+    $P0 = 1
+    $I0 = 1
+    push_eh eh
+    $I1 = $P0[1]
+    $I0 = 1
+eh:
+    pop_eh
+    ok( $I0, 'Getting with too-big index should not throw an exception' )
+    is( $I1, 0, '... and result should be 0' )
+
+    $I0 = $P0
+    is( $I0, 1, '... and should not extend array' )
+.end
+
+.sub test_conversion
+    $P0 = new ['ResizableIntegerArray']
+    $P0 = 6
+    $P0[0] = -7
+    $P0[1] = 3.7
+    $P0[2] = '17'
+    $P1 = new ['Integer']
+    $P1 = 123456
+    $P0[3] = $P1
+    $P2 = new ['Float']
+    $P2 = 7.3
+    $P0[4] = $P2
+    $P3 = new ['String']
+    $P3 = '987654321'
+    $P0[5] = $P3
+    $I0 = $P0[0]
+    is( $I0, -7, 'Setting element to integer' )
+    $N0 = $P0[1]
+    is( $N0, 3.0, 'Setting element to float (gets truncated)' )
+    $S0 = $P0[2]
+    is( $S0, '17', 'Setting element to string (gets converted to int and back)' )
+    $I0 = $P0[3]
+    is( $I0, 123456, 'Setting element to boxed integer' )
+    $N0 = $P0[4]
+    is( $N0, 7.0, 'Setting element to boxed float (gets truncated)' )
+    $S0 = $P0[5]
+    is( $S0, '987654321', 'Setting element to boxed string (gets converted to int and back)' )
+.end
+
+.sub test_conversion_overflow
+    $P0 = new ['ResizableIntegerArray']
+    $P0 = 1
+
+    $S0 = '12345678901234567890123456789012345678901234567890123456789012345678901234567890'
+
+    push_eh eh0
+    $I1 = 1
+        $P0[0] = $S0
+        $I0 = $P0[0]
+    $I1 = 0
+eh0:
+    pop_eh
+    ok( $I1, 'Throw exception when setting element to too-large digit-string' )
+
+.end
+
+.sub test_set_pmc_index
+    $P0 = new ['ResizableIntegerArray']
+    $P1 = new ['Key']
+    $P1 = 0
+    $P0[$P1] = 25
+    $P1 = 1
+    $P0[$P1] = 2.5
+    $P1 = 2
+    $P0[$P1] = '17'
+
+    $I1 = 0
+
+    $I0 = $P0[0]
+    ne $I0, 25, X1
+    inc $I1
+
+    $N0 = $P0[1]
+    ne $N0, 2.0, X1
+    inc $I1
+
+    $S0 = $P0[2]
+    ne $S0, '17', X1
+    inc $I1
+X1:
+    is( $I1, 3, 'Setting via PMC key (3 different types)' )
+.end
+
+.sub test_get_pmc_index
+    $P0 = new ['ResizableIntegerArray']
+    $P0 = 1
+    $P0[25] = 125
+    $P0[128] = 10.2
+    $P0[513] = '17'
+    $P0[1023] = 123456
+
+    $I1 = 0
+
+    $P2 = new ['Key']
+
+    $P2 = 25
+    $I0 = $P0[$P2]
+    ne $I0, 125, X1
+    inc $I1
+
+    $P2 = 128
+    $N0 = $P0[$P2]
+    ne $N0, 10.0, X1
+    inc $I1
+
+    $P2 = 513
+    $S0 = $P0[$P2]
+    ne $S0, '17', X1
+    inc $I1
+
+    $P2 = 1023
+    $I2 = $P0[$P2]
+    ne $I2, 123456, X1
+    inc $I1
+X1:
+    is( $I1, 4, 'Getting via PMC key (4 different types)' )
+.end
+
+.sub test_push
+    $P0 = new ['ResizableIntegerArray']
+    $P0[9999] = 0
+    push $P0, 12345
+    $I0 = $P0
+    is( $I0, 10001, 'Push increases number of elements by one' )
+    $I0 = $P0[10000]
+    is( $I0, 12345, '... and stores correct value' )
+.end
+
+.sub test_pop
+    $P0 = new ['ResizableIntegerArray']
+    $P0[0] = 4
+    $P0[1] = 8
+    $P0[2] = 16
+    $I0 = $P0
+    $I0 = pop $P0
+    is( $I0, 16, 'Pop retrieves correct value' )
+    $I0 = $P0
+    is( $I0, 2, '... and reduces number of elements by one' )
+.end
+
+.sub test_pop_many
+    $P0 = new ['ResizableIntegerArray']
+    $I0 = 0
+l1:
+    $P0[$I0] = $I0
+    inc $I0
+    lt $I0, 100000, l1
+l2:
+    le $I0, 0, e2
+    dec $I0
+    $I1 = pop $P0
+    eq $I0, $I1, l2
+e2:
+    is( $I0, $I1, 'Pop many times retrieves correct values' )
+    $I0 = $P0
+    is( $I0, 0, '... and leaves array empty' )
+.end
+
+.sub test_push_many
+    $P0 = new ['ResizableIntegerArray']
+    $I0 = 0
+l1:
+    push $P0, $I0
+    inc $I0
+    lt $I0, 100000, l1
+    $I1 = $P0
+    is( $I1, 100000, 'Push many values fills array to correct size' )
+l2:
+    le $I0, 0, e2
+    dec $I0
+    $I1 = $P0[$I0]
+    eq $I0, $I1, l2
+e2:
+    is( $I0, $I1, '... and stores correct values')
+.end
+
+.sub test_push_pop
+    $P0 = new ['ResizableIntegerArray']
+    $I1 = 0
+
+    push $P0, 2
+    $I0 = $P0
+    ne $I0, 1, X1
+    inc $I1
+
+    push $P0, 4
+    $I0 = $P0
+    ne $I0, 2, X1
+    inc $I1
+
+    push $P0, 6
+    $I0 = $P0
+    ne $I0, 3, X1
+    inc $I1
+
+    $I0 = pop $P0
+    ne $I0, 6, X1
+    inc $I1
+
+    $I0 = $P0
+    ne $I0, 2, X1
+    inc $I1
+
+    $I0 = pop $P0
+    ne $I0, 4, X1
+    inc $I1
+
+    $I0 = $P0
+    ne $I0, 1, X1
+    inc $I1
+
+    $I0 = pop $P0
+    ne $I0, 2, X1
+    inc $I1
+
+    $I0 = $P0
+    ne $I0, 0, X1
+    inc $I1
+
+X1:
+    is( $I1, 9, 'Push-then-Pop retrieves values in reverse order' )
+.end
+
+.sub test_cant_pop_empty
+    $P0 = new ['ResizableIntegerArray']
+    $I0 = 1
+    push_eh eh
+    $I0 = pop $P0
+    $I0 = 0
+eh:
+    pop_eh
+    ok( $I0, 'Pop from empty array should throw an exception' )
+.end
+
+# .sub test_cant_pop_empty
+# #   test_pass( 'pop from empty array should throw exception' )
+#     throws_like( <<'CODE', 'Can\'t pop from an empty array!', 'pop from empty array should throw exception' )
+# .sub main
+#     $P0 = new ['ResizableIntegerArray']
+#     $I0 = pop $P0
+# .end
+# CODE
+# #   test_test( 'pop from empty array should throw exception' )
+# .end
+
+.sub test_shift
+    $P0 = new ['ResizableIntegerArray']
+    $P0[0] = 10
+    $P0[1] = 20
+
+    $I1 = 0
+
+    $I0 = $P0
+    ne $I0, 2, X1
+    inc $I1
+
+    $I0 = shift $P0
+    ne $I0, 10, X1
+    inc $I1
+
+    $I0 = $P0
+    ne $I0, 1, X1
+    inc $I1
+
+    $I0 = shift $P0
+    ne $I0, 20, X1
+    inc $I1
+
+X1:
+    is( $I1, 4, 'Shift returns values in correct order' )
+
+    $I0 = $P0
+    is( $I0, 0, '... and removes correct number of elements' )
+.end
+
+.sub test_unshift
+    $P0 = new ['ResizableIntegerArray']
+    unshift $P0, 10
+    unshift $P0, 20
+
+    $I0 = $P0
+    is( $I0, 2, 'Unshift adds correct number of elements' )
+
+    $I1 = 0
+
+    $I0 = $P0[0]
+    ne $I0, 20, X1
+    inc $I1
+    $I0 = $P0[1]
+    ne $I0, 10, X1
+    inc $I1
+
+X1:
+    is( $I1, 2, '... and stores values in correct order' )
+.end
+
+.sub test_iterator
+    $P0 = new ['ResizableIntegerArray']
+    push_eh k0
     $P0[0] = 42
     $P0[1] = 43
     $P0[2] = 44
     push $P0, 999
+    $I0 = 0
     $P1 = iter $P0
-loop:
-    unless $P1 goto loop_end
-    $S2 = shift $P1
-    say $S2
-    goto loop
-loop_end:
+    $I2 = shift $P1
+    inc $I0
+    eq $I2, 42, k3
+    dec $I0
+    say 'Missing 42'
+k3:
+    $I2 = shift $P1
+    inc $I0
+    eq $I2, 43, k2
+    dec $I0
+    say 'Missing 43'
+k2:
+    $I2 = shift $P1
+    inc $I0
+    eq $I2, 44, k1
+    dec $I0
+    say 'Missing 44'
+k1:
+    $I2 = shift $P1
+    inc $I0
+    eq $I2, 999, k0
+    dec $I0
+    say 'Missing 999'
+k0:
+    pop_eh
+    is( $I0, 4, 'get_iter: iterator returns all values in correct sequence' )
 .end
-CODE
-42
-43
-44
-999
-OUTPUT
-
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
