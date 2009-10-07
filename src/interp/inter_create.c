@@ -63,7 +63,7 @@ static int
 is_env_var_set(PARROT_INTERP, ARGIN(STRING* var))
 {
     ASSERT_ARGS(is_env_var_set)
-    int free_it, retval;
+    int retval;
     char* const value = Parrot_getenv(interp, var);
     if (value == NULL)
         retval = 0;
@@ -71,8 +71,6 @@ is_env_var_set(PARROT_INTERP, ARGIN(STRING* var))
         retval = 0;
     else
         retval = !STREQ(value, "0");
-    if (free_it)
-        mem_sys_free(value);
     return retval;
 }
 

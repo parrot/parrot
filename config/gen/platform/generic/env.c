@@ -54,8 +54,6 @@ Parrot_setenv(PARROT_INTERP, STRING *str_name, STRING *str_value)
     strcpy(envs + name_len + 1, value);
 
     putenv(envs);
-
-    /* The buffer is intentionally not freed! */
 #endif
     Parrot_str_free_cstring(name);
     Parrot_str_free_cstring(value);

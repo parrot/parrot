@@ -778,11 +778,10 @@ char*
 Parrot_get_runtime_prefix(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_get_runtime_prefix)
-    int     free_it;
     char * const env = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_RUNTIME"));
 
     if (env)
-        return free_it ? env : mem_sys_strdup(env);
+        return env;
     else {
         PMC    * const config_hash =
             VTABLE_get_pmc_keyed_int(interp, interp->iglobals, (INTVAL) IGLOBALS_CONFIG_HASH);
@@ -813,15 +812,12 @@ STRING *
 Parrot_get_runtime_path(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_get_runtime_path)
-    int     free_it;
     char * const env = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_RUNTIME"));
     STRING *result;
 
     if (env)
     {
         result = Parrot_str_new(interp, env, 0);
-        if (free_it)
-             free(env);
     }
     else {
         PMC    * const config_hash =
