@@ -56,6 +56,13 @@ sub runstep {
         $conf->data->set( has_llvm => '' );
     }
     else {
+
+        # Here we will take a simple C file, compile it into an LLVM bitcode
+        # file, execute it as bitcode, then compile it to native assembly
+        # using the LLC code generator, then assemble the native assembly
+        # language file into a program and execute it.  Cf.:
+        # http://llvm.org/releases/2.5/docs/GettingStarted.html#overview
+
         $self->set_result('yes');
         $conf->data->set( has_llvm => 1 );
     }
@@ -63,45 +70,11 @@ sub runstep {
     return 1;
 }
 
-#sub _probe_for_llvm {
-#    my $conf = shift;
-#    my $variations_ref = shift;
-#    my $verbose = shift;
-#    my ($llvm, $has_llvm);
-#    while (defined (my $t = shift(@$variations_ref))) {
-#        my $output = capture_output( $t, '--version' ) || '';
-#        print $output, "\n" if $verbose;
-#        $has_llvm = _probe_for_llvm_output($output, $verbose);
-#        $llvm = $t if $has_llvm;
-#        last if $has_llvm;
-#    }
-#    return ($llvm, $has_llvm);
-#}
-#
-#sub _probe_for_llvm_output {
-#    my ($output, $verbose) = @_;
-#    my $has_llvm = ( $output =~ m/Exuberant Ctags/ ) ? 1 : 0;
-#    print $has_llvm, "\n" if $verbose;
-#    return $has_llvm;
-#}
-#
-#sub _evaluate_llvm {
-#    my ($self, $conf, $llvm, $has_llvm) = @_;
-#    if ($has_llvm) {
-#        $conf->data->set( llvm => $llvm );
-#        $self->set_result( 'yes' );
-#    }
-#    else {
-#        $conf->data->set( llvm => 'llvm' );
-#        $self->set_result( 'no' );
-#    }
-#}
-
 1;
 
 =head1 AUTHOR
 
-Paul Cochrane <paultcochrane at gmail dot com>
+James E Keenan
 
 =cut
 
