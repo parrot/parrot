@@ -372,7 +372,7 @@
 
 ##    method routine_def($/) {
 ##        my $past := $($<block>);
-##        $past.name(~$<ident>);
+##        $past.name(~$<name>);
 ##        $past.node($/);
 ##        $past.blocktype('declaration');
 ##        $past.control('return_pir');
@@ -394,7 +394,7 @@
     .local pmc past
     $P0 = match['block']
     past = $P0.'ast'()
-    $S0 = match['ident']
+    $S0 = match['name']
     past.'name'($S0)
     past.'node'(match)
     past.'blocktype'('declaration')

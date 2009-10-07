@@ -215,7 +215,7 @@ token block {
 
 rule routine_def {
     $<declarator>=['sub'|'method']
-    <ident>
+    $<name>=[<ident>[':sym<'<-[>]>+'>']?]
     '(' <signature> ')'
     <block>
     {*}
