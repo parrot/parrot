@@ -111,7 +111,37 @@ sub runstep {
                 $self->_handle_result( $conf, 0 );
             }
             else {
-                $self->_handle_result( $conf, 1 );
+                eval {
+                    system(qq{llc $bcfile -o $sfile});
+                };
+                if ( $@ or (! -e $sfile) ) {
+                    print "Unable to compile program to native assembly using 'llc'\n"
+                        if $verbose;
+                    $self->_handle_result( $conf, 0 );
+                }
+                else {
+                    eval {
+                        system(qq{cc $sfile -o $nativefile});
+                    };
+                    if ( $@ or (! -e $nativefile) ) {
+                        print "Unable to assemble native assembly into program\n"
+                            if $verbose;
+                        $self->_handle_result( $conf, 0 );
+                    }
+                    else {
+                        eval {
+                            $output = capture_output(qq{./$nativefile});
+                        };
+                        if ( $@ or ( $output !~ q/hello world/) ) {
+                            print "Unable to execute native assembly program successfuly\n"
+                                if $verbose;
+                            $self->_handle_result( $conf, 0 );
+                        }
+                        else {
+                            $self->_handle_result( $conf, 1 );
+                        }
+                    }
+                }
             }
         }
         foreach my $f ( $bcfile, $sfile, $nativefile ) {
