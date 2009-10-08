@@ -27,6 +27,11 @@ sub _init {
     my %data;
     $data{description} = q{Is LLVM installed};
     $data{result}      = q{};
+    $data{llvm_components} = [
+        [ 'llvm-gcc'    => 'llvm-gcc' ],
+        [ 'lli'         => 'Low Level Virtual Machine' ],
+        [ 'llc'         => 'Low Level Virtual Machine' ],
+    ];
     return \%data;
 }
 
@@ -35,23 +40,41 @@ sub runstep {
 
     my $verbose = $conf->options->get( 'verbose' );
 
-    my @llvm_components = (
-        [ 'llvm-gcc'    => 'llvm-gcc' ],
-        [ 'lli'         => 'Low Level Virtual Machine' ],
-        [ 'llc'         => 'Low Level Virtual Machine' ],
-    );
-    my $sanity_check = 0;
-    foreach my $prog (@llvm_components) {
-        my $output = capture_output( $prog->[0], '--version' );
+    my $llvm_lacking = 0;
+    foreach my $prog ( @{ $self->{llvm_components} } ) {
+        my $output = q{};
+        $output = capture_output( $prog->[0], '--version' );
         print $output, "\n" if $verbose;
         my $exp = $prog->[1];
         unless ( $output =~ m/$exp/s ) {
-            $sanity_check++;
+            $llvm_lacking++;
             print "Could not get expected '--version' output for $prog->[0]\n"
                 if $verbose;
         }
     }
-    if ( $sanity_check ) {
+    my $output = q{};
+    $output = capture_output( 'llvm-gcc', '--version' );
+    if (! $output) {
+        $llvm_lacking++;
+    }
+    else {
+        my @line = split /\n+/, $output;
+        if ( $line[0] =~ m/\b(\d+)\.(\d+)\.(\d+)\b/ ) {
+            my @version = ($1, $2, $3);
+            if ($version[0] < 4) {
+                print "llvm-gcc must be at least major version 4\n"
+                    if $verbose;
+                $llvm_lacking++;
+            }
+        }
+        else {
+            print "Unable to extract llvm-gcc major, minor and patch versions\n"
+                if $verbose;
+            $llvm_lacking++;
+        }
+    }
+            
+    if ( $llvm_lacking ) {
         $self->set_result('no');
         $conf->data->set( has_llvm => '' );
     }
@@ -63,8 +86,28 @@ sub runstep {
         # language file into a program and execute it.  Cf.:
         # http://llvm.org/releases/2.5/docs/GettingStarted.html#overview
 
-        $self->set_result('yes');
-        $conf->data->set( has_llvm => 1 );
+        my $stem = q|hello|;
+        my $cfile = qq|$stem.c|;
+        my $fullcfile = qq|config/auto/llvm/$cfile|;
+        my $bcfile = qq|$stem.bc|;
+        my $sfile = qq|$stem.s|;
+        my $nativefile = qq|$stem.native|;
+        eval {
+          system(qq{llvm-gcc -O3 -emit-llvm $fullcfile -c -o $bcfile});
+        };
+        if ($@) {
+          print "Unable to compile C file into LLVM bitcode file\n"
+            if $verbose;
+          $self->set_result('no');
+          $conf->data->set( has_llvm => '' );
+        }
+        else {
+          $self->set_result('yes');
+          $conf->data->set( has_llvm => 1 );
+        }
+        foreach my $f ( $bcfile, $sfile, $nativefile ) {
+          unlink $f if ( -e $f );
+        }
     }
 
     return 1;

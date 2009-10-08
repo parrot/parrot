@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan); # tests =>  28;
+use Test::More tests =>  14;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::llvm');
@@ -36,88 +36,35 @@ $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
 my $ret = $step->runstep($conf);
 ok( $ret, "runstep() returned true value" );
-ok(defined($step->result()), "Result was defined");
-#ok($possible_llvm{$conf->data->get('llvm')},
-#    "Acceptable value for 'llvm' attribute was set");
-#
-#$conf->replenish($serialized);
-#
-########### --verbose ##########
-#
-#($args, $step_list_ref) = process_options( {
-#    argv => [ q{--verbose} ],
-#    mode => q{configure},
-#} );
-#$conf->options->set( %{$args} );
-#$step = test_step_constructor_and_description($conf);
-#{
-#    my $stdout;
-#    my $ret = capture(
-#        sub { $step->runstep($conf) },
-#        \$stdout
-#    );
-#    ok( $ret, "runstep() returned true value" );
-#    ok( defined $step->result(), "Result was defined");
-#    ok($possible_llvm{$conf->data->get('llvm')},
-#        "Acceptable value for 'llvm' attribute was set");
-#}
-#
-#$conf->replenish($serialized);
-#
-########### _evaluate_llvm() ##########
-#
-#($args, $step_list_ref) = process_options( {
-#    argv => [ ],
-#    mode => q{configure},
-#} );
-#$conf->options->set( %{$args} );
-#$step = test_step_constructor_and_description($conf);
-#
-#$conf->replenish($serialized);
-#
-#my $pseudo_llvm;
-#$pseudo_llvm = q{alpha};
-#$step->_evaluate_llvm($conf, $pseudo_llvm, 1);
-#is($conf->data->get('llvm'), $pseudo_llvm,
-#    "'llvm' attribute was set as expected");
-#is($step->result(), q{yes}, "Got expected result");
-#
-#$pseudo_llvm = q{alpha};
-#$step->_evaluate_llvm($conf, $pseudo_llvm, 0);
-#is($conf->data->get('llvm'), 'llvm',
-#    "'llvm' attribute was set as expected");
-#is($step->result(), q{no}, "Got expected result");
-#
-#$conf->replenish($serialized);
-#
-########### _probe_for_llvm_output() ##########
-#
-#($args, $step_list_ref) = process_options( {
-#    argv => [ ],
-#    mode => q{configure},
-#} );
-#$conf->options->set( %{$args} );
-#$step = test_step_constructor_and_description($conf);
-#ok(auto::llvm::_probe_for_llvm_output('Exuberant Ctags', 0),
-#    "Probe returned true when output matched");
-#ok(! auto::llvm::_probe_for_llvm_output('alpha', 0),
-#    "Probe returned false when output matched");
-#{
-#    my $stdout;
-#    my $rv = capture(
-#        sub { auto::llvm::_probe_for_llvm_output('Exuberant Ctags', 1) },
-#        \$stdout
-#    );
-#    ok($rv, "Probe returned true when output matched");
-#}
-#{
-#    my $stdout;
-#    my $rv = capture(
-#        sub { auto::llvm::_probe_for_llvm_output('alpha', 1) },
-#        \$stdout
-#    );
-#    ok(! $rv, "Probe returned false when output matched");
-#}
+like( $step->result(), qr/yes|no/,
+  "Result was either 'yes' or 'no'" );
+
+$conf->replenish($serialized);
+
+########## --verbose ##########
+
+($args, $step_list_ref) = process_options( {
+    argv => [ q{--verbose} ],
+    mode => q{configure},
+} );
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+{
+    my $stdout;
+    my $ret = capture(
+        sub { $step->runstep($conf) },
+        \$stdout
+    );
+    ok( $ret, "runstep() returned true value" );
+    like( $step->result(), qr/yes|no/,
+        "Result was either 'yes' or 'no'" );
+    like( $stdout, qr/llvm-gcc/s,
+        "Got expected verbose output" );
+    like( $stdout, qr/Low Level Virtual Machine/s,
+        "Got expected verbose output" );
+}
+
+$conf->replenish($serialized);
 
 pass("Completed all tests in $0");
 
@@ -137,7 +84,7 @@ This file holds tests for auto::llvm.
 
 =head1 AUTHOR
 
-Paul Cochrane <paultcochrane at gmail dot com>
+James E Keenan
 
 =cut
 
