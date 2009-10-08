@@ -42,14 +42,15 @@ sub runstep {
 
     my $llvm_lacking = 0;
     foreach my $prog ( @{ $self->{llvm_components} } ) {
-        my $output = q{};
-        $output = capture_output( $prog->[0], '--version' );
-        print $output, "\n" if $verbose;
+        my $output = capture_output( $prog->[0], '--version' );
         my $exp = $prog->[1];
-        unless ( $output =~ m/$exp/s ) {
+        unless ( defined($output) and $output =~ m/$exp/s ) {
             $llvm_lacking++;
             print "Could not get expected '--version' output for $prog->[0]\n"
                 if $verbose;
+        }
+        else {
+            print $output, "\n" if $verbose;
         }
     }
     my $output = q{};
@@ -75,8 +76,7 @@ sub runstep {
     }
             
     if ( $llvm_lacking ) {
-        $self->set_result('no');
-        $conf->data->set( has_llvm => '' );
+        $self->_handle_result( $conf, 0 );
     }
     else {
 
@@ -93,17 +93,26 @@ sub runstep {
         my $sfile = qq|$stem.s|;
         my $nativefile = qq|$stem.native|;
         eval {
-          system(qq{llvm-gcc -O3 -emit-llvm $fullcfile -c -o $bcfile});
+            system(qq{llvm-gcc -O3 -emit-llvm $fullcfile -c -o $bcfile});
         };
         if ($@) {
-          print "Unable to compile C file into LLVM bitcode file\n"
-            if $verbose;
-          $self->set_result('no');
-          $conf->data->set( has_llvm => '' );
+            print "Unable to compile C file into LLVM bitcode file\n"
+                if $verbose;
+            $self->_handle_result( $conf, 0 );
         }
         else {
-          $self->set_result('yes');
-          $conf->data->set( has_llvm => 1 );
+            my $output;
+            eval {
+                $output = capture_output( 'lli', $bcfile );
+            };
+            if ( $@ or $output !~ /hello world/ ) {
+                print "Unable to into LLVM bitcode file with 'lli'\n"
+                    if $verbose;
+                $self->_handle_result( $conf, 0 );
+            }
+            else {
+                $self->_handle_result( $conf, 1 );
+            }
         }
         foreach my $f ( $bcfile, $sfile, $nativefile ) {
           unlink $f if ( -e $f );
@@ -113,6 +122,18 @@ sub runstep {
     return 1;
 }
 
+sub _handle_result {
+    my ($self, $conf, $result) = @_;
+    if ( $result ) {
+        $self->set_result('yes');
+        $conf->data->set( has_llvm => 1 );
+    }
+    else {
+        $self->set_result('no');
+        $conf->data->set( has_llvm => '' );
+    }
+    return 1;
+}
 1;
 
 =head1 AUTHOR

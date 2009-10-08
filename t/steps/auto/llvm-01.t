@@ -58,10 +58,14 @@ $step = test_step_constructor_and_description($conf);
     ok( $ret, "runstep() returned true value" );
     like( $step->result(), qr/yes|no/,
         "Result was either 'yes' or 'no'" );
-    like( $stdout, qr/llvm-gcc/s,
-        "Got expected verbose output" );
-    like( $stdout, qr/Low Level Virtual Machine/s,
-        "Got expected verbose output" );
+    SKIP: {
+        skip 'No sense testing for verbose output if LLVM not present',
+        2 unless ( $step->result() =~ /yes/ );
+        like( $stdout, qr/llvm-gcc/s,
+            "Got expected verbose output" );
+        like( $stdout, qr/Low Level Virtual Machine/s,
+            "Got expected verbose output" );
+    }
 }
 
 $conf->replenish($serialized);
