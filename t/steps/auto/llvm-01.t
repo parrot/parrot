@@ -75,12 +75,6 @@ $step = test_step_constructor_and_description($conf);
     }
 }
 
-$conf->replenish($serialized);
-
-# This must be fine-tuned; leaving test file in topdir;
-# generating uninitialized value warnings: +190
-# lib/Parrot/Configure/Compiler.pm
-
 $conf->cc_clean();
 
 pass("Completed all tests in $0");
