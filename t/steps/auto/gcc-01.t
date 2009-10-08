@@ -32,7 +32,7 @@ my $conf = Parrot::Configure->new();
 my $serialized = $conf->pcfreeze();
 
 test_step_thru_runstep($conf, q{init::defaults}, $args);
-test_step_thru_runstep( $conf, q{inter::progs},  $args );
+test_step_thru_runstep($conf, q{inter::progs},   $args);
 
 my $pkg = q{auto::gcc};
 
