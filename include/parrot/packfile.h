@@ -217,7 +217,6 @@ typedef struct PackFile_FixupEntry {
     opcode_t                  type;     /* who knows what fixups we need? */
     char                     *name;     /* name of the label */
     opcode_t                  offset;   /* location of the item */
-    PackFile_ByteCode        *seg;
 } PackFile_FixupEntry;
 
 typedef enum {

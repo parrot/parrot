@@ -943,10 +943,6 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
 
                 break;
             }
-            case enum_fixup_label:
-                /* fill in current bytecode seg */
-                ft->fixups[i]->seg = self;
-                break;
             default:
                 break;
         }
@@ -3533,7 +3529,6 @@ PackFile_FixupTable_new_entry(PARROT_INTERP,
     self->fixups[i]->type   = type;
     self->fixups[i]->name   = mem_sys_strdup(label);
     self->fixups[i]->offset = offs;
-    self->fixups[i]->seg    = self->code;
 }
 
 
@@ -3562,7 +3557,6 @@ find_fixup(ARGMOD(PackFile_FixupTable *ft), INTVAL type, ARGIN(const char *name)
     for (i = 0; i < ft->fixup_count; i++) {
         if ((INTVAL)((enum_fixup_t)ft->fixups[i]->type) == type
         &&  STREQ(ft->fixups[i]->name, name)) {
-            ft->fixups[i]->seg = ft->code;
             return ft->fixups[i];
         }
     }

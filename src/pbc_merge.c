@@ -548,8 +548,6 @@ pbc_merge_fixups(PARROT_INTERP, ARGIN(pbc_merge_input **inputs),
                     Parrot_exit(interp, 1);
             }
 
-            copy->seg = bc;
-
             /* Slot it into the list. */
             fixups[cursor] = copy;
             cursor++;
