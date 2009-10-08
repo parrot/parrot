@@ -19,10 +19,10 @@
 #define PF_NCONST(pf)  ((pf)->const_table->const_count)
 #define PF_CONST(pf, i) ((pf)->const_table->constants[(i)])
 
-#define DIRECTORY_SEGMENT_NAME   "DIRECTORY"
-#define FIXUP_TABLE_SEGMENT_NAME "FIXUP"
-#define CONSTANT_SEGMENT_NAME    "CONSTANT"
-#define BYTE_CODE_SEGMENT_NAME   "BYTECODE"
+#define DIRECTORY_SEGMENT_NAME   Parrot_str_new_constant(interp, "DIRECTORY")
+#define FIXUP_TABLE_SEGMENT_NAME Parrot_str_new_constant(interp, "FIXUP")
+#define CONSTANT_SEGMENT_NAME    Parrot_str_new_constant(interp, "CONSTANT")
+#define BYTE_CODE_SEGMENT_NAME   Parrot_str_new_constant(interp, "BYTECODE")
 
 #define FLOATTYPE_8           0
 #define FLOATTYPE_8_NAME      "IEEE-754 8 byte double"
@@ -147,7 +147,7 @@ typedef struct PackFile_Constant {
 */
 
 typedef struct PackFile_Segment * (*PackFile_Segment_new_func_t)
-    (PARROT_INTERP, struct PackFile *, const char *, int add);
+    (PARROT_INTERP, struct PackFile *, STRING *, int add);
 
 typedef void (*PackFile_Segment_destroy_func_t)
     (PARROT_INTERP, struct PackFile_Segment *);
@@ -197,7 +197,7 @@ typedef struct PackFile_Segment {
 
     /* directory information */
     UINTVAL             type;           /* one of above defined types */
-    char                *name;
+    STRING             *name;
     size_t              op_count;       /* external size in ops */
     size_t              file_offset;    /* offset in ops */
     /* common payload of all bytecode chunks
@@ -490,7 +490,7 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PackFile_Segment * PackFile_Annotations_new(SHIM_INTERP,
     SHIM(struct PackFile *pf),
-    SHIM(const char *name),
+    SHIM(STRING *name),
     NULLOK(int add));
 
 PARROT_EXPORT
@@ -585,7 +585,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PackFile_Segment * PackFile_find_segment(PARROT_INTERP,
     ARGIN_NULLOK(PackFile_Directory *dir),
-    ARGIN(const char *name),
+    ARGIN(STRING *name),
     int sub_dir)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -636,16 +636,17 @@ PackFile * PackFile_new(PARROT_INTERP, INTVAL is_mapped)
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PackFile * PackFile_new_dummy(PARROT_INTERP, ARGIN(const char *name))
+PackFile * PackFile_new_dummy(PARROT_INTERP, ARGIN(STRING *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PackFile_Segment * PackFile_remove_segment_by_name(SHIM_INTERP,
+PackFile_Segment * PackFile_remove_segment_by_name(PARROT_INTERP,
     ARGMOD(PackFile_Directory *dir),
-    ARGIN(const char *name))
+    ARGIN(STRING *name))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*dir);
@@ -666,7 +667,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_Segment * PackFile_Segment_new(SHIM_INTERP,
     SHIM(PackFile *pf),
-    SHIM(const char *name),
+    SHIM(STRING *name),
     NULLOK(int add));
 
 PARROT_EXPORT
@@ -675,7 +676,7 @@ PARROT_CANNOT_RETURN_NULL
 PackFile_Segment * PackFile_Segment_new_seg(PARROT_INTERP,
     ARGMOD(PackFile_Directory *dir),
     UINTVAL type,
-    ARGIN(const char *name),
+    ARGIN(STRING *name),
     int add)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -778,7 +779,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode * PF_create_default_segs(PARROT_INTERP,
-    ARGIN(const char *file_name),
+    ARGIN(STRING *file_name),
     int add)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -904,7 +905,8 @@ void Parrot_trace_eprintf(ARGIN(const char *s), ...)
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_PackFile_remove_segment_by_name \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(dir) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(dir) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_PackFile_Segment_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

@@ -1082,7 +1082,8 @@ Parrot_run_native(PARROT_INTERP, native_func_t func)
     program_code[1] = 0; /* end */
 
     pf->cur_cs = (PackFile_ByteCode *)
-        (pf->PackFuncs[PF_BYTEC_SEG].new_seg)(interp, pf, "code", 1);
+        (pf->PackFuncs[PF_BYTEC_SEG].new_seg)(interp, pf,
+                Parrot_str_new_constant(interp, "code"), 1);
     pf->cur_cs->base.data = program_code;
     pf->cur_cs->base.size = 2;
 
@@ -1117,7 +1118,8 @@ Parrot_compile_string(PARROT_INTERP, Parrot_String type,
      * before compiling a string */
 
     if (!interp->initial_pf) {
-        PackFile * const pf = PackFile_new_dummy(interp, "compile_string");
+        PackFile * const pf = PackFile_new_dummy(interp,
+                Parrot_str_new_constant(interp, "compile_string"));
         /* Assumption: there is no valid reason to fail to create it.
          * If the assumption changes, replace the assertion with a
          * runtime check */

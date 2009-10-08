@@ -132,7 +132,7 @@ Initialize PackfileDirectory from PackFile_Directory.
             }
 
             segment = pmc_new(interp, pmc_type);
-            name    = Parrot_str_new(interp, pfseg->name, strlen(pfseg->name));
+            name    = pfseg->name;
             VTABLE_set_pmc_keyed_str(interp, SELF, name, segment);
 
             /* Initialize internal PMC structure */
@@ -165,7 +165,7 @@ Creates PackFile for given directory.
             PackFile_Segment * const pfseg = (PackFile_Segment *)VTABLE_get_pointer(interp, seg);
 
             pfseg->pf   = pf;
-            pfseg->name = strdup(Parrot_string_cstring(interp, name));
+            pfseg->name = Parrot_str_copy(interp, name);
             PackFile_add_segment(interp, pfdir, pfseg);
         }
 

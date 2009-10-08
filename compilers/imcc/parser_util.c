@@ -620,7 +620,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
     /* imcc always compiles to interp->code
      * save old cs, make new
      */
-    char name[64];
+    STRING                *name;
     PackFile_ByteCode     *old_cs, *new_cs;
     PMC                   *sub      = NULL;
     struct _imc_info_t    *imc_info = NULL;
@@ -653,7 +653,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
     eval_number = ++eval_nr;
     UNLOCK(eval_nr_lock);
 
-    snprintf(name, sizeof (name), "EVAL_" INTVAL_FMT, eval_number);
+    name = Parrot_sprintf_c(interp, "EVAL_" INTVAL_FMT, eval_number);
     new_cs = PF_create_default_segs(interp, name, 0);
     old_cs = Parrot_switch_to_cs(interp, new_cs, 0);
 
@@ -661,7 +661,9 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
 
     /* spit out the sourcefile */
     if (Interp_debug_TEST(interp, PARROT_EVAL_DEBUG_FLAG)) {
-        FILE * const fp = fopen(name, "w");
+        char *buf = Parrot_str_to_cstring(interp, name);
+        FILE * const fp = fopen(buf, "w");
+        Parrot_str_free_cstring(buf);
         if (fp) {
             fputs(s, fp);
             fclose(fp);
@@ -675,7 +677,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
         IMCC_INFO(interp)->state->next = NULL;
 
     IMCC_INFO(interp)->state->pasm_file = pasm_file;
-    IMCC_INFO(interp)->state->file      = mem_sys_strdup(name);
+    IMCC_INFO(interp)->state->file      = Parrot_str_to_cstring(interp, name);
     IMCC_INFO(interp)->expect_pasm      = 0;
 
     compile_string(interp, s, yyscanner);
@@ -705,7 +707,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
         sub_data->seg        = new_cs;
         sub_data->start_offs = 0;
         sub_data->end_offs   = new_cs->base.size;
-        sub_data->name       = Parrot_str_new(interp, name, 0);
+        sub_data->name       = Parrot_str_copy(interp, name);
 
         *error_message = NULL;
     }

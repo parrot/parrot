@@ -447,10 +447,11 @@ e_pbc_open(PARROT_INTERP, SHIM(void *param))
 
     /* we need some segments */
     if (!interp->code) {
-        PMC *self;
+        const char *n    = IMCC_INFO(interp)->state->file;
+        STRING     *name = Parrot_str_new(interp, n, strlen(n));
+        PMC        *self;
 
-        cs->seg = interp->code =
-            PF_create_default_segs(interp, IMCC_INFO(interp)->state->file, 1);
+        cs->seg = interp->code = PF_create_default_segs(interp, name, 1);
 
         /*
          * create a PMC constant holding the interpreter state
@@ -2082,17 +2083,13 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
         /* Add annotations seg if we're missing one. */
         if (!interp->code->annotations) {
             /* Create segment. "_ANN" is added to the name */
-            const               size_t len  = strlen(interp->code->base.name) + 5;
-            char               * const name = (char *) mem_sys_allocate(len);
+            STRING *name = Parrot_sprintf_c(interp, "%Ss_ANN", interp->code->base.name);
             int                        add  = interp->code->base.dir ? 1 : 0;
             PackFile_Directory * const dir  = add ? interp->code->base.dir :
                     &interp->initial_pf->directory;
-            strcpy(name, interp->code->base.name);
-            strcat(name, "_ANN");
             interp->code->annotations = (PackFile_Annotations *)
                     PackFile_Segment_new_seg(interp, dir,
                         PF_ANNOTATIONS_SEG, name, add);
-            mem_sys_free(name);
             interp->code->annotations->code = interp->code;
 
             /* Create initial group. */

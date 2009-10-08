@@ -360,7 +360,7 @@ pbc_merge_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     /* Stash produced bytecode. */
     bc_seg->base.data = bc;
     bc_seg->base.size = cursor;
-    bc_seg->base.name = mem_sys_strdup("MERGED");
+    bc_seg->base.name = Parrot_str_new_constant(interp, "MERGED");
     return bc_seg;
 }
 

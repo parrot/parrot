@@ -74,7 +74,7 @@ Dump the constant table.
 static void
 const_dump(PARROT_INTERP, const PackFile_Segment *segp)
 {
-    Parrot_io_printf(interp, "%s => [\n", segp->name);
+    Parrot_io_printf(interp, "%Ss => [\n", segp->name);
     PackFile_ConstTable_dump(interp, (const PackFile_ConstTable *)segp);
     Parrot_io_printf(interp, "],\n");
 }
@@ -93,7 +93,7 @@ Dump the fixup table.
 static void
 fixup_dump(PARROT_INTERP, const PackFile_Segment *segp)
 {
-    Parrot_io_printf(interp, "%s => [\n", segp->name);
+    Parrot_io_printf(interp, "%Ss => [\n", segp->name);
     PackFile_Fixup_dump(interp, (const PackFile_FixupTable *)segp);
     Parrot_io_printf(interp, "],\n");
 }
@@ -114,7 +114,7 @@ disas_dump(PARROT_INTERP, const PackFile_Segment *self)
 {
     opcode_t *pc;
     size_t i, n;
-    Parrot_io_printf(interp, "%s => [ # %d ops at offs 0x%x\n",
+    Parrot_io_printf(interp, "%Ss => [ # %d ops at offs 0x%x\n",
             self->name, (int)self->size, (int)self->file_offset + 4);
     pc = self->data;
     while (pc < self->data + self->size) {
