@@ -121,7 +121,7 @@ sub runstep {
                 }
                 else {
                     eval {
-                        system(qq{cc $sfile -o $nativefile});
+                        system(qq{$conf->data->get('cc')  $sfile -o $nativefile});
                     };
                     if ( $@ or (! -e $nativefile) ) {
                         print "Unable to assemble native assembly into program\n"
@@ -147,6 +147,7 @@ sub runstep {
         foreach my $f ( $bcfile, $sfile, $nativefile ) {
           unlink $f if ( -e $f );
         }
+        cc_clean( $conf );
     }
 
     return 1;
