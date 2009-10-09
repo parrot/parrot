@@ -637,14 +637,11 @@ main(int argc, char* argv[])
     STRING         *code_type;
     STRING         *error;
     STRING         *foo_name;
-    Parrot_PackFile packfile;
 
     if (!interp) {
         printf( "Hiss\n" );
         return 1;
     }
-
-    packfile = PackFile_new_dummy(interp, "dummy");
 
     code_type = Parrot_str_new_constant( interp, "PIR" );
     retval    = Parrot_compile_string( interp, code_type, code, &error );
