@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  27;
+use Test::More qw(no_plan); # tests =>  27;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -74,6 +74,20 @@ $step = test_step_constructor_and_description($conf);
             "Got expected verbose output" );
     }
 }
+
+$step->set_result( undef );
+$conf->data->set( 'has_llvm' => undef );
+auto::llvm::_handle_result($step, $conf, 1);
+is( $step->result(), 'yes', "Got expected 'yes' result" );
+ok( $conf->data->get( 'has_llvm' ),
+    "'has_llvm' set to true value, as expected" );
+
+$step->set_result( undef );
+$conf->data->set( 'has_llvm' => undef );
+auto::llvm::_handle_result($step, $conf, 0);
+is( $step->result(), 'no', "Got expected 'no' result" );
+ok( ! $conf->data->get( 'has_llvm' ),
+    "'has_llvm' set to false  value, as expected" );
 
 $conf->cc_clean();
 
