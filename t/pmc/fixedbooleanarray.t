@@ -8,7 +8,7 @@ t/pmc/fixedbooleanarray.t - FixedBooleanArray PMC
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/FixedBooleanArray.t
+    % prove t/pmc/fixedbooleanarray.t
 
 =head1 DESCRIPTION
 

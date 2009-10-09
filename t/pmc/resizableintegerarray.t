@@ -8,7 +8,7 @@ t/pmc/resizableintegerarray.t - Tests for the ResizableIntegerArray PMC
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/ResizableIntegerArray.t
+    % prove t/pmc/resizableintegerarray.t
 
 =head1 DESCRIPTION
 

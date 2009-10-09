@@ -14,7 +14,7 @@ t/pmc/exception.t - Exception Handling
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/exception.t
+    % prove t/pmc/exception-old.t
 
 =head1 DESCRIPTION
 

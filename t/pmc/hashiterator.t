@@ -8,7 +8,7 @@ t/pmc/hash.t - Test the Hash PMC
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/hash.t
+    % prove t/pmc/hashiterator.t
 
 =head1 DESCRIPTION
 

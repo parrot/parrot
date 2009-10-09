@@ -15,7 +15,7 @@ t/pmc/namespace.t - test the NameSpace PMC as described in PDD 21.
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/namespace.t
+    % prove t/pmc/namespace-old.t
 
 =head1 DESCRIPTION
 

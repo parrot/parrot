@@ -17,7 +17,7 @@ t/pmc/mmd.t - Multi-Method Dispatch
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/mmd.t
+    % prove t/pmc/multidispatch.t
 
 =head1 DESCRIPTION
 

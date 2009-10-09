@@ -8,7 +8,7 @@ t/pmc/arrayiterator.t - ArrayIterator PMC
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/array.t
+    % prove t/pmc/arrayiterator.t
 
 =head1 DESCRIPTION
 

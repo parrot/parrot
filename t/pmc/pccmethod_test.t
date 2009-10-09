@@ -15,7 +15,7 @@ t/pmc/pmethod_test.t - test the PCCMETHOD_Test PMC
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/pmethod_test.t
+    % prove t/pmc/pccmethod_test.t
 
 =head1 DESCRIPTION
 

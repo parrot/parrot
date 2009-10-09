@@ -8,7 +8,7 @@ t/pmc/stringiterator.t - StringIterator.
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/string.t
+    % prove t/pmc/stringiterator.t
 
 =head1 DESCRIPTION
 

@@ -9,7 +9,7 @@ t/pmc/codestring.t - test the CodeString class
 
 =head1 SYNOPSIS
 
-        % prove t/pmc/codestring.t
+    % prove t/pmc/codestring.t
 
 =head1 DESCRIPTION
 

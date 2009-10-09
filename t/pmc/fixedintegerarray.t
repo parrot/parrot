@@ -8,7 +8,7 @@ t/pmc/fixedintegerarray.t - FixedIntegerArray PMC
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/FixedIntegerArray.t
+    % prove t/pmc/fixedintegerarray.t
 
 =head1 DESCRIPTION
 
