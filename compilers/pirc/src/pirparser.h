@@ -299,7 +299,7 @@ typedef union YYSTYPE
     struct macro_def   *mval;
     struct macro_param *pval;
 }
-/* Line 1489 of yacc.c.  */
+/* Line 1529 of yacc.c.  */
 #line 304 "pirparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
