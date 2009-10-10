@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 use File::Temp qw( tempdir );
-use Test::More tests =>  61;
+use Test::More tests =>  65;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -233,6 +233,49 @@ like(
     $stdout,
     qr/llvm-gcc must be at least major version 4/,
     "Got expected verbose output from _examine_llvm_gcc_version()",
+);
+
+##### 4 methods #####
+
+$verbose = 1;
+capture(
+    sub { $step->_handle_failure_to_compile_into_bitcode( $conf, $verbose ); },
+    \$stdout,
+    \$stderr,
+);
+like( $stdout,
+    qr/Unable to compile C file into LLVM bitcode file/,
+    "Got expected verbose output from _handle_failure_to_compile_into_bitcode()",
+);
+
+capture(
+    sub { $step->_handle_failure_to_execute_bitcode( $conf, $verbose ); },
+    \$stdout,
+    \$stderr,
+);
+like( $stdout,
+    qr/Unable to run LLVM bitcode file with 'lli'/,
+    "Got expected verbose output from _handle_failure_to_execute_bitcode()",
+);
+
+capture(
+    sub { $step->_handle_failure_to_compile_to_assembly( $conf, $verbose ); },
+    \$stdout,
+    \$stderr,
+);
+like( $stdout,
+    qr/Unable to compile program to native assembly using 'llc'/,
+    "Got expected verbose output from _handle_failure_to_compile_to_assembly()",
+);
+
+capture(
+    sub { $step->_handle_failure_to_assemble_assembly( $conf, $verbose ); },
+    \$stdout,
+    \$stderr,
+);
+like( $stdout,
+    qr/Unable to assemble native assembly into program/,
+    "Got expected verbose output from _handle_failure_to_assemble_assembly()",
 );
 
 ##### _handle_native_assembly_output() #####

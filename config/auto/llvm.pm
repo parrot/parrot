@@ -80,9 +80,7 @@ sub runstep {
             system(qq{llvm-gcc -O3 -emit-llvm $fullcfile -c -o $bcfile});
         };
         if ($@) {
-            print "Unable to compile C file into LLVM bitcode file\n"
-                if $verbose;
-            $self->_handle_result( $conf, 0 );
+            $self->_handle_failure_to_compile_into_bitcode( $conf, $verbose );
         }
         else {
             my $output;
@@ -90,18 +88,15 @@ sub runstep {
                 $output = capture_output( 'lli', $bcfile );
             };
             if ( $@ or $output !~ /hello world/ ) {
-                print "Unable to run  LLVM bitcode file with 'lli'\n"
-                    if $verbose;
-                $self->_handle_result( $conf, 0 );
+                $self->_handle_failure_to_execute_bitcode( $conf, $verbose );
             }
             else {
                 eval {
                     system(qq{llc $bcfile -o $sfile});
                 };
                 if ( $@ or (! -e $sfile) ) {
-                    print "Unable to compile program to native assembly using 'llc'\n"
-                        if $verbose;
-                    $self->_handle_result( $conf, 0 );
+                    $self->_handle_failure_to_compile_to_assembly(
+                        $conf, $verbose );
                 }
                 else {
                     eval {
@@ -109,9 +104,8 @@ sub runstep {
                         system(qq{$cc $sfile -o $nativefile});
                     };
                     if ( $@ or (! -e $nativefile) ) {
-                        print "Unable to assemble native assembly into program\n"
-                            if $verbose;
-                        $self->_handle_result( $conf, 0 );
+                        $self->_handle_failure_to_assemble_assembly(
+                            $conf, $verbose );
                     }
                     else {
                         eval {
@@ -169,6 +163,34 @@ sub _examine_llvm_gcc_version {
         }
     }
     return $llvm_lacking;
+}
+
+sub _handle_failure_to_compile_into_bitcode {
+    my ($self, $conf, $verbose ) = @_;
+    print "Unable to compile C file into LLVM bitcode file\n"
+        if $verbose;
+    $self->_handle_result( $conf, 0 );
+}
+
+sub _handle_failure_to_execute_bitcode {
+    my ($self, $conf, $verbose ) = @_;
+    print "Unable to run LLVM bitcode file with 'lli'\n"
+    if $verbose;
+    $self->_handle_result( $conf, 0 );
+}
+
+sub _handle_failure_to_compile_to_assembly {
+    my ($self, $conf, $verbose ) = @_;
+    print "Unable to compile program to native assembly using 'llc'\n"
+        if $verbose;
+    $self->_handle_result( $conf, 0 );
+}
+
+sub _handle_failure_to_assemble_assembly {
+    my ($self, $conf, $verbose ) = @_;
+    print "Unable to assemble native assembly into program\n"
+         if $verbose;
+    $self->_handle_result( $conf, 0 );
 }
 
 sub _handle_result {
