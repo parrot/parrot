@@ -1159,6 +1159,7 @@ init_context(PARROT_INTERP, ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
     ctx->handlers          = PMCNULL;
     ctx->caller_ctx        = NULL;
     ctx->pred_offset       = 0;
+    ctx->current_sub       = PMCNULL;
 
     if (old) {
         /* some items should better be COW copied */
