@@ -997,29 +997,26 @@ slurpy arguments).
 
         /* TODO switch to canonical NiSP order
          * see also imcc/reg_alloc.c */
-        static const char types[] = "INSP";
-        char *p;
+        STRING                *types = CONST_STRING(INTERP, "INSP");
         Parrot_Sub_attributes *sub;
-        char          * const kind = Parrot_str_to_cstring(interp, reg);
-        INTVAL                regs_used;
+        INTVAL                 regs_used;
+        INTVAL                 kind;
 
         PMC_get_sub(INTERP, SELF, sub);
         PARROT_ASSERT(sub->n_regs_used);
 
-        if (!*kind || kind[1]) {
-            Parrot_str_free_cstring(kind);
+        if (!reg || Parrot_str_length(INTERP, reg) != 1) {
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "illegal register kind '%Ss'", reg);
         }
 
-        p = strchr(types, *kind);
-        Parrot_str_free_cstring(kind);
+        kind = Parrot_str_find_index(INTERP, types, reg, 0);
 
-        if (!p)
+        if (kind == -1)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "illegal register kind '%Ss'", reg);
 
-        regs_used = sub->n_regs_used[p - types];
+        regs_used = sub->n_regs_used[kind];
         RETURN(INTVAL regs_used);
     }
 
