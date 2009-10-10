@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 use File::Temp qw( tempdir );
-use Test::More qw(no_plan); # tests =>  43;
+use Test::More tests =>  61;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -171,6 +171,68 @@ like(
     $stdout,
     qr/Could not get expected '--version' output for $exp/,
     "Got expected verbose output: llvm lacking",
+);
+
+##### _examine_llvm_gcc_version() #####
+
+$output = '';
+$llvm_lacking = 0;
+$verbose = 0;
+$llvm_lacking =
+    auto::llvm::_examine_llvm_gcc_version( $output, $llvm_lacking, $verbose );
+ok( $llvm_lacking, "_examine_llvm_gcc_version() reported LLVM lacking" );
+
+$output = 'foobar';
+$llvm_lacking = 0;
+$verbose = 0;
+$llvm_lacking =
+    auto::llvm::_examine_llvm_gcc_version( $output, $llvm_lacking, $verbose );
+ok( $llvm_lacking, "_examine_llvm_gcc_version() reported LLVM lacking" );
+
+$output = '3.2.1';
+$llvm_lacking = 0;
+$verbose = 0;
+$llvm_lacking =
+    auto::llvm::_examine_llvm_gcc_version( $output, $llvm_lacking, $verbose );
+ok( $llvm_lacking, "_examine_llvm_gcc_version() reported LLVM lacking" );
+
+$output = '4.2.1';
+$llvm_lacking = 0;
+$verbose = 0;
+$llvm_lacking =
+    auto::llvm::_examine_llvm_gcc_version( $output, $llvm_lacking, $verbose );
+ok( ! $llvm_lacking, "_examine_llvm_gcc_version() reported LLVM not lacking" );
+
+$output = 'foobar';
+$llvm_lacking = 0;
+$verbose = 1;
+capture(
+    sub { $llvm_lacking = auto::llvm::_examine_llvm_gcc_version(
+            $output, $llvm_lacking, $verbose ); },
+    \$stdout,
+    \$stderr,
+);
+ok( $llvm_lacking, "_examine_llvm_gcc_version() reported LLVM lacking" );
+like(
+    $stdout,
+    qr/Unable to extract llvm-gcc major, minor and patch versions/,
+    "Got expected verbose output from _examine_llvm_gcc_version()",
+);
+
+$output = '3.2.1';
+$llvm_lacking = 0;
+$verbose = 1;
+capture(
+    sub { $llvm_lacking = auto::llvm::_examine_llvm_gcc_version(
+            $output, $llvm_lacking, $verbose ); },
+    \$stdout,
+    \$stderr,
+);
+ok( $llvm_lacking, "_examine_llvm_gcc_version() reported LLVM lacking" );
+like(
+    $stdout,
+    qr/llvm-gcc must be at least major version 4/,
+    "Got expected verbose output from _examine_llvm_gcc_version()",
 );
 
 ##### _handle_native_assembly_output() #####

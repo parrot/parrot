@@ -52,35 +52,16 @@ sub runstep {
     }
     my $output = q{};
     $output = capture_output( 'llvm-gcc', '--version' );
-    if (! $output) {
-        $llvm_lacking++;
-    }
 
     # Next, we make sure we have at least major version 4 of 'llvm-gcc'
-
-    else {
-        my @line = split /\n+/, $output;
-        if ( $line[0] =~ m/\b(\d+)\.(\d+)\.(\d+)\b/ ) {
-            my @version = ($1, $2, $3);
-            if ($version[0] < 4) {
-                print "llvm-gcc must be at least major version 4\n"
-                    if $verbose;
-                $llvm_lacking++;
-            }
-        }
-        else {
-            print "Unable to extract llvm-gcc major, minor and patch versions\n"
-                if $verbose;
-            $llvm_lacking++;
-        }
-    }
+    $llvm_lacking = _examine_llvm_gcc_version(
+        $output, $llvm_lacking, $verbose
+    );
             
+    # Finally, we see whether our LLVM actually works.
     if ( $llvm_lacking ) {
         $self->_handle_result( $conf, 0 );
     }
-
-    # Finally, we see whether our LLVM actually works.
-
     else {
 
         # Here we will take a simple C file, compile it into an LLVM bitcode
@@ -162,6 +143,30 @@ sub _handle_component_version_output {
     }
     else {
         print $output, "\n" if $verbose;
+    }
+    return $llvm_lacking;
+}
+
+sub _examine_llvm_gcc_version {
+    my ( $output, $llvm_lacking, $verbose ) = @_;
+    if (! $output) {
+        $llvm_lacking++;
+    }
+    else {
+        my @line = split /\n+/, $output;
+        if ( $line[0] =~ m/\b(\d+)\.(\d+)\.(\d+)\b/ ) {
+            my @version = ($1, $2, $3);
+            if ($version[0] < 4) {
+                print "llvm-gcc must be at least major version 4\n"
+                    if $verbose;
+                $llvm_lacking++;
+            }
+        }
+        else {
+            print "Unable to extract llvm-gcc major, minor and patch versions\n"
+                if $verbose;
+            $llvm_lacking++;
+        }
     }
     return $llvm_lacking;
 }
