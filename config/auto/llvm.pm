@@ -90,7 +90,7 @@ sub runstep {
                 $output = capture_output( 'lli', $bcfile );
             };
             if ( $@ or $output !~ /hello world/ ) {
-                print "Unable to into LLVM bitcode file with 'lli'\n"
+                print "Unable to run  LLVM bitcode file with 'lli'\n"
                     if $verbose;
                 $self->_handle_result( $conf, 0 );
             }
