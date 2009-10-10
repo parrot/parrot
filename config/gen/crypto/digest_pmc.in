@@ -113,7 +113,7 @@ pmclass @TEMP_md_name@
     METHOD void Update(STRING *buf) {
 @TEMP_md_guard@
         @TEMP_md_ctx@ *c = PMC_data_typed(SELF, @TEMP_md_ctx@ *);
-        (void)@TEMP_md_name@_Update(c, (unsigned char *)buf->strstart, buf->bufused);
+        (void)@TEMP_md_name@_Update(c, Buffer_bufstart(buf), buf->bufused);
 #endif
     }
 
