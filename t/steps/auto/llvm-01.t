@@ -5,7 +5,8 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan); # tests =>  27;
+use File::Temp qw( tempdir );
+use Test::More tests =>  43;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -88,6 +89,115 @@ auto::llvm::_handle_result($step, $conf, 0);
 is( $step->result(), 'no', "Got expected 'no' result" );
 ok( ! $conf->data->get( 'has_llvm' ),
     "'has_llvm' set to false  value, as expected" );
+
+##### _handle_component_version_output() #####
+
+my ($prog, $output, $llvm_lacking, $verbose);
+$prog = [ 'llvm-gcc'    => 'llvm-gcc' ];
+
+$verbose = 0;
+
+$output = 'llvm-gcc';
+$llvm_lacking = 0;
+$llvm_lacking = auto::llvm::_handle_component_version_output(
+    $prog, $output, $llvm_lacking, $verbose
+);
+ok( ! $llvm_lacking, "llvm reported as not lacking" );
+
+$output = 'foobar';
+$llvm_lacking = 0;
+$llvm_lacking = auto::llvm::_handle_component_version_output(
+    $prog, $output, $llvm_lacking, $verbose
+);
+ok( $llvm_lacking, "llvm reported as lacking: wrong output" );
+
+$output = undef;
+$llvm_lacking = 0;
+$llvm_lacking = auto::llvm::_handle_component_version_output(
+    $prog, $output, $llvm_lacking, $verbose
+);
+ok( $llvm_lacking, "llvm reported as lacking: output undefined" );
+
+$verbose = 1;
+
+my ($stdout, $stderr);
+my $exp = $prog->[0];
+
+$output = 'llvm-gcc';
+$llvm_lacking = 0;
+capture(
+    sub {
+        $llvm_lacking = auto::llvm::_handle_component_version_output(
+            $prog, $output, $llvm_lacking, $verbose
+        );
+    },
+    \$stdout,
+    \$stderr,
+);
+ok( ! $llvm_lacking, "llvm reported as not lacking" );
+like( $stdout, qr/$output/, "Got expected verbose output: llvm not lacking" );
+
+$output = 'foobar';
+$llvm_lacking = 0;
+capture(
+    sub {
+        $llvm_lacking = auto::llvm::_handle_component_version_output(
+            $prog, $output, $llvm_lacking, $verbose
+        );
+    },
+    \$stdout,
+    \$stderr,
+);
+ok( $llvm_lacking, "llvm reported as lacking: wrong output" );
+like(
+    $stdout,
+    qr/Could not get expected '--version' output for $exp/,
+    "Got expected verbose output: llvm lacking",
+);
+
+$output = undef;
+$llvm_lacking = 0;
+capture(
+    sub {
+        $llvm_lacking = auto::llvm::_handle_component_version_output(
+            $prog, $output, $llvm_lacking, $verbose
+        );
+    },
+    \$stdout,
+    \$stderr,
+);
+ok( $llvm_lacking, "llvm reported as lacking: output undefined" );
+like(
+    $stdout,
+    qr/Could not get expected '--version' output for $exp/,
+    "Got expected verbose output: llvm lacking",
+);
+
+##### _cleanup_llvm_files() #####
+
+my ( $bcfile, $sfile, $nativefile );
+my $count_unlinked;
+
+$count_unlinked =
+    auto::llvm::_cleanup_llvm_files( $bcfile, $sfile, $nativefile );
+is( $count_unlinked, 0, "no files existed, hence none unlinked" );
+
+my ( $bcfile, $sfile, $nativefile ) = ( '', '', '' );
+$count_unlinked =
+    auto::llvm::_cleanup_llvm_files( $bcfile, $sfile, $nativefile );
+is( $count_unlinked, 0, "no files existed, hence none unlinked" );
+
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    my $bcfile = qq|$tdir/bcfile|;
+    open my $FH, '>', $bcfile
+        or die "Unable to open handle for writing: $!";
+    print $FH qq|bcfile hello world\n|;
+    close $FH or die "Unable to close handle after writing: $!";
+    $count_unlinked =
+        auto::llvm::_cleanup_llvm_files( $bcfile, $sfile, $nativefile );
+    is( $count_unlinked, 1, "one file existed, hence one unlinked" );
+}
 
 $conf->cc_clean();
 

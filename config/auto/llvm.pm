@@ -40,24 +40,24 @@ sub runstep {
 
     my $verbose = $conf->options->get( 'verbose' );
 
+    # We start by seeing whether we can run three LLVM component executables,
+    # each with the '--version' option, and get the expected output.
+
     my $llvm_lacking = 0;
     foreach my $prog ( @{ $self->{llvm_components} } ) {
         my $output = capture_output( $prog->[0], '--version' );
-        my $exp = $prog->[1];
-        unless ( defined($output) and $output =~ m/$exp/s ) {
-            $llvm_lacking++;
-            print "Could not get expected '--version' output for $prog->[0]\n"
-                if $verbose;
-        }
-        else {
-            print $output, "\n" if $verbose;
-        }
+        $llvm_lacking = _handle_component_version_output(
+          $prog, $output, $llvm_lacking, $verbose
+        );
     }
     my $output = q{};
     $output = capture_output( 'llvm-gcc', '--version' );
     if (! $output) {
         $llvm_lacking++;
     }
+
+    # Next, we make sure we have at least major version 4 of 'llvm-gcc'
+
     else {
         my @line = split /\n+/, $output;
         if ( $line[0] =~ m/\b(\d+)\.(\d+)\.(\d+)\b/ ) {
@@ -78,6 +78,9 @@ sub runstep {
     if ( $llvm_lacking ) {
         $self->_handle_result( $conf, 0 );
     }
+
+    # Finally, we see whether our LLVM actually works.
+
     else {
 
         # Here we will take a simple C file, compile it into an LLVM bitcode
@@ -145,13 +148,27 @@ sub runstep {
                 }
             }
         }
-        foreach my $f ( $bcfile, $sfile, $nativefile ) {
-          unlink $f if ( -e $f );
-        }
+        my $count_unlinked = _cleanup_llvm_files(
+            $bcfile, $sfile, $nativefile
+        );
         $conf->cc_clean();
     }
 
     return 1;
+}
+
+sub _handle_component_version_output {
+    my ($prog, $output, $llvm_lacking, $verbose) = @_;
+    my $exp = $prog->[1];
+    unless ( defined($output) and $output =~ m/$exp/s ) {
+        $llvm_lacking++;
+        print "Could not get expected '--version' output for $prog->[0]\n"
+            if $verbose;
+    }
+    else {
+        print $output, "\n" if $verbose;
+    }
+    return $llvm_lacking;
 }
 
 sub _handle_result {
@@ -166,6 +183,19 @@ sub _handle_result {
     }
     return 1;
 }
+
+sub _cleanup_llvm_files {
+   my @llvm_files = @_;
+   my $count_unlinked = 0;
+   foreach my $f ( @llvm_files ) {
+      if ( defined($f) and ( -e $f ) ) {
+          unlink $f;
+          $count_unlinked++;
+      }
+   }
+   return $count_unlinked;
+};
+
 1;
 
 =head1 AUTHOR
