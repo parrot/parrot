@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 use File::Temp qw( tempdir );
-use Test::More tests =>  65;
+use Test::More tests =>  69;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -236,6 +236,23 @@ like(
 );
 
 ##### 4 methods #####
+$verbose = 0;
+
+$step->set_result( undef );
+$step->_handle_failure_to_compile_into_bitcode( $conf, $verbose );
+is( $step->result(), 'no', "Got expected result" );
+
+$step->set_result( undef );
+$step->_handle_failure_to_execute_bitcode( $conf, $verbose );
+is( $step->result(), 'no', "Got expected result" );
+
+$step->set_result( undef );
+$step->_handle_failure_to_compile_to_assembly( $conf, $verbose );
+is( $step->result(), 'no', "Got expected result" );
+
+$step->set_result( undef );
+$step->_handle_failure_to_assemble_assembly( $conf, $verbose );
+is( $step->result(), 'no', "Got expected result" );
 
 $verbose = 1;
 capture(
