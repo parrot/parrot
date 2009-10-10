@@ -116,7 +116,6 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
     if (profile_output_var) {
         STRING  *lc_filename;
         runcore->profile_filename = Parrot_str_new(interp, profile_output_var, 0);
-        profile_filename          = Parrot_str_to_cstring(interp, runcore->profile_filename);
         lc_filename               = Parrot_str_downcase(interp, runcore->profile_filename);
 
         if (Parrot_str_equal(interp, lc_filename, CONST_STRING(interp, "stderr"))) {
@@ -132,7 +131,6 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
     }
     else {
         runcore->profile_filename = Parrot_sprintf_c(interp, "parrot.pprof.%d", getpid());
-        profile_filename          = Parrot_str_to_cstring(interp, runcore->profile_filename);
         runcore->profile_fd       = fopen(profile_filename, "w");
     }
 
@@ -152,12 +150,11 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
     Profiling_first_loop_SET(runcore);
 
     if (!runcore->profile_fd) {
+        profile_filename          = Parrot_str_to_cstring(interp, runcore->profile_filename);
         fprintf(stderr, "unable to open %s for writing", profile_filename);
         Parrot_str_free_cstring(profile_filename);
         exit(1);
     }
-
-    Parrot_str_free_cstring(profile_filename);
 
     return runops_profiling_core(interp, runcore, pc);
 }
