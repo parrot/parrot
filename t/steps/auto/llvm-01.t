@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 use File::Temp qw( tempdir );
-use Test::More tests =>  43;
+use Test::More qw(no_plan); # tests =>  43;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -173,6 +173,71 @@ like(
     "Got expected verbose output: llvm lacking",
 );
 
+##### _handle_native_assembly_output() #####
+
+{
+    local $@ = '';
+    $output = 'hello world';
+    $verbose = 0;
+    ok( $step->_handle_native_assembly_output( $conf, $output, $verbose ),
+        "_handle_native_assembly_output() returned true value" );
+    is( $step->result(), 'yes', "Got expected 'yes' result" );
+}
+
+{
+    local $@ = 'error';
+    $output = 'hello world';
+    $verbose = 0;
+    ok( $step->_handle_native_assembly_output( $conf, $output, $verbose ),
+        "_handle_native_assembly_output() returned true value" );
+    is( $step->result(), 'no', "Got expected 'no' result" );
+}
+
+{
+    local $@ = '';
+    $output = 'goodbye, cruel world';
+    $verbose = 0;
+    ok( $step->_handle_native_assembly_output( $conf, $output, $verbose ),
+        "_handle_native_assembly_output() returned true value" );
+    is( $step->result(), 'no', "Got expected 'no' result" );
+}
+
+{
+    local $@ = 'error';
+    $output = 'hello world';
+    $verbose = 1;
+    capture(
+        sub { $step->_handle_native_assembly_output(
+                $conf, $output, $verbose); },
+        \$stdout,
+        \$stderr,
+    );
+    is( $step->result(), 'no', "Got expected 'no' result" );
+    like(
+        $stdout, 
+        qr/Unable to execute native assembly program successfully/,
+        "Got expected verbose output: native assembly program",
+    );
+}
+
+{
+    local $@ = '';
+    $output = 'goodbye, cruel world';
+    $verbose = 1;
+    capture(
+        sub { $step->_handle_native_assembly_output(
+                $conf, $output, $verbose); },
+        \$stdout,
+        \$stderr,
+    );
+    is( $step->result(), 'no', "Got expected 'no' result" );
+    like(
+        $stdout, 
+        qr/Unable to execute native assembly program successfully/,
+        "Got expected verbose output: native assembly program",
+    );
+}
+
 ##### _cleanup_llvm_files() #####
 
 my ( $bcfile, $sfile, $nativefile );
@@ -182,14 +247,14 @@ $count_unlinked =
     auto::llvm::_cleanup_llvm_files( $bcfile, $sfile, $nativefile );
 is( $count_unlinked, 0, "no files existed, hence none unlinked" );
 
-my ( $bcfile, $sfile, $nativefile ) = ( '', '', '' );
+( $bcfile, $sfile, $nativefile ) = ( '', '', '' );
 $count_unlinked =
     auto::llvm::_cleanup_llvm_files( $bcfile, $sfile, $nativefile );
 is( $count_unlinked, 0, "no files existed, hence none unlinked" );
 
 {
     my $tdir = tempdir( CLEANUP => 1 );
-    my $bcfile = qq|$tdir/bcfile|;
+    $bcfile = qq|$tdir/bcfile|;
     open my $FH, '>', $bcfile
         or die "Unable to open handle for writing: $!";
     print $FH qq|bcfile hello world\n|;

@@ -136,14 +136,9 @@ sub runstep {
                         eval {
                             $output = capture_output(qq{./$nativefile});
                         };
-                        if ( $@ or ( $output !~ q/hello world/) ) {
-                            print "Unable to execute native assembly program successfuly\n"
-                                if $verbose;
-                            $self->_handle_result( $conf, 0 );
-                        }
-                        else {
-                            $self->_handle_result( $conf, 1 );
-                        }
+                        $self->_handle_native_assembly_output(
+                            $conf, $output, $verbose
+                        );
                     }
                 }
             }
@@ -182,6 +177,18 @@ sub _handle_result {
         $conf->data->set( has_llvm => '' );
     }
     return 1;
+}
+
+sub _handle_native_assembly_output {
+    my ($self, $conf, $output, $verbose) = @_;
+    if ( $@ or ( $output !~ /hello world/ ) ) {
+        print "Unable to execute native assembly program successfully\n"
+            if $verbose;
+        $self->_handle_result( $conf, 0 );
+    }
+    else {
+        $self->_handle_result( $conf, 1 );
+    }
 }
 
 sub _cleanup_llvm_files {
