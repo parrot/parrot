@@ -10,7 +10,7 @@ use Cwd;
 use Getopt::Long;
 use File::Spec::Functions;
 
-use Test::More tests => 33;
+use Test::More tests => 32;
 
 =head1 NAME
 
@@ -89,7 +89,10 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "1 + 2\n";
 close $FH;
-$out = `$parrot abc.pbc $filename`;
+$exe = catfile($pwd, $bindir, 'parrot-abc');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot abc.pbc" unless (-e $exe);
+$out = `$exe $filename`;
 ok($out eq "3\n", "check abc");
 unlink($filename);
 }
@@ -114,7 +117,10 @@ I                       @   _v
                  > :8- ^
 CODE
 close $FH;
-$out = `$parrot befunge.pbc $filename`;
+$exe = catfile($pwd, $bindir, 'parrot-befunge');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot befunge.pbc" unless (-e $exe);
+$out = `$exe $filename`;
 ok($out eq "If you can see a 4 here ->4 <- then everything is ok!\n", "check befunge");
 unlink($filename);
 }
@@ -123,11 +129,20 @@ SKIP:
 {
 skip("bf", 3) unless (-d "$pwd/$langdir/bf");
 chdir("$pwd/$langdir/bf");
-$out = `$parrot bf.pbc`;
+$exe = catfile($pwd, $bindir, 'parrot-bf');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot bf.pbc" unless (-e $exe);
+$out = `$exe`;
 ok($out =~ /^usage/, "check bf");
-$out = `$parrot bfc.pbc`;
+$exe = catfile($pwd, $bindir, 'parrot-bfc');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot bfc.pbc" unless (-e $exe);
+$out = `$exe`;
 ok($out =~ /^usage/, "check bfc");
-$out = `$parrot bfco.pbc`;
+$exe = catfile($pwd, $bindir, 'parrot-bfco');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot bfco.pbc" unless (-e $exe);
+$out = `$exe`;
 ok($out =~ /^usage/, "check bfco");
 }
 
@@ -147,7 +162,10 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "print qq{Hello, World!\n};\n";
 close $FH;
-$out = `$parrot perl5.pbc $filename`;
+$exe = catfile($pwd, $bindir, 'parrot-blizkost');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot perl5.pbc" unless (-e $exe);
+$out = `$exe $filename`;
 ok($out eq "Hello, World!\n" || $out eq "Hello, World!\r\n", "check blizkost");
 unlink($filename);
 }
@@ -156,7 +174,10 @@ SKIP:
 {
 skip("Cardinal", 1) unless (-d "$pwd/$langdir/cardinal");
 chdir("$pwd/$langdir/cardinal");
-$out = `$parrot cardinal.pbc -e "print 'hello world';"`;
+$exe = catfile($pwd, $bindir, 'parrot-cardinal');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot cardinal.pbc" unless (-e $exe);
+$out = `$exe -e "print 'hello world';"`;
 ok($out eq "hello world", "check cardinal");
 }
 
@@ -169,7 +190,10 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "Transcript show: 'Hello, world!'.";
 close $FH;
-$out = `$parrot chitchat.pbc $filename`;
+$exe = catfile($pwd, $bindir, 'parrot-chitchat');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot chitchat.pbc" unless (-e $exe);
+$out = `$exe $filename`;
 ok($out eq "Hello, world!\n", "check chitchat");
 unlink($filename);
 }
@@ -191,7 +215,10 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "print(\"Hello World from JS\");";
 close $FH;
-$out = `$parrot js.pbc $filename`;
+$exe = catfile($pwd, $bindir, 'parrot-js');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot js.pbc" unless (-e $exe);
+$out = `$exe $filename`;
 ok($out eq "Hello World from JS\n", "check ecmascript");
 unlink($filename);
 }
@@ -205,7 +232,10 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "\"Hello World!\".";
 close $FH;
-$out = `$parrot fun.pbc $filename`;
+$exe = catfile($pwd, $bindir, 'parrot-fun');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot fun.pbc" unless (-e $exe);
+$out = `$exe $filename`;
 ok($out eq "Hello World!\n", "check fun");
 unlink($filename);
 }
@@ -219,7 +249,10 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH q{say('Hello, world!');};
 close $FH;
-$out = `$parrot gil.pbc $filename`;
+$exe = catfile($pwd, $bindir, 'parrot-gil');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot gil.pbc" unless (-e $exe);
+$out = `$exe $filename`;
 ok($out eq "Hello, world!\n", "check gil");
 unlink($filename);
 }
@@ -233,7 +266,10 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "H";
 close $FH;
-$out = `$parrot hq9plus.pbc $filename`;
+$exe = catfile($pwd, $bindir, 'parrot-hq9plus');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot hq9plus.pbc" unless (-e $exe);
+$out = `$exe $filename`;
 ok($out eq "Hello, world!\n", "check HQ9Plus");
 unlink($filename);
 }
@@ -247,7 +283,10 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "( print \"Hello, World!\" )\n";
 close $FH;
-$out = `$parrot lisp.pbc $filename`;
+$exe = catfile($pwd, $bindir, 'parrot-lisp');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot lisp.pbc" unless (-e $exe);
+$out = `$exe $filename`;
 ok($out eq "Hello, World!\n", "check lisp");
 unlink($filename);
 }
@@ -265,7 +304,10 @@ HAI 1.2
 KTHXBYE
 CODE
 close $FH;
-$out = `$parrot lolcode.pbc $filename`;
+$exe = catfile($pwd, $bindir, 'parrot-lolcode');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot lolcode.pbc" unless (-e $exe);
+$out = `$exe $filename`;
 ok($out eq "HAI WORLD!\n", "check lolcode");
 unlink($filename);
 }
@@ -274,7 +316,10 @@ SKIP:
 {
 skip("Lua", 1) unless (-d "$pwd/$langdir/lua");
 chdir("$pwd/$langdir/lua");
-$out = `$parrot lua.pbc -e "print(nil)"`;
+$exe = catfile($pwd, $bindir, 'parrot-lua');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot lua.pbc" unless (-e $exe);
+$out = `$exe -e "print(nil)"`;
 ok($out eq "nil\n", "check lua");
 }
 
@@ -282,7 +327,10 @@ SKIP:
 {
 skip("m4", 1) unless (-d "$pwd/$langdir/m4");
 chdir("$pwd/$langdir/m4");
-$out = `$parrot m4.pbc`;
+$exe = catfile($pwd, $bindir, 'parrot-m4');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot m4.pbc" unless (-e $exe);
+$out = `$exe`;
 ok($out =~ /^Usage/, "check m4");
 }
 
@@ -295,7 +343,10 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "Hello, World!\n\n";
 close $FH;
-$out = `$parrot markdown.pbc $filename`;
+$exe = catfile($pwd, $bindir, 'parrot-markdown');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot markdown.pbc" unless (-e $exe);
+$out = `$exe $filename`;
 ok($out eq "<p>Hello, World!</p>\n", "check markdown");
 unlink($filename);
 }
@@ -309,7 +360,10 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "printf(\"Hello, world!\n\");";
 close $FH;
-$out = `$parrot matrixy.pbc $filename`;
+$exe = catfile($pwd, $bindir, 'parrot-matrixy');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot matrixy.pbc" unless (-e $exe);
+$out = `$exe $filename`;
 ok($out eq "Hello, world!\n", "check matrixy");
 unlink($filename);
 }
@@ -323,7 +377,10 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "\"Hello world!\"";
 close $FH;
-$out = `$parrot APL.pbc $filename`;
+$exe = catfile($pwd, $bindir, 'parrot-apl');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot apl.pbc" unless (-e $exe);
+$out = `$exe $filename`;
 ok($out eq "Hello world!\n", "check Paraplegic");
 unlink($filename);
 }
@@ -337,7 +394,10 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "( write \"Hello, World!\\n\" )\n";
 close $FH;
-$out = `$parrot pheme.pbc $filename`;
+$exe = catfile($pwd, $bindir, 'parrot-pheme');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot pheme.pbc" unless (-e $exe);
+$out = `$exe $filename`;
 ok($out eq "Hello, World!\n", "check pheme");
 unlink($filename);
 }
@@ -351,7 +411,10 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "<?php echo \"Hello, World!\\n\"; ?>";
 close $FH;
-$out = `$parrot pipp.pbc $filename`;
+$exe = catfile($pwd, $bindir, 'parrot-pipp');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot pipp.pbc" unless (-e $exe);
+$out = `$exe $filename`;
 ok($out eq "Hello, World!\n", "check pipp");
 unlink($filename);
 }
@@ -370,7 +433,10 @@ begin
 end.
 CODE
 close $FH;
-$out = `$parrot porcupine.pbc $filename`;
+$exe = catfile($pwd, $bindir, 'parrot-porcupine');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot porcupine.pbc" unless (-e $exe);
+$out = `$exe $filename`;
 ok($out eq "Hello, world!\n", "check porcupine");
 unlink($filename);
 }
@@ -384,7 +450,10 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH q{"Hello, world!\n"};
 close $FH;
-$out = `$parrot primitivearc.pbc $filename`;
+$exe = catfile($pwd, $bindir, 'parrot-primitivearc');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot primitivearc.pbc" unless (-e $exe);
+$out = `$exe $filename`;
 ok($out eq "Hello, world!\n\n", "check primitivearc");
 unlink($filename);
 }
@@ -398,7 +467,10 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "print \"Hello, World!\";\n";
 close $FH;
-$out = `$parrot punie.pbc $filename`;
+$exe = catfile($pwd, $bindir, 'parrot-punie');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot punie.pbc" unless (-e $exe);
+$out = `$exe $filename`;
 ok($out eq "Hello, World!", "check punie");
 unlink($filename);
 }
@@ -412,22 +484,23 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "print('Hello, World!')\n";
 close $FH;
-$out = `$parrot pynie.pbc $filename`;
+$exe = catfile($pwd, $bindir, 'parrot-pynie');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot pynie.pbc" unless (-e $exe);
+$out = `$exe $filename`;
 ok($out eq "Hello, World!\n", "check pynie");
 unlink($filename);
 }
 
 SKIP:
 {
-skip("Rakudo", 2) unless (-d "$pwd/$langdir/rakudo");
+skip("Rakudo", 1) unless (-d "$pwd/$langdir/rakudo");
 chdir("$pwd/$langdir/rakudo");
-$out = `$parrot perl6.pbc -e "say 'hello world'"`;
+$exe = catfile($pwd, $bindir, 'perl6');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot perl6.pbc" unless (-e $exe);
+$out = `$exe -e "say 'hello world'"`;
 ok($out eq "hello world\n", "check rakudo");
-
-skip("perl6 executable", 1) if ($bindir eq '.');
-$exe = catfile($bindir, 'perl6');
-$out = `$exe -v`;
-ok($out =~ /Rakudo/, "check perl6");
 }
 
 SKIP:
@@ -530,7 +603,10 @@ Ophelia:
 
 CODE
 close $FH;
-$out = `$parrot shakespeare.pbc $filename`;
+$exe = catfile($pwd, $bindir, 'parrot-shakespeare');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot shakespeare.pbc" unless (-e $exe);
+$out = `$exe $filename`;
 ok($out eq "Hello World!\n", "check shakespeare");
 unlink($filename);
 }
@@ -544,7 +620,10 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "( say \"Hello, World!\" )\n";
 close $FH;
-$out = `$parrot steme.pbc $filename`;
+$exe = catfile($pwd, $bindir, 'parrot-steme');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot steme.pbc" unless (-e $exe);
+$out = `$exe $filename`;
 ok($out eq "Hello, World!\n", "check steme");
 unlink($filename);
 }
@@ -558,7 +637,10 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "print(\"Hello, World!\")\n";
 close $FH;
-$out = `$parrot squaak.pbc $filename`;
+$exe = catfile($pwd, $bindir, 'parrot-squaak');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot squaak.pbc" unless (-e $exe);
+$out = `$exe $filename`;
 ok($out eq "Hello, World!\n", "check squaak");
 unlink($filename);
 }
@@ -575,7 +657,10 @@ print $FH <<'CODE';
 `r```````````.H.e.l.l.o. .w.o.r.l.di
 CODE
 close $FH;
-$out = `$parrot unl.pbc $filename`;
+$exe = catfile($pwd, $bindir, 'parrot-unl');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot unl.pbc" unless (-e $exe);
+$out = `$exe $filename`;
 ok($out eq "Hello world\n", "check unlambda");
 unlink($filename);
 }
@@ -597,7 +682,10 @@ extern function main()
 CODE
 close $FH;
 `wmlsc $filename`;
-$out = `$parrot wmlsi.pbc ${filename}c main`;
+$exe = catfile($pwd, $bindir, 'parrot-wmlsi');
+$exe .= '.exe' if ($^O eq 'MSWin32');
+$exe = "$parrot wmlsi.pbc" unless (-e $exe);
+$out = `$exe ${filename}c main`;
 ok($out eq "Hello World!\n", "check wmlscript");
 unlink($filename);
 unlink($filename . 'c');
