@@ -157,6 +157,10 @@ L<https://trac.parrot.org/parrot/ticket/511>
 
 L<https://trac.parrot.org/parrot/ticket/1091>
 
+=item implicit optional named parameters [eligible in 2.1]
+
+L<https://trac.parrot.org/parrot/ticket/1103>
+
 =back
 
 =head1 Functions
