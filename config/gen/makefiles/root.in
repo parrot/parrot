@@ -1423,15 +1423,7 @@ SRC_TEST_FILES := \
     t/src/*.t
 TOOLS_TEST_FILES := \
     t/tools/*.t
-EXTRA_TEST_FILES := \
-    t/compilers/json/*.t \
-    t/compilers/pct/*.t \
-    t/compilers/pge/*.t \
-    t/compilers/pge/p5regex/*.t \
-    t/compilers/pge/perl6regex/*.t \
-    t/compilers/tge/*.t \
-    t/library/*.t \
-    t/tools/*.t
+LIBRARY_TEST_FILES := @library_tests@
 PMC2CUTILS_DIR := t/tools/pmc2cutils
 OPS2PMUTILS_DIR := t/tools/ops2pm
 OPS2CUTILS_DIR := t/tools/ops2cutils
@@ -1458,10 +1450,6 @@ CONFIGURE_TEST_FILES := \
 # We probably need a complete build before running the tests.
 test_prep : all
 
-# We always want to test annotations are persisted in PBC during make test.
-test_pbc_annotation_persistence : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) -r t/op/annotate.t
-
 # Run test cases with a single call of t/harness. Users have to look at only
 # one report. The default set of tests to run is contained in t/harness,
 # make any edits there. Some tests are run in a separate harness only because
@@ -1471,7 +1459,7 @@ test_pbc_annotation_persistence : test_prep
 test : test_core nqp_test
 
 # Test Parrot core.
-test_core: test_prep test_pbc_annotation_persistence
+test_core: test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS)
 
 # Test the NQP compiler
@@ -1507,7 +1495,7 @@ fulltest :
 	src_tests \
 	run_tests \
 	perl_tests \
-	extra_tests \
+	library_tests \
 	nqp_test \
 	codetest \
 	benchmark_tests \
@@ -1603,9 +1591,9 @@ distro_tests : test_prep
 configure_tests :
 	$(PERL) t/harness $(CONFIGURE_TEST_FILES)
 
-# extra tests - tests needed by make fulltest and make cover for completion
-extra_tests : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(EXTRA_TEST_FILES)
+# library tests - tests run by make test but not by make fulltest or make cover
+library_tests : test_prep
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(LIBRARY_TEST_FILES)
 
 ###############################################################################
 #
@@ -2124,7 +2112,7 @@ cover-perl: cover.dummy
 	-@make@ perl_tests
 
 cover-extra: cover.dummy
-	-@make@ extra_tests
+	-@make@ library_tests
 
 cover-nqp: cover.dummy
 	-@make@ nqp_test
