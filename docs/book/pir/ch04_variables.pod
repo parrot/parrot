@@ -1030,7 +1030,7 @@ X<scalar PMCs>
 X<PMCs (Polymorphic Containers);scalar>
 In most of the examples shown so far, PMCs duplicate the behavior of integers,
 numbers, and strings. Parrot provides a set of PMCs for this exact purpose.
-C<Integer>, C<Number>, and C<String> are thin overlays on Parrot's low-level
+C<Integer>, C<Float>, and C<String> are thin overlays on Parrot's low-level
 integers, numbers, and strings.
 
 A previous example showed a string literal assigned to a PMC variable of type
@@ -1045,7 +1045,7 @@ types and their PMC equivalents:
   $P1 = new 'String'
   $P1 = "5 birds"
 
-  $P2 = new 'Number'
+  $P2 = new 'Float'
   $P2 = 3.14
 
 =end PIR_FRAGMENT
@@ -1068,7 +1068,7 @@ type is "boxing".>
   $P1 = $S1
 
   $N2 = 3.14
-  $P2 = new 'Number'
+  $P2 = new 'Float'
   $P2 = $N2
 
 =end PIR_FRAGMENT
@@ -1082,7 +1082,7 @@ object from an integer, number, or string literal or variable.
 
   $P1 = box $S1  # $P1 is a "String"
 
-  $P2 = box 3.14 # $P2 is a "Number"
+  $P2 = box 3.14 # $P2 is a "Float"
 
 =end PIR_FRAGMENT
 
@@ -1110,7 +1110,7 @@ the low-level type.N<The reverse of "boxing" is "unboxing".>
 
 =end PIR_FRAGMENT
 
-This example creates C<Integer>X<Integer PMC>, C<Number>X<Number PMC>,
+This example creates C<Integer>X<Integer PMC>, C<Float>X<Float PMC>,
 and C<String>X<String PMC> PMCs, and shows the effect of assigning each
 one back to a low-level type.
 
