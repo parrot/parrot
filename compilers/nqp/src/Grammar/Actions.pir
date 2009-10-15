@@ -796,7 +796,21 @@
 ##        $past.namespace($<name><ident>);
 ##        $past.blocktype('declaration');
 ##        $past.pirflags(':init :load');
-##        if ($<sym> eq 'class') { ...code to make class... }
+##        if ($<sym> eq 'class') { 
+##            my $classpast := 
+##                PAST::Op.new(
+##                    PAST::Var.new( :name('P6metaclass'), :scope('package'), 
+##                                   :namespace([]) ),
+##                    ~$<name>,
+##                    :pasttype('callmethod'), :name('new_class')
+##                );
+##            if $<parent> { 
+##                $classpast.push( 
+##                    PAST::Val.new( ~$<parent>[0] , :named('parent') )
+##                );
+##            }
+##            $past.push($classpast);
+##        }
 ##        make $past;
 ##    }
 .sub 'package_declarator' :method
@@ -813,22 +827,23 @@
     past.'lexical'(0)
     $S0 = match['sym']
     if $S0 != 'class' goto class_done
-    .local string inline
-    inline = <<'        INLINE'
-        $P0 = get_root_global ['parrot'], 'P6metaclass'
-        $P1 = split '::', '%s'
-        push_eh subclass_done
-        $P2 = $P0.'new_class'($P1)
-      subclass_done:
-        pop_eh
-        INLINE
-    $S0 = match['name']
-    $I0 = index inline, '%s'
-    substr inline, $I0, 2, $S0
+    .local pmc classvar, classop
+    $P0 = get_hll_global ['PAST'], 'Var'
+    $P1 = new ['ResizablePMCArray']
+    classvar = $P0.'new'( 'name'=>'P6metaclass', 'scope'=>'package', 'namespace'=>$P1)
     $P0 = get_hll_global ['PAST'], 'Op'
-    $P1 = $P0.'new'('inline'=>inline, 'pasttype'=>'inline')
+    $S0 = match['name']
+    classop = $P0.'new'( classvar, $S0, 'pasttype'=>'callmethod', 'name'=>'new_class')
     $P2 = past[0]
-    $P2.'push'($P1)
+    .local pmc parent
+    parent = match['parent']
+    if null parent goto parent_done
+    $S0 = parent[0]
+    $P0 = get_hll_global ['PAST'], 'Val'
+    $P1 = $P0.'new'( 'value'=>$S0, 'named'=>'parent' )
+    classop.'push'($P1)
+  parent_done:
+    $P2.'push'(classop)
   class_done:
     match.'!make'(past)
 .end

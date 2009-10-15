@@ -301,6 +301,7 @@ token colonpair {
 rule package_declarator {
     $<sym>=[module|class]
     <name>
+    [ 'is' <parent=name> ]?
     [
     || ';' <statement_block> {*}                           #= statement_block
     || <block> {*}                                         #= block
