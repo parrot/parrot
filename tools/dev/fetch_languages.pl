@@ -283,8 +283,8 @@ my @hlls = (
 
     {
         name       => 'tcl',
-        scm        => 'SVN',
-        repository => 'http://partcl.googlecode.com/svn/trunk'
+        scm        => 'GIT',
+        repository => 'git://github.com/partcl/partcl.git'
     },
 
     {
