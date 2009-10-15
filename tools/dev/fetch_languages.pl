@@ -181,8 +181,8 @@ my @hlls = (
 
     {
         name       => 'matrixy',
-        scm        => 'SVN',
-        repository => 'http://matrixy.googlecode.com/svn/trunk'
+        scm        => 'GIT',
+        repository => 'git://github.com/Whiteknight/matrixy.git'
     },
 
     {
