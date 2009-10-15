@@ -796,16 +796,16 @@
 ##        $past.namespace($<name><ident>);
 ##        $past.blocktype('declaration');
 ##        $past.pirflags(':init :load');
-##        if ($<sym> eq 'class') { 
-##            my $classpast := 
+##        if ($<sym> eq 'class') {
+##            my $classpast :=
 ##                PAST::Op.new(
-##                    PAST::Var.new( :name('P6metaclass'), :scope('package'), 
+##                    PAST::Var.new( :name('P6metaclass'), :scope('package'),
 ##                                   :namespace([]) ),
 ##                    ~$<name>,
 ##                    :pasttype('callmethod'), :name('new_class')
 ##                );
-##            if $<parent> { 
-##                $classpast.push( 
+##            if $<parent> {
+##                $classpast.push(
 ##                    PAST::Val.new( ~$<parent>[0] , :named('parent') )
 ##                );
 ##            }
