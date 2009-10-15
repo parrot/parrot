@@ -35,7 +35,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', 'macro, zero parameters, line numbe
     end
 .end
 CODE
-/(?s:Null PMC access .*current instr.*:4\))/
+/(?s:Null PMC access .*current instr.*:(4|-1)\))/
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', 'macro, zero parameters, line number' );
@@ -47,7 +47,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', 'macro, zero parameters, line numbe
     end
 .end
 CODE
-/(?s:Null PMC access .*current instr.*:5\))/
+/(?s:Null PMC access .*current instr.*:(5|-1)\))/
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', 'macro, zero parameters, line number' );
@@ -60,7 +60,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', 'macro, zero parameters, line numbe
     end
 .end
 CODE
-/(?s:Null PMC access .*current instr.*:6\))/
+/(?s:Null PMC access .*current instr.*:(6|-1)\))/
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'macro, one unused parameter, literal term' );

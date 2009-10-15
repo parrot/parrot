@@ -102,7 +102,7 @@ pir_error_output_like( <<'CODE', <<'OUT', 'off by one error message (TT #1016)',
 no:
 .end
 CODE
-/(?s:Null PMC access in get_bool.*current instr.*:4\))/
+/(?s:Null PMC access in get_bool.*current instr.*:(4|-1)\))/
 OUT
 
 pir_error_output_like( <<'CODE', <<'OUT', 'bare method names not allowed (RT #45859)');
