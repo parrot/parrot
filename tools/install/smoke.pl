@@ -66,6 +66,7 @@ my $out;
 my $FH;
 my $parrot = catfile($bindir, 'parrot');
 my $pirc = catfile($bindir, 'pirc');
+my $nqp = catfile($bindir, 'parrot_nqp');
 
 #
 # parrot executable
@@ -119,6 +120,15 @@ $out = `$pirc -n $filename`;
 ok($out eq "ok\n", "check pirc");
 unlink($filename);
 
+$filename = 'test.nqp';
+open $FH, '>', $filename
+        or die "Can't open $filename ($!).\n";
+print $FH "say('hello world!');\n";
+close $FH;
+$out = `$nqp $filename`;
+ok($out eq "hello world!\n", "check nqp");
+unlink($filename);
+
 # compilers/tge is typically not installed
 $filename = 'test.tg';
 open $FH, '>', $filename
@@ -127,16 +137,6 @@ print $FH "transform past (ROOT) { }\n";
 close $FH;
 $out = `$parrot $compdir/tge/tgc.pir $filename`;
 ok($out =~ /^\n\.sub '_ROOT_past'/, "check TGE");
-unlink($filename);
-
-# compilers/nqp is typically not installed
-$filename = 'test.nqp';
-open $FH, '>', $filename
-        or die "Can't open $filename ($!).\n";
-print $FH "say('hello world!');\n";
-close $FH;
-$out = `$parrot $compdir/nqp/nqp.pbc $filename`;
-ok($out eq "hello world!\n", "check nqp");
 unlink($filename);
 
 # Local Variables:
