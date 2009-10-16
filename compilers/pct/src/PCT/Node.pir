@@ -209,7 +209,6 @@ a C<Match> object and obtains source/position information from that.
     unless $I0 goto err_unknown
     $I0 = can node, 'from'
     unless $I0 goto err_unknown
-    if $I0 goto node_misc
     .local pmc source, pos
     source = node.'orig'()
     pos = node.'from'()
