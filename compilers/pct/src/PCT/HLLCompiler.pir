@@ -389,6 +389,9 @@ to any options and return the resulting parse tree.
     parseactions = self.'parseactions'()
     $I0 = isa parseactions, ['Undef']
     if $I0 goto have_action
+    ##  if parseactions is a protoobject, use it directly
+    $I0 = isa parseactions, 'P6protoobject'
+    if $I0 goto action_exact
     ##  if parseactions is a Class or array, make action directly from that
     $I0 = isa parseactions, 'Class'
     if $I0 goto action_make
@@ -399,6 +402,7 @@ to any options and return the resulting parse tree.
     ##  if parseactions is not a String, use it directly.
     $I0 = isa parseactions, 'String'
     if $I0 goto action_string
+  action_exact:
     action = parseactions
     goto have_action
   action_namespace:
