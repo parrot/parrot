@@ -204,11 +204,17 @@ a C<Match> object and obtains source/position information from that.
     if $I0 goto node_match
     $I0 = isa node, ['PCT';'Node']
     if $I0 goto node_pct
-    $S0 = typeof node
-    $S0 = concat "Don't know how to save info from node of type ", $S0
-    die $S0
-  node_match:
+  node_misc:
+    $I0 = can node, 'orig'
+    unless $I0 goto err_unknown
+    $I0 = can node, 'from'
+    unless $I0 goto err_unknown
+    if $I0 goto node_misc
     .local pmc source, pos
+    source = node.'orig'()
+    pos = node.'from'()
+    goto node_done
+  node_match:
     source = getattribute node, '$.target'
     pos    = node.'from'()
     goto node_done
@@ -219,6 +225,12 @@ a C<Match> object and obtains source/position information from that.
     self['source'] = source
     self['pos']    = pos
   done:
+    .return ()
+
+  err_unknown:
+    $S0 = typeof node
+    $S0 = concat "Don't know how to save info from node of type ", $S0
+    die $S0
 .end
 
 
