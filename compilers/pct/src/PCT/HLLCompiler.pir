@@ -387,7 +387,8 @@ to any options and return the resulting parse tree.
     null action
     if target == 'parse' goto have_action
     parseactions = self.'parseactions'()
-    unless parseactions goto have_action
+    $I0 = isa parseactions, ['Undef']
+    if $I0 goto have_action
     ##  if parseactions is a Class or array, make action directly from that
     $I0 = isa parseactions, 'Class'
     if $I0 goto action_make
