@@ -93,6 +93,11 @@ CODE
 hello
 OUT
 
+
+TODO: {
+    local $TODO = q|fails on switch runcore - TT #1102|
+        if $ENV{TEST_PROG_ARGS} =~ /--runcore=switch/;
+
 pir_error_output_like( <<'CODE', <<'OUT', 'off by one error message (TT #1016)', );
 .sub foo :main
   $P0 = new 'Hash'
@@ -102,8 +107,10 @@ pir_error_output_like( <<'CODE', <<'OUT', 'off by one error message (TT #1016)',
 no:
 .end
 CODE
-/(?s:Null PMC access in get_bool.*current instr.*:(4|-1|3)\))/
+/(?s:Null PMC access in get_bool.*current instr.*:(4|-1)\))/
 OUT
+
+}
 
 pir_error_output_like( <<'CODE', <<'OUT', 'bare method names not allowed (RT #45859)');
 .sub foo :main
