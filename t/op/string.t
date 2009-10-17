@@ -1,14 +1,6 @@
-#!perl
+#!parrot
 # Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-
-use Test::More;
-use Parrot::Test tests => 167;
-use Parrot::Config;
 
 =head1 NAME
 
@@ -24,2987 +16,2090 @@ Tests Parrot string registers and operations.
 
 =cut
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'set_s_s|sc' );
-    set S4, "JAPH\n"
-    set     S5, S4
-    print   S4
-    print   S5
-    end
-CODE
-JAPH
-JAPH
-OUTPUT
+.sub main :main
+    .include 'test_more.pir'
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'clone' );
-        set     S0, "Foo\n"
-    clone   S1, S0
-        print   S0
-    print   S1
+    plan(405)
 
-    clone   S1, "Bar\n"
-    print   S1
-        chopn   S1, 1   # Check that the contents of S1 are no longer constant
-    print   S1
-        print   "\n"
+    set_s_s_sc()
+    test_clone()
+    clone_null()
+    test_length_i_s()
+    zero_length_substr()
+    chopn_with_clone()
+    chopn_with_set()
+    chopn_oob_values()
+    three_argument_chopn()
+    three_argument_chopn__oob_values()
+    substr_tests()
+    neg_substr_offset()
+    exception_substr_oob()
+    exception_substr_oob()
+    len_greater_than_strlen()
+    len_greater_than_strlen_neg_offset()
+    five_arg_substr_w_rep_eq_length()
+    five_arg_substr_w_replacement_gt_length()
+    five_arg_substr_w_replacement_lt_length()
+    five_arg_substr__offset_at_end_of_string()
+    exception_five_arg_substr__offset_past_end_of_string()
+    five_arg_substr_neg_offset_repl_eq_length()
+    five_arg_substr_neg_offset_repl_gt_length()
+    five_arg_substr_neg_offset_repl_lt_length()
+    exception_five_arg_substr_neg_offset_out_of_string()
+    five_arg_substr_length_gt_strlen()
+    five_arg_substr_length_gt_strlen_neg_offset()
+    four_arg_replacement_only_substr()
+    three_arg_substr()
+    exception_substr__pos_offset_zero_length_string()
+    substr_offset_zero_zero_length_string()
+    exception_substr_offset_one_zero_length_string()
+    exception_substr_neg_offset_zero_length_string()
+    zero_length_substr_zero_length_string()
+    zero_length_substr_zero_length_string()
+    three_arg_substr_zero_length_string()
+    five_arg_substr_zero_length_string()
+    four_arg_substr_replace_zero_length_string()
+    concat_s_s_sc_null_onto_null()
+    concat_s_sc_repeated_two_arg_concats()
+    concat_s_s_sc_foo_one_onto_null()
+    test_concat_s_s_sc()
+    concat_s_s_sc_s_sc()
+    concat_ensure_copy_is_made()
+    test_clears()
 
-    end
-CODE
-Foo
-Foo
-Bar
-Bar
-OUTPUT
+    same_constant_twice_bug()
+    exception_two_param_ord_empty_string()
+    exception_two_param_ord_empty_string_register()
+    exception_three_param_ord_empty_string()
+    exception_three_param_ord_empty_string_register()
+    two_param_ord_one_character_string()
+    two_param_ord_multi_character_string()
+    two_param_ord_one_character_string_register()
+    three_param_ord_one_character_string()
+    three_param_ord_one_character_string_register()
+    three_param_ord_multi_character_string()
+    three_param_ord_multi_character_string_register()
+    exception_three_param_ord_multi_character_string()
+    exception_three_param_ord_multi_character_string()
+    three_param_ord_one_character_string_from_end()
+    three_param_ord_one_character_string_register_from_end()
+    three_param_ord_multi_character_string_from_end()
+    three_param_ord_multi_character_string_register_from_end()
+    exception_three_param_ord_multi_character_string_register_from_end_oob()
+    chr_of_thirty_two_is_space_in_ascii()
+    chr_of_sixty_five_is_a_in_ascii()
+    chr_of_one_hundred_and_twenty_two_is_z_in_ascii()
+    test_if_s_ic()
+    repeat_s_s_sc_i_ic()
+    exception_repeat_oob()
+    exception_repeat_oob_repeat_p_p_p()
+    exception_repeat_oob_repeate_p_p_i()
+    encodingname_oob()
+    index_three_arg_form()
+    index_four_arg_form()
+    index_four_arg_form_bug_twenty_two_thousand_seven_hundred_and_eighteen()
+    index_null_strings()
+    index_embedded_nulls()
+    index_big_strings()
+    index_big_hard_to_match_strings()
+    index_with_different_charsets()
+    negative_index_bug_35959()
+    index_multibyte_matching()
+    index_multibyte_matching_two()
+    num_to_string()
+    string_to_int()
+    concat_or_substr_cow()
+    constant_to_cstring()
+    cow_with_chopn_leaving_original_untouched()
+    check_that_bug_bug_16874_was_fixed()
+    stress_concat()
+    ord_and_substring_see_bug_17035()
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'clone null' );
-    null S0
-    clone S1, S0
-    end
-CODE
-OUTPUT
+    test_sprintf()
+    other_form_of_sprintf_op()
+    sprintf_left_justify()
+    correct_precision_for_sprintf_x()
+    test_exchange()
+    test_find_encoding()
+    test_string_encoding()
+    test_assign()
+    assign_and_globber()
+    assign_and_globber_2()
+    bands_null_string()
+    bands_2()
+    bands_3()
+    bands_cow()
+    bors_null_string()
+    bors_2()
+    bors_3()
+    bors_cow()
+    bxors_null_string()
+    bxors_2()
+    bxors_3()
+    bxors_cow()
+    bnots_null_string()
+    bnots_2()
+    bnots_cow()
+    transcode_to_utf8()
+    string_chartype()
+    split_on_empty_string()
+    split_on_non_empty_string()
+    test_join()
+    eq_addr_or_ne_addr()
+    test_if_null_s_ic()
+    test_upcase()
+    test_downcase()
+    test_titlecase()
+    three_param_ord_one_character_string_register_i()
+    three_param_ord_multi_character_string_i()
+    three_param_ord_multi_character_string_register_i()
+    exception_three_param_ord_multi_character_string_i()
+    exception_three_param_ord_multi_character_string_i()
+    three_param_ord_one_character_string_from_end_i()
+    three_param_ord_one_character_string_register_from_end_i()
+    three_param_ord_multi_character_string_from_end_i()
+    three_param_ord_multi_character_string_register_from_end_i()
+    exception_three_param_ord_multi_character_string_register_from_end_oob_i()
+    more_string_to_int()
+    constant_string_and_modify_in_situ_op_rt_bug_60030()
+    corner_cases_of_numification()
+    non_canonical_nan_and_inf()
+    split_hll_mapped()
+    # END_OF_TESTS
+    join_get_string_returns_a_null_string()
 
-pasm_output_is( <<'CODE', '4', 'length_i_s' );
-    set I4, 0
-    set S4, "JAPH"
-    length  I4, S4
-    print   I4
-    end
-CODE
+.end
 
-pasm_output_is( <<'CODE', '0', '0 length substr' );
-    set I4, 0
-    set S4, "JAPH"
-        substr  S3, S4, 1, 0
-    length  I4, S3
-        print   I4
-    end
-CODE
+.macro exception_is ( M )
+    .local pmc exception
+    .local string message
+    .get_results (exception)
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'chopn with clone' );
-    set S4, "JAPHxyzw"
-    set S5, "japhXYZW"
-        clone   S3, S4
-    set S1, "\n"
-    set I1, 4
-    chopn   S4, 3
-    chopn   S4, 1
-        chopn   S5, I1
-    print   S4
-        print   S1
-    print   S5
-        print   S1
-    print   S3
-        print   S1
-    end
-CODE
-JAPH
-japh
-JAPHxyzw
-OUTPUT
+    message = exception['message']
+    is( message, .M, .M )
+.endm
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'chopn with set' );
-    set S4, "JAPHxyzw"
-    set S5, "japhXYZW"
-        set     S3, S4
-    set S1, "\n"
-    set I1, 4
-    chopn   S4, 3
-    chopn   S4, 1
-        chopn   S5, I1
-    print   S4
-        print   S1
-    print   S5
-        print   S1
-    print   S3
-        print   S1
-    end
-CODE
-JAPH
-japh
-JAPH
-OUTPUT
+.sub set_s_s_sc
+    set $S4, "JAPH"
+    set $S5, $S4
+    
+    is( $S4, "JAPH", '' )
+    is( $S5, "JAPH", '' )
+.end
+ 
+.sub test_clone
+    set   $S0, "Foo1"
+    clone $S1, $S0
+   
+    is( $S0, "Foo1", '' )
+    is( $S1, "Foo1", '' )
+   
+    clone $S1, "Bar1"
+    is( $S1, "Bar1", '' )
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'chopn, OOB values' );
-    set S1, "A string of length 21"
-    chopn   S1, 0
-    print   S1
-    print   "\n"
-    chopn   S1, 4
-    print   S1
-    print   "\n"
+    chopn $S1, 1   
+    is( $S1, "Bar", 'the contents of $S1 are no longer constant' )
+.end
+ 
+.sub clone_null
+    null $S0
+    clone $S1, $S0
+    is( $S1, $S0, '' )
+.end
+
+.sub test_length_i_s
+    set $I4, 0
+    set $S4, "JAPH"
+    length  $I4, $S4
+    is( $I4, "4", '' )
+.end
+
+.sub zero_length_substr
+    set $I4, 0
+    set $S4, "JAPH"
+    substr  $S3, $S4, 1, 0
+    length  $I4, $S3
+    is( $I4, "0", '' )
+.end
+
+.sub chopn_with_clone
+    set $S4, "JAPHxyzw"
+    set $S5, "japhXYZW"
+    clone $S3, $S4
+    set $I1, 4
+    chopn $S4, 3
+    chopn $S4, 1
+    chopn $S5, $I1
+
+    is( $S4, "JAPH", '' )
+    is( $S5, "japh", '' )
+    is( $S3, "JAPHxyzw", '' )
+.end
+ 
+.sub chopn_with_set
+    set $S4, "JAPHxyzw"
+    set $S5, "japhXYZW"
+    set     $S3, $S4
+    set $I1, 4
+    chopn   $S4, 3
+    chopn   $S4, 1
+    chopn   $S5, $I1
+
+    is( $S4, "JAPH", '' )
+    is( $S5, "japh", '' )
+    is( $S3, "JAPH", '' )
+.end
+
+.sub chopn_oob_values
+    set $S1, "A string of length 21"
+    chopn   $S1, 0
+    is( $S1, "A string of length 21", '' )
+
+    chopn   $S1, 4
+    is( $S1, "A string of lengt", '' )
+
     # -length cuts now
-    chopn   S1, -4
-    print   S1
-    print   "\n"
-    chopn   S1, 1000
-    print   S1
-    print   "** nothing **\n"
-    end
-CODE
-A string of length 21
-A string of lengt
-A st
-** nothing **
-OUTPUT
+    chopn   $S1, -4
+    is( $S1, "A st", '' )
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'Three argument chopn' );
-    set S1, "Parrot"
+    chopn   $S1, 1000
+    is( $S1, "", '' )
+.end
+ 
+.sub three_argument_chopn
+    set $S1, "Parrot"
+    chopn   $S2, $S1, 0
+    is( $S1, "Parrot", '' )
+    is( $S2, "Parrot", '' )
+    
+    chopn   $S2, $S1, 1
+    is( $S1, "Parrot", '' )
+    is( $S2, "Parro", '' )
+    
+    set     $I0, 2
+    chopn   $S2, $S1, $I0
+    is( $S1, "Parrot", '' )
+    is( $S2, "Parr", '' )
+    
+    chopn   $S2, "Parrot", 3
+    is( $S2, "Par", '' )
+    
+    chopn   $S1, $S1, 5
+    is( $S1, "P", '' )
+    
+    set     $S1, "Parrot"
+    set     $S3, $S1
+    chopn   $S2, $S1, 3
+    is( $S3, "Parrot", '' )
+   
+    set     $S3, $S1
+    chopn   $S1, 3
+    is( $S3, "Par", '' )
+.end
+# 
+.sub three_argument_chopn__oob_values
+    set $S1, "Parrot"
+    chopn   $S2, $S1, 7
+    is( $S1, "Parrot", '' )
+    is( $S2, "", '' )
+    
+    chopn   $S2, $S1, -1
+    is( $S1, "Parrot", '' )
+    is( $S2, "P", '' )
+.end
 
-    chopn   S2, S1, 0
-    print   S1
-    print   "\n"
-    print   S2
-    print   "\n"
+.sub substr_tests
+    set $S4, "12345JAPH01"
+    set $I4, 5
+    set $I5, 4
 
-    chopn   S2, S1, 1
-    print   S1
-    print   "\n"
-    print   S2
-    print   "\n"
+    substr  $S5, $S4, $I4, $I5
+    is( $S5, "JAPH", '' )
 
-        set     I0, 2
-    chopn   S2, S1, I0
-    print   S1
-    print   "\n"
-    print   S2
-    print   "\n"
+    substr $S5, $S4, $I4, 4
+    is( $S5, "JAPH", '' )
 
-    chopn   S2, "Parrot", 3
-    print   S2
-    print   "\n"
+    substr $S5, $S4, 5, $I5
+    is( $S5, "JAPH", '' )
 
-    chopn   S1, S1, 5
-    print   S1
-    print   "\n"
+    substr $S5, $S4, 5, 4
+    is( $S5, "JAPH", '' )
 
-        set     S1, "Parrot"
-        set     S3, S1
-        chopn   S2, S1, 3
-        print   S3
-    print   "\n"
+    substr $S5, "12345JAPH01", $I4, $I5
+    is( $S5, "JAPH", '' )
 
-        set     S3, S1
-        chopn   S1, 3
-        print   S3
-    print   "\n"
+    substr $S5, "12345JAPH01", $I4, 4
+    is( $S5, "JAPH", '' )
 
-    end
-CODE
-Parrot
-Parrot
-Parrot
-Parro
-Parrot
-Parr
-Par
-P
-Parrot
-Par
-OUTPUT
+    substr $S5, "12345JAPH01", 5, $I5
+    is( $S5, "JAPH", '' )
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'Three argument chopn, OOB values' );
-    set S1, "Parrot"
-
-    chopn   S2, S1, 7
-    print   S1
-    print   "\n"
-    print   S2
-    print   "\n"
-
-    chopn   S2, S1, -1
-    print   S1
-    print   "\n"
-    print   S2
-    print   "\n"
-
-    end
-CODE
-Parrot
-
-Parrot
-P
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'substr_s_s|sc_i|ic_i|ic' );
-    set S4, "12345JAPH01"
-    set I4, 5
-    set I5, 4
-    substr  S5, S4, I4, I5
-    print   S5
-    substr S5, S4, I4, 4
-    print  S5
-    substr S5, S4, 5, I5
-    print  S5
-    substr S5, S4, 5, 4
-    print  S5
-    substr S5, "12345JAPH01", I4, I5
-    print  S5
-    substr S5, "12345JAPH01", I4, 4
-    print  S5
-    substr S5, "12345JAPH01", 5, I5
-    print  S5
-    substr S5, "12345JAPH01", 5, 4
-    print  S5
-    print  "\n"
-    end
-CODE
-JAPHJAPHJAPHJAPHJAPHJAPHJAPHJAPH
-OUTPUT
+    substr $S5, "12345JAPH01", 5, 4
+    is( $S5, "JAPH", '' )
+.end
 
 # negative offsets
-pasm_output_is( <<'CODE', <<'OUTPUT', 'neg substr offset' );
-    set S0, "A string of length 21"
-    set I0, -9
-    set I1, 6
-    substr S1, S0, I0, I1
-    print S0
-    print "\n"
-    print S1
-    print "\n"
-    end
-CODE
-A string of length 21
-length
-OUTPUT
+.sub neg_substr_offset
+    set $S0, "A string of length 21"
+    set $I0, -9
+    set $I1, 6
+    substr $S1, $S0, $I0, $I1
+    is( $S0, "A string of length 21", '' )
+    is( $S1, "length", '' )
+.end
+ 
+# This asks for substring that shouldn't be allowed...
+.sub exception_substr_oob
+    set $S0, "A string of length 21"
+    set $I0, -99
+    set $I1, 6
+    push_eh handler
+        substr $S1, $S0, $I0, $I1
+handler:
+    .exception_is( "Cannot take substr outside string" )
+.end
 
 # This asks for substring that shouldn't be allowed...
-pasm_error_output_like( <<'CODE', <<'OUTPUT', 'substr OOB' );
-    set S0, "A string of length 21"
-    set I0, -99
-    set I1, 6
-    substr S1, S0, I0, I1
-    end
-CODE
-/^Cannot take substr outside string/
-OUTPUT
-
-# This asks for substring that shouldn't be allowed...
-pasm_error_output_like( <<'CODE', <<'OUTPUT', 'substr OOB' );
-    set S0, "A string of length 21"
-    set I0, 99
-    set I1, 6
-    substr S1, S0, I0, I1
-    end
-CODE
-/^Cannot take substr outside string/
-OUTPUT
+.sub exception_substr_oob
+    set $S0, "A string of length 21"
+    set $I0, 99
+    set $I1, 6
+    push_eh handler
+        substr $S1, $S0, $I0, $I1
+handler:
+    .exception_is( "Cannot take substr outside string" )
+.end
 
 # This asks for substring much greater than length of original string
-pasm_output_is( <<'CODE', <<'OUTPUT', 'len>strlen' );
-    set S0, "A string of length 21"
-    set I0, 12
-    set I1, 1000
-    substr S1, S0, I0, I1
-    print  S0
-    print "\n"
-    print S1
-    print "\n"
-    end
-CODE
-A string of length 21
-length 21
-OUTPUT
+.sub len_greater_than_strlen
+    set $S0, "A string of length 21"
+    set $I0, 12
+    set $I1, 1000
+    substr $S1, $S0, $I0, $I1
+    is( $S0, "A string of length 21", '' )
+    is( $S1, "length 21", '' )
+.end
 
 # The same, with a negative offset
-pasm_output_is( <<'CODE', <<'OUTPUT', 'len>strlen, -ve os' );
-    set S0, "A string of length 21"
-    set I0, -9
-    set I1, 1000
-    substr S1, S0, I0, I1
-    print S0
-    print "\n"
-    print S1
-    print "\n"
-    end
-CODE
-A string of length 21
-length 21
-OUTPUT
+.sub len_greater_than_strlen_neg_offset
+    set $S0, "A string of length 21"
+    set $I0, -9
+    set $I1, 1000
+    substr $S1, $S0, $I0, $I1
+    is( $S0, "A string of length 21", '' )
+    is( $S1, "length 21", '' )
+.end
+ 
+.sub five_arg_substr_w_rep_eq_length
+    set $S0, "abcdefghijk"
+    set $S1, "xyz"
+    substr $S2, $S0, 4, 3, $S1
+    is( $S0, "abcdxyzhijk", '' )
+    is( $S1, "xyz", '' )
+    is( $S2, "efg", '' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, replacement = length' );
-  set S0, "abcdefghijk"
-  set S1, "xyz"
-  substr S2, S0, 4, 3, S1
-  print S0
-  print "\n"
-  print S1
-  print "\n"
-  print S2
-  print "\n"
-  end
-CODE
-abcdxyzhijk
-xyz
-efg
-OUTPUT
+.sub five_arg_substr_w_replacement_gt_length
+    set $S0, "abcdefghijk"
+    set $S1, "xyz0123"
+    substr $S2, $S0, 4, 3, $S1
+    is( $S0, "abcdxyz0123hijk", '' )
+    is( $S1, "xyz0123", '' )
+    is( $S2, "efg", '' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, replacement > length' );
-  set S0, "abcdefghijk"
-  set S1, "xyz0123"
-  substr S2, S0, 4, 3, S1
-  print S0
-  print "\n"
-  print S1
-  print "\n"
-  print S2
-  print "\n"
-  end
-CODE
-abcdxyz0123hijk
-xyz0123
-efg
-OUTPUT
+.sub five_arg_substr_w_replacement_lt_length
+    set $S0, "abcdefghijk"
+    set $S1, "x"
+    substr $S2, $S0, 4, 3, $S1
+    is( $S0, "abcdxhijk", '' )
+    is( $S1, "x", '' )
+    is( $S2, "efg", '' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, replacement < length' );
-  set S0, "abcdefghijk"
-  set S1, "x"
-  substr S2, S0, 4, 3, S1
-  print S0
-  print "\n"
-  print S1
-  print "\n"
-  print S2
-  print "\n"
-  end
-CODE
-abcdxhijk
-x
-efg
-OUTPUT
+.sub five_arg_substr__offset_at_end_of_string
+  set $S0, "abcdefghijk"
+  set $S1, "xyz"
+  substr $S2, $S0, 11, 3, $S1
+    is( $S0, "abcdefghijkxyz", '' )
+    is( $S1, "xyz", '' )
+    is( $S2, "", '' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, offset at end of string' );
-  set S0, "abcdefghijk"
-  set S1, "xyz"
-  substr S2, S0, 11, 3, S1
-  print S0
-  print "\n"
-  print S1
-  print "\n"
-  print S2
-  print "\n"
-  end
-CODE
-abcdefghijkxyz
-xyz
+.sub exception_five_arg_substr__offset_past_end_of_string
+    set $S0, "abcdefghijk"
+    set $S1, "xyz"
+    push_eh handler
+    substr $S2, $S0, 12, 3, $S1
+    ok(0,"no exception")
+handler:
+    .exception_is( "Can only replace inside string or index after end of string" )
+.end
 
-OUTPUT
+.sub five_arg_substr_neg_offset_repl_eq_length
+    set $S0, "abcdefghijk"
+    set $S1, "xyz"
+    substr $S2, $S0, -3, 3, $S1
+    is( $S0, "abcdefghxyz", '' )
+    is( $S1, "xyz", '' )
+    is( $S2, "ijk", '' )
+.end
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', '5 arg substr, offset past end of string' );
-  set S0, "abcdefghijk"
-  set S1, "xyz"
-  substr S2, S0, 12, 3, S1
-  print S0
-  print "\n"
-  print S1
-  print "\n"
-  print S2
-  print "\n"
-  end
-CODE
-/^Can only replace inside string or index after end of string/
-OUTPUT
+.sub five_arg_substr_neg_offset_repl_gt_length
+    set $S0, "abcdefghijk"
+    set $S1, "xyz"
+    substr $S2, $S0, -6, 2, $S1
+    is( $S0, "abcdexyzhijk", '' )
+    is( $S1, "xyz", '' )
+    is( $S2, "fg", '' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, -ve offset, repl=length' );
-  set S0, "abcdefghijk"
-  set S1, "xyz"
-  substr S2, S0, -3, 3, S1
-  print S0
-  print "\n"
-  print S1
-  print "\n"
-  print S2
-  print "\n"
-  end
-CODE
-abcdefghxyz
-xyz
-ijk
-OUTPUT
+.sub five_arg_substr_neg_offset_repl_lt_length
+    set $S0, "abcdefghijk"
+    set $S1, "xyz"
+    substr $S2, $S0, -6, 4, $S1
+    is( $S0, "abcdexyzjk", '' )
+    is( $S1, "xyz", '' )
+    is( $S2, "fghi", '' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, -ve offset, repl>length' );
-  set S0, "abcdefghijk"
-  set S1, "xyz"
-  substr S2, S0, -6, 2, S1
-  print S0
-  print "\n"
-  print S1
-  print "\n"
-  print S2
-  print "\n"
-  end
-CODE
-abcdexyzhijk
-xyz
-fg
-OUTPUT
+.sub exception_five_arg_substr_neg_offset_out_of_string
+    set $S0, "abcdefghijk"
+    set $S1, "xyz"
+    push_eh handler
+    substr $S2, $S0, -12, 4, $S1
+    ok(0,"no exception")
+handler:
+    .exception_is( "Can only replace inside string or index after end of string" )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, -ve offset, repl<length' );
-  set S0, "abcdefghijk"
-  set S1, "xyz"
-  substr S2, S0, -6, 4, S1
-  print S0
-  print "\n"
-  print S1
-  print "\n"
-  print S2
-  print "\n"
-  end
-CODE
-abcdexyzjk
-xyz
-fghi
-OUTPUT
+.sub five_arg_substr_length_gt_strlen
+    set $S0, "abcdefghijk"
+    set $S1, "xyz"
+    substr $S2, $S0, 3, 11, $S1
+    is( $S0, "abcxyz", '' )
+    is( $S1, "xyz", '' )
+    is( $S2, "defghijk", '' )
+.end
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', '5 arg substr, -ve offset out of string' );
-  set S0, "abcdefghijk"
-  set S1, "xyz"
-  substr S2, S0, -12, 4, S1
-  print S0
-  print "\n"
-  print S1
-  print "\n"
-  print S2
-  print "\n"
-  end
-CODE
-/^Can only replace inside string or index after end of string/
-OUTPUT
+.sub five_arg_substr_length_gt_strlen_neg_offset
+    set $S0, "abcdefghijk"
+    set $S1, "xyz"
+    substr $S2, $S0, -3, 11, $S1
+    is( $S0, "abcdefghxyz", '' )
+    is( $S1, "xyz", '' )
+    is( $S2, "ijk", '' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, length > strlen ' );
-  set S0, "abcdefghijk"
-  set S1, "xyz"
-  substr S2, S0, 3, 11, S1
-  print S0
-  print "\n"
-  print S1
-  print "\n"
-  print S2
-  print "\n"
-  end
-CODE
-abcxyz
-xyz
-defghijk
-OUTPUT
+.sub four_arg_replacement_only_substr
+    set $S0, "abcdefghijk"
+    set $S1, "xyz"
+    substr $S0, 3, 3, $S1
+    is( $S0, "abcxyzghijk", '' )
+    is( $S1, "xyz", '' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, length > strlen, -ve offset' );
-  set S0, "abcdefghijk"
-  set S1, "xyz"
-  substr S2, S0, -3, 11, S1
-  print S0
-  print "\n"
-  print S1
-  print "\n"
-  print S2
-  print "\n"
-  end
-CODE
-abcdefghxyz
-xyz
-ijk
-OUTPUT
+.sub three_arg_substr
+    set $S0, "JAPH"
+    substr $S1, $S0, 2
+    is( $S1, "PH", '' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', '4-arg, replacement-only substr' );
-  set S0, "abcdefghijk"
-  set S1, "xyz"
-  substr S0, 3, 3, S1
-  print S0
-  print "\n"
-  print S1
-  print "\n"
-  end
-CODE
-abcxyzghijk
-xyz
-OUTPUT
+.sub exception_substr__pos_offset_zero_length_string
+    set $S0, ""
+    push_eh handler
+    substr $S1, $S0, 10, 3
+    ok(0,"no exception")
+handler:
+    .exception_is( "Cannot take substr outside string" )
+.end
 
-pasm_output_is( <<'CODE', 'PH', '3-arg substr' );
-  set S0, "JAPH"
-  substr S1, S0, 2
-  print S1
-  end
-CODE
+.sub substr_offset_zero_zero_length_string
+    set $S0, ""
+    substr $S1, $S0, 0, 1
+    is( $S1, "", '' )
+.end
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "substr, +ve offset, zero-length string" );
-  set S0, ""
-  substr S1, S0, 10, 3
-  print S1
-  end
-CODE
-/Cannot take substr outside string/
-OUTPUT
+.sub exception_substr_offset_one_zero_length_string
+    set $S0, ""
+    push_eh handler
+    substr $S1, $S0, -1, 1
+    ok(0,"no exception")
+handler:
+    .exception_is( "Cannot take substr outside string" )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'substr, offset 0, zero-length string' );
-  set S0, ""
-  substr S1, S0, 0, 1
-  print S1
-  print "_\n"
-  end
-CODE
-_
-OUTPUT
+.sub exception_substr_neg_offset_zero_length_string
+    set $S0, ""
+    push_eh handler
+    substr $S1, $S0, -10, 5
+handler:
+    .exception_is( "Cannot take substr outside string" )
+.end
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "substr, offset -1, zero-length string" );
-  set S0, ""
-  substr S1, S0, -1, 1
-  print S1
-  end
-CODE
-/Cannot take substr outside string/
-OUTPUT
+.sub zero_length_substr_zero_length_string
+    set $S0, ""
+    substr $S1, $S0, 10, 0
+    is( $S1, "", '' )
+.end
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "substr, -ve offset, zero-length string" );
-  set S0, ""
-  substr S1, S0, -10, 5
-  print S1
-  end
-CODE
-/Cannot take substr outside string/
-OUTPUT
+.sub zero_length_substr_zero_length_string
+    set $S0, ""
+    substr $S1, $S0, -10, 0
+    is( $S1, "", '' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'zero-length substr, zero-length string' );
-  set S0, ""
-  substr S1, S0, 10, 0
-  print S1
-  print "_\n"
-  end
-CODE
-_
-OUTPUT
+.sub three_arg_substr_zero_length_string
+    set $S0, ""
+    substr $S1, $S0, 2
+    is( $S1, "", '' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'zero-length substr, zero-length string' );
-  set S0, ""
-  substr S1, S0, -10, 0
-  print S1
-  print "_\n"
-  end
-CODE
-_
-OUTPUT
+.sub five_arg_substr_zero_length_string
+    set $S0, ""
+    set $S1, "xyz"
+    substr $S2, $S0, 0, 3, $S1
+    is( $S0, "xyz", '' )
+    is( $S1, "xyz", '' )
+    is( $S2, "", '' )
 
-pasm_output_is( <<'CODE', <<'OUTPUT', '3-arg substr, zero-length string' );
-  set S0, ""
-  substr S1, S0, 2
-  print S1
-  print "_\n"
-  end
-CODE
-_
-OUTPUT
+    set $S3, ""
+    set $S4, "abcde"
+    substr $S5, $S3, 0, 0, $S4
+    is( $S3, "abcde", '' )
+    is( $S4, "abcde", '' )
+    is( $S5, "", '' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', '5 arg substr, zero-length string' );
-  set S0, ""
-  set S1, "xyz"
-  substr S2, S0, 0, 3, S1
-  print S0
-  print "\n"
-  print S1
-  print "\n"
-  print S2
-  print "\n"
+.sub four_arg_substr_replace_zero_length_string
+    set $S0, ""
+    set $S1, "xyz"
+    substr $S0, 0, 3, $S1
+    is( $S0, "xyz", '' )
+    is( $S1, "xyz", '' )
 
-  set S3, ""
-  set S4, "abcde"
-  substr S5, S3, 0, 0, S4
-  print S3
-  print "\n"
-  print S4
-  print "\n"
-  print S5
-  print "\n"
-  end
-CODE
-xyz
-xyz
+    set $S2, ""
+    set $S3, "abcde"
+    substr $S2, 0, 0, $S3
+    is( $S2, "abcde", '' )
+    is( $S3, "abcde", '' )
+.end
 
-abcde
-abcde
+.sub concat_s_s_sc_null_onto_null
+    concat $S0, $S0
+    is( $S0, "", '' )
+    concat $S1, ""
+    is( $S1, "", '' )
+.end
 
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', '4 arg substr replace, zero-length string' );
-  set S0, ""
-  set S1, "xyz"
-  substr S0, 0, 3, S1
-  print S0
-  print "\n"
-  print S1
-  print "\n"
-
-  set S2, ""
-  set S3, "abcde"
-  substr S2, 0, 0, S3
-  print S2
-  print "\n"
-  print S3
-  print "\n"
-  end
-CODE
-xyz
-xyz
-abcde
-abcde
-OUTPUT
-
-pasm_output_is( <<'CODE', '<><', 'concat_s_s|sc, null onto null' );
- print "<>"
- concat S0, S0
- concat S1, ""
- print "<"
- end
-CODE
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'concat_s_sc, repeated two-arg concats' );
-  set S12, ""
-  set I0, 0
+.sub concat_s_sc_repeated_two_arg_concats
+    set $S12, ""
+    set $I0, 0
 WHILE:
-  concat S12, "hi"
-  add I0, 1
-  lt I0, 10, WHILE
-  print S12
-  print "\n"
-  end
-CODE
-hihihihihihihihihihi
-OUTPUT
+    concat $S12, "hi"
+    add $I0, 1
+    lt $I0, 10, WHILE
+    is( $S12, "hihihihihihihihihihi", '' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'concat_s_s|sc, "foo1" onto null' );
- concat S0, "foo1"
- set S1, "foo2"
- concat S2, S1
- print S0
- print "\n"
- print S2
- print "\n"
- end
-CODE
-foo1
-foo2
-OUTPUT
+.sub concat_s_s_sc_foo_one_onto_null
+    concat $S0, "foo1"
+    set $S1, "foo2"
+    concat $S2, $S1
+    is( $S0, "foo1", '' )
+    is( $S2, "foo2", '' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'concat_s_s|sc' );
-    set S1, "fish"
-    set S2, "bone"
-    concat S1, S2
-    print S1
-    concat S1, "\n"
-    print S1
-    end
-CODE
-fishbonefishbone
-OUTPUT
+.sub test_concat_s_s_sc
+    set $S1, "fish"
+    set $S2, "bone"
+    concat $S1, $S2
+    is( $S1, "fishbone", '' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'concat_s_s|sc_s|sc' );
-    set S1, "japh"
-    set S2, "JAPH"
-    concat S0, "japh", "JAPH"
-    print S0
-    print "\n"
-    concat S0, S1, "JAPH"
-    print S0
-    print "\n"
-    concat S0, "japh", S2
-    print S0
-    print "\n"
-    concat S0, S1, S2
-    print S0
-    print "\n"
-    end
-CODE
-japhJAPH
-japhJAPH
-japhJAPH
-japhJAPH
-OUTPUT
+.sub concat_s_s_sc_s_sc
+    set $S1, "japh"
+    set $S2, "JAPH"
+    concat $S0, "japh", "JAPH"
+    is( $S0, "japhJAPH", '' )
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'concat - ensure copy is made' );
-    set S2, "JAPH"
-    concat S0, S2, ""
-    concat S1, "", S2
-    chopn S0, 1
-    chopn S1, 1
-    print S2
-    print "\n"
-    end
-CODE
-JAPH
-OUTPUT
+    concat $S0, $S1, "JAPH"
+    is( $S0, "japhJAPH", '' )
 
-pasm_output_is( <<"CODE", <<'OUTPUT', 'clears' );
-@{[ set_str_regs( sub {"BOO $_[0]\\n"} ) ]}
+    concat $S0, "japh", $S2
+    is( $S0, "japhJAPH", '' )
+
+    concat $S0, $S1, $S2
+    is( $S0, "japhJAPH", '' )
+.end
+
+.sub concat_ensure_copy_is_made
+    set $S2, "JAPH"
+    concat $S0, $S2, ""
+    concat $S1, "", $S2
+    chopn $S0, 1
+    chopn $S1, 1
+    is( $S2, "JAPH", '' )
+.end
+
+.sub test_clears
+    set $S0, "BOO 0"
+    set $S1, "BOO 1"
+    set $S2, "BOO 2"
+    set $S3, "BOO 3"
+    set $S4, "BOO 4"
+    set $S5, "BOO 5"
+    set $S6, "BOO 6"
+    set $S7, "BOO 7"
+    set $S8, "BOO 8"
+    set $S9, "BOO 9"
+    set $S10, "BOO 10"
+    set $S11, "BOO 11"
+    set $S12, "BOO 12"
+    set $S13, "BOO 13"
+    set $S14, "BOO 14"
+    set $S15, "BOO 15"
+    set $S16, "BOO 16"
+    set $S17, "BOO 17"
+    set $S18, "BOO 18"
+    set $S19, "BOO 19"
+    set $S20, "BOO 20"
+    set $S21, "BOO 21"
+    set $S22, "BOO 22"
+    set $S23, "BOO 23"
+    set $S24, "BOO 24"
+    set $S25, "BOO 25"
+    set $S26, "BOO 26"
+    set $S27, "BOO 27"
+    set $S28, "BOO 28"
+    set $S29, "BOO 29"
+    set $S30, "BOO 30"
+    set $S31, "BOO 31"
     clears
-@{[ print_str_regs() ]}
-    print "done\\n"
-    end
-CODE
-done
-OUTPUT
-
-my @strings = (
-    "hello",   "hello", "hello", "world", "world", "hello", "hello", "hellooo",
-    "hellooo", "hello", "hello", "hella", "hella", "hello", "hella", "hellooo",
-    "hellooo", "hella", "hElLo", "HeLlO", "hElLo", "hElLo"
-);
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'eq_s_s_ic' );
-@{[ compare_strings( 0, "eq", @strings ) ]}
-    print "ok\\n"
-    end
-ERROR:
-    print "bad\\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'eq_sc_s_ic' );
-@{[ compare_strings( 1, "eq", @strings ) ]}
-    print "ok\\n"
-    end
-ERROR:
-    print "bad\\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'eq_s_sc_ic' );
-@{[ compare_strings( 2, "eq", @strings ) ]}
-    print "ok\\n"
-    end
-ERROR:
-    print "bad\\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'eq_sc_sc_ic' );
-@{[ compare_strings( 3, "eq", @strings ) ]}
-    print "ok\\n"
-    end
-ERROR:
-    print "bad\\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'ne_s_s_ic' );
-@{[ compare_strings( 0, "ne", @strings ) ]}
-    print "ok\\n"
-    end
-ERROR:
-    print "bad\\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'ne_sc_s_ic' );
-@{[ compare_strings( 1, "ne", @strings ) ]}
-    print "ok\\n"
-    end
-ERROR:
-    print "bad\\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'ne_s_sc_ic' );
-@{[ compare_strings( 2, "ne", @strings ) ]}
-    print "ok\\n"
-    end
-ERROR:
-    print "bad\\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'ne_sc_sc_ic' );
-@{[ compare_strings( 3, "ne", @strings ) ]}
-    print "ok\\n"
-    end
-ERROR:
-    print "bad\\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'lt_s_s_ic' );
-@{[ compare_strings( 0, "lt", @strings ) ]}
-    print "ok\\n"
-    end
-ERROR:
-    print "bad\\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'lt_sc_s_ic' );
-@{[ compare_strings( 1, "lt", @strings ) ]}
-    print "ok\\n"
-    end
-ERROR:
-    print "bad\\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'lt_s_sc_ic' );
-@{[ compare_strings( 2, "lt", @strings ) ]}
-    print "ok\\n"
-    end
-ERROR:
-    print "bad\\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'lt_sc_sc_ic' );
-@{[ compare_strings( 3, "lt", @strings ) ]}
-    print "ok\\n"
-    end
-ERROR:
-    print "bad\\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'le_s_s_ic' );
-@{[ compare_strings( 0, "le", @strings ) ]}
-    print "ok\\n"
-    end
-ERROR:
-    print "bad\\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'le_sc_s_ic' );
-@{[ compare_strings( 1, "le", @strings ) ]}
-    print "ok\\n"
-    end
-ERROR:
-    print "bad\\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'le_s_sc_ic' );
-@{[ compare_strings( 2, "le", @strings ) ]}
-    print "ok\\n"
-    end
-ERROR:
-    print "bad\\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'le_sc_sc_ic' );
-@{[ compare_strings( 3, "le", @strings ) ]}
-    print "ok\\n"
-    end
-ERROR:
-    print "bad\\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'gt_s_s_ic' );
-@{[ compare_strings( 0, "gt", @strings ) ]}
-    print "ok\\n"
-    end
-ERROR:
-    print "bad\\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'gt_sc_s_ic' );
-@{[ compare_strings( 1, "gt", @strings ) ]}
-    print "ok\\n"
-    end
-ERROR:
-    print "bad\\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'gt_s_sc_ic' );
-@{[ compare_strings( 2, "gt", @strings ) ]}
-    print "ok\\n"
-    end
-ERROR:
-    print "bad\\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'gt_sc_sc_ic' );
-@{[ compare_strings( 3, "gt", @strings ) ]}
-    print "ok\\n"
-    end
-ERROR:
-    print "bad\\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'ge_s_s_ic' );
-@{[ compare_strings( 0, "ge", @strings ) ]}
-    print "ok\\n"
-    end
-ERROR:
-    print "bad\\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'ge_sc_s_ic' );
-@{[ compare_strings( 1, "ge", @strings ) ]}
-    print "ok\\n"
-    end
-ERROR:
-    print "bad\\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'ge_s_sc_ic' );
-@{[ compare_strings( 2, "ge", @strings ) ]}
-    print "ok\\n"
-    end
-ERROR:
-    print "bad\\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'ge_sc_sc_ic' );
-@{[ compare_strings( 3, "ge", @strings ) ]}
-    print "ok\\n"
-    end
-ERROR:
-    print "bad\\n"
-    end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'same constant twice bug' );
-       set     S0, ""
-       set     S1, ""
-       set     S2, "foo"
-       concat  S1,S1,S2
-       print   S1
-       print   S0
-       print   "\n"
-       end
-CODE
-foo
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<'OUTPUT', '2-param ord, empty string' );
-    ord I0,""
-    print I0
-    end
-CODE
-/^Cannot get character of empty string/
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<'OUTPUT', '2-param ord, empty string register' );
-    ord I0,S0
-    print I0
-    end
-CODE
-/^Cannot get character of empty string/
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<'OUTPUT', '3-param ord, empty string' );
-    ord I0,"",0
-    print I0
-    end
-CODE
-/^Cannot get character of empty string/
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<'OUTPUT', '3-param ord, empty string register' );
-    ord I0,S0,0
-    print I0
-    end
-CODE
-/^Cannot get character of empty string/
-OUTPUT
-
-pasm_output_is( <<'CODE', ord('a'), '2-param ord, one-character string' );
-    ord I0,"a"
-    print I0
-    end
-CODE
-
-pasm_output_is( <<'CODE', ord('a'), '2-param ord, multi-character string' );
-    ord I0,"abc"
-    print I0
-    end
-CODE
-
-pasm_output_is( <<'CODE', ord('a'), '2-param ord, one-character string register' );
-    set S0,"a"
-    ord I0,S0
-    print I0
-    end
-CODE
-
-pasm_output_is( <<'CODE', ord('a'), '3-param ord, one-character string' );
-    ord I0,"a",0
-    print I0
-    end
-CODE
-
-pasm_output_is( <<'CODE', ord('a'), '3-param ord, one-character string register' );
-    set S0,"a"
-    ord I0,S0,0
-    print I0
-    end
-CODE
-
-pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string' );
-    ord I0,"ab",1
-    print I0
-    end
-CODE
-
-pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string register' );
-    set S0,"ab"
-    ord I0,S0,1
-    print I0
-    end
-CODE
-
-pasm_error_output_like( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string' );
-    ord I0,"ab",2
-    print I0
-    end
-CODE
-/^Cannot get character past end of string/
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string' );
-    set S0,"ab"
-    ord I0,S0,2
-    print I0
-    end
-CODE
-/^Cannot get character past end of string/
-OUTPUT
-
-pasm_output_is( <<'CODE', ord('a'), '3-param ord, one-character string, from end' );
-    ord I0,"a",-1
-    print I0
-    end
-CODE
-
-pasm_output_is( <<'CODE', ord('a'), '3-param ord, one-character string register, from end' );
-    set S0,"a"
-    ord I0,S0,-1
-    print I0
-    end
-CODE
-
-pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string, from end' );
-    ord I0,"ab",-1
-    print I0
-    end
-CODE
-
-pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string register, from end' );
-    set S0,"ab"
-    ord I0,S0,-1
-    print I0
-    end
-CODE
-
-pasm_error_output_like(
-    <<'CODE', <<'OUTPUT', '3-param ord, multi-character string register, from end, OOB' );
-    set S0,"ab"
-    ord I0,S0,-3
-    print I0
-        end
-CODE
-/^Cannot get character before beginning of string/
-OUTPUT
-
-pasm_output_is( <<'CODE', chr(32), 'chr of 32 is space in ASCII' );
-        chr S0, 32
-        print S0
-        end
-CODE
-
-pasm_output_is( <<'CODE', chr(65), 'chr of 65 is A in ASCII' );
-        chr S0, 65
-        print S0
-        end
-CODE
-
-pasm_output_is( <<'CODE', chr(122), 'chr of 122 is z in ASCII' );
-        chr S0, 122
-        print S0
-    end
-CODE
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'if_s_ic' );
-    set S0, "I've told you once, I've told you twice..."
-    if  S0, OK1
-    print   "not "
-OK1:    print   "ok 1\n"
-
-    set S0, "0.0"
-    if  S0, OK2
-    print   "not "
-OK2:    print   "ok 2\n"
-
-    set S0, ""
-    if  S0, BAD3
-    branch OK3
-BAD3:   print   "not "
-OK3:    print   "ok 3\n"
-
-    set S0, "0"
-    if  S0, BAD4
-    branch OK4
-BAD4:   print   "not "
-OK4:    print   "ok 4\n"
-
-    set S0, "0e0"
-    if  S0, OK5
-    print   "not "
-OK5:    print   "ok 5\n"
-
-    set S0, "x"
-    if  S0, OK6
-    print   "not "
-OK6:    print   "ok 6\n"
-
-    set S0, "\\x0"
-    if  S0, OK7
-    print   "not "
-OK7:    print   "ok 7\n"
-
-    set S0, "\n"
-    if  S0, OK8
-    print   "not "
-OK8:    print   "ok 8\n"
-
-    set S0, " "
-    if  S0, OK9
-    print   "not "
-OK9:    print   "ok 9\n"
-
-# An empty register should be false...
-        clears
-        if      S1, BAD10
-        branch  OK10
-BAD10:  print   "not "
-OK10:   print   "ok 10\n"
-
-    end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-ok 5
-ok 6
-ok 7
-ok 8
-ok 9
-ok 10
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'repeat_s_s|sc_i|ic' );
-    set S0, "x"
-
-    repeat S1, S0, 12
-    print S0
-    print "\n"
-    print S1
-    print "\n"
-
-    set I0, 12
-    set S2, "X"
-
-    repeat S3, S2, I0
-    print S2
-    print "\n"
-    print S3
-    print "\n"
-
-    repeat S4, "~", 12
-    print S4
-    print "\n"
-
-    repeat S5, "~", I0
-    print S5
-    print "\n"
-
-    print ">"
-    repeat S6, "***", 0
-    print S6
-    print "< done\n"
-
-    end
-CODE
-x
-xxxxxxxxxxxx
-X
-XXXXXXXXXXXX
-~~~~~~~~~~~~
-~~~~~~~~~~~~
->< done
-OUTPUT
-
-pasm_error_output_like( <<'CODE', qr/Cannot repeat with negative arg\n/, 'repeat OOB' );
-    repeat S0, "japh", -1
-    end
-CODE
-
-pir_error_output_like( <<'CODE', qr/Cannot repeat with negative arg\n/, 'repeat OOB, repeat_p_p_p' );
-.sub main
+    is( $S0, "", '' )
+    is( $S1, "", '' )
+    is( $S2, "", '' )
+    is( $S3, "", '' )
+    is( $S4, "", '' )
+    is( $S5, "", '' )
+    is( $S6, "", '' )
+    is( $S7, "", '' )
+    is( $S8, "", '' )
+    is( $S9, "", '' )
+    is( $S10, "", '' )
+    is( $S11, "", '' )
+    is( $S12, "", '' )
+    is( $S13, "", '' )
+    is( $S14, "", '' )
+    is( $S15, "", '' )
+    is( $S16, "", '' )
+    is( $S17, "", '' )
+    is( $S18, "", '' )
+    is( $S19, "", '' )
+    is( $S20, "", '' )
+    is( $S21, "", '' )
+    is( $S22, "", '' )
+    is( $S23, "", '' )
+    is( $S24, "", '' )
+    is( $S25, "", '' )
+    is( $S26, "", '' )
+    is( $S27, "", '' )
+    is( $S28, "", '' )
+    is( $S29, "", '' )
+    is( $S30, "", '' )
+    is( $S31, "", '' )
+.end
+
+.sub same_constant_twice_bug
+   set     $S0, ""
+   set     $S1, ""
+   set     $S2, "foo"
+   concat  $S1,$S1,$S2
+   is( $S1, "foo", 'same constant twice bug' )
+   is( $S0, "", 'same constant twice bug' )
+.end
+
+.sub exception_two_param_ord_empty_string
+   push_eh handler
+   ord $I0,""
+   ok(0, 'no exception: 2-param ord, empty string' )
+  handler:
+   .exception_is( 'Cannot get character of empty string' )
+.end
+
+.sub exception_two_param_ord_empty_string_register
+   push_eh handler
+   ord $I0,$S0
+   ok( 0, 'no exception: 2-param ord, empty string register' )
+ handler:
+   .exception_is( 'Cannot get character of empty string' )
+.end
+
+.sub exception_three_param_ord_empty_string
+   push_eh handler
+   ord $I0,"",0
+   ok(0, 'no exception: 3-param ord, empty string' )
+ handler:
+   .exception_is( 'Cannot get character of empty string' )
+.end
+
+.sub exception_three_param_ord_empty_string_register
+   push_eh handler
+   ord $I0,$S0,0
+   ok( 0, 'no exception: 3-param ord, empty string register' )
+ handler:
+   .exception_is( 'Cannot get character of empty string' )
+.end
+
+.sub two_param_ord_one_character_string
+   ord $I0,"a"
+   is( $I0, "97", '2-param ord, one-character string' )
+.end
+
+.sub two_param_ord_multi_character_string
+   ord $I0,"abc"
+   is( $I0, "97", '2-param ord, multi-character string' )
+.end
+
+.sub two_param_ord_one_character_string_register
+   set $S0,"a"
+   ord $I0,$S0
+   is( $I0, "97", '2-param ord, one-character string register' )
+.end
+
+.sub three_param_ord_one_character_string
+   ord $I0,"a",0
+   is( $I0, "97", '3-param ord, one-character string' )
+.end
+
+.sub three_param_ord_one_character_string_register
+   set $S0,"a"
+   ord $I0,$S0,0
+   is( $I0, "97", '3-param ord, one-character string register' )
+.end
+
+.sub three_param_ord_multi_character_string
+   ord $I0,"ab",1
+   is( $I0, "98", '3-param ord, multi-character string' )
+.end
+
+.sub three_param_ord_multi_character_string_register
+   set $S0,"ab"
+   ord $I0,$S0,1
+   is( $I0, "98", '3-param ord, multi-character string register' )
+.end
+
+.sub exception_three_param_ord_multi_character_string
+   push_eh handler
+   ord $I0,"ab",2
+   ok( 0, 'no exception: 3-param ord, multi-character string' )
+ handler:
+   .exception_is( 'Cannot get character past end of string' )
+.end
+
+.sub exception_three_param_ord_multi_character_string
+   push_eh handler
+   set $S0,"ab"
+   ord $I0,$S0,2
+   ok( 0, 'no exception: 3-param ord, multi-character string' )
+ handler:
+   .exception_is( 'Cannot get character past end of string' )
+.end
+
+.sub three_param_ord_one_character_string_from_end
+   ord $I0,"a",-1
+   is( $I0, "97", '3-param ord, one-character string, from end' )
+.end
+
+.sub three_param_ord_one_character_string_register_from_end
+   set $S0,"a"
+   ord $I0,$S0,-1
+   is( $I0, "97", '3-param ord, one-character string register, from end' )
+.end
+
+.sub three_param_ord_multi_character_string_from_end
+   ord $I0,"ab",-1
+   is( $I0, "98", '3-param ord, multi-character string, from end' )
+.end
+
+.sub three_param_ord_multi_character_string_register_from_end
+    set $S0,"ab"
+    ord $I0,$S0,-1
+    is( $I0, "98", '3-param ord, multi-character string register, from end' )
+.end
+
+.sub exception_three_param_ord_multi_character_string_register_from_end_oob
+    push_eh handler
+    set $S0,"ab"
+    ord $I0,$S0,-3
+    ok( 0, 'no exception: 3-param ord, multi-character string register, from end, OOB' )
+  handler:
+    .exception_is( 'Cannot get character before beginning of string' )
+.end
+
+.sub chr_of_thirty_two_is_space_in_ascii
+    chr $S0, 32
+    is( $S0, " ", 'chr of 32 is space in ASCII' )
+.end
+
+.sub chr_of_sixty_five_is_a_in_ascii
+    chr $S0, 65
+    is( $S0, "A", 'chr of 65 is A in ASCII' )
+.end
+
+.sub chr_of_one_hundred_and_twenty_two_is_z_in_ascii
+    chr $S0, 122
+    is( $S0, "z", 'chr of 122 is z in ASCII' )
+.end
+
+.sub test_if_s_ic
+    set $S0, "I've told you once, I've told you twice..."
+    ok( $S0, 'normal strings are true' )
+
+    set $S0, "0.0"
+    ok( $S0, '0.0 is true' )
+
+    set $S0, ""
+    nok( $S0, 'empty string is false' )
+
+    set $S0, "0"
+    nok( $S0, '"0" string is false' )
+
+    set $S0, "0e0"
+    ok( $S0, 'string "0e0" is true' )
+
+    set $S0, "x"
+    ok( $S0, 'string "x" is true' )
+
+    set $S0, "\\x0"
+    ok( $S0, 'string "\\x0" is true' )
+
+    set $S0, "\n"
+    ok( $S0, 'string "\n" is true' )
+
+    set $S0, " "
+    ok( $S0, 'string " " is true' )
+
+    # An empty register should be false...
+    clears
+    nok( $S1, 'empty register is false' )
+.end
+
+.sub repeat_s_s_sc_i_ic
+    set $S0, "x"
+    repeat $S1, $S0, 12
+    is( $S0, "x", 'repeat_s_s|sc_i|ic' )
+    is( $S1, "xxxxxxxxxxxx", 'repeat_s_s|sc_i|ic' )
+    
+    set $I0, 12
+    set $S2, "X"
+    repeat $S3, $S2, $I0
+    is( $S2, "X", 'repeat_s_s|sc_i|ic' )
+    is( $S3, "XXXXXXXXXXXX", 'repeat_s_s|sc_i|ic' )
+    
+    repeat $S4, "~", 12
+    is( $S4, "~~~~~~~~~~~~", 'repeat_s_s|sc_i|ic' )
+    
+    repeat $S5, "~", $I0
+    is( $S5, "~~~~~~~~~~~~", 'repeat_s_s|sc_i|ic' )
+   
+  
+    repeat $S6, "***", 0
+    is( $S6, "", 'repeat_s_s|sc_i|ic' )
+.end
+
+.sub exception_repeat_oob
+    push_eh handler
+    repeat $S0, "japh", -1
+  handler:
+    .exception_is( 'Cannot repeat with negative arg' )
+.end
+
+.sub exception_repeat_oob_repeat_p_p_p
+    push_eh handler
     $P0 = new ['String']
     $P1 = new ['String']
     $P2 = new ['Integer']
-
     $P2 = -1
-
     repeat $P1, $P0, $P2
+  handler:
+    .exception_is( 'Cannot repeat with negative arg' )
 .end
-CODE
 
-pir_error_output_like( <<'CODE', qr/Cannot repeat with negative arg\n/, 'repeat OOB, repeate_p_p_i' );
-.sub main
+.sub exception_repeat_oob_repeate_p_p_i
+    push_eh handler
     $P0 = new ['String']
     $P1 = new ['String']
-
     repeat $P1, $P0, -1
+  handler:
+    .exception_is( 'Cannot repeat with negative arg' )
 .end
-CODE
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'encodingname OOB' );
-.sub main
+.sub encodingname_oob
     $I0 = -1
-
     $S0 = encodingname -1
     $S0 = encodingname $I0
-    say 'ok'
+    ok( 1, "no exceptions in encodingname_oob" )
 .end
-CODE
-ok
-OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'index, 3-arg form' );
-      set S0, "Parrot"
-      set S1, "Par"
-      index I1, S0, S1
-      print I1
-      print "\n"
+.sub index_three_arg_form
+    set $S0, "Parrot"
+    set $S1, "Par"
+    index $I1, $S0, $S1
+    is( $I1, "0", 'index, 3-arg form' )
 
-      set S1, "rot"
-      index I1, S0, S1
-      print I1
-      print "\n"
+    set $S1, "rot"
+    index $I1, $S0, $S1
+    is( $I1, "3", 'index, 3-arg form' )
+    
+    set $S1, "bar"
+    index $I1, $S0, $S1
+    is( $I1, "-1", 'index, 3-arg form' )
+.end
 
-      set S1, "bar"
-      index I1, S0, S1
-      print I1
-      print "\n"
+.sub index_four_arg_form
+    set $S0, "Barbarian"
+    set $S1, "ar"
+    index $I1, $S0, $S1, 0
+    is( $I1, "1", 'index, 4-arg form' )
+    
+    index $I1, $S0, $S1, 2
+    is( $I1, "4", 'index, 4-arg form' )
+    
+    set $S1, "qwx"
+    index $I1, $S0, $S1, 0
+    is( $I1, "-1", 'index, 4-arg form' )
+.end
 
-      end
-CODE
-0
-3
--1
-OUTPUT
+.sub index_four_arg_form_bug_twenty_two_thousand_seven_hundred_and_eighteen
+    set $S1, "This is not quite right"
+    set $S0, " is "
+    index $I0, $S1, $S0, 0
+    is( $I0, "4", 'index, 4-arg form, bug 22718' )
+    
+    set $S0, "is"
+    index $I0, $S1, $S0, 0
+    is( $I0, "2", 'index, 4-arg form, bug 22718' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'index, 4-arg form' );
-      set S0, "Barbarian"
-      set S1, "ar"
-      index I1, S0, S1, 0
-      print I1
-      print "\n"
+.sub index_null_strings
+    set $S0, "Parrot"
+    set $S1, ""
+    index $I1, $S0, $S1
+    is( $I1, "-1", 'index, null strings' )
+    
+    index $I1, $S0, $S1, 0
+    is( $I1, "-1", 'index, null strings' )
+   
+    index $I1, $S0, $S1, 5
+    is( $I1, "-1", 'index, null strings' )
+    
+    index $I1, $S0, $S1, 6
+    is( $I1, "-1", 'index, null strings' )
+    
+    set $S0, ""
+    set $S1, "a"
+    index $I1, $S0, $S1
+    is( $I1, "-1", 'index, null strings' )
+    
+    index $I1, $S0, $S1, 0
+    is( $I1, "-1", 'index, null strings' )
+    
+    set $S0, "Parrot"
+    null $S1
+    index $I1, $S0, $S1
+    is( $I1, "-1", 'index, null strings' )
+    
+    null $S0
+    null $S1
+    index $I1, $S0, $S1
+    is( $I1, "-1", 'index, null strings' )
+.end
 
-      index I1, S0, S1, 2
-      print I1
-      print "\n"
+.sub index_embedded_nulls
+    set $S0, "Par\0\0rot"
+    set $S1, "\0"
+    index $I1, $S0, $S1
+    is( $I1, "3", 'index, embedded nulls' )
+    
+    index $I1, $S0, $S1, 4
+    is( $I1, "4", 'index, embedded nulls' )
+.end
 
-      set S1, "qwx"
-      index I1, S0, S1, 0
-      print I1
-      print "\n"
+.sub index_big_strings
+    set $S0, "a"
+    repeat $S0, $S0, 10000
+    set $S1, "a"
+    repeat $S1, $S1, 500
+    index $I1, $S0, $S1
+    is( $I1, "0", 'index, big strings' )
+   
+    index $I1, $S0, $S1, 1234
+    is( $I1, "1234", 'index, big strings' )
+    
+    index $I1, $S0, $S1, 9501
+    is( $I1, "-1", 'index, big strings' )
+.end
 
-      end
-CODE
-1
-4
--1
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'index, 4-arg form, bug 22718' );
-    set S1, "This is not quite right"
-    set S0, " is "
-    index I0, S1, S0, 0
-    print I0
-    set S0, "is"
-    index I0, S1, S0, 0
-    print I0
-    print "\n"
-    end
-CODE
-42
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'index, null strings' );
-      set S0, "Parrot"
-      set S1, ""
-      index I1, S0, S1
-      print I1
-      print "\n"
-
-      index I1, S0, S1, 0
-      print I1
-      print "\n"
-
-      index I1, S0, S1, 5
-      print I1
-      print "\n"
-
-      index I1, S0, S1, 6
-      print I1
-      print "\n"
-
-      set S0, ""
-      set S1, "a"
-      index I1, S0, S1
-      print I1
-      print "\n"
-
-      index I1, S0, S1, 0
-      print I1
-      print "\n"
-
-      set S0, "Parrot"
-      null S1
-      index I1, S0, S1
-      print I1
-      print "\n"
-
-      null S0
-      null S1
-      index I1, S0, S1
-      print I1
-      print "\n"
-      end
-CODE
--1
--1
--1
--1
--1
--1
--1
--1
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'index, embedded nulls' );
-      set S0, "Par\0\0rot"
-      set S1, "\0"
-      index I1, S0, S1
-      print I1
-      print "\n"
-
-      index I1, S0, S1, 4
-      print I1
-      print "\n"
-
-      end
-CODE
-3
-4
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'index, big strings' );
-      set S0, "a"
-      repeat S0, S0, 10000
-      set S1, "a"
-      repeat S1, S1, 500
-      index I1, S0, S1
-      print I1
-      print "\n"
-
-      index I1, S0, S1, 1234
-      print I1
-      print "\n"
-
-      index I1, S0, S1, 9501
-      print I1
-      print "\n"
-
-      end
-CODE
-0
-1234
--1
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'index, big, hard to match strings' );
 # Builds a 24th iteration fibonacci string (approx. 100K)
-      set S1, "a"
-      set S2, "b"
-      set I0, 0
-LOOP:
-      set S3, S1
-      concat S1, S2, S3
-      set S2, S3
-      inc I0
-      lt I0, 24, LOOP
+.sub index_big_hard_to_match_strings
+    set $S1, "a"
+    set $S2, "b"
+    set $I0, 0
+  LOOP:
+    set $S3, $S1
+    concat $S1, $S2, $S3
+    set $S2, $S3
+    inc $I0
+    lt $I0, 24, LOOP
+    index $I1, $S1, $S2
+    is( $I1, "46368", 'index, big, hard to match strings' )
+    index $I1, $S1, $S2, 50000
+    is( $I1, "-1", 'index, big, hard to match strings' )
+.end
 
-      index I1, S1, S2
-      print I1
-      print "\n"
-
-      index I1, S1, S2, 50000
-      print I1
-      print "\n"
-      end
-CODE
-46368
--1
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', 'index with different charsets' );
-
-.sub test :main
-
-    print "default - default:\n"
+.sub index_with_different_charsets
     set $S0, "Parrot"
     set $S1, "rot"
     index $I1, $S0, $S1
-    print $I1
-    print "\n"
+    is( $I1, "3", 'default - default' )
 
-    print "ascii - ascii:\n"
     set $S0, ascii:"Parrot"
     set $S1, ascii:"rot"
     index $I1, $S0, $S1
-    print $I1
-    print "\n"
+    is( $I1, "3", 'ascii - ascii')
 
-    print "default - ascii:\n"
     set $S0, "Parrot"
     set $S1, ascii:"rot"
     index $I1, $S0, $S1
-    print $I1
-    print "\n"
+    is( $I1, "3", 'default - ascii' )
 
-    print "ascii - default:\n"
     set $S0, ascii:"Parrot"
     set $S1, "rot"
     index $I1, $S0, $S1
-    print $I1
-    print "\n"
+    is( $I1, "3", 'ascii - default' )
 
-    print "binary - binary:\n"
     set $S0, binary:"Parrot"
     set $S1, binary:"rot"
     index $I1, $S0, $S1
-    print $I1
-    print "\n"
-
+    is( $I1, "-1", 'binary - binary' )
 .end
-CODE
-default - default:
-3
-ascii - ascii:
-3
-default - ascii:
-3
-ascii - default:
-3
-binary - binary:
--1
-OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'negative index #35959' );
-    index I1, "u", "t", -123456
-    print I1
-    print "\n"
-    index I1, "u", "t", -123456789
-    print I1
-    print "\n"
+.sub negative_index_bug_35959
+    index $I1, "u", "t", -123456
+    is( $I1, "-1", 'negative index #35959' )
+
+    index $I1, "u", "t", -123456789
+    is( $I1, "-1", 'negative index #35959' )
+.end
+
+.sub index_multibyte_matching
+    skip( 3, "Pending rework of creating non-ascii literals" )
+
+    # set $S0, "\xAB"
+    # find_chartype $I0, "8859-1"
+    # set_chartype $S0, $I0
+    # find_encoding $I0, "singlebyte"
+    # set_encoding $S0, $I0
+    # find_encoding $I0, "utf8"
+    # find_chartype $I1, "unicode"
+    # transcode $S1, $S0, $I0, $I1
+    # is( $S0, $S1, 'equal' );
+
+    # index $I0, $S0, $S1
+    # is( $I0, "0", 'index, multibyte matching' )
+
+    # index $I0, $S1, $S0
+    # is( $I0, "0", 'index, multibyte matching' )
+.end
+
+.sub index_multibyte_matching_two
+    skip( 2, "Pending rework of creating non-ascii literals" )
+    # set $S0, "\xAB\xBA"
+    # set $S1, "foo\xAB\xAB\xBAbar"
+    # find_chartype $I0, "8859-1"
+    # set_chartype $S0, $I0
+    # find_encoding $I0, "singlebyte"
+    # set_encoding $S0, $I0
+    # find_chartype $I0, "unicode"
+    # find_encoding $I1, "utf8"
+    # transcode $S1, $S1, $I1, $I0
+    # index $I0, $S0, $S1
+    # is( $I0, "-1", 'index, multibyte matching 2' )
+    # index $I0, $S1, $S0
+    # is( $I0, "4", 'index, multibyte matching 2' )
+.end
+
+.sub num_to_string
+    set $N0, 80.43
+    set $S0, $N0
+    is( $S0, "80.43", 'num to string' )
+
+    set $N0, -1.111111
+    set $S0, $N0
+    is( $S0, "-1.111111", 'num to string' )
+.end
+
+.sub string_to_int
+    set $S0, "123"
+    set $I0, $S0
+    is( $I0, "123", 'string to int' )
+
+    set $S0, " 1"
+    set $I0, $S0
+    is( $I0, "1", 'string to int' )
+    
+    set $S0, "-1"
+    set $I0, $S0
+    is( $I0, "-1", 'string to int' )
+    
+    set     $S0, "Not a number"
+    set $I0, $S0
+    is( $I0, "0", 'string to int' )
+    
+    set $S0, ""
+    set $I0, $S0
+    is( $I0, "0", 'string to int' )
+.end
+
+.sub concat_or_substr_cow
+    set $S0, "<JA"
+    set $S1, "PH>"
+    set $S2, ""
+    concat $S2, $S2, $S0
+    concat $S2, $S2, $S1
+    is( $S2, "<JAPH>", 'concat/substr (COW)' )
+   
+    substr $S0, $S2, 1, 4
+    is( $S0, "JAPH", 'concat/substr (COW)' )
+.end
+
+.sub constant_to_cstring
+    stringinfo $I0, "\n", 2
+    stringinfo $I1, "\n", 2
+    is( $I1, $I0, 'constant to cstring' )
+
+    stringinfo $I2, "\n", 2
+    is( $I2, $I0, 'constant to cstring' )
+.end
+
+.sub cow_with_chopn_leaving_original_untouched
+    set $S0, "ABCD"
+    clone $S1, $S0
+    chopn $S0, 1
+    is( $S0, "ABC", 'COW with chopn leaving original untouched' )
+    is( $S1, "ABCD", 'COW with chopn leaving original untouched' )
+.end
+
+.sub check_that_bug_bug_16874_was_fixed
+    set $S0,  "foo     "
+    set $S1,  "bar     "
+    set $S2,  "quux    "
+    set $S15, ""
+    concat $S15, $S0
+    concat $S15, $S1
+    concat $S15, $S2
+    is( $S15, "foo     bar     quux    ", 'Check that bug #16874 was fixed' )
+.end
+
+.sub stress_concat
+    set $I0, 1000
+    set $S0, "michael"
+  LOOP:
+    set $S2, $I0
+    concat $S1, $S0, $S2
+    concat $S3, "mic", "hael"
+    concat $S3, $S3, $S2
+    eq $S1, $S3, BOTTOM
+    ok(0, 'failed stress concat test')
     end
-CODE
--1
--1
-OUTPUT
 
-SKIP: {
-    skip( "Pending rework of creating non-ascii literals", 2 );
-    pasm_output_is( <<'CODE', <<'OUTPUT', 'index, multibyte matching' );
-    set S0, "\xAB"
-    find_chartype I0, "8859-1"
-    set_chartype S0, I0
-    find_encoding I0, "singlebyte"
-    set_encoding S0, I0
+  BOTTOM:
+    sub $I0, $I0, 1
+    ne $I0, 0, LOOP
+    ok(1, 'stress concat test')
+.end
 
-    find_encoding I0, "utf8"
-    find_chartype I1, "unicode"
-    transcode S1, S0, I0, I1
+.sub ord_and_substring_see_bug_17035
+    set $S0, "abcdef"
+    substr $S1, $S0, 2, 3
+    ord $I0, $S0, 2
+    ord $I1, $S1, 0
+    ne $I0, $I1, fail
+    ord $I0, $S0, 3
+    ord $I1, $S1, 1
+    ne $I0, $I1, fail
+    ord $I0, $S0, 4
+    ord $I1, $S1, 2
+    ne $I0, $I1, fail
+    ok(1, 'ord and substring #17035')
+    goto end
+  fail:
+    ok(0, 'failed: ord and substring #17035')
+  end:
+.end
 
-    eq S0, S1, equal
-    print "not "
-equal:
-    print "equal\n"
-
-    index I0, S0, S1
-    print I0
-    print "\n"
-    index I0, S1, S0
-    print I0
-    print "\n"
-    end
-CODE
-equal
-0
-0
-OUTPUT
-
-    pasm_output_is( <<'CODE', <<'OUTPUT', 'index, multibyte matching 2' );
-    set S0, "\xAB\xBA"
-    set S1, "foo\xAB\xAB\xBAbar"
-    find_chartype I0, "8859-1"
-    set_chartype S0, I0
-    find_encoding I0, "singlebyte"
-    set_encoding S0, I0
-
-    find_chartype I0, "unicode"
-    find_encoding I1, "utf8"
-    transcode S1, S1, I1, I0
-
-    index I0, S0, S1
-    print I0
-    print "\n"
-    index I0, S1, S0
-    print I0
-    print "\n"
-    end
-CODE
--1
-4
-OUTPUT
-}
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'num to string' );
-    set N0, 80.43
-    set S0, N0
-    print S0
-    print "\n"
-
-    set N0, -1.111111
-    set S0, N0
-    print S0
-    print "\n"
-    end
-CODE
-80.43
--1.111111
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'string to int' );
-    set S0, "123"
-    set I0, S0
-    print   I0
-    print   "\n"
-
-    set S0, " 1"
-    set I0, S0
-    print   I0
-    print   "\n"
-
-    set S0, "-1"
-    set I0, S0
-    print   I0
-    print   "\n"
-
-        set     S0, "Not a number"
-    set I0, S0
-    print   I0
-    print   "\n"
-
-    set S0, ""
-    set I0, S0
-    print   I0
-    print   "\n"
-
-    end
-CODE
-123
-1
--1
-0
-0
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'concat/substr (COW)' );
-    set S0, "<JA"
-    set S1, "PH>"
-    set S2, ""
-    concat S2, S2, S0
-    concat S2, S2, S1
-    print S2
-    print "\n"
-    substr S0, S2, 1, 4
-    print S0
-    print "\n"
-    end
-CODE
-<JAPH>
-JAPH
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'constant to cstring' );
-  stringinfo I0, "\n", 2
-  stringinfo I1, "\n", 2
-  eq I1, I0, ok1
-  print "N"
-ok1:
-  print "OK"
-  print "\n"
-  stringinfo I2, "\n", 2
-  eq I2, I0, ok2
-  print "N"
-ok2:
-  print "OK\n"
-  end
-CODE
-OK
-OK
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'COW with chopn leaving original untouched' );
-  set S0, "ABCD"
-  clone S1, S0
-  chopn S0, 1
-  print S0
-  print "\n"
-  print S1
-  print "\n"
-  end
-CODE
-ABC
-ABCD
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'Check that bug #16874 was fixed' );
-  set S0,  "foo     "
-  set S1,  "bar     "
-  set S2,  "quux    "
-  set S15, ""
-  concat S15, S0
-  concat S15, S1
-  concat S15, S2
-  print "["
-  print S15
-  print "]\n"
-  end
-CODE
-[foo     bar     quux    ]
-OUTPUT
-
-pasm_output_is( <<'CODE', "all ok\n", 'stress concat' );
- set I0, 1000
- set S0, "michael"
-LOOP:
- set S2, I0
- concat S1, S0, S2
- concat S3, "mic", "hael"
- concat S3, S3, S2
- eq S1, S3, BOTTOM
- print "Failed: "
- print S1
- print " ne "
- print S3
- print "\n"
- end
-BOTTOM:
- sub I0, I0, 1
- ne I0, 0, LOOP
- print "all ok\n"
- end
-CODE
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'ord and substring (see #17035)' );
-  set S0, "abcdef"
-  substr S1, S0, 2, 3
-  ord I0, S0, 2
-  ord I1, S1, 0
-  ne I0, I1, fail
-  ord I0, S0, 3
-  ord I1, S1, 1
-  ne I0, I1, fail
-  ord I0, S0, 4
-  ord I1, S1, 2
-  ne I0, I1, fail
-  print "It's all good\n"
-  end
-fail:
-  print "Not good: original string="
-  print I0
-  print ", substring="
-  print I1
-  print "\n"
-  end
-CODE
-It's all good
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'sprintf' );
+.sub test_sprintf
     branch MAIN
+  NEWARYP:
+    new $P1, 'ResizablePMCArray'
+    set $P1[0], $P0
+    local_return $P4
+  NEWARYS:
+    new $P1, 'ResizablePMCArray'
+    set $P1[0], $S0
+    local_return $P4
+  NEWARYI:
+    new $P1, 'ResizablePMCArray'
+    set $P1[0], $I0
+    local_return $P4
+  NEWARYN:
+    new $P1, 'ResizablePMCArray'
+    set $P1[0], $N0
+    local_return $P4
+  PRINTF:
+    sprintf $S2, $S1, $P1
+    is( $S2, $S99, $S1 )
+    local_return $P4
 
-NEWARYP:
-    new P1, 'ResizablePMCArray'
-    set P1[0], P0
-    local_return P4
-NEWARYS:
-    new P1, 'ResizablePMCArray'
-    set P1[0], S0
-    local_return P4
-NEWARYI:
-    new P1, 'ResizablePMCArray'
-    set P1[0], I0
-    local_return P4
-NEWARYN:
-    new P1, 'ResizablePMCArray'
-    set P1[0], N0
-    local_return P4
-PRINTF:
-    sprintf S2, S1, P1
-    print S2
-    local_return P4
+  MAIN:
+    new $P4, 'ResizableIntegerArray'
+    set $S1, "Hello, %s"
+    set $S0, "Parrot!"
+    set $S99, "Hello, Parrot!"
+    local_branch $P4, NEWARYS
+    local_branch $P4, PRINTF
 
-MAIN:
-    new P4, 'ResizableIntegerArray'
-    set S1, "Hello, %s\n"
-    set S0, "Parrot!"
-    local_branch P4, NEWARYS
-    local_branch P4, PRINTF
+    set $S1, "Hash[0x%x]"
+    set $I0, 256
+    set $S99, "Hash[0x100]"
+    local_branch $P4, NEWARYI
+    local_branch $P4, PRINTF
 
-    set S1, "Hash[0x%x]\n"
-    set I0, 256
-    local_branch P4, NEWARYI
-    local_branch P4, PRINTF
+    set $S1, "Hash[0x%lx]"
+    set $I0, 256
+    set $S99, "Hash[0x100]"
+    local_branch $P4, NEWARYI
+    local_branch $P4, PRINTF
 
-    set S1, "Hash[0x%lx]\n"
-    set I0, 256
-    local_branch P4, NEWARYI
-    local_branch P4, PRINTF
+    set $S1, "Hello, %.2s!"
+    set $S0, "Parrot"
+    set $S99, "Hello, Pa!"
+    local_branch $P4, NEWARYS
+    local_branch $P4, PRINTF
 
-    set S1, "Hello, %.2s!\n"
-    set S0, "Parrot"
-    local_branch P4, NEWARYS
-    local_branch P4, PRINTF
+    set $S1, "Hello, %Ss"
+    set $S0, $S2
+    set $S99, "Hello, Hello, Pa!"
+    local_branch $P4, NEWARYS
+    local_branch $P4, PRINTF
 
-    set S1, "Hello, %Ss"
-    set S0, S2
-    local_branch P4, NEWARYS
-    local_branch P4, PRINTF
+    set $S1, "1 == %Pd"
+    new $P0, 'Integer'
+    set $P0, 1
+    set $S99, "1 == 1"
+    local_branch $P4, NEWARYP
+    local_branch $P4, PRINTF
 
-    set S1, "1 == %Pd\n"
-    new P0, 'Integer'
-    set P0, 1
-    local_branch P4, NEWARYP
-    local_branch P4, PRINTF
+    set $S1, "-255 == %vd"
+    set $I0, -255
+    set $S99, "-255 == -255"
+    local_branch $P4, NEWARYI
+    local_branch $P4, PRINTF
 
-    set S1, "-255 == %vd\n"
-    set I0, -255
-    local_branch P4, NEWARYI
-    local_branch P4, PRINTF
+    set $S1, "+123 == %+vd"
+    set $I0, 123
+    set $S99, "+123 == +123"
+    local_branch $P4, NEWARYI
+    local_branch $P4, PRINTF
 
-    set S1, "+123 == %+vd\n"
-    set I0, 123
-    local_branch P4, NEWARYI
-    local_branch P4, PRINTF
+    set $S1, "256 == %vu"
+    set $I0, 256
+    set $S99, "256 == 256"
+    local_branch $P4, NEWARYI
+    local_branch $P4, PRINTF
 
-    set S1, "256 == %vu\n"
-    set I0, 256
-    local_branch P4, NEWARYI
-    local_branch P4, PRINTF
+    set $S1, "1 == %+vu"
+    set $I0, 1
+    set $S99, "1 == 1"
+    local_branch $P4, NEWARYI
+    local_branch $P4, PRINTF
 
-    set S1, "1 == %+vu\n"
-    set I0, 1
-    local_branch P4, NEWARYI
-    local_branch P4, PRINTF
+    set $S1, "001 == %0.3u"
+    set $I0, 1
+    set $S99, "001 == 001"
+    local_branch $P4, NEWARYI
+    local_branch $P4, PRINTF
 
-    set S1, "001 == %0.3u\n"
-    set I0, 1
-    local_branch P4, NEWARYI
-    local_branch P4, PRINTF
+    set $S1, "001 == %+0.3u"
+    set $I0, 1
+    set $S99, "001 == 001"
+    local_branch $P4, NEWARYI
+    local_branch $P4, PRINTF
 
-    set S1, "001 == %+0.3u\n"
-    set I0, 1
-    local_branch P4, NEWARYI
-    local_branch P4, PRINTF
+    set $S1, "0.500000 == %f"
+    set $N0, 0.5
+    set $S99, "0.500000 == 0.500000"
+    local_branch $P4, NEWARYN
+    local_branch $P4, PRINTF
 
-    set S1, "0.500000 == %f\n"
-    set N0, 0.5
-    local_branch P4, NEWARYN
-    local_branch P4, PRINTF
+    set $S1, "0.500 == %5.3f"
+    set $N0, 0.5
+    set $S99, "0.500 == 0.500"
+    local_branch $P4, NEWARYN
+    local_branch $P4, PRINTF
 
-    set S1, "0.500 == %5.3f\n"
-    set N0, 0.5
-    local_branch P4, NEWARYN
-    local_branch P4, PRINTF
+    set $S1, "0.001 == %g"
+    set $N0, 0.001
+    set $S99, "0.001 == 0.001"
+    local_branch $P4, NEWARYN
+    local_branch $P4, PRINTF
 
-    set S1, "0.001 == %g\n"
-    set N0, 0.001
-    local_branch P4, NEWARYN
-    local_branch P4, PRINTF
+    set $S1, "1e+06 == %g"
+    set $N0, 1.0e6
+    set $S99, "1e+06 == 1e+06"
+    local_branch $P4, NEWARYN
+    local_branch $P4, PRINTF
 
-    set S1, "1e+06 == %g\n"
-    set N0, 1.0e6
-    local_branch P4, NEWARYN
-    local_branch P4, PRINTF
+    set $S1, "0.5 == %3.3g"
+    set $N0, 0.5
+    set $S99, "0.5 == 0.5"
+    local_branch $P4, NEWARYN
+    local_branch $P4, PRINTF
 
-    set S1, "0.5 == %3.3g\n"
-    set N0, 0.5
-    local_branch P4, NEWARYN
-    local_branch P4, PRINTF
+    set $S1, "%% == %%"
+    set $I0, 0
+    set $S99, "% == %"
+    local_branch $P4, NEWARYI
+    local_branch $P4, PRINTF
 
-    set S1, "%% == %%\n"
-    set I0, 0
-    local_branch P4, NEWARYI
-    local_branch P4, PRINTF
-
-    set S1, "That's all, %s\n"
-    set S0, "folks!"
-    local_branch P4, NEWARYS
-    local_branch P4, PRINTF
-
-    end
-CODE
-Hello, Parrot!
-Hash[0x100]
-Hash[0x100]
-Hello, Pa!
-Hello, Hello, Pa!
-1 == 1
--255 == -255
-+123 == +123
-256 == 256
-1 == 1
-001 == 001
-001 == 001
-0.500000 == 0.500000
-0.500 == 0.500
-0.001 == 0.001
-1e+06 == 1e+06
-0.5 == 0.5
-% == %
-That's all, folks!
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'other form of sprintf op' );
-    branch MAIN
-
-PRINTF:
-    sprintf P3, P2, P1
-    print P3
-    local_return P4
-
-MAIN:
-    new P4, 'ResizableIntegerArray'
-    new P3, 'String'
-
-    new P2, 'String'
-    set P2, "15 is %b\n"
-    new P1, 'ResizablePMCArray'
-    set P1[0], 15
-    local_branch P4, PRINTF
-
-    new P2, 'String'
-    set P2, "128 is %o\n"
-    new P1, 'ResizablePMCArray'
-    set P1[0], 128
-    local_branch P4, PRINTF
-
-    end
-CODE
-15 is 1111
-128 is 200
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', 'sprintf - left justify' );
-.sub main :main
-  $P0 = new 'ResizablePMCArray'
-  $P1 = new 'Integer'
-  $P1 = 10
-  $P0[0] = $P1
-  $P1 = new 'String'
-  $P1 = "foo"
-  $P0[1] = $P1
-  $P1 = new 'String'
-  $P1 = "bar"
-  $P0[2] = $P1
-  $S0 = sprintf "%-*s - %s\n", $P0
-  print $S0
-  end
+    set $S1, "That's all, %s"
+    set $S0, "folks!"
+    set $S99, "That's all, folks!"
+    local_branch $P4, NEWARYS
+    local_branch $P4, PRINTF
 .end
-CODE
-foo        - bar
-OUTPUT
 
-{
-    my $output = substr( ( 'f' x ( $PConfig{intvalsize} * 2 ) ) . ( ' ' x 20 ), 0, 20 );
-    pir_output_is( <<'CODE', $output, 'Correct precision for %x' ); }
-.sub main :main
-  $P0 = new 'ResizablePMCArray'
-  $P0[0] = -1
-  $S0 = sprintf "%-20x", $P0
-  print $S0
-  end
+.sub other_form_of_sprintf_op
+    new $P4, 'ResizableIntegerArray'
+    new $P3, 'String'
+    new $P2, 'String'
+    set $P2, "15 is %b"
+    new $P1, 'ResizablePMCArray'
+    set $P1[0], 15
+    sprintf $P3, $P2, $P1
+    is( $P3, "15 is 1111", 'other form of sprintf op' )
+
+    new $P2, 'String'
+    set $P2, "128 is %o"
+    new $P1, 'ResizablePMCArray'
+    set $P1[0], 128
+    sprintf $P3, $P2, $P1
+    is( $P3, "128 is 200", 'other form of sprintf op' )
 .end
-CODE
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'exchange' );
-    set S0, "String #0\n"
-    set S1, "String #1\n"
-    exchange S0, S1
-    print S0
-    print S1
+.sub sprintf_left_justify
+    $P0 = new 'ResizablePMCArray'
+    $P1 = new 'Integer'
+    $P1 = 10
+    $P0[0] = $P1
+    $P1 = new 'String'
+    $P1 = "foo"
+    $P0[1] = $P1
+    $P1 = new 'String'
+    $P1 = "bar"
+    $P0[2] = $P1
+    $S0 = sprintf "%-*s - %s", $P0
+    is( $S0, "foo        - bar", 'sprintf - left justify' )
+.end
 
-    set S2, "String #2\n"
-    exchange S2, S2
-    print S2
 
-    end
-CODE
-String #1
-String #0
-String #2
-OUTPUT
+.sub correct_precision_for_sprintf_x
+    .include "iglobals.pasm"
 
-SKIP: {
-    skip( "Pending reimplementation of find_encoding", 1 );
-    pasm_output_is( <<'CODE', <<'OUTPUT', 'find_encoding' );
-      find_encoding I0, "singlebyte"
-      print I0
-      print "\n"
-      find_encoding I0, "utf8"
-      print I0
-      print "\n"
-      find_encoding I0, "utf16"
-      print I0
-      print "\n"
-      find_encoding I0, "utf32"
-      print I0
-      print "\n"
-      end
-CODE
-0
-1
-2
-3
-OUTPUT
-}
+    # Create the string via concat
+    .local pmc interp     # a handle to our interpreter object.
+    interp = getinterp
+    .local pmc config
+    config = interp[.IGLOBALS_CONFIG_HASH]
+    .local int intvalsize 
+    intvalsize = config['intvalsize']
 
-SKIP: {
-    skip( "no more visible encoding", 1 );
-    pasm_output_is( <<'CODE', <<'OUTPUT', 'string_encoding' );
-      set I0, 0
-      new S0, 0, I0
-      string_encoding I1, S0
-      eq I0, I1, OK1
-      print "not "
-OK1:  print "ok 1\n"
+    $S0 = ''
+    $I0 = 1
+    $I1 = intvalsize * 2
+  loop:
+    concat $S0, 'f'
+    inc $I0
+    le $I0, $I1, loop
+  padding_loop:
+    concat $S0, ' '
+    inc $I0
+    le $I0, 20, padding_loop
+    
+    # Now see what sprintf comes up with
+    $P0 = new 'ResizablePMCArray'
+    $P0[0] = -1
+    $S1 = sprintf "%-20x", $P0
+    is( $S1, $S0, 'Correct precision for %x' )
+.end
 
-      set I0, 1
-      new S0, 0, I0
-      string_encoding I1, S0
-      eq I0, I1, OK2
-      print "not "
-OK2:  print "ok 2\n"
+.sub test_exchange
+    set $S0, "String #0"
+    set $S1, "String #1"
+    exchange $S0, $S1
+    is( $S0, "String #1", 'exchange' )
+    is( $S1, "String #0", 'exchange' )
+    
+    set $S2, "String #2"
+    exchange $S2, $S2
+    is( $S2, "String #2", 'exchange' )
+.end
 
-      set I0, 2
-      new S0, 0, I0
-      string_encoding I1, S0
-      eq I0, I1, OK3
-      print "not "
-OK3:  print "ok 3\n"
+.sub test_find_encoding
+    skip( 4, "Pending reimplementation of find_encoding" )
+    # find_encoding $I0, "singlebyte"
+    # is( $I0, "0", 'find_encoding' )
+    # find_encoding $I0, "utf8"
+    # is( $I0, "1", 'find_encoding' )
+    # find_encoding $I0, "utf16"
+    # is( $I0, "2", 'find_encoding' )
+    # find_encoding $I0, "utf32"
+    # is( $I0, "3", 'find_encoding' )
+.end
 
-      set I0, 3
-      new S0, 0, I0
-      string_encoding I1, S0
-      eq I0, I1, OK4
-      print "not "
-OK4:  print "ok 4\n"
+.sub test_string_encoding
+    skip(4, "no more visible encoding" )
+    # set $I0, 0
+    # new $S0, 0, $I0
+    # string_encoding $I1, $S0
+    # eq $I0, $I1, OK1
+    # print "not "
+    # OK1:  print "ok 1\n"
+    # set $I0, 1
+    # new $S0, 0, $I0
+    # string_encoding $I1, $S0
+    # eq $I0, $I1, OK2
+    # print "not "
+    # OK2:  print "ok 2\n"
+    # set $I0, 2
+    # new $S0, 0, $I0
+    # string_encoding $I1, $S0
+    # eq $I0, $I1, OK3
+    # print "not "
+    # OK3:  print "ok 3\n"
+    # set $I0, 3
+    # new $S0, 0, $I0
+    # string_encoding $I1, $S0
+    # eq $I0, $I1, OK4
+    # print "not "
+    # OK4:  print "ok 4\n"
+.end
 
-      end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
-}
+.sub test_assign
+    set $S4, "JAPH"
+    assign  $S5, $S4
+    is( $S4, "JAPH", 'assign' )
+    is( $S5, "JAPH", 'assign' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'assign' );
-    set S4, "JAPH\n"
-    assign  S5, S4
-    print   S4
-    print   S5
-    end
-CODE
-JAPH
-JAPH
-OUTPUT
+.sub assign_and_globber
+    set $S4, "JAPH"
+    assign  $S5, $S4
+    assign  $S4, "Parrot"
+    is( $S4, "Parrot", 'assign & globber' )
+    is( $S5, "JAPH", 'assign & globber' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'assign & globber' );
-    set S4, "JAPH\n"
-    assign  S5, S4
-    assign  S4, "Parrot\n"
-    print   S4
-    print   S5
-    end
-CODE
-Parrot
-JAPH
-OUTPUT
+.sub assign_and_globber_2
+    set $S4, "JAPH"
+    set     $S5, $S4
+    assign  $S4, "Parrot"
+    is( $S4, "Parrot", 'assign & globber 2' )
+    is( $S5, "Parrot", 'assign & globber 2' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'assign & globber 2' );
-    set S4, "JAPH\n"
-    set     S5, S4
-    assign  S4, "Parrot\n"
-    print   S4
-    print   S5
-    end
-CODE
-Parrot
-Parrot
-OUTPUT
+.sub bands_null_string
+    null $S1
+    set $S2, "abc"
+    bands $S1, $S2
+    null $S3
+    is( $S1, $S3, 'ok1' )
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bands NULL string' );
-    null S1
-    set S2, "abc"
-    bands S1, S2
-    null S3
-    eq S1, S3, ok1
-    print "not "
-ok1:    print "ok 1\n"
-    set S1, ""
-    bands S1, S2
-    unless S1, ok2
-    print "not "
-ok2:    print "ok 2\n"
+    set $S1, ""
+    bands $S1, $S2
+    nok( $S1, 'ok2' )
+    
+    null $S2
+    set $S1, "abc"
+    bands $S1, $S2
+    null $S3
+    is( $S1, $S3, 'ok3' )
+    
+    set $S2, ""
+    bands $S1, $S2
+    nok( $S1, 'ok4' )
+.end
 
-    null S2
-    set S1, "abc"
-    bands S1, S2
-    null S3
-    eq S1, S3, ok3
-    print "not "
-ok3:    print "ok 3\n"
-    set S2, ""
-    bands S1, S2
-    unless S1, ok4
-    print "not "
-ok4:    print "ok 4\n"
-    end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
+.sub bands_2
+    set $S1, "abc"
+    set $S2, "EE"
+    bands $S1, $S2
+    is( $S1, "A@", 'bands 2' )
+    is( $S2, "EE", 'bands 2' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bands 2' );
-    set S1, "abc"
-    set S2, "EE"
-    bands S1, S2
-    print S1
-    print "\n"
-    print S2
-    print "\n"
-    end
-CODE
-A@
-EE
-OUTPUT
+.sub bands_3
+    set $S1, "abc"
+    set $S2, "EE"
+    bands $S0, $S1, $S2
+    is( $S0, "A@", 'bands 3' )
+    is( $S1, "abc", 'bands 3' )
+    is( $S2, "EE", 'bands 3' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bands 3' );
-    set S1, "abc"
-    set S2, "EE"
-    bands S0, S1, S2
-    print S0
-    print "\n"
-    print S1
-    print "\n"
-    print S2
-    print "\n"
-    end
-CODE
-A@
-abc
-EE
-OUTPUT
+.sub bands_cow
+    set $S1, "foo"
+    substr $S2, $S1, 0, 3
+    bands $S1, "bar"
+    is( $S2, "foo", 'bands COW' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bands COW' );
-  set S1, "foo"
-  substr S2, S1, 0, 3
-  bands S1, "bar"
-  print S2
-  print "\n"
-  end
-CODE
-foo
-OUTPUT
+.sub bors_null_string
+    null $S1
+    null $S2
+    bors $S1, $S2
+    null $S3
+    is( $S1, $S3, 'bors NULL string' )
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bors NULL string' );
-     null S1
-     null S2
-     bors S1, S2
-     null S3
-     eq S1, S3, OK1
-     print "not "
-OK1: print "ok 1\n"
+    null $S1
+    set $S2, ""
+    bors $S1, $S2
+    null $S3
+    is( $S1, $S3, 'bors NULL string' )
+ 
+    bors $S2, $S1
+    is( $S2, $S3, 'bors NULL string' )
 
-     null S1
-     set S2, ""
-     bors S1, S2
-     null S3
-     eq S1, S3, OK2
-     print "not "
-OK2: print "ok 2\n"
-     bors S2, S1
-     eq S2, S3, OK3
-     print "not "
-OK3: print "ok 3\n"
+    null $S1
+    set $S2, "def"
+    bors $S1, $S2
+    is( $S1, "def", 'bors NULL string' )
 
-     null S1
-     set S2, "def"
-     bors S1, S2
-     eq S1, "def", OK4
-     print "not "
-OK4: print "ok 4\n"
-     null S2
-     bors S1, S2
-     eq S1, "def", OK5
-     print "not "
-OK5: print "ok 5\n"
+    null $S2
+    bors $S1, $S2
+    is( $S1, "def", 'bors NULL string' )
 
-     null S1
-     null S2
-     bors S3, S1, S2
-     null S4
-     eq S3, S4, OK6
-     print "not "
-OK6: print "ok 6\n"
+    null $S1
+    null $S2
+    bors $S3, $S1, $S2
+    null $S4
+    is( $S3, $S4, 'bors NULL string' )
 
-     set S1, ""
-     bors S3, S1, S2
-     eq S3, S4, OK7
-     print "not "
-OK7: print "ok 7\n"
-     bors S3, S2, S1
-     eq S3, S4, OK8
-     print "not "
-OK8: print "ok 8\n"
+    set $S1, ""
+    bors $S3, $S1, $S2
+    is( $S3, $S4, 'bors NULL string' )
 
-     set S1, "def"
-     bors S3, S1, S2
-     eq S3, "def", OK9
-     print "not "
-OK9: print "ok 9\n"
-     bors S3, S2, S1
-     eq S3, "def", OK10
-     print "not "
-OK10: print "ok 10\n"
-     end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-ok 5
-ok 6
-ok 7
-ok 8
-ok 9
-ok 10
-OUTPUT
+    bors $S3, $S2, $S1
+    is( $S3, $S4, 'bors NULL string' )
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bors 2' );
-    set S1, "abc"
-    set S2, "EE"
-    bors S1, S2
-    print S1
-    print "\n"
-    print S2
-    print "\n"
-    end
-CODE
-egc
-EE
-OUTPUT
+    set $S1, "def"
+    bors $S3, $S1, $S2
+    is( $S3, "def", 'bors NULL string' )
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bors 3' );
-    set S1, "abc"
-    set S2, "EE"
-    bors S0, S1, S2
-    print S0
-    print "\n"
-    print S1
-    print "\n"
-    print S2
-    print "\n"
-    end
-CODE
-egc
-abc
-EE
-OUTPUT
+    bors $S3, $S2, $S1
+    is( $S3, "def", 'bors NULL string' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bors COW' );
-  set S1, "foo"
-  substr S2, S1, 0, 3
-  bors S1, "bar"
-  print S2
-  print "\n"
-  end
-CODE
-foo
-OUTPUT
+.sub bors_2
+    set $S1, "abc"
+    set $S2, "EE"
+    bors $S1, $S2
+    is( $S1, "egc", 'bors 2' )
+    is( $S2, "EE", 'bors 2' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bxors NULL string' );
-     null S1
-     null S2
-     bxors S1, S2
-     null S3
-     eq S1, S3, OK1
-     print "not "
-OK1: print "ok 1\n"
+.sub bors_3
+    set $S1, "abc"
+    set $S2, "EE"
+    bors $S0, $S1, $S2
+    is( $S0, "egc", 'bors 3' )
+    is( $S1, "abc", 'bors 3' )
+    is( $S2, "EE", 'bors 3' )
+.end
 
-     null S1
-     set S2, ""
-     bxors S1, S2
-     null S3
-     eq S1, S3, OK2
-     print "not "
-OK2: print "ok 2\n"
-     bxors S2, S1
-     eq S2, S3, OK3
-     print "not "
-OK3: print "ok 3\n"
+.sub bors_cow
+    set $S1, "foo"
+    substr $S2, $S1, 0, 3
+    bors $S1, "bar"
+    is( $S2, "foo", 'bors COW' )
+.end
 
-     null S1
-     set S2, "abc"
-     bxors S1, S2
-     eq S1, "abc", OK4
-     print "not "
-OK4: print "ok 4\n"
-     null S2
-     bxors S1, S2
-     eq S1, "abc", OK5
-     print "not "
-OK5: print "ok 5\n"
+.sub bxors_null_string
+    null $S1
+    null $S2
+    bxors $S1, $S2
+    null $S3
+    is( $S1, $S3, 'bxors NULL string' )
 
-     null S1
-     null S2
-     bxors S3, S1, S2
-     null S4
-     eq S3, S4, OK6
-     print "not "
-OK6: print "ok 6\n"
+    null $S1
+    set $S2, ""
+    bxors $S1, $S2
+    null $S3
+    is( $S1, $S3, 'bxors NULL string' )
 
-     set S1, ""
-     bxors S3, S1, S2
-     eq S3, S4, OK7
-     print "not "
-OK7: print "ok 7\n"
-     bxors S3, S2, S1
-     eq S3, S4, OK8
-     print "not "
-OK8: print "ok 8\n"
+    bxors $S2, $S1
+    is( $S2, $S3, 'bxors NULL string' )
 
-     set S1, "abc"
-     bxors S3, S1, S2
-     eq S3, "abc", OK9
-     print "not "
-OK9: print "ok 9\n"
-     bxors S3, S2, S1
-     eq S3, "abc", OK10
-     print "not "
-OK10: print "ok 10\n"
-     end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-ok 5
-ok 6
-ok 7
-ok 8
-ok 9
-ok 10
-OUTPUT
+    null $S1
+    set $S2, "abc"
+    bxors $S1, $S2
+    is( $S1, "abc", 'bxors NULL string' )
 
-# string_133.pasm, used for t/native_pbc/string.t
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bxors 2' );
- set S1, "a2c"
- set S2, "Dw"
- bxors S1, S2
- print S1
- print "\n"
- print S2
- print "\n"
-    set S1, "abc"
-    set S2, "   X"
-    bxors S1, S2
-    print S1
- print "\n"
- print S2
- print "\n"
- end
-CODE
-%Ec
-Dw
-ABCX
-   X
-OUTPUT
+    null $S2
+    bxors $S1, $S2
+    is( $S1, "abc", 'bxors NULL string' )
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bxors 3' );
- set S1, "a2c"
- set S2, "Dw"
- bxors S0, S1, S2
- print S0
- print "\n"
- print S1
- print "\n"
- print S2
- print "\n"
-    set S1, "abc"
-    set S2, "   Y"
-    bxors S0, S1, S2
- print S0
- print "\n"
-    print S1
- print "\n"
- print S2
- print "\n"
- end
-CODE
-%Ec
-a2c
-Dw
-ABCY
-abc
-   Y
-OUTPUT
+    null $S1
+    null $S2
+    bxors $S3, $S1, $S2
+    null $S4
+    is( $S3, $S4, 'bxors NULL string' )
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bxors COW' );
-  set S1, "foo"
-  substr S2, S1, 0, 3
-  bxors S1, "bar"
-  print S2
-  print "\n"
-  end
-CODE
-foo
-OUTPUT
+    set $S1, ""
+    bxors $S3, $S1, $S2
+    is( $S3, $S4, 'bxors NULL string' )
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bnots NULL string' );
-     null S1
-     null S2
-     bnots S1, S2
-     null S3
-     eq S1, S3, OK1
-     print "not "
-OK1: print "ok 1\n"
+    bxors $S3, $S2, $S1
+    is( $S3, $S4, 'bxors NULL string' )
 
-     null S1
-     set S2, ""
-     bnots S1, S2
-     null S3
-     eq S1, S3, OK2
-     print "not "
-OK2: print "ok 2\n"
-     bnots S2, S1
-     eq S2, S3, OK3
-     print "not "
-OK3: print "ok 3\n"
-     end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
+    set $S1, "abc"
+    bxors $S3, $S1, $S2
+    is( $S3, "abc", 'bxors NULL string' )
 
-SKIP: {
-    skip( "No unicode yet", 1 );
-    # This was the previous test used for t/native_pbc/string.t
-    pasm_output_is( <<'CODE', <<'OUTPUT', 'bnots 2' );
- getstdout P0
- push P0, "utf8"
- set S1, "a2c"
- bnots S2, S1
- print S1
- print "\n"
- print S2
- print "\n"
- bnots S1, S1
- print S1
- print "\n"
- bnots S1, S1
- print S1
- print "\n"
- end
-CODE
-a2c
-\xC2\x9E\xC3\x8D\xC2\x9C
-\xC2\x9E\xC3\x8D\xC2\x9C
-a2c
-OUTPUT
-}
+    bxors $S3, $S2, $S1
+    is( $S3, "abc", 'bxors NULL string' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'bnots COW' );
-  set S1, "foo"
-  substr S2, S1, 0, 3
-  bnots S1, S1
-  print S2
-  print "\n"
-  end
-CODE
-foo
-OUTPUT
+.sub bxors_2
+    set $S1, "a2c"
+    set $S2, "Dw"
+    bxors $S1, $S2
+    is( $S1, "%Ec", 'bxors 2' )
+    is( $S2, "Dw", 'bxors 2' )
+    
+    set $S1, "abc"
+    set $S2, "   X"
+    bxors $S1, $S2
+    is( $S1, "ABCX", 'bxors 2' )
+    is( $S2, "   X", 'bxors 2' )
+.end
 
-SKIP: {
-    skip( "no more transcode", 1 );
-    pasm_output_is( <<'CODE', <<'OUTPUT', 'transcode to utf8' );
-  set S1, "ASCII is the same as UTF8\n"
-  find_encoding I1, "utf8"
-  transcode S2, S1, I1
-  print S1
-  print S2
-  end
-CODE
-ASCII is the same as UTF8
-ASCII is the same as UTF8
-OUTPUT
-}
+.sub bxors_3
+    set $S1, "a2c"
+    set $S2, "Dw"
+    bxors $S0, $S1, $S2
+    is( $S0, "%Ec", 'bxors 3' )
+    is( $S1, "a2c", 'bxors 3' )
+    is( $S2, "Dw", 'bxors 3' )
+    
+    set $S1, "abc"
+    set $S2, "   Y"
+    bxors $S0, $S1, $S2
+    is( $S0, "ABCY", 'bxors 3' )
+    is( $S1, "abc", 'bxors 3' )
+    is( $S2, "   Y", 'bxors 3' )
+.end
 
-SKIP: {
-    skip( "no more chartype", 1 );
-    pasm_output_is( <<'CODE', <<'OUTPUT', 'string_chartype' );
-    set S0, "Test String"
-    find_chartype I0, "usascii"
-    set_chartype S0, I0
-    string_chartype I1, S0
-    eq I1, I0, OK
-    print I0
-    print "\n"
-    print I1
-    print "\n"
-    print "not "
-OK: print "ok\n"
-    end
-CODE
-ok
-OUTPUT
-}
+.sub bxors_cow
+    set $S1, "foo"
+    substr $S2, $S1, 0, 3
+    bxors $S1, "bar"
+    is( $S2, "foo", 'bxors COW' )
+.end
 
-# Set all string registers to values given by &$_[0](reg num)
-sub set_str_regs {
-    my $code = shift;
-    my $rt;
-    for ( 0 .. 31 ) {
-        $rt .= "\tset S$_, \"" . &$code($_) . "\"\n";
-    }
-    return $rt;
-}
+.sub bnots_null_string
+    null $S1
+    null $S2
+    bnots $S1, $S2
+    null $S3
+    is( $S1, $S3, 'bnots NULL string' )
 
-# print string registers, no additional prints
-sub print_str_regs {
-    my $rt;
-    for ( 0 .. 31 ) {
-        $rt .= "\tprint S$_\n";
-    }
-    return $rt;
-}
+    null $S1
+    set $S2, ""
+    bnots $S1, $S2
+    null $S3
+    is( $S1, $S3, 'bnots NULL string' )
+    
+    bnots $S2, $S1
+    is( $S2, $S3, 'bnots NULL string' )
+.end
 
-# Generate code to compare each pair of strings in a list
-sub compare_strings {
-    my $const   = shift;
-    my $op      = shift;
-    my @strings = @_;
-    my $i       = 1;
-    my $rt;
-    while (@strings) {
-        my $s1 = shift @strings;
-        my $s2 = shift @strings;
-        my $arg1;
-        my $arg2;
-        if ( $const == 3 ) {
-            $arg1 = "\"$s1\"";
-            $arg2 = "\"$s2\"";
-        }
-        elsif ( $const == 2 ) {
-            $rt .= "    set S0, \"$s1\"\n";
-            $arg1 = "S0";
-            $arg2 = "\"$s2\"";
-        }
-        elsif ( $const == 1 ) {
-            $rt .= "    set S0, \"$s2\"\n";
-            $arg1 = "\"$s1\"";
-            $arg2 = "S0";
-        }
-        else {
-            $rt .= "    set S0, \"$s1\"\n";
-            $rt .= "    set S1, \"$s2\"\n";
-            $arg1 = "S0";
-            $arg2 = "S1";
-        }
-        if ( eval "\"$s1\" $op \"$s2\"" ) {
-            $rt .= "    $op $arg1, $arg2, OK$i\n";
-            $rt .= "    branch ERROR\n";
-        }
-        else {
-            $rt .= "    $op $arg1, $arg2, ERROR\n";
-        }
-        $rt .= "OK$i:\n";
-        $i++;
-    }
-    return $rt;
-}
+# This was the previous test used for t/native_pbc/string.t
+.sub bnots_2
+    skip( 4, "No unicode yet" )
+    # getstdout $P0
+    # push $P0, "utf8"
+    # set $S1, "a2c"
+    # bnots $S2, $S1
+    # is( $S1, "a2c", 'bnots 2' )
+    # is( $S2, "\xC2\x9E\xC3\x8D\xC2\x9C", 'bnots 2' )
+    # 
+    # bnots $S1, $S1
+    # is( $S1, "\xC2\x9E\xC3\x8D\xC2\x9C", 'bnots 2' )
+    # 
+    # bnots $S1, $S1
+    # is( $S1, "a2c", 'bnots 2' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'split on empty string' );
-_main:
-    split P1, "", ""
-    set I1, P1
-    print I1
-    print "\n"
-    split P0, "", "ab"
-    set I0, P0
-    print I0
-    print "\n"
-    set S0, P0[0]
-    print S0
-    set S0, P0[1]
-    print S0
-    print "\n"
-    end
-CODE
-0
-2
-ab
-OUTPUT
+.sub bnots_cow
+    set $S1, "foo"
+    substr $S2, $S1, 0, 3
+    bnots $S1, $S1
+    is( $S2, "foo", 'bnots COW' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'split on non-empty string' );
-_main:
-    split P0, "a", "afooabara"
-    set I0, P0
-    print I0
-    print "\n"
-    set I1, 0
-loop:
-    set S0, P0[I1]
-    print S0
-    print "\n"
-    inc I1
-    sub I2, I1, I0
-    if I2, loop
-    end
-CODE
-5
+.sub transcode_to_utf8
+    skip( 2, "no more transcode" )
+    # set $S1, "ASCII is the same as UTF8\n"
+    # find_encoding $I1, "utf8"
+    # transcode $S2, $S1, $I1
+    # is( $S1, "ASCII is the same as UTF8", 'transcode to utf8' )
+    # is( $S2, "ASCII is the same as UTF8", 'transcode to utf8' )
+.end
 
-foo
-b
-r
+.sub string_chartype
+    skip( 1, "no more chartype" )
 
-OUTPUT
+    # set $S0, "Test String"
+    # find_chartype $I0, "usascii"
+    # set_chartype $S0, $I0
+    # string_chartype $I1, $S0
+    # is( $I0, $I1, 'string_chartype' )
+.end
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'split HLL mapped' );
+.sub split_on_empty_string
+    split $P1, "", ""
+    set $I1, $P1
+    is( $I1, "0", 'split on empty string' )
+    
+    split $P0, "", "ab"
+    set $I0, $P0
+    is( $I0, "2", 'split on empty string' )
+    
+    set $S0, $P0[0]
+    is( $S0, "a", 'split on empty string' )
+    
+    set $S0, $P0[1]
+    is( $S0, "b", 'split on empty string' )
+.end
+
+.sub split_on_non_empty_string
+    split $P0, "a", "afooabara"
+    set $I0, $P0
+    is( $I0, "5", 'split on non-empty string' )
+    
+    set $S0, $P0[0]
+    is( $S0, "", 'split on non-empty string' )
+    set $S0, $P0[1]
+    is( $S0, "foo", 'split on non-empty string' )
+    set $S0, $P0[2]
+    is( $S0, "b", 'split on non-empty string' )
+    set $S0, $P0[3]
+    is( $S0, "r", 'split on non-empty string' )
+    set $S0, $P0[4]
+    is( $S0, "", 'split on non-empty string' )
+.end
+
+.sub test_join
+    new $P0, 'ResizablePMCArray'
+    join $S0, "--", $P0
+    is( $S0, "", 'join' )
+
+    push $P0, "a"
+    join $S0, "--", $P0
+    is( $S0, "a", 'join' )
+    
+    new $P0, 'ResizablePMCArray'
+    push $P0, "a"
+    push $P0, "b"
+    join $S0, "--", $P0
+    is( $S0, "a--b", 'join' )
+.end
+
+# join: get_string returns a null string --------
+.namespace ["Foo5"]
+    .sub get_string :vtable :method
+        .local string ret
+        null ret
+        .begin_return
+        .set_return ret
+        .end_return
+    .end
+.namespace []   # revert to root for next test
+.sub join_get_string_returns_a_null_string
+    newclass $P0, "Foo5"
+    new $P0, 'ResizablePMCArray'
+    $P1 = new "Foo5"
+    push $P0, $P1
+    join $S0, "", $P0
+    is( $S0, "", 'join: get_string returns a null string' )
+.end
+
+.sub eq_addr_or_ne_addr
+    set $S0, "Test"
+    set $S1, $S0
+
+    set $I99, 1
+    eq_addr $S1, $S0, OK1
+      set $I99, 0
+  OK1:
+    ok($I99, 'eq_addr/ne_addr')
+
+    set $S1, "Test"
+    set $I99, 0
+    eq_addr $S1, $S0, BAD2
+      set $I99, 1
+  BAD2:
+    ok($I99, 'eq_addr/ne_addr')
+
+    set $I99, 1
+    ne_addr $S1, $S0, OK3
+      set $I99, 0
+  OK3:
+    ok($I99, 'eq_addr/ne_addr')
+
+    set $S0, $S1
+    set $I99, 0
+    ne_addr $S1, $S0, BAD4
+      set $I99, 1
+  BAD4:
+    ok($I99, 'eq_addr/ne_addr')
+.end
+
+.sub test_if_null_s_ic
+    set $S0, "foo"
+    $I99 = 0
+    if_null $S0, ERROR
+      $I99 = 1
+  ERROR:
+    ok($I99, 'if_null s_ic' ) 
+
+    null $S0
+    $I99 = 1
+    if_null $S0, OK
+        $I99 = 0
+  OK: 
+    ok($I99, 'if_null s_ic' ) 
+.end
+
+.sub test_upcase
+    set $S0, "abCD012yz"
+    upcase $S1, $S0
+    is( $S1, "ABCD012YZ", 'upcase' )
+    
+    upcase $S0
+    is( $S0, "ABCD012YZ", 'upcase' )
+.end
+
+.sub test_downcase
+    set $S0, "ABcd012YZ"
+    downcase $S1, $S0
+    is( $S1, "abcd012yz", 'test_downcase' )
+    
+    downcase $S0
+    is( $S0, "abcd012yz", 'test_downcase' )
+.end
+
+.sub test_titlecase
+    set $S0, "aBcd012YZ"
+    titlecase $S1, $S0
+    is( $S1, "Abcd012yz", 'test_titlecase' )
+    
+    titlecase $S0
+    is( $S0, "Abcd012yz", 'test_titlecase' )
+.end
+
+.sub three_param_ord_one_character_string_register_i
+    set $S0,"a"
+    set $I1, 0
+    ord $I0,$S0,$I1
+    is( $I0, "97", '3-param ord, one-character string register, I' )
+.end
+
+.sub three_param_ord_multi_character_string_i
+    set $I1, 1
+    ord $I0,"ab",$I1
+    is( $I0, "98", '3-param ord, multi-character string, I' )
+.end
+
+.sub three_param_ord_multi_character_string_register_i
+    set $I1, 1
+    set $S0,"ab"
+    ord $I0,$S0,$I1
+    is( $I0, "98", '3-param ord, multi-character string register, I' )
+.end
+
+.sub exception_three_param_ord_multi_character_string_i
+    push_eh handler
+    set $I1, 2
+    ord $I0,"ab",$I1
+    ok( 0, 'no exception: 3-param ord, multi-character string, I' )
+  handler:
+    .exception_is( 'Cannot get character past end of string' )
+.end
+
+.sub exception_three_param_ord_multi_character_string_i
+    push_eh handler
+    set $I1, 2
+    set $S0,"ab"
+    ord $I0,$S0,$I1
+    ok( 0, 'no exception: 3-param ord, multi-character string, I' )
+  handler:
+    .exception_is( 'Cannot get character past end of string' )
+.end
+
+.sub three_param_ord_one_character_string_from_end_i
+    set $I1, -1
+    ord $I0,"a",$I1
+    is( $I0, "97", '3-param ord, one-character string, from end, I' )
+.end
+
+.sub three_param_ord_one_character_string_register_from_end_i
+    set $I1, -1
+    set $S0,"a"
+    ord $I0,$S0,$I1
+    is( $I0, "97", '3-param ord, one-character string register, from end, I' )
+.end
+
+.sub three_param_ord_multi_character_string_from_end_i
+    set $I1, -1
+    ord $I0,"ab",$I1
+    is( $I0, "98", '3-param ord, multi-character string, from end, I' )
+.end
+
+.sub three_param_ord_multi_character_string_register_from_end_i
+    set $I1, -1
+    set $S0,"ab"
+    ord $I0,$S0,$I1
+    is( $I0, "98", '3-param ord, multi-character string register, from end, I' )
+.end
+
+.sub exception_three_param_ord_multi_character_string_register_from_end_oob_i
+    push_eh handler
+    set $I1, -3
+    set $S0,"ab"
+    ord $I0,$S0,$I1
+    ok( 0, 'no exception: 3-param ord, multi-character string register, from end, OOB, I' )
+  handler:
+    .exception_is( 'Cannot get character before beginning of string' )
+.end
+
+# Utility method for more_string_to_int
+.sub 'print_as_integer'
+    .param string s
+    .param string answer
+    $I0 = s
+    concat $S99, 'string to int: ', s
+    is( $I0, answer, $S99 )
+.end
+
+.sub more_string_to_int
+    print_as_integer('-4', "-4")
+    print_as_integer('X-4',"0")
+    print_as_integer('--4',"0")
+    print_as_integer('+',"0")
+    print_as_integer('++',"0")
+    print_as_integer('+2',"2")
+    print_as_integer(' +3',"3")
+    print_as_integer('++4',"0")
+    print_as_integer('+ 5',"0")
+    print_as_integer('-',"0")
+    print_as_integer('--56',"0")
+    print_as_integer('  -+67',"0")
+    print_as_integer('+-78',"0")
+    print_as_integer('  -089xyz',"-89")
+    print_as_integer('- 89',"0")
+.end
+
+# Utility sub for constant_string_and_modify_in_situ_op_rt_bug_60030
+.sub doit_sub_for_but_60030
+    .param string s
+    $I0 = index s, '::'
+    is( s, "Foo::Bar", 'bug 60030' )
+    substr s, $I0, 2, "/"
+    is( s, "Foo/Bar", 'bug 60030' )
+    collect
+    is( s, "Foo/Bar", 'bug 60030' )
+.end
+.sub constant_string_and_modify_in_situ_op_rt_bug_60030
+    
+    doit_sub_for_but_60030('Foo::Bar')
+    # repeat to prove that the constant 'Foo4::Bar4' remains unchanged
+    doit_sub_for_but_60030('Foo::Bar')
+.end
+
+.sub corner_cases_of_numification
+    is( 2147483647.0, "2147483647", 'corner cases of numification' )
+    is( -2147483648.0, "-2147483648", 'corner cases of numification' )
+.end
+
+.sub non_canonical_nan_and_inf
+    $N0 = 'nan'
+    is( $N0, "NaN", 'Non canonical nan and inf' )
+
+    $N0 = 'iNf'
+    is( $N0, "Inf", 'Non canonical nan and inf' )
+
+    $N0 = 'INFINITY'
+    is( $N0, "Inf", 'Non canonical nan and inf' )
+
+    $N0 = '-INF'
+    is( $N0, "-Inf", 'Non canonical nan and inf' )
+
+    $N0 = '-Infinity'
+    is( $N0, "-Inf", 'Non canonical nan and inf' )
+.end
+
 .HLL 'foohll'
-.sub main
+.sub split_hll_mapped
+    .include 'test_more.pir'
+
     .local pmc RSA, fooRSA
     RSA = get_class ['ResizableStringArray']
     fooRSA = subclass ['ResizableStringArray'], 'fooRSA'
+
     .local pmc interp
     interp = getinterp
     interp.'hll_map'(RSA, fooRSA)
+
     .local pmc a
     split a, "a", "afooabara"
+
     .local string t
     t = typeof a
-    say t
+    is( t, 'fooRSA', 'split - hll mapped' )
+
     .local int n, i
     n = a
-    say n
-    i = 0
-loop:
+    is( n, '5', 'split - hll mapped' )
+
     .local string s
-    s = a[i]
-    say s
-    inc i
-    if i != n goto loop
+    s = a[0]
+    is( s, '', 'split - hll mapped' )
+    s = a[1]
+    is( s, 'foo', 'split - hll mapped' )
+    s = a[2]
+    is( s, 'b', 'split - hll mapped' )
+    s = a[3]
+    is( s, 'r', 'split - hll mapped' )
+    s = a[4]
+    is( s, '', 'split - hll mapped' )
 .end
-CODE
-fooRSA
-5
-
-foo
-b
-r
-
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'join' );
-_main:
-    new P0, 'ResizablePMCArray'
-    join S0, "--", P0
-    print S0
-    print "\n"
-    push P0, "a"
-    join S0, "--", P0
-    print S0
-    print "\n"
-    new P0, 'ResizablePMCArray'
-    push P0, "a"
-    push P0, "b"
-    join S0, "--", P0
-    print S0
-    print "\n"
-    end
-CODE
-
-a
-a--b
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', 'join: get_string returns a null string' );
-
-.sub _main
-    newclass $P0, "Foo"
-
-    new $P0, 'ResizablePMCArray'
-
-    $P1 = new "Foo"
-
-    push $P0, $P1
-
-    print "a"
-    join $S0, "", $P0
-    print "b"
-    print $S0
-    print "c\n"
-    end
-.end
-
-.namespace ["Foo"]
-
-.sub get_string :vtable :method
-    .local string ret
-
-    null ret
-    .begin_return
-    .set_return ret
-    .end_return
-.end
-CODE
-abc
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'eq_addr/ne_addr' );
-        set S0, "Test"
-        set S1, S0
-        eq_addr S1, S0, OK1
-        print "not "
-OK1:    print "ok 1\n"
-        set S1, "Test"
-        eq_addr S1, S0, BAD2
-        branch OK2
-BAD2:   print "not "
-OK2:    print "ok 2\n"
-
-        ne_addr S1, S0, OK3
-        print "not "
-OK3:    print "ok 3\n"
-        set S0, S1
-        ne_addr S1, S0, BAD4
-        branch OK4
-BAD4:   print "not "
-OK4:    print "ok 4\n"
-        end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'if_null_s_ic' );
-    set S0, "foo"
-    if_null S0, ERROR
-    print "ok 1\n"
-    null S0
-    if_null S0, OK
-ERROR:  print "error\n"
-    end
-OK: print "ok 2\n"
-    end
-CODE
-ok 1
-ok 2
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'upcase' );
-  set S0, "abCD012yz\n"
-  upcase S1, S0
-  print S1
-  upcase S0
-  print S0
-  end
-CODE
-ABCD012YZ
-ABCD012YZ
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'downcase' );
-  set S0, "ABcd012YZ\n"
-  downcase S1, S0
-  print S1
-  downcase S0
-  print S0
-  end
-CODE
-abcd012yz
-abcd012yz
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'titlecase' );
-  set S0, "aBcd012YZ\n"
-  titlecase S1, S0
-  print S1
-  titlecase S0
-  print S0
-  end
-CODE
-Abcd012yz
-Abcd012yz
-OUTPUT
-
-pasm_output_is( <<'CODE', ord('a'), '3-param ord, one-character string register, I' );
-    set S0,"a"
-    set I1, 0
-    ord I0,S0,I1
-    print I0
-    end
-CODE
-
-pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string, I' );
-    set I1, 1
-    ord I0,"ab",I1
-    print I0
-    end
-CODE
-
-pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string register, I' );
-    set I1, 1
-    set S0,"ab"
-    ord I0,S0,I1
-    print I0
-    end
-CODE
-
-pasm_error_output_like( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string, I' );
-    set I1, 2
-    ord I0,"ab",I1
-    print I0
-    end
-CODE
-/^Cannot get character past end of string/
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<'OUTPUT', '3-param ord, multi-character string, I' );
-    set I1, 2
-    set S0,"ab"
-    ord I0,S0,I1
-    print I0
-    end
-CODE
-/^Cannot get character past end of string/
-OUTPUT
-
-pasm_output_is( <<'CODE', ord('a'), '3-param ord, one-character string, from end, I' );
-    set I1, -1
-    ord I0,"a",I1
-    print I0
-    end
-CODE
-
-pasm_output_is( <<'CODE', ord('a'), '3-param ord, one-character string register, from end, I' );
-    set I1, -1
-    set S0,"a"
-    ord I0,S0,I1
-    print I0
-    end
-CODE
-
-pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string, from end, I' );
-    set I1, -1
-    ord I0,"ab",I1
-    print I0
-    end
-CODE
-
-pasm_output_is( <<'CODE', ord('b'), '3-param ord, multi-character string register, from end, I' );
-    set I1, -1
-    set S0,"ab"
-    ord I0,S0,I1
-    print I0
-    end
-CODE
-
-pasm_error_output_like(
-    <<'CODE', <<'OUTPUT', '3-param ord, multi-character string register, from end, OOB, I' );
-    set I1, -3
-    set S0,"ab"
-    ord I0,S0,I1
-    print I0
-        end
-CODE
-/^Cannot get character before beginning of string/
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUT', 'more string_to_int' );
-   .sub 'main' :main
-      print_as_integer('-4')
-      print_as_integer('X-4')
-      print_as_integer('--4')
-      print_as_integer('+')
-      print_as_integer('++')
-      print_as_integer('+2')
-      print_as_integer(' +3')
-      print_as_integer('++4')
-      print_as_integer('+ 5')
-      print_as_integer('-')
-      print_as_integer('--56')
-      print_as_integer('  -+67')
-      print_as_integer('+-78')
-      print_as_integer('  -089xyz')
-      print_as_integer('- 89')
-   .end
-
-   .sub 'print_as_integer'
-      .param string s
-      $I0 = s
-      print $I0
-      print "\n"
-   .end
-CODE
--4
-0
-0
-0
-0
-2
-3
-0
-0
-0
-0
-0
-0
--89
-0
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', 'constant string and modify-in-situ op (RT #60030)' );
-.sub doit
-    .param string s
-    $I0 = index s, '::'
-    say s
-    substr s, $I0, 2, "/"
-    say s
-    collect
-    say s
-.end
-
-.sub main :main
-    doit('Foo::Bar')
-
-    # repeat to prove that the constant 'Foo::Bar' remains unchanged
-    doit('Foo::Bar')
-.end
-CODE
-Foo::Bar
-Foo/Bar
-Foo/Bar
-Foo::Bar
-Foo/Bar
-Foo/Bar
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', 'Corner cases of numification' );
-.sub main :main
-    say 2147483647.0
-    say -2147483648.0
-.end
-CODE
-2147483647
--2147483648
-OUT
-pir_output_is( <<'CODE', <<'OUT', 'Non canonical nan and inf' );
-.sub main :main
-    $N0 = 'nan'
-    say $N0
-    $N0 = 'iNf'
-    say $N0
-    $N0 = 'INFINITY'
-    say $N0
-    $N0 = '-INF'
-    say $N0
-    $N0 = '-Infinity'
-    say $N0
-.end
-CODE
-NaN
-Inf
-Inf
--Inf
--Inf
-OUT
-
-
 
 # Local Variables:
-#   mode: cperl
+#   mode: pir
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir :
