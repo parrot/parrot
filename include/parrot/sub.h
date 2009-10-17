@@ -217,6 +217,7 @@ void invalidate_retc_context(PARROT_INTERP, ARGMOD(PMC *cont))
         FUNC_MODIFIES(*cont);
 
 void mark_context_start(void);
+PARROT_EXPORT
 void Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

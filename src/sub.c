@@ -462,6 +462,7 @@ Capture the current lexical environment of a sub.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
 {
