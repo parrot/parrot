@@ -799,8 +799,7 @@
 ##        if ($<sym> eq 'class') {
 ##            my $classpast :=
 ##                PAST::Op.new(
-##                    PAST::Var.new( :name('P6metaclass'), :scope('package'),
-##                                   :namespace([]) ),
+##                    ...P6metaclass...,
 ##                    ~$<name>,
 ##                    :pasttype('callmethod'), :name('new_class')
 ##                );
@@ -828,9 +827,8 @@
     $S0 = match['sym']
     if $S0 != 'class' goto class_done
     .local pmc classvar, classop
-    $P0 = get_hll_global ['PAST'], 'Var'
-    $P1 = new ['ResizablePMCArray']
-    classvar = $P0.'new'( 'name'=>'P6metaclass', 'scope'=>'package', 'namespace'=>$P1)
+    $P0 = get_hll_global ['PAST'], 'Op'
+    classvar = $P0.'new'( 'inline'=>'%r = get_root_global ["parrot"], "P6metaclass"' )
     $P0 = get_hll_global ['PAST'], 'Op'
     $S0 = match['name']
     classop = $P0.'new'( classvar, $S0, 'pasttype'=>'callmethod', 'name'=>'new_class')
