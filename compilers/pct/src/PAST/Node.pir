@@ -690,8 +690,8 @@ subid for the block if one does not already exist.
     .local pmc suffix
     suffix = get_global '$!subid_suffix'
     unless null suffix goto have_suffix
-    $I0 = time
-    $S0 = $I0
+    $N0 = time
+    $S0 = $N0
     $S0 = concat '_', $S0
     suffix = box $S0
     set_global '$!subid_suffix', suffix
