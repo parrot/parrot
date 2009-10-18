@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 23;
+use Test::More tests => 27;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
 use_ok('config::auto::frames');
@@ -102,7 +102,6 @@ $conf->data->set( osname => 'linux' );
 my $rv;
 
 $can_build_call_frames = 0;
-
 $rv = $step->_handle_can_build_call_frames( $conf, $can_build_call_frames );
 ok( $rv, "_handle_can_build_call_frames() returned true value" );
 ok( ! $conf->data->get( 'cc_build_call_frames'),
@@ -113,6 +112,21 @@ is( $step->result(), 'no', "Result is 'no', as expected" );
 
 $conf->data->set( 'cc_build_call_frames' => undef );
 $conf->data->set( 'has_exec_protect' => undef );
+
+$can_build_call_frames = 1;
+my $realos = $conf->data->get( 'osname' );
+$conf->data->set( 'osname' => 'foobar' );
+$rv = $step->_handle_can_build_call_frames( $conf, $can_build_call_frames );
+ok( $rv, "_handle_can_build_call_frames() returned true value" );
+is( $conf->data->get( 'cc_build_call_frames'), '-DCAN_BUILD_CALL_FRAMES',
+    "cc_build_call_frames set to expected value" );
+is( $conf->data->get( 'has_exec_protect' ), 0,
+    "has_exec_protect is 0, as expected" );
+is( $step->result(), 'yes', "Result is 'yes', as expected" );
+
+$conf->data->set( 'cc_build_call_frames' => undef );
+$conf->data->set( 'has_exec_protect' => undef );
+$conf->data->set( 'osname' => $realos );
 
 pass("Completed all tests in $0");
 
