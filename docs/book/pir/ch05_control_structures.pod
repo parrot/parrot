@@ -17,7 +17,7 @@ X<goto instruction>
 X<unconditional branch>
 An unconditional branch always jumps to a specified label.  PIR has only
 one unconditional branch instruction, C<goto>. In this example, the
-first C<print> statement never runs because the C<goto> always skips
+first C<say> statement never runs because the C<goto> always skips
 over it to the label C<skip_all_that>:
 
 =begin PIR_FRAGMENT
