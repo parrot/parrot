@@ -818,25 +818,25 @@ okay:
 CODE
 
 pir_output_is(
-    <<'CODE', <<'OUTPUT', "CLONE_CODE|CLONE_GLOBALS|CLONE_HLL|CLONE_LIBRARIES", todo => 'RT #41373' );
+    <<'CODE', <<'OUTPUT', 'CLONE_CODE|CLONE_GLOBALS|CLONE_HLL|CLONE_LIBRARIES - RT #41373' );
 .HLL 'Perl'
-.loadlib 'perl_group'
 
 .include 'interpinfo.pasm'
 
+.loadlib 'foo_group'
 .loadlib 'myops_ops'
 
 .sub test
     .param pmc passed_value
     .local pmc the_value
-    the_value = new ['PerlInt']
+    the_value = new ['Integer']
     the_value = 42
     set_hll_global ['Foo'], 'x', the_value
     $S0 = typeof passed_value
     $S1 = typeof the_value
     $I0 = iseq $S0, $S1
-    print $I0
-    print "\n"
+    say $I0
+
     .local pmc ns
     ns = get_namespace ['Foo']
     $P0 = interpinfo .INTERPINFO_CURRENT_SUB
@@ -846,11 +846,10 @@ pir_output_is(
     if $P0 == the_value goto okay
     print "not "
 okay:
-    print "ok (equal)\n"
+    say "ok (equal)"
 
     $I0 = the_value
-    print $I0
-    print "\n"
+    say $I0
 .end
 
 .include 'cloneflags.pasm'
@@ -865,15 +864,15 @@ okay:
     bor flags, flags, .PARROT_CLONE_LIBRARIES
 
     .local pmc passed
-    passed = new ['PerlInt']
+    passed = new ['Foo']
     passed = 15
 
     .local pmc thread_func
     thread_func = get_global 'test'
-    print "in thread:\n"
+    say "in thread:"
     thread.'run'(flags, thread_func, passed)
     thread.'join'()
-    print "in main:\n"
+    say "in main:"
     thread_func(passed)
 .end
 CODE
