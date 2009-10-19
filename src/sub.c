@@ -286,31 +286,31 @@ Parrot_Sub_get_line_from_pc(PARROT_INTERP, ARGIN_NULLOK(PMC *subpmc), ARGIN_NULL
 {
     ASSERT_ARGS(Parrot_Sub_get_line_from_pc)
     Parrot_Sub_attributes *sub;
-    PackFile_Debug        *debug;
-    opcode_t              *base_pc;
-    size_t                 i, n, offs;
+    opcode_t              *base_pc, *debug_ops;
+    size_t                 i, op, current_annotation, debug_size;
 
     if (!subpmc || !pc)
         return -1;
 
     PMC_get_sub(interp, subpmc, sub);
 
-    offs    = pc - sub->seg->base.data;
-    debug   = sub->seg->debugs;
-    base_pc = sub->seg->base.data;
+    debug_ops          = sub->seg->debugs->base.data;
+    debug_size         = sub->seg->debugs->base.size;
+    base_pc            = sub->seg->base.data;
+    current_annotation = pc - base_pc;
 
-    for (i = n = 0; n < sub->seg->base.size; i++) {
+    for (i = op = 0; op < debug_size; i++) {
         op_info_t * const op_info  = &interp->op_info_table[*base_pc];
         opcode_t          var_args = 0;
 
-        if (i >= debug->base.size)
+        if (i >= debug_size)
             return -1;
 
-        if (n >= offs)
-            return debug->base.data[i];
+        if (op >= current_annotation)
+            return debug_ops[i];
 
         ADD_OP_VAR_PART(interp, sub->seg, base_pc, var_args);
-        n       += op_info->op_count + var_args;
+        op      += op_info->op_count + var_args;
         base_pc += op_info->op_count + var_args;
     }
 
