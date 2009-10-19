@@ -1010,7 +1010,7 @@ parrot_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_
 =item C<void parrot_hash_destroy(PARROT_INTERP, Hash *hash)>
 
 Frees the memory allocated to the specified hash and its bucket store.  Used by
-Parrot_chash_destroy.
+parrot_chash_destroy.
 
 =cut
 
