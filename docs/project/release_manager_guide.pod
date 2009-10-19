@@ -10,7 +10,7 @@ To prepare a release:
 =item 0.
 
 As soon as you become the release manager: review the goals for the release on
-the Parrot roadmap (L<https://trac.parrot.org/parrot/wiki/ParrotRoadmap>) and
+the Parrot roadmap (L<https://trac.parrot.org/parrot/roadmap>) and
 announce the tasks to the Parrot mailing list.  Make sure everyone knows what
 they've committed to accomplish in time for the release.
 
