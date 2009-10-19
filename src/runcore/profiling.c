@@ -147,6 +147,7 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
     runcore->runloop_count   = 0;
     runcore->level           = 0;
     runcore->time_size       = 32;
+    runcore->line_cache      = parrot_new_pointer_hash(interp);
     runcore->time            = mem_allocate_n_typed(runcore->time_size,
                                                     UHUGEINTVAL);
     Profiling_first_loop_SET(runcore);
@@ -257,9 +258,13 @@ ARGIN(opcode_t *pc))
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
                     "attempt to access code outside of current code segment");
 
-        preop_line = Parrot_Sub_get_line_from_pc(interp,
-                Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp)),
-                CONTEXT(interp)->current_pc);
+        preop_line = parrot_hash_get(interp, runcore->line_cache, CONTEXT(interp)->current_pc);
+        if (preop_line == NULL) {
+            preop_line = Parrot_Sub_get_line_from_pc(interp,
+                    Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp)),
+                    CONTEXT(interp)->current_pc);
+            parrot_hash_put(interp, runcore->line_cache, CONTEXT(interp)->current_pc, preop_line);
+        }
 
         CONTEXT(interp)->current_pc = pc;
         preop_sub                   = CONTEXT(interp)->current_sub;
@@ -367,6 +372,7 @@ destroy_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore)
         "output from this file.\n", filename_cstr);
 
     Parrot_str_free_cstring(filename_cstr);
+    parrot_hash_destroy(interp, runcore->line_cache);
 
     fclose(runcore->profile_fd);
     mem_sys_free(runcore->time);

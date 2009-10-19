@@ -45,6 +45,7 @@ struct profiling_runcore_t {
     UINTVAL         level;      /* how many nested runloops */
     UINTVAL         time_size;  /* how big is the following array */
     UHUGEINTVAL    *time;       /* time spent between DO_OP and start/end of a runcore */
+    Hash           *line_cache; /* hash for caching pc -> line mapping */
 };
 
 
