@@ -27,7 +27,7 @@ Test handling C<dest> arg in 3-args arithmetic.
     interp = getinterp
     .local pmc config
     config = interp[.IGLOBALS_CONFIG_HASH]
-    .local int gmp
+    .local string gmp
     gmp = config['gmp']
 
     run_tests_for('Integer')
