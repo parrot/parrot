@@ -152,10 +152,18 @@ number types.
 # print -0.0 as -0
 #
 .sub negate_minus_zero_point_zero
+    .include 'sysinfo.pasm'
+    $S9 = sysinfo .SYSINFO_PARROT_OS
+
     set $N0, 0
     neg $N0
     $S0 = $N0
+    if $S9 == 'MSWin32' goto Todo_test1
     is( $S0, "-0", '1' )
+    goto End_test1
+Todo_test1:
+    todo(1, 'Faulty on this platform')
+End_test1:
 
     set $N0, -0.0
     neg $N0
@@ -171,7 +179,12 @@ number types.
     set $N1, 1
     neg $N1, $N0
     $S0 = $N1
+    if $S9 == 'MSWin32' goto Todo_test4
     is( $S0, "-0", '4' )
+    goto End_test4
+Todo_test4:
+    todo(1, 'Faulty on this platform')
+End_test4:
 .end
  
 #

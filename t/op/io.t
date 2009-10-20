@@ -51,6 +51,22 @@ Tests various io opcodes.
     ok(1, 'open with null mode')
 .end
 
+.sub 'tt661_todo_test' :anon
+    # Checks whether the platform is linux, MSWin32, darwin: on other
+    # platforms, the following tests are todo'ed.
+    .include 'sysinfo.pasm'
+    $S0 = sysinfo .SYSINFO_PARROT_OS
+    if $S0 == 'linux' goto tt661_ok
+#    if $S0 == 'MSWin32' goto tt661_ok
+    if $S0 == 'darwin' goto tt661_ok
+    if $S0 == 'openbsd' goto tt661_ok
+
+    .return (0)
+
+  tt661_ok:
+    .return (1)
+.end
+
 .include 'iglobals.pasm'
 
 .sub 'open_pipe_for_reading'
@@ -87,6 +103,8 @@ Tests various io opcodes.
 .end
 
 .sub 'open_pipe_for_writing'
+    $I0 = tt661_todo_test()
+    unless $I0 goto open_pipe_for_writing_todoed
     .local pmc interp
     interp = getinterp
 
@@ -119,6 +137,10 @@ Tests various io opcodes.
   open_pipe_for_writing_failed:
     nok(1, 'open pipe for writing')
     .return ()
+
+  open_pipe_for_writing_todoed:
+    todo(1, 'Unimplemented in this platform, TT #661')
+
 .end
 
 # Local Variables:
