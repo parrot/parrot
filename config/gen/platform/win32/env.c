@@ -131,7 +131,7 @@ Parrot_unsetenv(PARROT_INTERP, STRING *name)
    string -- in other words, by specifying only varname=.
        -- _putenv, _wputenv (CRT) documentation
 */
-    Parrot_setenv(interp, name, "");
+    Parrot_setenv(interp, name, Parrot_str_new(interp, "", 0));
 }
 
 /*
