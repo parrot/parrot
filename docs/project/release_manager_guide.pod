@@ -42,8 +42,10 @@ Make sure you're up to date:
 
  $ svn update
 
-You may want to ask the developer base to stop committing big changes;
-it will avoid complications.
+You should notify other developers the Saturday before a release to stop
+committing non-release related code to trunk.  This will help avoid
+complications. They are of course free to commit to branches as much as
+they like.
 
 =item 2.
 
