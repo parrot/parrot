@@ -509,6 +509,7 @@ D: pir-mode.el: fix for xemacs plus bugfixes and cleanups
 N: Jonathan Leto
 E: jonathan@leto.net
 W: http://leto.net
+D: Release manager for 1.7.0
 U: dukeleto
 A: leto
 A: Duke Leto

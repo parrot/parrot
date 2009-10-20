@@ -1,5 +1,29 @@
 # $Id$
 
+New in 1.7.0
+- Functionality
+ + Parrot_capture_lex has been added to the PARROT_EXPORT API
+ + PARROT_MAX_ARGS has been increased from 8 to 16 to allow for ops that take more than 8 args
+- Performance
+ + The profiling runcore now caches metadata for improved performance
+- Maintenance and cleanup
+  + Expanded the Parrot debugger documentation
+  + Parrot debugger now uses the new Parrot STRING API
+  + Continue to port rest of internals to use the STRING API
+- Deprecations
+ + The JIT subsystem has been removed and is being written from the ground up. More
+   information can be found at https://trac.parrot.org/parrot/wiki/JITRewrite
+ + Implicit optional named parameters (eligible in 2.1)
+ + Continuation-based ExceptionHandlers (eligible in 2.1)
+ + Use of undocumented variables in class_init (eligible in 2.1)
+ + Parrot_oo_get_namespace (eligible in 2.1)
+- Bugfix
+  + Improved line number tracking in IMCC
+- Tests
+  + Converted many more Perl 5 tests to PIR
+  + Expanded test coverage of the CallSignature, Namespace, FixedPMCArray,
+    ResizeableIntegerArray and ExceptionHandler PMCs
+
 New in 1.6.0
 - Functionality
   + Added a fixed-size structure allocator to the Garbage Collector

@@ -11,7 +11,7 @@ This document records Parrot source code releases, and their release managers.
 Simon Cozens, Jeff Goff, Steve Fink, Leo Toetsch, Chip Salzenberg, Jerry Gay,
 Patrick Michaud, Will Coleda, Matt Diephouse, chromatic, Allison Randal,
 Jonathan Worthington, Bob Rogers, Bernhard Schmalhofer, Andrew Whitworth,
-Francois Perrad.
+Francois Perrad, Jonathan Leto.
 
 
 =head1 THE RECORDS
@@ -95,5 +95,6 @@ Francois Perrad.
  cotto       1.4.0          2009-Jul-21     "Mundo Cani"
  Whiteknight 1.5.0          2009-Aug-18     "TEH PARROTZ!"
  Jerry       1.6.0          2009-Sep-15     "half-pie"
+ dukeleto    1.7.0          2009-Oct-20     "African Grey"
 
 =cut
