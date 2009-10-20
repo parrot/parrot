@@ -22,7 +22,7 @@ linux-x86-llvm-gcc-4.2            Y    ?     ?   ?   Y    Y     ?  20090819
 sol10-sparc-cc_5.9           B4   Y    -     Y   Y   Y    Y     ?  20090720
 sol10-sparc-cc_5.9           B8   Y    -     Y   Y   Y    Y     ?  20090720
 win32-x86-mingw_gcc3.4.5          Y    -     -   -   Y    Y/1   Y  20091020
-win32-x86-msvc_9.0                -    -     Y   -   Y    Y     ?  20090317
+win32-x86-msvc_9.0                -    -     Y   -   Y    Y/15  Y  20091020
 
 
 Extra Platforms:
@@ -54,7 +54,7 @@ netbsd5.0-sparc64-gcc-4.1.3  B8   Y    -     Y   Y   Y    Y/1   ?  20090519
 netbsd5.0-x86_64-gcc-4.1.3    8   Y    -     Y   Y   Y    Y     ?  20090419
 win32-x86-mingw_gcc4.3.0          Y    -     -   -   Y    Y/88  ?  20081203
 win32-x86-msvc_6.0            4   -    -     -   -   Y    Y/8   ?  20090315
-win32-x64-msvc_9.0            8   -    -     -   -   Y    Y/51  ?  20081203
+win32-x64-msvc_9.0            8   -    -     -   -   Y    Y/17  ?  20091020
 win32-x64-mingw_gcc3.4.5      8   Y    ?     ?   ?   Y    Y     ?  20090210
 win64-amd64-msvc_9.0          8   N    N     ?   ?   Y*1  N     ?  20090720
 
