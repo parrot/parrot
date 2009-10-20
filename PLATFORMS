@@ -10,52 +10,52 @@ docs/parrot.pod) and "Extra".
 
 
 Supported platforms:
-Platform                     B8    Runloops      Feature Comp Test Inst YYYYMMDD
-                                CGoto JIT EXEC   Thr Sig
+Platform                     B8  Runloops   Feature Comp Test Inst YYYYMMDD
+                                CGoto EXEC   Thr Sig
 --------------------------------------------------------------------------------
-cygwin1.5.25-x86-gcc3.4.4     4   Y    Y    -     -   -   Y    Y     Y  20090315
-darwin8.11.1-x86-gcc4.0.1    ??   Y    N    ?     ?   ?   Y    Y     N  20091020
-linux-x86-gcc4.1.2                Y    Y    ?     Y   Y   Y    Y     ?  20090419
-linux-x86-gcc4.2.4                Y    Y    ?     Y   Y   Y    Y     ?  20081023
-linux-x86-gcc4.3.2                Y    Y    ?     Y   Y   Y    Y     ?  20081030
-linux-x86-llvm-gcc-4.2            Y    Y    ?     ?   ?   Y    Y     ?  20090819
-sol10-sparc-cc_5.9           B4   Y    -    -     Y   Y   Y    Y     ?  20090720
-sol10-sparc-cc_5.9           B8   Y    -    -     Y   Y   Y    Y     ?  20090720
-win32-x86-mingw_gcc3.4.5          Y    Y    -     -   -   Y    Y/1   Y  20091020
-win32-x86-msvc_9.0                -    Y    -     Y   -   Y    Y     ?  20090317
+cygwin1.5.25-x86-gcc3.4.4     4   Y    -     -   -   Y    Y     Y  20090315
+darwin8.11.1-x86-gcc4.0.1    ??   Y    ?     ?   ?   Y    Y     N  20091020
+linux-x86-gcc4.1.2                Y    ?     Y   Y   Y    Y     ?  20090419
+linux-x86-gcc4.2.4                Y    ?     Y   Y   Y    Y     ?  20081023
+linux-x86-gcc4.3.2                Y    ?     Y   Y   Y    Y     ?  20081030
+linux-x86-llvm-gcc-4.2            Y    ?     ?   ?   Y    Y     ?  20090819
+sol10-sparc-cc_5.9           B4   Y    -     Y   Y   Y    Y     ?  20090720
+sol10-sparc-cc_5.9           B8   Y    -     Y   Y   Y    Y     ?  20090720
+win32-x86-mingw_gcc3.4.5          Y    -     -   -   Y    Y/1   Y  20091020
+win32-x86-msvc_9.0                -    -     Y   -   Y    Y     ?  20090317
 
 
 Extra Platforms:
 
-Platform                     B8    Runloops      Feature Comp Test Inst YYYYMMDD
-                                CGoto JIT EXEC   Thr Sig
+Platform                     B8  Runloops   Feature Comp Test Inst YYYYMMDD
+                                CGoto EXEC   Thr Sig
 --------------------------------------------------------------------------------
-cygwin1.7.0-x86-gcc4.3.2      4   Y    Y    -     -   -   Y    Y     Y  20090315
-dragonfly2.2.0-i386-gcc-4.1.2 4   Y    Y    -     Y   Y   Y    Y     ?  20090427
-freebsd-x86-gcc-4.2.1         4   Y    Y    Y     ?   ?   Y    Y     Y  20090415
-freebsd-amd64-gcc-4.2.1       8   Y    -    -     ?   ?   Y    Y     Y  20090720
-linux-amd64-clang-r73854      8   ?    ?    =     Y   Y   Y/4  Y/1   ?  20090622
-linux-amd64-clang-r75433      8   Y    N    ?     ?   ?   Y    Y*2   ?  20090913
-linux-amd64-gcc4.3.2          8   Y    -    -     Y   Y   Y    Y     ?  20081118
-linux-amd64-gcc4.3.3          8   Y    Y    ?     Y   Y   Y    Y     ?  20090712
-netbsd3.1-ppc-gcc-3.3.3       B   Y    Y    ?     Y   Y   Y    Y     ?  20090419
-netbsd4.0-alpha-gcc-4.1.2     8   Y    -    ?     Y   Y   Y    Y     ?  20090518
-netbsd4.0-arm-gcc-4.1.2           Y    -    ?     Y   Y   Y    Y     ?  20090518
-netbsd4.0-i386-gcc-4.1.2          Y    Y    ?     Y   Y   Y    Y     ?  20090517
-netbsd4.0-ppc-gcc-4.1.2       B   Y    Y    ?     Y   Y   Y    Y     ?  20090519
-netbsd4.0-sparc64-gcc-4.1.2  B8   Y    -    -     Y   Y   Y    Y     ?  20090519
-netbsd4.0-x86_64-gcc-4.1.2    8   Y    -    ?     Y   Y   Y    Y     ?  20090519
-netbsd5.0-i386-gcc-4.1.3          Y    Y    ?     Y   Y   Y    Y     ?  20090519
-netbsd5.0-ppc-gcc-4.1.3       B   Y    Y    ?     Y   Y   Y    Y     ?  20090517
-netbsd5.0-mipseb32-gcc-4.1.3  B   Y    -    ?     Y   Y   Y    Y     ?  20090518
-netbsd5.0-sparc-gcc-4.1.3     B   Y    -    -     Y   Y   Y    Y     ?  20090519
-netbsd5.0-sparc64-gcc-4.1.3  B8   Y    -    -     Y   Y   Y    Y/1   ?  20090519
-netbsd5.0-x86_64-gcc-4.1.3    8   Y    -    -     Y   Y   Y    Y     ?  20090419
-win32-x86-mingw_gcc4.3.0          Y    Y    -     -   -   Y    Y/88  ?  20081203
-win32-x86-msvc_6.0            4   -    Y    -     -   -   Y    Y/8   ?  20090315
-win32-x64-msvc_9.0            8   -    -    -     -   -   Y    Y/51  ?  20081203
-win32-x64-mingw_gcc3.4.5      8   Y    Y    ?     ?   ?   Y    Y     ?  20090210
-win64-amd64-msvc_9.0          8   N    N    N     ?   ?   Y*1  N     ?  20090720
+cygwin1.7.0-x86-gcc4.3.2      4   Y    -     -   -   Y    Y     Y  20090315
+dragonfly2.2.0-i386-gcc-4.1.2 4   Y    -     Y   Y   Y    Y     ?  20090427
+freebsd-x86-gcc-4.2.1         4   Y    Y     ?   ?   Y    Y     Y  20090415
+freebsd-amd64-gcc-4.2.1       8   Y    -     ?   ?   Y    Y     Y  20090720
+linux-amd64-clang-r73854      8   ?    =     Y   Y   Y/4  Y/1   ?  20090622
+linux-amd64-clang-r75433      8   Y    ?     ?   ?   Y    Y*2   ?  20090913
+linux-amd64-gcc4.3.2          8   Y    -     Y   Y   Y    Y     ?  20081118
+linux-amd64-gcc4.3.3          8   Y    ?     Y   Y   Y    Y     ?  20090712
+netbsd3.1-ppc-gcc-3.3.3       B   Y    ?     Y   Y   Y    Y     ?  20090419
+netbsd4.0-alpha-gcc-4.1.2     8   Y    ?     Y   Y   Y    Y     ?  20090518
+netbsd4.0-arm-gcc-4.1.2           Y    ?     Y   Y   Y    Y     ?  20090518
+netbsd4.0-i386-gcc-4.1.2          Y    ?     Y   Y   Y    Y     ?  20090517
+netbsd4.0-ppc-gcc-4.1.2       B   Y    ?     Y   Y   Y    Y     ?  20090519
+netbsd4.0-sparc64-gcc-4.1.2  B8   Y    -     Y   Y   Y    Y     ?  20090519
+netbsd4.0-x86_64-gcc-4.1.2    8   Y    ?     Y   Y   Y    Y     ?  20090519
+netbsd5.0-i386-gcc-4.1.3          Y    ?     Y   Y   Y    Y     ?  20090519
+netbsd5.0-ppc-gcc-4.1.3       B   Y    ?     Y   Y   Y    Y     ?  20090517
+netbsd5.0-mipseb32-gcc-4.1.3  B   Y    ?     Y   Y   Y    Y     ?  20090518
+netbsd5.0-sparc-gcc-4.1.3     B   Y    -     Y   Y   Y    Y     ?  20090519
+netbsd5.0-sparc64-gcc-4.1.3  B8   Y    -     Y   Y   Y    Y/1   ?  20090519
+netbsd5.0-x86_64-gcc-4.1.3    8   Y    -     Y   Y   Y    Y     ?  20090419
+win32-x86-mingw_gcc4.3.0          Y    -     -   -   Y    Y/88  ?  20081203
+win32-x86-msvc_6.0            4   -    -     -   -   Y    Y/8   ?  20090315
+win32-x64-msvc_9.0            8   -    -     -   -   Y    Y/51  ?  20081203
+win32-x64-mingw_gcc3.4.5      8   Y    ?     ?   ?   Y    Y     ?  20090210
+win64-amd64-msvc_9.0          8   N    N     ?   ?   Y*1  N     ?  20090720
 
 Legend:
 ?   ... unknown or untested
