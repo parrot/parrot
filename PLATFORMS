@@ -36,7 +36,7 @@ freebsd-x86-gcc-4.2.1         4   Y    Y     ?   ?   Y    Y     Y  20090415
 freebsd-amd64-gcc-4.2.1       8   Y    -     ?   ?   Y    Y     Y  20090720
 linux-amd64-clang-r73854      8   ?    =     Y   Y   Y/4  Y/1   ?  20090622
 linux-amd64-clang-r75433      8   Y    ?     ?   ?   Y    Y*2   ?  20090913
-linux-amd64-gcc4.3.2          8   Y    -     Y   Y   Y    Y     ?  20081118
+linux-amd64-gcc4.3.2          8   Y    -     Y   Y   Y    Y/1   Y  20091020
 linux-amd64-gcc4.3.3          8   Y    ?     Y   Y   Y    Y     ?  20090712
 linux-amd64-gcc4.4.1          8   Y    ?     Y   Y   Y    Y     Y  20091020
 netbsd3.1-ppc-gcc-3.3.3       B   Y    ?     Y   Y   Y    Y     ?  20090419
