@@ -275,6 +275,17 @@ F<ftp://ftp.parrot.org/pub/parrot/releases/devel/0.8.1>). Also update
 the URL for "release/developer" or "release/supported" depending on
 which type of release this is.
 
+=item f
+
+Update docs.parrot.org. Run "make html" in a release copy of parrot, and save
+the resources/ and html/ directories created in docs/.
+ssh into the parrotvm, and in the
+webroot for docs.parrot.org, expand these into a release directory (e.g.
+1.4.0). in <webroot>/parrot, there are symbolic links for latest, stable,
+and devel. Update the latest symlink to point to your new directory.
+If this is a stable release, also update the stable symlink. Do not delete
+any old copies of the docs.
+
 =back
 
 Preview the new page, and submit it.
