@@ -466,7 +466,13 @@ void Parrot_gc_inf_init(PARROT_INTERP);
 #  define Parrot_gc_mark_STRING_alive(interp, obj) Parrot_gc_mark_STRING_alive_fun((interp), (obj))
 #endif
 
-#define Parrot_gc_mark_PMC_alive(interp, obj) Parrot_gc_mark_PMC_alive_fun((interp), (obj))
+#if defined(PARROT_IN_CORE)
+#  define Parrot_gc_mark_PMC_alive(interp, obj) \
+      do if (!PMC_IS_NULL(obj)) Parrot_gc_mark_PMC_alive_fun((interp), (obj)); \
+      while (0)
+#else
+#  define Parrot_gc_mark_PMC_alive(interp, obj) Parrot_gc_mark_PMC_alive_fun((interp), (obj))
+#endif
 
 #endif /* PARROT_GC_API_H_GUARD */
 
