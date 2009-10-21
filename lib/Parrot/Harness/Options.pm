@@ -114,12 +114,13 @@ sub Usage {
 perl t/harness [options] [testfiles]
     -w         ... warnings on
     -g         ... run CGoto
-    -j         ... run JIT
     -C         ... run CGP
     -S         ... run Switched
     -b         ... run bounds checked
     --run-exec ... run exec core
     -f         ... run fast core
+    -j         ... run fast core
+    -r         ... run the compiled pbc
     -v         ... run parrot with -v : This is NOT the same as prove -v
                    All tests run with this option will probably fail
     -d         ... run debug
