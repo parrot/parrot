@@ -605,6 +605,7 @@ ucs2_decode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i))
      * See TT #557
      */
     PARROT_ASSERT(0);
+    return (UINTVAL)0; /* Stop the static analyzers from panicing */
 #endif
 }
 
