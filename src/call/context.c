@@ -544,7 +544,7 @@ PARROT_EXPORT
 void
 Parrot_pcc_set_handlers(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN(PMC *handlers))
 {
-    ASSERT_ARGS(Parrot_pcc_set_handers)
+    ASSERT_ARGS(Parrot_pcc_set_handlers)
     Parrot_Context *c = get_context_struct_fast(interp, ctx);
     c->handlers = handlers;
 }
