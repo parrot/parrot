@@ -573,7 +573,7 @@ void Parrot_pcc_set_continuation(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_set_handers(PARROT_INTERP,
+void Parrot_pcc_set_handlers(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN(PMC *handlers))
         __attribute__nonnull__(1)
@@ -877,7 +877,7 @@ PMC * Parrot_set_new_context(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_pcc_set_continuation __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_set_handers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_pcc_set_handlers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx) \
     , PARROT_ASSERT_ARG(handlers))

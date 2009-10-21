@@ -532,7 +532,7 @@ Parrot_pcc_get_handlers(PARROT_INTERP, ARGIN(PMC *ctx))
 
 /*
 
-=item C<void Parrot_pcc_set_handers(PARROT_INTERP, PMC *ctx, PMC *handlers)>
+=item C<void Parrot_pcc_set_handlers(PARROT_INTERP, PMC *ctx, PMC *handlers)>
 
 Set scheduler handlers.
 
@@ -542,7 +542,7 @@ Set scheduler handlers.
 
 PARROT_EXPORT
 void
-Parrot_pcc_set_handers(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN(PMC *handlers))
+Parrot_pcc_set_handlers(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN(PMC *handlers))
 {
     ASSERT_ARGS(Parrot_pcc_set_handers)
     Parrot_Context *c = get_context_struct_fast(interp, ctx);
