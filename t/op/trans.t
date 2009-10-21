@@ -387,9 +387,6 @@ ok 15
 ok 16
 OUTPUT
 
-TODO: {
-local $TODO = 'fails on netbsd' if $^O =~ /netbsd/;
-
 pasm_output_is( <<"CODE", <<'OUTPUT', 'atan, part 2' );
         .include 'fp_equality.pasm'
         atan N4, -0.0, -0.0
@@ -401,8 +398,6 @@ EQ1:    print "ok 1\\n"
 CODE
 ok 1
 OUTPUT
-
-}
 
 pasm_output_is( <<"CODE", <<OUTPUT, "log2" );
         .include 'fp_equality.pasm'
