@@ -129,7 +129,7 @@ typedef struct Parrot_Context Parrot_Context;
 
 #ifndef NDEBUG
 
-/* 
+/*
  * For optimised builds we provide macros which directly poke into
  * Parrot_Context.
  */
@@ -579,72 +579,70 @@ UINTVAL Parrot_pcc_warnings_test(PARROT_INTERP,
 #else /* ifndef NDEBUG */
 
 /* Context manipulating "functions" */
-#include "parrot/interpreter.h"
+#  define Parrot_pcc_get_context_struct(i, c) (PMC_data_typed((c), Parrot_Context*))
 
-#define Parrot_pcc_get_context_struct(i, c) (PMC_data_typed((c), Parrot_Context*))
+#  define Parrot_pcc_get_constants(i, c) (__C(c)->constants)
+#  define Parrot_pcc_set_constants(i, c, value) (__C(c)->constants = (value))
 
-#define Parrot_pcc_get_constants(i, c) (__C(c)->constants)
-#define Parrot_pcc_set_constants(i, c, value) (__C(c)->constants = (value))
+#  define Parrot_pcc_get_continuation(i, c) (__C(c)->current_cont)
+#  define Parrot_pcc_set_continuation(i, c, value) (__C(c)->current_cont = (value))
 
-#define Parrot_pcc_get_continuation(i, c) (__C(c)->current_cont)
-#define Parrot_pcc_set_continuation(i, c, value) (__C(c)->current_cont = (value))
+#  define Parrot_pcc_get_results(i, c) (__C(c)->current_results)
+#  define Parrot_pcc_set_results(i, c, value) (__C(c)->current_results = (value))
 
-#define Parrot_pcc_get_results(i, c) (__C(c)->current_results)
-#define Parrot_pcc_set_results(i, c, value) (__C(c)->current_results = (value))
+#  define Parrot_pcc_get_caller_ctx(i, c) (__C(c)->caller_ctx)
+#  define Parrot_pcc_set_caller_ctx(i, c, value) (__C(c)->caller_ctx = (value))
 
-#define Parrot_pcc_get_caller_ctx(i, c) (__C(c)->caller_ctx)
-#define Parrot_pcc_set_caller_ctx(i, c, value) (__C(c)->caller_ctx = (value))
+#  define Parrot_pcc_get_results_signature(i, c) (__C(c)->results_signature)
+#  define Parrot_pcc_set_results_signature(i, c, value) (__C(c)->results_signature = (value))
 
-#define Parrot_pcc_get_results_signature(i, c) (__C(c)->results_signature)
-#define Parrot_pcc_set_results_signature(i, c, value) (__C(c)->results_signature = (value))
+#  define Parrot_pcc_get_namespace(i, c) (__C(c)->current_namespace)
+#  define Parrot_pcc_set_namespace(i, c, value) (__C(c)->current_namespace = (value))
 
-#define Parrot_pcc_get_namespace(i, c) (__C(c)->current_namespace)
-#define Parrot_pcc_set_namespace(i, c, value) (__C(c)->current_namespace = (value))
+#  define Parrot_pcc_get_pred_offset(i, c) (__C(c)->pred_offset)
+#  define Parrot_pcc_set_pred_offset(i, c, value) (__C(c)->pred_offset = (value))
 
-#define Parrot_pcc_get_pred_offset(i, c) (__C(c)->pred_offset)
-#define Parrot_pcc_set_pred_offset(i, c, value) (__C(c)->pred_offset = (value))
+#  define Parrot_pcc_get_pc(i, c) (__C(c)->current_pc)
+#  define Parrot_pcc_set_pc(i, c, value) (__C(c)->current_pc = (value))
 
-#define Parrot_pcc_get_pc(i, c) (__C(c)->current_pc)
-#define Parrot_pcc_set_pc(i, c, value) (__C(c)->current_pc = (value))
+#  define Parrot_pcc_get_HLL(i, c) (__C(c)->current_HLL)
+#  define Parrot_pcc_set_HLL(i, c, value) (__C(c)->current_HLL = (value))
 
-#define Parrot_pcc_get_HLL(i, c) (__C(c)->current_HLL)
-#define Parrot_pcc_set_HLL(i, c, value) (__C(c)->current_HLL = (value))
+#  define Parrot_pcc_get_object(i, c) (__C(c)->current_object)
+#  define Parrot_pcc_set_object(i, c, value) (__C(c)->current_object = (value))
 
-#define Parrot_pcc_get_object(i, c) (__C(c)->current_object)
-#define Parrot_pcc_set_object(i, c, value) (__C(c)->current_object = (value))
+#  define Parrot_pcc_get_lex_pad(i, c) (__C(c)->lex_pad)
+#  define Parrot_pcc_set_lex_pad(i, c, value) (__C(c)->lex_pad = (value))
 
-#define Parrot_pcc_get_lex_pad(i, c) (__C(c)->lex_pad)
-#define Parrot_pcc_set_lex_pad(i, c, value) (__C(c)->lex_pad = (value))
+#  define Parrot_pcc_get_handlers(i, c) (__C(c)->handlers)
+#  define Parrot_pcc_set_handlers(i, c, value) (__C(c)->handlers = (value))
 
-#define Parrot_pcc_get_handlers(i, c) (__C(c)->handlers)
-#define Parrot_pcc_set_handlers(i, c, value) (__C(c)->handlers = (value))
+#  define Parrot_pcc_get_outer_ctx(i, c) (__C(c)->outer_ctx)
+#  define Parrot_pcc_set_outer_ctx(i, c, value) (__C(c)->outer_ctx = (value))
 
-#define Parrot_pcc_get_outer_ctx(i, c) (__C(c)->outer_ctx)
-#define Parrot_pcc_set_outer_ctx(i, c, value) (__C(c)->outer_ctx = (value))
+#  define Parrot_pcc_get_signature(i, c) (__C(c)->current_sig)
+#  define Parrot_pcc_set_signature(i, c, value) (__C(c)->current_sig = (value))
 
-#define Parrot_pcc_get_signature(i, c) (__C(c)->current_sig)
-#define Parrot_pcc_set_signature(i, c, value) (__C(c)->current_sig = (value))
+#  define Parrot_pcc_get_int_constant(i, c, idx) (__C(c)->constants[(idx)]->u.integer)
+#  define Parrot_pcc_get_num_constant(i, c, idx) (__C(c)->constants[(idx)]->u.number)
+#  define Parrot_pcc_get_string_constant(i, c, idx) (__C(c)->constants[(idx)]->u.string)
+#  define Parrot_pcc_get_pmc_constant(i, c, idx) (__C(c)->constants[(idx)]->u.key)
 
-#define Parrot_pcc_get_int_constant(i, c, idx) (__C(c)->constants[(idx)]->u.integer)
-#define Parrot_pcc_get_num_constant(i, c, idx) (__C(c)->constants[(idx)]->u.number)
-#define Parrot_pcc_get_string_constant(i, c, idx) (__C(c)->constants[(idx)]->u.string)
-#define Parrot_pcc_get_pmc_constant(i, c, idx) (__C(c)->constants[(idx)]->u.key)
+#  define Parrot_pcc_get_recursion_depth(i, c) (__C(c)->recursion_depth)
+#  define Parrot_pcc_dec_recursion_depth(i, c) (--__C(c)->recursion_depth)
+#  define Parrot_pcc_inc_recursion_depth(i, c) (__C(c)->recursion_depth++)
 
-#define Parrot_pcc_get_recursion_depth(i, c) (__C(c)->recursion_depth)
-#define Parrot_pcc_dec_recursion_depth(i, c) (--__C(c)->recursion_depth)
-#define Parrot_pcc_inc_recursion_depth(i, c) (__C(c)->recursion_depth++)
+#  define Parrot_pcc_warnings_on(i, c, flags)   (__C(c)->warns |= (flags))
+#  define Parrot_pcc_warnings_off(i, c, flags)  (__C(c)->warns &= ~(flags))
+#  define Parrot_pcc_warnings_test(i, c, flags) (__C(c)->warns & (flags))
 
-#define Parrot_pcc_warnings_on(i, c, flags)   (__C(c)->warns |= flags)
-#define Parrot_pcc_warnings_off(i, c, flags)  (__C(c)->warns &= ~flags)
-#define Parrot_pcc_warnings_test(i, c, flags) (__C(c)->warns & flags)
+#  define Parrot_pcc_errors_on(i, c, flags)     (__C(c)->errors |= (flags))
+#  define Parrot_pcc_errors_off(i, c, flags)    (__C(c)->errors &= ~(flags))
+#  define Parrot_pcc_errors_test(i, c, flags)   (__C(c)->errors & (flags))
 
-#define Parrot_pcc_errors_on(i, c, flags)     (__C(c)->errors |= flags)
-#define Parrot_pcc_errors_off(i, c, flags)    (__C(c)->errors &= ~flags)
-#define Parrot_pcc_errors_test(i, c, flags)   (__C(c)->errors & flags)
-
-#define Parrot_pcc_trace_flags_on(i, c, flags)     (__C(c)->trace_flags |= flags)
-#define Parrot_pcc_trace_flags_off(i, c, flags)    (__C(c)->trace_flags &= ~flags)
-#define Parrot_pcc_trace_flags_test(i, c, flags)   (__C(c)->trace_flags & flags)
+#  define Parrot_pcc_trace_flags_on(i, c, flags)     (__C(c)->trace_flags |= (flags))
+#  define Parrot_pcc_trace_flags_off(i, c, flags)    (__C(c)->trace_flags &= ~(flags))
+#  define Parrot_pcc_trace_flags_test(i, c, flags)   (__C(c)->trace_flags & (flags))
 
 #endif /* ifndef NDEBUG */
 
