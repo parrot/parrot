@@ -212,7 +212,7 @@ PMC object.
 
 PARROT_EXPORT
 INTVAL
-Parrot_io_close(PARROT_INTERP, ARGMOD(PMC *pmc))
+Parrot_io_close(PARROT_INTERP, ARGMOD_NULLOK(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_close)
     INTVAL result = 1;
@@ -301,7 +301,7 @@ filehandle PMC.
 
 PARROT_EXPORT
 void
-Parrot_io_flush(PARROT_INTERP, ARGMOD(PMC *pmc))
+Parrot_io_flush(PARROT_INTERP, ARGMOD_NULLOK(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_flush)
     if (PMC_IS_NULL(pmc))

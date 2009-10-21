@@ -144,9 +144,8 @@ void Parrot_IOData_mark(PARROT_INTERP, ARGIN(ParrotIOData *piodata))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-INTVAL Parrot_io_close(PARROT_INTERP, ARGMOD(PMC *pmc))
+INTVAL Parrot_io_close(PARROT_INTERP, ARGMOD_NULLOK(PMC *pmc))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
 
 PARROT_EXPORT
@@ -180,9 +179,8 @@ PMC * Parrot_io_fdopen(PARROT_INTERP,
         __attribute__nonnull__(4);
 
 PARROT_EXPORT
-void Parrot_io_flush(PARROT_INTERP, ARGMOD(PMC *pmc))
+void Parrot_io_flush(PARROT_INTERP, ARGMOD_NULLOK(PMC *pmc))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
 
 PARROT_EXPORT
@@ -353,8 +351,7 @@ PIOOFF_T Parrot_io_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
         FUNC_MODIFIES(*pmc);
 
 #define ASSERT_ARGS_Parrot_io_close __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_close_piohandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -366,8 +363,7 @@ PIOOFF_T Parrot_io_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sflags))
 #define ASSERT_ARGS_Parrot_io_flush __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_fprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc) \
