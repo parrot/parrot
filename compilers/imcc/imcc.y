@@ -771,10 +771,19 @@ mk_sub_address_fromc(PARROT_INTERP, ARGIN(const char *name))
     ASSERT_ARGS(mk_sub_address_fromc)
     /* name is a quoted sub name */
     SymReg *r;
-    char *name_copy                  = mem_sys_strdup(name + 1);
-    name_copy[strlen(name_copy) - 1] = 0;
+    char   *name_copy;
 
-    r = mk_sub_address(interp, name_copy);
+    /* interpolate only if the first character is a double-quote */
+    if (*name == '"') {
+        STRING *unescaped = Parrot_str_unescape(interp, name, '"', NULL);
+        name_copy         = Parrot_str_to_cstring(interp, unescaped);
+    }
+    else {
+        name_copy = mem_sys_strdup(name);
+        name_copy[ strlen(name) - 1 ] = 0;
+    }
+
+    r = mk_sub_address(interp, name_copy + 1);
     mem_sys_free(name_copy);
 
     return r;
