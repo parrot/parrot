@@ -116,12 +116,12 @@ If this bit is set on a PMC value, then the PMC must be an aggregate.  The
 contents of the aggregate, rather than the aggregate itself, will be passed.
 
 If the C<NAMED> bit is also set, the aggregate will be used as a hash; its
-contents, as key/value pairs, will be passed as named parameters.  The PMC
+contents, as key/value pairs, will be passed as named arguments.  The PMC
 must implement the full hash interface.  {{ RT#45367: Limit the required
 interface. }}
 
 If the C<NAMED> bit is not set, the aggregate will be used as an array; its
-contents will be passed as positional parameters.
+contents will be passed as positional arguments.
 
 The meaning of this bit is undefined when applied to integer, number, and
 string values.
@@ -174,10 +174,10 @@ All such values will be converted to PMCs according to the detailed rules
 below, and those PMCs will be stored into the new aggregate.
 
 If the C<NAMED> bit is also set, the aggregate will be the HLL-specific hash
-type and the contents will be all unassigned _named_ parameters.
+type and the contents will be all unassigned _named_ arguments.
 
 If the C<NAMED> bit is not set, the aggregate will be the HLL-specific array
-type and the contents will be all unassigned positional parameters.
+type and the contents will be all unassigned positional arguments.
 
 =item 6     (unused)
 
@@ -216,7 +216,7 @@ complex notion of read-only probably needs to do this kind of wrapping itself.
 
 When the SLURPY bit is also set, behavior is as described above in the
 "SLURPY" section.  Otherwise, this bit may only be set on a unique string
-constant specifying the name of the next argument (or returned value).
+constant specifying the name of the next parameter (or returned value).
 
 =back
 
