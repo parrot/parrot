@@ -386,7 +386,7 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     int dirs = 0;
     Instruction *ins;
     op_info_t   *op_info;
-    char fullname[64], format[128];
+    char fullname[64] = "", format[128] = "";
 
     if (STREQ(name, ".annotate")) {
         ins = _mk_instruction(name, "", n, r, 0);
