@@ -124,6 +124,27 @@ Parrot_pcc_set_constants(PARROT_INTERP, ARGIN(PMC *ctx),
 
 /*
 
+=item C<struct PackFile_Constant ** Parrot_pcc_get_constants(PARROT_INTERP, PMC
+*ctx)>
+
+Get reference to constants.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+struct PackFile_Constant **
+Parrot_pcc_get_constants(PARROT_INTERP, ARGIN(PMC *ctx))
+{
+    ASSERT_ARGS(Parrot_pcc_get_constants)
+    return get_context_struct_fast(interp, ctx)->constants;
+}
+
+
+/*
+
 =item C<INTVAL Parrot_pcc_get_int_constant(PARROT_INTERP, PMC *ctx, INTVAL idx)>
 
 Get FLOATVAL constant from context.
@@ -205,26 +226,6 @@ Parrot_pcc_get_pmc_constant(PARROT_INTERP, ARGIN(PMC *ctx), INTVAL idx)
     return c->constants[idx]->u.key;
 }
 
-
-/*
-
-=item C<struct PackFile_Constant ** Parrot_pcc_constants(PARROT_INTERP, PMC
-*ctx)>
-
-Get reference to constants.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-struct PackFile_Constant **
-Parrot_pcc_constants(PARROT_INTERP, ARGIN(PMC *ctx))
-{
-    ASSERT_ARGS(Parrot_pcc_constants)
-    return get_context_struct_fast(interp, ctx)->constants;
-}
 
 
 

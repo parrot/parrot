@@ -72,7 +72,7 @@ sub defines {
 #define NREG(i) REG_NUM(interp, cur_opcode[i])
 #define PREG(i) REG_PMC(interp, cur_opcode[i])
 #define SREG(i) REG_STR(interp, cur_opcode[i])
-#define CONST(i) Parrot_pcc_constants(interp, interp->ctx)[cur_opcode[i]]
+#define CONST(i) Parrot_pcc_get_constants(interp, interp->ctx)[cur_opcode[i]]
 END
 }
 

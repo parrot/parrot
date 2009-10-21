@@ -60,7 +60,7 @@ sub defines {
 #define NREG(i) (CUR_CTX->bp.regs_n[-1L - cur_opcode[i]])
 #define PREG(i) (CUR_CTX->bp_ps.regs_p[-1L - cur_opcode[i]])
 #define SREG(i) (CUR_CTX->bp_ps.regs_s[cur_opcode[i]])
-#define CONST(i) Parrot_pcc_constants(interp, interp->ctx)[cur_opcode[i]]
+#define CONST(i) Parrot_pcc_get_constants(interp, interp->ctx)[cur_opcode[i]]
 END
 }
 
