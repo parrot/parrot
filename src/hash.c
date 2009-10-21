@@ -1302,18 +1302,19 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
     const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed);
     HashBucket   *bucket  = hash->bi[hashval & hash->mask];
 
-    /* Very complex assert that we'll not put non-constant stuff into constant hash */
-    PARROT_ASSERT(
-        PMC_IS_NULL(hash->container)
-        || !(PObj_constant_TEST(hash->container))
-        || (
-            (
-                !(hash->key_type == Hash_key_type_STRING)
-                || PObj_constant_TEST((PObj *)key))
-            && (
-                !((hash->entry_type == enum_type_PMC) || (hash->entry_type == enum_type_STRING))
-                || PObj_constant_TEST((PObj *)value)))
-        || !"Use non-constant key or value in constant hash");
+    /* When the hash is constant, check that the key and value are also
+     * constant. */
+    if (!PMC_IS_NULL(hash->container)
+            && PObj_constant_TEST(hash->container)) {
+        if (hash->key_type == Hash_key_type_STRING
+                && !PObj_constant_TEST((PObj *)key))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Used non-constant key in constant hash.");
+        if (((hash->entry_type == enum_type_PMC) || (hash->entry_type == enum_type_STRING))
+                && !PObj_constant_TEST((PObj *)value))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Used non-constant value in constant hash.");
+    }
 
     while (bucket) {
         /* store hash_val or not */

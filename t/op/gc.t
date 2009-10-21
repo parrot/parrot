@@ -50,7 +50,7 @@ GC related bugs.
     sweep 1
     $I2 = interpinfo .INTERPINFO_GC_MARK_RUNS  # Should be one more now
     $I3 = $I2 - $I1
-    is($I3,1)
+    is($I3,1, "sweep_1")
 .end
 
 
@@ -59,7 +59,7 @@ GC related bugs.
     sweep 0
     $I2 = interpinfo .INTERPINFO_GC_MARK_RUNS  # Should be same
     $I3 = $I2 - $I1
-    is($I3,0)
+    is($I3,0, "sweep_0")
 .end
 
 
@@ -71,7 +71,7 @@ GC related bugs.
     sweep 0
     $I2 = interpinfo .INTERPINFO_GC_MARK_RUNS   # Should be one more now
     $I3 = $I2 - $I1
-    is($I3,1)
+    is($I3,1, "sweep_0_need_destroy_obj")
 .end
 
 
@@ -87,8 +87,8 @@ GC related bugs.
     sweep 0
     $I4 = interpinfo .INTERPINFO_GC_MARK_RUNS   # Should be same as last
     $I5 = $I4 - $I2
-    is($I3,1)
-    is($I5,0)
+    is($I3,1, "sweep_0_need_destroy_destroy_obj")
+    is($I5,0, "sweep_0_need_destroy_destroy_obj")
 .end
 
 
@@ -97,7 +97,7 @@ GC related bugs.
     collect
     $I2 = interpinfo .INTERPINFO_GC_COLLECT_RUNS  # Should be one more now
     $I3 = $I2 - $I1
-    is($I3,1)
+    is($I3,1, "collect_count")
 .end
 
 
@@ -107,13 +107,13 @@ GC related bugs.
     collect
     $I2 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
     $I3 = $I2 - $I1
-    is($I3,0)
+    is($I3,0, "collect_toggle")
 
     collecton
     collect
     $I4 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
     $I6 = $I4 - $I2
-    is($I6,1)
+    is($I6,1, "collect_toggle")
 .end
 
 
@@ -125,13 +125,13 @@ GC related bugs.
     collect           # This shouldn't do anything...    #'
     $I2 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
     $I3 = $I2 - $I1
-    is($I3,0)
+    is($I3,0, "collect_toggle_nested")
 
     collecton
     collect           # ... but this should
     $I4 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
     $I6 = $I4 - $I2
-    is($I6,1)
+    is($I6,1, "collect_toggle_nested")
 
 .end
 
@@ -152,7 +152,7 @@ GC related bugs.
 .sub _rand
     $P16 = new 'Env'
     $P5 = $P16['Foo']
-    is($P5, 'bar')
+    is($P5, 'bar', "_rand")
     if $P5 != 'bar' goto err
     .return()
     err:
@@ -192,7 +192,7 @@ GC related bugs.
     .local pmc o, cl
     cl = newclass 'Foo'
     o = new 'Foo'
-    ok(1)
+    ok(1, "end vanishing_return_continuation")
 .end
 
 # END: vanishing_return_continuation
@@ -252,8 +252,8 @@ buffer_ok:
     $P1 = new 'Integer'
     $P1 = 0
     n = $P0."b11"($P1)
-    ok(1)
-    is(n,8)
+    ok(1, "recursion_and_exceptions")
+    is(n,8, "recursion_and_exceptions")
 .end
 .namespace ["b"]
 .sub b11 :method
@@ -321,7 +321,7 @@ ok:
     lt $I0, $I1, lp2
     inc $I2
     lt $I2, $I3, lp3
-    ok(1)
+    ok(1, "leaving write_barrier_1")
 .end
 
 
@@ -376,7 +376,7 @@ ok:
     lt $I0, $I1, lp2
     inc $I2
     lt $I2, $I3, lp3
-    ok(1)
+    ok(1, "leaving write_barrier_2")
 .end
 
 
@@ -427,16 +427,16 @@ ok5:
     a = new 'String'
     b = new 'String'
     $I0 = elements reg
-    is($I0, 0)
+    is($I0, 0, "addr_registry_2_int")
     reg[a] = nil
     $I0 = elements reg
-    is($I0, 1)
+    is($I0, 1, "addr_registry_2_int")
     reg[a] = nil
     $I0 = elements reg
-    is($I0, 1)
+    is($I0, 1, "addr_registry_2_int")
     reg[b] = nil
     $I0 = elements reg
-    is($I0, 2)
+    is($I0, 2, "addr_registry_2_int")
 .end
 
 

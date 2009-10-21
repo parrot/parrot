@@ -149,6 +149,41 @@ sub signature {
     return ( $return_prefix, $method_suffix, $args, $sig, $return_type_char, $null_return );
 }
 
+=head1 C<pcc_signature()>
+
+Returns a PCC-style method signature for the method's parameters, as well as
+some additional information useful in building a call to that method.
+
+=cut
+
+sub pcc_signature {
+    my ($self) = @_;
+
+    my $args             = passable_args_from_parameter_list( $self->parameters );
+    my ($types, $vars)   = args_from_parameter_list( $self->parameters );
+    my $return_type      = $self->return_type;
+    my $return_type_char = $self->trans($return_type);
+    my $sig              = join ('', map { $self->trans($_) } @{$types}) .
+                           '->';
+
+    my $result_decl    = '';
+    my $return_stmt    = '';
+
+    if ( $return_type eq 'void' ) {
+        $return_stmt = "return ($return_type) NULL;" if $return_type_char =~ /P|I|S|V/;
+        $return_stmt = 'return (FLOATVAL) 0;'        if $return_type_char =~ /N/;
+        $return_stmt = 'return;'                     if $return_type_char =~ /v/;
+    }
+    else {
+        $result_decl = "$return_type result;";
+        $args .= ', &result';
+        $sig .= $return_type_char;
+        $return_stmt = "return ($return_type) result;";
+    }
+
+    return ( $sig, $args, $result_decl, $return_stmt );
+}
+
 1;
 
 # Local Variables:

@@ -138,12 +138,6 @@ Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub_pmc))
              * the running program.
              */
             PMC      * const saved_ccont       = interp->current_cont;
-            opcode_t * const current_args      = interp->current_args;
-            opcode_t * const current_params    = interp->current_params;
-            opcode_t * const current_returns   = interp->current_returns;
-            PMC      * const args_signature    = interp->args_signature;
-            PMC      * const params_signature  = interp->params_signature;
-            PMC      * const returns_signature = interp->returns_signature;
 
             Parrot_block_GC_mark(interp);
 
@@ -151,12 +145,6 @@ Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub_pmc))
 
             /* Restore stuff that might have got overwritten */
             interp->current_cont      = saved_ccont;
-            interp->current_args      = current_args;
-            interp->current_params    = current_params;
-            interp->current_returns   = current_returns;
-            interp->args_signature    = args_signature;
-            interp->params_signature  = params_signature;
-            interp->returns_signature = returns_signature;
 
             if (sub->name)
                 VTABLE_push_string(interp, ns_array, sub->name);

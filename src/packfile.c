@@ -669,7 +669,7 @@ run_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 {
     ASSERT_ARGS(run_sub)
     Parrot_runcore_t *old_core = interp->run_core;
-    PMC              *retval;
+    PMC              *retval   = PMCNULL;
 
     /* turn off JIT and prederef - both would act on the whole
      * PackFile which probably isn't worth the effort */
@@ -680,7 +680,7 @@ run_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
     Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp),
             interp->code->const_table->constants);
 
-    retval           = (PMC *)Parrot_runops_fromc_args(interp, sub_pmc, "P");
+    Parrot_pcc_invoke_sub_from_c_args(interp, sub_pmc, "->P", &retval);
     interp->run_core = old_core;
 
     return retval;

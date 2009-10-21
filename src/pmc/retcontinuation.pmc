@@ -42,9 +42,7 @@ Initializes the continuation.
         attrs->from_ctx        = CURRENT_CONTEXT(interp);    /* filled in during a call */
         attrs->runloop_id      = 0;
         attrs->seg             = interp->code;
-        attrs->current_results = NULL;
         attrs->address         = NULL;
-
     }
 
 

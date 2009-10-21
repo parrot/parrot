@@ -20,7 +20,7 @@ simple test file written in parrot.
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
     test_namespace = get_root_namespace [ 'parrot'; 'Test'; 'More' ]
-    exports = split ' ', 'plan diag ok nok is is_deeply like isa_ok skip isnt todo throws_like'
+    exports = split ' ', 'plan diag ok nok is is_deeply like substring isa_ok skip isnt todo throws_like throws_substring'
 
     test_namespace.'export_to'(curr_namespace, exports)
 

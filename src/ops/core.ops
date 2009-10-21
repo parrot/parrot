@@ -457,10 +457,14 @@ inline op yield() :flow {
 }
 
 inline op tailcall(invar PMC) :flow {
-    PMC * const p        = $1;
-    opcode_t   *dest     = expr NEXT();
-    interp->current_cont = Parrot_pcc_get_continuation(interp,
-                                CURRENT_CONTEXT(interp));
+    PMC * const p               = $1;
+    opcode_t   *dest            = expr NEXT();
+    PMC * const ctx             = CURRENT_CONTEXT(interp);
+    PMC * const parent_ctx      = Parrot_pcc_get_caller_ctx(interp, ctx);
+    PMC * const this_call_sig   = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const parent_call_sig = Parrot_pcc_get_signature(interp, parent_ctx);
+    interp->current_cont        = Parrot_pcc_get_continuation(interp, ctx);
+    Parrot_pcc_merge_signature_for_tailcall(interp, parent_call_sig, this_call_sig);
 
     SUB_FLAG_TAILCALL_SET(interp->current_cont);
     dest = VTABLE_invoke(interp, p, dest);
@@ -516,94 +520,71 @@ to the elements of the signature array.
 
 
 op set_args(inconst PMC) :flow {
-    opcode_t * const _this = CUR_OPCODE;
+    opcode_t * const raw_args = CUR_OPCODE;
     PMC * const signature = $1;
+    PMC * call_sig;
     INTVAL argc;
 
-    /* for now just point to the opcode */
-    interp->current_args = _this;
+    call_sig = Parrot_pcc_build_sig_object_from_op(interp,
+            PMCNULL, signature, raw_args);
+    Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_sig);
+
     argc = VTABLE_elements(interp, signature);
     goto OFFSET(argc + 2);
 }
 
 op get_results(inconst PMC) :flow {
-    opcode_t * const _this = CUR_OPCODE;
+    opcode_t * const raw_returns = CUR_OPCODE;
     PMC * const signature = $1;
+    PMC * call_sig;
     INTVAL argc;
 
-    Parrot_pcc_set_results(interp, CURRENT_CONTEXT(interp), _this);
+    call_sig = Parrot_pcc_build_sig_object_returns_from_op(interp,
+            Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp)),
+            signature, raw_returns);
+    Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_sig);
+
     argc = VTABLE_elements(interp, signature);
     goto OFFSET(argc + 2);
 }
 
 op get_params(inconst PMC) :flow {
-    opcode_t * const _this = CUR_OPCODE;
+    opcode_t * const raw_params = CUR_OPCODE;
     PMC *caller_ctx, *ctx;
-    PMC * ccont;
+    PMC *ccont, *call_object;
     PMC * const signature = $1;
     INTVAL argc;
-    opcode_t *src_indexes, *dst_indexes;
 
-    interp->current_params = _this;
     ctx     = CURRENT_CONTEXT(interp);
     ccont   = Parrot_pcc_get_continuation(interp, ctx);
 
     caller_ctx  = Parrot_pcc_get_caller_ctx(interp, ctx);
+    call_object = Parrot_pcc_get_signature(interp, caller_ctx);
 
-    src_indexes = interp->current_args;
-    dst_indexes = interp->current_params;
-    /* the args and params are now 'used.' */
-    interp->current_args = NULL;
-    interp->current_params = NULL;
+    Parrot_pcc_fill_params_from_op(interp, call_object, signature, raw_params);
 
-    parrot_pass_args(interp, caller_ctx, ctx, src_indexes, dst_indexes, PARROT_PASS_PARAMS);
     /* TODO Factor out with Sub.invoke */
     if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
         PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
         Parrot_pcc_dec_recursion_depth(interp, ctx);
         Parrot_pcc_set_caller_ctx(interp, ctx, Parrot_pcc_get_caller_ctx(interp, caller_ctx));
-        interp->current_args = NULL;
     }
     argc = VTABLE_elements(interp, signature);
     goto OFFSET(argc + 2);
 }
 
 op set_returns(inconst PMC) :flow {
-    opcode_t * const _this = CUR_OPCODE;
-    PMC *ctx, *caller_ctx;
-    PMC *ccont;
-    PMC *signature = $1;
-    INTVAL argc;
-    opcode_t *src_indexes, *dest_indexes;
+    opcode_t * const raw_returns = CUR_OPCODE;
+    PMC      *signature          = $1;
+    PMC      *ctx                = CURRENT_CONTEXT(interp);
+    PMC      *caller_ctx         = Parrot_pcc_get_caller_ctx(interp, ctx);
+    PMC      *call_object        = Parrot_pcc_get_signature(interp, caller_ctx);
+    INTVAL    argc               = VTABLE_elements(interp, signature);
 
-    interp->current_returns = _this;
-    ctx                     = CURRENT_CONTEXT(interp);
-    caller_ctx              = Parrot_pcc_get_caller_ctx(interp, ctx);
-    ccont                   = Parrot_pcc_get_continuation(interp, ctx);
+    Parrot_pcc_fill_returns_from_op(interp, call_object, signature, raw_returns);
 
-    if (PARROT_CONTINUATION(ccont)->address) {
-        /* Call is from runops_fromc */
-        caller_ctx = PMC_cont(ccont)->to_ctx;
-        if (PMC_IS_NULL(caller_ctx)) {
-            /* there is no point calling Parrot_ex_throw_..., because
-               PDB_backtrace can't deal with a missing to_ctx either. */
-            exit_fatal(1, "No caller_ctx for continuation %p.", ccont);
-        }
+    Parrot_pcc_set_signature(interp, ctx, NULL);
 
-        src_indexes             = interp->current_returns;
-        dest_indexes            = Parrot_pcc_get_results(interp, caller_ctx);
-        interp->current_returns = NULL;
-        /* does this need to be here */
-        interp->current_args = NULL;
-
-        parrot_pass_args(interp, ctx, caller_ctx, src_indexes, dest_indexes, PARROT_PASS_RESULTS);
-    }
-    else if (Parrot_pcc_get_results_signature(interp, caller_ctx)) {
-    /* We have a dynamic result signature, from pcc_invoke */
-        parrot_pass_args(interp, ctx, caller_ctx, interp->current_returns,
-                Parrot_pcc_get_results(interp, caller_ctx), PARROT_PASS_RESULTS);
-    }
-    argc = VTABLE_elements(interp, signature);
     goto OFFSET(argc + 2);
 }
 
@@ -617,17 +598,10 @@ specified in F<docs/pdds/pdd03_calling_conventions.pod>.
 =cut
 
 inline op result_info(out PMC) {
-    /* Get context of callee from return continuation. */
-    PMC * const cc = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
-    PMC *sig = NULL;
-    if (cc && PARROT_CONTINUATION(cc)->to_ctx) {
-        /* caller context has results */
-        opcode_t * const results = Parrot_pcc_get_results(interp, PMC_cont(cc)->to_ctx);
-        if (results) {
-            /* get results PMC index and get PMC. */
-            sig = PF_CONST(PARROT_CONTINUATION(cc)->seg, results[1])->u.key;
-        }
-    }
+    PMC *caller_ctx  = Parrot_pcc_get_caller_ctx(interp, CURRENT_CONTEXT(interp));
+    PMC *call_object = Parrot_pcc_get_signature(interp, caller_ctx);
+    PMC *sig = VTABLE_get_attr_str(interp, call_object,
+            Parrot_str_new_constant(interp, "return_flags"));
 
     /* If no elements, hand back empty array; otherwise PMC. */
     if (!sig)

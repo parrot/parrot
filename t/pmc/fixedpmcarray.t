@@ -310,7 +310,7 @@ out-of-bounds test. Checks INT and PMC keys.
     concat s, aux
     aux = get_repr_fpa_n(3)
     concat s, aux
-    like(s,'\(\)\(0\)\(0\,\s*1\)\(0\,\s*1\,\s*2\)','get_repr')
+    substring(s,'()(0)(0, 1)(0, 1, 2)','get_repr')
 .end
 
 .sub get_repr_fpa_n
@@ -333,7 +333,7 @@ done:
 .end
 
 .sub test_splice_oob
-    throws_like(<<'CODE',':s FixedPMCArray\: index out of bounds','splice oob, offset 0')
+    throws_substring(<<'CODE','FixedPMCArray: index out of bounds','splice oob, offset 0')
     .sub main
         .local pmc fpa
         fpa = new ['FixedPMCArray']
@@ -345,7 +345,7 @@ done:
         splice fpa, nil, 0, 6
     .end
 CODE
-    throws_like(<<'CODE',':s FixedPMCArray\: index out of bounds','splice oob, big offset')
+    throws_substring(<<'CODE','FixedPMCArray: index out of bounds','splice oob, big offset')
     .sub main
         .local pmc fpa
         fpa = new ['FixedPMCArray']
@@ -390,7 +390,7 @@ CODE
 .end
 
 .sub test_get_uninitialized
-    throws_like(<<'CODE',':s Null PMC access in name','get uninitialized')
+    throws_substring(<<'CODE','Null PMC access in name','get uninitialized')
     .sub main
         .local pmc arr1
         arr1 = new ['FixedPMCArray']
@@ -469,14 +469,14 @@ CODE
 .end
 
 .sub test_oob_elem
-    throws_like(<<'CODE',':s FixedPMCArray\: index out of bounds\!','set out-of-bounds index')
+    throws_substring(<<'CODE','FixedPMCArray: index out of bounds!','set out-of-bounds index')
         .sub main
             new $P0, ['FixedPMCArray']
             set $P0, 1
             set $P0[1], -7
         .end
 CODE
-    throws_like(<<'CODE',':s FixedPMCArray\: index out of bounds\!','set out-of-bounds index')
+    throws_substring(<<'CODE','FixedPMCArray: index out of bounds!','set out-of-bounds index')
         .sub main
             new $P0, ['FixedPMCArray']
             set $P0, 1
@@ -487,14 +487,14 @@ CODE
 .end
 
 .sub test_negative_index
-    throws_like(<<'CODE',':s FixedPMCArray\: index out of bounds\!','set negative index')
+    throws_substring(<<'CODE','FixedPMCArray: index out of bounds!','set negative index')
 .sub main
     new $P0, ['FixedPMCArray']
     set $P0, 1
     set $P0[-1], -7
 .end
 CODE
-    throws_like(<<'CODE',':s FixedPMCArray\: index out of bounds\!','get negative index')
+    throws_substring(<<'CODE','FixedPMCArray: index out of bounds!','get negative index')
 .sub main
     new $P0, ['FixedPMCArray']
     set $P0, 1
@@ -547,7 +547,7 @@ CODE
 .end
 
 .sub test_tt991
-    throws_like(<<'CODE',':s FixedPMCArray\: Cannot set array size to a negative number','cannot create a negative length array')
+    throws_substring(<<'CODE','FixedPMCArray: Cannot set array size to a negative number','cannot create a negative length array')
         .sub main
             new $P0, ['FixedPMCArray']
             set $P0, -1
@@ -556,7 +556,7 @@ CODE
 .end
 
 .sub test_resize_exception
-    throws_like(<<'CODE',':s FixedPMCArray\: Can.t resize','cannot resize FixedPMCArray')
+    throws_substring(<<'CODE',"FixedPMCArray: Can't resize",'cannot resize FixedPMCArray')
         .sub main
             new $P0, ['FixedPMCArray']
             set $I0,$P0
@@ -565,14 +565,14 @@ CODE
         .end
 CODE
 
-    throws_like(<<'CODE',":s set_number_native.* not implemented in class .*FixedPMCArray", 'cannot use float as length to FixedPMCArray')
+    throws_substring(<<'CODE',"set_number_native() not implemented in class 'FixedPMCArray'", 'cannot use float as length to FixedPMCArray')
         .sub main
             new $P0, ['FixedPMCArray']
             set $P0, 42.0
         .end
 CODE
 
-    throws_like(<<'CODE',":s set_string_native.* not implemented in class .*FixedPMCArray", 'cannot use string as length to FixedPMCArray')
+    throws_substring(<<'CODE',"set_string_native() not implemented in class 'FixedPMCArray'", 'cannot use string as length to FixedPMCArray')
         .sub main
             new $P0, ['FixedPMCArray']
             set $P0,"GIGO"
@@ -581,7 +581,7 @@ CODE
 .end
 
 .sub test_assign_non_array
-    throws_like(<<'CODE', ':s Can.t set self from this type','assign from non-array')
+    throws_substring(<<'CODE', "Can't set self from this type",'assign from non-array')
     .sub main
         .local pmc arr, other
         .local int n

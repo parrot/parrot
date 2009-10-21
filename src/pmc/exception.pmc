@@ -731,7 +731,7 @@ sub, or for the point of the call a level deeper for the rest.
 */
 
     METHOD backtrace() {
-        PMC *result = pmc_new(interp, enum_class_ResizablePMCArray);
+        PMC *result = PMCNULL;
         PMC *resume;
         PMC *cur_ctx;
         Parrot_Continuation_attributes    *cont;

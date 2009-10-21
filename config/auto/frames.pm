@@ -40,6 +40,7 @@ sub runstep {
 
 sub _call_frames_buildable {
     my $conf = shift;
+
     my $osname  = $conf->data->get('osname');
     my $cpuarch = $conf->data->get('cpuarch');
     my $nvsize  = $conf->data->get('nvsize');
@@ -49,8 +50,10 @@ sub _call_frames_buildable {
         $can_build_call_frames = $conf->options->get('buildframes');
     }
     else {
-        $can_build_call_frames = ($nvsize == 8 && $cpuarch eq 'i386'
-            && $osname ne 'darwin');
+        # Temporary disable build frames automatically.
+        #$can_build_call_frames = ($nvsize == 8 && $cpuarch eq 'i386'
+        #    && $osname ne 'darwin');
+        $can_build_call_frames = 0;
     }
     return $can_build_call_frames;
 }

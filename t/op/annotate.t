@@ -36,8 +36,8 @@ Test various use cases of the annotate directive.
 
   failed:
     .local pmc exception
-    .get_results (exception)
     pop_eh
+    .get_results (exception)
     $P0 = exception.'annotations'()
     isa_ok ($P0, 'Hash', 'annotations gives back hash')
     $I0 = elements $P0
@@ -59,8 +59,8 @@ Test various use cases of the annotate directive.
 
   failed:
     .local pmc exception
-    .get_results (exception)
     pop_eh
+    .get_results (exception)
 
     $P0 = exception.'annotations'('file')
     is ($P0, 'foo.p6', "file annotation got OK")
@@ -108,8 +108,8 @@ Test various use cases of the annotate directive.
 
   failed:
     .local pmc exception, bt, frame, ann
-    .get_results (exception)
     pop_eh
+    .get_results (exception)
     bt = exception.'backtrace'()
     $I0 = elements bt
     $I0 = $I0 > 3

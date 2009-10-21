@@ -92,6 +92,11 @@ NEXT:
 
 .end
 
+.sub fail
+    .param string desc
+    'ok'(0, desc)
+.end
+
 .namespace['Dog']
 
 .sub _accessor :method

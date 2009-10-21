@@ -111,6 +111,7 @@ struct Parrot_Context {
 
     INTVAL                 current_HLL;     /* see also src/hll.c */
 
+    PMC *current_sig;           /* temporary CallSignature PMC for active call */
     UINTVAL                warns;           /* Keeps track of what warnings
                                              * have been activated */
     UINTVAL                errors;          /* fatals that can be turned off */

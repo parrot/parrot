@@ -886,6 +886,85 @@ an exception that matches the pattern, fails the test otherwise.
   done:
 .end
 
+=item C<throws_substring( codestring, text, description )>
+
+Takes PIR code in C<codestring> and a string to match in C<text>, as
+well as an optional message in C<description>. Passes a test if the PIR throws
+an exception that matches the pattern, fails the test otherwise.
+
+=cut
+
+.sub throws_substring
+    .param string target
+    .param string text
+    .param string description :optional
+
+    .local pmc test
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
+
+    .local pmc comp
+    .local pmc compfun
+    .local pmc compiler
+    compiler = compreg 'PIR'
+
+    .local pmc eh
+    eh = new 'ExceptionHandler'
+    set_addr eh, handler            # set handler label for exceptions
+    push_eh eh
+
+    compfun = compiler(target)
+    compfun()                       # eval the target code
+
+    pop_eh
+
+    # if it doesn't throw an exception, fail
+    test.'ok'( 0, description )
+    test.'diag'( 'no error thrown' )
+
+    goto done
+
+  handler:
+    .local pmc ex
+    .local string error_msg
+    .get_results (ex)
+    pop_eh
+    error_msg = ex
+    substring(error_msg, text, description)
+
+  done:
+.end
+
+=item C<substring( target, text, description )>
+
+Similar to is, but using the index opcode to compare the string passed as
+C<text> to the string passed as C<target>.  It passes if C<text> is a substring
+of C<target> and fails otherwise.  This will report the results with the
+optional test description in C<description>.
+
+=cut
+
+.sub substring
+    .param string target
+    .param string text
+    .param string description :optional
+
+    .local pmc test
+    .local string diagnostic
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
+    $I0 = index target, text
+    $I0 = isne $I0, -1
+    test.'ok'( $I0, description )
+    if $I0 goto done
+    diagnostic = "substring failed: '"
+    diagnostic .= target
+    diagnostic .= "' does not contain '"
+    diagnostic .= text
+    diagnostic .= "'"
+    test.'diag'(diagnostic)
+  done:
+.end
+
+
 =item C<like( target, pattern, description )>
 
 Similar to is, but using the Parrot Grammar Engine to compare the string

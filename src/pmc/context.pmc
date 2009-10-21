@@ -69,6 +69,7 @@ Mark Context as alive.
         Parrot_gc_mark_PMC_alive(INTERP, ctx->current_object);
         Parrot_gc_mark_PMC_alive(INTERP, ctx->current_namespace);
         Parrot_gc_mark_PMC_alive(INTERP, ctx->results_signature);
+        Parrot_gc_mark_PMC_alive(INTERP, ctx->current_sig);
 
         if (!ctx->n_regs_used)
             return;

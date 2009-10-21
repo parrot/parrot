@@ -387,6 +387,7 @@ Invokes the subroutine.
         context               = Parrot_set_new_context(INTERP, sub->n_regs_used);
         Parrot_pcc_set_sub(interp, context, SELF);
         Parrot_pcc_set_continuation(interp, context, ccont);
+        Parrot_pcc_set_constants(interp, context, sub->seg->const_table->constants);
 
         /* check recursion/call depth */
         if (Parrot_pcc_inc_recursion_depth(INTERP, context) > INTERP->recursion_limit)
@@ -1053,7 +1054,7 @@ slurpy arguments).
     METHOD set_outer(PMC *outer) {
         /* Set outer sub. */
         Parrot_Sub_attributes *sub;
-        PMC *tmp1, *tmp2;
+        PMC *tmp1;
         PMC_get_sub(INTERP, SELF, sub);
 
         sub->outer_sub = outer;
@@ -1070,16 +1071,14 @@ slurpy arguments).
 
         /* If we've got a context around for the outer sub, set it as the
          * outer context. */
-
-        /* XXX This code looks very suspicious. */
-        /* (CONTEXT(interp)->caller_ctx->caller_ctx->current_sub */
-        tmp1 = Parrot_pcc_get_caller_ctx(interp, CURRENT_CONTEXT(interp));
-        tmp2 = Parrot_pcc_get_caller_ctx(interp, tmp1);
-        if (Parrot_pcc_get_sub(interp, tmp2) == outer)
-            sub->outer_ctx = tmp2;
-        /* else if (CONTEXT(interp)->caller_ctx->current_sub == outer) */
-        else if (Parrot_pcc_get_sub(interp, tmp1) == outer)
-            sub->outer_ctx = tmp1;
+        tmp1 = CURRENT_CONTEXT(interp);
+        while (!PMC_IS_NULL(tmp1)) {
+            if (Parrot_pcc_get_sub(interp, tmp1) == outer) {
+                sub->outer_ctx = tmp1;
+                break;
+            }
+            tmp1 = Parrot_pcc_get_caller_ctx(interp, tmp1);
+        }
     }
 
     METHOD get_multisig() {

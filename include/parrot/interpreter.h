@@ -295,14 +295,6 @@ struct parrot_interp_t {
 
     UINTVAL recursion_limit;                  /* Sub call resursion limit */
 
-
-    opcode_t *current_args;                   /* ptr into code w/ set_args op */
-    opcode_t *current_params;                 /* ... w/ get_params op */
-    opcode_t *current_returns;                /* ... w/ get_returns op */
-    PMC      *args_signature;                 /* non-const args signature PMC */
-    PMC      *params_signature;               /* non-const params sig PMC     */
-    PMC      *returns_signature;              /* non-const returns sig PMC    */
-
     /* during a call sequencer the caller fills these objects
      * inside the invoke these get moved to the context structure */
     PMC *current_cont;                        /* the return continuation PMC */

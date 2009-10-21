@@ -57,7 +57,9 @@ pmclass MultiSub extends ResizablePMCArray auto_attrs provides array {
     }
 
     VTABLE opcode_t *invoke(void *next) {
-        PMC * const func = Parrot_mmd_sort_manhattan(interp, SELF);
+        PMC * const sig_obj = CONTEXT(interp)->current_sig;
+        PMC * const func    = Parrot_mmd_sort_manhattan_by_sig_pmc(interp,
+                SELF, sig_obj);
 
         if (PMC_IS_NULL(func))
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "No applicable methods.\n");
@@ -66,10 +68,13 @@ pmclass MultiSub extends ResizablePMCArray auto_attrs provides array {
     }
 
     VTABLE PMC *get_iter() {
-        PMC * const sub = Parrot_mmd_sort_manhattan(INTERP, SELF);
+        PMC * const sig_obj = CONTEXT(interp)->current_sig;
+        PMC * const sub     = Parrot_mmd_sort_manhattan_by_sig_pmc(interp,
+                SELF, sig_obj);
 
         if (PMC_IS_NULL(sub))
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "No applicable methods.\n");
+
         return SUPER();
     }
 
@@ -78,14 +83,20 @@ pmclass MultiSub extends ResizablePMCArray auto_attrs provides array {
        ResizablePMCArray's VTABLE methods of the same names. Hopefully we
        don't need anything beyond that. */
     VTABLE PMC *get_pmc_keyed(PMC *key) {
-        PMC * const sub = Parrot_mmd_sort_manhattan(INTERP, SELF);
+        PMC * const sig_obj = CONTEXT(interp)->current_sig;
+        PMC * const sub     = Parrot_mmd_sort_manhattan_by_sig_pmc(interp,
+                SELF, sig_obj);
+
         if (PMC_IS_NULL(sub))
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "No applicable methods.\n");
         return SUPER(key);
     }
 
     VTABLE PMC *get_pmc_keyed_str(STRING *s) {
-        PMC * const sub = Parrot_mmd_sort_manhattan(INTERP, SELF);
+        PMC * const sig_obj = CONTEXT(interp)->current_sig;
+        PMC * const sub     = Parrot_mmd_sort_manhattan_by_sig_pmc(interp,
+                SELF, sig_obj);
+
         if (PMC_IS_NULL(sub))
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "No applicable methods.\n");
         return SUPER(s);

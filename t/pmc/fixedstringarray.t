@@ -110,6 +110,7 @@ out-of-bounds test. Checks INT and PMC keys.
     $I0 = 0
   handle_set:
     ok($I0, "Can't set out-of-bounds element")
+    pop_eh
 
     $I0 = 1
     push_eh handle_set_negative
@@ -117,6 +118,7 @@ out-of-bounds test. Checks INT and PMC keys.
     $I0 = 0
   handle_set_negative:
     ok($I0, "Can't set element on negative index")
+    pop_eh
 
     $I0 = 1
     push_eh handle_get
@@ -124,6 +126,7 @@ out-of-bounds test. Checks INT and PMC keys.
     $I0 = 0
   handle_get:
     ok($I0, "Can't get out-of-bounds element")
+    pop_eh
 
     $I0 = 1
     push_eh handle_get_negative
@@ -131,6 +134,7 @@ out-of-bounds test. Checks INT and PMC keys.
     $I0 = 0
   handle_get_negative:
     ok($I0, "Can't get element with negative index")
+    pop_eh
 
 .end
 
@@ -172,7 +176,7 @@ out-of-bounds test. Checks INT and PMC keys.
     $P0[1023] = $P1
 
     $P2 = new ['Key']
-    
+
     $P2 = 25
     $I0 = $P0[$P2]
     is($I0, 125, "Get INTVAL via Key works")
@@ -235,7 +239,7 @@ out-of-bounds test. Checks INT and PMC keys.
   clone_1:
     pop_eh
     ok($I0, "Resize of uninitialized clone successful")
- 
+
     $I1 = 1
     push_eh clone_2
     $P2 = clone $P0
@@ -243,6 +247,7 @@ out-of-bounds test. Checks INT and PMC keys.
     $I0 = 0
   clone_2:
     ok($I0, "Resize of initialization not successful")
+    pop_eh
 
 .end
 
@@ -336,7 +341,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
     i = iseq a1, other
     is(i, 0, "Not equal to other type")
-    
+
     a1 = 3
     isnt(a1, a2, "Different size arrays aren't equal")
 
@@ -349,7 +354,7 @@ out-of-bounds test. Checks INT and PMC keys.
     a1[1] = "bar"
     a2[1] = "BAR"
     isnt(a1, a2, "Not equal when second element differ")
-    
+
     a2[1] = "bar"
     is(a1, a2, "Equal when second element same")
 

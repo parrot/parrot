@@ -51,11 +51,8 @@ op callmethodcc(invar PMC, in STR) :object_base :flow {
   STRING   * const meth       = $2;
   opcode_t * const next       = expr NEXT();
 
-  /* a class-specific find_method can overwrite interp->current_args()! */
-  opcode_t *current_args      = interp->current_args;
   PMC      * const method_pmc = VTABLE_find_method(interp, object, meth);
   opcode_t *dest              = NULL;
-  interp->current_args        = current_args;
 
   if (PMC_IS_NULL(method_pmc)) {
     PMC * const _class = VTABLE_get_class(interp, object);
@@ -95,11 +92,8 @@ op callmethod(invar PMC, in STR, invar PMC) :object_base :flow {
   STRING   * const meth       = $2;
   opcode_t * const next       = expr NEXT();
 
-  /* a class-specific find_method can overwrite interp->current_args()! */
-  opcode_t *current_args      = interp->current_args;
   PMC      * const method_pmc = VTABLE_find_method(interp, object, meth);
   opcode_t *dest              = NULL;
-  interp->current_args        = current_args;
 
 
   if (PMC_IS_NULL(method_pmc)) {

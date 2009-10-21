@@ -62,9 +62,8 @@ out-of-bounds test. Checks INT and PMC keys.
     .return()
 
   resizing_not_allowed_handler:
-    .get_results($P0)
-    $S0 = $P0
-    like($S0, ":s FixedBooleanArray\\: Can\\'t resize\\!", 'Resetting array size (and getting an exception)')
+    pop_eh
+    ok(1, 'resizing does not work on a fixed-size array')
 .end
 
 .sub 'setting_first_element'
@@ -112,9 +111,8 @@ out-of-bounds test. Checks INT and PMC keys.
     .return()
 
   setting_out_of_bounds_handler:
-    .get_results($P0)
-    $S0 = $P0
-    like($S0, ":s FixedBooleanArray\\: index out of bounds\\!", "Setting out-of-bounds elements")
+    pop_eh
+    ok(1, "Setting out-of-bounds element did not succeed")
 .end
 
 .sub 'getting_out_of_bounds'
@@ -128,9 +126,8 @@ out-of-bounds test. Checks INT and PMC keys.
     .return()
 
   getting_out_of_bounds_handler:
-    .get_results($P0)
-    $S0 = $P0
-    like($S0, ":s FixedBooleanArray\\: index out of bounds\\!", "Getting out-of-bounds elements")
+    pop_eh
+    ok(1, "Getting out-of-bounds element does not succeed")
 .end
 
 .sub 'set_pmc_access_int'

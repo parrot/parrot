@@ -34,6 +34,8 @@ sub pre_method_gen {
 
         my ( $return_prefix, $ret_suffix, $args, $sig, $return_type_char, $null_return ) =
             $new_default_method->signature;
+        my ( $pcc_sig, $pcc_args, $pcc_result_decl, $pcc_return_stmt ) =
+            $new_default_method->pcc_signature;
         my $void_return  = $return_type_char eq 'v' ? 'return;'    : '';
         my $return       = $return_type_char eq 'v' ? ''           : $return_prefix;
         my $superargs    = $args;
@@ -53,8 +55,9 @@ sub pre_method_gen {
 
         PMC * const meth = Parrot_oo_find_vtable_override_for_class(interp, cur_class, meth_name);
         if (!PMC_IS_NULL(meth)) {
-            ${return}Parrot_run_meth_fromc_args$ret_suffix(interp, meth, pmc, meth_name, "$sig"$args);
-            $void_return
+            $pcc_result_decl
+            Parrot_pcc_invoke_sub_from_c_args(interp, meth, "Pi$pcc_sig", pmc$pcc_args);
+            $pcc_return_stmt
         }
         /* method name is $vt_method_name */
 EOC

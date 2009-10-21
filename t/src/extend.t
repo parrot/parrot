@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -663,7 +663,7 @@ CODE
 Hello from foo!
 OUTPUT
 
-c_output_is( <<"CODE", <<'OUTPUT', 'call multi sub from C - #41511', todo => 'RT #41511' );
+c_output_is( <<"CODE", <<'OUTPUT', 'call multi sub from C - #41511' );
 #include <parrot/parrot.h>
 #include <parrot/embed.h>
 #include <parrot/extend.h>
@@ -685,7 +685,7 @@ main(int argc, char* argv[])
     Parrot_pbc_load( interp, pf );
 
     sub      = Parrot_find_global_cur( interp, Parrot_str_new_constant( interp, "add" ) );
-    result   = Parrot_call_sub( interp, sub, "III", 100, 200 );
+    result   = Parrot_call_sub_ret_int( interp, sub, "III", 100, 200 );
     printf( "Result is %d.\\n", result );
 
     Parrot_exit(interp, 0);

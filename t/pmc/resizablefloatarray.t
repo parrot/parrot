@@ -90,9 +90,8 @@ out-of-bounds test. Checks INT and PMC keys.
     .return()
 
   negative_size_handler:
-    .get_results ($P1)
-    $S1 = $P1
-    like($S1, ":s ResizableFloatArray\\: Can\\'t resize to negative value\\!", 'setting negative array size')
+    pop_eh
+    ok(1, "cannot set negative array size")
 .end
 
 .sub 'setting_first_element'
@@ -331,9 +330,8 @@ out-of-bounds test. Checks INT and PMC keys.
     .return()
 
   pop_empty_handler:
-    .get_results($P0)
-    $S0 = $P0
-    like($S0, ":s ResizableFloatArray\\: Can\\'t pop from an empty array\\!", 'pop from empty array')
+    pop_eh
+    ok(1, "cannot pop from empty array")
 .end
 
 .sub 'shift_empty'
@@ -346,9 +344,8 @@ out-of-bounds test. Checks INT and PMC keys.
     .return()
 
   shift_empty_handler:
-    .get_results($P0)
-    $S0 = $P0
-    like($S0, ":s ResizableFloatArray\\: Can\\'t shift from an empty array\\!", 'shift from empty array')
+    pop_eh
+    ok(1, "cannot shift from empty array")
 .end
 
 .sub 'check_interface'

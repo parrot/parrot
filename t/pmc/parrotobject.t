@@ -247,7 +247,7 @@ pir_error_output_like( <<'CODE', <<'OUT', 'RT #41732' );
     $P1()
 .end
 CODE
-/2 params expected/
+/too few positional arguments/
 OUT
 
 # '

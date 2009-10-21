@@ -100,129 +100,6 @@ Parrot_jit_clone_buffer(PARROT_INTERP, PMC *pmc, void *priv)
     return rv;
 }
 
-INTVAL
-get_nci_I(PARROT_INTERP, ARGMOD(call_state *st), int n)
-{
-    if (n >= st->src.n)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-            "too few arguments passed to NCI function");
-
-    Parrot_fetch_arg_nci(interp, st);
-
-    return UVal_int(st->val);
-}
-
-FLOATVAL
-get_nci_N(PARROT_INTERP, ARGMOD(call_state *st), int n)
-{
-    if (n >= st->src.n)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-            "too few arguments passed to NCI function");
-
-    Parrot_fetch_arg_nci(interp, st);
-
-    return UVal_num(st->val);
-}
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING*
-get_nci_S(PARROT_INTERP, ARGMOD(call_state *st), int n)
-{
-    /* TODO or act like below? */
-    if (n >= st->src.n)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-            "too few arguments passed to NCI function");
-
-    Parrot_fetch_arg_nci(interp, st);
-
-    return UVal_str(st->val);
-}
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PMC*
-get_nci_P(PARROT_INTERP, ARGMOD(call_state *st), int n)
-{
-    /*
-     * excessive args are passed as NULL
-     * used by e.g. MMD infix like __add
-     */
-    if (n < st->src.n) {
-        PMC *value;
-        Parrot_fetch_arg_nci(interp, st);
-        value = UVal_pmc(st->val);
-        return PMC_IS_NULL(value) ? (PMC *)NULL : value;
-    }
-    else
-        return NULL;
-}
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-void*
-get_nci_p(PARROT_INTERP, ARGMOD(call_state *st), int n)
-{
-    /*
-     * excessive args are passed as NULL
-     * used by e.g. MMD infix like __add
-     */
-    if (n < st->src.n) {
-        PMC *value;
-        Parrot_fetch_arg_nci(interp, st);
-        value = UVal_pmc(st->val);
-        return PMC_IS_NULL(value) ? (PMC *)NULL : VTABLE_get_pointer(interp, value);
-    }
-    else
-        return NULL;
-}
-
-/*
- * set return value
- */
-void
-set_nci_I(PARROT_INTERP, ARGOUT(call_state *st), INTVAL val)
-{
-    Parrot_init_ret_nci(interp, st, "I");
-    if (st->dest.i < st->dest.n) {
-        UVal_int(st->val) = val;
-        Parrot_convert_arg(interp, st);
-        Parrot_store_arg(interp, st);
-    }
-}
-
-void
-set_nci_N(PARROT_INTERP, ARGOUT(call_state *st), FLOATVAL val)
-{
-    Parrot_init_ret_nci(interp, st, "N");
-    if (st->dest.i < st->dest.n) {
-        UVal_num(st->val) = val;
-        Parrot_convert_arg(interp, st);
-        Parrot_store_arg(interp, st);
-    }
-}
-
-void
-set_nci_S(PARROT_INTERP, ARGOUT(call_state *st), STRING *val)
-{
-    Parrot_init_ret_nci(interp, st, "S");
-    if (st->dest.i < st->dest.n) {
-        UVal_str(st->val) = val;
-        Parrot_convert_arg(interp, st);
-        Parrot_store_arg(interp, st);
-    }
-}
-
-void
-set_nci_P(PARROT_INTERP, ARGOUT(call_state *st), PMC* val)
-{
-    Parrot_init_ret_nci(interp, st, "P");
-    if (st->dest.i < st->dest.n) {
-        UVal_pmc(st->val) = val;
-        Parrot_convert_arg(interp, st);
-        Parrot_store_arg(interp, st);
-    }
-}
 
 int
 emit_is8bit(long disp)
@@ -461,8 +338,9 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
     emitm_movl_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, 8);
     emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 0);
 
-    if (sig && *sig)
-      emitm_call_cfunc(pc, Parrot_init_arg_nci);
+    /* XXX FIXME This whole function require major rework */
+    /* XXX FIXME if (sig && *sig) */
+    /* XXX FIXME   emitm_call_cfunc(pc, Parrot_init_arg_nci); */
 
     while (*sig) {
         emitm_movl_i_m(pc, arg_count, emit_EBP, 0, 1, temp_calls_offset + 8);
@@ -473,23 +351,23 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
                 emitm_movl_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'f':
-                emitm_call_cfunc(pc, get_nci_N);
+                /* FIXME emitm_call_cfunc(pc, get_nci_N); */
                 emitm_fstps(interp, pc, emit_EBP, 0, 1, args_offset);
                 break;
             case 'N':
             case 'd':
-                emitm_call_cfunc(pc, get_nci_N);
+                /* FIXME emitm_call_cfunc(pc, get_nci_N); */
                 emitm_fstpl(interp, pc, emit_EBP, 0, 1, args_offset);
                 args_offset += 4;
                 break;
             case 'I':   /* INTVAL */
             case 'l':   /* long */
             case 'i':   /* int */
-                emitm_call_cfunc(pc, get_nci_I);
+                /* FIXME emitm_call_cfunc(pc, get_nci_I); */
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 't':   /* string, pass a cstring */
-                emitm_call_cfunc(pc, get_nci_S);
+                /* FIXME emitm_call_cfunc(pc, get_nci_S); */
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
                 emitm_call_cfunc(pc, string_to_cstring_nullable);
 
@@ -503,12 +381,12 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
                 break;
             case 's':   /* short: movswl intreg_o(base), %eax */
-                emitm_call_cfunc(pc, get_nci_I);
+                /* FIXME emitm_call_cfunc(pc, get_nci_I); */
                 emitm_movswl_r_r(pc, emit_EAX, emit_EAX);
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'c':   /* char: movsbl intreg_o(base), %eax */
-                emitm_call_cfunc(pc, get_nci_I);
+                /* emitm_call_cfunc(pc, get_nci_I); */
                 emitm_movsbl_r_r(pc, emit_EAX, emit_EAX);
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
@@ -518,31 +396,31 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
                 arg_count--;
                 break;
             case 'p':   /* push pmc->data */
-                emitm_call_cfunc(pc, get_nci_p);
+                /* FIXME emitm_call_cfunc(pc, get_nci_p); */
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'O':   /* push PMC * object in P2 */
             case 'P':   /* push PMC * */
             case '@':
-                emitm_call_cfunc(pc, get_nci_P);
+                /* FIXME emitm_call_cfunc(pc, get_nci_P); */
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'v':
                 break;
             case 'b':   /* buffer (void*) pass Buffer_bufstart(SReg) */
-                emitm_call_cfunc(pc, get_nci_S);
+                /* FIXME emitm_call_cfunc(pc, get_nci_S); */
                 emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1,
                                (size_t) &Buffer_bufstart((STRING *) NULL));
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'B':   /* buffer (void**) pass &Buffer_bufstart(SReg) */
-                emitm_call_cfunc(pc, get_nci_S);
+                /* FIXME emitm_call_cfunc(pc, get_nci_S); */
                 emitm_lea_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1,
                               (size_t) &Buffer_bufstart((STRING *) NULL));
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'S':
-                emitm_call_cfunc(pc, get_nci_S);
+                /* FIXME emitm_call_cfunc(pc, get_nci_S); */
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
 
@@ -619,37 +497,37 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
             emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, 0);
             if (*sig == 2)      /* short */
                 emitm_movswl_r_r(pc, emit_EAX, emit_EAX);
-            emitm_call_cfunc(pc, set_nci_I);
+            /* XXX FIXME emitm_call_cfunc(pc, set_nci_I);*/
             break;
         case 'f':
         case 'd':
             jit_emit_fstore_mb_n(interp, pc, emit_EBP, temp_calls_offset + 8);
-            emitm_call_cfunc(pc, set_nci_N);
+            /* XXX FIXME emitm_call_cfunc(pc, set_nci_N); */
             /* pop num from st(0) and mov to reg */
             break;
         case 's':
             /* movswl %ax, %eax */
             emitm_movswl_r_r(pc, emit_EAX, emit_EAX);
             emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 8);
-            emitm_call_cfunc(pc, set_nci_I);
+            /* XXX FIXME emitm_call_cfunc(pc, set_nci_I); */
             break;
         case 'c':
             /* movsbl %al, %eax */
             emitm_movsbl_r_r(pc, emit_EAX, emit_EAX);
             emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 8);
-            emitm_call_cfunc(pc, set_nci_I);
+            /* XXX FIXME emitm_call_cfunc(pc, set_nci_I); */
             break;
         case 'I':   /* INTVAL */
         case 'l':
         case 'i':
             emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 8);
-            emitm_call_cfunc(pc, set_nci_I);
+           /* XXX FIXME emitm_call_cfunc(pc, set_nci_I); */
             break;
         case 'v': /* void - do nothing */
             break;
         case 'P':
             emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 8);
-            emitm_call_cfunc(pc, set_nci_P);
+            /* XXX FIXME emitm_call_cfunc(pc, set_nci_P); */
             break;
         case 'p':   /* make a new unmanaged struct */
             /* save return value on stack */
@@ -678,11 +556,11 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
             emitm_lea_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, st_offset);
             emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
 
-            emitm_call_cfunc(pc, set_nci_P);
+            /* XXX FIXME emitm_call_cfunc(pc, set_nci_P); */
             break;
         case 'S':
             emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 8);
-            emitm_call_cfunc(pc, set_nci_S);
+            /* XXX FIXME emitm_call_cfunc(pc, set_nci_S); */
             break;
         case 't':   /* string */
             /* EAX is char* */
@@ -699,7 +577,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
             emitm_lea_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, st_offset);
             emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
 
-            emitm_call_cfunc(pc, set_nci_S);
+            /* XXX FIXME emitm_call_cfunc(pc, set_nci_S); */
             break;
         default:
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,

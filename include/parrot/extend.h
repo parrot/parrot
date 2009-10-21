@@ -65,7 +65,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 void * Parrot_call_method(PARROT_INTERP,
-    Parrot_PMC sub,
+    Parrot_PMC sub_pmc,
     Parrot_PMC obj,
     Parrot_String method,
     ARGIN(const char *signature),
@@ -75,7 +75,7 @@ void * Parrot_call_method(PARROT_INTERP,
 
 PARROT_EXPORT
 Parrot_Float Parrot_call_method_ret_float(PARROT_INTERP,
-    Parrot_PMC sub,
+    Parrot_PMC sub_pmc,
     Parrot_PMC obj,
     Parrot_String method,
     ARGIN(const char *signature),
@@ -85,7 +85,7 @@ Parrot_Float Parrot_call_method_ret_float(PARROT_INTERP,
 
 PARROT_EXPORT
 Parrot_Int Parrot_call_method_ret_int(PARROT_INTERP,
-    Parrot_PMC sub,
+    Parrot_PMC sub_pmc,
     Parrot_PMC obj,
     Parrot_String method,
     ARGIN(const char *signature),
@@ -443,6 +443,15 @@ int Parrot_vfprintf(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+void append_result(PARROT_INTERP,
+    ARGIN(PMC *sig_object),
+    ARGIN(Parrot_String type),
+    ARGIN(void *result))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
+
 #define ASSERT_ARGS_Parrot_call_method __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(signature))
@@ -582,6 +591,11 @@ int Parrot_vfprintf(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pio) \
     , PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_append_result __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(sig_object) \
+    , PARROT_ASSERT_ARG(type) \
+    , PARROT_ASSERT_ARG(result))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/extend.c */
 

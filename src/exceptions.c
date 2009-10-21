@@ -38,24 +38,16 @@ static PMC * build_exception_from_args(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_CAN_RETURN_NULL
-static opcode_t * pass_exception_args(PARROT_INTERP,
-    ARGIN(const char *sig),
-    ARGIN(opcode_t *dest),
-    ARGIN(PMC * old_ctx),
-    ...)
+static void setup_exception_args(PARROT_INTERP, ARGIN(const char *sig), ...)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_build_exception_from_args __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(format))
-#define ASSERT_ARGS_pass_exception_args __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_setup_exception_args __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(sig) \
-    , PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(old_ctx))
+    , PARROT_ASSERT_ARG(sig))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -240,20 +232,7 @@ Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void 
     }
 
     address    = VTABLE_invoke(interp, handler, dest);
-
-    /* XXX This is an obvious hack. We need to identify here whether this is
-       an ExceptionHandler proper or a PIR-defined subclass. This conditional
-       monstrosity attempts to check whether this is an object of a PIR-defined
-       subclass. When we have garbage-collectable PMCs, we shouldn't need to do
-       this nonsense. See TT#154 for details */
-    if (handler->vtable->base_type == enum_class_Object) {
-        /* Don't know what to do here to make sure the exception parameter gets
-           passed properly. */
-    }
-    /* Set up the continuation context of the handler in the interpreter. */
-    else if (PARROT_CONTINUATION(handler)->current_results)
-        address = pass_exception_args(interp, "P", address,
-                CURRENT_CONTEXT(interp), exception);
+    setup_exception_args(interp, "P", exception);
 
     if (PObj_get_FLAGS(handler) & SUB_FLAG_C_HANDLER) {
         /* it's a C exception handler */
@@ -267,30 +246,29 @@ Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void 
 
 /*
 
-=item C<static opcode_t * pass_exception_args(PARROT_INTERP, const char *sig,
-opcode_t *dest, PMC * old_ctx, ...)>
+=item C<static void setup_exception_args(PARROT_INTERP, const char *sig, ...)>
 
-Passes arguments to the exception handler routine. These are retrieved with
-the .get_results() directive in PIR code.
+Sets up arguments to the exception handler invocation.
 
 =cut
 
 */
 
 PARROT_CAN_RETURN_NULL
-static opcode_t *
-pass_exception_args(PARROT_INTERP, ARGIN(const char *sig),
-        ARGIN(opcode_t *dest), ARGIN(PMC * old_ctx), ...)
+static void
+setup_exception_args(PARROT_INTERP, ARGIN(const char *sig), ...)
 {
-    ASSERT_ARGS(pass_exception_args)
-    va_list   ap;
-    opcode_t *next;
+    ASSERT_ARGS(setup_exception_args)
+    va_list  args;
+    PMC     *sig_obj;
 
-    va_start(ap, old_ctx);
-    next = parrot_pass_args_fromc(interp, sig, dest, old_ctx, ap);
-    va_end(ap);
+    va_start(args, sig);
+    sig_obj = Parrot_pcc_build_sig_object_from_varargs(interp, PMCNULL, sig, args);
+    va_end(args);
 
-    return next;
+    CALLSIGNATURE_is_exception_SET(sig_obj);
+
+    Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), sig_obj);
 }
 
 /*
@@ -380,6 +358,7 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
     /* Don't split line. It will break CONST_STRING handling */
     VTABLE_set_attr_str(interp, exception, CONST_STRING(interp, "thrower"), Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp)));
 
+
     /* it's a C exception handler */
     if (PObj_get_FLAGS(handler) & SUB_FLAG_C_HANDLER) {
         Parrot_runloop * const jump_point =
@@ -389,9 +368,7 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
 
     /* Run the handler. */
     address = VTABLE_invoke(interp, handler, NULL);
-    if (PARROT_CONTINUATION(handler)->current_results)
-        address = pass_exception_args(interp, "P", address,
-                CURRENT_CONTEXT(interp), exception);
+    setup_exception_args(interp, "P", exception);
     PARROT_ASSERT(return_point->handler_start == NULL);
     return_point->handler_start = address;
     longjmp(return_point->resume, 2);

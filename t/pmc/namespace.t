@@ -203,7 +203,7 @@ Although NameSpace.'export_to'() is used in test_more.pir.
     pop_eh
 
   test4:
-    throws_like( <<'CODE', 'Null\ PMC\ access\ in\ invoke', 'Invoking a non-existent sub')
+    throws_substring( <<'CODE', 'Null PMC access in invoke', 'Invoking a non-existent sub')
         .sub main
             $P0 = get_global ["Foo"], "SUB_THAT_DOES_NOT_EXIST"
             $P0()
@@ -212,7 +212,7 @@ CODE
 
   test5:
     # this used to behave differently from the previous case.
-    throws_like( <<'CODE', 'Null\ PMC\ access\ in\ invoke', 'Invoking a non-existent sub')
+    throws_substring( <<'CODE', 'Null PMC access in invoke', 'Invoking a non-existent sub')
         .sub main
             $P0 = get_global ["Foo";"Bar"], "SUB_THAT_DOES_NOT_EXIST"
             $P0()
@@ -552,9 +552,9 @@ CODE
 .sub 'export_to_method'
     .local string errormsg, description
 
-    errormsg = ":s destination namespace not specified"
+    errormsg = "destination namespace not specified"
     description = "export_to() Null NameSpace"
-    throws_like(<<"CODE", errormsg, description)
+    throws_substring(<<"CODE", errormsg, description)
         .sub 'test' :main
             .local pmc nsa, nsb, ar
 
@@ -566,9 +566,9 @@ CODE
         .end
 CODE
 
-    errormsg = ":s exporting default object set not yet implemented"
+    errormsg = "exporting default object set not yet implemented"
     description = 'export_to() with null exports default object set !!!UNSPECIFIED!!!'
-    throws_like(<<'CODE', errormsg, description)
+    throws_substring(<<'CODE', errormsg, description)
         .sub 'test' :main
             .local pmc nsa, nsb, ar
 
@@ -580,9 +580,9 @@ CODE
 CODE
 
 
-    errormsg = ":s exporting default object set not yet implemented"
+    errormsg = "exporting default object set not yet implemented"
     description = 'export_to() with empty array exports default object set !!!UNSPECIFIED!!!'
-    throws_like(<<'CODE', errormsg, description)
+    throws_substring(<<'CODE', errormsg, description)
         .sub 'test' :main
             .local pmc nsa, nsb, ar
 
@@ -593,9 +593,9 @@ CODE
         .end
 CODE
 
-    errormsg = ":s exporting default object set not yet implemented"
+    errormsg = "exporting default object set not yet implemented"
     description = 'export_to() with empty hash exports default object set !!!UNSPECIFIED!!!'
-    throws_like(<<'CODE', errormsg, description)
+    throws_substring(<<'CODE', errormsg, description)
         .sub 'test' :main
             .local pmc nsa, nsb, ar
 

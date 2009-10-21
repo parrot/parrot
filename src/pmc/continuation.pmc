@@ -48,10 +48,9 @@ pmclass Continuation auto_attrs {
     ATTR PackFile_ByteCode *seg;             /* bytecode segment */
     ATTR opcode_t          *address;         /* start of bytecode, addr to continue */
     ATTR PMC               *to_ctx;          /* pointer to dest context */
+    ATTR PMC               *to_call_object;  /* pointer to CallSignature */
     /* a Continuation keeps the from_ctx alive */
     ATTR PMC               *from_ctx;        /* sub, this cont is returning from */
-    ATTR opcode_t          *current_results; /* ptr into code with get_results opcode
-                                                full continuation only */
     ATTR int                runloop_id;      /* id of the creating runloop. */
     ATTR int                invoked;         /* flag when a handler has been invoked. */
 /*
@@ -67,12 +66,12 @@ Initializes the continuation.
     VTABLE void init() {
         Parrot_Continuation_attributes * const attrs = PARROT_CONTINUATION(SELF);
 
-        attrs->to_ctx     = CURRENT_CONTEXT(interp);
-        attrs->from_ctx   = CURRENT_CONTEXT(interp);
-        attrs->runloop_id = 0;
-        attrs->seg        = interp->code;
-        attrs->address    = NULL;
-        attrs->current_results = Parrot_pcc_get_results(interp, attrs->to_ctx);
+        attrs->to_ctx           = CURRENT_CONTEXT(interp);
+        attrs->to_call_object   = Parrot_pcc_get_signature(INTERP, attrs->to_ctx);
+        attrs->from_ctx         = CURRENT_CONTEXT(interp);
+        attrs->runloop_id       = 0;
+        attrs->seg              = interp->code;
+        attrs->address          = NULL;
 
         PObj_custom_mark_SET(SELF);
 
@@ -91,12 +90,12 @@ Initializes the continuation.
         Parrot_Continuation_attributes * const attrs  = PARROT_CONTINUATION(SELF);
         Parrot_Continuation_attributes * const theirs = PARROT_CONTINUATION(values);
 
-        attrs->to_ctx     = theirs->to_ctx;
-        attrs->from_ctx   = CURRENT_CONTEXT(interp);
-        attrs->runloop_id = 0;
-        attrs->seg        = theirs->seg;
-        attrs->address    = theirs->address;
-        attrs->current_results = Parrot_pcc_get_results(interp, attrs->to_ctx);
+        attrs->to_ctx           = theirs->to_ctx;
+        attrs->to_call_object   = Parrot_pcc_get_signature(INTERP, attrs->to_ctx);
+        attrs->from_ctx         = CURRENT_CONTEXT(interp);
+        attrs->runloop_id       = 0;
+        attrs->seg              = theirs->seg;
+        attrs->address          = theirs->address;
 
         PObj_custom_mark_SET(SELF);
 
@@ -130,6 +129,7 @@ Marks the continuation as live.
             return;
 
         Parrot_gc_mark_PMC_alive(INTERP, cc->to_ctx);
+        Parrot_gc_mark_PMC_alive(INTERP, cc->to_call_object);
         Parrot_gc_mark_PMC_alive(INTERP, cc->from_ctx);
     }
 
@@ -182,13 +182,6 @@ address for any returned values.
 
         cc->address    = pos;
         cc->runloop_id = INTERP->current_runloop_id;
-
-        cc->current_results = (cc->seg
-            && (pos >= cc->seg->base.data)
-            && (pos < (cc->seg->base.data + cc->seg->base.size)
-            && (*pos == PARROT_OP_get_results_pc))) ?
-                pos :
-                (opcode_t *)NULL;
     }
 
 /*
@@ -241,36 +234,30 @@ destination to continue execution.
         PMC      *from_ctx = CURRENT_CONTEXT(interp);
         PMC      *to_ctx   = cc->to_ctx;
         opcode_t *pc       = cc->address;
+        PMC      *call_obj = cc->to_call_object;
+        PMC      *from_obj = Parrot_pcc_get_signature(interp, from_ctx);
         UNUSED(next)
 
         Parrot_continuation_check(interp, SELF);
         Parrot_continuation_rewind_environment(interp, SELF);
 
-        /* pass args to where caller wants result */
-        if (cc->current_results)
-            Parrot_pcc_set_results(interp, to_ctx, cc->current_results);
+        if (!PMC_IS_NULL(from_obj)) {
+            STRING *string_sig = VTABLE_get_string(INTERP, from_obj);
+            /* If there is no string - there is no args */
+            if (string_sig) {
+                PMC *raw_sig, *invalid_sig;
+                Parrot_pcc_parse_signature_string(INTERP, string_sig, &raw_sig, &invalid_sig);
 
-        if (Parrot_pcc_get_results(interp, to_ctx) && INTERP->current_args) {
-            /*
-             * the register pointer is already switched back
-             * to the caller, therefore the registers of the
-             * sub we are returning from aren't marked, if
-             * inside argument passing a GC run is triggered
-             * therefore we have to block GC
-             */
-            opcode_t *src_indexes  = interp->current_args;
-            opcode_t *dest_indexes = Parrot_pcc_get_results(interp, to_ctx);
-            interp->current_args   = NULL;
+                /* Build results signature for continuation */
+                if (*pc == PARROT_OP_get_results_pc)
+                    call_obj = Parrot_pcc_build_sig_object_returns_from_op(INTERP, call_obj,
+                        Parrot_pcc_get_pmc_constant(INTERP, to_ctx, pc[1]), pc);
 
-            Parrot_block_GC_mark(INTERP);
-            parrot_pass_args(INTERP, from_ctx, to_ctx,
-                             src_indexes, dest_indexes, PARROT_PASS_PARAMS);
-            Parrot_unblock_GC_mark(INTERP);
+                Parrot_pcc_fill_returns_from_continuation(interp, call_obj, raw_sig, from_obj);
+            }
         }
 
         /* switch segment */
-        INTERP->current_args = NULL;
-
         if (INTERP->code != cc->seg)
             Parrot_switch_to_cs(INTERP, cc->seg, 1);
 

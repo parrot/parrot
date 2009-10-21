@@ -592,6 +592,45 @@ Parrot_pcc_set_continuation(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *_c
 
 /*
 
+=item C<PMC* Parrot_pcc_get_signature(PARROT_INTERP, PMC *ctx)>
+
+Get call signature object of Context (in sub/method call).
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+PMC*
+Parrot_pcc_get_signature(PARROT_INTERP, ARGIN(PMC *ctx))
+{
+    ASSERT_ARGS(Parrot_pcc_get_signature)
+    Parrot_Context const *c = get_context_struct_fast(interp, ctx);
+    return c->current_sig;
+}
+
+/*
+
+=item C<void Parrot_pcc_set_signature(PARROT_INTERP, PMC *ctx, PMC *sig_object)>
+
+Set signature of Context (in sub/method call).
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_pcc_set_signature(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *sig_object))
+{
+    ASSERT_ARGS(Parrot_pcc_set_signature)
+    Parrot_Context *c = get_context_struct_fast(interp, ctx);
+    c->current_sig = sig_object;
+}
+
+/*
+
 =item C<PMC* Parrot_pcc_get_object(PARROT_INTERP, PMC *ctx)>
 
 Get object of Context (in method call).
@@ -1158,6 +1197,7 @@ init_context(PARROT_INTERP, ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
     ctx->handlers          = PMCNULL;
     ctx->caller_ctx        = NULL;
     ctx->pred_offset       = 0;
+    ctx->current_sig       = PMCNULL;
     ctx->current_sub       = PMCNULL;
 
     if (old) {

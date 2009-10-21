@@ -72,8 +72,8 @@ void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_in
             case (INTVAL)'@':
                 param_sig[j++] = '@';
                 break;
-            case (INTVAL)'b':   /* buffer (void*) pass PObj_bufstart(SReg) */
-            case (INTVAL)'B':   /* buffer (void**) pass &PObj_bufstart(SReg) */
+            case (INTVAL)'b': /* buffer (void*) pass Buffer_bufstart(SReg) */
+            case (INTVAL)'B': /* buffer (void**) pass &Buffer_bufstart(SReg) */
                 param_sig[j++] = 'S';
                 break;
             default:

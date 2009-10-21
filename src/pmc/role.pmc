@@ -724,7 +724,8 @@ Compose the given role into this one, using the given exclusions and aliases.
             PMC *alias_method       :optional :named("alias_method"),
             int  got_alias_method   :opt_flag) {
         Parrot_Role_attributes *role_info = PARROT_ROLE(SELF);
-        STRING *s_name, *r_name;
+        STRING *s_name   = NULL;
+        STRING *r_name   = NULL;
 
         (STRING *s_name) = PCCINVOKE(interp, SELF, "name");
         (STRING *r_name) = PCCINVOKE(interp, role, "name");

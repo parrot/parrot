@@ -51,7 +51,7 @@ Tests the Integer PMC.
 .end
 
 .sub test_get_as_base_bounds_check
-    throws_like(<<'CODE', ':s get_as_base\: base out of bounds', 'get_as_base lower bound check')
+    throws_substring(<<'CODE', 'get_as_base: base out of bounds', 'get_as_base lower bound check')
     .sub main
         $P0 = new ['Integer']
         $P0 = 42
@@ -59,7 +59,7 @@ Tests the Integer PMC.
         say $S0
     .end
 CODE
-    throws_like(<<'CODE', ':s get_as_base\: base out of bounds', 'get_as_base upper bound check')
+    throws_substring(<<'CODE', 'get_as_base: base out of bounds', 'get_as_base upper bound check')
     .sub main
         $P0 = new ['Integer']
         $P0 = 42

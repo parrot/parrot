@@ -199,13 +199,6 @@ void Parrot_mmd_multi_dispatch_from_c_args(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC * Parrot_mmd_sort_manhattan(PARROT_INTERP, ARGIN(PMC *candidates))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_mmd_sort_manhattan_by_sig_pmc(PARROT_INTERP,
     ARGIN(PMC *candidates),
     ARGIN(PMC *invoke_sig))
@@ -283,9 +276,6 @@ PMC * Parrot_mmd_sort_manhattan_by_sig_pmc(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(sig))
-#define ASSERT_ARGS_Parrot_mmd_sort_manhattan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(candidates))
 #define ASSERT_ARGS_Parrot_mmd_sort_manhattan_by_sig_pmc \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

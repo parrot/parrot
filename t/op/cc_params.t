@@ -184,7 +184,7 @@ sub create_check_results {
     $self->{CHECK_RESULTS} =
         ( ( $c_args == $c_params ) and ( $c_results == $c_returns ) )
         ? 'ok'
-        : 'too (many|few) arguments passed .*';
+        : 'too (many|few) ((positional|named) (arguments|returns)).*';
 }
 
 sub initialize {
