@@ -15,6 +15,8 @@ src/context.c - Parrot_Context functions.
 #include "parrot/parrot.h"
 #include "parrot/call.h"
 
+#ifndef NDEBUG
+
 /* HEADERIZER HFILE: include/parrot/context.h */
 
 /* HEADERIZER BEGIN: static */
@@ -830,6 +832,7 @@ get_context_struct_fast(PARROT_INTERP, ARGIN(PMC *ctx))
     return PMC_data_typed(ctx, Parrot_Context *);
 }
 
+#endif
 
 /*
 
