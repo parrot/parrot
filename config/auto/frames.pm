@@ -50,6 +50,7 @@ sub _call_frames_buildable {
         $can_build_call_frames = $conf->options->get('buildframes');
     }
     else {
+        # TODO:  TT #1132
         # Temporary disable build frames automatically.
         #$can_build_call_frames = ($nvsize == 8 && $cpuarch eq 'i386'
         #    && $osname ne 'darwin');

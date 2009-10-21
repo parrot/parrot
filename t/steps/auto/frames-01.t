@@ -44,7 +44,11 @@ my $ret = $step->runstep($conf);
 ok( $ret, "runstep() returned true value" );
 ok( defined ( $step->result() ),
     "Got defined result" );
-is( $step->result(), 'yes', "Result is 'yes', as expected" );
+TODO: {
+    local $TODO =
+        'build frames temporarily disabled at pcc_reapply merge: TT #1132';
+    is( $step->result(), 'yes', "Result is 'yes', as expected" );
+}
 $conf->cc_clean();
 $step->set_result( undef );
 
@@ -69,8 +73,13 @@ $conf->data->set( osname =>  'linux' );
 $conf->data->set( cpuarch =>  'i386' );
 $conf->data->set( nvsize =>  8 );
 $can_build_call_frames = auto::frames::_call_frames_buildable($conf);
-ok( $can_build_call_frames,
-    "_call_frames_buildable() returned true value, as expected (i386/non darwin/8)" );
+TODO: {
+    local $TODO =
+        'build frames temporarily disabled at pcc_reapply merge: TT #1132';
+    ok( $can_build_call_frames,
+        "_call_frames_buildable() returned true value, as expected (i386/non darwin/8)"
+    );
+}
 
 $conf->data->set( osname =>  'darwin' );
 $conf->data->set( cpuarch =>  'i386' );
