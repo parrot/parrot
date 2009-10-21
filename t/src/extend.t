@@ -12,7 +12,7 @@ use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test;
 use Parrot::Config;
 
-plan tests => 17;
+plan tests => 20;
 
 =head1 NAME
 
@@ -471,6 +471,133 @@ hello in sub2
 back
 OUTPUT
 
+c_output_is( <<"CODE", <<'OUTPUT', 'call a parrot sub using the unified interface' );
+
+#include <parrot/parrot.h>
+#include <parrot/embed.h>
+#include <parrot/extend.h>
+
+static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
+
+int
+main(int argc, char *argv[])
+{
+    Parrot_Interp interp = Parrot_new(NULL);
+    if (!interp)
+        return 1;
+
+    Parrot_run_native(interp, the_test);
+
+    Parrot_exit(interp, 0);
+    return 0;
+}
+
+/* also both the test PASM and the_test() print to stderr
+ * so that buffering in PIO is not an issue */
+
+static opcode_t*
+the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
+{
+    PackFile *pf = Parrot_pbc_read(interp, "$temp_pbc", 0);
+    STRING   *name = Parrot_str_new_constant(interp, "_sub1");
+    PMC      *sub, *arg;
+
+    Parrot_pbc_load(interp, pf);
+    sub = Parrot_find_global_cur(interp, name);
+    Parrot_ext_call(interp, sub, "->");
+    Parrot_eprintf(interp, "back\\n");
+
+    /* win32 seems to buffer stderr ? */
+    Parrot_io_flush(interp, Parrot_io_STDERR(interp));
+
+    name = Parrot_str_new_constant(interp, "_sub2");
+    sub  = Parrot_find_global_cur(interp, name);
+    arg  = pmc_new(interp, enum_class_String);
+
+    Parrot_PMC_set_string_native(interp, arg,
+                 Parrot_str_new(interp, "hello ", 0));
+
+    Parrot_ext_call(interp, sub, "P->", arg);
+    Parrot_eprintf(interp, "back\\n");
+
+    return NULL;
+}
+CODE
+in sub1
+back
+hello in sub2
+back
+OUTPUT
+
+($TEMP, my $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
+
+print $TEMP <<'EOF';
+  .sub foo
+      .param pmc input
+      printerr input
+      printerr "in sub2\n"
+      $P0 = new "Integer"
+      $P0 = 42
+      .return($P0)
+  .end
+EOF
+close $TEMP;
+
+# compile to pbc
+(undef, $temp_pbc) = create_tempfile( SUFFIX => '.pbc', UNLINK => 1 );
+system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pir);
+
+c_output_is( <<"CODE", <<'OUTPUT', 'call a parrot sub and return an integer' );
+
+#include <parrot/parrot.h>
+#include <parrot/embed.h>
+#include <parrot/extend.h>
+
+static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
+
+int
+main(int argc, char *argv[])
+{
+    Parrot_Interp interp = Parrot_new(NULL);
+    if (!interp)
+        return 1;
+
+    Parrot_run_native(interp, the_test);
+
+    Parrot_exit(interp, 0);
+    return 0;
+}
+
+/* also both the test PASM and the_test() print to stderr
+ * so that buffering in PIO is not an issue */
+
+static opcode_t*
+the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
+{
+    PackFile *pf = Parrot_pbc_read(interp, "$temp_pbc", 0);
+    STRING   *name = Parrot_str_new_constant(interp, "foo");
+    PMC      *sub, *arg;
+    Parrot_Int result;
+
+    Parrot_pbc_load(interp, pf);
+    sub  = Parrot_find_global_cur(interp, name);
+    arg  = pmc_new(interp, enum_class_String);
+
+    Parrot_PMC_set_string_native(interp, arg,
+                 Parrot_str_new(interp, "hello ", 0));
+
+    Parrot_ext_call(interp, sub, "P->I", arg, &result);
+    Parrot_eprintf(interp, "result %d\\n", result);
+    Parrot_eprintf(interp, "back\\n");
+
+    return NULL;
+}
+CODE
+hello in sub2
+result 42
+back
+OUTPUT
+
 ($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $TEMP <<'EOF';
@@ -543,7 +670,7 @@ caught
 back
 OUTPUT
 
-($TEMP, my $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
+($TEMP, $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $TEMP <<'EOF';
 .sub main :main
@@ -686,6 +813,38 @@ main(int argc, char* argv[])
 
     sub      = Parrot_find_global_cur( interp, Parrot_str_new_constant( interp, "add" ) );
     result   = Parrot_call_sub_ret_int( interp, sub, "III", 100, 200 );
+    printf( "Result is %d.\\n", result );
+
+    Parrot_exit(interp, 0);
+    return 0;
+}
+CODE
+Result is 300.
+OUTPUT
+
+c_output_is( <<"CODE", <<'OUTPUT', 'call multi sub from C - unified interface' );
+#include <parrot/parrot.h>
+#include <parrot/embed.h>
+#include <parrot/extend.h>
+
+int
+main(int argc, char* argv[])
+{
+    Parrot_Int      result;
+    Parrot_PMC      sub;
+    Parrot_PackFile pf;
+    Parrot_Interp   interp = Parrot_new(NULL);
+
+    if (!interp) {
+        printf( "No interpreter\\n" );
+        return 1;
+    }
+
+    pf = Parrot_pbc_read( interp, "$temp_pbc", 0 );
+    Parrot_pbc_load( interp, pf );
+
+    sub      = Parrot_find_global_cur( interp, Parrot_str_new_constant( interp, "add" ) );
+    Parrot_ext_call( interp, sub, "II->I", 100, 200, &result );
     printf( "Result is %d.\\n", result );
 
     Parrot_exit(interp, 0);

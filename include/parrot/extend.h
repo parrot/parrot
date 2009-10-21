@@ -124,6 +124,15 @@ int Parrot_eprintf(NULLOK_INTERP, ARGIN(const char *s), ...)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+void Parrot_ext_call(PARROT_INTERP,
+    ARGIN(Parrot_PMC sub_pmc),
+    ARGIN(const char *signature),
+    ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 Parrot_Language Parrot_find_language(SHIM_INTERP, SHIM(char *language));
 
@@ -472,6 +481,10 @@ void append_result(PARROT_INTERP,
     , PARROT_ASSERT_ARG(signature))
 #define ASSERT_ARGS_Parrot_eprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_Parrot_ext_call __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(sub_pmc) \
+    , PARROT_ASSERT_ARG(signature))
 #define ASSERT_ARGS_Parrot_find_language __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_fprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

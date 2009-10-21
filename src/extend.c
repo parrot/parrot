@@ -1071,6 +1071,53 @@ append_result(PARROT_INTERP, ARGIN(PMC *sig_object), ARGIN(Parrot_String type), 
 
 /*
 
+=item C<void Parrot_ext_call(PARROT_INTERP, Parrot_PMC sub_pmc, const char
+*signature, ...)>
+
+Call a Parrot subroutine or method with the given function signature. The
+function signature holds one type character for each argument or return, these
+are:
+
+    I ... Parrot_Int
+    N ... Parrot_Float
+    S ... Parrot_String
+    P ... Parrot_PMC
+
+Returns come after the arguments, separated by an arrow, so "PN->S" takes a PMC
+and a float as arguments and returns a string.
+
+Pass the variables for the arguments and returns in the same order as the
+signature, with returns as reference to the variable (so it can be modified).
+
+    Parrot_ext_call(interp, sub, "P->S", pmc_arg, &string_result);
+
+To call a method, pass the object for the method as the first argument, and
+mark it in the signature as "Pi" ("i" stands for "invocant").
+
+    Parrot_ext_call(interp, sub, "PiP->S", object_arg, pmc_arg, &string_result);
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_ext_call(PARROT_INTERP, ARGIN(Parrot_PMC sub_pmc),
+                 ARGIN(const char *signature), ...)
+{
+    ASSERT_ARGS(Parrot_ext_call)
+    va_list args;
+    PMC  *sig_object;
+
+    va_start(args, signature);
+    sig_object = Parrot_pcc_build_sig_object_from_varargs(interp, PMCNULL, signature, args);
+    va_end(args);
+
+    Parrot_pcc_invoke_from_sig_object(interp, sub_pmc, sig_object);
+}
+
+/*
+
 =item C<void* Parrot_call_sub(PARROT_INTERP, Parrot_PMC sub_pmc, const char
 *signature, ...)>
 
