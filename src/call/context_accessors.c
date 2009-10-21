@@ -41,10 +41,6 @@ static Parrot_Context * get_context_struct_fast(PARROT_INTERP,
 
 =over 4
 
-*/
-
-/*
-
 =item C<Parrot_Context* Parrot_pcc_get_context_struct(PARROT_INTERP, PMC *ctx)>
 
 Fetch Parrot_Context from Context PMC.

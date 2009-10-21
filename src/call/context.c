@@ -99,6 +99,10 @@ static void init_context(PARROT_INTERP,
 
 /*
 
+=head2 Context API Functions
+
+=over 4
+
 =item C<PMC* Parrot_pcc_get_sub(PARROT_INTERP, PMC *ctx)>
 
 Get Sub executed inside Context.
