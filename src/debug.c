@@ -3581,10 +3581,11 @@ PDB_backtrace(PARROT_INTERP)
 
         /* print the context description */
         if (rec_level == 0) {
+            PackFile_ByteCode *seg = sub_cont->seg;
             Parrot_io_eprintf(interp, "%Ss", str);
-            if (interp->code->annotations) {
-                PMC *annot = PackFile_Annotations_lookup(interp, interp->code->annotations,
-                        Parrot_pcc_get_pc(interp, sub_cont->to_ctx) - interp->code->base.data + 1,
+            if (seg->annotations) {
+                PMC *annot = PackFile_Annotations_lookup(interp, seg->annotations,
+                        Parrot_pcc_get_pc(interp, sub_cont->to_ctx) - seg->base.data,
                         NULL);
 
                 if (!PMC_IS_NULL(annot)) {
