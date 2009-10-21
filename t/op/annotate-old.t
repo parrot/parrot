@@ -10,11 +10,11 @@ use Parrot::Test tests => 1;
 
 =head1 NAME
 
-t/op/annotate_ext.t - Test .annotate directive
+t/op/annotate-old.t - Test .annotate directive
 
 =head1 SYNOPSIS
 
-    % prove t/op/annotate_ext.t
+    % prove t/op/annotate-old.t
 
 =head1 DESCRIPTION
 
