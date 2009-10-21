@@ -428,11 +428,7 @@ Parrot_alloc_context(PARROT_INTERP, ARGIN(const INTVAL *number_regs_used),
 
     const size_t to_alloc = reg_alloc + ALIGNED_CTX_SIZE;
 
-#ifdef GC_USE_FIXED_SIZE_ALLOCATOR
     ctx  = (Parrot_Context *)Parrot_gc_allocate_fixed_size_storage(interp, to_alloc);
-#else
-    ctx  = (Parrot_Context *)mem_sys_allocate(to_alloc);
-#endif
 
     ctx->n_regs_used[REGNO_INT] = number_regs_used[REGNO_INT];
     ctx->n_regs_used[REGNO_NUM] = number_regs_used[REGNO_NUM];

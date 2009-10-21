@@ -105,13 +105,10 @@ Destroy Context and memory allocated by C<Parrot_alloc_context>.
         if (!ctx)
             return;
 
-#ifdef GC_USE_FIXED_SIZE_ALLOCATOR
         Parrot_gc_free_fixed_size_storage(interp,
                 Parrot_pcc_calculate_context_size(INTERP, ctx->n_regs_used),
                 ctx);
-#else
-        mem_sys_free(ctx);
-#endif
+
         PMC_data(SELF) = NULL;
     }
 
