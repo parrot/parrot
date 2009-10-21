@@ -1045,10 +1045,10 @@ sub _generate_test_functions {
                     . "$PConfig{ld_out}$exe_f "
                     . "$obj_f $cfg "
                     . "$PConfig{libparrot_linkflags} "
-		    # If rpath is defined (and therefore rpath_blib), use it to get at the build libraries
-		    . ( defined($PConfig{rpath_blib})
-			? (  $PConfig{rpath_blib} . " " )
-			: "" )
+            # If rpath is defined (and therefore rpath_blib), use it to get at the build libraries
+            . ( defined($PConfig{rpath_blib})
+            ? (  $PConfig{rpath_blib} . " " )
+            : "" )
                     . "$PConfig{linkflags} $PConfig{ld_debug} "
                     . "$iculibs $PConfig{libs}";
                 my $exit_code = run_command(
