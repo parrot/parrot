@@ -12,6 +12,59 @@
 #include "parrot/string.h"
 #include "parrot/compiler.h"
 
+struct PackFile_Constant;
+
+typedef union {
+    PMC         **regs_p;
+    STRING      **regs_s;
+} Regs_ps;
+
+typedef union {
+    FLOATVAL     *regs_n;
+    INTVAL       *regs_i;
+} Regs_ni;
+
+struct Parrot_Context {
+    PMC     *caller_ctx;      /* caller context */
+    Regs_ni  bp;              /* pointers to FLOATVAL & INTVAL */
+    Regs_ps  bp_ps;           /* pointers to PMC & STR */
+
+    /* end common header */
+    UINTVAL  n_regs_used[4];   /* INSP in PBC points to Sub */
+    PMC      *lex_pad;         /* LexPad PMC */
+    PMC      *outer_ctx;       /* outer context, if a closure */
+
+    /* new call scheme and introspective variables */
+    PMC      *current_sub;           /* the Sub we are executing */
+
+    /* for now use a return continuation PMC */
+    PMC      *handlers;              /* local handlers for the context */
+    PMC      *current_cont;          /* the return continuation PMC */
+    PMC      *current_object;        /* current object if a method call */
+    PMC      *current_namespace;     /* The namespace we're currently in */
+    PMC      *results_signature;     /* non-const results signature PMC */
+    opcode_t *current_pc;            /* program counter of Sub invocation */
+    opcode_t *current_results;       /* ptr into code with get_results opcode */
+    PMC      *current_sig;           /* temporary CallSignature PMC for active call */
+
+    /* deref the constants - we need it all the time */
+    struct PackFile_Constant **constants;
+
+    INTVAL                 current_HLL;     /* see also src/hll.c */
+
+    UINTVAL                warns;           /* Keeps track of what warnings
+                                             * have been activated */
+    UINTVAL                errors;          /* fatals that can be turned off */
+    UINTVAL                trace_flags;
+    UINTVAL                recursion_depth; /* Sub call recursion depth */
+
+    /* code->prederefed.code - code->base.data in opcodes
+     * to simplify conversion between code ptrs in e.g. invoke */
+    size_t pred_offset;
+};
+
+typedef struct Parrot_Context Parrot_Context;
+
 /*
  * Macros to make accessing registers more convenient/readable.
  */
@@ -71,59 +124,6 @@
         (__CTX->n_regs_used[REGNO_PMC] - 1L - (x)))
 #define REG_OFFS_STR(x) (sizeof (STRING*) * (x) + _SIZEOF_INTS + _SIZEOF_PMCS)
 
-
-struct PackFile_Constant;
-
-typedef union {
-    PMC         **regs_p;
-    STRING      **regs_s;
-} Regs_ps;
-
-typedef union {
-    FLOATVAL     *regs_n;
-    INTVAL       *regs_i;
-} Regs_ni;
-
-struct Parrot_Context {
-    PMC     *caller_ctx;      /* caller context */
-    Regs_ni  bp;              /* pointers to FLOATVAL & INTVAL */
-    Regs_ps  bp_ps;           /* pointers to PMC & STR */
-
-    /* end common header */
-    UINTVAL  n_regs_used[4];   /* INSP in PBC points to Sub */
-    PMC      *lex_pad;         /* LexPad PMC */
-    PMC      *outer_ctx;       /* outer context, if a closure */
-
-    /* new call scheme and introspective variables */
-    PMC      *current_sub;           /* the Sub we are executing */
-
-    /* for now use a return continuation PMC */
-    PMC      *handlers;              /* local handlers for the context */
-    PMC      *current_cont;          /* the return continuation PMC */
-    PMC      *current_object;        /* current object if a method call */
-    PMC      *current_namespace;     /* The namespace we're currently in */
-    PMC      *results_signature;     /* non-const results signature PMC */
-    opcode_t *current_pc;            /* program counter of Sub invocation */
-    opcode_t *current_results;       /* ptr into code with get_results opcode */
-
-    /* deref the constants - we need it all the time */
-    struct PackFile_Constant **constants;
-
-    INTVAL                 current_HLL;     /* see also src/hll.c */
-
-    PMC *current_sig;           /* temporary CallSignature PMC for active call */
-    UINTVAL                warns;           /* Keeps track of what warnings
-                                             * have been activated */
-    UINTVAL                errors;          /* fatals that can be turned off */
-    UINTVAL                trace_flags;
-    UINTVAL                recursion_depth; /* Sub call recursion depth */
-
-    /* code->prederefed.code - code->base.data in opcodes
-     * to simplify conversion between code ptrs in e.g. invoke */
-    size_t pred_offset;
-};
-
-typedef struct Parrot_Context Parrot_Context;
 
 /* Context accessors functions */
 
