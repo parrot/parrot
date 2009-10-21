@@ -258,8 +258,10 @@ ARGIN(opcode_t *pc))
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
                     "attempt to access code outside of current code segment");
 
-        preop_line = PTR2INTVAL(
-                parrot_hash_get(interp, runcore->line_cache, CONTEXT(interp)->current_pc));
+        preop_line = hash_value_to_int(interp, runcore->line_cache,
+            parrot_hash_get(interp, runcore->line_cache,
+                        CONTEXT(interp)->current_pc));
+
         if (preop_line == 0) {
             preop_line = Parrot_Sub_get_line_from_pc(interp,
                     Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp)),
