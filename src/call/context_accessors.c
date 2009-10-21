@@ -43,6 +43,29 @@ static Parrot_Context * get_context_struct_fast(PARROT_INTERP,
 
 /*
 
+=item C<Parrot_Context* Parrot_pcc_get_context_struct(PARROT_INTERP, PMC *ctx)>
+
+Fetch Parrot_Context from Context PMC.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+Parrot_Context*
+Parrot_pcc_get_context_struct(PARROT_INTERP, ARGIN_NULLOK(PMC *ctx))
+{
+    ASSERT_ARGS(Parrot_pcc_get_context_struct)
+
+    if (PMC_IS_NULL(ctx))
+        return NULL;
+
+    return get_context_struct_fast(interp, ctx);
+}
+
+/*
+
 =item C<struct PackFile_Constant ** Parrot_pcc_get_constants(PARROT_INTERP, PMC
 *ctx)>
 
@@ -539,6 +562,246 @@ Parrot_pcc_set_pred_offset(PARROT_INTERP, ARGIN(PMC *ctx), size_t pred_offset)
     Parrot_Context *c = get_context_struct_fast(interp, ctx);
     c->pred_offset = pred_offset;
 }
+
+
+/*
+
+=item C<UINTVAL Parrot_pcc_warnings_on(PARROT_INTERP, PMC *ctx, UINTVAL flags)>
+
+Set warnings flags.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+UINTVAL
+Parrot_pcc_warnings_on(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL flags)
+{
+    ASSERT_ARGS(Parrot_pcc_warnings_on)
+    Parrot_Context *c = get_context_struct_fast(interp, ctx);
+    c->warns |= flags;
+    return c->warns;
+}
+
+
+/*
+
+=item C<void Parrot_pcc_warnings_off(PARROT_INTERP, PMC *ctx, UINTVAL flags)>
+
+Clear warnings flags.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_pcc_warnings_off(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL flags)
+{
+    ASSERT_ARGS(Parrot_pcc_warnings_off)
+    Parrot_Context *c = get_context_struct_fast(interp, ctx);
+    c->warns &= ~flags;
+}
+
+
+/*
+
+=item C<UINTVAL Parrot_pcc_warnings_test(PARROT_INTERP, PMC *ctx, UINTVAL
+flags)>
+
+Test warnings flags.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+UINTVAL
+Parrot_pcc_warnings_test(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL flags)
+{
+    ASSERT_ARGS(Parrot_pcc_warnings_test)
+    Parrot_Context *c = get_context_struct_fast(interp, ctx);
+    return c->warns & flags;
+}
+
+/*
+
+=item C<void Parrot_pcc_errors_on(PARROT_INTERP, PMC *ctx, UINTVAL flags)>
+
+Set errors flags.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_pcc_errors_on(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL flags)
+{
+    ASSERT_ARGS(Parrot_pcc_errors_on)
+    Parrot_Context *c = get_context_struct_fast(interp, ctx);
+    c->errors |= flags;
+}
+
+
+/*
+
+=item C<void Parrot_pcc_errors_off(PARROT_INTERP, PMC *ctx, UINTVAL flags)>
+
+Clear errors flags.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_pcc_errors_off(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL flags)
+{
+    ASSERT_ARGS(Parrot_pcc_errors_off)
+    Parrot_Context *c = get_context_struct_fast(interp, ctx);
+    c->errors &= ~flags;
+}
+
+/*
+
+=item C<UINTVAL Parrot_pcc_errors_test(PARROT_INTERP, PMC *ctx, UINTVAL flags)>
+
+Test errors flags.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+UINTVAL
+Parrot_pcc_errors_test(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL flags)
+{
+    ASSERT_ARGS(Parrot_pcc_errors_test)
+    Parrot_Context *c = get_context_struct_fast(interp, ctx);
+    return c->errors & flags;
+}
+
+/*
+
+=item C<void Parrot_pcc_trace_flags_on(PARROT_INTERP, PMC *ctx, UINTVAL flags)>
+
+Set trace flags.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_pcc_trace_flags_on(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL flags)
+{
+    ASSERT_ARGS(Parrot_pcc_trace_flags_on)
+    Parrot_Context *c = get_context_struct_fast(interp, ctx);
+    c->trace_flags |= flags;
+}
+
+
+/*
+
+=item C<void Parrot_pcc_trace_flags_off(PARROT_INTERP, PMC *ctx, UINTVAL flags)>
+
+Clear trace flags.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_pcc_trace_flags_off(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL flags)
+{
+    ASSERT_ARGS(Parrot_pcc_trace_flags_off)
+    Parrot_Context *c = get_context_struct_fast(interp, ctx);
+    c->trace_flags &= ~flags;
+}
+
+/*
+
+=item C<UINTVAL Parrot_pcc_trace_flags_test(PARROT_INTERP, PMC *ctx, UINTVAL
+flags)>
+
+Test trace flags.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+UINTVAL
+Parrot_pcc_trace_flags_test(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL flags)
+{
+    ASSERT_ARGS(Parrot_pcc_trace_flags_test)
+    Parrot_Context *c = get_context_struct_fast(interp, ctx);
+    return c->trace_flags & flags;
+}
+
+
+/*
+
+=item C<INTVAL Parrot_pcc_get_int_constant(PARROT_INTERP, PMC *ctx, INTVAL idx)>
+
+=item C<FLOATVAL Parrot_pcc_get_num_constant(PARROT_INTERP, PMC *ctx, INTVAL
+idx)>
+
+=item C<STRING* Parrot_pcc_get_string_constant(PARROT_INTERP, PMC *ctx, INTVAL
+idx)>
+
+=item C<PMC* Parrot_pcc_get_pmc_constant(PARROT_INTERP, PMC *ctx, INTVAL idx)>
+
+Get typed constant from context.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+INTVAL
+Parrot_pcc_get_int_constant(PARROT_INTERP, ARGIN(PMC *ctx), INTVAL idx)
+{
+    ASSERT_ARGS(Parrot_pcc_get_int_constant)
+    Parrot_Context const * c = get_context_struct_fast(interp, ctx);
+    return c->constants[idx]->u.integer;
+}
+
+PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+FLOATVAL
+Parrot_pcc_get_num_constant(PARROT_INTERP, ARGIN(PMC *ctx), INTVAL idx)
+{
+    ASSERT_ARGS(Parrot_pcc_get_num_constant)
+    Parrot_Context const * c = get_context_struct_fast(interp, ctx);
+    return c->constants[idx]->u.number;
+}
+
+PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+STRING*
+Parrot_pcc_get_string_constant(PARROT_INTERP, ARGIN(PMC *ctx), INTVAL idx)
+{
+    ASSERT_ARGS(Parrot_pcc_get_string_constant)
+    Parrot_Context const * c = get_context_struct_fast(interp, ctx);
+    return c->constants[idx]->u.string;
+}
+
+PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+PMC*
+Parrot_pcc_get_pmc_constant(PARROT_INTERP, ARGIN(PMC *ctx), INTVAL idx)
+{
+    ASSERT_ARGS(Parrot_pcc_get_pmc_constant)
+    Parrot_Context const * c = get_context_struct_fast(interp, ctx);
+    return c->constants[idx]->u.key;
+}
+
+
 
 /*
 
