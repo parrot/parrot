@@ -25,11 +25,6 @@ CODE
 42
 OUTPUT
 
-
-TODO: {
-    local $TODO = q|fails on switch runcore - TT #1102|
-        if $ENV{TEST_PROG_ARGS} =~ /--runcore=switch/;
-
 pir_error_output_like( <<'CODE', <<'OUTPUT', 'macro, zero parameters, line number' );
 .sub test :main
 .macro answer()
@@ -43,13 +38,6 @@ CODE
 /(?s:Null PMC access .*current instr.*:(4|-1)\))/
 OUTPUT
 
-}
-
-
-TODO: {
-    local $TODO = q|fails on switch runcore - TT #1102|
-        if $ENV{TEST_PROG_ARGS} =~ /--runcore=switch/;
-
 pir_error_output_like( <<'CODE', <<'OUTPUT', 'macro, zero parameters, line number' );
 .sub test :main
 .macro answer()
@@ -61,13 +49,6 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', 'macro, zero parameters, line numbe
 CODE
 /(?s:Null PMC access .*current instr.*:(5|-1)\))/
 OUTPUT
-
-}
-
-
-TODO: {
-    local $TODO = q|fails on switch runcore - TT #1102|
-        if $ENV{TEST_PROG_ARGS} =~ /--runcore=switch/;
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', 'macro, zero parameters, line number' );
 .sub test :main
@@ -81,8 +62,6 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', 'macro, zero parameters, line numbe
 CODE
 /(?s:Null PMC access .*current instr.*:(6|-1)\))/
 OUTPUT
-
-}
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'macro, one unused parameter, literal term' );
 .sub test :main
