@@ -1613,8 +1613,8 @@ void *
 Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_gc_allocate_pmc_attributes)
-#if GC_USE_FIXED_SIZE_ALLOCATOR
     const size_t attr_size = pmc->vtable->attr_size;
+#if GC_USE_FIXED_SIZE_ALLOCATOR
     PMC_Attribute_Pool * const pool = Parrot_gc_get_attribute_pool(interp,
         attr_size);
     void * const attrs = Parrot_gc_get_attributes_from_pool(interp, pool);
@@ -1622,7 +1622,7 @@ Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
     PMC_data(pmc) = attrs;
     return attrs;
 #else
-    void * const data =  mem_sys_allocate_zeroed(new_vtable->attr_size);
+    void * const data =  mem_sys_allocate_zeroed(attr_size);
     PMC_data(pmc) = data;
     return data;
 #endif
