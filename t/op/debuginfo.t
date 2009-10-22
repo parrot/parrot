@@ -163,14 +163,8 @@ called from Sub 'rec' pc (\d+|-1) \(.*?:(\d+|-1)\)
 called from Sub 'main' pc (\d+|-1) \(.*?:(\d+|-1)\)$/
 OUTPUT
 
-$nolineno = $ENV{TEST_PROG_ARGS} =~ /--runcore=fast/
+$nolineno = $ENV{TEST_PROG_ARGS} =~ /--runcore=(fast|cgoto)/
     ? '\(\(unknown file\):-1\)' : '\(xyz.pir:126\)';
-
-#SKIP: {
-#skip "disabled on this core",2 if $ENV{TEST_PROG_ARGS} =~ /--runcore=(fast|cgoto|jit|switch)/;
-TODO: {
-    local $TODO = q|Not yet passing on 'cgoto', 'jit' or 'switch' runcores|
-        if $ENV{TEST_PROG_ARGS} =~ /--runcore=(cgoto|jit|switch)/;
 
 # See "RT #43269 and .annotate
 pir_error_output_like( <<'CODE', <<"OUTPUT", "setfile and setline" );
@@ -185,13 +179,7 @@ CODE
 /$nolineno/
 OUTPUT
 
-} # END TODO
-
-TODO: {
-    local $TODO = q|Not yet passing on 'jit' or 'switch' runcores|
-        if $ENV{TEST_PROG_ARGS} =~ /--runcore=(jit|switch)/;
-
-$nolineno = $ENV{TEST_PROG_ARGS} =~ /--runcore=(fast|cgoto|jit|switch)/
+$nolineno = $ENV{TEST_PROG_ARGS} =~ /--runcore=(fast|cgoto)/
     ? '\(\(unknown file\):-1\)' : '\(foo.p6:128\)';
 # See "RT #43269 and .annotate
 pir_error_output_like( <<'CODE', <<"OUTPUT", "setfile and setline" );
@@ -211,8 +199,6 @@ pir_error_output_like( <<'CODE', <<"OUTPUT", "setfile and setline" );
 CODE
 /$nolineno/
 OUTPUT
-
-} # END TODO
 
 # Local Variables:
 #   mode: cperl
