@@ -468,7 +468,7 @@ void Parrot_gc_inf_init(PARROT_INTERP);
 
 #if defined(PARROT_IN_CORE)
 #  define Parrot_gc_mark_PMC_alive(interp, obj) \
-      do if (!PMC_IS_NULL(obj)) Parrot_gc_mark_PMC_alive_fun((interp), (obj)); \
+      do if (!PMC_IS_NULL(obj) && !PObj_live_TEST(obj)) Parrot_gc_mark_PMC_alive_fun((interp), (obj)); \
       while (0)
 #else
 #  define Parrot_gc_mark_PMC_alive(interp, obj) Parrot_gc_mark_PMC_alive_fun((interp), (obj))
