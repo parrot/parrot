@@ -995,9 +995,11 @@ Parrot_gc_get_attributes_from_pool(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool * po
     PMC_Attribute_Free_List *item;
 
 #if GC_USE_LAZY_ALLOCATOR
-    if (pool->newfree == NULL && pool->free_list == NULL)
-        Parrot_gc_allocate_new_attributes_arena(interp, pool);
-    if (pool->newfree) {
+    if (pool->free_list) {
+        item            = pool->free_list;
+        pool->free_list = item->next;
+    }
+    else if (pool->newfree) {
         item          = pool->newfree;
         pool->newfree = (PMC_Attribute_Free_List *)
                         ((char *)(pool->newfree) + pool->attr_size);
@@ -1005,8 +1007,8 @@ Parrot_gc_get_attributes_from_pool(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool * po
             pool->newfree = NULL;
     }
     else {
-        item            = pool->free_list;
-        pool->free_list = item->next;
+        Parrot_gc_allocate_new_attributes_arena(interp, pool);
+        return Parrot_gc_get_attributes_from_pool(interp, pool);
     }
 #else
     if (pool->free_list == NULL)
