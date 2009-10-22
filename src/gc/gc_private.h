@@ -52,6 +52,7 @@ extern void *flush_reg_store(void);
 
 #define CONSTANT_PMC_HEADERS_PER_ALLOC 4096 / sizeof (PMC)
 #define GET_SIZED_POOL_IDX(x) ((x) / sizeof (void *))
+#define GC_NUM_INITIAL_FIXED_SIZE_POOLS 128
 
 
 /* these values are used for the attribute allocator */
@@ -346,6 +347,10 @@ void * Parrot_gc_get_attributes_from_pool(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(* pool);
 
+void Parrot_gc_initialize_fixed_size_pools(PARROT_INTERP,
+    size_t init_num_pools)
+        __attribute__nonnull__(1);
+
 void Parrot_gc_run_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -393,6 +398,9 @@ int Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pool))
+#define ASSERT_ARGS_Parrot_gc_initialize_fixed_size_pools \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_run_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_sweep_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
