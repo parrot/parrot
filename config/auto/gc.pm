@@ -13,7 +13,7 @@ Currently, we have only one choice:  the memory allocator in
 F<src/gc/alloc_resources.c>.
 
 In the future, we will have a C<--gc> command-line option which will enable
-the configurer to choose among several garbage colectors.
+the configurer to choose among several garbage collectors.
 
 =over 4
 
