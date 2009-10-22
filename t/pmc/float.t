@@ -348,7 +348,6 @@ Tests the Float PMC.
 
   negative_zero_todoed:
     todo(1, '-0.0 not implemented, TT#313')
-    pop_eh
 .end
 
 .sub 'equality'
