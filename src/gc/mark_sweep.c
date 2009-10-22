@@ -965,6 +965,11 @@ PMC_Attribute_Pool * pool, void *data)>
 
 Frees a fixed-size data item back to the pool for later reallocation
 
+=item C<void Parrot_gc_initialize_fixed_size_pools(PARROT_INTERP, size_t
+init_num_pools)>
+
+Initialize the pools (zeroize)
+
 =item C<PMC_Attribute_Pool * Parrot_gc_get_attribute_pool(PARROT_INTERP, size_t
 attrib_size)>
 
@@ -1089,7 +1094,7 @@ Parrot_gc_get_attribute_pool(PARROT_INTERP, size_t attrib_size)
     PMC_Attribute_Pool **pools = mem_pools->attrib_pools;
     const size_t         idx   = (attrib_size < sizeof (void *))
                                ? 0
-                               : attrib_size - sizeof(void *);
+                               : attrib_size - sizeof (void *);
 
     if (mem_pools->num_attribs <= idx) {
         const size_t total_length = idx + GC_ATTRIB_POOLS_HEADROOM;
@@ -1118,7 +1123,7 @@ static PMC_Attribute_Pool *
 Parrot_gc_create_attrib_pool(PARROT_INTERP, size_t attrib_idx)
 {
     ASSERT_ARGS(Parrot_gc_create_attrib_pool)
-    const size_t attrib_size = attrib_idx + sizeof(void *);
+    const size_t attrib_size = attrib_idx + sizeof (void *);
     const size_t num_objs_raw =
         (GC_FIXED_SIZE_POOL_SIZE - sizeof (PMC_Attribute_Arena)) / attrib_size;
     const size_t num_objs = (num_objs_raw == 0)?(1):(num_objs_raw);
