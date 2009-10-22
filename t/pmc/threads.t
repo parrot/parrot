@@ -680,15 +680,8 @@ ok 1
 ok 2
 OUTPUT
 
-my @todo;
-
-if ( $ENV{TEST_PROG_ARGS} ) {
-    push @todo, ( todo => 'Broken with CGP' ) if $ENV{TEST_PROG_ARGS} =~ /--runcore=cgp/;
-    push @todo, ( todo => 'Broken with JIT' ) if $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/;
-    push @todo, ( todo => 'Broken with switch core' )  if $ENV{TEST_PROG_ARGS} =~ /--runcore=switch/;
-}
 # Direct constant access to sub objects commented out, see TT #1120.
-pir_output_unlike( <<'CODE', qr/not/, "globals + constant table subs issue", @todo );
+pir_output_unlike( <<'CODE', qr/not/, "globals + constant table subs issue");
 .namespace [ 'Foo' ]
 
 .include 'interpinfo.pasm'
