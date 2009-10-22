@@ -200,9 +200,7 @@ CODE
 /syntax error.+unexpected/
 OUT
 
-SKIP: {
-    skip( 'Hang on Linux i386 and amd64', 1 );
-pir_output_like( <<'CODE', <<'OUT', 'Segfault, TT #1027', todo=>'segfaulting');
+pir_output_like( <<'CODE', <<'OUT', 'Segfault, TT #1027');
 .sub main :main
 push_eh handler
 test()
@@ -228,7 +226,6 @@ throw $P0
 CODE
 /.*/
 OUT
-}
 
 # We shouldn't crash (and valgrind shoudn't report invalid reads)
 pir_output_is( <<'CODE', <<'OUT', 'exit is last op in sub (TT#1009)');
