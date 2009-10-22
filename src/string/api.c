@@ -2778,27 +2778,26 @@ Parrot_str_unescape(PARROT_INTERP,
     ARGIN(const char *cstring), char delimiter, ARGIN_NULLOK(const char *enc_char))
 {
     ASSERT_ARGS(Parrot_str_unescape)
-    size_t          clength = strlen(cstring);
-    Parrot_UInt4    r;
-    String_iter     iter;
+
     STRING         *result;
     const ENCODING *encoding;
     const CHARSET  *charset;
-    char           *p;
-    UINTVAL         offs, d;
+
+    /* the default encoding is ascii */
+    const char     *enc_name = enc_char ? enc_char : "ascii";
+
+    /* does the encoding have a character set? */
+    char           *p        = enc_char ? strchr(enc_char, ':') : NULL;
+    size_t          clength  = strlen(cstring);
+    String_iter     iter;
+    INTVAL          offs, d;
+    Parrot_UInt4    r;
 
     /* we are constructing const table strings here */
     const UINTVAL   flags = PObj_constant_FLAG;
 
     if (delimiter && clength)
         --clength;
-
-    /* default is ascii */
-    if (!enc_char)
-        enc_char = "ascii";
-
-    /* check for encoding: */
-    p = strchr(enc_char, ':');
 
     if (p) {
         *p       = '\0';
