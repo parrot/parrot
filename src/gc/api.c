@@ -1696,7 +1696,6 @@ Parrot_gc_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGMOD(void *data)
     const size_t idx   = size - sizeof (void *);
     PMC_Attribute_Pool ** const pools = interp->mem_pools->attrib_pools;
     Parrot_gc_free_attributes_from_pool(interp, pools[idx], data);
-
 }
 
 /*

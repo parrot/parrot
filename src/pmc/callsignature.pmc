@@ -40,7 +40,8 @@ typedef struct Pcc_cell
 #define CELL_PMC(c)     UNTAG_CELL(c)->u.p
 
 #define NEXT_CELL(c) UNTAG_CELL(c)->next
-#define FREE_CELL(c) mem_sys_free(UNTAG_CELL(c))
+#define FREE_CELL(i, c) \
+    Parrot_gc_free_fixed_size_storage((i), sizeof (Pcc_cell), (UNTAG_CELL(c)))
 
 #define CELL_TYPE_MASK(c) (PTR2INTVAL(c)) & 3
 #define INTCELL    0
@@ -60,17 +61,26 @@ typedef struct Pcc_cell
 #define SET_CELL_PMC(c) \
         INTVAL2PTR(Pcc_cell *, PTR2INTVAL(UNTAG_CELL(c)) | PMCCELL)
 
-#define CREATE_INTVAL_CELL   SET_CELL_INT(mem_allocate_zeroed_typed(Pcc_cell))
+#define ALLOC_CELL(i) \
+    (Pcc_cell *)Parrot_gc_allocate_fixed_size_storage((i), sizeof (Pcc_cell))
 
-#define CREATE_FLOATVAL_CELL SET_CELL_FLOAT(mem_allocate_zeroed_typed(Pcc_cell))
+#define INIT_CELL_INT(c)    INTVAL2PTR(Pcc_cell *, PTR2INTVAL(c) | INTCELL)
+#define INIT_CELL_FLOAT(c)  INTVAL2PTR(Pcc_cell *, PTR2INTVAL(c) | FLOATCELL)
+#define INIT_CELL_STRING(c) INTVAL2PTR(Pcc_cell *, PTR2INTVAL(c) | STRINGCELL)
+#define INIT_CELL_PMC(c)    INTVAL2PTR(Pcc_cell *, PTR2INTVAL(c) | PMCCELL)
 
-#define CREATE_STRING_CELL   SET_CELL_STRING(mem_allocate_zeroed_typed(Pcc_cell))
+#define CREATE_INTVAL_CELL(i)   INIT_CELL_INT(ALLOC_CELL(i))
 
-#define CREATE_PMC_CELL      SET_CELL_PMC(mem_allocate_zeroed_typed(Pcc_cell))
+#define CREATE_FLOATVAL_CELL(i) INIT_CELL_FLOAT(ALLOC_CELL(i))
+
+#define CREATE_STRING_CELL(i)   INIT_CELL_STRING(ALLOC_CELL(i))
+
+#define CREATE_PMC_CELL(i)      INIT_CELL_PMC(ALLOC_CELL(i))
 
 #define APPEND_CELL(SELF, cell) \
     do { \
         Parrot_CallSignature_attributes * const a = PARROT_CALLSIGNATURE(SELF);\
+        NEXT_CELL(cell) = NULL; \
         (a)->num_positionals++; \
         if ((a)->positionals) { \
             Pcc_cell *c = (a)->positionals; \
@@ -591,7 +601,7 @@ Mark any referenced strings and PMCs.
             while (c) {
                 Pcc_cell *to_free = c;
                 c = NEXT_CELL(c);
-                FREE_CELL(to_free);
+                FREE_CELL(interp, to_free);
             }
         }
 
@@ -602,7 +612,7 @@ Mark any referenced strings and PMCs.
                 HashBucket *b = attrs->hash->bi[i];
 
                 while (b) {
-                    FREE_CELL((Pcc_cell *)b->value);
+                    FREE_CELL(interp, (Pcc_cell *)b->value);
                     b = b->next;
                 }
             }
@@ -620,25 +630,25 @@ Mark any referenced strings and PMCs.
     }
 
     VTABLE void push_integer(INTVAL value) {
-        Pcc_cell *cell = CREATE_INTVAL_CELL;
+        Pcc_cell *cell = CREATE_INTVAL_CELL(interp);
         APPEND_CELL(SELF, cell);
         CELL_INT(cell) = value;
     }
 
     VTABLE void push_float(FLOATVAL value) {
-        Pcc_cell *cell = CREATE_FLOATVAL_CELL;
+        Pcc_cell *cell = CREATE_FLOATVAL_CELL(interp);
         APPEND_CELL(SELF, cell);
         CELL_FLOAT(cell) = value;
     }
 
     VTABLE void push_string(STRING *value) {
-        Pcc_cell *cell = CREATE_STRING_CELL;
+        Pcc_cell *cell = CREATE_STRING_CELL(interp);
         APPEND_CELL(SELF, cell);
         CELL_STRING(cell) = value;
     }
 
     VTABLE void push_pmc(PMC *value) {
-        Pcc_cell *cell = CREATE_PMC_CELL;
+        Pcc_cell *cell = CREATE_PMC_CELL(interp);
         APPEND_CELL(SELF, cell);
         CELL_PMC(cell) = value;
     }
@@ -648,7 +658,7 @@ Mark any referenced strings and PMCs.
 
         if (cell) {
             INTVAL result = autobox_intval(interp, cell);
-            FREE_CELL(cell);
+            FREE_CELL(interp, cell);
             return result;
         }
 
@@ -660,7 +670,7 @@ Mark any referenced strings and PMCs.
 
         if (cell) {
             FLOATVAL result = autobox_floatval(interp, cell);
-            FREE_CELL(cell);
+            FREE_CELL(interp, cell);
             return result;
         }
 
@@ -672,7 +682,7 @@ Mark any referenced strings and PMCs.
 
         if (cell) {
             PMC *result = autobox_pmc(interp, cell);
-            FREE_CELL(cell);
+            FREE_CELL(interp, cell);
             return result;
         }
 
@@ -684,7 +694,7 @@ Mark any referenced strings and PMCs.
 
         if (cell) {
             STRING *result = autobox_string(interp, cell);
-            FREE_CELL(cell);
+            FREE_CELL(interp, cell);
             return result;
         }
 
@@ -728,26 +738,26 @@ Mark any referenced strings and PMCs.
     }
 
     VTABLE void unshift_integer(INTVAL value) {
-        Pcc_cell *cell = CREATE_INTVAL_CELL;
+        Pcc_cell *cell = CREATE_INTVAL_CELL(interp);
         PREPEND_CELL(SELF, cell);
         CELL_INT(cell) = value;
     }
 
     VTABLE void unshift_float(FLOATVAL value) {
-        Pcc_cell *cell = CREATE_FLOATVAL_CELL;
+        Pcc_cell *cell = CREATE_FLOATVAL_CELL(interp);
         PREPEND_CELL(SELF, cell);
         CELL_FLOAT(cell) = value;
     }
 
     VTABLE void unshift_string(STRING *value) {
-        Pcc_cell *cell = CREATE_STRING_CELL;
+        Pcc_cell *cell = CREATE_STRING_CELL(interp);
         PREPEND_CELL(SELF, cell);
         CELL_STRING(cell) = value;
     }
 
     VTABLE void unshift_pmc(PMC *value) {
         Parrot_CallSignature_attributes * const a = PARROT_CALLSIGNATURE(SELF);
-        Pcc_cell *cell = CREATE_PMC_CELL;
+        Pcc_cell *cell = CREATE_PMC_CELL(interp);
         PREPEND_CELL(SELF, cell);
         CELL_PMC(cell) = value;
     }
@@ -757,7 +767,7 @@ Mark any referenced strings and PMCs.
 
         if (cell) {
             INTVAL result = autobox_intval(interp, cell);
-            FREE_CELL(cell);
+            FREE_CELL(interp, cell);
             return result;
         }
 
@@ -769,7 +779,7 @@ Mark any referenced strings and PMCs.
 
         if (cell) {
             FLOATVAL result = autobox_floatval(interp, cell);
-            FREE_CELL(cell);
+            FREE_CELL(interp, cell);
             return result;
         }
 
@@ -781,7 +791,7 @@ Mark any referenced strings and PMCs.
 
         if (cell) {
             STRING *result = autobox_string(interp, cell);
-            FREE_CELL(cell);
+            FREE_CELL(interp, cell);
             return result;
         }
 
@@ -793,7 +803,7 @@ Mark any referenced strings and PMCs.
 
         if (cell) {
             PMC *result = autobox_pmc(interp, cell);
-            FREE_CELL(cell);
+            FREE_CELL(interp, cell);
             return result;
         }
 
@@ -869,8 +879,9 @@ Mark any referenced strings and PMCs.
         Pcc_cell *cell = (Pcc_cell *)parrot_hash_get(interp, hash, (void *)key);
 
         if (!cell) {
-            cell = CREATE_INTVAL_CELL;
+            cell = CREATE_INTVAL_CELL(interp);
             parrot_hash_put(interp, hash, (void *)key, (void *)cell);
+            NEXT_CELL(cell) = NULL;
         }
         else
             SET_CELL_INT(cell);
@@ -883,8 +894,9 @@ Mark any referenced strings and PMCs.
         Pcc_cell *cell = (Pcc_cell *)parrot_hash_get(interp, hash, (void *)key);
 
         if (!cell) {
-            cell = CREATE_FLOATVAL_CELL;
+            cell = CREATE_FLOATVAL_CELL(interp);
             parrot_hash_put(interp, hash, (void *)key, (void *)cell);
+            NEXT_CELL(cell) = NULL;
         }
         else
             SET_CELL_FLOAT(cell);
@@ -897,8 +909,9 @@ Mark any referenced strings and PMCs.
         Pcc_cell *cell = (Pcc_cell *)parrot_hash_get(interp, hash, (void *)key);
 
         if (!cell) {
-            cell = CREATE_STRING_CELL;
+            cell = CREATE_STRING_CELL(interp);
             parrot_hash_put(interp, hash, (void *)key, (void *)cell);
+            NEXT_CELL(cell) = NULL;
         }
         else
             SET_CELL_STRING(cell);
@@ -911,8 +924,9 @@ Mark any referenced strings and PMCs.
         Pcc_cell *cell = (Pcc_cell *)parrot_hash_get(interp, hash, (void *)key);
 
         if (!cell) {
-            cell = CREATE_PMC_CELL;
+            cell = CREATE_PMC_CELL(interp);
             parrot_hash_put(interp, hash, (void *)key, (void *)cell);
+            NEXT_CELL(cell) = NULL;
         }
         else
             SET_CELL_PMC(cell);
@@ -926,8 +940,9 @@ Mark any referenced strings and PMCs.
         Pcc_cell *cell = (Pcc_cell *)parrot_hash_get(interp, hash, k);
 
         if (!cell) {
-            cell = CREATE_INTVAL_CELL;
+            cell = CREATE_INTVAL_CELL(interp);
             parrot_hash_put(interp, hash, k, (void *)cell);
+            NEXT_CELL(cell) = NULL;
         }
         else
             SET_CELL_INT(cell);
@@ -941,8 +956,9 @@ Mark any referenced strings and PMCs.
         Pcc_cell *cell = (Pcc_cell *)parrot_hash_get(interp, hash, k);
 
         if (!cell) {
-            cell = CREATE_FLOATVAL_CELL;
+            cell = CREATE_FLOATVAL_CELL(interp);
             parrot_hash_put(interp, hash, k, (void *)cell);
+            NEXT_CELL(cell) = NULL;
         }
         else
             SET_CELL_FLOAT(cell);
@@ -956,8 +972,9 @@ Mark any referenced strings and PMCs.
         Pcc_cell *cell = (Pcc_cell *)parrot_hash_get(interp, hash, k);
 
         if (!cell) {
-            cell = CREATE_STRING_CELL;
+            cell = CREATE_STRING_CELL(interp);
             parrot_hash_put(interp, hash, k, (void *)cell);
+            NEXT_CELL(cell) = NULL;
         }
         else
             SET_CELL_STRING(cell);
@@ -971,8 +988,9 @@ Mark any referenced strings and PMCs.
         Pcc_cell *cell = (Pcc_cell *)parrot_hash_get(interp, hash, k);
 
         if (!cell) {
-            cell = CREATE_PMC_CELL;
+            cell = CREATE_PMC_CELL(interp);
             parrot_hash_put(interp, hash, k, (void *)cell);
+            NEXT_CELL(cell) = NULL;
         }
         else
             SET_CELL_PMC(cell);
