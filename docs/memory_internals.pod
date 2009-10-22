@@ -247,7 +247,7 @@ filled in.
 =head1 FILES
 
 src/gc/api.c, src/gc/gc_private.h, pobj.h, mark_sweep.[ch],
-alloc_resources.[ch], res_lea.c, string.[ch]. Other garbage collector
+alloc_resources.[ch], string.[ch]. Other garbage collector
 implementations may use separate files as well.
 
 =head1 BUGS

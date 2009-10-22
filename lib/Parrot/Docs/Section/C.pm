@@ -229,11 +229,6 @@ sub new {
             $self->c_pair_item( '', 'memory' ),
             $self->c_source_item( '', 'malloc' ),
             $self->c_source_item( '', 'malloc-trace' ),
-            $self->c_item(
-                '',
-                'pairs'   => ['resources'],
-                'sources' => ['res_lea']
-            ),
             $self->c_source_item( '', 'mark_sweep' ),
         ),
         $self->new_group(

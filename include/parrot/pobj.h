@@ -41,19 +41,14 @@ The actual set-up is more involved because of padding.  obj->bufstart must
 be suitably aligned. The start of the memory region (as returned by malloc())
 is suitably aligned for any use.  If, for example, malloc() returns
 objects aligned on 8-byte boundaries, and obj->bufstart is also aligned
-on 8-byte boundaries, then there should be 4 bytes of padding.  It is
-handled differently in the two files alloc_resources.c and res_lea.c.
-In alloc_resources.c, the buffer is carved out of a larger memory pool.  In
-res_lea.c, each buffer is individually allocated.
+on 8-byte boundaries, then there should be 4 bytes of padding.
 
-               src/gc/alloc_resources.c:       src/gc/res_lea.c:
-
-ptr from malloc ->  +------------------+      +------------------+
-                      [other blocks?]         | INTVAL ref_count |
-                    | INTVAL ref_count |      | possible padding |
-obj->bufstart   ->  +------------------+      +------------------+
-                    |     data         |      |      data        |
-                    v                  v      v                  v
+ptr from malloc ->  +------------------+
+                      [other blocks?]  |
+                    | INTVAL ref_count |
+obj->bufstart   ->  +------------------+
+                    |     data         |
+                    v                  v
 
 */
 

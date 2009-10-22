@@ -71,13 +71,11 @@ some of the architecture of Parrot.
 This file implements logic for tracing processor registers and the system stack.
 Here there be dragons.
 
-=item F<src/gc/res_lea.c>
-
 =item F<src/gc/malloc.c>
 
 =item F<src/gc/malloc_trace.c>
 
-These three files implement various unused features, including a custom malloc
+These two files implement various unused features, including a custom malloc
 implementation, and malloc wrappers for various purposes. These are unused.
 
 =back

@@ -129,7 +129,6 @@ examples/compilers/japhc.c
 src/atomic/gcc_x86.c
 src/debug.c
 src/gc/generational_ms.c
-src/gc/res_lea.c
 src/io/io_string.c
 src/nci_test.c
 src/pbc_dump.c

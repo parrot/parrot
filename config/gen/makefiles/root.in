@@ -1088,8 +1088,6 @@ $(SRC_DIR)/gc/api$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/gc/gc_private.h
 
 $(SRC_DIR)/gc/alloc_resources$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/gc/res_lea$(O) : $(GENERAL_H_FILES)
-
 $(SRC_DIR)/hll$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/hll.str
 
 $(SRC_DIR)/platform$(O) : $(GENERAL_H_FILES)
@@ -2225,7 +2223,6 @@ tags-emacs: tags.emacs.dummy
 	@ctags@ -e \
         --links=no --totals \
         -R --exclude=blib --exclude=.svn  \
-        --exclude=res_lea.c \
         --languages=c,perl --langmap=c:+.h,c:+.pmc,c:+.ops \
         -I NOTNULL,NULLOK,ARGIN,ARGMOD,ARGOUT,ARGINOUT,ARGIN_NULLOK,ARGOUT_NULLOK,ARGMOD_NULLOK \
         $(CUR_DIR)
@@ -2246,7 +2243,6 @@ tags-vi: tags.vi.dummy
 	@ctags@ \
     --links=no --totals \
     -R --exclude=blib --exclude=.svn  \
-    --exclude=res_lea.c \
     --languages=c,perl --langmap=c:+.h,c:+.pmc,c:+.ops \
     -I NOTNULL,NULLOK,ARGIN,ARGMOD,ARGOUT,ARGINOUT,ARGIN_NULLOK,ARGOUT_NULLOK,ARGMOD_NULLOK \
     $(CUR_DIR)
