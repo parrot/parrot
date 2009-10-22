@@ -255,9 +255,19 @@ Parrot_gc_mark_PMC_alive_fun(PARROT_INTERP, ARGMOD_NULLOK(PMC *obj))
 
         /* if object is a PMC and contains buffers or PMCs, then attach the PMC
          * to the chained mark list. */
-        if (PObj_is_special_PMC_TEST(obj))
-            mark_special(interp, obj);
-        else if (PMC_metadata(obj))
+        if (PObj_is_special_PMC_TEST(obj)) {
+            if (PObj_is_PMC_shared_TEST(obj)) {
+                Parrot_Interp i = PMC_sync(obj)->owner;
+
+                if (!i->mem_pools->gc_mark_ptr)
+                    i->mem_pools->gc_mark_ptr = obj;
+            }
+
+            if (PObj_custom_mark_TEST(obj))
+                VTABLE_mark(interp, obj);
+        }
+
+        if (PMC_metadata(obj))
             Parrot_gc_mark_PMC_alive(interp, PMC_metadata(obj));
     }
 }
