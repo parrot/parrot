@@ -21,7 +21,7 @@
 #define PARROT_MAJOR_VERSION    @MAJOR@
 #define PARROT_MINOR_VERSION    @MINOR@
 #define PARROT_PATCH_VERSION    @PATCH@
-#define PARROT_ARCHNAME         "@jitarchname@"
+#define PARROT_ARCHNAME         "@cpuarch@-@osname@"
 #define PARROT_JIT_CAPABLE      @jitcapable@
 #define PARROT_EXEC_CAPABLE     @execcapable@
 #define PARROT_SHARE_EXT        "@share_ext@"
