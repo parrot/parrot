@@ -29,6 +29,13 @@ subroutines.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static int do_run_ops(PARROT_INTERP, ARGIN(PMC *sub_obj))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_do_run_ops __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(sub_obj))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -193,6 +200,38 @@ Parrot_pcc_invoke_method_from_c_args(PARROT_INTERP, ARGIN(PMC* pmc),
     Parrot_pcc_invoke_from_sig_object(interp, sub_obj, sig_obj);
 }
 
+/*
+
+=item C<static int do_run_ops(PARROT_INTERP, PMC *sub_obj)>
+
+Check should we run ops.
+
+PIR Subs need runops to run their opcodes. Methods and NCI subs don't.
+
+=cut
+
+*/
+static int
+do_run_ops(PARROT_INTERP, ARGIN(PMC *sub_obj))
+{
+    if (!PMC_IS_NULL(interp->current_object))
+        return 0;
+
+    if (sub_obj->vtable->base_type == enum_class_Sub
+         || sub_obj->vtable->base_type == enum_class_MultiSub
+         || sub_obj->vtable->base_type == enum_class_Eval)
+        return 1;
+
+    /* No more core PMC to run ops */
+    if (sub_obj->vtable->base_type < enum_class_core_max)
+        return 0;
+
+    /* But we can have inherited */
+    if (VTABLE_isa(interp, sub_obj, CONST_STRING(interp, "Sub")))
+        return 1;
+
+    return 0;
+}
 
 /*
 
@@ -214,10 +253,10 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
 {
     ASSERT_ARGS(Parrot_pcc_invoke_from_sig_object)
 
-    opcode_t *dest;
-    INTVAL n_regs_used[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    PMC *ctx  = Parrot_push_context(interp, n_regs_used);
-    PMC * const ret_cont = new_ret_continuation_pmc(interp, NULL);
+    opcode_t    *dest;
+    INTVAL       n_regs_used[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    PMC         *ctx  = Parrot_push_context(interp, n_regs_used);
+    PMC * const  ret_cont = new_ret_continuation_pmc(interp, NULL);
 
     Parrot_pcc_set_signature(interp, ctx, call_object);
     Parrot_pcc_set_continuation(interp, ctx, ret_cont);
@@ -229,10 +268,7 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
 
     /* PIR Subs need runops to run their opcodes. Methods and NCI subs
      * don't. */
-    if ((sub_obj->vtable->base_type == enum_class_Sub
-    ||   sub_obj->vtable->base_type == enum_class_MultiSub
-         || (sub_obj->vtable->base_type == enum_class_Eval))
-            && PMC_IS_NULL(interp->current_object)) {
+    if (do_run_ops(interp, sub_obj)) {
         Parrot_runcore_t *old_core = interp->run_core;
         const opcode_t offset = dest - interp->code->base.data;
 
