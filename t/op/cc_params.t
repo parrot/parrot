@@ -1,3 +1,7 @@
+#!parrot
+# Copyright (C) 2009, Parrot Foundation.
+# $Id$
+
 =head1 NAME
 
 t/op/cc_params.t - Parrot Calling Conventions parameter matching tests
@@ -53,3 +57,10 @@ Tests Parrot calling conventions for parameter matching and mismatching.
     $I2 = sig["y"]
     is(5, $I2)
 .end
+
+# Local Variables:
+#   mode: pir
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
