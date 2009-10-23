@@ -2790,7 +2790,7 @@ Parrot_str_unescape(PARROT_INTERP,
     char           *p        = enc_char ? strchr(enc_char, ':') : NULL;
     size_t          clength  = strlen(cstring);
     String_iter     iter;
-    INTVAL          offs, d;
+    UINTVAL         offs, d;
     Parrot_UInt4    r;
 
     /* we are constructing const table strings here */
