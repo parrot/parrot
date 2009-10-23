@@ -1001,7 +1001,6 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
     if (param_count == 1) {
         const INTVAL first_flag = VTABLE_get_integer_keyed_int(interp, raw_sig, 0);
         if (first_flag & PARROT_ARG_CALL_SIG) {
-            fprintf(stderr, "Found CallSignature!\n");
             *accessor->pmc(interp, arg_info, 0) = call_object;
             return;
         }
