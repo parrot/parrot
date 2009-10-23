@@ -2229,8 +2229,9 @@ argtype_list:
    ;
 
 argtype:
-     ADV_FLAT                  { $$ = VT_FLAT; }
-   | ADV_NAMED                 { $$ = VT_NAMED; }
+     ADV_FLAT                  { $$ = VT_FLAT;     }
+   | ADV_NAMED                 { $$ = VT_NAMED;    }
+   | ADV_CALL_SIG              { $$ = VT_CALL_SIG; }
 
    /* don't free $3 here; adv_named_set uses the pointer directly */
    | ADV_NAMED '(' USTRINGC ')' { adv_named_set_u(interp, $3); $$ = 0; }
