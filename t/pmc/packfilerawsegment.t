@@ -95,7 +95,7 @@ Tests the PackfileRawSegment PMC.
 
   done:
     $I0 = elements hash
-    is($I0, 5, "Got all types of Packfile segments")
+    is($I0, 4, "Got all types of Packfile segments")
 
     # Now create RawSegment and set type.
     $P0 = new ['PackfileRawSegment']
