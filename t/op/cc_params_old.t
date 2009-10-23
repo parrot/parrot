@@ -1,6 +1,6 @@
 #!perl
 # Copyright (C) 2007, Parrot Foundation.
-# $Id: cc_params.t 41972 2009-10-21 16:54:18Z allison $
+# $Id$
 
 use strict;
 use warnings;
