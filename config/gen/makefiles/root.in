@@ -2149,7 +2149,9 @@ cover-clean:
 #
 ###############################################################################
 
-install: installable
+install: install-bin install-dev
+
+install-bin: installable
 	$(PERL) tools/dev/install_files.pl \
     --buildprefix=$(BUILDPREFIX) \
     --prefix=$(PREFIX) \
@@ -2162,7 +2164,7 @@ install: installable
     --versiondir=$(VERSION_DIR) \
     MANIFEST MANIFEST.generated
 
-install-dev: install
+install-dev: installable
 	$(PERL) tools/dev/install_dev_files.pl \
     --buildprefix=$(BUILDPREFIX) \
     --prefix=$(PREFIX) \
