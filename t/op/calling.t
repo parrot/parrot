@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 95;
+use Parrot::Test tests => 96;
 
 =head1 NAME
 
@@ -2461,6 +2461,25 @@ foo
 42
 OUTPUT
 
+# See Rakudo RT #62730
+pir_output_is( <<'CODE', <<'OUTPUT', "Handling :flat of emtpy arguments" );
+.sub 'main'
+    $P0   = new ['Undef']
+    ($P0) = foo()
+    $S0   = typeof $P0
+    say $S0
+.end
+
+.sub 'foo'
+    .param pmc arg :slurpy
+    $S0 = typeof arg
+    say $S0
+    .return (arg :flat)
+.end
+CODE
+ResizablePMCArray
+Undef
+OUTPUT
 
 # Local Variables:
 #   mode: cperl

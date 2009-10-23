@@ -1765,6 +1765,10 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                                                             "flattened return on a non-array");
                             }
                             flat_elems = VTABLE_elements(interp, return_item);
+                            if (flat_elems == 0) {
+                                /* Skip empty aggregate */
+                                break;
+                            }
                             if (return_subindex < flat_elems) {
                                 /* fetch an item out of the aggregate */
                                 return_item = VTABLE_get_pmc_keyed_int(interp, return_item,
