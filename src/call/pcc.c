@@ -214,6 +214,7 @@ PIR Subs need runops to run their opcodes. Methods and NCI subs don't.
 static int
 do_run_ops(PARROT_INTERP, ARGIN(PMC *sub_obj))
 {
+    ASSERT_ARGS(do_run_ops)
     if (!PMC_IS_NULL(interp->current_object))
         return 0;
 
