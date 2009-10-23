@@ -1135,6 +1135,8 @@ $(SRC_DIR)/call/args$(O) : $(SRC_DIR)/call/args.c $(GENERAL_H_FILES) \
 	$(SRC_DIR)/call/args.str \
 	$(SRC_DIR)/pmc/pmc_key.h $(SRC_DIR)/pmc/pmc_callsignature.h
 
+$(SRC_DIR)/call/context_accessors$(O): $(GENERAL_H_FILES)
+
 $(SRC_DIR)/call/pcc$(O) : $(SRC_DIR)/call/pcc.c $(GENERAL_H_FILES) \
 	$(SRC_DIR)/call/pcc.str $(SRC_DIR)/pmc/pmc_fixedintegerarray.h \
 	$(SRC_DIR)/pmc/pmc_key.h $(SRC_DIR)/pmc/pmc_continuation.h
@@ -2206,7 +2208,9 @@ exec : $(SRC_DIR)/parrot_config$(O) $(LIBPARROT)
 ###### OS depend targets ##########
 
 # for use by t/pmc/nci.t
-$(LIBNCI_TEST_SO): $(SRC_DIR)/nci_test$(O)
+$(SRC_DIR)/nci_test$(O): $(GENERAL_H_FILES)
+
+$(LIBNCI_TEST_SO): $(SRC_DIR)/nci_test$(O) $(LIBPARROT)
 	$(LD) $(LD_LOAD_FLAGS) @ncilib_link_extra@ $(LDFLAGS) \
     @ld_out@$@ $(SRC_DIR)/nci_test$(O) $(ALL_PARROT_LIBS) $(C_LIBS)
 
