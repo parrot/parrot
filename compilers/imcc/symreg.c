@@ -336,6 +336,7 @@ symreg_to_str(ARGIN(const SymReg *s))
     if (t & VT_FLAT)      { strcat(buf, "VT_FLAT ");       }
     if (t & VT_OPTIONAL)  { strcat(buf, "VT_OPTIONAL ");   }
     if (t & VT_NAMED)     { strcat(buf, "VT_NAMED ");      }
+    if (t & VT_CALL_SIG)  { strcat(buf, "VT_CALL_SIG ");   }
 
     strcat(buf, "]");
 
@@ -461,7 +462,7 @@ add_pcc_arg(ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
     sub->args[n]      = arg;
     sub->arg_flags[n] = arg->type;
 
-    arg->type &= ~(VT_FLAT|VT_OPTIONAL|VT_OPT_FLAG|VT_NAMED);
+    arg->type &= ~(VT_FLAT|VT_OPTIONAL|VT_OPT_FLAG|VT_NAMED|VT_CALL_SIG);
 
     sub->nargs++;
 }

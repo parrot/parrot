@@ -353,6 +353,7 @@ SP              [ ]
 ":named"        return ADV_NAMED;
 "=>"            return ADV_ARROW;
 ":invocant"     return ADV_INVOCANT;
+":call_sig"     return ADV_CALL_SIG;
 
 <emit,INITIAL>".namespace"    return NAMESPACE;
 <emit,INITIAL>".HLL"          return HLL;

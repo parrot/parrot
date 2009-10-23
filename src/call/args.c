@@ -986,14 +986,26 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         if (param_count > 0) {
             if (err_check)
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                        "too few arguments: 0 passed, %d expected",
-                        param_count);
+                    "too few arguments: 0 passed, %d expected", param_count);
         }
         return;
     }
 
     positional_args = VTABLE_elements(interp, call_object);
     GETATTR_CallSignature_arg_flags(interp, call_object, arg_sig);
+
+    /* EXPERIMENTAL! This block adds provisional :call_sig param support on the
+       callee side only. Does not add :call_sig arg support on the caller side.
+       This is not the final form of the algorithm, but should provide the
+       tools that HLL designers need in the interim. */
+    if (param_count == 1) {
+        const INTVAL first_flag = VTABLE_get_integer_keyed_int(interp, raw_sig, 0);
+        if (first_flag & PARROT_ARG_CALL_SIG) {
+            fprintf(stderr, "Found CallSignature!\n");
+            *accessor->pmc(interp, arg_info, 0) = call_object;
+            return;
+        }
+    }
 
     /* First iterate over positional args and positional parameters. */
     arg_index = 0;

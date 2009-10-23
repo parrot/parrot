@@ -288,31 +288,45 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
         regs[i + 1] = arg;
         flags       = 0;
 
-        if (arg_flags[i] & VT_FLAT)
-            flags |= PARROT_ARG_FLATTEN;
-
-        if (arg_flags[i] & VT_OPTIONAL)
-            flags |= PARROT_ARG_OPTIONAL;
-        else if (arg_flags[i] & VT_OPT_FLAG)
-            flags |= PARROT_ARG_OPT_FLAG;
-
-        if (arg_flags[i] & VT_NAMED)
-            flags |= PARROT_ARG_NAME;
-
-        /* add argument type bits */
-        if (arg->type & VTCONST)
-            flags |= PARROT_ARG_CONSTANT;
-
-        /* TODO verify if const is allowed */
-        switch (arg->set) {
-            case 'I':                               break;
-            case 'S': flags |= PARROT_ARG_STRING;   break;
-            case 'N': flags |= PARROT_ARG_FLOATVAL; break;
-            case 'K':
-            case 'P': flags |= PARROT_ARG_PMC;      break;
-            default :                               break;
+        if (arg_flags[i] & VT_CALL_SIG) {
+            if (n > 1 || i != 0)
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INTERNAL_PANIC,
+                    ":call_sig must be the first and only parameter");
+            if (arg_flags[i] & (VT_FLAT | VT_OPTIONAL | VT_OPT_FLAG | VT_NAMED))
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INTERNAL_PANIC,
+                    ":call_sig cannot be combined with any other flags");
+            if (arg->set != 'P')
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INTERNAL_PANIC,
+                    ":call_sig must be a PMC");
+            flags |= PARROT_ARG_CALL_SIG;
+            flags |= PARROT_ARG_PMC;
         }
+        else {
+            if (arg_flags[i] & VT_FLAT)
+                flags |= PARROT_ARG_FLATTEN;
 
+            if (arg_flags[i] & VT_OPTIONAL)
+                flags |= PARROT_ARG_OPTIONAL;
+            else if (arg_flags[i] & VT_OPT_FLAG)
+                flags |= PARROT_ARG_OPT_FLAG;
+
+            if (arg_flags[i] & VT_NAMED)
+                flags |= PARROT_ARG_NAME;
+
+            /* add argument type bits */
+            if (arg->type & VTCONST)
+                flags |= PARROT_ARG_CONSTANT;
+
+            /* TODO verify if const is allowed */
+            switch (arg->set) {
+                case 'I':                               break;
+                case 'S': flags |= PARROT_ARG_STRING;   break;
+                case 'N': flags |= PARROT_ARG_FLOATVAL; break;
+                case 'K':
+                case 'P': flags |= PARROT_ARG_PMC;      break;
+                default :                               break;
+            }
+        }
 
         snprintf(s, sizeof (s), "0x%.4x,", flags);
         if (bufpos+lenitem >= bufsize)

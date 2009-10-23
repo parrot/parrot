@@ -1071,7 +1071,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %token <t> HLL TK_LINE TK_FILE
 %token <t> GOTO ARG IF UNLESS PNULL SET_RETURN SET_YIELD
 %token <t> ADV_FLAT ADV_SLURPY ADV_OPTIONAL ADV_OPT_FLAG ADV_NAMED ADV_ARROW
-%token <t> NEW ADV_INVOCANT
+%token <t> NEW ADV_INVOCANT ADV_CALL_SIG
 %token <t> NAMESPACE DOT_METHOD
 %token <t> SUB SYM LOCAL LEXICAL CONST ANNOTATE
 %token <t> INC DEC GLOBAL_CONST
@@ -1706,6 +1706,7 @@ paramtype:
    | ADV_NAMED '(' STRINGC ')'  { adv_named_set(interp, $3);   $$ = 0; mem_sys_free($3); }
    | ADV_NAMED '(' USTRINGC ')' { adv_named_set_u(interp, $3); $$ = 0; mem_sys_free($3); }
    | UNIQUE_REG                 { $$ = VT_UNIQUE_REG; }
+   | ADV_CALL_SIG               { $$ = VT_CALL_SIG; }
    ;
 
 
