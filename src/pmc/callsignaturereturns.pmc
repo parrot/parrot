@@ -188,7 +188,7 @@ Sets the value of the element at index C<key> to C<value> with casting if nesses
         void *cell = STATICSELF.get_pointer_keyed_int(key);
         void *ptr  = UNTAG_CELL(cell);
 
-        switch((Call_bits_enum_t)CELL_TYPE_MASK(cell)) {
+        switch ((Call_bits_enum_t)CELL_TYPE_MASK(cell)) {
             case PARROT_ARG_INTVAL:
                 *(INTVAL *)ptr = value;
                 break;
@@ -210,7 +210,7 @@ Sets the value of the element at index C<key> to C<value> with casting if nesses
         void *cell = STATICSELF.get_pointer_keyed_int(key);
         void *ptr  = UNTAG_CELL(cell);
 
-        switch((Call_bits_enum_t)CELL_TYPE_MASK(cell)) {
+        switch ((Call_bits_enum_t)CELL_TYPE_MASK(cell)) {
             case PARROT_ARG_INTVAL:
                 *(INTVAL *)ptr = value;
                 break;
@@ -232,7 +232,7 @@ Sets the value of the element at index C<key> to C<value> with casting if nesses
         void *cell = STATICSELF.get_pointer_keyed_int(key);
         void *ptr  = UNTAG_CELL(cell);
 
-        switch((Call_bits_enum_t)CELL_TYPE_MASK(cell)) {
+        switch ((Call_bits_enum_t)CELL_TYPE_MASK(cell)) {
             case PARROT_ARG_INTVAL:
                 *(INTVAL *)ptr = Parrot_str_to_int(INTERP, value);
                 break;
@@ -254,7 +254,7 @@ Sets the value of the element at index C<key> to C<value> with casting if nesses
         void *cell = STATICSELF.get_pointer_keyed_int(key);
         void *ptr  = UNTAG_CELL(cell);
 
-        switch((Call_bits_enum_t)CELL_TYPE_MASK(cell)) {
+        switch ((Call_bits_enum_t)CELL_TYPE_MASK(cell)) {
             case PARROT_ARG_INTVAL:
                 *(INTVAL *)ptr = VTABLE_get_integer(INTERP, value);
                 break;
