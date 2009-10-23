@@ -2348,7 +2348,8 @@ merge in signatures for tailcall
 */
 
 void
-Parrot_pcc_merge_signature_for_tailcall(PARROT_INTERP, ARGMOD(PMC * parent), ARGMOD(PMC * tailcall))
+Parrot_pcc_merge_signature_for_tailcall(PARROT_INTERP,
+        ARGMOD_NULLOK(PMC * parent), ARGMOD_NULLOK(PMC * tailcall))
 {
     ASSERT_ARGS(Parrot_pcc_merge_signature_for_tailcall)
     if (PMC_IS_NULL(parent) || PMC_IS_NULL(tailcall))
