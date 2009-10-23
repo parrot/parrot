@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/pmc/callsignaturereturns.pmc - resizable array for typed pointers 
+src/pmc/callsignaturereturns.pmc - resizable array for typed pointers
 
 =head1 DESCRIPTION
 
