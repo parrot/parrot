@@ -729,7 +729,6 @@ Parrot_pcc_build_sig_object_returns_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *sig
 {
     ASSERT_ARGS(Parrot_pcc_build_sig_object_returns_from_op)
     PMC            *call_object;
-    STRING         *string_sig;
     INTVAL          arg_index;
     INTVAL          arg_count   = VTABLE_elements(interp, raw_sig);
     PMC            *ctx         = CURRENT_CONTEXT(interp);
@@ -750,8 +749,6 @@ Parrot_pcc_build_sig_object_returns_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *sig
     }
     else
         call_object = signature;
-
-    string_sig = VTABLE_get_string(interp, call_object);
 
     /* a little encapsulation violation for great speed */
     SETATTR_CallSignature_return_flags(interp, call_object, raw_sig);
