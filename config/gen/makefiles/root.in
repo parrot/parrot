@@ -1198,6 +1198,7 @@ $(SRC_DIR)/exit$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/exit.c
 
 $(SRC_DIR)/nci$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/nci.c $(SRC_DIR)/nci.str \
         $(SRC_DIR)/frame_builder$(O) \
+        $(SRC_DIR)/pmc/pmc_unmanagedstruct.h \
         $(SRC_DIR)/pmc/pmc_managedstruct.h \
         $(SRC_DIR)/pmc/pmc_nci.h \
         $(SRC_DIR)/pmc/pmc_pointer.h
