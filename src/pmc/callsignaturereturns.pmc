@@ -1,0 +1,322 @@
+/*
+Copyright (C) 2001-2008, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/callsignaturereturns.pmc - resizable array for typed pointers 
+
+=head1 DESCRIPTION
+
+This class stores typed pointers used to fill results in CallSignature.
+
+
+=head1 SYNOPSIS
+
+  # VTABLEs are too tight to implement something more beatyful
+
+  # Create signature
+  rets = new CallSignatureReturns
+  rets.push_pointer(&intval, 0);
+  rest.push_integer(PARROT_ARG_INTVAL);
+
+  rets.push_pointer(&floatval, 1);
+  rest.push_integer(PARROT_ARG_FLOATVAL);
+
+  rets.push_pointer(&string, 2);
+  rest.push_integer(PARROT_ARG_STRING);
+
+  rets.push_pointer(&pmc, 3);
+  rest.push_integer(PARROT_ARG_PMC);
+
+  # Fill
+  rets.set_integer_keyed_int(intval, 0);
+  rets.set_number_keyed_int(floatval, 1);
+  rets.set_string_keyed_int(string, 2);
+  rets.set_pmc_keyed_int(pmc, 3);
+
+CallSignatureReturns will behave like CPointer with autocasting values.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+
+/* mask off lower two bits (1 + 2 = 3) for pointer tags */
+#define TAG_BITS 3
+#define UNTAG_CELL(c) INTVAL2PTR(void *, (PTR2INTVAL(c)) & ~TAG_BITS)
+#define CELL_TYPE_MASK(c) (PTR2INTVAL(c)) & 3
+
+pmclass CallSignatureReturns auto_attrs provides array {
+    ATTR INTVAL     size;     /* number of stored elements */
+    ATTR void     **values;   /* stored pointers */
+    ATTR INTVAL     resize_threshold;   /* max size before array needs to be resized */
+
+/*
+
+=item C<void set_integer_native(INTVAL size)>
+
+Resizes the array to C<size> elements.
+
+=cut
+
+*/
+
+    VTABLE void set_integer_native(INTVAL size) {
+        void    **values;
+        INTVAL    resize_threshold;
+
+        GET_ATTR_values(INTERP, SELF, values);
+        GET_ATTR_resize_threshold(INTERP, SELF, resize_threshold);
+
+        if (!values) {
+            /* Empty. Allocate 8 elements (arbitary number) */
+            values = mem_allocate_n_zeroed_typed(8, void*);
+            SET_ATTR_values(INTERP, SELF, values);
+            SET_ATTR_size(INTERP, SELF, size);
+            SET_ATTR_resize_threshold(INTERP, SELF, 8);
+        }
+        else if (size <= resize_threshold) {
+            SET_ATTR_size(INTERP, SELF, size);
+            return;
+        }
+        else {
+            INTVAL  cur = resize_threshold;
+
+            if (cur < 8192)
+                cur = size < 2 * cur ? 2 * cur : size;
+            else {
+                INTVAL needed = size - cur;
+                cur          += needed + 4096;
+                cur          &= ~0xfff;
+            }
+
+            values = (void**) mem_sys_realloc((void*) values, cur * sizeof (void *));
+            SET_ATTR_values(INTERP, SELF, values);
+            SET_ATTR_size(INTERP, SELF, size);
+            SET_ATTR_resize_threshold(INTERP, SELF, cur);
+        }
+    }
+
+/*
+
+=item C<INTVAL elements()>
+
+Returns the number of elements in the array.
+
+=cut
+
+*/
+
+    VTABLE INTVAL elements() {
+        INTVAL size;
+        GET_ATTR_size(INTERP, SELF, size);
+        return size;
+    }
+
+/*
+
+*/
+    VTABLE void set_pointer_keyed_int(INTVAL key, void *value) {
+        void   **values;
+        INTVAL   size;
+
+        GET_ATTR_size(INTERP, SELF, size);
+        if (key >= size)
+            STATICSELF.set_integer_native(key + 1);
+
+        GET_ATTR_values(INTERP, SELF, values);
+        values[key] = value;
+    }
+
+/*
+
+=item C<void push_pointer(void* value)>
+
+Push pointer to self. Increase size of storage.
+
+=cut
+
+*/
+
+    VTABLE void push_pointer(void *value) {
+        INTVAL idx = STATICSELF.elements();
+        STATICSELF.set_pointer_keyed_int(idx, value);
+    }
+
+/*
+
+=item C<void push_integer(INTVAL value)>
+
+Set type of last pushed pointer.
+
+=cut
+
+*/
+
+    VTABLE void push_integer(INTVAL type) {
+        INTVAL   idx = STATICSELF.elements() - 1;
+        void   **values;
+
+        PARROT_ASSERT((type >=0 && type < 4) || !"Wrong pointer type");
+
+        GET_ATTR_values(INTERP, SELF, values);
+        values[idx] = INTVAL2PTR(void *, PTR2INTVAL(UNTAG_CELL(values[idx])) | type);
+    }
+
+/*
+
+=item C<void set_integer_keyed_int(INTVAL key, INTVAL value)>
+
+=item C<void set_number_keyed_int(INTVAL key, FLOATVAL value)>
+
+=item C<void set_string_keyed_int(INTVAL key, STRING *value)>
+
+=item C<void set_pmc_keyed_int(INTVAL key, PMC *value)>
+
+Sets the value of the element at index C<key> to C<value> with casting if nessesary.
+
+=cut
+
+*/
+
+    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
+        void *cell = STATICSELF.get_pointer_keyed_int(key);
+        void *ptr  = UNTAG_CELL(cell);
+
+        switch((Call_bits_enum_t)CELL_TYPE_MASK(cell)) {
+            case PARROT_ARG_INTVAL:
+                *(INTVAL *)ptr = value;
+                break;
+            case PARROT_ARG_FLOATVAL:
+                *(FLOATVAL *)ptr = value;
+                break;
+            case PARROT_ARG_STRING:
+                *(STRING **)ptr = Parrot_str_from_int(INTERP, value);
+                break;
+            case PARROT_ARG_PMC:
+                *(PMC **)ptr = get_integer_pmc(INTERP, value);
+                break;
+            default:
+                PARROT_ASSERT(!"Impossible type");
+        }
+    }
+
+    VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
+        void *cell = STATICSELF.get_pointer_keyed_int(key);
+        void *ptr  = UNTAG_CELL(cell);
+
+        switch((Call_bits_enum_t)CELL_TYPE_MASK(cell)) {
+            case PARROT_ARG_INTVAL:
+                *(INTVAL *)ptr = value;
+                break;
+            case PARROT_ARG_FLOATVAL:
+                *(FLOATVAL *)ptr = value;
+                break;
+            case PARROT_ARG_STRING:
+                *(STRING **)ptr = Parrot_str_from_num(INTERP, value);
+                break;
+            case PARROT_ARG_PMC:
+                *(PMC **)ptr = get_number_pmc(INTERP, value);
+                break;
+            default:
+                PARROT_ASSERT(!"Impossible type");
+        }
+    }
+
+    VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
+        void *cell = STATICSELF.get_pointer_keyed_int(key);
+        void *ptr  = UNTAG_CELL(cell);
+
+        switch((Call_bits_enum_t)CELL_TYPE_MASK(cell)) {
+            case PARROT_ARG_INTVAL:
+                *(INTVAL *)ptr = Parrot_str_to_int(INTERP, value);
+                break;
+            case PARROT_ARG_FLOATVAL:
+                *(FLOATVAL *)ptr = Parrot_str_to_num(INTERP, value);
+                break;
+            case PARROT_ARG_STRING:
+                *(STRING **)ptr = value;
+                break;
+            case PARROT_ARG_PMC:
+                *(PMC **)ptr = get_string_pmc(INTERP, value);
+                break;
+            default:
+                PARROT_ASSERT(!"Impossible type");
+        }
+    }
+
+    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
+        void *cell = STATICSELF.get_pointer_keyed_int(key);
+        void *ptr  = UNTAG_CELL(cell);
+
+        switch((Call_bits_enum_t)CELL_TYPE_MASK(cell)) {
+            case PARROT_ARG_INTVAL:
+                *(INTVAL *)ptr = VTABLE_get_integer(INTERP, value);
+                break;
+            case PARROT_ARG_FLOATVAL:
+                *(FLOATVAL *)ptr = VTABLE_get_number(INTERP, value);
+                break;
+            case PARROT_ARG_STRING:
+                *(STRING **)ptr = VTABLE_get_string(INTERP, value);
+                break;
+            case PARROT_ARG_PMC:
+                *(PMC **)ptr = value;
+                break;
+            default:
+                PARROT_ASSERT(!"Impossible type");
+        }
+    }
+
+/*
+
+*/
+    VTABLE STRING *get_string_keyed_int(INTVAL key) {
+        void *cell  = STATICSELF.get_pointer_keyed_int(key);
+        void *ptr   = UNTAG_CELL(cell);
+        return (STRING *)ptr;
+    }
+
+/*
+
+=item C<void *get_pointer_keyed_int(INTVAL key)>
+
+Get raw pointer for result.
+
+=cut
+
+*/
+
+    VTABLE void *get_pointer_keyed_int(INTVAL key) {
+        void   **values;
+        INTVAL   size;
+
+        GET_ATTR_size(INTERP, SELF, size);
+        PARROT_ASSERT((key < size) || !"Wrong index");
+
+        GET_ATTR_values(INTERP, SELF, values);
+        return values[key];
+    }
+}
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd03_calling_conventions.pod>.
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

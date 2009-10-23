@@ -1027,7 +1027,6 @@ append_result(PARROT_INTERP, ARGIN(PMC *sig_object), ARGIN(Parrot_String type), 
     ASSERT_ARGS(append_result)
     Parrot_String full_sig;
     Parrot_PMC    returns;
-    Parrot_PMC    return_pointer;
     Parrot_PMC    return_flags;
 
     Parrot_String return_name       = Parrot_str_new_constant(interp, "returns");
@@ -1039,16 +1038,12 @@ append_result(PARROT_INTERP, ARGIN(PMC *sig_object), ARGIN(Parrot_String type), 
     Parrot_str_concat(interp, full_sig, Parrot_str_new_constant(interp, "->"), 0);
     Parrot_str_concat(interp, full_sig, type, 0);
 
-    return_pointer = pmc_new(interp, enum_class_CPointer);
-
     returns = VTABLE_get_attr_str(interp, sig_object, return_name);
     if (PMC_IS_NULL(returns)) {
-        returns = pmc_new(interp, enum_class_ResizablePMCArray);
+        returns = pmc_new(interp, enum_class_CallSignatureReturns);
         VTABLE_set_attr_str(interp, sig_object, return_name, returns);
     }
-    VTABLE_set_pointer(interp, return_pointer, result);
-    VTABLE_set_string_keyed_str(interp, return_pointer, sig_name, type);
-    VTABLE_push_pmc(interp, returns, return_pointer);
+    VTABLE_set_pointer_keyed_int(interp, returns, VTABLE_elements(interp, returns), result);
 
     /* Update returns_flag */
     return_flags = VTABLE_get_attr_str(interp, sig_object, return_flags_name);
@@ -1057,10 +1052,22 @@ append_result(PARROT_INTERP, ARGIN(PMC *sig_object), ARGIN(Parrot_String type), 
         VTABLE_set_attr_str(interp, sig_object, return_flags_name, return_flags);
     }
     switch (Parrot_str_indexed(interp, type, 0)) {
-        case 'I': VTABLE_push_integer(interp, return_flags, PARROT_ARG_INTVAL); break;
-        case 'N': VTABLE_push_integer(interp, return_flags, PARROT_ARG_FLOATVAL); break;
-        case 'S': VTABLE_push_integer(interp, return_flags, PARROT_ARG_STRING); break;
-        case 'P': VTABLE_push_integer(interp, return_flags, PARROT_ARG_PMC); break;
+        case 'I':
+            VTABLE_push_integer(interp, return_flags, PARROT_ARG_INTVAL);
+            VTABLE_push_integer(interp, returns, PARROT_ARG_INTVAL);
+            break;
+        case 'N':
+            VTABLE_push_integer(interp, return_flags, PARROT_ARG_FLOATVAL);
+            VTABLE_push_integer(interp, returns, PARROT_ARG_FLOATVAL);
+            break;
+        case 'S':
+            VTABLE_push_integer(interp, return_flags, PARROT_ARG_STRING);
+            VTABLE_push_integer(interp, returns, PARROT_ARG_STRING);
+            break;
+        case 'P':
+            VTABLE_push_integer(interp, return_flags, PARROT_ARG_PMC);
+            VTABLE_push_integer(interp, returns, PARROT_ARG_PMC);
+            break;
         default:
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_OPERATION,
