@@ -2354,12 +2354,13 @@ Parrot_pcc_merge_signature_for_tailcall(PARROT_INTERP, ARGMOD(PMC * parent), ARG
     if (PMC_IS_NULL(parent) || PMC_IS_NULL(tailcall))
         return;
     else {
-        STRING * const results_s = CONST_STRING(interp, "results");
-        STRING * const return_flag_s = CONST_STRING(interp, "return_flags");
-        PMC * const results = VTABLE_get_attr_str(interp, parent, results_s);
-        PMC * const return_flags = VTABLE_get_attr_str(interp, parent, return_flag_s);
-        VTABLE_set_attr_str(interp, tailcall, results_s, results);
-        VTABLE_set_attr_str(interp, tailcall, return_flag_s, return_flags);
+        /* Broke encapuslation. Direct poking into CallSignature is much faster */
+        PMC * results;
+        PMC * return_flags;
+        GETATTR_CallSignature_results(interp, parent, results);
+        GETATTR_CallSignature_return_flags(interp, parent, return_flags);
+        SETATTR_CallSignature_results(interp, tailcall, results);
+        SETATTR_CallSignature_return_flags(interp, tailcall, return_flags);
     }
 }
 
