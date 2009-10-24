@@ -481,7 +481,7 @@ new_bytecode(PARROT_INTERP, ARGIN(char const * const filename))
 
     /* create segments */
     PARROT_ASSERT(filename != NULL);
-    interp->code = PF_create_default_segs(interp, filename, 1);
+    interp->code = PF_create_default_segs(interp, Parrot_str_new(interp, filename, strlen(filename)), 1);
 
     /* add interpreter globals to bytecode. XXX Why is this? */
     self         = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_INTERPRETER);
@@ -578,7 +578,10 @@ create_annotations_segment(ARGIN(bytecode * const bc), ARGIN(char const * const 
     bc->interp->code->annotations = (PackFile_Annotations*)
                                     PackFile_Segment_new_seg(bc->interp,
                                         bc->interp->code->base.dir,
-                                        PF_ANNOTATIONS_SEG, segment_name, 1);
+                                        PF_ANNOTATIONS_SEG, 
+                                        Parrot_str_new(bc->interp, segment_name, 
+                                            strlen(segment_name)), 
+                                        1);
 
     bc->interp->code->annotations->code = bc->interp->code;
 
