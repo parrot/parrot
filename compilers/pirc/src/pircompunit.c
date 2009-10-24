@@ -2102,6 +2102,17 @@ expr_from_key(NOTNULL(lexer_state * const lexer), NOTNULL(key * const k)) {
 }
 
 
+/*
+
+=item C<static key_entry * new_key_entry>
+
+Constructor for a key_entry node. Memory is allocated for the node,
+and the C<expr> field is initialized to the passed in C<expr> value.
+The newly constructed node is returned.
+
+=cut
+
+*/
 static key_entry *
 new_key_entry(lexer_state * const lexer, expression * const expr) {
     key_entry *entry = pir_mem_allocate_zeroed_typed(lexer, key_entry);
