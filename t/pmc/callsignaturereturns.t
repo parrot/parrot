@@ -22,12 +22,28 @@ Tests the CallSignatureReturns PMC.
     plan(1)
 
     instantiate()
+    switch_storage()
 .end
 
 
 .sub instantiate
     $P0 = new ['CallSignatureReturns']
     ok(1, 'Instantiated CallSignatureReturns')
+.end
+
+# Check that internal switching of storage works.
+.sub switch_storage
+    .local pmc r
+    (r :slurpy) = 'return_many'()
+    sweep 1
+    $S0 = join '', r
+    is($S0, "This is very long string to return as characters", "Internal storage switched")
+.end
+
+.sub return_many
+    .local pmc res
+    res = split '', "This is very long string to return as characters"
+    .return (res :flat)
 .end
 
 # Local Variables:

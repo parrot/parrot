@@ -37,6 +37,8 @@ This class stores typed pointers used to fill results in CallSignature.
 
 CallSignatureReturns will behave like CPointer with autocasting values.
 
+Up to 8 returns use FixedSizeAllocator. Switch to malloc/free after.
+
 =head2 Functions
 
 =over 4
@@ -67,10 +69,16 @@ Destroy CallSignatureReturns.
 */
     VTABLE void destroy() {
         void    **values;
+        INTVAL    resize_threshold;
 
         GET_ATTR_values(INTERP, SELF, values);
-        if (values)
-            mem_sys_free(values);
+        GET_ATTR_resize_threshold(INTERP, SELF, resize_threshold);
+        if (values) {
+            if (resize_threshold == 8)
+                Parrot_gc_free_fixed_size_storage(INTERP, 8 * sizeof (void *), values);
+            else
+                mem_sys_free(values);
+        }
     }
 /*
 
@@ -91,7 +99,7 @@ Resizes the array to C<size> elements.
 
         if (!values) {
             /* Empty. Allocate 8 elements (arbitary number) */
-            values = mem_allocate_n_zeroed_typed(8, void*);
+            values = (void **)Parrot_gc_allocate_fixed_size_storage(INTERP, 8 * sizeof (void *));
             SET_ATTR_values(INTERP, SELF, values);
             SET_ATTR_size(INTERP, SELF, size);
             SET_ATTR_resize_threshold(INTERP, SELF, 8);
@@ -101,7 +109,15 @@ Resizes the array to C<size> elements.
             return;
         }
         else {
-            INTVAL  cur = resize_threshold;
+            INTVAL  cur        = resize_threshold;
+            void   *old_values;
+
+            /* Switch to system allocator */
+            if (cur == 8) {
+                old_values = values;
+                values = (void **) mem_allocate_n_typed(8, void *);
+                memcpy(values, old_values, 8 * sizeof(void *));
+            }
 
             if (cur < 8192)
                 cur = size < 2 * cur ? 2 * cur : size;
