@@ -78,7 +78,7 @@ inline op get_label(out INT, invar PMC) {
 
 =over 4
 
-=item B<fetch>(out PMC, in PMC, in KEY, in PMC, in PMC)
+=item B<fetch>(out PMC, in PMC, in KEY, in PMC)
 
 Fetches a value from $2, keyed by $3 into $1.  If the resulting PMC is PMCNULL,
 clones $4 and assigns the result to $1 instead.
@@ -87,7 +87,7 @@ clones $4 and assigns the result to $1 instead.
 
 =item B<fetch>(out PMC, in PMC, in INT, in PMC)
 
-=item B<fetch>(out PMC, in PMC, in STRING, in PMC)
+=item B<fetch>(out PMC, in PMC, in STR, in PMC)
 
 =back
 
