@@ -19,7 +19,7 @@ Tests the CallSignatureReturns PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(1)
+    plan(2)
 
     instantiate()
     switch_storage()
