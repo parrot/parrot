@@ -23,6 +23,7 @@ subroutines following the Parrot Calling Conventions.
 #include "args.str"
 #include "../pmc/pmc_key.h"
 #include "../pmc/pmc_callsignature.h"
+#include "../pmc/pmc_fixedintegerarray.h"
 
 /* HEADERIZER HFILE: include/parrot/call.h */
 
@@ -479,9 +480,10 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
 {
     ASSERT_ARGS(Parrot_pcc_build_sig_object_from_op)
     PMC            *call_object;
-    INTVAL          arg_index;
-    INTVAL          arg_count  = VTABLE_elements(interp, raw_sig);
     PMC            *ctx        = CURRENT_CONTEXT(interp);
+    INTVAL         *int_array;
+    INTVAL          arg_count;
+    INTVAL          arg_index;
 
     if (PMC_IS_NULL(signature))
         call_object = pmc_new(interp, enum_class_CallSignature);
@@ -490,10 +492,11 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
 
     /* this macro is much, much faster than the VTABLE STRING comparisons */
     SETATTR_CallSignature_arg_flags(interp, call_object, raw_sig);
+    GETATTR_FixedIntegerArray_size(interp, raw_sig, arg_count);
+    GETATTR_FixedIntegerArray_int_array(interp, raw_sig, int_array);
 
     for (arg_index = 0; arg_index < arg_count; arg_index++) {
-        INTVAL arg_flags = VTABLE_get_integer_keyed_int(interp,
-                    raw_sig, arg_index);
+        INTVAL arg_flags = int_array[arg_index];
 
         const INTVAL constant  = PARROT_ARG_CONSTANT_ISSET(arg_flags);
         const INTVAL raw_index = raw_args[arg_index + 2];
@@ -705,11 +708,12 @@ Parrot_pcc_build_sig_object_returns_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *sig
 {
     ASSERT_ARGS(Parrot_pcc_build_sig_object_returns_from_op)
     PMC            *call_object;
-    INTVAL          arg_index;
-    INTVAL          arg_count   = VTABLE_elements(interp, raw_sig);
+    INTVAL         *int_array;
     PMC            *ctx         = CURRENT_CONTEXT(interp);
     PMC            *returns     = pmc_new(interp, enum_class_CallSignatureReturns);
     INTVAL          returns_pos = 0;
+    INTVAL          arg_index;
+    INTVAL          arg_count;
 
     if (PMC_IS_NULL(signature))
         call_object = pmc_new(interp, enum_class_CallSignature);
@@ -730,10 +734,12 @@ Parrot_pcc_build_sig_object_returns_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *sig
     SETATTR_CallSignature_return_flags(interp, call_object, raw_sig);
     SETATTR_CallSignature_results(interp, call_object, returns);
 
+    GETATTR_FixedIntegerArray_size(interp, raw_sig, arg_count);
+    GETATTR_FixedIntegerArray_int_array(interp, raw_sig, int_array);
+
     for (arg_index = 0; arg_index < arg_count; arg_index++) {
         STRING * const signature = CONST_STRING(interp, "signature");
-        INTVAL arg_flags = VTABLE_get_integer_keyed_int(interp,
-                    raw_sig, arg_index);
+        const INTVAL arg_flags = int_array[arg_index];
         const INTVAL raw_index = raw_args[arg_index + 2];
 
         /* Returns store a pointer to the register, so they can pass
@@ -1496,50 +1502,54 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         ARGIN(PMC *raw_sig), ARGIN(void *return_info), ARGIN(struct pcc_get_funcs *accessor))
 {
     ASSERT_ARGS(fill_results)
-    PMC    *ctx = CURRENT_CONTEXT(interp);
-    PMC    *named_used_list = PMCNULL;
-    PMC    *named_return_list = PMCNULL;
-    INTVAL  return_count    = VTABLE_elements(interp, raw_sig);
-    INTVAL  result_count;
-    INTVAL  positional_returns = 0; /* initialized by a loop later */
-    INTVAL  i = 0;                  /* used by the initialization loop */
-    INTVAL  return_index    = 0;
-    INTVAL  return_subindex = 0;
-    INTVAL  result_index    = 0;
-    INTVAL  positional_index = 0;
-    INTVAL  named_count    = 0;
-    INTVAL  err_check      = 0;
+    INTVAL *return_array;
     PMC    *result_list;
     PMC    *result_sig;
+    PMC    *ctx                = CURRENT_CONTEXT(interp);
+    PMC    *named_used_list    = PMCNULL;
+    PMC    *named_return_list  = PMCNULL;
+    INTVAL  return_index       = 0;
+    INTVAL  return_subindex    = 0;
+    INTVAL  result_index       = 0;
+    INTVAL  positional_index   = 0;
+    INTVAL  named_count        = 0;
+    INTVAL  err_check          = 0;
+    INTVAL  positional_returns = 0; /* initialized by a loop later */
+    INTVAL  i                  = 0; /* used by the initialization loop */
+    INTVAL  return_count;
+    INTVAL  result_count;
 
     /* Check if we should be throwing errors. This is configured separately
      * for parameters and return values. */
     if (PARROT_ERRORS_test(interp, PARROT_ERRORS_RESULT_COUNT_FLAG))
-            err_check = 1;
+        err_check = 1;
+
+    GETATTR_FixedIntegerArray_size(interp, raw_sig, return_count);
 
     /* A null call object is fine if there are no returns and no results. */
-    if (PMC_IS_NULL(call_object)) { /* No results to be filled. */
+    if (PMC_IS_NULL(call_object)) {
         /* If the return_count is 0, then there are no return values waiting to
          * fill the results, so no error. */
-        if (return_count > 0) {
-            if (err_check)
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                        "too few returns: 0 passed, %d expected",
-                        return_count);
-        }
+        if (return_count > 0 && (err_check))
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_OPERATION,
+                "too few returns: 0 passed, %d expected", return_count);
+
         return;
     }
 
     GETATTR_CallSignature_results(interp, call_object, result_list);
     GETATTR_CallSignature_return_flags(interp, call_object, result_sig);
+
     result_count = PMC_IS_NULL(result_list) ? 0 : VTABLE_elements(interp, result_list);
     PARROT_ASSERT(PMC_IS_NULL(result_list) || !PMC_IS_NULL(result_sig));
 
-    /* the call obj doesn't have the returns as positionals, so instead we loop
-     * over raw_sig and count the number of returns before the first named return.
-     */
+    GETATTR_FixedIntegerArray_int_array(interp, raw_sig, return_array);
+
+    /* the call obj doesn't have the returns as positionals.
+     * instead count number of returns before first named return */
     for (i = 0; i < return_count; i++) {
-        INTVAL flags = VTABLE_get_integer_keyed_int(interp, raw_sig, i);
+        INTVAL flags = return_array[i];
         if (flags & PARROT_ARG_NAME)
             break;
 
@@ -1599,7 +1609,7 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                 if (return_index >= return_count)
                     break; /* no more returns */
 
-                return_flags = VTABLE_get_integer_keyed_int(interp, raw_sig, return_index);
+                return_flags = return_array[return_index];
 
                 if (return_flags & PARROT_ARG_NAME)
                     break; /* stop at named returns */
@@ -1659,7 +1669,7 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
         /* We have a positional return, fill the result with it. */
         if (return_index < positional_returns) {
-            INTVAL return_flags = VTABLE_get_integer_keyed_int(interp, raw_sig, return_index);
+            INTVAL return_flags = return_array[return_index];
             INTVAL constant     = PARROT_ARG_CONSTANT_ISSET(return_flags);
 
             /* Fill a named result with a positional return. */
@@ -1813,7 +1823,7 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         INTVAL  return_flags;
         INTVAL  constant;
 
-        return_flags = VTABLE_get_integer_keyed_int(interp, raw_sig, return_index);
+        return_flags = return_array[return_index];
 
         /* All remaining returns must be named. */
         if (!(return_flags & PARROT_ARG_NAME))
@@ -1833,7 +1843,7 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                     "named returns must have a value");
 
-        return_flags = VTABLE_get_integer_keyed_int(interp, raw_sig, return_index);
+        return_flags = return_array[return_index];
 
         if (PMC_IS_NULL(named_return_list)) /* Only created if needed. */
             named_return_list = pmc_new(interp,
@@ -1956,8 +1966,7 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                     INTVAL next_result_flags;
 
                     if (result_index + 1 < result_count) {
-                        next_result_flags = VTABLE_get_integer_keyed_int(interp,
-                                raw_sig, result_index + 1);
+                        next_result_flags = return_array[result_index + 1];
                         if (next_result_flags & PARROT_ARG_OPT_FLAG) {
                             result_index++;
                             VTABLE_set_integer_keyed_int(interp, result_list, result_index, 1);
