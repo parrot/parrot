@@ -47,6 +47,16 @@ Up to 8 returns use FixedSizeAllocator. Switch to malloc/free after.
 
 */
 
+static void **
+allocate_initial_values(PARROT_INTERP, ARGIN(PMC *SELF))
+{
+    void **values = (void **)Parrot_gc_allocate_fixed_size_storage(interp,
+                                 8 * sizeof (void *));
+
+    SETATTR_CallSignatureReturns_resize_threshold(interp, SELF, 8);
+    return values;
+}
+
 
 /* mask off lower two bits (1 + 2 = 3) for pointer tags */
 #define TAG_BITS 3
@@ -103,14 +113,11 @@ Resizes the array to C<size> elements.
         GET_ATTR_values(INTERP, SELF, values);
         GET_ATTR_resize_threshold(INTERP, SELF, resize_threshold);
 
+        /* Empty. Allocate 8 elements (arbitary number) */
         if (!values) {
-            /* Empty. Allocate 8 elements (arbitary number) */
-            values = (void **)Parrot_gc_allocate_fixed_size_storage(INTERP,
-                                 8 * sizeof (void *));
-
+            values = allocate_initial_values(INTERP, SELF);
             SET_ATTR_values(INTERP, SELF, values);
             SET_ATTR_size(INTERP, SELF, size);
-            SET_ATTR_resize_threshold(INTERP, SELF, 8);
         }
         else if (size <= resize_threshold) {
             SET_ATTR_size(INTERP, SELF, size);
@@ -179,11 +186,17 @@ PMC, or STRING storage location.
         void   **values;
         INTVAL   size;
 
-        GET_ATTR_size(INTERP, SELF, size);
-        if (key >= size)
+        GET_ATTR_values(INTERP, SELF, values);
+        GET_ATTR_size(INTERP,   SELF, size);
+
+        if (!values && key < 8) {
+            values = allocate_initial_values(INTERP, SELF);
+            SET_ATTR_values(INTERP, SELF, values);
+            SET_ATTR_size(INTERP, SELF, key + 1);
+        }
+        else if (key >= size)
             STATICSELF.set_integer_native(key + 1);
 
-        GET_ATTR_values(INTERP, SELF, values);
         values[key] = value;
     }
 
