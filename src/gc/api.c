@@ -409,8 +409,6 @@ Parrot_gc_new_pmc_header(PARROT_INTERP, UINTVAL flags)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
             "Parrot VM: PMC allocation failed!\n");
 
-    flags |= PObj_is_special_PMC_FLAG;
-
     if (flags & PObj_is_PMC_shared_FLAG)
         Parrot_gc_add_pmc_sync(interp, pmc);
 
