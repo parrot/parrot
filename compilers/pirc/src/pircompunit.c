@@ -1973,6 +1973,8 @@ the allocated register.
 void
 set_lex_flag(lexer_state * const lexer, target * const t, char const * const name) {
     lexical *lex = (lexical *)pir_mem_allocate(lexer, sizeof (lexical));
+    lexical *iter;
+    
     lex->name    = name;
 
     /* get a pointer to the "color" field, so that the lexical struct knows
@@ -1980,6 +1982,14 @@ set_lex_flag(lexer_state * const lexer, target * const t, char const * const nam
      */
     lex->color   = &t->info->color;
 
+    /* check whether there is already a target marked as .lex with the specified name */
+    iter = CURRENT_SUB(lexer)->info.lexicals;
+    while (iter != NULL) {
+        if (STREQ(iter->name, name)) {
+            yypirerror(lexer->yyscanner, lexer, "lexical '%s' was already declared", name);   
+        }
+        iter = iter->next;   
+    }
     /* link this lex node in the list of lexicals at the front; order doesn't matter. */
     lex->next = CURRENT_SUB(lexer)->info.lexicals;
     CURRENT_SUB(lexer)->info.lexicals = lex;
