@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -51,12 +51,12 @@ Up to 8 returns use FixedSizeAllocator. Switch to malloc/free after.
 /* mask off lower two bits (1 + 2 = 3) for pointer tags */
 #define TAG_BITS 3
 #define UNTAG_CELL(c) INTVAL2PTR(void *, (PTR2INTVAL(c)) & ~TAG_BITS)
-#define CELL_TYPE_MASK(c) (PTR2INTVAL(c)) & 3
+#define CELL_TYPE_MASK(c) (PTR2INTVAL(c)) & TAG_BITS
 
 pmclass CallSignatureReturns auto_attrs provides array {
-    ATTR INTVAL     size;     /* number of stored elements */
-    ATTR void     **values;   /* stored pointers */
-    ATTR INTVAL     resize_threshold;   /* max size before array needs to be resized */
+    ATTR void     **values;             /* stored pointers */
+    ATTR INTVAL     size;               /* number of stored elements */
+    ATTR INTVAL     resize_threshold;   /* max size before resizing array */
 
 /*
 
@@ -67,19 +67,25 @@ Destroy CallSignatureReturns.
 =cut
 
 */
+
     VTABLE void destroy() {
         void    **values;
-        INTVAL    resize_threshold;
 
         GET_ATTR_values(INTERP, SELF, values);
-        GET_ATTR_resize_threshold(INTERP, SELF, resize_threshold);
+
         if (values) {
+            INTVAL    resize_threshold;
+            GET_ATTR_resize_threshold(INTERP, SELF, resize_threshold);
+
             if (resize_threshold == 8)
-                Parrot_gc_free_fixed_size_storage(INTERP, 8 * sizeof (void *), values);
+                Parrot_gc_free_fixed_size_storage(INTERP,
+                    8 * sizeof (void *), values);
             else
                 mem_sys_free(values);
         }
     }
+
+
 /*
 
 =item C<void set_integer_native(INTVAL size)>
@@ -91,7 +97,7 @@ Resizes the array to C<size> elements.
 */
 
     VTABLE void set_integer_native(INTVAL size) {
-        void    **values;
+        void    **values = NULL;
         INTVAL    resize_threshold;
 
         GET_ATTR_values(INTERP, SELF, values);
@@ -99,7 +105,9 @@ Resizes the array to C<size> elements.
 
         if (!values) {
             /* Empty. Allocate 8 elements (arbitary number) */
-            values = (void **)Parrot_gc_allocate_fixed_size_storage(INTERP, 8 * sizeof (void *));
+            values = (void **)Parrot_gc_allocate_fixed_size_storage(INTERP,
+                                 8 * sizeof (void *));
+
             SET_ATTR_values(INTERP, SELF, values);
             SET_ATTR_size(INTERP, SELF, size);
             SET_ATTR_resize_threshold(INTERP, SELF, 8);
@@ -109,13 +117,13 @@ Resizes the array to C<size> elements.
             return;
         }
         else {
-            INTVAL  cur        = resize_threshold;
             void   *old_values;
+            INTVAL  cur = resize_threshold;
 
             /* Switch to system allocator */
             if (cur == 8) {
                 old_values = values;
-                values = (void **) mem_allocate_n_typed(8, void *);
+                values     = mem_allocate_n_typed(8, void *);
                 memcpy(values, old_values, 8 * sizeof (void *));
             }
 
@@ -127,12 +135,16 @@ Resizes the array to C<size> elements.
                 cur          &= ~0xfff;
             }
 
-            values = (void**) mem_sys_realloc((void*) values, cur * sizeof (void *));
+            values = values
+                   ? mem_realloc_n_typed(values, cur, void *)
+                   : mem_allocate_n_typed(cur, void *);
+
             SET_ATTR_values(INTERP, SELF, values);
             SET_ATTR_size(INTERP, SELF, size);
             SET_ATTR_resize_threshold(INTERP, SELF, cur);
         }
     }
+
 
 /*
 
@@ -150,9 +162,19 @@ Returns the number of elements in the array.
         return size;
     }
 
+
 /*
 
+=item C<void set_pointer_keyed_int(INTVAL key, void *value)>
+
+Sets the pointer at position key.  The pointer should point to a storage
+location for a return value -- it must be a pointer to an INTVAL, FLOATVAL,
+PMC, or STRING storage location.
+
+=cut
+
 */
+
     VTABLE void set_pointer_keyed_int(INTVAL key, void *value) {
         void   **values;
         INTVAL   size;
@@ -165,9 +187,10 @@ Returns the number of elements in the array.
         values[key] = value;
     }
 
+
 /*
 
-=item C<void push_pointer(void* value)>
+=item C<void push_pointer(void *value)>
 
 Push pointer to self. Increase size of storage.
 
@@ -176,9 +199,13 @@ Push pointer to self. Increase size of storage.
 */
 
     VTABLE void push_pointer(void *value) {
-        INTVAL idx = STATICSELF.elements();
+        INTVAL idx;
+
+        GET_ATTR_size(INTERP, SELF, idx);
+
         STATICSELF.set_pointer_keyed_int(idx, value);
     }
+
 
 /*
 
@@ -191,14 +218,22 @@ Set type of last pushed pointer.
 */
 
     VTABLE void push_integer(INTVAL type) {
-        INTVAL   idx = STATICSELF.elements() - 1;
-        void   **values;
+        void  **values;
+        INTVAL  idx;
 
-        PARROT_ASSERT((type >=0 && type < 4) || !"Wrong pointer type");
+        GET_ATTR_size(INTERP, SELF, idx);
+
+        /* last index is size - 1, of course */
+        idx--;
+
+        PARROT_ASSERT((type >= 0 && type < 4) || !"Wrong pointer type");
 
         GET_ATTR_values(INTERP, SELF, values);
-        values[idx] = INTVAL2PTR(void *, PTR2INTVAL(UNTAG_CELL(values[idx])) | type);
+
+        values[idx] = INTVAL2PTR(void *,
+            PTR2INTVAL(UNTAG_CELL(values[idx])) | type);
     }
+
 
 /*
 
@@ -210,7 +245,8 @@ Set type of last pushed pointer.
 
 =item C<void set_pmc_keyed_int(INTVAL key, PMC *value)>
 
-Sets the value of the element at index C<key> to C<value> with casting if nessesary.
+Sets the value of the element at index C<key> to C<value>, casting if
+necessary.
 
 =cut
 
@@ -306,18 +342,26 @@ Sets the value of the element at index C<key> to C<value> with casting if nesses
 
 /*
 
+=item C<void *get_string_keyed_int(INTVAL key)>
+
+Gets raw pointer for result.
+
+=cut
+
 */
+
     VTABLE STRING *get_string_keyed_int(INTVAL key) {
         void *cell  = STATICSELF.get_pointer_keyed_int(key);
         void *ptr   = UNTAG_CELL(cell);
         return (STRING *)ptr;
     }
 
+
 /*
 
 =item C<void *get_pointer_keyed_int(INTVAL key)>
 
-Get raw pointer for result.
+Gets raw pointer for result.
 
 =cut
 
@@ -334,6 +378,8 @@ Get raw pointer for result.
         return values[key];
     }
 }
+
+
 /*
 
 =back
