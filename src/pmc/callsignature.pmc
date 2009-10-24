@@ -412,13 +412,13 @@ Returns the short signature for the CallSignature.
 
     VTABLE STRING *get_string() {
         Parrot_CallSignature_attributes * const attrs = PARROT_CALLSIGNATURE(SELF);
-        STRING *res = attrs->short_sig;
+        STRING   *res = attrs->short_sig;
+        Pcc_cell *c   = attrs->positionals;
 
         if (res)
             return res;
 
         res = Parrot_str_new(INTERP, NULL, attrs->num_positionals);
-        Pcc_cell *c = attrs->positionals;
 
         while (c) {
             switch (CELL_TYPE_MASK(c)) {
