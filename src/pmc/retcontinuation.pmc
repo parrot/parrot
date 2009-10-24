@@ -82,11 +82,7 @@ Transfers control to the calling context and frees the current context.
         Parrot_continuation_check(interp, SELF);
         Parrot_continuation_rewind_environment(interp, SELF);
 
-        /* the continuation is dead - delete and destroy it */
-        /* This line causes a failure in t/pmc/packfiledirectory.t. No idea
-           what the relationship is between this line of code and that test
-           failure. */
-        /* Parrot_gc_free_pmc_header(interp, SELF); */
+        Parrot_gc_free_pmc_header(interp, SELF);
 
         if (INTERP->code != seg)
             Parrot_switch_to_cs(INTERP, seg, 1);
