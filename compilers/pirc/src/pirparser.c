@@ -585,7 +585,7 @@ typedef union YYSTYPE
     struct symbol      *symb;
     struct macro_def   *mval;
     struct macro_param *pval;
-    STRING             *parrotstring;
+
 }
 /* Line 193 of yacc.c.  */
 #line 592 "pirparser.c"

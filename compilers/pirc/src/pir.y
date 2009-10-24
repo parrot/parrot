@@ -250,7 +250,7 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
     struct symbol      *symb;
     struct macro_def   *mval;
     struct macro_param *pval;
-    STRING             *parrotstring;
+
 }
 
 
