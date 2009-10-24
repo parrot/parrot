@@ -326,15 +326,6 @@ void Parrot_gc_clear_live_bits(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void Parrot_gc_free_attributes_from_pool(PARROT_INTERP,
-    ARGMOD(PMC_Attribute_Pool * pool),
-    ARGMOD(void *data))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(* pool)
-        FUNC_MODIFIES(*data);
-
 PARROT_CANNOT_RETURN_NULL
 PMC_Attribute_Pool * Parrot_gc_get_attribute_pool(PARROT_INTERP,
     size_t attrib_size)
@@ -387,11 +378,6 @@ int Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
 #define ASSERT_ARGS_Parrot_gc_clear_live_bits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pool))
-#define ASSERT_ARGS_Parrot_gc_free_attributes_from_pool \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pool) \
-    , PARROT_ASSERT_ARG(data))
 #define ASSERT_ARGS_Parrot_gc_get_attribute_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_get_attributes_from_pool \

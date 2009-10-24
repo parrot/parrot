@@ -960,11 +960,6 @@ PMC_Attribute_Pool *pool)>
 
 Allocate a new arena of fixed-sized data structures for the given pool.
 
-=item C<void Parrot_gc_free_attributes_from_pool(PARROT_INTERP,
-PMC_Attribute_Pool * pool, void *data)>
-
-Frees a fixed-size data item back to the pool for later reallocation
-
 =item C<void Parrot_gc_initialize_fixed_size_pools(PARROT_INTERP, size_t
 init_num_pools)>
 
@@ -1019,17 +1014,6 @@ Parrot_gc_get_attributes_from_pool(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool * po
 
     pool->num_free_objects--;
     return (void *)item;
-}
-
-void
-Parrot_gc_free_attributes_from_pool(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool * pool),
-    ARGMOD(void *data))
-{
-    ASSERT_ARGS(Parrot_gc_free_attributes_from_pool)
-    PMC_Attribute_Free_List * const item = (PMC_Attribute_Free_List *)data;
-    item->next = pool->free_list;
-    pool->free_list = item;
-    pool->num_free_objects++;
 }
 
 

@@ -116,6 +116,15 @@ static void * get_free_buffer(PARROT_INTERP, ARGIN(Fixed_Size_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void Parrot_gc_free_attributes_from_pool(PARROT_INTERP,
+    ARGMOD(PMC_Attribute_Pool *pool),
+    ARGMOD(void *data))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*pool)
+        FUNC_MODIFIES(*data);
+
 static void Parrot_gc_merge_buffer_pools(PARROT_INTERP,
     ARGMOD(Fixed_Size_Pool *dest),
     ARGMOD(Fixed_Size_Pool *source))
@@ -150,6 +159,11 @@ static int sweep_cb_pmc(PARROT_INTERP,
 #define ASSERT_ARGS_get_free_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pool))
+#define ASSERT_ARGS_Parrot_gc_free_attributes_from_pool \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pool) \
+    , PARROT_ASSERT_ARG(data))
 #define ASSERT_ARGS_Parrot_gc_merge_buffer_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(dest) \
@@ -314,14 +328,15 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
     ASSERT_ARGS(Parrot_gc_initialize)
 
     interp->mem_pools = mem_allocate_zeroed_typed(Memory_Pools);
-    interp->mem_pools->num_sized = 0;
-    interp->mem_pools->num_attribs = 0;
-    interp->mem_pools->attrib_pools = NULL;
+    interp->gc_sys    = mem_allocate_zeroed_typed(GC_Subsystem);
+
+    interp->mem_pools->num_sized          = 0;
+    interp->mem_pools->num_attribs        = 0;
+    interp->mem_pools->attrib_pools       = NULL;
     interp->mem_pools->sized_header_pools = NULL;
 
-    interp->lo_var_ptr                     = stacktop;
+    interp->lo_var_ptr                    = stacktop;
 
-    interp->gc_sys = mem_allocate_zeroed_typed(GC_Subsystem);
 
     /*TODO: add ability to specify GC core at command line w/ --gc= */
     if (0) /*If they chose sys_type with the --gc command line switch,*/
@@ -1705,6 +1720,29 @@ Parrot_gc_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGMOD(void *data)
     const size_t idx   = size - sizeof (void *);
     PMC_Attribute_Pool ** const pools = interp->mem_pools->attrib_pools;
     Parrot_gc_free_attributes_from_pool(interp, pools[idx], data);
+}
+
+
+/*
+
+=item C<static void Parrot_gc_free_attributes_from_pool(PARROT_INTERP,
+PMC_Attribute_Pool *pool, void *data)>
+
+Frees a fixed-size data item back to the pool for later reallocation.  Private
+to this file.
+
+*/
+
+static void
+Parrot_gc_free_attributes_from_pool(PARROT_INTERP,
+    ARGMOD(PMC_Attribute_Pool *pool),
+    ARGMOD(void *data))
+{
+    ASSERT_ARGS(Parrot_gc_free_attributes_from_pool)
+    PMC_Attribute_Free_List * const item = (PMC_Attribute_Free_List *)data;
+    item->next = pool->free_list;
+    pool->free_list = item;
+    pool->num_free_objects++;
 }
 
 /*
