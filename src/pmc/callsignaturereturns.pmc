@@ -116,7 +116,7 @@ Resizes the array to C<size> elements.
             if (cur == 8) {
                 old_values = values;
                 values = (void **) mem_allocate_n_typed(8, void *);
-                memcpy(values, old_values, 8 * sizeof(void *));
+                memcpy(values, old_values, 8 * sizeof (void *));
             }
 
             if (cur < 8192)
