@@ -263,13 +263,13 @@ void
 Parrot_gc_sweep_pool(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(Parrot_gc_sweep_pool)
-    PObj *b;
-    UINTVAL i;
-    UINTVAL total_used        = 0;
-    const UINTVAL object_size = pool->object_size;
 
-    Fixed_Size_Arena *cur_arena;
-    gc_object_fn_type   gc_object = pool->gc_object;
+    PObj               *b;
+    Fixed_Size_Arena   *cur_arena;
+    gc_object_fn_type   gc_object   = pool->gc_object;
+    UINTVAL             total_used  = 0;
+    const UINTVAL       object_size = pool->object_size;
+    UINTVAL             i;
 
 #if GC_VERBOSE
     if (Interp_trace_TEST(interp, 1)) {
@@ -288,20 +288,20 @@ Parrot_gc_sweep_pool(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool))
     /* Run through all the PObj header pools and mark */
     for (cur_arena = pool->last_Arena; cur_arena; cur_arena = cur_arena->prev) {
         const size_t objects_end = cur_arena->used;
-        UINTVAL i;
+        UINTVAL      i;
         b = (PObj *)cur_arena->start_objects;
 
         /* loop only while there are objects in the arena */
         for (i = objects_end; i; i--) {
 
-            if (PObj_on_free_list_TEST(b))
-                ; /* if it's on free list, do nothing */
-            else if (PObj_live_TEST(b)) {
+            /* if it's on free list, do nothing */
+
+            if (PObj_live_TEST(b)) {
                 total_used++;
                 PObj_live_CLEAR(b);
                 PObj_get_FLAGS(b) &= ~PObj_custom_GC_FLAG;
             }
-            else {
+            else if (!PObj_on_free_list_TEST(b)) {
                 /* it must be dead */
 
 #if GC_VERBOSE
@@ -320,9 +320,8 @@ Parrot_gc_sweep_pool(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool))
                      * a GC run.
                      * XXX wrong thing to do with "other" GCs
                      */
-                    if (!(interp->thread_data &&
-                            (interp->thread_data->state &
-                            THREAD_STATE_SUSPENDED_GC))) {
+                    if (!(interp->thread_data
+                    &&   (interp->thread_data->state & THREAD_STATE_SUSPENDED_GC))) {
                         ++total_used;
                         goto next;
                     }
@@ -593,11 +592,12 @@ free_pmc_in_pool(PARROT_INTERP, SHIM(Fixed_Size_Pool *pool),
 {
     ASSERT_ARGS(free_pmc_in_pool)
     PMC    * const pmc        = (PMC *)p;
-    Memory_Pools * const mem_pools = interp->mem_pools;
 
     /* TODO collect objects with finalizers */
-    if (PObj_needs_early_gc_TEST(p))
+    if (PObj_needs_early_gc_TEST(p)) {
+        Memory_Pools * const mem_pools = interp->mem_pools;
         --mem_pools->num_early_gc_PMCs;
+    }
 
     Parrot_pmc_destroy(interp, pmc);
 }
