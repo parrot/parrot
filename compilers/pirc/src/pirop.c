@@ -175,18 +175,17 @@ write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
             *instr_writer++ = 'c';
             break;
         case EXPR_KEY:
-            
-                *instr_writer++ = 'p';
-                *instr_writer++ = 'c';   
-                
-                /* XXX figure out what signature is needed. I think 'pc' */ 
+            *instr_writer++ = 'p';
+            *instr_writer++ = 'c';
+
+            /* XXX figure out what signature is needed. I think 'pc' */
             /*
             else {
                 *instr_writer++ = 'k';
             }
             */
             /*instr_writer    = write_signature(iter->expr.k->head->expr, instr_writer);*/
-            
+
             /*
 
             switch (iter->expr.k->expr->type) {
