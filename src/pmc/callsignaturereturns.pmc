@@ -58,6 +58,22 @@ pmclass CallSignatureReturns auto_attrs provides array {
 
 /*
 
+=item C<void destroy()>
+
+Destroy CallSignatureReturns.
+
+=cut
+
+*/
+    VTABLE void destroy() {
+        void    **values;
+
+        GET_ATTR_values(INTERP, SELF, values);
+        if (values)
+            mem_sys_free(values);
+    }
+/*
+
 =item C<void set_integer_native(INTVAL size)>
 
 Resizes the array to C<size> elements.
