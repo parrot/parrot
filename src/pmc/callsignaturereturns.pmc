@@ -17,16 +17,16 @@ This class stores typed pointers used to fill results in CallSignature.
 
   # Create signature
   rets = new CallSignatureReturns
-  rets.push_pointer(&intval, 0);
+  rets.set_pointer_keyed_int(0, &intval);
   rest.push_integer(PARROT_ARG_INTVAL);
 
-  rets.push_pointer(&floatval, 1);
+  rets.set_pointer_keyed_int(1, &floatval);
   rest.push_integer(PARROT_ARG_FLOATVAL);
 
-  rets.push_pointer(&string, 2);
+  rets.set_pointer_keyed_int(2, &string);
   rest.push_integer(PARROT_ARG_STRING);
 
-  rets.push_pointer(&pmc, 3);
+  rets.set_pointer_keyed_int(3, &pmc);
   rest.push_integer(PARROT_ARG_PMC);
 
   # Fill
