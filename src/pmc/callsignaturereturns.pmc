@@ -200,26 +200,6 @@ PMC, or STRING storage location.
         values[key] = value;
     }
 
-
-/*
-
-=item C<void push_pointer(void *value)>
-
-Push pointer to self. Increase size of storage.
-
-=cut
-
-*/
-
-    VTABLE void push_pointer(void *value) {
-        INTVAL idx;
-
-        GET_ATTR_size(INTERP, SELF, idx);
-
-        STATICSELF.set_pointer_keyed_int(idx, value);
-    }
-
-
 /*
 
 =item C<void push_integer(INTVAL value)>
