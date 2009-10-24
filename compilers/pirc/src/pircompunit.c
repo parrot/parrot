@@ -328,14 +328,16 @@ their thing.
 
 */
 void
-new_subr(lexer_state * const lexer, char const * const subname) {
+new_subr(lexer_state * const lexer, STRING *subname) {
     subroutine *newsub       = pir_mem_allocate_zeroed_typed(lexer, subroutine);
     int         index;
 
     /* set the sub fields */
-    newsub->info.subname     = subname;
+    newsub->info.subname1    = subname;
+    newsub->info.subname     = Parrot_str_to_cstring(lexer->interp, subname);
     /* set default lexid */
-    newsub->info.subid       = subname;
+    newsub->info.subid1      = subname;
+    newsub->info.subid       = Parrot_str_to_cstring(lexer->interp, subname);
     /* take namespace of this sub of the lexer, which keeps track of that */
     newsub->name_space       = lexer->current_ns;
 
@@ -368,7 +370,7 @@ new_subr(lexer_state * const lexer, char const * const subname) {
     CURRENT_SUB(lexer) = newsub;
 
     /* store the subroutine identifier as a global label */
-    store_global_label(lexer, subname);
+    store_global_label(lexer, Parrot_str_to_cstring(lexer->interp, subname));
 
     /* vanilla register allocator is reset for each sub */
     reset_register_allocator(lexer);

@@ -408,7 +408,7 @@ void set_sub_methodname(struct lexer_state * const lexer, char const * const met
 void set_sub_multi_types(struct lexer_state * const lexer, expression * const multitype);
 
 /* install a new subroutine node */
-void new_subr(struct lexer_state * const lexer, char const * const subname);
+void new_subr(struct lexer_state * const lexer, STRING *subname);
 
 void set_sub_name(struct lexer_state * const lexer, char const * const subname);
 

@@ -250,6 +250,7 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
     struct symbol      *symb;
     struct macro_def   *mval;
     struct macro_param *pval;
+    STRING             *parrotstring;
 }
 
 
@@ -707,7 +708,7 @@ sub_end           : ".end"
                   ;
 
 sub_head          : ".sub" sub_id
-                         { new_subr(lexer, $2); }
+                         { new_subr(lexer, lexer->sval /*$2*/); }
                   ;
 
 sub_id            : identifier
@@ -2199,7 +2200,7 @@ pasm_contents             : pasm_init pasm_lines
  * not allowed, so we don't have any name collisions.
  */
 pasm_init                 : opt_nl
-                                { new_subr(lexer, "@start"); }
+                                { new_subr(lexer, Parrot_str_new(lexer->interp, "@start", 6)); }
                           ;
 
 pasm_lines                : pasm_line

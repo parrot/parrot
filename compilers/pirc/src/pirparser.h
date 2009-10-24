@@ -298,9 +298,10 @@ typedef union YYSTYPE
     struct symbol      *symb;
     struct macro_def   *mval;
     struct macro_param *pval;
+    STRING             *parrotstring;
 }
 /* Line 1529 of yacc.c.  */
-#line 304 "pirparser.h"
+#line 305 "pirparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
