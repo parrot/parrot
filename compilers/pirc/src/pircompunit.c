@@ -1972,26 +1972,28 @@ the allocated register.
 */
 void
 set_lex_flag(lexer_state * const lexer, target * const t, char const * const name) {
-    lexical *lex = (lexical *)pir_mem_allocate(lexer, sizeof (lexical));
-    lexical *iter;
+    lexical *lex = CURRENT_SUB(lexer)->info.lexicals;
     
-    lex->name    = name;
+    /* check whether there is already a target marked as .lex with the specified name */
+    while (lex != NULL) {
+        if (STREQ(lex->name, name)) {
+            yypirerror(lexer->yyscanner, lexer, "lexical '%s' was already declared", name);   
+            /* abort immediately */
+            return;
+        }
+        lex = lex->next;   
+    }
+    
+    lex        = (lexical *)pir_mem_allocate(lexer, sizeof (lexical));    
+    lex->name  = name;
 
     /* get a pointer to the "color" field, so that the lexical struct knows
      * the assigned PASM register.
      */
-    lex->color   = &t->info->color;
-
-    /* check whether there is already a target marked as .lex with the specified name */
-    iter = CURRENT_SUB(lexer)->info.lexicals;
-    while (iter != NULL) {
-        if (STREQ(iter->name, name)) {
-            yypirerror(lexer->yyscanner, lexer, "lexical '%s' was already declared", name);   
-        }
-        iter = iter->next;   
-    }
+    lex->color = &t->info->color;
+    
     /* link this lex node in the list of lexicals at the front; order doesn't matter. */
-    lex->next = CURRENT_SUB(lexer)->info.lexicals;
+    lex->next  = CURRENT_SUB(lexer)->info.lexicals;
     CURRENT_SUB(lexer)->info.lexicals = lex;
 }
 
