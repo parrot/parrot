@@ -89,7 +89,7 @@ static PMC* clone_key_arg(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING * dissect_aggregate_arg(PARROT_INTERP,
+static void dissect_aggregate_arg(PARROT_INTERP,
     ARGMOD(PMC *call_object),
     ARGIN(PMC *aggregate))
         __attribute__nonnull__(1)
@@ -482,11 +482,6 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
     INTVAL          arg_index;
     INTVAL          arg_count  = VTABLE_elements(interp, raw_sig);
     PMC            *ctx        = CURRENT_CONTEXT(interp);
-    /*
-     * Preallocate some buffer for string signature.
-     * Parrot_str_new will allocate proper size
-     */
-    STRING         *string_sig = Parrot_str_new(interp, NULL, arg_count);
 
     if (PMC_IS_NULL(signature))
         call_object = pmc_new(interp, enum_class_CallSignature);
@@ -505,7 +500,6 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
 
         switch (PARROT_ARG_TYPE_MASK_MASK(arg_flags)) {
             case PARROT_ARG_INTVAL:
-                string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "I"));
                 if (constant)
                     VTABLE_push_integer(interp, call_object, raw_index);
                 else {
@@ -514,7 +508,6 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
                 }
                 break;
             case PARROT_ARG_FLOATVAL:
-                string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "N"));
                 if (constant)
                     VTABLE_push_float(interp, call_object,
                             Parrot_pcc_get_num_constant(interp, ctx, raw_index));
@@ -526,7 +519,6 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
             case PARROT_ARG_STRING:
             {
                 STRING *string_value;
-                string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "S"));
                 if (constant)
                     /* ensure that callees don't modify constant caller strings */
                     string_value = Parrot_str_new_COW(interp,
@@ -535,7 +527,6 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
                     string_value = CTX_REG_STR(ctx, raw_index);
 
                 if (arg_flags & PARROT_ARG_NAME) {
-                    string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "n"));
                     arg_index++;
                     if (!PMC_IS_NULL(call_object)
                          && VTABLE_exists_keyed_str(interp, call_object, string_value)) {
@@ -560,12 +551,9 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
                     pmc_value = CTX_REG_PMC(ctx, raw_index);
 
                 if (arg_flags & PARROT_ARG_FLATTEN) {
-                    STRING * const flat_list = dissect_aggregate_arg(
-                                                   interp, call_object, pmc_value);
-                    string_sig = Parrot_str_append(interp, string_sig, flat_list);
+                    dissect_aggregate_arg(interp, call_object, pmc_value);
                 }
                 else {
-                    string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "P"));
                     VTABLE_push_pmc(interp, call_object, clone_key_arg(interp, pmc_value));
                 }
 
@@ -577,7 +565,6 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
 
     }
 
-    VTABLE_set_string_native(interp, call_object, string_sig);
     return call_object;
 }
 
@@ -605,11 +592,9 @@ extract_named_arg_from_op(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(STRING 
 
     const INTVAL constant  = PARROT_ARG_CONSTANT_ISSET(arg_flags);
     const INTVAL raw_index = raw_args[arg_index + 2];
-    STRING      *string_sig = VTABLE_get_string(interp, call_object);
 
     switch (PARROT_ARG_TYPE_MASK_MASK(arg_flags)) {
         case PARROT_ARG_INTVAL:
-            string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "I"));
             if (constant)
                 VTABLE_set_integer_keyed_str(interp, call_object, name, raw_index);
             else
@@ -617,7 +602,6 @@ extract_named_arg_from_op(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(STRING 
                         CTX_REG_INT(ctx, raw_index));
             break;
         case PARROT_ARG_FLOATVAL:
-            string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "N"));
             if (constant)
                 VTABLE_set_number_keyed_str(interp, call_object, name,
                         Parrot_pcc_get_num_constant(interp, ctx, raw_index));
@@ -626,7 +610,6 @@ extract_named_arg_from_op(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(STRING 
                         CTX_REG_NUM(ctx, raw_index));
             break;
         case PARROT_ARG_STRING:
-            string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "S"));
             if (constant)
                 /* ensure that callees don't modify constant caller strings */
                 VTABLE_set_string_keyed_str(interp, call_object, name,
@@ -637,7 +620,6 @@ extract_named_arg_from_op(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(STRING 
                         CTX_REG_STR(ctx, raw_index));
             break;
         case PARROT_ARG_PMC:
-            string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "P"));
             if (constant)
                 VTABLE_set_pmc_keyed_str(interp, call_object, name,
                         Parrot_pcc_get_pmc_constant(interp, ctx, raw_index));
@@ -648,14 +630,12 @@ extract_named_arg_from_op(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(STRING 
         default:
             break;
     }
-
-    VTABLE_set_string_native(interp, call_object, string_sig);
 }
 
 /*
 
-=item C<static STRING * dissect_aggregate_arg(PARROT_INTERP, PMC *call_object,
-PMC *aggregate)>
+=item C<static void dissect_aggregate_arg(PARROT_INTERP, PMC *call_object, PMC
+*aggregate)>
 
 Takes an aggregate PMC and splits it up into individual arguments,
 adding each one to the CallSignature PMC. If the aggregate is an array,
@@ -667,11 +647,10 @@ hash, its key/value pairs are added as named arguments.
 */
 
 PARROT_CANNOT_RETURN_NULL
-static STRING *
+static void
 dissect_aggregate_arg(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(PMC *aggregate))
 {
     ASSERT_ARGS(dissect_aggregate_arg)
-    STRING * sub_string = Parrot_str_new(interp, NULL, 0);
     if (VTABLE_does(interp, aggregate, CONST_STRING(interp, "array"))) {
         INTVAL elements = VTABLE_elements(interp, aggregate);
         INTVAL index;
@@ -679,7 +658,6 @@ dissect_aggregate_arg(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(PMC *aggreg
             VTABLE_push_pmc(interp, call_object,
                     VTABLE_get_pmc_keyed_int(interp, aggregate, index));
         }
-        sub_string = Parrot_str_append(interp, sub_string, Parrot_str_repeat(interp, CONST_STRING(interp, "P"), index));
     }
     else if (VTABLE_does(interp, aggregate, CONST_STRING(interp, "hash"))) {
         INTVAL elements = VTABLE_elements(interp, aggregate);
@@ -697,14 +675,12 @@ dissect_aggregate_arg(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(PMC *aggreg
                 VTABLE_set_pmc_keyed_str(interp, call_object, name,
                     VTABLE_get_pmc_keyed_str(interp, aggregate, name));
             }
-            sub_string = Parrot_str_append(interp, sub_string, Parrot_str_repeat(interp, CONST_STRING(interp, "SnP"), index));
         }
     }
     else {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "flattened parameters must be a hash or array");
     }
-    return sub_string;
 }
 
 /*
@@ -827,7 +803,6 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
     PMC         *arg_flags     = PMCNULL;
     PMC         *return_flags  = PMCNULL;
     PMC         * const call_object = pmc_new(interp, enum_class_CallSignature);
-    STRING      *string_sig         = Parrot_str_new(interp, NULL, 0);
     const INTVAL sig_len            = strlen(sig);
     INTVAL       in_return_sig      = 0;
     INTVAL       i;
@@ -887,29 +862,23 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
             switch (type) {
                 case 'I':
                     VTABLE_push_integer(interp, call_object, va_arg(args, INTVAL));
-                    string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "I"));
                     break;
                 case 'N':
                     VTABLE_push_float(interp, call_object, va_arg(args, FLOATVAL));
-                    string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "N"));
                     break;
                 case 'S':
                     VTABLE_push_string(interp, call_object, va_arg(args, STRING *));
-                    string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "S"));
                     break;
                 case 'P':
                 {
                     INTVAL type_lookahead = sig[i+1];
                     PMC * const pmc_arg = va_arg(args, PMC *);
                     if (type_lookahead == 'f') {
-                        STRING * const flat_list = dissect_aggregate_arg(
-                                                       interp, call_object, pmc_arg);
-                        string_sig = Parrot_str_append(interp, string_sig, flat_list);
+                         dissect_aggregate_arg(interp, call_object, pmc_arg);
                         i++; /* skip 'f' */
                     }
                     else {
                         VTABLE_push_pmc(interp, call_object, clone_key_arg(interp, pmc_arg));
-                        string_sig = Parrot_str_append(interp, string_sig, CONST_STRING(interp, "P"));
                         if (type_lookahead == 'i') {
                             if (i != 0)
                                 Parrot_ex_throw_from_c_args(interp, NULL,
@@ -935,12 +904,8 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
 
     /* Check if we have an invocant, and add it to the front of the arguments iff needed */
     if (!PMC_IS_NULL(obj) && append_pi) {
-        string_sig = Parrot_str_concat(interp, CONST_STRING(interp, "Pi"), string_sig, 0);
-        VTABLE_set_string_native(interp, call_object, string_sig);
         VTABLE_unshift_pmc(interp, call_object, obj);
     }
-
-    VTABLE_set_string_native(interp, call_object, string_sig);
 
     return call_object;
 }
