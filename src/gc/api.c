@@ -1694,8 +1694,17 @@ void *
 Parrot_gc_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
 {
     ASSERT_ARGS(Parrot_gc_allocate_fixed_size_storage)
-    PMC_Attribute_Pool * const pool = Parrot_gc_get_attribute_pool(interp,
-        size);
+    PMC_Attribute_Pool *pool = NULL;
+    const size_t idx = (size < sizeof (void *)) ? 0 : (size - sizeof (void *));
+
+    /* get the pool directly, if possible, for great speed */
+    if (interp->mem_pools->num_attribs > idx)
+        pool = interp->mem_pools->attrib_pools[idx];
+
+    /* otherwise create it */
+    if (!pool)
+        pool = Parrot_gc_get_attribute_pool(interp, size);
+
     return Parrot_gc_get_attributes_from_pool(interp, pool);
 }
 
