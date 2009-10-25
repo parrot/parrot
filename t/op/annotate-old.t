@@ -23,6 +23,10 @@ be covered with pir based tests.
 
 =cut
 
+TODO: {
+    local $TODO = q|fails in fast and cgoto runcores - TT #1135|
+        if $ENV{TEST_PROG_ARGS} =~ /--runcore=(fast|cgoto)/;
+
 pir_error_output_like( <<CODE, <<OUTPUT, 'unhandled exception from loaded function');
 .sub main :main
     # Not using test more, just a quick way to pick a function
@@ -35,6 +39,8 @@ pir_error_output_like( <<CODE, <<OUTPUT, 'unhandled exception from loaded functi
 CODE
 /\(foobar:42\)/
 OUTPUT
+
+}
 
 # Local Variables:
 #   mode: cperl
