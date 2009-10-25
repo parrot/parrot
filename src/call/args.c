@@ -1288,7 +1288,14 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
     /* Double check that all named arguments were assigned to parameters. */
     if (err_check) {
-        PMC *named_arg_list = VTABLE_get_attr_str(interp, call_object, CONST_STRING(interp, "named"));
+        PMC  *named_arg_list;
+        Hash *h;
+        /* Early exit to avoid vtable call */
+        GETATTR_CallSignature_hash(interp, call_object, h);
+        if (!h || !h->entries)
+            return;
+
+        named_arg_list = VTABLE_get_attr_str(interp, call_object, CONST_STRING(interp, "named"));
         if (!PMC_IS_NULL(named_arg_list)) {
             INTVAL named_arg_count = VTABLE_elements(interp, named_arg_list);
             if (PMC_IS_NULL(named_used_list))
