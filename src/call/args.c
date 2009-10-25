@@ -1503,8 +1503,9 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 {
     ASSERT_ARGS(fill_results)
     INTVAL *return_array;
+    INTVAL *result_array;
     PMC    *result_list;
-    PMC    *result_sig;
+    PMC    *result_sig         = NULL;
     PMC    *ctx                = CURRENT_CONTEXT(interp);
     PMC    *named_used_list    = PMCNULL;
     PMC    *named_return_list  = PMCNULL;
@@ -1545,6 +1546,8 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
     PARROT_ASSERT(PMC_IS_NULL(result_list) || !PMC_IS_NULL(result_sig));
 
     GETATTR_FixedIntegerArray_int_array(interp, raw_sig, return_array);
+    if (!PMC_IS_NULL(result_sig))
+        GETATTR_FixedIntegerArray_int_array(interp, result_sig, result_array);
 
     /* the call obj doesn't have the returns as positionals.
      * instead count number of returns before first named return */
@@ -1583,7 +1586,7 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
             return;
         }
 
-        result_flags = VTABLE_get_integer_keyed_int(interp, result_sig, result_index);
+        result_flags = result_array[result_index];
 
         /* If the result is slurpy, collect all remaining positional
          * returns into an array.*/
@@ -1677,13 +1680,13 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                 STRING *result_name;
                 if (!(result_flags & PARROT_ARG_STRING))
                     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                            "named results must have a name specified");
+                            "named results must have a name specified 1683");
                 result_name = VTABLE_get_string_keyed_int(interp, result_list, result_index);
                 named_count++;
                 result_index++;
                 if (result_index >= result_count)
                     continue;
-                result_flags = VTABLE_get_integer_keyed_int(interp, result_sig, result_index);
+                result_flags = result_array[result_index];
 
                 /* Mark the name as used, cannot be filled again. */
                 if (PMC_IS_NULL(named_used_list)) /* Only created if needed. */
@@ -1768,8 +1771,7 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                 INTVAL next_result_flags;
 
                 if (result_index + 1 < result_count) {
-                    next_result_flags = VTABLE_get_integer_keyed_int(interp,
-                            result_sig, result_index + 1);
+                    next_result_flags = result_array[result_index + 1];
                     if (next_result_flags & PARROT_ARG_OPT_FLAG) {
                         result_index++;
                         VTABLE_set_integer_keyed_int(interp, result_list, result_index, 1);
@@ -1792,8 +1794,7 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
             /* Mark the option flag for the result to FALSE, it was filled
              * with a default value. */
             if (result_index + 1 < result_count) {
-                next_result_flags = VTABLE_get_integer_keyed_int(interp,
-                        result_sig, result_index + 1);
+                next_result_flags = result_array[result_index + 1];
                 if (next_result_flags & PARROT_ARG_OPT_FLAG) {
                     result_index++;
                     VTABLE_set_integer_keyed_int(interp, result_list, result_index, 0);
@@ -1832,7 +1833,7 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
         if (!(return_flags & PARROT_ARG_STRING))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                    "named results must have a name specified");
+                    "named results must have a name specified 1836");
 
         return_name = PARROT_ARG_CONSTANT_ISSET(return_flags)
                            ? accessor->string_constant(interp, return_info, return_index)
@@ -1902,7 +1903,7 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         if (result_index >= result_count)
             break;
 
-        result_flags = VTABLE_get_integer_keyed_int(interp, result_sig, result_index);
+        result_flags = result_array[result_index];
 
         /* All remaining results must be named. */
         if (!(result_flags & PARROT_ARG_NAME))
@@ -1922,7 +1923,7 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         /* Store the name. */
         if (!(result_flags & PARROT_ARG_STRING))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                    "named results must have a name specified");
+                    "named results must have a name specified 1926");
         result_name = VTABLE_get_string_keyed_int(interp, result_list, result_index);
 
         if (!STRING_IS_NULL(result_name)) {
@@ -1930,7 +1931,7 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
             result_index++;
             if (result_index >= result_count)
                 continue;
-            result_flags = VTABLE_get_integer_keyed_int(interp, result_sig, result_index);
+            result_flags = result_array[result_index];
 
             if (VTABLE_exists_keyed_str(interp, named_return_list, result_name)) {
 
@@ -1982,8 +1983,7 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                 /* Mark the option flag for the result to FALSE, it was filled
                  * with a default value. */
                 if (result_index + 1 < result_count) {
-                    next_result_flags = VTABLE_get_integer_keyed_int(interp,
-                            result_sig, result_index + 1);
+                    next_result_flags = result_array[result_index + 1];
                     if (next_result_flags & PARROT_ARG_OPT_FLAG) {
                         result_index++;
                         VTABLE_set_integer_keyed_int(interp, result_list, result_index, 1);
