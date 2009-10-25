@@ -394,6 +394,10 @@ CODE
 written
 OUTPUT
 
+TODO: {
+    local $TODO = q|fails eval.thaw test in testr with Segmentation fault - TT #1142|
+        if $ENV{TEST_PROG_ARGS} =~ /--run-pbc/;
+
 pir_output_is( <<"CODE", <<'OUTPUT', "eval.thaw" );
 .sub main :main
     .local pmc io, e
@@ -414,6 +418,8 @@ CODE
 hello from foo_1
 hello from foo_1
 OUTPUT
+
+}
 
 pir_output_is( <<"CODE", <<'OUTPUT', "eval.freeze+thaw" );
 .sub main :main
