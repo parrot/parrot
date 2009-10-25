@@ -1028,6 +1028,7 @@ append_result(PARROT_INTERP, ARGIN(PMC *sig_object), ARGIN(Parrot_String type), 
     Parrot_String full_sig;
     Parrot_PMC    returns;
     Parrot_PMC    return_flags;
+    Parrot_Int    return_flags_size;
 
     Parrot_String return_name       = Parrot_str_new_constant(interp, "returns");
     Parrot_String return_flags_name = Parrot_str_new_constant(interp, "return_flags");
@@ -1048,25 +1049,36 @@ append_result(PARROT_INTERP, ARGIN(PMC *sig_object), ARGIN(Parrot_String type), 
     /* Update returns_flag */
     return_flags = VTABLE_get_attr_str(interp, sig_object, return_flags_name);
     if (PMC_IS_NULL(return_flags)) {
+        /* Create return_flags for single element */
         return_flags = pmc_new(interp, enum_class_FixedIntegerArray);
+        return_flags_size = 0;
         VTABLE_set_integer_native(interp, return_flags, 1);
         VTABLE_set_attr_str(interp, sig_object, return_flags_name, return_flags);
     }
+    else {
+        /* Extend return_flags by one element */
+        return_flags_size = VTABLE_elements(interp, return_flags);
+        VTABLE_set_integer_native(interp, return_flags, return_flags_size + 1);
+    }
     switch (Parrot_str_indexed(interp, type, 0)) {
         case 'I':
-            VTABLE_set_integer_keyed_int(interp, return_flags, 0, PARROT_ARG_INTVAL);
+            VTABLE_set_integer_keyed_int(interp, return_flags, return_flags_size,
+                    PARROT_ARG_INTVAL);
             VTABLE_push_integer(interp, returns, PARROT_ARG_INTVAL);
             break;
         case 'N':
-            VTABLE_set_integer_keyed_int(interp, return_flags, 0, PARROT_ARG_FLOATVAL);
+            VTABLE_set_integer_keyed_int(interp, return_flags, return_flags_size,
+                    PARROT_ARG_FLOATVAL);
             VTABLE_push_integer(interp, returns, PARROT_ARG_FLOATVAL);
             break;
         case 'S':
-            VTABLE_set_integer_keyed_int(interp, return_flags, 0, PARROT_ARG_STRING);
+            VTABLE_set_integer_keyed_int(interp, return_flags, return_flags_size,
+                    PARROT_ARG_STRING);
             VTABLE_push_integer(interp, returns, PARROT_ARG_STRING);
             break;
         case 'P':
-            VTABLE_set_integer_keyed_int(interp, return_flags, 0, PARROT_ARG_PMC);
+            VTABLE_set_integer_keyed_int(interp, return_flags, return_flags_size,
+                    PARROT_ARG_PMC);
             VTABLE_push_integer(interp, returns, PARROT_ARG_PMC);
             break;
         default:
