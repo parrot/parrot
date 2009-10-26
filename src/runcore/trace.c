@@ -245,7 +245,7 @@ trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
         }
 
         if (key) {
-            key = (PMC *)VTABLE_shift_pmc(interp, key);
+            key = VTABLE_shift_pmc(interp, key);
             if (key)
                 len += Parrot_io_eprintf(debugger, ";");
         }
