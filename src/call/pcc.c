@@ -204,6 +204,26 @@ Parrot_pcc_invoke_method_from_c_args(PARROT_INTERP, ARGIN(PMC* pmc),
 
 /*
 
+=item C<static int is_invokable(PARROT_INTERP, PMC *sub_obj)>
+
+Check if the PMC is a Sub or does invokable. Helper for do_run_ops.
+
+=cut
+
+*/
+
+PARROT_INLINE
+static int
+is_invokable(PARROT_INTERP, ARGIN(PMC*sub_obj)) /* HEADERIZER SKIP */
+{
+    if (VTABLE_isa(interp, sub_obj, CONST_STRING(interp, "Sub")))
+        return 1;
+    else
+        return VTABLE_does(interp, sub_obj, CONST_STRING(interp, "invokable"));
+}
+
+/*
+
 =item C<static int do_run_ops(PARROT_INTERP, PMC *sub_obj)>
 
 Check should we run ops.
@@ -213,6 +233,7 @@ PIR Subs need runops to run their opcodes. Methods and NCI subs don't.
 =cut
 
 */
+
 static int
 do_run_ops(PARROT_INTERP, ARGIN(PMC *sub_obj))
 {
@@ -220,20 +241,12 @@ do_run_ops(PARROT_INTERP, ARGIN(PMC *sub_obj))
     if (!PMC_IS_NULL(interp->current_object))
         return 0;
 
-    if (sub_obj->vtable->base_type == enum_class_Sub
-         || sub_obj->vtable->base_type == enum_class_MultiSub
-         || sub_obj->vtable->base_type == enum_class_Eval)
-        return 1;
-
-    /* No more core PMC to run ops */
     if (sub_obj->vtable->base_type < enum_class_core_max)
-        return 0;
-
-    /* But we can have inherited */
-    if (VTABLE_isa(interp, sub_obj, CONST_STRING(interp, "Sub")))
-        return 1;
-
-    return 0;
+        return sub_obj->vtable->base_type == enum_class_Sub
+            || sub_obj->vtable->base_type == enum_class_MultiSub
+            || sub_obj->vtable->base_type == enum_class_Eval;
+    else
+        return is_invokable(interp, sub_obj);
 }
 
 /*
