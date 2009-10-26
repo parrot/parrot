@@ -79,6 +79,8 @@ Parrot_pcc_invoke_sub_from_c_args(PARROT_INTERP, ARGIN(PMC *sub_obj),
 =item C<void Parrot_PCCINVOKE(PARROT_INTERP, PMC* pmc, STRING *method_name,
 const char *signature, ...)>
 
+DEPRECATED. See TT #443. Use Parrot_pcc_invoke_method_from_c_args instead.
+
 C<pmc> is the invocant.
 
 C<method_name> is the same C<method_name> used in the C<find_method>
