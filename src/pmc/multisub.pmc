@@ -68,13 +68,16 @@ pmclass MultiSub extends ResizablePMCArray auto_attrs provides array {
     }
 
     VTABLE PMC *get_iter() {
+        /* If we have an active signature, we sort the candidates, Otherwise,
+         * just hand back an iterator on however the list is now. */
         PMC * const sig_obj = CONTEXT(interp)->current_sig;
-        PMC * const sub     = Parrot_mmd_sort_manhattan_by_sig_pmc(interp,
-                SELF, sig_obj);
+        if (!PMC_IS_NULL(sig_obj)) {
+            PMC * const sub     = Parrot_mmd_sort_manhattan_by_sig_pmc(interp,
+                    SELF, sig_obj);
 
-        if (PMC_IS_NULL(sub))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "No applicable methods.\n");
-
+            if (PMC_IS_NULL(sub))
+                Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "No applicable methods.\n");
+        }
         return SUPER();
     }
 
