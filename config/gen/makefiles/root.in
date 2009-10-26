@@ -2164,7 +2164,7 @@ install-bin: installable
     --versiondir=$(VERSION_DIR) \
     MANIFEST MANIFEST.generated
 
-install-dev: installable
+install-dev: install
 	$(PERL) tools/dev/install_dev_files.pl \
     --buildprefix=$(BUILDPREFIX) \
     --prefix=$(PREFIX) \
