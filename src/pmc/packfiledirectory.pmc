@@ -244,7 +244,7 @@ TODO: check type
 
 */
     VTABLE void set_pmc_keyed_str(STRING *name, PMC *segment)  {
-        Parrot_PCCINVOKE(interp, segment,
+        Parrot_pcc_invoke_method_from_c_args(interp, segment,
             Parrot_str_new_constant(interp, "set_directory"),
             "P->", SELF);
         VTABLE_set_pmc_keyed_str(interp,

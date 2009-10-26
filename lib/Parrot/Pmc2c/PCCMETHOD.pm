@@ -472,7 +472,7 @@ sub rewrite_pccinvoke {
       =                # results equals PCCINVOKE invocation
       \s*              # optional whitespace
       )?               # results are optional
-      \b               # exclude Parrot_PCCINVOKE when lacking optional capture
+      \b               # exclude Parrot_pcc_invoke_method_from_c_args when lacking optional capture
       PCCINVOKE        # method name
       \s*              # optional whitespace
       \( ([^\(]*) \)   # parameters

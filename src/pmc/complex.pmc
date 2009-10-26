@@ -1799,13 +1799,13 @@ x ^ y = exp(y * ln x))
         dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
 
-        Parrot_PCCINVOKE(interp, SELF, CONST_STRING(interp, "ln"),
+        Parrot_pcc_invoke_method_from_c_args(interp, SELF, CONST_STRING(interp, "ln"),
                     "->P", &log);
 
         l = Parrot_Complex_multi_multiply_Complex_PMC(INTERP,
                     log, value, l);
 
-        Parrot_PCCINVOKE(interp, l, CONST_STRING(interp, "exp"),
+        Parrot_pcc_invoke_method_from_c_args(interp, l, CONST_STRING(interp, "exp"),
                     "->P", &dest);
 
         return dest;
@@ -1817,10 +1817,10 @@ x ^ y = exp(y * ln x))
 
         dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
-        Parrot_PCCINVOKE(interp, SELF, CONST_STRING(interp, "ln"),
+        Parrot_pcc_invoke_method_from_c_args(interp, SELF, CONST_STRING(interp, "ln"),
                      "->P", &log);
         l = Parrot_Complex_multi_multiply_DEFAULT_PMC(INTERP, log, value, l);
-        Parrot_PCCINVOKE(interp, l, CONST_STRING(interp, "exp"),
+        Parrot_pcc_invoke_method_from_c_args(interp, l, CONST_STRING(interp, "exp"),
                      "->P", &dest);
 
         return dest;

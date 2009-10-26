@@ -877,7 +877,7 @@ create_lexinfo(ARGIN(bytecode * const bc), ARGIN(PMC * sub),
                 *lexiter->color);
 
 
-        Parrot_PCCINVOKE(bc->interp, lex_info, method, "SI->", lexname, *lexiter->color);
+        Parrot_pcc_invoke_method_from_c_args(bc->interp, lex_info, method, "SI->", lexname, *lexiter->color);
 
         lexiter = lexiter->next;
     }

@@ -1272,7 +1272,7 @@ PDB_get_command(PARROT_INTERP)
         STRING *s= Parrot_str_new(interpdeb, NULL, 0);
         PMC *tmp_stdin = Parrot_io_stdhandle(interpdeb, 0, NULL);
 
-        Parrot_PCCINVOKE(interpdeb,
+        Parrot_pcc_invoke_method_from_c_args(interpdeb,
             tmp_stdin, readline,
             "S->S", prompt, & s);
         {

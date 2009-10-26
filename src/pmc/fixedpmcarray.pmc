@@ -639,7 +639,7 @@ Return a new iterator for SELF.
         if (f == 0) {
             STRING     *name = CONST_STRING(interp, "set_key");
             PMC * const iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
-            Parrot_PCCINVOKE(interp, iter, name, "P->", key);
+            Parrot_pcc_invoke_method_from_c_args(interp, iter, name, "P->", key);
             return iter;
         }
 

@@ -241,12 +241,12 @@ init_class_from_hash(PARROT_INTERP, PMC *self, PMC *info)
     /* If we were attached to a namespace and are now attached to a new one,
      * need to unset ourselves in the old namespace. */
     if (!PMC_IS_NULL(old_ns) && _class->_namespace != old_ns)
-        Parrot_PCCINVOKE(interp, old_ns, CONST_STRING(interp, "set_class"), "P->", PMCNULL);
+        Parrot_pcc_invoke_method_from_c_args(interp, old_ns, CONST_STRING(interp, "set_class"), "P->", PMCNULL);
 
     /* Link namespace to this class, if there is one. */
     if (!PMC_IS_NULL(_class->_namespace)) {
         STRING * const set_class_str = CONST_STRING(interp, "set_class");
-        Parrot_PCCINVOKE(interp, _class->_namespace, set_class_str, "P->", self);
+        Parrot_pcc_invoke_method_from_c_args(interp, _class->_namespace, set_class_str, "P->", self);
     }
 
     /* Initialize resolve_method. */
