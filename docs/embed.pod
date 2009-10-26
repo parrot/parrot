@@ -1625,37 +1625,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_runcode>
 
-=item C<Parrot_run_meth_fromc>
-
-=item C<Parrot_run_meth_fromc_arglist>
-
-=item C<Parrot_run_meth_fromc_arglist_retf>
-
-=item C<Parrot_run_meth_fromc_arglist_reti>
-
-=item C<Parrot_run_meth_fromc_args>
-
-=item C<Parrot_run_meth_fromc_args_retf>
-
-=item C<Parrot_run_meth_fromc_args_reti>
-
 =item C<Parrot_run_native>
-
-=item C<Parrot_runops_fromc>
-
-=item C<Parrot_runops_fromc_arglist>
-
-=item C<Parrot_runops_fromc_arglist_retf>
-
-=item C<Parrot_runops_fromc_arglist_reti>
-
-=item C<Parrot_runops_fromc_args>
-
-=item C<Parrot_runops_fromc_args_event>
-
-=item C<Parrot_runops_fromc_args_retf>
-
-=item C<Parrot_runops_fromc_args_reti>
 
 =item C<Parrot_schedule_event>
 
