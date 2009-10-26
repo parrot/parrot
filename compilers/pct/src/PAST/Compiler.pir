@@ -749,18 +749,33 @@ Return the POST representation of a C<PAST::Block>.
     unshift blockpast, node
 
     .local string name, pirflags, blocktype
-    .local pmc subid, ns, hll
+    .local pmc nsentry, subid, ns, hll
     name = node.'name'()
     pirflags = node.'pirflags'()
     blocktype = node.'blocktype'()
+    nsentry = node.'nsentry'()
     subid = node.'subid'()
     ns = node.'namespace'()
     hll = node.'hll'()
+
+    ##  handle nsentry attribute
+    $I0 = defined nsentry
+    unless $I0 goto nsentry_done
+    unless nsentry goto nsentry_anon
+    $S0 = self.'escape'(nsentry)
+    pirflags = concat pirflags, ' :nsentry('
+    pirflags = concat pirflags, $S0
+    pirflags = concat pirflags, ')'
+    goto nsentry_done
+  nsentry_anon:
+    pirflags = concat pirflags, ' :anon'
+  nsentry_done:
 
     ##  handle anonymous blocks
     if name goto have_name
     name = self.'unique'('_block')
     if ns goto have_name
+    if nsentry goto have_name
     pirflags = concat pirflags, ' :anon'
   have_name:
 

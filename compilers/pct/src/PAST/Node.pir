@@ -553,6 +553,19 @@ Get/set the C<hll> for this block.
 .end
 
 
+=item nsentry([nsentry])
+
+Get/set the C<nsentry> for this block.
+
+=cut
+
+.sub 'nsentry' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('nsentry', value, has_value)
+.end
+
+
 =item symbol(name [, attr1 => val1, attr2 => val2, ...])
 
 If called with named arguments, sets the symbol hash corresponding
