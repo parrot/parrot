@@ -689,8 +689,10 @@ help :
 	@echo "                     Provide Parrot configuration information"
 	@echo ""
 	@echo "Installation:"
-	@echo "  install:           Install under '$(PREFIX)' on Unix systems"
-	@echo "  install-dev:       Same as 'install' but also install support for development."
+	@echo "  install:           Install under '$(PREFIX)' on Unix systems."
+	@echo "  install-dev:       Same as 'install'."
+	@echo "  install-bin:       Install only files needed for Parrot runtime."
+	@echo "  install-dev-only:  Install only files needed for Parrot development."
 	@echo ""
 	@echo "Documentation:"
 	@echo "  help:              Print this help message."
@@ -2149,7 +2151,8 @@ cover-clean:
 #
 ###############################################################################
 
-install: install-dev
+install: install-bin install-dev-only
+install-dev: install
 
 install-bin: installable
 	$(PERL) tools/dev/install_files.pl \
@@ -2164,7 +2167,7 @@ install-bin: installable
     --versiondir=$(VERSION_DIR) \
     MANIFEST MANIFEST.generated
 
-install-dev: install-bin
+install-dev-only: installable
 	$(PERL) tools/dev/install_dev_files.pl \
     --buildprefix=$(BUILDPREFIX) \
     --prefix=$(PREFIX) \
