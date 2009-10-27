@@ -1161,21 +1161,22 @@ Signature chars are:
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-void*
+void *
 Parrot_call_sub(PARROT_INTERP, Parrot_PMC sub_pmc,
                  ARGIN(const char *signature), ...)
 {
     ASSERT_ARGS(Parrot_call_sub)
-    va_list args;
-    PMC  *sig_object;
-    void *result;
-    char  return_sig = signature[0];
-    const char *arg_sig = signature;
+    va_list     args;
+    PMC        *sig_object;
     Parrot_sub *sub;
+    void       *result     = NULL;
+    const char *arg_sig    = signature;
+    char        return_sig = signature[0];
 
     arg_sig++;
     va_start(args, signature);
-    sig_object = Parrot_pcc_build_sig_object_from_varargs(interp, PMCNULL, arg_sig, args);
+    sig_object = Parrot_pcc_build_sig_object_from_varargs(interp, PMCNULL,
+        arg_sig, args);
     va_end(args);
 
     /* Add the return argument onto the call signature object (a bit
@@ -1196,16 +1197,19 @@ Parrot_call_sub(PARROT_INTERP, Parrot_PMC sub_pmc,
             break;
         }
         default:
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                        "Dispatch: invalid return type %c!", return_sig);
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_OPERATION,
+                "Dispatch: invalid return type %c!", return_sig);
     }
 
     PMC_get_sub(interp, sub_pmc, sub);
-    Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp), sub->seg->const_table->constants);
+    Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp),
+        sub->seg->const_table->constants);
     Parrot_pcc_invoke_from_sig_object(interp, sub_pmc, sig_object);
 
     return result;
 }
+
 
 /*
 
