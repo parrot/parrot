@@ -830,7 +830,7 @@ generate_multi_signature(ARGIN(bytecode * const bc),
                  */
                 int index = emit_pbc_key(bc, types[i].entry.key);
                 sig_pmc   = bc->interp->code->const_table->constants[index]->u.key;
-                
+
                 break;
             }
             default:
