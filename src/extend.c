@@ -1138,7 +1138,7 @@ Parrot_ext_call(PARROT_INTERP, ARGIN(Parrot_PMC sub_pmc),
 
 /*
 
-=item C<void* Parrot_call_sub(PARROT_INTERP, Parrot_PMC sub_pmc, const char
+=item C<void * Parrot_call_sub(PARROT_INTERP, Parrot_PMC sub_pmc, const char
 *signature, ...)>
 
 Call a parrot subroutine with the given function signature. The first char in
