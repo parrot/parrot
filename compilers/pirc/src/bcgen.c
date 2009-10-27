@@ -847,13 +847,11 @@ generate_multi_signature(ARGIN(bytecode * const bc),
 
 /*
 
-=item C<void
-emit_pbc_key(lexer_state * const lexer, key * const k)>
+=item C<int emit_pbc_key(lexer_state * const lexer, key * const k)>
 
 Emit bytecode for the key C<k>. First the bytecode is
 written to a temporary buffer, which is later unpacked
 in the actual PackFile. See C<store_key_bytecode()>.
-
 
 =cut
 
