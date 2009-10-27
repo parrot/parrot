@@ -246,7 +246,8 @@ init_class_from_hash(PARROT_INTERP, PMC *self, PMC *info)
     /* Link namespace to this class, if there is one. */
     if (!PMC_IS_NULL(_class->_namespace)) {
         STRING * const set_class_str = CONST_STRING(interp, "set_class");
-        Parrot_pcc_invoke_method_from_c_args(interp, _class->_namespace, set_class_str, "P->", self);
+        Parrot_pcc_invoke_method_from_c_args(interp, _class->_namespace, set_class_str, "P->",
+                                             self);
     }
 
     /* Initialize resolve_method. */
