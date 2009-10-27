@@ -1944,6 +1944,7 @@ hash_value_to_int(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN_NULLOK(vo
     ASSERT_ARGS(hash_value_to_int)
     INTVAL ret;
     switch (hash->entry_type) {
+        case enum_type_ptr:
         case enum_type_INTVAL:
             ret = (INTVAL)value;
             break;
