@@ -131,22 +131,32 @@ Use C<ptr> as this PMC's Hash*.
             parrot_hash_destroy(INTERP, old_hash);
     }
 
+
 /*
+
 =item C<void set_integer(INTVAL type)>
 
-Reset Hash to use differen keys. See enum C<Hash_key_type> for possible values.
+Reset Hash to use different keys. See enum C<Hash_key_type> for possible
+values.
 
 NB: this method will destroy all old data!
 
 =cut
+
 */
     VTABLE void set_integer_native(INTVAL type) {
-        Hash * const     old_hash   = (Hash *)SELF.get_pointer();
-        PARROT_DATA_TYPE entry_type = old_hash ? old_hash->entry_type : enum_type_PMC;
-        Hash *new_hash;
+        Hash            *new_hash;
+        Hash * const     old_hash   = PARROT_HASH(SELF)->hash;
+        PARROT_DATA_TYPE entry_type = old_hash
+                                    ? old_hash->entry_type
+                                    : enum_type_PMC;
 
         if (type == Hash_key_type_STRING)
-            new_hash = parrot_new_hash(INTERP);
+            new_hash = parrot_create_hash(interp,
+                    entry_type,
+                    Hash_key_type_STRING,
+                    STRING_compare,
+                    (hash_hash_key_fn)key_hash_STRING);
         else if (type == Hash_key_type_int)
             /* new_int_hash set BOTH keys and values to INTVAL */
             new_hash = parrot_create_hash(interp,
@@ -161,18 +171,9 @@ NB: this method will destroy all old data!
                     Hash_key_type_PMC,
                     (hash_comp_fn)PMC_compare,
                     (hash_hash_key_fn)key_hash_PMC);
-        else if (type == Hash_key_type_STRING)
-            /* new_int_hash set BOTH keys and values to INTVAL */
-            new_hash = parrot_create_hash(interp,
-                    entry_type,
-                    Hash_key_type_STRING,
-                    STRING_compare,
-                    (hash_hash_key_fn)key_hash_STRING);
         else
-            /*
-                We probably will not implement other types of keys. They are way
-                too dangerous to use from PIR
-            */
+            /* We probably will not implement other types of keys. They are way
+             * too dangerous to use from PIR */
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                 "Hash: Unknown key type");
 
