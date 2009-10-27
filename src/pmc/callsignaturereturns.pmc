@@ -13,7 +13,7 @@ This class stores typed pointers used to fill results in CallSignature.
 
 =head1 SYNOPSIS
 
-  # VTABLEs are too tight to implement something more beatyful
+  # VTABLEs are too tight to implement something more beautiful
 
   # Create signature
   rets = new CallSignatureReturns
@@ -142,9 +142,7 @@ Resizes the array to C<size> elements.
                 cur          &= ~0xfff;
             }
 
-            values = values
-                   ? mem_realloc_n_typed(values, cur, void *)
-                   : mem_allocate_n_typed(cur, void *);
+            mem_realloc_n_typed(values, cur, void *);
 
             SET_ATTR_values(INTERP, SELF, values);
             SET_ATTR_size(INTERP, SELF, size);
@@ -189,10 +187,16 @@ PMC, or STRING storage location.
         GET_ATTR_values(INTERP, SELF, values);
         GET_ATTR_size(INTERP,   SELF, size);
 
-        if (!values && key < 8) {
-            values = allocate_initial_values(INTERP, SELF);
-            SET_ATTR_values(INTERP, SELF, values);
-            SET_ATTR_size(INTERP, SELF, key + 1);
+        if (!values) {
+            if (key < 8) {
+                values = allocate_initial_values(INTERP, SELF);
+                SET_ATTR_values(INTERP, SELF, values);
+                SET_ATTR_size(INTERP, SELF, key + 1);
+            }
+            else {
+                STATICSELF.set_integer_native(key + 1);
+                GET_ATTR_values(INTERP, SELF, values);
+            }
         }
         else if (key >= size)
             STATICSELF.set_integer_native(key + 1);
