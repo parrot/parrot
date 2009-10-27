@@ -692,6 +692,13 @@ is_pir_directive(char const * const name) {
     return 0;
 }
 
+
+int
+main(int argc, char **argv) {
+    
+    return 0;   
+}
+
 /*
 
 =back

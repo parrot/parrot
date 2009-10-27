@@ -137,15 +137,15 @@ set_sub_multi_types(lexer_state * const lexer, expression * const multitype) {
 
         switch (multitype->type) {
             case EXPR_CONSTANT:
-                mtype->entry.ident    = multitype->expr.c->val.sval;
-                mtype->entry_type = MULTI_TYPE_IDENT;
+                mtype->entry.ident = multitype->expr.c->val.sval;
+                mtype->entry_type  = MULTI_TYPE_IDENT;
                 break;
             case EXPR_IDENT:
-                mtype->entry.ident    = multitype->expr.id;
-                mtype->entry_type = MULTI_TYPE_IDENT;
+                mtype->entry.ident = multitype->expr.id;
+                mtype->entry_type  = MULTI_TYPE_IDENT;
                 break;
             case EXPR_KEY:
-                /* mtype->u.key      = XXX todo */
+                mtype->entry.key  = multitype->expr.k; 
                 mtype->entry_type = MULTI_TYPE_KEYED;
                 break;
             default:

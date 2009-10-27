@@ -9,6 +9,7 @@
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
+#include "pircompunit.h"
 
 /* the type name is exported, but not its private bits */
 struct bytecode;
@@ -35,7 +36,7 @@ typedef struct multi_type {
 
     union multi_union {
         char const     *ident;
-        multi_key_type *key;
+        struct key     *key;
 
     } entry;
 
@@ -86,7 +87,7 @@ typedef struct sub_info {
 } sub_info;
 
 struct lexer_state;
-struct _IMC_Unit;
+
 
 /* HEADERIZER BEGIN: compilers/pirc/src/bcgen.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -281,6 +282,8 @@ FLOATVAL get_num_const(bytecode * const bc, unsigned index);
 
 STRING *get_string_const(bytecode * const bc, unsigned index);
 
+
+int emit_pbc_key(bytecode * const bc, struct key * const k);
 
 /*
 

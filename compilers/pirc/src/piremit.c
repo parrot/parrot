@@ -552,114 +552,7 @@ emit_pbc_label_arg(lexer_state * const lexer, label * const l) {
 
 
 
-/*
 
-=item C<static void
-emit_pbc_key(lexer_state * const lexer, key * const k)>
-
-Emit bytecode for the key C<k>. First the bytecode is
-written to a temporary buffer, which is later unpacked
-in the actual PackFile. See C<store_key_bytecode()>.
-
-
-=cut
-
-*/
-static int
-emit_pbc_key(lexer_state * const lexer, key * const k) {
-    key_entry  *iter;
-    opcode_t   *key;
-    opcode_t    keysize;    /* total size of key in bytecode */
-    opcode_t   *pc;         /* cursor to write into key array */
-    expression *operand;
-    int         index;
-
-    /* create an array of opcode_t for storing the bytecode representation
-     * of the key. Initialize the cursor (pc) to write into this buffer.
-     * The size is 2 opcode_t's for each key plus 1 opcode_t for storing the size.
-     */
-    pc  =
-    key = (opcode_t *)pir_mem_allocate(lexer, (k->keylength * 2 + 1) * sizeof (opcode_t));
-
-    /* store key length in slot 0 */
-    *pc++ = k->keylength;
-
-    /* initialize iterator */
-    iter  = k->head;
-
-    while (iter) {
-        switch (iter->expr->type) {
-            case EXPR_CONSTANT: {
-                constant *c = iter->expr->expr.c;
-                switch (c->type) {
-                    case INT_VAL:
-                        *pc++ = PARROT_ARG_IC;
-                        *pc++ = c->val.ival;
-                        break;
-                    case STRING_VAL:
-                        *pc++ = PARROT_ARG_SC;
-                        *pc++ = add_string_const(lexer->bc, c->val.sval, "ascii");
-                        break;
-                    case USTRING_VAL:
-                        *pc++ = PARROT_ARG_SC;
-                        *pc++ = add_string_const(lexer->bc, c->val.ustr->contents,
-                                                            c->val.ustr->charset);
-                        break;
-                    default:
-                        panic(lexer, "wrong type of key");
-                        break;
-                }
-
-                break;
-            }
-            case EXPR_TARGET: {
-                target *t = iter->expr->expr.t;
-
-                switch (t->info->type) {
-                    case INT_TYPE:
-                        *pc++ = PARROT_ARG_I;
-                        *pc++ = t->info->color;
-                        break;
-                    case STRING_TYPE:
-                        *pc++ = PARROT_ARG_S;
-                        *pc++ = t->info->color;
-                        break;
-                    default:
-                        panic(lexer, "wrong type of key");
-                        break;
-                }
-                break;
-            }
-            case EXPR_KEY:
-                fprintf(stderr, "Nested keys are not supported.");
-                break;
-
-            default:
-                panic(lexer, "unknown expression type");
-                break;
-
-        }
-
-        iter = iter->next;
-    }
-
-    /* calculate size of key in bytecode; each field has 2 INTVALs:
-     * flags/types and the register/constant index.
-     */
-    keysize = pc - key;
-/*
-    fprintf(stderr, "key: ");
-    for (index = 0; index < keysize; ++index) {
-        fprintf(stderr, "%d|", key[index]);
-    }
-*/
-    /* store the key, and emit the index at which it's stored into the code segment */
-    index = store_key_bytecode(lexer->bc, key);
-    emit_int_arg(lexer->bc, index);
-
-    return index;
-
-}
 
 
 /*
@@ -681,7 +574,7 @@ emit_pbc_target_arg(lexer_state * const lexer, target * const t) {
 
     /* if t has a key, emit that as well */
     if (t->key) {
-        emit_pbc_key(lexer, t->key);
+        emit_pbc_key(lexer->bc, t->key);
     }
 }
 
@@ -710,7 +603,7 @@ emit_pbc_expr(lexer_state * const lexer, expression * const operand) {
             emit_pbc_label_arg(lexer, operand->expr.l);
             break;
         case EXPR_KEY:
-            emit_pbc_key(lexer, operand->expr.k);
+            emit_pbc_key(lexer->bc, operand->expr.k);
             break;
         /*
         case EXPR_IDENT:

@@ -16,6 +16,7 @@
 
 #include "bcgen.h" /* XXX future maybe parrot/bcgen.h */
 
+
 /* HEADERIZER HFILE: compilers/pirc/src/bcgen.h */
 
 /* HEADERIZER BEGIN: static */
@@ -824,8 +825,12 @@ generate_multi_signature(ARGIN(bytecode * const bc),
                 break;
             }
             case MULTI_TYPE_KEYED: {
-                /* XXX implement this */
-
+                /* XXX not sure if this is correct. Reuse the emit_pbc_key infrastructure
+                   for emitting key bytecode. Need to see whether this works...
+                 */
+                int index = emit_pbc_key(bc, types[i].entry.key);
+                sig_pmc   = bc->interp->code->const_table->constants[index]->u.key;
+                
                 break;
             }
             default:
@@ -838,6 +843,115 @@ generate_multi_signature(ARGIN(bytecode * const bc),
     }
 
     return multi_signature;
+}
+
+/*
+
+=item C<void
+emit_pbc_key(lexer_state * const lexer, key * const k)>
+
+Emit bytecode for the key C<k>. First the bytecode is
+written to a temporary buffer, which is later unpacked
+in the actual PackFile. See C<store_key_bytecode()>.
+
+
+=cut
+
+*/
+int
+emit_pbc_key(bytecode * const bc, key * const k) {
+    key_entry  *iter;
+    opcode_t   *key;
+    opcode_t    keysize;    /* total size of key in bytecode */
+    opcode_t   *pc;         /* cursor to write into key array */
+    expression *operand;
+    int         index;
+
+    /* create an array of opcode_t for storing the bytecode representation
+     * of the key. Initialize the cursor (pc) to write into this buffer.
+     * The size is 2 opcode_t's for each key plus 1 opcode_t for storing the size.
+     */
+    pc  =
+    key = (opcode_t *)mem_sys_allocate((k->keylength * 2 + 1) * sizeof (opcode_t));
+
+    /* store key length in slot 0 */
+    *pc++ = k->keylength;
+
+    /* initialize iterator */
+    iter  = k->head;
+
+    while (iter) {
+        switch (iter->expr->type) {
+            case EXPR_CONSTANT: {
+                constant *c = iter->expr->expr.c;
+                switch (c->type) {
+                    case INT_VAL:
+                        *pc++ = PARROT_ARG_IC;
+                        *pc++ = c->val.ival;
+                        break;
+                    case STRING_VAL:
+                        *pc++ = PARROT_ARG_SC;
+                        *pc++ = add_string_const(bc, c->val.sval, "ascii");
+                        break;
+                    case USTRING_VAL:
+                        *pc++ = PARROT_ARG_SC;
+                        *pc++ = add_string_const(bc, c->val.ustr->contents,
+                                                            c->val.ustr->charset);
+                        break;
+                    default:
+                        fprintf(stderr, "wrong type of key");
+                        break;
+                }
+
+                break;
+            }
+            case EXPR_TARGET: {
+                target *t = iter->expr->expr.t;
+
+                switch (t->info->type) {
+                    case INT_TYPE:
+                        *pc++ = PARROT_ARG_I;
+                        *pc++ = t->info->color;
+                        break;
+                    case STRING_TYPE:
+                        *pc++ = PARROT_ARG_S;
+                        *pc++ = t->info->color;
+                        break;
+                    default:
+                        fprintf(stderr, "wrong type of key");
+                        break;
+                }
+                break;
+            }
+            case EXPR_KEY:
+                fprintf(stderr, "Nested keys are not supported.");
+                break;
+
+            default:
+                fprintf(stderr, "unknown expression type");
+                break;
+
+        }
+
+        iter = iter->next;
+    }
+
+    /* calculate size of key in bytecode; each field has 2 INTVALs:
+     * flags/types and the register/constant index.
+     */
+    keysize = pc - key;
+/*
+    fprintf(stderr, "key: ");
+    for (index = 0; index < keysize; ++index) {
+        fprintf(stderr, "%d|", key[index]);
+    }
+*/
+    /* store the key, and emit the index at which it's stored into the code segment */
+    index = store_key_bytecode(bc, key);
+    emit_int_arg(bc, index);
+
+    return index;
+
 }
 
 
