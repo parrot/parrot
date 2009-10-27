@@ -627,7 +627,7 @@ Parrot_lib_add_path(PARROT_INTERP,
     PMC * const lib_paths = VTABLE_get_pmc_keyed_int(interp, iglobals,
         IGLOBALS_LIB_PATHS);
     PMC * const paths = VTABLE_get_pmc_keyed_int(interp, lib_paths, which);
-    VTABLE_push_string(interp, paths, path_str);
+    VTABLE_unshift_string(interp, paths, path_str);
 }
 
 /*
