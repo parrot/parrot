@@ -67,6 +67,7 @@ any value type.
     piropsig['bnot']       = 'PP'
     piropsig['bor']        = 'PPP'
     piropsig['concat']     = 'PP~'
+    piropsig['die']        = 'v~'
     piropsig['div']        = 'PP+'
     piropsig['fdiv']       = 'PP+'
     piropsig['find_name']  = 'P~'
@@ -2022,7 +2023,12 @@ attribute.
     .local pmc viviself, vivipost, vivilabel
     viviself = node.'viviself'()
     vivipost = self.'as_vivipost'(viviself, 'rtype'=>'P')
-    ops.'result'(vivipost)
+    .local string result
+    result = vivipost.'result'()
+    unless result == '' goto have_result
+    result = self.'uniquereg'('P')
+  have_result:
+    ops.'result'(result)
     ops.'push'(fetchop)
     unless viviself goto vivipost_done
     $P0 = get_hll_global ['POST'], 'Label'
@@ -2169,6 +2175,52 @@ attribute.
     .tailcall $P0.'new'(name, bindpost, 'pirop'=>'store_lex', 'result'=>bindpost)
   lexical_bind_decl:
     .tailcall $P0.'new'(name, bindpost, 'pirop'=>'.lex', 'result'=>bindpost)
+.end
+
+
+.sub 'contextual' :method :multi(_, ['PAST';'Var'])
+    .param pmc node
+    .param pmc bindpost 
+    # If we've requested a contextual in a block that
+    # explicitly declares the variable as a different type, 
+    # treat it as that type.
+    .local string name
+    name = node.'name'()
+    $P0 = get_global '@?BLOCK'
+    $P0 = $P0[0]
+    $P0 = $P0.'symtable'()
+    unless $P0 goto contextual
+    $P0 = $P0[name]
+    if null $P0 goto contextual
+    $S0 = $P0['scope']
+    unless $S0 goto contextual
+    if $S0 == 'contextual' goto contextual
+    .tailcall self.$S0(node, bindpost)
+
+  contextual:
+    # If this is a declaration, treat it like a normal lexical
+    .local int isdecl
+    isdecl = node.'isdecl'()
+    if isdecl goto contextual_lex
+
+    name = self.'escape'(name)
+    if bindpost goto contextual_bind
+
+  contextual_post:
+    .local pmc ops, fetchop, storeop
+    $P0 = get_hll_global ['POST'], 'Ops'
+    ops = $P0.'new'('node'=>node)
+    $P0 = get_hll_global ['POST'], 'Op'
+    fetchop = $P0.'new'(ops, name, 'pirop'=>'find_dynamic_lex')
+    storeop = $P0.'new'(name, ops, 'pirop'=>'store_dynamic_lex')
+    .tailcall self.'vivify'(node, ops, fetchop, storeop)
+
+  contextual_bind:
+    $P0 = get_hll_global ['POST'], 'Op'
+    .tailcall $P0.'new'(name, bindpost, 'pirop'=>'store_dynamic_lex', 'result'=>bindpost)
+
+  contextual_lex:
+    .tailcall self.'lexical'(node, bindpost)
 .end
 
 
