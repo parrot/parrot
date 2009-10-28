@@ -703,7 +703,15 @@ PARROT_CANNOT_RETURN_NULL
 target *
 set_param_alias(lexer_state * const lexer, char const * const alias) {
     PARROT_ASSERT(lexer->curtarget != NULL);
-    lexer->curtarget->alias = alias;
+    
+    /* if no alias was specified, default to the target's name, if it's not a register. */
+    if (alias == NULL) {
+        if (!TEST_FLAG(lexer->curtarget->flags, TARGET_FLAG_IS_REG))
+            lexer->curtarget->alias = lexer->curtarget->info->id.name;
+    }
+    else
+        lexer->curtarget->alias = alias;
+        
     SET_FLAG(lexer->curtarget->flags, TARGET_FLAG_NAMED);
     return lexer->curtarget;
 }
