@@ -289,9 +289,9 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
         flags       = 0;
 
         if (arg_flags[i] & VT_CALL_SIG) {
-            if (n > 1 || i != 0)
+            if ((n > 1 || i != 0) && !(n == 2 && strcmp(args[0]->name, "self") == 0))
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INTERNAL_PANIC,
-                    ":call_sig must be the first and only parameter");
+                    ":call_sig must be the first and only parameter besides self");
             if (arg_flags[i] & (VT_FLAT | VT_OPTIONAL | VT_OPT_FLAG | VT_NAMED))
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INTERNAL_PANIC,
                     ":call_sig cannot be combined with any other flags");
