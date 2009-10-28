@@ -78,9 +78,10 @@ sub runstep {
         $osname  = 'cygwin';
     }
     elsif ( $cpuarch eq 'i86pc' and $osname eq 'solaris' ) {
-        # That's only the perl 32/64 bit setting. We can override it with
-        # -m64 / -m32 for ccflags and ldflags though.
-        $cpuarch = $archname =~ /-64int/ ? 'x86_64' : 'i386';
+        # That's only the perl value, and is the same for both i386 
+        # and amd64.  Use uname -p instead to find the processor type.
+        chomp($archname = `uname -p`);
+        $cpuarch = $archname;
     }
 
     if ( $archname =~ m/powerpc/ ) {
