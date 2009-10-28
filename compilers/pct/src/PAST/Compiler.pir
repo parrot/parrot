@@ -2180,9 +2180,9 @@ attribute.
 
 .sub 'contextual' :method :multi(_, ['PAST';'Var'])
     .param pmc node
-    .param pmc bindpost 
+    .param pmc bindpost
     # If we've requested a contextual in a block that
-    # explicitly declares the variable as a different type, 
+    # explicitly declares the variable as a different type,
     # treat it as that type.
     .local string name
     name = node.'name'()
