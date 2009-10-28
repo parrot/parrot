@@ -973,6 +973,11 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
             return;
         }
     }
+    else if (param_count == 2) {
+        const INTVAL second_flag = VTABLE_get_integer_keyed_int(interp, raw_sig, 1);
+        if (second_flag & PARROT_ARG_CALL_SIG)
+            *accessor->pmc(interp, arg_info, 1) = call_object;
+    }
 
     /* First iterate over positional args and positional parameters. */
     arg_index = 0;
@@ -997,6 +1002,10 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         }
 
         param_flags = VTABLE_get_integer_keyed_int(interp, raw_sig, param_index);
+
+        /* If it's a call_sig, we're done. */
+        if (param_flags & PARROT_ARG_CALL_SIG)
+            return;
 
         /* If the parameter is slurpy, collect all remaining positional
          * arguments into an array.*/
