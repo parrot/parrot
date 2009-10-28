@@ -21,7 +21,7 @@ out-of-bounds test. Checks INT and PMC keys.
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
 
-    plan(125)
+    plan(128)
 
     resize_tests()
     negative_array_size()
@@ -50,6 +50,7 @@ out-of-bounds test. Checks INT and PMC keys.
     sort_with_broken_cmp()
     addr_tests()
     equality_tests()
+    sort_tailcall()
 .end
 
 
@@ -971,6 +972,56 @@ end:
     isnt(array1, array3, 'Different arrays')
 .end
 
+.sub sort_tailcall
+    .local pmc array
+    array = new 'ResizablePMCArray'
+    push array, 4
+    push array, 5
+    push array, 3
+    push array, 2
+    push array, 5
+    push array, 1
+   
+    .local string unsorted 
+    unsorted = join ' ', array
+    is(unsorted,"4 5 3 2 5 1", "unsorted array")
+
+    ## sort using a non-tailcall function 
+    .const 'Sub' cmp_normal = 'cmp_normal_tailcall'
+    $P1 = clone array
+    $P1.'sort'(cmp_normal)
+    .local string sorted1
+    sorted1 = join ' ', $P1
+    is (sorted1, "1 2 3 4 5 5", "sorted array, no tailcall")
+
+    ## sort using a tailcall function
+    .const 'Sub' cmp_tailcall = 'cmp_tailcall_tailcall'
+    $P1 = clone array
+    $P1.'sort'(cmp_tailcall)
+    .local string sorted2
+    sorted2 = join ' ', $P1
+    is(sorted2, "1 2 3 4 5 5", "sorted array, with tailcall")
+.end
+
+.sub 'cmp_func_tailcall'
+    .param pmc a
+    .param pmc b
+    $I0 = cmp a, b
+    .return ($I0)
+.end
+
+.sub 'cmp_normal_tailcall'
+    .param pmc a
+    .param pmc b
+    $P0 = 'cmp_func_tailcall'(a, b)
+    .return ($P0)
+.end
+
+.sub 'cmp_tailcall_tailcall'
+    .param pmc a
+    .param pmc b
+    .tailcall 'cmp_func_tailcall'(a, b)
+.end
 # don't forget to change the test plan
 
 # Local Variables:
