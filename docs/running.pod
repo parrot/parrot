@@ -107,7 +107,7 @@ Optimize
  -O  same
  -O2 optimizations with life info
  -Op rewrite I and N PASM registers most used first
- -Ot select fastest runcore (default with -O1 and -O2)
+ -Ot select fastest runcore
  -Oc turns on the optional/experimental tail call optimizations
 
 See F<docs/dev/optimizer.pod> for more information on the optimizer.  Note that
