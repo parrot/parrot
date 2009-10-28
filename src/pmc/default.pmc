@@ -131,7 +131,6 @@ check_set_std_props(PARROT_INTERP, PMC *pmc, STRING *key, PMC *value)
         const INTVAL on = VTABLE_get_bool(interp, value);
 
         /* morph to Const/normal class or readonly class */
-        /* RT #46661 warn when this fails? */
         if (on && (pmc->vtable->flags & VTABLE_HAS_CONST_TOO))
             pmc->vtable = interp->vtables[pmc->vtable->base_type + 1];
         else if (!on && (pmc->vtable->flags & (VTABLE_IS_CONST_FLAG)))
