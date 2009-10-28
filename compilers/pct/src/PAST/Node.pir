@@ -241,6 +241,22 @@ passed in).
 .end
 
 
+=item call_sig([flag])
+
+Get/set the node's C<call_sig> attribute (for parameter variables) to C<flag>.
+A true value of C<call_sig> indicates that the parameter variable given by this
+node is to be created as a C<:call_sig> parameter. If you use this, it should be
+the only parameter.
+
+=cut
+
+.sub 'call_sig' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('call_sig', value, has_value)
+.end
+
+
 =item viviself([type])
 
 If the variable needs to be instantiated, then C<type> indicates

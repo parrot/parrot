@@ -31,6 +31,7 @@ for compiling programs in Parrot.
     $P0[4] = "    .param pmc %0 :named(%1)"
     $P0[5] = "    .param pmc %0 :optional :named(%1)\n    .param int has_%0 :opt_flag"
     $P0[6] = "    .param pmc %0 :slurpy :named"
+    $P0[8] = "    .param pmc %0 :call_sig"
     set_hll_global ['POST';'Sub'], '%!paramfmt', $P0
     .return ()
 .end
@@ -241,11 +242,12 @@ Get/set the opcode type for this node.
     .param pmc pname
     .param pmc adverbs         :slurpy :named
 
-    .local int optional, slurpy
+    .local int optional, slurpy, call_sig
     .local string named
     optional = adverbs['optional']
     slurpy = adverbs['slurpy']
     named = adverbs['named']
+    call_sig = adverbs['call_sig']
 
     .local int paramseq
     paramseq = isne optional, 0
@@ -255,6 +257,9 @@ Get/set the opcode type for this node.
     unless named goto named_done
     paramseq += 4
   named_done:
+    unless call_sig goto call_sig_done
+    paramseq += 8
+  call_sig_done:
 
     .local pmc paramlist
     paramlist = self['paramlist']

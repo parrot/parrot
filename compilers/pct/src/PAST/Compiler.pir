@@ -2080,9 +2080,10 @@ attribute.
     goto param_done
 
   param_required:
-    .local int slurpy
+    .local int call_sig, slurpy
+    call_sig = node.'call_sig'()
     slurpy = node.'slurpy'()
-    subpost.'add_param'(pname, 'named'=>named, 'slurpy'=>slurpy)
+    subpost.'add_param'(pname, 'named'=>named, 'slurpy'=>slurpy, 'call_sig'=>call_sig)
 
   param_done:
     name = self.'escape'(name)
