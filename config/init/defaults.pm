@@ -257,6 +257,8 @@ sub runstep {
         );
     }
 
+    $conf->data->set( clock_best => "" );
+
     $conf->data->set( 'archname', $Config{archname});
     # adjust archname, cc and libs for e.g. --m=32
     # RT#41499 this is maybe gcc only
