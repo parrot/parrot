@@ -30,6 +30,16 @@ High-resolution timer support
 
 #define TIME_IN_NS(n) ((n).tv_sec * 1000*1000*1000 + (n).tv_nsec)
 
+#ifndef CLOCK_BEST
+#  if defined(CLOCK_PROCESS_CPUTIME_ID)
+#    define CLOCK_BEST CLOCK_PROCESS_CPUTIME_ID
+#  elif defined(CLOCK_PROF)
+#    define CLOCK_BEST CLOCK_PROF
+#  else
+#    define CLOCK_BEST CLOCK_REALTIME
+#  endif
+#endif
+
 /*
 
 =item C<UHUGEINTVAL Parrot_hires_get_time(void)>

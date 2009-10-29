@@ -152,8 +152,6 @@ sub runstep {
         libparrot_soname       => "-Wl,-soname=libparrot$share_ext.$version",
     );
 
-    $conf->data->set( clock_best => '-DCLOCK_BEST=CLOCK_PROCESS_CPUTIME_ID' );
-
      if ( ( split( m/-/, $conf->data->get_p5('archname'), 2 ) )[0] eq 'ia64' ) {
 
         $conf->data->set( platform_asm => 1 );
