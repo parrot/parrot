@@ -1454,7 +1454,7 @@ PMC*
 get_integer_pmc(PARROT_INTERP, INTVAL value)
 {
     ASSERT_ARGS(get_integer_pmc)
-    PMC *ret = pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
+    PMC * const ret = pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
     VTABLE_set_integer_native(interp, ret, value);
     return ret;
 }
@@ -1475,7 +1475,7 @@ PMC*
 get_number_pmc(PARROT_INTERP, FLOATVAL value)
 {
     ASSERT_ARGS(get_number_pmc)
-    PMC *ret = pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
+    PMC * const ret = pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
     VTABLE_set_number_native(interp, ret, value);
     return ret;
 }
@@ -1495,7 +1495,7 @@ PMC *
 get_string_pmc(PARROT_INTERP, ARGIN(STRING *value))
 {
     ASSERT_ARGS(get_string_pmc)
-    PMC *ret = pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_String));
+    PMC * const ret = pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_String));
     VTABLE_set_string_native(interp, ret, value);
     return ret;
 }
@@ -1747,10 +1747,8 @@ hash_key_to_pmc(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN(void *key))
     PMC *ret;
     switch (hash->key_type) {
         case Hash_key_type_int:
-        {
             ret = get_integer_pmc(interp, (INTVAL)key);
             break;
-        }
         case Hash_key_type_PMC:
             ret = (PMC*)key;
             break;
