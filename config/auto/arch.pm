@@ -78,7 +78,7 @@ sub runstep {
         $osname  = 'cygwin';
     }
     elsif ( $cpuarch eq 'i86pc' and $osname eq 'solaris' ) {
-        # That's only the perl value, and is the same for both i386 
+        # That's only the perl value, and is the same for both i386
         # and amd64.  Use uname -p instead to find the processor type.
         chomp($archname = `uname -p`);
         $cpuarch = $archname;
