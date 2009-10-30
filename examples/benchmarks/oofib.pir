@@ -6,14 +6,15 @@
     .local int argc
     argc = argv
     .local pmc N
+    N = new 'Integer'
     if argc <= 1 goto noarg
     $S0 = argv[1]
     N = $S0
-noarg:
-    N = new 'Integer'
-    N = 24
     goto begin
+noarg:
+    N = 24
 begin:
+
     .local num start
     time start
 
