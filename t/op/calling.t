@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 96;
+use Parrot::Test tests => 97;
 
 =head1 NAME
 
@@ -2479,6 +2479,34 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Handling :flat of emtpy arguments" );
 CODE
 ResizablePMCArray
 Undef
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "Tailcall from vtable (Was RT #41583)" );
+
+.sub main :main
+$P1 = newclass "Foo"
+$P2 = new "Foo"
+
+## Should return 2, but doesn't.
+$I1 = elements $P2
+$S1 = $I1
+say $S1
+.end
+
+.namespace ["Foo"]
+
+.sub elements :vtable
+$I0 = 13
+$I1 = 2
+.tailcall identity($I1)
+.end
+
+.sub identity
+.param int arg
+.return (arg)
+.end
+CODE
+2
 OUTPUT
 
 # Local Variables:
