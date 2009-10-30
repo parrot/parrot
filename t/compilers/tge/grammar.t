@@ -274,7 +274,7 @@ after transform, the value of the right-most leaf is: 1
 OUT
 
 TODO: {
-    local $TODO = "unresolved bug; see: https://trac.parrot.org/parrot/ticket/1160";
+    local $TODO = "unresolved bug; see: TT #1160";
 
     pir_output_is(
         <<'CODE', <<'OUT', 'two rules of the same name can apply to the same node, when called with a different dummy type' );
