@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -1381,7 +1381,7 @@ l1:
 
     $P1 = new 'Foo41'
     $S1 = $P1
-    is( $S1, 'Hello world', '__get_string method' )
+    is( $S1, 'Hello world', 'get_string method' )
 
     $P1 = new 'Bar41'
     $S1 = $P1
@@ -1390,7 +1390,7 @@ l1:
 
 .namespace [ 'Foo41' ]
 
-.sub '__get_string' :method
+.sub 'get_string' :vtable :method
     .return('Hello world')
 .end
 

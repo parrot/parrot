@@ -182,7 +182,7 @@ GC related bugs.
     ok(1, "leaving do_inc")
 .end
 
-.sub __increment :method
+.sub increment :vtable :method
     ok(1, "in __increment")
     sweep 1
 .end
