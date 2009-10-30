@@ -54,16 +54,6 @@ ns_insert_sub_keyed_str(PARROT_INTERP, PMC *self, STRING *key, PMC *value)
 
     PMC_get_sub(interp, value, sub);
 
-    /* Handle vtable methods with two underscores at the start. */
-    if (sub->vtable_index == -1) {
-        if (Parrot_str_find_index(interp, key, CONST_STRING(interp, "__"), 0) == 0) {
-            STRING * const meth_name = Parrot_str_substr(interp, key, 2,
-                (INTVAL)(Parrot_str_byte_length(interp, key) - 2), NULL, 0);
-            sub->vtable_index        =
-                Parrot_get_vtable_index(interp, meth_name);
-        }
-    }
-
     if (sub->vtable_index != -1) {
         /* Insert it in class, if there is a class */
         if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj)) {
