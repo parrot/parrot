@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -396,7 +396,7 @@ OUTPUT
 
 TODO: {
     local $TODO = q|fails eval.thaw test in testr with Segmentation fault - TT #1142|
-        if $ENV{TEST_PROG_ARGS} =~ /--run-pbc/;
+        if defined $ENV{TEST_PROG_ARGS} && $ENV{TEST_PROG_ARGS} =~ /--run-pbc/;
 
 pir_output_is( <<"CODE", <<'OUTPUT', "eval.thaw" );
 .sub main :main
