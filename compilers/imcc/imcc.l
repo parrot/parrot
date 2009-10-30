@@ -491,7 +491,6 @@ SP              [ ]
             size_t len;
             YYCHOP();
 
-            /* RT #32421   if$I0 is parsed as if$ I0 */
             if (!IMCC_INFO(interp)->frames || !IMCC_INFO(interp)->frames->label)
                 IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "missing space?");
 
