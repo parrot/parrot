@@ -898,11 +898,11 @@ Returns the number of characters in the specified Parrot string.
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 UINTVAL
-Parrot_str_byte_length(SHIM_INTERP, ARGIN(const STRING *s))
+Parrot_str_byte_length(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_byte_length)
 
-    return s->strlen;
+    return s ? s->strlen : 0;
 }
 
 
