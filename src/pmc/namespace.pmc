@@ -94,6 +94,74 @@ ns_insert_sub_keyed_str(PARROT_INTERP, PMC *self, STRING *key, PMC *value)
     return 0;
 }
 
+static int
+maybe_add_sub_to_namespace(PARROT_INTERP, PMC *SELF, STRING *key, PMC *value)
+{
+    STRING *sub_str = CONST_STRING(interp, "Sub");
+
+    if (!PMC_IS_NULL(value)
+    &&   VTABLE_isa(interp, value, sub_str)
+    &&   value->vtable->base_type != enum_class_Object)
+        return ns_insert_sub_keyed_str(interp, SELF, key, value);
+
+    return 0;
+}
+
+static void
+add_nci_to_namespace(PARROT_INTERP, PMC *SELF, STRING *key, PMC *value)
+{
+    STRING *nci_str = CONST_STRING(interp, "NCI");
+
+    if (!PMC_IS_NULL(value)
+    &&   VTABLE_isa(interp, value, nci_str)) {
+        Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
+        PMC * const classobj = VTABLE_get_class(interp, SELF);
+
+        /* Insert it in class, if there is a class */
+        add_to_class(interp, nsinfo, classobj, key, value);
+    }
+}
+
+static void
+add_multi_to_namespace(PARROT_INTERP, PMC *SELF, STRING *key, PMC *value)
+{
+    STRING *multi_str = CONST_STRING(interp, "MultiSub");
+
+    if (!PMC_IS_NULL(value)
+    &&   VTABLE_isa(interp, value, multi_str)) {
+
+        /* TT #10; work around that Sub doesn't use PMC ATTRs */
+        if (value->vtable->base_type != enum_class_Object
+        &&  VTABLE_elements(interp, value) > 0) {
+            Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
+            PMC * const classobj = VTABLE_get_class(interp, SELF);
+
+            /* Extract the first alternate and check if it is a method */
+            PMC *pmc_sub = VTABLE_get_pmc_keyed_int(interp, value, 0);
+            Parrot_Sub_attributes *sub;
+            PMC_get_sub(interp, pmc_sub, sub);
+
+            if (sub->comp_flags & SUB_COMP_FLAG_METHOD) {
+                STRING *empty_str   = CONST_STRING(interp, "");
+                STRING *method_name = key;
+                Hash   *hash;
+
+                if (Parrot_str_not_equal(interp, sub->method_name, empty_str))
+                    method_name = sub->method_name;
+
+                add_to_class(interp, nsinfo, classobj, method_name, value);
+
+                GETATTR_NameSpace_hash(interp, SELF, hash);
+
+                parrot_hash_put(interp, hash,
+                    hash_key_from_string(interp, hash, key),
+                    hash_value_from_pmc(interp, hash, value));
+            }
+        }
+    }
+}
+
+
 /*
  * Typically a named slot contains either another namespace or a
  * var/sub (not both).
@@ -216,50 +284,14 @@ really a public API.
         PMC * const old = (PMC *)parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(), key);
 
         /* If it's a sub... */
-        if (!PMC_IS_NULL(value) && VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "Sub"))) {
-            /* TT #10; work around that Sub doesn't use PMC ATTRs */
-            if (value->vtable->base_type != enum_class_Object) {
-                if (ns_insert_sub_keyed_str(interp, SELF, key, value))
-                    return;
-            }
-        }
+        if (maybe_add_sub_to_namespace(interp, SELF, key, value))
+            return;
 
         /* If it's an NCI method */
-        if (!PMC_IS_NULL(value) && VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "NCI"))) {
-            Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
-            PMC * const classobj = VTABLE_get_class(interp, SELF);
-
-            /* Insert it in class, if there is a class */
-              add_to_class(INTERP, nsinfo, classobj, key, value);
-        }
+        add_nci_to_namespace(interp, SELF, key, value);
 
         /* If it's a multi-sub and the first in this NS... */
-        if (!PMC_IS_NULL(value)
-        &&   VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "MultiSub"))) {
-
-            /* TT #10; work around that Sub doesn't use PMC ATTRs */
-            if (value->vtable->base_type != enum_class_Object
-            && VTABLE_elements(interp, value) > 0) {
-                Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
-                PMC * const classobj = VTABLE_get_class(interp, SELF);
-
-                /* Extract the first alternate and check if it is a method */
-                PMC *pmc_sub = VTABLE_get_pmc_keyed_int(interp, value, 0);
-                Parrot_Sub_attributes *sub;
-                PMC_get_sub(INTERP, pmc_sub, sub);
-
-                if (sub->comp_flags & SUB_COMP_FLAG_METHOD) {
-                    STRING *method_name = key;
-
-                    if (Parrot_str_not_equal(interp, sub->method_name, CONST_STRING(interp, "")))
-                        method_name = sub->method_name;
-
-                    add_to_class(INTERP, nsinfo, classobj, method_name, value);
-
-                    SUPER(key, value);
-                }
-            }
-        }
+        add_multi_to_namespace(interp, SELF, key, value);
 
         if (!old)
             SUPER(key, value);
