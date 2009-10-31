@@ -121,16 +121,14 @@ similarly-named file.
 sub main {
     my $argv      = shift;
     my $stats     = {};
-    my $ctx_stack = [];
     my $filename  = $argv->[0];
 
     $stats->{global_stats}{total_time} = 0;
 
     open(my $in_fh, '<', $filename) or die "couldn't open $filename for reading: $!";
 
-    while (my $line = <$in_fh>) {
-        process_line($line, $stats, $ctx_stack);
-    }
+    process_input($in_fh, $stats);
+
     close($in_fh) or die "couldn't close $filename: $!";
 
     #print_stats($stats);
@@ -146,103 +144,105 @@ sub main {
     print "$filename can now be used with kcachegrind or other callgrind-compatible tools.\n";
 }
 
-=item C<process_line>
+=item C<process_input>
 
-This function takes a string containing a single line from a Parrot profile, a
-reference to a hash of fine-grained statistics about the current PIR program
-and a reference to the current context stack.  It modifies the statistics and
-context stack according to the information from the Parrot profile.
+This function takes a file handle open to a Parrot profile and a reference
+to a hash of fine-grained statistics about the current PIR program.  It
+modifies the statistics according to the information from the Parrot profile.
 
 =cut
 
-sub process_line {
-    my ($line, $stats, $ctx_stack) = @_;
+sub process_input {
+    my ($input, $stats) = @_;
+    my $ctx_stack = [];
 
-    if ($line =~ /^OP:(.*)$/) {
-        # Decode string in the format C<{x{key1:value1}x}{x{key2:value2}x}>
-        my %op_hash = $1 =~ /{x{([^:]+):(.*?)}x}/g
-            or die "invalidly formed line '$line'";
+    while(my $line = <$input>) {
+        if ($line =~ /^OP:(.*)$/) {
+            # Decode string in the format C<{x{key1:value1}x}{x{key2:value2}x}>
+            my %op_hash = $1 =~ /{x{([^:]+):(.*?)}x}/g
+                or die "invalidly formed line '$line'";
 
-        my $cur_ctx = $ctx_stack->[0]
-            or die "input file did not specify an initial context";
+            my $cur_ctx = $ctx_stack->[0]
+                or die "input file did not specify an initial context";
 
-        if (exists $cur_ctx->{line} && $op_hash{line} == $cur_ctx->{line}) {
-            $cur_ctx->{op_num}++;
-        }
-        else {
-            $cur_ctx->{op_num} = 0;
-        }
-
-        $cur_ctx->{line} = $op_hash{line};
-        my $extra = { op_name => $op_hash{op} };
-        my $time  = $op_hash{time};
-
-        $stats->{global_stats}{total_time} += $time;
-        store_stats($stats, $cur_ctx, $time, $extra);
-
-        # Extracted from store_stats() for speed
-        $stats->{$_->{file}}{$_->{ns}}{$_->{line}}[$_->{op_num}]{time} += $time
-            for @$ctx_stack[1 .. $#$ctx_stack];
-    }
-    #context switch
-    elsif ($line =~ /^CS:(.*)$/) {
-
-        # Decode string in the format C<{x{key1:value1}x}{x{key2:value2}x}>
-        my %cs_hash      = $1 =~ /{x{([^:]+):(.*?)}x}/g
-            or die "invalidly formed line '$line'";
-
-        # is_first
-        if (!@$ctx_stack) {
-            $ctx_stack->[0] = \%cs_hash;
-        }
-        else {
-            my $cur_ctx      = $ctx_stack->[0];
-            my $hash_ctx     = $cs_hash{ctx};
-            my $is_redundant = $cur_ctx->{ctx} eq $hash_ctx;
-            my $reused_ctx   = $is_redundant && $cur_ctx->{sub} ne $cs_hash{sub};
-
-            if ($reused_ctx) {
-                $cur_ctx->{sub} = $cs_hash{sub};
-                $cur_ctx->{ns}  = $cs_hash{ns};
-            }
-            elsif ($is_redundant) {
-                # don't do anything
-            }
-            # is_call
-            elsif (!grep {$_->{ctx} eq $hash_ctx} @$ctx_stack) {
+            if (exists $cur_ctx->{line} && $op_hash{line} == $cur_ctx->{line}) {
                 $cur_ctx->{op_num}++;
-                my $extra = {
-                             op_name => "CALL",
-                             target  => $cs_hash{ns}
-                            };
-                store_stats($stats, $ctx_stack->[0], 0, $extra);
-                unshift @$ctx_stack, \%cs_hash;
             }
             else {
-                #shift contexts off the stack until one matches the current ctx
-                shift @$ctx_stack while $ctx_stack->[0]{ctx} ne $hash_ctx;
+                $cur_ctx->{op_num} = 0;
+            }
+
+            $cur_ctx->{line} = $op_hash{line};
+            my $extra = { op_name => $op_hash{op} };
+            my $time  = $op_hash{time};
+
+            $stats->{global_stats}{total_time} += $time;
+            store_stats($stats, $cur_ctx, $time, $extra);
+
+            # Extracted from store_stats() for speed
+            $stats->{$_->{file}}{$_->{ns}}{$_->{line}}[$_->{op_num}]{time} += $time
+                for @$ctx_stack[1 .. $#$ctx_stack];
+        }
+        #context switch
+        elsif ($line =~ /^CS:(.*)$/) {
+
+            # Decode string in the format C<{x{key1:value1}x}{x{key2:value2}x}>
+            my %cs_hash      = $1 =~ /{x{([^:]+):(.*?)}x}/g
+                or die "invalidly formed line '$line'";
+
+            # is_first
+            if (!@$ctx_stack) {
+                $ctx_stack->[0] = \%cs_hash;
+            }
+            else {
+                my $cur_ctx      = $ctx_stack->[0];
+                my $hash_ctx     = $cs_hash{ctx};
+                my $is_redundant = $cur_ctx->{ctx} eq $hash_ctx;
+                my $reused_ctx   = $is_redundant && $cur_ctx->{sub} ne $cs_hash{sub};
+
+                if ($reused_ctx) {
+                    $cur_ctx->{sub} = $cs_hash{sub};
+                    $cur_ctx->{ns}  = $cs_hash{ns};
+                }
+                elsif ($is_redundant) {
+                    # don't do anything
+                }
+                # is_call
+                elsif (!grep {$_->{ctx} eq $hash_ctx} @$ctx_stack) {
+                    $cur_ctx->{op_num}++;
+                    my $extra = {
+                                 op_name => "CALL",
+                                 target  => $cs_hash{ns}
+                                };
+                    store_stats($stats, $ctx_stack->[0], 0, $extra);
+                    unshift @$ctx_stack, \%cs_hash;
+                }
+                else {
+                    #shift contexts off the stack until one matches the current ctx
+                    shift @$ctx_stack while $ctx_stack->[0]{ctx} ne $hash_ctx;
+                }
+            }
+            #print Dumper($ctx_stack);
+        }
+        elsif ($line =~ /^VERSION:(\d+)$/) {
+            my $version = $1;
+            if ($version != 1) {
+                die "profile was generated by an incompatible version of the profiling runcore.";
             }
         }
-        #print Dumper($ctx_stack);
-    }
-    elsif ($line =~ /^VERSION:(\d+)$/) {
-        my $version = $1;
-        if ($version != 1) {
-            die "profile was generated by an incompatible version of the profiling runcore.";
+        elsif ($line =~ /^CLI:(.*)$/) {
+            $stats->{'global_stats'}{'cli'} = $1;
         }
-    }
-    elsif ($line =~ /^CLI:(.*)$/) {
-        $stats->{'global_stats'}{'cli'} = $1;
-    }
-    elsif ($line =~ /^END_OF_RUNLOOP$/) {
-        #end of loop
-        @$ctx_stack = ();
-    }
-    elsif ($line =~ /^#/) {
-        #comments are always ignored
-    }
-    else {
-        die "Unrecognized line format: '$line'";
+        elsif ($line =~ /^END_OF_RUNLOOP$/) {
+            #end of loop
+            @$ctx_stack = ();
+        }
+        elsif ($line =~ /^#/) {
+            #comments are always ignored
+        }
+        else {
+            die "Unrecognized line format: '$line'";
+        }
     }
 }
 
