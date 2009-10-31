@@ -222,30 +222,27 @@ sub process_line {
             # Decode string in the format C<{x{key1:value1}x}{x{key2:value2}x}>
             my %op_hash = $1 =~ /{x{([^:]+):(.*?)}x}/g
                 or die "invalidly formed line '$line'";
-            my $op_hash = \%op_hash;
 
-            die "input file did not specify an initial context" if (@$ctx_stack == 0);
+            my $cur_ctx = $ctx_stack->[0]
+                or die "input file did not specify an initial context";
 
-            if (exists $ctx_stack->[0]{'line'} && $op_hash->{'line'} == $ctx_stack->[0]{'line'}) {
-                $ctx_stack->[0]{'op_num'}++;
+            if (exists $cur_ctx->{line} && $op_hash{line} == $cur_ctx->{line}) {
+                $cur_ctx->{op_num}++;
             }
             else {
-                $ctx_stack->[0]{'op_num'} = 0;
+                $cur_ctx->{op_num} = 0;
             }
 
-            $ctx_stack->[0]{'line'} = $op_hash->{'line'};
-            my $extra = { op_name => $op_hash->{'op'} };
-            my $time  = $op_hash->{time};
+            $cur_ctx->{line} = $op_hash{line};
+            my $extra = { op_name => $op_hash{op} };
+            my $time  = $op_hash{time};
 
             $stats->{global_stats}{total_time} += $time;
-            store_stats($stats, $ctx_stack->[0], $time, $extra);
-
-            $extra->{'no_hits'} = 1;
-            store_stats($stats, $ctx_stack->[$_], $time, $extra)
-                for 1 .. $#$ctx_stack;
+            store_stats      ($stats, $cur_ctx,   $time, $extra);
+            store_stats_stack($stats, $ctx_stack, $time, $extra);
         }
         else {
-            die "Unrecognized line format: \"$line\"";
+            die "Unrecognized line format: '$line'";
         }
     }
 }
@@ -283,7 +280,7 @@ sub print_stats {
 =item C<store_stats>
 
 This function adds statistical data to the C<$stats> hash reference.  The
-C<$locator> argument specifies information such as the namespace, file, line
+C<$loc> argument specifies information such as the namespace, file, line
 and op number where the data should go.  C<$time> is an integer representing
 the amount of time spent at the specified location.  C<$extra> contains any
 ancillary data that should be stored in the hash.  This includes data on
@@ -297,7 +294,7 @@ sub store_stats {
     my $by_op = ($stats->{$loc->{file}}{$loc->{ns}}{$loc->{line}}[$loc->{op_num}] ||= {});
 
     if ($by_op->{hits}) {
-        $by_op->{hits} ++ unless exists $extra->{no_hits};
+        $by_op->{hits} ++;
         $by_op->{time} += $time;
     }
     else {
@@ -305,6 +302,25 @@ sub store_stats {
         $by_op->{time} = $time;
 
         $by_op->{$_} = $extra->{$_} for keys %$extra;
+    }
+}
+
+=item C<store_stats_stack>
+
+This is a specialized version of C<core_stats> that walks up the context stack
+adding time to each op in the stack, skipping tasks that can't occur for ops above
+the current op.
+
+=cut
+
+sub store_stats_stack {
+    my ($stats, $ctx_stack, $time, $extra) = @_;
+
+    for (1 .. $#$ctx_stack) {
+        my $loc   = $ctx_stack->[$_];
+        my $by_op = ($stats->{$loc->{file}}{$loc->{ns}}{$loc->{line}}[$loc->{op_num}] ||= {});
+
+        $by_op->{time} += $time;
     }
 }
 
