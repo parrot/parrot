@@ -30,6 +30,10 @@ Provide C<HashIterator> to iterate over C<Hash>.
 
 =back
 
+By default Hash uses string keys and PMC values. Methods C<set_key_type> and
+C<set_value_type> used to switch key and values type. For C<PMC> keys
+hashvalue calculated using VTABLE C<get_hashvalue> function.
+
 These are the vtable functions for the Hash PMC.
 
 =head2 Functions
@@ -136,6 +140,8 @@ Use C<ptr> as this PMC's Hash*.
 
 =item C<void set_integer(INTVAL type)>
 
+=item C<void set_key_type(INTVAL type)>
+
 Reset Hash to use different keys. See enum C<Hash_key_type> for possible
 values.
 
@@ -189,6 +195,15 @@ NB: this method will destroy all old data!
         SELF.set_integer_native(type);
     }
 
+/*
+
+=item C<METHOD get_key_type()>
+
+Return type of keys in Hash.
+
+=cut
+
+*/
     METHOD get_key_type() {
         const INTVAL ret = ((Hash *)SELF.get_pointer())->key_type;
         RETURN(INTVAL ret);
