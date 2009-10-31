@@ -178,8 +178,11 @@ sub process_line {
         my $time  = $op_hash{time};
 
         $stats->{global_stats}{total_time} += $time;
-        store_stats      ($stats, $cur_ctx,   $time, $extra);
-        store_stats_stack($stats, $ctx_stack, $time);
+        store_stats($stats, $cur_ctx, $time, $extra);
+
+        # Extracted from store_stats() for speed
+        $stats->{$_->{file}}{$_->{ns}}{$_->{line}}[$_->{op_num}]{time} += $time
+            for @$ctx_stack[1 .. $#$ctx_stack];
     }
     #context switch
     elsif ($line =~ /^CS:(.*)$/) {
@@ -298,21 +301,6 @@ sub store_stats {
 
         $by_op->{$_} = $extra->{$_} for keys %$extra;
     }
-}
-
-=item C<store_stats_stack>
-
-This is a specialized version of C<store_stats> that walks up the context stack
-adding time to each op in the stack, skipping tasks that can't occur for ops above
-the current op.
-
-=cut
-
-sub store_stats_stack {
-    my ($stats, $ctx_stack, $time) = @_;
-
-    $stats->{$_->{file}}{$_->{ns}}{$_->{line}}[$_->{op_num}]{time} += $time
-        for @$ctx_stack[1 .. $#$ctx_stack];
 }
 
 =item C<get_cg_profile>
