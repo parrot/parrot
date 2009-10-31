@@ -153,7 +153,7 @@ FixedPMCArray:\s\d+\.\d+s\n
 #        Estimated\sops:\s200000000\n
 #        Elapsed\stime:\s\s\d+\.\d+\n
 #        M\sop\/s:\s\s\s\s\s\s\s\s\d+\.\d+\n$/x,
-    q{oo1.pasm}     => qq(10\n),
+    q{oo1.pir}      => qq(10\n),
     q{oo2.pasm}     => qq(10\n),
     q{oo3.pasm}     => qq(10\n),
     q{oo4.pasm}     => qq(500000\n),
