@@ -190,36 +190,37 @@ sub process_line {
         # Decode string in the format C<{x{key1:value1}x}{x{key2:value2}x}>
         my %cs_hash      = $1 =~ /{x{([^:]+):(.*?)}x}/g
             or die "invalidly formed line '$line'";
-        my $cs_hash      = \%cs_hash;
 
-        my $is_first     = scalar(@$ctx_stack) == 0;
-        my $is_redundant = !$is_first && ($ctx_stack->[0]{'ctx'} eq $cs_hash{ctx});
-        my $reused_ctx   = $is_redundant && ($ctx_stack->[0]{'sub'} ne $cs_hash{sub});
-        my $is_call      = scalar(grep {$_->{'ctx'} eq $cs_hash{ctx}} @$ctx_stack) == 0;
-
-        if ($is_first) {
-            $ctx_stack->[0] = $cs_hash;
-        }
-        elsif ($reused_ctx) {
-            $ctx_stack->[0]{'sub'} = $cs_hash{sub};
-            $ctx_stack->[0]{'ns'}  = $cs_hash{ns};
-        }
-        elsif ($is_redundant) {
-            #don't do anything
-        }
-        elsif ($is_call) {
-            $ctx_stack->[0]{'op_num'}++;
-            my $extra = {
-                op_name => "CALL",
-                target  => $cs_hash{ns}
-            };
-            store_stats($stats, $ctx_stack->[0], 0, $extra );
-            unshift @$ctx_stack, $cs_hash;
+        # is_first
+        if (!@$ctx_stack) {
+            $ctx_stack->[0] = \%cs_hash;
         }
         else {
-            #shift contexts off the stack until one matches the current ctx
-            while ($ctx_stack->[0]->{'ctx'} ne $cs_hash{ctx}) {
-                my $ctx = shift @$ctx_stack;
+            my $cur_ctx      = $ctx_stack->[0];
+            my $hash_ctx     = $cs_hash{ctx};
+            my $is_redundant = $cur_ctx->{ctx} eq $hash_ctx;
+            my $reused_ctx   = $is_redundant && $cur_ctx->{sub} ne $cs_hash{sub};
+
+            if ($reused_ctx) {
+                $cur_ctx->{sub} = $cs_hash{sub};
+                $cur_ctx->{ns}  = $cs_hash{ns};
+            }
+            elsif ($is_redundant) {
+                # don't do anything
+            }
+            # is_call
+            elsif (!grep {$_->{ctx} eq $hash_ctx} @$ctx_stack) {
+                $cur_ctx->{op_num}++;
+                my $extra = {
+                             op_name => "CALL",
+                             target  => $cs_hash{ns}
+                            };
+                store_stats($stats, $ctx_stack->[0], 0, $extra);
+                unshift @$ctx_stack, \%cs_hash;
+            }
+            else {
+                #shift contexts off the stack until one matches the current ctx
+                shift @$ctx_stack while $ctx_stack->[0]{ctx} ne $hash_ctx;
             }
         }
         #print Dumper($ctx_stack);
