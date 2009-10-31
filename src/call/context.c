@@ -15,6 +15,7 @@ src/context.c - Parrot_Context functions.
 #include "parrot/parrot.h"
 #include "parrot/call.h"
 #include "../pmc/pmc_sub.h"
+#include "../pmc/pmc_context.h"
 
 /*
 
@@ -65,6 +66,17 @@ an available context is stored corresponds to the size of the context.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void allocate_registers(PARROT_INTERP,
+    ARGIN(PMC *pmcctx),
+    ARGIN(const INTVAL *number_regs_used))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static size_t calculate_registers_size(SHIM_INTERP,
+    ARGIN(const INTVAL *number_regs_used))
+        __attribute__nonnull__(2);
+
 static void clear_regs(PARROT_INTERP, ARGMOD(PMC *pmcctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -84,6 +96,12 @@ static void init_context(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmcctx);
 
+#define ASSERT_ARGS_allocate_registers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmcctx) \
+    , PARROT_ASSERT_ARG(number_regs_used))
+#define ASSERT_ARGS_calculate_registers_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(number_regs_used))
 #define ASSERT_ARGS_clear_regs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmcctx))
@@ -372,7 +390,30 @@ Parrot_pop_context(PARROT_INTERP)
 
 /*
 
-=item C<size_t Parrot_pcc_calculate_context_size(PARROT_INTERP, const UINTVAL
+=item C<static size_t calculate_registers_size(PARROT_INTERP, const INTVAL
+*number_regs_used)>
+
+Calculate memory size required for registers.
+
+=cut
+
+*/
+static size_t
+calculate_registers_size(SHIM_INTERP, ARGIN(const INTVAL *number_regs_used))
+{
+    ASSERT_ARGS(calculate_registers_size)
+
+    return ROUND_ALLOC_SIZE(
+            sizeof (INTVAL)   * number_regs_used[REGNO_INT] +
+            sizeof (FLOATVAL) * number_regs_used[REGNO_NUM] +
+            sizeof (STRING *) * number_regs_used[REGNO_STR] +
+            sizeof (PMC *)    * number_regs_used[REGNO_PMC]);
+}
+
+
+/*
+
+=item C<size_t Parrot_pcc_calculate_registers_size(PARROT_INTERP, const INTVAL
 *number_regs_used)>
 
 Calculate size of Context.
@@ -381,15 +422,50 @@ Calculate size of Context.
 
 */
 size_t
-Parrot_pcc_calculate_context_size(SHIM_INTERP, ARGIN(const UINTVAL *number_regs_used))
+Parrot_pcc_calculate_registers_size(PARROT_INTERP, ARGIN(const INTVAL *number_regs_used))
 {
-    ASSERT_ARGS(Parrot_pcc_calculate_context_size)
+    ASSERT_ARGS(Parrot_pcc_calculate_registers_size)
+    return calculate_registers_size(interp, number_regs_used);
+}
 
-    return ALIGNED_CTX_SIZE + ROUND_ALLOC_SIZE(
-            sizeof (INTVAL)   * number_regs_used[REGNO_INT] +
-            sizeof (FLOATVAL) * number_regs_used[REGNO_NUM] +
-            sizeof (STRING *) * number_regs_used[REGNO_STR] +
-            sizeof (PMC *)    * number_regs_used[REGNO_PMC]);
+/*
+
+=item C<static void allocate_registers(PARROT_INTERP, PMC *pmcctx, const INTVAL
+*number_regs_used)>
+
+Allocate registers inside Context.
+
+=cut
+
+*/
+static void
+allocate_registers(PARROT_INTERP, ARGIN(PMC *pmcctx), ARGIN(const INTVAL *number_regs_used))
+{
+    ASSERT_ARGS(allocate_registers)
+    Parrot_Context_attributes *ctx = PARROT_CONTEXT(pmcctx);
+
+    const size_t size_i = sizeof (INTVAL)   * number_regs_used[REGNO_INT];
+    const size_t size_n = sizeof (FLOATVAL) * number_regs_used[REGNO_NUM];
+    const size_t size_s = sizeof (STRING *) * number_regs_used[REGNO_STR];
+    const size_t size_p = sizeof (PMC *)    * number_regs_used[REGNO_PMC];
+
+    const size_t size_nip      = size_n + size_i + size_p;
+    const size_t all_regs_size = size_n + size_i + size_p + size_s;
+    const size_t reg_alloc     = ROUND_ALLOC_SIZE(all_regs_size);
+
+    ctx->registers = (Parrot_Context *)Parrot_gc_allocate_fixed_size_storage(interp, reg_alloc);
+
+    ctx->n_regs_used[REGNO_INT] = number_regs_used[REGNO_INT];
+    ctx->n_regs_used[REGNO_NUM] = number_regs_used[REGNO_NUM];
+    ctx->n_regs_used[REGNO_STR] = number_regs_used[REGNO_STR];
+    ctx->n_regs_used[REGNO_PMC] = number_regs_used[REGNO_PMC];
+
+    /* ctx.bp points to I0, which has Nx on the left */
+    ctx->bp.regs_i = (INTVAL *)((char *)ctx->registers + size_n);
+
+    /* ctx.bp_ps points to S0, which has Px on the left */
+    ctx->bp_ps.regs_s = (STRING **)((char *)ctx->registers + size_nip);
+
 }
 
 /*
@@ -413,40 +489,9 @@ Parrot_alloc_context(PARROT_INTERP, ARGIN(const INTVAL *number_regs_used),
     ARGIN_NULLOK(PMC *old))
 {
     ASSERT_ARGS(Parrot_alloc_context)
-    PMC            *pmcctx;
-    Parrot_Context *ctx;
-    void *p;
+    PMC            *pmcctx = pmc_new(interp, enum_class_Context);
 
-    const size_t size_i = sizeof (INTVAL)   * number_regs_used[REGNO_INT];
-    const size_t size_n = sizeof (FLOATVAL) * number_regs_used[REGNO_NUM];
-    const size_t size_s = sizeof (STRING *) * number_regs_used[REGNO_STR];
-    const size_t size_p = sizeof (PMC *)    * number_regs_used[REGNO_PMC];
-
-    const size_t size_nip      = size_n + size_i + size_p;
-    const size_t all_regs_size = size_n + size_i + size_p + size_s;
-    const size_t reg_alloc     = ROUND_ALLOC_SIZE(all_regs_size);
-
-    const size_t to_alloc = reg_alloc + ALIGNED_CTX_SIZE;
-
-    ctx  = (Parrot_Context *)Parrot_gc_allocate_fixed_size_storage(interp, to_alloc);
-
-    ctx->n_regs_used[REGNO_INT] = number_regs_used[REGNO_INT];
-    ctx->n_regs_used[REGNO_NUM] = number_regs_used[REGNO_NUM];
-    ctx->n_regs_used[REGNO_STR] = number_regs_used[REGNO_STR];
-    ctx->n_regs_used[REGNO_PMC] = number_regs_used[REGNO_PMC];
-
-    /* regs start past the context */
-    p   = (void *) ((char *)ctx + ALIGNED_CTX_SIZE);
-
-    /* ctx.bp points to I0, which has Nx on the left */
-    ctx->bp.regs_i = (INTVAL *)((char *)p + size_n);
-
-    /* ctx.bp_ps points to S0, which has Px on the left */
-    ctx->bp_ps.regs_s = (STRING **)((char *)p + size_nip);
-
-    pmcctx = pmc_new(interp, enum_class_Context);
-    VTABLE_set_pointer(interp, pmcctx, ctx);
-
+    allocate_registers(interp, pmcctx, number_regs_used);
     init_context(interp, pmcctx, old);
 
     return pmcctx;

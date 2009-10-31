@@ -96,7 +96,7 @@ Parrot_Int Parrot_call_method_ret_int(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-void* Parrot_call_sub(PARROT_INTERP,
+void * Parrot_call_sub(PARROT_INTERP,
     Parrot_PMC sub_pmc,
     ARGIN(const char *signature),
     ...)

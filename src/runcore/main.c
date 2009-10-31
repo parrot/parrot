@@ -46,6 +46,7 @@ have the same number of elements because there is a one-to-one mapping.
 #endif
 #include "parrot/dynext.h"
 #include "../pmc/pmc_parrotlibrary.h"
+#include "../pmc/pmc_context.h"
 
 
 /* HEADERIZER HFILE: include/parrot/runcore_api.h */

@@ -162,6 +162,7 @@ opcode_t /*@alt void@*/
 emit_opcode(ARGIN(bytecode * const bc), opcode_t op)
         __attribute__nonnull__(1);
 
+int emit_pbc_key(bytecode * const bc, key * const k);
 FLOATVAL get_num_const(ARGIN(bytecode * const bc), unsigned index)
         __attribute__nonnull__(1);
 
@@ -222,6 +223,7 @@ void write_pbc_file(
        PARROT_ASSERT_ARG(bc))
 #define ASSERT_ARGS_emit_opcode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(bc))
+#define ASSERT_ARGS_emit_pbc_key __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_get_num_const __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(bc))
 #define ASSERT_ARGS_get_pmc_const __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

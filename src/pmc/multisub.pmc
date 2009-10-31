@@ -19,6 +19,8 @@ Sub PMCs with the same short name, but different long names.
 
 */
 
+#include "pmc_context.h"
+
 pmclass MultiSub extends ResizablePMCArray auto_attrs provides array {
 
     VTABLE void push_pmc(PMC *value) {
