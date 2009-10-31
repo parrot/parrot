@@ -828,7 +828,7 @@ the PMC in the final string result.
 
 =begin PIR_FRAGMENT
 
-  $P0 = new "Array"
+  $P0 = new "ResizablePMCArray"
   push $P0, "hi"
   push $P0, 0
   push $P0, 1
