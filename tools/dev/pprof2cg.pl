@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use Data::Dumper;
+# use Data::Dumper;
 
 =head1 Name
 
@@ -124,6 +124,8 @@ sub main {
     my $ctx_stack = [];
     my $filename  = $argv->[0];
 
+    $stats->{global_stats}{total_time} = 0;
+
     open(my $in_fh, '<', $filename) or die "couldn't open $filename for reading: $!";
 
     while (my $line = <$in_fh>) {
@@ -175,18 +177,22 @@ sub process_line {
         #context switch
         elsif (/^CS:(.*)$/) {
 
-            my $cs_hash      = split_vars($1);
+            # Decode string in the format C<{x{key1:value1}x}{x{key2:value2}x}>
+            my %cs_hash      = $1 =~ /{x{([^:]+):(.*?)}x}/g
+                or die "invalidly formed line '$line'";
+            my $cs_hash      = \%cs_hash;
+
             my $is_first     = scalar(@$ctx_stack) == 0;
-            my $is_redundant = !$is_first && ($ctx_stack->[0]{'ctx'} eq $cs_hash->{'ctx'});
-            my $reused_ctx   = $is_redundant && ($ctx_stack->[0]{'sub'} ne $cs_hash->{'sub'});
-            my $is_call      = scalar(grep {$_->{'ctx'} eq $cs_hash->{'ctx'}} @$ctx_stack) == 0;
+            my $is_redundant = !$is_first && ($ctx_stack->[0]{'ctx'} eq $cs_hash{ctx});
+            my $reused_ctx   = $is_redundant && ($ctx_stack->[0]{'sub'} ne $cs_hash{sub});
+            my $is_call      = scalar(grep {$_->{'ctx'} eq $cs_hash{ctx}} @$ctx_stack) == 0;
 
             if ($is_first) {
                 $ctx_stack->[0] = $cs_hash;
             }
             elsif ($reused_ctx) {
-                $ctx_stack->[0]{'sub'} = $cs_hash->{'sub'};
-                $ctx_stack->[0]{'ns'}  = $cs_hash->{'ns'};
+                $ctx_stack->[0]{'sub'} = $cs_hash{sub};
+                $ctx_stack->[0]{'ns'}  = $cs_hash{ns};
             }
             elsif ($is_redundant) {
                 #don't do anything
@@ -195,14 +201,14 @@ sub process_line {
                 $ctx_stack->[0]{'op_num'}++;
                 my $extra = {
                     op_name => "CALL",
-                    target  => $cs_hash->{'ns'}
+                    target  => $cs_hash{ns}
                 };
                 store_stats($stats, $ctx_stack->[0], 0, $extra );
                 unshift @$ctx_stack, $cs_hash;
             }
             else {
                 #shift contexts off the stack until one matches the current ctx
-                while ($ctx_stack->[0]->{'ctx'} ne $cs_hash->{'ctx'}) {
+                while ($ctx_stack->[0]->{'ctx'} ne $cs_hash{ctx}) {
                     my $ctx = shift @$ctx_stack;
                 }
             }
@@ -213,7 +219,10 @@ sub process_line {
             @$ctx_stack = ();
         }
         elsif (/^OP:(.*)$/) {
-            my $op_hash = split_vars($1);
+            # Decode string in the format C<{x{key1:value1}x}{x{key2:value2}x}>
+            my %op_hash = $1 =~ /{x{([^:]+):(.*?)}x}/g
+                or die "invalidly formed line '$line'";
+            my $op_hash = \%op_hash;
 
             die "input file did not specify an initial context" if (@$ctx_stack == 0);
 
@@ -226,12 +235,14 @@ sub process_line {
 
             $ctx_stack->[0]{'line'} = $op_hash->{'line'};
             my $extra = { op_name => $op_hash->{'op'} };
-            store_stats($stats, $ctx_stack->[0], $op_hash->{'time'}, $extra);
+            my $time  = $op_hash->{time};
+
+            $stats->{global_stats}{total_time} += $time;
+            store_stats($stats, $ctx_stack->[0], $time, $extra);
 
             $extra->{'no_hits'} = 1;
-            for my $frame (@$ctx_stack[1 .. scalar(@$ctx_stack)-1 ]) {
-                store_stats($stats, $frame, $op_hash->{'time'}, $extra);
-            }
+            store_stats($stats, $ctx_stack->[$_], $time, $extra)
+                for 1 .. $#$ctx_stack;
         }
         else {
             die "Unrecognized line format: \"$line\"";
@@ -269,25 +280,6 @@ sub print_stats {
     }
 }
 
-=item C<split_vars>
-
-This function takes a string specifying 1 or more key/value mappings and
-returns a reference to a hash containing those keys and values.  The string
-must be in the format C<{x{key1:value1}x}{x{key2:value2}x}>.
-
-=cut
-
-sub split_vars {
-    my $href;
-    my $str = shift;
-    die "invalidly formed line '$str'"
-        unless $str =~ /({x{  [^:]+  : (.*?) }x})+/x;
-    while ($str =~ /\G   {x{ ([^:]+) : (.*?) }x} /cxg) {
-        $href->{$1} = $2;
-    }
-    return $href;
-}
-
 =item C<store_stats>
 
 This function adds statistical data to the C<$stats> hash reference.  The
@@ -300,34 +292,19 @@ ancillary data that should be stored in the hash.  This includes data on
 =cut
 
 sub store_stats {
-    my $stats   = shift;
-    my $locator = shift;
-    my $time    = shift;
-    my $extra   = shift;
+    my ($stats, $loc, $time, $extra) = @_;
 
-    my $file   = $locator->{'file'};
-    my $ns     = $locator->{'ns'};
-    my $line   = $locator->{'line'};
-    my $op_num = $locator->{'op_num'};
+    my $by_op = ($stats->{$loc->{file}}{$loc->{ns}}{$loc->{line}}[$loc->{op_num}] ||= {});
 
-    if (exists $stats->{'global_stats'}{'total_time'}) {
-        $stats->{'global_stats'}{'total_time'} += $time;
+    if ($by_op->{hits}) {
+        $by_op->{hits} ++ unless exists $extra->{no_hits};
+        $by_op->{time} += $time;
     }
     else {
-        $stats->{'global_stats'}{'total_time'} = $time;
-    }
+        $by_op->{hits} = 1;
+        $by_op->{time} = $time;
 
-    if (exists $stats->{$file}{$ns}{$line}[$op_num]) {
-        $stats->{$file}{$ns}{$line}[$op_num]{'hits'}++
-            unless exists $extra->{no_hits};
-        $stats->{$file}{$ns}{$line}[$op_num]{'time'} += $time;
-    }
-    else {
-        $stats->{$file}{$ns}{$line}[$op_num]{'hits'} = 1;
-        $stats->{$file}{$ns}{$line}[$op_num]{'time'} = $time;
-        for my $key (keys %{$extra}) {
-            $stats->{$file}{$ns}{$line}[$op_num]{$key} = $extra->{$key};
-        }
+        $by_op->{$_} = $extra->{$_} for keys %$extra;
     }
 }
 
