@@ -155,7 +155,7 @@ FixedPMCArray:\s\d+\.\d+s\n
 #        M\sop\/s:\s\s\s\s\s\s\s\s\d+\.\d+\n$/x,
     q{oo1.pir}      => qq(10\n),
     q{oo2.pir}      => qq(10\n),
-    q{oo3.pasm}     => qq(10\n),
+    q{oo3.pir}      => qq(10\n),
     q{oo4.pasm}     => qq(500000\n),
     q{oo5.pir}      => qq(10\n),
     q{oo6.pir}      => qq(500000\n),
