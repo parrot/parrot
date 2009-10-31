@@ -8,7 +8,7 @@ src/pmc/hash.pmc - Hash PMC
 
 =head1 DESCRIPTION
 
-Hash PMC wraps Parrot's _hash to provide high-level API:
+Hash PMC wraps Parrot's _hash to provide a high-level API:
 
 =over 4
 
@@ -31,8 +31,8 @@ Provide C<HashIterator> to iterate over C<Hash>.
 =back
 
 By default Hash uses string keys and PMC values. Methods C<set_key_type> and
-C<set_value_type> used to switch key and values type. For C<PMC> keys
-hashvalue calculated using VTABLE C<get_hashvalue> function.
+C<set_value_type> may be used to switch key and values type. For C<PMC> keys
+hash value is calculated using VTABLE C<get_hashvalue> function.
 
 These are the vtable functions for the Hash PMC.
 
