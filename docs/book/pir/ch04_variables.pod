@@ -403,7 +403,7 @@ immediately follows. All text until the terminator is part of the string. The
 terminator must appear on its own line, must appear at the beginning of the
 line, and may not have any trailing whitespace.
 
-  $S2 = << "End_Token"
+  $S2 = <<"End_Token"
   This is a multi-line string literal. Notice that
   it doesn't use quotation marks.
   End_Token
