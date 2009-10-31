@@ -25,34 +25,35 @@
 # parrot -R jit oo2-prop.pasm                     2.6
 
 .namespace [ "Foo" ]
+.sub 'main'
+    newclass $P1, "Foo"
+    addattribute $P1, ".i"
+    addattribute $P1, ".j"
 
-    newclass P1, "Foo"
-    addattribute P1, ".i"
-    addattribute P1, ".j"
-
-    set I10, 0
-    set I11, 50000
+    $I10 = 0
+    $I11 = 50000
 loop:
-    new P3, "Foo"
-    inc I10
-    lt I10, I11, loop
+    new $P3, "Foo"
+    inc $I10
+    if $I10 < $I11 goto loop
 
-    new P3, "Foo"
-    getattribute P2, P3, ".i"
-    print P2
+    new $P3, "Foo"
+    getattribute $P2, $P3, ".i"
+    print $P2
     print "\n"
-    end
+.end
 
-.pcc_sub __init:
+.sub 'init' :vtable
 .include "interpinfo.pasm"
-    interpinfo P2, .INTERPINFO_CURRENT_OBJECT
-    new P10, 'Integer'
-    set P10, 10
-    setattribute P2, ".i", P10
-    new P10, 'Integer'
-    set P10, 20
-    setattribute P2, ".j", P10
-    returncc
+    interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
+    $P10 = new 'Integer'
+    $P10 = 10
+    setattribute $P2, ".i", $P10
+    $P10 = new 'Integer'
+    $P10 = 20
+    setattribute $P2, ".j", $P10
+    .return ()
+.end
 
 # Local Variables:
 #   mode: pir
