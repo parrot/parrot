@@ -43,12 +43,6 @@ To add a new test, you do not have to modify this script:
 See the explanation of benchmarks and sample data for reduced N benches at
 http://shootout.alioth.debian.org/sandbox/
 
-=head1 SEE ALSO
-
-#40064: shootout example testing in Parrot RT
-
-L<"https://rt.perl.org/rt3/Public/Bug/Display.html?id=40064">
-
 =cut
 
 my %skips = (
