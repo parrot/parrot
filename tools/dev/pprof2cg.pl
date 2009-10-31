@@ -239,7 +239,7 @@ sub process_line {
 
             $stats->{global_stats}{total_time} += $time;
             store_stats      ($stats, $cur_ctx,   $time, $extra);
-            store_stats_stack($stats, $ctx_stack, $time, $extra);
+            store_stats_stack($stats, $ctx_stack, $time);
         }
         else {
             die "Unrecognized line format: '$line'";
@@ -307,21 +307,17 @@ sub store_stats {
 
 =item C<store_stats_stack>
 
-This is a specialized version of C<core_stats> that walks up the context stack
+This is a specialized version of C<store_stats> that walks up the context stack
 adding time to each op in the stack, skipping tasks that can't occur for ops above
 the current op.
 
 =cut
 
 sub store_stats_stack {
-    my ($stats, $ctx_stack, $time, $extra) = @_;
+    my ($stats, $ctx_stack, $time) = @_;
 
-    for (1 .. $#$ctx_stack) {
-        my $loc   = $ctx_stack->[$_];
-        my $by_op = ($stats->{$loc->{file}}{$loc->{ns}}{$loc->{line}}[$loc->{op_num}] ||= {});
-
-        $by_op->{time} += $time;
-    }
+    $stats->{$_->{file}}{$_->{ns}}{$_->{line}}[$_->{op_num}]{time} += $time
+        for @$ctx_stack[1 .. $#$ctx_stack];
 }
 
 =item C<get_cg_profile>
