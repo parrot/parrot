@@ -11,6 +11,7 @@
 #include "parrot/interpreter.h"
 #include "../../../src/pmc/pmc_sub.h"
 #include "../../../src/pmc/pmc_namespace.h"
+#include "../../../src/pmc/pmc_context.h"
 
 /* #include "parrot/embed.h" */
 
