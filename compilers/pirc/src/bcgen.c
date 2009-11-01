@@ -858,6 +858,7 @@ in the actual PackFile. See C<store_key_bytecode()>.
 */
 int
 emit_pbc_key(bytecode * const bc, key * const k) {
+    ASSERT_ARGS(emit_pbc_key)
     key_entry  *iter;
     opcode_t   *key;
     opcode_t    keysize;    /* total size of key in bytecode */
