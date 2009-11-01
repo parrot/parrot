@@ -99,7 +99,7 @@ OUTPUT
 
 $ENV{TEST_PROG_ARGS} ||= '';
 my @todo = $ENV{TEST_PROG_ARGS} =~ /--run-pbc/
-    ? ( todo => 'lexicals not thawed properly from PBC, RT #60652' )
+    ? ( todo => 'lexicals not thawed properly from PBC, TT #1171' )
     : ();
 pir_output_is( <<'CODE', <<'OUTPUT', "pushaction as closure", @todo );
 .sub main :main

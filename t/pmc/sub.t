@@ -1439,7 +1439,7 @@ OUTPUT
 
 $ENV{TEST_PROG_ARGS} ||= '';
 @todo = $ENV{TEST_PROG_ARGS} =~ /--run-pbc/
-    ? ( todo => 'lexicals not thawed properly from PBC, RT #60652' )
+    ? ( todo => 'lexicals not thawed properly from PBC, TT #1171' )
     : ();
 pir_output_is( <<'CODE', <<'OUTPUT', ':outer with identical sub names', @todo );
 .sub 'main' :main
