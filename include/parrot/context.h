@@ -13,8 +13,6 @@
 #include "parrot/compiler.h"
 
 struct PackFile_Constant;
-struct Parrot_Context_attributes;
-typedef struct Parrot_Context_attributes Parrot_Context;
 
 typedef union {
     PMC         **regs_p;
@@ -25,6 +23,20 @@ typedef union {
     FLOATVAL     *regs_n;
     INTVAL       *regs_i;
 } Regs_ni;
+
+/* Ugly cheat to include Context definition. We have -Iinclude in compiler
+ * arguments. So ../src/pmc/pmc_context.h will always resolve to proper header
+ */
+#  ifdef PARROT_IN_CORE
+#    ifndef PARROT_IN_EXTENSION
+#      include "../src/pmc/pmc_context.h"
+#    else
+#      include "pmc/pmc_context.h"
+#    endif
+#  else
+#    include "pmc/pmc_context.h"
+#  endif
+typedef struct Parrot_Context_attributes Parrot_Context;
 
 /*
  * Macros to make accessing registers more convenient/readable.
@@ -538,11 +550,6 @@ UINTVAL Parrot_pcc_warnings_test(PARROT_INTERP,
 /* HEADERIZER END: src/call/context_accessors.c */
 
 #else /* ifndef NDEBUG */
-
-/* Ugly cheat to include Context definition. We have -Iinclude in compiler
- * arguments. So ../src/pmc/pmc_context.h will always resolve to proper header
- */
-#  include "../src/pmc/pmc_context.h"
 
 /* Context manipulating "functions" */
 #  define Parrot_pcc_get_context_struct(i, c) (PMC_data_typed((c), Parrot_Context*))
