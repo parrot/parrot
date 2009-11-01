@@ -1281,16 +1281,6 @@ argument, the PMC over which to iterate:
 
 =end PIR_FRAGMENT
 
-Alternatively, you can also create an iterator by creating a new
-C<Iterator>X<Iterator PMC> PMC, passing the aggregate PMC as an
-initialization parameter to C<new>:
-
-=begin PIR_FRAGMENT
-
-  $P1 = new "Iterator", $P2
-
-=end PIR_FRAGMENT
-
 The C<shift>X<shift opcode> opcode extracts the next value from the iterator.
 
 =begin PIR_FRAGMENT
