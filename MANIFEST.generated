@@ -232,6 +232,7 @@ src/pmc/pmc_boolean.h                             [devel]include
 src/pmc/pmc_class.h                               [devel]include
 src/pmc/pmc_callsignature.h                       [devel]include
 src/pmc/pmc_continuation.h                        [devel]include
+src/pmc/pmc_context.h                             [devel]include
 src/pmc/pmc_default.h                             [devel]include
 src/pmc/pmc_fixedintegerarray.h                   [devel]include
 src/pmc/pmc_fixedpmcarray.h                       [devel]include
