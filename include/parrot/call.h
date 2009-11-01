@@ -456,11 +456,6 @@ void Parrot_pcc_allocate_registers(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-size_t Parrot_pcc_calculate_registers_size(PARROT_INTERP,
-    ARGIN(const INTVAL *number_regs_used))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 void Parrot_pcc_free_registers(PARROT_INTERP, ARGIN(PMC *pmcctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -531,10 +526,6 @@ PMC * Parrot_set_new_context(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_pcc_allocate_registers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmcctx) \
-    , PARROT_ASSERT_ARG(number_regs_used))
-#define ASSERT_ARGS_Parrot_pcc_calculate_registers_size \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(number_regs_used))
 #define ASSERT_ARGS_Parrot_pcc_free_registers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

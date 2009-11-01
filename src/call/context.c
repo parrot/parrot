@@ -96,6 +96,11 @@ static void init_context(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmcctx);
 
+static size_t Parrot_pcc_calculate_registers_size(PARROT_INTERP,
+    ARGIN(const INTVAL *number_regs_used))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 #define ASSERT_ARGS_allocate_registers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmcctx) \
@@ -111,6 +116,10 @@ static void init_context(PARROT_INTERP,
 #define ASSERT_ARGS_init_context __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmcctx))
+#define ASSERT_ARGS_Parrot_pcc_calculate_registers_size \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(number_regs_used))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -413,15 +422,16 @@ calculate_registers_size(SHIM_INTERP, ARGIN(const INTVAL *number_regs_used))
 
 /*
 
-=item C<size_t Parrot_pcc_calculate_registers_size(PARROT_INTERP, const INTVAL
-*number_regs_used)>
+=item C<static size_t Parrot_pcc_calculate_registers_size(PARROT_INTERP, const
+INTVAL *number_regs_used)>
 
 Calculate size of Context.
 
 =cut
 
 */
-size_t
+
+static size_t
 Parrot_pcc_calculate_registers_size(PARROT_INTERP, ARGIN(const INTVAL *number_regs_used))
 {
     ASSERT_ARGS(Parrot_pcc_calculate_registers_size)
