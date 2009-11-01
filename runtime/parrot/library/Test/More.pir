@@ -13,7 +13,7 @@ Test::More - Parrot extension for testing modules
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
     test_namespace = get_namespace [ 'Test'; 'More' ]
-    exports        = split ' ', 'plan diag ok nok is is_deeply like isa_ok skip isnt todo throws_like'
+    exports        = split ' ', 'plan diag ok nok is is_deeply like isa_ok skip isnt todo throws_like lives_ok'
 
     test_namespace.'export_to'(curr_namespace, exports)
 
@@ -836,6 +836,55 @@ This handles comparisons of array-like and hash-like structures.
   compare_hash:
     equal = compare_hash( left, right, position )
     .return( equal )
+.end
+
+=item C<lives_ok( codestring, description )>
+
+Takes PIR code in C<codestring> and an optional message in C<description>.
+Passes a test if the PIR does not throw any exception.
+
+=cut
+
+.sub lives_ok
+    .param string target
+    .param string description :optional
+
+    .local pmc test
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
+
+    .local pmc comp
+    .local pmc compfun
+    .local pmc compiler
+    compiler = compreg 'PIR'
+
+    .local pmc eh
+    eh = new 'ExceptionHandler'
+    set_addr eh, handler            # set handler label for exceptions
+    push_eh eh
+
+    compfun = compiler(target)
+    compfun()                       # eval the target code
+
+    pop_eh
+
+    # if it doesn't throw an exception pass
+    test.'ok'( 1, description )
+
+    goto done
+
+  handler:
+    .local pmc ex
+    .local string error_msg
+    .local string diagnostic
+
+    .get_results (ex)
+    pop_eh
+    error_msg = ex
+    test.'ok'( 0, description )
+    test.'diag'(error_msg)
+
+  done:
+
 .end
 
 =item C<throws_like( codestring, pattern, description )>

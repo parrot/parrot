@@ -15,14 +15,14 @@
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
     test_namespace = get_namespace [ 'Test'; 'More' ]
-    exports = split " ", "ok nok is diag like skip todo is_deeply isa_ok isnt throws_like"
+    exports = split " ", "ok nok is diag like skip todo is_deeply isa_ok isnt throws_like lives_ok"
     test_namespace.'export_to'(curr_namespace, exports)
 
     test_namespace = get_namespace [ 'Test'; 'Builder'; 'Tester' ]
     exports = split " ", "plan test_out test_diag test_fail test_pass test_test"
     test_namespace.'export_to'(curr_namespace, exports)
 
-    plan( 94 )
+    plan( 98 )
 
     test_skip()
     test_todo()
@@ -33,10 +33,49 @@
     test_like()
     test_is_deeply()
     test_diagnostics()
+    test_lives_ok()
     test_throws_like()
     test_isa_ok()
 
     test.'finish'()
+.end
+
+.sub test_lives_ok
+
+    test_pass( 'lives_ok passes when there is no error' )
+    lives_ok( <<'CODE', 'lives_ok passes when there is no error' )
+.sub main
+    $I0 = 42
+.end
+CODE
+    test_test( 'lives_ok passes when there is no error' )
+
+    test_fail( 'lives_ok fails when there is an error')
+    lives_ok( <<'CODE', 'lives_ok fails when there is an error')
+.sub main
+    die 'I did it for the lulz'
+.end
+CODE
+    test_diag( 'I did it for the lulz' )
+    test_test( 'lives_ok fails when there is an error' )
+
+    test_pass( 'lives_ok passes when there is no error (with diagnostic message)' )
+    lives_ok( <<'CODE', 'lives_ok passes when there is no error (with diagnostic message)' )
+.sub main
+    $I0 = 42
+.end
+CODE
+    test_diag( '' )
+    test_test( 'lives_ok passes when there is no error (with diagnostic message)' )
+
+    test_fail( 'lives_ok fails when there is an error (with diagnostic message)' )
+    lives_ok( <<'CODE', 'lives_ok fails when there is an error (with diagnostic message)' )
+.sub main
+    die 'I did it for the lulz'
+.end
+CODE
+    test_diag( 'I did it for the lulz' )
+    test_test( 'lives_ok fails when there is an error' )
 .end
 
 .sub test_throws_like
