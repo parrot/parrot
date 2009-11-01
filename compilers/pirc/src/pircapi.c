@@ -196,7 +196,7 @@ parse_string(PARROT_INTERP, ARGIN(char *pirstring), int flags, int pasminput,
 
     snprintf(name, sizeof (name), "EVAL_" INTVAL_FMT, eval_number);
 
-    new_cs = PF_create_default_segs(interp, name, 0);
+    new_cs = PF_create_default_segs(interp, Parrot_str_new(interp, name, strlen(name)), 0);
     old_cs = Parrot_switch_to_cs(interp, new_cs, 0);
 
     /* create a yyscan_t object */
