@@ -73,6 +73,7 @@ e.g. eliminate new Px .PerlUndef because Px where different before
 #include "imc.h"
 #include "pbc.h"
 #include "optimizer.h"
+#include "../src/pmc/pmc_context.h"
 
 /* HEADERIZER HFILE: compilers/imcc/optimizer.h */
 

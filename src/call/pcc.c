@@ -23,6 +23,7 @@ subroutines.
 #include "pcc.str"
 #include "../pmc/pmc_key.h"
 #include "../pmc/pmc_continuation.h"
+#include "../pmc/pmc_context.h"
 
 /* HEADERIZER HFILE: include/parrot/call.h */
 

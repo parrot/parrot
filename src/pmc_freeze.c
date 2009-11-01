@@ -27,6 +27,7 @@ C<STRING> with a vtable.
 */
 
 #include "parrot/parrot.h"
+#include "pmc/pmc_context.h"
 #include "pmc_freeze.str"
 
 /* HEADERIZER HFILE: include/parrot/pmc_freeze.h */

@@ -24,6 +24,7 @@ subroutines following the Parrot Calling Conventions.
 #include "../pmc/pmc_key.h"
 #include "../pmc/pmc_callsignature.h"
 #include "../pmc/pmc_fixedintegerarray.h"
+#include "../pmc/pmc_context.h"
 
 /* HEADERIZER HFILE: include/parrot/call.h */
 

@@ -9,6 +9,7 @@
 #include "imc.h"
 #include "pbc.h"
 #include "optimizer.h"
+#include "../src/pmc/pmc_context.h"
 
 /*
 

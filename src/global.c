@@ -19,6 +19,7 @@ src/global.c - Access to global PMCs
 #include "parrot/parrot.h"
 #include "global.str"
 #include "pmc/pmc_sub.h"
+#include "pmc/pmc_context.h"
 
 /* HEADERIZER HFILE: include/parrot/global.h */
 /* HEADERIZER BEGIN: static */

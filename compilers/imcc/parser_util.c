@@ -22,6 +22,7 @@
 #include "parrot/dynext.h"
 #include "parrot/embed.h"
 #include "../../src/pmc/pmc_sub.h"
+#include "../../src/pmc/pmc_context.h"
 #include "pbc.h"
 #include "parser.h"
 #include "optimizer.h"

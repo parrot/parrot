@@ -19,6 +19,7 @@ src/pmc.c - The base vtable calling functions
 #include "parrot/parrot.h"
 #include "pmc.str"
 #include "pmc/pmc_class.h"
+#include "pmc/pmc_context.h"
 
 /* HEADERIZER HFILE: include/parrot/pmc.h */
 

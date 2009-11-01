@@ -24,16 +24,11 @@ typedef union {
     INTVAL       *regs_i;
 } Regs_ni;
 
-/* Ugly cheat to include Context definition. We have -Iinclude in compiler
- * arguments. So ../src/pmc/pmc_context.h will always resolve to proper header
+/* Ugly cheat to include Context definition for installed parrot. Directory
+ * structure is sooo different and there is no way to include pmc_context.h in
+ * sane way.
  */
-#  ifdef PARROT_IN_CORE
-#    ifndef PARROT_IN_EXTENSION
-#      include "../src/pmc/pmc_context.h"
-#    else
-#      include "pmc/pmc_context.h"
-#    endif
-#  else
+#  ifndef PARROT_IN_CORE
 #    include "pmc/pmc_context.h"
 #  endif
 typedef struct Parrot_Context_attributes Parrot_Context;

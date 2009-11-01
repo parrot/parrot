@@ -23,6 +23,7 @@ Subroutines, continuations, co-routines and other fun stuff...
 #include "sub.str"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_continuation.h"
+#include "pmc/pmc_context.h"
 
 /* HEADERIZER HFILE: include/parrot/sub.h */
 

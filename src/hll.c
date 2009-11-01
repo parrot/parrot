@@ -31,6 +31,7 @@ feature.
 
 #include "parrot/parrot.h"
 #include "parrot/dynext.h"
+#include "pmc/pmc_context.h"
 #include "hll.str"
 
 /* HEADERIZER HFILE: include/parrot/hll.h */

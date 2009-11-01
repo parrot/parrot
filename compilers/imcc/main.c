@@ -34,6 +34,7 @@ IMCC helpers.
 #include "parrot/longopt.h"
 #include "parrot/imcc.h"
 #include "parrot/runcore_api.h"
+#include "../src/pmc/pmc_context.h"
 #include "pbc.h"
 #include "parser.h"
 

@@ -22,6 +22,7 @@ exceptions, async I/O, and concurrent tasks (threads).
 #include "pmc/pmc_scheduler.h"
 #include "pmc/pmc_task.h"
 #include "pmc/pmc_timer.h"
+#include "pmc/pmc_context.h"
 
 #include "scheduler.str"
 

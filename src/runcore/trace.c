@@ -26,6 +26,7 @@ src/test_main.c
 #include "parrot/runcore_trace.h"
 #include "parrot/oplib/ops.h"
 #include "../pmc/pmc_sub.h"
+#include "../pmc/pmc_context.h"
 
 /* HEADERIZER HFILE: include/parrot/runcore_trace.h */
 

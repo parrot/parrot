@@ -33,6 +33,7 @@ about the structure of the frozen bytecode.
 #include "packfile.str"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_key.h"
+#include "pmc/pmc_context.h"
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 

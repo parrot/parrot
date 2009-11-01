@@ -22,6 +22,7 @@ Functions for loading and initializing dynamic link libraries.
 #include "parrot/dynext.h"
 #include "dynext.str"
 #include "pmc/pmc_parrotlibrary.h"
+#include "pmc/pmc_context.h"
 
 /* HEADERIZER HFILE: include/parrot/dynext.h */
 
