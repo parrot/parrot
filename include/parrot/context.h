@@ -542,7 +542,7 @@ UINTVAL Parrot_pcc_warnings_test(PARROT_INTERP,
 /* Ugly cheat to include Context definition. We have -Iinclude in compiler
  * arguments. So ../src/pmc/pmc_context.h will always resolve to proper header
  */
-#include "../src/pmc/pmc_context.h"
+#  include "../src/pmc/pmc_context.h"
 
 /* Context manipulating "functions" */
 #  define Parrot_pcc_get_context_struct(i, c) (PMC_data_typed((c), Parrot_Context*))
