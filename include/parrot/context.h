@@ -28,9 +28,9 @@ typedef union {
  * structure is sooo different and there is no way to include pmc_context.h in
  * sane way.
  */
-#  ifndef PARROT_IN_CORE
-#    include "pmc/pmc_context.h"
-#  endif
+#ifndef PARROT_IN_CORE
+#  include "pmc/pmc_context.h"
+#endif
 typedef struct Parrot_Context_attributes Parrot_Context;
 
 /*
