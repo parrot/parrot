@@ -470,6 +470,56 @@ allocate_registers(PARROT_INTERP, ARGIN(PMC *pmcctx), ARGIN(const INTVAL *number
 
 /*
 
+=item C<void Parrot_pcc_allocate_registers(PARROT_INTERP, PMC *pmcctx, const
+INTVAL *number_regs_used)>
+
+Allocate registers in Context.
+
+=cut
+
+*/
+
+void
+Parrot_pcc_allocate_registers(PARROT_INTERP, ARGIN(PMC *pmcctx),
+        ARGIN(const INTVAL *number_regs_used))
+{
+    ASSERT_ARGS(Parrot_pcc_allocate_registers)
+    return allocate_registers(interp, pmcctx, number_regs_used);
+}
+
+
+/*
+
+=item C<void Parrot_pcc_free_registers(PARROT_INTERP, PMC *pmcctx)>
+
+Free memory allocated for registers in Context.
+
+=cut
+
+*/
+
+void
+Parrot_pcc_free_registers(PARROT_INTERP, ARGIN(PMC *pmcctx))
+{
+    ASSERT_ARGS(Parrot_pcc_free_registers)
+    Parrot_Context_attributes * const ctx = PARROT_CONTEXT(pmcctx);
+    size_t reg_size;
+
+    if (!ctx)
+        return;
+
+    reg_size = Parrot_pcc_calculate_registers_size(interp, ctx->n_regs_used);
+    if (!reg_size)
+        return;
+
+    /* Free registers */
+    Parrot_gc_free_fixed_size_storage(interp, reg_size, ctx->registers);
+
+}
+
+
+/*
+
 =item C<PMC * Parrot_alloc_context(PARROT_INTERP, const INTVAL
 *number_regs_used, PMC *old)>
 

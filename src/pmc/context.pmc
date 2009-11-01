@@ -136,22 +136,7 @@ Destroy Context and memory allocated by C<Parrot_alloc_context>.
 */
 
     VTABLE void destroy() {
-        /* We own this pointer */
-        Parrot_Context_attributes * const ctx = PARROT_CONTEXT(SELF);
-        size_t reg_size;
-
-        if (!ctx)
-            return;
-
-        reg_size = Parrot_pcc_calculate_registers_size(INTERP, ctx->n_regs_used);
-        if (!reg_size)
-            return;
-
-        /* Free registers */
-        Parrot_gc_free_fixed_size_storage(interp,
-                Parrot_pcc_calculate_registers_size(INTERP, ctx->n_regs_used),
-                ctx->registers);
-
+        Parrot_pcc_free_registers(INTERP, SELF);
         PMC_data(SELF) = NULL;
     }
 
