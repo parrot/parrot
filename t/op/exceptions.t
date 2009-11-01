@@ -425,7 +425,7 @@ OUTPUT
 
 $ENV{TEST_PROG_ARGS} ||= '';
 my @todo = $ENV{TEST_PROG_ARGS} =~ /--run-pbc/
-    ? ( todo => '.tailcall and lexical maps not thawed from PBC, RT #60650' )
+    ? ( todo => '.tailcall and lexical maps not thawed from PBC, TT #1172' )
     : ();
 pir_output_is( <<'CODE', <<'OUTPUT', "exit_handler via exit exception", @todo );
 .sub main :main
