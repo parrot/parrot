@@ -878,14 +878,6 @@ Parrot_invalidate_method_cache(PARROT_INTERP, ARGIN_NULLOK(STRING *_class))
         invalidate_type_caches(interp, (UINTVAL)type);
 }
 
-
-/*
- * quick'n'dirty method cache
- * RT #45987: use a hash if method_name is not constant
- *       i.e. from obj.$Sreg(args)
- *       If this hash is implemented mark it during GC
- */
-
 /*
 
 =item C<PMC * Parrot_find_method_direct(PARROT_INTERP, PMC *_class, STRING
