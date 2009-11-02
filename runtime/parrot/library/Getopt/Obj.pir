@@ -467,8 +467,6 @@ return the name for the key.
 
 =cut
 
-# RT #56782 should the name really ever be passed?
-
 .sub "getNameForKey" :method
     .param string key
 
