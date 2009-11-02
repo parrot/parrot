@@ -115,6 +115,33 @@ Return the C<P6protoobject> for the invocant.
 .end
 
 
+=item WHERE()
+
+Return the memory address for the invocant.
+
+=cut
+
+.sub 'WHERE' :method
+    $I0 = get_addr self
+    .return ($I0)
+.end
+
+
+=item WHO()
+
+Return the package for the object.
+
+=cut
+
+.sub 'WHO' :method
+    $P0 = typeof self
+    $P0 = getprop 'metaclass', $P0
+    $P0 = getattribute $P0, 'parrotclass'
+    $P0 = $P0.'get_namespace'()
+    .return ($P0)
+.end
+
+
 =item PROTOOVERRIDES()
 
 Return a list of methods to be overridden in protoobjects

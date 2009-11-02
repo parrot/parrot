@@ -26,7 +26,7 @@ Testing Perl 6 objects.
     test_namespace.'export_to'(curr_namespace, exports)
 
     ##  set our plan
-    plan(252)
+    plan(295)
 
     ##  make sure we can load the P6object library
     push_eh load_fail
@@ -46,11 +46,12 @@ Testing Perl 6 objects.
     p6obj_tests(p6meta, 'P6metaclass', 'isa'=>'P6metaclass')
 
     ##  register an existing PMCProxy-based class
-    .local pmc hashproto, hashobj
+    .local pmc hashproto, hashobj, hashns
     $P0 = p6meta.'register'('Hash')
     hashproto = get_hll_global 'Hash'
+    hashns = get_hll_namespace ['Hash']
     is_same($P0, hashproto, 'return from .register =:= Hash')
-    hashobj = p6obj_tests(hashproto, 'Hash', 'isa'=>'Hash')
+    hashobj = p6obj_tests(hashproto, 'Hash', 'isa'=>'Hash', 'who'=>hashns)
     ##  make sure class of hash object is still a PMCProxy
     isa_nok(hashobj, 'P6object', 'Hash_obj')
     $P0 = typeof hashobj
@@ -61,12 +62,13 @@ Testing Perl 6 objects.
     nok($I0, '! < can Hash_obj, "new" >')
 
     ##  create a new standalone class by name
-    .local pmc abcproto, abcobj, abcmeta
+    .local pmc abcproto, abcobj, abcmeta, abcns
     $P0 = p6meta.'new_class'('ABC')
     abcproto = get_hll_global 'ABC'
+    abcns = get_hll_namespace ['ABC']
     is_same($P0, abcproto, 'return from .new_class =:= ABC')
     $P0 = split ' ', 'P6object'
-    abcobj = p6obj_tests(abcproto, 'ABC', 'isa'=>'ABC P6object', 'can'=>'foo')
+    abcobj = p6obj_tests(abcproto, 'ABC', 'isa'=>'ABC P6object', 'can'=>'foo', 'who'=>abcns)
     ##  make sure negative tests for 'can' work
     $I0 = can abcobj, 'bar'
     nok($I0, '! <can ABC_obj, "bar" >')
@@ -82,27 +84,30 @@ Testing Perl 6 objects.
     ghins = get_hll_namespace ['GHI']
     $P0 = p6meta.'new_class'(ghins)
     ghiproto = get_hll_global 'GHI'
-    ghiobj = p6obj_tests(ghiproto, 'GHI', 'can'=>'foo')
+    ghiobj = p6obj_tests(ghiproto, 'GHI', 'can'=>'foo', 'who'=>ghins)
 
     ##  create a subclass called DEF1 from 'ABC'
-    .local pmc defproto, defobj
+    .local pmc defproto, defobj, defns
     $P0 = p6meta.'new_class'('DEF1', 'parent'=>'ABC')
     defproto = get_hll_global 'DEF1'
+    defns    = get_hll_namespace ['DEF1']
     is_same($P0, defproto, 'return from .new_class =:= DEF1')
-    defobj = p6obj_tests(defproto, 'DEF1', 'isa'=>'DEF1 ABC P6object')
+    defobj = p6obj_tests(defproto, 'DEF1', 'isa'=>'DEF1 ABC P6object', 'who'=>defns)
 
     ##  create a subclass called DEF2 from ABC proto
     $P0 = p6meta.'new_class'('DEF2', 'parent'=>abcproto)
     defproto = get_hll_global 'DEF2'
+    defns = get_hll_namespace ['DEF2']
     is_same($P0, defproto, 'return from .new_class =:= DEF2')
-    defobj = p6obj_tests(defproto, 'DEF2', 'isa'=>'DEF2 ABC P6object')
+    defobj = p6obj_tests(defproto, 'DEF2', 'isa'=>'DEF2 ABC P6object', 'who'=>defns)
 
     ##  create a subclass of a PMC called MyInt
-    .local pmc myintproto, myintobj, myintmeta
+    .local pmc myintproto, myintobj, myintmeta, myintns
     $P0 = p6meta.'new_class'('MyInt', 'parent'=>'Integer')
     myintproto = get_hll_global 'MyInt'
+    myintns = get_hll_namespace ['MyInt']
     is_same($P0, myintproto, 'return from .new_class =:= MyInt')
-    myintobj = p6obj_tests(myintproto, 'MyInt', 'isa'=>'MyInt Integer P6object')
+    myintobj = p6obj_tests(myintproto, 'MyInt', 'isa'=>'MyInt Integer P6object', 'who'=>myintns)
 
     ##  map Integer PMC objects to MyInt class, don't inherit from MyInt
     .local pmc integerobj, integermeta
@@ -145,13 +150,14 @@ Testing Perl 6 objects.
     nok($I0, ".new_class didn't store proto as MyObject")
 
     ##  create class with ::-style name
-    .local pmc jklproto, jklobj
+    .local pmc jklproto, jklobj, jklns
     $P0 = p6meta.'new_class'('Foo::JKL')
     jklproto = get_hll_global ['Foo'], 'JKL'
+    jklns = get_hll_namespace ['Foo';'JKL']
     is_same($P0, jklproto, 'return from .new_class =:= Foo::JKL')
     $P0 = get_hll_global 'Foo::JKL'
     isa_nok($P0, 'P6protoobject', '["Foo::JKL"]')
-    jklobj = p6obj_tests(jklproto, 'Foo::JKL', 'isa'=>'P6object', 'can'=>'foo')
+    jklobj = p6obj_tests(jklproto, 'Foo::JKL', 'isa'=>'P6object', 'can'=>'foo', 'who'=>jklns)
 
     ##  add a method to a class
     $P0 = get_hll_global ['ABC'], 'foo'
@@ -201,6 +207,10 @@ The available options include:
     shortname = hash_default(options, 'shortname', classname)
     typename =  hash_default(options, 'typename',  classname)
 
+    .local pmc who
+    null who
+    who = hash_default(options, 'who', who)
+
     shortname = concat shortname, '()'
 
     .local string msg
@@ -228,6 +238,18 @@ The available options include:
     meta = proto.'HOW'()
     isa_ok(meta, 'P6metaclass', msg)
 
+    msg = 'concat'(classname, '.WHERE')
+    $P0 = proto.'WHERE'()
+    $I0 = get_addr proto
+    is($I0, $P0, msg)
+
+    if null who goto proto_who_done
+    msg = 'concat'(classname, '.WHO')
+    $P0 = proto.'WHO'()
+    is_same($P0, who, msg)
+  proto_who_done:
+
+  obj_tests:
     .local pmc obj, objmeta
     ##  skip object creation and tests for P6metaclass
     null obj
@@ -251,6 +273,17 @@ The available options include:
     msg = 'concat'(objname, '.^isa(', classname, ')')
     $I0 = objmeta.'isa'(obj, proto)
     ok($I0, msg)
+
+    msg = 'concat'(objname, '.WHERE')
+    $P0 = obj.'WHERE'()
+    $I0 = get_addr obj
+    is($I0, $P0, msg)
+
+    if null who goto obj_who_done
+    msg = 'concat'(objname, '.WHO')
+    $P0 = obj.'WHO'()
+    is_same($P0, who, msg)
+  obj_who_done:
 
   obj_done:
 
@@ -449,17 +482,18 @@ diagnostic message).
     $P0 = get_root_global ['parrot'], 'XYZ'
     $I0 = isnull $P0
     ok($I0, ".new_class didn't store ['parrot'], 'XYZ'")
-    p6obj_tests(xyzproto, 'XYZ', 'isa'=>'XYZ P6object', 'can'=>'foo')
+    p6obj_tests(xyzproto, 'XYZ', 'isa'=>'XYZ P6object', 'can'=>'foo', 'who'=>xyzns)
 
     ##  build HLL class using name
-    .local pmc wxyproto, wxyobj
+    .local pmc wxyproto, wxyobj, wxyns
     $P0 = p6meta.'new_class'('WXY')
     wxyproto = get_hll_global 'WXY'
+    wxyns = get_hll_namespace ['WXY']
     is_same($P0, wxyproto, 'return from .new_class =:= WXY')
     $P0 = get_root_global ['parrot'], 'WXY'
     $I0 = isnull $P0
     ok($I0, ".new_class didn't store ['parrot'], 'WXY'")
-    p6obj_tests(wxyproto, 'WXY', 'isa'=>'WXY P6object', 'can'=>'foo')
+    p6obj_tests(wxyproto, 'WXY', 'isa'=>'WXY P6object', 'can'=>'foo', 'who'=>wxyns)
 
     ## build a Parrotclass
     .local pmc vwx_nsarray, vwx_ns, vwx_parrotclass, vwx_proto 
@@ -468,7 +502,7 @@ diagnostic message).
     vwx_ns = get_hll_namespace vwx_nsarray
     vwx_parrotclass = newclass vwx_ns
     vwx_proto = p6meta.'register'(vwx_parrotclass)
-    p6obj_tests(vwx_proto, 'VWX', 'can'=>'foo')
+    p6obj_tests(vwx_proto, 'VWX', 'can'=>'foo', 'who'=>vwx_ns)
 .end
 
 .namespace ['XYZ']
