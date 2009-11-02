@@ -871,6 +871,7 @@ $(SRC_DIR)/oo$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/pmc/pmc_class.h $(SRC_DIR)/pm
 $(SRC_DIR)/scheduler$(O) : $(INC_DIR)/parrot.h \
                            $(SRC_DIR)/scheduler.str   \
                            $(SRC_DIR)/pmc/scheduler.c \
+                           $(SRC_DIR)/pmc/pmc_context.h \
                            $(SRC_DIR)/pmc/task.c      \
                            $(SRC_DIR)/pmc/timer.c     \
                            $(INC_DIR)/pbcversion.h
