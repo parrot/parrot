@@ -70,7 +70,7 @@ pmclass MultiSub extends ResizablePMCArray auto_attrs provides array {
                 SELF, sig_obj);
 
         if (PMC_IS_NULL(func))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 1, 
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
                     "No applicable candidates found to dispatch to for '%Ss'",
                     VTABLE_get_string(interp, SELF));
         return VTABLE_invoke(INTERP, func, next);
@@ -87,7 +87,7 @@ pmclass MultiSub extends ResizablePMCArray auto_attrs provides array {
                 SELF, sig_obj);
 
         if (PMC_IS_NULL(sub))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 1, 
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
                     "No applicable candidates found to dispatch to for '%Ss'",
                     VTABLE_get_string(interp, SELF));
         return SUPER(key);
@@ -99,7 +99,7 @@ pmclass MultiSub extends ResizablePMCArray auto_attrs provides array {
                 SELF, sig_obj);
 
         if (PMC_IS_NULL(sub))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 1, 
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
                     "No applicable candidates found to dispatch to for '%Ss'",
                     VTABLE_get_string(interp, SELF));
         return SUPER(s);
