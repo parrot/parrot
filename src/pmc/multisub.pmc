@@ -23,6 +23,12 @@ Sub PMCs with the same short name, but different long names.
 
 pmclass MultiSub extends ResizablePMCArray auto_attrs provides array {
 
+    VTABLE STRING * get_string() {
+        PMC * const sub0    = VTABLE_get_pmc_keyed_int(INTERP, SELF, 0);
+        STRING * const name = VTABLE_get_string(INTERP, sub0);
+        return name;
+    }
+
     VTABLE void push_pmc(PMC *value) {
         STRING * const _sub = CONST_STRING(interp, "Sub");
         STRING * const _nci = CONST_STRING(interp, "NCI");
@@ -64,8 +70,9 @@ pmclass MultiSub extends ResizablePMCArray auto_attrs provides array {
                 SELF, sig_obj);
 
         if (PMC_IS_NULL(func))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "No applicable methods.\n");
-
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1, 
+                    "No applicable candidates found to dispatch to for '%Ss'",
+                    VTABLE_get_string(interp, SELF));
         return VTABLE_invoke(INTERP, func, next);
     }
 
@@ -80,7 +87,9 @@ pmclass MultiSub extends ResizablePMCArray auto_attrs provides array {
                 SELF, sig_obj);
 
         if (PMC_IS_NULL(sub))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "No applicable methods.\n");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1, 
+                    "No applicable candidates found to dispatch to for '%Ss'",
+                    VTABLE_get_string(interp, SELF));
         return SUPER(key);
     }
 
@@ -90,7 +99,9 @@ pmclass MultiSub extends ResizablePMCArray auto_attrs provides array {
                 SELF, sig_obj);
 
         if (PMC_IS_NULL(sub))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "No applicable methods.\n");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1, 
+                    "No applicable candidates found to dispatch to for '%Ss'",
+                    VTABLE_get_string(interp, SELF));
         return SUPER(s);
     }
 

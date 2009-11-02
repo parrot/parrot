@@ -413,7 +413,7 @@ pir_error_output_like( <<'CODE', <<'OUT', "MMD single method, dispatch failure" 
 .end
 CODE
 /\A\(_, Float\) method:  1, 9\.5
-No applicable methods/
+No applicable candidates/
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "MMD on argument count" );
@@ -583,7 +583,7 @@ CODE
 PSt ok 2
 PSt ok 3
 String ok 4
-No applicable methods/
+No applicable candidates/
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'MMD on PMC types 3' );
