@@ -85,8 +85,13 @@ F<nvidia-devel> (?)
 
 =head2 Windows
 
-On Windows, Parrot supports three different compiler environments, each of
-which has different requirements for OpenGL support:
+On Windows, Parrot supports four different compiler environments, each of
+which has different requirements for OpenGL support.  Generally you should not
+attempt to mix the Cygwin variants (installing some X OpenGL libs and some
+w32api OpenGL libs) as this will almost certainly result in runtime errors
+like this one:
+
+    freeglut ERROR: Function <glutDisplayFunc> called without first calling 'glutInit'.
 
 
 =head3 MSVC
@@ -117,17 +122,17 @@ F<freeglut> and its dependencies.
 
 This is tried first.
 
+
 =head3 Cygwin/w32api
 
-The Cygwin/w32api for native opengl support is only tried if
-F</usr/include/GL> does not exist.
+Requires the F<opengl> and F<w32api> packages.
 
-The problem is that the L<NCI|pdds/draft/pdd16_native_call.pod>
-tries the header files to create the imports and not the libraries,
-and if the F</usr/include/GL> headers are found these are used, despite
-the w32api GLUT libraries are defined.
+Cygwin/w32api for native opengl support is only tried if
+F</usr/include/GL> does not exist.  The problem is that the OpenGL header files
+are used to create the OpenGL function list, and not the libraries themselves.
+If the F</usr/include/GL> headers are found these are used, even if the w32api
+GLUT libraries are defined.
 
-F<opengl>, F<w32api>
 
 =cut
 
