@@ -491,8 +491,6 @@ bb_findadd_edge(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Basic_block *from),
         bb_add_edge(unit, from, unit->bb_list[r->first_ins->bbindex]);
     else {
         IMCC_debug(interp, DEBUG_CFG, "register branch %I ", from->end);
-        /* RT #48282 is probably only ok, if the invoke is "near" the
-         *     set_addr ins */
         for (ins = from->end; ins; ins = ins->prev) {
             if ((ins->type & ITBRANCH)
             &&   STREQ(ins->opname, "set_addr")
