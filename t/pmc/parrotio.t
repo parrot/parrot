@@ -168,8 +168,6 @@ ok 4 - $S0 = $P1.readline($I2)
 ok 5 - $S0 = $P1.readline($I2) # again on same stream
 OUT
 
-# RT #46833 test reading/writing code points once supported
-
 # RT #46835 test reading long chunks, eof, and across newlines
 
 # RT #46837 pir_output_is( <<'CODE', <<'OUT', 'print, read, and readline - asynchronous', todo => 'not yet implemented' );
