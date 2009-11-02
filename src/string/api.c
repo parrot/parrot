@@ -2321,12 +2321,12 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
             return 0.0;
     }
 
-/* local macro to call proper pow version depending on FLOATVAL */
-#if NUMVAL_SIZE == DOUBLE_SIZE
+/* powl() could be used here, but it is an optional POSIX extension that
+   needs to be checked for at Configure-time.
+
+   See https://trac.parrot.org/parrot/ticket/1176 for more details. */
+
 #  define POW pow
-#else
-#  define POW powl
-#endif
 
      if (d && d_is_safe) {
         f = mantissa + (1.0 * d / POW(10.0, d_length));
