@@ -866,7 +866,7 @@ $(SRC_DIR)/install_config$(O) : $(SRC_DIR)/install_config.c
 
 $(SRC_DIR)/null_config$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/null_config.c
 
-$(SRC_DIR)/oo$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/pmc/class.c $(INC_DIR)/pbcversion.h
+$(SRC_DIR)/oo$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/pmc/pmc_class.h $(SRC_DIR)/pmc/pmc_object.h $(SRC_DIR)/pmc/pmc_context.h $(INC_DIR)/pbcversion.h $(SRC_DIR)/oo.str
 
 $(SRC_DIR)/scheduler$(O) : $(INC_DIR)/parrot.h \
                            $(SRC_DIR)/scheduler.str   \
