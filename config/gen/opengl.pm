@@ -162,6 +162,7 @@ my %C_TYPE = (
     LPPIXELFORMATDESCRIPTOR => 'void*',
     LPVOID                  => 'void*',
     PGPU_DEVICE             => 'void*',
+    GLsync                  => 'void*',
 
     GLchar                  => 'char',
     GLcharARB               => 'char',
@@ -225,7 +226,9 @@ my %C_TYPE = (
 
     int64_t                 => 'long long',
     INT64                   => 'long long',
+    GLint64                 => 'signed long long',
     GLint64EXT              => 'signed long long',
+    GLuint64                => 'unsigned long long',
     GLuint64EXT             => 'unsigned long long',
 
     FLOAT                   => 'float',
@@ -326,10 +329,12 @@ my @IGNORE = (
 
     # Can't handle longlong until RT 53406 is done
     'glBufferAddressRangeNV',
+    'glClientWaitSync',
     'glUniformui64NV',
     'glProgramUniformui64NV',
     'glPresentFrameKeyedNV',
     'glPresentFrameDualFillNV',
+    'glWaitSync',
     'glXSwapBuffersMscOML',
     'glXWaitForMscOML',
     'glXWaitForSbcOML',
