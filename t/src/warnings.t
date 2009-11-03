@@ -36,13 +36,11 @@ c_output_is( <<'CODE', <<'OUTPUT', "print_pbc_location" );
 int
 main(int argc, char* argv[])
 {
-    Interp *interp;
+    Parrot_Interp interp = Parrot_new(NULL);
     int error_val;
 
-    interp = Parrot_new(NULL);
-    if (!interp) {
+    if (!interp)
         return 1;
-    }
 
     print_pbc_location(interp);
 
@@ -61,13 +59,12 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot_warn" );
 int
 main(int argc, char* argv[])
 {
-    Interp *interp;
+    Parrot_Interp interp = Parrot_new(NULL);
     int error_val;
 
-    interp = Parrot_new(NULL);
-    if (!interp) {
+    if (!interp)
         return 1;
-    }
+
     PARROT_WARNINGS_on(interp, PARROT_WARNINGS_ALL_FLAG);
 
     error_val = Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG, "all");
