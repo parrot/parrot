@@ -18,6 +18,7 @@ darwin8.11.1-x86-gcc4.0.1    ??   Y    ?     ?   ?   Y    Y     N  20091020
 linux-x86-gcc4.1.2                Y    ?     Y   Y   Y    Y     ?  20090419
 linux-x86-gcc4.2.4                Y    ?     Y   Y   Y    Y     ?  20081023
 linux-x86-gcc4.3.2                Y    ?     Y   Y   Y    Y     ?  20081030
+linux-x86-gcc4.4.1                Y    ?     Y   Y   Y    Y     ?  20091103
 linux-x86-llvm-gcc-4.2            Y    ?     ?   ?   Y    Y     ?  20091021
 sol10-sparc-cc_5.9           B4   Y    -     Y   Y   Y    Y     ?  20090720
 sol10-sparc-cc_5.9           B8   Y    -     Y   Y   Y    Y     ?  20090720
