@@ -74,7 +74,7 @@ static void allocate_registers(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 static size_t calculate_registers_size(SHIM_INTERP,
-    ARGIN(const INTVAL *number_regs_used))
+    ARGIN(const UINTVAL *number_regs_used))
         __attribute__nonnull__(2);
 
 static void clear_regs(PARROT_INTERP, ARGMOD(PMC *pmcctx))
@@ -97,7 +97,7 @@ static void init_context(PARROT_INTERP,
         FUNC_MODIFIES(*pmcctx);
 
 static size_t Parrot_pcc_calculate_registers_size(PARROT_INTERP,
-    ARGIN(const INTVAL *number_regs_used))
+    ARGIN(const UINTVAL *number_regs_used))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -399,7 +399,7 @@ Parrot_pop_context(PARROT_INTERP)
 
 /*
 
-=item C<static size_t calculate_registers_size(PARROT_INTERP, const INTVAL
+=item C<static size_t calculate_registers_size(PARROT_INTERP, const UINTVAL
 *number_regs_used)>
 
 Calculate memory size required for registers.
@@ -408,7 +408,7 @@ Calculate memory size required for registers.
 
 */
 static size_t
-calculate_registers_size(SHIM_INTERP, ARGIN(const INTVAL *number_regs_used))
+calculate_registers_size(SHIM_INTERP, ARGIN(const UINTVAL *number_regs_used))
 {
     ASSERT_ARGS(calculate_registers_size)
 
@@ -423,7 +423,7 @@ calculate_registers_size(SHIM_INTERP, ARGIN(const INTVAL *number_regs_used))
 /*
 
 =item C<static size_t Parrot_pcc_calculate_registers_size(PARROT_INTERP, const
-INTVAL *number_regs_used)>
+UINTVAL *number_regs_used)>
 
 Calculate size of Context.
 
@@ -432,7 +432,7 @@ Calculate size of Context.
 */
 
 static size_t
-Parrot_pcc_calculate_registers_size(PARROT_INTERP, ARGIN(const INTVAL *number_regs_used))
+Parrot_pcc_calculate_registers_size(PARROT_INTERP, ARGIN(const UINTVAL *number_regs_used))
 {
     ASSERT_ARGS(Parrot_pcc_calculate_registers_size)
     return calculate_registers_size(interp, number_regs_used);
