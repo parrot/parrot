@@ -15,14 +15,14 @@
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
     test_namespace = get_namespace [ 'Test'; 'More' ]
-    exports = split " ", "ok nok is diag like skip todo is_deeply isa_ok isnt throws_like lives_ok"
+    exports = split " ", "ok nok is diag like skip todo is_deeply isa_ok isnt throws_like lives_ok dies_ok"
     test_namespace.'export_to'(curr_namespace, exports)
 
     test_namespace = get_namespace [ 'Test'; 'Builder'; 'Tester' ]
     exports = split " ", "plan test_out test_diag test_fail test_pass test_test"
     test_namespace.'export_to'(curr_namespace, exports)
 
-    plan( 98 )
+    plan( 102 )
 
     test_skip()
     test_todo()
@@ -34,10 +34,49 @@
     test_is_deeply()
     test_diagnostics()
     test_lives_ok()
+    test_dies_ok()
     test_throws_like()
     test_isa_ok()
 
     test.'finish'()
+.end
+
+.sub test_dies_ok
+    test_pass( 'dies_ok passes when there is an error' )
+    dies_ok( <<'CODE', 'dies_ok passes when there is an error' )
+.sub main
+    die 'I did it for the lulz'
+.end
+CODE
+    test_test( 'dies_ok passes when there is an error' )
+
+    test_fail( 'dies_ok fails when there is no error' )
+    dies_ok( <<'CODE', 'dies_ok fails when there is no error' )
+.sub main
+    $I0 = 42
+.end
+CODE
+    test_diag( 'no error thrown' )
+    test_test( 'dies_ok fails when there is no error' )
+
+    test_pass( 'dies_ok passes when there is an error with diagnostic message' )
+    dies_ok( <<'CODE', 'dies_ok passes when there is an error with diagnostic message' )
+.sub main
+    die 'I did it for the lulz'
+.end
+CODE
+    test_diag( '' )
+    test_test( 'dies_ok passes when there is an error with diagnostic message' )
+
+    test_fail( 'dies_ok fails when there is no error with diagnostic message' )
+    dies_ok( <<'CODE', 'dies_ok fails when there is no error with diagnostic message' )
+.sub main
+    $I0 = 42
+.end
+CODE
+    test_diag( 'no error thrown' )
+    test_test( 'dies_ok fails when there is no error with diagnostic message' )
+
 .end
 
 .sub test_lives_ok
