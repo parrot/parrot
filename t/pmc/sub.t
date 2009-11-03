@@ -688,7 +688,7 @@ print $TEMP <<'EOF';
 .end
 
 # :load or other pragmas are only evaluated on the first
-# instruction of a compilation unit
+# instruction of a subroutine
 .sub _sub1 :load
   say "in sub1"
   returncc
