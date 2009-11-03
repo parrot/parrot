@@ -176,7 +176,8 @@ Please note that these features I<do not> require deprecation notices:
 
 =over 4
 
-=item * Parrot functions I<not> marked with C<PARROT_API>
+=item * Parrot functions I<not> marked with C<PARROT_API> or documented as part
+of the public API (listed in docs/embed.pod)
 
 =item * The layout of Parrot's internal data structures
 
