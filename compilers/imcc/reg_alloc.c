@@ -725,7 +725,7 @@ rebuild_reglist(ARGMOD(IMC_Unit *unit))
 
     for (i = count = unused = 0; i < unit->n_symbols; i++) {
         SymReg * const r = unit->reglist[i];
-        char *p;
+        const char *p;
         int reg_set;
 
         if (r->color == -1)

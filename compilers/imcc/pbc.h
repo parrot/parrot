@@ -38,7 +38,7 @@ INTVAL IMCC_int_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-STRING * IMCC_string_from__STRINGC(PARROT_INTERP, ARGIN(const char *buf))
+STRING * IMCC_string_from__STRINGC(PARROT_INTERP, ARGIN(char *buf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

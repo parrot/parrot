@@ -906,7 +906,7 @@ IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
 
 /*
 
-=item C<STRING * IMCC_string_from__STRINGC(PARROT_INTERP, const char *buf)>
+=item C<STRING * IMCC_string_from__STRINGC(PARROT_INTERP, char *buf)>
 
 =cut
 
@@ -915,7 +915,7 @@ IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-IMCC_string_from__STRINGC(PARROT_INTERP, ARGIN(const char *buf))
+IMCC_string_from__STRINGC(PARROT_INTERP, ARGIN(char *buf))
 {
     ASSERT_ARGS(IMCC_string_from__STRINGC)
     const int ascii = (*buf == '\'' || *buf == '"');
