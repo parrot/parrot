@@ -41,7 +41,7 @@ X<.emit directive>
 
   .emit
 
-Define a compilation unit of PASM code. Always paired with C<.eom>.
+Define a block of PASM code. Always paired with C<.eom>.
 
 =head3 .end
 
@@ -49,7 +49,7 @@ X<.end directive>
 
   .end
 
-End a compilation unit. Always paired with C<.sub>.
+End a subroutine. Always paired with C<.sub>.
 
 =head3 .endm
 
@@ -65,7 +65,7 @@ X<.eom directive>
 
   .eom
 
-End a compilation unit of PASM code. Always paired with C<.emit>.
+End a block of PASM code. Always paired with C<.emit>.
 
 =head3 .flatten_arg
 
@@ -208,7 +208,7 @@ X<.sub directive>
 
   .sub R<NAME>
 
-Define a compilation unit. Always paired with C<.end>. Names begin
+Define a subroutine. Always paired with C<.end>. Names begin
 with "C<_>" by convention.
 
 =head3 .sym
