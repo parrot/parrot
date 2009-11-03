@@ -934,6 +934,23 @@ doit:
 .end
 
 #-----------------------------------------------------------------------
+.sub ClearArea :method
+    .param int x
+    .param int y
+    .param int width
+    .param int height
+    .param int exposures
+    .local pmc xdisp
+    xdisp = self.'getdisplay'()
+    .local pmc xwin
+    xwin = getattribute self, attr_XWindow
+    .local pmc func
+    func = get_xlib_function('XClearArea', 'ippiiiii')
+    $I0 = func(xdisp, xwin, x, y, width, height, exposures)
+    .return($I0)
+.end
+
+#-----------------------------------------------------------------------
 .sub StoreName :method
     .param string name
 
