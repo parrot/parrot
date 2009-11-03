@@ -383,7 +383,7 @@ L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.cal
 
  - Nov 17, 2009      - 1.8  - bernhard
  - Dec 15, 2009      - 1.9  - gerd
- - Jan 19, 2010      - 2.0* -
+ - Jan 19, 2010      - 2.0* - chromatic
  - Feb 16, 2010      - 2.1  - darbelo
  - Mar 16, 2010      - 2.2  - cotto
 
