@@ -1182,7 +1182,7 @@ Parrot_call_sub(PARROT_INTERP, Parrot_PMC sub_pmc,
 
     /* Add the return argument onto the call signature object (a bit
      * hackish, added for backward compatibility in deprecated API function,
-     * see TT #XXX). */
+     * see TT #1145). */
     switch (return_sig) {
         case 'v':
         {
@@ -1243,7 +1243,7 @@ Parrot_call_sub_ret_int(PARROT_INTERP, Parrot_PMC sub_pmc,
 
     /* Add the return argument onto the call signature object (a bit
      * hackish, added for backward compatibility in deprecated API function,
-     * see TT #XXX). */
+     * see TT #1145). */
     append_result(interp, sig_object, Parrot_str_new_constant(interp, "I"), &result);
     Parrot_pcc_invoke_from_sig_object(interp, sub_pmc, sig_object);
 
@@ -1281,7 +1281,7 @@ Parrot_call_sub_ret_float(PARROT_INTERP, Parrot_PMC sub_pmc,
 
     /* Add the return argument onto the call signature object (a bit
      * hackish, added for backward compatibility in deprecated API function,
-     * see TT #XXX). */
+     * see TT #1145). */
     append_result(interp, sig_object, Parrot_str_new_constant(interp, "N"), &result);
     PMC_get_sub(interp, sub_pmc, sub);
     Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp), sub->seg->const_table->constants);
@@ -1330,7 +1330,7 @@ Parrot_call_method(PARROT_INTERP, Parrot_PMC sub_pmc, Parrot_PMC obj,
 
     /* Add the return argument onto the call signature object (a bit
      * hackish, added for backward compatibility in deprecated API function,
-     * see TT #XXX). */
+     * see TT #1145). */
     switch (return_sig) {
         case 'v':
         {
