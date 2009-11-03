@@ -2780,8 +2780,8 @@ Parrot_str_unescape(PARROT_INTERP,
     ASSERT_ARGS(Parrot_str_unescape)
 
     STRING         *result;
-    const ENCODING *encoding;
     const CHARSET  *charset;
+    const ENCODING *encoding = NULL;
 
     /* the default encoding is ascii */
     const char     *enc_name = enc_char ? enc_char : "ascii";
@@ -2801,13 +2801,14 @@ Parrot_str_unescape(PARROT_INTERP,
 
     if (p) {
         #define MAX_ENCODING_NAME_ALLOWED 63
-        char buffer[MAX_ENCODING_NAME_ALLOWED + 1];
-        size_t l= p - enc_char;
-        charset = NULL;
+        char   buffer[MAX_ENCODING_NAME_ALLOWED + 1];
+        size_t l = p - enc_char;
+        charset  = NULL;
+
         if (l < MAX_ENCODING_NAME_ALLOWED) {
             memcpy(buffer, enc_char, l);
-            buffer[l]= '\0';
-            encoding = Parrot_find_encoding(interp, buffer);
+            buffer[l] = '\0';
+            encoding  = Parrot_find_encoding(interp, buffer);
         }
         if (!encoding)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
