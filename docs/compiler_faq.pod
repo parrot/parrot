@@ -96,7 +96,7 @@ The method name may also be a string variable representing a method name:
 There are several ways to achieve this, depending on the location of
 the subroutine.
 
-If the sub is in the same compilation unit use a Sub constant:
+If the sub is in the same file use a Sub constant:
 
 =begin PIR_FRAGMENT
 

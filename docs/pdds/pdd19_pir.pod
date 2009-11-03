@@ -397,9 +397,9 @@ level language debug information. Examples:
 =end PIR_FRAGMENT
 
 An annotation stays in effect until the next annotation with the same key or
-the end of the current compilation unit (that is, if you use a tool such as
-C<pbc_merge> to link multiple bytecode files, then annotations will not spill
-over from one mergee's bytecode to another).
+the end of the current file (that is, if you use a tool such as C<pbc_merge> to
+link multiple bytecode files, then annotations will not spill over from one
+mergee's bytecode to another).
 
 One annotation covers many PIR instructions. If the result of compiling one
 line of HLL code is 15 lines of PIR, you only need to emit one annotation

@@ -96,7 +96,7 @@ Gotchas:
 
 =item * probably a continuation/control flow boundary
 
-=item * packfiles and compilation units probably too much information for
+=item * packfiles and subroutines probably too much information for
 either
 
 =item * do not let MMD and other implementation details escape
