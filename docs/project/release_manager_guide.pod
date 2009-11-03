@@ -235,7 +235,7 @@ features, just be sure to say the same thing in both text and HTML versions.
 
 =item 10.
 
-Update the website. You will need an account with administrative rights
+Update the website. You will need an account with editor rights
 on L<http://www.parrot.org>.
 
 =over 4
