@@ -34,7 +34,7 @@ For example, you could select a name from
 L<http://en.wikipedia.org/wiki/List_of_parrots>.
 
 Set up your account on L<http://www.parrot.org/> and ask an existing release
-manager to provide you with admin privileges if you don't already have them.
+manager to provide you with editor privileges if you don't already have them.
 
 =item 1.
 
