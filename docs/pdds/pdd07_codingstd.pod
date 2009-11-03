@@ -208,8 +208,6 @@ Return values should not be parenthesized without need.  It may be necessary
 to parenthesize a long return expression so that a smart editor will properly
 indent it.
 
-{{ RT#45365: Modify parrot.el so this rule is no longer required. }}
-
 =item *
 
 When assigning inside a conditional, use extra parentheses,
