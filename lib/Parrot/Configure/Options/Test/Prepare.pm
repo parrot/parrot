@@ -29,11 +29,13 @@ my @steps_tests = _prepare_steps_tests_list(
 );
 
 sub get_preconfiguration_tests {
-    return ( @framework_tests, @steps_tests );
+#    return ( @framework_tests, @steps_tests );
+    return ( @framework_tests );
 };
 
 sub get_postconfiguration_tests {
     my @postconfiguration_tests = (
+        @steps_tests,
         glob("t/postconfigure/*.t"),
         glob("t/tools/pmc2cutils/*.t"),
         glob("t/tools/ops2cutils/*.t"),
