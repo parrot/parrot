@@ -15,6 +15,7 @@ use lib qw( lib );
 use_ok('config::init::headers');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
+use Parrot::Configure::Step::Test;
 
 my $pkg  = q{init::headers};
 my ($args, $step_list_ref) = process_options(
@@ -24,7 +25,9 @@ my ($args, $step_list_ref) = process_options(
     }
 );
 
-my $conf = Parrot::Configure->new;
+my $conf = Parrot::Configure::Step::Test->new;
+$conf->include_config_results( $args );
+
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 
