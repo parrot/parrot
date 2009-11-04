@@ -308,7 +308,9 @@ necessary.
                 *(STRING **)ptr = value;
                 break;
             case PARROT_ARG_PMC:
-                *(PMC **)ptr = get_string_pmc(INTERP, value);
+                *(PMC **)ptr = STRING_IS_NULL(value) ?
+                    PMCNULL :
+                    get_string_pmc(INTERP, value);
                 break;
             default:
                 PARROT_ASSERT(!"Impossible type");
