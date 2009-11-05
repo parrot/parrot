@@ -244,7 +244,6 @@ cfg_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
             return 1;
         if (branch_reorg(interp, unit))
             return 1;
-        /* RT #46283 cfg / loop detection breaks e.g. in t/compiler/5_3 */
         if (unused_label(interp, unit))
             return 1;
         if (dead_code_remove(interp, unit))
