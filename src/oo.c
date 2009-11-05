@@ -401,19 +401,21 @@ Parrot_oo_get_class_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
 
     if (STRING_IS_NULL(name))
         return PMCNULL;
+    else {
 
-    /* First check in current HLL namespace */
-    PMC * const hll_ns = VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace,
-                           Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)));
-    PMC * const ns     = Parrot_get_namespace_keyed_str(interp, hll_ns, name);
-    PMC * const _class = PMC_IS_NULL(ns)
-                       ? PMCNULL : VTABLE_get_class(interp, ns);
+        /* First check in current HLL namespace */
+        PMC * const hll_ns = VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace,
+                               Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)));
+        PMC * const ns     = Parrot_get_namespace_keyed_str(interp, hll_ns, name);
+        PMC * const _class = PMC_IS_NULL(ns)
+                           ? PMCNULL : VTABLE_get_class(interp, ns);
 
-    /* If not found, check for a PMC */
-    if (PMC_IS_NULL(_class))
-        return get_pmc_proxy(interp, pmc_type(interp, name));
-    else
-        return _class;
+        /* If not found, check for a PMC */
+        if (PMC_IS_NULL(_class))
+            return get_pmc_proxy(interp, pmc_type(interp, name));
+        else
+            return _class;
+    }
 }
 
 
