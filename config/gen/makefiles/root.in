@@ -1207,7 +1207,12 @@ $(SRC_DIR)/nci$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/nci.c $(SRC_DIR)/nci.str \
         $(SRC_DIR)/pmc/pmc_nci.h \
         $(SRC_DIR)/pmc/pmc_pointer.h
 
-$(SRC_DIR)/frame_builder$(O) : $(SRC_DIR)/frame_builder.h $(GENERAL_H_FILES) $(SRC_DIR)/frame_builder.c $(SRC_DIR)/frame_builder.str
+$(SRC_DIR)/frame_builder$(O) : $(SRC_DIR)/frame_builder.h $(GENERAL_H_FILES) \
+        $(SRC_DIR)/frame_builder.c \
+        $(SRC_DIR)/frame_builder.str \
+        $(SRC_DIR)/pmc/pmc_fixedintegerarray.h \
+        $(SRC_DIR)/pmc/pmc_unmanagedstruct.h \
+        $(SRC_DIR)/pmc/pmc_managedstruct.h
 
 $(SRC_DIR)/vtables$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/vtables.c
 
