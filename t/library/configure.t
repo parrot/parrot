@@ -17,8 +17,9 @@ t/library/configure.t - Test the Configure PBC
 
     load_bytecode 'Configure.pbc'
 
-    plan(23)
+    plan(39)
     test_conditioned_line()
+    test_eval_expr()
     test_interpolate_var()
     test_replace_slash()
 .end
@@ -57,6 +58,53 @@ t/library/configure.t - Test the Configure PBC
     is($S0, "alternate\n", "#IF/ELSIF alternate")
     $S0 = conditioned_line("#IF(bar):negative\n#ELSIF(bar):negative", config)
     is($S0, "", "#IF/ELSIF negative")
+.end
+
+.sub 'test_eval_expr'
+    .local pmc config
+    config = new 'Hash'
+    config['foo'] = 1
+    config['bar'] = 0
+    config['baz'] = 1
+
+    $I0 = cond_eval("foo", config)
+    is($I0, 1, "foo")
+    $I0 = cond_eval("   foo   ", config)
+    is($I0, 1, "   foo   ")
+    $I0 = cond_eval("bar", config)
+    is($I0, 0, "bar")
+    $I0 = cond_eval(" unknown ", config)
+    is($I0, 0, " unknown ")
+
+    $I0 = cond_eval("  ( foo )  ", config)
+    is($I0, 1, "  ( foo )  ")
+
+    $I0 = cond_eval("NOT foo", config)
+    is($I0, 0, "NOT foo")
+    $I0 = cond_eval(" NOT bar", config)
+    is($I0, 1, " NOT bar")
+    $I0 = cond_eval("!!foo", config)
+    is($I0, 1, "!!foo")
+
+    $I0 = cond_eval(" foo OR bar ", config)
+    is($I0, 1, " foo OR bar ")
+    $I0 = cond_eval("foo||bar", config)
+    is($I0, 1, "foo||bar")
+
+    $I0 = cond_eval(" foo AND bar ", config)
+    is($I0, 0, " foo AND bar ")
+    $I0 = cond_eval("foo&&bar", config)
+    is($I0, 0, "foo&&bar")
+
+    $I0 = cond_eval(" foo == bar ", config)
+    is($I0, 0, " foo == bar ")
+    $I0 = cond_eval(" foo == baz ", config)
+    is($I0, 1, " foo == baz ")
+
+    $I0 = cond_eval(" foo != bar ", config)
+    is($I0, 1, " foo != bar ")
+    $I0 = cond_eval(" foo != baz ", config)
+    is($I0, 0, " foo != baz ")
 .end
 
 .sub 'test_interpolate_var'

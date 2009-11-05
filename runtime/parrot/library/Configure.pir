@@ -17,6 +17,8 @@ Supply C<genfile> function, which handles
 
 =item conditioned line #IF/UNLESS/ELSIF/ELSE
 
+=item with expression evaluation || OR && AND ! NOT (expr) != ==
+
 =back
 
 Pure PIR, without any dependencies.
@@ -169,8 +171,186 @@ L<http://github.com/fperrad/markdown/blob/master/Configure.pir>
 .sub 'cond_eval'
     .param string expr
     .param pmc config
-    $I0 = config[expr]
-    .return ($I0)
+    .local int pos, end
+    end = length expr
+    pos = ws(expr, 0, end)
+    .tailcall or_expr(expr, pos, end, config)
+.end
+
+.sub 'or_expr' :anon
+    .param string str
+    .param int pos
+    .param int end
+    .param pmc config
+    .local int val1, val2
+    (val1, pos) = and_expr(str, pos, end, config)
+    pos = ws(str, pos, end)
+    $I0 = index str, "||", pos
+    if $I0 == pos goto L1
+    $I0 = index str, "OR", pos
+    if $I0 == pos goto L1
+    # or_expr -> and_expr
+    .return (val1, pos)
+  L1:
+    pos = pos + 2
+    pos = ws(str, pos, end)
+    (val2, pos) = or_expr(str, pos, end, config)
+    $I0 = val1 || val2
+    # or_expr -> and_expr ( '||' | 'OR' or_expr )
+    .return ($I0, pos)
+.end
+
+.sub 'and_expr' :anon
+    .param string str
+    .param int pos
+    .param int end
+    .param pmc config
+    .local int val1, val2
+    (val1, pos) = rel_expr(str, pos, end, config)
+    pos = ws(str, pos, end)
+    $I0 = index str, "&&", pos
+    if $I0 == pos goto L1
+    $I0 = index str, "AND", pos
+    if $I0 == pos goto L2
+    # and_expr -> rel_expr
+    .return (val1, pos)
+  L1:
+    pos = pos + 2
+    goto L3
+  L2:
+    pos = pos + 3
+  L3:
+    pos = ws(str, pos, end)
+    (val2, pos) = and_expr(str, pos, end, config)
+    $I0 = val1 && val2
+    # and_expr -> rel_expr ( '&&' | 'AND' and_expr )
+    .return ($I0, pos)
+.end
+
+.sub 'rel_expr' :anon
+    .param string str
+    .param int pos
+    .param int end
+    .param pmc config
+    .local int val1, val2
+    (val1, pos) = not_expr(str, pos, end, config)
+    pos = ws(str, pos, end)
+    $I0 = index str, "==", pos
+    if $I0 == pos goto L1
+    $I0 = index str, "!=", pos
+    if $I0 == pos goto L1
+    # rel_expr -> not_expr
+    .return (val1, pos)
+  L1:
+    $S0 = substr str, pos, 2
+    pos = pos + 2
+    pos = ws(str, pos, end)
+    (val2, pos) = not_expr(str, pos, end, config)
+    unless $S0 == '==' goto L2
+    $I0 = val1 == val2
+    # rel_expr -> not_expr '==' not_expr
+    .return ($I0, pos)
+  L2:
+    $I0 = val1 != val2
+    # rel_expr -> not_expr '!=' not_expr
+    .return ($I0, pos)
+.end
+
+.sub 'not_expr' :anon
+    .param string str
+    .param int pos
+    .param int end
+    .param pmc config
+    $I0 = index str, '!', pos
+    if $I0 == pos goto L1
+    $I0 = index str, 'NOT', pos
+    if $I0 == pos goto L2
+    # not_expr -> prim_expr
+    .tailcall prim_expr(str, pos, end, config)
+  L1:
+    pos = pos + 1
+    goto L3
+  L2:
+    pos = pos + 3
+  L3:
+    pos = ws(str, pos, end)
+    .local int val
+    (val, pos) = not_expr(str, pos, end, config)
+    $I0 = not val
+    # not_expr -> ( '!' | 'NOT' ) not_expr
+    .return ($I0, pos)
+.end
+
+.sub 'prim_expr' :anon
+    .param string str
+    .param int pos
+    .param int end
+    .param pmc config
+    .local int val
+    $S0 = substr str, pos, 1
+    unless $S0 == '(' goto L1
+    inc pos
+    pos = ws(str, pos, end)
+    (val, pos) = or_expr(str, pos, end, config)
+    pos = ws(str, pos, end)
+    $S0 = substr str, pos, 1
+    if $S0 == ')' goto L2
+    error(str, pos, "')' expected")
+  L2:
+    inc pos
+    # prim_expr -> '(' or_expr ')'
+    .return (val, pos)
+  L1:
+    # prim_expr -> idf
+    .tailcall idf(str, pos, end, config)
+.end
+
+.include 'cclass.pasm'
+
+.sub 'idf' :anon
+    .param string str
+    .param int pos
+    .param int end
+    .param pmc config
+    $I1 = pos
+  L1:
+    $I0 = is_cclass .CCLASS_WORD, str, pos
+    unless $I0 goto L2
+    inc pos
+    if pos >= end goto L2
+    goto L1
+  L2:
+    $I2 = pos - $I1
+    $S0 = substr str, $I1, $I2
+    $I0 = config[$S0]
+    .return ($I0, pos)
+.end
+
+.sub 'ws' :anon
+    .param string str
+    .param int pos
+    .param int end
+  L1:
+    $I0 = is_cclass .CCLASS_WHITESPACE, str, pos
+    unless $I0 goto L2
+    inc pos
+    if pos >= end goto L2
+    goto L1
+  L2:
+    .return (pos)
+.end
+
+.sub 'error' :anon
+    .param string str
+    .param int pos
+    .param string msg
+    printerr "in '"
+    printerr str
+    printerr "' at "
+    printerr pos
+    printerr " : "
+    printerr msg
+    printerr "\n"
 .end
 
 .sub 'interpolate_var'
