@@ -395,9 +395,12 @@ PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
-Parrot_oo_get_class_str(PARROT_INTERP, ARGIN(STRING *name))
+Parrot_oo_get_class_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
 {
     ASSERT_ARGS(Parrot_oo_get_class_str)
+
+    if (STRING_IS_NULL(name))
+        return PMCNULL;
 
     /* First check in current HLL namespace */
     PMC * const hll_ns = VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace,

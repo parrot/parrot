@@ -133,9 +133,8 @@ PMC * Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC * Parrot_oo_get_class_str(PARROT_INTERP, ARGIN(STRING *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+PMC * Parrot_oo_get_class_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
+        __attribute__nonnull__(1);
 
 void destroy_object_cache(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -221,8 +220,7 @@ INTVAL Parrot_oo_register_type(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(key))
 #define ASSERT_ARGS_Parrot_oo_get_class_str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(name))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_destroy_object_cache __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_init_object_cache __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
