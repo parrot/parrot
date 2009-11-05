@@ -1671,6 +1671,91 @@ IMCC_int_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
     return i;
 }
 
+/*
+
+=item C<static void init_fixedintegerarray_from_string(PARROT_INTERP, PMC *p, STRING *s)>
+
+Initializes the passed FIA from a string representation I<"(el0, el1, ...)">.
+
+=cut
+
+*/
+
+static void
+init_fixedintegerarray_from_string(PARROT_INTERP, PMC *p, STRING *s)
+{
+    INTVAL  n, elem, i, l;
+    char   *src, *chr, *start;
+    int     base;
+
+    if (s->encoding != Parrot_fixed_8_encoding_ptr)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
+            "unhandled string encoding in FixedIntegerArray initialization");
+
+    l = Parrot_str_byte_length(interp, s);
+
+    if (!l)
+        return;
+
+    chr = src = Parrot_str_to_cstring(interp, s);
+
+    /* "()" - no args */
+    if (l <= 2 && *src == '(') {
+        Parrot_str_free_cstring(src);
+        return;
+    }
+
+    /* count commas */
+    n = 0;
+    while (*chr) {
+        if (*chr == ',')
+            n++;
+        chr++;
+    }
+
+    /* presize the array */
+    VTABLE_set_integer_native(interp, p, n + 1);
+
+    /* parse string */
+    chr = src;
+
+    for (i = l, n = 0; i; --i, ++chr) {
+        switch (*chr) {
+            case ' ': continue;
+            case '\t': continue;
+            case '(': continue;
+            case ')': break;
+            case ',':
+                      n++;
+                      break;
+            default:
+                      base = 10;
+                      if (*chr == '0') {
+                          ++chr;
+                          --i;
+                          if (*chr == 'b' || *chr == 'B') {
+                              base = 2;
+                              ++chr;
+                              --i;
+                          }
+                          else if (*chr == 'x' || *chr == 'X') {
+                              base = 16;
+                              ++chr;
+                              --i;
+                          }
+                      }
+                      start = chr;
+                      elem  = strtoul(chr, &chr, base);
+                      --chr;
+                      i -= (chr - start);
+                      VTABLE_set_integer_keyed_int(interp, p, n, elem);
+                      break;
+        }
+    }
+
+    Parrot_str_free_cstring(src);
+
+}
 
 /*
 
@@ -1702,7 +1787,26 @@ make_pmc_const(PARROT_INTERP, ARGMOD(SymReg *r))
     else
         s = Parrot_str_unescape(interp, r->name, 0, NULL);
 
-    p = VTABLE_instantiate_str(interp, _class, s, PObj_constant_FLAG);
+    p  = constant_pmc_new(interp, r->pmc_type);
+
+    switch (r->pmc_type) {
+      case enum_class_Integer:
+        VTABLE_set_integer_native(interp, p, Parrot_str_to_int(interp, s));
+        break;
+      case enum_class_Float:
+        VTABLE_set_number_native(interp, p, Parrot_str_to_num(interp, s));
+        break;
+      case enum_class_String:
+        VTABLE_set_string_native(interp, p, s);
+        break;
+      case enum_class_FixedIntegerArray:
+        init_fixedintegerarray_from_string(interp, p, s);
+        break;
+      default:
+        Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_INVALID_OPERATION,
+            "Can't generate PMC constant for this type.");
+    }
 
     /* append PMC constant */
     r->color = add_const_table_pmc(interp, p);

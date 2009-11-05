@@ -532,9 +532,9 @@ static PMC *
 make_string_pmc(PARROT_INTERP, ARGIN(STRING *string))
 {
     ASSERT_ARGS(make_string_pmc)
-    PMC * const ret = VTABLE_instantiate_str(interp,
-        interp->vtables[enum_class_String]->pmc_class,
-        string, PObj_constant_FLAG);
+    PMC * const ret = constant_pmc_new(interp, enum_class_String);
+    VTABLE_set_string_native(interp, ret, string);
+
     return ret;
 }
 
