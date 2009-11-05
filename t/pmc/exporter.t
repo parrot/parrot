@@ -405,7 +405,8 @@ CODE
 ok 1
 OUT
 
-# RT #46861 test exporting mmd subs
+# TODO: Test exporting mmd subs: TT #1205
+# https://trac.parrot.org/parrot/ticket/1205
 
 # Local Variables:
 #   mode: cperl
