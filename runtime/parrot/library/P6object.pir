@@ -280,6 +280,12 @@ Deprecated; use add_parent(class, parentclass)
 
   end:
 .end
+.sub 'add_parent' :method :multi(_,P6metaclass,_)
+    .param pmc obj
+    .param pmc parentclass
+    $P0 = getattribute obj, 'parrotclass'
+    self.'add_parent'($P0, parentclass)
+.end
 
 
 =item add_method(name, method, [, 'to'=>parrotclass])
