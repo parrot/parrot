@@ -649,10 +649,6 @@ The String PMC implements the following vtable functions.
 
 Initialize a new String PMC.
 
-=item instantiate_str
-
-Create a new String PMC from a Parrot string argument.
-
 =item clone
 
 Clone a String PMC.
