@@ -293,13 +293,12 @@ sub proto {
     # type method(interp, self, parameters...)
     my $ret = $calltype{ $type or "void" }
         . "JO"
-        . join( '', map { $calltype{$_} or "?" } split( /,/, $parameters ) );
+        . join( '',
+            map { $calltype{$_} or die "Unknown signature type '$_'" }
+            split( /,/, $parameters ) );
 
     # RT #43733
     # scan src/call_list.txt if the generated signature is available
-
-    # RT #43735 report errors for "?"
-    # --leo
 
     return $ret;
 }
