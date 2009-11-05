@@ -10,7 +10,6 @@ use Test::More tests =>  9;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::inter::progs');
-use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(
