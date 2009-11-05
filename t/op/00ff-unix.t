@@ -1,12 +1,6 @@
-#!perl
-# Copyright (C) 2001-2005, Parrot Foundation.
+#!parrot
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 1;
 
 =head1 NAME
 
@@ -22,16 +16,24 @@ Tests file formats.
 
 =cut
 
-pasm_output_is( <<'CODE', <<'OUT', "fileformat unix" );
-    print "ok\n"
-    end
+.sub main :main
+    .include 'test_more.pir'
+    plan(1)
+
+    test_fileformat_unix()
+.end
+
+.sub test_fileformat_unix
+    lives_ok( <<'CODE', 'fileformat unix' )
+.sub main
+    print "testing\n"
+.end
 CODE
-ok
-OUT
+.end
 
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 filetype=pir:
