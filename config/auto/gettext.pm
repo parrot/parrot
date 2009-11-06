@@ -50,7 +50,7 @@ sub runstep {
         return 1;
     }
 
-    my $osname = $conf->data->get_p5('OSNAME');
+    my $osname = $conf->data->get('osname');
 
     my $extra_libs = $self->_select_lib( {
         conf            => $conf,
