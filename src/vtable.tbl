@@ -22,7 +22,6 @@ void delprop(STRING* key)
 PMC* getprops()
 
 INTVAL type()
-INTVAL type_keyed(PMC* key)
 
 STRING* name()
 
