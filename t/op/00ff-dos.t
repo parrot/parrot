@@ -21,9 +21,7 @@ Tests file formats.
     plan(2)
 
     test_fileformat_dos()
-    say 'hello!'
     test_fileformat_dos_ctrl_z()
-    say 'goodbye'
 
 .end
 
