@@ -1,6 +1,6 @@
 #!parrot
 # Copyright (C) 2009, Parrot Foundation.
-# $Id: fetch.t 42138 2009-10-27 20:14:56Z chromatic $
+# $Id$
 
 =head1 NAME
 
