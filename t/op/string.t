@@ -19,7 +19,7 @@ Tests Parrot string registers and operations.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(405)
+    plan(411)
 
     set_s_s_sc()
     test_clone()
@@ -1899,25 +1899,103 @@ WHILE:
     is( $S1, "ABCD012YZ", 'upcase' )
     
     upcase $S0
-    is( $S0, "ABCD012YZ", 'upcase' )
+    is( $S0, "ABCD012YZ", 'upcase inplace' )
+
+    push_eh catch1
+    null $S9
+    null $S0
+    upcase $S1, $S0
+    pop_eh
+    goto null1
+catch1:
+    .get_results($P9)
+    $S9 = $P9['message']
+    pop_eh
+null1:
+    is ($S9, "Can't upcase NULL string", 'upcase null')
+
+    push_eh catch2
+    null $S9
+    null $S0
+    upcase $S0
+    pop_eh
+    goto null2
+catch2:
+    .get_results($P9)
+    $S9 = $P9['message']
+    pop_eh
+null2:
+    is ($S9, "Can't upcase NULL string", 'upcase inplace null')
 .end
 
 .sub test_downcase
     set $S0, "ABcd012YZ"
     downcase $S1, $S0
-    is( $S1, "abcd012yz", 'test_downcase' )
+    is( $S1, "abcd012yz", 'downcase' )
     
     downcase $S0
-    is( $S0, "abcd012yz", 'test_downcase' )
+    is( $S0, "abcd012yz", 'downcase inplace' )
+
+    push_eh catch1
+    null $S9
+    null $S0
+    downcase $S1, $S0
+    pop_eh
+    goto null1
+catch1:
+    .get_results($P9)
+    $S9 = $P9['message']
+    pop_eh
+null1:
+    is ($S9, "Can't downcase NULL string", 'downcase null')
+
+    push_eh catch2
+    null $S9
+    null $S0
+    downcase $S0
+    pop_eh
+    goto null2
+catch2:
+    .get_results($P9)
+    $S9 = $P9['message']
+    pop_eh
+null2:
+    is ($S9, "Can't downcase NULL string", 'downcase inplace null')
 .end
 
 .sub test_titlecase
     set $S0, "aBcd012YZ"
     titlecase $S1, $S0
-    is( $S1, "Abcd012yz", 'test_titlecase' )
+    is( $S1, "Abcd012yz", 'titlecase' )
     
     titlecase $S0
-    is( $S0, "Abcd012yz", 'test_titlecase' )
+    is( $S0, "Abcd012yz", 'titlecase inplace' )
+
+    push_eh catch1
+    null $S9
+    null $S0
+    titlecase $S1, $S0
+    pop_eh
+    goto null1
+catch1:
+    .get_results($P9)
+    $S9 = $P9['message']
+    pop_eh
+null1:
+    is ($S9, "Can't titlecase NULL string", 'titlecase null')
+
+    push_eh catch2
+    null $S9
+    null $S0
+    titlecase $S0
+    pop_eh
+    goto null2
+catch2:
+    .get_results($P9)
+    $S9 = $P9['message']
+    pop_eh
+null2:
+    is ($S9, "Can't titlecase NULL string", 'titlecase inplace null')
 .end
 
 .sub three_param_ord_one_character_string_register_i
