@@ -1070,7 +1070,8 @@ $(SRC_DIR)/global$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/global.str \
 $(SRC_DIR)/pmc$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_class.h \
 	$(SRC_DIR)/pmc.str $(SRC_DIR)/pmc/pmc_context.h
 
-$(SRC_DIR)/pmc_freeze$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc_freeze.str
+$(SRC_DIR)/pmc_freeze$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc_freeze.str \
+	$(SRC_DIR)/pmc/pmc_context.h
 
 $(SRC_DIR)/hash$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_key.h
 
