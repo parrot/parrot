@@ -44,7 +44,7 @@ sub runstep {
         return 1;
     }
 
-    if ($conf->data->get_p5('OSNAME') eq 'MSWin32'
+    if ($conf->data->get('osname') eq 'MSWin32'
      || $conf->data->get('i_pthread') eq 'define') {
         $conf->data->set( HAS_THREADS => 1 );
         $self->set_result('yes');

@@ -437,7 +437,7 @@ sub runstep {
 
     my @include_paths_win32 = grep /\S/ => split /;/ => ($ENV{INCLUDE} || '');
 
-    my $osname = $conf->data->get_p5('OSNAME');
+    my $osname = $conf->data->get('osname');
     if (scalar @include_paths_win32 == 0 && $osname =~ /mswin32/i) {
         my $cc = $conf->data->get('cc');
         my $path = dirname(dirname(which($cc))) . '\include';
