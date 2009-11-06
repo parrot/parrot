@@ -26,7 +26,7 @@ my $files = `ack -fa . | grep '\\.c\$'`;
 
 my %deps;
 
-foreach my $file (split /\n/, $files) {
+foreach my $file (sort split /\n/, $files) {
     open my $fh, '<', $file;
     my $guts;
     {
