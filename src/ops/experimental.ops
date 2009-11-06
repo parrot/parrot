@@ -151,6 +151,8 @@ inline op fetch(out PMC, in PMC, in STR, in PMC) :base_core {
     }
 }
 
+=over 4
+
 =item B<vivify>(out PMC, in PMC, in PMC, in PMC)
 
 Fetches a value from $2, keyed by $3 into $1.  If the resulting PMC is PMCNULL,
