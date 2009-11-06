@@ -5,15 +5,13 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  30;
+use Test::More tests =>  32;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::gettext');
-use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
+use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(
-    test_step_thru_runstep
-    rerun_defaults_for_testing
     test_step_constructor_and_description
 );
 use IO::CaptureOutput qw( capture );
@@ -27,7 +25,8 @@ my ($args, $step_list_ref) = process_options(
     }
 );
 
-my $conf = Parrot::Configure->new;
+my $conf = Parrot::Configure::Step::Test->new;
+$conf->include_config_results( $args );
 
 my $pkg = q{auto::gettext};
 
@@ -160,21 +159,29 @@ $step = test_step_constructor_and_description($conf);
 
 $verbose = undef;
 $conf->data->set( ccflags => q{} );
-ok(auto::gettext::_handle_gettext($conf, $verbose),
+$conf->data->set( libs    => q{} );
+my $libs = q{foo bar baz};
+ok(auto::gettext::_handle_gettext($conf, $verbose, $libs),
     "_handle_gettext() returned true value");
 like($conf->data->get( 'ccflags' ), qr/-DHAS_GETTEXT/,
     "HAS_GETTEXT was added to 'ccflags'");
+like($conf->data->get( 'libs' ), qr/$libs/,
+    "Values added to 'libs' as expected");
 
+$conf->data->set( ccflags => q{} );
+$conf->data->set( libs    => q{} );
 {
     my ($stdout, $rv);
     $verbose = 1;
     capture(
-        sub { $rv = auto::gettext::_handle_gettext($conf, $verbose); },
+        sub { $rv = auto::gettext::_handle_gettext($conf, $verbose, $libs); },
         \$stdout,
     );
     ok($rv, "_handle_gettext() returned true value");
     like($conf->data->get( 'ccflags' ), qr/-DHAS_GETTEXT/,
         "HAS_GETTEXT was added to 'ccflags'");
+    like($conf->data->get( 'libs' ), qr/$libs/,
+        "Values added to 'libs' as expected");
     like($stdout,
         qr/ccflags:\s.*-DHAS_GETTEXT/,
         "Got expected verbose output"

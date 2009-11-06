@@ -10,10 +10,9 @@ use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::format');
 use Parrot::BuildUtil;
-use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
+use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(
-    test_step_thru_runstep
     test_step_constructor_and_description
 );
 
@@ -24,7 +23,8 @@ my ($args, $step_list_ref) = process_options( {
     mode            => q{configure},
 } );
 
-my $conf = Parrot::Configure->new();
+my $conf = Parrot::Configure::Step::Test->new;
+$conf->include_config_results( $args );
 
 my ($task, $step_name, $step, $ret);
 my $pkg = q{auto::format};
