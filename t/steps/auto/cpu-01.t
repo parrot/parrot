@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan); # tests =>  22;
+use Test::More tests =>  14;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::cpu');
@@ -26,12 +26,13 @@ my ($args, $step_list_ref) = process_options( {
 my $conf = Parrot::Configure::Step::Test->new;
 $conf->include_config_results( $args );
 
+my ($pkg, $step);
 my $serialized = $conf->pcfreeze();
 
-my $pkg = q{auto::cpu};
+$pkg = q{auto::cpu};
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
-my $step = test_step_constructor_and_description($conf);
+$step = test_step_constructor_and_description($conf);
 {
     $conf->data->set('cpuarch' => 'foobar');
     my ($ret, $stdout);
@@ -48,6 +49,7 @@ my $step = test_step_constructor_and_description($conf);
 }
 
 $conf->replenish($serialized);
+$conf->options->set( 'verbose' => undef );
 
 ########### mock cpuarch ###########
 
