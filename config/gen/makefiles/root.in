@@ -155,7 +155,8 @@ GEN_MAKEFILES := \
     compilers/tge/Makefile \
     editor/Makefile \
     ext/Makefile \
-    src/dynoplibs/Makefile
+    src/dynoplibs/Makefile \
+    src/dynpmc/Makefile
 
 GEN_CONFIGS := \
     $(INC_DIR)/config.h \
