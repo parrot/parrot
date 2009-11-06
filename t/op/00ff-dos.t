@@ -1,12 +1,6 @@
-#!perl
-# Copyright (C) 2001-2005, Parrot Foundation.
+#!parrot
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 2;
 
 =head1 NAME
 
@@ -22,19 +16,36 @@ Tests file formats.
 
 =cut
 
-my $code = qq(print "ok\\n"\r\nend\r\n);
-pasm_output_is( $code, <<'OUT', "fileformat dos" );
-ok
-OUT
+.sub main :main
+    .include 'test_more.pir'
+    plan(2)
 
-$code = qq(print "ok\\n"\r\nend\r\n\cZ\r\n);
-pasm_output_is( $code, <<'OUT', "fileformat dos w ctrl-z" );
-ok
-OUT
+    test_fileformat_dos()
+    say 'hello!'
+    test_fileformat_dos_ctrl_z()
+    say 'goodbye'
+
+.end
+
+.sub test_fileformat_dos
+    lives_ok( <<"CODE", 'fileformat dos')
+.sub main
+    $I0 = 42\r\n
+.end
+CODE
+.end
+
+.sub test_fileformat_dos_ctrl_z
+    lives_ok( <<"CODE", 'fileformat dos w ctrl-z')
+.sub main
+    $I0 = 42\r\n\cZ
+.end
+CODE
+.end
 
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 filetype=pir:
