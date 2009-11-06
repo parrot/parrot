@@ -102,7 +102,7 @@ src/pmc/pmc_$pmc.h: src/pmc/$pmc.c
 
 src/pmc/$pmc\$(O): src/pmc/pmc_${pmc}.h src/pmc/$pmc.str \$(NONGEN_HEADERS) \\
     $parent_headers $include_headers src/pmc/pmc_continuation.h \\
-    src/pmc/pmc_context.h src/pmc/pmc_fixedintegerarray.h 
+    src/pmc/pmc_context.h src/pmc/pmc_fixedintegerarray.h
 
 END
     }

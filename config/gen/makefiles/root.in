@@ -1139,7 +1139,7 @@ $(SRC_DIR)/thread$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h \
 	$(SRC_DIR)/pmc/pmc_parrotinterpreter.h
 
 $(SRC_DIR)/extend$(O) : $(GENERAL_H_FILES) $(INC_DIR)/extend.h \
-	$(SRC_DIR)/pmc/pmc_sub.h $(SRC_DIR)/pmc/pmc_context.h 
+	$(SRC_DIR)/pmc/pmc_sub.h $(SRC_DIR)/pmc/pmc_context.h
 
 $(SRC_DIR)/runcore/main$(O) : $(SRC_DIR)/runcore/main.c \
 	$(SRC_DIR)/runcore/main.str $(GENERAL_H_FILES) \
