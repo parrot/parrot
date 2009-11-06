@@ -1,13 +1,6 @@
-#! perl
+#! parrot
 # Copyright (C) 2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-
-use Test::More;
-use Parrot::Test tests => 32;
 
 =head1 NAME
 
@@ -23,630 +16,483 @@ Tests for mathematical operations with Inf and Nan.
 
 =cut
 
-pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - basic arith" );
-.sub 'test' :main
+.sub main :main
+    .include 'test_more.pir'
+    plan(105)
+
+    test_basic_arith()
+    test_exp()
+    test_sqrt()
+    test_sin()
+    test_sinh()
+    test_asin()
+    test_cos()
+    test_cosh()
+    test_acos()
+    test_tan()
+    test_tanh()
+    test_atan()
+    test_cot()
+    test_coth()
+    test_acot()
+    test_sec()
+    test_sech()
+    test_asec()
+    test_ln()
+    test_log10()
+    test_log2()
+    test_neg()
+    test_pow()
+    test_mix_nan_inf()
+    test_rounding_n()
+    test_rounding_i()
+    test_nan_complex()
+    test_fdiv_integer_pmc_nan()
+    test_fdiv_float_pmc_nan()
+    test_fdiv_float_integer_pmc_nan()
+    test_cmod_float_integer_pmc_nan()
+    test_mod_float_integer_pmc_nan()
+
+.end
+
+.sub test_basic_arith
     $N0 = 'Inf'
-    say $N0
+    is($N0, 'Inf', 'basic arithmetic: =')
     $N0 -= $N0
-    say $N0
+    is($N0, 'NaN', '... -=')
     $N0 *= -1
-    say $N0
+    is($N0, 'NaN', '... *= -1')
     $N0 *= 0
-    say $N0
+    is($N0, 'NaN', '... *= 0')
     $N0 += 5
-    say $N0
+    is($N0, 'NaN', '... += 5')
     $N0 -= 42
-    say $N0
+    is($N0, 'NaN', '... -= 42')
     inc $N0
-    say $N0
+    is($N0, 'NaN', '... inc')
     dec $N0
-    say $N0
+    is($N0, 'NaN', '... dec')
     $N2 = abs $N0
-    say $N2
+    is($N2, 'NaN', '... abs NaN')
     $N1 = 'Inf'
     $N3 = abs $N1
-    say $N3
+    is($N3, 'Inf', '... abs Inf')
     $N1 = '-Inf'
     $N3 = abs $N1
-    say $N3
+    is($N3, 'Inf', '... abs -Inf')
 .end
-CODE
-Inf
-NaN
-NaN
-NaN
-NaN
-NaN
-NaN
-NaN
-NaN
-Inf
-Inf
-OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - exp" );
-.sub 'test' :main
+
+.sub test_exp
     $N0 = 'Inf'
     $N1 = exp $N0
-    say $N1
+    is($N1, 'Inf', 'exp: exp Inf')
     $N0 = '-Inf'
     $N1 = exp $N0
-    say $N1
+    is($N1, 0, '... exp -Inf')
     $N0 = 'NaN'
     $N1 = exp $N0
-    say $N1
+    is($N1, 'NaN', '... exp NaN')
 .end
-CODE
-Inf
-0
-NaN
-OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - sqrt" );
-.sub 'test' :main
+.sub test_sqrt
     $N0 = 'Inf'
     $N1 =  $N0
-    say $N1
+    is($N1, 'Inf', 'sqrt: assignment')
     $N0 = '-Inf'
     $N1 = sqrt $N0
-    say $N1
+    is($N1, 'NaN', '... sqrt -Inf')
     $N0 = 'NaN'
     $N1 = sqrt $N0
-    say $N1
+    is($N1, 'NaN', '... sqrt NaN')
     $N0 = -1
     $N1 = sqrt $N0
-    say $N1
+    is($N1, 'NaN', '... sqrt -1')
 .end
-CODE
-Inf
-NaN
-NaN
-NaN
-OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - sin" );
-.sub 'test' :main
+.sub test_sin
     $N0 = 'Inf'
     $N1 = sin $N0
-    say $N1
+    is($N1, 'NaN', 'sin: sin Inf')
     $N0 = '-Inf'
     $N1 = sin $N0
-    say $N1
+    is($N1, 'NaN', '... sin -Inf')
     $N0 = 'NaN'
     $N1 = sin $N0
-    say $N1
+    is($N1, 'NaN', '... sin NaN')
 .end
-CODE
-NaN
-NaN
-NaN
-OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - sinh" );
-.sub 'test' :main
+.sub test_sinh 
     $N0 = 'Inf'
     $N1 = sinh $N0
-    say $N1
+    is($N1, 'Inf', 'sinh: sinh Inf')
     $N0 = '-Inf'
     $N1 = sinh $N0
-    say $N1
+    is($N1, '-Inf', '... sinh -Inf')
     $N0 = 'NaN'
     $N1 = sinh $N0
-    say $N1
+    is($N1, 'NaN', '... sinh NaN')
 .end
-CODE
-Inf
--Inf
-NaN
-OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - asin" );
-.sub 'test' :main
+.sub test_asin 
     $N0 = 'Inf'
     $N1 = asin $N0
-    say $N1
+    is($N1, 'NaN', 'asin: asin Inf')
     $N0 = '-Inf'
     $N1 = asin $N0
-    say $N1
+    is($N1, 'NaN', '... asin -Inf')
     $N0 = 'NaN'
     $N1 = asin $N0
-    say $N1
+    is($N1, 'NaN', '... asin NaN')
     $N0 = '-2'
     $N1 = asin $N0
-    say $N1
+    is($N1, 'NaN', '... asin -2')
     $N0 = '2'
     $N1 = asin $N0
-    say $N1
+    is($N1, 'NaN', '... asin 2')
 .end
-CODE
-NaN
-NaN
-NaN
-NaN
-NaN
-OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - cos" );
-.sub 'test' :main
+.sub test_cos
     $N0 = 'Inf'
     $N1 = cos $N0
-    say $N1
+    is($N1, 'NaN', 'cos: cos Inf')
     $N0 = '-Inf'
     $N1 = cos $N0
-    say $N1
+    is($N1, 'NaN', '... cos -Inf')
     $N0 = 'NaN'
     $N1 = cos $N0
-    say $N1
+    is($N1, 'NaN', '... cos NaN')
 .end
-CODE
-NaN
-NaN
-NaN
-OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - cosh" );
-.sub 'test' :main
+.sub test_cosh
     $N0 = 'Inf'
     $N1 = cosh $N0
-    say $N1
+    is($N1, 'Inf', 'cosh: cosh Inf')
     $N0 = '-Inf'
     $N1 = cosh $N0
-    say $N1
+    is($N1, 'Inf', '... cosh -Inf')
     $N0 = 'NaN'
     $N1 = cosh $N0
-    say $N1
+    is($N1, 'NaN', '... cosh NaN')
 .end
-CODE
-Inf
-Inf
-NaN
-OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - acos" );
-.sub 'test' :main
+.sub test_acos
     $N0 = 'Inf'
     $N1 = acos $N0
-    say $N1
+    is($N1, 'NaN', 'acos: acos Inf')
     $N0 = '-Inf'
     $N1 = acos $N0
-    say $N1
+    is($N1, 'NaN', '... acos -Inf')
     $N0 = 'NaN'
     $N1 = acos $N0
-    say $N1
+    is($N1, 'NaN', '... acos NaN')
     $N0 = '-2'
     $N1 = acos $N0
-    say $N1
+    is($N1, 'NaN', '... acos -2')
     $N0 = '2'
     $N1 = acos $N0
-    say $N1
+    is($N1, 'NaN', '... acos 2')
 .end
-CODE
-NaN
-NaN
-NaN
-NaN
-NaN
-OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - tan" );
-.sub 'test' :main
+.sub test_tan
     $N0 = 'Inf'
     $N1 = tan $N0
-    say $N1
+    is($N1, 'NaN', 'tan: tan Inf')
     $N0 = '-Inf'
     $N1 = tan $N0
-    say $N1
+    is($N1, 'NaN', '... tan -Inf')
     $N0 = 'NaN'
     $N1 = tan $N0
-    say $N1
+    is($N1, 'NaN', '... tan NaN')
 .end
-CODE
-NaN
-NaN
-NaN
-OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - tanh" );
-.sub 'test' :main
+.sub test_tanh
     $N0 = 'Inf'
     $N1 = tanh $N0
-    say $N1
+    is($N1, 1, 'tanh: tanh Inf')
     $N0 = '-Inf'
     $N1 = tanh $N0
-    say $N1
+    is($N1, -1, '... tanh -Inf')
     $N0 = 'NaN'
     $N1 = tanh $N0
-    say $N1
+    is($N1, 'NaN', '... tanh NaN')
 .end
-CODE
-1
--1
-NaN
-OUTPUT
 
-pir_output_like( <<'CODE',qr/^1.5707963.*^-1.5707963.*^NaN/ms,"Inf/NaN - atan" );
-.sub 'test' :main
+.sub test_atan 
     $N0 = 'Inf'
     $N1 = atan $N0
-    say $N1
+    like($N1,'1\.5707963.*', 'atan: atan Inf')
     $N0 = '-Inf'
     $N1 = atan $N0
-    say $N1
+    like($N1, '\-1\.5707963.*', '... atan -Inf')
     $N0 = 'NaN'
     $N1 = atan $N0
-    say $N1
+    is($N1, 'NaN', '... atan NaN')
 .end
-CODE
 
-{
-local $TODO = 'cot/coth/acot not implemented for real numbers';
-pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - cot" );
-.sub 'test' :main
+.sub test_cot
     $N0 = 'Inf'
-    $N1 = cot $N0
-    say $N1
+    #$N1 = cot $N0
+    #is($N1, 'NaN', 'cot: cot Inf')
+    todo(0, 'cot Inf', 'cot/coth/acot not implemented for real numbers')
     $N0 = '-Inf'
-    $N1 = cot $N0
-    say $N1
+    #$N1 = cot $N0
+    #is($N1, 'NaN', '... cot -Inf')
+    todo(0, 'cot -Inf', 'cot/coth/acot not implemented for real numbers')
     $N0 = 'NaN'
-    $N1 = cot $N0
-    say $N1
+    #$N1 = cot $N0
+    #is($N1, 'NaN', '... cot NaN')
+    todo(0, 'cot NaN', 'cot/coth/acot not implemented for real numbers')
 .end
-CODE
-NaN
-NaN
-NaN
-OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - coth" );
-.sub 'test' :main
+.sub test_coth
     $N0 = 'Inf'
-    $N1 = coth $N0
-    say $N1
+    #$N1 = coth $N0
+    #is($N1, 1, 'coth: coth Inf')
+    todo(0, 'coth Inf', 'cot/coth/acot not implemented for real numbers')
     $N0 = '-Inf'
-    $N1 = coth $N0
-    say $N1
+    #$N1 = coth $N0
+    #is($N1, -1, '... coth -Inf')
+    todo(0, 'coth -Inf', 'cot/coth/acot not implemented for real numbers')
     $N0 = 'NaN'
-    $N1 = coth $N0
-    say $N1
+    #$N1 = coth $N0
+    #is($N1, 'NaN', '... coth NaN')
+    todo(0, 'coth NaN', 'cot/coth/acot not implemented for real numbers')
 .end
-CODE
-1
--1
-NaN
-OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - acot" );
-.sub 'test' :main
+.sub test_acot 
     $N0 = 'Inf'
-    $N1 = acot $N0
-    say $N1
+    #$N1 = acot $N0
+    #is($N1, 'NaN', 'acot: acot Inf')
+    todo(0, 'acot Inf', 'cot/coth/acot not implemented for real numbers')
     $N0 = '-Inf'
-    $N1 = acot $N0
-    say $N1
+    #$N1 = acot $N0
+    #is($N1, 'NaN', '... acot -Inf')
+    todo(0, 'acot -Inf', 'cot/coth/acot not implemented for real numbers')
     $N0 = 'NaN'
-    $N1 = acot $N0
-    say $N1
+    #$N1 = acot $N0
+    #is($N1, 'NaN', '... acot NaN')
+    todo(0, 'acot NaN', 'cot/coth/acot not implemented for real numbers')
     $N0 = '-2'
-    $N1 = acot $N0
-    say $N1
+    #$N1 = acot $N0
+    #is($N1, 'NaN', '... acot -2')
+    todo(0, 'acot -2', 'cot/coth/acot not implemented for real numbers')
     $N0 = '2'
-    $N1 = acot $N0
-    say $N1
+    #$N1 = acot $N0
+    #is($N1, 'NaN', '... acot 2')
+    todo(0, 'acot 2', 'cot/coth/acot not implemented for real numbers')
 .end
-CODE
-NaN
-NaN
-NaN
-NaN
-NaN
-OUTPUT
-}
 
-pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - sec" );
-.sub 'test' :main
+.sub test_sec
     $N0 = 'Inf'
     $N1 = sec $N0
-    say $N1
+    is($N1, 'NaN', 'sec: sec Inf')
     $N0 = '-Inf'
     $N1 = sec $N0
-    say $N1
+    is($N1, 'NaN', '... sec -Inf')
     $N0 = 'NaN'
     $N1 = sec $N0
-    say $N1
+    is($N1, 'NaN', '... sec NaN')
 .end
-CODE
-NaN
-NaN
-NaN
-OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - sech" );
-.sub 'test' :main
+.sub test_sech
     $N0 = 'Inf'
     $N1 = sech $N0
-    say $N1
+    is($N1, 0, 'sech: sech Inf')
     $N0 = '-Inf'
     $N1 = sech $N0
-    say $N1
+    is($N1, 0, '... sech -Inf')
     $N0 = 'NaN'
     $N1 = sech $N0
-    say $N1
+    is($N1, 'NaN', '... sech NaN')
 .end
-CODE
-0
-0
-NaN
-OUTPUT
 
-pir_output_like( <<'CODE',qr/^1.5707963.*^1.5707963.*^NaN/ms,"Inf/NaN - asec" );
-.sub 'test' :main
+.sub test_asec
     $N0 = 'Inf'
     $N1 = asec $N0
-    say $N1
+    like($N1, '1\.5707963.*', 'asec: asec Inf')
     $N0 = '-Inf'
     $N1 = asec $N0
-    say $N1
+    like($N1, '1\.5707963.*', '... asec -Inf')
     $N0 = 'NaN'
     $N1 = asec $N0
-    say $N1
+    is($N1, 'NaN', 'asec NaN')
 .end
-CODE
 
-
-pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - ln" );
-.sub 'test' :main
+.sub test_ln
     $N0 = 'Inf'
     $N1 = ln $N0
-    say $N1
+    is($N1, 'Inf', 'ln: ln Inf')
     $N0 = '-Inf'
     $N1 = ln $N0
-    say $N1
+    is($N1, 'NaN', '... ln Inf')
     $N0 = 'NaN'
     $N1 = ln $N0
-    say $N1
+    is($N1, 'NaN', '... ln NaN')
 .end
-CODE
-Inf
-NaN
-NaN
-OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - log10" );
-.sub 'test' :main
+.sub test_log10
     $N0 = 'Inf'
     $N1 = log10 $N0
-    say $N1
+    is($N1, 'Inf', 'log10: log10 Inf')
     $N0 = '-Inf'
     $N1 = log10 $N0
-    say $N1
+    is($N1, 'NaN', '... log10 -Inf')
     $N0 = 'NaN'
     $N1 = log10 $N0
-    say $N1
+    is($N1, 'NaN', '... log10 NaN')
 .end
-CODE
-Inf
-NaN
-NaN
-OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - log2" );
-.sub 'test' :main
+.sub test_log2
     $N0 = 'Inf'
     $N1 = log2 $N0
-    say $N1
+    is($N1, 'Inf', 'log2: log2 Inf')
     $N0 = '-Inf'
     $N1 = log2 $N0
-    say $N1
+    is($N1, 'NaN', '... log2 -Inf')
     $N0 = 'NaN'
     $N1 = log2 $N0
-    say $N1
+    is($N1, 'NaN', '... log2 -Inf')
 .end
-CODE
-Inf
-NaN
-NaN
-OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - neg" );
-.sub 'test' :main
+.sub test_neg
     $N0 = 'Inf'
     $N1 = neg $N0
-    say $N1
+    is($N1, '-Inf', 'negative: neg Inf')
     $N0 = '-Inf'
     $N1 = neg $N0
-    say $N1
+    is($N1, 'Inf', '... neg -Inf')
     $N0 = 'NaN'
     $N1 = neg $N0
-    say $N1
+    is($N1, 'NaN', '... neg NaN')
 .end
-CODE
--Inf
-Inf
-NaN
-OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - pow" );
-.sub 'test' :main
+.sub test_pow
     $N0 = 'Inf'
     pow $N1, $N0, 2
-    say $N1
+    is($N1, 'Inf', 'pow: Inf ^ 2')
     pow $N1, 2, $N0
-    say $N1
+    is($N1, 'Inf', '...: 2 ^ Inf')
     $N0 = 'NaN'
     pow $N1, $N0, 2
-    say $N1
+    is($N1, 'NaN', '...: NaN ^ 2')
     pow $N1, 2, $N0
-    say $N1
+    is($N1, 'NaN', '...: 2 ^ NaN')
 .end
-CODE
-Inf
-Inf
-NaN
-NaN
-OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "Mixing NaN and Inf should give NaN" );
-.sub 'test' :main
+.sub test_mix_nan_inf
     $N0 = 'NaN'
     $N1 = 'Inf'
     $N0 *= $N1
-    say $N0
+    is($N0, 'NaN', 'mixing NaN and Inf: NaN * Inf')
     $N0 /= $N1
-    say $N0
+    is($N0, 'NaN', '... NaN / Inf')
     $N0 -= $N1
-    say $N0
+    is($N0, 'NaN', '... NaN - Inf')
     $N0 += $N1
-    say $N0
+    is($N0, 'NaN', '... NaN + Inf')
 .end
-CODE
-NaN
-NaN
-NaN
-NaN
-OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - rounding" );
-.sub 'test' :main
+.sub test_rounding_n
     $N0 = 'NaN'
     $N1 = floor $N0
-    say $N1
+    is($N1, 'NaN', 'rounding n: floor NaN') 
     $N2 = ceil $N0
-    say $N2
+    is($N2, 'NaN', '... ceil NaN')
     $N0 = 'Inf'
     $N1 = floor $N0
-    say $N1
+    is($N1, 'Inf', '... floor Inf')
     $N2 = ceil $N0
-    say $N2
+    is($N2, 'Inf', '... ceil Inf')
     $N0 = '-Inf'
     $N1 = floor $N0
-    say $N1
+    is($N1, '-Inf', '... floor -Inf')
     $N2 = ceil $N0
-    say $N2
+    is($N2, '-Inf', '... ceil -Inf')
 .end
-CODE
-NaN
-NaN
-Inf
-Inf
--Inf
--Inf
-OUTPUT
 
-TODO: {
+#pir_output_is(<<'CODE',<<OUTPUT, "TT #370 Rounding inf/nan");
+.sub test_rounding_i
+    $N0 = 'Inf'
+    $I0 = floor $N0
+    #is($I0, 'Inf', 'floor Inf')
+    todo(0, 'floor Inf', 'rounding nan/inf gives something like -2147483648')
+    $N0 = 'NaN'
+    $I0 = floor $N0
+    #is($I0, 'NaN', 'floor Inf')
+    todo(0, 'floor NaN', 'rounding nan/inf gives something like -2147483648')
+    $N0 = 'Inf'
+    $I0 = ceil $N0
+    #is($I0, 'Inf', 'floor Inf')
+    todo(0, 'ceil Inf', 'rounding nan/inf gives something like -2147483648')
+    $N0 = 'NaN'
+    $I0 = ceil $N0
+    #is($I0, 'NaN', 'floor Inf')
+    todo(0, 'ceil NaN', 'rounding nan/inf gives something like -2147483648')
+.end
 
-local $TODO = 'rounding nan/inf gives something like -2147483648';
-pir_output_is(<<'CODE',<<OUTPUT, "TT #370 Rounding inf/nan");
-.sub 'main'
-        $N0 = 'Inf'
-        $I0 = floor $N0
-        say $I0
-        $N0 = 'NaN'
-        $I0 = floor $N0
-        say $I0
-        $N0 = 'Inf'
-        $I0 = ceil $N0
-        say $I0
-        $N0 = 'NaN'
-        $I0 = ceil $N0
-        say $I0
-    .end
-CODE
-Inf
-NaN
-Inf
-NaN
-OUTPUT
-
-}
-
-TODO: {
-local $TODO = '1+i + NaN should be NaN';
-pir_output_is(<<'CODE',<<OUTPUT,"Adding NaN to a Complex");
-.sub main
+.sub test_nan_complex
     $P1 = new ["Complex"]
     $N0 = 'NaN'
     set $P1, "1 + i"
     $P1 += $N0
-    say $P1
+    #is($P1, 'NaN', '1+i + NaN')
+    todo(0, '1+i + NaN should be NaN')
 .end
-CODE
-NaN
-OUTPUT
-}
 
-{
-local $TODO = 'fdiv/mod/cmod do not play nicely with PMCs and NaN';
-pir_output_is(<<'CODE',<<OUTPUT,'fdiv with Integer PMCs and NaN');
-.sub main
+.sub test_fdiv_integer_pmc_nan
     $P1 = new "Integer"
     $P2 = new "Integer"
     $P2 = 1
     $N0 = 'NaN'
     fdiv $P1, $P2, $N0
-    say $P1
+    #is($P1, 'NaN', 'fdiv with Integer PMCs and NaN')
+    todo(0, 'fdiv with Integer PMCs and NaN', 'fdiv/mod/cmod do not play nicely with PMCs and NaN')
 .end
-CODE
-NaN
-OUTPUT
 
-pir_output_is(<<'CODE',<<OUTPUT,'fdiv with Float PMCs and NaN');
-.sub main
+.sub test_fdiv_float_pmc_nan
     $P1 = new 'Float'
     $P2 = new 'Float'
     $P2 = 1
     $N0 = 'NaN'
     fdiv $P1, $P2, $N0
-    say $P1
+    #is($P1, 'NaN','fdiv with Float PMCs and NaN')
+    todo(0,'fdiv with Float PMCs and NaN', 'fdiv/mod/cmod do not play nicely with PMCs and NaN')
 .end
-CODE
-NaN
-OUTPUT
 
-pir_output_is(<<'CODE',<<OUTPUT,'fdiv with Float and Integer PMCs and NaN');
-.sub main
+.sub test_fdiv_float_integer_pmc_nan
     $P1 = new 'Float'
     $P2 = new 'Integer'
     $P2 = 1
     $N0 = 'NaN'
     fdiv $P1, $P2, $N0
-    say $P1
+    #is($P1, 'NaN', 'fdiv with Float and Integer PMCs and NaN')
+    todo(0, 'fdiv with Float and Integer PMCs and NaN', 'fdiv/mod/cmod do not play nicely with PMCs and NaN')    
 .end
-CODE
-NaN
-OUTPUT
 
-pir_output_is(<<'CODE',<<OUTPUT,'cmod with Float and Integer PMCs and NaN');
-.sub main
+.sub test_cmod_float_integer_pmc_nan
     $P1 = new 'Float'
     $P2 = new 'Integer'
     $P2 = 1
     $N0 = 'NaN'
     cmod $P1, $P2, $N0
-    say $P1
+    #is($P1, 'NaN', 'cmod with Float and Integer PMCs and NaN')
+    todo(0, 'cmod with Float and Integer PMCs and NaN', 'fdiv/mod/cmod do not play nicely with PMCs and NaN')
 .end
-CODE
-NaN
-OUTPUT
 
-pir_output_is(<<'CODE',<<OUTPUT,'mod with Float and Integer PMCs and NaN');
-.sub main
+.sub test_mod_float_integer_pmc_nan
     $P1 = new 'Float'
     $P2 = new 'Integer'
     $P2 = 1
     $N0 = 'NaN'
     mod $P1, $P2, $N0
-    say $P1
+    #is($P1, 'NaN', 'mod with Float and Integer PMCs and NaN')
+    todo(0, 'mod with Float and Integer PMCs and NaN', 'fdiv/mod/cmod do not play nicely with PMCs and NaN')
 .end
-CODE
-NaN
-OUTPUT
-}
 
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
-
+# vim: expandtab shiftwidth=4 filetype=pir:
