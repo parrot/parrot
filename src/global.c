@@ -662,7 +662,7 @@ Parrot_find_global_op(PARROT_INTERP, ARGIN(PMC *ns),
 
 =item C<PMC * Parrot_find_name_op(PARROT_INTERP, STRING *name, void *next)>
 
-RT #46171 - THIS IS BROKEN - it doesn't walk up the scopes yet
+TT#1223 - THIS IS BROKEN - it doesn't walk up the scopes yet
 
 Find the given C<name> in lexicals, then the current namespace, then the HLL
 root namespace, and finally Parrot builtins.  If the name isn't found
