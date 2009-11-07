@@ -158,8 +158,8 @@ Invokes the first subroutine in the eval code.
          * These globals still exist, calling them will segfault
          * as the segment is destroyed now.
          *
-         * RT#46683 walk the fixups for this segment, locate globals
-         *      and nullify the Sub PMC.
+         * TT # 1230:
+         * Walk the fixups, locate globals and nullify the Sub PMC
          * This probably needs a pointer into the globals.
          *
          * OTOH - if the global exists - this eval pmc ought
