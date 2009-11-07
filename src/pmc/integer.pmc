@@ -1008,7 +1008,7 @@ Returns SELF to the C<value>th power in C<dest>.
 
 Raises SELF to the C<value>th power.
 
-RT #46631 Complex and BigInt rhs.
+TODO:  RT #46631 Complex and BigInt rhs.
 
 =cut
 
