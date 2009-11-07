@@ -179,7 +179,7 @@ Returns the number of elements in the array as a Parrot string. (??? -leo)
 =item C<STRING *get_repr()>
 
 Returns a string representation of the array contents.
-RT #46673 implement freeze/thaw and use that instead.
+TT #1229: implement freeze/thaw and use that instead.
 
 =cut
 
