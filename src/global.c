@@ -478,7 +478,7 @@ Parrot_set_global(PARROT_INTERP, ARGIN_NULLOK(PMC *ns),
 Search the namespace PMC C<ns> for an object with name C<globalname>.
 Return the object, or NULL if not found.
 
-RT #46161 - For now this function prefers non-namespaces, it will eventually
+TT#1222 - For now this function prefers non-namespaces, it will eventually
 entirely use the untyped interface.
 
 =cut
