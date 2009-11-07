@@ -919,83 +919,82 @@ io_thread(SHIM(void *data))
         const int retval = select(n_highest, &rfds, &wfds, NULL, NULL);
 
         switch (retval) {
-            case -1:
-                if (errno == EINTR) {
-                    edebug((stderr, "select EINTR\n"));
-                    if (sig_int) {
-                        edebug((stderr, "int arrived\n"));
-                        sig_int = 0;
-                        /*
-                         * signal the event thread
-                         */
-                        schedule_signal_event(SIGINT);
-                    }
-                    if (sig_hup) {
-                        edebug((stderr, "int arrived\n"));
-                        sig_hup = 0;
-                        /*
-                         * signal the event thread
-                         */
-                        schedule_signal_event(SIGHUP);
-                    }
-
+          case -1:
+            if (errno == EINTR) {
+                edebug((stderr, "select EINTR\n"));
+                if (sig_int) {
+                    edebug((stderr, "int arrived\n"));
+                    sig_int = 0;
+                    /*
+                     * signal the event thread
+                     */
+                    schedule_signal_event(SIGINT);
                 }
-                break;
-            case 0:     /* timeout - can't happen */
-                break;
-            default:
-                edebug((stderr, "IO ready\n"));
-                for (i = 0; i < n_highest; ++i) {
-                    if (FD_ISSET(i, &rfds)) {
-                        if (i == PIPE_READ_FD) {
-                            io_thread_msg buf;
-                            /*
-                             * a command arrived
-                             */
-                            edebug((stderr, "msg arrived\n"));
-                            if (read(PIPE_READ_FD, &buf, sizeof (buf)) != sizeof (buf))
-                                exit_fatal(1,
-                                        "read error from msg pipe");
-                            switch (buf.command) {
-                                case IO_THR_MSG_TERMINATE:
-                                    running = 0;
+                if (sig_hup) {
+                    edebug((stderr, "int arrived\n"));
+                    sig_hup = 0;
+                    /*
+                     * signal the event thread
+                     */
+                    schedule_signal_event(SIGHUP);
+                }
+
+            }
+            break;
+          case 0:     /* timeout - can't happen */
+            break;
+          default:
+            edebug((stderr, "IO ready\n"));
+            for (i = 0; i < n_highest; ++i) {
+                if (FD_ISSET(i, &rfds)) {
+                    if (i == PIPE_READ_FD) {
+                        io_thread_msg buf;
+                        /*
+                         * a command arrived
+                         */
+                        edebug((stderr, "msg arrived\n"));
+                        if (read(PIPE_READ_FD, &buf, sizeof (buf)) != sizeof (buf))
+                            exit_fatal(1,
+                                    "read error from msg pipe");
+                        switch (buf.command) {
+                          case IO_THR_MSG_TERMINATE:
+                            running = 0;
+                            break;
+                          case IO_THR_MSG_ADD_SELECT_RD:
+                            {
+                                PMC * const pio = buf.ev->u.io_event.pio;
+                                const int fd = Parrot_io_getfd(buf.ev->interp, pio);
+                                if (FD_ISSET(fd, &act_rfds)) {
+                                    mem_sys_free(buf.ev);
                                     break;
-                                case IO_THR_MSG_ADD_SELECT_RD:
-                                    {
-                                        PMC * const pio = buf.ev->u.io_event.pio;
-                                        const int fd = Parrot_io_getfd(buf.ev->interp, pio);
-                                        if (FD_ISSET(fd, &act_rfds)) {
-                                            mem_sys_free(buf.ev);
-                                            break;
-                                        }
-                                        FD_SET(fd, &act_rfds);
-                                        if (fd >= n_highest)
-                                            n_highest = fd + 1;
-                                        store_io_event(&ios, buf.ev);
-                                    }
-                                    break;
-                                    /* TODO */
-                                default:
-                                    exit_fatal(1,
-                                            "unhandled msg in pipe");
-                                    break;
+                                }
+                                FD_SET(fd, &act_rfds);
+                                if (fd >= n_highest)
+                                    n_highest = fd + 1;
+                                store_io_event(&ios, buf.ev);
                             }
+                            break;
+                          default:
+                            /* TODO */
+                            exit_fatal(1, "unhandled msg in pipe");
+                            break;
+                        }
 
-                        }
-                        else {
-                            /*
-                             * one of the io_event fds is ready
-                             * remove from active set, as we don't
-                             * want to fire again during io_handler
-                             * invocation
-                             */
-                            FD_CLR(i, &act_rfds);
-                            io_thread_ready_rd(&ios, i);
-                        }
+                    }
+                    else {
+                        /*
+                         * one of the io_event fds is ready
+                         * remove from active set, as we don't
+                         * want to fire again during io_handler
+                         * invocation
+                         */
+                        FD_CLR(i, &act_rfds);
+                        io_thread_ready_rd(&ios, i);
                     }
                 }
-                /* TODO check fds */
-                break;
+            }
+            /* TODO check fds */
+            break;
         }
     }
     edebug((stderr, "IO thread terminated\n"));

@@ -166,14 +166,14 @@ AGAIN:
     if ((connect(io->os_handle, (struct sockaddr *)SOCKADDR_REMOTE(socket),
             sizeof (struct sockaddr_in))) != 0) {
         switch (errno) {
-            case EINTR:
-                goto AGAIN;
-            case EINPROGRESS:
-                goto AGAIN;
-            case EISCONN:
-                return 0;
-            default:
-                return -1;
+          case EINTR:
+            goto AGAIN;
+          case EINPROGRESS:
+            goto AGAIN;
+          case EISCONN:
+            return 0;
+          default:
+            return -1;
         }
     }
 
@@ -312,21 +312,21 @@ AGAIN:
     }
     else {
         switch (errno) {
-            case EINTR:
-                goto AGAIN;
+          case EINTR:
+            goto AGAIN;
 #    ifdef EWOULDBLOCK
-            case EWOULDBLOCK:
-                goto AGAIN;
+          case EWOULDBLOCK:
+            goto AGAIN;
 #    else
-            case EAGAIN:
-                goto AGAIN;
+          case EAGAIN:
+            goto AGAIN;
 #    endif
-            case EPIPE:
-                /* XXX why close it here and not below */
-                close(io->os_handle);
-                return -1;
-            default:
-                return -1;
+          case EPIPE:
+            /* XXX why close it here and not below */
+            close(io->os_handle);
+            return -1;
+          default:
+            return -1;
         }
     }
 }
@@ -361,24 +361,24 @@ AGAIN:
     }
     else {
         switch (errno) {
-            case EINTR:
-                goto AGAIN;
+          case EINTR:
+            goto AGAIN;
 #    ifdef EWOULDBLOCK
-            case EWOULDBLOCK:
-                goto AGAIN;
+          case EWOULDBLOCK:
+            goto AGAIN;
 #    else
-            case EAGAIN:
-                goto AGAIN;
+          case EAGAIN:
+            goto AGAIN;
 #    endif
-            case ECONNRESET:
-                /* XXX why close it on err return result is -1 anyway */
-                close(io->os_handle);
-                *s = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
-                return -1;
-            default:
-                close(io->os_handle);
-                *s = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
-                return -1;
+          case ECONNRESET:
+            /* XXX why close it on err return result is -1 anyway */
+            close(io->os_handle);
+            *s = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
+            return -1;
+          default:
+            close(io->os_handle);
+            *s = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
+            return -1;
         }
     }
 }

@@ -1537,28 +1537,28 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
 
         switch (pf->header->floattype) {
 #  if NUMVAL_SIZE == 8
-        case FLOATTYPE_8:
+          case FLOATTYPE_8:
             pf->fetch_nv = fetch_buf_le_8;
             break;
-        case FLOATTYPE_12:
+          case FLOATTYPE_12:
             pf->fetch_nv = cvt_num12_num8_le;
             break;
-        case FLOATTYPE_16:
+          case FLOATTYPE_16:
             pf->fetch_nv = cvt_num16_num8_le;
             break;
 #  endif
 #  if NUMVAL_SIZE == 16
-        case FLOATTYPE_8:
+          case FLOATTYPE_8:
             pf->fetch_nv = cvt_num8_num16_le;
             break;
-        case FLOATTYPE_12:
+          case FLOATTYPE_12:
             pf->fetch_nv = cvt_num12_num16_le;
             break;
-        case FLOATTYPE_16:
+          case FLOATTYPE_16:
             pf->fetch_nv = fetch_buf_le_16;
             break;
 #  endif
-        default:
+          default:
             exit_fatal(1,
               "PackFile_unpack: unsupported float conversion %d to %d, "
               "PARROT_BIGENDIAN=%d\n",
@@ -1576,26 +1576,26 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
 
         switch (pf->header->floattype) {
 #  if NUMVAL_SIZE == 8
-        case FLOATTYPE_8: /* native */
+          case FLOATTYPE_8: /* native */
             break;
-        case FLOATTYPE_12:
+          case FLOATTYPE_12:
             pf->fetch_nv = cvt_num12_num8;
             break;
-        case FLOATTYPE_16:
+          case FLOATTYPE_16:
             pf->fetch_nv = cvt_num16_num8;
             break;
 #  endif
 #  if NUMVAL_SIZE == 16
-        case FLOATTYPE_8:
+          case FLOATTYPE_8:
             pf->fetch_nv = cvt_num8_num16;
             break;
-        case FLOATTYPE_12:
+          case FLOATTYPE_12:
             pf->fetch_nv = cvt_num12_num16;
             break;
-        case FLOATTYPE_16: /* native */
+          case FLOATTYPE_16: /* native */
             break;
 #  endif
-        default:
+          default:
             exit_fatal(1,
               "PackFile_unpack: unsupported float conversion %d to %d, "
               "PARROT_BIGENDIAN=%d\n",
@@ -1617,39 +1617,39 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
 
         switch (pf->header->floattype) {
 #  if NUMVAL_SIZE == 8
-        case FLOATTYPE_8:
+          case FLOATTYPE_8:
             pf->fetch_nv = fetch_buf_be_8;
             break;
-        case FLOATTYPE_12:
+          case FLOATTYPE_12:
             exit_fatal(1, "PackFile_unpack: invalid floattype 1 big-endian");
             break;
-        case FLOATTYPE_16:
+          case FLOATTYPE_16:
             pf->fetch_nv = cvt_num16_num8_be;
             break;
 #  endif
 #  if NUMVAL_SIZE == 12
-        case FLOATTYPE_8:
+          case FLOATTYPE_8:
             pf->fetch_nv = cvt_num8_num12_be;
             break;
-        case FLOATTYPE_12:
+          case FLOATTYPE_12:
             exit_fatal(1, "PackFile_unpack: invalid floattype 1 big-endian");
             break;
-        case FLOATTYPE_16:
+          case FLOATTYPE_16:
             pf->fetch_nv = cvt_num16_num12_be;
             break;
 #  endif
 #  if NUMVAL_SIZE == 16
-        case FLOATTYPE_8:
+          case FLOATTYPE_8:
             pf->fetch_nv = cvt_num8_num16_be;
             break;
-        case FLOATTYPE_12:
+          case FLOATTYPE_12:
             exit_fatal(1, "PackFile_unpack: invalid floattype 1 big-endian");
             break;
-        case FLOATTYPE_16:
+          case FLOATTYPE_16:
             pf->fetch_nv = fetch_buf_be_16;
             break;
 #  endif
-        default:
+          default:
             exit_fatal(1,
               "PackFile_unpack: unsupported float conversion %d to %d, "
               "PARROT_BIGENDIAN=%d\n",
@@ -1667,33 +1667,33 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
 
         switch (pf->header->floattype) {
 #  if NUMVAL_SIZE == 8
-        case FLOATTYPE_8: /* native */
+          case FLOATTYPE_8: /* native */
             break;
-        case FLOATTYPE_12:
+          case FLOATTYPE_12:
             pf->fetch_nv = cvt_num12_num8;
             break;
-        case FLOATTYPE_16:
+          case FLOATTYPE_16:
             pf->fetch_nv = cvt_num16_num8;
             break;
 #  endif
 #  if NUMVAL_SIZE == 12
-        case FLOATTYPE_8:
+          case FLOATTYPE_8:
             pf->fetch_nv = cvt_num8_num12;
             break;
-        case FLOATTYPE_12: /* native */
+          case FLOATTYPE_12: /* native */
             break;
-        case FLOATTYPE_16:
+          case FLOATTYPE_16:
             pf->fetch_nv = cvt_num16_num12;
             break;
 #  endif
 #  if NUMVAL_SIZE == 16
-        case FLOATTYPE_8:
+          case FLOATTYPE_8:
             pf->fetch_nv = cvt_num8_num16;
             break;
-        case FLOATTYPE_12:
+          case FLOATTYPE_12:
             pf->fetch_nv = cvt_num12_num16;
             break;
-        case FLOATTYPE_16: /* native */
+          case FLOATTYPE_16: /* native */
             break;
 #  endif
           default:

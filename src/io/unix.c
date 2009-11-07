@@ -512,9 +512,9 @@ Parrot_io_read_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
         }
         else if (bytes < 0) {
             switch (errno) {
-            case EINTR:
+              case EINTR:
                 continue;
-            default:
+              default:
                 s->bufused = s->strlen = 0;
                 return bytes;
             }
@@ -551,7 +551,7 @@ Parrot_io_write_unix(PARROT_INTERP, ARGIN(PMC *filehandle), ARGMOD(STRING *s))
     size_t to_write = s->bufused;
     size_t written  = 0;
 
-    write_through:
+  write_through:
     while (to_write > 0) {
         const int err = write(file_descriptor, ptr, to_write);
         if (err >= 0) {
@@ -599,24 +599,24 @@ Parrot_io_seek_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
     if (pos >= 0) {
         switch (whence) {
-            case SEEK_SET:
-                if (offset > Parrot_io_get_file_size(interp, filehandle)) {
-                    Parrot_io_set_file_size(interp, filehandle, offset);
+          case SEEK_SET:
+            if (offset > Parrot_io_get_file_size(interp, filehandle)) {
+                Parrot_io_set_file_size(interp, filehandle, offset);
+            }
+            break;
+          case SEEK_CUR:
+            {
+                const PIOOFF_T avail = offset
+                        + Parrot_io_get_buffer_next(interp, filehandle)
+                        - Parrot_io_get_buffer_start(interp, filehandle);
+                if (avail > Parrot_io_get_file_size(interp, filehandle)) {
+                    Parrot_io_set_file_size(interp, filehandle, avail);
                 }
-                break;
-            case SEEK_CUR:
-                {
-                    const PIOOFF_T avail = offset
-                            + Parrot_io_get_buffer_next(interp, filehandle)
-                            - Parrot_io_get_buffer_start(interp, filehandle);
-                    if (avail > Parrot_io_get_file_size(interp, filehandle)) {
-                        Parrot_io_set_file_size(interp, filehandle, avail);
-                    }
-                }
-                break;
-            case SEEK_END:
-            default:
-                break;
+             }
+            break;
+          case SEEK_END:
+          default:
+            break;
         }
 
         Parrot_io_set_file_position(interp, filehandle, pos);

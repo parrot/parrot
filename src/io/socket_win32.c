@@ -113,14 +113,14 @@ AGAIN:
     if ((connect((int)io->os_handle, (struct sockaddr *)SOCKADDR_REMOTE(socket),
             sizeof (struct sockaddr_in))) != 0) {
         switch (errno) {
-            case WSAEINTR:
-                goto AGAIN;
-            case WSAEINPROGRESS:
-                goto AGAIN;
-            case WSAEISCONN:
-                return 0;
-            default:
-                return -1;
+          case WSAEINTR:
+            goto AGAIN;
+          case WSAEINPROGRESS:
+            goto AGAIN;
+          case WSAEISCONN:
+            return 0;
+          default:
+            return -1;
         }
     }
 
@@ -259,21 +259,21 @@ AGAIN:
     }
     else {
         switch (errno) {
-            case WSAEINTR:
-                goto AGAIN;
+          case WSAEINTR:
+            goto AGAIN;
 #    ifdef WSAEWOULDBLOCK
-            case WSAEWOULDBLOCK:
-                goto AGAIN;
+          case WSAEWOULDBLOCK:
+            goto AGAIN;
 #    else
-            case WSAEAGAIN:
-                goto AGAIN;
+          case WSAEAGAIN:
+            goto AGAIN;
 #    endif
-            case EPIPE:
-                /* XXX why close it here and not below */
-                close((int)io->os_handle);
-                return -1;
-            default:
-                return -1;
+          case EPIPE:
+            /* XXX why close it here and not below */
+            close((int)io->os_handle);
+            return -1;
+          default:
+            return -1;
         }
     }
 }
@@ -308,24 +308,24 @@ AGAIN:
     }
     else {
         switch (errno) {
-            case EINTR:
-                goto AGAIN;
+          case EINTR:
+            goto AGAIN;
 #    ifdef WSAEWOULDBLOCK
-            case WSAEWOULDBLOCK:
-                goto AGAIN;
+          case WSAEWOULDBLOCK:
+            goto AGAIN;
 #    else
-            case WSAEAGAIN:
-                goto AGAIN;
+          case WSAEAGAIN:
+            goto AGAIN;
 #    endif
-            case WSAECONNRESET:
-                /* XXX why close it on err return result is -1 anyway */
-                close((int)io->os_handle);
-                *s = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
-                return -1;
-            default:
-                close((int)io->os_handle);
-                *s = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
-                return -1;
+          case WSAECONNRESET:
+            /* XXX why close it on err return result is -1 anyway */
+            close((int)io->os_handle);
+            *s = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
+            return -1;
+          default:
+            close((int)io->os_handle);
+            *s = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
+            return -1;
         }
     }
 }

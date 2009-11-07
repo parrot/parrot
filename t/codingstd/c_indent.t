@@ -188,15 +188,26 @@ sub check_indent {
             #
             # The indentation of the previous line is not considered.
             # Check sanity by verifying that the indentation of the current line
-            # is divisible by four.
-            if ( $indent % 4 &&
-                !$state{in_comment} &&
-                $state{prev_last_char} eq ';'
-            ) {
-                push @c_indent => "$path:$state{line_cnt}\n"
-                    . "    apparent non-4 space indenting ($indent space"
-                    . ( $indent == 1 ? '' : 's' ) . ")\n";
-                $c_failed{"$path\n"} = 1;
+            # is divisible by four, unless it should be outdented by 2.
+            if ($line =~ m{: (?:\s* /\* .*? \*/)? $}x) {
+                if ( $indent % 4 != 2 &&
+                    !$state{in_comment} &&
+                    $state{prev_last_char} eq ';'
+                ) {
+                    push @c_indent => "$path:$state{line_cnt}\n"
+                        . "    apparent non-2 space outdenting ($indent spaces)\n";
+                    $c_failed{"$path\n"} = 1
+                }
+            } else {
+                if ( $indent % 4 &&
+                    !$state{in_comment} &&
+                    $state{prev_last_char} eq ';'
+                ) {
+                    push @c_indent => "$path:$state{line_cnt}\n"
+                        . "    apparent non-4 space indenting ($indent space"
+                        . ( $indent == 1 ? '' : 's' ) . ")\n";
+                    $c_failed{"$path\n"} = 1;
+                }
             }
         }
     }
