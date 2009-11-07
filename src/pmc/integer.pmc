@@ -1008,7 +1008,7 @@ Returns SELF to the C<value>th power in C<dest>.
 
 Raises SELF to the C<value>th power.
 
-TODO:  RT #46631 Complex and BigInt rhs.
+TODO:  TT #1228: Implement Complex and BigInt RHS values for the pow() functions
 
 =cut
 
