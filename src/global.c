@@ -817,7 +817,7 @@ Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 
         Parrot_store_global_n(interp, ns, ns_entry_name, sub_pmc);
 
-        /* TT#1224: 
+        /* TT#1224:
            TEMPORARY HACK - cache invalidation should be a namespace function */
         if (!PMC_IS_NULL(nsname)) {
             STRING * const nsname_s = VTABLE_get_string(interp, nsname);
