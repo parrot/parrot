@@ -619,7 +619,7 @@ Parrot_store_global_s(PARROT_INTERP, ARGIN_NULLOK(STRING *str_key),
 
     Parrot_store_global_n(interp, ns, globalname, val);
 
-    /* RT #46169 - method cache invalidation should be a namespace function */
+    /* TT #1225 - method cache invalidation should be a namespace function */
     Parrot_invalidate_method_cache(interp, str_key);
 }
 
@@ -817,7 +817,8 @@ Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 
         Parrot_store_global_n(interp, ns, ns_entry_name, sub_pmc);
 
-        /* TEMPORARY HACK - cache invalidation should be a namespace function */
+        /* TT#1224: 
+           TEMPORARY HACK - cache invalidation should be a namespace function */
         if (!PMC_IS_NULL(nsname)) {
             STRING * const nsname_s = VTABLE_get_string(interp, nsname);
             Parrot_invalidate_method_cache(interp, nsname_s);
