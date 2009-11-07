@@ -102,7 +102,7 @@ the generated pir of C<node>'s children.
 
 .sub 'pir' :method :multi(_,_)
     .param pmc node
-    .tailcall self.'pir_children'(node)
+    self.'pir_children'(node)
 .end
 
 
