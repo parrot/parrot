@@ -545,7 +545,7 @@ Search the namespace designated by C<str_key>, or the HLL root if
 C<str_key> is NULL, for an object with name C<globalname>.  Return the
 object, or NULL if not found.
 
-RT #46161 - For now this function prefers non-namespaces, it will eventually
+TT#1222 - For now this function prefers non-namespaces, it will eventually
 entirely use the untyped interface.
 
 =cut
