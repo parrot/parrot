@@ -311,7 +311,7 @@ Return a representation of the hash contents.
     }
 
     VTABLE STRING *get_repr() {
-        /* RT #44643 use freeze */
+        /* TT #1231:  Use freeze in get_repr() (for hashes) */
         PMC * const  iter = VTABLE_get_iter(INTERP, SELF);
         STRING      *res  = CONST_STRING(INTERP, "{");
         const INTVAL n    = VTABLE_elements(INTERP, SELF);
