@@ -70,6 +70,22 @@ Returns true if value is also a null PMC, false otherwise.
         return PMC_IS_NULL(value);
     }
 
+/*
+
+=item C<PMC *find_method(STRING *method_name)>
+
+=cut
+
+Gives a more informative message than the automaticaaly generated version.
+
+*/
+
+    VTABLE PMC *find_method(STRING *method_name) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NULL_REG_ACCESS,
+                "Null PMC access in find_method('%Ss')",
+                method_name);
+    }
+
 }
 
 /*
