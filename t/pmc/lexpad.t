@@ -19,9 +19,10 @@ Tests the LexPad PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(1)
+    plan(4)
 
     new_test()
+    test_iter()
 .end
 
 .sub new_test
@@ -33,6 +34,38 @@ Tests the LexPad PMC.
 eh:
     ok(1, "can't create a LexPad without an initializer")
 end:
+.end
+
+
+
+.sub 'test_iter'
+
+    .local pmc str1,str2,str3
+    .lex 'a', str1
+    .lex 'b', str2
+    .lex 'c', str3
+
+    str1 = box 'pants'
+    str2 = box 'pants'
+    str3 = box 'pants'
+
+    .local pmc interp
+    interp = getinterp
+
+    .local pmc dlp
+    dlp    = interp['lexpad']
+
+    .local pmc iterator
+    iterator = iter dlp
+iter_loop:
+    unless iterator goto iter_done
+    .local pmc key
+    key = shift iterator
+    .local pmc value
+    value = dlp[key]
+    is(value, 'pants', "Got value from iterator")
+    goto iter_loop
+iter_done:
 .end
 
 # Local Variables:

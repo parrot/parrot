@@ -159,6 +159,22 @@ Return the LexInfo PMC, if any or a Null PMC.
         GET_ATTR_lexinfo(INTERP, SELF, lexinfo);
         RETURN(PMC *lexinfo);
     }
+
+/*
+
+=item C<PMC *get_iter()>
+
+Get iterator for declared lexicals.
+
+=cut
+
+*/
+    VTABLE PMC *get_iter() {
+        PMC *lexinfo;
+        GET_ATTR_lexinfo(INTERP, SELF, lexinfo);
+        return VTABLE_get_iter(INTERP, lexinfo);
+    }
+
 }
 
 
