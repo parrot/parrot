@@ -242,7 +242,7 @@ internal_ns_maybe_create(PARROT_INTERP, ARGIN(PMC *ns), ARGIN(STRING *key), int 
     ASSERT_ARGS(internal_ns_maybe_create)
     PMC *sub_ns;
 
-    /* RT #46157 - stop depending on typed namespace */
+    /* TT #1220 - stop depending on typed namespace */
     if (!(flags & INTERN_NS_CREAT))
         return PMCNULL;
 
