@@ -246,7 +246,7 @@ internal_ns_maybe_create(PARROT_INTERP, ARGIN(PMC *ns), ARGIN(STRING *key), int 
     if (!(flags & INTERN_NS_CREAT))
         return PMCNULL;
 
-    /* RT #46159 - match HLL of enclosing namespace? */
+    /* TT #1221 - match HLL of enclosing namespace? */
     sub_ns = pmc_new(interp, Parrot_get_ctx_HLL_type(interp,
                                                  enum_class_NameSpace));
 
