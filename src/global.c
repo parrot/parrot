@@ -503,7 +503,7 @@ Parrot_find_global_n(PARROT_INTERP, ARGIN_NULLOK(PMC *ns), ARGIN_NULLOK(STRING *
         res = PMCNULL;
     else {
         /*
-         * RT #46163 - we should be able to use 'get_pmc_keyed' here,
+         * TT #1219 - we should be able to use 'get_pmc_keyed' here,
          * but we can't because Parrot's default namespaces are not
          * fully typed and there's a pseudo-typed interface that
          * distinguishes 'get_pmc_keyed' from 'get_pointer_keyed';
