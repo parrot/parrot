@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 19;
+use Test::More qw(no_plan); # tests => 19;
 use Carp;
 use Cwd;
 use File::Copy;
@@ -14,10 +14,9 @@ use File::Temp qw( tempdir );
 use File::Spec;
 use lib qw( lib );
 use_ok('config::gen::platform');
-use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
+use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(
-    test_step_thru_runstep
     test_step_constructor_and_description
 );
 use Parrot::Configure::Utils qw( _slurp );
@@ -32,7 +31,9 @@ my ($args, $step_list_ref) = process_options(
     }
 );
 
-my $conf = Parrot::Configure->new;
+my $conf = Parrot::Configure::Step::Test->new;
+$conf->include_config_results( $args );
+
 my $pkg = q{gen::platform};
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
@@ -41,27 +42,27 @@ my $step = test_step_constructor_and_description($conf);
 ok(-f $step->{platform_interface},
     "Located required platform interface header");
 
-my $platform_orig = $conf->data->get_p5('OSNAME');
+my $platform_orig = $conf->data->get('osname');
 my $archname_orig = $conf->data->get_p5('archname');
 $conf->data->set_p5( archname => 'foo-bar' );
 my $verbose = 0;
 
 ########## _get_platform() ##########
 
-$conf->data->set_p5( OSNAME => 'msys' );
+$conf->data->set( osname => 'msys' );
 is( $step->_get_platform( $conf, $verbose ), q{win32},
     "Got expected platform for msys");
 
-$conf->data->set_p5( OSNAME => 'mingw' );
+$conf->data->set( osname => 'mingw' );
 is( $step->_get_platform( $conf, $verbose ), q{win32},
     "Got expected platform for mingw");
 
-$conf->data->set_p5( OSNAME => 'MSWin32' );
+$conf->data->set( osname => 'MSWin32' );
 is( $step->_get_platform( $conf, $verbose ), q{win32},
     "Got expected platform for MSWin32");
 
 # re-set to original values
-$conf->data->set_p5( OSNAME => $platform_orig );
+$conf->data->set( osname => $platform_orig );
 $conf->data->set_p5( archname => $archname_orig );
 
 $conf->data->set_p5( archname => 'ia64-bar' );
@@ -69,7 +70,7 @@ is( $step->_get_platform( $conf, $verbose ), q{ia64},
     "Got expected platform for ia64");
 
 $conf->data->set_p5( archname => 'foo-bar' );
-$conf->data->set_p5( OSNAME => 'foo' );
+$conf->data->set( osname => 'foo' );
 {
     $verbose = 1;
     my ($stdout, $stderr, $rv);
@@ -85,7 +86,7 @@ $conf->data->set_p5( OSNAME => 'foo' );
 
 # re-set to original values
 $conf->data->set_p5( archname => $archname_orig );
-$conf->data->set_p5( OSNAME => $platform_orig );
+$conf->data->set( osname => $platform_orig );
 
 ########## _get_generated() ##########
 

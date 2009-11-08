@@ -65,7 +65,7 @@ sub runstep {
 sub _get_platform {
     my $self = shift;
     my ($conf, $verbose) = @_;
-    my $platform = lc ( $conf->data->get_p5('OSNAME') );
+    my $platform = lc ( $conf->data->get('osname') );
 
     $platform = "win32" if $platform =~ /^msys/;
     $platform = "win32" if $platform =~ /^mingw/;
