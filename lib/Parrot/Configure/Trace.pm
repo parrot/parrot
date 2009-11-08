@@ -88,24 +88,23 @@ sub trace_data_c {
 sub diff_data_c {
     my ( $self, $argsref ) = @_;
     $argsref->{verbose} = 1;
-    my $trace_ref = $self->trace_data_c($argsref);
-    my @traces = @{ $trace_ref };
+    my @traces = @{ $self->trace_data_c($argsref) };
     my @results = ();
     for (my $i = 1; $i < scalar(@traces); $i++) {
         my %prior = %{$traces[$i - 1]};
         my %this  = %{$traces[$i]};
         my ($prior_key, $prior_value)   = each %prior;
-            my ($this_key,  $this_value)    = each %this;
-            $prior_value = q{} unless defined $prior_value;
-            $this_value = q{} unless defined $this_value;
-            if ($prior_value ne $this_value) {
-                push @results, {
-                    number  => $i,
-                    name    => $this_key,
-                    before  => $prior_value,
-                    after   => $this_value,
-                };
-            }
+        my ($this_key,  $this_value)    = each %this;
+        $prior_value = q{} unless defined $prior_value;
+        $this_value  = q{} unless defined $this_value;
+        if ($prior_value ne $this_value) {
+            push @results, {
+                number  => $i,
+                name    => $this_key,
+                before  => $prior_value,
+                after   => $this_value,
+            };
+        }
     }
     return \@results;
 }
@@ -422,8 +421,8 @@ following key-value pairs:
 
 =item * number
 
-Number of the configuration step where the value of the given attribute
-changed; enumeration starts at C<1>, not C<0>.
+Index position of the configuration step where the value of the given attribute
+changed.  Example:  C<init::defaults> has index position C<1>.
 
 =item * name
 
