@@ -933,7 +933,7 @@ propagate_need(ARGMOD(Basic_block *bb), ARGIN(const SymReg *r), int i)
                  * path where the var is not initialized, so this might even be
                  * correct :)
                  *
-                 * RT #48286 subroutines
+                 * TT #1244: emit warning in propagate_need()
                  */
 #if 0
                 if (pred->index == 0) {
