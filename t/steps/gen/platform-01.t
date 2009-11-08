@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan); # tests => 19;
+use Test::More tests => 19;
 use Carp;
 use Cwd;
 use File::Copy;
