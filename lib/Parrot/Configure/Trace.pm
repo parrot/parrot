@@ -202,7 +202,7 @@ to Parrot developers working on the configuration process or its results.
 
 To make use of Parrot::Configure::Trace's methods, first configure with the
 C<--configure_trace> option.  As configuration proceeds through what are
-currently 56 individual steps, the state of the Parrot::Configuration object
+currently 65 individual steps, the state of the Parrot::Configuration object
 is recorded in a Perl array reference.  That array ref is stored on disk via
 the Storable module in a file called F<.configure_trace.sto> found in the
 top-level of your Parrot sandbox directory.
@@ -403,7 +403,7 @@ the value is the value of the attribute at step C<n + 1>.
 
 Provide a list of those configuration steps where the value of a given
 attribute in the C<{data}->{c}> part of the Parrot::Configure object changed
-from that in effect at the conclusion of the preveious configuration step.
+from that in effect at the conclusion of the previous configuration step.
 
 =item * Arguments
 
