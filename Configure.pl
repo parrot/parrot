@@ -232,8 +232,8 @@ Link parrot dynamically.
 =item C<--m=32>
 
 Create a 32-bit executable on 64-architectures like x86_64. This
-option appends -m32 to compiler and linker programs and does
-s/lib64/lib/g on link flags.
+option appends C<-m32> to compiler and linker programs and does
+C<s/lib64/lib/g> on link flags.
 
 This option is experimental. See F<config/init/defaults.pm> for more.
 
@@ -247,7 +247,7 @@ Turn on profiled compile (gcc only for now)
 
 =item C<--optimize>
 
-Add perl5's $Config{optimize} to the compiler flags.
+Add Perl 5's C<$Config{optimize}> to the compiler flags.
 
 =item C<--optimize=flags>
 
