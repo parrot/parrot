@@ -688,7 +688,7 @@ Parrot_find_name_op(PARROT_INTERP, ARGIN(STRING *name), SHIM(void *next))
     else
         g = VTABLE_get_pmc_keyed_str(interp, lex_pad, name);
 
-    /* RT #46171 - walk up the scopes!  duh!! */
+    /* TT #1223 - walk up the scopes!  duh!! */
 
     if (PMC_IS_NULL(g))
         g = Parrot_find_global_cur(interp, name);
