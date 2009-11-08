@@ -246,6 +246,7 @@ the others items of the array are just the dependencies
     depends = $P0[pbc]
     $I0 = does depends, 'array'
     unless $I0 goto L3
+    $I0 = newer(pbc, depends)
     if $I0 goto L1
     src = shift depends
     goto L4
