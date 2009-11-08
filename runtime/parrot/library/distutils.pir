@@ -7,15 +7,37 @@ distutils - DistUtils for Parrot
 
 =head2 DESCRIPTION
 
+=head2 EXTERNAL DEPENDENCIES
+
+=over 4
+
+=item prove
+
+Perl5 and core module Test-Harness
+
+=item pod2html
+
+Perl5 and core module Pod-Html
+
+=back
+
+=head2 EXAMPLES
+
+L<http://github.com/fperrad/parrot-MT19937/blob/master/setup.pir>
+
 =cut
 
-.sub '__onload' :load :init
+.sub '__onload' :load :init :anon
     $P0 = new 'Hash'
     set_global '%step', $P0
     .const 'Sub' build_pbc_pir = 'build_pbc_pir'
     register_step('build', build_pbc_pir)
+    .const 'Sub' build_html_pod = 'build_html_pod'
+    register_step_after('build', build_html_pod)
     .const 'Sub' clean_pbc_pir = 'clean_pbc_pir'
     register_step('clean', clean_pbc_pir)
+    .const 'Sub' clean_html_pod = 'clean_html_pod'
+    register_step_after('clean', clean_html_pod)
     .const 'Sub' install = 'install'
     register_step('install', install)
     .const 'Sub' test = 'test'
@@ -187,7 +209,7 @@ the others items are just the dependencies
   L1:
 .end
 
-.sub '_build_pbc_pir'
+.sub '_build_pbc_pir' :anon
     .param pmc hash
     $P0 = iter hash
   L1:
@@ -211,6 +233,47 @@ the others items are just the dependencies
   L2:
 .end
 
+=item html_pod
+
+hash
+
+the key is the HTML pathname
+
+the value is the POD pathname
+
+=cut
+
+.sub 'build_html_pod'
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['html_pod']
+    unless $I0 goto L1
+    $P0 = kv['html_pod']
+    _build_html_pod($P0)
+  L1:
+.end
+
+.sub '_build_html_pod' :anon
+    .param pmc hash
+    $P0 = iter hash
+  L1:
+    unless $P0 goto L2
+    .local string html, pod
+    html = shift $P0
+    pod = $P0[html]
+    $I0 = newer(html, pod)
+    if $I0 goto L1
+    .local string cmd
+    cmd = "pod2html --infile "
+    cmd .= pod
+    cmd .= " --outfile "
+    cmd .= html
+    system(cmd)
+    unlink("pod2htmd.tmp")
+    unlink("pod2htmi.tmp")
+    goto L1
+  L2:
+.end
+
 =back
 
 =head3 Step clean
@@ -230,7 +293,20 @@ the others items are just the dependencies
   L1:
 .end
 
-.sub '_clean_key'
+=item html_pod
+
+=cut
+
+.sub 'clean_html_pod'
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['html_pod']
+    unless $I0 goto L1
+    $P0 = kv['html_pod']
+    _clean_key($P0)
+  L1:
+.end
+
+.sub '_clean_key' :anon
     .param pmc hash
     $P0 = iter hash
   L1:
@@ -337,7 +413,7 @@ array of pathname
   L5:
 .end
 
-.sub '_install_bin'
+.sub '_install_bin' :anon
     .param pmc array
     $S1 = get_bindir()
     $S1 .= "/"
@@ -351,7 +427,7 @@ array of pathname
   L2:
 .end
 
-.sub '_install_lib'
+.sub '_install_lib' :anon
     .param string dirname
     .param pmc array
     $S1 = get_libdir()
