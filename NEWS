@@ -1,5 +1,13 @@
 # $Id$
 
+New in 1.8.0 (to be released on 2009-11-19)
+- Functionality
+- Performance
+- Maintenance and cleanup
+- Deprecations
+- Bugfix
+- Tests
+
 New in 1.7.0
 - Functionality
  + Parrot_capture_lex has been added to the PARROT_EXPORT API
