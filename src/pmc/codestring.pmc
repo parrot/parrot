@@ -35,8 +35,41 @@ C<emit> method.
 #endif
 
 pmclass CodeString extends String provides string auto_attrs {
-    ATTR INTVAL last_line_number; /* most recent line number seen   */
-    ATTR INTVAL last_pos;         /* most recent byte position seen */
+    ATTR PMC *linepos;            /* start of line positions */
+
+/*
+
+=item C<init()>
+
+Initialize the CodeString.
+
+=cut
+
+*/
+
+  VTABLE void init() {
+      Parrot_CodeString_attributes * const attrs = PARROT_CODESTRING(SELF);
+      SUPER();
+      attrs->linepos = PMCNULL;
+      PObj_custom_mark_SET(SELF);
+  }
+
+/*
+
+=item C<mark()>
+
+Mark the CodeString as live.
+
+=cut
+
+*/
+
+  VTABLE void mark() {
+      Parrot_CodeString_attributes * const attrs = PARROT_CODESTRING(SELF);
+      SUPER();
+      if (!attrs) return;
+      Parrot_gc_mark_PMC_alive(INTERP, attrs->linepos);
+  }
 
 /*
 
@@ -125,7 +158,7 @@ A newline is automatically added to the end of the fmt.
     VTABLE_set_string_native(INTERP, SELF, S1);
 
     RETURN(PMC *SELF);
-}
+  }
 
 
 /*
@@ -140,54 +173,56 @@ the first line is line number zero.
 */
 
   METHOD lineof(INTVAL pos) {
-    STRING *str             = NULL;
-    INTVAL  line            = 0;
-    INTVAL  ipos            = 0;
-    INTVAL  seen_first_line = 0;
-    INTVAL  jpos;
-    INTVAL  last_pos;
+    PMC    *linepos;
+    INTVAL  line;
+    INTVAL  count;
 
-    GET_ATTR_last_pos(INTERP, SELF, last_pos);
+    GET_ATTR_linepos(INTERP, SELF, linepos);
 
-    /* the previous line number for this position is the same */
-    if (last_pos == pos) {
-        GET_ATTR_last_line_number(INTERP, SELF, line);
-        RETURN(INTVAL line);
-    }
+    /* build the linepos array if we haven't already done so */
+    if (!linepos || PMC_IS_NULL(linepos)) {
+        STRING *str             = NULL;
+        INTVAL  eos;
+        INTVAL  jpos;
 
-    /* start from the previous max line number and position */
-    if (last_pos < pos) {
-        GET_ATTR_last_line_number(INTERP, SELF, line);
-        ipos = last_pos;
-    }
+        linepos = pmc_new(INTERP, enum_class_ResizableIntegerArray);
+        /* get the string itself */
+        GET_ATTR_str_val(INTERP, SELF, str);
+        eos  = Parrot_str_byte_length(INTERP, str);
+        /* find the first newline, if any */
+        jpos = Parrot_str_find_cclass(INTERP, enum_cclass_newline,
+                                      str, 0, eos);
+        while (jpos < eos) {
+            jpos++;
+            /* add the start of line position */
+            VTABLE_push_integer(INTERP, linepos, jpos);
 
-    GET_ATTR_str_val(INTERP, SELF, str);
-    jpos = Parrot_str_find_cclass(INTERP, enum_cclass_newline, str, ipos, pos);
-
-    while (jpos < pos) {
-
-        if (ipos
-        &&  jpos == ipos
-        &&  string_ord(INTERP, str, jpos)     == 10
-        &&  string_ord(INTERP, str, ipos - 1) == 13) {
-            /* do not increment line; \r\n is a single line separator */
+            /* treat \r\n as a single newline */
+            if (jpos < eos
+            && string_ord(INTERP, str, jpos - 1)     == 13
+            && string_ord(INTERP, str, jpos)         == 10) {
+                jpos++;
+            }
+            /* search for the next newline */
+            jpos = Parrot_str_find_cclass(INTERP, enum_cclass_newline,
+                                          str, jpos, eos);
         }
-        else
-            line++;
-
-        ipos = jpos + 1;
-
-        jpos = Parrot_str_find_cclass(INTERP, enum_cclass_newline, str, ipos, pos);
+        /* save the array of line positions */
+        SET_ATTR_linepos(INTERP, SELF, linepos);
     }
 
-    /* cache this position and line number for next time */
-    if (pos > last_pos) {
-        SET_ATTR_last_pos(INTERP, SELF, jpos);
-        SET_ATTR_last_line_number(INTERP, SELF, line);
-    }
+    /* Find the line from the array, stop at the first index that is
+     * greater than the position we're looking for.  We do a linear
+     * search for now, * perhaps a binary search would be better someday.
+     */
+    count = VTABLE_elements(INTERP, linepos);
+    line  = 0;
+    while (line < count
+          && VTABLE_get_integer_keyed_int(INTERP, linepos, line) <= pos)
+        line++;
 
     RETURN(INTVAL line);
-}
+  }
 
 
 /*
