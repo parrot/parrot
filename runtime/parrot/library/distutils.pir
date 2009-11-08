@@ -218,11 +218,11 @@ hash
 
 the key is the PBC pathname
 
-the value is an array of pathname
+the value is an array of pathname or a single pathname
 
-the first item is the PIR source
+the first item of the array is the PIR source
 
-the others items are just the dependencies
+the others items of the array are just the dependencies
 
 =cut
 
@@ -240,14 +240,20 @@ the others items are just the dependencies
     $P0 = iter hash
   L1:
     unless $P0 goto L2
-    .local string pbc
+    .local string pbc, src
     pbc = shift $P0
     .local pmc depends
     depends = $P0[pbc]
-    $I0 = newer(pbc, depends)
+    $I0 = does depends, 'array'
+    unless $I0 goto L3
     if $I0 goto L1
-    .local string src
     src = shift depends
+    goto L4
+  L3:
+    src = depends
+    $I0 = newer(pbc, src)
+    if $I0 goto L1
+  L4:
     .local string cmd
     cmd = get_parrot()
     cmd .= " -o "
@@ -587,23 +593,23 @@ the default value is "t/*.t"
 
 =item inst_bin
 
-array of pathname
+array of pathname or a single pathname
 
 =item inst_dynext
 
-array of pathname
+array of pathname or a single pathname
 
 =item inst_inc
 
-array of pathname
+array of pathname or a single pathname
 
 =item inst_lang
 
-array of pathname
+array of pathname or a single pathname
 
 =item inst_lib
 
-array of pathname
+array of pathname or a single pathname
 
 =cut
 
@@ -640,6 +646,13 @@ array of pathname
     .param pmc array
     $S1 = get_bindir()
     $S1 .= "/"
+    $I0 = does array, 'array'
+    if $I0 goto L0
+    $S0 = array
+    $S2 = $S1 . $S0
+    cp($S0, $S2)
+    goto L2
+  L0:
     $P0 = iter array
   L1:
     unless $P0 goto L2
@@ -657,6 +670,13 @@ array of pathname
     $S1 .= "/"
     $S1 .= dirname
     $S1 .= "/"
+    $I0 = does array, 'array'
+    if $I0 goto L0
+    $S0 = array
+    $S2 = $S1 . $S0
+    cp($S0, $S2)
+    goto L2
+  L0:
     $P0 = iter array
   L1:
     unless $P0 goto L2
@@ -744,6 +764,13 @@ Same options as install.
     .param pmc array
     $S1 = get_bindir()
     $S1 .= "/"
+    $I0 = does array, 'array'
+    if $I0 goto L0
+    $S0 = array
+    $S2 = $S1 . $S0
+    unlink($S2)
+    goto L2
+  L0:
     $P0 = iter array
   L1:
     unless $P0 goto L2
@@ -761,6 +788,13 @@ Same options as install.
     $S1 .= "/"
     $S1 .= dirname
     $S1 .= "/"
+    $I0 = does array, 'array'
+    if $I0 goto L0
+    $S0 = array
+    $S2 = $S1 . $S0
+    unlink($S2)
+    goto L2
+  L0:
     $P0 = iter array
   L1:
     unless $P0 goto L2
