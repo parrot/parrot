@@ -25,25 +25,51 @@ Perl5 and core module Pod-Html
 
 L<http://github.com/fperrad/parrot-MT19937/blob/master/setup.pir>
 
+L<http://github.com/fperrad/markdown/blob/master/setup.pir>
+
+L<http://github.com/fperrad/xml/blob/master/setup.pir>
+
 =cut
 
 .sub '__onload' :load :init :anon
     $P0 = new 'Hash'
     set_global '%step', $P0
+
+    .const 'Sub' build_pir_pge = 'build_pir_pge'
+    register_step('build', build_pir_pge)
+    .const 'Sub' build_pir_nqp = 'build_pir_nqp'
+    register_step_after('build', build_pir_nqp)
     .const 'Sub' build_pbc_pir = 'build_pbc_pir'
-    register_step('build', build_pbc_pir)
+    register_step_after('build', build_pbc_pir)
+    .const 'Sub' build_exe_pbc = 'build_exe_pbc'
+    register_step_after('build', build_exe_pbc)
     .const 'Sub' build_html_pod = 'build_html_pod'
     register_step_after('build', build_html_pod)
+
+    .const 'Sub' clean_pir_pge = 'clean_pir_pge'
+    register_step('clean', clean_pir_pge)
+    .const 'Sub' clean_pir_nqp = 'clean_pir_nqp'
+    register_step_after('clean', clean_pir_nqp)
     .const 'Sub' clean_pbc_pir = 'clean_pbc_pir'
-    register_step('clean', clean_pbc_pir)
+    register_step_after('clean', clean_pbc_pir)
+    .const 'Sub' clean_exe_pbc = 'clean_exe_pbc'
+    register_step_after('clean', clean_exe_pbc)
     .const 'Sub' clean_html_pod = 'clean_html_pod'
     register_step_after('clean', clean_html_pod)
+
     .const 'Sub' install = 'install'
     register_step('install', install)
+    .const 'Sub' install_exe_pbc = 'install_exe_pbc'
+    register_step_after('install', install_exe_pbc)
+
     .const 'Sub' test = 'test'
     register_step('test', test)
+
     .const 'Sub' uninstall = 'uninstall'
     register_step('uninstall', uninstall)
+    .const 'Sub' uninstall_exe_pbc = 'uninstall_exe_pbc'
+    register_step_after('uninstall', uninstall_exe_pbc)
+
     .const 'Sub' usage = 'usage'
     register_step('usage', usage)
 .end
@@ -233,6 +259,141 @@ the others items are just the dependencies
   L2:
 .end
 
+=item pir_pge
+
+hash
+
+the key is the PIR pathname
+
+the value is the PGE pathname
+
+=cut
+
+.sub 'build_pir_pge'
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['pir_pge']
+    unless $I0 goto L1
+    $P0 = kv['pir_pge']
+    _build_pir_pge($P0)
+  L1:
+.end
+
+.sub '_build_pir_pge' :anon
+    .param pmc hash
+    $P0 = iter hash
+  L1:
+    unless $P0 goto L2
+    .local string pir, pge
+    pir = shift $P0
+    pge = $P0[pir]
+    $I0 = newer(pir, pge)
+    if $I0 goto L1
+    .local string cmd
+    cmd = get_parrot()
+    cmd .= " "
+    $S0 = get_libdir()
+    cmd .= $S0
+    cmd .= "/library/PGE/Perl6Grammar.pbc --output="
+    cmd .= pir
+    cmd .= " "
+    cmd .= pge
+    system(cmd)
+    goto L1
+  L2:
+.end
+
+=item pir_nqp
+
+hash
+
+the key is the PIR pathname
+
+the value is the NQP pathname
+
+=cut
+
+.sub 'build_pir_nqp'
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['pir_nqp']
+    unless $I0 goto L1
+    $P0 = kv['pir_nqp']
+    _build_pir_nqp($P0)
+  L1:
+.end
+
+.sub '_build_pir_nqp' :anon
+    .param pmc hash
+    $P0 = iter hash
+  L1:
+    unless $P0 goto L2
+    .local string pir, nqp
+    pir = shift $P0
+    nqp = $P0[pir]
+    $I0 = newer(pir, nqp)
+    if $I0 goto L1
+    .local string cmd
+    cmd = get_bindir()
+    cmd .= "/parrot_nqp"
+    $S0 = get_exe()
+    cmd .= $S0
+    cmd .= " --target=pir --output="
+    cmd .= pir
+    cmd .= " "
+    cmd .= nqp
+    system(cmd)
+    goto L1
+  L2:
+.end
+
+=item exe_pbc
+
+hash
+
+the key is the executable pathname
+
+the value is the PBC pathname
+
+=cut
+
+.sub 'build_exe_pbc'
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['exe_pbc']
+    unless $I0 goto L1
+    $P0 = kv['exe_pbc']
+    _build_exe_pbc($P0)
+  L1:
+.end
+
+.sub '_build_exe_pbc' :anon
+    .param pmc hash
+    .local string exe
+    exe = get_exe()
+    $P0 = iter hash
+  L1:
+    unless $P0 goto L2
+    .local string bin, pbc
+    bin = shift $P0
+    pbc = $P0[bin]
+    $I0 = length pbc
+    $I0 -= 4
+    $S0 = substr pbc, 0, $I0
+    $S1 = "installable_" . $S0
+    $S1 .= exe
+    $I0 = newer($S1, pbc)
+    if $I0 goto L1
+    .local string cmd
+    cmd = get_bindir()
+    cmd .= "/pbc_to_exe"
+    cmd .= exe
+    cmd .= " "
+    cmd .= pbc
+    system(cmd)
+    cmd .= " --install"
+    system(cmd)
+    goto L1
+  L2:
+.end
+
 =item html_pod
 
 hash
@@ -293,6 +454,81 @@ the value is the POD pathname
   L1:
 .end
 
+.sub '_clean_key' :anon
+    .param pmc hash
+    $P0 = iter hash
+  L1:
+     unless $P0 goto L2
+     $S0 = shift $P0
+     unlink($S0)
+     goto L1
+  L2:
+.end
+
+=item pir_pge
+
+=cut
+
+.sub 'clean_pir_pge'
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['pir_pge']
+    unless $I0 goto L1
+    $P0 = kv['pir_pge']
+    _clean_key($P0)
+  L1:
+.end
+
+=item pir_nqp
+
+=cut
+
+.sub 'clean_pir_nqp'
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['pir_nqp']
+    unless $I0 goto L1
+    $P0 = kv['pir_nqp']
+    _clean_key($P0)
+  L1:
+.end
+
+=item exe_pbc
+
+=cut
+
+.sub 'clean_exe_pbc'
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['exe_pbc']
+    unless $I0 goto L1
+    $P0 = kv['exe_pbc']
+    _clean_exe_pbc($P0)
+  L1:
+.end
+
+.sub '_clean_exe_pbc' :anon
+    .param pmc hash
+    .local string bin, exe, obj, pbc
+    exe = get_exe()
+    obj = get_obj()
+    $P0 = iter hash
+  L1:
+     unless $P0 goto L2
+     bin = shift $P0
+     pbc = hash[bin]
+     $I0 = length pbc
+     $I0 -= 4
+     $S0 = substr pbc, 0, $I0
+     $S1 = $S0 . exe
+     unlink($S1)
+     $S1 = 'installable_' . $S1
+     unlink($S1)
+     $S1 = $S0 . '.c'
+     unlink($S1)
+     $S1 = $S0 . obj
+     unlink($S1)
+     goto L1
+  L2:
+.end
+
 =item html_pod
 
 =cut
@@ -304,17 +540,6 @@ the value is the POD pathname
     $P0 = kv['html_pod']
     _clean_key($P0)
   L1:
-.end
-
-.sub '_clean_key' :anon
-    .param pmc hash
-    $P0 = iter hash
-  L1:
-     unless $P0 goto L2
-     $S0 = shift $P0
-     unlink($S0)
-     goto L1
-  L2:
 .end
 
 =back
@@ -380,8 +605,6 @@ array of pathname
 
 array of pathname
 
-=back
-
 =cut
 
 .sub 'install'
@@ -443,6 +666,44 @@ array of pathname
     goto L1
   L2:
 .end
+
+=item exe_pbc
+
+=cut
+
+.sub 'install_exe_pbc'
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['exe_pbc']
+    unless $I0 goto L1
+    $P0 = kv['exe_pbc']
+    _install_exe_pbc($P0)
+  L1:
+.end
+
+.sub '_install_exe_pbc' :anon
+    .param pmc hash
+    .local string bin, bindir, pbc, exe
+    bindir = get_bindir()
+    exe = get_exe()
+    $P0 = iter hash
+  L1:
+     unless $P0 goto L2
+     bin = shift $P0
+     pbc = hash[bin]
+     $I0 = length pbc
+     $I0 -= 4
+     $S0 = substr pbc, 0, $I0
+     $S1 = 'installable_' . $S0
+     $S1 .= exe
+     $S2 = bindir . '/'
+     $S2 .= bin
+     $S2 .= exe
+     cp($S1, $S2)
+     goto L1
+  L2:
+.end
+
+=back
 
 =head3 Step uninstall
 
@@ -510,6 +771,32 @@ Same options as install.
   L2:
 .end
 
+.sub 'uninstall_exe_pbc'
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['exe_pbc']
+    unless $I0 goto L1
+    $P0 = kv['exe_pbc']
+    _uninstall_exe_pbc($P0)
+  L1:
+.end
+
+.sub '_uninstall_exe_pbc' :anon
+    .param pmc hash
+    .local string bin, bindir, exe
+    bindir = get_bindir()
+    exe = get_exe()
+    $P0 = iter hash
+  L1:
+     unless $P0 goto L2
+     bin = shift $P0
+     $S1 = bindir . '/'
+     $S1 .=  bin
+     $S1 .= exe
+     unlink($S1)
+     goto L1
+  L2:
+.end
+
 =head3 Configuration Helpers
 
 =over 4
@@ -538,6 +825,16 @@ Return the whole config
     .return ($S0)
 .end
 
+=item get_exe
+
+=cut
+
+.sub 'get_exe'
+    $P0 = get_config()
+    $S0 = $P0['exe']
+    .return ($S0)
+.end
+
 =item get_libdir
 
 =cut
@@ -547,6 +844,16 @@ Return the whole config
     $S0 = $P0['libdir']
     $S1 = $P0['versiondir']
     $S0 .= $S1
+    .return ($S0)
+.end
+
+=item get_obj
+
+=cut
+
+.sub 'get_obj'
+    $P0 = get_config()
+    $S0 = $P0['o']
     .return ($S0)
 .end
 
@@ -603,6 +910,7 @@ Return the whole config
   L2:
     unless $P0 goto L3
     $S0 = shift $P0
+    if $S0 == '' goto L2
     $I1 = stat $S0, .STAT_MODIFYTIME
     if $I1 < $I0 goto L2
     .return (0)
