@@ -15,7 +15,6 @@ package auto::format;
 
 use strict;
 use warnings;
-use Config;  # for long double printf format
 
 use base qw(Parrot::Configure::Step);
 
@@ -75,8 +74,9 @@ sub _set_floatvalfmt_nvsize {
         # Stay way from long double for now (it may be 64 or 80 bits)
         # die "long double not supported at this time, use double.";
         $nvsize   = $ldsize;
-        if (defined($Config{'sPRIgldbl'})) {
-            $nvformat = "%.15" .  $Config{'sPRIgldbl'};
+        my $spri = $conf->data->get_p5('sPRIgldbl');
+        if ( defined $spri ) {
+            $nvformat = "%.15" .  $spri;
             $nvformat =~ s/"//g;   # Perl 5's Config value has embedded double quotes
         }
         else {

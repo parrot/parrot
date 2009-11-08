@@ -59,6 +59,7 @@ sub runstep {
         sig_name
         scriptdirexp
         use64bitint
+        sPRIgldbl
     | ) {
         $conf->data->set_p5( $orig => $Config{$orig} );
     }
