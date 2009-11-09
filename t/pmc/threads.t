@@ -829,7 +829,7 @@ okay:
 CODE
 
 pir_output_is(
-    <<'CODE', <<'OUTPUT', 'CLONE_CODE|CLONE_GLOBALS|CLONE_HLL|CLONE_LIBRARIES - RT #41373' );
+    <<'CODE', <<'OUTPUT', 'CLONE_CODE|CLONE_GLOBALS|CLONE_HLL|CLONE_LIBRARIES - TT # 1250' );
 .HLL 'Perl'
 
 .include 'interpinfo.pasm'
