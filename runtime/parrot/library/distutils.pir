@@ -29,6 +29,8 @@ L<http://github.com/fperrad/markdown/blob/master/setup.pir>
 
 L<http://github.com/fperrad/xml/blob/master/setup.pir>
 
+L<http://github.com/fperrad/wmlscript/blob/master/setup.pir>
+
 =cut
 
 .sub '__onload' :load :init :anon
@@ -501,30 +503,12 @@ the value is the OPS pathname
     cmd .= " --dynamic "
     cmd .= src
     system(cmd)
-    cmd = config['cc']
-    cmd .= " -c "
-    $S0 = config['cc_o_out']
-    cmd .= " "
+
     $S0 = config['o']
-    $S0 = _mk_path_gen_dynops(src, ops, suffix, $S0)
-    cmd .= $S0
-    cmd .= " -I"
-    $S0 = get_incdir()
-    cmd .= $S0
-    cmd .= " -I"
-    cmd .= $S0
-    cmd .= "/pmc -I"
-    $S0 = cwd()
-    cmd .= $S0
-    cmd .= " "
-    $S0 = get_cflags()
-    cmd .= $S0
-    cmd .= " "
-    cmd .= cflags
-    cmd .= " "
-    $S0 = _mk_path_gen_dynops(src, ops, suffix, '.c')
-    cmd .= $S0
-    system(cmd)
+    $S1 = _mk_path_gen_dynops(src, ops, suffix, $S0)
+    $S2 = _mk_path_gen_dynops(src, ops, suffix, '.c')
+    __compile_cc($S1, $S2, cflags)
+
     cmd = config['ld']
     cmd .= " "
     $S0 = config['ld_out']
@@ -550,6 +534,37 @@ the value is the OPS pathname
     cmd .= " "
   L1:
     cmd .= ldflags
+    system(cmd)
+.end
+
+.sub '__compile_cc' :anon
+    .param string obj
+    .param string src
+    .param string cflags
+    .local pmc config
+    config = get_config()
+    .local string cmd
+    cmd = config['cc']
+    cmd .= " -c "
+    $S0 = config['cc_o_out']
+    cmd .= $S0
+    cmd .= " "
+    cmd .= obj
+    cmd .= " -I"
+    $S0 = get_incdir()
+    cmd .= $S0
+    cmd .= " -I"
+    cmd .= $S0
+    cmd .= "/pmc -I"
+    $S0 = cwd()
+    cmd .= $S0
+    cmd .= " "
+    $S0 = get_cflags()
+    cmd .= $S0
+    cmd .= " "
+    cmd .= cflags
+    cmd .= " "
+    cmd .= src
     system(cmd)
 .end
 
@@ -604,11 +619,206 @@ the value is an array of PMC pathname
     $I0 = exists kv['dynpmc']
     unless $I0 goto L1
     mkpath('dynext')
+    .local string cflags, ldflags
+    cflags = ''
+    $I0 = exists kv['dynpmc_cflags']
+    unless $I0 goto L2
+    cflags = kv['dynpmc_cflags']
+  L2:
+    ldflags = ''
+    $I0 = exists kv['dynpmc_ldflags']
+    unless $I0 goto L3
+    ldflags = kv['dynpmc_ldflags']
+  L3:
     $P0 = kv['dynpmc']
-#    _build_exe_pbc($P0)
+    _build_dynpmc($P0, cflags, ldflags)
   L1:
 .end
 
+.sub '_build_dynpmc' :anon
+    .param pmc hash
+    .param string cflags
+    .param string ldflags
+    .local string load_ext, obj
+    load_ext = get_load_ext()
+    obj = get_obj()
+    $P0 = iter hash
+  L1:
+    unless $P0 goto L2
+    .local string group
+    group = shift $P0
+    .local pmc srcs
+    srcs = hash[group]
+    $P1 = iter srcs
+  L3:
+    unless $P1 goto L4
+    .local string src
+    src = shift $P1
+    $S0 = _mk_path_gen_dynpmc(src, obj)
+    $I0 = newer($S0, src)
+    if $I0 goto L3
+    __build_dynpmc(src, cflags)
+    goto L3
+  L4:
+    $S0 = _mk_path_dynpmc(group, load_ext)
+    $I0 = newer($S0, srcs)
+    if $I0 goto L1
+    __build_dynpmc_group(srcs, group, cflags, ldflags)
+    goto L1
+  L2:
+.end
+
+.sub '__build_dynpmc' :anon
+    .param string src
+    .param string cflags
+    .local pmc config
+    config = get_config()
+    .local string pmc2c
+    pmc2c = config['perl']
+    pmc2c .= " "
+    $S0 = get_libdir()
+    pmc2c .= $S0
+    pmc2c .= "/tools/build/pmc2c.pl"
+    .local string pmc2c_includes
+    pmc2c_includes = "--include "
+    $S0 = get_srcdir()
+    pmc2c_includes .= $S0
+    pmc2c_includes .= " --include "
+    pmc2c_includes .= $S0
+    pmc2c_includes .= "/pmc"
+    .local string cmd
+    cmd = clone pmc2c
+    cmd .= " --dump "
+    cmd .= pmc2c_includes
+    cmd .= " "
+    cmd .= src
+    system(cmd)
+
+    cmd = clone pmc2c
+    cmd .= " --c "
+    cmd .= pmc2c_includes
+    cmd .= " "
+    cmd .= src
+    system(cmd)
+
+    $S0 = config['o']
+    $S1 = _mk_path_gen_dynpmc(src, $S0)
+    $S2 = _mk_path_gen_dynpmc(src, '.c')
+    __compile_cc($S1, $S2, cflags)
+.end
+
+.sub '__build_dynpmc_group' :anon
+    .param pmc srcs
+    .param string group
+    .param string cflags
+    .param string ldflags
+    .local pmc config
+    config = get_config()
+    .local string src, obj
+    src = srcs[0]
+    obj = config['o']
+    .local string current_dir
+    current_dir = cwd()
+    $S0 = dirname(src)
+    chdir($S0)
+    .local string cmd
+    cmd = config['perl']
+    cmd .= " "
+    $S0 = get_libdir()
+    cmd .= $S0
+    cmd .= "/tools/build/pmc2c.pl --library "
+#    $S0 = dirname(src)
+#    cmd .= $S0
+#    cmd .= "/"
+    cmd .= group
+    cmd .= " --c "
+#    $S0 = join " ", srcs
+#    cmd .= $S0
+    $P0 = iter srcs
+  L1:
+    unless $P0 goto L2
+    src = shift $P0
+    $S0 = basename(src)
+    cmd .= $S0
+    cmd .= " "
+    goto L1
+  L2:
+    system(cmd)
+    chdir(current_dir)
+    $S1 = _mk_path_gen_dynpmc_group(src, group, obj)
+    $S2 = _mk_path_gen_dynpmc_group(src, group, '.c')
+    __compile_cc($S1, $S2, cflags)
+    cmd = config['ld']
+    cmd .= " "
+    $S0 = config['ld_out']
+    cmd .= $S0
+    $S0 = config['load_ext']
+    $S0 = _mk_path_dynpmc(group, $S0)
+    cmd .= $S0
+    cmd .= " "
+    $S0 = _mk_path_gen_dynpmc_group(src, group, obj)
+    cmd .= $S0
+    cmd .= " "
+    $P0 = iter srcs
+  L3:
+    unless $P0 goto L4
+    src = shift $P0
+    $S0 = _mk_path_gen_dynpmc(src, obj)
+    cmd .= $S0
+    cmd .= " "
+    goto L3
+  L4:
+    $S0 = get_ldflags()
+    cmd .= $S0
+    cmd .= " "
+    $S0 = config['ld_load_flags']
+    cmd .= $S0
+    cmd .= " "
+    $I0 = config['parrot_is_shared']
+    unless $I0 goto L5
+    $S0 = config['inst_libparrot_ldflags']
+    cmd .= $S0
+    cmd .= " "
+  L5:
+    cmd .= ldflags
+    system(cmd)
+
+.end
+
+.sub '_mk_path_dynpmc' :anon
+    .param string group
+    .param string load_ext
+    $S0 = "dynext/" . group
+    $S0 .= load_ext
+    .return ($S0)
+.end
+
+.sub '_mk_path_gen_dynpmc' :anon
+    .param string src
+    .param string ext
+    $I0 = length src
+    $I0 -= 4
+    $S0 = substr src, 0, $I0
+    $S0 .= ext
+    unless ext == '.h' goto L1
+    $S1 = dirname($S0)
+    $S2 = basename($S0)
+    $S0 = $S1 . "/pmc_"
+    $S0 .= $S2
+  L1:
+    .return ($S0)
+.end
+
+.sub '_mk_path_gen_dynpmc_group' :anon
+    .param string src
+    .param string group
+    .param string ext
+    $S0 = dirname(src)
+    $S0 .= "/"
+    $S0 .= group
+    $S0 .= ext
+    .return ($S0)
+.end
 
 =item html_pod
 
@@ -806,7 +1016,42 @@ the value is the POD pathname
 
 .sub '_clean_dynpmc' :anon
     .param pmc hash
-    # todo
+    .local string load_ext, obj
+    load_ext = get_load_ext()
+    obj = get_obj()
+    $P0 = iter hash
+  L1:
+    unless $P0 goto L2
+    .local string group
+    group = shift $P0
+    .local pmc srcs
+    srcs = hash[group]
+    $S0 = _mk_path_dynpmc(group, load_ext)
+    unlink($S0)
+    $P1 = iter srcs
+  L3:
+    unless $P1 goto L4
+    .local string src
+    src = shift $P1
+    $S0 = _mk_path_gen_dynpmc(src, '.c')
+    unlink($S0)
+    $S0 = _mk_path_gen_dynpmc(src, '.h')
+    unlink($S0)
+    $S0 = _mk_path_gen_dynpmc(src, '.dump')
+    unlink($S0)
+    $S0 = _mk_path_gen_dynpmc(src, obj)
+    unlink($S0)
+    goto L3
+  L4:
+    src = srcs[0]
+    $S0 = _mk_path_gen_dynpmc_group(src, group, '.c')
+    unlink($S0)
+    $S0 = _mk_path_gen_dynpmc_group(src, group, '.h')
+    unlink($S0)
+    $S0 = _mk_path_gen_dynpmc_group(src, group, obj)
+    unlink($S0)
+    goto L1
+  L2:
 .end
 
 =item html_pod
@@ -1058,11 +1303,9 @@ array of pathname or a single pathname
   L1:
     unless $P0 goto L2
     $S0 = shift $P0
-    $S1 = "dynext/" . $S0
-    $S1 .= load_ext
-    $S2 = libdir . "/dynext/"
-    $S2 .= $S0
-    $S2 .= load_ext
+    $S1 = _mk_path_dynpmc($S0, load_ext)
+    $S2 = libdir . "/"
+    $S2 .= $S1
     cp($S1, $S2)
     goto L1
   L2:
@@ -1229,9 +1472,9 @@ Same options as install.
   L1:
     unless $P0 goto L2
     $S0 = shift $P0
-    $S1 = libdir . "/dynext/"
+    $S0 = _mk_path_dynpmc($S0, load_ext)
+    $S1 = libdir . "/"
     $S1 .= $S0
-    $S1 .= load_ext
     unlink($S1)
     goto L1
   L2:
@@ -1374,6 +1617,18 @@ Return the whole config
     $S0 = $P0['bindir']
     $S0 .= '/parrot'
     $S1 = $P0['exe']
+    $S0 .= $S1
+    .return ($S0)
+.end
+
+=item get_srcdir
+
+=cut
+
+.sub 'get_srcdir'
+    $P0 = get_config()
+    $S0 = $P0['srcdir']
+    $S1 = $P0['versiondir']
     $S0 .= $S1
     .return ($S0)
 .end
@@ -1527,6 +1782,23 @@ Return the whole config
     .return ()
 .end
 
+=item basename
+
+=cut
+
+.sub 'basename'
+    .param string path
+    $I0 = 0
+  L1:
+    $I1 = index path, '/', $I0
+    if $I1 < 0 goto L2
+    $I0 = $I1 + 1
+    goto L1
+  L2:
+    $S0 = substr path, $I0
+    .return ($S0)
+.end
+
 =item dirname
 
 =cut
@@ -1553,6 +1825,16 @@ Return the whole config
     new $P0, 'OS'
     $S0 = $P0.'cwd'()
     .return ($S0)
+.end
+
+=item chdir
+
+=cut
+
+.sub 'chdir'
+    .param string dirname
+    new $P0, 'OS'
+    $P0.'chdir'(dirname)
 .end
 
 =back
