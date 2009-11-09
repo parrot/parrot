@@ -14,13 +14,22 @@ the Parrot roadmap (L<https://trac.parrot.org/parrot/roadmap>) and
 announce the tasks to the Parrot mailing list.  Make sure everyone knows what
 they've committed to accomplish in time for the release.
 
+Right after the release preceeding your release, it is a good idea to start
+tracking parrot news in NEWS. A good resource are the reports
+in the weekly #parrotsketch IRC-meeting. A reliable log of these meetings
+is available in L<http://irclog.perlgeek.de/parrotsketch/>.
+
 A couple of weeks in advance: Ask people to run C<make fulltest> and
 report (and hopefully fix!) any problems they find. Check in with
 language project leads for release blockers, to allow time to fix them.
 Also ask people to review the tickets targeted for the upcoming release
-L<https://trac.parrot.org/parrot/roadmap>. Make sure your ssh keys have
-been added to the FTP server, so you'll be able to ship the release (any
-previous release manager can help).
+L<https://trac.parrot.org/parrot/roadmap>.
+
+Make sure your ssh keys have been added to the FTP server ftp-osl.osuosl.org.
+The key need to be there, so you'll be able to ship the release.
+Also set up your account on L<http://www.parrot.org/> and ask an existing release
+manager to provide you with editor privileges if you don't already have them.
+Any previous release manager can help.
 
 A couple of days in advance: announce the new release to
 parrot-dev@lists.parrot.org and to the IRC channel #parrot. Ask whether
@@ -32,9 +41,6 @@ L<https://trac.parrot.org/parrot/wiki/Languages>.
 You might also select a name (and optionally a quote) for your release.
 For example, you could select a name from
 L<http://en.wikipedia.org/wiki/List_of_parrots>.
-
-Set up your account on L<http://www.parrot.org/> and ask an existing release
-manager to provide you with editor privileges if you don't already have them.
 
 =item 1.
 
