@@ -35,8 +35,12 @@ L<http://github.com/fperrad/xml/blob/master/setup.pir>
     $P0 = new 'Hash'
     set_global '%step', $P0
 
+    .const 'Sub' build_dynops = 'build_dynops'
+    register_step('build', build_dynops)
+    .const 'Sub' build_dynpmc = 'build_dynpmc'
+    register_step_after('build', build_dynpmc)
     .const 'Sub' build_pir_pge = 'build_pir_pge'
-    register_step('build', build_pir_pge)
+    register_step_after('build', build_pir_pge)
     .const 'Sub' build_pir_nqp = 'build_pir_nqp'
     register_step_after('build', build_pir_nqp)
     .const 'Sub' build_pbc_pir = 'build_pbc_pir'
@@ -46,8 +50,12 @@ L<http://github.com/fperrad/xml/blob/master/setup.pir>
     .const 'Sub' build_html_pod = 'build_html_pod'
     register_step_after('build', build_html_pod)
 
+    .const 'Sub' clean_dynops = 'clean_dynops'
+    register_step('clean', clean_dynops)
+    .const 'Sub' clean_dynpmc = 'clean_dynpmc'
+    register_step_after('clean', clean_dynpmc)
     .const 'Sub' clean_pir_pge = 'clean_pir_pge'
-    register_step('clean', clean_pir_pge)
+    register_step_after('clean', clean_pir_pge)
     .const 'Sub' clean_pir_nqp = 'clean_pir_nqp'
     register_step_after('clean', clean_pir_nqp)
     .const 'Sub' clean_pbc_pir = 'clean_pbc_pir'
@@ -59,6 +67,10 @@ L<http://github.com/fperrad/xml/blob/master/setup.pir>
 
     .const 'Sub' install = 'install'
     register_step('install', install)
+    .const 'Sub' install_dynops = 'install_dynops'
+    register_step_after('install', install_dynops)
+    .const 'Sub' install_dynpmc = 'install_dynpmc'
+    register_step_after('install', install_dynpmc)
     .const 'Sub' install_exe_pbc = 'install_exe_pbc'
     register_step_after('install', install_exe_pbc)
 
@@ -67,6 +79,10 @@ L<http://github.com/fperrad/xml/blob/master/setup.pir>
 
     .const 'Sub' uninstall = 'uninstall'
     register_step('uninstall', uninstall)
+    .const 'Sub' uninstall_dynops = 'uninstall_dynops'
+    register_step_after('uninstall', uninstall_dynops)
+    .const 'Sub' uninstall_dynpmc = 'uninstall_dynpmc'
+    register_step_after('uninstall', uninstall_dynpmc)
     .const 'Sub' uninstall_exe_pbc = 'uninstall_exe_pbc'
     register_step_after('uninstall', uninstall_exe_pbc)
 
@@ -401,6 +417,199 @@ the value is the PBC pathname
   L2:
 .end
 
+=item dynops
+
+hash
+
+the key is the name
+
+the value is the OPS pathname
+
+=item dynops_cflags
+
+=item dynops_ldflags
+
+=cut
+
+.sub 'build_dynops'
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['dynops']
+    unless $I0 goto L1
+    mkpath('dynext')
+    .local string cflags, ldflags
+    cflags = ''
+    $I0 = exists kv['dynops_cflags']
+    unless $I0 goto L2
+    cflags = kv['dynops_cflags']
+  L2:
+    ldflags = ''
+    $I0 = exists kv['dynops_ldflags']
+    unless $I0 goto L3
+    ldflags = kv['dynops_ldflags']
+  L3:
+    $P0 = kv['dynops']
+    _build_dynops($P0, cflags, ldflags)
+  L1:
+.end
+
+.sub '_build_dynops' :anon
+    .param pmc hash
+    .param string cflags
+    .param string ldflags
+    .local pmc cores
+    cores = get_cores()
+    .local string load_ext
+    load_ext = get_load_ext()
+    $P0 = iter hash
+  L1:
+    unless $P0 goto L2
+    .local string ops, src
+    ops = shift $P0
+    src = hash[ops]
+    $P1 = iter cores
+  L3:
+    unless $P1 goto L4
+    .local string core, suffix
+    core = shift $P1
+    suffix = cores[core]
+    $S0 = _mk_path_dynops(ops, suffix, load_ext)
+    $I0 = newer($S0, src)
+    if $I0 goto L3
+    __build_dynops(src, ops, core, suffix, cflags, ldflags)
+    goto L3
+  L4:
+    goto L1
+  L2:
+.end
+
+.sub '__build_dynops'
+    .param string src
+    .param string ops
+    .param string core
+    .param string suffix
+    .param string cflags
+    .param string ldflags
+    .local pmc config
+    config = get_config()
+    .local string cmd
+    cmd = config['perl']
+    cmd .= " "
+    $S0 = get_libdir()
+    cmd .= $S0
+    cmd .= "/tools/build/ops2c.pl "
+    cmd .= core
+    cmd .= " --dynamic "
+    cmd .= src
+    system(cmd)
+    cmd = config['cc']
+    cmd .= " -c "
+    $S0 = config['cc_o_out']
+    cmd .= " "
+    $S0 = config['o']
+    $S0 = _mk_path_gen_dynops(src, ops, suffix, $S0)
+    cmd .= $S0
+    cmd .= " -I"
+    $S0 = get_incdir()
+    cmd .= $S0
+    cmd .= " -I"
+    cmd .= $S0
+    cmd .= "/pmc -I"
+    $S0 = cwd()
+    cmd .= $S0
+    cmd .= " "
+    $S0 = get_cflags()
+    cmd .= $S0
+    cmd .= " "
+    cmd .= cflags
+    cmd .= " "
+    $S0 = _mk_path_gen_dynops(src, ops, suffix, '.c')
+    cmd .= $S0
+    system(cmd)
+    cmd = config['ld']
+    cmd .= " "
+    $S0 = config['ld_out']
+    cmd .= $S0
+    $S0 = config['load_ext']
+    $S0 = _mk_path_dynops(ops, suffix, $S0)
+    cmd .= $S0
+    cmd .= " "
+    $S0 = config['o']
+    $S0 = _mk_path_gen_dynops(src, ops, suffix, $S0)
+    cmd .= $S0
+    cmd .= " "
+    $S0 = get_ldflags()
+    cmd .= $S0
+    cmd .= " "
+    $S0 = config['ld_load_flags']
+    cmd .= $S0
+    cmd .= " "
+    $I0 = config['parrot_is_shared']
+    unless $I0 goto L1
+    $S0 = config['inst_libparrot_ldflags']
+    cmd .= $S0
+    cmd .= " "
+  L1:
+    cmd .= ldflags
+    system(cmd)
+.end
+
+.sub '_mk_path_dynops' :anon
+    .param string ops
+    .param string suffix
+    .param string load_ext
+    $S0 = "dynext/" . ops
+    $S0 .= suffix
+    $S0 .= load_ext
+    .return ($S0)
+.end
+
+.sub '_mk_path_gen_dynops' :anon
+    .param string src
+    .param string ops
+    .param string suffix
+    .param string ext
+    $S0 = dirname(src)
+    $S0 .= "/"
+    $S0 .= ops
+    $S0 .= suffix
+    $S0 .= ext
+    .return ($S0)
+.end
+
+.sub 'get_cores' :anon
+    $P0 = new 'Hash'
+    $P0['C'] = ''
+#    $P0['CGP'] = '_cgp'
+#    $P0['CGoto'] = '_cg'
+    $P0['CSwitch'] = '_switch'
+    .return ($P0)
+.end
+
+=item dynpmc
+
+hash
+
+the key is the group name
+
+the value is an array of PMC pathname
+
+=item dynpmc_cflags
+
+=item dynpmc_ldflags
+
+=cut
+
+.sub 'build_dynpmc'
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['dynpmc']
+    unless $I0 goto L1
+    mkpath('dynext')
+    $P0 = kv['dynpmc']
+#    _build_exe_pbc($P0)
+  L1:
+.end
+
+
 =item html_pod
 
 hash
@@ -534,6 +743,70 @@ the value is the POD pathname
      unlink($S1)
      goto L1
   L2:
+.end
+
+=item dynops
+
+=cut
+
+.sub 'clean_dynops'
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['dynops']
+    unless $I0 goto L1
+    $P0 = kv['dynops']
+    _clean_dynops($P0)
+  L1:
+.end
+
+.sub '_clean_dynops' :anon
+    .param pmc hash
+    .local pmc cores
+    cores = get_cores()
+    .local string load_ext, obj
+    load_ext = get_load_ext()
+    obj = get_obj()
+    $P0 = iter hash
+  L1:
+    unless $P0 goto L2
+    .local string ops, src
+    ops = shift $P0
+    src = hash[ops]
+    $P1 = iter cores
+  L3:
+    unless $P1 goto L4
+    .local string core, suffix
+    core = shift $P1
+    suffix = cores[core]
+    $S0 = _mk_path_dynops(ops, suffix, load_ext)
+    unlink($S0)
+    $S0 = _mk_path_gen_dynops(src, ops, suffix, '.c')
+    unlink($S0)
+    $S0 = _mk_path_gen_dynops(src, ops, suffix, '.h')
+    unlink($S0)
+    $S0 = _mk_path_gen_dynops(src, ops, suffix, obj)
+    unlink($S0)
+    goto L3
+  L4:
+    goto L1
+  L2:
+.end
+
+=item dynpmc
+
+=cut
+
+.sub 'clean_dynpmc'
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['dynpmc']
+    unless $I0 goto L1
+    $P0 = kv['dynpmc']
+    _clean_dynpmc($P0)
+  L1:
+.end
+
+.sub '_clean_dynpmc' :anon
+    .param pmc hash
+    # todo
 .end
 
 =item html_pod
@@ -724,6 +997,77 @@ array of pathname or a single pathname
   L2:
 .end
 
+=item dynops
+
+=cut
+
+.sub 'install_dynops'
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['dynops']
+    unless $I0 goto L1
+    $P0 = kv['dynops']
+    _install_dynops($P0)
+  L1:
+.end
+
+.sub '_install_dynops' :anon
+    .param pmc hash
+    .local string libdir, load_ext, ops, suffix
+    libdir = get_libdir()
+    load_ext = get_load_ext()
+    .local pmc cores
+    cores = get_cores()
+    $P0 = iter hash
+  L1:
+    unless $P0 goto L2
+    ops = shift $P0
+    $P1 = iter cores
+  L3:
+    unless $P1 goto L4
+    $S0 = shift $P1
+    suffix = cores[$S0]
+    $S1 = _mk_path_dynops(ops, suffix, load_ext)
+    $S2 = libdir . "/"
+    $S2 .= $S1
+    cp($S1, $S2)
+    goto L3
+  L4:
+    goto L1
+  L2:
+.end
+
+=item dynpmc
+
+=cut
+
+.sub 'install_dynpmc'
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['dynpmc']
+    unless $I0 goto L1
+    $P0 = kv['dynpmc']
+    _install_dynpmc($P0)
+  L1:
+.end
+
+.sub '_install_dynpmc' :anon
+    .param pmc hash
+    .local string libdir, load_ext
+    libdir = get_libdir()
+    load_ext = get_load_ext()
+    $P0 = iter hash
+  L1:
+    unless $P0 goto L2
+    $S0 = shift $P0
+    $S1 = "dynext/" . $S0
+    $S1 .= load_ext
+    $S2 = libdir . "/dynext/"
+    $S2 .= $S0
+    $S2 .= load_ext
+    cp($S1, $S2)
+    goto L1
+  L2:
+.end
+
 =back
 
 =head3 Step uninstall
@@ -832,6 +1176,67 @@ Same options as install.
   L2:
 .end
 
+.sub 'uninstall_dynops'
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['dynops']
+    unless $I0 goto L1
+    $P0 = kv['dynops']
+    _uninstall_dynops($P0)
+  L1:
+.end
+
+.sub '_uninstall_dynops' :anon
+    .param pmc hash
+    .local string libdir, load_ext, ops, suffix
+    libdir = get_libdir()
+    load_ext = get_load_ext()
+    .local pmc cores
+    cores = get_cores()
+    $P0 = iter hash
+  L1:
+    unless $P0 goto L2
+    ops = shift $P0
+    $P1 = iter cores
+  L3:
+    unless $P1 goto L4
+    $S0 = shift $P1
+    suffix = cores[$S0]
+    $S0 = _mk_path_dynops(ops, suffix, load_ext)
+    $S1 = libdir . "/"
+    $S1 .= $S0
+    unlink($S1)
+    goto L3
+  L4:
+    goto L1
+  L2:
+.end
+
+.sub 'uninstall_dynpmc'
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['dynpmc']
+    unless $I0 goto L1
+    $P0 = kv['dynpmc']
+    _uninstall_dynpmc($P0)
+  L1:
+.end
+
+.sub '_uninstall_dynpmc' :anon
+    .param pmc hash
+    .local string libdir, load_ext
+    libdir = get_libdir()
+    load_ext = get_load_ext()
+    $P0 = iter hash
+  L1:
+    unless $P0 goto L2
+    $S0 = shift $P0
+    $S1 = libdir . "/dynext/"
+    $S1 .= $S0
+    $S1 .= load_ext
+    unlink($S1)
+    goto L1
+  L2:
+.end
+
 =head3 Configuration Helpers
 
 =over 4
@@ -860,6 +1265,32 @@ Return the whole config
     .return ($S0)
 .end
 
+=item get_cflags
+
+=cut
+
+.sub 'get_cflags'
+    $P0 = get_config()
+    .local string flags
+    flags = $P0['ccflags']
+    flags .= " "
+    $S0 = $P0['cc_shared']
+    flags .= $S0
+    flags .= " "
+    $S0 = $P0['cc_debug']
+    flags .= $S0
+    flags .= " "
+    $S0 = $P0['ccwarn']
+    flags .= $S0
+    flags .= " "
+    $S0 = $P0['cc_hasjit']
+    flags .= $S0
+    flags .= " "
+    $S0 = $P0['cg_flag']
+    flags .= $S0
+    .return (flags)
+.end
+
 =item get_exe
 
 =cut
@@ -867,6 +1298,18 @@ Return the whole config
 .sub 'get_exe'
     $P0 = get_config()
     $S0 = $P0['exe']
+    .return ($S0)
+.end
+
+=item get_incdir
+
+=cut
+
+.sub 'get_incdir'
+    $P0 = get_config()
+    $S0 = $P0['includedir']
+    $S1 = $P0['versiondir']
+    $S0 .= $S1
     .return ($S0)
 .end
 
@@ -879,6 +1322,36 @@ Return the whole config
     $S0 = $P0['libdir']
     $S1 = $P0['versiondir']
     $S0 .= $S1
+    .return ($S0)
+.end
+
+=item get_ldflags
+
+=cut
+
+.sub 'get_ldflags'
+    $P0 = get_config()
+    .local string flags
+    flags = $P0['ldflags']
+    flags .= " "
+    $S0 = $P0['ld_debug']
+    flags .= $S0
+    flags .= " "
+    $S0 = $P0['rpath_blib']
+    flags .= $S0
+    flags .= " "
+    $S0 = $P0['linkflags']
+    flags .= $S0
+    .return (flags)
+.end
+
+=item get_load_ext
+
+=cut
+
+.sub 'get_load_ext'
+    $P0 = get_config()
+    $S0 = $P0['load_ext']
     .return ($S0)
 .end
 
@@ -1052,6 +1525,34 @@ Return the whole config
     pop_eh
   _handler:
     .return ()
+.end
+
+=item dirname
+
+=cut
+
+.sub 'dirname'
+    .param string path
+    $I0 = 0
+  L1:
+    $I1 = index path, '/', $I0
+    if $I1 < 0 goto L2
+    $I0 = $I1 + 1
+    goto L1
+  L2:
+    dec $I0
+    $S0 = substr path, 0, $I0
+    .return ($S0)
+.end
+
+=item cwd
+
+=cut
+
+.sub 'cwd'
+    new $P0, 'OS'
+    $S0 = $P0.'cwd'()
+    .return ($S0)
 .end
 
 =back
