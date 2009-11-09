@@ -93,7 +93,7 @@ So we do a bit of cheating here, and load it during class initialization.
 
     VTABLE void class_init() {
 #ifdef WIN32
-        /* RT #46393: What if libgdbm.so cannot be loaded */
+        /* TT #1252:  What if libgdbm.so cannot be loaded */
         /* Parrot_load_lib(interp, slib, NULL); */
         STRING *slib = CONST_STRING(interp, "gdbm3");
 #endif
