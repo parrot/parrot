@@ -290,7 +290,7 @@ okay:
     .local pmc thread_main
     thread_main = get_global 'thread_main'
     $P0.'run_clone'(thread_main)
-    $P0.'join'() # RT #46813
+    $P0.'join'()
 .end
 
 .sub thread_main
