@@ -733,20 +733,31 @@ the value is an array of PMC pathname
     pmc2c_includes .= " --include "
     pmc2c_includes .= $S0
     pmc2c_includes .= "/pmc"
+    .local string current_dir
+    current_dir = cwd()
+    $S0 = dirname(src)
+    chdir($S0)
+
     .local string cmd
     cmd = clone pmc2c
     cmd .= " --dump "
     cmd .= pmc2c_includes
     cmd .= " "
-    cmd .= src
+#    cmd .= src
+    $S0 = basename(src)
+    cmd .= $S0
     system(cmd)
 
     cmd = clone pmc2c
     cmd .= " --c "
     cmd .= pmc2c_includes
     cmd .= " "
-    cmd .= src
+#    cmd .= src
+    $S0 = basename(src)
+    cmd .= $S0
     system(cmd)
+
+    chdir(current_dir)
 
     $S0 = config['o']
     $S1 = _mk_path_gen_dynpmc(src, $S0)
@@ -768,6 +779,7 @@ the value is an array of PMC pathname
     current_dir = cwd()
     $S0 = dirname(src)
     chdir($S0)
+
     .local string cmd
     cmd = config['perl']
     cmd .= " "
@@ -791,10 +803,13 @@ the value is an array of PMC pathname
     goto L1
   L2:
     system(cmd)
+
     chdir(current_dir)
+
     $S1 = _mk_path_gen_dynpmc_group(src, group, obj)
     $S2 = _mk_path_gen_dynpmc_group(src, group, '.c')
     __compile_cc($S1, $S2, cflags)
+
     cmd = config['ld']
     cmd .= " "
     $S0 = config['ld_out']
@@ -829,7 +844,6 @@ the value is an array of PMC pathname
   L5:
     cmd .= ldflags
     system(cmd)
-
 .end
 
 .sub '_mk_path_dynpmc' :anon
