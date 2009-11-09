@@ -43,6 +43,8 @@ L<http://github.com/fperrad/wmlscript/blob/master/setup.pir>
     register_step_after('build', build_dynpmc)
     .const 'Sub' build_pir_pge = 'build_pir_pge'
     register_step_after('build', build_pir_pge)
+    .const 'Sub' build_pir_tge = 'build_pir_tge'
+    register_step_after('build', build_pir_tge)
     .const 'Sub' build_pir_nqp = 'build_pir_nqp'
     register_step_after('build', build_pir_nqp)
     .const 'Sub' build_pbc_pir = 'build_pbc_pir'
@@ -58,6 +60,8 @@ L<http://github.com/fperrad/wmlscript/blob/master/setup.pir>
     register_step_after('clean', clean_dynpmc)
     .const 'Sub' clean_pir_pge = 'clean_pir_pge'
     register_step_after('clean', clean_pir_pge)
+    .const 'Sub' clean_pir_tge = 'clean_pir_tge'
+    register_step_after('clean', clean_pir_tge)
     .const 'Sub' clean_pir_nqp = 'clean_pir_nqp'
     register_step_after('clean', clean_pir_nqp)
     .const 'Sub' clean_pbc_pir = 'clean_pbc_pir'
@@ -322,6 +326,49 @@ the value is the PGE pathname
     cmd .= pir
     cmd .= " "
     cmd .= pge
+    system(cmd)
+    goto L1
+  L2:
+.end
+
+=item pir_tge
+
+hash
+
+the key is the PIR pathname
+
+the value is the TGE pathname
+
+=cut
+
+.sub 'build_pir_tge'
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['pir_tge']
+    unless $I0 goto L1
+    $P0 = kv['pir_tge']
+    _build_pir_tge($P0)
+  L1:
+.end
+
+.sub '_build_pir_tge' :anon
+    .param pmc hash
+    $P0 = iter hash
+  L1:
+    unless $P0 goto L2
+    .local string pir, tge
+    pir = shift $P0
+    tge = $P0[pir]
+    $I0 = newer(pir, tge)
+    if $I0 goto L1
+    .local string cmd
+    cmd = get_parrot()
+    cmd .= " "
+    $S0 = get_libdir()
+    cmd .= $S0
+    cmd .= "/languages/tge/tgc.pir --output="
+    cmd .= pir
+    cmd .= " "
+    cmd .= tge
     system(cmd)
     goto L1
   L2:
@@ -900,6 +947,19 @@ the value is the POD pathname
     $I0 = exists kv['pir_pge']
     unless $I0 goto L1
     $P0 = kv['pir_pge']
+    _clean_key($P0)
+  L1:
+.end
+
+=item pir_tge
+
+=cut
+
+.sub 'clean_pir_tge'
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['pir_tge']
+    unless $I0 goto L1
+    $P0 = kv['pir_tge']
     _clean_key($P0)
   L1:
 .end
