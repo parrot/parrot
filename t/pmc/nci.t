@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 70;
+use Parrot::Test tests => 71;
 use Parrot::Config qw(%PConfig);
 
 =head1 NAME
@@ -1355,6 +1355,31 @@ hello from Parrot
 31
 OUTPUT
 
+    pir_output_is( << 'CODE', << "OUTPUT", "nci_pi - null" );
+
+.include "datatypes.pasm"
+
+.sub test :main
+
+  # load library
+  .local pmc libnci_test
+  libnci_test = loadlib "libnci_test"
+  unless libnci_test goto FAILED
+
+  # calling a function in libnci_test
+  .local pmc nci_pi
+  dlfunc nci_pi, libnci_test, "nci_pi", "pi"
+  .local pmc result
+  result = nci_pi( 10 )
+  unless_null result, FAILED
+  print "got null"
+FAILED:
+  print "\n"
+.end
+CODE
+got null
+OUTPUT
+
     pasm_output_is( <<'CODE', <<'OUTPUT', "nci_vP" );
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_vP", "vP"
@@ -2660,12 +2685,16 @@ pir_output_is( << 'CODE', << 'OUTPUT', "nci_vVi - void** out parameter" );
     nci_vp = dlfunc libnci_test, "nci_vp", "vp"
 
     .local pmc opaque
+    null opaque
+    nci_vp(opaque)
+
     opaque = new ['Pointer']
     $I0 = 10
     nci_vVi(opaque, $I0)
     nci_vp(opaque)
 .end
 CODE
+got null
 got 10
 OUTPUT
 

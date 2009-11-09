@@ -693,6 +693,8 @@ nci_pi(int test)
                 static int i = 55555;
                 return &i;
             }
+        case 10:
+            return NULL;
         default:
             fprintf(stderr, "unknown test number\n");
     }
@@ -1103,7 +1105,7 @@ nci_vp(Opaque *inOpaque)
     if (inOpaque)
         printf("got %d\n", inOpaque->x);
     else
-        printf("got null");
+        printf("got null\n");
 }
 
 /*

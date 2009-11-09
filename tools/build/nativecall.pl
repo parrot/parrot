@@ -41,9 +41,13 @@ print_head( \@ARGV );
 my %sig_table = (
     p => {
         as_proto => "void *",
-        other_decl => "PMC * const final_destination = pmc_new(interp, enum_class_UnManagedStruct);",
+        other_decl => "PMC * final_destination = PMCNULL;",
         sig_char => "P",
-        ret_assign => "VTABLE_set_pointer(interp, final_destination, return_data);\n    Parrot_pcc_fill_returns_from_c_args(interp, call_object, \"P\", final_destination);",
+        ret_assign => "if (return_data != NULL) {\n" .
+             "        final_destination = pmc_new(interp, enum_class_UnManagedStruct);\n" .
+             "        VTABLE_set_pointer(interp, final_destination, return_data);\n" .
+             "    }\n" .
+             "    Parrot_pcc_fill_returns_from_c_args(interp, call_object, \"P\", final_destination);",
     },
     i => { as_proto => "int",    sig_char => "I" },
     l => { as_proto => "long",   sig_char => "I" },
@@ -257,7 +261,7 @@ sub make_arg {
     /p/ && do {
         push @{$temps_ref},       "PMC *t_$temp_num;";
         push @{$fill_params_ref}, "&t_$temp_num";
-        return "VTABLE_get_pointer(interp, t_$temp_num)";
+        return "PMC_IS_NULL((PMC*)t_$temp_num)? (void*)NULL:VTABLE_get_pointer(interp, t_$temp_num)";
     };
     /V/ && do {
         push @{$temps_ref},          "PMC *t_$temp_num;";
