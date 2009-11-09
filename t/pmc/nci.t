@@ -1380,7 +1380,7 @@ CODE
 got null
 OUTPUT
 
-    pasm_output_is( <<'CODE', <<'OUTPUT', "nci_vP" );
+    pasm_output_is( <<'CODE', <<'OUTPUT', "nci_vP", todo => 'Disabled to avoid linkage problems, see src/nci_test.c' );
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_vP", "vP"
   new P5, ['String']
