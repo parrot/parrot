@@ -92,10 +92,12 @@ A PMC register.
 
 =item p
 
-PMC thingie. A generic pointer, taken from or stuck into a PMC's data
-pointer.  If this is a return type, parrot will create a new UnManagedStruct
-PMC type, which is just a generic "pointer to some damn thing or other" PMC
-type which Parrot does I<no> management of.
+PMC thingie. A generic pointer, taken from a PMC by using its
+get_pointer vtable function, or NULL for a PMCNULL.
+If this is a return type and the value is NULL, PMCNULL is returned,
+otherwise parrot will create a new UnManagedStruct PMC type, which
+is just a generic "pointer to something" PMC type which Parrot does
+I<no> management of.
 
 =item 2
 
