@@ -2,13 +2,13 @@
 
 New in 1.8.0 (to be released on 2009-11-19)
 - Functionality
-  + Added the new API-function  'Parrot_ext_call' for calling into C-land.
-  + Improvements to the fixed-size allocator.
-  + libjit frame builder
-  + The files installed by 'make install-dev' are now installed by 'make install' as well.
+  + Revamping of the parrot calling conventions.
+  + The new API-function  'Parrot_ext_call' was added for calling into C-land.
+  + Improvements to the fixed-size allocator were made.
+  + The files installed by 'make install-dev' are now covered by 'make install' as well.
   + Added experimental 'fetch' op.
   + Added experimental 'vivify' op.
-  + The -I option now prepends item to the search path.
+  + The -I option now prepends items to the search path.
   + Merged branch context_auto_attrs back to trunk.
   + Merge convert_OSNAME into trunk.
   + MultiSub PMCs now stringify to the name
@@ -17,21 +17,21 @@ New in 1.8.0 (to be released on 2009-11-19)
   + Started port of RTEMS.
   + Use shared libs on NetBSD.
 - Performance
-  + Use the the fixed-sized allocator in the Context and the CallSignature PMC
-- Maintenance and cleanup
-  + Revamping of the parrot calling conventions
+  + Use the the fixed-sized allocator in the Context and the CallSignature PMC.
+  + Speed penalty from the reworked parrot calling conventions.
+  + Many small speed improvments.
 - Deprecations
   + The last traces of the 'malloc' garbage collector were removed.
   + The 'Parrot_call_*' functions for invoking a sub/method object from C are
     deprecated. They are replaced by 'Parrot_ext_call'. (eligible in 2.1)
   + Renamed Parrot_pcc_constants() to Parrot_pcc_get_constants().
-  + Deprecated from the Embedding/Extension interface were removed.
+  + Deprecated functions from the Embedding/Extension interface were removed.
   + The library YAML/Parser/Syck.pir has been removed.
   + Removed the deprecated VTABLE function instantiate_str().
-- Bugfix
 - Tests
   + New tests using the new test functions lives_ok() and dies_ok().
-  + Added test file t/op/annotate-old.t.
+  + Added test script t/op/annotate-old.t.
+  + Many test scripst were converted from Perl5 to PIR.
 
 New in 1.7.0
 - Functionality
