@@ -414,11 +414,11 @@ the value is the NQP pathname
     $I0 = newer(pir, nqp)
     if $I0 goto L1
     .local string cmd
-    cmd = get_bindir()
-    cmd .= "/parrot_nqp"
-    $S0 = get_exe()
+    cmd = get_parrot()
+    cmd .= " "
+    $S0 = get_libdir()
     cmd .= $S0
-    cmd .= " --target=pir --output="
+    cmd .= "/languages/nqp/nqp.pbc --target=pir --output="
     cmd .= pir
     cmd .= " "
     cmd .= nqp
