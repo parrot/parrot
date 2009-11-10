@@ -116,17 +116,14 @@ CODE
     }
 }
 
-# 5 & 6
-if ( $PConfig{osname} eq 'MSWin32' ) {
-    # Windows 5 & 6
+SKIP:
+{
+    $PConfig{osname} eq 'MSWin32'
+        or skip "Tests only meaningful on Win32", 2;
     SKIP:
     {
         eval { require Win32; } or
             skip "requires package Win32 for these tests", 2;
-
-        # specifically don't use $Config{osvers}
-        # because it probably was the system perl was compiled on
-        # and we can do much better than that
 
         my $osname = Win32::GetOSName();
         $osname = 'WinXP' if $osname =~ m/^WinXP/;
@@ -145,31 +142,9 @@ CODE
     print S1
 end
 CODE
-        }
-    }
-}
-else {
-    # Other 5 & 6
-
-    # XXX I know this is wrong on Win32 but is it correct on any others?
-    # XXX also should it be %Config or %PConfig
-    TODO:
-    {
-        local $TODO = "Not Currently Implemented";
-
-        pasm_output_is( <<'CODE', $Config{osvers}, "sysinfo OS version string" );
-    sysinfo_s_ic S1, 5
-    print S1
-end
-CODE
-
-        pasm_output_is( <<'CODE', $Config{osvers}, "sysinfo OS version number string" );
-    sysinfo_s_ic S1, 6
-    print S1
-end
-CODE
-    }
-}
+        } # END TODO block
+    } # END inner SKIP block
+} # END outer SKIP block
 
 SKIP:
 {
