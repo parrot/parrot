@@ -21,7 +21,7 @@ The Class PMC structure (C<Parrot_Class>) consists of twelve items:
 
 =item C<id>
 
-The type number of the PMC. [deprecated: See RT #48024]
+The type number of the PMC.
 
 =item C<name>
 
@@ -460,7 +460,7 @@ calculate_mro(PARROT_INTERP, PMC *SELF, INTVAL num_parents)
 
 pmclass Class auto_attrs {
 
-    ATTR INTVAL id;             /* The type number of the PMC. [deprecated: See RT #48024] */
+    ATTR INTVAL id;             /* The type number of the PMC. */
     ATTR STRING *name;          /* The name of the class. */
     ATTR STRING *fullname;      /* The name of the class. */
     ATTR PMC *_namespace;       /* The namespace it's linked to, if any. */
@@ -1160,7 +1160,7 @@ Creates a new PMC object of the type of the class and calls init().
             }
 
             /* Build full parents list.
-             * RT #46101 Need pluggable MRO, for now always do C3. */
+             * TT #1256:  Need pluggable MRO, for now always do C3. */
             calculate_mro(interp, SELF, num_parents);
             build_attrib_index(interp, SELF);
 
