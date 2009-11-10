@@ -37,63 +37,63 @@ L<http://github.com/fperrad/wmlscript/blob/master/setup.pir>
     $P0 = new 'Hash'
     set_global '%step', $P0
 
-    .const 'Sub' build_dynops = 'build_dynops'
-    register_step('build', build_dynops)
-    .const 'Sub' build_dynpmc = 'build_dynpmc'
-    register_step_after('build', build_dynpmc)
-    .const 'Sub' build_pir_pge = 'build_pir_pge'
-    register_step_after('build', build_pir_pge)
-    .const 'Sub' build_pir_tge = 'build_pir_tge'
-    register_step_after('build', build_pir_tge)
-    .const 'Sub' build_pir_nqp = 'build_pir_nqp'
-    register_step_after('build', build_pir_nqp)
-    .const 'Sub' build_pbc_pir = 'build_pbc_pir'
-    register_step_after('build', build_pbc_pir)
-    .const 'Sub' build_exe_pbc = 'build_exe_pbc'
-    register_step_after('build', build_exe_pbc)
-    .const 'Sub' build_html_pod = 'build_html_pod'
-    register_step_after('build', build_html_pod)
+    .const 'Sub' _build_dynops = '_build_dynops'
+    register_step('build', _build_dynops)
+    .const 'Sub' _build_dynpmc = '_build_dynpmc'
+    register_step_after('build', _build_dynpmc)
+    .const 'Sub' _build_pir_pge = '_build_pir_pge'
+    register_step_after('build', _build_pir_pge)
+    .const 'Sub' _build_pir_tge = '_build_pir_tge'
+    register_step_after('build', _build_pir_tge)
+    .const 'Sub' _build_pir_nqp = '_build_pir_nqp'
+    register_step_after('build', _build_pir_nqp)
+    .const 'Sub' _build_pbc_pir = '_build_pbc_pir'
+    register_step_after('build', _build_pbc_pir)
+    .const 'Sub' _build_exe_pbc = '_build_exe_pbc'
+    register_step_after('build', _build_exe_pbc)
+    .const 'Sub' _build_html_pod = '_build_html_pod'
+    register_step_after('build', _build_html_pod)
 
-    .const 'Sub' clean_dynops = 'clean_dynops'
-    register_step('clean', clean_dynops)
-    .const 'Sub' clean_dynpmc = 'clean_dynpmc'
-    register_step_after('clean', clean_dynpmc)
-    .const 'Sub' clean_pir_pge = 'clean_pir_pge'
-    register_step_after('clean', clean_pir_pge)
-    .const 'Sub' clean_pir_tge = 'clean_pir_tge'
-    register_step_after('clean', clean_pir_tge)
-    .const 'Sub' clean_pir_nqp = 'clean_pir_nqp'
-    register_step_after('clean', clean_pir_nqp)
-    .const 'Sub' clean_pbc_pir = 'clean_pbc_pir'
-    register_step_after('clean', clean_pbc_pir)
-    .const 'Sub' clean_exe_pbc = 'clean_exe_pbc'
-    register_step_after('clean', clean_exe_pbc)
-    .const 'Sub' clean_html_pod = 'clean_html_pod'
-    register_step_after('clean', clean_html_pod)
+    .const 'Sub' _clean_dynops = '_clean_dynops'
+    register_step('clean', _clean_dynops)
+    .const 'Sub' _clean_dynpmc = '_clean_dynpmc'
+    register_step_after('clean', _clean_dynpmc)
+    .const 'Sub' _clean_pir_pge = '_clean_pir_pge'
+    register_step_after('clean', _clean_pir_pge)
+    .const 'Sub' _clean_pir_tge = '_clean_pir_tge'
+    register_step_after('clean', _clean_pir_tge)
+    .const 'Sub' _clean_pir_nqp = '_clean_pir_nqp'
+    register_step_after('clean', _clean_pir_nqp)
+    .const 'Sub' _clean_pbc_pir = '_clean_pbc_pir'
+    register_step_after('clean', _clean_pbc_pir)
+    .const 'Sub' _clean_exe_pbc = '_clean_exe_pbc'
+    register_step_after('clean', _clean_exe_pbc)
+    .const 'Sub' _clean_html_pod = '_clean_html_pod'
+    register_step_after('clean', _clean_html_pod)
 
-    .const 'Sub' install = 'install'
-    register_step('install', install)
-    .const 'Sub' install_dynops = 'install_dynops'
-    register_step_after('install', install_dynops)
-    .const 'Sub' install_dynpmc = 'install_dynpmc'
-    register_step_after('install', install_dynpmc)
-    .const 'Sub' install_exe_pbc = 'install_exe_pbc'
-    register_step_after('install', install_exe_pbc)
+    .const 'Sub' _install = '_install'
+    register_step('install', _install)
+    .const 'Sub' _install_dynops = '_install_dynops'
+    register_step_after('install', _install_dynops)
+    .const 'Sub' _install_dynpmc = '_install_dynpmc'
+    register_step_after('install', _install_dynpmc)
+    .const 'Sub' _install_exe_pbc = '_install_exe_pbc'
+    register_step_after('install', _install_exe_pbc)
 
-    .const 'Sub' test = 'test'
-    register_step('test', test)
+    .const 'Sub' _test = '_test'
+    register_step('test', _test)
 
-    .const 'Sub' uninstall = 'uninstall'
-    register_step('uninstall', uninstall)
-    .const 'Sub' uninstall_dynops = 'uninstall_dynops'
-    register_step_after('uninstall', uninstall_dynops)
-    .const 'Sub' uninstall_dynpmc = 'uninstall_dynpmc'
-    register_step_after('uninstall', uninstall_dynpmc)
-    .const 'Sub' uninstall_exe_pbc = 'uninstall_exe_pbc'
-    register_step_after('uninstall', uninstall_exe_pbc)
+    .const 'Sub' _uninstall = '_uninstall'
+    register_step('uninstall', _uninstall)
+    .const 'Sub' _uninstall_dynops = '_uninstall_dynops'
+    register_step_after('uninstall', _uninstall_dynops)
+    .const 'Sub' _uninstall_dynpmc = '_uninstall_dynpmc'
+    register_step_after('uninstall', _uninstall_dynpmc)
+    .const 'Sub' _uninstall_exe_pbc = '_uninstall_exe_pbc'
+    register_step_after('uninstall', _uninstall_exe_pbc)
 
-    .const 'Sub' usage = 'usage'
-    register_step('usage', usage)
+    .const 'Sub' _usage = '_usage'
+    register_step('usage', _usage)
 .end
 
 =head3 Functions
@@ -205,7 +205,7 @@ Overload the default message
 
 =cut
 
-.sub 'usage'
+.sub '_usage' :anon
     .param pmc kv :slurpy :named
     .local string msg
     msg = <<'USAGE'
@@ -248,16 +248,16 @@ the others items of the array are just the dependencies
 
 =cut
 
-.sub 'build_pbc_pir'
+.sub '_build_pbc_pir' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['pbc_pir']
     unless $I0 goto L1
     $P0 = kv['pbc_pir']
-    _build_pbc_pir($P0)
+    build_pbc_pir($P0)
   L1:
 .end
 
-.sub '_build_pbc_pir' :anon
+.sub 'build_pbc_pir'
     .param pmc hash
     $P0 = iter hash
   L1:
@@ -298,16 +298,16 @@ the value is an array of PGE pathname or a single PGE pathname
 
 =cut
 
-.sub 'build_pir_pge'
+.sub '_build_pir_pge' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['pir_pge']
     unless $I0 goto L1
     $P0 = kv['pir_pge']
-    _build_pir_pge($P0)
+    build_pir_pge($P0)
   L1:
 .end
 
-.sub '_build_pir_pge' :anon
+.sub 'build_pir_pge'
     .param pmc hash
     $P0 = iter hash
   L1:
@@ -351,16 +351,16 @@ the value is the TGE pathname
 
 =cut
 
-.sub 'build_pir_tge'
+.sub '_build_pir_tge' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['pir_tge']
     unless $I0 goto L1
     $P0 = kv['pir_tge']
-    _build_pir_tge($P0)
+    build_pir_tge($P0)
   L1:
 .end
 
-.sub '_build_pir_tge' :anon
+.sub 'build_pir_tge'
     .param pmc hash
     $P0 = iter hash
   L1:
@@ -394,16 +394,16 @@ the value is the NQP pathname
 
 =cut
 
-.sub 'build_pir_nqp'
+.sub '_build_pir_nqp' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['pir_nqp']
     unless $I0 goto L1
     $P0 = kv['pir_nqp']
-    _build_pir_nqp($P0)
+    build_pir_nqp($P0)
   L1:
 .end
 
-.sub '_build_pir_nqp' :anon
+.sub 'build_pir_nqp'
     .param pmc hash
     $P0 = iter hash
   L1:
@@ -437,16 +437,16 @@ the value is the PBC pathname
 
 =cut
 
-.sub 'build_exe_pbc'
+.sub '_build_exe_pbc' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['exe_pbc']
     unless $I0 goto L1
     $P0 = kv['exe_pbc']
-    _build_exe_pbc($P0)
+    build_exe_pbc($P0)
   L1:
 .end
 
-.sub '_build_exe_pbc' :anon
+.sub 'build_exe_pbc'
     .param pmc hash
     .local string exe
     exe = get_exe()
@@ -490,7 +490,7 @@ the value is the OPS pathname
 
 =cut
 
-.sub 'build_dynops'
+.sub '_build_dynops' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['dynops']
     unless $I0 goto L1
@@ -507,11 +507,11 @@ the value is the OPS pathname
     ldflags = kv['dynops_ldflags']
   L3:
     $P0 = kv['dynops']
-    _build_dynops($P0, cflags, ldflags)
+    build_dynops($P0, cflags, ldflags)
   L1:
 .end
 
-.sub '_build_dynops' :anon
+.sub 'build_dynops'
     .param pmc hash
     .param string cflags
     .param string ldflags
@@ -541,7 +541,7 @@ the value is the OPS pathname
   L2:
 .end
 
-.sub '__build_dynops'
+.sub '__build_dynops' :anon
     .param string src
     .param string ops
     .param string core
@@ -648,7 +648,7 @@ the value is the OPS pathname
     .return ($S0)
 .end
 
-.sub 'get_cores' :anon
+.sub 'get_cores'
     $P0 = new 'Hash'
     $P0['C'] = ''
 #    $P0['CGP'] = '_cgp'
@@ -671,7 +671,7 @@ the value is an array of PMC pathname
 
 =cut
 
-.sub 'build_dynpmc'
+.sub '_build_dynpmc' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['dynpmc']
     unless $I0 goto L1
@@ -688,11 +688,11 @@ the value is an array of PMC pathname
     ldflags = kv['dynpmc_ldflags']
   L3:
     $P0 = kv['dynpmc']
-    _build_dynpmc($P0, cflags, ldflags)
+    build_dynpmc($P0, cflags, ldflags)
   L1:
 .end
 
-.sub '_build_dynpmc' :anon
+.sub 'build_dynpmc'
     .param pmc hash
     .param string cflags
     .param string ldflags
@@ -901,16 +901,16 @@ the value is the POD pathname
 
 =cut
 
-.sub 'build_html_pod'
+.sub '_build_html_pod' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['html_pod']
     unless $I0 goto L1
     $P0 = kv['html_pod']
-    _build_html_pod($P0)
+    build_html_pod($P0)
   L1:
 .end
 
-.sub '_build_html_pod' :anon
+.sub 'build_html_pod'
     .param pmc hash
     $P0 = iter hash
   L1:
@@ -942,16 +942,16 @@ the value is the POD pathname
 
 =cut
 
-.sub 'clean_pbc_pir'
+.sub '_clean_pbc_pir' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['pbc_pir']
     unless $I0 goto L1
     $P0 = kv['pbc_pir']
-    _clean_key($P0)
+    clean_key($P0)
   L1:
 .end
 
-.sub '_clean_key' :anon
+.sub 'clean_key'
     .param pmc hash
     $P0 = iter hash
   L1:
@@ -966,12 +966,12 @@ the value is the POD pathname
 
 =cut
 
-.sub 'clean_pir_pge'
+.sub '_clean_pir_pge' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['pir_pge']
     unless $I0 goto L1
     $P0 = kv['pir_pge']
-    _clean_key($P0)
+    clean_key($P0)
   L1:
 .end
 
@@ -979,12 +979,12 @@ the value is the POD pathname
 
 =cut
 
-.sub 'clean_pir_tge'
+.sub '_clean_pir_tge' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['pir_tge']
     unless $I0 goto L1
     $P0 = kv['pir_tge']
-    _clean_key($P0)
+    clean_key($P0)
   L1:
 .end
 
@@ -992,12 +992,12 @@ the value is the POD pathname
 
 =cut
 
-.sub 'clean_pir_nqp'
+.sub '_clean_pir_nqp' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['pir_nqp']
     unless $I0 goto L1
     $P0 = kv['pir_nqp']
-    _clean_key($P0)
+    clean_key($P0)
   L1:
 .end
 
@@ -1005,16 +1005,16 @@ the value is the POD pathname
 
 =cut
 
-.sub 'clean_exe_pbc'
+.sub '_clean_exe_pbc' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['exe_pbc']
     unless $I0 goto L1
     $P0 = kv['exe_pbc']
-    _clean_exe_pbc($P0)
+    clean_exe_pbc($P0)
   L1:
 .end
 
-.sub '_clean_exe_pbc' :anon
+.sub 'clean_exe_pbc'
     .param pmc hash
     .local string bin, exe, obj, pbc
     exe = get_exe()
@@ -1043,16 +1043,16 @@ the value is the POD pathname
 
 =cut
 
-.sub 'clean_dynops'
+.sub '_clean_dynops' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['dynops']
     unless $I0 goto L1
     $P0 = kv['dynops']
-    _clean_dynops($P0)
+    clean_dynops($P0)
   L1:
 .end
 
-.sub '_clean_dynops' :anon
+.sub 'clean_dynops'
     .param pmc hash
     .local pmc cores
     cores = get_cores()
@@ -1089,16 +1089,16 @@ the value is the POD pathname
 
 =cut
 
-.sub 'clean_dynpmc'
+.sub '_clean_dynpmc' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['dynpmc']
     unless $I0 goto L1
     $P0 = kv['dynpmc']
-    _clean_dynpmc($P0)
+    clean_dynpmc($P0)
   L1:
 .end
 
-.sub '_clean_dynpmc' :anon
+.sub 'clean_dynpmc'
     .param pmc hash
     .local string load_ext, obj
     load_ext = get_load_ext()
@@ -1142,12 +1142,12 @@ the value is the POD pathname
 
 =cut
 
-.sub 'clean_html_pod'
+.sub '_clean_html_pod' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['html_pod']
     unless $I0 goto L1
     $P0 = kv['html_pod']
-    _clean_key($P0)
+    clean_key($P0)
   L1:
 .end
 
@@ -1173,7 +1173,7 @@ the default value is "t/*.t"
 
 =cut
 
-.sub 'test'
+.sub '_test' :anon
     .param pmc kv :slurpy :named
     run_step('build', kv :flat :named)
     .local string cmd
@@ -1229,36 +1229,36 @@ array of pathname or a single pathname
 
 =cut
 
-.sub 'install'
+.sub '_install' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['inst_bin']
     unless $I0 goto L1
     $P0 = kv['inst_bin']
-    _install_bin($P0)
+    install_bin($P0)
   L1:
     $I0 = exists kv['inst_dynext']
     unless $I0 goto L2
     $P0 = kv['inst_dynext']
-    _install_lib("dynext", $P0)
+    install_lib("dynext", $P0)
   L2:
     $I0 = exists kv['inst_inc']
     unless $I0 goto L3
     $P0 = kv['inst_inc']
-    _install_lib("include", $P0)
+    install_lib("include", $P0)
   L3:
     $I0 = exists kv['inst_lang']
     unless $I0 goto L4
     $P0 = kv['inst_lang']
-    _install_lib("languages", $P0)
+    install_lib("languages", $P0)
   L4:
     $I0 = exists kv['inst_lib']
     unless $I0 goto L5
     $P0 = kv['inst_lib']
-    _install_lib("library", $P0)
+    install_lib("library", $P0)
   L5:
 .end
 
-.sub '_install_bin' :anon
+.sub 'install_bin'
     .param pmc array
     $S1 = get_bindir()
     $S1 .= "/"
@@ -1279,7 +1279,7 @@ array of pathname or a single pathname
   L2:
 .end
 
-.sub '_install_lib' :anon
+.sub 'install_lib'
     .param string dirname
     .param pmc array
     $S1 = get_libdir()
@@ -1307,16 +1307,16 @@ array of pathname or a single pathname
 
 =cut
 
-.sub 'install_exe_pbc'
+.sub '_install_exe_pbc' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['exe_pbc']
     unless $I0 goto L1
     $P0 = kv['exe_pbc']
-    _install_exe_pbc($P0)
+    install_exe_pbc($P0)
   L1:
 .end
 
-.sub '_install_exe_pbc' :anon
+.sub 'install_exe_pbc'
     .param pmc hash
     .local string bin, bindir, pbc, exe
     bindir = get_bindir()
@@ -1343,16 +1343,16 @@ array of pathname or a single pathname
 
 =cut
 
-.sub 'install_dynops'
+.sub '_install_dynops' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['dynops']
     unless $I0 goto L1
     $P0 = kv['dynops']
-    _install_dynops($P0)
+    install_dynops($P0)
   L1:
 .end
 
-.sub '_install_dynops' :anon
+.sub 'install_dynops'
     .param pmc hash
     .local string libdir, load_ext, ops, suffix
     libdir = get_libdir()
@@ -1382,16 +1382,16 @@ array of pathname or a single pathname
 
 =cut
 
-.sub 'install_dynpmc'
+.sub '_install_dynpmc' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['dynpmc']
     unless $I0 goto L1
     $P0 = kv['dynpmc']
-    _install_dynpmc($P0)
+    install_dynpmc($P0)
   L1:
 .end
 
-.sub '_install_dynpmc' :anon
+.sub 'install_dynpmc'
     .param pmc hash
     .local string libdir, load_ext
     libdir = get_libdir()
@@ -1416,36 +1416,36 @@ Same options as install.
 
 =cut
 
-.sub 'uninstall'
+.sub '_uninstall' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['inst_bin']
     unless $I0 goto L1
     $P0 = kv['inst_bin']
-    _uninstall_bin($P0)
+    uninstall_bin($P0)
   L1:
     $I0 = exists kv['inst_dynext']
     unless $I0 goto L2
     $P0 = kv['inst_dynext']
-    _uninstall_lib("dynext", $P0)
+    uninstall_lib("dynext", $P0)
   L2:
     $I0 = exists kv['inst_inc']
     unless $I0 goto L3
     $P0 = kv['inst_inc']
-    _uninstall_lib("include", $P0)
+    uninstall_lib("include", $P0)
   L3:
     $I0 = exists kv['inst_lang']
     unless $I0 goto L4
     $P0 = kv['inst_lang']
-    _uninstall_lib("languages", $P0)
+    uninstall_lib("languages", $P0)
   L4:
     $I0 = exists kv['inst_lib']
     unless $I0 goto L5
     $P0 = kv['inst_lib']
-    _uninstall_lib("library", $P0)
+    uninstall_lib("library", $P0)
   L5:
 .end
 
-.sub '_uninstall_bin' :anon
+.sub 'uninstall_bin'
     .param pmc array
     $S1 = get_bindir()
     $S1 .= "/"
@@ -1466,7 +1466,7 @@ Same options as install.
   L2:
 .end
 
-.sub '_uninstall_lib' :anon
+.sub 'uninstall_lib'
     .param string dirname
     .param pmc array
     $S1 = get_libdir()
@@ -1490,16 +1490,16 @@ Same options as install.
   L2:
 .end
 
-.sub 'uninstall_exe_pbc'
+.sub '_uninstall_exe_pbc' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['exe_pbc']
     unless $I0 goto L1
     $P0 = kv['exe_pbc']
-    _uninstall_exe_pbc($P0)
+    uninstall_exe_pbc($P0)
   L1:
 .end
 
-.sub '_uninstall_exe_pbc' :anon
+.sub 'uninstall_exe_pbc'
     .param pmc hash
     .local string bin, bindir, exe
     bindir = get_bindir()
@@ -1516,16 +1516,16 @@ Same options as install.
   L2:
 .end
 
-.sub 'uninstall_dynops'
+.sub '_uninstall_dynops' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['dynops']
     unless $I0 goto L1
     $P0 = kv['dynops']
-    _uninstall_dynops($P0)
+    uninstall_dynops($P0)
   L1:
 .end
 
-.sub '_uninstall_dynops' :anon
+.sub 'uninstall_dynops'
     .param pmc hash
     .local string libdir, load_ext, ops, suffix
     libdir = get_libdir()
@@ -1551,16 +1551,16 @@ Same options as install.
   L2:
 .end
 
-.sub 'uninstall_dynpmc'
+.sub '_uninstall_dynpmc' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['dynpmc']
     unless $I0 goto L1
     $P0 = kv['dynpmc']
-    _uninstall_dynpmc($P0)
+    uninstall_dynpmc($P0)
   L1:
 .end
 
-.sub '_uninstall_dynpmc' :anon
+.sub 'uninstall_dynpmc'
     .param pmc hash
     .local string libdir, load_ext
     libdir = get_libdir()
