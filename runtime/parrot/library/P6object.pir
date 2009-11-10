@@ -262,19 +262,26 @@ Deprecated; use add_parent(class, parentclass)
     methoditer = iter methods
   method_loop:
     unless methoditer goto mro_loop
-    $S0 = shift methoditer
-    $P0 = parrotclassns[$S0]
-    if null $P0 goto add_method
-    $I0 = isa $P0, 'MultiSub'
-    unless $I0 goto method_loop
-  add_method:
-    $P0 = methods[$S0]
-    $I0 = isa $P0, 'NCI'
+    .local string methodname
+    .local pmc methodpmc
+    methodname = shift methoditer
+    methodpmc = methods[methodname]
+    # don't add NCI methods (they don't work)
+    $I0 = isa methodpmc, 'NCI'
     if $I0 goto method_loop
+    # if there's no existing entry, add method directly
+    $P0 = parrotclassns[methodname]
+    if null $P0 goto add_method
+    # if existing entry isn't a MultiSub, skip it
+    $I0 = isa $P0, ['MultiSub']
+    unless $I0 goto method_loop
     push_eh err
-    parrotclassns.'add_sub'($S0, $P0)
-    pop_eh
+    parrotclassns.'add_sub'(methodname, methodpmc)
   err:
+    pop_eh
+    goto method_loop
+  add_method:
+    parrotclassns[methodname] = methodpmc
     goto method_loop
   mro_end:
 
