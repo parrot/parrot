@@ -1692,7 +1692,7 @@ INV_COND:   Parrot_io_eprintf(interp->pdb->debugger, "Invalid condition\n");
             condition->type |= PDB_cond_const;
         }
         else if (condition->type & PDB_cond_pmc) {
-            /* RT #46123 Need to figure out what to do in this case.
+            /* TT #1259: Need to figure out what to do in this case.
              * For the time being, we just bail. */
             Parrot_io_eprintf(interp->pdb->debugger, "Can't compare PMC with constant\n");
             mem_sys_free(condition);
