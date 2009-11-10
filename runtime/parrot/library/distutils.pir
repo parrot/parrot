@@ -1866,16 +1866,14 @@ Return the whole config
 .sub 'unlink'
     .param string filename
     $I0 = stat filename, .STAT_EXISTS
-    if $I0 goto L1
-    .return ()
-  L1:
+    unless $I0 goto L1
+    $I0 = stat filename, .STAT_ISREG
+    unless $I0 goto L1
     print "unlink "
     say filename
     new $P0, 'OS'
-    push_eh _handler
     $P0.'rm'(filename)
-    pop_eh
-  _handler:
+  L1:
     .return ()
 .end
 
