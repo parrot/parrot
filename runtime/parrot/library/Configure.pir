@@ -367,6 +367,7 @@ L<http://github.com/fperrad/markdown/blob/master/Configure.pir>
   L3:
     $I1 = index line, '@', $I0
     if $I1 < 0 goto L4
+  L8:
     $I2 = $I1 - $I0
     inc $I1
     $I3 = index line, '@', $I1
@@ -381,6 +382,13 @@ L<http://github.com/fperrad/markdown/blob/master/Configure.pir>
     $S0 .= $S2
     goto L6
   L5:
+    $I8 = $I3 + 1
+    $I9 = index line, '@', $I8
+    if $I9 < 0 goto L7
+    $I0 = $I1 - 1
+    $I1 = $I3
+    goto L8
+  L7:
     printerr "\tunknown config: "
     printerr $S1
     printerr "\n"

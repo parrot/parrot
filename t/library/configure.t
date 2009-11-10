@@ -17,7 +17,7 @@ t/library/configure.t - Test the Configure PBC
 
     load_bytecode 'Configure.pbc'
 
-    plan(39)
+    plan(40)
     test_conditioned_line()
     test_eval_expr()
     test_interpolate_var()
@@ -113,12 +113,18 @@ t/library/configure.t - Test the Configure PBC
     config['foo'] = 'bar'
     $S0 = interpolate_var("# plain text", config)
     is($S0, "# plain text\n", "plain text")
+
     $S0 = interpolate_var("\t@echo foo", config)
     is($S0, "\t@echo foo\n", "@ alone")
+
     $S0 = interpolate_var("here @foo@ variable", config)
     is($S0, "here bar variable\n", "variable")
+
     $S0 = interpolate_var("here @foo@ variable, and here @foo@.", config)
     is($S0, "here bar variable, and here bar.\n", "variable")
+
+    $S0 = interpolate_var("\t@echo var @foo@.", config)
+    is($S0, "\t@echo var bar.\n", "gives a second change")
 .end
 
 .sub 'test_replace_slash'
