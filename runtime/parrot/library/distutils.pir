@@ -294,7 +294,7 @@ hash
 
 the key is the PIR pathname
 
-the value is the PGE pathname
+the value is an array of PGE pathname or a single PGE pathname
 
 =cut
 
@@ -312,11 +312,21 @@ the value is the PGE pathname
     $P0 = iter hash
   L1:
     unless $P0 goto L2
-    .local string pir, pge
+    .local string pir, src
     pir = shift $P0
-    pge = $P0[pir]
-    $I0 = newer(pir, pge)
+    .local pmc srcs
+    srcs = $P0[pir]
+    $I0 = does srcs, 'array'
+    unless $I0 goto L3
+    $I0 = newer(pir, srcs)
     if $I0 goto L1
+    src = join ' ', srcs
+    goto L4
+  L3:
+    src = srcs
+    $I0 = newer(pir, src)
+    if $I0 goto L1
+  L4:
     .local string cmd
     cmd = get_parrot()
     cmd .= " "
@@ -325,7 +335,7 @@ the value is the PGE pathname
     cmd .= "/library/PGE/Perl6Grammar.pbc --output="
     cmd .= pir
     cmd .= " "
-    cmd .= pge
+    cmd .= src
     system(cmd)
     goto L1
   L2:
