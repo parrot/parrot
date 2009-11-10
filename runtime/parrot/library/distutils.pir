@@ -1155,6 +1155,10 @@ the value is the POD pathname
 
 =head3 Step test
 
+If t/harness exists, run : perl t/harness
+
+Else run : prove t/*.t
+
 =over 4
 
 =item prove_exec
@@ -1173,20 +1177,29 @@ the default value is "t/*.t"
     .param pmc kv :slurpy :named
     run_step('build', kv :flat :named)
     .local string cmd
+    $I0 = file_exists('t/harness')
+    unless $I0 goto L1
+    cmd = "perl -I"
+    $S0 = get_libdir()
+    cmd .= $S0
+    cmd .= "/tools/lib t/harness"
+    goto L2
+  L1:
     cmd = "prove"
     $I0 = exists kv['prove_exec']
-    unless $I0 goto L1
+    unless $I0 goto L3
     cmd .= " --exec="
     $S0 = kv['prove_exec']
     cmd .= $S0
-  L1:
+  L3:
     cmd .= " "
     $S0 = "t/*.t" # default
     $I0 = exists kv['prove_files']
-    unless $I0 goto L2
+    unless $I0 goto L4
     $S0 = kv['prove_files']
-  L2:
+  L4:
     cmd .= $S0
+  L2:
     system(cmd)
 .end
 
