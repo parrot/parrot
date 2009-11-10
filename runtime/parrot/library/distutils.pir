@@ -1934,6 +1934,28 @@ Return the whole config
     $P0.'chdir'(dirname)
 .end
 
+=item getenv
+
+=cut
+
+.sub 'getenv'
+    .param string name
+    new $P0, 'Env'
+    $S0 = $P0[name]
+    .return ($S0)
+.end
+
+=item setenv
+
+=cut
+
+.sub 'setenv'
+    .param string name
+    .param string value
+    new $P0, 'Env'
+    $P0[name] = value
+.end
+
 =back
 
 =head2 SEE ALSO
