@@ -137,7 +137,6 @@ Destroy Context and memory allocated by C<Parrot_alloc_context>.
 
     VTABLE void destroy() {
         Parrot_pcc_free_registers(INTERP, SELF);
-        PMC_data(SELF) = NULL;
     }
 
 /*
