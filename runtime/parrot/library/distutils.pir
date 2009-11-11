@@ -1219,11 +1219,56 @@ the value is the POD pathname
 
 =head3 Step test
 
-If t/harness exists, run : perl t/harness
+If t/harness exists, run : t/harness
 
 Else run : prove t/*.t
 
+=cut
+
+.sub '_test' :anon
+    .param pmc kv :slurpy :named
+    run_step('build', kv :flat :named)
+    $I0 = file_exists('t/harness')
+    unless $I0 goto L1
+    .tailcall _test_harness(kv :flat :named)
+  L1:
+    .tailcall _test_prove(kv :flat :named)
+.end
+
 =over 4
+
+=item harness_exec
+
+the default value is with perl
+
+=item harness_files
+
+the default value is "t/*.t"
+
+=cut
+
+.sub '_test_harness' :anon
+    .param pmc kv :slurpy :named
+    .local string cmd
+    $I0 = exists kv['harness_exec']
+    unless $I0 goto L1
+    cmd = kv['harness_exec']
+    goto L2
+  L1:
+    cmd = "perl -I"
+    $S0 = get_libdir()
+    cmd .= $S0
+    cmd .= "/tools/lib"
+  L2:
+    cmd .= " t/harness "
+    $S0 = "t/*.t" # default
+    $I0 = exists kv['harness_files']
+    unless $I0 goto L3
+    $S0 = kv['harness_files']
+  L3:
+    cmd .= $S0
+    system(cmd)
+.end
 
 =item prove_exec
 
@@ -1237,33 +1282,23 @@ the default value is "t/*.t"
 
 =cut
 
-.sub '_test' :anon
+.sub '_test_prove' :anon
     .param pmc kv :slurpy :named
-    run_step('build', kv :flat :named)
     .local string cmd
-    $I0 = file_exists('t/harness')
-    unless $I0 goto L1
-    cmd = "perl -I"
-    $S0 = get_libdir()
-    cmd .= $S0
-    cmd .= "/tools/lib t/harness"
-    goto L2
-  L1:
     cmd = "prove"
     $I0 = exists kv['prove_exec']
-    unless $I0 goto L3
+    unless $I0 goto L1
     cmd .= " --exec="
     $S0 = kv['prove_exec']
     cmd .= $S0
-  L3:
+  L1:
     cmd .= " "
     $S0 = "t/*.t" # default
     $I0 = exists kv['prove_files']
-    unless $I0 goto L4
+    unless $I0 goto L2
     $S0 = kv['prove_files']
-  L4:
-    cmd .= $S0
   L2:
+    cmd .= $S0
     system(cmd)
 .end
 
