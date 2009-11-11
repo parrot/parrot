@@ -19,6 +19,10 @@ Perl5 and core module Test-Harness
 
 Perl5 and core module Pod-Html
 
+=item chmod (in step 'install')
+
+Perl5 and core module ExtUtils::Command
+
 =back
 
 =head2 EXAMPLES
@@ -1323,19 +1327,20 @@ array of pathname or a single pathname
     exe = get_exe()
     $P0 = iter hash
   L1:
-     unless $P0 goto L2
-     bin = shift $P0
-     pbc = hash[bin]
-     $I0 = length pbc
-     $I0 -= 4
-     $S0 = substr pbc, 0, $I0
-     $S1 = 'installable_' . $S0
-     $S1 .= exe
-     $S2 = bindir . '/'
-     $S2 .= bin
-     $S2 .= exe
-     cp($S1, $S2)
-     goto L1
+    unless $P0 goto L2
+    bin = shift $P0
+    pbc = hash[bin]
+    $I0 = length pbc
+    $I0 -= 4
+    $S0 = substr pbc, 0, $I0
+    $S1 = 'installable_' . $S0
+    $S1 .= exe
+    $S2 = bindir . '/'
+    $S2 .= bin
+    $S2 .= exe
+    cp($S1, $S2)
+    chmod($S2, 0o755)
+    goto L1
   L2:
 .end
 
@@ -1372,6 +1377,7 @@ array of pathname or a single pathname
     $S2 = libdir . "/"
     $S2 .= $S1
     cp($S1, $S2)
+    chmod($S2, 0o755)
     goto L3
   L4:
     goto L1
@@ -1404,6 +1410,7 @@ array of pathname or a single pathname
     $S2 = libdir . "/"
     $S2 .= $S1
     cp($S1, $S2)
+    chmod($S2, 0o755)
     goto L1
   L2:
 .end
@@ -1506,13 +1513,13 @@ Same options as install.
     exe = get_exe()
     $P0 = iter hash
   L1:
-     unless $P0 goto L2
-     bin = shift $P0
-     $S1 = bindir . '/'
-     $S1 .=  bin
-     $S1 .= exe
-     unlink($S1)
-     goto L1
+    unless $P0 goto L2
+    bin = shift $P0
+    $S1 = bindir . '/'
+    $S1 .=  bin
+    $S1 .= exe
+    unlink($S1)
+    goto L1
   L2:
 .end
 
@@ -1857,6 +1864,27 @@ Return the whole config
     $P0.'puts'($S0)
     $P0.'close'()
   L3:
+.end
+
+=item chmod
+
+=cut
+
+.sub 'chmod'
+    .param string filename
+    .param int mode
+    $P0 = get_config()
+    .local string cmd
+    cmd = $P0['perl']
+    cmd .= " -MExtUtils::Command -e ExtUtils::Command::chmod "
+    $P1 = new 'FixedIntegerArray'
+    set $P1, 1
+    $P1[0] = mode
+    $S0 = sprintf '0%o', $P1
+    cmd .= $S0
+    cmd .= " "
+    cmd .= filename
+    system(cmd)
 .end
 
 =item unlink
