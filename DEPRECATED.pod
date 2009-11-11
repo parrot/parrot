@@ -58,9 +58,10 @@ L<https://trac.parrot.org/parrot/ticket/679>
 
 L<https://trac.parrot.org/parrot/ticket/264>
 
-=item VTABLE nomenclature. [eligible in 1.5]
+=item various VTABLE functions [eligible in 1.5]
 
-Current list of VTABLE functions will be reviewed and cleaned.
+The get_bigint, set_bigint_*, pow, i_pow and nextkey_keyed VTABLE functions are
+deprecated and will be removed.
 
 L<https://trac.parrot.org/parrot/ticket/866>
 
