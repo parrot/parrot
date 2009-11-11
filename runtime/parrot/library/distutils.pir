@@ -1365,7 +1365,7 @@ array of pathname or a single pathname
     if $I0 goto L0
     $S0 = array
     $S2 = $S1 . $S0
-    cp($S0, $S2)
+    install($S0, $S2, 0)
     goto L2
   L0:
     $P0 = iter array
@@ -1373,7 +1373,7 @@ array of pathname or a single pathname
     unless $P0 goto L2
     $S0 = shift $P0
     $S2 = $S1 . $S0
-    cp($S0, $S2)
+    install($S0, $S2, 0)
     goto L1
   L2:
 .end
@@ -1389,7 +1389,7 @@ array of pathname or a single pathname
     if $I0 goto L0
     $S0 = array
     $S2 = $S1 . $S0
-    cp($S0, $S2)
+    install($S0, $S2, 0)
     goto L2
   L0:
     $P0 = iter array
@@ -1397,7 +1397,7 @@ array of pathname or a single pathname
     unless $P0 goto L2
     $S0 = shift $P0
     $S2 = $S1 . $S0
-    cp($S0, $S2)
+    install($S0, $S2, 0)
     goto L1
   L2:
 .end
@@ -1433,8 +1433,7 @@ array of pathname or a single pathname
     $S2 = bindir . '/'
     $S2 .= bin
     $S2 .= exe
-    cp($S1, $S2)
-    chmod($S2, 0o755)
+    install($S1, $S2, 1)
     goto L1
   L2:
 .end
@@ -1471,8 +1470,7 @@ array of pathname or a single pathname
     $S1 = _mk_path_dynops(ops, suffix, load_ext)
     $S2 = libdir . "/"
     $S2 .= $S1
-    cp($S1, $S2)
-    chmod($S2, 0o755)
+    install($S1, $S2, 1)
     goto L3
   L4:
     goto L1
@@ -1504,8 +1502,7 @@ array of pathname or a single pathname
     $S1 = _mk_path_dynpmc($S0, load_ext)
     $S2 = libdir . "/"
     $S2 .= $S1
-    cp($S1, $S2)
-    chmod($S2, 0o755)
+    install($S1, $S2, 1)
     goto L1
   L2:
 .end
@@ -1929,13 +1926,15 @@ Return the whole config
     $P0.'mkdir'(dirname, $I1)
 .end
 
-=item cp
+=item install
 
 =cut
 
-.sub 'cp'
+.sub 'install'
     .param string src
     .param string dst
+    .param int exe
+    # mkpath
     $I1 = 1
   L1:
     $I1 = index dst, '/', $I1
@@ -1949,6 +1948,19 @@ Return the whole config
   L2:
     $I0 = newer(dst, src)
     if $I0 goto L3
+    cp(src, dst)
+    unless exe goto L3
+    chmod(dst, 0o755)
+  L3:
+.end
+
+=item cp
+
+=cut
+
+.sub 'cp'
+    .param string src
+    .param string dst
     print "cp "
     print src
     print " "
@@ -1958,7 +1970,6 @@ Return the whole config
     $P0.'open'(dst, 'w')
     $P0.'puts'($S0)
     $P0.'close'()
-  L3:
 .end
 
 =item chmod
