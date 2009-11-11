@@ -57,6 +57,8 @@ L<http://github.com/fperrad/wmlscript/blob/master/setup.pir>
     register_step_after('build', _build_pbc_pir)
     .const 'Sub' _build_exe_pbc = '_build_exe_pbc'
     register_step_after('build', _build_exe_pbc)
+    .const 'Sub' _build_installable_pbc = '_build_installable_pbc'
+    register_step_after('build', _build_installable_pbc)
     .const 'Sub' _build_html_pod = '_build_html_pod'
     register_step_after('build', _build_html_pod)
 
@@ -76,6 +78,8 @@ L<http://github.com/fperrad/wmlscript/blob/master/setup.pir>
     register_step_after('clean', _clean_pbc_pir)
     .const 'Sub' _clean_exe_pbc = '_clean_exe_pbc'
     register_step_after('clean', _clean_exe_pbc)
+    .const 'Sub' _clean_installable_pbc = '_clean_installable_pbc'
+    register_step_after('clean', _clean_installable_pbc)
     .const 'Sub' _clean_html_pod = '_clean_html_pod'
     register_step_after('clean', _clean_html_pod)
 
@@ -85,8 +89,8 @@ L<http://github.com/fperrad/wmlscript/blob/master/setup.pir>
     register_step_after('install', _install_dynops)
     .const 'Sub' _install_dynpmc = '_install_dynpmc'
     register_step_after('install', _install_dynpmc)
-    .const 'Sub' _install_exe_pbc = '_install_exe_pbc'
-    register_step_after('install', _install_exe_pbc)
+    .const 'Sub' _install_installable_pbc = '_install_installable_pbc'
+    register_step_after('install', _install_installable_pbc)
 
     .const 'Sub' _test = '_test'
     register_step('test', _test)
@@ -97,8 +101,8 @@ L<http://github.com/fperrad/wmlscript/blob/master/setup.pir>
     register_step_after('uninstall', _uninstall_dynops)
     .const 'Sub' _uninstall_dynpmc = '_uninstall_dynpmc'
     register_step_after('uninstall', _uninstall_dynpmc)
-    .const 'Sub' _uninstall_exe_pbc = '_uninstall_exe_pbc'
-    register_step_after('uninstall', _uninstall_exe_pbc)
+    .const 'Sub' _uninstall_installable_pbc = '_uninstall_installable_pbc'
+    register_step_after('uninstall', _uninstall_installable_pbc)
 
     .const 'Sub' _usage = '_usage'
     register_step('usage', _usage)
@@ -517,6 +521,52 @@ the value is the PBC pathname
     $I0 = length pbc
     $I0 -= 4
     $S0 = substr pbc, 0, $I0
+    $S1 = $S0 . exe
+    $I0 = newer($S1, pbc)
+    if $I0 goto L1
+    .local string cmd
+    cmd = get_bindir()
+    cmd .= "/pbc_to_exe"
+    cmd .= exe
+    cmd .= " "
+    cmd .= pbc
+    system(cmd)
+    goto L1
+  L2:
+.end
+
+=item installable_pbc
+
+hash
+
+the key is the executable pathname
+
+the value is the PBC pathname
+
+=cut
+
+.sub '_build_installable_pbc' :anon
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['installable_pbc']
+    unless $I0 goto L1
+    $P0 = kv['installable_pbc']
+    build_installable_pbc($P0)
+  L1:
+.end
+
+.sub 'build_installable_pbc'
+    .param pmc hash
+    .local string exe
+    exe = get_exe()
+    $P0 = iter hash
+  L1:
+    unless $P0 goto L2
+    .local string bin, pbc
+    bin = shift $P0
+    pbc = $P0[bin]
+    $I0 = length pbc
+    $I0 -= 4
+    $S0 = substr pbc, 0, $I0
     $S1 = "installable_" . $S0
     $S1 .= exe
     $I0 = newer($S1, pbc)
@@ -527,7 +577,6 @@ the value is the PBC pathname
     cmd .= exe
     cmd .= " "
     cmd .= pbc
-    system(cmd)
     cmd .= " --install"
     system(cmd)
     goto L1
@@ -1092,21 +1141,56 @@ the value is the POD pathname
     obj = get_obj()
     $P0 = iter hash
   L1:
-     unless $P0 goto L2
-     bin = shift $P0
-     pbc = hash[bin]
-     $I0 = length pbc
-     $I0 -= 4
-     $S0 = substr pbc, 0, $I0
-     $S1 = $S0 . exe
-     unlink($S1)
-     $S1 = 'installable_' . $S1
-     unlink($S1)
-     $S1 = $S0 . '.c'
-     unlink($S1)
-     $S1 = $S0 . obj
-     unlink($S1)
-     goto L1
+    unless $P0 goto L2
+    bin = shift $P0
+    pbc = hash[bin]
+    $I0 = length pbc
+    $I0 -= 4
+    $S0 = substr pbc, 0, $I0
+    $S1 = $S0 . exe
+    unlink($S1)
+    $S1 = $S0 . '.c'
+    unlink($S1)
+    $S1 = $S0 . obj
+    unlink($S1)
+    goto L1
+  L2:
+.end
+
+=item installable_pbc
+
+=cut
+
+.sub '_clean_installable_pbc' :anon
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['installable_pbc']
+    unless $I0 goto L1
+    $P0 = kv['installable_pbc']
+    clean_installable_pbc($P0)
+  L1:
+.end
+
+.sub 'clean_installable_pbc'
+    .param pmc hash
+    .local string bin, exe, obj, pbc
+    exe = get_exe()
+    obj = get_obj()
+    $P0 = iter hash
+  L1:
+    unless $P0 goto L2
+    bin = shift $P0
+    pbc = hash[bin]
+    $I0 = length pbc
+    $I0 -= 4
+    $S0 = substr pbc, 0, $I0
+    $S1 = 'installable_' . $S0
+    $S1 .= exe
+    unlink($S1)
+    $S1 = $S0 . '.c'
+    unlink($S1)
+    $S1 = $S0 . obj
+    unlink($S1)
+    goto L1
   L2:
 .end
 
@@ -1409,20 +1493,20 @@ array of pathname or a single pathname
   L2:
 .end
 
-=item exe_pbc
+=item installable_pbc
 
 =cut
 
-.sub '_install_exe_pbc' :anon
+.sub '_install_installable_pbc' :anon
     .param pmc kv :slurpy :named
-    $I0 = exists kv['exe_pbc']
+    $I0 = exists kv['installable_pbc']
     unless $I0 goto L1
-    $P0 = kv['exe_pbc']
-    install_exe_pbc($P0)
+    $P0 = kv['installable_pbc']
+    install_installable_pbc($P0)
   L1:
 .end
 
-.sub 'install_exe_pbc'
+.sub 'install_installable_pbc'
     .param pmc hash
     .local string bin, bindir, pbc, exe
     bindir = get_bindir()
@@ -1596,16 +1680,16 @@ Same options as install.
   L2:
 .end
 
-.sub '_uninstall_exe_pbc' :anon
+.sub '_uninstall_installable_pbc' :anon
     .param pmc kv :slurpy :named
-    $I0 = exists kv['exe_pbc']
+    $I0 = exists kv['installable_pbc']
     unless $I0 goto L1
-    $P0 = kv['exe_pbc']
-    uninstall_exe_pbc($P0)
+    $P0 = kv['installable_pbc']
+    uninstall_installable_pbc($P0)
   L1:
 .end
 
-.sub 'uninstall_exe_pbc'
+.sub 'uninstall_installable_pbc'
     .param pmc hash
     .local string bin, bindir, exe
     bindir = get_bindir()
