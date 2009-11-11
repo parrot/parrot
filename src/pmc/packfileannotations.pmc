@@ -374,7 +374,23 @@ Create PackFile_Annotations* from self.
 
         return res;
     }
+
+/*
+
+=item C<METHOD type()>
+
+Get segment type.
+
+=cut
+
+*/
+
+    METHOD type() {
+        RETURN(INTVAL PF_ANNOTATIONS_SEG);
+    }
+
 }
+
 /*
 
 =back
