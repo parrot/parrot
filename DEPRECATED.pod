@@ -75,6 +75,14 @@ so this usage will not be allowed.
 
 L<https://trac.parrot.org/parrot/ticket/918>
 
+=item Overriding vtable invoke in PIR objects [experimental]
+
+The VTABLE invoke in object.pmc puts SELF at the start of the
+signature call arguments when there is no current object and is
+not already here. This allows the usage of $P0() instead of $P0($P0).
+
+L<https://trac.parrot.org/parrot/ticket/103>
+
 =item All bitwise VTABLE functions [eligible in 2.1]
 
 All bitwise VTABLE functions (all VTABLE functions containing C<bitwise> in
