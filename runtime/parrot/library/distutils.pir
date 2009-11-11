@@ -117,14 +117,21 @@ Entry point.
 .sub 'setup'
     .param pmc args :slurpy
     .param pmc kv :slurpy :named
-    .local string cmd
-    cmd = 'build'
-    $I0 = args
-    unless $I0 != 0 goto L1
-    cmd = shift args
+    $P0 = iter args
+    if $P0 goto L1
+    # default step
+    run_step('build', kv :flat :named)
+    goto L2
   L1:
+    $P0 = iter args
+  L3:
+    unless $P0 goto L2
+    .local string cmd
+    cmd = shift $P0
     $I0 = run_step(cmd, kv :flat :named)
-    if $I0 goto L2
+    if $I0 goto L3
+    print "unknown target : "
+    say cmd
     run_step('usage')
   L2:
 .end
