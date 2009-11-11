@@ -267,6 +267,47 @@ is($conf->data->get('cpuarch'), q{i386},
 is($conf->data->get('osname'), q{cygwin},
     "'osname' was set as expected");
 
+########### _get_platform() ##########
+#
+#$conf->data->set_p5( OSNAME => 'msys' );
+#is( $step->_get_platform( $conf, $verbose ), q{win32},
+#    "Got expected platform for msys");
+#
+#$conf->data->set_p5( OSNAME => 'mingw' );
+#is( $step->_get_platform( $conf, $verbose ), q{win32},
+#    "Got expected platform for mingw");
+#
+#$conf->data->set_p5( OSNAME => 'MSWin32' );
+#is( $step->_get_platform( $conf, $verbose ), q{win32},
+#    "Got expected platform for MSWin32");
+#
+## re-set to original values
+#$conf->data->set_p5( OSNAME => $platform_orig );
+#$conf->data->set_p5( archname => $archname_orig );
+#
+#$conf->data->set_p5( archname => 'ia64-bar' );
+#is( $step->_get_platform( $conf, $verbose ), q{ia64},
+#    "Got expected platform for ia64");
+#
+#$conf->data->set_p5( archname => 'foo-bar' );
+#$conf->data->set_p5( OSNAME => 'foo' );
+#{
+#    $verbose = 1;
+#    my ($stdout, $stderr, $rv);
+#    my $expected = q{generic};
+#    capture(
+#        sub { $rv = $step->_get_platform( $conf, $verbose ) },
+#        \$stdout,
+#        \$stderr,
+#    );
+#    is( $rv, $expected, "Got expected platform for foo");
+#    like( $stdout, qr/platform='$expected'/, "Got expected verbose output");
+#}
+#
+## re-set to original values
+#$conf->data->set_p5( archname => $archname_orig );
+#$conf->data->set_p5( OSNAME => $platform_orig );
+
 pass("Completed all tests in $0");
 
 sub _capture { $errstr = $_[0]; }
