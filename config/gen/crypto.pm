@@ -28,34 +28,34 @@ sub _init {
     $data{result}      = q{};
     $data{digest}      = {
         MD2         => {
-            md_result => '[0-9a-f]{32}',
+            md_result => 'ab4f496bfb2a530b219ff33031fe06b0',
         },
         MD4         => {
-            md_result => '[0-9a-f]{32}',
+            md_result => 'd9130a8164549fe818874806e1c7014b',
         },
         MD5         => {
             md_result => 'f96b697d7cb7938d525a2f31aaf161d0',
         },
         RIPEMD160   => {
-            md_result => '[0-9a-f]{40}',
+            md_result => '5d0689ef49d2fae572b881b123a85ffa21595f36',
             md_inc => 'ripemd',
         },
         SHA         => {
-            md_result => '[0-9a-f]{40}',
+            md_result => '<[0..9a..f]>**{40}',
         },
         SHA1        => {
-            md_result => '[0-9a-f]{40}',
+            md_result => 'c12252ceda8be8994d5fa0290a47231c1d16aae3',
             md_inc => 'sha',
             md_ctx => 'SHA_CTX',
             md_digest => 'SHA_DIGEST',
         },
         SHA256      => {
-            md_result => '[0-9a-f]{64}',
+            md_result => 'f7846f55cf23e14eebeab5b4e1550cad5b509e3348fbc4efa3a1413d393cb650',
             md_inc => 'sha',
             version_needed => '0.9.8a',
         },
         SHA512      => {
-            md_result => '[0-9a-f]{128}',
+            md_result => '107dbf389d9e9f71a3a95f6c055b9251bc5268c2be16d6c13492ea45b0199f3309e16455ab1e96118e8a905d5597b72038ddb372a89826046de66687bb420e7c',
             md_inc => 'sha',
             version_needed => '0.9.8a',
         },
