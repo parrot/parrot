@@ -51,6 +51,8 @@ L<http://github.com/fperrad/wmlscript/blob/master/setup.pir>
     register_step_after('build', _build_pir_tge)
     .const 'Sub' _build_pir_nqp = '_build_pir_nqp'
     register_step_after('build', _build_pir_nqp)
+    .const 'Sub' _build_pir_nqp_rx = '_build_pir_nqp_rx'
+    register_step_after('build', _build_pir_nqp_rx)
     .const 'Sub' _build_pbc_pir = '_build_pbc_pir'
     register_step_after('build', _build_pbc_pir)
     .const 'Sub' _build_exe_pbc = '_build_exe_pbc'
@@ -68,6 +70,8 @@ L<http://github.com/fperrad/wmlscript/blob/master/setup.pir>
     register_step_after('clean', _clean_pir_tge)
     .const 'Sub' _clean_pir_nqp = '_clean_pir_nqp'
     register_step_after('clean', _clean_pir_nqp)
+    .const 'Sub' _clean_pir_nqp_rx = '_clean_pir_nqp_rx'
+    register_step_after('clean', _clean_pir_nqp_rx)
     .const 'Sub' _clean_pbc_pir = '_clean_pbc_pir'
     register_step_after('clean', _clean_pbc_pir)
     .const 'Sub' _clean_exe_pbc = '_clean_exe_pbc'
@@ -423,6 +427,49 @@ the value is the NQP pathname
     $S0 = get_libdir()
     cmd .= $S0
     cmd .= "/languages/nqp/nqp.pbc --target=pir --output="
+    cmd .= pir
+    cmd .= " "
+    cmd .= nqp
+    system(cmd)
+    goto L1
+  L2:
+.end
+
+=item pir_nqp-rx
+
+hash
+
+the key is the PIR pathname
+
+the value is the NQP pathname
+
+=cut
+
+.sub '_build_pir_nqp_rx' :anon
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['pir_nqp-rx']
+    unless $I0 goto L1
+    $P0 = kv['pir_nqp-rx']
+    build_pir_nqp_rx($P0)
+  L1:
+.end
+
+.sub 'build_pir_nqp_rx'
+    .param pmc hash
+    $P0 = iter hash
+  L1:
+    unless $P0 goto L2
+    .local string pir, nqp
+    pir = shift $P0
+    nqp = $P0[pir]
+    $I0 = newer(pir, nqp)
+    if $I0 goto L1
+    .local string cmd
+    cmd = get_bindir()
+    cmd .= "/nqp"
+    $S0 = get_exe()
+    cmd .= $S0
+    cmd .= " --target=pir --output="
     cmd .= pir
     cmd .= " "
     cmd .= nqp
@@ -1001,6 +1048,19 @@ the value is the POD pathname
     $I0 = exists kv['pir_nqp']
     unless $I0 goto L1
     $P0 = kv['pir_nqp']
+    clean_key($P0)
+  L1:
+.end
+
+=item pir_nqp-rx
+
+=cut
+
+.sub '_clean_pir_nqp_rx' :anon
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['pir_nqp-rx']
+    unless $I0 goto L1
+    $P0 = kv['pir_nqp-rx']
     clean_key($P0)
   L1:
 .end
