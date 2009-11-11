@@ -70,6 +70,21 @@ pmclass CallSignatureReturns auto_attrs provides array {
 
 /*
 
+=item C<void init()>
+
+Initialize the CallSignatureReturns PMC.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        PObj_custom_destroy_SET(SELF);
+    }
+
+
+/*
+
 =item C<void destroy()>
 
 Destroy CallSignatureReturns.
