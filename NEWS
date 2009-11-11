@@ -10,9 +10,10 @@ New in 1.8.0 (to be released on 2009-11-19)
   + Added experimental 'vivify' op.
   + The -I option now prepends items to the search path.
   + Merged branch context_auto_attrs back to trunk.
-  + Merge convert_OSNAME into trunk.
-  + MultiSub PMCs now stringify to the name
-    of their first candidate instead of the number of candidates.
+  + Merged convert_OSNAME into trunk.
+  + Merged auto_format_no_Config into trunk.
+  + MultiSub PMCs now stringify to the name of their first candidate,
+    instead of the number of candidates.
 - Platforms
   + Started port of RTEMS.
   + Use shared libs on NetBSD.
@@ -20,18 +21,30 @@ New in 1.8.0 (to be released on 2009-11-19)
   + Use the the fixed-sized allocator in the Context and the CallSignature PMC.
   + Speed penalty from the reworked parrot calling conventions.
   + Many small speed improvments.
-- Deprecations
-  + The last traces of the 'malloc' garbage collector were removed.
+- New deprecations
   + The 'Parrot_call_*' functions for invoking a sub/method object from C are
     deprecated. They are replaced by 'Parrot_ext_call'. (eligible in 2.1)
+  + All bitwise VTABLE functions are deprecated. (eligible in 2.1)
+  + All bitwise ops will become dynops. (eligible in 2.1)
+- Realized deprecations
+  + The last traces of the 'malloc' garbage collector were removed.
   + Renamed Parrot_pcc_constants() to Parrot_pcc_get_constants().
   + Deprecated functions from the Embedding/Extension interface were removed.
   + The library YAML/Parser/Syck.pir has been removed.
-  + Removed the deprecated VTABLE function instantiate_str().
+  + The VTABLE function instantiate_str() was removed.
 - Tests
   + New tests using the new test functions lives_ok() and dies_ok().
   + Added test script t/op/annotate-old.t.
   + Many test scripst were converted from Perl5 to PIR.
+  + Eliminated dependency on Perl 5 in some tests.
+- Documentation
+  + Clarified what 'p' means in NCI function call signatures.
+- Tools
+  + The stubs for new language implementations, as created by mk_language_shell.pl,
+    now rely on PIR-based tools, replacing the Perl 5-based tools.
+- Miscellaneous
+  + various bugfixes, code cleanups, and coding standard fixes
+
 
 New in 1.7.0
 - Functionality
