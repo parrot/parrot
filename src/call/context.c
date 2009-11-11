@@ -463,7 +463,10 @@ allocate_registers(PARROT_INTERP, ARGIN(PMC *pmcctx), ARGIN(const INTVAL *number
     const size_t all_regs_size = size_n + size_i + size_p + size_s;
     const size_t reg_alloc     = ROUND_ALLOC_SIZE(all_regs_size);
 
-    ctx->registers = (Parrot_Context *)Parrot_gc_allocate_fixed_size_storage(interp, reg_alloc);
+    /* don't allocate any storage if there are no registers */
+    ctx->registers = reg_alloc
+        ? (Parrot_Context *)Parrot_gc_allocate_fixed_size_storage(interp, reg_alloc)
+        : NULL;
 
     ctx->n_regs_used[REGNO_INT] = number_regs_used[REGNO_INT];
     ctx->n_regs_used[REGNO_NUM] = number_regs_used[REGNO_NUM];
@@ -475,8 +478,8 @@ allocate_registers(PARROT_INTERP, ARGIN(PMC *pmcctx), ARGIN(const INTVAL *number
 
     /* ctx.bp_ps points to S0, which has Px on the left */
     ctx->bp_ps.regs_s = (STRING **)((char *)ctx->registers + size_nip);
-
 }
+
 
 /*
 
