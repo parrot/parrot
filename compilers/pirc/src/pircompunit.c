@@ -42,7 +42,7 @@ O(c) (constant) time.
 #include "parrot/oplib/ops.h"
 #include "parrot/string_funcs.h"
 #include "parrot/dynext.h"
-#include "../src/pmc/pmc_context.h"
+#include "pmc/pmc_context.h"
 
 
 static unsigned const prime_numbers[] = {113 /* XXX think of more primes */ };
@@ -146,7 +146,7 @@ set_sub_multi_types(lexer_state * const lexer, expression * const multitype) {
                 mtype->entry_type  = MULTI_TYPE_IDENT;
                 break;
             case EXPR_KEY:
-                mtype->entry.key  = multitype->expr.k; 
+                mtype->entry.key  = multitype->expr.k;
                 mtype->entry_type = MULTI_TYPE_KEYED;
                 break;
             default:
@@ -257,7 +257,7 @@ set_sub_methodname(lexer_state * const lexer, char const * const methodname) {
         CURRENT_SUB(lexer)->methodname = methodname;
     else /* :method without a value defaults to the subname. */
         CURRENT_SUB(lexer)->methodname = CURRENT_SUB(lexer)->info.subname;
-    
+
     CURRENT_SUB(lexer)->info.methodname = CURRENT_SUB(lexer)->methodname;
 
     /* :methods have an automatic "self" parameter */
@@ -704,7 +704,7 @@ PARROT_CANNOT_RETURN_NULL
 target *
 set_param_alias(lexer_state * const lexer, char const * const alias) {
     PARROT_ASSERT(lexer->curtarget != NULL);
-    
+
     /* if no alias was specified, default to the target's name, if it's not a register. */
     if (alias == NULL) {
         if (!TEST_FLAG(lexer->curtarget->flags, TARGET_FLAG_IS_REG))
@@ -712,7 +712,7 @@ set_param_alias(lexer_state * const lexer, char const * const alias) {
     }
     else
         lexer->curtarget->alias = alias;
-        
+
     SET_FLAG(lexer->curtarget->flags, TARGET_FLAG_NAMED);
     return lexer->curtarget;
 }
@@ -1982,25 +1982,25 @@ the allocated register.
 void
 set_lex_flag(lexer_state * const lexer, target * const t, char const * const name) {
     lexical *lex = CURRENT_SUB(lexer)->info.lexicals;
-    
+
     /* check whether there is already a target marked as .lex with the specified name */
     while (lex != NULL) {
         if (STREQ(lex->name, name)) {
-            yypirerror(lexer->yyscanner, lexer, "lexical '%s' was already declared", name);   
+            yypirerror(lexer->yyscanner, lexer, "lexical '%s' was already declared", name);
             /* abort immediately */
             return;
         }
-        lex = lex->next;   
+        lex = lex->next;
     }
-    
-    lex        = (lexical *)pir_mem_allocate(lexer, sizeof (lexical));    
+
+    lex        = (lexical *)pir_mem_allocate(lexer, sizeof (lexical));
     lex->name  = name;
 
     /* get a pointer to the "color" field, so that the lexical struct knows
      * the assigned PASM register.
      */
     lex->color = &t->info->color;
-    
+
     /* link this lex node in the list of lexicals at the front; order doesn't matter. */
     lex->next  = CURRENT_SUB(lexer)->info.lexicals;
     CURRENT_SUB(lexer)->info.lexicals = lex;
