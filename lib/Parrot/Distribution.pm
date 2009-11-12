@@ -568,12 +568,28 @@ sub get_pir_language_files {
     # make sure we're picking up pir files (i.e. look for the shebang line)
     my @pir_files;
     for my $file ( $self->pir_source_files ) {
+        next if $self->is_pir_exemption($file);
         push @pir_files, $file
             if $self->is_pir( $file->path );
     }
 
     return @pir_files;
 }
+
+=item C<is_pir_exemption()>
+
+Determines if the given filename is an exemption to being in the PIR source.
+This is to exclude automatically generated PIR-language files Parrot might have.
+
+=cut
+
+{
+    sub is_pir_exemption {
+        my ( $self, $file ) = @_;
+        $file->path =~ m{/ext/};
+    }
+}
+
 
 =item C<is_pir()>
 

@@ -226,6 +226,7 @@ Return the cursor's from position.
     .return ($P0)
 .end
 
+=back
 
 =head2 Private methods
 
@@ -687,6 +688,7 @@ Match the backreference given by C<name>.
     .return (0)
 .end
 
+=back
 
 =head1 AUTHORS
 
@@ -930,7 +932,7 @@ Patrick Michaud <pmichaud@pobox.com> is the author and maintainer.
 
 =head1 NAME
 
-    Regex::Cursor-protoregex-peek - simple protoregex implementation
+Regex::Cursor-protoregex-peek - simple protoregex implementation
 
 =head1 DESCRIPTION
 
@@ -1349,6 +1351,13 @@ tokrx hash.
 =back
 
 =cut
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
+
 ### .include 'src/Regex/Match.pir'
 # Copyright (C) 2009, Patrick R. Michaud
 # $Id$
@@ -1782,6 +1791,8 @@ PAST::Regex - Regex nodes for PAST
 This file implements the various abstract syntax tree nodes
 for regular expressions.
 
+=over 4
+
 =cut
 
 .namespace ['PAST';'Regex']
@@ -2048,7 +2059,6 @@ at this node.
 .end
 
 =back
-
 
 =head1 AUTHOR
 
