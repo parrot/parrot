@@ -1,0 +1,67 @@
+##  builtin subrules
+
+<ident>			2+3 ab2		/mob<ident>: <ab2 @ 4>/		capturing builtin <ident>
+<name>			ab::cd::x3::42	/mob<name>: <ab::cd::x3 @ 0>/	capturing builtin <name>
+
+<.ident>			2+3 ab2		y		non-capturing builtin <.ident>
+<.name>			ab::cd::x3::42	y	non-capturing builtin <.name>
+
+<?wb>def		abc\ndef\n-==\nghi	y	word boundary \W\w
+abc<?wb>		abc\ndef\n-==\nghi	y	word boundary \w\W
+<?wb>abc		abc\ndef\n-==\nghi	y	BOS word boundary
+ghi<?wb>		abc\ndef\n-==\nghi	y	EOS word boundary
+a<?wb>			abc\ndef\n-==\nghi	n	\w\w word boundary
+\-<?wb>			abc\ndef\n-==\nghi	n	\W\W word boundary
+<!wb>def		abc\ndef\n-==\nghi	n	nonword boundary \W\w
+abc<!wb>		abc\ndef\n-==\nghi	n	nonword boundary \w\W
+<!wb>abc		abc\ndef\n-==\nghi	n	BOS nonword boundary
+ghi<!wb>		abc\ndef\n-==\nghi	n	EOS nonword boundary
+a<!wb>			abc\ndef\n-==\nghi	y	\w\w nonword boundary
+\-<!wb>			abc\ndef\n-==\nghi	y	\W\W nonword boundary
+
+<upper>		\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob<upper>: <A @ 45>/		<upper>
+<+upper>	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <A @ 45>/			<+upper>
+<+upper>+	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <ABCDEFGHIJ @ 45>/	<+upper>+
+<lower>		\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob<lower>: <a @ 55>/		<lower>
+<+lower>	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <a @ 55>/			<+lower>
+<+lower>+	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <abcdefghij @ 55>/	<+lower>+
+<alpha>		\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob<alpha>: <_ @ 31>/		<alpha>
+<+alpha>	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <_ @ 31>/			<+alpha>
+<+alpha>+	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <_ @ 31>/	<+alpha>+
+<digit>		\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob<digit>: <0 @ 35>/		<digit>
+<+digit>	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <0 @ 35>/			<+digit>
+<+digit>+	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <0123456789 @ 35>/	<+digit>+
+<xdigit>	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob<xdigit>: <0 @ 35>/		<xdigit>
+<+xdigit>	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <0 @ 35>/			<+xdigit>
+<+xdigit>+	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <0123456789ABCDEF @ 35>/	<+xdigit>+
+<space>		\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob<space>: <\t @ 0>/		<space>
+<+space>	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <\t @ 0>/		<+space>
+<+space>+	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <\t\n\r  @ 0>/		<+space>+
+<blank>		\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob<blank>: <\t @ 0>/		<blank>
+<+blank>	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <\t @ 0>/			<+blank>
+<+blank>+	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <\t @ 0>/			<+blank>+
+<cntrl>		\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob<cntrl>: <\t @ 0>/		<cntrl>
+<+cntrl>	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <\t @ 0>/			<+cntrl>
+<+cntrl>+	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <\t\n\r @ 0>/		<+cntrl>+
+<punct>		\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob<punct>: <! @ 4>/		<punct>
+<+punct>	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <! @ 4>/			<+punct>
+<+punct>+	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <!"#$%&/		<+punct>+
+<alnum>		\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob<alnum>: <0 @ 35>/		<alnum>
+<+alnum>	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <0 @ 35>/	<+alnum>
+<+alnum>+	\t\n\r !"#$%&'()*+,-./:;<=>?@[\]^`_{|}0123456789ABCDEFGHIJabcdefghij	/mob: <0123456789ABCDEFGHIJabcdefghij @ 35>/	<+alnum>+
+<+alnum+[_]>	ident_1				y	union of character classes
+<+[ab]+[\-]>+	aaa-bbb				y	enumerated character classes
+<+  [ a  b ]+[\-]>+		aaa-bbb		y	whitespace is ignored within square brackets and after the initial +
+<+[ab]+[\-]>+	-ab-				y	enumerated character classes variant
+<+[ab]+[\-]>+	----				y	enumerated character classes variant
+<+[ab]+[\-]>+	-				y	enumerated character classes variant
+<-[ab]+[cd]>+	ccdd				y	enumerated character classes variant
+^<-[ab]+[cd]>+$	caad				n	enumerated character classes variant
+<-  [ a  b ]+[cd]>+	ccdd			y	whitespace is ignored within square brackets and after the initial -
+^<-upper>dent	ident_1				y	inverted character class
+^<-upper>dent	Ident_1				n	inverted character class
+<+alpha-[Jj]>+	abc				y	character class with no j
+<+ alpha - [ Jj ]>	abc			y	character class with no j with ws
+^<+alpha-[Jj]>+$	aJc			n	character class with no j fail
+
+## vim: noexpandtab tabstop=4 shiftwidth=4

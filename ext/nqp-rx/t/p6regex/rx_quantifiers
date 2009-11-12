@@ -1,0 +1,189 @@
+##  Quantifiers
+
+xa*			xaaaay		/<xaaaa @ 0>/	star 2+
+xa*			xay		/<xa @ 0>/	star 1
+xa*			xy		/<x @ 0>/	star 0
+xa*y			xaaaay		/<xaaaay @ 0>/	star 2+
+xa*y			xay		/<xay @ 0>/	star 1
+xa*y			xy		/<xy @ 0>/	star 0
+
+xa+			xaaaay		/<xaaaa @ 0>/	plus 2+
+xa+			xay		/<xa @ 0>/	plus 1
+xa+			xy		n		plus 0
+xa+y			xaaaay		/<xaaaay @ 0>/	plus 2+
+xa+y			xay		/<xay @ 0>/	plus 1
+xa+y			xy		n		plus 0
+
+xa?			xaaaay		/<xa @ 0>/	ques 2+
+xa?			xay		/<xa @ 0>/	ques 1
+xa?			xy		/<x @ 0>/	ques 0
+xa?y			xaaaay		n		ques 2+
+xa?y			xay		/<xay @ 0>/	ques 1
+xa?y			xy		/<xy @ 0>/	ques 0
+
+xa*!			xaaaay		/<xaaaa @ 0>/	star greedy 2+
+xa*!			xay		/<xa @ 0>/	star greedy 1
+xa*!			xy		/<x @ 0>/	star greedy 0
+xa*!y			xaaaay		/<xaaaay @ 0>/	star greedy 2+
+xa*!y			xay		/<xay @ 0>/	star greedy 1
+xa*!y			xy		/<xy @ 0>/	star greedy 0
+
+xa+!			xaaaay		/<xaaaa @ 0>/	plus greedy 2+
+xa+!			xay		/<xa @ 0>/	plus greedy 1
+xa+!			xy		n		plus greedy 0
+xa+!y			xaaaay		/<xaaaay @ 0>/	plus greedy 2+
+xa+!y			xay		/<xay @ 0>/	plus greedy 1
+xa+!y			xy		n		plus greedy 0
+
+xa?!			xaaaay		/<xa @ 0>/	ques greedy 2+
+xa?!			xay		/<xa @ 0>/	ques greedy 1
+xa?!			xy		/<x @ 0>/	ques greedy 0
+xa?!y			xaaaay		n		ques greedy 2+
+xa?!y			xay		/<xay @ 0>/	ques greedy 1
+xa?!y			xy		/<xy @ 0>/	ques greedy 0
+
+xa*:!			xaaaay		/<xaaaa @ 0>/	star :greedy 2+
+xa*:!			xay		/<xa @ 0>/	star :greedy 1
+xa*:!			xy		/<x @ 0>/	star :greedy 0
+xa*:!y			xaaaay		/<xaaaay @ 0>/	star :greedy 2+
+xa*:!y			xay		/<xay @ 0>/	star :greedy 1
+xa*:!y			xy		/<xy @ 0>/	star :greedy 0
+
+xa+:!			xaaaay		/<xaaaa @ 0>/	plus :greedy 2+
+xa+:!			xay		/<xa @ 0>/	plus :greedy 1
+xa+:!			xy		n		plus :greedy 0
+xa+:!y			xaaaay		/<xaaaay @ 0>/	plus :greedy 2+
+xa+:!y			xay		/<xay @ 0>/	plus :greedy 1
+xa+:!y			xy		n		plus :greedy 0
+
+xa?:!			xaaaay		/<xa @ 0>/	ques :greedy 2+
+xa?:!			xay		/<xa @ 0>/	ques :greedy 1
+xa?:!			xy		/<x @ 0>/	ques :greedy 0
+xa?:!y			xaaaay		n		ques :greedy 2+
+xa?:!y			xay		/<xay @ 0>/	ques :greedy 1
+xa?:!y			xy		/<xy @ 0>/	ques :greedy 0
+
+xa*?			xaaaay		/<x @ 0>/	star eager 2+
+xa*?			xay		/<x @ 0>/	star eager 1
+xa*?			xy		/<x @ 0>/	star eager 0
+xa*?y			xaaaay		/<xaaaay @ 0>/	star eager 2+
+xa*?y			xay		/<xay @ 0>/	star eager 1
+xa*?y			xy		/<xy @ 0>/	star eager 0
+
+xa+?			xaaaay		/<xa @ 0>/	plus eager 2+
+xa+?			xay		/<xa @ 0>/	plus eager 1
+xa+?			xy		n		plus eager 0
+xa+?y			xaaaay		/<xaaaay @ 0>/	plus eager 2+
+xa+?y			xay		/<xay @ 0>/	plus eager 1
+xa+?y			xy		n		plus eager 0
+
+xa??			xaaaay		/<x @ 0>/	ques eager 2+
+xa??			xay		/<x @ 0>/	ques eager 1
+xa??			xy		/<x @ 0>/	ques eager 0
+xa??y			xaaaay		n		ques eager 2+
+xa??y			xay		/<xay @ 0>/	ques eager 1
+xa??y			xy		/<xy @ 0>/	ques eager 0
+
+xa*:?			xaaaay		/<x @ 0>/	star :eager 2+
+xa*:?			xay		/<x @ 0>/	star :eager 1
+xa*:?			xy		/<x @ 0>/	star :eager 0
+xa*:?y			xaaaay		/<xaaaay @ 0>/	star :eager 2+
+xa*:?y			xay		/<xay @ 0>/	star :eager 1
+xa*:?y			xy		/<xy @ 0>/	star :eager 0
+
+xa+:?			xaaaay		/<xa @ 0>/	plus :eager 2+
+xa+:?			xay		/<xa @ 0>/	plus :eager 1
+xa+:?			xy		n		plus :eager 0
+xa+:?y			xaaaay		/<xaaaay @ 0>/	plus :eager 2+
+xa+:?y			xay		/<xay @ 0>/	plus :eager 1
+xa+:?y			xy		n		plus :eager 0
+
+xa?:?			xaaaay		/<x @ 0>/	ques :eager 2+
+xa?:?			xay		/<x @ 0>/	ques :eager 1
+xa?:?			xy		/<x @ 0>/	ques :eager 0
+xa?:?y			xaaaay		n		ques :eager 2+
+xa?:?y			xay		/<xay @ 0>/	ques :eager 1
+xa?:?y			xy		/<xy @ 0>/	ques :eager 0
+
+xa*:y			xaaaay		/<xaaaay @ 0>/	star cut 2+
+xa*:y			xay		/<xay @ 0>/	star cut 1
+xa*:y			xy		/<xy @ 0>/	star cut 0
+xa*:a			xaaaay		n		star cut 2+
+xa*:a			xay		n		star cut 1
+
+xa+:y			xaaaay		/<xaaaay @ 0>/	plus cut 2+
+xa+:y			xay		/<xay @ 0>/	plus cut 1
+xa+:y			xy		n		plus cut 0
+xa+:a			xaaaay		n		plus cut 2+
+xa+:a			xay		n		plus cut 1
+
+xa?:y			xaaaay		n		ques cut 2+
+xa?:y			xay		/<xay @ 0>/	ques cut 1
+xa?:y			xy		/<xy @ 0>/	ques cut 0
+xa?:a			xaaaay		/<xaa @ 0>	ques cut 2+
+xa?:a			xay		n		ques cut 1
+
+:ratchet xa*y			xaaaay		/<xaaaay @ 0>/	star ratchet 2+
+:ratchet xa*y			xay		/<xay @ 0>/	star ratchet 1
+:ratchet xa*y			xy		/<xy @ 0>/	star ratchet 0
+:ratchet xa*a			xaaaay		n		star ratchet 2+
+:ratchet xa*a			xay		n		star ratchet 1
+
+:ratchet xa+y			xaaaay		/<xaaaay @ 0>/	plus ratchet 2+
+:ratchet xa+y			xay		/<xay @ 0>/	plus ratchet 1
+:ratchet xa+y			xy		n		plus ratchet 0
+:ratchet xa+a			xaaaay		n		plus ratchet 2+
+:ratchet xa+a			xay		n		plus ratchet 1
+
+:ratchet xa?y			xaaaay		n		ques ratchet 2+
+:ratchet xa?y			xay		/<xay @ 0>/	ques ratchet 1
+:ratchet xa?y			xy		/<xy @ 0>/	ques ratchet 0
+:ratchet xa?a			xaaaay		/<xaa @ 0>	ques ratchet 2+
+:ratchet xa?a			xay		n		ques ratchet 1
+
+:ratchet xa*!y			xaaaay		/<xaaaay @ 0>/	star ratchet greedy 2+
+:ratchet xa*!y			xay		/<xay @ 0>/	star ratchet greedy 1
+:ratchet xa*!y			xy		/<xy @ 0>/	star ratchet greedy 0
+:ratchet xa*!a			xaaaay		/<xaaaa @ 0>/	star ratchet greedy 2+
+:ratchet xa*!a			xay		/<xa @ 0>/	star ratchet greedy 1
+
+:ratchet xa+!y			xaaaay		/<xaaaay @ 0>/	plus ratchet greedy 2+
+:ratchet xa+!y			xay		/<xay @ 0>/	plus ratchet greedy 1
+:ratchet xa+!y			xy		n		plus ratchet greedy 0
+:ratchet xa+!a			xaaaay		/<xaaaa @ 0>/	plus ratchet greedy 2+
+:ratchet xa+!a			xay		n		plus ratchet greedy 1
+
+:ratchet xa?!y			xaaaay		n		ques ratchet greedy 2+
+:ratchet xa?!y			xay		/<xay @ 0>/	ques ratchet greedy 1
+:ratchet xa?!y			xy		/<xy @ 0>/	ques ratchet greedy 0
+:ratchet xa?!a			xaaaay		/<xaa @ 0>	ques ratchet greedy 2+
+:ratchet xa?!a			xay		/<xa @ 0>	ques ratchet greedy 1
+
+
+## Quantifier bare range
+.**2			a			n	only one character
+.**2			ab			y	two characters
+a**2			foobar		n	only one "a" character
+a**2			baabaa		y	two "a" characters
+a**0..4			bbbbbbb		y	no "a" characters
+a**2..4			bababab		n	not two consecutive "a" characters
+a**2..4			baabbbb		y	two "a" characters
+a**2..4			baaabbb		y	three "a" characters
+a**2..4			baaaabb		y	four "a" characters
+a**2..4			baaaaaa		y	four "a" characters
+a**2..*			baaaaaa		y	six "a" characters
+a**?2..*		baaaaaa		y	two "a" characters (non-greedy)
+a**:?2..*		baaaaaa		y	two "a" characters (non-greedy)
+a**!2..*		baaaaaa		y	six "a" characters (explicit greed)
+a**:!2..*		baaaaaa		y	six "a" characters (explicit greed)
+a**?2..4		baaabbb		y	two "a" characters (non-greedy)
+a**:?2..4		baaabbb		y	two "a" characters (non-greedy)
+a**!2..4		baaabbb		y	three "a" characters (explicit greed)
+a**:!2..4		baaabbb		y	three "a" characters (explicit greed)
+
+^[\w+] ** \,$		foo,bar,baz	y	** with a term
+^[\w+] **? \, ....$	foo,bar,baz	y	**? with a term
+^[\w+] ** [\,\s*]$	foo, bar, baz	y	** with term + ws
+:sigspace ^[\w+] ** \, $	foo, bar ,baz	y	** under :sigspace
+:sigspace ^[\w+]** \, $	foo, bar ,baz	n	** under :sigspace w/o ws
+:sigspace ^[\w+]** \, $	foo,bar,baz	y	** under :sigspace w/o ws

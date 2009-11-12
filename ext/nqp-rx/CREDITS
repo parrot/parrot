@@ -1,0 +1,24 @@
+=pod
+
+    Following in the steps of other open source projects that
+    eventually take over the world, here is the partial list
+    of people who have contributed to Rakudo and its supporting
+    works.  It is sorted by name and formatted to allow easy
+    grepping and beautification by scripts.
+    The fields are: name (N), email (E), web-address (W),
+    description (D), subversion username (U) and snail-mail
+    address (S).
+
+        Thanks,
+
+        The NQP Team
+        PS: Yes, this looks remarkably like the Linux CREDITS format
+        PPS: This file is encoded in UTF-8
+
+----------
+N: Patrick R. Michaud
+U: pmichaud
+D: Perl 6 (Rakudo Perl) lead developer, pumpking
+E: pmichaud@pobox.com
+
+=cut

@@ -1,0 +1,33 @@
+##   Backtracking control tests
+a* a			bazaar		y	control
+# todo :pge<adverbs before backtrack(?)>
+a*:a			bazaar		/:a/	basic
+a*: a			bazaar		n	basic
+^[a|b]*  aba		abbabbababba	y	control
+^[a|b]*: aba		abbabbababba	n	outside a group
+\d+:			123abc		y	cut on character class shortcut
+\d+:			abc		n	cut on character class shortcut
+[ if    not | ify ]	verify		y	control
+[ if :: not | ify ]	verify		n	inside a group
+  if :: not | ify	verify		n	the default all group
+# todo :pugs<feature>
+[ if :  not | ify ]	verify		y	simple backtrack still works
+# todo :pugs<feature>
+[ if :: not | ify ] | verify	verify	y	rule continues
+[ when     ever ] | whence	whence	y	full backtrack failure
+[ when ::: ever ] | whence	whence	n	full backtrack failure
+# todo :pugs<feature>
+ab::cd | gh::ij		xyabghij	y	group cut at top
+ab:::cd | gh:::ij	xyabghij	n	rule cut at top
+# todo :pugs<feature>
+[ab::cd | gh::ij]	xyabghij	y	group cut in group
+[ab:::cd | gh:::ij]	xyabghij	n	rule cut in group
+[ ab | abc ]: de	xyzabcde	n	no backtrack into group
+( ab | abc ): de	xyzabcde	n	no backtrack into subpattern
+# todo :pugs<feature>
+[ when <commit> ever ] | whence	whence	n	full backtrack failure
+
+:ratchet a* a		bazaar		n	ratchet modifier
+:ratchet a*! a		bazaar		y	force backtracking !
+
+## vim: noexpandtab tabstop=4 shiftwidth=4

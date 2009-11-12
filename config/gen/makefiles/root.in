@@ -158,6 +158,7 @@ GEN_MAKEFILES := \
     compilers/tge/Makefile \
     editor/Makefile \
     ext/Makefile \
+    ext/nqp-rx/Makefile \
     src/dynoplibs/Makefile \
     src/dynpmc/Makefile
 
@@ -1443,6 +1444,7 @@ compilers.dummy : $(PARROT) $(GEN_LIBRARY)
 	$(MAKE) compilers/nqp
 	$(MAKE) compilers/json
 	$(MAKE) compilers/data_json
+	$(MAKE) ext/nqp-rx
 
 compilers-clean :
 	$(MAKE) compilers/pct clean

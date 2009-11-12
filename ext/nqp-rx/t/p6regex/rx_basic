@@ -1,0 +1,10 @@
+##   Basic tests
+a			a		y	basic literal
+abc			abc		y	basic multichar literal
+.			a		y	basic dot
+..			abc		y	basic multidot
+a.c			a.c		y	dot in mid pattern
+b			a		n	failed literal match
+aa			a		n	failed literal match
+...			ab		n	failed dot match
+c			abc		y	scanning match
