@@ -858,7 +858,8 @@ in the actual PackFile. See C<store_key_bytecode()>.
 
 */
 int
-emit_pbc_key(bytecode * const bc, key * const k) {
+emit_pbc_key(ARGIN(bytecode * const bc), ARGIN(key * const k))
+{
     ASSERT_ARGS(emit_pbc_key)
     key_entry  *iter;
     opcode_t   *key;

@@ -165,6 +165,13 @@ static void imcc_globals_destroy(PARROT_INTERP,
     SHIM(void *param))
         __attribute__nonnull__(1);
 
+static void init_fixedintegerarray_from_string(PARROT_INTERP,
+    ARGIN(PMC *p),
+    ARGIN(STRING *s))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 static void make_new_sub(PARROT_INTERP, ARGIN(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -258,6 +265,11 @@ static void verify_signature(PARROT_INTERP,
     , PARROT_ASSERT_ARG(ins_line))
 #define ASSERT_ARGS_imcc_globals_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_init_fixedintegerarray_from_string \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(p) \
+    , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_make_new_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(unit))
@@ -1673,7 +1685,8 @@ IMCC_int_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
 
 /*
 
-=item C<static void init_fixedintegerarray_from_string(PARROT_INTERP, PMC *p, STRING *s)>
+=item C<static void init_fixedintegerarray_from_string(PARROT_INTERP, PMC *p,
+STRING *s)>
 
 Initializes the passed FIA from a string representation I<"(el0, el1, ...)">.
 
@@ -1682,8 +1695,9 @@ Initializes the passed FIA from a string representation I<"(el0, el1, ...)">.
 */
 
 static void
-init_fixedintegerarray_from_string(PARROT_INTERP, PMC *p, STRING *s)
+init_fixedintegerarray_from_string(PARROT_INTERP, ARGIN(PMC *p), ARGIN(STRING *s))
 {
+    ASSERT_ARGS(init_fixedintegerarray_from_string)
     INTVAL  n, elem, i, l;
     char   *src, *chr, *start;
     int     base;
