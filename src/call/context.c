@@ -497,7 +497,7 @@ Parrot_pcc_allocate_registers(PARROT_INTERP, ARGIN(PMC *pmcctx),
         ARGIN(const INTVAL *number_regs_used))
 {
     ASSERT_ARGS(Parrot_pcc_allocate_registers)
-    return allocate_registers(interp, pmcctx, number_regs_used);
+    allocate_registers(interp, pmcctx, number_regs_used);
 }
 
 
