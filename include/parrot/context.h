@@ -89,8 +89,6 @@ typedef struct Parrot_Context_attributes Parrot_Context;
 
 /* Context accessors functions */
 
-#ifndef NDEBUG
-
 /*
  * For optimised builds we provide macros which directly poke into
  * Parrot_Context.
@@ -100,22 +98,26 @@ typedef struct Parrot_Context_attributes Parrot_Context;
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-UINTVAL Parrot_pcc_dec_recursion_depth(PARROT_INTERP, ARGIN(PMC *ctx))
+UINTVAL Parrot_pcc_dec_recursion_depth_func(PARROT_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_errors_off(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL flags)
+void Parrot_pcc_errors_off_func(PARROT_INTERP,
+    ARGIN(PMC *ctx),
+    UINTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_errors_on(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL flags)
+void Parrot_pcc_errors_on_func(PARROT_INTERP,
+    ARGIN(PMC *ctx),
+    UINTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-UINTVAL Parrot_pcc_errors_test(PARROT_INTERP,
+UINTVAL Parrot_pcc_errors_test_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     UINTVAL flags)
         __attribute__nonnull__(1)
@@ -123,43 +125,43 @@ UINTVAL Parrot_pcc_errors_test(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_pcc_get_caller_ctx(PARROT_INTERP, ARGIN(PMC *ctx))
+PMC* Parrot_pcc_get_caller_ctx_func(PARROT_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-struct PackFile_Constant ** Parrot_pcc_get_constants(PARROT_INTERP,
+struct PackFile_Constant ** Parrot_pcc_get_constants_func(PARROT_INTERP,
     ARGIN(PMC *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-Parrot_Context* Parrot_pcc_get_context_struct(PARROT_INTERP,
+Parrot_Context* Parrot_pcc_get_context_struct_func(PARROT_INTERP,
     ARGIN_NULLOK(PMC *ctx))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_pcc_get_continuation(PARROT_INTERP, ARGIN(PMC *ctx))
+PMC* Parrot_pcc_get_continuation_func(PARROT_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_pcc_get_handlers(PARROT_INTERP, ARGIN(PMC *ctx))
+PMC* Parrot_pcc_get_handlers_func(PARROT_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-INTVAL Parrot_pcc_get_HLL(PARROT_INTERP, ARGIN(PMC *ctx))
+INTVAL Parrot_pcc_get_HLL_func(PARROT_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-INTVAL Parrot_pcc_get_int_constant(PARROT_INTERP,
+INTVAL Parrot_pcc_get_int_constant_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     INTVAL idx)
         __attribute__nonnull__(1)
@@ -167,19 +169,19 @@ INTVAL Parrot_pcc_get_int_constant(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PMC* Parrot_pcc_get_lex_pad(PARROT_INTERP, ARGIN(PMC *ctx))
+PMC* Parrot_pcc_get_lex_pad_func(PARROT_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_pcc_get_namespace(PARROT_INTERP, ARGIN(PMC *ctx))
+PMC* Parrot_pcc_get_namespace_func(PARROT_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-FLOATVAL Parrot_pcc_get_num_constant(PARROT_INTERP,
+FLOATVAL Parrot_pcc_get_num_constant_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     INTVAL idx)
         __attribute__nonnull__(1)
@@ -187,71 +189,73 @@ FLOATVAL Parrot_pcc_get_num_constant(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_pcc_get_object(PARROT_INTERP, ARGIN(PMC *ctx))
+PMC* Parrot_pcc_get_object_func(PARROT_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_pcc_get_outer_ctx(PARROT_INTERP, ARGIN(PMC *ctx))
+PMC* Parrot_pcc_get_outer_ctx_func(PARROT_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-opcode_t* Parrot_pcc_get_pc(PARROT_INTERP, ARGIN(PMC *ctx))
+opcode_t* Parrot_pcc_get_pc_func(PARROT_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_pcc_get_pmc_constant(PARROT_INTERP, ARGIN(PMC *ctx), INTVAL idx)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-size_t Parrot_pcc_get_pred_offset(PARROT_INTERP, ARGIN(PMC *ctx))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-UINTVAL Parrot_pcc_get_recursion_depth(PARROT_INTERP, ARGIN(PMC *ctx))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
-opcode_t* Parrot_pcc_get_results(PARROT_INTERP, ARGIN(PMC *ctx))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
-PMC* Parrot_pcc_get_results_signature(PARROT_INTERP, ARGIN(PMC *ctx))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
-PMC* Parrot_pcc_get_signature(PARROT_INTERP, ARGIN(PMC *ctx))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
-STRING* Parrot_pcc_get_string_constant(PARROT_INTERP,
+PMC* Parrot_pcc_get_pmc_constant_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     INTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-UINTVAL Parrot_pcc_inc_recursion_depth(PARROT_INTERP, ARGIN(PMC *ctx))
+size_t Parrot_pcc_get_pred_offset_func(PARROT_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_set_caller_ctx(PARROT_INTERP,
+UINTVAL Parrot_pcc_get_recursion_depth_func(PARROT_INTERP, ARGIN(PMC *ctx))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+opcode_t* Parrot_pcc_get_results_func(PARROT_INTERP, ARGIN(PMC *ctx))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+PMC* Parrot_pcc_get_results_signature_func(PARROT_INTERP, ARGIN(PMC *ctx))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+PMC* Parrot_pcc_get_signature_func(PARROT_INTERP, ARGIN(PMC *ctx))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+STRING* Parrot_pcc_get_string_constant_func(PARROT_INTERP,
+    ARGIN(PMC *ctx),
+    INTVAL idx)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+UINTVAL Parrot_pcc_inc_recursion_depth_func(PARROT_INTERP, ARGIN(PMC *ctx))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+void Parrot_pcc_set_caller_ctx_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN(PMC *caller_ctx))
         __attribute__nonnull__(1)
@@ -260,21 +264,21 @@ void Parrot_pcc_set_caller_ctx(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-void Parrot_pcc_set_constants(PARROT_INTERP,
+void Parrot_pcc_set_constants_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN_NULLOK(struct PackFile_Constant **constants))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_set_continuation(PARROT_INTERP,
+void Parrot_pcc_set_continuation_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN_NULLOK(PMC *_continuation))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_set_handlers(PARROT_INTERP,
+void Parrot_pcc_set_handlers_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN(PMC *handlers))
         __attribute__nonnull__(1)
@@ -282,12 +286,12 @@ void Parrot_pcc_set_handlers(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-void Parrot_pcc_set_HLL(PARROT_INTERP, ARGIN(PMC *ctx), INTVAL hll)
+void Parrot_pcc_set_HLL_func(PARROT_INTERP, ARGIN(PMC *ctx), INTVAL hll)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_set_lex_pad(PARROT_INTERP,
+void Parrot_pcc_set_lex_pad_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN(PMC *lex_pad))
         __attribute__nonnull__(1)
@@ -295,21 +299,21 @@ void Parrot_pcc_set_lex_pad(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-void Parrot_pcc_set_namespace(PARROT_INTERP,
+void Parrot_pcc_set_namespace_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN_NULLOK(PMC *_namespace))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_set_object(PARROT_INTERP,
+void Parrot_pcc_set_object_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN_NULLOK(PMC *object))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_set_outer_ctx(PARROT_INTERP,
+void Parrot_pcc_set_outer_ctx_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN(PMC *outer_ctx))
         __attribute__nonnull__(1)
@@ -317,230 +321,244 @@ void Parrot_pcc_set_outer_ctx(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-void Parrot_pcc_set_pc(PARROT_INTERP,
+void Parrot_pcc_set_pc_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN_NULLOK(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_set_pred_offset(PARROT_INTERP,
+void Parrot_pcc_set_pred_offset_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     size_t pred_offset)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_set_results(PARROT_INTERP,
+void Parrot_pcc_set_results_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN_NULLOK(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_set_results_signature(PARROT_INTERP,
+void Parrot_pcc_set_results_signature_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN_NULLOK(PMC *sig))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_set_signature(PARROT_INTERP,
+void Parrot_pcc_set_signature_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN_NULLOK(PMC *sig_object))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_trace_flags_off(PARROT_INTERP,
+void Parrot_pcc_trace_flags_off_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     UINTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_trace_flags_on(PARROT_INTERP,
+void Parrot_pcc_trace_flags_on_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     UINTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-UINTVAL Parrot_pcc_trace_flags_test(PARROT_INTERP,
+UINTVAL Parrot_pcc_trace_flags_test_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     UINTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_warnings_off(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL flags)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-UINTVAL Parrot_pcc_warnings_on(PARROT_INTERP,
+void Parrot_pcc_warnings_off_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     UINTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-UINTVAL Parrot_pcc_warnings_test(PARROT_INTERP,
+UINTVAL Parrot_pcc_warnings_on_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     UINTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_Parrot_pcc_dec_recursion_depth \
+PARROT_EXPORT
+UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
+    ARGIN(PMC *ctx),
+    UINTVAL flags)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_Parrot_pcc_dec_recursion_depth_func \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_errors_off __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_pcc_errors_off_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_errors_on __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_pcc_errors_on_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_errors_test __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_pcc_errors_test_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_caller_ctx __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_pcc_get_caller_ctx_func \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_constants __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_pcc_get_constants_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_context_struct __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_pcc_get_context_struct_func \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_pcc_get_continuation __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_handlers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_HLL __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_int_constant __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_lex_pad __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_num_constant __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_object __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_outer_ctx __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_pc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_pmc_constant __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_pred_offset __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_recursion_depth \
+#define ASSERT_ARGS_Parrot_pcc_get_continuation_func \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_results __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_pcc_get_handlers_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_results_signature \
+#define ASSERT_ARGS_Parrot_pcc_get_HLL_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_get_int_constant_func \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_signature __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_pcc_get_lex_pad_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_string_constant \
+#define ASSERT_ARGS_Parrot_pcc_get_namespace_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_get_num_constant_func \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_inc_recursion_depth \
+#define ASSERT_ARGS_Parrot_pcc_get_object_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_get_outer_ctx_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_get_pc_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_get_pmc_constant_func \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_set_caller_ctx __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_pcc_get_pred_offset_func \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_get_recursion_depth_func \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_get_results_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_get_results_signature_func \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_get_signature_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_get_string_constant_func \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_inc_recursion_depth_func \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_set_caller_ctx_func \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx) \
     , PARROT_ASSERT_ARG(caller_ctx))
-#define ASSERT_ARGS_Parrot_pcc_set_constants __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_pcc_set_constants_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_set_continuation __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_set_handlers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx) \
-    , PARROT_ASSERT_ARG(handlers))
-#define ASSERT_ARGS_Parrot_pcc_set_HLL __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_set_lex_pad __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx) \
-    , PARROT_ASSERT_ARG(lex_pad))
-#define ASSERT_ARGS_Parrot_pcc_set_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_set_object __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_set_outer_ctx __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx) \
-    , PARROT_ASSERT_ARG(outer_ctx))
-#define ASSERT_ARGS_Parrot_pcc_set_pc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_set_pred_offset __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_set_results __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_set_results_signature \
+#define ASSERT_ARGS_Parrot_pcc_set_continuation_func \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_set_signature __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_pcc_set_handlers_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx) \
+    , PARROT_ASSERT_ARG(handlers))
+#define ASSERT_ARGS_Parrot_pcc_set_HLL_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_trace_flags_off __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_pcc_set_lex_pad_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx) \
+    , PARROT_ASSERT_ARG(lex_pad))
+#define ASSERT_ARGS_Parrot_pcc_set_namespace_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_trace_flags_on __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_pcc_set_object_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_trace_flags_test __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_pcc_set_outer_ctx_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx) \
+    , PARROT_ASSERT_ARG(outer_ctx))
+#define ASSERT_ARGS_Parrot_pcc_set_pc_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_warnings_off __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_pcc_set_pred_offset_func \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_warnings_on __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_pcc_set_results_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_warnings_test __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_pcc_set_results_signature_func \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_set_signature_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_trace_flags_off_func \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_trace_flags_on_func \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_trace_flags_test_func \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_warnings_off_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_warnings_on_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_warnings_test_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/call/context_accessors.c */
 
-#else /* ifndef NDEBUG */
-
-/* Context manipulating "functions" */
+/* Map Context manipulating functions to functions or macros */
+#ifdef NDEBUG
 #  define Parrot_pcc_get_context_struct(i, c) (PMC_data_typed((c), Parrot_Context*))
 
 #  define Parrot_pcc_get_constants(i, c) (__C(c)->constants)
@@ -605,6 +623,73 @@ UINTVAL Parrot_pcc_warnings_test(PARROT_INTERP,
 #  define Parrot_pcc_trace_flags_on(i, c, flags)     (__C(c)->trace_flags |= (flags))
 #  define Parrot_pcc_trace_flags_off(i, c, flags)    (__C(c)->trace_flags &= ~(flags))
 #  define Parrot_pcc_trace_flags_test(i, c, flags)   (__C(c)->trace_flags & (flags))
+
+#else
+
+#  define Parrot_pcc_get_context_struct(i, c) Parrot_pcc_get_context_struct_func((i), (c))
+
+#  define Parrot_pcc_get_constants(i, c) Parrot_pcc_get_constants_func((i), (c))
+#  define Parrot_pcc_set_constants(i, c, value) Parrot_pcc_set_constants_func((i), (c), (value))
+
+#  define Parrot_pcc_get_continuation(i, c) Parrot_pcc_get_continuation_func((i), (c))
+#  define Parrot_pcc_set_continuation(i, c, value) Parrot_pcc_set_continuation_func((i), (c), (value))
+
+#  define Parrot_pcc_get_results(i, c) Parrot_pcc_get_results_func((i), (c))
+#  define Parrot_pcc_set_results(i, c, value) Parrot_pcc_set_results_func((i), (c), (value))
+
+#  define Parrot_pcc_get_caller_ctx(i, c) Parrot_pcc_get_caller_ctx_func((i), (c))
+#  define Parrot_pcc_set_caller_ctx(i, c, value) Parrot_pcc_set_caller_ctx_func((i), (c), (value))
+
+#  define Parrot_pcc_get_results_signature(i, c) Parrot_pcc_get_results_signature_func((i), (c))
+#  define Parrot_pcc_set_results_signature(i, c, value) Parrot_pcc_set_results_signature_func((i), (c), (value))
+
+#  define Parrot_pcc_get_namespace(i, c) Parrot_pcc_get_namespace_func((i), (c))
+#  define Parrot_pcc_set_namespace(i, c, value) Parrot_pcc_set_namespace_func((i), (c), (value))
+
+#  define Parrot_pcc_get_pred_offset(i, c) Parrot_pcc_get_pred_offset_func((i), (c))
+#  define Parrot_pcc_set_pred_offset(i, c, value) Parrot_pcc_set_pred_offset_func((i), (c), (value))
+
+#  define Parrot_pcc_get_pc(i, c) Parrot_pcc_get_pc_func((i), (c))
+#  define Parrot_pcc_set_pc(i, c, value) Parrot_pcc_set_pc_func((i), (c), (value))
+
+#  define Parrot_pcc_get_HLL(i, c) Parrot_pcc_get_HLL_func((i), (c))
+#  define Parrot_pcc_set_HLL(i, c, value) Parrot_pcc_set_HLL_func((i), (c), (value))
+
+#  define Parrot_pcc_get_object(i, c) Parrot_pcc_get_object_func((i), (c))
+#  define Parrot_pcc_set_object(i, c, value) Parrot_pcc_set_object_func((i), (c), (value))
+
+#  define Parrot_pcc_get_lex_pad(i, c) Parrot_pcc_get_lex_pad_func((i), (c))
+#  define Parrot_pcc_set_lex_pad(i, c, value) Parrot_pcc_set_lex_pad_func((i), (c), (value))
+
+#  define Parrot_pcc_get_handlers(i, c) Parrot_pcc_get_handlers_func((i), (c))
+#  define Parrot_pcc_set_handlers(i, c, value) Parrot_pcc_set_handlers_func((i), (c), (value))
+
+#  define Parrot_pcc_get_outer_ctx(i, c) Parrot_pcc_get_outer_ctx_func((i), (c))
+#  define Parrot_pcc_set_outer_ctx(i, c, value) Parrot_pcc_set_outer_ctx_func((i), (c), (value))
+
+#  define Parrot_pcc_get_signature(i, c) Parrot_pcc_get_signature_func((i), (c))
+#  define Parrot_pcc_set_signature(i, c, value) Parrot_pcc_set_signature_func((i), (c), (value))
+
+#  define Parrot_pcc_get_int_constant(i, c, idx) Parrot_pcc_get_int_constant_func((i), (c), (idx))
+#  define Parrot_pcc_get_num_constant(i, c, idx) Parrot_pcc_get_num_constant_func((i), (c), (idx))
+#  define Parrot_pcc_get_string_constant(i, c, idx) Parrot_pcc_get_string_constant_func((i), (c), (idx))
+#  define Parrot_pcc_get_pmc_constant(i, c, idx) Parrot_pcc_get_pmc_constant_func((i), (c), (idx))
+
+#  define Parrot_pcc_get_recursion_depth(i, c) Parrot_pcc_get_recursion_depth_func((i), (c))
+#  define Parrot_pcc_dec_recursion_depth(i, c) Parrot_pcc_dec_recursion_depth_func((i), (c))
+#  define Parrot_pcc_inc_recursion_depth(i, c) Parrot_pcc_inc_recursion_depth_func((i), (c))
+
+#  define Parrot_pcc_warnings_on(i, c, flags) Parrot_pcc_warnings_on_func((i), (c), (flags))
+#  define Parrot_pcc_warnings_off(i, c, flags) Parrot_pcc_warnings_off_func((i), (c), (flags))
+#  define Parrot_pcc_warnings_test(i, c, flags) Parrot_pcc_warnings_test_func((i), (c), (flags))
+
+#  define Parrot_pcc_errors_on(i, c, flags) Parrot_pcc_errors_on_func((i), (c), (flags))
+#  define Parrot_pcc_errors_off(i, c, flags) Parrot_pcc_errors_off_func((i), (c), (flags))
+#  define Parrot_pcc_errors_test(i, c, flags) Parrot_pcc_errors_test_func((i), (c), (flags))
+
+#  define Parrot_pcc_trace_flags_on(i, c, flags) Parrot_pcc_trace_flags_on_func((i), (c), (flags))
+#  define Parrot_pcc_trace_flags_off(i, c, flags) Parrot_pcc_trace_flags_off_func((i), (c), (flags))
+#  define Parrot_pcc_trace_flags_test(i, c, flags) Parrot_pcc_trace_flags_test_func((i), (c), (flags))
 
 #endif /* ifndef NDEBUG */
 
