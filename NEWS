@@ -1,26 +1,27 @@
 # $Id$
 
-New in 1.8.0 (to be released on 2009-11-19)
+New in 1.8.0 (to be released on 2009-11-17)
 - Functionality
-  + Reworked the internals of the parrot calling conventions, PCC,
-    so that all call paths use a CallSignature object for passing arguments and return values.
+  + Experimental support for overriding VTABLE invoke in PIR objects was added.
+  + The method 'type' was added to the PackfileAnnotations PMC.
+  + The internals of the parrot calling conventions, PCC, were reworked.
+    All call paths now use a CallSignature object for passing arguments and return values.
   + The new API-function  'Parrot_ext_call' was added for calling into C-land.
-  + Improvements to the fixed-size allocator were made.
+  + The fixed-size allocator was improved.
   + The files installed by 'make install-dev' are now covered by 'make install' as well.
-  + Added experimental 'fetch' op.
-  + Added experimental 'vivify' op.
-  + The -I option now prepends items to the search path.
-  + Merged branch context_auto_attrs back to trunk.
-  + Merged convert_OSNAME into trunk.
-  + Merged auto_format_no_Config into trunk.
+  + The experimental ops 'fetch' and 'vivify' were added.
+  + The -I option to the command 'parrot' now prepends items to the search path.
+  + The development branch context_auto_attrs was merged.
+  + The development branch convert_OSNAME was merged.
+  + The development branch auto_format_no_Config was merged.
   + MultiSub PMCs now stringify to the name of their first candidate,
     instead of the number of candidates.
+  + The platform detection at the start of the configuration process was improved.
 - Platforms
-  + Started port of RTEMS.
-  + Use shared libs on NetBSD.
+  + Fixes for the port or Parrot to RTEMS were applied. Yay, first port to a real time OS!
+  + On NetBSD, shared libs are now used.
 - Performance
   + Use the the fixed-sized allocator in the Context and the CallSignature PMC.
-  + Speed penalty from the reworked parrot calling conventions.
   + Many small speed improvements.
 - New deprecations
   + The 'Parrot_call_*' functions for invoking a sub/method object from C are
@@ -29,25 +30,24 @@ New in 1.8.0 (to be released on 2009-11-19)
   + All bitwise ops will become dynops. (eligible in 2.1)
 - Realized deprecations
   + The last traces of the 'malloc' garbage collector were removed.
-  + Renamed Parrot_pcc_constants() to Parrot_pcc_get_constants().
-  + Deprecated functions from the Embedding/Extension interface were removed.
-  + The library YAML/Parser/Syck.pir has been removed.
+  + Parrot_pcc_constants() was renamed to Parrot_pcc_get_constants().
+  + The deprecated functions from the Embedding/Extension interface were removed.
+  + The library YAML/Parser/Syck.pir was removed.
   + The VTABLE function instantiate_str() was removed.
 - Tests
-  + New tests using the new test functions lives_ok() and dies_ok().
-  + Added test script t/op/annotate-old.t.
-  + Many test scripst were converted from Perl5 to PIR.
-  + Eliminated dependency on Perl 5 in some tests.
+  + New tests using the new test functions lives_ok() and dies_ok() were written.
+  + The test script t/op/annotate-old.t was added.
+  + Many test scripts were converted from Perl5 to PIR.
+  + In some test the dependency on Perl 5' %Config was eliminated. 
 - Documentation
-  + Clarified what 'p' means in NCI function call signatures.
+  + The meaning of 'p' means in NCI function call signatures was clarified.
 - Tools
-  + Added library Configure.pir
-  + Added library distutils.pir
-  + The stubs for new language implementations, as created by mk_language_shell.pl,
-    now rely on PIR-based tools, replacing the Perl 5-based tools.
+  + The stub for a new language, as created by mk_language_shell.pl,
+    now relies on the PIR-based tools, which are replacing the Perl 5-based tools.
+  + The library Configure.pir was added.
+  + The library distutils.pir was added.
 - Miscellaneous
-  + various bugfixes, code cleanups, and coding standard fixes
-
+  + Many bugfixes, code cleanups, and coding standard fixes.
 
 New in 1.7.0
 - Functionality
