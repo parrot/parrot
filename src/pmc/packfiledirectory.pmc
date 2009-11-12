@@ -68,27 +68,6 @@ Marks the object as live.
 
 /*
 
-=item C<void destroy()>
-
-Destroys the PMC and frees all allocated memory.
-
-=cut
-
-*/
-
-    VTABLE void destroy() {
-        Parrot_PackfileDirectory_attributes * attrs =
-                PARROT_PACKFILEDIRECTORY(SELF);
-
-        if (attrs) {
-            mem_sys_free(attrs);
-            PMC_data(SELF) = NULL;
-        }
-    }
-
-
-/*
-
 =item C<void set_pointer(void *ptr)>
 
 Initialize PackfileDirectory from PackFile_Directory.
