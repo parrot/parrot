@@ -59,6 +59,7 @@ sub runstep {
         sig_name
         scriptdirexp
         use64bitint
+        sPRIgldbl
     | ) {
         $conf->data->set_p5( $orig => $Config{$orig} );
     }
@@ -248,8 +249,7 @@ sub runstep {
         tempdir => File::Spec->tmpdir,
     );
 
-    # add profiling if needed
-    # RT #41497 gcc syntax
+    # TT #855:  Profiling options are too specific to GCC
     if ( $conf->options->get('profile') ) {
         $conf->data->set(
             cc_debug => " -pg ",
@@ -260,8 +260,8 @@ sub runstep {
     $conf->data->set( clock_best => "" );
 
     $conf->data->set( 'archname', $Config{archname});
+
     # adjust archname, cc and libs for e.g. --m=32
-    # RT#41499 this is maybe gcc only
     # remember corrected archname - jit.pm was using $Config('archname')
     _64_bit_adjustments($conf);
 
