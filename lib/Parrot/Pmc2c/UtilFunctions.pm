@@ -5,6 +5,7 @@ package Parrot::Pmc2c::UtilFunctions;
 use strict;
 use warnings;
 
+use File::Spec ();
 use Fatal qw(open close);
 
 use base qw( Exporter );
@@ -283,7 +284,7 @@ sub filename {
             $filename =~ s{(\w+)\.\w+$}{pmc_$1.h};
         }
         else {
-            $filename =~ s{(?:.*/)?(\w+)\.\w+$}{include/pmc/pmc_$1.h};
+            $filename =~ s{(?:.*/)?(\w+)\.\w+$}{File::Spec->catfile('include', 'pmc', "pmc_$1.h")}e;
         }
     }
     $filename =~ s/\.\w+$/.c/            if ( $type eq ".c" );
