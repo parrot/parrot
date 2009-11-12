@@ -21,7 +21,7 @@ New in 1.8.0 (to be released on 2009-11-19)
 - Performance
   + Use the the fixed-sized allocator in the Context and the CallSignature PMC.
   + Speed penalty from the reworked parrot calling conventions.
-  + Many small speed improvments.
+  + Many small speed improvements.
 - New deprecations
   + The 'Parrot_call_*' functions for invoking a sub/method object from C are
     deprecated. They are replaced by 'Parrot_ext_call'. (eligible in 2.1)
@@ -41,6 +41,8 @@ New in 1.8.0 (to be released on 2009-11-19)
 - Documentation
   + Clarified what 'p' means in NCI function call signatures.
 - Tools
+  + Added library Configure.pir
+  + Added library distutils.pir
   + The stubs for new language implementations, as created by mk_language_shell.pl,
     now rely on PIR-based tools, replacing the Perl 5-based tools.
 - Miscellaneous
