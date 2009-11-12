@@ -502,7 +502,7 @@ PDB                 := $(CUR_DIR)/parrot_debugger$(EXE)
 PBC_TO_EXE          := $(CUR_DIR)/pbc_to_exe$(EXE)
 PARROT_CONFIG       := $(CUR_DIR)/parrot_config$(EXE)
 PIRC                := $(CUR_DIR)/pirc$(EXE)
-NQP                 := $(CUR_DIR)/parrot_nqp$(EXE)
+NQP                 := $(CUR_DIR)/parrot-nqp$(EXE)
 
 # Installable executables
 INSTALLABLEPARROT   := $(CUR_DIR)/installable_parrot$(EXE)
@@ -512,7 +512,7 @@ INSTALLABLEPBCMERGE := $(CUR_DIR)/installable_pbc_merge$(EXE)
 INSTALLABLEPBCTOEXE := $(CUR_DIR)/installable_pbc_to_exe$(EXE)
 INSTALLABLEPDB      := $(CUR_DIR)/installable_parrot_debugger$(EXE)
 INSTALLABLECONFIG   := $(CUR_DIR)/installable_parrot_config$(EXE)
-INSTALLABLENQP      := $(CUR_DIR)/installable_parrot_nqp$(EXE)
+INSTALLABLENQP      := $(CUR_DIR)/installable_parrot-nqp$(EXE)
 
 # Libraries
 LIBPARROT_STATIC    := @blib_dir@/@libparrot_static@
@@ -823,8 +823,8 @@ $(PIRC) : $(PARROT)
 	$(CHMOD) 0755 $(PIRC)
 
 $(NQP) : $(PBC_TO_EXE) compilers.dummy
-	$(CP) compilers/nqp/nqp.pbc parrot_nqp.pbc
-	$(PBC_TO_EXE) parrot_nqp.pbc
+	$(CP) runtime/parrot/library/nqp-rx.pbc parrot-nqp.pbc
+	$(PBC_TO_EXE) parrot-nqp.pbc
 
 $(MINIPARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     lib/Parrot/OpLib/core.pm $(SRC_DIR)/null_config$(O)
@@ -934,9 +934,9 @@ $(INSTALLABLECONFIG) : $(SRC_DIR)/install_config$(O) $(PARROT_CONFIG) $(PBC_TO_E
 $(INSTALLABLEPBCTOEXE) : $(PBC_TO_EXE) $(SRC_DIR)/install_config$(O)
 	$(PBC_TO_EXE) pbc_to_exe.pbc --install
 
-$(INSTALLABLENQP) : compilers/nqp/nqp.pbc $(SRC_DIR)/install_config$(O) $(PBC_TO_EXE)
-	$(CP) compilers/nqp/nqp.pbc parrot_nqp.pbc
-	$(PBC_TO_EXE) parrot_nqp.pbc --install
+$(INSTALLABLENQP) : runtime/parrot/library/nqp-rx.pbc $(SRC_DIR)/install_config$(O) $(PBC_TO_EXE)
+	$(CP) runtime/parrot/library/nqp-rx.pbc parrot-nqp.pbc
+	$(PBC_TO_EXE) parrot-nqp.pbc --install
 
 #
 # Parrot Debugger
