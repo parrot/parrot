@@ -22,7 +22,6 @@ required C files first.
 
 =cut
 
-# TODO Unskip pmc generated files.
 my $files = `ack -fa . | grep '\\.c\$'`;
 
 my %deps;
