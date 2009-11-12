@@ -2,7 +2,8 @@
 
 New in 1.8.0 (to be released on 2009-11-19)
 - Functionality
-  + Revamping of the parrot calling conventions.
+  + Reworked the internals of the parrot calling conventions, PCC,
+    so that all call paths use a CallSignature object for passing arguments and return values.
   + The new API-function  'Parrot_ext_call' was added for calling into C-land.
   + Improvements to the fixed-size allocator were made.
   + The files installed by 'make install-dev' are now covered by 'make install' as well.
