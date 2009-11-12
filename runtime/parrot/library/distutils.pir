@@ -477,7 +477,7 @@ the value is the NQP pathname
     if $I0 goto L1
     .local string cmd
     cmd = get_bindir()
-    cmd .= "/nqp"
+    cmd .= "/parrot-nqp"
     $S0 = get_exe()
     cmd .= $S0
     cmd .= " --target=pir --output="
