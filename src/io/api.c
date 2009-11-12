@@ -30,8 +30,8 @@ src/io/io_string.c.
 #include "parrot/parrot.h"
 #include "io_private.h"
 #include "api.str"
-#include "../pmc/pmc_filehandle.h"
-#include "../pmc/pmc_stringhandle.h"
+#include "pmc/pmc_filehandle.h"
+#include "pmc/pmc_stringhandle.h"
 
 #include <stdarg.h>
 

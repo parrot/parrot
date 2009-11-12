@@ -17,8 +17,8 @@ $Id$
 
 #include "profiling.str"
 
-#include "../pmc/pmc_sub.h"
-#include "../pmc/pmc_context.h"
+#include "pmc/pmc_sub.h"
+#include "pmc/pmc_context.h"
 
 #ifdef WIN32
 #  define getpid _getpid

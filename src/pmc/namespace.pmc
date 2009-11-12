@@ -18,7 +18,7 @@ These are the vtable functions for the namespace PMC.
 
 */
 
-#include "pmc_sub.h"
+#include "pmc/pmc_sub.h"
 
 static void add_to_class(
         Interp *interp,

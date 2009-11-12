@@ -19,7 +19,7 @@ Sub PMCs with the same short name, but different long names.
 
 */
 
-#include "pmc_context.h"
+#include "pmc/pmc_context.h"
 
 pmclass MultiSub extends ResizablePMCArray auto_attrs provides array {
 

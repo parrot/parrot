@@ -68,7 +68,7 @@ E_NOTE
     foreach my $encoding ( split( /\s+/, $encoding_list ) ) {
         $encoding =~ s/\.c$//;
         $TEMP_encoding_build .= <<END
-src/string/encoding/$encoding\$(O): src/string/encoding/$encoding.h src/string/encoding/$encoding.c \$(NONGEN_HEADERS)
+src/string/encoding/$encoding\$(O): src/string/encoding/$encoding.h src/string/encoding/$encoding.c src/string/unicode.h \$(NONGEN_HEADERS)
 
 
 END

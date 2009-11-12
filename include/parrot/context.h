@@ -24,13 +24,7 @@ typedef union {
     INTVAL       *regs_i;
 } Regs_ni;
 
-/* Ugly cheat to include Context definition for installed parrot. Directory
- * structure is sooo different and there is no way to include pmc_context.h in
- * sane way.
- */
-#ifndef PARROT_IN_CORE
-#  include "pmc/pmc_context.h"
-#endif
+#include <pmc/pmc_context.h>
 typedef struct Parrot_Context_attributes Parrot_Context;
 
 /*

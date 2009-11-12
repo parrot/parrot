@@ -19,7 +19,7 @@ These are the vtable functions for the lexinfo PMC.
 */
 
 /* included manually to prevent breaking C++ builds -- see RT #56534*/
-#include "pmc_hash.h"
+#include "pmc/pmc_hash.h"
 
 /*
  * LexInfo contains a constant Hash with constant string

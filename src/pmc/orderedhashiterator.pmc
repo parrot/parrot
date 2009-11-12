@@ -18,8 +18,8 @@ src/pmc/orderedhashiterator.pmc - Implementation of Iterator for OrderedHash.
 
 */
 
-#include "pmc_hash.h"
-#include "pmc_hashiteratorkey.h"
+#include "pmc/pmc_hash.h"
+#include "pmc/pmc_hashiteratorkey.h"
 
 pmclass OrderedHashIterator extends Iterator no_ro auto_attrs {
     ATTR PMC        *pmc_hash;      /* the Hash which this Iterator iterates */

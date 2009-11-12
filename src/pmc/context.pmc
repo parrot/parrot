@@ -21,7 +21,7 @@ structure in PMC_data.
 
 
 #include "parrot/packfile.h"
-#include "pmc_sub.h"
+#include "pmc/pmc_sub.h"
 
 pmclass Context auto_attrs {
     ATTR PMC     *caller_ctx;      /* caller context */

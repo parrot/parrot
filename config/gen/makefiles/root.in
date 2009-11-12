@@ -62,6 +62,9 @@ PIRC_DIR        := compilers/pirc/src
 # directory for header files
 INC_DIR         := @inc@
 
+# directory for PMC generated header files
+PMC_INC_DIR     := @pmc_inc@
+
 # directory for the IO subsystem
 IO_DIR          := src/io
 
@@ -840,6 +843,9 @@ $(INC_DIR)/parrot.h : $(INC_DIR)/pbcversion.h $(INC_DIR)/vtable.h
 
 $(INC_DIR)/extend.h : $(INC_DIR)/extend_vtable.h
 
+$(INC_DIR)/parrot.h  : $(INC_DIR)/context.h
+$(INC_DIR)/context.h : $(PMC_INC_DIR)/pmc/pmc_context.h
+
 $(INC_DIR)/pbcversion.h :
 	$(PERL) $(BUILD_TOOLS_DIR)/pbcversion_h.pl > $(INC_DIR)/pbcversion.h
 
@@ -867,14 +873,17 @@ $(SRC_DIR)/install_config$(O) : $(SRC_DIR)/install_config.c
 
 $(SRC_DIR)/null_config$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/null_config.c
 
-$(SRC_DIR)/oo$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/pmc/pmc_class.h $(SRC_DIR)/pmc/pmc_object.h $(SRC_DIR)/pmc/pmc_context.h $(INC_DIR)/pbcversion.h $(SRC_DIR)/oo.str
+$(SRC_DIR)/oo$(O) : $(INC_DIR)/parrot.h $(PMC_INC_DIR)/pmc/pmc_class.h $(PMC_INC_DIR)/pmc/pmc_object.h $(PMC_INC_DIR)/pmc/pmc_context.h $(INC_DIR)/pbcversion.h $(SRC_DIR)/oo.str
 
 $(SRC_DIR)/scheduler$(O) : $(INC_DIR)/parrot.h \
-                           $(SRC_DIR)/scheduler.str \
-                           $(SRC_DIR)/pmc/pmc_scheduler.h \
-                           $(SRC_DIR)/pmc/pmc_context.h \
-                           $(SRC_DIR)/pmc/pmc_task.h \
-                           $(SRC_DIR)/pmc/pmc_timer.h \
+                           $(SRC_DIR)/scheduler.str   \
+                           $(SRC_DIR)/pmc/scheduler.c \
+                           $(PMC_INC_DIR)/pmc/pmc_context.h \
+                           $(PMC_INC_DIR)/pmc/pmc_scheduler.h \
+                           $(PMC_INC_DIR)/pmc/pmc_task.h \
+                           $(PMC_INC_DIR)/pmc/pmc_timer.h \
+                           $(SRC_DIR)/pmc/task.c      \
+                           $(SRC_DIR)/pmc/timer.c     \
                            $(INC_DIR)/pbcversion.h
 
 $(IO_DIR)/core$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/pmc/socket.c
@@ -971,7 +980,7 @@ $(INSTALLABLEDIS) : $(SRC_DIR)/pbc_disassemble$(O) \
 #
 # Parrot Dump
 #
-$(SRC_DIR)/packdump$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/pmc/pmc_sub.h $(SRC_DIR)/pmc/pmc_key.h
+$(SRC_DIR)/packdump$(O) : $(INC_DIR)/parrot.h $(PMC_INC_DIR)/pmc/pmc_sub.h $(PMC_INC_DIR)/pmc/pmc_key.h
 
 $(PDUMP) : $(SRC_DIR)/pbc_dump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
@@ -1063,18 +1072,18 @@ $(SRC_DIR)/datatypes$(O) : $(INC_DIR)/parrot.h
 
 $(SRC_DIR)/extend_vtable$(O) : $(INC_DIR)/parrot.h
 
-$(SRC_DIR)/global_setup$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/global_setup.str $(SRC_DIR)/pmc/pmc_context.h
+$(SRC_DIR)/global_setup$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/global_setup.str $(PMC_INC_DIR)/pmc/pmc_context.h
 
 $(SRC_DIR)/global$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/global.str \
-	$(SRC_DIR)/pmc/pmc_sub.h $(SRC_DIR)/pmc/pmc_context.h
+	$(PMC_INC_DIR)/pmc/pmc_sub.h $(PMC_INC_DIR)/pmc/pmc_context.h
 
-$(SRC_DIR)/pmc$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_class.h \
-	$(SRC_DIR)/pmc.str $(SRC_DIR)/pmc/pmc_context.h
+$(SRC_DIR)/pmc$(O) : $(GENERAL_H_FILES) $(PMC_INC_DIR)/pmc/pmc_class.h \
+	$(SRC_DIR)/pmc.str $(PMC_INC_DIR)/pmc/pmc_context.h
 
 $(SRC_DIR)/pmc_freeze$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc_freeze.str \
-	$(SRC_DIR)/pmc/pmc_context.h
+	$(PMC_INC_DIR)/pmc/pmc_context.h
 
-$(SRC_DIR)/hash$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_key.h
+$(SRC_DIR)/hash$(O) : $(GENERAL_H_FILES) $(PMC_INC_DIR)/pmc/pmc_key.h
 
 $(SRC_DIR)/list$(O) : $(GENERAL_H_FILES)
 
@@ -1084,7 +1093,7 @@ $(INC_DIR)/extend_vtable.h $(SRC_DIR)/extend_vtable.c $(SRC_DIR)/vtable.h : src/
 	$(PERL) $(BUILD_TOOLS_DIR)/vtable_extend.pl
 
 $(SRC_DIR)/key$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/key.str \
-        $(SRC_DIR)/pmc/pmc_key.h $(SRC_DIR)/pmc/pmc_context.h
+        $(PMC_INC_DIR)/pmc/pmc_key.h $(PMC_INC_DIR)/pmc/pmc_context.h
 
 $(SRC_DIR)/gc/mark_sweep$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/gc/gc_private.h
 
@@ -1099,7 +1108,7 @@ $(SRC_DIR)/gc/api$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/gc/gc_private.h
 $(SRC_DIR)/gc/alloc_resources$(O) : $(GENERAL_H_FILES) \
         $(SRC_DIR)/gc/gc_private.h
 
-$(SRC_DIR)/hll$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/hll.str $(SRC_DIR)/pmc/pmc_context.h
+$(SRC_DIR)/hll$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/hll.str $(PMC_INC_DIR)/pmc/pmc_context.h
 
 $(SRC_DIR)/platform$(O) : $(GENERAL_H_FILES)
 
@@ -1107,17 +1116,17 @@ $(SRC_DIR)/platform$(O) : $(GENERAL_H_FILES)
 #IF(platform_asm):
 $(SRC_DIR)/core_pmcs$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/runcore/trace$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h \
-        $(SRC_DIR)/pmc/pmc_context.h
+$(SRC_DIR)/runcore/trace$(O) : $(GENERAL_H_FILES) $(PMC_INC_DIR)/pmc/pmc_sub.h \
+        $(PMC_INC_DIR)/pmc/pmc_context.h
 
 $(SRC_DIR)/debug$(O) : $(GENERAL_H_FILES) $(INC_DIR)/debugger.h \
-    $(SRC_DIR)/debug.str $(SRC_DIR)/pmc/pmc_key.h \
-    $(SRC_DIR)/pmc/pmc_continuation.h \
-    $(SRC_DIR)/pmc/pmc_context.h
+    $(SRC_DIR)/debug.str $(PMC_INC_DIR)/pmc/pmc_key.h \
+    $(PMC_INC_DIR)/pmc/pmc_continuation.h \
+    $(PMC_INC_DIR)/pmc/pmc_context.h
 
 $(SRC_DIR)/sub$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/sub.str \
-	$(SRC_DIR)/pmc/pmc_sub.h $(SRC_DIR)/pmc/pmc_continuation.h \
-	$(SRC_DIR)/pmc/pmc_context.h
+	$(PMC_INC_DIR)/pmc/pmc_sub.h $(PMC_INC_DIR)/pmc/pmc_continuation.h \
+	$(PMC_INC_DIR)/pmc/pmc_context.h
 
 $(SRC_DIR)/string/api$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/string/api.str \
         $(SRC_DIR)/string/private_cstring.h
@@ -1127,60 +1136,62 @@ $(SRC_DIR)/string/primitives$(O) : $(GENERAL_H_FILES)
 $(SRC_DIR)/longopt$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/dynext$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/dynext.str \
-	$(SRC_DIR)/pmc/pmc_parrotlibrary.h $(SRC_DIR)/pmc/pmc_context.h
+	$(PMC_INC_DIR)/pmc/pmc_parrotlibrary.h $(PMC_INC_DIR)/pmc/pmc_context.h
 
 $(SRC_DIR)/exceptions$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/exceptions.str \
-	$(SRC_DIR)/pmc/pmc_continuation.h \
-	$(SRC_DIR)/pmc/pmc_context.h
+	$(PMC_INC_DIR)/pmc/pmc_continuation.h \
+	$(PMC_INC_DIR)/pmc/pmc_context.h
 
 $(SRC_DIR)/events$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/events.str
 
-$(SRC_DIR)/thread$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h \
-	$(SRC_DIR)/pmc/pmc_parrotinterpreter.h
+$(SRC_DIR)/thread$(O) : $(GENERAL_H_FILES) $(PMC_INC_DIR)/pmc/pmc_sub.h \
+	$(PMC_INC_DIR)/pmc/pmc_parrotinterpreter.h
 
 $(SRC_DIR)/extend$(O) : $(GENERAL_H_FILES) $(INC_DIR)/extend.h \
-	$(SRC_DIR)/pmc/pmc_sub.h $(SRC_DIR)/pmc/pmc_context.h
+	$(PMC_INC_DIR)/pmc/pmc_sub.h $(PMC_INC_DIR)/pmc/pmc_context.h
 
 $(SRC_DIR)/runcore/main$(O) : $(SRC_DIR)/runcore/main.c \
 	$(SRC_DIR)/runcore/main.str $(GENERAL_H_FILES) \
-	$(SRC_DIR)/pmc/pmc_parrotlibrary.h \
-	$(SRC_DIR)/pmc/pmc_context.h
+	$(PMC_INC_DIR)/pmc/pmc_parrotlibrary.h \
+	$(PMC_INC_DIR)/pmc/pmc_context.h
 
 $(SRC_DIR)/runcore/profiling$(O) : $(SRC_DIR)/runcore/profiling.str $(GENERAL_H_FILES) \
-	$(SRC_DIR)/pmc/pmc_sub.h \
-	$(SRC_DIR)/pmc/pmc_context.h
+	$(PMC_INC_DIR)/pmc/pmc_sub.h \
+	$(PMC_INC_DIR)/pmc/pmc_context.h
 
 $(SRC_DIR)/call/args$(O) : $(SRC_DIR)/call/args.c $(GENERAL_H_FILES) \
 	$(SRC_DIR)/call/args.str \
-	$(SRC_DIR)/pmc/pmc_key.h $(SRC_DIR)/pmc/pmc_callsignature.h \
-	$(SRC_DIR)/pmc/pmc_fixedintegerarray.h $(SRC_DIR)/pmc/pmc_context.h
+	$(PMC_INC_DIR)/pmc/pmc_key.h $(PMC_INC_DIR)/pmc/pmc_callsignature.h \
+	$(PMC_INC_DIR)/pmc/pmc_fixedintegerarray.h $(PMC_INC_DIR)/pmc/pmc_context.h
 
 $(SRC_DIR)/call/context_accessors$(O): $(GENERAL_H_FILES) \
-	$(SRC_DIR)/pmc/pmc_context.h
+	$(PMC_INC_DIR)/pmc/pmc_context.h
 
 $(SRC_DIR)/call/pcc$(O) : $(SRC_DIR)/call/pcc.c $(GENERAL_H_FILES) \
-	$(SRC_DIR)/call/pcc.str $(SRC_DIR)/pmc/pmc_fixedintegerarray.h \
-	$(SRC_DIR)/pmc/pmc_key.h $(SRC_DIR)/pmc/pmc_continuation.h \
-	$(SRC_DIR)/pmc/pmc_context.h
+	$(SRC_DIR)/call/pcc.str $(PMC_INC_DIR)/pmc/pmc_fixedintegerarray.h \
+	$(PMC_INC_DIR)/pmc/pmc_key.h $(PMC_INC_DIR)/pmc/pmc_continuation.h \
+	$(PMC_INC_DIR)/pmc/pmc_context.h
 
 $(SRC_DIR)/call/context$(O) : $(SRC_DIR)/call/context.c $(GENERAL_H_FILES) \
-	$(SRC_DIR)/pmc/pmc_sub.h $(SRC_DIR)/pmc/pmc_context.h
+	$(PMC_INC_DIR)/pmc/pmc_sub.h $(PMC_INC_DIR)/pmc/pmc_context.h
 
 $(SRC_DIR)/interp/inter_cb$(O) : $(SRC_DIR)/interp/inter_cb.c \
 	$(GENERAL_H_FILES) $(SRC_DIR)/interp/inter_cb.str
 
 $(SRC_DIR)/interp/inter_misc$(O) : $(SRC_DIR)/interp/inter_misc.c \
 	$(GENERAL_H_FILES) $(SRC_DIR)/interp/inter_misc.str \
-        $(SRC_DIR)/pmc/pmc_context.h
+	$(PMC_INC_DIR)/pmc/pmc_context.h \
+	compilers/imcc/imc.h
 
 $(SRC_DIR)/interp/inter_create$(O) : $(SRC_DIR)/interp/inter_create.c \
 	$(GENERAL_H_FILES) $(SRC_DIR)/interp/inter_create.str \
-        $(SRC_DIR)/pmc/pmc_context.h
+	$(PMC_INC_DIR)/pmc/pmc_context.h \
+	compilers/imcc/imc.h
 
 $(SRC_DIR)/call/ops$(O) : $(SRC_DIR)/call/ops.c $(GENERAL_H_FILES) \
-	$(SRC_DIR)/pmc/pmc_continuation.h
+	$(PMC_INC_DIR)/pmc/pmc_continuation.h
 
-$(IO_DIR)/api$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h $(IO_DIR)/api.str $(SRC_DIR)/pmc/pmc_filehandle.h
+$(IO_DIR)/api$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h $(IO_DIR)/api.str $(PMC_INC_DIR)/pmc/pmc_filehandle.h
 
 $(IO_DIR)/buffer$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
 
@@ -1197,26 +1208,26 @@ $(SRC_DIR)/gc/alloc_memory$(O) : $(GENERAL_H_FILES)
 $(SRC_DIR)/main$(O) : $(SRC_DIR)/main.c $(GENERAL_H_FILES)
 
 $(SRC_DIR)/multidispatch$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/multidispatch.str \
-	$(SRC_DIR)/pmc/pmc_nci.h $(SRC_DIR)/pmc/pmc_sub.h \
-	$(SRC_DIR)/pmc/pmc_context.h
+	$(PMC_INC_DIR)/pmc/pmc_nci.h $(PMC_INC_DIR)/pmc/pmc_sub.h \
+	$(PMC_INC_DIR)/pmc/pmc_context.h
 
 $(SRC_DIR)/packfile$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/packfile.str \
-	$(SRC_DIR)/pmc/pmc_sub.h $(SRC_DIR)/pmc/pmc_key.h \
-        $(SRC_DIR)/pmc/pmc_context.h compilers/imcc/imc.h
+	$(PMC_INC_DIR)/pmc/pmc_sub.h $(PMC_INC_DIR)/pmc/pmc_key.h \
+        $(PMC_INC_DIR)/pmc/pmc_context.h compilers/imcc/imc.h
 
 $(PF_DIR)/pf_items$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/packout$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_key.h
+$(SRC_DIR)/packout$(O) : $(GENERAL_H_FILES) $(PMC_INC_DIR)/pmc/pmc_key.h
 
 $(SRC_DIR)/parrot$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/runcore/cores$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/runcore/cores.str \
-	$(SRC_DIR)/pmc/pmc_sub.h $(SRC_DIR)/pmc/pmc_context.h
+	$(PMC_INC_DIR)/pmc/pmc_sub.h $(PMC_INC_DIR)/pmc/pmc_context.h
 
 $(SRC_DIR)/tsq$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/embed$(O) : $(GENERAL_H_FILES) $(INC_DIR)/debugger.h \
-	$(SRC_DIR)/pmc/pmc_sub.h $(SRC_DIR)/pmc/pmc_context.h \
+	$(PMC_INC_DIR)/pmc/pmc_sub.h $(PMC_INC_DIR)/pmc/pmc_context.h \
         compilers/imcc/imc.h
 
 $(SRC_DIR)/dataypes$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/dataypes.c
@@ -1225,32 +1236,32 @@ $(SRC_DIR)/exit$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/exit.c
 
 $(SRC_DIR)/nci$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/nci.c $(SRC_DIR)/nci.str \
         $(SRC_DIR)/frame_builder.h \
-        $(SRC_DIR)/pmc/pmc_context.h \
-        $(SRC_DIR)/pmc/pmc_unmanagedstruct.h \
-        $(SRC_DIR)/pmc/pmc_managedstruct.h \
-        $(SRC_DIR)/pmc/pmc_nci.h \
-        $(SRC_DIR)/pmc/pmc_pointer.h
+        $(PMC_INC_DIR)/pmc/pmc_context.h \
+        $(PMC_INC_DIR)/pmc/pmc_unmanagedstruct.h \
+        $(PMC_INC_DIR)/pmc/pmc_managedstruct.h \
+        $(PMC_INC_DIR)/pmc/pmc_nci.h \
+        $(PMC_INC_DIR)/pmc/pmc_pointer.h
 
 $(SRC_DIR)/frame_builder$(O) : $(SRC_DIR)/frame_builder.h $(GENERAL_H_FILES) \
         $(SRC_DIR)/frame_builder.c \
         $(SRC_DIR)/frame_builder.str \
-        $(SRC_DIR)/pmc/pmc_fixedintegerarray.h \
-        $(SRC_DIR)/pmc/pmc_unmanagedstruct.h \
-        $(SRC_DIR)/pmc/pmc_managedstruct.h
+        $(PMC_INC_DIR)/pmc/pmc_fixedintegerarray.h \
+        $(PMC_INC_DIR)/pmc/pmc_unmanagedstruct.h \
+        $(PMC_INC_DIR)/pmc/pmc_managedstruct.h
 
 $(SRC_DIR)/vtables$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/vtables.c
 
 $(SRC_DIR)/gc/system$(O) : $(GENERAL_H_FILES)  $(SRC_DIR)/gc/gc_private.h
 
 $(SRC_DIR)/nci.c : $(SRC_DIR)/call_list.txt $(BUILD_TOOLS_DIR)/nativecall.pl \
-	$(SRC_DIR)/pmc/pmc_nci.h
+	$(PMC_INC_DIR)/pmc/pmc_nci.h
 	$(PERL) $(BUILD_TOOLS_DIR)/nativecall.pl $(SRC_DIR)/call_list.txt
 
-$(SRC_DIR)/warnings$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_context.h
+$(SRC_DIR)/warnings$(O) : $(GENERAL_H_FILES) $(PMC_INC_DIR)/pmc/pmc_context.h
 
 $(SRC_DIR)/misc$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/utils$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_nci.h
+$(SRC_DIR)/utils$(O) : $(GENERAL_H_FILES) $(PMC_INC_DIR)/pmc/pmc_nci.h
 
 $(SRC_DIR)/spf_render$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/spf_render.str
 
@@ -1270,12 +1281,12 @@ $(SRC_DIR)/string/charset$(O) : $(SRC_DIR)/string/charset.c $(GENERAL_H_FILES) \
         $(SRC_DIR)/string/charset/unicode.h
 
 $(SRC_DIR)/pbc_merge$(O) : $(SRC_DIR)/pbc_merge.c $(GENERAL_H_FILES) \
-	$(SRC_DIR)/pmc/pmc_sub.h
+	$(PMC_INC_DIR)/pmc/pmc_sub.h
 
-$(IO_DIR)/filehandle$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/pmc/pmc_filehandle.h $(SRC_DIR)/io/io_private.h
+$(IO_DIR)/filehandle$(O) : $(INC_DIR)/parrot.h $(PMC_INC_DIR)/pmc/pmc_filehandle.h $(SRC_DIR)/io/io_private.h
 
 $(OPS_DIR)/core_ops$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops.c \
-	$(SRC_DIR)/pmc/pmc_continuation.h $(SRC_DIR)/pmc/pmc_parrotlibrary.h
+	$(PMC_INC_DIR)/pmc/pmc_continuation.h $(PMC_INC_DIR)/pmc/pmc_parrotlibrary.h
 
 # core_ops depends upon config.h so that it gets updated along with
 # updates to config.h's version numbers
@@ -1286,11 +1297,11 @@ $(INC_DIR)/oplib/core_ops.h: $(OPS_DIR)/core_ops.c
 $(OPS_DIR)/core_ops.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl \
 	lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC_DIR)/config.h \
 	lib/Parrot/OpLib/core.pm lib/Parrot/OpTrans/C.pm \
-	$(SRC_DIR)/pmc/pmc_continuation.h
+	$(PMC_INC_DIR)/pmc/pmc_continuation.h
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --core @no_lines_flag@
 
 $(OPS_DIR)/core_ops_switch$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops_switch.c \
-	$(SRC_DIR)/pmc/pmc_parrotlibrary.h
+	$(PMC_INC_DIR)/pmc/pmc_parrotlibrary.h
 
 $(INC_DIR)/oplib/core_ops_switch.h : $(OPS_DIR)/core_ops_switch.c
 
@@ -1704,7 +1715,7 @@ prog-clean :
 	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl --init
 	$(RM_F) \
     $(STR_FILES) \
-    $(SRC_DIR)/string/private_cstring.h "src/pmc/*.c" "src/pmc/pmc_*.h" \
+    $(SRC_DIR)/string/private_cstring.h "src/pmc/*.c" "include/pmc/pmc_*.h" \
     "src/pmc/*.dump" vtable.dump "*.def" "*.lib" "*.exp"
 
 archclean: dynoplibs-clean dynpmc-clean dynext-clean
@@ -1902,7 +1913,7 @@ SUNLINTOPTS := \
 
 sunlint :
 	rm -f *.ln
-	$(SUNLINT) $(CC_INC) "-Isrc/pmc" $(SUNLINTOPTS) $(LINTABLE_CFILES)
+	$(SUNLINT) $(CC_INC) "-Iinclude/pmc" $(SUNLINTOPTS) $(LINTABLE_CFILES)
 
 BSD_LINT_FLAGS := -a -aa -b -c -e -h -n -p -r -u -x -z -F -H -V
 
@@ -1921,7 +1932,7 @@ BSD_LINT_EXCLUSIONS := -X132,135,236,241,247,249,259,265,277,278
 
 bsdlint : $(PARROT)
 	rm -f *.ln
-	$(LINT) $(CC_INC) "-Isrc/pmc" $(BSD_LINT_FLAGS) $(BSD_LINT_EXCLUSIONS) $(LINTABLE_CFILES)
+	$(LINT) $(CC_INC) "-Iinclude/pmc" $(BSD_LINT_FLAGS) $(BSD_LINT_EXCLUSIONS) $(LINTABLE_CFILES)
 
 # For checking with splint see also http:////www.perlfoundation.org//parrot//index.cgi?splint
 # Splint: http:////splint.org
@@ -2062,7 +2073,7 @@ SPLINT_SOURCE := `echo $(O_FILES) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@`
 
 splint-all : $(PARROT)
 	$(MKPATH) $(SPLINT_TMP)
-	$(SPLINT) $(CC_INC) "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
+	$(SPLINT) $(CC_INC) "-Iinclude/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
 	$(SPLINT_SOURCE) \
 	$(SPLINT) $(CC_INC) $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) $(IMCC_DIR)/main.c
 
@@ -2073,7 +2084,7 @@ splint-all : $(PARROT)
 
 splint : all
 	$(MKPATH) $(SPLINT_TMP)
-	$(SPLINT) $(CC_INC) "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
+	$(SPLINT) $(CC_INC) "-Iinclude/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
 	+partial -DNDEBUG \
 	$(SPLINT_SOURCE) \
 		| grep -v 'Source code error generation point'

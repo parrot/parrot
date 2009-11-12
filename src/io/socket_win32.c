@@ -28,7 +28,7 @@ Win32 System Programming, 2nd Edition.
 
 #include "parrot/parrot.h"
 #include "io_private.h"
-#include "../pmc/pmc_socket.h"
+#include "pmc/pmc_socket.h"
 
 #ifdef PIO_OS_WIN32
 

@@ -29,8 +29,8 @@ These are the vtable functions for the ParrotInterpreter base class
 #include "parrot/dynext.h"
 #include "parrot/io.h"
 #include "parrot/runcore_api.h"
-#include "pmc_class.h"
-#include "pmc_sub.h"
+#include "pmc/pmc_class.h"
+#include "pmc/pmc_sub.h"
 
 #define PMC_interp(x) ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->interp
 #define PMC_args(x)   ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->args

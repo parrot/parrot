@@ -550,8 +550,8 @@ sub _print_preamble_source {
     print $fh $self->{preamble};
     print $fh <<END_C;
 #include "$self->{include}"
-#include "../pmc/pmc_parrotlibrary.h"
-#include "../pmc/pmc_context.h"
+#include "pmc/pmc_parrotlibrary.h"
+#include "pmc/pmc_context.h"
 
 $self->{defines}
 

@@ -136,7 +136,7 @@ sub runstep {
 
         libs => $Config{libs},
 
-        cc_inc     => "-I./include",
+        cc_inc     => "-I./include -I./include/pmc",
         cc_debug   => '-g',
         link_debug => '',
 

@@ -21,7 +21,7 @@ These are the primary interface functions for working with socket objects.
 #include "parrot/parrot.h"
 #include "io_private.h"
 #include "api.str"
-#include "../pmc/pmc_socket.h"
+#include "pmc/pmc_socket.h"
 
 #include <stdarg.h>
 

@@ -225,9 +225,9 @@ sub attributes {
 }
 
 sub filename {
-    my ( $self, $type ) = @_;
+    my ( $self, $type, $is_dynamic ) = @_;
     return $self->{filename} unless $type;
-    return Parrot::Pmc2c::UtilFunctions::filename( $self->{filename}, $type );
+    return Parrot::Pmc2c::UtilFunctions::filename( $self->{filename}, $type, $is_dynamic );
 }
 
 sub get_flags {

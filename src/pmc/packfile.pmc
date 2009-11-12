@@ -19,7 +19,7 @@ the top level parser and serializer for *.pbc files.
 
 */
 
-#include "pmc_packfiledirectory.h"
+#include "pmc/pmc_packfiledirectory.h"
 
 /*
 Copy attributes from PackFile* to Packfile PMC.

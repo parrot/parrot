@@ -19,7 +19,7 @@ Implements an instance of a class.
 */
 
 #include "parrot/oo_private.h"
-#include "pmc_class.h"
+#include "pmc/pmc_class.h"
 
 /* This finds the index of an attribute in an object's attribute store and
  * returns it. Returns -1 if the attribute does not exist. */

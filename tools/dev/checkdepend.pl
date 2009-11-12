@@ -22,6 +22,7 @@ required C files first.
 
 =cut
 
+# TODO Unskip pmc generated files.
 my $files = `ack -fa . | grep '\\.c\$'`;
 
 my %deps;
@@ -48,6 +49,7 @@ my $rules;
 }
 $rules =~ s/\\\n/ /g;
 $rules =~ s/\Q$(SRC_DIR)\E/src/g;
+$rules =~ s/\Q$(PMC_INC_DIR)\E/include/g;
 $rules =~ s/\Q$(O)\E//g;
 
 foreach my $file (keys %deps) {
@@ -61,23 +63,28 @@ foreach my $file (keys %deps) {
     {
         $declared =~ s/\s+/ /g;
         foreach my $inc (@{$deps{$file}}) {
+            # Skip #include "parrot/foo.h". It's in GENERAL_H_FILES rule.
+            next if $inc =~ m{^parrot/}o;
+
             # incs can be relative, but makefile is from top level
             my $file_dir = (File::Spec->splitpath($file))[1];
             my $make_dep = collapse_path(File::Spec->catfile($file_dir,$inc));
 
-            if (! defined $make_dep) {
-                # this means we didn't construct the right relative path.
-                # probably looking in include/ instead of  .
-                diag "skipping $inc...\n";
-                next;
-            }
+            # If it's include from src
+            next if defined($make_dep) && ($declared =~ /\b\Q$make_dep\E\b/);
 
-            if ($declared !~ /\b\Q$make_dep\E\b/) {
-              # this isn't the actual comparison, just to give nice output
-              # on failure.
-              is($declared,$inc,$file);
-              $failed = 1;
-            }
+            # Try to costruct "global" include
+            $make_dep = collapse_path(File::Spec->catfile('include', $inc));
+            next if defined($make_dep) && ($declared =~ /\b\Q$make_dep\E\b/);
+
+            # Try to costruct "pmc" include
+            $make_dep = collapse_path(File::Spec->catfile('include', 'pmc', $inc));
+            next if defined($make_dep) && ($declared =~ /\b\Q$make_dep\E\b/);
+
+            # this isn't the actual comparison, just to give nice output
+            # on failure.
+            is($inc, $declared, $file);
+            $failed = 1;
         }
     }
     pass("$file has proper deps") unless $failed;

@@ -19,7 +19,7 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 44;
+use Test::More tests => 52;
 use Carp;
 use File::Basename;
 use File::Copy;
@@ -44,7 +44,7 @@ my ( $tie, $msg, @lines );
     ok( chdir $tdir, 'changed to temp directory for testing' );
 
     my $temppmcdir = qq{$tdir/src/pmc};
-    for ( qq{$tdir/src}, $temppmcdir ) {
+    for ( qq{$tdir/src}, qq{$tdir/include}, qq{$tdir/include/pmc}, $temppmcdir ) {
         ok( mkdir($_), "created $_ under tempdir" );
     }
 
@@ -87,6 +87,8 @@ my ( $tie, $msg, @lines );
     ok( chdir $tdir, 'changed to temp directory for testing' );
     my $pmcdir = q{src/pmc};
     ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
+    ok( ( mkdir qq{$tdir/include} ), "created include/ under tempdir" );
+    ok( ( mkdir qq{$tdir/include/pmc} ), "created include/pmc/ under tempdir" );
     my $temppmcdir = qq{$tdir/src/pmc};
     ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
 
@@ -139,6 +141,8 @@ my ( $tie, $msg, @lines );
     ok( chdir $tdir, 'changed to temp directory for testing' );
     my $pmcdir = q{src/pmc};
     ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
+    ok( ( mkdir qq{$tdir/include} ), "created include/ under tempdir" );
+    ok( ( mkdir qq{$tdir/include/pmc} ), "created include/pmc/ under tempdir" );
     my $temppmcdir = qq{$tdir/src/pmc};
     ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
 
@@ -190,6 +194,8 @@ my ( $tie, $msg, @lines );
     ok( chdir $tdir, 'changed to temp directory for testing' );
     my $pmcdir = q{src/pmc};
     ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
+    ok( ( mkdir qq{$tdir/include} ), "created include/ under tempdir" );
+    ok( ( mkdir qq{$tdir/include/pmc} ), "created include/pmc/ under tempdir" );
     my $temppmcdir = qq{$tdir/src/pmc};
     ok( ( mkdir $temppmcdir ), "created src/pmc/ under tempdir" );
 

@@ -19,7 +19,7 @@ evaluation and execution.
 
 */
 
-#include "pmc_sub.h"
+#include "pmc/pmc_sub.h"
 
 static void
 clear_fixups(PARROT_INTERP, Parrot_Sub_attributes *sub_data)

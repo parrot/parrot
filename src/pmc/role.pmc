@@ -48,7 +48,7 @@ An empty Hash PMC is allocated during initialization.
 
 */
 
-#include "pmc_namespace.h"
+#include "pmc/pmc_namespace.h"
 
 /* Takes a hash and initializes the role based on it. */
 static void init_role_from_hash(PARROT_INTERP, PMC *self, PMC *info)

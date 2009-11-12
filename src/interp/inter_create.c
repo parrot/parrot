@@ -23,7 +23,7 @@ Create or destroy a Parrot interpreter
 #include "parrot/runcore_api.h"
 #include "parrot/oplib/core_ops.h"
 #include "../compilers/imcc/imc.h"
-#include "../pmc/pmc_context.h"
+#include "pmc/pmc_context.h"
 #include "inter_create.str"
 
 /* HEADERIZER HFILE: include/parrot/interpreter.h */

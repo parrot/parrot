@@ -30,7 +30,7 @@ APitUE - W. Richard Stevens, AT&T SFIO, Perl 5 (Nick Ing-Simmons)
 
 #include "parrot/parrot.h"
 #include "io_private.h"
-#include "../pmc/pmc_socket.h"
+#include "pmc/pmc_socket.h"
 
 #ifdef PIO_OS_UNIX
 

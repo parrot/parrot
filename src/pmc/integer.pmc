@@ -19,7 +19,7 @@ integer type without going to an I register.
 
 */
 
-#include "pmc_bigint.h"
+#include "pmc/pmc_bigint.h"
 
 static void
 maybe_throw_overflow_error(PARROT_INTERP)

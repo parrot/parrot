@@ -27,7 +27,7 @@ C<Parrot_register_pmc> if it isn't visible to Parrot.
 
 /* included manually to prevent breaking C++ builds -- see RT #56534 */
 #include "parrot/hash.h"
-#include "pmc_hash.h"
+#include "pmc/pmc_hash.h"
 
 pmclass AddrRegistry extends Hash provides hash auto_attrs {
 /*

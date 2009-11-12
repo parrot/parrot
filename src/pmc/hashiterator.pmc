@@ -46,8 +46,8 @@ Generic iterator for traversing Hash.
 
 */
 
-#include "pmc_hash.h"
-#include "pmc_hashiteratorkey.h"
+#include "pmc/pmc_hash.h"
+#include "pmc/pmc_hashiteratorkey.h"
 
 /*
 

@@ -22,7 +22,7 @@ more information.
 
 
 #include "parrot/oplib/ops.h"
-#include "pmc_sub.h"
+#include "pmc/pmc_sub.h"
 
 /*
 
