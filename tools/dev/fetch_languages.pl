@@ -138,6 +138,12 @@ my @hlls = (
     },
 
     {
+        name       => 'kea',
+        scm        => 'GIT',
+        repository => 'git://github.com/leto/kea.git'
+    },
+
+    {
         name       => 'kea-cl',
         scm        => 'SVN',
         repository => 'https://rgrjr.dyndns.org/svn/kea-cl/trunk'
