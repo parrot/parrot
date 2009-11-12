@@ -311,10 +311,6 @@ $exp = q{win32};
 is( $step->_get_platform( $conf ), $exp,
     "Got expected platform for $exp");
 
-## re-set to original values
-#$conf->data->set( osname => $platform_orig );
-#$conf->data->set( archname => $archname_orig );
-
 $conf->data->set( archname => 'ia64-bar' );
 $exp = q{ia64};
 is( $step->_get_platform( $conf ), $exp,
