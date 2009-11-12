@@ -416,9 +416,9 @@ END_OF_DEFINES
     .local string rc_contents
     rc_contents  = ''
     rc_contents .= rc_constant_defines
-    rc_contents .= 'RESOURCE_NAME_ID_WHOLE_PBC RESOURCE_TYPE_ID_WHOLE_PBC '
+    rc_contents .= 'RESOURCE_NAME_ID_WHOLE_PBC RESOURCE_TYPE_ID_WHOLE_PBC "'
     rc_contents .= pbc_path
-    rc_contents .= "\n"
+    rc_contents .= "\"\n"
 
     .local pmc rc_fh
     rc_fh = open rc_path, 'w'
