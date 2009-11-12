@@ -38,9 +38,12 @@ New in 1.8.0 (to be released on 2009-11-17)
   + New tests using the new test functions lives_ok() and dies_ok() were written.
   + The test script t/op/annotate-old.t was added.
   + Many test scripts were converted from Perl5 to PIR.
-  + In some test the dependency on Perl 5' %Config was eliminated. 
+  + In some test the dependency on Perl 5' %Config was eliminated.
 - Documentation
   + The meaning of 'p' means in NCI function call signatures was clarified.
+- Libraries
+  + Math/Random/mt19937ar.pir
+    - left the nest and is now at http://github.com/fperrad/parrot-MT19937
 - Tools
   + The stub for a new language, as created by mk_language_shell.pl,
     now relies on the PIR-based tools, which are replacing the Perl 5-based tools.
