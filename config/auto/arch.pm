@@ -97,16 +97,15 @@ sub runstep {
         osname   => $osname
     );
 
-    $conf->data->set( 'platform' => $self->_get_platform( $conf, $verbose ) );
+    $conf->data->set( 'platform' => $self->_get_platform( $conf ) );
 
-    _report_verbose( $conf, $verbose );
+    _report_verbose( $conf );
 
     return 1;
 }
 
 sub _get_platform {
-    my $self = shift;
-    my ($conf, $verbose) = @_;
+    my ($self, $conf) = @_;
     my $platform = lc ( $conf->data->get('osname') );
 
     $platform = "win32" if $platform =~ /^msys/;
@@ -123,7 +122,8 @@ sub _get_platform {
 }
 
 sub _report_verbose {
-    my ($conf, $verbose) = @_;
+    my ($conf) = @_;
+    my $verbose = $conf->options->get( 'verbose' );
     if ( $verbose ) {
         print "osname:   ", $conf->data->get('osname'), "\n";
         print "cpuarch:  ", $conf->data->get('cpuarch'), "\n";
