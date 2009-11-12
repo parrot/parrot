@@ -300,7 +300,7 @@ src/xyz.pir
 src/gen_grammar.pir
 src/gen_actions.pir
 src/builtins.pir
-src/builtins\say.pir
+src/builtins/say.pir
 SOURCES
     $S0 = pop $P8
     $P7['xyz/xyz.pbc'] = $P8
@@ -309,7 +309,7 @@ SOURCES
 
     $P9 = new 'Hash'
     $P9['parrot-xyz'] = 'xyz.pbc'
-    $P0['exe_pbc'] = $P9
+    $P0['installable_pbc'] = $P9
 
     # install
     $P0['inst_lang'] = 'xyz/xyz.pbc'
@@ -579,10 +579,10 @@ DOCS := README
 
 BUILD_CLEANUPS := \
   @lclang@.pbc \
+  @lclang@/@lclang@.pbc \
   "src/gen_*.pir" \
   "*.c" \
   "*$(O)" \
-  @lclang@@exe@ \
 #IF(win32):  parrot-@lclang@.exe \
 #IF(win32):  parrot-@lclang@.iss \
 #IF(win32):  "setup-parrot-*.exe" \
@@ -597,13 +597,10 @@ build: \
   @lclang@/@lclang@.pbc \
   @lclang@.pbc
 
-all: build @lclang@@exe@ installable
+all: build installable
 
 @lclang@.pbc: @lclang@.pir
 	$(PARROT) $(PARROT_ARGS) -o @lclang@.pbc @lclang@.pir
-
-@lclang@@exe@: @lclang@.pbc
-	$(PBC_TO_EXE) @lclang@.pbc
 
 @lclang@/@lclang@.pbc: $(SOURCES)
 	$(PARROT) $(PARROT_ARGS) -o @lclang@/@lclang@.pbc src/@lclang@.pir
@@ -785,7 +782,7 @@ to the @lang@ compiler.
 .sub 'main' :main
     .param pmc args
 
-    load_language '@lang@'
+    load_language '@lclang@'
 
     $P0 = compreg '@lang@'
     $P1 = $P0.'command_line'(args)
