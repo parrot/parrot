@@ -1344,6 +1344,10 @@ $(IMCC_DIR)/imcc.l.flag $(IMCC_DIR)/imclexer.c : $(IMCC_DIR)/imcc.l
 	$(LEX) -o$(IMCC_DIR)/imclexer.c $(IMCC_DIR)/imcc.l
 	$(TOUCH) $(IMCC_DIR)/imcc.l.flag $(IMCC_DIR)/imclexer.c
 
+$(IMCC_DIR)/parser_util$(O): $(PMC_INC_DIR)/pmc/pmc_sub.h
+
+$(IMCC_DIR)/pbc$(O): $(PMC_INC_DIR)/pmc/pmc_sub.h
+
 $(IMCC_O_FILES) : $(IMCC_H_FILES) $(ALL_H_FILES)
 
 ###############################################################################
