@@ -1,6 +1,6 @@
 #! parrot
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id: 01-regex.t 40191 2009-07-21 12:56:20Z bacek $
+# $Id$
 
 =head1 NAME
 
