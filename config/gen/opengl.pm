@@ -936,7 +936,7 @@ sub gen_glut_callbacks {
            $sig    =~ s/void//;
            $sig    =~ s/unsigned //;
            $sig    =~ s/(\w)\w+\W*/$1/g;
-           $sig    =  "v$sig";
+           $sig    =  "$sig->";
 
         my $glutcb =  "glutcb${friendly}Func";
            $glutcb =~ s/ //g;
