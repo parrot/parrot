@@ -35,10 +35,11 @@ New in 1.8.0 (to be released on 2009-11-17)
   + The library YAML/Parser/Syck.pir was removed.
   + The VTABLE function instantiate_str() was removed.
 - Tests
-  + New tests using the new test functions lives_ok() and dies_ok() were written.
-  + The test script t/op/annotate-old.t was added.
-  + Many test scripts were converted from Perl5 to PIR.
-  + In some test the dependency on Perl 5' %Config was eliminated.
+  + New testing functions in Test::More: lives_ok() and dies_ok().
+  + t/op/annotate.t has begun to be translated to PIR.
+  + t/op/00ff-dos.t was converted to PIR.
+  + t/op/inf_nan.t was converted to PIR.
+  + In some tests the dependency on %Config from Perl 5 was eliminated.
 - Documentation
   + The meaning of 'p' means in NCI function call signatures was clarified.
 - Libraries
