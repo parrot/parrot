@@ -1,13 +1,6 @@
-#!perl
-# Copyright (C) 2001-2005, Parrot Foundation.
+#!parrot
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 27;
-use Parrot::Config;
 
 =head1 NAME
 
@@ -23,500 +16,389 @@ Tests various bitwise logical operations.
 
 =cut
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "shr_i_i_i (>>)" );
-        set I0, 0b001100
-        set I1, 0b010100
-        set I2, 1
-        set I3, 2
-        shr I4, I0, I2
-        shr I2, I0, I2
-        shr I1, I1, I3
-        print I4
-        print "\n"
-        print I2
-        print "\n"
-        print I1
-        print "\n"
-        print I0
-        print "\n"
-        end
-CODE
-6
-6
-5
-12
-OUTPUT
+.sub main :main
+    .include 'test_more.pir'
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "shr_i_i (>>)" );
-        set I0, 0b001100
-        set I1, 0b010100
-        set I2, 1
-        set I3, 2
-        shr I0, I2
-        shr I1, I3
-        print I0
-        print "\n"
-        print I1
-        print "\n"
-        end
-CODE
-6
-5
-OUTPUT
+    plan(68)
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "shr_i_i_ic (>>)" );
-        set     I0, 0b001100
-        set     I1, 0b010100
-        shr     I2, I0, 1
-        shr     I1, I1, 2
-        print   I2
-        print   "\n"
-        print   I1
-        print   "\n"
-        print   I0
-        print   "\n"
-        end
-CODE
-6
-5
-12
-OUTPUT
+    test_shr_i_i_i_shift_rt_()
+    test_shr_i_i_shift_rt_()
+    test_shr_i_i_ic_shift_rt_()
+    test_shr_i_ic_i_shift_rt_()
+    test_shr_i_ic_ic_shift_rt_()
+    test_lsr_i_ic_ic_shift_rt_()
+    test_lsr_i_ic_shift_rt()
+    test_lsr_i_i_i_shift_rt()
+    test_lsr_i_i_ic_shift_rt()
+    test_shr_i_i_ic_shift_rt_negative()
+    test_shl_i_i_i_shift_lt()
+    test_shl_i_i_ic_shift_lt()
+    test_shl_i_ic_i_shift_lt()
+    test_shl_i_ic_ic_shift_lt()
+    test_shl_i_i_shift_lt()
+    test_bxor_i_i_i_xor()
+    test_bxor_i_i_ic_xor()
+    test_bxor_i_ic_xor()
+    test_band_i_i_i_and()
+    test_band_i_i_ic_and()
+    test_band_i_i_ic_and_2()
+    test_bor_i_i_i()
+    test_bor_i_i_ic()
+    test_bor_i_i_ic_2()
+    test_bnot_i_i_2()
+    test_rot_i_i_ic_ic()
+    test_i_reg_shl_and_pmc_shl_are_consistent()
+    # END_OF_TESTS
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "shr_i_ic_i (>>)" );
-        set I0, 1
-        set I1, 2
-        shr I2, 0b001100, I0
-        shr I1, 0b010100, I1
-        print I2
-        print "\n"
-        print I1
-        print "\n"
-        end
-CODE
-6
-5
-OUTPUT
+.macro exception_is ( M )
+    .local pmc exception
+    .local string message
+    .get_results (exception)
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "shr_i_ic_ic (>>)" );
-        shr I2, 0b001100, 1
-        shr I1, 0b010100, 2
-        print I2
-        print "\n"
-        print I1
-        print "\n"
-        end
-CODE
-6
-5
-OUTPUT
+    message = exception['message']
+    is( message, .M, .M )
+.endm
+
+.sub test_shr_i_i_i_shift_rt_
+    set $I0, 0b001100
+    set $I1, 0b010100
+    set $I2, 1
+    set $I3, 2
+    shr $I4, $I0, $I2
+    shr $I2, $I0, $I2
+    shr $I1, $I1, $I3
+    is( $I4, "6", 'shr_i_i_i (>>)' )
+    is( $I2, "6", 'shr_i_i_i (>>)' )
+    is( $I1, "5", 'shr_i_i_i (>>)' )
+    is( $I0, "12", 'shr_i_i_i (>>)' )
+.end
+
+.sub test_shr_i_i_shift_rt_
+    set $I0, 0b001100
+    set $I1, 0b010100
+    set $I2, 1
+    set $I3, 2
+    shr $I0, $I2
+    shr $I1, $I3
+    is( $I0, "6", 'shr_i_i (>>)' )
+    is( $I1, "5", 'shr_i_i (>>)' )
+.end
+
+.sub test_shr_i_i_ic_shift_rt_
+    set     $I0, 0b001100
+    set     $I1, 0b010100
+    shr     $I2, $I0, 1
+    shr     $I1, $I1, 2
+    is( $I2, "6", 'shr_i_i_ic (>>)' )
+    is( $I1, "5", 'shr_i_i_ic (>>)' )
+    is( $I0, "12", 'shr_i_i_ic (>>)' )
+.end
+
+.sub test_shr_i_ic_i_shift_rt_
+    set $I0, 1
+    set $I1, 2
+    shr $I2, 0b001100, $I0
+    shr $I1, 0b010100, $I1
+    is( $I2, "6", 'shr_i_ic_i (>>)' )
+    is( $I1, "5", 'shr_i_ic_i (>>)' )
+.end
+
+.sub test_shr_i_ic_ic_shift_rt_
+    shr $I2, 0b001100, 1
+    shr $I1, 0b010100, 2
+    is( $I2, "6", 'shr_i_ic_ic (>>)' )
+    is( $I1, "5", 'shr_i_ic_ic (>>)' )
+.end
 
 # The crux of this test is that a proper logical right shift
 # will clear the most significant bit, so the shifted value
 # will be a positive value on any 2's or 1's complement CPU
-pasm_output_is( <<'CODE', <<'OUTPUT', "lsr_i_ic_ic (>>)" );
-        lsr I2, -40, 1
-        lt I2, 0, BAD
-        print "OK\n"
-        end
-BAD:
-        print "Not OK"
-        print "\n"
-        end
-CODE
-OK
-OUTPUT
+.sub test_lsr_i_ic_ic_shift_rt_
+    lsr $I2, -40, 1
+    lt $I2, 0, BAD
+    ok( 1, 'lsr_i_ic_ic (>>)' )
+    goto END
+  BAD:
+    ok( 0, 'lsr_i_ic_ic (>>)' )
+  END:
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "lsr_i_ic (>>)" );
-        set I2, -100
-        lsr I2, 1
-        lt I2, 0, BAD
-        print "OK\n"
-        end
-BAD:
-        print "Not OK"
-        print "\n"
-        end
-CODE
-OK
-OUTPUT
+.sub test_lsr_i_ic_shift_rt
+    set $I2, -100
+    lsr $I2, 1
+    lt $I2, 0, BAD
+    ok( 1, 'lsr_i_ic (>>) OK')
+    goto END
+  BAD:
+    ok( 0, 'lsr_i_ic (>>)')
+  END:
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "lsr_i_i_i (>>)" );
-        set I0, -40
-        set I1, 1
-        lsr I2, I0, I1
-        lt I2, 0, BAD
-        print "OK\n"
-        end
-BAD:
-        print "Not OK"
-        print "\n"
-        end
-CODE
-OK
-OUTPUT
+.sub test_lsr_i_i_i_shift_rt
+    set $I0, -40
+    set $I1, 1
+    lsr $I2, $I0, $I1
+    lt $I2, 0, BAD
+    ok( 1, 'lsr_i_i_i (>>) OK')
+    goto END
+  BAD:
+    ok( 0, 'lsr_i_i_i (>>)')
+  END:
+.end
 
 # ... and the missing op signature was untested and wrong in JIT/i386
-pasm_output_is( <<'CODE', <<'OUTPUT', "lsr_i_i_ic (>>)" );
-        set I0, -40
-        lsr I2, I0, 1
-        lt I2, 0, BAD
-        print "OK\n"
-        end
-BAD:
-        print "Not OK"
-        print "\n"
-        end
-CODE
-OK
-OUTPUT
+.sub test_lsr_i_i_ic_shift_rt
+    set $I0, -40
+    lsr $I2, $I0, 1
+    lt $I2, 0, BAD
+    ok( 1, 'lsr_i_i_ic (>>) OK')
+    goto END
+  BAD:
+    ok( 0, 'lsr_i_i_ic (>>)')
+  END:
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "shr_i_i_ic (>>) negative" );
-        set I0, -40
-        shr I2, I0, 1
-        ge I2, 0, BAD
-        print "OK\n"
-        end
-BAD:
-        print "Not OK"
-        print "\n"
-        end
-CODE
-OK
-OUTPUT
-pasm_output_is( <<'CODE', <<'OUTPUT', "shl_i_i_i (<<)" );
-        set I0, 0b001100
-        set I1, 0b010100
-        set I2, 2
-        set I3, 1
-        shl I4, I0, I2
-        shl I2, I0, I2
-        shl I1, I1, I3
-        print I4
-        print "\n"
-        print I2
-        print "\n"
-        print I1
-        print "\n"
-        print I0
-        print "\n"
-        end
-CODE
-48
-48
-40
-12
-OUTPUT
+.sub test_shr_i_i_ic_shift_rt_negative
+    set $I0, -40
+    shr $I2, $I0, 1
+    ge $I2, 0, BAD
+    ok( 1, 'shr_i_i_ic (>>) negative OK')
+    goto END
+  BAD:
+    ok( 0, 'shr_i_i_ic (>>) negative')
+  END:
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "shl_i_i_ic (<<)" );
-        set I0, 0b001100
-        set I1, 0b010100
-        shl I2, I0, 2
-        shl I1, I1, 1
-        print I2
-        print "\n"
-        print I1
-        print "\n"
-        print I0
-        print "\n"
-        end
-CODE
-48
-40
-12
-OUTPUT
+.sub test_shl_i_i_i_shift_lt
+    set $I0, 0b001100
+    set $I1, 0b010100
+    set $I2, 2
+    set $I3, 1
+    shl $I4, $I0, $I2
+    shl $I2, $I0, $I2
+    shl $I1, $I1, $I3
+    is( $I4, "48", 'shl_i_i_i (<<)' )
+    is( $I2, "48", 'shl_i_i_i (<<)' )
+    is( $I1, "40", 'shl_i_i_i (<<)' )
+    is( $I0, "12", 'shl_i_i_i (<<)' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "shl_i_ic_i (<<)" );
-        set I0, 2
-        set I1, 1
-        shl I2, 0b001100, I0
-        shl I1, 0b010100, I1
-        print I2
-        print "\n"
-        print I1
-        print "\n"
-        end
-CODE
-48
-40
-OUTPUT
+.sub test_shl_i_i_ic_shift_lt
+    set $I0, 0b001100
+    set $I1, 0b010100
+    shl $I2, $I0, 2
+    shl $I1, $I1, 1
+    is( $I2, "48", 'shl_i_i_ic (<<)' )
+    is( $I1, "40", 'shl_i_i_ic (<<)' )
+    is( $I0, "12", 'shl_i_i_ic (<<)' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "shl_i_ic_ic (<<)" );
-        shl I2, 0b001100, 2
-        shl I1, 0b010100, 1
-        print I2
-        print "\n"
-        print I1
-        print "\n"
-        end
-CODE
-48
-40
-OUTPUT
+.sub test_shl_i_ic_i_shift_lt
+    set $I0, 2
+    set $I1, 1
+    shl $I2, 0b001100, $I0
+    shl $I1, 0b010100, $I1
+    is( $I2, "48", 'shl_i_ic_i (<<)' )
+    is( $I1, "40", 'shl_i_ic_i (<<)' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "shl_i_i (<<)" );
-        set I0, 0b001100
-        set I1, 0b010100
-        set I2, 1
-        set I3, 2
-        shl I0, I2
-        shl I1, I3
-        print I0
-        print "\n"
-        print I1
-        print "\n"
-        end
-CODE
-24
-80
-OUTPUT
+.sub test_shl_i_ic_ic_shift_lt
+    shl $I2, 0b001100, 2
+    shl $I1, 0b010100, 1
+    is( $I2, "48", 'shl_i_ic_ic (<<)' )
+    is( $I1, "40", 'shl_i_ic_ic (<<)' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "bxor_i_i_i (^)" );
-        set     I0, 0b001100
-        set     I1, 0b100110
-        bxor    I2, I0, I1
-        print   I2
-        print   "\n"
-        bxor    I1, I0, I1
-        print   I1
-        print   "\n"
-        print   I0
-        print   "\n"
-        end
-CODE
-42
-42
-12
-OUTPUT
+.sub test_shl_i_i_shift_lt
+    set $I0, 0b001100
+    set $I1, 0b010100
+    set $I2, 1
+    set $I3, 2
+    shl $I0, $I2
+    shl $I1, $I3
+    is( $I0, "24", 'shl_i_i (<<)' )
+    is( $I1, "80", 'shl_i_i (<<)' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "bxor_i_i_ic (^)" );
-        set I0, 0b001100
-        bxor I2, I0, 0b100110
-        print I2
-        print "\n"
-        print I0
-        print "\n"
-        bxor I0, I0, 0b100110
-        print I0
-        print "\n"
-        end
-CODE
-42
-12
-42
-OUTPUT
+.sub test_bxor_i_i_i_xor
+    set     $I0, 0b001100
+    set     $I1, 0b100110
+    bxor    $I2, $I0, $I1
+    is( $I2, "42", 'bxor_i_i_i (^)' )
+    bxor    $I1, $I0, $I1
+    is( $I1, "42", 'bxor_i_i_i (^)' )
+    is( $I0, "12", 'bxor_i_i_i (^)' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "bxor_i|ic (^)" );
-        set I0, 0b001100
-        set I2, 0b000011
-        bxor I2, I0
-        print I2
-        print "\n"
+.sub test_bxor_i_i_ic_xor
+    set $I0, 0b001100
+    bxor $I2, $I0, 0b100110
+    is( $I2, "42", 'bxor_i_i_ic (^)' )
+    is( $I0, "12", 'bxor_i_i_ic (^)' )
+    bxor $I0, $I0, 0b100110
+    is( $I0, "42", 'bxor_i_i_ic (^)' )
+.end
 
-        set I2, 0b001100
-        bxor  I2, I0
-        print I2
-        print "\n"
+.sub test_bxor_i_ic_xor
+    set $I0, 0b001100
+    set $I2, 0b000011
+    bxor $I2, $I0
+    is( $I2, "15", 'bxor_i|ic (^)' )
+    set $I2, 0b001100
+    bxor  $I2, $I0
+    is( $I2, "0", 'bxor_i|ic (^)' )
+    set $I2, 0b101010
+    bxor $I2, $I2
+    is( $I2, "0", 'bxor_i|ic (^)' )
+    set $I2, 0b010101
+    bxor $I2, 0b000011
+    is( $I2, "22", 'bxor_i|ic (^)' )
+.end
 
-        set I2, 0b101010
-        bxor I2, I2
-        print I2
-        print "\n"
+.sub test_band_i_i_i_and
+    set     $I0, 0b001100
+    set     $I1, 0b010110
+    band    $I2, $I0,$I1
+    is( $I2, "4", 'band_i_i_i (&)' )
+    band    $I1,$I0,$I1
+    is( $I1, "4", 'band_i_i_i (&)' )
+    is( $I0, "12", 'band_i_i_i (&)' )
+.end
 
-        set I2, 0b010101
-        bxor I2, 0b000011
-        print I2
-        print "\n"
+.sub test_band_i_i_ic_and
+    set $I0, 0b001100
+    band $I2, $I0,0b010110
+    is( $I2, "4", 'band_i_i_ic (&)' )
+    is( $I0, "12", 'band_i_i_ic (&)' )
+    band $I0,$I0,0b010110
+    is( $I0, "4", 'band_i_i_ic (&)' )
+.end
 
-        end
-CODE
-15
-0
-0
-22
-OUTPUT
+.sub test_band_i_i_ic_and_2
+    set $I0, 0b001100
+    set $I2, 0b000011
+    band $I2, $I0
+    is( $I2, "0", 'band_i_i|ic (&)' )
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "band_i_i_i (&)" );
-        set     I0, 0b001100
-        set     I1, 0b010110
-        band    I2, I0,I1
-        print   I2
-        print   "\n"
-        band    I1,I0,I1
-        print   I1
-        print   "\n"
-        print   I0
-        print   "\n"
-        end
-CODE
-4
-4
-12
-OUTPUT
+    set $I2, 0b001100
+    band  $I2, $I0
+    is( $I2, "12", 'band_i_i|ic (&)' )
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "band_i_i_ic (&)" );
-        set I0, 0b001100
-        band I2, I0,0b010110
-        print I2
-        print "\n"
-        print I0
-        print "\n"
-        band I0,I0,0b010110
-        print I0
-        print "\n"
-        end
-CODE
-4
-12
-4
-OUTPUT
+    set $I2, 0b101010
+    band $I2, $I2
+    is( $I2, "42", 'band_i_i|ic (&)' )
+    
+    set $I2, 0b010101
+    band $I2, 0b000011
+    is( $I2, "1", 'band_i_i|ic (&)' )
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "band_i_i|ic (&)" );
-        set I0, 0b001100
-        set I2, 0b000011
-        band I2, I0
-        print I2
-        print "\n"
+.sub test_bor_i_i_i
+    set $I0, 0b001100
+    set $I1, 0b010110
+    bor $I2, $I0,$I1
+    is( $I2, "30", 'bor_i_i_i (|)' )
+    bor $I1,$I0,$I1
+    is( $I1, "30", 'bor_i_i_i (|)' )
+    is( $I0, "12", 'bor_i_i_i (|)' )
+.end
 
-        set I2, 0b001100
-        band  I2, I0
-        print I2
-        print "\n"
+.sub test_bor_i_i_ic
+    set $I0, 0b001100
+    bor $I2, $I0,0b010110
+    is( $I2, "30", 'bor_i_i_ic (|)' )
+    is( $I0, "12", 'bor_i_i_ic (|)' )
+    bor $I0,$I0,0b010110
+    is( $I0, "30", 'bor_i_i_ic (|)' )
+.end
 
-        set I2, 0b101010
-        band I2, I2
-        print I2
-        print "\n"
+.sub test_bor_i_i_ic_2
+    set $I0, 0b001100
+    set $I2, 0b000011
+    bor $I2, $I0
+    is( $I2, "15", 'bor_i_i|ic (|) 2' )
+    set $I2, 0b001100
+    bor  $I2, $I0
+    is( $I2, "12", 'bor_i_i|ic (|) 2' )
+    set $I2, 0b101010
+    bor $I2, $I2
+    is( $I2, "42", 'bor_i_i|ic (|) 2' )
+    set $I2, 0b010101
+    bor $I2, 0b000011
+    is( $I2, "23", 'bor_i_i|ic (|) 2' )
+.end
 
-        set I2, 0b010101
-        band I2, 0b000011
-        print I2
-        print "\n"
+.sub test_bnot_i_i_2
+    set     $I0, 0b001100
+    set     $I1, 0b001100
+    set     $I31, 0b111111
+    bnot    $I2, $I0
+    band    $I2, $I2, $I31
+    is( $I2, "51", 'bnot_i_i (~) 2' )
+    bnot    $I1, $I1
+    band    $I1, $I1, $I31
+    is( $I1, "51", 'bnot_i_i (~) 2' )
+    is( $I0, "12", 'bnot_i_i (~) 2' )
+.end
 
-        end
-CODE
-0
-12
-42
-1
-OUTPUT
+.sub test_rot_i_i_ic_ic
+    .include "iglobals.pasm"
+    .local pmc interp     # a handle to our interpreter object.
+    interp = getinterp
+    .local pmc config
+    config = interp[.IGLOBALS_CONFIG_HASH]
+    .local int intvalsize 
+    intvalsize = config['intvalsize']
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "bor_i_i_i (|)" );
-        set I0, 0b001100
-        set I1, 0b010110
-        bor I2, I0,I1
-        print I2
-        print "\n"
-        bor I1,I0,I1
-        print I1
-        print "\n"
-        print I0
-        print "\n"
-        end
-CODE
-30
-30
-12
-OUTPUT
+    .local int int_bits
+    int_bits = intvalsize * 8
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "bor_i_i_ic (|)" );
-        set I0, 0b001100
-        bor I2, I0,0b010110
-        print I2
-        print "\n"
-        print I0
-        print "\n"
-        bor I0,I0,0b010110
-        print I0
-        print "\n"
-        end
-CODE
-30
-12
-30
-OUTPUT
+    set $I0, 0b001100
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "bor_i_i|ic (|)" );
-        set I0, 0b001100
-        set I2, 0b000011
-        bor I2, I0
-        print I2
-        print "\n"
+    gt intvalsize, 4, do64bit
 
-        set I2, 0b001100
-        bor  I2, I0
-        print I2
-        print "\n"
+    rot $I1, $I0, 1, 32         # 1 left
+    is( $I1, "24", 'rot_i_i_ic_ic' )
+    rot $I1, $I0, -1, 32        # 1 right
+    is( $I1, "6", 'rot_i_i_ic_ic' )
+    goto END
 
-        set I2, 0b101010
-        bor I2, I2
-        print I2
-        print "\n"
+  do64bit:
+    rot $I1, $I0, 1, 64         # 1 left
+    is( $I1, "24", 'rot_i_i_ic_ic' )
+    rot $I1, $I0, -1, 64        # 1 right
+    is( $I1, "6", 'rot_i_i_ic_ic' )
+    
+  END:
+.end
 
-        set I2, 0b010101
-        bor I2, 0b000011
-        print I2
-        print "\n"
-
-        end
-CODE
-15
-12
-42
-23
-OUTPUT
-
-# use C<and> to only check low order bits, this should be platform nice
-pasm_output_is( <<'CODE', <<'OUTPUT', "bnot_i_i (~)" );
-        set     I0, 0b001100
-        set     I1, 0b001100
-        set     I31, 0b111111
-        bnot    I2, I0
-        band    I2, I2, I31
-        print   I2
-        print   "\n"
-        bnot    I1, I1
-        band    I1, I1, I31
-        print   I1
-        print   "\n"
-        print   I0
-        print   "\n"
-        end
-CODE
-51
-51
-12
-OUTPUT
-
-my $int_bits = $PConfig{intvalsize} * 8;
-pasm_output_is( <<"CODE", <<'OUTPUT', 'rot_i_i_ic_ic' );
-    set I0, 0b001100
-    rot I1, I0, 1, $int_bits   # 1 left
-    print I1
-    print "\\n"
-    rot I1, I0, -1, $int_bits   # 1 right
-    print I1
-    print "\\n"
-    end
-CODE
-24
-6
-OUTPUT
-
-SKIP: {
-    skip 'no BigInt lib found' => 1
-        unless $PConfig{gmp};
-
-    my @todo;
-    @todo = ( todo => 'broken with JIT (RT #43245)' )
-        if ( defined $ENV{TEST_PROG_ARGS} and 
-            $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/ );
-
-    pir_output_is( <<'CODE', <<'OUT', "I-reg shl and PMC shl are consistent", @todo );
 ## The PMC shl op will promote Integer to Bigint when needed.  We can't stuff a
 ## BigInt in an I register, but we can produce the same result modulo wordsize.
 ## [Only we cheat by using the word size minus one, so that we don't have to
 ## deal with negative numbers.  -- rgr, 2-Jun-07.]
-.sub main :main
+.sub test_i_reg_shl_and_pmc_shl_are_consistent
+
+    # This seems to be passing fine with --runcore=jit
+    #     my @todo;
+    #     @todo = ( todo => 'broken with JIT (RT #43245)' )
+    #         if ( defined $ENV{TEST_PROG_ARGS} and 
+    #             $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/ );
+
+    .include "iglobals.pasm"
+    .local pmc interp     # a handle to our interpreter object.
+    interp = getinterp
+    .local pmc config
+    config = interp[.IGLOBALS_CONFIG_HASH]
+    .local string gmp
+    gmp = config['gmp']
+    
+    if gmp, runtest
+    skip( 1, 'no BigInt lib found' )
+    goto END
+
+  runtest:
+
     ## Figure out the wordsize.  We need integer_modulus because assigning a
     ## too-big BigInt throws an error otherwise.
     .include 'sysinfo.pasm'
@@ -539,6 +421,7 @@ SKIP: {
     ## Test shifting a negative number.
     set $P0, -1000001
     test_shift($P0, integer_modulus)
+  END:
 .end
 
 .sub test_shift
@@ -550,7 +433,7 @@ SKIP: {
     i_number = number
 
     ## Start the loop.
-loop:
+  loop:
     if $P1 > 100 goto done
     ## shift number and i_number into $P2 and $I2.
     shl $P2, number, $P1
@@ -567,36 +450,31 @@ loop:
     $I5 = - $I4
     if $I4 == $I5 goto ok
     goto bad
-pos_check:
+  pos_check:
     if $I2 == $I3 goto ok
-bad:
-    print "oops; not ok: "
-    print i_number
-    print ' << '
-    print $I1
-    print ' gives I '
-    print $I2
-    print ' vs. P '
-    print $P3
-    print ".\n"
-    print $I5
-    print "\n"
-ok:
+  bad:
+    ok( 0, "oops; not ok: " )
+    diag( i_number )
+    diag( ' << ' )
+    diag( $I1 )
+    diag( ' gives I ' )
+    diag( $I2 )
+    diag( ' vs. P ' )
+    diag( $P3 )
+    diag( ".\n" )
+    diag( $I5 )
+    diag( "\n" )
+  ok:
     ## set up for the next one
     inc $P1
     goto loop
-done:
-    print "done.\n"
+  done:
+    ok( 1, 'finished ok' )
 .end
-CODE
-done.
-done.
-OUT
-}
 
 # Local Variables:
-#   mode: cperl
+#   mode: pir
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
