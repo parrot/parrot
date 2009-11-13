@@ -246,7 +246,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
 
 =item C<void set_pmc_keyed(PMC *key, PMC *src)>
 
-If key is a slice, do a splice as set that item.
+Sets the PMC value of the element keyed by C<key> to C<*src>.
 
 =cut
 

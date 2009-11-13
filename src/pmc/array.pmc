@@ -1141,13 +1141,8 @@ The C<==> operation. Compares two array to hold equal elements.
         return 1;
     }
 
+
 /*
-
-=item C<PMC *slice(PMC *key, INTVAL f)>
-
-Return a new iterator for the slice PMC C<key> if f == 0.
-
-Return a new pythonic array slice if f == 1.
 
 =item C<PMC *get_iter()>
 
@@ -1156,18 +1151,6 @@ Return a new iterator for SELF.
 =cut
 
 */
-
-    VTABLE PMC *slice(PMC *key, INTVAL f) {
-        if (f == 0) {
-            STRING * const name = CONST_STRING(interp, "set_key");
-            PMC * const iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
-            Parrot_pcc_invoke_method_from_c_args(interp, iter, name, "P->", key);
-            return iter;
-        }
-
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                "Array: Unknown slice type");
-    }
 
     VTABLE PMC *get_iter() {
         return pmc_new_init(INTERP, enum_class_ArrayIterator, SELF);

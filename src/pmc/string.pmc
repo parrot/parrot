@@ -736,6 +736,8 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
         VTABLE_set_integer_native(INTERP, result, (INTVAL)i);
         RETURN(PMC *result);
     }
+
+
 /*
 
 =back
@@ -743,12 +745,6 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
 =head2 Iterator Interface
 
 =over 4
-
-=item C<PMC *slice(PMC *key, INTVAL f)>
-
-Return a new iterator for the slice PMC C<key> if f==0.
-
-Return a new pythonic slice if f == 1.
 
 =item C<PMC *get_iter(PMC *key)>
 
@@ -758,25 +754,12 @@ Return a new iterator for this string.
 
 Return length of the string.
 
-
 =cut
 
 */
 
     VTABLE INTVAL elements() {
         return Parrot_str_byte_length(INTERP, VTABLE_get_string(INTERP, SELF));
-    }
-
-    VTABLE PMC *slice(PMC *key, INTVAL f) {
-        if (f == 0) {
-            STRING     *name = CONST_STRING(interp, "set_key");
-            PMC * const iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
-            Parrot_pcc_invoke_method_from_c_args(interp, iter, name, "P->", key);
-            return iter;
-        }
-
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                "String: Unknown slice type");
     }
 
     VTABLE PMC *get_iter() {

@@ -1559,8 +1559,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_PMC_shift_string>
 
-=item C<Parrot_PMC_slice>
-
 =item C<Parrot_PMC_splice>
 
 =item C<Parrot_PMC_substr>

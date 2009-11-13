@@ -975,7 +975,7 @@ Returns the number of elements in the hash.
 
 =item C<PMC *get_iter()>
 
-Return a new iterator for the slice PMC C<key>
+Return a new iterator.
 
 =cut
 
