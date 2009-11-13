@@ -36,6 +36,7 @@ my $step = test_step_constructor_and_description($conf);
 my $serialized = $conf->pcfreeze();
 
 {
+    $conf->data->set( ptr_alignment => undef );
     $conf->data->set( OSNAME_provisional => 'hpux' );
     my $ret = $step->runstep($conf);
     ok( $ret, "runstep() returned true value" );
