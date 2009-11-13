@@ -171,7 +171,7 @@ for the Cursor if one hasn't been created yet.
 .end
 
 
-=item parse(target [, regex])
+=item parse(target [, 'rule'=>regex])
 
 Parse C<target> in the current grammar starting with C<regex>.
 If C<regex> is omitted, then use the C<TOP> rule for the grammar.
@@ -180,14 +180,19 @@ If C<regex> is omitted, then use the C<TOP> rule for the grammar.
 
 .sub 'parse' :method
     .param pmc target
-    .param pmc regex           :optional
+    .param pmc regex           :named('rule') :optional
     .param int has_regex       :opt_flag
     .param pmc actions         :named('actions') :optional
     .param int rxtrace         :named('rxtrace') :optional
     .param pmc options         :slurpy :named
 
-    if has_regex goto regex_done
-    regex = find_method self, 'TOP'
+    if has_regex goto have_regex
+    regex = box 'TOP'
+  have_regex:
+    $I0 = isa regex, ['Sub']
+    if $I0 goto regex_done
+    $S0 = regex
+    regex = find_method self, $S0
   regex_done:
 
     .lex '$*ACTIONS', actions
