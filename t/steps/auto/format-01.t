@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan); # tests => 16;
+use Test::More tests => 16;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::format');
@@ -96,14 +96,8 @@ $step = test_step_constructor_and_description($conf);
         nvsize      => undef,
     );
 }
-TODO: {
-    # Getting uninitialized value warning here.
-    # Not a surprise.  We converted from an explicit 'use Config;'
-    # to get_p5 ... but since we're no longer running init::defaults in this
-    # test that value will necessarily be uninitialized.
-    local $TODO = 'Need to get rid of get_p5';
-    no warnings 'uninitialized';
-    my $p5format = '%.15' . $conf->data->get_p5('sPRIgldbl');
+{
+    my $p5format = '%.15' . $conf->data->get('sPRIgldbl_provisional');
     $p5format =~ s/"//g;; # Perl 5's Config value has embedded double quotes
     $conf->data->set( nv => 'long double' );
     eval {

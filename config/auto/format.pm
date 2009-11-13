@@ -74,7 +74,7 @@ sub _set_floatvalfmt_nvsize {
         # Stay way from long double for now (it may be 64 or 80 bits)
         # die "long double not supported at this time, use double.";
         $nvsize   = $ldsize;
-        my $spri = $conf->data->get_p5('sPRIgldbl');
+        my $spri = $conf->data->get('sPRIgldbl_provisional');
         if ( defined $spri ) {
             $nvformat = "%.15" .  $spri;
             $nvformat =~ s/"//g;   # Perl 5's Config value has embedded double quotes

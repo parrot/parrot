@@ -74,6 +74,14 @@ sub runstep {
     # to their 'use English' names as documented in 'perlvar'.)
     $conf->data->set_p5( OSNAME => $^O );
 
+    # configtests branch:  We start to handle these things differently.
+    foreach my $orig ( qw|
+        sPRIgldbl
+    | ) {
+        $conf->data->set( qq|${orig}_provisional| => $Config{$orig} );
+    }
+
+
     my $ccdlflags = $Config{ccdlflags};
     $ccdlflags =~ s/\s*-Wl,-rpath,\S*//g if $conf->options->get('disable-rpath');
 
