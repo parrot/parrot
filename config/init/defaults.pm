@@ -57,9 +57,7 @@ sub runstep {
         longsize
         optimize
         sig_name
-        scriptdirexp
         use64bitint
-        sPRIgldbl
     | ) {
         $conf->data->set_p5( $orig => $Config{$orig} );
     }
@@ -76,6 +74,7 @@ sub runstep {
 
     # configtests branch:  We start to handle these things differently.
     foreach my $orig ( qw|
+        scriptdirexp
         sPRIgldbl
     | ) {
         $conf->data->set( qq|${orig}_provisional| => $Config{$orig} );
