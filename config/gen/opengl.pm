@@ -641,7 +641,8 @@ sub gen_opengl_wrappers {
 
             # Get rid of junk needed for C, but not for Parrot NCI;
             # also do general cleanup to make parsing easier
-            s/\b(?:AVAILABLE|DEPRECATED_FOR)_MAC_OS_X_VERSION_\d+_\d+_AND_LATER\b\s*//;
+            s/\b(?:AVAILABLE|DEPRECATED_(?:IN|FOR))_MAC_OS_X_VERSION_\d+_\d+_AND_LATER\b\s*//;
+            s/\bAVAILABLE_MAC_OS_X_VERSION_\d+_\d+_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_\d+_\d+\b\s*//;
             s/\b__cdecl\b\s*//;
             s/\b__stdcall\b\s*//;
             s/\b_CRTIMP\b\s*//;
