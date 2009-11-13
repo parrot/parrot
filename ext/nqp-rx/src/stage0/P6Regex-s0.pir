@@ -10965,7 +10965,6 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .end
 
 
-=cut
 
 # Local Variables:
 #   mode: pir
