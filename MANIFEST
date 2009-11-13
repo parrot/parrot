@@ -1061,7 +1061,6 @@ include/parrot/runcore_trace.h                              [main]include
 include/parrot/scheduler.h                                  [main]include
 include/parrot/scheduler_private.h                          [main]include
 include/parrot/settings.h                                   [main]include
-include/parrot/slice.h                                      [main]include
 include/parrot/stat.h                                       [main]include
 include/parrot/string.h                                     [main]include
 include/parrot/string_funcs.h                               [main]include

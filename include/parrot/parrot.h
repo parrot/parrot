@@ -294,7 +294,6 @@ typedef struct PackFile_ByteCode PackFile_ByteCode;
 #include "parrot/library.h"
 #include "parrot/global.h"
 #include "parrot/stat.h"
-#include "parrot/slice.h"
 #include "parrot/hll.h"
 #include "parrot/pbcversion.h"
 
