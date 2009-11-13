@@ -145,6 +145,7 @@ my %C_TYPE = (
     AGLRendererInfo         => 'void*',
     AGLPbuffer              => 'void*',
     GDHandle                => 'void*',
+    IOSurfaceRef            => 'void*',
     WindowRef               => 'void*',
     HIViewRef               => 'void*',
     Style                   => 'void*',
