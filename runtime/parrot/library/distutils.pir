@@ -476,10 +476,7 @@ the value is the NQP pathname
     $I0 = newer(pir, nqp)
     if $I0 goto L1
     .local string cmd
-    cmd = get_bindir()
-    cmd .= "/parrot-nqp"
-    $S0 = get_exe()
-    cmd .= $S0
+    cmd = get_nqp()
     cmd .= " --target=pir --output="
     cmd .= pir
     cmd .= " "
@@ -701,7 +698,7 @@ the value is the OPS pathname
     system(cmd)
 .end
 
-.sub '__compile_cc' :anon
+.sub '__compile_cc'
     .param string obj
     .param string src
     .param string cflags
@@ -824,6 +821,7 @@ the value is an array of PMC pathname
     __build_dynpmc(src, cflags)
     goto L3
   L4:
+    if group == '' goto L1
     $S0 = _mk_path_dynpmc(group, load_ext)
     $I0 = newer($S0, srcs)
     if $I0 goto L1
@@ -1903,6 +1901,19 @@ Return the whole config
     $P0 = get_config()
     $S0 = $P0['bindir']
     $S0 .= '/parrot'
+    $S1 = $P0['exe']
+    $S0 .= $S1
+    .return ($S0)
+.end
+
+=item get_nqp
+
+=cut
+
+.sub 'get_nqp'
+    $P0 = get_config()
+    $S0 = $P0['bindir']
+    $S0 .= '/parrot-nqp'
     $S1 = $P0['exe']
     $S0 .= $S1
     .return ($S0)
