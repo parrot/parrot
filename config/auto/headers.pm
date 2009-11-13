@@ -79,7 +79,8 @@ sub _set_from_Config {
     my %mapping = ( i_niin => "i_netinetin" );
 
     for ( grep { /^i_/ } $conf->data->keys_p5() ) {
-        $conf->data->set( $mapping{$_} || $_ => $conf->data->get_p5($_) );
+        $conf->data->set( $mapping{$_} || $_ =>
+            $conf->data->get( $_ . q{_provisional} ) );
     }
 }
 
@@ -101,11 +102,11 @@ sub _list_extra_headers {
         sys/stat.h sysexit.h limits.h);
 
     # more extra_headers needed on mingw/msys; *BSD fails if they are present
-    if ( $conf->data->get_p5('OSNAME') eq "msys" ) {
+    if ( $conf->data->get('OSNAME_provisional') eq "msys" ) {
         push @extra_headers, qw(sysmman.h netdb.h);
     }
 
-    if ( $conf->data->get_p5('OSNAME') eq "MSWin32" ) {
+    if ( $conf->data->get('OSNAME_provisional') eq "MSWin32" ) {
         # Microsoft provides two annotations mechanisms.  __declspec, which has been
         # around for a while, and Microsoft's standard source code annotation
         # language (SAL), introduced with Visual C++ 8.0.

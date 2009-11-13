@@ -51,10 +51,7 @@ sub runstep {
 
     # Stage 1:
     foreach my $orig ( qw|
-        archname
-        ccflags
         longsize
-        optimize
         use64bitint
     | ) {
         $conf->data->set_p5( $orig => $Config{$orig} );
@@ -72,7 +69,10 @@ sub runstep {
 
     # configtests branch:  We start to handle these things differently.
     foreach my $orig ( qw|
+        archname
+        ccflags
         d_socklen_t
+        optimize
         scriptdirexp
         sig_name
         sPRIgldbl
@@ -80,6 +80,11 @@ sub runstep {
         $conf->data->set( qq|${orig}_provisional| => $Config{$orig} );
     }
 
+    $conf->data->set(
+#        map { qq|${_}_provisional| => $Config{$_} } grep { /^i_/ } keys %Config
+        map { $_ . q{_provisional} => $Config{$_} } grep { /^i_/ } keys %Config
+    );
+    $conf->data->set( OSNAME_provisional => $^O );
 
     my $ccdlflags = $Config{ccdlflags};
     $ccdlflags =~ s/\s*-Wl,-rpath,\S*//g if $conf->options->get('disable-rpath');

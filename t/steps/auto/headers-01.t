@@ -82,7 +82,7 @@ auto::headers::_set_from_Config($conf);
 ok(! $conf->data->get('i_niin'), "Mapping made correctly");
 
 {
-    $conf->data->set_p5( OSNAME => "msys" );
+    $conf->data->set( OSNAME_provisional => "msys" );
     my %extra_headers =
         map {$_, 1} auto::headers::_list_extra_headers($conf);
     ok($extra_headers{'sysmman.h'}, "Special header set for msys");

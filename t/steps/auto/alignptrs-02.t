@@ -36,10 +36,10 @@ my $step = test_step_constructor_and_description($conf);
 my $serialized = $conf->pcfreeze();
 
 {
-    $conf->data->set_p5( OSNAME => 'hpux' );
+    $conf->data->set( OSNAME_provisional => 'hpux' );
     my $ret = $step->runstep($conf);
     ok( $ret, "runstep() returned true value" );
-    if ( $conf->data->get_p5('ccflags') !~ /DD64/ ) {
+    if ( $conf->data->get('ccflags_provisional') !~ /DD64/ ) {
         is($conf->data->get('ptr_alignment'), 4,
             "Got expected pointer alignment for HP Unix");
         is($step->result(), qq{for hpux:  4 bytes},

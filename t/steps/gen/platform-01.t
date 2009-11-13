@@ -44,7 +44,7 @@ ok(-f $step->{platform_interface},
 
 my $platform_orig = $conf->data->get('osname');
 my $archname_orig = $conf->data->get('archname');
-$conf->data->set_p5( archname => 'foo-bar' );
+$conf->data->set( archname => 'foo-bar' );
 my $verbose = 0;
 
 ########## _get_generated() ##########

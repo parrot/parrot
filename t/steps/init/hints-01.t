@@ -149,8 +149,8 @@ $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
 {
     my ($stdout, $stderr, $ret);
-    $conf->data->set_p5( OSNAME => q{imaginaryOS} );
-    my $osname = lc( $conf->data->get_p5( 'OSNAME' ) );
+    $conf->data->set( OSNAME_provisional => q{imaginaryOS} );
+    my $osname = lc( $conf->data->get( 'OSNAME_provisional' ) );
     my $hints_file = catfile('config', 'init', 'hints', "$osname.pm");
     capture (
         sub { $ret = $step->runstep($conf); },

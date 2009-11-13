@@ -36,7 +36,7 @@ sub runstep {
 
     my $hints_used = 0;
 
-    my $osname = lc( $conf->data->get_p5('OSNAME') );
+    my $osname = lc( $conf->data->get('OSNAME_provisional') );
     $osname = 'linux' if ($osname eq 'gnukfreebsd');
     my $hints_file = catfile('config', 'init', 'hints', "$osname.pm");
     if ( -f $hints_file ) {
