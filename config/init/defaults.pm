@@ -53,7 +53,6 @@ sub runstep {
     foreach my $orig ( qw|
         archname
         ccflags
-        d_socklen_t
         longsize
         optimize
         use64bitint
@@ -73,6 +72,7 @@ sub runstep {
 
     # configtests branch:  We start to handle these things differently.
     foreach my $orig ( qw|
+        d_socklen_t
         scriptdirexp
         sig_name
         sPRIgldbl

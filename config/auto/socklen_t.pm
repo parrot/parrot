@@ -43,7 +43,7 @@ sub _probe_for_socklen_t {
     my $conf = shift;
     return $conf->data->get('has_socklen_t')
             ||
-           $conf->data->get_p5('d_socklen_t');
+           $conf->data->get('d_socklen_t_provisional');
 }
 
 sub _evaluate_socklen_t {
