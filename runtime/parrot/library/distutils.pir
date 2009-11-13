@@ -315,19 +315,28 @@ the key is the PIR pathname
 
 the value is an array of PGE pathname or a single PGE pathname
 
+=item pir_pge_flags
+
 =cut
 
 .sub '_build_pir_pge' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['pir_pge']
     unless $I0 goto L1
+    .local string flags
+    flags = ''
+    $I0 = exists kv['pir_pge_flags']
+    unless $I0 goto L2
+    flags = kv['pir_pge_flags']
+  L2:
     $P0 = kv['pir_pge']
-    build_pir_pge($P0)
+    build_pir_pge($P0, flags)
   L1:
 .end
 
 .sub 'build_pir_pge'
     .param pmc hash
+    .param string flags
     $P0 = iter hash
   L1:
     unless $P0 goto L2
@@ -353,6 +362,8 @@ the value is an array of PGE pathname or a single PGE pathname
     cmd .= $S0
     cmd .= "/library/PGE/Perl6Grammar.pbc --output="
     cmd .= pir
+    cmd .= " "
+    cmd .= flags
     cmd .= " "
     cmd .= src
     system(cmd)
@@ -411,19 +422,28 @@ the key is the PIR pathname
 
 the value is the NQP pathname
 
+=item pir_nqp_flags
+
 =cut
 
 .sub '_build_pir_nqp' :anon
     .param pmc kv :slurpy :named
     $I0 = exists kv['pir_nqp']
     unless $I0 goto L1
+    .local string flags
+    flags = ''
+    $I0 = exists kv['pir_nqp_flags']
+    unless $I0 goto L2
+    flags = kv['pir_nqp_flags']
+  L2:
     $P0 = kv['pir_nqp']
-    build_pir_nqp($P0)
+    build_pir_nqp($P0, flags)
   L1:
 .end
 
 .sub 'build_pir_nqp'
     .param pmc hash
+    .param string flags
     $P0 = iter hash
   L1:
     unless $P0 goto L2
@@ -439,6 +459,8 @@ the value is the NQP pathname
     cmd .= $S0
     cmd .= "/languages/nqp/nqp.pbc --target=pir --output="
     cmd .= pir
+    cmd .= " "
+    cmd .= flags
     cmd .= " "
     cmd .= nqp
     system(cmd)
