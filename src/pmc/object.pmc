@@ -620,7 +620,8 @@ Invokes the object (if this vtable function is overridden).
                 /* Experimental code. See DEPRECATED.pod */
                 PMC *call_sig = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
                 if (PMC_IS_NULL(interp->current_object) &&
-                        VTABLE_get_pmc_keyed_int(interp, call_sig, 0) != SELF)
+                        (VTABLE_elements(interp, call_sig) == 0 ||
+                        VTABLE_get_pmc_keyed_int(interp, call_sig, 0) != SELF))
                     VTABLE_unshift_pmc(interp, call_sig, SELF);
 
                 return VTABLE_invoke(interp, meth, next);
