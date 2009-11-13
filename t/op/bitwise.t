@@ -390,11 +390,11 @@ Tests various bitwise logical operations.
     interp = getinterp
     .local pmc config
     config = interp[.IGLOBALS_CONFIG_HASH]
-    .local string gmp
+    .local int gmp
     gmp = config['gmp']
     
     if gmp, runtest
-    skip( 1, 'no BigInt lib found' )
+    skip( 2, 'no BigInt lib found' )
     goto END
 
   runtest:
