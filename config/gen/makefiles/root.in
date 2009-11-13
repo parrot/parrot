@@ -2277,6 +2277,8 @@ $(LIBNCI_TEST_SO): $(SRC_DIR)/nci_test$(O) $(LIBPARROT)
     @ld_out@$@ $(SRC_DIR)/nci_test$(O) $(C_LIBS)
 
 # for use by runtime/parrot/library/OpenGL.pir
+$(SRC_DIR)/glut_callbacks$(O): $(GENERAL_H_FILES)
+
 $(LIBGLUTCB_SO): $(LIBPARROT) $(SRC_DIR)/glut_callbacks$(O)
 	$(LD) $(LD_LOAD_FLAGS) $(LDFLAGS) \
     @ld_out@$@ $(SRC_DIR)/glut_callbacks$(O) \
