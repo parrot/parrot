@@ -56,7 +56,6 @@ sub runstep {
         d_socklen_t
         longsize
         optimize
-        sig_name
         use64bitint
     | ) {
         $conf->data->set_p5( $orig => $Config{$orig} );
@@ -75,6 +74,7 @@ sub runstep {
     # configtests branch:  We start to handle these things differently.
     foreach my $orig ( qw|
         scriptdirexp
+        sig_name
         sPRIgldbl
     | ) {
         $conf->data->set( qq|${orig}_provisional| => $Config{$orig} );
