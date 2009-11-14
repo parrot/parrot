@@ -1401,14 +1401,20 @@ the default value is "t/*.t"
     unless $I0 goto L1
     cmd .= " --exec="
     $S0 = kv['prove_exec']
+    $I0 = index $S0, ' '
+    if $I0 < 0 goto L2
+    cmd .= "\""
+  L2:
     cmd .= $S0
+    if $I0 < 0 goto L1
+    cmd .= "\""
   L1:
     cmd .= " "
     $S0 = "t/*.t" # default
     $I0 = exists kv['prove_files']
-    unless $I0 goto L2
+    unless $I0 goto L3
     $S0 = kv['prove_files']
-  L2:
+  L3:
     cmd .= $S0
     system(cmd)
 .end
