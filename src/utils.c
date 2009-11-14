@@ -544,6 +544,7 @@ PMC*
 tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
 {
     ASSERT_ARGS(tm_to_array)
+    /* TT #1270 Should make this a FixedIntegerArray instead of an Array */
     PMC * const Array = pmc_new(interp, enum_class_Array);
 
     VTABLE_set_integer_native(interp, Array, 9);
