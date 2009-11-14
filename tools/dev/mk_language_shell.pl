@@ -311,6 +311,11 @@ SOURCES
     $P9['parrot-xyz'] = 'xyz.pbc'
     $P0['installable_pbc'] = $P9
 
+    # test
+    $S0 = get_parrot()
+    $S0 .= ' xyz.pbc'
+    $P0['prove_exec'] = $S0 # used unless t/harness exists
+
     # install
     $P0['inst_lang'] = 'xyz/xyz.pbc'
 
@@ -657,6 +662,7 @@ help:
 
 test: build
 	$(PERL) -I$(LIB_DIR)/tools/lib t/harness --bindir=$(BIN_DIR)
+#	prove --exec="$(PARROT) @lclang@.pbc" t/*.t
 
 # basic run for missing libs
 test-installable: installable
