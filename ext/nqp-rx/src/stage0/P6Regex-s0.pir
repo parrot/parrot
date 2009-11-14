@@ -18,10 +18,10 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .namespace []
 .sub "_block11"  :anon :subid("10_1258128993.11955")
 .annotate "line", 0
-    get_hll_global $P14, ["Regex";"P6Regex";"Grammar"], "_block13" 
+    get_hll_global $P14, ["Regex";"P6Regex";"Grammar"], "_block13"
     capture_lex $P14
 .annotate "line", 3
-    get_hll_global $P14, ["Regex";"P6Regex";"Grammar"], "_block13" 
+    get_hll_global $P14, ["Regex";"P6Regex";"Grammar"], "_block13"
     capture_lex $P14
     $P523 = $P14()
 .annotate "line", 1
@@ -32,7 +32,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .namespace []
 .sub "" :load :init :subid("post158") :outer("10_1258128993.11955")
 .annotate "line", 0
-    .const 'Sub' $P12 = "10_1258128993.11955" 
+    .const 'Sub' $P12 = "10_1258128993.11955"
     .local pmc block
     set block, $P12
     $P524 = get_root_global ["parrot"], "P6metaclass"
@@ -43,131 +43,131 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .namespace ["Regex";"P6Regex";"Grammar"]
 .sub "_block13"  :subid("11_1258128993.11955") :outer("10_1258128993.11955")
 .annotate "line", 3
-    .const 'Sub' $P516 = "156_1258128993.11955" 
+    .const 'Sub' $P516 = "156_1258128993.11955"
     capture_lex $P516
-    .const 'Sub' $P509 = "154_1258128993.11955" 
+    .const 'Sub' $P509 = "154_1258128993.11955"
     capture_lex $P509
-    .const 'Sub' $P502 = "152_1258128993.11955" 
+    .const 'Sub' $P502 = "152_1258128993.11955"
     capture_lex $P502
-    .const 'Sub' $P482 = "147_1258128993.11955" 
+    .const 'Sub' $P482 = "147_1258128993.11955"
     capture_lex $P482
-    .const 'Sub' $P448 = "141_1258128993.11955" 
+    .const 'Sub' $P448 = "141_1258128993.11955"
     capture_lex $P448
-    .const 'Sub' $P437 = "138_1258128993.11955" 
+    .const 'Sub' $P437 = "138_1258128993.11955"
     capture_lex $P437
-    .const 'Sub' $P425 = "135_1258128993.11955" 
+    .const 'Sub' $P425 = "135_1258128993.11955"
     capture_lex $P425
-    .const 'Sub' $P420 = "133_1258128993.11955" 
+    .const 'Sub' $P420 = "133_1258128993.11955"
     capture_lex $P420
-    .const 'Sub' $P410 = "130_1258128993.11955" 
+    .const 'Sub' $P410 = "130_1258128993.11955"
     capture_lex $P410
-    .const 'Sub' $P400 = "127_1258128993.11955" 
+    .const 'Sub' $P400 = "127_1258128993.11955"
     capture_lex $P400
-    .const 'Sub' $P392 = "123_1258128993.11955" 
+    .const 'Sub' $P392 = "123_1258128993.11955"
     capture_lex $P392
-    .const 'Sub' $P387 = "121_1258128993.11955" 
+    .const 'Sub' $P387 = "121_1258128993.11955"
     capture_lex $P387
-    .const 'Sub' $P382 = "119_1258128993.11955" 
+    .const 'Sub' $P382 = "119_1258128993.11955"
     capture_lex $P382
-    .const 'Sub' $P377 = "117_1258128993.11955" 
+    .const 'Sub' $P377 = "117_1258128993.11955"
     capture_lex $P377
-    .const 'Sub' $P372 = "115_1258128993.11955" 
+    .const 'Sub' $P372 = "115_1258128993.11955"
     capture_lex $P372
-    .const 'Sub' $P362 = "113_1258128993.11955" 
+    .const 'Sub' $P362 = "113_1258128993.11955"
     capture_lex $P362
-    .const 'Sub' $P352 = "111_1258128993.11955" 
+    .const 'Sub' $P352 = "111_1258128993.11955"
     capture_lex $P352
-    .const 'Sub' $P345 = "109_1258128993.11955" 
+    .const 'Sub' $P345 = "109_1258128993.11955"
     capture_lex $P345
-    .const 'Sub' $P340 = "107_1258128993.11955" 
+    .const 'Sub' $P340 = "107_1258128993.11955"
     capture_lex $P340
-    .const 'Sub' $P335 = "105_1258128993.11955" 
+    .const 'Sub' $P335 = "105_1258128993.11955"
     capture_lex $P335
-    .const 'Sub' $P330 = "103_1258128993.11955" 
+    .const 'Sub' $P330 = "103_1258128993.11955"
     capture_lex $P330
-    .const 'Sub' $P325 = "101_1258128993.11955" 
+    .const 'Sub' $P325 = "101_1258128993.11955"
     capture_lex $P325
-    .const 'Sub' $P320 = "99_1258128993.11955" 
+    .const 'Sub' $P320 = "99_1258128993.11955"
     capture_lex $P320
-    .const 'Sub' $P315 = "97_1258128993.11955" 
+    .const 'Sub' $P315 = "97_1258128993.11955"
     capture_lex $P315
-    .const 'Sub' $P310 = "95_1258128993.11955" 
+    .const 'Sub' $P310 = "95_1258128993.11955"
     capture_lex $P310
-    .const 'Sub' $P305 = "93_1258128993.11955" 
+    .const 'Sub' $P305 = "93_1258128993.11955"
     capture_lex $P305
-    .const 'Sub' $P294 = "89_1258128993.11955" 
+    .const 'Sub' $P294 = "89_1258128993.11955"
     capture_lex $P294
-    .const 'Sub' $P283 = "87_1258128993.11955" 
+    .const 'Sub' $P283 = "87_1258128993.11955"
     capture_lex $P283
-    .const 'Sub' $P277 = "85_1258128993.11955" 
+    .const 'Sub' $P277 = "85_1258128993.11955"
     capture_lex $P277
-    .const 'Sub' $P261 = "83_1258128993.11955" 
+    .const 'Sub' $P261 = "83_1258128993.11955"
     capture_lex $P261
-    .const 'Sub' $P255 = "81_1258128993.11955" 
+    .const 'Sub' $P255 = "81_1258128993.11955"
     capture_lex $P255
-    .const 'Sub' $P250 = "79_1258128993.11955" 
+    .const 'Sub' $P250 = "79_1258128993.11955"
     capture_lex $P250
-    .const 'Sub' $P245 = "77_1258128993.11955" 
+    .const 'Sub' $P245 = "77_1258128993.11955"
     capture_lex $P245
-    .const 'Sub' $P239 = "75_1258128993.11955" 
+    .const 'Sub' $P239 = "75_1258128993.11955"
     capture_lex $P239
-    .const 'Sub' $P233 = "73_1258128993.11955" 
+    .const 'Sub' $P233 = "73_1258128993.11955"
     capture_lex $P233
-    .const 'Sub' $P227 = "71_1258128993.11955" 
+    .const 'Sub' $P227 = "71_1258128993.11955"
     capture_lex $P227
-    .const 'Sub' $P221 = "69_1258128993.11955" 
+    .const 'Sub' $P221 = "69_1258128993.11955"
     capture_lex $P221
-    .const 'Sub' $P216 = "67_1258128993.11955" 
+    .const 'Sub' $P216 = "67_1258128993.11955"
     capture_lex $P216
-    .const 'Sub' $P211 = "65_1258128993.11955" 
+    .const 'Sub' $P211 = "65_1258128993.11955"
     capture_lex $P211
-    .const 'Sub' $P206 = "63_1258128993.11955" 
+    .const 'Sub' $P206 = "63_1258128993.11955"
     capture_lex $P206
-    .const 'Sub' $P201 = "61_1258128993.11955" 
+    .const 'Sub' $P201 = "61_1258128993.11955"
     capture_lex $P201
-    .const 'Sub' $P196 = "59_1258128993.11955" 
+    .const 'Sub' $P196 = "59_1258128993.11955"
     capture_lex $P196
-    .const 'Sub' $P191 = "57_1258128993.11955" 
+    .const 'Sub' $P191 = "57_1258128993.11955"
     capture_lex $P191
-    .const 'Sub' $P186 = "55_1258128993.11955" 
+    .const 'Sub' $P186 = "55_1258128993.11955"
     capture_lex $P186
-    .const 'Sub' $P181 = "53_1258128993.11955" 
+    .const 'Sub' $P181 = "53_1258128993.11955"
     capture_lex $P181
-    .const 'Sub' $P176 = "51_1258128993.11955" 
+    .const 'Sub' $P176 = "51_1258128993.11955"
     capture_lex $P176
-    .const 'Sub' $P161 = "46_1258128993.11955" 
+    .const 'Sub' $P161 = "46_1258128993.11955"
     capture_lex $P161
-    .const 'Sub' $P150 = "44_1258128993.11955" 
+    .const 'Sub' $P150 = "44_1258128993.11955"
     capture_lex $P150
-    .const 'Sub' $P144 = "42_1258128993.11955" 
+    .const 'Sub' $P144 = "42_1258128993.11955"
     capture_lex $P144
-    .const 'Sub' $P138 = "40_1258128993.11955" 
+    .const 'Sub' $P138 = "40_1258128993.11955"
     capture_lex $P138
-    .const 'Sub' $P132 = "38_1258128993.11955" 
+    .const 'Sub' $P132 = "38_1258128993.11955"
     capture_lex $P132
-    .const 'Sub' $P114 = "33_1258128993.11955" 
+    .const 'Sub' $P114 = "33_1258128993.11955"
     capture_lex $P114
-    .const 'Sub' $P102 = "30_1258128993.11955" 
+    .const 'Sub' $P102 = "30_1258128993.11955"
     capture_lex $P102
-    .const 'Sub' $P96 = "28_1258128993.11955" 
+    .const 'Sub' $P96 = "28_1258128993.11955"
     capture_lex $P96
-    .const 'Sub' $P85 = "26_1258128993.11955" 
+    .const 'Sub' $P85 = "26_1258128993.11955"
     capture_lex $P85
-    .const 'Sub' $P79 = "24_1258128993.11955" 
+    .const 'Sub' $P79 = "24_1258128993.11955"
     capture_lex $P79
-    .const 'Sub' $P68 = "22_1258128993.11955" 
+    .const 'Sub' $P68 = "22_1258128993.11955"
     capture_lex $P68
-    .const 'Sub' $P61 = "20_1258128993.11955" 
+    .const 'Sub' $P61 = "20_1258128993.11955"
     capture_lex $P61
-    .const 'Sub' $P54 = "18_1258128993.11955" 
+    .const 'Sub' $P54 = "18_1258128993.11955"
     capture_lex $P54
-    .const 'Sub' $P45 = "15_1258128993.11955" 
+    .const 'Sub' $P45 = "15_1258128993.11955"
     capture_lex $P45
-    .const 'Sub' $P38 = "13_1258128993.11955" 
+    .const 'Sub' $P38 = "13_1258128993.11955"
     capture_lex $P38
-    .const 'Sub' $P15 = "12_1258128993.11955" 
+    .const 'Sub' $P15 = "12_1258128993.11955"
     capture_lex $P15
-    .const 'Sub' $P516 = "156_1258128993.11955" 
+    .const 'Sub' $P516 = "156_1258128993.11955"
     capture_lex $P516
     .return ($P516)
 .end
@@ -214,8 +214,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 3
     .return ($P36)
   control_16:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P37, exception, "payload"
     .return ($P37)
     rethrow exception
@@ -304,7 +304,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .namespace ["Regex";"P6Regex";"Grammar"]
 .sub "normspace"  :subid("15_1258128993.11955") :method :outer("11_1258128993.11955")
 .annotate "line", 3
-    .const 'Sub' $P50 = "17_1258128993.11955" 
+    .const 'Sub' $P50 = "17_1258128993.11955"
     capture_lex $P50
     .local string rx46_tgt
     .local int rx46_pos
@@ -326,7 +326,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 10
   # rx subrule "before" subtype=zerowidth negate=
     rx46_cur."!cursor_pos"(rx46_pos)
-    .const 'Sub' $P50 = "17_1258128993.11955" 
+    .const 'Sub' $P50 = "17_1258128993.11955"
     capture_lex $P50
     $P10 = rx46_cur."before"($P50)
     unless $P10, rx46_fail
@@ -462,7 +462,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     set_addr $I59, rxquantr58_done
     rx55_cur."!mark_push"(0, rx55_pos, $I59)
   rxquantr58_loop:
-  # rx enumcharlist negate=1 
+  # rx enumcharlist negate=1
     ge rx55_pos, rx55_eos, rx55_fail
     sub $I10, rx55_pos, rx55_off
     substr $S10, rx55_tgt, $I10, 1
@@ -1011,7 +1011,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .namespace ["Regex";"P6Regex";"Grammar"]
 .sub "quantified_atom"  :subid("30_1258128993.11955") :method :outer("11_1258128993.11955")
 .annotate "line", 3
-    .const 'Sub' $P110 = "32_1258128993.11955" 
+    .const 'Sub' $P110 = "32_1258128993.11955"
     capture_lex $P110
     .local string rx103_tgt
     .local int rx103_pos
@@ -1062,7 +1062,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
   alt108_1:
   # rx subrule "before" subtype=zerowidth negate=
     rx103_cur."!cursor_pos"(rx103_pos)
-    .const 'Sub' $P110 = "32_1258128993.11955" 
+    .const 'Sub' $P110 = "32_1258128993.11955"
     capture_lex $P110
     $P10 = rx103_cur."before"($P110)
     unless $P10, rx103_fail
@@ -1165,7 +1165,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .namespace ["Regex";"P6Regex";"Grammar"]
 .sub "atom"  :subid("33_1258128993.11955") :method :outer("11_1258128993.11955")
 .annotate "line", 3
-    .const 'Sub' $P124 = "35_1258128993.11955" 
+    .const 'Sub' $P124 = "35_1258128993.11955"
     capture_lex $P124
     .local string rx115_tgt
     .local int rx115_pos
@@ -1213,7 +1213,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
   rxquantg121_done:
   # rx subrule "before" subtype=zerowidth negate=
     rx115_cur."!cursor_pos"(rx115_pos)
-    .const 'Sub' $P124 = "35_1258128993.11955" 
+    .const 'Sub' $P124 = "35_1258128993.11955"
     capture_lex $P124
     $P10 = rx115_cur."before"($P124)
     unless $P10, rx115_fail
@@ -1730,7 +1730,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .namespace ["Regex";"P6Regex";"Grammar"]
 .sub "backmod"  :subid("46_1258128993.11955") :method :outer("11_1258128993.11955")
 .annotate "line", 3
-    .const 'Sub' $P169 = "48_1258128993.11955" 
+    .const 'Sub' $P169 = "48_1258128993.11955"
     capture_lex $P169
     .local string rx162_tgt
     .local int rx162_pos
@@ -1788,7 +1788,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
   alt167_2:
   # rx subrule "before" subtype=zerowidth negate=1
     rx162_cur."!cursor_pos"(rx162_pos)
-    .const 'Sub' $P169 = "48_1258128993.11955" 
+    .const 'Sub' $P169 = "48_1258128993.11955"
     capture_lex $P169
     $P10 = rx162_cur."before"($P169)
     if $P10, rx162_fail
@@ -3068,7 +3068,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     set_addr $I268, rxquantr267_done
     rx262_cur."!mark_push"(0, rx262_pos, $I268)
   rxquantr267_loop:
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx262_pos, rx262_eos, rx262_fail
     sub $I10, rx262_pos, rx262_off
     substr $S10, rx262_tgt, $I10, 1
@@ -3090,7 +3090,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     set_addr $I270, rxquantr269_done
     rx262_cur."!mark_push"(0, rx262_pos, $I270)
   rxquantr269_loop:
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx262_pos, rx262_eos, rx262_fail
     sub $I10, rx262_pos, rx262_off
     substr $S10, rx262_tgt, $I10, 1
@@ -3118,7 +3118,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     set_addr $I273, rxquantr272_done
     rx262_cur."!mark_push"(0, -1, $I273)
   rxquantr272_loop:
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx262_pos, rx262_eos, rx262_fail
     sub $I10, rx262_pos, rx262_off
     substr $S10, rx262_tgt, $I10, 1
@@ -3303,7 +3303,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     set_addr $I289, rxquantr288_done
     rx284_cur."!mark_push"(0, -1, $I289)
   rxquantr288_loop:
-  # rx enumcharlist negate=1 
+  # rx enumcharlist negate=1
     ge rx284_pos, rx284_eos, rx284_fail
     sub $I10, rx284_pos, rx284_off
     substr $S10, rx284_tgt, $I10, 1
@@ -3551,7 +3551,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
   # rx subcapture "sym"
     set_addr $I10, rxcap_309_fail
     rx306_cur."!mark_push"(0, rx306_pos, $I10)
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx306_pos, rx306_eos, rx306_fail
     sub $I10, rx306_pos, rx306_off
     substr $S10, rx306_tgt, $I10, 1
@@ -3627,7 +3627,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
   # rx subcapture "sym"
     set_addr $I10, rxcap_314_fail
     rx311_cur."!mark_push"(0, rx311_pos, $I10)
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx311_pos, rx311_eos, rx311_fail
     sub $I10, rx311_pos, rx311_off
     substr $S10, rx311_tgt, $I10, 1
@@ -3697,7 +3697,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
   # rx subcapture "sym"
     set_addr $I10, rxcap_319_fail
     rx316_cur."!mark_push"(0, rx316_pos, $I10)
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx316_pos, rx316_eos, rx316_fail
     sub $I10, rx316_pos, rx316_off
     substr $S10, rx316_tgt, $I10, 1
@@ -3767,7 +3767,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
   # rx subcapture "sym"
     set_addr $I10, rxcap_324_fail
     rx321_cur."!mark_push"(0, rx321_pos, $I10)
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx321_pos, rx321_eos, rx321_fail
     sub $I10, rx321_pos, rx321_off
     substr $S10, rx321_tgt, $I10, 1
@@ -3837,7 +3837,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
   # rx subcapture "sym"
     set_addr $I10, rxcap_329_fail
     rx326_cur."!mark_push"(0, rx326_pos, $I10)
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx326_pos, rx326_eos, rx326_fail
     sub $I10, rx326_pos, rx326_off
     substr $S10, rx326_tgt, $I10, 1
@@ -3907,7 +3907,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
   # rx subcapture "sym"
     set_addr $I10, rxcap_334_fail
     rx331_cur."!mark_push"(0, rx331_pos, $I10)
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx331_pos, rx331_eos, rx331_fail
     sub $I10, rx331_pos, rx331_off
     substr $S10, rx331_tgt, $I10, 1
@@ -3977,7 +3977,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
   # rx subcapture "sym"
     set_addr $I10, rxcap_339_fail
     rx336_cur."!mark_push"(0, rx336_pos, $I10)
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx336_pos, rx336_eos, rx336_fail
     sub $I10, rx336_pos, rx336_off
     substr $S10, rx336_tgt, $I10, 1
@@ -4047,7 +4047,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
   # rx subcapture "sym"
     set_addr $I10, rxcap_344_fail
     rx341_cur."!mark_push"(0, rx341_pos, $I10)
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx341_pos, rx341_eos, rx341_fail
     sub $I10, rx341_pos, rx341_off
     substr $S10, rx341_tgt, $I10, 1
@@ -4117,7 +4117,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
   # rx subcapture "sym"
     set_addr $I10, rxcap_351_fail
     rx346_cur."!mark_push"(0, rx346_pos, $I10)
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx346_pos, rx346_eos, rx346_fail
     sub $I10, rx346_pos, rx346_off
     substr $S10, rx346_tgt, $I10, 1
@@ -4196,7 +4196,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
   # rx subcapture "sym"
     set_addr $I10, rxcap_360_fail
     rx353_cur."!mark_push"(0, rx353_pos, $I10)
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx353_pos, rx353_eos, rx353_fail
     sub $I10, rx353_pos, rx353_off
     substr $S10, rx353_tgt, $I10, 1
@@ -4306,7 +4306,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
   # rx subcapture "sym"
     set_addr $I10, rxcap_370_fail
     rx363_cur."!mark_push"(0, rx363_pos, $I10)
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx363_pos, rx363_eos, rx363_fail
     sub $I10, rx363_pos, rx363_off
     substr $S10, rx363_tgt, $I10, 1
@@ -4709,7 +4709,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .namespace ["Regex";"P6Regex";"Grammar"]
 .sub "assertion:sym<?>"  :subid("127_1258128993.11955") :method :outer("11_1258128993.11955")
 .annotate "line", 3
-    .const 'Sub' $P407 = "129_1258128993.11955" 
+    .const 'Sub' $P407 = "129_1258128993.11955"
     capture_lex $P407
     .local string rx401_tgt
     .local int rx401_pos
@@ -4741,7 +4741,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     rx401_cur."!mark_push"(0, rx401_pos, $I10)
   # rx subrule "before" subtype=zerowidth negate=
     rx401_cur."!cursor_pos"(rx401_pos)
-    .const 'Sub' $P407 = "129_1258128993.11955" 
+    .const 'Sub' $P407 = "129_1258128993.11955"
     capture_lex $P407
     $P10 = rx401_cur."before"($P407)
     unless $P10, rx401_fail
@@ -4840,7 +4840,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .namespace ["Regex";"P6Regex";"Grammar"]
 .sub "assertion:sym<!>"  :subid("130_1258128993.11955") :method :outer("11_1258128993.11955")
 .annotate "line", 3
-    .const 'Sub' $P417 = "132_1258128993.11955" 
+    .const 'Sub' $P417 = "132_1258128993.11955"
     capture_lex $P417
     .local string rx411_tgt
     .local int rx411_pos
@@ -4872,7 +4872,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     rx411_cur."!mark_push"(0, rx411_pos, $I10)
   # rx subrule "before" subtype=zerowidth negate=
     rx411_cur."!cursor_pos"(rx411_pos)
-    .const 'Sub' $P417 = "132_1258128993.11955" 
+    .const 'Sub' $P417 = "132_1258128993.11955"
     capture_lex $P417
     $P10 = rx411_cur."before"($P417)
     unless $P10, rx411_fail
@@ -5035,7 +5035,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .namespace ["Regex";"P6Regex";"Grammar"]
 .sub "assertion:sym<name>"  :subid("135_1258128993.11955") :method :outer("11_1258128993.11955")
 .annotate "line", 3
-    .const 'Sub' $P433 = "137_1258128993.11955" 
+    .const 'Sub' $P433 = "137_1258128993.11955"
     capture_lex $P433
     .local string rx426_tgt
     .local int rx426_pos
@@ -5088,7 +5088,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 143
   # rx subrule "before" subtype=zerowidth negate=
     rx426_cur."!cursor_pos"(rx426_pos)
-    .const 'Sub' $P433 = "137_1258128993.11955" 
+    .const 'Sub' $P433 = "137_1258128993.11955"
     capture_lex $P433
     $P10 = rx426_cur."before"($P433)
     unless $P10, rx426_fail
@@ -5259,7 +5259,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .namespace ["Regex";"P6Regex";"Grammar"]
 .sub "assertion:sym<[>"  :subid("138_1258128993.11955") :method :outer("11_1258128993.11955")
 .annotate "line", 3
-    .const 'Sub' $P442 = "140_1258128993.11955" 
+    .const 'Sub' $P442 = "140_1258128993.11955"
     capture_lex $P442
     .local string rx438_tgt
     .local int rx438_pos
@@ -5282,7 +5282,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 151
   # rx subrule "before" subtype=zerowidth negate=
     rx438_cur."!cursor_pos"(rx438_pos)
-    .const 'Sub' $P442 = "140_1258128993.11955" 
+    .const 'Sub' $P442 = "140_1258128993.11955"
     capture_lex $P442
     $P10 = rx438_cur."before"($P442)
     unless $P10, rx438_fail
@@ -5408,7 +5408,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .namespace ["Regex";"P6Regex";"Grammar"]
 .sub "cclass_elem"  :subid("141_1258128993.11955") :method :outer("11_1258128993.11955")
 .annotate "line", 3
-    .const 'Sub' $P459 = "143_1258128993.11955" 
+    .const 'Sub' $P459 = "143_1258128993.11955"
     capture_lex $P459
     .local string rx449_tgt
     .local int rx449_pos
@@ -5499,7 +5499,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 157
   # rx subrule $P459 subtype=capture negate=
     rx449_cur."!cursor_pos"(rx449_pos)
-    .const 'Sub' $P459 = "143_1258128993.11955" 
+    .const 'Sub' $P459 = "143_1258128993.11955"
     capture_lex $P459
     $P10 = rx449_cur.$P459()
     unless $P10, rx449_fail
@@ -5593,11 +5593,11 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .namespace ["Regex";"P6Regex";"Grammar"]
 .sub "_block458"  :anon :subid("143_1258128993.11955") :method :outer("141_1258128993.11955")
 .annotate "line", 157
-    .const 'Sub' $P474 = "146_1258128993.11955" 
+    .const 'Sub' $P474 = "146_1258128993.11955"
     capture_lex $P474
-    .const 'Sub' $P469 = "145_1258128993.11955" 
+    .const 'Sub' $P469 = "145_1258128993.11955"
     capture_lex $P469
-    .const 'Sub' $P465 = "144_1258128993.11955" 
+    .const 'Sub' $P465 = "144_1258128993.11955"
     capture_lex $P465
     .local string rx460_tgt
     .local int rx460_pos
@@ -5665,7 +5665,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     add rx460_pos, 1
   # rx subrule $P465 subtype=capture negate=
     rx460_cur."!cursor_pos"(rx460_pos)
-    .const 'Sub' $P465 = "144_1258128993.11955" 
+    .const 'Sub' $P465 = "144_1258128993.11955"
     capture_lex $P465
     $P10 = rx460_cur.$P465()
     unless $P10, rx460_fail
@@ -5676,7 +5676,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
   alt463_1:
   # rx subrule $P469 subtype=capture negate=
     rx460_cur."!cursor_pos"(rx460_pos)
-    .const 'Sub' $P469 = "145_1258128993.11955" 
+    .const 'Sub' $P469 = "145_1258128993.11955"
     capture_lex $P469
     $P10 = rx460_cur.$P469()
     unless $P10, rx460_fail
@@ -5705,7 +5705,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     add rx460_pos, rx460_off, $I11
   # rx subrule $P474 subtype=capture negate=
     rx460_cur."!cursor_pos"(rx460_pos)
-    .const 'Sub' $P474 = "146_1258128993.11955" 
+    .const 'Sub' $P474 = "146_1258128993.11955"
     capture_lex $P474
     $P10 = rx460_cur.$P474()
     unless $P10, rx460_fail
@@ -5811,7 +5811,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     set_addr $I10, rxscan471_loop
     rx470_cur."!mark_push"(0, rx470_pos, $I10)
   rxscan471_done:
-  # rx enumcharlist negate=1 
+  # rx enumcharlist negate=1
     ge rx470_pos, rx470_eos, rx470_fail
     sub $I10, rx470_pos, rx470_off
     substr $S10, rx470_tgt, $I10, 1
@@ -5887,7 +5887,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .namespace ["Regex";"P6Regex";"Grammar"]
 .sub "mod_internal"  :subid("147_1258128993.11955") :method :outer("11_1258128993.11955")
 .annotate "line", 3
-    .const 'Sub' $P490 = "149_1258128993.11955" 
+    .const 'Sub' $P490 = "149_1258128993.11955"
     capture_lex $P490
     .local string rx483_tgt
     .local int rx483_pos
@@ -5925,7 +5925,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
   rxquantr488_loop:
   # rx subrule $P490 subtype=capture negate=
     rx483_cur."!cursor_pos"(rx483_pos)
-    .const 'Sub' $P490 = "149_1258128993.11955" 
+    .const 'Sub' $P490 = "149_1258128993.11955"
     capture_lex $P490
     $P10 = rx483_cur.$P490()
     unless $P10, rx483_fail
@@ -6368,10 +6368,10 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .namespace []
 .sub "_block11"  :anon :subid("10_1258129000.66298")
 .annotate "line", 0
-    get_hll_global $P14, ["Regex";"P6Regex";"Actions"], "_block13" 
+    get_hll_global $P14, ["Regex";"P6Regex";"Actions"], "_block13"
     capture_lex $P14
 .annotate "line", 4
-    get_hll_global $P14, ["Regex";"P6Regex";"Actions"], "_block13" 
+    get_hll_global $P14, ["Regex";"P6Regex";"Actions"], "_block13"
     capture_lex $P14
     $P1509 = $P14()
 .annotate "line", 1
@@ -6382,7 +6382,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .namespace []
 .sub "" :load :init :subid("post88") :outer("10_1258129000.66298")
 .annotate "line", 0
-    .const 'Sub' $P12 = "10_1258129000.66298" 
+    .const 'Sub' $P12 = "10_1258129000.66298"
     .local pmc block
     set block, $P12
     $P1510 = get_root_global ["parrot"], "P6metaclass"
@@ -6393,111 +6393,111 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .namespace ["Regex";"P6Regex";"Actions"]
 .sub "_block13"  :subid("11_1258129000.66298") :outer("10_1258129000.66298")
 .annotate "line", 4
-    .const 'Sub' $P1476 = "87_1258129000.66298" 
+    .const 'Sub' $P1476 = "87_1258129000.66298"
     capture_lex $P1476
-    .const 'Sub' $P1407 = "83_1258129000.66298" 
+    .const 'Sub' $P1407 = "83_1258129000.66298"
     capture_lex $P1407
-    .const 'Sub' $P1339 = "81_1258129000.66298" 
+    .const 'Sub' $P1339 = "81_1258129000.66298"
     capture_lex $P1339
-    .const 'Sub' $P1266 = "78_1258129000.66298" 
+    .const 'Sub' $P1266 = "78_1258129000.66298"
     capture_lex $P1266
-    .const 'Sub' $P1253 = "77_1258129000.66298" 
+    .const 'Sub' $P1253 = "77_1258129000.66298"
     capture_lex $P1253
-    .const 'Sub' $P1229 = "76_1258129000.66298" 
+    .const 'Sub' $P1229 = "76_1258129000.66298"
     capture_lex $P1229
-    .const 'Sub' $P1211 = "75_1258129000.66298" 
+    .const 'Sub' $P1211 = "75_1258129000.66298"
     capture_lex $P1211
-    .const 'Sub' $P1197 = "74_1258129000.66298" 
+    .const 'Sub' $P1197 = "74_1258129000.66298"
     capture_lex $P1197
-    .const 'Sub' $P1166 = "73_1258129000.66298" 
+    .const 'Sub' $P1166 = "73_1258129000.66298"
     capture_lex $P1166
-    .const 'Sub' $P1135 = "72_1258129000.66298" 
+    .const 'Sub' $P1135 = "72_1258129000.66298"
     capture_lex $P1135
-    .const 'Sub' $P1119 = "71_1258129000.66298" 
+    .const 'Sub' $P1119 = "71_1258129000.66298"
     capture_lex $P1119
-    .const 'Sub' $P1103 = "70_1258129000.66298" 
+    .const 'Sub' $P1103 = "70_1258129000.66298"
     capture_lex $P1103
-    .const 'Sub' $P1087 = "69_1258129000.66298" 
+    .const 'Sub' $P1087 = "69_1258129000.66298"
     capture_lex $P1087
-    .const 'Sub' $P1071 = "68_1258129000.66298" 
+    .const 'Sub' $P1071 = "68_1258129000.66298"
     capture_lex $P1071
-    .const 'Sub' $P1055 = "67_1258129000.66298" 
+    .const 'Sub' $P1055 = "67_1258129000.66298"
     capture_lex $P1055
-    .const 'Sub' $P1039 = "66_1258129000.66298" 
+    .const 'Sub' $P1039 = "66_1258129000.66298"
     capture_lex $P1039
-    .const 'Sub' $P1023 = "65_1258129000.66298" 
+    .const 'Sub' $P1023 = "65_1258129000.66298"
     capture_lex $P1023
-    .const 'Sub' $P999 = "64_1258129000.66298" 
+    .const 'Sub' $P999 = "64_1258129000.66298"
     capture_lex $P999
-    .const 'Sub' $P984 = "63_1258129000.66298" 
+    .const 'Sub' $P984 = "63_1258129000.66298"
     capture_lex $P984
-    .const 'Sub' $P928 = "62_1258129000.66298" 
+    .const 'Sub' $P928 = "62_1258129000.66298"
     capture_lex $P928
-    .const 'Sub' $P907 = "61_1258129000.66298" 
+    .const 'Sub' $P907 = "61_1258129000.66298"
     capture_lex $P907
-    .const 'Sub' $P885 = "60_1258129000.66298" 
+    .const 'Sub' $P885 = "60_1258129000.66298"
     capture_lex $P885
-    .const 'Sub' $P875 = "59_1258129000.66298" 
+    .const 'Sub' $P875 = "59_1258129000.66298"
     capture_lex $P875
-    .const 'Sub' $P865 = "58_1258129000.66298" 
+    .const 'Sub' $P865 = "58_1258129000.66298"
     capture_lex $P865
-    .const 'Sub' $P855 = "57_1258129000.66298" 
+    .const 'Sub' $P855 = "57_1258129000.66298"
     capture_lex $P855
-    .const 'Sub' $P843 = "56_1258129000.66298" 
+    .const 'Sub' $P843 = "56_1258129000.66298"
     capture_lex $P843
-    .const 'Sub' $P831 = "55_1258129000.66298" 
+    .const 'Sub' $P831 = "55_1258129000.66298"
     capture_lex $P831
-    .const 'Sub' $P819 = "54_1258129000.66298" 
+    .const 'Sub' $P819 = "54_1258129000.66298"
     capture_lex $P819
-    .const 'Sub' $P807 = "53_1258129000.66298" 
+    .const 'Sub' $P807 = "53_1258129000.66298"
     capture_lex $P807
-    .const 'Sub' $P795 = "52_1258129000.66298" 
+    .const 'Sub' $P795 = "52_1258129000.66298"
     capture_lex $P795
-    .const 'Sub' $P783 = "51_1258129000.66298" 
+    .const 'Sub' $P783 = "51_1258129000.66298"
     capture_lex $P783
-    .const 'Sub' $P771 = "50_1258129000.66298" 
+    .const 'Sub' $P771 = "50_1258129000.66298"
     capture_lex $P771
-    .const 'Sub' $P759 = "49_1258129000.66298" 
+    .const 'Sub' $P759 = "49_1258129000.66298"
     capture_lex $P759
-    .const 'Sub' $P743 = "48_1258129000.66298" 
+    .const 'Sub' $P743 = "48_1258129000.66298"
     capture_lex $P743
-    .const 'Sub' $P725 = "47_1258129000.66298" 
+    .const 'Sub' $P725 = "47_1258129000.66298"
     capture_lex $P725
-    .const 'Sub' $P715 = "46_1258129000.66298" 
+    .const 'Sub' $P715 = "46_1258129000.66298"
     capture_lex $P715
-    .const 'Sub' $P697 = "45_1258129000.66298" 
+    .const 'Sub' $P697 = "45_1258129000.66298"
     capture_lex $P697
-    .const 'Sub' $P650 = "44_1258129000.66298" 
+    .const 'Sub' $P650 = "44_1258129000.66298"
     capture_lex $P650
-    .const 'Sub' $P633 = "43_1258129000.66298" 
+    .const 'Sub' $P633 = "43_1258129000.66298"
     capture_lex $P633
-    .const 'Sub' $P618 = "42_1258129000.66298" 
+    .const 'Sub' $P618 = "42_1258129000.66298"
     capture_lex $P618
-    .const 'Sub' $P603 = "41_1258129000.66298" 
+    .const 'Sub' $P603 = "41_1258129000.66298"
     capture_lex $P603
-    .const 'Sub' $P577 = "40_1258129000.66298" 
+    .const 'Sub' $P577 = "40_1258129000.66298"
     capture_lex $P577
-    .const 'Sub' $P527 = "38_1258129000.66298" 
+    .const 'Sub' $P527 = "38_1258129000.66298"
     capture_lex $P527
-    .const 'Sub' $P472 = "36_1258129000.66298" 
+    .const 'Sub' $P472 = "36_1258129000.66298"
     capture_lex $P472
-    .const 'Sub' $P415 = "33_1258129000.66298" 
+    .const 'Sub' $P415 = "33_1258129000.66298"
     capture_lex $P415
-    .const 'Sub' $P400 = "32_1258129000.66298" 
+    .const 'Sub' $P400 = "32_1258129000.66298"
     capture_lex $P400
-    .const 'Sub' $P374 = "30_1258129000.66298" 
+    .const 'Sub' $P374 = "30_1258129000.66298"
     capture_lex $P374
-    .const 'Sub' $P356 = "29_1258129000.66298" 
+    .const 'Sub' $P356 = "29_1258129000.66298"
     capture_lex $P356
-    .const 'Sub' $P336 = "28_1258129000.66298" 
+    .const 'Sub' $P336 = "28_1258129000.66298"
     capture_lex $P336
-    .const 'Sub' $P304 = "27_1258129000.66298" 
+    .const 'Sub' $P304 = "27_1258129000.66298"
     capture_lex $P304
-    .const 'Sub' $P42 = "14_1258129000.66298" 
+    .const 'Sub' $P42 = "14_1258129000.66298"
     capture_lex $P42
-    .const 'Sub' $P21 = "13_1258129000.66298" 
+    .const 'Sub' $P21 = "13_1258129000.66298"
     capture_lex $P21
-    .const 'Sub' $P16 = "12_1258129000.66298" 
+    .const 'Sub' $P16 = "12_1258129000.66298"
     capture_lex $P16
     get_global $P15, "@MODIFIERS"
     unless_null $P15, vivify_89
@@ -6505,23 +6505,23 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     set_global "@MODIFIERS", $P15
   vivify_89:
 .annotate "line", 6
-    .const 'Sub' $P16 = "12_1258129000.66298" 
+    .const 'Sub' $P16 = "12_1258129000.66298"
     capture_lex $P16
     .lex "INIT", $P16
 .annotate "line", 461
-    .const 'Sub' $P21 = "13_1258129000.66298" 
+    .const 'Sub' $P21 = "13_1258129000.66298"
     capture_lex $P21
     .lex "buildsub", $P21
 .annotate "line", 474
-    .const 'Sub' $P42 = "14_1258129000.66298" 
+    .const 'Sub' $P42 = "14_1258129000.66298"
     capture_lex $P42
     .lex "capnames", $P42
 .annotate "line", 540
-    .const 'Sub' $P304 = "27_1258129000.66298" 
+    .const 'Sub' $P304 = "27_1258129000.66298"
     capture_lex $P304
     .lex "backmod", $P304
 .annotate "line", 547
-    .const 'Sub' $P336 = "28_1258129000.66298" 
+    .const 'Sub' $P336 = "28_1258129000.66298"
     capture_lex $P336
     .lex "subrule_alias", $P336
 .annotate "line", 4
@@ -6549,13 +6549,13 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
         $P19 = new ['ResizablePMCArray']
         $P0 = new ['Hash']
         push $P19, $P0
-    
+
     set_global "@MODIFIERS", $P19
 .annotate "line", 6
     .return ($P19)
   control_17:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P20, exception, "payload"
     .return ($P20)
     rethrow exception
@@ -6606,8 +6606,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 461
     .return ($P40)
   control_22:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P41, exception, "payload"
     .return ($P41)
     rethrow exception
@@ -6619,15 +6619,15 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     .param pmc param_45
     .param pmc param_46
 .annotate "line", 474
-    .const 'Sub' $P279 = "25_1258129000.66298" 
+    .const 'Sub' $P279 = "25_1258129000.66298"
     capture_lex $P279
-    .const 'Sub' $P214 = "22_1258129000.66298" 
+    .const 'Sub' $P214 = "22_1258129000.66298"
     capture_lex $P214
-    .const 'Sub' $P170 = "20_1258129000.66298" 
+    .const 'Sub' $P170 = "20_1258129000.66298"
     capture_lex $P170
-    .const 'Sub' $P128 = "18_1258129000.66298" 
+    .const 'Sub' $P128 = "18_1258129000.66298"
     capture_lex $P128
-    .const 'Sub' $P57 = "15_1258129000.66298" 
+    .const 'Sub' $P57 = "15_1258129000.66298"
     capture_lex $P57
     new $P44, 'ExceptionHandler'
     set_addr $P44, control_43
@@ -6683,21 +6683,21 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     set $S276, $P275
     iseq $I277, $S276, "quant"
     unless $I277, if_274_end
-    .const 'Sub' $P279 = "25_1258129000.66298" 
+    .const 'Sub' $P279 = "25_1258129000.66298"
     capture_lex $P279
     $P279()
   if_274_end:
     goto if_209_end
   if_209:
 .annotate "line", 512
-    .const 'Sub' $P214 = "22_1258129000.66298" 
+    .const 'Sub' $P214 = "22_1258129000.66298"
     capture_lex $P214
     $P214()
   if_209_end:
     goto if_160_end
   if_160:
 .annotate "line", 499
-    .const 'Sub' $P170 = "20_1258129000.66298" 
+    .const 'Sub' $P170 = "20_1258129000.66298"
     capture_lex $P170
     $P170()
   if_160_end:
@@ -6717,26 +6717,26 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P122, loop157_done
     shift $P126, $P122
   loop157_redo:
-    .const 'Sub' $P128 = "18_1258129000.66298" 
+    .const 'Sub' $P128 = "18_1258129000.66298"
     capture_lex $P128
     $P128($P126)
   loop157_next:
     goto loop157_test
   loop157_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P159, exception, 'type'
     eq $P159, 65, loop157_next
     eq $P159, 67, loop157_redo
   loop157_done:
-    pop_eh 
+    pop_eh
   for_undef_111:
   if_118_end:
 .annotate "line", 490
     goto if_52_end
   if_52:
 .annotate "line", 477
-    .const 'Sub' $P57 = "15_1258129000.66298" 
+    .const 'Sub' $P57 = "15_1258129000.66298"
     capture_lex $P57
     $P57()
   if_52_end:
@@ -6752,8 +6752,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 474
     .return ($P302)
   control_43:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P303, exception, "payload"
     .return ($P303)
     rethrow exception
@@ -6763,7 +6763,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .namespace ["Regex";"P6Regex";"Actions"]
 .sub "_block278"  :anon :subid("25_1258129000.66298") :outer("14_1258129000.66298")
 .annotate "line", 529
-    .const 'Sub' $P290 = "26_1258129000.66298" 
+    .const 'Sub' $P290 = "26_1258129000.66298"
     capture_lex $P290
 .annotate "line", 530
     new $P280, "Hash"
@@ -6792,19 +6792,19 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P285, loop295_done
     shift $P288, $P285
   loop295_redo:
-    .const 'Sub' $P290 = "26_1258129000.66298" 
+    .const 'Sub' $P290 = "26_1258129000.66298"
     capture_lex $P290
     $P290($P288)
   loop295_next:
     goto loop295_test
   loop295_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P297, exception, 'type'
     eq $P297, 65, loop295_next
     eq $P297, 67, loop295_redo
   loop295_done:
-    pop_eh 
+    pop_eh
   for_undef_93:
 .annotate "line", 534
     find_lex $P298, "%astcap"
@@ -6844,9 +6844,9 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .namespace ["Regex";"P6Regex";"Actions"]
 .sub "_block213"  :anon :subid("22_1258129000.66298") :outer("14_1258129000.66298")
 .annotate "line", 512
-    .const 'Sub' $P256 = "24_1258129000.66298" 
+    .const 'Sub' $P256 = "24_1258129000.66298"
     capture_lex $P256
-    .const 'Sub' $P226 = "23_1258129000.66298" 
+    .const 'Sub' $P226 = "23_1258129000.66298"
     capture_lex $P226
 .annotate "line", 513
     new $P215, "Undef"
@@ -6866,7 +6866,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
             $P0 = find_lex '$name'
             $S0 = $P0
             $P220 = split '=', $S0
-        
+
     store_lex "@names", $P220
 .annotate "line", 519
     find_lex $P222, "@names"
@@ -6881,19 +6881,19 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P221, loop244_done
     shift $P224, $P221
   loop244_redo:
-    .const 'Sub' $P226 = "23_1258129000.66298" 
+    .const 'Sub' $P226 = "23_1258129000.66298"
     capture_lex $P226
     $P226($P224)
   loop244_next:
     goto loop244_test
   loop244_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P246, exception, 'type'
     eq $P246, 65, loop244_next
     eq $P246, 67, loop244_redo
   loop244_done:
-    pop_eh 
+    pop_eh
   for_undef_97:
 .annotate "line", 523
     find_lex $P247, "$ast"
@@ -6920,19 +6920,19 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P251, loop269_done
     shift $P254, $P251
   loop269_redo:
-    .const 'Sub' $P256 = "24_1258129000.66298" 
+    .const 'Sub' $P256 = "24_1258129000.66298"
     capture_lex $P256
     $P256($P254)
   loop269_next:
     goto loop269_test
   loop269_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P271, exception, 'type'
     eq $P271, 65, loop269_next
     eq $P271, 67, loop269_redo
   loop269_done:
-    pop_eh 
+    pop_eh
   for_undef_101:
 .annotate "line", 527
     find_lex $P272, "%x"
@@ -7035,7 +7035,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .namespace ["Regex";"P6Regex";"Actions"]
 .sub "_block169"  :anon :subid("20_1258129000.66298") :outer("14_1258129000.66298")
 .annotate "line", 499
-    .const 'Sub' $P188 = "21_1258129000.66298" 
+    .const 'Sub' $P188 = "21_1258129000.66298"
     capture_lex $P188
 .annotate "line", 500
     new $P171, "Undef"
@@ -7063,7 +7063,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
             $P0 = find_lex '$name'
             $S0 = $P0
             $P182 = split '=', $S0
-        
+
     store_lex "@names", $P182
 .annotate "line", 507
     find_lex $P184, "@names"
@@ -7078,19 +7078,19 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P183, loop206_done
     shift $P186, $P183
   loop206_redo:
-    .const 'Sub' $P188 = "21_1258129000.66298" 
+    .const 'Sub' $P188 = "21_1258129000.66298"
     capture_lex $P188
     $P188($P186)
   loop206_next:
     goto loop206_test
   loop206_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P208, exception, 'type'
     eq $P208, 65, loop206_next
     eq $P208, 67, loop206_redo
   loop206_done:
-    pop_eh 
+    pop_eh
   for_undef_109:
 .annotate "line", 499
     .return ($P183)
@@ -7144,7 +7144,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .sub "_block127"  :anon :subid("18_1258129000.66298") :outer("14_1258129000.66298")
     .param pmc param_130
 .annotate "line", 491
-    .const 'Sub' $P139 = "19_1258129000.66298" 
+    .const 'Sub' $P139 = "19_1258129000.66298"
     capture_lex $P139
 .annotate "line", 492
     new $P129, "Hash"
@@ -7167,19 +7167,19 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P134, loop152_done
     shift $P137, $P134
   loop152_redo:
-    .const 'Sub' $P139 = "19_1258129000.66298" 
+    .const 'Sub' $P139 = "19_1258129000.66298"
     capture_lex $P139
     $P139($P137)
   loop152_next:
     goto loop152_test
   loop152_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P154, exception, 'type'
     eq $P154, 65, loop152_next
     eq $P154, 67, loop152_redo
   loop152_done:
-    pop_eh 
+    pop_eh
   for_undef_112:
 .annotate "line", 496
     find_lex $P155, "%x"
@@ -7239,7 +7239,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .namespace ["Regex";"P6Regex";"Actions"]
 .sub "_block56"  :anon :subid("15_1258129000.66298") :outer("14_1258129000.66298")
 .annotate "line", 477
-    .const 'Sub' $P66 = "16_1258129000.66298" 
+    .const 'Sub' $P66 = "16_1258129000.66298"
     capture_lex $P66
 .annotate "line", 478
     new $P58, "Undef"
@@ -7260,19 +7260,19 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P60, loop114_done
     shift $P64, $P60
   loop114_redo:
-    .const 'Sub' $P66 = "16_1258129000.66298" 
+    .const 'Sub' $P66 = "16_1258129000.66298"
     capture_lex $P66
     $P66($P64)
   loop114_next:
     goto loop114_test
   loop114_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P116, exception, 'type'
     eq $P116, 65, loop114_next
     eq $P116, 67, loop114_redo
   loop114_done:
-    pop_eh 
+    pop_eh
   for_undef_120:
 .annotate "line", 488
     find_lex $P117, "$max"
@@ -7286,7 +7286,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .sub "_block65"  :anon :subid("16_1258129000.66298") :outer("15_1258129000.66298")
     .param pmc param_68
 .annotate "line", 479
-    .const 'Sub' $P77 = "17_1258129000.66298" 
+    .const 'Sub' $P77 = "17_1258129000.66298"
     capture_lex $P77
 .annotate "line", 480
     new $P67, "Hash"
@@ -7309,19 +7309,19 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P72, loop101_done
     shift $P75, $P72
   loop101_redo:
-    .const 'Sub' $P77 = "17_1258129000.66298" 
+    .const 'Sub' $P77 = "17_1258129000.66298"
     capture_lex $P77
     $P77($P75)
   loop101_next:
     goto loop101_test
   loop101_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P103, exception, 'type'
     eq $P103, 65, loop101_next
     eq $P103, 67, loop101_redo
   loop101_done:
-    pop_eh 
+    pop_eh
   for_undef_121:
 .annotate "line", 486
     find_lex $P106, "%x"
@@ -7489,8 +7489,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 540
     .return ($P334)
   control_305:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P335, exception, "payload"
     .return ($P335)
     rethrow exception
@@ -7541,8 +7541,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 547
     .return ($P351)
   control_337:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P353, exception, "payload"
     .return ($P353)
     rethrow exception
@@ -7603,8 +7603,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 14
     .return ($P372)
   control_357:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P373, exception, "payload"
     .return ($P373)
     rethrow exception
@@ -7615,7 +7615,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .sub "arglist"  :subid("30_1258129000.66298") :method :outer("11_1258129000.66298")
     .param pmc param_377
 .annotate "line", 18
-    .const 'Sub' $P387 = "31_1258129000.66298" 
+    .const 'Sub' $P387 = "31_1258129000.66298"
     capture_lex $P387
     new $P376, 'ExceptionHandler'
     set_addr $P376, control_375
@@ -7649,19 +7649,19 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P381, loop393_done
     shift $P385, $P381
   loop393_redo:
-    .const 'Sub' $P387 = "31_1258129000.66298" 
+    .const 'Sub' $P387 = "31_1258129000.66298"
     capture_lex $P387
     $P387($P385)
   loop393_next:
     goto loop393_test
   loop393_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P395, exception, 'type'
     eq $P395, 65, loop393_next
     eq $P395, 67, loop393_redo
   loop393_done:
-    pop_eh 
+    pop_eh
   for_undef_144:
 .annotate "line", 21
     find_lex $P396, "$/"
@@ -7670,8 +7670,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 18
     .return ($P398)
   control_375:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P399, exception, "payload"
     .return ($P399)
     rethrow exception
@@ -7726,8 +7726,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 24
     .return ($P413)
   control_401:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P414, exception, "payload"
     .return ($P414)
     rethrow exception
@@ -7740,9 +7740,9 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     .param pmc param_419 :optional
     .param int has_param_419 :opt_flag
 .annotate "line", 30
-    .const 'Sub' $P455 = "35_1258129000.66298" 
+    .const 'Sub' $P455 = "35_1258129000.66298"
     capture_lex $P455
-    .const 'Sub' $P427 = "34_1258129000.66298" 
+    .const 'Sub' $P427 = "34_1258129000.66298"
     capture_lex $P427
     new $P417, 'ExceptionHandler'
     set_addr $P417, control_416
@@ -7763,7 +7763,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     set $S424, $P423
     iseq $I425, $S424, "open"
     unless $I425, if_422_end
-    .const 'Sub' $P427 = "34_1258129000.66298" 
+    .const 'Sub' $P427 = "34_1258129000.66298"
     capture_lex $P427
     $P427()
   if_422_end:
@@ -7829,19 +7829,19 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P449, loop461_done
     shift $P453, $P449
   loop461_redo:
-    .const 'Sub' $P455 = "35_1258129000.66298" 
+    .const 'Sub' $P455 = "35_1258129000.66298"
     capture_lex $P455
     $P455($P453)
   loop461_next:
     goto loop461_test
   loop461_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P463, exception, 'type'
     eq $P463, 65, loop461_next
     eq $P463, 67, loop461_redo
   loop461_done:
-    pop_eh 
+    pop_eh
   for_undef_157:
   if_439_end:
 .annotate "line", 52
@@ -7851,8 +7851,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 30
     .return ($P470)
   control_416:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P471, exception, "payload"
     .return ($P471)
     rethrow exception
@@ -7881,7 +7881,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
                        $P0 = find_lex '%old'
                        $P432 = clone $P0
-                   
+
     store_lex "%new", $P432
 .annotate "line", 37
     get_global $P433, "@MODIFIERS"
@@ -7918,7 +7918,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .sub "termish"  :subid("36_1258129000.66298") :method :outer("11_1258129000.66298")
     .param pmc param_475
 .annotate "line", 55
-    .const 'Sub' $P488 = "37_1258129000.66298" 
+    .const 'Sub' $P488 = "37_1258129000.66298"
     capture_lex $P488
     new $P474, 'ExceptionHandler'
     set_addr $P474, control_473
@@ -7961,19 +7961,19 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P482, loop520_done
     shift $P486, $P482
   loop520_redo:
-    .const 'Sub' $P488 = "37_1258129000.66298" 
+    .const 'Sub' $P488 = "37_1258129000.66298"
     capture_lex $P488
     $P488($P486)
   loop520_next:
     goto loop520_test
   loop520_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P522, exception, 'type'
     eq $P522, 65, loop520_next
     eq $P522, 67, loop520_redo
   loop520_done:
-    pop_eh 
+    pop_eh
   for_undef_160:
 .annotate "line", 69
     find_lex $P523, "$/"
@@ -7982,8 +7982,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 55
     .return ($P525)
   control_473:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P526, exception, "payload"
     .return ($P526)
     rethrow exception
@@ -8081,7 +8081,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .sub "quantified_atom"  :subid("38_1258129000.66298") :method :outer("11_1258129000.66298")
     .param pmc param_530
 .annotate "line", 72
-    .const 'Sub' $P539 = "39_1258129000.66298" 
+    .const 'Sub' $P539 = "39_1258129000.66298"
     capture_lex $P539
     new $P529, 'ExceptionHandler'
     set_addr $P529, control_528
@@ -8144,7 +8144,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     goto if_535_end
   if_535:
 .annotate "line", 74
-    .const 'Sub' $P539 = "39_1258129000.66298" 
+    .const 'Sub' $P539 = "39_1258129000.66298"
     capture_lex $P539
     $P539()
   if_535_end:
@@ -8190,8 +8190,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 72
     .return ($P575)
   control_528:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P576, exception, "payload"
     .return ($P576)
     rethrow exception
@@ -8308,8 +8308,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 87
     .return ($P601)
   control_578:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P602, exception, "payload"
     .return ($P602)
     rethrow exception
@@ -8349,8 +8349,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 97
     .return ($P616)
   control_604:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P617, exception, "payload"
     .return ($P617)
     rethrow exception
@@ -8390,8 +8390,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 102
     .return ($P631)
   control_619:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P632, exception, "payload"
     .return ($P632)
     rethrow exception
@@ -8435,8 +8435,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 107
     .return ($P648)
   control_634:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P649, exception, "payload"
     .return ($P649)
     rethrow exception
@@ -8576,8 +8576,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 113
     .return ($P695)
   control_651:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P696, exception, "payload"
     .return ($P696)
     rethrow exception
@@ -8629,8 +8629,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 127
     .return ($P713)
   control_698:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P714, exception, "payload"
     .return ($P714)
     rethrow exception
@@ -8662,8 +8662,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 136
     .return ($P723)
   control_716:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P724, exception, "payload"
     .return ($P724)
     rethrow exception
@@ -8711,8 +8711,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 140
     .return ($P741)
   control_726:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P742, exception, "payload"
     .return ($P742)
     rethrow exception
@@ -8756,8 +8756,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 147
     .return ($P757)
   control_744:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P758, exception, "payload"
     .return ($P758)
     rethrow exception
@@ -8788,8 +8788,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 152
     .return ($P769)
   control_760:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P770, exception, "payload"
     .return ($P770)
     rethrow exception
@@ -8820,8 +8820,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 157
     .return ($P781)
   control_772:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P782, exception, "payload"
     .return ($P782)
     rethrow exception
@@ -8852,8 +8852,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 162
     .return ($P793)
   control_784:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P794, exception, "payload"
     .return ($P794)
     rethrow exception
@@ -8884,8 +8884,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 167
     .return ($P805)
   control_796:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P806, exception, "payload"
     .return ($P806)
     rethrow exception
@@ -8916,8 +8916,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 172
     .return ($P817)
   control_808:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P818, exception, "payload"
     .return ($P818)
     rethrow exception
@@ -8948,8 +8948,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 177
     .return ($P829)
   control_820:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P830, exception, "payload"
     .return ($P830)
     rethrow exception
@@ -8980,8 +8980,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 182
     .return ($P841)
   control_832:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P842, exception, "payload"
     .return ($P842)
     rethrow exception
@@ -9012,8 +9012,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 187
     .return ($P853)
   control_844:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P854, exception, "payload"
     .return ($P854)
     rethrow exception
@@ -9045,8 +9045,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 192
     .return ($P863)
   control_856:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P864, exception, "payload"
     .return ($P864)
     rethrow exception
@@ -9078,8 +9078,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 196
     .return ($P873)
   control_866:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P874, exception, "payload"
     .return ($P874)
     rethrow exception
@@ -9111,8 +9111,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 200
     .return ($P883)
   control_876:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P884, exception, "payload"
     .return ($P884)
     rethrow exception
@@ -9174,8 +9174,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 204
     .return ($P905)
   control_886:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P906, exception, "payload"
     .return ($P906)
     rethrow exception
@@ -9236,8 +9236,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 217
     .return ($P926)
   control_908:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P927, exception, "payload"
     .return ($P927)
     rethrow exception
@@ -9397,8 +9397,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 224
     .return ($P982)
   control_929:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P983, exception, "payload"
     .return ($P983)
     rethrow exception
@@ -9437,8 +9437,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 244
     .return ($P997)
   control_985:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P998, exception, "payload"
     .return ($P998)
     rethrow exception
@@ -9504,8 +9504,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 252
     .return ($P1021)
   control_1000:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P1022, exception, "payload"
     .return ($P1022)
     rethrow exception
@@ -9548,8 +9548,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 258
     .return ($P1037)
   control_1024:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P1038, exception, "payload"
     .return ($P1038)
     rethrow exception
@@ -9592,8 +9592,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 264
     .return ($P1053)
   control_1040:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P1054, exception, "payload"
     .return ($P1054)
     rethrow exception
@@ -9636,8 +9636,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 270
     .return ($P1069)
   control_1056:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P1070, exception, "payload"
     .return ($P1070)
     rethrow exception
@@ -9680,8 +9680,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 276
     .return ($P1085)
   control_1072:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P1086, exception, "payload"
     .return ($P1086)
     rethrow exception
@@ -9724,8 +9724,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 282
     .return ($P1101)
   control_1088:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P1102, exception, "payload"
     .return ($P1102)
     rethrow exception
@@ -9768,8 +9768,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 288
     .return ($P1117)
   control_1104:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P1118, exception, "payload"
     .return ($P1118)
     rethrow exception
@@ -9812,8 +9812,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 294
     .return ($P1133)
   control_1120:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P1134, exception, "payload"
     .return ($P1134)
     rethrow exception
@@ -9896,8 +9896,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 301
     .return ($P1164)
   control_1136:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P1165, exception, "payload"
     .return ($P1165)
     rethrow exception
@@ -9980,8 +9980,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 310
     .return ($P1195)
   control_1167:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P1196, exception, "payload"
     .return ($P1196)
     rethrow exception
@@ -10014,8 +10014,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 319
     .return ($P1209)
   control_1198:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P1210, exception, "payload"
     .return ($P1210)
     rethrow exception
@@ -10075,8 +10075,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 325
     .return ($P1227)
   control_1212:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P1228, exception, "payload"
     .return ($P1228)
     rethrow exception
@@ -10144,8 +10144,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 335
     .return ($P1251)
   control_1230:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P1252, exception, "payload"
     .return ($P1252)
     rethrow exception
@@ -10185,8 +10185,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 348
     .return ($P1264)
   control_1254:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P1265, exception, "payload"
     .return ($P1265)
     rethrow exception
@@ -10197,9 +10197,9 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .sub "assertion:sym<name>"  :subid("78_1258129000.66298") :method :outer("11_1258129000.66298")
     .param pmc param_1269
 .annotate "line", 354
-    .const 'Sub' $P1327 = "80_1258129000.66298" 
+    .const 'Sub' $P1327 = "80_1258129000.66298"
     capture_lex $P1327
-    .const 'Sub' $P1291 = "79_1258129000.66298" 
+    .const 'Sub' $P1291 = "79_1258129000.66298"
     capture_lex $P1291
     new $P1268, 'ExceptionHandler'
     set_addr $P1268, control_1267
@@ -10295,19 +10295,19 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P1318, loop1332_done
     shift $P1325, $P1318
   loop1332_redo:
-    .const 'Sub' $P1327 = "80_1258129000.66298" 
+    .const 'Sub' $P1327 = "80_1258129000.66298"
     capture_lex $P1327
     $P1327($P1325)
   loop1332_next:
     goto loop1332_test
   loop1332_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P1334, exception, 'type'
     eq $P1334, 65, loop1332_next
     eq $P1334, 67, loop1332_redo
   loop1332_done:
-    pop_eh 
+    pop_eh
   for_undef_310:
   if_1315_end:
 .annotate "line", 382
@@ -10335,7 +10335,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     goto if_1286_end
   if_1286:
 .annotate "line", 361
-    .const 'Sub' $P1291 = "79_1258129000.66298" 
+    .const 'Sub' $P1291 = "79_1258129000.66298"
     capture_lex $P1291
     $P1291()
   if_1286_end:
@@ -10368,8 +10368,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 354
     .return ($P1337)
   control_1267:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P1338, exception, "payload"
     .return ($P1338)
     rethrow exception
@@ -10401,7 +10401,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
             $S0 = substr $S0, $I0
             chopn $S0, 1
             $P1293 = box $S0
-        
+
     store_lex "$regexsym", $P1293
 .annotate "line", 371
     get_hll_global $P1294, ["PAST"], "Regex"
@@ -10423,7 +10423,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .sub "assertion:sym<[>"  :subid("81_1258129000.66298") :method :outer("11_1258129000.66298")
     .param pmc param_1342
 .annotate "line", 389
-    .const 'Sub' $P1377 = "82_1258129000.66298" 
+    .const 'Sub' $P1377 = "82_1258129000.66298"
     capture_lex $P1377
     new $P1341, 'ExceptionHandler'
     set_addr $P1341, control_1340
@@ -10515,19 +10515,19 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     islt $I1375, $N1372, $N1374
     unless $I1375, loop1400_done
   loop1400_redo:
-    .const 'Sub' $P1377 = "82_1258129000.66298" 
+    .const 'Sub' $P1377 = "82_1258129000.66298"
     capture_lex $P1377
     $P1377()
   loop1400_next:
     goto loop1400_test
   loop1400_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P1402, exception, 'type'
     eq $P1402, 65, loop1400_next
     eq $P1402, 67, loop1400_redo
   loop1400_done:
-    pop_eh 
+    pop_eh
 .annotate "line", 413
     find_lex $P1403, "$/"
     find_lex $P1404, "$past"
@@ -10535,8 +10535,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 389
     .return ($P1405)
   control_1340:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P1406, exception, "payload"
     .return ($P1406)
     rethrow exception
@@ -10598,9 +10598,9 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .sub "cclass_elem"  :subid("83_1258129000.66298") :method :outer("11_1258129000.66298")
     .param pmc param_1410
 .annotate "line", 416
-    .const 'Sub' $P1435 = "85_1258129000.66298" 
+    .const 'Sub' $P1435 = "85_1258129000.66298"
     capture_lex $P1435
-    .const 'Sub' $P1419 = "84_1258129000.66298" 
+    .const 'Sub' $P1419 = "84_1258129000.66298"
     capture_lex $P1419
     new $P1409, 'ExceptionHandler'
     set_addr $P1409, control_1408
@@ -10649,19 +10649,19 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P1429, loop1460_done
     shift $P1433, $P1429
   loop1460_redo:
-    .const 'Sub' $P1435 = "85_1258129000.66298" 
+    .const 'Sub' $P1435 = "85_1258129000.66298"
     capture_lex $P1435
     $P1435($P1433)
   loop1460_next:
     goto loop1460_test
   loop1460_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P1462, exception, 'type'
     eq $P1462, 65, loop1460_next
     eq $P1462, 67, loop1460_redo
   loop1460_done:
-    pop_eh 
+    pop_eh
   for_undef_327:
 .annotate "line", 448
     get_hll_global $P1463, ["PAST"], "Regex"
@@ -10673,7 +10673,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     goto if_1415_end
   if_1415:
 .annotate "line", 419
-    .const 'Sub' $P1419 = "84_1258129000.66298" 
+    .const 'Sub' $P1419 = "84_1258129000.66298"
     capture_lex $P1419
     $P1419()
   if_1415_end:
@@ -10697,8 +10697,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 416
     .return ($P1474)
   control_1408:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P1475, exception, "payload"
     .return ($P1475)
     rethrow exception
@@ -10709,7 +10709,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .sub "_block1434"  :anon :subid("85_1258129000.66298") :outer("83_1258129000.66298")
     .param pmc param_1436
 .annotate "line", 423
-    .const 'Sub' $P1442 = "86_1258129000.66298" 
+    .const 'Sub' $P1442 = "86_1258129000.66298"
     capture_lex $P1442
     .lex "$_", param_1436
 .annotate "line", 424
@@ -10738,7 +10738,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 424
     goto if_1438_end
   if_1438:
-    .const 'Sub' $P1442 = "86_1258129000.66298" 
+    .const 'Sub' $P1442 = "86_1258129000.66298"
     capture_lex $P1442
     $P1455 = $P1442()
     set $P1437, $P1455
@@ -10800,7 +10800,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
                              goto cclass_loop
                            cclass_done:
                              $P1451 = box $S2
-                         
+
     store_lex "$c", $P1451
 .annotate "line", 444
     find_lex $P1452, "$str"
@@ -10931,8 +10931,8 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 454
     .return ($P1503)
   control_1477:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P1504, exception, "payload"
     .return ($P1504)
     rethrow exception
@@ -10964,8 +10964,6 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     exit 0
 .end
 
-
-=cut
 
 # Local Variables:
 #   mode: pir
