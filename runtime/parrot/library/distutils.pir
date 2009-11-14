@@ -41,10 +41,10 @@ L<http://github.com/fperrad/wmlscript/blob/master/setup.pir>
     $P0 = new 'Hash'
     set_global '%step', $P0
 
-    .const 'Sub' _build_dynops = '_build_dynops'
-    register_step('build', _build_dynops)
     .const 'Sub' _build_dynpmc = '_build_dynpmc'
-    register_step_after('build', _build_dynpmc)
+    register_step('build', _build_dynpmc)
+    .const 'Sub' _build_dynops = '_build_dynops'
+    register_step_after('build', _build_dynops)
     .const 'Sub' _build_pir_pge = '_build_pir_pge'
     register_step_after('build', _build_pir_pge)
     .const 'Sub' _build_pir_tge = '_build_pir_tge'
@@ -62,10 +62,10 @@ L<http://github.com/fperrad/wmlscript/blob/master/setup.pir>
     .const 'Sub' _build_html_pod = '_build_html_pod'
     register_step_after('build', _build_html_pod)
 
-    .const 'Sub' _clean_dynops = '_clean_dynops'
-    register_step('clean', _clean_dynops)
     .const 'Sub' _clean_dynpmc = '_clean_dynpmc'
-    register_step_after('clean', _clean_dynpmc)
+    register_step('clean', _clean_dynpmc)
+    .const 'Sub' _clean_dynops = '_clean_dynops'
+    register_step_after('clean', _clean_dynops)
     .const 'Sub' _clean_pir_pge = '_clean_pir_pge'
     register_step_after('clean', _clean_pir_pge)
     .const 'Sub' _clean_pir_tge = '_clean_pir_tge'
@@ -85,10 +85,10 @@ L<http://github.com/fperrad/wmlscript/blob/master/setup.pir>
 
     .const 'Sub' _install = '_install'
     register_step('install', _install)
-    .const 'Sub' _install_dynops = '_install_dynops'
-    register_step_after('install', _install_dynops)
     .const 'Sub' _install_dynpmc = '_install_dynpmc'
     register_step_after('install', _install_dynpmc)
+    .const 'Sub' _install_dynops = '_install_dynops'
+    register_step_after('install', _install_dynops)
     .const 'Sub' _install_installable_pbc = '_install_installable_pbc'
     register_step_after('install', _install_installable_pbc)
 
@@ -97,10 +97,10 @@ L<http://github.com/fperrad/wmlscript/blob/master/setup.pir>
 
     .const 'Sub' _uninstall = '_uninstall'
     register_step('uninstall', _uninstall)
-    .const 'Sub' _uninstall_dynops = '_uninstall_dynops'
-    register_step_after('uninstall', _uninstall_dynops)
     .const 'Sub' _uninstall_dynpmc = '_uninstall_dynpmc'
     register_step_after('uninstall', _uninstall_dynpmc)
+    .const 'Sub' _uninstall_dynops = '_uninstall_dynops'
+    register_step_after('uninstall', _uninstall_dynops)
     .const 'Sub' _uninstall_installable_pbc = '_uninstall_installable_pbc'
     register_step_after('uninstall', _uninstall_installable_pbc)
 
