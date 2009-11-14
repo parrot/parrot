@@ -1082,7 +1082,7 @@ glut_timer_func(int data)
     PMC           *sub   = callback_data[GLUT_CB_TIMER].sub;
 
     if (is_safe(interp, sub))
-        Parrot_pcc_invoke_sub_from_c_args(interp, sub, "I->", data);
+        Parrot_ext_call(interp, sub, "I->", data);
 }
 
 PARROT_DYNEXT_EXPORT
@@ -1117,7 +1117,7 @@ glut_joystick_func(unsigned int buttons, int xaxis, int yaxis, int zaxis)
     PMC           *sub   = callback_data[GLUT_CB_JOYSTICK].sub;
 
     if (is_safe(interp, sub))
-        Parrot_pcc_invoke_sub_from_c_args(interp, sub, "IIII->", buttons, xaxis, yaxis, zaxis);
+        Parrot_ext_call(interp, sub, "IIII->", buttons, xaxis, yaxis, zaxis);
 }
 
 PARROT_DYNEXT_EXPORT
@@ -1157,7 +1157,7 @@ $_->{thunk}($_->{params})
     PMC           *sub   = callback_data[$_->{enum}].sub;
 
     if (is_safe(interp, sub))
-        Parrot_pcc_invoke_sub_from_c_args(interp, sub, "$_->{sig}"$_->{args});
+        Parrot_ext_call(interp, sub, "$_->{sig}"$_->{args});
 }
 
 PARROT_DYNEXT_EXPORT
