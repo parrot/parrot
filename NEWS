@@ -17,6 +17,9 @@ New in 1.8.0 (to be released on 2009-11-17)
   + MultiSub PMCs now stringify to the name of their first candidate,
     instead of the number of candidates.
   + The platform detection at the start of the configuration process was improved.
+- Compilers
+  + A shiny new self-hosting implementation of NQP has been added in ext/nqp-rx.
+    It is available as the executable parrot-nqp.
 - Platforms
   + Fixes for the port or Parrot to RTEMS were applied. Yay, first port to a real time OS!
   + On NetBSD, shared libs are now used.
@@ -29,16 +32,22 @@ New in 1.8.0 (to be released on 2009-11-17)
   + All bitwise VTABLE functions are deprecated. (eligible in 2.1)
   + All bitwise ops will become dynops. (eligible in 2.1)
 - Realized deprecations
+  + The slice VTABLE entry was removed.
   + The last traces of the 'malloc' garbage collector were removed.
   + Parrot_pcc_constants() was renamed to Parrot_pcc_get_constants().
   + The deprecated functions from the Embedding/Extension interface were removed.
   + The library YAML/Parser/Syck.pir was removed.
   + The VTABLE function instantiate_str() was removed.
+  + Building of parrot_nqp was removed.
 - Tests
   + New testing functions in Test::More: lives_ok() and dies_ok().
   + t/op/annotate.t has begun to be translated to PIR.
   + t/op/00ff-dos.t was converted to PIR.
   + t/op/inf_nan.t was converted to PIR.
+  + t/op/bitwist.t was converted to PIR.
+  + t/op/sprintf2.t was converted to PIR.
+  + t/op/number.t was converted to PIR.
+  + t/op/literal.t was converted to PIR.
   + In some tests the dependency on %Config from Perl 5 was eliminated.
 - Documentation
   + The meaning of 'p' means in NCI function call signatures was clarified.
