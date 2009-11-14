@@ -9,7 +9,7 @@ use 5.008;
 use Getopt::Long;
 use File::Spec::Functions;
 
-use Test::More tests => 7;
+use Test::More tests => 8;
 
 =head1 NAME
 
@@ -66,7 +66,7 @@ my $out;
 my $FH;
 my $parrot = catfile($bindir, 'parrot');
 my $pirc = catfile($bindir, 'pirc');
-my $nqp = catfile($bindir, 'parrot_nqp');
+my $nqp = catfile($bindir, 'parrot-nqp');
 
 #
 # parrot executable
@@ -126,7 +126,7 @@ open $FH, '>', $filename
 print $FH "say('hello world!');\n";
 close $FH;
 $out = `$nqp $filename`;
-ok($out eq "hello world!\n", "check nqp");
+ok($out eq "hello world!\n", "check nqp-rx");
 unlink($filename);
 
 # compilers/tge is typically not installed
@@ -137,6 +137,16 @@ print $FH "transform past (ROOT) { }\n";
 close $FH;
 $out = `$parrot $compdir/tge/tgc.pir $filename`;
 ok($out =~ /^\n\.sub '_ROOT_past'/, "check TGE");
+unlink($filename);
+
+# compilers/nqp is typically not installed
+$filename = 'test.nqp';
+open $FH, '>', $filename
+        or die "Can't open $filename ($!).\n";
+print $FH "say('hello world!');\n";
+close $FH;
+$out = `$parrot $compdir/nqp/nqp.pbc $filename`;
+ok($out eq "hello world!\n", "check nqp");
 unlink($filename);
 
 # Local Variables:
