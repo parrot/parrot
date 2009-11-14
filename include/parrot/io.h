@@ -948,7 +948,7 @@ typedef enum {
 
 typedef enum {
     PIO_PROTO_TCP   = 6,
-    PIO_PROTO_UDP   = 17,
+    PIO_PROTO_UDP   = 17 /* last element */
 } Socket_Protocol;
 /* &end_gen */
 

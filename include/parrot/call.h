@@ -36,7 +36,7 @@ typedef struct parrot_runloop_t {
 typedef parrot_runloop_t Parrot_runloop;
 
 typedef enum {
-    CALLSIGNATURE_is_exception_FLAG      = PObj_private0_FLAG,
+    CALLSIGNATURE_is_exception_FLAG      = PObj_private0_FLAG /* last element */
 } callsignature_flags_enum;
 
 #define CALLSIGNATURE_get_FLAGS(o) (PObj_get_FLAGS(o))
