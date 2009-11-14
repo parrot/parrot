@@ -291,6 +291,13 @@ my %PCC_TYPE = (
     p => 'P',
 );
 
+my %PCC_CAST = (
+    I => '(INTVAL) ',
+    N => '(FLOATVAL) ',
+    S => '',
+    P => '',
+);
+
 my %OVERRIDE = (
     'glutInit'  => 'v3p',
 );
@@ -939,14 +946,15 @@ sub gen_glut_callbacks {
 
         my $args   =  $params;
            $args   =~ s/void//;
-           $args   =~ s/(^|, )(\w+ )+/$1/g;
+           $args   =~ s/unsigned //;
+           $args   =~ s/(^|, )((?:\w+ )+)/$1$PCC_CAST{$PCC_TYPE{$NCI_TYPE{(split ' ', $2)[0]}}}/g;
            $args   =  ", $args" if $args;
         my $proto  =  $params;
            $proto  =~ s/ \w+(,|$)/$1/g;
         my $sig    =  $proto;
            $sig    =~ s/void//;
            $sig    =~ s/unsigned //;
-           $sig    =~ s/(\w+)\W*/$PCC_TYPE{$NCI_TYPE{$1}}/eg;
+           $sig    =~ s/(\w+)\W*/$PCC_TYPE{$NCI_TYPE{$1}}/g;
            $sig    =  "$sig->";
 
         my $glutcb =  "glutcb${friendly}Func";
@@ -1082,7 +1090,7 @@ glut_timer_func(int data)
     PMC           *sub   = callback_data[GLUT_CB_TIMER].sub;
 
     if (is_safe(interp, sub))
-        Parrot_ext_call(interp, sub, "I->", data);
+        Parrot_ext_call(interp, sub, "I->", (INTVAL) data);
 }
 
 PARROT_DYNEXT_EXPORT
@@ -1117,7 +1125,8 @@ glut_joystick_func(unsigned int buttons, int xaxis, int yaxis, int zaxis)
     PMC           *sub   = callback_data[GLUT_CB_JOYSTICK].sub;
 
     if (is_safe(interp, sub))
-        Parrot_ext_call(interp, sub, "IIII->", buttons, xaxis, yaxis, zaxis);
+        Parrot_ext_call(interp, sub, "IIII->",
+            (INTVAL) buttons, (INTVAL) xaxis, (INTVAL) yaxis, (INTVAL) zaxis);
 }
 
 PARROT_DYNEXT_EXPORT
