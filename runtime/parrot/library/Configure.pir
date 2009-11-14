@@ -52,7 +52,7 @@ L<http://github.com/fperrad/markdown/blob/master/Configure.pir>
     $S0 = interpolate_var($S0, config)
     $S1 = sysinfo .SYSINFO_PARROT_OS
     $S0 = replace_slash($S0, $S1)
-    output(outfile, $S0)
+    spew(outfile, $S0)
     printerr "\n\tGenerating '"
     printerr outfile
     printerr "'\n\n"
@@ -78,7 +78,7 @@ L<http://github.com/fperrad/markdown/blob/master/Configure.pir>
     rethrow e
 .end
 
-.sub 'output' :anon
+.sub 'spew' :anon
     .param string filename
     .param string content
     $P0 = new 'FileHandle'
