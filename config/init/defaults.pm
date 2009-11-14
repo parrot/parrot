@@ -49,25 +49,36 @@ sub runstep {
     # special keys within the Parrot::Configure object.
     # This is a multi-stage process.
 
+#    # Stage 1:
+#    foreach my $orig ( qw|
+#        longsize
+#    | ) {
+#        $conf->data->set_p5( $orig => $Config{$orig} );
+#    }
+#
+#    # Stage 2 (anticipating needs of config/auto/headers.pm):
+#    $conf->data->set_p5(
+#        map { $_ => $Config{$_} } grep { /^i_/ } keys %Config
+#    );
+#
+#    # Stage 3 (Along similar lines, look up values from Perl 5 special
+#    # variables and stash them for later lookups.  Name them according
+#    # to their 'use English' names as documented in 'perlvar'.)
+#    $conf->data->set_p5( OSNAME => $^O );
+
+    # Later configuration steps need access to values from the Perl 5
+    # %Config.  However, other later configuration steps may change
+    # the corresponding values in the Parrot::Configure object.  In
+    # order to provide access to the original values from Perl 5
+    # %Config, we grab those settings we need now and store them in
+    # special keys within the Parrot::Configure object.  We label these keys
+    # '_provisional' to alert users that these should only be used during
+    # configuration and testing of configuration steps.  They should not be
+    # used during Parrot's build, nor should they be used in 'make test'.
+    #
+    # This is a multi-stage process.
+
     # Stage 1:
-    foreach my $orig ( qw|
-        longsize
-        use64bitint
-    | ) {
-        $conf->data->set_p5( $orig => $Config{$orig} );
-    }
-
-    # Stage 2 (anticipating needs of config/auto/headers.pm):
-    $conf->data->set_p5(
-        map { $_ => $Config{$_} } grep { /^i_/ } keys %Config
-    );
-
-    # Stage 3 (Along similar lines, look up values from Perl 5 special
-    # variables and stash them for later lookups.  Name them according
-    # to their 'use English' names as documented in 'perlvar'.)
-    $conf->data->set_p5( OSNAME => $^O );
-
-    # configtests branch:  We start to handle these things differently.
     foreach my $orig ( qw|
         archname
         ccflags
@@ -80,10 +91,14 @@ sub runstep {
         $conf->data->set( qq|${orig}_provisional| => $Config{$orig} );
     }
 
+    # Stage 2 (anticipating needs of config/auto/headers.pm):
     $conf->data->set(
-#        map { qq|${_}_provisional| => $Config{$_} } grep { /^i_/ } keys %Config
         map { $_ . q{_provisional} => $Config{$_} } grep { /^i_/ } keys %Config
     );
+
+    # Stage 3 (Along similar lines, look up values from Perl 5 special
+    # variables and stash them for later lookups.  Name them according
+    # to their 'use English' names as documented in 'perlvar'.)
     $conf->data->set( OSNAME_provisional => $^O );
 
     my $ccdlflags = $Config{ccdlflags};
