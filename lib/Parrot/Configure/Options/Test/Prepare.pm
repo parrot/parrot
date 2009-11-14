@@ -29,7 +29,6 @@ my @steps_tests = _prepare_steps_tests_list(
 );
 
 sub get_preconfiguration_tests {
-#    return ( @framework_tests, @steps_tests );
     return ( @framework_tests );
 };
 
