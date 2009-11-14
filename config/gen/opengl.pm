@@ -280,6 +280,17 @@ my %NCI_TYPE = (
     'double***'  => 'p',
 );
 
+my %PCC_TYPE = (
+    c => 'I',
+    s => 'I',
+    i => 'I',
+    l => 'I',
+    f => 'N',
+    d => 'N',
+    t => 'S',
+    p => 'P',
+);
+
 my %OVERRIDE = (
     'glutInit'  => 'v3p',
 );
@@ -935,7 +946,7 @@ sub gen_glut_callbacks {
         my $sig    =  $proto;
            $sig    =~ s/void//;
            $sig    =~ s/unsigned //;
-           $sig    =~ s/(\w)\w+\W*/$1/g;
+           $sig    =~ s/(\w+)\W*/$PCC_TYPE{$NCI_TYPE{$1}}/eg;
            $sig    =  "$sig->";
 
         my $glutcb =  "glutcb${friendly}Func";
@@ -1071,7 +1082,7 @@ glut_timer_func(int data)
     PMC           *sub   = callback_data[GLUT_CB_TIMER].sub;
 
     if (is_safe(interp, sub))
-        Parrot_pcc_invoke_sub_from_c_args(interp, sub, "vi", data);
+        Parrot_pcc_invoke_sub_from_c_args(interp, sub, "I->", data);
 }
 
 PARROT_DYNEXT_EXPORT
@@ -1106,7 +1117,7 @@ glut_joystick_func(unsigned int buttons, int xaxis, int yaxis, int zaxis)
     PMC           *sub   = callback_data[GLUT_CB_JOYSTICK].sub;
 
     if (is_safe(interp, sub))
-        Parrot_pcc_invoke_sub_from_c_args(interp, sub, "viiii", buttons, xaxis, yaxis, zaxis);
+        Parrot_pcc_invoke_sub_from_c_args(interp, sub, "IIII->", buttons, xaxis, yaxis, zaxis);
 }
 
 PARROT_DYNEXT_EXPORT
