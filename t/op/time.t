@@ -3,15 +3,19 @@
 .sub main :main
     .include 'test_more.pir'
 
-    plan(11)
+    plan(29)
     test_time_i()
     test_time_n()
     test_sleep_i()
     test_sleep_i_negative()
     test_sleep_n()
     test_sleep_n_negative()
-    test_gmtime_string_length()
+    test_tm_pasm()
+    test_gmtime_s_i()
     test_time_n_vs_time_i()
+    test_decodetime_p_i()
+    test_localtime_s_i()
+    test_decodelocaltime_p_i()
 .end
 
 .sub test_time_i
@@ -37,12 +41,12 @@
 .sub test_sleep_i
     $I0 = time
     sleep 1
-
-    $I1 = 1
-    sleep $I1
     $I1 = time
     $I2 = isgt $I1, $I2
     ok($I2, "sleep_i increases time")
+    $I2 = $I0 + 1
+    $I3 = isge $I1, $I2
+    ok($I3, "sleep_i slept for at least the amount of time specified")
 .end
 
 .sub test_sleep_i_negative
@@ -59,12 +63,12 @@
 .sub test_sleep_n
     $N0 = time
     sleep 1.1
-
-    $N1 = 1.1
-    sleep $N1
     $N1 = time
-    $I2 = isgt $N1, $N22
+    $I2 = isgt $N1, $N0
     ok($I2, "sleep_n increases time")
+    $N2 = $N0 + 1.0
+    $I2 = isge $N1, $N2
+    ok($I2, "sleep_n slept for at least the integer amount of time specified")
 .end
 
 .sub test_sleep_n_negative
@@ -78,10 +82,24 @@
     ok(1, "Cannot sleep_n backwards")
 .end
 
-.sub test_gmtime_string_length
-    $I0 = 1199145600
-    $S0 = gmtime $I0
-    is($S0, "Tue Jan  1 00:00:00 2008\n", "can decode a gmtime string")
+.sub test_tm_pasm
+    .include "tm.pasm"
+    is(.TM_SEC, 0, "TM_SEC ok")
+    is(.TM_MIN, 1, "TM_MIN ok")
+    is(.TM_HOUR, 2, "TM_HOUR ok")
+    is(.TM_MDAY, 3, "TM_MDAY ok")
+    is(.TM_MON, 4, "TM_MON ok")
+    is(.TM_YEAR, 5, "TM_YEAR ok")
+    is(.TM_WDAY, 6, "TM_WDAY ok")
+    is(.TM_YDAY, 7, "TM_YDAY ok")
+    is(.TM_ISDST, 8, "TM_ISDST ok")
+.end
+
+.sub test_gmtime_s_i
+    $S0 = gmtime 0
+    $I0 = isnull $S0
+    is($I0, 0, "gmtime string is not null")
+    is($S0, "Thu Jan  1 00:00:00 1970\n", "correct epoch")
     $I1 = length $S0
     is($I1, 25, "string is the correct length")
 .end
@@ -107,4 +125,28 @@
   FAIL:
     ok(0, "time_n value does not correspond to time_t value")
     .return()
+.end
+
+.sub test_decodetime_p_i
+    $P0 = decodetime 0
+    $I0 = $P0
+    is($I0, 9, "decodetime result has 9 values")
+    $S0 = typeof $P0
+    is($S0, "Array", "decodetime returns the correct PMC type")
+.end
+
+.sub test_localtime_s_i
+    $S0 = localtime 0
+    $I0 = isnull $S0
+    is($I0, 0, "localtime string is not a null string")
+    $I0 = length $S0
+    is($I0, 25, "localtime string is the correct length")
+.end
+
+.sub test_decodelocaltime_p_i
+    $P0 = decodelocaltime 0
+    $I0 = $P0
+    is($I0, 9, "decodelocaltime result has 9 values")
+    $S0 = typeof $P0
+    is($S0, "Array", "decodelocaltime returns the correct PMC type")
 .end
