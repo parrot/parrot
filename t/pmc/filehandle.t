@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 18;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -583,6 +583,35 @@ pir_output_is( <<"CODE", <<"OUTPUT", "readall() - utf8 on opened filehandle" );
 .end
 CODE
 utf8
+OUTPUT
+
+pir_output_is( <<"CODE", <<"OUTPUT", "exit status" );
+.sub 'main'
+    .local pmc pipe
+    .local string cmd
+    pipe = new ['FileHandle']
+
+    cmd = 'parrot'
+    pipe = open cmd, "rp"
+    pipe.'readall'()
+    pipe.'close'()
+    print "expect 0 exit status: "
+    \$I0 = pipe.'exit_status'()
+    say \$I0
+
+    cmd = 'parrot --this_is_not_a_valid_option'
+    pipe = open cmd, "rp"
+    pipe.'readall'()
+    pipe.'close'()
+    print "expect 1 exit status: "
+    \$I0 = pipe.'exit_status'()
+    \$I0 = \$I0 != 0
+    say \$I0
+
+.end
+CODE
+expect 0 exit status: 0
+expect 1 exit status: 1
 OUTPUT
 
 # RT #46843

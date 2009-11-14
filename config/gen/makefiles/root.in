@@ -890,9 +890,9 @@ $(SRC_DIR)/scheduler$(O) : $(INC_DIR)/parrot.h \
 $(IO_DIR)/core$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/pmc/socket.c
 $(IO_DIR)/socket_api$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/pmc/socket.c
 $(IO_DIR)/socket_unix$(O) : $(INC_DIR)/parrot.h $(INC_DIR)/pbcversion.h   \
-                            $(SRC_DIR)/pmc/socket.c
+                            $(SRC_DIR)/pmc/socket.c $(PMC_INC_DIR)/pmc/pmc_filehandle.h
 $(IO_DIR)/socket_win32$(O) : $(INC_DIR)/parrot.h $(INC_DIR)/pbcversion.h   \
-                            $(SRC_DIR)/pmc/socket.c
+                            $(SRC_DIR)/pmc/socket.c $(PMC_INC_DIR)/pmc/pmc_filehandle.h
 
 lib_deps_object : $(O_FILES)
 	$(PERL) tools/dev/lib_deps.pl object $(O_FILES)

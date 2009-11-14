@@ -49,8 +49,7 @@ Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)
     if (child) {
         /* parent */
         int   status;
-        pid_t returnstat = waitpid(child, &status, 0);
-        UNUSED(returnstat);
+        waitpid(child, &status, 0);
         return status;
     }
     else {

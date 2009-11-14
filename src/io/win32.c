@@ -27,6 +27,7 @@ Win32 System Programming, 2nd Edition.
 #endif
 
 #include "parrot/parrot.h"
+#include "pmc/pmc_filehandle.h"
 #include "io_private.h"
 
 #ifdef PIO_OS_WIN32
@@ -336,10 +337,17 @@ Parrot_io_close_win32(PARROT_INTERP, ARGMOD(PMC *filehandle))
         if (CloseHandle(os_handle) == 0)
             result = GetLastError();
         Parrot_io_set_os_handle(interp, filehandle, INVALID_HANDLE_VALUE);
+
         if (flags & PIO_F_PIPE) {
-            INTVAL procid =  VTABLE_get_integer_keyed_int(interp, filehandle, 0);
+            INTVAL procid  = VTABLE_get_integer_keyed_int(interp, filehandle, 0);
             HANDLE process = (HANDLE) procid;
-            WaitForSingleObject(process, INFINITE);
+            DWORD  status  = WaitForSingleObject(process, INFINITE);
+            DWORD  exit_code;
+
+            if (status != WAIT_FAILED && GetExitCodeProcess(process, &exit_code))
+                SETATTR_FileHandle_exit_status(interp, filehandle, exit_code);
+            else
+                SETATTR_FileHandle_exit_status(interp, filehandle, 1);
             CloseHandle(process);
         }
     }

@@ -30,6 +30,7 @@ APitUE - W. Richard Stevens, AT&T SFIO, Perl 5 (Nick Ing-Simmons)
 
 #include "parrot/parrot.h"
 #include "io_private.h"
+#include "pmc/pmc_filehandle.h"
 
 #ifdef PIO_OS_UNIX
 
@@ -352,6 +353,13 @@ Parrot_io_close_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
         if (flags & PIO_F_PIPE) {
             int status;
             waitpid(VTABLE_get_integer_keyed_int(interp, filehandle, 0), &status, 0);
+            if (WIFEXITED(status)) {
+                SETATTR_FileHandle_exit_status(interp, filehandle, WEXITSTATUS(status));
+            }
+            else {
+                /* abnormal termination means non-zero exit status */
+                SETATTR_FileHandle_exit_status(interp, filehandle, 1);
+            }
         }
     }
     Parrot_io_set_os_handle(interp, filehandle, -1);
