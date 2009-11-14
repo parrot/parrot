@@ -3,11 +3,13 @@
 .sub main :main
     .include 'test_more.pir'
 
-    plan(9)
+    plan(11)
     test_time_i()
     test_time_n()
     test_sleep_i()
     test_sleep_i_negative()
+    test_sleep_n()
+    test_sleep_n_negative()
     test_gmtime_string_length()
     test_time_n_vs_time_i()
 .end
@@ -40,18 +42,40 @@
     sleep $I1
     $I1 = time
     $I2 = isgt $I1, $I2
-    ok($I2, "Sleeping increases time")
+    ok($I2, "sleep_i increases time")
 .end
 
 .sub test_sleep_i_negative
     push_eh cannot_sleep_negative
-    sleep   -1
+    sleep -1
     pop_eh
     ok(0, "Guess what? Just time traveled")
     .return()
   cannot_sleep_negative:
     pop_eh
-    ok(1, "Cannot sleep backwards")
+    ok(1, "Cannot sleep_i backwards")
+.end
+
+.sub test_sleep_n
+    $N0 = time
+    sleep 1.1
+
+    $N1 = 1.1
+    sleep $N1
+    $N1 = time
+    $I2 = isgt $N1, $N22
+    ok($I2, "sleep_n increases time")
+.end
+
+.sub test_sleep_n_negative
+    push_eh cannot_sleep_negative
+    sleep -1.2
+    pop_eh
+    ok(0, "Guess what? Just time traveled")
+    .return()
+  cannot_sleep_negative:
+    pop_eh
+    ok(1, "Cannot sleep_n backwards")
 .end
 
 .sub test_gmtime_string_length
