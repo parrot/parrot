@@ -20,6 +20,9 @@ Parrot::Configure::Step::Test - Populate Parrot::Configure object with results o
 
     $conf = Parrot::Configure::Step::Test->new;
     $conf->include_config_results( $args );
+
+Methods below are inherited from Parrot::Configure:
+
     $conf->add_steps( 'some_package' );
     $serialized = $conf->pcfreeze();
     $conf->options->set( %options );
@@ -28,16 +31,19 @@ Parrot::Configure::Step::Test - Populate Parrot::Configure object with results o
 
 =head1 DESCRIPTION
 
-This module is a wrapper around Parrot::Configure to be used for testing of
-individual configuration steps once F<Configure.pl> has run.  It inherits
-C<Parrot::Configure::new()> -- the Parrot::Configure constructor -- and all
-Parrot::Configure methods.  It adds just one method:
+This module is a close simulation of Parrot::Configure to be used for testing
+of individual configuration steps once F<Configure.pl> has run.  Its
+constructor is structured in the same way as C<Parrot::Configure::new()> --
+the Parrot::Configure constructor -- and inherits all Parrot::Configure
+methods.  It adds just one method:
 C<Parrot::Configure::Step::Test::include_config_results()>.  This method
 populates the C<data> section of the Parrot::Configure object's data structure
 with the results of Parrot configuration, I<i.e.,> C<%PConfig> from
 Parrot::Config (F<lib/Parrot/Config.pm>).
 
 =head2 Rationale
+
+I<You may skip this section on first reading.>
 
 Consider these questions:
 
@@ -97,18 +103,9 @@ TK
 
 =head2 C<new()>
 
-Constructor.  Inherited from Parrot::Configure.  See
-F<lib/Parrot/Configure.pm>.
+Constructor, structured the same way as that of Parrot::Configure.
 
-=head2 C<include_config_results()>
-
-B<Purpose:>
-
-B<Arguments:>
-
-B<Return Value:>
-
-B<Comment:>
+See F<lib/Parrot/Configure.pm>.
 
 =cut
 
@@ -128,11 +125,26 @@ sub new {
     return $singleton;
 }
 
-#sub new {
-#    my ($class, $args) = @_;
-#    my $self = Parrot::Configure::new( $class, $args );
-#    return $self;
-#}
+=head2 C<include_config_results()>
+
+B<Purpose:>  Populate the Parrot::Configure object with the results of Parrot
+configuration as recorded in C<%Parrot::Config::PConfig>.
+
+B<Arguments:>  One argument: Hash-reference which is the first return value of
+Parrot::Configure::Options::process_options();
+
+    ($args, $step_list_ref) = process_options( {
+        argv => [ ],
+        mode => q{configure},
+    } );
+
+    $conf = Parrot::Configure::Step::Test->new;
+
+    $conf->include_config_results( $args );
+
+B<Return Value:>  None.
+
+=cut
 
 sub include_config_results {
     my ($conf, $args) = @_;
