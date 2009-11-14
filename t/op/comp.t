@@ -1,12 +1,6 @@
-#!perl
-# Copyright (C) 2001-2005, Parrot Foundation.
+#!parrot
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 7;
 
 =head1 NAME
 
@@ -24,155 +18,136 @@ Tests various conditional branch operations.
 
 # some of these were failing with JIT/i386
 
-pasm_output_is( <<'CODE', <<OUTPUT, "gt_ic_i_ic" );
-        set I0, 10
-        gt 11, I0, ok1
-        print "nok gt\n"
-ok1:
-        print "ok 1\n"
-        gt 9, I0, nok1
-        print "ok 2\n"
-        branch ok2
-nok1:
-        print "nok gt 2\n"
-ok2:
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
+.sub main :main
+    .include 'test_more.pir'
+    plan(17)
+    test_gt_ic_i_ic()
+    test_ge_ic_i_ic()
+    test_le_ic_i_ic()
+    test_lt_ic_i_ic()
+    test_eq_ic_i_ic()
+    test_ne_ic_i_ic()
+    test_eq_num()
+.end
 
-pasm_output_is( <<'CODE', <<OUTPUT, "ge_ic_i_ic" );
-        set I0, 10
-        ge 11, I0, ok1
-        print "nok ge\n"
-ok1:
-        print "ok 1\n"
-        ge 9, I0, nok1
-        print "ok 2\n"
-        branch ok2
-nok1:
-        print "nok ge 2\n"
-ok2:
-        ge 10, I0, ok3
-        print "nok ge 3\n"
-ok3:
-        print "ok 3\n"
-        end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
+.sub test_gt_ic_i_ic
+    set $I0, 10
+    gt 11, $I0, ok1
+    ok(0, "nok gt1")
+  ok1:
+    ok(1, "ok gt1")
+    gt 9, $I0, nok1
+    ok(1, "ok gt2")
+    .return()
+  nok1:
+    ok(0,"nok gt 2")
+.end
 
-pasm_output_is( <<'CODE', <<OUTPUT, "le_ic_i_ic" );
-        set I0, 10
-        le 9, I0, ok1
-        print "nok le\n"
-ok1:
-        print "ok 1\n"
-        le 11, I0, nok1
-        print "ok 2\n"
-        branch ok2
-nok1:
-        print "nok le 2\n"
-ok2:
-        le 10, I0, ok3
-        print "nok le 3\n"
-ok3:
-        print "ok 3\n"
-        end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
+.sub test_ge_ic_i_ic
+    set $I0, 10
+    ge 11, $I0, ok1
+    ok(0, "nok ge1")
+  ok1:
+    ok(1, "ok ge1")
+    ge 9, $I0, nok1
+    ok(1, "ok ge2")
+    branch ok2
+  nok1:
+    ok(0, "nok ge2")
+  ok2:
+    ge 10, $I0, ok3
+    ok(0, "nok ge3")
+  ok3:
+    ok(1, "ok ge3")
+.end
 
-pasm_output_is( <<'CODE', <<OUTPUT, "lt_ic_i_ic" );
-        set I0, 10
-        lt 9, I0, ok1
-        print "nok lt\n"
-ok1:
-        print "ok 1\n"
-        lt 10, I0, nok1
-        print "ok 2\n"
-        branch ok2
-nok1:
-        print "nok lt 2\n"
-ok2:
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
+.sub test_le_ic_i_ic
+    set $I0, 10
+    le 9, $I0, ok1
+    ok(0, "nok le1")
+  ok1:
+    ok(1, "ok le1")
+    le 11, $I0, nok1
+    ok(1, "ok le2")
+    branch ok2
+  nok1:
+    ok(0, "nok le2")
+  ok2:
+    le 10, $I0, ok3
+    ok(0, "nok le2")
+  ok3:
+    ok(1, "ok le3")
+.end
 
-pasm_output_is( <<'CODE', <<OUTPUT, "eq_ic_i_ic" );
-        set I0, 10
-        eq 9, I0, nok1
-        print "ok 1\n"
-        branch ok1
-nok1:
-        print "nok eq\n"
-ok1:
-        eq 10, I0, ok2
-        print "nok eq 2\n"
-        end
-ok2:
-        print "ok 2\n"
-        eq 11, 10, nok3
-        print "ok 3\n"
-        end
-nok3:
-        print "nok 3 eq \n"
-        end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
+.sub test_lt_ic_i_ic
+    set $I0, 10
+    lt 9, $I0, ok1
+    ok(0, "nok lt1")
+  ok1:
+    ok(1, "ok lt1")
+    lt 10, $I0, nok1
+    ok(1, "ok lt2")
+    .return()
+  nok1:
+    ok(0, "nok lt2")
+.end
 
-pasm_output_is( <<'CODE', <<OUTPUT, "ne_ic_i_ic" );
-        set I0, 10
-        ne 9, I0, ok1
-        print "nok 1\n"
-        branch nok1
-ok1:
-        print "ok 1\n"
-nok1:
-        ne 10, I0, nok2
-        print "ok 2\n"
-        branch ok2
-nok2:
-        print "nok 2\n"
-ok2:
-        ne 11, 10, ok3
-        print "nok 3\n"
-        end
-ok3:
-        print "ok 3\n"
-        end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
+.sub test_eq_ic_i_ic
+    set $I0, 10
+    eq 9, $I0, nok1
+    ok(1, "ok eq1")
+    branch ok1
+  nok1:
+    ok(0, "nok eq1")
+  ok1:
+    eq 10, $I0, ok2
+    ok(0, "nok eq2")
+    branch test1
+  ok2:
+    ok(1, "ok eq2")
+  test1:
+    eq 11, 10, nok3
+    ok(1, "ok eq3")
+    .return()
+  nok3:
+    ok(0, "nok eq3")
+.end
 
-pasm_output_is( <<'CODE', <<OUTPUT, "eq_num" );
-        new P0, 'Float'
-        set P0, -1.2
-        new P1, 'String'
-        set P1, "-1.2"
-        eq_num P0, P1, OK
-        print "not "
-OK:     print "ok\n"
-        end
-CODE
-ok
-OUTPUT
+.sub test_ne_ic_i_ic
+    set $I0, 10
+    ne 9, $I0, ok1
+    ok(0, "nok neq1")
+    branch nok1
+  ok1:
+    ok(1, "ok neq1")
+  nok1:
+    ne 10, $I0, nok2
+    ok(1, "ok neq2")
+    branch ok2
+  nok2:
+    ok(0, "nok neq2")
+  ok2:
+    ne 11, 10, ok3
+    ok(0, "nok neq2")
+    .return()
+  ok3:
+    ok(1, "ok neq3")
+.end
+
+.sub test_eq_num
+    new $P0, 'Float'
+    set $P0, -1.2
+    new $P1, 'String'
+    set $P1, "-1.2"
+    eq_num $P0, $P1, OK
+    ok(0, "not eq_num")
+  OK:
+    ok(1, "eq_num")
+.end
 
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 filetype=pir:
