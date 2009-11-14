@@ -27,6 +27,9 @@ The returned value is actually returned from the 'waitpid' system call.
 In order to get the exit code from the spawned process, it needs to be right
 shifted by 8 bit.
 
+TT #1271: Do not rely on the existence of Perl5 here. Spawn Parrot or some
+other program which will exist on the target platform
+
 =head1 TODO
 
 Test negative return codes.
