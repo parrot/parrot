@@ -586,12 +586,25 @@ utf8
 OUTPUT
 
 pir_output_is( <<"CODE", <<"OUTPUT", "exit status" );
+.include 'iglobals.pasm'
 .sub 'main'
-    .local pmc pipe
+    .local pmc pipe, conf, interp
     .local string cmd
     pipe = new ['FileHandle']
 
-    cmd = 'parrot'
+    interp = getinterp
+    conf = interp[.IGLOBALS_CONFIG_HASH]
+
+    cmd = conf['build_dir']
+
+    .local string aux
+    aux = conf['slash']
+    cmd .= aux
+    aux = conf['test_prog']
+    cmd .= aux
+    aux = conf['exe']
+    cmd .= aux
+
     pipe = open cmd, "rp"
     pipe.'readall'()
     pipe.'close'()
@@ -599,7 +612,7 @@ pir_output_is( <<"CODE", <<"OUTPUT", "exit status" );
     \$I0 = pipe.'exit_status'()
     say \$I0
 
-    cmd = 'parrot --this_is_not_a_valid_option'
+    cmd .= ' --this_is_not_a_valid_option'
     pipe = open cmd, "rp"
     pipe.'readall'()
     pipe.'close'()
