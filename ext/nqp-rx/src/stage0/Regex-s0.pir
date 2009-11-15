@@ -2778,26 +2778,37 @@ second child of this node.
     .local int litconst
     lpast = node[0]
     litconst = isa lpast, ['String']
-    unless litconst goto lpast_done
+    if litconst goto lpast_string
+    litconst = isa lpast, ['PAST';'Val']
+    if litconst goto lpast_val
+  lpast_expr:
+    lpost = self.'as_post'(lpast, 'rtype'=>'~')
     unless ignorecase goto lpast_done
+    $S0 = lpost.'result'()
+    lpost.'push_pirop'('downcase', $S0, $S0)
+    goto lpast_done
+  lpast_val:
+    $S0 = lpast.'value'()
+    lpast = box $S0
+  lpast_string:
+    unless ignorecase goto lpast_const
     $S0 = lpast
     $S0 = downcase $S0
     lpast = box $S0
-  lpast_done:
+  lpast_const:
     lpost = self.'as_post'(lpast, 'rtype'=>'~')
+  lpast_done:
 
     $S0 = lpost.'result'()
     ops.'push_pirop'('inline', subtype, $S0, 'inline'=>'  # rx literal %0 %1')
     ops.'push'(lpost)
 
-    # compute constant literal length at compile time
-    .local string litlen
-    $I0 = isa lpast, ['String']
-    if $I0 goto literal_string
+    .local int litlen
+    if litconst goto litlen_const
     litlen = '$I10'
     ops.'push_pirop'('length', '$I10', lpost)
     goto have_litlen
-  literal_string:
+  litlen_const:
     $S0 = lpast
     $I0 = length $S0
     litlen = $I0
