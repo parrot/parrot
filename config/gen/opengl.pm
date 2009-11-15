@@ -1021,6 +1021,7 @@ cannot be used.
 #define PARROT_IN_EXTENSION
 
 #include "parrot/parrot.h"
+#include "parrot/extend.h"
 #include <$glut_header>
 
 
