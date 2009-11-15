@@ -34,12 +34,14 @@ Tests various conditional branch operations.
     set $I0, 10
     gt 11, $I0, ok1
     ok(0, "nok gt1")
+    branch nok1
   ok1:
     ok(1, "ok gt1")
-    gt 9, $I0, nok1
+  nok1:
+    gt 9, $I0, nok2
     ok(1, "ok gt2")
     .return()
-  nok1:
+  nok2:
     ok(0,"nok gt 2")
 .end
 
@@ -47,16 +49,19 @@ Tests various conditional branch operations.
     set $I0, 10
     ge 11, $I0, ok1
     ok(0, "nok ge1")
+    branch nok1
   ok1:
     ok(1, "ok ge1")
-    ge 9, $I0, nok1
+  nok1:
+    ge 9, $I0, nok2
     ok(1, "ok ge2")
     branch ok2
-  nok1:
+  nok2:
     ok(0, "nok ge2")
   ok2:
     ge 10, $I0, ok3
     ok(0, "nok ge3")
+    .return()
   ok3:
     ok(1, "ok ge3")
 .end
@@ -65,16 +70,19 @@ Tests various conditional branch operations.
     set $I0, 10
     le 9, $I0, ok1
     ok(0, "nok le1")
+    branch nok1
   ok1:
     ok(1, "ok le1")
-    le 11, $I0, nok1
+  nok1:
+    le 11, $I0, nok2
     ok(1, "ok le2")
     branch ok2
-  nok1:
+  nok2:
     ok(0, "nok le2")
   ok2:
     le 10, $I0, ok3
     ok(0, "nok le2")
+    .return()
   ok3:
     ok(1, "ok le3")
 .end
@@ -83,12 +91,14 @@ Tests various conditional branch operations.
     set $I0, 10
     lt 9, $I0, ok1
     ok(0, "nok lt1")
+    branch nok1
   ok1:
     ok(1, "ok lt1")
-    lt 10, $I0, nok1
+  nok1:
+    lt 10, $I0, nok2
     ok(1, "ok lt2")
     .return()
-  nok1:
+  nok2:
     ok(0, "nok lt2")
 .end
 
@@ -102,10 +112,10 @@ Tests various conditional branch operations.
   ok1:
     eq 10, $I0, ok2
     ok(0, "nok eq2")
-    branch test1
+    branch nok2
   ok2:
     ok(1, "ok eq2")
-  test1:
+  nok2:
     eq 11, 10, nok3
     ok(1, "ok eq3")
     .return()
@@ -141,6 +151,7 @@ Tests various conditional branch operations.
     set $P1, "-1.2"
     eq_num $P0, $P1, OK
     ok(0, "not eq_num")
+    .return()
   OK:
     ok(1, "eq_num")
 .end
