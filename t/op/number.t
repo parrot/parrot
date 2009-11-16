@@ -685,9 +685,18 @@ Tests the use of Parrot floating-point number registers.
 .end
 
 .sub test_neg_0_dot_0
+    load_bytecode 'config.pbc'
+    $P1 = _config()
+    $P2 = $P1['has_negative_zero']
+    unless $P2 goto negative_zero_todoed
+
     set $N1, 0
     neg $N1
     is( $N1, "-0", 'neg 0.0' )
+    .return ()
+
+  negative_zero_todoed:
+    todo(0, '-0.0 not implemented, TT#313')
 .end
 
 .sub test_mul_n_n
