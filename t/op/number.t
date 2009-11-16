@@ -914,13 +914,13 @@ Tests the use of Parrot floating-point number registers.
     set $N0, 0
     set $N1, 10
     mod $N2, $N1, $N0
-    is( $N1, "10", 'mod_n_n_n by zero' )
+    is( $N2, "10", 'mod_n_n_n by zero' )
 .end
 
 .sub test_mod_n_nc_n_by_zero
     set $N0, 0
     mod $N2, 10, $N0
-    is( $N1, 0, 'mod_n_nc_n by zero' )
+    is( $N2, 10, 'mod_n_nc_n by zero' )
 .end
 
 .sub test_mod_n_n_nc_by_zero
