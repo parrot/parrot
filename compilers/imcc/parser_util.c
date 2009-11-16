@@ -871,7 +871,7 @@ imcc_compile_pir_ex(PARROT_INTERP, ARGIN(const char *s))
     /* We need to clear the current_results from the current context. This is
      * in order to prevent any RetContinuations that get promoted to full
      * Continuations (this happens when something is the target of a :outer)
-     * trying to return values using them when invoked. (See TT#500 for the
+     * trying to return values using them when invoked. (See TT #500 for the
      * report of the bug this fixes). */
     opcode_t *save_results = Parrot_pcc_get_results(interp, CURRENT_CONTEXT(interp));
     Parrot_pcc_set_results(interp, CURRENT_CONTEXT(interp), NULL);

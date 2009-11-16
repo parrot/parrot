@@ -139,7 +139,7 @@ See below.
 
 =item Spurious stackdumps while building
 
-Building with an already installed library fails. See RT#39742
+Building with an already installed library fails. See RT #39742
 
 Be sure that there's no other libparrot.dll.a or libparrot.a
 in the linker libpath.

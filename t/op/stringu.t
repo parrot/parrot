@@ -550,7 +550,7 @@ CODE
 OUT
 }
 
-pir_output_is( <<'CODE', <<'OUT', 'concatenation of utf8 and iso-8859-1 (TT#752)' );
+pir_output_is( <<'CODE', <<'OUT', 'concatenation of utf8 and iso-8859-1 (TT #752)' );
 .sub 'main'
 
     $S1 = chr 0xe5

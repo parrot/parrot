@@ -55,7 +55,7 @@ inline op end() :base_core :check_event :flow {
 =item B<load_bytecode>(in STR)
 
 Load Parrot bytecode from file $1, and
-RT#42381 search the library path to locate the file.
+RT #42381 search the library path to locate the file.
 
 =cut
 

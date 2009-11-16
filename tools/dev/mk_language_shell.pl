@@ -1092,7 +1092,7 @@ initialize the pmc class. Store some constants, etc.
 
 */
 
-    /* RT#48194: move any constant string declarations here so we just do them once. */
+    /* RT #48194: move any constant string declarations here so we just do them once. */
     void class_init() {
     }
 
@@ -1185,7 +1185,7 @@ the end of the vector.
         } else if (new_size > old_size) {
             pos = 0;
             for (; new_size != old_size; old_size++, pos++) {
-                /* RT#48196 clone this? */
+                /* RT #48196 clone this? */
                 VTABLE_push_pmc(INTERP, SELF,
                     VTABLE_get_pmc_keyed_int(INTERP, SELF, pos));
             }

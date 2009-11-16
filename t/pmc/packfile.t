@@ -32,7 +32,7 @@ Tests the Packfile PMC.
     'test_load'()
     'test_pack_fresh_packfile'()
     'test_pack'()
-    # This test will crash on many platforms. See TT#545.
+    # This test will crash on many platforms. See TT #545.
     #'test_synonyms'()
 .end
 

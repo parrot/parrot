@@ -49,7 +49,7 @@ Create the class, with attributes, when this PBC is loaded.
   addattribute $P1, 'exhausted'
 .end
 
-# RT#42430
+# RT #42430
 # :method is only specified here so we can get 'self'
 
 =head1 :vtable
@@ -175,7 +175,7 @@ done:
   .return (from)
 .end
 
-# RT#42430
+# RT #42430
 # :method is only specified on the shift_* vtables for self.
 
 # Wrappers for the shift_pmc vtable - rely on autoboxing.
@@ -226,7 +226,7 @@ done:
   .return (to)
 .end
 
-# RT#42430
+# RT #42430
 # :method is only specified on the shift_* vtables for self.
 
 # Wrappers for the shift_pmc vtable - rely on autoboxing.

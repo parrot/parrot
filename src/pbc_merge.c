@@ -614,7 +614,7 @@ pbc_merge_debugs(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         }
 
         /* Update counts.  The "- 1" allows for the fact that the size value
-           itself is included in in_seg->base.size.  See RT#58660. */
+           itself is included in in_seg->base.size.  See RT #58660. */
         num_lines    += in_seg->base.size - 1;
         num_mappings += in_seg->num_mappings;
     }

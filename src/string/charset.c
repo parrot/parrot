@@ -168,7 +168,7 @@ Parrot_find_charset(SHIM_INTERP, ARGIN(const char *charsetname))
 
 =item C<CHARSET * Parrot_load_charset(PARROT_INTERP, const char *charsetname)>
 
-Throws an exception (Can't load charsets dynamically yet. RT#58184).
+Throws an exception (Can't load charsets dynamically yet. RT #58184).
 
 =cut
 

@@ -191,7 +191,7 @@ Invokes the first subroutine in the eval code.
             return;
         }
 
-        /* RT#46685 create PF API, move it there */
+        /* RT #46685 create PF API, move it there */
         seg = (PackFile_Segment *)cur_cs->const_table;
         if (seg) {
             PackFile_Segment_destroy(INTERP, seg);
@@ -370,7 +370,7 @@ Unarchives the code.
         pf->directory.num_segments = 0;
 
         /*
-         * RT#46687 this isn't ok - it seems that the packfile
+         * RT #46687 this isn't ok - it seems that the packfile
          *     gets attached to interp->code and is
          *     destroyed again during interpreter destruction
          */

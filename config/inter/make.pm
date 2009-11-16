@@ -120,7 +120,7 @@ sub _set_make_c {
         # get the default value
         my $make_c = $conf->data->get('make_c');
 
-        # RT#43171 this is an ugly hack
+        # RT #43171 this is an ugly hack
         # replace the value for $(MAKE) with the actual path or we'll end up
         # with a variable that recursively refers to itself
         $make_c =~ s/\$\(MAKE\)/$prog/;

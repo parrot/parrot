@@ -782,7 +782,7 @@ Return a malloced C-string for the runtime prefix.  The calling function
 must free it.
 
 This function is deprecated, use Parrot_get_runtime_path instead.
-See RT#58988
+See RT #58988
 
 =cut
 

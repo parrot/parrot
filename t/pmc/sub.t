@@ -1592,7 +1592,7 @@ bar
 bazsubid
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'Thaw PIR subclass', todo => 'See TT#132' );
+pir_output_is( <<'CODE', <<'OUTPUT', 'Thaw PIR subclass', todo => 'See TT #132' );
 .sub main :main
 
   $P0 = get_class 'Sub'

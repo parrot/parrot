@@ -150,8 +150,8 @@ my %calltype = (
     'void**'   => 'B',
     'void **'  => 'B',
 
-    #"BIGNUM*" => "???" # RT#43731
-    #"BIGNUM *"=> "???" # RT#43731
+    #"BIGNUM*" => "???" # RT #43731
+    #"BIGNUM *"=> "???" # RT #43731
 );
 
 sub proto {

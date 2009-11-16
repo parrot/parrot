@@ -633,7 +633,7 @@ Set an attribute value for the exception object.
         }
         else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "thrower"))) {
             /* Ensure it's a ret cont, and extract the from_ctx.
-             * XXX TT#596 - when we have Context PMCs, just take and set that. */
+             * XXX TT #596 - when we have Context PMCs, just take and set that. */
             if (!PMC_IS_NULL(value) && VTABLE_isa(interp, value, CONST_STRING(interp, "Continuation"))) {
                 PMC *ctx = PMC_cont(value)->from_ctx;
                 if (!PMC_IS_NULL(ctx))

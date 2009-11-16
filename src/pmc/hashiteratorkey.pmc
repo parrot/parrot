@@ -36,7 +36,7 @@ Get "key".
         Parrot_HashIteratorKey_attributes *attrs =
                 PARROT_HASHITERATORKEY(SELF);
 
-        /* TT#1080 & TT#1081 Wallpapering problem with NULL attributes */
+        /* TT #1080 & TT #1081 Wallpapering problem with NULL attributes */
         if (!attrs->parrot_hash || !attrs->bucket)
             return PMCNULL;
 
@@ -64,7 +64,7 @@ Get "key".
         Parrot_HashIteratorKey_attributes *attrs =
                 PARROT_HASHITERATORKEY(SELF);
 
-        /* TT#1080 & TT#1081 Wallpapering problem with NULL attributes */
+        /* TT #1080 & TT #1081 Wallpapering problem with NULL attributes */
         if (!attrs->parrot_hash || !attrs->bucket)
             return CONST_STRING(INTERP, "");
 

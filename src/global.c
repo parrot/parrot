@@ -478,7 +478,7 @@ Parrot_set_global(PARROT_INTERP, ARGIN_NULLOK(PMC *ns),
 Search the namespace PMC C<ns> for an object with name C<globalname>.
 Return the object, or NULL if not found.
 
-TT#1222 - For now this function prefers non-namespaces, it will eventually
+TT #1222 - For now this function prefers non-namespaces, it will eventually
 entirely use the untyped interface.
 
 =cut
@@ -545,7 +545,7 @@ Search the namespace designated by C<str_key>, or the HLL root if
 C<str_key> is NULL, for an object with name C<globalname>.  Return the
 object, or NULL if not found.
 
-TT#1222 - For now this function prefers non-namespaces, it will eventually
+TT #1222 - For now this function prefers non-namespaces, it will eventually
 entirely use the untyped interface.
 
 =cut
@@ -662,7 +662,7 @@ Parrot_find_global_op(PARROT_INTERP, ARGIN(PMC *ns),
 
 =item C<PMC * Parrot_find_name_op(PARROT_INTERP, STRING *name, void *next)>
 
-TT#1223 - THIS IS BROKEN - it doesn't walk up the scopes yet
+TT #1223 - THIS IS BROKEN - it doesn't walk up the scopes yet
 
 Find the given C<name> in lexicals, then the current namespace, then the HLL
 root namespace, and finally Parrot builtins.  If the name isn't found
@@ -817,7 +817,7 @@ Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 
         Parrot_store_global_n(interp, ns, ns_entry_name, sub_pmc);
 
-        /* TT#1224:
+        /* TT #1224:
            TEMPORARY HACK - cache invalidation should be a namespace function */
         if (!PMC_IS_NULL(nsname)) {
             STRING * const nsname_s = VTABLE_get_string(interp, nsname);

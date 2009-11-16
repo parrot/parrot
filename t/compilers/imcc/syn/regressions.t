@@ -228,7 +228,7 @@ CODE
 OUT
 
 # We shouldn't crash (and valgrind shoudn't report invalid reads)
-pir_output_is( <<'CODE', <<'OUT', 'exit is last op in sub (TT#1009)');
+pir_output_is( <<'CODE', <<'OUT', 'exit is last op in sub (TT #1009)');
 .sub main :main
     exit 0
 .end

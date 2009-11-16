@@ -41,7 +41,7 @@ void
 Parrot_on_exit(PARROT_INTERP, NOTNULL(exit_handler_f function), ARGIN_NULLOK(void *arg))
 {
     ASSERT_ARGS(Parrot_on_exit)
-    /* RT#46403  we might want locking around the list access.   I'm sure this
+    /* RT #46403  we might want locking around the list access.   I'm sure this
      * will be the least of the threading issues. */
 
     handler_node_t * const new_node = mem_allocate_typed(handler_node_t);
@@ -72,7 +72,7 @@ Parrot_exit(PARROT_INTERP, int status)
     /* we are well "below" the runloop now, where lo_var_ptr
      * is set usually - exit handlers may run some resource-hungry
      * stuff like printing profile stats - a GC run would kill
-     * resources - RT#46405 reset stacktop or better disable GC
+     * resources - RT #46405 reset stacktop or better disable GC
      */
     /*
      * we don't allow new exit_handlers being installed inside exit handlers
