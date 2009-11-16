@@ -1324,20 +1324,28 @@ tokrx hash.
     goto caller_loop
   caller_done:
 
-    .local pmc tokens, tokens_it
-    tokens = self.peekname()
-    unless tokens goto subrule_none
-    unless prefix goto tokens_done
-    tokens_it = iter tokens
+    .local pmc subtokens, tokens
+    subtokens = self.peekname()
+    unless subtokens goto subrule_none
+    unless prefix goto prefix_none
     tokens = new ['ResizablePMCArray']
-  tokens_loop:
-    unless tokens_it goto tokens_done
-    $S0 = shift tokens_it
+  subtokens_loop:
+    unless subtokens goto subtokens_done
+    $P0 = shift subtokens
+    $I0 = isa $P0, ['ResizablePMCArray']
+    unless $I0 goto subtokens_item
+    splice subtokens, $P0, 0, 0
+    goto subtokens_loop
+  subtokens_item:
+    $S0 = $P0
     $S0 = concat prefix, $S0
     push tokens, $S0
-    goto tokens_loop
-  tokens_done:
+    goto subtokens_loop
+  subtokens_done:
     .return (tokens)
+
+  prefix_none:
+    .return (subtokens)
 
   subrule_none:
     .return (prefix)

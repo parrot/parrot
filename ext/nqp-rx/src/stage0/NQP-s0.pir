@@ -15,7 +15,7 @@ NQP::Compiler - NQP compiler
 ### .include 'gen/nqp-grammar.pir'
 
 .namespace []
-.sub "_block11"  :anon :subid("10_1258300993.09831")
+.sub "_block11"  :anon :subid("10_1258388854.98833")
 .annotate "line", 0
     get_hll_global $P14, ["NQP";"Grammar"], "_block13" 
     capture_lex $P14
@@ -29,9 +29,9 @@ NQP::Compiler - NQP compiler
 
 
 .namespace []
-.sub "" :load :init :subid("post309") :outer("10_1258300993.09831")
+.sub "" :load :init :subid("post309") :outer("10_1258388854.98833")
 .annotate "line", 0
-    .const 'Sub' $P12 = "10_1258300993.09831" 
+    .const 'Sub' $P12 = "10_1258388854.98833" 
     .local pmc block
     set block, $P12
     $P1059 = get_root_global ["parrot"], "P6metaclass"
@@ -40,271 +40,271 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "_block13"  :subid("11_1258300993.09831") :outer("10_1258300993.09831")
+.sub "_block13"  :subid("11_1258388854.98833") :outer("10_1258388854.98833")
 .annotate "line", 4
     get_hll_global $P1007, ["NQP";"Regex"], "_block1006" 
     capture_lex $P1007
-    .const 'Sub' $P1001 = "294_1258300993.09831" 
+    .const 'Sub' $P1001 = "294_1258388854.98833" 
     capture_lex $P1001
-    .const 'Sub' $P996 = "292_1258300993.09831" 
+    .const 'Sub' $P996 = "292_1258388854.98833" 
     capture_lex $P996
-    .const 'Sub' $P990 = "290_1258300993.09831" 
+    .const 'Sub' $P990 = "290_1258388854.98833" 
     capture_lex $P990
-    .const 'Sub' $P984 = "288_1258300993.09831" 
+    .const 'Sub' $P984 = "288_1258388854.98833" 
     capture_lex $P984
-    .const 'Sub' $P978 = "286_1258300993.09831" 
+    .const 'Sub' $P978 = "286_1258388854.98833" 
     capture_lex $P978
-    .const 'Sub' $P972 = "284_1258300993.09831" 
+    .const 'Sub' $P972 = "284_1258388854.98833" 
     capture_lex $P972
-    .const 'Sub' $P967 = "282_1258300993.09831" 
+    .const 'Sub' $P967 = "282_1258388854.98833" 
     capture_lex $P967
-    .const 'Sub' $P961 = "280_1258300993.09831" 
+    .const 'Sub' $P961 = "280_1258388854.98833" 
     capture_lex $P961
-    .const 'Sub' $P955 = "278_1258300993.09831" 
+    .const 'Sub' $P955 = "278_1258388854.98833" 
     capture_lex $P955
-    .const 'Sub' $P949 = "276_1258300993.09831" 
+    .const 'Sub' $P949 = "276_1258388854.98833" 
     capture_lex $P949
-    .const 'Sub' $P943 = "274_1258300993.09831" 
+    .const 'Sub' $P943 = "274_1258388854.98833" 
     capture_lex $P943
-    .const 'Sub' $P937 = "272_1258300993.09831" 
+    .const 'Sub' $P937 = "272_1258388854.98833" 
     capture_lex $P937
-    .const 'Sub' $P931 = "270_1258300993.09831" 
+    .const 'Sub' $P931 = "270_1258388854.98833" 
     capture_lex $P931
-    .const 'Sub' $P925 = "268_1258300993.09831" 
+    .const 'Sub' $P925 = "268_1258388854.98833" 
     capture_lex $P925
-    .const 'Sub' $P919 = "266_1258300993.09831" 
+    .const 'Sub' $P919 = "266_1258388854.98833" 
     capture_lex $P919
-    .const 'Sub' $P913 = "264_1258300993.09831" 
+    .const 'Sub' $P913 = "264_1258388854.98833" 
     capture_lex $P913
-    .const 'Sub' $P907 = "262_1258300993.09831" 
+    .const 'Sub' $P907 = "262_1258388854.98833" 
     capture_lex $P907
-    .const 'Sub' $P901 = "260_1258300993.09831" 
+    .const 'Sub' $P901 = "260_1258388854.98833" 
     capture_lex $P901
-    .const 'Sub' $P895 = "258_1258300993.09831" 
+    .const 'Sub' $P895 = "258_1258388854.98833" 
     capture_lex $P895
-    .const 'Sub' $P889 = "256_1258300993.09831" 
+    .const 'Sub' $P889 = "256_1258388854.98833" 
     capture_lex $P889
-    .const 'Sub' $P883 = "254_1258300993.09831" 
+    .const 'Sub' $P883 = "254_1258388854.98833" 
     capture_lex $P883
-    .const 'Sub' $P877 = "252_1258300993.09831" 
+    .const 'Sub' $P877 = "252_1258388854.98833" 
     capture_lex $P877
-    .const 'Sub' $P871 = "250_1258300993.09831" 
+    .const 'Sub' $P871 = "250_1258388854.98833" 
     capture_lex $P871
-    .const 'Sub' $P865 = "248_1258300993.09831" 
+    .const 'Sub' $P865 = "248_1258388854.98833" 
     capture_lex $P865
-    .const 'Sub' $P859 = "246_1258300993.09831" 
+    .const 'Sub' $P859 = "246_1258388854.98833" 
     capture_lex $P859
-    .const 'Sub' $P853 = "244_1258300993.09831" 
+    .const 'Sub' $P853 = "244_1258388854.98833" 
     capture_lex $P853
-    .const 'Sub' $P847 = "242_1258300993.09831" 
+    .const 'Sub' $P847 = "242_1258388854.98833" 
     capture_lex $P847
-    .const 'Sub' $P841 = "240_1258300993.09831" 
+    .const 'Sub' $P841 = "240_1258388854.98833" 
     capture_lex $P841
-    .const 'Sub' $P835 = "238_1258300993.09831" 
+    .const 'Sub' $P835 = "238_1258388854.98833" 
     capture_lex $P835
-    .const 'Sub' $P829 = "236_1258300993.09831" 
+    .const 'Sub' $P829 = "236_1258388854.98833" 
     capture_lex $P829
-    .const 'Sub' $P823 = "234_1258300993.09831" 
+    .const 'Sub' $P823 = "234_1258388854.98833" 
     capture_lex $P823
-    .const 'Sub' $P817 = "232_1258300993.09831" 
+    .const 'Sub' $P817 = "232_1258388854.98833" 
     capture_lex $P817
-    .const 'Sub' $P811 = "230_1258300993.09831" 
+    .const 'Sub' $P811 = "230_1258388854.98833" 
     capture_lex $P811
-    .const 'Sub' $P805 = "228_1258300993.09831" 
+    .const 'Sub' $P805 = "228_1258388854.98833" 
     capture_lex $P805
-    .const 'Sub' $P799 = "226_1258300993.09831" 
+    .const 'Sub' $P799 = "226_1258388854.98833" 
     capture_lex $P799
-    .const 'Sub' $P793 = "224_1258300993.09831" 
+    .const 'Sub' $P793 = "224_1258388854.98833" 
     capture_lex $P793
-    .const 'Sub' $P787 = "222_1258300993.09831" 
+    .const 'Sub' $P787 = "222_1258388854.98833" 
     capture_lex $P787
-    .const 'Sub' $P781 = "220_1258300993.09831" 
+    .const 'Sub' $P781 = "220_1258388854.98833" 
     capture_lex $P781
-    .const 'Sub' $P775 = "218_1258300993.09831" 
+    .const 'Sub' $P775 = "218_1258388854.98833" 
     capture_lex $P775
-    .const 'Sub' $P769 = "216_1258300993.09831" 
+    .const 'Sub' $P769 = "216_1258388854.98833" 
     capture_lex $P769
-    .const 'Sub' $P764 = "214_1258300993.09831" 
+    .const 'Sub' $P764 = "214_1258388854.98833" 
     capture_lex $P764
-    .const 'Sub' $P759 = "212_1258300993.09831" 
+    .const 'Sub' $P759 = "212_1258388854.98833" 
     capture_lex $P759
-    .const 'Sub' $P755 = "210_1258300993.09831" 
+    .const 'Sub' $P755 = "210_1258388854.98833" 
     capture_lex $P755
-    .const 'Sub' $P750 = "208_1258300993.09831" 
+    .const 'Sub' $P750 = "208_1258388854.98833" 
     capture_lex $P750
-    .const 'Sub' $P745 = "206_1258300993.09831" 
+    .const 'Sub' $P745 = "206_1258388854.98833" 
     capture_lex $P745
-    .const 'Sub' $P741 = "204_1258300993.09831" 
+    .const 'Sub' $P741 = "204_1258388854.98833" 
     capture_lex $P741
-    .const 'Sub' $P737 = "202_1258300993.09831" 
+    .const 'Sub' $P737 = "202_1258388854.98833" 
     capture_lex $P737
-    .const 'Sub' $P731 = "200_1258300993.09831" 
+    .const 'Sub' $P731 = "200_1258388854.98833" 
     capture_lex $P731
-    .const 'Sub' $P724 = "198_1258300993.09831" 
+    .const 'Sub' $P724 = "198_1258388854.98833" 
     capture_lex $P724
-    .const 'Sub' $P720 = "196_1258300993.09831" 
+    .const 'Sub' $P720 = "196_1258388854.98833" 
     capture_lex $P720
-    .const 'Sub' $P716 = "194_1258300993.09831" 
+    .const 'Sub' $P716 = "194_1258388854.98833" 
     capture_lex $P716
-    .const 'Sub' $P709 = "192_1258300993.09831" 
+    .const 'Sub' $P709 = "192_1258388854.98833" 
     capture_lex $P709
-    .const 'Sub' $P702 = "190_1258300993.09831" 
+    .const 'Sub' $P702 = "190_1258388854.98833" 
     capture_lex $P702
-    .const 'Sub' $P698 = "188_1258300993.09831" 
+    .const 'Sub' $P698 = "188_1258388854.98833" 
     capture_lex $P698
-    .const 'Sub' $P694 = "186_1258300993.09831" 
+    .const 'Sub' $P694 = "186_1258388854.98833" 
     capture_lex $P694
-    .const 'Sub' $P689 = "184_1258300993.09831" 
+    .const 'Sub' $P689 = "184_1258388854.98833" 
     capture_lex $P689
-    .const 'Sub' $P684 = "182_1258300993.09831" 
+    .const 'Sub' $P684 = "182_1258388854.98833" 
     capture_lex $P684
-    .const 'Sub' $P679 = "180_1258300993.09831" 
+    .const 'Sub' $P679 = "180_1258388854.98833" 
     capture_lex $P679
-    .const 'Sub' $P674 = "178_1258300993.09831" 
+    .const 'Sub' $P674 = "178_1258388854.98833" 
     capture_lex $P674
-    .const 'Sub' $P670 = "176_1258300993.09831" 
+    .const 'Sub' $P670 = "176_1258388854.98833" 
     capture_lex $P670
-    .const 'Sub' $P666 = "174_1258300993.09831" 
+    .const 'Sub' $P666 = "174_1258388854.98833" 
     capture_lex $P666
-    .const 'Sub' $P654 = "170_1258300993.09831" 
+    .const 'Sub' $P654 = "170_1258388854.98833" 
     capture_lex $P654
-    .const 'Sub' $P649 = "168_1258300993.09831" 
+    .const 'Sub' $P649 = "168_1258388854.98833" 
     capture_lex $P649
-    .const 'Sub' $P643 = "166_1258300993.09831" 
+    .const 'Sub' $P643 = "166_1258388854.98833" 
     capture_lex $P643
-    .const 'Sub' $P638 = "164_1258300993.09831" 
+    .const 'Sub' $P638 = "164_1258388854.98833" 
     capture_lex $P638
-    .const 'Sub' $P631 = "162_1258300993.09831" 
+    .const 'Sub' $P631 = "162_1258388854.98833" 
     capture_lex $P631
-    .const 'Sub' $P624 = "160_1258300993.09831" 
+    .const 'Sub' $P624 = "160_1258388854.98833" 
     capture_lex $P624
-    .const 'Sub' $P619 = "158_1258300993.09831" 
+    .const 'Sub' $P619 = "158_1258388854.98833" 
     capture_lex $P619
-    .const 'Sub' $P614 = "156_1258300993.09831" 
+    .const 'Sub' $P614 = "156_1258388854.98833" 
     capture_lex $P614
-    .const 'Sub' $P602 = "152_1258300993.09831" 
+    .const 'Sub' $P602 = "152_1258388854.98833" 
     capture_lex $P602
-    .const 'Sub' $P571 = "150_1258300993.09831" 
+    .const 'Sub' $P571 = "150_1258388854.98833" 
     capture_lex $P571
-    .const 'Sub' $P564 = "148_1258300993.09831" 
+    .const 'Sub' $P564 = "148_1258388854.98833" 
     capture_lex $P564
-    .const 'Sub' $P559 = "146_1258300993.09831" 
+    .const 'Sub' $P559 = "146_1258388854.98833" 
     capture_lex $P559
-    .const 'Sub' $P550 = "144_1258300993.09831" 
+    .const 'Sub' $P550 = "144_1258388854.98833" 
     capture_lex $P550
-    .const 'Sub' $P536 = "142_1258300993.09831" 
+    .const 'Sub' $P536 = "142_1258388854.98833" 
     capture_lex $P536
-    .const 'Sub' $P528 = "140_1258300993.09831" 
+    .const 'Sub' $P528 = "140_1258388854.98833" 
     capture_lex $P528
-    .const 'Sub' $P510 = "138_1258300993.09831" 
+    .const 'Sub' $P510 = "138_1258388854.98833" 
     capture_lex $P510
-    .const 'Sub' $P492 = "136_1258300993.09831" 
+    .const 'Sub' $P492 = "136_1258388854.98833" 
     capture_lex $P492
-    .const 'Sub' $P486 = "134_1258300993.09831" 
+    .const 'Sub' $P486 = "134_1258388854.98833" 
     capture_lex $P486
-    .const 'Sub' $P480 = "132_1258300993.09831" 
+    .const 'Sub' $P480 = "132_1258388854.98833" 
     capture_lex $P480
-    .const 'Sub' $P471 = "128_1258300993.09831" 
+    .const 'Sub' $P471 = "128_1258388854.98833" 
     capture_lex $P471
-    .const 'Sub' $P461 = "126_1258300993.09831" 
+    .const 'Sub' $P461 = "126_1258388854.98833" 
     capture_lex $P461
-    .const 'Sub' $P455 = "124_1258300993.09831" 
+    .const 'Sub' $P455 = "124_1258388854.98833" 
     capture_lex $P455
-    .const 'Sub' $P449 = "122_1258300993.09831" 
+    .const 'Sub' $P449 = "122_1258388854.98833" 
     capture_lex $P449
-    .const 'Sub' $P443 = "120_1258300993.09831" 
+    .const 'Sub' $P443 = "120_1258388854.98833" 
     capture_lex $P443
-    .const 'Sub' $P417 = "116_1258300993.09831" 
+    .const 'Sub' $P417 = "116_1258388854.98833" 
     capture_lex $P417
-    .const 'Sub' $P409 = "114_1258300993.09831" 
+    .const 'Sub' $P409 = "114_1258388854.98833" 
     capture_lex $P409
-    .const 'Sub' $P403 = "112_1258300993.09831" 
+    .const 'Sub' $P403 = "112_1258388854.98833" 
     capture_lex $P403
-    .const 'Sub' $P395 = "108_1258300993.09831" 
+    .const 'Sub' $P395 = "108_1258388854.98833" 
     capture_lex $P395
-    .const 'Sub' $P391 = "106_1258300993.09831" 
+    .const 'Sub' $P391 = "106_1258388854.98833" 
     capture_lex $P391
-    .const 'Sub' $P380 = "104_1258300993.09831" 
+    .const 'Sub' $P380 = "104_1258388854.98833" 
     capture_lex $P380
-    .const 'Sub' $P370 = "102_1258300993.09831" 
+    .const 'Sub' $P370 = "102_1258388854.98833" 
     capture_lex $P370
-    .const 'Sub' $P366 = "100_1258300993.09831" 
+    .const 'Sub' $P366 = "100_1258388854.98833" 
     capture_lex $P366
-    .const 'Sub' $P361 = "98_1258300993.09831" 
+    .const 'Sub' $P361 = "98_1258388854.98833" 
     capture_lex $P361
-    .const 'Sub' $P356 = "96_1258300993.09831" 
+    .const 'Sub' $P356 = "96_1258388854.98833" 
     capture_lex $P356
-    .const 'Sub' $P351 = "94_1258300993.09831" 
+    .const 'Sub' $P351 = "94_1258388854.98833" 
     capture_lex $P351
-    .const 'Sub' $P346 = "92_1258300993.09831" 
+    .const 'Sub' $P346 = "92_1258388854.98833" 
     capture_lex $P346
-    .const 'Sub' $P341 = "90_1258300993.09831" 
+    .const 'Sub' $P341 = "90_1258388854.98833" 
     capture_lex $P341
-    .const 'Sub' $P336 = "88_1258300993.09831" 
+    .const 'Sub' $P336 = "88_1258388854.98833" 
     capture_lex $P336
-    .const 'Sub' $P331 = "86_1258300993.09831" 
+    .const 'Sub' $P331 = "86_1258388854.98833" 
     capture_lex $P331
-    .const 'Sub' $P324 = "84_1258300993.09831" 
+    .const 'Sub' $P324 = "84_1258388854.98833" 
     capture_lex $P324
-    .const 'Sub' $P317 = "82_1258300993.09831" 
+    .const 'Sub' $P317 = "82_1258388854.98833" 
     capture_lex $P317
-    .const 'Sub' $P306 = "78_1258300993.09831" 
+    .const 'Sub' $P306 = "78_1258388854.98833" 
     capture_lex $P306
-    .const 'Sub' $P299 = "76_1258300993.09831" 
+    .const 'Sub' $P299 = "76_1258388854.98833" 
     capture_lex $P299
-    .const 'Sub' $P290 = "72_1258300993.09831" 
+    .const 'Sub' $P290 = "72_1258388854.98833" 
     capture_lex $P290
-    .const 'Sub' $P284 = "70_1258300993.09831" 
+    .const 'Sub' $P284 = "70_1258388854.98833" 
     capture_lex $P284
-    .const 'Sub' $P273 = "66_1258300993.09831" 
+    .const 'Sub' $P273 = "66_1258388854.98833" 
     capture_lex $P273
-    .const 'Sub' $P254 = "64_1258300993.09831" 
+    .const 'Sub' $P254 = "64_1258388854.98833" 
     capture_lex $P254
-    .const 'Sub' $P246 = "62_1258300993.09831" 
+    .const 'Sub' $P246 = "62_1258388854.98833" 
     capture_lex $P246
-    .const 'Sub' $P229 = "59_1258300993.09831" 
+    .const 'Sub' $P229 = "59_1258388854.98833" 
     capture_lex $P229
-    .const 'Sub' $P210 = "57_1258300993.09831" 
+    .const 'Sub' $P210 = "57_1258388854.98833" 
     capture_lex $P210
-    .const 'Sub' $P202 = "53_1258300993.09831" 
+    .const 'Sub' $P202 = "53_1258388854.98833" 
     capture_lex $P202
-    .const 'Sub' $P198 = "51_1258300993.09831" 
+    .const 'Sub' $P198 = "51_1258388854.98833" 
     capture_lex $P198
-    .const 'Sub' $P190 = "47_1258300993.09831" 
+    .const 'Sub' $P190 = "47_1258388854.98833" 
     capture_lex $P190
-    .const 'Sub' $P186 = "45_1258300993.09831" 
+    .const 'Sub' $P186 = "45_1258388854.98833" 
     capture_lex $P186
-    .const 'Sub' $P179 = "43_1258300993.09831" 
+    .const 'Sub' $P179 = "43_1258388854.98833" 
     capture_lex $P179
-    .const 'Sub' $P173 = "41_1258300993.09831" 
+    .const 'Sub' $P173 = "41_1258388854.98833" 
     capture_lex $P173
-    .const 'Sub' $P168 = "39_1258300993.09831" 
+    .const 'Sub' $P168 = "39_1258388854.98833" 
     capture_lex $P168
-    .const 'Sub' $P161 = "37_1258300993.09831" 
+    .const 'Sub' $P161 = "37_1258388854.98833" 
     capture_lex $P161
-    .const 'Sub' $P156 = "35_1258300993.09831" 
+    .const 'Sub' $P156 = "35_1258388854.98833" 
     capture_lex $P156
-    .const 'Sub' $P151 = "33_1258300993.09831" 
+    .const 'Sub' $P151 = "33_1258388854.98833" 
     capture_lex $P151
-    .const 'Sub' $P136 = "30_1258300993.09831" 
+    .const 'Sub' $P136 = "30_1258388854.98833" 
     capture_lex $P136
-    .const 'Sub' $P124 = "28_1258300993.09831" 
+    .const 'Sub' $P124 = "28_1258388854.98833" 
     capture_lex $P124
-    .const 'Sub' $P118 = "26_1258300993.09831" 
+    .const 'Sub' $P118 = "26_1258388854.98833" 
     capture_lex $P118
-    .const 'Sub' $P76 = "23_1258300993.09831" 
+    .const 'Sub' $P76 = "23_1258388854.98833" 
     capture_lex $P76
-    .const 'Sub' $P67 = "21_1258300993.09831" 
+    .const 'Sub' $P67 = "21_1258388854.98833" 
     capture_lex $P67
-    .const 'Sub' $P58 = "19_1258300993.09831" 
+    .const 'Sub' $P58 = "19_1258388854.98833" 
     capture_lex $P58
-    .const 'Sub' $P44 = "17_1258300993.09831" 
+    .const 'Sub' $P44 = "17_1258388854.98833" 
     capture_lex $P44
-    .const 'Sub' $P38 = "15_1258300993.09831" 
+    .const 'Sub' $P38 = "15_1258388854.98833" 
     capture_lex $P38
-    .const 'Sub' $P33 = "13_1258300993.09831" 
+    .const 'Sub' $P33 = "13_1258388854.98833" 
     capture_lex $P33
-    .const 'Sub' $P15 = "12_1258300993.09831" 
+    .const 'Sub' $P15 = "12_1258388854.98833" 
     capture_lex $P15
 .annotate "line", 472
     get_hll_global $P1007, ["NQP";"Regex"], "_block1006" 
@@ -316,7 +316,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "" :load :init :subid("post310") :outer("11_1258300993.09831")
+.sub "" :load :init :subid("post310") :outer("11_1258388854.98833")
 .annotate "line", 4
     get_hll_global $P14, ["NQP";"Grammar"], "_block13" 
     .local pmc block
@@ -373,7 +373,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "TOP"  :subid("12_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "TOP"  :subid("12_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     new $P17, 'ExceptionHandler'
     set_addr $P17, control_16
@@ -442,7 +442,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "identifier"  :subid("13_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "identifier"  :subid("13_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx34_tgt
     .local int rx34_pos
@@ -488,7 +488,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__identifier"  :subid("14_1258300993.09831") :method
+.sub "!PREFIX__identifier"  :subid("14_1258388854.98833") :method
 .annotate "line", 4
     $P36 = self."!PREFIX__!subrule"("ident", "")
     new $P37, "ResizablePMCArray"
@@ -498,7 +498,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "name"  :subid("15_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "name"  :subid("15_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx39_tgt
     .local int rx39_pos
@@ -560,7 +560,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__name"  :subid("16_1258300993.09831") :method
+.sub "!PREFIX__name"  :subid("16_1258388854.98833") :method
 .annotate "line", 4
     new $P41, "ResizablePMCArray"
     push $P41, ""
@@ -569,7 +569,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "deflongname"  :subid("17_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "deflongname"  :subid("17_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx45_tgt
     .local int rx45_pos
@@ -716,7 +716,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__deflongname"  :subid("18_1258300993.09831") :method
+.sub "!PREFIX__deflongname"  :subid("18_1258388854.98833") :method
 .annotate "line", 4
     $P47 = self."!PREFIX__!subrule"("identifier", "")
     new $P48, "ResizablePMCArray"
@@ -726,7 +726,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "ENDSTMT"  :subid("19_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "ENDSTMT"  :subid("19_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx59_tgt
     .local int rx59_pos
@@ -806,7 +806,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__ENDSTMT"  :subid("20_1258300993.09831") :method
+.sub "!PREFIX__ENDSTMT"  :subid("20_1258388854.98833") :method
 .annotate "line", 4
     new $P61, "ResizablePMCArray"
     push $P61, ""
@@ -815,7 +815,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "ws"  :subid("21_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "ws"  :subid("21_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx68_tgt
     .local int rx68_pos
@@ -929,7 +929,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__ws"  :subid("22_1258300993.09831") :method
+.sub "!PREFIX__ws"  :subid("22_1258388854.98833") :method
 .annotate "line", 4
     new $P70, "ResizablePMCArray"
     push $P70, ""
@@ -939,9 +939,9 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "pod_comment"  :subid("23_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "pod_comment"  :subid("23_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
-    .const 'Sub' $P110 = "25_1258300993.09831" 
+    .const 'Sub' $P110 = "25_1258388854.98833" 
     capture_lex $P110
     .local string rx77_tgt
     .local int rx77_pos
@@ -1361,7 +1361,7 @@ NQP::Compiler - NQP compiler
 .annotate "line", 56
   # rx subrule "before" subtype=zerowidth negate=
     rx77_cur."!cursor_pos"(rx77_pos)
-    .const 'Sub' $P110 = "25_1258300993.09831" 
+    .const 'Sub' $P110 = "25_1258388854.98833" 
     capture_lex $P110
     $P10 = rx77_cur."before"($P110)
     unless $P10, rx77_fail
@@ -1428,7 +1428,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__pod_comment"  :subid("24_1258300993.09831") :method
+.sub "!PREFIX__pod_comment"  :subid("24_1258388854.98833") :method
 .annotate "line", 4
     new $P79, "ResizablePMCArray"
     push $P79, ""
@@ -1437,7 +1437,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "_block109"  :anon :subid("25_1258300993.09831") :method :outer("23_1258300993.09831")
+.sub "_block109"  :anon :subid("25_1258388854.98833") :method :outer("23_1258388854.98833")
 .annotate "line", 56
     .local string rx111_tgt
     .local int rx111_pos
@@ -1517,7 +1517,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "comp_unit"  :subid("26_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "comp_unit"  :subid("26_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx119_tgt
     .local int rx119_pos
@@ -1584,7 +1584,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__comp_unit"  :subid("27_1258300993.09831") :method
+.sub "!PREFIX__comp_unit"  :subid("27_1258388854.98833") :method
 .annotate "line", 4
     $P121 = self."!PREFIX__!subrule"("", "")
     new $P122, "ResizablePMCArray"
@@ -1594,7 +1594,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "statementlist"  :subid("28_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "statementlist"  :subid("28_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx125_tgt
     .local int rx125_pos
@@ -1690,7 +1690,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statementlist"  :subid("29_1258300993.09831") :method
+.sub "!PREFIX__statementlist"  :subid("29_1258388854.98833") :method
 .annotate "line", 4
     new $P127, "ResizablePMCArray"
     push $P127, ""
@@ -1700,9 +1700,9 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "statement"  :subid("30_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "statement"  :subid("30_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
-    .const 'Sub' $P141 = "32_1258300993.09831" 
+    .const 'Sub' $P141 = "32_1258388854.98833" 
     capture_lex $P141
     .local string rx137_tgt
     .local int rx137_pos
@@ -1725,7 +1725,7 @@ NQP::Compiler - NQP compiler
 .annotate "line", 78
   # rx subrule "before" subtype=zerowidth negate=1
     rx137_cur."!cursor_pos"(rx137_pos)
-    .const 'Sub' $P141 = "32_1258300993.09831" 
+    .const 'Sub' $P141 = "32_1258388854.98833" 
     capture_lex $P141
     $P10 = rx137_cur."before"($P141)
     if $P10, rx137_fail
@@ -1821,7 +1821,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement"  :subid("31_1258300993.09831") :method
+.sub "!PREFIX__statement"  :subid("31_1258388854.98833") :method
 .annotate "line", 4
     new $P139, "ResizablePMCArray"
     push $P139, ""
@@ -1830,7 +1830,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "_block140"  :anon :subid("32_1258300993.09831") :method :outer("30_1258300993.09831")
+.sub "_block140"  :anon :subid("32_1258388854.98833") :method :outer("30_1258388854.98833")
 .annotate "line", 78
     .local string rx142_tgt
     .local int rx142_pos
@@ -1891,7 +1891,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "eat_terminator"  :subid("33_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "eat_terminator"  :subid("33_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx152_tgt
     .local int rx152_pos
@@ -1966,7 +1966,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__eat_terminator"  :subid("34_1258300993.09831") :method
+.sub "!PREFIX__eat_terminator"  :subid("34_1258388854.98833") :method
 .annotate "line", 4
     new $P154, "ResizablePMCArray"
     push $P154, ""
@@ -1978,7 +1978,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "xblock"  :subid("35_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "xblock"  :subid("35_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx157_tgt
     .local int rx157_pos
@@ -2037,7 +2037,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__xblock"  :subid("36_1258300993.09831") :method
+.sub "!PREFIX__xblock"  :subid("36_1258388854.98833") :method
 .annotate "line", 4
     $P159 = self."!PREFIX__!subrule"("EXPR", "")
     new $P160, "ResizablePMCArray"
@@ -2047,7 +2047,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "pblock"  :subid("37_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "pblock"  :subid("37_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx162_tgt
     .local int rx162_pos
@@ -2154,7 +2154,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__pblock"  :subid("38_1258300993.09831") :method
+.sub "!PREFIX__pblock"  :subid("38_1258388854.98833") :method
 .annotate "line", 4
     $P164 = self."!PREFIX__!subrule"("", "")
     $P165 = self."!PREFIX__!subrule"("", "")
@@ -2167,7 +2167,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "lambda"  :subid("39_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "lambda"  :subid("39_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx169_tgt
     .local int rx169_pos
@@ -2226,7 +2226,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__lambda"  :subid("40_1258300993.09831") :method
+.sub "!PREFIX__lambda"  :subid("40_1258388854.98833") :method
 .annotate "line", 4
     new $P171, "ResizablePMCArray"
     push $P171, "<->"
@@ -2236,7 +2236,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "block"  :subid("41_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "block"  :subid("41_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx174_tgt
     .local int rx174_pos
@@ -2307,7 +2307,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__block"  :subid("42_1258300993.09831") :method
+.sub "!PREFIX__block"  :subid("42_1258388854.98833") :method
 .annotate "line", 4
     $P176 = self."!PREFIX__!subrule"("", "")
     new $P177, "ResizablePMCArray"
@@ -2318,7 +2318,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "blockoid"  :subid("43_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "blockoid"  :subid("43_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx180_tgt
     .local int rx180_pos
@@ -2401,7 +2401,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__blockoid"  :subid("44_1258300993.09831") :method
+.sub "!PREFIX__blockoid"  :subid("44_1258388854.98833") :method
 .annotate "line", 4
     $P182 = self."!PREFIX__!subrule"("", "")
     new $P183, "ResizablePMCArray"
@@ -2411,7 +2411,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "newpad"  :subid("45_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "newpad"  :subid("45_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx187_tgt
     .local int rx187_pos
@@ -2450,7 +2450,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__newpad"  :subid("46_1258300993.09831") :method
+.sub "!PREFIX__newpad"  :subid("46_1258388854.98833") :method
 .annotate "line", 4
     new $P189, "ResizablePMCArray"
     push $P189, ""
@@ -2459,7 +2459,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "finishpad"  :subid("47_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "finishpad"  :subid("47_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx191_tgt
     .local int rx191_pos
@@ -2498,7 +2498,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__finishpad"  :subid("48_1258300993.09831") :method
+.sub "!PREFIX__finishpad"  :subid("48_1258388854.98833") :method
 .annotate "line", 4
     new $P193, "ResizablePMCArray"
     push $P193, ""
@@ -2507,7 +2507,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "terminator"  :subid("49_1258300993.09831") :method
+.sub "terminator"  :subid("49_1258388854.98833") :method
 .annotate "line", 128
     $P195 = self."!protoregex"("terminator")
     .return ($P195)
@@ -2515,7 +2515,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__terminator"  :subid("50_1258300993.09831") :method
+.sub "!PREFIX__terminator"  :subid("50_1258388854.98833") :method
 .annotate "line", 128
     $P197 = self."!PREFIX__!protoregex"("terminator")
     .return ($P197)
@@ -2523,7 +2523,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "terminator:sym<;>"  :subid("51_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "terminator:sym<;>"  :subid("51_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx199_tgt
     .local int rx199_pos
@@ -2568,7 +2568,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__terminator:sym<;>"  :subid("52_1258300993.09831") :method
+.sub "!PREFIX__terminator:sym<;>"  :subid("52_1258388854.98833") :method
 .annotate "line", 4
     new $P201, "ResizablePMCArray"
     push $P201, ";"
@@ -2577,7 +2577,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "terminator:sym<}>"  :subid("53_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "terminator:sym<}>"  :subid("53_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx203_tgt
     .local int rx203_pos
@@ -2622,7 +2622,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__terminator:sym<}>"  :subid("54_1258300993.09831") :method
+.sub "!PREFIX__terminator:sym<}>"  :subid("54_1258388854.98833") :method
 .annotate "line", 4
     new $P205, "ResizablePMCArray"
     push $P205, "}"
@@ -2631,7 +2631,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "statement_control"  :subid("55_1258300993.09831") :method
+.sub "statement_control"  :subid("55_1258388854.98833") :method
 .annotate "line", 135
     $P207 = self."!protoregex"("statement_control")
     .return ($P207)
@@ -2639,7 +2639,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_control"  :subid("56_1258300993.09831") :method
+.sub "!PREFIX__statement_control"  :subid("56_1258388854.98833") :method
 .annotate "line", 135
     $P209 = self."!PREFIX__!protoregex"("statement_control")
     .return ($P209)
@@ -2647,7 +2647,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "statement_control:sym<if>"  :subid("57_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "statement_control:sym<if>"  :subid("57_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx211_tgt
     .local int rx211_pos
@@ -2657,7 +2657,7 @@ NQP::Compiler - NQP compiler
     .local pmc rx211_cur
     (rx211_cur, rx211_pos, rx211_tgt, $I10) = self."!cursor_start"()
     rx211_cur."!cursor_debug"("START ", "statement_control:sym<if>")
-    rx211_cur."!cursor_caparray"("else", "xblock")
+    rx211_cur."!cursor_caparray"("xblock", "else")
     .lex unicode:"$\x{a2}", rx211_cur
     .local pmc match
     .lex "$/", match
@@ -2823,7 +2823,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_control:sym<if>"  :subid("58_1258300993.09831") :method
+.sub "!PREFIX__statement_control:sym<if>"  :subid("58_1258388854.98833") :method
 .annotate "line", 4
     new $P213, "ResizablePMCArray"
     push $P213, "if"
@@ -2832,9 +2832,9 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "statement_control:sym<unless>"  :subid("59_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "statement_control:sym<unless>"  :subid("59_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
-    .const 'Sub' $P239 = "61_1258300993.09831" 
+    .const 'Sub' $P239 = "61_1258388854.98833" 
     capture_lex $P239
     .local string rx230_tgt
     .local int rx230_pos
@@ -2904,7 +2904,7 @@ NQP::Compiler - NQP compiler
     rx230_pos = $P10."pos"()
   # rx subrule "before" subtype=zerowidth negate=1
     rx230_cur."!cursor_pos"(rx230_pos)
-    .const 'Sub' $P239 = "61_1258300993.09831" 
+    .const 'Sub' $P239 = "61_1258388854.98833" 
     capture_lex $P239
     $P10 = rx230_cur."before"($P239)
     if $P10, rx230_fail
@@ -2956,7 +2956,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_control:sym<unless>"  :subid("60_1258300993.09831") :method
+.sub "!PREFIX__statement_control:sym<unless>"  :subid("60_1258388854.98833") :method
 .annotate "line", 4
     new $P232, "ResizablePMCArray"
     push $P232, "unless"
@@ -2965,7 +2965,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "_block238"  :anon :subid("61_1258300993.09831") :method :outer("59_1258300993.09831")
+.sub "_block238"  :anon :subid("61_1258388854.98833") :method :outer("59_1258388854.98833")
 .annotate "line", 147
     .local string rx240_tgt
     .local int rx240_pos
@@ -3018,7 +3018,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "statement_control:sym<while>"  :subid("62_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "statement_control:sym<while>"  :subid("62_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx247_tgt
     .local int rx247_pos
@@ -3110,7 +3110,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_control:sym<while>"  :subid("63_1258300993.09831") :method
+.sub "!PREFIX__statement_control:sym<while>"  :subid("63_1258388854.98833") :method
 .annotate "line", 4
     new $P249, "ResizablePMCArray"
     push $P249, "until"
@@ -3120,7 +3120,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "statement_control:sym<repeat>"  :subid("64_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "statement_control:sym<repeat>"  :subid("64_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx255_tgt
     .local int rx255_pos
@@ -3337,7 +3337,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_control:sym<repeat>"  :subid("65_1258300993.09831") :method
+.sub "!PREFIX__statement_control:sym<repeat>"  :subid("65_1258388854.98833") :method
 .annotate "line", 4
     new $P257, "ResizablePMCArray"
     push $P257, "repeat"
@@ -3346,7 +3346,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "statement_control:sym<for>"  :subid("66_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "statement_control:sym<for>"  :subid("66_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx274_tgt
     .local int rx274_pos
@@ -3425,7 +3425,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_control:sym<for>"  :subid("67_1258300993.09831") :method
+.sub "!PREFIX__statement_control:sym<for>"  :subid("67_1258388854.98833") :method
 .annotate "line", 4
     new $P276, "ResizablePMCArray"
     push $P276, "for"
@@ -3434,7 +3434,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "statement_prefix"  :subid("68_1258300993.09831") :method
+.sub "statement_prefix"  :subid("68_1258388854.98833") :method
 .annotate "line", 168
     $P281 = self."!protoregex"("statement_prefix")
     .return ($P281)
@@ -3442,7 +3442,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_prefix"  :subid("69_1258300993.09831") :method
+.sub "!PREFIX__statement_prefix"  :subid("69_1258388854.98833") :method
 .annotate "line", 168
     $P283 = self."!PREFIX__!protoregex"("statement_prefix")
     .return ($P283)
@@ -3450,7 +3450,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "statement_prefix:sym<INIT>"  :subid("70_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "statement_prefix:sym<INIT>"  :subid("70_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx285_tgt
     .local int rx285_pos
@@ -3517,7 +3517,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_prefix:sym<INIT>"  :subid("71_1258300993.09831") :method
+.sub "!PREFIX__statement_prefix:sym<INIT>"  :subid("71_1258388854.98833") :method
 .annotate "line", 4
     $P287 = self."!PREFIX__!subrule"("blorst", "INIT")
     new $P288, "ResizablePMCArray"
@@ -3527,7 +3527,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "blorst"  :subid("72_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "blorst"  :subid("72_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx291_tgt
     .local int rx291_pos
@@ -3604,7 +3604,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__blorst"  :subid("73_1258300993.09831") :method
+.sub "!PREFIX__blorst"  :subid("73_1258388854.98833") :method
 .annotate "line", 4
     new $P293, "ResizablePMCArray"
     push $P293, ""
@@ -3613,7 +3613,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "statement_mod_cond"  :subid("74_1258300993.09831") :method
+.sub "statement_mod_cond"  :subid("74_1258388854.98833") :method
 .annotate "line", 177
     $P296 = self."!protoregex"("statement_mod_cond")
     .return ($P296)
@@ -3621,7 +3621,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_mod_cond"  :subid("75_1258300993.09831") :method
+.sub "!PREFIX__statement_mod_cond"  :subid("75_1258388854.98833") :method
 .annotate "line", 177
     $P298 = self."!PREFIX__!protoregex"("statement_mod_cond")
     .return ($P298)
@@ -3629,7 +3629,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "statement_mod_cond:sym<if>"  :subid("76_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "statement_mod_cond:sym<if>"  :subid("76_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx300_tgt
     .local int rx300_pos
@@ -3706,7 +3706,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_mod_cond:sym<if>"  :subid("77_1258300993.09831") :method
+.sub "!PREFIX__statement_mod_cond:sym<if>"  :subid("77_1258388854.98833") :method
 .annotate "line", 4
     new $P302, "ResizablePMCArray"
     push $P302, "if"
@@ -3715,7 +3715,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "statement_mod_cond:sym<unless>"  :subid("78_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "statement_mod_cond:sym<unless>"  :subid("78_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx307_tgt
     .local int rx307_pos
@@ -3792,7 +3792,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_mod_cond:sym<unless>"  :subid("79_1258300993.09831") :method
+.sub "!PREFIX__statement_mod_cond:sym<unless>"  :subid("79_1258388854.98833") :method
 .annotate "line", 4
     new $P309, "ResizablePMCArray"
     push $P309, "unless"
@@ -3801,7 +3801,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "statement_mod_loop"  :subid("80_1258300993.09831") :method
+.sub "statement_mod_loop"  :subid("80_1258388854.98833") :method
 .annotate "line", 182
     $P314 = self."!protoregex"("statement_mod_loop")
     .return ($P314)
@@ -3809,7 +3809,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_mod_loop"  :subid("81_1258300993.09831") :method
+.sub "!PREFIX__statement_mod_loop"  :subid("81_1258388854.98833") :method
 .annotate "line", 182
     $P316 = self."!PREFIX__!protoregex"("statement_mod_loop")
     .return ($P316)
@@ -3817,7 +3817,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "statement_mod_loop:sym<while>"  :subid("82_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "statement_mod_loop:sym<while>"  :subid("82_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx318_tgt
     .local int rx318_pos
@@ -3894,7 +3894,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_mod_loop:sym<while>"  :subid("83_1258300993.09831") :method
+.sub "!PREFIX__statement_mod_loop:sym<while>"  :subid("83_1258388854.98833") :method
 .annotate "line", 4
     new $P320, "ResizablePMCArray"
     push $P320, "while"
@@ -3903,7 +3903,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "statement_mod_loop:sym<until>"  :subid("84_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "statement_mod_loop:sym<until>"  :subid("84_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx325_tgt
     .local int rx325_pos
@@ -3980,7 +3980,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_mod_loop:sym<until>"  :subid("85_1258300993.09831") :method
+.sub "!PREFIX__statement_mod_loop:sym<until>"  :subid("85_1258388854.98833") :method
 .annotate "line", 4
     new $P327, "ResizablePMCArray"
     push $P327, "until"
@@ -3989,7 +3989,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "term:sym<colonpair>"  :subid("86_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "term:sym<colonpair>"  :subid("86_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx332_tgt
     .local int rx332_pos
@@ -4035,7 +4035,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<colonpair>"  :subid("87_1258300993.09831") :method
+.sub "!PREFIX__term:sym<colonpair>"  :subid("87_1258388854.98833") :method
 .annotate "line", 4
     $P334 = self."!PREFIX__!subrule"("colonpair", "")
     new $P335, "ResizablePMCArray"
@@ -4045,7 +4045,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "term:sym<variable>"  :subid("88_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "term:sym<variable>"  :subid("88_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx337_tgt
     .local int rx337_pos
@@ -4091,7 +4091,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<variable>"  :subid("89_1258300993.09831") :method
+.sub "!PREFIX__term:sym<variable>"  :subid("89_1258388854.98833") :method
 .annotate "line", 4
     $P339 = self."!PREFIX__!subrule"("variable", "")
     new $P340, "ResizablePMCArray"
@@ -4101,7 +4101,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "term:sym<package_declarator>"  :subid("90_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "term:sym<package_declarator>"  :subid("90_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx342_tgt
     .local int rx342_pos
@@ -4147,7 +4147,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<package_declarator>"  :subid("91_1258300993.09831") :method
+.sub "!PREFIX__term:sym<package_declarator>"  :subid("91_1258388854.98833") :method
 .annotate "line", 4
     $P344 = self."!PREFIX__!subrule"("package_declarator", "")
     new $P345, "ResizablePMCArray"
@@ -4157,7 +4157,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "term:sym<scope_declarator>"  :subid("92_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "term:sym<scope_declarator>"  :subid("92_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx347_tgt
     .local int rx347_pos
@@ -4203,7 +4203,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<scope_declarator>"  :subid("93_1258300993.09831") :method
+.sub "!PREFIX__term:sym<scope_declarator>"  :subid("93_1258388854.98833") :method
 .annotate "line", 4
     $P349 = self."!PREFIX__!subrule"("scope_declarator", "")
     new $P350, "ResizablePMCArray"
@@ -4213,7 +4213,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "term:sym<routine_declarator>"  :subid("94_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "term:sym<routine_declarator>"  :subid("94_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx352_tgt
     .local int rx352_pos
@@ -4259,7 +4259,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<routine_declarator>"  :subid("95_1258300993.09831") :method
+.sub "!PREFIX__term:sym<routine_declarator>"  :subid("95_1258388854.98833") :method
 .annotate "line", 4
     $P354 = self."!PREFIX__!subrule"("routine_declarator", "")
     new $P355, "ResizablePMCArray"
@@ -4269,7 +4269,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "term:sym<regex_declarator>"  :subid("96_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "term:sym<regex_declarator>"  :subid("96_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx357_tgt
     .local int rx357_pos
@@ -4315,7 +4315,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<regex_declarator>"  :subid("97_1258300993.09831") :method
+.sub "!PREFIX__term:sym<regex_declarator>"  :subid("97_1258388854.98833") :method
 .annotate "line", 4
     $P359 = self."!PREFIX__!subrule"("regex_declarator", "")
     new $P360, "ResizablePMCArray"
@@ -4325,7 +4325,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "term:sym<statement_prefix>"  :subid("98_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "term:sym<statement_prefix>"  :subid("98_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx362_tgt
     .local int rx362_pos
@@ -4371,7 +4371,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<statement_prefix>"  :subid("99_1258300993.09831") :method
+.sub "!PREFIX__term:sym<statement_prefix>"  :subid("99_1258388854.98833") :method
 .annotate "line", 4
     $P364 = self."!PREFIX__!subrule"("statement_prefix", "")
     new $P365, "ResizablePMCArray"
@@ -4381,7 +4381,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "term:sym<lambda>"  :subid("100_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "term:sym<lambda>"  :subid("100_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx367_tgt
     .local int rx367_pos
@@ -4431,7 +4431,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<lambda>"  :subid("101_1258300993.09831") :method
+.sub "!PREFIX__term:sym<lambda>"  :subid("101_1258388854.98833") :method
 .annotate "line", 4
     new $P369, "ResizablePMCArray"
     push $P369, ""
@@ -4440,7 +4440,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "colonpair"  :subid("102_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "colonpair"  :subid("102_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx371_tgt
     .local int rx371_pos
@@ -4545,7 +4545,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__colonpair"  :subid("103_1258300993.09831") :method
+.sub "!PREFIX__colonpair"  :subid("103_1258388854.98833") :method
 .annotate "line", 4
     $P373 = self."!PREFIX__!subrule"("identifier", ":")
     $P374 = self."!PREFIX__!subrule"("identifier", ":!")
@@ -4557,7 +4557,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "variable"  :subid("104_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "variable"  :subid("104_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx381_tgt
     .local int rx381_pos
@@ -4700,7 +4700,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__variable"  :subid("105_1258300993.09831") :method
+.sub "!PREFIX__variable"  :subid("105_1258388854.98833") :method
 .annotate "line", 4
     $P383 = self."!PREFIX__!subrule"("sigil", "")
     $P384 = self."!PREFIX__!subrule"("sigil", "")
@@ -4715,7 +4715,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "sigil"  :subid("106_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "sigil"  :subid("106_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx392_tgt
     .local int rx392_pos
@@ -4761,7 +4761,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__sigil"  :subid("107_1258300993.09831") :method
+.sub "!PREFIX__sigil"  :subid("107_1258388854.98833") :method
 .annotate "line", 4
     new $P394, "ResizablePMCArray"
     push $P394, "&"
@@ -4773,7 +4773,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "twigil"  :subid("108_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "twigil"  :subid("108_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx396_tgt
     .local int rx396_pos
@@ -4819,7 +4819,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__twigil"  :subid("109_1258300993.09831") :method
+.sub "!PREFIX__twigil"  :subid("109_1258388854.98833") :method
 .annotate "line", 4
     new $P398, "ResizablePMCArray"
     push $P398, "?"
@@ -4830,7 +4830,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "package_declarator"  :subid("110_1258300993.09831") :method
+.sub "package_declarator"  :subid("110_1258388854.98833") :method
 .annotate "line", 216
     $P400 = self."!protoregex"("package_declarator")
     .return ($P400)
@@ -4838,7 +4838,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__package_declarator"  :subid("111_1258300993.09831") :method
+.sub "!PREFIX__package_declarator"  :subid("111_1258388854.98833") :method
 .annotate "line", 216
     $P402 = self."!PREFIX__!protoregex"("package_declarator")
     .return ($P402)
@@ -4846,7 +4846,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "package_declarator:sym<module>"  :subid("112_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "package_declarator:sym<module>"  :subid("112_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx404_tgt
     .local int rx404_pos
@@ -4913,7 +4913,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__package_declarator:sym<module>"  :subid("113_1258300993.09831") :method
+.sub "!PREFIX__package_declarator:sym<module>"  :subid("113_1258388854.98833") :method
 .annotate "line", 4
     $P406 = self."!PREFIX__!subrule"("package_def", "module")
     new $P407, "ResizablePMCArray"
@@ -4923,7 +4923,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "package_declarator:sym<class>"  :subid("114_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "package_declarator:sym<class>"  :subid("114_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx410_tgt
     .local int rx410_pos
@@ -5003,7 +5003,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__package_declarator:sym<class>"  :subid("115_1258300993.09831") :method
+.sub "!PREFIX__package_declarator:sym<class>"  :subid("115_1258388854.98833") :method
 .annotate "line", 4
     $P412 = self."!PREFIX__!subrule"("package_def", "grammar")
     $P413 = self."!PREFIX__!subrule"("package_def", "class")
@@ -5015,7 +5015,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "package_def"  :subid("116_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "package_def"  :subid("116_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx418_tgt
     .local int rx418_pos
@@ -5207,7 +5207,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__package_def"  :subid("117_1258300993.09831") :method
+.sub "!PREFIX__package_def"  :subid("117_1258388854.98833") :method
 .annotate "line", 4
     new $P420, "ResizablePMCArray"
     push $P420, ""
@@ -5216,7 +5216,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "scope_declarator"  :subid("118_1258300993.09831") :method
+.sub "scope_declarator"  :subid("118_1258388854.98833") :method
 .annotate "line", 230
     $P440 = self."!protoregex"("scope_declarator")
     .return ($P440)
@@ -5224,7 +5224,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__scope_declarator"  :subid("119_1258300993.09831") :method
+.sub "!PREFIX__scope_declarator"  :subid("119_1258388854.98833") :method
 .annotate "line", 230
     $P442 = self."!PREFIX__!protoregex"("scope_declarator")
     .return ($P442)
@@ -5232,7 +5232,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "scope_declarator:sym<my>"  :subid("120_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "scope_declarator:sym<my>"  :subid("120_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx444_tgt
     .local int rx444_pos
@@ -5299,7 +5299,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__scope_declarator:sym<my>"  :subid("121_1258300993.09831") :method
+.sub "!PREFIX__scope_declarator:sym<my>"  :subid("121_1258388854.98833") :method
 .annotate "line", 4
     $P446 = self."!PREFIX__!subrule"("scoped", "my")
     new $P447, "ResizablePMCArray"
@@ -5309,7 +5309,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "scope_declarator:sym<our>"  :subid("122_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "scope_declarator:sym<our>"  :subid("122_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx450_tgt
     .local int rx450_pos
@@ -5376,7 +5376,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__scope_declarator:sym<our>"  :subid("123_1258300993.09831") :method
+.sub "!PREFIX__scope_declarator:sym<our>"  :subid("123_1258388854.98833") :method
 .annotate "line", 4
     $P452 = self."!PREFIX__!subrule"("scoped", "our")
     new $P453, "ResizablePMCArray"
@@ -5386,7 +5386,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "scope_declarator:sym<has>"  :subid("124_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "scope_declarator:sym<has>"  :subid("124_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx456_tgt
     .local int rx456_pos
@@ -5453,7 +5453,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__scope_declarator:sym<has>"  :subid("125_1258300993.09831") :method
+.sub "!PREFIX__scope_declarator:sym<has>"  :subid("125_1258388854.98833") :method
 .annotate "line", 4
     $P458 = self."!PREFIX__!subrule"("scoped", "has")
     new $P459, "ResizablePMCArray"
@@ -5463,7 +5463,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "scoped"  :subid("126_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "scoped"  :subid("126_1258388854.98833") :method :outer("11_1258388854.98833")
     .param pmc param_462
 .annotate "line", 235
     .lex "$*SCOPE", param_462
@@ -5548,7 +5548,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__scoped"  :subid("127_1258300993.09831") :method
+.sub "!PREFIX__scoped"  :subid("127_1258388854.98833") :method
 .annotate "line", 4
     new $P465, "ResizablePMCArray"
     push $P465, ""
@@ -5558,7 +5558,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "variable_declarator"  :subid("128_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "variable_declarator"  :subid("128_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx472_tgt
     .local int rx472_pos
@@ -5604,7 +5604,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__variable_declarator"  :subid("129_1258300993.09831") :method
+.sub "!PREFIX__variable_declarator"  :subid("129_1258388854.98833") :method
 .annotate "line", 4
     $P474 = self."!PREFIX__!subrule"("variable", "")
     new $P475, "ResizablePMCArray"
@@ -5614,7 +5614,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "routine_declarator"  :subid("130_1258300993.09831") :method
+.sub "routine_declarator"  :subid("130_1258388854.98833") :method
 .annotate "line", 242
     $P477 = self."!protoregex"("routine_declarator")
     .return ($P477)
@@ -5622,7 +5622,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__routine_declarator"  :subid("131_1258300993.09831") :method
+.sub "!PREFIX__routine_declarator"  :subid("131_1258388854.98833") :method
 .annotate "line", 242
     $P479 = self."!PREFIX__!protoregex"("routine_declarator")
     .return ($P479)
@@ -5630,7 +5630,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "routine_declarator:sym<sub>"  :subid("132_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "routine_declarator:sym<sub>"  :subid("132_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx481_tgt
     .local int rx481_pos
@@ -5697,7 +5697,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__routine_declarator:sym<sub>"  :subid("133_1258300993.09831") :method
+.sub "!PREFIX__routine_declarator:sym<sub>"  :subid("133_1258388854.98833") :method
 .annotate "line", 4
     $P483 = self."!PREFIX__!subrule"("routine_def", "sub")
     new $P484, "ResizablePMCArray"
@@ -5707,7 +5707,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "routine_declarator:sym<method>"  :subid("134_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "routine_declarator:sym<method>"  :subid("134_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx487_tgt
     .local int rx487_pos
@@ -5774,7 +5774,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__routine_declarator:sym<method>"  :subid("135_1258300993.09831") :method
+.sub "!PREFIX__routine_declarator:sym<method>"  :subid("135_1258388854.98833") :method
 .annotate "line", 4
     $P489 = self."!PREFIX__!subrule"("method_def", "method")
     new $P490, "ResizablePMCArray"
@@ -5784,7 +5784,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "routine_def"  :subid("136_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "routine_def"  :subid("136_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx493_tgt
     .local int rx493_pos
@@ -5942,7 +5942,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__routine_def"  :subid("137_1258300993.09831") :method
+.sub "!PREFIX__routine_def"  :subid("137_1258388854.98833") :method
 .annotate "line", 4
     new $P495, "ResizablePMCArray"
     push $P495, ""
@@ -5951,7 +5951,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "method_def"  :subid("138_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "method_def"  :subid("138_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx511_tgt
     .local int rx511_pos
@@ -6109,7 +6109,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__method_def"  :subid("139_1258300993.09831") :method
+.sub "!PREFIX__method_def"  :subid("139_1258388854.98833") :method
 .annotate "line", 4
     new $P513, "ResizablePMCArray"
     push $P513, ""
@@ -6118,7 +6118,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "signature"  :subid("140_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "signature"  :subid("140_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx529_tgt
     .local int rx529_pos
@@ -6196,7 +6196,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__signature"  :subid("141_1258300993.09831") :method
+.sub "!PREFIX__signature"  :subid("141_1258388854.98833") :method
 .annotate "line", 4
     new $P531, "ResizablePMCArray"
     push $P531, ""
@@ -6205,7 +6205,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "parameter"  :subid("142_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "parameter"  :subid("142_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx537_tgt
     .local int rx537_pos
@@ -6354,7 +6354,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__parameter"  :subid("143_1258300993.09831") :method
+.sub "!PREFIX__parameter"  :subid("143_1258388854.98833") :method
 .annotate "line", 4
     $P539 = self."!PREFIX__!subrule"("named_param", "")
     $P540 = self."!PREFIX__!subrule"("param_var", "")
@@ -6368,7 +6368,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "param_var"  :subid("144_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "param_var"  :subid("144_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx551_tgt
     .local int rx551_pos
@@ -6464,7 +6464,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__param_var"  :subid("145_1258300993.09831") :method
+.sub "!PREFIX__param_var"  :subid("145_1258388854.98833") :method
 .annotate "line", 4
     $P553 = self."!PREFIX__!subrule"("sigil", "")
     new $P554, "ResizablePMCArray"
@@ -6474,7 +6474,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "named_param"  :subid("146_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "named_param"  :subid("146_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx560_tgt
     .local int rx560_pos
@@ -6528,7 +6528,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__named_param"  :subid("147_1258300993.09831") :method
+.sub "!PREFIX__named_param"  :subid("147_1258388854.98833") :method
 .annotate "line", 4
     $P562 = self."!PREFIX__!subrule"("param_var", ":")
     new $P563, "ResizablePMCArray"
@@ -6538,7 +6538,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "default_value"  :subid("148_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "default_value"  :subid("148_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx565_tgt
     .local int rx565_pos
@@ -6606,7 +6606,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__default_value"  :subid("149_1258300993.09831") :method
+.sub "!PREFIX__default_value"  :subid("149_1258388854.98833") :method
 .annotate "line", 4
     new $P567, "ResizablePMCArray"
     push $P567, ""
@@ -6615,7 +6615,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "regex_declarator"  :subid("150_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "regex_declarator"  :subid("150_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx572_tgt
     .local int rx572_pos
@@ -6970,7 +6970,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__regex_declarator"  :subid("151_1258300993.09831") :method
+.sub "!PREFIX__regex_declarator"  :subid("151_1258388854.98833") :method
 .annotate "line", 4
     new $P574, "ResizablePMCArray"
     push $P574, ""
@@ -6979,7 +6979,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "dotty"  :subid("152_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "dotty"  :subid("152_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx603_tgt
     .local int rx603_pos
@@ -7084,7 +7084,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__dotty"  :subid("153_1258300993.09831") :method
+.sub "!PREFIX__dotty"  :subid("153_1258388854.98833") :method
 .annotate "line", 4
     $P605 = self."!PREFIX__!subrule"("identifier", ".")
     new $P606, "ResizablePMCArray"
@@ -7094,7 +7094,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "term"  :subid("154_1258300993.09831") :method
+.sub "term"  :subid("154_1258388854.98833") :method
 .annotate "line", 306
     $P611 = self."!protoregex"("term")
     .return ($P611)
@@ -7102,7 +7102,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term"  :subid("155_1258300993.09831") :method
+.sub "!PREFIX__term"  :subid("155_1258388854.98833") :method
 .annotate "line", 306
     $P613 = self."!PREFIX__!protoregex"("term")
     .return ($P613)
@@ -7110,7 +7110,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "term:sym<self>"  :subid("156_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "term:sym<self>"  :subid("156_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx615_tgt
     .local int rx615_pos
@@ -7178,7 +7178,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<self>"  :subid("157_1258300993.09831") :method
+.sub "!PREFIX__term:sym<self>"  :subid("157_1258388854.98833") :method
 .annotate "line", 4
     new $P617, "ResizablePMCArray"
     push $P617, "self"
@@ -7187,7 +7187,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "term:sym<identifier>"  :subid("158_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "term:sym<identifier>"  :subid("158_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx620_tgt
     .local int rx620_pos
@@ -7247,7 +7247,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<identifier>"  :subid("159_1258300993.09831") :method
+.sub "!PREFIX__term:sym<identifier>"  :subid("159_1258388854.98833") :method
 .annotate "line", 4
     $P622 = self."!PREFIX__!subrule"("identifier", "")
     new $P623, "ResizablePMCArray"
@@ -7257,7 +7257,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "term:sym<name>"  :subid("160_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "term:sym<name>"  :subid("160_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx625_tgt
     .local int rx625_pos
@@ -7318,7 +7318,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<name>"  :subid("161_1258300993.09831") :method
+.sub "!PREFIX__term:sym<name>"  :subid("161_1258388854.98833") :method
 .annotate "line", 4
     $P627 = self."!PREFIX__!subrule"("name", "")
     new $P628, "ResizablePMCArray"
@@ -7328,7 +7328,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "term:sym<pir::op>"  :subid("162_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "term:sym<pir::op>"  :subid("162_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx632_tgt
     .local int rx632_pos
@@ -7409,7 +7409,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<pir::op>"  :subid("163_1258300993.09831") :method
+.sub "!PREFIX__term:sym<pir::op>"  :subid("163_1258388854.98833") :method
 .annotate "line", 4
     new $P634, "ResizablePMCArray"
     push $P634, "pir::"
@@ -7418,7 +7418,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "args"  :subid("164_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "args"  :subid("164_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx639_tgt
     .local int rx639_pos
@@ -7478,7 +7478,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__args"  :subid("165_1258300993.09831") :method
+.sub "!PREFIX__args"  :subid("165_1258388854.98833") :method
 .annotate "line", 4
     $P641 = self."!PREFIX__!subrule"("arglist", "(")
     new $P642, "ResizablePMCArray"
@@ -7488,7 +7488,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "arglist"  :subid("166_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "arglist"  :subid("166_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx644_tgt
     .local int rx644_pos
@@ -7548,7 +7548,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__arglist"  :subid("167_1258300993.09831") :method
+.sub "!PREFIX__arglist"  :subid("167_1258388854.98833") :method
 .annotate "line", 4
     $P646 = self."!PREFIX__!subrule"("", "")
     new $P647, "ResizablePMCArray"
@@ -7558,7 +7558,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "term:sym<value>"  :subid("168_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "term:sym<value>"  :subid("168_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx650_tgt
     .local int rx650_pos
@@ -7604,7 +7604,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<value>"  :subid("169_1258300993.09831") :method
+.sub "!PREFIX__term:sym<value>"  :subid("169_1258388854.98833") :method
 .annotate "line", 4
     $P652 = self."!PREFIX__!subrule"("value", "")
     new $P653, "ResizablePMCArray"
@@ -7614,7 +7614,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "value"  :subid("170_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "value"  :subid("170_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx655_tgt
     .local int rx655_pos
@@ -7688,7 +7688,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__value"  :subid("171_1258300993.09831") :method
+.sub "!PREFIX__value"  :subid("171_1258388854.98833") :method
 .annotate "line", 4
     $P657 = self."!PREFIX__!subrule"("integer", "")
     $P658 = self."!PREFIX__!subrule"("quote", "")
@@ -7702,7 +7702,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "quote"  :subid("172_1258300993.09831") :method
+.sub "quote"  :subid("172_1258388854.98833") :method
 .annotate "line", 343
     $P663 = self."!protoregex"("quote")
     .return ($P663)
@@ -7710,7 +7710,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__quote"  :subid("173_1258300993.09831") :method
+.sub "!PREFIX__quote"  :subid("173_1258388854.98833") :method
 .annotate "line", 343
     $P665 = self."!PREFIX__!protoregex"("quote")
     .return ($P665)
@@ -7718,7 +7718,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "quote:sym<apos>"  :subid("174_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "quote:sym<apos>"  :subid("174_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx667_tgt
     .local int rx667_pos
@@ -7770,7 +7770,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__quote:sym<apos>"  :subid("175_1258300993.09831") :method
+.sub "!PREFIX__quote:sym<apos>"  :subid("175_1258388854.98833") :method
 .annotate "line", 4
     new $P669, "ResizablePMCArray"
     push $P669, "'"
@@ -7779,7 +7779,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "quote:sym<dblq>"  :subid("176_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "quote:sym<dblq>"  :subid("176_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx671_tgt
     .local int rx671_pos
@@ -7831,7 +7831,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__quote:sym<dblq>"  :subid("177_1258300993.09831") :method
+.sub "!PREFIX__quote:sym<dblq>"  :subid("177_1258388854.98833") :method
 .annotate "line", 4
     new $P673, "ResizablePMCArray"
     push $P673, "\""
@@ -7840,7 +7840,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "quote:sym<q>"  :subid("178_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "quote:sym<q>"  :subid("178_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx675_tgt
     .local int rx675_pos
@@ -7904,7 +7904,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__quote:sym<q>"  :subid("179_1258300993.09831") :method
+.sub "!PREFIX__quote:sym<q>"  :subid("179_1258388854.98833") :method
 .annotate "line", 4
     $P677 = self."!PREFIX__!subrule"("", "q")
     new $P678, "ResizablePMCArray"
@@ -7914,7 +7914,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "quote:sym<qq>"  :subid("180_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "quote:sym<qq>"  :subid("180_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx680_tgt
     .local int rx680_pos
@@ -7978,7 +7978,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__quote:sym<qq>"  :subid("181_1258300993.09831") :method
+.sub "!PREFIX__quote:sym<qq>"  :subid("181_1258388854.98833") :method
 .annotate "line", 4
     $P682 = self."!PREFIX__!subrule"("", "qq")
     new $P683, "ResizablePMCArray"
@@ -7988,7 +7988,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "quote:sym<Q>"  :subid("182_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "quote:sym<Q>"  :subid("182_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx685_tgt
     .local int rx685_pos
@@ -8052,7 +8052,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__quote:sym<Q>"  :subid("183_1258300993.09831") :method
+.sub "!PREFIX__quote:sym<Q>"  :subid("183_1258388854.98833") :method
 .annotate "line", 4
     $P687 = self."!PREFIX__!subrule"("", "Q")
     new $P688, "ResizablePMCArray"
@@ -8062,7 +8062,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "quote:sym<Q:PIR>"  :subid("184_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "quote:sym<Q:PIR>"  :subid("184_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx690_tgt
     .local int rx690_pos
@@ -8120,7 +8120,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__quote:sym<Q:PIR>"  :subid("185_1258300993.09831") :method
+.sub "!PREFIX__quote:sym<Q:PIR>"  :subid("185_1258388854.98833") :method
 .annotate "line", 4
     $P692 = self."!PREFIX__!subrule"("", "Q:PIR")
     new $P693, "ResizablePMCArray"
@@ -8130,7 +8130,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "quote_escape:sym<$>"  :subid("186_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "quote_escape:sym<$>"  :subid("186_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx695_tgt
     .local int rx695_pos
@@ -8186,7 +8186,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__quote_escape:sym<$>"  :subid("187_1258300993.09831") :method
+.sub "!PREFIX__quote_escape:sym<$>"  :subid("187_1258388854.98833") :method
 .annotate "line", 4
     new $P697, "ResizablePMCArray"
     push $P697, "$"
@@ -8195,7 +8195,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "quote_escape:sym<{ }>"  :subid("188_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "quote_escape:sym<{ }>"  :subid("188_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx699_tgt
     .local int rx699_pos
@@ -8251,7 +8251,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__quote_escape:sym<{ }>"  :subid("189_1258300993.09831") :method
+.sub "!PREFIX__quote_escape:sym<{ }>"  :subid("189_1258388854.98833") :method
 .annotate "line", 4
     new $P701, "ResizablePMCArray"
     push $P701, "{"
@@ -8260,7 +8260,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "circumfix:sym<( )>"  :subid("190_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "circumfix:sym<( )>"  :subid("190_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx703_tgt
     .local int rx703_pos
@@ -8332,7 +8332,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__circumfix:sym<( )>"  :subid("191_1258300993.09831") :method
+.sub "!PREFIX__circumfix:sym<( )>"  :subid("191_1258388854.98833") :method
 .annotate "line", 4
     $P705 = self."!PREFIX__!subrule"("", "(")
     new $P706, "ResizablePMCArray"
@@ -8342,7 +8342,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "circumfix:sym<[ ]>"  :subid("192_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "circumfix:sym<[ ]>"  :subid("192_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx710_tgt
     .local int rx710_pos
@@ -8414,7 +8414,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__circumfix:sym<[ ]>"  :subid("193_1258300993.09831") :method
+.sub "!PREFIX__circumfix:sym<[ ]>"  :subid("193_1258388854.98833") :method
 .annotate "line", 4
     $P712 = self."!PREFIX__!subrule"("", "[")
     new $P713, "ResizablePMCArray"
@@ -8424,7 +8424,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "circumfix:sym<ang>"  :subid("194_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "circumfix:sym<ang>"  :subid("194_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx717_tgt
     .local int rx717_pos
@@ -8476,7 +8476,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__circumfix:sym<ang>"  :subid("195_1258300993.09831") :method
+.sub "!PREFIX__circumfix:sym<ang>"  :subid("195_1258388854.98833") :method
 .annotate "line", 4
     new $P719, "ResizablePMCArray"
     push $P719, "<"
@@ -8485,7 +8485,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "circumfix:sym<{ }>"  :subid("196_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "circumfix:sym<{ }>"  :subid("196_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx721_tgt
     .local int rx721_pos
@@ -8537,7 +8537,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__circumfix:sym<{ }>"  :subid("197_1258300993.09831") :method
+.sub "!PREFIX__circumfix:sym<{ }>"  :subid("197_1258388854.98833") :method
 .annotate "line", 4
     new $P723, "ResizablePMCArray"
     push $P723, "{"
@@ -8546,7 +8546,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "circumfix:sym<sigil>"  :subid("198_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "circumfix:sym<sigil>"  :subid("198_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx725_tgt
     .local int rx725_pos
@@ -8624,7 +8624,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__circumfix:sym<sigil>"  :subid("199_1258300993.09831") :method
+.sub "!PREFIX__circumfix:sym<sigil>"  :subid("199_1258388854.98833") :method
 .annotate "line", 4
     $P727 = self."!PREFIX__!subrule"("sigil", "")
     new $P728, "ResizablePMCArray"
@@ -8634,7 +8634,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "semilist"  :subid("200_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "semilist"  :subid("200_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 4
     .local string rx732_tgt
     .local int rx732_pos
@@ -8690,7 +8690,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__semilist"  :subid("201_1258300993.09831") :method
+.sub "!PREFIX__semilist"  :subid("201_1258388854.98833") :method
 .annotate "line", 4
     new $P734, "ResizablePMCArray"
     push $P734, ""
@@ -8699,7 +8699,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infixish"  :subid("202_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infixish"  :subid("202_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx738_tgt
     .local int rx738_pos
@@ -8749,7 +8749,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infixish"  :subid("203_1258300993.09831") :method
+.sub "!PREFIX__infixish"  :subid("203_1258388854.98833") :method
 .annotate "line", 364
     new $P740, "ResizablePMCArray"
     push $P740, ""
@@ -8758,7 +8758,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infixstopper"  :subid("204_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infixstopper"  :subid("204_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx742_tgt
     .local int rx742_pos
@@ -8801,7 +8801,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infixstopper"  :subid("205_1258300993.09831") :method
+.sub "!PREFIX__infixstopper"  :subid("205_1258388854.98833") :method
 .annotate "line", 364
     new $P744, "ResizablePMCArray"
     push $P744, ""
@@ -8810,7 +8810,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "postcircumfix:sym<[ ]>"  :subid("206_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "postcircumfix:sym<[ ]>"  :subid("206_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx746_tgt
     .local int rx746_pos
@@ -8884,7 +8884,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__postcircumfix:sym<[ ]>"  :subid("207_1258300993.09831") :method
+.sub "!PREFIX__postcircumfix:sym<[ ]>"  :subid("207_1258388854.98833") :method
 .annotate "line", 364
     $P748 = self."!PREFIX__!subrule"("", "[")
     new $P749, "ResizablePMCArray"
@@ -8894,7 +8894,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "postcircumfix:sym<{ }>"  :subid("208_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "postcircumfix:sym<{ }>"  :subid("208_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx751_tgt
     .local int rx751_pos
@@ -8968,7 +8968,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__postcircumfix:sym<{ }>"  :subid("209_1258300993.09831") :method
+.sub "!PREFIX__postcircumfix:sym<{ }>"  :subid("209_1258388854.98833") :method
 .annotate "line", 364
     $P753 = self."!PREFIX__!subrule"("", "{")
     new $P754, "ResizablePMCArray"
@@ -8978,7 +8978,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "postcircumfix:sym<ang>"  :subid("210_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "postcircumfix:sym<ang>"  :subid("210_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx756_tgt
     .local int rx756_pos
@@ -9039,7 +9039,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__postcircumfix:sym<ang>"  :subid("211_1258300993.09831") :method
+.sub "!PREFIX__postcircumfix:sym<ang>"  :subid("211_1258388854.98833") :method
 .annotate "line", 364
     new $P758, "ResizablePMCArray"
     push $P758, "<"
@@ -9048,7 +9048,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "postcircumfix:sym<( )>"  :subid("212_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "postcircumfix:sym<( )>"  :subid("212_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx760_tgt
     .local int rx760_pos
@@ -9122,7 +9122,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__postcircumfix:sym<( )>"  :subid("213_1258300993.09831") :method
+.sub "!PREFIX__postcircumfix:sym<( )>"  :subid("213_1258388854.98833") :method
 .annotate "line", 364
     $P762 = self."!PREFIX__!subrule"("", "(")
     new $P763, "ResizablePMCArray"
@@ -9132,7 +9132,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "postfix:sym<.>"  :subid("214_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "postfix:sym<.>"  :subid("214_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx765_tgt
     .local int rx765_pos
@@ -9185,7 +9185,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__postfix:sym<.>"  :subid("215_1258300993.09831") :method
+.sub "!PREFIX__postfix:sym<.>"  :subid("215_1258388854.98833") :method
 .annotate "line", 364
     $P767 = self."!PREFIX__!subrule"("dotty", "")
     new $P768, "ResizablePMCArray"
@@ -9195,7 +9195,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "prefix:sym<++>"  :subid("216_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "prefix:sym<++>"  :subid("216_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx770_tgt
     .local int rx770_pos
@@ -9262,7 +9262,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__prefix:sym<++>"  :subid("217_1258300993.09831") :method
+.sub "!PREFIX__prefix:sym<++>"  :subid("217_1258388854.98833") :method
 .annotate "line", 364
     $P772 = self."!PREFIX__!subrule"("O", "++")
     new $P773, "ResizablePMCArray"
@@ -9272,7 +9272,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "prefix:sym<-->"  :subid("218_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "prefix:sym<-->"  :subid("218_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx776_tgt
     .local int rx776_pos
@@ -9339,7 +9339,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__prefix:sym<-->"  :subid("219_1258300993.09831") :method
+.sub "!PREFIX__prefix:sym<-->"  :subid("219_1258388854.98833") :method
 .annotate "line", 364
     $P778 = self."!PREFIX__!subrule"("O", "--")
     new $P779, "ResizablePMCArray"
@@ -9349,7 +9349,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "postfix:sym<++>"  :subid("220_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "postfix:sym<++>"  :subid("220_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx782_tgt
     .local int rx782_pos
@@ -9416,7 +9416,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__postfix:sym<++>"  :subid("221_1258300993.09831") :method
+.sub "!PREFIX__postfix:sym<++>"  :subid("221_1258388854.98833") :method
 .annotate "line", 364
     $P784 = self."!PREFIX__!subrule"("O", "++")
     new $P785, "ResizablePMCArray"
@@ -9426,7 +9426,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "postfix:sym<-->"  :subid("222_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "postfix:sym<-->"  :subid("222_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx788_tgt
     .local int rx788_pos
@@ -9493,7 +9493,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__postfix:sym<-->"  :subid("223_1258300993.09831") :method
+.sub "!PREFIX__postfix:sym<-->"  :subid("223_1258388854.98833") :method
 .annotate "line", 364
     $P790 = self."!PREFIX__!subrule"("O", "--")
     new $P791, "ResizablePMCArray"
@@ -9503,7 +9503,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<**>"  :subid("224_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<**>"  :subid("224_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx794_tgt
     .local int rx794_pos
@@ -9570,7 +9570,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<**>"  :subid("225_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<**>"  :subid("225_1258388854.98833") :method
 .annotate "line", 364
     $P796 = self."!PREFIX__!subrule"("O", "**")
     new $P797, "ResizablePMCArray"
@@ -9580,7 +9580,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "prefix:sym<+>"  :subid("226_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "prefix:sym<+>"  :subid("226_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx800_tgt
     .local int rx800_pos
@@ -9647,7 +9647,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__prefix:sym<+>"  :subid("227_1258300993.09831") :method
+.sub "!PREFIX__prefix:sym<+>"  :subid("227_1258388854.98833") :method
 .annotate "line", 364
     $P802 = self."!PREFIX__!subrule"("O", "+")
     new $P803, "ResizablePMCArray"
@@ -9657,7 +9657,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "prefix:sym<~>"  :subid("228_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "prefix:sym<~>"  :subid("228_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx806_tgt
     .local int rx806_pos
@@ -9724,7 +9724,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__prefix:sym<~>"  :subid("229_1258300993.09831") :method
+.sub "!PREFIX__prefix:sym<~>"  :subid("229_1258388854.98833") :method
 .annotate "line", 364
     $P808 = self."!PREFIX__!subrule"("O", "~")
     new $P809, "ResizablePMCArray"
@@ -9734,7 +9734,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "prefix:sym<->"  :subid("230_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "prefix:sym<->"  :subid("230_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx812_tgt
     .local int rx812_pos
@@ -9807,7 +9807,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__prefix:sym<->"  :subid("231_1258300993.09831") :method
+.sub "!PREFIX__prefix:sym<->"  :subid("231_1258388854.98833") :method
 .annotate "line", 364
     $P814 = self."!PREFIX__!subrule"("O", "-")
     new $P815, "ResizablePMCArray"
@@ -9817,7 +9817,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "prefix:sym<?>"  :subid("232_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "prefix:sym<?>"  :subid("232_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx818_tgt
     .local int rx818_pos
@@ -9884,7 +9884,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__prefix:sym<?>"  :subid("233_1258300993.09831") :method
+.sub "!PREFIX__prefix:sym<?>"  :subid("233_1258388854.98833") :method
 .annotate "line", 364
     $P820 = self."!PREFIX__!subrule"("O", "?")
     new $P821, "ResizablePMCArray"
@@ -9894,7 +9894,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "prefix:sym<!>"  :subid("234_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "prefix:sym<!>"  :subid("234_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx824_tgt
     .local int rx824_pos
@@ -9961,7 +9961,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__prefix:sym<!>"  :subid("235_1258300993.09831") :method
+.sub "!PREFIX__prefix:sym<!>"  :subid("235_1258388854.98833") :method
 .annotate "line", 364
     $P826 = self."!PREFIX__!subrule"("O", "!")
     new $P827, "ResizablePMCArray"
@@ -9971,7 +9971,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "prefix:sym<|>"  :subid("236_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "prefix:sym<|>"  :subid("236_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx830_tgt
     .local int rx830_pos
@@ -10038,7 +10038,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__prefix:sym<|>"  :subid("237_1258300993.09831") :method
+.sub "!PREFIX__prefix:sym<|>"  :subid("237_1258388854.98833") :method
 .annotate "line", 364
     $P832 = self."!PREFIX__!subrule"("O", "|")
     new $P833, "ResizablePMCArray"
@@ -10048,7 +10048,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<*>"  :subid("238_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<*>"  :subid("238_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx836_tgt
     .local int rx836_pos
@@ -10115,7 +10115,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<*>"  :subid("239_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<*>"  :subid("239_1258388854.98833") :method
 .annotate "line", 364
     $P838 = self."!PREFIX__!subrule"("O", "*")
     new $P839, "ResizablePMCArray"
@@ -10125,7 +10125,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym</>"  :subid("240_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym</>"  :subid("240_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx842_tgt
     .local int rx842_pos
@@ -10192,7 +10192,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym</>"  :subid("241_1258300993.09831") :method
+.sub "!PREFIX__infix:sym</>"  :subid("241_1258388854.98833") :method
 .annotate "line", 364
     $P844 = self."!PREFIX__!subrule"("O", "/")
     new $P845, "ResizablePMCArray"
@@ -10202,7 +10202,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<%>"  :subid("242_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<%>"  :subid("242_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx848_tgt
     .local int rx848_pos
@@ -10269,7 +10269,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<%>"  :subid("243_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<%>"  :subid("243_1258388854.98833") :method
 .annotate "line", 364
     $P850 = self."!PREFIX__!subrule"("O", "%")
     new $P851, "ResizablePMCArray"
@@ -10279,7 +10279,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<+>"  :subid("244_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<+>"  :subid("244_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx854_tgt
     .local int rx854_pos
@@ -10346,7 +10346,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<+>"  :subid("245_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<+>"  :subid("245_1258388854.98833") :method
 .annotate "line", 364
     $P856 = self."!PREFIX__!subrule"("O", "+")
     new $P857, "ResizablePMCArray"
@@ -10356,7 +10356,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<->"  :subid("246_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<->"  :subid("246_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx860_tgt
     .local int rx860_pos
@@ -10423,7 +10423,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<->"  :subid("247_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<->"  :subid("247_1258388854.98833") :method
 .annotate "line", 364
     $P862 = self."!PREFIX__!subrule"("O", "-")
     new $P863, "ResizablePMCArray"
@@ -10433,7 +10433,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<~>"  :subid("248_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<~>"  :subid("248_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx866_tgt
     .local int rx866_pos
@@ -10500,7 +10500,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<~>"  :subid("249_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<~>"  :subid("249_1258388854.98833") :method
 .annotate "line", 364
     $P868 = self."!PREFIX__!subrule"("O", "~")
     new $P869, "ResizablePMCArray"
@@ -10510,7 +10510,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<==>"  :subid("250_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<==>"  :subid("250_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx872_tgt
     .local int rx872_pos
@@ -10577,7 +10577,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<==>"  :subid("251_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<==>"  :subid("251_1258388854.98833") :method
 .annotate "line", 364
     $P874 = self."!PREFIX__!subrule"("O", "==")
     new $P875, "ResizablePMCArray"
@@ -10587,7 +10587,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<!=>"  :subid("252_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<!=>"  :subid("252_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx878_tgt
     .local int rx878_pos
@@ -10654,7 +10654,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<!=>"  :subid("253_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<!=>"  :subid("253_1258388854.98833") :method
 .annotate "line", 364
     $P880 = self."!PREFIX__!subrule"("O", "!=")
     new $P881, "ResizablePMCArray"
@@ -10664,7 +10664,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<<=>"  :subid("254_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<<=>"  :subid("254_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx884_tgt
     .local int rx884_pos
@@ -10731,7 +10731,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<<=>"  :subid("255_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<<=>"  :subid("255_1258388854.98833") :method
 .annotate "line", 364
     $P886 = self."!PREFIX__!subrule"("O", "<=")
     new $P887, "ResizablePMCArray"
@@ -10741,7 +10741,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<>=>"  :subid("256_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<>=>"  :subid("256_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx890_tgt
     .local int rx890_pos
@@ -10808,7 +10808,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<>=>"  :subid("257_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<>=>"  :subid("257_1258388854.98833") :method
 .annotate "line", 364
     $P892 = self."!PREFIX__!subrule"("O", ">=")
     new $P893, "ResizablePMCArray"
@@ -10818,7 +10818,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<<>"  :subid("258_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<<>"  :subid("258_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx896_tgt
     .local int rx896_pos
@@ -10885,7 +10885,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<<>"  :subid("259_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<<>"  :subid("259_1258388854.98833") :method
 .annotate "line", 364
     $P898 = self."!PREFIX__!subrule"("O", "<")
     new $P899, "ResizablePMCArray"
@@ -10895,7 +10895,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<>>"  :subid("260_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<>>"  :subid("260_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx902_tgt
     .local int rx902_pos
@@ -10962,7 +10962,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<>>"  :subid("261_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<>>"  :subid("261_1258388854.98833") :method
 .annotate "line", 364
     $P904 = self."!PREFIX__!subrule"("O", ">")
     new $P905, "ResizablePMCArray"
@@ -10972,7 +10972,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<eq>"  :subid("262_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<eq>"  :subid("262_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx908_tgt
     .local int rx908_pos
@@ -11039,7 +11039,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<eq>"  :subid("263_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<eq>"  :subid("263_1258388854.98833") :method
 .annotate "line", 364
     $P910 = self."!PREFIX__!subrule"("O", "eq")
     new $P911, "ResizablePMCArray"
@@ -11049,7 +11049,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<ne>"  :subid("264_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<ne>"  :subid("264_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx914_tgt
     .local int rx914_pos
@@ -11116,7 +11116,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<ne>"  :subid("265_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<ne>"  :subid("265_1258388854.98833") :method
 .annotate "line", 364
     $P916 = self."!PREFIX__!subrule"("O", "ne")
     new $P917, "ResizablePMCArray"
@@ -11126,7 +11126,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<le>"  :subid("266_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<le>"  :subid("266_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx920_tgt
     .local int rx920_pos
@@ -11193,7 +11193,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<le>"  :subid("267_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<le>"  :subid("267_1258388854.98833") :method
 .annotate "line", 364
     $P922 = self."!PREFIX__!subrule"("O", "le")
     new $P923, "ResizablePMCArray"
@@ -11203,7 +11203,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<ge>"  :subid("268_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<ge>"  :subid("268_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx926_tgt
     .local int rx926_pos
@@ -11270,7 +11270,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<ge>"  :subid("269_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<ge>"  :subid("269_1258388854.98833") :method
 .annotate "line", 364
     $P928 = self."!PREFIX__!subrule"("O", "ge")
     new $P929, "ResizablePMCArray"
@@ -11280,7 +11280,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<lt>"  :subid("270_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<lt>"  :subid("270_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx932_tgt
     .local int rx932_pos
@@ -11347,7 +11347,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<lt>"  :subid("271_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<lt>"  :subid("271_1258388854.98833") :method
 .annotate "line", 364
     $P934 = self."!PREFIX__!subrule"("O", "lt")
     new $P935, "ResizablePMCArray"
@@ -11357,7 +11357,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<gt>"  :subid("272_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<gt>"  :subid("272_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx938_tgt
     .local int rx938_pos
@@ -11424,7 +11424,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<gt>"  :subid("273_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<gt>"  :subid("273_1258388854.98833") :method
 .annotate "line", 364
     $P940 = self."!PREFIX__!subrule"("O", "gt")
     new $P941, "ResizablePMCArray"
@@ -11434,7 +11434,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<=:=>"  :subid("274_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<=:=>"  :subid("274_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx944_tgt
     .local int rx944_pos
@@ -11501,7 +11501,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<=:=>"  :subid("275_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<=:=>"  :subid("275_1258388854.98833") :method
 .annotate "line", 364
     $P946 = self."!PREFIX__!subrule"("O", "=:=")
     new $P947, "ResizablePMCArray"
@@ -11511,7 +11511,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<&&>"  :subid("276_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<&&>"  :subid("276_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx950_tgt
     .local int rx950_pos
@@ -11578,7 +11578,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<&&>"  :subid("277_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<&&>"  :subid("277_1258388854.98833") :method
 .annotate "line", 364
     $P952 = self."!PREFIX__!subrule"("O", "&&")
     new $P953, "ResizablePMCArray"
@@ -11588,7 +11588,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<||>"  :subid("278_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<||>"  :subid("278_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx956_tgt
     .local int rx956_pos
@@ -11655,7 +11655,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<||>"  :subid("279_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<||>"  :subid("279_1258388854.98833") :method
 .annotate "line", 364
     $P958 = self."!PREFIX__!subrule"("O", "||")
     new $P959, "ResizablePMCArray"
@@ -11665,7 +11665,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<//>"  :subid("280_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<//>"  :subid("280_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx962_tgt
     .local int rx962_pos
@@ -11732,7 +11732,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<//>"  :subid("281_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<//>"  :subid("281_1258388854.98833") :method
 .annotate "line", 364
     $P964 = self."!PREFIX__!subrule"("O", "//")
     new $P965, "ResizablePMCArray"
@@ -11742,7 +11742,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<?? !!>"  :subid("282_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<?? !!>"  :subid("282_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx968_tgt
     .local int rx968_pos
@@ -11819,7 +11819,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<?? !!>"  :subid("283_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<?? !!>"  :subid("283_1258388854.98833") :method
 .annotate "line", 364
     $P970 = self."!PREFIX__!subrule"("", "??")
     new $P971, "ResizablePMCArray"
@@ -11829,7 +11829,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<=>"  :subid("284_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<=>"  :subid("284_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx973_tgt
     .local int rx973_pos
@@ -11895,7 +11895,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<=>"  :subid("285_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<=>"  :subid("285_1258388854.98833") :method
 .annotate "line", 364
     $P975 = self."!PREFIX__!subrule"("", "=")
     new $P976, "ResizablePMCArray"
@@ -11905,7 +11905,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<:=>"  :subid("286_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<:=>"  :subid("286_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx979_tgt
     .local int rx979_pos
@@ -11972,7 +11972,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<:=>"  :subid("287_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<:=>"  :subid("287_1258388854.98833") :method
 .annotate "line", 364
     $P981 = self."!PREFIX__!subrule"("O", ":=")
     new $P982, "ResizablePMCArray"
@@ -11982,7 +11982,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<::=>"  :subid("288_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<::=>"  :subid("288_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx985_tgt
     .local int rx985_pos
@@ -12049,7 +12049,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<::=>"  :subid("289_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<::=>"  :subid("289_1258388854.98833") :method
 .annotate "line", 364
     $P987 = self."!PREFIX__!subrule"("O", "::=")
     new $P988, "ResizablePMCArray"
@@ -12059,7 +12059,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<,>"  :subid("290_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "infix:sym<,>"  :subid("290_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx991_tgt
     .local int rx991_pos
@@ -12126,7 +12126,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<,>"  :subid("291_1258300993.09831") :method
+.sub "!PREFIX__infix:sym<,>"  :subid("291_1258388854.98833") :method
 .annotate "line", 364
     $P993 = self."!PREFIX__!subrule"("O", ",")
     new $P994, "ResizablePMCArray"
@@ -12136,7 +12136,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "prefix:sym<return>"  :subid("292_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "prefix:sym<return>"  :subid("292_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx997_tgt
     .local int rx997_pos
@@ -12209,7 +12209,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__prefix:sym<return>"  :subid("293_1258300993.09831") :method
+.sub "!PREFIX__prefix:sym<return>"  :subid("293_1258388854.98833") :method
 .annotate "line", 364
     new $P999, "ResizablePMCArray"
     push $P999, "return"
@@ -12218,7 +12218,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "prefix:sym<make>"  :subid("294_1258300993.09831") :method :outer("11_1258300993.09831")
+.sub "prefix:sym<make>"  :subid("294_1258388854.98833") :method :outer("11_1258388854.98833")
 .annotate "line", 364
     .local string rx1002_tgt
     .local int rx1002_pos
@@ -12291,7 +12291,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__prefix:sym<make>"  :subid("295_1258300993.09831") :method
+.sub "!PREFIX__prefix:sym<make>"  :subid("295_1258388854.98833") :method
 .annotate "line", 364
     new $P1004, "ResizablePMCArray"
     push $P1004, "make"
@@ -12300,28 +12300,28 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Regex"]
-.sub "_block1006"  :subid("296_1258300993.09831") :outer("11_1258300993.09831")
+.sub "_block1006"  :subid("296_1258388854.98833") :outer("11_1258388854.98833")
 .annotate "line", 472
-    .const 'Sub' $P1036 = "307_1258300993.09831" 
+    .const 'Sub' $P1036 = "307_1258388854.98833" 
     capture_lex $P1036
-    .const 'Sub' $P1024 = "304_1258300993.09831" 
+    .const 'Sub' $P1024 = "304_1258388854.98833" 
     capture_lex $P1024
-    .const 'Sub' $P1020 = "302_1258300993.09831" 
+    .const 'Sub' $P1020 = "302_1258388854.98833" 
     capture_lex $P1020
-    .const 'Sub' $P1016 = "300_1258300993.09831" 
+    .const 'Sub' $P1016 = "300_1258388854.98833" 
     capture_lex $P1016
-    .const 'Sub' $P1008 = "297_1258300993.09831" 
+    .const 'Sub' $P1008 = "297_1258388854.98833" 
     capture_lex $P1008
-    .const 'Sub' $P1036 = "307_1258300993.09831" 
+    .const 'Sub' $P1036 = "307_1258388854.98833" 
     capture_lex $P1036
     .return ($P1036)
 .end
 
 
 .namespace ["NQP";"Regex"]
-.sub "metachar:sym<:my>"  :subid("297_1258300993.09831") :method :outer("296_1258300993.09831")
+.sub "metachar:sym<:my>"  :subid("297_1258388854.98833") :method :outer("296_1258388854.98833")
 .annotate "line", 472
-    .const 'Sub' $P1013 = "299_1258300993.09831" 
+    .const 'Sub' $P1013 = "299_1258388854.98833" 
     capture_lex $P1013
     .local string rx1009_tgt
     .local int rx1009_pos
@@ -12350,7 +12350,7 @@ NQP::Compiler - NQP compiler
     add rx1009_pos, 1
   # rx subrule "before" subtype=zerowidth negate=
     rx1009_cur."!cursor_pos"(rx1009_pos)
-    .const 'Sub' $P1013 = "299_1258300993.09831" 
+    .const 'Sub' $P1013 = "299_1258388854.98833" 
     capture_lex $P1013
     $P10 = rx1009_cur."before"($P1013)
     unless $P10, rx1009_fail
@@ -12393,7 +12393,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Regex"]
-.sub "!PREFIX__metachar:sym<:my>"  :subid("298_1258300993.09831") :method
+.sub "!PREFIX__metachar:sym<:my>"  :subid("298_1258388854.98833") :method
 .annotate "line", 472
     new $P1011, "ResizablePMCArray"
     push $P1011, ":"
@@ -12402,7 +12402,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Regex"]
-.sub "_block1012"  :anon :subid("299_1258300993.09831") :method :outer("297_1258300993.09831")
+.sub "_block1012"  :anon :subid("299_1258388854.98833") :method :outer("297_1258388854.98833")
 .annotate "line", 474
     .local string rx1014_tgt
     .local int rx1014_pos
@@ -12455,7 +12455,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Regex"]
-.sub "metachar:sym<{ }>"  :subid("300_1258300993.09831") :method :outer("296_1258300993.09831")
+.sub "metachar:sym<{ }>"  :subid("300_1258388854.98833") :method :outer("296_1258388854.98833")
 .annotate "line", 472
     .local string rx1017_tgt
     .local int rx1017_pos
@@ -12508,7 +12508,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Regex"]
-.sub "!PREFIX__metachar:sym<{ }>"  :subid("301_1258300993.09831") :method
+.sub "!PREFIX__metachar:sym<{ }>"  :subid("301_1258388854.98833") :method
 .annotate "line", 472
     new $P1019, "ResizablePMCArray"
     push $P1019, "{"
@@ -12517,7 +12517,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Regex"]
-.sub "assertion:sym<{ }>"  :subid("302_1258300993.09831") :method :outer("296_1258300993.09831")
+.sub "assertion:sym<{ }>"  :subid("302_1258388854.98833") :method :outer("296_1258388854.98833")
 .annotate "line", 472
     .local string rx1021_tgt
     .local int rx1021_pos
@@ -12570,7 +12570,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Regex"]
-.sub "!PREFIX__assertion:sym<{ }>"  :subid("303_1258300993.09831") :method
+.sub "!PREFIX__assertion:sym<{ }>"  :subid("303_1258388854.98833") :method
 .annotate "line", 472
     new $P1023, "ResizablePMCArray"
     push $P1023, "{"
@@ -12579,9 +12579,9 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Regex"]
-.sub "assertion:sym<name>"  :subid("304_1258300993.09831") :method :outer("296_1258300993.09831")
+.sub "assertion:sym<name>"  :subid("304_1258388854.98833") :method :outer("296_1258388854.98833")
 .annotate "line", 472
-    .const 'Sub' $P1032 = "306_1258300993.09831" 
+    .const 'Sub' $P1032 = "306_1258388854.98833" 
     capture_lex $P1032
     .local string rx1025_tgt
     .local int rx1025_pos
@@ -12591,7 +12591,7 @@ NQP::Compiler - NQP compiler
     .local pmc rx1025_cur
     (rx1025_cur, rx1025_pos, rx1025_tgt, $I10) = self."!cursor_start"()
     rx1025_cur."!cursor_debug"("START ", "assertion:sym<name>")
-    rx1025_cur."!cursor_caparray"("arglist", "nibbler", "assertion")
+    rx1025_cur."!cursor_caparray"("nibbler", "arglist", "assertion")
     .lex unicode:"$\x{a2}", rx1025_cur
     .local pmc match
     .lex "$/", match
@@ -12634,7 +12634,7 @@ NQP::Compiler - NQP compiler
 .annotate "line", 488
   # rx subrule "before" subtype=zerowidth negate=
     rx1025_cur."!cursor_pos"(rx1025_pos)
-    .const 'Sub' $P1032 = "306_1258300993.09831" 
+    .const 'Sub' $P1032 = "306_1258388854.98833" 
     capture_lex $P1032
     $P10 = rx1025_cur."before"($P1032)
     unless $P10, rx1025_fail
@@ -12741,7 +12741,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Regex"]
-.sub "!PREFIX__assertion:sym<name>"  :subid("305_1258300993.09831") :method
+.sub "!PREFIX__assertion:sym<name>"  :subid("305_1258388854.98833") :method
 .annotate "line", 472
     new $P1027, "ResizablePMCArray"
     push $P1027, ""
@@ -12750,7 +12750,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Regex"]
-.sub "_block1031"  :anon :subid("306_1258300993.09831") :method :outer("304_1258300993.09831")
+.sub "_block1031"  :anon :subid("306_1258388854.98833") :method :outer("304_1258388854.98833")
 .annotate "line", 488
     .local string rx1033_tgt
     .local int rx1033_pos
@@ -12803,7 +12803,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Regex"]
-.sub "codeblock"  :subid("307_1258300993.09831") :method :outer("296_1258300993.09831")
+.sub "codeblock"  :subid("307_1258388854.98833") :method :outer("296_1258388854.98833")
 .annotate "line", 472
     .local string rx1037_tgt
     .local int rx1037_pos
@@ -12850,7 +12850,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Regex"]
-.sub "!PREFIX__codeblock"  :subid("308_1258300993.09831") :method
+.sub "!PREFIX__codeblock"  :subid("308_1258388854.98833") :method
 .annotate "line", 472
     $P1039 = self."!PREFIX__!subrule"("block", "")
     new $P1040, "ResizablePMCArray"
@@ -12861,7 +12861,7 @@ NQP::Compiler - NQP compiler
 ### .include 'gen/nqp-actions.pir'
 
 .namespace []
-.sub "_block11"  :anon :subid("10_1258301011.45318")
+.sub "_block11"  :anon :subid("10_1258388873.30655")
 .annotate "line", 0
     get_hll_global $P14, ["NQP";"Actions"], "_block13" 
     capture_lex $P14
@@ -12875,9 +12875,9 @@ NQP::Compiler - NQP compiler
 
 
 .namespace []
-.sub "" :load :init :subid("post114") :outer("10_1258301011.45318")
+.sub "" :load :init :subid("post114") :outer("10_1258388873.30655")
 .annotate "line", 0
-    .const 'Sub' $P12 = "10_1258301011.45318" 
+    .const 'Sub' $P12 = "10_1258388873.30655" 
     .local pmc block
     set block, $P12
     $P1871 = get_root_global ["parrot"], "P6metaclass"
@@ -12886,177 +12886,177 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block13"  :subid("11_1258301011.45318") :outer("10_1258301011.45318")
+.sub "_block13"  :subid("11_1258388873.30655") :outer("10_1258388873.30655")
 .annotate "line", 3
-    .const 'Sub' $P1866 = "113_1258301011.45318" 
+    .const 'Sub' $P1866 = "113_1258388873.30655" 
     capture_lex $P1866
     get_hll_global $P1802, ["NQP";"RegexActions"], "_block1801" 
     capture_lex $P1802
-    .const 'Sub' $P1789 = "107_1258301011.45318" 
+    .const 'Sub' $P1789 = "107_1258388873.30655" 
     capture_lex $P1789
-    .const 'Sub' $P1779 = "106_1258301011.45318" 
+    .const 'Sub' $P1779 = "106_1258388873.30655" 
     capture_lex $P1779
-    .const 'Sub' $P1769 = "105_1258301011.45318" 
+    .const 'Sub' $P1769 = "105_1258388873.30655" 
     capture_lex $P1769
-    .const 'Sub' $P1759 = "104_1258301011.45318" 
+    .const 'Sub' $P1759 = "104_1258388873.30655" 
     capture_lex $P1759
-    .const 'Sub' $P1745 = "103_1258301011.45318" 
+    .const 'Sub' $P1745 = "103_1258388873.30655" 
     capture_lex $P1745
-    .const 'Sub' $P1735 = "102_1258301011.45318" 
+    .const 'Sub' $P1735 = "102_1258388873.30655" 
     capture_lex $P1735
-    .const 'Sub' $P1721 = "101_1258301011.45318" 
+    .const 'Sub' $P1721 = "101_1258388873.30655" 
     capture_lex $P1721
-    .const 'Sub' $P1711 = "100_1258301011.45318" 
+    .const 'Sub' $P1711 = "100_1258388873.30655" 
     capture_lex $P1711
-    .const 'Sub' $P1701 = "99_1258301011.45318" 
+    .const 'Sub' $P1701 = "99_1258388873.30655" 
     capture_lex $P1701
-    .const 'Sub' $P1691 = "98_1258301011.45318" 
+    .const 'Sub' $P1691 = "98_1258388873.30655" 
     capture_lex $P1691
-    .const 'Sub' $P1681 = "97_1258301011.45318" 
+    .const 'Sub' $P1681 = "97_1258388873.30655" 
     capture_lex $P1681
-    .const 'Sub' $P1671 = "96_1258301011.45318" 
+    .const 'Sub' $P1671 = "96_1258388873.30655" 
     capture_lex $P1671
-    .const 'Sub' $P1643 = "95_1258301011.45318" 
+    .const 'Sub' $P1643 = "95_1258388873.30655" 
     capture_lex $P1643
-    .const 'Sub' $P1633 = "94_1258301011.45318" 
+    .const 'Sub' $P1633 = "94_1258388873.30655" 
     capture_lex $P1633
-    .const 'Sub' $P1621 = "93_1258301011.45318" 
+    .const 'Sub' $P1621 = "93_1258388873.30655" 
     capture_lex $P1621
-    .const 'Sub' $P1609 = "92_1258301011.45318" 
+    .const 'Sub' $P1609 = "92_1258388873.30655" 
     capture_lex $P1609
-    .const 'Sub' $P1597 = "91_1258301011.45318" 
+    .const 'Sub' $P1597 = "91_1258388873.30655" 
     capture_lex $P1597
-    .const 'Sub' $P1587 = "90_1258301011.45318" 
+    .const 'Sub' $P1587 = "90_1258388873.30655" 
     capture_lex $P1587
-    .const 'Sub' $P1558 = "89_1258301011.45318" 
+    .const 'Sub' $P1558 = "89_1258388873.30655" 
     capture_lex $P1558
-    .const 'Sub' $P1534 = "88_1258301011.45318" 
+    .const 'Sub' $P1534 = "88_1258388873.30655" 
     capture_lex $P1534
-    .const 'Sub' $P1524 = "87_1258301011.45318" 
+    .const 'Sub' $P1524 = "87_1258388873.30655" 
     capture_lex $P1524
-    .const 'Sub' $P1497 = "86_1258301011.45318" 
+    .const 'Sub' $P1497 = "86_1258388873.30655" 
     capture_lex $P1497
-    .const 'Sub' $P1479 = "85_1258301011.45318" 
+    .const 'Sub' $P1479 = "85_1258388873.30655" 
     capture_lex $P1479
-    .const 'Sub' $P1469 = "84_1258301011.45318" 
+    .const 'Sub' $P1469 = "84_1258388873.30655" 
     capture_lex $P1469
-    .const 'Sub' $P1385 = "81_1258301011.45318" 
+    .const 'Sub' $P1385 = "81_1258388873.30655" 
     capture_lex $P1385
-    .const 'Sub' $P1375 = "80_1258301011.45318" 
+    .const 'Sub' $P1375 = "80_1258388873.30655" 
     capture_lex $P1375
-    .const 'Sub' $P1346 = "79_1258301011.45318" 
+    .const 'Sub' $P1346 = "79_1258388873.30655" 
     capture_lex $P1346
-    .const 'Sub' $P1313 = "78_1258301011.45318" 
+    .const 'Sub' $P1313 = "78_1258388873.30655" 
     capture_lex $P1313
-    .const 'Sub' $P1297 = "77_1258301011.45318" 
+    .const 'Sub' $P1297 = "77_1258388873.30655" 
     capture_lex $P1297
-    .const 'Sub' $P1288 = "76_1258301011.45318" 
+    .const 'Sub' $P1288 = "76_1258388873.30655" 
     capture_lex $P1288
-    .const 'Sub' $P1263 = "75_1258301011.45318" 
+    .const 'Sub' $P1263 = "75_1258388873.30655" 
     capture_lex $P1263
-    .const 'Sub' $P1159 = "72_1258301011.45318" 
+    .const 'Sub' $P1159 = "72_1258388873.30655" 
     capture_lex $P1159
-    .const 'Sub' $P1142 = "71_1258301011.45318" 
+    .const 'Sub' $P1142 = "71_1258388873.30655" 
     capture_lex $P1142
-    .const 'Sub' $P1122 = "70_1258301011.45318" 
+    .const 'Sub' $P1122 = "70_1258388873.30655" 
     capture_lex $P1122
-    .const 'Sub' $P1038 = "69_1258301011.45318" 
+    .const 'Sub' $P1038 = "69_1258388873.30655" 
     capture_lex $P1038
-    .const 'Sub' $P1014 = "67_1258301011.45318" 
+    .const 'Sub' $P1014 = "67_1258388873.30655" 
     capture_lex $P1014
-    .const 'Sub' $P980 = "65_1258301011.45318" 
+    .const 'Sub' $P980 = "65_1258388873.30655" 
     capture_lex $P980
-    .const 'Sub' $P934 = "63_1258301011.45318" 
+    .const 'Sub' $P934 = "63_1258388873.30655" 
     capture_lex $P934
-    .const 'Sub' $P924 = "62_1258301011.45318" 
+    .const 'Sub' $P924 = "62_1258388873.30655" 
     capture_lex $P924
-    .const 'Sub' $P914 = "61_1258301011.45318" 
+    .const 'Sub' $P914 = "61_1258388873.30655" 
     capture_lex $P914
-    .const 'Sub' $P843 = "59_1258301011.45318" 
+    .const 'Sub' $P843 = "59_1258388873.30655" 
     capture_lex $P843
-    .const 'Sub' $P826 = "58_1258301011.45318" 
+    .const 'Sub' $P826 = "58_1258388873.30655" 
     capture_lex $P826
-    .const 'Sub' $P816 = "57_1258301011.45318" 
+    .const 'Sub' $P816 = "57_1258388873.30655" 
     capture_lex $P816
-    .const 'Sub' $P806 = "56_1258301011.45318" 
+    .const 'Sub' $P806 = "56_1258388873.30655" 
     capture_lex $P806
-    .const 'Sub' $P796 = "55_1258301011.45318" 
+    .const 'Sub' $P796 = "55_1258388873.30655" 
     capture_lex $P796
-    .const 'Sub' $P772 = "54_1258301011.45318" 
+    .const 'Sub' $P772 = "54_1258388873.30655" 
     capture_lex $P772
-    .const 'Sub' $P719 = "53_1258301011.45318" 
+    .const 'Sub' $P719 = "53_1258388873.30655" 
     capture_lex $P719
-    .const 'Sub' $P709 = "52_1258301011.45318" 
+    .const 'Sub' $P709 = "52_1258388873.30655" 
     capture_lex $P709
-    .const 'Sub' $P660 = "51_1258301011.45318" 
+    .const 'Sub' $P660 = "51_1258388873.30655" 
     capture_lex $P660
-    .const 'Sub' $P634 = "50_1258301011.45318" 
+    .const 'Sub' $P634 = "50_1258388873.30655" 
     capture_lex $P634
-    .const 'Sub' $P624 = "49_1258301011.45318" 
+    .const 'Sub' $P624 = "49_1258388873.30655" 
     capture_lex $P624
-    .const 'Sub' $P614 = "48_1258301011.45318" 
+    .const 'Sub' $P614 = "48_1258388873.30655" 
     capture_lex $P614
-    .const 'Sub' $P604 = "47_1258301011.45318" 
+    .const 'Sub' $P604 = "47_1258388873.30655" 
     capture_lex $P604
-    .const 'Sub' $P594 = "46_1258301011.45318" 
+    .const 'Sub' $P594 = "46_1258388873.30655" 
     capture_lex $P594
-    .const 'Sub' $P584 = "45_1258301011.45318" 
+    .const 'Sub' $P584 = "45_1258388873.30655" 
     capture_lex $P584
-    .const 'Sub' $P574 = "44_1258301011.45318" 
+    .const 'Sub' $P574 = "44_1258388873.30655" 
     capture_lex $P574
-    .const 'Sub' $P564 = "43_1258301011.45318" 
+    .const 'Sub' $P564 = "43_1258388873.30655" 
     capture_lex $P564
-    .const 'Sub' $P554 = "42_1258301011.45318" 
+    .const 'Sub' $P554 = "42_1258388873.30655" 
     capture_lex $P554
-    .const 'Sub' $P544 = "41_1258301011.45318" 
+    .const 'Sub' $P544 = "41_1258388873.30655" 
     capture_lex $P544
-    .const 'Sub' $P534 = "40_1258301011.45318" 
+    .const 'Sub' $P534 = "40_1258388873.30655" 
     capture_lex $P534
-    .const 'Sub' $P524 = "39_1258301011.45318" 
+    .const 'Sub' $P524 = "39_1258388873.30655" 
     capture_lex $P524
-    .const 'Sub' $P514 = "38_1258301011.45318" 
+    .const 'Sub' $P514 = "38_1258388873.30655" 
     capture_lex $P514
-    .const 'Sub' $P496 = "37_1258301011.45318" 
+    .const 'Sub' $P496 = "37_1258388873.30655" 
     capture_lex $P496
-    .const 'Sub' $P480 = "36_1258301011.45318" 
+    .const 'Sub' $P480 = "36_1258388873.30655" 
     capture_lex $P480
-    .const 'Sub' $P467 = "35_1258301011.45318" 
+    .const 'Sub' $P467 = "35_1258388873.30655" 
     capture_lex $P467
-    .const 'Sub' $P441 = "34_1258301011.45318" 
+    .const 'Sub' $P441 = "34_1258388873.30655" 
     capture_lex $P441
-    .const 'Sub' $P405 = "33_1258301011.45318" 
+    .const 'Sub' $P405 = "33_1258388873.30655" 
     capture_lex $P405
-    .const 'Sub' $P388 = "32_1258301011.45318" 
+    .const 'Sub' $P388 = "32_1258388873.30655" 
     capture_lex $P388
-    .const 'Sub' $P374 = "31_1258301011.45318" 
+    .const 'Sub' $P374 = "31_1258388873.30655" 
     capture_lex $P374
-    .const 'Sub' $P319 = "29_1258301011.45318" 
+    .const 'Sub' $P319 = "29_1258388873.30655" 
     capture_lex $P319
-    .const 'Sub' $P306 = "28_1258301011.45318" 
+    .const 'Sub' $P306 = "28_1258388873.30655" 
     capture_lex $P306
-    .const 'Sub' $P287 = "27_1258301011.45318" 
+    .const 'Sub' $P287 = "27_1258388873.30655" 
     capture_lex $P287
-    .const 'Sub' $P277 = "26_1258301011.45318" 
+    .const 'Sub' $P277 = "26_1258388873.30655" 
     capture_lex $P277
-    .const 'Sub' $P267 = "25_1258301011.45318" 
+    .const 'Sub' $P267 = "25_1258388873.30655" 
     capture_lex $P267
-    .const 'Sub' $P251 = "24_1258301011.45318" 
+    .const 'Sub' $P251 = "24_1258388873.30655" 
     capture_lex $P251
-    .const 'Sub' $P173 = "22_1258301011.45318" 
+    .const 'Sub' $P173 = "22_1258388873.30655" 
     capture_lex $P173
-    .const 'Sub' $P130 = "20_1258301011.45318" 
+    .const 'Sub' $P130 = "20_1258388873.30655" 
     capture_lex $P130
-    .const 'Sub' $P111 = "19_1258301011.45318" 
+    .const 'Sub' $P111 = "19_1258388873.30655" 
     capture_lex $P111
-    .const 'Sub' $P89 = "18_1258301011.45318" 
+    .const 'Sub' $P89 = "18_1258388873.30655" 
     capture_lex $P89
-    .const 'Sub' $P79 = "17_1258301011.45318" 
+    .const 'Sub' $P79 = "17_1258388873.30655" 
     capture_lex $P79
-    .const 'Sub' $P57 = "16_1258301011.45318" 
+    .const 'Sub' $P57 = "16_1258388873.30655" 
     capture_lex $P57
-    .const 'Sub' $P26 = "13_1258301011.45318" 
+    .const 'Sub' $P26 = "13_1258388873.30655" 
     capture_lex $P26
-    .const 'Sub' $P16 = "12_1258301011.45318" 
+    .const 'Sub' $P16 = "12_1258388873.30655" 
     capture_lex $P16
     get_global $P15, "@BLOCK"
     unless_null $P15, vivify_117
@@ -13064,15 +13064,15 @@ NQP::Compiler - NQP compiler
     set_global "@BLOCK", $P15
   vivify_117:
 .annotate "line", 9
-    .const 'Sub' $P16 = "12_1258301011.45318" 
+    .const 'Sub' $P16 = "12_1258388873.30655" 
     capture_lex $P16
     .lex "xblock_immediate", $P16
 .annotate "line", 14
-    .const 'Sub' $P26 = "13_1258301011.45318" 
+    .const 'Sub' $P26 = "13_1258388873.30655" 
     capture_lex $P26
     .lex "block_immediate", $P26
 .annotate "line", 24
-    .const 'Sub' $P57 = "16_1258301011.45318" 
+    .const 'Sub' $P57 = "16_1258388873.30655" 
     capture_lex $P57
     .lex "sigiltype", $P57
 .annotate "line", 3
@@ -13091,13 +13091,13 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "" :load :init :subid("post115") :outer("11_1258301011.45318")
+.sub "" :load :init :subid("post115") :outer("11_1258388873.30655")
 .annotate "line", 3
     get_hll_global $P14, ["NQP";"Actions"], "_block13" 
     .local pmc block
     set block, $P14
 .annotate "line", 5
-    .const 'Sub' $P1866 = "113_1258301011.45318" 
+    .const 'Sub' $P1866 = "113_1258388873.30655" 
     capture_lex $P1866
     $P1866()
     $P1869 = get_root_global ["parrot"], "P6metaclass"
@@ -13106,7 +13106,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block1865"  :anon :subid("113_1258301011.45318") :outer("11_1258301011.45318")
+.sub "_block1865"  :anon :subid("113_1258388873.30655") :outer("11_1258388873.30655")
 .annotate "line", 6
     get_global $P1867, "@BLOCK"
     unless_null $P1867, vivify_116
@@ -13121,7 +13121,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "xblock_immediate"  :subid("12_1258301011.45318") :outer("11_1258301011.45318")
+.sub "xblock_immediate"  :subid("12_1258388873.30655") :outer("11_1258388873.30655")
     .param pmc param_19
 .annotate "line", 9
     new $P18, 'ExceptionHandler'
@@ -13158,10 +13158,10 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "block_immediate"  :subid("13_1258301011.45318") :outer("11_1258301011.45318")
+.sub "block_immediate"  :subid("13_1258388873.30655") :outer("11_1258388873.30655")
     .param pmc param_29
 .annotate "line", 14
-    .const 'Sub' $P35 = "14_1258301011.45318" 
+    .const 'Sub' $P35 = "14_1258388873.30655" 
     capture_lex $P35
     new $P28, 'ExceptionHandler'
     set_addr $P28, control_27
@@ -13175,7 +13175,7 @@ NQP::Compiler - NQP compiler
     find_lex $P32, "$block"
     $P33 = $P32."symtable"()
     if $P33, unless_31_end
-    .const 'Sub' $P35 = "14_1258301011.45318" 
+    .const 'Sub' $P35 = "14_1258388873.30655" 
     capture_lex $P35
     $P35()
   unless_31_end:
@@ -13192,9 +13192,9 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block34"  :anon :subid("14_1258301011.45318") :outer("13_1258301011.45318")
+.sub "_block34"  :anon :subid("14_1258388873.30655") :outer("13_1258388873.30655")
 .annotate "line", 16
-    .const 'Sub' $P46 = "15_1258301011.45318" 
+    .const 'Sub' $P46 = "15_1258388873.30655" 
     capture_lex $P46
 .annotate "line", 17
     new $P36, "Undef"
@@ -13217,7 +13217,7 @@ NQP::Compiler - NQP compiler
     unless $P40, loop51_done
     shift $P44, $P40
   loop51_redo:
-    .const 'Sub' $P46 = "15_1258301011.45318" 
+    .const 'Sub' $P46 = "15_1258388873.30655" 
     capture_lex $P46
     $P46($P44)
   loop51_next:
@@ -13240,7 +13240,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block45"  :anon :subid("15_1258301011.45318") :outer("14_1258301011.45318")
+.sub "_block45"  :anon :subid("15_1258388873.30655") :outer("14_1258388873.30655")
     .param pmc param_47
 .annotate "line", 18
     .lex "$_", param_47
@@ -13252,7 +13252,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "sigiltype"  :subid("16_1258301011.45318") :outer("11_1258301011.45318")
+.sub "sigiltype"  :subid("16_1258388873.30655") :outer("11_1258388873.30655")
     .param pmc param_60
 .annotate "line", 24
     new $P59, 'ExceptionHandler'
@@ -13299,7 +13299,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "TOP"  :subid("17_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "TOP"  :subid("17_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_82
 .annotate "line", 30
     new $P81, 'ExceptionHandler'
@@ -13330,7 +13330,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "deflongname"  :subid("18_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "deflongname"  :subid("18_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_92
 .annotate "line", 32
     new $P91, 'ExceptionHandler'
@@ -13395,7 +13395,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "comp_unit"  :subid("19_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "comp_unit"  :subid("19_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_114
 .annotate "line", 36
     new $P113, 'ExceptionHandler'
@@ -13449,10 +13449,10 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statementlist"  :subid("20_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "statementlist"  :subid("20_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_133
 .annotate "line", 44
-    .const 'Sub' $P147 = "21_1258301011.45318" 
+    .const 'Sub' $P147 = "21_1258388873.30655" 
     capture_lex $P147
     new $P132, 'ExceptionHandler'
     set_addr $P132, control_131
@@ -13497,7 +13497,7 @@ NQP::Compiler - NQP compiler
     unless $P141, loop166_done
     shift $P145, $P141
   loop166_redo:
-    .const 'Sub' $P147 = "21_1258301011.45318" 
+    .const 'Sub' $P147 = "21_1258388873.30655" 
     capture_lex $P147
     $P147($P145)
   loop166_next:
@@ -13528,7 +13528,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block146"  :anon :subid("21_1258301011.45318") :outer("20_1258301011.45318")
+.sub "_block146"  :anon :subid("21_1258388873.30655") :outer("20_1258388873.30655")
     .param pmc param_149
 .annotate "line", 48
     new $P148, "Undef"
@@ -13567,12 +13567,12 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statement"  :subid("22_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "statement"  :subid("22_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_176
     .param pmc param_177 :optional
     .param int has_param_177 :opt_flag
 .annotate "line", 58
-    .const 'Sub' $P185 = "23_1258301011.45318" 
+    .const 'Sub' $P185 = "23_1258388873.30655" 
     capture_lex $P185
     new $P175, 'ExceptionHandler'
     set_addr $P175, control_174
@@ -13631,7 +13631,7 @@ NQP::Compiler - NQP compiler
     goto if_181_end
   if_181:
 .annotate "line", 60
-    .const 'Sub' $P185 = "23_1258301011.45318" 
+    .const 'Sub' $P185 = "23_1258388873.30655" 
     capture_lex $P185
     $P185()
   if_181_end:
@@ -13651,7 +13651,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block184"  :anon :subid("23_1258301011.45318") :outer("22_1258301011.45318")
+.sub "_block184"  :anon :subid("23_1258388873.30655") :outer("22_1258388873.30655")
 .annotate "line", 61
     new $P186, "Undef"
     .lex "$mc", $P186
@@ -13821,7 +13821,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "xblock"  :subid("24_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "xblock"  :subid("24_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_254
 .annotate "line", 79
     new $P253, 'ExceptionHandler'
@@ -13866,7 +13866,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "pblock"  :subid("25_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "pblock"  :subid("25_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_270
 .annotate "line", 83
     new $P269, 'ExceptionHandler'
@@ -13899,7 +13899,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "block"  :subid("26_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "block"  :subid("26_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_280
 .annotate "line", 87
     new $P279, 'ExceptionHandler'
@@ -13932,7 +13932,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "blockoid"  :subid("27_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "blockoid"  :subid("27_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_290
 .annotate "line", 91
     new $P289, 'ExceptionHandler'
@@ -13986,7 +13986,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "newpad"  :subid("28_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "newpad"  :subid("28_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_309
 .annotate "line", 99
     new $P308, 'ExceptionHandler'
@@ -14022,10 +14022,10 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statement_control:sym<if>"  :subid("29_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "statement_control:sym<if>"  :subid("29_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_322
 .annotate "line", 106
-    .const 'Sub' $P352 = "30_1258301011.45318" 
+    .const 'Sub' $P352 = "30_1258388873.30655" 
     capture_lex $P352
     new $P321, 'ExceptionHandler'
     set_addr $P321, control_320
@@ -14113,7 +14113,7 @@ NQP::Compiler - NQP compiler
     isgt $I350, $N347, $N349
     unless $I350, loop367_done
   loop367_redo:
-    .const 'Sub' $P352 = "30_1258301011.45318" 
+    .const 'Sub' $P352 = "30_1258388873.30655" 
     capture_lex $P352
     $P352()
   loop367_next:
@@ -14142,7 +14142,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block351"  :anon :subid("30_1258301011.45318") :outer("29_1258301011.45318")
+.sub "_block351"  :anon :subid("30_1258388873.30655") :outer("29_1258388873.30655")
 .annotate "line", 115
     new $P353, "Undef"
     .lex "$else", $P353
@@ -14181,7 +14181,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statement_control:sym<unless>"  :subid("31_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "statement_control:sym<unless>"  :subid("31_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_377
 .annotate "line", 122
     new $P376, 'ExceptionHandler'
@@ -14223,7 +14223,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statement_control:sym<while>"  :subid("32_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "statement_control:sym<while>"  :subid("32_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_391
 .annotate "line", 128
     new $P390, 'ExceptionHandler'
@@ -14274,7 +14274,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statement_control:sym<repeat>"  :subid("33_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "statement_control:sym<repeat>"  :subid("33_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_408
 .annotate "line", 134
     new $P407, 'ExceptionHandler'
@@ -14375,7 +14375,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statement_control:sym<for>"  :subid("34_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "statement_control:sym<for>"  :subid("34_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_444
 .annotate "line", 148
     new $P443, 'ExceptionHandler'
@@ -14456,7 +14456,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statement_control:sym<return>"  :subid("35_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "statement_control:sym<return>"  :subid("35_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_470
 .annotate "line", 161
     new $P469, 'ExceptionHandler'
@@ -14492,7 +14492,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statement_prefix:sym<INIT>"  :subid("36_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "statement_prefix:sym<INIT>"  :subid("36_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_483
 .annotate "line", 165
     new $P482, 'ExceptionHandler'
@@ -14539,7 +14539,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "blorst"  :subid("37_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "blorst"  :subid("37_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_499
 .annotate "line", 170
     new $P498, 'ExceptionHandler'
@@ -14599,7 +14599,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statement_mod_cond:sym<if>"  :subid("38_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "statement_mod_cond:sym<if>"  :subid("38_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_517
 .annotate "line", 178
     new $P516, 'ExceptionHandler'
@@ -14630,7 +14630,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statement_mod_cond:sym<unless>"  :subid("39_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "statement_mod_cond:sym<unless>"  :subid("39_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_527
 .annotate "line", 179
     new $P526, 'ExceptionHandler'
@@ -14661,7 +14661,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statement_mod_loop:sym<while>"  :subid("40_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "statement_mod_loop:sym<while>"  :subid("40_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_537
 .annotate "line", 181
     new $P536, 'ExceptionHandler'
@@ -14692,7 +14692,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statement_mod_loop:sym<until>"  :subid("41_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "statement_mod_loop:sym<until>"  :subid("41_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_547
 .annotate "line", 182
     new $P546, 'ExceptionHandler'
@@ -14723,7 +14723,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<colonpair>"  :subid("42_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "term:sym<colonpair>"  :subid("42_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_557
 .annotate "line", 186
     new $P556, 'ExceptionHandler'
@@ -14754,7 +14754,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<variable>"  :subid("43_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "term:sym<variable>"  :subid("43_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_567
 .annotate "line", 187
     new $P566, 'ExceptionHandler'
@@ -14785,7 +14785,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<package_declarator>"  :subid("44_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "term:sym<package_declarator>"  :subid("44_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_577
 .annotate "line", 188
     new $P576, 'ExceptionHandler'
@@ -14816,7 +14816,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<scope_declarator>"  :subid("45_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "term:sym<scope_declarator>"  :subid("45_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_587
 .annotate "line", 189
     new $P586, 'ExceptionHandler'
@@ -14847,7 +14847,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<routine_declarator>"  :subid("46_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "term:sym<routine_declarator>"  :subid("46_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_597
 .annotate "line", 190
     new $P596, 'ExceptionHandler'
@@ -14878,7 +14878,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<regex_declarator>"  :subid("47_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "term:sym<regex_declarator>"  :subid("47_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_607
 .annotate "line", 191
     new $P606, 'ExceptionHandler'
@@ -14909,7 +14909,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<statement_prefix>"  :subid("48_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "term:sym<statement_prefix>"  :subid("48_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_617
 .annotate "line", 192
     new $P616, 'ExceptionHandler'
@@ -14940,7 +14940,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<lambda>"  :subid("49_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "term:sym<lambda>"  :subid("49_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_627
 .annotate "line", 193
     new $P626, 'ExceptionHandler'
@@ -14971,7 +14971,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "colonpair"  :subid("50_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "colonpair"  :subid("50_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_637
 .annotate "line", 195
     new $P636, 'ExceptionHandler'
@@ -15053,7 +15053,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "variable"  :subid("51_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "variable"  :subid("51_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_663
 .annotate "line", 203
     new $P662, 'ExceptionHandler'
@@ -15185,7 +15185,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "package_declarator:sym<module>"  :subid("52_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "package_declarator:sym<module>"  :subid("52_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_712
 .annotate "line", 225
     new $P711, 'ExceptionHandler'
@@ -15216,7 +15216,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "package_declarator:sym<class>"  :subid("53_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "package_declarator:sym<class>"  :subid("53_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_722
 .annotate "line", 226
     new $P721, 'ExceptionHandler'
@@ -15374,7 +15374,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "package_def"  :subid("54_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "package_def"  :subid("54_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_775
 .annotate "line", 249
     new $P774, 'ExceptionHandler'
@@ -15453,7 +15453,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "scope_declarator:sym<my>"  :subid("55_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "scope_declarator:sym<my>"  :subid("55_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_799
 .annotate "line", 256
     new $P798, 'ExceptionHandler'
@@ -15484,7 +15484,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "scope_declarator:sym<our>"  :subid("56_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "scope_declarator:sym<our>"  :subid("56_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_809
 .annotate "line", 257
     new $P808, 'ExceptionHandler'
@@ -15515,7 +15515,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "scope_declarator:sym<has>"  :subid("57_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "scope_declarator:sym<has>"  :subid("57_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_819
 .annotate "line", 258
     new $P818, 'ExceptionHandler'
@@ -15546,7 +15546,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "scoped"  :subid("58_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "scoped"  :subid("58_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_829
 .annotate "line", 260
     new $P828, 'ExceptionHandler'
@@ -15605,10 +15605,10 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "variable_declarator"  :subid("59_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "variable_declarator"  :subid("59_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_846
 .annotate "line", 266
-    .const 'Sub' $P886 = "60_1258301011.45318" 
+    .const 'Sub' $P886 = "60_1258388873.30655" 
     capture_lex $P886
     new $P845, 'ExceptionHandler'
     set_addr $P845, control_844
@@ -15687,7 +15687,7 @@ NQP::Compiler - NQP compiler
     iseq $I871, $S870, "has"
     if $I871, if_868
 .annotate "line", 283
-    .const 'Sub' $P886 = "60_1258301011.45318" 
+    .const 'Sub' $P886 = "60_1258388873.30655" 
     capture_lex $P886
     $P886()
     goto if_868_end
@@ -15748,7 +15748,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block885"  :anon :subid("60_1258301011.45318") :outer("59_1258301011.45318")
+.sub "_block885"  :anon :subid("60_1258388873.30655") :outer("59_1258388873.30655")
 .annotate "line", 284
     new $P887, "Undef"
     .lex "$scope", $P887
@@ -15806,7 +15806,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "routine_declarator:sym<sub>"  :subid("61_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "routine_declarator:sym<sub>"  :subid("61_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_917
 .annotate "line", 294
     new $P916, 'ExceptionHandler'
@@ -15837,7 +15837,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "routine_declarator:sym<method>"  :subid("62_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "routine_declarator:sym<method>"  :subid("62_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_927
 .annotate "line", 295
     new $P926, 'ExceptionHandler'
@@ -15868,10 +15868,10 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "routine_def"  :subid("63_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "routine_def"  :subid("63_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_937
 .annotate "line", 297
-    .const 'Sub' $P948 = "64_1258301011.45318" 
+    .const 'Sub' $P948 = "64_1258388873.30655" 
     capture_lex $P948
     new $P936, 'ExceptionHandler'
     set_addr $P936, control_935
@@ -15908,7 +15908,7 @@ NQP::Compiler - NQP compiler
     new $P946, "Undef"
   vivify_335:
     unless $P946, if_944_end
-    .const 'Sub' $P948 = "64_1258301011.45318" 
+    .const 'Sub' $P948 = "64_1258388873.30655" 
     capture_lex $P948
     $P948()
   if_944_end:
@@ -15928,7 +15928,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block947"  :anon :subid("64_1258301011.45318") :outer("63_1258301011.45318")
+.sub "_block947"  :anon :subid("64_1258388873.30655") :outer("63_1258388873.30655")
 .annotate "line", 302
     new $P949, "Undef"
     .lex "$name", $P949
@@ -16008,10 +16008,10 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "method_def"  :subid("65_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "method_def"  :subid("65_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_983
 .annotate "line", 315
-    .const 'Sub' $P999 = "66_1258301011.45318" 
+    .const 'Sub' $P999 = "66_1258388873.30655" 
     capture_lex $P999
     new $P982, 'ExceptionHandler'
     set_addr $P982, control_981
@@ -16063,7 +16063,7 @@ NQP::Compiler - NQP compiler
     new $P997, "Undef"
   vivify_350:
     unless $P997, if_995_end
-    .const 'Sub' $P999 = "66_1258301011.45318" 
+    .const 'Sub' $P999 = "66_1258388873.30655" 
     capture_lex $P999
     $P999()
   if_995_end:
@@ -16083,7 +16083,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block998"  :anon :subid("66_1258301011.45318") :outer("65_1258301011.45318")
+.sub "_block998"  :anon :subid("66_1258388873.30655") :outer("65_1258388873.30655")
 .annotate "line", 322
     new $P1000, "Undef"
     .lex "$name", $P1000
@@ -16114,10 +16114,10 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "signature"  :subid("67_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "signature"  :subid("67_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1017
 .annotate "line", 329
-    .const 'Sub' $P1028 = "68_1258301011.45318" 
+    .const 'Sub' $P1028 = "68_1258388873.30655" 
     capture_lex $P1028
     new $P1016, 'ExceptionHandler'
     set_addr $P1016, control_1015
@@ -16161,7 +16161,7 @@ NQP::Compiler - NQP compiler
     unless $P1022, loop1034_done
     shift $P1026, $P1022
   loop1034_redo:
-    .const 'Sub' $P1028 = "68_1258301011.45318" 
+    .const 'Sub' $P1028 = "68_1258388873.30655" 
     capture_lex $P1028
     $P1028($P1026)
   loop1034_next:
@@ -16187,7 +16187,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block1027"  :anon :subid("68_1258301011.45318") :outer("67_1258301011.45318")
+.sub "_block1027"  :anon :subid("68_1258388873.30655") :outer("67_1258388873.30655")
     .param pmc param_1029
 .annotate "line", 331
     .lex "$_", param_1029
@@ -16200,7 +16200,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "parameter"  :subid("69_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "parameter"  :subid("69_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1041
 .annotate "line", 334
     new $P1040, 'ExceptionHandler'
@@ -16433,7 +16433,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "param_var"  :subid("70_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "param_var"  :subid("70_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1125
 .annotate "line", 366
     new $P1124, 'ExceptionHandler'
@@ -16487,7 +16487,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "named_param"  :subid("71_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "named_param"  :subid("71_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1145
 .annotate "line", 374
     new $P1144, 'ExceptionHandler'
@@ -16541,14 +16541,14 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "regex_declarator"  :subid("72_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "regex_declarator"  :subid("72_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1162
     .param pmc param_1163 :optional
     .param int has_param_1163 :opt_flag
 .annotate "line", 380
-    .const 'Sub' $P1233 = "74_1258301011.45318" 
+    .const 'Sub' $P1233 = "74_1258388873.30655" 
     capture_lex $P1233
-    .const 'Sub' $P1180 = "73_1258301011.45318" 
+    .const 'Sub' $P1180 = "73_1258388873.30655" 
     capture_lex $P1180
     new $P1161, 'ExceptionHandler'
     set_addr $P1161, control_1160
@@ -16606,7 +16606,7 @@ NQP::Compiler - NQP compiler
   vivify_399:
     if $P1209, if_1207
 .annotate "line", 426
-    .const 'Sub' $P1233 = "74_1258301011.45318" 
+    .const 'Sub' $P1233 = "74_1258388873.30655" 
     capture_lex $P1233
     $P1233()
     goto if_1207_end
@@ -16651,7 +16651,7 @@ NQP::Compiler - NQP compiler
     goto if_1175_end
   if_1175:
 .annotate "line", 386
-    .const 'Sub' $P1180 = "73_1258301011.45318" 
+    .const 'Sub' $P1180 = "73_1258388873.30655" 
     capture_lex $P1180
     $P1180()
   if_1175_end:
@@ -16671,7 +16671,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block1232"  :anon :subid("74_1258301011.45318") :outer("72_1258301011.45318")
+.sub "_block1232"  :anon :subid("74_1258388873.30655") :outer("72_1258388873.30655")
 .annotate "line", 427
     new $P1234, "Undef"
     .lex "$rpast", $P1234
@@ -16737,7 +16737,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block1179"  :anon :subid("73_1258301011.45318") :outer("72_1258301011.45318")
+.sub "_block1179"  :anon :subid("73_1258388873.30655") :outer("72_1258388873.30655")
 .annotate "line", 387
     new $P1181, "Hash"
     .lex "%h", $P1181
@@ -16835,7 +16835,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "dotty"  :subid("75_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "dotty"  :subid("75_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1266
 .annotate "line", 446
     new $P1265, 'ExceptionHandler'
@@ -16909,7 +16909,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<self>"  :subid("76_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "term:sym<self>"  :subid("76_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1291
 .annotate "line", 455
     new $P1290, 'ExceptionHandler'
@@ -16935,7 +16935,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<identifier>"  :subid("77_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "term:sym<identifier>"  :subid("77_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1300
 .annotate "line", 459
     new $P1299, 'ExceptionHandler'
@@ -16985,7 +16985,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<name>"  :subid("78_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "term:sym<name>"  :subid("78_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1316
 .annotate "line", 465
     new $P1315, 'ExceptionHandler'
@@ -17086,7 +17086,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<pir::op>"  :subid("79_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "term:sym<pir::op>"  :subid("79_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1349
 .annotate "line", 482
     new $P1348, 'ExceptionHandler'
@@ -17178,7 +17178,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "args"  :subid("80_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "args"  :subid("80_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1378
 .annotate "line", 497
     new $P1377, 'ExceptionHandler'
@@ -17209,10 +17209,10 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "arglist"  :subid("81_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "arglist"  :subid("81_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1388
 .annotate "line", 499
-    .const 'Sub' $P1399 = "82_1258301011.45318" 
+    .const 'Sub' $P1399 = "82_1258388873.30655" 
     capture_lex $P1399
     new $P1387, 'ExceptionHandler'
     set_addr $P1387, control_1386
@@ -17244,7 +17244,7 @@ NQP::Compiler - NQP compiler
     new $P1397, "Undef"
   vivify_443:
     unless $P1397, if_1395_end
-    .const 'Sub' $P1399 = "82_1258301011.45318" 
+    .const 'Sub' $P1399 = "82_1258388873.30655" 
     capture_lex $P1399
     $P1399()
   if_1395_end:
@@ -17353,9 +17353,9 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block1398"  :anon :subid("82_1258301011.45318") :outer("81_1258301011.45318")
+.sub "_block1398"  :anon :subid("82_1258388873.30655") :outer("81_1258388873.30655")
 .annotate "line", 501
-    .const 'Sub' $P1420 = "83_1258301011.45318" 
+    .const 'Sub' $P1420 = "83_1258388873.30655" 
     capture_lex $P1420
 .annotate "line", 502
     new $P1400, "Undef"
@@ -17408,7 +17408,7 @@ NQP::Compiler - NQP compiler
     unless $P1414, loop1425_done
     shift $P1418, $P1414
   loop1425_redo:
-    .const 'Sub' $P1420 = "83_1258301011.45318" 
+    .const 'Sub' $P1420 = "83_1258388873.30655" 
     capture_lex $P1420
     $P1420($P1418)
   loop1425_next:
@@ -17431,7 +17431,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block1419"  :anon :subid("83_1258301011.45318") :outer("82_1258301011.45318")
+.sub "_block1419"  :anon :subid("83_1258388873.30655") :outer("82_1258388873.30655")
     .param pmc param_1421
 .annotate "line", 504
     .lex "$_", param_1421
@@ -17443,7 +17443,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<value>"  :subid("84_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "term:sym<value>"  :subid("84_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1472
 .annotate "line", 521
     new $P1471, 'ExceptionHandler'
@@ -17474,7 +17474,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "circumfix:sym<( )>"  :subid("85_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "circumfix:sym<( )>"  :subid("85_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1482
 .annotate "line", 523
     new $P1481, 'ExceptionHandler'
@@ -17531,7 +17531,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "circumfix:sym<[ ]>"  :subid("86_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "circumfix:sym<[ ]>"  :subid("86_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1500
 .annotate "line", 529
     new $P1499, 'ExceptionHandler'
@@ -17608,7 +17608,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "circumfix:sym<ang>"  :subid("87_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "circumfix:sym<ang>"  :subid("87_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1527
 .annotate "line", 544
     new $P1526, 'ExceptionHandler'
@@ -17639,7 +17639,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "circumfix:sym<{ }>"  :subid("88_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "circumfix:sym<{ }>"  :subid("88_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1537
 .annotate "line", 546
     new $P1536, 'ExceptionHandler'
@@ -17709,7 +17709,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "circumfix:sym<sigil>"  :subid("89_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "circumfix:sym<sigil>"  :subid("89_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1561
 .annotate "line", 552
     new $P1560, 'ExceptionHandler'
@@ -17789,7 +17789,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "semilist"  :subid("90_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "semilist"  :subid("90_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1590
 .annotate "line", 559
     new $P1589, 'ExceptionHandler'
@@ -17820,7 +17820,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "postcircumfix:sym<[ ]>"  :subid("91_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "postcircumfix:sym<[ ]>"  :subid("91_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1600
 .annotate "line", 561
     new $P1599, 'ExceptionHandler'
@@ -17855,7 +17855,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "postcircumfix:sym<{ }>"  :subid("92_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "postcircumfix:sym<{ }>"  :subid("92_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1612
 .annotate "line", 567
     new $P1611, 'ExceptionHandler'
@@ -17890,7 +17890,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "postcircumfix:sym<ang>"  :subid("93_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "postcircumfix:sym<ang>"  :subid("93_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1624
 .annotate "line", 573
     new $P1623, 'ExceptionHandler'
@@ -17925,7 +17925,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "postcircumfix:sym<( )>"  :subid("94_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "postcircumfix:sym<( )>"  :subid("94_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1636
 .annotate "line", 579
     new $P1635, 'ExceptionHandler'
@@ -17958,7 +17958,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "value"  :subid("95_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "value"  :subid("95_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1646
 .annotate "line", 583
     new $P1645, 'ExceptionHandler'
@@ -18051,7 +18051,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "quote:sym<apos>"  :subid("96_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "quote:sym<apos>"  :subid("96_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1674
 .annotate "line", 594
     new $P1673, 'ExceptionHandler'
@@ -18082,7 +18082,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "quote:sym<dblq>"  :subid("97_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "quote:sym<dblq>"  :subid("97_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1684
 .annotate "line", 595
     new $P1683, 'ExceptionHandler'
@@ -18113,7 +18113,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "quote:sym<qq>"  :subid("98_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "quote:sym<qq>"  :subid("98_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1694
 .annotate "line", 596
     new $P1693, 'ExceptionHandler'
@@ -18144,7 +18144,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "quote:sym<q>"  :subid("99_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "quote:sym<q>"  :subid("99_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1704
 .annotate "line", 597
     new $P1703, 'ExceptionHandler'
@@ -18175,7 +18175,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "quote:sym<Q>"  :subid("100_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "quote:sym<Q>"  :subid("100_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1714
 .annotate "line", 598
     new $P1713, 'ExceptionHandler'
@@ -18206,7 +18206,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "quote:sym<Q:PIR>"  :subid("101_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "quote:sym<Q:PIR>"  :subid("101_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1724
 .annotate "line", 599
     new $P1723, 'ExceptionHandler'
@@ -18243,7 +18243,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "quote_escape:sym<$>"  :subid("102_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "quote_escape:sym<$>"  :subid("102_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1738
 .annotate "line", 605
     new $P1737, 'ExceptionHandler'
@@ -18274,7 +18274,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "quote_escape:sym<{ }>"  :subid("103_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "quote_escape:sym<{ }>"  :subid("103_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1748
 .annotate "line", 606
     new $P1747, 'ExceptionHandler'
@@ -18313,7 +18313,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "postfix:sym<.>"  :subid("104_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "postfix:sym<.>"  :subid("104_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1762
 .annotate "line", 614
     new $P1761, 'ExceptionHandler'
@@ -18344,7 +18344,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "postfix:sym<++>"  :subid("105_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "postfix:sym<++>"  :subid("105_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1772
 .annotate "line", 616
     new $P1771, 'ExceptionHandler'
@@ -18375,7 +18375,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "postfix:sym<-->"  :subid("106_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "postfix:sym<-->"  :subid("106_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1782
 .annotate "line", 622
     new $P1781, 'ExceptionHandler'
@@ -18406,7 +18406,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "prefix:sym<make>"  :subid("107_1258301011.45318") :method :outer("11_1258301011.45318")
+.sub "prefix:sym<make>"  :subid("107_1258388873.30655") :method :outer("11_1258388873.30655")
     .param pmc param_1792
 .annotate "line", 628
     new $P1791, 'ExceptionHandler'
@@ -18437,18 +18437,18 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"RegexActions"]
-.sub "_block1801"  :subid("108_1258301011.45318") :outer("11_1258301011.45318")
+.sub "_block1801"  :subid("108_1258388873.30655") :outer("11_1258388873.30655")
 .annotate "line", 638
-    .const 'Sub' $P1837 = "112_1258301011.45318" 
+    .const 'Sub' $P1837 = "112_1258388873.30655" 
     capture_lex $P1837
-    .const 'Sub' $P1827 = "111_1258301011.45318" 
+    .const 'Sub' $P1827 = "111_1258388873.30655" 
     capture_lex $P1827
-    .const 'Sub' $P1817 = "110_1258301011.45318" 
+    .const 'Sub' $P1817 = "110_1258388873.30655" 
     capture_lex $P1817
-    .const 'Sub' $P1803 = "109_1258301011.45318" 
+    .const 'Sub' $P1803 = "109_1258388873.30655" 
     capture_lex $P1803
 .annotate "line", 649
-    .const 'Sub' $P1837 = "112_1258301011.45318" 
+    .const 'Sub' $P1837 = "112_1258388873.30655" 
     capture_lex $P1837
 .annotate "line", 638
     .return ($P1837)
@@ -18456,7 +18456,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"RegexActions"]
-.sub "metachar:sym<:my>"  :subid("109_1258301011.45318") :method :outer("108_1258301011.45318")
+.sub "metachar:sym<:my>"  :subid("109_1258388873.30655") :method :outer("108_1258388873.30655")
     .param pmc param_1806
 .annotate "line", 640
     new $P1805, 'ExceptionHandler'
@@ -18496,7 +18496,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"RegexActions"]
-.sub "metachar:sym<{ }>"  :subid("110_1258301011.45318") :method :outer("108_1258301011.45318")
+.sub "metachar:sym<{ }>"  :subid("110_1258388873.30655") :method :outer("108_1258388873.30655")
     .param pmc param_1820
 .annotate "line", 645
     new $P1819, 'ExceptionHandler'
@@ -18527,7 +18527,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"RegexActions"]
-.sub "assertion:sym<{ }>"  :subid("111_1258301011.45318") :method :outer("108_1258301011.45318")
+.sub "assertion:sym<{ }>"  :subid("111_1258388873.30655") :method :outer("108_1258388873.30655")
     .param pmc param_1830
 .annotate "line", 647
     new $P1829, 'ExceptionHandler'
@@ -18558,7 +18558,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"RegexActions"]
-.sub "codeblock"  :subid("112_1258301011.45318") :method :outer("108_1258301011.45318")
+.sub "codeblock"  :subid("112_1258388873.30655") :method :outer("108_1258388873.30655")
     .param pmc param_1840
 .annotate "line", 649
     new $P1839, 'ExceptionHandler'
