@@ -42,7 +42,7 @@
     $I0 = time
     sleep 1
     $I1 = time
-    $I2 = isgt $I1, $I2
+    $I2 = isgt $I1, $I0
     ok($I2, "sleep_i increases time")
     $I2 = $I0 + 1
     $I3 = isge $I1, $I2
