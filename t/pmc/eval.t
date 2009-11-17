@@ -10,6 +10,7 @@ use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
 use Parrot::Test tests => 17;
+use Parrot::Config;
 
 =head1 NAME
 
@@ -316,9 +317,9 @@ hello from foo_2
 2 1 1 1
 OUTPUT
 
-(my $fh, $temp_pbc)  = create_tempfile( SUFFIX => '.pbc', UNLINK => 1 ); 
+(my $fh, $temp_pbc)  = create_tempfile( SUFFIX => '.pbc', UNLINK => 1 );
 close $fh;
-        
+
 pir_output_is( <<"CODE", <<'OUTPUT', "eval.get_string - same file" );
 .sub main :main
   .local pmc f1, f2
@@ -396,7 +397,8 @@ OUTPUT
 
 TODO: {
     local $TODO = q|fails eval.thaw test in testr with Segmentation fault - TT #1142|
-        if defined $ENV{TEST_PROG_ARGS} && $ENV{TEST_PROG_ARGS} =~ /--run-pbc/;
+        if (defined $ENV{TEST_PROG_ARGS} && $ENV{TEST_PROG_ARGS} =~ /--run-pbc/)
+           && ($PConfig{cpuarch} eq 'amd64' && $PConfig{cc} =~ /cc/);
 
 pir_output_is( <<"CODE", <<'OUTPUT', "eval.thaw" );
 .sub main :main
