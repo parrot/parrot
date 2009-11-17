@@ -934,8 +934,6 @@ Parrot_mmd_maybe_candidate(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *cl))
 
     if (VTABLE_isa(interp, pmc, _sub)) {
         /* a plain sub stops outer searches */
-        /* RT #45959 check arity of sub */
-
         VTABLE_push_pmc(interp, cl, pmc);
         return 1;
     }
