@@ -129,7 +129,7 @@ foo.c: foo.dump
 foo.dump: foo.pmc
 	$(PMC2CD) foo.pmc
 
-foo2$(O): foo2.c
+foo2$(O): foo.c foo2.c
 	$(CC) -c @cc_o_out@foo2$(O) $(INCLUDES) $(CFLAGS) foo2.c
 
 foo2.c: foo2.dump foo.pmc
