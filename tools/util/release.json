@@ -1,9 +1,9 @@
 {
-    "release.version"  : "1.7.0",
-    "release.name"     : "African Grey",
+    "release.version"  : "1.8.0",
+    "release.name"     : "Zygodactyly",
     "release.day"      : "Tuesday",
-    "release.date"     : "20 October 2009",
-    "release.nextdate" : "17 November 2009",
+    "release.date"     : "17 November 2009",
+    "release.nextdate" : "15 December 2009",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -11,13 +11,13 @@
     "web.repository"   : "https://svn.parrot.org/parrot/trunk/",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "17 October 2009",
+    "bugday.date"      : "12 December 2009",
 
     "wiki.root"        : "https://trac.parrot.org/parrot/wiki/",
-    "wiki.bugday"      : "bug_day_2009_10_17",
+    "wiki.bugday"      : "bug_day_2009_12_15",
 
     "cpan.search"      : "http://search.cpan.org/dist/parrot",
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/1.7.0/",
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/1.8.0/",
     "subversion.root"  : "http://subversion.tigris.org/",
     "svk.root"         : "http://svk.bestpractical.com/"
 }

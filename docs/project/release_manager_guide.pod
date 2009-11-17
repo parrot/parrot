@@ -25,11 +25,12 @@ language project leads for release blockers, to allow time to fix them.
 Also ask people to review the tickets targeted for the upcoming release
 L<https://trac.parrot.org/parrot/roadmap>.
 
-Make sure your ssh keys have been added to the FTP server ftp-osl.osuosl.org.
-The key need to be there, so you'll be able to ship the release.
-Also set up your account on L<http://www.parrot.org/> and ask an existing release
+Make sure your ssh key have been added to the FTP server ftp-osl.osuosl.org.
+Without the key you won't be able to ship the release.
+
+Set up your account on L<http://www.parrot.org/> and ask an previous release
 manager to provide you with editor privileges if you don't already have them.
-Any previous release manager can help.
+Any previous release manager should be able to help.
 
 A couple of days in advance: announce the new release to
 parrot-dev@lists.parrot.org and to the IRC channel #parrot. Ask whether
@@ -51,6 +52,7 @@ L<http://en.wikipedia.org/wiki/List_of_parrots>.
 
 =item 1.
 
+The day of the release has come.
 Make sure you're up to date:
 
  $ svn update
@@ -389,7 +391,6 @@ The calendar of releases is available at the comp.lang.parrot google calendar,
 visible at
 L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.calendar.google.com>.
 
- - Nov 17, 2009      - 1.8  - bernhard
  - Dec 15, 2009      - 1.9  - gerd
  - Jan 19, 2010      - 2.0* - chromatic
  - Feb 16, 2010      - 2.1  - darbelo

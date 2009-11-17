@@ -96,5 +96,6 @@ Francois Perrad, Jonathan Leto.
  Whiteknight 1.5.0          2009-Aug-18     "TEH PARROTZ!"
  Jerry       1.6.0          2009-Sep-15     "half-pie"
  dukeleto    1.7.0          2009-Oct-20     "African Grey"
+ Barney      1.8.0          2009-Nov-17     "Zygodactyly"
 
 =cut
