@@ -9,12 +9,14 @@ This document records Parrot source code releases, and their release managers.
 =head1 RELEASE MANAGERS
 
 Simon Cozens, Jeff Goff, Steve Fink, Leo Toetsch, Chip Salzenberg, Jerry Gay,
-Patrick Michaud, Will Coleda, Matt Diephouse, chromatic, Allison Randal,
+Patrick Michaud, Will "coke" Coleda, Matt Diephouse, chromatic, Allison Randal,
 Jonathan Worthington, Bob Rogers, Bernhard Schmalhofer, Andrew Whitworth,
 Francois Perrad, Jonathan Leto.
 
 
 =head1 THE RECORDS
+
+Starred release numbers indicate supported releases.
 
  Release     Release        Date            Release name
  Manager
@@ -58,14 +60,14 @@ Francois Perrad, Jonathan Leto.
 
  Jerry       0.4.8b         2007-Jan-16     "Eponymous"
  Patrick     0.4.9          2007-Feb-22     "Socorro"
- Will        0.4.10         2007-Mar-20     "Release Formerly Known as Prince"
+ coke        0.4.10         2007-Mar-20     "Release Formerly Known as Prince"
  Matt        0.4.11         2007-Apr-17     "Tax Bird"
  chromatic   0.4.12         2007-May-15     "Of The Caribbean"
  Allison     0.4.13         2007-Jun-19     "Clifton"
  Jerry       0.4.14         2007-Jul-17     "Now, with Seat Belts!"
  Patrick     0.4.15         2007-Aug-22     "Augean Stable"
  Jerry       0.4.16         2007-Sep-18     "A Farewell to Alex"
- Will        0.4.17         2007-Oct-17     "Two for Finching"
+ coke        0.4.17         2007-Oct-17     "Two for Finching"
 
  chromatic   0.5.0          2007-Nov-20     "Caulked Snack"
  Jonathan    0.5.1          2007-Dec-18     "Hatachi"
@@ -88,11 +90,12 @@ Francois Perrad, Jonathan Leto.
  chromatic   0.9.0          2009-Jan-20     "From Outer Space"
  kjs         0.9.1          2009-Feb-17     "Final Countdown"
 
- Allison     1.0.0          2009-Mar-17     "Haru Tatsu"
+ Allison     1.0.0 *        2009-Mar-17     "Haru Tatsu"
  Francois    1.1.0          2009-Apr-21     "Half-moon Conure"
  Infinoid    1.2.0          2009-May-19     "Bird Brain"
  Whiteknight 1.3.0          2009-Jun-16     "Andean Swift"
- cotto       1.4.0          2009-Jul-21     "Mundo Cani"
+
+ cotto       1.4.0 *        2009-Jul-21     "Mundo Cani"
  Whiteknight 1.5.0          2009-Aug-18     "TEH PARROTZ!"
  Jerry       1.6.0          2009-Sep-15     "half-pie"
  dukeleto    1.7.0          2009-Oct-20     "African Grey"
