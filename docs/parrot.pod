@@ -7,7 +7,7 @@ docs/parrot.pod - Parrot
 
 =head1 The Parrot Virtual Machine
 
-Parrot is a language-agnostic common bytecode format and interpreter for
+Parrot is a language-agnostic common bytecode format and an interpreter for
 dynamic languages.
 
 =head2 Documentation
