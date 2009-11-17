@@ -23,7 +23,8 @@ You also need Perl 5.8.4 or newer, and Storable 2.12 or newer
 for running various configure and build scripts.
 
 For most of the platforms that we are supporting initially, Parrot should build
-out of the box. PLATFORM lists our target platforms.
+out of the box. docs/parrot.pod lists the core platforms.
+PLATFORMS provides reports on the platforms on which Parrot has been built and tested. 
 
 INSTRUCTIONS
 ------------
