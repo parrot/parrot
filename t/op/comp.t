@@ -148,7 +148,10 @@ Tests various conditional branch operations.
     new $P0, 'Float'
     set $P0, -1.2
     new $P1, 'String'
-    set $P1, "-1.2"
+#
+#   fix problems with g++ 4.4.1 (with --optimize) on i386 - TT #1275
+#   set $P1, "-1.2"
+    set $P1, "-1.2000000000"
     eq_num $P0, $P1, OK
     ok(0, "not eq_num")
     .return()
