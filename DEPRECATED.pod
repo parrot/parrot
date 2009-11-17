@@ -75,6 +75,15 @@ so this usage will not be allowed.
 
 L<https://trac.parrot.org/parrot/ticket/918>
 
+=item The IMAGE_IO structure and associated VTABLEs. [eligible in 2.1]
+
+The current freeze/thaw implementation makes heavy use of the IMAGE_IO
+structure and the VTABLE interface attached to it. This structure will
+be replaced with a PMC of equivalent functionality and with a possibly
+similar interface.
+
+L<https://trac.parrot.org/parrot/ticket/1305>
+
 =item Overriding vtable invoke in PIR objects [experimental]
 
 The VTABLE invoke in object.pmc puts SELF at the start of the
