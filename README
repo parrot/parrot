@@ -14,17 +14,16 @@ For more details, see the full text of the license in the file LICENSE.
 PREREQUISITES
 -------------
 
-You need a C compiler, a linker, and a make program of course. If you will be
-linking with the ICU library you have to download and install it before
-configuring Parrot.
+You need a C compiler, a linker, and a make program of course.
 
-Get it from http://site.icu-project.org/download
+If you will be linking with the ICU library you have to download and install it before
+configuring Parrot. Get it from http://site.icu-project.org/download
 
-You also need Perl 5.8.4 or newer, Storable 2.12 or newer, and Bundle::Parrot
-to run various configure and build scripts.
+You also need Perl 5.8.4 or newer, and Storable 2.12 or newer
+for running various configure and build scripts.
 
 For most of the platforms that we are supporting initially, Parrot should build
-out of the box.  PLATFORM lists our target platforms.
+out of the box. PLATFORM lists our target platforms.
 
 INSTRUCTIONS
 ------------
