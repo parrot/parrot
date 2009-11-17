@@ -572,9 +572,6 @@ again:
     /* the man page states that it's ok to close a mmaped file */
     if (fd >= 0)
         close(fd);
-#else
-    /* RT #46155 Parrot_exec uses this
-    mem_sys_free(program_code); */
 #endif
 
     return pf;
