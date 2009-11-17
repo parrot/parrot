@@ -31,7 +31,6 @@ Warning! With --install there must be no directory prefix in the first arg yet.
     (infile, cfile, objfile, exefile) = 'handle_args'(argv)
     unless infile > '' goto err_infile
 
-
     .local string code_type
     code_type = 'determine_code_type'()
 
@@ -164,7 +163,7 @@ MAIN
     cfile   = 'replace_pbc_extension'(infile, '.c')
     objfile = 'replace_pbc_extension'(infile, obj)
     $S0     = 'replace_pbc_extension'(infile, exe)
-    exefile = concat 'installable_', $S0
+    exefile = 'prepend_installable'($S0)
 
     .return(infile, cfile, objfile, exefile)
 
@@ -680,6 +679,26 @@ END_OF_FUNCTION
     .return()
 .end
 
+# handle any directory components
+.sub 'prepend_installable'
+    .param string file
+
+    $P0   = '_config'()
+
+    .local string slash
+    slash = $P0['slash']
+
+    .local pmc path
+    path = split slash, file
+
+    file     = path[-1]
+    file     = concat 'installable_', file
+    path[-1] = file
+
+    file     = join slash, path
+
+    .return( file )
+.end
 
 # Local Variables:
 #   mode: pir
