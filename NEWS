@@ -1,6 +1,6 @@
 # $Id$
 
-New in 1.8.0 (to be released on 2009-11-17)
+New in 1.8.0
 - Functionality
   + The FileHandle PMC now exposes the exit code of child process that was run as pipe.
   + Experimental support for overriding VTABLE invoke in PIR objects was added.
@@ -12,9 +12,9 @@ New in 1.8.0 (to be released on 2009-11-17)
   + The files installed by 'make install-dev' are now covered by 'make install' as well.
   + The experimental ops 'fetch' and 'vivify' were added.
   + The -I option to the command 'parrot' now prepends items to the search path.
-  + The development branch context_auto_attrs was merged.
-  + The development branch convert_OSNAME was merged.
-  + The development branch auto_format_no_Config was merged.
+  + The Context struct was substituted with auto attributes (context_auto_attrs branch).
+  + Use the osname determined in auto::arch in subsequent configuration steps (convert_OSNAME branch).
+  + Eliminated dependence on Perl 5 '%Config' in auto::format (auto_format_no_Config branch).
   + MultiSub PMCs now stringify to the name of their first candidate,
     instead of the number of candidates.
   + The platform detection at the start of the configuration process was improved.
@@ -34,7 +34,7 @@ New in 1.8.0 (to be released on 2009-11-17)
     - PAST::Var allows 'contextual' scope.
     - Attribute bindings now return the bound value.
 - Platforms
-  + Fixes for the port or Parrot to RTEMS were applied. Yay, first port to a real time OS!
+  + Fixes for the port of Parrot to RTEMS were applied. Yay, first port to a real time OS!
   + On NetBSD, shared libs are now used.
 - Performance
   + Use the the fixed-sized allocator in the Context and the CallSignature PMC.
