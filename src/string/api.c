@@ -295,12 +295,6 @@ Parrot_str_init(PARROT_INTERP)
         Parrot_srand(Parrot_intval_time());
         interp->hash_seed = Parrot_uint_rand(0);
     }
-
-    /* initialize STRINGNULL, but not in the constant table */
-    STRINGNULL = Parrot_str_new_init(interp, NULL, 0,
-                       PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
-                       PObj_constant_FLAG);
-
     /* initialize the constant string table */
     if (interp->parent_interpreter) {
         interp->const_cstring_table =
@@ -314,6 +308,11 @@ Parrot_str_init(PARROT_INTERP)
     const_cstring_hash          = parrot_new_cstring_hash(interp);
     interp->const_cstring_hash  = const_cstring_hash;
     Parrot_charsets_encodings_init(interp);
+
+    /* initialize STRINGNULL, but not in the constant table */
+    STRINGNULL = Parrot_str_new_init(interp, NULL, 0,
+                       PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+                       PObj_constant_FLAG);
 
     interp->const_cstring_table =
         mem_allocate_n_zeroed_typed(n_parrot_cstrings, STRING *);
