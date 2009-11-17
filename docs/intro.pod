@@ -116,13 +116,8 @@ is, no longer referenced) whenever the garbage collector runs.
 
 =head2 Where to get Parrot
 
-Every month, numbered releases will appear on CPAN.  At this stage of the
-project, an awful lot is changing between releases. You can get a copy of the
-latest Parrot from the SVN repository. This is done as follows:
-
-  svn co https://svn.parrot.org/parrot/trunk parrot
-
-You can find more instructions at: L<http://www.parrot.org/download>.
+See L<http://www.parrot.org/download> for several ways to get a recent
+version of parrot.
 
 =head2 Building Parrot
 
@@ -132,15 +127,14 @@ typing:
 
   perl Configure.pl
 
-Once this is complete, run the C<make> program (sometimes called C<nmake> or
-C<dmake> or C<gmake>).  This should complete, giving you a working Parrot
-executable.
+Once this is complete, run the C<make> program C<Configure.pl> prompts you
+with. When this completes, you will have a working C<parrot> executable.
 
 Please report any problems that you encounter while building Parrot so the
-developers can fix them. You can do this by sending a message to
-C<parrotbug@parrotcode.org> containing a description of your problem. Please
-include the F<myconfig> file that was generated as part of the build process
-and any errors that you observed.
+developers can fix them. You can do this by creating a login and opening
+a new ticket at L<https://trac.parrot.org>.  Please include the F<myconfig>
+file that was generated as part of the build process and any errors that you
+observed.
 
 =head2 The Parrot test suite
 
@@ -176,7 +170,7 @@ Create a file called F<hello.pir> that contains the following code.
 =begin PIR
 
   .sub main
-      print "Hello world!\n"
+      say "Hello world!"
   .end
 
 =end PIR
@@ -186,7 +180,7 @@ Then run it by typing:
   parrot hello.pir
 
 As expected, this will display the text C<Hello world!> on the console,
-followed by a new line (due to the C<\n>).
+followed by a new line. 
 
 Let's take the program apart. C<.sub main> states that the instructions that
 follow make up a subroutine named C<main>, until a C<.end> is encountered. The
@@ -196,14 +190,14 @@ care of deciding which variant of the instruction to use for us.
 
 =head2 Using registers
 
-We can modify hello.pir to first store the string C<Hello world!\n> in a
+We can modify hello.pir to first store the string C<Hello world!> in a
 register and then use that register with the print instruction.
 
 =begin PIR
 
   .sub main
-      $S0 = "Hello world!\n"
-      print $S0
+      $S0 = "Hello world!"
+      say $S0
   .end
 
 =end PIR
@@ -221,8 +215,8 @@ mapped to real numbered registers.
 
   .sub main
       .local string hello
-      hello = "Hello world!\n"
-      print hello
+      hello = "Hello world!"
+      say hello
   .end
 
 =end PIR
