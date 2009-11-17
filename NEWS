@@ -58,6 +58,8 @@ New in 1.8.0 (to be released on 2009-11-17)
   + The library Configure.pir was added.
   + The library distutils.pir was added.
 - Miscellaneous
+  + The mailing list parrot-users and a corresponding google group was created,
+    http://groups.google.com/group/parrot-users.
   + Many bugfixes, code cleanups, and coding standard fixes.
 
 New in 1.7.0
