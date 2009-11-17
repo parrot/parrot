@@ -341,7 +341,7 @@ typedef enum {
 #endif
 
 #if PARROT_CATCH_NULL
-PARROT_DATA PMC * PMCNULL;   /* Holds single Null PMC */
+PARROT_DATA PMC    *PMCNULL;    /* Holds single Null PMC */
 #else
 #  define PMCNULL         ((PMC *)NULL)
 #endif /* PARROT_CATCH_NULL */
@@ -353,7 +353,9 @@ PARROT_DATA PMC * PMCNULL;   /* Holds single Null PMC */
 #  define PMC_IS_NULL(pmc) (pmc) == NULL
 #endif
 
-#define STRING_IS_NULL(s) ((s) == NULL)
+PARROT_DATA STRING *STRINGNULL; /* a single Null STRING */
+
+#define STRING_IS_NULL(s) ((s) == STRINGNULL || (s) == NULL)
 #define STRING_IS_EMPTY(s) !(int)(s)->strlen
 
 /* &gen_from_def(sysinfo.pasm) prefix(SYSINFO_) */
@@ -591,6 +593,9 @@ typedef void * *(*native_func_t)(PARROT_INTERP,
 
 #ifndef PMC_IS_NULL
 #  define PMC_IS_NULL(pmc) PMC_is_null(NULL, (pmc))
+#endif
+#ifndef STRING_IS_NULL
+#  define STRING_IS_NULL(s) ((s) == NULL || STRING_is_null(NULL, (s))
 #endif
 
 #endif   /* PARROT_INTERPRETER_H_GUARD */
