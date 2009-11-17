@@ -43,16 +43,13 @@ New in 1.8.0 (to be released on 2009-11-17)
 - Tests
   + The test coverage of the time-related ops was much improved.
   + New testing functions in Test::More: lives_ok() and dies_ok().
-  + The Perl 5 based test scripts t/op/bitwist.t, t/op/comp.t, t/op/inf_nan.t, 
+  + The Perl 5 based test scripts t/op/bitwist.t, t/op/comp.t, t/op/inf_nan.t,
     t/op/literal.t, t/op/number.t, t/op/sprintf2.t, and t/op/00ff-dos.t were converted to PIR.
   + The test scripts t/op/annotate.t and t/op/time.t have begun
     to be translated from Perl 5 to PIR.
   + In some tests the dependency on %Config from Perl 5 was eliminated.
 - Documentation
   + The meaning of 'p' means in NCI function call signatures was clarified.
-- Libraries
-  + Math/Random/mt19937ar.pir
-    - left the nest and is now at http://github.com/fperrad/parrot-MT19937
 - Tools
   + The stub for a new language, as created by mk_language_shell.pl,
     now relies on the PIR-based tools, which are replacing the Perl 5-based tools.
