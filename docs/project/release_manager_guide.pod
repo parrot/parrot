@@ -38,6 +38,13 @@ project leads. It's also good to ask for updates to F<NEWS>, F<CREDITS>,
 F<PLATFORMS>, F<RESPONSIBLE_PARTIES>, F<DEPRECATED.pod> and
 L<https://trac.parrot.org/parrot/wiki/Languages>.
 
+On the Saturday before a release you should notify other developers to stop
+committing non-release related code to trunk.  This will help avoid
+complications. They are of course free to commit to branches as much as
+they like. You might also set the topic in #parrot, announcing the 
+time when you plan on starting the release procedure. This will help
+the committers with timing their last minute commits.
+
 You might also select a name (and optionally a quote) for your release.
 For example, you could select a name from
 L<http://en.wikipedia.org/wiki/List_of_parrots>.
@@ -47,11 +54,6 @@ L<http://en.wikipedia.org/wiki/List_of_parrots>.
 Make sure you're up to date:
 
  $ svn update
-
-You should notify other developers the Saturday before a release to stop
-committing non-release related code to trunk.  This will help avoid
-complications. They are of course free to commit to branches as much as
-they like.
 
 =item 2.
 
