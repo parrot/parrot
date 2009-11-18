@@ -46,7 +46,6 @@ to F<xyz> if an explicit C<path> isn't given):
     src/ops/Makefile.in
     src/ops/xyz.ops
     src/xyz.pir
-    t/harness
     t/00-sanity.t
     xyz/.ignore
 
@@ -314,7 +313,7 @@ SOURCES
     # test
     $S0 = get_parrot()
     $S0 .= ' xyz.pbc'
-    $P0['prove_exec'] = $S0 # used unless t/harness exists
+    $P0['prove_exec'] = $S0
 
     # install
     $P0['inst_lang'] = 'xyz/xyz.pbc'
@@ -661,8 +660,7 @@ help:
 	@echo ""
 
 test: build
-	$(PERL) -I$(LIB_DIR)/tools/lib t/harness --bindir=$(BIN_DIR)
-#	prove --exec="$(PARROT) @lclang@.pbc" t/*.t
+	prove --exec="$(PARROT) @lclang@.pbc" t/*.t
 
 # basic run for missing libs
 test-installable: installable
@@ -1274,39 +1272,6 @@ say.pir -- simple implementation of a say function
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4 ft=pir:
-
-__t/harness__
-#! perl
-
-# @Id@
-
-# pragmata
-use strict;
-use warnings;
-use Getopt::Long;
-use 5.008;
-
-our %harness_args = (
-    language  => '@lang@',
-    verbosity => 0,
-);
-
-GetOptions(
-        'verbosity=i'       => \$harness_args{verbosity},
-        'bindir=s'          => \my $bindir,
-        # A sensible default is num_cores + 1.
-        # Many people have two cores these days.
-        'jobs:3'            => \$harness_args{jobs},
-);
-
-if ($bindir) {
-    $harness_args{exec} = [$bindir.'/parrot', '@lclang@.pbc'];
-}
-else {
-    $harness_args{compiler} = '@lclang@.pbc';
-}
-
-eval 'use Parrot::Test::Harness %harness_args';
 
 __t/00-sanity.t__
 # This just checks that the basic parsing and call to builtin say() works.
