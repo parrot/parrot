@@ -36,11 +36,11 @@ static INTVAL register_encoding(SHIM_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-ENCODING *Parrot_default_encoding_ptr;
-ENCODING *Parrot_fixed_8_encoding_ptr;
-ENCODING *Parrot_utf8_encoding_ptr;
-ENCODING *Parrot_ucs2_encoding_ptr;
-ENCODING *Parrot_utf16_encoding_ptr;
+ENCODING *Parrot_default_encoding_ptr = NULL;
+ENCODING *Parrot_fixed_8_encoding_ptr = NULL;
+ENCODING *Parrot_utf8_encoding_ptr    = NULL;
+ENCODING *Parrot_ucs2_encoding_ptr    = NULL;
+ENCODING *Parrot_utf16_encoding_ptr   = NULL;
 
 typedef struct One_encoding {
     NOTNULL(ENCODING *encoding);
