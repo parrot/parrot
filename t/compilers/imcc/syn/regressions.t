@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 20;
 
 pir_error_output_like( <<'CODE', <<'OUT', 'invalid get_results syntax');
 .sub main :main
@@ -235,8 +235,29 @@ pir_output_is( <<'CODE', <<'OUT', 'exit is last op in sub (TT #1009)');
 CODE
 OUT
 
+# This test probably belongs in subflags.t
+# The test inspired by TT #744, even though it presents differently.
+{
+    my @types = qw/string num pmc/;
+    foreach my $invalid_type (@types) {
 
+    pir_error_output_like( <<"CODE", <<'OUT', 'opt_flag must be an int.', todo => 'broken');
 
+.sub bar
+  .param pmc foo :optional
+  .param $invalid_type joe :opt_flag
+  say joe
+.end
+
+.sub main :main
+bar()
+.end
+CODE
+/:opt_flag parameter must be of type 'int'/
+OUT
+
+    }
+}
 
 # Local Variables:
 #   mode: cperl
