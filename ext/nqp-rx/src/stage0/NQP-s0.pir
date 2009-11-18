@@ -15,365 +15,367 @@ NQP::Compiler - NQP compiler
 ### .include 'gen/nqp-grammar.pir'
 
 .namespace []
-.sub "_block11"  :anon :subid("10_1258424429.0004")
+.sub "_block11"  :anon :subid("10_1258533478.31768")
 .annotate "line", 0
     get_hll_global $P14, ["NQP";"Grammar"], "_block13" 
     capture_lex $P14
 .annotate "line", 4
     get_hll_global $P14, ["NQP";"Grammar"], "_block13" 
     capture_lex $P14
-    $P1058 = $P14()
+    $P1079 = $P14()
 .annotate "line", 1
-    .return ($P1058)
+    .return ($P1079)
 .end
 
 
 .namespace []
-.sub "" :load :init :subid("post309") :outer("10_1258424429.0004")
+.sub "" :load :init :subid("post312") :outer("10_1258533478.31768")
 .annotate "line", 0
-    .const 'Sub' $P12 = "10_1258424429.0004" 
+    .const 'Sub' $P12 = "10_1258533478.31768" 
     .local pmc block
     set block, $P12
-    $P1059 = get_root_global ["parrot"], "P6metaclass"
-    $P1059."new_class"("NQP::Grammar", "HLL::Grammar" :named("parent"))
+    $P1080 = get_root_global ["parrot"], "P6metaclass"
+    $P1080."new_class"("NQP::Grammar", "HLL::Grammar" :named("parent"))
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "_block13"  :subid("11_1258424429.0004") :outer("10_1258424429.0004")
+.sub "_block13"  :subid("11_1258533478.31768") :outer("10_1258533478.31768")
 .annotate "line", 4
-    get_hll_global $P1007, ["NQP";"Regex"], "_block1006" 
-    capture_lex $P1007
-    .const 'Sub' $P1001 = "294_1258424429.0004" 
-    capture_lex $P1001
-    .const 'Sub' $P996 = "292_1258424429.0004" 
-    capture_lex $P996
-    .const 'Sub' $P990 = "290_1258424429.0004" 
-    capture_lex $P990
-    .const 'Sub' $P984 = "288_1258424429.0004" 
-    capture_lex $P984
-    .const 'Sub' $P978 = "286_1258424429.0004" 
-    capture_lex $P978
-    .const 'Sub' $P972 = "284_1258424429.0004" 
-    capture_lex $P972
-    .const 'Sub' $P967 = "282_1258424429.0004" 
-    capture_lex $P967
-    .const 'Sub' $P961 = "280_1258424429.0004" 
-    capture_lex $P961
-    .const 'Sub' $P955 = "278_1258424429.0004" 
-    capture_lex $P955
-    .const 'Sub' $P949 = "276_1258424429.0004" 
-    capture_lex $P949
-    .const 'Sub' $P943 = "274_1258424429.0004" 
-    capture_lex $P943
-    .const 'Sub' $P937 = "272_1258424429.0004" 
-    capture_lex $P937
-    .const 'Sub' $P931 = "270_1258424429.0004" 
-    capture_lex $P931
-    .const 'Sub' $P925 = "268_1258424429.0004" 
-    capture_lex $P925
-    .const 'Sub' $P919 = "266_1258424429.0004" 
-    capture_lex $P919
-    .const 'Sub' $P913 = "264_1258424429.0004" 
-    capture_lex $P913
-    .const 'Sub' $P907 = "262_1258424429.0004" 
-    capture_lex $P907
-    .const 'Sub' $P901 = "260_1258424429.0004" 
-    capture_lex $P901
-    .const 'Sub' $P895 = "258_1258424429.0004" 
-    capture_lex $P895
-    .const 'Sub' $P889 = "256_1258424429.0004" 
-    capture_lex $P889
-    .const 'Sub' $P883 = "254_1258424429.0004" 
-    capture_lex $P883
-    .const 'Sub' $P877 = "252_1258424429.0004" 
-    capture_lex $P877
-    .const 'Sub' $P871 = "250_1258424429.0004" 
-    capture_lex $P871
-    .const 'Sub' $P865 = "248_1258424429.0004" 
-    capture_lex $P865
-    .const 'Sub' $P859 = "246_1258424429.0004" 
-    capture_lex $P859
-    .const 'Sub' $P853 = "244_1258424429.0004" 
-    capture_lex $P853
-    .const 'Sub' $P847 = "242_1258424429.0004" 
-    capture_lex $P847
-    .const 'Sub' $P841 = "240_1258424429.0004" 
-    capture_lex $P841
-    .const 'Sub' $P835 = "238_1258424429.0004" 
-    capture_lex $P835
-    .const 'Sub' $P829 = "236_1258424429.0004" 
-    capture_lex $P829
-    .const 'Sub' $P823 = "234_1258424429.0004" 
-    capture_lex $P823
-    .const 'Sub' $P817 = "232_1258424429.0004" 
-    capture_lex $P817
-    .const 'Sub' $P811 = "230_1258424429.0004" 
-    capture_lex $P811
-    .const 'Sub' $P805 = "228_1258424429.0004" 
-    capture_lex $P805
-    .const 'Sub' $P799 = "226_1258424429.0004" 
-    capture_lex $P799
-    .const 'Sub' $P793 = "224_1258424429.0004" 
-    capture_lex $P793
-    .const 'Sub' $P787 = "222_1258424429.0004" 
-    capture_lex $P787
-    .const 'Sub' $P781 = "220_1258424429.0004" 
-    capture_lex $P781
-    .const 'Sub' $P775 = "218_1258424429.0004" 
-    capture_lex $P775
-    .const 'Sub' $P769 = "216_1258424429.0004" 
-    capture_lex $P769
-    .const 'Sub' $P764 = "214_1258424429.0004" 
-    capture_lex $P764
-    .const 'Sub' $P759 = "212_1258424429.0004" 
-    capture_lex $P759
-    .const 'Sub' $P755 = "210_1258424429.0004" 
-    capture_lex $P755
-    .const 'Sub' $P750 = "208_1258424429.0004" 
-    capture_lex $P750
-    .const 'Sub' $P745 = "206_1258424429.0004" 
+    get_hll_global $P1028, ["NQP";"Regex"], "_block1027" 
+    capture_lex $P1028
+    .const 'Sub' $P1022 = "297_1258533478.31768" 
+    capture_lex $P1022
+    .const 'Sub' $P1017 = "295_1258533478.31768" 
+    capture_lex $P1017
+    .const 'Sub' $P1011 = "293_1258533478.31768" 
+    capture_lex $P1011
+    .const 'Sub' $P1005 = "291_1258533478.31768" 
+    capture_lex $P1005
+    .const 'Sub' $P999 = "289_1258533478.31768" 
+    capture_lex $P999
+    .const 'Sub' $P993 = "287_1258533478.31768" 
+    capture_lex $P993
+    .const 'Sub' $P988 = "285_1258533478.31768" 
+    capture_lex $P988
+    .const 'Sub' $P982 = "283_1258533478.31768" 
+    capture_lex $P982
+    .const 'Sub' $P976 = "281_1258533478.31768" 
+    capture_lex $P976
+    .const 'Sub' $P970 = "279_1258533478.31768" 
+    capture_lex $P970
+    .const 'Sub' $P964 = "277_1258533478.31768" 
+    capture_lex $P964
+    .const 'Sub' $P958 = "275_1258533478.31768" 
+    capture_lex $P958
+    .const 'Sub' $P952 = "273_1258533478.31768" 
+    capture_lex $P952
+    .const 'Sub' $P946 = "271_1258533478.31768" 
+    capture_lex $P946
+    .const 'Sub' $P940 = "269_1258533478.31768" 
+    capture_lex $P940
+    .const 'Sub' $P934 = "267_1258533478.31768" 
+    capture_lex $P934
+    .const 'Sub' $P928 = "265_1258533478.31768" 
+    capture_lex $P928
+    .const 'Sub' $P922 = "263_1258533478.31768" 
+    capture_lex $P922
+    .const 'Sub' $P916 = "261_1258533478.31768" 
+    capture_lex $P916
+    .const 'Sub' $P910 = "259_1258533478.31768" 
+    capture_lex $P910
+    .const 'Sub' $P904 = "257_1258533478.31768" 
+    capture_lex $P904
+    .const 'Sub' $P898 = "255_1258533478.31768" 
+    capture_lex $P898
+    .const 'Sub' $P892 = "253_1258533478.31768" 
+    capture_lex $P892
+    .const 'Sub' $P886 = "251_1258533478.31768" 
+    capture_lex $P886
+    .const 'Sub' $P880 = "249_1258533478.31768" 
+    capture_lex $P880
+    .const 'Sub' $P874 = "247_1258533478.31768" 
+    capture_lex $P874
+    .const 'Sub' $P868 = "245_1258533478.31768" 
+    capture_lex $P868
+    .const 'Sub' $P862 = "243_1258533478.31768" 
+    capture_lex $P862
+    .const 'Sub' $P856 = "241_1258533478.31768" 
+    capture_lex $P856
+    .const 'Sub' $P850 = "239_1258533478.31768" 
+    capture_lex $P850
+    .const 'Sub' $P844 = "237_1258533478.31768" 
+    capture_lex $P844
+    .const 'Sub' $P838 = "235_1258533478.31768" 
+    capture_lex $P838
+    .const 'Sub' $P832 = "233_1258533478.31768" 
+    capture_lex $P832
+    .const 'Sub' $P826 = "231_1258533478.31768" 
+    capture_lex $P826
+    .const 'Sub' $P820 = "229_1258533478.31768" 
+    capture_lex $P820
+    .const 'Sub' $P814 = "227_1258533478.31768" 
+    capture_lex $P814
+    .const 'Sub' $P808 = "225_1258533478.31768" 
+    capture_lex $P808
+    .const 'Sub' $P802 = "223_1258533478.31768" 
+    capture_lex $P802
+    .const 'Sub' $P796 = "221_1258533478.31768" 
+    capture_lex $P796
+    .const 'Sub' $P790 = "219_1258533478.31768" 
+    capture_lex $P790
+    .const 'Sub' $P785 = "217_1258533478.31768" 
+    capture_lex $P785
+    .const 'Sub' $P780 = "215_1258533478.31768" 
+    capture_lex $P780
+    .const 'Sub' $P776 = "213_1258533478.31768" 
+    capture_lex $P776
+    .const 'Sub' $P771 = "211_1258533478.31768" 
+    capture_lex $P771
+    .const 'Sub' $P766 = "209_1258533478.31768" 
+    capture_lex $P766
+    .const 'Sub' $P762 = "207_1258533478.31768" 
+    capture_lex $P762
+    .const 'Sub' $P758 = "205_1258533478.31768" 
+    capture_lex $P758
+    .const 'Sub' $P752 = "203_1258533478.31768" 
+    capture_lex $P752
+    .const 'Sub' $P745 = "201_1258533478.31768" 
     capture_lex $P745
-    .const 'Sub' $P741 = "204_1258424429.0004" 
+    .const 'Sub' $P741 = "199_1258533478.31768" 
     capture_lex $P741
-    .const 'Sub' $P737 = "202_1258424429.0004" 
+    .const 'Sub' $P737 = "197_1258533478.31768" 
     capture_lex $P737
-    .const 'Sub' $P731 = "200_1258424429.0004" 
-    capture_lex $P731
-    .const 'Sub' $P724 = "198_1258424429.0004" 
-    capture_lex $P724
-    .const 'Sub' $P720 = "196_1258424429.0004" 
-    capture_lex $P720
-    .const 'Sub' $P716 = "194_1258424429.0004" 
-    capture_lex $P716
-    .const 'Sub' $P709 = "192_1258424429.0004" 
-    capture_lex $P709
-    .const 'Sub' $P702 = "190_1258424429.0004" 
-    capture_lex $P702
-    .const 'Sub' $P698 = "188_1258424429.0004" 
-    capture_lex $P698
-    .const 'Sub' $P694 = "186_1258424429.0004" 
-    capture_lex $P694
-    .const 'Sub' $P689 = "184_1258424429.0004" 
-    capture_lex $P689
-    .const 'Sub' $P684 = "182_1258424429.0004" 
-    capture_lex $P684
-    .const 'Sub' $P679 = "180_1258424429.0004" 
-    capture_lex $P679
-    .const 'Sub' $P674 = "178_1258424429.0004" 
-    capture_lex $P674
-    .const 'Sub' $P670 = "176_1258424429.0004" 
+    .const 'Sub' $P730 = "195_1258533478.31768" 
+    capture_lex $P730
+    .const 'Sub' $P723 = "193_1258533478.31768" 
+    capture_lex $P723
+    .const 'Sub' $P719 = "191_1258533478.31768" 
+    capture_lex $P719
+    .const 'Sub' $P715 = "189_1258533478.31768" 
+    capture_lex $P715
+    .const 'Sub' $P710 = "187_1258533478.31768" 
+    capture_lex $P710
+    .const 'Sub' $P705 = "185_1258533478.31768" 
+    capture_lex $P705
+    .const 'Sub' $P700 = "183_1258533478.31768" 
+    capture_lex $P700
+    .const 'Sub' $P695 = "181_1258533478.31768" 
+    capture_lex $P695
+    .const 'Sub' $P691 = "179_1258533478.31768" 
+    capture_lex $P691
+    .const 'Sub' $P687 = "177_1258533478.31768" 
+    capture_lex $P687
+    .const 'Sub' $P675 = "173_1258533478.31768" 
+    capture_lex $P675
+    .const 'Sub' $P670 = "171_1258533478.31768" 
     capture_lex $P670
-    .const 'Sub' $P666 = "174_1258424429.0004" 
-    capture_lex $P666
-    .const 'Sub' $P654 = "170_1258424429.0004" 
-    capture_lex $P654
-    .const 'Sub' $P649 = "168_1258424429.0004" 
-    capture_lex $P649
-    .const 'Sub' $P643 = "166_1258424429.0004" 
-    capture_lex $P643
-    .const 'Sub' $P638 = "164_1258424429.0004" 
-    capture_lex $P638
-    .const 'Sub' $P631 = "162_1258424429.0004" 
-    capture_lex $P631
-    .const 'Sub' $P624 = "160_1258424429.0004" 
-    capture_lex $P624
-    .const 'Sub' $P619 = "158_1258424429.0004" 
-    capture_lex $P619
-    .const 'Sub' $P614 = "156_1258424429.0004" 
-    capture_lex $P614
-    .const 'Sub' $P602 = "152_1258424429.0004" 
-    capture_lex $P602
-    .const 'Sub' $P571 = "150_1258424429.0004" 
+    .const 'Sub' $P664 = "169_1258533478.31768" 
+    capture_lex $P664
+    .const 'Sub' $P659 = "167_1258533478.31768" 
+    capture_lex $P659
+    .const 'Sub' $P652 = "165_1258533478.31768" 
+    capture_lex $P652
+    .const 'Sub' $P645 = "163_1258533478.31768" 
+    capture_lex $P645
+    .const 'Sub' $P640 = "161_1258533478.31768" 
+    capture_lex $P640
+    .const 'Sub' $P635 = "159_1258533478.31768" 
+    capture_lex $P635
+    .const 'Sub' $P623 = "155_1258533478.31768" 
+    capture_lex $P623
+    .const 'Sub' $P592 = "153_1258533478.31768" 
+    capture_lex $P592
+    .const 'Sub' $P585 = "151_1258533478.31768" 
+    capture_lex $P585
+    .const 'Sub' $P580 = "149_1258533478.31768" 
+    capture_lex $P580
+    .const 'Sub' $P571 = "147_1258533478.31768" 
     capture_lex $P571
-    .const 'Sub' $P564 = "148_1258424429.0004" 
-    capture_lex $P564
-    .const 'Sub' $P559 = "146_1258424429.0004" 
-    capture_lex $P559
-    .const 'Sub' $P550 = "144_1258424429.0004" 
-    capture_lex $P550
-    .const 'Sub' $P536 = "142_1258424429.0004" 
-    capture_lex $P536
-    .const 'Sub' $P528 = "140_1258424429.0004" 
-    capture_lex $P528
-    .const 'Sub' $P510 = "138_1258424429.0004" 
-    capture_lex $P510
-    .const 'Sub' $P492 = "136_1258424429.0004" 
+    .const 'Sub' $P557 = "145_1258533478.31768" 
+    capture_lex $P557
+    .const 'Sub' $P549 = "143_1258533478.31768" 
+    capture_lex $P549
+    .const 'Sub' $P531 = "141_1258533478.31768" 
+    capture_lex $P531
+    .const 'Sub' $P513 = "139_1258533478.31768" 
+    capture_lex $P513
+    .const 'Sub' $P507 = "137_1258533478.31768" 
+    capture_lex $P507
+    .const 'Sub' $P501 = "135_1258533478.31768" 
+    capture_lex $P501
+    .const 'Sub' $P492 = "131_1258533478.31768" 
     capture_lex $P492
-    .const 'Sub' $P486 = "134_1258424429.0004" 
-    capture_lex $P486
-    .const 'Sub' $P480 = "132_1258424429.0004" 
-    capture_lex $P480
-    .const 'Sub' $P471 = "128_1258424429.0004" 
-    capture_lex $P471
-    .const 'Sub' $P461 = "126_1258424429.0004" 
-    capture_lex $P461
-    .const 'Sub' $P455 = "124_1258424429.0004" 
-    capture_lex $P455
-    .const 'Sub' $P449 = "122_1258424429.0004" 
-    capture_lex $P449
-    .const 'Sub' $P443 = "120_1258424429.0004" 
-    capture_lex $P443
-    .const 'Sub' $P417 = "116_1258424429.0004" 
-    capture_lex $P417
-    .const 'Sub' $P409 = "114_1258424429.0004" 
-    capture_lex $P409
-    .const 'Sub' $P403 = "112_1258424429.0004" 
-    capture_lex $P403
-    .const 'Sub' $P395 = "108_1258424429.0004" 
-    capture_lex $P395
-    .const 'Sub' $P391 = "106_1258424429.0004" 
+    .const 'Sub' $P482 = "129_1258533478.31768" 
+    capture_lex $P482
+    .const 'Sub' $P476 = "127_1258533478.31768" 
+    capture_lex $P476
+    .const 'Sub' $P470 = "125_1258533478.31768" 
+    capture_lex $P470
+    .const 'Sub' $P464 = "123_1258533478.31768" 
+    capture_lex $P464
+    .const 'Sub' $P438 = "119_1258533478.31768" 
+    capture_lex $P438
+    .const 'Sub' $P430 = "117_1258533478.31768" 
+    capture_lex $P430
+    .const 'Sub' $P424 = "115_1258533478.31768" 
+    capture_lex $P424
+    .const 'Sub' $P416 = "111_1258533478.31768" 
+    capture_lex $P416
+    .const 'Sub' $P412 = "109_1258533478.31768" 
+    capture_lex $P412
+    .const 'Sub' $P401 = "107_1258533478.31768" 
+    capture_lex $P401
+    .const 'Sub' $P391 = "105_1258533478.31768" 
     capture_lex $P391
-    .const 'Sub' $P380 = "104_1258424429.0004" 
-    capture_lex $P380
-    .const 'Sub' $P370 = "102_1258424429.0004" 
-    capture_lex $P370
-    .const 'Sub' $P366 = "100_1258424429.0004" 
-    capture_lex $P366
-    .const 'Sub' $P361 = "98_1258424429.0004" 
-    capture_lex $P361
-    .const 'Sub' $P356 = "96_1258424429.0004" 
-    capture_lex $P356
-    .const 'Sub' $P351 = "94_1258424429.0004" 
-    capture_lex $P351
-    .const 'Sub' $P346 = "92_1258424429.0004" 
-    capture_lex $P346
-    .const 'Sub' $P341 = "90_1258424429.0004" 
-    capture_lex $P341
-    .const 'Sub' $P336 = "88_1258424429.0004" 
-    capture_lex $P336
-    .const 'Sub' $P331 = "86_1258424429.0004" 
-    capture_lex $P331
-    .const 'Sub' $P324 = "84_1258424429.0004" 
-    capture_lex $P324
-    .const 'Sub' $P317 = "82_1258424429.0004" 
-    capture_lex $P317
-    .const 'Sub' $P306 = "78_1258424429.0004" 
-    capture_lex $P306
-    .const 'Sub' $P299 = "76_1258424429.0004" 
-    capture_lex $P299
-    .const 'Sub' $P290 = "72_1258424429.0004" 
-    capture_lex $P290
-    .const 'Sub' $P284 = "70_1258424429.0004" 
-    capture_lex $P284
-    .const 'Sub' $P273 = "66_1258424429.0004" 
-    capture_lex $P273
-    .const 'Sub' $P254 = "64_1258424429.0004" 
-    capture_lex $P254
-    .const 'Sub' $P246 = "62_1258424429.0004" 
-    capture_lex $P246
-    .const 'Sub' $P229 = "59_1258424429.0004" 
-    capture_lex $P229
-    .const 'Sub' $P210 = "57_1258424429.0004" 
-    capture_lex $P210
-    .const 'Sub' $P202 = "53_1258424429.0004" 
-    capture_lex $P202
-    .const 'Sub' $P198 = "51_1258424429.0004" 
-    capture_lex $P198
-    .const 'Sub' $P190 = "47_1258424429.0004" 
-    capture_lex $P190
-    .const 'Sub' $P186 = "45_1258424429.0004" 
-    capture_lex $P186
-    .const 'Sub' $P179 = "43_1258424429.0004" 
-    capture_lex $P179
-    .const 'Sub' $P173 = "41_1258424429.0004" 
-    capture_lex $P173
-    .const 'Sub' $P168 = "39_1258424429.0004" 
-    capture_lex $P168
-    .const 'Sub' $P161 = "37_1258424429.0004" 
-    capture_lex $P161
-    .const 'Sub' $P156 = "35_1258424429.0004" 
-    capture_lex $P156
-    .const 'Sub' $P151 = "33_1258424429.0004" 
-    capture_lex $P151
-    .const 'Sub' $P136 = "30_1258424429.0004" 
-    capture_lex $P136
-    .const 'Sub' $P124 = "28_1258424429.0004" 
-    capture_lex $P124
-    .const 'Sub' $P118 = "26_1258424429.0004" 
-    capture_lex $P118
-    .const 'Sub' $P76 = "23_1258424429.0004" 
-    capture_lex $P76
-    .const 'Sub' $P67 = "21_1258424429.0004" 
-    capture_lex $P67
-    .const 'Sub' $P58 = "19_1258424429.0004" 
+    .const 'Sub' $P387 = "103_1258533478.31768" 
+    capture_lex $P387
+    .const 'Sub' $P382 = "101_1258533478.31768" 
+    capture_lex $P382
+    .const 'Sub' $P377 = "99_1258533478.31768" 
+    capture_lex $P377
+    .const 'Sub' $P372 = "97_1258533478.31768" 
+    capture_lex $P372
+    .const 'Sub' $P367 = "95_1258533478.31768" 
+    capture_lex $P367
+    .const 'Sub' $P362 = "93_1258533478.31768" 
+    capture_lex $P362
+    .const 'Sub' $P357 = "91_1258533478.31768" 
+    capture_lex $P357
+    .const 'Sub' $P352 = "89_1258533478.31768" 
+    capture_lex $P352
+    .const 'Sub' $P345 = "87_1258533478.31768" 
+    capture_lex $P345
+    .const 'Sub' $P338 = "85_1258533478.31768" 
+    capture_lex $P338
+    .const 'Sub' $P327 = "81_1258533478.31768" 
+    capture_lex $P327
+    .const 'Sub' $P320 = "79_1258533478.31768" 
+    capture_lex $P320
+    .const 'Sub' $P311 = "75_1258533478.31768" 
+    capture_lex $P311
+    .const 'Sub' $P305 = "73_1258533478.31768" 
+    capture_lex $P305
+    .const 'Sub' $P294 = "69_1258533478.31768" 
+    capture_lex $P294
+    .const 'Sub' $P275 = "67_1258533478.31768" 
+    capture_lex $P275
+    .const 'Sub' $P267 = "65_1258533478.31768" 
+    capture_lex $P267
+    .const 'Sub' $P250 = "62_1258533478.31768" 
+    capture_lex $P250
+    .const 'Sub' $P231 = "60_1258533478.31768" 
+    capture_lex $P231
+    .const 'Sub' $P223 = "56_1258533478.31768" 
+    capture_lex $P223
+    .const 'Sub' $P219 = "54_1258533478.31768" 
+    capture_lex $P219
+    .const 'Sub' $P211 = "50_1258533478.31768" 
+    capture_lex $P211
+    .const 'Sub' $P207 = "48_1258533478.31768" 
+    capture_lex $P207
+    .const 'Sub' $P200 = "46_1258533478.31768" 
+    capture_lex $P200
+    .const 'Sub' $P194 = "44_1258533478.31768" 
+    capture_lex $P194
+    .const 'Sub' $P189 = "42_1258533478.31768" 
+    capture_lex $P189
+    .const 'Sub' $P182 = "40_1258533478.31768" 
+    capture_lex $P182
+    .const 'Sub' $P177 = "38_1258533478.31768" 
+    capture_lex $P177
+    .const 'Sub' $P172 = "36_1258533478.31768" 
+    capture_lex $P172
+    .const 'Sub' $P157 = "33_1258533478.31768" 
+    capture_lex $P157
+    .const 'Sub' $P145 = "31_1258533478.31768" 
+    capture_lex $P145
+    .const 'Sub' $P139 = "29_1258533478.31768" 
+    capture_lex $P139
+    .const 'Sub' $P97 = "26_1258533478.31768" 
+    capture_lex $P97
+    .const 'Sub' $P80 = "23_1258533478.31768" 
+    capture_lex $P80
+    .const 'Sub' $P71 = "21_1258533478.31768" 
+    capture_lex $P71
+    .const 'Sub' $P58 = "19_1258533478.31768" 
     capture_lex $P58
-    .const 'Sub' $P44 = "17_1258424429.0004" 
+    .const 'Sub' $P44 = "17_1258533478.31768" 
     capture_lex $P44
-    .const 'Sub' $P38 = "15_1258424429.0004" 
+    .const 'Sub' $P38 = "15_1258533478.31768" 
     capture_lex $P38
-    .const 'Sub' $P33 = "13_1258424429.0004" 
+    .const 'Sub' $P33 = "13_1258533478.31768" 
     capture_lex $P33
-    .const 'Sub' $P15 = "12_1258424429.0004" 
+    .const 'Sub' $P15 = "12_1258533478.31768" 
     capture_lex $P15
-.annotate "line", 472
-    get_hll_global $P1007, ["NQP";"Regex"], "_block1006" 
-    capture_lex $P1007
-    $P1041 = $P1007()
+.annotate "line", 484
+    get_hll_global $P1028, ["NQP";"Regex"], "_block1027" 
+    capture_lex $P1028
+    $P1062 = $P1028()
 .annotate "line", 4
-    .return ($P1041)
+    .return ($P1062)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "" :load :init :subid("post310") :outer("11_1258424429.0004")
+.sub "" :load :init :subid("post313") :outer("11_1258533478.31768")
 .annotate "line", 4
     get_hll_global $P14, ["NQP";"Grammar"], "_block13" 
     .local pmc block
     set block, $P14
-.annotate "line", 365
-    get_hll_global $P1042, ["NQP"], "Grammar"
-    $P1042."O"(":prec<y=>, :assoc<unary>", "%methodop")
-.annotate "line", 366
-    get_hll_global $P1043, ["NQP"], "Grammar"
-    $P1043."O"(":prec<x=>, :assoc<unary>", "%autoincrement")
-.annotate "line", 367
-    get_hll_global $P1044, ["NQP"], "Grammar"
-    $P1044."O"(":prec<w=>, :assoc<left>", "%exponentiation")
-.annotate "line", 368
-    get_hll_global $P1045, ["NQP"], "Grammar"
-    $P1045."O"(":prec<v=>, :assoc<unary>", "%symbolic_unary")
-.annotate "line", 369
-    get_hll_global $P1046, ["NQP"], "Grammar"
-    $P1046."O"(":prec<u=>, :assoc<left>", "%multiplicative")
-.annotate "line", 370
-    get_hll_global $P1047, ["NQP"], "Grammar"
-    $P1047."O"(":prec<t=>, :assoc<left>", "%additive")
-.annotate "line", 371
-    get_hll_global $P1048, ["NQP"], "Grammar"
-    $P1048."O"(":prec<r=>, :assoc<left>", "%concatenation")
-.annotate "line", 372
-    get_hll_global $P1049, ["NQP"], "Grammar"
-    $P1049."O"(":prec<m=>, :assoc<left>", "%relational")
-.annotate "line", 373
-    get_hll_global $P1050, ["NQP"], "Grammar"
-    $P1050."O"(":prec<l=>, :assoc<left>", "%tight_and")
-.annotate "line", 374
-    get_hll_global $P1051, ["NQP"], "Grammar"
-    $P1051."O"(":prec<k=>, :assoc<left>", "%tight_or")
-.annotate "line", 375
-    get_hll_global $P1052, ["NQP"], "Grammar"
-    $P1052."O"(":prec<j=>, :assoc<right>", "%conditional")
-.annotate "line", 376
-    get_hll_global $P1053, ["NQP"], "Grammar"
-    $P1053."O"(":prec<i=>, :assoc<right>", "%assignment")
 .annotate "line", 377
-    get_hll_global $P1054, ["NQP"], "Grammar"
-    $P1054."O"(":prec<g=>, :assoc<list>, :nextterm<nulltermish>", "%comma")
+    get_hll_global $P1063, ["NQP"], "Grammar"
+    $P1063."O"(":prec<y=>, :assoc<unary>", "%methodop")
 .annotate "line", 378
-    get_hll_global $P1055, ["NQP"], "Grammar"
-    $P1055."O"(":prec<f=>, :assoc<list>", "%list_infix")
+    get_hll_global $P1064, ["NQP"], "Grammar"
+    $P1064."O"(":prec<x=>, :assoc<unary>", "%autoincrement")
 .annotate "line", 379
-    get_hll_global $P1056, ["NQP"], "Grammar"
-    $P1056."O"(":prec<e=>, :assoc<unary>", "%list_prefix")
-.annotate "line", 364
-    $P1057 = get_root_global ["parrot"], "P6metaclass"
-    $P1057."new_class"("NQP::Regex", "Regex::P6Regex::Grammar" :named("parent"))
+    get_hll_global $P1065, ["NQP"], "Grammar"
+    $P1065."O"(":prec<w=>, :assoc<left>", "%exponentiation")
+.annotate "line", 380
+    get_hll_global $P1066, ["NQP"], "Grammar"
+    $P1066."O"(":prec<v=>, :assoc<unary>", "%symbolic_unary")
+.annotate "line", 381
+    get_hll_global $P1067, ["NQP"], "Grammar"
+    $P1067."O"(":prec<u=>, :assoc<left>", "%multiplicative")
+.annotate "line", 382
+    get_hll_global $P1068, ["NQP"], "Grammar"
+    $P1068."O"(":prec<t=>, :assoc<left>", "%additive")
+.annotate "line", 383
+    get_hll_global $P1069, ["NQP"], "Grammar"
+    $P1069."O"(":prec<r=>, :assoc<left>", "%concatenation")
+.annotate "line", 384
+    get_hll_global $P1070, ["NQP"], "Grammar"
+    $P1070."O"(":prec<m=>, :assoc<left>", "%relational")
+.annotate "line", 385
+    get_hll_global $P1071, ["NQP"], "Grammar"
+    $P1071."O"(":prec<l=>, :assoc<left>", "%tight_and")
+.annotate "line", 386
+    get_hll_global $P1072, ["NQP"], "Grammar"
+    $P1072."O"(":prec<k=>, :assoc<left>", "%tight_or")
+.annotate "line", 387
+    get_hll_global $P1073, ["NQP"], "Grammar"
+    $P1073."O"(":prec<j=>, :assoc<right>", "%conditional")
+.annotate "line", 388
+    get_hll_global $P1074, ["NQP"], "Grammar"
+    $P1074."O"(":prec<i=>, :assoc<right>", "%assignment")
+.annotate "line", 389
+    get_hll_global $P1075, ["NQP"], "Grammar"
+    $P1075."O"(":prec<g=>, :assoc<list>, :nextterm<nulltermish>", "%comma")
+.annotate "line", 390
+    get_hll_global $P1076, ["NQP"], "Grammar"
+    $P1076."O"(":prec<f=>, :assoc<list>", "%list_infix")
+.annotate "line", 391
+    get_hll_global $P1077, ["NQP"], "Grammar"
+    $P1077."O"(":prec<e=>, :assoc<unary>", "%list_prefix")
+.annotate "line", 376
+    $P1078 = get_root_global ["parrot"], "P6metaclass"
+    $P1078."new_class"("NQP::Regex", "Regex::P6Regex::Grammar" :named("parent"))
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "TOP"  :subid("12_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "TOP"  :subid("12_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
     new $P17, 'ExceptionHandler'
     set_addr $P17, control_16
@@ -388,55 +390,55 @@ NQP::Compiler - NQP compiler
     .lex "$*SCOPE", $P19
 .annotate "line", 4
     find_lex $P20, "%*LANG"
-    unless_null $P20, vivify_311
+    unless_null $P20, vivify_314
     get_hll_global $P20, "%LANG"
-    unless_null $P20, vivify_312
+    unless_null $P20, vivify_315
     die "Contextual %*LANG not found"
-  vivify_312:
-  vivify_311:
+  vivify_315:
+  vivify_314:
 .annotate "line", 6
     get_hll_global $P21, ["NQP"], "Regex"
     find_lex $P22, "%*LANG"
-    unless_null $P22, vivify_313
+    unless_null $P22, vivify_316
     get_hll_global $P22, "%LANG"
-    unless_null $P22, vivify_314
+    unless_null $P22, vivify_317
     die "Contextual %*LANG not found"
-  vivify_314:
+  vivify_317:
     store_lex "%*LANG", $P22
-  vivify_313:
+  vivify_316:
     set $P22["Regex"], $P21
 .annotate "line", 7
     get_hll_global $P23, ["NQP"], "RegexActions"
     find_lex $P24, "%*LANG"
-    unless_null $P24, vivify_315
+    unless_null $P24, vivify_318
     get_hll_global $P24, "%LANG"
-    unless_null $P24, vivify_316
+    unless_null $P24, vivify_319
     die "Contextual %*LANG not found"
-  vivify_316:
+  vivify_319:
     store_lex "%*LANG", $P24
-  vivify_315:
+  vivify_318:
     set $P24["Regex-actions"], $P23
 .annotate "line", 8
     get_hll_global $P25, ["NQP"], "Grammar"
     find_lex $P26, "%*LANG"
-    unless_null $P26, vivify_317
+    unless_null $P26, vivify_320
     get_hll_global $P26, "%LANG"
-    unless_null $P26, vivify_318
+    unless_null $P26, vivify_321
     die "Contextual %*LANG not found"
-  vivify_318:
+  vivify_321:
     store_lex "%*LANG", $P26
-  vivify_317:
+  vivify_320:
     set $P26["MAIN"], $P25
 .annotate "line", 9
     get_hll_global $P27, ["NQP"], "Actions"
     find_lex $P28, "%*LANG"
-    unless_null $P28, vivify_319
+    unless_null $P28, vivify_322
     get_hll_global $P28, "%LANG"
-    unless_null $P28, vivify_320
+    unless_null $P28, vivify_323
     die "Contextual %*LANG not found"
-  vivify_320:
+  vivify_323:
     store_lex "%*LANG", $P28
-  vivify_319:
+  vivify_322:
     set $P28["MAIN-actions"], $P27
 .annotate "line", 10
     new $P29, "String"
@@ -457,7 +459,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "identifier"  :subid("13_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "identifier"  :subid("13_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
     .local string rx34_tgt
     .local int rx34_pos
@@ -503,7 +505,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__identifier"  :subid("14_1258424429.0004") :method
+.sub "!PREFIX__identifier"  :subid("14_1258533478.31768") :method
 .annotate "line", 4
     $P36 = self."!PREFIX__!subrule"("ident", "")
     new $P37, "ResizablePMCArray"
@@ -513,7 +515,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "name"  :subid("15_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "name"  :subid("15_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
     .local string rx39_tgt
     .local int rx39_pos
@@ -575,7 +577,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__name"  :subid("16_1258424429.0004") :method
+.sub "!PREFIX__name"  :subid("16_1258533478.31768") :method
 .annotate "line", 4
     new $P41, "ResizablePMCArray"
     push $P41, ""
@@ -584,7 +586,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "deflongname"  :subid("17_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "deflongname"  :subid("17_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
     .local string rx45_tgt
     .local int rx45_pos
@@ -731,7 +733,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__deflongname"  :subid("18_1258424429.0004") :method
+.sub "!PREFIX__deflongname"  :subid("18_1258533478.31768") :method
 .annotate "line", 4
     $P47 = self."!PREFIX__!subrule"("identifier", "")
     new $P48, "ResizablePMCArray"
@@ -741,7 +743,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "ENDSTMT"  :subid("19_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "ENDSTMT"  :subid("19_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
     .local string rx59_tgt
     .local int rx59_pos
@@ -760,15 +762,20 @@ NQP::Compiler - NQP compiler
     sub rx59_off, $I10, 1
     substr rx59_tgt, rx59_tgt, rx59_off
   rx59_start:
-.annotate "line", 26
+.annotate "line", 29
   # rx rxquantr62 ** 0..1
-    set_addr $I66, rxquantr62_done
-    rx59_cur."!mark_push"(0, rx59_pos, $I66)
+    set_addr $I70, rxquantr62_done
+    rx59_cur."!mark_push"(0, rx59_pos, $I70)
   rxquantr62_loop:
-  # rx rxquantr63 ** 0..*
-    set_addr $I64, rxquantr63_done
-    rx59_cur."!mark_push"(0, rx59_pos, $I64)
-  rxquantr63_loop:
+  alt63_0:
+.annotate "line", 26
+    set_addr $I10, alt63_1
+    rx59_cur."!mark_push"(0, rx59_pos, $I10)
+.annotate "line", 27
+  # rx rxquantr64 ** 0..*
+    set_addr $I65, rxquantr64_done
+    rx59_cur."!mark_push"(0, rx59_pos, $I65)
+  rxquantr64_loop:
   # rx enumcharlist negate=0 
     ge rx59_pos, rx59_eos, rx59_fail
     sub $I10, rx59_pos, rx59_off
@@ -776,20 +783,20 @@ NQP::Compiler - NQP compiler
     index $I11, unicode:"\t \x{a0}\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000", $S10
     lt $I11, 0, rx59_fail
     inc rx59_pos
-    (rx59_rep) = rx59_cur."!mark_commit"($I64)
-    rx59_cur."!mark_push"(rx59_rep, rx59_pos, $I64)
-    goto rxquantr63_loop
-  rxquantr63_done:
+    (rx59_rep) = rx59_cur."!mark_commit"($I65)
+    rx59_cur."!mark_push"(rx59_rep, rx59_pos, $I65)
+    goto rxquantr64_loop
+  rxquantr64_done:
   # rxanchor eol
     sub $I10, rx59_pos, rx59_off
     is_cclass $I11, 4096, rx59_tgt, $I10
-    if $I11, rxanchor65_done
+    if $I11, rxanchor66_done
     ne rx59_pos, rx59_eos, rx59_fail
-    eq rx59_pos, 0, rxanchor65_done
+    eq rx59_pos, 0, rxanchor66_done
     dec $I10
     is_cclass $I11, 4096, rx59_tgt, $I10
     if $I11, rx59_fail
-  rxanchor65_done:
+  rxanchor66_done:
   # rx subrule "ws" subtype=method negate=
     rx59_cur."!cursor_pos"(rx59_pos)
     $P10 = rx59_cur."ws"()
@@ -799,7 +806,42 @@ NQP::Compiler - NQP compiler
     rx59_cur."!cursor_pos"(rx59_pos)
     $P10 = rx59_cur."MARKER"("endstmt")
     unless $P10, rx59_fail
-    (rx59_rep) = rx59_cur."!mark_commit"($I66)
+    goto alt63_end
+  alt63_1:
+.annotate "line", 28
+  # rx rxquantr67 ** 0..1
+    set_addr $I68, rxquantr67_done
+    rx59_cur."!mark_push"(0, rx59_pos, $I68)
+  rxquantr67_loop:
+  # rx subrule "unv" subtype=method negate=
+    rx59_cur."!cursor_pos"(rx59_pos)
+    $P10 = rx59_cur."unv"()
+    unless $P10, rx59_fail
+    rx59_pos = $P10."pos"()
+    (rx59_rep) = rx59_cur."!mark_commit"($I68)
+  rxquantr67_done:
+  # rxanchor eol
+    sub $I10, rx59_pos, rx59_off
+    is_cclass $I11, 4096, rx59_tgt, $I10
+    if $I11, rxanchor69_done
+    ne rx59_pos, rx59_eos, rx59_fail
+    eq rx59_pos, 0, rxanchor69_done
+    dec $I10
+    is_cclass $I11, 4096, rx59_tgt, $I10
+    if $I11, rx59_fail
+  rxanchor69_done:
+  # rx subrule "ws" subtype=method negate=
+    rx59_cur."!cursor_pos"(rx59_pos)
+    $P10 = rx59_cur."ws"()
+    unless $P10, rx59_fail
+    rx59_pos = $P10."pos"()
+  # rx subrule "MARKER" subtype=zerowidth negate=
+    rx59_cur."!cursor_pos"(rx59_pos)
+    $P10 = rx59_cur."MARKER"("endstmt")
+    unless $P10, rx59_fail
+  alt63_end:
+.annotate "line", 29
+    (rx59_rep) = rx59_cur."!mark_commit"($I70)
   rxquantr62_done:
 .annotate "line", 25
   # rx pass
@@ -821,7 +863,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__ENDSTMT"  :subid("20_1258424429.0004") :method
+.sub "!PREFIX__ENDSTMT"  :subid("20_1258533478.31768") :method
 .annotate "line", 4
     new $P61, "ResizablePMCArray"
     push $P61, ""
@@ -830,3907 +872,3875 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "ws"  :subid("21_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "ws"  :subid("21_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx68_tgt
-    .local int rx68_pos
-    .local int rx68_off
-    .local int rx68_eos
-    .local int rx68_rep
-    .local pmc rx68_cur
-    (rx68_cur, rx68_pos, rx68_tgt, $I10) = self."!cursor_start"()
-    rx68_cur."!cursor_debug"("START ", "ws")
-    .lex unicode:"$\x{a2}", rx68_cur
+    .local string rx72_tgt
+    .local int rx72_pos
+    .local int rx72_off
+    .local int rx72_eos
+    .local int rx72_rep
+    .local pmc rx72_cur
+    (rx72_cur, rx72_pos, rx72_tgt, $I10) = self."!cursor_start"()
+    rx72_cur."!cursor_debug"("START ", "ws")
+    .lex unicode:"$\x{a2}", rx72_cur
     .local pmc match
     .lex "$/", match
-    length rx68_eos, rx68_tgt
-    set rx68_off, 0
-    lt $I10, 2, rx68_start
-    sub rx68_off, $I10, 1
-    substr rx68_tgt, rx68_tgt, rx68_off
-  rx68_start:
-  alt71_0:
-.annotate "line", 29
-    set_addr $I10, alt71_1
-    rx68_cur."!mark_push"(0, rx68_pos, $I10)
-.annotate "line", 30
-  # rx subrule "MARKED" subtype=zerowidth negate=
-    rx68_cur."!cursor_pos"(rx68_pos)
-    $P10 = rx68_cur."MARKED"("ws")
-    unless $P10, rx68_fail
-    goto alt71_end
-  alt71_1:
-.annotate "line", 31
-  # rx subrule "ww" subtype=zerowidth negate=1
-    rx68_cur."!cursor_pos"(rx68_pos)
-    $P10 = rx68_cur."ww"()
-    if $P10, rx68_fail
-.annotate "line", 35
-  # rx rxquantr72 ** 0..*
-    set_addr $I75, rxquantr72_done
-    rx68_cur."!mark_push"(0, rx68_pos, $I75)
-  rxquantr72_loop:
-  alt73_0:
+    length rx72_eos, rx72_tgt
+    set rx72_off, 0
+    lt $I10, 2, rx72_start
+    sub rx72_off, $I10, 1
+    substr rx72_tgt, rx72_tgt, rx72_off
+  rx72_start:
+  alt75_0:
 .annotate "line", 32
-    set_addr $I10, alt73_1
-    rx68_cur."!mark_push"(0, rx68_pos, $I10)
-  # rx charclass_q s r 1..-1
-    sub $I10, rx68_pos, rx68_off
-    find_not_cclass $I11, 32, rx68_tgt, $I10, rx68_eos
-    add $I12, $I10, 1
-    lt $I11, $I12, rx68_fail
-    add rx68_pos, rx68_off, $I11
-    goto alt73_end
-  alt73_1:
-    set_addr $I10, alt73_2
-    rx68_cur."!mark_push"(0, rx68_pos, $I10)
+    set_addr $I10, alt75_1
+    rx72_cur."!mark_push"(0, rx72_pos, $I10)
 .annotate "line", 33
-  # rx literal  "#"
-    add $I11, rx68_pos, 1
-    gt $I11, rx68_eos, rx68_fail
-    sub $I11, rx68_pos, rx68_off
-    substr $S10, rx68_tgt, $I11, 1
-    ne $S10, "#", rx68_fail
-    add rx68_pos, 1
-  # rx charclass_q N r 0..-1
-    sub $I10, rx68_pos, rx68_off
-    find_cclass $I11, 4096, rx68_tgt, $I10, rx68_eos
-    add rx68_pos, rx68_off, $I11
-    goto alt73_end
-  alt73_2:
+  # rx subrule "MARKED" subtype=zerowidth negate=
+    rx72_cur."!cursor_pos"(rx72_pos)
+    $P10 = rx72_cur."MARKED"("ws")
+    unless $P10, rx72_fail
+    goto alt75_end
+  alt75_1:
 .annotate "line", 34
-  # rxanchor bol
-    eq rx68_pos, 0, rxanchor74_done
-    ge rx68_pos, rx68_eos, rx68_fail
-    sub $I10, rx68_pos, rx68_off
-    dec $I10
-    is_cclass $I11, 4096, rx68_tgt, $I10
-    unless $I11, rx68_fail
-  rxanchor74_done:
-  # rx subrule "pod_comment" subtype=method negate=
-    rx68_cur."!cursor_pos"(rx68_pos)
-    $P10 = rx68_cur."pod_comment"()
-    unless $P10, rx68_fail
-    rx68_pos = $P10."pos"()
-  alt73_end:
+  # rx subrule "ww" subtype=zerowidth negate=1
+    rx72_cur."!cursor_pos"(rx72_pos)
+    $P10 = rx72_cur."ww"()
+    if $P10, rx72_fail
+.annotate "line", 38
+  # rx rxquantr76 ** 0..*
+    set_addr $I79, rxquantr76_done
+    rx72_cur."!mark_push"(0, rx72_pos, $I79)
+  rxquantr76_loop:
+  alt77_0:
 .annotate "line", 35
-    (rx68_rep) = rx68_cur."!mark_commit"($I75)
-    rx68_cur."!mark_push"(rx68_rep, rx68_pos, $I75)
-    goto rxquantr72_loop
-  rxquantr72_done:
+    set_addr $I10, alt77_1
+    rx72_cur."!mark_push"(0, rx72_pos, $I10)
+  # rx charclass_q s r 1..-1
+    sub $I10, rx72_pos, rx72_off
+    find_not_cclass $I11, 32, rx72_tgt, $I10, rx72_eos
+    add $I12, $I10, 1
+    lt $I11, $I12, rx72_fail
+    add rx72_pos, rx72_off, $I11
+    goto alt77_end
+  alt77_1:
+    set_addr $I10, alt77_2
+    rx72_cur."!mark_push"(0, rx72_pos, $I10)
 .annotate "line", 36
-  # rx subrule "MARKER" subtype=zerowidth negate=
-    rx68_cur."!cursor_pos"(rx68_pos)
-    $P10 = rx68_cur."MARKER"("ws")
-    unless $P10, rx68_fail
-  alt71_end:
-.annotate "line", 29
-  # rx pass
-    rx68_cur."!cursor_pass"(rx68_pos, "ws")
-    rx68_cur."!cursor_debug"("PASS  ", "ws", " at pos=", rx68_pos)
-    .return (rx68_cur)
-  rx68_fail:
-.annotate "line", 4
-    (rx68_rep, rx68_pos, $I10, $P10) = rx68_cur."!mark_fail"(0)
-    lt rx68_pos, -1, rx68_done
-    eq rx68_pos, -1, rx68_fail
-    jump $I10
-  rx68_done:
-    rx68_cur."!cursor_fail"()
-    rx68_cur."!cursor_debug"("FAIL  ", "ws")
-    .return (rx68_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__ws"  :subid("22_1258424429.0004") :method
-.annotate "line", 4
-    new $P70, "ResizablePMCArray"
-    push $P70, ""
-    push $P70, ""
-    .return ($P70)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "pod_comment"  :subid("23_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .const 'Sub' $P110 = "25_1258424429.0004" 
-    capture_lex $P110
-    .local string rx77_tgt
-    .local int rx77_pos
-    .local int rx77_off
-    .local int rx77_eos
-    .local int rx77_rep
-    .local pmc rx77_cur
-    (rx77_cur, rx77_pos, rx77_tgt, $I10) = self."!cursor_start"()
-    rx77_cur."!cursor_debug"("START ", "pod_comment")
-    .lex unicode:"$\x{a2}", rx77_cur
-    .local pmc match
-    .lex "$/", match
-    length rx77_eos, rx77_tgt
-    set rx77_off, 0
-    lt $I10, 2, rx77_start
-    sub rx77_off, $I10, 1
-    substr rx77_tgt, rx77_tgt, rx77_off
-  rx77_start:
-.annotate "line", 40
-  # rxanchor bol
-    eq rx77_pos, 0, rxanchor80_done
-    ge rx77_pos, rx77_eos, rx77_fail
-    sub $I10, rx77_pos, rx77_off
-    dec $I10
-    is_cclass $I11, 4096, rx77_tgt, $I10
-    unless $I11, rx77_fail
-  rxanchor80_done:
-  # rx rxquantr81 ** 0..*
-    set_addr $I82, rxquantr81_done
-    rx77_cur."!mark_push"(0, rx77_pos, $I82)
-  rxquantr81_loop:
-  # rx enumcharlist negate=0 
-    ge rx77_pos, rx77_eos, rx77_fail
-    sub $I10, rx77_pos, rx77_off
-    substr $S10, rx77_tgt, $I10, 1
-    index $I11, unicode:"\t \x{a0}\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000", $S10
-    lt $I11, 0, rx77_fail
-    inc rx77_pos
-    (rx77_rep) = rx77_cur."!mark_commit"($I82)
-    rx77_cur."!mark_push"(rx77_rep, rx77_pos, $I82)
-    goto rxquantr81_loop
-  rxquantr81_done:
-  # rx literal  "="
-    add $I11, rx77_pos, 1
-    gt $I11, rx77_eos, rx77_fail
-    sub $I11, rx77_pos, rx77_off
-    substr $S10, rx77_tgt, $I11, 1
-    ne $S10, "=", rx77_fail
-    add rx77_pos, 1
-  alt83_0:
-.annotate "line", 41
-    set_addr $I10, alt83_1
-    rx77_cur."!mark_push"(0, rx77_pos, $I10)
-.annotate "line", 42
-  # rx literal  "begin"
-    add $I11, rx77_pos, 5
-    gt $I11, rx77_eos, rx77_fail
-    sub $I11, rx77_pos, rx77_off
-    substr $S10, rx77_tgt, $I11, 5
-    ne $S10, "begin", rx77_fail
-    add rx77_pos, 5
-  # rx rxquantr84 ** 1..*
-    set_addr $I85, rxquantr84_done
-    rx77_cur."!mark_push"(0, -1, $I85)
-  rxquantr84_loop:
-  # rx enumcharlist negate=0 
-    ge rx77_pos, rx77_eos, rx77_fail
-    sub $I10, rx77_pos, rx77_off
-    substr $S10, rx77_tgt, $I10, 1
-    index $I11, unicode:"\t \x{a0}\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000", $S10
-    lt $I11, 0, rx77_fail
-    inc rx77_pos
-    (rx77_rep) = rx77_cur."!mark_commit"($I85)
-    rx77_cur."!mark_push"(rx77_rep, rx77_pos, $I85)
-    goto rxquantr84_loop
-  rxquantr84_done:
-  # rx literal  "END"
-    add $I11, rx77_pos, 3
-    gt $I11, rx77_eos, rx77_fail
-    sub $I11, rx77_pos, rx77_off
-    substr $S10, rx77_tgt, $I11, 3
-    ne $S10, "END", rx77_fail
-    add rx77_pos, 3
-  # rxanchor rwb
-    le rx77_pos, 0, rx77_fail
-    sub $I10, rx77_pos, rx77_off
-    is_cclass $I11, 8192, rx77_tgt, $I10
-    if $I11, rx77_fail
-    dec $I10
-    is_cclass $I11, 8192, rx77_tgt, $I10
-    unless $I11, rx77_fail
-  alt86_0:
-.annotate "line", 43
-    set_addr $I10, alt86_1
-    rx77_cur."!mark_push"(0, rx77_pos, $I10)
-  # rx rxquantf87 ** 0..*
-    set_addr $I10, rxquantf87_loop
-    rx77_cur."!mark_push"(0, rx77_pos, $I10)
-    goto rxquantf87_done
-  rxquantf87_loop:
-  # rx charclass .
-    ge rx77_pos, rx77_eos, rx77_fail
-    inc rx77_pos
-    set_addr $I10, rxquantf87_loop
-    rx77_cur."!mark_push"($I88, rx77_pos, $I10)
-  rxquantf87_done:
-  # rx charclass nl
-    ge rx77_pos, rx77_eos, rx77_fail
-    sub $I10, rx77_pos, rx77_off
-    is_cclass $I11, 4096, rx77_tgt, $I10
-    unless $I11, rx77_fail
-    substr $S10, rx77_tgt, $I10, 2
-    iseq $I11, $S10, "\r\n"
-    add rx77_pos, $I11
-    inc rx77_pos
-  # rx literal  "=end"
-    add $I11, rx77_pos, 4
-    gt $I11, rx77_eos, rx77_fail
-    sub $I11, rx77_pos, rx77_off
-    substr $S10, rx77_tgt, $I11, 4
-    ne $S10, "=end", rx77_fail
-    add rx77_pos, 4
-  # rx rxquantr89 ** 1..*
-    set_addr $I90, rxquantr89_done
-    rx77_cur."!mark_push"(0, -1, $I90)
-  rxquantr89_loop:
-  # rx enumcharlist negate=0 
-    ge rx77_pos, rx77_eos, rx77_fail
-    sub $I10, rx77_pos, rx77_off
-    substr $S10, rx77_tgt, $I10, 1
-    index $I11, unicode:"\t \x{a0}\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000", $S10
-    lt $I11, 0, rx77_fail
-    inc rx77_pos
-    (rx77_rep) = rx77_cur."!mark_commit"($I90)
-    rx77_cur."!mark_push"(rx77_rep, rx77_pos, $I90)
-    goto rxquantr89_loop
-  rxquantr89_done:
-  # rx literal  "END"
-    add $I11, rx77_pos, 3
-    gt $I11, rx77_eos, rx77_fail
-    sub $I11, rx77_pos, rx77_off
-    substr $S10, rx77_tgt, $I11, 3
-    ne $S10, "END", rx77_fail
-    add rx77_pos, 3
-  # rxanchor rwb
-    le rx77_pos, 0, rx77_fail
-    sub $I10, rx77_pos, rx77_off
-    is_cclass $I11, 8192, rx77_tgt, $I10
-    if $I11, rx77_fail
-    dec $I10
-    is_cclass $I11, 8192, rx77_tgt, $I10
-    unless $I11, rx77_fail
-  # rx charclass_q N r 0..-1
-    sub $I10, rx77_pos, rx77_off
-    find_cclass $I11, 4096, rx77_tgt, $I10, rx77_eos
-    add rx77_pos, rx77_off, $I11
-    goto alt86_end
-  alt86_1:
-  # rx charclass_q . r 0..-1
-    sub $I10, rx77_pos, rx77_off
-    find_not_cclass $I11, 65535, rx77_tgt, $I10, rx77_eos
-    add rx77_pos, rx77_off, $I11
-  alt86_end:
-.annotate "line", 42
-    goto alt83_end
-  alt83_1:
-    set_addr $I10, alt83_2
-    rx77_cur."!mark_push"(0, rx77_pos, $I10)
-.annotate "line", 44
-  # rx literal  "begin"
-    add $I11, rx77_pos, 5
-    gt $I11, rx77_eos, rx77_fail
-    sub $I11, rx77_pos, rx77_off
-    substr $S10, rx77_tgt, $I11, 5
-    ne $S10, "begin", rx77_fail
-    add rx77_pos, 5
-  # rx rxquantr91 ** 1..*
-    set_addr $I92, rxquantr91_done
-    rx77_cur."!mark_push"(0, -1, $I92)
-  rxquantr91_loop:
-  # rx enumcharlist negate=0 
-    ge rx77_pos, rx77_eos, rx77_fail
-    sub $I10, rx77_pos, rx77_off
-    substr $S10, rx77_tgt, $I10, 1
-    index $I11, unicode:"\t \x{a0}\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000", $S10
-    lt $I11, 0, rx77_fail
-    inc rx77_pos
-    (rx77_rep) = rx77_cur."!mark_commit"($I92)
-    rx77_cur."!mark_push"(rx77_rep, rx77_pos, $I92)
-    goto rxquantr91_loop
-  rxquantr91_done:
-  # rx subrule "identifier" subtype=capture negate=
-    rx77_cur."!cursor_pos"(rx77_pos)
-    $P10 = rx77_cur."identifier"()
-    unless $P10, rx77_fail
-    rx77_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("identifier")
-    rx77_pos = $P10."pos"()
-  alt93_0:
-.annotate "line", 45
-    set_addr $I10, alt93_1
-    rx77_cur."!mark_push"(0, rx77_pos, $I10)
-.annotate "line", 46
-  # rx rxquantf94 ** 0..*
-    set_addr $I10, rxquantf94_loop
-    rx77_cur."!mark_push"(0, rx77_pos, $I10)
-    goto rxquantf94_done
-  rxquantf94_loop:
-  # rx charclass .
-    ge rx77_pos, rx77_eos, rx77_fail
-    inc rx77_pos
-    set_addr $I10, rxquantf94_loop
-    rx77_cur."!mark_push"($I95, rx77_pos, $I10)
-  rxquantf94_done:
-  # rx charclass nl
-    ge rx77_pos, rx77_eos, rx77_fail
-    sub $I10, rx77_pos, rx77_off
-    is_cclass $I11, 4096, rx77_tgt, $I10
-    unless $I11, rx77_fail
-    substr $S10, rx77_tgt, $I10, 2
-    iseq $I11, $S10, "\r\n"
-    add rx77_pos, $I11
-    inc rx77_pos
-  # rx literal  "=end"
-    add $I11, rx77_pos, 4
-    gt $I11, rx77_eos, rx77_fail
-    sub $I11, rx77_pos, rx77_off
-    substr $S10, rx77_tgt, $I11, 4
-    ne $S10, "=end", rx77_fail
-    add rx77_pos, 4
-  # rx rxquantr96 ** 1..*
-    set_addr $I97, rxquantr96_done
-    rx77_cur."!mark_push"(0, -1, $I97)
-  rxquantr96_loop:
-  # rx enumcharlist negate=0 
-    ge rx77_pos, rx77_eos, rx77_fail
-    sub $I10, rx77_pos, rx77_off
-    substr $S10, rx77_tgt, $I10, 1
-    index $I11, unicode:"\t \x{a0}\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000", $S10
-    lt $I11, 0, rx77_fail
-    inc rx77_pos
-    (rx77_rep) = rx77_cur."!mark_commit"($I97)
-    rx77_cur."!mark_push"(rx77_rep, rx77_pos, $I97)
-    goto rxquantr96_loop
-  rxquantr96_done:
-  # rx subrule "!BACKREF" subtype=method negate=
-    rx77_cur."!cursor_pos"(rx77_pos)
-    $P10 = rx77_cur."!BACKREF"("identifier")
-    unless $P10, rx77_fail
-    rx77_pos = $P10."pos"()
-  # rxanchor rwb
-    le rx77_pos, 0, rx77_fail
-    sub $I10, rx77_pos, rx77_off
-    is_cclass $I11, 8192, rx77_tgt, $I10
-    if $I11, rx77_fail
-    dec $I10
-    is_cclass $I11, 8192, rx77_tgt, $I10
-    unless $I11, rx77_fail
-  # rx charclass_q N r 0..-1
-    sub $I10, rx77_pos, rx77_off
-    find_cclass $I11, 4096, rx77_tgt, $I10, rx77_eos
-    add rx77_pos, rx77_off, $I11
-    goto alt93_end
-  alt93_1:
-.annotate "line", 47
-  # rx subrule "panic" subtype=method negate=
-    rx77_cur."!cursor_pos"(rx77_pos)
-    $P10 = rx77_cur."panic"("=begin without matching =end")
-    unless $P10, rx77_fail
-    rx77_pos = $P10."pos"()
-  alt93_end:
-.annotate "line", 44
-    goto alt83_end
-  alt83_2:
-    set_addr $I10, alt83_3
-    rx77_cur."!mark_push"(0, rx77_pos, $I10)
-.annotate "line", 49
-  # rx literal  "begin"
-    add $I11, rx77_pos, 5
-    gt $I11, rx77_eos, rx77_fail
-    sub $I11, rx77_pos, rx77_off
-    substr $S10, rx77_tgt, $I11, 5
-    ne $S10, "begin", rx77_fail
-    add rx77_pos, 5
-  # rxanchor rwb
-    le rx77_pos, 0, rx77_fail
-    sub $I10, rx77_pos, rx77_off
-    is_cclass $I11, 8192, rx77_tgt, $I10
-    if $I11, rx77_fail
-    dec $I10
-    is_cclass $I11, 8192, rx77_tgt, $I10
-    unless $I11, rx77_fail
-  # rx rxquantr99 ** 0..*
-    set_addr $I100, rxquantr99_done
-    rx77_cur."!mark_push"(0, rx77_pos, $I100)
-  rxquantr99_loop:
-  # rx enumcharlist negate=0 
-    ge rx77_pos, rx77_eos, rx77_fail
-    sub $I10, rx77_pos, rx77_off
-    substr $S10, rx77_tgt, $I10, 1
-    index $I11, unicode:"\t \x{a0}\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000", $S10
-    lt $I11, 0, rx77_fail
-    inc rx77_pos
-    (rx77_rep) = rx77_cur."!mark_commit"($I100)
-    rx77_cur."!mark_push"(rx77_rep, rx77_pos, $I100)
-    goto rxquantr99_loop
-  rxquantr99_done:
-  alt101_0:
-.annotate "line", 50
-    set_addr $I10, alt101_1
-    rx77_cur."!mark_push"(0, rx77_pos, $I10)
-  # rxanchor eol
-    sub $I10, rx77_pos, rx77_off
-    is_cclass $I11, 4096, rx77_tgt, $I10
-    if $I11, rxanchor102_done
-    ne rx77_pos, rx77_eos, rx77_fail
-    eq rx77_pos, 0, rxanchor102_done
-    dec $I10
-    is_cclass $I11, 4096, rx77_tgt, $I10
-    if $I11, rx77_fail
-  rxanchor102_done:
-    goto alt101_end
-  alt101_1:
-    set_addr $I10, alt101_2
-    rx77_cur."!mark_push"(0, rx77_pos, $I10)
   # rx literal  "#"
-    add $I11, rx77_pos, 1
-    gt $I11, rx77_eos, rx77_fail
-    sub $I11, rx77_pos, rx77_off
-    substr $S10, rx77_tgt, $I11, 1
-    ne $S10, "#", rx77_fail
-    add rx77_pos, 1
-    goto alt101_end
-  alt101_2:
-  # rx subrule "panic" subtype=method negate=
-    rx77_cur."!cursor_pos"(rx77_pos)
-    $P10 = rx77_cur."panic"("Unrecognized token after =begin")
-    unless $P10, rx77_fail
-    rx77_pos = $P10."pos"()
-  alt101_end:
-  alt103_0:
-.annotate "line", 51
-    set_addr $I10, alt103_1
-    rx77_cur."!mark_push"(0, rx77_pos, $I10)
-.annotate "line", 52
-  # rx rxquantf104 ** 0..*
-    set_addr $I10, rxquantf104_loop
-    rx77_cur."!mark_push"(0, rx77_pos, $I10)
-    goto rxquantf104_done
-  rxquantf104_loop:
-  # rx charclass .
-    ge rx77_pos, rx77_eos, rx77_fail
-    inc rx77_pos
-    set_addr $I10, rxquantf104_loop
-    rx77_cur."!mark_push"($I105, rx77_pos, $I10)
-  rxquantf104_done:
-  # rx charclass nl
-    ge rx77_pos, rx77_eos, rx77_fail
-    sub $I10, rx77_pos, rx77_off
-    is_cclass $I11, 4096, rx77_tgt, $I10
-    unless $I11, rx77_fail
-    substr $S10, rx77_tgt, $I10, 2
-    iseq $I11, $S10, "\r\n"
-    add rx77_pos, $I11
-    inc rx77_pos
-  # rx rxquantr106 ** 0..*
-    set_addr $I107, rxquantr106_done
-    rx77_cur."!mark_push"(0, rx77_pos, $I107)
-  rxquantr106_loop:
-  # rx enumcharlist negate=0 
-    ge rx77_pos, rx77_eos, rx77_fail
-    sub $I10, rx77_pos, rx77_off
-    substr $S10, rx77_tgt, $I10, 1
-    index $I11, unicode:"\t \x{a0}\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000", $S10
-    lt $I11, 0, rx77_fail
-    inc rx77_pos
-    (rx77_rep) = rx77_cur."!mark_commit"($I107)
-    rx77_cur."!mark_push"(rx77_rep, rx77_pos, $I107)
-    goto rxquantr106_loop
-  rxquantr106_done:
-  # rx literal  "=end"
-    add $I11, rx77_pos, 4
-    gt $I11, rx77_eos, rx77_fail
-    sub $I11, rx77_pos, rx77_off
-    substr $S10, rx77_tgt, $I11, 4
-    ne $S10, "=end", rx77_fail
-    add rx77_pos, 4
-  # rxanchor rwb
-    le rx77_pos, 0, rx77_fail
-    sub $I10, rx77_pos, rx77_off
-    is_cclass $I11, 8192, rx77_tgt, $I10
-    if $I11, rx77_fail
-    dec $I10
-    is_cclass $I11, 8192, rx77_tgt, $I10
-    unless $I11, rx77_fail
+    add $I11, rx72_pos, 1
+    gt $I11, rx72_eos, rx72_fail
+    sub $I11, rx72_pos, rx72_off
+    substr $S10, rx72_tgt, $I11, 1
+    ne $S10, "#", rx72_fail
+    add rx72_pos, 1
   # rx charclass_q N r 0..-1
-    sub $I10, rx77_pos, rx77_off
-    find_cclass $I11, 4096, rx77_tgt, $I10, rx77_eos
-    add rx77_pos, rx77_off, $I11
-    goto alt103_end
-  alt103_1:
-.annotate "line", 53
-  # rx subrule "panic" subtype=method negate=
-    rx77_cur."!cursor_pos"(rx77_pos)
-    $P10 = rx77_cur."panic"("=begin without matching =end")
-    unless $P10, rx77_fail
-    rx77_pos = $P10."pos"()
-  alt103_end:
-.annotate "line", 49
-    goto alt83_end
-  alt83_3:
-.annotate "line", 57
-  # rx rxquantr108 ** 0..1
-    set_addr $I116, rxquantr108_done
-    rx77_cur."!mark_push"(0, rx77_pos, $I116)
-  rxquantr108_loop:
-.annotate "line", 56
-  # rx subrule "before" subtype=zerowidth negate=
-    rx77_cur."!cursor_pos"(rx77_pos)
-    .const 'Sub' $P110 = "25_1258424429.0004" 
-    capture_lex $P110
-    $P10 = rx77_cur."before"($P110)
-    unless $P10, rx77_fail
-.annotate "line", 57
-  # rx subrule "panic" subtype=method negate=
-    rx77_cur."!cursor_pos"(rx77_pos)
-    $P10 = rx77_cur."panic"("Obsolete pod format, please use =begin/=end instead")
-    unless $P10, rx77_fail
-    rx77_pos = $P10."pos"()
-    (rx77_rep) = rx77_cur."!mark_commit"($I116)
-  rxquantr108_done:
-  alt117_0:
-.annotate "line", 58
-    set_addr $I10, alt117_1
-    rx77_cur."!mark_push"(0, rx77_pos, $I10)
-  # rx subrule "alpha" subtype=capture negate=
-    rx77_cur."!cursor_pos"(rx77_pos)
-    $P10 = rx77_cur."alpha"()
-    unless $P10, rx77_fail
-    rx77_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("alpha")
-    rx77_pos = $P10."pos"()
-    goto alt117_end
-  alt117_1:
-    set_addr $I10, alt117_2
-    rx77_cur."!mark_push"(0, rx77_pos, $I10)
-  # rx charclass s
-    ge rx77_pos, rx77_eos, rx77_fail
-    sub $I10, rx77_pos, rx77_off
-    is_cclass $I11, 32, rx77_tgt, $I10
-    unless $I11, rx77_fail
-    inc rx77_pos
-    goto alt117_end
-  alt117_2:
-  # rx subrule "panic" subtype=method negate=
-    rx77_cur."!cursor_pos"(rx77_pos)
-    $P10 = rx77_cur."panic"("Illegal pod directive")
-    unless $P10, rx77_fail
-    rx77_pos = $P10."pos"()
-  alt117_end:
-.annotate "line", 59
-  # rx charclass_q N r 0..-1
-    sub $I10, rx77_pos, rx77_off
-    find_cclass $I11, 4096, rx77_tgt, $I10, rx77_eos
-    add rx77_pos, rx77_off, $I11
-  alt83_end:
-.annotate "line", 39
-  # rx pass
-    rx77_cur."!cursor_pass"(rx77_pos, "pod_comment")
-    rx77_cur."!cursor_debug"("PASS  ", "pod_comment", " at pos=", rx77_pos)
-    .return (rx77_cur)
-  rx77_fail:
-.annotate "line", 4
-    (rx77_rep, rx77_pos, $I10, $P10) = rx77_cur."!mark_fail"(0)
-    lt rx77_pos, -1, rx77_done
-    eq rx77_pos, -1, rx77_fail
-    jump $I10
-  rx77_done:
-    rx77_cur."!cursor_fail"()
-    rx77_cur."!cursor_debug"("FAIL  ", "pod_comment")
-    .return (rx77_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__pod_comment"  :subid("24_1258424429.0004") :method
-.annotate "line", 4
-    new $P79, "ResizablePMCArray"
-    push $P79, ""
-    .return ($P79)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "_block109"  :anon :subid("25_1258424429.0004") :method :outer("23_1258424429.0004")
-.annotate "line", 56
-    .local string rx111_tgt
-    .local int rx111_pos
-    .local int rx111_off
-    .local int rx111_eos
-    .local int rx111_rep
-    .local pmc rx111_cur
-    (rx111_cur, rx111_pos, rx111_tgt, $I10) = self."!cursor_start"()
-    rx111_cur."!cursor_debug"("START ", "")
-    .lex unicode:"$\x{a2}", rx111_cur
-    .local pmc match
-    .lex "$/", match
-    length rx111_eos, rx111_tgt
-    set rx111_off, 0
-    lt $I10, 2, rx111_start
-    sub rx111_off, $I10, 1
-    substr rx111_tgt, rx111_tgt, rx111_off
-  rx111_start:
-    ge rx111_pos, 0, rxscan112_done
-  rxscan112_loop:
-    ($P10) = rx111_cur."from"()
-    inc $P10
-    set rx111_pos, $P10
-    ge rx111_pos, rx111_eos, rxscan112_done
-    set_addr $I10, rxscan112_loop
-    rx111_cur."!mark_push"(0, rx111_pos, $I10)
-  rxscan112_done:
-  # rx rxquantf113 ** 0..*
-    set_addr $I10, rxquantf113_loop
-    rx111_cur."!mark_push"(0, rx111_pos, $I10)
-    goto rxquantf113_done
-  rxquantf113_loop:
-  # rx charclass .
-    ge rx111_pos, rx111_eos, rx111_fail
-    inc rx111_pos
-    set_addr $I10, rxquantf113_loop
-    rx111_cur."!mark_push"($I114, rx111_pos, $I10)
-  rxquantf113_done:
+    sub $I10, rx72_pos, rx72_off
+    find_cclass $I11, 4096, rx72_tgt, $I10, rx72_eos
+    add rx72_pos, rx72_off, $I11
+    goto alt77_end
+  alt77_2:
+.annotate "line", 37
   # rxanchor bol
-    eq rx111_pos, 0, rxanchor115_done
-    ge rx111_pos, rx111_eos, rx111_fail
-    sub $I10, rx111_pos, rx111_off
+    eq rx72_pos, 0, rxanchor78_done
+    ge rx72_pos, rx72_eos, rx72_fail
+    sub $I10, rx72_pos, rx72_off
     dec $I10
-    is_cclass $I11, 4096, rx111_tgt, $I10
-    unless $I11, rx111_fail
-  rxanchor115_done:
-  # rx literal  "=cut"
-    add $I11, rx111_pos, 4
-    gt $I11, rx111_eos, rx111_fail
-    sub $I11, rx111_pos, rx111_off
-    substr $S10, rx111_tgt, $I11, 4
-    ne $S10, "=cut", rx111_fail
-    add rx111_pos, 4
-  # rxanchor rwb
-    le rx111_pos, 0, rx111_fail
-    sub $I10, rx111_pos, rx111_off
-    is_cclass $I11, 8192, rx111_tgt, $I10
-    if $I11, rx111_fail
+    is_cclass $I11, 4096, rx72_tgt, $I10
+    unless $I11, rx72_fail
+  rxanchor78_done:
+  # rx subrule "pod_comment" subtype=method negate=
+    rx72_cur."!cursor_pos"(rx72_pos)
+    $P10 = rx72_cur."pod_comment"()
+    unless $P10, rx72_fail
+    rx72_pos = $P10."pos"()
+  alt77_end:
+.annotate "line", 38
+    (rx72_rep) = rx72_cur."!mark_commit"($I79)
+    rx72_cur."!mark_push"(rx72_rep, rx72_pos, $I79)
+    goto rxquantr76_loop
+  rxquantr76_done:
+.annotate "line", 39
+  # rx subrule "MARKER" subtype=zerowidth negate=
+    rx72_cur."!cursor_pos"(rx72_pos)
+    $P10 = rx72_cur."MARKER"("ws")
+    unless $P10, rx72_fail
+  alt75_end:
+.annotate "line", 32
+  # rx pass
+    rx72_cur."!cursor_pass"(rx72_pos, "ws")
+    rx72_cur."!cursor_debug"("PASS  ", "ws", " at pos=", rx72_pos)
+    .return (rx72_cur)
+  rx72_fail:
+.annotate "line", 4
+    (rx72_rep, rx72_pos, $I10, $P10) = rx72_cur."!mark_fail"(0)
+    lt rx72_pos, -1, rx72_done
+    eq rx72_pos, -1, rx72_fail
+    jump $I10
+  rx72_done:
+    rx72_cur."!cursor_fail"()
+    rx72_cur."!cursor_debug"("FAIL  ", "ws")
+    .return (rx72_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__ws"  :subid("22_1258533478.31768") :method
+.annotate "line", 4
+    new $P74, "ResizablePMCArray"
+    push $P74, ""
+    push $P74, ""
+    .return ($P74)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "unv"  :subid("23_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .const 'Sub' $P87 = "25_1258533478.31768" 
+    capture_lex $P87
+    .local string rx81_tgt
+    .local int rx81_pos
+    .local int rx81_off
+    .local int rx81_eos
+    .local int rx81_rep
+    .local pmc rx81_cur
+    (rx81_cur, rx81_pos, rx81_tgt, $I10) = self."!cursor_start"()
+    rx81_cur."!cursor_debug"("START ", "unv")
+    .lex unicode:"$\x{a2}", rx81_cur
+    .local pmc match
+    .lex "$/", match
+    length rx81_eos, rx81_tgt
+    set rx81_off, 0
+    lt $I10, 2, rx81_start
+    sub rx81_off, $I10, 1
+    substr rx81_tgt, rx81_tgt, rx81_off
+  rx81_start:
+  alt84_0:
+.annotate "line", 44
+    set_addr $I10, alt84_1
+    rx81_cur."!mark_push"(0, rx81_pos, $I10)
+.annotate "line", 45
+  # rxanchor bol
+    eq rx81_pos, 0, rxanchor85_done
+    ge rx81_pos, rx81_eos, rx81_fail
+    sub $I10, rx81_pos, rx81_off
     dec $I10
-    is_cclass $I11, 8192, rx111_tgt, $I10
-    unless $I11, rx111_fail
-  # rx pass
-    rx111_cur."!cursor_pass"(rx111_pos, "")
-    rx111_cur."!cursor_debug"("PASS  ", "", " at pos=", rx111_pos)
-    .return (rx111_cur)
-  rx111_fail:
-    (rx111_rep, rx111_pos, $I10, $P10) = rx111_cur."!mark_fail"(0)
-    lt rx111_pos, -1, rx111_done
-    eq rx111_pos, -1, rx111_fail
-    jump $I10
-  rx111_done:
-    rx111_cur."!cursor_fail"()
-    rx111_cur."!cursor_debug"("FAIL  ", "")
-    .return (rx111_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "comp_unit"  :subid("26_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx119_tgt
-    .local int rx119_pos
-    .local int rx119_off
-    .local int rx119_eos
-    .local int rx119_rep
-    .local pmc rx119_cur
-    (rx119_cur, rx119_pos, rx119_tgt, $I10) = self."!cursor_start"()
-    rx119_cur."!cursor_debug"("START ", "comp_unit")
-    .lex unicode:"$\x{a2}", rx119_cur
-    .local pmc match
-    .lex "$/", match
-    length rx119_eos, rx119_tgt
-    set rx119_off, 0
-    lt $I10, 2, rx119_start
-    sub rx119_off, $I10, 1
-    substr rx119_tgt, rx119_tgt, rx119_off
-  rx119_start:
-.annotate "line", 67
-  # rx subrule "newpad" subtype=method negate=
-    rx119_cur."!cursor_pos"(rx119_pos)
-    $P10 = rx119_cur."newpad"()
-    unless $P10, rx119_fail
-    rx119_pos = $P10."pos"()
-.annotate "line", 68
-  # rx subrule "statementlist" subtype=capture negate=
-    rx119_cur."!cursor_pos"(rx119_pos)
-    $P10 = rx119_cur."statementlist"()
-    unless $P10, rx119_fail
-    rx119_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("statementlist")
-    rx119_pos = $P10."pos"()
-  alt123_0:
-.annotate "line", 69
-    set_addr $I10, alt123_1
-    rx119_cur."!mark_push"(0, rx119_pos, $I10)
-  # rxanchor eos
-    ne rx119_pos, rx119_eos, rx119_fail
-    goto alt123_end
-  alt123_1:
-  # rx subrule "panic" subtype=method negate=
-    rx119_cur."!cursor_pos"(rx119_pos)
-    $P10 = rx119_cur."panic"("Confused")
-    unless $P10, rx119_fail
-    rx119_pos = $P10."pos"()
-  alt123_end:
-.annotate "line", 66
-  # rx pass
-    rx119_cur."!cursor_pass"(rx119_pos, "comp_unit")
-    rx119_cur."!cursor_debug"("PASS  ", "comp_unit", " at pos=", rx119_pos)
-    .return (rx119_cur)
-  rx119_fail:
-.annotate "line", 4
-    (rx119_rep, rx119_pos, $I10, $P10) = rx119_cur."!mark_fail"(0)
-    lt rx119_pos, -1, rx119_done
-    eq rx119_pos, -1, rx119_fail
-    jump $I10
-  rx119_done:
-    rx119_cur."!cursor_fail"()
-    rx119_cur."!cursor_debug"("FAIL  ", "comp_unit")
-    .return (rx119_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__comp_unit"  :subid("27_1258424429.0004") :method
-.annotate "line", 4
-    $P121 = self."!PREFIX__!subrule"("", "")
-    new $P122, "ResizablePMCArray"
-    push $P122, $P121
-    .return ($P122)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "statementlist"  :subid("28_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx125_tgt
-    .local int rx125_pos
-    .local int rx125_off
-    .local int rx125_eos
-    .local int rx125_rep
-    .local pmc rx125_cur
-    (rx125_cur, rx125_pos, rx125_tgt, $I10) = self."!cursor_start"()
-    rx125_cur."!cursor_debug"("START ", "statementlist")
-    rx125_cur."!cursor_caparray"("statement")
-    .lex unicode:"$\x{a2}", rx125_cur
-    .local pmc match
-    .lex "$/", match
-    length rx125_eos, rx125_tgt
-    set rx125_off, 0
-    lt $I10, 2, rx125_start
-    sub rx125_off, $I10, 1
-    substr rx125_tgt, rx125_tgt, rx125_off
-  rx125_start:
-  alt128_0:
-.annotate "line", 72
-    set_addr $I10, alt128_1
-    rx125_cur."!mark_push"(0, rx125_pos, $I10)
-.annotate "line", 73
-  # rx subrule "ws" subtype=method negate=
-    rx125_cur."!cursor_pos"(rx125_pos)
-    $P10 = rx125_cur."ws"()
-    unless $P10, rx125_fail
-    rx125_pos = $P10."pos"()
-  # rxanchor eos
-    ne rx125_pos, rx125_eos, rx125_fail
-  # rx subrule "ws" subtype=method negate=
-    rx125_cur."!cursor_pos"(rx125_pos)
-    $P10 = rx125_cur."ws"()
-    unless $P10, rx125_fail
-    rx125_pos = $P10."pos"()
-    goto alt128_end
-  alt128_1:
-.annotate "line", 74
-  # rx subrule "ws" subtype=method negate=
-    rx125_cur."!cursor_pos"(rx125_pos)
-    $P10 = rx125_cur."ws"()
-    unless $P10, rx125_fail
-    rx125_pos = $P10."pos"()
-  # rx rxquantr132 ** 0..*
-    set_addr $I134, rxquantr132_done
-    rx125_cur."!mark_push"(0, rx125_pos, $I134)
-  rxquantr132_loop:
-  # rx subrule "statement" subtype=capture negate=
-    rx125_cur."!cursor_pos"(rx125_pos)
-    $P10 = rx125_cur."statement"()
-    unless $P10, rx125_fail
-    rx125_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("statement")
-    rx125_pos = $P10."pos"()
-  # rx subrule "eat_terminator" subtype=method negate=
-    rx125_cur."!cursor_pos"(rx125_pos)
-    $P10 = rx125_cur."eat_terminator"()
-    unless $P10, rx125_fail
-    rx125_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx125_cur."!cursor_pos"(rx125_pos)
-    $P10 = rx125_cur."ws"()
-    unless $P10, rx125_fail
-    rx125_pos = $P10."pos"()
-    (rx125_rep) = rx125_cur."!mark_commit"($I134)
-    rx125_cur."!mark_push"(rx125_rep, rx125_pos, $I134)
-    goto rxquantr132_loop
-  rxquantr132_done:
-  # rx subrule "ws" subtype=method negate=
-    rx125_cur."!cursor_pos"(rx125_pos)
-    $P10 = rx125_cur."ws"()
-    unless $P10, rx125_fail
-    rx125_pos = $P10."pos"()
-  alt128_end:
-.annotate "line", 72
-  # rx pass
-    rx125_cur."!cursor_pass"(rx125_pos, "statementlist")
-    rx125_cur."!cursor_debug"("PASS  ", "statementlist", " at pos=", rx125_pos)
-    .return (rx125_cur)
-  rx125_fail:
-.annotate "line", 4
-    (rx125_rep, rx125_pos, $I10, $P10) = rx125_cur."!mark_fail"(0)
-    lt rx125_pos, -1, rx125_done
-    eq rx125_pos, -1, rx125_fail
-    jump $I10
-  rx125_done:
-    rx125_cur."!cursor_fail"()
-    rx125_cur."!cursor_debug"("FAIL  ", "statementlist")
-    .return (rx125_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statementlist"  :subid("29_1258424429.0004") :method
-.annotate "line", 4
-    new $P127, "ResizablePMCArray"
-    push $P127, ""
-    push $P127, ""
-    .return ($P127)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "statement"  :subid("30_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .const 'Sub' $P141 = "32_1258424429.0004" 
-    capture_lex $P141
-    .local string rx137_tgt
-    .local int rx137_pos
-    .local int rx137_off
-    .local int rx137_eos
-    .local int rx137_rep
-    .local pmc rx137_cur
-    (rx137_cur, rx137_pos, rx137_tgt, $I10) = self."!cursor_start"()
-    rx137_cur."!cursor_debug"("START ", "statement")
-    rx137_cur."!cursor_caparray"("statement_mod_loop", "statement_mod_cond")
-    .lex unicode:"$\x{a2}", rx137_cur
-    .local pmc match
-    .lex "$/", match
-    length rx137_eos, rx137_tgt
-    set rx137_off, 0
-    lt $I10, 2, rx137_start
-    sub rx137_off, $I10, 1
-    substr rx137_tgt, rx137_tgt, rx137_off
-  rx137_start:
-.annotate "line", 78
-  # rx subrule "before" subtype=zerowidth negate=1
-    rx137_cur."!cursor_pos"(rx137_pos)
-    .const 'Sub' $P141 = "32_1258424429.0004" 
-    capture_lex $P141
-    $P10 = rx137_cur."before"($P141)
-    if $P10, rx137_fail
-  alt145_0:
-.annotate "line", 79
-    set_addr $I10, alt145_1
-    rx137_cur."!mark_push"(0, rx137_pos, $I10)
-.annotate "line", 80
-  # rx subrule "statement_control" subtype=capture negate=
-    rx137_cur."!cursor_pos"(rx137_pos)
-    $P10 = rx137_cur."statement_control"()
-    unless $P10, rx137_fail
-    rx137_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("statement_control")
-    rx137_pos = $P10."pos"()
-    goto alt145_end
-  alt145_1:
-.annotate "line", 81
-  # rx subrule "EXPR" subtype=capture negate=
-    rx137_cur."!cursor_pos"(rx137_pos)
-    $P10 = rx137_cur."EXPR"()
-    unless $P10, rx137_fail
-    rx137_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("EXPR")
-    rx137_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx137_cur."!cursor_pos"(rx137_pos)
-    $P10 = rx137_cur."ws"()
-    unless $P10, rx137_fail
-    rx137_pos = $P10."pos"()
-.annotate "line", 85
-  # rx rxquantr146 ** 0..1
-    set_addr $I150, rxquantr146_done
-    rx137_cur."!mark_push"(0, rx137_pos, $I150)
-  rxquantr146_loop:
-  alt147_0:
-.annotate "line", 82
-    set_addr $I10, alt147_1
-    rx137_cur."!mark_push"(0, rx137_pos, $I10)
-.annotate "line", 83
-  # rx subrule "statement_mod_cond" subtype=capture negate=
-    rx137_cur."!cursor_pos"(rx137_pos)
-    $P10 = rx137_cur."statement_mod_cond"()
-    unless $P10, rx137_fail
-    rx137_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("statement_mod_cond")
-    rx137_pos = $P10."pos"()
-  # rx rxquantr148 ** 0..1
-    set_addr $I149, rxquantr148_done
-    rx137_cur."!mark_push"(0, rx137_pos, $I149)
-  rxquantr148_loop:
-  # rx subrule "statement_mod_loop" subtype=capture negate=
-    rx137_cur."!cursor_pos"(rx137_pos)
-    $P10 = rx137_cur."statement_mod_loop"()
-    unless $P10, rx137_fail
-    rx137_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("statement_mod_loop")
-    rx137_pos = $P10."pos"()
-    (rx137_rep) = rx137_cur."!mark_commit"($I149)
-  rxquantr148_done:
-    goto alt147_end
-  alt147_1:
-.annotate "line", 84
-  # rx subrule "statement_mod_loop" subtype=capture negate=
-    rx137_cur."!cursor_pos"(rx137_pos)
-    $P10 = rx137_cur."statement_mod_loop"()
-    unless $P10, rx137_fail
-    rx137_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("statement_mod_loop")
-    rx137_pos = $P10."pos"()
-  alt147_end:
-.annotate "line", 85
-    (rx137_rep) = rx137_cur."!mark_commit"($I150)
-  rxquantr146_done:
-  alt145_end:
-.annotate "line", 77
-  # rx pass
-    rx137_cur."!cursor_pass"(rx137_pos, "statement")
-    rx137_cur."!cursor_debug"("PASS  ", "statement", " at pos=", rx137_pos)
-    .return (rx137_cur)
-  rx137_fail:
-.annotate "line", 4
-    (rx137_rep, rx137_pos, $I10, $P10) = rx137_cur."!mark_fail"(0)
-    lt rx137_pos, -1, rx137_done
-    eq rx137_pos, -1, rx137_fail
-    jump $I10
-  rx137_done:
-    rx137_cur."!cursor_fail"()
-    rx137_cur."!cursor_debug"("FAIL  ", "statement")
-    .return (rx137_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement"  :subid("31_1258424429.0004") :method
-.annotate "line", 4
-    new $P139, "ResizablePMCArray"
-    push $P139, ""
-    .return ($P139)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "_block140"  :anon :subid("32_1258424429.0004") :method :outer("30_1258424429.0004")
-.annotate "line", 78
-    .local string rx142_tgt
-    .local int rx142_pos
-    .local int rx142_off
-    .local int rx142_eos
-    .local int rx142_rep
-    .local pmc rx142_cur
-    (rx142_cur, rx142_pos, rx142_tgt, $I10) = self."!cursor_start"()
-    rx142_cur."!cursor_debug"("START ", "")
-    .lex unicode:"$\x{a2}", rx142_cur
-    .local pmc match
-    .lex "$/", match
-    length rx142_eos, rx142_tgt
-    set rx142_off, 0
-    lt $I10, 2, rx142_start
-    sub rx142_off, $I10, 1
-    substr rx142_tgt, rx142_tgt, rx142_off
-  rx142_start:
-    ge rx142_pos, 0, rxscan143_done
-  rxscan143_loop:
-    ($P10) = rx142_cur."from"()
-    inc $P10
-    set rx142_pos, $P10
-    ge rx142_pos, rx142_eos, rxscan143_done
-    set_addr $I10, rxscan143_loop
-    rx142_cur."!mark_push"(0, rx142_pos, $I10)
-  rxscan143_done:
-  alt144_0:
-    set_addr $I10, alt144_1
-    rx142_cur."!mark_push"(0, rx142_pos, $I10)
+    is_cclass $I11, 4096, rx81_tgt, $I10
+    unless $I11, rx81_fail
+  rxanchor85_done:
+  # rx subrule "before" subtype=zerowidth negate=
+    rx81_cur."!cursor_pos"(rx81_pos)
+    .const 'Sub' $P87 = "25_1258533478.31768" 
+    capture_lex $P87
+    $P10 = rx81_cur."before"($P87)
+    unless $P10, rx81_fail
+  # rx subrule "pod_comment" subtype=method negate=
+    rx81_cur."!cursor_pos"(rx81_pos)
+    $P10 = rx81_cur."pod_comment"()
+    unless $P10, rx81_fail
+    rx81_pos = $P10."pos"()
+    goto alt84_end
+  alt84_1:
+    set_addr $I10, alt84_2
+    rx81_cur."!mark_push"(0, rx81_pos, $I10)
+.annotate "line", 46
+  # rx rxquantr93 ** 0..*
+    set_addr $I94, rxquantr93_done
+    rx81_cur."!mark_push"(0, rx81_pos, $I94)
+  rxquantr93_loop:
   # rx enumcharlist negate=0 
-    ge rx142_pos, rx142_eos, rx142_fail
-    sub $I10, rx142_pos, rx142_off
-    substr $S10, rx142_tgt, $I10, 1
-    index $I11, "])}", $S10
-    lt $I11, 0, rx142_fail
-    inc rx142_pos
+    ge rx81_pos, rx81_eos, rx81_fail
+    sub $I10, rx81_pos, rx81_off
+    substr $S10, rx81_tgt, $I10, 1
+    index $I11, unicode:"\t \x{a0}\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000", $S10
+    lt $I11, 0, rx81_fail
+    inc rx81_pos
+    (rx81_rep) = rx81_cur."!mark_commit"($I94)
+    rx81_cur."!mark_push"(rx81_rep, rx81_pos, $I94)
+    goto rxquantr93_loop
+  rxquantr93_done:
+  # rx literal  "#"
+    add $I11, rx81_pos, 1
+    gt $I11, rx81_eos, rx81_fail
+    sub $I11, rx81_pos, rx81_off
+    substr $S10, rx81_tgt, $I11, 1
+    ne $S10, "#", rx81_fail
+    add rx81_pos, 1
+  # rx charclass_q N r 0..-1
+    sub $I10, rx81_pos, rx81_off
+    find_cclass $I11, 4096, rx81_tgt, $I10, rx81_eos
+    add rx81_pos, rx81_off, $I11
+    goto alt84_end
+  alt84_2:
+.annotate "line", 47
+  # rx rxquantr95 ** 1..*
+    set_addr $I96, rxquantr95_done
+    rx81_cur."!mark_push"(0, -1, $I96)
+  rxquantr95_loop:
+  # rx enumcharlist negate=0 
+    ge rx81_pos, rx81_eos, rx81_fail
+    sub $I10, rx81_pos, rx81_off
+    substr $S10, rx81_tgt, $I10, 1
+    index $I11, unicode:"\t \x{a0}\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000", $S10
+    lt $I11, 0, rx81_fail
+    inc rx81_pos
+    (rx81_rep) = rx81_cur."!mark_commit"($I96)
+    rx81_cur."!mark_push"(rx81_rep, rx81_pos, $I96)
+    goto rxquantr95_loop
+  rxquantr95_done:
+  alt84_end:
+.annotate "line", 42
+  # rx pass
+    rx81_cur."!cursor_pass"(rx81_pos, "unv")
+    rx81_cur."!cursor_debug"("PASS  ", "unv", " at pos=", rx81_pos)
+    .return (rx81_cur)
+  rx81_fail:
+.annotate "line", 4
+    (rx81_rep, rx81_pos, $I10, $P10) = rx81_cur."!mark_fail"(0)
+    lt rx81_pos, -1, rx81_done
+    eq rx81_pos, -1, rx81_fail
+    jump $I10
+  rx81_done:
+    rx81_cur."!cursor_fail"()
+    rx81_cur."!cursor_debug"("FAIL  ", "unv")
+    .return (rx81_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__unv"  :subid("24_1258533478.31768") :method
+.annotate "line", 4
+    new $P83, "ResizablePMCArray"
+    push $P83, ""
+    push $P83, ""
+    push $P83, ""
+    .return ($P83)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "_block86"  :anon :subid("25_1258533478.31768") :method :outer("23_1258533478.31768")
+.annotate "line", 45
+    .local string rx88_tgt
+    .local int rx88_pos
+    .local int rx88_off
+    .local int rx88_eos
+    .local int rx88_rep
+    .local pmc rx88_cur
+    (rx88_cur, rx88_pos, rx88_tgt, $I10) = self."!cursor_start"()
+    rx88_cur."!cursor_debug"("START ", "")
+    .lex unicode:"$\x{a2}", rx88_cur
+    .local pmc match
+    .lex "$/", match
+    length rx88_eos, rx88_tgt
+    set rx88_off, 0
+    lt $I10, 2, rx88_start
+    sub rx88_off, $I10, 1
+    substr rx88_tgt, rx88_tgt, rx88_off
+  rx88_start:
+    ge rx88_pos, 0, rxscan89_done
+  rxscan89_loop:
+    ($P10) = rx88_cur."from"()
+    inc $P10
+    set rx88_pos, $P10
+    ge rx88_pos, rx88_eos, rxscan89_done
+    set_addr $I10, rxscan89_loop
+    rx88_cur."!mark_push"(0, rx88_pos, $I10)
+  rxscan89_done:
+  # rx rxquantr90 ** 0..*
+    set_addr $I91, rxquantr90_done
+    rx88_cur."!mark_push"(0, rx88_pos, $I91)
+  rxquantr90_loop:
+  # rx enumcharlist negate=0 
+    ge rx88_pos, rx88_eos, rx88_fail
+    sub $I10, rx88_pos, rx88_off
+    substr $S10, rx88_tgt, $I10, 1
+    index $I11, unicode:"\t \x{a0}\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000", $S10
+    lt $I11, 0, rx88_fail
+    inc rx88_pos
+    (rx88_rep) = rx88_cur."!mark_commit"($I91)
+    rx88_cur."!mark_push"(rx88_rep, rx88_pos, $I91)
+    goto rxquantr90_loop
+  rxquantr90_done:
+  # rx literal  "="
+    add $I11, rx88_pos, 1
+    gt $I11, rx88_eos, rx88_fail
+    sub $I11, rx88_pos, rx88_off
+    substr $S10, rx88_tgt, $I11, 1
+    ne $S10, "=", rx88_fail
+    add rx88_pos, 1
+  alt92_0:
+    set_addr $I10, alt92_1
+    rx88_cur."!mark_push"(0, rx88_pos, $I10)
+  # rx charclass w
+    ge rx88_pos, rx88_eos, rx88_fail
+    sub $I10, rx88_pos, rx88_off
+    is_cclass $I11, 8192, rx88_tgt, $I10
+    unless $I11, rx88_fail
+    inc rx88_pos
+    goto alt92_end
+  alt92_1:
+  # rx literal  "\\"
+    add $I11, rx88_pos, 1
+    gt $I11, rx88_eos, rx88_fail
+    sub $I11, rx88_pos, rx88_off
+    substr $S10, rx88_tgt, $I11, 1
+    ne $S10, "\\", rx88_fail
+    add rx88_pos, 1
+  alt92_end:
+  # rx pass
+    rx88_cur."!cursor_pass"(rx88_pos, "")
+    rx88_cur."!cursor_debug"("PASS  ", "", " at pos=", rx88_pos)
+    .return (rx88_cur)
+  rx88_fail:
+    (rx88_rep, rx88_pos, $I10, $P10) = rx88_cur."!mark_fail"(0)
+    lt rx88_pos, -1, rx88_done
+    eq rx88_pos, -1, rx88_fail
+    jump $I10
+  rx88_done:
+    rx88_cur."!cursor_fail"()
+    rx88_cur."!cursor_debug"("FAIL  ", "")
+    .return (rx88_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "pod_comment"  :subid("26_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .const 'Sub' $P131 = "28_1258533478.31768" 
+    capture_lex $P131
+    .local string rx98_tgt
+    .local int rx98_pos
+    .local int rx98_off
+    .local int rx98_eos
+    .local int rx98_rep
+    .local pmc rx98_cur
+    (rx98_cur, rx98_pos, rx98_tgt, $I10) = self."!cursor_start"()
+    rx98_cur."!cursor_debug"("START ", "pod_comment")
+    .lex unicode:"$\x{a2}", rx98_cur
+    .local pmc match
+    .lex "$/", match
+    length rx98_eos, rx98_tgt
+    set rx98_off, 0
+    lt $I10, 2, rx98_start
+    sub rx98_off, $I10, 1
+    substr rx98_tgt, rx98_tgt, rx98_off
+  rx98_start:
+.annotate "line", 52
+  # rxanchor bol
+    eq rx98_pos, 0, rxanchor101_done
+    ge rx98_pos, rx98_eos, rx98_fail
+    sub $I10, rx98_pos, rx98_off
+    dec $I10
+    is_cclass $I11, 4096, rx98_tgt, $I10
+    unless $I11, rx98_fail
+  rxanchor101_done:
+  # rx rxquantr102 ** 0..*
+    set_addr $I103, rxquantr102_done
+    rx98_cur."!mark_push"(0, rx98_pos, $I103)
+  rxquantr102_loop:
+  # rx enumcharlist negate=0 
+    ge rx98_pos, rx98_eos, rx98_fail
+    sub $I10, rx98_pos, rx98_off
+    substr $S10, rx98_tgt, $I10, 1
+    index $I11, unicode:"\t \x{a0}\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000", $S10
+    lt $I11, 0, rx98_fail
+    inc rx98_pos
+    (rx98_rep) = rx98_cur."!mark_commit"($I103)
+    rx98_cur."!mark_push"(rx98_rep, rx98_pos, $I103)
+    goto rxquantr102_loop
+  rxquantr102_done:
+  # rx literal  "="
+    add $I11, rx98_pos, 1
+    gt $I11, rx98_eos, rx98_fail
+    sub $I11, rx98_pos, rx98_off
+    substr $S10, rx98_tgt, $I11, 1
+    ne $S10, "=", rx98_fail
+    add rx98_pos, 1
+  alt104_0:
+.annotate "line", 53
+    set_addr $I10, alt104_1
+    rx98_cur."!mark_push"(0, rx98_pos, $I10)
+.annotate "line", 54
+  # rx literal  "begin"
+    add $I11, rx98_pos, 5
+    gt $I11, rx98_eos, rx98_fail
+    sub $I11, rx98_pos, rx98_off
+    substr $S10, rx98_tgt, $I11, 5
+    ne $S10, "begin", rx98_fail
+    add rx98_pos, 5
+  # rx rxquantr105 ** 1..*
+    set_addr $I106, rxquantr105_done
+    rx98_cur."!mark_push"(0, -1, $I106)
+  rxquantr105_loop:
+  # rx enumcharlist negate=0 
+    ge rx98_pos, rx98_eos, rx98_fail
+    sub $I10, rx98_pos, rx98_off
+    substr $S10, rx98_tgt, $I10, 1
+    index $I11, unicode:"\t \x{a0}\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000", $S10
+    lt $I11, 0, rx98_fail
+    inc rx98_pos
+    (rx98_rep) = rx98_cur."!mark_commit"($I106)
+    rx98_cur."!mark_push"(rx98_rep, rx98_pos, $I106)
+    goto rxquantr105_loop
+  rxquantr105_done:
+  # rx literal  "END"
+    add $I11, rx98_pos, 3
+    gt $I11, rx98_eos, rx98_fail
+    sub $I11, rx98_pos, rx98_off
+    substr $S10, rx98_tgt, $I11, 3
+    ne $S10, "END", rx98_fail
+    add rx98_pos, 3
+  # rxanchor rwb
+    le rx98_pos, 0, rx98_fail
+    sub $I10, rx98_pos, rx98_off
+    is_cclass $I11, 8192, rx98_tgt, $I10
+    if $I11, rx98_fail
+    dec $I10
+    is_cclass $I11, 8192, rx98_tgt, $I10
+    unless $I11, rx98_fail
+  alt107_0:
+.annotate "line", 55
+    set_addr $I10, alt107_1
+    rx98_cur."!mark_push"(0, rx98_pos, $I10)
+  # rx rxquantf108 ** 0..*
+    set_addr $I10, rxquantf108_loop
+    rx98_cur."!mark_push"(0, rx98_pos, $I10)
+    goto rxquantf108_done
+  rxquantf108_loop:
+  # rx charclass .
+    ge rx98_pos, rx98_eos, rx98_fail
+    inc rx98_pos
+    set_addr $I10, rxquantf108_loop
+    rx98_cur."!mark_push"($I109, rx98_pos, $I10)
+  rxquantf108_done:
+  # rx charclass nl
+    ge rx98_pos, rx98_eos, rx98_fail
+    sub $I10, rx98_pos, rx98_off
+    is_cclass $I11, 4096, rx98_tgt, $I10
+    unless $I11, rx98_fail
+    substr $S10, rx98_tgt, $I10, 2
+    iseq $I11, $S10, "\r\n"
+    add rx98_pos, $I11
+    inc rx98_pos
+  # rx literal  "=end"
+    add $I11, rx98_pos, 4
+    gt $I11, rx98_eos, rx98_fail
+    sub $I11, rx98_pos, rx98_off
+    substr $S10, rx98_tgt, $I11, 4
+    ne $S10, "=end", rx98_fail
+    add rx98_pos, 4
+  # rx rxquantr110 ** 1..*
+    set_addr $I111, rxquantr110_done
+    rx98_cur."!mark_push"(0, -1, $I111)
+  rxquantr110_loop:
+  # rx enumcharlist negate=0 
+    ge rx98_pos, rx98_eos, rx98_fail
+    sub $I10, rx98_pos, rx98_off
+    substr $S10, rx98_tgt, $I10, 1
+    index $I11, unicode:"\t \x{a0}\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000", $S10
+    lt $I11, 0, rx98_fail
+    inc rx98_pos
+    (rx98_rep) = rx98_cur."!mark_commit"($I111)
+    rx98_cur."!mark_push"(rx98_rep, rx98_pos, $I111)
+    goto rxquantr110_loop
+  rxquantr110_done:
+  # rx literal  "END"
+    add $I11, rx98_pos, 3
+    gt $I11, rx98_eos, rx98_fail
+    sub $I11, rx98_pos, rx98_off
+    substr $S10, rx98_tgt, $I11, 3
+    ne $S10, "END", rx98_fail
+    add rx98_pos, 3
+  # rxanchor rwb
+    le rx98_pos, 0, rx98_fail
+    sub $I10, rx98_pos, rx98_off
+    is_cclass $I11, 8192, rx98_tgt, $I10
+    if $I11, rx98_fail
+    dec $I10
+    is_cclass $I11, 8192, rx98_tgt, $I10
+    unless $I11, rx98_fail
+  # rx charclass_q N r 0..-1
+    sub $I10, rx98_pos, rx98_off
+    find_cclass $I11, 4096, rx98_tgt, $I10, rx98_eos
+    add rx98_pos, rx98_off, $I11
+    goto alt107_end
+  alt107_1:
+  # rx charclass_q . r 0..-1
+    sub $I10, rx98_pos, rx98_off
+    find_not_cclass $I11, 65535, rx98_tgt, $I10, rx98_eos
+    add rx98_pos, rx98_off, $I11
+  alt107_end:
+.annotate "line", 54
+    goto alt104_end
+  alt104_1:
+    set_addr $I10, alt104_2
+    rx98_cur."!mark_push"(0, rx98_pos, $I10)
+.annotate "line", 56
+  # rx literal  "begin"
+    add $I11, rx98_pos, 5
+    gt $I11, rx98_eos, rx98_fail
+    sub $I11, rx98_pos, rx98_off
+    substr $S10, rx98_tgt, $I11, 5
+    ne $S10, "begin", rx98_fail
+    add rx98_pos, 5
+  # rx rxquantr112 ** 1..*
+    set_addr $I113, rxquantr112_done
+    rx98_cur."!mark_push"(0, -1, $I113)
+  rxquantr112_loop:
+  # rx enumcharlist negate=0 
+    ge rx98_pos, rx98_eos, rx98_fail
+    sub $I10, rx98_pos, rx98_off
+    substr $S10, rx98_tgt, $I10, 1
+    index $I11, unicode:"\t \x{a0}\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000", $S10
+    lt $I11, 0, rx98_fail
+    inc rx98_pos
+    (rx98_rep) = rx98_cur."!mark_commit"($I113)
+    rx98_cur."!mark_push"(rx98_rep, rx98_pos, $I113)
+    goto rxquantr112_loop
+  rxquantr112_done:
+  # rx subrule "identifier" subtype=capture negate=
+    rx98_cur."!cursor_pos"(rx98_pos)
+    $P10 = rx98_cur."identifier"()
+    unless $P10, rx98_fail
+    rx98_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("identifier")
+    rx98_pos = $P10."pos"()
+  alt114_0:
+.annotate "line", 57
+    set_addr $I10, alt114_1
+    rx98_cur."!mark_push"(0, rx98_pos, $I10)
+.annotate "line", 58
+  # rx rxquantf115 ** 0..*
+    set_addr $I10, rxquantf115_loop
+    rx98_cur."!mark_push"(0, rx98_pos, $I10)
+    goto rxquantf115_done
+  rxquantf115_loop:
+  # rx charclass .
+    ge rx98_pos, rx98_eos, rx98_fail
+    inc rx98_pos
+    set_addr $I10, rxquantf115_loop
+    rx98_cur."!mark_push"($I116, rx98_pos, $I10)
+  rxquantf115_done:
+  # rx charclass nl
+    ge rx98_pos, rx98_eos, rx98_fail
+    sub $I10, rx98_pos, rx98_off
+    is_cclass $I11, 4096, rx98_tgt, $I10
+    unless $I11, rx98_fail
+    substr $S10, rx98_tgt, $I10, 2
+    iseq $I11, $S10, "\r\n"
+    add rx98_pos, $I11
+    inc rx98_pos
+  # rx literal  "=end"
+    add $I11, rx98_pos, 4
+    gt $I11, rx98_eos, rx98_fail
+    sub $I11, rx98_pos, rx98_off
+    substr $S10, rx98_tgt, $I11, 4
+    ne $S10, "=end", rx98_fail
+    add rx98_pos, 4
+  # rx rxquantr117 ** 1..*
+    set_addr $I118, rxquantr117_done
+    rx98_cur."!mark_push"(0, -1, $I118)
+  rxquantr117_loop:
+  # rx enumcharlist negate=0 
+    ge rx98_pos, rx98_eos, rx98_fail
+    sub $I10, rx98_pos, rx98_off
+    substr $S10, rx98_tgt, $I10, 1
+    index $I11, unicode:"\t \x{a0}\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000", $S10
+    lt $I11, 0, rx98_fail
+    inc rx98_pos
+    (rx98_rep) = rx98_cur."!mark_commit"($I118)
+    rx98_cur."!mark_push"(rx98_rep, rx98_pos, $I118)
+    goto rxquantr117_loop
+  rxquantr117_done:
+  # rx subrule "!BACKREF" subtype=method negate=
+    rx98_cur."!cursor_pos"(rx98_pos)
+    $P10 = rx98_cur."!BACKREF"("identifier")
+    unless $P10, rx98_fail
+    rx98_pos = $P10."pos"()
+  # rxanchor rwb
+    le rx98_pos, 0, rx98_fail
+    sub $I10, rx98_pos, rx98_off
+    is_cclass $I11, 8192, rx98_tgt, $I10
+    if $I11, rx98_fail
+    dec $I10
+    is_cclass $I11, 8192, rx98_tgt, $I10
+    unless $I11, rx98_fail
+  # rx charclass_q N r 0..-1
+    sub $I10, rx98_pos, rx98_off
+    find_cclass $I11, 4096, rx98_tgt, $I10, rx98_eos
+    add rx98_pos, rx98_off, $I11
+    goto alt114_end
+  alt114_1:
+.annotate "line", 59
+  # rx subrule "panic" subtype=method negate=
+    rx98_cur."!cursor_pos"(rx98_pos)
+    $P10 = rx98_cur."panic"("=begin without matching =end")
+    unless $P10, rx98_fail
+    rx98_pos = $P10."pos"()
+  alt114_end:
+.annotate "line", 56
+    goto alt104_end
+  alt104_2:
+    set_addr $I10, alt104_3
+    rx98_cur."!mark_push"(0, rx98_pos, $I10)
+.annotate "line", 61
+  # rx literal  "begin"
+    add $I11, rx98_pos, 5
+    gt $I11, rx98_eos, rx98_fail
+    sub $I11, rx98_pos, rx98_off
+    substr $S10, rx98_tgt, $I11, 5
+    ne $S10, "begin", rx98_fail
+    add rx98_pos, 5
+  # rxanchor rwb
+    le rx98_pos, 0, rx98_fail
+    sub $I10, rx98_pos, rx98_off
+    is_cclass $I11, 8192, rx98_tgt, $I10
+    if $I11, rx98_fail
+    dec $I10
+    is_cclass $I11, 8192, rx98_tgt, $I10
+    unless $I11, rx98_fail
+  # rx rxquantr120 ** 0..*
+    set_addr $I121, rxquantr120_done
+    rx98_cur."!mark_push"(0, rx98_pos, $I121)
+  rxquantr120_loop:
+  # rx enumcharlist negate=0 
+    ge rx98_pos, rx98_eos, rx98_fail
+    sub $I10, rx98_pos, rx98_off
+    substr $S10, rx98_tgt, $I10, 1
+    index $I11, unicode:"\t \x{a0}\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000", $S10
+    lt $I11, 0, rx98_fail
+    inc rx98_pos
+    (rx98_rep) = rx98_cur."!mark_commit"($I121)
+    rx98_cur."!mark_push"(rx98_rep, rx98_pos, $I121)
+    goto rxquantr120_loop
+  rxquantr120_done:
+  alt122_0:
+.annotate "line", 62
+    set_addr $I10, alt122_1
+    rx98_cur."!mark_push"(0, rx98_pos, $I10)
+  # rxanchor eol
+    sub $I10, rx98_pos, rx98_off
+    is_cclass $I11, 4096, rx98_tgt, $I10
+    if $I11, rxanchor123_done
+    ne rx98_pos, rx98_eos, rx98_fail
+    eq rx98_pos, 0, rxanchor123_done
+    dec $I10
+    is_cclass $I11, 4096, rx98_tgt, $I10
+    if $I11, rx98_fail
+  rxanchor123_done:
+    goto alt122_end
+  alt122_1:
+    set_addr $I10, alt122_2
+    rx98_cur."!mark_push"(0, rx98_pos, $I10)
+  # rx literal  "#"
+    add $I11, rx98_pos, 1
+    gt $I11, rx98_eos, rx98_fail
+    sub $I11, rx98_pos, rx98_off
+    substr $S10, rx98_tgt, $I11, 1
+    ne $S10, "#", rx98_fail
+    add rx98_pos, 1
+    goto alt122_end
+  alt122_2:
+  # rx subrule "panic" subtype=method negate=
+    rx98_cur."!cursor_pos"(rx98_pos)
+    $P10 = rx98_cur."panic"("Unrecognized token after =begin")
+    unless $P10, rx98_fail
+    rx98_pos = $P10."pos"()
+  alt122_end:
+  alt124_0:
+.annotate "line", 63
+    set_addr $I10, alt124_1
+    rx98_cur."!mark_push"(0, rx98_pos, $I10)
+.annotate "line", 64
+  # rx rxquantf125 ** 0..*
+    set_addr $I10, rxquantf125_loop
+    rx98_cur."!mark_push"(0, rx98_pos, $I10)
+    goto rxquantf125_done
+  rxquantf125_loop:
+  # rx charclass .
+    ge rx98_pos, rx98_eos, rx98_fail
+    inc rx98_pos
+    set_addr $I10, rxquantf125_loop
+    rx98_cur."!mark_push"($I126, rx98_pos, $I10)
+  rxquantf125_done:
+  # rx charclass nl
+    ge rx98_pos, rx98_eos, rx98_fail
+    sub $I10, rx98_pos, rx98_off
+    is_cclass $I11, 4096, rx98_tgt, $I10
+    unless $I11, rx98_fail
+    substr $S10, rx98_tgt, $I10, 2
+    iseq $I11, $S10, "\r\n"
+    add rx98_pos, $I11
+    inc rx98_pos
+  # rx rxquantr127 ** 0..*
+    set_addr $I128, rxquantr127_done
+    rx98_cur."!mark_push"(0, rx98_pos, $I128)
+  rxquantr127_loop:
+  # rx enumcharlist negate=0 
+    ge rx98_pos, rx98_eos, rx98_fail
+    sub $I10, rx98_pos, rx98_off
+    substr $S10, rx98_tgt, $I10, 1
+    index $I11, unicode:"\t \x{a0}\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000", $S10
+    lt $I11, 0, rx98_fail
+    inc rx98_pos
+    (rx98_rep) = rx98_cur."!mark_commit"($I128)
+    rx98_cur."!mark_push"(rx98_rep, rx98_pos, $I128)
+    goto rxquantr127_loop
+  rxquantr127_done:
+  # rx literal  "=end"
+    add $I11, rx98_pos, 4
+    gt $I11, rx98_eos, rx98_fail
+    sub $I11, rx98_pos, rx98_off
+    substr $S10, rx98_tgt, $I11, 4
+    ne $S10, "=end", rx98_fail
+    add rx98_pos, 4
+  # rxanchor rwb
+    le rx98_pos, 0, rx98_fail
+    sub $I10, rx98_pos, rx98_off
+    is_cclass $I11, 8192, rx98_tgt, $I10
+    if $I11, rx98_fail
+    dec $I10
+    is_cclass $I11, 8192, rx98_tgt, $I10
+    unless $I11, rx98_fail
+  # rx charclass_q N r 0..-1
+    sub $I10, rx98_pos, rx98_off
+    find_cclass $I11, 4096, rx98_tgt, $I10, rx98_eos
+    add rx98_pos, rx98_off, $I11
+    goto alt124_end
+  alt124_1:
+.annotate "line", 65
+  # rx subrule "panic" subtype=method negate=
+    rx98_cur."!cursor_pos"(rx98_pos)
+    $P10 = rx98_cur."panic"("=begin without matching =end")
+    unless $P10, rx98_fail
+    rx98_pos = $P10."pos"()
+  alt124_end:
+.annotate "line", 61
+    goto alt104_end
+  alt104_3:
+.annotate "line", 69
+  # rx rxquantr129 ** 0..1
+    set_addr $I137, rxquantr129_done
+    rx98_cur."!mark_push"(0, rx98_pos, $I137)
+  rxquantr129_loop:
+.annotate "line", 68
+  # rx subrule "before" subtype=zerowidth negate=
+    rx98_cur."!cursor_pos"(rx98_pos)
+    .const 'Sub' $P131 = "28_1258533478.31768" 
+    capture_lex $P131
+    $P10 = rx98_cur."before"($P131)
+    unless $P10, rx98_fail
+.annotate "line", 69
+  # rx subrule "panic" subtype=method negate=
+    rx98_cur."!cursor_pos"(rx98_pos)
+    $P10 = rx98_cur."panic"("Obsolete pod format, please use =begin/=end instead")
+    unless $P10, rx98_fail
+    rx98_pos = $P10."pos"()
+    (rx98_rep) = rx98_cur."!mark_commit"($I137)
+  rxquantr129_done:
+  alt138_0:
+.annotate "line", 70
+    set_addr $I10, alt138_1
+    rx98_cur."!mark_push"(0, rx98_pos, $I10)
+  # rx subrule "alpha" subtype=capture negate=
+    rx98_cur."!cursor_pos"(rx98_pos)
+    $P10 = rx98_cur."alpha"()
+    unless $P10, rx98_fail
+    rx98_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("alpha")
+    rx98_pos = $P10."pos"()
+    goto alt138_end
+  alt138_1:
+    set_addr $I10, alt138_2
+    rx98_cur."!mark_push"(0, rx98_pos, $I10)
+  # rx charclass s
+    ge rx98_pos, rx98_eos, rx98_fail
+    sub $I10, rx98_pos, rx98_off
+    is_cclass $I11, 32, rx98_tgt, $I10
+    unless $I11, rx98_fail
+    inc rx98_pos
+    goto alt138_end
+  alt138_2:
+  # rx subrule "panic" subtype=method negate=
+    rx98_cur."!cursor_pos"(rx98_pos)
+    $P10 = rx98_cur."panic"("Illegal pod directive")
+    unless $P10, rx98_fail
+    rx98_pos = $P10."pos"()
+  alt138_end:
+.annotate "line", 71
+  # rx charclass_q N r 0..-1
+    sub $I10, rx98_pos, rx98_off
+    find_cclass $I11, 4096, rx98_tgt, $I10, rx98_eos
+    add rx98_pos, rx98_off, $I11
+  alt104_end:
+.annotate "line", 51
+  # rx pass
+    rx98_cur."!cursor_pass"(rx98_pos, "pod_comment")
+    rx98_cur."!cursor_debug"("PASS  ", "pod_comment", " at pos=", rx98_pos)
+    .return (rx98_cur)
+  rx98_fail:
+.annotate "line", 4
+    (rx98_rep, rx98_pos, $I10, $P10) = rx98_cur."!mark_fail"(0)
+    lt rx98_pos, -1, rx98_done
+    eq rx98_pos, -1, rx98_fail
+    jump $I10
+  rx98_done:
+    rx98_cur."!cursor_fail"()
+    rx98_cur."!cursor_debug"("FAIL  ", "pod_comment")
+    .return (rx98_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__pod_comment"  :subid("27_1258533478.31768") :method
+.annotate "line", 4
+    new $P100, "ResizablePMCArray"
+    push $P100, ""
+    .return ($P100)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "_block130"  :anon :subid("28_1258533478.31768") :method :outer("26_1258533478.31768")
+.annotate "line", 68
+    .local string rx132_tgt
+    .local int rx132_pos
+    .local int rx132_off
+    .local int rx132_eos
+    .local int rx132_rep
+    .local pmc rx132_cur
+    (rx132_cur, rx132_pos, rx132_tgt, $I10) = self."!cursor_start"()
+    rx132_cur."!cursor_debug"("START ", "")
+    .lex unicode:"$\x{a2}", rx132_cur
+    .local pmc match
+    .lex "$/", match
+    length rx132_eos, rx132_tgt
+    set rx132_off, 0
+    lt $I10, 2, rx132_start
+    sub rx132_off, $I10, 1
+    substr rx132_tgt, rx132_tgt, rx132_off
+  rx132_start:
+    ge rx132_pos, 0, rxscan133_done
+  rxscan133_loop:
+    ($P10) = rx132_cur."from"()
+    inc $P10
+    set rx132_pos, $P10
+    ge rx132_pos, rx132_eos, rxscan133_done
+    set_addr $I10, rxscan133_loop
+    rx132_cur."!mark_push"(0, rx132_pos, $I10)
+  rxscan133_done:
+  # rx rxquantf134 ** 0..*
+    set_addr $I10, rxquantf134_loop
+    rx132_cur."!mark_push"(0, rx132_pos, $I10)
+    goto rxquantf134_done
+  rxquantf134_loop:
+  # rx charclass .
+    ge rx132_pos, rx132_eos, rx132_fail
+    inc rx132_pos
+    set_addr $I10, rxquantf134_loop
+    rx132_cur."!mark_push"($I135, rx132_pos, $I10)
+  rxquantf134_done:
+  # rxanchor bol
+    eq rx132_pos, 0, rxanchor136_done
+    ge rx132_pos, rx132_eos, rx132_fail
+    sub $I10, rx132_pos, rx132_off
+    dec $I10
+    is_cclass $I11, 4096, rx132_tgt, $I10
+    unless $I11, rx132_fail
+  rxanchor136_done:
+  # rx literal  "=cut"
+    add $I11, rx132_pos, 4
+    gt $I11, rx132_eos, rx132_fail
+    sub $I11, rx132_pos, rx132_off
+    substr $S10, rx132_tgt, $I11, 4
+    ne $S10, "=cut", rx132_fail
+    add rx132_pos, 4
+  # rxanchor rwb
+    le rx132_pos, 0, rx132_fail
+    sub $I10, rx132_pos, rx132_off
+    is_cclass $I11, 8192, rx132_tgt, $I10
+    if $I11, rx132_fail
+    dec $I10
+    is_cclass $I11, 8192, rx132_tgt, $I10
+    unless $I11, rx132_fail
+  # rx pass
+    rx132_cur."!cursor_pass"(rx132_pos, "")
+    rx132_cur."!cursor_debug"("PASS  ", "", " at pos=", rx132_pos)
+    .return (rx132_cur)
+  rx132_fail:
+    (rx132_rep, rx132_pos, $I10, $P10) = rx132_cur."!mark_fail"(0)
+    lt rx132_pos, -1, rx132_done
+    eq rx132_pos, -1, rx132_fail
+    jump $I10
+  rx132_done:
+    rx132_cur."!cursor_fail"()
+    rx132_cur."!cursor_debug"("FAIL  ", "")
+    .return (rx132_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "comp_unit"  :subid("29_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx140_tgt
+    .local int rx140_pos
+    .local int rx140_off
+    .local int rx140_eos
+    .local int rx140_rep
+    .local pmc rx140_cur
+    (rx140_cur, rx140_pos, rx140_tgt, $I10) = self."!cursor_start"()
+    rx140_cur."!cursor_debug"("START ", "comp_unit")
+    .lex unicode:"$\x{a2}", rx140_cur
+    .local pmc match
+    .lex "$/", match
+    length rx140_eos, rx140_tgt
+    set rx140_off, 0
+    lt $I10, 2, rx140_start
+    sub rx140_off, $I10, 1
+    substr rx140_tgt, rx140_tgt, rx140_off
+  rx140_start:
+.annotate "line", 79
+  # rx subrule "newpad" subtype=method negate=
+    rx140_cur."!cursor_pos"(rx140_pos)
+    $P10 = rx140_cur."newpad"()
+    unless $P10, rx140_fail
+    rx140_pos = $P10."pos"()
+.annotate "line", 80
+  # rx subrule "statementlist" subtype=capture negate=
+    rx140_cur."!cursor_pos"(rx140_pos)
+    $P10 = rx140_cur."statementlist"()
+    unless $P10, rx140_fail
+    rx140_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("statementlist")
+    rx140_pos = $P10."pos"()
+  alt144_0:
+.annotate "line", 81
+    set_addr $I10, alt144_1
+    rx140_cur."!mark_push"(0, rx140_pos, $I10)
+  # rxanchor eos
+    ne rx140_pos, rx140_eos, rx140_fail
     goto alt144_end
   alt144_1:
-  # rxanchor eos
-    ne rx142_pos, rx142_eos, rx142_fail
+  # rx subrule "panic" subtype=method negate=
+    rx140_cur."!cursor_pos"(rx140_pos)
+    $P10 = rx140_cur."panic"("Confused")
+    unless $P10, rx140_fail
+    rx140_pos = $P10."pos"()
   alt144_end:
+.annotate "line", 78
   # rx pass
-    rx142_cur."!cursor_pass"(rx142_pos, "")
-    rx142_cur."!cursor_debug"("PASS  ", "", " at pos=", rx142_pos)
-    .return (rx142_cur)
-  rx142_fail:
-    (rx142_rep, rx142_pos, $I10, $P10) = rx142_cur."!mark_fail"(0)
-    lt rx142_pos, -1, rx142_done
-    eq rx142_pos, -1, rx142_fail
+    rx140_cur."!cursor_pass"(rx140_pos, "comp_unit")
+    rx140_cur."!cursor_debug"("PASS  ", "comp_unit", " at pos=", rx140_pos)
+    .return (rx140_cur)
+  rx140_fail:
+.annotate "line", 4
+    (rx140_rep, rx140_pos, $I10, $P10) = rx140_cur."!mark_fail"(0)
+    lt rx140_pos, -1, rx140_done
+    eq rx140_pos, -1, rx140_fail
     jump $I10
-  rx142_done:
-    rx142_cur."!cursor_fail"()
-    rx142_cur."!cursor_debug"("FAIL  ", "")
-    .return (rx142_cur)
+  rx140_done:
+    rx140_cur."!cursor_fail"()
+    rx140_cur."!cursor_debug"("FAIL  ", "comp_unit")
+    .return (rx140_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "eat_terminator"  :subid("33_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "!PREFIX__comp_unit"  :subid("30_1258533478.31768") :method
 .annotate "line", 4
-    .local string rx152_tgt
-    .local int rx152_pos
-    .local int rx152_off
-    .local int rx152_eos
-    .local int rx152_rep
-    .local pmc rx152_cur
-    (rx152_cur, rx152_pos, rx152_tgt, $I10) = self."!cursor_start"()
-    rx152_cur."!cursor_debug"("START ", "eat_terminator")
-    .lex unicode:"$\x{a2}", rx152_cur
-    .local pmc match
-    .lex "$/", match
-    length rx152_eos, rx152_tgt
-    set rx152_off, 0
-    lt $I10, 2, rx152_start
-    sub rx152_off, $I10, 1
-    substr rx152_tgt, rx152_tgt, rx152_off
-  rx152_start:
-  alt155_0:
-.annotate "line", 89
-    set_addr $I10, alt155_1
-    rx152_cur."!mark_push"(0, rx152_pos, $I10)
-.annotate "line", 90
-  # rx literal  ";"
-    add $I11, rx152_pos, 1
-    gt $I11, rx152_eos, rx152_fail
-    sub $I11, rx152_pos, rx152_off
-    substr $S10, rx152_tgt, $I11, 1
-    ne $S10, ";", rx152_fail
-    add rx152_pos, 1
-    goto alt155_end
-  alt155_1:
-    set_addr $I10, alt155_2
-    rx152_cur."!mark_push"(0, rx152_pos, $I10)
-.annotate "line", 91
-  # rx subrule "MARKED" subtype=zerowidth negate=
-    rx152_cur."!cursor_pos"(rx152_pos)
-    $P10 = rx152_cur."MARKED"("endstmt")
-    unless $P10, rx152_fail
-    goto alt155_end
-  alt155_2:
-    set_addr $I10, alt155_3
-    rx152_cur."!mark_push"(0, rx152_pos, $I10)
-.annotate "line", 92
-  # rx subrule "terminator" subtype=zerowidth negate=
-    rx152_cur."!cursor_pos"(rx152_pos)
-    $P10 = rx152_cur."terminator"()
-    unless $P10, rx152_fail
-    goto alt155_end
-  alt155_3:
-.annotate "line", 93
-  # rxanchor eos
-    ne rx152_pos, rx152_eos, rx152_fail
-  alt155_end:
-.annotate "line", 89
-  # rx pass
-    rx152_cur."!cursor_pass"(rx152_pos, "eat_terminator")
-    rx152_cur."!cursor_debug"("PASS  ", "eat_terminator", " at pos=", rx152_pos)
-    .return (rx152_cur)
-  rx152_fail:
-.annotate "line", 4
-    (rx152_rep, rx152_pos, $I10, $P10) = rx152_cur."!mark_fail"(0)
-    lt rx152_pos, -1, rx152_done
-    eq rx152_pos, -1, rx152_fail
-    jump $I10
-  rx152_done:
-    rx152_cur."!cursor_fail"()
-    rx152_cur."!cursor_debug"("FAIL  ", "eat_terminator")
-    .return (rx152_cur)
-    .return ()
+    $P142 = self."!PREFIX__!subrule"("", "")
+    new $P143, "ResizablePMCArray"
+    push $P143, $P142
+    .return ($P143)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__eat_terminator"  :subid("34_1258424429.0004") :method
+.sub "statementlist"  :subid("31_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    new $P154, "ResizablePMCArray"
-    push $P154, ""
-    push $P154, ""
-    push $P154, ""
-    push $P154, ";"
-    .return ($P154)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "xblock"  :subid("35_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx157_tgt
-    .local int rx157_pos
-    .local int rx157_off
-    .local int rx157_eos
-    .local int rx157_rep
-    .local pmc rx157_cur
-    (rx157_cur, rx157_pos, rx157_tgt, $I10) = self."!cursor_start"()
-    rx157_cur."!cursor_debug"("START ", "xblock")
-    .lex unicode:"$\x{a2}", rx157_cur
+    .local string rx146_tgt
+    .local int rx146_pos
+    .local int rx146_off
+    .local int rx146_eos
+    .local int rx146_rep
+    .local pmc rx146_cur
+    (rx146_cur, rx146_pos, rx146_tgt, $I10) = self."!cursor_start"()
+    rx146_cur."!cursor_debug"("START ", "statementlist")
+    rx146_cur."!cursor_caparray"("statement")
+    .lex unicode:"$\x{a2}", rx146_cur
     .local pmc match
     .lex "$/", match
-    length rx157_eos, rx157_tgt
-    set rx157_off, 0
-    lt $I10, 2, rx157_start
-    sub rx157_off, $I10, 1
-    substr rx157_tgt, rx157_tgt, rx157_off
-  rx157_start:
-.annotate "line", 97
-  # rx subrule "EXPR" subtype=capture negate=
-    rx157_cur."!cursor_pos"(rx157_pos)
-    $P10 = rx157_cur."EXPR"()
-    unless $P10, rx157_fail
-    rx157_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("EXPR")
-    rx157_pos = $P10."pos"()
+    length rx146_eos, rx146_tgt
+    set rx146_off, 0
+    lt $I10, 2, rx146_start
+    sub rx146_off, $I10, 1
+    substr rx146_tgt, rx146_tgt, rx146_off
+  rx146_start:
+  alt149_0:
+.annotate "line", 84
+    set_addr $I10, alt149_1
+    rx146_cur."!mark_push"(0, rx146_pos, $I10)
+.annotate "line", 85
   # rx subrule "ws" subtype=method negate=
-    rx157_cur."!cursor_pos"(rx157_pos)
-    $P10 = rx157_cur."ws"()
-    unless $P10, rx157_fail
-    rx157_pos = $P10."pos"()
-  # rx subrule "pblock" subtype=capture negate=
-    rx157_cur."!cursor_pos"(rx157_pos)
-    $P10 = rx157_cur."pblock"()
-    unless $P10, rx157_fail
-    rx157_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("pblock")
-    rx157_pos = $P10."pos"()
-.annotate "line", 96
+    rx146_cur."!cursor_pos"(rx146_pos)
+    $P10 = rx146_cur."ws"()
+    unless $P10, rx146_fail
+    rx146_pos = $P10."pos"()
+  # rxanchor eos
+    ne rx146_pos, rx146_eos, rx146_fail
+  # rx subrule "ws" subtype=method negate=
+    rx146_cur."!cursor_pos"(rx146_pos)
+    $P10 = rx146_cur."ws"()
+    unless $P10, rx146_fail
+    rx146_pos = $P10."pos"()
+    goto alt149_end
+  alt149_1:
+.annotate "line", 86
+  # rx subrule "ws" subtype=method negate=
+    rx146_cur."!cursor_pos"(rx146_pos)
+    $P10 = rx146_cur."ws"()
+    unless $P10, rx146_fail
+    rx146_pos = $P10."pos"()
+  # rx rxquantr153 ** 0..*
+    set_addr $I155, rxquantr153_done
+    rx146_cur."!mark_push"(0, rx146_pos, $I155)
+  rxquantr153_loop:
+  # rx subrule "statement" subtype=capture negate=
+    rx146_cur."!cursor_pos"(rx146_pos)
+    $P10 = rx146_cur."statement"()
+    unless $P10, rx146_fail
+    rx146_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("statement")
+    rx146_pos = $P10."pos"()
+  # rx subrule "eat_terminator" subtype=method negate=
+    rx146_cur."!cursor_pos"(rx146_pos)
+    $P10 = rx146_cur."eat_terminator"()
+    unless $P10, rx146_fail
+    rx146_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx146_cur."!cursor_pos"(rx146_pos)
+    $P10 = rx146_cur."ws"()
+    unless $P10, rx146_fail
+    rx146_pos = $P10."pos"()
+    (rx146_rep) = rx146_cur."!mark_commit"($I155)
+    rx146_cur."!mark_push"(rx146_rep, rx146_pos, $I155)
+    goto rxquantr153_loop
+  rxquantr153_done:
+  # rx subrule "ws" subtype=method negate=
+    rx146_cur."!cursor_pos"(rx146_pos)
+    $P10 = rx146_cur."ws"()
+    unless $P10, rx146_fail
+    rx146_pos = $P10."pos"()
+  alt149_end:
+.annotate "line", 84
   # rx pass
-    rx157_cur."!cursor_pass"(rx157_pos, "xblock")
-    rx157_cur."!cursor_debug"("PASS  ", "xblock", " at pos=", rx157_pos)
-    .return (rx157_cur)
-  rx157_fail:
+    rx146_cur."!cursor_pass"(rx146_pos, "statementlist")
+    rx146_cur."!cursor_debug"("PASS  ", "statementlist", " at pos=", rx146_pos)
+    .return (rx146_cur)
+  rx146_fail:
 .annotate "line", 4
-    (rx157_rep, rx157_pos, $I10, $P10) = rx157_cur."!mark_fail"(0)
-    lt rx157_pos, -1, rx157_done
-    eq rx157_pos, -1, rx157_fail
+    (rx146_rep, rx146_pos, $I10, $P10) = rx146_cur."!mark_fail"(0)
+    lt rx146_pos, -1, rx146_done
+    eq rx146_pos, -1, rx146_fail
     jump $I10
-  rx157_done:
-    rx157_cur."!cursor_fail"()
-    rx157_cur."!cursor_debug"("FAIL  ", "xblock")
-    .return (rx157_cur)
+  rx146_done:
+    rx146_cur."!cursor_fail"()
+    rx146_cur."!cursor_debug"("FAIL  ", "statementlist")
+    .return (rx146_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__xblock"  :subid("36_1258424429.0004") :method
+.sub "!PREFIX__statementlist"  :subid("32_1258533478.31768") :method
 .annotate "line", 4
-    $P159 = self."!PREFIX__!subrule"("EXPR", "")
+    new $P148, "ResizablePMCArray"
+    push $P148, ""
+    push $P148, ""
+    .return ($P148)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "statement"  :subid("33_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .const 'Sub' $P162 = "35_1258533478.31768" 
+    capture_lex $P162
+    .local string rx158_tgt
+    .local int rx158_pos
+    .local int rx158_off
+    .local int rx158_eos
+    .local int rx158_rep
+    .local pmc rx158_cur
+    (rx158_cur, rx158_pos, rx158_tgt, $I10) = self."!cursor_start"()
+    rx158_cur."!cursor_debug"("START ", "statement")
+    rx158_cur."!cursor_caparray"("statement_mod_loop", "statement_mod_cond")
+    .lex unicode:"$\x{a2}", rx158_cur
+    .local pmc match
+    .lex "$/", match
+    length rx158_eos, rx158_tgt
+    set rx158_off, 0
+    lt $I10, 2, rx158_start
+    sub rx158_off, $I10, 1
+    substr rx158_tgt, rx158_tgt, rx158_off
+  rx158_start:
+.annotate "line", 90
+  # rx subrule "before" subtype=zerowidth negate=1
+    rx158_cur."!cursor_pos"(rx158_pos)
+    .const 'Sub' $P162 = "35_1258533478.31768" 
+    capture_lex $P162
+    $P10 = rx158_cur."before"($P162)
+    if $P10, rx158_fail
+  alt166_0:
+.annotate "line", 91
+    set_addr $I10, alt166_1
+    rx158_cur."!mark_push"(0, rx158_pos, $I10)
+.annotate "line", 92
+  # rx subrule "statement_control" subtype=capture negate=
+    rx158_cur."!cursor_pos"(rx158_pos)
+    $P10 = rx158_cur."statement_control"()
+    unless $P10, rx158_fail
+    rx158_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("statement_control")
+    rx158_pos = $P10."pos"()
+    goto alt166_end
+  alt166_1:
+.annotate "line", 93
+  # rx subrule "EXPR" subtype=capture negate=
+    rx158_cur."!cursor_pos"(rx158_pos)
+    $P10 = rx158_cur."EXPR"()
+    unless $P10, rx158_fail
+    rx158_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("EXPR")
+    rx158_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx158_cur."!cursor_pos"(rx158_pos)
+    $P10 = rx158_cur."ws"()
+    unless $P10, rx158_fail
+    rx158_pos = $P10."pos"()
+.annotate "line", 97
+  # rx rxquantr167 ** 0..1
+    set_addr $I171, rxquantr167_done
+    rx158_cur."!mark_push"(0, rx158_pos, $I171)
+  rxquantr167_loop:
+  alt168_0:
+.annotate "line", 94
+    set_addr $I10, alt168_1
+    rx158_cur."!mark_push"(0, rx158_pos, $I10)
+.annotate "line", 95
+  # rx subrule "statement_mod_cond" subtype=capture negate=
+    rx158_cur."!cursor_pos"(rx158_pos)
+    $P10 = rx158_cur."statement_mod_cond"()
+    unless $P10, rx158_fail
+    rx158_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("statement_mod_cond")
+    rx158_pos = $P10."pos"()
+  # rx rxquantr169 ** 0..1
+    set_addr $I170, rxquantr169_done
+    rx158_cur."!mark_push"(0, rx158_pos, $I170)
+  rxquantr169_loop:
+  # rx subrule "statement_mod_loop" subtype=capture negate=
+    rx158_cur."!cursor_pos"(rx158_pos)
+    $P10 = rx158_cur."statement_mod_loop"()
+    unless $P10, rx158_fail
+    rx158_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("statement_mod_loop")
+    rx158_pos = $P10."pos"()
+    (rx158_rep) = rx158_cur."!mark_commit"($I170)
+  rxquantr169_done:
+    goto alt168_end
+  alt168_1:
+.annotate "line", 96
+  # rx subrule "statement_mod_loop" subtype=capture negate=
+    rx158_cur."!cursor_pos"(rx158_pos)
+    $P10 = rx158_cur."statement_mod_loop"()
+    unless $P10, rx158_fail
+    rx158_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("statement_mod_loop")
+    rx158_pos = $P10."pos"()
+  alt168_end:
+.annotate "line", 97
+    (rx158_rep) = rx158_cur."!mark_commit"($I171)
+  rxquantr167_done:
+  alt166_end:
+.annotate "line", 89
+  # rx pass
+    rx158_cur."!cursor_pass"(rx158_pos, "statement")
+    rx158_cur."!cursor_debug"("PASS  ", "statement", " at pos=", rx158_pos)
+    .return (rx158_cur)
+  rx158_fail:
+.annotate "line", 4
+    (rx158_rep, rx158_pos, $I10, $P10) = rx158_cur."!mark_fail"(0)
+    lt rx158_pos, -1, rx158_done
+    eq rx158_pos, -1, rx158_fail
+    jump $I10
+  rx158_done:
+    rx158_cur."!cursor_fail"()
+    rx158_cur."!cursor_debug"("FAIL  ", "statement")
+    .return (rx158_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__statement"  :subid("34_1258533478.31768") :method
+.annotate "line", 4
     new $P160, "ResizablePMCArray"
-    push $P160, $P159
+    push $P160, ""
     .return ($P160)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "pblock"  :subid("37_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx162_tgt
-    .local int rx162_pos
-    .local int rx162_off
-    .local int rx162_eos
-    .local int rx162_rep
-    .local pmc rx162_cur
-    (rx162_cur, rx162_pos, rx162_tgt, $I10) = self."!cursor_start"()
-    rx162_cur."!cursor_debug"("START ", "pblock")
-    .lex unicode:"$\x{a2}", rx162_cur
+.sub "_block161"  :anon :subid("35_1258533478.31768") :method :outer("33_1258533478.31768")
+.annotate "line", 90
+    .local string rx163_tgt
+    .local int rx163_pos
+    .local int rx163_off
+    .local int rx163_eos
+    .local int rx163_rep
+    .local pmc rx163_cur
+    (rx163_cur, rx163_pos, rx163_tgt, $I10) = self."!cursor_start"()
+    rx163_cur."!cursor_debug"("START ", "")
+    .lex unicode:"$\x{a2}", rx163_cur
     .local pmc match
     .lex "$/", match
-    length rx162_eos, rx162_tgt
-    set rx162_off, 0
-    lt $I10, 2, rx162_start
-    sub rx162_off, $I10, 1
-    substr rx162_tgt, rx162_tgt, rx162_off
-  rx162_start:
-  alt167_0:
-.annotate "line", 100
-    set_addr $I10, alt167_1
-    rx162_cur."!mark_push"(0, rx162_pos, $I10)
+    length rx163_eos, rx163_tgt
+    set rx163_off, 0
+    lt $I10, 2, rx163_start
+    sub rx163_off, $I10, 1
+    substr rx163_tgt, rx163_tgt, rx163_off
+  rx163_start:
+    ge rx163_pos, 0, rxscan164_done
+  rxscan164_loop:
+    ($P10) = rx163_cur."from"()
+    inc $P10
+    set rx163_pos, $P10
+    ge rx163_pos, rx163_eos, rxscan164_done
+    set_addr $I10, rxscan164_loop
+    rx163_cur."!mark_push"(0, rx163_pos, $I10)
+  rxscan164_done:
+  alt165_0:
+    set_addr $I10, alt165_1
+    rx163_cur."!mark_push"(0, rx163_pos, $I10)
+  # rx enumcharlist negate=0 
+    ge rx163_pos, rx163_eos, rx163_fail
+    sub $I10, rx163_pos, rx163_off
+    substr $S10, rx163_tgt, $I10, 1
+    index $I11, "])}", $S10
+    lt $I11, 0, rx163_fail
+    inc rx163_pos
+    goto alt165_end
+  alt165_1:
+  # rxanchor eos
+    ne rx163_pos, rx163_eos, rx163_fail
+  alt165_end:
+  # rx pass
+    rx163_cur."!cursor_pass"(rx163_pos, "")
+    rx163_cur."!cursor_debug"("PASS  ", "", " at pos=", rx163_pos)
+    .return (rx163_cur)
+  rx163_fail:
+    (rx163_rep, rx163_pos, $I10, $P10) = rx163_cur."!mark_fail"(0)
+    lt rx163_pos, -1, rx163_done
+    eq rx163_pos, -1, rx163_fail
+    jump $I10
+  rx163_done:
+    rx163_cur."!cursor_fail"()
+    rx163_cur."!cursor_debug"("FAIL  ", "")
+    .return (rx163_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "eat_terminator"  :subid("36_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx173_tgt
+    .local int rx173_pos
+    .local int rx173_off
+    .local int rx173_eos
+    .local int rx173_rep
+    .local pmc rx173_cur
+    (rx173_cur, rx173_pos, rx173_tgt, $I10) = self."!cursor_start"()
+    rx173_cur."!cursor_debug"("START ", "eat_terminator")
+    .lex unicode:"$\x{a2}", rx173_cur
+    .local pmc match
+    .lex "$/", match
+    length rx173_eos, rx173_tgt
+    set rx173_off, 0
+    lt $I10, 2, rx173_start
+    sub rx173_off, $I10, 1
+    substr rx173_tgt, rx173_tgt, rx173_off
+  rx173_start:
+  alt176_0:
 .annotate "line", 101
-  # rx subrule "lambda" subtype=method negate=
-    rx162_cur."!cursor_pos"(rx162_pos)
-    $P10 = rx162_cur."lambda"()
-    unless $P10, rx162_fail
-    rx162_pos = $P10."pos"()
+    set_addr $I10, alt176_1
+    rx173_cur."!mark_push"(0, rx173_pos, $I10)
 .annotate "line", 102
-  # rx subrule "newpad" subtype=method negate=
-    rx162_cur."!cursor_pos"(rx162_pos)
-    $P10 = rx162_cur."newpad"()
-    unless $P10, rx162_fail
-    rx162_pos = $P10."pos"()
+  # rx literal  ";"
+    add $I11, rx173_pos, 1
+    gt $I11, rx173_eos, rx173_fail
+    sub $I11, rx173_pos, rx173_off
+    substr $S10, rx173_tgt, $I11, 1
+    ne $S10, ";", rx173_fail
+    add rx173_pos, 1
+    goto alt176_end
+  alt176_1:
+    set_addr $I10, alt176_2
+    rx173_cur."!mark_push"(0, rx173_pos, $I10)
 .annotate "line", 103
-  # rx subrule "signature" subtype=capture negate=
-    rx162_cur."!cursor_pos"(rx162_pos)
-    $P10 = rx162_cur."signature"()
-    unless $P10, rx162_fail
-    rx162_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("signature")
-    rx162_pos = $P10."pos"()
+  # rx subrule "MARKED" subtype=zerowidth negate=
+    rx173_cur."!cursor_pos"(rx173_pos)
+    $P10 = rx173_cur."MARKED"("endstmt")
+    unless $P10, rx173_fail
+    goto alt176_end
+  alt176_2:
+    set_addr $I10, alt176_3
+    rx173_cur."!mark_push"(0, rx173_pos, $I10)
 .annotate "line", 104
-  # rx subrule "blockoid" subtype=capture negate=
-    rx162_cur."!cursor_pos"(rx162_pos)
-    $P10 = rx162_cur."blockoid"()
-    unless $P10, rx162_fail
-    rx162_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("blockoid")
-    rx162_pos = $P10."pos"()
+  # rx subrule "terminator" subtype=zerowidth negate=
+    rx173_cur."!cursor_pos"(rx173_pos)
+    $P10 = rx173_cur."terminator"()
+    unless $P10, rx173_fail
+    goto alt176_end
+  alt176_3:
+.annotate "line", 105
+  # rxanchor eos
+    ne rx173_pos, rx173_eos, rx173_fail
+  alt176_end:
 .annotate "line", 101
-    goto alt167_end
-  alt167_1:
-    set_addr $I10, alt167_2
-    rx162_cur."!mark_push"(0, rx162_pos, $I10)
-.annotate "line", 105
-  # rx enumcharlist negate=0 zerowidth
-    ge rx162_pos, rx162_eos, rx162_fail
-    sub $I10, rx162_pos, rx162_off
-    substr $S10, rx162_tgt, $I10, 1
-    index $I11, "{", $S10
-    lt $I11, 0, rx162_fail
-.annotate "line", 106
-  # rx subrule "newpad" subtype=method negate=
-    rx162_cur."!cursor_pos"(rx162_pos)
-    $P10 = rx162_cur."newpad"()
-    unless $P10, rx162_fail
-    rx162_pos = $P10."pos"()
-.annotate "line", 107
-  # rx subrule "blockoid" subtype=capture negate=
-    rx162_cur."!cursor_pos"(rx162_pos)
-    $P10 = rx162_cur."blockoid"()
-    unless $P10, rx162_fail
-    rx162_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("blockoid")
-    rx162_pos = $P10."pos"()
-.annotate "line", 105
-    goto alt167_end
-  alt167_2:
+  # rx pass
+    rx173_cur."!cursor_pass"(rx173_pos, "eat_terminator")
+    rx173_cur."!cursor_debug"("PASS  ", "eat_terminator", " at pos=", rx173_pos)
+    .return (rx173_cur)
+  rx173_fail:
+.annotate "line", 4
+    (rx173_rep, rx173_pos, $I10, $P10) = rx173_cur."!mark_fail"(0)
+    lt rx173_pos, -1, rx173_done
+    eq rx173_pos, -1, rx173_fail
+    jump $I10
+  rx173_done:
+    rx173_cur."!cursor_fail"()
+    rx173_cur."!cursor_debug"("FAIL  ", "eat_terminator")
+    .return (rx173_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__eat_terminator"  :subid("37_1258533478.31768") :method
+.annotate "line", 4
+    new $P175, "ResizablePMCArray"
+    push $P175, ""
+    push $P175, ""
+    push $P175, ""
+    push $P175, ";"
+    .return ($P175)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "xblock"  :subid("38_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx178_tgt
+    .local int rx178_pos
+    .local int rx178_off
+    .local int rx178_eos
+    .local int rx178_rep
+    .local pmc rx178_cur
+    (rx178_cur, rx178_pos, rx178_tgt, $I10) = self."!cursor_start"()
+    rx178_cur."!cursor_debug"("START ", "xblock")
+    .lex unicode:"$\x{a2}", rx178_cur
+    .local pmc match
+    .lex "$/", match
+    length rx178_eos, rx178_tgt
+    set rx178_off, 0
+    lt $I10, 2, rx178_start
+    sub rx178_off, $I10, 1
+    substr rx178_tgt, rx178_tgt, rx178_off
+  rx178_start:
+.annotate "line", 109
+  # rx subrule "EXPR" subtype=capture negate=
+    rx178_cur."!cursor_pos"(rx178_pos)
+    $P10 = rx178_cur."EXPR"()
+    unless $P10, rx178_fail
+    rx178_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("EXPR")
+    rx178_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx178_cur."!cursor_pos"(rx178_pos)
+    $P10 = rx178_cur."ws"()
+    unless $P10, rx178_fail
+    rx178_pos = $P10."pos"()
+  # rx subrule "pblock" subtype=capture negate=
+    rx178_cur."!cursor_pos"(rx178_pos)
+    $P10 = rx178_cur."pblock"()
+    unless $P10, rx178_fail
+    rx178_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("pblock")
+    rx178_pos = $P10."pos"()
 .annotate "line", 108
-  # rx subrule "panic" subtype=method negate=
-    rx162_cur."!cursor_pos"(rx162_pos)
-    $P10 = rx162_cur."panic"("Missing block")
-    unless $P10, rx162_fail
-    rx162_pos = $P10."pos"()
-  alt167_end:
-.annotate "line", 100
   # rx pass
-    rx162_cur."!cursor_pass"(rx162_pos, "pblock")
-    rx162_cur."!cursor_debug"("PASS  ", "pblock", " at pos=", rx162_pos)
-    .return (rx162_cur)
-  rx162_fail:
+    rx178_cur."!cursor_pass"(rx178_pos, "xblock")
+    rx178_cur."!cursor_debug"("PASS  ", "xblock", " at pos=", rx178_pos)
+    .return (rx178_cur)
+  rx178_fail:
 .annotate "line", 4
-    (rx162_rep, rx162_pos, $I10, $P10) = rx162_cur."!mark_fail"(0)
-    lt rx162_pos, -1, rx162_done
-    eq rx162_pos, -1, rx162_fail
+    (rx178_rep, rx178_pos, $I10, $P10) = rx178_cur."!mark_fail"(0)
+    lt rx178_pos, -1, rx178_done
+    eq rx178_pos, -1, rx178_fail
     jump $I10
-  rx162_done:
-    rx162_cur."!cursor_fail"()
-    rx162_cur."!cursor_debug"("FAIL  ", "pblock")
-    .return (rx162_cur)
+  rx178_done:
+    rx178_cur."!cursor_fail"()
+    rx178_cur."!cursor_debug"("FAIL  ", "xblock")
+    .return (rx178_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__pblock"  :subid("38_1258424429.0004") :method
+.sub "!PREFIX__xblock"  :subid("39_1258533478.31768") :method
 .annotate "line", 4
-    $P164 = self."!PREFIX__!subrule"("", "")
-    $P165 = self."!PREFIX__!subrule"("", "")
-    new $P166, "ResizablePMCArray"
-    push $P166, $P164
-    push $P166, "{"
-    push $P166, $P165
-    .return ($P166)
+    $P180 = self."!PREFIX__!subrule"("EXPR", "")
+    new $P181, "ResizablePMCArray"
+    push $P181, $P180
+    .return ($P181)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "lambda"  :subid("39_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "pblock"  :subid("40_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx169_tgt
-    .local int rx169_pos
-    .local int rx169_off
-    .local int rx169_eos
-    .local int rx169_rep
-    .local pmc rx169_cur
-    (rx169_cur, rx169_pos, rx169_tgt, $I10) = self."!cursor_start"()
-    rx169_cur."!cursor_debug"("START ", "lambda")
-    .lex unicode:"$\x{a2}", rx169_cur
+    .local string rx183_tgt
+    .local int rx183_pos
+    .local int rx183_off
+    .local int rx183_eos
+    .local int rx183_rep
+    .local pmc rx183_cur
+    (rx183_cur, rx183_pos, rx183_tgt, $I10) = self."!cursor_start"()
+    rx183_cur."!cursor_debug"("START ", "pblock")
+    .lex unicode:"$\x{a2}", rx183_cur
     .local pmc match
     .lex "$/", match
-    length rx169_eos, rx169_tgt
-    set rx169_off, 0
-    lt $I10, 2, rx169_start
-    sub rx169_off, $I10, 1
-    substr rx169_tgt, rx169_tgt, rx169_off
-  rx169_start:
-  alt172_0:
-.annotate "line", 111
-    set_addr $I10, alt172_1
-    rx169_cur."!mark_push"(0, rx169_pos, $I10)
-  # rx literal  "->"
-    add $I11, rx169_pos, 2
-    gt $I11, rx169_eos, rx169_fail
-    sub $I11, rx169_pos, rx169_off
-    substr $S10, rx169_tgt, $I11, 2
-    ne $S10, "->", rx169_fail
-    add rx169_pos, 2
-    goto alt172_end
-  alt172_1:
-  # rx literal  "<->"
-    add $I11, rx169_pos, 3
-    gt $I11, rx169_eos, rx169_fail
-    sub $I11, rx169_pos, rx169_off
-    substr $S10, rx169_tgt, $I11, 3
-    ne $S10, "<->", rx169_fail
-    add rx169_pos, 3
-  alt172_end:
-  # rx pass
-    rx169_cur."!cursor_pass"(rx169_pos, "lambda")
-    rx169_cur."!cursor_debug"("PASS  ", "lambda", " at pos=", rx169_pos)
-    .return (rx169_cur)
-  rx169_fail:
-.annotate "line", 4
-    (rx169_rep, rx169_pos, $I10, $P10) = rx169_cur."!mark_fail"(0)
-    lt rx169_pos, -1, rx169_done
-    eq rx169_pos, -1, rx169_fail
-    jump $I10
-  rx169_done:
-    rx169_cur."!cursor_fail"()
-    rx169_cur."!cursor_debug"("FAIL  ", "lambda")
-    .return (rx169_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__lambda"  :subid("40_1258424429.0004") :method
-.annotate "line", 4
-    new $P171, "ResizablePMCArray"
-    push $P171, "<->"
-    push $P171, "->"
-    .return ($P171)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "block"  :subid("41_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx174_tgt
-    .local int rx174_pos
-    .local int rx174_off
-    .local int rx174_eos
-    .local int rx174_rep
-    .local pmc rx174_cur
-    (rx174_cur, rx174_pos, rx174_tgt, $I10) = self."!cursor_start"()
-    rx174_cur."!cursor_debug"("START ", "block")
-    .lex unicode:"$\x{a2}", rx174_cur
-    .local pmc match
-    .lex "$/", match
-    length rx174_eos, rx174_tgt
-    set rx174_off, 0
-    lt $I10, 2, rx174_start
-    sub rx174_off, $I10, 1
-    substr rx174_tgt, rx174_tgt, rx174_off
-  rx174_start:
-  alt178_0:
+    length rx183_eos, rx183_tgt
+    set rx183_off, 0
+    lt $I10, 2, rx183_start
+    sub rx183_off, $I10, 1
+    substr rx183_tgt, rx183_tgt, rx183_off
+  rx183_start:
+  alt188_0:
+.annotate "line", 112
+    set_addr $I10, alt188_1
+    rx183_cur."!mark_push"(0, rx183_pos, $I10)
+.annotate "line", 113
+  # rx subrule "lambda" subtype=method negate=
+    rx183_cur."!cursor_pos"(rx183_pos)
+    $P10 = rx183_cur."lambda"()
+    unless $P10, rx183_fail
+    rx183_pos = $P10."pos"()
 .annotate "line", 114
-    set_addr $I10, alt178_1
-    rx174_cur."!mark_push"(0, rx174_pos, $I10)
-  # rx enumcharlist negate=0 zerowidth
-    ge rx174_pos, rx174_eos, rx174_fail
-    sub $I10, rx174_pos, rx174_off
-    substr $S10, rx174_tgt, $I10, 1
-    index $I11, "{", $S10
-    lt $I11, 0, rx174_fail
-    goto alt178_end
-  alt178_1:
-  # rx subrule "panic" subtype=method negate=
-    rx174_cur."!cursor_pos"(rx174_pos)
-    $P10 = rx174_cur."panic"("Missing block")
-    unless $P10, rx174_fail
-    rx174_pos = $P10."pos"()
-  alt178_end:
-.annotate "line", 115
   # rx subrule "newpad" subtype=method negate=
-    rx174_cur."!cursor_pos"(rx174_pos)
-    $P10 = rx174_cur."newpad"()
-    unless $P10, rx174_fail
-    rx174_pos = $P10."pos"()
+    rx183_cur."!cursor_pos"(rx183_pos)
+    $P10 = rx183_cur."newpad"()
+    unless $P10, rx183_fail
+    rx183_pos = $P10."pos"()
+.annotate "line", 115
+  # rx subrule "signature" subtype=capture negate=
+    rx183_cur."!cursor_pos"(rx183_pos)
+    $P10 = rx183_cur."signature"()
+    unless $P10, rx183_fail
+    rx183_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("signature")
+    rx183_pos = $P10."pos"()
 .annotate "line", 116
   # rx subrule "blockoid" subtype=capture negate=
-    rx174_cur."!cursor_pos"(rx174_pos)
-    $P10 = rx174_cur."blockoid"()
-    unless $P10, rx174_fail
-    rx174_cur."!mark_push"(0, -1, 0, $P10)
+    rx183_cur."!cursor_pos"(rx183_pos)
+    $P10 = rx183_cur."blockoid"()
+    unless $P10, rx183_fail
+    rx183_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("blockoid")
-    rx174_pos = $P10."pos"()
+    rx183_pos = $P10."pos"()
 .annotate "line", 113
-  # rx pass
-    rx174_cur."!cursor_pass"(rx174_pos, "block")
-    rx174_cur."!cursor_debug"("PASS  ", "block", " at pos=", rx174_pos)
-    .return (rx174_cur)
-  rx174_fail:
-.annotate "line", 4
-    (rx174_rep, rx174_pos, $I10, $P10) = rx174_cur."!mark_fail"(0)
-    lt rx174_pos, -1, rx174_done
-    eq rx174_pos, -1, rx174_fail
-    jump $I10
-  rx174_done:
-    rx174_cur."!cursor_fail"()
-    rx174_cur."!cursor_debug"("FAIL  ", "block")
-    .return (rx174_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__block"  :subid("42_1258424429.0004") :method
-.annotate "line", 4
-    $P176 = self."!PREFIX__!subrule"("", "")
-    new $P177, "ResizablePMCArray"
-    push $P177, $P176
-    push $P177, "{"
-    .return ($P177)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "blockoid"  :subid("43_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx180_tgt
-    .local int rx180_pos
-    .local int rx180_off
-    .local int rx180_eos
-    .local int rx180_rep
-    .local pmc rx180_cur
-    (rx180_cur, rx180_pos, rx180_tgt, $I10) = self."!cursor_start"()
-    rx180_cur."!cursor_debug"("START ", "blockoid")
-    .lex unicode:"$\x{a2}", rx180_cur
-    .local pmc match
-    .lex "$/", match
-    length rx180_eos, rx180_tgt
-    set rx180_off, 0
-    lt $I10, 2, rx180_start
-    sub rx180_off, $I10, 1
-    substr rx180_tgt, rx180_tgt, rx180_off
-  rx180_start:
-.annotate "line", 120
-  # rx subrule "finishpad" subtype=method negate=
-    rx180_cur."!cursor_pos"(rx180_pos)
-    $P10 = rx180_cur."finishpad"()
-    unless $P10, rx180_fail
-    rx180_pos = $P10."pos"()
-.annotate "line", 121
-  # rx literal  "{"
-    add $I11, rx180_pos, 1
-    gt $I11, rx180_eos, rx180_fail
-    sub $I11, rx180_pos, rx180_off
-    substr $S10, rx180_tgt, $I11, 1
-    ne $S10, "{", rx180_fail
-    add rx180_pos, 1
-  # rx subrule "statementlist" subtype=capture negate=
-    rx180_cur."!cursor_pos"(rx180_pos)
-    $P10 = rx180_cur."statementlist"()
-    unless $P10, rx180_fail
-    rx180_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("statementlist")
-    rx180_pos = $P10."pos"()
-  alt184_0:
-    set_addr $I10, alt184_1
-    rx180_cur."!mark_push"(0, rx180_pos, $I10)
-  # rx literal  "}"
-    add $I11, rx180_pos, 1
-    gt $I11, rx180_eos, rx180_fail
-    sub $I11, rx180_pos, rx180_off
-    substr $S10, rx180_tgt, $I11, 1
-    ne $S10, "}", rx180_fail
-    add rx180_pos, 1
-    goto alt184_end
-  alt184_1:
-  # rx subrule "FAILGOAL" subtype=method negate=
-    rx180_cur."!cursor_pos"(rx180_pos)
-    $P10 = rx180_cur."FAILGOAL"("'}'")
-    unless $P10, rx180_fail
-    rx180_pos = $P10."pos"()
-  alt184_end:
-.annotate "line", 122
-  # rx subrule "ENDSTMT" subtype=zerowidth negate=
-    rx180_cur."!cursor_pos"(rx180_pos)
-    $P10 = rx180_cur."ENDSTMT"()
-    unless $P10, rx180_fail
+    goto alt188_end
+  alt188_1:
+    set_addr $I10, alt188_2
+    rx183_cur."!mark_push"(0, rx183_pos, $I10)
+.annotate "line", 117
+  # rx enumcharlist negate=0 zerowidth
+    ge rx183_pos, rx183_eos, rx183_fail
+    sub $I10, rx183_pos, rx183_off
+    substr $S10, rx183_tgt, $I10, 1
+    index $I11, "{", $S10
+    lt $I11, 0, rx183_fail
+.annotate "line", 118
+  # rx subrule "newpad" subtype=method negate=
+    rx183_cur."!cursor_pos"(rx183_pos)
+    $P10 = rx183_cur."newpad"()
+    unless $P10, rx183_fail
+    rx183_pos = $P10."pos"()
 .annotate "line", 119
+  # rx subrule "blockoid" subtype=capture negate=
+    rx183_cur."!cursor_pos"(rx183_pos)
+    $P10 = rx183_cur."blockoid"()
+    unless $P10, rx183_fail
+    rx183_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("blockoid")
+    rx183_pos = $P10."pos"()
+.annotate "line", 117
+    goto alt188_end
+  alt188_2:
+.annotate "line", 120
+  # rx subrule "panic" subtype=method negate=
+    rx183_cur."!cursor_pos"(rx183_pos)
+    $P10 = rx183_cur."panic"("Missing block")
+    unless $P10, rx183_fail
+    rx183_pos = $P10."pos"()
+  alt188_end:
+.annotate "line", 112
   # rx pass
-    rx180_cur."!cursor_pass"(rx180_pos, "blockoid")
-    rx180_cur."!cursor_debug"("PASS  ", "blockoid", " at pos=", rx180_pos)
-    .return (rx180_cur)
-  rx180_fail:
+    rx183_cur."!cursor_pass"(rx183_pos, "pblock")
+    rx183_cur."!cursor_debug"("PASS  ", "pblock", " at pos=", rx183_pos)
+    .return (rx183_cur)
+  rx183_fail:
 .annotate "line", 4
-    (rx180_rep, rx180_pos, $I10, $P10) = rx180_cur."!mark_fail"(0)
-    lt rx180_pos, -1, rx180_done
-    eq rx180_pos, -1, rx180_fail
+    (rx183_rep, rx183_pos, $I10, $P10) = rx183_cur."!mark_fail"(0)
+    lt rx183_pos, -1, rx183_done
+    eq rx183_pos, -1, rx183_fail
     jump $I10
-  rx180_done:
-    rx180_cur."!cursor_fail"()
-    rx180_cur."!cursor_debug"("FAIL  ", "blockoid")
-    .return (rx180_cur)
+  rx183_done:
+    rx183_cur."!cursor_fail"()
+    rx183_cur."!cursor_debug"("FAIL  ", "pblock")
+    .return (rx183_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__blockoid"  :subid("44_1258424429.0004") :method
+.sub "!PREFIX__pblock"  :subid("41_1258533478.31768") :method
 .annotate "line", 4
-    $P182 = self."!PREFIX__!subrule"("", "")
-    new $P183, "ResizablePMCArray"
-    push $P183, $P182
-    .return ($P183)
+    $P185 = self."!PREFIX__!subrule"("", "")
+    $P186 = self."!PREFIX__!subrule"("", "")
+    new $P187, "ResizablePMCArray"
+    push $P187, $P185
+    push $P187, "{"
+    push $P187, $P186
+    .return ($P187)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "newpad"  :subid("45_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "lambda"  :subid("42_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx187_tgt
-    .local int rx187_pos
-    .local int rx187_off
-    .local int rx187_eos
-    .local int rx187_rep
-    .local pmc rx187_cur
-    (rx187_cur, rx187_pos, rx187_tgt, $I10) = self."!cursor_start"()
-    rx187_cur."!cursor_debug"("START ", "newpad")
-    .lex unicode:"$\x{a2}", rx187_cur
+    .local string rx190_tgt
+    .local int rx190_pos
+    .local int rx190_off
+    .local int rx190_eos
+    .local int rx190_rep
+    .local pmc rx190_cur
+    (rx190_cur, rx190_pos, rx190_tgt, $I10) = self."!cursor_start"()
+    rx190_cur."!cursor_debug"("START ", "lambda")
+    .lex unicode:"$\x{a2}", rx190_cur
     .local pmc match
     .lex "$/", match
-    length rx187_eos, rx187_tgt
-    set rx187_off, 0
-    lt $I10, 2, rx187_start
-    sub rx187_off, $I10, 1
-    substr rx187_tgt, rx187_tgt, rx187_off
-  rx187_start:
+    length rx190_eos, rx190_tgt
+    set rx190_off, 0
+    lt $I10, 2, rx190_start
+    sub rx190_off, $I10, 1
+    substr rx190_tgt, rx190_tgt, rx190_off
+  rx190_start:
+  alt193_0:
+.annotate "line", 123
+    set_addr $I10, alt193_1
+    rx190_cur."!mark_push"(0, rx190_pos, $I10)
+  # rx literal  "->"
+    add $I11, rx190_pos, 2
+    gt $I11, rx190_eos, rx190_fail
+    sub $I11, rx190_pos, rx190_off
+    substr $S10, rx190_tgt, $I11, 2
+    ne $S10, "->", rx190_fail
+    add rx190_pos, 2
+    goto alt193_end
+  alt193_1:
+  # rx literal  "<->"
+    add $I11, rx190_pos, 3
+    gt $I11, rx190_eos, rx190_fail
+    sub $I11, rx190_pos, rx190_off
+    substr $S10, rx190_tgt, $I11, 3
+    ne $S10, "<->", rx190_fail
+    add rx190_pos, 3
+  alt193_end:
+  # rx pass
+    rx190_cur."!cursor_pass"(rx190_pos, "lambda")
+    rx190_cur."!cursor_debug"("PASS  ", "lambda", " at pos=", rx190_pos)
+    .return (rx190_cur)
+  rx190_fail:
+.annotate "line", 4
+    (rx190_rep, rx190_pos, $I10, $P10) = rx190_cur."!mark_fail"(0)
+    lt rx190_pos, -1, rx190_done
+    eq rx190_pos, -1, rx190_fail
+    jump $I10
+  rx190_done:
+    rx190_cur."!cursor_fail"()
+    rx190_cur."!cursor_debug"("FAIL  ", "lambda")
+    .return (rx190_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__lambda"  :subid("43_1258533478.31768") :method
+.annotate "line", 4
+    new $P192, "ResizablePMCArray"
+    push $P192, "<->"
+    push $P192, "->"
+    .return ($P192)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "block"  :subid("44_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx195_tgt
+    .local int rx195_pos
+    .local int rx195_off
+    .local int rx195_eos
+    .local int rx195_rep
+    .local pmc rx195_cur
+    (rx195_cur, rx195_pos, rx195_tgt, $I10) = self."!cursor_start"()
+    rx195_cur."!cursor_debug"("START ", "block")
+    .lex unicode:"$\x{a2}", rx195_cur
+    .local pmc match
+    .lex "$/", match
+    length rx195_eos, rx195_tgt
+    set rx195_off, 0
+    lt $I10, 2, rx195_start
+    sub rx195_off, $I10, 1
+    substr rx195_tgt, rx195_tgt, rx195_off
+  rx195_start:
+  alt199_0:
+.annotate "line", 126
+    set_addr $I10, alt199_1
+    rx195_cur."!mark_push"(0, rx195_pos, $I10)
+  # rx enumcharlist negate=0 zerowidth
+    ge rx195_pos, rx195_eos, rx195_fail
+    sub $I10, rx195_pos, rx195_off
+    substr $S10, rx195_tgt, $I10, 1
+    index $I11, "{", $S10
+    lt $I11, 0, rx195_fail
+    goto alt199_end
+  alt199_1:
+  # rx subrule "panic" subtype=method negate=
+    rx195_cur."!cursor_pos"(rx195_pos)
+    $P10 = rx195_cur."panic"("Missing block")
+    unless $P10, rx195_fail
+    rx195_pos = $P10."pos"()
+  alt199_end:
+.annotate "line", 127
+  # rx subrule "newpad" subtype=method negate=
+    rx195_cur."!cursor_pos"(rx195_pos)
+    $P10 = rx195_cur."newpad"()
+    unless $P10, rx195_fail
+    rx195_pos = $P10."pos"()
+.annotate "line", 128
+  # rx subrule "blockoid" subtype=capture negate=
+    rx195_cur."!cursor_pos"(rx195_pos)
+    $P10 = rx195_cur."blockoid"()
+    unless $P10, rx195_fail
+    rx195_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("blockoid")
+    rx195_pos = $P10."pos"()
 .annotate "line", 125
   # rx pass
-    rx187_cur."!cursor_pass"(rx187_pos, "newpad")
-    rx187_cur."!cursor_debug"("PASS  ", "newpad", " at pos=", rx187_pos)
-    .return (rx187_cur)
-  rx187_fail:
+    rx195_cur."!cursor_pass"(rx195_pos, "block")
+    rx195_cur."!cursor_debug"("PASS  ", "block", " at pos=", rx195_pos)
+    .return (rx195_cur)
+  rx195_fail:
 .annotate "line", 4
-    (rx187_rep, rx187_pos, $I10, $P10) = rx187_cur."!mark_fail"(0)
-    lt rx187_pos, -1, rx187_done
-    eq rx187_pos, -1, rx187_fail
+    (rx195_rep, rx195_pos, $I10, $P10) = rx195_cur."!mark_fail"(0)
+    lt rx195_pos, -1, rx195_done
+    eq rx195_pos, -1, rx195_fail
     jump $I10
-  rx187_done:
-    rx187_cur."!cursor_fail"()
-    rx187_cur."!cursor_debug"("FAIL  ", "newpad")
-    .return (rx187_cur)
+  rx195_done:
+    rx195_cur."!cursor_fail"()
+    rx195_cur."!cursor_debug"("FAIL  ", "block")
+    .return (rx195_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__newpad"  :subid("46_1258424429.0004") :method
+.sub "!PREFIX__block"  :subid("45_1258533478.31768") :method
 .annotate "line", 4
-    new $P189, "ResizablePMCArray"
-    push $P189, ""
-    .return ($P189)
+    $P197 = self."!PREFIX__!subrule"("", "")
+    new $P198, "ResizablePMCArray"
+    push $P198, $P197
+    push $P198, "{"
+    .return ($P198)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "finishpad"  :subid("47_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "blockoid"  :subid("46_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx191_tgt
-    .local int rx191_pos
-    .local int rx191_off
-    .local int rx191_eos
-    .local int rx191_rep
-    .local pmc rx191_cur
-    (rx191_cur, rx191_pos, rx191_tgt, $I10) = self."!cursor_start"()
-    rx191_cur."!cursor_debug"("START ", "finishpad")
-    .lex unicode:"$\x{a2}", rx191_cur
+    .local string rx201_tgt
+    .local int rx201_pos
+    .local int rx201_off
+    .local int rx201_eos
+    .local int rx201_rep
+    .local pmc rx201_cur
+    (rx201_cur, rx201_pos, rx201_tgt, $I10) = self."!cursor_start"()
+    rx201_cur."!cursor_debug"("START ", "blockoid")
+    .lex unicode:"$\x{a2}", rx201_cur
     .local pmc match
     .lex "$/", match
-    length rx191_eos, rx191_tgt
-    set rx191_off, 0
-    lt $I10, 2, rx191_start
-    sub rx191_off, $I10, 1
-    substr rx191_tgt, rx191_tgt, rx191_off
-  rx191_start:
-.annotate "line", 126
-  # rx pass
-    rx191_cur."!cursor_pass"(rx191_pos, "finishpad")
-    rx191_cur."!cursor_debug"("PASS  ", "finishpad", " at pos=", rx191_pos)
-    .return (rx191_cur)
-  rx191_fail:
-.annotate "line", 4
-    (rx191_rep, rx191_pos, $I10, $P10) = rx191_cur."!mark_fail"(0)
-    lt rx191_pos, -1, rx191_done
-    eq rx191_pos, -1, rx191_fail
-    jump $I10
-  rx191_done:
-    rx191_cur."!cursor_fail"()
-    rx191_cur."!cursor_debug"("FAIL  ", "finishpad")
-    .return (rx191_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__finishpad"  :subid("48_1258424429.0004") :method
-.annotate "line", 4
-    new $P193, "ResizablePMCArray"
-    push $P193, ""
-    .return ($P193)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "terminator"  :subid("49_1258424429.0004") :method
-.annotate "line", 128
-    $P195 = self."!protoregex"("terminator")
-    .return ($P195)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__terminator"  :subid("50_1258424429.0004") :method
-.annotate "line", 128
-    $P197 = self."!PREFIX__!protoregex"("terminator")
-    .return ($P197)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "terminator:sym<;>"  :subid("51_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx199_tgt
-    .local int rx199_pos
-    .local int rx199_off
-    .local int rx199_eos
-    .local int rx199_rep
-    .local pmc rx199_cur
-    (rx199_cur, rx199_pos, rx199_tgt, $I10) = self."!cursor_start"()
-    rx199_cur."!cursor_debug"("START ", "terminator:sym<;>")
-    .lex unicode:"$\x{a2}", rx199_cur
-    .local pmc match
-    .lex "$/", match
-    length rx199_eos, rx199_tgt
-    set rx199_off, 0
-    lt $I10, 2, rx199_start
-    sub rx199_off, $I10, 1
-    substr rx199_tgt, rx199_tgt, rx199_off
-  rx199_start:
-.annotate "line", 130
-  # rx enumcharlist negate=0 zerowidth
-    ge rx199_pos, rx199_eos, rx199_fail
-    sub $I10, rx199_pos, rx199_off
-    substr $S10, rx199_tgt, $I10, 1
-    index $I11, ";", $S10
-    lt $I11, 0, rx199_fail
-  # rx pass
-    rx199_cur."!cursor_pass"(rx199_pos, "terminator:sym<;>")
-    rx199_cur."!cursor_debug"("PASS  ", "terminator:sym<;>", " at pos=", rx199_pos)
-    .return (rx199_cur)
-  rx199_fail:
-.annotate "line", 4
-    (rx199_rep, rx199_pos, $I10, $P10) = rx199_cur."!mark_fail"(0)
-    lt rx199_pos, -1, rx199_done
-    eq rx199_pos, -1, rx199_fail
-    jump $I10
-  rx199_done:
-    rx199_cur."!cursor_fail"()
-    rx199_cur."!cursor_debug"("FAIL  ", "terminator:sym<;>")
-    .return (rx199_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__terminator:sym<;>"  :subid("52_1258424429.0004") :method
-.annotate "line", 4
-    new $P201, "ResizablePMCArray"
-    push $P201, ";"
-    .return ($P201)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "terminator:sym<}>"  :subid("53_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx203_tgt
-    .local int rx203_pos
-    .local int rx203_off
-    .local int rx203_eos
-    .local int rx203_rep
-    .local pmc rx203_cur
-    (rx203_cur, rx203_pos, rx203_tgt, $I10) = self."!cursor_start"()
-    rx203_cur."!cursor_debug"("START ", "terminator:sym<}>")
-    .lex unicode:"$\x{a2}", rx203_cur
-    .local pmc match
-    .lex "$/", match
-    length rx203_eos, rx203_tgt
-    set rx203_off, 0
-    lt $I10, 2, rx203_start
-    sub rx203_off, $I10, 1
-    substr rx203_tgt, rx203_tgt, rx203_off
-  rx203_start:
+    length rx201_eos, rx201_tgt
+    set rx201_off, 0
+    lt $I10, 2, rx201_start
+    sub rx201_off, $I10, 1
+    substr rx201_tgt, rx201_tgt, rx201_off
+  rx201_start:
+.annotate "line", 132
+  # rx subrule "finishpad" subtype=method negate=
+    rx201_cur."!cursor_pos"(rx201_pos)
+    $P10 = rx201_cur."finishpad"()
+    unless $P10, rx201_fail
+    rx201_pos = $P10."pos"()
+.annotate "line", 133
+  # rx literal  "{"
+    add $I11, rx201_pos, 1
+    gt $I11, rx201_eos, rx201_fail
+    sub $I11, rx201_pos, rx201_off
+    substr $S10, rx201_tgt, $I11, 1
+    ne $S10, "{", rx201_fail
+    add rx201_pos, 1
+  # rx subrule "statementlist" subtype=capture negate=
+    rx201_cur."!cursor_pos"(rx201_pos)
+    $P10 = rx201_cur."statementlist"()
+    unless $P10, rx201_fail
+    rx201_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("statementlist")
+    rx201_pos = $P10."pos"()
+  alt205_0:
+    set_addr $I10, alt205_1
+    rx201_cur."!mark_push"(0, rx201_pos, $I10)
+  # rx literal  "}"
+    add $I11, rx201_pos, 1
+    gt $I11, rx201_eos, rx201_fail
+    sub $I11, rx201_pos, rx201_off
+    substr $S10, rx201_tgt, $I11, 1
+    ne $S10, "}", rx201_fail
+    add rx201_pos, 1
+    goto alt205_end
+  alt205_1:
+  # rx subrule "FAILGOAL" subtype=method negate=
+    rx201_cur."!cursor_pos"(rx201_pos)
+    $P10 = rx201_cur."FAILGOAL"("'}'")
+    unless $P10, rx201_fail
+    rx201_pos = $P10."pos"()
+  alt205_end:
+.annotate "line", 134
+  # rx subrule "ENDSTMT" subtype=zerowidth negate=
+    rx201_cur."!cursor_pos"(rx201_pos)
+    $P10 = rx201_cur."ENDSTMT"()
+    unless $P10, rx201_fail
 .annotate "line", 131
-  # rx enumcharlist negate=0 zerowidth
-    ge rx203_pos, rx203_eos, rx203_fail
-    sub $I10, rx203_pos, rx203_off
-    substr $S10, rx203_tgt, $I10, 1
-    index $I11, "}", $S10
-    lt $I11, 0, rx203_fail
   # rx pass
-    rx203_cur."!cursor_pass"(rx203_pos, "terminator:sym<}>")
-    rx203_cur."!cursor_debug"("PASS  ", "terminator:sym<}>", " at pos=", rx203_pos)
-    .return (rx203_cur)
-  rx203_fail:
+    rx201_cur."!cursor_pass"(rx201_pos, "blockoid")
+    rx201_cur."!cursor_debug"("PASS  ", "blockoid", " at pos=", rx201_pos)
+    .return (rx201_cur)
+  rx201_fail:
 .annotate "line", 4
-    (rx203_rep, rx203_pos, $I10, $P10) = rx203_cur."!mark_fail"(0)
-    lt rx203_pos, -1, rx203_done
-    eq rx203_pos, -1, rx203_fail
+    (rx201_rep, rx201_pos, $I10, $P10) = rx201_cur."!mark_fail"(0)
+    lt rx201_pos, -1, rx201_done
+    eq rx201_pos, -1, rx201_fail
     jump $I10
-  rx203_done:
-    rx203_cur."!cursor_fail"()
-    rx203_cur."!cursor_debug"("FAIL  ", "terminator:sym<}>")
-    .return (rx203_cur)
+  rx201_done:
+    rx201_cur."!cursor_fail"()
+    rx201_cur."!cursor_debug"("FAIL  ", "blockoid")
+    .return (rx201_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__terminator:sym<}>"  :subid("54_1258424429.0004") :method
+.sub "!PREFIX__blockoid"  :subid("47_1258533478.31768") :method
 .annotate "line", 4
-    new $P205, "ResizablePMCArray"
-    push $P205, "}"
-    .return ($P205)
+    $P203 = self."!PREFIX__!subrule"("", "")
+    new $P204, "ResizablePMCArray"
+    push $P204, $P203
+    .return ($P204)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "statement_control"  :subid("55_1258424429.0004") :method
-.annotate "line", 135
-    $P207 = self."!protoregex"("statement_control")
-    .return ($P207)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_control"  :subid("56_1258424429.0004") :method
-.annotate "line", 135
-    $P209 = self."!PREFIX__!protoregex"("statement_control")
-    .return ($P209)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "statement_control:sym<if>"  :subid("57_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "newpad"  :subid("48_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx211_tgt
-    .local int rx211_pos
-    .local int rx211_off
-    .local int rx211_eos
-    .local int rx211_rep
-    .local pmc rx211_cur
-    (rx211_cur, rx211_pos, rx211_tgt, $I10) = self."!cursor_start"()
-    rx211_cur."!cursor_debug"("START ", "statement_control:sym<if>")
-    rx211_cur."!cursor_caparray"("else", "xblock")
-    .lex unicode:"$\x{a2}", rx211_cur
+    .local string rx208_tgt
+    .local int rx208_pos
+    .local int rx208_off
+    .local int rx208_eos
+    .local int rx208_rep
+    .local pmc rx208_cur
+    (rx208_cur, rx208_pos, rx208_tgt, $I10) = self."!cursor_start"()
+    rx208_cur."!cursor_debug"("START ", "newpad")
+    .lex unicode:"$\x{a2}", rx208_cur
     .local pmc match
     .lex "$/", match
-    length rx211_eos, rx211_tgt
-    set rx211_off, 0
-    lt $I10, 2, rx211_start
-    sub rx211_off, $I10, 1
-    substr rx211_tgt, rx211_tgt, rx211_off
-  rx211_start:
-.annotate "line", 138
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_214_fail
-    rx211_cur."!mark_push"(0, rx211_pos, $I10)
-  # rx literal  "if"
-    add $I11, rx211_pos, 2
-    gt $I11, rx211_eos, rx211_fail
-    sub $I11, rx211_pos, rx211_off
-    substr $S10, rx211_tgt, $I11, 2
-    ne $S10, "if", rx211_fail
-    add rx211_pos, 2
-    set_addr $I10, rxcap_214_fail
-    ($I12, $I11) = rx211_cur."!mark_peek"($I10)
-    rx211_cur."!cursor_pos"($I11)
-    ($P10) = rx211_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx211_pos, "")
-    rx211_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_214_done
-  rxcap_214_fail:
-    goto rx211_fail
-  rxcap_214_done:
-  # rx subrule "ws" subtype=method negate=
-    rx211_cur."!cursor_pos"(rx211_pos)
-    $P10 = rx211_cur."ws"()
-    unless $P10, rx211_fail
-    rx211_pos = $P10."pos"()
-.annotate "line", 139
-  # rx subrule "xblock" subtype=capture negate=
-    rx211_cur."!cursor_pos"(rx211_pos)
-    $P10 = rx211_cur."xblock"()
-    unless $P10, rx211_fail
-    rx211_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("xblock")
-    rx211_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx211_cur."!cursor_pos"(rx211_pos)
-    $P10 = rx211_cur."ws"()
-    unless $P10, rx211_fail
-    rx211_pos = $P10."pos"()
-.annotate "line", 140
-  # rx rxquantr217 ** 0..*
-    set_addr $I221, rxquantr217_done
-    rx211_cur."!mark_push"(0, rx211_pos, $I221)
-  rxquantr217_loop:
-  # rx subrule "ws" subtype=method negate=
-    rx211_cur."!cursor_pos"(rx211_pos)
-    $P10 = rx211_cur."ws"()
-    unless $P10, rx211_fail
-    rx211_pos = $P10."pos"()
-  # rx literal  "elsif"
-    add $I11, rx211_pos, 5
-    gt $I11, rx211_eos, rx211_fail
-    sub $I11, rx211_pos, rx211_off
-    substr $S10, rx211_tgt, $I11, 5
-    ne $S10, "elsif", rx211_fail
-    add rx211_pos, 5
-  # rx charclass s
-    ge rx211_pos, rx211_eos, rx211_fail
-    sub $I10, rx211_pos, rx211_off
-    is_cclass $I11, 32, rx211_tgt, $I10
-    unless $I11, rx211_fail
-    inc rx211_pos
-  # rx subrule "ws" subtype=method negate=
-    rx211_cur."!cursor_pos"(rx211_pos)
-    $P10 = rx211_cur."ws"()
-    unless $P10, rx211_fail
-    rx211_pos = $P10."pos"()
-  # rx subrule "xblock" subtype=capture negate=
-    rx211_cur."!cursor_pos"(rx211_pos)
-    $P10 = rx211_cur."xblock"()
-    unless $P10, rx211_fail
-    rx211_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("xblock")
-    rx211_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx211_cur."!cursor_pos"(rx211_pos)
-    $P10 = rx211_cur."ws"()
-    unless $P10, rx211_fail
-    rx211_pos = $P10."pos"()
-    (rx211_rep) = rx211_cur."!mark_commit"($I221)
-    rx211_cur."!mark_push"(rx211_rep, rx211_pos, $I221)
-    goto rxquantr217_loop
-  rxquantr217_done:
-  # rx subrule "ws" subtype=method negate=
-    rx211_cur."!cursor_pos"(rx211_pos)
-    $P10 = rx211_cur."ws"()
-    unless $P10, rx211_fail
-    rx211_pos = $P10."pos"()
-.annotate "line", 141
-  # rx rxquantr223 ** 0..1
-    set_addr $I227, rxquantr223_done
-    rx211_cur."!mark_push"(0, rx211_pos, $I227)
-  rxquantr223_loop:
-  # rx subrule "ws" subtype=method negate=
-    rx211_cur."!cursor_pos"(rx211_pos)
-    $P10 = rx211_cur."ws"()
-    unless $P10, rx211_fail
-    rx211_pos = $P10."pos"()
-  # rx literal  "else"
-    add $I11, rx211_pos, 4
-    gt $I11, rx211_eos, rx211_fail
-    sub $I11, rx211_pos, rx211_off
-    substr $S10, rx211_tgt, $I11, 4
-    ne $S10, "else", rx211_fail
-    add rx211_pos, 4
-  # rx charclass s
-    ge rx211_pos, rx211_eos, rx211_fail
-    sub $I10, rx211_pos, rx211_off
-    is_cclass $I11, 32, rx211_tgt, $I10
-    unless $I11, rx211_fail
-    inc rx211_pos
-  # rx subrule "ws" subtype=method negate=
-    rx211_cur."!cursor_pos"(rx211_pos)
-    $P10 = rx211_cur."ws"()
-    unless $P10, rx211_fail
-    rx211_pos = $P10."pos"()
-  # rx subrule "pblock" subtype=capture negate=
-    rx211_cur."!cursor_pos"(rx211_pos)
-    $P10 = rx211_cur."pblock"()
-    unless $P10, rx211_fail
-    rx211_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("else")
-    rx211_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx211_cur."!cursor_pos"(rx211_pos)
-    $P10 = rx211_cur."ws"()
-    unless $P10, rx211_fail
-    rx211_pos = $P10."pos"()
-    (rx211_rep) = rx211_cur."!mark_commit"($I227)
-  rxquantr223_done:
-  # rx subrule "ws" subtype=method negate=
-    rx211_cur."!cursor_pos"(rx211_pos)
-    $P10 = rx211_cur."ws"()
-    unless $P10, rx211_fail
-    rx211_pos = $P10."pos"()
+    length rx208_eos, rx208_tgt
+    set rx208_off, 0
+    lt $I10, 2, rx208_start
+    sub rx208_off, $I10, 1
+    substr rx208_tgt, rx208_tgt, rx208_off
+  rx208_start:
 .annotate "line", 137
   # rx pass
-    rx211_cur."!cursor_pass"(rx211_pos, "statement_control:sym<if>")
-    rx211_cur."!cursor_debug"("PASS  ", "statement_control:sym<if>", " at pos=", rx211_pos)
-    .return (rx211_cur)
-  rx211_fail:
+    rx208_cur."!cursor_pass"(rx208_pos, "newpad")
+    rx208_cur."!cursor_debug"("PASS  ", "newpad", " at pos=", rx208_pos)
+    .return (rx208_cur)
+  rx208_fail:
 .annotate "line", 4
-    (rx211_rep, rx211_pos, $I10, $P10) = rx211_cur."!mark_fail"(0)
-    lt rx211_pos, -1, rx211_done
-    eq rx211_pos, -1, rx211_fail
+    (rx208_rep, rx208_pos, $I10, $P10) = rx208_cur."!mark_fail"(0)
+    lt rx208_pos, -1, rx208_done
+    eq rx208_pos, -1, rx208_fail
     jump $I10
-  rx211_done:
-    rx211_cur."!cursor_fail"()
-    rx211_cur."!cursor_debug"("FAIL  ", "statement_control:sym<if>")
-    .return (rx211_cur)
+  rx208_done:
+    rx208_cur."!cursor_fail"()
+    rx208_cur."!cursor_debug"("FAIL  ", "newpad")
+    .return (rx208_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_control:sym<if>"  :subid("58_1258424429.0004") :method
+.sub "!PREFIX__newpad"  :subid("49_1258533478.31768") :method
 .annotate "line", 4
-    new $P213, "ResizablePMCArray"
-    push $P213, "if"
-    .return ($P213)
+    new $P210, "ResizablePMCArray"
+    push $P210, ""
+    .return ($P210)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "statement_control:sym<unless>"  :subid("59_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "finishpad"  :subid("50_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .const 'Sub' $P239 = "61_1258424429.0004" 
-    capture_lex $P239
-    .local string rx230_tgt
-    .local int rx230_pos
-    .local int rx230_off
-    .local int rx230_eos
-    .local int rx230_rep
-    .local pmc rx230_cur
-    (rx230_cur, rx230_pos, rx230_tgt, $I10) = self."!cursor_start"()
-    rx230_cur."!cursor_debug"("START ", "statement_control:sym<unless>")
-    .lex unicode:"$\x{a2}", rx230_cur
+    .local string rx212_tgt
+    .local int rx212_pos
+    .local int rx212_off
+    .local int rx212_eos
+    .local int rx212_rep
+    .local pmc rx212_cur
+    (rx212_cur, rx212_pos, rx212_tgt, $I10) = self."!cursor_start"()
+    rx212_cur."!cursor_debug"("START ", "finishpad")
+    .lex unicode:"$\x{a2}", rx212_cur
     .local pmc match
     .lex "$/", match
-    length rx230_eos, rx230_tgt
-    set rx230_off, 0
-    lt $I10, 2, rx230_start
-    sub rx230_off, $I10, 1
-    substr rx230_tgt, rx230_tgt, rx230_off
-  rx230_start:
-.annotate "line", 145
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_233_fail
-    rx230_cur."!mark_push"(0, rx230_pos, $I10)
-  # rx literal  "unless"
-    add $I11, rx230_pos, 6
-    gt $I11, rx230_eos, rx230_fail
-    sub $I11, rx230_pos, rx230_off
-    substr $S10, rx230_tgt, $I11, 6
-    ne $S10, "unless", rx230_fail
-    add rx230_pos, 6
-    set_addr $I10, rxcap_233_fail
-    ($I12, $I11) = rx230_cur."!mark_peek"($I10)
-    rx230_cur."!cursor_pos"($I11)
-    ($P10) = rx230_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx230_pos, "")
-    rx230_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_233_done
-  rxcap_233_fail:
-    goto rx230_fail
-  rxcap_233_done:
-  # rx subrule "ws" subtype=method negate=
-    rx230_cur."!cursor_pos"(rx230_pos)
-    $P10 = rx230_cur."ws"()
-    unless $P10, rx230_fail
-    rx230_pos = $P10."pos"()
-.annotate "line", 146
-  # rx subrule "xblock" subtype=capture negate=
-    rx230_cur."!cursor_pos"(rx230_pos)
-    $P10 = rx230_cur."xblock"()
-    unless $P10, rx230_fail
-    rx230_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("xblock")
-    rx230_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx230_cur."!cursor_pos"(rx230_pos)
-    $P10 = rx230_cur."ws"()
-    unless $P10, rx230_fail
-    rx230_pos = $P10."pos"()
-  alt236_0:
-.annotate "line", 147
-    set_addr $I10, alt236_1
-    rx230_cur."!mark_push"(0, rx230_pos, $I10)
-  # rx subrule "ws" subtype=method negate=
-    rx230_cur."!cursor_pos"(rx230_pos)
-    $P10 = rx230_cur."ws"()
-    unless $P10, rx230_fail
-    rx230_pos = $P10."pos"()
-  # rx subrule "before" subtype=zerowidth negate=1
-    rx230_cur."!cursor_pos"(rx230_pos)
-    .const 'Sub' $P239 = "61_1258424429.0004" 
-    capture_lex $P239
-    $P10 = rx230_cur."before"($P239)
-    if $P10, rx230_fail
-  # rx subrule "ws" subtype=method negate=
-    rx230_cur."!cursor_pos"(rx230_pos)
-    $P10 = rx230_cur."ws"()
-    unless $P10, rx230_fail
-    rx230_pos = $P10."pos"()
-    goto alt236_end
-  alt236_1:
-  # rx subrule "ws" subtype=method negate=
-    rx230_cur."!cursor_pos"(rx230_pos)
-    $P10 = rx230_cur."ws"()
-    unless $P10, rx230_fail
-    rx230_pos = $P10."pos"()
-  # rx subrule "panic" subtype=method negate=
-    rx230_cur."!cursor_pos"(rx230_pos)
-    $P10 = rx230_cur."panic"("unless does not take \"else\", please rewrite using \"if\"")
-    unless $P10, rx230_fail
-    rx230_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx230_cur."!cursor_pos"(rx230_pos)
-    $P10 = rx230_cur."ws"()
-    unless $P10, rx230_fail
-    rx230_pos = $P10."pos"()
-  alt236_end:
-  # rx subrule "ws" subtype=method negate=
-    rx230_cur."!cursor_pos"(rx230_pos)
-    $P10 = rx230_cur."ws"()
-    unless $P10, rx230_fail
-    rx230_pos = $P10."pos"()
-.annotate "line", 144
+    length rx212_eos, rx212_tgt
+    set rx212_off, 0
+    lt $I10, 2, rx212_start
+    sub rx212_off, $I10, 1
+    substr rx212_tgt, rx212_tgt, rx212_off
+  rx212_start:
+.annotate "line", 138
   # rx pass
-    rx230_cur."!cursor_pass"(rx230_pos, "statement_control:sym<unless>")
-    rx230_cur."!cursor_debug"("PASS  ", "statement_control:sym<unless>", " at pos=", rx230_pos)
-    .return (rx230_cur)
-  rx230_fail:
+    rx212_cur."!cursor_pass"(rx212_pos, "finishpad")
+    rx212_cur."!cursor_debug"("PASS  ", "finishpad", " at pos=", rx212_pos)
+    .return (rx212_cur)
+  rx212_fail:
 .annotate "line", 4
-    (rx230_rep, rx230_pos, $I10, $P10) = rx230_cur."!mark_fail"(0)
-    lt rx230_pos, -1, rx230_done
-    eq rx230_pos, -1, rx230_fail
+    (rx212_rep, rx212_pos, $I10, $P10) = rx212_cur."!mark_fail"(0)
+    lt rx212_pos, -1, rx212_done
+    eq rx212_pos, -1, rx212_fail
     jump $I10
-  rx230_done:
-    rx230_cur."!cursor_fail"()
-    rx230_cur."!cursor_debug"("FAIL  ", "statement_control:sym<unless>")
-    .return (rx230_cur)
+  rx212_done:
+    rx212_cur."!cursor_fail"()
+    rx212_cur."!cursor_debug"("FAIL  ", "finishpad")
+    .return (rx212_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_control:sym<unless>"  :subid("60_1258424429.0004") :method
+.sub "!PREFIX__finishpad"  :subid("51_1258533478.31768") :method
 .annotate "line", 4
-    new $P232, "ResizablePMCArray"
-    push $P232, "unless"
-    .return ($P232)
+    new $P214, "ResizablePMCArray"
+    push $P214, ""
+    .return ($P214)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "_block238"  :anon :subid("61_1258424429.0004") :method :outer("59_1258424429.0004")
-.annotate "line", 147
-    .local string rx240_tgt
-    .local int rx240_pos
-    .local int rx240_off
-    .local int rx240_eos
-    .local int rx240_rep
-    .local pmc rx240_cur
-    (rx240_cur, rx240_pos, rx240_tgt, $I10) = self."!cursor_start"()
-    rx240_cur."!cursor_debug"("START ", "")
-    .lex unicode:"$\x{a2}", rx240_cur
+.sub "terminator"  :subid("52_1258533478.31768") :method
+.annotate "line", 140
+    $P216 = self."!protoregex"("terminator")
+    .return ($P216)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__terminator"  :subid("53_1258533478.31768") :method
+.annotate "line", 140
+    $P218 = self."!PREFIX__!protoregex"("terminator")
+    .return ($P218)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "terminator:sym<;>"  :subid("54_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx220_tgt
+    .local int rx220_pos
+    .local int rx220_off
+    .local int rx220_eos
+    .local int rx220_rep
+    .local pmc rx220_cur
+    (rx220_cur, rx220_pos, rx220_tgt, $I10) = self."!cursor_start"()
+    rx220_cur."!cursor_debug"("START ", "terminator:sym<;>")
+    .lex unicode:"$\x{a2}", rx220_cur
     .local pmc match
     .lex "$/", match
-    length rx240_eos, rx240_tgt
-    set rx240_off, 0
-    lt $I10, 2, rx240_start
-    sub rx240_off, $I10, 1
-    substr rx240_tgt, rx240_tgt, rx240_off
-  rx240_start:
-    ge rx240_pos, 0, rxscan241_done
-  rxscan241_loop:
-    ($P10) = rx240_cur."from"()
-    inc $P10
-    set rx240_pos, $P10
-    ge rx240_pos, rx240_eos, rxscan241_done
-    set_addr $I10, rxscan241_loop
-    rx240_cur."!mark_push"(0, rx240_pos, $I10)
-  rxscan241_done:
-  # rx literal  "else"
-    add $I11, rx240_pos, 4
-    gt $I11, rx240_eos, rx240_fail
-    sub $I11, rx240_pos, rx240_off
-    substr $S10, rx240_tgt, $I11, 4
-    ne $S10, "else", rx240_fail
-    add rx240_pos, 4
-  # rx pass
-    rx240_cur."!cursor_pass"(rx240_pos, "")
-    rx240_cur."!cursor_debug"("PASS  ", "", " at pos=", rx240_pos)
-    .return (rx240_cur)
-  rx240_fail:
-    (rx240_rep, rx240_pos, $I10, $P10) = rx240_cur."!mark_fail"(0)
-    lt rx240_pos, -1, rx240_done
-    eq rx240_pos, -1, rx240_fail
-    jump $I10
-  rx240_done:
-    rx240_cur."!cursor_fail"()
-    rx240_cur."!cursor_debug"("FAIL  ", "")
-    .return (rx240_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "statement_control:sym<while>"  :subid("62_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx247_tgt
-    .local int rx247_pos
-    .local int rx247_off
-    .local int rx247_eos
-    .local int rx247_rep
-    .local pmc rx247_cur
-    (rx247_cur, rx247_pos, rx247_tgt, $I10) = self."!cursor_start"()
-    rx247_cur."!cursor_debug"("START ", "statement_control:sym<while>")
-    .lex unicode:"$\x{a2}", rx247_cur
-    .local pmc match
-    .lex "$/", match
-    length rx247_eos, rx247_tgt
-    set rx247_off, 0
-    lt $I10, 2, rx247_start
-    sub rx247_off, $I10, 1
-    substr rx247_tgt, rx247_tgt, rx247_off
-  rx247_start:
-.annotate "line", 151
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_251_fail
-    rx247_cur."!mark_push"(0, rx247_pos, $I10)
-  alt250_0:
-    set_addr $I10, alt250_1
-    rx247_cur."!mark_push"(0, rx247_pos, $I10)
-  # rx literal  "while"
-    add $I11, rx247_pos, 5
-    gt $I11, rx247_eos, rx247_fail
-    sub $I11, rx247_pos, rx247_off
-    substr $S10, rx247_tgt, $I11, 5
-    ne $S10, "while", rx247_fail
-    add rx247_pos, 5
-    goto alt250_end
-  alt250_1:
-  # rx literal  "until"
-    add $I11, rx247_pos, 5
-    gt $I11, rx247_eos, rx247_fail
-    sub $I11, rx247_pos, rx247_off
-    substr $S10, rx247_tgt, $I11, 5
-    ne $S10, "until", rx247_fail
-    add rx247_pos, 5
-  alt250_end:
-    set_addr $I10, rxcap_251_fail
-    ($I12, $I11) = rx247_cur."!mark_peek"($I10)
-    rx247_cur."!cursor_pos"($I11)
-    ($P10) = rx247_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx247_pos, "")
-    rx247_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_251_done
-  rxcap_251_fail:
-    goto rx247_fail
-  rxcap_251_done:
-  # rx subrule "ws" subtype=method negate=
-    rx247_cur."!cursor_pos"(rx247_pos)
-    $P10 = rx247_cur."ws"()
-    unless $P10, rx247_fail
-    rx247_pos = $P10."pos"()
-.annotate "line", 152
-  # rx subrule "xblock" subtype=capture negate=
-    rx247_cur."!cursor_pos"(rx247_pos)
-    $P10 = rx247_cur."xblock"()
-    unless $P10, rx247_fail
-    rx247_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("xblock")
-    rx247_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx247_cur."!cursor_pos"(rx247_pos)
-    $P10 = rx247_cur."ws"()
-    unless $P10, rx247_fail
-    rx247_pos = $P10."pos"()
-.annotate "line", 150
-  # rx pass
-    rx247_cur."!cursor_pass"(rx247_pos, "statement_control:sym<while>")
-    rx247_cur."!cursor_debug"("PASS  ", "statement_control:sym<while>", " at pos=", rx247_pos)
-    .return (rx247_cur)
-  rx247_fail:
-.annotate "line", 4
-    (rx247_rep, rx247_pos, $I10, $P10) = rx247_cur."!mark_fail"(0)
-    lt rx247_pos, -1, rx247_done
-    eq rx247_pos, -1, rx247_fail
-    jump $I10
-  rx247_done:
-    rx247_cur."!cursor_fail"()
-    rx247_cur."!cursor_debug"("FAIL  ", "statement_control:sym<while>")
-    .return (rx247_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_control:sym<while>"  :subid("63_1258424429.0004") :method
-.annotate "line", 4
-    new $P249, "ResizablePMCArray"
-    push $P249, "until"
-    push $P249, "while"
-    .return ($P249)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "statement_control:sym<repeat>"  :subid("64_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx255_tgt
-    .local int rx255_pos
-    .local int rx255_off
-    .local int rx255_eos
-    .local int rx255_rep
-    .local pmc rx255_cur
-    (rx255_cur, rx255_pos, rx255_tgt, $I10) = self."!cursor_start"()
-    rx255_cur."!cursor_debug"("START ", "statement_control:sym<repeat>")
-    .lex unicode:"$\x{a2}", rx255_cur
-    .local pmc match
-    .lex "$/", match
-    length rx255_eos, rx255_tgt
-    set rx255_off, 0
-    lt $I10, 2, rx255_start
-    sub rx255_off, $I10, 1
-    substr rx255_tgt, rx255_tgt, rx255_off
-  rx255_start:
-.annotate "line", 156
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_258_fail
-    rx255_cur."!mark_push"(0, rx255_pos, $I10)
-  # rx literal  "repeat"
-    add $I11, rx255_pos, 6
-    gt $I11, rx255_eos, rx255_fail
-    sub $I11, rx255_pos, rx255_off
-    substr $S10, rx255_tgt, $I11, 6
-    ne $S10, "repeat", rx255_fail
-    add rx255_pos, 6
-    set_addr $I10, rxcap_258_fail
-    ($I12, $I11) = rx255_cur."!mark_peek"($I10)
-    rx255_cur."!cursor_pos"($I11)
-    ($P10) = rx255_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx255_pos, "")
-    rx255_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_258_done
-  rxcap_258_fail:
-    goto rx255_fail
-  rxcap_258_done:
-  # rx subrule "ws" subtype=method negate=
-    rx255_cur."!cursor_pos"(rx255_pos)
-    $P10 = rx255_cur."ws"()
-    unless $P10, rx255_fail
-    rx255_pos = $P10."pos"()
-  alt260_0:
-.annotate "line", 157
-    set_addr $I10, alt260_1
-    rx255_cur."!mark_push"(0, rx255_pos, $I10)
-.annotate "line", 158
-  # rx subrule "ws" subtype=method negate=
-    rx255_cur."!cursor_pos"(rx255_pos)
-    $P10 = rx255_cur."ws"()
-    unless $P10, rx255_fail
-    rx255_pos = $P10."pos"()
-  # rx subcapture "wu"
-    set_addr $I10, rxcap_263_fail
-    rx255_cur."!mark_push"(0, rx255_pos, $I10)
-  alt262_0:
-    set_addr $I10, alt262_1
-    rx255_cur."!mark_push"(0, rx255_pos, $I10)
-  # rx literal  "while"
-    add $I11, rx255_pos, 5
-    gt $I11, rx255_eos, rx255_fail
-    sub $I11, rx255_pos, rx255_off
-    substr $S10, rx255_tgt, $I11, 5
-    ne $S10, "while", rx255_fail
-    add rx255_pos, 5
-    goto alt262_end
-  alt262_1:
-  # rx literal  "until"
-    add $I11, rx255_pos, 5
-    gt $I11, rx255_eos, rx255_fail
-    sub $I11, rx255_pos, rx255_off
-    substr $S10, rx255_tgt, $I11, 5
-    ne $S10, "until", rx255_fail
-    add rx255_pos, 5
-  alt262_end:
-    set_addr $I10, rxcap_263_fail
-    ($I12, $I11) = rx255_cur."!mark_peek"($I10)
-    rx255_cur."!cursor_pos"($I11)
-    ($P10) = rx255_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx255_pos, "")
-    rx255_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("wu")
-    goto rxcap_263_done
-  rxcap_263_fail:
-    goto rx255_fail
-  rxcap_263_done:
-  # rx charclass s
-    ge rx255_pos, rx255_eos, rx255_fail
-    sub $I10, rx255_pos, rx255_off
-    is_cclass $I11, 32, rx255_tgt, $I10
-    unless $I11, rx255_fail
-    inc rx255_pos
-  # rx subrule "ws" subtype=method negate=
-    rx255_cur."!cursor_pos"(rx255_pos)
-    $P10 = rx255_cur."ws"()
-    unless $P10, rx255_fail
-    rx255_pos = $P10."pos"()
-  # rx subrule "xblock" subtype=capture negate=
-    rx255_cur."!cursor_pos"(rx255_pos)
-    $P10 = rx255_cur."xblock"()
-    unless $P10, rx255_fail
-    rx255_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("xblock")
-    rx255_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx255_cur."!cursor_pos"(rx255_pos)
-    $P10 = rx255_cur."ws"()
-    unless $P10, rx255_fail
-    rx255_pos = $P10."pos"()
-    goto alt260_end
-  alt260_1:
-.annotate "line", 159
-  # rx subrule "ws" subtype=method negate=
-    rx255_cur."!cursor_pos"(rx255_pos)
-    $P10 = rx255_cur."ws"()
-    unless $P10, rx255_fail
-    rx255_pos = $P10."pos"()
-  # rx subrule "pblock" subtype=capture negate=
-    rx255_cur."!cursor_pos"(rx255_pos)
-    $P10 = rx255_cur."pblock"()
-    unless $P10, rx255_fail
-    rx255_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("pblock")
-    rx255_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx255_cur."!cursor_pos"(rx255_pos)
-    $P10 = rx255_cur."ws"()
-    unless $P10, rx255_fail
-    rx255_pos = $P10."pos"()
-  # rx subcapture "wu"
-    set_addr $I10, rxcap_269_fail
-    rx255_cur."!mark_push"(0, rx255_pos, $I10)
-  alt268_0:
-    set_addr $I10, alt268_1
-    rx255_cur."!mark_push"(0, rx255_pos, $I10)
-  # rx literal  "while"
-    add $I11, rx255_pos, 5
-    gt $I11, rx255_eos, rx255_fail
-    sub $I11, rx255_pos, rx255_off
-    substr $S10, rx255_tgt, $I11, 5
-    ne $S10, "while", rx255_fail
-    add rx255_pos, 5
-    goto alt268_end
-  alt268_1:
-  # rx literal  "until"
-    add $I11, rx255_pos, 5
-    gt $I11, rx255_eos, rx255_fail
-    sub $I11, rx255_pos, rx255_off
-    substr $S10, rx255_tgt, $I11, 5
-    ne $S10, "until", rx255_fail
-    add rx255_pos, 5
-  alt268_end:
-    set_addr $I10, rxcap_269_fail
-    ($I12, $I11) = rx255_cur."!mark_peek"($I10)
-    rx255_cur."!cursor_pos"($I11)
-    ($P10) = rx255_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx255_pos, "")
-    rx255_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("wu")
-    goto rxcap_269_done
-  rxcap_269_fail:
-    goto rx255_fail
-  rxcap_269_done:
-  # rx charclass s
-    ge rx255_pos, rx255_eos, rx255_fail
-    sub $I10, rx255_pos, rx255_off
-    is_cclass $I11, 32, rx255_tgt, $I10
-    unless $I11, rx255_fail
-    inc rx255_pos
-  # rx subrule "ws" subtype=method negate=
-    rx255_cur."!cursor_pos"(rx255_pos)
-    $P10 = rx255_cur."ws"()
-    unless $P10, rx255_fail
-    rx255_pos = $P10."pos"()
-  # rx subrule "EXPR" subtype=capture negate=
-    rx255_cur."!cursor_pos"(rx255_pos)
-    $P10 = rx255_cur."EXPR"()
-    unless $P10, rx255_fail
-    rx255_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("EXPR")
-    rx255_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx255_cur."!cursor_pos"(rx255_pos)
-    $P10 = rx255_cur."ws"()
-    unless $P10, rx255_fail
-    rx255_pos = $P10."pos"()
-  alt260_end:
-.annotate "line", 160
-  # rx subrule "ws" subtype=method negate=
-    rx255_cur."!cursor_pos"(rx255_pos)
-    $P10 = rx255_cur."ws"()
-    unless $P10, rx255_fail
-    rx255_pos = $P10."pos"()
-.annotate "line", 155
-  # rx pass
-    rx255_cur."!cursor_pass"(rx255_pos, "statement_control:sym<repeat>")
-    rx255_cur."!cursor_debug"("PASS  ", "statement_control:sym<repeat>", " at pos=", rx255_pos)
-    .return (rx255_cur)
-  rx255_fail:
-.annotate "line", 4
-    (rx255_rep, rx255_pos, $I10, $P10) = rx255_cur."!mark_fail"(0)
-    lt rx255_pos, -1, rx255_done
-    eq rx255_pos, -1, rx255_fail
-    jump $I10
-  rx255_done:
-    rx255_cur."!cursor_fail"()
-    rx255_cur."!cursor_debug"("FAIL  ", "statement_control:sym<repeat>")
-    .return (rx255_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_control:sym<repeat>"  :subid("65_1258424429.0004") :method
-.annotate "line", 4
-    new $P257, "ResizablePMCArray"
-    push $P257, "repeat"
-    .return ($P257)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "statement_control:sym<for>"  :subid("66_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx274_tgt
-    .local int rx274_pos
-    .local int rx274_off
-    .local int rx274_eos
-    .local int rx274_rep
-    .local pmc rx274_cur
-    (rx274_cur, rx274_pos, rx274_tgt, $I10) = self."!cursor_start"()
-    rx274_cur."!cursor_debug"("START ", "statement_control:sym<for>")
-    .lex unicode:"$\x{a2}", rx274_cur
-    .local pmc match
-    .lex "$/", match
-    length rx274_eos, rx274_tgt
-    set rx274_off, 0
-    lt $I10, 2, rx274_start
-    sub rx274_off, $I10, 1
-    substr rx274_tgt, rx274_tgt, rx274_off
-  rx274_start:
-.annotate "line", 164
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_277_fail
-    rx274_cur."!mark_push"(0, rx274_pos, $I10)
-  # rx literal  "for"
-    add $I11, rx274_pos, 3
-    gt $I11, rx274_eos, rx274_fail
-    sub $I11, rx274_pos, rx274_off
-    substr $S10, rx274_tgt, $I11, 3
-    ne $S10, "for", rx274_fail
-    add rx274_pos, 3
-    set_addr $I10, rxcap_277_fail
-    ($I12, $I11) = rx274_cur."!mark_peek"($I10)
-    rx274_cur."!cursor_pos"($I11)
-    ($P10) = rx274_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx274_pos, "")
-    rx274_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_277_done
-  rxcap_277_fail:
-    goto rx274_fail
-  rxcap_277_done:
-  # rx subrule "ws" subtype=method negate=
-    rx274_cur."!cursor_pos"(rx274_pos)
-    $P10 = rx274_cur."ws"()
-    unless $P10, rx274_fail
-    rx274_pos = $P10."pos"()
-.annotate "line", 165
-  # rx subrule "xblock" subtype=capture negate=
-    rx274_cur."!cursor_pos"(rx274_pos)
-    $P10 = rx274_cur."xblock"()
-    unless $P10, rx274_fail
-    rx274_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("xblock")
-    rx274_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx274_cur."!cursor_pos"(rx274_pos)
-    $P10 = rx274_cur."ws"()
-    unless $P10, rx274_fail
-    rx274_pos = $P10."pos"()
-.annotate "line", 163
-  # rx pass
-    rx274_cur."!cursor_pass"(rx274_pos, "statement_control:sym<for>")
-    rx274_cur."!cursor_debug"("PASS  ", "statement_control:sym<for>", " at pos=", rx274_pos)
-    .return (rx274_cur)
-  rx274_fail:
-.annotate "line", 4
-    (rx274_rep, rx274_pos, $I10, $P10) = rx274_cur."!mark_fail"(0)
-    lt rx274_pos, -1, rx274_done
-    eq rx274_pos, -1, rx274_fail
-    jump $I10
-  rx274_done:
-    rx274_cur."!cursor_fail"()
-    rx274_cur."!cursor_debug"("FAIL  ", "statement_control:sym<for>")
-    .return (rx274_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_control:sym<for>"  :subid("67_1258424429.0004") :method
-.annotate "line", 4
-    new $P276, "ResizablePMCArray"
-    push $P276, "for"
-    .return ($P276)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "statement_prefix"  :subid("68_1258424429.0004") :method
-.annotate "line", 168
-    $P281 = self."!protoregex"("statement_prefix")
-    .return ($P281)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_prefix"  :subid("69_1258424429.0004") :method
-.annotate "line", 168
-    $P283 = self."!PREFIX__!protoregex"("statement_prefix")
-    .return ($P283)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "statement_prefix:sym<INIT>"  :subid("70_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx285_tgt
-    .local int rx285_pos
-    .local int rx285_off
-    .local int rx285_eos
-    .local int rx285_rep
-    .local pmc rx285_cur
-    (rx285_cur, rx285_pos, rx285_tgt, $I10) = self."!cursor_start"()
-    rx285_cur."!cursor_debug"("START ", "statement_prefix:sym<INIT>")
-    .lex unicode:"$\x{a2}", rx285_cur
-    .local pmc match
-    .lex "$/", match
-    length rx285_eos, rx285_tgt
-    set rx285_off, 0
-    lt $I10, 2, rx285_start
-    sub rx285_off, $I10, 1
-    substr rx285_tgt, rx285_tgt, rx285_off
-  rx285_start:
-.annotate "line", 169
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_289_fail
-    rx285_cur."!mark_push"(0, rx285_pos, $I10)
-  # rx literal  "INIT"
-    add $I11, rx285_pos, 4
-    gt $I11, rx285_eos, rx285_fail
-    sub $I11, rx285_pos, rx285_off
-    substr $S10, rx285_tgt, $I11, 4
-    ne $S10, "INIT", rx285_fail
-    add rx285_pos, 4
-    set_addr $I10, rxcap_289_fail
-    ($I12, $I11) = rx285_cur."!mark_peek"($I10)
-    rx285_cur."!cursor_pos"($I11)
-    ($P10) = rx285_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx285_pos, "")
-    rx285_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_289_done
-  rxcap_289_fail:
-    goto rx285_fail
-  rxcap_289_done:
-  # rx subrule "blorst" subtype=capture negate=
-    rx285_cur."!cursor_pos"(rx285_pos)
-    $P10 = rx285_cur."blorst"()
-    unless $P10, rx285_fail
-    rx285_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("blorst")
-    rx285_pos = $P10."pos"()
-  # rx pass
-    rx285_cur."!cursor_pass"(rx285_pos, "statement_prefix:sym<INIT>")
-    rx285_cur."!cursor_debug"("PASS  ", "statement_prefix:sym<INIT>", " at pos=", rx285_pos)
-    .return (rx285_cur)
-  rx285_fail:
-.annotate "line", 4
-    (rx285_rep, rx285_pos, $I10, $P10) = rx285_cur."!mark_fail"(0)
-    lt rx285_pos, -1, rx285_done
-    eq rx285_pos, -1, rx285_fail
-    jump $I10
-  rx285_done:
-    rx285_cur."!cursor_fail"()
-    rx285_cur."!cursor_debug"("FAIL  ", "statement_prefix:sym<INIT>")
-    .return (rx285_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_prefix:sym<INIT>"  :subid("71_1258424429.0004") :method
-.annotate "line", 4
-    $P287 = self."!PREFIX__!subrule"("blorst", "INIT")
-    new $P288, "ResizablePMCArray"
-    push $P288, $P287
-    .return ($P288)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "blorst"  :subid("72_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx291_tgt
-    .local int rx291_pos
-    .local int rx291_off
-    .local int rx291_eos
-    .local int rx291_rep
-    .local pmc rx291_cur
-    (rx291_cur, rx291_pos, rx291_tgt, $I10) = self."!cursor_start"()
-    rx291_cur."!cursor_debug"("START ", "blorst")
-    .lex unicode:"$\x{a2}", rx291_cur
-    .local pmc match
-    .lex "$/", match
-    length rx291_eos, rx291_tgt
-    set rx291_off, 0
-    lt $I10, 2, rx291_start
-    sub rx291_off, $I10, 1
-    substr rx291_tgt, rx291_tgt, rx291_off
-  rx291_start:
-.annotate "line", 172
-  # rx charclass s
-    ge rx291_pos, rx291_eos, rx291_fail
-    sub $I10, rx291_pos, rx291_off
-    is_cclass $I11, 32, rx291_tgt, $I10
-    unless $I11, rx291_fail
-    inc rx291_pos
-  # rx subrule "ws" subtype=method negate=
-    rx291_cur."!cursor_pos"(rx291_pos)
-    $P10 = rx291_cur."ws"()
-    unless $P10, rx291_fail
-    rx291_pos = $P10."pos"()
-  alt294_0:
-    set_addr $I10, alt294_1
-    rx291_cur."!mark_push"(0, rx291_pos, $I10)
+    length rx220_eos, rx220_tgt
+    set rx220_off, 0
+    lt $I10, 2, rx220_start
+    sub rx220_off, $I10, 1
+    substr rx220_tgt, rx220_tgt, rx220_off
+  rx220_start:
+.annotate "line", 142
   # rx enumcharlist negate=0 zerowidth
-    ge rx291_pos, rx291_eos, rx291_fail
-    sub $I10, rx291_pos, rx291_off
-    substr $S10, rx291_tgt, $I10, 1
-    index $I11, "{", $S10
-    lt $I11, 0, rx291_fail
-  # rx subrule "block" subtype=capture negate=
-    rx291_cur."!cursor_pos"(rx291_pos)
-    $P10 = rx291_cur."block"()
-    unless $P10, rx291_fail
-    rx291_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("block")
-    rx291_pos = $P10."pos"()
-    goto alt294_end
-  alt294_1:
-  # rx subrule "statement" subtype=capture negate=
-    rx291_cur."!cursor_pos"(rx291_pos)
-    $P10 = rx291_cur."statement"()
-    unless $P10, rx291_fail
-    rx291_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("statement")
-    rx291_pos = $P10."pos"()
-  alt294_end:
-.annotate "line", 171
+    ge rx220_pos, rx220_eos, rx220_fail
+    sub $I10, rx220_pos, rx220_off
+    substr $S10, rx220_tgt, $I10, 1
+    index $I11, ";", $S10
+    lt $I11, 0, rx220_fail
   # rx pass
-    rx291_cur."!cursor_pass"(rx291_pos, "blorst")
-    rx291_cur."!cursor_debug"("PASS  ", "blorst", " at pos=", rx291_pos)
-    .return (rx291_cur)
-  rx291_fail:
+    rx220_cur."!cursor_pass"(rx220_pos, "terminator:sym<;>")
+    rx220_cur."!cursor_debug"("PASS  ", "terminator:sym<;>", " at pos=", rx220_pos)
+    .return (rx220_cur)
+  rx220_fail:
 .annotate "line", 4
-    (rx291_rep, rx291_pos, $I10, $P10) = rx291_cur."!mark_fail"(0)
-    lt rx291_pos, -1, rx291_done
-    eq rx291_pos, -1, rx291_fail
+    (rx220_rep, rx220_pos, $I10, $P10) = rx220_cur."!mark_fail"(0)
+    lt rx220_pos, -1, rx220_done
+    eq rx220_pos, -1, rx220_fail
     jump $I10
-  rx291_done:
-    rx291_cur."!cursor_fail"()
-    rx291_cur."!cursor_debug"("FAIL  ", "blorst")
-    .return (rx291_cur)
+  rx220_done:
+    rx220_cur."!cursor_fail"()
+    rx220_cur."!cursor_debug"("FAIL  ", "terminator:sym<;>")
+    .return (rx220_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__blorst"  :subid("73_1258424429.0004") :method
+.sub "!PREFIX__terminator:sym<;>"  :subid("55_1258533478.31768") :method
 .annotate "line", 4
-    new $P293, "ResizablePMCArray"
-    push $P293, ""
-    .return ($P293)
+    new $P222, "ResizablePMCArray"
+    push $P222, ";"
+    .return ($P222)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "statement_mod_cond"  :subid("74_1258424429.0004") :method
-.annotate "line", 177
-    $P296 = self."!protoregex"("statement_mod_cond")
-    .return ($P296)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_mod_cond"  :subid("75_1258424429.0004") :method
-.annotate "line", 177
-    $P298 = self."!PREFIX__!protoregex"("statement_mod_cond")
-    .return ($P298)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "statement_mod_cond:sym<if>"  :subid("76_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "terminator:sym<}>"  :subid("56_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx300_tgt
-    .local int rx300_pos
-    .local int rx300_off
-    .local int rx300_eos
-    .local int rx300_rep
-    .local pmc rx300_cur
-    (rx300_cur, rx300_pos, rx300_tgt, $I10) = self."!cursor_start"()
-    rx300_cur."!cursor_debug"("START ", "statement_mod_cond:sym<if>")
-    .lex unicode:"$\x{a2}", rx300_cur
+    .local string rx224_tgt
+    .local int rx224_pos
+    .local int rx224_off
+    .local int rx224_eos
+    .local int rx224_rep
+    .local pmc rx224_cur
+    (rx224_cur, rx224_pos, rx224_tgt, $I10) = self."!cursor_start"()
+    rx224_cur."!cursor_debug"("START ", "terminator:sym<}>")
+    .lex unicode:"$\x{a2}", rx224_cur
     .local pmc match
     .lex "$/", match
-    length rx300_eos, rx300_tgt
-    set rx300_off, 0
-    lt $I10, 2, rx300_start
-    sub rx300_off, $I10, 1
-    substr rx300_tgt, rx300_tgt, rx300_off
-  rx300_start:
-.annotate "line", 179
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_303_fail
-    rx300_cur."!mark_push"(0, rx300_pos, $I10)
-  # rx literal  "if"
-    add $I11, rx300_pos, 2
-    gt $I11, rx300_eos, rx300_fail
-    sub $I11, rx300_pos, rx300_off
-    substr $S10, rx300_tgt, $I11, 2
-    ne $S10, "if", rx300_fail
-    add rx300_pos, 2
-    set_addr $I10, rxcap_303_fail
-    ($I12, $I11) = rx300_cur."!mark_peek"($I10)
-    rx300_cur."!cursor_pos"($I11)
-    ($P10) = rx300_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx300_pos, "")
-    rx300_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_303_done
-  rxcap_303_fail:
-    goto rx300_fail
-  rxcap_303_done:
-  # rx subrule "ws" subtype=method negate=
-    rx300_cur."!cursor_pos"(rx300_pos)
-    $P10 = rx300_cur."ws"()
-    unless $P10, rx300_fail
-    rx300_pos = $P10."pos"()
-  # rx subrule "EXPR" subtype=capture negate=
-    rx300_cur."!cursor_pos"(rx300_pos)
-    $P10 = rx300_cur."EXPR"()
-    unless $P10, rx300_fail
-    rx300_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("cond")
-    rx300_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx300_cur."!cursor_pos"(rx300_pos)
-    $P10 = rx300_cur."ws"()
-    unless $P10, rx300_fail
-    rx300_pos = $P10."pos"()
+    length rx224_eos, rx224_tgt
+    set rx224_off, 0
+    lt $I10, 2, rx224_start
+    sub rx224_off, $I10, 1
+    substr rx224_tgt, rx224_tgt, rx224_off
+  rx224_start:
+.annotate "line", 143
+  # rx enumcharlist negate=0 zerowidth
+    ge rx224_pos, rx224_eos, rx224_fail
+    sub $I10, rx224_pos, rx224_off
+    substr $S10, rx224_tgt, $I10, 1
+    index $I11, "}", $S10
+    lt $I11, 0, rx224_fail
   # rx pass
-    rx300_cur."!cursor_pass"(rx300_pos, "statement_mod_cond:sym<if>")
-    rx300_cur."!cursor_debug"("PASS  ", "statement_mod_cond:sym<if>", " at pos=", rx300_pos)
-    .return (rx300_cur)
-  rx300_fail:
+    rx224_cur."!cursor_pass"(rx224_pos, "terminator:sym<}>")
+    rx224_cur."!cursor_debug"("PASS  ", "terminator:sym<}>", " at pos=", rx224_pos)
+    .return (rx224_cur)
+  rx224_fail:
 .annotate "line", 4
-    (rx300_rep, rx300_pos, $I10, $P10) = rx300_cur."!mark_fail"(0)
-    lt rx300_pos, -1, rx300_done
-    eq rx300_pos, -1, rx300_fail
+    (rx224_rep, rx224_pos, $I10, $P10) = rx224_cur."!mark_fail"(0)
+    lt rx224_pos, -1, rx224_done
+    eq rx224_pos, -1, rx224_fail
     jump $I10
-  rx300_done:
-    rx300_cur."!cursor_fail"()
-    rx300_cur."!cursor_debug"("FAIL  ", "statement_mod_cond:sym<if>")
-    .return (rx300_cur)
+  rx224_done:
+    rx224_cur."!cursor_fail"()
+    rx224_cur."!cursor_debug"("FAIL  ", "terminator:sym<}>")
+    .return (rx224_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_mod_cond:sym<if>"  :subid("77_1258424429.0004") :method
+.sub "!PREFIX__terminator:sym<}>"  :subid("57_1258533478.31768") :method
 .annotate "line", 4
-    new $P302, "ResizablePMCArray"
-    push $P302, "if"
+    new $P226, "ResizablePMCArray"
+    push $P226, "}"
+    .return ($P226)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "statement_control"  :subid("58_1258533478.31768") :method
+.annotate "line", 147
+    $P228 = self."!protoregex"("statement_control")
+    .return ($P228)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__statement_control"  :subid("59_1258533478.31768") :method
+.annotate "line", 147
+    $P230 = self."!PREFIX__!protoregex"("statement_control")
+    .return ($P230)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "statement_control:sym<if>"  :subid("60_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx232_tgt
+    .local int rx232_pos
+    .local int rx232_off
+    .local int rx232_eos
+    .local int rx232_rep
+    .local pmc rx232_cur
+    (rx232_cur, rx232_pos, rx232_tgt, $I10) = self."!cursor_start"()
+    rx232_cur."!cursor_debug"("START ", "statement_control:sym<if>")
+    rx232_cur."!cursor_caparray"("else", "xblock")
+    .lex unicode:"$\x{a2}", rx232_cur
+    .local pmc match
+    .lex "$/", match
+    length rx232_eos, rx232_tgt
+    set rx232_off, 0
+    lt $I10, 2, rx232_start
+    sub rx232_off, $I10, 1
+    substr rx232_tgt, rx232_tgt, rx232_off
+  rx232_start:
+.annotate "line", 150
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_235_fail
+    rx232_cur."!mark_push"(0, rx232_pos, $I10)
+  # rx literal  "if"
+    add $I11, rx232_pos, 2
+    gt $I11, rx232_eos, rx232_fail
+    sub $I11, rx232_pos, rx232_off
+    substr $S10, rx232_tgt, $I11, 2
+    ne $S10, "if", rx232_fail
+    add rx232_pos, 2
+    set_addr $I10, rxcap_235_fail
+    ($I12, $I11) = rx232_cur."!mark_peek"($I10)
+    rx232_cur."!cursor_pos"($I11)
+    ($P10) = rx232_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx232_pos, "")
+    rx232_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_235_done
+  rxcap_235_fail:
+    goto rx232_fail
+  rxcap_235_done:
+  # rx charclass s
+    ge rx232_pos, rx232_eos, rx232_fail
+    sub $I10, rx232_pos, rx232_off
+    is_cclass $I11, 32, rx232_tgt, $I10
+    unless $I11, rx232_fail
+    inc rx232_pos
+  # rx subrule "ws" subtype=method negate=
+    rx232_cur."!cursor_pos"(rx232_pos)
+    $P10 = rx232_cur."ws"()
+    unless $P10, rx232_fail
+    rx232_pos = $P10."pos"()
+.annotate "line", 151
+  # rx subrule "xblock" subtype=capture negate=
+    rx232_cur."!cursor_pos"(rx232_pos)
+    $P10 = rx232_cur."xblock"()
+    unless $P10, rx232_fail
+    rx232_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("xblock")
+    rx232_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx232_cur."!cursor_pos"(rx232_pos)
+    $P10 = rx232_cur."ws"()
+    unless $P10, rx232_fail
+    rx232_pos = $P10."pos"()
+.annotate "line", 152
+  # rx rxquantr238 ** 0..*
+    set_addr $I242, rxquantr238_done
+    rx232_cur."!mark_push"(0, rx232_pos, $I242)
+  rxquantr238_loop:
+  # rx subrule "ws" subtype=method negate=
+    rx232_cur."!cursor_pos"(rx232_pos)
+    $P10 = rx232_cur."ws"()
+    unless $P10, rx232_fail
+    rx232_pos = $P10."pos"()
+  # rx literal  "elsif"
+    add $I11, rx232_pos, 5
+    gt $I11, rx232_eos, rx232_fail
+    sub $I11, rx232_pos, rx232_off
+    substr $S10, rx232_tgt, $I11, 5
+    ne $S10, "elsif", rx232_fail
+    add rx232_pos, 5
+  # rx charclass s
+    ge rx232_pos, rx232_eos, rx232_fail
+    sub $I10, rx232_pos, rx232_off
+    is_cclass $I11, 32, rx232_tgt, $I10
+    unless $I11, rx232_fail
+    inc rx232_pos
+  # rx subrule "ws" subtype=method negate=
+    rx232_cur."!cursor_pos"(rx232_pos)
+    $P10 = rx232_cur."ws"()
+    unless $P10, rx232_fail
+    rx232_pos = $P10."pos"()
+  # rx subrule "xblock" subtype=capture negate=
+    rx232_cur."!cursor_pos"(rx232_pos)
+    $P10 = rx232_cur."xblock"()
+    unless $P10, rx232_fail
+    rx232_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("xblock")
+    rx232_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx232_cur."!cursor_pos"(rx232_pos)
+    $P10 = rx232_cur."ws"()
+    unless $P10, rx232_fail
+    rx232_pos = $P10."pos"()
+    (rx232_rep) = rx232_cur."!mark_commit"($I242)
+    rx232_cur."!mark_push"(rx232_rep, rx232_pos, $I242)
+    goto rxquantr238_loop
+  rxquantr238_done:
+  # rx subrule "ws" subtype=method negate=
+    rx232_cur."!cursor_pos"(rx232_pos)
+    $P10 = rx232_cur."ws"()
+    unless $P10, rx232_fail
+    rx232_pos = $P10."pos"()
+.annotate "line", 153
+  # rx rxquantr244 ** 0..1
+    set_addr $I248, rxquantr244_done
+    rx232_cur."!mark_push"(0, rx232_pos, $I248)
+  rxquantr244_loop:
+  # rx subrule "ws" subtype=method negate=
+    rx232_cur."!cursor_pos"(rx232_pos)
+    $P10 = rx232_cur."ws"()
+    unless $P10, rx232_fail
+    rx232_pos = $P10."pos"()
+  # rx literal  "else"
+    add $I11, rx232_pos, 4
+    gt $I11, rx232_eos, rx232_fail
+    sub $I11, rx232_pos, rx232_off
+    substr $S10, rx232_tgt, $I11, 4
+    ne $S10, "else", rx232_fail
+    add rx232_pos, 4
+  # rx charclass s
+    ge rx232_pos, rx232_eos, rx232_fail
+    sub $I10, rx232_pos, rx232_off
+    is_cclass $I11, 32, rx232_tgt, $I10
+    unless $I11, rx232_fail
+    inc rx232_pos
+  # rx subrule "ws" subtype=method negate=
+    rx232_cur."!cursor_pos"(rx232_pos)
+    $P10 = rx232_cur."ws"()
+    unless $P10, rx232_fail
+    rx232_pos = $P10."pos"()
+  # rx subrule "pblock" subtype=capture negate=
+    rx232_cur."!cursor_pos"(rx232_pos)
+    $P10 = rx232_cur."pblock"()
+    unless $P10, rx232_fail
+    rx232_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("else")
+    rx232_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx232_cur."!cursor_pos"(rx232_pos)
+    $P10 = rx232_cur."ws"()
+    unless $P10, rx232_fail
+    rx232_pos = $P10."pos"()
+    (rx232_rep) = rx232_cur."!mark_commit"($I248)
+  rxquantr244_done:
+  # rx subrule "ws" subtype=method negate=
+    rx232_cur."!cursor_pos"(rx232_pos)
+    $P10 = rx232_cur."ws"()
+    unless $P10, rx232_fail
+    rx232_pos = $P10."pos"()
+.annotate "line", 149
+  # rx pass
+    rx232_cur."!cursor_pass"(rx232_pos, "statement_control:sym<if>")
+    rx232_cur."!cursor_debug"("PASS  ", "statement_control:sym<if>", " at pos=", rx232_pos)
+    .return (rx232_cur)
+  rx232_fail:
+.annotate "line", 4
+    (rx232_rep, rx232_pos, $I10, $P10) = rx232_cur."!mark_fail"(0)
+    lt rx232_pos, -1, rx232_done
+    eq rx232_pos, -1, rx232_fail
+    jump $I10
+  rx232_done:
+    rx232_cur."!cursor_fail"()
+    rx232_cur."!cursor_debug"("FAIL  ", "statement_control:sym<if>")
+    .return (rx232_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__statement_control:sym<if>"  :subid("61_1258533478.31768") :method
+.annotate "line", 4
+    new $P234, "ResizablePMCArray"
+    push $P234, "if"
+    .return ($P234)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "statement_control:sym<unless>"  :subid("62_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .const 'Sub' $P260 = "64_1258533478.31768" 
+    capture_lex $P260
+    .local string rx251_tgt
+    .local int rx251_pos
+    .local int rx251_off
+    .local int rx251_eos
+    .local int rx251_rep
+    .local pmc rx251_cur
+    (rx251_cur, rx251_pos, rx251_tgt, $I10) = self."!cursor_start"()
+    rx251_cur."!cursor_debug"("START ", "statement_control:sym<unless>")
+    .lex unicode:"$\x{a2}", rx251_cur
+    .local pmc match
+    .lex "$/", match
+    length rx251_eos, rx251_tgt
+    set rx251_off, 0
+    lt $I10, 2, rx251_start
+    sub rx251_off, $I10, 1
+    substr rx251_tgt, rx251_tgt, rx251_off
+  rx251_start:
+.annotate "line", 157
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_254_fail
+    rx251_cur."!mark_push"(0, rx251_pos, $I10)
+  # rx literal  "unless"
+    add $I11, rx251_pos, 6
+    gt $I11, rx251_eos, rx251_fail
+    sub $I11, rx251_pos, rx251_off
+    substr $S10, rx251_tgt, $I11, 6
+    ne $S10, "unless", rx251_fail
+    add rx251_pos, 6
+    set_addr $I10, rxcap_254_fail
+    ($I12, $I11) = rx251_cur."!mark_peek"($I10)
+    rx251_cur."!cursor_pos"($I11)
+    ($P10) = rx251_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx251_pos, "")
+    rx251_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_254_done
+  rxcap_254_fail:
+    goto rx251_fail
+  rxcap_254_done:
+  # rx charclass s
+    ge rx251_pos, rx251_eos, rx251_fail
+    sub $I10, rx251_pos, rx251_off
+    is_cclass $I11, 32, rx251_tgt, $I10
+    unless $I11, rx251_fail
+    inc rx251_pos
+  # rx subrule "ws" subtype=method negate=
+    rx251_cur."!cursor_pos"(rx251_pos)
+    $P10 = rx251_cur."ws"()
+    unless $P10, rx251_fail
+    rx251_pos = $P10."pos"()
+.annotate "line", 158
+  # rx subrule "xblock" subtype=capture negate=
+    rx251_cur."!cursor_pos"(rx251_pos)
+    $P10 = rx251_cur."xblock"()
+    unless $P10, rx251_fail
+    rx251_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("xblock")
+    rx251_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx251_cur."!cursor_pos"(rx251_pos)
+    $P10 = rx251_cur."ws"()
+    unless $P10, rx251_fail
+    rx251_pos = $P10."pos"()
+  alt257_0:
+.annotate "line", 159
+    set_addr $I10, alt257_1
+    rx251_cur."!mark_push"(0, rx251_pos, $I10)
+  # rx subrule "ws" subtype=method negate=
+    rx251_cur."!cursor_pos"(rx251_pos)
+    $P10 = rx251_cur."ws"()
+    unless $P10, rx251_fail
+    rx251_pos = $P10."pos"()
+  # rx subrule "before" subtype=zerowidth negate=1
+    rx251_cur."!cursor_pos"(rx251_pos)
+    .const 'Sub' $P260 = "64_1258533478.31768" 
+    capture_lex $P260
+    $P10 = rx251_cur."before"($P260)
+    if $P10, rx251_fail
+  # rx subrule "ws" subtype=method negate=
+    rx251_cur."!cursor_pos"(rx251_pos)
+    $P10 = rx251_cur."ws"()
+    unless $P10, rx251_fail
+    rx251_pos = $P10."pos"()
+    goto alt257_end
+  alt257_1:
+  # rx subrule "ws" subtype=method negate=
+    rx251_cur."!cursor_pos"(rx251_pos)
+    $P10 = rx251_cur."ws"()
+    unless $P10, rx251_fail
+    rx251_pos = $P10."pos"()
+  # rx subrule "panic" subtype=method negate=
+    rx251_cur."!cursor_pos"(rx251_pos)
+    $P10 = rx251_cur."panic"("unless does not take \"else\", please rewrite using \"if\"")
+    unless $P10, rx251_fail
+    rx251_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx251_cur."!cursor_pos"(rx251_pos)
+    $P10 = rx251_cur."ws"()
+    unless $P10, rx251_fail
+    rx251_pos = $P10."pos"()
+  alt257_end:
+  # rx subrule "ws" subtype=method negate=
+    rx251_cur."!cursor_pos"(rx251_pos)
+    $P10 = rx251_cur."ws"()
+    unless $P10, rx251_fail
+    rx251_pos = $P10."pos"()
+.annotate "line", 156
+  # rx pass
+    rx251_cur."!cursor_pass"(rx251_pos, "statement_control:sym<unless>")
+    rx251_cur."!cursor_debug"("PASS  ", "statement_control:sym<unless>", " at pos=", rx251_pos)
+    .return (rx251_cur)
+  rx251_fail:
+.annotate "line", 4
+    (rx251_rep, rx251_pos, $I10, $P10) = rx251_cur."!mark_fail"(0)
+    lt rx251_pos, -1, rx251_done
+    eq rx251_pos, -1, rx251_fail
+    jump $I10
+  rx251_done:
+    rx251_cur."!cursor_fail"()
+    rx251_cur."!cursor_debug"("FAIL  ", "statement_control:sym<unless>")
+    .return (rx251_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__statement_control:sym<unless>"  :subid("63_1258533478.31768") :method
+.annotate "line", 4
+    new $P253, "ResizablePMCArray"
+    push $P253, "unless"
+    .return ($P253)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "_block259"  :anon :subid("64_1258533478.31768") :method :outer("62_1258533478.31768")
+.annotate "line", 159
+    .local string rx261_tgt
+    .local int rx261_pos
+    .local int rx261_off
+    .local int rx261_eos
+    .local int rx261_rep
+    .local pmc rx261_cur
+    (rx261_cur, rx261_pos, rx261_tgt, $I10) = self."!cursor_start"()
+    rx261_cur."!cursor_debug"("START ", "")
+    .lex unicode:"$\x{a2}", rx261_cur
+    .local pmc match
+    .lex "$/", match
+    length rx261_eos, rx261_tgt
+    set rx261_off, 0
+    lt $I10, 2, rx261_start
+    sub rx261_off, $I10, 1
+    substr rx261_tgt, rx261_tgt, rx261_off
+  rx261_start:
+    ge rx261_pos, 0, rxscan262_done
+  rxscan262_loop:
+    ($P10) = rx261_cur."from"()
+    inc $P10
+    set rx261_pos, $P10
+    ge rx261_pos, rx261_eos, rxscan262_done
+    set_addr $I10, rxscan262_loop
+    rx261_cur."!mark_push"(0, rx261_pos, $I10)
+  rxscan262_done:
+  # rx literal  "else"
+    add $I11, rx261_pos, 4
+    gt $I11, rx261_eos, rx261_fail
+    sub $I11, rx261_pos, rx261_off
+    substr $S10, rx261_tgt, $I11, 4
+    ne $S10, "else", rx261_fail
+    add rx261_pos, 4
+  # rx pass
+    rx261_cur."!cursor_pass"(rx261_pos, "")
+    rx261_cur."!cursor_debug"("PASS  ", "", " at pos=", rx261_pos)
+    .return (rx261_cur)
+  rx261_fail:
+    (rx261_rep, rx261_pos, $I10, $P10) = rx261_cur."!mark_fail"(0)
+    lt rx261_pos, -1, rx261_done
+    eq rx261_pos, -1, rx261_fail
+    jump $I10
+  rx261_done:
+    rx261_cur."!cursor_fail"()
+    rx261_cur."!cursor_debug"("FAIL  ", "")
+    .return (rx261_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "statement_control:sym<while>"  :subid("65_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx268_tgt
+    .local int rx268_pos
+    .local int rx268_off
+    .local int rx268_eos
+    .local int rx268_rep
+    .local pmc rx268_cur
+    (rx268_cur, rx268_pos, rx268_tgt, $I10) = self."!cursor_start"()
+    rx268_cur."!cursor_debug"("START ", "statement_control:sym<while>")
+    .lex unicode:"$\x{a2}", rx268_cur
+    .local pmc match
+    .lex "$/", match
+    length rx268_eos, rx268_tgt
+    set rx268_off, 0
+    lt $I10, 2, rx268_start
+    sub rx268_off, $I10, 1
+    substr rx268_tgt, rx268_tgt, rx268_off
+  rx268_start:
+.annotate "line", 163
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_272_fail
+    rx268_cur."!mark_push"(0, rx268_pos, $I10)
+  alt271_0:
+    set_addr $I10, alt271_1
+    rx268_cur."!mark_push"(0, rx268_pos, $I10)
+  # rx literal  "while"
+    add $I11, rx268_pos, 5
+    gt $I11, rx268_eos, rx268_fail
+    sub $I11, rx268_pos, rx268_off
+    substr $S10, rx268_tgt, $I11, 5
+    ne $S10, "while", rx268_fail
+    add rx268_pos, 5
+    goto alt271_end
+  alt271_1:
+  # rx literal  "until"
+    add $I11, rx268_pos, 5
+    gt $I11, rx268_eos, rx268_fail
+    sub $I11, rx268_pos, rx268_off
+    substr $S10, rx268_tgt, $I11, 5
+    ne $S10, "until", rx268_fail
+    add rx268_pos, 5
+  alt271_end:
+    set_addr $I10, rxcap_272_fail
+    ($I12, $I11) = rx268_cur."!mark_peek"($I10)
+    rx268_cur."!cursor_pos"($I11)
+    ($P10) = rx268_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx268_pos, "")
+    rx268_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_272_done
+  rxcap_272_fail:
+    goto rx268_fail
+  rxcap_272_done:
+  # rx charclass s
+    ge rx268_pos, rx268_eos, rx268_fail
+    sub $I10, rx268_pos, rx268_off
+    is_cclass $I11, 32, rx268_tgt, $I10
+    unless $I11, rx268_fail
+    inc rx268_pos
+  # rx subrule "ws" subtype=method negate=
+    rx268_cur."!cursor_pos"(rx268_pos)
+    $P10 = rx268_cur."ws"()
+    unless $P10, rx268_fail
+    rx268_pos = $P10."pos"()
+.annotate "line", 164
+  # rx subrule "xblock" subtype=capture negate=
+    rx268_cur."!cursor_pos"(rx268_pos)
+    $P10 = rx268_cur."xblock"()
+    unless $P10, rx268_fail
+    rx268_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("xblock")
+    rx268_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx268_cur."!cursor_pos"(rx268_pos)
+    $P10 = rx268_cur."ws"()
+    unless $P10, rx268_fail
+    rx268_pos = $P10."pos"()
+.annotate "line", 162
+  # rx pass
+    rx268_cur."!cursor_pass"(rx268_pos, "statement_control:sym<while>")
+    rx268_cur."!cursor_debug"("PASS  ", "statement_control:sym<while>", " at pos=", rx268_pos)
+    .return (rx268_cur)
+  rx268_fail:
+.annotate "line", 4
+    (rx268_rep, rx268_pos, $I10, $P10) = rx268_cur."!mark_fail"(0)
+    lt rx268_pos, -1, rx268_done
+    eq rx268_pos, -1, rx268_fail
+    jump $I10
+  rx268_done:
+    rx268_cur."!cursor_fail"()
+    rx268_cur."!cursor_debug"("FAIL  ", "statement_control:sym<while>")
+    .return (rx268_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__statement_control:sym<while>"  :subid("66_1258533478.31768") :method
+.annotate "line", 4
+    new $P270, "ResizablePMCArray"
+    push $P270, "until"
+    push $P270, "while"
+    .return ($P270)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "statement_control:sym<repeat>"  :subid("67_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx276_tgt
+    .local int rx276_pos
+    .local int rx276_off
+    .local int rx276_eos
+    .local int rx276_rep
+    .local pmc rx276_cur
+    (rx276_cur, rx276_pos, rx276_tgt, $I10) = self."!cursor_start"()
+    rx276_cur."!cursor_debug"("START ", "statement_control:sym<repeat>")
+    .lex unicode:"$\x{a2}", rx276_cur
+    .local pmc match
+    .lex "$/", match
+    length rx276_eos, rx276_tgt
+    set rx276_off, 0
+    lt $I10, 2, rx276_start
+    sub rx276_off, $I10, 1
+    substr rx276_tgt, rx276_tgt, rx276_off
+  rx276_start:
+.annotate "line", 168
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_279_fail
+    rx276_cur."!mark_push"(0, rx276_pos, $I10)
+  # rx literal  "repeat"
+    add $I11, rx276_pos, 6
+    gt $I11, rx276_eos, rx276_fail
+    sub $I11, rx276_pos, rx276_off
+    substr $S10, rx276_tgt, $I11, 6
+    ne $S10, "repeat", rx276_fail
+    add rx276_pos, 6
+    set_addr $I10, rxcap_279_fail
+    ($I12, $I11) = rx276_cur."!mark_peek"($I10)
+    rx276_cur."!cursor_pos"($I11)
+    ($P10) = rx276_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx276_pos, "")
+    rx276_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_279_done
+  rxcap_279_fail:
+    goto rx276_fail
+  rxcap_279_done:
+  # rx charclass s
+    ge rx276_pos, rx276_eos, rx276_fail
+    sub $I10, rx276_pos, rx276_off
+    is_cclass $I11, 32, rx276_tgt, $I10
+    unless $I11, rx276_fail
+    inc rx276_pos
+  # rx subrule "ws" subtype=method negate=
+    rx276_cur."!cursor_pos"(rx276_pos)
+    $P10 = rx276_cur."ws"()
+    unless $P10, rx276_fail
+    rx276_pos = $P10."pos"()
+  alt281_0:
+.annotate "line", 169
+    set_addr $I10, alt281_1
+    rx276_cur."!mark_push"(0, rx276_pos, $I10)
+.annotate "line", 170
+  # rx subrule "ws" subtype=method negate=
+    rx276_cur."!cursor_pos"(rx276_pos)
+    $P10 = rx276_cur."ws"()
+    unless $P10, rx276_fail
+    rx276_pos = $P10."pos"()
+  # rx subcapture "wu"
+    set_addr $I10, rxcap_284_fail
+    rx276_cur."!mark_push"(0, rx276_pos, $I10)
+  alt283_0:
+    set_addr $I10, alt283_1
+    rx276_cur."!mark_push"(0, rx276_pos, $I10)
+  # rx literal  "while"
+    add $I11, rx276_pos, 5
+    gt $I11, rx276_eos, rx276_fail
+    sub $I11, rx276_pos, rx276_off
+    substr $S10, rx276_tgt, $I11, 5
+    ne $S10, "while", rx276_fail
+    add rx276_pos, 5
+    goto alt283_end
+  alt283_1:
+  # rx literal  "until"
+    add $I11, rx276_pos, 5
+    gt $I11, rx276_eos, rx276_fail
+    sub $I11, rx276_pos, rx276_off
+    substr $S10, rx276_tgt, $I11, 5
+    ne $S10, "until", rx276_fail
+    add rx276_pos, 5
+  alt283_end:
+    set_addr $I10, rxcap_284_fail
+    ($I12, $I11) = rx276_cur."!mark_peek"($I10)
+    rx276_cur."!cursor_pos"($I11)
+    ($P10) = rx276_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx276_pos, "")
+    rx276_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("wu")
+    goto rxcap_284_done
+  rxcap_284_fail:
+    goto rx276_fail
+  rxcap_284_done:
+  # rx charclass s
+    ge rx276_pos, rx276_eos, rx276_fail
+    sub $I10, rx276_pos, rx276_off
+    is_cclass $I11, 32, rx276_tgt, $I10
+    unless $I11, rx276_fail
+    inc rx276_pos
+  # rx subrule "ws" subtype=method negate=
+    rx276_cur."!cursor_pos"(rx276_pos)
+    $P10 = rx276_cur."ws"()
+    unless $P10, rx276_fail
+    rx276_pos = $P10."pos"()
+  # rx subrule "xblock" subtype=capture negate=
+    rx276_cur."!cursor_pos"(rx276_pos)
+    $P10 = rx276_cur."xblock"()
+    unless $P10, rx276_fail
+    rx276_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("xblock")
+    rx276_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx276_cur."!cursor_pos"(rx276_pos)
+    $P10 = rx276_cur."ws"()
+    unless $P10, rx276_fail
+    rx276_pos = $P10."pos"()
+    goto alt281_end
+  alt281_1:
+.annotate "line", 171
+  # rx subrule "ws" subtype=method negate=
+    rx276_cur."!cursor_pos"(rx276_pos)
+    $P10 = rx276_cur."ws"()
+    unless $P10, rx276_fail
+    rx276_pos = $P10."pos"()
+  # rx subrule "pblock" subtype=capture negate=
+    rx276_cur."!cursor_pos"(rx276_pos)
+    $P10 = rx276_cur."pblock"()
+    unless $P10, rx276_fail
+    rx276_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("pblock")
+    rx276_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx276_cur."!cursor_pos"(rx276_pos)
+    $P10 = rx276_cur."ws"()
+    unless $P10, rx276_fail
+    rx276_pos = $P10."pos"()
+  # rx subcapture "wu"
+    set_addr $I10, rxcap_290_fail
+    rx276_cur."!mark_push"(0, rx276_pos, $I10)
+  alt289_0:
+    set_addr $I10, alt289_1
+    rx276_cur."!mark_push"(0, rx276_pos, $I10)
+  # rx literal  "while"
+    add $I11, rx276_pos, 5
+    gt $I11, rx276_eos, rx276_fail
+    sub $I11, rx276_pos, rx276_off
+    substr $S10, rx276_tgt, $I11, 5
+    ne $S10, "while", rx276_fail
+    add rx276_pos, 5
+    goto alt289_end
+  alt289_1:
+  # rx literal  "until"
+    add $I11, rx276_pos, 5
+    gt $I11, rx276_eos, rx276_fail
+    sub $I11, rx276_pos, rx276_off
+    substr $S10, rx276_tgt, $I11, 5
+    ne $S10, "until", rx276_fail
+    add rx276_pos, 5
+  alt289_end:
+    set_addr $I10, rxcap_290_fail
+    ($I12, $I11) = rx276_cur."!mark_peek"($I10)
+    rx276_cur."!cursor_pos"($I11)
+    ($P10) = rx276_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx276_pos, "")
+    rx276_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("wu")
+    goto rxcap_290_done
+  rxcap_290_fail:
+    goto rx276_fail
+  rxcap_290_done:
+  # rx charclass s
+    ge rx276_pos, rx276_eos, rx276_fail
+    sub $I10, rx276_pos, rx276_off
+    is_cclass $I11, 32, rx276_tgt, $I10
+    unless $I11, rx276_fail
+    inc rx276_pos
+  # rx subrule "ws" subtype=method negate=
+    rx276_cur."!cursor_pos"(rx276_pos)
+    $P10 = rx276_cur."ws"()
+    unless $P10, rx276_fail
+    rx276_pos = $P10."pos"()
+  # rx subrule "EXPR" subtype=capture negate=
+    rx276_cur."!cursor_pos"(rx276_pos)
+    $P10 = rx276_cur."EXPR"()
+    unless $P10, rx276_fail
+    rx276_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("EXPR")
+    rx276_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx276_cur."!cursor_pos"(rx276_pos)
+    $P10 = rx276_cur."ws"()
+    unless $P10, rx276_fail
+    rx276_pos = $P10."pos"()
+  alt281_end:
+.annotate "line", 172
+  # rx subrule "ws" subtype=method negate=
+    rx276_cur."!cursor_pos"(rx276_pos)
+    $P10 = rx276_cur."ws"()
+    unless $P10, rx276_fail
+    rx276_pos = $P10."pos"()
+.annotate "line", 167
+  # rx pass
+    rx276_cur."!cursor_pass"(rx276_pos, "statement_control:sym<repeat>")
+    rx276_cur."!cursor_debug"("PASS  ", "statement_control:sym<repeat>", " at pos=", rx276_pos)
+    .return (rx276_cur)
+  rx276_fail:
+.annotate "line", 4
+    (rx276_rep, rx276_pos, $I10, $P10) = rx276_cur."!mark_fail"(0)
+    lt rx276_pos, -1, rx276_done
+    eq rx276_pos, -1, rx276_fail
+    jump $I10
+  rx276_done:
+    rx276_cur."!cursor_fail"()
+    rx276_cur."!cursor_debug"("FAIL  ", "statement_control:sym<repeat>")
+    .return (rx276_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__statement_control:sym<repeat>"  :subid("68_1258533478.31768") :method
+.annotate "line", 4
+    new $P278, "ResizablePMCArray"
+    push $P278, "repeat"
+    .return ($P278)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "statement_control:sym<for>"  :subid("69_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx295_tgt
+    .local int rx295_pos
+    .local int rx295_off
+    .local int rx295_eos
+    .local int rx295_rep
+    .local pmc rx295_cur
+    (rx295_cur, rx295_pos, rx295_tgt, $I10) = self."!cursor_start"()
+    rx295_cur."!cursor_debug"("START ", "statement_control:sym<for>")
+    .lex unicode:"$\x{a2}", rx295_cur
+    .local pmc match
+    .lex "$/", match
+    length rx295_eos, rx295_tgt
+    set rx295_off, 0
+    lt $I10, 2, rx295_start
+    sub rx295_off, $I10, 1
+    substr rx295_tgt, rx295_tgt, rx295_off
+  rx295_start:
+.annotate "line", 176
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_298_fail
+    rx295_cur."!mark_push"(0, rx295_pos, $I10)
+  # rx literal  "for"
+    add $I11, rx295_pos, 3
+    gt $I11, rx295_eos, rx295_fail
+    sub $I11, rx295_pos, rx295_off
+    substr $S10, rx295_tgt, $I11, 3
+    ne $S10, "for", rx295_fail
+    add rx295_pos, 3
+    set_addr $I10, rxcap_298_fail
+    ($I12, $I11) = rx295_cur."!mark_peek"($I10)
+    rx295_cur."!cursor_pos"($I11)
+    ($P10) = rx295_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx295_pos, "")
+    rx295_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_298_done
+  rxcap_298_fail:
+    goto rx295_fail
+  rxcap_298_done:
+  # rx charclass s
+    ge rx295_pos, rx295_eos, rx295_fail
+    sub $I10, rx295_pos, rx295_off
+    is_cclass $I11, 32, rx295_tgt, $I10
+    unless $I11, rx295_fail
+    inc rx295_pos
+  # rx subrule "ws" subtype=method negate=
+    rx295_cur."!cursor_pos"(rx295_pos)
+    $P10 = rx295_cur."ws"()
+    unless $P10, rx295_fail
+    rx295_pos = $P10."pos"()
+.annotate "line", 177
+  # rx subrule "xblock" subtype=capture negate=
+    rx295_cur."!cursor_pos"(rx295_pos)
+    $P10 = rx295_cur."xblock"()
+    unless $P10, rx295_fail
+    rx295_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("xblock")
+    rx295_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx295_cur."!cursor_pos"(rx295_pos)
+    $P10 = rx295_cur."ws"()
+    unless $P10, rx295_fail
+    rx295_pos = $P10."pos"()
+.annotate "line", 175
+  # rx pass
+    rx295_cur."!cursor_pass"(rx295_pos, "statement_control:sym<for>")
+    rx295_cur."!cursor_debug"("PASS  ", "statement_control:sym<for>", " at pos=", rx295_pos)
+    .return (rx295_cur)
+  rx295_fail:
+.annotate "line", 4
+    (rx295_rep, rx295_pos, $I10, $P10) = rx295_cur."!mark_fail"(0)
+    lt rx295_pos, -1, rx295_done
+    eq rx295_pos, -1, rx295_fail
+    jump $I10
+  rx295_done:
+    rx295_cur."!cursor_fail"()
+    rx295_cur."!cursor_debug"("FAIL  ", "statement_control:sym<for>")
+    .return (rx295_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__statement_control:sym<for>"  :subid("70_1258533478.31768") :method
+.annotate "line", 4
+    new $P297, "ResizablePMCArray"
+    push $P297, "for"
+    .return ($P297)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "statement_prefix"  :subid("71_1258533478.31768") :method
+.annotate "line", 180
+    $P302 = self."!protoregex"("statement_prefix")
     .return ($P302)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "statement_mod_cond:sym<unless>"  :subid("78_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "!PREFIX__statement_prefix"  :subid("72_1258533478.31768") :method
+.annotate "line", 180
+    $P304 = self."!PREFIX__!protoregex"("statement_prefix")
+    .return ($P304)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "statement_prefix:sym<INIT>"  :subid("73_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx307_tgt
-    .local int rx307_pos
-    .local int rx307_off
-    .local int rx307_eos
-    .local int rx307_rep
-    .local pmc rx307_cur
-    (rx307_cur, rx307_pos, rx307_tgt, $I10) = self."!cursor_start"()
-    rx307_cur."!cursor_debug"("START ", "statement_mod_cond:sym<unless>")
-    .lex unicode:"$\x{a2}", rx307_cur
+    .local string rx306_tgt
+    .local int rx306_pos
+    .local int rx306_off
+    .local int rx306_eos
+    .local int rx306_rep
+    .local pmc rx306_cur
+    (rx306_cur, rx306_pos, rx306_tgt, $I10) = self."!cursor_start"()
+    rx306_cur."!cursor_debug"("START ", "statement_prefix:sym<INIT>")
+    .lex unicode:"$\x{a2}", rx306_cur
     .local pmc match
     .lex "$/", match
-    length rx307_eos, rx307_tgt
-    set rx307_off, 0
-    lt $I10, 2, rx307_start
-    sub rx307_off, $I10, 1
-    substr rx307_tgt, rx307_tgt, rx307_off
-  rx307_start:
-.annotate "line", 180
+    length rx306_eos, rx306_tgt
+    set rx306_off, 0
+    lt $I10, 2, rx306_start
+    sub rx306_off, $I10, 1
+    substr rx306_tgt, rx306_tgt, rx306_off
+  rx306_start:
+.annotate "line", 181
   # rx subcapture "sym"
     set_addr $I10, rxcap_310_fail
-    rx307_cur."!mark_push"(0, rx307_pos, $I10)
-  # rx literal  "unless"
-    add $I11, rx307_pos, 6
-    gt $I11, rx307_eos, rx307_fail
-    sub $I11, rx307_pos, rx307_off
-    substr $S10, rx307_tgt, $I11, 6
-    ne $S10, "unless", rx307_fail
-    add rx307_pos, 6
+    rx306_cur."!mark_push"(0, rx306_pos, $I10)
+  # rx literal  "INIT"
+    add $I11, rx306_pos, 4
+    gt $I11, rx306_eos, rx306_fail
+    sub $I11, rx306_pos, rx306_off
+    substr $S10, rx306_tgt, $I11, 4
+    ne $S10, "INIT", rx306_fail
+    add rx306_pos, 4
     set_addr $I10, rxcap_310_fail
-    ($I12, $I11) = rx307_cur."!mark_peek"($I10)
-    rx307_cur."!cursor_pos"($I11)
-    ($P10) = rx307_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx307_pos, "")
-    rx307_cur."!mark_push"(0, -1, 0, $P10)
+    ($I12, $I11) = rx306_cur."!mark_peek"($I10)
+    rx306_cur."!cursor_pos"($I11)
+    ($P10) = rx306_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx306_pos, "")
+    rx306_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
     goto rxcap_310_done
   rxcap_310_fail:
-    goto rx307_fail
+    goto rx306_fail
   rxcap_310_done:
-  # rx subrule "ws" subtype=method negate=
-    rx307_cur."!cursor_pos"(rx307_pos)
-    $P10 = rx307_cur."ws"()
-    unless $P10, rx307_fail
-    rx307_pos = $P10."pos"()
-  # rx subrule "EXPR" subtype=capture negate=
-    rx307_cur."!cursor_pos"(rx307_pos)
-    $P10 = rx307_cur."EXPR"()
-    unless $P10, rx307_fail
-    rx307_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("cond")
-    rx307_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx307_cur."!cursor_pos"(rx307_pos)
-    $P10 = rx307_cur."ws"()
-    unless $P10, rx307_fail
-    rx307_pos = $P10."pos"()
+  # rx subrule "blorst" subtype=capture negate=
+    rx306_cur."!cursor_pos"(rx306_pos)
+    $P10 = rx306_cur."blorst"()
+    unless $P10, rx306_fail
+    rx306_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("blorst")
+    rx306_pos = $P10."pos"()
   # rx pass
-    rx307_cur."!cursor_pass"(rx307_pos, "statement_mod_cond:sym<unless>")
-    rx307_cur."!cursor_debug"("PASS  ", "statement_mod_cond:sym<unless>", " at pos=", rx307_pos)
-    .return (rx307_cur)
-  rx307_fail:
+    rx306_cur."!cursor_pass"(rx306_pos, "statement_prefix:sym<INIT>")
+    rx306_cur."!cursor_debug"("PASS  ", "statement_prefix:sym<INIT>", " at pos=", rx306_pos)
+    .return (rx306_cur)
+  rx306_fail:
 .annotate "line", 4
-    (rx307_rep, rx307_pos, $I10, $P10) = rx307_cur."!mark_fail"(0)
-    lt rx307_pos, -1, rx307_done
-    eq rx307_pos, -1, rx307_fail
+    (rx306_rep, rx306_pos, $I10, $P10) = rx306_cur."!mark_fail"(0)
+    lt rx306_pos, -1, rx306_done
+    eq rx306_pos, -1, rx306_fail
     jump $I10
-  rx307_done:
-    rx307_cur."!cursor_fail"()
-    rx307_cur."!cursor_debug"("FAIL  ", "statement_mod_cond:sym<unless>")
-    .return (rx307_cur)
+  rx306_done:
+    rx306_cur."!cursor_fail"()
+    rx306_cur."!cursor_debug"("FAIL  ", "statement_prefix:sym<INIT>")
+    .return (rx306_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_mod_cond:sym<unless>"  :subid("79_1258424429.0004") :method
+.sub "!PREFIX__statement_prefix:sym<INIT>"  :subid("74_1258533478.31768") :method
 .annotate "line", 4
+    $P308 = self."!PREFIX__!subrule"("blorst", "INIT")
     new $P309, "ResizablePMCArray"
-    push $P309, "unless"
+    push $P309, $P308
     .return ($P309)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "statement_mod_loop"  :subid("80_1258424429.0004") :method
-.annotate "line", 182
-    $P314 = self."!protoregex"("statement_mod_loop")
+.sub "blorst"  :subid("75_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx312_tgt
+    .local int rx312_pos
+    .local int rx312_off
+    .local int rx312_eos
+    .local int rx312_rep
+    .local pmc rx312_cur
+    (rx312_cur, rx312_pos, rx312_tgt, $I10) = self."!cursor_start"()
+    rx312_cur."!cursor_debug"("START ", "blorst")
+    .lex unicode:"$\x{a2}", rx312_cur
+    .local pmc match
+    .lex "$/", match
+    length rx312_eos, rx312_tgt
+    set rx312_off, 0
+    lt $I10, 2, rx312_start
+    sub rx312_off, $I10, 1
+    substr rx312_tgt, rx312_tgt, rx312_off
+  rx312_start:
+.annotate "line", 184
+  # rx charclass s
+    ge rx312_pos, rx312_eos, rx312_fail
+    sub $I10, rx312_pos, rx312_off
+    is_cclass $I11, 32, rx312_tgt, $I10
+    unless $I11, rx312_fail
+    inc rx312_pos
+  # rx subrule "ws" subtype=method negate=
+    rx312_cur."!cursor_pos"(rx312_pos)
+    $P10 = rx312_cur."ws"()
+    unless $P10, rx312_fail
+    rx312_pos = $P10."pos"()
+  alt315_0:
+    set_addr $I10, alt315_1
+    rx312_cur."!mark_push"(0, rx312_pos, $I10)
+  # rx enumcharlist negate=0 zerowidth
+    ge rx312_pos, rx312_eos, rx312_fail
+    sub $I10, rx312_pos, rx312_off
+    substr $S10, rx312_tgt, $I10, 1
+    index $I11, "{", $S10
+    lt $I11, 0, rx312_fail
+  # rx subrule "block" subtype=capture negate=
+    rx312_cur."!cursor_pos"(rx312_pos)
+    $P10 = rx312_cur."block"()
+    unless $P10, rx312_fail
+    rx312_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("block")
+    rx312_pos = $P10."pos"()
+    goto alt315_end
+  alt315_1:
+  # rx subrule "statement" subtype=capture negate=
+    rx312_cur."!cursor_pos"(rx312_pos)
+    $P10 = rx312_cur."statement"()
+    unless $P10, rx312_fail
+    rx312_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("statement")
+    rx312_pos = $P10."pos"()
+  alt315_end:
+.annotate "line", 183
+  # rx pass
+    rx312_cur."!cursor_pass"(rx312_pos, "blorst")
+    rx312_cur."!cursor_debug"("PASS  ", "blorst", " at pos=", rx312_pos)
+    .return (rx312_cur)
+  rx312_fail:
+.annotate "line", 4
+    (rx312_rep, rx312_pos, $I10, $P10) = rx312_cur."!mark_fail"(0)
+    lt rx312_pos, -1, rx312_done
+    eq rx312_pos, -1, rx312_fail
+    jump $I10
+  rx312_done:
+    rx312_cur."!cursor_fail"()
+    rx312_cur."!cursor_debug"("FAIL  ", "blorst")
+    .return (rx312_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__blorst"  :subid("76_1258533478.31768") :method
+.annotate "line", 4
+    new $P314, "ResizablePMCArray"
+    push $P314, ""
     .return ($P314)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_mod_loop"  :subid("81_1258424429.0004") :method
-.annotate "line", 182
-    $P316 = self."!PREFIX__!protoregex"("statement_mod_loop")
-    .return ($P316)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "statement_mod_loop:sym<while>"  :subid("82_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx318_tgt
-    .local int rx318_pos
-    .local int rx318_off
-    .local int rx318_eos
-    .local int rx318_rep
-    .local pmc rx318_cur
-    (rx318_cur, rx318_pos, rx318_tgt, $I10) = self."!cursor_start"()
-    rx318_cur."!cursor_debug"("START ", "statement_mod_loop:sym<while>")
-    .lex unicode:"$\x{a2}", rx318_cur
-    .local pmc match
-    .lex "$/", match
-    length rx318_eos, rx318_tgt
-    set rx318_off, 0
-    lt $I10, 2, rx318_start
-    sub rx318_off, $I10, 1
-    substr rx318_tgt, rx318_tgt, rx318_off
-  rx318_start:
-.annotate "line", 184
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_321_fail
-    rx318_cur."!mark_push"(0, rx318_pos, $I10)
-  # rx literal  "while"
-    add $I11, rx318_pos, 5
-    gt $I11, rx318_eos, rx318_fail
-    sub $I11, rx318_pos, rx318_off
-    substr $S10, rx318_tgt, $I11, 5
-    ne $S10, "while", rx318_fail
-    add rx318_pos, 5
-    set_addr $I10, rxcap_321_fail
-    ($I12, $I11) = rx318_cur."!mark_peek"($I10)
-    rx318_cur."!cursor_pos"($I11)
-    ($P10) = rx318_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx318_pos, "")
-    rx318_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_321_done
-  rxcap_321_fail:
-    goto rx318_fail
-  rxcap_321_done:
-  # rx subrule "ws" subtype=method negate=
-    rx318_cur."!cursor_pos"(rx318_pos)
-    $P10 = rx318_cur."ws"()
-    unless $P10, rx318_fail
-    rx318_pos = $P10."pos"()
-  # rx subrule "EXPR" subtype=capture negate=
-    rx318_cur."!cursor_pos"(rx318_pos)
-    $P10 = rx318_cur."EXPR"()
-    unless $P10, rx318_fail
-    rx318_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("cond")
-    rx318_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx318_cur."!cursor_pos"(rx318_pos)
-    $P10 = rx318_cur."ws"()
-    unless $P10, rx318_fail
-    rx318_pos = $P10."pos"()
-  # rx pass
-    rx318_cur."!cursor_pass"(rx318_pos, "statement_mod_loop:sym<while>")
-    rx318_cur."!cursor_debug"("PASS  ", "statement_mod_loop:sym<while>", " at pos=", rx318_pos)
-    .return (rx318_cur)
-  rx318_fail:
-.annotate "line", 4
-    (rx318_rep, rx318_pos, $I10, $P10) = rx318_cur."!mark_fail"(0)
-    lt rx318_pos, -1, rx318_done
-    eq rx318_pos, -1, rx318_fail
-    jump $I10
-  rx318_done:
-    rx318_cur."!cursor_fail"()
-    rx318_cur."!cursor_debug"("FAIL  ", "statement_mod_loop:sym<while>")
-    .return (rx318_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_mod_loop:sym<while>"  :subid("83_1258424429.0004") :method
-.annotate "line", 4
-    new $P320, "ResizablePMCArray"
-    push $P320, "while"
-    .return ($P320)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "statement_mod_loop:sym<until>"  :subid("84_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx325_tgt
-    .local int rx325_pos
-    .local int rx325_off
-    .local int rx325_eos
-    .local int rx325_rep
-    .local pmc rx325_cur
-    (rx325_cur, rx325_pos, rx325_tgt, $I10) = self."!cursor_start"()
-    rx325_cur."!cursor_debug"("START ", "statement_mod_loop:sym<until>")
-    .lex unicode:"$\x{a2}", rx325_cur
-    .local pmc match
-    .lex "$/", match
-    length rx325_eos, rx325_tgt
-    set rx325_off, 0
-    lt $I10, 2, rx325_start
-    sub rx325_off, $I10, 1
-    substr rx325_tgt, rx325_tgt, rx325_off
-  rx325_start:
-.annotate "line", 185
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_328_fail
-    rx325_cur."!mark_push"(0, rx325_pos, $I10)
-  # rx literal  "until"
-    add $I11, rx325_pos, 5
-    gt $I11, rx325_eos, rx325_fail
-    sub $I11, rx325_pos, rx325_off
-    substr $S10, rx325_tgt, $I11, 5
-    ne $S10, "until", rx325_fail
-    add rx325_pos, 5
-    set_addr $I10, rxcap_328_fail
-    ($I12, $I11) = rx325_cur."!mark_peek"($I10)
-    rx325_cur."!cursor_pos"($I11)
-    ($P10) = rx325_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx325_pos, "")
-    rx325_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_328_done
-  rxcap_328_fail:
-    goto rx325_fail
-  rxcap_328_done:
-  # rx subrule "ws" subtype=method negate=
-    rx325_cur."!cursor_pos"(rx325_pos)
-    $P10 = rx325_cur."ws"()
-    unless $P10, rx325_fail
-    rx325_pos = $P10."pos"()
-  # rx subrule "EXPR" subtype=capture negate=
-    rx325_cur."!cursor_pos"(rx325_pos)
-    $P10 = rx325_cur."EXPR"()
-    unless $P10, rx325_fail
-    rx325_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("cond")
-    rx325_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx325_cur."!cursor_pos"(rx325_pos)
-    $P10 = rx325_cur."ws"()
-    unless $P10, rx325_fail
-    rx325_pos = $P10."pos"()
-  # rx pass
-    rx325_cur."!cursor_pass"(rx325_pos, "statement_mod_loop:sym<until>")
-    rx325_cur."!cursor_debug"("PASS  ", "statement_mod_loop:sym<until>", " at pos=", rx325_pos)
-    .return (rx325_cur)
-  rx325_fail:
-.annotate "line", 4
-    (rx325_rep, rx325_pos, $I10, $P10) = rx325_cur."!mark_fail"(0)
-    lt rx325_pos, -1, rx325_done
-    eq rx325_pos, -1, rx325_fail
-    jump $I10
-  rx325_done:
-    rx325_cur."!cursor_fail"()
-    rx325_cur."!cursor_debug"("FAIL  ", "statement_mod_loop:sym<until>")
-    .return (rx325_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__statement_mod_loop:sym<until>"  :subid("85_1258424429.0004") :method
-.annotate "line", 4
-    new $P327, "ResizablePMCArray"
-    push $P327, "until"
-    .return ($P327)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "term:sym<colonpair>"  :subid("86_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx332_tgt
-    .local int rx332_pos
-    .local int rx332_off
-    .local int rx332_eos
-    .local int rx332_rep
-    .local pmc rx332_cur
-    (rx332_cur, rx332_pos, rx332_tgt, $I10) = self."!cursor_start"()
-    rx332_cur."!cursor_debug"("START ", "term:sym<colonpair>")
-    .lex unicode:"$\x{a2}", rx332_cur
-    .local pmc match
-    .lex "$/", match
-    length rx332_eos, rx332_tgt
-    set rx332_off, 0
-    lt $I10, 2, rx332_start
-    sub rx332_off, $I10, 1
-    substr rx332_tgt, rx332_tgt, rx332_off
-  rx332_start:
+.sub "statement_mod_cond"  :subid("77_1258533478.31768") :method
 .annotate "line", 189
-  # rx subrule "colonpair" subtype=capture negate=
-    rx332_cur."!cursor_pos"(rx332_pos)
-    $P10 = rx332_cur."colonpair"()
-    unless $P10, rx332_fail
-    rx332_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("colonpair")
-    rx332_pos = $P10."pos"()
-  # rx pass
-    rx332_cur."!cursor_pass"(rx332_pos, "term:sym<colonpair>")
-    rx332_cur."!cursor_debug"("PASS  ", "term:sym<colonpair>", " at pos=", rx332_pos)
-    .return (rx332_cur)
-  rx332_fail:
+    $P317 = self."!protoregex"("statement_mod_cond")
+    .return ($P317)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__statement_mod_cond"  :subid("78_1258533478.31768") :method
+.annotate "line", 189
+    $P319 = self."!PREFIX__!protoregex"("statement_mod_cond")
+    .return ($P319)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "statement_mod_cond:sym<if>"  :subid("79_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    (rx332_rep, rx332_pos, $I10, $P10) = rx332_cur."!mark_fail"(0)
-    lt rx332_pos, -1, rx332_done
-    eq rx332_pos, -1, rx332_fail
+    .local string rx321_tgt
+    .local int rx321_pos
+    .local int rx321_off
+    .local int rx321_eos
+    .local int rx321_rep
+    .local pmc rx321_cur
+    (rx321_cur, rx321_pos, rx321_tgt, $I10) = self."!cursor_start"()
+    rx321_cur."!cursor_debug"("START ", "statement_mod_cond:sym<if>")
+    .lex unicode:"$\x{a2}", rx321_cur
+    .local pmc match
+    .lex "$/", match
+    length rx321_eos, rx321_tgt
+    set rx321_off, 0
+    lt $I10, 2, rx321_start
+    sub rx321_off, $I10, 1
+    substr rx321_tgt, rx321_tgt, rx321_off
+  rx321_start:
+.annotate "line", 191
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_324_fail
+    rx321_cur."!mark_push"(0, rx321_pos, $I10)
+  # rx literal  "if"
+    add $I11, rx321_pos, 2
+    gt $I11, rx321_eos, rx321_fail
+    sub $I11, rx321_pos, rx321_off
+    substr $S10, rx321_tgt, $I11, 2
+    ne $S10, "if", rx321_fail
+    add rx321_pos, 2
+    set_addr $I10, rxcap_324_fail
+    ($I12, $I11) = rx321_cur."!mark_peek"($I10)
+    rx321_cur."!cursor_pos"($I11)
+    ($P10) = rx321_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx321_pos, "")
+    rx321_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_324_done
+  rxcap_324_fail:
+    goto rx321_fail
+  rxcap_324_done:
+  # rx subrule "ws" subtype=method negate=
+    rx321_cur."!cursor_pos"(rx321_pos)
+    $P10 = rx321_cur."ws"()
+    unless $P10, rx321_fail
+    rx321_pos = $P10."pos"()
+  # rx subrule "EXPR" subtype=capture negate=
+    rx321_cur."!cursor_pos"(rx321_pos)
+    $P10 = rx321_cur."EXPR"()
+    unless $P10, rx321_fail
+    rx321_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("cond")
+    rx321_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx321_cur."!cursor_pos"(rx321_pos)
+    $P10 = rx321_cur."ws"()
+    unless $P10, rx321_fail
+    rx321_pos = $P10."pos"()
+  # rx pass
+    rx321_cur."!cursor_pass"(rx321_pos, "statement_mod_cond:sym<if>")
+    rx321_cur."!cursor_debug"("PASS  ", "statement_mod_cond:sym<if>", " at pos=", rx321_pos)
+    .return (rx321_cur)
+  rx321_fail:
+.annotate "line", 4
+    (rx321_rep, rx321_pos, $I10, $P10) = rx321_cur."!mark_fail"(0)
+    lt rx321_pos, -1, rx321_done
+    eq rx321_pos, -1, rx321_fail
     jump $I10
-  rx332_done:
-    rx332_cur."!cursor_fail"()
-    rx332_cur."!cursor_debug"("FAIL  ", "term:sym<colonpair>")
-    .return (rx332_cur)
+  rx321_done:
+    rx321_cur."!cursor_fail"()
+    rx321_cur."!cursor_debug"("FAIL  ", "statement_mod_cond:sym<if>")
+    .return (rx321_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<colonpair>"  :subid("87_1258424429.0004") :method
+.sub "!PREFIX__statement_mod_cond:sym<if>"  :subid("80_1258533478.31768") :method
 .annotate "line", 4
-    $P334 = self."!PREFIX__!subrule"("colonpair", "")
-    new $P335, "ResizablePMCArray"
-    push $P335, $P334
+    new $P323, "ResizablePMCArray"
+    push $P323, "if"
+    .return ($P323)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "statement_mod_cond:sym<unless>"  :subid("81_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx328_tgt
+    .local int rx328_pos
+    .local int rx328_off
+    .local int rx328_eos
+    .local int rx328_rep
+    .local pmc rx328_cur
+    (rx328_cur, rx328_pos, rx328_tgt, $I10) = self."!cursor_start"()
+    rx328_cur."!cursor_debug"("START ", "statement_mod_cond:sym<unless>")
+    .lex unicode:"$\x{a2}", rx328_cur
+    .local pmc match
+    .lex "$/", match
+    length rx328_eos, rx328_tgt
+    set rx328_off, 0
+    lt $I10, 2, rx328_start
+    sub rx328_off, $I10, 1
+    substr rx328_tgt, rx328_tgt, rx328_off
+  rx328_start:
+.annotate "line", 192
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_331_fail
+    rx328_cur."!mark_push"(0, rx328_pos, $I10)
+  # rx literal  "unless"
+    add $I11, rx328_pos, 6
+    gt $I11, rx328_eos, rx328_fail
+    sub $I11, rx328_pos, rx328_off
+    substr $S10, rx328_tgt, $I11, 6
+    ne $S10, "unless", rx328_fail
+    add rx328_pos, 6
+    set_addr $I10, rxcap_331_fail
+    ($I12, $I11) = rx328_cur."!mark_peek"($I10)
+    rx328_cur."!cursor_pos"($I11)
+    ($P10) = rx328_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx328_pos, "")
+    rx328_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_331_done
+  rxcap_331_fail:
+    goto rx328_fail
+  rxcap_331_done:
+  # rx subrule "ws" subtype=method negate=
+    rx328_cur."!cursor_pos"(rx328_pos)
+    $P10 = rx328_cur."ws"()
+    unless $P10, rx328_fail
+    rx328_pos = $P10."pos"()
+  # rx subrule "EXPR" subtype=capture negate=
+    rx328_cur."!cursor_pos"(rx328_pos)
+    $P10 = rx328_cur."EXPR"()
+    unless $P10, rx328_fail
+    rx328_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("cond")
+    rx328_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx328_cur."!cursor_pos"(rx328_pos)
+    $P10 = rx328_cur."ws"()
+    unless $P10, rx328_fail
+    rx328_pos = $P10."pos"()
+  # rx pass
+    rx328_cur."!cursor_pass"(rx328_pos, "statement_mod_cond:sym<unless>")
+    rx328_cur."!cursor_debug"("PASS  ", "statement_mod_cond:sym<unless>", " at pos=", rx328_pos)
+    .return (rx328_cur)
+  rx328_fail:
+.annotate "line", 4
+    (rx328_rep, rx328_pos, $I10, $P10) = rx328_cur."!mark_fail"(0)
+    lt rx328_pos, -1, rx328_done
+    eq rx328_pos, -1, rx328_fail
+    jump $I10
+  rx328_done:
+    rx328_cur."!cursor_fail"()
+    rx328_cur."!cursor_debug"("FAIL  ", "statement_mod_cond:sym<unless>")
+    .return (rx328_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__statement_mod_cond:sym<unless>"  :subid("82_1258533478.31768") :method
+.annotate "line", 4
+    new $P330, "ResizablePMCArray"
+    push $P330, "unless"
+    .return ($P330)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "statement_mod_loop"  :subid("83_1258533478.31768") :method
+.annotate "line", 194
+    $P335 = self."!protoregex"("statement_mod_loop")
     .return ($P335)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "term:sym<variable>"  :subid("88_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx337_tgt
-    .local int rx337_pos
-    .local int rx337_off
-    .local int rx337_eos
-    .local int rx337_rep
-    .local pmc rx337_cur
-    (rx337_cur, rx337_pos, rx337_tgt, $I10) = self."!cursor_start"()
-    rx337_cur."!cursor_debug"("START ", "term:sym<variable>")
-    .lex unicode:"$\x{a2}", rx337_cur
-    .local pmc match
-    .lex "$/", match
-    length rx337_eos, rx337_tgt
-    set rx337_off, 0
-    lt $I10, 2, rx337_start
-    sub rx337_off, $I10, 1
-    substr rx337_tgt, rx337_tgt, rx337_off
-  rx337_start:
-.annotate "line", 190
-  # rx subrule "variable" subtype=capture negate=
-    rx337_cur."!cursor_pos"(rx337_pos)
-    $P10 = rx337_cur."variable"()
-    unless $P10, rx337_fail
-    rx337_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("variable")
-    rx337_pos = $P10."pos"()
-  # rx pass
-    rx337_cur."!cursor_pass"(rx337_pos, "term:sym<variable>")
-    rx337_cur."!cursor_debug"("PASS  ", "term:sym<variable>", " at pos=", rx337_pos)
-    .return (rx337_cur)
-  rx337_fail:
-.annotate "line", 4
-    (rx337_rep, rx337_pos, $I10, $P10) = rx337_cur."!mark_fail"(0)
-    lt rx337_pos, -1, rx337_done
-    eq rx337_pos, -1, rx337_fail
-    jump $I10
-  rx337_done:
-    rx337_cur."!cursor_fail"()
-    rx337_cur."!cursor_debug"("FAIL  ", "term:sym<variable>")
-    .return (rx337_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<variable>"  :subid("89_1258424429.0004") :method
-.annotate "line", 4
-    $P339 = self."!PREFIX__!subrule"("variable", "")
-    new $P340, "ResizablePMCArray"
-    push $P340, $P339
-    .return ($P340)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "term:sym<package_declarator>"  :subid("90_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx342_tgt
-    .local int rx342_pos
-    .local int rx342_off
-    .local int rx342_eos
-    .local int rx342_rep
-    .local pmc rx342_cur
-    (rx342_cur, rx342_pos, rx342_tgt, $I10) = self."!cursor_start"()
-    rx342_cur."!cursor_debug"("START ", "term:sym<package_declarator>")
-    .lex unicode:"$\x{a2}", rx342_cur
-    .local pmc match
-    .lex "$/", match
-    length rx342_eos, rx342_tgt
-    set rx342_off, 0
-    lt $I10, 2, rx342_start
-    sub rx342_off, $I10, 1
-    substr rx342_tgt, rx342_tgt, rx342_off
-  rx342_start:
-.annotate "line", 191
-  # rx subrule "package_declarator" subtype=capture negate=
-    rx342_cur."!cursor_pos"(rx342_pos)
-    $P10 = rx342_cur."package_declarator"()
-    unless $P10, rx342_fail
-    rx342_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("package_declarator")
-    rx342_pos = $P10."pos"()
-  # rx pass
-    rx342_cur."!cursor_pass"(rx342_pos, "term:sym<package_declarator>")
-    rx342_cur."!cursor_debug"("PASS  ", "term:sym<package_declarator>", " at pos=", rx342_pos)
-    .return (rx342_cur)
-  rx342_fail:
-.annotate "line", 4
-    (rx342_rep, rx342_pos, $I10, $P10) = rx342_cur."!mark_fail"(0)
-    lt rx342_pos, -1, rx342_done
-    eq rx342_pos, -1, rx342_fail
-    jump $I10
-  rx342_done:
-    rx342_cur."!cursor_fail"()
-    rx342_cur."!cursor_debug"("FAIL  ", "term:sym<package_declarator>")
-    .return (rx342_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<package_declarator>"  :subid("91_1258424429.0004") :method
-.annotate "line", 4
-    $P344 = self."!PREFIX__!subrule"("package_declarator", "")
-    new $P345, "ResizablePMCArray"
-    push $P345, $P344
-    .return ($P345)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "term:sym<scope_declarator>"  :subid("92_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx347_tgt
-    .local int rx347_pos
-    .local int rx347_off
-    .local int rx347_eos
-    .local int rx347_rep
-    .local pmc rx347_cur
-    (rx347_cur, rx347_pos, rx347_tgt, $I10) = self."!cursor_start"()
-    rx347_cur."!cursor_debug"("START ", "term:sym<scope_declarator>")
-    .lex unicode:"$\x{a2}", rx347_cur
-    .local pmc match
-    .lex "$/", match
-    length rx347_eos, rx347_tgt
-    set rx347_off, 0
-    lt $I10, 2, rx347_start
-    sub rx347_off, $I10, 1
-    substr rx347_tgt, rx347_tgt, rx347_off
-  rx347_start:
-.annotate "line", 192
-  # rx subrule "scope_declarator" subtype=capture negate=
-    rx347_cur."!cursor_pos"(rx347_pos)
-    $P10 = rx347_cur."scope_declarator"()
-    unless $P10, rx347_fail
-    rx347_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("scope_declarator")
-    rx347_pos = $P10."pos"()
-  # rx pass
-    rx347_cur."!cursor_pass"(rx347_pos, "term:sym<scope_declarator>")
-    rx347_cur."!cursor_debug"("PASS  ", "term:sym<scope_declarator>", " at pos=", rx347_pos)
-    .return (rx347_cur)
-  rx347_fail:
-.annotate "line", 4
-    (rx347_rep, rx347_pos, $I10, $P10) = rx347_cur."!mark_fail"(0)
-    lt rx347_pos, -1, rx347_done
-    eq rx347_pos, -1, rx347_fail
-    jump $I10
-  rx347_done:
-    rx347_cur."!cursor_fail"()
-    rx347_cur."!cursor_debug"("FAIL  ", "term:sym<scope_declarator>")
-    .return (rx347_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<scope_declarator>"  :subid("93_1258424429.0004") :method
-.annotate "line", 4
-    $P349 = self."!PREFIX__!subrule"("scope_declarator", "")
-    new $P350, "ResizablePMCArray"
-    push $P350, $P349
-    .return ($P350)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "term:sym<routine_declarator>"  :subid("94_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx352_tgt
-    .local int rx352_pos
-    .local int rx352_off
-    .local int rx352_eos
-    .local int rx352_rep
-    .local pmc rx352_cur
-    (rx352_cur, rx352_pos, rx352_tgt, $I10) = self."!cursor_start"()
-    rx352_cur."!cursor_debug"("START ", "term:sym<routine_declarator>")
-    .lex unicode:"$\x{a2}", rx352_cur
-    .local pmc match
-    .lex "$/", match
-    length rx352_eos, rx352_tgt
-    set rx352_off, 0
-    lt $I10, 2, rx352_start
-    sub rx352_off, $I10, 1
-    substr rx352_tgt, rx352_tgt, rx352_off
-  rx352_start:
-.annotate "line", 193
-  # rx subrule "routine_declarator" subtype=capture negate=
-    rx352_cur."!cursor_pos"(rx352_pos)
-    $P10 = rx352_cur."routine_declarator"()
-    unless $P10, rx352_fail
-    rx352_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("routine_declarator")
-    rx352_pos = $P10."pos"()
-  # rx pass
-    rx352_cur."!cursor_pass"(rx352_pos, "term:sym<routine_declarator>")
-    rx352_cur."!cursor_debug"("PASS  ", "term:sym<routine_declarator>", " at pos=", rx352_pos)
-    .return (rx352_cur)
-  rx352_fail:
-.annotate "line", 4
-    (rx352_rep, rx352_pos, $I10, $P10) = rx352_cur."!mark_fail"(0)
-    lt rx352_pos, -1, rx352_done
-    eq rx352_pos, -1, rx352_fail
-    jump $I10
-  rx352_done:
-    rx352_cur."!cursor_fail"()
-    rx352_cur."!cursor_debug"("FAIL  ", "term:sym<routine_declarator>")
-    .return (rx352_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<routine_declarator>"  :subid("95_1258424429.0004") :method
-.annotate "line", 4
-    $P354 = self."!PREFIX__!subrule"("routine_declarator", "")
-    new $P355, "ResizablePMCArray"
-    push $P355, $P354
-    .return ($P355)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "term:sym<regex_declarator>"  :subid("96_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx357_tgt
-    .local int rx357_pos
-    .local int rx357_off
-    .local int rx357_eos
-    .local int rx357_rep
-    .local pmc rx357_cur
-    (rx357_cur, rx357_pos, rx357_tgt, $I10) = self."!cursor_start"()
-    rx357_cur."!cursor_debug"("START ", "term:sym<regex_declarator>")
-    .lex unicode:"$\x{a2}", rx357_cur
-    .local pmc match
-    .lex "$/", match
-    length rx357_eos, rx357_tgt
-    set rx357_off, 0
-    lt $I10, 2, rx357_start
-    sub rx357_off, $I10, 1
-    substr rx357_tgt, rx357_tgt, rx357_off
-  rx357_start:
+.sub "!PREFIX__statement_mod_loop"  :subid("84_1258533478.31768") :method
 .annotate "line", 194
-  # rx subrule "regex_declarator" subtype=capture negate=
-    rx357_cur."!cursor_pos"(rx357_pos)
-    $P10 = rx357_cur."regex_declarator"()
-    unless $P10, rx357_fail
-    rx357_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("regex_declarator")
-    rx357_pos = $P10."pos"()
-  # rx pass
-    rx357_cur."!cursor_pass"(rx357_pos, "term:sym<regex_declarator>")
-    rx357_cur."!cursor_debug"("PASS  ", "term:sym<regex_declarator>", " at pos=", rx357_pos)
-    .return (rx357_cur)
-  rx357_fail:
-.annotate "line", 4
-    (rx357_rep, rx357_pos, $I10, $P10) = rx357_cur."!mark_fail"(0)
-    lt rx357_pos, -1, rx357_done
-    eq rx357_pos, -1, rx357_fail
-    jump $I10
-  rx357_done:
-    rx357_cur."!cursor_fail"()
-    rx357_cur."!cursor_debug"("FAIL  ", "term:sym<regex_declarator>")
-    .return (rx357_cur)
-    .return ()
+    $P337 = self."!PREFIX__!protoregex"("statement_mod_loop")
+    .return ($P337)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<regex_declarator>"  :subid("97_1258424429.0004") :method
+.sub "statement_mod_loop:sym<while>"  :subid("85_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    $P359 = self."!PREFIX__!subrule"("regex_declarator", "")
-    new $P360, "ResizablePMCArray"
-    push $P360, $P359
-    .return ($P360)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "term:sym<statement_prefix>"  :subid("98_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx362_tgt
-    .local int rx362_pos
-    .local int rx362_off
-    .local int rx362_eos
-    .local int rx362_rep
-    .local pmc rx362_cur
-    (rx362_cur, rx362_pos, rx362_tgt, $I10) = self."!cursor_start"()
-    rx362_cur."!cursor_debug"("START ", "term:sym<statement_prefix>")
-    .lex unicode:"$\x{a2}", rx362_cur
+    .local string rx339_tgt
+    .local int rx339_pos
+    .local int rx339_off
+    .local int rx339_eos
+    .local int rx339_rep
+    .local pmc rx339_cur
+    (rx339_cur, rx339_pos, rx339_tgt, $I10) = self."!cursor_start"()
+    rx339_cur."!cursor_debug"("START ", "statement_mod_loop:sym<while>")
+    .lex unicode:"$\x{a2}", rx339_cur
     .local pmc match
     .lex "$/", match
-    length rx362_eos, rx362_tgt
-    set rx362_off, 0
-    lt $I10, 2, rx362_start
-    sub rx362_off, $I10, 1
-    substr rx362_tgt, rx362_tgt, rx362_off
-  rx362_start:
-.annotate "line", 195
-  # rx subrule "statement_prefix" subtype=capture negate=
-    rx362_cur."!cursor_pos"(rx362_pos)
-    $P10 = rx362_cur."statement_prefix"()
-    unless $P10, rx362_fail
-    rx362_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("statement_prefix")
-    rx362_pos = $P10."pos"()
-  # rx pass
-    rx362_cur."!cursor_pass"(rx362_pos, "term:sym<statement_prefix>")
-    rx362_cur."!cursor_debug"("PASS  ", "term:sym<statement_prefix>", " at pos=", rx362_pos)
-    .return (rx362_cur)
-  rx362_fail:
-.annotate "line", 4
-    (rx362_rep, rx362_pos, $I10, $P10) = rx362_cur."!mark_fail"(0)
-    lt rx362_pos, -1, rx362_done
-    eq rx362_pos, -1, rx362_fail
-    jump $I10
-  rx362_done:
-    rx362_cur."!cursor_fail"()
-    rx362_cur."!cursor_debug"("FAIL  ", "term:sym<statement_prefix>")
-    .return (rx362_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<statement_prefix>"  :subid("99_1258424429.0004") :method
-.annotate "line", 4
-    $P364 = self."!PREFIX__!subrule"("statement_prefix", "")
-    new $P365, "ResizablePMCArray"
-    push $P365, $P364
-    .return ($P365)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "term:sym<lambda>"  :subid("100_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx367_tgt
-    .local int rx367_pos
-    .local int rx367_off
-    .local int rx367_eos
-    .local int rx367_rep
-    .local pmc rx367_cur
-    (rx367_cur, rx367_pos, rx367_tgt, $I10) = self."!cursor_start"()
-    rx367_cur."!cursor_debug"("START ", "term:sym<lambda>")
-    .lex unicode:"$\x{a2}", rx367_cur
-    .local pmc match
-    .lex "$/", match
-    length rx367_eos, rx367_tgt
-    set rx367_off, 0
-    lt $I10, 2, rx367_start
-    sub rx367_off, $I10, 1
-    substr rx367_tgt, rx367_tgt, rx367_off
-  rx367_start:
+    length rx339_eos, rx339_tgt
+    set rx339_off, 0
+    lt $I10, 2, rx339_start
+    sub rx339_off, $I10, 1
+    substr rx339_tgt, rx339_tgt, rx339_off
+  rx339_start:
 .annotate "line", 196
-  # rx subrule "lambda" subtype=zerowidth negate=
-    rx367_cur."!cursor_pos"(rx367_pos)
-    $P10 = rx367_cur."lambda"()
-    unless $P10, rx367_fail
-  # rx subrule "pblock" subtype=capture negate=
-    rx367_cur."!cursor_pos"(rx367_pos)
-    $P10 = rx367_cur."pblock"()
-    unless $P10, rx367_fail
-    rx367_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("pblock")
-    rx367_pos = $P10."pos"()
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_342_fail
+    rx339_cur."!mark_push"(0, rx339_pos, $I10)
+  # rx literal  "while"
+    add $I11, rx339_pos, 5
+    gt $I11, rx339_eos, rx339_fail
+    sub $I11, rx339_pos, rx339_off
+    substr $S10, rx339_tgt, $I11, 5
+    ne $S10, "while", rx339_fail
+    add rx339_pos, 5
+    set_addr $I10, rxcap_342_fail
+    ($I12, $I11) = rx339_cur."!mark_peek"($I10)
+    rx339_cur."!cursor_pos"($I11)
+    ($P10) = rx339_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx339_pos, "")
+    rx339_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_342_done
+  rxcap_342_fail:
+    goto rx339_fail
+  rxcap_342_done:
+  # rx subrule "ws" subtype=method negate=
+    rx339_cur."!cursor_pos"(rx339_pos)
+    $P10 = rx339_cur."ws"()
+    unless $P10, rx339_fail
+    rx339_pos = $P10."pos"()
+  # rx subrule "EXPR" subtype=capture negate=
+    rx339_cur."!cursor_pos"(rx339_pos)
+    $P10 = rx339_cur."EXPR"()
+    unless $P10, rx339_fail
+    rx339_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("cond")
+    rx339_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx339_cur."!cursor_pos"(rx339_pos)
+    $P10 = rx339_cur."ws"()
+    unless $P10, rx339_fail
+    rx339_pos = $P10."pos"()
   # rx pass
-    rx367_cur."!cursor_pass"(rx367_pos, "term:sym<lambda>")
-    rx367_cur."!cursor_debug"("PASS  ", "term:sym<lambda>", " at pos=", rx367_pos)
-    .return (rx367_cur)
-  rx367_fail:
+    rx339_cur."!cursor_pass"(rx339_pos, "statement_mod_loop:sym<while>")
+    rx339_cur."!cursor_debug"("PASS  ", "statement_mod_loop:sym<while>", " at pos=", rx339_pos)
+    .return (rx339_cur)
+  rx339_fail:
 .annotate "line", 4
-    (rx367_rep, rx367_pos, $I10, $P10) = rx367_cur."!mark_fail"(0)
-    lt rx367_pos, -1, rx367_done
-    eq rx367_pos, -1, rx367_fail
+    (rx339_rep, rx339_pos, $I10, $P10) = rx339_cur."!mark_fail"(0)
+    lt rx339_pos, -1, rx339_done
+    eq rx339_pos, -1, rx339_fail
     jump $I10
-  rx367_done:
-    rx367_cur."!cursor_fail"()
-    rx367_cur."!cursor_debug"("FAIL  ", "term:sym<lambda>")
-    .return (rx367_cur)
+  rx339_done:
+    rx339_cur."!cursor_fail"()
+    rx339_cur."!cursor_debug"("FAIL  ", "statement_mod_loop:sym<while>")
+    .return (rx339_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<lambda>"  :subid("101_1258424429.0004") :method
+.sub "!PREFIX__statement_mod_loop:sym<while>"  :subid("86_1258533478.31768") :method
 .annotate "line", 4
-    new $P369, "ResizablePMCArray"
-    push $P369, ""
-    .return ($P369)
+    new $P341, "ResizablePMCArray"
+    push $P341, "while"
+    .return ($P341)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "colonpair"  :subid("102_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "statement_mod_loop:sym<until>"  :subid("87_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx371_tgt
-    .local int rx371_pos
-    .local int rx371_off
-    .local int rx371_eos
-    .local int rx371_rep
-    .local pmc rx371_cur
-    (rx371_cur, rx371_pos, rx371_tgt, $I10) = self."!cursor_start"()
-    rx371_cur."!cursor_debug"("START ", "colonpair")
-    rx371_cur."!cursor_caparray"("circumfix")
-    .lex unicode:"$\x{a2}", rx371_cur
+    .local string rx346_tgt
+    .local int rx346_pos
+    .local int rx346_off
+    .local int rx346_eos
+    .local int rx346_rep
+    .local pmc rx346_cur
+    (rx346_cur, rx346_pos, rx346_tgt, $I10) = self."!cursor_start"()
+    rx346_cur."!cursor_debug"("START ", "statement_mod_loop:sym<until>")
+    .lex unicode:"$\x{a2}", rx346_cur
     .local pmc match
     .lex "$/", match
-    length rx371_eos, rx371_tgt
-    set rx371_off, 0
-    lt $I10, 2, rx371_start
-    sub rx371_off, $I10, 1
-    substr rx371_tgt, rx371_tgt, rx371_off
-  rx371_start:
-.annotate "line", 199
-  # rx literal  ":"
-    add $I11, rx371_pos, 1
-    gt $I11, rx371_eos, rx371_fail
-    sub $I11, rx371_pos, rx371_off
-    substr $S10, rx371_tgt, $I11, 1
-    ne $S10, ":", rx371_fail
-    add rx371_pos, 1
-  alt376_0:
-.annotate "line", 200
-    set_addr $I10, alt376_1
-    rx371_cur."!mark_push"(0, rx371_pos, $I10)
+    length rx346_eos, rx346_tgt
+    set rx346_off, 0
+    lt $I10, 2, rx346_start
+    sub rx346_off, $I10, 1
+    substr rx346_tgt, rx346_tgt, rx346_off
+  rx346_start:
+.annotate "line", 197
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_349_fail
+    rx346_cur."!mark_push"(0, rx346_pos, $I10)
+  # rx literal  "until"
+    add $I11, rx346_pos, 5
+    gt $I11, rx346_eos, rx346_fail
+    sub $I11, rx346_pos, rx346_off
+    substr $S10, rx346_tgt, $I11, 5
+    ne $S10, "until", rx346_fail
+    add rx346_pos, 5
+    set_addr $I10, rxcap_349_fail
+    ($I12, $I11) = rx346_cur."!mark_peek"($I10)
+    rx346_cur."!cursor_pos"($I11)
+    ($P10) = rx346_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx346_pos, "")
+    rx346_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_349_done
+  rxcap_349_fail:
+    goto rx346_fail
+  rxcap_349_done:
+  # rx subrule "ws" subtype=method negate=
+    rx346_cur."!cursor_pos"(rx346_pos)
+    $P10 = rx346_cur."ws"()
+    unless $P10, rx346_fail
+    rx346_pos = $P10."pos"()
+  # rx subrule "EXPR" subtype=capture negate=
+    rx346_cur."!cursor_pos"(rx346_pos)
+    $P10 = rx346_cur."EXPR"()
+    unless $P10, rx346_fail
+    rx346_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("cond")
+    rx346_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx346_cur."!cursor_pos"(rx346_pos)
+    $P10 = rx346_cur."ws"()
+    unless $P10, rx346_fail
+    rx346_pos = $P10."pos"()
+  # rx pass
+    rx346_cur."!cursor_pass"(rx346_pos, "statement_mod_loop:sym<until>")
+    rx346_cur."!cursor_debug"("PASS  ", "statement_mod_loop:sym<until>", " at pos=", rx346_pos)
+    .return (rx346_cur)
+  rx346_fail:
+.annotate "line", 4
+    (rx346_rep, rx346_pos, $I10, $P10) = rx346_cur."!mark_fail"(0)
+    lt rx346_pos, -1, rx346_done
+    eq rx346_pos, -1, rx346_fail
+    jump $I10
+  rx346_done:
+    rx346_cur."!cursor_fail"()
+    rx346_cur."!cursor_debug"("FAIL  ", "statement_mod_loop:sym<until>")
+    .return (rx346_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__statement_mod_loop:sym<until>"  :subid("88_1258533478.31768") :method
+.annotate "line", 4
+    new $P348, "ResizablePMCArray"
+    push $P348, "until"
+    .return ($P348)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "term:sym<colonpair>"  :subid("89_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx353_tgt
+    .local int rx353_pos
+    .local int rx353_off
+    .local int rx353_eos
+    .local int rx353_rep
+    .local pmc rx353_cur
+    (rx353_cur, rx353_pos, rx353_tgt, $I10) = self."!cursor_start"()
+    rx353_cur."!cursor_debug"("START ", "term:sym<colonpair>")
+    .lex unicode:"$\x{a2}", rx353_cur
+    .local pmc match
+    .lex "$/", match
+    length rx353_eos, rx353_tgt
+    set rx353_off, 0
+    lt $I10, 2, rx353_start
+    sub rx353_off, $I10, 1
+    substr rx353_tgt, rx353_tgt, rx353_off
+  rx353_start:
 .annotate "line", 201
-  # rx subcapture "not"
-    set_addr $I10, rxcap_377_fail
-    rx371_cur."!mark_push"(0, rx371_pos, $I10)
-  # rx literal  "!"
-    add $I11, rx371_pos, 1
-    gt $I11, rx371_eos, rx371_fail
-    sub $I11, rx371_pos, rx371_off
-    substr $S10, rx371_tgt, $I11, 1
-    ne $S10, "!", rx371_fail
-    add rx371_pos, 1
-    set_addr $I10, rxcap_377_fail
-    ($I12, $I11) = rx371_cur."!mark_peek"($I10)
-    rx371_cur."!cursor_pos"($I11)
-    ($P10) = rx371_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx371_pos, "")
-    rx371_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("not")
-    goto rxcap_377_done
-  rxcap_377_fail:
-    goto rx371_fail
-  rxcap_377_done:
-  # rx subrule "identifier" subtype=capture negate=
-    rx371_cur."!cursor_pos"(rx371_pos)
-    $P10 = rx371_cur."identifier"()
-    unless $P10, rx371_fail
-    rx371_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("identifier")
-    rx371_pos = $P10."pos"()
-    goto alt376_end
-  alt376_1:
-.annotate "line", 202
-  # rx subrule "identifier" subtype=capture negate=
-    rx371_cur."!cursor_pos"(rx371_pos)
-    $P10 = rx371_cur."identifier"()
-    unless $P10, rx371_fail
-    rx371_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("identifier")
-    rx371_pos = $P10."pos"()
-  # rx rxquantr378 ** 0..1
-    set_addr $I379, rxquantr378_done
-    rx371_cur."!mark_push"(0, rx371_pos, $I379)
-  rxquantr378_loop:
-  # rx subrule "circumfix" subtype=capture negate=
-    rx371_cur."!cursor_pos"(rx371_pos)
-    $P10 = rx371_cur."circumfix"()
-    unless $P10, rx371_fail
-    rx371_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("circumfix")
-    rx371_pos = $P10."pos"()
-    (rx371_rep) = rx371_cur."!mark_commit"($I379)
-  rxquantr378_done:
-  alt376_end:
-.annotate "line", 198
+  # rx subrule "colonpair" subtype=capture negate=
+    rx353_cur."!cursor_pos"(rx353_pos)
+    $P10 = rx353_cur."colonpair"()
+    unless $P10, rx353_fail
+    rx353_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("colonpair")
+    rx353_pos = $P10."pos"()
   # rx pass
-    rx371_cur."!cursor_pass"(rx371_pos, "colonpair")
-    rx371_cur."!cursor_debug"("PASS  ", "colonpair", " at pos=", rx371_pos)
-    .return (rx371_cur)
-  rx371_fail:
+    rx353_cur."!cursor_pass"(rx353_pos, "term:sym<colonpair>")
+    rx353_cur."!cursor_debug"("PASS  ", "term:sym<colonpair>", " at pos=", rx353_pos)
+    .return (rx353_cur)
+  rx353_fail:
 .annotate "line", 4
-    (rx371_rep, rx371_pos, $I10, $P10) = rx371_cur."!mark_fail"(0)
-    lt rx371_pos, -1, rx371_done
-    eq rx371_pos, -1, rx371_fail
+    (rx353_rep, rx353_pos, $I10, $P10) = rx353_cur."!mark_fail"(0)
+    lt rx353_pos, -1, rx353_done
+    eq rx353_pos, -1, rx353_fail
     jump $I10
-  rx371_done:
-    rx371_cur."!cursor_fail"()
-    rx371_cur."!cursor_debug"("FAIL  ", "colonpair")
-    .return (rx371_cur)
+  rx353_done:
+    rx353_cur."!cursor_fail"()
+    rx353_cur."!cursor_debug"("FAIL  ", "term:sym<colonpair>")
+    .return (rx353_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__colonpair"  :subid("103_1258424429.0004") :method
+.sub "!PREFIX__term:sym<colonpair>"  :subid("90_1258533478.31768") :method
 .annotate "line", 4
-    $P373 = self."!PREFIX__!subrule"("identifier", ":")
-    $P374 = self."!PREFIX__!subrule"("identifier", ":!")
-    new $P375, "ResizablePMCArray"
-    push $P375, $P373
-    push $P375, $P374
-    .return ($P375)
+    $P355 = self."!PREFIX__!subrule"("colonpair", "")
+    new $P356, "ResizablePMCArray"
+    push $P356, $P355
+    .return ($P356)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "variable"  :subid("104_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "term:sym<variable>"  :subid("91_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx381_tgt
-    .local int rx381_pos
-    .local int rx381_off
-    .local int rx381_eos
-    .local int rx381_rep
-    .local pmc rx381_cur
-    (rx381_cur, rx381_pos, rx381_tgt, $I10) = self."!cursor_start"()
-    rx381_cur."!cursor_debug"("START ", "variable")
-    rx381_cur."!cursor_caparray"("twigil")
-    .lex unicode:"$\x{a2}", rx381_cur
+    .local string rx358_tgt
+    .local int rx358_pos
+    .local int rx358_off
+    .local int rx358_eos
+    .local int rx358_rep
+    .local pmc rx358_cur
+    (rx358_cur, rx358_pos, rx358_tgt, $I10) = self."!cursor_start"()
+    rx358_cur."!cursor_debug"("START ", "term:sym<variable>")
+    .lex unicode:"$\x{a2}", rx358_cur
     .local pmc match
     .lex "$/", match
-    length rx381_eos, rx381_tgt
-    set rx381_off, 0
-    lt $I10, 2, rx381_start
-    sub rx381_off, $I10, 1
-    substr rx381_tgt, rx381_tgt, rx381_off
-  rx381_start:
-  alt386_0:
-.annotate "line", 206
-    set_addr $I10, alt386_1
-    rx381_cur."!mark_push"(0, rx381_pos, $I10)
-.annotate "line", 207
-  # rx subrule "sigil" subtype=capture negate=
-    rx381_cur."!cursor_pos"(rx381_pos)
-    $P10 = rx381_cur."sigil"()
-    unless $P10, rx381_fail
-    rx381_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sigil")
-    rx381_pos = $P10."pos"()
-  # rx rxquantr387 ** 0..1
-    set_addr $I388, rxquantr387_done
-    rx381_cur."!mark_push"(0, rx381_pos, $I388)
-  rxquantr387_loop:
-  # rx subrule "twigil" subtype=capture negate=
-    rx381_cur."!cursor_pos"(rx381_pos)
-    $P10 = rx381_cur."twigil"()
-    unless $P10, rx381_fail
-    rx381_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("twigil")
-    rx381_pos = $P10."pos"()
-    (rx381_rep) = rx381_cur."!mark_commit"($I388)
-  rxquantr387_done:
-  # rx subrule "name" subtype=capture negate=
-    rx381_cur."!cursor_pos"(rx381_pos)
-    $P10 = rx381_cur."name"()
-    unless $P10, rx381_fail
-    rx381_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("desigilname")
-    rx381_pos = $P10."pos"()
-    goto alt386_end
-  alt386_1:
-    set_addr $I10, alt386_2
-    rx381_cur."!mark_push"(0, rx381_pos, $I10)
-.annotate "line", 208
-  # rx subrule "sigil" subtype=capture negate=
-    rx381_cur."!cursor_pos"(rx381_pos)
-    $P10 = rx381_cur."sigil"()
-    unless $P10, rx381_fail
-    rx381_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sigil")
-    rx381_pos = $P10."pos"()
-  # rx enumcharlist negate=0 zerowidth
-    ge rx381_pos, rx381_eos, rx381_fail
-    sub $I10, rx381_pos, rx381_off
-    substr $S10, rx381_tgt, $I10, 1
-    index $I11, "<[", $S10
-    lt $I11, 0, rx381_fail
-  # rx subrule "postcircumfix" subtype=capture negate=
-    rx381_cur."!cursor_pos"(rx381_pos)
-    $P10 = rx381_cur."postcircumfix"()
-    unless $P10, rx381_fail
-    rx381_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("postcircumfix")
-    rx381_pos = $P10."pos"()
-    goto alt386_end
-  alt386_2:
-.annotate "line", 209
-  # rx subcapture "sigil"
-    set_addr $I10, rxcap_389_fail
-    rx381_cur."!mark_push"(0, rx381_pos, $I10)
-  # rx literal  "$"
-    add $I11, rx381_pos, 1
-    gt $I11, rx381_eos, rx381_fail
-    sub $I11, rx381_pos, rx381_off
-    substr $S10, rx381_tgt, $I11, 1
-    ne $S10, "$", rx381_fail
-    add rx381_pos, 1
-    set_addr $I10, rxcap_389_fail
-    ($I12, $I11) = rx381_cur."!mark_peek"($I10)
-    rx381_cur."!cursor_pos"($I11)
-    ($P10) = rx381_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx381_pos, "")
-    rx381_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sigil")
-    goto rxcap_389_done
-  rxcap_389_fail:
-    goto rx381_fail
-  rxcap_389_done:
-  # rx subcapture "desigilname"
-    set_addr $I10, rxcap_390_fail
-    rx381_cur."!mark_push"(0, rx381_pos, $I10)
-  # rx enumcharlist negate=0 
-    ge rx381_pos, rx381_eos, rx381_fail
-    sub $I10, rx381_pos, rx381_off
-    substr $S10, rx381_tgt, $I10, 1
-    index $I11, "/_!", $S10
-    lt $I11, 0, rx381_fail
-    inc rx381_pos
-    set_addr $I10, rxcap_390_fail
-    ($I12, $I11) = rx381_cur."!mark_peek"($I10)
-    rx381_cur."!cursor_pos"($I11)
-    ($P10) = rx381_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx381_pos, "")
-    rx381_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("desigilname")
-    goto rxcap_390_done
-  rxcap_390_fail:
-    goto rx381_fail
-  rxcap_390_done:
-  alt386_end:
-.annotate "line", 206
+    length rx358_eos, rx358_tgt
+    set rx358_off, 0
+    lt $I10, 2, rx358_start
+    sub rx358_off, $I10, 1
+    substr rx358_tgt, rx358_tgt, rx358_off
+  rx358_start:
+.annotate "line", 202
+  # rx subrule "variable" subtype=capture negate=
+    rx358_cur."!cursor_pos"(rx358_pos)
+    $P10 = rx358_cur."variable"()
+    unless $P10, rx358_fail
+    rx358_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("variable")
+    rx358_pos = $P10."pos"()
   # rx pass
-    rx381_cur."!cursor_pass"(rx381_pos, "variable")
-    rx381_cur."!cursor_debug"("PASS  ", "variable", " at pos=", rx381_pos)
-    .return (rx381_cur)
-  rx381_fail:
+    rx358_cur."!cursor_pass"(rx358_pos, "term:sym<variable>")
+    rx358_cur."!cursor_debug"("PASS  ", "term:sym<variable>", " at pos=", rx358_pos)
+    .return (rx358_cur)
+  rx358_fail:
 .annotate "line", 4
-    (rx381_rep, rx381_pos, $I10, $P10) = rx381_cur."!mark_fail"(0)
-    lt rx381_pos, -1, rx381_done
-    eq rx381_pos, -1, rx381_fail
+    (rx358_rep, rx358_pos, $I10, $P10) = rx358_cur."!mark_fail"(0)
+    lt rx358_pos, -1, rx358_done
+    eq rx358_pos, -1, rx358_fail
     jump $I10
-  rx381_done:
-    rx381_cur."!cursor_fail"()
-    rx381_cur."!cursor_debug"("FAIL  ", "variable")
-    .return (rx381_cur)
+  rx358_done:
+    rx358_cur."!cursor_fail"()
+    rx358_cur."!cursor_debug"("FAIL  ", "term:sym<variable>")
+    .return (rx358_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__variable"  :subid("105_1258424429.0004") :method
+.sub "!PREFIX__term:sym<variable>"  :subid("92_1258533478.31768") :method
 .annotate "line", 4
-    $P383 = self."!PREFIX__!subrule"("sigil", "")
-    $P384 = self."!PREFIX__!subrule"("sigil", "")
-    new $P385, "ResizablePMCArray"
-    push $P385, "$!"
-    push $P385, "$_"
-    push $P385, "$/"
-    push $P385, $P383
-    push $P385, $P384
-    .return ($P385)
+    $P360 = self."!PREFIX__!subrule"("variable", "")
+    new $P361, "ResizablePMCArray"
+    push $P361, $P360
+    .return ($P361)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "sigil"  :subid("106_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "term:sym<package_declarator>"  :subid("93_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx363_tgt
+    .local int rx363_pos
+    .local int rx363_off
+    .local int rx363_eos
+    .local int rx363_rep
+    .local pmc rx363_cur
+    (rx363_cur, rx363_pos, rx363_tgt, $I10) = self."!cursor_start"()
+    rx363_cur."!cursor_debug"("START ", "term:sym<package_declarator>")
+    .lex unicode:"$\x{a2}", rx363_cur
+    .local pmc match
+    .lex "$/", match
+    length rx363_eos, rx363_tgt
+    set rx363_off, 0
+    lt $I10, 2, rx363_start
+    sub rx363_off, $I10, 1
+    substr rx363_tgt, rx363_tgt, rx363_off
+  rx363_start:
+.annotate "line", 203
+  # rx subrule "package_declarator" subtype=capture negate=
+    rx363_cur."!cursor_pos"(rx363_pos)
+    $P10 = rx363_cur."package_declarator"()
+    unless $P10, rx363_fail
+    rx363_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("package_declarator")
+    rx363_pos = $P10."pos"()
+  # rx pass
+    rx363_cur."!cursor_pass"(rx363_pos, "term:sym<package_declarator>")
+    rx363_cur."!cursor_debug"("PASS  ", "term:sym<package_declarator>", " at pos=", rx363_pos)
+    .return (rx363_cur)
+  rx363_fail:
+.annotate "line", 4
+    (rx363_rep, rx363_pos, $I10, $P10) = rx363_cur."!mark_fail"(0)
+    lt rx363_pos, -1, rx363_done
+    eq rx363_pos, -1, rx363_fail
+    jump $I10
+  rx363_done:
+    rx363_cur."!cursor_fail"()
+    rx363_cur."!cursor_debug"("FAIL  ", "term:sym<package_declarator>")
+    .return (rx363_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__term:sym<package_declarator>"  :subid("94_1258533478.31768") :method
+.annotate "line", 4
+    $P365 = self."!PREFIX__!subrule"("package_declarator", "")
+    new $P366, "ResizablePMCArray"
+    push $P366, $P365
+    .return ($P366)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "term:sym<scope_declarator>"  :subid("95_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx368_tgt
+    .local int rx368_pos
+    .local int rx368_off
+    .local int rx368_eos
+    .local int rx368_rep
+    .local pmc rx368_cur
+    (rx368_cur, rx368_pos, rx368_tgt, $I10) = self."!cursor_start"()
+    rx368_cur."!cursor_debug"("START ", "term:sym<scope_declarator>")
+    .lex unicode:"$\x{a2}", rx368_cur
+    .local pmc match
+    .lex "$/", match
+    length rx368_eos, rx368_tgt
+    set rx368_off, 0
+    lt $I10, 2, rx368_start
+    sub rx368_off, $I10, 1
+    substr rx368_tgt, rx368_tgt, rx368_off
+  rx368_start:
+.annotate "line", 204
+  # rx subrule "scope_declarator" subtype=capture negate=
+    rx368_cur."!cursor_pos"(rx368_pos)
+    $P10 = rx368_cur."scope_declarator"()
+    unless $P10, rx368_fail
+    rx368_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("scope_declarator")
+    rx368_pos = $P10."pos"()
+  # rx pass
+    rx368_cur."!cursor_pass"(rx368_pos, "term:sym<scope_declarator>")
+    rx368_cur."!cursor_debug"("PASS  ", "term:sym<scope_declarator>", " at pos=", rx368_pos)
+    .return (rx368_cur)
+  rx368_fail:
+.annotate "line", 4
+    (rx368_rep, rx368_pos, $I10, $P10) = rx368_cur."!mark_fail"(0)
+    lt rx368_pos, -1, rx368_done
+    eq rx368_pos, -1, rx368_fail
+    jump $I10
+  rx368_done:
+    rx368_cur."!cursor_fail"()
+    rx368_cur."!cursor_debug"("FAIL  ", "term:sym<scope_declarator>")
+    .return (rx368_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__term:sym<scope_declarator>"  :subid("96_1258533478.31768") :method
+.annotate "line", 4
+    $P370 = self."!PREFIX__!subrule"("scope_declarator", "")
+    new $P371, "ResizablePMCArray"
+    push $P371, $P370
+    .return ($P371)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "term:sym<routine_declarator>"  :subid("97_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx373_tgt
+    .local int rx373_pos
+    .local int rx373_off
+    .local int rx373_eos
+    .local int rx373_rep
+    .local pmc rx373_cur
+    (rx373_cur, rx373_pos, rx373_tgt, $I10) = self."!cursor_start"()
+    rx373_cur."!cursor_debug"("START ", "term:sym<routine_declarator>")
+    .lex unicode:"$\x{a2}", rx373_cur
+    .local pmc match
+    .lex "$/", match
+    length rx373_eos, rx373_tgt
+    set rx373_off, 0
+    lt $I10, 2, rx373_start
+    sub rx373_off, $I10, 1
+    substr rx373_tgt, rx373_tgt, rx373_off
+  rx373_start:
+.annotate "line", 205
+  # rx subrule "routine_declarator" subtype=capture negate=
+    rx373_cur."!cursor_pos"(rx373_pos)
+    $P10 = rx373_cur."routine_declarator"()
+    unless $P10, rx373_fail
+    rx373_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("routine_declarator")
+    rx373_pos = $P10."pos"()
+  # rx pass
+    rx373_cur."!cursor_pass"(rx373_pos, "term:sym<routine_declarator>")
+    rx373_cur."!cursor_debug"("PASS  ", "term:sym<routine_declarator>", " at pos=", rx373_pos)
+    .return (rx373_cur)
+  rx373_fail:
+.annotate "line", 4
+    (rx373_rep, rx373_pos, $I10, $P10) = rx373_cur."!mark_fail"(0)
+    lt rx373_pos, -1, rx373_done
+    eq rx373_pos, -1, rx373_fail
+    jump $I10
+  rx373_done:
+    rx373_cur."!cursor_fail"()
+    rx373_cur."!cursor_debug"("FAIL  ", "term:sym<routine_declarator>")
+    .return (rx373_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__term:sym<routine_declarator>"  :subid("98_1258533478.31768") :method
+.annotate "line", 4
+    $P375 = self."!PREFIX__!subrule"("routine_declarator", "")
+    new $P376, "ResizablePMCArray"
+    push $P376, $P375
+    .return ($P376)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "term:sym<regex_declarator>"  :subid("99_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx378_tgt
+    .local int rx378_pos
+    .local int rx378_off
+    .local int rx378_eos
+    .local int rx378_rep
+    .local pmc rx378_cur
+    (rx378_cur, rx378_pos, rx378_tgt, $I10) = self."!cursor_start"()
+    rx378_cur."!cursor_debug"("START ", "term:sym<regex_declarator>")
+    .lex unicode:"$\x{a2}", rx378_cur
+    .local pmc match
+    .lex "$/", match
+    length rx378_eos, rx378_tgt
+    set rx378_off, 0
+    lt $I10, 2, rx378_start
+    sub rx378_off, $I10, 1
+    substr rx378_tgt, rx378_tgt, rx378_off
+  rx378_start:
+.annotate "line", 206
+  # rx subrule "regex_declarator" subtype=capture negate=
+    rx378_cur."!cursor_pos"(rx378_pos)
+    $P10 = rx378_cur."regex_declarator"()
+    unless $P10, rx378_fail
+    rx378_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("regex_declarator")
+    rx378_pos = $P10."pos"()
+  # rx pass
+    rx378_cur."!cursor_pass"(rx378_pos, "term:sym<regex_declarator>")
+    rx378_cur."!cursor_debug"("PASS  ", "term:sym<regex_declarator>", " at pos=", rx378_pos)
+    .return (rx378_cur)
+  rx378_fail:
+.annotate "line", 4
+    (rx378_rep, rx378_pos, $I10, $P10) = rx378_cur."!mark_fail"(0)
+    lt rx378_pos, -1, rx378_done
+    eq rx378_pos, -1, rx378_fail
+    jump $I10
+  rx378_done:
+    rx378_cur."!cursor_fail"()
+    rx378_cur."!cursor_debug"("FAIL  ", "term:sym<regex_declarator>")
+    .return (rx378_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__term:sym<regex_declarator>"  :subid("100_1258533478.31768") :method
+.annotate "line", 4
+    $P380 = self."!PREFIX__!subrule"("regex_declarator", "")
+    new $P381, "ResizablePMCArray"
+    push $P381, $P380
+    .return ($P381)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "term:sym<statement_prefix>"  :subid("101_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx383_tgt
+    .local int rx383_pos
+    .local int rx383_off
+    .local int rx383_eos
+    .local int rx383_rep
+    .local pmc rx383_cur
+    (rx383_cur, rx383_pos, rx383_tgt, $I10) = self."!cursor_start"()
+    rx383_cur."!cursor_debug"("START ", "term:sym<statement_prefix>")
+    .lex unicode:"$\x{a2}", rx383_cur
+    .local pmc match
+    .lex "$/", match
+    length rx383_eos, rx383_tgt
+    set rx383_off, 0
+    lt $I10, 2, rx383_start
+    sub rx383_off, $I10, 1
+    substr rx383_tgt, rx383_tgt, rx383_off
+  rx383_start:
+.annotate "line", 207
+  # rx subrule "statement_prefix" subtype=capture negate=
+    rx383_cur."!cursor_pos"(rx383_pos)
+    $P10 = rx383_cur."statement_prefix"()
+    unless $P10, rx383_fail
+    rx383_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("statement_prefix")
+    rx383_pos = $P10."pos"()
+  # rx pass
+    rx383_cur."!cursor_pass"(rx383_pos, "term:sym<statement_prefix>")
+    rx383_cur."!cursor_debug"("PASS  ", "term:sym<statement_prefix>", " at pos=", rx383_pos)
+    .return (rx383_cur)
+  rx383_fail:
+.annotate "line", 4
+    (rx383_rep, rx383_pos, $I10, $P10) = rx383_cur."!mark_fail"(0)
+    lt rx383_pos, -1, rx383_done
+    eq rx383_pos, -1, rx383_fail
+    jump $I10
+  rx383_done:
+    rx383_cur."!cursor_fail"()
+    rx383_cur."!cursor_debug"("FAIL  ", "term:sym<statement_prefix>")
+    .return (rx383_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__term:sym<statement_prefix>"  :subid("102_1258533478.31768") :method
+.annotate "line", 4
+    $P385 = self."!PREFIX__!subrule"("statement_prefix", "")
+    new $P386, "ResizablePMCArray"
+    push $P386, $P385
+    .return ($P386)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "term:sym<lambda>"  :subid("103_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx388_tgt
+    .local int rx388_pos
+    .local int rx388_off
+    .local int rx388_eos
+    .local int rx388_rep
+    .local pmc rx388_cur
+    (rx388_cur, rx388_pos, rx388_tgt, $I10) = self."!cursor_start"()
+    rx388_cur."!cursor_debug"("START ", "term:sym<lambda>")
+    .lex unicode:"$\x{a2}", rx388_cur
+    .local pmc match
+    .lex "$/", match
+    length rx388_eos, rx388_tgt
+    set rx388_off, 0
+    lt $I10, 2, rx388_start
+    sub rx388_off, $I10, 1
+    substr rx388_tgt, rx388_tgt, rx388_off
+  rx388_start:
+.annotate "line", 208
+  # rx subrule "lambda" subtype=zerowidth negate=
+    rx388_cur."!cursor_pos"(rx388_pos)
+    $P10 = rx388_cur."lambda"()
+    unless $P10, rx388_fail
+  # rx subrule "pblock" subtype=capture negate=
+    rx388_cur."!cursor_pos"(rx388_pos)
+    $P10 = rx388_cur."pblock"()
+    unless $P10, rx388_fail
+    rx388_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("pblock")
+    rx388_pos = $P10."pos"()
+  # rx pass
+    rx388_cur."!cursor_pass"(rx388_pos, "term:sym<lambda>")
+    rx388_cur."!cursor_debug"("PASS  ", "term:sym<lambda>", " at pos=", rx388_pos)
+    .return (rx388_cur)
+  rx388_fail:
+.annotate "line", 4
+    (rx388_rep, rx388_pos, $I10, $P10) = rx388_cur."!mark_fail"(0)
+    lt rx388_pos, -1, rx388_done
+    eq rx388_pos, -1, rx388_fail
+    jump $I10
+  rx388_done:
+    rx388_cur."!cursor_fail"()
+    rx388_cur."!cursor_debug"("FAIL  ", "term:sym<lambda>")
+    .return (rx388_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__term:sym<lambda>"  :subid("104_1258533478.31768") :method
+.annotate "line", 4
+    new $P390, "ResizablePMCArray"
+    push $P390, ""
+    .return ($P390)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "colonpair"  :subid("105_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
     .local string rx392_tgt
     .local int rx392_pos
@@ -4739,7 +4749,8 @@ NQP::Compiler - NQP compiler
     .local int rx392_rep
     .local pmc rx392_cur
     (rx392_cur, rx392_pos, rx392_tgt, $I10) = self."!cursor_start"()
-    rx392_cur."!cursor_debug"("START ", "sigil")
+    rx392_cur."!cursor_debug"("START ", "colonpair")
+    rx392_cur."!cursor_caparray"("circumfix")
     .lex unicode:"$\x{a2}", rx392_cur
     .local pmc match
     .lex "$/", match
@@ -4749,17 +4760,75 @@ NQP::Compiler - NQP compiler
     sub rx392_off, $I10, 1
     substr rx392_tgt, rx392_tgt, rx392_off
   rx392_start:
+.annotate "line", 211
+  # rx literal  ":"
+    add $I11, rx392_pos, 1
+    gt $I11, rx392_eos, rx392_fail
+    sub $I11, rx392_pos, rx392_off
+    substr $S10, rx392_tgt, $I11, 1
+    ne $S10, ":", rx392_fail
+    add rx392_pos, 1
+  alt397_0:
 .annotate "line", 212
-  # rx enumcharlist negate=0 
-    ge rx392_pos, rx392_eos, rx392_fail
-    sub $I10, rx392_pos, rx392_off
-    substr $S10, rx392_tgt, $I10, 1
-    index $I11, "$@%&", $S10
-    lt $I11, 0, rx392_fail
-    inc rx392_pos
+    set_addr $I10, alt397_1
+    rx392_cur."!mark_push"(0, rx392_pos, $I10)
+.annotate "line", 213
+  # rx subcapture "not"
+    set_addr $I10, rxcap_398_fail
+    rx392_cur."!mark_push"(0, rx392_pos, $I10)
+  # rx literal  "!"
+    add $I11, rx392_pos, 1
+    gt $I11, rx392_eos, rx392_fail
+    sub $I11, rx392_pos, rx392_off
+    substr $S10, rx392_tgt, $I11, 1
+    ne $S10, "!", rx392_fail
+    add rx392_pos, 1
+    set_addr $I10, rxcap_398_fail
+    ($I12, $I11) = rx392_cur."!mark_peek"($I10)
+    rx392_cur."!cursor_pos"($I11)
+    ($P10) = rx392_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx392_pos, "")
+    rx392_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("not")
+    goto rxcap_398_done
+  rxcap_398_fail:
+    goto rx392_fail
+  rxcap_398_done:
+  # rx subrule "identifier" subtype=capture negate=
+    rx392_cur."!cursor_pos"(rx392_pos)
+    $P10 = rx392_cur."identifier"()
+    unless $P10, rx392_fail
+    rx392_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("identifier")
+    rx392_pos = $P10."pos"()
+    goto alt397_end
+  alt397_1:
+.annotate "line", 214
+  # rx subrule "identifier" subtype=capture negate=
+    rx392_cur."!cursor_pos"(rx392_pos)
+    $P10 = rx392_cur."identifier"()
+    unless $P10, rx392_fail
+    rx392_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("identifier")
+    rx392_pos = $P10."pos"()
+  # rx rxquantr399 ** 0..1
+    set_addr $I400, rxquantr399_done
+    rx392_cur."!mark_push"(0, rx392_pos, $I400)
+  rxquantr399_loop:
+  # rx subrule "circumfix" subtype=capture negate=
+    rx392_cur."!cursor_pos"(rx392_pos)
+    $P10 = rx392_cur."circumfix"()
+    unless $P10, rx392_fail
+    rx392_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("circumfix")
+    rx392_pos = $P10."pos"()
+    (rx392_rep) = rx392_cur."!mark_commit"($I400)
+  rxquantr399_done:
+  alt397_end:
+.annotate "line", 210
   # rx pass
-    rx392_cur."!cursor_pass"(rx392_pos, "sigil")
-    rx392_cur."!cursor_debug"("PASS  ", "sigil", " at pos=", rx392_pos)
+    rx392_cur."!cursor_pass"(rx392_pos, "colonpair")
+    rx392_cur."!cursor_debug"("PASS  ", "colonpair", " at pos=", rx392_pos)
     .return (rx392_cur)
   rx392_fail:
 .annotate "line", 4
@@ -4769,1037 +4838,1027 @@ NQP::Compiler - NQP compiler
     jump $I10
   rx392_done:
     rx392_cur."!cursor_fail"()
-    rx392_cur."!cursor_debug"("FAIL  ", "sigil")
+    rx392_cur."!cursor_debug"("FAIL  ", "colonpair")
     .return (rx392_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__sigil"  :subid("107_1258424429.0004") :method
+.sub "!PREFIX__colonpair"  :subid("106_1258533478.31768") :method
 .annotate "line", 4
-    new $P394, "ResizablePMCArray"
-    push $P394, "&"
-    push $P394, "%"
-    push $P394, "@"
-    push $P394, "$"
-    .return ($P394)
+    $P394 = self."!PREFIX__!subrule"("identifier", ":")
+    $P395 = self."!PREFIX__!subrule"("identifier", ":!")
+    new $P396, "ResizablePMCArray"
+    push $P396, $P394
+    push $P396, $P395
+    .return ($P396)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "twigil"  :subid("108_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "variable"  :subid("107_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx396_tgt
-    .local int rx396_pos
-    .local int rx396_off
-    .local int rx396_eos
-    .local int rx396_rep
-    .local pmc rx396_cur
-    (rx396_cur, rx396_pos, rx396_tgt, $I10) = self."!cursor_start"()
-    rx396_cur."!cursor_debug"("START ", "twigil")
-    .lex unicode:"$\x{a2}", rx396_cur
+    .local string rx402_tgt
+    .local int rx402_pos
+    .local int rx402_off
+    .local int rx402_eos
+    .local int rx402_rep
+    .local pmc rx402_cur
+    (rx402_cur, rx402_pos, rx402_tgt, $I10) = self."!cursor_start"()
+    rx402_cur."!cursor_debug"("START ", "variable")
+    rx402_cur."!cursor_caparray"("twigil")
+    .lex unicode:"$\x{a2}", rx402_cur
     .local pmc match
     .lex "$/", match
-    length rx396_eos, rx396_tgt
-    set rx396_off, 0
-    lt $I10, 2, rx396_start
-    sub rx396_off, $I10, 1
-    substr rx396_tgt, rx396_tgt, rx396_off
-  rx396_start:
-.annotate "line", 214
-  # rx enumcharlist negate=0 
-    ge rx396_pos, rx396_eos, rx396_fail
-    sub $I10, rx396_pos, rx396_off
-    substr $S10, rx396_tgt, $I10, 1
-    index $I11, "*!?", $S10
-    lt $I11, 0, rx396_fail
-    inc rx396_pos
-  # rx pass
-    rx396_cur."!cursor_pass"(rx396_pos, "twigil")
-    rx396_cur."!cursor_debug"("PASS  ", "twigil", " at pos=", rx396_pos)
-    .return (rx396_cur)
-  rx396_fail:
-.annotate "line", 4
-    (rx396_rep, rx396_pos, $I10, $P10) = rx396_cur."!mark_fail"(0)
-    lt rx396_pos, -1, rx396_done
-    eq rx396_pos, -1, rx396_fail
-    jump $I10
-  rx396_done:
-    rx396_cur."!cursor_fail"()
-    rx396_cur."!cursor_debug"("FAIL  ", "twigil")
-    .return (rx396_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__twigil"  :subid("109_1258424429.0004") :method
-.annotate "line", 4
-    new $P398, "ResizablePMCArray"
-    push $P398, "?"
-    push $P398, "!"
-    push $P398, "*"
-    .return ($P398)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "package_declarator"  :subid("110_1258424429.0004") :method
-.annotate "line", 216
-    $P400 = self."!protoregex"("package_declarator")
-    .return ($P400)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__package_declarator"  :subid("111_1258424429.0004") :method
-.annotate "line", 216
-    $P402 = self."!PREFIX__!protoregex"("package_declarator")
-    .return ($P402)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "package_declarator:sym<module>"  :subid("112_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx404_tgt
-    .local int rx404_pos
-    .local int rx404_off
-    .local int rx404_eos
-    .local int rx404_rep
-    .local pmc rx404_cur
-    (rx404_cur, rx404_pos, rx404_tgt, $I10) = self."!cursor_start"()
-    rx404_cur."!cursor_debug"("START ", "package_declarator:sym<module>")
-    .lex unicode:"$\x{a2}", rx404_cur
-    .local pmc match
-    .lex "$/", match
-    length rx404_eos, rx404_tgt
-    set rx404_off, 0
-    lt $I10, 2, rx404_start
-    sub rx404_off, $I10, 1
-    substr rx404_tgt, rx404_tgt, rx404_off
-  rx404_start:
-.annotate "line", 217
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_408_fail
-    rx404_cur."!mark_push"(0, rx404_pos, $I10)
-  # rx literal  "module"
-    add $I11, rx404_pos, 6
-    gt $I11, rx404_eos, rx404_fail
-    sub $I11, rx404_pos, rx404_off
-    substr $S10, rx404_tgt, $I11, 6
-    ne $S10, "module", rx404_fail
-    add rx404_pos, 6
-    set_addr $I10, rxcap_408_fail
-    ($I12, $I11) = rx404_cur."!mark_peek"($I10)
-    rx404_cur."!cursor_pos"($I11)
-    ($P10) = rx404_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx404_pos, "")
-    rx404_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_408_done
-  rxcap_408_fail:
-    goto rx404_fail
-  rxcap_408_done:
-  # rx subrule "package_def" subtype=capture negate=
-    rx404_cur."!cursor_pos"(rx404_pos)
-    $P10 = rx404_cur."package_def"()
-    unless $P10, rx404_fail
-    rx404_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("package_def")
-    rx404_pos = $P10."pos"()
-  # rx pass
-    rx404_cur."!cursor_pass"(rx404_pos, "package_declarator:sym<module>")
-    rx404_cur."!cursor_debug"("PASS  ", "package_declarator:sym<module>", " at pos=", rx404_pos)
-    .return (rx404_cur)
-  rx404_fail:
-.annotate "line", 4
-    (rx404_rep, rx404_pos, $I10, $P10) = rx404_cur."!mark_fail"(0)
-    lt rx404_pos, -1, rx404_done
-    eq rx404_pos, -1, rx404_fail
-    jump $I10
-  rx404_done:
-    rx404_cur."!cursor_fail"()
-    rx404_cur."!cursor_debug"("FAIL  ", "package_declarator:sym<module>")
-    .return (rx404_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__package_declarator:sym<module>"  :subid("113_1258424429.0004") :method
-.annotate "line", 4
-    $P406 = self."!PREFIX__!subrule"("package_def", "module")
-    new $P407, "ResizablePMCArray"
-    push $P407, $P406
-    .return ($P407)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "package_declarator:sym<class>"  :subid("114_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx410_tgt
-    .local int rx410_pos
-    .local int rx410_off
-    .local int rx410_eos
-    .local int rx410_rep
-    .local pmc rx410_cur
-    (rx410_cur, rx410_pos, rx410_tgt, $I10) = self."!cursor_start"()
-    rx410_cur."!cursor_debug"("START ", "package_declarator:sym<class>")
-    .lex unicode:"$\x{a2}", rx410_cur
-    .local pmc match
-    .lex "$/", match
-    length rx410_eos, rx410_tgt
-    set rx410_off, 0
-    lt $I10, 2, rx410_start
-    sub rx410_off, $I10, 1
-    substr rx410_tgt, rx410_tgt, rx410_off
-  rx410_start:
+    length rx402_eos, rx402_tgt
+    set rx402_off, 0
+    lt $I10, 2, rx402_start
+    sub rx402_off, $I10, 1
+    substr rx402_tgt, rx402_tgt, rx402_off
+  rx402_start:
+  alt407_0:
 .annotate "line", 218
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_416_fail
-    rx410_cur."!mark_push"(0, rx410_pos, $I10)
-  alt415_0:
-    set_addr $I10, alt415_1
-    rx410_cur."!mark_push"(0, rx410_pos, $I10)
-  # rx literal  "class"
-    add $I11, rx410_pos, 5
-    gt $I11, rx410_eos, rx410_fail
-    sub $I11, rx410_pos, rx410_off
-    substr $S10, rx410_tgt, $I11, 5
-    ne $S10, "class", rx410_fail
-    add rx410_pos, 5
-    goto alt415_end
-  alt415_1:
-  # rx literal  "grammar"
-    add $I11, rx410_pos, 7
-    gt $I11, rx410_eos, rx410_fail
-    sub $I11, rx410_pos, rx410_off
-    substr $S10, rx410_tgt, $I11, 7
-    ne $S10, "grammar", rx410_fail
-    add rx410_pos, 7
-  alt415_end:
-    set_addr $I10, rxcap_416_fail
-    ($I12, $I11) = rx410_cur."!mark_peek"($I10)
-    rx410_cur."!cursor_pos"($I11)
-    ($P10) = rx410_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx410_pos, "")
-    rx410_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_416_done
-  rxcap_416_fail:
-    goto rx410_fail
-  rxcap_416_done:
-  # rx subrule "package_def" subtype=capture negate=
-    rx410_cur."!cursor_pos"(rx410_pos)
-    $P10 = rx410_cur."package_def"()
-    unless $P10, rx410_fail
-    rx410_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("package_def")
-    rx410_pos = $P10."pos"()
-  # rx pass
-    rx410_cur."!cursor_pass"(rx410_pos, "package_declarator:sym<class>")
-    rx410_cur."!cursor_debug"("PASS  ", "package_declarator:sym<class>", " at pos=", rx410_pos)
-    .return (rx410_cur)
-  rx410_fail:
-.annotate "line", 4
-    (rx410_rep, rx410_pos, $I10, $P10) = rx410_cur."!mark_fail"(0)
-    lt rx410_pos, -1, rx410_done
-    eq rx410_pos, -1, rx410_fail
-    jump $I10
-  rx410_done:
-    rx410_cur."!cursor_fail"()
-    rx410_cur."!cursor_debug"("FAIL  ", "package_declarator:sym<class>")
-    .return (rx410_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__package_declarator:sym<class>"  :subid("115_1258424429.0004") :method
-.annotate "line", 4
-    $P412 = self."!PREFIX__!subrule"("package_def", "grammar")
-    $P413 = self."!PREFIX__!subrule"("package_def", "class")
-    new $P414, "ResizablePMCArray"
-    push $P414, $P412
-    push $P414, $P413
-    .return ($P414)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "package_def"  :subid("116_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx418_tgt
-    .local int rx418_pos
-    .local int rx418_off
-    .local int rx418_eos
-    .local int rx418_rep
-    .local pmc rx418_cur
-    (rx418_cur, rx418_pos, rx418_tgt, $I10) = self."!cursor_start"()
-    rx418_cur."!cursor_debug"("START ", "package_def")
-    rx418_cur."!cursor_caparray"("parent")
-    .lex unicode:"$\x{a2}", rx418_cur
-    .local pmc match
-    .lex "$/", match
-    length rx418_eos, rx418_tgt
-    set rx418_off, 0
-    lt $I10, 2, rx418_start
-    sub rx418_off, $I10, 1
-    substr rx418_tgt, rx418_tgt, rx418_off
-  rx418_start:
+    set_addr $I10, alt407_1
+    rx402_cur."!mark_push"(0, rx402_pos, $I10)
+.annotate "line", 219
+  # rx subrule "sigil" subtype=capture negate=
+    rx402_cur."!cursor_pos"(rx402_pos)
+    $P10 = rx402_cur."sigil"()
+    unless $P10, rx402_fail
+    rx402_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sigil")
+    rx402_pos = $P10."pos"()
+  # rx rxquantr408 ** 0..1
+    set_addr $I409, rxquantr408_done
+    rx402_cur."!mark_push"(0, rx402_pos, $I409)
+  rxquantr408_loop:
+  # rx subrule "twigil" subtype=capture negate=
+    rx402_cur."!cursor_pos"(rx402_pos)
+    $P10 = rx402_cur."twigil"()
+    unless $P10, rx402_fail
+    rx402_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("twigil")
+    rx402_pos = $P10."pos"()
+    (rx402_rep) = rx402_cur."!mark_commit"($I409)
+  rxquantr408_done:
+  # rx subrule "name" subtype=capture negate=
+    rx402_cur."!cursor_pos"(rx402_pos)
+    $P10 = rx402_cur."name"()
+    unless $P10, rx402_fail
+    rx402_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("desigilname")
+    rx402_pos = $P10."pos"()
+    goto alt407_end
+  alt407_1:
+    set_addr $I10, alt407_2
+    rx402_cur."!mark_push"(0, rx402_pos, $I10)
 .annotate "line", 220
-  # rx subrule "ws" subtype=method negate=
-    rx418_cur."!cursor_pos"(rx418_pos)
-    $P10 = rx418_cur."ws"()
-    unless $P10, rx418_fail
-    rx418_pos = $P10."pos"()
-.annotate "line", 221
-  # rx subrule "name" subtype=capture negate=
-    rx418_cur."!cursor_pos"(rx418_pos)
-    $P10 = rx418_cur."name"()
-    unless $P10, rx418_fail
-    rx418_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("name")
-    rx418_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx418_cur."!cursor_pos"(rx418_pos)
-    $P10 = rx418_cur."ws"()
-    unless $P10, rx418_fail
-    rx418_pos = $P10."pos"()
-.annotate "line", 222
-  # rx rxquantr423 ** 0..1
-    set_addr $I427, rxquantr423_done
-    rx418_cur."!mark_push"(0, rx418_pos, $I427)
-  rxquantr423_loop:
-  # rx subrule "ws" subtype=method negate=
-    rx418_cur."!cursor_pos"(rx418_pos)
-    $P10 = rx418_cur."ws"()
-    unless $P10, rx418_fail
-    rx418_pos = $P10."pos"()
-  # rx literal  "is"
-    add $I11, rx418_pos, 2
-    gt $I11, rx418_eos, rx418_fail
-    sub $I11, rx418_pos, rx418_off
-    substr $S10, rx418_tgt, $I11, 2
-    ne $S10, "is", rx418_fail
-    add rx418_pos, 2
-  # rx subrule "ws" subtype=method negate=
-    rx418_cur."!cursor_pos"(rx418_pos)
-    $P10 = rx418_cur."ws"()
-    unless $P10, rx418_fail
-    rx418_pos = $P10."pos"()
-  # rx subrule "name" subtype=capture negate=
-    rx418_cur."!cursor_pos"(rx418_pos)
-    $P10 = rx418_cur."name"()
-    unless $P10, rx418_fail
-    rx418_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("parent")
-    rx418_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx418_cur."!cursor_pos"(rx418_pos)
-    $P10 = rx418_cur."ws"()
-    unless $P10, rx418_fail
-    rx418_pos = $P10."pos"()
-    (rx418_rep) = rx418_cur."!mark_commit"($I427)
-  rxquantr423_done:
-  # rx subrule "ws" subtype=method negate=
-    rx418_cur."!cursor_pos"(rx418_pos)
-    $P10 = rx418_cur."ws"()
-    unless $P10, rx418_fail
-    rx418_pos = $P10."pos"()
-  alt429_0:
-.annotate "line", 223
-    set_addr $I10, alt429_1
-    rx418_cur."!mark_push"(0, rx418_pos, $I10)
-.annotate "line", 224
-  # rx subrule "ws" subtype=method negate=
-    rx418_cur."!cursor_pos"(rx418_pos)
-    $P10 = rx418_cur."ws"()
-    unless $P10, rx418_fail
-    rx418_pos = $P10."pos"()
-  # rx literal  ";"
-    add $I11, rx418_pos, 1
-    gt $I11, rx418_eos, rx418_fail
-    sub $I11, rx418_pos, rx418_off
-    substr $S10, rx418_tgt, $I11, 1
-    ne $S10, ";", rx418_fail
-    add rx418_pos, 1
-  # rx subrule "ws" subtype=method negate=
-    rx418_cur."!cursor_pos"(rx418_pos)
-    $P10 = rx418_cur."ws"()
-    unless $P10, rx418_fail
-    rx418_pos = $P10."pos"()
-  # rx subrule "comp_unit" subtype=capture negate=
-    rx418_cur."!cursor_pos"(rx418_pos)
-    $P10 = rx418_cur."comp_unit"()
-    unless $P10, rx418_fail
-    rx418_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("comp_unit")
-    rx418_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx418_cur."!cursor_pos"(rx418_pos)
-    $P10 = rx418_cur."ws"()
-    unless $P10, rx418_fail
-    rx418_pos = $P10."pos"()
-    goto alt429_end
-  alt429_1:
-    set_addr $I10, alt429_2
-    rx418_cur."!mark_push"(0, rx418_pos, $I10)
-.annotate "line", 225
-  # rx subrule "ws" subtype=method negate=
-    rx418_cur."!cursor_pos"(rx418_pos)
-    $P10 = rx418_cur."ws"()
-    unless $P10, rx418_fail
-    rx418_pos = $P10."pos"()
+  # rx subrule "sigil" subtype=capture negate=
+    rx402_cur."!cursor_pos"(rx402_pos)
+    $P10 = rx402_cur."sigil"()
+    unless $P10, rx402_fail
+    rx402_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sigil")
+    rx402_pos = $P10."pos"()
   # rx enumcharlist negate=0 zerowidth
-    ge rx418_pos, rx418_eos, rx418_fail
-    sub $I10, rx418_pos, rx418_off
-    substr $S10, rx418_tgt, $I10, 1
-    index $I11, "{", $S10
-    lt $I11, 0, rx418_fail
-  # rx subrule "ws" subtype=method negate=
-    rx418_cur."!cursor_pos"(rx418_pos)
-    $P10 = rx418_cur."ws"()
-    unless $P10, rx418_fail
-    rx418_pos = $P10."pos"()
-  # rx subrule "block" subtype=capture negate=
-    rx418_cur."!cursor_pos"(rx418_pos)
-    $P10 = rx418_cur."block"()
-    unless $P10, rx418_fail
-    rx418_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("block")
-    rx418_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx418_cur."!cursor_pos"(rx418_pos)
-    $P10 = rx418_cur."ws"()
-    unless $P10, rx418_fail
-    rx418_pos = $P10."pos"()
-    goto alt429_end
-  alt429_2:
+    ge rx402_pos, rx402_eos, rx402_fail
+    sub $I10, rx402_pos, rx402_off
+    substr $S10, rx402_tgt, $I10, 1
+    index $I11, "<[", $S10
+    lt $I11, 0, rx402_fail
+  # rx subrule "postcircumfix" subtype=capture negate=
+    rx402_cur."!cursor_pos"(rx402_pos)
+    $P10 = rx402_cur."postcircumfix"()
+    unless $P10, rx402_fail
+    rx402_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("postcircumfix")
+    rx402_pos = $P10."pos"()
+    goto alt407_end
+  alt407_2:
+.annotate "line", 221
+  # rx subcapture "sigil"
+    set_addr $I10, rxcap_410_fail
+    rx402_cur."!mark_push"(0, rx402_pos, $I10)
+  # rx literal  "$"
+    add $I11, rx402_pos, 1
+    gt $I11, rx402_eos, rx402_fail
+    sub $I11, rx402_pos, rx402_off
+    substr $S10, rx402_tgt, $I11, 1
+    ne $S10, "$", rx402_fail
+    add rx402_pos, 1
+    set_addr $I10, rxcap_410_fail
+    ($I12, $I11) = rx402_cur."!mark_peek"($I10)
+    rx402_cur."!cursor_pos"($I11)
+    ($P10) = rx402_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx402_pos, "")
+    rx402_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sigil")
+    goto rxcap_410_done
+  rxcap_410_fail:
+    goto rx402_fail
+  rxcap_410_done:
+  # rx subcapture "desigilname"
+    set_addr $I10, rxcap_411_fail
+    rx402_cur."!mark_push"(0, rx402_pos, $I10)
+  # rx enumcharlist negate=0 
+    ge rx402_pos, rx402_eos, rx402_fail
+    sub $I10, rx402_pos, rx402_off
+    substr $S10, rx402_tgt, $I10, 1
+    index $I11, "/_!", $S10
+    lt $I11, 0, rx402_fail
+    inc rx402_pos
+    set_addr $I10, rxcap_411_fail
+    ($I12, $I11) = rx402_cur."!mark_peek"($I10)
+    rx402_cur."!cursor_pos"($I11)
+    ($P10) = rx402_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx402_pos, "")
+    rx402_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("desigilname")
+    goto rxcap_411_done
+  rxcap_411_fail:
+    goto rx402_fail
+  rxcap_411_done:
+  alt407_end:
+.annotate "line", 218
+  # rx pass
+    rx402_cur."!cursor_pass"(rx402_pos, "variable")
+    rx402_cur."!cursor_debug"("PASS  ", "variable", " at pos=", rx402_pos)
+    .return (rx402_cur)
+  rx402_fail:
+.annotate "line", 4
+    (rx402_rep, rx402_pos, $I10, $P10) = rx402_cur."!mark_fail"(0)
+    lt rx402_pos, -1, rx402_done
+    eq rx402_pos, -1, rx402_fail
+    jump $I10
+  rx402_done:
+    rx402_cur."!cursor_fail"()
+    rx402_cur."!cursor_debug"("FAIL  ", "variable")
+    .return (rx402_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__variable"  :subid("108_1258533478.31768") :method
+.annotate "line", 4
+    $P404 = self."!PREFIX__!subrule"("sigil", "")
+    $P405 = self."!PREFIX__!subrule"("sigil", "")
+    new $P406, "ResizablePMCArray"
+    push $P406, "$!"
+    push $P406, "$_"
+    push $P406, "$/"
+    push $P406, $P404
+    push $P406, $P405
+    .return ($P406)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "sigil"  :subid("109_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx413_tgt
+    .local int rx413_pos
+    .local int rx413_off
+    .local int rx413_eos
+    .local int rx413_rep
+    .local pmc rx413_cur
+    (rx413_cur, rx413_pos, rx413_tgt, $I10) = self."!cursor_start"()
+    rx413_cur."!cursor_debug"("START ", "sigil")
+    .lex unicode:"$\x{a2}", rx413_cur
+    .local pmc match
+    .lex "$/", match
+    length rx413_eos, rx413_tgt
+    set rx413_off, 0
+    lt $I10, 2, rx413_start
+    sub rx413_off, $I10, 1
+    substr rx413_tgt, rx413_tgt, rx413_off
+  rx413_start:
+.annotate "line", 224
+  # rx enumcharlist negate=0 
+    ge rx413_pos, rx413_eos, rx413_fail
+    sub $I10, rx413_pos, rx413_off
+    substr $S10, rx413_tgt, $I10, 1
+    index $I11, "$@%&", $S10
+    lt $I11, 0, rx413_fail
+    inc rx413_pos
+  # rx pass
+    rx413_cur."!cursor_pass"(rx413_pos, "sigil")
+    rx413_cur."!cursor_debug"("PASS  ", "sigil", " at pos=", rx413_pos)
+    .return (rx413_cur)
+  rx413_fail:
+.annotate "line", 4
+    (rx413_rep, rx413_pos, $I10, $P10) = rx413_cur."!mark_fail"(0)
+    lt rx413_pos, -1, rx413_done
+    eq rx413_pos, -1, rx413_fail
+    jump $I10
+  rx413_done:
+    rx413_cur."!cursor_fail"()
+    rx413_cur."!cursor_debug"("FAIL  ", "sigil")
+    .return (rx413_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__sigil"  :subid("110_1258533478.31768") :method
+.annotate "line", 4
+    new $P415, "ResizablePMCArray"
+    push $P415, "&"
+    push $P415, "%"
+    push $P415, "@"
+    push $P415, "$"
+    .return ($P415)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "twigil"  :subid("111_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx417_tgt
+    .local int rx417_pos
+    .local int rx417_off
+    .local int rx417_eos
+    .local int rx417_rep
+    .local pmc rx417_cur
+    (rx417_cur, rx417_pos, rx417_tgt, $I10) = self."!cursor_start"()
+    rx417_cur."!cursor_debug"("START ", "twigil")
+    .lex unicode:"$\x{a2}", rx417_cur
+    .local pmc match
+    .lex "$/", match
+    length rx417_eos, rx417_tgt
+    set rx417_off, 0
+    lt $I10, 2, rx417_start
+    sub rx417_off, $I10, 1
+    substr rx417_tgt, rx417_tgt, rx417_off
+  rx417_start:
 .annotate "line", 226
-  # rx subrule "ws" subtype=method negate=
-    rx418_cur."!cursor_pos"(rx418_pos)
-    $P10 = rx418_cur."ws"()
-    unless $P10, rx418_fail
-    rx418_pos = $P10."pos"()
-  # rx subrule "panic" subtype=method negate=
-    rx418_cur."!cursor_pos"(rx418_pos)
-    $P10 = rx418_cur."panic"("Malformed package declaration")
-    unless $P10, rx418_fail
-    rx418_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx418_cur."!cursor_pos"(rx418_pos)
-    $P10 = rx418_cur."ws"()
-    unless $P10, rx418_fail
-    rx418_pos = $P10."pos"()
-  alt429_end:
-.annotate "line", 227
-  # rx subrule "ws" subtype=method negate=
-    rx418_cur."!cursor_pos"(rx418_pos)
-    $P10 = rx418_cur."ws"()
-    unless $P10, rx418_fail
-    rx418_pos = $P10."pos"()
-.annotate "line", 220
+  # rx enumcharlist negate=0 
+    ge rx417_pos, rx417_eos, rx417_fail
+    sub $I10, rx417_pos, rx417_off
+    substr $S10, rx417_tgt, $I10, 1
+    index $I11, "*!?", $S10
+    lt $I11, 0, rx417_fail
+    inc rx417_pos
   # rx pass
-    rx418_cur."!cursor_pass"(rx418_pos, "package_def")
-    rx418_cur."!cursor_debug"("PASS  ", "package_def", " at pos=", rx418_pos)
-    .return (rx418_cur)
-  rx418_fail:
+    rx417_cur."!cursor_pass"(rx417_pos, "twigil")
+    rx417_cur."!cursor_debug"("PASS  ", "twigil", " at pos=", rx417_pos)
+    .return (rx417_cur)
+  rx417_fail:
 .annotate "line", 4
-    (rx418_rep, rx418_pos, $I10, $P10) = rx418_cur."!mark_fail"(0)
-    lt rx418_pos, -1, rx418_done
-    eq rx418_pos, -1, rx418_fail
+    (rx417_rep, rx417_pos, $I10, $P10) = rx417_cur."!mark_fail"(0)
+    lt rx417_pos, -1, rx417_done
+    eq rx417_pos, -1, rx417_fail
     jump $I10
-  rx418_done:
-    rx418_cur."!cursor_fail"()
-    rx418_cur."!cursor_debug"("FAIL  ", "package_def")
-    .return (rx418_cur)
+  rx417_done:
+    rx417_cur."!cursor_fail"()
+    rx417_cur."!cursor_debug"("FAIL  ", "twigil")
+    .return (rx417_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__package_def"  :subid("117_1258424429.0004") :method
+.sub "!PREFIX__twigil"  :subid("112_1258533478.31768") :method
 .annotate "line", 4
-    new $P420, "ResizablePMCArray"
-    push $P420, ""
-    .return ($P420)
+    new $P419, "ResizablePMCArray"
+    push $P419, "?"
+    push $P419, "!"
+    push $P419, "*"
+    .return ($P419)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "scope_declarator"  :subid("118_1258424429.0004") :method
-.annotate "line", 230
-    $P440 = self."!protoregex"("scope_declarator")
-    .return ($P440)
+.sub "package_declarator"  :subid("113_1258533478.31768") :method
+.annotate "line", 228
+    $P421 = self."!protoregex"("package_declarator")
+    .return ($P421)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__scope_declarator"  :subid("119_1258424429.0004") :method
-.annotate "line", 230
-    $P442 = self."!PREFIX__!protoregex"("scope_declarator")
-    .return ($P442)
+.sub "!PREFIX__package_declarator"  :subid("114_1258533478.31768") :method
+.annotate "line", 228
+    $P423 = self."!PREFIX__!protoregex"("package_declarator")
+    .return ($P423)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "scope_declarator:sym<my>"  :subid("120_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "package_declarator:sym<module>"  :subid("115_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx444_tgt
-    .local int rx444_pos
-    .local int rx444_off
-    .local int rx444_eos
-    .local int rx444_rep
-    .local pmc rx444_cur
-    (rx444_cur, rx444_pos, rx444_tgt, $I10) = self."!cursor_start"()
-    rx444_cur."!cursor_debug"("START ", "scope_declarator:sym<my>")
-    .lex unicode:"$\x{a2}", rx444_cur
+    .local string rx425_tgt
+    .local int rx425_pos
+    .local int rx425_off
+    .local int rx425_eos
+    .local int rx425_rep
+    .local pmc rx425_cur
+    (rx425_cur, rx425_pos, rx425_tgt, $I10) = self."!cursor_start"()
+    rx425_cur."!cursor_debug"("START ", "package_declarator:sym<module>")
+    .lex unicode:"$\x{a2}", rx425_cur
     .local pmc match
     .lex "$/", match
-    length rx444_eos, rx444_tgt
-    set rx444_off, 0
-    lt $I10, 2, rx444_start
-    sub rx444_off, $I10, 1
-    substr rx444_tgt, rx444_tgt, rx444_off
-  rx444_start:
-.annotate "line", 231
+    length rx425_eos, rx425_tgt
+    set rx425_off, 0
+    lt $I10, 2, rx425_start
+    sub rx425_off, $I10, 1
+    substr rx425_tgt, rx425_tgt, rx425_off
+  rx425_start:
+.annotate "line", 229
   # rx subcapture "sym"
-    set_addr $I10, rxcap_448_fail
-    rx444_cur."!mark_push"(0, rx444_pos, $I10)
-  # rx literal  "my"
-    add $I11, rx444_pos, 2
-    gt $I11, rx444_eos, rx444_fail
-    sub $I11, rx444_pos, rx444_off
-    substr $S10, rx444_tgt, $I11, 2
-    ne $S10, "my", rx444_fail
-    add rx444_pos, 2
-    set_addr $I10, rxcap_448_fail
-    ($I12, $I11) = rx444_cur."!mark_peek"($I10)
-    rx444_cur."!cursor_pos"($I11)
-    ($P10) = rx444_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx444_pos, "")
-    rx444_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_429_fail
+    rx425_cur."!mark_push"(0, rx425_pos, $I10)
+  # rx literal  "module"
+    add $I11, rx425_pos, 6
+    gt $I11, rx425_eos, rx425_fail
+    sub $I11, rx425_pos, rx425_off
+    substr $S10, rx425_tgt, $I11, 6
+    ne $S10, "module", rx425_fail
+    add rx425_pos, 6
+    set_addr $I10, rxcap_429_fail
+    ($I12, $I11) = rx425_cur."!mark_peek"($I10)
+    rx425_cur."!cursor_pos"($I11)
+    ($P10) = rx425_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx425_pos, "")
+    rx425_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_448_done
-  rxcap_448_fail:
-    goto rx444_fail
-  rxcap_448_done:
-  # rx subrule "scoped" subtype=capture negate=
-    rx444_cur."!cursor_pos"(rx444_pos)
-    $P10 = rx444_cur."scoped"("my")
-    unless $P10, rx444_fail
-    rx444_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("scoped")
-    rx444_pos = $P10."pos"()
+    goto rxcap_429_done
+  rxcap_429_fail:
+    goto rx425_fail
+  rxcap_429_done:
+  # rx subrule "package_def" subtype=capture negate=
+    rx425_cur."!cursor_pos"(rx425_pos)
+    $P10 = rx425_cur."package_def"()
+    unless $P10, rx425_fail
+    rx425_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("package_def")
+    rx425_pos = $P10."pos"()
   # rx pass
-    rx444_cur."!cursor_pass"(rx444_pos, "scope_declarator:sym<my>")
-    rx444_cur."!cursor_debug"("PASS  ", "scope_declarator:sym<my>", " at pos=", rx444_pos)
-    .return (rx444_cur)
-  rx444_fail:
+    rx425_cur."!cursor_pass"(rx425_pos, "package_declarator:sym<module>")
+    rx425_cur."!cursor_debug"("PASS  ", "package_declarator:sym<module>", " at pos=", rx425_pos)
+    .return (rx425_cur)
+  rx425_fail:
 .annotate "line", 4
-    (rx444_rep, rx444_pos, $I10, $P10) = rx444_cur."!mark_fail"(0)
-    lt rx444_pos, -1, rx444_done
-    eq rx444_pos, -1, rx444_fail
+    (rx425_rep, rx425_pos, $I10, $P10) = rx425_cur."!mark_fail"(0)
+    lt rx425_pos, -1, rx425_done
+    eq rx425_pos, -1, rx425_fail
     jump $I10
-  rx444_done:
-    rx444_cur."!cursor_fail"()
-    rx444_cur."!cursor_debug"("FAIL  ", "scope_declarator:sym<my>")
-    .return (rx444_cur)
+  rx425_done:
+    rx425_cur."!cursor_fail"()
+    rx425_cur."!cursor_debug"("FAIL  ", "package_declarator:sym<module>")
+    .return (rx425_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__scope_declarator:sym<my>"  :subid("121_1258424429.0004") :method
+.sub "!PREFIX__package_declarator:sym<module>"  :subid("116_1258533478.31768") :method
 .annotate "line", 4
-    $P446 = self."!PREFIX__!subrule"("scoped", "my")
-    new $P447, "ResizablePMCArray"
-    push $P447, $P446
-    .return ($P447)
+    $P427 = self."!PREFIX__!subrule"("package_def", "module")
+    new $P428, "ResizablePMCArray"
+    push $P428, $P427
+    .return ($P428)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "scope_declarator:sym<our>"  :subid("122_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "package_declarator:sym<class>"  :subid("117_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx450_tgt
-    .local int rx450_pos
-    .local int rx450_off
-    .local int rx450_eos
-    .local int rx450_rep
-    .local pmc rx450_cur
-    (rx450_cur, rx450_pos, rx450_tgt, $I10) = self."!cursor_start"()
-    rx450_cur."!cursor_debug"("START ", "scope_declarator:sym<our>")
-    .lex unicode:"$\x{a2}", rx450_cur
+    .local string rx431_tgt
+    .local int rx431_pos
+    .local int rx431_off
+    .local int rx431_eos
+    .local int rx431_rep
+    .local pmc rx431_cur
+    (rx431_cur, rx431_pos, rx431_tgt, $I10) = self."!cursor_start"()
+    rx431_cur."!cursor_debug"("START ", "package_declarator:sym<class>")
+    .lex unicode:"$\x{a2}", rx431_cur
     .local pmc match
     .lex "$/", match
-    length rx450_eos, rx450_tgt
-    set rx450_off, 0
-    lt $I10, 2, rx450_start
-    sub rx450_off, $I10, 1
-    substr rx450_tgt, rx450_tgt, rx450_off
-  rx450_start:
+    length rx431_eos, rx431_tgt
+    set rx431_off, 0
+    lt $I10, 2, rx431_start
+    sub rx431_off, $I10, 1
+    substr rx431_tgt, rx431_tgt, rx431_off
+  rx431_start:
+.annotate "line", 230
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_437_fail
+    rx431_cur."!mark_push"(0, rx431_pos, $I10)
+  alt436_0:
+    set_addr $I10, alt436_1
+    rx431_cur."!mark_push"(0, rx431_pos, $I10)
+  # rx literal  "class"
+    add $I11, rx431_pos, 5
+    gt $I11, rx431_eos, rx431_fail
+    sub $I11, rx431_pos, rx431_off
+    substr $S10, rx431_tgt, $I11, 5
+    ne $S10, "class", rx431_fail
+    add rx431_pos, 5
+    goto alt436_end
+  alt436_1:
+  # rx literal  "grammar"
+    add $I11, rx431_pos, 7
+    gt $I11, rx431_eos, rx431_fail
+    sub $I11, rx431_pos, rx431_off
+    substr $S10, rx431_tgt, $I11, 7
+    ne $S10, "grammar", rx431_fail
+    add rx431_pos, 7
+  alt436_end:
+    set_addr $I10, rxcap_437_fail
+    ($I12, $I11) = rx431_cur."!mark_peek"($I10)
+    rx431_cur."!cursor_pos"($I11)
+    ($P10) = rx431_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx431_pos, "")
+    rx431_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_437_done
+  rxcap_437_fail:
+    goto rx431_fail
+  rxcap_437_done:
+  # rx subrule "package_def" subtype=capture negate=
+    rx431_cur."!cursor_pos"(rx431_pos)
+    $P10 = rx431_cur."package_def"()
+    unless $P10, rx431_fail
+    rx431_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("package_def")
+    rx431_pos = $P10."pos"()
+  # rx pass
+    rx431_cur."!cursor_pass"(rx431_pos, "package_declarator:sym<class>")
+    rx431_cur."!cursor_debug"("PASS  ", "package_declarator:sym<class>", " at pos=", rx431_pos)
+    .return (rx431_cur)
+  rx431_fail:
+.annotate "line", 4
+    (rx431_rep, rx431_pos, $I10, $P10) = rx431_cur."!mark_fail"(0)
+    lt rx431_pos, -1, rx431_done
+    eq rx431_pos, -1, rx431_fail
+    jump $I10
+  rx431_done:
+    rx431_cur."!cursor_fail"()
+    rx431_cur."!cursor_debug"("FAIL  ", "package_declarator:sym<class>")
+    .return (rx431_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__package_declarator:sym<class>"  :subid("118_1258533478.31768") :method
+.annotate "line", 4
+    $P433 = self."!PREFIX__!subrule"("package_def", "grammar")
+    $P434 = self."!PREFIX__!subrule"("package_def", "class")
+    new $P435, "ResizablePMCArray"
+    push $P435, $P433
+    push $P435, $P434
+    .return ($P435)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "package_def"  :subid("119_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx439_tgt
+    .local int rx439_pos
+    .local int rx439_off
+    .local int rx439_eos
+    .local int rx439_rep
+    .local pmc rx439_cur
+    (rx439_cur, rx439_pos, rx439_tgt, $I10) = self."!cursor_start"()
+    rx439_cur."!cursor_debug"("START ", "package_def")
+    rx439_cur."!cursor_caparray"("parent")
+    .lex unicode:"$\x{a2}", rx439_cur
+    .local pmc match
+    .lex "$/", match
+    length rx439_eos, rx439_tgt
+    set rx439_off, 0
+    lt $I10, 2, rx439_start
+    sub rx439_off, $I10, 1
+    substr rx439_tgt, rx439_tgt, rx439_off
+  rx439_start:
 .annotate "line", 232
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_454_fail
-    rx450_cur."!mark_push"(0, rx450_pos, $I10)
-  # rx literal  "our"
-    add $I11, rx450_pos, 3
-    gt $I11, rx450_eos, rx450_fail
-    sub $I11, rx450_pos, rx450_off
-    substr $S10, rx450_tgt, $I11, 3
-    ne $S10, "our", rx450_fail
-    add rx450_pos, 3
-    set_addr $I10, rxcap_454_fail
-    ($I12, $I11) = rx450_cur."!mark_peek"($I10)
-    rx450_cur."!cursor_pos"($I11)
-    ($P10) = rx450_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx450_pos, "")
-    rx450_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_454_done
-  rxcap_454_fail:
-    goto rx450_fail
-  rxcap_454_done:
-  # rx subrule "scoped" subtype=capture negate=
-    rx450_cur."!cursor_pos"(rx450_pos)
-    $P10 = rx450_cur."scoped"("our")
-    unless $P10, rx450_fail
-    rx450_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("scoped")
-    rx450_pos = $P10."pos"()
-  # rx pass
-    rx450_cur."!cursor_pass"(rx450_pos, "scope_declarator:sym<our>")
-    rx450_cur."!cursor_debug"("PASS  ", "scope_declarator:sym<our>", " at pos=", rx450_pos)
-    .return (rx450_cur)
-  rx450_fail:
-.annotate "line", 4
-    (rx450_rep, rx450_pos, $I10, $P10) = rx450_cur."!mark_fail"(0)
-    lt rx450_pos, -1, rx450_done
-    eq rx450_pos, -1, rx450_fail
-    jump $I10
-  rx450_done:
-    rx450_cur."!cursor_fail"()
-    rx450_cur."!cursor_debug"("FAIL  ", "scope_declarator:sym<our>")
-    .return (rx450_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__scope_declarator:sym<our>"  :subid("123_1258424429.0004") :method
-.annotate "line", 4
-    $P452 = self."!PREFIX__!subrule"("scoped", "our")
-    new $P453, "ResizablePMCArray"
-    push $P453, $P452
-    .return ($P453)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "scope_declarator:sym<has>"  :subid("124_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx456_tgt
-    .local int rx456_pos
-    .local int rx456_off
-    .local int rx456_eos
-    .local int rx456_rep
-    .local pmc rx456_cur
-    (rx456_cur, rx456_pos, rx456_tgt, $I10) = self."!cursor_start"()
-    rx456_cur."!cursor_debug"("START ", "scope_declarator:sym<has>")
-    .lex unicode:"$\x{a2}", rx456_cur
-    .local pmc match
-    .lex "$/", match
-    length rx456_eos, rx456_tgt
-    set rx456_off, 0
-    lt $I10, 2, rx456_start
-    sub rx456_off, $I10, 1
-    substr rx456_tgt, rx456_tgt, rx456_off
-  rx456_start:
+  # rx subrule "ws" subtype=method negate=
+    rx439_cur."!cursor_pos"(rx439_pos)
+    $P10 = rx439_cur."ws"()
+    unless $P10, rx439_fail
+    rx439_pos = $P10."pos"()
 .annotate "line", 233
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_460_fail
-    rx456_cur."!mark_push"(0, rx456_pos, $I10)
-  # rx literal  "has"
-    add $I11, rx456_pos, 3
-    gt $I11, rx456_eos, rx456_fail
-    sub $I11, rx456_pos, rx456_off
-    substr $S10, rx456_tgt, $I11, 3
-    ne $S10, "has", rx456_fail
-    add rx456_pos, 3
-    set_addr $I10, rxcap_460_fail
-    ($I12, $I11) = rx456_cur."!mark_peek"($I10)
-    rx456_cur."!cursor_pos"($I11)
-    ($P10) = rx456_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx456_pos, "")
-    rx456_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_460_done
-  rxcap_460_fail:
-    goto rx456_fail
-  rxcap_460_done:
-  # rx subrule "scoped" subtype=capture negate=
-    rx456_cur."!cursor_pos"(rx456_pos)
-    $P10 = rx456_cur."scoped"("has")
-    unless $P10, rx456_fail
-    rx456_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("scoped")
-    rx456_pos = $P10."pos"()
-  # rx pass
-    rx456_cur."!cursor_pass"(rx456_pos, "scope_declarator:sym<has>")
-    rx456_cur."!cursor_debug"("PASS  ", "scope_declarator:sym<has>", " at pos=", rx456_pos)
-    .return (rx456_cur)
-  rx456_fail:
-.annotate "line", 4
-    (rx456_rep, rx456_pos, $I10, $P10) = rx456_cur."!mark_fail"(0)
-    lt rx456_pos, -1, rx456_done
-    eq rx456_pos, -1, rx456_fail
-    jump $I10
-  rx456_done:
-    rx456_cur."!cursor_fail"()
-    rx456_cur."!cursor_debug"("FAIL  ", "scope_declarator:sym<has>")
-    .return (rx456_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__scope_declarator:sym<has>"  :subid("125_1258424429.0004") :method
-.annotate "line", 4
-    $P458 = self."!PREFIX__!subrule"("scoped", "has")
-    new $P459, "ResizablePMCArray"
-    push $P459, $P458
-    .return ($P459)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "scoped"  :subid("126_1258424429.0004") :method :outer("11_1258424429.0004")
-    .param pmc param_462
+  # rx subrule "name" subtype=capture negate=
+    rx439_cur."!cursor_pos"(rx439_pos)
+    $P10 = rx439_cur."name"()
+    unless $P10, rx439_fail
+    rx439_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("name")
+    rx439_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx439_cur."!cursor_pos"(rx439_pos)
+    $P10 = rx439_cur."ws"()
+    unless $P10, rx439_fail
+    rx439_pos = $P10."pos"()
+.annotate "line", 234
+  # rx rxquantr444 ** 0..1
+    set_addr $I448, rxquantr444_done
+    rx439_cur."!mark_push"(0, rx439_pos, $I448)
+  rxquantr444_loop:
+  # rx subrule "ws" subtype=method negate=
+    rx439_cur."!cursor_pos"(rx439_pos)
+    $P10 = rx439_cur."ws"()
+    unless $P10, rx439_fail
+    rx439_pos = $P10."pos"()
+  # rx literal  "is"
+    add $I11, rx439_pos, 2
+    gt $I11, rx439_eos, rx439_fail
+    sub $I11, rx439_pos, rx439_off
+    substr $S10, rx439_tgt, $I11, 2
+    ne $S10, "is", rx439_fail
+    add rx439_pos, 2
+  # rx subrule "ws" subtype=method negate=
+    rx439_cur."!cursor_pos"(rx439_pos)
+    $P10 = rx439_cur."ws"()
+    unless $P10, rx439_fail
+    rx439_pos = $P10."pos"()
+  # rx subrule "name" subtype=capture negate=
+    rx439_cur."!cursor_pos"(rx439_pos)
+    $P10 = rx439_cur."name"()
+    unless $P10, rx439_fail
+    rx439_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("parent")
+    rx439_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx439_cur."!cursor_pos"(rx439_pos)
+    $P10 = rx439_cur."ws"()
+    unless $P10, rx439_fail
+    rx439_pos = $P10."pos"()
+    (rx439_rep) = rx439_cur."!mark_commit"($I448)
+  rxquantr444_done:
+  # rx subrule "ws" subtype=method negate=
+    rx439_cur."!cursor_pos"(rx439_pos)
+    $P10 = rx439_cur."ws"()
+    unless $P10, rx439_fail
+    rx439_pos = $P10."pos"()
+  alt450_0:
 .annotate "line", 235
-    .lex "$*SCOPE", param_462
-.annotate "line", 4
-    .local string rx463_tgt
-    .local int rx463_pos
-    .local int rx463_off
-    .local int rx463_eos
-    .local int rx463_rep
-    .local pmc rx463_cur
-    (rx463_cur, rx463_pos, rx463_tgt, $I10) = self."!cursor_start"()
-    rx463_cur."!cursor_debug"("START ", "scoped")
-    .lex unicode:"$\x{a2}", rx463_cur
-    .local pmc match
-    .lex "$/", match
-    length rx463_eos, rx463_tgt
-    set rx463_off, 0
-    lt $I10, 2, rx463_start
-    sub rx463_off, $I10, 1
-    substr rx463_tgt, rx463_tgt, rx463_off
-  rx463_start:
-  alt466_0:
-.annotate "line", 235
-    set_addr $I10, alt466_1
-    rx463_cur."!mark_push"(0, rx463_pos, $I10)
+    set_addr $I10, alt450_1
+    rx439_cur."!mark_push"(0, rx439_pos, $I10)
 .annotate "line", 236
   # rx subrule "ws" subtype=method negate=
-    rx463_cur."!cursor_pos"(rx463_pos)
-    $P10 = rx463_cur."ws"()
-    unless $P10, rx463_fail
-    rx463_pos = $P10."pos"()
-  # rx subrule "variable_declarator" subtype=capture negate=
-    rx463_cur."!cursor_pos"(rx463_pos)
-    $P10 = rx463_cur."variable_declarator"()
-    unless $P10, rx463_fail
-    rx463_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("variable_declarator")
-    rx463_pos = $P10."pos"()
+    rx439_cur."!cursor_pos"(rx439_pos)
+    $P10 = rx439_cur."ws"()
+    unless $P10, rx439_fail
+    rx439_pos = $P10."pos"()
+  # rx literal  ";"
+    add $I11, rx439_pos, 1
+    gt $I11, rx439_eos, rx439_fail
+    sub $I11, rx439_pos, rx439_off
+    substr $S10, rx439_tgt, $I11, 1
+    ne $S10, ";", rx439_fail
+    add rx439_pos, 1
   # rx subrule "ws" subtype=method negate=
-    rx463_cur."!cursor_pos"(rx463_pos)
-    $P10 = rx463_cur."ws"()
-    unless $P10, rx463_fail
-    rx463_pos = $P10."pos"()
-    goto alt466_end
-  alt466_1:
+    rx439_cur."!cursor_pos"(rx439_pos)
+    $P10 = rx439_cur."ws"()
+    unless $P10, rx439_fail
+    rx439_pos = $P10."pos"()
+  # rx subrule "comp_unit" subtype=capture negate=
+    rx439_cur."!cursor_pos"(rx439_pos)
+    $P10 = rx439_cur."comp_unit"()
+    unless $P10, rx439_fail
+    rx439_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("comp_unit")
+    rx439_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx439_cur."!cursor_pos"(rx439_pos)
+    $P10 = rx439_cur."ws"()
+    unless $P10, rx439_fail
+    rx439_pos = $P10."pos"()
+    goto alt450_end
+  alt450_1:
+    set_addr $I10, alt450_2
+    rx439_cur."!mark_push"(0, rx439_pos, $I10)
 .annotate "line", 237
   # rx subrule "ws" subtype=method negate=
-    rx463_cur."!cursor_pos"(rx463_pos)
-    $P10 = rx463_cur."ws"()
-    unless $P10, rx463_fail
-    rx463_pos = $P10."pos"()
-  # rx subrule "routine_declarator" subtype=capture negate=
-    rx463_cur."!cursor_pos"(rx463_pos)
-    $P10 = rx463_cur."routine_declarator"()
-    unless $P10, rx463_fail
-    rx463_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("routine_declarator")
-    rx463_pos = $P10."pos"()
+    rx439_cur."!cursor_pos"(rx439_pos)
+    $P10 = rx439_cur."ws"()
+    unless $P10, rx439_fail
+    rx439_pos = $P10."pos"()
+  # rx enumcharlist negate=0 zerowidth
+    ge rx439_pos, rx439_eos, rx439_fail
+    sub $I10, rx439_pos, rx439_off
+    substr $S10, rx439_tgt, $I10, 1
+    index $I11, "{", $S10
+    lt $I11, 0, rx439_fail
   # rx subrule "ws" subtype=method negate=
-    rx463_cur."!cursor_pos"(rx463_pos)
-    $P10 = rx463_cur."ws"()
-    unless $P10, rx463_fail
-    rx463_pos = $P10."pos"()
-  alt466_end:
-.annotate "line", 235
+    rx439_cur."!cursor_pos"(rx439_pos)
+    $P10 = rx439_cur."ws"()
+    unless $P10, rx439_fail
+    rx439_pos = $P10."pos"()
+  # rx subrule "block" subtype=capture negate=
+    rx439_cur."!cursor_pos"(rx439_pos)
+    $P10 = rx439_cur."block"()
+    unless $P10, rx439_fail
+    rx439_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("block")
+    rx439_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx439_cur."!cursor_pos"(rx439_pos)
+    $P10 = rx439_cur."ws"()
+    unless $P10, rx439_fail
+    rx439_pos = $P10."pos"()
+    goto alt450_end
+  alt450_2:
+.annotate "line", 238
+  # rx subrule "ws" subtype=method negate=
+    rx439_cur."!cursor_pos"(rx439_pos)
+    $P10 = rx439_cur."ws"()
+    unless $P10, rx439_fail
+    rx439_pos = $P10."pos"()
+  # rx subrule "panic" subtype=method negate=
+    rx439_cur."!cursor_pos"(rx439_pos)
+    $P10 = rx439_cur."panic"("Malformed package declaration")
+    unless $P10, rx439_fail
+    rx439_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx439_cur."!cursor_pos"(rx439_pos)
+    $P10 = rx439_cur."ws"()
+    unless $P10, rx439_fail
+    rx439_pos = $P10."pos"()
+  alt450_end:
+.annotate "line", 239
+  # rx subrule "ws" subtype=method negate=
+    rx439_cur."!cursor_pos"(rx439_pos)
+    $P10 = rx439_cur."ws"()
+    unless $P10, rx439_fail
+    rx439_pos = $P10."pos"()
+.annotate "line", 232
   # rx pass
-    rx463_cur."!cursor_pass"(rx463_pos, "scoped")
-    rx463_cur."!cursor_debug"("PASS  ", "scoped", " at pos=", rx463_pos)
-    .return (rx463_cur)
-  rx463_fail:
+    rx439_cur."!cursor_pass"(rx439_pos, "package_def")
+    rx439_cur."!cursor_debug"("PASS  ", "package_def", " at pos=", rx439_pos)
+    .return (rx439_cur)
+  rx439_fail:
 .annotate "line", 4
-    (rx463_rep, rx463_pos, $I10, $P10) = rx463_cur."!mark_fail"(0)
-    lt rx463_pos, -1, rx463_done
-    eq rx463_pos, -1, rx463_fail
+    (rx439_rep, rx439_pos, $I10, $P10) = rx439_cur."!mark_fail"(0)
+    lt rx439_pos, -1, rx439_done
+    eq rx439_pos, -1, rx439_fail
     jump $I10
-  rx463_done:
-    rx463_cur."!cursor_fail"()
-    rx463_cur."!cursor_debug"("FAIL  ", "scoped")
-    .return (rx463_cur)
+  rx439_done:
+    rx439_cur."!cursor_fail"()
+    rx439_cur."!cursor_debug"("FAIL  ", "package_def")
+    .return (rx439_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__scoped"  :subid("127_1258424429.0004") :method
+.sub "!PREFIX__package_def"  :subid("120_1258533478.31768") :method
 .annotate "line", 4
-    new $P465, "ResizablePMCArray"
-    push $P465, ""
-    push $P465, ""
-    .return ($P465)
+    new $P441, "ResizablePMCArray"
+    push $P441, ""
+    .return ($P441)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "variable_declarator"  :subid("128_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "scope_declarator"  :subid("121_1258533478.31768") :method
+.annotate "line", 242
+    $P461 = self."!protoregex"("scope_declarator")
+    .return ($P461)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__scope_declarator"  :subid("122_1258533478.31768") :method
+.annotate "line", 242
+    $P463 = self."!PREFIX__!protoregex"("scope_declarator")
+    .return ($P463)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "scope_declarator:sym<my>"  :subid("123_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx472_tgt
-    .local int rx472_pos
-    .local int rx472_off
-    .local int rx472_eos
-    .local int rx472_rep
-    .local pmc rx472_cur
-    (rx472_cur, rx472_pos, rx472_tgt, $I10) = self."!cursor_start"()
-    rx472_cur."!cursor_debug"("START ", "variable_declarator")
-    .lex unicode:"$\x{a2}", rx472_cur
+    .local string rx465_tgt
+    .local int rx465_pos
+    .local int rx465_off
+    .local int rx465_eos
+    .local int rx465_rep
+    .local pmc rx465_cur
+    (rx465_cur, rx465_pos, rx465_tgt, $I10) = self."!cursor_start"()
+    rx465_cur."!cursor_debug"("START ", "scope_declarator:sym<my>")
+    .lex unicode:"$\x{a2}", rx465_cur
     .local pmc match
     .lex "$/", match
-    length rx472_eos, rx472_tgt
-    set rx472_off, 0
-    lt $I10, 2, rx472_start
-    sub rx472_off, $I10, 1
-    substr rx472_tgt, rx472_tgt, rx472_off
-  rx472_start:
-.annotate "line", 240
-  # rx subrule "variable" subtype=capture negate=
-    rx472_cur."!cursor_pos"(rx472_pos)
-    $P10 = rx472_cur."variable"()
-    unless $P10, rx472_fail
-    rx472_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("variable")
-    rx472_pos = $P10."pos"()
-  # rx pass
-    rx472_cur."!cursor_pass"(rx472_pos, "variable_declarator")
-    rx472_cur."!cursor_debug"("PASS  ", "variable_declarator", " at pos=", rx472_pos)
-    .return (rx472_cur)
-  rx472_fail:
-.annotate "line", 4
-    (rx472_rep, rx472_pos, $I10, $P10) = rx472_cur."!mark_fail"(0)
-    lt rx472_pos, -1, rx472_done
-    eq rx472_pos, -1, rx472_fail
-    jump $I10
-  rx472_done:
-    rx472_cur."!cursor_fail"()
-    rx472_cur."!cursor_debug"("FAIL  ", "variable_declarator")
-    .return (rx472_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__variable_declarator"  :subid("129_1258424429.0004") :method
-.annotate "line", 4
-    $P474 = self."!PREFIX__!subrule"("variable", "")
-    new $P475, "ResizablePMCArray"
-    push $P475, $P474
-    .return ($P475)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "routine_declarator"  :subid("130_1258424429.0004") :method
-.annotate "line", 242
-    $P477 = self."!protoregex"("routine_declarator")
-    .return ($P477)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__routine_declarator"  :subid("131_1258424429.0004") :method
-.annotate "line", 242
-    $P479 = self."!PREFIX__!protoregex"("routine_declarator")
-    .return ($P479)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "routine_declarator:sym<sub>"  :subid("132_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx481_tgt
-    .local int rx481_pos
-    .local int rx481_off
-    .local int rx481_eos
-    .local int rx481_rep
-    .local pmc rx481_cur
-    (rx481_cur, rx481_pos, rx481_tgt, $I10) = self."!cursor_start"()
-    rx481_cur."!cursor_debug"("START ", "routine_declarator:sym<sub>")
-    .lex unicode:"$\x{a2}", rx481_cur
-    .local pmc match
-    .lex "$/", match
-    length rx481_eos, rx481_tgt
-    set rx481_off, 0
-    lt $I10, 2, rx481_start
-    sub rx481_off, $I10, 1
-    substr rx481_tgt, rx481_tgt, rx481_off
-  rx481_start:
+    length rx465_eos, rx465_tgt
+    set rx465_off, 0
+    lt $I10, 2, rx465_start
+    sub rx465_off, $I10, 1
+    substr rx465_tgt, rx465_tgt, rx465_off
+  rx465_start:
 .annotate "line", 243
   # rx subcapture "sym"
-    set_addr $I10, rxcap_485_fail
-    rx481_cur."!mark_push"(0, rx481_pos, $I10)
-  # rx literal  "sub"
-    add $I11, rx481_pos, 3
-    gt $I11, rx481_eos, rx481_fail
-    sub $I11, rx481_pos, rx481_off
-    substr $S10, rx481_tgt, $I11, 3
-    ne $S10, "sub", rx481_fail
-    add rx481_pos, 3
-    set_addr $I10, rxcap_485_fail
-    ($I12, $I11) = rx481_cur."!mark_peek"($I10)
-    rx481_cur."!cursor_pos"($I11)
-    ($P10) = rx481_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx481_pos, "")
-    rx481_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_469_fail
+    rx465_cur."!mark_push"(0, rx465_pos, $I10)
+  # rx literal  "my"
+    add $I11, rx465_pos, 2
+    gt $I11, rx465_eos, rx465_fail
+    sub $I11, rx465_pos, rx465_off
+    substr $S10, rx465_tgt, $I11, 2
+    ne $S10, "my", rx465_fail
+    add rx465_pos, 2
+    set_addr $I10, rxcap_469_fail
+    ($I12, $I11) = rx465_cur."!mark_peek"($I10)
+    rx465_cur."!cursor_pos"($I11)
+    ($P10) = rx465_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx465_pos, "")
+    rx465_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_485_done
-  rxcap_485_fail:
-    goto rx481_fail
-  rxcap_485_done:
-  # rx subrule "routine_def" subtype=capture negate=
-    rx481_cur."!cursor_pos"(rx481_pos)
-    $P10 = rx481_cur."routine_def"()
-    unless $P10, rx481_fail
-    rx481_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("routine_def")
-    rx481_pos = $P10."pos"()
+    goto rxcap_469_done
+  rxcap_469_fail:
+    goto rx465_fail
+  rxcap_469_done:
+  # rx subrule "scoped" subtype=capture negate=
+    rx465_cur."!cursor_pos"(rx465_pos)
+    $P10 = rx465_cur."scoped"("my")
+    unless $P10, rx465_fail
+    rx465_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("scoped")
+    rx465_pos = $P10."pos"()
   # rx pass
-    rx481_cur."!cursor_pass"(rx481_pos, "routine_declarator:sym<sub>")
-    rx481_cur."!cursor_debug"("PASS  ", "routine_declarator:sym<sub>", " at pos=", rx481_pos)
-    .return (rx481_cur)
-  rx481_fail:
+    rx465_cur."!cursor_pass"(rx465_pos, "scope_declarator:sym<my>")
+    rx465_cur."!cursor_debug"("PASS  ", "scope_declarator:sym<my>", " at pos=", rx465_pos)
+    .return (rx465_cur)
+  rx465_fail:
 .annotate "line", 4
-    (rx481_rep, rx481_pos, $I10, $P10) = rx481_cur."!mark_fail"(0)
-    lt rx481_pos, -1, rx481_done
-    eq rx481_pos, -1, rx481_fail
+    (rx465_rep, rx465_pos, $I10, $P10) = rx465_cur."!mark_fail"(0)
+    lt rx465_pos, -1, rx465_done
+    eq rx465_pos, -1, rx465_fail
     jump $I10
-  rx481_done:
-    rx481_cur."!cursor_fail"()
-    rx481_cur."!cursor_debug"("FAIL  ", "routine_declarator:sym<sub>")
-    .return (rx481_cur)
+  rx465_done:
+    rx465_cur."!cursor_fail"()
+    rx465_cur."!cursor_debug"("FAIL  ", "scope_declarator:sym<my>")
+    .return (rx465_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__routine_declarator:sym<sub>"  :subid("133_1258424429.0004") :method
+.sub "!PREFIX__scope_declarator:sym<my>"  :subid("124_1258533478.31768") :method
 .annotate "line", 4
-    $P483 = self."!PREFIX__!subrule"("routine_def", "sub")
-    new $P484, "ResizablePMCArray"
-    push $P484, $P483
-    .return ($P484)
+    $P467 = self."!PREFIX__!subrule"("scoped", "my")
+    new $P468, "ResizablePMCArray"
+    push $P468, $P467
+    .return ($P468)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "routine_declarator:sym<method>"  :subid("134_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "scope_declarator:sym<our>"  :subid("125_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx487_tgt
-    .local int rx487_pos
-    .local int rx487_off
-    .local int rx487_eos
-    .local int rx487_rep
-    .local pmc rx487_cur
-    (rx487_cur, rx487_pos, rx487_tgt, $I10) = self."!cursor_start"()
-    rx487_cur."!cursor_debug"("START ", "routine_declarator:sym<method>")
-    .lex unicode:"$\x{a2}", rx487_cur
+    .local string rx471_tgt
+    .local int rx471_pos
+    .local int rx471_off
+    .local int rx471_eos
+    .local int rx471_rep
+    .local pmc rx471_cur
+    (rx471_cur, rx471_pos, rx471_tgt, $I10) = self."!cursor_start"()
+    rx471_cur."!cursor_debug"("START ", "scope_declarator:sym<our>")
+    .lex unicode:"$\x{a2}", rx471_cur
     .local pmc match
     .lex "$/", match
-    length rx487_eos, rx487_tgt
-    set rx487_off, 0
-    lt $I10, 2, rx487_start
-    sub rx487_off, $I10, 1
-    substr rx487_tgt, rx487_tgt, rx487_off
-  rx487_start:
+    length rx471_eos, rx471_tgt
+    set rx471_off, 0
+    lt $I10, 2, rx471_start
+    sub rx471_off, $I10, 1
+    substr rx471_tgt, rx471_tgt, rx471_off
+  rx471_start:
 .annotate "line", 244
   # rx subcapture "sym"
-    set_addr $I10, rxcap_491_fail
-    rx487_cur."!mark_push"(0, rx487_pos, $I10)
-  # rx literal  "method"
-    add $I11, rx487_pos, 6
-    gt $I11, rx487_eos, rx487_fail
-    sub $I11, rx487_pos, rx487_off
-    substr $S10, rx487_tgt, $I11, 6
-    ne $S10, "method", rx487_fail
-    add rx487_pos, 6
-    set_addr $I10, rxcap_491_fail
-    ($I12, $I11) = rx487_cur."!mark_peek"($I10)
-    rx487_cur."!cursor_pos"($I11)
-    ($P10) = rx487_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx487_pos, "")
-    rx487_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_475_fail
+    rx471_cur."!mark_push"(0, rx471_pos, $I10)
+  # rx literal  "our"
+    add $I11, rx471_pos, 3
+    gt $I11, rx471_eos, rx471_fail
+    sub $I11, rx471_pos, rx471_off
+    substr $S10, rx471_tgt, $I11, 3
+    ne $S10, "our", rx471_fail
+    add rx471_pos, 3
+    set_addr $I10, rxcap_475_fail
+    ($I12, $I11) = rx471_cur."!mark_peek"($I10)
+    rx471_cur."!cursor_pos"($I11)
+    ($P10) = rx471_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx471_pos, "")
+    rx471_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_491_done
-  rxcap_491_fail:
-    goto rx487_fail
-  rxcap_491_done:
-  # rx subrule "method_def" subtype=capture negate=
-    rx487_cur."!cursor_pos"(rx487_pos)
-    $P10 = rx487_cur."method_def"()
-    unless $P10, rx487_fail
-    rx487_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("method_def")
-    rx487_pos = $P10."pos"()
+    goto rxcap_475_done
+  rxcap_475_fail:
+    goto rx471_fail
+  rxcap_475_done:
+  # rx subrule "scoped" subtype=capture negate=
+    rx471_cur."!cursor_pos"(rx471_pos)
+    $P10 = rx471_cur."scoped"("our")
+    unless $P10, rx471_fail
+    rx471_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("scoped")
+    rx471_pos = $P10."pos"()
   # rx pass
-    rx487_cur."!cursor_pass"(rx487_pos, "routine_declarator:sym<method>")
-    rx487_cur."!cursor_debug"("PASS  ", "routine_declarator:sym<method>", " at pos=", rx487_pos)
-    .return (rx487_cur)
-  rx487_fail:
+    rx471_cur."!cursor_pass"(rx471_pos, "scope_declarator:sym<our>")
+    rx471_cur."!cursor_debug"("PASS  ", "scope_declarator:sym<our>", " at pos=", rx471_pos)
+    .return (rx471_cur)
+  rx471_fail:
 .annotate "line", 4
-    (rx487_rep, rx487_pos, $I10, $P10) = rx487_cur."!mark_fail"(0)
-    lt rx487_pos, -1, rx487_done
-    eq rx487_pos, -1, rx487_fail
+    (rx471_rep, rx471_pos, $I10, $P10) = rx471_cur."!mark_fail"(0)
+    lt rx471_pos, -1, rx471_done
+    eq rx471_pos, -1, rx471_fail
     jump $I10
-  rx487_done:
-    rx487_cur."!cursor_fail"()
-    rx487_cur."!cursor_debug"("FAIL  ", "routine_declarator:sym<method>")
-    .return (rx487_cur)
+  rx471_done:
+    rx471_cur."!cursor_fail"()
+    rx471_cur."!cursor_debug"("FAIL  ", "scope_declarator:sym<our>")
+    .return (rx471_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__routine_declarator:sym<method>"  :subid("135_1258424429.0004") :method
+.sub "!PREFIX__scope_declarator:sym<our>"  :subid("126_1258533478.31768") :method
 .annotate "line", 4
-    $P489 = self."!PREFIX__!subrule"("method_def", "method")
-    new $P490, "ResizablePMCArray"
-    push $P490, $P489
-    .return ($P490)
+    $P473 = self."!PREFIX__!subrule"("scoped", "our")
+    new $P474, "ResizablePMCArray"
+    push $P474, $P473
+    .return ($P474)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "routine_def"  :subid("136_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "scope_declarator:sym<has>"  :subid("127_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx477_tgt
+    .local int rx477_pos
+    .local int rx477_off
+    .local int rx477_eos
+    .local int rx477_rep
+    .local pmc rx477_cur
+    (rx477_cur, rx477_pos, rx477_tgt, $I10) = self."!cursor_start"()
+    rx477_cur."!cursor_debug"("START ", "scope_declarator:sym<has>")
+    .lex unicode:"$\x{a2}", rx477_cur
+    .local pmc match
+    .lex "$/", match
+    length rx477_eos, rx477_tgt
+    set rx477_off, 0
+    lt $I10, 2, rx477_start
+    sub rx477_off, $I10, 1
+    substr rx477_tgt, rx477_tgt, rx477_off
+  rx477_start:
+.annotate "line", 245
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_481_fail
+    rx477_cur."!mark_push"(0, rx477_pos, $I10)
+  # rx literal  "has"
+    add $I11, rx477_pos, 3
+    gt $I11, rx477_eos, rx477_fail
+    sub $I11, rx477_pos, rx477_off
+    substr $S10, rx477_tgt, $I11, 3
+    ne $S10, "has", rx477_fail
+    add rx477_pos, 3
+    set_addr $I10, rxcap_481_fail
+    ($I12, $I11) = rx477_cur."!mark_peek"($I10)
+    rx477_cur."!cursor_pos"($I11)
+    ($P10) = rx477_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx477_pos, "")
+    rx477_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_481_done
+  rxcap_481_fail:
+    goto rx477_fail
+  rxcap_481_done:
+  # rx subrule "scoped" subtype=capture negate=
+    rx477_cur."!cursor_pos"(rx477_pos)
+    $P10 = rx477_cur."scoped"("has")
+    unless $P10, rx477_fail
+    rx477_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("scoped")
+    rx477_pos = $P10."pos"()
+  # rx pass
+    rx477_cur."!cursor_pass"(rx477_pos, "scope_declarator:sym<has>")
+    rx477_cur."!cursor_debug"("PASS  ", "scope_declarator:sym<has>", " at pos=", rx477_pos)
+    .return (rx477_cur)
+  rx477_fail:
+.annotate "line", 4
+    (rx477_rep, rx477_pos, $I10, $P10) = rx477_cur."!mark_fail"(0)
+    lt rx477_pos, -1, rx477_done
+    eq rx477_pos, -1, rx477_fail
+    jump $I10
+  rx477_done:
+    rx477_cur."!cursor_fail"()
+    rx477_cur."!cursor_debug"("FAIL  ", "scope_declarator:sym<has>")
+    .return (rx477_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__scope_declarator:sym<has>"  :subid("128_1258533478.31768") :method
+.annotate "line", 4
+    $P479 = self."!PREFIX__!subrule"("scoped", "has")
+    new $P480, "ResizablePMCArray"
+    push $P480, $P479
+    .return ($P480)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "scoped"  :subid("129_1258533478.31768") :method :outer("11_1258533478.31768")
+    .param pmc param_483
+.annotate "line", 247
+    .lex "$*SCOPE", param_483
+.annotate "line", 4
+    .local string rx484_tgt
+    .local int rx484_pos
+    .local int rx484_off
+    .local int rx484_eos
+    .local int rx484_rep
+    .local pmc rx484_cur
+    (rx484_cur, rx484_pos, rx484_tgt, $I10) = self."!cursor_start"()
+    rx484_cur."!cursor_debug"("START ", "scoped")
+    .lex unicode:"$\x{a2}", rx484_cur
+    .local pmc match
+    .lex "$/", match
+    length rx484_eos, rx484_tgt
+    set rx484_off, 0
+    lt $I10, 2, rx484_start
+    sub rx484_off, $I10, 1
+    substr rx484_tgt, rx484_tgt, rx484_off
+  rx484_start:
+  alt487_0:
+.annotate "line", 247
+    set_addr $I10, alt487_1
+    rx484_cur."!mark_push"(0, rx484_pos, $I10)
+.annotate "line", 248
+  # rx subrule "ws" subtype=method negate=
+    rx484_cur."!cursor_pos"(rx484_pos)
+    $P10 = rx484_cur."ws"()
+    unless $P10, rx484_fail
+    rx484_pos = $P10."pos"()
+  # rx subrule "variable_declarator" subtype=capture negate=
+    rx484_cur."!cursor_pos"(rx484_pos)
+    $P10 = rx484_cur."variable_declarator"()
+    unless $P10, rx484_fail
+    rx484_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("variable_declarator")
+    rx484_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx484_cur."!cursor_pos"(rx484_pos)
+    $P10 = rx484_cur."ws"()
+    unless $P10, rx484_fail
+    rx484_pos = $P10."pos"()
+    goto alt487_end
+  alt487_1:
+.annotate "line", 249
+  # rx subrule "ws" subtype=method negate=
+    rx484_cur."!cursor_pos"(rx484_pos)
+    $P10 = rx484_cur."ws"()
+    unless $P10, rx484_fail
+    rx484_pos = $P10."pos"()
+  # rx subrule "routine_declarator" subtype=capture negate=
+    rx484_cur."!cursor_pos"(rx484_pos)
+    $P10 = rx484_cur."routine_declarator"()
+    unless $P10, rx484_fail
+    rx484_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("routine_declarator")
+    rx484_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx484_cur."!cursor_pos"(rx484_pos)
+    $P10 = rx484_cur."ws"()
+    unless $P10, rx484_fail
+    rx484_pos = $P10."pos"()
+  alt487_end:
+.annotate "line", 247
+  # rx pass
+    rx484_cur."!cursor_pass"(rx484_pos, "scoped")
+    rx484_cur."!cursor_debug"("PASS  ", "scoped", " at pos=", rx484_pos)
+    .return (rx484_cur)
+  rx484_fail:
+.annotate "line", 4
+    (rx484_rep, rx484_pos, $I10, $P10) = rx484_cur."!mark_fail"(0)
+    lt rx484_pos, -1, rx484_done
+    eq rx484_pos, -1, rx484_fail
+    jump $I10
+  rx484_done:
+    rx484_cur."!cursor_fail"()
+    rx484_cur."!cursor_debug"("FAIL  ", "scoped")
+    .return (rx484_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__scoped"  :subid("130_1258533478.31768") :method
+.annotate "line", 4
+    new $P486, "ResizablePMCArray"
+    push $P486, ""
+    push $P486, ""
+    .return ($P486)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "variable_declarator"  :subid("131_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
     .local string rx493_tgt
     .local int rx493_pos
@@ -5808,8 +5867,7 @@ NQP::Compiler - NQP compiler
     .local int rx493_rep
     .local pmc rx493_cur
     (rx493_cur, rx493_pos, rx493_tgt, $I10) = self."!cursor_start"()
-    rx493_cur."!cursor_debug"("START ", "routine_def")
-    rx493_cur."!cursor_caparray"("deflongname")
+    rx493_cur."!cursor_debug"("START ", "variable_declarator")
     .lex unicode:"$\x{a2}", rx493_cur
     .local pmc match
     .lex "$/", match
@@ -5819,128 +5877,17 @@ NQP::Compiler - NQP compiler
     sub rx493_off, $I10, 1
     substr rx493_tgt, rx493_tgt, rx493_off
   rx493_start:
-.annotate "line", 246
-  # rx subrule "ws" subtype=method negate=
+.annotate "line", 252
+  # rx subrule "variable" subtype=capture negate=
     rx493_cur."!cursor_pos"(rx493_pos)
-    $P10 = rx493_cur."ws"()
-    unless $P10, rx493_fail
-    rx493_pos = $P10."pos"()
-.annotate "line", 247
-  # rx rxquantr497 ** 0..1
-    set_addr $I498, rxquantr497_done
-    rx493_cur."!mark_push"(0, rx493_pos, $I498)
-  rxquantr497_loop:
-  # rx subrule "deflongname" subtype=capture negate=
-    rx493_cur."!cursor_pos"(rx493_pos)
-    $P10 = rx493_cur."deflongname"()
+    $P10 = rx493_cur."variable"()
     unless $P10, rx493_fail
     rx493_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("deflongname")
+    $P10."!cursor_names"("variable")
     rx493_pos = $P10."pos"()
-    (rx493_rep) = rx493_cur."!mark_commit"($I498)
-  rxquantr497_done:
-  # rx subrule "ws" subtype=method negate=
-    rx493_cur."!cursor_pos"(rx493_pos)
-    $P10 = rx493_cur."ws"()
-    unless $P10, rx493_fail
-    rx493_pos = $P10."pos"()
-.annotate "line", 248
-  # rx subrule "newpad" subtype=method negate=
-    rx493_cur."!cursor_pos"(rx493_pos)
-    $P10 = rx493_cur."newpad"()
-    unless $P10, rx493_fail
-    rx493_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx493_cur."!cursor_pos"(rx493_pos)
-    $P10 = rx493_cur."ws"()
-    unless $P10, rx493_fail
-    rx493_pos = $P10."pos"()
-  alt501_0:
-.annotate "line", 249
-    set_addr $I10, alt501_1
-    rx493_cur."!mark_push"(0, rx493_pos, $I10)
-  # rx subrule "ws" subtype=method negate=
-    rx493_cur."!cursor_pos"(rx493_pos)
-    $P10 = rx493_cur."ws"()
-    unless $P10, rx493_fail
-    rx493_pos = $P10."pos"()
-  # rx literal  "("
-    add $I11, rx493_pos, 1
-    gt $I11, rx493_eos, rx493_fail
-    sub $I11, rx493_pos, rx493_off
-    substr $S10, rx493_tgt, $I11, 1
-    ne $S10, "(", rx493_fail
-    add rx493_pos, 1
-  # rx subrule "ws" subtype=method negate=
-    rx493_cur."!cursor_pos"(rx493_pos)
-    $P10 = rx493_cur."ws"()
-    unless $P10, rx493_fail
-    rx493_pos = $P10."pos"()
-  # rx subrule "signature" subtype=capture negate=
-    rx493_cur."!cursor_pos"(rx493_pos)
-    $P10 = rx493_cur."signature"()
-    unless $P10, rx493_fail
-    rx493_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("signature")
-    rx493_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx493_cur."!cursor_pos"(rx493_pos)
-    $P10 = rx493_cur."ws"()
-    unless $P10, rx493_fail
-    rx493_pos = $P10."pos"()
-  # rx literal  ")"
-    add $I11, rx493_pos, 1
-    gt $I11, rx493_eos, rx493_fail
-    sub $I11, rx493_pos, rx493_off
-    substr $S10, rx493_tgt, $I11, 1
-    ne $S10, ")", rx493_fail
-    add rx493_pos, 1
-  # rx subrule "ws" subtype=method negate=
-    rx493_cur."!cursor_pos"(rx493_pos)
-    $P10 = rx493_cur."ws"()
-    unless $P10, rx493_fail
-    rx493_pos = $P10."pos"()
-    goto alt501_end
-  alt501_1:
-.annotate "line", 250
-  # rx subrule "ws" subtype=method negate=
-    rx493_cur."!cursor_pos"(rx493_pos)
-    $P10 = rx493_cur."ws"()
-    unless $P10, rx493_fail
-    rx493_pos = $P10."pos"()
-  # rx subrule "panic" subtype=method negate=
-    rx493_cur."!cursor_pos"(rx493_pos)
-    $P10 = rx493_cur."panic"("Routine declaration requires a signature")
-    unless $P10, rx493_fail
-    rx493_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx493_cur."!cursor_pos"(rx493_pos)
-    $P10 = rx493_cur."ws"()
-    unless $P10, rx493_fail
-    rx493_pos = $P10."pos"()
-  alt501_end:
-  # rx subrule "ws" subtype=method negate=
-    rx493_cur."!cursor_pos"(rx493_pos)
-    $P10 = rx493_cur."ws"()
-    unless $P10, rx493_fail
-    rx493_pos = $P10."pos"()
-.annotate "line", 251
-  # rx subrule "blockoid" subtype=capture negate=
-    rx493_cur."!cursor_pos"(rx493_pos)
-    $P10 = rx493_cur."blockoid"()
-    unless $P10, rx493_fail
-    rx493_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("blockoid")
-    rx493_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx493_cur."!cursor_pos"(rx493_pos)
-    $P10 = rx493_cur."ws"()
-    unless $P10, rx493_fail
-    rx493_pos = $P10."pos"()
-.annotate "line", 246
   # rx pass
-    rx493_cur."!cursor_pass"(rx493_pos, "routine_def")
-    rx493_cur."!cursor_debug"("PASS  ", "routine_def", " at pos=", rx493_pos)
+    rx493_cur."!cursor_pass"(rx493_pos, "variable_declarator")
+    rx493_cur."!cursor_debug"("PASS  ", "variable_declarator", " at pos=", rx493_pos)
     .return (rx493_cur)
   rx493_fail:
 .annotate "line", 4
@@ -5950,687 +5897,778 @@ NQP::Compiler - NQP compiler
     jump $I10
   rx493_done:
     rx493_cur."!cursor_fail"()
-    rx493_cur."!cursor_debug"("FAIL  ", "routine_def")
+    rx493_cur."!cursor_debug"("FAIL  ", "variable_declarator")
     .return (rx493_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__routine_def"  :subid("137_1258424429.0004") :method
+.sub "!PREFIX__variable_declarator"  :subid("132_1258533478.31768") :method
 .annotate "line", 4
-    new $P495, "ResizablePMCArray"
-    push $P495, ""
-    .return ($P495)
+    $P495 = self."!PREFIX__!subrule"("variable", "")
+    new $P496, "ResizablePMCArray"
+    push $P496, $P495
+    .return ($P496)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "method_def"  :subid("138_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "routine_declarator"  :subid("133_1258533478.31768") :method
+.annotate "line", 254
+    $P498 = self."!protoregex"("routine_declarator")
+    .return ($P498)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__routine_declarator"  :subid("134_1258533478.31768") :method
+.annotate "line", 254
+    $P500 = self."!PREFIX__!protoregex"("routine_declarator")
+    .return ($P500)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "routine_declarator:sym<sub>"  :subid("135_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx511_tgt
-    .local int rx511_pos
-    .local int rx511_off
-    .local int rx511_eos
-    .local int rx511_rep
-    .local pmc rx511_cur
-    (rx511_cur, rx511_pos, rx511_tgt, $I10) = self."!cursor_start"()
-    rx511_cur."!cursor_debug"("START ", "method_def")
-    rx511_cur."!cursor_caparray"("deflongname")
-    .lex unicode:"$\x{a2}", rx511_cur
+    .local string rx502_tgt
+    .local int rx502_pos
+    .local int rx502_off
+    .local int rx502_eos
+    .local int rx502_rep
+    .local pmc rx502_cur
+    (rx502_cur, rx502_pos, rx502_tgt, $I10) = self."!cursor_start"()
+    rx502_cur."!cursor_debug"("START ", "routine_declarator:sym<sub>")
+    .lex unicode:"$\x{a2}", rx502_cur
     .local pmc match
     .lex "$/", match
-    length rx511_eos, rx511_tgt
-    set rx511_off, 0
-    lt $I10, 2, rx511_start
-    sub rx511_off, $I10, 1
-    substr rx511_tgt, rx511_tgt, rx511_off
-  rx511_start:
-.annotate "line", 254
-  # rx subrule "ws" subtype=method negate=
-    rx511_cur."!cursor_pos"(rx511_pos)
-    $P10 = rx511_cur."ws"()
-    unless $P10, rx511_fail
-    rx511_pos = $P10."pos"()
+    length rx502_eos, rx502_tgt
+    set rx502_off, 0
+    lt $I10, 2, rx502_start
+    sub rx502_off, $I10, 1
+    substr rx502_tgt, rx502_tgt, rx502_off
+  rx502_start:
 .annotate "line", 255
-  # rx rxquantr515 ** 0..1
-    set_addr $I516, rxquantr515_done
-    rx511_cur."!mark_push"(0, rx511_pos, $I516)
-  rxquantr515_loop:
-  # rx subrule "deflongname" subtype=capture negate=
-    rx511_cur."!cursor_pos"(rx511_pos)
-    $P10 = rx511_cur."deflongname"()
-    unless $P10, rx511_fail
-    rx511_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("deflongname")
-    rx511_pos = $P10."pos"()
-    (rx511_rep) = rx511_cur."!mark_commit"($I516)
-  rxquantr515_done:
-  # rx subrule "ws" subtype=method negate=
-    rx511_cur."!cursor_pos"(rx511_pos)
-    $P10 = rx511_cur."ws"()
-    unless $P10, rx511_fail
-    rx511_pos = $P10."pos"()
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_506_fail
+    rx502_cur."!mark_push"(0, rx502_pos, $I10)
+  # rx literal  "sub"
+    add $I11, rx502_pos, 3
+    gt $I11, rx502_eos, rx502_fail
+    sub $I11, rx502_pos, rx502_off
+    substr $S10, rx502_tgt, $I11, 3
+    ne $S10, "sub", rx502_fail
+    add rx502_pos, 3
+    set_addr $I10, rxcap_506_fail
+    ($I12, $I11) = rx502_cur."!mark_peek"($I10)
+    rx502_cur."!cursor_pos"($I11)
+    ($P10) = rx502_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx502_pos, "")
+    rx502_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_506_done
+  rxcap_506_fail:
+    goto rx502_fail
+  rxcap_506_done:
+  # rx subrule "routine_def" subtype=capture negate=
+    rx502_cur."!cursor_pos"(rx502_pos)
+    $P10 = rx502_cur."routine_def"()
+    unless $P10, rx502_fail
+    rx502_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("routine_def")
+    rx502_pos = $P10."pos"()
+  # rx pass
+    rx502_cur."!cursor_pass"(rx502_pos, "routine_declarator:sym<sub>")
+    rx502_cur."!cursor_debug"("PASS  ", "routine_declarator:sym<sub>", " at pos=", rx502_pos)
+    .return (rx502_cur)
+  rx502_fail:
+.annotate "line", 4
+    (rx502_rep, rx502_pos, $I10, $P10) = rx502_cur."!mark_fail"(0)
+    lt rx502_pos, -1, rx502_done
+    eq rx502_pos, -1, rx502_fail
+    jump $I10
+  rx502_done:
+    rx502_cur."!cursor_fail"()
+    rx502_cur."!cursor_debug"("FAIL  ", "routine_declarator:sym<sub>")
+    .return (rx502_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__routine_declarator:sym<sub>"  :subid("136_1258533478.31768") :method
+.annotate "line", 4
+    $P504 = self."!PREFIX__!subrule"("routine_def", "sub")
+    new $P505, "ResizablePMCArray"
+    push $P505, $P504
+    .return ($P505)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "routine_declarator:sym<method>"  :subid("137_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx508_tgt
+    .local int rx508_pos
+    .local int rx508_off
+    .local int rx508_eos
+    .local int rx508_rep
+    .local pmc rx508_cur
+    (rx508_cur, rx508_pos, rx508_tgt, $I10) = self."!cursor_start"()
+    rx508_cur."!cursor_debug"("START ", "routine_declarator:sym<method>")
+    .lex unicode:"$\x{a2}", rx508_cur
+    .local pmc match
+    .lex "$/", match
+    length rx508_eos, rx508_tgt
+    set rx508_off, 0
+    lt $I10, 2, rx508_start
+    sub rx508_off, $I10, 1
+    substr rx508_tgt, rx508_tgt, rx508_off
+  rx508_start:
 .annotate "line", 256
-  # rx subrule "newpad" subtype=method negate=
-    rx511_cur."!cursor_pos"(rx511_pos)
-    $P10 = rx511_cur."newpad"()
-    unless $P10, rx511_fail
-    rx511_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx511_cur."!cursor_pos"(rx511_pos)
-    $P10 = rx511_cur."ws"()
-    unless $P10, rx511_fail
-    rx511_pos = $P10."pos"()
-  alt519_0:
-.annotate "line", 257
-    set_addr $I10, alt519_1
-    rx511_cur."!mark_push"(0, rx511_pos, $I10)
-  # rx subrule "ws" subtype=method negate=
-    rx511_cur."!cursor_pos"(rx511_pos)
-    $P10 = rx511_cur."ws"()
-    unless $P10, rx511_fail
-    rx511_pos = $P10."pos"()
-  # rx literal  "("
-    add $I11, rx511_pos, 1
-    gt $I11, rx511_eos, rx511_fail
-    sub $I11, rx511_pos, rx511_off
-    substr $S10, rx511_tgt, $I11, 1
-    ne $S10, "(", rx511_fail
-    add rx511_pos, 1
-  # rx subrule "ws" subtype=method negate=
-    rx511_cur."!cursor_pos"(rx511_pos)
-    $P10 = rx511_cur."ws"()
-    unless $P10, rx511_fail
-    rx511_pos = $P10."pos"()
-  # rx subrule "signature" subtype=capture negate=
-    rx511_cur."!cursor_pos"(rx511_pos)
-    $P10 = rx511_cur."signature"()
-    unless $P10, rx511_fail
-    rx511_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("signature")
-    rx511_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx511_cur."!cursor_pos"(rx511_pos)
-    $P10 = rx511_cur."ws"()
-    unless $P10, rx511_fail
-    rx511_pos = $P10."pos"()
-  # rx literal  ")"
-    add $I11, rx511_pos, 1
-    gt $I11, rx511_eos, rx511_fail
-    sub $I11, rx511_pos, rx511_off
-    substr $S10, rx511_tgt, $I11, 1
-    ne $S10, ")", rx511_fail
-    add rx511_pos, 1
-  # rx subrule "ws" subtype=method negate=
-    rx511_cur."!cursor_pos"(rx511_pos)
-    $P10 = rx511_cur."ws"()
-    unless $P10, rx511_fail
-    rx511_pos = $P10."pos"()
-    goto alt519_end
-  alt519_1:
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_512_fail
+    rx508_cur."!mark_push"(0, rx508_pos, $I10)
+  # rx literal  "method"
+    add $I11, rx508_pos, 6
+    gt $I11, rx508_eos, rx508_fail
+    sub $I11, rx508_pos, rx508_off
+    substr $S10, rx508_tgt, $I11, 6
+    ne $S10, "method", rx508_fail
+    add rx508_pos, 6
+    set_addr $I10, rxcap_512_fail
+    ($I12, $I11) = rx508_cur."!mark_peek"($I10)
+    rx508_cur."!cursor_pos"($I11)
+    ($P10) = rx508_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx508_pos, "")
+    rx508_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_512_done
+  rxcap_512_fail:
+    goto rx508_fail
+  rxcap_512_done:
+  # rx subrule "method_def" subtype=capture negate=
+    rx508_cur."!cursor_pos"(rx508_pos)
+    $P10 = rx508_cur."method_def"()
+    unless $P10, rx508_fail
+    rx508_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("method_def")
+    rx508_pos = $P10."pos"()
+  # rx pass
+    rx508_cur."!cursor_pass"(rx508_pos, "routine_declarator:sym<method>")
+    rx508_cur."!cursor_debug"("PASS  ", "routine_declarator:sym<method>", " at pos=", rx508_pos)
+    .return (rx508_cur)
+  rx508_fail:
+.annotate "line", 4
+    (rx508_rep, rx508_pos, $I10, $P10) = rx508_cur."!mark_fail"(0)
+    lt rx508_pos, -1, rx508_done
+    eq rx508_pos, -1, rx508_fail
+    jump $I10
+  rx508_done:
+    rx508_cur."!cursor_fail"()
+    rx508_cur."!cursor_debug"("FAIL  ", "routine_declarator:sym<method>")
+    .return (rx508_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__routine_declarator:sym<method>"  :subid("138_1258533478.31768") :method
+.annotate "line", 4
+    $P510 = self."!PREFIX__!subrule"("method_def", "method")
+    new $P511, "ResizablePMCArray"
+    push $P511, $P510
+    .return ($P511)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "routine_def"  :subid("139_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx514_tgt
+    .local int rx514_pos
+    .local int rx514_off
+    .local int rx514_eos
+    .local int rx514_rep
+    .local pmc rx514_cur
+    (rx514_cur, rx514_pos, rx514_tgt, $I10) = self."!cursor_start"()
+    rx514_cur."!cursor_debug"("START ", "routine_def")
+    rx514_cur."!cursor_caparray"("deflongname")
+    .lex unicode:"$\x{a2}", rx514_cur
+    .local pmc match
+    .lex "$/", match
+    length rx514_eos, rx514_tgt
+    set rx514_off, 0
+    lt $I10, 2, rx514_start
+    sub rx514_off, $I10, 1
+    substr rx514_tgt, rx514_tgt, rx514_off
+  rx514_start:
 .annotate "line", 258
   # rx subrule "ws" subtype=method negate=
-    rx511_cur."!cursor_pos"(rx511_pos)
-    $P10 = rx511_cur."ws"()
-    unless $P10, rx511_fail
-    rx511_pos = $P10."pos"()
-  # rx subrule "panic" subtype=method negate=
-    rx511_cur."!cursor_pos"(rx511_pos)
-    $P10 = rx511_cur."panic"("Routine declaration requires a signature")
-    unless $P10, rx511_fail
-    rx511_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx511_cur."!cursor_pos"(rx511_pos)
-    $P10 = rx511_cur."ws"()
-    unless $P10, rx511_fail
-    rx511_pos = $P10."pos"()
-  alt519_end:
-  # rx subrule "ws" subtype=method negate=
-    rx511_cur."!cursor_pos"(rx511_pos)
-    $P10 = rx511_cur."ws"()
-    unless $P10, rx511_fail
-    rx511_pos = $P10."pos"()
+    rx514_cur."!cursor_pos"(rx514_pos)
+    $P10 = rx514_cur."ws"()
+    unless $P10, rx514_fail
+    rx514_pos = $P10."pos"()
 .annotate "line", 259
-  # rx subrule "blockoid" subtype=capture negate=
-    rx511_cur."!cursor_pos"(rx511_pos)
-    $P10 = rx511_cur."blockoid"()
-    unless $P10, rx511_fail
-    rx511_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("blockoid")
-    rx511_pos = $P10."pos"()
+  # rx rxquantr518 ** 0..1
+    set_addr $I519, rxquantr518_done
+    rx514_cur."!mark_push"(0, rx514_pos, $I519)
+  rxquantr518_loop:
+  # rx subrule "deflongname" subtype=capture negate=
+    rx514_cur."!cursor_pos"(rx514_pos)
+    $P10 = rx514_cur."deflongname"()
+    unless $P10, rx514_fail
+    rx514_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("deflongname")
+    rx514_pos = $P10."pos"()
+    (rx514_rep) = rx514_cur."!mark_commit"($I519)
+  rxquantr518_done:
   # rx subrule "ws" subtype=method negate=
-    rx511_cur."!cursor_pos"(rx511_pos)
-    $P10 = rx511_cur."ws"()
-    unless $P10, rx511_fail
-    rx511_pos = $P10."pos"()
-.annotate "line", 254
-  # rx pass
-    rx511_cur."!cursor_pass"(rx511_pos, "method_def")
-    rx511_cur."!cursor_debug"("PASS  ", "method_def", " at pos=", rx511_pos)
-    .return (rx511_cur)
-  rx511_fail:
-.annotate "line", 4
-    (rx511_rep, rx511_pos, $I10, $P10) = rx511_cur."!mark_fail"(0)
-    lt rx511_pos, -1, rx511_done
-    eq rx511_pos, -1, rx511_fail
-    jump $I10
-  rx511_done:
-    rx511_cur."!cursor_fail"()
-    rx511_cur."!cursor_debug"("FAIL  ", "method_def")
-    .return (rx511_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__method_def"  :subid("139_1258424429.0004") :method
-.annotate "line", 4
-    new $P513, "ResizablePMCArray"
-    push $P513, ""
-    .return ($P513)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "signature"  :subid("140_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx529_tgt
-    .local int rx529_pos
-    .local int rx529_off
-    .local int rx529_eos
-    .local int rx529_rep
-    .local pmc rx529_cur
-    (rx529_cur, rx529_pos, rx529_tgt, $I10) = self."!cursor_start"()
-    rx529_cur."!cursor_debug"("START ", "signature")
-    rx529_cur."!cursor_caparray"("parameter")
-    .lex unicode:"$\x{a2}", rx529_cur
-    .local pmc match
-    .lex "$/", match
-    length rx529_eos, rx529_tgt
-    set rx529_off, 0
-    lt $I10, 2, rx529_start
-    sub rx529_off, $I10, 1
-    substr rx529_tgt, rx529_tgt, rx529_off
-  rx529_start:
+    rx514_cur."!cursor_pos"(rx514_pos)
+    $P10 = rx514_cur."ws"()
+    unless $P10, rx514_fail
+    rx514_pos = $P10."pos"()
+.annotate "line", 260
+  # rx subrule "newpad" subtype=method negate=
+    rx514_cur."!cursor_pos"(rx514_pos)
+    $P10 = rx514_cur."newpad"()
+    unless $P10, rx514_fail
+    rx514_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx514_cur."!cursor_pos"(rx514_pos)
+    $P10 = rx514_cur."ws"()
+    unless $P10, rx514_fail
+    rx514_pos = $P10."pos"()
+  alt522_0:
+.annotate "line", 261
+    set_addr $I10, alt522_1
+    rx514_cur."!mark_push"(0, rx514_pos, $I10)
+  # rx subrule "ws" subtype=method negate=
+    rx514_cur."!cursor_pos"(rx514_pos)
+    $P10 = rx514_cur."ws"()
+    unless $P10, rx514_fail
+    rx514_pos = $P10."pos"()
+  # rx literal  "("
+    add $I11, rx514_pos, 1
+    gt $I11, rx514_eos, rx514_fail
+    sub $I11, rx514_pos, rx514_off
+    substr $S10, rx514_tgt, $I11, 1
+    ne $S10, "(", rx514_fail
+    add rx514_pos, 1
+  # rx subrule "ws" subtype=method negate=
+    rx514_cur."!cursor_pos"(rx514_pos)
+    $P10 = rx514_cur."ws"()
+    unless $P10, rx514_fail
+    rx514_pos = $P10."pos"()
+  # rx subrule "signature" subtype=capture negate=
+    rx514_cur."!cursor_pos"(rx514_pos)
+    $P10 = rx514_cur."signature"()
+    unless $P10, rx514_fail
+    rx514_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("signature")
+    rx514_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx514_cur."!cursor_pos"(rx514_pos)
+    $P10 = rx514_cur."ws"()
+    unless $P10, rx514_fail
+    rx514_pos = $P10."pos"()
+  # rx literal  ")"
+    add $I11, rx514_pos, 1
+    gt $I11, rx514_eos, rx514_fail
+    sub $I11, rx514_pos, rx514_off
+    substr $S10, rx514_tgt, $I11, 1
+    ne $S10, ")", rx514_fail
+    add rx514_pos, 1
+  # rx subrule "ws" subtype=method negate=
+    rx514_cur."!cursor_pos"(rx514_pos)
+    $P10 = rx514_cur."ws"()
+    unless $P10, rx514_fail
+    rx514_pos = $P10."pos"()
+    goto alt522_end
+  alt522_1:
 .annotate "line", 262
-  # rx rxquantr532 ** 0..1
-    set_addr $I535, rxquantr532_done
-    rx529_cur."!mark_push"(0, rx529_pos, $I535)
-  rxquantr532_loop:
-  # rx rxquantr533 ** 1..*
-    set_addr $I534, rxquantr533_done
-    rx529_cur."!mark_push"(0, -1, $I534)
-  rxquantr533_loop:
   # rx subrule "ws" subtype=method negate=
-    rx529_cur."!cursor_pos"(rx529_pos)
-    $P10 = rx529_cur."ws"()
-    unless $P10, rx529_fail
-    rx529_pos = $P10."pos"()
-  # rx subrule "parameter" subtype=capture negate=
-    rx529_cur."!cursor_pos"(rx529_pos)
-    $P10 = rx529_cur."parameter"()
-    unless $P10, rx529_fail
-    rx529_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("parameter")
-    rx529_pos = $P10."pos"()
+    rx514_cur."!cursor_pos"(rx514_pos)
+    $P10 = rx514_cur."ws"()
+    unless $P10, rx514_fail
+    rx514_pos = $P10."pos"()
+  # rx subrule "panic" subtype=method negate=
+    rx514_cur."!cursor_pos"(rx514_pos)
+    $P10 = rx514_cur."panic"("Routine declaration requires a signature")
+    unless $P10, rx514_fail
+    rx514_pos = $P10."pos"()
   # rx subrule "ws" subtype=method negate=
-    rx529_cur."!cursor_pos"(rx529_pos)
-    $P10 = rx529_cur."ws"()
-    unless $P10, rx529_fail
-    rx529_pos = $P10."pos"()
-    (rx529_rep) = rx529_cur."!mark_commit"($I534)
-    rx529_cur."!mark_push"(rx529_rep, rx529_pos, $I534)
-  # rx literal  ","
-    add $I11, rx529_pos, 1
-    gt $I11, rx529_eos, rx529_fail
-    sub $I11, rx529_pos, rx529_off
-    substr $S10, rx529_tgt, $I11, 1
-    ne $S10, ",", rx529_fail
-    add rx529_pos, 1
-    goto rxquantr533_loop
-  rxquantr533_done:
-    (rx529_rep) = rx529_cur."!mark_commit"($I535)
-  rxquantr532_done:
+    rx514_cur."!cursor_pos"(rx514_pos)
+    $P10 = rx514_cur."ws"()
+    unless $P10, rx514_fail
+    rx514_pos = $P10."pos"()
+  alt522_end:
+  # rx subrule "ws" subtype=method negate=
+    rx514_cur."!cursor_pos"(rx514_pos)
+    $P10 = rx514_cur."ws"()
+    unless $P10, rx514_fail
+    rx514_pos = $P10."pos"()
+.annotate "line", 263
+  # rx subrule "blockoid" subtype=capture negate=
+    rx514_cur."!cursor_pos"(rx514_pos)
+    $P10 = rx514_cur."blockoid"()
+    unless $P10, rx514_fail
+    rx514_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("blockoid")
+    rx514_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx514_cur."!cursor_pos"(rx514_pos)
+    $P10 = rx514_cur."ws"()
+    unless $P10, rx514_fail
+    rx514_pos = $P10."pos"()
+.annotate "line", 258
   # rx pass
-    rx529_cur."!cursor_pass"(rx529_pos, "signature")
-    rx529_cur."!cursor_debug"("PASS  ", "signature", " at pos=", rx529_pos)
-    .return (rx529_cur)
-  rx529_fail:
+    rx514_cur."!cursor_pass"(rx514_pos, "routine_def")
+    rx514_cur."!cursor_debug"("PASS  ", "routine_def", " at pos=", rx514_pos)
+    .return (rx514_cur)
+  rx514_fail:
 .annotate "line", 4
-    (rx529_rep, rx529_pos, $I10, $P10) = rx529_cur."!mark_fail"(0)
-    lt rx529_pos, -1, rx529_done
-    eq rx529_pos, -1, rx529_fail
+    (rx514_rep, rx514_pos, $I10, $P10) = rx514_cur."!mark_fail"(0)
+    lt rx514_pos, -1, rx514_done
+    eq rx514_pos, -1, rx514_fail
     jump $I10
-  rx529_done:
-    rx529_cur."!cursor_fail"()
-    rx529_cur."!cursor_debug"("FAIL  ", "signature")
-    .return (rx529_cur)
+  rx514_done:
+    rx514_cur."!cursor_fail"()
+    rx514_cur."!cursor_debug"("FAIL  ", "routine_def")
+    .return (rx514_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__signature"  :subid("141_1258424429.0004") :method
+.sub "!PREFIX__routine_def"  :subid("140_1258533478.31768") :method
 .annotate "line", 4
-    new $P531, "ResizablePMCArray"
-    push $P531, ""
-    .return ($P531)
+    new $P516, "ResizablePMCArray"
+    push $P516, ""
+    .return ($P516)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "parameter"  :subid("142_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "method_def"  :subid("141_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx537_tgt
-    .local int rx537_pos
-    .local int rx537_off
-    .local int rx537_eos
-    .local int rx537_rep
-    .local pmc rx537_cur
-    (rx537_cur, rx537_pos, rx537_tgt, $I10) = self."!cursor_start"()
-    rx537_cur."!cursor_debug"("START ", "parameter")
-    rx537_cur."!cursor_caparray"("default_value")
-    .lex unicode:"$\x{a2}", rx537_cur
+    .local string rx532_tgt
+    .local int rx532_pos
+    .local int rx532_off
+    .local int rx532_eos
+    .local int rx532_rep
+    .local pmc rx532_cur
+    (rx532_cur, rx532_pos, rx532_tgt, $I10) = self."!cursor_start"()
+    rx532_cur."!cursor_debug"("START ", "method_def")
+    rx532_cur."!cursor_caparray"("deflongname")
+    .lex unicode:"$\x{a2}", rx532_cur
     .local pmc match
     .lex "$/", match
-    length rx537_eos, rx537_tgt
-    set rx537_off, 0
-    lt $I10, 2, rx537_start
-    sub rx537_off, $I10, 1
-    substr rx537_tgt, rx537_tgt, rx537_off
-  rx537_start:
-  alt543_0:
-.annotate "line", 265
-    set_addr $I10, alt543_1
-    rx537_cur."!mark_push"(0, rx537_pos, $I10)
+    length rx532_eos, rx532_tgt
+    set rx532_off, 0
+    lt $I10, 2, rx532_start
+    sub rx532_off, $I10, 1
+    substr rx532_tgt, rx532_tgt, rx532_off
+  rx532_start:
 .annotate "line", 266
-  # rx subcapture "quant"
-    set_addr $I10, rxcap_544_fail
-    rx537_cur."!mark_push"(0, rx537_pos, $I10)
-  # rx literal  "*"
-    add $I11, rx537_pos, 1
-    gt $I11, rx537_eos, rx537_fail
-    sub $I11, rx537_pos, rx537_off
-    substr $S10, rx537_tgt, $I11, 1
-    ne $S10, "*", rx537_fail
-    add rx537_pos, 1
-    set_addr $I10, rxcap_544_fail
-    ($I12, $I11) = rx537_cur."!mark_peek"($I10)
-    rx537_cur."!cursor_pos"($I11)
-    ($P10) = rx537_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx537_pos, "")
-    rx537_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("quant")
-    goto rxcap_544_done
-  rxcap_544_fail:
-    goto rx537_fail
-  rxcap_544_done:
-  # rx subrule "param_var" subtype=capture negate=
-    rx537_cur."!cursor_pos"(rx537_pos)
-    $P10 = rx537_cur."param_var"()
-    unless $P10, rx537_fail
-    rx537_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("param_var")
-    rx537_pos = $P10."pos"()
-    goto alt543_end
-  alt543_1:
-  alt545_0:
+  # rx subrule "ws" subtype=method negate=
+    rx532_cur."!cursor_pos"(rx532_pos)
+    $P10 = rx532_cur."ws"()
+    unless $P10, rx532_fail
+    rx532_pos = $P10."pos"()
 .annotate "line", 267
-    set_addr $I10, alt545_1
-    rx537_cur."!mark_push"(0, rx537_pos, $I10)
-  # rx subrule "param_var" subtype=capture negate=
-    rx537_cur."!cursor_pos"(rx537_pos)
-    $P10 = rx537_cur."param_var"()
-    unless $P10, rx537_fail
-    rx537_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("param_var")
-    rx537_pos = $P10."pos"()
-    goto alt545_end
-  alt545_1:
-  # rx subrule "named_param" subtype=capture negate=
-    rx537_cur."!cursor_pos"(rx537_pos)
-    $P10 = rx537_cur."named_param"()
-    unless $P10, rx537_fail
-    rx537_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("named_param")
-    rx537_pos = $P10."pos"()
-  alt545_end:
-  # rx subcapture "quant"
-    set_addr $I10, rxcap_547_fail
-    rx537_cur."!mark_push"(0, rx537_pos, $I10)
-  alt546_0:
-    set_addr $I10, alt546_1
-    rx537_cur."!mark_push"(0, rx537_pos, $I10)
-  # rx literal  "?"
-    add $I11, rx537_pos, 1
-    gt $I11, rx537_eos, rx537_fail
-    sub $I11, rx537_pos, rx537_off
-    substr $S10, rx537_tgt, $I11, 1
-    ne $S10, "?", rx537_fail
-    add rx537_pos, 1
-    goto alt546_end
-  alt546_1:
-    set_addr $I10, alt546_2
-    rx537_cur."!mark_push"(0, rx537_pos, $I10)
-  # rx literal  "!"
-    add $I11, rx537_pos, 1
-    gt $I11, rx537_eos, rx537_fail
-    sub $I11, rx537_pos, rx537_off
-    substr $S10, rx537_tgt, $I11, 1
-    ne $S10, "!", rx537_fail
-    add rx537_pos, 1
-    goto alt546_end
-  alt546_2:
-  alt546_end:
-    set_addr $I10, rxcap_547_fail
-    ($I12, $I11) = rx537_cur."!mark_peek"($I10)
-    rx537_cur."!cursor_pos"($I11)
-    ($P10) = rx537_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx537_pos, "")
-    rx537_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("quant")
-    goto rxcap_547_done
-  rxcap_547_fail:
-    goto rx537_fail
-  rxcap_547_done:
-  alt543_end:
+  # rx rxquantr536 ** 0..1
+    set_addr $I537, rxquantr536_done
+    rx532_cur."!mark_push"(0, rx532_pos, $I537)
+  rxquantr536_loop:
+  # rx subrule "deflongname" subtype=capture negate=
+    rx532_cur."!cursor_pos"(rx532_pos)
+    $P10 = rx532_cur."deflongname"()
+    unless $P10, rx532_fail
+    rx532_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("deflongname")
+    rx532_pos = $P10."pos"()
+    (rx532_rep) = rx532_cur."!mark_commit"($I537)
+  rxquantr536_done:
+  # rx subrule "ws" subtype=method negate=
+    rx532_cur."!cursor_pos"(rx532_pos)
+    $P10 = rx532_cur."ws"()
+    unless $P10, rx532_fail
+    rx532_pos = $P10."pos"()
+.annotate "line", 268
+  # rx subrule "newpad" subtype=method negate=
+    rx532_cur."!cursor_pos"(rx532_pos)
+    $P10 = rx532_cur."newpad"()
+    unless $P10, rx532_fail
+    rx532_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx532_cur."!cursor_pos"(rx532_pos)
+    $P10 = rx532_cur."ws"()
+    unless $P10, rx532_fail
+    rx532_pos = $P10."pos"()
+  alt540_0:
 .annotate "line", 269
-  # rx rxquantr548 ** 0..1
-    set_addr $I549, rxquantr548_done
-    rx537_cur."!mark_push"(0, rx537_pos, $I549)
-  rxquantr548_loop:
-  # rx subrule "default_value" subtype=capture negate=
-    rx537_cur."!cursor_pos"(rx537_pos)
-    $P10 = rx537_cur."default_value"()
-    unless $P10, rx537_fail
-    rx537_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("default_value")
-    rx537_pos = $P10."pos"()
-    (rx537_rep) = rx537_cur."!mark_commit"($I549)
-  rxquantr548_done:
-.annotate "line", 264
+    set_addr $I10, alt540_1
+    rx532_cur."!mark_push"(0, rx532_pos, $I10)
+  # rx subrule "ws" subtype=method negate=
+    rx532_cur."!cursor_pos"(rx532_pos)
+    $P10 = rx532_cur."ws"()
+    unless $P10, rx532_fail
+    rx532_pos = $P10."pos"()
+  # rx literal  "("
+    add $I11, rx532_pos, 1
+    gt $I11, rx532_eos, rx532_fail
+    sub $I11, rx532_pos, rx532_off
+    substr $S10, rx532_tgt, $I11, 1
+    ne $S10, "(", rx532_fail
+    add rx532_pos, 1
+  # rx subrule "ws" subtype=method negate=
+    rx532_cur."!cursor_pos"(rx532_pos)
+    $P10 = rx532_cur."ws"()
+    unless $P10, rx532_fail
+    rx532_pos = $P10."pos"()
+  # rx subrule "signature" subtype=capture negate=
+    rx532_cur."!cursor_pos"(rx532_pos)
+    $P10 = rx532_cur."signature"()
+    unless $P10, rx532_fail
+    rx532_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("signature")
+    rx532_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx532_cur."!cursor_pos"(rx532_pos)
+    $P10 = rx532_cur."ws"()
+    unless $P10, rx532_fail
+    rx532_pos = $P10."pos"()
+  # rx literal  ")"
+    add $I11, rx532_pos, 1
+    gt $I11, rx532_eos, rx532_fail
+    sub $I11, rx532_pos, rx532_off
+    substr $S10, rx532_tgt, $I11, 1
+    ne $S10, ")", rx532_fail
+    add rx532_pos, 1
+  # rx subrule "ws" subtype=method negate=
+    rx532_cur."!cursor_pos"(rx532_pos)
+    $P10 = rx532_cur."ws"()
+    unless $P10, rx532_fail
+    rx532_pos = $P10."pos"()
+    goto alt540_end
+  alt540_1:
+.annotate "line", 270
+  # rx subrule "ws" subtype=method negate=
+    rx532_cur."!cursor_pos"(rx532_pos)
+    $P10 = rx532_cur."ws"()
+    unless $P10, rx532_fail
+    rx532_pos = $P10."pos"()
+  # rx subrule "panic" subtype=method negate=
+    rx532_cur."!cursor_pos"(rx532_pos)
+    $P10 = rx532_cur."panic"("Routine declaration requires a signature")
+    unless $P10, rx532_fail
+    rx532_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx532_cur."!cursor_pos"(rx532_pos)
+    $P10 = rx532_cur."ws"()
+    unless $P10, rx532_fail
+    rx532_pos = $P10."pos"()
+  alt540_end:
+  # rx subrule "ws" subtype=method negate=
+    rx532_cur."!cursor_pos"(rx532_pos)
+    $P10 = rx532_cur."ws"()
+    unless $P10, rx532_fail
+    rx532_pos = $P10."pos"()
+.annotate "line", 271
+  # rx subrule "blockoid" subtype=capture negate=
+    rx532_cur."!cursor_pos"(rx532_pos)
+    $P10 = rx532_cur."blockoid"()
+    unless $P10, rx532_fail
+    rx532_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("blockoid")
+    rx532_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx532_cur."!cursor_pos"(rx532_pos)
+    $P10 = rx532_cur."ws"()
+    unless $P10, rx532_fail
+    rx532_pos = $P10."pos"()
+.annotate "line", 266
   # rx pass
-    rx537_cur."!cursor_pass"(rx537_pos, "parameter")
-    rx537_cur."!cursor_debug"("PASS  ", "parameter", " at pos=", rx537_pos)
-    .return (rx537_cur)
-  rx537_fail:
+    rx532_cur."!cursor_pass"(rx532_pos, "method_def")
+    rx532_cur."!cursor_debug"("PASS  ", "method_def", " at pos=", rx532_pos)
+    .return (rx532_cur)
+  rx532_fail:
 .annotate "line", 4
-    (rx537_rep, rx537_pos, $I10, $P10) = rx537_cur."!mark_fail"(0)
-    lt rx537_pos, -1, rx537_done
-    eq rx537_pos, -1, rx537_fail
+    (rx532_rep, rx532_pos, $I10, $P10) = rx532_cur."!mark_fail"(0)
+    lt rx532_pos, -1, rx532_done
+    eq rx532_pos, -1, rx532_fail
     jump $I10
-  rx537_done:
-    rx537_cur."!cursor_fail"()
-    rx537_cur."!cursor_debug"("FAIL  ", "parameter")
-    .return (rx537_cur)
+  rx532_done:
+    rx532_cur."!cursor_fail"()
+    rx532_cur."!cursor_debug"("FAIL  ", "method_def")
+    .return (rx532_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__parameter"  :subid("143_1258424429.0004") :method
+.sub "!PREFIX__method_def"  :subid("142_1258533478.31768") :method
 .annotate "line", 4
-    $P539 = self."!PREFIX__!subrule"("named_param", "")
-    $P540 = self."!PREFIX__!subrule"("param_var", "")
-    $P541 = self."!PREFIX__!subrule"("param_var", "*")
-    new $P542, "ResizablePMCArray"
-    push $P542, $P539
-    push $P542, $P540
-    push $P542, $P541
-    .return ($P542)
+    new $P534, "ResizablePMCArray"
+    push $P534, ""
+    .return ($P534)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "param_var"  :subid("144_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "signature"  :subid("143_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx551_tgt
-    .local int rx551_pos
-    .local int rx551_off
-    .local int rx551_eos
-    .local int rx551_rep
-    .local pmc rx551_cur
-    (rx551_cur, rx551_pos, rx551_tgt, $I10) = self."!cursor_start"()
-    rx551_cur."!cursor_debug"("START ", "param_var")
-    rx551_cur."!cursor_caparray"("twigil")
-    .lex unicode:"$\x{a2}", rx551_cur
+    .local string rx550_tgt
+    .local int rx550_pos
+    .local int rx550_off
+    .local int rx550_eos
+    .local int rx550_rep
+    .local pmc rx550_cur
+    (rx550_cur, rx550_pos, rx550_tgt, $I10) = self."!cursor_start"()
+    rx550_cur."!cursor_debug"("START ", "signature")
+    rx550_cur."!cursor_caparray"("parameter")
+    .lex unicode:"$\x{a2}", rx550_cur
     .local pmc match
     .lex "$/", match
-    length rx551_eos, rx551_tgt
-    set rx551_off, 0
-    lt $I10, 2, rx551_start
-    sub rx551_off, $I10, 1
-    substr rx551_tgt, rx551_tgt, rx551_off
-  rx551_start:
-.annotate "line", 273
-  # rx subrule "sigil" subtype=capture negate=
-    rx551_cur."!cursor_pos"(rx551_pos)
-    $P10 = rx551_cur."sigil"()
-    unless $P10, rx551_fail
-    rx551_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sigil")
-    rx551_pos = $P10."pos"()
-  # rx rxquantr555 ** 0..1
-    set_addr $I556, rxquantr555_done
-    rx551_cur."!mark_push"(0, rx551_pos, $I556)
-  rxquantr555_loop:
-  # rx subrule "twigil" subtype=capture negate=
-    rx551_cur."!cursor_pos"(rx551_pos)
-    $P10 = rx551_cur."twigil"()
-    unless $P10, rx551_fail
-    rx551_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("twigil")
-    rx551_pos = $P10."pos"()
-    (rx551_rep) = rx551_cur."!mark_commit"($I556)
-  rxquantr555_done:
-  alt557_0:
+    length rx550_eos, rx550_tgt
+    set rx550_off, 0
+    lt $I10, 2, rx550_start
+    sub rx550_off, $I10, 1
+    substr rx550_tgt, rx550_tgt, rx550_off
+  rx550_start:
 .annotate "line", 274
-    set_addr $I10, alt557_1
-    rx551_cur."!mark_push"(0, rx551_pos, $I10)
-  # rx subrule "ident" subtype=capture negate=
-    rx551_cur."!cursor_pos"(rx551_pos)
-    $P10 = rx551_cur."ident"()
-    unless $P10, rx551_fail
-    rx551_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("name")
-    rx551_pos = $P10."pos"()
-    goto alt557_end
-  alt557_1:
-  # rx subcapture "name"
-    set_addr $I10, rxcap_558_fail
-    rx551_cur."!mark_push"(0, rx551_pos, $I10)
-  # rx enumcharlist negate=0 
-    ge rx551_pos, rx551_eos, rx551_fail
-    sub $I10, rx551_pos, rx551_off
-    substr $S10, rx551_tgt, $I10, 1
-    index $I11, "/!", $S10
-    lt $I11, 0, rx551_fail
-    inc rx551_pos
-    set_addr $I10, rxcap_558_fail
-    ($I12, $I11) = rx551_cur."!mark_peek"($I10)
-    rx551_cur."!cursor_pos"($I11)
-    ($P10) = rx551_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx551_pos, "")
-    rx551_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("name")
-    goto rxcap_558_done
-  rxcap_558_fail:
-    goto rx551_fail
-  rxcap_558_done:
-  alt557_end:
-.annotate "line", 272
+  # rx rxquantr553 ** 0..1
+    set_addr $I556, rxquantr553_done
+    rx550_cur."!mark_push"(0, rx550_pos, $I556)
+  rxquantr553_loop:
+  # rx rxquantr554 ** 1..*
+    set_addr $I555, rxquantr554_done
+    rx550_cur."!mark_push"(0, -1, $I555)
+  rxquantr554_loop:
+  # rx subrule "ws" subtype=method negate=
+    rx550_cur."!cursor_pos"(rx550_pos)
+    $P10 = rx550_cur."ws"()
+    unless $P10, rx550_fail
+    rx550_pos = $P10."pos"()
+  # rx subrule "parameter" subtype=capture negate=
+    rx550_cur."!cursor_pos"(rx550_pos)
+    $P10 = rx550_cur."parameter"()
+    unless $P10, rx550_fail
+    rx550_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("parameter")
+    rx550_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx550_cur."!cursor_pos"(rx550_pos)
+    $P10 = rx550_cur."ws"()
+    unless $P10, rx550_fail
+    rx550_pos = $P10."pos"()
+    (rx550_rep) = rx550_cur."!mark_commit"($I555)
+    rx550_cur."!mark_push"(rx550_rep, rx550_pos, $I555)
+  # rx literal  ","
+    add $I11, rx550_pos, 1
+    gt $I11, rx550_eos, rx550_fail
+    sub $I11, rx550_pos, rx550_off
+    substr $S10, rx550_tgt, $I11, 1
+    ne $S10, ",", rx550_fail
+    add rx550_pos, 1
+    goto rxquantr554_loop
+  rxquantr554_done:
+    (rx550_rep) = rx550_cur."!mark_commit"($I556)
+  rxquantr553_done:
   # rx pass
-    rx551_cur."!cursor_pass"(rx551_pos, "param_var")
-    rx551_cur."!cursor_debug"("PASS  ", "param_var", " at pos=", rx551_pos)
-    .return (rx551_cur)
-  rx551_fail:
+    rx550_cur."!cursor_pass"(rx550_pos, "signature")
+    rx550_cur."!cursor_debug"("PASS  ", "signature", " at pos=", rx550_pos)
+    .return (rx550_cur)
+  rx550_fail:
 .annotate "line", 4
-    (rx551_rep, rx551_pos, $I10, $P10) = rx551_cur."!mark_fail"(0)
-    lt rx551_pos, -1, rx551_done
-    eq rx551_pos, -1, rx551_fail
+    (rx550_rep, rx550_pos, $I10, $P10) = rx550_cur."!mark_fail"(0)
+    lt rx550_pos, -1, rx550_done
+    eq rx550_pos, -1, rx550_fail
     jump $I10
-  rx551_done:
-    rx551_cur."!cursor_fail"()
-    rx551_cur."!cursor_debug"("FAIL  ", "param_var")
-    .return (rx551_cur)
+  rx550_done:
+    rx550_cur."!cursor_fail"()
+    rx550_cur."!cursor_debug"("FAIL  ", "signature")
+    .return (rx550_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__param_var"  :subid("145_1258424429.0004") :method
+.sub "!PREFIX__signature"  :subid("144_1258533478.31768") :method
 .annotate "line", 4
-    $P553 = self."!PREFIX__!subrule"("sigil", "")
-    new $P554, "ResizablePMCArray"
-    push $P554, $P553
-    .return ($P554)
+    new $P552, "ResizablePMCArray"
+    push $P552, ""
+    .return ($P552)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "named_param"  :subid("146_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "parameter"  :subid("145_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx560_tgt
-    .local int rx560_pos
-    .local int rx560_off
-    .local int rx560_eos
-    .local int rx560_rep
-    .local pmc rx560_cur
-    (rx560_cur, rx560_pos, rx560_tgt, $I10) = self."!cursor_start"()
-    rx560_cur."!cursor_debug"("START ", "named_param")
-    .lex unicode:"$\x{a2}", rx560_cur
+    .local string rx558_tgt
+    .local int rx558_pos
+    .local int rx558_off
+    .local int rx558_eos
+    .local int rx558_rep
+    .local pmc rx558_cur
+    (rx558_cur, rx558_pos, rx558_tgt, $I10) = self."!cursor_start"()
+    rx558_cur."!cursor_debug"("START ", "parameter")
+    rx558_cur."!cursor_caparray"("default_value")
+    .lex unicode:"$\x{a2}", rx558_cur
     .local pmc match
     .lex "$/", match
-    length rx560_eos, rx560_tgt
-    set rx560_off, 0
-    lt $I10, 2, rx560_start
-    sub rx560_off, $I10, 1
-    substr rx560_tgt, rx560_tgt, rx560_off
-  rx560_start:
-.annotate "line", 278
-  # rx literal  ":"
-    add $I11, rx560_pos, 1
-    gt $I11, rx560_eos, rx560_fail
-    sub $I11, rx560_pos, rx560_off
-    substr $S10, rx560_tgt, $I11, 1
-    ne $S10, ":", rx560_fail
-    add rx560_pos, 1
-  # rx subrule "param_var" subtype=capture negate=
-    rx560_cur."!cursor_pos"(rx560_pos)
-    $P10 = rx560_cur."param_var"()
-    unless $P10, rx560_fail
-    rx560_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("param_var")
-    rx560_pos = $P10."pos"()
+    length rx558_eos, rx558_tgt
+    set rx558_off, 0
+    lt $I10, 2, rx558_start
+    sub rx558_off, $I10, 1
+    substr rx558_tgt, rx558_tgt, rx558_off
+  rx558_start:
+  alt564_0:
 .annotate "line", 277
+    set_addr $I10, alt564_1
+    rx558_cur."!mark_push"(0, rx558_pos, $I10)
+.annotate "line", 278
+  # rx subcapture "quant"
+    set_addr $I10, rxcap_565_fail
+    rx558_cur."!mark_push"(0, rx558_pos, $I10)
+  # rx literal  "*"
+    add $I11, rx558_pos, 1
+    gt $I11, rx558_eos, rx558_fail
+    sub $I11, rx558_pos, rx558_off
+    substr $S10, rx558_tgt, $I11, 1
+    ne $S10, "*", rx558_fail
+    add rx558_pos, 1
+    set_addr $I10, rxcap_565_fail
+    ($I12, $I11) = rx558_cur."!mark_peek"($I10)
+    rx558_cur."!cursor_pos"($I11)
+    ($P10) = rx558_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx558_pos, "")
+    rx558_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("quant")
+    goto rxcap_565_done
+  rxcap_565_fail:
+    goto rx558_fail
+  rxcap_565_done:
+  # rx subrule "param_var" subtype=capture negate=
+    rx558_cur."!cursor_pos"(rx558_pos)
+    $P10 = rx558_cur."param_var"()
+    unless $P10, rx558_fail
+    rx558_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("param_var")
+    rx558_pos = $P10."pos"()
+    goto alt564_end
+  alt564_1:
+  alt566_0:
+.annotate "line", 279
+    set_addr $I10, alt566_1
+    rx558_cur."!mark_push"(0, rx558_pos, $I10)
+  # rx subrule "param_var" subtype=capture negate=
+    rx558_cur."!cursor_pos"(rx558_pos)
+    $P10 = rx558_cur."param_var"()
+    unless $P10, rx558_fail
+    rx558_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("param_var")
+    rx558_pos = $P10."pos"()
+    goto alt566_end
+  alt566_1:
+  # rx subrule "named_param" subtype=capture negate=
+    rx558_cur."!cursor_pos"(rx558_pos)
+    $P10 = rx558_cur."named_param"()
+    unless $P10, rx558_fail
+    rx558_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("named_param")
+    rx558_pos = $P10."pos"()
+  alt566_end:
+  # rx subcapture "quant"
+    set_addr $I10, rxcap_568_fail
+    rx558_cur."!mark_push"(0, rx558_pos, $I10)
+  alt567_0:
+    set_addr $I10, alt567_1
+    rx558_cur."!mark_push"(0, rx558_pos, $I10)
+  # rx literal  "?"
+    add $I11, rx558_pos, 1
+    gt $I11, rx558_eos, rx558_fail
+    sub $I11, rx558_pos, rx558_off
+    substr $S10, rx558_tgt, $I11, 1
+    ne $S10, "?", rx558_fail
+    add rx558_pos, 1
+    goto alt567_end
+  alt567_1:
+    set_addr $I10, alt567_2
+    rx558_cur."!mark_push"(0, rx558_pos, $I10)
+  # rx literal  "!"
+    add $I11, rx558_pos, 1
+    gt $I11, rx558_eos, rx558_fail
+    sub $I11, rx558_pos, rx558_off
+    substr $S10, rx558_tgt, $I11, 1
+    ne $S10, "!", rx558_fail
+    add rx558_pos, 1
+    goto alt567_end
+  alt567_2:
+  alt567_end:
+    set_addr $I10, rxcap_568_fail
+    ($I12, $I11) = rx558_cur."!mark_peek"($I10)
+    rx558_cur."!cursor_pos"($I11)
+    ($P10) = rx558_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx558_pos, "")
+    rx558_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("quant")
+    goto rxcap_568_done
+  rxcap_568_fail:
+    goto rx558_fail
+  rxcap_568_done:
+  alt564_end:
+.annotate "line", 281
+  # rx rxquantr569 ** 0..1
+    set_addr $I570, rxquantr569_done
+    rx558_cur."!mark_push"(0, rx558_pos, $I570)
+  rxquantr569_loop:
+  # rx subrule "default_value" subtype=capture negate=
+    rx558_cur."!cursor_pos"(rx558_pos)
+    $P10 = rx558_cur."default_value"()
+    unless $P10, rx558_fail
+    rx558_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("default_value")
+    rx558_pos = $P10."pos"()
+    (rx558_rep) = rx558_cur."!mark_commit"($I570)
+  rxquantr569_done:
+.annotate "line", 276
   # rx pass
-    rx560_cur."!cursor_pass"(rx560_pos, "named_param")
-    rx560_cur."!cursor_debug"("PASS  ", "named_param", " at pos=", rx560_pos)
-    .return (rx560_cur)
-  rx560_fail:
+    rx558_cur."!cursor_pass"(rx558_pos, "parameter")
+    rx558_cur."!cursor_debug"("PASS  ", "parameter", " at pos=", rx558_pos)
+    .return (rx558_cur)
+  rx558_fail:
 .annotate "line", 4
-    (rx560_rep, rx560_pos, $I10, $P10) = rx560_cur."!mark_fail"(0)
-    lt rx560_pos, -1, rx560_done
-    eq rx560_pos, -1, rx560_fail
+    (rx558_rep, rx558_pos, $I10, $P10) = rx558_cur."!mark_fail"(0)
+    lt rx558_pos, -1, rx558_done
+    eq rx558_pos, -1, rx558_fail
     jump $I10
-  rx560_done:
-    rx560_cur."!cursor_fail"()
-    rx560_cur."!cursor_debug"("FAIL  ", "named_param")
-    .return (rx560_cur)
+  rx558_done:
+    rx558_cur."!cursor_fail"()
+    rx558_cur."!cursor_debug"("FAIL  ", "parameter")
+    .return (rx558_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__named_param"  :subid("147_1258424429.0004") :method
+.sub "!PREFIX__parameter"  :subid("146_1258533478.31768") :method
 .annotate "line", 4
-    $P562 = self."!PREFIX__!subrule"("param_var", ":")
+    $P560 = self."!PREFIX__!subrule"("named_param", "")
+    $P561 = self."!PREFIX__!subrule"("param_var", "")
+    $P562 = self."!PREFIX__!subrule"("param_var", "*")
     new $P563, "ResizablePMCArray"
+    push $P563, $P560
+    push $P563, $P561
     push $P563, $P562
     .return ($P563)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "default_value"  :subid("148_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx565_tgt
-    .local int rx565_pos
-    .local int rx565_off
-    .local int rx565_eos
-    .local int rx565_rep
-    .local pmc rx565_cur
-    (rx565_cur, rx565_pos, rx565_tgt, $I10) = self."!cursor_start"()
-    rx565_cur."!cursor_debug"("START ", "default_value")
-    .lex unicode:"$\x{a2}", rx565_cur
-    .local pmc match
-    .lex "$/", match
-    length rx565_eos, rx565_tgt
-    set rx565_off, 0
-    lt $I10, 2, rx565_start
-    sub rx565_off, $I10, 1
-    substr rx565_tgt, rx565_tgt, rx565_off
-  rx565_start:
-.annotate "line", 281
-  # rx subrule "ws" subtype=method negate=
-    rx565_cur."!cursor_pos"(rx565_pos)
-    $P10 = rx565_cur."ws"()
-    unless $P10, rx565_fail
-    rx565_pos = $P10."pos"()
-  # rx literal  "="
-    add $I11, rx565_pos, 1
-    gt $I11, rx565_eos, rx565_fail
-    sub $I11, rx565_pos, rx565_off
-    substr $S10, rx565_tgt, $I11, 1
-    ne $S10, "=", rx565_fail
-    add rx565_pos, 1
-  # rx subrule "ws" subtype=method negate=
-    rx565_cur."!cursor_pos"(rx565_pos)
-    $P10 = rx565_cur."ws"()
-    unless $P10, rx565_fail
-    rx565_pos = $P10."pos"()
-  # rx subrule "EXPR" subtype=capture negate=
-    rx565_cur."!cursor_pos"(rx565_pos)
-    $P10 = rx565_cur."EXPR"("i=")
-    unless $P10, rx565_fail
-    rx565_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("EXPR")
-    rx565_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx565_cur."!cursor_pos"(rx565_pos)
-    $P10 = rx565_cur."ws"()
-    unless $P10, rx565_fail
-    rx565_pos = $P10."pos"()
-  # rx pass
-    rx565_cur."!cursor_pass"(rx565_pos, "default_value")
-    rx565_cur."!cursor_debug"("PASS  ", "default_value", " at pos=", rx565_pos)
-    .return (rx565_cur)
-  rx565_fail:
-.annotate "line", 4
-    (rx565_rep, rx565_pos, $I10, $P10) = rx565_cur."!mark_fail"(0)
-    lt rx565_pos, -1, rx565_done
-    eq rx565_pos, -1, rx565_fail
-    jump $I10
-  rx565_done:
-    rx565_cur."!cursor_fail"()
-    rx565_cur."!cursor_debug"("FAIL  ", "default_value")
-    .return (rx565_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__default_value"  :subid("149_1258424429.0004") :method
-.annotate "line", 4
-    new $P567, "ResizablePMCArray"
-    push $P567, ""
-    .return ($P567)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "regex_declarator"  :subid("150_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "param_var"  :subid("147_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
     .local string rx572_tgt
     .local int rx572_pos
@@ -6639,8 +6677,8 @@ NQP::Compiler - NQP compiler
     .local int rx572_rep
     .local pmc rx572_cur
     (rx572_cur, rx572_pos, rx572_tgt, $I10) = self."!cursor_start"()
-    rx572_cur."!cursor_debug"("START ", "regex_declarator")
-    rx572_cur."!cursor_caparray"("signature")
+    rx572_cur."!cursor_debug"("START ", "param_var")
+    rx572_cur."!cursor_caparray"("twigil")
     .lex unicode:"$\x{a2}", rx572_cur
     .local pmc match
     .lex "$/", match
@@ -6650,325 +6688,66 @@ NQP::Compiler - NQP compiler
     sub rx572_off, $I10, 1
     substr rx572_tgt, rx572_tgt, rx572_off
   rx572_start:
-.annotate "line", 283
-  # rx subrule "ws" subtype=method negate=
-    rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."ws"()
-    unless $P10, rx572_fail
-    rx572_pos = $P10."pos"()
-  alt576_0:
-.annotate "line", 284
-    set_addr $I10, alt576_1
-    rx572_cur."!mark_push"(0, rx572_pos, $I10)
 .annotate "line", 285
-  # rx subrule "ws" subtype=method negate=
+  # rx subrule "sigil" subtype=capture negate=
     rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."ws"()
+    $P10 = rx572_cur."sigil"()
     unless $P10, rx572_fail
-    rx572_pos = $P10."pos"()
-  # rx subcapture "proto"
-    set_addr $I10, rxcap_578_fail
-    rx572_cur."!mark_push"(0, rx572_pos, $I10)
-  # rx literal  "proto"
-    add $I11, rx572_pos, 5
-    gt $I11, rx572_eos, rx572_fail
-    sub $I11, rx572_pos, rx572_off
-    substr $S10, rx572_tgt, $I11, 5
-    ne $S10, "proto", rx572_fail
-    add rx572_pos, 5
-    set_addr $I10, rxcap_578_fail
-    ($I12, $I11) = rx572_cur."!mark_peek"($I10)
-    rx572_cur."!cursor_pos"($I11)
-    ($P10) = rx572_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx572_pos, "")
     rx572_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("proto")
-    goto rxcap_578_done
-  rxcap_578_fail:
-    goto rx572_fail
-  rxcap_578_done:
-  # rx subrule "ws" subtype=method negate=
-    rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."ws"()
-    unless $P10, rx572_fail
+    $P10."!cursor_names"("sigil")
     rx572_pos = $P10."pos"()
-  alt580_0:
-    set_addr $I10, alt580_1
-    rx572_cur."!mark_push"(0, rx572_pos, $I10)
-  # rx literal  "regex"
-    add $I11, rx572_pos, 5
-    gt $I11, rx572_eos, rx572_fail
-    sub $I11, rx572_pos, rx572_off
-    substr $S10, rx572_tgt, $I11, 5
-    ne $S10, "regex", rx572_fail
-    add rx572_pos, 5
-    goto alt580_end
-  alt580_1:
-    set_addr $I10, alt580_2
-    rx572_cur."!mark_push"(0, rx572_pos, $I10)
-  # rx literal  "token"
-    add $I11, rx572_pos, 5
-    gt $I11, rx572_eos, rx572_fail
-    sub $I11, rx572_pos, rx572_off
-    substr $S10, rx572_tgt, $I11, 5
-    ne $S10, "token", rx572_fail
-    add rx572_pos, 5
-    goto alt580_end
-  alt580_2:
-  # rx literal  "rule"
-    add $I11, rx572_pos, 4
-    gt $I11, rx572_eos, rx572_fail
-    sub $I11, rx572_pos, rx572_off
-    substr $S10, rx572_tgt, $I11, 4
-    ne $S10, "rule", rx572_fail
-    add rx572_pos, 4
-  alt580_end:
-  # rx subrule "ws" subtype=method negate=
+  # rx rxquantr576 ** 0..1
+    set_addr $I577, rxquantr576_done
+    rx572_cur."!mark_push"(0, rx572_pos, $I577)
+  rxquantr576_loop:
+  # rx subrule "twigil" subtype=capture negate=
     rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."ws"()
+    $P10 = rx572_cur."twigil"()
     unless $P10, rx572_fail
+    rx572_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("twigil")
     rx572_pos = $P10."pos"()
+    (rx572_rep) = rx572_cur."!mark_commit"($I577)
+  rxquantr576_done:
+  alt578_0:
 .annotate "line", 286
-  # rx subrule "deflongname" subtype=capture negate=
+    set_addr $I10, alt578_1
+    rx572_cur."!mark_push"(0, rx572_pos, $I10)
+  # rx subrule "ident" subtype=capture negate=
     rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."deflongname"()
+    $P10 = rx572_cur."ident"()
     unless $P10, rx572_fail
     rx572_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("deflongname")
+    $P10."!cursor_names"("name")
     rx572_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."ws"()
-    unless $P10, rx572_fail
-    rx572_pos = $P10."pos"()
-.annotate "line", 287
-  # rx literal  "{"
-    add $I11, rx572_pos, 1
-    gt $I11, rx572_eos, rx572_fail
-    sub $I11, rx572_pos, rx572_off
-    substr $S10, rx572_tgt, $I11, 1
-    ne $S10, "{", rx572_fail
-    add rx572_pos, 1
-  # rx subrule "ws" subtype=method negate=
-    rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."ws"()
-    unless $P10, rx572_fail
-    rx572_pos = $P10."pos"()
-  # rx literal  "<...>"
-    add $I11, rx572_pos, 5
-    gt $I11, rx572_eos, rx572_fail
-    sub $I11, rx572_pos, rx572_off
-    substr $S10, rx572_tgt, $I11, 5
-    ne $S10, "<...>", rx572_fail
-    add rx572_pos, 5
-  # rx subrule "ws" subtype=method negate=
-    rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."ws"()
-    unless $P10, rx572_fail
-    rx572_pos = $P10."pos"()
-  # rx literal  "}"
-    add $I11, rx572_pos, 1
-    gt $I11, rx572_eos, rx572_fail
-    sub $I11, rx572_pos, rx572_off
-    substr $S10, rx572_tgt, $I11, 1
-    ne $S10, "}", rx572_fail
-    add rx572_pos, 1
-  # rx subrule "ENDSTMT" subtype=zerowidth negate=
-    rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."ENDSTMT"()
-    unless $P10, rx572_fail
-  # rx subrule "ws" subtype=method negate=
-    rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."ws"()
-    unless $P10, rx572_fail
-    rx572_pos = $P10."pos"()
-.annotate "line", 285
-    goto alt576_end
-  alt576_1:
-.annotate "line", 288
-  # rx subrule "ws" subtype=method negate=
-    rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."ws"()
-    unless $P10, rx572_fail
-    rx572_pos = $P10."pos"()
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_588_fail
+    goto alt578_end
+  alt578_1:
+  # rx subcapture "name"
+    set_addr $I10, rxcap_579_fail
     rx572_cur."!mark_push"(0, rx572_pos, $I10)
-  alt587_0:
-    set_addr $I10, alt587_1
-    rx572_cur."!mark_push"(0, rx572_pos, $I10)
-  # rx literal  "regex"
-    add $I11, rx572_pos, 5
-    gt $I11, rx572_eos, rx572_fail
-    sub $I11, rx572_pos, rx572_off
-    substr $S10, rx572_tgt, $I11, 5
-    ne $S10, "regex", rx572_fail
-    add rx572_pos, 5
-    goto alt587_end
-  alt587_1:
-    set_addr $I10, alt587_2
-    rx572_cur."!mark_push"(0, rx572_pos, $I10)
-  # rx literal  "token"
-    add $I11, rx572_pos, 5
-    gt $I11, rx572_eos, rx572_fail
-    sub $I11, rx572_pos, rx572_off
-    substr $S10, rx572_tgt, $I11, 5
-    ne $S10, "token", rx572_fail
-    add rx572_pos, 5
-    goto alt587_end
-  alt587_2:
-  # rx literal  "rule"
-    add $I11, rx572_pos, 4
-    gt $I11, rx572_eos, rx572_fail
-    sub $I11, rx572_pos, rx572_off
-    substr $S10, rx572_tgt, $I11, 4
-    ne $S10, "rule", rx572_fail
-    add rx572_pos, 4
-  alt587_end:
-    set_addr $I10, rxcap_588_fail
+  # rx enumcharlist negate=0 
+    ge rx572_pos, rx572_eos, rx572_fail
+    sub $I10, rx572_pos, rx572_off
+    substr $S10, rx572_tgt, $I10, 1
+    index $I11, "/!", $S10
+    lt $I11, 0, rx572_fail
+    inc rx572_pos
+    set_addr $I10, rxcap_579_fail
     ($I12, $I11) = rx572_cur."!mark_peek"($I10)
     rx572_cur."!cursor_pos"($I11)
     ($P10) = rx572_cur."!cursor_start"()
     $P10."!cursor_pass"(rx572_pos, "")
     rx572_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_588_done
-  rxcap_588_fail:
+    $P10."!cursor_names"("name")
+    goto rxcap_579_done
+  rxcap_579_fail:
     goto rx572_fail
-  rxcap_588_done:
-  # rx subrule "ws" subtype=method negate=
-    rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."ws"()
-    unless $P10, rx572_fail
-    rx572_pos = $P10."pos"()
-.annotate "line", 289
-  # rx subrule "deflongname" subtype=capture negate=
-    rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."deflongname"()
-    unless $P10, rx572_fail
-    rx572_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("deflongname")
-    rx572_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."ws"()
-    unless $P10, rx572_fail
-    rx572_pos = $P10."pos"()
-.annotate "line", 290
-  # rx subrule "newpad" subtype=method negate=
-    rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."newpad"()
-    unless $P10, rx572_fail
-    rx572_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."ws"()
-    unless $P10, rx572_fail
-    rx572_pos = $P10."pos"()
-.annotate "line", 291
-  # rx rxquantr592 ** 0..1
-    set_addr $I597, rxquantr592_done
-    rx572_cur."!mark_push"(0, rx572_pos, $I597)
-  rxquantr592_loop:
-  # rx subrule "ws" subtype=method negate=
-    rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."ws"()
-    unless $P10, rx572_fail
-    rx572_pos = $P10."pos"()
-  # rx literal  "("
-    add $I11, rx572_pos, 1
-    gt $I11, rx572_eos, rx572_fail
-    sub $I11, rx572_pos, rx572_off
-    substr $S10, rx572_tgt, $I11, 1
-    ne $S10, "(", rx572_fail
-    add rx572_pos, 1
-  # rx subrule "ws" subtype=method negate=
-    rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."ws"()
-    unless $P10, rx572_fail
-    rx572_pos = $P10."pos"()
-  # rx subrule "signature" subtype=capture negate=
-    rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."signature"()
-    unless $P10, rx572_fail
-    rx572_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("signature")
-    rx572_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."ws"()
-    unless $P10, rx572_fail
-    rx572_pos = $P10."pos"()
-  # rx literal  ")"
-    add $I11, rx572_pos, 1
-    gt $I11, rx572_eos, rx572_fail
-    sub $I11, rx572_pos, rx572_off
-    substr $S10, rx572_tgt, $I11, 1
-    ne $S10, ")", rx572_fail
-    add rx572_pos, 1
-  # rx subrule "ws" subtype=method negate=
-    rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."ws"()
-    unless $P10, rx572_fail
-    rx572_pos = $P10."pos"()
-    (rx572_rep) = rx572_cur."!mark_commit"($I597)
-  rxquantr592_done:
-  # rx subrule "ws" subtype=method negate=
-    rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."ws"()
-    unless $P10, rx572_fail
-    rx572_pos = $P10."pos"()
-.annotate "line", 292
-  # rx reduce name="regex_declarator" key="open"
-    rx572_cur."!cursor_pos"(rx572_pos)
-    rx572_cur."!reduce"("regex_declarator", "open")
-  # rx subrule "ws" subtype=method negate=
-    rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."ws"()
-    unless $P10, rx572_fail
-    rx572_pos = $P10."pos"()
-.annotate "line", 293
-  # rx literal  "{"
-    add $I11, rx572_pos, 1
-    gt $I11, rx572_eos, rx572_fail
-    sub $I11, rx572_pos, rx572_off
-    substr $S10, rx572_tgt, $I11, 1
-    ne $S10, "{", rx572_fail
-    add rx572_pos, 1
-  # rx subrule "LANG" subtype=capture negate=
-    rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."LANG"("Regex", "nibbler")
-    unless $P10, rx572_fail
-    rx572_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("p6regex")
-    rx572_pos = $P10."pos"()
-  # rx literal  "}"
-    add $I11, rx572_pos, 1
-    gt $I11, rx572_eos, rx572_fail
-    sub $I11, rx572_pos, rx572_off
-    substr $S10, rx572_tgt, $I11, 1
-    ne $S10, "}", rx572_fail
-    add rx572_pos, 1
-  # rx subrule "ENDSTMT" subtype=zerowidth negate=
-    rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."ENDSTMT"()
-    unless $P10, rx572_fail
-  # rx subrule "ws" subtype=method negate=
-    rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."ws"()
-    unless $P10, rx572_fail
-    rx572_pos = $P10."pos"()
-  alt576_end:
-.annotate "line", 294
-  # rx subrule "ws" subtype=method negate=
-    rx572_cur."!cursor_pos"(rx572_pos)
-    $P10 = rx572_cur."ws"()
-    unless $P10, rx572_fail
-    rx572_pos = $P10."pos"()
-.annotate "line", 283
+  rxcap_579_done:
+  alt578_end:
+.annotate "line", 284
   # rx pass
-    rx572_cur."!cursor_pass"(rx572_pos, "regex_declarator")
-    rx572_cur."!cursor_debug"("PASS  ", "regex_declarator", " at pos=", rx572_pos)
+    rx572_cur."!cursor_pass"(rx572_pos, "param_var")
+    rx572_cur."!cursor_debug"("PASS  ", "param_var", " at pos=", rx572_pos)
     .return (rx572_cur)
   rx572_fail:
 .annotate "line", 4
@@ -6978,823 +6757,1108 @@ NQP::Compiler - NQP compiler
     jump $I10
   rx572_done:
     rx572_cur."!cursor_fail"()
-    rx572_cur."!cursor_debug"("FAIL  ", "regex_declarator")
+    rx572_cur."!cursor_debug"("FAIL  ", "param_var")
     .return (rx572_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__regex_declarator"  :subid("151_1258424429.0004") :method
+.sub "!PREFIX__param_var"  :subid("148_1258533478.31768") :method
 .annotate "line", 4
-    new $P574, "ResizablePMCArray"
-    push $P574, ""
-    .return ($P574)
+    $P574 = self."!PREFIX__!subrule"("sigil", "")
+    new $P575, "ResizablePMCArray"
+    push $P575, $P574
+    .return ($P575)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "dotty"  :subid("152_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "named_param"  :subid("149_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx603_tgt
-    .local int rx603_pos
-    .local int rx603_off
-    .local int rx603_eos
-    .local int rx603_rep
-    .local pmc rx603_cur
-    (rx603_cur, rx603_pos, rx603_tgt, $I10) = self."!cursor_start"()
-    rx603_cur."!cursor_debug"("START ", "dotty")
-    rx603_cur."!cursor_caparray"("args")
-    .lex unicode:"$\x{a2}", rx603_cur
+    .local string rx581_tgt
+    .local int rx581_pos
+    .local int rx581_off
+    .local int rx581_eos
+    .local int rx581_rep
+    .local pmc rx581_cur
+    (rx581_cur, rx581_pos, rx581_tgt, $I10) = self."!cursor_start"()
+    rx581_cur."!cursor_debug"("START ", "named_param")
+    .lex unicode:"$\x{a2}", rx581_cur
     .local pmc match
     .lex "$/", match
-    length rx603_eos, rx603_tgt
-    set rx603_off, 0
-    lt $I10, 2, rx603_start
-    sub rx603_off, $I10, 1
-    substr rx603_tgt, rx603_tgt, rx603_off
-  rx603_start:
+    length rx581_eos, rx581_tgt
+    set rx581_off, 0
+    lt $I10, 2, rx581_start
+    sub rx581_off, $I10, 1
+    substr rx581_tgt, rx581_tgt, rx581_off
+  rx581_start:
+.annotate "line", 290
+  # rx literal  ":"
+    add $I11, rx581_pos, 1
+    gt $I11, rx581_eos, rx581_fail
+    sub $I11, rx581_pos, rx581_off
+    substr $S10, rx581_tgt, $I11, 1
+    ne $S10, ":", rx581_fail
+    add rx581_pos, 1
+  # rx subrule "param_var" subtype=capture negate=
+    rx581_cur."!cursor_pos"(rx581_pos)
+    $P10 = rx581_cur."param_var"()
+    unless $P10, rx581_fail
+    rx581_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("param_var")
+    rx581_pos = $P10."pos"()
+.annotate "line", 289
+  # rx pass
+    rx581_cur."!cursor_pass"(rx581_pos, "named_param")
+    rx581_cur."!cursor_debug"("PASS  ", "named_param", " at pos=", rx581_pos)
+    .return (rx581_cur)
+  rx581_fail:
+.annotate "line", 4
+    (rx581_rep, rx581_pos, $I10, $P10) = rx581_cur."!mark_fail"(0)
+    lt rx581_pos, -1, rx581_done
+    eq rx581_pos, -1, rx581_fail
+    jump $I10
+  rx581_done:
+    rx581_cur."!cursor_fail"()
+    rx581_cur."!cursor_debug"("FAIL  ", "named_param")
+    .return (rx581_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__named_param"  :subid("150_1258533478.31768") :method
+.annotate "line", 4
+    $P583 = self."!PREFIX__!subrule"("param_var", ":")
+    new $P584, "ResizablePMCArray"
+    push $P584, $P583
+    .return ($P584)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "default_value"  :subid("151_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx586_tgt
+    .local int rx586_pos
+    .local int rx586_off
+    .local int rx586_eos
+    .local int rx586_rep
+    .local pmc rx586_cur
+    (rx586_cur, rx586_pos, rx586_tgt, $I10) = self."!cursor_start"()
+    rx586_cur."!cursor_debug"("START ", "default_value")
+    .lex unicode:"$\x{a2}", rx586_cur
+    .local pmc match
+    .lex "$/", match
+    length rx586_eos, rx586_tgt
+    set rx586_off, 0
+    lt $I10, 2, rx586_start
+    sub rx586_off, $I10, 1
+    substr rx586_tgt, rx586_tgt, rx586_off
+  rx586_start:
+.annotate "line", 293
+  # rx subrule "ws" subtype=method negate=
+    rx586_cur."!cursor_pos"(rx586_pos)
+    $P10 = rx586_cur."ws"()
+    unless $P10, rx586_fail
+    rx586_pos = $P10."pos"()
+  # rx literal  "="
+    add $I11, rx586_pos, 1
+    gt $I11, rx586_eos, rx586_fail
+    sub $I11, rx586_pos, rx586_off
+    substr $S10, rx586_tgt, $I11, 1
+    ne $S10, "=", rx586_fail
+    add rx586_pos, 1
+  # rx subrule "ws" subtype=method negate=
+    rx586_cur."!cursor_pos"(rx586_pos)
+    $P10 = rx586_cur."ws"()
+    unless $P10, rx586_fail
+    rx586_pos = $P10."pos"()
+  # rx subrule "EXPR" subtype=capture negate=
+    rx586_cur."!cursor_pos"(rx586_pos)
+    $P10 = rx586_cur."EXPR"("i=")
+    unless $P10, rx586_fail
+    rx586_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("EXPR")
+    rx586_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx586_cur."!cursor_pos"(rx586_pos)
+    $P10 = rx586_cur."ws"()
+    unless $P10, rx586_fail
+    rx586_pos = $P10."pos"()
+  # rx pass
+    rx586_cur."!cursor_pass"(rx586_pos, "default_value")
+    rx586_cur."!cursor_debug"("PASS  ", "default_value", " at pos=", rx586_pos)
+    .return (rx586_cur)
+  rx586_fail:
+.annotate "line", 4
+    (rx586_rep, rx586_pos, $I10, $P10) = rx586_cur."!mark_fail"(0)
+    lt rx586_pos, -1, rx586_done
+    eq rx586_pos, -1, rx586_fail
+    jump $I10
+  rx586_done:
+    rx586_cur."!cursor_fail"()
+    rx586_cur."!cursor_debug"("FAIL  ", "default_value")
+    .return (rx586_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__default_value"  :subid("152_1258533478.31768") :method
+.annotate "line", 4
+    new $P588, "ResizablePMCArray"
+    push $P588, ""
+    .return ($P588)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "regex_declarator"  :subid("153_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx593_tgt
+    .local int rx593_pos
+    .local int rx593_off
+    .local int rx593_eos
+    .local int rx593_rep
+    .local pmc rx593_cur
+    (rx593_cur, rx593_pos, rx593_tgt, $I10) = self."!cursor_start"()
+    rx593_cur."!cursor_debug"("START ", "regex_declarator")
+    rx593_cur."!cursor_caparray"("signature")
+    .lex unicode:"$\x{a2}", rx593_cur
+    .local pmc match
+    .lex "$/", match
+    length rx593_eos, rx593_tgt
+    set rx593_off, 0
+    lt $I10, 2, rx593_start
+    sub rx593_off, $I10, 1
+    substr rx593_tgt, rx593_tgt, rx593_off
+  rx593_start:
+.annotate "line", 295
+  # rx subrule "ws" subtype=method negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."ws"()
+    unless $P10, rx593_fail
+    rx593_pos = $P10."pos"()
+  alt597_0:
+.annotate "line", 296
+    set_addr $I10, alt597_1
+    rx593_cur."!mark_push"(0, rx593_pos, $I10)
+.annotate "line", 297
+  # rx subrule "ws" subtype=method negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."ws"()
+    unless $P10, rx593_fail
+    rx593_pos = $P10."pos"()
+  # rx subcapture "proto"
+    set_addr $I10, rxcap_599_fail
+    rx593_cur."!mark_push"(0, rx593_pos, $I10)
+  # rx literal  "proto"
+    add $I11, rx593_pos, 5
+    gt $I11, rx593_eos, rx593_fail
+    sub $I11, rx593_pos, rx593_off
+    substr $S10, rx593_tgt, $I11, 5
+    ne $S10, "proto", rx593_fail
+    add rx593_pos, 5
+    set_addr $I10, rxcap_599_fail
+    ($I12, $I11) = rx593_cur."!mark_peek"($I10)
+    rx593_cur."!cursor_pos"($I11)
+    ($P10) = rx593_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx593_pos, "")
+    rx593_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("proto")
+    goto rxcap_599_done
+  rxcap_599_fail:
+    goto rx593_fail
+  rxcap_599_done:
+  # rx subrule "ws" subtype=method negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."ws"()
+    unless $P10, rx593_fail
+    rx593_pos = $P10."pos"()
+  alt601_0:
+    set_addr $I10, alt601_1
+    rx593_cur."!mark_push"(0, rx593_pos, $I10)
+  # rx literal  "regex"
+    add $I11, rx593_pos, 5
+    gt $I11, rx593_eos, rx593_fail
+    sub $I11, rx593_pos, rx593_off
+    substr $S10, rx593_tgt, $I11, 5
+    ne $S10, "regex", rx593_fail
+    add rx593_pos, 5
+    goto alt601_end
+  alt601_1:
+    set_addr $I10, alt601_2
+    rx593_cur."!mark_push"(0, rx593_pos, $I10)
+  # rx literal  "token"
+    add $I11, rx593_pos, 5
+    gt $I11, rx593_eos, rx593_fail
+    sub $I11, rx593_pos, rx593_off
+    substr $S10, rx593_tgt, $I11, 5
+    ne $S10, "token", rx593_fail
+    add rx593_pos, 5
+    goto alt601_end
+  alt601_2:
+  # rx literal  "rule"
+    add $I11, rx593_pos, 4
+    gt $I11, rx593_eos, rx593_fail
+    sub $I11, rx593_pos, rx593_off
+    substr $S10, rx593_tgt, $I11, 4
+    ne $S10, "rule", rx593_fail
+    add rx593_pos, 4
+  alt601_end:
+  # rx subrule "ws" subtype=method negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."ws"()
+    unless $P10, rx593_fail
+    rx593_pos = $P10."pos"()
 .annotate "line", 298
-  # rx literal  "."
-    add $I11, rx603_pos, 1
-    gt $I11, rx603_eos, rx603_fail
-    sub $I11, rx603_pos, rx603_off
-    substr $S10, rx603_tgt, $I11, 1
-    ne $S10, ".", rx603_fail
-    add rx603_pos, 1
-  # rx subrule "identifier" subtype=capture negate=
-    rx603_cur."!cursor_pos"(rx603_pos)
-    $P10 = rx603_cur."identifier"()
-    unless $P10, rx603_fail
-    rx603_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("identifier")
-    rx603_pos = $P10."pos"()
-.annotate "line", 302
-  # rx rxquantr607 ** 0..1
-    set_addr $I609, rxquantr607_done
-    rx603_cur."!mark_push"(0, rx603_pos, $I609)
-  rxquantr607_loop:
-  alt608_0:
+  # rx subrule "deflongname" subtype=capture negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."deflongname"()
+    unless $P10, rx593_fail
+    rx593_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("deflongname")
+    rx593_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."ws"()
+    unless $P10, rx593_fail
+    rx593_pos = $P10."pos"()
 .annotate "line", 299
-    set_addr $I10, alt608_1
-    rx603_cur."!mark_push"(0, rx603_pos, $I10)
+  # rx literal  "{"
+    add $I11, rx593_pos, 1
+    gt $I11, rx593_eos, rx593_fail
+    sub $I11, rx593_pos, rx593_off
+    substr $S10, rx593_tgt, $I11, 1
+    ne $S10, "{", rx593_fail
+    add rx593_pos, 1
+  # rx subrule "ws" subtype=method negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."ws"()
+    unless $P10, rx593_fail
+    rx593_pos = $P10."pos"()
+  # rx literal  "<...>"
+    add $I11, rx593_pos, 5
+    gt $I11, rx593_eos, rx593_fail
+    sub $I11, rx593_pos, rx593_off
+    substr $S10, rx593_tgt, $I11, 5
+    ne $S10, "<...>", rx593_fail
+    add rx593_pos, 5
+  # rx subrule "ws" subtype=method negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."ws"()
+    unless $P10, rx593_fail
+    rx593_pos = $P10."pos"()
+  # rx literal  "}"
+    add $I11, rx593_pos, 1
+    gt $I11, rx593_eos, rx593_fail
+    sub $I11, rx593_pos, rx593_off
+    substr $S10, rx593_tgt, $I11, 1
+    ne $S10, "}", rx593_fail
+    add rx593_pos, 1
+  # rx subrule "ENDSTMT" subtype=zerowidth negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."ENDSTMT"()
+    unless $P10, rx593_fail
+  # rx subrule "ws" subtype=method negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."ws"()
+    unless $P10, rx593_fail
+    rx593_pos = $P10."pos"()
+.annotate "line", 297
+    goto alt597_end
+  alt597_1:
 .annotate "line", 300
-  # rx enumcharlist negate=0 zerowidth
-    ge rx603_pos, rx603_eos, rx603_fail
-    sub $I10, rx603_pos, rx603_off
-    substr $S10, rx603_tgt, $I10, 1
-    index $I11, "(", $S10
-    lt $I11, 0, rx603_fail
-  # rx subrule "args" subtype=capture negate=
-    rx603_cur."!cursor_pos"(rx603_pos)
-    $P10 = rx603_cur."args"()
-    unless $P10, rx603_fail
-    rx603_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("args")
-    rx603_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."ws"()
+    unless $P10, rx593_fail
+    rx593_pos = $P10."pos"()
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_609_fail
+    rx593_cur."!mark_push"(0, rx593_pos, $I10)
+  alt608_0:
+    set_addr $I10, alt608_1
+    rx593_cur."!mark_push"(0, rx593_pos, $I10)
+  # rx literal  "regex"
+    add $I11, rx593_pos, 5
+    gt $I11, rx593_eos, rx593_fail
+    sub $I11, rx593_pos, rx593_off
+    substr $S10, rx593_tgt, $I11, 5
+    ne $S10, "regex", rx593_fail
+    add rx593_pos, 5
     goto alt608_end
   alt608_1:
-.annotate "line", 301
-  # rx literal  ":"
-    add $I11, rx603_pos, 1
-    gt $I11, rx603_eos, rx603_fail
-    sub $I11, rx603_pos, rx603_off
-    substr $S10, rx603_tgt, $I11, 1
-    ne $S10, ":", rx603_fail
-    add rx603_pos, 1
-  # rx charclass s
-    ge rx603_pos, rx603_eos, rx603_fail
-    sub $I10, rx603_pos, rx603_off
-    is_cclass $I11, 32, rx603_tgt, $I10
-    unless $I11, rx603_fail
-    inc rx603_pos
-  # rx subrule "arglist" subtype=capture negate=
-    rx603_cur."!cursor_pos"(rx603_pos)
-    $P10 = rx603_cur."arglist"()
-    unless $P10, rx603_fail
-    rx603_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("args")
-    rx603_pos = $P10."pos"()
+    set_addr $I10, alt608_2
+    rx593_cur."!mark_push"(0, rx593_pos, $I10)
+  # rx literal  "token"
+    add $I11, rx593_pos, 5
+    gt $I11, rx593_eos, rx593_fail
+    sub $I11, rx593_pos, rx593_off
+    substr $S10, rx593_tgt, $I11, 5
+    ne $S10, "token", rx593_fail
+    add rx593_pos, 5
+    goto alt608_end
+  alt608_2:
+  # rx literal  "rule"
+    add $I11, rx593_pos, 4
+    gt $I11, rx593_eos, rx593_fail
+    sub $I11, rx593_pos, rx593_off
+    substr $S10, rx593_tgt, $I11, 4
+    ne $S10, "rule", rx593_fail
+    add rx593_pos, 4
   alt608_end:
-.annotate "line", 302
-    (rx603_rep) = rx603_cur."!mark_commit"($I609)
-  rxquantr607_done:
-.annotate "line", 297
-  # rx pass
-    rx603_cur."!cursor_pass"(rx603_pos, "dotty")
-    rx603_cur."!cursor_debug"("PASS  ", "dotty", " at pos=", rx603_pos)
-    .return (rx603_cur)
-  rx603_fail:
-.annotate "line", 4
-    (rx603_rep, rx603_pos, $I10, $P10) = rx603_cur."!mark_fail"(0)
-    lt rx603_pos, -1, rx603_done
-    eq rx603_pos, -1, rx603_fail
-    jump $I10
-  rx603_done:
-    rx603_cur."!cursor_fail"()
-    rx603_cur."!cursor_debug"("FAIL  ", "dotty")
-    .return (rx603_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__dotty"  :subid("153_1258424429.0004") :method
-.annotate "line", 4
-    $P605 = self."!PREFIX__!subrule"("identifier", ".")
-    new $P606, "ResizablePMCArray"
-    push $P606, $P605
-    .return ($P606)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "term"  :subid("154_1258424429.0004") :method
-.annotate "line", 306
-    $P611 = self."!protoregex"("term")
-    .return ($P611)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term"  :subid("155_1258424429.0004") :method
-.annotate "line", 306
-    $P613 = self."!PREFIX__!protoregex"("term")
-    .return ($P613)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "term:sym<self>"  :subid("156_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx615_tgt
-    .local int rx615_pos
-    .local int rx615_off
-    .local int rx615_eos
-    .local int rx615_rep
-    .local pmc rx615_cur
-    (rx615_cur, rx615_pos, rx615_tgt, $I10) = self."!cursor_start"()
-    rx615_cur."!cursor_debug"("START ", "term:sym<self>")
-    .lex unicode:"$\x{a2}", rx615_cur
-    .local pmc match
-    .lex "$/", match
-    length rx615_eos, rx615_tgt
-    set rx615_off, 0
-    lt $I10, 2, rx615_start
-    sub rx615_off, $I10, 1
-    substr rx615_tgt, rx615_tgt, rx615_off
-  rx615_start:
-.annotate "line", 308
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_618_fail
-    rx615_cur."!mark_push"(0, rx615_pos, $I10)
-  # rx literal  "self"
-    add $I11, rx615_pos, 4
-    gt $I11, rx615_eos, rx615_fail
-    sub $I11, rx615_pos, rx615_off
-    substr $S10, rx615_tgt, $I11, 4
-    ne $S10, "self", rx615_fail
-    add rx615_pos, 4
-    set_addr $I10, rxcap_618_fail
-    ($I12, $I11) = rx615_cur."!mark_peek"($I10)
-    rx615_cur."!cursor_pos"($I11)
-    ($P10) = rx615_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx615_pos, "")
-    rx615_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_609_fail
+    ($I12, $I11) = rx593_cur."!mark_peek"($I10)
+    rx593_cur."!cursor_pos"($I11)
+    ($P10) = rx593_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx593_pos, "")
+    rx593_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_618_done
-  rxcap_618_fail:
-    goto rx615_fail
-  rxcap_618_done:
-  # rxanchor rwb
-    le rx615_pos, 0, rx615_fail
-    sub $I10, rx615_pos, rx615_off
-    is_cclass $I11, 8192, rx615_tgt, $I10
-    if $I11, rx615_fail
-    dec $I10
-    is_cclass $I11, 8192, rx615_tgt, $I10
-    unless $I11, rx615_fail
+    goto rxcap_609_done
+  rxcap_609_fail:
+    goto rx593_fail
+  rxcap_609_done:
+  # rx subrule "ws" subtype=method negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."ws"()
+    unless $P10, rx593_fail
+    rx593_pos = $P10."pos"()
+.annotate "line", 301
+  # rx subrule "deflongname" subtype=capture negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."deflongname"()
+    unless $P10, rx593_fail
+    rx593_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("deflongname")
+    rx593_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."ws"()
+    unless $P10, rx593_fail
+    rx593_pos = $P10."pos"()
+.annotate "line", 302
+  # rx subrule "newpad" subtype=method negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."newpad"()
+    unless $P10, rx593_fail
+    rx593_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."ws"()
+    unless $P10, rx593_fail
+    rx593_pos = $P10."pos"()
+.annotate "line", 303
+  # rx rxquantr613 ** 0..1
+    set_addr $I618, rxquantr613_done
+    rx593_cur."!mark_push"(0, rx593_pos, $I618)
+  rxquantr613_loop:
+  # rx subrule "ws" subtype=method negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."ws"()
+    unless $P10, rx593_fail
+    rx593_pos = $P10."pos"()
+  # rx literal  "("
+    add $I11, rx593_pos, 1
+    gt $I11, rx593_eos, rx593_fail
+    sub $I11, rx593_pos, rx593_off
+    substr $S10, rx593_tgt, $I11, 1
+    ne $S10, "(", rx593_fail
+    add rx593_pos, 1
+  # rx subrule "ws" subtype=method negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."ws"()
+    unless $P10, rx593_fail
+    rx593_pos = $P10."pos"()
+  # rx subrule "signature" subtype=capture negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."signature"()
+    unless $P10, rx593_fail
+    rx593_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("signature")
+    rx593_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."ws"()
+    unless $P10, rx593_fail
+    rx593_pos = $P10."pos"()
+  # rx literal  ")"
+    add $I11, rx593_pos, 1
+    gt $I11, rx593_eos, rx593_fail
+    sub $I11, rx593_pos, rx593_off
+    substr $S10, rx593_tgt, $I11, 1
+    ne $S10, ")", rx593_fail
+    add rx593_pos, 1
+  # rx subrule "ws" subtype=method negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."ws"()
+    unless $P10, rx593_fail
+    rx593_pos = $P10."pos"()
+    (rx593_rep) = rx593_cur."!mark_commit"($I618)
+  rxquantr613_done:
+  # rx subrule "ws" subtype=method negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."ws"()
+    unless $P10, rx593_fail
+    rx593_pos = $P10."pos"()
+.annotate "line", 304
+  # rx reduce name="regex_declarator" key="open"
+    rx593_cur."!cursor_pos"(rx593_pos)
+    rx593_cur."!reduce"("regex_declarator", "open")
+  # rx subrule "ws" subtype=method negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."ws"()
+    unless $P10, rx593_fail
+    rx593_pos = $P10."pos"()
+.annotate "line", 305
+  # rx literal  "{"
+    add $I11, rx593_pos, 1
+    gt $I11, rx593_eos, rx593_fail
+    sub $I11, rx593_pos, rx593_off
+    substr $S10, rx593_tgt, $I11, 1
+    ne $S10, "{", rx593_fail
+    add rx593_pos, 1
+  # rx subrule "LANG" subtype=capture negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."LANG"("Regex", "nibbler")
+    unless $P10, rx593_fail
+    rx593_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("p6regex")
+    rx593_pos = $P10."pos"()
+  # rx literal  "}"
+    add $I11, rx593_pos, 1
+    gt $I11, rx593_eos, rx593_fail
+    sub $I11, rx593_pos, rx593_off
+    substr $S10, rx593_tgt, $I11, 1
+    ne $S10, "}", rx593_fail
+    add rx593_pos, 1
+  # rx subrule "ENDSTMT" subtype=zerowidth negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."ENDSTMT"()
+    unless $P10, rx593_fail
+  # rx subrule "ws" subtype=method negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."ws"()
+    unless $P10, rx593_fail
+    rx593_pos = $P10."pos"()
+  alt597_end:
+.annotate "line", 306
+  # rx subrule "ws" subtype=method negate=
+    rx593_cur."!cursor_pos"(rx593_pos)
+    $P10 = rx593_cur."ws"()
+    unless $P10, rx593_fail
+    rx593_pos = $P10."pos"()
+.annotate "line", 295
   # rx pass
-    rx615_cur."!cursor_pass"(rx615_pos, "term:sym<self>")
-    rx615_cur."!cursor_debug"("PASS  ", "term:sym<self>", " at pos=", rx615_pos)
-    .return (rx615_cur)
-  rx615_fail:
+    rx593_cur."!cursor_pass"(rx593_pos, "regex_declarator")
+    rx593_cur."!cursor_debug"("PASS  ", "regex_declarator", " at pos=", rx593_pos)
+    .return (rx593_cur)
+  rx593_fail:
 .annotate "line", 4
-    (rx615_rep, rx615_pos, $I10, $P10) = rx615_cur."!mark_fail"(0)
-    lt rx615_pos, -1, rx615_done
-    eq rx615_pos, -1, rx615_fail
+    (rx593_rep, rx593_pos, $I10, $P10) = rx593_cur."!mark_fail"(0)
+    lt rx593_pos, -1, rx593_done
+    eq rx593_pos, -1, rx593_fail
     jump $I10
-  rx615_done:
-    rx615_cur."!cursor_fail"()
-    rx615_cur."!cursor_debug"("FAIL  ", "term:sym<self>")
-    .return (rx615_cur)
+  rx593_done:
+    rx593_cur."!cursor_fail"()
+    rx593_cur."!cursor_debug"("FAIL  ", "regex_declarator")
+    .return (rx593_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<self>"  :subid("157_1258424429.0004") :method
+.sub "!PREFIX__regex_declarator"  :subid("154_1258533478.31768") :method
 .annotate "line", 4
-    new $P617, "ResizablePMCArray"
-    push $P617, "self"
-    .return ($P617)
+    new $P595, "ResizablePMCArray"
+    push $P595, ""
+    .return ($P595)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "term:sym<identifier>"  :subid("158_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "dotty"  :subid("155_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx620_tgt
-    .local int rx620_pos
-    .local int rx620_off
-    .local int rx620_eos
-    .local int rx620_rep
-    .local pmc rx620_cur
-    (rx620_cur, rx620_pos, rx620_tgt, $I10) = self."!cursor_start"()
-    rx620_cur."!cursor_debug"("START ", "term:sym<identifier>")
-    .lex unicode:"$\x{a2}", rx620_cur
+    .local string rx624_tgt
+    .local int rx624_pos
+    .local int rx624_off
+    .local int rx624_eos
+    .local int rx624_rep
+    .local pmc rx624_cur
+    (rx624_cur, rx624_pos, rx624_tgt, $I10) = self."!cursor_start"()
+    rx624_cur."!cursor_debug"("START ", "dotty")
+    rx624_cur."!cursor_caparray"("args")
+    .lex unicode:"$\x{a2}", rx624_cur
     .local pmc match
     .lex "$/", match
-    length rx620_eos, rx620_tgt
-    set rx620_off, 0
-    lt $I10, 2, rx620_start
-    sub rx620_off, $I10, 1
-    substr rx620_tgt, rx620_tgt, rx620_off
-  rx620_start:
-.annotate "line", 311
-  # rx subrule "identifier" subtype=capture negate=
-    rx620_cur."!cursor_pos"(rx620_pos)
-    $P10 = rx620_cur."identifier"()
-    unless $P10, rx620_fail
-    rx620_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("identifier")
-    rx620_pos = $P10."pos"()
-  # rx enumcharlist negate=0 zerowidth
-    ge rx620_pos, rx620_eos, rx620_fail
-    sub $I10, rx620_pos, rx620_off
-    substr $S10, rx620_tgt, $I10, 1
-    index $I11, "(", $S10
-    lt $I11, 0, rx620_fail
-  # rx subrule "args" subtype=capture negate=
-    rx620_cur."!cursor_pos"(rx620_pos)
-    $P10 = rx620_cur."args"()
-    unless $P10, rx620_fail
-    rx620_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("args")
-    rx620_pos = $P10."pos"()
+    length rx624_eos, rx624_tgt
+    set rx624_off, 0
+    lt $I10, 2, rx624_start
+    sub rx624_off, $I10, 1
+    substr rx624_tgt, rx624_tgt, rx624_off
+  rx624_start:
 .annotate "line", 310
-  # rx pass
-    rx620_cur."!cursor_pass"(rx620_pos, "term:sym<identifier>")
-    rx620_cur."!cursor_debug"("PASS  ", "term:sym<identifier>", " at pos=", rx620_pos)
-    .return (rx620_cur)
-  rx620_fail:
-.annotate "line", 4
-    (rx620_rep, rx620_pos, $I10, $P10) = rx620_cur."!mark_fail"(0)
-    lt rx620_pos, -1, rx620_done
-    eq rx620_pos, -1, rx620_fail
-    jump $I10
-  rx620_done:
-    rx620_cur."!cursor_fail"()
-    rx620_cur."!cursor_debug"("FAIL  ", "term:sym<identifier>")
-    .return (rx620_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<identifier>"  :subid("159_1258424429.0004") :method
-.annotate "line", 4
-    $P622 = self."!PREFIX__!subrule"("identifier", "")
-    new $P623, "ResizablePMCArray"
-    push $P623, $P622
-    .return ($P623)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "term:sym<name>"  :subid("160_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx625_tgt
-    .local int rx625_pos
-    .local int rx625_off
-    .local int rx625_eos
-    .local int rx625_rep
-    .local pmc rx625_cur
-    (rx625_cur, rx625_pos, rx625_tgt, $I10) = self."!cursor_start"()
-    rx625_cur."!cursor_debug"("START ", "term:sym<name>")
-    rx625_cur."!cursor_caparray"("args")
-    .lex unicode:"$\x{a2}", rx625_cur
-    .local pmc match
-    .lex "$/", match
-    length rx625_eos, rx625_tgt
-    set rx625_off, 0
-    lt $I10, 2, rx625_start
-    sub rx625_off, $I10, 1
-    substr rx625_tgt, rx625_tgt, rx625_off
-  rx625_start:
-.annotate "line", 315
-  # rx subrule "name" subtype=capture negate=
-    rx625_cur."!cursor_pos"(rx625_pos)
-    $P10 = rx625_cur."name"()
-    unless $P10, rx625_fail
-    rx625_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("name")
-    rx625_pos = $P10."pos"()
-  # rx rxquantr629 ** 0..1
-    set_addr $I630, rxquantr629_done
-    rx625_cur."!mark_push"(0, rx625_pos, $I630)
-  rxquantr629_loop:
-  # rx subrule "args" subtype=capture negate=
-    rx625_cur."!cursor_pos"(rx625_pos)
-    $P10 = rx625_cur."args"()
-    unless $P10, rx625_fail
-    rx625_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("args")
-    rx625_pos = $P10."pos"()
-    (rx625_rep) = rx625_cur."!mark_commit"($I630)
-  rxquantr629_done:
+  # rx literal  "."
+    add $I11, rx624_pos, 1
+    gt $I11, rx624_eos, rx624_fail
+    sub $I11, rx624_pos, rx624_off
+    substr $S10, rx624_tgt, $I11, 1
+    ne $S10, ".", rx624_fail
+    add rx624_pos, 1
+  # rx subrule "identifier" subtype=capture negate=
+    rx624_cur."!cursor_pos"(rx624_pos)
+    $P10 = rx624_cur."identifier"()
+    unless $P10, rx624_fail
+    rx624_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("identifier")
+    rx624_pos = $P10."pos"()
 .annotate "line", 314
-  # rx pass
-    rx625_cur."!cursor_pass"(rx625_pos, "term:sym<name>")
-    rx625_cur."!cursor_debug"("PASS  ", "term:sym<name>", " at pos=", rx625_pos)
-    .return (rx625_cur)
-  rx625_fail:
-.annotate "line", 4
-    (rx625_rep, rx625_pos, $I10, $P10) = rx625_cur."!mark_fail"(0)
-    lt rx625_pos, -1, rx625_done
-    eq rx625_pos, -1, rx625_fail
-    jump $I10
-  rx625_done:
-    rx625_cur."!cursor_fail"()
-    rx625_cur."!cursor_debug"("FAIL  ", "term:sym<name>")
-    .return (rx625_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<name>"  :subid("161_1258424429.0004") :method
-.annotate "line", 4
-    $P627 = self."!PREFIX__!subrule"("name", "")
-    new $P628, "ResizablePMCArray"
-    push $P628, $P627
-    .return ($P628)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "term:sym<pir::op>"  :subid("162_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx632_tgt
-    .local int rx632_pos
-    .local int rx632_off
-    .local int rx632_eos
-    .local int rx632_rep
-    .local pmc rx632_cur
-    (rx632_cur, rx632_pos, rx632_tgt, $I10) = self."!cursor_start"()
-    rx632_cur."!cursor_debug"("START ", "term:sym<pir::op>")
-    rx632_cur."!cursor_caparray"("args")
-    .lex unicode:"$\x{a2}", rx632_cur
-    .local pmc match
-    .lex "$/", match
-    length rx632_eos, rx632_tgt
-    set rx632_off, 0
-    lt $I10, 2, rx632_start
-    sub rx632_off, $I10, 1
-    substr rx632_tgt, rx632_tgt, rx632_off
-  rx632_start:
-.annotate "line", 319
-  # rx literal  "pir::"
-    add $I11, rx632_pos, 5
-    gt $I11, rx632_eos, rx632_fail
-    sub $I11, rx632_pos, rx632_off
-    substr $S10, rx632_tgt, $I11, 5
-    ne $S10, "pir::", rx632_fail
-    add rx632_pos, 5
-  # rx subcapture "op"
-    set_addr $I10, rxcap_635_fail
-    rx632_cur."!mark_push"(0, rx632_pos, $I10)
-  # rx charclass_q w r 1..-1
-    sub $I10, rx632_pos, rx632_off
-    find_not_cclass $I11, 8192, rx632_tgt, $I10, rx632_eos
-    add $I12, $I10, 1
-    lt $I11, $I12, rx632_fail
-    add rx632_pos, rx632_off, $I11
-    set_addr $I10, rxcap_635_fail
-    ($I12, $I11) = rx632_cur."!mark_peek"($I10)
-    rx632_cur."!cursor_pos"($I11)
-    ($P10) = rx632_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx632_pos, "")
-    rx632_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("op")
-    goto rxcap_635_done
-  rxcap_635_fail:
-    goto rx632_fail
-  rxcap_635_done:
-  # rx rxquantr636 ** 0..1
-    set_addr $I637, rxquantr636_done
-    rx632_cur."!mark_push"(0, rx632_pos, $I637)
-  rxquantr636_loop:
+  # rx rxquantr628 ** 0..1
+    set_addr $I630, rxquantr628_done
+    rx624_cur."!mark_push"(0, rx624_pos, $I630)
+  rxquantr628_loop:
+  alt629_0:
+.annotate "line", 311
+    set_addr $I10, alt629_1
+    rx624_cur."!mark_push"(0, rx624_pos, $I10)
+.annotate "line", 312
+  # rx enumcharlist negate=0 zerowidth
+    ge rx624_pos, rx624_eos, rx624_fail
+    sub $I10, rx624_pos, rx624_off
+    substr $S10, rx624_tgt, $I10, 1
+    index $I11, "(", $S10
+    lt $I11, 0, rx624_fail
   # rx subrule "args" subtype=capture negate=
-    rx632_cur."!cursor_pos"(rx632_pos)
-    $P10 = rx632_cur."args"()
-    unless $P10, rx632_fail
-    rx632_cur."!mark_push"(0, -1, 0, $P10)
+    rx624_cur."!cursor_pos"(rx624_pos)
+    $P10 = rx624_cur."args"()
+    unless $P10, rx624_fail
+    rx624_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("args")
-    rx632_pos = $P10."pos"()
-    (rx632_rep) = rx632_cur."!mark_commit"($I637)
-  rxquantr636_done:
-.annotate "line", 318
+    rx624_pos = $P10."pos"()
+    goto alt629_end
+  alt629_1:
+.annotate "line", 313
+  # rx literal  ":"
+    add $I11, rx624_pos, 1
+    gt $I11, rx624_eos, rx624_fail
+    sub $I11, rx624_pos, rx624_off
+    substr $S10, rx624_tgt, $I11, 1
+    ne $S10, ":", rx624_fail
+    add rx624_pos, 1
+  # rx charclass s
+    ge rx624_pos, rx624_eos, rx624_fail
+    sub $I10, rx624_pos, rx624_off
+    is_cclass $I11, 32, rx624_tgt, $I10
+    unless $I11, rx624_fail
+    inc rx624_pos
+  # rx subrule "arglist" subtype=capture negate=
+    rx624_cur."!cursor_pos"(rx624_pos)
+    $P10 = rx624_cur."arglist"()
+    unless $P10, rx624_fail
+    rx624_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("args")
+    rx624_pos = $P10."pos"()
+  alt629_end:
+.annotate "line", 314
+    (rx624_rep) = rx624_cur."!mark_commit"($I630)
+  rxquantr628_done:
+.annotate "line", 309
   # rx pass
-    rx632_cur."!cursor_pass"(rx632_pos, "term:sym<pir::op>")
-    rx632_cur."!cursor_debug"("PASS  ", "term:sym<pir::op>", " at pos=", rx632_pos)
-    .return (rx632_cur)
-  rx632_fail:
+    rx624_cur."!cursor_pass"(rx624_pos, "dotty")
+    rx624_cur."!cursor_debug"("PASS  ", "dotty", " at pos=", rx624_pos)
+    .return (rx624_cur)
+  rx624_fail:
 .annotate "line", 4
-    (rx632_rep, rx632_pos, $I10, $P10) = rx632_cur."!mark_fail"(0)
-    lt rx632_pos, -1, rx632_done
-    eq rx632_pos, -1, rx632_fail
+    (rx624_rep, rx624_pos, $I10, $P10) = rx624_cur."!mark_fail"(0)
+    lt rx624_pos, -1, rx624_done
+    eq rx624_pos, -1, rx624_fail
     jump $I10
-  rx632_done:
-    rx632_cur."!cursor_fail"()
-    rx632_cur."!cursor_debug"("FAIL  ", "term:sym<pir::op>")
-    .return (rx632_cur)
+  rx624_done:
+    rx624_cur."!cursor_fail"()
+    rx624_cur."!cursor_debug"("FAIL  ", "dotty")
+    .return (rx624_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<pir::op>"  :subid("163_1258424429.0004") :method
+.sub "!PREFIX__dotty"  :subid("156_1258533478.31768") :method
 .annotate "line", 4
-    new $P634, "ResizablePMCArray"
-    push $P634, "pir::"
+    $P626 = self."!PREFIX__!subrule"("identifier", ".")
+    new $P627, "ResizablePMCArray"
+    push $P627, $P626
+    .return ($P627)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "term"  :subid("157_1258533478.31768") :method
+.annotate "line", 318
+    $P632 = self."!protoregex"("term")
+    .return ($P632)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__term"  :subid("158_1258533478.31768") :method
+.annotate "line", 318
+    $P634 = self."!PREFIX__!protoregex"("term")
     .return ($P634)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "args"  :subid("164_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "term:sym<self>"  :subid("159_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx639_tgt
-    .local int rx639_pos
-    .local int rx639_off
-    .local int rx639_eos
-    .local int rx639_rep
-    .local pmc rx639_cur
-    (rx639_cur, rx639_pos, rx639_tgt, $I10) = self."!cursor_start"()
-    rx639_cur."!cursor_debug"("START ", "args")
-    .lex unicode:"$\x{a2}", rx639_cur
+    .local string rx636_tgt
+    .local int rx636_pos
+    .local int rx636_off
+    .local int rx636_eos
+    .local int rx636_rep
+    .local pmc rx636_cur
+    (rx636_cur, rx636_pos, rx636_tgt, $I10) = self."!cursor_start"()
+    rx636_cur."!cursor_debug"("START ", "term:sym<self>")
+    .lex unicode:"$\x{a2}", rx636_cur
     .local pmc match
     .lex "$/", match
-    length rx639_eos, rx639_tgt
-    set rx639_off, 0
-    lt $I10, 2, rx639_start
-    sub rx639_off, $I10, 1
-    substr rx639_tgt, rx639_tgt, rx639_off
-  rx639_start:
-.annotate "line", 323
-  # rx literal  "("
-    add $I11, rx639_pos, 1
-    gt $I11, rx639_eos, rx639_fail
-    sub $I11, rx639_pos, rx639_off
-    substr $S10, rx639_tgt, $I11, 1
-    ne $S10, "(", rx639_fail
-    add rx639_pos, 1
-  # rx subrule "arglist" subtype=capture negate=
-    rx639_cur."!cursor_pos"(rx639_pos)
-    $P10 = rx639_cur."arglist"()
-    unless $P10, rx639_fail
-    rx639_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("arglist")
-    rx639_pos = $P10."pos"()
-  # rx literal  ")"
-    add $I11, rx639_pos, 1
-    gt $I11, rx639_eos, rx639_fail
-    sub $I11, rx639_pos, rx639_off
-    substr $S10, rx639_tgt, $I11, 1
-    ne $S10, ")", rx639_fail
-    add rx639_pos, 1
+    length rx636_eos, rx636_tgt
+    set rx636_off, 0
+    lt $I10, 2, rx636_start
+    sub rx636_off, $I10, 1
+    substr rx636_tgt, rx636_tgt, rx636_off
+  rx636_start:
+.annotate "line", 320
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_639_fail
+    rx636_cur."!mark_push"(0, rx636_pos, $I10)
+  # rx literal  "self"
+    add $I11, rx636_pos, 4
+    gt $I11, rx636_eos, rx636_fail
+    sub $I11, rx636_pos, rx636_off
+    substr $S10, rx636_tgt, $I11, 4
+    ne $S10, "self", rx636_fail
+    add rx636_pos, 4
+    set_addr $I10, rxcap_639_fail
+    ($I12, $I11) = rx636_cur."!mark_peek"($I10)
+    rx636_cur."!cursor_pos"($I11)
+    ($P10) = rx636_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx636_pos, "")
+    rx636_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_639_done
+  rxcap_639_fail:
+    goto rx636_fail
+  rxcap_639_done:
+  # rxanchor rwb
+    le rx636_pos, 0, rx636_fail
+    sub $I10, rx636_pos, rx636_off
+    is_cclass $I11, 8192, rx636_tgt, $I10
+    if $I11, rx636_fail
+    dec $I10
+    is_cclass $I11, 8192, rx636_tgt, $I10
+    unless $I11, rx636_fail
   # rx pass
-    rx639_cur."!cursor_pass"(rx639_pos, "args")
-    rx639_cur."!cursor_debug"("PASS  ", "args", " at pos=", rx639_pos)
-    .return (rx639_cur)
-  rx639_fail:
+    rx636_cur."!cursor_pass"(rx636_pos, "term:sym<self>")
+    rx636_cur."!cursor_debug"("PASS  ", "term:sym<self>", " at pos=", rx636_pos)
+    .return (rx636_cur)
+  rx636_fail:
 .annotate "line", 4
-    (rx639_rep, rx639_pos, $I10, $P10) = rx639_cur."!mark_fail"(0)
-    lt rx639_pos, -1, rx639_done
-    eq rx639_pos, -1, rx639_fail
+    (rx636_rep, rx636_pos, $I10, $P10) = rx636_cur."!mark_fail"(0)
+    lt rx636_pos, -1, rx636_done
+    eq rx636_pos, -1, rx636_fail
     jump $I10
-  rx639_done:
-    rx639_cur."!cursor_fail"()
-    rx639_cur."!cursor_debug"("FAIL  ", "args")
-    .return (rx639_cur)
+  rx636_done:
+    rx636_cur."!cursor_fail"()
+    rx636_cur."!cursor_debug"("FAIL  ", "term:sym<self>")
+    .return (rx636_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__args"  :subid("165_1258424429.0004") :method
+.sub "!PREFIX__term:sym<self>"  :subid("160_1258533478.31768") :method
 .annotate "line", 4
-    $P641 = self."!PREFIX__!subrule"("arglist", "(")
-    new $P642, "ResizablePMCArray"
-    push $P642, $P641
-    .return ($P642)
+    new $P638, "ResizablePMCArray"
+    push $P638, "self"
+    .return ($P638)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "arglist"  :subid("166_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "term:sym<identifier>"  :subid("161_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx644_tgt
-    .local int rx644_pos
-    .local int rx644_off
-    .local int rx644_eos
-    .local int rx644_rep
-    .local pmc rx644_cur
-    (rx644_cur, rx644_pos, rx644_tgt, $I10) = self."!cursor_start"()
-    rx644_cur."!cursor_debug"("START ", "arglist")
-    .lex unicode:"$\x{a2}", rx644_cur
+    .local string rx641_tgt
+    .local int rx641_pos
+    .local int rx641_off
+    .local int rx641_eos
+    .local int rx641_rep
+    .local pmc rx641_cur
+    (rx641_cur, rx641_pos, rx641_tgt, $I10) = self."!cursor_start"()
+    rx641_cur."!cursor_debug"("START ", "term:sym<identifier>")
+    .lex unicode:"$\x{a2}", rx641_cur
     .local pmc match
     .lex "$/", match
-    length rx644_eos, rx644_tgt
-    set rx644_off, 0
-    lt $I10, 2, rx644_start
-    sub rx644_off, $I10, 1
-    substr rx644_tgt, rx644_tgt, rx644_off
-  rx644_start:
+    length rx641_eos, rx641_tgt
+    set rx641_off, 0
+    lt $I10, 2, rx641_start
+    sub rx641_off, $I10, 1
+    substr rx641_tgt, rx641_tgt, rx641_off
+  rx641_start:
+.annotate "line", 323
+  # rx subrule "identifier" subtype=capture negate=
+    rx641_cur."!cursor_pos"(rx641_pos)
+    $P10 = rx641_cur."identifier"()
+    unless $P10, rx641_fail
+    rx641_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("identifier")
+    rx641_pos = $P10."pos"()
+  # rx enumcharlist negate=0 zerowidth
+    ge rx641_pos, rx641_eos, rx641_fail
+    sub $I10, rx641_pos, rx641_off
+    substr $S10, rx641_tgt, $I10, 1
+    index $I11, "(", $S10
+    lt $I11, 0, rx641_fail
+  # rx subrule "args" subtype=capture negate=
+    rx641_cur."!cursor_pos"(rx641_pos)
+    $P10 = rx641_cur."args"()
+    unless $P10, rx641_fail
+    rx641_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("args")
+    rx641_pos = $P10."pos"()
+.annotate "line", 322
+  # rx pass
+    rx641_cur."!cursor_pass"(rx641_pos, "term:sym<identifier>")
+    rx641_cur."!cursor_debug"("PASS  ", "term:sym<identifier>", " at pos=", rx641_pos)
+    .return (rx641_cur)
+  rx641_fail:
+.annotate "line", 4
+    (rx641_rep, rx641_pos, $I10, $P10) = rx641_cur."!mark_fail"(0)
+    lt rx641_pos, -1, rx641_done
+    eq rx641_pos, -1, rx641_fail
+    jump $I10
+  rx641_done:
+    rx641_cur."!cursor_fail"()
+    rx641_cur."!cursor_debug"("FAIL  ", "term:sym<identifier>")
+    .return (rx641_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__term:sym<identifier>"  :subid("162_1258533478.31768") :method
+.annotate "line", 4
+    $P643 = self."!PREFIX__!subrule"("identifier", "")
+    new $P644, "ResizablePMCArray"
+    push $P644, $P643
+    .return ($P644)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "term:sym<name>"  :subid("163_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx646_tgt
+    .local int rx646_pos
+    .local int rx646_off
+    .local int rx646_eos
+    .local int rx646_rep
+    .local pmc rx646_cur
+    (rx646_cur, rx646_pos, rx646_tgt, $I10) = self."!cursor_start"()
+    rx646_cur."!cursor_debug"("START ", "term:sym<name>")
+    rx646_cur."!cursor_caparray"("args")
+    .lex unicode:"$\x{a2}", rx646_cur
+    .local pmc match
+    .lex "$/", match
+    length rx646_eos, rx646_tgt
+    set rx646_off, 0
+    lt $I10, 2, rx646_start
+    sub rx646_off, $I10, 1
+    substr rx646_tgt, rx646_tgt, rx646_off
+  rx646_start:
 .annotate "line", 327
-  # rx subrule "ws" subtype=method negate=
-    rx644_cur."!cursor_pos"(rx644_pos)
-    $P10 = rx644_cur."ws"()
-    unless $P10, rx644_fail
-    rx644_pos = $P10."pos"()
-  alt648_0:
-.annotate "line", 328
-    set_addr $I10, alt648_1
-    rx644_cur."!mark_push"(0, rx644_pos, $I10)
-.annotate "line", 329
-  # rx subrule "EXPR" subtype=capture negate=
-    rx644_cur."!cursor_pos"(rx644_pos)
-    $P10 = rx644_cur."EXPR"("f=")
-    unless $P10, rx644_fail
-    rx644_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("EXPR")
-    rx644_pos = $P10."pos"()
-    goto alt648_end
-  alt648_1:
-  alt648_end:
+  # rx subrule "name" subtype=capture negate=
+    rx646_cur."!cursor_pos"(rx646_pos)
+    $P10 = rx646_cur."name"()
+    unless $P10, rx646_fail
+    rx646_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("name")
+    rx646_pos = $P10."pos"()
+  # rx rxquantr650 ** 0..1
+    set_addr $I651, rxquantr650_done
+    rx646_cur."!mark_push"(0, rx646_pos, $I651)
+  rxquantr650_loop:
+  # rx subrule "args" subtype=capture negate=
+    rx646_cur."!cursor_pos"(rx646_pos)
+    $P10 = rx646_cur."args"()
+    unless $P10, rx646_fail
+    rx646_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("args")
+    rx646_pos = $P10."pos"()
+    (rx646_rep) = rx646_cur."!mark_commit"($I651)
+  rxquantr650_done:
 .annotate "line", 326
   # rx pass
-    rx644_cur."!cursor_pass"(rx644_pos, "arglist")
-    rx644_cur."!cursor_debug"("PASS  ", "arglist", " at pos=", rx644_pos)
-    .return (rx644_cur)
-  rx644_fail:
+    rx646_cur."!cursor_pass"(rx646_pos, "term:sym<name>")
+    rx646_cur."!cursor_debug"("PASS  ", "term:sym<name>", " at pos=", rx646_pos)
+    .return (rx646_cur)
+  rx646_fail:
 .annotate "line", 4
-    (rx644_rep, rx644_pos, $I10, $P10) = rx644_cur."!mark_fail"(0)
-    lt rx644_pos, -1, rx644_done
-    eq rx644_pos, -1, rx644_fail
+    (rx646_rep, rx646_pos, $I10, $P10) = rx646_cur."!mark_fail"(0)
+    lt rx646_pos, -1, rx646_done
+    eq rx646_pos, -1, rx646_fail
     jump $I10
-  rx644_done:
-    rx644_cur."!cursor_fail"()
-    rx644_cur."!cursor_debug"("FAIL  ", "arglist")
-    .return (rx644_cur)
+  rx646_done:
+    rx646_cur."!cursor_fail"()
+    rx646_cur."!cursor_debug"("FAIL  ", "term:sym<name>")
+    .return (rx646_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__arglist"  :subid("167_1258424429.0004") :method
+.sub "!PREFIX__term:sym<name>"  :subid("164_1258533478.31768") :method
 .annotate "line", 4
-    $P646 = self."!PREFIX__!subrule"("", "")
-    new $P647, "ResizablePMCArray"
-    push $P647, $P646
-    .return ($P647)
+    $P648 = self."!PREFIX__!subrule"("name", "")
+    new $P649, "ResizablePMCArray"
+    push $P649, $P648
+    .return ($P649)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "term:sym<value>"  :subid("168_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "term:sym<pir::op>"  :subid("165_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx650_tgt
-    .local int rx650_pos
-    .local int rx650_off
-    .local int rx650_eos
-    .local int rx650_rep
-    .local pmc rx650_cur
-    (rx650_cur, rx650_pos, rx650_tgt, $I10) = self."!cursor_start"()
-    rx650_cur."!cursor_debug"("START ", "term:sym<value>")
-    .lex unicode:"$\x{a2}", rx650_cur
+    .local string rx653_tgt
+    .local int rx653_pos
+    .local int rx653_off
+    .local int rx653_eos
+    .local int rx653_rep
+    .local pmc rx653_cur
+    (rx653_cur, rx653_pos, rx653_tgt, $I10) = self."!cursor_start"()
+    rx653_cur."!cursor_debug"("START ", "term:sym<pir::op>")
+    rx653_cur."!cursor_caparray"("args")
+    .lex unicode:"$\x{a2}", rx653_cur
     .local pmc match
     .lex "$/", match
-    length rx650_eos, rx650_tgt
-    set rx650_off, 0
-    lt $I10, 2, rx650_start
-    sub rx650_off, $I10, 1
-    substr rx650_tgt, rx650_tgt, rx650_off
-  rx650_start:
+    length rx653_eos, rx653_tgt
+    set rx653_off, 0
+    lt $I10, 2, rx653_start
+    sub rx653_off, $I10, 1
+    substr rx653_tgt, rx653_tgt, rx653_off
+  rx653_start:
+.annotate "line", 331
+  # rx literal  "pir::"
+    add $I11, rx653_pos, 5
+    gt $I11, rx653_eos, rx653_fail
+    sub $I11, rx653_pos, rx653_off
+    substr $S10, rx653_tgt, $I11, 5
+    ne $S10, "pir::", rx653_fail
+    add rx653_pos, 5
+  # rx subcapture "op"
+    set_addr $I10, rxcap_656_fail
+    rx653_cur."!mark_push"(0, rx653_pos, $I10)
+  # rx charclass_q w r 1..-1
+    sub $I10, rx653_pos, rx653_off
+    find_not_cclass $I11, 8192, rx653_tgt, $I10, rx653_eos
+    add $I12, $I10, 1
+    lt $I11, $I12, rx653_fail
+    add rx653_pos, rx653_off, $I11
+    set_addr $I10, rxcap_656_fail
+    ($I12, $I11) = rx653_cur."!mark_peek"($I10)
+    rx653_cur."!cursor_pos"($I11)
+    ($P10) = rx653_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx653_pos, "")
+    rx653_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("op")
+    goto rxcap_656_done
+  rxcap_656_fail:
+    goto rx653_fail
+  rxcap_656_done:
+  # rx rxquantr657 ** 0..1
+    set_addr $I658, rxquantr657_done
+    rx653_cur."!mark_push"(0, rx653_pos, $I658)
+  rxquantr657_loop:
+  # rx subrule "args" subtype=capture negate=
+    rx653_cur."!cursor_pos"(rx653_pos)
+    $P10 = rx653_cur."args"()
+    unless $P10, rx653_fail
+    rx653_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("args")
+    rx653_pos = $P10."pos"()
+    (rx653_rep) = rx653_cur."!mark_commit"($I658)
+  rxquantr657_done:
+.annotate "line", 330
+  # rx pass
+    rx653_cur."!cursor_pass"(rx653_pos, "term:sym<pir::op>")
+    rx653_cur."!cursor_debug"("PASS  ", "term:sym<pir::op>", " at pos=", rx653_pos)
+    .return (rx653_cur)
+  rx653_fail:
+.annotate "line", 4
+    (rx653_rep, rx653_pos, $I10, $P10) = rx653_cur."!mark_fail"(0)
+    lt rx653_pos, -1, rx653_done
+    eq rx653_pos, -1, rx653_fail
+    jump $I10
+  rx653_done:
+    rx653_cur."!cursor_fail"()
+    rx653_cur."!cursor_debug"("FAIL  ", "term:sym<pir::op>")
+    .return (rx653_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__term:sym<pir::op>"  :subid("166_1258533478.31768") :method
+.annotate "line", 4
+    new $P655, "ResizablePMCArray"
+    push $P655, "pir::"
+    .return ($P655)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "args"  :subid("167_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx660_tgt
+    .local int rx660_pos
+    .local int rx660_off
+    .local int rx660_eos
+    .local int rx660_rep
+    .local pmc rx660_cur
+    (rx660_cur, rx660_pos, rx660_tgt, $I10) = self."!cursor_start"()
+    rx660_cur."!cursor_debug"("START ", "args")
+    .lex unicode:"$\x{a2}", rx660_cur
+    .local pmc match
+    .lex "$/", match
+    length rx660_eos, rx660_tgt
+    set rx660_off, 0
+    lt $I10, 2, rx660_start
+    sub rx660_off, $I10, 1
+    substr rx660_tgt, rx660_tgt, rx660_off
+  rx660_start:
 .annotate "line", 335
-  # rx subrule "value" subtype=capture negate=
-    rx650_cur."!cursor_pos"(rx650_pos)
-    $P10 = rx650_cur."value"()
-    unless $P10, rx650_fail
-    rx650_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("value")
-    rx650_pos = $P10."pos"()
+  # rx literal  "("
+    add $I11, rx660_pos, 1
+    gt $I11, rx660_eos, rx660_fail
+    sub $I11, rx660_pos, rx660_off
+    substr $S10, rx660_tgt, $I11, 1
+    ne $S10, "(", rx660_fail
+    add rx660_pos, 1
+  # rx subrule "arglist" subtype=capture negate=
+    rx660_cur."!cursor_pos"(rx660_pos)
+    $P10 = rx660_cur."arglist"()
+    unless $P10, rx660_fail
+    rx660_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("arglist")
+    rx660_pos = $P10."pos"()
+  # rx literal  ")"
+    add $I11, rx660_pos, 1
+    gt $I11, rx660_eos, rx660_fail
+    sub $I11, rx660_pos, rx660_off
+    substr $S10, rx660_tgt, $I11, 1
+    ne $S10, ")", rx660_fail
+    add rx660_pos, 1
   # rx pass
-    rx650_cur."!cursor_pass"(rx650_pos, "term:sym<value>")
-    rx650_cur."!cursor_debug"("PASS  ", "term:sym<value>", " at pos=", rx650_pos)
-    .return (rx650_cur)
-  rx650_fail:
+    rx660_cur."!cursor_pass"(rx660_pos, "args")
+    rx660_cur."!cursor_debug"("PASS  ", "args", " at pos=", rx660_pos)
+    .return (rx660_cur)
+  rx660_fail:
 .annotate "line", 4
-    (rx650_rep, rx650_pos, $I10, $P10) = rx650_cur."!mark_fail"(0)
-    lt rx650_pos, -1, rx650_done
-    eq rx650_pos, -1, rx650_fail
+    (rx660_rep, rx660_pos, $I10, $P10) = rx660_cur."!mark_fail"(0)
+    lt rx660_pos, -1, rx660_done
+    eq rx660_pos, -1, rx660_fail
     jump $I10
-  rx650_done:
-    rx650_cur."!cursor_fail"()
-    rx650_cur."!cursor_debug"("FAIL  ", "term:sym<value>")
-    .return (rx650_cur)
+  rx660_done:
+    rx660_cur."!cursor_fail"()
+    rx660_cur."!cursor_debug"("FAIL  ", "args")
+    .return (rx660_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__term:sym<value>"  :subid("169_1258424429.0004") :method
+.sub "!PREFIX__args"  :subid("168_1258533478.31768") :method
 .annotate "line", 4
-    $P652 = self."!PREFIX__!subrule"("value", "")
-    new $P653, "ResizablePMCArray"
-    push $P653, $P652
-    .return ($P653)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "value"  :subid("170_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx655_tgt
-    .local int rx655_pos
-    .local int rx655_off
-    .local int rx655_eos
-    .local int rx655_rep
-    .local pmc rx655_cur
-    (rx655_cur, rx655_pos, rx655_tgt, $I10) = self."!cursor_start"()
-    rx655_cur."!cursor_debug"("START ", "value")
-    .lex unicode:"$\x{a2}", rx655_cur
-    .local pmc match
-    .lex "$/", match
-    length rx655_eos, rx655_tgt
-    set rx655_off, 0
-    lt $I10, 2, rx655_start
-    sub rx655_off, $I10, 1
-    substr rx655_tgt, rx655_tgt, rx655_off
-  rx655_start:
-  alt661_0:
-.annotate "line", 337
-    set_addr $I10, alt661_1
-    rx655_cur."!mark_push"(0, rx655_pos, $I10)
-.annotate "line", 338
-  # rx subrule "dec_number" subtype=capture negate=
-    rx655_cur."!cursor_pos"(rx655_pos)
-    $P10 = rx655_cur."dec_number"()
-    unless $P10, rx655_fail
-    rx655_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("dec_number")
-    rx655_pos = $P10."pos"()
-    goto alt661_end
-  alt661_1:
-    set_addr $I10, alt661_2
-    rx655_cur."!mark_push"(0, rx655_pos, $I10)
-.annotate "line", 339
-  # rx subrule "quote" subtype=capture negate=
-    rx655_cur."!cursor_pos"(rx655_pos)
-    $P10 = rx655_cur."quote"()
-    unless $P10, rx655_fail
-    rx655_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("quote")
-    rx655_pos = $P10."pos"()
-    goto alt661_end
-  alt661_2:
-.annotate "line", 340
-  # rx subrule "integer" subtype=capture negate=
-    rx655_cur."!cursor_pos"(rx655_pos)
-    $P10 = rx655_cur."integer"()
-    unless $P10, rx655_fail
-    rx655_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("integer")
-    rx655_pos = $P10."pos"()
-  alt661_end:
-.annotate "line", 337
-  # rx pass
-    rx655_cur."!cursor_pass"(rx655_pos, "value")
-    rx655_cur."!cursor_debug"("PASS  ", "value", " at pos=", rx655_pos)
-    .return (rx655_cur)
-  rx655_fail:
-.annotate "line", 4
-    (rx655_rep, rx655_pos, $I10, $P10) = rx655_cur."!mark_fail"(0)
-    lt rx655_pos, -1, rx655_done
-    eq rx655_pos, -1, rx655_fail
-    jump $I10
-  rx655_done:
-    rx655_cur."!cursor_fail"()
-    rx655_cur."!cursor_debug"("FAIL  ", "value")
-    .return (rx655_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__value"  :subid("171_1258424429.0004") :method
-.annotate "line", 4
-    $P657 = self."!PREFIX__!subrule"("integer", "")
-    $P658 = self."!PREFIX__!subrule"("quote", "")
-    $P659 = self."!PREFIX__!subrule"("dec_number", "")
-    new $P660, "ResizablePMCArray"
-    push $P660, $P657
-    push $P660, $P658
-    push $P660, $P659
-    .return ($P660)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "quote"  :subid("172_1258424429.0004") :method
-.annotate "line", 343
-    $P663 = self."!protoregex"("quote")
+    $P662 = self."!PREFIX__!subrule"("arglist", "(")
+    new $P663, "ResizablePMCArray"
+    push $P663, $P662
     .return ($P663)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__quote"  :subid("173_1258424429.0004") :method
-.annotate "line", 343
-    $P665 = self."!PREFIX__!protoregex"("quote")
-    .return ($P665)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "quote:sym<apos>"  :subid("174_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "arglist"  :subid("169_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx667_tgt
-    .local int rx667_pos
-    .local int rx667_off
-    .local int rx667_eos
-    .local int rx667_rep
-    .local pmc rx667_cur
-    (rx667_cur, rx667_pos, rx667_tgt, $I10) = self."!cursor_start"()
-    rx667_cur."!cursor_debug"("START ", "quote:sym<apos>")
-    .lex unicode:"$\x{a2}", rx667_cur
+    .local string rx665_tgt
+    .local int rx665_pos
+    .local int rx665_off
+    .local int rx665_eos
+    .local int rx665_rep
+    .local pmc rx665_cur
+    (rx665_cur, rx665_pos, rx665_tgt, $I10) = self."!cursor_start"()
+    rx665_cur."!cursor_debug"("START ", "arglist")
+    .lex unicode:"$\x{a2}", rx665_cur
     .local pmc match
     .lex "$/", match
-    length rx667_eos, rx667_tgt
-    set rx667_off, 0
-    lt $I10, 2, rx667_start
-    sub rx667_off, $I10, 1
-    substr rx667_tgt, rx667_tgt, rx667_off
-  rx667_start:
-.annotate "line", 344
-  # rx enumcharlist negate=0 zerowidth
-    ge rx667_pos, rx667_eos, rx667_fail
-    sub $I10, rx667_pos, rx667_off
-    substr $S10, rx667_tgt, $I10, 1
-    index $I11, "'", $S10
-    lt $I11, 0, rx667_fail
-  # rx subrule "quote_EXPR" subtype=capture negate=
-    rx667_cur."!cursor_pos"(rx667_pos)
-    $P10 = rx667_cur."quote_EXPR"(":q")
-    unless $P10, rx667_fail
-    rx667_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("quote_EXPR")
-    rx667_pos = $P10."pos"()
+    length rx665_eos, rx665_tgt
+    set rx665_off, 0
+    lt $I10, 2, rx665_start
+    sub rx665_off, $I10, 1
+    substr rx665_tgt, rx665_tgt, rx665_off
+  rx665_start:
+.annotate "line", 339
+  # rx subrule "ws" subtype=method negate=
+    rx665_cur."!cursor_pos"(rx665_pos)
+    $P10 = rx665_cur."ws"()
+    unless $P10, rx665_fail
+    rx665_pos = $P10."pos"()
+  alt669_0:
+.annotate "line", 340
+    set_addr $I10, alt669_1
+    rx665_cur."!mark_push"(0, rx665_pos, $I10)
+.annotate "line", 341
+  # rx subrule "EXPR" subtype=capture negate=
+    rx665_cur."!cursor_pos"(rx665_pos)
+    $P10 = rx665_cur."EXPR"("f=")
+    unless $P10, rx665_fail
+    rx665_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("EXPR")
+    rx665_pos = $P10."pos"()
+    goto alt669_end
+  alt669_1:
+  alt669_end:
+.annotate "line", 338
   # rx pass
-    rx667_cur."!cursor_pass"(rx667_pos, "quote:sym<apos>")
-    rx667_cur."!cursor_debug"("PASS  ", "quote:sym<apos>", " at pos=", rx667_pos)
-    .return (rx667_cur)
-  rx667_fail:
+    rx665_cur."!cursor_pass"(rx665_pos, "arglist")
+    rx665_cur."!cursor_debug"("PASS  ", "arglist", " at pos=", rx665_pos)
+    .return (rx665_cur)
+  rx665_fail:
 .annotate "line", 4
-    (rx667_rep, rx667_pos, $I10, $P10) = rx667_cur."!mark_fail"(0)
-    lt rx667_pos, -1, rx667_done
-    eq rx667_pos, -1, rx667_fail
+    (rx665_rep, rx665_pos, $I10, $P10) = rx665_cur."!mark_fail"(0)
+    lt rx665_pos, -1, rx665_done
+    eq rx665_pos, -1, rx665_fail
     jump $I10
-  rx667_done:
-    rx667_cur."!cursor_fail"()
-    rx667_cur."!cursor_debug"("FAIL  ", "quote:sym<apos>")
-    .return (rx667_cur)
+  rx665_done:
+    rx665_cur."!cursor_fail"()
+    rx665_cur."!cursor_debug"("FAIL  ", "arglist")
+    .return (rx665_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__quote:sym<apos>"  :subid("175_1258424429.0004") :method
+.sub "!PREFIX__arglist"  :subid("170_1258533478.31768") :method
 .annotate "line", 4
-    new $P669, "ResizablePMCArray"
-    push $P669, "'"
-    .return ($P669)
+    $P667 = self."!PREFIX__!subrule"("", "")
+    new $P668, "ResizablePMCArray"
+    push $P668, $P667
+    .return ($P668)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "quote:sym<dblq>"  :subid("176_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "term:sym<value>"  :subid("171_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
     .local string rx671_tgt
     .local int rx671_pos
@@ -7803,7 +7867,7 @@ NQP::Compiler - NQP compiler
     .local int rx671_rep
     .local pmc rx671_cur
     (rx671_cur, rx671_pos, rx671_tgt, $I10) = self."!cursor_start"()
-    rx671_cur."!cursor_debug"("START ", "quote:sym<dblq>")
+    rx671_cur."!cursor_debug"("START ", "term:sym<value>")
     .lex unicode:"$\x{a2}", rx671_cur
     .local pmc match
     .lex "$/", match
@@ -7813,23 +7877,17 @@ NQP::Compiler - NQP compiler
     sub rx671_off, $I10, 1
     substr rx671_tgt, rx671_tgt, rx671_off
   rx671_start:
-.annotate "line", 345
-  # rx enumcharlist negate=0 zerowidth
-    ge rx671_pos, rx671_eos, rx671_fail
-    sub $I10, rx671_pos, rx671_off
-    substr $S10, rx671_tgt, $I10, 1
-    index $I11, "\"", $S10
-    lt $I11, 0, rx671_fail
-  # rx subrule "quote_EXPR" subtype=capture negate=
+.annotate "line", 347
+  # rx subrule "value" subtype=capture negate=
     rx671_cur."!cursor_pos"(rx671_pos)
-    $P10 = rx671_cur."quote_EXPR"(":qq")
+    $P10 = rx671_cur."value"()
     unless $P10, rx671_fail
     rx671_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("quote_EXPR")
+    $P10."!cursor_names"("value")
     rx671_pos = $P10."pos"()
   # rx pass
-    rx671_cur."!cursor_pass"(rx671_pos, "quote:sym<dblq>")
-    rx671_cur."!cursor_debug"("PASS  ", "quote:sym<dblq>", " at pos=", rx671_pos)
+    rx671_cur."!cursor_pass"(rx671_pos, "term:sym<value>")
+    rx671_cur."!cursor_debug"("PASS  ", "term:sym<value>", " at pos=", rx671_pos)
     .return (rx671_cur)
   rx671_fail:
 .annotate "line", 4
@@ -7839,883 +7897,835 @@ NQP::Compiler - NQP compiler
     jump $I10
   rx671_done:
     rx671_cur."!cursor_fail"()
-    rx671_cur."!cursor_debug"("FAIL  ", "quote:sym<dblq>")
+    rx671_cur."!cursor_debug"("FAIL  ", "term:sym<value>")
     .return (rx671_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__quote:sym<dblq>"  :subid("177_1258424429.0004") :method
+.sub "!PREFIX__term:sym<value>"  :subid("172_1258533478.31768") :method
 .annotate "line", 4
-    new $P673, "ResizablePMCArray"
-    push $P673, "\""
-    .return ($P673)
+    $P673 = self."!PREFIX__!subrule"("value", "")
+    new $P674, "ResizablePMCArray"
+    push $P674, $P673
+    .return ($P674)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "quote:sym<q>"  :subid("178_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "value"  :subid("173_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx675_tgt
-    .local int rx675_pos
-    .local int rx675_off
-    .local int rx675_eos
-    .local int rx675_rep
-    .local pmc rx675_cur
-    (rx675_cur, rx675_pos, rx675_tgt, $I10) = self."!cursor_start"()
-    rx675_cur."!cursor_debug"("START ", "quote:sym<q>")
-    .lex unicode:"$\x{a2}", rx675_cur
+    .local string rx676_tgt
+    .local int rx676_pos
+    .local int rx676_off
+    .local int rx676_eos
+    .local int rx676_rep
+    .local pmc rx676_cur
+    (rx676_cur, rx676_pos, rx676_tgt, $I10) = self."!cursor_start"()
+    rx676_cur."!cursor_debug"("START ", "value")
+    .lex unicode:"$\x{a2}", rx676_cur
     .local pmc match
     .lex "$/", match
-    length rx675_eos, rx675_tgt
-    set rx675_off, 0
-    lt $I10, 2, rx675_start
-    sub rx675_off, $I10, 1
-    substr rx675_tgt, rx675_tgt, rx675_off
-  rx675_start:
-.annotate "line", 346
-  # rx literal  "q"
-    add $I11, rx675_pos, 1
-    gt $I11, rx675_eos, rx675_fail
-    sub $I11, rx675_pos, rx675_off
-    substr $S10, rx675_tgt, $I11, 1
-    ne $S10, "q", rx675_fail
-    add rx675_pos, 1
-  # rx enumcharlist negate=1 zerowidth
-    ge rx675_pos, rx675_eos, rx675_fail
-    sub $I10, rx675_pos, rx675_off
-    substr $S10, rx675_tgt, $I10, 1
-    index $I11, "(", $S10
-    ge $I11, 0, rx675_fail
-  # rx subrule "ws" subtype=method negate=
-    rx675_cur."!cursor_pos"(rx675_pos)
-    $P10 = rx675_cur."ws"()
-    unless $P10, rx675_fail
-    rx675_pos = $P10."pos"()
-  # rx subrule "quote_EXPR" subtype=capture negate=
-    rx675_cur."!cursor_pos"(rx675_pos)
-    $P10 = rx675_cur."quote_EXPR"(":q")
-    unless $P10, rx675_fail
-    rx675_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("quote_EXPR")
-    rx675_pos = $P10."pos"()
-  # rx pass
-    rx675_cur."!cursor_pass"(rx675_pos, "quote:sym<q>")
-    rx675_cur."!cursor_debug"("PASS  ", "quote:sym<q>", " at pos=", rx675_pos)
-    .return (rx675_cur)
-  rx675_fail:
-.annotate "line", 4
-    (rx675_rep, rx675_pos, $I10, $P10) = rx675_cur."!mark_fail"(0)
-    lt rx675_pos, -1, rx675_done
-    eq rx675_pos, -1, rx675_fail
-    jump $I10
-  rx675_done:
-    rx675_cur."!cursor_fail"()
-    rx675_cur."!cursor_debug"("FAIL  ", "quote:sym<q>")
-    .return (rx675_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__quote:sym<q>"  :subid("179_1258424429.0004") :method
-.annotate "line", 4
-    $P677 = self."!PREFIX__!subrule"("", "q")
-    new $P678, "ResizablePMCArray"
-    push $P678, $P677
-    .return ($P678)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "quote:sym<qq>"  :subid("180_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx680_tgt
-    .local int rx680_pos
-    .local int rx680_off
-    .local int rx680_eos
-    .local int rx680_rep
-    .local pmc rx680_cur
-    (rx680_cur, rx680_pos, rx680_tgt, $I10) = self."!cursor_start"()
-    rx680_cur."!cursor_debug"("START ", "quote:sym<qq>")
-    .lex unicode:"$\x{a2}", rx680_cur
-    .local pmc match
-    .lex "$/", match
-    length rx680_eos, rx680_tgt
-    set rx680_off, 0
-    lt $I10, 2, rx680_start
-    sub rx680_off, $I10, 1
-    substr rx680_tgt, rx680_tgt, rx680_off
-  rx680_start:
-.annotate "line", 347
-  # rx literal  "qq"
-    add $I11, rx680_pos, 2
-    gt $I11, rx680_eos, rx680_fail
-    sub $I11, rx680_pos, rx680_off
-    substr $S10, rx680_tgt, $I11, 2
-    ne $S10, "qq", rx680_fail
-    add rx680_pos, 2
-  # rx enumcharlist negate=1 zerowidth
-    ge rx680_pos, rx680_eos, rx680_fail
-    sub $I10, rx680_pos, rx680_off
-    substr $S10, rx680_tgt, $I10, 1
-    index $I11, "(", $S10
-    ge $I11, 0, rx680_fail
-  # rx subrule "ws" subtype=method negate=
-    rx680_cur."!cursor_pos"(rx680_pos)
-    $P10 = rx680_cur."ws"()
-    unless $P10, rx680_fail
-    rx680_pos = $P10."pos"()
-  # rx subrule "quote_EXPR" subtype=capture negate=
-    rx680_cur."!cursor_pos"(rx680_pos)
-    $P10 = rx680_cur."quote_EXPR"(":qq")
-    unless $P10, rx680_fail
-    rx680_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("quote_EXPR")
-    rx680_pos = $P10."pos"()
-  # rx pass
-    rx680_cur."!cursor_pass"(rx680_pos, "quote:sym<qq>")
-    rx680_cur."!cursor_debug"("PASS  ", "quote:sym<qq>", " at pos=", rx680_pos)
-    .return (rx680_cur)
-  rx680_fail:
-.annotate "line", 4
-    (rx680_rep, rx680_pos, $I10, $P10) = rx680_cur."!mark_fail"(0)
-    lt rx680_pos, -1, rx680_done
-    eq rx680_pos, -1, rx680_fail
-    jump $I10
-  rx680_done:
-    rx680_cur."!cursor_fail"()
-    rx680_cur."!cursor_debug"("FAIL  ", "quote:sym<qq>")
-    .return (rx680_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__quote:sym<qq>"  :subid("181_1258424429.0004") :method
-.annotate "line", 4
-    $P682 = self."!PREFIX__!subrule"("", "qq")
-    new $P683, "ResizablePMCArray"
-    push $P683, $P682
-    .return ($P683)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "quote:sym<Q>"  :subid("182_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx685_tgt
-    .local int rx685_pos
-    .local int rx685_off
-    .local int rx685_eos
-    .local int rx685_rep
-    .local pmc rx685_cur
-    (rx685_cur, rx685_pos, rx685_tgt, $I10) = self."!cursor_start"()
-    rx685_cur."!cursor_debug"("START ", "quote:sym<Q>")
-    .lex unicode:"$\x{a2}", rx685_cur
-    .local pmc match
-    .lex "$/", match
-    length rx685_eos, rx685_tgt
-    set rx685_off, 0
-    lt $I10, 2, rx685_start
-    sub rx685_off, $I10, 1
-    substr rx685_tgt, rx685_tgt, rx685_off
-  rx685_start:
-.annotate "line", 348
-  # rx literal  "Q"
-    add $I11, rx685_pos, 1
-    gt $I11, rx685_eos, rx685_fail
-    sub $I11, rx685_pos, rx685_off
-    substr $S10, rx685_tgt, $I11, 1
-    ne $S10, "Q", rx685_fail
-    add rx685_pos, 1
-  # rx enumcharlist negate=1 zerowidth
-    ge rx685_pos, rx685_eos, rx685_fail
-    sub $I10, rx685_pos, rx685_off
-    substr $S10, rx685_tgt, $I10, 1
-    index $I11, "(", $S10
-    ge $I11, 0, rx685_fail
-  # rx subrule "ws" subtype=method negate=
-    rx685_cur."!cursor_pos"(rx685_pos)
-    $P10 = rx685_cur."ws"()
-    unless $P10, rx685_fail
-    rx685_pos = $P10."pos"()
-  # rx subrule "quote_EXPR" subtype=capture negate=
-    rx685_cur."!cursor_pos"(rx685_pos)
-    $P10 = rx685_cur."quote_EXPR"()
-    unless $P10, rx685_fail
-    rx685_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("quote_EXPR")
-    rx685_pos = $P10."pos"()
-  # rx pass
-    rx685_cur."!cursor_pass"(rx685_pos, "quote:sym<Q>")
-    rx685_cur."!cursor_debug"("PASS  ", "quote:sym<Q>", " at pos=", rx685_pos)
-    .return (rx685_cur)
-  rx685_fail:
-.annotate "line", 4
-    (rx685_rep, rx685_pos, $I10, $P10) = rx685_cur."!mark_fail"(0)
-    lt rx685_pos, -1, rx685_done
-    eq rx685_pos, -1, rx685_fail
-    jump $I10
-  rx685_done:
-    rx685_cur."!cursor_fail"()
-    rx685_cur."!cursor_debug"("FAIL  ", "quote:sym<Q>")
-    .return (rx685_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__quote:sym<Q>"  :subid("183_1258424429.0004") :method
-.annotate "line", 4
-    $P687 = self."!PREFIX__!subrule"("", "Q")
-    new $P688, "ResizablePMCArray"
-    push $P688, $P687
-    .return ($P688)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "quote:sym<Q:PIR>"  :subid("184_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx690_tgt
-    .local int rx690_pos
-    .local int rx690_off
-    .local int rx690_eos
-    .local int rx690_rep
-    .local pmc rx690_cur
-    (rx690_cur, rx690_pos, rx690_tgt, $I10) = self."!cursor_start"()
-    rx690_cur."!cursor_debug"("START ", "quote:sym<Q:PIR>")
-    .lex unicode:"$\x{a2}", rx690_cur
-    .local pmc match
-    .lex "$/", match
-    length rx690_eos, rx690_tgt
-    set rx690_off, 0
-    lt $I10, 2, rx690_start
-    sub rx690_off, $I10, 1
-    substr rx690_tgt, rx690_tgt, rx690_off
-  rx690_start:
+    length rx676_eos, rx676_tgt
+    set rx676_off, 0
+    lt $I10, 2, rx676_start
+    sub rx676_off, $I10, 1
+    substr rx676_tgt, rx676_tgt, rx676_off
+  rx676_start:
+  alt682_0:
 .annotate "line", 349
-  # rx literal  "Q:PIR"
-    add $I11, rx690_pos, 5
-    gt $I11, rx690_eos, rx690_fail
-    sub $I11, rx690_pos, rx690_off
-    substr $S10, rx690_tgt, $I11, 5
-    ne $S10, "Q:PIR", rx690_fail
-    add rx690_pos, 5
-  # rx subrule "ws" subtype=method negate=
-    rx690_cur."!cursor_pos"(rx690_pos)
-    $P10 = rx690_cur."ws"()
-    unless $P10, rx690_fail
-    rx690_pos = $P10."pos"()
-  # rx subrule "quote_EXPR" subtype=capture negate=
-    rx690_cur."!cursor_pos"(rx690_pos)
-    $P10 = rx690_cur."quote_EXPR"()
-    unless $P10, rx690_fail
-    rx690_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("quote_EXPR")
-    rx690_pos = $P10."pos"()
-  # rx pass
-    rx690_cur."!cursor_pass"(rx690_pos, "quote:sym<Q:PIR>")
-    rx690_cur."!cursor_debug"("PASS  ", "quote:sym<Q:PIR>", " at pos=", rx690_pos)
-    .return (rx690_cur)
-  rx690_fail:
-.annotate "line", 4
-    (rx690_rep, rx690_pos, $I10, $P10) = rx690_cur."!mark_fail"(0)
-    lt rx690_pos, -1, rx690_done
-    eq rx690_pos, -1, rx690_fail
-    jump $I10
-  rx690_done:
-    rx690_cur."!cursor_fail"()
-    rx690_cur."!cursor_debug"("FAIL  ", "quote:sym<Q:PIR>")
-    .return (rx690_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__quote:sym<Q:PIR>"  :subid("185_1258424429.0004") :method
-.annotate "line", 4
-    $P692 = self."!PREFIX__!subrule"("", "Q:PIR")
-    new $P693, "ResizablePMCArray"
-    push $P693, $P692
-    .return ($P693)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "quote_escape:sym<$>"  :subid("186_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx695_tgt
-    .local int rx695_pos
-    .local int rx695_off
-    .local int rx695_eos
-    .local int rx695_rep
-    .local pmc rx695_cur
-    (rx695_cur, rx695_pos, rx695_tgt, $I10) = self."!cursor_start"()
-    rx695_cur."!cursor_debug"("START ", "quote_escape:sym<$>")
-    .lex unicode:"$\x{a2}", rx695_cur
-    .local pmc match
-    .lex "$/", match
-    length rx695_eos, rx695_tgt
-    set rx695_off, 0
-    lt $I10, 2, rx695_start
-    sub rx695_off, $I10, 1
-    substr rx695_tgt, rx695_tgt, rx695_off
-  rx695_start:
+    set_addr $I10, alt682_1
+    rx676_cur."!mark_push"(0, rx676_pos, $I10)
+.annotate "line", 350
+  # rx subrule "dec_number" subtype=capture negate=
+    rx676_cur."!cursor_pos"(rx676_pos)
+    $P10 = rx676_cur."dec_number"()
+    unless $P10, rx676_fail
+    rx676_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("dec_number")
+    rx676_pos = $P10."pos"()
+    goto alt682_end
+  alt682_1:
+    set_addr $I10, alt682_2
+    rx676_cur."!mark_push"(0, rx676_pos, $I10)
 .annotate "line", 351
-  # rx enumcharlist negate=0 zerowidth
-    ge rx695_pos, rx695_eos, rx695_fail
-    sub $I10, rx695_pos, rx695_off
-    substr $S10, rx695_tgt, $I10, 1
-    index $I11, "$", $S10
-    lt $I11, 0, rx695_fail
-  # rx subrule "quotemod_check" subtype=zerowidth negate=
-    rx695_cur."!cursor_pos"(rx695_pos)
-    $P10 = rx695_cur."quotemod_check"("s")
-    unless $P10, rx695_fail
-  # rx subrule "variable" subtype=capture negate=
-    rx695_cur."!cursor_pos"(rx695_pos)
-    $P10 = rx695_cur."variable"()
-    unless $P10, rx695_fail
-    rx695_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("variable")
-    rx695_pos = $P10."pos"()
-  # rx pass
-    rx695_cur."!cursor_pass"(rx695_pos, "quote_escape:sym<$>")
-    rx695_cur."!cursor_debug"("PASS  ", "quote_escape:sym<$>", " at pos=", rx695_pos)
-    .return (rx695_cur)
-  rx695_fail:
-.annotate "line", 4
-    (rx695_rep, rx695_pos, $I10, $P10) = rx695_cur."!mark_fail"(0)
-    lt rx695_pos, -1, rx695_done
-    eq rx695_pos, -1, rx695_fail
-    jump $I10
-  rx695_done:
-    rx695_cur."!cursor_fail"()
-    rx695_cur."!cursor_debug"("FAIL  ", "quote_escape:sym<$>")
-    .return (rx695_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__quote_escape:sym<$>"  :subid("187_1258424429.0004") :method
-.annotate "line", 4
-    new $P697, "ResizablePMCArray"
-    push $P697, "$"
-    .return ($P697)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "quote_escape:sym<{ }>"  :subid("188_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx699_tgt
-    .local int rx699_pos
-    .local int rx699_off
-    .local int rx699_eos
-    .local int rx699_rep
-    .local pmc rx699_cur
-    (rx699_cur, rx699_pos, rx699_tgt, $I10) = self."!cursor_start"()
-    rx699_cur."!cursor_debug"("START ", "quote_escape:sym<{ }>")
-    .lex unicode:"$\x{a2}", rx699_cur
-    .local pmc match
-    .lex "$/", match
-    length rx699_eos, rx699_tgt
-    set rx699_off, 0
-    lt $I10, 2, rx699_start
-    sub rx699_off, $I10, 1
-    substr rx699_tgt, rx699_tgt, rx699_off
-  rx699_start:
+  # rx subrule "quote" subtype=capture negate=
+    rx676_cur."!cursor_pos"(rx676_pos)
+    $P10 = rx676_cur."quote"()
+    unless $P10, rx676_fail
+    rx676_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("quote")
+    rx676_pos = $P10."pos"()
+    goto alt682_end
+  alt682_2:
 .annotate "line", 352
-  # rx enumcharlist negate=0 zerowidth
-    ge rx699_pos, rx699_eos, rx699_fail
-    sub $I10, rx699_pos, rx699_off
-    substr $S10, rx699_tgt, $I10, 1
-    index $I11, "{", $S10
-    lt $I11, 0, rx699_fail
-  # rx subrule "quotemod_check" subtype=zerowidth negate=
-    rx699_cur."!cursor_pos"(rx699_pos)
-    $P10 = rx699_cur."quotemod_check"("c")
-    unless $P10, rx699_fail
-  # rx subrule "block" subtype=capture negate=
-    rx699_cur."!cursor_pos"(rx699_pos)
-    $P10 = rx699_cur."block"()
-    unless $P10, rx699_fail
-    rx699_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("block")
-    rx699_pos = $P10."pos"()
+  # rx subrule "integer" subtype=capture negate=
+    rx676_cur."!cursor_pos"(rx676_pos)
+    $P10 = rx676_cur."integer"()
+    unless $P10, rx676_fail
+    rx676_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("integer")
+    rx676_pos = $P10."pos"()
+  alt682_end:
+.annotate "line", 349
   # rx pass
-    rx699_cur."!cursor_pass"(rx699_pos, "quote_escape:sym<{ }>")
-    rx699_cur."!cursor_debug"("PASS  ", "quote_escape:sym<{ }>", " at pos=", rx699_pos)
-    .return (rx699_cur)
-  rx699_fail:
+    rx676_cur."!cursor_pass"(rx676_pos, "value")
+    rx676_cur."!cursor_debug"("PASS  ", "value", " at pos=", rx676_pos)
+    .return (rx676_cur)
+  rx676_fail:
 .annotate "line", 4
-    (rx699_rep, rx699_pos, $I10, $P10) = rx699_cur."!mark_fail"(0)
-    lt rx699_pos, -1, rx699_done
-    eq rx699_pos, -1, rx699_fail
+    (rx676_rep, rx676_pos, $I10, $P10) = rx676_cur."!mark_fail"(0)
+    lt rx676_pos, -1, rx676_done
+    eq rx676_pos, -1, rx676_fail
     jump $I10
-  rx699_done:
-    rx699_cur."!cursor_fail"()
-    rx699_cur."!cursor_debug"("FAIL  ", "quote_escape:sym<{ }>")
-    .return (rx699_cur)
+  rx676_done:
+    rx676_cur."!cursor_fail"()
+    rx676_cur."!cursor_debug"("FAIL  ", "value")
+    .return (rx676_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__quote_escape:sym<{ }>"  :subid("189_1258424429.0004") :method
+.sub "!PREFIX__value"  :subid("174_1258533478.31768") :method
 .annotate "line", 4
-    new $P701, "ResizablePMCArray"
-    push $P701, "{"
-    .return ($P701)
+    $P678 = self."!PREFIX__!subrule"("integer", "")
+    $P679 = self."!PREFIX__!subrule"("quote", "")
+    $P680 = self."!PREFIX__!subrule"("dec_number", "")
+    new $P681, "ResizablePMCArray"
+    push $P681, $P678
+    push $P681, $P679
+    push $P681, $P680
+    .return ($P681)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "circumfix:sym<( )>"  :subid("190_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx703_tgt
-    .local int rx703_pos
-    .local int rx703_off
-    .local int rx703_eos
-    .local int rx703_rep
-    .local pmc rx703_cur
-    (rx703_cur, rx703_pos, rx703_tgt, $I10) = self."!cursor_start"()
-    rx703_cur."!cursor_debug"("START ", "circumfix:sym<( )>")
-    rx703_cur."!cursor_caparray"("EXPR")
-    .lex unicode:"$\x{a2}", rx703_cur
-    .local pmc match
-    .lex "$/", match
-    length rx703_eos, rx703_tgt
-    set rx703_off, 0
-    lt $I10, 2, rx703_start
-    sub rx703_off, $I10, 1
-    substr rx703_tgt, rx703_tgt, rx703_off
-  rx703_start:
-.annotate "line", 354
-  # rx literal  "("
-    add $I11, rx703_pos, 1
-    gt $I11, rx703_eos, rx703_fail
-    sub $I11, rx703_pos, rx703_off
-    substr $S10, rx703_tgt, $I11, 1
-    ne $S10, "(", rx703_fail
-    add rx703_pos, 1
-  # rx subrule "ws" subtype=method negate=
-    rx703_cur."!cursor_pos"(rx703_pos)
-    $P10 = rx703_cur."ws"()
-    unless $P10, rx703_fail
-    rx703_pos = $P10."pos"()
-  # rx rxquantr707 ** 0..1
-    set_addr $I708, rxquantr707_done
-    rx703_cur."!mark_push"(0, rx703_pos, $I708)
-  rxquantr707_loop:
-  # rx subrule "EXPR" subtype=capture negate=
-    rx703_cur."!cursor_pos"(rx703_pos)
-    $P10 = rx703_cur."EXPR"()
-    unless $P10, rx703_fail
-    rx703_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("EXPR")
-    rx703_pos = $P10."pos"()
-    (rx703_rep) = rx703_cur."!mark_commit"($I708)
-  rxquantr707_done:
-  # rx literal  ")"
-    add $I11, rx703_pos, 1
-    gt $I11, rx703_eos, rx703_fail
-    sub $I11, rx703_pos, rx703_off
-    substr $S10, rx703_tgt, $I11, 1
-    ne $S10, ")", rx703_fail
-    add rx703_pos, 1
-  # rx pass
-    rx703_cur."!cursor_pass"(rx703_pos, "circumfix:sym<( )>")
-    rx703_cur."!cursor_debug"("PASS  ", "circumfix:sym<( )>", " at pos=", rx703_pos)
-    .return (rx703_cur)
-  rx703_fail:
-.annotate "line", 4
-    (rx703_rep, rx703_pos, $I10, $P10) = rx703_cur."!mark_fail"(0)
-    lt rx703_pos, -1, rx703_done
-    eq rx703_pos, -1, rx703_fail
-    jump $I10
-  rx703_done:
-    rx703_cur."!cursor_fail"()
-    rx703_cur."!cursor_debug"("FAIL  ", "circumfix:sym<( )>")
-    .return (rx703_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__circumfix:sym<( )>"  :subid("191_1258424429.0004") :method
-.annotate "line", 4
-    $P705 = self."!PREFIX__!subrule"("", "(")
-    new $P706, "ResizablePMCArray"
-    push $P706, $P705
-    .return ($P706)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "circumfix:sym<[ ]>"  :subid("192_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 4
-    .local string rx710_tgt
-    .local int rx710_pos
-    .local int rx710_off
-    .local int rx710_eos
-    .local int rx710_rep
-    .local pmc rx710_cur
-    (rx710_cur, rx710_pos, rx710_tgt, $I10) = self."!cursor_start"()
-    rx710_cur."!cursor_debug"("START ", "circumfix:sym<[ ]>")
-    rx710_cur."!cursor_caparray"("EXPR")
-    .lex unicode:"$\x{a2}", rx710_cur
-    .local pmc match
-    .lex "$/", match
-    length rx710_eos, rx710_tgt
-    set rx710_off, 0
-    lt $I10, 2, rx710_start
-    sub rx710_off, $I10, 1
-    substr rx710_tgt, rx710_tgt, rx710_off
-  rx710_start:
+.sub "quote"  :subid("175_1258533478.31768") :method
 .annotate "line", 355
-  # rx literal  "["
-    add $I11, rx710_pos, 1
-    gt $I11, rx710_eos, rx710_fail
-    sub $I11, rx710_pos, rx710_off
-    substr $S10, rx710_tgt, $I11, 1
-    ne $S10, "[", rx710_fail
-    add rx710_pos, 1
-  # rx subrule "ws" subtype=method negate=
-    rx710_cur."!cursor_pos"(rx710_pos)
-    $P10 = rx710_cur."ws"()
-    unless $P10, rx710_fail
-    rx710_pos = $P10."pos"()
-  # rx rxquantr714 ** 0..1
-    set_addr $I715, rxquantr714_done
-    rx710_cur."!mark_push"(0, rx710_pos, $I715)
-  rxquantr714_loop:
-  # rx subrule "EXPR" subtype=capture negate=
-    rx710_cur."!cursor_pos"(rx710_pos)
-    $P10 = rx710_cur."EXPR"()
-    unless $P10, rx710_fail
-    rx710_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("EXPR")
-    rx710_pos = $P10."pos"()
-    (rx710_rep) = rx710_cur."!mark_commit"($I715)
-  rxquantr714_done:
-  # rx literal  "]"
-    add $I11, rx710_pos, 1
-    gt $I11, rx710_eos, rx710_fail
-    sub $I11, rx710_pos, rx710_off
-    substr $S10, rx710_tgt, $I11, 1
-    ne $S10, "]", rx710_fail
-    add rx710_pos, 1
-  # rx pass
-    rx710_cur."!cursor_pass"(rx710_pos, "circumfix:sym<[ ]>")
-    rx710_cur."!cursor_debug"("PASS  ", "circumfix:sym<[ ]>", " at pos=", rx710_pos)
-    .return (rx710_cur)
-  rx710_fail:
-.annotate "line", 4
-    (rx710_rep, rx710_pos, $I10, $P10) = rx710_cur."!mark_fail"(0)
-    lt rx710_pos, -1, rx710_done
-    eq rx710_pos, -1, rx710_fail
-    jump $I10
-  rx710_done:
-    rx710_cur."!cursor_fail"()
-    rx710_cur."!cursor_debug"("FAIL  ", "circumfix:sym<[ ]>")
-    .return (rx710_cur)
-    .return ()
+    $P684 = self."!protoregex"("quote")
+    .return ($P684)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__circumfix:sym<[ ]>"  :subid("193_1258424429.0004") :method
-.annotate "line", 4
-    $P712 = self."!PREFIX__!subrule"("", "[")
-    new $P713, "ResizablePMCArray"
-    push $P713, $P712
-    .return ($P713)
+.sub "!PREFIX__quote"  :subid("176_1258533478.31768") :method
+.annotate "line", 355
+    $P686 = self."!PREFIX__!protoregex"("quote")
+    .return ($P686)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "circumfix:sym<ang>"  :subid("194_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "quote:sym<apos>"  :subid("177_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx717_tgt
-    .local int rx717_pos
-    .local int rx717_off
-    .local int rx717_eos
-    .local int rx717_rep
-    .local pmc rx717_cur
-    (rx717_cur, rx717_pos, rx717_tgt, $I10) = self."!cursor_start"()
-    rx717_cur."!cursor_debug"("START ", "circumfix:sym<ang>")
-    .lex unicode:"$\x{a2}", rx717_cur
+    .local string rx688_tgt
+    .local int rx688_pos
+    .local int rx688_off
+    .local int rx688_eos
+    .local int rx688_rep
+    .local pmc rx688_cur
+    (rx688_cur, rx688_pos, rx688_tgt, $I10) = self."!cursor_start"()
+    rx688_cur."!cursor_debug"("START ", "quote:sym<apos>")
+    .lex unicode:"$\x{a2}", rx688_cur
     .local pmc match
     .lex "$/", match
-    length rx717_eos, rx717_tgt
-    set rx717_off, 0
-    lt $I10, 2, rx717_start
-    sub rx717_off, $I10, 1
-    substr rx717_tgt, rx717_tgt, rx717_off
-  rx717_start:
+    length rx688_eos, rx688_tgt
+    set rx688_off, 0
+    lt $I10, 2, rx688_start
+    sub rx688_off, $I10, 1
+    substr rx688_tgt, rx688_tgt, rx688_off
+  rx688_start:
 .annotate "line", 356
   # rx enumcharlist negate=0 zerowidth
-    ge rx717_pos, rx717_eos, rx717_fail
-    sub $I10, rx717_pos, rx717_off
-    substr $S10, rx717_tgt, $I10, 1
-    index $I11, "<", $S10
-    lt $I11, 0, rx717_fail
+    ge rx688_pos, rx688_eos, rx688_fail
+    sub $I10, rx688_pos, rx688_off
+    substr $S10, rx688_tgt, $I10, 1
+    index $I11, "'", $S10
+    lt $I11, 0, rx688_fail
   # rx subrule "quote_EXPR" subtype=capture negate=
-    rx717_cur."!cursor_pos"(rx717_pos)
-    $P10 = rx717_cur."quote_EXPR"(":q", ":w")
-    unless $P10, rx717_fail
-    rx717_cur."!mark_push"(0, -1, 0, $P10)
+    rx688_cur."!cursor_pos"(rx688_pos)
+    $P10 = rx688_cur."quote_EXPR"(":q")
+    unless $P10, rx688_fail
+    rx688_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("quote_EXPR")
-    rx717_pos = $P10."pos"()
+    rx688_pos = $P10."pos"()
   # rx pass
-    rx717_cur."!cursor_pass"(rx717_pos, "circumfix:sym<ang>")
-    rx717_cur."!cursor_debug"("PASS  ", "circumfix:sym<ang>", " at pos=", rx717_pos)
-    .return (rx717_cur)
-  rx717_fail:
+    rx688_cur."!cursor_pass"(rx688_pos, "quote:sym<apos>")
+    rx688_cur."!cursor_debug"("PASS  ", "quote:sym<apos>", " at pos=", rx688_pos)
+    .return (rx688_cur)
+  rx688_fail:
 .annotate "line", 4
-    (rx717_rep, rx717_pos, $I10, $P10) = rx717_cur."!mark_fail"(0)
-    lt rx717_pos, -1, rx717_done
-    eq rx717_pos, -1, rx717_fail
+    (rx688_rep, rx688_pos, $I10, $P10) = rx688_cur."!mark_fail"(0)
+    lt rx688_pos, -1, rx688_done
+    eq rx688_pos, -1, rx688_fail
     jump $I10
-  rx717_done:
-    rx717_cur."!cursor_fail"()
-    rx717_cur."!cursor_debug"("FAIL  ", "circumfix:sym<ang>")
-    .return (rx717_cur)
+  rx688_done:
+    rx688_cur."!cursor_fail"()
+    rx688_cur."!cursor_debug"("FAIL  ", "quote:sym<apos>")
+    .return (rx688_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__circumfix:sym<ang>"  :subid("195_1258424429.0004") :method
+.sub "!PREFIX__quote:sym<apos>"  :subid("178_1258533478.31768") :method
 .annotate "line", 4
-    new $P719, "ResizablePMCArray"
-    push $P719, "<"
-    .return ($P719)
+    new $P690, "ResizablePMCArray"
+    push $P690, "'"
+    .return ($P690)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "circumfix:sym<{ }>"  :subid("196_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "quote:sym<dblq>"  :subid("179_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx721_tgt
-    .local int rx721_pos
-    .local int rx721_off
-    .local int rx721_eos
-    .local int rx721_rep
-    .local pmc rx721_cur
-    (rx721_cur, rx721_pos, rx721_tgt, $I10) = self."!cursor_start"()
-    rx721_cur."!cursor_debug"("START ", "circumfix:sym<{ }>")
-    .lex unicode:"$\x{a2}", rx721_cur
+    .local string rx692_tgt
+    .local int rx692_pos
+    .local int rx692_off
+    .local int rx692_eos
+    .local int rx692_rep
+    .local pmc rx692_cur
+    (rx692_cur, rx692_pos, rx692_tgt, $I10) = self."!cursor_start"()
+    rx692_cur."!cursor_debug"("START ", "quote:sym<dblq>")
+    .lex unicode:"$\x{a2}", rx692_cur
     .local pmc match
     .lex "$/", match
-    length rx721_eos, rx721_tgt
-    set rx721_off, 0
-    lt $I10, 2, rx721_start
-    sub rx721_off, $I10, 1
-    substr rx721_tgt, rx721_tgt, rx721_off
-  rx721_start:
+    length rx692_eos, rx692_tgt
+    set rx692_off, 0
+    lt $I10, 2, rx692_start
+    sub rx692_off, $I10, 1
+    substr rx692_tgt, rx692_tgt, rx692_off
+  rx692_start:
 .annotate "line", 357
   # rx enumcharlist negate=0 zerowidth
-    ge rx721_pos, rx721_eos, rx721_fail
-    sub $I10, rx721_pos, rx721_off
-    substr $S10, rx721_tgt, $I10, 1
-    index $I11, "{", $S10
-    lt $I11, 0, rx721_fail
-  # rx subrule "pblock" subtype=capture negate=
-    rx721_cur."!cursor_pos"(rx721_pos)
-    $P10 = rx721_cur."pblock"()
-    unless $P10, rx721_fail
-    rx721_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("pblock")
-    rx721_pos = $P10."pos"()
+    ge rx692_pos, rx692_eos, rx692_fail
+    sub $I10, rx692_pos, rx692_off
+    substr $S10, rx692_tgt, $I10, 1
+    index $I11, "\"", $S10
+    lt $I11, 0, rx692_fail
+  # rx subrule "quote_EXPR" subtype=capture negate=
+    rx692_cur."!cursor_pos"(rx692_pos)
+    $P10 = rx692_cur."quote_EXPR"(":qq")
+    unless $P10, rx692_fail
+    rx692_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("quote_EXPR")
+    rx692_pos = $P10."pos"()
   # rx pass
-    rx721_cur."!cursor_pass"(rx721_pos, "circumfix:sym<{ }>")
-    rx721_cur."!cursor_debug"("PASS  ", "circumfix:sym<{ }>", " at pos=", rx721_pos)
-    .return (rx721_cur)
-  rx721_fail:
+    rx692_cur."!cursor_pass"(rx692_pos, "quote:sym<dblq>")
+    rx692_cur."!cursor_debug"("PASS  ", "quote:sym<dblq>", " at pos=", rx692_pos)
+    .return (rx692_cur)
+  rx692_fail:
 .annotate "line", 4
-    (rx721_rep, rx721_pos, $I10, $P10) = rx721_cur."!mark_fail"(0)
-    lt rx721_pos, -1, rx721_done
-    eq rx721_pos, -1, rx721_fail
+    (rx692_rep, rx692_pos, $I10, $P10) = rx692_cur."!mark_fail"(0)
+    lt rx692_pos, -1, rx692_done
+    eq rx692_pos, -1, rx692_fail
     jump $I10
-  rx721_done:
-    rx721_cur."!cursor_fail"()
-    rx721_cur."!cursor_debug"("FAIL  ", "circumfix:sym<{ }>")
-    .return (rx721_cur)
+  rx692_done:
+    rx692_cur."!cursor_fail"()
+    rx692_cur."!cursor_debug"("FAIL  ", "quote:sym<dblq>")
+    .return (rx692_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__circumfix:sym<{ }>"  :subid("197_1258424429.0004") :method
+.sub "!PREFIX__quote:sym<dblq>"  :subid("180_1258533478.31768") :method
 .annotate "line", 4
-    new $P723, "ResizablePMCArray"
-    push $P723, "{"
-    .return ($P723)
+    new $P694, "ResizablePMCArray"
+    push $P694, "\""
+    .return ($P694)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "circumfix:sym<sigil>"  :subid("198_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "quote:sym<q>"  :subid("181_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx725_tgt
-    .local int rx725_pos
-    .local int rx725_off
-    .local int rx725_eos
-    .local int rx725_rep
-    .local pmc rx725_cur
-    (rx725_cur, rx725_pos, rx725_tgt, $I10) = self."!cursor_start"()
-    rx725_cur."!cursor_debug"("START ", "circumfix:sym<sigil>")
-    .lex unicode:"$\x{a2}", rx725_cur
+    .local string rx696_tgt
+    .local int rx696_pos
+    .local int rx696_off
+    .local int rx696_eos
+    .local int rx696_rep
+    .local pmc rx696_cur
+    (rx696_cur, rx696_pos, rx696_tgt, $I10) = self."!cursor_start"()
+    rx696_cur."!cursor_debug"("START ", "quote:sym<q>")
+    .lex unicode:"$\x{a2}", rx696_cur
     .local pmc match
     .lex "$/", match
-    length rx725_eos, rx725_tgt
-    set rx725_off, 0
-    lt $I10, 2, rx725_start
-    sub rx725_off, $I10, 1
-    substr rx725_tgt, rx725_tgt, rx725_off
-  rx725_start:
+    length rx696_eos, rx696_tgt
+    set rx696_off, 0
+    lt $I10, 2, rx696_start
+    sub rx696_off, $I10, 1
+    substr rx696_tgt, rx696_tgt, rx696_off
+  rx696_start:
 .annotate "line", 358
-  # rx subrule "sigil" subtype=capture negate=
-    rx725_cur."!cursor_pos"(rx725_pos)
-    $P10 = rx725_cur."sigil"()
-    unless $P10, rx725_fail
-    rx725_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sigil")
-    rx725_pos = $P10."pos"()
-  # rx literal  "("
-    add $I11, rx725_pos, 1
-    gt $I11, rx725_eos, rx725_fail
-    sub $I11, rx725_pos, rx725_off
-    substr $S10, rx725_tgt, $I11, 1
-    ne $S10, "(", rx725_fail
-    add rx725_pos, 1
-  # rx subrule "semilist" subtype=capture negate=
-    rx725_cur."!cursor_pos"(rx725_pos)
-    $P10 = rx725_cur."semilist"()
-    unless $P10, rx725_fail
-    rx725_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("semilist")
-    rx725_pos = $P10."pos"()
-  alt729_0:
-    set_addr $I10, alt729_1
-    rx725_cur."!mark_push"(0, rx725_pos, $I10)
-  # rx literal  ")"
-    add $I11, rx725_pos, 1
-    gt $I11, rx725_eos, rx725_fail
-    sub $I11, rx725_pos, rx725_off
-    substr $S10, rx725_tgt, $I11, 1
-    ne $S10, ")", rx725_fail
-    add rx725_pos, 1
-    goto alt729_end
-  alt729_1:
-  # rx subrule "FAILGOAL" subtype=method negate=
-    rx725_cur."!cursor_pos"(rx725_pos)
-    $P10 = rx725_cur."FAILGOAL"("')'")
-    unless $P10, rx725_fail
-    rx725_pos = $P10."pos"()
-  alt729_end:
+  # rx literal  "q"
+    add $I11, rx696_pos, 1
+    gt $I11, rx696_eos, rx696_fail
+    sub $I11, rx696_pos, rx696_off
+    substr $S10, rx696_tgt, $I11, 1
+    ne $S10, "q", rx696_fail
+    add rx696_pos, 1
+  # rx enumcharlist negate=1 zerowidth
+    ge rx696_pos, rx696_eos, rx696_fail
+    sub $I10, rx696_pos, rx696_off
+    substr $S10, rx696_tgt, $I10, 1
+    index $I11, "(", $S10
+    ge $I11, 0, rx696_fail
+  # rx subrule "ws" subtype=method negate=
+    rx696_cur."!cursor_pos"(rx696_pos)
+    $P10 = rx696_cur."ws"()
+    unless $P10, rx696_fail
+    rx696_pos = $P10."pos"()
+  # rx subrule "quote_EXPR" subtype=capture negate=
+    rx696_cur."!cursor_pos"(rx696_pos)
+    $P10 = rx696_cur."quote_EXPR"(":q")
+    unless $P10, rx696_fail
+    rx696_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("quote_EXPR")
+    rx696_pos = $P10."pos"()
   # rx pass
-    rx725_cur."!cursor_pass"(rx725_pos, "circumfix:sym<sigil>")
-    rx725_cur."!cursor_debug"("PASS  ", "circumfix:sym<sigil>", " at pos=", rx725_pos)
-    .return (rx725_cur)
-  rx725_fail:
+    rx696_cur."!cursor_pass"(rx696_pos, "quote:sym<q>")
+    rx696_cur."!cursor_debug"("PASS  ", "quote:sym<q>", " at pos=", rx696_pos)
+    .return (rx696_cur)
+  rx696_fail:
 .annotate "line", 4
-    (rx725_rep, rx725_pos, $I10, $P10) = rx725_cur."!mark_fail"(0)
-    lt rx725_pos, -1, rx725_done
-    eq rx725_pos, -1, rx725_fail
+    (rx696_rep, rx696_pos, $I10, $P10) = rx696_cur."!mark_fail"(0)
+    lt rx696_pos, -1, rx696_done
+    eq rx696_pos, -1, rx696_fail
     jump $I10
-  rx725_done:
-    rx725_cur."!cursor_fail"()
-    rx725_cur."!cursor_debug"("FAIL  ", "circumfix:sym<sigil>")
-    .return (rx725_cur)
+  rx696_done:
+    rx696_cur."!cursor_fail"()
+    rx696_cur."!cursor_debug"("FAIL  ", "quote:sym<q>")
+    .return (rx696_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__circumfix:sym<sigil>"  :subid("199_1258424429.0004") :method
+.sub "!PREFIX__quote:sym<q>"  :subid("182_1258533478.31768") :method
 .annotate "line", 4
-    $P727 = self."!PREFIX__!subrule"("sigil", "")
-    new $P728, "ResizablePMCArray"
-    push $P728, $P727
-    .return ($P728)
+    $P698 = self."!PREFIX__!subrule"("", "q")
+    new $P699, "ResizablePMCArray"
+    push $P699, $P698
+    .return ($P699)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "semilist"  :subid("200_1258424429.0004") :method :outer("11_1258424429.0004")
+.sub "quote:sym<qq>"  :subid("183_1258533478.31768") :method :outer("11_1258533478.31768")
 .annotate "line", 4
-    .local string rx732_tgt
-    .local int rx732_pos
-    .local int rx732_off
-    .local int rx732_eos
-    .local int rx732_rep
-    .local pmc rx732_cur
-    (rx732_cur, rx732_pos, rx732_tgt, $I10) = self."!cursor_start"()
-    rx732_cur."!cursor_debug"("START ", "semilist")
-    .lex unicode:"$\x{a2}", rx732_cur
+    .local string rx701_tgt
+    .local int rx701_pos
+    .local int rx701_off
+    .local int rx701_eos
+    .local int rx701_rep
+    .local pmc rx701_cur
+    (rx701_cur, rx701_pos, rx701_tgt, $I10) = self."!cursor_start"()
+    rx701_cur."!cursor_debug"("START ", "quote:sym<qq>")
+    .lex unicode:"$\x{a2}", rx701_cur
     .local pmc match
     .lex "$/", match
-    length rx732_eos, rx732_tgt
-    set rx732_off, 0
-    lt $I10, 2, rx732_start
-    sub rx732_off, $I10, 1
-    substr rx732_tgt, rx732_tgt, rx732_off
-  rx732_start:
-.annotate "line", 360
+    length rx701_eos, rx701_tgt
+    set rx701_off, 0
+    lt $I10, 2, rx701_start
+    sub rx701_off, $I10, 1
+    substr rx701_tgt, rx701_tgt, rx701_off
+  rx701_start:
+.annotate "line", 359
+  # rx literal  "qq"
+    add $I11, rx701_pos, 2
+    gt $I11, rx701_eos, rx701_fail
+    sub $I11, rx701_pos, rx701_off
+    substr $S10, rx701_tgt, $I11, 2
+    ne $S10, "qq", rx701_fail
+    add rx701_pos, 2
+  # rx enumcharlist negate=1 zerowidth
+    ge rx701_pos, rx701_eos, rx701_fail
+    sub $I10, rx701_pos, rx701_off
+    substr $S10, rx701_tgt, $I10, 1
+    index $I11, "(", $S10
+    ge $I11, 0, rx701_fail
   # rx subrule "ws" subtype=method negate=
-    rx732_cur."!cursor_pos"(rx732_pos)
-    $P10 = rx732_cur."ws"()
-    unless $P10, rx732_fail
-    rx732_pos = $P10."pos"()
-  # rx subrule "statement" subtype=capture negate=
-    rx732_cur."!cursor_pos"(rx732_pos)
-    $P10 = rx732_cur."statement"()
-    unless $P10, rx732_fail
-    rx732_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("statement")
-    rx732_pos = $P10."pos"()
-  # rx subrule "ws" subtype=method negate=
-    rx732_cur."!cursor_pos"(rx732_pos)
-    $P10 = rx732_cur."ws"()
-    unless $P10, rx732_fail
-    rx732_pos = $P10."pos"()
+    rx701_cur."!cursor_pos"(rx701_pos)
+    $P10 = rx701_cur."ws"()
+    unless $P10, rx701_fail
+    rx701_pos = $P10."pos"()
+  # rx subrule "quote_EXPR" subtype=capture negate=
+    rx701_cur."!cursor_pos"(rx701_pos)
+    $P10 = rx701_cur."quote_EXPR"(":qq")
+    unless $P10, rx701_fail
+    rx701_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("quote_EXPR")
+    rx701_pos = $P10."pos"()
   # rx pass
-    rx732_cur."!cursor_pass"(rx732_pos, "semilist")
-    rx732_cur."!cursor_debug"("PASS  ", "semilist", " at pos=", rx732_pos)
-    .return (rx732_cur)
-  rx732_fail:
+    rx701_cur."!cursor_pass"(rx701_pos, "quote:sym<qq>")
+    rx701_cur."!cursor_debug"("PASS  ", "quote:sym<qq>", " at pos=", rx701_pos)
+    .return (rx701_cur)
+  rx701_fail:
 .annotate "line", 4
-    (rx732_rep, rx732_pos, $I10, $P10) = rx732_cur."!mark_fail"(0)
-    lt rx732_pos, -1, rx732_done
-    eq rx732_pos, -1, rx732_fail
+    (rx701_rep, rx701_pos, $I10, $P10) = rx701_cur."!mark_fail"(0)
+    lt rx701_pos, -1, rx701_done
+    eq rx701_pos, -1, rx701_fail
     jump $I10
-  rx732_done:
-    rx732_cur."!cursor_fail"()
-    rx732_cur."!cursor_debug"("FAIL  ", "semilist")
-    .return (rx732_cur)
+  rx701_done:
+    rx701_cur."!cursor_fail"()
+    rx701_cur."!cursor_debug"("FAIL  ", "quote:sym<qq>")
+    .return (rx701_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__semilist"  :subid("201_1258424429.0004") :method
+.sub "!PREFIX__quote:sym<qq>"  :subid("184_1258533478.31768") :method
 .annotate "line", 4
+    $P703 = self."!PREFIX__!subrule"("", "qq")
+    new $P704, "ResizablePMCArray"
+    push $P704, $P703
+    .return ($P704)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "quote:sym<Q>"  :subid("185_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx706_tgt
+    .local int rx706_pos
+    .local int rx706_off
+    .local int rx706_eos
+    .local int rx706_rep
+    .local pmc rx706_cur
+    (rx706_cur, rx706_pos, rx706_tgt, $I10) = self."!cursor_start"()
+    rx706_cur."!cursor_debug"("START ", "quote:sym<Q>")
+    .lex unicode:"$\x{a2}", rx706_cur
+    .local pmc match
+    .lex "$/", match
+    length rx706_eos, rx706_tgt
+    set rx706_off, 0
+    lt $I10, 2, rx706_start
+    sub rx706_off, $I10, 1
+    substr rx706_tgt, rx706_tgt, rx706_off
+  rx706_start:
+.annotate "line", 360
+  # rx literal  "Q"
+    add $I11, rx706_pos, 1
+    gt $I11, rx706_eos, rx706_fail
+    sub $I11, rx706_pos, rx706_off
+    substr $S10, rx706_tgt, $I11, 1
+    ne $S10, "Q", rx706_fail
+    add rx706_pos, 1
+  # rx enumcharlist negate=1 zerowidth
+    ge rx706_pos, rx706_eos, rx706_fail
+    sub $I10, rx706_pos, rx706_off
+    substr $S10, rx706_tgt, $I10, 1
+    index $I11, "(", $S10
+    ge $I11, 0, rx706_fail
+  # rx subrule "ws" subtype=method negate=
+    rx706_cur."!cursor_pos"(rx706_pos)
+    $P10 = rx706_cur."ws"()
+    unless $P10, rx706_fail
+    rx706_pos = $P10."pos"()
+  # rx subrule "quote_EXPR" subtype=capture negate=
+    rx706_cur."!cursor_pos"(rx706_pos)
+    $P10 = rx706_cur."quote_EXPR"()
+    unless $P10, rx706_fail
+    rx706_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("quote_EXPR")
+    rx706_pos = $P10."pos"()
+  # rx pass
+    rx706_cur."!cursor_pass"(rx706_pos, "quote:sym<Q>")
+    rx706_cur."!cursor_debug"("PASS  ", "quote:sym<Q>", " at pos=", rx706_pos)
+    .return (rx706_cur)
+  rx706_fail:
+.annotate "line", 4
+    (rx706_rep, rx706_pos, $I10, $P10) = rx706_cur."!mark_fail"(0)
+    lt rx706_pos, -1, rx706_done
+    eq rx706_pos, -1, rx706_fail
+    jump $I10
+  rx706_done:
+    rx706_cur."!cursor_fail"()
+    rx706_cur."!cursor_debug"("FAIL  ", "quote:sym<Q>")
+    .return (rx706_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__quote:sym<Q>"  :subid("186_1258533478.31768") :method
+.annotate "line", 4
+    $P708 = self."!PREFIX__!subrule"("", "Q")
+    new $P709, "ResizablePMCArray"
+    push $P709, $P708
+    .return ($P709)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "quote:sym<Q:PIR>"  :subid("187_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx711_tgt
+    .local int rx711_pos
+    .local int rx711_off
+    .local int rx711_eos
+    .local int rx711_rep
+    .local pmc rx711_cur
+    (rx711_cur, rx711_pos, rx711_tgt, $I10) = self."!cursor_start"()
+    rx711_cur."!cursor_debug"("START ", "quote:sym<Q:PIR>")
+    .lex unicode:"$\x{a2}", rx711_cur
+    .local pmc match
+    .lex "$/", match
+    length rx711_eos, rx711_tgt
+    set rx711_off, 0
+    lt $I10, 2, rx711_start
+    sub rx711_off, $I10, 1
+    substr rx711_tgt, rx711_tgt, rx711_off
+  rx711_start:
+.annotate "line", 361
+  # rx literal  "Q:PIR"
+    add $I11, rx711_pos, 5
+    gt $I11, rx711_eos, rx711_fail
+    sub $I11, rx711_pos, rx711_off
+    substr $S10, rx711_tgt, $I11, 5
+    ne $S10, "Q:PIR", rx711_fail
+    add rx711_pos, 5
+  # rx subrule "ws" subtype=method negate=
+    rx711_cur."!cursor_pos"(rx711_pos)
+    $P10 = rx711_cur."ws"()
+    unless $P10, rx711_fail
+    rx711_pos = $P10."pos"()
+  # rx subrule "quote_EXPR" subtype=capture negate=
+    rx711_cur."!cursor_pos"(rx711_pos)
+    $P10 = rx711_cur."quote_EXPR"()
+    unless $P10, rx711_fail
+    rx711_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("quote_EXPR")
+    rx711_pos = $P10."pos"()
+  # rx pass
+    rx711_cur."!cursor_pass"(rx711_pos, "quote:sym<Q:PIR>")
+    rx711_cur."!cursor_debug"("PASS  ", "quote:sym<Q:PIR>", " at pos=", rx711_pos)
+    .return (rx711_cur)
+  rx711_fail:
+.annotate "line", 4
+    (rx711_rep, rx711_pos, $I10, $P10) = rx711_cur."!mark_fail"(0)
+    lt rx711_pos, -1, rx711_done
+    eq rx711_pos, -1, rx711_fail
+    jump $I10
+  rx711_done:
+    rx711_cur."!cursor_fail"()
+    rx711_cur."!cursor_debug"("FAIL  ", "quote:sym<Q:PIR>")
+    .return (rx711_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__quote:sym<Q:PIR>"  :subid("188_1258533478.31768") :method
+.annotate "line", 4
+    $P713 = self."!PREFIX__!subrule"("", "Q:PIR")
+    new $P714, "ResizablePMCArray"
+    push $P714, $P713
+    .return ($P714)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "quote_escape:sym<$>"  :subid("189_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx716_tgt
+    .local int rx716_pos
+    .local int rx716_off
+    .local int rx716_eos
+    .local int rx716_rep
+    .local pmc rx716_cur
+    (rx716_cur, rx716_pos, rx716_tgt, $I10) = self."!cursor_start"()
+    rx716_cur."!cursor_debug"("START ", "quote_escape:sym<$>")
+    .lex unicode:"$\x{a2}", rx716_cur
+    .local pmc match
+    .lex "$/", match
+    length rx716_eos, rx716_tgt
+    set rx716_off, 0
+    lt $I10, 2, rx716_start
+    sub rx716_off, $I10, 1
+    substr rx716_tgt, rx716_tgt, rx716_off
+  rx716_start:
+.annotate "line", 363
+  # rx enumcharlist negate=0 zerowidth
+    ge rx716_pos, rx716_eos, rx716_fail
+    sub $I10, rx716_pos, rx716_off
+    substr $S10, rx716_tgt, $I10, 1
+    index $I11, "$", $S10
+    lt $I11, 0, rx716_fail
+  # rx subrule "quotemod_check" subtype=zerowidth negate=
+    rx716_cur."!cursor_pos"(rx716_pos)
+    $P10 = rx716_cur."quotemod_check"("s")
+    unless $P10, rx716_fail
+  # rx subrule "variable" subtype=capture negate=
+    rx716_cur."!cursor_pos"(rx716_pos)
+    $P10 = rx716_cur."variable"()
+    unless $P10, rx716_fail
+    rx716_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("variable")
+    rx716_pos = $P10."pos"()
+  # rx pass
+    rx716_cur."!cursor_pass"(rx716_pos, "quote_escape:sym<$>")
+    rx716_cur."!cursor_debug"("PASS  ", "quote_escape:sym<$>", " at pos=", rx716_pos)
+    .return (rx716_cur)
+  rx716_fail:
+.annotate "line", 4
+    (rx716_rep, rx716_pos, $I10, $P10) = rx716_cur."!mark_fail"(0)
+    lt rx716_pos, -1, rx716_done
+    eq rx716_pos, -1, rx716_fail
+    jump $I10
+  rx716_done:
+    rx716_cur."!cursor_fail"()
+    rx716_cur."!cursor_debug"("FAIL  ", "quote_escape:sym<$>")
+    .return (rx716_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__quote_escape:sym<$>"  :subid("190_1258533478.31768") :method
+.annotate "line", 4
+    new $P718, "ResizablePMCArray"
+    push $P718, "$"
+    .return ($P718)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "quote_escape:sym<{ }>"  :subid("191_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx720_tgt
+    .local int rx720_pos
+    .local int rx720_off
+    .local int rx720_eos
+    .local int rx720_rep
+    .local pmc rx720_cur
+    (rx720_cur, rx720_pos, rx720_tgt, $I10) = self."!cursor_start"()
+    rx720_cur."!cursor_debug"("START ", "quote_escape:sym<{ }>")
+    .lex unicode:"$\x{a2}", rx720_cur
+    .local pmc match
+    .lex "$/", match
+    length rx720_eos, rx720_tgt
+    set rx720_off, 0
+    lt $I10, 2, rx720_start
+    sub rx720_off, $I10, 1
+    substr rx720_tgt, rx720_tgt, rx720_off
+  rx720_start:
+.annotate "line", 364
+  # rx enumcharlist negate=0 zerowidth
+    ge rx720_pos, rx720_eos, rx720_fail
+    sub $I10, rx720_pos, rx720_off
+    substr $S10, rx720_tgt, $I10, 1
+    index $I11, "{", $S10
+    lt $I11, 0, rx720_fail
+  # rx subrule "quotemod_check" subtype=zerowidth negate=
+    rx720_cur."!cursor_pos"(rx720_pos)
+    $P10 = rx720_cur."quotemod_check"("c")
+    unless $P10, rx720_fail
+  # rx subrule "block" subtype=capture negate=
+    rx720_cur."!cursor_pos"(rx720_pos)
+    $P10 = rx720_cur."block"()
+    unless $P10, rx720_fail
+    rx720_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("block")
+    rx720_pos = $P10."pos"()
+  # rx pass
+    rx720_cur."!cursor_pass"(rx720_pos, "quote_escape:sym<{ }>")
+    rx720_cur."!cursor_debug"("PASS  ", "quote_escape:sym<{ }>", " at pos=", rx720_pos)
+    .return (rx720_cur)
+  rx720_fail:
+.annotate "line", 4
+    (rx720_rep, rx720_pos, $I10, $P10) = rx720_cur."!mark_fail"(0)
+    lt rx720_pos, -1, rx720_done
+    eq rx720_pos, -1, rx720_fail
+    jump $I10
+  rx720_done:
+    rx720_cur."!cursor_fail"()
+    rx720_cur."!cursor_debug"("FAIL  ", "quote_escape:sym<{ }>")
+    .return (rx720_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__quote_escape:sym<{ }>"  :subid("192_1258533478.31768") :method
+.annotate "line", 4
+    new $P722, "ResizablePMCArray"
+    push $P722, "{"
+    .return ($P722)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "circumfix:sym<( )>"  :subid("193_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx724_tgt
+    .local int rx724_pos
+    .local int rx724_off
+    .local int rx724_eos
+    .local int rx724_rep
+    .local pmc rx724_cur
+    (rx724_cur, rx724_pos, rx724_tgt, $I10) = self."!cursor_start"()
+    rx724_cur."!cursor_debug"("START ", "circumfix:sym<( )>")
+    rx724_cur."!cursor_caparray"("EXPR")
+    .lex unicode:"$\x{a2}", rx724_cur
+    .local pmc match
+    .lex "$/", match
+    length rx724_eos, rx724_tgt
+    set rx724_off, 0
+    lt $I10, 2, rx724_start
+    sub rx724_off, $I10, 1
+    substr rx724_tgt, rx724_tgt, rx724_off
+  rx724_start:
+.annotate "line", 366
+  # rx literal  "("
+    add $I11, rx724_pos, 1
+    gt $I11, rx724_eos, rx724_fail
+    sub $I11, rx724_pos, rx724_off
+    substr $S10, rx724_tgt, $I11, 1
+    ne $S10, "(", rx724_fail
+    add rx724_pos, 1
+  # rx subrule "ws" subtype=method negate=
+    rx724_cur."!cursor_pos"(rx724_pos)
+    $P10 = rx724_cur."ws"()
+    unless $P10, rx724_fail
+    rx724_pos = $P10."pos"()
+  # rx rxquantr728 ** 0..1
+    set_addr $I729, rxquantr728_done
+    rx724_cur."!mark_push"(0, rx724_pos, $I729)
+  rxquantr728_loop:
+  # rx subrule "EXPR" subtype=capture negate=
+    rx724_cur."!cursor_pos"(rx724_pos)
+    $P10 = rx724_cur."EXPR"()
+    unless $P10, rx724_fail
+    rx724_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("EXPR")
+    rx724_pos = $P10."pos"()
+    (rx724_rep) = rx724_cur."!mark_commit"($I729)
+  rxquantr728_done:
+  # rx literal  ")"
+    add $I11, rx724_pos, 1
+    gt $I11, rx724_eos, rx724_fail
+    sub $I11, rx724_pos, rx724_off
+    substr $S10, rx724_tgt, $I11, 1
+    ne $S10, ")", rx724_fail
+    add rx724_pos, 1
+  # rx pass
+    rx724_cur."!cursor_pass"(rx724_pos, "circumfix:sym<( )>")
+    rx724_cur."!cursor_debug"("PASS  ", "circumfix:sym<( )>", " at pos=", rx724_pos)
+    .return (rx724_cur)
+  rx724_fail:
+.annotate "line", 4
+    (rx724_rep, rx724_pos, $I10, $P10) = rx724_cur."!mark_fail"(0)
+    lt rx724_pos, -1, rx724_done
+    eq rx724_pos, -1, rx724_fail
+    jump $I10
+  rx724_done:
+    rx724_cur."!cursor_fail"()
+    rx724_cur."!cursor_debug"("FAIL  ", "circumfix:sym<( )>")
+    .return (rx724_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__circumfix:sym<( )>"  :subid("194_1258533478.31768") :method
+.annotate "line", 4
+    $P726 = self."!PREFIX__!subrule"("", "(")
+    new $P727, "ResizablePMCArray"
+    push $P727, $P726
+    .return ($P727)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "circumfix:sym<[ ]>"  :subid("195_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx731_tgt
+    .local int rx731_pos
+    .local int rx731_off
+    .local int rx731_eos
+    .local int rx731_rep
+    .local pmc rx731_cur
+    (rx731_cur, rx731_pos, rx731_tgt, $I10) = self."!cursor_start"()
+    rx731_cur."!cursor_debug"("START ", "circumfix:sym<[ ]>")
+    rx731_cur."!cursor_caparray"("EXPR")
+    .lex unicode:"$\x{a2}", rx731_cur
+    .local pmc match
+    .lex "$/", match
+    length rx731_eos, rx731_tgt
+    set rx731_off, 0
+    lt $I10, 2, rx731_start
+    sub rx731_off, $I10, 1
+    substr rx731_tgt, rx731_tgt, rx731_off
+  rx731_start:
+.annotate "line", 367
+  # rx literal  "["
+    add $I11, rx731_pos, 1
+    gt $I11, rx731_eos, rx731_fail
+    sub $I11, rx731_pos, rx731_off
+    substr $S10, rx731_tgt, $I11, 1
+    ne $S10, "[", rx731_fail
+    add rx731_pos, 1
+  # rx subrule "ws" subtype=method negate=
+    rx731_cur."!cursor_pos"(rx731_pos)
+    $P10 = rx731_cur."ws"()
+    unless $P10, rx731_fail
+    rx731_pos = $P10."pos"()
+  # rx rxquantr735 ** 0..1
+    set_addr $I736, rxquantr735_done
+    rx731_cur."!mark_push"(0, rx731_pos, $I736)
+  rxquantr735_loop:
+  # rx subrule "EXPR" subtype=capture negate=
+    rx731_cur."!cursor_pos"(rx731_pos)
+    $P10 = rx731_cur."EXPR"()
+    unless $P10, rx731_fail
+    rx731_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("EXPR")
+    rx731_pos = $P10."pos"()
+    (rx731_rep) = rx731_cur."!mark_commit"($I736)
+  rxquantr735_done:
+  # rx literal  "]"
+    add $I11, rx731_pos, 1
+    gt $I11, rx731_eos, rx731_fail
+    sub $I11, rx731_pos, rx731_off
+    substr $S10, rx731_tgt, $I11, 1
+    ne $S10, "]", rx731_fail
+    add rx731_pos, 1
+  # rx pass
+    rx731_cur."!cursor_pass"(rx731_pos, "circumfix:sym<[ ]>")
+    rx731_cur."!cursor_debug"("PASS  ", "circumfix:sym<[ ]>", " at pos=", rx731_pos)
+    .return (rx731_cur)
+  rx731_fail:
+.annotate "line", 4
+    (rx731_rep, rx731_pos, $I10, $P10) = rx731_cur."!mark_fail"(0)
+    lt rx731_pos, -1, rx731_done
+    eq rx731_pos, -1, rx731_fail
+    jump $I10
+  rx731_done:
+    rx731_cur."!cursor_fail"()
+    rx731_cur."!cursor_debug"("FAIL  ", "circumfix:sym<[ ]>")
+    .return (rx731_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__circumfix:sym<[ ]>"  :subid("196_1258533478.31768") :method
+.annotate "line", 4
+    $P733 = self."!PREFIX__!subrule"("", "[")
     new $P734, "ResizablePMCArray"
-    push $P734, ""
+    push $P734, $P733
     .return ($P734)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infixish"  :subid("202_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
+.sub "circumfix:sym<ang>"  :subid("197_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
     .local string rx738_tgt
     .local int rx738_pos
     .local int rx738_off
@@ -8723,7 +8733,7 @@ NQP::Compiler - NQP compiler
     .local int rx738_rep
     .local pmc rx738_cur
     (rx738_cur, rx738_pos, rx738_tgt, $I10) = self."!cursor_start"()
-    rx738_cur."!cursor_debug"("START ", "infixish")
+    rx738_cur."!cursor_debug"("START ", "circumfix:sym<ang>")
     .lex unicode:"$\x{a2}", rx738_cur
     .local pmc match
     .lex "$/", match
@@ -8733,48 +8743,50 @@ NQP::Compiler - NQP compiler
     sub rx738_off, $I10, 1
     substr rx738_tgt, rx738_tgt, rx738_off
   rx738_start:
-.annotate "line", 383
-  # rx subrule "infixstopper" subtype=zerowidth negate=1
+.annotate "line", 368
+  # rx enumcharlist negate=0 zerowidth
+    ge rx738_pos, rx738_eos, rx738_fail
+    sub $I10, rx738_pos, rx738_off
+    substr $S10, rx738_tgt, $I10, 1
+    index $I11, "<", $S10
+    lt $I11, 0, rx738_fail
+  # rx subrule "quote_EXPR" subtype=capture negate=
     rx738_cur."!cursor_pos"(rx738_pos)
-    $P10 = rx738_cur."infixstopper"()
-    if $P10, rx738_fail
-  # rx subrule "infix" subtype=capture negate=
-    rx738_cur."!cursor_pos"(rx738_pos)
-    $P10 = rx738_cur."infix"()
+    $P10 = rx738_cur."quote_EXPR"(":q", ":w")
     unless $P10, rx738_fail
     rx738_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("OPER=infix")
+    $P10."!cursor_names"("quote_EXPR")
     rx738_pos = $P10."pos"()
   # rx pass
-    rx738_cur."!cursor_pass"(rx738_pos, "infixish")
-    rx738_cur."!cursor_debug"("PASS  ", "infixish", " at pos=", rx738_pos)
+    rx738_cur."!cursor_pass"(rx738_pos, "circumfix:sym<ang>")
+    rx738_cur."!cursor_debug"("PASS  ", "circumfix:sym<ang>", " at pos=", rx738_pos)
     .return (rx738_cur)
   rx738_fail:
-.annotate "line", 364
+.annotate "line", 4
     (rx738_rep, rx738_pos, $I10, $P10) = rx738_cur."!mark_fail"(0)
     lt rx738_pos, -1, rx738_done
     eq rx738_pos, -1, rx738_fail
     jump $I10
   rx738_done:
     rx738_cur."!cursor_fail"()
-    rx738_cur."!cursor_debug"("FAIL  ", "infixish")
+    rx738_cur."!cursor_debug"("FAIL  ", "circumfix:sym<ang>")
     .return (rx738_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infixish"  :subid("203_1258424429.0004") :method
-.annotate "line", 364
+.sub "!PREFIX__circumfix:sym<ang>"  :subid("198_1258533478.31768") :method
+.annotate "line", 4
     new $P740, "ResizablePMCArray"
-    push $P740, ""
+    push $P740, "<"
     .return ($P740)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infixstopper"  :subid("204_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
+.sub "circumfix:sym<{ }>"  :subid("199_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
     .local string rx742_tgt
     .local int rx742_pos
     .local int rx742_off
@@ -8782,7 +8794,7 @@ NQP::Compiler - NQP compiler
     .local int rx742_rep
     .local pmc rx742_cur
     (rx742_cur, rx742_pos, rx742_tgt, $I10) = self."!cursor_start"()
-    rx742_cur."!cursor_debug"("START ", "infixstopper")
+    rx742_cur."!cursor_debug"("START ", "circumfix:sym<{ }>")
     .lex unicode:"$\x{a2}", rx742_cur
     .local pmc match
     .lex "$/", match
@@ -8792,41 +8804,50 @@ NQP::Compiler - NQP compiler
     sub rx742_off, $I10, 1
     substr rx742_tgt, rx742_tgt, rx742_off
   rx742_start:
-.annotate "line", 384
-  # rx subrule "lambda" subtype=zerowidth negate=
+.annotate "line", 369
+  # rx enumcharlist negate=0 zerowidth
+    ge rx742_pos, rx742_eos, rx742_fail
+    sub $I10, rx742_pos, rx742_off
+    substr $S10, rx742_tgt, $I10, 1
+    index $I11, "{", $S10
+    lt $I11, 0, rx742_fail
+  # rx subrule "pblock" subtype=capture negate=
     rx742_cur."!cursor_pos"(rx742_pos)
-    $P10 = rx742_cur."lambda"()
+    $P10 = rx742_cur."pblock"()
     unless $P10, rx742_fail
+    rx742_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("pblock")
+    rx742_pos = $P10."pos"()
   # rx pass
-    rx742_cur."!cursor_pass"(rx742_pos, "infixstopper")
-    rx742_cur."!cursor_debug"("PASS  ", "infixstopper", " at pos=", rx742_pos)
+    rx742_cur."!cursor_pass"(rx742_pos, "circumfix:sym<{ }>")
+    rx742_cur."!cursor_debug"("PASS  ", "circumfix:sym<{ }>", " at pos=", rx742_pos)
     .return (rx742_cur)
   rx742_fail:
-.annotate "line", 364
+.annotate "line", 4
     (rx742_rep, rx742_pos, $I10, $P10) = rx742_cur."!mark_fail"(0)
     lt rx742_pos, -1, rx742_done
     eq rx742_pos, -1, rx742_fail
     jump $I10
   rx742_done:
     rx742_cur."!cursor_fail"()
-    rx742_cur."!cursor_debug"("FAIL  ", "infixstopper")
+    rx742_cur."!cursor_debug"("FAIL  ", "circumfix:sym<{ }>")
     .return (rx742_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infixstopper"  :subid("205_1258424429.0004") :method
-.annotate "line", 364
+.sub "!PREFIX__circumfix:sym<{ }>"  :subid("200_1258533478.31768") :method
+.annotate "line", 4
     new $P744, "ResizablePMCArray"
-    push $P744, ""
+    push $P744, "{"
     .return ($P744)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "postcircumfix:sym<[ ]>"  :subid("206_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
+.sub "circumfix:sym<sigil>"  :subid("201_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
     .local string rx746_tgt
     .local int rx746_pos
     .local int rx746_off
@@ -8834,7 +8855,7 @@ NQP::Compiler - NQP compiler
     .local int rx746_rep
     .local pmc rx746_cur
     (rx746_cur, rx746_pos, rx746_tgt, $I10) = self."!cursor_start"()
-    rx746_cur."!cursor_debug"("START ", "postcircumfix:sym<[ ]>")
+    rx746_cur."!cursor_debug"("START ", "circumfix:sym<sigil>")
     .lex unicode:"$\x{a2}", rx746_cur
     .local pmc match
     .lex "$/", match
@@ -8844,64 +8865,68 @@ NQP::Compiler - NQP compiler
     sub rx746_off, $I10, 1
     substr rx746_tgt, rx746_tgt, rx746_off
   rx746_start:
-.annotate "line", 387
-  # rx literal  "["
+.annotate "line", 370
+  # rx subrule "sigil" subtype=capture negate=
+    rx746_cur."!cursor_pos"(rx746_pos)
+    $P10 = rx746_cur."sigil"()
+    unless $P10, rx746_fail
+    rx746_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sigil")
+    rx746_pos = $P10."pos"()
+  # rx literal  "("
     add $I11, rx746_pos, 1
     gt $I11, rx746_eos, rx746_fail
     sub $I11, rx746_pos, rx746_off
     substr $S10, rx746_tgt, $I11, 1
-    ne $S10, "[", rx746_fail
+    ne $S10, "(", rx746_fail
     add rx746_pos, 1
-  # rx subrule "ws" subtype=method negate=
+  # rx subrule "semilist" subtype=capture negate=
     rx746_cur."!cursor_pos"(rx746_pos)
-    $P10 = rx746_cur."ws"()
-    unless $P10, rx746_fail
-    rx746_pos = $P10."pos"()
-  # rx subrule "EXPR" subtype=capture negate=
-    rx746_cur."!cursor_pos"(rx746_pos)
-    $P10 = rx746_cur."EXPR"()
+    $P10 = rx746_cur."semilist"()
     unless $P10, rx746_fail
     rx746_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("EXPR")
+    $P10."!cursor_names"("semilist")
     rx746_pos = $P10."pos"()
-  # rx literal  "]"
+  alt750_0:
+    set_addr $I10, alt750_1
+    rx746_cur."!mark_push"(0, rx746_pos, $I10)
+  # rx literal  ")"
     add $I11, rx746_pos, 1
     gt $I11, rx746_eos, rx746_fail
     sub $I11, rx746_pos, rx746_off
     substr $S10, rx746_tgt, $I11, 1
-    ne $S10, "]", rx746_fail
+    ne $S10, ")", rx746_fail
     add rx746_pos, 1
-.annotate "line", 388
-  # rx subrule "O" subtype=capture negate=
+    goto alt750_end
+  alt750_1:
+  # rx subrule "FAILGOAL" subtype=method negate=
     rx746_cur."!cursor_pos"(rx746_pos)
-    $P10 = rx746_cur."O"("%methodop")
+    $P10 = rx746_cur."FAILGOAL"("')'")
     unless $P10, rx746_fail
-    rx746_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("O")
     rx746_pos = $P10."pos"()
-.annotate "line", 386
+  alt750_end:
   # rx pass
-    rx746_cur."!cursor_pass"(rx746_pos, "postcircumfix:sym<[ ]>")
-    rx746_cur."!cursor_debug"("PASS  ", "postcircumfix:sym<[ ]>", " at pos=", rx746_pos)
+    rx746_cur."!cursor_pass"(rx746_pos, "circumfix:sym<sigil>")
+    rx746_cur."!cursor_debug"("PASS  ", "circumfix:sym<sigil>", " at pos=", rx746_pos)
     .return (rx746_cur)
   rx746_fail:
-.annotate "line", 364
+.annotate "line", 4
     (rx746_rep, rx746_pos, $I10, $P10) = rx746_cur."!mark_fail"(0)
     lt rx746_pos, -1, rx746_done
     eq rx746_pos, -1, rx746_fail
     jump $I10
   rx746_done:
     rx746_cur."!cursor_fail"()
-    rx746_cur."!cursor_debug"("FAIL  ", "postcircumfix:sym<[ ]>")
+    rx746_cur."!cursor_debug"("FAIL  ", "circumfix:sym<sigil>")
     .return (rx746_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__postcircumfix:sym<[ ]>"  :subid("207_1258424429.0004") :method
-.annotate "line", 364
-    $P748 = self."!PREFIX__!subrule"("", "[")
+.sub "!PREFIX__circumfix:sym<sigil>"  :subid("202_1258533478.31768") :method
+.annotate "line", 4
+    $P748 = self."!PREFIX__!subrule"("sigil", "")
     new $P749, "ResizablePMCArray"
     push $P749, $P748
     .return ($P749)
@@ -8909,3974 +8934,4234 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "postcircumfix:sym<{ }>"  :subid("208_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx751_tgt
-    .local int rx751_pos
-    .local int rx751_off
-    .local int rx751_eos
-    .local int rx751_rep
-    .local pmc rx751_cur
-    (rx751_cur, rx751_pos, rx751_tgt, $I10) = self."!cursor_start"()
-    rx751_cur."!cursor_debug"("START ", "postcircumfix:sym<{ }>")
-    .lex unicode:"$\x{a2}", rx751_cur
+.sub "semilist"  :subid("203_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 4
+    .local string rx753_tgt
+    .local int rx753_pos
+    .local int rx753_off
+    .local int rx753_eos
+    .local int rx753_rep
+    .local pmc rx753_cur
+    (rx753_cur, rx753_pos, rx753_tgt, $I10) = self."!cursor_start"()
+    rx753_cur."!cursor_debug"("START ", "semilist")
+    .lex unicode:"$\x{a2}", rx753_cur
     .local pmc match
     .lex "$/", match
-    length rx751_eos, rx751_tgt
-    set rx751_off, 0
-    lt $I10, 2, rx751_start
-    sub rx751_off, $I10, 1
-    substr rx751_tgt, rx751_tgt, rx751_off
-  rx751_start:
-.annotate "line", 392
-  # rx literal  "{"
-    add $I11, rx751_pos, 1
-    gt $I11, rx751_eos, rx751_fail
-    sub $I11, rx751_pos, rx751_off
-    substr $S10, rx751_tgt, $I11, 1
-    ne $S10, "{", rx751_fail
-    add rx751_pos, 1
+    length rx753_eos, rx753_tgt
+    set rx753_off, 0
+    lt $I10, 2, rx753_start
+    sub rx753_off, $I10, 1
+    substr rx753_tgt, rx753_tgt, rx753_off
+  rx753_start:
+.annotate "line", 372
   # rx subrule "ws" subtype=method negate=
-    rx751_cur."!cursor_pos"(rx751_pos)
-    $P10 = rx751_cur."ws"()
-    unless $P10, rx751_fail
-    rx751_pos = $P10."pos"()
-  # rx subrule "EXPR" subtype=capture negate=
-    rx751_cur."!cursor_pos"(rx751_pos)
-    $P10 = rx751_cur."EXPR"()
-    unless $P10, rx751_fail
-    rx751_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("EXPR")
-    rx751_pos = $P10."pos"()
-  # rx literal  "}"
-    add $I11, rx751_pos, 1
-    gt $I11, rx751_eos, rx751_fail
-    sub $I11, rx751_pos, rx751_off
-    substr $S10, rx751_tgt, $I11, 1
-    ne $S10, "}", rx751_fail
-    add rx751_pos, 1
-.annotate "line", 393
-  # rx subrule "O" subtype=capture negate=
-    rx751_cur."!cursor_pos"(rx751_pos)
-    $P10 = rx751_cur."O"("%methodop")
-    unless $P10, rx751_fail
-    rx751_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("O")
-    rx751_pos = $P10."pos"()
-.annotate "line", 391
+    rx753_cur."!cursor_pos"(rx753_pos)
+    $P10 = rx753_cur."ws"()
+    unless $P10, rx753_fail
+    rx753_pos = $P10."pos"()
+  # rx subrule "statement" subtype=capture negate=
+    rx753_cur."!cursor_pos"(rx753_pos)
+    $P10 = rx753_cur."statement"()
+    unless $P10, rx753_fail
+    rx753_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("statement")
+    rx753_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx753_cur."!cursor_pos"(rx753_pos)
+    $P10 = rx753_cur."ws"()
+    unless $P10, rx753_fail
+    rx753_pos = $P10."pos"()
   # rx pass
-    rx751_cur."!cursor_pass"(rx751_pos, "postcircumfix:sym<{ }>")
-    rx751_cur."!cursor_debug"("PASS  ", "postcircumfix:sym<{ }>", " at pos=", rx751_pos)
-    .return (rx751_cur)
-  rx751_fail:
-.annotate "line", 364
-    (rx751_rep, rx751_pos, $I10, $P10) = rx751_cur."!mark_fail"(0)
-    lt rx751_pos, -1, rx751_done
-    eq rx751_pos, -1, rx751_fail
+    rx753_cur."!cursor_pass"(rx753_pos, "semilist")
+    rx753_cur."!cursor_debug"("PASS  ", "semilist", " at pos=", rx753_pos)
+    .return (rx753_cur)
+  rx753_fail:
+.annotate "line", 4
+    (rx753_rep, rx753_pos, $I10, $P10) = rx753_cur."!mark_fail"(0)
+    lt rx753_pos, -1, rx753_done
+    eq rx753_pos, -1, rx753_fail
     jump $I10
-  rx751_done:
-    rx751_cur."!cursor_fail"()
-    rx751_cur."!cursor_debug"("FAIL  ", "postcircumfix:sym<{ }>")
-    .return (rx751_cur)
+  rx753_done:
+    rx753_cur."!cursor_fail"()
+    rx753_cur."!cursor_debug"("FAIL  ", "semilist")
+    .return (rx753_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__postcircumfix:sym<{ }>"  :subid("209_1258424429.0004") :method
-.annotate "line", 364
-    $P753 = self."!PREFIX__!subrule"("", "{")
-    new $P754, "ResizablePMCArray"
-    push $P754, $P753
-    .return ($P754)
+.sub "!PREFIX__semilist"  :subid("204_1258533478.31768") :method
+.annotate "line", 4
+    new $P755, "ResizablePMCArray"
+    push $P755, ""
+    .return ($P755)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "postcircumfix:sym<ang>"  :subid("210_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx756_tgt
-    .local int rx756_pos
-    .local int rx756_off
-    .local int rx756_eos
-    .local int rx756_rep
-    .local pmc rx756_cur
-    (rx756_cur, rx756_pos, rx756_tgt, $I10) = self."!cursor_start"()
-    rx756_cur."!cursor_debug"("START ", "postcircumfix:sym<ang>")
-    .lex unicode:"$\x{a2}", rx756_cur
+.sub "infixish"  :subid("205_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx759_tgt
+    .local int rx759_pos
+    .local int rx759_off
+    .local int rx759_eos
+    .local int rx759_rep
+    .local pmc rx759_cur
+    (rx759_cur, rx759_pos, rx759_tgt, $I10) = self."!cursor_start"()
+    rx759_cur."!cursor_debug"("START ", "infixish")
+    .lex unicode:"$\x{a2}", rx759_cur
     .local pmc match
     .lex "$/", match
-    length rx756_eos, rx756_tgt
-    set rx756_off, 0
-    lt $I10, 2, rx756_start
-    sub rx756_off, $I10, 1
-    substr rx756_tgt, rx756_tgt, rx756_off
-  rx756_start:
-.annotate "line", 397
-  # rx enumcharlist negate=0 zerowidth
-    ge rx756_pos, rx756_eos, rx756_fail
-    sub $I10, rx756_pos, rx756_off
-    substr $S10, rx756_tgt, $I10, 1
-    index $I11, "<", $S10
-    lt $I11, 0, rx756_fail
-  # rx subrule "quote_EXPR" subtype=capture negate=
-    rx756_cur."!cursor_pos"(rx756_pos)
-    $P10 = rx756_cur."quote_EXPR"(":q")
-    unless $P10, rx756_fail
-    rx756_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("quote_EXPR")
-    rx756_pos = $P10."pos"()
-.annotate "line", 398
-  # rx subrule "O" subtype=capture negate=
-    rx756_cur."!cursor_pos"(rx756_pos)
-    $P10 = rx756_cur."O"("%methodop")
-    unless $P10, rx756_fail
-    rx756_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("O")
-    rx756_pos = $P10."pos"()
+    length rx759_eos, rx759_tgt
+    set rx759_off, 0
+    lt $I10, 2, rx759_start
+    sub rx759_off, $I10, 1
+    substr rx759_tgt, rx759_tgt, rx759_off
+  rx759_start:
+.annotate "line", 395
+  # rx subrule "infixstopper" subtype=zerowidth negate=1
+    rx759_cur."!cursor_pos"(rx759_pos)
+    $P10 = rx759_cur."infixstopper"()
+    if $P10, rx759_fail
+  # rx subrule "infix" subtype=capture negate=
+    rx759_cur."!cursor_pos"(rx759_pos)
+    $P10 = rx759_cur."infix"()
+    unless $P10, rx759_fail
+    rx759_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("OPER=infix")
+    rx759_pos = $P10."pos"()
+  # rx pass
+    rx759_cur."!cursor_pass"(rx759_pos, "infixish")
+    rx759_cur."!cursor_debug"("PASS  ", "infixish", " at pos=", rx759_pos)
+    .return (rx759_cur)
+  rx759_fail:
+.annotate "line", 376
+    (rx759_rep, rx759_pos, $I10, $P10) = rx759_cur."!mark_fail"(0)
+    lt rx759_pos, -1, rx759_done
+    eq rx759_pos, -1, rx759_fail
+    jump $I10
+  rx759_done:
+    rx759_cur."!cursor_fail"()
+    rx759_cur."!cursor_debug"("FAIL  ", "infixish")
+    .return (rx759_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__infixish"  :subid("206_1258533478.31768") :method
+.annotate "line", 376
+    new $P761, "ResizablePMCArray"
+    push $P761, ""
+    .return ($P761)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "infixstopper"  :subid("207_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx763_tgt
+    .local int rx763_pos
+    .local int rx763_off
+    .local int rx763_eos
+    .local int rx763_rep
+    .local pmc rx763_cur
+    (rx763_cur, rx763_pos, rx763_tgt, $I10) = self."!cursor_start"()
+    rx763_cur."!cursor_debug"("START ", "infixstopper")
+    .lex unicode:"$\x{a2}", rx763_cur
+    .local pmc match
+    .lex "$/", match
+    length rx763_eos, rx763_tgt
+    set rx763_off, 0
+    lt $I10, 2, rx763_start
+    sub rx763_off, $I10, 1
+    substr rx763_tgt, rx763_tgt, rx763_off
+  rx763_start:
 .annotate "line", 396
+  # rx subrule "lambda" subtype=zerowidth negate=
+    rx763_cur."!cursor_pos"(rx763_pos)
+    $P10 = rx763_cur."lambda"()
+    unless $P10, rx763_fail
   # rx pass
-    rx756_cur."!cursor_pass"(rx756_pos, "postcircumfix:sym<ang>")
-    rx756_cur."!cursor_debug"("PASS  ", "postcircumfix:sym<ang>", " at pos=", rx756_pos)
-    .return (rx756_cur)
-  rx756_fail:
-.annotate "line", 364
-    (rx756_rep, rx756_pos, $I10, $P10) = rx756_cur."!mark_fail"(0)
-    lt rx756_pos, -1, rx756_done
-    eq rx756_pos, -1, rx756_fail
+    rx763_cur."!cursor_pass"(rx763_pos, "infixstopper")
+    rx763_cur."!cursor_debug"("PASS  ", "infixstopper", " at pos=", rx763_pos)
+    .return (rx763_cur)
+  rx763_fail:
+.annotate "line", 376
+    (rx763_rep, rx763_pos, $I10, $P10) = rx763_cur."!mark_fail"(0)
+    lt rx763_pos, -1, rx763_done
+    eq rx763_pos, -1, rx763_fail
     jump $I10
-  rx756_done:
-    rx756_cur."!cursor_fail"()
-    rx756_cur."!cursor_debug"("FAIL  ", "postcircumfix:sym<ang>")
-    .return (rx756_cur)
+  rx763_done:
+    rx763_cur."!cursor_fail"()
+    rx763_cur."!cursor_debug"("FAIL  ", "infixstopper")
+    .return (rx763_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__postcircumfix:sym<ang>"  :subid("211_1258424429.0004") :method
-.annotate "line", 364
-    new $P758, "ResizablePMCArray"
-    push $P758, "<"
-    .return ($P758)
+.sub "!PREFIX__infixstopper"  :subid("208_1258533478.31768") :method
+.annotate "line", 376
+    new $P765, "ResizablePMCArray"
+    push $P765, ""
+    .return ($P765)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "postcircumfix:sym<( )>"  :subid("212_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx760_tgt
-    .local int rx760_pos
-    .local int rx760_off
-    .local int rx760_eos
-    .local int rx760_rep
-    .local pmc rx760_cur
-    (rx760_cur, rx760_pos, rx760_tgt, $I10) = self."!cursor_start"()
-    rx760_cur."!cursor_debug"("START ", "postcircumfix:sym<( )>")
-    .lex unicode:"$\x{a2}", rx760_cur
+.sub "postcircumfix:sym<[ ]>"  :subid("209_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx767_tgt
+    .local int rx767_pos
+    .local int rx767_off
+    .local int rx767_eos
+    .local int rx767_rep
+    .local pmc rx767_cur
+    (rx767_cur, rx767_pos, rx767_tgt, $I10) = self."!cursor_start"()
+    rx767_cur."!cursor_debug"("START ", "postcircumfix:sym<[ ]>")
+    .lex unicode:"$\x{a2}", rx767_cur
     .local pmc match
     .lex "$/", match
-    length rx760_eos, rx760_tgt
-    set rx760_off, 0
-    lt $I10, 2, rx760_start
-    sub rx760_off, $I10, 1
-    substr rx760_tgt, rx760_tgt, rx760_off
-  rx760_start:
-.annotate "line", 402
-  # rx literal  "("
-    add $I11, rx760_pos, 1
-    gt $I11, rx760_eos, rx760_fail
-    sub $I11, rx760_pos, rx760_off
-    substr $S10, rx760_tgt, $I11, 1
-    ne $S10, "(", rx760_fail
-    add rx760_pos, 1
+    length rx767_eos, rx767_tgt
+    set rx767_off, 0
+    lt $I10, 2, rx767_start
+    sub rx767_off, $I10, 1
+    substr rx767_tgt, rx767_tgt, rx767_off
+  rx767_start:
+.annotate "line", 399
+  # rx literal  "["
+    add $I11, rx767_pos, 1
+    gt $I11, rx767_eos, rx767_fail
+    sub $I11, rx767_pos, rx767_off
+    substr $S10, rx767_tgt, $I11, 1
+    ne $S10, "[", rx767_fail
+    add rx767_pos, 1
   # rx subrule "ws" subtype=method negate=
-    rx760_cur."!cursor_pos"(rx760_pos)
-    $P10 = rx760_cur."ws"()
-    unless $P10, rx760_fail
-    rx760_pos = $P10."pos"()
-  # rx subrule "arglist" subtype=capture negate=
-    rx760_cur."!cursor_pos"(rx760_pos)
-    $P10 = rx760_cur."arglist"()
-    unless $P10, rx760_fail
-    rx760_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("arglist")
-    rx760_pos = $P10."pos"()
-  # rx literal  ")"
-    add $I11, rx760_pos, 1
-    gt $I11, rx760_eos, rx760_fail
-    sub $I11, rx760_pos, rx760_off
-    substr $S10, rx760_tgt, $I11, 1
-    ne $S10, ")", rx760_fail
-    add rx760_pos, 1
+    rx767_cur."!cursor_pos"(rx767_pos)
+    $P10 = rx767_cur."ws"()
+    unless $P10, rx767_fail
+    rx767_pos = $P10."pos"()
+  # rx subrule "EXPR" subtype=capture negate=
+    rx767_cur."!cursor_pos"(rx767_pos)
+    $P10 = rx767_cur."EXPR"()
+    unless $P10, rx767_fail
+    rx767_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("EXPR")
+    rx767_pos = $P10."pos"()
+  # rx literal  "]"
+    add $I11, rx767_pos, 1
+    gt $I11, rx767_eos, rx767_fail
+    sub $I11, rx767_pos, rx767_off
+    substr $S10, rx767_tgt, $I11, 1
+    ne $S10, "]", rx767_fail
+    add rx767_pos, 1
+.annotate "line", 400
+  # rx subrule "O" subtype=capture negate=
+    rx767_cur."!cursor_pos"(rx767_pos)
+    $P10 = rx767_cur."O"("%methodop")
+    unless $P10, rx767_fail
+    rx767_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("O")
+    rx767_pos = $P10."pos"()
+.annotate "line", 398
+  # rx pass
+    rx767_cur."!cursor_pass"(rx767_pos, "postcircumfix:sym<[ ]>")
+    rx767_cur."!cursor_debug"("PASS  ", "postcircumfix:sym<[ ]>", " at pos=", rx767_pos)
+    .return (rx767_cur)
+  rx767_fail:
+.annotate "line", 376
+    (rx767_rep, rx767_pos, $I10, $P10) = rx767_cur."!mark_fail"(0)
+    lt rx767_pos, -1, rx767_done
+    eq rx767_pos, -1, rx767_fail
+    jump $I10
+  rx767_done:
+    rx767_cur."!cursor_fail"()
+    rx767_cur."!cursor_debug"("FAIL  ", "postcircumfix:sym<[ ]>")
+    .return (rx767_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__postcircumfix:sym<[ ]>"  :subid("210_1258533478.31768") :method
+.annotate "line", 376
+    $P769 = self."!PREFIX__!subrule"("", "[")
+    new $P770, "ResizablePMCArray"
+    push $P770, $P769
+    .return ($P770)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "postcircumfix:sym<{ }>"  :subid("211_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx772_tgt
+    .local int rx772_pos
+    .local int rx772_off
+    .local int rx772_eos
+    .local int rx772_rep
+    .local pmc rx772_cur
+    (rx772_cur, rx772_pos, rx772_tgt, $I10) = self."!cursor_start"()
+    rx772_cur."!cursor_debug"("START ", "postcircumfix:sym<{ }>")
+    .lex unicode:"$\x{a2}", rx772_cur
+    .local pmc match
+    .lex "$/", match
+    length rx772_eos, rx772_tgt
+    set rx772_off, 0
+    lt $I10, 2, rx772_start
+    sub rx772_off, $I10, 1
+    substr rx772_tgt, rx772_tgt, rx772_off
+  rx772_start:
+.annotate "line", 404
+  # rx literal  "{"
+    add $I11, rx772_pos, 1
+    gt $I11, rx772_eos, rx772_fail
+    sub $I11, rx772_pos, rx772_off
+    substr $S10, rx772_tgt, $I11, 1
+    ne $S10, "{", rx772_fail
+    add rx772_pos, 1
+  # rx subrule "ws" subtype=method negate=
+    rx772_cur."!cursor_pos"(rx772_pos)
+    $P10 = rx772_cur."ws"()
+    unless $P10, rx772_fail
+    rx772_pos = $P10."pos"()
+  # rx subrule "EXPR" subtype=capture negate=
+    rx772_cur."!cursor_pos"(rx772_pos)
+    $P10 = rx772_cur."EXPR"()
+    unless $P10, rx772_fail
+    rx772_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("EXPR")
+    rx772_pos = $P10."pos"()
+  # rx literal  "}"
+    add $I11, rx772_pos, 1
+    gt $I11, rx772_eos, rx772_fail
+    sub $I11, rx772_pos, rx772_off
+    substr $S10, rx772_tgt, $I11, 1
+    ne $S10, "}", rx772_fail
+    add rx772_pos, 1
+.annotate "line", 405
+  # rx subrule "O" subtype=capture negate=
+    rx772_cur."!cursor_pos"(rx772_pos)
+    $P10 = rx772_cur."O"("%methodop")
+    unless $P10, rx772_fail
+    rx772_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("O")
+    rx772_pos = $P10."pos"()
 .annotate "line", 403
-  # rx subrule "O" subtype=capture negate=
-    rx760_cur."!cursor_pos"(rx760_pos)
-    $P10 = rx760_cur."O"("%methodop")
-    unless $P10, rx760_fail
-    rx760_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("O")
-    rx760_pos = $P10."pos"()
-.annotate "line", 401
   # rx pass
-    rx760_cur."!cursor_pass"(rx760_pos, "postcircumfix:sym<( )>")
-    rx760_cur."!cursor_debug"("PASS  ", "postcircumfix:sym<( )>", " at pos=", rx760_pos)
-    .return (rx760_cur)
-  rx760_fail:
-.annotate "line", 364
-    (rx760_rep, rx760_pos, $I10, $P10) = rx760_cur."!mark_fail"(0)
-    lt rx760_pos, -1, rx760_done
-    eq rx760_pos, -1, rx760_fail
+    rx772_cur."!cursor_pass"(rx772_pos, "postcircumfix:sym<{ }>")
+    rx772_cur."!cursor_debug"("PASS  ", "postcircumfix:sym<{ }>", " at pos=", rx772_pos)
+    .return (rx772_cur)
+  rx772_fail:
+.annotate "line", 376
+    (rx772_rep, rx772_pos, $I10, $P10) = rx772_cur."!mark_fail"(0)
+    lt rx772_pos, -1, rx772_done
+    eq rx772_pos, -1, rx772_fail
     jump $I10
-  rx760_done:
-    rx760_cur."!cursor_fail"()
-    rx760_cur."!cursor_debug"("FAIL  ", "postcircumfix:sym<( )>")
-    .return (rx760_cur)
+  rx772_done:
+    rx772_cur."!cursor_fail"()
+    rx772_cur."!cursor_debug"("FAIL  ", "postcircumfix:sym<{ }>")
+    .return (rx772_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__postcircumfix:sym<( )>"  :subid("213_1258424429.0004") :method
-.annotate "line", 364
-    $P762 = self."!PREFIX__!subrule"("", "(")
-    new $P763, "ResizablePMCArray"
-    push $P763, $P762
-    .return ($P763)
+.sub "!PREFIX__postcircumfix:sym<{ }>"  :subid("212_1258533478.31768") :method
+.annotate "line", 376
+    $P774 = self."!PREFIX__!subrule"("", "{")
+    new $P775, "ResizablePMCArray"
+    push $P775, $P774
+    .return ($P775)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "postfix:sym<.>"  :subid("214_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx765_tgt
-    .local int rx765_pos
-    .local int rx765_off
-    .local int rx765_eos
-    .local int rx765_rep
-    .local pmc rx765_cur
-    (rx765_cur, rx765_pos, rx765_tgt, $I10) = self."!cursor_start"()
-    rx765_cur."!cursor_debug"("START ", "postfix:sym<.>")
-    .lex unicode:"$\x{a2}", rx765_cur
+.sub "postcircumfix:sym<ang>"  :subid("213_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx777_tgt
+    .local int rx777_pos
+    .local int rx777_off
+    .local int rx777_eos
+    .local int rx777_rep
+    .local pmc rx777_cur
+    (rx777_cur, rx777_pos, rx777_tgt, $I10) = self."!cursor_start"()
+    rx777_cur."!cursor_debug"("START ", "postcircumfix:sym<ang>")
+    .lex unicode:"$\x{a2}", rx777_cur
     .local pmc match
     .lex "$/", match
-    length rx765_eos, rx765_tgt
-    set rx765_off, 0
-    lt $I10, 2, rx765_start
-    sub rx765_off, $I10, 1
-    substr rx765_tgt, rx765_tgt, rx765_off
-  rx765_start:
-.annotate "line", 406
-  # rx subrule "dotty" subtype=capture negate=
-    rx765_cur."!cursor_pos"(rx765_pos)
-    $P10 = rx765_cur."dotty"()
-    unless $P10, rx765_fail
-    rx765_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("dotty")
-    rx765_pos = $P10."pos"()
-  # rx subrule "O" subtype=capture negate=
-    rx765_cur."!cursor_pos"(rx765_pos)
-    $P10 = rx765_cur."O"("%methodop")
-    unless $P10, rx765_fail
-    rx765_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("O")
-    rx765_pos = $P10."pos"()
-  # rx pass
-    rx765_cur."!cursor_pass"(rx765_pos, "postfix:sym<.>")
-    rx765_cur."!cursor_debug"("PASS  ", "postfix:sym<.>", " at pos=", rx765_pos)
-    .return (rx765_cur)
-  rx765_fail:
-.annotate "line", 364
-    (rx765_rep, rx765_pos, $I10, $P10) = rx765_cur."!mark_fail"(0)
-    lt rx765_pos, -1, rx765_done
-    eq rx765_pos, -1, rx765_fail
-    jump $I10
-  rx765_done:
-    rx765_cur."!cursor_fail"()
-    rx765_cur."!cursor_debug"("FAIL  ", "postfix:sym<.>")
-    .return (rx765_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__postfix:sym<.>"  :subid("215_1258424429.0004") :method
-.annotate "line", 364
-    $P767 = self."!PREFIX__!subrule"("dotty", "")
-    new $P768, "ResizablePMCArray"
-    push $P768, $P767
-    .return ($P768)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "prefix:sym<++>"  :subid("216_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx770_tgt
-    .local int rx770_pos
-    .local int rx770_off
-    .local int rx770_eos
-    .local int rx770_rep
-    .local pmc rx770_cur
-    (rx770_cur, rx770_pos, rx770_tgt, $I10) = self."!cursor_start"()
-    rx770_cur."!cursor_debug"("START ", "prefix:sym<++>")
-    .lex unicode:"$\x{a2}", rx770_cur
-    .local pmc match
-    .lex "$/", match
-    length rx770_eos, rx770_tgt
-    set rx770_off, 0
-    lt $I10, 2, rx770_start
-    sub rx770_off, $I10, 1
-    substr rx770_tgt, rx770_tgt, rx770_off
-  rx770_start:
-.annotate "line", 408
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_774_fail
-    rx770_cur."!mark_push"(0, rx770_pos, $I10)
-  # rx literal  "++"
-    add $I11, rx770_pos, 2
-    gt $I11, rx770_eos, rx770_fail
-    sub $I11, rx770_pos, rx770_off
-    substr $S10, rx770_tgt, $I11, 2
-    ne $S10, "++", rx770_fail
-    add rx770_pos, 2
-    set_addr $I10, rxcap_774_fail
-    ($I12, $I11) = rx770_cur."!mark_peek"($I10)
-    rx770_cur."!cursor_pos"($I11)
-    ($P10) = rx770_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx770_pos, "")
-    rx770_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_774_done
-  rxcap_774_fail:
-    goto rx770_fail
-  rxcap_774_done:
-  # rx subrule "O" subtype=capture negate=
-    rx770_cur."!cursor_pos"(rx770_pos)
-    $P10 = rx770_cur."O"("%autoincrement, :pirop<inc>")
-    unless $P10, rx770_fail
-    rx770_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("O")
-    rx770_pos = $P10."pos"()
-  # rx pass
-    rx770_cur."!cursor_pass"(rx770_pos, "prefix:sym<++>")
-    rx770_cur."!cursor_debug"("PASS  ", "prefix:sym<++>", " at pos=", rx770_pos)
-    .return (rx770_cur)
-  rx770_fail:
-.annotate "line", 364
-    (rx770_rep, rx770_pos, $I10, $P10) = rx770_cur."!mark_fail"(0)
-    lt rx770_pos, -1, rx770_done
-    eq rx770_pos, -1, rx770_fail
-    jump $I10
-  rx770_done:
-    rx770_cur."!cursor_fail"()
-    rx770_cur."!cursor_debug"("FAIL  ", "prefix:sym<++>")
-    .return (rx770_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__prefix:sym<++>"  :subid("217_1258424429.0004") :method
-.annotate "line", 364
-    $P772 = self."!PREFIX__!subrule"("O", "++")
-    new $P773, "ResizablePMCArray"
-    push $P773, $P772
-    .return ($P773)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "prefix:sym<-->"  :subid("218_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx776_tgt
-    .local int rx776_pos
-    .local int rx776_off
-    .local int rx776_eos
-    .local int rx776_rep
-    .local pmc rx776_cur
-    (rx776_cur, rx776_pos, rx776_tgt, $I10) = self."!cursor_start"()
-    rx776_cur."!cursor_debug"("START ", "prefix:sym<-->")
-    .lex unicode:"$\x{a2}", rx776_cur
-    .local pmc match
-    .lex "$/", match
-    length rx776_eos, rx776_tgt
-    set rx776_off, 0
-    lt $I10, 2, rx776_start
-    sub rx776_off, $I10, 1
-    substr rx776_tgt, rx776_tgt, rx776_off
-  rx776_start:
+    length rx777_eos, rx777_tgt
+    set rx777_off, 0
+    lt $I10, 2, rx777_start
+    sub rx777_off, $I10, 1
+    substr rx777_tgt, rx777_tgt, rx777_off
+  rx777_start:
 .annotate "line", 409
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_780_fail
-    rx776_cur."!mark_push"(0, rx776_pos, $I10)
-  # rx literal  "--"
-    add $I11, rx776_pos, 2
-    gt $I11, rx776_eos, rx776_fail
-    sub $I11, rx776_pos, rx776_off
-    substr $S10, rx776_tgt, $I11, 2
-    ne $S10, "--", rx776_fail
-    add rx776_pos, 2
-    set_addr $I10, rxcap_780_fail
-    ($I12, $I11) = rx776_cur."!mark_peek"($I10)
-    rx776_cur."!cursor_pos"($I11)
-    ($P10) = rx776_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx776_pos, "")
-    rx776_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_780_done
-  rxcap_780_fail:
-    goto rx776_fail
-  rxcap_780_done:
+  # rx enumcharlist negate=0 zerowidth
+    ge rx777_pos, rx777_eos, rx777_fail
+    sub $I10, rx777_pos, rx777_off
+    substr $S10, rx777_tgt, $I10, 1
+    index $I11, "<", $S10
+    lt $I11, 0, rx777_fail
+  # rx subrule "quote_EXPR" subtype=capture negate=
+    rx777_cur."!cursor_pos"(rx777_pos)
+    $P10 = rx777_cur."quote_EXPR"(":q")
+    unless $P10, rx777_fail
+    rx777_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("quote_EXPR")
+    rx777_pos = $P10."pos"()
+.annotate "line", 410
   # rx subrule "O" subtype=capture negate=
-    rx776_cur."!cursor_pos"(rx776_pos)
-    $P10 = rx776_cur."O"("%autoincrement, :pirop<dec>")
-    unless $P10, rx776_fail
-    rx776_cur."!mark_push"(0, -1, 0, $P10)
+    rx777_cur."!cursor_pos"(rx777_pos)
+    $P10 = rx777_cur."O"("%methodop")
+    unless $P10, rx777_fail
+    rx777_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx776_pos = $P10."pos"()
+    rx777_pos = $P10."pos"()
+.annotate "line", 408
   # rx pass
-    rx776_cur."!cursor_pass"(rx776_pos, "prefix:sym<-->")
-    rx776_cur."!cursor_debug"("PASS  ", "prefix:sym<-->", " at pos=", rx776_pos)
-    .return (rx776_cur)
-  rx776_fail:
-.annotate "line", 364
-    (rx776_rep, rx776_pos, $I10, $P10) = rx776_cur."!mark_fail"(0)
-    lt rx776_pos, -1, rx776_done
-    eq rx776_pos, -1, rx776_fail
+    rx777_cur."!cursor_pass"(rx777_pos, "postcircumfix:sym<ang>")
+    rx777_cur."!cursor_debug"("PASS  ", "postcircumfix:sym<ang>", " at pos=", rx777_pos)
+    .return (rx777_cur)
+  rx777_fail:
+.annotate "line", 376
+    (rx777_rep, rx777_pos, $I10, $P10) = rx777_cur."!mark_fail"(0)
+    lt rx777_pos, -1, rx777_done
+    eq rx777_pos, -1, rx777_fail
     jump $I10
-  rx776_done:
-    rx776_cur."!cursor_fail"()
-    rx776_cur."!cursor_debug"("FAIL  ", "prefix:sym<-->")
-    .return (rx776_cur)
+  rx777_done:
+    rx777_cur."!cursor_fail"()
+    rx777_cur."!cursor_debug"("FAIL  ", "postcircumfix:sym<ang>")
+    .return (rx777_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__prefix:sym<-->"  :subid("219_1258424429.0004") :method
-.annotate "line", 364
-    $P778 = self."!PREFIX__!subrule"("O", "--")
+.sub "!PREFIX__postcircumfix:sym<ang>"  :subid("214_1258533478.31768") :method
+.annotate "line", 376
     new $P779, "ResizablePMCArray"
-    push $P779, $P778
+    push $P779, "<"
     .return ($P779)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "postfix:sym<++>"  :subid("220_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx782_tgt
-    .local int rx782_pos
-    .local int rx782_off
-    .local int rx782_eos
-    .local int rx782_rep
-    .local pmc rx782_cur
-    (rx782_cur, rx782_pos, rx782_tgt, $I10) = self."!cursor_start"()
-    rx782_cur."!cursor_debug"("START ", "postfix:sym<++>")
-    .lex unicode:"$\x{a2}", rx782_cur
+.sub "postcircumfix:sym<( )>"  :subid("215_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx781_tgt
+    .local int rx781_pos
+    .local int rx781_off
+    .local int rx781_eos
+    .local int rx781_rep
+    .local pmc rx781_cur
+    (rx781_cur, rx781_pos, rx781_tgt, $I10) = self."!cursor_start"()
+    rx781_cur."!cursor_debug"("START ", "postcircumfix:sym<( )>")
+    .lex unicode:"$\x{a2}", rx781_cur
     .local pmc match
     .lex "$/", match
-    length rx782_eos, rx782_tgt
-    set rx782_off, 0
-    lt $I10, 2, rx782_start
-    sub rx782_off, $I10, 1
-    substr rx782_tgt, rx782_tgt, rx782_off
-  rx782_start:
-.annotate "line", 412
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_786_fail
-    rx782_cur."!mark_push"(0, rx782_pos, $I10)
-  # rx literal  "++"
-    add $I11, rx782_pos, 2
-    gt $I11, rx782_eos, rx782_fail
-    sub $I11, rx782_pos, rx782_off
-    substr $S10, rx782_tgt, $I11, 2
-    ne $S10, "++", rx782_fail
-    add rx782_pos, 2
-    set_addr $I10, rxcap_786_fail
-    ($I12, $I11) = rx782_cur."!mark_peek"($I10)
-    rx782_cur."!cursor_pos"($I11)
-    ($P10) = rx782_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx782_pos, "")
-    rx782_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_786_done
-  rxcap_786_fail:
-    goto rx782_fail
-  rxcap_786_done:
-  # rx subrule "O" subtype=capture negate=
-    rx782_cur."!cursor_pos"(rx782_pos)
-    $P10 = rx782_cur."O"("%autoincrement")
-    unless $P10, rx782_fail
-    rx782_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("O")
-    rx782_pos = $P10."pos"()
-  # rx pass
-    rx782_cur."!cursor_pass"(rx782_pos, "postfix:sym<++>")
-    rx782_cur."!cursor_debug"("PASS  ", "postfix:sym<++>", " at pos=", rx782_pos)
-    .return (rx782_cur)
-  rx782_fail:
-.annotate "line", 364
-    (rx782_rep, rx782_pos, $I10, $P10) = rx782_cur."!mark_fail"(0)
-    lt rx782_pos, -1, rx782_done
-    eq rx782_pos, -1, rx782_fail
-    jump $I10
-  rx782_done:
-    rx782_cur."!cursor_fail"()
-    rx782_cur."!cursor_debug"("FAIL  ", "postfix:sym<++>")
-    .return (rx782_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__postfix:sym<++>"  :subid("221_1258424429.0004") :method
-.annotate "line", 364
-    $P784 = self."!PREFIX__!subrule"("O", "++")
-    new $P785, "ResizablePMCArray"
-    push $P785, $P784
-    .return ($P785)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "postfix:sym<-->"  :subid("222_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx788_tgt
-    .local int rx788_pos
-    .local int rx788_off
-    .local int rx788_eos
-    .local int rx788_rep
-    .local pmc rx788_cur
-    (rx788_cur, rx788_pos, rx788_tgt, $I10) = self."!cursor_start"()
-    rx788_cur."!cursor_debug"("START ", "postfix:sym<-->")
-    .lex unicode:"$\x{a2}", rx788_cur
-    .local pmc match
-    .lex "$/", match
-    length rx788_eos, rx788_tgt
-    set rx788_off, 0
-    lt $I10, 2, rx788_start
-    sub rx788_off, $I10, 1
-    substr rx788_tgt, rx788_tgt, rx788_off
-  rx788_start:
-.annotate "line", 413
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_792_fail
-    rx788_cur."!mark_push"(0, rx788_pos, $I10)
-  # rx literal  "--"
-    add $I11, rx788_pos, 2
-    gt $I11, rx788_eos, rx788_fail
-    sub $I11, rx788_pos, rx788_off
-    substr $S10, rx788_tgt, $I11, 2
-    ne $S10, "--", rx788_fail
-    add rx788_pos, 2
-    set_addr $I10, rxcap_792_fail
-    ($I12, $I11) = rx788_cur."!mark_peek"($I10)
-    rx788_cur."!cursor_pos"($I11)
-    ($P10) = rx788_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx788_pos, "")
-    rx788_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_792_done
-  rxcap_792_fail:
-    goto rx788_fail
-  rxcap_792_done:
-  # rx subrule "O" subtype=capture negate=
-    rx788_cur."!cursor_pos"(rx788_pos)
-    $P10 = rx788_cur."O"("%autoincrement")
-    unless $P10, rx788_fail
-    rx788_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("O")
-    rx788_pos = $P10."pos"()
-  # rx pass
-    rx788_cur."!cursor_pass"(rx788_pos, "postfix:sym<-->")
-    rx788_cur."!cursor_debug"("PASS  ", "postfix:sym<-->", " at pos=", rx788_pos)
-    .return (rx788_cur)
-  rx788_fail:
-.annotate "line", 364
-    (rx788_rep, rx788_pos, $I10, $P10) = rx788_cur."!mark_fail"(0)
-    lt rx788_pos, -1, rx788_done
-    eq rx788_pos, -1, rx788_fail
-    jump $I10
-  rx788_done:
-    rx788_cur."!cursor_fail"()
-    rx788_cur."!cursor_debug"("FAIL  ", "postfix:sym<-->")
-    .return (rx788_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__postfix:sym<-->"  :subid("223_1258424429.0004") :method
-.annotate "line", 364
-    $P790 = self."!PREFIX__!subrule"("O", "--")
-    new $P791, "ResizablePMCArray"
-    push $P791, $P790
-    .return ($P791)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "infix:sym<**>"  :subid("224_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx794_tgt
-    .local int rx794_pos
-    .local int rx794_off
-    .local int rx794_eos
-    .local int rx794_rep
-    .local pmc rx794_cur
-    (rx794_cur, rx794_pos, rx794_tgt, $I10) = self."!cursor_start"()
-    rx794_cur."!cursor_debug"("START ", "infix:sym<**>")
-    .lex unicode:"$\x{a2}", rx794_cur
-    .local pmc match
-    .lex "$/", match
-    length rx794_eos, rx794_tgt
-    set rx794_off, 0
-    lt $I10, 2, rx794_start
-    sub rx794_off, $I10, 1
-    substr rx794_tgt, rx794_tgt, rx794_off
-  rx794_start:
+    length rx781_eos, rx781_tgt
+    set rx781_off, 0
+    lt $I10, 2, rx781_start
+    sub rx781_off, $I10, 1
+    substr rx781_tgt, rx781_tgt, rx781_off
+  rx781_start:
+.annotate "line", 414
+  # rx literal  "("
+    add $I11, rx781_pos, 1
+    gt $I11, rx781_eos, rx781_fail
+    sub $I11, rx781_pos, rx781_off
+    substr $S10, rx781_tgt, $I11, 1
+    ne $S10, "(", rx781_fail
+    add rx781_pos, 1
+  # rx subrule "ws" subtype=method negate=
+    rx781_cur."!cursor_pos"(rx781_pos)
+    $P10 = rx781_cur."ws"()
+    unless $P10, rx781_fail
+    rx781_pos = $P10."pos"()
+  # rx subrule "arglist" subtype=capture negate=
+    rx781_cur."!cursor_pos"(rx781_pos)
+    $P10 = rx781_cur."arglist"()
+    unless $P10, rx781_fail
+    rx781_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("arglist")
+    rx781_pos = $P10."pos"()
+  # rx literal  ")"
+    add $I11, rx781_pos, 1
+    gt $I11, rx781_eos, rx781_fail
+    sub $I11, rx781_pos, rx781_off
+    substr $S10, rx781_tgt, $I11, 1
+    ne $S10, ")", rx781_fail
+    add rx781_pos, 1
 .annotate "line", 415
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_798_fail
-    rx794_cur."!mark_push"(0, rx794_pos, $I10)
-  # rx literal  "**"
-    add $I11, rx794_pos, 2
-    gt $I11, rx794_eos, rx794_fail
-    sub $I11, rx794_pos, rx794_off
-    substr $S10, rx794_tgt, $I11, 2
-    ne $S10, "**", rx794_fail
-    add rx794_pos, 2
-    set_addr $I10, rxcap_798_fail
-    ($I12, $I11) = rx794_cur."!mark_peek"($I10)
-    rx794_cur."!cursor_pos"($I11)
-    ($P10) = rx794_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx794_pos, "")
-    rx794_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_798_done
-  rxcap_798_fail:
-    goto rx794_fail
-  rxcap_798_done:
   # rx subrule "O" subtype=capture negate=
-    rx794_cur."!cursor_pos"(rx794_pos)
-    $P10 = rx794_cur."O"("%exponentiation, :pirop<pow>")
-    unless $P10, rx794_fail
-    rx794_cur."!mark_push"(0, -1, 0, $P10)
+    rx781_cur."!cursor_pos"(rx781_pos)
+    $P10 = rx781_cur."O"("%methodop")
+    unless $P10, rx781_fail
+    rx781_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx794_pos = $P10."pos"()
+    rx781_pos = $P10."pos"()
+.annotate "line", 413
   # rx pass
-    rx794_cur."!cursor_pass"(rx794_pos, "infix:sym<**>")
-    rx794_cur."!cursor_debug"("PASS  ", "infix:sym<**>", " at pos=", rx794_pos)
-    .return (rx794_cur)
-  rx794_fail:
-.annotate "line", 364
-    (rx794_rep, rx794_pos, $I10, $P10) = rx794_cur."!mark_fail"(0)
-    lt rx794_pos, -1, rx794_done
-    eq rx794_pos, -1, rx794_fail
+    rx781_cur."!cursor_pass"(rx781_pos, "postcircumfix:sym<( )>")
+    rx781_cur."!cursor_debug"("PASS  ", "postcircumfix:sym<( )>", " at pos=", rx781_pos)
+    .return (rx781_cur)
+  rx781_fail:
+.annotate "line", 376
+    (rx781_rep, rx781_pos, $I10, $P10) = rx781_cur."!mark_fail"(0)
+    lt rx781_pos, -1, rx781_done
+    eq rx781_pos, -1, rx781_fail
     jump $I10
-  rx794_done:
-    rx794_cur."!cursor_fail"()
-    rx794_cur."!cursor_debug"("FAIL  ", "infix:sym<**>")
-    .return (rx794_cur)
+  rx781_done:
+    rx781_cur."!cursor_fail"()
+    rx781_cur."!cursor_debug"("FAIL  ", "postcircumfix:sym<( )>")
+    .return (rx781_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<**>"  :subid("225_1258424429.0004") :method
-.annotate "line", 364
-    $P796 = self."!PREFIX__!subrule"("O", "**")
-    new $P797, "ResizablePMCArray"
-    push $P797, $P796
-    .return ($P797)
+.sub "!PREFIX__postcircumfix:sym<( )>"  :subid("216_1258533478.31768") :method
+.annotate "line", 376
+    $P783 = self."!PREFIX__!subrule"("", "(")
+    new $P784, "ResizablePMCArray"
+    push $P784, $P783
+    .return ($P784)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "prefix:sym<+>"  :subid("226_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx800_tgt
-    .local int rx800_pos
-    .local int rx800_off
-    .local int rx800_eos
-    .local int rx800_rep
-    .local pmc rx800_cur
-    (rx800_cur, rx800_pos, rx800_tgt, $I10) = self."!cursor_start"()
-    rx800_cur."!cursor_debug"("START ", "prefix:sym<+>")
-    .lex unicode:"$\x{a2}", rx800_cur
+.sub "postfix:sym<.>"  :subid("217_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx786_tgt
+    .local int rx786_pos
+    .local int rx786_off
+    .local int rx786_eos
+    .local int rx786_rep
+    .local pmc rx786_cur
+    (rx786_cur, rx786_pos, rx786_tgt, $I10) = self."!cursor_start"()
+    rx786_cur."!cursor_debug"("START ", "postfix:sym<.>")
+    .lex unicode:"$\x{a2}", rx786_cur
     .local pmc match
     .lex "$/", match
-    length rx800_eos, rx800_tgt
-    set rx800_off, 0
-    lt $I10, 2, rx800_start
-    sub rx800_off, $I10, 1
-    substr rx800_tgt, rx800_tgt, rx800_off
-  rx800_start:
-.annotate "line", 417
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_804_fail
-    rx800_cur."!mark_push"(0, rx800_pos, $I10)
-  # rx literal  "+"
-    add $I11, rx800_pos, 1
-    gt $I11, rx800_eos, rx800_fail
-    sub $I11, rx800_pos, rx800_off
-    substr $S10, rx800_tgt, $I11, 1
-    ne $S10, "+", rx800_fail
-    add rx800_pos, 1
-    set_addr $I10, rxcap_804_fail
-    ($I12, $I11) = rx800_cur."!mark_peek"($I10)
-    rx800_cur."!cursor_pos"($I11)
-    ($P10) = rx800_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx800_pos, "")
-    rx800_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_804_done
-  rxcap_804_fail:
-    goto rx800_fail
-  rxcap_804_done:
-  # rx subrule "O" subtype=capture negate=
-    rx800_cur."!cursor_pos"(rx800_pos)
-    $P10 = rx800_cur."O"("%symbolic_unary, :pirop<set N*>")
-    unless $P10, rx800_fail
-    rx800_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("O")
-    rx800_pos = $P10."pos"()
-  # rx pass
-    rx800_cur."!cursor_pass"(rx800_pos, "prefix:sym<+>")
-    rx800_cur."!cursor_debug"("PASS  ", "prefix:sym<+>", " at pos=", rx800_pos)
-    .return (rx800_cur)
-  rx800_fail:
-.annotate "line", 364
-    (rx800_rep, rx800_pos, $I10, $P10) = rx800_cur."!mark_fail"(0)
-    lt rx800_pos, -1, rx800_done
-    eq rx800_pos, -1, rx800_fail
-    jump $I10
-  rx800_done:
-    rx800_cur."!cursor_fail"()
-    rx800_cur."!cursor_debug"("FAIL  ", "prefix:sym<+>")
-    .return (rx800_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__prefix:sym<+>"  :subid("227_1258424429.0004") :method
-.annotate "line", 364
-    $P802 = self."!PREFIX__!subrule"("O", "+")
-    new $P803, "ResizablePMCArray"
-    push $P803, $P802
-    .return ($P803)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "prefix:sym<~>"  :subid("228_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx806_tgt
-    .local int rx806_pos
-    .local int rx806_off
-    .local int rx806_eos
-    .local int rx806_rep
-    .local pmc rx806_cur
-    (rx806_cur, rx806_pos, rx806_tgt, $I10) = self."!cursor_start"()
-    rx806_cur."!cursor_debug"("START ", "prefix:sym<~>")
-    .lex unicode:"$\x{a2}", rx806_cur
-    .local pmc match
-    .lex "$/", match
-    length rx806_eos, rx806_tgt
-    set rx806_off, 0
-    lt $I10, 2, rx806_start
-    sub rx806_off, $I10, 1
-    substr rx806_tgt, rx806_tgt, rx806_off
-  rx806_start:
+    length rx786_eos, rx786_tgt
+    set rx786_off, 0
+    lt $I10, 2, rx786_start
+    sub rx786_off, $I10, 1
+    substr rx786_tgt, rx786_tgt, rx786_off
+  rx786_start:
 .annotate "line", 418
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_810_fail
-    rx806_cur."!mark_push"(0, rx806_pos, $I10)
-  # rx literal  "~"
-    add $I11, rx806_pos, 1
-    gt $I11, rx806_eos, rx806_fail
-    sub $I11, rx806_pos, rx806_off
-    substr $S10, rx806_tgt, $I11, 1
-    ne $S10, "~", rx806_fail
-    add rx806_pos, 1
-    set_addr $I10, rxcap_810_fail
-    ($I12, $I11) = rx806_cur."!mark_peek"($I10)
-    rx806_cur."!cursor_pos"($I11)
-    ($P10) = rx806_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx806_pos, "")
-    rx806_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_810_done
-  rxcap_810_fail:
-    goto rx806_fail
-  rxcap_810_done:
+  # rx subrule "dotty" subtype=capture negate=
+    rx786_cur."!cursor_pos"(rx786_pos)
+    $P10 = rx786_cur."dotty"()
+    unless $P10, rx786_fail
+    rx786_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("dotty")
+    rx786_pos = $P10."pos"()
   # rx subrule "O" subtype=capture negate=
-    rx806_cur."!cursor_pos"(rx806_pos)
-    $P10 = rx806_cur."O"("%symbolic_unary, :pirop<set S*>")
-    unless $P10, rx806_fail
-    rx806_cur."!mark_push"(0, -1, 0, $P10)
+    rx786_cur."!cursor_pos"(rx786_pos)
+    $P10 = rx786_cur."O"("%methodop")
+    unless $P10, rx786_fail
+    rx786_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx806_pos = $P10."pos"()
+    rx786_pos = $P10."pos"()
   # rx pass
-    rx806_cur."!cursor_pass"(rx806_pos, "prefix:sym<~>")
-    rx806_cur."!cursor_debug"("PASS  ", "prefix:sym<~>", " at pos=", rx806_pos)
-    .return (rx806_cur)
-  rx806_fail:
-.annotate "line", 364
-    (rx806_rep, rx806_pos, $I10, $P10) = rx806_cur."!mark_fail"(0)
-    lt rx806_pos, -1, rx806_done
-    eq rx806_pos, -1, rx806_fail
+    rx786_cur."!cursor_pass"(rx786_pos, "postfix:sym<.>")
+    rx786_cur."!cursor_debug"("PASS  ", "postfix:sym<.>", " at pos=", rx786_pos)
+    .return (rx786_cur)
+  rx786_fail:
+.annotate "line", 376
+    (rx786_rep, rx786_pos, $I10, $P10) = rx786_cur."!mark_fail"(0)
+    lt rx786_pos, -1, rx786_done
+    eq rx786_pos, -1, rx786_fail
     jump $I10
-  rx806_done:
-    rx806_cur."!cursor_fail"()
-    rx806_cur."!cursor_debug"("FAIL  ", "prefix:sym<~>")
-    .return (rx806_cur)
+  rx786_done:
+    rx786_cur."!cursor_fail"()
+    rx786_cur."!cursor_debug"("FAIL  ", "postfix:sym<.>")
+    .return (rx786_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__prefix:sym<~>"  :subid("229_1258424429.0004") :method
-.annotate "line", 364
-    $P808 = self."!PREFIX__!subrule"("O", "~")
-    new $P809, "ResizablePMCArray"
-    push $P809, $P808
-    .return ($P809)
+.sub "!PREFIX__postfix:sym<.>"  :subid("218_1258533478.31768") :method
+.annotate "line", 376
+    $P788 = self."!PREFIX__!subrule"("dotty", "")
+    new $P789, "ResizablePMCArray"
+    push $P789, $P788
+    .return ($P789)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "prefix:sym<->"  :subid("230_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx812_tgt
-    .local int rx812_pos
-    .local int rx812_off
-    .local int rx812_eos
-    .local int rx812_rep
-    .local pmc rx812_cur
-    (rx812_cur, rx812_pos, rx812_tgt, $I10) = self."!cursor_start"()
-    rx812_cur."!cursor_debug"("START ", "prefix:sym<->")
-    .lex unicode:"$\x{a2}", rx812_cur
+.sub "prefix:sym<++>"  :subid("219_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx791_tgt
+    .local int rx791_pos
+    .local int rx791_off
+    .local int rx791_eos
+    .local int rx791_rep
+    .local pmc rx791_cur
+    (rx791_cur, rx791_pos, rx791_tgt, $I10) = self."!cursor_start"()
+    rx791_cur."!cursor_debug"("START ", "prefix:sym<++>")
+    .lex unicode:"$\x{a2}", rx791_cur
     .local pmc match
     .lex "$/", match
-    length rx812_eos, rx812_tgt
-    set rx812_off, 0
-    lt $I10, 2, rx812_start
-    sub rx812_off, $I10, 1
-    substr rx812_tgt, rx812_tgt, rx812_off
-  rx812_start:
-.annotate "line", 419
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_816_fail
-    rx812_cur."!mark_push"(0, rx812_pos, $I10)
-  # rx literal  "-"
-    add $I11, rx812_pos, 1
-    gt $I11, rx812_eos, rx812_fail
-    sub $I11, rx812_pos, rx812_off
-    substr $S10, rx812_tgt, $I11, 1
-    ne $S10, "-", rx812_fail
-    add rx812_pos, 1
-    set_addr $I10, rxcap_816_fail
-    ($I12, $I11) = rx812_cur."!mark_peek"($I10)
-    rx812_cur."!cursor_pos"($I11)
-    ($P10) = rx812_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx812_pos, "")
-    rx812_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_816_done
-  rxcap_816_fail:
-    goto rx812_fail
-  rxcap_816_done:
-  # rx enumcharlist negate=1 zerowidth
-    ge rx812_pos, rx812_eos, rx812_fail
-    sub $I10, rx812_pos, rx812_off
-    substr $S10, rx812_tgt, $I10, 1
-    index $I11, ">", $S10
-    ge $I11, 0, rx812_fail
-  # rx subrule "O" subtype=capture negate=
-    rx812_cur."!cursor_pos"(rx812_pos)
-    $P10 = rx812_cur."O"("%symbolic_unary, :pirop<neg>")
-    unless $P10, rx812_fail
-    rx812_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("O")
-    rx812_pos = $P10."pos"()
-  # rx pass
-    rx812_cur."!cursor_pass"(rx812_pos, "prefix:sym<->")
-    rx812_cur."!cursor_debug"("PASS  ", "prefix:sym<->", " at pos=", rx812_pos)
-    .return (rx812_cur)
-  rx812_fail:
-.annotate "line", 364
-    (rx812_rep, rx812_pos, $I10, $P10) = rx812_cur."!mark_fail"(0)
-    lt rx812_pos, -1, rx812_done
-    eq rx812_pos, -1, rx812_fail
-    jump $I10
-  rx812_done:
-    rx812_cur."!cursor_fail"()
-    rx812_cur."!cursor_debug"("FAIL  ", "prefix:sym<->")
-    .return (rx812_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__prefix:sym<->"  :subid("231_1258424429.0004") :method
-.annotate "line", 364
-    $P814 = self."!PREFIX__!subrule"("O", "-")
-    new $P815, "ResizablePMCArray"
-    push $P815, $P814
-    .return ($P815)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "prefix:sym<?>"  :subid("232_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx818_tgt
-    .local int rx818_pos
-    .local int rx818_off
-    .local int rx818_eos
-    .local int rx818_rep
-    .local pmc rx818_cur
-    (rx818_cur, rx818_pos, rx818_tgt, $I10) = self."!cursor_start"()
-    rx818_cur."!cursor_debug"("START ", "prefix:sym<?>")
-    .lex unicode:"$\x{a2}", rx818_cur
-    .local pmc match
-    .lex "$/", match
-    length rx818_eos, rx818_tgt
-    set rx818_off, 0
-    lt $I10, 2, rx818_start
-    sub rx818_off, $I10, 1
-    substr rx818_tgt, rx818_tgt, rx818_off
-  rx818_start:
+    length rx791_eos, rx791_tgt
+    set rx791_off, 0
+    lt $I10, 2, rx791_start
+    sub rx791_off, $I10, 1
+    substr rx791_tgt, rx791_tgt, rx791_off
+  rx791_start:
 .annotate "line", 420
   # rx subcapture "sym"
-    set_addr $I10, rxcap_822_fail
-    rx818_cur."!mark_push"(0, rx818_pos, $I10)
-  # rx literal  "?"
-    add $I11, rx818_pos, 1
-    gt $I11, rx818_eos, rx818_fail
-    sub $I11, rx818_pos, rx818_off
-    substr $S10, rx818_tgt, $I11, 1
-    ne $S10, "?", rx818_fail
-    add rx818_pos, 1
-    set_addr $I10, rxcap_822_fail
-    ($I12, $I11) = rx818_cur."!mark_peek"($I10)
-    rx818_cur."!cursor_pos"($I11)
-    ($P10) = rx818_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx818_pos, "")
-    rx818_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_795_fail
+    rx791_cur."!mark_push"(0, rx791_pos, $I10)
+  # rx literal  "++"
+    add $I11, rx791_pos, 2
+    gt $I11, rx791_eos, rx791_fail
+    sub $I11, rx791_pos, rx791_off
+    substr $S10, rx791_tgt, $I11, 2
+    ne $S10, "++", rx791_fail
+    add rx791_pos, 2
+    set_addr $I10, rxcap_795_fail
+    ($I12, $I11) = rx791_cur."!mark_peek"($I10)
+    rx791_cur."!cursor_pos"($I11)
+    ($P10) = rx791_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx791_pos, "")
+    rx791_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_822_done
-  rxcap_822_fail:
-    goto rx818_fail
-  rxcap_822_done:
+    goto rxcap_795_done
+  rxcap_795_fail:
+    goto rx791_fail
+  rxcap_795_done:
   # rx subrule "O" subtype=capture negate=
-    rx818_cur."!cursor_pos"(rx818_pos)
-    $P10 = rx818_cur."O"("%symbolic_unary, :pirop<istrue>")
-    unless $P10, rx818_fail
-    rx818_cur."!mark_push"(0, -1, 0, $P10)
+    rx791_cur."!cursor_pos"(rx791_pos)
+    $P10 = rx791_cur."O"("%autoincrement, :pirop<inc>")
+    unless $P10, rx791_fail
+    rx791_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx818_pos = $P10."pos"()
+    rx791_pos = $P10."pos"()
   # rx pass
-    rx818_cur."!cursor_pass"(rx818_pos, "prefix:sym<?>")
-    rx818_cur."!cursor_debug"("PASS  ", "prefix:sym<?>", " at pos=", rx818_pos)
-    .return (rx818_cur)
-  rx818_fail:
-.annotate "line", 364
-    (rx818_rep, rx818_pos, $I10, $P10) = rx818_cur."!mark_fail"(0)
-    lt rx818_pos, -1, rx818_done
-    eq rx818_pos, -1, rx818_fail
+    rx791_cur."!cursor_pass"(rx791_pos, "prefix:sym<++>")
+    rx791_cur."!cursor_debug"("PASS  ", "prefix:sym<++>", " at pos=", rx791_pos)
+    .return (rx791_cur)
+  rx791_fail:
+.annotate "line", 376
+    (rx791_rep, rx791_pos, $I10, $P10) = rx791_cur."!mark_fail"(0)
+    lt rx791_pos, -1, rx791_done
+    eq rx791_pos, -1, rx791_fail
     jump $I10
-  rx818_done:
-    rx818_cur."!cursor_fail"()
-    rx818_cur."!cursor_debug"("FAIL  ", "prefix:sym<?>")
-    .return (rx818_cur)
+  rx791_done:
+    rx791_cur."!cursor_fail"()
+    rx791_cur."!cursor_debug"("FAIL  ", "prefix:sym<++>")
+    .return (rx791_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__prefix:sym<?>"  :subid("233_1258424429.0004") :method
-.annotate "line", 364
-    $P820 = self."!PREFIX__!subrule"("O", "?")
-    new $P821, "ResizablePMCArray"
-    push $P821, $P820
-    .return ($P821)
+.sub "!PREFIX__prefix:sym<++>"  :subid("220_1258533478.31768") :method
+.annotate "line", 376
+    $P793 = self."!PREFIX__!subrule"("O", "++")
+    new $P794, "ResizablePMCArray"
+    push $P794, $P793
+    .return ($P794)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "prefix:sym<!>"  :subid("234_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx824_tgt
-    .local int rx824_pos
-    .local int rx824_off
-    .local int rx824_eos
-    .local int rx824_rep
-    .local pmc rx824_cur
-    (rx824_cur, rx824_pos, rx824_tgt, $I10) = self."!cursor_start"()
-    rx824_cur."!cursor_debug"("START ", "prefix:sym<!>")
-    .lex unicode:"$\x{a2}", rx824_cur
+.sub "prefix:sym<-->"  :subid("221_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx797_tgt
+    .local int rx797_pos
+    .local int rx797_off
+    .local int rx797_eos
+    .local int rx797_rep
+    .local pmc rx797_cur
+    (rx797_cur, rx797_pos, rx797_tgt, $I10) = self."!cursor_start"()
+    rx797_cur."!cursor_debug"("START ", "prefix:sym<-->")
+    .lex unicode:"$\x{a2}", rx797_cur
     .local pmc match
     .lex "$/", match
-    length rx824_eos, rx824_tgt
-    set rx824_off, 0
-    lt $I10, 2, rx824_start
-    sub rx824_off, $I10, 1
-    substr rx824_tgt, rx824_tgt, rx824_off
-  rx824_start:
+    length rx797_eos, rx797_tgt
+    set rx797_off, 0
+    lt $I10, 2, rx797_start
+    sub rx797_off, $I10, 1
+    substr rx797_tgt, rx797_tgt, rx797_off
+  rx797_start:
 .annotate "line", 421
   # rx subcapture "sym"
-    set_addr $I10, rxcap_828_fail
-    rx824_cur."!mark_push"(0, rx824_pos, $I10)
-  # rx literal  "!"
-    add $I11, rx824_pos, 1
-    gt $I11, rx824_eos, rx824_fail
-    sub $I11, rx824_pos, rx824_off
-    substr $S10, rx824_tgt, $I11, 1
-    ne $S10, "!", rx824_fail
-    add rx824_pos, 1
-    set_addr $I10, rxcap_828_fail
-    ($I12, $I11) = rx824_cur."!mark_peek"($I10)
-    rx824_cur."!cursor_pos"($I11)
-    ($P10) = rx824_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx824_pos, "")
-    rx824_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_801_fail
+    rx797_cur."!mark_push"(0, rx797_pos, $I10)
+  # rx literal  "--"
+    add $I11, rx797_pos, 2
+    gt $I11, rx797_eos, rx797_fail
+    sub $I11, rx797_pos, rx797_off
+    substr $S10, rx797_tgt, $I11, 2
+    ne $S10, "--", rx797_fail
+    add rx797_pos, 2
+    set_addr $I10, rxcap_801_fail
+    ($I12, $I11) = rx797_cur."!mark_peek"($I10)
+    rx797_cur."!cursor_pos"($I11)
+    ($P10) = rx797_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx797_pos, "")
+    rx797_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_828_done
-  rxcap_828_fail:
-    goto rx824_fail
-  rxcap_828_done:
+    goto rxcap_801_done
+  rxcap_801_fail:
+    goto rx797_fail
+  rxcap_801_done:
   # rx subrule "O" subtype=capture negate=
-    rx824_cur."!cursor_pos"(rx824_pos)
-    $P10 = rx824_cur."O"("%symbolic_unary, :pirop<isfalse>")
-    unless $P10, rx824_fail
-    rx824_cur."!mark_push"(0, -1, 0, $P10)
+    rx797_cur."!cursor_pos"(rx797_pos)
+    $P10 = rx797_cur."O"("%autoincrement, :pirop<dec>")
+    unless $P10, rx797_fail
+    rx797_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx824_pos = $P10."pos"()
+    rx797_pos = $P10."pos"()
   # rx pass
-    rx824_cur."!cursor_pass"(rx824_pos, "prefix:sym<!>")
-    rx824_cur."!cursor_debug"("PASS  ", "prefix:sym<!>", " at pos=", rx824_pos)
-    .return (rx824_cur)
-  rx824_fail:
-.annotate "line", 364
-    (rx824_rep, rx824_pos, $I10, $P10) = rx824_cur."!mark_fail"(0)
-    lt rx824_pos, -1, rx824_done
-    eq rx824_pos, -1, rx824_fail
+    rx797_cur."!cursor_pass"(rx797_pos, "prefix:sym<-->")
+    rx797_cur."!cursor_debug"("PASS  ", "prefix:sym<-->", " at pos=", rx797_pos)
+    .return (rx797_cur)
+  rx797_fail:
+.annotate "line", 376
+    (rx797_rep, rx797_pos, $I10, $P10) = rx797_cur."!mark_fail"(0)
+    lt rx797_pos, -1, rx797_done
+    eq rx797_pos, -1, rx797_fail
     jump $I10
-  rx824_done:
-    rx824_cur."!cursor_fail"()
-    rx824_cur."!cursor_debug"("FAIL  ", "prefix:sym<!>")
-    .return (rx824_cur)
+  rx797_done:
+    rx797_cur."!cursor_fail"()
+    rx797_cur."!cursor_debug"("FAIL  ", "prefix:sym<-->")
+    .return (rx797_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__prefix:sym<!>"  :subid("235_1258424429.0004") :method
-.annotate "line", 364
-    $P826 = self."!PREFIX__!subrule"("O", "!")
-    new $P827, "ResizablePMCArray"
-    push $P827, $P826
-    .return ($P827)
+.sub "!PREFIX__prefix:sym<-->"  :subid("222_1258533478.31768") :method
+.annotate "line", 376
+    $P799 = self."!PREFIX__!subrule"("O", "--")
+    new $P800, "ResizablePMCArray"
+    push $P800, $P799
+    .return ($P800)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "prefix:sym<|>"  :subid("236_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx830_tgt
-    .local int rx830_pos
-    .local int rx830_off
-    .local int rx830_eos
-    .local int rx830_rep
-    .local pmc rx830_cur
-    (rx830_cur, rx830_pos, rx830_tgt, $I10) = self."!cursor_start"()
-    rx830_cur."!cursor_debug"("START ", "prefix:sym<|>")
-    .lex unicode:"$\x{a2}", rx830_cur
+.sub "postfix:sym<++>"  :subid("223_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx803_tgt
+    .local int rx803_pos
+    .local int rx803_off
+    .local int rx803_eos
+    .local int rx803_rep
+    .local pmc rx803_cur
+    (rx803_cur, rx803_pos, rx803_tgt, $I10) = self."!cursor_start"()
+    rx803_cur."!cursor_debug"("START ", "postfix:sym<++>")
+    .lex unicode:"$\x{a2}", rx803_cur
     .local pmc match
     .lex "$/", match
-    length rx830_eos, rx830_tgt
-    set rx830_off, 0
-    lt $I10, 2, rx830_start
-    sub rx830_off, $I10, 1
-    substr rx830_tgt, rx830_tgt, rx830_off
-  rx830_start:
-.annotate "line", 422
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_834_fail
-    rx830_cur."!mark_push"(0, rx830_pos, $I10)
-  # rx literal  "|"
-    add $I11, rx830_pos, 1
-    gt $I11, rx830_eos, rx830_fail
-    sub $I11, rx830_pos, rx830_off
-    substr $S10, rx830_tgt, $I11, 1
-    ne $S10, "|", rx830_fail
-    add rx830_pos, 1
-    set_addr $I10, rxcap_834_fail
-    ($I12, $I11) = rx830_cur."!mark_peek"($I10)
-    rx830_cur."!cursor_pos"($I11)
-    ($P10) = rx830_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx830_pos, "")
-    rx830_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_834_done
-  rxcap_834_fail:
-    goto rx830_fail
-  rxcap_834_done:
-  # rx subrule "O" subtype=capture negate=
-    rx830_cur."!cursor_pos"(rx830_pos)
-    $P10 = rx830_cur."O"("%symbolic_unary")
-    unless $P10, rx830_fail
-    rx830_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("O")
-    rx830_pos = $P10."pos"()
-  # rx pass
-    rx830_cur."!cursor_pass"(rx830_pos, "prefix:sym<|>")
-    rx830_cur."!cursor_debug"("PASS  ", "prefix:sym<|>", " at pos=", rx830_pos)
-    .return (rx830_cur)
-  rx830_fail:
-.annotate "line", 364
-    (rx830_rep, rx830_pos, $I10, $P10) = rx830_cur."!mark_fail"(0)
-    lt rx830_pos, -1, rx830_done
-    eq rx830_pos, -1, rx830_fail
-    jump $I10
-  rx830_done:
-    rx830_cur."!cursor_fail"()
-    rx830_cur."!cursor_debug"("FAIL  ", "prefix:sym<|>")
-    .return (rx830_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__prefix:sym<|>"  :subid("237_1258424429.0004") :method
-.annotate "line", 364
-    $P832 = self."!PREFIX__!subrule"("O", "|")
-    new $P833, "ResizablePMCArray"
-    push $P833, $P832
-    .return ($P833)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "infix:sym<*>"  :subid("238_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx836_tgt
-    .local int rx836_pos
-    .local int rx836_off
-    .local int rx836_eos
-    .local int rx836_rep
-    .local pmc rx836_cur
-    (rx836_cur, rx836_pos, rx836_tgt, $I10) = self."!cursor_start"()
-    rx836_cur."!cursor_debug"("START ", "infix:sym<*>")
-    .lex unicode:"$\x{a2}", rx836_cur
-    .local pmc match
-    .lex "$/", match
-    length rx836_eos, rx836_tgt
-    set rx836_off, 0
-    lt $I10, 2, rx836_start
-    sub rx836_off, $I10, 1
-    substr rx836_tgt, rx836_tgt, rx836_off
-  rx836_start:
+    length rx803_eos, rx803_tgt
+    set rx803_off, 0
+    lt $I10, 2, rx803_start
+    sub rx803_off, $I10, 1
+    substr rx803_tgt, rx803_tgt, rx803_off
+  rx803_start:
 .annotate "line", 424
   # rx subcapture "sym"
-    set_addr $I10, rxcap_840_fail
-    rx836_cur."!mark_push"(0, rx836_pos, $I10)
-  # rx literal  "*"
-    add $I11, rx836_pos, 1
-    gt $I11, rx836_eos, rx836_fail
-    sub $I11, rx836_pos, rx836_off
-    substr $S10, rx836_tgt, $I11, 1
-    ne $S10, "*", rx836_fail
-    add rx836_pos, 1
-    set_addr $I10, rxcap_840_fail
-    ($I12, $I11) = rx836_cur."!mark_peek"($I10)
-    rx836_cur."!cursor_pos"($I11)
-    ($P10) = rx836_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx836_pos, "")
-    rx836_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_807_fail
+    rx803_cur."!mark_push"(0, rx803_pos, $I10)
+  # rx literal  "++"
+    add $I11, rx803_pos, 2
+    gt $I11, rx803_eos, rx803_fail
+    sub $I11, rx803_pos, rx803_off
+    substr $S10, rx803_tgt, $I11, 2
+    ne $S10, "++", rx803_fail
+    add rx803_pos, 2
+    set_addr $I10, rxcap_807_fail
+    ($I12, $I11) = rx803_cur."!mark_peek"($I10)
+    rx803_cur."!cursor_pos"($I11)
+    ($P10) = rx803_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx803_pos, "")
+    rx803_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_840_done
-  rxcap_840_fail:
-    goto rx836_fail
-  rxcap_840_done:
+    goto rxcap_807_done
+  rxcap_807_fail:
+    goto rx803_fail
+  rxcap_807_done:
   # rx subrule "O" subtype=capture negate=
-    rx836_cur."!cursor_pos"(rx836_pos)
-    $P10 = rx836_cur."O"("%multiplicative, :pirop<mul>")
-    unless $P10, rx836_fail
-    rx836_cur."!mark_push"(0, -1, 0, $P10)
+    rx803_cur."!cursor_pos"(rx803_pos)
+    $P10 = rx803_cur."O"("%autoincrement")
+    unless $P10, rx803_fail
+    rx803_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx836_pos = $P10."pos"()
+    rx803_pos = $P10."pos"()
   # rx pass
-    rx836_cur."!cursor_pass"(rx836_pos, "infix:sym<*>")
-    rx836_cur."!cursor_debug"("PASS  ", "infix:sym<*>", " at pos=", rx836_pos)
-    .return (rx836_cur)
-  rx836_fail:
-.annotate "line", 364
-    (rx836_rep, rx836_pos, $I10, $P10) = rx836_cur."!mark_fail"(0)
-    lt rx836_pos, -1, rx836_done
-    eq rx836_pos, -1, rx836_fail
+    rx803_cur."!cursor_pass"(rx803_pos, "postfix:sym<++>")
+    rx803_cur."!cursor_debug"("PASS  ", "postfix:sym<++>", " at pos=", rx803_pos)
+    .return (rx803_cur)
+  rx803_fail:
+.annotate "line", 376
+    (rx803_rep, rx803_pos, $I10, $P10) = rx803_cur."!mark_fail"(0)
+    lt rx803_pos, -1, rx803_done
+    eq rx803_pos, -1, rx803_fail
     jump $I10
-  rx836_done:
-    rx836_cur."!cursor_fail"()
-    rx836_cur."!cursor_debug"("FAIL  ", "infix:sym<*>")
-    .return (rx836_cur)
+  rx803_done:
+    rx803_cur."!cursor_fail"()
+    rx803_cur."!cursor_debug"("FAIL  ", "postfix:sym<++>")
+    .return (rx803_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<*>"  :subid("239_1258424429.0004") :method
-.annotate "line", 364
-    $P838 = self."!PREFIX__!subrule"("O", "*")
-    new $P839, "ResizablePMCArray"
-    push $P839, $P838
-    .return ($P839)
+.sub "!PREFIX__postfix:sym<++>"  :subid("224_1258533478.31768") :method
+.annotate "line", 376
+    $P805 = self."!PREFIX__!subrule"("O", "++")
+    new $P806, "ResizablePMCArray"
+    push $P806, $P805
+    .return ($P806)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym</>"  :subid("240_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx842_tgt
-    .local int rx842_pos
-    .local int rx842_off
-    .local int rx842_eos
-    .local int rx842_rep
-    .local pmc rx842_cur
-    (rx842_cur, rx842_pos, rx842_tgt, $I10) = self."!cursor_start"()
-    rx842_cur."!cursor_debug"("START ", "infix:sym</>")
-    .lex unicode:"$\x{a2}", rx842_cur
+.sub "postfix:sym<-->"  :subid("225_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx809_tgt
+    .local int rx809_pos
+    .local int rx809_off
+    .local int rx809_eos
+    .local int rx809_rep
+    .local pmc rx809_cur
+    (rx809_cur, rx809_pos, rx809_tgt, $I10) = self."!cursor_start"()
+    rx809_cur."!cursor_debug"("START ", "postfix:sym<-->")
+    .lex unicode:"$\x{a2}", rx809_cur
     .local pmc match
     .lex "$/", match
-    length rx842_eos, rx842_tgt
-    set rx842_off, 0
-    lt $I10, 2, rx842_start
-    sub rx842_off, $I10, 1
-    substr rx842_tgt, rx842_tgt, rx842_off
-  rx842_start:
+    length rx809_eos, rx809_tgt
+    set rx809_off, 0
+    lt $I10, 2, rx809_start
+    sub rx809_off, $I10, 1
+    substr rx809_tgt, rx809_tgt, rx809_off
+  rx809_start:
 .annotate "line", 425
   # rx subcapture "sym"
-    set_addr $I10, rxcap_846_fail
-    rx842_cur."!mark_push"(0, rx842_pos, $I10)
-  # rx literal  "/"
-    add $I11, rx842_pos, 1
-    gt $I11, rx842_eos, rx842_fail
-    sub $I11, rx842_pos, rx842_off
-    substr $S10, rx842_tgt, $I11, 1
-    ne $S10, "/", rx842_fail
-    add rx842_pos, 1
-    set_addr $I10, rxcap_846_fail
-    ($I12, $I11) = rx842_cur."!mark_peek"($I10)
-    rx842_cur."!cursor_pos"($I11)
-    ($P10) = rx842_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx842_pos, "")
-    rx842_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_813_fail
+    rx809_cur."!mark_push"(0, rx809_pos, $I10)
+  # rx literal  "--"
+    add $I11, rx809_pos, 2
+    gt $I11, rx809_eos, rx809_fail
+    sub $I11, rx809_pos, rx809_off
+    substr $S10, rx809_tgt, $I11, 2
+    ne $S10, "--", rx809_fail
+    add rx809_pos, 2
+    set_addr $I10, rxcap_813_fail
+    ($I12, $I11) = rx809_cur."!mark_peek"($I10)
+    rx809_cur."!cursor_pos"($I11)
+    ($P10) = rx809_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx809_pos, "")
+    rx809_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_846_done
-  rxcap_846_fail:
-    goto rx842_fail
-  rxcap_846_done:
+    goto rxcap_813_done
+  rxcap_813_fail:
+    goto rx809_fail
+  rxcap_813_done:
   # rx subrule "O" subtype=capture negate=
-    rx842_cur."!cursor_pos"(rx842_pos)
-    $P10 = rx842_cur."O"("%multiplicative, :pirop<div>")
-    unless $P10, rx842_fail
-    rx842_cur."!mark_push"(0, -1, 0, $P10)
+    rx809_cur."!cursor_pos"(rx809_pos)
+    $P10 = rx809_cur."O"("%autoincrement")
+    unless $P10, rx809_fail
+    rx809_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx842_pos = $P10."pos"()
+    rx809_pos = $P10."pos"()
   # rx pass
-    rx842_cur."!cursor_pass"(rx842_pos, "infix:sym</>")
-    rx842_cur."!cursor_debug"("PASS  ", "infix:sym</>", " at pos=", rx842_pos)
-    .return (rx842_cur)
-  rx842_fail:
-.annotate "line", 364
-    (rx842_rep, rx842_pos, $I10, $P10) = rx842_cur."!mark_fail"(0)
-    lt rx842_pos, -1, rx842_done
-    eq rx842_pos, -1, rx842_fail
+    rx809_cur."!cursor_pass"(rx809_pos, "postfix:sym<-->")
+    rx809_cur."!cursor_debug"("PASS  ", "postfix:sym<-->", " at pos=", rx809_pos)
+    .return (rx809_cur)
+  rx809_fail:
+.annotate "line", 376
+    (rx809_rep, rx809_pos, $I10, $P10) = rx809_cur."!mark_fail"(0)
+    lt rx809_pos, -1, rx809_done
+    eq rx809_pos, -1, rx809_fail
     jump $I10
-  rx842_done:
-    rx842_cur."!cursor_fail"()
-    rx842_cur."!cursor_debug"("FAIL  ", "infix:sym</>")
-    .return (rx842_cur)
+  rx809_done:
+    rx809_cur."!cursor_fail"()
+    rx809_cur."!cursor_debug"("FAIL  ", "postfix:sym<-->")
+    .return (rx809_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym</>"  :subid("241_1258424429.0004") :method
-.annotate "line", 364
-    $P844 = self."!PREFIX__!subrule"("O", "/")
-    new $P845, "ResizablePMCArray"
-    push $P845, $P844
-    .return ($P845)
+.sub "!PREFIX__postfix:sym<-->"  :subid("226_1258533478.31768") :method
+.annotate "line", 376
+    $P811 = self."!PREFIX__!subrule"("O", "--")
+    new $P812, "ResizablePMCArray"
+    push $P812, $P811
+    .return ($P812)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<%>"  :subid("242_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx848_tgt
-    .local int rx848_pos
-    .local int rx848_off
-    .local int rx848_eos
-    .local int rx848_rep
-    .local pmc rx848_cur
-    (rx848_cur, rx848_pos, rx848_tgt, $I10) = self."!cursor_start"()
-    rx848_cur."!cursor_debug"("START ", "infix:sym<%>")
-    .lex unicode:"$\x{a2}", rx848_cur
+.sub "infix:sym<**>"  :subid("227_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx815_tgt
+    .local int rx815_pos
+    .local int rx815_off
+    .local int rx815_eos
+    .local int rx815_rep
+    .local pmc rx815_cur
+    (rx815_cur, rx815_pos, rx815_tgt, $I10) = self."!cursor_start"()
+    rx815_cur."!cursor_debug"("START ", "infix:sym<**>")
+    .lex unicode:"$\x{a2}", rx815_cur
     .local pmc match
     .lex "$/", match
-    length rx848_eos, rx848_tgt
-    set rx848_off, 0
-    lt $I10, 2, rx848_start
-    sub rx848_off, $I10, 1
-    substr rx848_tgt, rx848_tgt, rx848_off
-  rx848_start:
-.annotate "line", 426
+    length rx815_eos, rx815_tgt
+    set rx815_off, 0
+    lt $I10, 2, rx815_start
+    sub rx815_off, $I10, 1
+    substr rx815_tgt, rx815_tgt, rx815_off
+  rx815_start:
+.annotate "line", 427
   # rx subcapture "sym"
-    set_addr $I10, rxcap_852_fail
-    rx848_cur."!mark_push"(0, rx848_pos, $I10)
-  # rx literal  "%"
-    add $I11, rx848_pos, 1
-    gt $I11, rx848_eos, rx848_fail
-    sub $I11, rx848_pos, rx848_off
-    substr $S10, rx848_tgt, $I11, 1
-    ne $S10, "%", rx848_fail
-    add rx848_pos, 1
-    set_addr $I10, rxcap_852_fail
-    ($I12, $I11) = rx848_cur."!mark_peek"($I10)
-    rx848_cur."!cursor_pos"($I11)
-    ($P10) = rx848_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx848_pos, "")
-    rx848_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_819_fail
+    rx815_cur."!mark_push"(0, rx815_pos, $I10)
+  # rx literal  "**"
+    add $I11, rx815_pos, 2
+    gt $I11, rx815_eos, rx815_fail
+    sub $I11, rx815_pos, rx815_off
+    substr $S10, rx815_tgt, $I11, 2
+    ne $S10, "**", rx815_fail
+    add rx815_pos, 2
+    set_addr $I10, rxcap_819_fail
+    ($I12, $I11) = rx815_cur."!mark_peek"($I10)
+    rx815_cur."!cursor_pos"($I11)
+    ($P10) = rx815_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx815_pos, "")
+    rx815_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_852_done
-  rxcap_852_fail:
-    goto rx848_fail
-  rxcap_852_done:
+    goto rxcap_819_done
+  rxcap_819_fail:
+    goto rx815_fail
+  rxcap_819_done:
   # rx subrule "O" subtype=capture negate=
-    rx848_cur."!cursor_pos"(rx848_pos)
-    $P10 = rx848_cur."O"("%multiplicative, :pirop<mod>")
-    unless $P10, rx848_fail
-    rx848_cur."!mark_push"(0, -1, 0, $P10)
+    rx815_cur."!cursor_pos"(rx815_pos)
+    $P10 = rx815_cur."O"("%exponentiation, :pirop<pow>")
+    unless $P10, rx815_fail
+    rx815_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx848_pos = $P10."pos"()
+    rx815_pos = $P10."pos"()
   # rx pass
-    rx848_cur."!cursor_pass"(rx848_pos, "infix:sym<%>")
-    rx848_cur."!cursor_debug"("PASS  ", "infix:sym<%>", " at pos=", rx848_pos)
-    .return (rx848_cur)
-  rx848_fail:
-.annotate "line", 364
-    (rx848_rep, rx848_pos, $I10, $P10) = rx848_cur."!mark_fail"(0)
-    lt rx848_pos, -1, rx848_done
-    eq rx848_pos, -1, rx848_fail
+    rx815_cur."!cursor_pass"(rx815_pos, "infix:sym<**>")
+    rx815_cur."!cursor_debug"("PASS  ", "infix:sym<**>", " at pos=", rx815_pos)
+    .return (rx815_cur)
+  rx815_fail:
+.annotate "line", 376
+    (rx815_rep, rx815_pos, $I10, $P10) = rx815_cur."!mark_fail"(0)
+    lt rx815_pos, -1, rx815_done
+    eq rx815_pos, -1, rx815_fail
     jump $I10
-  rx848_done:
-    rx848_cur."!cursor_fail"()
-    rx848_cur."!cursor_debug"("FAIL  ", "infix:sym<%>")
-    .return (rx848_cur)
+  rx815_done:
+    rx815_cur."!cursor_fail"()
+    rx815_cur."!cursor_debug"("FAIL  ", "infix:sym<**>")
+    .return (rx815_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<%>"  :subid("243_1258424429.0004") :method
-.annotate "line", 364
-    $P850 = self."!PREFIX__!subrule"("O", "%")
-    new $P851, "ResizablePMCArray"
-    push $P851, $P850
-    .return ($P851)
+.sub "!PREFIX__infix:sym<**>"  :subid("228_1258533478.31768") :method
+.annotate "line", 376
+    $P817 = self."!PREFIX__!subrule"("O", "**")
+    new $P818, "ResizablePMCArray"
+    push $P818, $P817
+    .return ($P818)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<+>"  :subid("244_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx854_tgt
-    .local int rx854_pos
-    .local int rx854_off
-    .local int rx854_eos
-    .local int rx854_rep
-    .local pmc rx854_cur
-    (rx854_cur, rx854_pos, rx854_tgt, $I10) = self."!cursor_start"()
-    rx854_cur."!cursor_debug"("START ", "infix:sym<+>")
-    .lex unicode:"$\x{a2}", rx854_cur
+.sub "prefix:sym<+>"  :subid("229_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx821_tgt
+    .local int rx821_pos
+    .local int rx821_off
+    .local int rx821_eos
+    .local int rx821_rep
+    .local pmc rx821_cur
+    (rx821_cur, rx821_pos, rx821_tgt, $I10) = self."!cursor_start"()
+    rx821_cur."!cursor_debug"("START ", "prefix:sym<+>")
+    .lex unicode:"$\x{a2}", rx821_cur
     .local pmc match
     .lex "$/", match
-    length rx854_eos, rx854_tgt
-    set rx854_off, 0
-    lt $I10, 2, rx854_start
-    sub rx854_off, $I10, 1
-    substr rx854_tgt, rx854_tgt, rx854_off
-  rx854_start:
-.annotate "line", 428
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_858_fail
-    rx854_cur."!mark_push"(0, rx854_pos, $I10)
-  # rx literal  "+"
-    add $I11, rx854_pos, 1
-    gt $I11, rx854_eos, rx854_fail
-    sub $I11, rx854_pos, rx854_off
-    substr $S10, rx854_tgt, $I11, 1
-    ne $S10, "+", rx854_fail
-    add rx854_pos, 1
-    set_addr $I10, rxcap_858_fail
-    ($I12, $I11) = rx854_cur."!mark_peek"($I10)
-    rx854_cur."!cursor_pos"($I11)
-    ($P10) = rx854_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx854_pos, "")
-    rx854_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_858_done
-  rxcap_858_fail:
-    goto rx854_fail
-  rxcap_858_done:
-  # rx subrule "O" subtype=capture negate=
-    rx854_cur."!cursor_pos"(rx854_pos)
-    $P10 = rx854_cur."O"("%additive, :pirop<add>")
-    unless $P10, rx854_fail
-    rx854_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("O")
-    rx854_pos = $P10."pos"()
-  # rx pass
-    rx854_cur."!cursor_pass"(rx854_pos, "infix:sym<+>")
-    rx854_cur."!cursor_debug"("PASS  ", "infix:sym<+>", " at pos=", rx854_pos)
-    .return (rx854_cur)
-  rx854_fail:
-.annotate "line", 364
-    (rx854_rep, rx854_pos, $I10, $P10) = rx854_cur."!mark_fail"(0)
-    lt rx854_pos, -1, rx854_done
-    eq rx854_pos, -1, rx854_fail
-    jump $I10
-  rx854_done:
-    rx854_cur."!cursor_fail"()
-    rx854_cur."!cursor_debug"("FAIL  ", "infix:sym<+>")
-    .return (rx854_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<+>"  :subid("245_1258424429.0004") :method
-.annotate "line", 364
-    $P856 = self."!PREFIX__!subrule"("O", "+")
-    new $P857, "ResizablePMCArray"
-    push $P857, $P856
-    .return ($P857)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "infix:sym<->"  :subid("246_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx860_tgt
-    .local int rx860_pos
-    .local int rx860_off
-    .local int rx860_eos
-    .local int rx860_rep
-    .local pmc rx860_cur
-    (rx860_cur, rx860_pos, rx860_tgt, $I10) = self."!cursor_start"()
-    rx860_cur."!cursor_debug"("START ", "infix:sym<->")
-    .lex unicode:"$\x{a2}", rx860_cur
-    .local pmc match
-    .lex "$/", match
-    length rx860_eos, rx860_tgt
-    set rx860_off, 0
-    lt $I10, 2, rx860_start
-    sub rx860_off, $I10, 1
-    substr rx860_tgt, rx860_tgt, rx860_off
-  rx860_start:
+    length rx821_eos, rx821_tgt
+    set rx821_off, 0
+    lt $I10, 2, rx821_start
+    sub rx821_off, $I10, 1
+    substr rx821_tgt, rx821_tgt, rx821_off
+  rx821_start:
 .annotate "line", 429
   # rx subcapture "sym"
-    set_addr $I10, rxcap_864_fail
-    rx860_cur."!mark_push"(0, rx860_pos, $I10)
-  # rx literal  "-"
-    add $I11, rx860_pos, 1
-    gt $I11, rx860_eos, rx860_fail
-    sub $I11, rx860_pos, rx860_off
-    substr $S10, rx860_tgt, $I11, 1
-    ne $S10, "-", rx860_fail
-    add rx860_pos, 1
-    set_addr $I10, rxcap_864_fail
-    ($I12, $I11) = rx860_cur."!mark_peek"($I10)
-    rx860_cur."!cursor_pos"($I11)
-    ($P10) = rx860_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx860_pos, "")
-    rx860_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_825_fail
+    rx821_cur."!mark_push"(0, rx821_pos, $I10)
+  # rx literal  "+"
+    add $I11, rx821_pos, 1
+    gt $I11, rx821_eos, rx821_fail
+    sub $I11, rx821_pos, rx821_off
+    substr $S10, rx821_tgt, $I11, 1
+    ne $S10, "+", rx821_fail
+    add rx821_pos, 1
+    set_addr $I10, rxcap_825_fail
+    ($I12, $I11) = rx821_cur."!mark_peek"($I10)
+    rx821_cur."!cursor_pos"($I11)
+    ($P10) = rx821_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx821_pos, "")
+    rx821_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_864_done
-  rxcap_864_fail:
-    goto rx860_fail
-  rxcap_864_done:
+    goto rxcap_825_done
+  rxcap_825_fail:
+    goto rx821_fail
+  rxcap_825_done:
   # rx subrule "O" subtype=capture negate=
-    rx860_cur."!cursor_pos"(rx860_pos)
-    $P10 = rx860_cur."O"("%additive, :pirop<sub>")
-    unless $P10, rx860_fail
-    rx860_cur."!mark_push"(0, -1, 0, $P10)
+    rx821_cur."!cursor_pos"(rx821_pos)
+    $P10 = rx821_cur."O"("%symbolic_unary, :pirop<set N*>")
+    unless $P10, rx821_fail
+    rx821_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx860_pos = $P10."pos"()
+    rx821_pos = $P10."pos"()
   # rx pass
-    rx860_cur."!cursor_pass"(rx860_pos, "infix:sym<->")
-    rx860_cur."!cursor_debug"("PASS  ", "infix:sym<->", " at pos=", rx860_pos)
-    .return (rx860_cur)
-  rx860_fail:
-.annotate "line", 364
-    (rx860_rep, rx860_pos, $I10, $P10) = rx860_cur."!mark_fail"(0)
-    lt rx860_pos, -1, rx860_done
-    eq rx860_pos, -1, rx860_fail
+    rx821_cur."!cursor_pass"(rx821_pos, "prefix:sym<+>")
+    rx821_cur."!cursor_debug"("PASS  ", "prefix:sym<+>", " at pos=", rx821_pos)
+    .return (rx821_cur)
+  rx821_fail:
+.annotate "line", 376
+    (rx821_rep, rx821_pos, $I10, $P10) = rx821_cur."!mark_fail"(0)
+    lt rx821_pos, -1, rx821_done
+    eq rx821_pos, -1, rx821_fail
     jump $I10
-  rx860_done:
-    rx860_cur."!cursor_fail"()
-    rx860_cur."!cursor_debug"("FAIL  ", "infix:sym<->")
-    .return (rx860_cur)
+  rx821_done:
+    rx821_cur."!cursor_fail"()
+    rx821_cur."!cursor_debug"("FAIL  ", "prefix:sym<+>")
+    .return (rx821_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<->"  :subid("247_1258424429.0004") :method
-.annotate "line", 364
-    $P862 = self."!PREFIX__!subrule"("O", "-")
-    new $P863, "ResizablePMCArray"
-    push $P863, $P862
-    .return ($P863)
+.sub "!PREFIX__prefix:sym<+>"  :subid("230_1258533478.31768") :method
+.annotate "line", 376
+    $P823 = self."!PREFIX__!subrule"("O", "+")
+    new $P824, "ResizablePMCArray"
+    push $P824, $P823
+    .return ($P824)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<~>"  :subid("248_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx866_tgt
-    .local int rx866_pos
-    .local int rx866_off
-    .local int rx866_eos
-    .local int rx866_rep
-    .local pmc rx866_cur
-    (rx866_cur, rx866_pos, rx866_tgt, $I10) = self."!cursor_start"()
-    rx866_cur."!cursor_debug"("START ", "infix:sym<~>")
-    .lex unicode:"$\x{a2}", rx866_cur
+.sub "prefix:sym<~>"  :subid("231_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx827_tgt
+    .local int rx827_pos
+    .local int rx827_off
+    .local int rx827_eos
+    .local int rx827_rep
+    .local pmc rx827_cur
+    (rx827_cur, rx827_pos, rx827_tgt, $I10) = self."!cursor_start"()
+    rx827_cur."!cursor_debug"("START ", "prefix:sym<~>")
+    .lex unicode:"$\x{a2}", rx827_cur
     .local pmc match
     .lex "$/", match
-    length rx866_eos, rx866_tgt
-    set rx866_off, 0
-    lt $I10, 2, rx866_start
-    sub rx866_off, $I10, 1
-    substr rx866_tgt, rx866_tgt, rx866_off
-  rx866_start:
+    length rx827_eos, rx827_tgt
+    set rx827_off, 0
+    lt $I10, 2, rx827_start
+    sub rx827_off, $I10, 1
+    substr rx827_tgt, rx827_tgt, rx827_off
+  rx827_start:
+.annotate "line", 430
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_831_fail
+    rx827_cur."!mark_push"(0, rx827_pos, $I10)
+  # rx literal  "~"
+    add $I11, rx827_pos, 1
+    gt $I11, rx827_eos, rx827_fail
+    sub $I11, rx827_pos, rx827_off
+    substr $S10, rx827_tgt, $I11, 1
+    ne $S10, "~", rx827_fail
+    add rx827_pos, 1
+    set_addr $I10, rxcap_831_fail
+    ($I12, $I11) = rx827_cur."!mark_peek"($I10)
+    rx827_cur."!cursor_pos"($I11)
+    ($P10) = rx827_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx827_pos, "")
+    rx827_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_831_done
+  rxcap_831_fail:
+    goto rx827_fail
+  rxcap_831_done:
+  # rx subrule "O" subtype=capture negate=
+    rx827_cur."!cursor_pos"(rx827_pos)
+    $P10 = rx827_cur."O"("%symbolic_unary, :pirop<set S*>")
+    unless $P10, rx827_fail
+    rx827_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("O")
+    rx827_pos = $P10."pos"()
+  # rx pass
+    rx827_cur."!cursor_pass"(rx827_pos, "prefix:sym<~>")
+    rx827_cur."!cursor_debug"("PASS  ", "prefix:sym<~>", " at pos=", rx827_pos)
+    .return (rx827_cur)
+  rx827_fail:
+.annotate "line", 376
+    (rx827_rep, rx827_pos, $I10, $P10) = rx827_cur."!mark_fail"(0)
+    lt rx827_pos, -1, rx827_done
+    eq rx827_pos, -1, rx827_fail
+    jump $I10
+  rx827_done:
+    rx827_cur."!cursor_fail"()
+    rx827_cur."!cursor_debug"("FAIL  ", "prefix:sym<~>")
+    .return (rx827_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__prefix:sym<~>"  :subid("232_1258533478.31768") :method
+.annotate "line", 376
+    $P829 = self."!PREFIX__!subrule"("O", "~")
+    new $P830, "ResizablePMCArray"
+    push $P830, $P829
+    .return ($P830)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "prefix:sym<->"  :subid("233_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx833_tgt
+    .local int rx833_pos
+    .local int rx833_off
+    .local int rx833_eos
+    .local int rx833_rep
+    .local pmc rx833_cur
+    (rx833_cur, rx833_pos, rx833_tgt, $I10) = self."!cursor_start"()
+    rx833_cur."!cursor_debug"("START ", "prefix:sym<->")
+    .lex unicode:"$\x{a2}", rx833_cur
+    .local pmc match
+    .lex "$/", match
+    length rx833_eos, rx833_tgt
+    set rx833_off, 0
+    lt $I10, 2, rx833_start
+    sub rx833_off, $I10, 1
+    substr rx833_tgt, rx833_tgt, rx833_off
+  rx833_start:
 .annotate "line", 431
   # rx subcapture "sym"
-    set_addr $I10, rxcap_870_fail
-    rx866_cur."!mark_push"(0, rx866_pos, $I10)
-  # rx literal  "~"
-    add $I11, rx866_pos, 1
-    gt $I11, rx866_eos, rx866_fail
-    sub $I11, rx866_pos, rx866_off
-    substr $S10, rx866_tgt, $I11, 1
-    ne $S10, "~", rx866_fail
-    add rx866_pos, 1
-    set_addr $I10, rxcap_870_fail
-    ($I12, $I11) = rx866_cur."!mark_peek"($I10)
-    rx866_cur."!cursor_pos"($I11)
-    ($P10) = rx866_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx866_pos, "")
-    rx866_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_837_fail
+    rx833_cur."!mark_push"(0, rx833_pos, $I10)
+  # rx literal  "-"
+    add $I11, rx833_pos, 1
+    gt $I11, rx833_eos, rx833_fail
+    sub $I11, rx833_pos, rx833_off
+    substr $S10, rx833_tgt, $I11, 1
+    ne $S10, "-", rx833_fail
+    add rx833_pos, 1
+    set_addr $I10, rxcap_837_fail
+    ($I12, $I11) = rx833_cur."!mark_peek"($I10)
+    rx833_cur."!cursor_pos"($I11)
+    ($P10) = rx833_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx833_pos, "")
+    rx833_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_870_done
-  rxcap_870_fail:
-    goto rx866_fail
-  rxcap_870_done:
+    goto rxcap_837_done
+  rxcap_837_fail:
+    goto rx833_fail
+  rxcap_837_done:
+  # rx enumcharlist negate=1 zerowidth
+    ge rx833_pos, rx833_eos, rx833_fail
+    sub $I10, rx833_pos, rx833_off
+    substr $S10, rx833_tgt, $I10, 1
+    index $I11, ">", $S10
+    ge $I11, 0, rx833_fail
   # rx subrule "O" subtype=capture negate=
-    rx866_cur."!cursor_pos"(rx866_pos)
-    $P10 = rx866_cur."O"("%concatenation , :pirop<concat>")
-    unless $P10, rx866_fail
-    rx866_cur."!mark_push"(0, -1, 0, $P10)
+    rx833_cur."!cursor_pos"(rx833_pos)
+    $P10 = rx833_cur."O"("%symbolic_unary, :pirop<neg>")
+    unless $P10, rx833_fail
+    rx833_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx866_pos = $P10."pos"()
+    rx833_pos = $P10."pos"()
   # rx pass
-    rx866_cur."!cursor_pass"(rx866_pos, "infix:sym<~>")
-    rx866_cur."!cursor_debug"("PASS  ", "infix:sym<~>", " at pos=", rx866_pos)
-    .return (rx866_cur)
-  rx866_fail:
-.annotate "line", 364
-    (rx866_rep, rx866_pos, $I10, $P10) = rx866_cur."!mark_fail"(0)
-    lt rx866_pos, -1, rx866_done
-    eq rx866_pos, -1, rx866_fail
+    rx833_cur."!cursor_pass"(rx833_pos, "prefix:sym<->")
+    rx833_cur."!cursor_debug"("PASS  ", "prefix:sym<->", " at pos=", rx833_pos)
+    .return (rx833_cur)
+  rx833_fail:
+.annotate "line", 376
+    (rx833_rep, rx833_pos, $I10, $P10) = rx833_cur."!mark_fail"(0)
+    lt rx833_pos, -1, rx833_done
+    eq rx833_pos, -1, rx833_fail
     jump $I10
-  rx866_done:
-    rx866_cur."!cursor_fail"()
-    rx866_cur."!cursor_debug"("FAIL  ", "infix:sym<~>")
-    .return (rx866_cur)
+  rx833_done:
+    rx833_cur."!cursor_fail"()
+    rx833_cur."!cursor_debug"("FAIL  ", "prefix:sym<->")
+    .return (rx833_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<~>"  :subid("249_1258424429.0004") :method
-.annotate "line", 364
-    $P868 = self."!PREFIX__!subrule"("O", "~")
-    new $P869, "ResizablePMCArray"
-    push $P869, $P868
-    .return ($P869)
+.sub "!PREFIX__prefix:sym<->"  :subid("234_1258533478.31768") :method
+.annotate "line", 376
+    $P835 = self."!PREFIX__!subrule"("O", "-")
+    new $P836, "ResizablePMCArray"
+    push $P836, $P835
+    .return ($P836)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<==>"  :subid("250_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx872_tgt
-    .local int rx872_pos
-    .local int rx872_off
-    .local int rx872_eos
-    .local int rx872_rep
-    .local pmc rx872_cur
-    (rx872_cur, rx872_pos, rx872_tgt, $I10) = self."!cursor_start"()
-    rx872_cur."!cursor_debug"("START ", "infix:sym<==>")
-    .lex unicode:"$\x{a2}", rx872_cur
+.sub "prefix:sym<?>"  :subid("235_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx839_tgt
+    .local int rx839_pos
+    .local int rx839_off
+    .local int rx839_eos
+    .local int rx839_rep
+    .local pmc rx839_cur
+    (rx839_cur, rx839_pos, rx839_tgt, $I10) = self."!cursor_start"()
+    rx839_cur."!cursor_debug"("START ", "prefix:sym<?>")
+    .lex unicode:"$\x{a2}", rx839_cur
     .local pmc match
     .lex "$/", match
-    length rx872_eos, rx872_tgt
-    set rx872_off, 0
-    lt $I10, 2, rx872_start
-    sub rx872_off, $I10, 1
-    substr rx872_tgt, rx872_tgt, rx872_off
-  rx872_start:
+    length rx839_eos, rx839_tgt
+    set rx839_off, 0
+    lt $I10, 2, rx839_start
+    sub rx839_off, $I10, 1
+    substr rx839_tgt, rx839_tgt, rx839_off
+  rx839_start:
+.annotate "line", 432
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_843_fail
+    rx839_cur."!mark_push"(0, rx839_pos, $I10)
+  # rx literal  "?"
+    add $I11, rx839_pos, 1
+    gt $I11, rx839_eos, rx839_fail
+    sub $I11, rx839_pos, rx839_off
+    substr $S10, rx839_tgt, $I11, 1
+    ne $S10, "?", rx839_fail
+    add rx839_pos, 1
+    set_addr $I10, rxcap_843_fail
+    ($I12, $I11) = rx839_cur."!mark_peek"($I10)
+    rx839_cur."!cursor_pos"($I11)
+    ($P10) = rx839_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx839_pos, "")
+    rx839_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_843_done
+  rxcap_843_fail:
+    goto rx839_fail
+  rxcap_843_done:
+  # rx subrule "O" subtype=capture negate=
+    rx839_cur."!cursor_pos"(rx839_pos)
+    $P10 = rx839_cur."O"("%symbolic_unary, :pirop<istrue>")
+    unless $P10, rx839_fail
+    rx839_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("O")
+    rx839_pos = $P10."pos"()
+  # rx pass
+    rx839_cur."!cursor_pass"(rx839_pos, "prefix:sym<?>")
+    rx839_cur."!cursor_debug"("PASS  ", "prefix:sym<?>", " at pos=", rx839_pos)
+    .return (rx839_cur)
+  rx839_fail:
+.annotate "line", 376
+    (rx839_rep, rx839_pos, $I10, $P10) = rx839_cur."!mark_fail"(0)
+    lt rx839_pos, -1, rx839_done
+    eq rx839_pos, -1, rx839_fail
+    jump $I10
+  rx839_done:
+    rx839_cur."!cursor_fail"()
+    rx839_cur."!cursor_debug"("FAIL  ", "prefix:sym<?>")
+    .return (rx839_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__prefix:sym<?>"  :subid("236_1258533478.31768") :method
+.annotate "line", 376
+    $P841 = self."!PREFIX__!subrule"("O", "?")
+    new $P842, "ResizablePMCArray"
+    push $P842, $P841
+    .return ($P842)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "prefix:sym<!>"  :subid("237_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx845_tgt
+    .local int rx845_pos
+    .local int rx845_off
+    .local int rx845_eos
+    .local int rx845_rep
+    .local pmc rx845_cur
+    (rx845_cur, rx845_pos, rx845_tgt, $I10) = self."!cursor_start"()
+    rx845_cur."!cursor_debug"("START ", "prefix:sym<!>")
+    .lex unicode:"$\x{a2}", rx845_cur
+    .local pmc match
+    .lex "$/", match
+    length rx845_eos, rx845_tgt
+    set rx845_off, 0
+    lt $I10, 2, rx845_start
+    sub rx845_off, $I10, 1
+    substr rx845_tgt, rx845_tgt, rx845_off
+  rx845_start:
 .annotate "line", 433
   # rx subcapture "sym"
-    set_addr $I10, rxcap_876_fail
-    rx872_cur."!mark_push"(0, rx872_pos, $I10)
-  # rx literal  "=="
-    add $I11, rx872_pos, 2
-    gt $I11, rx872_eos, rx872_fail
-    sub $I11, rx872_pos, rx872_off
-    substr $S10, rx872_tgt, $I11, 2
-    ne $S10, "==", rx872_fail
-    add rx872_pos, 2
-    set_addr $I10, rxcap_876_fail
-    ($I12, $I11) = rx872_cur."!mark_peek"($I10)
-    rx872_cur."!cursor_pos"($I11)
-    ($P10) = rx872_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx872_pos, "")
-    rx872_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_849_fail
+    rx845_cur."!mark_push"(0, rx845_pos, $I10)
+  # rx literal  "!"
+    add $I11, rx845_pos, 1
+    gt $I11, rx845_eos, rx845_fail
+    sub $I11, rx845_pos, rx845_off
+    substr $S10, rx845_tgt, $I11, 1
+    ne $S10, "!", rx845_fail
+    add rx845_pos, 1
+    set_addr $I10, rxcap_849_fail
+    ($I12, $I11) = rx845_cur."!mark_peek"($I10)
+    rx845_cur."!cursor_pos"($I11)
+    ($P10) = rx845_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx845_pos, "")
+    rx845_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_876_done
-  rxcap_876_fail:
-    goto rx872_fail
-  rxcap_876_done:
+    goto rxcap_849_done
+  rxcap_849_fail:
+    goto rx845_fail
+  rxcap_849_done:
   # rx subrule "O" subtype=capture negate=
-    rx872_cur."!cursor_pos"(rx872_pos)
-    $P10 = rx872_cur."O"("%relational, :pirop<iseq INn>")
-    unless $P10, rx872_fail
-    rx872_cur."!mark_push"(0, -1, 0, $P10)
+    rx845_cur."!cursor_pos"(rx845_pos)
+    $P10 = rx845_cur."O"("%symbolic_unary, :pirop<isfalse>")
+    unless $P10, rx845_fail
+    rx845_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx872_pos = $P10."pos"()
+    rx845_pos = $P10."pos"()
   # rx pass
-    rx872_cur."!cursor_pass"(rx872_pos, "infix:sym<==>")
-    rx872_cur."!cursor_debug"("PASS  ", "infix:sym<==>", " at pos=", rx872_pos)
-    .return (rx872_cur)
-  rx872_fail:
-.annotate "line", 364
-    (rx872_rep, rx872_pos, $I10, $P10) = rx872_cur."!mark_fail"(0)
-    lt rx872_pos, -1, rx872_done
-    eq rx872_pos, -1, rx872_fail
+    rx845_cur."!cursor_pass"(rx845_pos, "prefix:sym<!>")
+    rx845_cur."!cursor_debug"("PASS  ", "prefix:sym<!>", " at pos=", rx845_pos)
+    .return (rx845_cur)
+  rx845_fail:
+.annotate "line", 376
+    (rx845_rep, rx845_pos, $I10, $P10) = rx845_cur."!mark_fail"(0)
+    lt rx845_pos, -1, rx845_done
+    eq rx845_pos, -1, rx845_fail
     jump $I10
-  rx872_done:
-    rx872_cur."!cursor_fail"()
-    rx872_cur."!cursor_debug"("FAIL  ", "infix:sym<==>")
-    .return (rx872_cur)
+  rx845_done:
+    rx845_cur."!cursor_fail"()
+    rx845_cur."!cursor_debug"("FAIL  ", "prefix:sym<!>")
+    .return (rx845_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<==>"  :subid("251_1258424429.0004") :method
-.annotate "line", 364
-    $P874 = self."!PREFIX__!subrule"("O", "==")
-    new $P875, "ResizablePMCArray"
-    push $P875, $P874
-    .return ($P875)
+.sub "!PREFIX__prefix:sym<!>"  :subid("238_1258533478.31768") :method
+.annotate "line", 376
+    $P847 = self."!PREFIX__!subrule"("O", "!")
+    new $P848, "ResizablePMCArray"
+    push $P848, $P847
+    .return ($P848)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<!=>"  :subid("252_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx878_tgt
-    .local int rx878_pos
-    .local int rx878_off
-    .local int rx878_eos
-    .local int rx878_rep
-    .local pmc rx878_cur
-    (rx878_cur, rx878_pos, rx878_tgt, $I10) = self."!cursor_start"()
-    rx878_cur."!cursor_debug"("START ", "infix:sym<!=>")
-    .lex unicode:"$\x{a2}", rx878_cur
+.sub "prefix:sym<|>"  :subid("239_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx851_tgt
+    .local int rx851_pos
+    .local int rx851_off
+    .local int rx851_eos
+    .local int rx851_rep
+    .local pmc rx851_cur
+    (rx851_cur, rx851_pos, rx851_tgt, $I10) = self."!cursor_start"()
+    rx851_cur."!cursor_debug"("START ", "prefix:sym<|>")
+    .lex unicode:"$\x{a2}", rx851_cur
     .local pmc match
     .lex "$/", match
-    length rx878_eos, rx878_tgt
-    set rx878_off, 0
-    lt $I10, 2, rx878_start
-    sub rx878_off, $I10, 1
-    substr rx878_tgt, rx878_tgt, rx878_off
-  rx878_start:
+    length rx851_eos, rx851_tgt
+    set rx851_off, 0
+    lt $I10, 2, rx851_start
+    sub rx851_off, $I10, 1
+    substr rx851_tgt, rx851_tgt, rx851_off
+  rx851_start:
 .annotate "line", 434
   # rx subcapture "sym"
-    set_addr $I10, rxcap_882_fail
-    rx878_cur."!mark_push"(0, rx878_pos, $I10)
-  # rx literal  "!="
-    add $I11, rx878_pos, 2
-    gt $I11, rx878_eos, rx878_fail
-    sub $I11, rx878_pos, rx878_off
-    substr $S10, rx878_tgt, $I11, 2
-    ne $S10, "!=", rx878_fail
-    add rx878_pos, 2
-    set_addr $I10, rxcap_882_fail
-    ($I12, $I11) = rx878_cur."!mark_peek"($I10)
-    rx878_cur."!cursor_pos"($I11)
-    ($P10) = rx878_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx878_pos, "")
-    rx878_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_855_fail
+    rx851_cur."!mark_push"(0, rx851_pos, $I10)
+  # rx literal  "|"
+    add $I11, rx851_pos, 1
+    gt $I11, rx851_eos, rx851_fail
+    sub $I11, rx851_pos, rx851_off
+    substr $S10, rx851_tgt, $I11, 1
+    ne $S10, "|", rx851_fail
+    add rx851_pos, 1
+    set_addr $I10, rxcap_855_fail
+    ($I12, $I11) = rx851_cur."!mark_peek"($I10)
+    rx851_cur."!cursor_pos"($I11)
+    ($P10) = rx851_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx851_pos, "")
+    rx851_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_882_done
-  rxcap_882_fail:
-    goto rx878_fail
-  rxcap_882_done:
+    goto rxcap_855_done
+  rxcap_855_fail:
+    goto rx851_fail
+  rxcap_855_done:
   # rx subrule "O" subtype=capture negate=
-    rx878_cur."!cursor_pos"(rx878_pos)
-    $P10 = rx878_cur."O"("%relational, :pirop<isne INn>")
-    unless $P10, rx878_fail
-    rx878_cur."!mark_push"(0, -1, 0, $P10)
+    rx851_cur."!cursor_pos"(rx851_pos)
+    $P10 = rx851_cur."O"("%symbolic_unary")
+    unless $P10, rx851_fail
+    rx851_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx878_pos = $P10."pos"()
+    rx851_pos = $P10."pos"()
   # rx pass
-    rx878_cur."!cursor_pass"(rx878_pos, "infix:sym<!=>")
-    rx878_cur."!cursor_debug"("PASS  ", "infix:sym<!=>", " at pos=", rx878_pos)
-    .return (rx878_cur)
-  rx878_fail:
-.annotate "line", 364
-    (rx878_rep, rx878_pos, $I10, $P10) = rx878_cur."!mark_fail"(0)
-    lt rx878_pos, -1, rx878_done
-    eq rx878_pos, -1, rx878_fail
+    rx851_cur."!cursor_pass"(rx851_pos, "prefix:sym<|>")
+    rx851_cur."!cursor_debug"("PASS  ", "prefix:sym<|>", " at pos=", rx851_pos)
+    .return (rx851_cur)
+  rx851_fail:
+.annotate "line", 376
+    (rx851_rep, rx851_pos, $I10, $P10) = rx851_cur."!mark_fail"(0)
+    lt rx851_pos, -1, rx851_done
+    eq rx851_pos, -1, rx851_fail
     jump $I10
-  rx878_done:
-    rx878_cur."!cursor_fail"()
-    rx878_cur."!cursor_debug"("FAIL  ", "infix:sym<!=>")
-    .return (rx878_cur)
+  rx851_done:
+    rx851_cur."!cursor_fail"()
+    rx851_cur."!cursor_debug"("FAIL  ", "prefix:sym<|>")
+    .return (rx851_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<!=>"  :subid("253_1258424429.0004") :method
-.annotate "line", 364
-    $P880 = self."!PREFIX__!subrule"("O", "!=")
-    new $P881, "ResizablePMCArray"
-    push $P881, $P880
-    .return ($P881)
+.sub "!PREFIX__prefix:sym<|>"  :subid("240_1258533478.31768") :method
+.annotate "line", 376
+    $P853 = self."!PREFIX__!subrule"("O", "|")
+    new $P854, "ResizablePMCArray"
+    push $P854, $P853
+    .return ($P854)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<<=>"  :subid("254_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx884_tgt
-    .local int rx884_pos
-    .local int rx884_off
-    .local int rx884_eos
-    .local int rx884_rep
-    .local pmc rx884_cur
-    (rx884_cur, rx884_pos, rx884_tgt, $I10) = self."!cursor_start"()
-    rx884_cur."!cursor_debug"("START ", "infix:sym<<=>")
-    .lex unicode:"$\x{a2}", rx884_cur
+.sub "infix:sym<*>"  :subid("241_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx857_tgt
+    .local int rx857_pos
+    .local int rx857_off
+    .local int rx857_eos
+    .local int rx857_rep
+    .local pmc rx857_cur
+    (rx857_cur, rx857_pos, rx857_tgt, $I10) = self."!cursor_start"()
+    rx857_cur."!cursor_debug"("START ", "infix:sym<*>")
+    .lex unicode:"$\x{a2}", rx857_cur
     .local pmc match
     .lex "$/", match
-    length rx884_eos, rx884_tgt
-    set rx884_off, 0
-    lt $I10, 2, rx884_start
-    sub rx884_off, $I10, 1
-    substr rx884_tgt, rx884_tgt, rx884_off
-  rx884_start:
-.annotate "line", 435
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_888_fail
-    rx884_cur."!mark_push"(0, rx884_pos, $I10)
-  # rx literal  "<="
-    add $I11, rx884_pos, 2
-    gt $I11, rx884_eos, rx884_fail
-    sub $I11, rx884_pos, rx884_off
-    substr $S10, rx884_tgt, $I11, 2
-    ne $S10, "<=", rx884_fail
-    add rx884_pos, 2
-    set_addr $I10, rxcap_888_fail
-    ($I12, $I11) = rx884_cur."!mark_peek"($I10)
-    rx884_cur."!cursor_pos"($I11)
-    ($P10) = rx884_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx884_pos, "")
-    rx884_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_888_done
-  rxcap_888_fail:
-    goto rx884_fail
-  rxcap_888_done:
-  # rx subrule "O" subtype=capture negate=
-    rx884_cur."!cursor_pos"(rx884_pos)
-    $P10 = rx884_cur."O"("%relational, :pirop<isle INn>")
-    unless $P10, rx884_fail
-    rx884_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("O")
-    rx884_pos = $P10."pos"()
-  # rx pass
-    rx884_cur."!cursor_pass"(rx884_pos, "infix:sym<<=>")
-    rx884_cur."!cursor_debug"("PASS  ", "infix:sym<<=>", " at pos=", rx884_pos)
-    .return (rx884_cur)
-  rx884_fail:
-.annotate "line", 364
-    (rx884_rep, rx884_pos, $I10, $P10) = rx884_cur."!mark_fail"(0)
-    lt rx884_pos, -1, rx884_done
-    eq rx884_pos, -1, rx884_fail
-    jump $I10
-  rx884_done:
-    rx884_cur."!cursor_fail"()
-    rx884_cur."!cursor_debug"("FAIL  ", "infix:sym<<=>")
-    .return (rx884_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<<=>"  :subid("255_1258424429.0004") :method
-.annotate "line", 364
-    $P886 = self."!PREFIX__!subrule"("O", "<=")
-    new $P887, "ResizablePMCArray"
-    push $P887, $P886
-    .return ($P887)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "infix:sym<>=>"  :subid("256_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx890_tgt
-    .local int rx890_pos
-    .local int rx890_off
-    .local int rx890_eos
-    .local int rx890_rep
-    .local pmc rx890_cur
-    (rx890_cur, rx890_pos, rx890_tgt, $I10) = self."!cursor_start"()
-    rx890_cur."!cursor_debug"("START ", "infix:sym<>=>")
-    .lex unicode:"$\x{a2}", rx890_cur
-    .local pmc match
-    .lex "$/", match
-    length rx890_eos, rx890_tgt
-    set rx890_off, 0
-    lt $I10, 2, rx890_start
-    sub rx890_off, $I10, 1
-    substr rx890_tgt, rx890_tgt, rx890_off
-  rx890_start:
+    length rx857_eos, rx857_tgt
+    set rx857_off, 0
+    lt $I10, 2, rx857_start
+    sub rx857_off, $I10, 1
+    substr rx857_tgt, rx857_tgt, rx857_off
+  rx857_start:
 .annotate "line", 436
   # rx subcapture "sym"
-    set_addr $I10, rxcap_894_fail
-    rx890_cur."!mark_push"(0, rx890_pos, $I10)
-  # rx literal  ">="
-    add $I11, rx890_pos, 2
-    gt $I11, rx890_eos, rx890_fail
-    sub $I11, rx890_pos, rx890_off
-    substr $S10, rx890_tgt, $I11, 2
-    ne $S10, ">=", rx890_fail
-    add rx890_pos, 2
-    set_addr $I10, rxcap_894_fail
-    ($I12, $I11) = rx890_cur."!mark_peek"($I10)
-    rx890_cur."!cursor_pos"($I11)
-    ($P10) = rx890_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx890_pos, "")
-    rx890_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_861_fail
+    rx857_cur."!mark_push"(0, rx857_pos, $I10)
+  # rx literal  "*"
+    add $I11, rx857_pos, 1
+    gt $I11, rx857_eos, rx857_fail
+    sub $I11, rx857_pos, rx857_off
+    substr $S10, rx857_tgt, $I11, 1
+    ne $S10, "*", rx857_fail
+    add rx857_pos, 1
+    set_addr $I10, rxcap_861_fail
+    ($I12, $I11) = rx857_cur."!mark_peek"($I10)
+    rx857_cur."!cursor_pos"($I11)
+    ($P10) = rx857_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx857_pos, "")
+    rx857_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_894_done
-  rxcap_894_fail:
-    goto rx890_fail
-  rxcap_894_done:
+    goto rxcap_861_done
+  rxcap_861_fail:
+    goto rx857_fail
+  rxcap_861_done:
   # rx subrule "O" subtype=capture negate=
-    rx890_cur."!cursor_pos"(rx890_pos)
-    $P10 = rx890_cur."O"("%relational, :pirop<isge INn>")
-    unless $P10, rx890_fail
-    rx890_cur."!mark_push"(0, -1, 0, $P10)
+    rx857_cur."!cursor_pos"(rx857_pos)
+    $P10 = rx857_cur."O"("%multiplicative, :pirop<mul>")
+    unless $P10, rx857_fail
+    rx857_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx890_pos = $P10."pos"()
+    rx857_pos = $P10."pos"()
   # rx pass
-    rx890_cur."!cursor_pass"(rx890_pos, "infix:sym<>=>")
-    rx890_cur."!cursor_debug"("PASS  ", "infix:sym<>=>", " at pos=", rx890_pos)
-    .return (rx890_cur)
-  rx890_fail:
-.annotate "line", 364
-    (rx890_rep, rx890_pos, $I10, $P10) = rx890_cur."!mark_fail"(0)
-    lt rx890_pos, -1, rx890_done
-    eq rx890_pos, -1, rx890_fail
+    rx857_cur."!cursor_pass"(rx857_pos, "infix:sym<*>")
+    rx857_cur."!cursor_debug"("PASS  ", "infix:sym<*>", " at pos=", rx857_pos)
+    .return (rx857_cur)
+  rx857_fail:
+.annotate "line", 376
+    (rx857_rep, rx857_pos, $I10, $P10) = rx857_cur."!mark_fail"(0)
+    lt rx857_pos, -1, rx857_done
+    eq rx857_pos, -1, rx857_fail
     jump $I10
-  rx890_done:
-    rx890_cur."!cursor_fail"()
-    rx890_cur."!cursor_debug"("FAIL  ", "infix:sym<>=>")
-    .return (rx890_cur)
+  rx857_done:
+    rx857_cur."!cursor_fail"()
+    rx857_cur."!cursor_debug"("FAIL  ", "infix:sym<*>")
+    .return (rx857_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<>=>"  :subid("257_1258424429.0004") :method
-.annotate "line", 364
-    $P892 = self."!PREFIX__!subrule"("O", ">=")
-    new $P893, "ResizablePMCArray"
-    push $P893, $P892
-    .return ($P893)
+.sub "!PREFIX__infix:sym<*>"  :subid("242_1258533478.31768") :method
+.annotate "line", 376
+    $P859 = self."!PREFIX__!subrule"("O", "*")
+    new $P860, "ResizablePMCArray"
+    push $P860, $P859
+    .return ($P860)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<<>"  :subid("258_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx896_tgt
-    .local int rx896_pos
-    .local int rx896_off
-    .local int rx896_eos
-    .local int rx896_rep
-    .local pmc rx896_cur
-    (rx896_cur, rx896_pos, rx896_tgt, $I10) = self."!cursor_start"()
-    rx896_cur."!cursor_debug"("START ", "infix:sym<<>")
-    .lex unicode:"$\x{a2}", rx896_cur
+.sub "infix:sym</>"  :subid("243_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx863_tgt
+    .local int rx863_pos
+    .local int rx863_off
+    .local int rx863_eos
+    .local int rx863_rep
+    .local pmc rx863_cur
+    (rx863_cur, rx863_pos, rx863_tgt, $I10) = self."!cursor_start"()
+    rx863_cur."!cursor_debug"("START ", "infix:sym</>")
+    .lex unicode:"$\x{a2}", rx863_cur
     .local pmc match
     .lex "$/", match
-    length rx896_eos, rx896_tgt
-    set rx896_off, 0
-    lt $I10, 2, rx896_start
-    sub rx896_off, $I10, 1
-    substr rx896_tgt, rx896_tgt, rx896_off
-  rx896_start:
+    length rx863_eos, rx863_tgt
+    set rx863_off, 0
+    lt $I10, 2, rx863_start
+    sub rx863_off, $I10, 1
+    substr rx863_tgt, rx863_tgt, rx863_off
+  rx863_start:
 .annotate "line", 437
   # rx subcapture "sym"
-    set_addr $I10, rxcap_900_fail
-    rx896_cur."!mark_push"(0, rx896_pos, $I10)
-  # rx literal  "<"
-    add $I11, rx896_pos, 1
-    gt $I11, rx896_eos, rx896_fail
-    sub $I11, rx896_pos, rx896_off
-    substr $S10, rx896_tgt, $I11, 1
-    ne $S10, "<", rx896_fail
-    add rx896_pos, 1
-    set_addr $I10, rxcap_900_fail
-    ($I12, $I11) = rx896_cur."!mark_peek"($I10)
-    rx896_cur."!cursor_pos"($I11)
-    ($P10) = rx896_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx896_pos, "")
-    rx896_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_867_fail
+    rx863_cur."!mark_push"(0, rx863_pos, $I10)
+  # rx literal  "/"
+    add $I11, rx863_pos, 1
+    gt $I11, rx863_eos, rx863_fail
+    sub $I11, rx863_pos, rx863_off
+    substr $S10, rx863_tgt, $I11, 1
+    ne $S10, "/", rx863_fail
+    add rx863_pos, 1
+    set_addr $I10, rxcap_867_fail
+    ($I12, $I11) = rx863_cur."!mark_peek"($I10)
+    rx863_cur."!cursor_pos"($I11)
+    ($P10) = rx863_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx863_pos, "")
+    rx863_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_900_done
-  rxcap_900_fail:
-    goto rx896_fail
-  rxcap_900_done:
+    goto rxcap_867_done
+  rxcap_867_fail:
+    goto rx863_fail
+  rxcap_867_done:
   # rx subrule "O" subtype=capture negate=
-    rx896_cur."!cursor_pos"(rx896_pos)
-    $P10 = rx896_cur."O"("%relational, :pirop<islt INn>")
-    unless $P10, rx896_fail
-    rx896_cur."!mark_push"(0, -1, 0, $P10)
+    rx863_cur."!cursor_pos"(rx863_pos)
+    $P10 = rx863_cur."O"("%multiplicative, :pirop<div>")
+    unless $P10, rx863_fail
+    rx863_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx896_pos = $P10."pos"()
+    rx863_pos = $P10."pos"()
   # rx pass
-    rx896_cur."!cursor_pass"(rx896_pos, "infix:sym<<>")
-    rx896_cur."!cursor_debug"("PASS  ", "infix:sym<<>", " at pos=", rx896_pos)
-    .return (rx896_cur)
-  rx896_fail:
-.annotate "line", 364
-    (rx896_rep, rx896_pos, $I10, $P10) = rx896_cur."!mark_fail"(0)
-    lt rx896_pos, -1, rx896_done
-    eq rx896_pos, -1, rx896_fail
+    rx863_cur."!cursor_pass"(rx863_pos, "infix:sym</>")
+    rx863_cur."!cursor_debug"("PASS  ", "infix:sym</>", " at pos=", rx863_pos)
+    .return (rx863_cur)
+  rx863_fail:
+.annotate "line", 376
+    (rx863_rep, rx863_pos, $I10, $P10) = rx863_cur."!mark_fail"(0)
+    lt rx863_pos, -1, rx863_done
+    eq rx863_pos, -1, rx863_fail
     jump $I10
-  rx896_done:
-    rx896_cur."!cursor_fail"()
-    rx896_cur."!cursor_debug"("FAIL  ", "infix:sym<<>")
-    .return (rx896_cur)
+  rx863_done:
+    rx863_cur."!cursor_fail"()
+    rx863_cur."!cursor_debug"("FAIL  ", "infix:sym</>")
+    .return (rx863_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<<>"  :subid("259_1258424429.0004") :method
-.annotate "line", 364
-    $P898 = self."!PREFIX__!subrule"("O", "<")
-    new $P899, "ResizablePMCArray"
-    push $P899, $P898
-    .return ($P899)
+.sub "!PREFIX__infix:sym</>"  :subid("244_1258533478.31768") :method
+.annotate "line", 376
+    $P865 = self."!PREFIX__!subrule"("O", "/")
+    new $P866, "ResizablePMCArray"
+    push $P866, $P865
+    .return ($P866)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<>>"  :subid("260_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx902_tgt
-    .local int rx902_pos
-    .local int rx902_off
-    .local int rx902_eos
-    .local int rx902_rep
-    .local pmc rx902_cur
-    (rx902_cur, rx902_pos, rx902_tgt, $I10) = self."!cursor_start"()
-    rx902_cur."!cursor_debug"("START ", "infix:sym<>>")
-    .lex unicode:"$\x{a2}", rx902_cur
+.sub "infix:sym<%>"  :subid("245_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx869_tgt
+    .local int rx869_pos
+    .local int rx869_off
+    .local int rx869_eos
+    .local int rx869_rep
+    .local pmc rx869_cur
+    (rx869_cur, rx869_pos, rx869_tgt, $I10) = self."!cursor_start"()
+    rx869_cur."!cursor_debug"("START ", "infix:sym<%>")
+    .lex unicode:"$\x{a2}", rx869_cur
     .local pmc match
     .lex "$/", match
-    length rx902_eos, rx902_tgt
-    set rx902_off, 0
-    lt $I10, 2, rx902_start
-    sub rx902_off, $I10, 1
-    substr rx902_tgt, rx902_tgt, rx902_off
-  rx902_start:
+    length rx869_eos, rx869_tgt
+    set rx869_off, 0
+    lt $I10, 2, rx869_start
+    sub rx869_off, $I10, 1
+    substr rx869_tgt, rx869_tgt, rx869_off
+  rx869_start:
 .annotate "line", 438
   # rx subcapture "sym"
-    set_addr $I10, rxcap_906_fail
-    rx902_cur."!mark_push"(0, rx902_pos, $I10)
-  # rx literal  ">"
-    add $I11, rx902_pos, 1
-    gt $I11, rx902_eos, rx902_fail
-    sub $I11, rx902_pos, rx902_off
-    substr $S10, rx902_tgt, $I11, 1
-    ne $S10, ">", rx902_fail
-    add rx902_pos, 1
-    set_addr $I10, rxcap_906_fail
-    ($I12, $I11) = rx902_cur."!mark_peek"($I10)
-    rx902_cur."!cursor_pos"($I11)
-    ($P10) = rx902_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx902_pos, "")
-    rx902_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_873_fail
+    rx869_cur."!mark_push"(0, rx869_pos, $I10)
+  # rx literal  "%"
+    add $I11, rx869_pos, 1
+    gt $I11, rx869_eos, rx869_fail
+    sub $I11, rx869_pos, rx869_off
+    substr $S10, rx869_tgt, $I11, 1
+    ne $S10, "%", rx869_fail
+    add rx869_pos, 1
+    set_addr $I10, rxcap_873_fail
+    ($I12, $I11) = rx869_cur."!mark_peek"($I10)
+    rx869_cur."!cursor_pos"($I11)
+    ($P10) = rx869_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx869_pos, "")
+    rx869_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_906_done
-  rxcap_906_fail:
-    goto rx902_fail
-  rxcap_906_done:
+    goto rxcap_873_done
+  rxcap_873_fail:
+    goto rx869_fail
+  rxcap_873_done:
   # rx subrule "O" subtype=capture negate=
-    rx902_cur."!cursor_pos"(rx902_pos)
-    $P10 = rx902_cur."O"("%relational, :pirop<isgt INn>")
-    unless $P10, rx902_fail
-    rx902_cur."!mark_push"(0, -1, 0, $P10)
+    rx869_cur."!cursor_pos"(rx869_pos)
+    $P10 = rx869_cur."O"("%multiplicative, :pirop<mod>")
+    unless $P10, rx869_fail
+    rx869_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx902_pos = $P10."pos"()
+    rx869_pos = $P10."pos"()
   # rx pass
-    rx902_cur."!cursor_pass"(rx902_pos, "infix:sym<>>")
-    rx902_cur."!cursor_debug"("PASS  ", "infix:sym<>>", " at pos=", rx902_pos)
-    .return (rx902_cur)
-  rx902_fail:
-.annotate "line", 364
-    (rx902_rep, rx902_pos, $I10, $P10) = rx902_cur."!mark_fail"(0)
-    lt rx902_pos, -1, rx902_done
-    eq rx902_pos, -1, rx902_fail
+    rx869_cur."!cursor_pass"(rx869_pos, "infix:sym<%>")
+    rx869_cur."!cursor_debug"("PASS  ", "infix:sym<%>", " at pos=", rx869_pos)
+    .return (rx869_cur)
+  rx869_fail:
+.annotate "line", 376
+    (rx869_rep, rx869_pos, $I10, $P10) = rx869_cur."!mark_fail"(0)
+    lt rx869_pos, -1, rx869_done
+    eq rx869_pos, -1, rx869_fail
     jump $I10
-  rx902_done:
-    rx902_cur."!cursor_fail"()
-    rx902_cur."!cursor_debug"("FAIL  ", "infix:sym<>>")
-    .return (rx902_cur)
+  rx869_done:
+    rx869_cur."!cursor_fail"()
+    rx869_cur."!cursor_debug"("FAIL  ", "infix:sym<%>")
+    .return (rx869_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<>>"  :subid("261_1258424429.0004") :method
-.annotate "line", 364
-    $P904 = self."!PREFIX__!subrule"("O", ">")
-    new $P905, "ResizablePMCArray"
-    push $P905, $P904
-    .return ($P905)
+.sub "!PREFIX__infix:sym<%>"  :subid("246_1258533478.31768") :method
+.annotate "line", 376
+    $P871 = self."!PREFIX__!subrule"("O", "%")
+    new $P872, "ResizablePMCArray"
+    push $P872, $P871
+    .return ($P872)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<eq>"  :subid("262_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx908_tgt
-    .local int rx908_pos
-    .local int rx908_off
-    .local int rx908_eos
-    .local int rx908_rep
-    .local pmc rx908_cur
-    (rx908_cur, rx908_pos, rx908_tgt, $I10) = self."!cursor_start"()
-    rx908_cur."!cursor_debug"("START ", "infix:sym<eq>")
-    .lex unicode:"$\x{a2}", rx908_cur
+.sub "infix:sym<+>"  :subid("247_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx875_tgt
+    .local int rx875_pos
+    .local int rx875_off
+    .local int rx875_eos
+    .local int rx875_rep
+    .local pmc rx875_cur
+    (rx875_cur, rx875_pos, rx875_tgt, $I10) = self."!cursor_start"()
+    rx875_cur."!cursor_debug"("START ", "infix:sym<+>")
+    .lex unicode:"$\x{a2}", rx875_cur
     .local pmc match
     .lex "$/", match
-    length rx908_eos, rx908_tgt
-    set rx908_off, 0
-    lt $I10, 2, rx908_start
-    sub rx908_off, $I10, 1
-    substr rx908_tgt, rx908_tgt, rx908_off
-  rx908_start:
-.annotate "line", 439
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_912_fail
-    rx908_cur."!mark_push"(0, rx908_pos, $I10)
-  # rx literal  "eq"
-    add $I11, rx908_pos, 2
-    gt $I11, rx908_eos, rx908_fail
-    sub $I11, rx908_pos, rx908_off
-    substr $S10, rx908_tgt, $I11, 2
-    ne $S10, "eq", rx908_fail
-    add rx908_pos, 2
-    set_addr $I10, rxcap_912_fail
-    ($I12, $I11) = rx908_cur."!mark_peek"($I10)
-    rx908_cur."!cursor_pos"($I11)
-    ($P10) = rx908_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx908_pos, "")
-    rx908_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_912_done
-  rxcap_912_fail:
-    goto rx908_fail
-  rxcap_912_done:
-  # rx subrule "O" subtype=capture negate=
-    rx908_cur."!cursor_pos"(rx908_pos)
-    $P10 = rx908_cur."O"("%relational, :pirop<iseq ISs>")
-    unless $P10, rx908_fail
-    rx908_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("O")
-    rx908_pos = $P10."pos"()
-  # rx pass
-    rx908_cur."!cursor_pass"(rx908_pos, "infix:sym<eq>")
-    rx908_cur."!cursor_debug"("PASS  ", "infix:sym<eq>", " at pos=", rx908_pos)
-    .return (rx908_cur)
-  rx908_fail:
-.annotate "line", 364
-    (rx908_rep, rx908_pos, $I10, $P10) = rx908_cur."!mark_fail"(0)
-    lt rx908_pos, -1, rx908_done
-    eq rx908_pos, -1, rx908_fail
-    jump $I10
-  rx908_done:
-    rx908_cur."!cursor_fail"()
-    rx908_cur."!cursor_debug"("FAIL  ", "infix:sym<eq>")
-    .return (rx908_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<eq>"  :subid("263_1258424429.0004") :method
-.annotate "line", 364
-    $P910 = self."!PREFIX__!subrule"("O", "eq")
-    new $P911, "ResizablePMCArray"
-    push $P911, $P910
-    .return ($P911)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "infix:sym<ne>"  :subid("264_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx914_tgt
-    .local int rx914_pos
-    .local int rx914_off
-    .local int rx914_eos
-    .local int rx914_rep
-    .local pmc rx914_cur
-    (rx914_cur, rx914_pos, rx914_tgt, $I10) = self."!cursor_start"()
-    rx914_cur."!cursor_debug"("START ", "infix:sym<ne>")
-    .lex unicode:"$\x{a2}", rx914_cur
-    .local pmc match
-    .lex "$/", match
-    length rx914_eos, rx914_tgt
-    set rx914_off, 0
-    lt $I10, 2, rx914_start
-    sub rx914_off, $I10, 1
-    substr rx914_tgt, rx914_tgt, rx914_off
-  rx914_start:
+    length rx875_eos, rx875_tgt
+    set rx875_off, 0
+    lt $I10, 2, rx875_start
+    sub rx875_off, $I10, 1
+    substr rx875_tgt, rx875_tgt, rx875_off
+  rx875_start:
 .annotate "line", 440
   # rx subcapture "sym"
-    set_addr $I10, rxcap_918_fail
-    rx914_cur."!mark_push"(0, rx914_pos, $I10)
-  # rx literal  "ne"
-    add $I11, rx914_pos, 2
-    gt $I11, rx914_eos, rx914_fail
-    sub $I11, rx914_pos, rx914_off
-    substr $S10, rx914_tgt, $I11, 2
-    ne $S10, "ne", rx914_fail
-    add rx914_pos, 2
-    set_addr $I10, rxcap_918_fail
-    ($I12, $I11) = rx914_cur."!mark_peek"($I10)
-    rx914_cur."!cursor_pos"($I11)
-    ($P10) = rx914_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx914_pos, "")
-    rx914_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_879_fail
+    rx875_cur."!mark_push"(0, rx875_pos, $I10)
+  # rx literal  "+"
+    add $I11, rx875_pos, 1
+    gt $I11, rx875_eos, rx875_fail
+    sub $I11, rx875_pos, rx875_off
+    substr $S10, rx875_tgt, $I11, 1
+    ne $S10, "+", rx875_fail
+    add rx875_pos, 1
+    set_addr $I10, rxcap_879_fail
+    ($I12, $I11) = rx875_cur."!mark_peek"($I10)
+    rx875_cur."!cursor_pos"($I11)
+    ($P10) = rx875_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx875_pos, "")
+    rx875_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_918_done
-  rxcap_918_fail:
-    goto rx914_fail
-  rxcap_918_done:
+    goto rxcap_879_done
+  rxcap_879_fail:
+    goto rx875_fail
+  rxcap_879_done:
   # rx subrule "O" subtype=capture negate=
-    rx914_cur."!cursor_pos"(rx914_pos)
-    $P10 = rx914_cur."O"("%relational, :pirop<isne ISs>")
-    unless $P10, rx914_fail
-    rx914_cur."!mark_push"(0, -1, 0, $P10)
+    rx875_cur."!cursor_pos"(rx875_pos)
+    $P10 = rx875_cur."O"("%additive, :pirop<add>")
+    unless $P10, rx875_fail
+    rx875_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx914_pos = $P10."pos"()
+    rx875_pos = $P10."pos"()
   # rx pass
-    rx914_cur."!cursor_pass"(rx914_pos, "infix:sym<ne>")
-    rx914_cur."!cursor_debug"("PASS  ", "infix:sym<ne>", " at pos=", rx914_pos)
-    .return (rx914_cur)
-  rx914_fail:
-.annotate "line", 364
-    (rx914_rep, rx914_pos, $I10, $P10) = rx914_cur."!mark_fail"(0)
-    lt rx914_pos, -1, rx914_done
-    eq rx914_pos, -1, rx914_fail
+    rx875_cur."!cursor_pass"(rx875_pos, "infix:sym<+>")
+    rx875_cur."!cursor_debug"("PASS  ", "infix:sym<+>", " at pos=", rx875_pos)
+    .return (rx875_cur)
+  rx875_fail:
+.annotate "line", 376
+    (rx875_rep, rx875_pos, $I10, $P10) = rx875_cur."!mark_fail"(0)
+    lt rx875_pos, -1, rx875_done
+    eq rx875_pos, -1, rx875_fail
     jump $I10
-  rx914_done:
-    rx914_cur."!cursor_fail"()
-    rx914_cur."!cursor_debug"("FAIL  ", "infix:sym<ne>")
-    .return (rx914_cur)
+  rx875_done:
+    rx875_cur."!cursor_fail"()
+    rx875_cur."!cursor_debug"("FAIL  ", "infix:sym<+>")
+    .return (rx875_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<ne>"  :subid("265_1258424429.0004") :method
-.annotate "line", 364
-    $P916 = self."!PREFIX__!subrule"("O", "ne")
-    new $P917, "ResizablePMCArray"
-    push $P917, $P916
-    .return ($P917)
+.sub "!PREFIX__infix:sym<+>"  :subid("248_1258533478.31768") :method
+.annotate "line", 376
+    $P877 = self."!PREFIX__!subrule"("O", "+")
+    new $P878, "ResizablePMCArray"
+    push $P878, $P877
+    .return ($P878)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<le>"  :subid("266_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx920_tgt
-    .local int rx920_pos
-    .local int rx920_off
-    .local int rx920_eos
-    .local int rx920_rep
-    .local pmc rx920_cur
-    (rx920_cur, rx920_pos, rx920_tgt, $I10) = self."!cursor_start"()
-    rx920_cur."!cursor_debug"("START ", "infix:sym<le>")
-    .lex unicode:"$\x{a2}", rx920_cur
+.sub "infix:sym<->"  :subid("249_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx881_tgt
+    .local int rx881_pos
+    .local int rx881_off
+    .local int rx881_eos
+    .local int rx881_rep
+    .local pmc rx881_cur
+    (rx881_cur, rx881_pos, rx881_tgt, $I10) = self."!cursor_start"()
+    rx881_cur."!cursor_debug"("START ", "infix:sym<->")
+    .lex unicode:"$\x{a2}", rx881_cur
     .local pmc match
     .lex "$/", match
-    length rx920_eos, rx920_tgt
-    set rx920_off, 0
-    lt $I10, 2, rx920_start
-    sub rx920_off, $I10, 1
-    substr rx920_tgt, rx920_tgt, rx920_off
-  rx920_start:
+    length rx881_eos, rx881_tgt
+    set rx881_off, 0
+    lt $I10, 2, rx881_start
+    sub rx881_off, $I10, 1
+    substr rx881_tgt, rx881_tgt, rx881_off
+  rx881_start:
 .annotate "line", 441
   # rx subcapture "sym"
-    set_addr $I10, rxcap_924_fail
-    rx920_cur."!mark_push"(0, rx920_pos, $I10)
-  # rx literal  "le"
-    add $I11, rx920_pos, 2
-    gt $I11, rx920_eos, rx920_fail
-    sub $I11, rx920_pos, rx920_off
-    substr $S10, rx920_tgt, $I11, 2
-    ne $S10, "le", rx920_fail
-    add rx920_pos, 2
-    set_addr $I10, rxcap_924_fail
-    ($I12, $I11) = rx920_cur."!mark_peek"($I10)
-    rx920_cur."!cursor_pos"($I11)
-    ($P10) = rx920_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx920_pos, "")
-    rx920_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_885_fail
+    rx881_cur."!mark_push"(0, rx881_pos, $I10)
+  # rx literal  "-"
+    add $I11, rx881_pos, 1
+    gt $I11, rx881_eos, rx881_fail
+    sub $I11, rx881_pos, rx881_off
+    substr $S10, rx881_tgt, $I11, 1
+    ne $S10, "-", rx881_fail
+    add rx881_pos, 1
+    set_addr $I10, rxcap_885_fail
+    ($I12, $I11) = rx881_cur."!mark_peek"($I10)
+    rx881_cur."!cursor_pos"($I11)
+    ($P10) = rx881_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx881_pos, "")
+    rx881_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_924_done
-  rxcap_924_fail:
-    goto rx920_fail
-  rxcap_924_done:
+    goto rxcap_885_done
+  rxcap_885_fail:
+    goto rx881_fail
+  rxcap_885_done:
   # rx subrule "O" subtype=capture negate=
-    rx920_cur."!cursor_pos"(rx920_pos)
-    $P10 = rx920_cur."O"("%relational, :pirop<isle ISs>")
-    unless $P10, rx920_fail
-    rx920_cur."!mark_push"(0, -1, 0, $P10)
+    rx881_cur."!cursor_pos"(rx881_pos)
+    $P10 = rx881_cur."O"("%additive, :pirop<sub>")
+    unless $P10, rx881_fail
+    rx881_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx920_pos = $P10."pos"()
+    rx881_pos = $P10."pos"()
   # rx pass
-    rx920_cur."!cursor_pass"(rx920_pos, "infix:sym<le>")
-    rx920_cur."!cursor_debug"("PASS  ", "infix:sym<le>", " at pos=", rx920_pos)
-    .return (rx920_cur)
-  rx920_fail:
-.annotate "line", 364
-    (rx920_rep, rx920_pos, $I10, $P10) = rx920_cur."!mark_fail"(0)
-    lt rx920_pos, -1, rx920_done
-    eq rx920_pos, -1, rx920_fail
+    rx881_cur."!cursor_pass"(rx881_pos, "infix:sym<->")
+    rx881_cur."!cursor_debug"("PASS  ", "infix:sym<->", " at pos=", rx881_pos)
+    .return (rx881_cur)
+  rx881_fail:
+.annotate "line", 376
+    (rx881_rep, rx881_pos, $I10, $P10) = rx881_cur."!mark_fail"(0)
+    lt rx881_pos, -1, rx881_done
+    eq rx881_pos, -1, rx881_fail
     jump $I10
-  rx920_done:
-    rx920_cur."!cursor_fail"()
-    rx920_cur."!cursor_debug"("FAIL  ", "infix:sym<le>")
-    .return (rx920_cur)
+  rx881_done:
+    rx881_cur."!cursor_fail"()
+    rx881_cur."!cursor_debug"("FAIL  ", "infix:sym<->")
+    .return (rx881_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<le>"  :subid("267_1258424429.0004") :method
-.annotate "line", 364
-    $P922 = self."!PREFIX__!subrule"("O", "le")
-    new $P923, "ResizablePMCArray"
-    push $P923, $P922
-    .return ($P923)
+.sub "!PREFIX__infix:sym<->"  :subid("250_1258533478.31768") :method
+.annotate "line", 376
+    $P883 = self."!PREFIX__!subrule"("O", "-")
+    new $P884, "ResizablePMCArray"
+    push $P884, $P883
+    .return ($P884)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<ge>"  :subid("268_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx926_tgt
-    .local int rx926_pos
-    .local int rx926_off
-    .local int rx926_eos
-    .local int rx926_rep
-    .local pmc rx926_cur
-    (rx926_cur, rx926_pos, rx926_tgt, $I10) = self."!cursor_start"()
-    rx926_cur."!cursor_debug"("START ", "infix:sym<ge>")
-    .lex unicode:"$\x{a2}", rx926_cur
+.sub "infix:sym<~>"  :subid("251_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx887_tgt
+    .local int rx887_pos
+    .local int rx887_off
+    .local int rx887_eos
+    .local int rx887_rep
+    .local pmc rx887_cur
+    (rx887_cur, rx887_pos, rx887_tgt, $I10) = self."!cursor_start"()
+    rx887_cur."!cursor_debug"("START ", "infix:sym<~>")
+    .lex unicode:"$\x{a2}", rx887_cur
     .local pmc match
     .lex "$/", match
-    length rx926_eos, rx926_tgt
-    set rx926_off, 0
-    lt $I10, 2, rx926_start
-    sub rx926_off, $I10, 1
-    substr rx926_tgt, rx926_tgt, rx926_off
-  rx926_start:
-.annotate "line", 442
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_930_fail
-    rx926_cur."!mark_push"(0, rx926_pos, $I10)
-  # rx literal  "ge"
-    add $I11, rx926_pos, 2
-    gt $I11, rx926_eos, rx926_fail
-    sub $I11, rx926_pos, rx926_off
-    substr $S10, rx926_tgt, $I11, 2
-    ne $S10, "ge", rx926_fail
-    add rx926_pos, 2
-    set_addr $I10, rxcap_930_fail
-    ($I12, $I11) = rx926_cur."!mark_peek"($I10)
-    rx926_cur."!cursor_pos"($I11)
-    ($P10) = rx926_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx926_pos, "")
-    rx926_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_930_done
-  rxcap_930_fail:
-    goto rx926_fail
-  rxcap_930_done:
-  # rx subrule "O" subtype=capture negate=
-    rx926_cur."!cursor_pos"(rx926_pos)
-    $P10 = rx926_cur."O"("%relational, :pirop<isge ISs>")
-    unless $P10, rx926_fail
-    rx926_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("O")
-    rx926_pos = $P10."pos"()
-  # rx pass
-    rx926_cur."!cursor_pass"(rx926_pos, "infix:sym<ge>")
-    rx926_cur."!cursor_debug"("PASS  ", "infix:sym<ge>", " at pos=", rx926_pos)
-    .return (rx926_cur)
-  rx926_fail:
-.annotate "line", 364
-    (rx926_rep, rx926_pos, $I10, $P10) = rx926_cur."!mark_fail"(0)
-    lt rx926_pos, -1, rx926_done
-    eq rx926_pos, -1, rx926_fail
-    jump $I10
-  rx926_done:
-    rx926_cur."!cursor_fail"()
-    rx926_cur."!cursor_debug"("FAIL  ", "infix:sym<ge>")
-    .return (rx926_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<ge>"  :subid("269_1258424429.0004") :method
-.annotate "line", 364
-    $P928 = self."!PREFIX__!subrule"("O", "ge")
-    new $P929, "ResizablePMCArray"
-    push $P929, $P928
-    .return ($P929)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "infix:sym<lt>"  :subid("270_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx932_tgt
-    .local int rx932_pos
-    .local int rx932_off
-    .local int rx932_eos
-    .local int rx932_rep
-    .local pmc rx932_cur
-    (rx932_cur, rx932_pos, rx932_tgt, $I10) = self."!cursor_start"()
-    rx932_cur."!cursor_debug"("START ", "infix:sym<lt>")
-    .lex unicode:"$\x{a2}", rx932_cur
-    .local pmc match
-    .lex "$/", match
-    length rx932_eos, rx932_tgt
-    set rx932_off, 0
-    lt $I10, 2, rx932_start
-    sub rx932_off, $I10, 1
-    substr rx932_tgt, rx932_tgt, rx932_off
-  rx932_start:
+    length rx887_eos, rx887_tgt
+    set rx887_off, 0
+    lt $I10, 2, rx887_start
+    sub rx887_off, $I10, 1
+    substr rx887_tgt, rx887_tgt, rx887_off
+  rx887_start:
 .annotate "line", 443
   # rx subcapture "sym"
-    set_addr $I10, rxcap_936_fail
-    rx932_cur."!mark_push"(0, rx932_pos, $I10)
-  # rx literal  "lt"
-    add $I11, rx932_pos, 2
-    gt $I11, rx932_eos, rx932_fail
-    sub $I11, rx932_pos, rx932_off
-    substr $S10, rx932_tgt, $I11, 2
-    ne $S10, "lt", rx932_fail
-    add rx932_pos, 2
-    set_addr $I10, rxcap_936_fail
-    ($I12, $I11) = rx932_cur."!mark_peek"($I10)
-    rx932_cur."!cursor_pos"($I11)
-    ($P10) = rx932_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx932_pos, "")
-    rx932_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_891_fail
+    rx887_cur."!mark_push"(0, rx887_pos, $I10)
+  # rx literal  "~"
+    add $I11, rx887_pos, 1
+    gt $I11, rx887_eos, rx887_fail
+    sub $I11, rx887_pos, rx887_off
+    substr $S10, rx887_tgt, $I11, 1
+    ne $S10, "~", rx887_fail
+    add rx887_pos, 1
+    set_addr $I10, rxcap_891_fail
+    ($I12, $I11) = rx887_cur."!mark_peek"($I10)
+    rx887_cur."!cursor_pos"($I11)
+    ($P10) = rx887_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx887_pos, "")
+    rx887_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_936_done
-  rxcap_936_fail:
-    goto rx932_fail
-  rxcap_936_done:
+    goto rxcap_891_done
+  rxcap_891_fail:
+    goto rx887_fail
+  rxcap_891_done:
   # rx subrule "O" subtype=capture negate=
-    rx932_cur."!cursor_pos"(rx932_pos)
-    $P10 = rx932_cur."O"("%relational, :pirop<islt ISs>")
-    unless $P10, rx932_fail
-    rx932_cur."!mark_push"(0, -1, 0, $P10)
+    rx887_cur."!cursor_pos"(rx887_pos)
+    $P10 = rx887_cur."O"("%concatenation , :pirop<concat>")
+    unless $P10, rx887_fail
+    rx887_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx932_pos = $P10."pos"()
+    rx887_pos = $P10."pos"()
   # rx pass
-    rx932_cur."!cursor_pass"(rx932_pos, "infix:sym<lt>")
-    rx932_cur."!cursor_debug"("PASS  ", "infix:sym<lt>", " at pos=", rx932_pos)
-    .return (rx932_cur)
-  rx932_fail:
-.annotate "line", 364
-    (rx932_rep, rx932_pos, $I10, $P10) = rx932_cur."!mark_fail"(0)
-    lt rx932_pos, -1, rx932_done
-    eq rx932_pos, -1, rx932_fail
+    rx887_cur."!cursor_pass"(rx887_pos, "infix:sym<~>")
+    rx887_cur."!cursor_debug"("PASS  ", "infix:sym<~>", " at pos=", rx887_pos)
+    .return (rx887_cur)
+  rx887_fail:
+.annotate "line", 376
+    (rx887_rep, rx887_pos, $I10, $P10) = rx887_cur."!mark_fail"(0)
+    lt rx887_pos, -1, rx887_done
+    eq rx887_pos, -1, rx887_fail
     jump $I10
-  rx932_done:
-    rx932_cur."!cursor_fail"()
-    rx932_cur."!cursor_debug"("FAIL  ", "infix:sym<lt>")
-    .return (rx932_cur)
+  rx887_done:
+    rx887_cur."!cursor_fail"()
+    rx887_cur."!cursor_debug"("FAIL  ", "infix:sym<~>")
+    .return (rx887_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<lt>"  :subid("271_1258424429.0004") :method
-.annotate "line", 364
-    $P934 = self."!PREFIX__!subrule"("O", "lt")
-    new $P935, "ResizablePMCArray"
-    push $P935, $P934
-    .return ($P935)
+.sub "!PREFIX__infix:sym<~>"  :subid("252_1258533478.31768") :method
+.annotate "line", 376
+    $P889 = self."!PREFIX__!subrule"("O", "~")
+    new $P890, "ResizablePMCArray"
+    push $P890, $P889
+    .return ($P890)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<gt>"  :subid("272_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx938_tgt
-    .local int rx938_pos
-    .local int rx938_off
-    .local int rx938_eos
-    .local int rx938_rep
-    .local pmc rx938_cur
-    (rx938_cur, rx938_pos, rx938_tgt, $I10) = self."!cursor_start"()
-    rx938_cur."!cursor_debug"("START ", "infix:sym<gt>")
-    .lex unicode:"$\x{a2}", rx938_cur
+.sub "infix:sym<==>"  :subid("253_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx893_tgt
+    .local int rx893_pos
+    .local int rx893_off
+    .local int rx893_eos
+    .local int rx893_rep
+    .local pmc rx893_cur
+    (rx893_cur, rx893_pos, rx893_tgt, $I10) = self."!cursor_start"()
+    rx893_cur."!cursor_debug"("START ", "infix:sym<==>")
+    .lex unicode:"$\x{a2}", rx893_cur
     .local pmc match
     .lex "$/", match
-    length rx938_eos, rx938_tgt
-    set rx938_off, 0
-    lt $I10, 2, rx938_start
-    sub rx938_off, $I10, 1
-    substr rx938_tgt, rx938_tgt, rx938_off
-  rx938_start:
-.annotate "line", 444
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_942_fail
-    rx938_cur."!mark_push"(0, rx938_pos, $I10)
-  # rx literal  "gt"
-    add $I11, rx938_pos, 2
-    gt $I11, rx938_eos, rx938_fail
-    sub $I11, rx938_pos, rx938_off
-    substr $S10, rx938_tgt, $I11, 2
-    ne $S10, "gt", rx938_fail
-    add rx938_pos, 2
-    set_addr $I10, rxcap_942_fail
-    ($I12, $I11) = rx938_cur."!mark_peek"($I10)
-    rx938_cur."!cursor_pos"($I11)
-    ($P10) = rx938_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx938_pos, "")
-    rx938_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_942_done
-  rxcap_942_fail:
-    goto rx938_fail
-  rxcap_942_done:
-  # rx subrule "O" subtype=capture negate=
-    rx938_cur."!cursor_pos"(rx938_pos)
-    $P10 = rx938_cur."O"("%relational, :pirop<isgt ISs>")
-    unless $P10, rx938_fail
-    rx938_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("O")
-    rx938_pos = $P10."pos"()
-  # rx pass
-    rx938_cur."!cursor_pass"(rx938_pos, "infix:sym<gt>")
-    rx938_cur."!cursor_debug"("PASS  ", "infix:sym<gt>", " at pos=", rx938_pos)
-    .return (rx938_cur)
-  rx938_fail:
-.annotate "line", 364
-    (rx938_rep, rx938_pos, $I10, $P10) = rx938_cur."!mark_fail"(0)
-    lt rx938_pos, -1, rx938_done
-    eq rx938_pos, -1, rx938_fail
-    jump $I10
-  rx938_done:
-    rx938_cur."!cursor_fail"()
-    rx938_cur."!cursor_debug"("FAIL  ", "infix:sym<gt>")
-    .return (rx938_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<gt>"  :subid("273_1258424429.0004") :method
-.annotate "line", 364
-    $P940 = self."!PREFIX__!subrule"("O", "gt")
-    new $P941, "ResizablePMCArray"
-    push $P941, $P940
-    .return ($P941)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "infix:sym<=:=>"  :subid("274_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx944_tgt
-    .local int rx944_pos
-    .local int rx944_off
-    .local int rx944_eos
-    .local int rx944_rep
-    .local pmc rx944_cur
-    (rx944_cur, rx944_pos, rx944_tgt, $I10) = self."!cursor_start"()
-    rx944_cur."!cursor_debug"("START ", "infix:sym<=:=>")
-    .lex unicode:"$\x{a2}", rx944_cur
-    .local pmc match
-    .lex "$/", match
-    length rx944_eos, rx944_tgt
-    set rx944_off, 0
-    lt $I10, 2, rx944_start
-    sub rx944_off, $I10, 1
-    substr rx944_tgt, rx944_tgt, rx944_off
-  rx944_start:
+    length rx893_eos, rx893_tgt
+    set rx893_off, 0
+    lt $I10, 2, rx893_start
+    sub rx893_off, $I10, 1
+    substr rx893_tgt, rx893_tgt, rx893_off
+  rx893_start:
 .annotate "line", 445
   # rx subcapture "sym"
-    set_addr $I10, rxcap_948_fail
-    rx944_cur."!mark_push"(0, rx944_pos, $I10)
-  # rx literal  "=:="
-    add $I11, rx944_pos, 3
-    gt $I11, rx944_eos, rx944_fail
-    sub $I11, rx944_pos, rx944_off
-    substr $S10, rx944_tgt, $I11, 3
-    ne $S10, "=:=", rx944_fail
-    add rx944_pos, 3
-    set_addr $I10, rxcap_948_fail
-    ($I12, $I11) = rx944_cur."!mark_peek"($I10)
-    rx944_cur."!cursor_pos"($I11)
-    ($P10) = rx944_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx944_pos, "")
-    rx944_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_897_fail
+    rx893_cur."!mark_push"(0, rx893_pos, $I10)
+  # rx literal  "=="
+    add $I11, rx893_pos, 2
+    gt $I11, rx893_eos, rx893_fail
+    sub $I11, rx893_pos, rx893_off
+    substr $S10, rx893_tgt, $I11, 2
+    ne $S10, "==", rx893_fail
+    add rx893_pos, 2
+    set_addr $I10, rxcap_897_fail
+    ($I12, $I11) = rx893_cur."!mark_peek"($I10)
+    rx893_cur."!cursor_pos"($I11)
+    ($P10) = rx893_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx893_pos, "")
+    rx893_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_948_done
-  rxcap_948_fail:
-    goto rx944_fail
-  rxcap_948_done:
+    goto rxcap_897_done
+  rxcap_897_fail:
+    goto rx893_fail
+  rxcap_897_done:
   # rx subrule "O" subtype=capture negate=
-    rx944_cur."!cursor_pos"(rx944_pos)
-    $P10 = rx944_cur."O"("%relational, :pirop<issame>")
-    unless $P10, rx944_fail
-    rx944_cur."!mark_push"(0, -1, 0, $P10)
+    rx893_cur."!cursor_pos"(rx893_pos)
+    $P10 = rx893_cur."O"("%relational, :pirop<iseq INn>")
+    unless $P10, rx893_fail
+    rx893_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx944_pos = $P10."pos"()
+    rx893_pos = $P10."pos"()
   # rx pass
-    rx944_cur."!cursor_pass"(rx944_pos, "infix:sym<=:=>")
-    rx944_cur."!cursor_debug"("PASS  ", "infix:sym<=:=>", " at pos=", rx944_pos)
-    .return (rx944_cur)
-  rx944_fail:
-.annotate "line", 364
-    (rx944_rep, rx944_pos, $I10, $P10) = rx944_cur."!mark_fail"(0)
-    lt rx944_pos, -1, rx944_done
-    eq rx944_pos, -1, rx944_fail
+    rx893_cur."!cursor_pass"(rx893_pos, "infix:sym<==>")
+    rx893_cur."!cursor_debug"("PASS  ", "infix:sym<==>", " at pos=", rx893_pos)
+    .return (rx893_cur)
+  rx893_fail:
+.annotate "line", 376
+    (rx893_rep, rx893_pos, $I10, $P10) = rx893_cur."!mark_fail"(0)
+    lt rx893_pos, -1, rx893_done
+    eq rx893_pos, -1, rx893_fail
     jump $I10
-  rx944_done:
-    rx944_cur."!cursor_fail"()
-    rx944_cur."!cursor_debug"("FAIL  ", "infix:sym<=:=>")
-    .return (rx944_cur)
+  rx893_done:
+    rx893_cur."!cursor_fail"()
+    rx893_cur."!cursor_debug"("FAIL  ", "infix:sym<==>")
+    .return (rx893_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<=:=>"  :subid("275_1258424429.0004") :method
-.annotate "line", 364
-    $P946 = self."!PREFIX__!subrule"("O", "=:=")
-    new $P947, "ResizablePMCArray"
-    push $P947, $P946
-    .return ($P947)
+.sub "!PREFIX__infix:sym<==>"  :subid("254_1258533478.31768") :method
+.annotate "line", 376
+    $P895 = self."!PREFIX__!subrule"("O", "==")
+    new $P896, "ResizablePMCArray"
+    push $P896, $P895
+    .return ($P896)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<&&>"  :subid("276_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx950_tgt
-    .local int rx950_pos
-    .local int rx950_off
-    .local int rx950_eos
-    .local int rx950_rep
-    .local pmc rx950_cur
-    (rx950_cur, rx950_pos, rx950_tgt, $I10) = self."!cursor_start"()
-    rx950_cur."!cursor_debug"("START ", "infix:sym<&&>")
-    .lex unicode:"$\x{a2}", rx950_cur
+.sub "infix:sym<!=>"  :subid("255_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx899_tgt
+    .local int rx899_pos
+    .local int rx899_off
+    .local int rx899_eos
+    .local int rx899_rep
+    .local pmc rx899_cur
+    (rx899_cur, rx899_pos, rx899_tgt, $I10) = self."!cursor_start"()
+    rx899_cur."!cursor_debug"("START ", "infix:sym<!=>")
+    .lex unicode:"$\x{a2}", rx899_cur
     .local pmc match
     .lex "$/", match
-    length rx950_eos, rx950_tgt
-    set rx950_off, 0
-    lt $I10, 2, rx950_start
-    sub rx950_off, $I10, 1
-    substr rx950_tgt, rx950_tgt, rx950_off
-  rx950_start:
+    length rx899_eos, rx899_tgt
+    set rx899_off, 0
+    lt $I10, 2, rx899_start
+    sub rx899_off, $I10, 1
+    substr rx899_tgt, rx899_tgt, rx899_off
+  rx899_start:
+.annotate "line", 446
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_903_fail
+    rx899_cur."!mark_push"(0, rx899_pos, $I10)
+  # rx literal  "!="
+    add $I11, rx899_pos, 2
+    gt $I11, rx899_eos, rx899_fail
+    sub $I11, rx899_pos, rx899_off
+    substr $S10, rx899_tgt, $I11, 2
+    ne $S10, "!=", rx899_fail
+    add rx899_pos, 2
+    set_addr $I10, rxcap_903_fail
+    ($I12, $I11) = rx899_cur."!mark_peek"($I10)
+    rx899_cur."!cursor_pos"($I11)
+    ($P10) = rx899_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx899_pos, "")
+    rx899_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_903_done
+  rxcap_903_fail:
+    goto rx899_fail
+  rxcap_903_done:
+  # rx subrule "O" subtype=capture negate=
+    rx899_cur."!cursor_pos"(rx899_pos)
+    $P10 = rx899_cur."O"("%relational, :pirop<isne INn>")
+    unless $P10, rx899_fail
+    rx899_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("O")
+    rx899_pos = $P10."pos"()
+  # rx pass
+    rx899_cur."!cursor_pass"(rx899_pos, "infix:sym<!=>")
+    rx899_cur."!cursor_debug"("PASS  ", "infix:sym<!=>", " at pos=", rx899_pos)
+    .return (rx899_cur)
+  rx899_fail:
+.annotate "line", 376
+    (rx899_rep, rx899_pos, $I10, $P10) = rx899_cur."!mark_fail"(0)
+    lt rx899_pos, -1, rx899_done
+    eq rx899_pos, -1, rx899_fail
+    jump $I10
+  rx899_done:
+    rx899_cur."!cursor_fail"()
+    rx899_cur."!cursor_debug"("FAIL  ", "infix:sym<!=>")
+    .return (rx899_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__infix:sym<!=>"  :subid("256_1258533478.31768") :method
+.annotate "line", 376
+    $P901 = self."!PREFIX__!subrule"("O", "!=")
+    new $P902, "ResizablePMCArray"
+    push $P902, $P901
+    .return ($P902)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "infix:sym<<=>"  :subid("257_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx905_tgt
+    .local int rx905_pos
+    .local int rx905_off
+    .local int rx905_eos
+    .local int rx905_rep
+    .local pmc rx905_cur
+    (rx905_cur, rx905_pos, rx905_tgt, $I10) = self."!cursor_start"()
+    rx905_cur."!cursor_debug"("START ", "infix:sym<<=>")
+    .lex unicode:"$\x{a2}", rx905_cur
+    .local pmc match
+    .lex "$/", match
+    length rx905_eos, rx905_tgt
+    set rx905_off, 0
+    lt $I10, 2, rx905_start
+    sub rx905_off, $I10, 1
+    substr rx905_tgt, rx905_tgt, rx905_off
+  rx905_start:
 .annotate "line", 447
   # rx subcapture "sym"
-    set_addr $I10, rxcap_954_fail
-    rx950_cur."!mark_push"(0, rx950_pos, $I10)
-  # rx literal  "&&"
-    add $I11, rx950_pos, 2
-    gt $I11, rx950_eos, rx950_fail
-    sub $I11, rx950_pos, rx950_off
-    substr $S10, rx950_tgt, $I11, 2
-    ne $S10, "&&", rx950_fail
-    add rx950_pos, 2
-    set_addr $I10, rxcap_954_fail
-    ($I12, $I11) = rx950_cur."!mark_peek"($I10)
-    rx950_cur."!cursor_pos"($I11)
-    ($P10) = rx950_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx950_pos, "")
-    rx950_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_909_fail
+    rx905_cur."!mark_push"(0, rx905_pos, $I10)
+  # rx literal  "<="
+    add $I11, rx905_pos, 2
+    gt $I11, rx905_eos, rx905_fail
+    sub $I11, rx905_pos, rx905_off
+    substr $S10, rx905_tgt, $I11, 2
+    ne $S10, "<=", rx905_fail
+    add rx905_pos, 2
+    set_addr $I10, rxcap_909_fail
+    ($I12, $I11) = rx905_cur."!mark_peek"($I10)
+    rx905_cur."!cursor_pos"($I11)
+    ($P10) = rx905_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx905_pos, "")
+    rx905_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_954_done
-  rxcap_954_fail:
-    goto rx950_fail
-  rxcap_954_done:
+    goto rxcap_909_done
+  rxcap_909_fail:
+    goto rx905_fail
+  rxcap_909_done:
   # rx subrule "O" subtype=capture negate=
-    rx950_cur."!cursor_pos"(rx950_pos)
-    $P10 = rx950_cur."O"("%tight_and, :pasttype<if>")
-    unless $P10, rx950_fail
-    rx950_cur."!mark_push"(0, -1, 0, $P10)
+    rx905_cur."!cursor_pos"(rx905_pos)
+    $P10 = rx905_cur."O"("%relational, :pirop<isle INn>")
+    unless $P10, rx905_fail
+    rx905_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx950_pos = $P10."pos"()
+    rx905_pos = $P10."pos"()
   # rx pass
-    rx950_cur."!cursor_pass"(rx950_pos, "infix:sym<&&>")
-    rx950_cur."!cursor_debug"("PASS  ", "infix:sym<&&>", " at pos=", rx950_pos)
-    .return (rx950_cur)
-  rx950_fail:
-.annotate "line", 364
-    (rx950_rep, rx950_pos, $I10, $P10) = rx950_cur."!mark_fail"(0)
-    lt rx950_pos, -1, rx950_done
-    eq rx950_pos, -1, rx950_fail
+    rx905_cur."!cursor_pass"(rx905_pos, "infix:sym<<=>")
+    rx905_cur."!cursor_debug"("PASS  ", "infix:sym<<=>", " at pos=", rx905_pos)
+    .return (rx905_cur)
+  rx905_fail:
+.annotate "line", 376
+    (rx905_rep, rx905_pos, $I10, $P10) = rx905_cur."!mark_fail"(0)
+    lt rx905_pos, -1, rx905_done
+    eq rx905_pos, -1, rx905_fail
     jump $I10
-  rx950_done:
-    rx950_cur."!cursor_fail"()
-    rx950_cur."!cursor_debug"("FAIL  ", "infix:sym<&&>")
-    .return (rx950_cur)
+  rx905_done:
+    rx905_cur."!cursor_fail"()
+    rx905_cur."!cursor_debug"("FAIL  ", "infix:sym<<=>")
+    .return (rx905_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<&&>"  :subid("277_1258424429.0004") :method
-.annotate "line", 364
-    $P952 = self."!PREFIX__!subrule"("O", "&&")
-    new $P953, "ResizablePMCArray"
-    push $P953, $P952
-    .return ($P953)
+.sub "!PREFIX__infix:sym<<=>"  :subid("258_1258533478.31768") :method
+.annotate "line", 376
+    $P907 = self."!PREFIX__!subrule"("O", "<=")
+    new $P908, "ResizablePMCArray"
+    push $P908, $P907
+    .return ($P908)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<||>"  :subid("278_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx956_tgt
-    .local int rx956_pos
-    .local int rx956_off
-    .local int rx956_eos
-    .local int rx956_rep
-    .local pmc rx956_cur
-    (rx956_cur, rx956_pos, rx956_tgt, $I10) = self."!cursor_start"()
-    rx956_cur."!cursor_debug"("START ", "infix:sym<||>")
-    .lex unicode:"$\x{a2}", rx956_cur
+.sub "infix:sym<>=>"  :subid("259_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx911_tgt
+    .local int rx911_pos
+    .local int rx911_off
+    .local int rx911_eos
+    .local int rx911_rep
+    .local pmc rx911_cur
+    (rx911_cur, rx911_pos, rx911_tgt, $I10) = self."!cursor_start"()
+    rx911_cur."!cursor_debug"("START ", "infix:sym<>=>")
+    .lex unicode:"$\x{a2}", rx911_cur
     .local pmc match
     .lex "$/", match
-    length rx956_eos, rx956_tgt
-    set rx956_off, 0
-    lt $I10, 2, rx956_start
-    sub rx956_off, $I10, 1
-    substr rx956_tgt, rx956_tgt, rx956_off
-  rx956_start:
+    length rx911_eos, rx911_tgt
+    set rx911_off, 0
+    lt $I10, 2, rx911_start
+    sub rx911_off, $I10, 1
+    substr rx911_tgt, rx911_tgt, rx911_off
+  rx911_start:
+.annotate "line", 448
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_915_fail
+    rx911_cur."!mark_push"(0, rx911_pos, $I10)
+  # rx literal  ">="
+    add $I11, rx911_pos, 2
+    gt $I11, rx911_eos, rx911_fail
+    sub $I11, rx911_pos, rx911_off
+    substr $S10, rx911_tgt, $I11, 2
+    ne $S10, ">=", rx911_fail
+    add rx911_pos, 2
+    set_addr $I10, rxcap_915_fail
+    ($I12, $I11) = rx911_cur."!mark_peek"($I10)
+    rx911_cur."!cursor_pos"($I11)
+    ($P10) = rx911_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx911_pos, "")
+    rx911_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_915_done
+  rxcap_915_fail:
+    goto rx911_fail
+  rxcap_915_done:
+  # rx subrule "O" subtype=capture negate=
+    rx911_cur."!cursor_pos"(rx911_pos)
+    $P10 = rx911_cur."O"("%relational, :pirop<isge INn>")
+    unless $P10, rx911_fail
+    rx911_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("O")
+    rx911_pos = $P10."pos"()
+  # rx pass
+    rx911_cur."!cursor_pass"(rx911_pos, "infix:sym<>=>")
+    rx911_cur."!cursor_debug"("PASS  ", "infix:sym<>=>", " at pos=", rx911_pos)
+    .return (rx911_cur)
+  rx911_fail:
+.annotate "line", 376
+    (rx911_rep, rx911_pos, $I10, $P10) = rx911_cur."!mark_fail"(0)
+    lt rx911_pos, -1, rx911_done
+    eq rx911_pos, -1, rx911_fail
+    jump $I10
+  rx911_done:
+    rx911_cur."!cursor_fail"()
+    rx911_cur."!cursor_debug"("FAIL  ", "infix:sym<>=>")
+    .return (rx911_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__infix:sym<>=>"  :subid("260_1258533478.31768") :method
+.annotate "line", 376
+    $P913 = self."!PREFIX__!subrule"("O", ">=")
+    new $P914, "ResizablePMCArray"
+    push $P914, $P913
+    .return ($P914)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "infix:sym<<>"  :subid("261_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx917_tgt
+    .local int rx917_pos
+    .local int rx917_off
+    .local int rx917_eos
+    .local int rx917_rep
+    .local pmc rx917_cur
+    (rx917_cur, rx917_pos, rx917_tgt, $I10) = self."!cursor_start"()
+    rx917_cur."!cursor_debug"("START ", "infix:sym<<>")
+    .lex unicode:"$\x{a2}", rx917_cur
+    .local pmc match
+    .lex "$/", match
+    length rx917_eos, rx917_tgt
+    set rx917_off, 0
+    lt $I10, 2, rx917_start
+    sub rx917_off, $I10, 1
+    substr rx917_tgt, rx917_tgt, rx917_off
+  rx917_start:
 .annotate "line", 449
   # rx subcapture "sym"
-    set_addr $I10, rxcap_960_fail
-    rx956_cur."!mark_push"(0, rx956_pos, $I10)
-  # rx literal  "||"
-    add $I11, rx956_pos, 2
-    gt $I11, rx956_eos, rx956_fail
-    sub $I11, rx956_pos, rx956_off
-    substr $S10, rx956_tgt, $I11, 2
-    ne $S10, "||", rx956_fail
-    add rx956_pos, 2
-    set_addr $I10, rxcap_960_fail
-    ($I12, $I11) = rx956_cur."!mark_peek"($I10)
-    rx956_cur."!cursor_pos"($I11)
-    ($P10) = rx956_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx956_pos, "")
-    rx956_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_921_fail
+    rx917_cur."!mark_push"(0, rx917_pos, $I10)
+  # rx literal  "<"
+    add $I11, rx917_pos, 1
+    gt $I11, rx917_eos, rx917_fail
+    sub $I11, rx917_pos, rx917_off
+    substr $S10, rx917_tgt, $I11, 1
+    ne $S10, "<", rx917_fail
+    add rx917_pos, 1
+    set_addr $I10, rxcap_921_fail
+    ($I12, $I11) = rx917_cur."!mark_peek"($I10)
+    rx917_cur."!cursor_pos"($I11)
+    ($P10) = rx917_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx917_pos, "")
+    rx917_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_960_done
-  rxcap_960_fail:
-    goto rx956_fail
-  rxcap_960_done:
+    goto rxcap_921_done
+  rxcap_921_fail:
+    goto rx917_fail
+  rxcap_921_done:
   # rx subrule "O" subtype=capture negate=
-    rx956_cur."!cursor_pos"(rx956_pos)
-    $P10 = rx956_cur."O"("%tight_or, :pasttype<unless>")
-    unless $P10, rx956_fail
-    rx956_cur."!mark_push"(0, -1, 0, $P10)
+    rx917_cur."!cursor_pos"(rx917_pos)
+    $P10 = rx917_cur."O"("%relational, :pirop<islt INn>")
+    unless $P10, rx917_fail
+    rx917_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx956_pos = $P10."pos"()
+    rx917_pos = $P10."pos"()
   # rx pass
-    rx956_cur."!cursor_pass"(rx956_pos, "infix:sym<||>")
-    rx956_cur."!cursor_debug"("PASS  ", "infix:sym<||>", " at pos=", rx956_pos)
-    .return (rx956_cur)
-  rx956_fail:
-.annotate "line", 364
-    (rx956_rep, rx956_pos, $I10, $P10) = rx956_cur."!mark_fail"(0)
-    lt rx956_pos, -1, rx956_done
-    eq rx956_pos, -1, rx956_fail
+    rx917_cur."!cursor_pass"(rx917_pos, "infix:sym<<>")
+    rx917_cur."!cursor_debug"("PASS  ", "infix:sym<<>", " at pos=", rx917_pos)
+    .return (rx917_cur)
+  rx917_fail:
+.annotate "line", 376
+    (rx917_rep, rx917_pos, $I10, $P10) = rx917_cur."!mark_fail"(0)
+    lt rx917_pos, -1, rx917_done
+    eq rx917_pos, -1, rx917_fail
     jump $I10
-  rx956_done:
-    rx956_cur."!cursor_fail"()
-    rx956_cur."!cursor_debug"("FAIL  ", "infix:sym<||>")
-    .return (rx956_cur)
+  rx917_done:
+    rx917_cur."!cursor_fail"()
+    rx917_cur."!cursor_debug"("FAIL  ", "infix:sym<<>")
+    .return (rx917_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<||>"  :subid("279_1258424429.0004") :method
-.annotate "line", 364
-    $P958 = self."!PREFIX__!subrule"("O", "||")
-    new $P959, "ResizablePMCArray"
-    push $P959, $P958
-    .return ($P959)
+.sub "!PREFIX__infix:sym<<>"  :subid("262_1258533478.31768") :method
+.annotate "line", 376
+    $P919 = self."!PREFIX__!subrule"("O", "<")
+    new $P920, "ResizablePMCArray"
+    push $P920, $P919
+    .return ($P920)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<//>"  :subid("280_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx962_tgt
-    .local int rx962_pos
-    .local int rx962_off
-    .local int rx962_eos
-    .local int rx962_rep
-    .local pmc rx962_cur
-    (rx962_cur, rx962_pos, rx962_tgt, $I10) = self."!cursor_start"()
-    rx962_cur."!cursor_debug"("START ", "infix:sym<//>")
-    .lex unicode:"$\x{a2}", rx962_cur
+.sub "infix:sym<>>"  :subid("263_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx923_tgt
+    .local int rx923_pos
+    .local int rx923_off
+    .local int rx923_eos
+    .local int rx923_rep
+    .local pmc rx923_cur
+    (rx923_cur, rx923_pos, rx923_tgt, $I10) = self."!cursor_start"()
+    rx923_cur."!cursor_debug"("START ", "infix:sym<>>")
+    .lex unicode:"$\x{a2}", rx923_cur
     .local pmc match
     .lex "$/", match
-    length rx962_eos, rx962_tgt
-    set rx962_off, 0
-    lt $I10, 2, rx962_start
-    sub rx962_off, $I10, 1
-    substr rx962_tgt, rx962_tgt, rx962_off
-  rx962_start:
+    length rx923_eos, rx923_tgt
+    set rx923_off, 0
+    lt $I10, 2, rx923_start
+    sub rx923_off, $I10, 1
+    substr rx923_tgt, rx923_tgt, rx923_off
+  rx923_start:
 .annotate "line", 450
   # rx subcapture "sym"
-    set_addr $I10, rxcap_966_fail
-    rx962_cur."!mark_push"(0, rx962_pos, $I10)
-  # rx literal  "//"
-    add $I11, rx962_pos, 2
-    gt $I11, rx962_eos, rx962_fail
-    sub $I11, rx962_pos, rx962_off
-    substr $S10, rx962_tgt, $I11, 2
-    ne $S10, "//", rx962_fail
-    add rx962_pos, 2
-    set_addr $I10, rxcap_966_fail
-    ($I12, $I11) = rx962_cur."!mark_peek"($I10)
-    rx962_cur."!cursor_pos"($I11)
-    ($P10) = rx962_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx962_pos, "")
-    rx962_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_927_fail
+    rx923_cur."!mark_push"(0, rx923_pos, $I10)
+  # rx literal  ">"
+    add $I11, rx923_pos, 1
+    gt $I11, rx923_eos, rx923_fail
+    sub $I11, rx923_pos, rx923_off
+    substr $S10, rx923_tgt, $I11, 1
+    ne $S10, ">", rx923_fail
+    add rx923_pos, 1
+    set_addr $I10, rxcap_927_fail
+    ($I12, $I11) = rx923_cur."!mark_peek"($I10)
+    rx923_cur."!cursor_pos"($I11)
+    ($P10) = rx923_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx923_pos, "")
+    rx923_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_966_done
-  rxcap_966_fail:
-    goto rx962_fail
-  rxcap_966_done:
+    goto rxcap_927_done
+  rxcap_927_fail:
+    goto rx923_fail
+  rxcap_927_done:
   # rx subrule "O" subtype=capture negate=
-    rx962_cur."!cursor_pos"(rx962_pos)
-    $P10 = rx962_cur."O"("%tight_or, :pasttype<def_or>")
-    unless $P10, rx962_fail
-    rx962_cur."!mark_push"(0, -1, 0, $P10)
+    rx923_cur."!cursor_pos"(rx923_pos)
+    $P10 = rx923_cur."O"("%relational, :pirop<isgt INn>")
+    unless $P10, rx923_fail
+    rx923_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx962_pos = $P10."pos"()
+    rx923_pos = $P10."pos"()
   # rx pass
-    rx962_cur."!cursor_pass"(rx962_pos, "infix:sym<//>")
-    rx962_cur."!cursor_debug"("PASS  ", "infix:sym<//>", " at pos=", rx962_pos)
-    .return (rx962_cur)
-  rx962_fail:
-.annotate "line", 364
-    (rx962_rep, rx962_pos, $I10, $P10) = rx962_cur."!mark_fail"(0)
-    lt rx962_pos, -1, rx962_done
-    eq rx962_pos, -1, rx962_fail
+    rx923_cur."!cursor_pass"(rx923_pos, "infix:sym<>>")
+    rx923_cur."!cursor_debug"("PASS  ", "infix:sym<>>", " at pos=", rx923_pos)
+    .return (rx923_cur)
+  rx923_fail:
+.annotate "line", 376
+    (rx923_rep, rx923_pos, $I10, $P10) = rx923_cur."!mark_fail"(0)
+    lt rx923_pos, -1, rx923_done
+    eq rx923_pos, -1, rx923_fail
     jump $I10
-  rx962_done:
-    rx962_cur."!cursor_fail"()
-    rx962_cur."!cursor_debug"("FAIL  ", "infix:sym<//>")
-    .return (rx962_cur)
+  rx923_done:
+    rx923_cur."!cursor_fail"()
+    rx923_cur."!cursor_debug"("FAIL  ", "infix:sym<>>")
+    .return (rx923_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<//>"  :subid("281_1258424429.0004") :method
-.annotate "line", 364
-    $P964 = self."!PREFIX__!subrule"("O", "//")
-    new $P965, "ResizablePMCArray"
-    push $P965, $P964
-    .return ($P965)
+.sub "!PREFIX__infix:sym<>>"  :subid("264_1258533478.31768") :method
+.annotate "line", 376
+    $P925 = self."!PREFIX__!subrule"("O", ">")
+    new $P926, "ResizablePMCArray"
+    push $P926, $P925
+    .return ($P926)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<?? !!>"  :subid("282_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx968_tgt
-    .local int rx968_pos
-    .local int rx968_off
-    .local int rx968_eos
-    .local int rx968_rep
-    .local pmc rx968_cur
-    (rx968_cur, rx968_pos, rx968_tgt, $I10) = self."!cursor_start"()
-    rx968_cur."!cursor_debug"("START ", "infix:sym<?? !!>")
-    .lex unicode:"$\x{a2}", rx968_cur
+.sub "infix:sym<eq>"  :subid("265_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx929_tgt
+    .local int rx929_pos
+    .local int rx929_off
+    .local int rx929_eos
+    .local int rx929_rep
+    .local pmc rx929_cur
+    (rx929_cur, rx929_pos, rx929_tgt, $I10) = self."!cursor_start"()
+    rx929_cur."!cursor_debug"("START ", "infix:sym<eq>")
+    .lex unicode:"$\x{a2}", rx929_cur
     .local pmc match
     .lex "$/", match
-    length rx968_eos, rx968_tgt
-    set rx968_off, 0
-    lt $I10, 2, rx968_start
-    sub rx968_off, $I10, 1
-    substr rx968_tgt, rx968_tgt, rx968_off
-  rx968_start:
-.annotate "line", 453
-  # rx literal  "??"
-    add $I11, rx968_pos, 2
-    gt $I11, rx968_eos, rx968_fail
-    sub $I11, rx968_pos, rx968_off
-    substr $S10, rx968_tgt, $I11, 2
-    ne $S10, "??", rx968_fail
-    add rx968_pos, 2
-.annotate "line", 454
-  # rx subrule "ws" subtype=method negate=
-    rx968_cur."!cursor_pos"(rx968_pos)
-    $P10 = rx968_cur."ws"()
-    unless $P10, rx968_fail
-    rx968_pos = $P10."pos"()
-.annotate "line", 455
-  # rx subrule "EXPR" subtype=capture negate=
-    rx968_cur."!cursor_pos"(rx968_pos)
-    $P10 = rx968_cur."EXPR"("i=")
-    unless $P10, rx968_fail
-    rx968_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("EXPR")
-    rx968_pos = $P10."pos"()
-.annotate "line", 456
-  # rx literal  "!!"
-    add $I11, rx968_pos, 2
-    gt $I11, rx968_eos, rx968_fail
-    sub $I11, rx968_pos, rx968_off
-    substr $S10, rx968_tgt, $I11, 2
-    ne $S10, "!!", rx968_fail
-    add rx968_pos, 2
-.annotate "line", 457
+    length rx929_eos, rx929_tgt
+    set rx929_off, 0
+    lt $I10, 2, rx929_start
+    sub rx929_off, $I10, 1
+    substr rx929_tgt, rx929_tgt, rx929_off
+  rx929_start:
+.annotate "line", 451
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_933_fail
+    rx929_cur."!mark_push"(0, rx929_pos, $I10)
+  # rx literal  "eq"
+    add $I11, rx929_pos, 2
+    gt $I11, rx929_eos, rx929_fail
+    sub $I11, rx929_pos, rx929_off
+    substr $S10, rx929_tgt, $I11, 2
+    ne $S10, "eq", rx929_fail
+    add rx929_pos, 2
+    set_addr $I10, rxcap_933_fail
+    ($I12, $I11) = rx929_cur."!mark_peek"($I10)
+    rx929_cur."!cursor_pos"($I11)
+    ($P10) = rx929_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx929_pos, "")
+    rx929_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_933_done
+  rxcap_933_fail:
+    goto rx929_fail
+  rxcap_933_done:
   # rx subrule "O" subtype=capture negate=
-    rx968_cur."!cursor_pos"(rx968_pos)
-    $P10 = rx968_cur."O"("%conditional, :reducecheck<ternary>, :pasttype<if>")
-    unless $P10, rx968_fail
-    rx968_cur."!mark_push"(0, -1, 0, $P10)
+    rx929_cur."!cursor_pos"(rx929_pos)
+    $P10 = rx929_cur."O"("%relational, :pirop<iseq ISs>")
+    unless $P10, rx929_fail
+    rx929_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx968_pos = $P10."pos"()
+    rx929_pos = $P10."pos"()
+  # rx pass
+    rx929_cur."!cursor_pass"(rx929_pos, "infix:sym<eq>")
+    rx929_cur."!cursor_debug"("PASS  ", "infix:sym<eq>", " at pos=", rx929_pos)
+    .return (rx929_cur)
+  rx929_fail:
+.annotate "line", 376
+    (rx929_rep, rx929_pos, $I10, $P10) = rx929_cur."!mark_fail"(0)
+    lt rx929_pos, -1, rx929_done
+    eq rx929_pos, -1, rx929_fail
+    jump $I10
+  rx929_done:
+    rx929_cur."!cursor_fail"()
+    rx929_cur."!cursor_debug"("FAIL  ", "infix:sym<eq>")
+    .return (rx929_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__infix:sym<eq>"  :subid("266_1258533478.31768") :method
+.annotate "line", 376
+    $P931 = self."!PREFIX__!subrule"("O", "eq")
+    new $P932, "ResizablePMCArray"
+    push $P932, $P931
+    .return ($P932)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "infix:sym<ne>"  :subid("267_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx935_tgt
+    .local int rx935_pos
+    .local int rx935_off
+    .local int rx935_eos
+    .local int rx935_rep
+    .local pmc rx935_cur
+    (rx935_cur, rx935_pos, rx935_tgt, $I10) = self."!cursor_start"()
+    rx935_cur."!cursor_debug"("START ", "infix:sym<ne>")
+    .lex unicode:"$\x{a2}", rx935_cur
+    .local pmc match
+    .lex "$/", match
+    length rx935_eos, rx935_tgt
+    set rx935_off, 0
+    lt $I10, 2, rx935_start
+    sub rx935_off, $I10, 1
+    substr rx935_tgt, rx935_tgt, rx935_off
+  rx935_start:
 .annotate "line", 452
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_939_fail
+    rx935_cur."!mark_push"(0, rx935_pos, $I10)
+  # rx literal  "ne"
+    add $I11, rx935_pos, 2
+    gt $I11, rx935_eos, rx935_fail
+    sub $I11, rx935_pos, rx935_off
+    substr $S10, rx935_tgt, $I11, 2
+    ne $S10, "ne", rx935_fail
+    add rx935_pos, 2
+    set_addr $I10, rxcap_939_fail
+    ($I12, $I11) = rx935_cur."!mark_peek"($I10)
+    rx935_cur."!cursor_pos"($I11)
+    ($P10) = rx935_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx935_pos, "")
+    rx935_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_939_done
+  rxcap_939_fail:
+    goto rx935_fail
+  rxcap_939_done:
+  # rx subrule "O" subtype=capture negate=
+    rx935_cur."!cursor_pos"(rx935_pos)
+    $P10 = rx935_cur."O"("%relational, :pirop<isne ISs>")
+    unless $P10, rx935_fail
+    rx935_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("O")
+    rx935_pos = $P10."pos"()
   # rx pass
-    rx968_cur."!cursor_pass"(rx968_pos, "infix:sym<?? !!>")
-    rx968_cur."!cursor_debug"("PASS  ", "infix:sym<?? !!>", " at pos=", rx968_pos)
-    .return (rx968_cur)
-  rx968_fail:
-.annotate "line", 364
-    (rx968_rep, rx968_pos, $I10, $P10) = rx968_cur."!mark_fail"(0)
-    lt rx968_pos, -1, rx968_done
-    eq rx968_pos, -1, rx968_fail
+    rx935_cur."!cursor_pass"(rx935_pos, "infix:sym<ne>")
+    rx935_cur."!cursor_debug"("PASS  ", "infix:sym<ne>", " at pos=", rx935_pos)
+    .return (rx935_cur)
+  rx935_fail:
+.annotate "line", 376
+    (rx935_rep, rx935_pos, $I10, $P10) = rx935_cur."!mark_fail"(0)
+    lt rx935_pos, -1, rx935_done
+    eq rx935_pos, -1, rx935_fail
     jump $I10
-  rx968_done:
-    rx968_cur."!cursor_fail"()
-    rx968_cur."!cursor_debug"("FAIL  ", "infix:sym<?? !!>")
-    .return (rx968_cur)
+  rx935_done:
+    rx935_cur."!cursor_fail"()
+    rx935_cur."!cursor_debug"("FAIL  ", "infix:sym<ne>")
+    .return (rx935_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<?? !!>"  :subid("283_1258424429.0004") :method
-.annotate "line", 364
-    $P970 = self."!PREFIX__!subrule"("", "??")
-    new $P971, "ResizablePMCArray"
-    push $P971, $P970
-    .return ($P971)
+.sub "!PREFIX__infix:sym<ne>"  :subid("268_1258533478.31768") :method
+.annotate "line", 376
+    $P937 = self."!PREFIX__!subrule"("O", "ne")
+    new $P938, "ResizablePMCArray"
+    push $P938, $P937
+    .return ($P938)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<=>"  :subid("284_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx973_tgt
-    .local int rx973_pos
-    .local int rx973_off
-    .local int rx973_eos
-    .local int rx973_rep
-    .local pmc rx973_cur
-    (rx973_cur, rx973_pos, rx973_tgt, $I10) = self."!cursor_start"()
-    rx973_cur."!cursor_debug"("START ", "infix:sym<=>")
-    .lex unicode:"$\x{a2}", rx973_cur
+.sub "infix:sym<le>"  :subid("269_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx941_tgt
+    .local int rx941_pos
+    .local int rx941_off
+    .local int rx941_eos
+    .local int rx941_rep
+    .local pmc rx941_cur
+    (rx941_cur, rx941_pos, rx941_tgt, $I10) = self."!cursor_start"()
+    rx941_cur."!cursor_debug"("START ", "infix:sym<le>")
+    .lex unicode:"$\x{a2}", rx941_cur
     .local pmc match
     .lex "$/", match
-    length rx973_eos, rx973_tgt
-    set rx973_off, 0
-    lt $I10, 2, rx973_start
-    sub rx973_off, $I10, 1
-    substr rx973_tgt, rx973_tgt, rx973_off
-  rx973_start:
+    length rx941_eos, rx941_tgt
+    set rx941_off, 0
+    lt $I10, 2, rx941_start
+    sub rx941_off, $I10, 1
+    substr rx941_tgt, rx941_tgt, rx941_off
+  rx941_start:
+.annotate "line", 453
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_945_fail
+    rx941_cur."!mark_push"(0, rx941_pos, $I10)
+  # rx literal  "le"
+    add $I11, rx941_pos, 2
+    gt $I11, rx941_eos, rx941_fail
+    sub $I11, rx941_pos, rx941_off
+    substr $S10, rx941_tgt, $I11, 2
+    ne $S10, "le", rx941_fail
+    add rx941_pos, 2
+    set_addr $I10, rxcap_945_fail
+    ($I12, $I11) = rx941_cur."!mark_peek"($I10)
+    rx941_cur."!cursor_pos"($I11)
+    ($P10) = rx941_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx941_pos, "")
+    rx941_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_945_done
+  rxcap_945_fail:
+    goto rx941_fail
+  rxcap_945_done:
+  # rx subrule "O" subtype=capture negate=
+    rx941_cur."!cursor_pos"(rx941_pos)
+    $P10 = rx941_cur."O"("%relational, :pirop<isle ISs>")
+    unless $P10, rx941_fail
+    rx941_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("O")
+    rx941_pos = $P10."pos"()
+  # rx pass
+    rx941_cur."!cursor_pass"(rx941_pos, "infix:sym<le>")
+    rx941_cur."!cursor_debug"("PASS  ", "infix:sym<le>", " at pos=", rx941_pos)
+    .return (rx941_cur)
+  rx941_fail:
+.annotate "line", 376
+    (rx941_rep, rx941_pos, $I10, $P10) = rx941_cur."!mark_fail"(0)
+    lt rx941_pos, -1, rx941_done
+    eq rx941_pos, -1, rx941_fail
+    jump $I10
+  rx941_done:
+    rx941_cur."!cursor_fail"()
+    rx941_cur."!cursor_debug"("FAIL  ", "infix:sym<le>")
+    .return (rx941_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__infix:sym<le>"  :subid("270_1258533478.31768") :method
+.annotate "line", 376
+    $P943 = self."!PREFIX__!subrule"("O", "le")
+    new $P944, "ResizablePMCArray"
+    push $P944, $P943
+    .return ($P944)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "infix:sym<ge>"  :subid("271_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx947_tgt
+    .local int rx947_pos
+    .local int rx947_off
+    .local int rx947_eos
+    .local int rx947_rep
+    .local pmc rx947_cur
+    (rx947_cur, rx947_pos, rx947_tgt, $I10) = self."!cursor_start"()
+    rx947_cur."!cursor_debug"("START ", "infix:sym<ge>")
+    .lex unicode:"$\x{a2}", rx947_cur
+    .local pmc match
+    .lex "$/", match
+    length rx947_eos, rx947_tgt
+    set rx947_off, 0
+    lt $I10, 2, rx947_start
+    sub rx947_off, $I10, 1
+    substr rx947_tgt, rx947_tgt, rx947_off
+  rx947_start:
+.annotate "line", 454
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_951_fail
+    rx947_cur."!mark_push"(0, rx947_pos, $I10)
+  # rx literal  "ge"
+    add $I11, rx947_pos, 2
+    gt $I11, rx947_eos, rx947_fail
+    sub $I11, rx947_pos, rx947_off
+    substr $S10, rx947_tgt, $I11, 2
+    ne $S10, "ge", rx947_fail
+    add rx947_pos, 2
+    set_addr $I10, rxcap_951_fail
+    ($I12, $I11) = rx947_cur."!mark_peek"($I10)
+    rx947_cur."!cursor_pos"($I11)
+    ($P10) = rx947_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx947_pos, "")
+    rx947_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_951_done
+  rxcap_951_fail:
+    goto rx947_fail
+  rxcap_951_done:
+  # rx subrule "O" subtype=capture negate=
+    rx947_cur."!cursor_pos"(rx947_pos)
+    $P10 = rx947_cur."O"("%relational, :pirop<isge ISs>")
+    unless $P10, rx947_fail
+    rx947_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("O")
+    rx947_pos = $P10."pos"()
+  # rx pass
+    rx947_cur."!cursor_pass"(rx947_pos, "infix:sym<ge>")
+    rx947_cur."!cursor_debug"("PASS  ", "infix:sym<ge>", " at pos=", rx947_pos)
+    .return (rx947_cur)
+  rx947_fail:
+.annotate "line", 376
+    (rx947_rep, rx947_pos, $I10, $P10) = rx947_cur."!mark_fail"(0)
+    lt rx947_pos, -1, rx947_done
+    eq rx947_pos, -1, rx947_fail
+    jump $I10
+  rx947_done:
+    rx947_cur."!cursor_fail"()
+    rx947_cur."!cursor_debug"("FAIL  ", "infix:sym<ge>")
+    .return (rx947_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__infix:sym<ge>"  :subid("272_1258533478.31768") :method
+.annotate "line", 376
+    $P949 = self."!PREFIX__!subrule"("O", "ge")
+    new $P950, "ResizablePMCArray"
+    push $P950, $P949
+    .return ($P950)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "infix:sym<lt>"  :subid("273_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx953_tgt
+    .local int rx953_pos
+    .local int rx953_off
+    .local int rx953_eos
+    .local int rx953_rep
+    .local pmc rx953_cur
+    (rx953_cur, rx953_pos, rx953_tgt, $I10) = self."!cursor_start"()
+    rx953_cur."!cursor_debug"("START ", "infix:sym<lt>")
+    .lex unicode:"$\x{a2}", rx953_cur
+    .local pmc match
+    .lex "$/", match
+    length rx953_eos, rx953_tgt
+    set rx953_off, 0
+    lt $I10, 2, rx953_start
+    sub rx953_off, $I10, 1
+    substr rx953_tgt, rx953_tgt, rx953_off
+  rx953_start:
+.annotate "line", 455
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_957_fail
+    rx953_cur."!mark_push"(0, rx953_pos, $I10)
+  # rx literal  "lt"
+    add $I11, rx953_pos, 2
+    gt $I11, rx953_eos, rx953_fail
+    sub $I11, rx953_pos, rx953_off
+    substr $S10, rx953_tgt, $I11, 2
+    ne $S10, "lt", rx953_fail
+    add rx953_pos, 2
+    set_addr $I10, rxcap_957_fail
+    ($I12, $I11) = rx953_cur."!mark_peek"($I10)
+    rx953_cur."!cursor_pos"($I11)
+    ($P10) = rx953_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx953_pos, "")
+    rx953_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_957_done
+  rxcap_957_fail:
+    goto rx953_fail
+  rxcap_957_done:
+  # rx subrule "O" subtype=capture negate=
+    rx953_cur."!cursor_pos"(rx953_pos)
+    $P10 = rx953_cur."O"("%relational, :pirop<islt ISs>")
+    unless $P10, rx953_fail
+    rx953_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("O")
+    rx953_pos = $P10."pos"()
+  # rx pass
+    rx953_cur."!cursor_pass"(rx953_pos, "infix:sym<lt>")
+    rx953_cur."!cursor_debug"("PASS  ", "infix:sym<lt>", " at pos=", rx953_pos)
+    .return (rx953_cur)
+  rx953_fail:
+.annotate "line", 376
+    (rx953_rep, rx953_pos, $I10, $P10) = rx953_cur."!mark_fail"(0)
+    lt rx953_pos, -1, rx953_done
+    eq rx953_pos, -1, rx953_fail
+    jump $I10
+  rx953_done:
+    rx953_cur."!cursor_fail"()
+    rx953_cur."!cursor_debug"("FAIL  ", "infix:sym<lt>")
+    .return (rx953_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__infix:sym<lt>"  :subid("274_1258533478.31768") :method
+.annotate "line", 376
+    $P955 = self."!PREFIX__!subrule"("O", "lt")
+    new $P956, "ResizablePMCArray"
+    push $P956, $P955
+    .return ($P956)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "infix:sym<gt>"  :subid("275_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx959_tgt
+    .local int rx959_pos
+    .local int rx959_off
+    .local int rx959_eos
+    .local int rx959_rep
+    .local pmc rx959_cur
+    (rx959_cur, rx959_pos, rx959_tgt, $I10) = self."!cursor_start"()
+    rx959_cur."!cursor_debug"("START ", "infix:sym<gt>")
+    .lex unicode:"$\x{a2}", rx959_cur
+    .local pmc match
+    .lex "$/", match
+    length rx959_eos, rx959_tgt
+    set rx959_off, 0
+    lt $I10, 2, rx959_start
+    sub rx959_off, $I10, 1
+    substr rx959_tgt, rx959_tgt, rx959_off
+  rx959_start:
+.annotate "line", 456
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_963_fail
+    rx959_cur."!mark_push"(0, rx959_pos, $I10)
+  # rx literal  "gt"
+    add $I11, rx959_pos, 2
+    gt $I11, rx959_eos, rx959_fail
+    sub $I11, rx959_pos, rx959_off
+    substr $S10, rx959_tgt, $I11, 2
+    ne $S10, "gt", rx959_fail
+    add rx959_pos, 2
+    set_addr $I10, rxcap_963_fail
+    ($I12, $I11) = rx959_cur."!mark_peek"($I10)
+    rx959_cur."!cursor_pos"($I11)
+    ($P10) = rx959_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx959_pos, "")
+    rx959_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_963_done
+  rxcap_963_fail:
+    goto rx959_fail
+  rxcap_963_done:
+  # rx subrule "O" subtype=capture negate=
+    rx959_cur."!cursor_pos"(rx959_pos)
+    $P10 = rx959_cur."O"("%relational, :pirop<isgt ISs>")
+    unless $P10, rx959_fail
+    rx959_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("O")
+    rx959_pos = $P10."pos"()
+  # rx pass
+    rx959_cur."!cursor_pass"(rx959_pos, "infix:sym<gt>")
+    rx959_cur."!cursor_debug"("PASS  ", "infix:sym<gt>", " at pos=", rx959_pos)
+    .return (rx959_cur)
+  rx959_fail:
+.annotate "line", 376
+    (rx959_rep, rx959_pos, $I10, $P10) = rx959_cur."!mark_fail"(0)
+    lt rx959_pos, -1, rx959_done
+    eq rx959_pos, -1, rx959_fail
+    jump $I10
+  rx959_done:
+    rx959_cur."!cursor_fail"()
+    rx959_cur."!cursor_debug"("FAIL  ", "infix:sym<gt>")
+    .return (rx959_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__infix:sym<gt>"  :subid("276_1258533478.31768") :method
+.annotate "line", 376
+    $P961 = self."!PREFIX__!subrule"("O", "gt")
+    new $P962, "ResizablePMCArray"
+    push $P962, $P961
+    .return ($P962)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "infix:sym<=:=>"  :subid("277_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx965_tgt
+    .local int rx965_pos
+    .local int rx965_off
+    .local int rx965_eos
+    .local int rx965_rep
+    .local pmc rx965_cur
+    (rx965_cur, rx965_pos, rx965_tgt, $I10) = self."!cursor_start"()
+    rx965_cur."!cursor_debug"("START ", "infix:sym<=:=>")
+    .lex unicode:"$\x{a2}", rx965_cur
+    .local pmc match
+    .lex "$/", match
+    length rx965_eos, rx965_tgt
+    set rx965_off, 0
+    lt $I10, 2, rx965_start
+    sub rx965_off, $I10, 1
+    substr rx965_tgt, rx965_tgt, rx965_off
+  rx965_start:
+.annotate "line", 457
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_969_fail
+    rx965_cur."!mark_push"(0, rx965_pos, $I10)
+  # rx literal  "=:="
+    add $I11, rx965_pos, 3
+    gt $I11, rx965_eos, rx965_fail
+    sub $I11, rx965_pos, rx965_off
+    substr $S10, rx965_tgt, $I11, 3
+    ne $S10, "=:=", rx965_fail
+    add rx965_pos, 3
+    set_addr $I10, rxcap_969_fail
+    ($I12, $I11) = rx965_cur."!mark_peek"($I10)
+    rx965_cur."!cursor_pos"($I11)
+    ($P10) = rx965_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx965_pos, "")
+    rx965_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_969_done
+  rxcap_969_fail:
+    goto rx965_fail
+  rxcap_969_done:
+  # rx subrule "O" subtype=capture negate=
+    rx965_cur."!cursor_pos"(rx965_pos)
+    $P10 = rx965_cur."O"("%relational, :pirop<issame>")
+    unless $P10, rx965_fail
+    rx965_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("O")
+    rx965_pos = $P10."pos"()
+  # rx pass
+    rx965_cur."!cursor_pass"(rx965_pos, "infix:sym<=:=>")
+    rx965_cur."!cursor_debug"("PASS  ", "infix:sym<=:=>", " at pos=", rx965_pos)
+    .return (rx965_cur)
+  rx965_fail:
+.annotate "line", 376
+    (rx965_rep, rx965_pos, $I10, $P10) = rx965_cur."!mark_fail"(0)
+    lt rx965_pos, -1, rx965_done
+    eq rx965_pos, -1, rx965_fail
+    jump $I10
+  rx965_done:
+    rx965_cur."!cursor_fail"()
+    rx965_cur."!cursor_debug"("FAIL  ", "infix:sym<=:=>")
+    .return (rx965_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__infix:sym<=:=>"  :subid("278_1258533478.31768") :method
+.annotate "line", 376
+    $P967 = self."!PREFIX__!subrule"("O", "=:=")
+    new $P968, "ResizablePMCArray"
+    push $P968, $P967
+    .return ($P968)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "infix:sym<&&>"  :subid("279_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx971_tgt
+    .local int rx971_pos
+    .local int rx971_off
+    .local int rx971_eos
+    .local int rx971_rep
+    .local pmc rx971_cur
+    (rx971_cur, rx971_pos, rx971_tgt, $I10) = self."!cursor_start"()
+    rx971_cur."!cursor_debug"("START ", "infix:sym<&&>")
+    .lex unicode:"$\x{a2}", rx971_cur
+    .local pmc match
+    .lex "$/", match
+    length rx971_eos, rx971_tgt
+    set rx971_off, 0
+    lt $I10, 2, rx971_start
+    sub rx971_off, $I10, 1
+    substr rx971_tgt, rx971_tgt, rx971_off
+  rx971_start:
+.annotate "line", 459
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_975_fail
+    rx971_cur."!mark_push"(0, rx971_pos, $I10)
+  # rx literal  "&&"
+    add $I11, rx971_pos, 2
+    gt $I11, rx971_eos, rx971_fail
+    sub $I11, rx971_pos, rx971_off
+    substr $S10, rx971_tgt, $I11, 2
+    ne $S10, "&&", rx971_fail
+    add rx971_pos, 2
+    set_addr $I10, rxcap_975_fail
+    ($I12, $I11) = rx971_cur."!mark_peek"($I10)
+    rx971_cur."!cursor_pos"($I11)
+    ($P10) = rx971_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx971_pos, "")
+    rx971_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_975_done
+  rxcap_975_fail:
+    goto rx971_fail
+  rxcap_975_done:
+  # rx subrule "O" subtype=capture negate=
+    rx971_cur."!cursor_pos"(rx971_pos)
+    $P10 = rx971_cur."O"("%tight_and, :pasttype<if>")
+    unless $P10, rx971_fail
+    rx971_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("O")
+    rx971_pos = $P10."pos"()
+  # rx pass
+    rx971_cur."!cursor_pass"(rx971_pos, "infix:sym<&&>")
+    rx971_cur."!cursor_debug"("PASS  ", "infix:sym<&&>", " at pos=", rx971_pos)
+    .return (rx971_cur)
+  rx971_fail:
+.annotate "line", 376
+    (rx971_rep, rx971_pos, $I10, $P10) = rx971_cur."!mark_fail"(0)
+    lt rx971_pos, -1, rx971_done
+    eq rx971_pos, -1, rx971_fail
+    jump $I10
+  rx971_done:
+    rx971_cur."!cursor_fail"()
+    rx971_cur."!cursor_debug"("FAIL  ", "infix:sym<&&>")
+    .return (rx971_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__infix:sym<&&>"  :subid("280_1258533478.31768") :method
+.annotate "line", 376
+    $P973 = self."!PREFIX__!subrule"("O", "&&")
+    new $P974, "ResizablePMCArray"
+    push $P974, $P973
+    .return ($P974)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "infix:sym<||>"  :subid("281_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx977_tgt
+    .local int rx977_pos
+    .local int rx977_off
+    .local int rx977_eos
+    .local int rx977_rep
+    .local pmc rx977_cur
+    (rx977_cur, rx977_pos, rx977_tgt, $I10) = self."!cursor_start"()
+    rx977_cur."!cursor_debug"("START ", "infix:sym<||>")
+    .lex unicode:"$\x{a2}", rx977_cur
+    .local pmc match
+    .lex "$/", match
+    length rx977_eos, rx977_tgt
+    set rx977_off, 0
+    lt $I10, 2, rx977_start
+    sub rx977_off, $I10, 1
+    substr rx977_tgt, rx977_tgt, rx977_off
+  rx977_start:
 .annotate "line", 461
   # rx subcapture "sym"
-    set_addr $I10, rxcap_977_fail
-    rx973_cur."!mark_push"(0, rx973_pos, $I10)
-  # rx literal  "="
-    add $I11, rx973_pos, 1
-    gt $I11, rx973_eos, rx973_fail
-    sub $I11, rx973_pos, rx973_off
-    substr $S10, rx973_tgt, $I11, 1
-    ne $S10, "=", rx973_fail
-    add rx973_pos, 1
-    set_addr $I10, rxcap_977_fail
-    ($I12, $I11) = rx973_cur."!mark_peek"($I10)
-    rx973_cur."!cursor_pos"($I11)
-    ($P10) = rx973_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx973_pos, "")
-    rx973_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_981_fail
+    rx977_cur."!mark_push"(0, rx977_pos, $I10)
+  # rx literal  "||"
+    add $I11, rx977_pos, 2
+    gt $I11, rx977_eos, rx977_fail
+    sub $I11, rx977_pos, rx977_off
+    substr $S10, rx977_tgt, $I11, 2
+    ne $S10, "||", rx977_fail
+    add rx977_pos, 2
+    set_addr $I10, rxcap_981_fail
+    ($I12, $I11) = rx977_cur."!mark_peek"($I10)
+    rx977_cur."!cursor_pos"($I11)
+    ($P10) = rx977_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx977_pos, "")
+    rx977_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_977_done
-  rxcap_977_fail:
-    goto rx973_fail
-  rxcap_977_done:
-  # rx subrule "panic" subtype=method negate=
-    rx973_cur."!cursor_pos"(rx973_pos)
-    $P10 = rx973_cur."panic"("Assignment (\"=\") not supported in NQP, use \":=\" instead")
-    unless $P10, rx973_fail
-    rx973_pos = $P10."pos"()
-.annotate "line", 460
-  # rx pass
-    rx973_cur."!cursor_pass"(rx973_pos, "infix:sym<=>")
-    rx973_cur."!cursor_debug"("PASS  ", "infix:sym<=>", " at pos=", rx973_pos)
-    .return (rx973_cur)
-  rx973_fail:
-.annotate "line", 364
-    (rx973_rep, rx973_pos, $I10, $P10) = rx973_cur."!mark_fail"(0)
-    lt rx973_pos, -1, rx973_done
-    eq rx973_pos, -1, rx973_fail
-    jump $I10
-  rx973_done:
-    rx973_cur."!cursor_fail"()
-    rx973_cur."!cursor_debug"("FAIL  ", "infix:sym<=>")
-    .return (rx973_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<=>"  :subid("285_1258424429.0004") :method
-.annotate "line", 364
-    $P975 = self."!PREFIX__!subrule"("", "=")
-    new $P976, "ResizablePMCArray"
-    push $P976, $P975
-    .return ($P976)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "infix:sym<:=>"  :subid("286_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx979_tgt
-    .local int rx979_pos
-    .local int rx979_off
-    .local int rx979_eos
-    .local int rx979_rep
-    .local pmc rx979_cur
-    (rx979_cur, rx979_pos, rx979_tgt, $I10) = self."!cursor_start"()
-    rx979_cur."!cursor_debug"("START ", "infix:sym<:=>")
-    .lex unicode:"$\x{a2}", rx979_cur
-    .local pmc match
-    .lex "$/", match
-    length rx979_eos, rx979_tgt
-    set rx979_off, 0
-    lt $I10, 2, rx979_start
-    sub rx979_off, $I10, 1
-    substr rx979_tgt, rx979_tgt, rx979_off
-  rx979_start:
-.annotate "line", 463
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_983_fail
-    rx979_cur."!mark_push"(0, rx979_pos, $I10)
-  # rx literal  ":="
-    add $I11, rx979_pos, 2
-    gt $I11, rx979_eos, rx979_fail
-    sub $I11, rx979_pos, rx979_off
-    substr $S10, rx979_tgt, $I11, 2
-    ne $S10, ":=", rx979_fail
-    add rx979_pos, 2
-    set_addr $I10, rxcap_983_fail
-    ($I12, $I11) = rx979_cur."!mark_peek"($I10)
-    rx979_cur."!cursor_pos"($I11)
-    ($P10) = rx979_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx979_pos, "")
-    rx979_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_983_done
-  rxcap_983_fail:
-    goto rx979_fail
-  rxcap_983_done:
+    goto rxcap_981_done
+  rxcap_981_fail:
+    goto rx977_fail
+  rxcap_981_done:
   # rx subrule "O" subtype=capture negate=
-    rx979_cur."!cursor_pos"(rx979_pos)
-    $P10 = rx979_cur."O"("%assignment, :pasttype<bind>")
-    unless $P10, rx979_fail
-    rx979_cur."!mark_push"(0, -1, 0, $P10)
+    rx977_cur."!cursor_pos"(rx977_pos)
+    $P10 = rx977_cur."O"("%tight_or, :pasttype<unless>")
+    unless $P10, rx977_fail
+    rx977_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx979_pos = $P10."pos"()
+    rx977_pos = $P10."pos"()
   # rx pass
-    rx979_cur."!cursor_pass"(rx979_pos, "infix:sym<:=>")
-    rx979_cur."!cursor_debug"("PASS  ", "infix:sym<:=>", " at pos=", rx979_pos)
-    .return (rx979_cur)
-  rx979_fail:
-.annotate "line", 364
-    (rx979_rep, rx979_pos, $I10, $P10) = rx979_cur."!mark_fail"(0)
-    lt rx979_pos, -1, rx979_done
-    eq rx979_pos, -1, rx979_fail
+    rx977_cur."!cursor_pass"(rx977_pos, "infix:sym<||>")
+    rx977_cur."!cursor_debug"("PASS  ", "infix:sym<||>", " at pos=", rx977_pos)
+    .return (rx977_cur)
+  rx977_fail:
+.annotate "line", 376
+    (rx977_rep, rx977_pos, $I10, $P10) = rx977_cur."!mark_fail"(0)
+    lt rx977_pos, -1, rx977_done
+    eq rx977_pos, -1, rx977_fail
     jump $I10
-  rx979_done:
-    rx979_cur."!cursor_fail"()
-    rx979_cur."!cursor_debug"("FAIL  ", "infix:sym<:=>")
-    .return (rx979_cur)
+  rx977_done:
+    rx977_cur."!cursor_fail"()
+    rx977_cur."!cursor_debug"("FAIL  ", "infix:sym<||>")
+    .return (rx977_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<:=>"  :subid("287_1258424429.0004") :method
-.annotate "line", 364
-    $P981 = self."!PREFIX__!subrule"("O", ":=")
-    new $P982, "ResizablePMCArray"
-    push $P982, $P981
-    .return ($P982)
+.sub "!PREFIX__infix:sym<||>"  :subid("282_1258533478.31768") :method
+.annotate "line", 376
+    $P979 = self."!PREFIX__!subrule"("O", "||")
+    new $P980, "ResizablePMCArray"
+    push $P980, $P979
+    .return ($P980)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<::=>"  :subid("288_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx985_tgt
-    .local int rx985_pos
-    .local int rx985_off
-    .local int rx985_eos
-    .local int rx985_rep
-    .local pmc rx985_cur
-    (rx985_cur, rx985_pos, rx985_tgt, $I10) = self."!cursor_start"()
-    rx985_cur."!cursor_debug"("START ", "infix:sym<::=>")
-    .lex unicode:"$\x{a2}", rx985_cur
+.sub "infix:sym<//>"  :subid("283_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx983_tgt
+    .local int rx983_pos
+    .local int rx983_off
+    .local int rx983_eos
+    .local int rx983_rep
+    .local pmc rx983_cur
+    (rx983_cur, rx983_pos, rx983_tgt, $I10) = self."!cursor_start"()
+    rx983_cur."!cursor_debug"("START ", "infix:sym<//>")
+    .lex unicode:"$\x{a2}", rx983_cur
     .local pmc match
     .lex "$/", match
-    length rx985_eos, rx985_tgt
-    set rx985_off, 0
-    lt $I10, 2, rx985_start
-    sub rx985_off, $I10, 1
-    substr rx985_tgt, rx985_tgt, rx985_off
-  rx985_start:
-.annotate "line", 464
+    length rx983_eos, rx983_tgt
+    set rx983_off, 0
+    lt $I10, 2, rx983_start
+    sub rx983_off, $I10, 1
+    substr rx983_tgt, rx983_tgt, rx983_off
+  rx983_start:
+.annotate "line", 462
   # rx subcapture "sym"
-    set_addr $I10, rxcap_989_fail
-    rx985_cur."!mark_push"(0, rx985_pos, $I10)
-  # rx literal  "::="
-    add $I11, rx985_pos, 3
-    gt $I11, rx985_eos, rx985_fail
-    sub $I11, rx985_pos, rx985_off
-    substr $S10, rx985_tgt, $I11, 3
-    ne $S10, "::=", rx985_fail
-    add rx985_pos, 3
-    set_addr $I10, rxcap_989_fail
-    ($I12, $I11) = rx985_cur."!mark_peek"($I10)
-    rx985_cur."!cursor_pos"($I11)
-    ($P10) = rx985_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx985_pos, "")
-    rx985_cur."!mark_push"(0, -1, 0, $P10)
+    set_addr $I10, rxcap_987_fail
+    rx983_cur."!mark_push"(0, rx983_pos, $I10)
+  # rx literal  "//"
+    add $I11, rx983_pos, 2
+    gt $I11, rx983_eos, rx983_fail
+    sub $I11, rx983_pos, rx983_off
+    substr $S10, rx983_tgt, $I11, 2
+    ne $S10, "//", rx983_fail
+    add rx983_pos, 2
+    set_addr $I10, rxcap_987_fail
+    ($I12, $I11) = rx983_cur."!mark_peek"($I10)
+    rx983_cur."!cursor_pos"($I11)
+    ($P10) = rx983_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx983_pos, "")
+    rx983_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("sym")
-    goto rxcap_989_done
-  rxcap_989_fail:
-    goto rx985_fail
-  rxcap_989_done:
+    goto rxcap_987_done
+  rxcap_987_fail:
+    goto rx983_fail
+  rxcap_987_done:
   # rx subrule "O" subtype=capture negate=
-    rx985_cur."!cursor_pos"(rx985_pos)
-    $P10 = rx985_cur."O"("%assignment, :pasttype<bind>")
-    unless $P10, rx985_fail
-    rx985_cur."!mark_push"(0, -1, 0, $P10)
+    rx983_cur."!cursor_pos"(rx983_pos)
+    $P10 = rx983_cur."O"("%tight_or, :pasttype<def_or>")
+    unless $P10, rx983_fail
+    rx983_cur."!mark_push"(0, -1, 0, $P10)
     $P10."!cursor_names"("O")
-    rx985_pos = $P10."pos"()
+    rx983_pos = $P10."pos"()
   # rx pass
-    rx985_cur."!cursor_pass"(rx985_pos, "infix:sym<::=>")
-    rx985_cur."!cursor_debug"("PASS  ", "infix:sym<::=>", " at pos=", rx985_pos)
-    .return (rx985_cur)
-  rx985_fail:
-.annotate "line", 364
-    (rx985_rep, rx985_pos, $I10, $P10) = rx985_cur."!mark_fail"(0)
-    lt rx985_pos, -1, rx985_done
-    eq rx985_pos, -1, rx985_fail
+    rx983_cur."!cursor_pass"(rx983_pos, "infix:sym<//>")
+    rx983_cur."!cursor_debug"("PASS  ", "infix:sym<//>", " at pos=", rx983_pos)
+    .return (rx983_cur)
+  rx983_fail:
+.annotate "line", 376
+    (rx983_rep, rx983_pos, $I10, $P10) = rx983_cur."!mark_fail"(0)
+    lt rx983_pos, -1, rx983_done
+    eq rx983_pos, -1, rx983_fail
     jump $I10
-  rx985_done:
-    rx985_cur."!cursor_fail"()
-    rx985_cur."!cursor_debug"("FAIL  ", "infix:sym<::=>")
-    .return (rx985_cur)
+  rx983_done:
+    rx983_cur."!cursor_fail"()
+    rx983_cur."!cursor_debug"("FAIL  ", "infix:sym<//>")
+    .return (rx983_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<::=>"  :subid("289_1258424429.0004") :method
-.annotate "line", 364
-    $P987 = self."!PREFIX__!subrule"("O", "::=")
-    new $P988, "ResizablePMCArray"
-    push $P988, $P987
-    .return ($P988)
+.sub "!PREFIX__infix:sym<//>"  :subid("284_1258533478.31768") :method
+.annotate "line", 376
+    $P985 = self."!PREFIX__!subrule"("O", "//")
+    new $P986, "ResizablePMCArray"
+    push $P986, $P985
+    .return ($P986)
 .end
 
 
 .namespace ["NQP";"Grammar"]
-.sub "infix:sym<,>"  :subid("290_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx991_tgt
-    .local int rx991_pos
-    .local int rx991_off
-    .local int rx991_eos
-    .local int rx991_rep
-    .local pmc rx991_cur
-    (rx991_cur, rx991_pos, rx991_tgt, $I10) = self."!cursor_start"()
-    rx991_cur."!cursor_debug"("START ", "infix:sym<,>")
-    .lex unicode:"$\x{a2}", rx991_cur
+.sub "infix:sym<?? !!>"  :subid("285_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx989_tgt
+    .local int rx989_pos
+    .local int rx989_off
+    .local int rx989_eos
+    .local int rx989_rep
+    .local pmc rx989_cur
+    (rx989_cur, rx989_pos, rx989_tgt, $I10) = self."!cursor_start"()
+    rx989_cur."!cursor_debug"("START ", "infix:sym<?? !!>")
+    .lex unicode:"$\x{a2}", rx989_cur
     .local pmc match
     .lex "$/", match
-    length rx991_eos, rx991_tgt
-    set rx991_off, 0
-    lt $I10, 2, rx991_start
-    sub rx991_off, $I10, 1
-    substr rx991_tgt, rx991_tgt, rx991_off
-  rx991_start:
+    length rx989_eos, rx989_tgt
+    set rx989_off, 0
+    lt $I10, 2, rx989_start
+    sub rx989_off, $I10, 1
+    substr rx989_tgt, rx989_tgt, rx989_off
+  rx989_start:
+.annotate "line", 465
+  # rx literal  "??"
+    add $I11, rx989_pos, 2
+    gt $I11, rx989_eos, rx989_fail
+    sub $I11, rx989_pos, rx989_off
+    substr $S10, rx989_tgt, $I11, 2
+    ne $S10, "??", rx989_fail
+    add rx989_pos, 2
 .annotate "line", 466
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_995_fail
-    rx991_cur."!mark_push"(0, rx991_pos, $I10)
-  # rx literal  ","
-    add $I11, rx991_pos, 1
-    gt $I11, rx991_eos, rx991_fail
-    sub $I11, rx991_pos, rx991_off
-    substr $S10, rx991_tgt, $I11, 1
-    ne $S10, ",", rx991_fail
-    add rx991_pos, 1
-    set_addr $I10, rxcap_995_fail
-    ($I12, $I11) = rx991_cur."!mark_peek"($I10)
-    rx991_cur."!cursor_pos"($I11)
-    ($P10) = rx991_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx991_pos, "")
-    rx991_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_995_done
-  rxcap_995_fail:
-    goto rx991_fail
-  rxcap_995_done:
-  # rx subrule "O" subtype=capture negate=
-    rx991_cur."!cursor_pos"(rx991_pos)
-    $P10 = rx991_cur."O"("%comma, :pasttype<list>")
-    unless $P10, rx991_fail
-    rx991_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("O")
-    rx991_pos = $P10."pos"()
-  # rx pass
-    rx991_cur."!cursor_pass"(rx991_pos, "infix:sym<,>")
-    rx991_cur."!cursor_debug"("PASS  ", "infix:sym<,>", " at pos=", rx991_pos)
-    .return (rx991_cur)
-  rx991_fail:
-.annotate "line", 364
-    (rx991_rep, rx991_pos, $I10, $P10) = rx991_cur."!mark_fail"(0)
-    lt rx991_pos, -1, rx991_done
-    eq rx991_pos, -1, rx991_fail
-    jump $I10
-  rx991_done:
-    rx991_cur."!cursor_fail"()
-    rx991_cur."!cursor_debug"("FAIL  ", "infix:sym<,>")
-    .return (rx991_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__infix:sym<,>"  :subid("291_1258424429.0004") :method
-.annotate "line", 364
-    $P993 = self."!PREFIX__!subrule"("O", ",")
-    new $P994, "ResizablePMCArray"
-    push $P994, $P993
-    .return ($P994)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "prefix:sym<return>"  :subid("292_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx997_tgt
-    .local int rx997_pos
-    .local int rx997_off
-    .local int rx997_eos
-    .local int rx997_rep
-    .local pmc rx997_cur
-    (rx997_cur, rx997_pos, rx997_tgt, $I10) = self."!cursor_start"()
-    rx997_cur."!cursor_debug"("START ", "prefix:sym<return>")
-    .lex unicode:"$\x{a2}", rx997_cur
-    .local pmc match
-    .lex "$/", match
-    length rx997_eos, rx997_tgt
-    set rx997_off, 0
-    lt $I10, 2, rx997_start
-    sub rx997_off, $I10, 1
-    substr rx997_tgt, rx997_tgt, rx997_off
-  rx997_start:
-.annotate "line", 468
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_1000_fail
-    rx997_cur."!mark_push"(0, rx997_pos, $I10)
-  # rx literal  "return"
-    add $I11, rx997_pos, 6
-    gt $I11, rx997_eos, rx997_fail
-    sub $I11, rx997_pos, rx997_off
-    substr $S10, rx997_tgt, $I11, 6
-    ne $S10, "return", rx997_fail
-    add rx997_pos, 6
-    set_addr $I10, rxcap_1000_fail
-    ($I12, $I11) = rx997_cur."!mark_peek"($I10)
-    rx997_cur."!cursor_pos"($I11)
-    ($P10) = rx997_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx997_pos, "")
-    rx997_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_1000_done
-  rxcap_1000_fail:
-    goto rx997_fail
-  rxcap_1000_done:
-  # rx charclass s
-    ge rx997_pos, rx997_eos, rx997_fail
-    sub $I10, rx997_pos, rx997_off
-    is_cclass $I11, 32, rx997_tgt, $I10
-    unless $I11, rx997_fail
-    inc rx997_pos
-  # rx subrule "O" subtype=capture negate=
-    rx997_cur."!cursor_pos"(rx997_pos)
-    $P10 = rx997_cur."O"("%list_prefix, :pasttype<return>")
-    unless $P10, rx997_fail
-    rx997_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("O")
-    rx997_pos = $P10."pos"()
-  # rx pass
-    rx997_cur."!cursor_pass"(rx997_pos, "prefix:sym<return>")
-    rx997_cur."!cursor_debug"("PASS  ", "prefix:sym<return>", " at pos=", rx997_pos)
-    .return (rx997_cur)
-  rx997_fail:
-.annotate "line", 364
-    (rx997_rep, rx997_pos, $I10, $P10) = rx997_cur."!mark_fail"(0)
-    lt rx997_pos, -1, rx997_done
-    eq rx997_pos, -1, rx997_fail
-    jump $I10
-  rx997_done:
-    rx997_cur."!cursor_fail"()
-    rx997_cur."!cursor_debug"("FAIL  ", "prefix:sym<return>")
-    .return (rx997_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__prefix:sym<return>"  :subid("293_1258424429.0004") :method
-.annotate "line", 364
-    new $P999, "ResizablePMCArray"
-    push $P999, "return"
-    .return ($P999)
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "prefix:sym<make>"  :subid("294_1258424429.0004") :method :outer("11_1258424429.0004")
-.annotate "line", 364
-    .local string rx1002_tgt
-    .local int rx1002_pos
-    .local int rx1002_off
-    .local int rx1002_eos
-    .local int rx1002_rep
-    .local pmc rx1002_cur
-    (rx1002_cur, rx1002_pos, rx1002_tgt, $I10) = self."!cursor_start"()
-    rx1002_cur."!cursor_debug"("START ", "prefix:sym<make>")
-    .lex unicode:"$\x{a2}", rx1002_cur
-    .local pmc match
-    .lex "$/", match
-    length rx1002_eos, rx1002_tgt
-    set rx1002_off, 0
-    lt $I10, 2, rx1002_start
-    sub rx1002_off, $I10, 1
-    substr rx1002_tgt, rx1002_tgt, rx1002_off
-  rx1002_start:
-.annotate "line", 469
-  # rx subcapture "sym"
-    set_addr $I10, rxcap_1005_fail
-    rx1002_cur."!mark_push"(0, rx1002_pos, $I10)
-  # rx literal  "make"
-    add $I11, rx1002_pos, 4
-    gt $I11, rx1002_eos, rx1002_fail
-    sub $I11, rx1002_pos, rx1002_off
-    substr $S10, rx1002_tgt, $I11, 4
-    ne $S10, "make", rx1002_fail
-    add rx1002_pos, 4
-    set_addr $I10, rxcap_1005_fail
-    ($I12, $I11) = rx1002_cur."!mark_peek"($I10)
-    rx1002_cur."!cursor_pos"($I11)
-    ($P10) = rx1002_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx1002_pos, "")
-    rx1002_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("sym")
-    goto rxcap_1005_done
-  rxcap_1005_fail:
-    goto rx1002_fail
-  rxcap_1005_done:
-  # rx charclass s
-    ge rx1002_pos, rx1002_eos, rx1002_fail
-    sub $I10, rx1002_pos, rx1002_off
-    is_cclass $I11, 32, rx1002_tgt, $I10
-    unless $I11, rx1002_fail
-    inc rx1002_pos
-  # rx subrule "O" subtype=capture negate=
-    rx1002_cur."!cursor_pos"(rx1002_pos)
-    $P10 = rx1002_cur."O"("%list_prefix")
-    unless $P10, rx1002_fail
-    rx1002_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("O")
-    rx1002_pos = $P10."pos"()
-  # rx pass
-    rx1002_cur."!cursor_pass"(rx1002_pos, "prefix:sym<make>")
-    rx1002_cur."!cursor_debug"("PASS  ", "prefix:sym<make>", " at pos=", rx1002_pos)
-    .return (rx1002_cur)
-  rx1002_fail:
-.annotate "line", 364
-    (rx1002_rep, rx1002_pos, $I10, $P10) = rx1002_cur."!mark_fail"(0)
-    lt rx1002_pos, -1, rx1002_done
-    eq rx1002_pos, -1, rx1002_fail
-    jump $I10
-  rx1002_done:
-    rx1002_cur."!cursor_fail"()
-    rx1002_cur."!cursor_debug"("FAIL  ", "prefix:sym<make>")
-    .return (rx1002_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Grammar"]
-.sub "!PREFIX__prefix:sym<make>"  :subid("295_1258424429.0004") :method
-.annotate "line", 364
-    new $P1004, "ResizablePMCArray"
-    push $P1004, "make"
-    .return ($P1004)
-.end
-
-
-.namespace ["NQP";"Regex"]
-.sub "_block1006"  :subid("296_1258424429.0004") :outer("11_1258424429.0004")
-.annotate "line", 472
-    .const 'Sub' $P1036 = "307_1258424429.0004" 
-    capture_lex $P1036
-    .const 'Sub' $P1024 = "304_1258424429.0004" 
-    capture_lex $P1024
-    .const 'Sub' $P1020 = "302_1258424429.0004" 
-    capture_lex $P1020
-    .const 'Sub' $P1016 = "300_1258424429.0004" 
-    capture_lex $P1016
-    .const 'Sub' $P1008 = "297_1258424429.0004" 
-    capture_lex $P1008
-    .const 'Sub' $P1036 = "307_1258424429.0004" 
-    capture_lex $P1036
-    .return ($P1036)
-.end
-
-
-.namespace ["NQP";"Regex"]
-.sub "metachar:sym<:my>"  :subid("297_1258424429.0004") :method :outer("296_1258424429.0004")
-.annotate "line", 472
-    .const 'Sub' $P1013 = "299_1258424429.0004" 
-    capture_lex $P1013
-    .local string rx1009_tgt
-    .local int rx1009_pos
-    .local int rx1009_off
-    .local int rx1009_eos
-    .local int rx1009_rep
-    .local pmc rx1009_cur
-    (rx1009_cur, rx1009_pos, rx1009_tgt, $I10) = self."!cursor_start"()
-    rx1009_cur."!cursor_debug"("START ", "metachar:sym<:my>")
-    .lex unicode:"$\x{a2}", rx1009_cur
-    .local pmc match
-    .lex "$/", match
-    length rx1009_eos, rx1009_tgt
-    set rx1009_off, 0
-    lt $I10, 2, rx1009_start
-    sub rx1009_off, $I10, 1
-    substr rx1009_tgt, rx1009_tgt, rx1009_off
-  rx1009_start:
-.annotate "line", 474
-  # rx literal  ":"
-    add $I11, rx1009_pos, 1
-    gt $I11, rx1009_eos, rx1009_fail
-    sub $I11, rx1009_pos, rx1009_off
-    substr $S10, rx1009_tgt, $I11, 1
-    ne $S10, ":", rx1009_fail
-    add rx1009_pos, 1
-  # rx subrule "before" subtype=zerowidth negate=
-    rx1009_cur."!cursor_pos"(rx1009_pos)
-    .const 'Sub' $P1013 = "299_1258424429.0004" 
-    capture_lex $P1013
-    $P10 = rx1009_cur."before"($P1013)
-    unless $P10, rx1009_fail
-  # rx subrule "LANG" subtype=capture negate=
-    rx1009_cur."!cursor_pos"(rx1009_pos)
-    $P10 = rx1009_cur."LANG"("MAIN", "statement")
-    unless $P10, rx1009_fail
-    rx1009_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("statement")
-    rx1009_pos = $P10."pos"()
   # rx subrule "ws" subtype=method negate=
-    rx1009_cur."!cursor_pos"(rx1009_pos)
-    $P10 = rx1009_cur."ws"()
-    unless $P10, rx1009_fail
-    rx1009_pos = $P10."pos"()
-  # rx literal  ";"
-    add $I11, rx1009_pos, 1
-    gt $I11, rx1009_eos, rx1009_fail
-    sub $I11, rx1009_pos, rx1009_off
-    substr $S10, rx1009_tgt, $I11, 1
-    ne $S10, ";", rx1009_fail
-    add rx1009_pos, 1
+    rx989_cur."!cursor_pos"(rx989_pos)
+    $P10 = rx989_cur."ws"()
+    unless $P10, rx989_fail
+    rx989_pos = $P10."pos"()
+.annotate "line", 467
+  # rx subrule "EXPR" subtype=capture negate=
+    rx989_cur."!cursor_pos"(rx989_pos)
+    $P10 = rx989_cur."EXPR"("i=")
+    unless $P10, rx989_fail
+    rx989_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("EXPR")
+    rx989_pos = $P10."pos"()
+.annotate "line", 468
+  # rx literal  "!!"
+    add $I11, rx989_pos, 2
+    gt $I11, rx989_eos, rx989_fail
+    sub $I11, rx989_pos, rx989_off
+    substr $S10, rx989_tgt, $I11, 2
+    ne $S10, "!!", rx989_fail
+    add rx989_pos, 2
+.annotate "line", 469
+  # rx subrule "O" subtype=capture negate=
+    rx989_cur."!cursor_pos"(rx989_pos)
+    $P10 = rx989_cur."O"("%conditional, :reducecheck<ternary>, :pasttype<if>")
+    unless $P10, rx989_fail
+    rx989_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("O")
+    rx989_pos = $P10."pos"()
+.annotate "line", 464
+  # rx pass
+    rx989_cur."!cursor_pass"(rx989_pos, "infix:sym<?? !!>")
+    rx989_cur."!cursor_debug"("PASS  ", "infix:sym<?? !!>", " at pos=", rx989_pos)
+    .return (rx989_cur)
+  rx989_fail:
+.annotate "line", 376
+    (rx989_rep, rx989_pos, $I10, $P10) = rx989_cur."!mark_fail"(0)
+    lt rx989_pos, -1, rx989_done
+    eq rx989_pos, -1, rx989_fail
+    jump $I10
+  rx989_done:
+    rx989_cur."!cursor_fail"()
+    rx989_cur."!cursor_debug"("FAIL  ", "infix:sym<?? !!>")
+    .return (rx989_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__infix:sym<?? !!>"  :subid("286_1258533478.31768") :method
+.annotate "line", 376
+    $P991 = self."!PREFIX__!subrule"("", "??")
+    new $P992, "ResizablePMCArray"
+    push $P992, $P991
+    .return ($P992)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "infix:sym<=>"  :subid("287_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx994_tgt
+    .local int rx994_pos
+    .local int rx994_off
+    .local int rx994_eos
+    .local int rx994_rep
+    .local pmc rx994_cur
+    (rx994_cur, rx994_pos, rx994_tgt, $I10) = self."!cursor_start"()
+    rx994_cur."!cursor_debug"("START ", "infix:sym<=>")
+    .lex unicode:"$\x{a2}", rx994_cur
+    .local pmc match
+    .lex "$/", match
+    length rx994_eos, rx994_tgt
+    set rx994_off, 0
+    lt $I10, 2, rx994_start
+    sub rx994_off, $I10, 1
+    substr rx994_tgt, rx994_tgt, rx994_off
+  rx994_start:
 .annotate "line", 473
-  # rx pass
-    rx1009_cur."!cursor_pass"(rx1009_pos, "metachar:sym<:my>")
-    rx1009_cur."!cursor_debug"("PASS  ", "metachar:sym<:my>", " at pos=", rx1009_pos)
-    .return (rx1009_cur)
-  rx1009_fail:
-.annotate "line", 472
-    (rx1009_rep, rx1009_pos, $I10, $P10) = rx1009_cur."!mark_fail"(0)
-    lt rx1009_pos, -1, rx1009_done
-    eq rx1009_pos, -1, rx1009_fail
-    jump $I10
-  rx1009_done:
-    rx1009_cur."!cursor_fail"()
-    rx1009_cur."!cursor_debug"("FAIL  ", "metachar:sym<:my>")
-    .return (rx1009_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Regex"]
-.sub "!PREFIX__metachar:sym<:my>"  :subid("298_1258424429.0004") :method
-.annotate "line", 472
-    new $P1011, "ResizablePMCArray"
-    push $P1011, ":"
-    .return ($P1011)
-.end
-
-
-.namespace ["NQP";"Regex"]
-.sub "_block1012"  :anon :subid("299_1258424429.0004") :method :outer("297_1258424429.0004")
-.annotate "line", 474
-    .local string rx1014_tgt
-    .local int rx1014_pos
-    .local int rx1014_off
-    .local int rx1014_eos
-    .local int rx1014_rep
-    .local pmc rx1014_cur
-    (rx1014_cur, rx1014_pos, rx1014_tgt, $I10) = self."!cursor_start"()
-    rx1014_cur."!cursor_debug"("START ", "")
-    .lex unicode:"$\x{a2}", rx1014_cur
-    .local pmc match
-    .lex "$/", match
-    length rx1014_eos, rx1014_tgt
-    set rx1014_off, 0
-    lt $I10, 2, rx1014_start
-    sub rx1014_off, $I10, 1
-    substr rx1014_tgt, rx1014_tgt, rx1014_off
-  rx1014_start:
-    ge rx1014_pos, 0, rxscan1015_done
-  rxscan1015_loop:
-    ($P10) = rx1014_cur."from"()
-    inc $P10
-    set rx1014_pos, $P10
-    ge rx1014_pos, rx1014_eos, rxscan1015_done
-    set_addr $I10, rxscan1015_loop
-    rx1014_cur."!mark_push"(0, rx1014_pos, $I10)
-  rxscan1015_done:
-  # rx literal  "my"
-    add $I11, rx1014_pos, 2
-    gt $I11, rx1014_eos, rx1014_fail
-    sub $I11, rx1014_pos, rx1014_off
-    substr $S10, rx1014_tgt, $I11, 2
-    ne $S10, "my", rx1014_fail
-    add rx1014_pos, 2
-  # rx pass
-    rx1014_cur."!cursor_pass"(rx1014_pos, "")
-    rx1014_cur."!cursor_debug"("PASS  ", "", " at pos=", rx1014_pos)
-    .return (rx1014_cur)
-  rx1014_fail:
-    (rx1014_rep, rx1014_pos, $I10, $P10) = rx1014_cur."!mark_fail"(0)
-    lt rx1014_pos, -1, rx1014_done
-    eq rx1014_pos, -1, rx1014_fail
-    jump $I10
-  rx1014_done:
-    rx1014_cur."!cursor_fail"()
-    rx1014_cur."!cursor_debug"("FAIL  ", "")
-    .return (rx1014_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Regex"]
-.sub "metachar:sym<{ }>"  :subid("300_1258424429.0004") :method :outer("296_1258424429.0004")
-.annotate "line", 472
-    .local string rx1017_tgt
-    .local int rx1017_pos
-    .local int rx1017_off
-    .local int rx1017_eos
-    .local int rx1017_rep
-    .local pmc rx1017_cur
-    (rx1017_cur, rx1017_pos, rx1017_tgt, $I10) = self."!cursor_start"()
-    rx1017_cur."!cursor_debug"("START ", "metachar:sym<{ }>")
-    .lex unicode:"$\x{a2}", rx1017_cur
-    .local pmc match
-    .lex "$/", match
-    length rx1017_eos, rx1017_tgt
-    set rx1017_off, 0
-    lt $I10, 2, rx1017_start
-    sub rx1017_off, $I10, 1
-    substr rx1017_tgt, rx1017_tgt, rx1017_off
-  rx1017_start:
-.annotate "line", 478
-  # rx enumcharlist negate=0 zerowidth
-    ge rx1017_pos, rx1017_eos, rx1017_fail
-    sub $I10, rx1017_pos, rx1017_off
-    substr $S10, rx1017_tgt, $I10, 1
-    index $I11, "{", $S10
-    lt $I11, 0, rx1017_fail
-  # rx subrule "codeblock" subtype=capture negate=
-    rx1017_cur."!cursor_pos"(rx1017_pos)
-    $P10 = rx1017_cur."codeblock"()
-    unless $P10, rx1017_fail
-    rx1017_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("codeblock")
-    rx1017_pos = $P10."pos"()
-.annotate "line", 477
-  # rx pass
-    rx1017_cur."!cursor_pass"(rx1017_pos, "metachar:sym<{ }>")
-    rx1017_cur."!cursor_debug"("PASS  ", "metachar:sym<{ }>", " at pos=", rx1017_pos)
-    .return (rx1017_cur)
-  rx1017_fail:
-.annotate "line", 472
-    (rx1017_rep, rx1017_pos, $I10, $P10) = rx1017_cur."!mark_fail"(0)
-    lt rx1017_pos, -1, rx1017_done
-    eq rx1017_pos, -1, rx1017_fail
-    jump $I10
-  rx1017_done:
-    rx1017_cur."!cursor_fail"()
-    rx1017_cur."!cursor_debug"("FAIL  ", "metachar:sym<{ }>")
-    .return (rx1017_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Regex"]
-.sub "!PREFIX__metachar:sym<{ }>"  :subid("301_1258424429.0004") :method
-.annotate "line", 472
-    new $P1019, "ResizablePMCArray"
-    push $P1019, "{"
-    .return ($P1019)
-.end
-
-
-.namespace ["NQP";"Regex"]
-.sub "assertion:sym<{ }>"  :subid("302_1258424429.0004") :method :outer("296_1258424429.0004")
-.annotate "line", 472
-    .local string rx1021_tgt
-    .local int rx1021_pos
-    .local int rx1021_off
-    .local int rx1021_eos
-    .local int rx1021_rep
-    .local pmc rx1021_cur
-    (rx1021_cur, rx1021_pos, rx1021_tgt, $I10) = self."!cursor_start"()
-    rx1021_cur."!cursor_debug"("START ", "assertion:sym<{ }>")
-    .lex unicode:"$\x{a2}", rx1021_cur
-    .local pmc match
-    .lex "$/", match
-    length rx1021_eos, rx1021_tgt
-    set rx1021_off, 0
-    lt $I10, 2, rx1021_start
-    sub rx1021_off, $I10, 1
-    substr rx1021_tgt, rx1021_tgt, rx1021_off
-  rx1021_start:
-.annotate "line", 482
-  # rx enumcharlist negate=0 zerowidth
-    ge rx1021_pos, rx1021_eos, rx1021_fail
-    sub $I10, rx1021_pos, rx1021_off
-    substr $S10, rx1021_tgt, $I10, 1
-    index $I11, "{", $S10
-    lt $I11, 0, rx1021_fail
-  # rx subrule "codeblock" subtype=capture negate=
-    rx1021_cur."!cursor_pos"(rx1021_pos)
-    $P10 = rx1021_cur."codeblock"()
-    unless $P10, rx1021_fail
-    rx1021_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("codeblock")
-    rx1021_pos = $P10."pos"()
-.annotate "line", 481
-  # rx pass
-    rx1021_cur."!cursor_pass"(rx1021_pos, "assertion:sym<{ }>")
-    rx1021_cur."!cursor_debug"("PASS  ", "assertion:sym<{ }>", " at pos=", rx1021_pos)
-    .return (rx1021_cur)
-  rx1021_fail:
-.annotate "line", 472
-    (rx1021_rep, rx1021_pos, $I10, $P10) = rx1021_cur."!mark_fail"(0)
-    lt rx1021_pos, -1, rx1021_done
-    eq rx1021_pos, -1, rx1021_fail
-    jump $I10
-  rx1021_done:
-    rx1021_cur."!cursor_fail"()
-    rx1021_cur."!cursor_debug"("FAIL  ", "assertion:sym<{ }>")
-    .return (rx1021_cur)
-    .return ()
-.end
-
-
-.namespace ["NQP";"Regex"]
-.sub "!PREFIX__assertion:sym<{ }>"  :subid("303_1258424429.0004") :method
-.annotate "line", 472
-    new $P1023, "ResizablePMCArray"
-    push $P1023, "{"
-    .return ($P1023)
-.end
-
-
-.namespace ["NQP";"Regex"]
-.sub "assertion:sym<name>"  :subid("304_1258424429.0004") :method :outer("296_1258424429.0004")
-.annotate "line", 472
-    .const 'Sub' $P1032 = "306_1258424429.0004" 
-    capture_lex $P1032
-    .local string rx1025_tgt
-    .local int rx1025_pos
-    .local int rx1025_off
-    .local int rx1025_eos
-    .local int rx1025_rep
-    .local pmc rx1025_cur
-    (rx1025_cur, rx1025_pos, rx1025_tgt, $I10) = self."!cursor_start"()
-    rx1025_cur."!cursor_debug"("START ", "assertion:sym<name>")
-    rx1025_cur."!cursor_caparray"("nibbler", "arglist", "assertion")
-    .lex unicode:"$\x{a2}", rx1025_cur
-    .local pmc match
-    .lex "$/", match
-    length rx1025_eos, rx1025_tgt
-    set rx1025_off, 0
-    lt $I10, 2, rx1025_start
-    sub rx1025_off, $I10, 1
-    substr rx1025_tgt, rx1025_tgt, rx1025_off
-  rx1025_start:
-.annotate "line", 486
-  # rx subcapture "longname"
-    set_addr $I10, rxcap_1028_fail
-    rx1025_cur."!mark_push"(0, rx1025_pos, $I10)
-  # rx charclass_q w r 1..-1
-    sub $I10, rx1025_pos, rx1025_off
-    find_not_cclass $I11, 8192, rx1025_tgt, $I10, rx1025_eos
-    add $I12, $I10, 1
-    lt $I11, $I12, rx1025_fail
-    add rx1025_pos, rx1025_off, $I11
-    set_addr $I10, rxcap_1028_fail
-    ($I12, $I11) = rx1025_cur."!mark_peek"($I10)
-    rx1025_cur."!cursor_pos"($I11)
-    ($P10) = rx1025_cur."!cursor_start"()
-    $P10."!cursor_pass"(rx1025_pos, "")
-    rx1025_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("longname")
-    goto rxcap_1028_done
-  rxcap_1028_fail:
-    goto rx1025_fail
-  rxcap_1028_done:
-.annotate "line", 493
-  # rx rxquantr1029 ** 0..1
-    set_addr $I1035, rxquantr1029_done
-    rx1025_cur."!mark_push"(0, rx1025_pos, $I1035)
-  rxquantr1029_loop:
-  alt1030_0:
-.annotate "line", 487
-    set_addr $I10, alt1030_1
-    rx1025_cur."!mark_push"(0, rx1025_pos, $I10)
-.annotate "line", 488
-  # rx subrule "before" subtype=zerowidth negate=
-    rx1025_cur."!cursor_pos"(rx1025_pos)
-    .const 'Sub' $P1032 = "306_1258424429.0004" 
-    capture_lex $P1032
-    $P10 = rx1025_cur."before"($P1032)
-    unless $P10, rx1025_fail
-    goto alt1030_end
-  alt1030_1:
-    set_addr $I10, alt1030_2
-    rx1025_cur."!mark_push"(0, rx1025_pos, $I10)
-.annotate "line", 489
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_998_fail
+    rx994_cur."!mark_push"(0, rx994_pos, $I10)
   # rx literal  "="
-    add $I11, rx1025_pos, 1
-    gt $I11, rx1025_eos, rx1025_fail
-    sub $I11, rx1025_pos, rx1025_off
-    substr $S10, rx1025_tgt, $I11, 1
-    ne $S10, "=", rx1025_fail
-    add rx1025_pos, 1
-  # rx subrule "assertion" subtype=capture negate=
-    rx1025_cur."!cursor_pos"(rx1025_pos)
-    $P10 = rx1025_cur."assertion"()
-    unless $P10, rx1025_fail
-    rx1025_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("assertion")
-    rx1025_pos = $P10."pos"()
-    goto alt1030_end
-  alt1030_2:
-    set_addr $I10, alt1030_3
-    rx1025_cur."!mark_push"(0, rx1025_pos, $I10)
-.annotate "line", 490
+    add $I11, rx994_pos, 1
+    gt $I11, rx994_eos, rx994_fail
+    sub $I11, rx994_pos, rx994_off
+    substr $S10, rx994_tgt, $I11, 1
+    ne $S10, "=", rx994_fail
+    add rx994_pos, 1
+    set_addr $I10, rxcap_998_fail
+    ($I12, $I11) = rx994_cur."!mark_peek"($I10)
+    rx994_cur."!cursor_pos"($I11)
+    ($P10) = rx994_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx994_pos, "")
+    rx994_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_998_done
+  rxcap_998_fail:
+    goto rx994_fail
+  rxcap_998_done:
+  # rx subrule "panic" subtype=method negate=
+    rx994_cur."!cursor_pos"(rx994_pos)
+    $P10 = rx994_cur."panic"("Assignment (\"=\") not supported in NQP, use \":=\" instead")
+    unless $P10, rx994_fail
+    rx994_pos = $P10."pos"()
+.annotate "line", 472
+  # rx pass
+    rx994_cur."!cursor_pass"(rx994_pos, "infix:sym<=>")
+    rx994_cur."!cursor_debug"("PASS  ", "infix:sym<=>", " at pos=", rx994_pos)
+    .return (rx994_cur)
+  rx994_fail:
+.annotate "line", 376
+    (rx994_rep, rx994_pos, $I10, $P10) = rx994_cur."!mark_fail"(0)
+    lt rx994_pos, -1, rx994_done
+    eq rx994_pos, -1, rx994_fail
+    jump $I10
+  rx994_done:
+    rx994_cur."!cursor_fail"()
+    rx994_cur."!cursor_debug"("FAIL  ", "infix:sym<=>")
+    .return (rx994_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__infix:sym<=>"  :subid("288_1258533478.31768") :method
+.annotate "line", 376
+    $P996 = self."!PREFIX__!subrule"("", "=")
+    new $P997, "ResizablePMCArray"
+    push $P997, $P996
+    .return ($P997)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "infix:sym<:=>"  :subid("289_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx1000_tgt
+    .local int rx1000_pos
+    .local int rx1000_off
+    .local int rx1000_eos
+    .local int rx1000_rep
+    .local pmc rx1000_cur
+    (rx1000_cur, rx1000_pos, rx1000_tgt, $I10) = self."!cursor_start"()
+    rx1000_cur."!cursor_debug"("START ", "infix:sym<:=>")
+    .lex unicode:"$\x{a2}", rx1000_cur
+    .local pmc match
+    .lex "$/", match
+    length rx1000_eos, rx1000_tgt
+    set rx1000_off, 0
+    lt $I10, 2, rx1000_start
+    sub rx1000_off, $I10, 1
+    substr rx1000_tgt, rx1000_tgt, rx1000_off
+  rx1000_start:
+.annotate "line", 475
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_1004_fail
+    rx1000_cur."!mark_push"(0, rx1000_pos, $I10)
+  # rx literal  ":="
+    add $I11, rx1000_pos, 2
+    gt $I11, rx1000_eos, rx1000_fail
+    sub $I11, rx1000_pos, rx1000_off
+    substr $S10, rx1000_tgt, $I11, 2
+    ne $S10, ":=", rx1000_fail
+    add rx1000_pos, 2
+    set_addr $I10, rxcap_1004_fail
+    ($I12, $I11) = rx1000_cur."!mark_peek"($I10)
+    rx1000_cur."!cursor_pos"($I11)
+    ($P10) = rx1000_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx1000_pos, "")
+    rx1000_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_1004_done
+  rxcap_1004_fail:
+    goto rx1000_fail
+  rxcap_1004_done:
+  # rx subrule "O" subtype=capture negate=
+    rx1000_cur."!cursor_pos"(rx1000_pos)
+    $P10 = rx1000_cur."O"("%assignment, :pasttype<bind>")
+    unless $P10, rx1000_fail
+    rx1000_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("O")
+    rx1000_pos = $P10."pos"()
+  # rx pass
+    rx1000_cur."!cursor_pass"(rx1000_pos, "infix:sym<:=>")
+    rx1000_cur."!cursor_debug"("PASS  ", "infix:sym<:=>", " at pos=", rx1000_pos)
+    .return (rx1000_cur)
+  rx1000_fail:
+.annotate "line", 376
+    (rx1000_rep, rx1000_pos, $I10, $P10) = rx1000_cur."!mark_fail"(0)
+    lt rx1000_pos, -1, rx1000_done
+    eq rx1000_pos, -1, rx1000_fail
+    jump $I10
+  rx1000_done:
+    rx1000_cur."!cursor_fail"()
+    rx1000_cur."!cursor_debug"("FAIL  ", "infix:sym<:=>")
+    .return (rx1000_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__infix:sym<:=>"  :subid("290_1258533478.31768") :method
+.annotate "line", 376
+    $P1002 = self."!PREFIX__!subrule"("O", ":=")
+    new $P1003, "ResizablePMCArray"
+    push $P1003, $P1002
+    .return ($P1003)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "infix:sym<::=>"  :subid("291_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx1006_tgt
+    .local int rx1006_pos
+    .local int rx1006_off
+    .local int rx1006_eos
+    .local int rx1006_rep
+    .local pmc rx1006_cur
+    (rx1006_cur, rx1006_pos, rx1006_tgt, $I10) = self."!cursor_start"()
+    rx1006_cur."!cursor_debug"("START ", "infix:sym<::=>")
+    .lex unicode:"$\x{a2}", rx1006_cur
+    .local pmc match
+    .lex "$/", match
+    length rx1006_eos, rx1006_tgt
+    set rx1006_off, 0
+    lt $I10, 2, rx1006_start
+    sub rx1006_off, $I10, 1
+    substr rx1006_tgt, rx1006_tgt, rx1006_off
+  rx1006_start:
+.annotate "line", 476
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_1010_fail
+    rx1006_cur."!mark_push"(0, rx1006_pos, $I10)
+  # rx literal  "::="
+    add $I11, rx1006_pos, 3
+    gt $I11, rx1006_eos, rx1006_fail
+    sub $I11, rx1006_pos, rx1006_off
+    substr $S10, rx1006_tgt, $I11, 3
+    ne $S10, "::=", rx1006_fail
+    add rx1006_pos, 3
+    set_addr $I10, rxcap_1010_fail
+    ($I12, $I11) = rx1006_cur."!mark_peek"($I10)
+    rx1006_cur."!cursor_pos"($I11)
+    ($P10) = rx1006_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx1006_pos, "")
+    rx1006_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_1010_done
+  rxcap_1010_fail:
+    goto rx1006_fail
+  rxcap_1010_done:
+  # rx subrule "O" subtype=capture negate=
+    rx1006_cur."!cursor_pos"(rx1006_pos)
+    $P10 = rx1006_cur."O"("%assignment, :pasttype<bind>")
+    unless $P10, rx1006_fail
+    rx1006_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("O")
+    rx1006_pos = $P10."pos"()
+  # rx pass
+    rx1006_cur."!cursor_pass"(rx1006_pos, "infix:sym<::=>")
+    rx1006_cur."!cursor_debug"("PASS  ", "infix:sym<::=>", " at pos=", rx1006_pos)
+    .return (rx1006_cur)
+  rx1006_fail:
+.annotate "line", 376
+    (rx1006_rep, rx1006_pos, $I10, $P10) = rx1006_cur."!mark_fail"(0)
+    lt rx1006_pos, -1, rx1006_done
+    eq rx1006_pos, -1, rx1006_fail
+    jump $I10
+  rx1006_done:
+    rx1006_cur."!cursor_fail"()
+    rx1006_cur."!cursor_debug"("FAIL  ", "infix:sym<::=>")
+    .return (rx1006_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__infix:sym<::=>"  :subid("292_1258533478.31768") :method
+.annotate "line", 376
+    $P1008 = self."!PREFIX__!subrule"("O", "::=")
+    new $P1009, "ResizablePMCArray"
+    push $P1009, $P1008
+    .return ($P1009)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "infix:sym<,>"  :subid("293_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx1012_tgt
+    .local int rx1012_pos
+    .local int rx1012_off
+    .local int rx1012_eos
+    .local int rx1012_rep
+    .local pmc rx1012_cur
+    (rx1012_cur, rx1012_pos, rx1012_tgt, $I10) = self."!cursor_start"()
+    rx1012_cur."!cursor_debug"("START ", "infix:sym<,>")
+    .lex unicode:"$\x{a2}", rx1012_cur
+    .local pmc match
+    .lex "$/", match
+    length rx1012_eos, rx1012_tgt
+    set rx1012_off, 0
+    lt $I10, 2, rx1012_start
+    sub rx1012_off, $I10, 1
+    substr rx1012_tgt, rx1012_tgt, rx1012_off
+  rx1012_start:
+.annotate "line", 478
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_1016_fail
+    rx1012_cur."!mark_push"(0, rx1012_pos, $I10)
+  # rx literal  ","
+    add $I11, rx1012_pos, 1
+    gt $I11, rx1012_eos, rx1012_fail
+    sub $I11, rx1012_pos, rx1012_off
+    substr $S10, rx1012_tgt, $I11, 1
+    ne $S10, ",", rx1012_fail
+    add rx1012_pos, 1
+    set_addr $I10, rxcap_1016_fail
+    ($I12, $I11) = rx1012_cur."!mark_peek"($I10)
+    rx1012_cur."!cursor_pos"($I11)
+    ($P10) = rx1012_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx1012_pos, "")
+    rx1012_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_1016_done
+  rxcap_1016_fail:
+    goto rx1012_fail
+  rxcap_1016_done:
+  # rx subrule "O" subtype=capture negate=
+    rx1012_cur."!cursor_pos"(rx1012_pos)
+    $P10 = rx1012_cur."O"("%comma, :pasttype<list>")
+    unless $P10, rx1012_fail
+    rx1012_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("O")
+    rx1012_pos = $P10."pos"()
+  # rx pass
+    rx1012_cur."!cursor_pass"(rx1012_pos, "infix:sym<,>")
+    rx1012_cur."!cursor_debug"("PASS  ", "infix:sym<,>", " at pos=", rx1012_pos)
+    .return (rx1012_cur)
+  rx1012_fail:
+.annotate "line", 376
+    (rx1012_rep, rx1012_pos, $I10, $P10) = rx1012_cur."!mark_fail"(0)
+    lt rx1012_pos, -1, rx1012_done
+    eq rx1012_pos, -1, rx1012_fail
+    jump $I10
+  rx1012_done:
+    rx1012_cur."!cursor_fail"()
+    rx1012_cur."!cursor_debug"("FAIL  ", "infix:sym<,>")
+    .return (rx1012_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__infix:sym<,>"  :subid("294_1258533478.31768") :method
+.annotate "line", 376
+    $P1014 = self."!PREFIX__!subrule"("O", ",")
+    new $P1015, "ResizablePMCArray"
+    push $P1015, $P1014
+    .return ($P1015)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "prefix:sym<return>"  :subid("295_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx1018_tgt
+    .local int rx1018_pos
+    .local int rx1018_off
+    .local int rx1018_eos
+    .local int rx1018_rep
+    .local pmc rx1018_cur
+    (rx1018_cur, rx1018_pos, rx1018_tgt, $I10) = self."!cursor_start"()
+    rx1018_cur."!cursor_debug"("START ", "prefix:sym<return>")
+    .lex unicode:"$\x{a2}", rx1018_cur
+    .local pmc match
+    .lex "$/", match
+    length rx1018_eos, rx1018_tgt
+    set rx1018_off, 0
+    lt $I10, 2, rx1018_start
+    sub rx1018_off, $I10, 1
+    substr rx1018_tgt, rx1018_tgt, rx1018_off
+  rx1018_start:
+.annotate "line", 480
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_1021_fail
+    rx1018_cur."!mark_push"(0, rx1018_pos, $I10)
+  # rx literal  "return"
+    add $I11, rx1018_pos, 6
+    gt $I11, rx1018_eos, rx1018_fail
+    sub $I11, rx1018_pos, rx1018_off
+    substr $S10, rx1018_tgt, $I11, 6
+    ne $S10, "return", rx1018_fail
+    add rx1018_pos, 6
+    set_addr $I10, rxcap_1021_fail
+    ($I12, $I11) = rx1018_cur."!mark_peek"($I10)
+    rx1018_cur."!cursor_pos"($I11)
+    ($P10) = rx1018_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx1018_pos, "")
+    rx1018_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_1021_done
+  rxcap_1021_fail:
+    goto rx1018_fail
+  rxcap_1021_done:
+  # rx charclass s
+    ge rx1018_pos, rx1018_eos, rx1018_fail
+    sub $I10, rx1018_pos, rx1018_off
+    is_cclass $I11, 32, rx1018_tgt, $I10
+    unless $I11, rx1018_fail
+    inc rx1018_pos
+  # rx subrule "O" subtype=capture negate=
+    rx1018_cur."!cursor_pos"(rx1018_pos)
+    $P10 = rx1018_cur."O"("%list_prefix, :pasttype<return>")
+    unless $P10, rx1018_fail
+    rx1018_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("O")
+    rx1018_pos = $P10."pos"()
+  # rx pass
+    rx1018_cur."!cursor_pass"(rx1018_pos, "prefix:sym<return>")
+    rx1018_cur."!cursor_debug"("PASS  ", "prefix:sym<return>", " at pos=", rx1018_pos)
+    .return (rx1018_cur)
+  rx1018_fail:
+.annotate "line", 376
+    (rx1018_rep, rx1018_pos, $I10, $P10) = rx1018_cur."!mark_fail"(0)
+    lt rx1018_pos, -1, rx1018_done
+    eq rx1018_pos, -1, rx1018_fail
+    jump $I10
+  rx1018_done:
+    rx1018_cur."!cursor_fail"()
+    rx1018_cur."!cursor_debug"("FAIL  ", "prefix:sym<return>")
+    .return (rx1018_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__prefix:sym<return>"  :subid("296_1258533478.31768") :method
+.annotate "line", 376
+    new $P1020, "ResizablePMCArray"
+    push $P1020, "return"
+    .return ($P1020)
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "prefix:sym<make>"  :subid("297_1258533478.31768") :method :outer("11_1258533478.31768")
+.annotate "line", 376
+    .local string rx1023_tgt
+    .local int rx1023_pos
+    .local int rx1023_off
+    .local int rx1023_eos
+    .local int rx1023_rep
+    .local pmc rx1023_cur
+    (rx1023_cur, rx1023_pos, rx1023_tgt, $I10) = self."!cursor_start"()
+    rx1023_cur."!cursor_debug"("START ", "prefix:sym<make>")
+    .lex unicode:"$\x{a2}", rx1023_cur
+    .local pmc match
+    .lex "$/", match
+    length rx1023_eos, rx1023_tgt
+    set rx1023_off, 0
+    lt $I10, 2, rx1023_start
+    sub rx1023_off, $I10, 1
+    substr rx1023_tgt, rx1023_tgt, rx1023_off
+  rx1023_start:
+.annotate "line", 481
+  # rx subcapture "sym"
+    set_addr $I10, rxcap_1026_fail
+    rx1023_cur."!mark_push"(0, rx1023_pos, $I10)
+  # rx literal  "make"
+    add $I11, rx1023_pos, 4
+    gt $I11, rx1023_eos, rx1023_fail
+    sub $I11, rx1023_pos, rx1023_off
+    substr $S10, rx1023_tgt, $I11, 4
+    ne $S10, "make", rx1023_fail
+    add rx1023_pos, 4
+    set_addr $I10, rxcap_1026_fail
+    ($I12, $I11) = rx1023_cur."!mark_peek"($I10)
+    rx1023_cur."!cursor_pos"($I11)
+    ($P10) = rx1023_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx1023_pos, "")
+    rx1023_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("sym")
+    goto rxcap_1026_done
+  rxcap_1026_fail:
+    goto rx1023_fail
+  rxcap_1026_done:
+  # rx charclass s
+    ge rx1023_pos, rx1023_eos, rx1023_fail
+    sub $I10, rx1023_pos, rx1023_off
+    is_cclass $I11, 32, rx1023_tgt, $I10
+    unless $I11, rx1023_fail
+    inc rx1023_pos
+  # rx subrule "O" subtype=capture negate=
+    rx1023_cur."!cursor_pos"(rx1023_pos)
+    $P10 = rx1023_cur."O"("%list_prefix")
+    unless $P10, rx1023_fail
+    rx1023_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("O")
+    rx1023_pos = $P10."pos"()
+  # rx pass
+    rx1023_cur."!cursor_pass"(rx1023_pos, "prefix:sym<make>")
+    rx1023_cur."!cursor_debug"("PASS  ", "prefix:sym<make>", " at pos=", rx1023_pos)
+    .return (rx1023_cur)
+  rx1023_fail:
+.annotate "line", 376
+    (rx1023_rep, rx1023_pos, $I10, $P10) = rx1023_cur."!mark_fail"(0)
+    lt rx1023_pos, -1, rx1023_done
+    eq rx1023_pos, -1, rx1023_fail
+    jump $I10
+  rx1023_done:
+    rx1023_cur."!cursor_fail"()
+    rx1023_cur."!cursor_debug"("FAIL  ", "prefix:sym<make>")
+    .return (rx1023_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Grammar"]
+.sub "!PREFIX__prefix:sym<make>"  :subid("298_1258533478.31768") :method
+.annotate "line", 376
+    new $P1025, "ResizablePMCArray"
+    push $P1025, "make"
+    .return ($P1025)
+.end
+
+
+.namespace ["NQP";"Regex"]
+.sub "_block1027"  :subid("299_1258533478.31768") :outer("11_1258533478.31768")
+.annotate "line", 484
+    .const 'Sub' $P1057 = "310_1258533478.31768" 
+    capture_lex $P1057
+    .const 'Sub' $P1045 = "307_1258533478.31768" 
+    capture_lex $P1045
+    .const 'Sub' $P1041 = "305_1258533478.31768" 
+    capture_lex $P1041
+    .const 'Sub' $P1037 = "303_1258533478.31768" 
+    capture_lex $P1037
+    .const 'Sub' $P1029 = "300_1258533478.31768" 
+    capture_lex $P1029
+    .const 'Sub' $P1057 = "310_1258533478.31768" 
+    capture_lex $P1057
+    .return ($P1057)
+.end
+
+
+.namespace ["NQP";"Regex"]
+.sub "metachar:sym<:my>"  :subid("300_1258533478.31768") :method :outer("299_1258533478.31768")
+.annotate "line", 484
+    .const 'Sub' $P1034 = "302_1258533478.31768" 
+    capture_lex $P1034
+    .local string rx1030_tgt
+    .local int rx1030_pos
+    .local int rx1030_off
+    .local int rx1030_eos
+    .local int rx1030_rep
+    .local pmc rx1030_cur
+    (rx1030_cur, rx1030_pos, rx1030_tgt, $I10) = self."!cursor_start"()
+    rx1030_cur."!cursor_debug"("START ", "metachar:sym<:my>")
+    .lex unicode:"$\x{a2}", rx1030_cur
+    .local pmc match
+    .lex "$/", match
+    length rx1030_eos, rx1030_tgt
+    set rx1030_off, 0
+    lt $I10, 2, rx1030_start
+    sub rx1030_off, $I10, 1
+    substr rx1030_tgt, rx1030_tgt, rx1030_off
+  rx1030_start:
+.annotate "line", 486
   # rx literal  ":"
-    add $I11, rx1025_pos, 1
-    gt $I11, rx1025_eos, rx1025_fail
-    sub $I11, rx1025_pos, rx1025_off
-    substr $S10, rx1025_tgt, $I11, 1
-    ne $S10, ":", rx1025_fail
-    add rx1025_pos, 1
-  # rx subrule "arglist" subtype=capture negate=
-    rx1025_cur."!cursor_pos"(rx1025_pos)
-    $P10 = rx1025_cur."arglist"()
-    unless $P10, rx1025_fail
-    rx1025_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("arglist")
-    rx1025_pos = $P10."pos"()
-    goto alt1030_end
-  alt1030_3:
-    set_addr $I10, alt1030_4
-    rx1025_cur."!mark_push"(0, rx1025_pos, $I10)
-.annotate "line", 491
-  # rx literal  "("
-    add $I11, rx1025_pos, 1
-    gt $I11, rx1025_eos, rx1025_fail
-    sub $I11, rx1025_pos, rx1025_off
-    substr $S10, rx1025_tgt, $I11, 1
-    ne $S10, "(", rx1025_fail
-    add rx1025_pos, 1
+    add $I11, rx1030_pos, 1
+    gt $I11, rx1030_eos, rx1030_fail
+    sub $I11, rx1030_pos, rx1030_off
+    substr $S10, rx1030_tgt, $I11, 1
+    ne $S10, ":", rx1030_fail
+    add rx1030_pos, 1
+  # rx subrule "before" subtype=zerowidth negate=
+    rx1030_cur."!cursor_pos"(rx1030_pos)
+    .const 'Sub' $P1034 = "302_1258533478.31768" 
+    capture_lex $P1034
+    $P10 = rx1030_cur."before"($P1034)
+    unless $P10, rx1030_fail
   # rx subrule "LANG" subtype=capture negate=
-    rx1025_cur."!cursor_pos"(rx1025_pos)
-    $P10 = rx1025_cur."LANG"("MAIN", "arglist")
-    unless $P10, rx1025_fail
-    rx1025_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("arglist")
-    rx1025_pos = $P10."pos"()
-  # rx literal  ")"
-    add $I11, rx1025_pos, 1
-    gt $I11, rx1025_eos, rx1025_fail
-    sub $I11, rx1025_pos, rx1025_off
-    substr $S10, rx1025_tgt, $I11, 1
-    ne $S10, ")", rx1025_fail
-    add rx1025_pos, 1
-    goto alt1030_end
-  alt1030_4:
-.annotate "line", 492
-  # rx subrule "normspace" subtype=method negate=
-    rx1025_cur."!cursor_pos"(rx1025_pos)
-    $P10 = rx1025_cur."normspace"()
-    unless $P10, rx1025_fail
-    rx1025_pos = $P10."pos"()
-  # rx subrule "nibbler" subtype=capture negate=
-    rx1025_cur."!cursor_pos"(rx1025_pos)
-    $P10 = rx1025_cur."nibbler"()
-    unless $P10, rx1025_fail
-    rx1025_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("nibbler")
-    rx1025_pos = $P10."pos"()
-  alt1030_end:
-.annotate "line", 493
-    (rx1025_rep) = rx1025_cur."!mark_commit"($I1035)
-  rxquantr1029_done:
+    rx1030_cur."!cursor_pos"(rx1030_pos)
+    $P10 = rx1030_cur."LANG"("MAIN", "statement")
+    unless $P10, rx1030_fail
+    rx1030_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("statement")
+    rx1030_pos = $P10."pos"()
+  # rx subrule "ws" subtype=method negate=
+    rx1030_cur."!cursor_pos"(rx1030_pos)
+    $P10 = rx1030_cur."ws"()
+    unless $P10, rx1030_fail
+    rx1030_pos = $P10."pos"()
+  # rx literal  ";"
+    add $I11, rx1030_pos, 1
+    gt $I11, rx1030_eos, rx1030_fail
+    sub $I11, rx1030_pos, rx1030_off
+    substr $S10, rx1030_tgt, $I11, 1
+    ne $S10, ";", rx1030_fail
+    add rx1030_pos, 1
 .annotate "line", 485
   # rx pass
-    rx1025_cur."!cursor_pass"(rx1025_pos, "assertion:sym<name>")
-    rx1025_cur."!cursor_debug"("PASS  ", "assertion:sym<name>", " at pos=", rx1025_pos)
-    .return (rx1025_cur)
-  rx1025_fail:
-.annotate "line", 472
-    (rx1025_rep, rx1025_pos, $I10, $P10) = rx1025_cur."!mark_fail"(0)
-    lt rx1025_pos, -1, rx1025_done
-    eq rx1025_pos, -1, rx1025_fail
+    rx1030_cur."!cursor_pass"(rx1030_pos, "metachar:sym<:my>")
+    rx1030_cur."!cursor_debug"("PASS  ", "metachar:sym<:my>", " at pos=", rx1030_pos)
+    .return (rx1030_cur)
+  rx1030_fail:
+.annotate "line", 484
+    (rx1030_rep, rx1030_pos, $I10, $P10) = rx1030_cur."!mark_fail"(0)
+    lt rx1030_pos, -1, rx1030_done
+    eq rx1030_pos, -1, rx1030_fail
     jump $I10
-  rx1025_done:
-    rx1025_cur."!cursor_fail"()
-    rx1025_cur."!cursor_debug"("FAIL  ", "assertion:sym<name>")
-    .return (rx1025_cur)
+  rx1030_done:
+    rx1030_cur."!cursor_fail"()
+    rx1030_cur."!cursor_debug"("FAIL  ", "metachar:sym<:my>")
+    .return (rx1030_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Regex"]
-.sub "!PREFIX__assertion:sym<name>"  :subid("305_1258424429.0004") :method
-.annotate "line", 472
-    new $P1027, "ResizablePMCArray"
-    push $P1027, ""
-    .return ($P1027)
+.sub "!PREFIX__metachar:sym<:my>"  :subid("301_1258533478.31768") :method
+.annotate "line", 484
+    new $P1032, "ResizablePMCArray"
+    push $P1032, ":"
+    .return ($P1032)
 .end
 
 
 .namespace ["NQP";"Regex"]
-.sub "_block1031"  :anon :subid("306_1258424429.0004") :method :outer("304_1258424429.0004")
-.annotate "line", 488
-    .local string rx1033_tgt
-    .local int rx1033_pos
-    .local int rx1033_off
-    .local int rx1033_eos
-    .local int rx1033_rep
-    .local pmc rx1033_cur
-    (rx1033_cur, rx1033_pos, rx1033_tgt, $I10) = self."!cursor_start"()
-    rx1033_cur."!cursor_debug"("START ", "")
-    .lex unicode:"$\x{a2}", rx1033_cur
+.sub "_block1033"  :anon :subid("302_1258533478.31768") :method :outer("300_1258533478.31768")
+.annotate "line", 486
+    .local string rx1035_tgt
+    .local int rx1035_pos
+    .local int rx1035_off
+    .local int rx1035_eos
+    .local int rx1035_rep
+    .local pmc rx1035_cur
+    (rx1035_cur, rx1035_pos, rx1035_tgt, $I10) = self."!cursor_start"()
+    rx1035_cur."!cursor_debug"("START ", "")
+    .lex unicode:"$\x{a2}", rx1035_cur
     .local pmc match
     .lex "$/", match
-    length rx1033_eos, rx1033_tgt
-    set rx1033_off, 0
-    lt $I10, 2, rx1033_start
-    sub rx1033_off, $I10, 1
-    substr rx1033_tgt, rx1033_tgt, rx1033_off
-  rx1033_start:
-    ge rx1033_pos, 0, rxscan1034_done
-  rxscan1034_loop:
-    ($P10) = rx1033_cur."from"()
+    length rx1035_eos, rx1035_tgt
+    set rx1035_off, 0
+    lt $I10, 2, rx1035_start
+    sub rx1035_off, $I10, 1
+    substr rx1035_tgt, rx1035_tgt, rx1035_off
+  rx1035_start:
+    ge rx1035_pos, 0, rxscan1036_done
+  rxscan1036_loop:
+    ($P10) = rx1035_cur."from"()
     inc $P10
-    set rx1033_pos, $P10
-    ge rx1033_pos, rx1033_eos, rxscan1034_done
-    set_addr $I10, rxscan1034_loop
-    rx1033_cur."!mark_push"(0, rx1033_pos, $I10)
-  rxscan1034_done:
-  # rx literal  ">"
-    add $I11, rx1033_pos, 1
-    gt $I11, rx1033_eos, rx1033_fail
-    sub $I11, rx1033_pos, rx1033_off
-    substr $S10, rx1033_tgt, $I11, 1
-    ne $S10, ">", rx1033_fail
-    add rx1033_pos, 1
+    set rx1035_pos, $P10
+    ge rx1035_pos, rx1035_eos, rxscan1036_done
+    set_addr $I10, rxscan1036_loop
+    rx1035_cur."!mark_push"(0, rx1035_pos, $I10)
+  rxscan1036_done:
+  # rx literal  "my"
+    add $I11, rx1035_pos, 2
+    gt $I11, rx1035_eos, rx1035_fail
+    sub $I11, rx1035_pos, rx1035_off
+    substr $S10, rx1035_tgt, $I11, 2
+    ne $S10, "my", rx1035_fail
+    add rx1035_pos, 2
   # rx pass
-    rx1033_cur."!cursor_pass"(rx1033_pos, "")
-    rx1033_cur."!cursor_debug"("PASS  ", "", " at pos=", rx1033_pos)
-    .return (rx1033_cur)
-  rx1033_fail:
-    (rx1033_rep, rx1033_pos, $I10, $P10) = rx1033_cur."!mark_fail"(0)
-    lt rx1033_pos, -1, rx1033_done
-    eq rx1033_pos, -1, rx1033_fail
+    rx1035_cur."!cursor_pass"(rx1035_pos, "")
+    rx1035_cur."!cursor_debug"("PASS  ", "", " at pos=", rx1035_pos)
+    .return (rx1035_cur)
+  rx1035_fail:
+    (rx1035_rep, rx1035_pos, $I10, $P10) = rx1035_cur."!mark_fail"(0)
+    lt rx1035_pos, -1, rx1035_done
+    eq rx1035_pos, -1, rx1035_fail
     jump $I10
-  rx1033_done:
-    rx1033_cur."!cursor_fail"()
-    rx1033_cur."!cursor_debug"("FAIL  ", "")
-    .return (rx1033_cur)
+  rx1035_done:
+    rx1035_cur."!cursor_fail"()
+    rx1035_cur."!cursor_debug"("FAIL  ", "")
+    .return (rx1035_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Regex"]
-.sub "codeblock"  :subid("307_1258424429.0004") :method :outer("296_1258424429.0004")
-.annotate "line", 472
-    .local string rx1037_tgt
-    .local int rx1037_pos
-    .local int rx1037_off
-    .local int rx1037_eos
-    .local int rx1037_rep
-    .local pmc rx1037_cur
-    (rx1037_cur, rx1037_pos, rx1037_tgt, $I10) = self."!cursor_start"()
-    rx1037_cur."!cursor_debug"("START ", "codeblock")
-    .lex unicode:"$\x{a2}", rx1037_cur
+.sub "metachar:sym<{ }>"  :subid("303_1258533478.31768") :method :outer("299_1258533478.31768")
+.annotate "line", 484
+    .local string rx1038_tgt
+    .local int rx1038_pos
+    .local int rx1038_off
+    .local int rx1038_eos
+    .local int rx1038_rep
+    .local pmc rx1038_cur
+    (rx1038_cur, rx1038_pos, rx1038_tgt, $I10) = self."!cursor_start"()
+    rx1038_cur."!cursor_debug"("START ", "metachar:sym<{ }>")
+    .lex unicode:"$\x{a2}", rx1038_cur
     .local pmc match
     .lex "$/", match
-    length rx1037_eos, rx1037_tgt
-    set rx1037_off, 0
-    lt $I10, 2, rx1037_start
-    sub rx1037_off, $I10, 1
-    substr rx1037_tgt, rx1037_tgt, rx1037_off
-  rx1037_start:
+    length rx1038_eos, rx1038_tgt
+    set rx1038_off, 0
+    lt $I10, 2, rx1038_start
+    sub rx1038_off, $I10, 1
+    substr rx1038_tgt, rx1038_tgt, rx1038_off
+  rx1038_start:
+.annotate "line", 490
+  # rx enumcharlist negate=0 zerowidth
+    ge rx1038_pos, rx1038_eos, rx1038_fail
+    sub $I10, rx1038_pos, rx1038_off
+    substr $S10, rx1038_tgt, $I10, 1
+    index $I11, "{", $S10
+    lt $I11, 0, rx1038_fail
+  # rx subrule "codeblock" subtype=capture negate=
+    rx1038_cur."!cursor_pos"(rx1038_pos)
+    $P10 = rx1038_cur."codeblock"()
+    unless $P10, rx1038_fail
+    rx1038_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("codeblock")
+    rx1038_pos = $P10."pos"()
+.annotate "line", 489
+  # rx pass
+    rx1038_cur."!cursor_pass"(rx1038_pos, "metachar:sym<{ }>")
+    rx1038_cur."!cursor_debug"("PASS  ", "metachar:sym<{ }>", " at pos=", rx1038_pos)
+    .return (rx1038_cur)
+  rx1038_fail:
+.annotate "line", 484
+    (rx1038_rep, rx1038_pos, $I10, $P10) = rx1038_cur."!mark_fail"(0)
+    lt rx1038_pos, -1, rx1038_done
+    eq rx1038_pos, -1, rx1038_fail
+    jump $I10
+  rx1038_done:
+    rx1038_cur."!cursor_fail"()
+    rx1038_cur."!cursor_debug"("FAIL  ", "metachar:sym<{ }>")
+    .return (rx1038_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Regex"]
+.sub "!PREFIX__metachar:sym<{ }>"  :subid("304_1258533478.31768") :method
+.annotate "line", 484
+    new $P1040, "ResizablePMCArray"
+    push $P1040, "{"
+    .return ($P1040)
+.end
+
+
+.namespace ["NQP";"Regex"]
+.sub "assertion:sym<{ }>"  :subid("305_1258533478.31768") :method :outer("299_1258533478.31768")
+.annotate "line", 484
+    .local string rx1042_tgt
+    .local int rx1042_pos
+    .local int rx1042_off
+    .local int rx1042_eos
+    .local int rx1042_rep
+    .local pmc rx1042_cur
+    (rx1042_cur, rx1042_pos, rx1042_tgt, $I10) = self."!cursor_start"()
+    rx1042_cur."!cursor_debug"("START ", "assertion:sym<{ }>")
+    .lex unicode:"$\x{a2}", rx1042_cur
+    .local pmc match
+    .lex "$/", match
+    length rx1042_eos, rx1042_tgt
+    set rx1042_off, 0
+    lt $I10, 2, rx1042_start
+    sub rx1042_off, $I10, 1
+    substr rx1042_tgt, rx1042_tgt, rx1042_off
+  rx1042_start:
+.annotate "line", 494
+  # rx enumcharlist negate=0 zerowidth
+    ge rx1042_pos, rx1042_eos, rx1042_fail
+    sub $I10, rx1042_pos, rx1042_off
+    substr $S10, rx1042_tgt, $I10, 1
+    index $I11, "{", $S10
+    lt $I11, 0, rx1042_fail
+  # rx subrule "codeblock" subtype=capture negate=
+    rx1042_cur."!cursor_pos"(rx1042_pos)
+    $P10 = rx1042_cur."codeblock"()
+    unless $P10, rx1042_fail
+    rx1042_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("codeblock")
+    rx1042_pos = $P10."pos"()
+.annotate "line", 493
+  # rx pass
+    rx1042_cur."!cursor_pass"(rx1042_pos, "assertion:sym<{ }>")
+    rx1042_cur."!cursor_debug"("PASS  ", "assertion:sym<{ }>", " at pos=", rx1042_pos)
+    .return (rx1042_cur)
+  rx1042_fail:
+.annotate "line", 484
+    (rx1042_rep, rx1042_pos, $I10, $P10) = rx1042_cur."!mark_fail"(0)
+    lt rx1042_pos, -1, rx1042_done
+    eq rx1042_pos, -1, rx1042_fail
+    jump $I10
+  rx1042_done:
+    rx1042_cur."!cursor_fail"()
+    rx1042_cur."!cursor_debug"("FAIL  ", "assertion:sym<{ }>")
+    .return (rx1042_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Regex"]
+.sub "!PREFIX__assertion:sym<{ }>"  :subid("306_1258533478.31768") :method
+.annotate "line", 484
+    new $P1044, "ResizablePMCArray"
+    push $P1044, "{"
+    .return ($P1044)
+.end
+
+
+.namespace ["NQP";"Regex"]
+.sub "assertion:sym<name>"  :subid("307_1258533478.31768") :method :outer("299_1258533478.31768")
+.annotate "line", 484
+    .const 'Sub' $P1053 = "309_1258533478.31768" 
+    capture_lex $P1053
+    .local string rx1046_tgt
+    .local int rx1046_pos
+    .local int rx1046_off
+    .local int rx1046_eos
+    .local int rx1046_rep
+    .local pmc rx1046_cur
+    (rx1046_cur, rx1046_pos, rx1046_tgt, $I10) = self."!cursor_start"()
+    rx1046_cur."!cursor_debug"("START ", "assertion:sym<name>")
+    rx1046_cur."!cursor_caparray"("assertion", "nibbler", "arglist")
+    .lex unicode:"$\x{a2}", rx1046_cur
+    .local pmc match
+    .lex "$/", match
+    length rx1046_eos, rx1046_tgt
+    set rx1046_off, 0
+    lt $I10, 2, rx1046_start
+    sub rx1046_off, $I10, 1
+    substr rx1046_tgt, rx1046_tgt, rx1046_off
+  rx1046_start:
 .annotate "line", 498
+  # rx subcapture "longname"
+    set_addr $I10, rxcap_1049_fail
+    rx1046_cur."!mark_push"(0, rx1046_pos, $I10)
+  # rx charclass_q w r 1..-1
+    sub $I10, rx1046_pos, rx1046_off
+    find_not_cclass $I11, 8192, rx1046_tgt, $I10, rx1046_eos
+    add $I12, $I10, 1
+    lt $I11, $I12, rx1046_fail
+    add rx1046_pos, rx1046_off, $I11
+    set_addr $I10, rxcap_1049_fail
+    ($I12, $I11) = rx1046_cur."!mark_peek"($I10)
+    rx1046_cur."!cursor_pos"($I11)
+    ($P10) = rx1046_cur."!cursor_start"()
+    $P10."!cursor_pass"(rx1046_pos, "")
+    rx1046_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("longname")
+    goto rxcap_1049_done
+  rxcap_1049_fail:
+    goto rx1046_fail
+  rxcap_1049_done:
+.annotate "line", 505
+  # rx rxquantr1050 ** 0..1
+    set_addr $I1056, rxquantr1050_done
+    rx1046_cur."!mark_push"(0, rx1046_pos, $I1056)
+  rxquantr1050_loop:
+  alt1051_0:
+.annotate "line", 499
+    set_addr $I10, alt1051_1
+    rx1046_cur."!mark_push"(0, rx1046_pos, $I10)
+.annotate "line", 500
+  # rx subrule "before" subtype=zerowidth negate=
+    rx1046_cur."!cursor_pos"(rx1046_pos)
+    .const 'Sub' $P1053 = "309_1258533478.31768" 
+    capture_lex $P1053
+    $P10 = rx1046_cur."before"($P1053)
+    unless $P10, rx1046_fail
+    goto alt1051_end
+  alt1051_1:
+    set_addr $I10, alt1051_2
+    rx1046_cur."!mark_push"(0, rx1046_pos, $I10)
+.annotate "line", 501
+  # rx literal  "="
+    add $I11, rx1046_pos, 1
+    gt $I11, rx1046_eos, rx1046_fail
+    sub $I11, rx1046_pos, rx1046_off
+    substr $S10, rx1046_tgt, $I11, 1
+    ne $S10, "=", rx1046_fail
+    add rx1046_pos, 1
+  # rx subrule "assertion" subtype=capture negate=
+    rx1046_cur."!cursor_pos"(rx1046_pos)
+    $P10 = rx1046_cur."assertion"()
+    unless $P10, rx1046_fail
+    rx1046_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("assertion")
+    rx1046_pos = $P10."pos"()
+    goto alt1051_end
+  alt1051_2:
+    set_addr $I10, alt1051_3
+    rx1046_cur."!mark_push"(0, rx1046_pos, $I10)
+.annotate "line", 502
+  # rx literal  ":"
+    add $I11, rx1046_pos, 1
+    gt $I11, rx1046_eos, rx1046_fail
+    sub $I11, rx1046_pos, rx1046_off
+    substr $S10, rx1046_tgt, $I11, 1
+    ne $S10, ":", rx1046_fail
+    add rx1046_pos, 1
+  # rx subrule "arglist" subtype=capture negate=
+    rx1046_cur."!cursor_pos"(rx1046_pos)
+    $P10 = rx1046_cur."arglist"()
+    unless $P10, rx1046_fail
+    rx1046_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("arglist")
+    rx1046_pos = $P10."pos"()
+    goto alt1051_end
+  alt1051_3:
+    set_addr $I10, alt1051_4
+    rx1046_cur."!mark_push"(0, rx1046_pos, $I10)
+.annotate "line", 503
+  # rx literal  "("
+    add $I11, rx1046_pos, 1
+    gt $I11, rx1046_eos, rx1046_fail
+    sub $I11, rx1046_pos, rx1046_off
+    substr $S10, rx1046_tgt, $I11, 1
+    ne $S10, "(", rx1046_fail
+    add rx1046_pos, 1
   # rx subrule "LANG" subtype=capture negate=
-    rx1037_cur."!cursor_pos"(rx1037_pos)
-    $P10 = rx1037_cur."LANG"("MAIN", "pblock")
-    unless $P10, rx1037_fail
-    rx1037_cur."!mark_push"(0, -1, 0, $P10)
-    $P10."!cursor_names"("block")
-    rx1037_pos = $P10."pos"()
+    rx1046_cur."!cursor_pos"(rx1046_pos)
+    $P10 = rx1046_cur."LANG"("MAIN", "arglist")
+    unless $P10, rx1046_fail
+    rx1046_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("arglist")
+    rx1046_pos = $P10."pos"()
+  # rx literal  ")"
+    add $I11, rx1046_pos, 1
+    gt $I11, rx1046_eos, rx1046_fail
+    sub $I11, rx1046_pos, rx1046_off
+    substr $S10, rx1046_tgt, $I11, 1
+    ne $S10, ")", rx1046_fail
+    add rx1046_pos, 1
+    goto alt1051_end
+  alt1051_4:
+.annotate "line", 504
+  # rx subrule "normspace" subtype=method negate=
+    rx1046_cur."!cursor_pos"(rx1046_pos)
+    $P10 = rx1046_cur."normspace"()
+    unless $P10, rx1046_fail
+    rx1046_pos = $P10."pos"()
+  # rx subrule "nibbler" subtype=capture negate=
+    rx1046_cur."!cursor_pos"(rx1046_pos)
+    $P10 = rx1046_cur."nibbler"()
+    unless $P10, rx1046_fail
+    rx1046_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("nibbler")
+    rx1046_pos = $P10."pos"()
+  alt1051_end:
+.annotate "line", 505
+    (rx1046_rep) = rx1046_cur."!mark_commit"($I1056)
+  rxquantr1050_done:
 .annotate "line", 497
   # rx pass
-    rx1037_cur."!cursor_pass"(rx1037_pos, "codeblock")
-    rx1037_cur."!cursor_debug"("PASS  ", "codeblock", " at pos=", rx1037_pos)
-    .return (rx1037_cur)
-  rx1037_fail:
-.annotate "line", 472
-    (rx1037_rep, rx1037_pos, $I10, $P10) = rx1037_cur."!mark_fail"(0)
-    lt rx1037_pos, -1, rx1037_done
-    eq rx1037_pos, -1, rx1037_fail
+    rx1046_cur."!cursor_pass"(rx1046_pos, "assertion:sym<name>")
+    rx1046_cur."!cursor_debug"("PASS  ", "assertion:sym<name>", " at pos=", rx1046_pos)
+    .return (rx1046_cur)
+  rx1046_fail:
+.annotate "line", 484
+    (rx1046_rep, rx1046_pos, $I10, $P10) = rx1046_cur."!mark_fail"(0)
+    lt rx1046_pos, -1, rx1046_done
+    eq rx1046_pos, -1, rx1046_fail
     jump $I10
-  rx1037_done:
-    rx1037_cur."!cursor_fail"()
-    rx1037_cur."!cursor_debug"("FAIL  ", "codeblock")
-    .return (rx1037_cur)
+  rx1046_done:
+    rx1046_cur."!cursor_fail"()
+    rx1046_cur."!cursor_debug"("FAIL  ", "assertion:sym<name>")
+    .return (rx1046_cur)
     .return ()
 .end
 
 
 .namespace ["NQP";"Regex"]
-.sub "!PREFIX__codeblock"  :subid("308_1258424429.0004") :method
-.annotate "line", 472
-    $P1039 = self."!PREFIX__!subrule"("block", "")
-    new $P1040, "ResizablePMCArray"
-    push $P1040, $P1039
-    .return ($P1040)
+.sub "!PREFIX__assertion:sym<name>"  :subid("308_1258533478.31768") :method
+.annotate "line", 484
+    new $P1048, "ResizablePMCArray"
+    push $P1048, ""
+    .return ($P1048)
+.end
+
+
+.namespace ["NQP";"Regex"]
+.sub "_block1052"  :anon :subid("309_1258533478.31768") :method :outer("307_1258533478.31768")
+.annotate "line", 500
+    .local string rx1054_tgt
+    .local int rx1054_pos
+    .local int rx1054_off
+    .local int rx1054_eos
+    .local int rx1054_rep
+    .local pmc rx1054_cur
+    (rx1054_cur, rx1054_pos, rx1054_tgt, $I10) = self."!cursor_start"()
+    rx1054_cur."!cursor_debug"("START ", "")
+    .lex unicode:"$\x{a2}", rx1054_cur
+    .local pmc match
+    .lex "$/", match
+    length rx1054_eos, rx1054_tgt
+    set rx1054_off, 0
+    lt $I10, 2, rx1054_start
+    sub rx1054_off, $I10, 1
+    substr rx1054_tgt, rx1054_tgt, rx1054_off
+  rx1054_start:
+    ge rx1054_pos, 0, rxscan1055_done
+  rxscan1055_loop:
+    ($P10) = rx1054_cur."from"()
+    inc $P10
+    set rx1054_pos, $P10
+    ge rx1054_pos, rx1054_eos, rxscan1055_done
+    set_addr $I10, rxscan1055_loop
+    rx1054_cur."!mark_push"(0, rx1054_pos, $I10)
+  rxscan1055_done:
+  # rx literal  ">"
+    add $I11, rx1054_pos, 1
+    gt $I11, rx1054_eos, rx1054_fail
+    sub $I11, rx1054_pos, rx1054_off
+    substr $S10, rx1054_tgt, $I11, 1
+    ne $S10, ">", rx1054_fail
+    add rx1054_pos, 1
+  # rx pass
+    rx1054_cur."!cursor_pass"(rx1054_pos, "")
+    rx1054_cur."!cursor_debug"("PASS  ", "", " at pos=", rx1054_pos)
+    .return (rx1054_cur)
+  rx1054_fail:
+    (rx1054_rep, rx1054_pos, $I10, $P10) = rx1054_cur."!mark_fail"(0)
+    lt rx1054_pos, -1, rx1054_done
+    eq rx1054_pos, -1, rx1054_fail
+    jump $I10
+  rx1054_done:
+    rx1054_cur."!cursor_fail"()
+    rx1054_cur."!cursor_debug"("FAIL  ", "")
+    .return (rx1054_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Regex"]
+.sub "codeblock"  :subid("310_1258533478.31768") :method :outer("299_1258533478.31768")
+.annotate "line", 484
+    .local string rx1058_tgt
+    .local int rx1058_pos
+    .local int rx1058_off
+    .local int rx1058_eos
+    .local int rx1058_rep
+    .local pmc rx1058_cur
+    (rx1058_cur, rx1058_pos, rx1058_tgt, $I10) = self."!cursor_start"()
+    rx1058_cur."!cursor_debug"("START ", "codeblock")
+    .lex unicode:"$\x{a2}", rx1058_cur
+    .local pmc match
+    .lex "$/", match
+    length rx1058_eos, rx1058_tgt
+    set rx1058_off, 0
+    lt $I10, 2, rx1058_start
+    sub rx1058_off, $I10, 1
+    substr rx1058_tgt, rx1058_tgt, rx1058_off
+  rx1058_start:
+.annotate "line", 510
+  # rx subrule "LANG" subtype=capture negate=
+    rx1058_cur."!cursor_pos"(rx1058_pos)
+    $P10 = rx1058_cur."LANG"("MAIN", "pblock")
+    unless $P10, rx1058_fail
+    rx1058_cur."!mark_push"(0, -1, 0, $P10)
+    $P10."!cursor_names"("block")
+    rx1058_pos = $P10."pos"()
+.annotate "line", 509
+  # rx pass
+    rx1058_cur."!cursor_pass"(rx1058_pos, "codeblock")
+    rx1058_cur."!cursor_debug"("PASS  ", "codeblock", " at pos=", rx1058_pos)
+    .return (rx1058_cur)
+  rx1058_fail:
+.annotate "line", 484
+    (rx1058_rep, rx1058_pos, $I10, $P10) = rx1058_cur."!mark_fail"(0)
+    lt rx1058_pos, -1, rx1058_done
+    eq rx1058_pos, -1, rx1058_fail
+    jump $I10
+  rx1058_done:
+    rx1058_cur."!cursor_fail"()
+    rx1058_cur."!cursor_debug"("FAIL  ", "codeblock")
+    .return (rx1058_cur)
+    .return ()
+.end
+
+
+.namespace ["NQP";"Regex"]
+.sub "!PREFIX__codeblock"  :subid("311_1258533478.31768") :method
+.annotate "line", 484
+    $P1060 = self."!PREFIX__!subrule"("block", "")
+    new $P1061, "ResizablePMCArray"
+    push $P1061, $P1060
+    .return ($P1061)
 .end
 
 ### .include 'gen/nqp-actions.pir'
 
 .namespace []
-.sub "_block11"  :anon :subid("10_1258424448.06319")
+.sub "_block11"  :anon :subid("10_1258533497.4656")
 .annotate "line", 0
     get_hll_global $P14, ["NQP";"Actions"], "_block13" 
     capture_lex $P14
@@ -12890,9 +13175,9 @@ NQP::Compiler - NQP compiler
 
 
 .namespace []
-.sub "" :load :init :subid("post115") :outer("10_1258424448.06319")
+.sub "" :load :init :subid("post115") :outer("10_1258533497.4656")
 .annotate "line", 0
-    .const 'Sub' $P12 = "10_1258424448.06319" 
+    .const 'Sub' $P12 = "10_1258533497.4656" 
     .local pmc block
     set block, $P12
     $P1908 = get_root_global ["parrot"], "P6metaclass"
@@ -12901,177 +13186,177 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block13"  :subid("11_1258424448.06319") :outer("10_1258424448.06319")
+.sub "_block13"  :subid("11_1258533497.4656") :outer("10_1258533497.4656")
 .annotate "line", 3
-    .const 'Sub' $P1903 = "114_1258424448.06319" 
+    .const 'Sub' $P1903 = "114_1258533497.4656" 
     capture_lex $P1903
     get_hll_global $P1839, ["NQP";"RegexActions"], "_block1838" 
     capture_lex $P1839
-    .const 'Sub' $P1826 = "108_1258424448.06319" 
+    .const 'Sub' $P1826 = "108_1258533497.4656" 
     capture_lex $P1826
-    .const 'Sub' $P1816 = "107_1258424448.06319" 
+    .const 'Sub' $P1816 = "107_1258533497.4656" 
     capture_lex $P1816
-    .const 'Sub' $P1806 = "106_1258424448.06319" 
+    .const 'Sub' $P1806 = "106_1258533497.4656" 
     capture_lex $P1806
-    .const 'Sub' $P1796 = "105_1258424448.06319" 
+    .const 'Sub' $P1796 = "105_1258533497.4656" 
     capture_lex $P1796
-    .const 'Sub' $P1782 = "104_1258424448.06319" 
+    .const 'Sub' $P1782 = "104_1258533497.4656" 
     capture_lex $P1782
-    .const 'Sub' $P1772 = "103_1258424448.06319" 
+    .const 'Sub' $P1772 = "103_1258533497.4656" 
     capture_lex $P1772
-    .const 'Sub' $P1758 = "102_1258424448.06319" 
+    .const 'Sub' $P1758 = "102_1258533497.4656" 
     capture_lex $P1758
-    .const 'Sub' $P1748 = "101_1258424448.06319" 
+    .const 'Sub' $P1748 = "101_1258533497.4656" 
     capture_lex $P1748
-    .const 'Sub' $P1738 = "100_1258424448.06319" 
+    .const 'Sub' $P1738 = "100_1258533497.4656" 
     capture_lex $P1738
-    .const 'Sub' $P1728 = "99_1258424448.06319" 
+    .const 'Sub' $P1728 = "99_1258533497.4656" 
     capture_lex $P1728
-    .const 'Sub' $P1718 = "98_1258424448.06319" 
+    .const 'Sub' $P1718 = "98_1258533497.4656" 
     capture_lex $P1718
-    .const 'Sub' $P1708 = "97_1258424448.06319" 
+    .const 'Sub' $P1708 = "97_1258533497.4656" 
     capture_lex $P1708
-    .const 'Sub' $P1680 = "96_1258424448.06319" 
+    .const 'Sub' $P1680 = "96_1258533497.4656" 
     capture_lex $P1680
-    .const 'Sub' $P1670 = "95_1258424448.06319" 
+    .const 'Sub' $P1670 = "95_1258533497.4656" 
     capture_lex $P1670
-    .const 'Sub' $P1658 = "94_1258424448.06319" 
+    .const 'Sub' $P1658 = "94_1258533497.4656" 
     capture_lex $P1658
-    .const 'Sub' $P1646 = "93_1258424448.06319" 
+    .const 'Sub' $P1646 = "93_1258533497.4656" 
     capture_lex $P1646
-    .const 'Sub' $P1634 = "92_1258424448.06319" 
+    .const 'Sub' $P1634 = "92_1258533497.4656" 
     capture_lex $P1634
-    .const 'Sub' $P1624 = "91_1258424448.06319" 
+    .const 'Sub' $P1624 = "91_1258533497.4656" 
     capture_lex $P1624
-    .const 'Sub' $P1595 = "90_1258424448.06319" 
+    .const 'Sub' $P1595 = "90_1258533497.4656" 
     capture_lex $P1595
-    .const 'Sub' $P1571 = "89_1258424448.06319" 
+    .const 'Sub' $P1571 = "89_1258533497.4656" 
     capture_lex $P1571
-    .const 'Sub' $P1561 = "88_1258424448.06319" 
+    .const 'Sub' $P1561 = "88_1258533497.4656" 
     capture_lex $P1561
-    .const 'Sub' $P1534 = "87_1258424448.06319" 
+    .const 'Sub' $P1534 = "87_1258533497.4656" 
     capture_lex $P1534
-    .const 'Sub' $P1516 = "86_1258424448.06319" 
+    .const 'Sub' $P1516 = "86_1258533497.4656" 
     capture_lex $P1516
-    .const 'Sub' $P1506 = "85_1258424448.06319" 
+    .const 'Sub' $P1506 = "85_1258533497.4656" 
     capture_lex $P1506
-    .const 'Sub' $P1422 = "82_1258424448.06319" 
+    .const 'Sub' $P1422 = "82_1258533497.4656" 
     capture_lex $P1422
-    .const 'Sub' $P1412 = "81_1258424448.06319" 
+    .const 'Sub' $P1412 = "81_1258533497.4656" 
     capture_lex $P1412
-    .const 'Sub' $P1383 = "80_1258424448.06319" 
+    .const 'Sub' $P1383 = "80_1258533497.4656" 
     capture_lex $P1383
-    .const 'Sub' $P1350 = "79_1258424448.06319" 
+    .const 'Sub' $P1350 = "79_1258533497.4656" 
     capture_lex $P1350
-    .const 'Sub' $P1334 = "78_1258424448.06319" 
+    .const 'Sub' $P1334 = "78_1258533497.4656" 
     capture_lex $P1334
-    .const 'Sub' $P1325 = "77_1258424448.06319" 
+    .const 'Sub' $P1325 = "77_1258533497.4656" 
     capture_lex $P1325
-    .const 'Sub' $P1300 = "76_1258424448.06319" 
+    .const 'Sub' $P1300 = "76_1258533497.4656" 
     capture_lex $P1300
-    .const 'Sub' $P1196 = "73_1258424448.06319" 
+    .const 'Sub' $P1196 = "73_1258533497.4656" 
     capture_lex $P1196
-    .const 'Sub' $P1179 = "72_1258424448.06319" 
+    .const 'Sub' $P1179 = "72_1258533497.4656" 
     capture_lex $P1179
-    .const 'Sub' $P1159 = "71_1258424448.06319" 
+    .const 'Sub' $P1159 = "71_1258533497.4656" 
     capture_lex $P1159
-    .const 'Sub' $P1075 = "70_1258424448.06319" 
+    .const 'Sub' $P1075 = "70_1258533497.4656" 
     capture_lex $P1075
-    .const 'Sub' $P1051 = "68_1258424448.06319" 
+    .const 'Sub' $P1051 = "68_1258533497.4656" 
     capture_lex $P1051
-    .const 'Sub' $P1017 = "66_1258424448.06319" 
+    .const 'Sub' $P1017 = "66_1258533497.4656" 
     capture_lex $P1017
-    .const 'Sub' $P971 = "64_1258424448.06319" 
+    .const 'Sub' $P971 = "64_1258533497.4656" 
     capture_lex $P971
-    .const 'Sub' $P961 = "63_1258424448.06319" 
+    .const 'Sub' $P961 = "63_1258533497.4656" 
     capture_lex $P961
-    .const 'Sub' $P951 = "62_1258424448.06319" 
+    .const 'Sub' $P951 = "62_1258533497.4656" 
     capture_lex $P951
-    .const 'Sub' $P880 = "60_1258424448.06319" 
+    .const 'Sub' $P880 = "60_1258533497.4656" 
     capture_lex $P880
-    .const 'Sub' $P863 = "59_1258424448.06319" 
+    .const 'Sub' $P863 = "59_1258533497.4656" 
     capture_lex $P863
-    .const 'Sub' $P853 = "58_1258424448.06319" 
+    .const 'Sub' $P853 = "58_1258533497.4656" 
     capture_lex $P853
-    .const 'Sub' $P843 = "57_1258424448.06319" 
+    .const 'Sub' $P843 = "57_1258533497.4656" 
     capture_lex $P843
-    .const 'Sub' $P833 = "56_1258424448.06319" 
+    .const 'Sub' $P833 = "56_1258533497.4656" 
     capture_lex $P833
-    .const 'Sub' $P809 = "55_1258424448.06319" 
+    .const 'Sub' $P809 = "55_1258533497.4656" 
     capture_lex $P809
-    .const 'Sub' $P756 = "54_1258424448.06319" 
+    .const 'Sub' $P756 = "54_1258533497.4656" 
     capture_lex $P756
-    .const 'Sub' $P746 = "53_1258424448.06319" 
+    .const 'Sub' $P746 = "53_1258533497.4656" 
     capture_lex $P746
-    .const 'Sub' $P660 = "51_1258424448.06319" 
+    .const 'Sub' $P660 = "51_1258533497.4656" 
     capture_lex $P660
-    .const 'Sub' $P634 = "50_1258424448.06319" 
+    .const 'Sub' $P634 = "50_1258533497.4656" 
     capture_lex $P634
-    .const 'Sub' $P624 = "49_1258424448.06319" 
+    .const 'Sub' $P624 = "49_1258533497.4656" 
     capture_lex $P624
-    .const 'Sub' $P614 = "48_1258424448.06319" 
+    .const 'Sub' $P614 = "48_1258533497.4656" 
     capture_lex $P614
-    .const 'Sub' $P604 = "47_1258424448.06319" 
+    .const 'Sub' $P604 = "47_1258533497.4656" 
     capture_lex $P604
-    .const 'Sub' $P594 = "46_1258424448.06319" 
+    .const 'Sub' $P594 = "46_1258533497.4656" 
     capture_lex $P594
-    .const 'Sub' $P584 = "45_1258424448.06319" 
+    .const 'Sub' $P584 = "45_1258533497.4656" 
     capture_lex $P584
-    .const 'Sub' $P574 = "44_1258424448.06319" 
+    .const 'Sub' $P574 = "44_1258533497.4656" 
     capture_lex $P574
-    .const 'Sub' $P564 = "43_1258424448.06319" 
+    .const 'Sub' $P564 = "43_1258533497.4656" 
     capture_lex $P564
-    .const 'Sub' $P554 = "42_1258424448.06319" 
+    .const 'Sub' $P554 = "42_1258533497.4656" 
     capture_lex $P554
-    .const 'Sub' $P544 = "41_1258424448.06319" 
+    .const 'Sub' $P544 = "41_1258533497.4656" 
     capture_lex $P544
-    .const 'Sub' $P534 = "40_1258424448.06319" 
+    .const 'Sub' $P534 = "40_1258533497.4656" 
     capture_lex $P534
-    .const 'Sub' $P524 = "39_1258424448.06319" 
+    .const 'Sub' $P524 = "39_1258533497.4656" 
     capture_lex $P524
-    .const 'Sub' $P514 = "38_1258424448.06319" 
+    .const 'Sub' $P514 = "38_1258533497.4656" 
     capture_lex $P514
-    .const 'Sub' $P496 = "37_1258424448.06319" 
+    .const 'Sub' $P496 = "37_1258533497.4656" 
     capture_lex $P496
-    .const 'Sub' $P480 = "36_1258424448.06319" 
+    .const 'Sub' $P480 = "36_1258533497.4656" 
     capture_lex $P480
-    .const 'Sub' $P467 = "35_1258424448.06319" 
+    .const 'Sub' $P467 = "35_1258533497.4656" 
     capture_lex $P467
-    .const 'Sub' $P441 = "34_1258424448.06319" 
+    .const 'Sub' $P441 = "34_1258533497.4656" 
     capture_lex $P441
-    .const 'Sub' $P405 = "33_1258424448.06319" 
+    .const 'Sub' $P405 = "33_1258533497.4656" 
     capture_lex $P405
-    .const 'Sub' $P388 = "32_1258424448.06319" 
+    .const 'Sub' $P388 = "32_1258533497.4656" 
     capture_lex $P388
-    .const 'Sub' $P374 = "31_1258424448.06319" 
+    .const 'Sub' $P374 = "31_1258533497.4656" 
     capture_lex $P374
-    .const 'Sub' $P319 = "29_1258424448.06319" 
+    .const 'Sub' $P319 = "29_1258533497.4656" 
     capture_lex $P319
-    .const 'Sub' $P306 = "28_1258424448.06319" 
+    .const 'Sub' $P306 = "28_1258533497.4656" 
     capture_lex $P306
-    .const 'Sub' $P287 = "27_1258424448.06319" 
+    .const 'Sub' $P287 = "27_1258533497.4656" 
     capture_lex $P287
-    .const 'Sub' $P277 = "26_1258424448.06319" 
+    .const 'Sub' $P277 = "26_1258533497.4656" 
     capture_lex $P277
-    .const 'Sub' $P267 = "25_1258424448.06319" 
+    .const 'Sub' $P267 = "25_1258533497.4656" 
     capture_lex $P267
-    .const 'Sub' $P251 = "24_1258424448.06319" 
+    .const 'Sub' $P251 = "24_1258533497.4656" 
     capture_lex $P251
-    .const 'Sub' $P173 = "22_1258424448.06319" 
+    .const 'Sub' $P173 = "22_1258533497.4656" 
     capture_lex $P173
-    .const 'Sub' $P130 = "20_1258424448.06319" 
+    .const 'Sub' $P130 = "20_1258533497.4656" 
     capture_lex $P130
-    .const 'Sub' $P111 = "19_1258424448.06319" 
+    .const 'Sub' $P111 = "19_1258533497.4656" 
     capture_lex $P111
-    .const 'Sub' $P89 = "18_1258424448.06319" 
+    .const 'Sub' $P89 = "18_1258533497.4656" 
     capture_lex $P89
-    .const 'Sub' $P79 = "17_1258424448.06319" 
+    .const 'Sub' $P79 = "17_1258533497.4656" 
     capture_lex $P79
-    .const 'Sub' $P57 = "16_1258424448.06319" 
+    .const 'Sub' $P57 = "16_1258533497.4656" 
     capture_lex $P57
-    .const 'Sub' $P26 = "13_1258424448.06319" 
+    .const 'Sub' $P26 = "13_1258533497.4656" 
     capture_lex $P26
-    .const 'Sub' $P16 = "12_1258424448.06319" 
+    .const 'Sub' $P16 = "12_1258533497.4656" 
     capture_lex $P16
     get_global $P15, "@BLOCK"
     unless_null $P15, vivify_118
@@ -13079,15 +13364,15 @@ NQP::Compiler - NQP compiler
     set_global "@BLOCK", $P15
   vivify_118:
 .annotate "line", 9
-    .const 'Sub' $P16 = "12_1258424448.06319" 
+    .const 'Sub' $P16 = "12_1258533497.4656" 
     capture_lex $P16
     .lex "xblock_immediate", $P16
 .annotate "line", 14
-    .const 'Sub' $P26 = "13_1258424448.06319" 
+    .const 'Sub' $P26 = "13_1258533497.4656" 
     capture_lex $P26
     .lex "block_immediate", $P26
 .annotate "line", 24
-    .const 'Sub' $P57 = "16_1258424448.06319" 
+    .const 'Sub' $P57 = "16_1258533497.4656" 
     capture_lex $P57
     .lex "sigiltype", $P57
 .annotate "line", 3
@@ -13106,13 +13391,13 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "" :load :init :subid("post116") :outer("11_1258424448.06319")
+.sub "" :load :init :subid("post116") :outer("11_1258533497.4656")
 .annotate "line", 3
     get_hll_global $P14, ["NQP";"Actions"], "_block13" 
     .local pmc block
     set block, $P14
 .annotate "line", 5
-    .const 'Sub' $P1903 = "114_1258424448.06319" 
+    .const 'Sub' $P1903 = "114_1258533497.4656" 
     capture_lex $P1903
     $P1903()
     $P1906 = get_root_global ["parrot"], "P6metaclass"
@@ -13121,7 +13406,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block1902"  :anon :subid("114_1258424448.06319") :outer("11_1258424448.06319")
+.sub "_block1902"  :anon :subid("114_1258533497.4656") :outer("11_1258533497.4656")
 .annotate "line", 6
     get_global $P1904, "@BLOCK"
     unless_null $P1904, vivify_117
@@ -13136,7 +13421,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "xblock_immediate"  :subid("12_1258424448.06319") :outer("11_1258424448.06319")
+.sub "xblock_immediate"  :subid("12_1258533497.4656") :outer("11_1258533497.4656")
     .param pmc param_19
 .annotate "line", 9
     new $P18, 'ExceptionHandler'
@@ -13173,10 +13458,10 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "block_immediate"  :subid("13_1258424448.06319") :outer("11_1258424448.06319")
+.sub "block_immediate"  :subid("13_1258533497.4656") :outer("11_1258533497.4656")
     .param pmc param_29
 .annotate "line", 14
-    .const 'Sub' $P35 = "14_1258424448.06319" 
+    .const 'Sub' $P35 = "14_1258533497.4656" 
     capture_lex $P35
     new $P28, 'ExceptionHandler'
     set_addr $P28, control_27
@@ -13190,7 +13475,7 @@ NQP::Compiler - NQP compiler
     find_lex $P32, "$block"
     $P33 = $P32."symtable"()
     if $P33, unless_31_end
-    .const 'Sub' $P35 = "14_1258424448.06319" 
+    .const 'Sub' $P35 = "14_1258533497.4656" 
     capture_lex $P35
     $P35()
   unless_31_end:
@@ -13207,9 +13492,9 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block34"  :anon :subid("14_1258424448.06319") :outer("13_1258424448.06319")
+.sub "_block34"  :anon :subid("14_1258533497.4656") :outer("13_1258533497.4656")
 .annotate "line", 16
-    .const 'Sub' $P46 = "15_1258424448.06319" 
+    .const 'Sub' $P46 = "15_1258533497.4656" 
     capture_lex $P46
 .annotate "line", 17
     new $P36, "Undef"
@@ -13232,7 +13517,7 @@ NQP::Compiler - NQP compiler
     unless $P40, loop51_done
     shift $P44, $P40
   loop51_redo:
-    .const 'Sub' $P46 = "15_1258424448.06319" 
+    .const 'Sub' $P46 = "15_1258533497.4656" 
     capture_lex $P46
     $P46($P44)
   loop51_next:
@@ -13255,7 +13540,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block45"  :anon :subid("15_1258424448.06319") :outer("14_1258424448.06319")
+.sub "_block45"  :anon :subid("15_1258533497.4656") :outer("14_1258533497.4656")
     .param pmc param_47
 .annotate "line", 18
     .lex "$_", param_47
@@ -13267,7 +13552,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "sigiltype"  :subid("16_1258424448.06319") :outer("11_1258424448.06319")
+.sub "sigiltype"  :subid("16_1258533497.4656") :outer("11_1258533497.4656")
     .param pmc param_60
 .annotate "line", 24
     new $P59, 'ExceptionHandler'
@@ -13314,7 +13599,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "TOP"  :subid("17_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "TOP"  :subid("17_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_82
 .annotate "line", 30
     new $P81, 'ExceptionHandler'
@@ -13345,7 +13630,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "deflongname"  :subid("18_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "deflongname"  :subid("18_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_92
 .annotate "line", 32
     new $P91, 'ExceptionHandler'
@@ -13410,7 +13695,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "comp_unit"  :subid("19_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "comp_unit"  :subid("19_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_114
 .annotate "line", 36
     new $P113, 'ExceptionHandler'
@@ -13464,10 +13749,10 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statementlist"  :subid("20_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "statementlist"  :subid("20_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_133
 .annotate "line", 44
-    .const 'Sub' $P147 = "21_1258424448.06319" 
+    .const 'Sub' $P147 = "21_1258533497.4656" 
     capture_lex $P147
     new $P132, 'ExceptionHandler'
     set_addr $P132, control_131
@@ -13512,7 +13797,7 @@ NQP::Compiler - NQP compiler
     unless $P141, loop166_done
     shift $P145, $P141
   loop166_redo:
-    .const 'Sub' $P147 = "21_1258424448.06319" 
+    .const 'Sub' $P147 = "21_1258533497.4656" 
     capture_lex $P147
     $P147($P145)
   loop166_next:
@@ -13543,7 +13828,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block146"  :anon :subid("21_1258424448.06319") :outer("20_1258424448.06319")
+.sub "_block146"  :anon :subid("21_1258533497.4656") :outer("20_1258533497.4656")
     .param pmc param_149
 .annotate "line", 48
     new $P148, "Undef"
@@ -13582,12 +13867,12 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statement"  :subid("22_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "statement"  :subid("22_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_176
     .param pmc param_177 :optional
     .param int has_param_177 :opt_flag
 .annotate "line", 58
-    .const 'Sub' $P185 = "23_1258424448.06319" 
+    .const 'Sub' $P185 = "23_1258533497.4656" 
     capture_lex $P185
     new $P175, 'ExceptionHandler'
     set_addr $P175, control_174
@@ -13646,7 +13931,7 @@ NQP::Compiler - NQP compiler
     goto if_181_end
   if_181:
 .annotate "line", 60
-    .const 'Sub' $P185 = "23_1258424448.06319" 
+    .const 'Sub' $P185 = "23_1258533497.4656" 
     capture_lex $P185
     $P185()
   if_181_end:
@@ -13666,7 +13951,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block184"  :anon :subid("23_1258424448.06319") :outer("22_1258424448.06319")
+.sub "_block184"  :anon :subid("23_1258533497.4656") :outer("22_1258533497.4656")
 .annotate "line", 61
     new $P186, "Undef"
     .lex "$mc", $P186
@@ -13836,7 +14121,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "xblock"  :subid("24_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "xblock"  :subid("24_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_254
 .annotate "line", 79
     new $P253, 'ExceptionHandler'
@@ -13881,7 +14166,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "pblock"  :subid("25_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "pblock"  :subid("25_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_270
 .annotate "line", 83
     new $P269, 'ExceptionHandler'
@@ -13914,7 +14199,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "block"  :subid("26_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "block"  :subid("26_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_280
 .annotate "line", 87
     new $P279, 'ExceptionHandler'
@@ -13947,7 +14232,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "blockoid"  :subid("27_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "blockoid"  :subid("27_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_290
 .annotate "line", 91
     new $P289, 'ExceptionHandler'
@@ -14001,7 +14286,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "newpad"  :subid("28_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "newpad"  :subid("28_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_309
 .annotate "line", 99
     new $P308, 'ExceptionHandler'
@@ -14037,10 +14322,10 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statement_control:sym<if>"  :subid("29_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "statement_control:sym<if>"  :subid("29_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_322
 .annotate "line", 106
-    .const 'Sub' $P352 = "30_1258424448.06319" 
+    .const 'Sub' $P352 = "30_1258533497.4656" 
     capture_lex $P352
     new $P321, 'ExceptionHandler'
     set_addr $P321, control_320
@@ -14128,7 +14413,7 @@ NQP::Compiler - NQP compiler
     isgt $I350, $N347, $N349
     unless $I350, loop367_done
   loop367_redo:
-    .const 'Sub' $P352 = "30_1258424448.06319" 
+    .const 'Sub' $P352 = "30_1258533497.4656" 
     capture_lex $P352
     $P352()
   loop367_next:
@@ -14157,7 +14442,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block351"  :anon :subid("30_1258424448.06319") :outer("29_1258424448.06319")
+.sub "_block351"  :anon :subid("30_1258533497.4656") :outer("29_1258533497.4656")
 .annotate "line", 115
     new $P353, "Undef"
     .lex "$else", $P353
@@ -14196,7 +14481,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statement_control:sym<unless>"  :subid("31_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "statement_control:sym<unless>"  :subid("31_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_377
 .annotate "line", 122
     new $P376, 'ExceptionHandler'
@@ -14238,7 +14523,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statement_control:sym<while>"  :subid("32_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "statement_control:sym<while>"  :subid("32_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_391
 .annotate "line", 128
     new $P390, 'ExceptionHandler'
@@ -14289,7 +14574,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statement_control:sym<repeat>"  :subid("33_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "statement_control:sym<repeat>"  :subid("33_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_408
 .annotate "line", 134
     new $P407, 'ExceptionHandler'
@@ -14390,7 +14675,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statement_control:sym<for>"  :subid("34_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "statement_control:sym<for>"  :subid("34_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_444
 .annotate "line", 148
     new $P443, 'ExceptionHandler'
@@ -14471,7 +14756,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statement_control:sym<return>"  :subid("35_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "statement_control:sym<return>"  :subid("35_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_470
 .annotate "line", 161
     new $P469, 'ExceptionHandler'
@@ -14507,7 +14792,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statement_prefix:sym<INIT>"  :subid("36_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "statement_prefix:sym<INIT>"  :subid("36_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_483
 .annotate "line", 165
     new $P482, 'ExceptionHandler'
@@ -14554,7 +14839,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "blorst"  :subid("37_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "blorst"  :subid("37_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_499
 .annotate "line", 170
     new $P498, 'ExceptionHandler'
@@ -14614,7 +14899,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statement_mod_cond:sym<if>"  :subid("38_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "statement_mod_cond:sym<if>"  :subid("38_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_517
 .annotate "line", 178
     new $P516, 'ExceptionHandler'
@@ -14645,7 +14930,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statement_mod_cond:sym<unless>"  :subid("39_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "statement_mod_cond:sym<unless>"  :subid("39_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_527
 .annotate "line", 179
     new $P526, 'ExceptionHandler'
@@ -14676,7 +14961,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statement_mod_loop:sym<while>"  :subid("40_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "statement_mod_loop:sym<while>"  :subid("40_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_537
 .annotate "line", 181
     new $P536, 'ExceptionHandler'
@@ -14707,7 +14992,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "statement_mod_loop:sym<until>"  :subid("41_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "statement_mod_loop:sym<until>"  :subid("41_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_547
 .annotate "line", 182
     new $P546, 'ExceptionHandler'
@@ -14738,7 +15023,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<colonpair>"  :subid("42_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "term:sym<colonpair>"  :subid("42_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_557
 .annotate "line", 186
     new $P556, 'ExceptionHandler'
@@ -14769,7 +15054,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<variable>"  :subid("43_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "term:sym<variable>"  :subid("43_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_567
 .annotate "line", 187
     new $P566, 'ExceptionHandler'
@@ -14800,7 +15085,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<package_declarator>"  :subid("44_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "term:sym<package_declarator>"  :subid("44_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_577
 .annotate "line", 188
     new $P576, 'ExceptionHandler'
@@ -14831,7 +15116,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<scope_declarator>"  :subid("45_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "term:sym<scope_declarator>"  :subid("45_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_587
 .annotate "line", 189
     new $P586, 'ExceptionHandler'
@@ -14862,7 +15147,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<routine_declarator>"  :subid("46_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "term:sym<routine_declarator>"  :subid("46_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_597
 .annotate "line", 190
     new $P596, 'ExceptionHandler'
@@ -14893,7 +15178,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<regex_declarator>"  :subid("47_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "term:sym<regex_declarator>"  :subid("47_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_607
 .annotate "line", 191
     new $P606, 'ExceptionHandler'
@@ -14924,7 +15209,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<statement_prefix>"  :subid("48_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "term:sym<statement_prefix>"  :subid("48_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_617
 .annotate "line", 192
     new $P616, 'ExceptionHandler'
@@ -14955,7 +15240,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<lambda>"  :subid("49_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "term:sym<lambda>"  :subid("49_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_627
 .annotate "line", 193
     new $P626, 'ExceptionHandler'
@@ -14986,7 +15271,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "colonpair"  :subid("50_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "colonpair"  :subid("50_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_637
 .annotate "line", 195
     new $P636, 'ExceptionHandler'
@@ -15068,10 +15353,10 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "variable"  :subid("51_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "variable"  :subid("51_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_663
 .annotate "line", 203
-    .const 'Sub' $P676 = "52_1258424448.06319" 
+    .const 'Sub' $P676 = "52_1258533497.4656" 
     capture_lex $P676
     new $P662, 'ExceptionHandler'
     set_addr $P662, control_661
@@ -15095,7 +15380,7 @@ NQP::Compiler - NQP compiler
   vivify_262:
     if $P668, if_666
 .annotate "line", 209
-    .const 'Sub' $P676 = "52_1258424448.06319" 
+    .const 'Sub' $P676 = "52_1258533497.4656" 
     capture_lex $P676
     $P676()
     goto if_666_end
@@ -15133,7 +15418,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block675"  :anon :subid("52_1258424448.06319") :outer("51_1258424448.06319")
+.sub "_block675"  :anon :subid("52_1258533497.4656") :outer("51_1258533497.4656")
 .annotate "line", 210
     new $P677, "ResizablePMCArray"
     .lex "@name", $P677
@@ -15297,7 +15582,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "package_declarator:sym<module>"  :subid("53_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "package_declarator:sym<module>"  :subid("53_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_749
 .annotate "line", 240
     new $P748, 'ExceptionHandler'
@@ -15328,7 +15613,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "package_declarator:sym<class>"  :subid("54_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "package_declarator:sym<class>"  :subid("54_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_759
 .annotate "line", 241
     new $P758, 'ExceptionHandler'
@@ -15486,7 +15771,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "package_def"  :subid("55_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "package_def"  :subid("55_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_812
 .annotate "line", 264
     new $P811, 'ExceptionHandler'
@@ -15565,7 +15850,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "scope_declarator:sym<my>"  :subid("56_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "scope_declarator:sym<my>"  :subid("56_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_836
 .annotate "line", 271
     new $P835, 'ExceptionHandler'
@@ -15596,7 +15881,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "scope_declarator:sym<our>"  :subid("57_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "scope_declarator:sym<our>"  :subid("57_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_846
 .annotate "line", 272
     new $P845, 'ExceptionHandler'
@@ -15627,7 +15912,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "scope_declarator:sym<has>"  :subid("58_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "scope_declarator:sym<has>"  :subid("58_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_856
 .annotate "line", 273
     new $P855, 'ExceptionHandler'
@@ -15658,7 +15943,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "scoped"  :subid("59_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "scoped"  :subid("59_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_866
 .annotate "line", 275
     new $P865, 'ExceptionHandler'
@@ -15717,10 +16002,10 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "variable_declarator"  :subid("60_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "variable_declarator"  :subid("60_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_883
 .annotate "line", 281
-    .const 'Sub' $P923 = "61_1258424448.06319" 
+    .const 'Sub' $P923 = "61_1258533497.4656" 
     capture_lex $P923
     new $P882, 'ExceptionHandler'
     set_addr $P882, control_881
@@ -15802,7 +16087,7 @@ NQP::Compiler - NQP compiler
     iseq $I908, $S907, "has"
     if $I908, if_905
 .annotate "line", 298
-    .const 'Sub' $P923 = "61_1258424448.06319" 
+    .const 'Sub' $P923 = "61_1258533497.4656" 
     capture_lex $P923
     $P923()
     goto if_905_end
@@ -15863,7 +16148,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block922"  :anon :subid("61_1258424448.06319") :outer("60_1258424448.06319")
+.sub "_block922"  :anon :subid("61_1258533497.4656") :outer("60_1258533497.4656")
 .annotate "line", 299
     new $P924, "Undef"
     .lex "$scope", $P924
@@ -15924,7 +16209,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "routine_declarator:sym<sub>"  :subid("62_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "routine_declarator:sym<sub>"  :subid("62_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_954
 .annotate "line", 309
     new $P953, 'ExceptionHandler'
@@ -15955,7 +16240,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "routine_declarator:sym<method>"  :subid("63_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "routine_declarator:sym<method>"  :subid("63_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_964
 .annotate "line", 310
     new $P963, 'ExceptionHandler'
@@ -15986,10 +16271,10 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "routine_def"  :subid("64_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "routine_def"  :subid("64_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_974
 .annotate "line", 312
-    .const 'Sub' $P985 = "65_1258424448.06319" 
+    .const 'Sub' $P985 = "65_1258533497.4656" 
     capture_lex $P985
     new $P973, 'ExceptionHandler'
     set_addr $P973, control_972
@@ -16026,7 +16311,7 @@ NQP::Compiler - NQP compiler
     new $P983, "Undef"
   vivify_346:
     unless $P983, if_981_end
-    .const 'Sub' $P985 = "65_1258424448.06319" 
+    .const 'Sub' $P985 = "65_1258533497.4656" 
     capture_lex $P985
     $P985()
   if_981_end:
@@ -16046,7 +16331,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block984"  :anon :subid("65_1258424448.06319") :outer("64_1258424448.06319")
+.sub "_block984"  :anon :subid("65_1258533497.4656") :outer("64_1258533497.4656")
 .annotate "line", 317
     new $P986, "Undef"
     .lex "$name", $P986
@@ -16129,10 +16414,10 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "method_def"  :subid("66_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "method_def"  :subid("66_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1020
 .annotate "line", 330
-    .const 'Sub' $P1036 = "67_1258424448.06319" 
+    .const 'Sub' $P1036 = "67_1258533497.4656" 
     capture_lex $P1036
     new $P1019, 'ExceptionHandler'
     set_addr $P1019, control_1018
@@ -16184,7 +16469,7 @@ NQP::Compiler - NQP compiler
     new $P1034, "Undef"
   vivify_362:
     unless $P1034, if_1032_end
-    .const 'Sub' $P1036 = "67_1258424448.06319" 
+    .const 'Sub' $P1036 = "67_1258533497.4656" 
     capture_lex $P1036
     $P1036()
   if_1032_end:
@@ -16204,7 +16489,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block1035"  :anon :subid("67_1258424448.06319") :outer("66_1258424448.06319")
+.sub "_block1035"  :anon :subid("67_1258533497.4656") :outer("66_1258533497.4656")
 .annotate "line", 337
     new $P1037, "Undef"
     .lex "$name", $P1037
@@ -16235,10 +16520,10 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "signature"  :subid("68_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "signature"  :subid("68_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1054
 .annotate "line", 344
-    .const 'Sub' $P1065 = "69_1258424448.06319" 
+    .const 'Sub' $P1065 = "69_1258533497.4656" 
     capture_lex $P1065
     new $P1053, 'ExceptionHandler'
     set_addr $P1053, control_1052
@@ -16282,7 +16567,7 @@ NQP::Compiler - NQP compiler
     unless $P1059, loop1071_done
     shift $P1063, $P1059
   loop1071_redo:
-    .const 'Sub' $P1065 = "69_1258424448.06319" 
+    .const 'Sub' $P1065 = "69_1258533497.4656" 
     capture_lex $P1065
     $P1065($P1063)
   loop1071_next:
@@ -16308,7 +16593,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block1064"  :anon :subid("69_1258424448.06319") :outer("68_1258424448.06319")
+.sub "_block1064"  :anon :subid("69_1258533497.4656") :outer("68_1258533497.4656")
     .param pmc param_1066
 .annotate "line", 346
     .lex "$_", param_1066
@@ -16321,7 +16606,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "parameter"  :subid("70_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "parameter"  :subid("70_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1078
 .annotate "line", 349
     new $P1077, 'ExceptionHandler'
@@ -16554,7 +16839,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "param_var"  :subid("71_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "param_var"  :subid("71_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1162
 .annotate "line", 381
     new $P1161, 'ExceptionHandler'
@@ -16608,7 +16893,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "named_param"  :subid("72_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "named_param"  :subid("72_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1182
 .annotate "line", 389
     new $P1181, 'ExceptionHandler'
@@ -16662,14 +16947,14 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "regex_declarator"  :subid("73_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "regex_declarator"  :subid("73_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1199
     .param pmc param_1200 :optional
     .param int has_param_1200 :opt_flag
 .annotate "line", 395
-    .const 'Sub' $P1270 = "75_1258424448.06319" 
+    .const 'Sub' $P1270 = "75_1258533497.4656" 
     capture_lex $P1270
-    .const 'Sub' $P1217 = "74_1258424448.06319" 
+    .const 'Sub' $P1217 = "74_1258533497.4656" 
     capture_lex $P1217
     new $P1198, 'ExceptionHandler'
     set_addr $P1198, control_1197
@@ -16727,7 +17012,7 @@ NQP::Compiler - NQP compiler
   vivify_411:
     if $P1246, if_1244
 .annotate "line", 441
-    .const 'Sub' $P1270 = "75_1258424448.06319" 
+    .const 'Sub' $P1270 = "75_1258533497.4656" 
     capture_lex $P1270
     $P1270()
     goto if_1244_end
@@ -16772,7 +17057,7 @@ NQP::Compiler - NQP compiler
     goto if_1212_end
   if_1212:
 .annotate "line", 401
-    .const 'Sub' $P1217 = "74_1258424448.06319" 
+    .const 'Sub' $P1217 = "74_1258533497.4656" 
     capture_lex $P1217
     $P1217()
   if_1212_end:
@@ -16792,7 +17077,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block1269"  :anon :subid("75_1258424448.06319") :outer("73_1258424448.06319")
+.sub "_block1269"  :anon :subid("75_1258533497.4656") :outer("73_1258533497.4656")
 .annotate "line", 442
     new $P1271, "Undef"
     .lex "$rpast", $P1271
@@ -16858,7 +17143,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block1216"  :anon :subid("74_1258424448.06319") :outer("73_1258424448.06319")
+.sub "_block1216"  :anon :subid("74_1258533497.4656") :outer("73_1258533497.4656")
 .annotate "line", 402
     new $P1218, "Hash"
     .lex "%h", $P1218
@@ -16956,7 +17241,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "dotty"  :subid("76_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "dotty"  :subid("76_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1303
 .annotate "line", 461
     new $P1302, 'ExceptionHandler'
@@ -17030,7 +17315,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<self>"  :subid("77_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "term:sym<self>"  :subid("77_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1328
 .annotate "line", 470
     new $P1327, 'ExceptionHandler'
@@ -17056,7 +17341,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<identifier>"  :subid("78_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "term:sym<identifier>"  :subid("78_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1337
 .annotate "line", 474
     new $P1336, 'ExceptionHandler'
@@ -17106,7 +17391,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<name>"  :subid("79_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "term:sym<name>"  :subid("79_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1353
 .annotate "line", 480
     new $P1352, 'ExceptionHandler'
@@ -17207,7 +17492,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<pir::op>"  :subid("80_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "term:sym<pir::op>"  :subid("80_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1386
 .annotate "line", 497
     new $P1385, 'ExceptionHandler'
@@ -17299,7 +17584,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "args"  :subid("81_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "args"  :subid("81_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1415
 .annotate "line", 512
     new $P1414, 'ExceptionHandler'
@@ -17330,10 +17615,10 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "arglist"  :subid("82_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "arglist"  :subid("82_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1425
 .annotate "line", 514
-    .const 'Sub' $P1436 = "83_1258424448.06319" 
+    .const 'Sub' $P1436 = "83_1258533497.4656" 
     capture_lex $P1436
     new $P1424, 'ExceptionHandler'
     set_addr $P1424, control_1423
@@ -17365,7 +17650,7 @@ NQP::Compiler - NQP compiler
     new $P1434, "Undef"
   vivify_455:
     unless $P1434, if_1432_end
-    .const 'Sub' $P1436 = "83_1258424448.06319" 
+    .const 'Sub' $P1436 = "83_1258533497.4656" 
     capture_lex $P1436
     $P1436()
   if_1432_end:
@@ -17474,9 +17759,9 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block1435"  :anon :subid("83_1258424448.06319") :outer("82_1258424448.06319")
+.sub "_block1435"  :anon :subid("83_1258533497.4656") :outer("82_1258533497.4656")
 .annotate "line", 516
-    .const 'Sub' $P1457 = "84_1258424448.06319" 
+    .const 'Sub' $P1457 = "84_1258533497.4656" 
     capture_lex $P1457
 .annotate "line", 517
     new $P1437, "Undef"
@@ -17529,7 +17814,7 @@ NQP::Compiler - NQP compiler
     unless $P1451, loop1462_done
     shift $P1455, $P1451
   loop1462_redo:
-    .const 'Sub' $P1457 = "84_1258424448.06319" 
+    .const 'Sub' $P1457 = "84_1258533497.4656" 
     capture_lex $P1457
     $P1457($P1455)
   loop1462_next:
@@ -17552,7 +17837,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block1456"  :anon :subid("84_1258424448.06319") :outer("83_1258424448.06319")
+.sub "_block1456"  :anon :subid("84_1258533497.4656") :outer("83_1258533497.4656")
     .param pmc param_1458
 .annotate "line", 519
     .lex "$_", param_1458
@@ -17564,7 +17849,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "term:sym<value>"  :subid("85_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "term:sym<value>"  :subid("85_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1509
 .annotate "line", 536
     new $P1508, 'ExceptionHandler'
@@ -17595,7 +17880,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "circumfix:sym<( )>"  :subid("86_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "circumfix:sym<( )>"  :subid("86_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1519
 .annotate "line", 538
     new $P1518, 'ExceptionHandler'
@@ -17652,7 +17937,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "circumfix:sym<[ ]>"  :subid("87_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "circumfix:sym<[ ]>"  :subid("87_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1537
 .annotate "line", 544
     new $P1536, 'ExceptionHandler'
@@ -17729,7 +18014,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "circumfix:sym<ang>"  :subid("88_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "circumfix:sym<ang>"  :subid("88_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1564
 .annotate "line", 559
     new $P1563, 'ExceptionHandler'
@@ -17760,7 +18045,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "circumfix:sym<{ }>"  :subid("89_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "circumfix:sym<{ }>"  :subid("89_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1574
 .annotate "line", 561
     new $P1573, 'ExceptionHandler'
@@ -17830,7 +18115,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "circumfix:sym<sigil>"  :subid("90_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "circumfix:sym<sigil>"  :subid("90_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1598
 .annotate "line", 567
     new $P1597, 'ExceptionHandler'
@@ -17910,7 +18195,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "semilist"  :subid("91_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "semilist"  :subid("91_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1627
 .annotate "line", 574
     new $P1626, 'ExceptionHandler'
@@ -17941,7 +18226,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "postcircumfix:sym<[ ]>"  :subid("92_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "postcircumfix:sym<[ ]>"  :subid("92_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1637
 .annotate "line", 576
     new $P1636, 'ExceptionHandler'
@@ -17976,7 +18261,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "postcircumfix:sym<{ }>"  :subid("93_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "postcircumfix:sym<{ }>"  :subid("93_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1649
 .annotate "line", 582
     new $P1648, 'ExceptionHandler'
@@ -18011,7 +18296,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "postcircumfix:sym<ang>"  :subid("94_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "postcircumfix:sym<ang>"  :subid("94_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1661
 .annotate "line", 588
     new $P1660, 'ExceptionHandler'
@@ -18046,7 +18331,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "postcircumfix:sym<( )>"  :subid("95_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "postcircumfix:sym<( )>"  :subid("95_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1673
 .annotate "line", 594
     new $P1672, 'ExceptionHandler'
@@ -18079,7 +18364,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "value"  :subid("96_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "value"  :subid("96_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1683
 .annotate "line", 598
     new $P1682, 'ExceptionHandler'
@@ -18172,7 +18457,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "quote:sym<apos>"  :subid("97_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "quote:sym<apos>"  :subid("97_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1711
 .annotate "line", 609
     new $P1710, 'ExceptionHandler'
@@ -18203,7 +18488,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "quote:sym<dblq>"  :subid("98_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "quote:sym<dblq>"  :subid("98_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1721
 .annotate "line", 610
     new $P1720, 'ExceptionHandler'
@@ -18234,7 +18519,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "quote:sym<qq>"  :subid("99_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "quote:sym<qq>"  :subid("99_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1731
 .annotate "line", 611
     new $P1730, 'ExceptionHandler'
@@ -18265,7 +18550,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "quote:sym<q>"  :subid("100_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "quote:sym<q>"  :subid("100_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1741
 .annotate "line", 612
     new $P1740, 'ExceptionHandler'
@@ -18296,7 +18581,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "quote:sym<Q>"  :subid("101_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "quote:sym<Q>"  :subid("101_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1751
 .annotate "line", 613
     new $P1750, 'ExceptionHandler'
@@ -18327,7 +18612,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "quote:sym<Q:PIR>"  :subid("102_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "quote:sym<Q:PIR>"  :subid("102_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1761
 .annotate "line", 614
     new $P1760, 'ExceptionHandler'
@@ -18364,7 +18649,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "quote_escape:sym<$>"  :subid("103_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "quote_escape:sym<$>"  :subid("103_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1775
 .annotate "line", 620
     new $P1774, 'ExceptionHandler'
@@ -18395,7 +18680,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "quote_escape:sym<{ }>"  :subid("104_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "quote_escape:sym<{ }>"  :subid("104_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1785
 .annotate "line", 621
     new $P1784, 'ExceptionHandler'
@@ -18434,7 +18719,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "postfix:sym<.>"  :subid("105_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "postfix:sym<.>"  :subid("105_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1799
 .annotate "line", 629
     new $P1798, 'ExceptionHandler'
@@ -18465,7 +18750,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "postfix:sym<++>"  :subid("106_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "postfix:sym<++>"  :subid("106_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1809
 .annotate "line", 631
     new $P1808, 'ExceptionHandler'
@@ -18496,7 +18781,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "postfix:sym<-->"  :subid("107_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "postfix:sym<-->"  :subid("107_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1819
 .annotate "line", 637
     new $P1818, 'ExceptionHandler'
@@ -18527,7 +18812,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "prefix:sym<make>"  :subid("108_1258424448.06319") :method :outer("11_1258424448.06319")
+.sub "prefix:sym<make>"  :subid("108_1258533497.4656") :method :outer("11_1258533497.4656")
     .param pmc param_1829
 .annotate "line", 643
     new $P1828, 'ExceptionHandler'
@@ -18558,18 +18843,18 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"RegexActions"]
-.sub "_block1838"  :subid("109_1258424448.06319") :outer("11_1258424448.06319")
+.sub "_block1838"  :subid("109_1258533497.4656") :outer("11_1258533497.4656")
 .annotate "line", 653
-    .const 'Sub' $P1874 = "113_1258424448.06319" 
+    .const 'Sub' $P1874 = "113_1258533497.4656" 
     capture_lex $P1874
-    .const 'Sub' $P1864 = "112_1258424448.06319" 
+    .const 'Sub' $P1864 = "112_1258533497.4656" 
     capture_lex $P1864
-    .const 'Sub' $P1854 = "111_1258424448.06319" 
+    .const 'Sub' $P1854 = "111_1258533497.4656" 
     capture_lex $P1854
-    .const 'Sub' $P1840 = "110_1258424448.06319" 
+    .const 'Sub' $P1840 = "110_1258533497.4656" 
     capture_lex $P1840
 .annotate "line", 664
-    .const 'Sub' $P1874 = "113_1258424448.06319" 
+    .const 'Sub' $P1874 = "113_1258533497.4656" 
     capture_lex $P1874
 .annotate "line", 653
     .return ($P1874)
@@ -18577,7 +18862,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"RegexActions"]
-.sub "metachar:sym<:my>"  :subid("110_1258424448.06319") :method :outer("109_1258424448.06319")
+.sub "metachar:sym<:my>"  :subid("110_1258533497.4656") :method :outer("109_1258533497.4656")
     .param pmc param_1843
 .annotate "line", 655
     new $P1842, 'ExceptionHandler'
@@ -18617,7 +18902,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"RegexActions"]
-.sub "metachar:sym<{ }>"  :subid("111_1258424448.06319") :method :outer("109_1258424448.06319")
+.sub "metachar:sym<{ }>"  :subid("111_1258533497.4656") :method :outer("109_1258533497.4656")
     .param pmc param_1857
 .annotate "line", 660
     new $P1856, 'ExceptionHandler'
@@ -18648,7 +18933,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"RegexActions"]
-.sub "assertion:sym<{ }>"  :subid("112_1258424448.06319") :method :outer("109_1258424448.06319")
+.sub "assertion:sym<{ }>"  :subid("112_1258533497.4656") :method :outer("109_1258533497.4656")
     .param pmc param_1867
 .annotate "line", 662
     new $P1866, 'ExceptionHandler'
@@ -18679,7 +18964,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"RegexActions"]
-.sub "codeblock"  :subid("113_1258424448.06319") :method :outer("109_1258424448.06319")
+.sub "codeblock"  :subid("113_1258533497.4656") :method :outer("109_1258533497.4656")
     .param pmc param_1877
 .annotate "line", 664
     new $P1876, 'ExceptionHandler'
