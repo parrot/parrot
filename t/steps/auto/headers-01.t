@@ -5,16 +5,14 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  30;
+use Test::More tests =>  19;
 use Carp;
 use lib qw( lib t/configure/testlib );
-use_ok('config::init::defaults');
 use_ok('config::auto::headers');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
+use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(
-    test_step_thru_runstep
-    rerun_defaults_for_testing
     test_step_constructor_and_description
 );
 use IO::CaptureOutput qw | capture |;
@@ -28,11 +26,10 @@ my ($args, $step_list_ref) = process_options(
     }
 );
 
-my $conf = Parrot::Configure->new;
-
+my $conf = Parrot::Configure::Step::Test->new;
+$conf->include_config_results( $args );
 my $serialized = $conf->pcfreeze();
 
-test_step_thru_runstep( $conf, q{init::defaults}, $args );
 my $pkg = q{auto::headers};
 
 $conf->add_steps($pkg);
@@ -53,8 +50,6 @@ $conf->replenish($serialized);
         mode => q{configure},
     }
 );
-
-rerun_defaults_for_testing($conf, $args );
 
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
@@ -79,8 +74,6 @@ $conf->replenish($serialized);
     }
 );
 
-rerun_defaults_for_testing($conf, $args );
-
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
@@ -89,7 +82,7 @@ auto::headers::_set_from_Config($conf);
 ok(! $conf->data->get('i_niin'), "Mapping made correctly");
 
 {
-    $conf->data->set_p5( OSNAME => "msys" );
+    $conf->data->set( OSNAME_provisional => "msys" );
     my %extra_headers =
         map {$_, 1} auto::headers::_list_extra_headers($conf);
     ok($extra_headers{'sysmman.h'}, "Special header set for msys");

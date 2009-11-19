@@ -36,7 +36,7 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $cmd = $conf->data->get_p5('scriptdirexp') . q{/perldoc};
+    my $cmd = $conf->data->get('scriptdirexp_provisional') . q{/perldoc};
     my ( $fh, $filename ) = tempfile( UNLINK => 1 );
     my $content = capture_output("$cmd -ud $filename perldoc") || undef;
 

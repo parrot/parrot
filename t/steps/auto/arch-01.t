@@ -5,16 +5,13 @@
 
 use strict;
 use warnings;
-use Test::More tests => 119;
+use Test::More tests =>  81;
 use Carp;
 use lib qw( lib t/configure/testlib );
-use_ok('config::init::defaults');
 use_ok('config::auto::arch');
-use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
+use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(
-    test_step_thru_runstep
-    rerun_defaults_for_testing
     test_step_constructor_and_description
 );
 use IO::CaptureOutput qw| capture |;
@@ -26,40 +23,16 @@ my ($args, $step_list_ref) = process_options( {
     mode => q{configure},
 } );
 
-my $conf = Parrot::Configure->new;
+my $conf = Parrot::Configure::Step::Test->new;
+$conf->include_config_results( $args );
 
 my $serialized = $conf->pcfreeze();
-
-test_step_thru_runstep( $conf, q{init::defaults}, $args );
 
 my $pkg = q{auto::arch};
 
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
-my $errstr;
-{
-    # As the t/configure/ test suite is currently (Dec 25 2007) constructed,
-    # an uninitialized value warning is generated when this test is run on
-    # Darwin because of a hack in config/auto/arch.pm.  We capture the warning
-    # and verify that we did so if on Darwin.  In the future, we will be able
-    # to eliminate this use of the signal handler because the
-    # Parrot::Configure object will have the same information available to it
-    # as it does during regular configuration.
-    local $SIG{__WARN__} = \&_capture;
-    my $ret = $step->runstep($conf);
-    ok( $ret, "runstep() returned true value" );
-    is($step->result(), q{}, "Result was empty string as expected");
-    if ($^O eq 'darwin') {
-        like(
-            $errstr,
-            qr/Uninitialized value/i,
-            "Caught uninitialized value warning as expected"
-        );
-    } else {
-        pass("Test not needed except on Darwin");
-    }
-}
 
 $conf->replenish($serialized);
 
@@ -69,7 +42,7 @@ $conf->replenish($serialized);
     argv => [ q{--verbose} ],
     mode => q{configure},
 } );
-rerun_defaults_for_testing($conf, $args );
+
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
@@ -95,7 +68,7 @@ $conf->replenish($serialized);
     argv => [ ],
     mode => q{configure},
 } );
-rerun_defaults_for_testing($conf, $args );
+
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
@@ -117,7 +90,7 @@ $conf->replenish($serialized);
     argv => [ ],
     mode => q{configure},
 } );
-rerun_defaults_for_testing($conf, $args );
+
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
@@ -141,7 +114,7 @@ $conf->replenish($serialized);
     argv => [ ],
     mode => q{configure},
 } );
-rerun_defaults_for_testing($conf, $args );
+
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
@@ -165,7 +138,7 @@ $conf->replenish($serialized);
     argv => [ ],
     mode => q{configure},
 } );
-rerun_defaults_for_testing($conf, $args );
+
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
@@ -187,7 +160,7 @@ $conf->replenish($serialized);
     argv => [ ],
     mode => q{configure},
 } );
-rerun_defaults_for_testing($conf, $args );
+
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
@@ -209,7 +182,7 @@ $conf->replenish($serialized);
     argv => [ ],
     mode => q{configure},
 } );
-rerun_defaults_for_testing($conf, $args );
+
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
@@ -231,7 +204,7 @@ $conf->replenish($serialized);
     argv => [ ],
     mode => q{configure},
 } );
-rerun_defaults_for_testing($conf, $args );
+
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
@@ -253,7 +226,7 @@ $conf->replenish($serialized);
     argv => [ ],
     mode => q{configure},
 } );
-rerun_defaults_for_testing($conf, $args );
+
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
@@ -273,7 +246,7 @@ is($conf->data->get('osname'), q{cygwin},
     argv => [ ],
     mode => q{configure},
 } );
-rerun_defaults_for_testing($conf, $args );
+
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
@@ -342,10 +315,7 @@ $conf->options->set( verbose => 1 );
     like( $stdout, qr/platform:\s+?baz/s,
         "Got expected verbose output" );
 }
-
 pass("Completed all tests in $0");
-
-sub _capture { $errstr = $_[0]; }
 
 ################### DOCUMENTATION ###################
 

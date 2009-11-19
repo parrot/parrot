@@ -5,15 +5,13 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  18;
+use Test::More tests =>  13;
 use Carp;
 use lib qw( lib t/configure/testlib );
-use_ok('config::init::defaults');
 use_ok('config::auto::alignptrs');
-use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
+use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(
-    test_step_thru_runstep
     test_step_constructor_and_description
 );
 
@@ -26,9 +24,8 @@ my ($args, $step_list_ref) = process_options(
     }
 );
 
-my $conf = Parrot::Configure->new;
-
-test_step_thru_runstep( $conf, q{init::defaults}, $args );
+my $conf = Parrot::Configure::Step::Test->new;
+$conf->include_config_results( $args );
 
 my $pkg = q{auto::alignptrs};
 
@@ -39,10 +36,11 @@ my $step = test_step_constructor_and_description($conf);
 my $serialized = $conf->pcfreeze();
 
 {
-    $conf->data->set_p5( OSNAME => 'hpux' );
+    $conf->data->set( ptr_alignment => undef );
+    $conf->data->set( OSNAME_provisional => 'hpux' );
     my $ret = $step->runstep($conf);
     ok( $ret, "runstep() returned true value" );
-    if ( $conf->data->get_p5('ccflags') !~ /DD64/ ) {
+    if ( $conf->data->get('ccflags_provisional') !~ /DD64/ ) {
         is($conf->data->get('ptr_alignment'), 4,
             "Got expected pointer alignment for HP Unix");
         is($step->result(), qq{for hpux:  4 bytes},

@@ -126,7 +126,7 @@ sub _get_programs {
 
     $libs = $conf->data->get('libs');
     $libs = join q{ },
-        grep { $conf->data->get_p5('OSNAME') =~ /VMS|MSWin/ || !/^-l(c|gdbm(_compat)?|dbm|ndbm|db)$/ }
+        grep { $conf->data->get('OSNAME_provisional') =~ /VMS|MSWin/ || !/^-l(c|gdbm(_compat)?|dbm|ndbm|db)$/ }
         split( q{ }, $libs );
     $libs = integrate( $libs, $conf->options->get('libs') );
     $libs = prompt( "What libraries should your C compiler use?", $libs )

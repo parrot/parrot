@@ -107,7 +107,7 @@ sub _print_signalpasm {
 EOF
     my ( $i, $name );
     $i = 0;
-    foreach $name ( split( ' ', $conf->data->get_p5('sig_name') ) ) {
+    foreach $name ( split( ' ', $conf->data->get('sig_name_provisional') ) ) {
         print {$O} ".macro_const SIG$name\t$i\n" if $i;
         $i++;
     }

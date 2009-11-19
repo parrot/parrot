@@ -5,16 +5,13 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  22;
+use Test::More tests =>  14;
 use Carp;
 use lib qw( lib t/configure/testlib );
-use_ok('config::init::defaults');
 use_ok('config::auto::cpu');
-use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
+use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(
-    test_step_thru_runstep
-    rerun_defaults_for_testing
     test_step_constructor_and_description
 );
 use IO::CaptureOutput qw( capture );
@@ -26,16 +23,16 @@ my ($args, $step_list_ref) = process_options( {
     mode => q{configure},
 } );
 
-my $conf = Parrot::Configure->new;
+my $conf = Parrot::Configure::Step::Test->new;
+$conf->include_config_results( $args );
 
+my ($pkg, $step);
 my $serialized = $conf->pcfreeze();
 
-test_step_thru_runstep( $conf, q{init::defaults}, $args );
-
-my $pkg = q{auto::cpu};
+$pkg = q{auto::cpu};
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
-my $step = test_step_constructor_and_description($conf);
+$step = test_step_constructor_and_description($conf);
 {
     $conf->data->set('cpuarch' => 'foobar');
     my ($ret, $stdout);
@@ -52,6 +49,7 @@ my $step = test_step_constructor_and_description($conf);
 }
 
 $conf->replenish($serialized);
+$conf->options->set( 'verbose' => undef );
 
 ########### mock cpuarch ###########
 
@@ -59,7 +57,7 @@ $conf->replenish($serialized);
     argv => [ ],
     mode => q{configure},
 } );
-rerun_defaults_for_testing($conf, $args );
+
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);

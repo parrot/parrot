@@ -12,7 +12,7 @@ BEGIN {
     our $topdir = realpath($Bin) . "/../..";
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More qw(no_plan); # tests => 29;
+use Test::More tests => 31;
 use Carp;
 use Parrot::Configure::Options qw| process_options |;
 

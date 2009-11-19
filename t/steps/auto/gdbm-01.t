@@ -5,19 +5,16 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  40;
+use Test::More tests =>  29;
 use Carp;
 use Cwd;
 use File::Spec;
 use File::Temp qw( tempdir );
 use lib qw( lib t/configure/testlib );
-use_ok('config::init::defaults');
 use_ok('config::auto::gdbm');
-use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
+use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(
-    test_step_thru_runstep
-    rerun_defaults_for_testing
     test_step_constructor_and_description
 );
 use IO::CaptureOutput qw| capture |;
@@ -37,11 +34,10 @@ my ($args, $step_list_ref) = process_options( {
     mode => q{configure},
 } );
 
-my $conf = Parrot::Configure->new;
+my $conf = Parrot::Configure::Step::Test->new;
+$conf->include_config_results( $args );
 
 my $serialized = $conf->pcfreeze();
-
-test_step_thru_runstep( $conf, q{init::defaults}, $args );
 
 my $pkg = q{auto::gdbm};
 
@@ -62,7 +58,6 @@ $conf->replenish($serialized);
     argv => [ q{--without-gdbm} ],
     mode => q{configure},
 } );
-rerun_defaults_for_testing($conf, $args );
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
@@ -107,7 +102,6 @@ $conf->replenish($serialized);
     argv => [ q{--without-gdbm} ],
     mode => q{configure},
 } );
-rerun_defaults_for_testing($conf, $args );
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);

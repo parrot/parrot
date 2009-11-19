@@ -34,7 +34,7 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $cmd = $conf->data->get_p5('scriptdirexp') . q{/pod2man};
+    my $cmd = $conf->data->get('scriptdirexp_provisional') . q{/pod2man};
     my $content = capture_output("$cmd docs/parrot.pod") || undef;
 
     return 1 unless defined( $self->_initial_content_check($conf, $content) );
