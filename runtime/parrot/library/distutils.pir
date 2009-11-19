@@ -83,6 +83,9 @@ L<http://github.com/fperrad/wmlscript/blob/master/setup.pir>
     .const 'Sub' _clean_html_pod = '_clean_html_pod'
     register_step_after('clean', _clean_html_pod)
 
+    .const 'Sub' _update = '_update'
+    register_step('update', _update)
+
     .const 'Sub' _install = '_install'
     register_step('install', _install)
     .const 'Sub' _install_dynpmc = '_install_dynpmc'
@@ -239,6 +242,8 @@ Overload the default message
         uninstall:      Uninstall the library.
 
         clean:          Basic cleaning up.
+
+        update:         Update from repository.
 
         help:           Print this help message.
 USAGE
@@ -1324,6 +1329,73 @@ the value is the POD pathname
     $P0 = kv['html_pod']
     clean_key($P0)
   L1:
+.end
+
+=back
+
+=head3 Step update
+
+The following Version Control System are handled :
+
+=over 4
+
+=cut
+
+.sub '_update' :anon
+    .param pmc kv :slurpy :named
+    $I0 = file_exists('CVS')
+    unless $I0 goto L1
+    .tailcall _update_cvs(kv :flat :named)
+  L1:
+    $I0 = file_exists('.git')
+    unless $I0 goto L2
+    .tailcall _update_git(kv :flat :named)
+  L2:
+    $I0 = file_exists('.hg')
+    unless $I0 goto L3
+    .tailcall _update_hg(kv :flat :named)
+  L3:
+    $I0 = file_exists('.svn')
+    unless $I0 goto L4
+    .tailcall _update_svn(kv :flat :named)
+  L4:
+    die "Don't known how to update."
+.end
+
+=item CVS
+
+=cut
+
+.sub '_update_cvs' :anon
+    .param pmc kv :slurpy :named
+    system('cvs update')
+.end
+
+=item Git
+
+=cut
+
+.sub '_update_git' :anon
+    .param pmc kv :slurpy :named
+    system('git pull')
+.end
+
+=item Mercurial
+
+=cut
+
+.sub '_update_hg' :anon
+    .param pmc kv :slurpy :named
+    system('hg pull')
+.end
+
+=item SVN
+
+=cut
+
+.sub '_update_svn' :anon
+    .param pmc kv :slurpy :named
+    system('svn update')
 .end
 
 =back
