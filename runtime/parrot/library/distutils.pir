@@ -2063,7 +2063,8 @@ Return the whole config
 .sub 'install'
     .param string src
     .param string dst
-    .param int exe
+    .param int exe      :optional
+    .param int has_exe  :opt_flag
     # mkpath
     $I1 = 1
   L1:
@@ -2079,6 +2080,7 @@ Return the whole config
     $I0 = newer(dst, src)
     if $I0 goto L3
     cp(src, dst)
+    unless has_exe goto L3
     unless exe goto L3
     chmod(dst, 0o755)
   L3:
