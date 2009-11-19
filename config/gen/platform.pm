@@ -177,8 +177,7 @@ END_HERE
 }
 
 sub _set_limits {
-    my $self = shift;
-    my ($conf, $verbose) = @_;
+    my ($self, $conf) = @_;
     my $platform = $conf->data->get('platform');
 
     my $limits = "config/gen/platform/generic/platform_limits.h";
