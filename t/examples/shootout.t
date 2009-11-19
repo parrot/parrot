@@ -47,9 +47,6 @@ http://shootout.alioth.debian.org/sandbox/
 
 my %skips = (
     'pidigits.pir'    => [ 'not exists $PConfig{HAS_GMP}', 'needs GMP' ],
-    'recursive.pir'   => [ '$PConfig{cpuarch} !~ /86/',    'float JIT broken on non-x86' ],
-    'recursive-2.pir' => [ '$PConfig{cpuarch} !~ /86/',    'float JIT broken on non-x86' ],
-    'revcomp.pir'     => [ '1',              'string buffering segfault, TT #445' ],
 );
 my $INPUT_EXT = '_input';
 foreach my $script (@shootouts) {
