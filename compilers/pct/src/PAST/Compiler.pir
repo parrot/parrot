@@ -2077,7 +2077,8 @@ attribute.
     subpost = get_global '$?SUB'
 
     ##  determine lexical, register, and parameter names
-    .local string name, named, pname, has_pname
+    .local string named, pname, has_pname
+    .local pmc name
     name = node.'name'()
     named = node.'named'()
     pname = self.'unique'('param_')
@@ -2109,8 +2110,11 @@ attribute.
     subpost.'add_param'(pname, 'named'=>named, 'slurpy'=>slurpy, 'call_sig'=>call_sig)
 
   param_done:
+    $I0 = defined name
+    unless $I0 goto param_lex_done
     name = self.'escape'(name)
     ops.'push_pirop'('.lex', name, ops)
+  param_lex_done:
     .return (ops)
 .end
 
