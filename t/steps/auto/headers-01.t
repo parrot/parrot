@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  19;
+use Test::More tests =>  20;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::headers');
@@ -82,11 +82,20 @@ auto::headers::_set_from_Config($conf);
 ok(! $conf->data->get('i_niin'), "Mapping made correctly");
 
 {
-    $conf->data->set( OSNAME_provisional => "msys" );
+    my $os = 'msys';
+    $conf->data->set( OSNAME_provisional => $os );
     my %extra_headers =
         map {$_, 1} auto::headers::_list_extra_headers($conf);
-    ok($extra_headers{'sysmman.h'}, "Special header set for msys");
-    ok($extra_headers{'netdb.h'}, "Special header set for msys");
+    ok($extra_headers{'sysmman.h'}, "Special header set for $os");
+    ok($extra_headers{'netdb.h'}, "Special header set for $os");
+}
+
+{
+    my $os = 'MSWin32';
+    $conf->data->set( OSNAME_provisional => $os );
+    my %extra_headers =
+        map {$_, 1} auto::headers::_list_extra_headers($conf);
+    ok($extra_headers{'sal.h'}, "Special header set for $os");
 }
 
 pass("Completed all tests in $0");
