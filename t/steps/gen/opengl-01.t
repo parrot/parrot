@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  5;
+use Test::More tests =>  7;
 use Carp;
 use lib qw( lib );
 use_ok('config::gen::opengl');
@@ -31,6 +31,12 @@ my $pkg = q{gen::opengl};
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
+
+##### mock no OpenGL #####
+$conf->data->set( has_opengl => 0 );
+my $result = $step->runstep($conf);
+ok($result, "runstep() returned true value");
+is($step->result(), q{skipped}, "Got expected result when no 'has_opengl'" );
 
 pass("Completed all tests in $0");
 
