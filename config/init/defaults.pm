@@ -92,8 +92,11 @@ sub runstep {
     }
 
     # Stage 2 (anticipating needs of config/auto/headers.pm):
-    $conf->data->set(
-        map { $_ . q{_provisional} => $Config{$_} } grep { /^i_/ } keys %Config
+#    $conf->data->set(
+#        map { $_ . q{_provisional} => $Config{$_} } grep { /^i_/ } keys %Config
+#    );
+    $conf->data->set_p5(
+        map { $_ => $Config{$_} } grep { /^i_/ } keys %Config
     );
 
     # Stage 3 (Along similar lines, look up values from Perl 5 special

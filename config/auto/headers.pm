@@ -78,9 +78,12 @@ sub _set_from_Config {
     # probing ourselves
     my %mapping = ( i_niin => "i_netinetin" );
 
+#    for ( grep { /^i_/ } $conf->data->keys_p5() ) {
+#        $conf->data->set( $mapping{$_} || $_ =>
+#            $conf->data->get( $_ . q{_provisional} ) );
+#    }
     for ( grep { /^i_/ } $conf->data->keys_p5() ) {
-        $conf->data->set( $mapping{$_} || $_ =>
-            $conf->data->get( $_ . q{_provisional} ) );
+        $conf->data->set( $mapping{$_} || $_ => $conf->data->get_p5($_) );
     }
 }
 
