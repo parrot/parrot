@@ -43,10 +43,6 @@ sub new {
     for my $k (grep { ! $excluded_options{$_} } keys %{$argsref}) {
         $self->set($k, $argsref->{$k});
     }
-    my $sto = '.configure_parallel.sto';
-    if (-e $sto) {
-        unlink $sto or die "Unable to unlink $sto: $!";
-    }
     return $self;
 }
 
