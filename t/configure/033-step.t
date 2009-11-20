@@ -20,8 +20,6 @@ BEGIN { use Parrot::Configure::Utils; }
 Parrot::Configure::Utils->import(@Parrot::Configure::Utils::EXPORT_OK);
 can_ok( __PACKAGE__, @Parrot::Configure::Utils::EXPORT_OK );
 
-# RT #44455 add verbose tests with some Test::Warn like mechanism
-
 my $cwd = cwd();
 my ( @prompts, $object, $cc, $nonexistent, $command );
 
