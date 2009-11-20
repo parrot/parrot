@@ -241,7 +241,7 @@ OUT
     my @types = qw/string num pmc/;
     foreach my $invalid_type (@types) {
 
-    pir_error_output_like( <<"CODE", <<'OUT', 'opt_flag must be an int.', todo => 'broken');
+    pir_error_output_like( <<"CODE", <<"OUT", 'opt_flag must be an int' );
 
 .sub bar
   .param pmc foo :optional
@@ -253,7 +253,7 @@ OUT
 bar()
 .end
 CODE
-/:opt_flag parameter must be of type 'int'/
+/:opt_flag parameter must be of type 'I', not '$invalid_type'/
 OUT
 
     }
