@@ -26,7 +26,9 @@ add a new step unless that component I<clearly> belongs in a current step. For
 example, if you added a new user-configurable type called C<FOOVAL>, you would
 add the code used to determine its size in F<config/auto/sizes.pm>.  However,
 if you were determining what dynaloading capabilities are available, you would
-create a new step.
+create a new step.  It is strongly recommended that you file a Trac ticket in
+which you state the rationale for adding a new configuration step and sketch
+out what the code in the step would look like.
 
 =head2 Initialization Steps
 
@@ -57,9 +59,10 @@ F<config/auto> folder.
 
 =head2 Generations
 
-Generations create files needed after configuration has completed, such as
-Makefiles and configuration headers. A step containing generations is a
-I<generation step>. Generation steps should be in the F<config/gen> folder.
+Generations create files which will be needed once configuration has
+completed, such as Makefiles and configuration headers. A step containing
+generations is a I<generation step>. Generation steps should be in the
+F<config/gen> folder.
 
 Templates for files to be generated usually have the extension F<.in>.  There
 are variable substitutes and funny macros like C<#IF> and C<#UNLESS>
