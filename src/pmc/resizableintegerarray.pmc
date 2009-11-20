@@ -35,12 +35,15 @@ Returns the integer value of the element at index C<key>.
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
         INTVAL *int_array;
+        INTVAL  size;
 
         if (key < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "ResizableIntegerArray: index out of bounds!");
 
-        if (key >= SELF.get_integer())
+        GET_ATTR_size(interp, SELF, size);
+
+        if (key >= size)
             return 0;
 
         GET_ATTR_int_array(INTERP, SELF, int_array);
@@ -65,7 +68,7 @@ Sets the integer value of the element at index C<key> to C<value>.
                 "ResizableIntegerArray: index out of bounds!");
 
         if (key >= SELF.get_integer())
-            SELF.set_integer_native(key+1);
+            SELF.set_integer_native(key + 1);
 
         GET_ATTR_int_array(INTERP, SELF, int_array);
         int_array[key] = value;
@@ -82,7 +85,6 @@ Resizes the array to C<size> elements.
 */
 
     VTABLE void set_integer_native(INTVAL size) {
-
         INTVAL *int_array;
         INTVAL  resize_threshold;
 
@@ -122,7 +124,7 @@ Resizes the array to C<size> elements.
             }
 
             GET_ATTR_int_array(INTERP, SELF, int_array);
-            int_array = (INTVAL*) mem_sys_realloc((void*) int_array, cur * sizeof (INTVAL));
+            mem_realloc_n_typed(int_array, cur, INTVAL);
             SET_ATTR_int_array(INTERP, SELF, int_array);
             SET_ATTR_size(INTERP, SELF, size);
             SET_ATTR_resize_threshold(INTERP, SELF, cur);
@@ -141,8 +143,22 @@ of the array.
 */
 
     VTABLE void push_integer(INTVAL value) {
-        INTVAL nextix = SELF.get_integer();
-        SELF.set_integer_keyed_int(nextix, value);
+        INTVAL *int_array;
+        INTVAL  nextix;
+        INTVAL  resize_threshold;
+
+        GET_ATTR_size(interp, SELF, nextix);
+        GET_ATTR_resize_threshold(interp, SELF, resize_threshold);
+
+        /* can't always avoid the resize, but don't duplicate the code */
+        if ((nextix && (nextix >= resize_threshold)) || !nextix)
+            SELF.set_integer_native(nextix + 1);
+        else
+            SET_ATTR_size(interp, SELF, nextix + 1);
+
+        /* fetch the array only after resize check; realloc may move it */
+        GET_ATTR_int_array(interp, SELF, int_array);
+        int_array[nextix] = value;
     }
 
 /*
