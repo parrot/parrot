@@ -938,44 +938,47 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
     ASSERT_ARGS(fill_params)
     PMC    *named_used_list = PMCNULL;
     PMC    *arg_sig;
+    INTVAL *raw_params;
     INTVAL  param_count     = VTABLE_elements(interp, raw_sig);
-    INTVAL  positional_args;
     INTVAL  param_index     = 0;
     INTVAL  arg_index       = 0;
     INTVAL  named_count     = 0;
     INTVAL  err_check       = 0;
+    INTVAL  positional_args;
 
     /* Check if we should be throwing errors. This is configured separately
      * for parameters and return values. */
     if (PARROT_ERRORS_test(interp, PARROT_ERRORS_PARAM_COUNT_FLAG))
-            err_check = 1;
+        err_check = 1;
 
     /* A null call object is fine if there are no arguments and no returns. */
     if (PMC_IS_NULL(call_object)) {
-        if (param_count > 0) {
-            if (err_check)
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                    "too few arguments: 0 passed, %d expected", param_count);
-        }
+        if (param_count > 0 && err_check)
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_OPERATION,
+                "too few arguments: 0 passed, %d expected", param_count);
+
         return;
     }
 
     positional_args = VTABLE_elements(interp, call_object);
     GETATTR_CallSignature_arg_flags(interp, call_object, arg_sig);
+    GETATTR_FixedIntegerArray_int_array(interp, raw_sig, raw_params);
 
     /* EXPERIMENTAL! This block adds provisional :call_sig param support on the
        callee side only. Does not add :call_sig arg support on the caller side.
        This is not the final form of the algorithm, but should provide the
        tools that HLL designers need in the interim. */
     if (param_count == 1) {
-        const INTVAL first_flag = VTABLE_get_integer_keyed_int(interp, raw_sig, 0);
+        const INTVAL first_flag = raw_params[0];
+
         if (first_flag & PARROT_ARG_CALL_SIG) {
             *accessor->pmc(interp, arg_info, 0) = call_object;
             return;
         }
     }
     else if (param_count == 2) {
-        const INTVAL second_flag = VTABLE_get_integer_keyed_int(interp, raw_sig, 1);
+        const INTVAL second_flag = raw_params[1];
         if (second_flag & PARROT_ARG_CALL_SIG)
             *accessor->pmc(interp, arg_info, 1) = call_object;
     }
@@ -1002,7 +1005,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
             return;
         }
 
-        param_flags = VTABLE_get_integer_keyed_int(interp, raw_sig, param_index);
+        param_flags = raw_params[param_index];
 
         /* If it's a call_sig, we're done. */
         if (param_flags & PARROT_ARG_CALL_SIG)
@@ -1049,12 +1052,13 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                 param_index++;
                 if (param_index >= param_count)
                     continue;
-                param_flags = VTABLE_get_integer_keyed_int(interp,
-                            raw_sig, param_index);
+
+                param_flags = raw_params[param_index];
 
                 /* Mark the name as used, cannot be filled again. */
                 if (PMC_IS_NULL(named_used_list)) /* Only created if needed. */
                     named_used_list = pmc_new(interp, enum_class_Hash);
+
                 VTABLE_set_integer_keyed_str(interp, named_used_list, param_name, 1);
             }
             else if (named_count > 0) {
@@ -1093,8 +1097,8 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                 INTVAL next_param_flags;
 
                 if (param_index + 1 < param_count) {
-                    next_param_flags = VTABLE_get_integer_keyed_int(interp,
-                            raw_sig, param_index + 1);
+                    next_param_flags = raw_params[param_index + 1];
+
                     if (next_param_flags & PARROT_ARG_OPT_FLAG) {
                         param_index++;
                         *accessor->intval(interp, arg_info, param_index) = 1;
@@ -1118,8 +1122,8 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
             /* Mark the option flag for the parameter to FALSE, it was filled
              * with a default value. */
             if (param_index + 1 < param_count) {
-                next_param_flags = VTABLE_get_integer_keyed_int(interp,
-                        raw_sig, param_index + 1);
+                next_param_flags = raw_params[param_index + 1];
+
                 if (next_param_flags & PARROT_ARG_OPT_FLAG) {
                     param_index++;
                     *accessor->intval(interp, arg_info, param_index) = 0;
@@ -1154,7 +1158,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         if (param_index >= param_count)
             break;
 
-        param_flags = VTABLE_get_integer_keyed_int(interp, raw_sig, param_index);
+        param_flags = raw_params[param_index];
 
         /* All remaining parameters must be named. */
         if (!(param_flags & PARROT_ARG_NAME)) {
@@ -1218,7 +1222,8 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
             param_index++;
             if (param_index >= param_count)
                 continue;
-            param_flags = VTABLE_get_integer_keyed_int(interp, raw_sig, param_index);
+
+            param_flags = raw_params[param_index];
 
             if (VTABLE_exists_keyed_str(interp, call_object, param_name)) {
 
@@ -1257,8 +1262,8 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                     INTVAL next_param_flags;
 
                     if (param_index + 1 < param_count) {
-                        next_param_flags = VTABLE_get_integer_keyed_int(interp,
-                                raw_sig, param_index + 1);
+                        next_param_flags = raw_params[param_index + 1];
+
                         if (next_param_flags & PARROT_ARG_OPT_FLAG) {
                             param_index++;
                             *accessor->intval(interp, arg_info, param_index) = 1;
@@ -1275,8 +1280,8 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                 /* Mark the option flag for the parameter to FALSE, it was filled
                  * with a default value. */
                 if (param_index + 1 < param_count) {
-                    next_param_flags = VTABLE_get_integer_keyed_int(interp,
-                            raw_sig, param_index + 1);
+                    next_param_flags = raw_params[param_index + 1];
+
                     if (next_param_flags & PARROT_ARG_OPT_FLAG) {
                         param_index++;
                         *accessor->intval(interp, arg_info, param_index) = 0;
