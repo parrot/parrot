@@ -35,6 +35,8 @@ L<http://github.com/fperrad/xml/blob/master/setup.pir>
 
 L<http://github.com/fperrad/wmlscript/blob/master/setup.pir>
 
+L<http://github.com/fperrad/lua-batteries/blob/master/setup.pir>
+
 =cut
 
 .sub '__onload' :load :init :anon
@@ -109,6 +111,13 @@ L<http://github.com/fperrad/wmlscript/blob/master/setup.pir>
 
     .const 'Sub' _usage = '_usage'
     register_step('usage', _usage)
+
+    $P0 = get_config()
+    $S0 = $P0['osname']
+    unless $S0 == 'MSWin32' goto L1
+    .const 'Sub' _win32_inno_installer = '_win32_inno_installer'
+    register_step('win32-inno-installer', _win32_inno_installer)
+  L1:
 .end
 
 =head3 Functions
@@ -1865,6 +1874,56 @@ Same options as install.
   L2:
 .end
 
+=head3 Step win32-inno-installer
+
+Only on Windows.
+
+Currently use the Perl script tools/dev/mk_inno_language.pl
+
+=cut
+
+.sub '_win32_inno_installer' :anon
+    .param pmc kv :slurpy :named
+
+    $I0 = exists kv['installable_pbc']
+    unless $I0 goto L1
+    $P0 = kv['installable_pbc']
+    .local string exe, bin, pbc
+    exe = get_exe()
+    $P1 = iter $P0
+  L2:
+    unless $P1 goto L1
+    bin = shift $P1
+    pbc = $P0[bin]
+    $I0 = length pbc
+    $I0 -= 4
+    $S0 = substr pbc, 0, $I0
+    $S1 = 'installable_' . $S0
+    $S1 .= exe
+    $S2 = bin . exe
+    cp($S1, $S2)
+    goto L2
+  L1:
+
+    .local string lang
+    $S0 = cwd()
+    lang = basename($S0)
+
+    .local string cmd
+    cmd = "perl -I"
+    $S0 = get_libdir()
+    cmd .= $S0
+    cmd .= "/tools/lib "
+    cmd .= $S0
+    cmd .= "/tools/dev/mk_inno_language.pl "
+    cmd .= lang
+    system(cmd)
+
+    cmd = "iscc parrot-" . lang
+    cmd .= ".iss"
+    system(cmd)
+.end
+
 =head3 Configuration Helpers
 
 =over 4
@@ -2257,6 +2316,8 @@ Return the whole config
 .sub 'cwd'
     new $P0, 'OS'
     $S0 = $P0.'cwd'()
+    $P0 = split "\\", $S0
+    $S0 = join "/", $P0
     .return ($S0)
 .end
 
