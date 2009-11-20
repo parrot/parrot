@@ -100,6 +100,9 @@ L<http://github.com/fperrad/lua-batteries/blob/master/setup.pir>
     .const 'Sub' _test = '_test'
     register_step('test', _test)
 
+    .const 'Sub' _smoke = '_smoke'
+    register_step('smoke', _smoke)
+
     .const 'Sub' _uninstall = '_uninstall'
     register_step('uninstall', _uninstall)
     .const 'Sub' _uninstall_dynpmc = '_uninstall_dynpmc'
@@ -1498,6 +1501,117 @@ the default value is "t/*.t"
   L3:
     cmd .= $S0
     system(cmd)
+.end
+
+=head3 Step smoke
+
+Unless t/harness exists, run : prove --archive t/*.t
+
+=cut
+
+.sub '_smoke' :anon
+    .param pmc kv :slurpy :named
+    run_step('build', kv :flat :named)
+    $I0 = file_exists('t/harness')
+    if $I0 goto L1
+    .tailcall _smoke_prove(kv :flat :named)
+  L1:
+    die "Don't known how to smoke."
+.end
+
+=over 4
+
+=item prove_exec
+
+option --exec of prove
+
+=item prove_files
+
+the default value is "t/*.t"
+
+=item prove_archive
+
+option --archive of prove
+
+the default value is test.tar.gz
+
+=item smolder_url
+
+=item smolder_tags
+
+=item smolder_comments
+
+=back
+
+=cut
+
+.sub '_smoke_prove' :anon
+    .param pmc kv :slurpy :named
+    .local string cmd
+    cmd = "prove"
+    $I0 = exists kv['prove_exec']
+    unless $I0 goto L1
+    cmd .= " --exec="
+    $S0 = kv['prove_exec']
+    $I0 = index $S0, ' '
+    if $I0 < 0 goto L2
+    cmd .= "\""
+  L2:
+    cmd .= $S0
+    if $I0 < 0 goto L1
+    cmd .= "\""
+  L1:
+    cmd .= " "
+    $S0 = "t/*.t" # default
+    $I0 = exists kv['prove_files']
+    unless $I0 goto L3
+    $S0 = kv['prove_files']
+  L3:
+    cmd .= $S0
+    cmd .= " --archive="
+    .local string archive
+    archive = "test.tar.gz" # default
+    $I0 = exists kv['prove_archive']
+    unless $I0 goto L4
+    archive = kv['prove_archive']
+  L4:
+    cmd .= archive
+    system(cmd)
+
+    $I0 = exists kv['smolder_url']
+    unless $I0 goto L5
+    .local pmc config
+    config = get_config()
+    cmd = "curl -F architecture="
+    $S0 = config['cpuarch']
+    cmd .= $S0
+    cmd .= " -F platform="
+    $S0 = config['osname']
+    cmd .= $S0
+    cmd .= " -F revision="
+    $S0 = config['revision']
+    cmd .= $S0
+    $I0 = exists kv['smolder_tags']
+    unless $I0 goto L6
+    cmd .= " -F tags=\""
+    $S0 = kv['smolder_tags']
+    cmd .= $S0
+    cmd .= "\""
+  L6:
+    $I0 = exists kv['smolder_comments']
+    unless $I0 goto L7
+    cmd .= " -F comments=\""
+    $S0 = kv['smolder_comments']
+    cmd .= $S0
+    cmd .= "\""
+  L7:
+    cmd .= " -F report_file=@"
+    cmd .= archive
+    cmd .= " "
+    $S0 = kv['smolder_url']
+    cmd .= $S0
+    system(cmd)
+  L5:
 .end
 
 =head3 Step install
