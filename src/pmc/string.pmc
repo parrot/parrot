@@ -34,7 +34,7 @@ Initializes the string.
 */
 
     VTABLE void init() {
-        STRING *str_val = Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
+        STRING *str_val = STRINGNULL;
         SET_ATTR_str_val(INTERP, SELF, str_val);
 
         PObj_custom_mark_SET(SELF);
