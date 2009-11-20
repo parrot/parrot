@@ -50,24 +50,26 @@ sub runstep {
         feature_file   => 1
     );
 
+    my @sorted_keys = sort $conf->data->keys();
+
     $conf->data->set( TEMP_header =>
         join "\n", map { $conf->data->get($_)
                        ? "#define PARROT_HAS_HEADER_" . uc(substr $_, 2) . " 1"
                        : "#undef  PARROT_HAS_HEADER_" . uc(substr $_, 2) }
                    grep { /^i_\w+/ }
-                   sort $conf->data->keys()
+                   @sorted_keys
     );
 
     $conf->data->set( TEMP_has_config =>
         join "\n", map { "#define PARROT_" . uc($_) . " 1" }
                    grep { /^HAS_\w+/ && $conf->data->get($_) }
-                   sort $conf->data->keys()
+                   @sorted_keys
     );
 
     $conf->data->set( TEMP_d_config =>
         join "\n", map { "#define PARROT_" . uc(substr $_, 2) . " " . $conf->data->get($_) }
                    grep { /^D_\w+/ }
-                   sort $conf->data->keys()
+                   @sorted_keys
     );
 
     $conf->data->set( TEMP_cli_define =>
