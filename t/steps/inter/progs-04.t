@@ -19,9 +19,8 @@ use Tie::Filehandle::Preempt::Stdin;
 use IO::CaptureOutput qw| capture |;
 
 =for hints_for_testing Testing and refactoring of inter::progs should
-entail understanding of issues discussed in the following RT tickets:
-http://rt.perl.org/rt3/Ticket/Display.html?id=43174; and
-http://rt.perl.org/rt3/Ticket/Display.html?id=41168.
+entail understanding of issues discussed in
+https://trac.parrot.org/parrot/ticket/854
 
 =cut
 
