@@ -107,6 +107,32 @@ get_attrib_index_keyed(PARROT_INTERP, PMC *self, PMC *key, STRING *name)
     return -1;
 }
 
+static PMC *
+find_cached(PARROT_INTERP, PMC *_class, STRING *name)
+{
+    PMC *cache;
+    GETATTR_Class_meth_cache(interp, _class, cache);
+
+    if (PMC_IS_NULL(cache))
+        return PMCNULL;
+
+    return VTABLE_get_pmc_keyed_str(interp, cache, name);
+}
+
+static void
+cache_method(PARROT_INTERP, PMC *_class, STRING *name, PMC *method)
+{
+    PMC *cache;
+    GETATTR_Class_meth_cache(interp, _class, cache);
+
+    if (PMC_IS_NULL(cache)) {
+        cache = pmc_new(interp, enum_class_Hash);
+        SETATTR_Class_meth_cache(interp, _class, cache);
+    }
+
+    VTABLE_set_pmc_keyed_str(interp, cache, name, method);
+}
+
 pmclass Object auto_attrs {
     ATTR PMC *_class;       /* The class this is an instance of. */
     ATTR PMC *attrib_store; /* The attributes store - a resizable PMC array. */
@@ -328,51 +354,66 @@ Queries this object's class to find the method with the given name.
 
 */
     VTABLE PMC *find_method(STRING *name) {
-        Parrot_Object_attributes * const obj         = PARROT_OBJECT(SELF);
-        Parrot_Class_attributes  * const _class      = PARROT_CLASS(obj->_class);
-        STRING                   * const find_method = CONST_STRING(interp, "find_method");
-        PMC           *method        = PMCNULL;
+        Parrot_Object_attributes * const obj    = PARROT_OBJECT(SELF);
+        Parrot_Class_attributes  * const _class = PARROT_CLASS(obj->_class);
+        PMC                             *method = find_cached(interp, obj->_class, name);
 
-        /* Walk and search. One day, we'll use the cache first. */
-        const int num_classes        = VTABLE_elements(interp,
+        if (!PMC_IS_NULL(method))
+            return method;
+        else {
+            STRING * const find_method = CONST_STRING(interp, "find_method");
+            const int      num_classes = VTABLE_elements(interp,
                                                       _class->all_parents);
-        const int all_in_universe    = !CLASS_has_alien_parents_TEST(obj->_class);
-        int i;
 
-        for (i = 0; i < num_classes; i++) {
-            /* Get the class. */
-            PMC * const cur_class =
-                VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
+            const int all_in_universe  =
+                            !CLASS_has_alien_parents_TEST(obj->_class);
+            int i;
 
-            const Parrot_Class_attributes * const class_info = PARROT_CLASS(cur_class);
+            for (i = 0; i < num_classes; i++) {
+                /* Get the class. */
+                PMC * const cur_class =
+                    VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
 
-            /* If there's a vtable override for 'find_method' in the current
-             * class, run that first. */
-            method = Parrot_oo_find_vtable_override_for_class(interp, cur_class,
-                    find_method);
+                const Parrot_Class_attributes * const class_info =
+                        PARROT_CLASS(cur_class);
 
-            if (!PMC_IS_NULL(method)) {
-                PMC *result = PMCNULL;
-                Parrot_pcc_invoke_sub_from_c_args(interp, method,
-                        "PiS->P", SELF, name, &result);
-                return result;
-            }
+                /* If there's a vtable override for 'find_method' in the
+                 * current class, run that first. */
 
-            /* If it's from this universe or the class doesn't inherit from
-             * anything outside of it... */
-            if (all_in_universe || VTABLE_isa(interp, cur_class, CONST_STRING(interp, "Class"))) {
-                method = VTABLE_get_pmc_keyed_str(interp, class_info->methods, name);
-                /* Found it! */
-                if (!PMC_IS_NULL(method))
+                method = Parrot_oo_find_vtable_override_for_class(interp,
+                            cur_class, find_method);
+
+                if (!PMC_IS_NULL(method)) {
+                    PMC *result = PMCNULL;
+                    Parrot_pcc_invoke_sub_from_c_args(interp, method,
+                            "PiS->P", SELF, name, &result);
+
+                    /* break out to the CACHE IF FOUND code */
+                    method = result;
                     break;
-            }
-            else {
-                Parrot_ex_throw_from_c_args(INTERP, NULL, -1,
-                        "Class %Ss inherits from alien parents.", class_info->name);
-            }
-        }
+                }
 
-        return method;
+                /* If it's from this universe or the class doesn't inherit from
+                 * anything outside of it... */
+                if (all_in_universe || VTABLE_isa(interp, cur_class, CONST_STRING(interp, "Class"))) {
+                    method = VTABLE_get_pmc_keyed_str(interp,
+                                    class_info->methods, name);
+
+                    /* Found it! */
+                    if (!PMC_IS_NULL(method))
+                        break;
+                }
+                else
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, -1,
+                        "Class %Ss inherits from alien parents.",
+                        class_info->name);
+            }
+
+            if (!PMC_IS_NULL(method))
+                cache_method(interp, obj->_class, name, method);
+
+            return method;
+        }
     }
 
 /*

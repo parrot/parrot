@@ -476,6 +476,7 @@ pmclass Class auto_attrs {
     ATTR PMC *resolve_method;   /* List of method names the class provides to resolve
                                  * conflicts with methods from roles. */
     ATTR PMC *parent_overrides;
+    ATTR PMC *meth_cache;
 
 /*
 
@@ -510,6 +511,7 @@ arguments. The class is attached to the current HLL namespace.
         _class->attrib_metadata = pmc_new(interp, enum_class_Hash);
         _class->attrib_index    = PMCNULL;
         _class->attrib_cache    = PMCNULL;
+        _class->meth_cache      = PMCNULL;
         _class->resolve_method  = pmc_new(interp, enum_class_ResizablePMCArray);
 
         _class->vtable_overrides = pmc_new(interp, enum_class_Hash);
@@ -610,6 +612,7 @@ Marks any referenced strings and PMCs in the structure as live.
         Parrot_gc_mark_PMC_alive(interp, _class->attrib_index);
         Parrot_gc_mark_PMC_alive(interp, _class->attrib_cache);
         Parrot_gc_mark_PMC_alive(interp, _class->resolve_method);
+        Parrot_gc_mark_PMC_alive(interp, _class->meth_cache);
     }
 
 
