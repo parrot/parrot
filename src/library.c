@@ -159,30 +159,34 @@ void
 parrot_init_library_paths(PARROT_INTERP)
 {
     ASSERT_ARGS(parrot_init_library_paths)
-    PMC *paths;
+    PMC    *paths;
     STRING *entry;
-    STRING *versionlib = NULL;
-    STRING *builddir = NULL;
-
-    PMC * const iglobals = interp->iglobals;
-    PMC * const config_hash =
-            VTABLE_get_pmc_keyed_int(interp, iglobals, (INTVAL) IGLOBALS_CONFIG_HASH);
+    STRING *versionlib      = NULL;
+    STRING *builddir        = NULL;
+    PMC * const iglobals    = interp->iglobals;
+    PMC * const config_hash = VTABLE_get_pmc_keyed_int(interp, iglobals,
+                                (INTVAL)IGLOBALS_CONFIG_HASH);
 
     /* create the lib_paths array */
-    PMC * const lib_paths = pmc_new(interp, enum_class_FixedPMCArray);
+    PMC * const lib_paths   = pmc_new(interp, enum_class_FixedPMCArray);
+
     VTABLE_set_integer_native(interp, lib_paths, PARROT_LIB_PATH_SIZE);
     VTABLE_set_pmc_keyed_int(interp, iglobals,
             IGLOBALS_LIB_PATHS, lib_paths);
 
     if (VTABLE_elements(interp, config_hash)) {
-        STRING * const libkey = CONST_STRING(interp, "libdir");
-        STRING * const verkey = CONST_STRING(interp, "versiondir");
+        STRING * const libkey      = CONST_STRING(interp, "libdir");
+        STRING * const verkey      = CONST_STRING(interp, "versiondir");
         STRING * const builddirkey = CONST_STRING(interp, "build_dir");
+        STRING * const installed   = CONST_STRING(interp, "installed");
+
         versionlib = VTABLE_get_string_keyed_str(interp, config_hash, libkey);
-        entry = VTABLE_get_string_keyed_str(interp, config_hash, verkey);
+        entry      = VTABLE_get_string_keyed_str(interp, config_hash, verkey);
         versionlib = Parrot_str_append(interp, versionlib, entry);
 
-        builddir = VTABLE_get_string_keyed_str(interp, config_hash, builddirkey);
+        if (!VTABLE_get_integer_keyed_str(interp, config_hash, installed))
+            builddir = VTABLE_get_string_keyed_str(interp,
+                                config_hash, builddirkey);
     }
 
     /* each is an array of strings */
