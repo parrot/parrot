@@ -594,17 +594,7 @@ static void *
 get_free_buffer(PARROT_INTERP, ARGIN(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(get_free_buffer)
-    Buffer * const buffer = (Buffer *)pool->get_free_object(interp, pool);
-
-    /* don't mess around with flags */
-    Buffer_bufstart(buffer) = NULL;
-    Buffer_buflen(buffer)   = 0;
-
-    if (pool->object_size > sizeof (Buffer))
-        memset(buffer + 1, 0,
-                pool->object_size - sizeof (Buffer));
-
-    return buffer;
+    return pool->get_free_object(interp, pool);
 }
 
 /*
