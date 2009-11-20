@@ -26,6 +26,8 @@ of primes, the last one found, and the time taken.
 
     new     P6, 'Integer'
     set     P6, 0
+    new     P7, 'Integer'
+
     print   "N primes up to "
     print   P2
     print   " is: "
@@ -48,10 +50,10 @@ LOOP:
     branch  NEXT
 OK:
     inc     P3
-    lt      P3, P4, LOOP
+    le      P3, P4, LOOP
     # We haven't found a factor so it must be a prime
     inc     P6
-    set     P7, P1
+    assign  P7, P1
     # print I1
     # print "\n"    # to get them all
 
