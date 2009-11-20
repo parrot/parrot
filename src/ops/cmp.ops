@@ -552,7 +552,7 @@ op if_null(invar PMC, inconst LABEL) {
 }
 
 op if_null(invar STR, inconst LABEL) {
-  if (!$1) {
+  if (STRING_IS_NULL($1)) {
     goto OFFSET($2);
   }
 }
@@ -576,7 +576,7 @@ op unless_null(invar PMC, inconst LABEL) {
 }
 
 op unless_null(invar STR, inconst LABEL) {
-  if ($1) {
+  if (!STRING_IS_NULL($1)) {
     goto OFFSET($2);
   }
 }
