@@ -253,7 +253,7 @@ my %NCI_TYPE = (
     long         => 'l',
     size_t       => 'l',
     ptrdiff_t    => 'l',
-    # Requires RT 53406
+    # Requires TT #1182
     # longlong     => 'L',
     float        => 'f',
     double       => 'd',
@@ -346,7 +346,7 @@ my @IGNORE = (
     'GetPixelFormat',
     'SetPixelFormat',
 
-    # Can't handle longlong until RT 53406 is done
+    # Can't handle longlong until TT #1182 is done
     'glBufferAddressRangeNV',
     'glClientWaitSync',
     'glUniformui64NV',
