@@ -670,14 +670,26 @@ Returns the PMC value for the element at C<*key>.
 */
 
     VTABLE PMC *get_pmc_keyed_str(STRING *key) {
-        const Hash * const hash = (Hash *)SELF.get_pointer();
-        HashBucket * const b    = parrot_hash_get_bucket(INTERP, hash,
+        const Hash *hash;
+        HashBucket *b = NULL;
+
+        GET_ATTR_hash(interp, SELF, hash);
+
+        /* special case the most key type, for speed */
+        if (hash->key_type == Hash_key_type_STRING)
+            b = parrot_hash_get_bucket(interp, hash, key);
+        else
+            b = parrot_hash_get_bucket(INTERP, hash,
                 hash_key_from_string(INTERP, hash, key));
 
         if (!b)
             return PMCNULL;
 
-        return hash_value_to_pmc(INTERP, hash, b->value);
+        /* special case the most likely value type, for speed */
+        if (hash->entry_type == enum_type_PMC)
+            return (PMC *)b->value;
+        else
+            return hash_value_to_pmc(INTERP, hash, b->value);
     }
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
