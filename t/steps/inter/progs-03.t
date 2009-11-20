@@ -70,10 +70,9 @@ can_ok( 'Tie::Filehandle::Preempt::Stdin', ('READLINE') );
 isa_ok( $object, 'Tie::Filehandle::Preempt::Stdin' );
 
 capture( sub {
-    my $verbose = inter::progs::_get_verbose($conf);
     my $ask = inter::progs::_prepare_for_interactivity($conf);
     my $cc;
-    ($conf, $cc) = inter::progs::_get_programs($conf, $verbose, $ask);
+    ($conf, $cc) = inter::progs::_get_programs($conf, $ask);
     $debug = inter::progs::_get_debug($conf, $ask);
     $debug_validity = inter::progs::_is_debug_setting_valid($debug);
 }, \$stdout);

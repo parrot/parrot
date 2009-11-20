@@ -34,12 +34,10 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $verbose = _get_verbose($conf);
-
     my $ask = _prepare_for_interactivity($conf);
 
     my $cc;
-    ($conf, $cc) = _get_programs($conf, $verbose, $ask);
+    ($conf, $cc) = _get_programs($conf, $ask);
 
     my $debug = _get_debug($conf, $ask);
 
@@ -53,13 +51,6 @@ sub runstep {
     test_compiler($conf, $cc);
 
     return 1;
-}
-
-sub _get_verbose {
-    my $conf = shift;
-    my $verbose = $conf->options->get('verbose');
-    print "\n" if $verbose;
-    return $verbose;
 }
 
 sub _prepare_for_interactivity {
@@ -81,7 +72,7 @@ END
 }
 
 sub _get_programs {
-    my ($conf, $verbose, $ask) = @_;
+    my ($conf, $ask) = @_;
     # Set each variable individually so that hints files can use them as
     # triggers to help pick the correct defaults for later answers.
     my ( $cc, $cxx, $link, $ld, $ccflags, $linkflags, $ldflags, $libs, $lex, $yacc );
@@ -109,7 +100,7 @@ sub _get_programs {
         if $ask;
     $conf->data->set( ccflags => $ccflags );
 
-    $verbose and print " ccflags: $ccflags\n";
+    $conf->options->get('verbose') and print "\nccflags: $ccflags\n";
 
     $linkflags = $conf->data->get('linkflags');
     $linkflags =~ s/-libpath:\S+//g;    # TT #854: No idea why.
