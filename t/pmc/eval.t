@@ -10,7 +10,6 @@ use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
 use Parrot::Test tests => 17;
-use Parrot::Config;
 
 =head1 NAME
 
@@ -395,11 +394,6 @@ CODE
 written
 OUTPUT
 
-TODO: {
-    local $TODO = q|fails eval.thaw test in testr with Segmentation fault - TT #1142|
-        if (defined $ENV{TEST_PROG_ARGS} && $ENV{TEST_PROG_ARGS} =~ /--run-pbc/)
-           && ($PConfig{cpuarch} eq 'amd64' && $PConfig{cc} =~ /cc/);
-
 pir_output_is( <<"CODE", <<'OUTPUT', "eval.thaw" );
 .sub main :main
     .local pmc io, e
@@ -420,8 +414,6 @@ CODE
 hello from foo_1
 hello from foo_1
 OUTPUT
-
-}
 
 pir_output_is( <<"CODE", <<'OUTPUT', "eval.freeze+thaw" );
 .sub main :main
