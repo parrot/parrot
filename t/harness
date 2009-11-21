@@ -116,7 +116,6 @@ else {
     }
     my $results = $harness->runtests(@tests);
 
-    # a non-zero code stops make after test failures (RT #60116)
     exit ( $results->all_passed() ? 0 : 1 );
 }
 
