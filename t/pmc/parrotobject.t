@@ -132,7 +132,6 @@ OUT
 
 # '
 
-# :vtable inheritance; RT #40626
 pir_output_is( <<'CODE', <<'OUT', ':vtable inheritance from core classes' );
 .sub main :main
     $P0 = subclass 'Hash', 'Foo'
