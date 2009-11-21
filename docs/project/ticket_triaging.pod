@@ -25,10 +25,10 @@ in a healthy state.  I<This means you!> Most of the document below still makes
 sense in terms of activities in trac, but the specifics are of course different
 with the new system.
 
-We still have several hundred tickets at the old RT system, but our goal is to
-close out those tickets and (if necessary), replace them with trac tickets.
-The old system is available at L<https://rt.perl.org>.  The Parrot issues are
-in the queue I<parrot>.
+Our previous bug tracking system was RT.  In November 2009 all remaining RT
+tickets were closed, with many being reopened in Trac.  No new issues should
+be opened in RT, but the old system is available at L<https://rt.perl.org>.
+The Parrot issues are in the queue I<parrot>.
 
 =head1 TICKET HANDLING PROCEDURES
 
@@ -334,7 +334,7 @@ or
 
   [tcl]: commit message
 
-=item If related to an RT ticket, use the ticket title
+=item If related to an TT ticket, use the ticket title
 
   [tcl]: #37301: [BUG] 9262: env tests failing on win32
 
