@@ -1,13 +1,6 @@
-#!perl
-# Copyright (C) 2001-2005, Parrot Foundation.
+#!parrot
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( t . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 6;
-use Parrot::Config;
 
 =head1 NAME
 
@@ -26,81 +19,82 @@ expected absolute filenames.
 
 # Common code in the test files
 
-my $template_top = << 'END_CODE';
-.sub _main
+.sub main :main
+    load_bytecode 'runtime/parrot/include/parrotlib.pbc'
 
-  load_bytecode 'runtime/parrot/include/parrotlib.pbc'
-  .local pmc    location_sub
-  .local string location
-END_CODE
+    .include 'test_more.pir'
+    plan(6)
 
-my $template_bottom = << 'END_CODE';
-  print location
-  print "\n"
-
-  end
+    test_include_file_location()
+    test_include_file_location_non_existent()
+    test_imcc_compile_file_location()
+    test_imcc_compile_file_location_non_existent()
+    test_dynext_location()
+    test_dynext_location_non_existent()
 .end
-END_CODE
+
 
 # Testing include_file_location
 
-pir_output_is( << "END_CODE", << 'END_OUT', 'include_file_location' );
-$template_top
-  location_sub = get_global ["_parrotlib"], "include_file_location"
-  location     = location_sub( 'datatypes.pasm' )
-$template_bottom
-END_CODE
-runtime/parrot/include/datatypes.pasm
-END_OUT
+.sub test_include_file_location
+    .local pmc    location_sub
+    .local string location
+    location_sub = get_global ["_parrotlib"], "include_file_location"
+    location     = location_sub( 'datatypes.pasm' )
+    is(location,'runtime/parrot/include/datatypes.pasm', 'include file location' )
+.end
 
-pir_output_is( << "END_CODE", << 'END_OUT', 'include_file_location, non-existent' );
-$template_top
-  location_sub = get_global ['_parrotlib'], "include_file_location"
-  location     = location_sub( 'nonexistent.pasm' )
-$template_bottom
-END_CODE
-
-END_OUT
+.sub test_include_file_location_non_existent
+    .local pmc    location_sub
+    .local string location
+    location_sub = get_global ['_parrotlib'], "include_file_location"
+    location     = location_sub( 'nonexistent.pasm' )
+    is(location, '', 'include file location non-existent')
+.end
 
 # Testing imcc_compile_file_location
 
-pir_output_is( << "END_CODE", << 'END_OUT', 'imcc_compile_file_location' );
-$template_top
-  location_sub = get_global ['_parrotlib'], "imcc_compile_file_location"
-  location     = location_sub( 'parrotlib.pbc' )
-$template_bottom
-END_CODE
-runtime/parrot/include/parrotlib.pbc
-END_OUT
+.sub test_imcc_compile_file_location
+    .local pmc    location_sub
+    .local string location
+    location_sub = get_global ['_parrotlib'], "imcc_compile_file_location"
+    location     = location_sub( 'parrotlib.pbc' )
+    is(location, 'runtime/parrot/include/parrotlib.pbc','imcc compile file location')
+.end
 
-pir_output_is( << "END_CODE", << 'END_OUT', 'imcc_compile_file_location, non-existent' );
-$template_top
-  location_sub = get_global ['_parrotlib'], "imcc_compile_file_location"
-  location     = location_sub( 'nonexistent.pbc' )
-$template_bottom
-END_CODE
-
-END_OUT
+.sub test_imcc_compile_file_location_non_existent
+    .local pmc    location_sub
+    .local string location
+    location_sub = get_global ['_parrotlib'], "imcc_compile_file_location"
+    location     = location_sub( 'nonexistent.pbc' )
+    is(location, '', 'imcc compile file location, non-existent')
+.end
 
 # Testing dynext_location
 
-pir_output_is( << "END_CODE", << "END_OUT", 'dynext_location' );
-$template_top
-  location_sub = get_global ['_parrotlib'], "dynext_location"
-  location     = location_sub( 'libnci_test', '$PConfig{load_ext}' )
-$template_bottom
-END_CODE
-runtime/parrot/dynext/libnci_test$PConfig{load_ext}
-END_OUT
+.sub test_dynext_location
+    .include 'iglobals.pasm'
+    .local pmc config_hash, interp
+    .local pmc    location_sub
+    .local string location
 
-pir_output_is( << "END_CODE", << 'END_OUT', 'dynext_location, non-existent' );
-$template_top
-  location_sub = get_global ['_parrotlib'], "imcc_compile_file_location"
-  location     = location_sub( 'nonexistent' )
-$template_bottom
-END_CODE
+    interp = getinterp
+    config_hash = interp[.IGLOBALS_CONFIG_HASH]
+    $S0 = config_hash['load_ext']
+    location_sub = get_global ['_parrotlib'], "dynext_location"
+    location     = location_sub( 'libnci_test', $S0 )
+    $S1 = 'runtime/parrot/dynext/libnci_test'
+    $S1 .= $S0
+    is(location, $S1, 'dynext_location')
+.end
 
-END_OUT
+.sub test_dynext_location_non_existent
+    .local pmc    location_sub
+    .local string location
+    location_sub = get_global ['_parrotlib'], "imcc_compile_file_location"
+    location     = location_sub( 'nonexistent' )
+    is(location, '', 'dynext location non-existent')
+.end
 
 =head1 AUTHOR
 
@@ -117,4 +111,4 @@ F<runtime/parrot/library/parrotlib.pir>
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 filetype=pir:
