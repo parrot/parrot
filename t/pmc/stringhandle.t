@@ -69,8 +69,6 @@ ok 4 - $P3.open()         # reopening
 ok 7 - $P7.open($S1, $S2) # new file, write mode succeeds
 OUT
 
-# RT #46827 test open file, close file, delete file, reopen previously opened stream
-
 SKIP: {
     skip 'no asynch calls yet' => 1;
 
