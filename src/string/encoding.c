@@ -133,7 +133,7 @@ Parrot_find_encoding(SHIM_INTERP, ARGIN(const char *encodingname))
 *encodingname)>
 
 Loads an encoding. Currently throws an exception because we cannot load
-encodings. See RT #58186.
+encodings. See https://trac.parrot.org/parrot/wiki/StringsTasklist.
 
 =cut
 
