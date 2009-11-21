@@ -1360,7 +1360,7 @@ rpwi:  recursive case
 [got 99]
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "RT #56398: Jonathan's recursive case" );
+pir_output_is( <<'CODE', <<'OUTPUT', "Jonathan's recursive case" );
 .sub 'main' :main
     $P0 = new 'ResizablePMCArray'
     push $P0, 'a'
