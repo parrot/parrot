@@ -58,7 +58,6 @@ Marks the OrderedHash as live.
         if (!h)
             return;
 
-        /* RT #53890 - keys can be NULL on purpose; move to src/hash.c ? */
         for (i = h->mask; i >= 0; --i) {
             HashBucket *b = h->bi[i];
 
