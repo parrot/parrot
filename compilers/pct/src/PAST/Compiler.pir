@@ -199,7 +199,7 @@ Compile the abstract syntax tree given by C<past> into POST.
     set_global '@?BLOCK', blockpast
   have_blockpast:
     null $P0
-    set_global '$?SUB', $P0                                # see RT #49758
+    set_global '$?SUB', $P0
     .tailcall self.'as_post'(past, 'rtype'=>'v')
 .end
 
