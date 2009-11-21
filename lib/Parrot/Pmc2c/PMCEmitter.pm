@@ -276,8 +276,6 @@ my %calltype = (
     "void"     => "v",
     "void*"    => "b",
     "void**"   => "B",
-
-    #"BIGNUM*" => "???" # RT #43731
 );
 
 sub proto {
