@@ -665,9 +665,6 @@ sub preamble {
         s/goto\s+ADDRESS\((.*)\)/{{=$1}}/mg;
         s/HALT\(\)/{{=0}}/mg;
 
-        # RT #43721: This ought to throw errors when attempting to rewrite $n
-        # argument accesses and other things that make no sense in the
-        # preamble.
         $_ = Parrot::Op->rewrite_body( $_, $trans, 'preamble' );
     }
 
