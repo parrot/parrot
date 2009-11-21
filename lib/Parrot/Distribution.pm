@@ -382,8 +382,6 @@ sub get_c_language_files {
     }
 
     return @c_language_files;
-
-    # RT #50046: pir_source_files() fails to collect PIR .t files.
 }
 
 =item C<is_c_exemption()>
