@@ -326,7 +326,7 @@ macro, unfortunately leading to violations of the double-negative rule.)
 
 Avoid dependency on "FIXME" and "TODO" labels: use the external bug tracking
 system.  If a bug must be fixed soon, use "XXX" B<and> put a ticket in the
-bug tracking system.  This means that each "XXX" should have an RT ticket
+bug tracking system.  This means that each "XXX" should have a Trac ticket
 number next to it.
 
 =back
