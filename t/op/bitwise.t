@@ -379,12 +379,6 @@ Tests various bitwise logical operations.
 ## deal with negative numbers.  -- rgr, 2-Jun-07.]
 .sub test_i_reg_shl_and_pmc_shl_are_consistent
 
-    # This seems to be passing fine with --runcore=jit
-    #     my @todo;
-    #     @todo = ( todo => 'broken with JIT (RT #43245)' )
-    #         if ( defined $ENV{TEST_PROG_ARGS} and 
-    #             $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/ );
-
     .include "iglobals.pasm"
     .local pmc interp     # a handle to our interpreter object.
     interp = getinterp
