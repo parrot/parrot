@@ -309,7 +309,7 @@ Accessor (get and set) for the I/O stream's encoding attribute. Currently,
 the only valid value to set is 'utf8' which turns on UTF-8 reading/writing
 mode for the stream. The default behavior is fixed-width 8-bit characters.
 
-=item C<get_fd> [RT #48312]
+=item C<get_fd>
 
 =begin PIR_FRAGMENT
 
