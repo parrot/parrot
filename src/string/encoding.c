@@ -456,7 +456,7 @@ Parrot_find_encoding_converter(PARROT_INTERP, ARGIN(ENCODING *lhs), ARGIN(ENCODI
     UNUSED(lhs);
     UNUSED(rhs);
 
-    /* XXX Apparently unwritten RT #58188 */
+    /* XXX Apparently unwritten https://trac.parrot.org/parrot/wiki/StringsTasklist */
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
         "Can't find encoding converters yet.");
 }
