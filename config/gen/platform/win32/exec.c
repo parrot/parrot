@@ -62,7 +62,6 @@ Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)
     WaitForSingleObject(pi.hProcess, INFINITE);
 
     if (!GetExitCodeProcess(pi.hProcess, &status)) {
-        /* RT #48278 njs Should call GetLastError for failure message? */
         Parrot_warn(interp, PARROT_WARNINGS_PLATFORM_FLAG,
             "Process completed: Failed to get exit code.");
     }
