@@ -1312,7 +1312,6 @@ l1:
     is( $S0, 'Perl6a;PAST;Node', 'typeof returns objects created from get_class' )
 .end
 
-#RT #39045
 .sub isa_bug
     .local pmc base, o1, o2
     base = subclass 'Hash', ['Perl6b'; 'PAST'; 'Node']
