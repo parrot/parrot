@@ -847,7 +847,7 @@ CODE
 \u2001\u2002\u2003\u2004\x{e01ef}\u0114
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', 'escape unicode w/ literal 0, RT #60396' );
+pir_output_is(<<'CODE', <<'OUTPUT', 'escape unicode w/ literal 0' );
 .sub 'main'
     $S0 = unicode:"x/\u0445\u0440\u0435\u043d\u044c_09-10.txt"
     $S1 = escape $S0
