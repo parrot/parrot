@@ -166,9 +166,9 @@ ok 4 - $S0 = $P1.readline($I2)
 ok 5 - $S0 = $P1.readline($I2) # again on same stream
 OUT
 
-# RT #46835 test reading long chunks, eof, and across newlines
+# TT #1204 test reading long chunks, eof, and across newlines
 
-# RT #46837 pir_output_is( <<'CODE', <<'OUT', 'print, read, and readline - asynchronous', todo => 'not yet implemented' );
+# TT #1204 pir_output_is( <<'CODE', <<'OUT', 'print, read, and readline - asynchronous', todo => 'not yet implemented' );
 
 # L<PDD22/I\/O PMC API/=item record_separator>
 pir_output_is( <<'CODE', <<'OUT', 'record_separator', todo => 'not yet implemented' );
@@ -264,16 +264,16 @@ ok 5 - $I0 = $P1.buffer_type() # PIO_FULLBUF
 ok 6 - $S0 = $P1.buffer_type() # PIO_FULLBUF
 OUT
 
-# RT #46839 test effects of buffer_type, not just set/get
+# TT #1204 test effects of buffer_type, not just set/get
 
-# RT #46841
+# TT #1177
 # L<PDD22/I\/O PMC API/=item buffer_size>
 # NOTES: try setting positive, zero, negative int
 # perform print and read ops
 # change buffer size while it contains data
 # try with all 'buffer_type' modes
 
-# RT #46843
+# TT #1178
 # L<PDD22/I\/O PMC API/=item get_fd>
 # NOTES: this is going to be platform dependent
 
