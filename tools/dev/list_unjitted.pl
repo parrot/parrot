@@ -59,7 +59,7 @@ printf "%-13s%5d\n", ( 'Total ops:' , scalar keys %ops );
 
 tools/dev/list_unjitted.pl
 
-=head1 ABSTRACT
+=head1 DESCRIPTION
 
 For a given platform, report the number of ops JITted or not JITted.
 

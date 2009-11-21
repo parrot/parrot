@@ -12,12 +12,16 @@ use File::Spec;
 use Test::More;
 use Test::Harness;
 
-=for comment
+=head1 NAME
 
-A braindead script to check that every .c file has makefile deps
+tools/dev/checkdepend.pl
+
+=head1 DESCRIPTION
+
+A braindead script to check that every F<.c> file has makefile deps
 on its includes.
 
-Requires: a standard (possibly non -j) make run to generate all
+Requires: a standard (possibly non C<-j>) C<make> run to generate all
 required C files first.
 
 =cut

@@ -10,9 +10,10 @@ tools/dev/mk_inno.pl - Create a script for Inno Setup
 
     % perl tools/dev/mk_inno.pl
 
-=head1 SEE ALSO
+=head1 DESCRIPTION
 
-http://www.jrsoftware.org/
+From L<http://www.jrsoftware.org/>:  Inno Setup is a free installer for
+Windows programs.
 
 =cut
 

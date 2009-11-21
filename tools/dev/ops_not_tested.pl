@@ -12,7 +12,13 @@ use Parrot::Config qw/ %PConfig /;
 use Parrot::Op;
 use Parrot::OpLib::core;
 
-=head1 The problem
+=head1 NAME
+
+tools/dev/ops_not_tested.pl
+
+=head1 DESCRIPTION
+
+The problem this program addresses is described in this IRC log:
 
 10:23 <toor> # Tests - ~1/3 of opcodes are uncovered by tests <--
              were can I see which ones are not

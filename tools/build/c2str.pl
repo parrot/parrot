@@ -5,7 +5,11 @@
 
 =head1 NAME
 
-tools/build/c2str.pl - constant string support
+tools/build/c2str.pl
+
+=head1 DESCRIPTION
+
+constant string support
 
 =cut
 

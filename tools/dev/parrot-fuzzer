@@ -16,22 +16,22 @@ import random
 
 '''
 
-=head1 Name
+=head1 NAME
 
 parrot-fuzzer
 
-=head1 Description
+=head1 DESCRIPTION
 
 This is a fuzzer for Parrot, written in Python using the fusil library.  It
 attempts to break Parrot by generating calls to random PIR opcodes.
 
-=head1 Dependencies
+=head1 DEPENDENCIES
 
 This script requires Python 2.5+ to run.  The fusil
 L<http://fusil.hachoir.org/trac> and python-ptrace
 L<http://python-ptrace.hachoir.org/trac> libraries are also required.
 
-=head1 Running
+=head1 USAGE
 
 Short version: C<sudo ./tools/dev/parrot-fuzzer>
 
@@ -49,7 +49,7 @@ which PMCs and ops are available.  It assumes that it's running in the root dir
 of Parrot's source code.  You can use a different dir via
 C<--parrot_root=/some/other/path>.
 
-=head1 Options
+=head1 OPTIONS
 
 =over 4
 
@@ -79,7 +79,7 @@ that a larger number such as 20 does not necessarily result in more failures.
 
 =back
 
-=head1 License
+=head1 LICENSE
 
 This program is distributed under the same license as Parrot itself.
 

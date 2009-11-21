@@ -11,9 +11,10 @@ tools/dev/mk_inno_language.pl - Create a script for Inno Setup
     % cd languages/lang
     % perl ../../tools/dev/mk_inno_language.pl lang
 
-=head1 SEE ALSO
+=head1 DESCRIPTION
 
-http://www.jrsoftware.org/
+From L<http://www.jrsoftware.org/>:  Inno Setup is a free installer for
+Windows programs.
 
 =cut
 
