@@ -332,11 +332,11 @@ or
 
 =item Put a subsystem identifier out the front
 
-  [tcl]: commit message
+  [json]: commit message
 
-=item If related to an TT ticket, use the ticket title
+=item If related to a Trac ticket, use the ticket number
 
-  [tcl]: #37301: [BUG] 9262: env tests failing on win32
+  [json]: Resolve #731
 
 =item Add a "Courtesy of <foo>" if supplied by someone else
 
