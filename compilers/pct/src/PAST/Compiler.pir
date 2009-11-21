@@ -1875,8 +1875,7 @@ node with a 'pasttype' of bind.
 
 =item copy(PAST::Op node)
 
-Implement a 'copy' assignment (at least until we get the 'copy'
-opcode -- see RT #47828).
+Implement a 'copy' assignment (at least until we get the 'copy' opcode).
 
 =cut
 
