@@ -61,9 +61,6 @@ runit_v_pp:
         if (++lru->u.type == lr_types)
             goto runit_v_pp;
         mic->pic->miss_count++;
-        /*
-         * RT #42353 if we got too often here just do a dynamic lookup
-         */
     }
     parrot_pic_find_infix_v_pp(interp, left, right, mic, cur_opcode);
     /* rerun this opcode */
@@ -106,7 +103,6 @@ inline op pic_inline_sub__(inconst INT, invar PMC, invar PMC) :pic {
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ERR_OVERFLOW,
                         "Integer overflow");
             }
-            /* #RT42354 preserve type system */
             VTABLE_morph(interp, left, enum_class_BigInt);
             VTABLE_set_integer_native(interp, left, a);
             mmd_dispatch_p_pip(interp, left, b, left, MMD_SUBTRACT);
@@ -241,7 +237,7 @@ C<pc> of the next opcode and is usually just returned.
 inline op pic_callr__(inconst PMC) :pic :flow {
     Parrot_MIC *mic;
     Parrot_PIC_lru *lru;
-    void *args[6];      /* RT #42355 ARG_MAX */
+    void *args[6];
     parrot_context_t *ctx;
     opcode_t *pc;
     void **pred_pc;
@@ -290,7 +286,6 @@ inline op pic_callr__(inconst PMC) :pic :flow {
     pc = CUR_OPCODE + 2 + n_args + 3 + 3 + 2;
     args[1 + n_args] = pc;
     lru = &mic->lru;
-    /* RT #42356 verify $1 didn't change */
     (void) ((interface_f)lru->f.real_function)(interp, sig_bits, args);
     goto ADDRESS(pc);
 }
