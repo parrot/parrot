@@ -1349,7 +1349,6 @@ l1:
 
 .namespace []   # revert to root for next test
 
-#RT #39056
 .sub vtable_override_once_removed
     .local pmc base
     $P0 = get_class 'Integer'
