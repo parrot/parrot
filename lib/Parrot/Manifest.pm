@@ -22,6 +22,12 @@ Parrot::Manifest - Re-create MANIFEST and MANIFEST.SKIP
     $print_str     = $mani->prepare_gitignore();
     $mani->print_gitignore($print_str) if $need_for_skip;
 
+=head1 DESCRIPTION
+
+This package exports no functions.  A Parrot::Manifest object is used in
+F<tools/dev/mk_manifest_and_skip.pl>, which in turn is the basis of C<make
+manifest_tests>.
+
 =cut
 
 package Parrot::Manifest;

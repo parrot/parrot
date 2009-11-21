@@ -8,6 +8,16 @@ use Exporter;
 %EXPORT_TAGS = (all => \@EXPORT_OK);
 $VERSION = '1.06';
 
+=head1 NAME
+
+IO::CaptureOutput - capture STDOUT and STDERR from Perl code, subprocesses or XS
+
+=head1 DESCRIPTION
+
+Included from CPAN.  Thanks to David Golden for reviving this useful module.
+
+=cut
+
 sub capture (&@) { ## no critic
     my ($code, $output, $error) = @_;
     for ($output, $error) {

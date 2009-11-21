@@ -7,6 +7,8 @@ Parrot::Harness::Options - Handle options and argument processing in F<t/harness
 
 =head1 DESCRIPTION
 
+This package exports subroutines on request only.  The subroutines are useful
+in providing command-line options to Parrot's F<t/harness>.
 
 =cut
 
