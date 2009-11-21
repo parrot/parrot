@@ -1162,7 +1162,7 @@ CODE
 Explosion T0
 OUT
 
-pir_error_output_like( <<'CODE', <<OUT, "NameSpace with no class, RT #55620" );
+pir_error_output_like( <<'CODE', <<OUT, "NameSpace with no class" );
 .sub 'main' :main
     $P1 = new ['NameSpace']
     set_args '(0)', $P1
