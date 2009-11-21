@@ -526,7 +526,7 @@ Parses terms beginning with backslash.
 
     ##  if it's a word character, it may be negated
     isnegated = is_cclass .CCLASS_UPPERCASE, backchar, 0
-    ##  $S0 = downcase charlist   FIXME: RT #48108
+    ##  $S0 = downcase charlist
             $I0 = ord backchar
             $S0 = chr $I0
             backchar = downcase $S0
