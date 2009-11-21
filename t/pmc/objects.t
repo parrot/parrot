@@ -1371,7 +1371,6 @@ l1:
 
 .namespace []   # revert to root for next test
 
-#RT #40626
 .sub vtable_fails_for_subclasses_of_core_classes
     $P0 = subclass 'Hash', 'Foo41'
     $P0 = subclass 'Hash', 'Bar41'
