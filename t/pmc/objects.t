@@ -1398,7 +1398,6 @@ l1:
 
 .namespace []   # revert to root for next test
 
-#RT #3901
 .sub super___init_called_twice
     $P0 = newclass 'Foo42'
     $P1 = subclass $P0, 'Bar42'
