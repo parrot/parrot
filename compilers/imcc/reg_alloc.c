@@ -394,7 +394,7 @@ imc_reg_alloc(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
     rebuild_reglist(unit);
 
     /*
-     * RT #57028 - graph coloring reg allocator ignores local_branch/local_return
+     * TT #1281 - graph coloring reg allocator ignores local_branch/local_return
     if (IMCC_INFO(interp)->allocator == IMCC_VANILLA_ALLOCATOR)
     */
         vanilla_reg_alloc(interp, unit);
