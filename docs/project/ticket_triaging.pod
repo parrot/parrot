@@ -381,18 +381,6 @@ intentions clear.
 Look at past commit messages, and L<http://cia.navi.cx/stats/project/parrot>
 for more best practices.
 
-=item OBTW
-
-There is a completely separate RT instance in which parrot tickets may
-occasionally appear. If you find one in this queue, create a new ticket in
-our RT system, add the original poster as a requestor to the new ticket, and
-remove yourself.
-
-Then, close the ticket in the original system, and include a reference to the
-new ticket's url in our system when you close the original ticket.
-
-L<https://rt.cpan.org/Dist/Display.html?Queue=parrot>
-
 =back
 
 =cut
