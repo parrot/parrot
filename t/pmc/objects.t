@@ -1479,7 +1479,6 @@ handler:
 end:
 .end
 
-# RT #46845
 .sub getting_null_attribute
     newclass $P1, "Foo51"
     addattribute $P1, "i"
