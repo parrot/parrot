@@ -232,8 +232,7 @@ CODE
 3
 OUT
 
-pir_error_output_like( <<'CODE', <<'OUT',
-    'handle too few positional arguments' );
+pir_error_output_like( <<'CODE', <<'OUT', 'handle too few positional arguments' );
 .namespace ['Foo']
 
 .sub invoke :vtable
