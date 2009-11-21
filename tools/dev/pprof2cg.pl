@@ -6,22 +6,20 @@
 use strict;
 use warnings;
 
-# use Data::Dumper;
-
-=head1 Name
+=head1 NAME
 
 tools/dev/pprof2cg.pl
 
-=head1 Description
+=head1 DESCRIPTION
 
 Convert the output of Parrot's profiling runcore to a Callgrind-compatible
 format.
 
-=head1 Synopsis
+=head1 SYNOPSIS
 
 perl tools/dev/pprof2cg.pl parrot.pprof.1234
 
-=head1 Usage
+=head1 USAGE
 
 Generate a profile by passing C<-Rprofiling> to parrot, for example C<./parrot
 -Rprofiling perl6.pbc hello.p6>.  Once execution completes, C<parrot> will
@@ -34,7 +32,7 @@ To generate a Callgrind-compatible profile, run this script with the pprof
 filename as the first argument.  The output file usable by kcachegrind will be
 in parrot.out.XXXX, where XXXX again is the PID of the original parrot process.
 
-=head1 Environment Variables
+=head1 ENVIRONMENT VARIABLES
 
 =head2 PARROT_PROFILING_OUTPUT
 
@@ -47,7 +45,7 @@ existing files.
 
 main(\@ARGV);
 
-=head1 Internal Data Structures
+=head1 INTERNAL DATA STRUCTURES
 
 =over 4
 
@@ -106,7 +104,7 @@ contained in C<$stats>.
 
 =back
 
-=head1 Functions
+=head1 FUNCTIONS
 
 =over 4
 
