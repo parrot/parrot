@@ -394,7 +394,7 @@ static STRING*
 decompose(PARROT_INTERP, SHIM(STRING *src))
 {
     ASSERT_ARGS(decompose)
-    /* TODO: RT #59696 Implement this. */
+    /* TODO: https://trac.parrot.org/parrot/wiki/StringsTasklist Implement this. */
     UNIMPL;
 }
 
@@ -642,7 +642,7 @@ static void
 upcase_first(PARROT_INTERP, SHIM(STRING *source_string))
 {
     ASSERT_ARGS(upcase_first)
-    /* TODO: RT #59696 Implement this. */
+    /* TODO: https://trac.parrot.org/parrot/wiki/StringsTasklist Implement this. */
     UNIMPL;
 }
 
@@ -662,7 +662,7 @@ static void
 downcase_first(PARROT_INTERP, SHIM(STRING *source_string))
 {
     ASSERT_ARGS(downcase_first)
-    /* TODO: RT #59696 Implement this. */
+    /* TODO: https://trac.parrot.org/parrot/wiki/StringsTasklist Implement this. */
     UNIMPL;
 }
 
@@ -682,7 +682,7 @@ static void
 titlecase_first(PARROT_INTERP, SHIM(STRING *source_string))
 {
     ASSERT_ARGS(titlecase_first)
-    /* TODO: RT #59696 Implement this. */
+    /* TODO: https://trac.parrot.org/parrot/wiki/StringsTasklist Implement this. */
     UNIMPL;
 }
 
@@ -750,7 +750,7 @@ cs_rindex(PARROT_INTERP, SHIM(STRING *source_string),
         SHIM(STRING *search_string), SHIM(UINTVAL offset))
 {
     ASSERT_ARGS(cs_rindex)
-    /* TODO: RT #59696 Implement this. */
+    /* TODO: https://trac.parrot.org/parrot/wiki/StringsTasklist Implement this. */
     UNIMPL;
 }
 
