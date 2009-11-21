@@ -574,7 +574,7 @@ CODE
 10
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', "RT # 34991" );
+pir_output_is( <<'CODE', <<'OUT', "const int" );
 .const int c = 12
 .sub test
     .local num a
