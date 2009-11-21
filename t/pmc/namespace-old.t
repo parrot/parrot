@@ -1132,7 +1132,7 @@ CODE
 /Finding method/
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUT, "iterate through a NameSpace PMC, RT #39978" );
+pir_output_is( <<'CODE', <<OUT, "iterate through a NameSpace PMC" );
 .sub main :main
      $P0 = new ['String']
      $P0 = "Ook...BANG!\n"
