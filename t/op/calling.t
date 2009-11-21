@@ -2433,7 +2433,7 @@ CODE
 /too many arguments passed\(1\) - 0 params expected/
 OUTPUT
 
-# See Rakudo RT http://rt.perl.org/rt3/Ticket/Display.html?id=62730
+# See Rakudo queue http://rt.perl.org/rt3/Ticket/Display.html?id=62730
 pir_output_is( <<'CODE', <<'OUTPUT', "named from register, not constant" );
 .sub 'main'
     $S0 = 'foo'
@@ -2460,7 +2460,7 @@ foo
 42
 OUTPUT
 
-# See Rakudo RT #62730
+# See Rakudo queue http://rt.perl.org/rt3/Ticket/Display.html?id=62730
 pir_output_is( <<'CODE', <<'OUTPUT', "Handling :flat of emtpy arguments" );
 .sub 'main'
     $P0   = new ['Undef']
@@ -2480,7 +2480,7 @@ ResizablePMCArray
 Undef
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "Tailcall from vtable (Was RT #41583)" );
+pir_output_is( <<'CODE', <<'OUTPUT', "Tailcall from vtable" );
 
 .sub main :main
 $P1 = newclass "Foo"
