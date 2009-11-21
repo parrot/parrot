@@ -34,7 +34,7 @@ my $object_map = {
     n   => q<N0>,
     nc  => q<13.013>,
     p   => q<P0>,
-    pc  => undef,                  ## RT #39992 figure out how to test this type
+    pc  => undef,                  ## TT #1158 figure out how to test this type
     s   => q<S0>,
     sc  => q<'foo'>,
 };
