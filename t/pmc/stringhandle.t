@@ -74,7 +74,7 @@ SKIP: {
 
     pir_output_is( <<'CODE', <<'OUT', 'open and close - asynchronous' );
 .sub 'test' :main
-    $P1 = # RT #46831 create a callback here
+    $P1 = # TT #1204 create a callback here
     $P0 = new ['StringHandle']
 
     $P0.'open'('README')
