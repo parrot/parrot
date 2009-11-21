@@ -825,7 +825,7 @@ _mk_const(ARGMOD(SymHash *hsh), ARGIN(const char *name), int t)
         r->type |= VT_ENCODED;
     }
 
-    /* autopromote big ints to floats; fallout from 
+    /* autopromote big ints to floats; fallout from
      * http://rt.perl.org/rt3/Ticket/Display.html?id=53908
      * */
     if (t == 'I') {
