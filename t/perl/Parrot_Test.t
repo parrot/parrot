@@ -90,10 +90,6 @@ is( Parrot::Test::per_test( undef, 0 ),     undef, 'per_test() invalid first arg
 is( Parrot::Test::per_test( 0,     undef ), undef, 'per_test() invalid second arg' );
 is( Parrot::Test::per_test( undef, undef ), undef, 'per_test() two invalid args' );
 
-# RT #46893 test write_code_to_file(), plan(), skip(), slurp_file()
-
-# test the test functions from Parrot::Test
-# RT #46893: test the untested test functions
 my ( $desc, $err, $line );
 
 # PASM
