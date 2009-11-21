@@ -1010,7 +1010,8 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
      */
     branched = eval_ins(interp, op, found, r);
     if (branched == -1) {
-         /* Don't set ok (See RT #43048 for info) */
+         /* Don't set ok 
+          * (See http://rt.perl.org/rt3/Ticket/Display.html?id=43048 for info) */
          return NULL;
     }
     /*
