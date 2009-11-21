@@ -2303,7 +2303,7 @@ CODE
 /named arguments must follow all positional arguments/
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "RT #40490 - flat/slurpy named arguments" );
+pir_output_is( <<'CODE', <<'OUTPUT', "flat/slurpy named arguments" );
 .sub 'main' :main
         .local pmc args
         args = new 'Hash'
