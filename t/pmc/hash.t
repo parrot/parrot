@@ -126,7 +126,6 @@ well.
 .end
 
 .sub null_key
-    # See RT #59542
     new $P0, ['Hash']
     $P0['yum'] = 5
     null $S0
