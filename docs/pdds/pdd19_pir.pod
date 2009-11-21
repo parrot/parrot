@@ -59,7 +59,7 @@ identifiers.
     A42
 
 Opcode names are not reserved words in PIR, and may be used as variable names.
-For example, you can define a local variable named C<print>.  [See RT #24251]
+For example, you can define a local variable named C<print>.  
 Note that currently, by using an opcode name as a local variable name, the
 variable will I<hide> the opcode name, effectively making the opcode unusable.
 In the future this will be resolved.
