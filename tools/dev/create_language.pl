@@ -229,7 +229,8 @@ sub create_makefile {
     if ($^O eq 'MSWin32') {
         # use backslashes.
         $maketext =~ s{/}{\\}g;
-        # wildcards (for clean rules) need an additional backslash, see Rakudo RT #65006
+        # wildcards (for clean rules) need an additional backslash,
+        # see Rakudo http://rt.perl.org/rt3/Ticket/Display.html?id=65006
         $maketext =~ s{\\\*}{\\\\*}g;
         # use forward slashes again for HTTP URLs
         $maketext =~ s{http:\S+}{ do {my $t = $&; $t =~ s'\\'/'g; $t} }eg;
