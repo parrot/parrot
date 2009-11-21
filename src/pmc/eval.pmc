@@ -191,7 +191,7 @@ Invokes the first subroutine in the eval code.
             return;
         }
 
-        /* RT #46685 create PF API, move it there */
+        /* TT #1315 create PF API, move it there */
         seg = (PackFile_Segment *)cur_cs->const_table;
         if (seg) {
             PackFile_Segment_destroy(INTERP, seg);
