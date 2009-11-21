@@ -565,7 +565,7 @@ t_class_meth:
 
 
 # L<PDD15/Class PMC API/=item does>
-.sub 'more does' # RT #42974
+.sub 'more does'
     .local pmc attrs
     attrs = new ['Hash']
 
