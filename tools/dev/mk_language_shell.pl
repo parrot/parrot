@@ -1182,7 +1182,6 @@ the end of the vector.
         } else if (new_size > old_size) {
             pos = 0;
             for (; new_size != old_size; old_size++, pos++) {
-                /* RT #48196 clone this? */
                 VTABLE_push_pmc(INTERP, SELF,
                     VTABLE_get_pmc_keyed_int(INTERP, SELF, pos));
             }
