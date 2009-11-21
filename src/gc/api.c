@@ -750,10 +750,6 @@ Parrot_gc_allocate_string_storage(PARROT_INTERP, ARGOUT(STRING *str),
     Buffer_buflen(str)   = 0;
     Buffer_bufstart(str) = NULL;
 
-    /* there's no sense in allocating zero memory, when the overhead of
-     * allocating a string is one pointer; this can fill the pools in an
-     * uncompactable way.  See RT #42320.
-     */
     if (size == 0)
         return;
 
