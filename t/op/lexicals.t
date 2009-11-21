@@ -1249,7 +1249,7 @@ Sub 2 was called 4 times. Any sub was called 11 times.
 Sub 3 was called 4 times. Any sub was called 12 times.
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'Double-inner scope called from closure (RT #56184)' );
+pir_output_is( <<'CODE', <<'OUTPUT', 'Double-inner scope called from closure' );
 .sub 'main' :main
     .local pmc x
     x = 'foo'()
