@@ -190,7 +190,7 @@ CODE
 1
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'RT #41733 - Execution ends after returning from invoke' );
+pir_output_is( <<'CODE', <<'OUT', 'Execution ends after returning from invoke' );
 .namespace ['Foo']
 
 .sub invoke :vtable
