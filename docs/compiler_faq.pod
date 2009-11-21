@@ -179,7 +179,7 @@ created as a Coroutine PMC:
 =end PIR
 
 The sub C<bar> will return to the caller of C<foo>. (Warning! This fails
-in some cases. XXX Find the RT ticket and reference it here.)
+in some cases. XXX Find the TT ticket and reference it here.)
 
 =head2 How do I generate a sub call with a variable-length parameter
 list in PIR?
