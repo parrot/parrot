@@ -81,8 +81,6 @@ OUT
 # should be in the PIR code
 unlink 'new_file';
 
-# RT #46827 test open file, close file, delete file, reopen previously opened stream
-
 SKIP: {
     skip 'no asynch calls yet' => 1;
 
