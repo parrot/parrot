@@ -70,7 +70,8 @@ Parrot_exit(PARROT_INTERP, int status)
     /* we are well "below" the runloop now, where lo_var_ptr
      * is set usually - exit handlers may run some resource-hungry
      * stuff like printing profile stats - a GC run would kill
-     * resources - RT #46405 reset stacktop or better disable GC
+     * resources
+     * http://rt.perl.org/rt3/Ticket/Display.html?id=46405 (resolved)
      */
     /*
      * we don't allow new exit_handlers being installed inside exit handlers
