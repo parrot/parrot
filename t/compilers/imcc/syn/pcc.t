@@ -510,7 +510,6 @@ CODE
 foo
 OUT
 
-#RT #58866 calling a PIR sub with 206 params segfaults parrot
 my $too_many_args = <<'CODE';
 .sub main :main
     'foo'(_ARGS_)
