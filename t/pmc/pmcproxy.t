@@ -198,7 +198,6 @@ Tests the PMCProxy PMC.
 .end
 
 
-#RT #56816 - issues with PMCProxy, 'typeof', and 'get_class'
 .sub get_class_and_typeof_return_same_pmcproxy
     $P0 = get_class 'Integer'
     $P1 = new $P0
