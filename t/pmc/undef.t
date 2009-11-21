@@ -170,10 +170,10 @@ Tests mainly morphing undef to other types.
     $P1 = new ['Undef']
     $P2 = new ['Undef']
     if $P1 == $P2 goto ok
-        ok( 0, 'Undef == Undef (RT #33603)' )
+        ok( 0, 'Undef == Undef' )
         .return()
   ok:
-    ok( 1, 'Undef == Undef (RT #33603)' )
+    ok( 1, 'Undef == Undef' )
 .end
 
 .sub set_undef_to_object
