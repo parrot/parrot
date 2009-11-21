@@ -1123,7 +1123,7 @@ sub _handle_test_options {
 
     my $out = $options->{'STDOUT'} || '';
     my $err = $options->{'STDERR'} || '';
-    ##  File::Temp overloads 'eq' here, so we need the quotes. RT #58840
+    ##  File::Temp overloads 'eq' here, so we need the quotes.
     if ( $out and $err and "$out" eq "$err" ) {
         $err = '&STDOUT';
     }
