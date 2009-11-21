@@ -484,7 +484,7 @@ C<value>.
         else {
             PMC *box = SELF.get_pmc_keyed_int(k);
 
-            /* RT #46675: autovivify an Array and insert it in SELF */
+            /* TT #1295: autovivify an Array and insert it in SELF */
             if (!box)
                 box = pmc_new(INTERP, SELF.type());
 
@@ -572,7 +572,7 @@ Sets the PMC at index C<key> to C<value>.
         else {
             PMC *box = SELF.get_pmc_keyed_int(k);
 
-            /* RT #46675: autovivify an Array and insert it in SELF */
+            /* TT #1295: autovivify an Array and insert it in SELF */
             if (!box)
                 box = pmc_new(INTERP, SELF.type());
 
