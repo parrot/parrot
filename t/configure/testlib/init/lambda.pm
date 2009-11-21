@@ -5,6 +5,10 @@
 
 t/configure/testlib/init/lambda.pm - Module used in configuration tests
 
+=head1 DESCRIPTION
+
+Nonsense module used only in testing the configuration system.
+
 =cut
 
 package init::lambda;
