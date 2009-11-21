@@ -61,7 +61,7 @@ sub new {
     {
 
       # autogenerate for nonstandard types
-      # (RT #44433: is this appropriate or do we want them to each be
+      # (TT #1240: is this appropriate or do we want them to each be
       # explicitly cleared to have RO ?)
         no strict 'refs';
         if ( !@{ ref($self) . '::ISA' } ) {
