@@ -2492,7 +2492,7 @@ TEMPLATE
 
 .sub '_clean_win32_installer' :anon
     .param pmc kv :slurpy :named
-    system('del setup-*.exe')
+    system('if exist setup-parrot-*.exe del setup-parrot-*.exe')
 .end
 
 =head3 Configuration Helpers
