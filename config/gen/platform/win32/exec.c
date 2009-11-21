@@ -132,7 +132,6 @@ Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)
 
     /* Get exit code. */
     if (!GetExitCodeProcess(pi.hProcess, &status)) {
-        /* RT #48278 njs Should call GetLastError for failure message? */
         Parrot_warn(interp, PARROT_WARNINGS_PLATFORM_FLAG,
             "Process completed: Failed to get exit code.");
     }
