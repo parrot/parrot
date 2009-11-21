@@ -264,7 +264,6 @@ Writes C<$code> into the file C<$code_f>.
 
 Generate functions that are only used by a couple of
 Parrot::Test::<lang> modules.
-See RT #43266.
 This implementation is experimental and currently only works
 for languages/pipp.
 
