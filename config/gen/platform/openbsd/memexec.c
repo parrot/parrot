@@ -11,7 +11,7 @@ memexec.c
 
 =head1 DESCRIPTION
 
-TT #292
+Memory protection functions.
 
 =head2 Functions
 

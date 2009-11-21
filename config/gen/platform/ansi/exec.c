@@ -11,7 +11,7 @@ config/gen/platform/ansi/exec.c
 
 =head1 DESCRIPTION
 
-TT #292
+Functions for dealing with child processes and Execs. (Currently not implemented on this platform.)
 
 =head2 Functions
 

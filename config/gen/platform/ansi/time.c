@@ -11,7 +11,7 @@ config/gen/platform/ansi/time.c
 
 =head1 DESCRIPTION
 
-TT #292
+Time-related functions.
 
 =head2 Functions
 

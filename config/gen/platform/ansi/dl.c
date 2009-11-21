@@ -11,7 +11,7 @@ config/gen/platform/ansi/dl.c
 
 =head1 DESCRIPTION
 
-TT #292
+Dynlib stuff.  (Currently, just placeholders.)
 
 =head2 Functions
 
