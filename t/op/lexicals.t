@@ -1323,7 +1323,7 @@ outer foo try 3
 inner foo try 3
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "RT #56398: Bob's recursion bug");
+pir_output_is( <<'CODE', <<'OUTPUT', "Bob's recursion bug");
 .sub main :main
     rpwi(0)
 .end
