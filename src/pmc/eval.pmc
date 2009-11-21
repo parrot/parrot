@@ -371,7 +371,7 @@ Unarchives the code.
         pf->directory.num_segments = 0;
 
         /*
-         * RT #46687 this isn't ok - it seems that the packfile
+         * TT #1292 this isn't ok - it seems that the packfile
          *     gets attached to interp->code and is
          *     destroyed again during interpreter destruction
          */
