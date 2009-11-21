@@ -1098,7 +1098,7 @@ CODE
 get_class was called
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "method called on non-object (RT #50440)" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "method called on non-object" );
 .namespace [ 'Foo' ]
 
 .sub 'blah' :method
