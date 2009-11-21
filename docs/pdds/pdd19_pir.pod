@@ -844,7 +844,7 @@ becomes:
 =end PIR_FRAGMENT
 
 Note that this only works for opcodes that have have a leading C<OUT>
-parameter. [this restriction unimplemented: RT #36283]
+parameter. [this restriction unimplemented: TT #906]
 
 =item ([<var1> [:<mod1> ...], ...]) = <var2>([<arg1> [:<mod2> ...], ...])
 
