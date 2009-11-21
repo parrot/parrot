@@ -11,7 +11,7 @@ config/gen/platform/ansi/exec.c
 
 =head1 DESCRIPTION
 
-RT #48264
+TT #292
 
 =head2 Functions
 
