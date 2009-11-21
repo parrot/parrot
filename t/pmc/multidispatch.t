@@ -1226,7 +1226,7 @@ CODE
 Called multi for class
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "unicode sub names and multi (RT #39254)" );
+pir_output_is( <<'CODE', <<'OUTPUT', "unicode sub names and multi" );
 .sub unicode:"\u7777" :multi(string)
   .param pmc arg
   print 'String:'
