@@ -595,9 +595,6 @@ do_pre_process(PARROT_INTERP)
             case NAMESPACE:     printf(".namespace "); break;
             case CONST:         printf(".const "); break;
             case PARAM:         printf(".param "); break;
-            /* RT #46147: print out more information about the macro */
-            /* case MACRO:         yylex(&val, interp, yyscanner);
-                                break; */ /* swallow nl */
             case MACRO:         printf(".macro "); break;
 
             case GOTO:          printf("goto ");break;
