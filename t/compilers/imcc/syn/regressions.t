@@ -116,7 +116,7 @@ CODE
 /Bareword method name 'lower' not allowed/
 OUT
 
-pir_error_output_like( <<'CODE', <<'OUT', ':: not allowed in identifiers (RT #48735)');
+pir_error_output_like( <<'CODE', <<'OUT', ':: not allowed in identifiers');
 .sub foo :main
   .local string a::b
   a::b = 'HI' 
