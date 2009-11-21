@@ -10,11 +10,15 @@ use Parrot::Test tests => 1;
 
 =head1 NAME
 
-t/library/pge-hs.t - Grammar Engine Haskell Output tests
+t/library/pge-hs.t
 
 =head1 SYNOPSIS
 
         % prove t/library/pge-hs.t
+
+=head1 DESCRIPTION
+
+Grammar Engine Haskell Output tests
 
 =cut
 

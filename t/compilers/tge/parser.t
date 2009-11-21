@@ -10,11 +10,15 @@ use Parrot::Test tests => 2;
 
 =head1 NAME
 
-t/parser.t - TGE::Parser tests
+t/parser.t
 
 =head1 SYNOPSIS
 
         $ prove t/compilers/tge/parser.t
+
+=head1 DESCRIPTION
+
+TGE::Parser tests
 
 =cut
 

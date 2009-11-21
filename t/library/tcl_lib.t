@@ -4,13 +4,15 @@
 
 =head1 NAME
 
-t/library/tcl_lib.t - test parrot to external Tcl connection
+t/library/tcl_lib.t
+
+=head1 DESCRIPTION
+
+test parrot to external Tcl connection
 
 =head1 SYNOPSIS
 
     % prove t/library/tcl_lib.t
-
-=head1 DESCRIPTION
 
 =cut
 

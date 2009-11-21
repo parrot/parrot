@@ -19,7 +19,7 @@ use Parrot::Test tests => 14;
 
 syn/file.t - test inclusion of files
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 A test script which is supposed to be called by Test::Harness.
 

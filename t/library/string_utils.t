@@ -4,7 +4,11 @@
 
 =head1 NAME
 
-t/library/string_utils.t  -- Tests for String/Utils.pbc
+t/library/string_utils.t
+
+=head1 DESCRIPTION
+
+Tests for String/Utils.pbc
 
 =head1 SYNOPSIS
 

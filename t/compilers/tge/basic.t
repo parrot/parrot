@@ -10,11 +10,15 @@ use Parrot::Test tests => 3;
 
 =head1 NAME
 
-t/basic.t - testing a few basic components of TGE::Grammar and TGE::Tree
+t/basic.t
 
 =head1 SYNOPSIS
 
         $ prove t/compilers/tge/basic.t
+
+=head1 DESCRIPTION
+
+testing a few basic components of TGE::Grammar and TGE::Tree
 
 =cut
 

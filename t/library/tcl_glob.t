@@ -4,13 +4,15 @@
 
 =head1 NAME
 
-t/library/tcl_glob.t - test tcl-style globs
+t/library/tcl_glob.t
+
+=head1 DESCRIPTION
+
+test tcl-style globs
 
 =head1 SYNOPSIS
 
     % prove t/library/tcl_glob.t
-
-=head1 DESCRIPTION
 
 =cut
 

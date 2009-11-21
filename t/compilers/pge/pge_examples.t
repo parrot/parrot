@@ -12,11 +12,15 @@ use Parrot::Test::PGE;
 
 =head1 NAME
 
-t/library/pge_examples.t - Parrot Grammar Engine tests of examples
+t/library/pge_examples.t
 
 =head1 SYNOPSIS
 
     % prove t/compilers/pge/pge_examples.t
+
+=head1 DESCRIPTION
+
+Parrot Grammar Engine tests of examples
 
 =cut
 

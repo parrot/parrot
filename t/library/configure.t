@@ -4,7 +4,11 @@
 
 =head1 NAME
 
-t/library/configure.t - Test the Configure PBC
+t/library/configure.t
+
+=head1 DESCRIPTION
+
+Test the Configure PBC
 
 =head1 SYNOPSIS
 

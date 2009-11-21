@@ -4,7 +4,11 @@
 
 =head1 NAME
 
-t/library/rand.t - Test the Math::Rand PBC
+t/library/rand.t
+
+=head1 DESCRIPTION
+
+Test the Math::Rand PBC
 
 =head1 SYNOPSIS
 

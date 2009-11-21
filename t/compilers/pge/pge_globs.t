@@ -11,11 +11,15 @@ use Parrot::Test::PGE;
 
 =head1 NAME
 
-t/library/pge_globs.t - Parrot Grammar Engine tests of globs
+t/library/pge_globs.t
 
 =head1 SYNOPSIS
 
         % prove -Ilib t/library/pge_globs.t
+
+=head1 DESCRIPTION
+
+Parrot Grammar Engine tests of globs
 
 =cut
 

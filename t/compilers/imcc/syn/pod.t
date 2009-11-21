@@ -9,7 +9,20 @@ use Test::More;
 use Parrot::Config;
 use Parrot::Test tests => 4;
 
-# POD
+=head1 NAME
+
+t/compilers/imcc/syn/pod.t
+
+=head1 SYNOPSIS
+
+    % prove t/compilers/imcc/syn/pod.t
+
+=head1 DESCRIPTION
+
+Tests PIR's handling of Plain Old Documentation (POD) format.
+
+=cut
+
 
 pir_output_is( <<'CODE', <<'OUT', "simple pod" );
 .sub test :main

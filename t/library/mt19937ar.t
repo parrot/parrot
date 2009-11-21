@@ -4,7 +4,11 @@
 
 =head1 NAME
 
-t/library/mt19937ar.t - Math::Random::MT tests
+t/library/mt19937ar.t
+
+=head1 DESCRIPTION
+
+Math::Random::MT tests
 
 =head1 SYNOPSIS
 

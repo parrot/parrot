@@ -10,11 +10,15 @@ use Parrot::Test tests => 9;
 
 =head1 NAME
 
-t/library/uuid.t - uuid library tests
+t/library/uuid.t
 
 =head1 SYNOPSIS
 
     % prove t/library/uuid.t
+
+=head1 DESCRIPTION
+
+uuid library tests
 
 =cut
 

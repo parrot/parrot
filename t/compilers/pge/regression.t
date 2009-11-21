@@ -10,11 +10,15 @@ use Parrot::Test tests => 2;
 
 =head1 NAME
 
-t/compilers/pge/regression.t - PGE regression tests
+t/compilers/pge/regression.t
 
 =head1 SYNOPSIS
 
         % prove t/compilers/pge/regression.t
+
+=head1 DESCRIPTION
+
+PGE regression tests
 
 =cut
 
