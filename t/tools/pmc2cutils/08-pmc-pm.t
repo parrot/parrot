@@ -50,6 +50,8 @@ pass("Completed all tests in $0");
 
 =head1 DESCRIPTION
 
+Test functionality of Parrot::Pmc2c::PMC.
+
 =head1 AUTHOR
 
 Kevin Tew

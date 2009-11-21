@@ -19,6 +19,8 @@ t/perl/Parrot_Distribution.t - Parrot::Distribution unit tests
 
 =head1 DESCRIPTION
 
+Test individual Parrot::Distribution methods.
+
 =cut
 
 BEGIN { use_ok('Parrot::Distribution') }

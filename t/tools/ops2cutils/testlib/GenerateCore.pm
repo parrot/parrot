@@ -100,8 +100,6 @@ GenerateCore - functionality used in testing Parrot::Ops2c::Utils
 
 =head1 DESCRIPTION
 
-=head2 Purpose
-
 The test suite found in F<t/tools/ops2cutils/> tests the methods of
 Parrot::Ops2c::Utils.  Those methods are invoked by Parrot build tool
 F<tools/build/ops2c.pl>, which in turn is invoked several times by F<make>.
@@ -121,6 +119,8 @@ C<generate_core>, which (a) creates subdirectories needed underneath a
 temporary directory created solely for testing purposes; then
 (b) creates a temporary copy of Parrot::OpLib::core such that
 C<Parrot::Ops2c::Utils::new()> can successfully execute.
+
+=head1 SUBROUTINES
 
 =head2 C<generate_core()>
 
