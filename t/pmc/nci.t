@@ -1398,7 +1398,7 @@ OUTPUT
 
   # Tests with callback functions
   my @todo = $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/ ?
-    ( todo => 'RT #49718, add scheduler tasks to JIT' ) : ();
+    ( todo => 'TT #1316, add scheduler tasks to JIT' ) : ();
 
   pasm_output_is( <<'CODE', <<'OUTPUT', "nci_cb_C1 - PASM", @todo );
 
