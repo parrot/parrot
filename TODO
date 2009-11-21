@@ -8,7 +8,3 @@ To open a new todo ticket, use
 
  https://trac.parrot.org/
 
-Note that we are still transitioning away from RT. To see what todos remain
-in our old tracking system, use:
-
- http://www.parrotcode.org/todo
