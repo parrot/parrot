@@ -192,7 +192,7 @@ OUT
 
 }
 
-pir_error_output_like( <<'CODE', <<'OUT', 'No segfault from syntax error, RT #60172');
+pir_error_output_like( <<'CODE', <<'OUT', 'No segfault from syntax error');
 .sub 'main'
     ($S0) = 'blah'(:pir_only=>1)
 .end
