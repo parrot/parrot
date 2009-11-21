@@ -105,7 +105,7 @@ CODE
 /(?s:Null PMC access in get_bool.*current instr.*:(4|-1)\))/
 OUT
 
-pir_error_output_like( <<'CODE', <<'OUT', 'bare method names not allowed (RT #45859)');
+pir_error_output_like( <<'CODE', <<'OUT', 'bare method names not allowed');
 .sub foo :main
   $P0 = new 'String'
   $P0 = 'HI'
