@@ -2000,7 +2000,7 @@ e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), ARGIN(IMC_Unit *unit))
     pragma = ins->symregs[0]->pcc_sub->pragma;
 
     if (pragma & P_IMMEDIATE) {
-        /* clear global symbols temporarily -- RT #60000, for example */
+        /* clear global symbols temporarily -- TT #1324, for example */
         imcc_globals *g      = IMCC_INFO(interp)->globals;
         SymHash       ghash;
 
