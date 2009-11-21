@@ -327,7 +327,7 @@ in meth
 done
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', ":vtable implies self (see RT #47674)" );
+pir_output_is( <<'CODE', <<'OUT', ":vtable implies self" );
 .sub 'main' :main
     $P1 = newclass "Foo"
     $P2 = new "Foo"
