@@ -112,9 +112,6 @@ All subroutines herein are exported only on demand.
 
 =cut
 
-# RT #44437 this should really be using src_dir instead of build_dir but it
-# does not exist (yet)
-
 sub new {
     my $class = shift;
     my $args = shift;
