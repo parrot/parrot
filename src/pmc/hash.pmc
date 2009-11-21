@@ -1132,7 +1132,6 @@ Used to unarchive the hash.
             const INTVAL v_type = VTABLE_shift_integer(INTERP, io);
             Hash        *hash;
 
-            /* RT #46653 create hash with needed size in the first place */
             if (k_type == Hash_key_type_int && v_type == enum_hash_int) {
                 SELF.set_pointer(parrot_new_intval_hash(INTERP));
             }
