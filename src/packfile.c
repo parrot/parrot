@@ -530,7 +530,7 @@ PackFile_destroy(PARROT_INTERP, ARGMOD_NULLOK(PackFile *pf))
     if (pf->is_mmap_ped) {
         DECL_CONST_CAST;
         /* Cast the result to void to avoid a warning with
-         * some not-so-standard mmap headers, see RT #56110
+         * some not-so-standard mmap headers
          */
         munmap((void *)PARROT_const_cast(opcode_t *, pf->src), pf->size);
     }
@@ -1105,7 +1105,7 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     && (self->need_endianize || self->need_wordsize)) {
         DECL_CONST_CAST;
         /* Cast the result to void to avoid a warning with
-         * some not-so-standard mmap headers, see RT #56110
+         * some not-so-standard mmap headers
          */
         munmap((void *)PARROT_const_cast(opcode_t *, self->src), self->size);
         self->is_mmap_ped = 0;
