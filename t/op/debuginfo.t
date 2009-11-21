@@ -125,11 +125,6 @@ current instr.: 'parrot;Test2;foo' pc (\d+|-1) \(.*?:(\d+|-1)\)
 called from Sub 'parrot;Test2;main' pc (\d+|-1) \(.*?:(\d+|-1)\)$/
 OUTPUT
 
-# RT #46895
-# in plain functional run-loop result is 999
-# other run-loops report 998
-# investigate this after interpreter strtup is done
-# see also todo item in src/embed.c
 pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - recursion 1" );
 .sub main
     main()
@@ -166,7 +161,6 @@ OUTPUT
 $nolineno = $ENV{TEST_PROG_ARGS} =~ /--runcore=(fast|cgoto)/
     ? '\(\(unknown file\):-1\)' : '\(xyz.pir:126\)';
 
-# See "RT #43269 and .annotate
 pir_error_output_like( <<'CODE', <<"OUTPUT", "setfile and setline" );
 .sub main :main
     setfile "xyz.pir"
@@ -181,7 +175,6 @@ OUTPUT
 
 $nolineno = $ENV{TEST_PROG_ARGS} =~ /--runcore=(fast|cgoto)/
     ? '\(\(unknown file\):-1\)' : '\(foo.p6:128\)';
-# See "RT #43269 and .annotate
 pir_error_output_like( <<'CODE', <<"OUTPUT", "setfile and setline" );
 .sub main :main
     setfile "foo.p6"
