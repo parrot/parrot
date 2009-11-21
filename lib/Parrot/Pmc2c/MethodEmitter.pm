@@ -164,9 +164,6 @@ sub proto {
         map { $calltype{$_} or die "Unknown signature type '$_'" }
         split( /,/, $parameters ) );
 
-    # RT #43733
-    # scan src/call_list.txt if the generated signature is available
-
     return $ret;
 }
 
