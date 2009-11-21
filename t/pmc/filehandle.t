@@ -100,7 +100,7 @@ SKIP: {
 
     pir_output_is( <<'CODE', <<'OUT', 'open and close - asynchronous' );
 .sub 'test' :main
-    $P1 = # RT #46831 create a callback here
+    $P1 = # TT #1204 create a callback here
     $P0 = new ['FileHandle']
 
     $P0.'open'('README')
@@ -290,11 +290,9 @@ ok 1 - read 10,000 lines
 OUT
 
 
-# RT #46833 test reading/writing code points once supported
+# TT #1204 test reading long chunks, eof, and across newlines
 
-# RT #46835 test reading long chunks, eof, and across newlines
-
-# RT #46837 pir_output_is( <<'CODE', <<'OUT', 'print, read, and readline - asynchronous', todo => 'not yet implemented' );
+# TT #1204 pir_output_is( <<'CODE', <<'OUT', 'print, read, and readline - asynchronous', todo => 'not yet implemented' );
 
 # L<PDD22/I\/O PMC API/=item record_separator>
 pir_output_is( <<'CODE', <<'OUT', 'record_separator', todo => 'not yet implemented' );
@@ -365,9 +363,9 @@ ok 2 - $S0 = $P1.buffer_type() # line-buffered
 ok 3 - $S0 = $P1.buffer_type() # full-buffered
 OUT
 
-# RT #46839 test effects of buffer_type, not just set/get
+# TT #1204 test effects of buffer_type, not just set/get
 
-# RT #46841
+# TT #1177
 # L<PDD22/I\/O PMC API/=item buffer_size>
 # NOTES: try setting positive, zero, negative int
 # perform print and read ops
@@ -625,7 +623,7 @@ expect 0 exit status: 0
 expect 1 exit status: 1
 OUTPUT
 
-# RT #46843
+# TT #1178
 # L<PDD22/I\/O PMC API/=item get_fd>
 # NOTES: this is going to be platform dependent
 
