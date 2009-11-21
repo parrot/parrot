@@ -1421,9 +1421,6 @@ PDB_next(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 
     /* If program ended */
 
-    /*
-     * RT #46119 this doesn't handle resume opcodes
-     */
     if (!pdb->cur_opcode)
         (void)PDB_program_end(interp);
     #endif
