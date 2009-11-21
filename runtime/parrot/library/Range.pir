@@ -49,9 +49,6 @@ Create the class, with attributes, when this PBC is loaded.
   addattribute $P1, 'exhausted'
 .end
 
-# RT #42430
-# :method is only specified here so we can get 'self'
-
 =head1 :vtable
 
 =head2 init
@@ -175,9 +172,6 @@ done:
   .return (from)
 .end
 
-# RT #42430
-# :method is only specified on the shift_* vtables for self.
-
 # Wrappers for the shift_pmc vtable - rely on autoboxing.
 .sub 'shift_integer' :vtable :method
   $P0 = shift self
@@ -225,9 +219,6 @@ exhaust:
 done:
   .return (to)
 .end
-
-# RT #42430
-# :method is only specified on the shift_* vtables for self.
 
 # Wrappers for the shift_pmc vtable - rely on autoboxing.
 .sub 'pop_integer' :vtable :method
