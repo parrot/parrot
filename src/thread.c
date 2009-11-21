@@ -1123,7 +1123,6 @@ pt_gc_wakeup_check(PARROT_INTERP)
     Shared_gc_info * const info = shared_gc_info;
     int             thread_count;
 
-    /* XXX: maybe a little hack; see RT #49532 */
     if (!info)
         return;
 
