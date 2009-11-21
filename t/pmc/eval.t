@@ -499,7 +499,7 @@ foo
 bar
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "catch compile err: RT:#39892" );
+pir_output_is( <<'CODE', <<'OUTPUT', "catch compile err" );
 .sub main :main
      push_eh handler
      $P2 = compreg "PIR"
