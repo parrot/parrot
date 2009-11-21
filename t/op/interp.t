@@ -86,8 +86,6 @@ CODE
 ok\s2\n$/x
 OUTPUT
 
-# This is the behavior as of Parrot 0.4.3
-# RT #46819 Should there be a warning?
 pasm_output_is( <<'CODE', 'nada:', 'interp - warnings' );
     new P0, 'Undef'
     set I0, P0
