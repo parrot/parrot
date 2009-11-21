@@ -18,7 +18,7 @@ t/compilers/pge/regression.t - PGE regression tests
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'load_bytecode with .pir (RT #39807)' );
+pir_output_is( <<'CODE', <<'OUTPUT', 'load_bytecode with .pir' );
 .sub main :main
     load_bytecode 'PGE.pbc'
     load_bytecode 'dumper.pir'
