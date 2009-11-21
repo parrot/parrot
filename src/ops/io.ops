@@ -49,9 +49,6 @@ inline op close(invar PMC) :base_io {
 
 Create ParrotIO object in $1 as a copy of file descriptor $2.
 
-RT #42373: integral file descriptors might not exist outside of the UNIX
-     platform.  This op needs work.
-
 =cut
 
 inline op fdopen(out PMC, in INT, in STR) :filesys_open {
