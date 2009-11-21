@@ -1290,7 +1290,7 @@ hello world
 hello world
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "RT #56398:  Patrick's request" );
+pir_output_is( <<'CODE', <<'OUTPUT', "Patrick's request" );
 .sub 'main' :main
     foo('try 1')
     foo('try 2')
