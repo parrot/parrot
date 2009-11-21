@@ -153,7 +153,6 @@ runcode(PARROT_INTERP, int argc, char *argv[]) {
     /* runs :init functions */
     PackFile_fixup_subs(interp, PBC_MAIN, NULL);
 
-    /* RT #46149 no return value :-( */
     Parrot_runcode(interp, argc, argv);
 }
 
