@@ -22,7 +22,7 @@ C<File> is a singleton class which provides access to File functions.
 #  include <direct.h>
 #endif
 
-/* RT #46681 apparently, strerror_r is thread-safe and should be used instead.*/
+/* TT #1050 apparently, strerror_r is thread-safe and should be used instead.*/
 
 static PMC *File_PMC;
 pmclass File singleton {
