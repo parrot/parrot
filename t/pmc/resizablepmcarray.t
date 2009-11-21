@@ -901,7 +901,6 @@ end:
 .end
 
 
-#RT #56636 - segfault from sort if comparison is always 1
 .sub sort_with_broken_cmp
     .local pmc array
     array = new ['ResizablePMCArray']
