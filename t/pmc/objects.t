@@ -1036,7 +1036,6 @@ l1:
 
 .namespace []       # Reset to root namespace for next test
 
-#RT #33103
 .sub multiple_anon_classes
      newclass $P0, "City3"
      subclass $P1, $P0
