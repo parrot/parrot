@@ -11,7 +11,7 @@ use Parrot::Test tests => 6;
 # generated PASM code for various optimizations at level 0
 
 SKIP: {
-    skip("disabled graph coloring register allocator, RT #57028", 1);
+    skip("disabled graph coloring register allocator, TT #1281", 1);
 pir_2_pasm_like( <<'CODE', <<'OUT', "add_n_i_n" );
 .sub _ :anon
    add $N0, $I0, $N1
@@ -43,7 +43,7 @@ OUT
 
 ##############################
 SKIP: {
-    skip("disabled graph coloring register allocator, RT #57028", 1);
+    skip("disabled graph coloring register allocator, TT #1281", 1);
 pir_2_pasm_like( <<'CODE', <<'OUT', "sub_n_i_n" );
 .sub _test
    sub $N0, $I0, $N1
