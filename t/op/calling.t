@@ -2374,7 +2374,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "slurpy named after :optional" );
     foo($P0 :flat, 'abc' => 3)
     $P0 = new 'ResizablePMCArray'
     foo($P0 :flat, 'abc' => 4)
-    # Shorter version of RT #53926
     $P0 = new 'Hash'
     $P0['abc'] = 5
     foo($P0 :named :flat)
@@ -2434,7 +2433,7 @@ CODE
 /too many arguments passed\(1\) - 0 params expected/
 OUTPUT
 
-# See Rakudo RT #62730
+# See Rakudo RT http://rt.perl.org/rt3/Ticket/Display.html?id=62730
 pir_output_is( <<'CODE', <<'OUTPUT', "named from register, not constant" );
 .sub 'main'
     $S0 = 'foo'
