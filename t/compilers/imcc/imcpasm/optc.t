@@ -253,7 +253,7 @@ foo:
   returncc/
 OUT
 
-pir_2_pasm_like( <<'CODE', <<'OUT', "tailcall 1", todo => "RT #57028" );
+pir_2_pasm_like( <<'CODE', <<'OUT', "tailcall 1", todo => "TT #1281" );
 .sub _main
     foo(1, 2)
 .end
