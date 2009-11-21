@@ -123,6 +123,8 @@ L<http://github.com/fperrad/lua-batteries/blob/master/setup.pir>
     unless $S0 == 'MSWin32' goto L1
     .const 'Sub' _win32_inno_installer = '_win32_inno_installer'
     register_step('win32-inno-installer', _win32_inno_installer)
+    .const 'Sub' _clean_win32_installer = '_clean_win32_installer'
+    register_step_after('clean', _clean_win32_installer)
   L1:
 .end
 
@@ -2486,6 +2488,11 @@ TEMPLATE
     goto L1
   L2:
     .return (result)
+.end
+
+.sub '_clean_win32_installer' :anon
+    .param pmc kv :slurpy :named
+    system('del setup-*.exe')
 .end
 
 =head3 Configuration Helpers
