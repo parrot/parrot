@@ -148,7 +148,7 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
      * returning NULL from here returns resume address NULL to the
      * runloop, which will terminate the thread function finally
      *
-     * RT #45917 this check should better be in Parrot_exit
+     * TT #1287 this check should better be in Parrot_exit
      */
 
     /* no exception handler, but this is not the main thread */
