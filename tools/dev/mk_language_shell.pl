@@ -1090,7 +1090,6 @@ initialize the pmc class. Store some constants, etc.
 
 */
 
-    /* RT #48194: move any constant string declarations here so we just do them once. */
     void class_init() {
     }
 
