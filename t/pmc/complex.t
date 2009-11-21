@@ -1161,7 +1161,7 @@ todo:
 .end
 
 .sub add_using_subclass_of_complex_bug_59630
-    skip( 3, 'add using subclass of Complex - RT #59630' )
+    skip( 3, 'add using subclass of Complex - TT #1318' )
     .return()
 
     $P0 = subclass 'Complex', 'MyComplex'
