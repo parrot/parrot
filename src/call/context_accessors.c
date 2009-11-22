@@ -4,9 +4,11 @@ $Id$
 
 =head1 NAME
 
-src/context.c - Parrot_Context functions.
+src/context.c
 
 =head1 DESCRIPTION
+
+Parrot_Context functions.
 
 =cut
 
@@ -119,7 +121,7 @@ Parrot_pcc_get_recursion_depth_func(PARROT_INTERP, ARGIN(PMC *ctx))
 
 =item C<UINTVAL Parrot_pcc_inc_recursion_depth_func(PARROT_INTERP, PMC *ctx)>
 
-Increase recurtion depth. Returns previous recursion_depth value.
+Increase recursion depth. Returns previous recursion_depth value.
 
 =cut
 
@@ -138,7 +140,7 @@ Parrot_pcc_inc_recursion_depth_func(PARROT_INTERP, ARGIN(PMC *ctx))
 
 =item C<UINTVAL Parrot_pcc_dec_recursion_depth_func(PARROT_INTERP, PMC *ctx)>
 
-Decrease recurtion depth. Returns new recursion_depth value.
+Decrease recursion depth. Returns new recursion_depth value.
 
 =cut
 

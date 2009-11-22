@@ -4,9 +4,11 @@ $Id$
 
 =head1 NAME
 
-src/context.c - Parrot_Context functions.
+src/context.c
 
 =head1 DESCRIPTION
+
+Parrot_Context functions.
 
 =cut
 

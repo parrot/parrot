@@ -2,14 +2,16 @@
 Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
-=head1 Parrot Calling Conventions
+=head1 NAME
 
-=head1 Description
+src/call/pcc.c
 
-Functions in this file handle argument/return value passing to and from
-subroutines.
+=head1 DESCRIPTION
 
-=head2 Functions
+B<Parrot Calling Conventions>:  Functions in this file handle argument/return
+value passing to and from subroutines.
+
+=head1 FUNCTIONS
 
 =over 4
 

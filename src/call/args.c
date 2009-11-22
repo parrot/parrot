@@ -2,14 +2,16 @@
 Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
-=head1 Arguments and Returns
+=head1 NAME
 
-=head1 Description
+src/call/args.c
 
-Functions in this file handle argument/return value passing to and from
-subroutines following the Parrot Calling Conventions.
+=head1 DESCRIPTION
 
-=head2 Functions
+B<Arguments and Returns>: Functions in this file handle argument/return value
+passing to and from subroutines following the Parrot Calling Conventions.
+
+=head1 FUNCTIONS
 
 =over 4
 

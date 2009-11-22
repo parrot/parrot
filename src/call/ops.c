@@ -2,13 +2,15 @@
 Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
-=head1 Calling Ops
+=head1 NAME
 
-=head1 Description
+src/call/ops.c
 
-Various functions that call the run loop.
+=head1 DESCRIPTION
 
-=head2 Functions
+B<Calling Ops>:  Various functions that call the run loop.
+
+=head1 FUNCTIONS
 
 =over 4
 
