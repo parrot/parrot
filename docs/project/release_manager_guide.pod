@@ -312,7 +312,7 @@ following channels (and any others you can think of):
 
 =item a
 
-Send a text email to parrot-dev, perl6-language, perl6-announce,
+Send a text email to parrot-dev, parrot-users, perl6-language, perl6-announce,
 perl5-porters, etc.  You should also include LWN.net in this mailing; email to
 C<lwn> at that domain.
 
