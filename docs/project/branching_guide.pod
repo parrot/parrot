@@ -1,7 +1,11 @@
 # Copyright (C) 2008-2009, Parrot Foundation.
 # $Id$
 
-=head1 Branching Instructions
+=head1 NAME
+
+docs/project/branching_guide.pod - Branching Instructions
+
+=head1 DESCRIPTION
 
 To minimize the disruption of feature development on language and tool
 developers, all major changes to Parrot core take place in a branch. Ideally,

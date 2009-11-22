@@ -7,7 +7,7 @@
 
 docs/project/ticket_triaging.pod - Managing Tickets
 
-=head1 ABSTRACT
+=head1 DESCRIPTION
 
 This document attempts to outline a set of best practices for dealing with
 tickets in Parrot's tracking system.  It is targeted at Parrot developers and
