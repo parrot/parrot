@@ -57,11 +57,11 @@ Callgrind-compatible tools expect.  For this reason, the profiling runcore
 captures information about context switches (CS lines in the pprof file) and
 pprof2cg.pl maintains a context stack that functions similarly to a typical
 call stack.  pprof2cg.pl then maps these context switches as if they were
-function calls and returns.  See C<$ctx_stack> for more information.
+function calls and returns.  See C<$call_stack> for more information.
 
-=item C<$ctx_stack>
+=item C<$call_stack>
 
-Variables which are named C<$ctx_stack> hold a reference to an array of hashes
+Variables which are named C<$call_stack> hold a reference to an array of hashes
 which contain information about the currently active contexts.  When collecting
 timing information about an op, it is necessary to add that information to all
 function calls on the stack because Callgrind-compatible tools expect the cost
@@ -77,7 +77,7 @@ has been switched to.  When C<process_line> detects a new context, it adds a
 fake op representing a function call to C<$stats> and unshifts a new context
 onto the stack.
 
-Each element of C<@$ctx_stack> contains the information needed to uniquely
+Each element of C<@$call_stack> contains the information needed to uniquely
 identify the site of the original context switch.
 
 =item C<$stats>
@@ -152,7 +152,7 @@ modifies the statistics according to the information from the Parrot profile.
 
 sub process_input {
     my ($input, $stats) = @_;
-    my $ctx_stack = [];
+    my $call_stack = [];
 
     while(my $line = <$input>) {
         if ($line =~ /^OP:(.*)$/) {
@@ -160,9 +160,10 @@ sub process_input {
             my %op_hash = $1 =~ /{x{([^:]+):(.*?)}x}/g
                 or die "invalidly formed line '$line'";
 
-            my $cur_ctx = $ctx_stack->[0]
+            my $cur_ctx = $call_stack->[0]
                 or die "input file did not specify an initial context";
 
+            # If we've already seen this line, bump the op number.  Otherwise reset it.
             if (exists $cur_ctx->{line} && $op_hash{line} == $cur_ctx->{line}) {
                 $cur_ctx->{op_num}++;
             }
@@ -177,50 +178,55 @@ sub process_input {
             $stats->{global_stats}{total_time} += $time;
             store_stats($stats, $cur_ctx, $time, $extra);
 
-            # Extracted from store_stats() for speed
-            $stats->{$_->{file}}{$_->{ns}}{$_->{line}}[$_->{op_num}]{time} += $time
-                for @$ctx_stack[1 .. $#$ctx_stack];
+            # Add the time spent by this op to each op on the call "stack".
+            $stats->{ $_->{file} }{ $_->{ns} }{ $_->{line} }[ $_->{op_num} ]{time} += $time
+                for @$call_stack[1 .. $#$call_stack];
         }
         #context switch
         elsif ($line =~ /^CS:(.*)$/) {
 
             # Decode string in the format C<{x{key1:value1}x}{x{key2:value2}x}>
-            my %cs_hash      = $1 =~ /{x{([^:]+):(.*?)}x}/g
+            my %cs_hash = $1 =~ /{x{([^:]+):(.*?)}x}/g
                 or die "invalidly formed line '$line'";
 
-            # is_first
-            if (!@$ctx_stack) {
-                $ctx_stack->[0] = \%cs_hash;
+            if (!@$call_stack) {
+                $call_stack->[0] = \%cs_hash;
             }
             else {
-                my $cur_ctx      = $ctx_stack->[0];
+                my $cur_ctx      = $call_stack->[0];
                 my $hash_ctx     = $cs_hash{ctx};
                 my $is_redundant = $cur_ctx->{ctx} eq $hash_ctx;
                 my $reused_ctx   = $is_redundant && $cur_ctx->{sub} ne $cs_hash{sub};
 
+                # If we're calling a new sub with the same context, modify the
+                # current context to have the name and address of the new sub.
                 if ($reused_ctx) {
-                    $cur_ctx->{sub} = $cs_hash{sub};
                     $cur_ctx->{ns}  = $cs_hash{ns};
+                    $cur_ctx->{sub} = $cs_hash{sub};
                 }
+
+                # The new context is the same as the old one, so don't modify the call stack.
                 elsif ($is_redundant) {
-                    # don't do anything
+                    # This space intentionally left blank.
                 }
-                # is_call
-                elsif (!grep {$_->{ctx} eq $hash_ctx} @$ctx_stack) {
+
+                # If the new context isn't in the current call stack, unshift
+                # it onto the start of the stack.
+                elsif (!grep {$_->{ctx} eq $hash_ctx} @$call_stack) {
                     $cur_ctx->{op_num}++;
                     my $extra = {
                                  op_name => "CALL",
                                  target  => $cs_hash{ns}
                                 };
-                    store_stats($stats, $ctx_stack->[0], 0, $extra);
-                    unshift @$ctx_stack, \%cs_hash;
+                    store_stats($stats, $call_stack->[0], 0, $extra);
+                    unshift @$call_stack, \%cs_hash;
                 }
                 else {
                     #shift contexts off the stack until one matches the current ctx
-                    shift @$ctx_stack while $ctx_stack->[0]{ctx} ne $hash_ctx;
+                    shift @$call_stack while $call_stack->[0]{ctx} ne $hash_ctx;
                 }
             }
-            #print Dumper($ctx_stack);
+            #print Dumper($call_stack);
         }
         elsif ($line =~ /^VERSION:(\d+)$/) {
             my $version = $1;
@@ -233,7 +239,7 @@ sub process_input {
         }
         elsif ($line =~ /^END_OF_RUNLOOP$/) {
             #end of loop
-            @$ctx_stack = ();
+            @$call_stack = ();
         }
         elsif ($line =~ /^#/) {
             #comments are always ignored
@@ -288,7 +294,7 @@ ancillary data that should be stored in the hash.  This includes data on
 sub store_stats {
     my ($stats, $loc, $time, $extra) = @_;
 
-    my $by_op = ($stats->{$loc->{file}}{$loc->{ns}}{$loc->{line}}[$loc->{op_num}] ||= {});
+    my $by_op = ( $stats->{ $loc->{file} }{ $loc->{ns} }{ $loc->{line} }[ $loc->{op_num} ] ||= {} );
 
     if ($by_op->{hits}) {
         $by_op->{hits} ++;
