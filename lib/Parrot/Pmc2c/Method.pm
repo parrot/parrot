@@ -9,6 +9,22 @@ use constant NON_VTABLE   => 'NON_VTABLE';
 use constant MULTI        => 'MULTI';
 use Parrot::Pmc2c::UtilFunctions qw( args_from_parameter_list passable_args_from_parameter_list );
 
+=head1 NAME
+
+Parrot::Pmc2c::Method
+
+=head1 DESCRIPTION
+
+Functions used in transformation of PMCs to C code.
+
+=head1 METHODS
+
+=head2 C<new()>
+
+Parrot::Pmc2c::Method constructor.
+
+=cut
+
 sub new {
     my ( $class, $self_hash ) = @_;
     my $self = {
@@ -89,7 +105,7 @@ sub pmc_unused {
     return $self->{pmc_unused};
 }
 
-=head1 C<trans($type)>
+=head2 C<trans($type)>
 
 Used in C<signature()> to normalize argument types.
 
@@ -111,7 +127,7 @@ sub trans {
     return '?';
 }
 
-=head1 C<signature()>
+=head2 C<signature()>
 
 Returns the method signature for the methods $parameters
 
@@ -149,7 +165,7 @@ sub signature {
     return ( $return_prefix, $method_suffix, $args, $sig, $return_type_char, $null_return );
 }
 
-=head1 C<pcc_signature()>
+=head2 C<pcc_signature()>
 
 Returns a PCC-style method signature for the method's parameters, as well as
 some additional information useful in building a call to that method.
@@ -183,6 +199,16 @@ sub pcc_signature {
 
     return ( $sig, $args, $result_decl, $return_stmt );
 }
+
+=head1 SEE ALSO
+
+    lib/Parrot/Pmc2c/PMC/RO.pm
+    lib/Parrot/Pmc2c/PMCEmitter.pm
+    lib/Parrot/Pmc2c/VTable.pm
+    lib/Parrot/Pmc2c/PMC.pm
+    lib/Parrot/Pmc2c/Parser.pm
+
+=cut
 
 1;
 

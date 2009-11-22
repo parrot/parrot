@@ -12,6 +12,18 @@ use Carp;
 use base 'Exporter';
 @Parrot::Pmc2c::Dumper::EXPORT_OK = 'dump_pmc';
 
+=head1 NAME
+
+Parrot::Pmc2c::Dumper
+
+=head1 DESCRIPTION
+
+Create dump file for PMCs.
+
+=head1 FUNCTIONS
+
+=head2 Public Functions
+
 =head3 C<dump_pmc()>
 
     $return_value = dump_pmc($pmc2cMain);

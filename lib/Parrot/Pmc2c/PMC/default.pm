@@ -1,7 +1,15 @@
 # Copyright (C) 2007-2008, Parrot Foundation.
 # $Id$
 
-=head1 Parrot::Pmc2c::PMC::default Instance Methods
+=head1 NAME
+
+Parrot::Pmc2c::PMC::default
+
+=head1 DESCRIPTION
+
+Instance Methods
+
+=head1 METHODS
 
 =over 4
 
@@ -16,6 +24,8 @@ use base qw( Parrot::Pmc2c::PMC );
 =item C<pre_method_gen()>
 
 Always true.
+
+=back
 
 =cut
 

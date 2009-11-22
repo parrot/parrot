@@ -7,7 +7,17 @@ use base 'Parrot::Pmc2c::PMC';
 use strict;
 use warnings;
 
-=head1 C<body($method, $line, $out_name)>
+=head1 NAME
+
+Parrot::Pmc2c::PMC::Object
+
+=head1 DESCRIPTION
+
+PMC to C Methods
+
+=head1 METHODS
+
+=head2 C<body($method, $line, $out_name)>
 
 Returns the C code for the method body.
 

@@ -1,16 +1,20 @@
 # Copyright (C) 2007-2008, Parrot Foundation.
 # $Id$
 
-=head1 Parrot::Pmc2c::Null Instance Methods
-
-=over 4
-
-=cut
-
 package Parrot::Pmc2c::PMC::Null;
 use base 'Parrot::Pmc2c::PMC';
 use strict;
 use warnings;
+
+=head1 NAME
+
+Parrot::Pmc2c::PMC::Null
+
+=head1 DESCRIPTION
+
+PMC to C Instance Methods
+
+=over 4
 
 =item C<pre_method_gen($method, $line, $out_name)>
 

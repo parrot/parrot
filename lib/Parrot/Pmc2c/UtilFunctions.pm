@@ -14,6 +14,17 @@ our @EXPORT_OK = qw( count_newlines return_statement dont_edit dynext_load_code
     passable_args_from_parameter_list
 );
 
+=head1 NAME
+
+Parrot::Pmc2c::UtilFunctions
+
+=head1 DESCRIPTION
+
+Various utility functions used in PMC to C transformations.  All functionas
+are exported on request only.
+
+=head1 SUBROUTINES
+
 =over 4
 
 =item C<passable_args_from_parameter_list( $parms )>

@@ -7,6 +7,16 @@ use base 'Parrot::Pmc2c';
 use strict;
 use warnings;
 
+=head1 NAME
+
+Parrot::Pmc2c::Object
+
+=head1 DESCRIPTION
+
+Functions used in transformation of PMCs to C code.
+
+=head1 METHODS
+
 =over 4
 
 =item C<implements($method)>
