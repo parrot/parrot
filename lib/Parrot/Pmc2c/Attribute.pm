@@ -6,6 +6,23 @@ package Parrot::Pmc2c::Attribute;
 use strict;
 use warnings;
 
+=head1 NAME
+
+Parrot::Pmc2c::Attribute
+
+=head1 DESCRIPTION
+
+Methods for attribute struct.  Called by
+C<Parrot::Pmc2c::Parser::find_attrs()>.
+
+=head1 METHODS
+
+=head2 C<new>
+
+Parrot::Pmc2c::Attribute constructor.
+
+=cut
+
 sub new {
     my ( $class, $self_hash ) = @_;
     my $self = {
@@ -21,14 +38,19 @@ sub new {
     bless $self, $class;
 }
 
-# getters/setters
+=head2 C<name>
+
+Getter/setter.
+
+=cut
+
 sub name {
     my ( $self, $value ) = @_;
     $self->{name}        = $value if $value;
     return $self->{name};
 }
 
-=head1 C<generate_declaration>
+=head2 C<generate_declaration>
 
 Generate and emit the C code for an attribute declaration.
 
@@ -44,7 +66,7 @@ sub generate_declaration {
     return 1;
 }
 
-=head1 C<generate_start>
+=head2 C<generate_start>
 
 Generate and emit the C code for the start of an attribute struct.
 
@@ -64,7 +86,7 @@ EOH
     return 1;
 }
 
-=head1 C<generate_end>
+=head2 C<generate_end>
 
 Generate and emit the C code for the end of an attribute struct.
 
@@ -87,7 +109,7 @@ EOH
     return 1;
 }
 
-=head1 C<generate_accessor>
+=head2 C<generate_accessor>
 
 Generate and emit the C code for an attribute get/set accessor pair.
 
