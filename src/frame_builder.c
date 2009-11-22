@@ -1,6 +1,19 @@
 /*
 Copyright (C) 2008-2009, Parrot Foundation.
 $Id$
+
+=head1 NAME
+
+src/frame_builder.c
+
+=head1 DESCRIPTION
+
+Functions for the ManagedStruct PMC and others.
+
+=head1 FUNCTIONS
+
+=cut
+
 */
 
 /* HEADERIZER HFILE: none */
@@ -338,9 +351,9 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
     emitm_movl_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, 8);
     emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 0);
 
-    /* XXX FIXME This whole function require major rework */
-    /* XXX FIXME if (sig && *sig) */
-    /* XXX FIXME   emitm_call_cfunc(pc, Parrot_init_arg_nci); */
+    /* XXX FIXME (TT #1325) This whole function require major rework */
+    /* if (sig && *sig) */
+    /*   emitm_call_cfunc(pc, Parrot_init_arg_nci); */
 
     while (*sig) {
         emitm_movl_i_m(pc, arg_count, emit_EBP, 0, 1, temp_calls_offset + 8);
@@ -351,23 +364,23 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
                 emitm_movl_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'f':
-                /* FIXME emitm_call_cfunc(pc, get_nci_N); */
+                /* FIXME (TT #1325) emitm_call_cfunc(pc, get_nci_N); */
                 emitm_fstps(interp, pc, emit_EBP, 0, 1, args_offset);
                 break;
             case 'N':
             case 'd':
-                /* FIXME emitm_call_cfunc(pc, get_nci_N); */
+                /* FIXME (TT #1325) emitm_call_cfunc(pc, get_nci_N); */
                 emitm_fstpl(interp, pc, emit_EBP, 0, 1, args_offset);
                 args_offset += 4;
                 break;
             case 'I':   /* INTVAL */
             case 'l':   /* long */
             case 'i':   /* int */
-                /* FIXME emitm_call_cfunc(pc, get_nci_I); */
+                /* FIXME (TT #1325) emitm_call_cfunc(pc, get_nci_I); */
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 't':   /* string, pass a cstring */
-                /* FIXME emitm_call_cfunc(pc, get_nci_S); */
+                /* FIXME (TT #1325) emitm_call_cfunc(pc, get_nci_S); */
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
                 emitm_call_cfunc(pc, string_to_cstring_nullable);
 
@@ -381,7 +394,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
                 break;
             case 's':   /* short: movswl intreg_o(base), %eax */
-                /* FIXME emitm_call_cfunc(pc, get_nci_I); */
+                /* FIXME (TT #1325) emitm_call_cfunc(pc, get_nci_I); */
                 emitm_movswl_r_r(pc, emit_EAX, emit_EAX);
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
@@ -396,31 +409,31 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
                 arg_count--;
                 break;
             case 'p':   /* push pmc->data */
-                /* FIXME emitm_call_cfunc(pc, get_nci_p); */
+                /* FIXME (TT #1325) emitm_call_cfunc(pc, get_nci_p); */
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'O':   /* push PMC * object in P2 */
             case 'P':   /* push PMC * */
             case '@':
-                /* FIXME emitm_call_cfunc(pc, get_nci_P); */
+                /* FIXME (TT #1325) emitm_call_cfunc(pc, get_nci_P); */
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'v':
                 break;
             case 'b':   /* buffer (void*) pass Buffer_bufstart(SReg) */
-                /* FIXME emitm_call_cfunc(pc, get_nci_S); */
+                /* FIXME (TT #1325) emitm_call_cfunc(pc, get_nci_S); */
                 emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1,
                                (size_t) &Buffer_bufstart((STRING *) NULL));
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'B':   /* buffer (void**) pass &Buffer_bufstart(SReg) */
-                /* FIXME emitm_call_cfunc(pc, get_nci_S); */
+                /* FIXME (TT #1325) emitm_call_cfunc(pc, get_nci_S); */
                 emitm_lea_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1,
                               (size_t) &Buffer_bufstart((STRING *) NULL));
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'S':
-                /* FIXME emitm_call_cfunc(pc, get_nci_S); */
+                /* FIXME (TT #1325) emitm_call_cfunc(pc, get_nci_S); */
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
 
@@ -497,37 +510,37 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
             emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, 0);
             if (*sig == 2)      /* short */
                 emitm_movswl_r_r(pc, emit_EAX, emit_EAX);
-            /* XXX FIXME emitm_call_cfunc(pc, set_nci_I);*/
+            /* XXX FIXME (TT #1325) emitm_call_cfunc(pc, set_nci_I);*/
             break;
         case 'f':
         case 'd':
             jit_emit_fstore_mb_n(interp, pc, emit_EBP, temp_calls_offset + 8);
-            /* XXX FIXME emitm_call_cfunc(pc, set_nci_N); */
+            /* XXX FIXME (TT #1325) emitm_call_cfunc(pc, set_nci_N); */
             /* pop num from st(0) and mov to reg */
             break;
         case 's':
             /* movswl %ax, %eax */
             emitm_movswl_r_r(pc, emit_EAX, emit_EAX);
             emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 8);
-            /* XXX FIXME emitm_call_cfunc(pc, set_nci_I); */
+            /* XXX FIXME (TT #1325) emitm_call_cfunc(pc, set_nci_I); */
             break;
         case 'c':
             /* movsbl %al, %eax */
             emitm_movsbl_r_r(pc, emit_EAX, emit_EAX);
             emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 8);
-            /* XXX FIXME emitm_call_cfunc(pc, set_nci_I); */
+            /* XXX FIXME (TT #1325) emitm_call_cfunc(pc, set_nci_I); */
             break;
         case 'I':   /* INTVAL */
         case 'l':
         case 'i':
             emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 8);
-           /* XXX FIXME emitm_call_cfunc(pc, set_nci_I); */
+           /* XXX FIXME (TT #1325) emitm_call_cfunc(pc, set_nci_I); */
             break;
         case 'v': /* void - do nothing */
             break;
         case 'P':
             emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 8);
-            /* XXX FIXME emitm_call_cfunc(pc, set_nci_P); */
+            /* XXX FIXME (TT #1325) emitm_call_cfunc(pc, set_nci_P); */
             break;
         case 'p':   /* make a new unmanaged struct */
             /* save return value on stack */
@@ -556,11 +569,11 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
             emitm_lea_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, st_offset);
             emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
 
-            /* XXX FIXME emitm_call_cfunc(pc, set_nci_P); */
+            /* XXX FIXME (TT #1325) emitm_call_cfunc(pc, set_nci_P); */
             break;
         case 'S':
             emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 8);
-            /* XXX FIXME emitm_call_cfunc(pc, set_nci_S); */
+            /* XXX FIXME (TT #1325) emitm_call_cfunc(pc, set_nci_S); */
             break;
         case 't':   /* string */
             /* EAX is char* */
@@ -577,7 +590,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
             emitm_lea_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, st_offset);
             emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
 
-            /* XXX FIXME emitm_call_cfunc(pc, set_nci_S); */
+            /* XXX FIXME (TT #1325) emitm_call_cfunc(pc, set_nci_S); */
             break;
         default:
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
