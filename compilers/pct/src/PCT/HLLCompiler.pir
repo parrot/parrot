@@ -289,6 +289,11 @@ when the stage corresponding to target has been reached.
     .param pmc source
     .param pmc adverbs         :slurpy :named
 
+    .local pmc compiling, options
+    compiling = new ['Hash']
+    .lex '%*COMPILING', compiling
+    compiling['%?OPTIONS'] = adverbs
+
     .local string target
     target = adverbs['target']
     target = downcase target
@@ -548,6 +553,13 @@ options provided.
     .local string target
     target = adverbs['target']
     if target != '' goto end
+    .local pmc outer_ctx, outer
+    outer_ctx = adverbs['outer_ctx']
+    if null outer_ctx goto outer_done
+    outer = outer_ctx['current_sub']
+    $P1 = $P0[0]
+    $P1.'set_outer'(outer)
+  outer_done:
     $I0 = adverbs['trace']
     trace $I0
     $P0 = $P0(args :flat)
