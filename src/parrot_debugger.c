@@ -2,21 +2,20 @@
 Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
-History:
-    Renamed from pdb.c in 2008.7.15
-
 =head1 NAME
 
-parrot_debugger - The Parrot debugger
-
-=head1 SYNOPSIS
-
- parrot_debugger programfile
- parrot_debugger --script scriptfile programfile
+parrot_debugger
 
 =head1 DESCRIPTION
 
-=head2 Commands
+The Parrot debugger
+
+=head1 SYNOPSIS
+
+    parrot_debugger programfile
+    parrot_debugger --script scriptfile programfile
+
+=head1 COMMANDS
 
 =over 4
 
@@ -361,6 +360,10 @@ history/completion).
 
 
 =back
+
+=head1 HISTORY
+
+Renamed from F<pdb.c> on 2008.7.15
 
 =cut
 

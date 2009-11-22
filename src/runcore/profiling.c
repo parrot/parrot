@@ -2,6 +2,14 @@
 Copyright (C) 2009, Parrot Foundation.
 $Id$
 
+=head1 NAME
+
+src/runcore/profiling.c
+
+=head1 DESCRIPTION
+
+Functions controlling Parrot's profiling runcore.
+
 =head2 Functions
 
 =over 4

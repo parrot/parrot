@@ -4,9 +4,11 @@ $Id$
 
 =head1 NAME
 
-src/vtables.c - Functions to build and manipulate vtables
+src/vtables.c
 
 =head1 DESCRIPTION
+
+Functions to build and manipulate vtables
 
 =head2 Functions
 

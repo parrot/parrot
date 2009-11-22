@@ -4,11 +4,13 @@ $Id$
 
 =head1 NAME
 
-src/pmc.c - The base vtable calling functions
+src/pmc.c
 
 =head1 DESCRIPTION
 
-=head2 Functions
+The base vtable calling functions
+
+=head1 FUNCTIONS
 
 =over 4
 

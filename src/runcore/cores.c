@@ -2,7 +2,11 @@
 Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
-=head1 Run Cores
+=head1 NAME
+
+src/runcore/cores.c - Parrot's execution runcores
+
+=head1 DESCRIPTION
 
 During execution, the runcore is like the heart of Parrot. The runcore
 controls calling the various opcodes with the correct data, and making

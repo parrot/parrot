@@ -10,13 +10,13 @@ src/packfile.c - Parrot PackFile API
 
 =head1 DESCRIPTION
 
-=head2 PackFile Manipulation Functions
-
 This file contains all the functions required for the processing of the
 structure of a PackFile. It is not intended to understand the byte code
 stream itself, but merely to dissect and reconstruct data from the
 various segments. See F<docs/pdds/pdd13_bytecode.pod> for information
 about the structure of the frozen bytecode.
+
+=head2 PackFile Manipulation Functions
 
 =over 4
 

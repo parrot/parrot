@@ -4,11 +4,13 @@ $Id$
 
 =head1 NAME
 
-src/global.c - Access to global PMCs
+src/global.c
 
 =head1 DESCRIPTION
 
-=head2 Functions
+Access to global PMCs
+
+=head1 FUNCTIONS
 
 =over 4
 

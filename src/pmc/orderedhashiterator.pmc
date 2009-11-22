@@ -4,13 +4,13 @@ $Id$
 
 =head1 NAME
 
-src/pmc/orderedhashiterator.pmc - Implementation of Iterator for OrderedHash.
+src/pmc/orderedhashiterator.pmc
 
 =head1 DESCRIPTION
 
-=head1 SYNOPSIS
+Implementation of Iterator for OrderedHash.
 
-=head1 Methods
+=head1 METHODS
 
 =over 4
 
@@ -114,6 +114,7 @@ Marks the hash as live.
 Returns this Iterator's Hash.
 
 =cut
+
 */
     VTABLE PMC* get_pmc() {
         return PARROT_ORDEREDHASHITERATOR(SELF)->pmc_hash;

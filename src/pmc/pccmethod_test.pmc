@@ -4,7 +4,11 @@ $Id$
 
 =head1 NAME
 
-src/pmc/pmethod_test.pmc - METHOD_Test PMC
+src/pmc/pmethod_test.pmc
+
+=head1 DESCRIPTION
+
+METHOD_Test PMC
 
 =cut
 
