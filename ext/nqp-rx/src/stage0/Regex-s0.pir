@@ -245,7 +245,10 @@ Create a new cursor for matching C<target>.
 
 .sub '!cursor_init' :method
     .param string target
-    .param int from            :named('from') :optional
+    .param int pos             :named('p') :optional
+    .param int has_pos         :opt_flag
+    .param int cont            :named('c') :optional
+    .param int has_cont        :opt_flag
 
     .local pmc parrotclass, cur
     $P0 = self.'HOW'()
@@ -256,10 +259,18 @@ Create a new cursor for matching C<target>.
     $P0 = target
     setattribute cur, '$!target', $P0
 
-    $P0 = box from
+    if has_cont goto cursor_cont
+    $P0 = box pos
     setattribute cur, '$!from', $P0
-    $P0 = box from
+    $P0 = box pos
     setattribute cur, '$!pos', $P0
+    goto cursor_done
+  cursor_cont:
+    $P0 = box CURSOR_FAIL
+    setattribute cur, '$!from', $P0
+    $P0 = box cont
+    setattribute cur, '$!pos', $P0
+  cursor_done:
 
     .return (cur)
 .end
@@ -295,7 +306,7 @@ provided, then the new cursor has the same type as lang.
     debug = getattribute self, '$!debug'
     setattribute cur, '$!debug', debug
 
-    .return (cur, from, target, from)
+    .return (cur, from, target)
 .end
 
 
@@ -2219,7 +2230,7 @@ Return the POST representation of the regex AST rooted by C<node>.
     concat $S0, pos
     concat $S0, ', '
     concat $S0, tgt
-    concat $S0, ', $I10)'
+    concat $S0, ')'
     ops.'push_pirop'('callmethod', '"!cursor_start"', 'self', 'result'=>$S0)
     self.'!cursorop'(ops, '!cursor_debug', 0, '"START "', regexname_esc)
     unless caparray goto caparray_skip
@@ -2242,8 +2253,8 @@ Return the POST representation of the regex AST rooted by C<node>.
     # operations on the resulting target relative to C<off>.
 
     ops.'push_pirop'('set', off, 0)
-    ops.'push_pirop'('lt', '$I10', 2, startlabel)
-    ops.'push_pirop'('sub', off, '$I10', 1, 'result'=>off)
+    ops.'push_pirop'('lt', pos, 2, startlabel)
+    ops.'push_pirop'('sub', off, pos, 1, 'result'=>off)
     ops.'push_pirop'('substr', tgt, tgt, off, 'result'=>tgt)
     ops.'push'(startlabel)
 
@@ -3088,19 +3099,24 @@ Code for initial regex scan.
     .local pmc cur, pos, eos, ops
     (cur, pos, eos) = self.'!rxregs'('cur pos eos')
     ops = self.'post_new'('Ops', 'node'=>node, 'result'=>cur)
-    .local pmc looplabel, donelabel
+    .local pmc looplabel, scanlabel, donelabel
     $S0 = self.'unique'('rxscan')
     $S1 = concat $S0, '_loop'
     looplabel = self.'post_new'('Label', 'result'=>$S1)
+    $S1 = concat $S0, '_scan'
+    scanlabel = self.'post_new'('Label', 'result'=>$S1)
     $S1 = concat $S0, '_done'
     donelabel = self.'post_new'('Label', 'result'=>$S1)
 
-    ops.'push_pirop'('ge', pos, 0, donelabel)
+    ops.'push_pirop'('callmethod', "'from'", 'self', 'result'=>'$I10')
+    ops.'push_pirop'('ne', '$I10', CURSOR_FAIL, donelabel)
+    ops.'push_pirop'('goto', scanlabel)
     ops.'push'(looplabel)
     self.'!cursorop'(ops, 'from', 1, '$P10')
     ops.'push_pirop'('inc', '$P10')
     ops.'push_pirop'('set', pos, '$P10')
     ops.'push_pirop'('ge', pos, eos, donelabel)
+    ops.'push'(scanlabel)
     ops.'push_pirop'('set_addr', '$I10', looplabel)
     self.'!cursorop'(ops, '!mark_push', 0, 0, pos, '$I10')
     ops.'push'(donelabel)
