@@ -1,17 +1,18 @@
 # $Id$
-
-package Parrot::Test::Cardinal;
-
 # Copyright (C) 2006-2007, Parrot Foundation.
 
+package Parrot::Test::Cardinal;
 use strict;
 use warnings;
-
 use File::Basename;
 
-=head1 Parrot::Test::Cardinal
+=head1 NAME
 
-Provide language specific testing routines here...
+Parrot::Test::Cardinal
+
+=head1 DESCRIPTION
+
+Provide language specific testing routines here.
 
 This is currently alarmingly similar to the generated subs in Parrot::Test.
 Perhaps someone can do a better job of delegation here.
