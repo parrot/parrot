@@ -2236,6 +2236,7 @@ Only on Windows.
 
 .sub '_win32_inno_installer' :anon
     .param pmc kv :slurpy :named
+    run_step('build', kv :flat :named)
 
     $I0 = exists kv['installable_pbc']
     unless $I0 goto L1
@@ -2492,6 +2493,21 @@ TEMPLATE
 
 .sub '_clean_win32_installer' :anon
     .param pmc kv :slurpy :named
+
+    $I0 = exists kv['installable_pbc']
+    unless $I0 goto L1
+    $P0 = kv['installable_pbc']
+    .local string exe, bin
+    exe = get_exe()
+    $P1 = iter $P0
+  L1:
+    unless $P1 goto L2
+    bin = shift $P1
+    $S0 = bin . exe
+    unlink($S0)
+    goto L1
+  L2:
+
     unlink('inno.iss')
     system('if exist setup-parrot-*.exe del setup-parrot-*.exe')
 .end
