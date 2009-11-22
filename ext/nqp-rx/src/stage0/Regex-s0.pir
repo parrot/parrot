@@ -189,8 +189,8 @@ If C<regex> is omitted, then use the C<TOP> rule for the grammar.
     if has_regex goto have_regex
     regex = box 'TOP'
   have_regex:
-    $I0 = isa regex, ['Sub']
-    if $I0 goto regex_done
+    $I0 = isa regex, ['String']
+    unless $I0 goto regex_done
     $S0 = regex
     regex = find_method self, $S0
   regex_done:
