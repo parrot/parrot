@@ -23,10 +23,12 @@ Tests C<ArrayIterator> PMC. Navigate in both directions, check bounds.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(14)
+    plan(21)
 
     iterate_forward() # 8 tests
-    iterate_backward() # 5 tests
+    iterate_backward() # 6 tests
+    iterate_backward_string() # 6 test
+    iterator_init() # 1 test
 .end
 
 
@@ -87,6 +89,49 @@ Tests C<ArrayIterator> PMC. Navigate in both directions, check bounds.
     pop_eh
     ok($I0, "Shifting from finished iterator throws exception")
 .end
+
+.sub 'iterate_backward_string'
+    .local pmc foo, it
+
+    foo = new ['ResizableStringArray']
+    push foo, 'First'
+    push foo, 'Other'
+
+    it = iter foo
+    it = .ITERATE_FROM_END
+    ok(it, "Iterator reset to backward iteration - string")
+    $S0 = pop it
+    ok(it, "Can shift 1st element - string")
+    is($S0, 'Other', "With expected value- string")
+    $S0 = pop it
+    nok(it, "Iterator is finished after second shift - string")
+    is($S0, 'First', "2nd element has correct value - string")
+
+    $I0 = 1
+    push_eh fail
+    $S0 = shift it
+    $I0 = 0
+  fail:
+    pop_eh
+    ok($I0, "Shifting from finished iterator throws exception - string")
+.end
+
+.sub 'iterator_init'
+    .local pmc it, e
+    .local string msg
+    msg = "ArrayIterator can't be directly instantiated, init must throw"
+    push_eh CATCH
+    it = new 'ArrayIterator'
+    pop_eh
+    ok(0, msg)
+    goto DONE
+CATCH:
+    .get_results(e)
+    pop_eh
+    ok(1, msg)
+DONE:
+.end
+
 
 # Local Variables:
 #   mode: cperl
