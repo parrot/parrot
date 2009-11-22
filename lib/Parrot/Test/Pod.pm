@@ -1,5 +1,25 @@
 # Copyright (C) 2009, Parrot Foundation.
 # $Id$
+
+=head1 NAME
+
+Parrot::Test::Pod - Utilities for tests which test POD
+
+=head1 SYNOPSIS
+
+    use Parrot::Test::Pod;
+
+    $self = Parrot::Test::Pod->new( {
+        argv => [ @ARGV ],
+    } );
+
+=head1 DESCRIPTION
+
+This module provides utilities for tests in the Parrot test suite which test
+the validity of documentation written in the POD format.
+
+=cut
+
 package Parrot::Test::Pod;
 use strict;
 use warnings;
@@ -93,22 +113,16 @@ our %second_analysis_subs = (
     },
 );
 
-=head1 Parrot::Test::Pod
+=head1 METHODS
 
-Utilities for tests which test POD.
+=head2 C<new()>
 
-=head2 Synopsis
+B<Purpose:>  Parrot::Test::Pod constructor.
 
-    use Parrot::Test::Pod;
+B<Arguments:>  Hash reference holding, at a minimum, one elemente keyed by
+C<argv>, whose value is typically a reference to C<@ARGV>.
 
-=head2 Description
-
-This module provides utilities for tests in the Parrot test suite which test
-the validity of documentation written in the POD format.
-
-All subroutines herein are exported only on demand.
-
-=head2 Functions
+B<Return Value:>  Parrot::Test::Pod object.
 
 =cut
 
@@ -129,12 +143,10 @@ sub new {
     return bless $args, $class;
 }
 
-=head3 C<identify_files_for_POD_testing()>
+=head2 C<identify_files_for_POD_testing()>
 
-B<Purpose:>
-
-Identifies files in the Parrot distribution which are likely to merit
-examination for the validity of their POD.
+B<Purpose:> Identifies files in the Parrot distribution which are likely to
+merit examination for the validity of their POD.
 
 The subroutine itself does a first pass at that process, and takes as one of
 its arguments a reference to a subroutine which does a second such pass.
@@ -145,12 +157,10 @@ B<Arguments:>
         second_analysis => 'oreilly_summary_malformed',
     } );
 
-B<Return Value:>
-
-A reference to a hash where each element's key is the path to a file deemed
-needing examination for the validity of its POD.  The element's value is
-either C<1> or C<2>, depending on whether it was seen in F<MANIFEST> or
-F<MANIFEST.generated> or both.
+B<Return Value:> A reference to a hash where each element's key is the path to
+a file deemed needing examination for the validity of its POD.  The element's
+value is either C<1> or C<2>, depending on whether it was seen in F<MANIFEST>
+or F<MANIFEST.generated> or both.
 
 B<Comment:> The first time this subroutine is invoked, it creates a Storable
 file in the top-level Parrot directory called F<.pod_examinable.sto>.  That
@@ -236,11 +246,9 @@ sub identify_files_for_POD_testing {
     return [ keys %{ $files_needing_analysis } ];
 }
 
-=head3 C<oreilly_summary_malformed()>
+=head2 C<oreilly_summary_malformed()>
 
-B<Purpose:>
-
-An instance of the "second pass" type of subroutine passed to
+B<Purpose:>  An instance of the "second pass" type of subroutine passed to
 C<identify_files_for_POD_testing()> C<second_analysis> argument.
 
 In this instance, we omit:
@@ -277,14 +285,12 @@ Path to build directory (currently, the top-level Parrot directory).
 
 =back
 
-B<Return Value:>
-
-Reference to hash of files meriting analysis, I<i.e.,> the results of the
-first pass minus the results of the second pass.
+B<Return Value:> Reference to hash of files meriting analysis, I<i.e.,> the
+results of the first pass minus the results of the second pass.
 
 =cut
 
-=head2 Author
+=head1 AUTHOR
 
 James E Keenan, refactored from earlier code
 
