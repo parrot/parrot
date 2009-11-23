@@ -63,9 +63,17 @@ alignment.
 # Load library and store handler
     xlib = loadlib 'libX11'
     $I0 = defined xlib
-    unless $I0 goto cygwin
+    unless $I0 goto check2
     if xlib goto store
-cygwin:
+check2:
+    xlib = loadlib 'libX11.so'
+    unless $I0 goto check3
+    if xlib goto store
+check3:
+    xlib = loadlib 'libX11.so.6'
+    unless $I0 goto check4
+    if xlib goto store
+check4:
     xlib = loadlib 'cygX11-6'
     $I0 = defined xlib
     unless $I0 goto failed
