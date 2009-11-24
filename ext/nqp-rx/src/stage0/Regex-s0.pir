@@ -452,8 +452,12 @@ the address of a label to branch to when backtracking occurs.)
   bstack_done:
 
     # If a new subcursor is being pushed, then save it in cstack
-    # and change cptr to include the new subcursor.
+    # and change cptr to include the new subcursor.  Also clear
+    # any existing match object, as we may have just changed the
+    # match state.
     unless has_subcur goto subcur_done
+    null $P0
+    setattribute self, '$!match', $P0
     .local pmc cstack
     cstack = getattribute self, '@!cstack'
     unless null cstack goto have_cstack
@@ -527,6 +531,10 @@ values of repetition count, cursor position, and mark (address).
     .local int rep, pos, mark, bptr, cptr
     .local pmc bstack
     (rep, pos, mark, bptr, bstack, cptr) = self.'!mark_peek'(mark)
+
+    # clear any existing Match object
+    null $P0
+    setattribute self, '$!match', $P0
 
     .local pmc subcur
     null subcur
