@@ -610,7 +610,7 @@ the value is the PBC pathname
     .local string exe
     exe = get_exe()
     .local int has_strip
-    has_strip = _has_strip()
+    has_strip = _has_strip('')
     $P0 = iter hash
   L1:
     unless $P0 goto L2
@@ -640,10 +640,13 @@ the value is the PBC pathname
 .end
 
 .sub '_has_strip' :anon
+    .param string cflags
     .local pmc config
     config = get_config()
     $S0 = config['gccversion']
     unless $S0 goto L1
+    $I0 = index cflags, '-g '
+    unless $I0 < 0 goto L1
     $S0 = config['cflags']
     $I0 = index $S0, '-g '
     unless $I0 < 0 goto L1
@@ -770,7 +773,7 @@ the value is the OPS pathname
     cmd .= ldflags
     system(cmd)
 
-    $I0 = _has_strip()
+    $I0 = _has_strip(cflags)
     unless $I0 goto L2
     cmd = "strip " . dynext
     system(cmd)
@@ -1040,7 +1043,7 @@ the value is an array of PMC pathname
     cmd .= ldflags
     system(cmd)
 
-    $I0 = _has_strip()
+    $I0 = _has_strip(cflags)
     unless $I0 goto L6
     cmd = "strip " . dynext
     system(cmd)
@@ -2141,7 +2144,7 @@ Same options as install.
   L10:
 
     .local string vcs
-    vcs = 'vcs'
+    vcs = 'VCS'
     $I0 = file_exists('CVS')
     unless $I0 goto L21
     vcs = 'cvs'
@@ -2158,7 +2161,7 @@ Same options as install.
     goto L29
   L23:
     $I0 = file_exists('.svn')
-    unless $I0 goto L4
+    unless $I0 goto L24
     vcs = 'svn'
     goto L29
   L24:
