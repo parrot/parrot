@@ -609,6 +609,8 @@ the value is the PBC pathname
     .param pmc hash
     .local string exe
     exe = get_exe()
+    .local int has_strip
+    has_strip = _has_strip()
     $P0 = iter hash
   L1:
     unless $P0 goto L2
@@ -630,8 +632,24 @@ the value is the PBC pathname
     cmd .= pbc
     cmd .= " --install"
     system(cmd)
+    unless has_strip goto L1
+    cmd = "strip " . $S1
+    system(cmd)
     goto L1
   L2:
+.end
+
+.sub '_has_strip' :anon
+    .local pmc config
+    config = get_config()
+    $S0 = config['gccversion']
+    unless $S0 goto L1
+    $S0 = config['cflags']
+    $I0 = index $S0, '-g '
+    unless $I0 < 0 goto L1
+    .return (1)
+  L1:
+    .return (0)
 .end
 
 =item dynops
@@ -724,13 +742,14 @@ the value is the OPS pathname
     $S2 = _mk_path_gen_dynops(src, ops, suffix, '.c')
     __compile_cc($S1, $S2, cflags)
 
+    .local string dynext
+    $S0 = config['load_ext']
+    dynext = _mk_path_dynops(ops, suffix, $S0)
     cmd = config['ld']
     cmd .= " "
     $S0 = config['ld_out']
     cmd .= $S0
-    $S0 = config['load_ext']
-    $S0 = _mk_path_dynops(ops, suffix, $S0)
-    cmd .= $S0
+    cmd .= dynext
     cmd .= " "
     $S0 = config['o']
     $S0 = _mk_path_gen_dynops(src, ops, suffix, $S0)
@@ -750,6 +769,12 @@ the value is the OPS pathname
   L1:
     cmd .= ldflags
     system(cmd)
+
+    $I0 = _has_strip()
+    unless $I0 goto L2
+    cmd = "strip " . dynext
+    system(cmd)
+  L2:
 .end
 
 .sub '__compile_cc'
@@ -979,13 +1004,14 @@ the value is an array of PMC pathname
     $S2 = _mk_path_gen_dynpmc_group(src, group, '.c')
     __compile_cc($S1, $S2, cflags)
 
+    .local string dynext
+    $S0 = config['load_ext']
+    dynext = _mk_path_dynpmc(group, $S0)
     cmd = config['ld']
     cmd .= " "
     $S0 = config['ld_out']
     cmd .= $S0
-    $S0 = config['load_ext']
-    $S0 = _mk_path_dynpmc(group, $S0)
-    cmd .= $S0
+    cmd .= dynext
     cmd .= " "
     $S0 = _mk_path_gen_dynpmc_group(src, group, obj)
     cmd .= $S0
@@ -1013,6 +1039,12 @@ the value is an array of PMC pathname
   L5:
     cmd .= ldflags
     system(cmd)
+
+    $I0 = _has_strip()
+    unless $I0 goto L6
+    cmd = "strip " . dynext
+    system(cmd)
+  L6:
 .end
 
 .sub '_mk_path_dynpmc' :anon
