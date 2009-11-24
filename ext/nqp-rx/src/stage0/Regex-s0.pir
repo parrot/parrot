@@ -1505,17 +1505,9 @@ has been set then returns C<Str> above.
 .sub 'ast' :method
     .local pmc ast
     ast = getattribute self, '$!ast'
-    if null ast goto ret_null
-    .return (ast)
-  ret_null:
-    .tailcall self.'Str'()
-.end
-
-.sub 'peek_ast' :method
-    .local pmc ast
-    ast = getattribute self, '$!ast'
     unless null ast goto have_ast
     ast = new ['Undef']
+    setattribute self, '$!ast', ast
   have_ast:
     .return (ast)
 .end
