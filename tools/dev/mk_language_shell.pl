@@ -186,8 +186,14 @@ __DATA__
 __README__
 Language '@lang@' was created with @script@, r@rev@.
 
-See doc/@lang@.pod for the documentation, and
-doc/running.pod for the command-line options.
+    $ parrot setup.pir
+    $ parrot setup.pir test
+
+or
+
+    $ parrot Configure.pir
+    $ make
+    $ make test
 
 __Configure.pir__
 #! /usr/local/bin/parrot
@@ -273,15 +279,19 @@ No Configure step, no Makefile generated.
     $S0 = shift args
     load_bytecode 'distutils.pbc'
 
-    # build
     $P0 = new 'Hash'
+    $P0['name'] = '@lang@'
+    $P0['abstract'] = 'the @lang@ compiler'
+    $P0['description'] = 'the @lang@ for Parrot VM.'
+
+    # build
 @no_ops@    $P1 = new 'Hash'
-@no_ops@    $P1['xyz_ops'] = 'src/ops/xyz.ops'
+@no_ops@    $P1['@lclang@_ops'] = 'src/ops/@lclang@.ops'
 @no_ops@    $P0['dynops'] = $P1
 
 @no_pmc@    $P2 = new 'Hash'
-@no_pmc@    $P3 = split ' ', 'src/pmc/xyz.pmc'
-@no_pmc@    $P2['xyz_group'] = $P3
+@no_pmc@    $P3 = split ' ', 'src/pmc/@lclang@.pmc'
+@no_pmc@    $P2['@lclang@_group'] = $P3
 @no_pmc@    $P0['dynpmc'] = $P2
 
     $P4 = new 'Hash'
@@ -295,28 +305,28 @@ No Configure step, no Makefile generated.
 
     $P7 = new 'Hash'
     $P8 = split "\n", <<'SOURCES'
-src/xyz.pir
+src/@lclang@.pir
 src/gen_grammar.pir
 src/gen_actions.pir
 src/builtins.pir
 src/builtins/say.pir
 SOURCES
     $S0 = pop $P8
-    $P7['xyz/xyz.pbc'] = $P8
-    $P7['xyz.pbc'] = 'xyz.pir'
+    $P7['@lclang@/@lclang@.pbc'] = $P8
+    $P7['@lclang@.pbc'] = '@lclang@.pir'
     $P0['pbc_pir'] = $P7
 
     $P9 = new 'Hash'
-    $P9['parrot-xyz'] = 'xyz.pbc'
+    $P9['parrot-@lclang@'] = '@lclang@.pbc'
     $P0['installable_pbc'] = $P9
 
     # test
     $S0 = get_parrot()
-    $S0 .= ' xyz.pbc'
+    $S0 .= ' @lclang@.pbc'
     $P0['prove_exec'] = $S0
 
     # install
-    $P0['inst_lang'] = 'xyz/xyz.pbc'
+    $P0['inst_lang'] = '@lclang@/@lclang@.pbc'
 
     .tailcall setup(args :flat, $P0 :flat :named)
 .end
