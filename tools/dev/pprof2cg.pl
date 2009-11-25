@@ -129,7 +129,7 @@ sub main {
 
     close($in_fh) or die "couldn't close $filename: $!";
 
-    print_stats($stats);
+    #print_stats($stats);
 
     unless ($filename =~ s/pprof/out/) {
         $filename = "$filename.out";
