@@ -77,6 +77,7 @@ any value type.
     piropsig['exit']       = 'vi'
     piropsig['fdiv']       = 'PP+'
     piropsig['find_name']  = 'Ps'
+    piropsig['find_dynamic_lex'] = 'Ps'
     piropsig['getprop']    = 'P~P'
     piropsig['index']      = 'Issi'
     piropsig['join']       = 'SsP'
@@ -1071,8 +1072,16 @@ a 'pasttype' of 'pirop'.
     pirop = node.'pirop'()
     ##  see if pirop is of form "pirop signature"
     $I0 = index pirop, ' '
-    if $I0 < 0 goto pirop_1
+    if $I0 < 0 goto pirop_0
     $I1 = $I0 + 1
+    signature = substr pirop, $I1
+    pirop = substr pirop, 0, $I0
+    goto have_signature
+  pirop_0:
+    ##  see if pirop is of form "pirop__signature"
+    $I0 = index pirop, '__'
+    if $I0 < 0 goto pirop_1
+    $I1 = $I0 + 2
     signature = substr pirop, $I1
     pirop = substr pirop, 0, $I0
     goto have_signature
