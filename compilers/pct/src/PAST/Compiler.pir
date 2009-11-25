@@ -69,6 +69,7 @@ any value type.
     piropsig['chr']        = 'Si'
     piropsig['clone']      = 'PP'
     piropsig['concat']     = 'PP~'
+    piropsig['copy']       = '0PP'
     piropsig['defined']    = 'IP'
     piropsig['die']        = 'v~'
     piropsig['div']        = 'PP+'
