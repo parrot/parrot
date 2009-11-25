@@ -129,7 +129,7 @@ sub main {
 
     close($in_fh) or die "couldn't close $filename: $!";
 
-    #print_stats($stats);
+    print_stats($stats);
 
     unless ($filename =~ s/pprof/out/) {
         $filename = "$filename.out";
@@ -238,7 +238,8 @@ sub process_input {
             $stats->{'global_stats'}{'cli'} = $1;
         }
         elsif ($line =~ /^END_OF_RUNLOOP$/) {
-            #end of loop
+            # This is the end of an outermost runloop.  Several of these can
+            # occur during the execution of a script, e.g. for :init subs.
             @$call_stack = ();
         }
         elsif ($line =~ /^#/) {
