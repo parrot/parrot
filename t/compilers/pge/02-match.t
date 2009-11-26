@@ -1,12 +1,6 @@
-#!perl
-# Copyright (C) 2006-2007, Parrot Foundation.
+#!parrot
+# Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 2;
 
 =head1 NAME
 
@@ -23,30 +17,31 @@ Tests the Match class directly.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'concat on a Match object (rt#39135)' );
 .sub main :main
+    .include 'test_more.pir'
+    plan(4)
+
+    test_concat_on_a_match_object()
+    test_push_on_a_match_object()
+.end
+
+.sub test_concat_on_a_match_object
     load_bytecode 'PGE.pbc'
 
     $P0 = compreg 'PGE::Perl6Regex'
     $P1 = $P0('.+')
     $P2 = $P1('world')
 
-    say $P2              # world
+    is($P2, 'world', 'concat on a Match object (rt#39135)')
 
     $P3 = new 'String'
     $P3 = 'hello '
 
     $P4 = concat $P3, $P2
-    say $P4              # hello world
+    is($P4, 'hello world', 'concat on a Match object (rt#39135)')
 .end
 
-CODE
-world
-hello world
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', 'push on a Match object' );
-.sub main :main
+.sub test_push_on_a_match_object
     .local pmc match, str, arr
     load_bytecode 'PGE.pbc'
     match = new ['PGE';'Match']
@@ -55,19 +50,14 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'push on a Match object' );
     push match, str
     arr = match.'list'()
     $I0 = elements arr
-    print $I0
-    print "\n"
+    is($I0, 1, 'push on a Match object')
     $P3 = match[0]
-    say $P3
+    is($P3, 'foo', 'push on a Match object')
 .end
-CODE
-1
-foo
-OUTPUT
 
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 filetype=pir:
