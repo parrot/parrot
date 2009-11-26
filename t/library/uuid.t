@@ -1,12 +1,6 @@
-#!perl
-# Copyright (C) 2008, Parrot Foundation.
+#!parrot
+# Copyright (C) 2008-2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( t . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 9;
 
 =head1 NAME
 
@@ -22,166 +16,118 @@ uuid library tests
 
 =cut
 
-pir_output_is( << 'CODE', << 'OUTPUT', 'generate' );
-.sub test :main
+.sub main :main
+    .include 'test_more.pir'
+    plan(20)
+
+    test_generate_1()
+    test_generate_2()
+    test_generate_random()
+    test_generate_time()
+    test_parse_1()
+    test_parse_2()
+    test_time()
+    test_type()
+    test_variant()
+.end
+
+
+.sub test_generate_1
     load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'generate'
     $P1 = $P0()
     $S1 = typeof $P1
-    print $S1
-    print "\n"
+    is($S1,'uuid', 'generate 1')
 .end
-CODE
-uuid
-OUTPUT
 
 
-pir_output_like( << 'CODE', << 'OUTPUT', 'generate' );
-.sub test :main
+.sub test_generate_2
     load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'generate'
     $P1 = $P0()
-    print $P1
+    like($P1, '<[0..9a..f]>**8\-<[0..9a..f]>**4\-<[0..9a..f]>**4\-<[0..9a..f]>**4\-<[0..9a..f]>**12', 'generate 2' )
 .end
-CODE
-/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
-OUTPUT
 
 
-pir_output_like( << 'CODE', << 'OUTPUT', 'generate_random' );
-.sub test :main
+.sub test_generate_random
     load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'generate_random'
     $P1 = $P0()
-    print $P1
+    like($P1, '<[0..9a..f]>**8\-<[0..9a..f]>**4\-<[0..9a..f]>**4\-<[0..9a..f]>**4\-<[0..9a..f]>**12', 'generate random')
 .end
-CODE
-/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
-OUTPUT
 
 
-pir_output_like( << 'CODE', << 'OUTPUT', 'generate_time' );
-.sub test :main
+.sub test_generate_time
     load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'generate_time'
     $P1 = $P0()
-    print $P1
+    like($P1, '<[0..9a..f]>**8\-<[0..9a..f]>**4\-<[0..9a..f]>**4\-<[0..9a..f]>**4\-<[0..9a..f]>**12', 'generate time')
 .end
-CODE
-/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
-OUTPUT
 
 
-pir_output_is( << 'CODE', << 'OUTPUT', 'parse' );
-.sub test :main
+.sub test_parse_1
     load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'parse'
     ($I0, $P1) = $P0("84949cc5-4701-4a84-895b-354c584a981b")
-    print $I0
-    print "\n"
+    is($I0, 0, 'parse 1')
     $S1 = typeof $P1
-    print $S1
-    print "\n"
+    is($S1, 'uuid', 'parse 1')
 .end
-CODE
-0
-uuid
-OUTPUT
 
 
-pir_output_is( << 'CODE', << 'OUTPUT', 'parse' );
-.sub test :main
+.sub test_parse_2
     load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'parse'
     $I0 = $P0("84949cc5-4701-4a84-895b-354c584a981b")
-    print $I0
-    print "\n"
+    is($I0, 0, 'parse 2')
     $I0 = $P0("84949CC5-4701-4A84-895B-354C584A981B")
-    print $I0
-    print "\n"
+    is($I0, 0, 'parse 2')
     $I0 = $P0("84949cc5-4701-4a84-895b-354c584a981bc")
-    print $I0
-    print "\n"
+    is($I0, -1, 'parse 2')
     $I0 = $P0("84949cc5-4701-4a84-895b-354c584a981")
-    print $I0
-    print "\n"
+    is($I0, -1, 'parse 2')
     $I0 = $P0("84949cc5x4701-4a84-895b-354c584a981b")
-    print $I0
-    print "\n"
+    is($I0, -1, 'parse 2')
     $I0 = $P0("84949cc504701-4a84-895b-354c584a981b")
-    print $I0
-    print "\n"
+    is($I0, -1, 'parse 2')
     $I0 = $P0("84949cc5-470104a84-895b-354c584a981b")
-    print $I0
-    print "\n"
+    is($I0, -1, 'parse 2')
     $I0 = $P0("84949cc5-4701-4a840895b-354c584a981b")
-    print $I0
-    print "\n"
+    is($I0, -1, 'parse 2')
     $I0 = $P0("84949cc5-4701-4a84-895b0354c584a981b")
-    print $I0
-    print "\n"
+    is($I0, -1, 'parse 2')
     $I0 = $P0("g4949cc5-4701-4a84-895b-354c584a981b")
-    print $I0
-    print "\n"
+    is($I0, -1, 'parse 2')
     $I0 = $P0("84949cc5-4701-4a84-895b-354c584a981g")
-    print $I0
-    print "\n"
+    is($I0, -1, 'parse 2')
 .end
-CODE
-0
-0
--1
--1
--1
--1
--1
--1
--1
--1
--1
-OUTPUT
 
 
-pir_output_is( << 'CODE', << 'OUTPUT', 'time' );
-.sub test :main
+.sub test_time
     load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'parse'
     ($I0, $P1) = $P0("84949cc5-4701-4a84-895b-354c584a981b")
     $I1 = $P1.'time'()
-    print $I1
-    print "\n"
+    is($I1, -1, 'time')
 .end
-CODE
--1
-OUTPUT
 
 
-pir_output_is( << 'CODE', << 'OUTPUT', 'type' );
-.sub test :main
+.sub test_type
     load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'generate'
     $P1 = $P0()
     $I0 = $P1.'type'()
-    print $I0
-    print "\n"
+    is($I0, 4, 'type')
 .end
-CODE
-4
-OUTPUT
 
 
-pir_output_is( << 'CODE', << 'OUTPUT', 'variant' );
-.sub test :main
+.sub test_variant
     load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'generate'
     $P1 = $P0()
     $I0 = $P1.'variant'()
-    print $I0
-    print "\n"
+    is($I0, 1, 'variant')
 .end
-CODE
-1
-OUTPUT
 
 
 # Local Variables:
@@ -189,4 +135,4 @@ OUTPUT
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 filetype=pir:
