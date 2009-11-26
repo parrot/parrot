@@ -1,4 +1,12 @@
-#!./parrot
+#!parrot
+# Copyright (C) 2001-2009, Parrot Foundation.
+# $Id$
+
+=head1 NAME
+
+t/op/time.t - Time and Sleep
+
+=cut
 
 .sub main :main
     .include 'test_more.pir'
@@ -150,3 +158,11 @@
     $S0 = typeof $P0
     is($S0, "Array", "decodelocaltime returns the correct PMC type")
 .end
+
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 filetype=pir:
