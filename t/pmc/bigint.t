@@ -1,14 +1,6 @@
-#! perl
-# Copyright (C) 2001-2007, Parrot Foundation.
+#!parrot
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-
-use Test::More;
-use Parrot::Test;
-use Parrot::Config;
 
 =head1 NAME
 
@@ -24,654 +16,876 @@ Tests the BigInt PMC.
 
 =cut
 
-if ( $PConfig{gmp} ) {
-    plan tests => 44;
-}
-else {
-    plan skip_all => "No BigInt Lib configured";
-}
-
-my $vers_check = <<'EOP';
 .sub main :main
-    .local pmc b, ar
-    .local string v
-    .local int ma, mi, pa
-    b = new ['BigInt']
-    v = b.'version'()
-    ar = split '.', v
-    ma = ar[0]
-    mi = ar[1]
-    pa = ar[2]
-    if ma >= 4 goto ge_4
-warn:
-    print 'GMP version '
-    print v
-    print " is buggy with huge digit multiply - please upgrade\n"
-    end
-ge_4:
-   if mi >= 2 goto ok
-   if mi == 0 goto warn
-   # test 4.1.x
-   if pa >= 4 goto ok
-   goto warn
-   end
-ok:
+
+    .include 'test_more.pir'
+
+    plan(45)
+    check_libgmp_good()
+
+    set_and_get()
+    addition()
+    subtraction()
+    multiplication()
+    division()
+    division_by_zero()
+    negation()
+    absolute_value()
+    overflow_coercion()
+    interface()
+    boolean()
+    pi()
+    left_shift()
+    right_shift()
+    bugfixes()
+
 .end
-EOP
 
-if ( $PConfig{gmp} ) {
+.include 'iglobals.pasm'
+.include 'fp_equality.pasm'
+.include 'errors.pasm'
 
-    # argh
-    my $parrot = '.' . $PConfig{slash} . 'parrot' . $PConfig{exe};
-    my $test   = 'temp_gmp_vers.pir';
-    open my $O, '>', "$test" or die "can't open $test: $!";
-    print $O $vers_check;
-    close $O;
-    my $warn = `$parrot $test`;
-    diag $warn if $warn;
-    unlink $test;
-}
+.sub check_libgmp_good
+    # check libgmp included in Parrot build
+    $P0 = getinterp
+    $P1 = $P0[.IGLOBALS_CONFIG_HASH]
 
-pasm_output_is( <<'CODE', <<'OUT', "create" );
-   new P0, ['BigInt']
-   print "ok\n"
-   end
-CODE
-ok
-OUT
+    $P2 = $P1['gmp']
+    $I1 = isnull $P2
+    if $I1, NoLibGMP
+    say 'This Parrot uses GMP'
 
-pasm_output_is( <<'CODE', <<'OUT', "set/get int" );
-   new P0, ['BigInt']
-   set P0, 999999
-   set I1, P0
-   print I1
-   print "\n"
-   get_repr S0, P0
-   print S0
-   print "\n"
-   end
-CODE
-999999
-999999L
-OUT
+    # check version is >= 4.1.4
+    $P0 = new ['BigInt']
+    $S3 = $P0.'version'()
+    $P1 = split '.', $S3
+    $S0 = $P1[0]
+    $I0 = $S0
+    gt $I0, 4, Config2
+    lt $I0, 4, OldLibGMP
+    $S1 = $P1[1]
+    $I1 = $S1
+    gt $I1, 1, Config2
+    lt $I1, 1, OldLibGMP
+    $S2 = $P1[2]
+    $I2 = $S2
+    lt $I2, 4, OldLibGMP
 
-pasm_output_is( <<"CODE", <<'OUT', "set int, get double" );
-     .include 'fp_equality.pasm'
-     new P0, ['BigInt']
-     set P0, 999999
-     set N1, P0
-     .fp_eq_pasm(N1, 999999.0, OK1)
-     print "not "
-OK1: print "ok 1\\n"
+Config2:
+    print 'Suitable GMP version ['
+    print $S3
+    say '] available'
+    goto ret
 
-     set P0, -999999
-     set N1, P0
-     .fp_eq_pasm(N1, -999999.0, OK2)
-     print "not "
-OK2: print "ok 2\\n"
+NoLibGMP:
+    ok(1, 'No BigInt Lib configured')
+    skip(44)
+    exit 0
 
-     set P0, 2147483646
-     set N1, P0
-     .fp_eq_pasm(N1, 2.147483646e9, OK3)
-     print "not "
-OK3: print "ok 3\\n"
+OldLibGMP:
+    print 'Buggy GMP version ['
+    print $S3
+    say '] with huge digit multiply - please upgrade'
+    ok(0)
+    skip(44)
+    exit 1
 
-     set P0, -2147483646
-     set N1, P0
-     .fp_eq_pasm(N1, -2.147483646e9, OK4)
-     print "not "
-OK4: print "ok 4\\n"
-     end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUT
+ret:
+.end
 
-pasm_output_is( <<'CODE', <<'OUT', "set double, get str" );
-   new P0, ['BigInt']
-   set P0, 1.23e12
-   print P0
-   print "\n"
-   end
-CODE
-1230000000000
-OUT
+.sub set_and_get
+    $I1 = 1
+    $P0 = new ['BigInt']
+    $I0 = 999999
+    $P0 = $I0
+    $I2 = $P0
+    eq $I0, $I2, OK1
+    $I1 = 0
+    say 'set_int/get_int 999999 wrong'
+OK1:
 
-pasm_output_is( <<'CODE', <<'OUT', "set str, get str" );
-   new P0, ['BigInt']
-   set P0, "1230000000000"
-   print P0
-   print "\n"
-   end
-CODE
-1230000000000
-OUT
+    $P0 = new ['BigInt']
+    $I0 = 999999
+    $P0 = $I0
+    $S0 = get_repr $P0
+    $I2 = $S0
+    eq $I0, $I2, OK2
+    $I1 = 0
+    say 'set_int/get_str 999999 wrong'
+OK2:
 
-pasm_output_is( <<'CODE', <<'OUT', "add" );
-   new P0, ['BigInt']
-   set P0, 999999
-   new P1, ['BigInt']
-   set P1, 1000000
-   new P2, ['BigInt']
-   add P2, P0, P1
-   set S0, P2
-   print S0
-   print "\n"
-   set P0, "12345678987654321"
-   set P1, "10000000000000000"
-   add P2, P1, P0
-   set S0, P2
-   print S0
-   print "\n"
-   end
-CODE
-1999999
-22345678987654321
-OUT
+    $P0 = new ['BigInt']
+    $P0 = 999999
+    $N1 = $P0
+    .fp_eq($N1, 999999.0, OK3)
+    $I1 = 0
+    say 'set_int/get_num 999999 wrong'
+OK3:
 
-pasm_output_is( <<'CODE', <<'OUT', "add_int" );
-   new P0, ['BigInt']
-   set P0, 999999
-   new P2, ['BigInt']
-   add P2, P0, 1000000
-   set S0, P2
-   print S0
-   print "\n"
-   set P0, "100000000000000000000"
-   add P2, P0, 1000000
-   set S0, P2
-   print S0
-   print "\n"
-   end
-CODE
-1999999
-100000000000001000000
-OUT
+    $P0 = -999999
+    $N1 = $P0
+    .fp_eq($N1, -999999.0, OK4)
+    $I1 = 0
+    say 'set_int/get_num -999999 wrong'
+OK4:
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "sub bigint" );
-     new P0, ['BigInt']
-     set P0, 12345678
-     new P1, ['BigInt']
-     set P1, 5678
-     new P2, ['BigInt']
-     sub P2, P0, P1
-     set I0, P2
-     eq I0, 12340000, OK1
-     print "not "
-OK1: print "ok 1\n"
-     set P0, "123456789012345678"
-     sub P2, P0, P1
-     new P3, ['BigInt']
-     set P3, "123456789012340000"
-     eq P2, P3, OK2
-     print "not "
-OK2: print "ok 2\n"
-     set P1, "223456789012345678"
-     sub P2, P0, P1
-     set P3, "-100000000000000000"
-     eq P2, P3, OK3
-     print "not "
-OK3: print "ok 3\n"
-     end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
+    $P0 = 2147483646
+    $N1 = $P0
+    .fp_eq($N1, 2.147483646e9, OK5)
+    $I1 = 0
+    say 'set_int/get_num 2^31-1 wrong'
+OK5:
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "sub native int" );
-     new P0, ['BigInt']
-     set P0, 12345678
-     new P2, ['BigInt']
-     sub P2, P0, 5678
-     set I0, P2
-     eq I0, 12340000, OK1
-     print "not "
-OK1: print "ok 1\n"
-     set P0, "123456789012345678"
-     sub P2, P0, 5678
-     new P3, ['BigInt']
-     set P3, "123456789012340000"
-     eq P2, P3, OK2
-     print "not "
-OK2: print "ok 2\n"
-     end
-CODE
-ok 1
-ok 2
-OUTPUT
+    $P0 = -2147483646
+    $N1 = $P0
+    .fp_eq($N1, -2.147483646e9, OK6)
+    $I1 = 0
+    say 'set_int/get_num 2-2^31 wrong'
+OK6:
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "sub other int" );
-     new P0, ['BigInt']
-     set P0, 12345678
-     new P1, ['Integer']
-     set P1, 5678
-     new P2, ['BigInt']
-     sub P2, P0, P1
-     set I0, P2
-     eq I0, 12340000, OK1
-     print "not "
-OK1: print "ok 1\n"
-     set P0, "123456789012345678"
-     sub P2, P0, P1
-     new P3, ['BigInt']
-     set P3, "123456789012340000"
-     eq P2, P3, OK2
-     print "not "
-OK2: print "ok 2\n"
-     set P0, 9876543
-     new P4, ['Integer']
-     set P4, 44
-     sub P2, P0, P4
-     set I0, P2
-     eq I0, 9876499, OK3
-     print "not "
-OK3: print "ok 3\n"
-     set P0, "9876543219876543"
-     sub P2, P0, P4
-     set P3, "9876543219876499"
-     eq P3, P2, OK4
-     print "not "
-OK4: print "ok 4\n"
-     end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
+    $P0 = new ['BigInt']
+    $P0 = 1.23e12
+    $S0 = $P0
+    eq $S0, '1230000000000', OK7
+    $I1 = 0
+    say 'set_num/get_str 1230000000000'
+OK7:
 
-pasm_output_is( <<'CODE', <<'OUT', "mul" );
-   new P0, ['BigInt']
-   set P0, 999999
-   new P1, ['BigInt']
-   set P1, 1000000
-   new P2, ['BigInt']
-   mul P2, P0, P1
-   set S0, P2
-   print S0
-   print "\n"
-   end
-CODE
-999999000000
-OUT
+    $P0 = new ['BigInt']
+    $P0 = '1230000000000'
+    $S0 = $P0
+    eq $S0, '1230000000000', OK8
+    $I1 = 0
+    say 'set_str/get_str 1230000000000'
 
-pasm_output_is( <<'CODE', <<'OUT', "mul_int" );
-   new P0, ['BigInt']
-   set P0, 999999
-   new P2, ['BigInt']
-   mul P2, P0, 1000000
-   print P2
-   print "\n"
-   end
-CODE
-999999000000
-OUT
+OK8:
+    ok($I1, 'set and get combinations')
+.end
 
-pasm_output_is( <<'CODE', <<'OUT', "div bigint" );
-     new P0, ['BigInt']
-     set P0, "100000000000000000000"
-     new P1, ['BigInt']
-     set P1, "100000000000000000000"
-     new P2, ['BigInt']
-     div P2, P0, P1
-     set I0, P2
-     eq I0, 1, OK1
-     print "not "
-OK1: print "ok 1\n"
+.sub addition
+    $I1 = 1
+    $P0 = new ['BigInt']
+    $P0 = 999999
+    $P1 = new ['BigInt']
+    $P1 = 1000000
+    $P2 = new ['BigInt']
+    $P2 = add $P0, $P1
+    $S0 = $P2
+    eq $S0, '1999999', OK1
+    $I1 = 0
+    say 'add 999999+1000000 wrong'
+OK1:
 
-     new P3, ['BigInt']
-     set P3, "10000000000000"
-     set P1, 10000000
-     div P2, P0, P1
-     eq  P2, P3, OK2
-     print "not "
-OK2: print "ok 2\n"
+    $P0 = '12345678987654321'
+    $P1 = '10000000000000000'
+    $P2 = add $P1, $P0
+    $S0 = $P2
+    eq $S0,'22345678987654321',OK2
+    $I1 = 0
+    say 'add 12345678987654321+10000000000000000 wrong'
+OK2:
+    ok($I1, 'add(bigint,bigint)')
 
-     set P1, 10
-     set P3, "10000000000000000000"
-     div P2, P0, P1
-     eq  P2, P3, OK3
-     print "not "
-OK3: print "ok 3\n"
+    $I1 = 1
+    $P0 = 999999
+    $P2 = add $P0, 1000000
+    $S0 = $P2
+    eq $S0,'1999999',OK3
+    $I1 = 0
+    say 'add 999999+1000000 wrong'
+OK3:
 
-     set P1, -1
-     set P3, "-100000000000000000000"
-     div P2, P0, P1
-     eq  P2, P3, OK4
-     print "not "
-OK4: print "ok 4\n"
-     end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUT
+    $P0 = '100000000000000000000'
+    $P2 = add $P0, 1000000
+    $S0 = $P2
+    eq $S0,'100000000000001000000',OK4
+    $I1 = 0
+    say 'add 100000000000000000000+1000000 wrong'
+OK4:
+    ok($I1, 'add(bigint,nativeint)')
 
-pasm_output_is( <<'CODE', <<'OUT', "div native int" );
-     new P0, ['BigInt']
-     set P0, "100000000000000000000"
-     new P1, ['BigInt']
-     div P1, P0, 10
-     new P2, ['BigInt']
-     set P2, "10000000000000000000"
-     eq P1, P2, OK1
-     print "not "
-OK1: print "ok 1\n"
+.end
 
-     set P0, "100000000000000"
-     div P1, P0, 10000000
-     set P2, 10000000
-     eq  P1, P2, OK2
-     print "not "
-OK2: print "ok 2\n"
-     end
-CODE
-ok 1
-ok 2
-OUT
+.sub subtraction
+    $I1 = 1
+    $P0 = new ['BigInt']
+    $P0 = 12345678
+    $P1 = new ['BigInt']
+    $P1 = 5678
+    $P2 = new ['BigInt']
+    $P2 = sub $P0, $P1
+    $I0 = $P2
+    eq $I0, 12340000, OK1
+    $I1 = 0
+    say 'sub 12345678-5678 wrong'
+OK1:
 
-pasm_output_is( <<'CODE', <<'OUT', "div other int" );
-     new P0, ['BigInt']
-     set P0, "100000000000000000000"
-     new P1, ['BigInt']
-     new P3, ['Integer']
-     set P3, 10
-     div P1, P0, P3
-     new P2, ['BigInt']
-     set P2, "10000000000000000000"
-     eq P1, P2, OK1
-     print "not "
-OK1: print "ok 1\n"
+    $P0 = '123456789012345678'
+    $P2 = sub $P0, $P1
+    $P3 = new ['BigInt']
+    $P3 = '123456789012340000'
+    eq $P2, $P3, OK2
+    $I1 = 0
+    say 'sub 123456789012345678-5678 wrong'
+OK2:
 
-     set P0, "100000000000000"
-     new P4, ['Integer']
-     set P4, 10000000
-     div P1, P0, P4
-     set P2, 10000000
-     eq  P1, P2, OK2
-     print "not "
-OK2: print "ok 2\n"
-     end
-CODE
-ok 1
-ok 2
-OUT
+    $P1 = '223456789012345678'
+    $P2 = sub $P0, $P1
+    $P3 = '-100000000000000000'
+    eq $P2, $P3, OK3
+    $I1 = 0
+    say 'sub 123456789012345678-(-100000000000000000) wrong'
+OK3:
+    ok($I1, 'sub(bigint,bigint)')
+    $I1 = 1
 
-for my $op ( "/", "%" ) {
-    for my $type ( "BigInt", "Integer" ) {
-        pir_output_is( <<"CODE", <<OUTPUT, "bigint $op by zero $type" );
-.sub _main :main
-    \$P0 = new ['BigInt']
-    set \$P0, "1000000000000000000000"
-    \$P1 = new ['BigInt']
-    ## divide by a zero $type
-    \$P2 = new ['$type']
-    set \$P2, 0
-    push_eh OK
-    \$P1 = \$P0 $op \$P2
-    print "fail\\n"
+    $P0 = 12345678
+    $P2 = sub $P0, 5678
+    $I0 = $P2
+    eq $I0, 12340000, OK4
+    $I1 = 0
+    say 'sub 12345678-5678 wrong'
+OK4:
+
+    $P0 = '123456789012345678'
+    $P2 = sub $P0, 5678
+    $P3 = new ['BigInt']
+    $P3 = '123456789012340000'
+    eq $P2, $P3, OK5
+    $I1 = 0
+    say 'sub 123456789012345678-5678 wrong'
+OK5:
+
+    $P0 = new ['BigInt']
+    $P0 = 12345678
+    $P1 = new ['Integer']
+    $P1 = 5678
+    $P2 = new ['BigInt']
+    $P2 = sub $P0, $P1
+    $I0 = $P2
+    eq $I0, 12340000, OK6
+    $I1 = 0
+    say 'sub 12345678-5678 wrong'
+OK6:
+
+    $P0 = '123456789012345678'
+    $P2 = sub $P0, $P1
+    $P3 = new ['BigInt']
+    $P3 = '123456789012340000'
+    eq $P2, $P3, OK7
+    $I1 = 0
+    say 'sub 123456789012345678-5678 wrong'
+OK7:
+
+    $P0 = 9876543
+    $P4 = new ['Integer']
+    $P4 = 44
+    $P2 = sub $P0, $P4
+    $I0 = $P2
+    eq $I0, 9876499, OK8
+    $I1 = 0
+    say 'sub 9876543-44 wrong'
+OK8:
+
+    $P0 = '9876543219876543'
+    $P2 = sub $P0, $P4
+    $P3 = '9876543219876499'
+    eq $P3, $P2, OK9
+    $I1 = 0
+    say 'sub 9876543219876543-44 wrong'
+OK9:
+    ok($I1, 'sub(bigint,integer)')
+.end
+
+.sub multiplication
+    $P0 = new ['BigInt']
+    $P0 = 999999
+    $P1 = new ['BigInt']
+    $P1 = 1000000
+    $P2 = new ['BigInt']
+    $P2 = mul $P0, $P1
+    $S0 = $P2
+    is($S0, '999999000000', 'mul(bigint,bigint)')
+
+    $P0 = new ['BigInt']
+    $P0 = 999999
+    $P2 = new ['BigInt']
+    $P2 = mul $P0, 1000000
+    is($P2, '999999000000', 'mul(bigint,nativeint)')
+.end
+
+.sub division
+    $I1 = 1
+    $P0 = new ['BigInt']
+    $P0 = '100000000000000000000'
+    $P1 = new ['BigInt']
+    $P1 = '100000000000000000000'
+    $P2 = new ['BigInt']
+    $P2 = div $P0, $P1
+    $I0 = $P2
+    eq $I0, 1, OK1
+    $I1 = 0
+    say 'div 100000000000000000000/100000000000000000000 wrong'
+OK1:
+
+    $P3 = new ['BigInt']
+    $P3 = '10000000000000'
+    $P1 = 10000000
+    $P2 = div $P0, $P1
+    eq $P2, $P3, OK2
+    $I1 = 0
+    say 'div 100000000000000000000/10000000 wrong'
+OK2:
+
+    $P1 = 10
+    $P3 = '10000000000000000000'
+    $P2 = div $P0, $P1
+    eq $P2, $P3, OK3
+    $I1 = 0
+    say 'div 100000000000000000000/10 wrong'
+OK3:
+
+    $P1 = -1
+    $P3 = '-100000000000000000000'
+    $P2 = div $P0, $P1
+    eq $P2, $P3, OK4
+    $I1 = 0
+    say 'div 100000000000000000000/(-1) wrong'
+OK4:
+    ok($I1, 'div(bigint,bigint)')
+    $I1 = 1
+
+    $P0 = new ['BigInt']
+    $P0 = '100000000000000000000'
+    $P1 = new ['BigInt']
+    $P1 = div $P0, 10
+    $P2 = new ['BigInt']
+    $P2 = '10000000000000000000'
+    eq $P1, $P2, OK5
+    $I1 = 0
+    say 'div 100000000000000000000/10 wrong'
+OK5:
+
+    $P0 = '100000000000000'
+    $P1 = div $P0, 10000000
+    $P2 = 10000000
+    eq $P1, $P2, OK6
+    $I1 = 0
+    say 'div 100000000000000/10000000 wrong'
+OK6:
+    ok($I1, 'div(bigint,nativeint)')
+    $I1 = 1
+
+    $P0 = new ['BigInt']
+    $P0 = '100000000000000000000'
+    $P1 = new ['BigInt']
+    $P3 = new ['Integer']
+    $P3 = 10
+    $P1 = div $P0, $P3
+    $P2 = new ['BigInt']
+    $P2 = '10000000000000000000'
+    eq $P1, $P2, OK7
+    $I1 = 0
+    say 'div 100000000000000000000/10 wrong'
+OK7:
+
+    $P0 = '100000000000000'
+    $P4 = new ['Integer']
+    $P4 = 10000000
+    $P1 = div $P0, $P4
+    $P2 = 10000000
+    eq $P1, $P2, OK8
+    $I1 = 0
+    say 'div 100000000000000/10000000 wrong'
+OK8:
+    ok($I1, 'div(bigint,integer)')
+
+.end
+
+.sub division_by_zero
+    $I1 = 1
+    $P0 = new ['BigInt']
+    $P0 = '1000000000000000000000'
+    $P1 = new ['BigInt']
+    ## divide by a zero BigInt
+    $P2 = new ['BigInt']
+    $P2 = 0
+    push_eh E1
+        $P1 = div $P0, $P2
+        $I1 = 0
+        say 'Failed to throw exception'
+E1:
     pop_eh
-OK:
-    get_results '0', \$P0
-    \$S0 = \$P0
-    print "ok\\n"
-    print \$S0
-    print "\\n"
+    get_results '0', $P0
+    $S0 = $P0
+    eq $S0, 'Divide by zero', OK1
+    $I1 = 0
+    print $S0
+    say ' is wrong exception type'
+OK1:
+    ok($I1, 'div(bigint,bigint 0) throws "Divide by zero" exception')
+    $I1 = 1
+
+    $P0 = new ['BigInt']
+    $P0 = '1000000000000000000000'
+    $P1 = new ['BigInt']
+    ## modulus by a zero BigInt
+    $P2 = new ['BigInt']
+    $P2 = 0
+    push_eh E2
+        $P1 = mod $P0, $P2
+        $I1 = 0
+        say 'Failed to throw exception'
+E2:
+    pop_eh
+    get_results '0', $P0
+    $S0 = $P0
+    eq $S0, 'Divide by zero', OK2
+    $I1 = 0
+    print $S0
+    say ' is wrong exception type'
+OK2:
+    ok($I1, 'mod(bigint,bigint 0) throws "Divide by zero" exception')
+    $I1 = 1
+
+    $P0 = new ['BigInt']
+    $P0 = '1000000000000000000000'
+    $P1 = new ['BigInt']
+    ## divide by a zero Integer
+    $P2 = new ['Integer']
+    $P2 = 0
+    push_eh E3
+        $P1 = div $P0, $P2
+        $I1 = 0
+        say 'Failed to throw exception'
+E3:
+    pop_eh
+    get_results '0', $P0
+    $S0 = $P0
+    eq $S0, 'Divide by zero', OK3
+    $I1 = 0
+    print $S0
+    say ' is wrong exception type'
+OK3:
+    ok($I1, 'div(bigint,integer 0) throws "Divide by zero" exception')
+    $I1 = 1
+
+    $P0 = new ['BigInt']
+    $P0 = '1000000000000000000000'
+    $P1 = new ['BigInt']
+    ## modulus by a zero Integer
+    $P2 = new ['Integer']
+    $P2 = 0
+    push_eh E4
+        $P1 = mod $P0, $P2
+        $I1 = 0
+        say 'Failed to throw exception'
+E4:
+    pop_eh
+    get_results '0', $S0
+    eq $S0, 'Divide by zero', OK4
+    $I1 = 0
+    print $S0
+    say ' is wrong exception type'
+OK4:
+    ok($I1, 'mod(bigint,integer 0) throws "Divide by zero" exception')
+
 .end
-CODE
-ok
-Divide by zero
-OUTPUT
-    }
-}
 
-{
-    my ( $a, $b, $c, $d, $e );
-    if ( $PConfig{intvalsize} == 8 ) {
-        $a = '9223372036854775806';    # 2**63-2
-        $b = '1';
-        $c = '9223372036854775807';    # still Integer
-        $d = '9223372036854775808';    # no more Integer
-        $e = '9223372036854775809';    # still no more Integer
-    }
-    elsif ( $PConfig{intvalsize} == 4 ) {
-        $a = '2147483646';             # 2**31-2
-        $b = '1';
-        $c = '2147483647';             # still Integer
-        $d = '2147483648';             # no more PerlInt
-        $e = '2147483649';             # still no more PerlInt
-    }
-    else {
-        die "\$PConfig{intvalsize} == $PConfig{intvalsize}?\n";
-    }
+.sub negation
+    $I1 = 1
+    $P0 = new ['BigInt']
+    $P1 = new ['BigInt']
+    $P0 = '123456789123456789'
+    neg $P0
+    $P1 = '-123456789123456789'
+    eq $P0, $P1, OK1
+    $I1 = 0
+OK1:
+    $P0 = '-123456789123456789'
+    neg $P0
+    $P1 = '123456789123456789'
+    eq $P0, $P1, OK2
+    $I1 = 0
+OK2:
+    ok($I1, 'negation')
+.end
 
-    pasm_output_is( <<CODE, <<OUT, "add overflow Integer" );
-   new P0, ['Integer']
-   set P0, $a
-   new P1, ['Integer']
-   set P1, $b
-   new P2, ['Integer']
-   new P3, ['BigInt']
-   set I3, 3
-lp:
-   add P2, P0, P1
-   set S0, P2
-   print S0
-   print " "
-   typeof S1, P2
-   print S1
-   print "\\n"
-   add P1, $b
-   dec I3
-   if I3, lp
-   print "ok\\n"
+.sub absolute_value
+    $P0 = new ['BigInt']
+    $P0 = '-1230000000000000000000'
+    $P1 = new ['Undef']
+    $P1 = abs $P0
+    $S0 = $P1
+    is($S0,'1230000000000000000000','abs negates negative number')
+    $S0 = $P0
+    is($S0,'-1230000000000000000000','... and original unchanged with 2-arg form')
+    $P1 = abs $P1
+    $S0 = $P1
+    is($S0,'1230000000000000000000','... does not change to positive number')
+    $S0 = $P1
+    abs $P0
+    $S0 = $P0
+    is($S0,'1230000000000000000000','... and in-place works too')
+.end
+
+.sub overflow_coercion
+    # check libgmp included in Parrot build
+    $P0 = getinterp
+    $P4 = $P0[.IGLOBALS_CONFIG_HASH]
+    $I0 = $P4['intvalsize']
+    eq $I0, 8, sz8
+    eq $I0, 4, sz4
+    print 'Cannot cope with sizeof(INTVAL) == '
+    say $I0
+    skip(43)
+    exit 1
+
+sz8:
+    $I3 = 0x100000000               # sqrt(2*(MinInt+1))
+    $I4 = 9223372036854775806       # MaxInt-1 == 2**63-2
+    $I5 = 9223372036854775807       # MaxInt
+    $S5 = '9223372036854775807'     # MaxInt
+    $S6 = '9223372036854775808'     # MaxInt+1
+    $S7 = '9223372036854775809'     # MaxInt+2
+    $I8 = -9223372036854775807      # MinInt+1 == 1-2**63
+    $I9 = -9223372036854775808      # MinInt
+    $S9 = '-9223372036854775808'    # MinInt
+    $S10 = '-9223372036854775809'   # MinInt-1
+    $S11 = '-9223372036854775810'   # MinInt-2
+    goto esz
+
+sz4:
+    $I3 = 0x10000                   # sqrt(2*(MinInt+1))
+    $I4 = 2147483646                # MaxInt-1 == 2**31-2
+    $I5 = 2147483647                # MaxInt
+    $S5 = '2147483647'              # MaxInt
+    $S6 = '2147483648'              # MaxInt+1
+    $S7 = '2147483649'              # MaxInt+2
+    $I8 = -2147483647               # MinInt+1 == 1-2**31
+    $I9 = -2147483648               # MinInt
+    $S9 = '-2147483648'             # MinInt
+    $S10 = '-2147483649'            # MinInt-1
+    $S11 = '-2147483650'            # MinInt-2
+    goto esz
+
+esz:
+    print 'Using '
+    $I0 = mul $I0, 8
+    print $I0
+    print '-bit Integers ['
+    print $I9
+    print '...'
+    print $I5
+    say ']'
+
+    # Checking upper bound by incremental increase
+    $I1 = 1
+    $P0 = new ['Integer']
+    $P0 = $I4               # MaxInt-1
+    $P1 = new ['Integer']
+    $P1 = 1
+    $P0 = add $P0, $P1
+    $S0 = typeof $P0
+    eq $S0, 'Integer', k0
+    $I1 = 0
+    say "typeof != 'Integer'"
+k0:
+    $S0 = $P0
+    eq $S0, $S5, k1         # MaxInt
+    $I1 = 0
+    say 'value != MaxInt'
+k1:
+    $P0 = add $P0, $P1
+    $S0 = typeof $P0
+    eq $S0, 'BigInt', k2
+    $I1 = 0
+    say "typeof != 'BigInt'"
+k2:
+    $S0 = $P0
+    eq $S0, $S6, k3         # MaxInt+1
+    $I1 = 0
+    say 'value != MaxInt+1'
+k3:
+    $P0 = add $P0, $P1
+    $S0 = typeof $P0
+    eq $S0, 'BigInt', k4
+    $I1 = 0
+    say "typeof != 'BigInt'"
+k4:
+    $S0 = $P0
+    eq $S0, $S7, k5         # MaxInt+2
+    $I1 = 0
+    say 'value != MaxInt+2'
+k5:
+
+    # Checking upper bound by increased steps
+    $P0 = new ['Integer']
+    $P0 = $I4               # MaxInt-1
+    $P2 = new ['Integer']
+    $P2 = add $P0, $P1
+    $S0 = typeof $P2
+    eq $S0, 'Integer', k6
+    $I1 = 0
+    say "typeof != 'Integer'"
+k6:
+    $S0 = $P2
+    eq $S0, $S5, k7         # MaxInt
+    $I1 = 0
+    say 'value != MaxInt'
+k7:
+    inc $P1
+    $P2 = new ['Integer']
+    $P2 = add $P0, $P1
+    $S0 = typeof $P2
+    eq $S0, 'BigInt', k8
+    $I1 = 0
+    say "typeof != 'BigInt'"
+k8:
+    $S0 = $P2
+    eq $S0, $S6, k9         # MaxInt+1
+    $I1 = 0
+    say 'value != MaxInt+1'
+k9:
+    add $P1, 1
+    $P2 = new ['Integer']
+    $P2 = add $P0, $P1
+    $S0 = typeof $P2
+    eq $S0, 'BigInt', k10
+    $I1 = 0
+    say "typeof != 'BigInt'"
+k10:
+    $S0 = $P2
+    eq $S0, $S7, k11         # MaxInt+2
+    $I1 = 0
+    say 'value != MaxInt+2'
+k11:
+    ok($I1, 'integer addition converts MaxInt+1 to BigInt')
+
+    # Checking lower bound
+    $I1 = 6
+    $P0 = new ['Integer']
+    $P0 = $I8
+    $P1 = -1
+    $P2 = new ['Integer']
+    $P2 = add $P0, $P1
+    $S0 = typeof $P2
+    ne $S0, 'Integer', k12
+    dec $I1
+k12:
+    $S0 = $P2
+    ne $S0, $S9, k13
+    dec $I1
+k13:
+    dec $P1
+    $P2 = new ['Integer']
+    $P2 = add $P0, $P1
+    $S0 = typeof $P2
+    ne $S0, 'BigInt', k14
+    dec $I1
+k14:
+    $S0 = $P2
+    ne $S0, $S10, k15
+    dec $I1
+k15:
+    sub $P1, 1
+    $P2 = new ['Integer']
+    $P2 = add $P0, $P1
+    $S0 = typeof $P2
+    ne $S0, 'BigInt', k16
+    dec $I1
+k16:
+    $S0 = $P2
+    ne $S0, $S11, k17
+    dec $I1
+k17:
+    is($I1, 0, 'integer addition converts MinInt+(-1) to BigInt')
+
+    $I1 = 6
+    $P0 = new ['Integer']
+    $P0 = $I4
+    $P1 = -1
+    $P2 = new ['Integer']
+    $P2 = sub $P0, $P1
+    $S0 = typeof $P2
+    ne $S0, 'Integer', k18
+    dec $I1
+k18:
+    $S0 = $P2
+    ne $S0, $S5, k19
+    dec $I1
+k19:
+    dec $P1
+    $P2 = new ['Integer']
+    $P2 = sub $P0, $P1
+    $S0 = typeof $P2
+    ne $S0, 'BigInt', k20
+    dec $I1
+k20:
+    $S0 = $P2
+    ne $S0, $S6, k21
+    dec $I1
+k21:
+    sub $P1, 1
+    $P2 = new ['Integer']
+    $P2 = sub $P0, $P1
+    $S0 = typeof $P2
+    ne $S0, 'BigInt', k22
+    dec $I1
+k22:
+    $S0 = $P2
+    ne $S0, $S7, k23
+    dec $I1
+k23:
+    is($I1, 0, 'integer subtraction converts MaxInt-(-1) to BigInt')
+
+    $I1 = 0
+    $P0 = new ['Integer']
+    $P0 = $I8   # MinInt
+    dec $P0
+    neg $P0
+    $S0 = typeof $P0
+    ne $S0, 'BigInt', k24
+    inc $I1
+k24:
+    $S0 = $P0
+    ne $S0, $S6, k25
+    inc $I1
+k25:
+    todo($I1, 'integer negation of MinInt converts MaxInt+1 to BigInt')
+
+    $I1 = 0
+    $P0 = new ['Integer']
+    $P0 = $I8   # MinInt
+    dec $P0
+    abs $P0
+    $S0 = typeof $P0
+    ne $S0, 'BigInt', k26
+    inc $I1
+k26:
+    $S0 = $P0
+    ne $S0, $S6, k27
+    inc $I1
+k27:
+    todo($I1, 'integer absolute-value of MinInt converts MaxInt+1 to BigInt')
+
+    $P0 = new ['Integer']
+    $P0 = $I3
+    $P1 = new ['Integer']
+    $P1 = $I3
+
 ex:
-   end
-CODE
-$c Integer
-$d BigInt
-$e BigInt
-ok
-OUT
-
-    pasm_output_is( <<CODE, <<OUT, "add overflow Integer" );
-   new P0, ['Integer']
-   set P0, $a
-   new P1, ['Integer']
-   set P1, $b
-   new P2, ['Integer']
-   new P3, ['BigInt']
-   set I3, 3
-lp:
-   add P2, P0, P1
-   set S0, P2
-   print S0
-   print " "
-   typeof S1, P2
-   print S1
-   print "\\n"
-   add P1, $b
-   dec I3
-   if I3, lp
-   print "ok\\n"
-ex:
-   end
-CODE
-$c Integer
-$d BigInt
-$e BigInt
-ok
-OUT
-}
-
-pasm_output_is( <<'CODE', <<'OUT', "abs" );
-   new P0, ['BigInt']
-   set P0, "-1230000000000"
-   new P1, ['Undef']
-   abs P1, P0
-   print P1
-   print "\n"
-   print P0
-   print "\n"
-   abs P0
-   print P0
-   print "\n"
-   end
-CODE
-1230000000000
--1230000000000
-1230000000000
-OUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
-
-.sub _main
-    .local pmc pmc1
-    pmc1 = new ['BigInt']
-    .local int bool1
-    does bool1, pmc1, "scalar"
-    print bool1
-    print "\n"
-    does bool1, pmc1, "no_interface"
-    print bool1
-    print "\n"
-    end
-.end
-CODE
-1
-0
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', "Truth" );
-     new P0, ['BigInt']
-     set P0, "123456789123456789"
-     if P0, OK1
-     print "not "
-OK1: print "ok 1\\n"
-     set P0, 0
-     unless P0, OK2
-     print "not "
-OK2: print "ok 2\\n"
-     end
-CODE
-ok 1
-ok 2
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', "neg" );
-     new P0, ['BigInt']
-     new P1, ['BigInt']
-     set P0, "123456789123456789"
-     neg P0
-     set P1, "-123456789123456789"
-     eq P0, P1, OK1
-     print "not "
-OK1: print "ok 1\\n"
-     end
-CODE
-ok 1
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "pi() generator" );
-.sub PI
-    .local pmc k, a, b, a1, b1
-    k = new ['Integer']
-    k = 2
-    a = new ['Integer']
-    a = 4
-    b = new ['Integer']
-    b = 1
-    a1 = new ['Integer']
-    a1 = 12
-    b1 = new ['Integer']
-    b1 = 4
-forever:
-    .local pmc p, q
-    p = mul k, k
-    q = mul k, 2
-    inc q
-    inc k
-    .local pmc ta, tb, ta1, tb1
-    ta = clone a1
-    tb = clone b1
-    $P0 = mul p, a
-    $P1 = mul q, a1
-    ta1 =  add $P0, $P1
-    $P2 = mul p, b
-    $P3 = mul q, b1
-    tb1 =  add $P2, $P3
-    a = ta
-    b = tb
-    a1 = ta1
-    b1 = tb1
-    .local pmc d, d1
-    d = fdiv a, b
-    d1 = fdiv a1, b1
-yield_loop:
-    unless d == d1 goto end_yield
-    .yield(d)
-    $P4 = mod a, b
-    a = mul $P4, 10
-    $P5 = mod a1, b1
-    a1 = mul $P5, 10
-    d = fdiv a, b
-    d1 = fdiv a1, b1
-    goto yield_loop
-end_yield:
-    goto forever
 .end
 
-.sub main :main
-    .local int i
-    .local pmc d
-    null i
-loop:
-    d = PI()
-    print d
-    inc i
-    $I0 = i % 50
-    if $I0 goto no_nl
-    print "\n"
-no_nl:
-    if i < 1000 goto loop
-    print "\n"
+.sub interface
+    $P0 = new ['BigInt']
+    $I0 = does $P0, 'scalar'
+    is($I0,1,'Interface does scalar')
+    $I0 = does $P0, 'no_interface'
+    is($I0,0,'... and does not do bogus')
 .end
 
-=begin python
+.sub boolean
+    $P0 = new ['BigInt']
 
-class PI(object):
-    def __iter__(self):
-        k, a, b, a1, b1 = 2, 4, 1, 12, 4
-        while 1:
-            p, q, k = k*k, 2*k+1, k+1
-            a, b, a1, b1 = a1, b1, p*a+q*a1, p*b+q*b1
-            d, d1 = a//b, a1//b1
-            while d == d1:
-                yield d
-                a, a1 = 10*(a%b), 10*(a1%b1)
-                d, d1 = a//b, a1//b1
+    $P0 = '123456789123456789'
+    $I0 = 1
+    if $P0, OK1
+    $I0 = 0
+OK1:
 
-pi = iter(PI())
-ds = ""
-for i in xrange(1, 1001):
-    d = pi.next()
-    ds += str(d)
-    im = i % 50
-    if im == 0:
-        print ds
-        ds = ""
+    $P0 = 0
+    unless $P0, OK2
+    $I0 = 0
+OK2:
 
-print ds
+    ok($I0, 'truth and falsehood')
+.end
 
-=end python
+# How this next test was originally written in Python:
+#
+#   class PI(object):
+#       def __iter__(self):
+#           k, a, b, a1, b1 = 2, 4, 1, 12, 4
+#           while 1:
+#               p, q, k = k*k, 2*k+1, k+1
+#               a, b, a1, b1 = a1, b1, p*a+q*a1, p*b+q*b1
+#               d, d1 = a//b, a1//b1
+#               while d == d1:
+#                   yield d
+#                   a, a1 = 10*(a%b), 10*(a1%b1)
+#                   d, d1 = a//b, a1//b1
+#
+#   pi = iter(PI())
+#   ds = ""
+#   for i in xrange(1, 1001):
+#       d = pi.next()
+#       ds += str(d)
+#       im = i % 50
+#       if im == 0:
+#           print ds
+#           ds = ""
+#
+#   print ds
+#
 
-=cut
+.sub pi_generator
+    # k = $P6
+    $P6 = new ['Integer']
+    $P6 = 2
+    # a = $P7
+    $P7 = new ['Integer']
+    $P7 = 4
+    # b = $P8
+    $P8 = new ['Integer']
+    $P8 = 1
+    # a1 = $P9
+    $P9 = new ['Integer']
+    $P9 = 12
+    # b1 = $P10
+    $P10 = new ['Integer']
+    $P10 = 4
+restart:
+    # p = $P11
+    $P11 = mul $P6, $P6
+    # q = $P12
+    $P12 = mul $P6, 2
+    inc $P12
+    inc $P6
+    # ta  = $P13
+    $P13 = clone $P9
+    # tb  = $P14
+    $P14 = clone $P10
+    $P0 = mul $P11, $P7
+    $P1 = mul $P12, $P9
+    # ta1 = $P15
+    $P15 =  add $P0, $P1
+    $P2 = mul $P11, $P8
+    $P3 = mul $P12, $P10
+    # tb1 = $P16
+    $P16 =  add $P2, $P3
+    $P7 = $P13
+    $P8 = $P14
+    $P9 = $P15
+    $P10 = $P16
+    # d = $P17
+    $P17 = fdiv $P7, $P8
+    # d1 = $P18
+    $P18 = fdiv $P9, $P10
+next:
+    ne $P17, $P18, restart
+    .yield($P17)
+    $P4 = mod $P7, $P8
+    $P7 = mul $P4, 10
+    $P5 = mod $P9, $P10
+    $P9 = mul $P5, 10
+    $P17 = fdiv $P7, $P8
+    $P18 = fdiv $P9, $P10
+    goto next
+.end
 
-CODE
+.sub pi
+    $S0 = <<'EoN'
 31415926535897932384626433832795028841971693993751
 05820974944592307816406286208998628034825342117067
 98214808651328230664709384460955058223172535940812
@@ -692,408 +906,433 @@ CODE
 17101000313783875288658753320838142061717766914730
 35982534904287554687311595628638823537875937519577
 81857780532171226806613001927876611195909216420198
+EoN
 
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUT', "shl_bigint" );
-   new P0, ['BigInt']
-   set P0, "2"
-   new P1, ['BigInt']
-   set P1, 2
-   new P2, ['BigInt']
-   shl P2, P0, P1
-   set S0, P2
-   print S0
-   print "\n"
-   set P0, "100000000000"
-   set P1, 10
-   shl P2, P0, P1
-   set S0, P2
-   print S0
-   print "\n"
-   end
-CODE
-8
-102400000000000
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', "shl_bigint with a negative shift" );
-## cf the shr_bigint case.
-.sub main :main
-   $P0 = new ['BigInt']
-   set $P0, 8
-   $P1 = new ['BigInt']
-   set $P1, -2
-   $P2 = new ['BigInt']
-   shl $P2, $P0, $P1
-   say $P2
-   set $P0, "102400000000000"
-   set $P1, -10
-   shl $P2, $P0, $P1
-   say $P2
+    $I3 = 0
+    $I4 = length $S0
+loop:
+    $P0 = pi_generator()
+skip_ws:
+    $S1 = substr $S0,$I3,1
+    eq $S1, '', stop
+    inc $I3
+    eq $S1, '.', skip_ws
+    eq $S1, ' ', skip_ws
+    eq $S1, "\r", skip_ws
+    eq $S1, "\n", skip_ws
+    $I1 = $S1
+    $I0 = $P0
+    eq $I0, $I1, loop
+stop:
+    is($I0, $I1, 'Computed 1000 digits of PI (using coroutine)')
+    eq $I0, $I1, ret
+        print 'Wrong digit '
+        print $I0
+        print ' should have been '
+        print $S1
+        print ' at position '
+        print $I3
+        say '.'
+    ret:
 .end
-CODE
-2
-100000000000
-OUT
 
-pasm_output_is( <<'CODE', <<'OUT', "shl_int" );
-   new P0, ['BigInt']
-   set P0, 2
-   new P1, ['Integer']
-   set P1, 1
-   new P2, ['BigInt']
-   shl P2, P0, P1
-   set S0, P2
-   print S0
-   print "\n"
-   set P0, "100000000000"
-   set P1, 1
-   shl P2, P0, P1
-   set S0, P2
-   print S0
-   print "\n"
-   set P0, "100000000000"
-   set P1, 10
-   shl P2, P0, P1
-   set S0, P2
-   print S0
-   print "\n"
-   end
-CODE
-4
-200000000000
-102400000000000
-OUT
+.sub left_shift
+    $I1 = 1
 
-pir_output_is( <<'CODE', <<'OUT', "shl_int with a negative shift" );
-## cf the shr_int case.
-.sub main :main
-   $P0 = new ['BigInt']
-   set $P0, 4
-   $P1 =  new ['Integer']
-   set $P1, -1
-   $P2 = new ['BigInt']
-   shl $P2, $P0, $P1
-   say $P2
-   set $P0, "200000000000"
-   set $P1, -1
-   shl $P2, $P0, $P1
-   say $P2
-   set $P0, "102400000000000"
-   set $P1, -10
-   shl $P2, $P0, $P1
-   say $P2
-.end
-CODE
-2
-100000000000
-100000000000
-OUT
+    $P0 = new ['BigInt']
+    $P1 = new ['BigInt']
 
-pir_output_like( <<'CODE', <<'OUT', "shl_int and i_shl_int promote Integer to Bigint" );
-## The result on the second line is a BigInt on 32-bit systems and still an
-## Integer on 64-bit systems.
-.sub main :main
-   $P0 = new ['Integer']
-   set $P0, 1000001
-   $P1 = new ['Integer']
-   set $P1, 10
-   $P2 = new ['Integer']
-   ## shift by 10 bits . . .
-   shl $P2, $P0, $P1
-   $S2 = typeof $P2
-   print $S2
-   print ' '
-   say $P2
-   ## then by 20 bits . . .
-   $P1 = 20
-   $P3 = new ['Integer']
-   $P3 = 1000001
-   shl $P3, $P0, $P1
-   $S2 = typeof $P3
-   print $S2
-   print ' '
-   say $P3
-   ## then by another 40 bits (total 60) in place.
-   $P1 = 40
-   shl $P3, $P3, $P1
-   $S2 = typeof $P3
-   print $S2
-   print ' '
-   say $P3
-.end
-CODE
-/Integer 1024001024
-(Integer|BigInt) 1048577048576
-BigInt 1152922657528351582846976
-/
-OUT
+# shl with a positive shift
+    $P0 = 2
+    $P1 = 2
+    $P2 = new ['Integer']
+    $P2 = shl $P0, $P1
+    $S0 = $P2
+    eq $S0, '8', OK1
+    $I1 = 0
+    say 'shl(bigint 2,bigint 2) did not return 8'
+OK1:
+    $P0 = '100000000000'
+    $P1 = 10
+    $P2 = new ['Integer']
+    $P2 = shl $P0, $P1
+    $S0 = $P2
+    eq $S0, '102400000000000', OK2
+    $I1 = 0
+    say 'shl(bigint 100000000000,bigint 10) did not return 102400000000000'
+OK2:
 
-pir_error_output_like( <<'CODE', <<'OUT', "shl_int throws an error when promotion is disabled" );
-.include "errors.pasm"
-.sub main :main
-   errorson .PARROT_ERRORS_OVERFLOW_FLAG
-   $P0 = new ['Integer']
-   set $P0, 1000001
-   $P1 = new ['Integer']
-   set $P1, 10
-   $P2 = new ['Integer']
-   ## shift by 10 bits . . .
-   shl $P2, $P0, $P1
-   $S2 = typeof $P2
-   print $S2
-   print ' '
-   say $P2
-   ## then by 60 bits.
-   $P1 = 60
-   $P0 = 1000001
-   shl $P3, $P0, $P1
-   $S2 = typeof $P3
-   print $S2
-   print ' '
-   say $P3
-.end
-CODE
-/Integer 1024001024
-Integer overflow
-current instr/
-OUT
+# shl with a negative shift
+    $P0 = 8
+    $P1 = -2
+    $P2 = new ['Integer']
+    $P2 = shl $P0, $P1
+    $S0 = $P2
+    is($S0, '2', 'shl(bigint, -bigint)')
+    $P0 = '102400000000000'
+    $P1 = -10
+    $P2 = new ['Integer']
+    $P2 = shl $P0, $P1
+    $S0 = $P2
+    eq $S0, '100000000000', OK3
+    $I1 = 0
+    say 'shl(bigint 102400000000000,bigint -10) did not return 100000000000'
+OK3:
 
-pir_output_is( <<'CODE', <<'OUT', "shl_int by 64 bits also promotes to Bigint" );
+    ok($I1, 'shl(bigint, +bigint)')
+    $I1 = 1
+
+# shl_int with a positive shift
+    $P0 = 2
+    $P1 = 1
+    $P2 = new ['Integer']
+    $P2 = shl $P0, $P1
+    $S0 = $P2
+    eq $S0, '4', OK4
+    $I1 = 0
+    say 'shl(bigint 2,integer 1) did not return 4'
+OK4:
+    $P0 = '100000000000'
+    $P1 = 1
+    $P2 = new ['Integer']
+    $P2 = shl $P0, $P1
+    $S0 = $P2
+    eq $S0, '200000000000', OK5
+    $I1 = 0
+    say 'shl(bigint 100000000000,integer 1) did not return 200000000000'
+OK5:
+    $P0 = '100000000000'
+    $P1 = 10
+    $P2 = new ['Integer']
+    $P2 = shl $P0, $P1
+    $S0 = $P2
+    eq $S0, '102400000000000', OK6
+    $I1 = 0
+    say 'shl(bigint 100000000000,integer 10) did not return 102400000000000'
+OK6:
+
+# shl_int with a negative shift
+
+    $P0 = 4
+    $P1 = -1
+    $P2 = new ['Integer']
+    $P2 = shl $P0, $P1
+    $S0 = $P2
+    eq $S0, '2', OK7
+    $I1 = 0
+    say 'shl(bigint 4,integer -1) did not return 2'
+OK7:
+    $P0 = '200000000000'
+    $P1 = -1
+    $P2 = new ['Integer']
+    $P2 = shl $P0, $P1
+    $S0 = $P2
+    eq $S0, '100000000000', OK8
+    $I1 = 0
+    say 'shl(bigint 200000000000,integer -1) did not return 100000000000'
+OK8:
+    $P0 = '102400000000000'
+    $P1 = -10
+    $P2 = new ['Integer']
+    $P2 = shl $P0, $P1
+    $S0 = $P2
+    eq $S0, '100000000000', OK9
+    $I1 = 0
+    say 'shl(bigint 102400000000000,integer -10) did not return 100000000000'
+OK9:
+    ok($I1, 'shl(bigint,integer)')
+    $I1 = 1
+
+# shl_int throws an error when promotion is disabled
+
+    errorson .PARROT_ERRORS_OVERFLOW_FLAG
+    $P0 = new ['Integer']
+    $P0 = 1000001
+    $P1 = new ['Integer']
+    $P1 = 10
+
+    ## shift by 10 bits . . .
+    $P2 = new ['Integer']
+    $P2 = shl $P0, $P1
+    $S1 = $P2
+    $S2 = typeof $P2
+    eq $S2, 'Integer', OK11
+    $I1 = 0
+    print 'shl(integer 1000001,integer 10) did not return an Integer PMC; got a '
+    print $S2
+    say ' instead.'
+
+OK11:
+    eq $S1,'1024001024', OK12
+    $I1 = 0
+    print 'shl(integer 1000001,integer 10) did not return 1024001024; got '
+    print $S1
+    say ' instead.'
+OK12:
+
+    ## then by 60 bits.
+    $P0 = 1000001
+    $P1 = 60
+    push_eh E1
+        $I1 = 1
+        $P2 = new ['Integer']
+        $P2 = shl $P0, $P1
+        $I1 = 0
+        $S1 = $P2
+        $S2 = typeof $P2
+        print 'Failed to throw exception; return type '
+        print $S2
+        print ', return value '
+        say $P1
+E1:
+    pop_eh
+    get_results '0', $P2
+    $S0 = $P2
+    eq $S0, 'Integer overflow', OK13
+    $I1 = 0
+    say 'shl(integer 1000001, integer 60) throws exception, but wrong type'
+OK13:
+    ok($I1, 'shl(integer 1000001, integer 60) throws "Integer overflow" exception')
+    $I1 = 1
+
+# shl_int and i_shl_int promote Integer to Bigint
+
+    errorsoff .PARROT_ERRORS_OVERFLOW_FLAG
+    ## shift left by 20 bits ...
+    $P0 = new ['Integer']
+    $P0 = 1000001
+    $P1 = new ['Integer']
+    $P1 = 20
+    $P2 = new ['Integer']
+    $P2 = shl $P0, $P1
+    ## ... then by another 40 bits (total 60) in place.
+    $P1 = 40
+    $P2 = shl $P2, $P1
+    $S1 = $P2
+    $S2 = typeof $P2
+    eq $S2, 'BigInt', OK14
+    $S1 = ''
+OK14:
+    is($S1, '1152922657528351582846976', 'shl(shl(integer 1000001, 20), 40) => bigint 1152922657528351582846976')
+
+# shl_int by 64 bits also promotes to Bigint
 ## The C << and >> ops take the right arg modulo the word size in bits (at least
 ## on all the systems I have available), so both 32- and 64-bit systems treat
 ## shifting by 64 bits as shifting by zero.
-.sub main :main
-   $P0 = new ['Integer']
-   set $P0, 1000001
-   $P1 = new ['Integer']
-   set $P1, 64
-   shl $P2, $P0, $P1
-   $S2 = typeof $P2
-   print $S2
-   print ' '
-   say $P2
+    $P0 = new ['Integer']
+    $P0 = 1000001
+    $P1 = new ['Integer']
+    $P1 = 64
+    $P2 = new ['Integer']
+    $P2 = shl $P0, $P1
+    $S1 = $P2
+    $S2 = typeof $P2
+    eq $S2, 'BigInt', OK15
+    $S1 = ''
+OK15:
+    is($S1, '18446762520453625325551616', 'shl(integer 1000001, 64) => bigint 18446762520453625325551616')
 .end
-CODE
-BigInt 18446762520453625325551616
-OUT
 
-pir_output_is(
-    <<'CODE', <<'OUT', "shr_int and i_shr_int with a neg shift promote Integer to Bigint" );
-.sub main :main
-   $P0 = new ['Integer']
-   set $P0, 1000001
-   $P1 = new ['Integer']
-   set $P1, -10
-   $P2 = new ['Integer']
-   ## shift by 10 bits . . .
-   shr $P2, $P0, $P1
-   $S2 = typeof $P2
-   print $S2
-   print ' '
-   say $P2
-   ## then by another 50 bits (total 60) in place.
-   $P1 = -50
-   shr $P2, $P1
-   $S2 = typeof $P2
-   print $S2
-   print ' '
-   say $P2
-.end
-CODE
-Integer 1024001024
-BigInt 1152922657528351582846976
-OUT
+.sub right_shift
+    $I1 = 1
+#shr_int and i_shr_int with a neg shift promote Integer to Bigint
 
-pasm_output_is( <<'CODE', <<'OUT', "shr_bigint" );
-   new P0, ['BigInt']
-   set P0, 8
-   new P1, ['BigInt']
-   set P1, 2
-   new P2, ['BigInt']
-   shr P2, P0, P1
-   set S0, P2
-   print S0
-   print "\n"
-   set P0, "102400000000000"
-   set P1, 10
-   shr P2, P0, P1
-   set S0, P2
-   print S0
-   print "\n"
-   end
-CODE
-2
-100000000000
-OUT
+    $P0 = new ['Integer']
+    $P0 = 1000001
+    $P1 = new ['Integer']
+    $P1 = -10
+    $P2 = new ['Integer']
+    ## shift by 10 bits . . .
+    $P2 = shr $P0, $P1
+#   $S2 = typeof $P2
+#   ne $S2, 'Integer', OK2
 
-pir_output_is( <<'CODE', <<'OUT', "shr_bigint with a negative shift" );
+    ## then by another 50 bits (total 60) in place.
+    $P1 = -50
+    $P2 = shr $P1
+    $S1 = $P2
+    $S2 = typeof $P2
+    eq $S2, 'BigInt', OK2
+    $S1 = ''
+OK2:
+    is($S1, '1152922657528351582846976', 'shr(shr(integer 1000001, integer -10), -50) => bigint 1152922657528351582846976')
+
+#   shr_bigint
+    $P0 = new ['BigInt']
+    $P0 = 8
+    $P1 = new ['BigInt']
+    $P1 = 2
+    $P2 = new ['BigInt']
+    $P2 = shr $P0, $P1
+    $S0 = $P2
+    eq $S0, '2', OK3
+    $I1 = 0
+    say 'shr(bigint 8, bigint 2) did not return 2'
+OK3:
+
+    $P0 = '102400000000000'
+    $P1 = 10
+    $P2 = shr $P0, $P1
+    $S0 = $P2
+    eq $S0, '100000000000', OK4
+    $I1 = 0
+    say 'shr(bigint 102400000000000, bigint 10) did not return 100000000000'
+OK4:
+    ok($I1, 'shr(bigint, +bigint)')
+    $I1 = 1
+
+# shr_bigint with a negative shift
 ## cf the shl_bigint case.
-.sub main :main
-   $P0 = new ['BigInt']
-   set $P0, 2
-   $P1 = new['BigInt']
-   set $P1, -2
-   $P2 = new ['BigInt']
-   shr $P2, $P0, $P1
-   say $P2
-   set $P0, "100000000000"
-   set $P1, -10
-   shr $P2, $P0, $P1
-   say $P2
-.end
-CODE
-8
-102400000000000
-OUT
 
-pasm_output_is( <<'CODE', <<'OUT', "shr_int" );
-   new P0, ['BigInt']
-   set P0, 4
-   new P1, ['Integer']
-   set P1, 1
-   new P2, ['BigInt']
-   shr P2, P0, P1
-   set S0, P2
-   print S0
-   print "\n"
-   set P0, "200000000000"
-   set P1, 1
-   shr P2, P0, P1
-   set S0, P2
-   print S0
-   print "\n"
-   set P0, "102400000000000"
-   set P1, 10
-   shr P2, P0, P1
-   set S0, P2
-   print S0
-   print "\n"
-   end
-CODE
-2
-100000000000
-100000000000
-OUT
+    $P0 = new ['BigInt']
+    $P0 = 2
+    $P1 = new['BigInt']
+    $P1 = -2
+    $P2 = new ['BigInt']
+    $P2 = shr $P0, $P1
+    $S0 = $P2
+    eq $S0, '8', OK5
+    $I1 = 0
+    say 'shr(bigint 2, bigint -2) did not return 8'
+OK5:
 
-pir_output_is( <<'CODE', <<'OUT', "shr_int with a negative shift" );
+    $P0 = '100000000000'
+    $P1 = -10
+    $P2 = shr $P0, $P1
+    $S0 = $P2
+    eq $S0, '102400000000000', OK6
+    $I1 = 0
+    say 'shr(bigint 100000000000, bigint -10) did not return 102400000000000'
+OK6:
+    ok($I1, 'shr(bigint, -bigint)')
+    $I1 = 1
+
+# shr_int
+    $P0 = new ['BigInt']
+    $P0 = 4
+    $P1 = new ['Integer']
+    $P1 = 1
+    $P2 = new ['BigInt']
+    $P2 = shr $P0, $P1
+    $S0 = $P2
+    eq $S0, '2', OK7
+    $I1 = 0
+    say 'shr(bigint 4, integer 1) did not return 2'
+OK7:
+
+    $P0 = '200000000000'
+    $P1 = 1
+    $P2 = shr $P0, $P1
+    $S0 = $P2
+    eq $S0, '100000000000', OK8
+    $I1 = 0
+    say 'shr(bigint 200000000000, integer 1) did not return 100000000000'
+OK8:
+
+    $P0 = '102400000000000'
+    $P1 = 10
+    $P2 = shr $P0, $P1
+    $S0 = $P2
+    eq $S0, '100000000000', OK9
+    $I1 = 0
+    say 'shr(bigint 102400000000000, integer 10) did not return 100000000000'
+OK9:
+
+    ok($I1,'shr(bigint, +integer)')
+    $I1 = 1
+
+# shr_int with a negative shift
 ## cf the shl_int case.
-.sub main :main
-   $P0 = new ['BigInt']
-   set $P0, 2
-   $P1 = new ['Integer']
-   set $P1, -1
-   $P2 = new ['BigInt']
-   shr $P2, $P0, $P1
-   say $P2
-   set $P0, "100000000000"
-   set $P1, -1
-   shr $P2, $P0, $P1
-   say $P2
-   set $P1, -10
-   shr $P2, $P0, $P1
-   say $P2
-.end
-CODE
-4
-200000000000
-102400000000000
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "BUG #34949 gt" );
-.sub main :main
-    .local pmc b
-    b = new ['BigInt']
-    b = 1e10
-    if b > 4 goto ok
-    print "never\n"
-    end
-ok:
-    print "ok\n"
-.end
-CODE
-ok
-OUT
+    $P0 = new ['BigInt']
+    $P0 = 2
+    $P1 = new ['Integer']
+    $P1 = -1
+    $P2 = new ['BigInt']
+    $P2 = shr $P0, $P1
+    $S0 = $P2
+    eq $S0, '4', OK10
+    $I1 = 0
+    say 'shr(bigint 2, int -1) did not return 4'
+OK10:
 
-pir_output_is( <<'CODE', <<'OUT', "BUG #34949 ge" );
-.sub main :main
-    .local pmc b
-    b = new ['BigInt']
-    b = 1e10
-    if b >= 4 goto ok
-    print "never\n"
-    end
-ok:
-    print "ok\n"
-.end
-CODE
-ok
-OUT
+    $P0 = '100000000000'
+    $P1 = -1
+    $P2 = new ['BigInt']
+    $P2 = shr $P0, $P1
+    $S0 = $P2
+    eq $S0, '200000000000', OK11
+    $I1 = 0
+    say 'shr(bigint 100000000000, int -1) did not return 200000000000'
+OK11:
 
-pir_output_is( <<'CODE', <<'OUT', "BUG #34949 ne" );
-.sub main :main
-    .local pmc b
-    b = new ['BigInt']
-    b = 1e10
-    if b != 4 goto ok
-    print "never\n"
-    end
-ok:
-    print "ok\n"
-.end
-CODE
-ok
-OUT
+    $P1 = -10
+    $P2 = new ['BigInt']
+    $P2 = shr $P0, $P1
+    $S0 = $P2
+    eq $S0, '102400000000000', OK12
+    $I1 = 0
+    say 'shr(bigint 100000000000,int -10) did not return 102400000000000'
+OK12:
 
-pir_output_is( <<'CODE', <<'OUT', "BUG #34949 eq" );
-.sub main :main
-    .local pmc b
-    b = new ['BigInt']
-    b = 1e10
-    if b == 4 goto nok
-    print "ok\n"
-    end
-nok:
-    print "nok\n"
+    ok($I1,'shr(bigint, -integer)')
 .end
-CODE
-ok
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "BUG #34949 le" );
-.sub main :main
-    .local pmc b
-    b = new ['BigInt']
-    b = 1e10
-    if b <= 4 goto nok
-    print "ok\n"
-    end
-nok:
-    print "nok\n"
-.end
-CODE
-ok
-OUT
+.sub bugfixes
 
-pir_output_is( <<'CODE', <<'OUT', "BUG #34949 lt" );
-.sub main :main
-    .local pmc b
-    b = new ['BigInt']
-    b = 1e10
-    if b < 4 goto nok
-    print "ok\n"
-    end
-nok:
-    print "nok\n"
+    $P0 = new ['BigInt']
+    $P0 = 1e10
+    $I1 = 1
+    gt $P0, 4, OK1
+    $I1 = 0
+OK1:
+    ok($I1, 'BUG #34949 gt')
+
+    $P0 = new ['BigInt']
+    $P0 = 1e10
+    $I1 = 1
+    ge $P0, 4, OK2
+    $I1 = 0
+OK2:
+    ok($I1, 'BUG #34949 ge')
+
+    $P0 = new ['BigInt']
+    $P0 = 1e10
+    $I1 = 1
+    ne $P0, 4, OK3
+    $I1 = 0
+OK3:
+    ok($I1, 'BUG #34949 ne')
+
+    $P0 = new ['BigInt']
+    $P0 = 1e10
+    $I1 = 0
+    eq $P0, 4, NOK4
+    $I1 = 1
+NOK4:
+    ok($I1, 'BUG #34949 eq')
+
+    $P0 = new ['BigInt']
+    $P0 = 1e10
+    $I1 = 0
+    lt $P0, 4, NOK5
+    $I1 = 1
+NOK5:
+    ok($I1, 'BUG #34949 le')
+
+    $P0 = new ['BigInt']
+    $P0 = 1e10
+    $I1 = 0
+    lt $P0, 4, NOK6
+    $I1 = 1
+NOK6:
+    ok($I1, 'BUG #34949 lt')
+
 .end
-CODE
-ok
-OUT
 
 # Local Variables:
-#   mode: cperl
+#   mode: pir
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 filetype=pir:
