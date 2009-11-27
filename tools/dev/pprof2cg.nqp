@@ -8,10 +8,9 @@ main();
 sub main() {
 
     my $filename := pir::getinterp__P[2][1];
-    say("filename is $filename");
 
     my %stats;
-    %stats<'global_stats'><'total_time'> := 0;
+    %stats<global_stats><total_time> := 0;
 
     my $fh := pir::new__PP("FileHandle");
     $fh.open($filename, "r");
@@ -58,9 +57,9 @@ sub process_input($fh, %stats) {
 
             my $op_time     := %op_hash<time>;
             # += would be nice here
-            my $global_time := $op_time + %stats<global_stats><time>;
+            my $global_time := $op_time + %stats<global_stats><total_time>;
+            %stats<global_stats><total_time> := $global_time;
             %cur_ctx<line>  := %op_hash<line>;
-            %stats<global_stats><time> := $global_time;
             store_stats(%stats, %cur_ctx, $op_time, %op_hash<op>);
 
             my $skip_first := 1;
@@ -70,7 +69,7 @@ sub process_input($fh, %stats) {
                 }
                 else {
                     %stats{ $_<file> }{ $_<ns> }{ $_<line> }[ $_<op_num> ]<time> :=
-                      %stats{ $_<file> }{ $_<ns> }{ $_<line> }[ $_<op_num> ]<time> + $op_time;
+                    %stats{ $_<file> }{ $_<ns> }{ $_<line> }[ $_<op_num> ]<time> + $op_time;
                 }
             }
         }
@@ -133,7 +132,7 @@ sub process_input($fh, %stats) {
         }
         elsif ($type eq "CLI") {
             #say("found a CLI line");
-            %stats{'global_stats'}{'cli'} := $data;
+            %stats<global_stats><cli> := $data;
         }
         elsif (pir::index($line, "END_OF_RUNLOOP") == 0) {
             #say("found an end of runloop line");
@@ -159,7 +158,6 @@ sub store_stats(%stats, %loc, $time, $op_name, :$target?) {
     else {
         %op_stats := %stats{ %loc<file> }{ %loc<ns> }{ %loc<line> }[ %loc<op_num> ] := {};
     }
-    say("storing stats in file " ~ ~%loc<file>);
 
     if %op_stats<hits> {
         %op_stats<hits>++;
@@ -193,7 +191,7 @@ sub print_stats(%stats) {
 #            }
 #        }
 #    }
-    pir::load_bytecode("./parrot/runtime/parrot/library/dumper.pbc");
+    pir::load_bytecode("dumper.pbc");
     _dumper(%stats);
 }
 
@@ -204,8 +202,8 @@ sub get_cg_profile(%stats) {
     @output.push("creator: PARROT IS AWESOME");
     @output.push("pid: 5751");
     @output.push("cmd: " ~ ~%stats<global_stats><cli>);
-    @output.push("");
-    @output.push("part: a");
+    #@output.push("");
+    @output.push("part: 1");
     @output.push("desc: I1 cache:");
     @output.push("desc: D1 cache:");
     @output.push("desc: L2 cache:");
@@ -217,7 +215,8 @@ sub get_cg_profile(%stats) {
     @output.push("");
 
     for %stats -> $file {
-        unless $file eq "global_stats" {
+        if $file ne "global_stats" {
+
             @output.push("fl=$file");
             for %stats{$file} -> $ns {
                 @output.push("\nfn=$ns");
@@ -229,27 +228,30 @@ sub get_cg_profile(%stats) {
                     my $op_count   := +@line_stats;
                     my $op_time    := 0;
 
-                    while $curr_op < $op_count && @line_stats[$curr_op]<name> ne "CALL"  {
+                    while $curr_op < $op_count && @line_stats[$curr_op]<op_name> ne "CALL"  {
                         $op_time := $op_time + @line_stats[$curr_op]<time>;
+                        #say("op is "~ @line_stats[$curr_op]<op_name>);
                         $curr_op++;
                     }
                     @output.push(~$line ~ " " ~ ~$op_time);
                     
-                    if $curr_op < $op_count && @line_stats[$curr_op]<name> eq "CALL" {
+                    if $curr_op < $op_count && @line_stats[$curr_op]<op_name> eq "CALL" {
                         my $hits   := @line_stats[$curr_op]<hits>;
                         my $time   := @line_stats[$curr_op]<time>;
                         my $target := @line_stats[$curr_op]<target>;
                         @output.push("cfn=$target");
                         @output.push("calls=$hits $time");
+                        #say("op is "~ @line_stats[$curr_op]<op_name>);
                     }
                     
                     if $curr_op < $op_count {
                         $op_time := 0;
                         while $curr_op < $op_count {
                             $op_time := $op_time + @line_stats[$curr_op]<time>;
+                        #say("op is "~ @line_stats[$curr_op]<op_name>);
                             $curr_op++;
                         }
-                        @output.push("$line $op_time");
+                        @output.push(~$line ~ " " ~ ~$op_time);
                     }
                 }
             }
