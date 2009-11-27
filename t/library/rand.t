@@ -17,15 +17,16 @@ Test the Math::Rand PBC
 =cut
 
 .sub main :main
-    .include 'test_more.pir'
+    load_bytecode 'Math/Rand.pbc'
 
+    .include 'test_more.pir'
     plan(7)
+
     test_rand_srand()
     test_rand_max()
 .end
 
 .sub test_rand_srand
-    load_bytecode 'Math/Rand.pbc'
     .local pmc rand
     rand = get_global [ 'Math'; 'Rand' ], 'rand'
     .local pmc srand
@@ -46,7 +47,6 @@ Test the Math::Rand PBC
 .end
 
 .sub test_rand_max
-    load_bytecode 'Math/Rand.pbc'
     .local pmc rand_max
     rand_max = get_global [ 'Math'; 'Rand' ], 'RAND_MAX'
     $I0 = rand_max()

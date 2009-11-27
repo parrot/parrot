@@ -27,6 +27,8 @@ regressisions in the parrot VM, JIT and GC
 # Stress parrot using MD5 library
 
 .sub main :main
+    load_bytecode "Digest/MD5.pbc"
+
     .include 'test_more.pir'
     plan(517)
 
@@ -39,8 +41,6 @@ regressisions in the parrot VM, JIT and GC
 .end
 
 .sub test_miscellaneous_words
-
-    load_bytecode "Digest/MD5.pbc"
     $P0 = _md5sum ("Hello")
     $S0 = _md5_hex($P0)
     is($S0, '8b1a9953c4611296a827abf8c47804d7', 'md5 Hello')
@@ -56,18 +56,15 @@ regressisions in the parrot VM, JIT and GC
     $P0 = _md5sum ("Hello World!")
     $S0 = _md5_hex($P0)
     is($S0, 'ed076287532e86365e841e92bfc50d8c', 'md5 Hello World')
-
 .end
 
 .sub test_funny_chars
-    load_bytecode "Digest/MD5.pbc"
     $P0 = _md5sum ("\n\n\n\n\t")
     $S0 = _md5_hex($P0)
     is($S0, 'b66434493525523b4393ce0d1f2425d7', 'funny chars')
 .end
 
 .sub test_string_lengths
-    load_bytecode "Digest/MD5.pbc"
     $I0 = 0
 
     $S10 = <<'OUTPUT'
@@ -201,7 +198,6 @@ OUTPUT
 .end
 
 .sub test_really_long_string
-    load_bytecode "Digest/MD5.pbc"
     $S0 = "Hello Parrot World! "
     repeat $S1, $S0, 50000
     $P0 = _md5sum ($S1)
@@ -226,7 +222,6 @@ done
 =cut
 
 .sub test_recursive_md5_1
-    load_bytecode "Digest/MD5.pbc"
     .local string output
     $S0 = "Hello World!"
     $I0 = 0
@@ -464,7 +459,6 @@ done
 =cut
 
 .sub test_recursive_md5_2
-    load_bytecode "Digest/MD5.pbc"
     .local string output
     .local pmc output_array
     $S0 = "Hello World!"

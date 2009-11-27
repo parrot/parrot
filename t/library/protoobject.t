@@ -17,6 +17,8 @@ This test exercises the protoobject/Protomaker implementations.
 =cut
 
 .sub main :main
+    load_bytecode 'Protoobject.pbc'
+
     .include 'test_more.pir'
     plan(13)
 
@@ -33,8 +35,6 @@ This test exercises the protoobject/Protomaker implementations.
 
 
 .sub test_basic_load
-    load_bytecode 'Protoobject.pbc'
-
     $P0 = get_hll_global 'Protomaker'
     $S0 = typeof $P0
     is($S0, 'Protomaker', 'basic load')
@@ -42,8 +42,6 @@ This test exercises the protoobject/Protomaker implementations.
 
 
 .sub test_type_of_protoobject
-    load_bytecode 'Protoobject.pbc'
-
     $P0 = get_hll_global 'Protomaker'
     $P1 = newclass 'XYZ'
     $P2 = $P0.'new_proto'($P1)
@@ -54,8 +52,6 @@ This test exercises the protoobject/Protomaker implementations.
 
 
 .sub test_type_of_ns_based_protoobject
-    load_bytecode 'Protoobject.pbc'
-
     $P0 = get_hll_global 'Protomaker'
     $P1 = newclass ['Foo';'Bar1']
     $P2 = $P0.'new_proto'($P1)
@@ -66,8 +62,6 @@ This test exercises the protoobject/Protomaker implementations.
 
 
 .sub test_protoobject_symbol_1
-    load_bytecode 'Protoobject.pbc'
-
     $P0 = get_hll_global 'Protomaker'
     $P1 = newclass ['Foo';'Bar2']
     $P2 = $P0.'new_proto'($P1)
@@ -79,8 +73,6 @@ This test exercises the protoobject/Protomaker implementations.
 
 
 .sub test_protoobject_symbol_2
-    load_bytecode 'Protoobject.pbc'
-
     $P0 = get_hll_global 'Protomaker'
     $P1 = newclass 'Foo'
     $P2 = $P0.'new_proto'($P1)
@@ -92,8 +84,6 @@ This test exercises the protoobject/Protomaker implementations.
 
 
 .sub test_protoobject_symbol_for_classes
-    load_bytecode 'Protoobject.pbc'
-
     $P0 = get_hll_global 'Protomaker'
     $P1 = newclass 'Foo::Bar3'
     $P2 = $P0.'new_proto'($P1)
@@ -105,8 +95,6 @@ This test exercises the protoobject/Protomaker implementations.
 
 
 .sub test_new_subclass_for_classes
-    load_bytecode 'Protoobject.pbc'
-
     $P0 = get_hll_global 'Protomaker'
     $P1 = get_class 'Hash'
     $P0.'new_subclass'($P1, 'Foo::Bar4')
@@ -122,8 +110,6 @@ This test exercises the protoobject/Protomaker implementations.
 
 
 .sub test_new_subclass_with_attrs
-    load_bytecode 'Protoobject.pbc'
-
     .local pmc protomaker, hashclass, attrs
     protomaker = get_hll_global 'Protomaker'
     hashclass = get_class 'Hash'
@@ -146,8 +132,6 @@ This test exercises the protoobject/Protomaker implementations.
 
 
 .sub test_method_new_on_protoobject
-    load_bytecode 'Protoobject.pbc'
-
     $P0 = newclass 'Foo1'
 
     .local pmc protomaker

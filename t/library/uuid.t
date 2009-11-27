@@ -17,6 +17,8 @@ uuid library tests
 =cut
 
 .sub main :main
+    load_bytecode 'uuid.pbc'
+
     .include 'test_more.pir'
     plan(20)
 
@@ -33,7 +35,6 @@ uuid library tests
 
 
 .sub test_generate_1
-    load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'generate'
     $P1 = $P0()
     $S1 = typeof $P1
@@ -42,7 +43,6 @@ uuid library tests
 
 
 .sub test_generate_2
-    load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'generate'
     $P1 = $P0()
     like($P1, '<[0..9a..f]>**8\-<[0..9a..f]>**4\-<[0..9a..f]>**4\-<[0..9a..f]>**4\-<[0..9a..f]>**12', 'generate 2' )
@@ -50,7 +50,6 @@ uuid library tests
 
 
 .sub test_generate_random
-    load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'generate_random'
     $P1 = $P0()
     like($P1, '<[0..9a..f]>**8\-<[0..9a..f]>**4\-<[0..9a..f]>**4\-<[0..9a..f]>**4\-<[0..9a..f]>**12', 'generate random')
@@ -58,7 +57,6 @@ uuid library tests
 
 
 .sub test_generate_time
-    load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'generate_time'
     $P1 = $P0()
     like($P1, '<[0..9a..f]>**8\-<[0..9a..f]>**4\-<[0..9a..f]>**4\-<[0..9a..f]>**4\-<[0..9a..f]>**12', 'generate time')
@@ -66,7 +64,6 @@ uuid library tests
 
 
 .sub test_parse_1
-    load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'parse'
     ($I0, $P1) = $P0("84949cc5-4701-4a84-895b-354c584a981b")
     is($I0, 0, 'parse 1')
@@ -76,7 +73,6 @@ uuid library tests
 
 
 .sub test_parse_2
-    load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'parse'
     $I0 = $P0("84949cc5-4701-4a84-895b-354c584a981b")
     is($I0, 0, 'parse 2')
@@ -104,7 +100,6 @@ uuid library tests
 
 
 .sub test_time
-    load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'parse'
     ($I0, $P1) = $P0("84949cc5-4701-4a84-895b-354c584a981b")
     $I1 = $P1.'time'()
@@ -113,7 +108,6 @@ uuid library tests
 
 
 .sub test_type
-    load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'generate'
     $P1 = $P0()
     $I0 = $P1.'type'()
@@ -122,7 +116,6 @@ uuid library tests
 
 
 .sub test_variant
-    load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'generate'
     $P1 = $P0()
     $I0 = $P1.'variant'()
