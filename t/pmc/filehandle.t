@@ -581,7 +581,7 @@ CODE
 utf8
 OUTPUT
 
-pir_output_is( <<"CODE", <<"OUTPUT", "exit status" );
+pir_output_is( <<'CODE', <<"OUTPUT", "exit status" );
 .include 'iglobals.pasm'
 .sub 'main'
     .local pmc pipe, conf, interp
@@ -605,17 +605,17 @@ pir_output_is( <<"CODE", <<"OUTPUT", "exit status" );
     pipe.'readall'()
     pipe.'close'()
     print "expect 0 exit status: "
-    \$I0 = pipe.'exit_status'()
-    say \$I0
+    $I0 = pipe.'exit_status'()
+    say $I0
 
     cmd .= ' --this_is_not_a_valid_option'
     pipe = open cmd, "rp"
     pipe.'readall'()
     pipe.'close'()
     print "expect 1 exit status: "
-    \$I0 = pipe.'exit_status'()
-    \$I0 = \$I0 != 0
-    say \$I0
+    $I0 = pipe.'exit_status'()
+    $I0 = $I0 != 0
+    say $I0
 
 .end
 CODE
