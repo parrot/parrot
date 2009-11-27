@@ -2509,13 +2509,13 @@ TEMPLATE
     .local string exe, bin
     exe = get_exe()
     $P1 = iter $P0
-  L1:
-    unless $P1 goto L2
+  L2:
+    unless $P1 goto L1
     bin = shift $P1
     $S0 = bin . exe
     unlink($S0)
-    goto L1
-  L2:
+    goto L2
+  L1:
 
     unlink('inno.iss')
     system('if exist setup-parrot-*.exe del setup-parrot-*.exe')
