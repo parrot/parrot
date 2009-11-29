@@ -45,6 +45,14 @@ L<https://trac.parrot.org/languages/browser/lolcode/trunk/setup.pir>
 
 L<https://trac.parrot.org/languages/browser/pheme/trunk/setup.pir>
 
+L<http://github.com/leto/kea/blob/master/setup.pir>
+
+L<http://github.com/vadrer/tcl-bridge/blob/master/setup.pir>
+
+L<http://github.com/tene/gil/blob/master/setup.pir>
+
+L<http://github.com/tene/steme/blob/master/setup.pir>
+
 =cut
 
 .sub '__onload' :load :init :anon
@@ -122,6 +130,7 @@ L<https://trac.parrot.org/languages/browser/pheme/trunk/setup.pir>
 
     .const 'Sub' _usage = '_usage'
     register_step('usage', _usage)
+    register_step('help', _usage)
 
     .const 'Sub' _plumage = '_plumage'
     register_step('plumage', _plumage)
