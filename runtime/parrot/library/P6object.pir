@@ -802,9 +802,10 @@ will be used in lieu of this one.)
     $P0 = self.'HOW'()
     parrotclass = $P0.'get_parrotclass'(self)
 
-    # Perl6Object accepts anything.
+    # Perl6Object (legacy) and Mu accept anything.
     $S0 = parrotclass
     if $S0 == 'Perl6Object' goto accept_anyway
+    if $S0 == 'Mu' goto accept_anyway
 
     # Otherwise, just try a normal check.
     $I0 = can topic, 'HOW'
