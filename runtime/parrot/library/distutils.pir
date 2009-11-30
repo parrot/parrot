@@ -3,9 +3,89 @@
 
 =head1 NAME
 
-distutils - DistUtils for Parrot
+distutils - Parrot Distribution Utilities
 
 =head2 DESCRIPTION
+
+This module is greatly inspired by Python Distribution Utilities
+(L<http://docs.python.org/distutils/>).
+
+Its goal is to make Parrot modules and extensions easily available
+to a wider audience with very little overhead for build/release/install mechanics.
+
+All the rules needed (dynops, dynpmc, pbc_to_exe, nqp, ...) are coded in this module distutils.
+A module author just must write a script C<setup.pir> (or C<setup.nqp> in future).
+
+A setup script can be as simple as this:
+
+=begin perl
+
+    pir::load_bytecode('distutils.pir');
+    setup(
+        ... many key/values here ...
+    );
+
+=end perl
+
+Distutils could work with Plumage (L<https://trac.parrot.org/parrot/wiki/ModuleEcosystem>).
+Plumage handles setup.pir commands.
+Distutils could generate a skeleton of Pluamge metadata.
+
+=head3 Commands / Steps / Targets
+
+The default are :
+
+=over 4
+
+=item build
+
+Build the library. (it is the default command)
+
+=item test
+
+Run the test suite.
+
+=item install
+
+Install the library.
+
+=item uninstall
+
+Uninstall the library.
+
+=item clean
+
+Basic cleaning up.
+
+=item update
+
+Update from the repository.
+
+=item plumage
+
+Output a skeleton for Plumage
+
+=item help
+
+Print this help message.
+
+=back
+
+The behaviour is driven by the data supplied to the function C<setup>.
+So, below each step is described with the list of key/values handled.
+
+An API allows to write customized step :
+C<register_step>, C<register_step_before>, C<register_step_after>, C<run_step>.
+
+Customized step could reuse Configuration Helpers & OS Utilities.
+
+=head3 Invocations
+
+Typical invocations are:
+
+    $ parrot setup.pir
+    $ parrot setup.pir test
+    $ sudo parrot setup.pir install
 
 =head2 EXTERNAL DEPENDENCIES
 
@@ -265,6 +345,8 @@ Overload the default message
     .param pmc kv :slurpy :named
     .local string msg
     msg = <<'USAGE'
+usage: parrot setup.pir [target]*
+
     Default targets are :
 
         build:          Build the library.
@@ -1414,20 +1496,17 @@ The following Version Control System are handled :
 
 .sub '_update' :anon
     .param pmc kv :slurpy :named
-    $I0 = file_exists('CVS')
-    unless $I0 goto L1
+    $S0 = get_vcs()
+    unless $S0 == 'cvs' goto L1
     .tailcall _update_cvs(kv :flat :named)
   L1:
-    $I0 = file_exists('.git')
-    unless $I0 goto L2
+    unless $S0 == 'git' goto L2
     .tailcall _update_git(kv :flat :named)
   L2:
-    $I0 = file_exists('.hg')
-    unless $I0 goto L3
+    unless $S0 == 'hg' goto L3
     .tailcall _update_hg(kv :flat :named)
   L3:
-    $I0 = file_exists('.svn')
-    unless $I0 goto L4
+    unless $S0 == 'svn' goto L4
     .tailcall _update_svn(kv :flat :named)
   L4:
     die "Don't known how to update."
@@ -2153,28 +2232,7 @@ Same options as install.
   L10:
 
     .local string vcs
-    vcs = 'VCS'
-    $I0 = file_exists('CVS')
-    unless $I0 goto L21
-    vcs = 'cvs'
-    goto L29
-  L21:
-    $I0 = file_exists('.git')
-    unless $I0 goto L22
-    vcs = 'git'
-    goto L29
-  L22:
-    $I0 = file_exists('.hg')
-    unless $I0 goto L23
-    vcs = 'hg'
-    goto L29
-  L23:
-    $I0 = file_exists('.svn')
-    unless $I0 goto L24
-    vcs = 'svn'
-    goto L29
-  L24:
-  L29:
+    vcs = get_vcs()
 
     .local string checkout_uri
     checkout_uri = 'CHECKOUT_URI'
@@ -2368,23 +2426,11 @@ Only on Windows.
   L2:
 
     .local string license
-    $I0 = file_exists('LICENSE')
-    unless $I0 goto L11
-    license = "LicenseFile=LICENSE"
-    goto L19
-  L11:
-    $I0 = file_exists('COPYING')
-    unless $I0 goto L12
-    license = "LicenseFile=COPYING"
-    goto L19
-  L12:
-    $I0 = file_exists('COPYRIGHT')
-    unless $I0 goto L13
-    license = "LicenseFile=COPYRIGHT"
-    goto L19
-  L13:
     license = "; no LicenseFile"
-  L19:
+    $S0 = get_license_file()
+    if $S0 == '' goto L3
+    license = "LicenseFile=" . $S0
+  L3:
 
     $P0 = new 'FixedStringArray'
     set $P0, 9
@@ -2696,6 +2742,54 @@ Return the whole config
     .return ($S0)
 .end
 
+=item get_vcs
+
+=cut
+
+.sub 'get_vcs'
+    .local string vcs
+    vcs = 'VCS'
+    $I0 = file_exists('CVS')
+    unless $I0 goto L1
+    vcs = 'cvs'
+    goto L9
+  L1:
+    $I0 = file_exists('.git')
+    unless $I0 goto L2
+    vcs = 'git'
+    goto L9
+  L2:
+    $I0 = file_exists('.hg')
+    unless $I0 goto L3
+    vcs = 'hg'
+    goto L9
+  L3:
+    $I0 = file_exists('.svn')
+    unless $I0 goto L4
+    vcs = 'svn'
+    goto L9
+  L4:
+  L9:
+    .return (vcs)
+.end
+
+=item get_license_file
+
+=cut
+
+.sub 'get_license_file'
+    $P0 = split ' ', "LICENSE COPYING COPYRIGHT"
+    $P1 = iter $P0
+  L1:
+    unless $P1 goto L2
+    $S0 = shift $P1
+    $I0 = file_exists($S0)
+    unless $I0 goto L1
+    .return ($S0)
+  L2:
+    .return ('')
+.end
+
 =back
 
 =head3 OS Utilities
@@ -2963,7 +3057,7 @@ Return the whole config
 
 =cut
 
-.sub 'slurp' :anon
+.sub 'slurp'
     .param string filename
     $P0 = new 'FileHandle'
     push_eh _handler
@@ -2987,7 +3081,7 @@ Return the whole config
 
 =cut
 
-.sub 'spew' :anon
+.sub 'spew'
     .param string filename
     .param string content
     $P0 = new 'FileHandle'
@@ -3011,10 +3105,6 @@ Return the whole config
 .end
 
 =back
-
-=head2 SEE ALSO
-
-See: L<http://docs.python.org/distutils/>
 
 =head1 AUTHOR
 
