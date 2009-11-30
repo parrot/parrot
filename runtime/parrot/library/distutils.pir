@@ -65,6 +65,10 @@ Update from the repository.
 
 Output a skeleton for Plumage
 
+=item sdist, sdist_gztar, sdist_zip, manifest
+
+Create a source distribution
+
 =item help
 
 Print this help message.
@@ -215,6 +219,12 @@ L<http://github.com/tene/steme/blob/master/setup.pir>
     .const 'Sub' _plumage = '_plumage'
     register_step('plumage', _plumage)
 
+    .const 'Sub' _sdist = '_sdist'
+    register_step('sdist', _sdist)
+    .const 'Sub' _sdist_gztar = '_sdist_gztar'
+    register_step('sdist_gztar', _sdist_gztar)
+    .const 'Sub' _sdist_zip = '_sdist_zip'
+    register_step('sdist_zip', _sdist_zip)
     .const 'Sub' _manifest = '_manifest'
     register_step('manifest', _manifest)
 
@@ -382,6 +392,8 @@ usage: parrot setup.pir [target|--key value]*
         update:         Update from the repository.
 
         plumage:        Output a skeleton for Plumage
+
+        sdist:          Create a source distribution
 
         help:           Print this help message.
 USAGE
@@ -2570,8 +2582,8 @@ array of pathname or a single pathname
     unless $P0 goto L2
     $S0 = shift $P0
     .local string cmd                   #
-    cmd = 'perl -e "for (<' . $S0       # refactoring needed
-    cmd .= '>) { print $_, qq{\n};}"'   # without perl
+    cmd = "perl -e 'for (<" . $S0       # refactoring needed
+    cmd .= ">) { print $_, qq{\n};}'"   # without perl
     $P1 = open cmd, 'rp'                #
   L3:
     $S0 = $P1.'readline'()
@@ -2585,6 +2597,113 @@ array of pathname or a single pathname
     $P1.'close'()
     goto L1
   L2:
+.end
+
+=head3 Step sdist
+
+On Windows calls sdist_zip, otherwise sdist_gztar
+
+=cut
+
+.sub '_sdist' :anon
+    .param pmc kv :slurpy :named
+    $P0 = get_config()
+    $S0 = $P0['osname']
+    unless $S0 == 'MSWin32' goto L1
+    .tailcall run_step('sdist_zip', kv :flat :named)
+  L1:
+    .tailcall run_step('sdist_gztar', kv :flat :named)
+.end
+
+=head3 Step sdist_gztar
+
+=cut
+
+.sub '_sdist_gztar' :anon
+    .param pmc kv :slurpy :named
+    run_step('manifest', kv :flat :named)
+
+    $S0 = get_tarname(kv :flat :named)
+
+    .local string cmd
+    cmd = 'tar -cvf ' . $S0
+    cmd .= ' -T MANIFEST'
+    system(cmd)
+
+    cmd = 'gzip --best ' . $S0
+    system(cmd)
+.end
+
+.sub 'get_tarname' :anon
+    .param pmc kv :slurpy :named
+    .local string name
+    $S0 = cwd()
+    name = basename($S0)
+    $I0 = exists kv['name']
+    unless $I0 goto L1
+    $S0 = kv['name']
+    name = downcase $S0
+  L1:
+
+    .local string version
+    version = 'HEAD'
+    $I0 = exists kv['version']
+    unless $I0 goto L2
+    version = kv['version']
+  L2:
+
+    $S0 = 'parrot-' . name
+    $S0 .= '-'
+    $S0 .= version
+    $S0 .= '.tar'
+    .return ($S0)
+.end
+
+=head3 Step sdist_zip
+
+=cut
+
+.sub '_sdist_zip' :anon
+    .param pmc kv :slurpy :named
+    run_step('manifest', kv :flat :named)
+
+    $S0 = get_zipname(kv :flat :named)
+
+    .local string cmd
+    cmd = 'cat'
+    $P0 = get_config()
+    $S1 = $P0['osname']
+    unless $S1 == 'MSWin32' goto L1
+    cmd = 'type'
+  L1:
+    cmd .= ' MANIFEST | zip -9 -@ '
+    cmd .= $S0
+    system(cmd)
+.end
+
+.sub 'get_zipname' :anon
+    .param pmc kv :slurpy :named
+    .local string name
+    $S0 = cwd()
+    name = basename($S0)
+    $I0 = exists kv['name']
+    unless $I0 goto L1
+    $S0 = kv['name']
+    name = downcase $S0
+  L1:
+
+    .local string version
+    version = 'HEAD'
+    $I0 = exists kv['version']
+    unless $I0 goto L2
+    version = kv['version']
+  L2:
+
+    $S0 = 'parrot-' . name
+    $S0 .= '-'
+    $S0 .= version
+    $S0 .= '.zip'
+    .return ($S0)
 .end
 
 =head3 Step win32-inno-installer
