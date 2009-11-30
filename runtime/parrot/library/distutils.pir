@@ -69,6 +69,10 @@ Output a skeleton for Plumage
 
 Create a source distribution
 
+=item bdist, bdist_wininst
+
+Create a binary package or Windows Installer.
+
 =item help
 
 Print this help message.
@@ -228,13 +232,16 @@ L<http://github.com/tene/steme/blob/master/setup.pir>
     .const 'Sub' _manifest = '_manifest'
     register_step('manifest', _manifest)
 
+    .const 'Sub' _bdist = '_bdist'
+    register_step('bdist', _bdist)
+
     $P0 = get_config()
     $S0 = $P0['osname']
     unless $S0 == 'MSWin32' goto L1
-    .const 'Sub' _win32_inno_installer = '_win32_inno_installer'
-    register_step('win32-inno-installer', _win32_inno_installer)
-    .const 'Sub' _clean_win32_installer = '_clean_win32_installer'
-    register_step_after('clean', _clean_win32_installer)
+    .const 'Sub' _bdist_wininst = '_bdist_wininst'
+    register_step('bdist_wininst', _bdist_wininst)
+    .const 'Sub' _clean_wininst = '_clean_wininst'
+    register_step_after('clean', _clean_wininst)
   L1:
 .end
 
@@ -394,6 +401,8 @@ usage: parrot setup.pir [target|--key value]*
         plumage:        Output a skeleton for Plumage
 
         sdist:          Create a source distribution
+
+        bdist:          Create a binary distribution
 
         help:           Print this help message.
 USAGE
@@ -2682,9 +2691,25 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     system(cmd)
 .end
 
-=head3 Step win32-inno-installer
+=head3 Step bdist
 
-Only on Windows.
+On Windows calls bdist_wininst, otherwise ...
+
+=cut
+
+.sub '_bdist' :anon
+    .param pmc kv :slurpy :named
+    $P0 = get_config()
+    $S0 = $P0['osname']
+    unless $S0 == 'MSWin32' goto L1
+    .tailcall run_step('bdist_wininst', kv :flat :named)
+  L1:
+    die "no bdist"
+.end
+
+=head3 Step bdist_wininst
+
+Build an installer with Inno Setup.
 
 =over 4
 
@@ -2704,7 +2729,7 @@ Only on Windows.
 
 =cut
 
-.sub '_win32_inno_installer' :anon
+.sub '_bdist_wininst' :anon
     .param pmc kv :slurpy :named
     run_step('build', kv :flat :named)
 
@@ -2896,7 +2921,7 @@ TEMPLATE
     .return ($S0)
 .end
 
-.sub '_clean_win32_installer' :anon
+.sub '_clean_wininst' :anon
     .param pmc kv :slurpy :named
 
     $I0 = exists kv['installable_pbc']
