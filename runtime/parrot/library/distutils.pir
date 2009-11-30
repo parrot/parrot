@@ -2582,8 +2582,8 @@ array of pathname or a single pathname
     unless $P0 goto L2
     $S0 = shift $P0
     .local string cmd                   #
-    cmd = "perl -e 'for (<" . $S0       # refactoring needed
-    cmd .= ">) { print $_, qq{\n};}'"   # without perl
+    cmd = 'perl -e "for (<' . $S0       # refactoring needed
+    cmd .= '>) { print; print qq{\n};}"'# without perl
     $P1 = open cmd, 'rp'                #
   L3:
     $S0 = $P1.'readline'()
