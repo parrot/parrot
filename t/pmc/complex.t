@@ -1161,29 +1161,34 @@ todo:
 .end
 
 .sub add_using_subclass_of_complex_bug_59630
-    skip( 3, 'add using subclass of Complex - TT #1318' )
-    .return()
-
     $P0 = subclass 'Complex', 'MyComplex'
     addattribute $P0, "re"
     addattribute $P0, "im"
 
-    .local pmc a, b, c
+    .local pmc a, b, c, expected
     ##   a = 1 + 2i
     a = new ['MyComplex']
     a['real'] = 1
     a['imag'] = 2
-    is( a, "1+2i", '' )
+    is( a, "1+2i", 'a created' )
 
     ##   b = 3 + 4i
     b = new ['MyComplex']
     b['real'] = 3
     b['imag'] = 4
-    is( b, "3+4i" , '' )
+    is( b, "3+4i" , 'b created' )
 
     ##   c = a + b
     c = add a, b
-    is( c, "4+6i", '' )
+    expected = new ['MyComplex']
+    expected['real'] = 4
+    expected['imag'] = 6
+    $I0 = c == expected
+    $S1 = c
+    $S0 = concat $S1, ' != '
+    $S1 = expected
+    $S0 = concat $S0, $S1
+    todo( $I0, $S0 )
 .end
 
 .namespace ['MyComplex']
