@@ -2623,7 +2623,7 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     .param pmc kv :slurpy :named
     run_step('manifest', kv :flat :named)
 
-    $S0 = get_tarname(kv :flat :named)
+    $S0 = get_tarname('.tar', kv :flat :named)
 
     .local string cmd
     cmd = 'tar -cvf ' . $S0
@@ -2635,6 +2635,7 @@ On Windows calls sdist_zip, otherwise sdist_gztar
 .end
 
 .sub 'get_tarname' :anon
+    .param string ext
     .param pmc kv :slurpy :named
     .local string name
     $S0 = cwd()
@@ -2655,7 +2656,7 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     $S0 = 'parrot-' . name
     $S0 .= '-'
     $S0 .= version
-    $S0 .= '.tar'
+    $S0 .= ext
     .return ($S0)
 .end
 
@@ -2667,7 +2668,7 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     .param pmc kv :slurpy :named
     run_step('manifest', kv :flat :named)
 
-    $S0 = get_zipname(kv :flat :named)
+    $S0 = get_tarname('.zip', kv :flat :named)
 
     .local string cmd
     cmd = 'cat'
@@ -2679,31 +2680,6 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     cmd .= ' MANIFEST | zip -9 -@ '
     cmd .= $S0
     system(cmd)
-.end
-
-.sub 'get_zipname' :anon
-    .param pmc kv :slurpy :named
-    .local string name
-    $S0 = cwd()
-    name = basename($S0)
-    $I0 = exists kv['name']
-    unless $I0 goto L1
-    $S0 = kv['name']
-    name = downcase $S0
-  L1:
-
-    .local string version
-    version = 'HEAD'
-    $I0 = exists kv['version']
-    unless $I0 goto L2
-    version = kv['version']
-  L2:
-
-    $S0 = 'parrot-' . name
-    $S0 .= '-'
-    $S0 .= version
-    $S0 .= '.zip'
-    .return ($S0)
 .end
 
 =head3 Step win32-inno-installer
