@@ -215,6 +215,9 @@ L<http://github.com/tene/steme/blob/master/setup.pir>
     .const 'Sub' _plumage = '_plumage'
     register_step('plumage', _plumage)
 
+    .const 'Sub' _manifest = '_manifest'
+    register_step('manifest', _manifest)
+
     $P0 = get_config()
     $S0 = $P0['osname']
     unless $S0 == 'MSWin32' goto L1
@@ -2348,6 +2351,242 @@ TEMPLATE
     print $S0
 .end
 
+=head3 Step manifest
+
+=over 4
+
+=item manifest_includes
+
+array of pathname or a single pathname
+
+=item manifest_excludes
+
+array of pathname or a single pathname
+
+=item pbc_pir
+
+=item pir_pge
+
+=item pir_tge
+
+=item pir_nqp
+
+=item pir_nqp-rx
+
+=item exe_pbc
+
+=item installable_pbc
+
+=item dynops
+
+=item dynpmc
+
+=item html_pod
+
+=item inst_bin
+
+=item inst_dynext
+
+=item inst_inc
+
+=item inst_lang
+
+=item inst_lib
+
+=item harness_files
+
+=item prove_files
+
+=back
+
+=cut
+
+.sub '_manifest' :anon
+    .param pmc kv :slurpy :named
+    .local pmc needed, generated
+    needed = new 'Hash'
+    generated = new 'Hash'
+
+    $P0 = split ' ', 'pbc_pir pir_pge pir_tge pir_nqp pir_nqp-rx exe_pbc installable_pbc dynops dynpmc html_pod'
+  L1:
+    unless $P0 goto L2
+    $S0 = shift $P0
+    $I0 = exists kv[$S0]
+    unless $I0 goto L1
+    $P1 = kv[$S0]
+    _manifest_add_hash(needed, generated, $P1)
+    goto L1
+  L2:
+
+    $P0 = split ' ', 'inst_bin inst_dynext inst_inc inst_lang inst_lib'
+  L3:
+    unless $P0 goto L4
+    $S0 = shift $P0
+    $I0 = exists kv[$S0]
+    unless $I0 goto L3
+    $P1 = kv[$S0]
+    _manifest_add_array(needed, $P1)
+    goto L3
+  L4:
+
+    $P0 = split ' ', 'harness_files prove_files'
+    $I1 = 0
+  L5:
+    unless $P0 goto L6
+    $S0 = shift $P0
+    $I0 = exists kv[$S0]
+    unless $I0 goto L5
+    $I1 = 1
+    $S1 = kv[$S0]
+    _manifest_add_glob(needed, $S1)
+    goto L5
+  L6:
+    if $I1 goto L7
+    _manifest_add_glob(needed, 't/*.t')
+  L7:
+
+    $P0 = split ' ', 'CREDITS Changes MAINTAINER NEWS README TODO setup.pir setup.nqp t/harness'
+  L8:
+    unless $P0 goto L9
+    $S0 = shift $P0
+    $I0 = file_exists($S0)
+    unless $I0 goto L8
+    needed[$S0] = 1
+    goto L8
+  L9:
+
+    $S0 = get_license_file()
+    if $S0 == '' goto L10
+    needed[$S0] = 1
+  L10:
+
+    $P0 = iter generated
+  L11:
+    unless $P0 goto L12
+    $S0 = shift $P0
+    delete needed[$S0]
+    goto L11
+  L12:
+
+    $I0 = exists kv['manifest_includes']
+    unless $I0 goto L13
+    $P1 = kv['manifest_includes']
+    _manifest_add_array(needed, $P1)
+  L13:
+
+    $I0 = exists kv['manifest_excludes']
+    unless $I0 goto L14
+    $P1 = kv['manifest_excludes']
+    _manifest_del_array(needed, $P1)
+  L14:
+
+    $P1 = iter needed
+    $I0 = elements $P1
+    inc $I0
+    $P0 = new 'FixedPMCArray' # currently, FixedStringArray hasn't the method sort.
+    set $P0, $I0
+    $I0 = 0
+    $P0[$I0] = 'MANIFEST'
+  L21:
+    unless $P1 goto L22
+    $S0 = shift $P1
+    inc $I0
+    $P0[$I0] = $S0
+    goto L21
+  L22:
+
+    $P0.'sort'()
+    $S0 = join "\n", $P0
+    spew('MANIFEST', $S0)
+.end
+
+.sub '_manifest_add_hash' :anon
+    .param pmc needed
+    .param pmc generated
+    .param pmc hash
+    $P0 = iter hash
+  L1:
+    unless $P0 goto L2
+    .local string key
+    key = shift $P0
+    generated[key] = 1
+    .local pmc depends
+    depends = $P0[key]
+    $I0 = does depends, 'array'
+    unless $I0 goto L3
+    $P1 = iter depends
+  L4:
+    unless $P1 goto L1
+    $S0 = shift $P1
+    if $S0 == '' goto L4
+    needed[$S0] = 1
+    goto L4
+  L3:
+    $S0 = depends
+    needed[$S0] = 1
+    goto L1
+  L2:
+.end
+
+.sub '_manifest_add_array' :anon
+    .param pmc needed
+    .param pmc array
+    $I0 = does array, 'array'
+    unless $I0 goto L1
+    $P0 = iter array
+  L2:
+    unless $P0 goto L3
+    $S0 = shift $P0
+    needed[$S0] = 1
+    goto L2
+  L1:
+    $S0 = array
+    needed[$S0] = 1
+  L3:
+.end
+
+.sub '_manifest_del_array' :anon
+    .param pmc needed
+    .param pmc array
+    $I0 = does array, 'array'
+    unless $I0 goto L1
+    $P0 = iter array
+  L2:
+    unless $P0 goto L3
+    $S0 = shift $P0
+    delete needed[$S0]
+    goto L2
+  L1:
+    $S0 = array
+    delete needed[$S0]
+  L3:
+.end
+
+.sub '_manifest_add_glob' :anon
+    .param pmc needed
+    .param string str
+    $P0 = split ' ', str
+  L1:
+    unless $P0 goto L2
+    $S0 = shift $P0
+    .local string cmd                   #
+    cmd = 'perl -e "for (<' . $S0       # refactoring needed
+    cmd .= '>) { print $_, qq{\n};}"'   # without perl
+    $P1 = open cmd, 'rp'                #
+  L3:
+    $S0 = $P1.'readline'()
+    if $S0 == '' goto L4
+    $I0 = length $S0
+    dec $I0
+    $S0 = substr $S0, 0, $I0
+    needed[$S0] = 1
+    goto L3
+  L4:
+    $P1.'close'()
+    goto L1
+  L2:
+.end
+
 =head3 Step win32-inno-installer
 
 Only on Windows.
@@ -2786,10 +3025,9 @@ Return the whole config
 
 .sub 'get_license_file'
     $P0 = split ' ', "LICENSE COPYING COPYRIGHT"
-    $P1 = iter $P0
   L1:
-    unless $P1 goto L2
-    $S0 = shift $P1
+    unless $P0 goto L2
+    $S0 = shift $P0
     $I0 = file_exists($S0)
     unless $I0 goto L1
     .return ($S0)
