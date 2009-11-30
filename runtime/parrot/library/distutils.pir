@@ -188,6 +188,10 @@ L<http://github.com/tene/steme/blob/master/setup.pir>
     register_step_after('clean', _clean_installable_pbc)
     .const 'Sub' _clean_html_pod = '_clean_html_pod'
     register_step_after('clean', _clean_html_pod)
+    .const 'Sub' _clean_gztar = '_clean_gztar'
+    register_step_after('clean', _clean_gztar)
+    .const 'Sub' _clean_zip = '_clean_zip'
+    register_step_after('clean', _clean_zip)
 
     .const 'Sub' _update = '_update'
     register_step('update', _update)
@@ -2643,6 +2647,14 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     system(cmd)
 .end
 
+.sub '_clean_gztar' :anon
+    .param pmc kv :slurpy :named
+
+    $S0 = get_tarname('.tar.gz', kv :flat :named)
+    unlink($S0)
+    unlink('MANIFEST')
+.end
+
 .sub 'get_tarname' :anon
     .param string ext
     .param pmc kv :slurpy :named
@@ -2689,6 +2701,14 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     cmd .= ' MANIFEST | zip -9 -@ '
     cmd .= $S0
     system(cmd)
+.end
+
+.sub '_clean_zip' :anon
+    .param pmc kv :slurpy :named
+
+    $S0 = get_tarname('.zip', kv :flat :named)
+    unlink($S0)
+    unlink('MANIFEST')
 .end
 
 =head3 Step bdist
