@@ -21,7 +21,7 @@ A setup script can be as simple as this:
 =begin perl
 
     pir::load_bytecode('distutils.pir');
-    setup(
+    setup( @ARGS,
         ... many key/values here ...
     );
 
@@ -238,23 +238,40 @@ Entry point.
 .sub 'setup'
     .param pmc args :slurpy
     .param pmc kv :slurpy :named
+    .local pmc steps
+    steps = new 'ResizableStringArray'
     $P0 = iter args
-    if $P0 goto L1
+  L1:
+    unless $P0 goto L2
+    $S0 = shift $P0
+    $S1 = substr $S0, 0, 2
+    unless $S1 == '--' goto L3
+    $S1 = substr $S0, 2
+    $S2 = shift $P0
+    print $S1
+    print "="
+    say $S2
+    kv[$S1] = $S2
+    goto L1
+  L3:
+    push steps, $S0
+    goto L1
+  L2:
+
+    $P0 = iter steps
+    if $P0 goto L11
     # default step
     run_step('build', kv :flat :named)
-    goto L2
-  L1:
-    $P0 = iter args
-  L3:
-    unless $P0 goto L2
-    .local string cmd
-    cmd = shift $P0
-    $I0 = run_step(cmd, kv :flat :named)
-    if $I0 goto L3
+    goto L12
+  L11:
+    unless $P0 goto L12
+    $S0 = shift $P0
+    $I0 = run_step($S0, kv :flat :named)
+    if $I0 goto L11
     print "unknown target : "
-    say cmd
+    say $S0
     run_step('usage')
-  L2:
+  L12:
 .end
 
 =item run_step
@@ -345,7 +362,7 @@ Overload the default message
     .param pmc kv :slurpy :named
     .local string msg
     msg = <<'USAGE'
-usage: parrot setup.pir [target]*
+usage: parrot setup.pir [target|--key value]*
 
     Default targets are :
 
@@ -2409,17 +2426,7 @@ Only on Windows.
   L1:
 
     .local string version
-    $I0 = time
-    $P1 = decodetime $I0
-    $P2 = new 'FixedIntegerArray'
-    set $P2, 3
-    $I0 = $P1[.TM_YEAR]
-    $P2[0] = $I0
-    $I0 = $P1[.TM_MON]
-    $P2[1] = $I0
-    $I0 = $P1[.TM_MDAY]
-    $P2[2] = $I0
-    version = sprintf "%04d%02d%02d", $P2
+    version = 'HEAD'
     $I0 = exists kv['version']
     unless $I0 goto L2
     version = kv['version']
