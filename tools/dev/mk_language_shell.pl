@@ -203,7 +203,7 @@ __Configure.pir__
 .include 'iglobals.pasm'
 
 .sub 'main' :main
-    load_bytecode 'Configure.pbc'
+    load_bytecode 'Configure/genfile.pbc'
 
     # Wave to the friendly users
     print "Hello, I'm Configure. My job is to poke and prod\n"

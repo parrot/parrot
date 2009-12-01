@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Configure.pir - Configure step helpers
+Configure/genfile.pir - Configure step helpers
 
 =head1 DESCRIPTION
 
@@ -22,9 +22,6 @@ Supply C<genfile> function, which handles
 =back
 
 Pure PIR, without any dependencies.
-
-See as example,
-L<http://github.com/fperrad/markdown/blob/master/Configure.pir>
 
 =head1 USAGE
 

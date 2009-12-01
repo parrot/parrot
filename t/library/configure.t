@@ -19,7 +19,7 @@ Test the Configure PBC
 .sub 'main' :main
     .include 'test_more.pir'
 
-    load_bytecode 'Configure.pbc'
+    load_bytecode 'Configure/genfile.pbc'
 
     plan(40)
     test_conditioned_line()
