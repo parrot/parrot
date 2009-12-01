@@ -2340,11 +2340,11 @@ TEMPLATE
 
 =item manifest_includes
 
-string with pathname or pattern separated by space
+array of pathname or a single pathname
 
 =item manifest_excludes
 
-string with pathname or pattern separated by space
+array of pathname or a single pathname
 
 =item pbc_pir
 
@@ -2453,24 +2453,15 @@ string with pathname or pattern separated by space
 
     $I0 = exists kv['manifest_includes']
     unless $I0 goto L13
-    $S1 = kv['manifest_includes']
-    _manifest_add_glob(needed, $S1)
+    $P1 = kv['manifest_includes']
+    _manifest_add_array(needed, $P1)
   L13:
 
-    generated = new 'Hash'
     $I0 = exists kv['manifest_excludes']
     unless $I0 goto L14
-    $S1 = kv['manifest_excludes']
-    _manifest_add_glob(generated, $S1)
+    $P1 = kv['manifest_excludes']
+    _manifest_del_array(needed, $P1)
   L14:
-
-    $P0 = iter generated
-  L15:
-    unless $P0 goto L16
-    $S0 = shift $P0
-    delete needed[$S0]
-    goto L15
-  L16:
 
     $P1 = iter needed
     $I0 = elements $P1
@@ -2537,19 +2528,32 @@ string with pathname or pattern separated by space
   L3:
 .end
 
+.sub '_manifest_del_array' :anon
+    .param pmc needed
+    .param pmc array
+    $I0 = does array, 'array'
+    unless $I0 goto L1
+    $P0 = iter array
+  L2:
+    unless $P0 goto L3
+    $S0 = shift $P0
+    delete needed[$S0]
+    goto L2
+  L1:
+    $S0 = array
+    delete needed[$S0]
+  L3:
+.end
+
 .sub '_manifest_add_glob' :anon
     .param pmc needed
     .param string str
-    $P0 = split ' ', str
+    $P0 = glob(str)
   L1:
     unless $P0 goto L2
     $S0 = shift $P0
-    $P1 = glob($S0)
-  L3:
-    unless $P1 goto L1
-    $S1 = shift $P1
-    needed[$S1] = 1
-    goto L3
+    needed[$S0] = 1
+    goto L1
   L2:
 .end
 
