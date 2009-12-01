@@ -86,7 +86,7 @@ op store_dynamic_lex(in STR, invar PMC) {
 Find the lexical variable named $2 and store it in $1. This
 opcode either throws an exception or returns a Null PMC for the failure case,
 depending on the implementation of the LexPad PMC. Parrot's
-standard LexPad throws and exception for non-existing names.
+standard LexPad throws an exception for non-existent names.
 
 =cut
 
