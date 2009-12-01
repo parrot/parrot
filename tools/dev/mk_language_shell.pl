@@ -32,6 +32,7 @@ to F<xyz> if an explicit C<path> isn't given):
     Makefile.in
     README
     Configure.pir
+    setup.pir
     xyz.pir
     doc/running.pod
     doc/Xyz.pod
@@ -196,7 +197,7 @@ or
     $ make test
 
 __Configure.pir__
-#! /usr/local/bin/parrot
+#!/usr/bin/env parrot
 # @Id@
 
 .include 'sysinfo.pasm'
@@ -255,7 +256,7 @@ __Configure.pir__
 # vim: expandtab shiftwidth=4 ft=pir:
 
 __setup.pir__
-#! /usr/local/bin/parrot
+#!/usr/bin/env parrot
 # @Id@
 
 =head1 NAME
