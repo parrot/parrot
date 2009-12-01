@@ -2340,11 +2340,11 @@ TEMPLATE
 
 =item manifest_includes
 
-array of pathname or a single pathname
+string with pathname or pattern separated by space
 
 =item manifest_excludes
 
-array of pathname or a single pathname
+string with pathname or pattern separated by space
 
 =item pbc_pir
 
@@ -2453,15 +2453,24 @@ array of pathname or a single pathname
 
     $I0 = exists kv['manifest_includes']
     unless $I0 goto L13
-    $P1 = kv['manifest_includes']
-    _manifest_add_array(needed, $P1)
+    $S1 = kv['manifest_includes']
+    _manifest_add_glob(needed, $S1)
   L13:
 
+    generated = new 'Hash'
     $I0 = exists kv['manifest_excludes']
     unless $I0 goto L14
-    $P1 = kv['manifest_excludes']
-    _manifest_del_array(needed, $P1)
+    $S1 = kv['manifest_excludes']
+    _manifest_add_glob(generated, $S1)
   L14:
+
+    $P0 = iter generated
+  L15:
+    unless $P0 goto L16
+    $S0 = shift $P0
+    delete needed[$S0]
+    goto L15
+  L16:
 
     $P1 = iter needed
     $I0 = elements $P1
@@ -2528,23 +2537,6 @@ array of pathname or a single pathname
   L3:
 .end
 
-.sub '_manifest_del_array' :anon
-    .param pmc needed
-    .param pmc array
-    $I0 = does array, 'array'
-    unless $I0 goto L1
-    $P0 = iter array
-  L2:
-    unless $P0 goto L3
-    $S0 = shift $P0
-    delete needed[$S0]
-    goto L2
-  L1:
-    $S0 = array
-    delete needed[$S0]
-  L3:
-.end
-
 .sub '_manifest_add_glob' :anon
     .param pmc needed
     .param string str
@@ -2552,21 +2544,12 @@ array of pathname or a single pathname
   L1:
     unless $P0 goto L2
     $S0 = shift $P0
-    .local string cmd                   #
-    cmd = 'perl -e "for (<' . $S0       # refactoring needed
-    cmd .= '>) { print; print qq{\n};}"'# without perl
-    $P1 = open cmd, 'rp'                #
+    $P1 = glob($S0)
   L3:
-    $S0 = $P1.'readline'()
-    if $S0 == '' goto L4
-    $I0 = length $S0
-    dec $I0
-    $S0 = substr $S0, 0, $I0
-    needed[$S0] = 1
+    unless $P1 goto L1
+    $S1 = shift $P1
+    needed[$S1] = 1
     goto L3
-  L4:
-    $P1.'close'()
-    goto L1
   L2:
 .end
 
@@ -3460,6 +3443,47 @@ Return the whole config
     .param string dirname
     new $P0, 'OS'
     $P0.'chdir'(dirname)
+.end
+
+=item chomp
+
+=cut
+
+.include 'cclass.pasm'
+
+.sub 'chomp'
+    .param string str
+    $I0 = index str, "\r"
+    if $I0 < 0 goto L1
+    str = substr str, 0, $I0
+  L1:
+    $I1 = index str, "\n"
+    if $I1 < 0 goto L2
+    str = substr str, 0, $I1
+  L2:
+    .return (str)
+.end
+
+=item glob
+
+=cut
+
+.sub 'glob'
+    .param string pattern
+    $P0 = new 'ResizableStringArray'
+    .local string cmd                   #
+    cmd = 'perl -e "for (<' . pattern   # refactoring needed
+    cmd .= '>) { print; print qq{\n};}"'# without perl
+    $P1 = open cmd, 'rp'                #
+  L1:
+    $S0 = $P1.'readline'()
+    if $S0 == '' goto L2
+    $S0 = chomp($S0)
+    push $P0, $S0
+    goto L1
+  L2:
+    $P1.'close'()
+    .return ($P0)
 .end
 
 =item getenv
