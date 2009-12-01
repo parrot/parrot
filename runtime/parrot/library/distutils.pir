@@ -2209,62 +2209,28 @@ Same options as install.
     .param pmc kv :slurpy :named
 
     .local string name
-    $S0 = cwd()
-    name = basename($S0)
-    $I0 = exists kv['name']
-    unless $I0 goto L1
-    $S0 = kv['name']
-    name = downcase $S0
-  L1:
+    name = get_name(kv :flat :named)
 
     .local string abstract
-    abstract = 'ABSTRACT'
-    $I0 = exists kv['abstract']
-    unless $I0 goto L2
-    abstract = kv['abstract']
-  L2:
+    abstract = get_value('abstract', kv :flat :named)
 
     .local string authority
-    authority = 'AUTHORITY'
-    $I0 = exists kv['authority']
-    unless $I0 goto L3
-    authority = kv['authority']
-  L3:
+    authority = get_value('authority', kv :flat :named)
 
     .local string version
-    version = 'HEAD'
-    $I0 = exists kv['version']
-    unless $I0 goto L4
-    version = kv['version']
-  L4:
+    version = get_version(kv :flat :named)
 
     .local string license_type
-    license_type = 'LICENSE TYPE'
-    $I0 = exists kv['license_type']
-    unless $I0 goto L5
-    license_type = kv['license_type']
-  L5:
+    license_type = get_value('license_type', kv :flat :named)
 
     .local string license_uri
-    license_uri = 'LICENSE URI'
-    $I0 = exists kv['license_uri']
-    unless $I0 goto L6
-    license_uri = kv['license_uri']
-  L6:
+    license_uri = get_value('license_uri', kv :flat :named)
 
     .local string copyright_holder
-    copyright_holder = 'COPYRIGHT HOLDER'
-    $I0 = exists kv['copyright_holder']
-    unless $I0 goto L7
-    copyright_holder = kv['copyright_holder']
-  L7:
+    copyright_holder = get_value('copyright_holder', kv :flat :named)
 
     .local string description
-    description = 'DESCRIPTION'
-    $I0 = exists kv['description']
-    unless $I0 goto L9
-    description = kv['description']
-  L9:
+    description = get_value('description', kv :flat :named)
 
     .local string keywords
     keywords = ''
@@ -2280,25 +2246,13 @@ Same options as install.
     vcs = get_vcs()
 
     .local string checkout_uri
-    checkout_uri = 'CHECKOUT_URI'
-    $I0 = exists kv['checkout_uri']
-    unless $I0 goto L31
-    checkout_uri = kv['checkout_uri']
-  L31:
+    checkout_uri = get_value('checkout_uri', kv :flat :named)
 
     .local string browser_uri
-    browser_uri = 'BROWSER_URI'
-    $I0 = exists kv['browser_uri']
-    unless $I0 goto L32
-    browser_uri = kv['browser_uri']
-  L32:
+    browser_uri = get_value('browser_uri', kv :flat :named)
 
     .local string project_uri
-    project_uri = 'PROJECT_URI'
-    $I0 = exists kv['project_uri']
-    unless $I0 goto L33
-    project_uri = kv['project_uri']
-  L33:
+    project_uri =get_value('project_uri', kv :flat :named)
 
     $P0 = new 'FixedStringArray'
     set $P0, 15
@@ -2658,25 +2612,13 @@ On Windows calls sdist_zip, otherwise sdist_gztar
 .sub 'get_tarname' :anon
     .param string ext
     .param pmc kv :slurpy :named
-    .local string name
-    $S0 = cwd()
-    name = basename($S0)
-    $I0 = exists kv['name']
-    unless $I0 goto L1
-    $S0 = kv['name']
-    name = downcase $S0
-  L1:
 
-    .local string version
-    version = 'HEAD'
-    $I0 = exists kv['version']
-    unless $I0 goto L2
-    version = kv['version']
-  L2:
-
-    $S0 = 'parrot-' . name
+    $S0 = 'parrot-'
+    $S1 = get_name(kv :flat :named)
+    $S0 .= $S1
     $S0 .= '-'
-    $S0 .= version
+    $S1 = get_version(kv :flat :named)
+    $S0 .= $S1
     $S0 .= ext
     .return ($S0)
 .end
@@ -2724,7 +2666,7 @@ On Windows calls bdist_wininst, otherwise ...
     unless $S0 == 'MSWin32' goto L1
     .tailcall run_step('bdist_wininst', kv :flat :named)
   L1:
-    die "no bdist"
+    die "no yet bdist"
 .end
 
 =head3 Step bdist_wininst
@@ -2797,19 +2739,16 @@ Build an installer with Inno Setup.
     parrot_version = $S1 . $S2
 
     .local string name
-    $S0 = cwd()
-    name = basename($S0)
-    $I0 = exists kv['name']
-    unless $I0 goto L1
-    name = kv['name']
-  L1:
+    name = get_Name(kv :flat :named)
 
     .local string version
-    version = 'HEAD'
-    $I0 = exists kv['version']
-    unless $I0 goto L2
-    version = kv['version']
-  L2:
+    version = get_version(kv :flat :named)
+
+    .local string copyright_holder
+    copyright_holder = get_value('copyright_holder', kv :flat :named)
+
+    .local string project_uri
+    project_uri =get_value('project_uri', kv :flat :named)
 
     .local string license
     license = "; no LicenseFile"
@@ -2818,17 +2757,20 @@ Build an installer with Inno Setup.
     license = "LicenseFile=" . $S0
   L3:
 
+    .local string setupname
+    setupname = get_setupname('', kv :flat :named)
+
     $P0 = new 'FixedStringArray'
     set $P0, 9
     $P0[0] = name
     $P0[1] = parrot_version
     $P0[2] = name
     $P0[3] = version
-    $P0[4] = prefix
-    $P0[5] = license
-    $P0[6] = parrot_version
-    $P0[7] = name
-    $P0[8] = version
+    $P0[4] = copyright_holder
+    $P0[5] = project_uri
+    $P0[6] = prefix
+    $P0[7] = license
+    $P0[8] = setupname
 
     $S0 = <<'TEMPLATE'
 ; generated by distutils.pir for the Inno Setup Script Compiler.
@@ -2836,14 +2778,14 @@ Build an installer with Inno Setup.
 [Setup]
 AppName=Parrot-%s
 AppVerName=Parrot-%s-%s-%s
-AppPublisher=Parrot Foundation
-AppPublisherURL=http://www.parrot.org/
+AppPublisher=%s
+AppPublisherURL=%s
 DefaultDirName={sd}%s
 DefaultGroupName=Parrot
 AllowNoIcons=yes
 %s
 OutputDir=.\\
-OutputBaseFilename=setup-parrot-%s-%s-%s
+OutputBaseFilename=%s
 Compression=lzma
 SolidCompression=yes
 Uninstallable=no
@@ -2941,6 +2883,27 @@ TEMPLATE
     .return ($S0)
 .end
 
+.sub 'get_setupname' :anon
+    .param string ext
+    .param pmc kv :slurpy :named
+    .local pmc config
+    config = get_config()
+
+    $S0 = 'setup-parrot-'
+    $S1 = config['VERSION']
+    $S0 .= $S1
+    $S1 = config['DEVEL']
+    $S0 .= $S1
+    $S0 .= '-'
+    $S1 = get_name(kv :flat :named)
+    $S0 .= $S1
+    $S0 .= '-'
+    $S1 = get_version(kv :flat :named)
+    $S0 .= $S1
+    $S0 .= ext
+    .return ($S0)
+.end
+
 .sub '_clean_wininst' :anon
     .param pmc kv :slurpy :named
 
@@ -2959,7 +2922,8 @@ TEMPLATE
   L1:
 
     unlink('inno.iss')
-    system('if exist setup-parrot-*.exe del setup-parrot-*.exe')
+    $S0 = get_setupname('.exe', kv :flat :named)
+    unlink($S0)
 .end
 
 =head3 Configuration Helpers
@@ -3173,6 +3137,70 @@ Return the whole config
     .return ($S0)
   L2:
     .return ('')
+.end
+
+=item get_Name
+
+=cut
+
+.sub 'get_Name'
+    .param string name          :named('name') :optional
+    .param int has_name         :opt_flag
+    .param pmc extra            :slurpy :named
+    unless has_name goto L1
+    .return (name)
+  L1:
+    $S0 = cwd()
+    $S0 = basename($S0)
+    .return ($S0)
+.end
+
+=item get_name
+
+=cut
+
+.sub 'get_name'
+    .param string name          :named('name') :optional
+    .param int has_name         :opt_flag
+    .param pmc extra            :slurpy :named
+    unless has_name goto L1
+    $S0 = downcase name
+    .return ($S0)
+  L1:
+    $S0 = cwd()
+    $S0 = basename($S0)
+    $S0 = downcase $S0
+    .return ($S0)
+.end
+
+=item get_version
+
+=cut
+
+.sub 'get_version'
+    .param string version       :named('version') :optional
+    .param int has_version      :opt_flag
+    .param pmc extra            :slurpy :named
+    unless has_version goto L1
+    .return (version)
+  L1:
+    .return ('HEAD')
+.end
+
+=item get_value
+
+=cut
+
+.sub 'get_value'
+    .param string key
+    .param pmc kv :slurpy :named
+    $I0 = exists kv[key]
+    unless $I0 goto L1
+    $S0 = kv[key]
+    .return ($S0)
+  L1:
+    $S0 = upcase key
+    .return ($S0)
 .end
 
 =back
