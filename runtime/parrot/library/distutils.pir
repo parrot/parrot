@@ -192,6 +192,8 @@ L<http://github.com/tene/steme/blob/master/setup.pir>
     register_step_after('clean', _clean_gztar)
     .const 'Sub' _clean_zip = '_clean_zip'
     register_step_after('clean', _clean_zip)
+    .const 'Sub' _clean_smoke = '_clean_smoke'
+    register_step_after('clean', _clean_smoke)
 
     .const 'Sub' _update = '_update'
     register_step('update', _update)
@@ -1702,6 +1704,12 @@ Unless t/harness exists, run : prove --archive t/*.t
     die "Don't known how to smoke."
 .end
 
+.sub '_clean_smoke' :anon
+    .param pmc kv :slurpy :named
+    $S0 = get_prove_archive(kv :flat :named)
+    unlink($S0)
+.end
+
 =over 4
 
 =item prove_exec
@@ -1753,11 +1761,7 @@ the default value is test.tar.gz
     cmd .= $S0
     cmd .= " --archive="
     .local string archive
-    archive = "test.tar.gz" # default
-    $I0 = exists kv['prove_archive']
-    unless $I0 goto L4
-    archive = kv['prove_archive']
-  L4:
+    archive = get_prove_archive(kv :flat :named)
     cmd .= archive
     system(cmd)
 
@@ -3171,6 +3175,20 @@ Return the whole config
     $S0 = basename($S0)
     $S0 = downcase $S0
     .return ($S0)
+.end
+
+=item get_prove_archive
+
+=cut
+
+.sub 'get_prove_archive'
+    .param string archive       :named('prove_archive') :optional
+    .param int has_archive      :opt_flag
+    .param pmc extra            :slurpy :named
+    unless has_archive goto L1
+    .return (archive)
+  L1:
+    .return ('test.tar.gz')
 .end
 
 =item get_version
