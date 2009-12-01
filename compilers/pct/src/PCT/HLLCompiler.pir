@@ -32,7 +32,7 @@ running compilers from a command line.
     $P0 = split ' ', 'parse past post pir evalpmc'
     setattribute self, '@stages', $P0
 
-    $P0 = split ' ', 'e=s help|h target=s dumper=s trace|t=s encoding=s output|o=s combine version|v'
+    $P0 = split ' ', 'e=s help|h target=s dumper=s trace|t=s encoding=s output|o=s combine version|v stagestats'
     setattribute self, '@cmdoptions', $P0
 
     $P1 = box <<'    USAGE'
@@ -298,18 +298,37 @@ when the stage corresponding to target has been reached.
     target = adverbs['target']
     target = downcase target
 
+    .local int stagestats
+    stagestats = adverbs['stagestats']
+
     .local pmc stages, result, it
     result = source
     stages = getattribute self, '@stages'
     it = iter stages
+    if stagestats goto stagestats_loop
+
   iter_loop:
-    unless it goto iter_end
+    unless it goto have_result
     .local string stagename
     stagename = shift it
     result = self.stagename(result, adverbs :flat :named)
     if target == stagename goto have_result
     goto iter_loop
-  iter_end:
+
+  stagestats_loop:
+    unless it goto have_result
+    stagename = shift it
+    $N0 = time
+    result = self.stagename(result, adverbs :flat :named)
+    $N1 = time
+    $N2 = $N1 - $N0
+    printerr "Stage '"
+    printerr stagename
+    printerr "': "
+    printerr $N2
+    printerr " sec\n"
+    if target == stagename goto have_result
+    goto stagestats_loop
 
   have_result:
     .return (result)
