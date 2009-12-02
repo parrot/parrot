@@ -794,11 +794,15 @@ Tests the use of Parrot floating-point number registers.
 
 # Don't check exact string representation. Last digit part can be different */
 .sub test_sqrt_n_n
-    set $N1, 2
-    sqrt $N2, $N1
-    like( $N2, "^1.414213562373*", 'sqrt_n_n' )
-    sqrt $N2, 2.0
-    like( $N2, "1.414213562373*", 'sqrt_n_n' )
+    $P0 = new 'Float'
+    $N1 = 2
+    $N2 = sqrt $N1
+    $P0 = $N2
+    is( $P0, 1.414213562373, 'sqrt_n_n',1e-6 )
+
+    $N2 = sqrt 2.0
+    $P0 = $N2
+    is( $P0, 1.414213562373, 'sqrt_n_n',1e-6 )
 .end
 
 .sub test_exception_div_n_n_by_zero
