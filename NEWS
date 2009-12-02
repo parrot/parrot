@@ -1,5 +1,22 @@
 # $Id$
 
+New in 1.9.0
+- Functionality
+- Compilers
+- Platforms
+- Performance
+- New deprecations
+- Realized deprecations
+- Tests
+  + The following tests were translated from Perl to PIR :
+    t/pmc/bigint.t, t/compilers/pge/04-compile.t, t/compilers/pge/02-match.t,
+    t/compilers/json/from_parrot.t, t/library/protoobject.t, t/library/uuid.t,
+    t/library/md5.t, t/library/mt19937ar.t
+- Documentation
+- Tools
+  + A version of pprof2cg was written in NQP
+- Miscellaneous
+
 New in 1.8.0
 - Functionality
   + The FileHandle PMC now exposes the exit code of child process that was run as pipe.
@@ -57,7 +74,7 @@ New in 1.8.0
 - Tests
   + The test coverage of the time-related ops was much improved.
   + New testing functions in Test::More: lives_ok() and dies_ok().
-  + The Perl 5 based test scripts t/op/bitwist.t, t/op/comp.t, t/op/inf_nan.t,
+  + The Perl 5 based test scripts t/op/bitwise.t, t/op/comp.t, t/op/inf_nan.t,
     t/op/literal.t, t/op/number.t, t/op/sprintf2.t, and t/op/00ff-dos.t were converted to PIR.
   + The test scripts t/op/annotate.t and t/op/time.t have begun
     to be translated from Perl 5 to PIR.
