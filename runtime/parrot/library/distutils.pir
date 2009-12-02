@@ -3415,6 +3415,7 @@ Return the whole config
 
 .sub 'dirname'
     .param string path
+    unless path goto L3
     $I0 = 0
   L1:
     $I1 = index path, '/', $I0
@@ -3423,8 +3424,11 @@ Return the whole config
     goto L1
   L2:
     dec $I0
+    unless $I0 > 0 goto L3
     $S0 = substr path, 0, $I0
     .return ($S0)
+  L3:
+    .return ('.')
 .end
 
 =item cwd
@@ -3473,20 +3477,46 @@ Return the whole config
 =cut
 
 .sub 'glob'
-    .param string pattern
+    .param string patterns
     $P0 = new 'ResizableStringArray'
-    .local string cmd                   #
-    cmd = 'perl -e "for (<' . pattern   # refactoring needed
-    cmd .= '>) { print; print qq{\n};}"'# without perl
-    $P1 = open cmd, 'rp'                #
+    $P1 = split ' ', patterns
   L1:
-    $S0 = $P1.'readline'()
-    if $S0 == '' goto L2
-    $S0 = chomp($S0)
-    push $P0, $S0
+    unless $P1 goto L2
+    .local string pattern
+    pattern = shift $P1
+    $I0 = index pattern, '*'
+    unless $I0 < 0 goto L3
+    $I0 = index pattern, '?'
+    unless $I0 < 0 goto L3
+    $I0 = index pattern, '['
+    unless $I0 < 0 goto L3
+    $I0 = stat pattern, .STAT_EXISTS
+    unless $I0 goto L1
+    push $P0, pattern
     goto L1
+  L3:
+    .local pmc matcher
+    load_bytecode 'PGE/Glob.pbc'
+    $P4 = compreg 'PGE::Glob'
+    matcher = $P4.'compile'(pattern)
+    .local string dir
+    dir = dirname(pattern)
+    $P2 = new 'OS'
+    $P3 = $P2.'readdir'(dir)
+  L4:
+    unless $P3 goto L1
+    $S0 = shift $P3
+    if dir == '.' goto L5
+    $S1 = dir . '/'
+    $S0 = $S1 . $S0
+  L5:
+    $I0 = stat $S0, .STAT_ISDIR
+    if $I0 goto L4
+    $P5 = matcher($S0)
+    unless $P5 goto L4
+    push $P0, $S0
+    goto L4
   L2:
-    $P1.'close'()
     .return ($P0)
 .end
 
