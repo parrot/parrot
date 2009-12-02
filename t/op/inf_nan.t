@@ -218,13 +218,19 @@ Tests for mathematical operations with Inf and Nan.
     is($N1, 'NaN', '... tanh NaN')
 .end
 
-.sub test_atan 
+.sub test_atan
     $N0 = 'Inf'
     $N1 = atan $N0
-    like($N1,'1\.5707963.*', 'atan: atan Inf')
+    $P1 = new 'Float'
+    $P1 = $N1
+    is($P1, 1.5707963, 'atan: atan Inf',1e-6)
+
     $N0 = '-Inf'
     $N1 = atan $N0
-    like($N1, '\-1\.5707963.*', '... atan -Inf')
+    $P1 = new 'Float'
+    $P1 = $N1
+    is($P1, -1.5707963, '... atan -Inf',1e-6)
+
     $N0 = 'NaN'
     $N1 = atan $N0
     is($N1, 'NaN', '... atan NaN')
