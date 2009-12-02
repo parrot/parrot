@@ -39,7 +39,7 @@ extern void *flush_reg_store(void);
 /* the percent of used Arena items at which to trace next time through */
 #define GC_DEBUG_REPLENISH_LEVEL_FACTOR        0.0
 #define GC_DEBUG_UNITS_PER_ALLOC_GROWTH_FACTOR 1
-#define REPLENISH_LEVEL_FACTOR                 0.3
+#define REPLENISH_LEVEL_FACTOR                 0.5
 
 /* this factor is totally arbitrary, but gives good timings for stress.pasm */
 #define UNITS_PER_ALLOC_GROWTH_FACTOR          1.75
