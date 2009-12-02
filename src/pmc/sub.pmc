@@ -92,7 +92,10 @@ Initializes the subroutine.
         Parrot_Sub_attributes * const attrs =
             (Parrot_Sub_attributes *) PMC_data(SELF);
 
-        attrs->seg = INTERP->code;
+        attrs->seg             = INTERP->code;
+        attrs->outer_sub       = PMCNULL;
+        attrs->multi_signature = PMCNULL;
+        attrs->namespace_name  = PMCNULL;
 
         PObj_custom_mark_destroy_SETALL(SELF);
     }
