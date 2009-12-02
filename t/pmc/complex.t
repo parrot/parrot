@@ -1188,6 +1188,8 @@ todo:
     $S0 = concat $S1, ' != '
     $S1 = expected
     $S0 = concat $S0, $S1
+    $S0 = concat $S0, ' - subclassing Complex add returns 0+0i - TT #562'
+    $I0 = not $I0    # invert $I0 so todo does not pass
     todo( $I0, $S0 )
 .end
 
