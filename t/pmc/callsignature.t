@@ -19,7 +19,7 @@ Tests the CallSignature PMC.
 .sub 'main' :main
     .include 'test_more.pir'
 
-    plan(65)
+    plan(68)
 
     test_instantiate()
     test_get_set_attrs()
@@ -29,6 +29,7 @@ Tests the CallSignature PMC.
     test_indexed_boxing()
     test_keyed_access()
     test_exists()
+    test_clone()
 .end
 
 .sub 'test_instantiate'
@@ -283,6 +284,22 @@ Tests the CallSignature PMC.
 
     $I0 = exists $P0['bar']
     nok( $I0, 'exists_keyed_str -- non-existant' )
+.end
+
+.sub 'test_clone'
+    $P0 = new ['CallSignature']
+    $P0[0] = 42
+    $P0[1] = "Hello Parrot"
+    $P0['floatval'] = 3.14159
+
+    $P1 = clone $P0
+
+    $I2 = $P1[0]
+    is($I2, 42, 'clone - integer positional cloned')
+    $S2 = $P1[1]
+    is($S2, "Hello Parrot", 'clone - string positional cloned')
+    $N2 = $P1['floatval']
+    is($N2, 3.14159, 'clone - named number cloned')
 .end
 
 # Local Variables:

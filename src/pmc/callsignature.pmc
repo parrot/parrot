@@ -281,7 +281,11 @@ get_hash(PARROT_INTERP, ARGIN(PMC *SELF))
     Parrot_CallSignature_attributes * const attrs = PARROT_CALLSIGNATURE(SELF);
 
     if (!attrs->hash)
-        attrs->hash = parrot_new_hash(interp);
+        attrs->hash = parrot_create_hash(interp,
+            enum_type_ptr,
+            Hash_key_type_STRING,
+            STRING_compare,
+            (hash_hash_key_fn)key_hash_STRING);
 
     return attrs->hash;
 }
@@ -1173,6 +1177,70 @@ Mark any referenced strings and PMCs.
             return key < attrs->num_positionals;
 
         return 0;
+    }
+
+/*
+
+=item C<PMC *clone()>
+
+Creates and returns a clone of the signature.
+
+=cut
+
+*/
+    VTABLE PMC *clone() {
+        struct Parrot_CallSignature_attributes *sig, *dest_sig;
+        PMC * const dest = pmc_new(INTERP, SELF->vtable->base_type);
+        Pcc_cell *cell;
+
+        sig = PARROT_CALLSIGNATURE(SELF);
+        dest_sig = PARROT_CALLSIGNATURE(dest);
+
+        /* Copy all positional cells (thanks to APPEND_CELL, this also
+         * sets num_positionals). */
+        for (cell = sig->positionals; cell; cell = NEXT_CELL(cell)) {
+            Pcc_cell *cloned_cell;
+
+            switch (CELL_TYPE_MASK(cell)) {
+              case INTCELL:
+                cloned_cell = CREATE_INTVAL_CELL(INTERP);
+                CELL_INT(cloned_cell) = CELL_INT(cell);
+                break;
+              case FLOATCELL:
+                cloned_cell = CREATE_FLOATVAL_CELL(INTERP);
+                CELL_FLOAT(cloned_cell) = CELL_FLOAT(cell);
+                break;
+              case STRINGCELL:
+                cloned_cell = CREATE_STRING_CELL(INTERP);
+                CELL_STRING(cloned_cell) = CELL_STRING(cell);
+                break;
+              case PMCCELL:
+                cloned_cell = CREATE_PMC_CELL(INTERP);
+                CELL_PMC(cloned_cell) = CELL_PMC(cell);
+                break;
+            }
+            APPEND_CELL(dest, cloned_cell);
+        }
+
+        if (!PMC_IS_NULL(sig->results))
+            dest_sig->results = VTABLE_clone(INTERP, sig->results);
+
+        if (!PMC_IS_NULL(sig->type_tuple))
+            dest_sig->type_tuple = VTABLE_clone(INTERP, sig->type_tuple);
+
+        if (sig->short_sig)
+            dest_sig->short_sig = Parrot_str_copy(INTERP, sig->short_sig);
+
+        if (!PMC_IS_NULL(sig->arg_flags))
+            dest_sig->arg_flags = VTABLE_clone(INTERP, sig->arg_flags);
+
+        if (!PMC_IS_NULL(sig->return_flags))
+            dest_sig->return_flags = VTABLE_clone(INTERP, sig->return_flags);
+
+        parrot_hash_clone(INTERP, get_hash(INTERP, SELF),
+            get_hash(INTERP, dest));
+
+        return dest;
     }
 
 /*
