@@ -407,7 +407,11 @@ gc_ms_get_free_object(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool))
         free_list = (PObj *)pool->free_list;
     }
 
-    if (!free_list) {
+    if (free_list) {
+        ptr             = free_list;
+        pool->free_list = ((GC_MS_PObj_Wrapper *)ptr)->next_ptr;
+    }
+    else {
         Fixed_Size_Arena * const arena = pool->last_Arena;
         ptr           = (PObj *)pool->newfree;
         pool->newfree = (void *)((char *)pool->newfree + pool->object_size);
@@ -417,10 +421,6 @@ gc_ms_get_free_object(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool))
             pool->newfree = NULL;
 
         PARROT_ASSERT(ptr < (PObj *)pool->newlast);
-    }
-    else {
-        ptr             = free_list;
-        pool->free_list = ((GC_MS_PObj_Wrapper *)ptr)->next_ptr;
     }
 #else
     /* if we don't have any objects */
