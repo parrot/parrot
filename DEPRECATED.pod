@@ -102,7 +102,7 @@ L<https://trac.parrot.org/parrot/ticket/1260>
 
 =item Array PMC [eligible in 2.1]
 
-This PMC is old, ill-used and is superseded by other array-like PMCs.  Any code
+This PMC is old, ill-used and is superceded by other array-like PMCs.  Any code
 using this PMC should migrate to ResizablePMCArray or something more suitable.
 
 L<https://trac.parrot.org/parrot/ticket/1303>
@@ -186,7 +186,7 @@ if the arg is a Array (of any sort) or Key
   Relative to the current HLL Namespace
 
 if the arg is a Namespace or Class PMC
-  The passed in class or the class attached to the passed in namespace.
+  The passed in class or the class attatched to the passed in namespace.
 
 L<https://trac.parrot.org/parrot/ticket/159>
 
@@ -249,7 +249,7 @@ for TT #895
 
 The function PDB_compile doesn't work since some time, and his implementation
 was a hack. His functionality may be reimplemented in another way. Until the
-end of deprecation cycle it just throws an exception.
+end of deprecation cycle it just throws an excpetion.
 
 The PDB_eval function, that used in the debugger to support the eval
 command, was using PDB_compile. His functionality must be reimplemented

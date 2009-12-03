@@ -90,13 +90,13 @@ Tests the ParrotInterpreter PMC.
     ok($I0, 'Got ParrotInterp.context')
     # Add more tests for Context. E.g. it is correct Context by inspecting it.
 
-    push_eh caught
+    push_eh cought
     $I0 = 1
     $P0 = interp['some_field';0]
     $I0 = 0
-  caught:
+  cought:
     pop_eh
-    ok($I0, "Access to non-existent field throws exception")
+    ok($I0, "Access to non-existing field throws exception")
 
     push_eh wrong_depth
     $I0 = 1

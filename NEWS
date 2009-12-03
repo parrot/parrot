@@ -324,7 +324,7 @@ New in 0.9.1
   + pbc_disassemble prints constants in constants table
   + New experimental BigNum implementation
   + Pair is now a dynamic loadable PMC
-  + Various function name sanitization
+  + Various function name sanification
   + New implementation of Strings component
   + Replace various PMC value union access code by VTABLE method invocations
   + Replace various PMC value unions by ATTRibutes
@@ -414,7 +414,7 @@ New in January 2009 release (0.9.0)
     - skip creating a class/grammar if it already exists
 - Languages
   + Rakudo
-    - improved error messages in multi dispatch
+    - improved error mesages in multi dispatch
     - implemented clone method for all objects
     - implemented MAIN sub
     - Unicode versions of infix hyper operators
@@ -518,7 +518,7 @@ New in 0.8.2
     - merged LuaClosure & LuaFunction PMC
   + Pipp
     - added support for a return value from user defined functions
-    - added incomplete implementation of 'require_once'
+    - added incomplete implemention of 'require_once'
   + Ecmascript
     - parser fixes, parses spidermonkey's top level test/shell.js
 - Deprecations
@@ -564,7 +564,7 @@ New in 0.8.1
     - added .PARROT method
   + Pipp
     - added some predefined constants
-    - added implementation of the function basename()
+    - added implemention of the function basename()
   + Cardinal (Ruby)
     - Added initial support for the classes Proc, Continuation, Queue, Dir, File, and FileStat
     - fixed various minor bugs
@@ -667,7 +667,7 @@ New in 0.7.1
     - now over 3300 passing spectests
     - precompiled modules
     - precompiled scripts  (--target=pir can now be executed standalone)
-    - Support for @*INC and %*INC variables
+    - Support for @*INC and %*INC varialbes
     - additional builtin methods and subs
     - added 'fail' function, warnings on use of undefined values
     - m/.../ regexes
@@ -960,7 +960,7 @@ New in 0.6.1
   + HQ9+: reimplemented with PCT
   + Lua:
     . reimplementation with PCT, using PAST and POST
-    . behavior aligned with 5.1.3
+    . behavior aligned wih 5.1.3
   + Rakudo:
     . implemented basic I/O, including '$*IN', '$*OUT', '$*ERR', 'prefix:='
     . implemented simple typing and runtime type checking
@@ -1054,7 +1054,7 @@ New in 0.5.3
   + NQP: add '=:=' op, tests for scalar and list contextualizers, \x escapes
 - Languages
   + APL: reimplementation with PCT
-  + Cardinal (Ruby): reimplementation with PCT
+  + Cardinal (Ruby): reimplemention with PCT
   + Ecmascript: reimplementation with PCT
   + lolcode: improved expression parsing, ifthen, IT, YARN
   + lua:
@@ -1268,16 +1268,16 @@ New in 0.4.14
  + Introduced PCT, a refactor of HLLCompiler and PAST-pm
 - Design:
  + PDD15 "Objects" - details added to 'new' and 'getattribute' opcodes
- + PDD17 "PMCs" - notes added on instantiation and dynamic extension in PIR
+ + PDD17 "PMCs" - notes added on instantiation and dynamic extention in PIR
 - Documentation:
  + added Parrot-related text from "Perl 6 and Parrot Essentials" book,
    tutorial examples from "Learning PIR" talk, and PDD15 metamodel diagrams
 - Implementation:
  + reduced memory footprint when using named registers
- + implemented overriding of vtable methods by PDD15 classes
+ + implemented overridding of vtable methods by PDD15 classes
  + improved PDD15 support for 'new', 'instantiate', and others
  + added makefile targets to ease core and HLL makefile regeneration
- + updated parrot debugger, "pdb", to allow loading of commands from file
+ + updated parrot dubugger, "pdb", to allow loading of commands from file
 - Misc:
  + many bugfixes, enhancements, documentation, and coding standard updates
 
@@ -1372,7 +1372,7 @@ New in 0.4.10
  + PDD15 "Objects" - details on roles, objects, and classes added
  + PDD22 "I/O" - added async ops and Status PMC details
 - Documentation:
- + Added guides for Metacommitter, Release Manager, and Cage Cleaner roles
+ + Added guides for Metacommitter, Relase Manager, and Cage Cleaner roles
 - Implementation:
  + Object, Class, Role, and Attribute PMC implementation has begun
  + Perl 5 module "Parrot::Embed" now compiles and links on all platforms
@@ -1558,7 +1558,7 @@ New in 0.4.1
 - Installation: 'make install' is using standard locations now
   (/usr/local is the default --prefix)
 - Produce static and shared libraries on some systems
-- Configure system rearrangement
+- Configure system rearragement
 - OS pmc started (mkdir,cd,cwd,rm,umask,stat)
 - Shootout examples
 - Test files are now testable with 'prove'
@@ -1567,7 +1567,7 @@ New in 0.4.1
 - Add support for octal number constants
 - partcl updates:
   - almost finish [string]; start [file]
-  - add build tool for generating inlined tcl builtins from templates.
+  - add build tool for generating inline'd tcl builtins from templates.
 - Jako updates: NCI, subroutines, global variables and constants all work.
   (Gregor)
 
@@ -1593,7 +1593,7 @@ New in 0.3.1
 - Vastly improved PGE (Parrot Grammar Engine) including shift-reduce,
   precedence-based expression parser and support for matching of
   bracketed text delimited by e.g. ()[]{}'"
-- unicode character classification (is_upper ...)
+- uniccode character classification (is_upper ...)
 - support for heredoc syntax in assembler
 - improved examples, basic JSON support
 - debian packaging support
@@ -1672,7 +1672,7 @@ Parrot 0.1.1 is an intermediate release with tons of updates and fixes.
  - BigInt, Complex, *Array, Slice, Enumerate, None PMC classes
  - IA64 and hppa JIT support
  - Tons of fixes, improvements, new tests, and documentation updates.
-A lot is unfinished and keeps changing. Nevertheless Parrot is stable
+A lot is unfinished and keeps changing. Nethertheless Parrot is stable
 and usable at the surface, while internals are moving.
 
 New in 0.1.0
