@@ -1,3 +1,6 @@
+# Copyright (C) 2009, Parrot Foundation.
+# $Id$
+
         set     N0, 1.0
         set     N1, 4.0
         set     N2, 16.0
@@ -78,3 +81,9 @@
         print   N25
         print   "\n"
         end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
