@@ -235,6 +235,8 @@ L<http://github.com/tene/steme/blob/master/setup.pir>
 
     .const 'Sub' _update = '_update'
     register_step('update', _update)
+    .const 'Sub' _patch = '_patch'
+    register_step('patch', _patch)
 
     .const 'Sub' _install = '_install'
     register_step('install', _install)
@@ -1631,6 +1633,70 @@ The following Version Control System are handled :
 .sub '_update_svn' :anon
     .param pmc kv :slurpy :named
     system('svn update', 1 :named('verbose'))
+.end
+
+=back
+
+=head3 Step patch
+
+The following Version Control System are handled :
+
+=over 4
+
+=cut
+
+.sub '_patch' :anon
+    .param pmc kv :slurpy :named
+    $S0 = get_vcs()
+    unless $S0 == 'cvs' goto L1
+    .tailcall _patch_cvs(kv :flat :named)
+  L1:
+    unless $S0 == 'git' goto L2
+    .tailcall _patch_git(kv :flat :named)
+  L2:
+    unless $S0 == 'hg' goto L3
+    .tailcall _patch_hg(kv :flat :named)
+  L3:
+    unless $S0 == 'svn' goto L4
+    .tailcall _patch_svn(kv :flat :named)
+  L4:
+    die "Don't known how to create a patch."
+.end
+
+=item CVS
+
+=cut
+
+.sub '_patch_cvs' :anon
+    .param pmc kv :slurpy :named
+    system('cvs diff', 1 :named('verbose'))
+.end
+
+=item Git
+
+=cut
+
+.sub '_patch_git' :anon
+    .param pmc kv :slurpy :named
+    system('git diff', 1 :named('verbose'))
+.end
+
+=item Mercurial
+
+=cut
+
+.sub '_patch_hg' :anon
+    .param pmc kv :slurpy :named
+    system('hg diff', 1 :named('verbose'))
+.end
+
+=item SVN
+
+=cut
+
+.sub '_patch_svn' :anon
+    .param pmc kv :slurpy :named
+    system('svn diff', 1 :named('verbose'))
 .end
 
 =back
