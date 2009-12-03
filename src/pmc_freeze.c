@@ -87,13 +87,6 @@ static void push_opcode_number(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void push_opcode_pmc(PARROT_INTERP,
-    ARGIN(IMAGE_IO *io),
-    ARGIN(PMC* v))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
 static void push_opcode_string(PARROT_INTERP,
     ARGIN(IMAGE_IO *io),
     ARGIN(STRING *v))
@@ -113,12 +106,6 @@ static INTVAL shift_opcode_integer(SHIM_INTERP, ARGIN(IMAGE_IO *io))
         __attribute__nonnull__(2);
 
 static FLOATVAL shift_opcode_number(SHIM_INTERP, ARGIN(IMAGE_IO *io))
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PMC* shift_opcode_pmc(PARROT_INTERP, ARGIN(IMAGE_IO *io))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -207,10 +194,6 @@ static void visit_todo_list_thaw(PARROT_INTERP,
 #define ASSERT_ARGS_push_opcode_number __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(io))
-#define ASSERT_ARGS_push_opcode_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(io) \
-    , PARROT_ASSERT_ARG(v))
 #define ASSERT_ARGS_push_opcode_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(io) \
@@ -222,9 +205,6 @@ static void visit_todo_list_thaw(PARROT_INTERP,
        PARROT_ASSERT_ARG(io))
 #define ASSERT_ARGS_shift_opcode_number __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(io))
-#define ASSERT_ARGS_shift_opcode_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(io))
 #define ASSERT_ARGS_shift_opcode_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(io))
@@ -404,27 +384,6 @@ push_opcode_string(PARROT_INTERP, ARGIN(IMAGE_IO *io), ARGIN(STRING *v))
 
 /*
 
-=item C<static void push_opcode_pmc(PARROT_INTERP, IMAGE_IO *io, PMC* v)>
-
-Pushes the PMC C<*v> onto the end of the C<*io> "stream".
-
-=cut
-
-*/
-
-static void
-push_opcode_pmc(PARROT_INTERP, ARGIN(IMAGE_IO *io), ARGIN(PMC* v))
-{
-    ASSERT_ARGS(push_opcode_pmc)
-    UINTVAL size = sizeof (opcode_t);
-    STRING   *op = Parrot_str_new_init(interp, (char *)&v, size,
-        Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
-    io->image = Parrot_str_append(interp, io->image, op);
-}
-
-
-/*
-
 =item C<static INTVAL shift_opcode_integer(PARROT_INTERP, IMAGE_IO *io)>
 
 Removes and returns an integer from the start of the C<*io> "stream".
@@ -448,29 +407,6 @@ shift_opcode_integer(SHIM_INTERP, ARGIN(IMAGE_IO *io))
     PARROT_ASSERT((int)io->image->bufused >= 0);
 
     return i;
-}
-
-
-/*
-
-=item C<static PMC* shift_opcode_pmc(PARROT_INTERP, IMAGE_IO *io)>
-
-Removes and returns an PMC from the start of the C<*io> "stream".
-
-Note that this actually reads a PMC id, not a PMC.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PMC*
-shift_opcode_pmc(PARROT_INTERP, ARGIN(IMAGE_IO *io))
-{
-    ASSERT_ARGS(shift_opcode_pmc)
-    INTVAL i = shift_opcode_integer(interp, io);
-    return (PMC *)i;
 }
 
 
@@ -555,11 +491,9 @@ shift_opcode_string(PARROT_INTERP, ARGIN(IMAGE_IO *io))
 
 static image_funcs opcode_funcs = {
     push_opcode_integer,
-    push_opcode_pmc,
     push_opcode_string,
     push_opcode_number,
     shift_opcode_integer,
-    shift_opcode_pmc,
     shift_opcode_string,
     shift_opcode_number
 };
@@ -682,7 +616,7 @@ freeze_pmc(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info),
 
     if (PMC_IS_NULL(pmc)) {
         /* NULL + seen bit */
-        VTABLE_push_pmc(interp, io, (PMC*)PackID_new(NULL, enum_PackID_seen));
+        VTABLE_push_integer(interp, io, PackID_new(NULL, enum_PackID_seen));
         return;
     }
 
@@ -694,7 +628,7 @@ freeze_pmc(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info),
     if (seen) {
         if (info->extra_flags) {
             PackID_set_FLAGS(id, enum_PackID_extra_info);
-            VTABLE_push_pmc(interp, io, (PMC *)id);
+            VTABLE_push_integer(interp, io, id);
             VTABLE_push_integer(interp, io, info->extra_flags);
             return;
         }
@@ -704,7 +638,7 @@ freeze_pmc(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info),
     else if (type == info->last_type)
         PackID_set_FLAGS(id, enum_PackID_prev_type);
 
-    VTABLE_push_pmc(interp, io, (PMC*)id);
+    VTABLE_push_integer(interp, io, id);
 
     if (PackID_get_FLAGS(id) == enum_PackID_normal) {
         /* write type */
@@ -744,7 +678,7 @@ thaw_pmc(PARROT_INTERP, ARGMOD(visit_info *info),
 {
     ASSERT_ARGS(thaw_pmc)
     IMAGE_IO * const io   = info->image_io;
-    PMC             *n    = VTABLE_shift_pmc(interp, io);
+    UINTVAL          n    = VTABLE_shift_integer(interp, io);
     int              seen = 0;
 
     info->extra_flags     = EXTRA_IS_NULL;
@@ -778,7 +712,7 @@ thaw_pmc(PARROT_INTERP, ARGMOD(visit_info *info),
         break;
     }
 
-    *id = (UINTVAL)n;
+    *id = n;
     return seen;
 }
 
