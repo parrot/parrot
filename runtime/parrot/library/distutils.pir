@@ -3672,6 +3672,15 @@ Return the whole config
 .sub 'setenv'
     .param string name
     .param string value
+    .param int verbose          :named('verbose') :optional
+    .param int has_verbose      :opt_flag
+    unless has_verbose goto L1
+    unless verbose goto L1
+    print "setenv "
+    print name
+    print " = "
+    say value
+  L1:
     new $P0, 'Env'
     $P0[name] = value
 .end
