@@ -122,15 +122,13 @@ fi
 tail myconfig
 make -s || exit 1
 
-[ -e t/op/number_1.pasm ] || perl t/harness t/op/number.t
-[ -e t/op/string_133.pasm ] || perl t/harness t/op/string.t
 ./parrot -o t/native_pbc/integer_${N}.pbc -a - <<EOF
 print 0x10203040
 end
 EOF
 [ $? -le 0 ] && echo "t/native_pbc/integer_${N}.pbc updated"
-./parrot -o t/native_pbc/number_${N}.pbc t/op/number_1.pasm && echo "t/native_pbc/number_${N}.pbc updated"
-./parrot -o t/native_pbc/string_${N}.pbc t/op/string_133.pasm  && echo "t/native_pbc/string_${N}.pbc updated"
+./parrot -o t/native_pbc/number_${N}.pbc t/native_pbc/testdata/number.pasm && echo "t/native_pbc/number_${N}.pbc updated"
+./parrot -o t/native_pbc/string_${N}.pbc t/native_pbc/testdata/string.pasm  && echo "t/native_pbc/string_${N}.pbc updated"
 
 make pbc_dump$exe
 ./pbc_dump -h t/native_pbc/number_${N}.pbc
