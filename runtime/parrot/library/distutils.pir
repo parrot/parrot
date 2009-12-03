@@ -95,21 +95,59 @@ Typical invocations are:
     $ parrot setup.pir test
     $ sudo parrot setup.pir install
 
-=head2 EXTERNAL DEPENDENCIES
+=head2 PERL DEPENDENCIES
 
 =over 4
 
-=item prove
+=item prove (in step 'test')
 
-Perl5 and core module Test-Harness
+core module Test-Harness
+
+=item prove --archive (in step 'smoke')
+
+module TAP-Harness-Archive
 
 =item pod2html
 
-Perl5 and core module Pod-Html
+core module Pod-Html
 
 =item chmod (in step 'install')
 
-Perl5 and core module ExtUtils::Command
+core module ExtUtils::Command
+
+=back
+
+=head2 PARROT DEPENDENCIES
+
+=over 4
+
+=item glob (in step 'manifest' & 'sdist')
+
+PGE::Glob
+
+Limitation: currently, OS.'readdir' is dummy with MSVC.
+
+=back
+
+=head2 SYSTEM DEPENDENCIES
+
+=over 4
+
+=item smoke
+
+curl
+
+=item sdist_gztar
+
+Some coreutils : tar, gzip
+
+=item sdist_zip
+
+zip
+
+=item bdist_wininst
+
+Inno Setup
 
 =back
 
