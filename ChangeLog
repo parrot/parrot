@@ -1,6 +1,6 @@
 #1 $Id$
 
-2009.10.20     barney
+2009.11.20     barney
 	* Released 1.8.0
 	See NEWS for more.
 
@@ -133,7 +133,7 @@
 	See NEWS for more.
 
 2007.3.10     coke
-        * removed parakeet
+	* removed parakeet
 
 2007.02.22    pmichaud
 	* Released 0.4.9
@@ -197,7 +197,7 @@
 	  (old {find,store}*global will be supported for a short while)
 
 2006.07.20    audreyt
-	* --maintainer prerequesites are now bison 2.2+ and flex 2.5.3x
+	* --maintainer prerequisites are now bison 2.2+ and flex 2.5.3x
 	  (or some such --leo)
           (at the moment code is checking for 2.0 -- ambs)
 
@@ -329,7 +329,7 @@
 	* the usual bug fixes and improvements
 
 2005-03-06    leo
-        * Released 0.1.2
+	* Released 0.1.2
 	* big rewrite of string code, not yet finished but ...
 	* partial implementation of a generational garbage collector
 	* indirect register frame addressing
@@ -344,7 +344,7 @@
 	* and as always a lot more
 
 2004-10-09    leo
-        * Released 0.1.1
+	* Released 0.1.1
 	* Need Perl 5.6 now for building
 	* Basic AST support, PAST file parser, bits of code generation
 	* BigInt PMC using GMP
@@ -374,39 +374,39 @@
 	* ... and a lot more
 
 2004-02-29    leo
-        * Released 0.1.0
-        * "Ladies and gentlemen, I give you... objects!"
-        * Huge documentation overhaul
-        * More supported platforms, s. PLATFORMS
-        * Basic thread support for pthread based architectures
-        * Basic event handling for timers and signals including:
-        * PASM callbacks for NCI (native C) functions.
-        * Improved platform configuration
-        * COW stacks now working, stacks code redone
-        * Structure handling vastly improved
-        * Random PMC and rand primitives
-        * Better subroutine call syntax in PIR
-        * Make PIR subroutines compliant with pdd03
-        * Improved profiling (DOD, GC timings)
-        * Hash code improvements, incl. random key order support
-        * Experimental freeze/thaw code for some PMC types
-        * IO improvements for buffered layer and Win32
-        * String iterators
-        * String bitwise vtables
-        * Many new opcodes
-        * Support for JIT, where malloced memory isn't executable
-        * Priority DOD scheme for objects that need timely destruction
-        * Improved bytecode loading (e.g. onLoad functions)
-        * Language updates: forth, Perl6/P6C, m4
-        * Libraries: Getopt_Long, SDL, Dumper, Sort
-        * new JAPH examples
-        * Unified imcc and parrot test handling
-        * Many new tests (make test reports 1386 tests)
-        * Numerous bug fixes
+	* Released 0.1.0
+	* "Ladies and gentlemen, I give you... objects!"
+	* Huge documentation overhaul
+	* More supported platforms, s. PLATFORMS
+	* Basic thread support for pthread based architectures
+	* Basic event handling for timers and signals including:
+	* PASM callbacks for NCI (native C) functions.
+	* Improved platform configuration
+	* COW stacks now working, stacks code redone
+	* Structure handling vastly improved
+	* Random PMC and rand primitives
+	* Better subroutine call syntax in PIR
+	* Make PIR subroutines compliant with pdd03
+	* Improved profiling (DOD, GC timings)
+	* Hash code improvements, incl. random key order support
+	* Experimental freeze/thaw code for some PMC types
+	* IO improvements for buffered layer and Win32
+	* String iterators
+	* String bitwise vtables
+	* Many new opcodes
+	* Support for JIT, where malloced memory isn't executable
+	* Priority DOD scheme for objects that need timely destruction
+	* Improved bytecode loading (e.g. onLoad functions)
+	* Language updates: forth, Perl6/P6C, m4
+	* Libraries: Getopt_Long, SDL, Dumper, Sort
+	* new JAPH examples
+	* Unified imcc and parrot test handling
+	* Many new tests (make test reports 1386 tests)
+	* Numerous bug fixes
 
 
 2003-10-31    leo
-        * Released 0.0.13
+	* Released 0.0.13
 	* Yep thirteen - haunted by the ghost of 0.0.12
 	* Build imcc as parrot
 	* Objects more finished
@@ -429,7 +429,7 @@
 	* Many new tests and fixes
 
 2003-10-22    melvin
-        * imcc moved from parrot/languages/ to parrot/
+	* imcc moved from parrot/languages/ to parrot/
 
 2003-09-20    sfink
 
@@ -469,20 +469,20 @@
 
 2003-06-14 13:50 dan
 	* Moved the registers out of the context structure, since they
-          really aren't context
+	  really aren't context
 	* Changed the register stack frames to hold only 16 registers
 	  rather than 32, added half-set push and pop ops, and reworked
 	  the full set push/pops to do two half-set push/pops. Should
 	  speed up saving register data on calls, since we usually only
 	  care about the top half of the registers anyway.
 	* Started committing some of the new class/object framework
-	* Remembered to finally start updating the Changelog
+	* Remembered to finally start updating the ChangeLog
 
 2003-03-18 03:50  ask
 
 	* Various files
 	  Update Yet Another copyright statements to reflect the (no longer
-          so) shiny new year.
+	  so) shiny new year.
 
 2003-03-11 22:06  chip
 
@@ -677,7 +677,7 @@
 
 	* types/: bignum.c, bignum.h: Lots of prototypes changed in
 	readiness for nicely telling your caller about any oddness you've
-	caused in the persuit of flow.
+	caused in the pursuit of flow.
 
 2002-03-16 17:38  dan
 
@@ -1347,8 +1347,8 @@
 2002-03-01 06:15  dan
 
 	* string.c:
-	A non-existing buffer + a non-existing buffer should be a
-	non-existing buffer, not "", which is really '\0'.
+	A non-existent buffer + a non-existent buffer should be a
+	non-existent buffer, not "", which is really '\0'.
 
 	Courtesy of "Bryan C. Warnock" <Bryan.Warnock@raba.com>
 
@@ -1356,7 +1356,7 @@
 
 	* classes/: array.pmc, perlarray.pmc, perlhash.pmc, perlstring.pmc:
 
-	TMTOWTDI, but strcmp is probably the worse.
+	TMTOWTDI, but strcmp is probably the worst.
 
 	Courtesy of "Bryan C. Warnock" <Bryan.Warnock@raba.com>
 

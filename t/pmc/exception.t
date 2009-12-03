@@ -126,7 +126,7 @@ _handler:
     getattribute $P5, $P0, 'foo'
     $I0 = 0
   done:
-    ok($I0, "Can't fetch non-existing aattribute")
+    ok($I0, "Can't fetch non-existent attribute")
 .end
 
 # Local Variables:
