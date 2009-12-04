@@ -19,7 +19,7 @@ Tests the CallSignature PMC.
 .sub 'main' :main
     .include 'test_more.pir'
 
-    plan(68)
+    plan(66)
 
     test_instantiate()
     test_get_set_attrs()
@@ -40,12 +40,6 @@ Tests the CallSignature PMC.
 .sub 'test_get_set_attrs'
     $P0 = new ['CallSignature']
     $P5 = new 'String'
-
-    $P5 = 'foobar'
-    setattribute $P0, 'returns', $P5
-    ok(1, 'set returns attribute')
-    getattribute $P1, $P0, 'returns'
-    is($P1,'foobar', 'got returns attribute')
 
     $P5 = 'moonbomb'
     setattribute $P0, 'return_flags', $P5

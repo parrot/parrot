@@ -1011,87 +1011,6 @@ Parrot_free_cstring(ARGIN_NULLOK(char *string))
 
 /*
 
-=item C<void append_result(PARROT_INTERP, PMC *sig_object, Parrot_String type,
-void *result)>
-
-Helper function between old and new style PCC to append return pointer to signature.
-
-To be removed with deprecated functions.
-
-=cut
-
-*/
-
-void
-append_result(PARROT_INTERP, ARGIN(PMC *sig_object), ARGIN(Parrot_String type), ARGIN(void *result))
-{
-    ASSERT_ARGS(append_result)
-    Parrot_String full_sig;
-    Parrot_PMC    returns;
-    Parrot_PMC    return_flags;
-    Parrot_Int    return_flags_size;
-
-    Parrot_String return_name       = Parrot_str_new_constant(interp, "returns");
-    Parrot_String return_flags_name = Parrot_str_new_constant(interp, "return_flags");
-    Parrot_String sig_name          = Parrot_str_new_constant(interp, "signature");
-
-    full_sig = VTABLE_get_string(interp, sig_object);
-    /* Append ->[T] */
-    Parrot_str_concat(interp, full_sig, Parrot_str_new_constant(interp, "->"), 0);
-    Parrot_str_concat(interp, full_sig, type, 0);
-
-    returns = VTABLE_get_attr_str(interp, sig_object, return_name);
-    if (PMC_IS_NULL(returns)) {
-        returns = pmc_new(interp, enum_class_CallSignatureReturns);
-        VTABLE_set_attr_str(interp, sig_object, return_name, returns);
-    }
-    VTABLE_set_pointer_keyed_int(interp, returns, VTABLE_elements(interp, returns), result);
-
-    /* Update returns_flag */
-    return_flags = VTABLE_get_attr_str(interp, sig_object, return_flags_name);
-    if (PMC_IS_NULL(return_flags)) {
-        /* Create return_flags for single element */
-        return_flags = pmc_new(interp, enum_class_FixedIntegerArray);
-        return_flags_size = 0;
-        VTABLE_set_integer_native(interp, return_flags, 1);
-        VTABLE_set_attr_str(interp, sig_object, return_flags_name, return_flags);
-    }
-    else {
-        /* Extend return_flags by one element */
-        return_flags_size = VTABLE_elements(interp, return_flags);
-        VTABLE_set_integer_native(interp, return_flags, return_flags_size + 1);
-    }
-    switch (Parrot_str_indexed(interp, type, 0)) {
-        case 'I':
-            VTABLE_set_integer_keyed_int(interp, return_flags, return_flags_size,
-                    PARROT_ARG_INTVAL);
-            VTABLE_push_integer(interp, returns, PARROT_ARG_INTVAL);
-            break;
-        case 'N':
-            VTABLE_set_integer_keyed_int(interp, return_flags, return_flags_size,
-                    PARROT_ARG_FLOATVAL);
-            VTABLE_push_integer(interp, returns, PARROT_ARG_FLOATVAL);
-            break;
-        case 'S':
-            VTABLE_set_integer_keyed_int(interp, return_flags, return_flags_size,
-                    PARROT_ARG_STRING);
-            VTABLE_push_integer(interp, returns, PARROT_ARG_STRING);
-            break;
-        case 'P':
-            VTABLE_set_integer_keyed_int(interp, return_flags, return_flags_size,
-                    PARROT_ARG_PMC);
-            VTABLE_push_integer(interp, returns, PARROT_ARG_PMC);
-            break;
-        default:
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                EXCEPTION_INVALID_OPERATION,
-                "invalid signature string element!");
-    }
-
-}
-
-/*
-
 =item C<void Parrot_ext_call(PARROT_INTERP, Parrot_PMC sub_pmc, const char
 *signature, ...)>
 
@@ -1194,7 +1113,8 @@ Parrot_call_sub(PARROT_INTERP, Parrot_PMC sub_pmc,
         case 'V':
         case 'P':
         {
-            append_result(interp, sig_object, Parrot_str_new_constant(interp, "P"), &result);
+            Parrot_pcc_append_result(interp, sig_object, Parrot_str_new_constant(interp, "P"),
+                    &result);
             break;
         }
         default:
@@ -1244,7 +1164,7 @@ Parrot_call_sub_ret_int(PARROT_INTERP, Parrot_PMC sub_pmc,
     /* Add the return argument onto the call signature object (a bit
      * hackish, added for backward compatibility in deprecated API function,
      * see TT #1145). */
-    append_result(interp, sig_object, Parrot_str_new_constant(interp, "I"), &result);
+    Parrot_pcc_append_result(interp, sig_object, Parrot_str_new_constant(interp, "I"), &result);
     Parrot_pcc_invoke_from_sig_object(interp, sub_pmc, sig_object);
 
     return result;
@@ -1282,7 +1202,7 @@ Parrot_call_sub_ret_float(PARROT_INTERP, Parrot_PMC sub_pmc,
     /* Add the return argument onto the call signature object (a bit
      * hackish, added for backward compatibility in deprecated API function,
      * see TT #1145). */
-    append_result(interp, sig_object, Parrot_str_new_constant(interp, "N"), &result);
+    Parrot_pcc_append_result(interp, sig_object, Parrot_str_new_constant(interp, "N"), &result);
     PMC_get_sub(interp, sub_pmc, sub);
     Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp), sub->seg->const_table->constants);
     Parrot_pcc_invoke_from_sig_object(interp, sub_pmc, sig_object);
@@ -1342,7 +1262,8 @@ Parrot_call_method(PARROT_INTERP, Parrot_PMC sub_pmc, Parrot_PMC obj,
         case 'V':
         case 'P':
         {
-            append_result(interp, sig_object, Parrot_str_new_constant(interp, "P"), &result);
+            Parrot_pcc_append_result(interp, sig_object, Parrot_str_new_constant(interp, "P"),
+                    &result);
             break;
         }
         default:
@@ -1393,7 +1314,7 @@ Parrot_call_method_ret_int(PARROT_INTERP, Parrot_PMC sub_pmc,
     va_end(args);
     free(arg_sig);
 
-    append_result(interp, sig_object, Parrot_str_new_constant(interp, "I"), &result);
+    Parrot_pcc_append_result(interp, sig_object, Parrot_str_new_constant(interp, "I"), &result);
     PMC_get_sub(interp, sub_pmc, sub);
     Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp), sub->seg->const_table->constants);
     Parrot_pcc_invoke_from_sig_object(interp, sub_pmc, sig_object);
@@ -1434,7 +1355,7 @@ Parrot_call_method_ret_float(PARROT_INTERP, Parrot_PMC sub_pmc,
     va_end(args);
     free(arg_sig);
 
-    append_result(interp, sig_object, Parrot_str_new_constant(interp, "N"), &result);
+    Parrot_pcc_append_result(interp, sig_object, Parrot_str_new_constant(interp, "N"), &result);
     PMC_get_sub(interp, sub_pmc, sub);
     Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp), sub->seg->const_table->constants);
     Parrot_pcc_invoke_from_sig_object(interp, sub_pmc, sig_object);
