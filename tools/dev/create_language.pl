@@ -182,7 +182,7 @@ you may also need a subversion (svn) client.
 
 =head2 Building and invoking @lang@
 
-We generally recommend downloading @lang@ directly from 
+We generally recommend downloading @lang@ directly from
 [XXX: fill in this information for @lang@].
 
 Once you have a copy of @lang@, build it as follows:
@@ -192,7 +192,7 @@ Once you have a copy of @lang@, build it as follows:
     $ make
 
 This will create a "@lclang@" or "@lclang@.exe" executable in the
-current directory.  Programs can then be run from the build 
+current directory.  Programs can then be run from the build
 directory using a command like:
 
     $ ./@lclang@ <source>
@@ -212,7 +212,7 @@ of C<--gen-parrot> to use an already installed Parrot for building
 environment; typically this is done via Parrot's C<make install>
 target or by installing prebuilt C<parrot-devel> and/or C<libparrot-dev>
 packages.  The version of the already installed Parrot must satisfy a
-minimum specified by @lang@ -- Configure.pl will verify this for you.  
+minimum specified by @lang@ -- Configure.pl will verify this for you.
 
 Once built, @lang@'s C<make install> target will install @lang@
 and its libraries into the Parrot installation that was used to
@@ -230,9 +230,9 @@ are preserved after they are defined, but variables are not).
 
 =head2 Running the test suite
 
-Entering C<make test> will run a test suite that comes bundled 
-with @lang@.  This is a simple suite of tests, designed to make sure 
-that the compiler is basically working and that it's capable of 
+Entering C<make test> will run a test suite that comes bundled
+with @lang@.  This is a simple suite of tests, designed to make sure
+that the compiler is basically working and that it's capable of
 running a simple test harness.
 
 If you want to run the tests in parallel, you need to install a
