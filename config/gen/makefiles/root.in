@@ -1456,6 +1456,9 @@ compilers-clean :
 	$(MAKE) compilers/data_json clean
 	$(MAKE) compilers/pirc clean
 
+ext-clean:
+	$(MAKE) ext/nqp-rx clean
+
 ###############################################################################
 #
 # editors targets:
@@ -1679,6 +1682,7 @@ clean : \
     examples-clean \
     imcc-clean \
     compilers-clean \
+    ext-clean \
 #UNLESS(win32):    cover-clean \
     editor-clean
 	@TEMP_cg_r@
