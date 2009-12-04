@@ -113,7 +113,7 @@ core module Pod-Html
 
 =item chmod (in step 'install')
 
-core module ExtUtils::Command
+core module ExtUtils::Command, see TT #1322
 
 =back
 
@@ -851,7 +851,6 @@ the value is the OPS pathname
     .param pmc kv :slurpy :named
     $I0 = exists kv['dynops']
     unless $I0 goto L1
-    mkpath('dynext', 1 :named('verbose'))
     .local string cflags, ldflags
     cflags = ''
     $I0 = exists kv['dynops_cflags']
@@ -872,6 +871,7 @@ the value is the OPS pathname
     .param pmc hash
     .param string cflags
     .param string ldflags
+    mkpath('dynext', 1 :named('verbose'))
     .local pmc cores
     cores = get_cores()
     .local string load_ext
@@ -1039,7 +1039,6 @@ the value is an array of PMC pathname
     .param pmc kv :slurpy :named
     $I0 = exists kv['dynpmc']
     unless $I0 goto L1
-    mkpath('dynext', 1 :named('verbose'))
     .local string cflags, ldflags
     cflags = ''
     $I0 = exists kv['dynpmc_cflags']
@@ -1060,6 +1059,7 @@ the value is an array of PMC pathname
     .param pmc hash
     .param string cflags
     .param string ldflags
+    mkpath('dynext', 1 :named('verbose'))
     .local string load_ext, obj
     load_ext = get_load_ext()
     obj = get_obj()
@@ -2570,7 +2570,9 @@ array of pathname or a single pathname
     $P1 = iter needed
     $I0 = elements $P1
     inc $I0
-    $P0 = new 'FixedPMCArray' # currently, FixedStringArray hasn't the method sort.
+    $P0 = new 'FixedPMCArray'
+    # currently, FixedStringArray hasn't the method sort.
+    # see TT #1356
     set $P0, $I0
     $I0 = 0
     $P0[$I0] = 'MANIFEST'
@@ -3482,6 +3484,7 @@ Return the whole config
     .param string filename
     .param int mode
     .param int verbose          :named('verbose') :optional
+    # see TT #1322
     $P0 = get_config()
     .local string cmd
     cmd = $P0['perl']
