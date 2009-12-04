@@ -1458,6 +1458,11 @@ compilers-clean :
 
 ext-clean:
 	$(MAKE) ext/nqp-rx clean
+	$(RM_RF) runtime/parrot/library/HLL.pbc \
+  runtime/parrot/library/P6Regex.pbc \
+  runtime/parrot/library/Regex.pbc \
+  runtime/parrot/library/nqp-rx.pbc \
+  parrot-nqp*
 
 ###############################################################################
 #
