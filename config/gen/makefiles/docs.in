@@ -18,7 +18,7 @@ POD := @TEMP_pod@
 #
 
 # The default target
-all: doc-prep packfile-c.pod $(POD)
+all: packfile-c.pod $(POD)
 
 # This is a listing of all targets, that are meant to be called by users
 # Most of them are proxied in the root makefile parrot/Makefile
@@ -32,6 +32,8 @@ help :
 	@echo "  html:              Generate HTML documentation."
 	@echo "  html-clean:        Remove the generated HTML documentation."
 	@echo ""
+
+$(POD): doc-prep
 
 doc-prep:
 	$(MKPATH) ops
