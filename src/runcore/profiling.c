@@ -259,7 +259,7 @@ ARGIN(opcode_t *pc))
     }
 
     while (pc) {
-        STRING         *postop_filename;
+        STRING         *preop_filename;
         Parrot_Context *preop_ctx;
         INTVAL          preop_line;
 
@@ -270,6 +270,9 @@ ARGIN(opcode_t *pc))
         preop_line = hash_value_to_int(interp, runcore->line_cache,
             parrot_hash_get(interp, runcore->line_cache,
                         CONTEXT(interp)->current_pc));
+
+        preop_filename = Parrot_Sub_get_filename_from_pc(interp,
+                Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp)), pc);
 
         if (preop_line == 0) {
             preop_line = Parrot_Sub_get_line_from_pc(interp,
@@ -300,8 +303,6 @@ ARGIN(opcode_t *pc))
             op_time = runcore->op_finish - runcore->op_start;
 
         runcore->level--;
-        postop_filename = Parrot_Sub_get_filename_from_pc(interp,
-                Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp)), pc);
 
         /* if current context changed since the last printing of a CS line... */
         /* Occasionally the ctx stays the same while the sub changes, possible
@@ -316,7 +317,7 @@ ARGIN(opcode_t *pc))
 
                 GETATTR_Sub_name(interp, preop_ctx->current_sub, sub_name);
                 sub_cstr      = Parrot_str_to_cstring(interp, sub_name);
-                filename_cstr = Parrot_str_to_cstring(interp, postop_filename);
+                filename_cstr = Parrot_str_to_cstring(interp, preop_filename);
                 ns_cstr       = Parrot_str_to_cstring(interp,
                                     VTABLE_get_string(interp,
                                         preop_ctx->current_namespace));
