@@ -21,9 +21,9 @@ Tests the ParrotInterpreter PMC.
 .sub main :main
 .include 'test_more.pir'
 
-    plan(11)
+    plan(12)
     test_new()      # 1 test
-    test_hll_map()  # 2 tests
+    test_hll_map()  # 3 tests
 
 # Need for testing
 .annotate 'foo', 'bar'
@@ -46,13 +46,20 @@ Tests the ParrotInterpreter PMC.
     $P2.'hll_map'($P0, $P1)
 
     $P3 = 'foo'()
-    is($P3,3)
+    is($P3, 3)
     $S0 = typeof $P3
-    is($S0,"MyInt")
+    is($S0, "MyInt")
+    bar(4)
 .end
 
 .sub foo
     .return (3)
+.end
+
+.sub bar
+    .param pmc n
+    $S0 = typeof n
+    is($S0, 'MyInt')
 .end
 
 # Switch back to root namespace

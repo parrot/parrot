@@ -101,6 +101,8 @@ typedef struct Pcc_cell
         a->positionals  = (cell); \
     } while (0)
 
+#define HLL_TYPE(i) Parrot_get_ctx_HLL_type(interp, (i))
+
 /* TODO: could use get_cell_at */
 static Pcc_cell *
 pop_cell(PARROT_INTERP, ARGIN(PMC *SELF))
@@ -251,18 +253,17 @@ autobox_pmc(PARROT_INTERP, Pcc_cell *cell)
 {
     PMC *result = PMCNULL;
 
-    /* TODO: respect HLL types? */
     switch (CELL_TYPE_MASK(cell)) {
         case INTCELL:
-            result = pmc_new(interp, enum_class_Integer);
+            result = pmc_new(interp, HLL_TYPE(enum_class_Integer));
             VTABLE_set_integer_native(interp, result, CELL_INT(cell));
             break;
         case FLOATCELL:
-            result = pmc_new(interp, enum_class_Float);
+            result = pmc_new(interp, HLL_TYPE(enum_class_Float));
             VTABLE_set_number_native(interp, result, CELL_FLOAT(cell));
             break;
         case STRINGCELL:
-            result = pmc_new(interp, enum_class_String);
+            result = pmc_new(interp, HLL_TYPE(enum_class_String));
             VTABLE_set_string_native(interp, result, CELL_STRING(cell));
             break;
         case PMCCELL:
