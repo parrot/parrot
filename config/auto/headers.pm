@@ -73,15 +73,11 @@ sub runstep {
 
 sub _set_from_Config {
     my $conf = shift;
-    # perl5's Configure system doesn't call this by its full name, which may
+    # Perl 5's Configure system doesn't call this by its full name, which may
     # confuse use later, particularly once we break free and start doing all
     # probing ourselves
     my %mapping = ( i_niin => "i_netinetin" );
 
-#    for ( grep { /^i_/ } $conf->data->keys_p5() ) {
-#        $conf->data->set( $mapping{$_} || $_ =>
-#            $conf->data->get( $_ . q{_provisional} ) );
-#    }
     for ( grep { /^i_/ } $conf->data->keys_p5() ) {
         $conf->data->set( $mapping{$_} || $_ => $conf->data->get_p5($_) );
     }
@@ -89,7 +85,7 @@ sub _set_from_Config {
 
 sub _list_extra_headers {
     my $conf = shift;
-    # some headers may not be probed-for by perl 5, or might not be
+    # some headers may not be probed-for by Perl 5, or might not be
     # properly reflected in %Config (i_fcntl seems to be wrong on my machine,
     # for instance).
     #
@@ -110,10 +106,10 @@ sub _list_extra_headers {
     }
 
     if ( $conf->data->get('OSNAME_provisional') eq "MSWin32" ) {
-        # Microsoft provides two annotations mechanisms.  __declspec, which has been
-        # around for a while, and Microsoft's standard source code annotation
-        # language (SAL), introduced with Visual C++ 8.0.
-        # See <http://msdn2.microsoft.com/en-us/library/ms235402(VS.80).aspx>,
+        # Microsoft provides two annotations mechanisms.  __declspec, which
+        # has been around for a while, and Microsoft's standard source code
+        # annotation language (SAL), introduced with Visual C++ 8.0.  See
+        # <http://msdn2.microsoft.com/en-us/library/ms235402(VS.80).aspx>,
         # <http://msdn2.microsoft.com/en-us/library/dabb5z75(VS.80).aspx>.
         push @extra_headers, qw(sal.h);
     }
