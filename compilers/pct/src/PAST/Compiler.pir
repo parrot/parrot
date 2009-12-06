@@ -2451,7 +2451,16 @@ to have a PMC generated containing the constant value.
     .local string rtype
     rtype = options['rtype']
     $I0 = index valflags, rtype
+    if $I0 < 0 goto result_convert
+    ops.'result'(value)
+    .return (ops)
+
+  result_convert:
+    # handle int-to-num conversion here
+    if rtype != 'n' goto result_pmc
+    $I0 = index valflags, 'i'
     if $I0 < 0 goto result_pmc
+    value = concat value, '.0'
     ops.'result'(value)
     .return (ops)
 
