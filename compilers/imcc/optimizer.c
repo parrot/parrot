@@ -694,7 +694,7 @@ constant_propagation(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                                     ins2, i);
                             old = ins2->symregs[i];
                             ins2->symregs[i] = c;
-       /* first we try subst_constants for e.g. if 10 < 5 goto next*/
+                /* first we try subst_constants for e.g. if 10 < 5 goto next*/
                             tmp = IMCC_subst_constants(interp,
                                 unit, ins2->opname, ins2->symregs, ins2->opsize,
                                 &found);
@@ -810,38 +810,38 @@ eval_ins(PARROT_INTERP, ARGIN(const char *op), size_t ops, ARGIN(SymReg **r))
     eval[0] = opnum;
     for (i = 0; i < op_info->op_count - 1; i++) {
         switch (op_info->types[i]) {
-            case PARROT_ARG_IC:
-                PARROT_ASSERT(i && ops == (unsigned int)i);
-                /* set branch offset to zero */
-                eval[i + 1] = 0;
-                break;
-            case PARROT_ARG_I:
-            case PARROT_ARG_N:
-            case PARROT_ARG_S:
-                eval[i + 1] = i;        /* regs used are I0, I1, I2 */
-                if (ops <= 2 || i) { /* fill source regs */
-                    switch (r[i]->set) {
-                        case 'I':
-                            REG_INT(interp, i) = IMCC_int_from_reg(interp, r[i]);
-                            break;
-                        case 'N':
-                            {
-                            STRING * const s = Parrot_str_new(interp, r[i]->name, 0);
-                            REG_NUM(interp, i) = Parrot_str_to_num(interp, s);
-                            }
-                            break;
-                        case 'S':
-                            REG_STR(interp, i) = IMCC_string_from_reg(interp, r[i]);
-                            break;
-                        default:
-                            break;
+          case PARROT_ARG_IC:
+            PARROT_ASSERT(i && ops == (unsigned int)i);
+            /* set branch offset to zero */
+            eval[i + 1] = 0;
+            break;
+          case PARROT_ARG_I:
+          case PARROT_ARG_N:
+          case PARROT_ARG_S:
+            eval[i + 1] = i;        /* regs used are I0, I1, I2 */
+            if (ops <= 2 || i) { /* fill source regs */
+                switch (r[i]->set) {
+                  case 'I':
+                    REG_INT(interp, i) = IMCC_int_from_reg(interp, r[i]);
+                    break;
+                  case 'N':
+                    {
+                        STRING * const s = Parrot_str_new(interp, r[i]->name, 0);
+                        REG_NUM(interp, i) = Parrot_str_to_num(interp, s);
                     }
+                    break;
+                  case 'S':
+                    REG_STR(interp, i) = IMCC_string_from_reg(interp, r[i]);
+                    break;
+                  default:
+                    break;
                 }
-                break;
-            default:
-                IMCC_fatal(interp, 1, "eval_ins"
-                        "invalid arg #%d for op '%s' not found\n",
-                        i, op);
+            }
+            break;
+          default:
+            IMCC_fatal(interp, 1, "eval_ins"
+                    "invalid arg #%d for op '%s' not found\n",
+                    i, op);
         }
     }
 
@@ -1037,27 +1037,27 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
          */
         char b[128];
         switch (r[0]->set) {
-            case 'I':
-                snprintf(b, sizeof (b), INTVAL_FMT, REG_INT(interp, 0));
-                r[1] = mk_const(interp, b, r[0]->set);
-                break;
-            case 'N':
-                snprintf(b, sizeof (b), fmt, REG_NUM(interp, 0));
-                r[1] = mk_const(interp, b, r[0]->set);
-                break;
-            case 'S':
-            {
-                char * const name = Parrot_str_to_cstring(interp, REG_STR(interp, 0));
+          case 'I':
+            snprintf(b, sizeof (b), INTVAL_FMT, REG_INT(interp, 0));
+            r[1] = mk_const(interp, b, r[0]->set);
+            break;
+          case 'N':
+            snprintf(b, sizeof (b), fmt, REG_NUM(interp, 0));
+            r[1] = mk_const(interp, b, r[0]->set);
+            break;
+          case 'S':
+          {
+            char * const name = Parrot_str_to_cstring(interp, REG_STR(interp, 0));
 
-                r[1] = mk_const(interp, name, r[0]->set);
+            r[1] = mk_const(interp, name, r[0]->set);
 
-                snprintf(b, sizeof (b), "%p", REG_STR(interp, 0));
-                Parrot_str_free_cstring(name);
+            snprintf(b, sizeof (b), "%p", REG_STR(interp, 0));
+            Parrot_str_free_cstring(name);
 
-                break;
-            }
-            default:
-                break;
+            break;
+          }
+          default:
+            break;
         }
         tmp = INS(interp, unit, "set", "", r, 2, 0, 0);
     }

@@ -146,7 +146,7 @@ check_size(macro_def * const macro, unsigned length) {
     if (used + length >= macro->buffersize) {
         unsigned  newsize = macro->buffersize << 1;
         char     *newbuffer;
-         /* double the size (moving all bits left by 1 means doubling) */
+        /* double the size (moving all bits left by 1 means doubling) */
         newbuffer = (char *)mem_sys_allocate(sizeof (char) * macro->buffersize);
         memcpy(newbuffer, macro->body, macro->buffersize);
         mem_sys_free(macro->body);

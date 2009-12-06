@@ -80,20 +80,20 @@ calculate_pcc_argument_flags(argument * const arg) {
     int flag = 0;
 
     switch (arg->value->type) {
-        case EXPR_TARGET:
-            /* copy the type of the target */
-            SET_FLAG(flag, arg->value->expr.t->info->type);
-            break;
-        case EXPR_CONSTANT:
-            /* copy the type of the constant; note that constants store a value_type,
-             * not a pir_type, so convert here.
-             */
-            SET_FLAG(flag, valuetype_pirtype_clut[arg->value->expr.c->type]);
-            /* set the flag indicating the argument is a constant literal, not a register. */
-            SET_FLAG(flag, PARROT_ARG_CONSTANT);
-            break;
-        default:
-            break;
+      case EXPR_TARGET:
+        /* copy the type of the target */
+        SET_FLAG(flag, arg->value->expr.t->info->type);
+        break;
+      case EXPR_CONSTANT:
+        /* copy the type of the constant; note that constants store a value_type,
+         * not a pir_type, so convert here.
+         */
+        SET_FLAG(flag, valuetype_pirtype_clut[arg->value->expr.c->type]);
+        /* set the flag indicating the argument is a constant literal, not a register. */
+        SET_FLAG(flag, PARROT_ARG_CONSTANT);
+        break;
+      default:
+        break;
     }
 
     /* if the argument has a :flat flag, copy that */
@@ -694,17 +694,17 @@ convert_pcc_methodtailcall(lexer_state * const lexer, invocation * const inv) {
 
     /* check out the type of the method expression; it may be a PMC or a STRING. */
     switch (inv->method->type) {
-        case EXPR_TARGET:
-            new_sub_instr(lexer, PARROT_OP_tailcallmethod_p_p, "tailcallmethod_p_p", 0);
-            add_operands(lexer, "%T%E", inv->sub, inv->method); /* XXX test this */
-            break;
-        case EXPR_CONSTANT:
-            new_sub_instr(lexer, PARROT_OP_tailcallmethod_p_sc, "tailcallmethod_p_sc", 0);
-            add_operands(lexer, "%T%E", inv->sub, inv->method);
-            break;
-        default:
-            panic(lexer, "unknown expression type in tailcallmethod instruction");
-            break;
+      case EXPR_TARGET:
+        new_sub_instr(lexer, PARROT_OP_tailcallmethod_p_p, "tailcallmethod_p_p", 0);
+        add_operands(lexer, "%T%E", inv->sub, inv->method); /* XXX test this */
+        break;
+      case EXPR_CONSTANT:
+        new_sub_instr(lexer, PARROT_OP_tailcallmethod_p_sc, "tailcallmethod_p_sc", 0);
+        add_operands(lexer, "%T%E", inv->sub, inv->method);
+        break;
+      default:
+        panic(lexer, "unknown expression type in tailcallmethod instruction");
+        break;
     }
 }
 
@@ -725,30 +725,30 @@ on the type of C<inv>.
 void
 convert_inv_to_instr(lexer_state * const lexer, invocation * const inv) {
     switch (inv->type) {
-        case CALL_PCC:
-            convert_pcc_call(lexer, inv);
-            break;
-        case CALL_RETURN:
-            convert_pcc_return(lexer, inv);
-            break;
-        case CALL_NCI:
-            convert_nci_call(lexer, inv);
-            break;
-        case CALL_YIELD:
-            convert_pcc_yield(lexer, inv);
-            break;
-        case CALL_TAILCALL:
-            convert_pcc_tailcall(lexer, inv);
-            break;
-        case CALL_METHOD:
-            convert_pcc_methodcall(lexer, inv);
-            break;
-        case CALL_METHOD_TAILCALL:
-            convert_pcc_methodtailcall(lexer, inv);
-            break;
-        default:
-            panic(lexer, "Unknown invocation type in convert_inv_to_instr()");
-            break;
+      case CALL_PCC:
+        convert_pcc_call(lexer, inv);
+        break;
+      case CALL_RETURN:
+        convert_pcc_return(lexer, inv);
+        break;
+      case CALL_NCI:
+        convert_nci_call(lexer, inv);
+        break;
+      case CALL_YIELD:
+        convert_pcc_yield(lexer, inv);
+        break;
+      case CALL_TAILCALL:
+        convert_pcc_tailcall(lexer, inv);
+        break;
+      case CALL_METHOD:
+        convert_pcc_methodcall(lexer, inv);
+        break;
+      case CALL_METHOD_TAILCALL:
+        convert_pcc_methodtailcall(lexer, inv);
+        break;
+      default:
+        panic(lexer, "Unknown invocation type in convert_inv_to_instr()");
+        break;
     }
 
 

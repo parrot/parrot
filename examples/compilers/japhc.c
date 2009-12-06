@@ -81,12 +81,12 @@ unescape(char *string)
     for (start = p = string ; *string; string++) {
         if (*string == '\\' && string[1]) {
             switch (*++string) {
-                case 'n':
-                    *p++ = '\n';
-                    break;
-                default:
-                    *p++ = *string;
-                    break;
+              case 'n':
+                *p++ = '\n';
+                break;
+              default:
+                *p++ = *string;
+                break;
             }
         }
         else
@@ -191,32 +191,32 @@ japh_compiler(PARROT_INTERP, const char *program)
     pc = cur_cs->base.data;
     for (p = program; *p; ++p) {
         switch (*p) {
-            case 'p':        /* print_sc */
-                *pc++ = interp->op_lib->op_code("print_sc", 1);
-                /* const follows */
-                ++p;
-                switch (*p) {
-                    case 'J':
-                        *pc++ = add_const_str(interp, consts, "Just ");
-                        break;
-                    case 'a':
-                        *pc++ = add_const_str(interp, consts, "another ");
-                        break;
-                    case 'P':
-                        *pc++ = add_const_str(interp, consts, "Parrot ");
-                        break;
-                    case 'H':
-                        *pc++ = add_const_str(interp, consts, "Hacker");
-                        break;
-                    case 'n':
-                        *pc++ = add_const_str(interp, consts, "\n");
-                        break;
-                }
+          case 'p':        /* print_sc */
+            *pc++ = interp->op_lib->op_code("print_sc", 1);
+            /* const follows */
+            ++p;
+            switch (*p) {
+              case 'J':
+                *pc++ = add_const_str(interp, consts, "Just ");
                 break;
-            case 'e':        /* end */
-                *pc++ = interp->op_lib->op_code("invoke_p", 1);
-                *pc++ = 1;
+              case 'a':
+                *pc++ = add_const_str(interp, consts, "another ");
                 break;
+              case 'P':
+                *pc++ = add_const_str(interp, consts, "Parrot ");
+                break;
+              case 'H':
+                *pc++ = add_const_str(interp, consts, "Hacker");
+                break;
+              case 'n':
+                *pc++ = add_const_str(interp, consts, "\n");
+                break;
+            }
+            break;
+          case 'e':        /* end */
+            *pc++ = interp->op_lib->op_code("invoke_p", 1);
+            *pc++ = 1;
+            break;
         }
     }
     if (old_cs) {

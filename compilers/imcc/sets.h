@@ -7,8 +7,8 @@
 #define PARROT_IMCC_SETS_H_GUARD
 
 typedef struct _Set {
-   unsigned int   length;
-   unsigned char *bmp;
+    unsigned int   length;
+    unsigned char *bmp;
 } Set;
 
 /* HEADERIZER BEGIN: compilers/imcc/sets.c */

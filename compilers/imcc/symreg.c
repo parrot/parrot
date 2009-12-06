@@ -730,14 +730,14 @@ mk_pmc_const_2(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(SymReg *left),
     rhs->pmc_type = left->pmc_type;
 
     switch (rhs->pmc_type) {
-        case enum_class_Sub:
-        case enum_class_Coroutine:
-            r[1]        = rhs;
-            rhs->usage |= U_FIXUP;
-            INS(interp, unit, "set_p_pc", "", r, 2, 0, 1);
-            return NULL;
-        default:
-            break;
+      case enum_class_Sub:
+      case enum_class_Coroutine:
+        r[1]        = rhs;
+        rhs->usage |= U_FIXUP;
+        INS(interp, unit, "set_p_pc", "", r, 2, 0, 1);
+        return NULL;
+      default:
+        break;
     }
 
     r[1] = rhs;

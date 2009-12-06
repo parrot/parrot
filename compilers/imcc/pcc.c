@@ -319,12 +319,20 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
 
             /* TODO verify if const is allowed */
             switch (arg->set) {
-                case 'I':                               break;
-                case 'S': flags |= PARROT_ARG_STRING;   break;
-                case 'N': flags |= PARROT_ARG_FLOATVAL; break;
-                case 'K':
-                case 'P': flags |= PARROT_ARG_PMC;      break;
-                default :                               break;
+              case 'I':
+                break;
+              case 'S':
+                flags |= PARROT_ARG_STRING;
+                break;
+              case 'N':
+                flags |= PARROT_ARG_FLOATVAL;
+                break;
+              case 'K':
+              case 'P':
+                flags |= PARROT_ARG_PMC;
+                break;
+              default :
+                break;
             }
         }
 

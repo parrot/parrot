@@ -21,7 +21,7 @@
  * Subroutine flags
  */
 typedef enum {
-     /* runtime usage flags */
+    /* runtime usage flags */
     SUB_FLAG_CORO_FF      = PObj_private0_FLAG,
     SUB_FLAG_C_HANDLER    = PObj_private0_FLAG, /* C exceptions only */
     SUB_FLAG_TAILCALL     = PObj_private2_FLAG,

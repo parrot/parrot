@@ -131,48 +131,48 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
         }
 
         switch (opt.opt_id) {
-        case 'b':
+          case 'b':
             setopt(PARROT_BOUNDS_FLAG);
             break;
-        case 'j':
+          case 'j':
             setopt(PARROT_JIT_FLAG);
             break;
-        case 'o':
+          case 'o':
             setopt(PARROT_EXEC_FLAG);
             break;
-        case 'p':
+          case 'p':
             setopt(PARROT_PROFILE_FLAG);
             break;
-        case 'P':
+          case 'P':
             setopt(PARROT_PREDEREF_FLAG);
             break;
-        case 'S':
+          case 'S':
             setopt(PARROT_SWITCH_FLAG);
             break;
-        case 'g':
+          case 'g':
             unsetopt(PARROT_CGOTO_FLAG);
             break;
-        case 't':
+          case 't':
             setopt(PARROT_TRACE_FLAG);
             break;
-        case 'd':
+          case 'd':
             setopt(PARROT_DEBUG_FLAG);
             break;
-        case 'h':
+          case 'h':
             usage();
             break;
-        case 'v':
+          case 'v':
             version();
             break;
-        case 'w':
+          case 'w':
             Parrot_setwarnings(interp, PARROT_WARNINGS_ALL_FLAG);
             break;
 
-        case '.':  /* Give Windows Parrot hackers an opportunity to
-                    * attach a debuggger. */
+          case '.':  /* Give Windows Parrot hackers an opportunity to
+                      * attach a debuggger. */
             fgetc(stdin);
             break;
-        case OPT_GC_DEBUG:
+          case OPT_GC_DEBUG:
 #if DISABLE_GC_DEBUG
             Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
                         "PARROT_GC_DEBUG is set but the binary was "
@@ -180,7 +180,7 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
 #endif
             setopt(PARROT_GC_DEBUG_FLAG);
             break;
-        case OPT_DESTROY_FLAG:
+          case OPT_DESTROY_FLAG:
             setopt(PARROT_DESTROY_FLAG);
             break;
         }

@@ -883,54 +883,54 @@ emit_pbc_key(ARGIN(bytecode * const bc), ARGIN(key * const k))
 
     while (iter) {
         switch (iter->expr->type) {
-            case EXPR_CONSTANT: {
-                constant *c = iter->expr->expr.c;
-                switch (c->type) {
-                    case INT_VAL:
-                        *pc++ = PARROT_ARG_IC;
-                        *pc++ = c->val.ival;
-                        break;
-                    case STRING_VAL:
-                        *pc++ = PARROT_ARG_SC;
-                        *pc++ = add_string_const(bc, c->val.sval, "ascii");
-                        break;
-                    case USTRING_VAL:
-                        *pc++ = PARROT_ARG_SC;
-                        *pc++ = add_string_const(bc, c->val.ustr->contents,
-                                                            c->val.ustr->charset);
-                        break;
-                    default:
-                        fprintf(stderr, "wrong type of key");
-                        break;
-                }
-
+          case EXPR_CONSTANT: {
+            constant *c = iter->expr->expr.c;
+            switch (c->type) {
+              case INT_VAL:
+                *pc++ = PARROT_ARG_IC;
+                *pc++ = c->val.ival;
+                break;
+              case STRING_VAL:
+                *pc++ = PARROT_ARG_SC;
+                *pc++ = add_string_const(bc, c->val.sval, "ascii");
+                break;
+              case USTRING_VAL:
+                *pc++ = PARROT_ARG_SC;
+                *pc++ = add_string_const(bc, c->val.ustr->contents,
+                                                c->val.ustr->charset);
+                break;
+              default:
+                fprintf(stderr, "wrong type of key");
                 break;
             }
-            case EXPR_TARGET: {
-                target *t = iter->expr->expr.t;
 
-                switch (t->info->type) {
-                    case INT_TYPE:
-                        *pc++ = PARROT_ARG_I;
-                        *pc++ = t->info->color;
-                        break;
-                    case STRING_TYPE:
-                        *pc++ = PARROT_ARG_S;
-                        *pc++ = t->info->color;
-                        break;
-                    default:
-                        fprintf(stderr, "wrong type of key");
-                        break;
-                }
+            break;
+          }
+          case EXPR_TARGET: {
+            target *t = iter->expr->expr.t;
+
+            switch (t->info->type) {
+              case INT_TYPE:
+                *pc++ = PARROT_ARG_I;
+                *pc++ = t->info->color;
+                break;
+              case STRING_TYPE:
+                *pc++ = PARROT_ARG_S;
+                *pc++ = t->info->color;
+                break;
+              default:
+                fprintf(stderr, "wrong type of key");
                 break;
             }
-            case EXPR_KEY:
-                fprintf(stderr, "Nested keys are not supported.");
-                break;
+            break;
+          }
+          case EXPR_KEY:
+            fprintf(stderr, "Nested keys are not supported.");
+            break;
 
-            default:
-                fprintf(stderr, "unknown expression type");
-                break;
+          default:
+            fprintf(stderr, "unknown expression type");
+            break;
 
         }
 

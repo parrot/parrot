@@ -66,8 +66,8 @@ Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)
 void
 Parrot_Exec_OS_Comman(PARROT_INTERP, STRING *command)
 {
-  Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NOSPAWN,
-         "Exec not implemented");
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NOSPAWN,
+            "Exec not implemented");
 }
 
 /*

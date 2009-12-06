@@ -1500,10 +1500,10 @@ them).
 void
 search_predecessors_not_in(ARGIN(const Basic_block *node), ARGMOD(Set *s))
 {
-   ASSERT_ARGS(search_predecessors_not_in)
-   Edge *edge;
+    ASSERT_ARGS(search_predecessors_not_in)
+    Edge *edge;
 
-   for (edge = node->pred_list; edge; edge = edge->pred_next) {
+    for (edge = node->pred_list; edge; edge = edge->pred_next) {
         Basic_block * const pred = edge->from;
 
         if (!set_contains(s, pred->index)) {
@@ -1511,7 +1511,7 @@ search_predecessors_not_in(ARGIN(const Basic_block *node), ARGMOD(Set *s))
            pred->loop_depth++;
            search_predecessors_not_in(pred, s);
         }
-   }
+    }
 }
 
 /*** Utility functions ***/

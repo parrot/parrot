@@ -747,34 +747,34 @@ ins_print(PARROT_INTERP, ARGIN(PMC *io), ARGIN(const Instruction *ins))
     }
 
     switch (ins->opsize-1) {
-        case -1:        /* labels */
-        case 1:
-            len = Parrot_io_fprintf(interp, io, ins->format, regstr[0]);
-            break;
-        case 2:
-            len = Parrot_io_fprintf(interp, io, ins->format, regstr[0], regstr[1]);
-            break;
-        case 3:
-            len = Parrot_io_fprintf(interp, io, ins->format, regstr[0], regstr[1], regstr[2]);
-            break;
-        case 4:
-            len = Parrot_io_fprintf(interp, io, ins->format, regstr[0], regstr[1], regstr[2],
+      case -1:        /* labels */
+      case 1:
+        len = Parrot_io_fprintf(interp, io, ins->format, regstr[0]);
+        break;
+      case 2:
+        len = Parrot_io_fprintf(interp, io, ins->format, regstr[0], regstr[1]);
+        break;
+      case 3:
+        len = Parrot_io_fprintf(interp, io, ins->format, regstr[0], regstr[1], regstr[2]);
+        break;
+      case 4:
+        len = Parrot_io_fprintf(interp, io, ins->format, regstr[0], regstr[1], regstr[2],
                     regstr[3]);
-            break;
-        case 5:
-            len = Parrot_io_fprintf(interp, io, ins->format, regstr[0], regstr[1], regstr[2],
+        break;
+      case 5:
+        len = Parrot_io_fprintf(interp, io, ins->format, regstr[0], regstr[1], regstr[2],
                     regstr[3], regstr[4]);
-            break;
-        case 6:
-            len = Parrot_io_fprintf(interp, io, ins->format, regstr[0], regstr[1], regstr[2],
+        break;
+      case 6:
+        len = Parrot_io_fprintf(interp, io, ins->format, regstr[0], regstr[1], regstr[2],
                     regstr[3], regstr[4], regstr[5]);
-            break;
-        default:
-            Parrot_io_fprintf(interp, Parrot_io_STDERR(interp),
+        break;
+      default:
+        Parrot_io_fprintf(interp, Parrot_io_STDERR(interp),
                 "unhandled: opsize (%d), op %s, fmt %s\n",
                 ins->opsize, ins->opname, ins->format);
-            exit(EXIT_FAILURE);
-            break;
+        exit(EXIT_FAILURE);
+        break;
     }
 
     return len;

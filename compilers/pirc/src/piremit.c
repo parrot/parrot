@@ -129,24 +129,24 @@ value is printed.
 void
 print_constant(lexer_state * const lexer, constant * const c) {
     switch (c->type) {
-        case INT_VAL:
-            fprintf(out, "%d", c->val.ival);
-            break;
-        case NUM_VAL:
-            fprintf(out, "%f", c->val.nval);
-            break;
-        case STRING_VAL:
-            fprintf(out, "\"%s\"", c->val.sval);
-            break;
-        case PMC_VAL:
-            fprintf(out, "\"%s\"", c->val.pval);
-            break;
-        case USTRING_VAL:
-            fprintf(out, "%s:\"%s\"", c->val.ustr->charset, c->val.ustr->contents);
-            break;
-        default:
-            panic(lexer, "Unknown type detected in print_constant()");
-            break;
+      case INT_VAL:
+        fprintf(out, "%d", c->val.ival);
+        break;
+      case NUM_VAL:
+        fprintf(out, "%f", c->val.nval);
+        break;
+      case STRING_VAL:
+        fprintf(out, "\"%s\"", c->val.sval);
+        break;
+      case PMC_VAL:
+        fprintf(out, "\"%s\"", c->val.pval);
+        break;
+      case USTRING_VAL:
+        fprintf(out, "%s:\"%s\"", c->val.ustr->charset, c->val.ustr->contents);
+        break;
+      default:
+        panic(lexer, "Unknown type detected in print_constant()");
+        break;
     }
 }
 
@@ -164,23 +164,23 @@ a specialized function based on C<expr>'s type.
 void
 print_expr(lexer_state * const lexer, expression * const expr) {
     switch (expr->type) {
-        case EXPR_TARGET:
-            print_target(lexer, expr->expr.t);
-            break;
-        case EXPR_CONSTANT:
-            print_constant(lexer, expr->expr.c);
-            break;
-        case EXPR_IDENT:
-            fprintf(out, "%s", expr->expr.id);
-            break;
-        case EXPR_KEY:
-            print_key(lexer, expr->expr.k);
-            break;
-        case EXPR_LABEL:
-            fprintf(out, "%d", expr->expr.l->offset);
-            break;
-        default:
-            break;
+      case EXPR_TARGET:
+        print_target(lexer, expr->expr.t);
+        break;
+      case EXPR_CONSTANT:
+        print_constant(lexer, expr->expr.c);
+        break;
+      case EXPR_IDENT:
+        fprintf(out, "%s", expr->expr.id);
+        break;
+      case EXPR_KEY:
+        print_key(lexer, expr->expr.k);
+        break;
+      case EXPR_LABEL:
+        fprintf(out, "%d", expr->expr.l->offset);
+        break;
+      default:
+        break;
     }
 }
 
@@ -593,25 +593,25 @@ type.
 static void
 emit_pbc_expr(lexer_state * const lexer, expression * const operand) {
     switch (operand->type) {
-        case EXPR_CONSTANT:
-            emit_pbc_const_arg(lexer, operand->expr.c);
-            break;
-        case EXPR_TARGET:
-            emit_pbc_target_arg(lexer, operand->expr.t);
-            break;
-        case EXPR_LABEL:
-            emit_pbc_label_arg(lexer, operand->expr.l);
-            break;
-        case EXPR_KEY:
-            emit_pbc_key(lexer->bc, operand->expr.k);
-            break;
-        /*
-        case EXPR_IDENT:
-            fprintf(stderr, "expr ident\n");
-            break;
-        */
-        default:
-            break;
+      case EXPR_CONSTANT:
+        emit_pbc_const_arg(lexer, operand->expr.c);
+        break;
+      case EXPR_TARGET:
+        emit_pbc_target_arg(lexer, operand->expr.t);
+        break;
+      case EXPR_LABEL:
+        emit_pbc_label_arg(lexer, operand->expr.l);
+        break;
+      case EXPR_KEY:
+        emit_pbc_key(lexer->bc, operand->expr.k);
+        break;
+      /*
+      case EXPR_IDENT:
+        fprintf(stderr, "expr ident\n");
+        break;
+       */
+      default:
+        break;
     }
 }
 
@@ -833,22 +833,22 @@ emit_pbc_annotations(lexer_state * const lexer) {
         key = add_string_const(lexer->bc, iter->key, "ascii");
 
         switch (iter->value->type) {
-            case INT_VAL:
-                value = iter->value->val.ival;
-                break;
-            case NUM_VAL:
-                value = add_num_const(lexer->bc, iter->value->val.nval);
-                break;
-            case STRING_VAL:
-                value = add_string_const(lexer->bc, iter->value->val.sval, "ascii");
-                break;
-            case USTRING_VAL:
-                value = add_string_const(lexer->bc, iter->value->val.ustr->contents,
-                                                    iter->value->val.ustr->charset);
-                break;
-            default:
-                panic(lexer, "unknown annotation constant type");
-                return; /* panic() exits, so this never happens */
+          case INT_VAL:
+            value = iter->value->val.ival;
+            break;
+          case NUM_VAL:
+            value = add_num_const(lexer->bc, iter->value->val.nval);
+            break;
+          case STRING_VAL:
+            value = add_string_const(lexer->bc, iter->value->val.sval, "ascii");
+            break;
+          case USTRING_VAL:
+            value = add_string_const(lexer->bc, iter->value->val.ustr->contents,
+                                                iter->value->val.ustr->charset);
+            break;
+          default:
+            panic(lexer, "unknown annotation constant type");
+            return; /* panic() exits, so this never happens */
         }
 
 

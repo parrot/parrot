@@ -452,18 +452,18 @@ mk_pmc_const(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *type),
     }
 
     switch (type_enum) {
-        case enum_class_Sub:
-        case enum_class_Coroutine:
-            rhs = mk_const(interp, name, 'p');
+      case enum_class_Sub:
+      case enum_class_Coroutine:
+        rhs = mk_const(interp, name, 'p');
 
-            if (!ascii)
-                rhs->type |= VT_ENCODED;
+        if (!ascii)
+            rhs->type |= VT_ENCODED;
 
-            rhs->usage    |= U_FIXUP | U_SUBID_LOOKUP;
-            break;
-        default:
-            rhs = mk_const(interp, name, 'P');
-            break;
+        rhs->usage    |= U_FIXUP | U_SUBID_LOOKUP;
+        break;
+      default:
+        rhs = mk_const(interp, name, 'P');
+        break;
     }
 
     r[1]          = rhs;

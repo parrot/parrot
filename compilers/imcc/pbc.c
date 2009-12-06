@@ -1344,15 +1344,15 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
 
     if (ns_const >= 0 && ns_const < ct->const_count) {
         switch (ct->constants[ns_const]->type) {
-            case PFC_KEY:
-                ns_pmc = ct->constants[ns_const]->u.key;
-                break;
-            case PFC_STRING:
-                ns_pmc = constant_pmc_new(interp, enum_class_String);
-                VTABLE_set_string_native(interp, ns_pmc, ct->constants[ns_const]->u.string);
-                break;
-            default:
-                break;
+          case PFC_KEY:
+            ns_pmc = ct->constants[ns_const]->u.key;
+            break;
+          case PFC_STRING:
+            ns_pmc = constant_pmc_new(interp, enum_class_String);
+            VTABLE_set_string_native(interp, ns_pmc, ct->constants[ns_const]->u.string);
+            break;
+          default:
+            break;
         }
     }
 
@@ -1555,61 +1555,61 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
             r = r->reg;
 
         switch (type) {
-            case VTIDENTIFIER:       /* P[S0] */
-            case VTPASM:             /* P[S0] */
-            case VTREG:              /* P[S0] */
-                if (r->set == 'I')
-                    *pc++ = PARROT_ARG_I;    /* register type */
-                else if (r->set == 'S')
-                    *pc++ = PARROT_ARG_S;
-                else
-                    IMCC_fatal(interp, 1, "build_key: wrong register set\n");
+          case VTIDENTIFIER:       /* P[S0] */
+          case VTPASM:             /* P[S0] */
+          case VTREG:              /* P[S0] */
+            if (r->set == 'I')
+                *pc++ = PARROT_ARG_I;    /* register type */
+            else if (r->set == 'S')
+                *pc++ = PARROT_ARG_S;
+            else
+                IMCC_fatal(interp, 1, "build_key: wrong register set\n");
 
-                /* don't emit mapped regs in key parts */
-                if (r->color < 0)
-                    *pc++ = -1 - r->color;
-                else
-                    *pc++ = r->color;
+            /* don't emit mapped regs in key parts */
+            if (r->color < 0)
+                *pc++ = -1 - r->color;
+            else
+                *pc++ = r->color;
 
-                sprintf(s+strlen(s), "%c%d", r->set, (int)r->color);
+            sprintf(s+strlen(s), "%c%d", r->set, (int)r->color);
+
+            IMCC_debug(interp, DEBUG_PBC_CONST,
+                    " keypart reg %s %c%d\n",
+                    r->name, r->set, (int)r->color);
+            break;
+          case VT_CONSTP:
+          case VTCONST:
+          case VTCONST|VT_ENCODED:
+            switch (r->set) {
+              case 'S':                       /* P["key"] */
+                /* str constant */
+                *pc++ = PARROT_ARG_SC;
+
+                /* constant idx */
+                *pc++ = r->color;
 
                 IMCC_debug(interp, DEBUG_PBC_CONST,
-                        " keypart reg %s %c%d\n",
-                        r->name, r->set, (int)r->color);
+                        " keypart SC %s #%d\n",
+                        r->name, r->color);
                 break;
-            case VT_CONSTP:
-            case VTCONST:
-            case VTCONST|VT_ENCODED:
-                switch (r->set) {
-                    case 'S':                       /* P["key"] */
-                        /* str constant */
-                        *pc++ = PARROT_ARG_SC;
+              case 'I':                       /* P[;42;..] */
+                /* int constant */
+                *pc++ = PARROT_ARG_IC;
 
-                        /* constant idx */
-                        *pc++ = r->color;
+                /* value */
+                *pc++ = r->color = atol(r->name);
 
-                        IMCC_debug(interp, DEBUG_PBC_CONST,
-                                " keypart SC %s #%d\n",
-                                r->name, r->color);
-                        break;
-                    case 'I':                       /* P[;42;..] */
-                        /* int constant */
-                        *pc++ = PARROT_ARG_IC;
-
-                        /* value */
-                        *pc++ = r->color = atol(r->name);
-
-                        IMCC_debug(interp, DEBUG_PBC_CONST,
-                                " keypart IC %s #%d\n",
-                                r->name, r->color);
-                        break;
-                    default:
-                        IMCC_fatal(interp, 1, "build_key: unknown set\n");
-                }
-                sprintf(s+strlen(s), "%cc" INTVAL_FMT, r->set, r->color);
+                IMCC_debug(interp, DEBUG_PBC_CONST,
+                        " keypart IC %s #%d\n",
+                        r->name, r->color);
                 break;
-            default:
-                IMCC_fatal(interp, 1, "build_key: "
+              default:
+                IMCC_fatal(interp, 1, "build_key: unknown set\n");
+            }
+            sprintf(s+strlen(s), "%cc" INTVAL_FMT, r->set, r->color);
+            break;
+          default:
+            IMCC_fatal(interp, 1, "build_key: "
                     "unknown type 0x%x on %s\n", type, r->name);
         }
     }
@@ -1735,35 +1735,39 @@ init_fixedintegerarray_from_string(PARROT_INTERP, ARGIN(PMC *p), ARGIN(STRING *s
 
     for (i = l, n = 0; i; --i, ++chr) {
         switch (*chr) {
-            case ' ': continue;
-            case '\t': continue;
-            case '(': continue;
-            case ')': break;
-            case ',':
-                      n++;
-                      break;
-            default:
-                      base = 10;
-                      if (*chr == '0') {
-                          ++chr;
-                          --i;
-                          if (*chr == 'b' || *chr == 'B') {
-                              base = 2;
-                              ++chr;
-                              --i;
-                          }
-                          else if (*chr == 'x' || *chr == 'X') {
-                              base = 16;
-                              ++chr;
-                              --i;
-                          }
-                      }
-                      start = chr;
-                      elem  = strtoul(chr, &chr, base);
-                      --chr;
-                      i -= (chr - start);
-                      VTABLE_set_integer_keyed_int(interp, p, n, elem);
-                      break;
+          case ' ':
+            continue;
+          case '\t':
+            continue;
+          case '(':
+            continue;
+          case ')':
+            break;
+          case ',':
+            n++;
+            break;
+          default:
+            base = 10;
+            if (*chr == '0') {
+                ++chr;
+                --i;
+                if (*chr == 'b' || *chr == 'B') {
+                    base = 2;
+                    ++chr;
+                    --i;
+                }
+                else if (*chr == 'x' || *chr == 'X') {
+                    base = 16;
+                    ++chr;
+                    --i;
+                }
+            }
+            start = chr;
+            elem  = strtoul(chr, &chr, base);
+            --chr;
+            i -= (chr - start);
+            VTABLE_set_integer_keyed_int(interp, p, n, elem);
+            break;
         }
     }
 
@@ -1848,34 +1852,34 @@ add_1_const(PARROT_INTERP, ARGMOD(SymReg *r))
         return;
 
     switch (r->set) {
-        case 'I':
-            r->color = IMCC_int_from_reg(interp, r);
-            break;
-        case 'S':
-            if (r->type & VT_CONSTP)
-                r = r->reg;
-            r->color = add_const_str(interp, r);
-            break;
-        case 'N':
-            r->color = add_const_num(interp, r->name);
-            break;
-        case 'K':
-            {
+      case 'I':
+        r->color = IMCC_int_from_reg(interp, r);
+        break;
+      case 'S':
+        if (r->type & VT_CONSTP)
+            r = r->reg;
+        r->color = add_const_str(interp, r);
+        break;
+      case 'N':
+        r->color = add_const_num(interp, r->name);
+        break;
+      case 'K':
+        {
             SymReg *key = r;
 
             for (r = r->nextkey; r; r = r->nextkey)
                 if (r->type & VTCONST)
                     add_1_const(interp, r);
                 build_key(interp, key);
-            }
-            break;
-        case 'P':
-            make_pmc_const(interp, r);
-            IMCC_debug(interp, DEBUG_PBC_CONST,
+        }
+        break;
+      case 'P':
+        make_pmc_const(interp, r);
+        IMCC_debug(interp, DEBUG_PBC_CONST,
                     "PMC const %s\tcolor %d\n", r->name, r->color);
-            break;
-        default:
-            break;
+        break;
+      default:
+        break;
     }
 
     if (r)
@@ -2217,18 +2221,18 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
 
         /* Add annotation. */
         switch (ins->symregs[1]->set) {
-            case 'I':
-                annotation_type = PF_ANNOTATION_KEY_TYPE_INT;
-                break;
-            case 'N':
-                annotation_type = PF_ANNOTATION_KEY_TYPE_NUM;
-                break;
-            case 'S':
-                annotation_type = PF_ANNOTATION_KEY_TYPE_STR;
-                break;
-            default:
-                IMCC_fatal(interp, 1, "e_pbc_emit:"
-                        "invalid type for annotation value\n");
+          case 'I':
+            annotation_type = PF_ANNOTATION_KEY_TYPE_INT;
+            break;
+          case 'N':
+            annotation_type = PF_ANNOTATION_KEY_TYPE_NUM;
+            break;
+          case 'S':
+            annotation_type = PF_ANNOTATION_KEY_TYPE_STR;
+            break;
+          default:
+            IMCC_fatal(interp, 1, "e_pbc_emit:"
+                    "invalid type for annotation value\n");
         }
         PackFile_Annotations_add_entry(interp, interp->code->annotations,
                     IMCC_INFO(interp)->pc - interp->code->base.data,
@@ -2276,52 +2280,52 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
 
         for (i = 0; i < op_info->op_count-1; i++) {
             switch (op_info->types[i]) {
-                case PARROT_ARG_IC:
-                    /* branch instruction */
-                    if (op_info->labels[i]) {
-                        if (last_label == 1)
-                            /* we don't have a branch with offset 1 !? */
-                            IMCC_fatal(interp, 1, "e_pbc_emit: "
+              case PARROT_ARG_IC:
+                /* branch instruction */
+                if (op_info->labels[i]) {
+                    if (last_label == 1)
+                        /* we don't have a branch with offset 1 !? */
+                        IMCC_fatal(interp, 1, "e_pbc_emit: "
                                     "no label offset found\n");
-                        *(IMCC_INFO(interp)->pc)++      = last_label;
-                        last_label = 1;
-                        break;
-                        /* else fall through */
-                    }
-                case PARROT_ARG_I:
-                case PARROT_ARG_N:
-                case PARROT_ARG_S:
-                case PARROT_ARG_P:
-                case PARROT_ARG_K:
-                case PARROT_ARG_KI:
-                case PARROT_ARG_KIC:
-                case PARROT_ARG_SC:
-                case PARROT_ARG_NC:
-                case PARROT_ARG_PC:
-                    r     = ins->symregs[i];
-
-                    if (r->type & VT_CONSTP)
-                        r = r->reg;
-
-                    *(IMCC_INFO(interp)->pc)++ = (opcode_t) r->color;
-                    IMCC_debug(interp, DEBUG_PBC, " %d", r->color);
+                    *(IMCC_INFO(interp)->pc)++      = last_label;
+                    last_label = 1;
                     break;
-                case PARROT_ARG_KC:
-                    r = ins->symregs[i];
-                    if (r->set == 'K') {
-                        PARROT_ASSERT(r->color >= 0);
-                        *(IMCC_INFO(interp)->pc)++ = r->color;
-                    }
-                    else {
-                        *(IMCC_INFO(interp)->pc)++ = build_key(interp, r);
-                    }
-                    IMCC_debug(interp, DEBUG_PBC, " %d",
+                    /* else fall through */
+                }
+              case PARROT_ARG_I:
+              case PARROT_ARG_N:
+              case PARROT_ARG_S:
+              case PARROT_ARG_P:
+              case PARROT_ARG_K:
+              case PARROT_ARG_KI:
+              case PARROT_ARG_KIC:
+              case PARROT_ARG_SC:
+              case PARROT_ARG_NC:
+              case PARROT_ARG_PC:
+                r     = ins->symregs[i];
+
+                if (r->type & VT_CONSTP)
+                    r = r->reg;
+
+                *(IMCC_INFO(interp)->pc)++ = (opcode_t) r->color;
+                IMCC_debug(interp, DEBUG_PBC, " %d", r->color);
+                break;
+              case PARROT_ARG_KC:
+                r = ins->symregs[i];
+                if (r->set == 'K') {
+                    PARROT_ASSERT(r->color >= 0);
+                    *(IMCC_INFO(interp)->pc)++ = r->color;
+                }
+                else {
+                    *(IMCC_INFO(interp)->pc)++ = build_key(interp, r);
+                }
+                IMCC_debug(interp, DEBUG_PBC, " %d",
                         IMCC_INFO(interp)->pc[-1]);
-                    break;
-                default:
-                    IMCC_fatal(interp, 1, "e_pbc_emit:"
+                break;
+              default:
+                IMCC_fatal(interp, 1, "e_pbc_emit:"
                             "unknown argtype in parrot op\n");
-                    break;
+                break;
             }
         }
         if (ins->opnum == PARROT_OP_set_args_pc

@@ -16,8 +16,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-char * readline(const char *);
-void * rl_get_keymap(void);
+    char * readline(const char *);
+    void * rl_get_keymap(void);
 #ifdef __cplusplus
 }
 #endif

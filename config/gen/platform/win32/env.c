@@ -127,10 +127,10 @@ Deletes an environment variable by assigning an empty string to the specified va
 void
 Parrot_unsetenv(PARROT_INTERP, STRING *name)
 {
-/* You can remove a variable from the environment by specifying an empty
-   string -- in other words, by specifying only varname=.
-       -- _putenv, _wputenv (CRT) documentation
-*/
+    /* You can remove a variable from the environment by specifying an empty
+       string -- in other words, by specifying only varname=.
+           -- _putenv, _wputenv (CRT) documentation
+    */
     Parrot_setenv(interp, name, Parrot_str_new(interp, "", 0));
 }
 

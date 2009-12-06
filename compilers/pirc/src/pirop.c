@@ -74,29 +74,29 @@ PARROT_WARN_UNUSED_RESULT
 static int
 get_signature_length(NOTNULL(expression * const e)) {
     switch (e->type) {
-        case EXPR_TARGET:
-            return 2 + ((e->expr.t->key != NULL) /* if there's a key on this target ... */
-                                                 /* ... get its length. */
-                       ? get_signature_length(e->expr.t->key->head->expr) + 1
-                       : 0);
-        case EXPR_CONSTANT:
-            return 3;    /* for _, 'k', 'c' */
-        case EXPR_IDENT:
-            return 3; /* 1 for '_', 1 for 'i', 1 for 'c' */
-        case EXPR_KEY: { /* for '_', 'k' */
-            int n;
-            /* if the key is an integer constant, then signature becomes '_kic', otherwise _kc. */
-            if (e->expr.k->head->expr->type         == EXPR_CONSTANT
-            &&  e->expr.k->head->expr->expr.c->type == INT_VAL)
-                n = 3;
-            else
-                n = 2;
+      case EXPR_TARGET:
+        return 2 + ((e->expr.t->key != NULL) /* if there's a key on this target ... */
+                                             /* ... get its length. */
+                   ? get_signature_length(e->expr.t->key->head->expr) + 1
+                   : 0);
+      case EXPR_CONSTANT:
+        return 3;    /* for _, 'k', 'c' */
+      case EXPR_IDENT:
+        return 3; /* 1 for '_', 1 for 'i', 1 for 'c' */
+      case EXPR_KEY: { /* for '_', 'k' */
+        int n;
+        /* if the key is an integer constant, then signature becomes '_kic', otherwise _kc. */
+        if (e->expr.k->head->expr->type         == EXPR_CONSTANT
+         && e->expr.k->head->expr->expr.c->type == INT_VAL)
+            n = 3;
+        else
+            n = 2;
 
-            return n + get_signature_length(e->expr.k->head->expr);
-        }
-        default:
-            fprintf(stderr, "wrong expression typein get_signature_length()\n");
-            break;
+        return n + get_signature_length(e->expr.k->head->expr);
+      }
+      default:
+        fprintf(stderr, "wrong expression typein get_signature_length()\n");
+        break;
     }
     return 0;
 }
@@ -125,84 +125,84 @@ PARROT_CANNOT_RETURN_NULL
 static char *
 write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
     switch (iter->type) {
-        case EXPR_TARGET:
-            *instr_writer++ = type_codes[iter->expr.t->info->type];
+      case EXPR_TARGET:
+        *instr_writer++ = type_codes[iter->expr.t->info->type];
 
-            if (iter->expr.t->key) {
-                *instr_writer++ = '_';
-                *instr_writer++ = 'k';
+        if (iter->expr.t->key) {
+            *instr_writer++ = '_';
+            *instr_writer++ = 'k';
 
-                switch (iter->expr.t->key->head->expr->type) {
-                    case EXPR_TARGET:
-                        switch (iter->expr.t->key->head->expr->expr.t->info->type) {
-                            case PMC_TYPE:
-                                /* the key is a target, and its type is a PMC. In that
-                                 * case, do not print the signature; 'kp' is not valid.
-                                 */
-                                break;
-                            case STRING_TYPE: /* strings become key-constant */
-                                *instr_writer++ = 'c';
-                                break;
-                            case INT_TYPE:
-                                *instr_writer++ = 'i';
-                                break;
-                            default:
-                                break;
-                        }
-                        break;
-                    case EXPR_CONSTANT:
-                        /* integer constant key results in '_kic' signature */
-                        if (iter->expr.c->type == INT_VAL)
-                            *instr_writer++ = 'i';
-
-                        *instr_writer++ = 'c';
-                        break;
-                    default:
-                        /* XXX does this ever happen? */
-                        fprintf(stderr, "write_signature: non-constant key\n");
-                        instr_writer = write_signature(iter->expr.t->key->head->expr, instr_writer);
-                        break;
-                }
-
-            }
-            break;
-        case EXPR_CONSTANT:
-            *instr_writer++ = type_codes[iter->expr.c->type];
-            *instr_writer++ = 'c';
-            break;
-        case EXPR_IDENT: /* used for labels; these will be converted to (i)nteger (c)onstants*/
-            *instr_writer++ = 'i';
-            *instr_writer++ = 'c';
-            break;
-        case EXPR_KEY:
-            *instr_writer++ = 'p';
-            *instr_writer++ = 'c';
-
-            /* XXX figure out what signature is needed. I think 'pc' */
-            /*
-            else {
-                *instr_writer++ = 'k';
-            }
-            */
-            /*instr_writer    = write_signature(iter->expr.k->head->expr, instr_writer);*/
-
-            /*
-
-            switch (iter->expr.k->expr->type) {
-                case EXPR_CONSTANT:
-                   *instr_writer++ = 'c';
-                   break;
-                default:
-                    fprintf(stderr, "write_signature: non-constant key\n");
-                    instr_writer = write_signature(iter->expr.k->expr, instr_writer);
+            switch (iter->expr.t->key->head->expr->type) {
+              case EXPR_TARGET:
+                switch (iter->expr.t->key->head->expr->expr.t->info->type) {
+                  case PMC_TYPE:
+                    /* the key is a target, and its type is a PMC. In that
+                     * case, do not print the signature; 'kp' is not valid.
+                     */
                     break;
-            }
-            */
+                  case STRING_TYPE: /* strings become key-constant */
+                    *instr_writer++ = 'c';
+                    break;
+                  case INT_TYPE:
+                    *instr_writer++ = 'i';
+                    break;
+                  default:
+                    break;
+                }
+                break;
+              case EXPR_CONSTANT:
+                /* integer constant key results in '_kic' signature */
+                if (iter->expr.c->type == INT_VAL)
+                    *instr_writer++ = 'i';
 
+                *instr_writer++ = 'c';
+                break;
+              default:
+                /* XXX does this ever happen? */
+                fprintf(stderr, "write_signature: non-constant key\n");
+                instr_writer = write_signature(iter->expr.t->key->head->expr, instr_writer);
+                break;
+            }
+
+        }
+        break;
+      case EXPR_CONSTANT:
+        *instr_writer++ = type_codes[iter->expr.c->type];
+        *instr_writer++ = 'c';
+        break;
+      case EXPR_IDENT: /* used for labels; these will be converted to (i)nteger (c)onstants*/
+        *instr_writer++ = 'i';
+        *instr_writer++ = 'c';
+        break;
+      case EXPR_KEY:
+        *instr_writer++ = 'p';
+        *instr_writer++ = 'c';
+
+        /* XXX figure out what signature is needed. I think 'pc' */
+        /*
+        else {
+            *instr_writer++ = 'k';
+        }
+        */
+        /*instr_writer    = write_signature(iter->expr.k->head->expr, instr_writer);*/
+
+        /*
+
+        switch (iter->expr.k->expr->type) {
+          case EXPR_CONSTANT:
+            *instr_writer++ = 'c';
             break;
-        default:
-            fprintf(stderr, "wrong expression type in write_signature()\n");
+          default:
+            fprintf(stderr, "write_signature: non-constant key\n");
+            instr_writer = write_signature(iter->expr.k->expr, instr_writer);
             break;
+        }
+        */
+
+        break;
+      default:
+        fprintf(stderr, "wrong expression type in write_signature()\n");
+        break;
     }
     return instr_writer;
 }

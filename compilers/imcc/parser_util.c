@@ -465,19 +465,19 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     /* XXX Speed up some by keep track of the end of format ourselves */
     for (i = 0; i < n; i++) {
         switch (op_info->dirs[i]) {
-            case PARROT_ARGDIR_INOUT:
-                dirs |= 1 << (16 + i);
-                /* go on */
-            case PARROT_ARGDIR_IN:
-                dirs |= 1 << i ;
-                break;
+          case PARROT_ARGDIR_INOUT:
+            dirs |= 1 << (16 + i);
+            /* go on */
+          case PARROT_ARGDIR_IN:
+            dirs |= 1 << i ;
+            break;
 
-            case PARROT_ARGDIR_OUT:
-                dirs |= 1 << (16 + i);
-                break;
+          case PARROT_ARGDIR_OUT:
+            dirs |= 1 << (16 + i);
+            break;
 
-            default:
-                PARROT_ASSERT(0);
+          default:
+            PARROT_ASSERT(0);
         };
 
         if (keyvec & KEY_BIT(i)) {

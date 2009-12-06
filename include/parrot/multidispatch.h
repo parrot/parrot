@@ -33,9 +33,9 @@ typedef void (*mmd_f_v_ps)(PARROT_INTERP, PMC *, STRING *);
 typedef INTVAL (*mmd_f_i_pp)(PARROT_INTERP, PMC *, PMC *);
 
 typedef struct _MMD_init {
-        INTVAL func_nr;
-        INTVAL left, right;
-        funcptr_t func_ptr;
+    INTVAL func_nr;
+    INTVAL left, right;
+    funcptr_t func_ptr;
 } MMD_init;
 
 typedef struct _MMD_table {
@@ -45,14 +45,14 @@ typedef struct _MMD_table {
 } MMD_table;
 
 typedef struct _multi_func_list {
-/* TT #646
- * This STRING ideally must be const but actually can't.
- */
-        STRING *multi_name;
-        STRING *short_sig;
-        STRING *full_sig;
-        STRING *ns_name;
-        funcptr_t func_ptr;
+    /* TT #646
+     * This STRING ideally must be const but actually can't.
+     */
+    STRING *multi_name;
+    STRING *short_sig;
+    STRING *full_sig;
+    STRING *ns_name;
+    funcptr_t func_ptr;
 } multi_func_list;
 
 #define MMD_Cache Hash

@@ -248,7 +248,7 @@ parse_string(PARROT_INTERP, ARGIN(char *pirstring), int flags, int pasminput,
     /* clean up after playing */
     release_resources(lexer);
 
-       /* clean up after playing */
+    /* clean up after playing */
     yypirlex_destroy(yyscanner);
 
 
