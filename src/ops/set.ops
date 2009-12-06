@@ -25,10 +25,10 @@ $1. Removes the constant flag on the copy, if there was one.
 =cut
 
 inline op clone(out STR, in STR) :base_mem {
-  /* cloning a NULL STRING produces an empty STRING; TT #964 */
-  $1 = $2
-     ? Parrot_str_copy(interp, $2)
-     : Parrot_str_new(interp, NULL, 0);
+    /* cloning a NULL STRING produces an empty STRING; TT #964 */
+    $1 = $2
+       ? Parrot_str_copy(interp, $2)
+       : Parrot_str_new(interp, NULL, 0);
 }
 
 
@@ -48,27 +48,27 @@ Exchange the contents of registers $1 and $2
 =cut
 
 op exchange(inout INT, inout INT) :base_core {
-   const INTVAL temp = $1;
-   $1 = $2;
-   $2 = temp;
+    const INTVAL temp = $1;
+    $1 = $2;
+    $2 = temp;
 }
 
 op exchange(inout PMC, inout PMC) :base_core {
-   PMC * const temp = $1;
-   $1 = $2;
-   $2 = temp;
+    PMC * const temp = $1;
+    $1 = $2;
+    $2 = temp;
 }
 
 op exchange(inout NUM, inout NUM) :base_core {
-   FLOATVAL temp = $1;
-   $1 = $2;
-   $2 = temp;
+    FLOATVAL temp = $1;
+    $1 = $2;
+    $2 = temp;
 }
 
 op exchange(inout STR, inout STR) :base_core {
-   STRING * const temp = $1;
-   $1 = $2;
-   $2 = temp;
+    STRING * const temp = $1;
+    $1 = $2;
+    $2 = temp;
 }
 
 ########################################
@@ -118,79 +118,79 @@ Set $1 to $2.
 =cut
 
 inline op set(out INT, in INT) :base_core {
-  $1 = $2;
+    $1 = $2;
 }
 
 inline op set(out INT, in NUM) :base_core {
-  $1 = (INTVAL)($2);
+    $1 = (INTVAL)($2);
 }
 
 inline op set(out INT, in STR) :base_core {
-  $1 = Parrot_str_to_int(interp, $2);
+    $1 = Parrot_str_to_int(interp, $2);
 }
 
 inline op set(out NUM, in NUM) :base_core {
-  $1 = $2;
+    $1 = $2;
 }
 
 inline op set(out NUM, in INT) :base_core {
-  $1 = (FLOATVAL)$2;
+    $1 = (FLOATVAL)$2;
 }
 
 inline op set(out NUM, in STR) :base_core {
-  $1 = Parrot_str_to_num(interp, $2);
+    $1 = Parrot_str_to_num(interp, $2);
 }
 
 inline op set(out NUM, invar PMC) :base_core {
-  $1 = VTABLE_get_number(interp, $2);
+    $1 = VTABLE_get_number(interp, $2);
 }
 
 inline op set(out STR, invar PMC) :base_core {
-  $1 = VTABLE_get_string(interp, $2);
+    $1 = VTABLE_get_string(interp, $2);
 }
 
 inline op set(out STR, invar STR) :base_core {
-  $1 = $2;
+    $1 = $2;
 }
 
 inline op set(out STR, inconst STR) :base_core {
-  $1 = Parrot_str_copy(interp, $2);
+    $1 = Parrot_str_copy(interp, $2);
 }
 
 inline op set(out STR, in INT) :base_core {
-  $1 = Parrot_str_from_int(interp, $2);
+    $1 = Parrot_str_from_int(interp, $2);
 }
 
 inline op set(out STR, in NUM) :base_core {
-  $1 = Parrot_str_from_num(interp, $2);
+    $1 = Parrot_str_from_num(interp, $2);
 }
 
 inline op set(out PMC, inconst PMC) :base_core {
-  $1 = $2;
+    $1 = $2;
 }
 
 inline op set(out PMC, invar PMC) :base_core {
-  $1 = $2;
+    $1 = $2;
 }
 
 inline op set(invar PMC, in INT) :base_core {
-  VTABLE_set_integer_native(interp, $1, $2);
+    VTABLE_set_integer_native(interp, $1, $2);
 }
 
 inline op set(invar PMC, in NUM) :base_core {
-  VTABLE_set_number_native(interp, $1, $2);
+    VTABLE_set_number_native(interp, $1, $2);
 }
 
 inline op set(invar PMC, invar STR) :base_core {
-  VTABLE_set_string_native(interp, $1, $2);
+    VTABLE_set_string_native(interp, $1, $2);
 }
 
 inline op set(invar PMC, inconst STR) :base_core {
-  VTABLE_set_string_native(interp, $1,
-    Parrot_str_copy(interp, $2));
+    VTABLE_set_string_native(interp, $1,
+        Parrot_str_copy(interp, $2));
 }
 inline op set(out INT, invar PMC) :base_core {
-  $1 = VTABLE_get_integer(interp, $2);
+    $1 = VTABLE_get_integer(interp, $2);
 }
 
 =back
@@ -231,31 +231,31 @@ reference PMC $2 refers to.
 =cut
 
 inline op assign(invar PMC, invar PMC) :base_core {
-  VTABLE_assign_pmc(interp, $1, $2);
+    VTABLE_assign_pmc(interp, $1, $2);
 }
 
 inline op assign(invar PMC, in INT) :base_core {
-  VTABLE_set_integer_native(interp, $1, $2);
+    VTABLE_set_integer_native(interp, $1, $2);
 }
 
 inline op assign(invar PMC, in NUM) :base_core {
-  VTABLE_set_number_native(interp, $1, $2);
+    VTABLE_set_number_native(interp, $1, $2);
 }
 
 inline op assign(invar PMC, in STR) :base_core {
-  VTABLE_assign_string_native(interp, $1, $2);
+    VTABLE_assign_string_native(interp, $1, $2);
 }
 
 inline op assign(out STR, in STR) :base_core {
-  $1 = Parrot_str_set(interp, $1, $2);
+    $1 = Parrot_str_set(interp, $1, $2);
 }
 
 inline op setref(invar PMC, invar PMC) :base_core {
-  VTABLE_set_pmc(interp, $1, $2);
+    VTABLE_set_pmc(interp, $1, $2);
 }
 
 inline op deref(out PMC, invar PMC) :base_ref {
-  $1 = VTABLE_get_pmc(interp, $2);
+    $1 = VTABLE_get_pmc(interp, $2);
 }
 
 =back
@@ -471,7 +471,7 @@ Makes a copy of the PMC in $2 and puts it in $1.
 =cut
 
 inline op clone(out PMC, invar PMC) :base_mem {
-  $1 = VTABLE_clone(interp, $2);
+    $1 = VTABLE_clone(interp, $2);
 }
 
 =item B<clone>(out PMC, invar PMC, in PMC)
@@ -481,7 +481,7 @@ Makes a copy of the PMC in $2 and puts it in $1, using the arguments in $3.
 =cut
 
 inline op clone(out PMC, invar PMC, in PMC) :base_mem {
-  $1 = VTABLE_clone_pmc(interp, $2, $3);
+    $1 = VTABLE_clone_pmc(interp, $2, $3);
 }
 
 =item B<copy>(inout PMC, invar PMC)
@@ -560,19 +560,19 @@ Set register $1 to PMCNULL.
 =cut
 
 inline op null(out STR) :base_core {
-  $1 = NULL;
+    $1 = NULL;
 }
 
 inline op null(out INT) :base_core {
-  $1 = 0;
+    $1 = 0;
 }
 
 inline op null(out PMC) :base_core {
-  $1 = PMCNULL;
+    $1 = PMCNULL;
 }
 
 inline op null(out NUM) :base_core {
-  $1 = 0;
+    $1 = 0;
 }
 
 ########################################
@@ -594,19 +594,19 @@ PMC ('p') and STRING ('s') registers clear to NULL.
 =cut
 
 inline op cleari() :base_core {
-  Parrot_clear_i(interp);
+    Parrot_clear_i(interp);
 }
 
 inline op clearn() :base_core {
-  Parrot_clear_n(interp);
+    Parrot_clear_n(interp);
 }
 
 inline op clears() :base_core {
-  Parrot_clear_s(interp);
+    Parrot_clear_s(interp);
 }
 
 inline op clearp() :base_core {
-  Parrot_clear_p(interp);
+    Parrot_clear_p(interp);
 }
 
 =back

@@ -47,115 +47,115 @@ Make a tailcall to method $2 with invocant $1.
 =cut
 
 op callmethodcc(invar PMC, in STR) :object_base :flow {
-  PMC      * const object     = $1;
-  STRING   * const meth       = $2;
-  opcode_t * const next       = expr NEXT();
+    PMC      * const object     = $1;
+    STRING   * const meth       = $2;
+    opcode_t * const next       = expr NEXT();
 
-  PMC      * const method_pmc = VTABLE_find_method(interp, object, meth);
-  opcode_t *dest              = NULL;
+    PMC      * const method_pmc = VTABLE_find_method(interp, object, meth);
+    opcode_t *dest              = NULL;
 
-  if (PMC_IS_NULL(method_pmc)) {
-    PMC * const _class = VTABLE_get_class(interp, object);
-    if (PMC_IS_NULL(_class)) {
-      dest = Parrot_ex_throw_from_op_args(interp, next,
-          EXCEPTION_METHOD_NOT_FOUND,
-          "Method '%Ss' not found for non-object", meth);
+    if (PMC_IS_NULL(method_pmc)) {
+        PMC * const _class = VTABLE_get_class(interp, object);
+        if (PMC_IS_NULL(_class)) {
+            dest = Parrot_ex_throw_from_op_args(interp, next,
+                EXCEPTION_METHOD_NOT_FOUND,
+                "Method '%Ss' not found for non-object", meth);
+        }
+        else {
+            dest = Parrot_ex_throw_from_op_args(interp, next,
+                EXCEPTION_METHOD_NOT_FOUND,
+                "Method '%Ss' not found for invocant of class '%Ss'", meth,
+                VTABLE_get_string(interp, _class));
+        }
     }
     else {
-      dest = Parrot_ex_throw_from_op_args(interp, next,
-          EXCEPTION_METHOD_NOT_FOUND,
-          "Method '%Ss' not found for invocant of class '%Ss'", meth,
-          VTABLE_get_string(interp, _class));
+        interp->current_object = object;
+        interp->current_cont   = NEED_CONTINUATION;
+        dest                   = VTABLE_invoke(interp, method_pmc, next);
     }
-  }
-  else {
-    interp->current_object = object;
-    interp->current_cont   = NEED_CONTINUATION;
-    dest                   = VTABLE_invoke(interp, method_pmc, next);
-  }
-  goto ADDRESS(dest);
+    goto ADDRESS(dest);
 }
 
 op callmethodcc(invar PMC, invar PMC) :object_base :flow {
-  opcode_t        *dest;
-  opcode_t * const next  = expr NEXT();
+    opcode_t        *dest;
+    opcode_t * const next  = expr NEXT();
 
-  interp->current_object = $1;
-  interp->current_cont   = NEED_CONTINUATION;
-  dest                   = VTABLE_invoke(interp, $2, next);
+    interp->current_object = $1;
+    interp->current_cont   = NEED_CONTINUATION;
+    dest                   = VTABLE_invoke(interp, $2, next);
 
-  goto ADDRESS(dest);
+    goto ADDRESS(dest);
 }
 
 op callmethod(invar PMC, in STR, invar PMC) :object_base :flow {
-  PMC      * const object     = $1;
-  STRING   * const meth       = $2;
-  opcode_t * const next       = expr NEXT();
+    PMC      * const object     = $1;
+    STRING   * const meth       = $2;
+    opcode_t * const next       = expr NEXT();
 
-  PMC      * const method_pmc = VTABLE_find_method(interp, object, meth);
-  opcode_t *dest              = NULL;
+    PMC      * const method_pmc = VTABLE_find_method(interp, object, meth);
+    opcode_t *dest              = NULL;
 
 
-  if (PMC_IS_NULL(method_pmc)) {
-    dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND,
-        "Method '%Ss' not found for invocant of class '%Ss'", meth,
-        VTABLE_get_string(interp, VTABLE_get_class(interp, object)));
-  }
-  else {
-    interp->current_object = object;
-    interp->current_cont = $3;
-    dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
-  }
-  goto ADDRESS(dest);
+    if (PMC_IS_NULL(method_pmc)) {
+        dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND,
+            "Method '%Ss' not found for invocant of class '%Ss'", meth,
+            VTABLE_get_string(interp, VTABLE_get_class(interp, object)));
+    }
+    else {
+        interp->current_object = object;
+        interp->current_cont = $3;
+        dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
+    }
+    goto ADDRESS(dest);
 }
 
 op callmethod(invar PMC, invar PMC, invar PMC) :object_base :flow {
-  PMC      * const object     = $1;
-  PMC      * const method_pmc = $2;
-  opcode_t * const next       = expr NEXT();
+    PMC      * const object     = $1;
+    PMC      * const method_pmc = $2;
+    opcode_t * const next       = expr NEXT();
 
-  opcode_t *dest;
+    opcode_t *dest;
 
-  interp->current_object = object;
-  interp->current_cont = $3;
-  dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
-  goto ADDRESS(dest);
+    interp->current_object = object;
+    interp->current_cont = $3;
+    dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
+    goto ADDRESS(dest);
 }
 
 op tailcallmethod(invar PMC, in STR) :object_base :flow {
-  opcode_t * const next       = expr NEXT();
-  PMC      * const object     = $1;
-  STRING   * const meth       = $2;
-  PMC      * const method_pmc = VTABLE_find_method(interp, object, meth);
+    opcode_t * const next       = expr NEXT();
+    PMC      * const object     = $1;
+    STRING   * const meth       = $2;
+    PMC      * const method_pmc = VTABLE_find_method(interp, object, meth);
 
-  opcode_t *dest;
+    opcode_t *dest;
 
-  if (PMC_IS_NULL(method_pmc)) {
-    dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND,
-        "Method '%Ss' not found for invocant of class '%Ss'", meth,
-        VTABLE_get_string(interp, VTABLE_get_class(interp, object)));
-  }
-  else {
+    if (PMC_IS_NULL(method_pmc)) {
+        dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND,
+            "Method '%Ss' not found for invocant of class '%Ss'", meth,
+            VTABLE_get_string(interp, VTABLE_get_class(interp, object)));
+    }
+    else {
+        interp->current_cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
+        PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL;
+        interp->current_object = object;
+        dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
+    }
+    goto ADDRESS(dest);
+}
+
+op tailcallmethod(invar PMC, invar PMC) :object_base :flow {
+    opcode_t * const next       = expr NEXT();
+    PMC      * const object     = $1;
+    PMC      * const method_pmc = $2;
+
+    opcode_t *dest;
+
     interp->current_cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
     PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL;
     interp->current_object = object;
     dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
-  }
-  goto ADDRESS(dest);
-}
-
-op tailcallmethod(invar PMC, invar PMC) :object_base :flow {
-  opcode_t * const next       = expr NEXT();
-  PMC      * const object     = $1;
-  PMC      * const method_pmc = $2;
-
-  opcode_t *dest;
-
-  interp->current_cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
-  PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL;
-  interp->current_object = object;
-  dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
-  goto ADDRESS(dest);
+    goto ADDRESS(dest);
 }
 
 =item B<addmethod>(invar PMC, in STR, invar PMC)
@@ -165,7 +165,7 @@ Adds $3 as a method named $2 to $1.
 =cut
 
 inline op addmethod(invar PMC, in STR, invar PMC) :object_classes {
-  VTABLE_add_method(interp, $1, $2, $3);
+    VTABLE_add_method(interp, $1, $2, $3);
 }
 
 
@@ -177,7 +177,7 @@ given method $3.
 =cut
 
 inline op can(out INT, invar PMC, in STR) :object_base {
-  $1 = VTABLE_can(interp, $2, $3);
+    $1 = VTABLE_can(interp, $2, $3);
 }
 
 
@@ -189,7 +189,7 @@ given the role of name $3.
 =cut
 
 inline op does(out INT, invar PMC, in STR) :object_base {
-  $1 = $3 ? VTABLE_does(interp, $2, $3) : 0;
+    $1 = $3 ? VTABLE_does(interp, $2, $3) : 0;
 }
 
 =item B<does>(out INT, invar PMC, in PMC)
@@ -200,7 +200,7 @@ given the role $3.
 =cut
 
 inline op does(out INT, invar PMC, in PMC) :object_base {
-  $1 = $3 ? VTABLE_does_pmc(interp, $2, $3) : 0;
+    $1 = $3 ? VTABLE_does_pmc(interp, $2, $3) : 0;
 }
 
 =item B<isa>(out INT, invar PMC, in STR)
@@ -213,7 +213,7 @@ given class $3.
 =cut
 
 inline op isa(out INT, invar PMC, in STR) :object_base {
-  $1 = $3 ? VTABLE_isa(interp, $2, $3) : 0;
+    $1 = $3 ? VTABLE_isa(interp, $2, $3) : 0;
 }
 
 inline op isa(out INT, invar PMC, in PMC) :object_base {
@@ -235,9 +235,9 @@ namespace, or string PMC.
 =cut
 
 inline op newclass(out PMC, in STR) :object_classes {
-  PMC * const name = pmc_new(interp, enum_class_String);
-  VTABLE_set_string_native(interp, name, $2);
-  $1 = pmc_new_init(interp, enum_class_Class, name);
+    PMC * const name = pmc_new(interp, enum_class_String);
+    VTABLE_set_string_native(interp, name, $2);
+    $1 = pmc_new_init(interp, enum_class_Class, name);
 }
 
 inline op newclass(out PMC, in PMC) :object_classes {
@@ -373,11 +373,11 @@ Find the PMC for a class, by string name or by key.
 =cut
 
 inline op get_class(out PMC, in STR) :object_classes {
-  $1 = Parrot_oo_get_class_str(interp, $2);
+    $1 = Parrot_oo_get_class_str(interp, $2);
 }
 
 inline op get_class(out PMC, in PMC) :object_classes {
-  $1 = Parrot_oo_get_class(interp, $2);
+    $1 = Parrot_oo_get_class(interp, $2);
 }
 
 ###############################################################################
@@ -511,11 +511,11 @@ introspection information corresponding to the requested string name.
 =cut
 
 inline op inspect(out PMC, in PMC) :object_classes {
-  $1 = VTABLE_inspect(interp, $2);
+    $1 = VTABLE_inspect(interp, $2);
 }
 
 inline op inspect(out PMC, in PMC, in STR) :object_classes {
-  $1 = VTABLE_inspect_str(interp, $2, $3);
+    $1 = VTABLE_inspect_str(interp, $2, $3);
 }
 
 =back

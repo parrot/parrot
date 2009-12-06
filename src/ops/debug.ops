@@ -117,9 +117,9 @@ Get the current line number.
 =cut
 
 inline op getline(out INT) {
-  Parrot_Context_info info;
-  Parrot_Context_get_info(interp, CURRENT_CONTEXT(interp), &info);
-  $1 = info.line;
+    Parrot_Context_info info;
+    Parrot_Context_get_info(interp, CURRENT_CONTEXT(interp), &info);
+    $1 = info.line;
 }
 
 =item B<getfile>(out STR)
@@ -129,9 +129,9 @@ Get the name of the current file.
 =cut
 
 inline op getfile(out STR) {
-  Parrot_Context_info info;
-  Parrot_Context_get_info(interp, CURRENT_CONTEXT(interp), &info);
-  $1 = info.file;
+    Parrot_Context_info info;
+    Parrot_Context_get_info(interp, CURRENT_CONTEXT(interp), &info);
+    $1 = info.file;
 }
 
 =back

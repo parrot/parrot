@@ -885,13 +885,13 @@ inline op popmark(in INT) {
     while (VTABLE_elements(interp, interp->dynamic_env)) {
         PMC * const item = VTABLE_pop_pmc(interp, interp->dynamic_env);
         if (item->vtable->base_type == enum_class_Integer
-           && VTABLE_get_integer(interp, item) == $1) {
-           found = 1;
-           break;
+         && VTABLE_get_integer(interp, item) == $1) {
+            found = 1;
+            break;
         }
 
         else if (item->vtable->base_type == enum_class_Sub
-                 || item->vtable->base_type == enum_class_NCI)
+              || item->vtable->base_type == enum_class_NCI)
             Parrot_pcc_invoke_sub_from_c_args(interp, item, "I->", 0);
     }
     if (!found)
@@ -1237,7 +1237,7 @@ when unused during the lazy sweep, triggered by C<sweep 0>.
 =cut
 
 op needs_destroy(invar PMC) {
-     Parrot_gc_pmc_needs_early_collection(interp, $1);
+    Parrot_gc_pmc_needs_early_collection(interp, $1);
 }
 
 =back

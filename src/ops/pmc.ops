@@ -184,11 +184,11 @@ Return the type of PMC in $2.
 =cut
 
 inline op typeof(out STR, invar PMC) {
-  $1 = VTABLE_name(interp, $2);
+    $1 = VTABLE_name(interp, $2);
 }
 
 inline op typeof(out PMC, invar PMC) {
-  $1 = VTABLE_get_class(interp, $2);
+    $1 = VTABLE_get_class(interp, $2);
 }
 
 ########################################
@@ -259,23 +259,23 @@ Places the answer in INT.
 =cut
 
 inline op defined(out INT, invar PMC) {
-  $1 = PMC_IS_NULL($2) ? 0 : VTABLE_defined(interp, $2);
+    $1 = PMC_IS_NULL($2) ? 0 : VTABLE_defined(interp, $2);
 }
 
 inline op defined(out INT, invar PMC, in INTKEY) {
-  $1 = PMC_IS_NULL($2) ? 0 : VTABLE_defined_keyed_int(interp, $2, $3);
+    $1 = PMC_IS_NULL($2) ? 0 : VTABLE_defined_keyed_int(interp, $2, $3);
 }
 
 inline op defined(out INT, invar PMC, in KEY) {
-  $1 = PMC_IS_NULL($2) ? 0 : VTABLE_defined_keyed(interp, $2, $3);
+    $1 = PMC_IS_NULL($2) ? 0 : VTABLE_defined_keyed(interp, $2, $3);
 }
 
 inline op exists(out INT, invar PMC, in INTKEY) {
-  $1 = PMC_IS_NULL($2) ? 0 : VTABLE_exists_keyed_int(interp, $2, $3);
+    $1 = PMC_IS_NULL($2) ? 0 : VTABLE_exists_keyed_int(interp, $2, $3);
 }
 
 inline op exists(out INT, invar PMC, in KEY) {
-  $1 = PMC_IS_NULL($2) ? 0: VTABLE_exists_keyed(interp, $2, $3);
+    $1 = PMC_IS_NULL($2) ? 0: VTABLE_exists_keyed(interp, $2, $3);
 }
 
 ########################################
@@ -289,11 +289,11 @@ Delete the specified entry $2 from aggregate $1.
 =cut
 
 inline op delete(invar PMC, in KEY) {
-  VTABLE_delete_keyed(interp, $1, $2);
+    VTABLE_delete_keyed(interp, $1, $2);
 }
 
 inline op delete(invar PMC, in INTKEY) {
-  VTABLE_delete_keyed_int(interp, $1, $2);
+    VTABLE_delete_keyed_int(interp, $1, $2);
 }
 
 ########################################
@@ -305,7 +305,7 @@ Returns the number of items in aggregate $2
 =cut
 
 inline op elements(out INT, invar PMC) {
-  $1 = VTABLE_elements(interp, $2);
+    $1 = VTABLE_elements(interp, $2);
 }
 
 =back
@@ -478,7 +478,7 @@ Set property $2 to value $3 for PMC $1.
 =cut
 
 op setprop(invar PMC, in STR, invar PMC) {
-      VTABLE_setprop(interp, $1, $2, $3);
+    VTABLE_setprop(interp, $1, $2, $3);
 }
 
 ########################################
@@ -490,7 +490,7 @@ Get property $2 of PMC $3 and put it in $1.
 =cut
 
 op getprop(out PMC, in STR, invar PMC) {
-   $1 = VTABLE_getprop(interp, $3, $2);
+    $1 = VTABLE_getprop(interp, $3, $2);
 }
 
 ########################################
@@ -502,7 +502,7 @@ Delete property $2 from PMC $1.
 =cut
 
 op delprop(invar PMC, in STR) {
-   VTABLE_delprop(interp, $1, $2);
+    VTABLE_delprop(interp, $1, $2);
 }
 
 ########################################
@@ -515,7 +515,7 @@ hash doesn't exist, the C<Null> PMC is returned.
 =cut
 
 op prophash(out PMC, invar PMC) {
-   $1 = VTABLE_getprops(interp, $2);
+    $1 = VTABLE_getprops(interp, $2);
 }
 
 =back
@@ -545,11 +545,11 @@ Set $1 to a newly created PMC from the image $2.
 =cut
 
 op freeze(out STR, invar PMC) {
-   $1 = Parrot_freeze(interp, $2);
+    $1 = Parrot_freeze(interp, $2);
 }
 
 op thaw(out PMC, in STR) {
-   $1 = Parrot_thaw(interp, $2);
+    $1 = Parrot_thaw(interp, $2);
 }
 
 =back
@@ -580,7 +580,7 @@ Register method $3 as the MMD method for the sub named $1 with signature $2.
 =cut
 
 inline op add_multi(in STR, in STR, invar PMC) {
-  Parrot_mmd_add_multi_from_long_sig(interp, $1, $2, $3);
+    Parrot_mmd_add_multi_from_long_sig(interp, $1, $2, $3);
 }
 
 =item B<find_multi>(out PMC, in STR, in STR)
@@ -590,7 +590,7 @@ Set $1 to the sub that would be called for sub named $2 with signature $3.
 =cut
 
 inline op find_multi(out PMC, in STR, in STR) {
-  $1 = Parrot_mmd_find_multi_from_long_sig(interp, $2, $3);
+    $1 = Parrot_mmd_find_multi_from_long_sig(interp, $2, $3);
 }
 
 =back
@@ -623,11 +623,11 @@ Remove one reference of $1.
 =cut
 
 op register(invar PMC) {
-  gc_register_pmc(interp, $1);
+    gc_register_pmc(interp, $1);
 }
 
 op unregister(invar PMC) {
-  gc_unregister_pmc(interp, $1);
+    gc_unregister_pmc(interp, $1);
 }
 
 
@@ -679,7 +679,7 @@ Have $1 turn itself into a PMC of type $2.
 =cut
 
 inline op morph(invar PMC, in PMC) {
-  VTABLE_morph(interp, $1, $2);
+    VTABLE_morph(interp, $1, $2);
 }
 
 =back

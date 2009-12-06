@@ -40,7 +40,7 @@ Close IO object $1
 =cut
 
 inline op close(invar PMC) :base_io {
-  Parrot_io_close(interp, $1);
+    Parrot_io_close(interp, $1);
 }
 
 ########################################
@@ -75,15 +75,15 @@ store it in $1
 =cut
 
 inline op getstdin(out PMC) :base_io {
-  $1 = _PIO_STDIN(interp);
+    $1 = _PIO_STDIN(interp);
 }
 
 inline op getstdout(out PMC) :base_io {
-  $1 = _PIO_STDOUT(interp);
+    $1 = _PIO_STDOUT(interp);
 }
 
 inline op getstderr(out PMC) :base_io {
-  $1 = _PIO_STDERR(interp);
+    $1 = _PIO_STDERR(interp);
 }
 
 #########################################
@@ -106,15 +106,15 @@ Call C<getstderr> first if you care about retaining the previous PMC.
 =cut
 
 inline op setstdin(invar PMC) :base_io {
-        _PIO_STDIN(interp) = $1;
+    _PIO_STDIN(interp) = $1;
 }
 
 inline op setstdout(invar PMC) :base_io {
-        _PIO_STDOUT(interp) = $1;
+    _PIO_STDOUT(interp) = $1;
 }
 
 inline op setstderr(invar PMC) :base_io {
-        _PIO_STDERR(interp) = $1;
+    _PIO_STDERR(interp) = $1;
 }
 
 #########################################
@@ -177,34 +177,34 @@ Print $1 to standard output.
 =cut
 
 inline op print(in INT) :base_io {
-  Parrot_io_printf(interp, INTVAL_FMT, (INTVAL)$1);
+    Parrot_io_printf(interp, INTVAL_FMT, (INTVAL)$1);
 }
 
 inline op print(in NUM) :base_io {
 #ifdef PARROT_HAS_NEGATIVE_ZERO
-  Parrot_io_printf(interp, FLOATVAL_FMT, $1);
-#else
-  /* Workaround for older msvcrt and openbsd. TT #313 */
-  if (Parrot_is_nzero($1)) {
-    Parrot_io_printf(interp, "-0");
-  }
-  else {
     Parrot_io_printf(interp, FLOATVAL_FMT, $1);
-  }
+#else
+    /* Workaround for older msvcrt and openbsd. TT #313 */
+    if (Parrot_is_nzero($1)) {
+        Parrot_io_printf(interp, "-0");
+    }
+    else {
+        Parrot_io_printf(interp, FLOATVAL_FMT, $1);
+    }
 #endif
 }
 
 op print(in STR) :base_io {
-  STRING * const s = $1;
-  if (s && Parrot_str_byte_length(interp, s))
-    Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+    STRING * const s = $1;
+    if (s && Parrot_str_byte_length(interp, s))
+        Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
 }
 
 op print(invar PMC) :base_io {
-  PMC * const p = $1;
-  STRING * const s = (VTABLE_get_string(interp, p));
-  if (s)
-    Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+    PMC * const p = $1;
+    STRING * const s = (VTABLE_get_string(interp, p));
+    if (s)
+        Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
 }
 
 =item B<say>(in INT)
@@ -220,28 +220,28 @@ Print $1 to standard output with a trailing newline.
 =cut
 
 inline op say(in INT) :base_io {
-  Parrot_io_printf(interp, INTVAL_FMT "\n", (INTVAL)$1);
+    Parrot_io_printf(interp, INTVAL_FMT "\n", (INTVAL)$1);
 }
 
 inline op say(in NUM) :base_io {
 #ifdef PARROT_HAS_NEGATIVE_ZERO
-  Parrot_io_printf(interp, FLOATVAL_FMT "\n", $1);
+    Parrot_io_printf(interp, FLOATVAL_FMT "\n", $1);
 #else
-  /* Workaround for older msvcrt and openbsd. TT #313 */
-  if (Parrot_is_nzero($1)) {
-      Parrot_io_printf(interp, "-0\n");
-  }
-  else {
-      Parrot_io_printf(interp, FLOATVAL_FMT "\n", $1);
-  }
+    /* Workaround for older msvcrt and openbsd. TT #313 */
+    if (Parrot_is_nzero($1)) {
+        Parrot_io_printf(interp, "-0\n");
+    }
+    else {
+        Parrot_io_printf(interp, FLOATVAL_FMT "\n", $1);
+    }
 #endif
 }
 
 op say(in STR) :base_io {
-  STRING * const s = $1;
-  if (s && Parrot_str_byte_length(interp, s))
-    Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
-  Parrot_io_putps(interp, _PIO_STDOUT(interp), Parrot_str_new_constant(interp, "\n"));
+    STRING * const s = $1;
+    if (s && Parrot_str_byte_length(interp, s))
+        Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+    Parrot_io_putps(interp, _PIO_STDOUT(interp), Parrot_str_new_constant(interp, "\n"));
 }
 
 op say(invar PMC) :base_io {
@@ -279,24 +279,24 @@ Print $1 to standard error.
 =cut
 
 op printerr(in INT) :base_io {
-  Parrot_io_eprintf(interp, INTVAL_FMT, $1);
+    Parrot_io_eprintf(interp, INTVAL_FMT, $1);
 }
 
 op printerr(in NUM) :base_io {
-  Parrot_io_eprintf(interp, FLOATVAL_FMT, $1);
+    Parrot_io_eprintf(interp, FLOATVAL_FMT, $1);
 }
 
 op printerr(in STR) :base_io {
-  STRING * const s = $1;
-  if (s && Parrot_str_byte_length(interp, s))
-    Parrot_io_putps(interp, _PIO_STDERR(interp), s);
+    STRING * const s = $1;
+    if (s && Parrot_str_byte_length(interp, s))
+        Parrot_io_putps(interp, _PIO_STDERR(interp), s);
 }
 
 op printerr(invar PMC) :base_io {
-  PMC * const p = $1;
-  STRING * const s = (VTABLE_get_string(interp, p));
-  if (s)
-    Parrot_io_putps(interp, _PIO_STDERR(interp), s);
+    PMC * const p = $1;
+    STRING * const s = (VTABLE_get_string(interp, p));
+    if (s)
+        Parrot_io_putps(interp, _PIO_STDERR(interp), s);
 }
 
 ##########################################
@@ -314,30 +314,30 @@ Print $2 on the IO stream object $1.
 =cut
 
 op print(invar PMC, in INT) :base_io {
-  if ($1) {
-    STRING * const s = Parrot_str_from_int(interp, $2);
-    Parrot_io_putps(interp, $1, s);
-  }
+    if ($1) {
+        STRING * const s = Parrot_str_from_int(interp, $2);
+        Parrot_io_putps(interp, $1, s);
+    }
 }
 
 op print(invar PMC, in NUM) :base_io {
-  if ($1) {
-    STRING * const s = Parrot_sprintf_c(interp, FLOATVAL_FMT, $2);
-    Parrot_io_putps(interp, $1, s);
-  }
+    if ($1) {
+        STRING * const s = Parrot_sprintf_c(interp, FLOATVAL_FMT, $2);
+        Parrot_io_putps(interp, $1, s);
+    }
 }
 
 op print(invar PMC, in STR) :base_io {
-  if ($2 && $1) {
-    Parrot_io_putps(interp, $1, $2);
-  }
+    if ($2 && $1) {
+        Parrot_io_putps(interp, $1, $2);
+    }
 }
 
 op print(invar PMC, invar PMC) :base_io {
-  if ($2 && $1) {
-    STRING * const s = VTABLE_get_string(interp, $2);
-    Parrot_io_putps(interp, $1, s);
-  }
+    if ($2 && $1) {
+        STRING * const s = VTABLE_get_string(interp, $2);
+        Parrot_io_putps(interp, $1, s);
+    }
 }
 
 ##########################################
@@ -353,11 +353,11 @@ Read up to N bytes from IO PMC stream.
 =cut
 
 op read(out STR, in INT) :base_io {
-  $1 = Parrot_io_reads(interp, _PIO_STDIN(interp), (size_t)$2);
+    $1 = Parrot_io_reads(interp, _PIO_STDIN(interp), (size_t)$2);
 }
 
 op read(out STR, invar PMC, in INT) :base_io {
-  $1 = Parrot_io_reads(interp, $2, (size_t)$3);
+    $1 = Parrot_io_reads(interp, $2, (size_t)$3);
 }
 
 =item B<readline>(out STR, invar PMC)
@@ -386,21 +386,21 @@ remove it from the stream.
 =cut
 
 op peek(out STR) :base_io {
-  STRING ** const s = &$1;
+    STRING ** const s = &$1;
 
-  *s = NULL;
-  if (Parrot_io_peek(interp, _PIO_STDIN(interp), s) < 0) {
-    $1 = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
-  }
+    *s = NULL;
+    if (Parrot_io_peek(interp, _PIO_STDIN(interp), s) < 0) {
+        $1 = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
+    }
 }
 
 op peek(out STR, invar PMC) :base_io {
-  STRING ** const s = &$1;
+    STRING ** const s = &$1;
 
-  *s = NULL;
-  if (Parrot_io_peek(interp, $2, s) < 0) {
-    $1 = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
-  }
+    *s = NULL;
+    if (Parrot_io_peek(interp, $2, s) < 0) {
+        $1 = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
+    }
 }
 
 ##########################################
@@ -428,11 +428,11 @@ items currently are:
 =cut
 
 op stat(out INT, in STR, in INT) {
-  $1 = Parrot_stat_info_intval(interp, $2, $3);
+    $1 = Parrot_stat_info_intval(interp, $2, $3);
 }
 
 op stat(out INT, in INT, in INT) {
-  $1 = Parrot_fstat_info_intval(interp, $2, $3);
+    $1 = Parrot_fstat_info_intval(interp, $2, $3);
 }
 
 
@@ -499,17 +499,17 @@ Get the current file positon of stream $3 in two parts of 32-bit each
 =cut
 
 op tell(out INT, invar PMC) :base_io {
-  if ($2)
-    $1 = (INTVAL)Parrot_io_tell(interp, $2);
+    if ($2)
+        $1 = (INTVAL)Parrot_io_tell(interp, $2);
 }
 
 op tell(out INT, out INT, invar PMC) :base_io {
-  if ($3) {
-    PIOOFF_T pos;
-    pos = Parrot_io_tell(interp, $3);
-    $1 = (INTVAL)(pos >> 31);
-    $2 = (INTVAL)(pos & 0xffffffff);
-  }
+    if ($3) {
+        PIOOFF_T pos;
+        pos = Parrot_io_tell(interp, $3);
+        $1 = (INTVAL)(pos >> 31);
+        $2 = (INTVAL)(pos & 0xffffffff);
+    }
 }
 
 =back
