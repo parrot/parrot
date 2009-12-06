@@ -100,9 +100,6 @@ struct PMC {
 
 #define PMC_data(pmc)                   (pmc)->data
 #define PMC_data_typed(pmc, type) (type)(pmc)->data
-/* do not allow PMC_data2 as lvalue */
-#define PMC_data0(pmc)            (1 ? (pmc)->data : 0)
-#define PMC_data0_typed(pmc)      (type)(1 ? (pmc)->data : 0)
 #define PMC_metadata(pmc)         ((pmc)->_metadata)
 #define PMC_sync(pmc)             ((pmc)->_synchronize)
 
