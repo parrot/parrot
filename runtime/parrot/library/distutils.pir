@@ -324,6 +324,7 @@ Entry point.
     goto L1
   L2:
 
+    push_eh _handler
     $P0 = iter steps
     if $P0 goto L11
     # default step
@@ -338,6 +339,12 @@ Entry point.
     say $S0
     run_step('usage')
   L12:
+    pop_eh
+    end
+  _handler:
+    .local pmc ex
+    .get_results (ex)
+    rethrow ex
 .end
 
 =item run_step
@@ -3333,6 +3340,15 @@ Return the whole config
     say cmd
   L1:
     $I0 = spawnw cmd
+    unless $I0 goto L2
+    $S0 = "exit status: "
+    $S1 = $I0
+    $S0 .= $S1
+    $S0 .= "\ncommand: "
+    $S0 .= cmd
+    $S0 .= "\n"
+    die $S0
+  L2:
 .end
 
 .include 'stat.pasm'
