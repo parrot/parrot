@@ -116,29 +116,29 @@ See F<docs/pdds/pdd02_vtables.pod> for initializers.
         for (i = 0; i < n; i += 2) {
             const INTVAL key = VTABLE_get_integer_keyed_int(INTERP, init, i);
             switch (key) {
-                case PARROT_TIMER_SEC:
-                case PARROT_TIMER_USEC:
-                case PARROT_TIMER_REPEAT:
-                case PARROT_TIMER_RUNNING:
-                    {
+              case PARROT_TIMER_SEC:
+              case PARROT_TIMER_USEC:
+              case PARROT_TIMER_REPEAT:
+              case PARROT_TIMER_RUNNING:
+                {
                     const INTVAL val = VTABLE_get_integer_keyed_int(INTERP, init, i+1);
                     SELF.set_integer_keyed_int(key, val);
-                    }
-                    break;
-                case PARROT_TIMER_NSEC:
-                    {
+                }
+                break;
+              case PARROT_TIMER_NSEC:
+                {
                     const FLOATVAL nval = VTABLE_get_number_keyed_int(INTERP, init, i+1);
                     SELF.set_number_keyed_int(key, nval);
-                    }
-                    break;
-                case PARROT_TIMER_HANDLER:
-                    {
+                }
+                break;
+              case PARROT_TIMER_HANDLER:
+                {
                     PMC * const pval = VTABLE_get_pmc_keyed_int(INTERP, init, i+1);
                     SELF.set_pmc_keyed_int(key, pval);
-                    }
-                    break;
-                default:
-                    break;
+                }
+                break;
+              default:
+                break;
             }
         }
     }
@@ -194,18 +194,18 @@ Returns the timer info for C<key>.
         const FLOATVAL absolute_time = core_struct->birthtime + core_struct->duration;
 
         switch (key) {
-            case PARROT_TIMER_SEC:
-                return (INTVAL)absolute_time;
-            case PARROT_TIMER_USEC:
-                return (INTVAL)((absolute_time - (INTVAL)absolute_time) *1000000.0);
-            case PARROT_TIMER_REPEAT:
-                return (INTVAL) core_struct->repeat;
-            case PARROT_TIMER_INTERVAL:
-                return (INTVAL) core_struct->interval;
-            case PARROT_TIMER_RUNNING:
-                return 0;
-            default:
-                return -1;
+          case PARROT_TIMER_SEC:
+            return (INTVAL)absolute_time;
+          case PARROT_TIMER_USEC:
+            return (INTVAL)((absolute_time - (INTVAL)absolute_time) *1000000.0);
+          case PARROT_TIMER_REPEAT:
+            return (INTVAL) core_struct->repeat;
+          case PARROT_TIMER_INTERVAL:
+            return (INTVAL) core_struct->interval;
+          case PARROT_TIMER_RUNNING:
+            return 0;
+          default:
+            return -1;
         }
     }
 
@@ -242,12 +242,12 @@ Returns the number associated with C<key>.
         Parrot_Timer_attributes * const core_struct = PARROT_TIMER(SELF);
 
         switch (key) {
-            case PARROT_TIMER_NSEC:
-                return core_struct->birthtime + core_struct->duration;
-            case PARROT_TIMER_INTERVAL:
-                return core_struct->interval;
-            default:
-                break;
+          case PARROT_TIMER_NSEC:
+            return core_struct->birthtime + core_struct->duration;
+          case PARROT_TIMER_INTERVAL:
+            return core_struct->interval;
+          default:
+            break;
         }
 
         return -1.0;
@@ -267,26 +267,26 @@ Sets the value associated with C<key> to C<value>.
         Parrot_Timer_attributes * const core_struct = PARROT_TIMER(SELF);
 
         switch (key) {
-            case PARROT_TIMER_SEC:
-                core_struct->duration = value;
-                break;
-            case PARROT_TIMER_USEC:
-                core_struct->duration += value / 1000000.0;
-                break;
-            case PARROT_TIMER_REPEAT:
-                core_struct->repeat = value;
-                break;
-            case PARROT_TIMER_INTERVAL:
-                core_struct->interval = value;
-                break;
-            case PARROT_TIMER_RUNNING:
-                if (value)
-                    Parrot_cx_schedule_task(INTERP, SELF);
-                else
-                    Parrot_cx_delete_task(INTERP, SELF);
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
+          case PARROT_TIMER_SEC:
+            core_struct->duration = value;
+            break;
+          case PARROT_TIMER_USEC:
+            core_struct->duration += value / 1000000.0;
+            break;
+          case PARROT_TIMER_REPEAT:
+            core_struct->repeat = value;
+            break;
+          case PARROT_TIMER_INTERVAL:
+            core_struct->interval = value;
+            break;
+          case PARROT_TIMER_RUNNING:
+            if (value)
+                Parrot_cx_schedule_task(INTERP, SELF);
+            else
+                Parrot_cx_delete_task(INTERP, SELF);
+            break;
+          default:
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
                     EXCEPTION_INVALID_OPERATION,
                     "Unknown timer type in Timer.set_integer_keyed_int: %d",
                     key);
@@ -342,14 +342,14 @@ Sets the floating-point value associated with C<key> to C<value>.
         Parrot_Timer_attributes * const core_struct = PARROT_TIMER(SELF);
 
         switch (key) {
-            case PARROT_TIMER_NSEC:
-                core_struct->duration = value;
-                break;
-            case PARROT_TIMER_INTERVAL:
-                core_struct->interval = value;
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
+          case PARROT_TIMER_NSEC:
+            core_struct->duration = value;
+            break;
+          case PARROT_TIMER_INTERVAL:
+            core_struct->interval = value;
+            break;
+          default:
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
                     EXCEPTION_INVALID_OPERATION,
                     "Unknown timer attribute in Timer.set_number_keyed_int: %d",
                     key);

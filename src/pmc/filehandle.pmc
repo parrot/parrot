@@ -172,11 +172,11 @@ For internal usage only, subject to change without notice.
     VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
         INTVAL result;
         switch (key) {
-            case 0:
-                GET_ATTR_process_id(INTERP, SELF, result);
-                break;
-            default:
-                result = 0;
+          case 0:
+            GET_ATTR_process_id(INTERP, SELF, result);
+            break;
+          default:
+            result = 0;
         }
 
         return result;
@@ -196,11 +196,11 @@ For internal usage only, subject to change without notice.
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
         switch (key) {
-            case 0:
-                SET_ATTR_process_id(INTERP, SELF, value);
-                break;
-            default:
-                break;
+          case 0:
+            SET_ATTR_process_id(INTERP, SELF, value);
+            break;
+          default:
+            break;
         }
     }
 

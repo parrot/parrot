@@ -893,8 +893,8 @@ true (1) is returned; otherwise, false (0) is returned.
 */
 
     VTABLE INTVAL isa_pmc(PMC *lookup) {
-       Hash   * const isa_hash = SELF->vtable->isa_hash;
-       STRING *pmc_name;
+        Hash   * const isa_hash = SELF->vtable->isa_hash;
+        STRING *pmc_name;
 
         if (PMC_IS_NULL(lookup))
             return 0;

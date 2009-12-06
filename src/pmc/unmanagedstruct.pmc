@@ -238,55 +238,55 @@ static INTVAL
 ret_int(PARROT_INTERP, const char *p, int type)
 {
     switch (type) {
-        case enum_type_INTVAL:
-            return *(const INTVAL*) p;
+      case enum_type_INTVAL:
+        return *(const INTVAL*) p;
 
 #if INT_SIZE == 4
-        case enum_type_int32:
-        case enum_type_uint32:
+      case enum_type_int32:
+      case enum_type_uint32:
 #endif
 
 #if INT_SIZE == 8
-        case enum_type_int64:
-        case enum_type_uint64:
+      case enum_type_int64:
+      case enum_type_uint64:
 #endif
 
-        case enum_type_int:
-            return *(const int *)p;
+      case enum_type_int:
+        return *(const int *)p;
 
 #if (LONG_SIZE == 4) && !(INT_SIZE == 4) /* Unlikely combination. */
-        case enum_type_int32:
-        case enum_type_uint32:
+      case enum_type_int32:
+      case enum_type_uint32:
 #endif
 
 #if (LONG_SIZE == 8) && !(INT_SIZE == 8)
-        case enum_type_int64:
-        case enum_type_uint64:
+      case enum_type_int64:
+      case enum_type_uint64:
 #endif
 
-        case enum_type_long:
-        case enum_type_ulong:
-            return *(const long *)p;
+      case enum_type_long:
+      case enum_type_ulong:
+        return *(const long *)p;
 
 #if SHORT_SIZE == 2
-        case enum_type_int16:
-        case enum_type_uint16:
+      case enum_type_int16:
+      case enum_type_uint16:
 #endif
 
         /* If SHORT_SIZE != 2 getting int16s requires extra tricks. */
-        case enum_type_short:
-            return *(const short *)p;
-        case enum_type_uint8:
-        case enum_type_uchar:
+      case enum_type_short:
+        return *(const short *)p;
+      case enum_type_uint8:
+      case enum_type_uchar:
         {
             const unsigned char *uc = (const unsigned char *)p;
             return (INTVAL)*uc;
         }
-        case enum_type_int8:
-        case enum_type_char:
-            return *p;
-        default:
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+      case enum_type_int8:
+      case enum_type_char:
+        return *p;
+      default:
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "returning unhandled int type in struct");
     }
 }
@@ -310,14 +310,14 @@ static FLOATVAL
 ret_float(PARROT_INTERP, const char *p, int type)
 {
     switch (type) {
-        case enum_type_FLOATVAL:
-            return (FLOATVAL) *(const FLOATVAL *)p;
-        case enum_type_float:
-            return (FLOATVAL) *(const float *)p;
-        case enum_type_double:
-            return (FLOATVAL) *(const double *)p;
-        default:
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+      case enum_type_FLOATVAL:
+        return (FLOATVAL) *(const FLOATVAL *)p;
+      case enum_type_float:
+        return (FLOATVAL) *(const float *)p;
+      case enum_type_double:
+        return (FLOATVAL) *(const double *)p;
+      default:
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "returning unhandled float type in struct");
     }
 }
@@ -377,40 +377,40 @@ ret_pmc(PARROT_INTERP, PMC *pmc, char *p, int type, INTVAL idx)
     PMC *ptr  = VTABLE_get_pmc_keyed_int(interp, init, idx * 3);
 
     switch (type) {
-        case enum_type_func_ptr:
-            /* this is a raw function pointer - not a PMC */
-            ret  = *(PMC**) p;
+      case enum_type_func_ptr:
+        /* this is a raw function pointer - not a PMC */
+        ret  = *(PMC**) p;
 
-            /* now check if initializer has a signature attached */
-            if (PMC_metadata(ptr)) {
-                STRING *signature_str = CONST_STRING(interp, "_signature");
-                PMC *sig = VTABLE_getprop(interp, ptr, signature_str);
-                if (VTABLE_defined(interp, sig)) {
-                    STRING *sig_str = VTABLE_get_string(interp, sig);
-                    ret             = pmc_new(interp, enum_class_NCI);
-                    VTABLE_set_pointer_keyed_str(interp, ret, sig_str,
+        /* now check if initializer has a signature attached */
+        if (PMC_metadata(ptr)) {
+            STRING *signature_str = CONST_STRING(interp, "_signature");
+            PMC *sig = VTABLE_getprop(interp, ptr, signature_str);
+            if (VTABLE_defined(interp, sig)) {
+                STRING *sig_str = VTABLE_get_string(interp, sig);
+                ret             = pmc_new(interp, enum_class_NCI);
+                VTABLE_set_pointer_keyed_str(interp, ret, sig_str,
                             *(PMC **)p);
-                }
             }
+        }
 
-            return ret;
-        case enum_type_struct_ptr:
-            /* check the metadata for an initializer */
+        return ret;
+      case enum_type_struct_ptr:
+        /* check the metadata for an initializer */
 
-            /* grab the struct from the metadata */
-            if (PMC_metadata(ptr))
-                ret = VTABLE_getprop(interp, ptr, CONST_STRING(interp, "_struct"));
-            else {
-                Parrot_ex_throw_from_c_args(interp, NULL,
+        /* grab the struct from the metadata */
+        if (PMC_metadata(ptr))
+            ret = VTABLE_getprop(interp, ptr, CONST_STRING(interp, "_struct"));
+        else {
+            Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_OPERATION,
                     "no initializer available for nested struct");
-            }
+        }
 
-            VTABLE_set_pointer(interp, ret, *(void**)p);
+        VTABLE_set_pointer(interp, ret, *(void**)p);
 
-            return ret;
-        default:
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        return ret;
+      default:
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                     "returning unhandled pmc type (%d) in struct", type);
     }
 }
@@ -428,27 +428,27 @@ static void
 set_int(PARROT_INTERP, char *p, int type, INTVAL value)
 {
     switch (type) {
-        case enum_type_uint8:
-        case enum_type_int8:
-        case enum_type_char:
-        case enum_type_uchar:
-            *(char *)p = (char)(value & 0xff);
-            break;
-        case enum_type_INTVAL:
-            *(INTVAL *)p = value;
-            break;
-        case enum_type_int:
-            *(int *)p = value;
-            break;
-        case enum_type_int16:
-        case enum_type_uint16:
-        case enum_type_short:
-            *(short *)p = (short)value;
-            break;
-        default:
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+      case enum_type_uint8:
+      case enum_type_int8:
+      case enum_type_char:
+      case enum_type_uchar:
+        *(char *)p = (char)(value & 0xff);
+        break;
+      case enum_type_INTVAL:
+        *(INTVAL *)p = value;
+        break;
+      case enum_type_int:
+        *(int *)p = value;
+        break;
+      case enum_type_int16:
+      case enum_type_uint16:
+      case enum_type_short:
+        *(short *)p = (short)value;
+        break;
+      default:
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "setting unhandled int type in struct");
-            break;
+        break;
     }
 }
 
@@ -468,19 +468,19 @@ static void
 set_float(PARROT_INTERP, char *p, int type, FLOATVAL value)
 {
     switch (type) {
-        case enum_type_FLOATVAL:
-            *(FLOATVAL *)p = (FLOATVAL)value;
-            break;
-        case enum_type_float:
-            *(float *)p = (float)value;
-            break;
-        case enum_type_double:
-            *(double *)p = (double)value;
-            break;
-        default:
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+      case enum_type_FLOATVAL:
+        *(FLOATVAL *)p = (FLOATVAL)value;
+        break;
+      case enum_type_float:
+        *(float *)p = (float)value;
+        break;
+      case enum_type_double:
+        *(double *)p = (double)value;
+        break;
+      default:
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "setting unhandled float type in struct");
-            break;
+        break;
     }
 }
 

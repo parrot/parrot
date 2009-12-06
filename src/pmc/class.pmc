@@ -537,36 +537,36 @@ arguments. The class is attached to the current HLL namespace.
 
         /* fast attempt to determine init_data type */
         switch (arg_type) {
-            case enum_class_String:
-            case enum_class_Key:
-            case enum_class_ResizableStringArray:
-            case enum_class_NameSpace:
+          case enum_class_String:
+          case enum_class_Key:
+          case enum_class_ResizableStringArray:
+          case enum_class_NameSpace:
+            /* set only the name property */
+            arg = pmc_new(interp, enum_class_Hash);
+            VTABLE_set_pmc_keyed_str(interp, arg, name_str, init_data);
+            break;
+
+          case enum_class_Hash:
+            arg = init_data;
+            break;
+
+            /* slow attempt to determine init_data type */
+          default:
+            if (VTABLE_isa(interp, init_data, CONST_STRING(interp, "String"))
+             || VTABLE_isa(interp, init_data, CONST_STRING(interp, "Key"))
+             || VTABLE_isa(interp, init_data, CONST_STRING(interp, "ResizableStringArray"))) {
                 /* set only the name property */
                 arg = pmc_new(interp, enum_class_Hash);
                 VTABLE_set_pmc_keyed_str(interp, arg, name_str, init_data);
-                break;
+            }
 
-            case enum_class_Hash:
+            if (VTABLE_isa(interp, init_data, CONST_STRING(interp, "Hash")))
                 arg = init_data;
-                break;
-
-            /* slow attempt to determine init_data type */
-            default:
-                if (VTABLE_isa(interp, init_data, CONST_STRING(interp, "String"))
-                || VTABLE_isa(interp, init_data, CONST_STRING(interp, "Key"))
-                || VTABLE_isa(interp, init_data, CONST_STRING(interp, "ResizableStringArray"))) {
-                    /* set only the name property */
-                    arg = pmc_new(interp, enum_class_Hash);
-                    VTABLE_set_pmc_keyed_str(interp, arg, name_str, init_data);
-                }
-
-                if (VTABLE_isa(interp, init_data, CONST_STRING(interp, "Hash")))
-                    arg = init_data;
-                else
-                    Parrot_ex_throw_from_c_args(INTERP, NULL,
+            else
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
                         EXCEPTION_INVALID_OPERATION,
                             "Invalid class name key in init_pmc for Class");
-                break;
+            break;
         }
 
         /* Initialize the class with the supplied data. */

@@ -60,28 +60,28 @@ Creates and returns a clone of the key.
 
         for (; key ;) {
             switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
-                case KEY_integer_FLAG:
-                case KEY_integer_FLAG | KEY_register_FLAG:
-                    key_set_integer(INTERP, dkey, key_integer(INTERP, key));
-                    break;
-                case KEY_number_FLAG:
-                case KEY_number_FLAG | KEY_register_FLAG:
-                    key_set_number(INTERP, dkey, key_number(INTERP, key));
-                    break;
-                case KEY_string_FLAG:
-                case KEY_string_FLAG | KEY_register_FLAG:
-                    key_set_string(INTERP, dkey,
+              case KEY_integer_FLAG:
+              case KEY_integer_FLAG | KEY_register_FLAG:
+                key_set_integer(INTERP, dkey, key_integer(INTERP, key));
+                break;
+              case KEY_number_FLAG:
+              case KEY_number_FLAG | KEY_register_FLAG:
+                key_set_number(INTERP, dkey, key_number(INTERP, key));
+                break;
+              case KEY_string_FLAG:
+              case KEY_string_FLAG | KEY_register_FLAG:
+                key_set_string(INTERP, dkey,
                         Parrot_str_copy(INTERP, VTABLE_get_string(INTERP, key)));
-                    break;
-                case KEY_pmc_FLAG:
-                case KEY_pmc_FLAG | KEY_register_FLAG:
-                    {
+                break;
+              case KEY_pmc_FLAG:
+              case KEY_pmc_FLAG | KEY_register_FLAG:
+                {
                     PMC * const p = key_pmc(INTERP, key);
                     key_set_pmc(INTERP, dkey, VTABLE_clone(INTERP, p));
-                    }
-                    break;
-                default:
-                    break;
+                }
+                break;
+              default:
+                break;
             }
 
             key = key_next(INTERP, key);
@@ -330,22 +330,22 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
 
         /* and contents of this key component */
         switch (flags) {
-            case KEY_integer_FLAG:
-            case KEY_integer_FLAG | KEY_register_FLAG:
-                VTABLE_push_integer(INTERP, io, key_integer(INTERP, SELF));
-                break;
-            case KEY_number_FLAG:
-            case KEY_number_FLAG | KEY_register_FLAG:
-                VTABLE_push_float(INTERP, io, key_number(INTERP, SELF));
-                break;
-            case KEY_string_FLAG:
-            case KEY_string_FLAG | KEY_register_FLAG:
-                VTABLE_push_string(INTERP, io, key_string(INTERP, SELF));
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
+          case KEY_integer_FLAG:
+          case KEY_integer_FLAG | KEY_register_FLAG:
+            VTABLE_push_integer(INTERP, io, key_integer(INTERP, SELF));
+            break;
+          case KEY_number_FLAG:
+          case KEY_number_FLAG | KEY_register_FLAG:
+            VTABLE_push_float(INTERP, io, key_number(INTERP, SELF));
+            break;
+          case KEY_string_FLAG:
+          case KEY_string_FLAG | KEY_register_FLAG:
+            VTABLE_push_string(INTERP, io, key_string(INTERP, SELF));
+            break;
+          default:
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
                     "Unsupported key type in Key.freeze");
-                break;
+            break;
         }
     }
 
@@ -361,19 +361,19 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
 
         /* get contents */
         switch (flags) {
-            case KEY_integer_FLAG:
-                SET_ATTR_int_key(INTERP, SELF, VTABLE_shift_integer(INTERP, io));
-                break;
-            case KEY_number_FLAG:
-                VTABLE_set_number_native(INTERP, SELF, VTABLE_shift_float(INTERP, io));
-                break;
-            case KEY_string_FLAG:
-                VTABLE_set_string_native(INTERP, SELF, VTABLE_shift_string(INTERP, io));
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
+          case KEY_integer_FLAG:
+            SET_ATTR_int_key(INTERP, SELF, VTABLE_shift_integer(INTERP, io));
+            break;
+          case KEY_number_FLAG:
+            VTABLE_set_number_native(INTERP, SELF, VTABLE_shift_float(INTERP, io));
+            break;
+          case KEY_string_FLAG:
+            VTABLE_set_string_native(INTERP, SELF, VTABLE_shift_string(INTERP, io));
+            break;
+          default:
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
                     "Unsupported key type in Key.thaw");
-                break;
+            break;
         }
     }
 

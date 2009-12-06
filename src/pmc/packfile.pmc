@@ -44,18 +44,18 @@ copy_packfile_header(PARROT_INTERP, PMC *self, PackFile *pf) {
 }
 
 pmclass Packfile auto_attrs {
-        ATTR INTVAL wordsize;
-        ATTR INTVAL byteorder;
-        ATTR INTVAL fptype;
-        ATTR INTVAL version_major;
-        ATTR INTVAL version_minor;
-        ATTR INTVAL version_patch;
-        ATTR INTVAL bytecode_major;
-        ATTR INTVAL bytecode_minor;
-        ATTR INTVAL uuid_type;
-        ATTR STRING *uuid;
+    ATTR INTVAL wordsize;
+    ATTR INTVAL byteorder;
+    ATTR INTVAL fptype;
+    ATTR INTVAL version_major;
+    ATTR INTVAL version_minor;
+    ATTR INTVAL version_patch;
+    ATTR INTVAL bytecode_major;
+    ATTR INTVAL bytecode_minor;
+    ATTR INTVAL uuid_type;
+    ATTR STRING *uuid;
 
-        ATTR PMC    *directory;
+    ATTR PMC    *directory;
 /*
 
 =item C<void init()>

@@ -47,12 +47,12 @@ Initialize the CodeString.
 
 */
 
-  VTABLE void init() {
-      Parrot_CodeString_attributes * const attrs = PARROT_CODESTRING(SELF);
-      SUPER();
-      attrs->linepos = PMCNULL;
-      PObj_custom_mark_SET(SELF);
-  }
+    VTABLE void init() {
+        Parrot_CodeString_attributes * const attrs = PARROT_CODESTRING(SELF);
+        SUPER();
+        attrs->linepos = PMCNULL;
+        PObj_custom_mark_SET(SELF);
+    }
 
 /*
 
@@ -64,12 +64,12 @@ Mark the CodeString as live.
 
 */
 
-  VTABLE void mark() {
-      Parrot_CodeString_attributes * const attrs = PARROT_CODESTRING(SELF);
-      SUPER();
-      if (!attrs) return;
-      Parrot_gc_mark_PMC_alive(INTERP, attrs->linepos);
-  }
+    VTABLE void mark() {
+        Parrot_CodeString_attributes * const attrs = PARROT_CODESTRING(SELF);
+        SUPER();
+        if (!attrs) return;
+        Parrot_gc_mark_PMC_alive(INTERP, attrs->linepos);
+    }
 
 /*
 

@@ -630,34 +630,34 @@ preserve key/value order.
         info->container  = SELF;
 
         switch (info->what) {
-            case VISIT_THAW_NORMAL:
-            case VISIT_THAW_CONSTANTS:
-                SUPER(info);
-                break;
+          case VISIT_THAW_NORMAL:
+          case VISIT_THAW_CONSTANTS:
+            SUPER(info);
+            break;
 
-            case VISIT_FREEZE_NORMAL:
-            case VISIT_FREEZE_AT_DESTRUCT:
-                {
-                    Hash     * const hash = (Hash *)SELF.get_pointer();
-                    IMAGE_IO * const io   = info->image_io;
-                    const UINTVAL entries = hash->entries;
-                    UINTVAL i;
+          case VISIT_FREEZE_NORMAL:
+          case VISIT_FREEZE_AT_DESTRUCT:
+            {
+                Hash     * const hash = (Hash *)SELF.get_pointer();
+                IMAGE_IO * const io   = info->image_io;
+                const UINTVAL entries = hash->entries;
+                UINTVAL i;
 
-                    for (i = 0; i < entries; i++) {
-                        HashBucket * const b   = hash->bs + i;
+                for (i = 0; i < entries; i++) {
+                    HashBucket * const b   = hash->bs + i;
 
-                        if (b) {
-                            STRING * const key = (STRING *)b->key;
-                            if (key) {
-                                VTABLE_push_string(interp, io, key);
-                                (info->visit_pmc_now)(interp, (PMC *)b->value, info);
-                            }
+                    if (b) {
+                        STRING * const key = (STRING *)b->key;
+                        if (key) {
+                            VTABLE_push_string(interp, io, key);
+                            (info->visit_pmc_now)(interp, (PMC *)b->value, info);
                         }
                     }
                 }
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(interp, NULL,
+            }
+            break;
+          default:
+            Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_OPERATION,
                     "unhandled visit action (%d)", info->what);
         }

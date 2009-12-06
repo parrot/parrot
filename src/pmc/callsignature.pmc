@@ -186,18 +186,18 @@ static INTVAL
 autobox_intval(PARROT_INTERP, Pcc_cell *cell)
 {
     switch (CELL_TYPE_MASK(cell)) {
-        case INTCELL:
-            return CELL_INT(cell);
-        case FLOATCELL:
-            return (INTVAL)CELL_FLOAT(cell);
-        case STRINGCELL:
-            return CELL_STRING(cell) ? Parrot_str_to_int(interp, CELL_STRING(cell)) : 0;
-        case PMCCELL:
-            return PMC_IS_NULL(CELL_PMC(cell))
-                    ? 0
-                    : VTABLE_get_integer(interp, CELL_PMC(cell));
-        default:
-            break;
+      case INTCELL:
+        return CELL_INT(cell);
+      case FLOATCELL:
+        return (INTVAL)CELL_FLOAT(cell);
+      case STRINGCELL:
+        return CELL_STRING(cell) ? Parrot_str_to_int(interp, CELL_STRING(cell)) : 0;
+      case PMCCELL:
+        return PMC_IS_NULL(CELL_PMC(cell))
+                ? 0
+                : VTABLE_get_integer(interp, CELL_PMC(cell));
+      default:
+        break;
     }
 
     /* exception */
@@ -208,18 +208,18 @@ static FLOATVAL
 autobox_floatval(PARROT_INTERP, Pcc_cell *cell)
 {
     switch (CELL_TYPE_MASK(cell)) {
-        case INTCELL:
-            return (FLOATVAL)CELL_INT(cell);
-        case FLOATCELL:
-            return CELL_FLOAT(cell);
-        case STRINGCELL:
-            return CELL_STRING(cell) ? Parrot_str_to_num(interp, CELL_STRING(cell)) : 0.0;
-        case PMCCELL:
-            return PMC_IS_NULL(CELL_PMC(cell))
-                    ? 0.0
-                    : VTABLE_get_number(interp, CELL_PMC(cell));
-        default:
-            break;
+      case INTCELL:
+        return (FLOATVAL)CELL_INT(cell);
+      case FLOATCELL:
+        return CELL_FLOAT(cell);
+      case STRINGCELL:
+        return CELL_STRING(cell) ? Parrot_str_to_num(interp, CELL_STRING(cell)) : 0.0;
+      case PMCCELL:
+        return PMC_IS_NULL(CELL_PMC(cell))
+                ? 0.0
+                : VTABLE_get_number(interp, CELL_PMC(cell));
+      default:
+        break;
     }
 
     /* exception */
@@ -230,18 +230,18 @@ static STRING *
 autobox_string(PARROT_INTERP, Pcc_cell *cell)
 {
     switch (CELL_TYPE_MASK(cell)) {
-        case INTCELL:
-            return Parrot_str_from_int(interp, CELL_INT(cell));
-        case FLOATCELL:
-            return Parrot_str_from_num(interp, CELL_FLOAT(cell));
-        case STRINGCELL:
-            return CELL_STRING(cell);
-        case PMCCELL:
-            return PMC_IS_NULL(CELL_PMC(cell))
-                    ? NULL
-                    : VTABLE_get_string(interp, CELL_PMC(cell));
-        default:
-            break;
+      case INTCELL:
+        return Parrot_str_from_int(interp, CELL_INT(cell));
+      case FLOATCELL:
+        return Parrot_str_from_num(interp, CELL_FLOAT(cell));
+      case STRINGCELL:
+        return CELL_STRING(cell);
+      case PMCCELL:
+        return PMC_IS_NULL(CELL_PMC(cell))
+                ? NULL
+                : VTABLE_get_string(interp, CELL_PMC(cell));
+      default:
+        break;
     }
 
     /* exception */
@@ -254,23 +254,23 @@ autobox_pmc(PARROT_INTERP, Pcc_cell *cell)
     PMC *result = PMCNULL;
 
     switch (CELL_TYPE_MASK(cell)) {
-        case INTCELL:
-            result = pmc_new(interp, HLL_TYPE(enum_class_Integer));
-            VTABLE_set_integer_native(interp, result, CELL_INT(cell));
-            break;
-        case FLOATCELL:
-            result = pmc_new(interp, HLL_TYPE(enum_class_Float));
-            VTABLE_set_number_native(interp, result, CELL_FLOAT(cell));
-            break;
-        case STRINGCELL:
-            result = pmc_new(interp, HLL_TYPE(enum_class_String));
-            VTABLE_set_string_native(interp, result, CELL_STRING(cell));
-            break;
-        case PMCCELL:
-            return CELL_PMC(cell);
-        default:
-            /* exception */
-            break;
+      case INTCELL:
+        result = pmc_new(interp, HLL_TYPE(enum_class_Integer));
+        VTABLE_set_integer_native(interp, result, CELL_INT(cell));
+        break;
+      case FLOATCELL:
+        result = pmc_new(interp, HLL_TYPE(enum_class_Float));
+        VTABLE_set_number_native(interp, result, CELL_FLOAT(cell));
+        break;
+      case STRINGCELL:
+        result = pmc_new(interp, HLL_TYPE(enum_class_String));
+        VTABLE_set_string_native(interp, result, CELL_STRING(cell));
+        break;
+      case PMCCELL:
+        return CELL_PMC(cell);
+      default:
+        /* exception */
+        break;
     }
 
     return result;
@@ -296,18 +296,18 @@ mark_positionals(PARROT_INTERP, ARGIN(Pcc_cell *c))
 {
     while (c) {
         switch (CELL_TYPE_MASK(c)) {
-            case STRINGCELL:
-                if (CELL_STRING(c))
-                    Parrot_gc_mark_STRING_alive(interp, CELL_STRING(c));
-                break;
-            case PMCCELL:
-                if (!PMC_IS_NULL(CELL_PMC(c)))
-                    Parrot_gc_mark_PMC_alive(interp, CELL_PMC(c));
-                break;
-            case INTCELL:
-            case FLOATCELL:
-            default:
-                break;
+          case STRINGCELL:
+            if (CELL_STRING(c))
+                Parrot_gc_mark_STRING_alive(interp, CELL_STRING(c));
+            break;
+          case PMCCELL:
+            if (!PMC_IS_NULL(CELL_PMC(c)))
+                Parrot_gc_mark_PMC_alive(interp, CELL_PMC(c));
+            break;
+          case INTCELL:
+          case FLOATCELL:
+          default:
+            break;
         }
 
         c = NEXT_CELL(c);
@@ -498,21 +498,21 @@ Returns the short signature for the CallSignature.
 
         while (c) {
             switch (CELL_TYPE_MASK(c)) {
-                case INTCELL:
-                    res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "I"));
-                    break;
-                case FLOATCELL:
-                    res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "N"));
-                    break;
-                case STRINGCELL:
-                    res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "S"));
-                    break;
-                case PMCCELL:
-                    res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "P"));
-                    break;
-                default:
-                    PARROT_ASSERT(!"Impossible flag");
-                    break;
+              case INTCELL:
+                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "I"));
+                break;
+              case FLOATCELL:
+                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "N"));
+                break;
+              case STRINGCELL:
+                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "S"));
+                break;
+              case PMCCELL:
+                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "P"));
+                break;
+              default:
+                PARROT_ASSERT(!"Impossible flag");
+                break;
             }
             c = NEXT_CELL(c);
         }

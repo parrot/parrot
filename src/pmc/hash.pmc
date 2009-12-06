@@ -233,17 +233,17 @@ NB: this method will destroy all old data!
             old_hash = parrot_new_hash(INTERP);
 
         switch (type) {
-            case enum_type_INTVAL:
-            case enum_type_STRING:
-            case enum_type_PMC:
-                new_hash = parrot_create_hash(interp,
+          case enum_type_INTVAL:
+          case enum_type_STRING:
+          case enum_type_PMC:
+            new_hash = parrot_create_hash(interp,
                         (PARROT_DATA_TYPE)type,
                         old_hash->key_type,
                         old_hash->compare,
                         old_hash->hash_val);
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+            break;
+          default:
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                         "Hash: unsupported entry_type %d", type);
         }
 

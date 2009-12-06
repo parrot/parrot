@@ -287,31 +287,31 @@ Creates an identical copy of the complex number.
         const INTVAL arg_type = VTABLE_type(interp, initializer);
         SELF.init();
         switch (arg_type) {
-            case enum_class_String:
-                SELF.set_string_native(VTABLE_get_string(interp, initializer));
+          case enum_class_String:
+            SELF.set_string_native(VTABLE_get_string(interp, initializer));
+            break;
+          case enum_class_FixedFloatArray:
+          case enum_class_ResizableFloatArray:
+          case enum_class_FixedIntegerArray:
+          case enum_class_ResizableIntegerArray:
+            if (VTABLE_get_integer(interp, initializer) == 2) {
+                FLOATVAL re = VTABLE_get_number_keyed_int(interp, initializer, 0);
+                FLOATVAL im = VTABLE_get_number_keyed_int(interp, initializer, 1);
+                SET_ATTR_re(INTERP, SELF, re);
+                SET_ATTR_im(INTERP, SELF, im);
                 break;
-            case enum_class_FixedFloatArray:
-            case enum_class_ResizableFloatArray:
-            case enum_class_FixedIntegerArray:
-            case enum_class_ResizableIntegerArray:
-                if (VTABLE_get_integer(interp, initializer) == 2) {
-                    FLOATVAL re = VTABLE_get_number_keyed_int(interp, initializer, 0);
-                    FLOATVAL im = VTABLE_get_number_keyed_int(interp, initializer, 1);
-                    SET_ATTR_re(INTERP, SELF, re);
-                    SET_ATTR_im(INTERP, SELF, im);
-                    break;
-                }
-                /* else let it fall to default */
-            default:
-                if (VTABLE_isa(interp, initializer, CONST_STRING(interp, "String"))) {
-                    STRING * s = VTABLE_get_string(interp, initializer);
-                    SELF.set_string_native(s);
-                }
-                else {
-                    Parrot_ex_throw_from_c_args(interp, NULL,
+            }
+            /* else let it fall to default */
+          default:
+            if (VTABLE_isa(interp, initializer, CONST_STRING(interp, "String"))) {
+                STRING * s = VTABLE_get_string(interp, initializer);
+                SELF.set_string_native(s);
+            }
+            else {
+                Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_INVALID_OPERATION,
                         "Invalid Complex initializer");
-                }
+            }
         }
     }
 
@@ -479,14 +479,14 @@ Set real or imag depending on key
     VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
         FLOATVAL f;
         switch (key) {
-            case 0:
-                GET_ATTR_re(INTERP, SELF, f);
-                break;
-            case 1:
-                GET_ATTR_im(INTERP, SELF, f);
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(interp, NULL,
+          case 0:
+            GET_ATTR_re(INTERP, SELF, f);
+            break;
+          case 1:
+            GET_ATTR_im(INTERP, SELF, f);
+            break;
+          default:
+            Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_OPERATION, "Complex: key must be 0 or 1");
         }
         return f;
@@ -494,14 +494,14 @@ Set real or imag depending on key
 
     VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL v) {
         switch (key) {
-            case 0:
-                SET_ATTR_re(INTERP, SELF, v);
-                break;
-            case 1:
-                SET_ATTR_im(INTERP, SELF, v);
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(interp, NULL,
+          case 0:
+            SET_ATTR_re(INTERP, SELF, v);
+            break;
+          case 1:
+            SET_ATTR_im(INTERP, SELF, v);
+            break;
+          default:
+            Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_OPERATION, "Complex: key must be 0 or 1");
         }
     }

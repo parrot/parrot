@@ -36,53 +36,53 @@ void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_in
         INTVAL c = Parrot_str_indexed(interp, sig, i);
 
         switch (c) {
-            case (INTVAL)'0':    /* null ptr or such - doesn't consume a reg */
-                break;
-            case (INTVAL)'f':
-            case (INTVAL)'N':
-            case (INTVAL)'d':
-                param_sig[j++] = 'N';
-                break;
-            case (INTVAL)'I':   /* INTVAL */
-            case (INTVAL)'l':   /* long */
-            case (INTVAL)'i':   /* int */
-            case (INTVAL)'s':   /* short */
-            case (INTVAL)'c':   /* char */
-                param_sig[j++] = 'I';
-                break;
-            case (INTVAL)'S':
-            case (INTVAL)'t':   /* string, pass a cstring */
-                param_sig[j++] = 'S';
-                break;
-            case (INTVAL)'J':   /* interpreter */
-                break;
-            case (INTVAL)'p':   /* push pmc->data */
-            case (INTVAL)'O':   /* push PMC * object in P2 */
-            case (INTVAL)'P':   /* push PMC * */
-            case (INTVAL)'V':   /* push PMC * */
-                param_sig[j++] = 'P';
-            case (INTVAL)'v':
-                break;
-                /* I have no idea how to handle these */
-            case (INTVAL)'2':
-            case (INTVAL)'3':
-            case (INTVAL)'4':
-                param_sig[j++] = 'I';
-                break;
-            case (INTVAL)'@':
-                param_sig[j++] = '@';
-                break;
-            case (INTVAL)'b': /* buffer (void*) pass Buffer_bufstart(SReg) */
-            case (INTVAL)'B': /* buffer (void**) pass &Buffer_bufstart(SReg) */
-                param_sig[j++] = 'S';
-                break;
-            default:
-                if (sig_length > 7)
-                    mem_sys_free(param_sig);
-                Parrot_ex_throw_from_c_args(interp, NULL,
+          case (INTVAL)'0':    /* null ptr or such - doesn't consume a reg */
+            break;
+          case (INTVAL)'f':
+          case (INTVAL)'N':
+          case (INTVAL)'d':
+            param_sig[j++] = 'N';
+            break;
+          case (INTVAL)'I':   /* INTVAL */
+          case (INTVAL)'l':   /* long */
+          case (INTVAL)'i':   /* int */
+          case (INTVAL)'s':   /* short */
+          case (INTVAL)'c':   /* char */
+            param_sig[j++] = 'I';
+            break;
+          case (INTVAL)'S':
+          case (INTVAL)'t':   /* string, pass a cstring */
+            param_sig[j++] = 'S';
+            break;
+          case (INTVAL)'J':   /* interpreter */
+            break;
+          case (INTVAL)'p':   /* push pmc->data */
+          case (INTVAL)'O':   /* push PMC * object in P2 */
+          case (INTVAL)'P':   /* push PMC * */
+          case (INTVAL)'V':   /* push PMC * */
+            param_sig[j++] = 'P';
+          case (INTVAL)'v':
+            break;
+            /* I have no idea how to handle these */
+          case (INTVAL)'2':
+          case (INTVAL)'3':
+          case (INTVAL)'4':
+            param_sig[j++] = 'I';
+            break;
+          case (INTVAL)'@':
+            param_sig[j++] = '@';
+            break;
+          case (INTVAL)'b': /* buffer (void*) pass Buffer_bufstart(SReg) */
+          case (INTVAL)'B': /* buffer (void**) pass &Buffer_bufstart(SReg) */
+            param_sig[j++] = 'S';
+            break;
+          default:
+            if (sig_length > 7)
+                mem_sys_free(param_sig);
+            Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_JIT_ERROR,
                     "Unknown param Signature %c\n", (char)c);
-                break;
+            break;
         }
     }
 

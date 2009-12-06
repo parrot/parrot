@@ -1099,17 +1099,17 @@ The C<==> operation.
         PMC *temp;
 
         switch (value->vtable->base_type) {
-            case enum_class_BigInt:
-                temp = pmc_new(INTERP, enum_class_BigInt);
-                VTABLE_set_integer_native(INTERP, temp, SELF.get_integer());
-                Parrot_mmd_multi_dispatch_from_c_args(interp,
+          case enum_class_BigInt:
+            temp = pmc_new(INTERP, enum_class_BigInt);
+            VTABLE_set_integer_native(INTERP, temp, SELF.get_integer());
+            Parrot_mmd_multi_dispatch_from_c_args(interp,
                     "is_equal", "PP->I", temp, value, &retval);
-                return retval;
-                break;
-            default:
-                return (VTABLE_get_integer(INTERP, SELF)
-                    ==  VTABLE_get_integer(INTERP, value));
-                break;
+            return retval;
+            break;
+          default:
+            return (VTABLE_get_integer(INTERP, SELF)
+                ==  VTABLE_get_integer(INTERP, value));
+            break;
         }
     }
 
