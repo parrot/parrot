@@ -53,25 +53,25 @@ Parrot_io_parse_open_flags(PARROT_INTERP, ARGIN_NULLOK(STRING *mode_str))
     for (i = 0; i < mode_len; ++i) {
         INTVAL s = Parrot_str_indexed(interp, mode_str, i);
         switch (s) {
-            case 'r':
-                flags |= PIO_F_READ;
-                break;
-            case 'w':
-                flags |= PIO_F_WRITE;
-                if (!(flags & PIO_F_APPEND)) /* don't truncate if appending */
-                    flags |= PIO_F_TRUNC;
-                break;
-            case 'a':
-                flags |= PIO_F_APPEND;
-                flags |= PIO_F_WRITE;
-                if ((flags & PIO_F_TRUNC)) /* don't truncate if appending */
-                    flags &= ~PIO_F_TRUNC;
-                break;
-            case 'p':
-                flags |= PIO_F_PIPE;
-                break;
-            default:
-                break;
+          case 'r':
+            flags |= PIO_F_READ;
+            break;
+          case 'w':
+            flags |= PIO_F_WRITE;
+            if (!(flags & PIO_F_APPEND)) /* don't truncate if appending */
+                flags |= PIO_F_TRUNC;
+            break;
+          case 'a':
+            flags |= PIO_F_APPEND;
+            flags |= PIO_F_WRITE;
+            if ((flags & PIO_F_TRUNC)) /* don't truncate if appending */
+                flags &= ~PIO_F_TRUNC;
+            break;
+          case 'p':
+            flags |= PIO_F_PIPE;
+            break;
+          default:
+            break;
         }
     }
 

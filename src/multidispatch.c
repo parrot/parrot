@@ -534,26 +534,26 @@ Parrot_mmd_build_type_tuple_from_sig_obj(PARROT_INTERP, ARGIN(PMC *sig_obj))
 
         /* Regular arguments just set the value */
         switch (type) {
-            case 'I':
-                VTABLE_set_integer_keyed_int(interp, type_tuple,
+          case 'I':
+            VTABLE_set_integer_keyed_int(interp, type_tuple,
                         i, enum_type_INTVAL);
-                break;
-            case 'N':
-                VTABLE_set_integer_keyed_int(interp, type_tuple,
+            break;
+          case 'N':
+            VTABLE_set_integer_keyed_int(interp, type_tuple,
                         i, enum_type_FLOATVAL);
-                break;
-            case 'S':
-                {
-                    INTVAL type_lookahead = Parrot_str_indexed(interp, string_sig, (i + 1));
-                    if (type_lookahead == 'n') {
-                        args_ended = 1;
-                        break;
-                    }
-                    VTABLE_set_integer_keyed_int(interp, type_tuple,
-                            i, enum_type_STRING);
+            break;
+          case 'S':
+            {
+                INTVAL type_lookahead = Parrot_str_indexed(interp, string_sig, (i + 1));
+                if (type_lookahead == 'n') {
+                    args_ended = 1;
                     break;
                 }
-            case 'P':
+                VTABLE_set_integer_keyed_int(interp, type_tuple,
+                            i, enum_type_STRING);
+                break;
+            }
+          case 'P':
             {
                 INTVAL type_lookahead = Parrot_str_indexed(interp, string_sig, (i + 1));
                 if (type_lookahead == 'i') {
@@ -579,11 +579,11 @@ Parrot_mmd_build_type_tuple_from_sig_obj(PARROT_INTERP, ARGIN(PMC *sig_obj))
 
                 break;
             }
-            case '-':
-                args_ended = 1;
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(interp, NULL,
+          case '-':
+            args_ended = 1;
+            break;
+          default:
+            Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_OPERATION,
                     "Multiple Dispatch: invalid argument type %c!", type);
         }
@@ -768,17 +768,17 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
         /* promote primitives to their PMC equivalents, as PCC will autobox
          * the distance penalty makes primitive variants look cheaper */
         switch (type_call) {
-            case enum_type_INTVAL:
-                if (type_sig == enum_class_Integer) { dist++; continue; }
-                break;
-            case enum_type_FLOATVAL:
-                if (type_sig == enum_class_Float)   { dist++; continue; }
-                break;
-            case enum_type_STRING:
-                if (type_sig == enum_class_String)  { dist++; continue; }
-                break;
-            default:
-                break;
+          case enum_type_INTVAL:
+            if (type_sig == enum_class_Integer) { dist++; continue; }
+            break;
+          case enum_type_FLOATVAL:
+            if (type_sig == enum_class_Float)   { dist++; continue; }
+            break;
+          case enum_type_STRING:
+            if (type_sig == enum_class_String)  { dist++; continue; }
+            break;
+          default:
+            break;
         }
 
         /*

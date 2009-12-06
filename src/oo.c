@@ -110,12 +110,12 @@ into the class.
 void
 Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *ns))
 {
-   ASSERT_ARGS(Parrot_oo_extract_methods_from_namespace)
-   PMC *methods, *vtable_overrides;
+    ASSERT_ARGS(Parrot_oo_extract_methods_from_namespace)
+    PMC *methods, *vtable_overrides;
 
     /* Pull in methods from the namespace, if any. */
-   if (PMC_IS_NULL(ns))
-       return;
+    if (PMC_IS_NULL(ns))
+        return;
 
     /* Import any methods. */
     Parrot_pcc_invoke_method_from_c_args(interp, ns, CONST_STRING(interp, "get_associated_methods"), "->P", &methods);
@@ -169,7 +169,7 @@ PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_oo_get_namespace(SHIM_INTERP, ARGIN(const PMC *classobj))
 {
-   ASSERT_ARGS(Parrot_oo_get_namespace)
+    ASSERT_ARGS(Parrot_oo_get_namespace)
     Parrot_Class_attributes * const _class     = PARROT_CLASS(classobj);
     PMC          * const _namespace = _class->_namespace;
 
@@ -204,13 +204,13 @@ Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
     else {
         /* Fast select of behavior based on type of the lookup key */
         switch (key->vtable->base_type) {
-            case enum_class_NameSpace:
-                classobj = VTABLE_get_class(interp, key);
-                break;
-            case enum_class_String:
-            case enum_class_Key:
-            case enum_class_ResizableStringArray:
-                {
+          case enum_class_NameSpace:
+            classobj = VTABLE_get_class(interp, key);
+            break;
+          case enum_class_String:
+          case enum_class_Key:
+          case enum_class_ResizableStringArray:
+            {
                 PMC * const hll_ns = VTABLE_get_pmc_keyed_int(interp,
                                         interp->HLL_namespace,
                                         Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)));
@@ -219,9 +219,9 @@ Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
 
                 if (!PMC_IS_NULL(ns))
                     classobj = VTABLE_get_class(interp, ns);
-                }
-            default:
-                break;
+            }
+          default:
+            break;
         }
     }
 
@@ -624,24 +624,24 @@ fail_if_type_exists(PARROT_INTERP, ARGIN(PMC *name))
         return 0;
 
     switch (VTABLE_type(interp, value)) {
-        case enum_class_NameSpace:
-            return 0;
-            break;
-        case enum_class_Integer:
-            {
-                const INTVAL type = VTABLE_get_integer(interp, value);
-                if (type < enum_type_undef)  {
-                    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+      case enum_class_NameSpace:
+        return 0;
+        break;
+      case enum_class_Integer:
+        {
+            const INTVAL type = VTABLE_get_integer(interp, value);
+            if (type < enum_type_undef)  {
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                             "native type with name '%s' already exists - "
                             "can't register Class", data_types[type].name);
-                }
-                return type;
             }
-            break;
-        default:
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INTERP_ERROR,
+            return type;
+        }
+        break;
+      default:
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INTERP_ERROR,
                     "Unrecognized class name PMC type");
-            break;
+        break;
     }
 }
 

@@ -469,49 +469,49 @@ Parrot_sprintf_format(PARROT_INTERP,
                     switch (info.phase) {
                     /*@fallthrough@ */ case PHASE_FLAGS:
                         switch (ch) {
-                        case '-':
+                          case '-':
                             info.flags |= FLAG_MINUS;
                             continue;
 
-                        case '+':
+                          case '+':
                             info.flags |= FLAG_PLUS;
                             continue;
 
-                        case '0':
+                          case '0':
                             info.flags |= FLAG_ZERO;
                             continue;
 
-                        case ' ':
+                          case ' ':
                             info.flags |= FLAG_SPACE;
                             continue;
 
-                        case '#':
+                          case '#':
                             info.flags |= FLAG_SHARP;
                             continue;
 
-                        default:
+                          default:
                             info.phase = PHASE_WIDTH;
                         }
 
 
                     /*@fallthrough@ */ case PHASE_WIDTH:
                         switch (ch) {
-                        case '0':
-                        case '1':
-                        case '2':
-                        case '3':
-                        case '4':
-                        case '5':
-                        case '6':
-                        case '7':
-                        case '8':
-                        case '9':
+                          case '0':
+                          case '1':
+                          case '2':
+                          case '3':
+                          case '4':
+                          case '5':
+                          case '6':
+                          case '7':
+                          case '8':
+                          case '9':
                             info.flags |= FLAG_WIDTH;
                             info.width *= 10;
                             info.width += ch - '0';
                             continue;
 
-                        case '*':
+                          case '*':
                             info.flags |= FLAG_WIDTH;
                             num = obj->getint(interp, SIZE_XVAL, obj);
                             if (num < 0) {
@@ -523,75 +523,75 @@ Parrot_sprintf_format(PARROT_INTERP,
                             }
                             continue;
 
-                        case '.':
+                          case '.':
                             info.phase = PHASE_PREC;
                             continue;
 
-                        default:
+                          default:
                             info.phase = PHASE_PREC;
                         }
 
 
                     /*@fallthrough@ */ case PHASE_PREC:
                         switch (ch) {
-                        case '0':
-                        case '1':
-                        case '2':
-                        case '3':
-                        case '4':
-                        case '5':
-                        case '6':
-                        case '7':
-                        case '8':
-                        case '9':
+                          case '0':
+                          case '1':
+                          case '2':
+                          case '3':
+                          case '4':
+                          case '5':
+                          case '6':
+                          case '7':
+                          case '8':
+                          case '9':
                             info.flags |= FLAG_PREC;
                             info.prec *= 10;
                             info.prec += ch - '0';
                             continue;
 
-                        case '*':
+                          case '*':
                             info.flags |= FLAG_PREC;
                             info.prec = (UINTVAL)obj->getint(interp,
                                                      SIZE_XVAL, obj);
                             info.phase = PHASE_TYPE;
                             continue;
 
-                        default:
+                          default:
                             info.phase = PHASE_TYPE;
                         }
 
                     /*@fallthrough@ */ case PHASE_TYPE:
                         switch (ch) {
-                        case 'h':
+                          case 'h':
                             info.type = SIZE_SHORT;
                             continue;
 
-                        case 'l':
+                          case 'l':
                             info.type = SIZE_LONG;
                             continue;
 
-                        case 'L':
-                        case 'H':
+                          case 'L':
+                          case 'H':
                             info.type = SIZE_HUGE;
                             continue;
 
-                        case 'v':
+                          case 'v':
                             info.type = SIZE_XVAL;
                             continue;
 
-                        case 'O':
+                          case 'O':
                             info.type = SIZE_OPCODE;
                             continue;
 
-                        case 'P':
+                          case 'P':
                             info.type = SIZE_PMC;
                             continue;
 
-                        case 'S':
+                          case 'S':
                             info.type = SIZE_PSTR;
                             continue;
 
-                        default:
+                          default:
                             info.phase = PHASE_TERM;
                         }
 
@@ -599,7 +599,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                     /*@fallthrough@ */ case PHASE_TERM:
                         switch (ch) {
                             /* INTEGERS */
-                        case 'c':
+                          case 'c':
                             {
                             STRING * const ts = string_chr(interp,
                                  (UINTVAL)obj->getint(interp, info.type, obj));
@@ -607,7 +607,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                             }
                             break;
 
-                        case 'o':
+                          case 'o':
                             {
                             const UHUGEINTVAL theuint =
                                 obj->getuint(interp, info.type, obj);
@@ -622,7 +622,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                             }
                             break;
 
-                        case 'x':
+                          case 'x':
                             {
                             const UHUGEINTVAL theuint =
                                 obj->getuint(interp, info.type, obj);
@@ -637,7 +637,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                             }
                             break;
 
-                        case 'X':
+                          case 'X':
                             {
                             STRING * const prefix = CONST_STRING(interp, "0X");
                             const UHUGEINTVAL theuint =
@@ -653,7 +653,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                             }
                             break;
 
-                        case 'b':
+                          case 'b':
                             {
                             STRING * const prefix = CONST_STRING(interp, "0b");
                             const UHUGEINTVAL theuint =
@@ -668,7 +668,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                             }
                             break;
 
-                        case 'B':
+                          case 'B':
                             {
                             STRING * const prefix = CONST_STRING(interp, "0B");
                             const HUGEINTVAL theint =
@@ -683,15 +683,15 @@ Parrot_sprintf_format(PARROT_INTERP,
                             }
                             break;
 
-                        case 'u':
+                          case 'u':
                             {
                             const UHUGEINTVAL theuint =
                                 obj->getuint(interp, info.type, obj);
                             sharedint = theuint;
                             }
                             goto do_sprintf;
-                        case 'd':
-                        case 'i':
+                          case 'd':
+                          case 'i':
 
                             /* EVIL: Work around bug in glibc that makes %0lld
                              * sometimes output an empty string. */
@@ -699,7 +699,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                                 info.flags &= ~FLAG_ZERO;
 
                             sharedint = obj->getint(interp, info.type, obj);
-                        do_sprintf:
+                          do_sprintf:
                             {
                             STRING *ts;
                             gen_sprintf_call(tc, &info, ch);
@@ -721,7 +721,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                             }
                             break;
 
-                        case 'p':
+                          case 'p':
                             {
                             STRING * const prefix = CONST_STRING(interp, "0x");
                             const void * const ptr =
@@ -735,11 +735,11 @@ Parrot_sprintf_format(PARROT_INTERP,
                             break;
 
                             /* FLOATS - We cheat on these and use snprintf. */
-                        case 'e':
-                        case 'E':
-                        case 'f':
-                        case 'g':
-                        case 'G':
+                          case 'e':
+                          case 'E':
+                          case 'f':
+                          case 'g':
+                          case 'G':
                             {
                             STRING *ts;
                             const HUGEFLOATVAL thefloat =
@@ -822,7 +822,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                             break;
 
                             /* STRINGS */
-                        case 'r':        /* Python repr */
+                          case 'r':        /* Python repr */
                             /* XXX the right fix is to add a getrepr entry *
                              * to SPRINTF_OBJ, but for now, getstring_pmc  *
                              * is inlined and modified to call get_repr    */
@@ -841,7 +841,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                                 break;
                             }
 
-                        case 's':
+                          case 's':
                           CASE_s:
                             {
                             STRING * const string = obj->getstring(interp,
@@ -855,7 +855,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                             }
                             break;
 
-                        default:
+                          default:
                             /* fake the old %P and %S commands */
                             if (info.type == SIZE_PMC
                              || info.type == SIZE_PSTR) {
@@ -875,8 +875,8 @@ Parrot_sprintf_format(PARROT_INTERP,
                         info.phase = PHASE_DONE;
                         break;
 
-                    case PHASE_DONE:
-                    default:
+                      case PHASE_DONE:
+                      default:
                         /* This is the terminating condition of the surrounding
                          * loop, so...
                          */

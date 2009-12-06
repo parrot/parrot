@@ -193,43 +193,43 @@ interpinfo(PARROT_INTERP, INTVAL what)
     INTVAL ret;
 
     switch (what) {
-        case TOTAL_MEM_ALLOC:
-            ret = Parrot_gc_total_memory_allocated(interp);
-            break;
-        case GC_MARK_RUNS:
-            ret = Parrot_gc_count_mark_runs(interp);
-            break;
-        case GC_LAZY_MARK_RUNS:
-            ret = Parrot_gc_count_lazy_mark_runs(interp);
-            break;
-        case GC_COLLECT_RUNS:
-            ret = Parrot_gc_count_collect_runs(interp);
-            break;
-        case ACTIVE_PMCS:
-            ret = Parrot_gc_active_pmcs(interp);
-            break;
-        case ACTIVE_BUFFERS:
-            ret = Parrot_gc_active_sized_buffers(interp);
-            break;
-        case TOTAL_PMCS:
-            ret = Parrot_gc_total_pmcs(interp);
-            break;
-        case TOTAL_BUFFERS:
-            ret = Parrot_gc_total_sized_buffers(interp);
-            break;
-        case HEADER_ALLOCS_SINCE_COLLECT:
-            ret = Parrot_gc_headers_alloc_since_last_collect(interp);
-            break;
-        case MEM_ALLOCS_SINCE_COLLECT:
-            ret = Parrot_gc_mem_alloc_since_last_collect(interp);
-            break;
-        case TOTAL_COPIED:
-            ret = Parrot_gc_total_copied(interp);
-            break;
-        case IMPATIENT_PMCS:
-            ret = Parrot_gc_impatient_pmcs(interp);
-            break;
-        case CURRENT_RUNCORE:
+      case TOTAL_MEM_ALLOC:
+        ret = Parrot_gc_total_memory_allocated(interp);
+        break;
+      case GC_MARK_RUNS:
+        ret = Parrot_gc_count_mark_runs(interp);
+        break;
+      case GC_LAZY_MARK_RUNS:
+        ret = Parrot_gc_count_lazy_mark_runs(interp);
+        break;
+      case GC_COLLECT_RUNS:
+        ret = Parrot_gc_count_collect_runs(interp);
+        break;
+      case ACTIVE_PMCS:
+        ret = Parrot_gc_active_pmcs(interp);
+        break;
+      case ACTIVE_BUFFERS:
+        ret = Parrot_gc_active_sized_buffers(interp);
+        break;
+      case TOTAL_PMCS:
+        ret = Parrot_gc_total_pmcs(interp);
+        break;
+      case TOTAL_BUFFERS:
+        ret = Parrot_gc_total_sized_buffers(interp);
+        break;
+      case HEADER_ALLOCS_SINCE_COLLECT:
+        ret = Parrot_gc_headers_alloc_since_last_collect(interp);
+        break;
+      case MEM_ALLOCS_SINCE_COLLECT:
+        ret = Parrot_gc_mem_alloc_since_last_collect(interp);
+        break;
+      case TOTAL_COPIED:
+        ret = Parrot_gc_total_copied(interp);
+        break;
+      case IMPATIENT_PMCS:
+        ret = Parrot_gc_impatient_pmcs(interp);
+        break;
+      case CURRENT_RUNCORE:
         {
             STRING *name = interp->run_core->name;
 
@@ -252,9 +252,9 @@ interpinfo(PARROT_INTERP, INTVAL what)
             else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "profiling")))
                 return PARROT_PROFILING_CORE;
         }
-        default:        /* or a warning only? */
-            ret = -1;
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+      default:        /* or a warning only? */
+        ret = -1;
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                 "illegal argument in interpinfo");
     }
     return ret;
@@ -279,22 +279,22 @@ interpinfo_p(PARROT_INTERP, INTVAL what)
 {
     ASSERT_ARGS(interpinfo_p)
     switch (what) {
-        case CURRENT_SUB:
-            return Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
-        case CURRENT_CONT:
-            {
+      case CURRENT_SUB:
+        return Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
+      case CURRENT_CONT:
+        {
             PMC * const cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
             if (!PMC_IS_NULL(cont) && cont->vtable->base_type ==
                     enum_class_RetContinuation)
                 return VTABLE_clone(interp, cont);
             return cont;
-            }
-        case CURRENT_OBJECT:
-            return Parrot_pcc_get_object(interp, CURRENT_CONTEXT(interp));
-        case CURRENT_LEXPAD:
-            return Parrot_pcc_get_lex_pad(interp, CURRENT_CONTEXT(interp));
-        default:        /* or a warning only? */
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        }
+      case CURRENT_OBJECT:
+        return Parrot_pcc_get_object(interp, CURRENT_CONTEXT(interp));
+      case CURRENT_LEXPAD:
+        return Parrot_pcc_get_lex_pad(interp, CURRENT_CONTEXT(interp));
+      default:        /* or a warning only? */
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                 "illegal argument in interpinfo");
     }
 }
@@ -322,7 +322,7 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
 {
     ASSERT_ARGS(interpinfo_s)
     switch (what) {
-        case EXECUTABLE_FULLNAME:
+      case EXECUTABLE_FULLNAME:
         {
             PMC *exe_name = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
                     IGLOBALS_EXECUTABLE);
@@ -330,7 +330,7 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
                 return string_from_literal(interp, "");
             return VTABLE_get_string(interp, exe_name);
         }
-        case EXECUTABLE_BASENAME:
+      case EXECUTABLE_BASENAME:
         {
             STRING *basename;
             PMC    *exe_name = VTABLE_get_pmc_keyed_int(interp,
@@ -359,10 +359,10 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
                 return basename;
             }
         }
-        case RUNTIME_PREFIX:
-            return Parrot_get_runtime_path(interp);
-        default:
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+      case RUNTIME_PREFIX:
+        return Parrot_get_runtime_path(interp);
+      default:
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                 "illegal argument in interpinfo");
     }
 }
@@ -393,18 +393,18 @@ sysinfo_i(SHIM_INTERP, INTVAL info_wanted)
 {
     ASSERT_ARGS(sysinfo_i)
     switch (info_wanted) {
-        case PARROT_INTSIZE:
-            return sizeof (INTVAL);
-        case PARROT_FLOATSIZE:
-            return sizeof (FLOATVAL);
-        case PARROT_POINTERSIZE:
-            return sizeof (void *);
-        case PARROT_INTMIN:
-            return PARROT_INTVAL_MIN;
-        case PARROT_INTMAX:
-            return PARROT_INTVAL_MAX;
-        default:
-            return -1;
+      case PARROT_INTSIZE:
+        return sizeof (INTVAL);
+      case PARROT_FLOATSIZE:
+        return sizeof (FLOATVAL);
+      case PARROT_POINTERSIZE:
+        return sizeof (void *);
+      case PARROT_INTMIN:
+        return PARROT_INTVAL_MIN;
+      case PARROT_INTMAX:
+        return PARROT_INTVAL_MAX;
+      default:
+        return -1;
     }
 }
 
@@ -435,33 +435,33 @@ sysinfo_s(PARROT_INTERP, INTVAL info_wanted)
 {
     ASSERT_ARGS(sysinfo_s)
     switch (info_wanted) {
-        case PARROT_OS:
-            return Parrot_str_new_constant(interp, BUILD_OS_NAME);
-        case PARROT_OS_VERSION:
+      case PARROT_OS:
+        return Parrot_str_new_constant(interp, BUILD_OS_NAME);
+      case PARROT_OS_VERSION:
 #ifdef PARROT_HAS_HEADER_SYSUTSNAME
-            {
-                struct utsname info;
-                if (uname(&info) == 0) {
-                    return string_make(interp, info.version, strlen(info.version), "ascii", 0);
-                }
+        {
+            struct utsname info;
+            if (uname(&info) == 0) {
+                return string_make(interp, info.version, strlen(info.version), "ascii", 0);
             }
+        }
 #endif
-            break;
-        case PARROT_OS_VERSION_NUMBER:
+        break;
+      case PARROT_OS_VERSION_NUMBER:
 #ifdef PARROT_HAS_HEADER_SYSUTSNAME
-            {
-                struct utsname info;
-                if (uname(&info) == 0) {
-                    return string_make(interp, info.release, strlen(info.version), "ascii", 0);
-                }
+        {
+            struct utsname info;
+            if (uname(&info) == 0) {
+                return string_make(interp, info.release, strlen(info.version), "ascii", 0);
             }
+        }
 #endif
-            break;
-        case CPU_ARCH:
-            return string_make(interp, PARROT_CPU_ARCH, sizeof (PARROT_CPU_ARCH) - 1, "ascii", 0);
-        case CPU_TYPE:
-        default:
-            break;
+        break;
+      case CPU_ARCH:
+        return string_make(interp, PARROT_CPU_ARCH, sizeof (PARROT_CPU_ARCH) - 1, "ascii", 0);
+      case CPU_TYPE:
+      default:
+        break;
     }
     return string_from_literal(interp, "");
 }

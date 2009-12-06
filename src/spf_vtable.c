@@ -209,30 +209,32 @@ getint_va(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
     va_list * const arg = (va_list *)(obj->data);
 
     switch (size) {
-    case SIZE_REG:
+      case SIZE_REG:
         return va_arg(*arg, int);
 
-    case SIZE_SHORT:
+      case SIZE_SHORT:
         /* "'short int' is promoted to 'int' when passed through '...'" */
         return (short)va_arg(*arg, int);
 
-    case SIZE_LONG:
+      case SIZE_LONG:
         return va_arg(*arg, long);
 
-    case SIZE_HUGE:
+      case SIZE_HUGE:
         return va_arg(*arg, HUGEINTVAL);
 
-    case SIZE_XVAL:
+      case SIZE_XVAL:
         return va_arg(*arg, INTVAL);
 
-    case SIZE_OPCODE:
+      case SIZE_OPCODE:
         return va_arg(*arg, opcode_t);
 
-    case SIZE_PMC:{
+      case SIZE_PMC:
+        {
             PMC * const pmc = (PMC *)va_arg(*arg, PMC *);
             return VTABLE_get_integer(interp, pmc);
         }
-    default:
+
+      default:
         PANIC(interp, "Invalid int type!");
     }
 }
@@ -260,30 +262,32 @@ getuint_va(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
     va_list * const arg = (va_list *)(obj->data);
 
     switch (size) {
-    case SIZE_REG:
+      case SIZE_REG:
         return va_arg(*arg, unsigned int);
 
-    case SIZE_SHORT:
+      case SIZE_SHORT:
         /* short int promoted HLAGHLAGHLAGH. See note above */
         return (unsigned short)va_arg(*arg, unsigned int);
 
-    case SIZE_LONG:
+      case SIZE_LONG:
         return va_arg(*arg, unsigned long);
 
-    case SIZE_HUGE:
+      case SIZE_HUGE:
         return va_arg(*arg, UHUGEINTVAL);
 
-    case SIZE_XVAL:
+      case SIZE_XVAL:
         return va_arg(*arg, UINTVAL);
 
-    case SIZE_OPCODE:
+      case SIZE_OPCODE:
         return va_arg(*arg, opcode_t);
 
-    case SIZE_PMC:{
+      case SIZE_PMC:
+        {
             PMC * const pmc = va_arg(*arg, PMC *);
             return (UINTVAL)VTABLE_get_integer(interp, pmc);
         }
-    default:
+
+      default:
         PANIC(interp, "Invalid uint type!");
     }
 }
@@ -311,25 +315,27 @@ getfloat_va(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
     va_list * const arg = (va_list *)(obj->data);
 
     switch (size) {
-    case SIZE_SHORT:
+      case SIZE_SHORT:
         /* float is promoted to double */
         return (HUGEFLOATVAL)(float)va_arg(*arg, double);
 
-    case SIZE_REG:
+      case SIZE_REG:
         return (HUGEFLOATVAL)(double)va_arg(*arg, double);
 
-    case SIZE_HUGE:
+      case SIZE_HUGE:
         return (HUGEFLOATVAL)(HUGEFLOATVAL) va_arg(*arg, HUGEFLOATVAL);
 
-    case SIZE_XVAL:
+      case SIZE_XVAL:
         return (HUGEFLOATVAL)(FLOATVAL) va_arg(*arg, FLOATVAL);
 
-    case SIZE_PMC:{
+      case SIZE_PMC:
+        {
             PMC * const pmc = (PMC *)va_arg(*arg, PMC *);
 
             return (HUGEFLOATVAL)(VTABLE_get_number(interp, pmc));
         }
-    default:
+
+      default:
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
             "Internal sprintf doesn't recognize size %d for a float", size);
     }
@@ -476,14 +482,14 @@ getint_pmc(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
     ret = VTABLE_get_integer(interp, tmp);
 
     switch (size) {
-    case SIZE_SHORT:
+      case SIZE_SHORT:
         ret = (short)ret;
         break;
         /* case SIZE_REG: ret=(HUGEINTVAL)(int)ret; break; */
-    case SIZE_LONG:
+      case SIZE_LONG:
         ret = (long)ret;
         break;
-    default:
+      default:
         /* nothing */ ;
     }
 
@@ -516,14 +522,14 @@ getuint_pmc(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
     ret = (UINTVAL)VTABLE_get_integer(interp, tmp);
 
     switch (size) {
-    case SIZE_SHORT:
+      case SIZE_SHORT:
         ret = (unsigned short)ret;
         break;
         /* case SIZE_REG: * ret=(UHUGEINTVAL)(unsigned int)ret; * break; */
-    case SIZE_LONG:
+      case SIZE_LONG:
         ret = (unsigned long)ret;
         break;
-    default:
+      default:
         /* nothing */ ;
     }
 

@@ -2138,45 +2138,45 @@ Parrot_str_to_int(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
                 break;
 
             switch (state) {
-                case parse_start:
-                    if (isdigit((unsigned char)c)) {
-                        const INTVAL nextval = c - '0';
-                        if (i < max_safe || (i == max_safe && nextval <= last_dig))
-                            i = i * 10 + nextval;
-                        else
-                            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ERR_OVERFLOW,
-                                "Integer value of String '%S' too big", s);
-                        state = parse_before_dot;
-                    }
-                    else if (c == '-') {
-                        sign      = -1;
-                        state = parse_before_dot;
-                    }
-                    else if (c == '+')
-                        state = parse_before_dot;
-                    else if (isspace((unsigned char)c))
-                        ; /* Do nothing */
+              case parse_start:
+                if (isdigit((unsigned char)c)) {
+                    const INTVAL nextval = c - '0';
+                    if (i < max_safe || (i == max_safe && nextval <= last_dig))
+                        i = i * 10 + nextval;
                     else
-                        state = parse_end;
-
-                    break;
-
-                case parse_before_dot:
-                    if (isdigit((unsigned char)c)) {
-                        const INTVAL nextval = c - '0';
-                        if (i < max_safe || (i == max_safe && nextval <= last_dig))
-                            i = i * 10 + nextval;
-                        else
-                            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ERR_OVERFLOW,
+                        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ERR_OVERFLOW,
                                 "Integer value of String '%S' too big", s);
-                    }
-                    else
-                        state = parse_end;
-                    break;
+                    state = parse_before_dot;
+                }
+                else if (c == '-') {
+                    sign      = -1;
+                    state = parse_before_dot;
+                }
+                else if (c == '+')
+                    state = parse_before_dot;
+                else if (isspace((unsigned char)c))
+                    ; /* Do nothing */
+                else
+                    state = parse_end;
 
-                default:
-                    /* Pacify compiler */
-                    break;
+                break;
+
+              case parse_before_dot:
+                if (isdigit((unsigned char)c)) {
+                    const INTVAL nextval = c - '0';
+                    if (i < max_safe || (i == max_safe && nextval <= last_dig))
+                        i = i * 10 + nextval;
+                    else
+                        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ERR_OVERFLOW,
+                                "Integer value of String '%S' too big", s);
+                }
+                else
+                    state = parse_end;
+                break;
+
+              default:
+                /* Pacify compiler */
+                break;
             }
         }
 
@@ -2233,100 +2233,100 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
             break;
 
         switch (state) {
-            case parse_start:
-                if (isdigit((unsigned char)c)) {
-                    f = c - '0';
-                    m = c - '0';
-                    state = parse_before_dot;
-                }
-                else if (c == '-') {
-                    sign = -1.0;
-                    state = parse_before_dot;
-                }
-                else if (c == '+')
-                    state = parse_before_dot;
-                else if (c == '.')
-                    state = parse_after_dot;
-                else if (isspace((unsigned char)c))
-                    ; /* Do nothing */
-                else {
-                    check_nan = 1;
-                    state     = parse_end;
-                }
-                break;
+          case parse_start:
+            if (isdigit((unsigned char)c)) {
+                f = c - '0';
+                m = c - '0';
+                state = parse_before_dot;
+            }
+            else if (c == '-') {
+                sign = -1.0;
+                state = parse_before_dot;
+            }
+            else if (c == '+')
+                state = parse_before_dot;
+            else if (c == '.')
+                state = parse_after_dot;
+            else if (isspace((unsigned char)c))
+                ; /* Do nothing */
+            else {
+                check_nan = 1;
+                state     = parse_end;
+            }
+            break;
 
-            case parse_before_dot:
-                if (isdigit((unsigned char)c)) {
-                    f = f*10.0 + (c-'0');
-                    m = m*10 + (c-'0');
-                    /* Integer overflow for mantissa */
-                    if (m >= max_safe)
-                        m_is_safe = 0;
-                }
-                else if (c == '.') {
-                    state = parse_after_dot;
-                    /*
-                     * Throw gathered result. Recalulate from integer mantissa
-                     * to preserve precision.
-                     */
-                    if (m_is_safe)
-                        f = m;
-                    mantissa = f;
-                }
-                else if (c == 'e' || c == 'E') {
-                    state = parse_after_e;
-                    /* See comment above */
-                    if (m_is_safe)
-                        f = m;
-                    mantissa = f;
-                }
-                else {
-                    check_nan = 1;
-                    state     = parse_end;
-                }
-                break;
+          case parse_before_dot:
+            if (isdigit((unsigned char)c)) {
+                f = f*10.0 + (c-'0');
+                m = m*10 + (c-'0');
+                /* Integer overflow for mantissa */
+                if (m >= max_safe)
+                    m_is_safe = 0;
+            }
+            else if (c == '.') {
+                state = parse_after_dot;
+                /*
+                 * Throw gathered result. Recalulate from integer mantissa
+                 * to preserve precision.
+                 */
+                if (m_is_safe)
+                    f = m;
+                mantissa = f;
+            }
+            else if (c == 'e' || c == 'E') {
+                state = parse_after_e;
+                /* See comment above */
+                if (m_is_safe)
+                    f = m;
+                mantissa = f;
+            }
+            else {
+                check_nan = 1;
+                state     = parse_end;
+            }
+            break;
 
-            case parse_after_dot:
-                if (isdigit((unsigned char)c)) {
-                    f += (c-'0') * divider;
-                    divider /= 10.0;
-                    d = d*10 + (c-'0');
-                    if (d >= max_safe)
-                        d_is_safe = 0;
-                    d_length++;
-                }
-                else if (c == 'e' || c == 'E')
-                    state = parse_after_e;
-                else
-                    state = parse_end;
-                break;
+          case parse_after_dot:
+            if (isdigit((unsigned char)c)) {
+                f += (c-'0') * divider;
+                divider /= 10.0;
+                d = d*10 + (c-'0');
+                if (d >= max_safe)
+                    d_is_safe = 0;
+                d_length++;
+            }
+            else if (c == 'e' || c == 'E')
+                state = parse_after_e;
+            else
+                state = parse_end;
+            break;
 
-            case parse_after_e:
-                if (isdigit((unsigned char)c)) {
-                    e = e*10 + (c-'0');
-                    state = parse_after_e_sign;
-                }
-                else if (c == '-') {
-                    e_sign = -1;
-                    state = parse_after_e_sign;
-                }
-                else if (c == '+')
-                    state = parse_after_e_sign;
-                else
-                    state = parse_end;
-                break;
+          case parse_after_e:
+            if (isdigit((unsigned char)c)) {
+                e = e*10 + (c-'0');
+                state = parse_after_e_sign;
+            }
+            else if (c == '-') {
+                e_sign = -1;
+                state = parse_after_e_sign;
+            }
+            else if (c == '+')
+                state = parse_after_e_sign;
+            else
+                state = parse_end;
+            break;
 
-            case parse_after_e_sign:
-                if (isdigit((unsigned char)c))
-                    e = e*10 + (c-'0');
-                else
-                    state = parse_end;
-                break;
+          case parse_after_e_sign:
+            if (isdigit((unsigned char)c))
+                e = e*10 + (c-'0');
+            else
+                state = parse_end;
+            break;
 
-            case parse_end:
-            default:
-                /* Pacify compiler */
-                break;
+          case parse_end:
+          default:
+            /* Pacify compiler */
+            break;
         }
     }
 
@@ -2707,43 +2707,43 @@ Parrot_str_escape_truncate(PARROT_INTERP,
                 dp = (unsigned char *)result->strstart;
             }
             switch (c) {
-                case '\\':
-                    dp[i++] = '\\';
-                    break;
-                case '\a':
-                    dp[i++] = '\\';
-                    c = 'a';
-                    break;
-                case '\b':
-                    dp[i++] = '\\';
-                    c = 'b';
-                    break;
-                case '\n':
-                    dp[i++] = '\\';
-                    c = 'n';
-                    break;
-                case '\r':
-                    dp[i++] = '\\';
-                    c = 'r';
-                    break;
-                case '\t':
-                    dp[i++] = '\\';
-                    c = 't';
-                    break;
-                case '\f':
-                    dp[i++] = '\\';
-                    c = 'f';
-                    break;
-                case '"':
-                    dp[i++] = '\\';
-                    c = '"';
-                    break;
-                case 27:
-                    dp[i++] = '\\';
-                    c = 'e';
-                    break;
-                default:
-                    break;
+              case '\\':
+                dp[i++] = '\\';
+                break;
+              case '\a':
+                dp[i++] = '\\';
+                c = 'a';
+                break;
+              case '\b':
+                dp[i++] = '\\';
+                c = 'b';
+                break;
+              case '\n':
+                dp[i++] = '\\';
+                c = 'n';
+                break;
+              case '\r':
+                dp[i++] = '\\';
+                c = 'r';
+                break;
+              case '\t':
+                dp[i++] = '\\';
+                c = 't';
+                break;
+              case '\f':
+                dp[i++] = '\\';
+                c = 'f';
+                break;
+              case '"':
+                dp[i++] = '\\';
+                c = '"';
+                break;
+              case 27:
+                dp[i++] = '\\';
+                c = 'e';
+                break;
+              default:
+                break;
             }
             if (c >= 0x20) {
                 dp[i++]         = (unsigned char)c;
@@ -3430,8 +3430,8 @@ Parrot_str_split(PARROT_INTERP,
         VTABLE_set_integer_native(interp, res, slen);
 
         for (i = 0; i < slen; ++i) {
-           STRING * const p = Parrot_str_substr(interp, str, i, 1, NULL, 0);
-           VTABLE_set_string_keyed_int(interp, res, i, p);
+            STRING * const p = Parrot_str_substr(interp, str, i, 1, NULL, 0);
+            VTABLE_set_string_keyed_int(interp, res, i, p);
         }
 
         return res;

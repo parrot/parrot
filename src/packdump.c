@@ -163,11 +163,11 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
 
     switch (self->type) {
 
-    case PFC_NUMBER:
+      case PFC_NUMBER:
         Parrot_io_printf(interp, "    [ 'PFC_NUMBER', %g ],\n", self->u.number);
         break;
 
-    case PFC_STRING:
+      case PFC_STRING:
         Parrot_io_printf(interp, "    [ 'PFC_STRING', {\n");
         pobj_flag_dump(interp, (long)PObj_get_FLAGS(self->u.string));
         Parrot_io_printf(interp, "        CHARSET  => %ld,\n",
@@ -181,7 +181,7 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
         Parrot_io_printf(interp, "    } ],\n");
         break;
 
-    case PFC_KEY:
+      case PFC_KEY:
         for (i = 0, key = self->u.key; key; i++) {
             GETATTR_Key_next_key(interp, key, key);
         }
@@ -196,14 +196,14 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
             type &= KEY_type_FLAGS;
             pobj_flag_dump(interp, (long)PObj_get_FLAGS(key));
             switch (type) {
-                case KEY_integer_FLAG:
-                    Parrot_io_printf(interp, "        TYPE        => INTEGER\n");
-                    Parrot_io_printf(interp, "        DATA        => %ld\n",
+              case KEY_integer_FLAG:
+                Parrot_io_printf(interp, "        TYPE        => INTEGER\n");
+                Parrot_io_printf(interp, "        DATA        => %ld\n",
                             VTABLE_get_integer(interp, key));
-                    Parrot_io_printf(interp, "       },\n");
-                    break;
-                case KEY_number_FLAG:
-                    {
+                Parrot_io_printf(interp, "       },\n");
+                break;
+              case KEY_number_FLAG:
+                {
                     const PackFile_Constant *detail;
                     size_t ct_index;
 
@@ -213,10 +213,10 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                     detail = ct->constants[ct_index];
                     Parrot_io_printf(interp, "        DATA        => %ld\n", detail->u.number);
                     Parrot_io_printf(interp, "       },\n");
-                    }
-                    break;
-                case KEY_string_FLAG:
-                    {
+                }
+                break;
+              case KEY_string_FLAG:
+                {
                     const PackFile_Constant *detail;
                     size_t ct_index;
 
@@ -227,42 +227,42 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                     Parrot_io_printf(interp, "        DATA        => '%Ss'\n",
                               detail->u.string);
                     Parrot_io_printf(interp, "       },\n");
-                    }
-                    break;
-                case KEY_integer_FLAG | KEY_register_FLAG:
-                    Parrot_io_printf(interp, "        TYPE        => I REGISTER\n");
-                    Parrot_io_printf(interp, "        DATA        => %ld\n",
+                }
+                break;
+              case KEY_integer_FLAG | KEY_register_FLAG:
+                Parrot_io_printf(interp, "        TYPE        => I REGISTER\n");
+                Parrot_io_printf(interp, "        DATA        => %ld\n",
                             VTABLE_get_integer(interp, key));
-                    Parrot_io_printf(interp, "       },\n");
-                    break;
-                case KEY_number_FLAG | KEY_register_FLAG:
-                    Parrot_io_printf(interp, "        TYPE        => N REGISTER\n");
-                    Parrot_io_printf(interp, "        DATA        => %ld\n",
+                Parrot_io_printf(interp, "       },\n");
+                break;
+              case KEY_number_FLAG | KEY_register_FLAG:
+                Parrot_io_printf(interp, "        TYPE        => N REGISTER\n");
+                Parrot_io_printf(interp, "        DATA        => %ld\n",
                             VTABLE_get_integer(interp, key));
-                    Parrot_io_printf(interp, "       },\n");
-                    break;
-                case KEY_string_FLAG | KEY_register_FLAG:
-                    Parrot_io_printf(interp, "        TYPE        => S REGISTER\n");
-                    Parrot_io_printf(interp, "        DATA        => %ld\n",
+                Parrot_io_printf(interp, "       },\n");
+                break;
+              case KEY_string_FLAG | KEY_register_FLAG:
+                Parrot_io_printf(interp, "        TYPE        => S REGISTER\n");
+                Parrot_io_printf(interp, "        DATA        => %ld\n",
                             VTABLE_get_integer(interp, key));
-                    Parrot_io_printf(interp, "       },\n");
-                    break;
-                case KEY_pmc_FLAG | KEY_register_FLAG:
-                    Parrot_io_printf(interp, "        TYPE        => P REGISTER\n");
-                    Parrot_io_printf(interp, "        DATA        => %ld\n",
+                Parrot_io_printf(interp, "       },\n");
+                break;
+              case KEY_pmc_FLAG | KEY_register_FLAG:
+                Parrot_io_printf(interp, "        TYPE        => P REGISTER\n");
+                Parrot_io_printf(interp, "        DATA        => %ld\n",
                             VTABLE_get_integer(interp, key));
-                    Parrot_io_printf(interp, "       },\n");
-                    break;
-                default:
-                    Parrot_io_eprintf(NULL, "PackFile_Constant_pack: "
+                Parrot_io_printf(interp, "       },\n");
+                break;
+              default:
+                Parrot_io_eprintf(NULL, "PackFile_Constant_pack: "
                             "unsupported constant type\n");
-                    Parrot_exit(interp, 1);
+                Parrot_exit(interp, 1);
             }
             GETATTR_Key_next_key(interp, key, key);
         }
         Parrot_io_printf(interp, "    ],\n");
         break;
-    case PFC_PMC:
+      case PFC_PMC:
         Parrot_io_printf(interp, "    [ 'PFC_PMC', {\n");
         {
             PMC * const pmc = self->u.key;
@@ -272,16 +272,16 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
 
             pobj_flag_dump(interp, (long)PObj_get_FLAGS(pmc));
             switch (pmc->vtable->base_type) {
-                case enum_class_FixedBooleanArray:
-                case enum_class_FixedFloatArray:
-                case enum_class_FixedPMCArray:
-                case enum_class_FixedStringArray:
-                case enum_class_ResizableBooleanArray:
-                case enum_class_ResizableIntegerArray:
-                case enum_class_ResizableFloatArray:
-                case enum_class_ResizablePMCArray:
-                case enum_class_ResizableStringArray:
-                    {
+              case enum_class_FixedBooleanArray:
+              case enum_class_FixedFloatArray:
+              case enum_class_FixedPMCArray:
+              case enum_class_FixedStringArray:
+              case enum_class_ResizableBooleanArray:
+              case enum_class_ResizableIntegerArray:
+              case enum_class_ResizableFloatArray:
+              case enum_class_ResizablePMCArray:
+              case enum_class_ResizableStringArray:
+                {
                     const int n = VTABLE_get_integer(interp, pmc);
                     STRING* const out_buffer = VTABLE_get_repr(interp, pmc);
                     Parrot_io_printf(interp,
@@ -291,34 +291,34 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                             pmc->vtable->whoami,
                             n,
                             out_buffer);
-                    }
-                    break;
-                case enum_class_Sub:
-                case enum_class_Coroutine:
-                    PMC_get_sub(interp, pmc, sub);
-                    if (sub->namespace_name) {
-                        switch (sub->namespace_name->vtable->base_type) {
-                            case enum_class_String:
-                                namespace_description = Parrot_str_new(interp, "'", 1);
-                                namespace_description = Parrot_str_append(interp,
+                }
+                break;
+              case enum_class_Sub:
+              case enum_class_Coroutine:
+                PMC_get_sub(interp, pmc, sub);
+                if (sub->namespace_name) {
+                    switch (sub->namespace_name->vtable->base_type) {
+                      case enum_class_String:
+                        namespace_description = Parrot_str_new(interp, "'", 1);
+                        namespace_description = Parrot_str_append(interp,
                                         namespace_description,
                                         VTABLE_get_string(interp, sub->namespace_name));
-                                namespace_description = Parrot_str_append(interp,
+                        namespace_description = Parrot_str_append(interp,
                                         namespace_description,
                                         Parrot_str_new(interp, "'", 1));
-                                break;
-                            case enum_class_Key:
-                                namespace_description =
+                        break;
+                      case enum_class_Key:
+                        namespace_description =
                                     key_set_to_string(interp, sub->namespace_name);
-                                break;
-                            default:
-                                namespace_description = sub->namespace_name->vtable->whoami;
-                        }
+                        break;
+                      default:
+                        namespace_description = sub->namespace_name->vtable->whoami;
                     }
-                    else {
-                        namespace_description = null;
-                    }
-                    Parrot_io_printf(interp,
+                }
+                else {
+                    namespace_description = null;
+                }
+                Parrot_io_printf(interp,
                             "\tclass => %Ss,\n"
                             "\tstart_offs => %d,\n"
                             "\tend_offs => %d,\n"
@@ -337,23 +337,23 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                             sub->ns_entry_name,
                             namespace_description,
                             sub->HLL_id);
-                    break;
-                case enum_class_FixedIntegerArray:
-                    Parrot_io_printf(interp,
+                break;
+              case enum_class_FixedIntegerArray:
+                Parrot_io_printf(interp,
                             "\tclass => %Ss,\n"
                             "\trepr => '%Ss'\n",
                             pmc->vtable->whoami,
                             VTABLE_get_repr(interp, pmc));
-                    break;
-                default:
-                    Parrot_io_printf(interp, "\tno dump info for PMC %ld %Ss\n",
+                break;
+              default:
+                Parrot_io_printf(interp, "\tno dump info for PMC %ld %Ss\n",
                             pmc->vtable->base_type, pmc->vtable->whoami);
-                    Parrot_io_printf(interp, "\tclass => %Ss,\n", pmc->vtable->whoami);
+                Parrot_io_printf(interp, "\tclass => %Ss,\n", pmc->vtable->whoami);
             }
         }
         Parrot_io_printf(interp, "    } ],\n");
         break;
-    default:
+      default:
         Parrot_io_printf(interp, "    [ 'PFC_\?\?\?', type '0x%x' ],\n",
                 self->type);
         break;
@@ -380,18 +380,18 @@ PackFile_Fixup_dump(PARROT_INTERP, ARGIN(const PackFile_FixupTable *ft))
     for (i = 0; i < ft->fixup_count; i++) {
         Parrot_io_printf(interp, "\t#%d\n", (int) i);
         switch (ft->fixups[i]->type) {
-            case enum_fixup_label:
-            case enum_fixup_sub:
-                Parrot_io_printf(interp,
+          case enum_fixup_label:
+          case enum_fixup_sub:
+            Parrot_io_printf(interp,
                         "\ttype => %d offs => %8d name => '%s',\n",
                         (int)ft->fixups[i]->type,
                         (int)ft->fixups[i]->offset,
                         ft->fixups[i]->name);
-                    break;
-            default:
-                Parrot_io_printf(interp, "\ttype => %d ???,\n",
+            break;
+          default:
+            Parrot_io_printf(interp, "\ttype => %d ???,\n",
                         (int) ft->fixups[i]->type);
-                break;
+            break;
         }
     }
 }

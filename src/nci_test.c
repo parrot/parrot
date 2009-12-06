@@ -270,7 +270,7 @@ Returns the current value of <nci_dlvar_int>.
 PARROT_DYNEXT_EXPORT int
 nci_i(void)
 {
-   return nci_dlvar_int;
+    return nci_dlvar_int;
 }
 
 /*
@@ -568,135 +568,135 @@ PARROT_DYNEXT_EXPORT void *
 nci_pi(int test)
 {
     switch (test) {
-        case 0:
-            {
-                static struct {
-                    int i[2];
-                    char c;
-                } t = {
-                    {42, 100},
-                    'B'
-                };
-                return &t;
-            }
-        case 1:
-            {
-                static struct {
-                    float f[2];
-                    double d;
-                } t = {
-                    {42.0, 100.0},
-                    47.11
-                };
-                return &t;
-            }
-        case 2:
-            {
-                static struct {
-                    char c;
+      case 0:
+        {
+            static struct {
+                int i[2];
+                char c;
+            } t = {
+                {42, 100},
+                'B'
+            };
+            return &t;
+        }
+      case 1:
+        {
+            static struct {
+                float f[2];
+                double d;
+            } t = {
+                {42.0, 100.0},
+                47.11
+            };
+            return &t;
+          }
+      case 2:
+        {
+            static struct {
+                char c;
+                int i;
+            } t = {
+                10,
+                20
+            };
+            return &t;
+        }
+      case 3:
+        {
+            static struct {
+                const char *c;
+                int i;
+            } t = {
+                "hello",
+                20
+            };
+            return &t;
+        }
+      case 4:
+        {
+            static struct _x {
+                int i;
+                int j;
+                double d;
+            } xx = { 100, 77, 200.0 };
+            static struct {
+                char c;
+                struct _x *x;
+            } t = {
+                10,
+                &xx
+            };
+            return &t;
+        }
+      case 5:
+        {
+            static struct {
+                int (*f)(const char *);
+            } t = {
+                call_back
+            };
+            return &t;
+        }
+      case 6:
+        {
+            static struct xt {
+                int x;
+                struct yt {
                     int i;
-                } t = {
-                     10,
-                     20
-                };
-                return &t;
-            }
-        case 3:
-            {
-                static struct {
-                    const char *c;
-                    int i;
-                } t = {
-                     "hello",
-                     20
-                };
-                return &t;
-            }
-        case 4:
-            {
-                static struct _x {
+                    int  j;
+                } _y;
+                int z;
+            } _x = {
+                32,
+                { 127, 12345 },
+                33
+            };
+            return &_x;
+        }
+      case 7:
+        {
+            static struct xt {
+                char x;
+                struct yt {
+                    char i;
+                    int  j;
+                } _y;
+                char z;
+            } _x = {
+                32,
+                { 127, 12345 },
+                33
+            };
+            return &_x;
+        }
+      case 8:
+        {
+            static struct _z {
+                int i;
+                int j;
+            } zz = { 100, 77 };
+            static struct xt {
+                int x;
+                struct yt {
                     int i;
                     int j;
-                    double d;
-                } xx = { 100, 77, 200.0 };
-                static struct {
-                    char c;
-                    struct _x *x;
-                } t = {
-                     10,
-                     &xx
-                };
-                return &t;
-            }
-        case 5:
-            {
-                static struct {
-                    int (*f)(const char *);
-                } t = {
-                     call_back
-                };
-                return &t;
-            }
-        case 6:
-            {
-                static struct xt {
-                    int x;
-                    struct yt {
-                        int i;
-                        int  j;
-                    } _y;
-                    int z;
-                } _x = {
-                    32,
-                    { 127, 12345 },
-                    33
-                };
-                return &_x;
-            }
-        case 7:
-            {
-                static struct xt {
-                    char x;
-                    struct yt {
-                        char i;
-                        int  j;
-                    } _y;
-                    char z;
-                } _x = {
-                    32,
-                    { 127, 12345 },
-                    33
-                };
-                return &_x;
-            }
-        case 8:
-            {
-                static struct _z {
-                    int i;
-                    int j;
-                } zz = { 100, 77 };
-                static struct xt {
-                    int x;
-                    struct yt {
-                        int i;
-                        int j;
-                        struct _z *z;
-                    } _y;
-                } _x = {
-                    32,
-                    { 127, 12345, &zz },
-                };
-                return &_x;
-            }
-        case 9:
-            {
-                static int i = 55555;
-                return &i;
-            }
-        case 10:
-            return NULL;
-        default:
-            fprintf(stderr, "unknown test number\n");
+                    struct _z *z;
+                } _y;
+            } _x = {
+                32,
+                { 127, 12345, &zz },
+            };
+            return &_x;
+        }
+      case 9:
+        {
+            static int i = 55555;
+            return &i;
+        }
+      case 10:
+        return NULL;
+      default:
+        fprintf(stderr, "unknown test number\n");
     }
 
     return NULL;
@@ -750,13 +750,13 @@ Prints "ok" if C<PMC> is not null, prints "got null" otherwise.
 PARROT_DYNEXT_EXPORT void
 nci_vP(void *pmc)
 {
-/* Disable this test until someone figures a way to check for
- * PMCNULL without using libparrot.
+    /* Disable this test until someone figures a way to check for
+     * PMCNULL without using libparrot.
     if (!PMC_IS_NULL(pmc))
         puts("ok");
     else
-*/
-        puts("got null");
+     */
+    puts("got null");
 }
 
 
@@ -1032,9 +1032,9 @@ to the product of C<fac1 * fac2>.
 PARROT_DYNEXT_EXPORT void *
 nci_pii(int fac1, int fac2)
 {
-   nci_dlvar_int = fac1 * fac2;
+    nci_dlvar_int = fac1 * fac2;
 
-   return &nci_dlvar_int;
+    return &nci_dlvar_int;
 }
 
 /*
@@ -1154,9 +1154,9 @@ Returns the result of C<l1> / C<l2>.
 PARROT_DYNEXT_EXPORT void
 nci_vfff(float l1, float l2, float l3)
 {
-  validate_float(l1, 3456.54);
-  validate_float(l2, 10.1999);
-  validate_float(l3, 14245.567);
+    validate_float(l1, 3456.54);
+    validate_float(l2, 10.1999);
+    validate_float(l3, 14245.567);
 }
 
 
@@ -1174,7 +1174,7 @@ Returns the result of C<l1> / C<l2>.
 PARROT_DYNEXT_EXPORT void
 nci_vV(const char **ptr)
 {
-  *ptr = "Hello bright new world\n";
+    *ptr = "Hello bright new world\n";
 }
 
 /*
@@ -1191,9 +1191,9 @@ Returns the result of C<l1> / C<l2>.
 PARROT_DYNEXT_EXPORT void
 nci_vVVV(const char **ptr1, const char **ptr2, const char **ptr3)
 {
-  *ptr1 = "Hello bright new world!\n";
-  *ptr2 = "It is a beautiful day!\n";
-  *ptr3 = "Go suck a lemon.\n";
+    *ptr1 = "Hello bright new world!\n";
+    *ptr2 = "It is a beautiful day!\n";
+    *ptr3 = "Go suck a lemon.\n";
 }
 
 #ifdef TEST

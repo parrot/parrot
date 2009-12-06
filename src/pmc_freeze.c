@@ -739,14 +739,14 @@ do_action(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info),
 {
     ASSERT_ARGS(do_action)
     switch (info->what) {
-        case VISIT_FREEZE_AT_DESTRUCT:
-        case VISIT_FREEZE_NORMAL:
-            freeze_pmc(interp, pmc, info, seen, id);
-            if (pmc)
-                info->visit_action = pmc->vtable->freeze;
-            break;
-        default:
-            Parrot_ex_throw_from_c_args(interp, NULL, 1, "Illegal action %ld",
+      case VISIT_FREEZE_AT_DESTRUCT:
+      case VISIT_FREEZE_NORMAL:
+        freeze_pmc(interp, pmc, info, seen, id);
+        if (pmc)
+            info->visit_action = pmc->vtable->freeze;
+        break;
+      default:
+        Parrot_ex_throw_from_c_args(interp, NULL, 1, "Illegal action %ld",
                 (long)info->what);
     }
 }
@@ -772,14 +772,14 @@ thaw_create_pmc(PARROT_INTERP, ARGIN(const visit_info *info),
     ASSERT_ARGS(thaw_create_pmc)
     PMC *pmc;
     switch (info->what) {
-        case VISIT_THAW_NORMAL:
-            pmc = pmc_new_noinit(interp, type);
-            break;
-        case VISIT_THAW_CONSTANTS:
-            pmc = constant_pmc_new_noinit(interp, type);
-            break;
-        default:
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+      case VISIT_THAW_NORMAL:
+        pmc = pmc_new_noinit(interp, type);
+        break;
+      case VISIT_THAW_CONSTANTS:
+        pmc = constant_pmc_new_noinit(interp, type);
+        break;
+      default:
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "Illegal visit_next type");
     }
 

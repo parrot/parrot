@@ -249,28 +249,28 @@ main(int argc, const char **argv)
     while ((status = longopt_get(interp,
                     argc, argv, opt_options, &opt)) > 0) {
         switch (opt.opt_id) {
-            case 'h':
-                options += PFOPT_HEADERONLY;
-                break;
-            case 't':
-                terse = 1;
-                break;
-            case 'd':
-                disas = 1;
-                break;
+          case 'h':
+            options += PFOPT_HEADERONLY;
+            break;
+          case 't':
+            terse = 1;
+            break;
+          case 'd':
+            disas = 1;
+            break;
 #if TRACE_PACKFILE
-            case 'D':
-                options += atoi(opt.opt_arg) << 2;
-                break;
+          case 'D':
+            options += atoi(opt.opt_arg) << 2;
+            break;
 #endif
-            case 'o':
-                file = opt.opt_arg;
-                convert = 1;
-                break;
-            case '?':
-            default:
-                help();
-                break;
+          case 'o':
+            file = opt.opt_arg;
+            convert = 1;
+            break;
+          case '?':
+          default:
+            help();
+            break;
         }
     }
     if (status == -1) {

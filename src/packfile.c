@@ -564,30 +564,30 @@ make_code_pointers(ARGMOD(PackFile_Segment *seg))
     PackFile * const pf = seg->pf;
 
     switch (seg->type) {
-        case PF_BYTEC_SEG:
-            if (!pf->cur_cs)
-                pf->cur_cs = (PackFile_ByteCode *)seg;
-            break;
-        case PF_FIXUP_SEG:
-            if (!pf->cur_cs->fixups) {
-                pf->cur_cs->fixups       = (PackFile_FixupTable *)seg;
-                pf->cur_cs->fixups->code = pf->cur_cs;
-            }
-            break;
-        case PF_CONST_SEG:
-            if (!pf->cur_cs->const_table) {
-                pf->cur_cs->const_table       = (PackFile_ConstTable *)seg;
-                pf->cur_cs->const_table->code = pf->cur_cs;
-            }
-            break;
-        case PF_UNKNOWN_SEG:
-            break;
-        case PF_DEBUG_SEG:
-            pf->cur_cs->debugs       = (PackFile_Debug *)seg;
-            pf->cur_cs->debugs->code = pf->cur_cs;
-            break;
-        default:
-            break;
+      case PF_BYTEC_SEG:
+        if (!pf->cur_cs)
+            pf->cur_cs = (PackFile_ByteCode *)seg;
+        break;
+      case PF_FIXUP_SEG:
+        if (!pf->cur_cs->fixups) {
+            pf->cur_cs->fixups       = (PackFile_FixupTable *)seg;
+            pf->cur_cs->fixups->code = pf->cur_cs;
+        }
+        break;
+      case PF_CONST_SEG:
+        if (!pf->cur_cs->const_table) {
+            pf->cur_cs->const_table       = (PackFile_ConstTable *)seg;
+            pf->cur_cs->const_table->code = pf->cur_cs;
+        }
+        break;
+      case PF_UNKNOWN_SEG:
+        break;
+      case PF_DEBUG_SEG:
+        pf->cur_cs->debugs       = (PackFile_Debug *)seg;
+        pf->cur_cs->debugs->code = pf->cur_cs;
+        break;
+      default:
+        break;
     }
 }
 
@@ -625,25 +625,25 @@ sub_pragma(PARROT_INTERP, pbc_action_enum_t action, ARGIN(const PMC *sub_pmc))
         return 0;
 
     switch (action) {
-        case PBC_PBC:
-        case PBC_MAIN:
-            /* denote MAIN entry in first loaded PASM */
-            if (interp->resume_flag & RESUME_INITIAL)
-                todo = 1;
+      case PBC_PBC:
+      case PBC_MAIN:
+        /* denote MAIN entry in first loaded PASM */
+        if (interp->resume_flag & RESUME_INITIAL)
+            todo = 1;
 
-            /* :init functions need to be called at MAIN time, so return 1 */
-            /* symreg.h:P_INIT */
-            if (Sub_comp_INIT_TEST(sub))
-                todo = 1;
+        /* :init functions need to be called at MAIN time, so return 1 */
+        /* symreg.h:P_INIT */
+        if (Sub_comp_INIT_TEST(sub))
+            todo = 1;
 
-            break;
-        case PBC_LOADED:
-            /* symreg.h:P_LOAD */
-            if (pragmas & SUB_FLAG_PF_LOAD)
-                todo = 1;
-            break;
-        default:
-            break;
+        break;
+      case PBC_LOADED:
+        /* symreg.h:P_LOAD */
+        if (pragmas & SUB_FLAG_PF_LOAD)
+            todo = 1;
+        break;
+      default:
+        break;
     }
 
     if (pragmas & (SUB_FLAG_PF_IMMEDIATE | SUB_FLAG_PF_POSTCOMP))
@@ -709,74 +709,74 @@ do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), pbc_action_enum_t action)
     PMC_get_sub(interp, sub_pmc, sub);
 
     switch (action) {
-        case PBC_IMMEDIATE:
-            /* run IMMEDIATE sub */
-            if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_IMMEDIATE) {
-                void *lo_var_ptr = interp->lo_var_ptr;
-                PMC  *result;
+      case PBC_IMMEDIATE:
+        /* run IMMEDIATE sub */
+        if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_IMMEDIATE) {
+            void *lo_var_ptr = interp->lo_var_ptr;
+            PMC  *result;
 
-                PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_IMMEDIATE;
-                result     = run_sub(interp, sub_pmc);
+            PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_IMMEDIATE;
+            result     = run_sub(interp, sub_pmc);
 
-                /* reset initial flag so MAIN detection works
-                 * and reset lo_var_ptr to prev */
-                interp->resume_flag = RESUME_INITIAL;
-                interp->lo_var_ptr  = lo_var_ptr;
-                return result;
+            /* reset initial flag so MAIN detection works
+             * and reset lo_var_ptr to prev */
+            interp->resume_flag = RESUME_INITIAL;
+            interp->lo_var_ptr  = lo_var_ptr;
+            return result;
+        }
+        break;
+      case PBC_POSTCOMP:
+        /* run POSTCOMP sub */
+        if (PObj_get_FLAGS(sub_pmc) &   SUB_FLAG_PF_POSTCOMP) {
+            PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_POSTCOMP;
+            run_sub(interp, sub_pmc);
+
+            /* reset initial flag so MAIN detection works */
+            interp->resume_flag = RESUME_INITIAL;
+            return NULL;
+        }
+        break;
+
+      case PBC_LOADED:
+        if (PObj_get_FLAGS(sub_pmc) &   SUB_FLAG_PF_LOAD) {
+            PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_LOAD;
+
+            /* if loaded no need for init */
+            Sub_comp_INIT_CLEAR(sub);
+            run_sub(interp, sub_pmc);
+        }
+        break;
+      default:
+        if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MAIN) {
+            if ((interp->resume_flag   &  RESUME_INITIAL)
+             &&  interp->resume_offset == 0) {
+                void           *ptr   = VTABLE_get_pointer(interp, sub_pmc);
+                const ptrdiff_t code  = (ptrdiff_t) sub->seg->base.data;
+
+                interp->resume_offset = ((ptrdiff_t)ptr - code)
+                                      / sizeof (opcode_t *);
+
+                PObj_get_FLAGS(sub_pmc)      &= ~SUB_FLAG_PF_MAIN;
+                Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), sub_pmc);
             }
-            break;
-        case PBC_POSTCOMP:
-            /* run POSTCOMP sub */
-            if (PObj_get_FLAGS(sub_pmc) &   SUB_FLAG_PF_POSTCOMP) {
-                PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_POSTCOMP;
-                run_sub(interp, sub_pmc);
-
-                /* reset initial flag so MAIN detection works */
-                interp->resume_flag = RESUME_INITIAL;
-                return NULL;
-            }
-            break;
-
-        case PBC_LOADED:
-            if (PObj_get_FLAGS(sub_pmc) &   SUB_FLAG_PF_LOAD) {
-                PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_LOAD;
-
-                /* if loaded no need for init */
-                Sub_comp_INIT_CLEAR(sub);
-                run_sub(interp, sub_pmc);
-            }
-            break;
-        default:
-            if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MAIN) {
-                if ((interp->resume_flag   &  RESUME_INITIAL)
-                &&   interp->resume_offset == 0) {
-                    void           *ptr   = VTABLE_get_pointer(interp, sub_pmc);
-                    const ptrdiff_t code  = (ptrdiff_t) sub->seg->base.data;
-
-                    interp->resume_offset = ((ptrdiff_t)ptr - code)
-                                          / sizeof (opcode_t *);
-
-                    PObj_get_FLAGS(sub_pmc)      &= ~SUB_FLAG_PF_MAIN;
-                    Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), sub_pmc);
-                }
-                else {
-                    Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
+            else {
+                Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
                                 ":main sub not allowed\n");
-                }
             }
+        }
 
-            /* run :init tagged functions */
-            if (action == PBC_MAIN && Sub_comp_INIT_TEST(sub)) {
-                /* if loaded no need for init */
-                Sub_comp_INIT_CLEAR(sub);
+        /* run :init tagged functions */
+        if (action == PBC_MAIN && Sub_comp_INIT_TEST(sub)) {
+            /* if loaded no need for init */
+            Sub_comp_INIT_CLEAR(sub);
 
-                /* if inited no need for load */
-                PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_LOAD;
+            /* if inited no need for load */
+            PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_LOAD;
 
-                run_sub(interp, sub_pmc);
-                interp->resume_flag = RESUME_INITIAL;
-            }
-            break;
+            run_sub(interp, sub_pmc);
+            interp->resume_flag = RESUME_INITIAL;
+        }
+        break;
     }
 
     return NULL;
@@ -805,18 +805,18 @@ mark_1_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
         PMC    * pmc;
         STRING * string;
         switch (constants[i]->type) {
-            case PFC_PMC:
-            case PFC_KEY:
-                pmc = constants[i]->u.key;
-                Parrot_gc_mark_PMC_alive(interp, pmc);
-                break;
-            case PFC_STRING:
-                string = constants[i]->u.string;
-                Parrot_gc_mark_STRING_alive(interp, string);
-                break;
-            default:
-                /* Do nothing. */
-                break;
+          case PFC_PMC:
+          case PFC_KEY:
+            pmc = constants[i]->u.key;
+            Parrot_gc_mark_PMC_alive(interp, pmc);
+            break;
+          case PFC_STRING:
+            string = constants[i]->u.string;
+            Parrot_gc_mark_STRING_alive(interp, string);
+            break;
+          default:
+            /* Do nothing. */
+            break;
         }
     }
 }
@@ -3331,15 +3331,15 @@ fixup_packed_size(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
         /* fixup_entry type */
         size++;
         switch (ft->fixups[i]->type) {
-            case enum_fixup_label:
-            case enum_fixup_sub:
-                size += PF_size_cstring(ft->fixups[i]->name);
-                size ++; /* offset */
-                break;
-            case enum_fixup_none:
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+          case enum_fixup_label:
+          case enum_fixup_sub:
+            size += PF_size_cstring(ft->fixups[i]->name);
+            size ++; /* offset */
+            break;
+          case enum_fixup_none:
+            break;
+          default:
+            Parrot_ex_throw_from_c_args(interp, NULL, 1,
                     "Unknown fixup type\n");
         }
     }
@@ -3373,15 +3373,15 @@ fixup_pack(PARROT_INTERP, ARGIN(PackFile_Segment *self), ARGOUT(opcode_t *cursor
     for (i = 0; i < ft->fixup_count; i++) {
         *cursor++ = (opcode_t) ft->fixups[i]->type;
         switch (ft->fixups[i]->type) {
-            case enum_fixup_label:
-            case enum_fixup_sub:
-                cursor    = PF_store_cstring(cursor, ft->fixups[i]->name);
-                *cursor++ = ft->fixups[i]->offset;
-                break;
-            case enum_fixup_none:
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+          case enum_fixup_label:
+          case enum_fixup_sub:
+            cursor    = PF_store_cstring(cursor, ft->fixups[i]->name);
+            *cursor++ = ft->fixups[i]->offset;
+            break;
+          case enum_fixup_none:
+            break;
+          default:
+            Parrot_ex_throw_from_c_args(interp, NULL, 1,
                     "Unknown fixup type\n");
         }
     }
@@ -3471,21 +3471,21 @@ fixup_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg), ARGIN(const opcode_t *
         entry->type = PF_fetch_opcode(pf, &cursor);
 
         switch (entry->type) {
-            case enum_fixup_label:
-            case enum_fixup_sub:
-                entry->name   = PF_fetch_cstring(pf, &cursor);
-                entry->offset = PF_fetch_opcode(pf, &cursor);
-                TRACE_PRINTF_VAL(("PackFile_FixupTable_unpack(): type %d, "
+          case enum_fixup_label:
+          case enum_fixup_sub:
+            entry->name   = PF_fetch_cstring(pf, &cursor);
+            entry->offset = PF_fetch_opcode(pf, &cursor);
+            TRACE_PRINTF_VAL(("PackFile_FixupTable_unpack(): type %d, "
                     "name %s, offset %ld\n",
                     entry->type, entry->name, entry->offset));
-                break;
-            case enum_fixup_none:
-                break;
-            default:
-                Parrot_io_eprintf(interp,
+            break;
+          case enum_fixup_none:
+            break;
+          default:
+            Parrot_io_eprintf(interp,
                     "PackFile_FixupTable_unpack: Unknown fixup type %d!\n",
                     entry->type);
-                return NULL;
+            return NULL;
         }
     }
 
@@ -3858,40 +3858,40 @@ PackFile_Constant_pack_size(PARROT_INTERP, ARGIN(const PackFile_Constant *self))
     size_t  packed_size;
 
     switch (self->type) {
-        case PFC_NUMBER:
-            packed_size = PF_size_number();
-            break;
+      case PFC_NUMBER:
+        packed_size = PF_size_number();
+        break;
 
-        case PFC_STRING:
-            packed_size = PF_size_string(self->u.string);
-            break;
+      case PFC_STRING:
+        packed_size = PF_size_string(self->u.string);
+        break;
 
-        case PFC_KEY:
-            packed_size = 1;
+      case PFC_KEY:
+        packed_size = 1;
 
-            for (component = self->u.key; component;){
-                packed_size += 2;
-                GETATTR_Key_next_key(interp, component, component);
-            }
-            break;
+        for (component = self->u.key; component;){
+            packed_size += 2;
+            GETATTR_Key_next_key(interp, component, component);
+        }
+        break;
 
-        case PFC_PMC:
-            component = self->u.key; /* the pmc (Sub, ...) */
+      case PFC_PMC:
+        component = self->u.key; /* the pmc (Sub, ...) */
 
-            /*
-             * TODO create either
-             * a) a frozen_size freeze entry or
-             * b) change packout.c so that component size isn't needed
-             */
-            image       = Parrot_freeze(interp, component);
-            packed_size = PF_size_string(image);
-            break;
+        /*
+         * TODO create either
+         * a) a frozen_size freeze entry or
+         * b) change packout.c so that component size isn't needed
+         */
+        image       = Parrot_freeze(interp, component);
+        packed_size = PF_size_string(image);
+        break;
 
-        default:
-            Parrot_io_eprintf(NULL,
+      default:
+        Parrot_io_eprintf(NULL,
                     "Constant_packed_size: Unrecognized type '%c'!\n",
                     (char)self->type);
-            return 0;
+        return 0;
     }
 
     /* Tack on space for the initial type field */
@@ -3930,30 +3930,28 @@ PackFile_Constant_unpack(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
                   type, (char)type));
 
     switch (type) {
-        case PFC_NUMBER:
-            self->u.number = PF_fetch_number(pf, &cursor);
-            self->type     = PFC_NUMBER;
-            break;
+      case PFC_NUMBER:
+        self->u.number = PF_fetch_number(pf, &cursor);
+        self->type     = PFC_NUMBER;
+        break;
 
-        case PFC_STRING:
-            self->u.string = PF_fetch_string(interp, pf, &cursor);
-            self->type     = PFC_STRING;
-            break;
+      case PFC_STRING:
+        self->u.string = PF_fetch_string(interp, pf, &cursor);
+        self->type     = PFC_STRING;
+        break;
 
-        case PFC_KEY:
-            cursor = PackFile_Constant_unpack_key(interp, constt,
-                    self, cursor);
-            break;
+      case PFC_KEY:
+        cursor = PackFile_Constant_unpack_key(interp, constt, self, cursor);
+        break;
 
-        case PFC_PMC:
-            cursor = PackFile_Constant_unpack_pmc(interp, constt,
-                    self, cursor);
-            break;
-        default:
-            Parrot_io_eprintf(NULL,
+      case PFC_PMC:
+        cursor = PackFile_Constant_unpack_pmc(interp, constt, self, cursor);
+        break;
+      default:
+        Parrot_io_eprintf(NULL,
                     "Constant_unpack: Unrecognized type '%c' during unpack!\n",
                     (char)type);
-            return NULL;
+        return NULL;
     }
 
     return cursor;
@@ -4061,29 +4059,29 @@ PackFile_Constant_unpack_key(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
         op = PF_fetch_opcode(pf, &cursor);
 
         switch (type) {
-            case PARROT_ARG_IC:
-                key_set_integer(interp, tail, op);
-                break;
-            case PARROT_ARG_NC:
-                key_set_number(interp, tail, constt->constants[op]->u.number);
-                break;
-            case PARROT_ARG_SC:
-                key_set_string(interp, tail, constt->constants[op]->u.string);
-                break;
-            case PARROT_ARG_I:
-                key_set_register(interp, tail, op, KEY_integer_FLAG);
-                break;
-            case PARROT_ARG_N:
-                key_set_register(interp, tail, op, KEY_number_FLAG);
-                break;
-            case PARROT_ARG_S:
-                key_set_register(interp, tail, op, KEY_string_FLAG);
-                break;
-            case PARROT_ARG_P:
-                key_set_register(interp, tail, op, KEY_pmc_FLAG);
-                break;
-            default:
-                return NULL;
+          case PARROT_ARG_IC:
+            key_set_integer(interp, tail, op);
+            break;
+          case PARROT_ARG_NC:
+            key_set_number(interp, tail, constt->constants[op]->u.number);
+            break;
+          case PARROT_ARG_SC:
+            key_set_string(interp, tail, constt->constants[op]->u.string);
+            break;
+          case PARROT_ARG_I:
+            key_set_register(interp, tail, op, KEY_integer_FLAG);
+            break;
+          case PARROT_ARG_N:
+            key_set_register(interp, tail, op, KEY_number_FLAG);
+            break;
+          case PARROT_ARG_S:
+            key_set_register(interp, tail, op, KEY_string_FLAG);
+            break;
+          case PARROT_ARG_P:
+            key_set_register(interp, tail, op, KEY_pmc_FLAG);
+            break;
+          default:
+            return NULL;
         }
     }
 
@@ -4539,18 +4537,18 @@ make_annotation_value_pmc(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
     PMC *result;
 
     switch (type) {
-        case PF_ANNOTATION_KEY_TYPE_INT:
-            result = pmc_new(interp, enum_class_Integer);
-            VTABLE_set_integer_native(interp, result, value);
-            break;
-        case PF_ANNOTATION_KEY_TYPE_NUM:
-            result = pmc_new(interp, enum_class_Float);
-            VTABLE_set_number_native(interp, result,
+      case PF_ANNOTATION_KEY_TYPE_INT:
+        result = pmc_new(interp, enum_class_Integer);
+        VTABLE_set_integer_native(interp, result, value);
+        break;
+      case PF_ANNOTATION_KEY_TYPE_NUM:
+        result = pmc_new(interp, enum_class_Float);
+        VTABLE_set_number_native(interp, result,
                     PF_CONST(self->code, value)->u.number);
-            break;
-        default:
-            result = pmc_new(interp, enum_class_String);
-            VTABLE_set_string_native(interp, result,
+        break;
+      default:
+        result = pmc_new(interp, enum_class_String);
+        VTABLE_set_string_native(interp, result,
                     PF_CONST(self->code, value)->u.string);
     }
 

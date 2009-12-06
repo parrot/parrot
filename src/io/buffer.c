@@ -83,17 +83,17 @@ Parrot_io_setbuf(PARROT_INTERP, ARGMOD(PMC *filehandle), size_t bufsize)
 
     /* Choose an appropriate buffer size for caller */
     switch (bufsize) {
-        case 0:
-            Parrot_io_set_buffer_size(interp, filehandle, 0);
-            break;
-        case PIO_UNBOUND:
-            Parrot_io_set_buffer_size(interp, filehandle,
+      case 0:
+        Parrot_io_set_buffer_size(interp, filehandle, 0);
+        break;
+      case PIO_UNBOUND:
+        Parrot_io_set_buffer_size(interp, filehandle,
                     PIO_GETBLKSIZE(Parrot_io_get_os_handle(interp, filehandle)));
-            break;
-        default:
-            Parrot_io_set_buffer_size(interp, filehandle,
+        break;
+      default:
+        Parrot_io_set_buffer_size(interp, filehandle,
                     (bufsize >= PIO_GRAIN ? bufsize : PIO_GRAIN));
-            break;
+        break;
     }
 
     buffer_size = Parrot_io_get_buffer_size(interp, filehandle);
@@ -692,20 +692,20 @@ Parrot_io_seek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
     unsigned char *buffer_end   = Parrot_io_get_buffer_end(interp, filehandle);
 
     switch (whence) {
-    case SEEK_SET:
+      case SEEK_SET:
         newpos = offset;
         break;
-    case SEEK_CUR:
+      case SEEK_CUR:
         newpos = file_pos + offset;
         break;
-    case SEEK_END:
+      case SEEK_END:
         newpos = PIO_SEEK(interp, filehandle, offset,
                                whence);
         if (newpos == -1)
             return -1;
 
         break;
-    default:
+      default:
         /* XXX: somehow report the illegal whence value */
         return -1;
     }

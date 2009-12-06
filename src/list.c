@@ -1201,33 +1201,33 @@ Parrot_pmc_array_set(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(void *item)
     }
 
     switch (type) {
-    case enum_type_sized:
+      case enum_type_sized:
         /* copy data into list */
         memcpy(&((char *) Buffer_bufstart(&chunk->data))[idx * list->item_size],
                 item, list->item_size);
         break;
-    case enum_type_char:
+      case enum_type_char:
         ((char *) Buffer_bufstart(&chunk->data))[idx] = (char)PTR2INTVAL(item);
         break;
-    case enum_type_short:
+      case enum_type_short:
         ((short *) Buffer_bufstart(&chunk->data))[idx] = (short)PTR2INTVAL(item);
         break;
-    case enum_type_int:
+      case enum_type_int:
         ((int *) Buffer_bufstart(&chunk->data))[idx] = (int)PTR2INTVAL(item);
         break;
-    case enum_type_INTVAL:
+      case enum_type_INTVAL:
         ((INTVAL *) Buffer_bufstart(&chunk->data))[idx] = PTR2INTVAL(item);
         break;
-    case enum_type_FLOATVAL:
+      case enum_type_FLOATVAL:
         ((FLOATVAL *) Buffer_bufstart(&chunk->data))[idx] = *(FLOATVAL *)item;
         break;
-    case enum_type_PMC:
+      case enum_type_PMC:
         ((PMC **) Buffer_bufstart(&chunk->data))[idx] = (PMC *)item;
         break;
-    case enum_type_STRING:
+      case enum_type_STRING:
         ((STRING **) Buffer_bufstart(&chunk->data))[idx] = (STRING *)item;
         break;
-    default:
+      default:
         Parrot_ex_throw_from_c_args(interp, NULL, 1, "Unknown list entry type\n");
         break;
     }
@@ -1265,25 +1265,25 @@ Parrot_pmc_array_item(PARROT_INTERP, ARGMOD(List *list), int type, INTVAL idx)
     }
 
     switch (type) {
-        case enum_type_sized:
-            return (void *)&((char *)
+      case enum_type_sized:
+        return (void *)&((char *)
                 Buffer_bufstart(&chunk->data))[idx * list->item_size];
-        case enum_type_char:
-            return (void *)&((char *) Buffer_bufstart(&chunk->data))[idx];
-        case enum_type_short:
-            return (void *)&((short *) Buffer_bufstart(&chunk->data))[idx];
-        case enum_type_int:
-            return (void *)&((int *) Buffer_bufstart(&chunk->data))[idx];
-        case enum_type_INTVAL:
-            return (void *)&((INTVAL *) Buffer_bufstart(&chunk->data))[idx];
-        case enum_type_FLOATVAL:
-            return (void *)&((FLOATVAL *) Buffer_bufstart(&chunk->data))[idx];
-        case enum_type_PMC:
-            return (void *)&((PMC **) Buffer_bufstart(&chunk->data))[idx];
-        case enum_type_STRING:
-            return (void *)&((STRING **) Buffer_bufstart(&chunk->data))[idx];
-        default:
-            Parrot_ex_throw_from_c_args(interp, NULL, 1, "Unknown list entry type\n");
+      case enum_type_char:
+        return (void *)&((char *) Buffer_bufstart(&chunk->data))[idx];
+      case enum_type_short:
+        return (void *)&((short *) Buffer_bufstart(&chunk->data))[idx];
+      case enum_type_int:
+        return (void *)&((int *) Buffer_bufstart(&chunk->data))[idx];
+      case enum_type_INTVAL:
+        return (void *)&((INTVAL *) Buffer_bufstart(&chunk->data))[idx];
+      case enum_type_FLOATVAL:
+        return (void *)&((FLOATVAL *) Buffer_bufstart(&chunk->data))[idx];
+      case enum_type_PMC:
+        return (void *)&((PMC **) Buffer_bufstart(&chunk->data))[idx];
+      case enum_type_STRING:
+        return (void *)&((STRING **) Buffer_bufstart(&chunk->data))[idx];
+      default:
+        Parrot_ex_throw_from_c_args(interp, NULL, 1, "Unknown list entry type\n");
     }
 }
 
@@ -1344,31 +1344,31 @@ Parrot_pmc_array_new(PARROT_INTERP, PARROT_DATA_TYPE type)
 
     list->item_type = type;
     switch (type) {
-        case enum_type_sized:       /* gets overridden below */
-        case enum_type_char:
-            list->item_size = sizeof (char);
-            break;
-        case enum_type_short:
-            list->item_size = sizeof (short);
-            break;
-        case enum_type_int:
-            list->item_size = sizeof (int);
-            break;
-        case enum_type_INTVAL:
-            list->item_size = sizeof (INTVAL);
-            break;
-        case enum_type_FLOATVAL:
-            list->item_size = sizeof (FLOATVAL);
-            break;
-        case enum_type_PMC:
-            list->item_size = sizeof (PMC *);
-            break;
-        case enum_type_STRING:
-            list->item_size = sizeof (STRING *);
-            break;
-        default:
-            Parrot_ex_throw_from_c_args(interp, NULL, 1, "Unknown list type\n");
-            break;
+      case enum_type_sized:       /* gets overridden below */
+      case enum_type_char:
+        list->item_size = sizeof (char);
+        break;
+      case enum_type_short:
+        list->item_size = sizeof (short);
+        break;
+      case enum_type_int:
+        list->item_size = sizeof (int);
+        break;
+      case enum_type_INTVAL:
+        list->item_size = sizeof (INTVAL);
+        break;
+      case enum_type_FLOATVAL:
+        list->item_size = sizeof (FLOATVAL);
+        break;
+      case enum_type_PMC:
+        list->item_size = sizeof (PMC *);
+        break;
+      case enum_type_STRING:
+        list->item_size = sizeof (STRING *);
+        break;
+      default:
+        Parrot_ex_throw_from_c_args(interp, NULL, 1, "Unknown list type\n");
+        break;
     }
 
     return list;
@@ -1443,28 +1443,28 @@ Parrot_pmc_array_new_init(PARROT_INTERP, PARROT_DATA_TYPE type, ARGIN(PMC *init)
         const INTVAL key = VTABLE_get_integer_keyed_int(interp, init, i);
         const INTVAL val = i + 1;
         switch (key) {
-            case 0:
-                size = VTABLE_get_integer_keyed_int(interp, init, val);
-                break;
-            case 1:
-                multi_key = VTABLE_get_pmc_keyed_int(interp, init, val);
-                break;
-            case 2:
-                {
+          case 0:
+            size = VTABLE_get_integer_keyed_int(interp, init, val);
+            break;
+          case 1:
+            multi_key = VTABLE_get_pmc_keyed_int(interp, init, val);
+            break;
+          case 2:
+            {
                 const INTVAL result =
                     VTABLE_get_integer_keyed_int(interp, init, val);
                 type   = (PARROT_DATA_TYPE)result;
-                }
-                break;
-            case 3:
-                item_size = VTABLE_get_integer_keyed_int(interp, init, val);
-                break;
-            case 4:
-                items_per_chunk = VTABLE_get_integer_keyed_int(
+            }
+            break;
+          case 3:
+            item_size = VTABLE_get_integer_keyed_int(interp, init, val);
+            break;
+          case 4:
+            items_per_chunk = VTABLE_get_integer_keyed_int(
                         interp, init, val);
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            break;
+          default:
+            Parrot_ex_throw_from_c_args(interp, NULL, 1,
                     "Invalid initializer for list\n");
         }
     }
@@ -1561,7 +1561,7 @@ Parrot_pmc_array_clone(PARROT_INTERP, ARGIN(const List *other))
 
         if (!(new_chunk->flags & sparse)) {
             switch (l->item_type) {
-            case enum_type_PMC:
+              case enum_type_PMC:
                 for (i = 0; i < chunk->items; i++) {
                     PMC * const op = ((PMC **) Buffer_bufstart(&chunk->data))[i];
 
@@ -1570,7 +1570,7 @@ Parrot_pmc_array_clone(PARROT_INTERP, ARGIN(const List *other))
                             VTABLE_clone(interp, op);
                 }
                 break;
-            case enum_type_STRING:
+              case enum_type_STRING:
                 for (i = 0; i < chunk->items; i++) {
                     STRING *s = ((STRING **) Buffer_bufstart(&chunk->data))[i];
                     if (s)
@@ -1578,7 +1578,7 @@ Parrot_pmc_array_clone(PARROT_INTERP, ARGIN(const List *other))
                                 Parrot_str_copy(interp, s);
                 }
                 break;
-            default:
+              default:
                 mem_sys_memcopy(Buffer_bufstart(&new_chunk->data),
                         Buffer_bufstart(&chunk->data), Buffer_buflen(&chunk->data));
                 break;

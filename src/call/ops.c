@@ -68,31 +68,31 @@ runops(PARROT_INTERP, size_t offs)
 #endif
     {
         new_runloop_jump_point(interp);
-    reenter:
+  reenter:
         interp->current_runloop->handler_start = NULL;
         switch (setjmp(interp->current_runloop->resume)) {
-            case 1:
-                /* an exception was handled */
-                if (STACKED_EXCEPTIONS)
-                    free_runloop_jump_point(interp);
+          case 1:
+            /* an exception was handled */
+            if (STACKED_EXCEPTIONS)
+                free_runloop_jump_point(interp);
 
-                interp->current_runloop_level = our_runloop_level - 1;
-                interp->current_runloop_id    = old_runloop_id;
+            interp->current_runloop_level = our_runloop_level - 1;
+            interp->current_runloop_id    = old_runloop_id;
 
 #if RUNLOOP_TRACE
-                fprintf(stderr, "[handled exception; back to loop %d, level %d]\n",
+            fprintf(stderr, "[handled exception; back to loop %d, level %d]\n",
                         interp->current_runloop_id, interp->current_runloop_level);
 #endif
-                return;
-            case 2:
-                /* Reenter the runloop from a exception thrown from C
-                 * with a pir handler */
-                PARROT_ASSERT(interp->current_runloop->handler_start);
-                offset = interp->current_runloop->handler_start - interp->code->base.data;
-                /* Prevent incorrect reuse */
-                goto reenter;
-            default:
-                break;
+            return;
+          case 2:
+            /* Reenter the runloop from a exception thrown from C
+             * with a pir handler */
+            PARROT_ASSERT(interp->current_runloop->handler_start);
+            offset = interp->current_runloop->handler_start - interp->code->base.data;
+            /* Prevent incorrect reuse */
+            goto reenter;
+          default:
+            break;
         }
     }
 

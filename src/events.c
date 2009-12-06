@@ -244,14 +244,14 @@ sig_handler(int signum)
 {
     ASSERT_ARGS(sig_handler)
     switch (signum) {
-        case SIGINT:
-            sig_int = 1;
-            break;
-        case SIGHUP:
-            sig_hup = 1;
-            break;
-        default:
-            break;
+      case SIGINT:
+        sig_int = 1;
+        break;
+      case SIGHUP:
+        sig_hup = 1;
+        break;
+      default:
+        break;
     }
 }
 
@@ -477,21 +477,21 @@ Parrot_schedule_event(PARROT_INTERP, ARGMOD(parrot_event* ev))
     ev->interp  = interp;
     entry->data = ev;
     switch (ev->type) {
-        case EVENT_TYPE_TIMER:
-        case EVENT_TYPE_SLEEP:
-            entry->type = QUEUE_ENTRY_TYPE_TIMED_EVENT;
-            insert_entry(event_queue, entry);
-            break;
-        case EVENT_TYPE_CALL_BACK:
-        case EVENT_TYPE_SIGNAL:
-        case EVENT_TYPE_IO:
-            entry->type = QUEUE_ENTRY_TYPE_EVENT;
-            unshift_entry(event_queue, entry);
-            break;
-        default:
-            entry->type = QUEUE_ENTRY_TYPE_EVENT;
-            push_entry(event_queue, entry);
-            break;
+      case EVENT_TYPE_TIMER:
+      case EVENT_TYPE_SLEEP:
+        entry->type = QUEUE_ENTRY_TYPE_TIMED_EVENT;
+        insert_entry(event_queue, entry);
+        break;
+      case EVENT_TYPE_CALL_BACK:
+      case EVENT_TYPE_SIGNAL:
+      case EVENT_TYPE_IO:
+        entry->type = QUEUE_ENTRY_TYPE_EVENT;
+        unshift_entry(event_queue, entry);
+        break;
+      default:
+        entry->type = QUEUE_ENTRY_TYPE_EVENT;
+        push_entry(event_queue, entry);
+        break;
     }
 }
 
@@ -722,13 +722,13 @@ Parrot_schedule_interp_qentry(PARROT_INTERP, ARGIN(struct QUEUE_ENTRY *entry))
      * in front or at the end of the queue
      */
     switch (event->type) {
-        case EVENT_TYPE_CALL_BACK:
-        case EVENT_TYPE_SIGNAL:
-            unshift_entry(interp->task_queue, entry);
-            break;
-        default:
-            push_entry(interp->task_queue, entry);
-            break;
+      case EVENT_TYPE_CALL_BACK:
+      case EVENT_TYPE_SIGNAL:
+        unshift_entry(interp->task_queue, entry);
+        break;
+      default:
+        push_entry(interp->task_queue, entry);
+        break;
     }
 }
 
@@ -749,52 +749,52 @@ Parrot_schedule_broadcast_qentry(ARGIN(struct QUEUE_ENTRY *entry))
     parrot_event * const event = (parrot_event *)entry->data;
 
     switch (event->type) {
-        case EVENT_TYPE_SIGNAL:
-            edebug((stderr, "broadcast signal\n"));
-            /*
-             * we don't have special signal handlers in usercode yet
-             * e.g.:
-             * install handler like exception handler *and*
-             * set a interpreter flag, that a handler exists
-             * we then could examine that flag (after LOCKing it)
-             * and dispatch the exception to all interpreters that
-             * handle it
-             * Finally, we send the first (main) interpreter that signal
-             *
-             * For now just send to all.
-             *
-             */
-            switch (event->u.signal) {
-                case SIGHUP:
-                case SIGINT:
-                    {
-                    if (n_interpreters) {
-                        size_t i;
-                        LOCK(interpreter_array_mutex);
-                        for (i = 1; i < n_interpreters; ++i) {
-                            Interp *interp;
-                            edebug((stderr, "deliver SIGINT to %d\n", i));
-                            interp = interpreter_array[i];
-                            if (interp)
-                                Parrot_schedule_interp_qentry(interp,
+      case EVENT_TYPE_SIGNAL:
+        edebug((stderr, "broadcast signal\n"));
+        /*
+         * we don't have special signal handlers in usercode yet
+         * e.g.:
+         * install handler like exception handler *and*
+         * set a interpreter flag, that a handler exists
+         * we then could examine that flag (after LOCKing it)
+         * and dispatch the exception to all interpreters that
+         * handle it
+         * Finally, we send the first (main) interpreter that signal
+         *
+         * For now just send to all.
+         *
+         */
+        switch (event->u.signal) {
+          case SIGHUP:
+          case SIGINT:
+            {
+                if (n_interpreters) {
+                    size_t i;
+                    LOCK(interpreter_array_mutex);
+                    for (i = 1; i < n_interpreters; ++i) {
+                        Interp *interp;
+                        edebug((stderr, "deliver SIGINT to %d\n", i));
+                        interp = interpreter_array[i];
+                        if (interp)
+                            Parrot_schedule_interp_qentry(interp,
                                         dup_entry(entry));
-                        }
-                        UNLOCK(interpreter_array_mutex);
                     }
-                    Parrot_schedule_interp_qentry(interpreter_array[0], entry);
-                    edebug((stderr, "deliver SIGINT to 0\n"));
-                    }
-                    break;
-                default:
-                    mem_sys_free(entry);
-                    mem_sys_free(event);
+                    UNLOCK(interpreter_array_mutex);
+                }
+                Parrot_schedule_interp_qentry(interpreter_array[0], entry);
+                edebug((stderr, "deliver SIGINT to 0\n"));
             }
             break;
-        default:
+          default:
             mem_sys_free(entry);
             mem_sys_free(event);
-            exit_fatal(1, "Unknown event to broadcast");
-            break;
+        }
+        break;
+      default:
+        mem_sys_free(entry);
+        mem_sys_free(event);
+        exit_fatal(1, "Unknown event to broadcast");
+        break;
     }
 }
 
@@ -1154,37 +1154,37 @@ process_events(ARGMOD(QUEUE *event_q))
         parrot_event *event = NULL;
 
         switch (entry->type) {
-            case QUEUE_ENTRY_TYPE_EVENT:
-                entry = nosync_pop_entry(event_q);
-                event = (parrot_event *)entry->data;
-                break;
+          case QUEUE_ENTRY_TYPE_EVENT:
+            entry = nosync_pop_entry(event_q);
+            event = (parrot_event *)entry->data;
+            break;
 
-            case QUEUE_ENTRY_TYPE_TIMED_EVENT:
-                event = (parrot_event *)entry->data;
-                now   = Parrot_floatval_time();
+          case QUEUE_ENTRY_TYPE_TIMED_EVENT:
+            event = (parrot_event *)entry->data;
+            now   = Parrot_floatval_time();
 
-                /*
-                 * if the timer_event isn't due yet, ignore the event
-                 * (we were signalled on insert of the event)
-                 * wait until we get at it again when time has elapsed
-                 */
-                if (now < event->u.timer_event.abs_time)
-                    return 1;
-                entry = nosync_pop_entry(event_q);
+            /*
+             * if the timer_event isn't due yet, ignore the event
+             * (we were signalled on insert of the event)
+             * wait until we get at it again when time has elapsed
+             */
+            if (now < event->u.timer_event.abs_time)
+                return 1;
+            entry = nosync_pop_entry(event_q);
 
-                /* if event is repeated dup and reinsert it */
+            /* if event is repeated dup and reinsert it */
 
-                if (event->u.timer_event.interval) {
-                    if (event->u.timer_event.repeat) {
-                        if (event->u.timer_event.repeat != -1)
-                            event->u.timer_event.repeat--;
-                        nosync_insert_entry(event_q,
+            if (event->u.timer_event.interval) {
+                if (event->u.timer_event.repeat) {
+                    if (event->u.timer_event.repeat != -1)
+                        event->u.timer_event.repeat--;
+                    nosync_insert_entry(event_q,
                                 dup_entry_interval(entry, now));
-                    }
                 }
-                break;
-            default:
-                exit_fatal(1, "Unknown queue entry");
+            }
+            break;
+          default:
+            exit_fatal(1, "Unknown queue entry");
         }
         PARROT_ASSERT(event);
         if (event->type == EVENT_TYPE_NONE) {
@@ -1417,24 +1417,24 @@ event_to_exception(PARROT_INTERP, ARGIN(const parrot_event* event))
     const int exit_code = -event->u.signal;
 
     switch (event->u.signal) {
-        case SIGINT:
-        case SIGHUP:
-            /*
-             * SIGINT is silent, if no exception handler is
-             * installed: set severity to EXCEPT_exit
-             */
-            {
-                STRING * const message = CONST_STRING(interp, "Caught signal.");
-                PMC           *exception = Parrot_ex_build_exception(interp,
+      case SIGINT:
+      case SIGHUP:
+        /*
+         * SIGINT is silent, if no exception handler is
+         * installed: set severity to EXCEPT_exit
+         */
+        {
+            STRING * const message = CONST_STRING(interp, "Caught signal.");
+            PMC           *exception = Parrot_ex_build_exception(interp,
                                         EXCEPT_exit, exit_code, message);
 
-                Parrot_ex_throw_from_c(interp, exception);
-            }
-            break;
-        default:
-            Parrot_ex_throw_from_c_args(interp, NULL, exit_code,
+            Parrot_ex_throw_from_c(interp, exception);
+        }
+        break;
+      default:
+        Parrot_ex_throw_from_c_args(interp, NULL, exit_code,
                     "Caught signal.");
-            break;
+        break;
     }
 }
 
@@ -1459,43 +1459,43 @@ do_event(PARROT_INTERP, ARGIN(parrot_event* event), ARGIN_NULLOK(opcode_t *next)
     ASSERT_ARGS(do_event)
     edebug((stderr, "do_event %s\n", et(event)));
     switch (event->type) {
-        case EVENT_TYPE_TERMINATE:
-            next = NULL;        /* this will terminate the run loop */
-            break;
-        case EVENT_TYPE_SIGNAL:
-            interp->sleeping = 0;
-            /* generate exception */
-            event_to_exception(interp, event);
-            /* not reached - will longjmp */
-            break;
-        case EVENT_TYPE_TIMER:
-            /* run ops, save registers */
-            Parrot_pcc_invoke_sub_from_c_args(interp,
+      case EVENT_TYPE_TERMINATE:
+        next = NULL;        /* this will terminate the run loop */
+        break;
+      case EVENT_TYPE_SIGNAL:
+        interp->sleeping = 0;
+        /* generate exception */
+        event_to_exception(interp, event);
+        /* not reached - will longjmp */
+        break;
+      case EVENT_TYPE_TIMER:
+        /* run ops, save registers */
+        Parrot_pcc_invoke_sub_from_c_args(interp,
                     event->u.timer_event.sub, "->");
-            break;
-        case EVENT_TYPE_CALL_BACK:
-            edebug((stderr, "starting user cb\n"));
-            Parrot_run_callback(interp, event->u.call_back.cbi,
+        break;
+      case EVENT_TYPE_CALL_BACK:
+        edebug((stderr, "starting user cb\n"));
+        Parrot_run_callback(interp, event->u.call_back.cbi,
                     event->u.call_back.external_data);
-            break;
-        case EVENT_TYPE_IO:
-            edebug((stderr, "starting io handler\n"));
-            Parrot_pcc_invoke_sub_from_c_args(interp,
+        break;
+      case EVENT_TYPE_IO:
+        edebug((stderr, "starting io handler\n"));
+        Parrot_pcc_invoke_sub_from_c_args(interp,
                     event->u.io_event.handler,
                     "PP->",
                     event->u.io_event.pio,
                     event->u.io_event.user_data);
-            break;
-        case EVENT_TYPE_SLEEP:
-            interp->sleeping = 0;
-            break;
-        case EVENT_TYPE_SUSPEND_FOR_GC:
-            edebug((stderr, "suspend for gc\n"));
-            pt_suspend_self_for_gc(interp);
-            break;
-        default:
-            fprintf(stderr, "Unhandled event type %d\n", (int)event->type);
-            break;
+        break;
+      case EVENT_TYPE_SLEEP:
+        interp->sleeping = 0;
+        break;
+      case EVENT_TYPE_SUSPEND_FOR_GC:
+        edebug((stderr, "suspend for gc\n"));
+        pt_suspend_self_for_gc(interp);
+        break;
+      default:
+        fprintf(stderr, "Unhandled event type %d\n", (int)event->type);
+        break;
     }
     mem_sys_free(event);
     return next;

@@ -197,13 +197,13 @@ trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
 
     while (key) {
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
-        case KEY_integer_FLAG:
+          case KEY_integer_FLAG:
             len += Parrot_io_eprintf(debugger, "%vi", VTABLE_get_integer(interp, key));
             break;
-        case KEY_number_FLAG:
+          case KEY_number_FLAG:
             len += Parrot_io_eprintf(debugger, "%vg", VTABLE_get_number(interp, key));
             break;
-        case KEY_string_FLAG:
+          case KEY_string_FLAG:
             {
             const STRING * const s = key_string(interp, key);
             STRING* const escaped = Parrot_str_escape_truncate(
@@ -214,15 +214,15 @@ trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
                 len += Parrot_io_eprintf(debugger, "\"(null)\"");
             }
             break;
-        case KEY_integer_FLAG|KEY_register_FLAG:
+          case KEY_integer_FLAG|KEY_register_FLAG:
             len += Parrot_io_eprintf(debugger, "I%vd=%vd", VTABLE_get_integer(interp, key),
                     REG_INT(interp, VTABLE_get_integer(interp, key)));
             break;
-        case KEY_number_FLAG|KEY_register_FLAG:
+          case KEY_number_FLAG|KEY_register_FLAG:
             len += Parrot_io_eprintf(debugger, "I%vd=%vd", VTABLE_get_integer(interp, key),
                     REG_NUM(interp, VTABLE_get_integer(interp, key)));
             break;
-        case KEY_string_FLAG|KEY_register_FLAG:
+          case KEY_string_FLAG|KEY_register_FLAG:
             {
             const STRING * const s = REG_STR(interp, VTABLE_get_integer(interp, key));
             STRING* const escaped = Parrot_str_escape_truncate(
@@ -235,11 +235,11 @@ trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
                         VTABLE_get_integer(interp, key));
             }
             break;
-        case KEY_pmc_FLAG|KEY_register_FLAG:
+          case KEY_pmc_FLAG|KEY_register_FLAG:
             len += Parrot_io_eprintf(debugger, "P%vd=", VTABLE_get_integer(interp, key));
             trace_pmc_dump(debugger, REG_PMC(interp, VTABLE_get_integer(interp, key)));
             break;
-        default:
+          default:
             len += Parrot_io_eprintf(debugger, "??");
             key = NULL;
             break;
@@ -333,21 +333,21 @@ trace_op_dump(PARROT_INTERP,
                 len += Parrot_io_eprintf(debugger, ", ");
             }
             switch (type) {
-                case PARROT_ARG_IC:
-                    len += Parrot_io_eprintf(debugger, "%vd", o);
-                    break;
-                case PARROT_ARG_NC:
-                    len += Parrot_io_eprintf(debugger, "%vg", PCONST(o)->u.number);
-                    break;
-                case PARROT_ARG_PC:
-                    if (var_args)
-                        len += Parrot_io_eprintf(debugger, "PC%d (%d)",
+              case PARROT_ARG_IC:
+                len += Parrot_io_eprintf(debugger, "%vd", o);
+                break;
+              case PARROT_ARG_NC:
+                len += Parrot_io_eprintf(debugger, "%vg", PCONST(o)->u.number);
+                break;
+              case PARROT_ARG_PC:
+                if (var_args)
+                    len += Parrot_io_eprintf(debugger, "PC%d (%d)",
                                 (int)o, var_args);
-                    else
-                        len += Parrot_io_eprintf(debugger, "PC%d", (int)o);
-                    break;
-                case PARROT_ARG_SC:
-                    {
+                else
+                    len += Parrot_io_eprintf(debugger, "PC%d", (int)o);
+                break;
+              case PARROT_ARG_SC:
+                {
                     STRING* const escaped = Parrot_str_escape_truncate(
                             interp,
                             PCONST(o)->u.string, 20);
@@ -355,42 +355,42 @@ trace_op_dump(PARROT_INTERP,
                         len += Parrot_io_eprintf(debugger, "\"%Ss\"", escaped);
                     else
                         len += Parrot_io_eprintf(debugger, "\"(null)\"");
-                    }
-                    break;
-                case PARROT_ARG_KC:
-                    len += trace_key_dump(interp, PCONST(o)->u.key);
-                    break;
-                case PARROT_ARG_KIC:
-                    len += Parrot_io_eprintf(debugger, "[%vd]", o);
-                    break;
-                case PARROT_ARG_KI:
-                    len += Parrot_io_eprintf(debugger, "[I%vd]", o);
-                    more = 1;
-                    break;
-                case PARROT_ARG_K:
-                    len += Parrot_io_eprintf(debugger, "[P%vd]", o);
-                    more = 1;
-                    break;
-                case PARROT_ARG_I:
-                    len += Parrot_io_eprintf(debugger, "I%vd", o);
-                    more = 1;
-                    break;
-                case PARROT_ARG_N:
-                    len += Parrot_io_eprintf(debugger, "N%vd", o);
-                    more = 1;
-                    break;
-                case PARROT_ARG_P:
-                    len += Parrot_io_eprintf(debugger, "P%vd", o);
-                    more = 1;
-                    break;
-                case PARROT_ARG_S:
-                    len += Parrot_io_eprintf(debugger, "S%vd", o);
-                    more = 1;
-                    break;
-                default:
-                    Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                }
+                break;
+              case PARROT_ARG_KC:
+                len += trace_key_dump(interp, PCONST(o)->u.key);
+                break;
+              case PARROT_ARG_KIC:
+                len += Parrot_io_eprintf(debugger, "[%vd]", o);
+                break;
+              case PARROT_ARG_KI:
+                len += Parrot_io_eprintf(debugger, "[I%vd]", o);
+                more = 1;
+                break;
+              case PARROT_ARG_K:
+                len += Parrot_io_eprintf(debugger, "[P%vd]", o);
+                more = 1;
+                break;
+              case PARROT_ARG_I:
+                len += Parrot_io_eprintf(debugger, "I%vd", o);
+                more = 1;
+                break;
+              case PARROT_ARG_N:
+                len += Parrot_io_eprintf(debugger, "N%vd", o);
+                more = 1;
+                break;
+              case PARROT_ARG_P:
+                len += Parrot_io_eprintf(debugger, "P%vd", o);
+                more = 1;
+                break;
+              case PARROT_ARG_S:
+                len += Parrot_io_eprintf(debugger, "S%vd", o);
+                more = 1;
+                break;
+              default:
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
                         "unhandled type in trace");
-                    break;
+                break;
             }
         }
         if (!more)
@@ -417,39 +417,39 @@ trace_op_dump(PARROT_INTERP,
                 Parrot_io_eprintf(debugger, " ");
             }
             switch (type) {
-                case PARROT_ARG_I:
-                    Parrot_io_eprintf(debugger, "I%vd=%vd", o, REG_INT(interp, o));
-                    break;
-                case PARROT_ARG_N:
-                    Parrot_io_eprintf(debugger, "N%vd=%vf", o, REG_NUM(interp, o));
-                    break;
-                case PARROT_ARG_PC:
-                    Parrot_io_eprintf(debugger, "PC%vd=", o);
-                    trace_pmc_dump(interp, PCONST(o)->u.key);
-                    break;
-                case PARROT_ARG_P:
-                    Parrot_io_eprintf(debugger, "P%vd=", o);
-                    trace_pmc_dump(interp, REG_PMC(interp, o));
-                    break;
-                case PARROT_ARG_S:
-                    if (REG_STR(interp, o)) {
-                        STRING* const escaped = Parrot_str_escape_truncate(
+              case PARROT_ARG_I:
+                Parrot_io_eprintf(debugger, "I%vd=%vd", o, REG_INT(interp, o));
+                break;
+              case PARROT_ARG_N:
+                Parrot_io_eprintf(debugger, "N%vd=%vf", o, REG_NUM(interp, o));
+                break;
+              case PARROT_ARG_PC:
+                Parrot_io_eprintf(debugger, "PC%vd=", o);
+                trace_pmc_dump(interp, PCONST(o)->u.key);
+                break;
+              case PARROT_ARG_P:
+                Parrot_io_eprintf(debugger, "P%vd=", o);
+                trace_pmc_dump(interp, REG_PMC(interp, o));
+                break;
+              case PARROT_ARG_S:
+                if (REG_STR(interp, o)) {
+                    STRING* const escaped = Parrot_str_escape_truncate(
                                 interp, REG_STR(interp, o), 20);
-                        Parrot_io_eprintf(debugger, "S%vd=\"%Ss\"", o,
+                    Parrot_io_eprintf(debugger, "S%vd=\"%Ss\"", o,
                                 escaped);
-                    }
-                    else
-                        Parrot_io_eprintf(debugger, "S%vd=\"(null)\"", o);
-                    break;
-                case PARROT_ARG_K:
-                    Parrot_io_eprintf(debugger, "P%vd=", o);
-                    trace_key_dump(interp, REG_PMC(interp, *(pc + i)));
-                    break;
-                case PARROT_ARG_KI:
-                    Parrot_io_eprintf(debugger, "I%vd=[%vd]", o, REG_INT(interp, o));
-                    break;
-                default:
-                    break;
+                }
+                else
+                    Parrot_io_eprintf(debugger, "S%vd=\"(null)\"", o);
+                break;
+              case PARROT_ARG_K:
+                Parrot_io_eprintf(debugger, "P%vd=", o);
+                trace_key_dump(interp, REG_PMC(interp, *(pc + i)));
+                break;
+              case PARROT_ARG_KI:
+                Parrot_io_eprintf(debugger, "I%vd=[%vd]", o, REG_INT(interp, o));
+                break;
+              default:
+                break;
             }
         }
     }

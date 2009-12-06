@@ -537,20 +537,20 @@ Parrot_cx_delete_handler_local(PARROT_INTERP, ARGIN(STRING *handler_type))
             PMC *handler = VTABLE_get_pmc_keyed_int(interp, handlers, index);
             if (!PMC_IS_NULL(handler)) {
                 switch (htype) {
-                    case Hexception:
-                        if (VTABLE_isa(interp, handler, handler_name)) {
-                            VTABLE_set_pmc_keyed_int(interp, handlers, index, PMCNULL);
-                            return;
-                        }
-                        break;
-                    case Hevent:
-                        if (handler->vtable->base_type == enum_class_EventHandler) {
-                            VTABLE_set_pmc_keyed_int(interp, handlers, index, PMCNULL);
-                            return;
-                        }
-                        break;
-                    default:
-                        break;
+                  case Hexception:
+                    if (VTABLE_isa(interp, handler, handler_name)) {
+                        VTABLE_set_pmc_keyed_int(interp, handlers, index, PMCNULL);
+                        return;
+                    }
+                    break;
+                  case Hevent:
+                    if (handler->vtable->base_type == enum_class_EventHandler) {
+                        VTABLE_set_pmc_keyed_int(interp, handlers, index, PMCNULL);
+                        return;
+                    }
+                    break;
+                  default:
+                    break;
                 }
             }
         }
@@ -611,16 +611,16 @@ Parrot_cx_count_handlers_local(PARROT_INTERP, ARGIN(STRING *handler_type))
             PMC *handler = VTABLE_get_pmc_keyed_int(interp, handlers, index);
             if (!PMC_IS_NULL(handler)) {
                 switch (htype) {
-                case Hexception:
-                        if (VTABLE_isa(interp, handler, handler_name))
-                            count++;
-                        break;
-                    case Hevent:
-                        if (handler->vtable->base_type == enum_class_EventHandler)
-                            count++;
-                        break;
-                    default:
-                        break;
+                  case Hexception:
+                    if (VTABLE_isa(interp, handler, handler_name))
+                        count++;
+                    break;
+                  case Hevent:
+                    if (handler->vtable->base_type == enum_class_EventHandler)
+                        count++;
+                    break;
+                  default:
+                    break;
                 }
             }
         }

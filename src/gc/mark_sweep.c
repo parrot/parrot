@@ -761,7 +761,7 @@ free_buffer(SHIM_INTERP, ARGMOD(Fixed_Size_Pool *pool), ARGMOD(Buffer *b))
         if (!PObj_COW_TEST(b))
             mem_pool->guaranteed_reclaimable += Buffer_buflen(b);
 
-         mem_pool->possibly_reclaimable += Buffer_buflen(b);
+        mem_pool->possibly_reclaimable += Buffer_buflen(b);
     }
 
     Buffer_buflen(b)        = 0;

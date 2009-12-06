@@ -276,21 +276,21 @@ PackFile_Constant_pack(PARROT_INTERP,
 
     switch (self->type) {
 
-    case PFC_NUMBER:
+      case PFC_NUMBER:
         cursor = PF_store_number(cursor, &self->u.number);
         break;
 
-    case PFC_STRING:
+      case PFC_STRING:
         cursor = PF_store_string(cursor, self->u.string);
         break;
 
-    case PFC_PMC:
+      case PFC_PMC:
         key = self->u.key;      /* the (Sub) PMC */
         image = Parrot_freeze(interp, key);
         cursor = PF_store_string(cursor, image);
         break;
 
-    case PFC_KEY:
+      case PFC_KEY:
         for (i = 0, key = self->u.key; key; i++){
             GETATTR_Key_next_key(interp, key, key);
         }
@@ -302,48 +302,48 @@ PackFile_Constant_pack(PARROT_INTERP,
             const opcode_t type = PObj_get_FLAGS(key);
 
             switch (type & KEY_type_FLAGS) {
-                case KEY_integer_FLAG:
-                    *cursor++ = PARROT_ARG_IC;
-                    GETATTR_Key_int_key(interp, key, *cursor++);
-                    break;
-                case KEY_number_FLAG:
-                    *cursor++ = PARROT_ARG_NC;
-                    /* Argh */
-                    *cursor++ = PackFile_find_in_const(interp, const_table, key, PFC_NUMBER);
-                    break;
-                case KEY_string_FLAG:
-                    *cursor++ = PARROT_ARG_SC;
-                    /* Argh */
-                    *cursor++ = PackFile_find_in_const(interp, const_table, key, PFC_STRING);
-                    break;
+              case KEY_integer_FLAG:
+                *cursor++ = PARROT_ARG_IC;
+                GETATTR_Key_int_key(interp, key, *cursor++);
+                break;
+              case KEY_number_FLAG:
+                *cursor++ = PARROT_ARG_NC;
+                /* Argh */
+                *cursor++ = PackFile_find_in_const(interp, const_table, key, PFC_NUMBER);
+                break;
+              case KEY_string_FLAG:
+                *cursor++ = PARROT_ARG_SC;
+                /* Argh */
+                *cursor++ = PackFile_find_in_const(interp, const_table, key, PFC_STRING);
+                break;
 
-                case KEY_integer_FLAG | KEY_register_FLAG:
-                    *cursor++ = PARROT_ARG_I;
-                    GETATTR_Key_int_key(interp, key, *cursor++);
-                    break;
-                case KEY_number_FLAG | KEY_register_FLAG:
-                    *cursor++ = PARROT_ARG_N;
-                    GETATTR_Key_int_key(interp, key, *cursor++);
-                    break;
-                case KEY_string_FLAG | KEY_register_FLAG:
-                    *cursor++ = PARROT_ARG_S;
-                    GETATTR_Key_int_key(interp, key, *cursor++);
-                    break;
-                case KEY_pmc_FLAG | KEY_register_FLAG:
-                    *cursor++ = PARROT_ARG_P;
-                    GETATTR_Key_int_key(interp, key, *cursor++);
-                    break;
-                default:
-                    Parrot_io_eprintf(NULL, "PackFile_Constant_pack: "
+              case KEY_integer_FLAG | KEY_register_FLAG:
+                *cursor++ = PARROT_ARG_I;
+                GETATTR_Key_int_key(interp, key, *cursor++);
+                break;
+              case KEY_number_FLAG | KEY_register_FLAG:
+                *cursor++ = PARROT_ARG_N;
+                GETATTR_Key_int_key(interp, key, *cursor++);
+                break;
+              case KEY_string_FLAG | KEY_register_FLAG:
+                *cursor++ = PARROT_ARG_S;
+                GETATTR_Key_int_key(interp, key, *cursor++);
+                break;
+              case KEY_pmc_FLAG | KEY_register_FLAG:
+                *cursor++ = PARROT_ARG_P;
+                GETATTR_Key_int_key(interp, key, *cursor++);
+                break;
+              default:
+                Parrot_io_eprintf(NULL, "PackFile_Constant_pack: "
                             "unsupported constant type\n");
-                    Parrot_exit(interp, 1);
+                Parrot_exit(interp, 1);
             }
             GETATTR_Key_next_key(interp, key, key);
         }
 
         break;
 
-    default:
+      default:
         Parrot_io_eprintf(NULL, "PackFile_Constant_pack: unsupported constant\n");
         Parrot_exit(interp, 1);
         break;
