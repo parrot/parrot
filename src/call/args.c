@@ -1007,7 +1007,6 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 {
     ASSERT_ARGS(fill_params)
     PMC    *named_used_list = PMCNULL;
-    PMC    *arg_sig;
     INTVAL *raw_params;
     INTVAL  param_count     = VTABLE_elements(interp, raw_sig);
     INTVAL  param_index     = 0;
@@ -1031,8 +1030,6 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         return;
     }
 
-    positional_args = VTABLE_elements(interp, call_object);
-    GETATTR_CallSignature_arg_flags(interp, call_object, arg_sig);
     GETATTR_FixedIntegerArray_int_array(interp, raw_sig, raw_params);
 
     /* EXPERIMENTAL! This block adds provisional :call_sig param support on the
@@ -1056,6 +1053,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
     /* First iterate over positional args and positional parameters. */
     arg_index = 0;
     param_index = 0;
+    positional_args = VTABLE_elements(interp, call_object);
     while (1) {
         INTVAL param_flags;
 
@@ -1237,6 +1235,10 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         }
 
         if (arg_index < positional_args) {
+            PMC *arg_sig;
+
+            GETATTR_CallSignature_arg_flags(interp, call_object, arg_sig);
+
             /* We've used up all the positional parameters, but have extra
              * positional args left over. */
             if (VTABLE_get_integer_keyed_int(interp, arg_sig, arg_index) & PARROT_ARG_NAME) {
