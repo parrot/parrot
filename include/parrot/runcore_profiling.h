@@ -16,11 +16,38 @@ typedef struct profiling_runcore_t Parrot_profiling_runcore_t;
 #include "parrot/op.h"
 #include "parrot/runcore_api.h"
 
+/* make a #define that will hold an INTVAL and a pointer */
+#if PTR_SIZE == INTVAL_SIZE
+#  define PPROF_DATA INTVAL
+#else
+#  define PPROF_DATA HUGEINTVAL
+#endif
+
 typedef enum Parrot_profiling_flags {
     PROFILING_EXIT_CHECK_FLAG       = 1 << 0,
     PROFILING_FIRST_LOOP_FLAG       = 1 << 1,
     PROFILING_HAVE_PRINTED_CLI_FLAG = 1 << 2
 } Parrot_profiling_flags;
+
+typedef enum Parrot_profiling_line {
+    PPROF_LINE_CONTEXT_SWITCH,
+    PPROF_LINE_OP,
+    PPROF_LINE_VERSION,
+    PPROF_LINE_CLI,
+    PPROF_LINE_END_OF_RUNLOOP
+} Parrot_profiling_line;
+
+typedef enum Parrot_profiling_datatype {
+    PPROF_DATA_TIME = 0,
+    PPROF_DATA_FILENAME,
+    PPROF_DATA_LINE,
+    PPROF_DATA_NAMESPACE,
+    PPROF_DATA_OPNAME,
+    PPROF_DATA_SUB_ADDR,
+    PPROF_DATA_CTX_ADDR,
+    PPROF_DATA_CLI,
+    PPROF_DATA_MAX      /* this must be the last element */
+} Parrot_profiling_datatype;
 
 struct profiling_runcore_t {
     STRING                      *name;
@@ -46,6 +73,7 @@ struct profiling_runcore_t {
     UINTVAL         time_size;  /* how big is the following array */
     UHUGEINTVAL    *time;       /* time spent between DO_OP and start/end of a runcore */
     Hash           *line_cache; /* hash for caching pc -> line mapping */
+    PPROF_DATA      pprof_data[PPROF_DATA_MAX]; /* array for storage of one line of profiling data */
 };
 
 
