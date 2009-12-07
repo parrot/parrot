@@ -1820,7 +1820,11 @@ Unless t/harness exists, run : prove --archive t/*.t
 .sub '_clean_smoke' :anon
     .param pmc kv :slurpy :named
     $S0 = get_prove_archive(kv :flat :named)
-    unlink($S0, 1 :named('verbose'))
+    $S1 = $S0 . '.tar'
+    unlink($S1, 1 :named('verbose'))
+    $S1 = $S0 . '.tar.gz'
+    unlink($S1, 1 :named('verbose'))
+    unlink('meta.yml', 1 :named('verbose'))
 .end
 
 =over 4
@@ -1837,13 +1841,23 @@ the default value is "t/*.t"
 
 option --archive of prove
 
-the default value is test.tar.gz
+the default value is 'report' (for report.tar.gz)
 
 =item smolder_url
 
+a string
+
 =item smolder_tags
 
+a string
+
 =item smolder_comments
+
+a string
+
+=item smolder_extra_properties
+
+a hash
 
 =back
 
@@ -1876,7 +1890,35 @@ the default value is test.tar.gz
     .local string archive
     archive = get_prove_archive(kv :flat :named)
     cmd .= archive
+    cmd .= ".tar"
     system(cmd, 1 :named('verbose'), 1 :named('ignore_error'))
+
+    unless $I0 goto L4
+    cmd = "tar xf "
+    cmd .= archive
+    cmd .= ".tar meta.yml"
+    system(cmd, 1 :named('verbose'))
+
+    cmd = "tar f "
+    cmd .= archive
+    cmd .= ".tar --delete meta.yml"
+    system(cmd, 1 :named('verbose'))
+
+    $P0 = kv['smolder_extra_properties']
+    $S0 = mk_extra_properties($P0)
+    say "append extra properties"
+    append('meta.yml', $S0)
+
+    cmd = "tar rf "
+    cmd .= archive
+    cmd .= ".tar meta.yml"
+    system(cmd, 1 :named('verbose'))
+  L4:
+
+    cmd = "gzip --best "
+    cmd .= archive
+    cmd .= ".tar"
+    system(cmd, 1 :named('verbose'))
 
     $I0 = exists kv['smolder_url']
     unless $I0 goto L5
@@ -1907,11 +1949,31 @@ the default value is test.tar.gz
   L7:
     cmd .= " -F report_file=@"
     cmd .= archive
-    cmd .= " "
+    cmd .= ".tar.gz "
     $S0 = kv['smolder_url']
     cmd .= $S0
     system(cmd, 1 :named('verbose'))
   L5:
+.end
+
+.sub 'mk_extra_properties' :anon
+    .param pmc hash
+    $S0 = "extra_properties:\n"
+    $P0 = iter hash
+  L1:
+    unless $P0 goto L2
+    .local string key, value
+    key = shift $P0
+    value = hash[key]
+    if value == '' goto L1
+    $S0 .= "  "
+    $S0 .= key
+    $S0 .= ": "
+    $S0 .= value
+    $S0 .= "\n"
+    goto L1
+  L2:
+    .return ($S0)
 .end
 
 =head3 Step install
@@ -3290,7 +3352,7 @@ Return the whole config
     unless has_archive goto L1
     .return (archive)
   L1:
-    .return ('test.tar.gz')
+    .return ('report')
 .end
 
 =item get_version
@@ -3745,6 +3807,33 @@ Return the whole config
     $P0 = new 'FileHandle'
     push_eh _handler
     $P0.'open'(filename, 'w')
+    pop_eh
+    $P0.'puts'(content)
+    $P0.'close'()
+    .return ()
+  _handler:
+    .local pmc e
+    .get_results (e)
+    $S0 = "Can't open '"
+    $S0 .= filename
+    $S0 .= "' ("
+    $S1 = err
+    $S0 .= $S1
+    $S0 .= ")\n"
+    e = $S0
+    rethrow e
+.end
+
+=item append
+
+=cut
+
+.sub 'append'
+    .param string filename
+    .param string content
+    $P0 = new 'FileHandle'
+    push_eh _handler
+    $P0.'open'(filename, 'a')
     pop_eh
     $P0.'puts'(content)
     $P0.'close'()
