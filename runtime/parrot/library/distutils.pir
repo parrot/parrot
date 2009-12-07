@@ -1820,10 +1820,7 @@ Unless t/harness exists, run : prove --archive t/*.t
 .sub '_clean_smoke' :anon
     .param pmc kv :slurpy :named
     $S0 = get_prove_archive(kv :flat :named)
-    $S1 = $S0 . '.tar'
-    unlink($S1, 1 :named('verbose'))
-    $S1 = $S0 . '.tar.gz'
-    unlink($S1, 1 :named('verbose'))
+    unlink($S0, 1 :named('verbose'))
     unlink('meta.yml', 1 :named('verbose'))
 .end
 
@@ -1841,7 +1838,7 @@ the default value is "t/*.t"
 
 option --archive of prove
 
-the default value is 'report' (for report.tar.gz)
+the default value is report.tar.gz
 
 =item smolder_url
 
@@ -1890,35 +1887,27 @@ a hash
     .local string archive
     archive = get_prove_archive(kv :flat :named)
     cmd .= archive
-    cmd .= ".tar"
     system(cmd, 1 :named('verbose'), 1 :named('ignore_error'))
 
+    $I0 = exists kv['smolder_extra_properties']
     unless $I0 goto L4
-    cmd = "tar xf "
+    system('perl -MExtUtils::Command -e rm_rf tmp')
+    cmd = "mkdir tmp && cd tmp && tar xzf ../"
     cmd .= archive
-    cmd .= ".tar meta.yml"
-    system(cmd, 1 :named('verbose'))
-
-    cmd = "tar f "
-    cmd .= archive
-    cmd .= ".tar --delete meta.yml"
     system(cmd, 1 :named('verbose'))
 
     $P0 = kv['smolder_extra_properties']
     $S0 = mk_extra_properties($P0)
     say "append extra properties"
-    append('meta.yml', $S0)
+    append('tmp/meta.yml', $S0)
 
-    cmd = "tar rf "
+    unlink(archive)
+    cmd = "cd tmp && tar czf ../"
     cmd .= archive
-    cmd .= ".tar meta.yml"
+    cmd .= " *"
     system(cmd, 1 :named('verbose'))
+    system('perl -MExtUtils::Command -e rm_rf tmp')
   L4:
-
-    cmd = "gzip --best "
-    cmd .= archive
-    cmd .= ".tar"
-    system(cmd, 1 :named('verbose'))
 
     $I0 = exists kv['smolder_url']
     unless $I0 goto L5
@@ -1949,7 +1938,7 @@ a hash
   L7:
     cmd .= " -F report_file=@"
     cmd .= archive
-    cmd .= ".tar.gz "
+    cmd .= " "
     $S0 = kv['smolder_url']
     cmd .= $S0
     system(cmd, 1 :named('verbose'))
@@ -3352,7 +3341,7 @@ Return the whole config
     unless has_archive goto L1
     .return (archive)
   L1:
-    .return ('report')
+    .return ('report.tar.gz')
 .end
 
 =item get_version
