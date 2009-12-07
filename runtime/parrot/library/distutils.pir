@@ -3719,25 +3719,32 @@ Return the whole config
   L3:
     .local pmc matcher
     load_bytecode 'PGE/Glob.pbc'
-    $P4 = compreg 'PGE::Glob'
-    matcher = $P4.'compile'(pattern)
-    .local string dir
-    dir = dirname(pattern)
-    $P2 = new 'OS'
-    $P3 = $P2.'readdir'(dir)
+    $P2 = compreg 'PGE::Glob'
+    matcher = $P2.'compile'(pattern)
+    $S0 = dirname(pattern)
+    $P3 = glob($S0)
+    $P4 = new 'OS'
   L4:
     unless $P3 goto L1
-    $S0 = shift $P3
-    if dir == '.' goto L5
+    .local string dir
+    dir = shift $P3
+    $I0 = stat dir, .STAT_ISDIR
+    unless $I0 goto L4
+    $S0 = basename(dir)
+    if $S0 == '.' goto L4
+    if $S0 == '..' goto L4
+    $P5 = $P4.'readdir'(dir)
+  L5:
+    unless $P5 goto L4
+    $S0 = shift $P5
+    if dir == '.' goto L6
     $S1 = dir . '/'
     $S0 = $S1 . $S0
-  L5:
-    $I0 = stat $S0, .STAT_ISDIR
-    if $I0 goto L4
-    $P5 = matcher($S0)
-    unless $P5 goto L4
+  L6:
+    $P6 = matcher($S0)
+    unless $P6 goto L5
     push $P0, $S0
-    goto L4
+    goto L5
   L2:
     .return ($P0)
 .end
