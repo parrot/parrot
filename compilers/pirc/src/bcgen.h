@@ -162,6 +162,10 @@ opcode_t /*@alt void@*/
 emit_opcode(ARGIN(bytecode * const bc), opcode_t op)
         __attribute__nonnull__(1);
 
+int emit_pbc_key(ARGIN(bytecode * const bc), ARGIN(key * const k))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 FLOATVAL get_num_const(ARGIN(bytecode * const bc), unsigned index)
         __attribute__nonnull__(1);
 

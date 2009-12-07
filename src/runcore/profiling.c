@@ -54,9 +54,8 @@ static void * init_profiling_core(PARROT_INTERP,
 
 static void record_values_ascii_pprof(
     ARGIN(Parrot_profiling_runcore_t * runcore),
-    ARGIN(Parrot_profiling_line type))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+    ARGIN_NULLOK(Parrot_profiling_line type))
+        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -72,8 +71,7 @@ static opcode_t * runops_profiling_core(PARROT_INTERP,
     , PARROT_ASSERT_ARG(runcore) \
     , PARROT_ASSERT_ARG(pc))
 #define ASSERT_ARGS_record_values_ascii_pprof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(runcore) \
-    , PARROT_ASSERT_ARG(type))
+       PARROT_ASSERT_ARG(runcore))
 #define ASSERT_ARGS_runops_profiling_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(runcore) \
@@ -418,7 +416,7 @@ Record profiling data to a filehandle in a human-readable format.
 
 static void
 record_values_ascii_pprof(ARGIN(Parrot_profiling_runcore_t * runcore),
-ARGIN(Parrot_profiling_line type))
+ARGIN_NULLOK(Parrot_profiling_line type))
 {
     ASSERT_ARGS(record_values_ascii_pprof)
 
