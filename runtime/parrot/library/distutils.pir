@@ -179,6 +179,8 @@ L<http://github.com/tene/gil/blob/master/setup.pir>
 
 L<http://github.com/tene/steme/blob/master/setup.pir>
 
+L<http://github.com/TiMBuS/fun/blob/master/setup.pir>
+
 =cut
 
 .sub '__onload' :load :init :anon
@@ -1874,7 +1876,7 @@ the default value is test.tar.gz
     .local string archive
     archive = get_prove_archive(kv :flat :named)
     cmd .= archive
-    system(cmd, 1 :named('verbose'))
+    system(cmd, 1 :named('verbose'), 1 :named('ignore_error'))
 
     $I0 = exists kv['smolder_url']
     unless $I0 goto L5
@@ -3335,12 +3337,17 @@ Return the whole config
     .param string cmd
     .param int verbose          :named('verbose') :optional
     .param int has_verbose      :opt_flag
+    .param int ignore_error     :named('ignore_error') :optional
+    .param int has_ignore_error :opt_flag
     unless has_verbose goto L1
     unless verbose goto L1
     say cmd
   L1:
     $I0 = spawnw cmd
     unless $I0 goto L2
+    unless has_ignore_error goto L3
+    if ignore_error goto L2
+  L3:
     $S0 = "exit status: "
     $S1 = $I0
     $S0 .= $S1
