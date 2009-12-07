@@ -42,7 +42,7 @@ Instantiate a new object from a string PMC or key name, or from a class object.
 For strings and keys, first check the namespace for a class object, then fall
 back to the type ID if no class object is stored in the namespace.
 
-  new P0, 'ResizableBooleanArray'
+  new $P0, 'ResizableBooleanArray'
 
 Optionally a PMC may be passed to the constructor. It's up to the class what
 to do with the initializer.  See PDD17 and the init_pmc function for more.
@@ -50,17 +50,19 @@ to do with the initializer.  See PDD17 and the init_pmc function for more.
 =cut
 
 op new(out PMC, in STR) {
-    STRING * const classname = $2;
-    PMC * const classobj = Parrot_oo_get_class_str(interp, classname);
+    STRING * const name   = $2;
+    PMC    * const _class = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp))
+                          ? Parrot_oo_get_class_str(interp, name)
+                          : PMCNULL;
 
-    if (!PMC_IS_NULL(classobj))
-        $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
+    if (!PMC_IS_NULL(_class))
+        $1 = VTABLE_instantiate(interp, _class, PMCNULL);
     else {
-        const INTVAL type = pmc_type(interp, classname);
+        const INTVAL type = pmc_type(interp, name);
         if (type <= 0) {
             opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
                 EXCEPTION_NO_CLASS,
-                "Class '%Ss' not found", classname);
+                "Class '%Ss' not found", name);
             goto ADDRESS(dest);
         }
         $1 = pmc_new(interp, type);
@@ -68,17 +70,19 @@ op new(out PMC, in STR) {
 }
 
 op new(out PMC, in STR, in PMC) {
-    STRING * const classname = $2;
-    PMC * const classobj = Parrot_oo_get_class_str(interp, classname);
+    STRING * const name   = $2;
+    PMC    * const _class = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp))
+                          ? Parrot_oo_get_class_str(interp, name)
+                          : PMCNULL;
 
-    if (!PMC_IS_NULL(classobj))
-        $1 = VTABLE_instantiate(interp, classobj, $3);
+    if (!PMC_IS_NULL(_class))
+        $1 = VTABLE_instantiate(interp, _class, $3);
     else {
-        const INTVAL type = pmc_type(interp, classname);
+        const INTVAL type = pmc_type(interp, name);
         if (type <= 0) {
             opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
                 EXCEPTION_NO_CLASS,
-                "Class '%Ss' not found", classname);
+                "Class '%Ss' not found", name);
             goto ADDRESS(dest);
         }
         $1 = pmc_new_init(interp, type, $3);
@@ -86,17 +90,17 @@ op new(out PMC, in STR, in PMC) {
 }
 
 inline op new(out PMC, in PMC) :object_classes {
-    PMC * const classname_key = $2;
-    PMC * const classobj = Parrot_oo_get_class(interp, classname_key);
+    PMC * const name_key = $2;
+    PMC * const _class   = Parrot_oo_get_class(interp, name_key);
 
-    if (!PMC_IS_NULL(classobj))
-        $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
+    if (!PMC_IS_NULL(_class))
+        $1 = VTABLE_instantiate(interp, _class, PMCNULL);
     else {
-        const INTVAL type = pmc_type_p(interp, classname_key);
+        const INTVAL type = pmc_type_p(interp, name_key);
         if (type <= 0) {
             opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
                 EXCEPTION_NO_CLASS,
-                "Class '%Ss' not found", VTABLE_get_repr(interp, classname_key));
+                "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
             goto ADDRESS(dest);
         }
         $1 = pmc_new(interp, type);
@@ -104,17 +108,17 @@ inline op new(out PMC, in PMC) :object_classes {
 }
 
 op new(out PMC, in PMC, in PMC) {
-    PMC * const classname_key = $2;
-    PMC * const classobj = Parrot_oo_get_class(interp, classname_key);
+    PMC * const name_key = $2;
+    PMC * const _class   = Parrot_oo_get_class(interp, name_key);
 
-    if (!PMC_IS_NULL(classobj))
-        $1 = VTABLE_instantiate(interp, classobj, $3);
+    if (!PMC_IS_NULL(_class))
+        $1 = VTABLE_instantiate(interp, _class, $3);
     else {
-        const INTVAL type = pmc_type_p(interp, classname_key);
+        const INTVAL type = pmc_type_p(interp, name_key);
         if (type <= 0) {
             opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
                 EXCEPTION_NO_CLASS,
-                "Class '%Ss' not found", VTABLE_get_repr(interp, classname_key));
+                "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
             goto ADDRESS(dest);
         }
         $1 = pmc_new_init(interp, type, $3);
@@ -129,7 +133,7 @@ op new(out PMC, in PMC, in PMC) {
 
 Instantiate a new object from a key name relative to the root namespace.
 
-  root_new P0, ['parrot';'ResizableBooleanArray']
+  root_new $P0, ['parrot';'ResizableBooleanArray']
 
 Optionally a PMC may be passed to the constructor. It's up to the class what
 to do with the initializer.
