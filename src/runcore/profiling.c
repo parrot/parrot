@@ -425,13 +425,13 @@ ARGIN(Parrot_profiling_line type))
     switch (type) {
         case PPROF_LINE_CONTEXT_SWITCH:
             {
-                char *namespace = (char *) runcore->pprof_data[PPROF_DATA_NAMESPACE];
-                char *filename  = (char *) runcore->pprof_data[PPROF_DATA_FILENAME];
+                char *pnamespace = (char *) runcore->pprof_data[PPROF_DATA_NAMESPACE];
+                char *pfilename  = (char *) runcore->pprof_data[PPROF_DATA_FILENAME];
                 void *sub_addr =  (void *) runcore->pprof_data[PPROF_DATA_SUB_ADDR];
                 void *ctx_addr =  (void *) runcore->pprof_data[PPROF_DATA_CTX_ADDR];
                 fprintf(runcore->profile_fd,
                         "OP:{x{ns:%s}x}{x{file:%s}x}{x{sub:%p}x}{x{ctx:%p}x}\n",
-                        namespace, filename, sub_addr, ctx_addr);
+                        pnamespace, pfilename, sub_addr, ctx_addr);
             }
             break;
 
