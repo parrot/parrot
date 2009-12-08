@@ -219,12 +219,15 @@ Marks the namespace as live.
 */
     VTABLE void mark() {
         Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
-        SUPER();
-        Parrot_gc_mark_PMC_alive(INTERP, nsinfo->parent);
-        Parrot_gc_mark_STRING_alive(INTERP, nsinfo->name);
-        Parrot_gc_mark_PMC_alive(INTERP, nsinfo->_class);
-        Parrot_gc_mark_PMC_alive(INTERP, nsinfo->vtable);
-        Parrot_gc_mark_PMC_alive(INTERP, nsinfo->methods);
+
+        if (nsinfo->hash)
+            parrot_mark_hash(interp, nsinfo->hash);
+
+        Parrot_gc_mark_PMC_alive(interp, nsinfo->parent);
+        Parrot_gc_mark_PMC_alive(interp, nsinfo->_class);
+        Parrot_gc_mark_PMC_alive(interp, nsinfo->vtable);
+        Parrot_gc_mark_PMC_alive(interp, nsinfo->methods);
+        Parrot_gc_mark_STRING_alive(interp, nsinfo->name);
     }
 
 /*
