@@ -3493,7 +3493,21 @@ Return the whole config
   L1:
     $P0 = new 'OS'
     $I1 = 0o775
+    push_eh _handler
     $P0.'mkdir'(dirname, $I1)
+    pop_eh
+    .return ()
+  _handler:
+    .local pmc e
+    .get_results (e)
+    $S0 = "Can't mkdir '"
+    $S0 .= dirname
+    $S0 .= "' ("
+    $S1 = err
+    $S0 .= $S1
+    $S0 .= ")\n"
+    e = $S0
+    rethrow e
 .end
 
 =item install
@@ -3544,10 +3558,37 @@ Return the whole config
     say dst
   L1:
     $P0 = new 'FileHandle'
+    push_eh _handler1
     $S0 = $P0.'readall'(src)
+    pop_eh
+    push_eh _handler2
     $P0.'open'(dst, 'w')
+    pop_eh
     $P0.'puts'($S0)
     $P0.'close'()
+    .return ()
+  _handler1:
+    .local pmc e
+    .get_results (e)
+    $S0 = "Can't open '"
+    $S0 .= src
+    $S0 .= "' ("
+    $S1 = err
+    $S0 .= $S1
+    $S0 .= ")\n"
+    e = $S0
+    rethrow e
+  _handler2:
+    .local pmc e
+    .get_results (e)
+    $S0 = "Can't open '"
+    $S0 .= dst
+    $S0 .= "' ("
+    $S1 = err
+    $S0 .= $S1
+    $S0 .= ")\n"
+    e = $S0
+    rethrow e
 .end
 
 =item chmod
@@ -3591,9 +3632,22 @@ Return the whole config
     say filename
   L2:
     new $P0, 'OS'
+    push_eh _handler
     $P0.'rm'(filename)
+    pop_eh
   L1:
     .return ()
+  _handler:
+    .local pmc e
+    .get_results (e)
+    $S0 = "Can't remove '"
+    $S0 .= filename
+    $S0 .= "' ("
+    $S1 = err
+    $S0 .= $S1
+    $S0 .= ")\n"
+    e = $S0
+    rethrow e
 .end
 
 =item basename
@@ -3661,7 +3715,21 @@ Return the whole config
     say dirname
   L1:
     new $P0, 'OS'
+    push_eh _handler
     $P0.'chdir'(dirname)
+    pop_eh
+    .return ()
+  _handler:
+    .local pmc e
+    .get_results (e)
+    $S0 = "Can't chdir '"
+    $S0 .= dirname
+    $S0 .= "' ("
+    $S1 = err
+    $S0 .= $S1
+    $S0 .= ")\n"
+    e = $S0
+    rethrow e
 .end
 
 =item chomp
