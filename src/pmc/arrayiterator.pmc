@@ -85,15 +85,13 @@ Defaults iteration mode to iterate from start.
 */
 
     VTABLE void init_pmc(PMC *array) {
-        Parrot_ArrayIterator_attributes * const attrs =
-            (Parrot_ArrayIterator_attributes *) PMC_data(SELF);
 
-        attrs->array     = array;
+        SET_ATTR_array(interp, SELF, array);
 
         PObj_custom_mark_SET(SELF);
 
         /* by default, iterate from start */
-        SELF.set_integer_native(ITERATE_FROM_START);
+        STATICSELF.set_integer_native(ITERATE_FROM_START);
     }
 
 /*
@@ -108,7 +106,9 @@ Marks the current idx/key and the aggregate as live.
 
     VTABLE void mark() {
         PMC *array;
+
         GET_ATTR_array(INTERP, SELF, array);
+
         Parrot_gc_mark_PMC_alive(INTERP, array);
     }
 
@@ -120,15 +120,19 @@ Marks the current idx/key and the aggregate as live.
 
 */
     VTABLE PMC* clone() {
-        Parrot_ArrayIterator_attributes * const attrs =
-                PARROT_ARRAYITERATOR(SELF);
-        PMC                             * const clone =
-                pmc_new_init(INTERP, enum_class_ArrayIterator, attrs->array);
-        Parrot_ArrayIterator_attributes * const clone_attrs =
-                PARROT_ARRAYITERATOR(clone);
+        INTVAL pos, reverse;
+        PMC   *array;
+        PMC   *clone;
 
-        clone_attrs->pos     = attrs->pos;
-        clone_attrs->reverse = attrs->reverse;
+        GET_ATTR_array(interp, SELF, array);
+        GET_ATTR_pos(interp, SELF, pos);
+        GET_ATTR_reverse(interp, SELF, reverse);
+
+        clone = pmc_new_init(INTERP, enum_class_ArrayIterator, array);
+
+        SET_ATTR_pos(interp, clone, pos);
+        SET_ATTR_reverse(interp, clone, reverse);
+
         return clone;
     }
 
@@ -143,7 +147,7 @@ Returns true if there is more elements to iterate over.
 */
 
     VTABLE INTVAL get_bool() {
-        return SELF.elements() > 0;
+        return STATICSELF.elements() > 0;
     }
 
 /*
@@ -157,16 +161,23 @@ Returns the number of remaining elements in the array.
 */
 
     VTABLE INTVAL elements() {
-        Parrot_ArrayIterator_attributes * const attrs =
-                PARROT_ARRAYITERATOR(SELF);
-        if (attrs->reverse)
-            return attrs->pos;
-        else
-            return attrs->length - attrs->pos;
+        INTVAL reverse, pos, length;
+
+        GET_ATTR_reverse(interp, SELF, reverse);
+
+        if (reverse) {
+            GET_ATTR_pos(interp, SELF, pos);
+            return pos;
+        }
+        else {
+            GET_ATTR_length(interp, SELF, length);
+            GET_ATTR_pos(interp, SELF, pos);
+            return length - pos;
+        }
     }
 
     VTABLE INTVAL get_integer() {
-        return SELF.elements();
+        return STATICSELF.elements();
     }
 
 /*
@@ -183,17 +194,21 @@ Reset the Iterator. C<value> must be one of
 */
 
     VTABLE void set_integer_native(INTVAL value) {
-        Parrot_ArrayIterator_attributes * const attrs =
-                PARROT_ARRAYITERATOR(SELF);
+        PMC *array;
+        
         if (value == ITERATE_FROM_START) {
-            attrs->reverse   = 0;
-            attrs->pos       = 0;
-            attrs->length    = VTABLE_elements(INTERP, attrs->array);
+            GET_ATTR_array(interp, SELF, array);
+            SET_ATTR_reverse(interp, SELF, 0);
+            SET_ATTR_pos(interp, SELF, 0);
+            SET_ATTR_length(interp, SELF, VTABLE_elements(INTERP, array));
         }
         else if (value == ITERATE_FROM_END) {
-            attrs->reverse   = 1;
-            attrs->pos       = attrs->length
-                             = VTABLE_elements(INTERP, attrs->array);
+            INTVAL element;
+            GET_ATTR_array(interp, SELF, array);
+            element = VTABLE_elements(INTERP, array);
+            SET_ATTR_reverse(interp, SELF, 1);
+            SET_ATTR_length(interp, SELF, element);
+            SET_ATTR_pos(interp, SELF, element);
         }
         else
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
@@ -228,14 +243,20 @@ the next one.
 */
 
     VTABLE INTVAL shift_integer() {
-        Parrot_ArrayIterator_attributes * const attrs =
-                PARROT_ARRAYITERATOR(SELF);
+        INTVAL pos, length;
+        PMC   *array;
 
-        if (attrs->pos >= attrs->length)
+        GET_ATTR_pos(INTERP, SELF, pos);
+        GET_ATTR_length(INTERP, SELF, length);
+
+        if (pos >= length)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        return VTABLE_get_integer_keyed_int(INTERP, attrs->array, attrs->pos++);
+        GET_ATTR_array(INTERP, SELF, array);
+        SET_ATTR_pos(INTERP, SELF, pos+1);
+
+        return VTABLE_get_integer_keyed_int(INTERP, array, pos);
     }
 
 /*
@@ -247,14 +268,19 @@ the next one.
 */
 
     VTABLE FLOATVAL shift_float() {
-        Parrot_ArrayIterator_attributes * const attrs =
-                PARROT_ARRAYITERATOR(SELF);
+        INTVAL pos;
+        PMC   *array;
+
+        GET_ATTR_pos(INTERP, SELF, pos);
 
         if (!STATICSELF.get_bool())
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        return VTABLE_get_number_keyed_int(INTERP, attrs->array, attrs->pos++);
+        GET_ATTR_array(INTERP, SELF, array);
+        SET_ATTR_pos(INTERP, SELF, pos+1);
+
+        return VTABLE_get_number_keyed_int(INTERP, array, pos);
     }
 
 
@@ -267,14 +293,19 @@ the next one.
 */
 
     VTABLE STRING *shift_string() {
-        Parrot_ArrayIterator_attributes * const attrs =
-                PARROT_ARRAYITERATOR(SELF);
+        INTVAL pos;
+        PMC   *array;
+
+        GET_ATTR_pos(INTERP, SELF, pos);
 
         if (!STATICSELF.get_bool())
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        return VTABLE_get_string_keyed_int(INTERP, attrs->array, attrs->pos++);
+        GET_ATTR_array(INTERP, SELF, array);
+        SET_ATTR_pos(INTERP, SELF, pos+1);
+
+        return VTABLE_get_string_keyed_int(INTERP, array, pos);
     }
 
 /*
@@ -289,14 +320,20 @@ the next one.
 */
 
     VTABLE PMC *shift_pmc() {
-        Parrot_ArrayIterator_attributes * const attrs =
-                PARROT_ARRAYITERATOR(SELF);
+        INTVAL pos;
+        PMC   *array;
+
+        GET_ATTR_pos(INTERP, SELF, pos);
+
 
         if (!STATICSELF.get_bool())
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        return VTABLE_get_pmc_keyed_int(INTERP, attrs->array, attrs->pos++);
+        GET_ATTR_array(INTERP, SELF, array);
+        SET_ATTR_pos(INTERP, SELF, pos+1);
+
+        return VTABLE_get_pmc_keyed_int(INTERP, array, pos);
     }
 
 
@@ -312,14 +349,20 @@ the next one.
 */
 
     VTABLE INTVAL pop_integer() {
-        Parrot_ArrayIterator_attributes * const attrs =
-                PARROT_ARRAYITERATOR(SELF);
+        INTVAL pos;
+        PMC   *array;
+
+        GET_ATTR_pos(INTERP, SELF, pos);
+
 
         if (!STATICSELF.get_bool())
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        return VTABLE_get_integer_keyed_int(INTERP, attrs->array, --attrs->pos);
+        GET_ATTR_array(INTERP, SELF, array);
+        SET_ATTR_pos(INTERP, SELF, --pos);
+
+        return VTABLE_get_integer_keyed_int(INTERP, array, pos);
     }
 
 /*
@@ -331,14 +374,19 @@ the next one.
 */
 
     VTABLE FLOATVAL pop_float() {
-        Parrot_ArrayIterator_attributes * const attrs =
-                PARROT_ARRAYITERATOR(SELF);
+        INTVAL pos;
+        PMC   *array;
+
+        GET_ATTR_pos(INTERP, SELF, pos);
 
         if (!STATICSELF.get_bool())
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        return VTABLE_get_number_keyed_int(INTERP, attrs->array, --attrs->pos);
+        GET_ATTR_array(INTERP, SELF, array);
+        SET_ATTR_pos(INTERP, SELF, --pos);
+
+        return VTABLE_get_number_keyed_int(INTERP, array, pos);
     }
 
 
@@ -351,14 +399,19 @@ the next one.
 */
 
     VTABLE STRING *pop_string() {
-        Parrot_ArrayIterator_attributes * const attrs =
-                PARROT_ARRAYITERATOR(SELF);
+        INTVAL pos;
+        PMC   *array;
+
+        GET_ATTR_pos(INTERP, SELF, pos);
 
         if (!STATICSELF.get_bool())
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        return VTABLE_get_string_keyed_int(INTERP, attrs->array, --attrs->pos);
+        GET_ATTR_array(INTERP, SELF, array);
+        SET_ATTR_pos(INTERP, SELF, --pos);
+
+        return VTABLE_get_string_keyed_int(INTERP, array, pos);
     }
 
 /*
@@ -373,14 +426,19 @@ the next one.
 */
 
     VTABLE PMC *pop_pmc() {
-        Parrot_ArrayIterator_attributes * const attrs =
-                PARROT_ARRAYITERATOR(SELF);
+        INTVAL pos;
+        PMC   *array;
+
+        GET_ATTR_pos(INTERP, SELF, pos);
 
         if (!STATICSELF.get_bool())
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        return VTABLE_get_pmc_keyed_int(INTERP, attrs->array, --attrs->pos);
+        GET_ATTR_array(INTERP, SELF, array);
+        SET_ATTR_pos(INTERP, SELF, --pos);
+
+        return VTABLE_get_pmc_keyed_int(INTERP, array, pos);
     }
 
 /*
@@ -407,8 +465,12 @@ Returns the element for C<key>.
 */
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL idx) {
+        INTVAL pos;
+
+        GET_ATTR_pos(INTERP, SELF, pos);
+
         return VTABLE_get_pmc_keyed_int(INTERP, STATICSELF.get_pmc(),
-                PARROT_ARRAYITERATOR(SELF)->pos + idx);
+                pos + idx);
     }
 /*
 
@@ -433,8 +495,12 @@ Get integer value of current position plus idx.
 */
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL idx) {
+        INTVAL pos;
+
+        GET_ATTR_pos(INTERP, SELF, pos);
+
         return VTABLE_get_integer_keyed_int(INTERP, STATICSELF.get_pmc(),
-                PARROT_ARRAYITERATOR(SELF)->pos + idx);
+                pos + idx);
     }
 
 /*
@@ -460,8 +526,12 @@ Get number value of current position plus idx.
 */
 
     VTABLE FLOATVAL get_number_keyed_int(INTVAL idx) {
+        INTVAL pos;
+
+        GET_ATTR_pos(INTERP, SELF, pos);
+
         return VTABLE_get_number_keyed_int(INTERP, STATICSELF.get_pmc(),
-                PARROT_ARRAYITERATOR(SELF)->pos + idx);
+                pos + idx);
     }
 
 
@@ -489,8 +559,12 @@ Get string value of current position plus idx.
 */
 
     VTABLE STRING *get_string_keyed_int(INTVAL idx) {
+        INTVAL pos;
+
+        GET_ATTR_pos(INTERP, SELF, pos);
+
         return VTABLE_get_string_keyed_int(INTERP, STATICSELF.get_pmc(),
-                PARROT_ARRAYITERATOR(SELF)->pos + idx);
+                pos + idx);
     }
 
 /*
@@ -518,12 +592,17 @@ Returns whether an element for C<idx> exists in the aggregate.
 */
 
     VTABLE INTVAL exists_keyed_int(INTVAL idx) {
-        Parrot_ArrayIterator_attributes * const attrs =
-                PARROT_ARRAYITERATOR(SELF);
-        /* Cheat! */
-        const INTVAL final_pos = attrs->pos + idx - attrs->reverse;
+        INTVAL pos, reverse, final_pos;
+        PMC   *array;
 
-        return VTABLE_exists_keyed_int(INTERP, attrs->array, final_pos);
+        GET_ATTR_pos(INTERP, SELF, pos);
+        GET_ATTR_reverse(INTERP, SELF, reverse);
+        GET_ATTR_array(INTERP, SELF, array);
+
+        /* Cheat! */
+        final_pos = pos + idx - reverse;
+
+        return VTABLE_exists_keyed_int(INTERP, array, final_pos);
     }
 
 /*
@@ -549,12 +628,17 @@ Returns the result of calling C<defined_keyed(key)> on the aggregate.
 */
 
     VTABLE INTVAL defined_keyed_int(INTVAL idx) {
-        Parrot_ArrayIterator_attributes * const attrs =
-                PARROT_ARRAYITERATOR(SELF);
-        /* Cheat! */
-        const INTVAL final_pos = attrs->pos + idx - attrs->reverse;
+        INTVAL pos, reverse, final_pos;
+        PMC   *array;
 
-        return VTABLE_defined_keyed_int(INTERP, attrs->array, final_pos);
+        GET_ATTR_pos(INTERP, SELF, pos);
+        GET_ATTR_reverse(INTERP, SELF, reverse);
+        GET_ATTR_array(INTERP, SELF, array);
+
+        /* Cheat! */
+        final_pos = pos + idx - reverse;
+
+        return VTABLE_defined_keyed_int(INTERP, array, final_pos);
     }
 }
 
