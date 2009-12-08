@@ -8,7 +8,7 @@ t/pmc/capture.t - Test the Capture PMC
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/capture.t
+    % parrot t/pmc/capture.t
 
 =head1 DESCRIPTION
 

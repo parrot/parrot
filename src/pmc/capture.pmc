@@ -19,11 +19,17 @@ These are the vtable functions for the Capture PMC.
 */
 
 #define CAPTURE_array_CREATE(i, obj) \
-    if (!PARROT_CAPTURE(obj)->array) \
-        PARROT_CAPTURE(obj)->array = pmc_new((i), enum_class_ResizablePMCArray);
+    do { \
+        GETATTR_Capture_array((i), (obj), array); \
+        if (!array) \
+            SETATTR_Capture_array((i), (obj), pmc_new((i), enum_class_ResizablePMCArray)); \
+    } while (0)
 #define CAPTURE_hash_CREATE(i, obj) \
-    if (!PARROT_CAPTURE(obj)->hash) \
-        PARROT_CAPTURE(obj)->hash = pmc_new((i), enum_class_Hash);
+    do { \
+        GETATTR_Capture_hash((i), (obj), hash); \
+        if (!hash) \
+            SETATTR_Capture_hash((i), (obj),  pmc_new((i), enum_class_Hash)); \
+    } while (0)
 
 pmclass Capture auto_attrs {
     ATTR PMC    *array;
@@ -85,27 +91,35 @@ Sets a value in the array component of the Capture.
 */
 
     VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
+        PMC *array;
+
         CAPTURE_array_CREATE(INTERP, SELF);
-        VTABLE_set_number_keyed_int(INTERP, PARROT_CAPTURE(SELF)->array,
-                                    key, value);
+        GET_ATTR_array(INTERP, SELF, array);
+        VTABLE_set_number_keyed_int(INTERP, array, key, value);
     }
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
+        PMC *array;
+
         CAPTURE_array_CREATE(INTERP, SELF);
-        VTABLE_set_integer_keyed_int(INTERP, PARROT_CAPTURE(SELF)->array,
-                                     key, value);
+        GET_ATTR_array(INTERP, SELF, array);
+        VTABLE_set_integer_keyed_int(INTERP, array, key, value);
     }
 
     VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
+        PMC *array;
+
         CAPTURE_array_CREATE(INTERP, SELF);
-        VTABLE_set_pmc_keyed_int(INTERP, PARROT_CAPTURE(SELF)->array,
-                                 key, value);
+        GET_ATTR_array(INTERP, SELF, array);
+        VTABLE_set_pmc_keyed_int(INTERP, array, key, value);
     }
 
     VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
+        PMC *array;
+
         CAPTURE_array_CREATE(INTERP, SELF);
-        VTABLE_set_string_keyed_int(INTERP, PARROT_CAPTURE(SELF)->array,
-                                    key, value);
+        GET_ATTR_array(INTERP, SELF, array);
+        VTABLE_set_string_keyed_int(INTERP, array, key, value);
     }
 
 /*
@@ -125,31 +139,47 @@ Retrieves a value in the array component of the Capture.
 */
 
     VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
-        if (!(PARROT_CAPTURE(SELF)->array))
+        PMC *array;
+
+        GET_ATTR_array(INTERP, SELF, array);
+
+        if (!array)
             return 0.0;
-        return VTABLE_get_number_keyed_int(INTERP, PARROT_CAPTURE(SELF)->array,
-                                           key);
+
+        return VTABLE_get_number_keyed_int(INTERP, array, key);
     }
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
-        if (!(PARROT_CAPTURE(SELF)->array))
+        PMC *array;
+
+        GET_ATTR_array(INTERP, SELF, array);
+
+        if (!array)
             return 0;
-        return VTABLE_get_integer_keyed_int(INTERP, PARROT_CAPTURE(SELF)->array,
-                                            key);
+
+        return VTABLE_get_integer_keyed_int(INTERP, array, key);
     }
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
-        if (!(PARROT_CAPTURE(SELF)->array))
+        PMC *array;
+
+        GET_ATTR_array(INTERP, SELF, array);
+
+        if (!array)
             return PMCNULL;
-        return VTABLE_get_pmc_keyed_int(INTERP, PARROT_CAPTURE(SELF)->array,
-                                        key);
+
+        return VTABLE_get_pmc_keyed_int(INTERP, array, key);
     }
 
     VTABLE STRING *get_string_keyed_int(INTVAL key) {
-        if (!(PARROT_CAPTURE(SELF)->array))
+        PMC *array;
+
+        GET_ATTR_array(INTERP, SELF, array);
+
+        if (!array)
             return CONST_STRING(INTERP, "");
-        return VTABLE_get_string_keyed_int(INTERP, PARROT_CAPTURE(SELF)->array,
-                                           key);
+
+        return VTABLE_get_string_keyed_int(INTERP, array, key);
     }
 
 /*
@@ -179,43 +209,75 @@ Unshift a value onto the array component of the Capture.
 */
 
     VTABLE void push_float(FLOATVAL value) {
+        PMC *array;
+
         CAPTURE_array_CREATE(INTERP, SELF);
-        VTABLE_push_float(INTERP, PARROT_CAPTURE(SELF)->array, value);
+        GET_ATTR_array(INTERP, SELF, array);
+
+        VTABLE_push_float(INTERP, array, value);
     }
 
     VTABLE void push_integer(INTVAL value) {
+        PMC *array;
+
         CAPTURE_array_CREATE(INTERP, SELF);
-        VTABLE_push_integer(INTERP, PARROT_CAPTURE(SELF)->array, value);
+        GET_ATTR_array(INTERP, SELF, array);
+
+        VTABLE_push_integer(INTERP, array, value);
     }
 
     VTABLE void push_pmc(PMC *value) {
+        PMC *array;
+
         CAPTURE_array_CREATE(INTERP, SELF);
-        VTABLE_push_pmc(INTERP, PARROT_CAPTURE(SELF)->array, value);
+        GET_ATTR_array(INTERP, SELF, array);
+
+        VTABLE_push_pmc(INTERP, array, value);
     }
 
     VTABLE void push_string(STRING *value) {
+        PMC *array;
+
         CAPTURE_array_CREATE(INTERP, SELF);
-        VTABLE_push_string(INTERP, PARROT_CAPTURE(SELF)->array, value);
+        GET_ATTR_array(INTERP, SELF, array);
+
+        VTABLE_push_string(INTERP, array, value);
     }
 
     VTABLE void unshift_float(FLOATVAL value) {
+        PMC *array;
+
         CAPTURE_array_CREATE(INTERP, SELF);
-        VTABLE_unshift_float(INTERP, PARROT_CAPTURE(SELF)->array, value);
+        GET_ATTR_array(INTERP, SELF, array);
+
+        VTABLE_unshift_float(INTERP, array, value);
     }
 
     VTABLE void unshift_integer(INTVAL value) {
+        PMC *array;
+
         CAPTURE_array_CREATE(INTERP, SELF);
-        VTABLE_unshift_integer(INTERP, PARROT_CAPTURE(SELF)->array, value);
+        GET_ATTR_array(INTERP, SELF, array);
+
+        VTABLE_unshift_integer(INTERP, array, value);
     }
 
     VTABLE void unshift_pmc(PMC *value) {
+        PMC *array;
+
         CAPTURE_array_CREATE(INTERP, SELF);
-        VTABLE_unshift_pmc(INTERP, PARROT_CAPTURE(SELF)->array, value);
+        GET_ATTR_array(INTERP, SELF, array);
+
+        VTABLE_unshift_pmc(INTERP, array, value);
     }
 
     VTABLE void unshift_string(STRING *value) {
+        PMC *array;
+
         CAPTURE_array_CREATE(INTERP, SELF);
-        VTABLE_unshift_string(INTERP, PARROT_CAPTURE(SELF)->array, value);
+        GET_ATTR_array(INTERP, SELF, array);
+
+        VTABLE_unshift_string(INTERP, array, value);
     }
 
 /*
@@ -245,43 +307,75 @@ Shift a value from the array component of the Capture.
 */
 
     VTABLE FLOATVAL pop_float() {
+        PMC *array;
+
         CAPTURE_array_CREATE(INTERP, SELF);
-        return VTABLE_pop_float(INTERP, PARROT_CAPTURE(SELF)->array);
+        GET_ATTR_array(INTERP, SELF, array);
+
+        return VTABLE_pop_float(INTERP, array);
     }
 
     VTABLE INTVAL pop_integer() {
+        PMC *array;
+
         CAPTURE_array_CREATE(INTERP, SELF);
-        return VTABLE_pop_integer(INTERP, PARROT_CAPTURE(SELF)->array);
+        GET_ATTR_array(INTERP, SELF, array);
+
+        return VTABLE_pop_integer(INTERP, array);
     }
 
     VTABLE PMC *pop_pmc() {
+        PMC *array;
+
         CAPTURE_array_CREATE(INTERP, SELF);
-        return VTABLE_pop_pmc(INTERP, PARROT_CAPTURE(SELF)->array);
+        GET_ATTR_array(INTERP, SELF, array);
+
+        return VTABLE_pop_pmc(INTERP, array);
     }
 
     VTABLE STRING *pop_string() {
+        PMC *array;
+
         CAPTURE_array_CREATE(INTERP, SELF);
-        return VTABLE_pop_string(INTERP, PARROT_CAPTURE(SELF)->array);
+        GET_ATTR_array(INTERP, SELF, array);
+
+        return VTABLE_pop_string(INTERP, array);
     }
 
     VTABLE FLOATVAL shift_float() {
+        PMC *array;
+
         CAPTURE_array_CREATE(INTERP, SELF);
-        return VTABLE_shift_float(INTERP, PARROT_CAPTURE(SELF)->array);
+        GET_ATTR_array(INTERP, SELF, array);
+
+        return VTABLE_shift_float(INTERP, array);
     }
 
     VTABLE INTVAL shift_integer() {
+        PMC *array;
+
         CAPTURE_array_CREATE(INTERP, SELF);
-        return VTABLE_shift_integer(INTERP, PARROT_CAPTURE(SELF)->array);
+        GET_ATTR_array(INTERP, SELF, array);
+
+        return VTABLE_shift_integer(INTERP, array);
     }
 
     VTABLE PMC *shift_pmc() {
+        PMC *array;
+
         CAPTURE_array_CREATE(INTERP, SELF);
-        return VTABLE_shift_pmc(INTERP, PARROT_CAPTURE(SELF)->array);
+        GET_ATTR_array(INTERP, SELF, array);
+
+        return VTABLE_shift_pmc(INTERP, array);
     }
 
     VTABLE STRING *shift_string() {
+        PMC *array;
+
         CAPTURE_array_CREATE(INTERP, SELF);
-        return VTABLE_shift_string(INTERP, PARROT_CAPTURE(SELF)->array);
+        GET_ATTR_array(INTERP, SELF, array);
+
+        return VTABLE_shift_string(INTERP, array);
     }
 
 /*
@@ -307,29 +401,45 @@ Delete the element corresponding to C<key> in the array component.
 */
 
     VTABLE INTVAL elements() {
-        if (!PARROT_CAPTURE(SELF)->array) return 0;
-        return VTABLE_elements(INTERP, PARROT_CAPTURE(SELF)->array);
+        PMC *array;
+
+        GET_ATTR_array(INTERP, SELF, array);
+
+        if (!array)
+            return 0;
+
+        return VTABLE_elements(INTERP, array);
     }
 
     VTABLE INTVAL defined_keyed_int(INTVAL key) {
-        if (!PARROT_CAPTURE(SELF)->array)
+        PMC *array;
+
+        GET_ATTR_array(INTERP, SELF, array);
+
+        if (!array)
             return 0;
 
-        return VTABLE_defined_keyed_int(INTERP, PARROT_CAPTURE(SELF)->array,
-                                        key);
+        return VTABLE_defined_keyed_int(INTERP, array, key);
     }
 
     VTABLE INTVAL exists_keyed_int(INTVAL key) {
-        if (!PARROT_CAPTURE(SELF)->array)
+        PMC *array;
+
+        GET_ATTR_array(INTERP, SELF, array);
+
+        if (!array)
             return 0;
 
-        return VTABLE_exists_keyed_int(INTERP, PARROT_CAPTURE(SELF)->array,
-                                               key);
+        return VTABLE_exists_keyed_int(INTERP, array, key);
     }
 
     VTABLE void delete_keyed_int(INTVAL key) {
-        if (PARROT_CAPTURE(SELF)->array)
-            VTABLE_delete_keyed_int(INTERP, PARROT_CAPTURE(SELF)->array, key);
+        PMC *array;
+
+        GET_ATTR_array(INTERP, SELF, array);
+
+        if (array)
+            VTABLE_delete_keyed_int(INTERP, array, key);
     }
 
 /*
@@ -349,24 +459,39 @@ Sets a value in the hash component of the Capture.
 */
 
     VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
+        PMC *hash;
+
         CAPTURE_hash_CREATE(INTERP, SELF);
-        VTABLE_set_number_keyed(INTERP, PARROT_CAPTURE(SELF)->hash, key, value);
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        VTABLE_set_number_keyed(INTERP, hash, key, value);
     }
 
     VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
+        PMC *hash;
+
         CAPTURE_hash_CREATE(INTERP, SELF);
-        VTABLE_set_integer_keyed(INTERP, PARROT_CAPTURE(SELF)->hash,
-                                 key, value);
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        VTABLE_set_integer_keyed(INTERP, hash, key, value);
     }
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
+        PMC *hash;
+
         CAPTURE_hash_CREATE(INTERP, SELF);
-        VTABLE_set_pmc_keyed(INTERP, PARROT_CAPTURE(SELF)->hash, key, value);
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        VTABLE_set_pmc_keyed(INTERP, hash, key, value);
     }
 
     VTABLE void set_string_keyed(PMC *key, STRING *value) {
+        PMC *hash;
+
         CAPTURE_hash_CREATE(INTERP, SELF);
-        VTABLE_set_string_keyed(INTERP, PARROT_CAPTURE(SELF)->hash, key, value);
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        VTABLE_set_string_keyed(INTERP, hash, key, value);
     }
 
 /*
@@ -386,28 +511,47 @@ Retrieves a value from the hash component of the Capture.
 */
 
     VTABLE FLOATVAL get_number_keyed(PMC *key) {
-        if (!(PARROT_CAPTURE(SELF)->hash))
+        PMC *hash;
+
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        if (!hash)
             return 0.0;
-        return VTABLE_get_number_keyed(INTERP, PARROT_CAPTURE(SELF)->hash, key);
+
+        return VTABLE_get_number_keyed(INTERP, hash, key);
     }
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
-        if (!(PARROT_CAPTURE(SELF)->hash))
+        PMC *hash;
+
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        if (!hash)
             return 0;
-        return VTABLE_get_integer_keyed(INTERP, PARROT_CAPTURE(SELF)->hash,
-                                        key);
+
+        return VTABLE_get_integer_keyed(INTERP, hash, key);
     }
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
-        if (!(PARROT_CAPTURE(SELF)->hash))
+        PMC *hash;
+
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        if (!hash)
             return PMCNULL;
-        return VTABLE_get_pmc_keyed(INTERP, PARROT_CAPTURE(SELF)->hash, key);
+
+        return VTABLE_get_pmc_keyed(INTERP, hash, key);
     }
 
     VTABLE STRING *get_string_keyed(PMC *key) {
-        if (!(PARROT_CAPTURE(SELF)->hash))
+        PMC *hash;
+
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        if (!hash)
             return CONST_STRING(INTERP, "");
-        return VTABLE_get_string_keyed(INTERP, PARROT_CAPTURE(SELF)->hash, key);
+
+        return VTABLE_get_string_keyed(INTERP, hash, key);
     }
 
 /*
@@ -427,27 +571,39 @@ Sets a value in the hash component of the Capture.
 */
 
     VTABLE void set_number_keyed_str(STRING *key, FLOATVAL value) {
+        PMC *hash;
+
         CAPTURE_hash_CREATE(INTERP, SELF);
-        VTABLE_set_number_keyed_str(INTERP, PARROT_CAPTURE(SELF)->hash,
-                                    key, value);
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        VTABLE_set_number_keyed_str(INTERP, hash, key, value);
     }
 
     VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) {
+        PMC *hash;
+
         CAPTURE_hash_CREATE(INTERP, SELF);
-        VTABLE_set_integer_keyed_str(INTERP, PARROT_CAPTURE(SELF)->hash,
-                                     key, value);
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        VTABLE_set_integer_keyed_str(INTERP, hash, key, value);
     }
 
     VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
+        PMC *hash;
+
         CAPTURE_hash_CREATE(INTERP, SELF);
-        VTABLE_set_pmc_keyed_str(INTERP, PARROT_CAPTURE(SELF)->hash,
-                                 key, value);
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        VTABLE_set_pmc_keyed_str(INTERP, hash, key, value);
     }
 
     VTABLE void set_string_keyed_str(STRING *key, STRING *value) {
+        PMC *hash;
+
         CAPTURE_hash_CREATE(INTERP, SELF);
-        VTABLE_set_string_keyed_str(INTERP, PARROT_CAPTURE(SELF)->hash,
-                                    key, value);
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        VTABLE_set_string_keyed_str(INTERP, hash, key, value);
     }
 
 /*
@@ -467,31 +623,46 @@ Retrieves a value in the hash component of the Capture.
 */
 
     VTABLE FLOATVAL get_number_keyed_str(STRING *key) {
-        if (!(PARROT_CAPTURE(SELF)->hash))
+        PMC *hash;
+
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        if (!hash)
             return 0.0;
-        return VTABLE_get_number_keyed_str(INTERP, PARROT_CAPTURE(SELF)->hash,
-                                           key);
+
+        return VTABLE_get_number_keyed_str(INTERP, hash, key);
     }
 
     VTABLE INTVAL get_integer_keyed_str(STRING *key) {
-        if (!(PARROT_CAPTURE(SELF)->hash))
+        PMC *hash;
+
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        if (!hash)
             return 0;
-        return VTABLE_get_integer_keyed_str(INTERP, PARROT_CAPTURE(SELF)->hash,
-                                            key);
+
+        return VTABLE_get_integer_keyed_str(INTERP, hash, key);
     }
 
     VTABLE PMC *get_pmc_keyed_str(STRING *key) {
-        if (!(PARROT_CAPTURE(SELF)->hash))
+        PMC *hash;
+
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        if (!hash)
             return PMCNULL;
-        return VTABLE_get_pmc_keyed_str(INTERP, PARROT_CAPTURE(SELF)->hash,
-                                        key);
+
+        return VTABLE_get_pmc_keyed_str(INTERP, hash, key);
     }
 
     VTABLE STRING *get_string_keyed_str(STRING *key) {
-        if (!(PARROT_CAPTURE(SELF)->hash))
+        PMC *hash;
+
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        if (!hash)
             return CONST_STRING(INTERP, "");
-        return VTABLE_get_string_keyed_str(INTERP, PARROT_CAPTURE(SELF)->hash,
-                                           key);
+        return VTABLE_get_string_keyed_str(INTERP, hash, key);
     }
 
 /*
@@ -513,18 +684,34 @@ Delete the element corresponding to C<key> in the hash component.
 */
 
     VTABLE INTVAL defined_keyed(PMC *key) {
-        if (!PARROT_CAPTURE(SELF)->hash) return 0;
-        return VTABLE_defined_keyed(INTERP, PARROT_CAPTURE(SELF)->hash, key);
+        PMC *hash;
+
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        if (!hash)
+            return 0;
+
+        return VTABLE_defined_keyed(INTERP, hash, key);
     }
 
     VTABLE INTVAL exists_keyed(PMC *key) {
-        if (!PARROT_CAPTURE(SELF)->hash) return 0;
-        return VTABLE_exists_keyed(INTERP, PARROT_CAPTURE(SELF)->hash, key);
+        PMC *hash;
+
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        if (!hash)
+            return 0;
+
+        return VTABLE_exists_keyed(INTERP, hash, key);
     }
 
     VTABLE void delete_keyed(PMC *key) {
-        if (PARROT_CAPTURE(SELF)->hash)
-            VTABLE_delete_keyed(INTERP, PARROT_CAPTURE(SELF)->hash, key);
+        PMC *hash;
+
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        if (hash)
+            VTABLE_delete_keyed(INTERP, hash, key);
     }
 
 /*
@@ -546,18 +733,32 @@ Delete the element corresponding to C<key> in the hash component.
 */
 
     VTABLE INTVAL defined_keyed_str(STRING *key) {
-        if (!PARROT_CAPTURE(SELF)->hash) return 0;
-        return VTABLE_defined_keyed_str(INTERP, PARROT_CAPTURE(SELF)->hash, key);
+        PMC *hash;
+
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        if (!hash)
+            return 0;
+        return VTABLE_defined_keyed_str(INTERP, hash, key);
     }
 
     VTABLE INTVAL exists_keyed_str(STRING *key) {
-        if (!PARROT_CAPTURE(SELF)->hash) return 0;
-        return VTABLE_exists_keyed_str(INTERP, PARROT_CAPTURE(SELF)->hash, key);
+        PMC *hash;
+
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        if (!hash)
+            return 0;
+        return VTABLE_exists_keyed_str(INTERP, hash, key);
     }
 
     VTABLE void delete_keyed_str(STRING *key) {
-        if (PARROT_CAPTURE(SELF)->hash)
-            VTABLE_delete_keyed_str(INTERP, PARROT_CAPTURE(SELF)->hash, key);
+        PMC *hash;
+
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        if (hash)
+            VTABLE_delete_keyed_str(INTERP, hash, key);
     }
 
 /*
@@ -573,12 +774,15 @@ erase the contents of the array and hash components.
 
     VTABLE void set_pmc(PMC *capture) {
         if (PMC_IS_NULL(capture)) {
-            PARROT_CAPTURE(SELF)->array = NULL;
-            PARROT_CAPTURE(SELF)->hash = NULL;
+            SET_ATTR_array(INTERP, SELF, NULL);
+            SET_ATTR_hash(INTERP, SELF, NULL);
         }
         else if (VTABLE_isa(INTERP, capture, CONST_STRING(INTERP, "Capture"))) {
-            PARROT_CAPTURE(SELF)->array = PARROT_CAPTURE(capture)->array;
-            PARROT_CAPTURE(SELF)->hash  = PARROT_CAPTURE(capture)->hash;
+            PMC *array, *hash;
+            GET_ATTR_array(INTERP, capture, array);
+            GET_ATTR_hash(INTERP, capture, hash);
+            SET_ATTR_array(INTERP, SELF, array);
+            SET_ATTR_hash(INTERP, SELF, hash);
         }
         else
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
@@ -597,7 +801,7 @@ and memory address.
 */
 
     VTABLE STRING *get_string() {
-        STRING *classname = VTABLE_name(INTERP, SELF);
+        const STRING * const classname = VTABLE_name(INTERP, SELF);
         return Parrot_sprintf_c(INTERP, "%S[0x%x]", classname, SELF);
     }
 
@@ -612,11 +816,13 @@ Mark the array.
 */
 
     VTABLE void mark() {
-        Parrot_Capture_attributes * const data = PARROT_CAPTURE(SELF);
-        if (!data)
-            return;
-        Parrot_gc_mark_PMC_alive(INTERP, data->array);
-        Parrot_gc_mark_PMC_alive(INTERP, data->hash);
+        PMC *array, *hash;
+
+        GET_ATTR_array(INTERP, SELF, array);
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        Parrot_gc_mark_PMC_alive(INTERP, array);
+        Parrot_gc_mark_PMC_alive(INTERP, hash);
     }
 
 /*
@@ -632,40 +838,45 @@ Mark the array.
 */
 
     METHOD list() {
-        PMC *capt_array;
+        PMC *array;
         PMC *capt = SELF;
+
         /* XXX:  This workaround is for when we get here as
                  part of a subclass of Capture */
         if (PObj_is_object_TEST(SELF)) {
-            STRING *attribute = CONST_STRING(interp, "proxy");
             PMC    *classobj;
-            PMC *ns = INTERP->root_namespace;
-            ns = Parrot_get_namespace_keyed_str(INTERP, ns, CONST_STRING(INTERP, "parrot"));
-            ns = Parrot_get_namespace_keyed_str(INTERP, ns, CONST_STRING(INTERP, "Capture"));
-            classobj  = Parrot_oo_get_class(INTERP, ns);
-            capt              = VTABLE_get_attr_keyed(interp, SELF, classobj, attribute);
+            PMC    *ns        = INTERP->root_namespace;
+            STRING *attribute = CONST_STRING(INTERP, "proxy");
+
+            ns                = Parrot_get_namespace_keyed_str(INTERP, ns, CONST_STRING(INTERP, "parrot"));
+            ns                = Parrot_get_namespace_keyed_str(INTERP, ns, CONST_STRING(INTERP, "Capture"));
+            classobj          = Parrot_oo_get_class(INTERP, ns);
+            capt              = VTABLE_get_attr_keyed(INTERP, SELF, classobj, attribute);
         }
 
         CAPTURE_array_CREATE(INTERP, capt);
-        capt_array = PARROT_CAPTURE(capt)->array;
+        GET_ATTR_array(INTERP, capt, array);
 
-        RETURN(PMC *capt_array);
+        RETURN(PMC *array);
     }
 
     METHOD hash() {
-        PMC *capt_hash;
+        PMC *hash;
         PMC *capt = SELF;
         /* XXX:  This workaround is for when we get here as
                  part of a subclass of Capture */
         if (PObj_is_object_TEST(SELF)) {
-            STRING *classname = CONST_STRING(INTERP, "Capture");
-            PMC    *classobj  = Parrot_oo_get_class_str(INTERP, classname);
-            STRING *attribute = CONST_STRING(interp, "proxy");
-            capt              = VTABLE_get_attr_keyed(interp, SELF, classobj, attribute);
+            STRING * const classname = CONST_STRING(INTERP, "Capture");
+            STRING        *attribute = CONST_STRING(INTERP, "proxy");
+            PMC           *classobj  = Parrot_oo_get_class_str(INTERP, classname);
+
+            capt                     = VTABLE_get_attr_keyed(INTERP, SELF, classobj, attribute);
         }
+
         CAPTURE_hash_CREATE(INTERP, capt);
-        capt_hash = PARROT_CAPTURE(capt)->hash;
-        RETURN(PMC *capt_hash);
+        GET_ATTR_hash(INTERP, capt, hash);
+
+        RETURN(PMC *hash);
     }
 
 }
