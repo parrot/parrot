@@ -3811,12 +3811,12 @@ Return the whole config
     $I0 = stat dir, .STAT_ISDIR
     unless $I0 goto L4
     $S0 = basename(dir)
-    if $S0 == '.' goto L4
-    if $S0 == '..' goto L4
     $P5 = $P4.'readdir'(dir)
   L5:
     unless $P5 goto L4
     $S0 = shift $P5
+    if $S0 == '.' goto L5
+    if $S0 == '..' goto L5
     if dir == '.' goto L6
     $S1 = dir . '/'
     $S0 = $S1 . $S0
