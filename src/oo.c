@@ -939,16 +939,16 @@ PMC *
 Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *method_name))
 {
     ASSERT_ARGS(Parrot_find_method_with_cache)
-    UINTVAL type, bits;
 
+    UINTVAL type, bits;
     Caches           *mc;
-    Meth_cache_entry *e, *old;
+    Meth_cache_entry *e;
 
     PARROT_ASSERT(method_name != 0);
 
 #if DISABLE_METH_CACHE
     return Parrot_find_method_direct(interp, _class, method_name);
-#endif
+#else
 
     if (! PObj_constant_TEST(method_name))
         return Parrot_find_method_direct(interp, _class, method_name);
@@ -975,10 +975,8 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
     }
 
     e   = mc->idx[type][bits];
-    old = NULL;
 
     while (e && e->strstart != method_name->strstart) {
-        old = e;
         e   = e->next;
     }
 
@@ -986,10 +984,7 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
         /* when here no or no correct entry was at [bits] */
         e     = mem_allocate_typed(Meth_cache_entry);
 
-        if (old)
-            old->next = e;
-        else
-            mc->idx[type][bits] = e;
+        mc->idx[type][bits] = e;
 
         e->pmc      = Parrot_find_method_direct(interp, _class, method_name);
         e->next     = NULL;
@@ -997,6 +992,8 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
     }
 
     return e->pmc;
+
+#endif
 }
 
 
