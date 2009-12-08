@@ -3424,6 +3424,11 @@ Return the whole config
 .sub 'newer' :multi(string, pmc)
     .param string target
     .param pmc depends
+    $I0 = does depends, 'array'
+    if $I0 goto L0
+    $S0 = depends
+    .tailcall newer(target, $S0)
+  L0:
     $I0 = stat target, .STAT_EXISTS
     if $I0 goto L1
     .return (0)
@@ -3618,7 +3623,7 @@ Return the whole config
 
 =cut
 
-.sub 'unlink'
+.sub 'unlink' :multi(string)
     .param string filename
     .param int verbose          :named('verbose') :optional
     .param int has_verbose      :opt_flag
@@ -3648,6 +3653,24 @@ Return the whole config
     $S0 .= ")\n"
     e = $S0
     rethrow e
+.end
+
+.sub 'unlink' :multi(pmc)
+    .param pmc list
+    .param int verbose          :named('verbose') :optional
+    $I0 = does list, 'array'
+    if $I0 goto L1
+    $S0 = list
+    unlink($S0, verbose :named('verbose'))
+    goto L2
+  L1:
+    $P0 = iter list
+  L3:
+    unless $P0 goto L2
+    $S0 = shift $P0
+    unlink($S0, verbose :named('verbose'))
+    goto L3
+  L2:
 .end
 
 =item basename
