@@ -60,23 +60,30 @@ $bindir = 'bin' unless $bindir;
 
 chdir $DESTDIR if ($DESTDIR);
 
+sub quote {
+    my $exe = shift;
+    $exe .= '.exe' if ($^O eq 'MSWin32');
+    $exe = '"' . $exe . '"' if ($exe =~ / /);
+    return $exe;
+}
+
 my $filename;
 my $exe;
 my $out;
 my $FH;
-my $parrot = catfile($bindir, 'parrot');
-my $pirc = catfile($bindir, 'pirc');
-my $nqp = catfile($bindir, 'parrot-nqp');
+my $parrot = quote(catfile($bindir, 'parrot'));
+my $pirc = quote(catfile($bindir, 'pirc'));
+my $nqp = quote(catfile($bindir, 'parrot-nqp'));
 
 #
 # parrot executable
 #
 
-$exe = catfile($bindir, 'pbc_merge');
+$exe = quote(catfile($bindir, 'pbc_merge'));
 $out = `$exe`;
 ok($out =~ /^pbc_merge/, "check pbc_merge");
 
-$exe = catfile($bindir, 'pbc_dump');
+$exe = quote(catfile($bindir, 'pbc_dump'));
 $out = `$exe`;
 ok($out =~ /^pbc_dump/, "check pbc_dump");
 
