@@ -69,7 +69,7 @@ Tests the C<digest_group> a libcrypto wrapper.
     $S3 .= $S2
     goto L1
   L2:
-    like($S3, '@TEMP_md_result@', '@TEMP_md_name@ digest')
+    is($S3, '@TEMP_md_result@', '@TEMP_md_name@ digest')
 .end
 
 # Local Variables:

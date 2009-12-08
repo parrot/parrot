@@ -122,7 +122,7 @@ Tests for mathematical operations with Inf and Nan.
     is($N1, 'NaN', '... sin NaN')
 .end
 
-.sub test_sinh 
+.sub test_sinh
     $N0 = 'Inf'
     $N1 = sinh $N0
     is($N1, 'Inf', 'sinh: sinh Inf')
@@ -134,7 +134,7 @@ Tests for mathematical operations with Inf and Nan.
     is($N1, 'NaN', '... sinh NaN')
 .end
 
-.sub test_asin 
+.sub test_asin
     $N0 = 'Inf'
     $N1 = asin $N0
     is($N1, 'NaN', 'asin: asin Inf')
@@ -266,7 +266,7 @@ Tests for mathematical operations with Inf and Nan.
     todo(0, 'coth NaN', 'cot/coth/acot not implemented for real numbers')
 .end
 
-.sub test_acot 
+.sub test_acot
     $N0 = 'Inf'
     #$N1 = acot $N0
     #is($N1, 'NaN', 'acot: acot Inf')
@@ -316,10 +316,10 @@ Tests for mathematical operations with Inf and Nan.
 .sub test_asec
     $N0 = 'Inf'
     $N1 = asec $N0
-    like($N1, '1\.5707963.*', 'asec: asec Inf')
+    is($N1, '1.5707963267949', 'asec: asec Inf')
     $N0 = '-Inf'
     $N1 = asec $N0
-    like($N1, '1\.5707963.*', '... asec -Inf')
+    is($N1, '1.5707963267949', '... asec -Inf')
     $N0 = 'NaN'
     $N1 = asec $N0
     is($N1, 'NaN', 'asec NaN')
@@ -402,7 +402,7 @@ Tests for mathematical operations with Inf and Nan.
 .sub test_rounding_n
     $N0 = 'NaN'
     $N1 = floor $N0
-    is($N1, 'NaN', 'rounding n: floor NaN') 
+    is($N1, 'NaN', 'rounding n: floor NaN')
     $N2 = ceil $N0
     is($N2, 'NaN', '... ceil NaN')
     $N0 = 'Inf'
@@ -473,7 +473,7 @@ Tests for mathematical operations with Inf and Nan.
     $N0 = 'NaN'
     fdiv $P1, $P2, $N0
     #is($P1, 'NaN', 'fdiv with Float and Integer PMCs and NaN')
-    todo(0, 'fdiv with Float and Integer PMCs and NaN', 'fdiv/mod/cmod do not play nicely with PMCs and NaN')    
+    todo(0, 'fdiv with Float and Integer PMCs and NaN', 'fdiv/mod/cmod do not play nicely with PMCs and NaN')
 .end
 
 .sub test_cmod_float_integer_pmc_nan

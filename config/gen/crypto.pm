@@ -41,7 +41,7 @@ sub _init {
             md_inc => 'ripemd',
         },
         SHA         => {
-            md_result => '<[0..9a..f]>**{40}',
+            md_result => 'c1b0f222d150ebb9aa36a40cafdc8bcbed830b14',,
         },
         SHA1        => {
             md_result => 'c12252ceda8be8994d5fa0290a47231c1d16aae3',
