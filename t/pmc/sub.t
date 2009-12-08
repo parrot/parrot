@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -1133,19 +1133,19 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', ':postcomp' );
 .sub main :main
-    say "main"
+    say 'main'
 .end
 .sub pc :postcomp
-    print "pc\n"
+    say 'pc'
 .end
 .sub im :immediate
-    print "im\n"
+    say 'im'
 .end
 .sub pc2 :postcomp
-    print "pc2\n"
+    say 'pc2'
 .end
 .sub im2 :immediate
-    print "im2\n"
+    say 'im2'
 .end
 CODE
 im
