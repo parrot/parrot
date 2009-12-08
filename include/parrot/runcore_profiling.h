@@ -9,7 +9,7 @@
 #ifndef PARROT_RUNCORE_PROFILING_H_GUARD
 #define PARROT_RUNCORE_PROFILING_H_GUARD
 
-struct profiling_runcore_t;
+struct         profiling_runcore_t;
 typedef struct profiling_runcore_t Parrot_profiling_runcore_t;
 
 #include "parrot/parrot.h"
@@ -37,6 +37,9 @@ typedef enum Parrot_profiling_line {
     PPROF_LINE_END_OF_RUNLOOP
 } Parrot_profiling_line;
 
+typedef void (*profiling_output_fn)(ARGIN(Parrot_profiling_runcore_t*), ARGIN_NULLOK(Parrot_profiling_line));
+typedef        profiling_output_fn Parrot_profiling_output_fn;
+
 typedef enum Parrot_profiling_datatype {
     PPROF_DATA_TIME = 0,
     PPROF_DATA_FILENAME,
@@ -59,6 +62,7 @@ struct profiling_runcore_t {
     INTVAL                       flags;
 
     /* end of common members */
+    Parrot_profiling_output_fn output_fn;
     UHUGEINTVAL     runcore_start;
     UHUGEINTVAL     op_start;
     UHUGEINTVAL     op_finish;
@@ -75,7 +79,6 @@ struct profiling_runcore_t {
     Hash           *line_cache; /* hash for caching pc -> line mapping */
     PPROF_DATA      pprof_data[PPROF_DATA_MAX]; /* array for storage of one line of profiling data */
 };
-
 
 #define Profiling_flag_SET(runcore, flag) \
     ((runcore)->profiling_flags |= flag)
