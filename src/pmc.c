@@ -112,14 +112,10 @@ Parrot_pmc_destroy(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_pmc_destroy)
 
-    if (PObj_custom_destroy_TEST(pmc)) {
+    if (PObj_custom_destroy_TEST(pmc))
         VTABLE_destroy(interp, pmc);
-        /* Prevent repeated calls. */
-        PObj_custom_destroy_CLEAR(pmc);
-    }
 
-    PObj_custom_mark_CLEAR(pmc);
-    PObj_live_CLEAR(pmc);
+    PObj_gc_CLEAR(pmc);
 
     if (PObj_is_PMC_shared_TEST(pmc) && PMC_sync(pmc))
         Parrot_gc_free_pmc_sync(interp, pmc);

@@ -326,6 +326,11 @@ typedef enum PObj_enum {
         PObj_custom_destroy_SET(o); \
 } while (0)
 
+#define PObj_gc_CLEAR(o) (PObj_get_FLAGS(o) \
+    &= ~PObj_custom_destroy_FLAG \
+     | ~PObj_custom_mark_FLAG \
+     | ~PObj_live_FLAG)
+
 /*******************************************************
  * DEPRECATED -- use PObj_custom_destroy_FOO() instead *
  *******************************************************/

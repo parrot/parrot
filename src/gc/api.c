@@ -1733,8 +1733,10 @@ Parrot_gc_free_attributes_from_pool(PARROT_INTERP,
 {
     ASSERT_ARGS(Parrot_gc_free_attributes_from_pool)
     PMC_Attribute_Free_List * const item = (PMC_Attribute_Free_List *)data;
-    item->next = pool->free_list;
+
+    item->next      = pool->free_list;
     pool->free_list = item;
+
     pool->num_free_objects++;
 }
 
