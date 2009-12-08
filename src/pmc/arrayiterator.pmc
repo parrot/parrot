@@ -195,7 +195,7 @@ Reset the Iterator. C<value> must be one of
 
     VTABLE void set_integer_native(INTVAL value) {
         PMC *array;
-        
+
         if (value == ITERATE_FROM_START) {
             GET_ATTR_array(interp, SELF, array);
             SET_ATTR_reverse(interp, SELF, 0);
