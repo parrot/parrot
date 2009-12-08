@@ -785,6 +785,7 @@ imcc_run_pbc(PARROT_INTERP, int obj_file, ARGIN_NULLOK(const char *output_file),
         IMCC_info(interp, 1, "Running...\n");
 
     /* runs :init functions */
+    PackFile_fixup_subs(interp, PBC_IMMEDIATE, NULL);
     PackFile_fixup_subs(interp, PBC_MAIN, NULL);
 
     Parrot_runcode(interp, argc, argv);

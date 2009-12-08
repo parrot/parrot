@@ -1990,6 +1990,9 @@ e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), ARGIN(IMC_Unit *unit))
     if (!unit->instructions)
         return 0;
 
+    if (IMCC_INFO(interp)->write_pbc)
+        return 0;
+
     /*
      * if the sub was marked IMMEDIATE, we run it now
      * This is *dangerous*: all possible global state can be messed
