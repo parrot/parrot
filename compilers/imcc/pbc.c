@@ -1990,9 +1990,6 @@ e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), ARGIN(IMC_Unit *unit))
     if (!unit->instructions)
         return 0;
 
-    if (IMCC_INFO(interp)->write_pbc)
-        return 0;
-
     /*
      * if the sub was marked IMMEDIATE, we run it now
      * This is *dangerous*: all possible global state can be messed
@@ -2006,7 +2003,11 @@ e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), ARGIN(IMC_Unit *unit))
 
     pragma = ins->symregs[0]->pcc_sub->pragma;
 
-    if (pragma & P_IMMEDIATE) {
+    if (IMCC_INFO(interp)->write_pbc && !(pragma & P_ANON))
+        return 0;
+
+    if (pragma & P_IMMEDIATE
+    && (!IMCC_INFO(interp)->write_pbc || (pragma & P_ANON))) {
         /* clear global symbols temporarily -- TT #1324, for example */
         imcc_globals *g      = IMCC_INFO(interp)->globals;
         SymHash       ghash;

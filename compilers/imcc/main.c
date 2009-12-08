@@ -786,6 +786,7 @@ imcc_run_pbc(PARROT_INTERP, int obj_file, ARGIN_NULLOK(const char *output_file),
 
     /* runs :init functions */
     PackFile_fixup_subs(interp, PBC_IMMEDIATE, NULL);
+    PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
     PackFile_fixup_subs(interp, PBC_MAIN, NULL);
 
     Parrot_runcode(interp, argc, argv);
@@ -979,7 +980,7 @@ compile_to_bytecode(PARROT_INTERP,
     fclose(imc_yyin_get(yyscanner));
 
     IMCC_info(interp, 1, "%ld lines compiled.\n", IMCC_INFO(interp)->line);
-    if (per_pbc)
+    if (per_pbc && !IMCC_INFO(interp)->write_pbc)
         PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
 }
 
