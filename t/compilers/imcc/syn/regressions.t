@@ -119,7 +119,7 @@ OUT
 pir_error_output_like( <<'CODE', <<'OUT', ':: not allowed in identifiers');
 .sub foo :main
   .local string a::b
-  a::b = 'HI' 
+  a::b = 'HI'
   say a::b
 .end
 CODE
@@ -177,11 +177,6 @@ OUT
 
 }
 
-TODO: {
-    local $TODO = 'Broken with CGP'
-        if defined $ENV{TEST_PROG_ARGS}
-        &&         $ENV{TEST_PROG_ARGS} =~ /--run-pbc/;
-
 pir_error_output_like( <<'CODE', <<'OUT', 'die in immediate, TT #629');
 .sub 'foo' :immediate
   die 'no'
@@ -189,8 +184,6 @@ pir_error_output_like( <<'CODE', <<'OUT', 'die in immediate, TT #629');
 CODE
 /no\ncurrent inst.*:[\d-]+\)$/
 OUT
-
-}
 
 pir_error_output_like( <<'CODE', <<'OUT', 'No segfault from syntax error');
 .sub 'main'
