@@ -427,6 +427,9 @@ my @SKIP = (
     'GLwDrawAP.h',
     'GLwMDrawA.h',
     'GLwMDrawAP.h',
+
+    # GLFW, a replacement for GLUT
+    'glfw.h',
 );
 
 my $MACRO_FILE = 'runtime/parrot/include/opengl_defines.pasm';
@@ -574,6 +577,9 @@ sub gen_opengl_defines {
             if ($F[2] =~ /^(?:[ACW])?GL[A-Z]*_\w+$/) {
                 push @macros, [$api, $F[1], $F[2]];
             }
+            if ($F[2] =~ /^\(?((?:[ACW])?GL[A-Z]*_\w+)([+-]\d+(?:\.\d*)?(?:e\d+)?)\)?$/) {
+                push @macros, [$api, $F[1], $1, $2];
+            }
             elsif (   $F[2] =~ /^0x[0-9a-fA-F]+$/
                    || $F[2] =~ /^\d+(?:\.\d*)?(?:e\d+)?$/) {
                 $defs{$api}{$F[1]} = $F[2];
@@ -586,15 +592,17 @@ sub gen_opengl_defines {
     }
 
     foreach my $macro (@macros) {
-        my ($api, $define, $value) = @$macro;
+        my ($api, $define, $value, $offset) = @$macro;
         my ($val_api) = $value =~ /^((?:[ACW])?GL[A-Z]*)_/;
 
-        unless (defined ($defs{$api}{$define} = $defs{$val_api}{$value})) {
-            delete $defs{$api}{$define};
+        unless (defined $defs{$val_api}{$value}) {
             next if $non_numeric{$define};
 
-            die "'$define' is defined as '$value', but no '$value' has been defined";
+            die "'$define' is defined using '$value', but no '$value' has been defined";
         }
+
+        $defs{$api}{$define}  = $defs{$val_api}{$value};
+        $defs{$api}{$define} += $offset if defined $offset;
     }
 
     open my $macros, '>', $MACRO_FILE
