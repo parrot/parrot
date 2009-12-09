@@ -22,7 +22,7 @@
     exports = split " ", "plan test_out test_diag test_fail test_pass test_test"
     test_namespace.'export_to'(curr_namespace, exports)
 
-    plan( 102 )
+    plan( 104 )
 
     test_skip()
     test_todo()
@@ -277,6 +277,16 @@ CODE
     test_diag( 'Have: 777.1' )
     test_diag( 'Want: 888.8' )
     test_test( 'failing test is() for floats with description')
+
+    test_fail( 'comparing two floats with precision, failure' )
+    is( 777.1, 888.8, 'comparing two floats with precision, failure', 1e-6)
+    test_diag( 'Have: 777.1' )
+    test_diag( 'Want: 888.8' )
+    test_test( 'failing test is() for floats with precision')
+
+    test_pass( 'comparing two floats with precision, success' )
+    is( 666.222, 666.223, 'comparing two floats with precision, success', 1e-2)
+    test_test( 'passing test is() for floats with precision')
 
     test_pass()
     is( 'bob', 'bob' )

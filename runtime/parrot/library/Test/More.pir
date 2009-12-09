@@ -179,31 +179,28 @@ add more.
   done:
 .end
 
-.sub is :multi(PMC, Float)
-    .param pmc left
-    .param pmc right
-    .param pmc description :optional
-    .param int have_desc   :opt_flag
-    .param pmc precision   :optional
-    .param int have_prec   :opt_flag
+.sub is :multi(_, Float)
+    .param num    left
+    .param num    right
+    .param string description :optional
+    .param int    have_desc   :opt_flag
+    .param num    precision   :optional
+    .param int    have_prec   :opt_flag
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
 
-    .local num l, r
+    if have_prec goto check_precision
+
     .local int pass
-    l    = left
-    r    = right
-    pass = iseq l, r
+    pass = iseq left, right
+    goto report
 
-    if     pass      goto report
-    unless have_prec goto report
-
-    .local num diff, prec_num
-    prec_num = precision
-    diff     = l - r
-    diff     = abs diff
-    pass     = isle diff, prec_num
+  check_precision:
+    .local num diff
+    diff = left - right
+    diff = abs diff
+    pass = isle diff, precision
 
   report:
     test.'ok'( pass, description )
@@ -216,7 +213,7 @@ add more.
     l_string    = left
     r_string    = right
 
-    diagnostic = _make_diagnostic( l_string, r_string )
+    diagnostic = _make_diagnostic( left, right )
     test.'diag'( diagnostic )
   done:
 .end
