@@ -181,6 +181,8 @@ L<http://github.com/tene/steme/blob/master/setup.pir>
 
 L<http://github.com/TiMBuS/fun/blob/master/setup.pir>
 
+L<http://code.google.com/p/decnum-dynpmcs/source/browse/trunk/setup.pir>
+
 =cut
 
 .sub '__onload' :load :init :anon
@@ -3374,6 +3376,60 @@ Return the whole config
     .return ($S0)
 .end
 
+=item probe_include
+
+=cut
+
+.sub 'probe_include'
+    .param string include
+    .param int verbose          :named('verbose') :optional
+    .param string cflags        :named('cflags') :optional
+    .param int has_cflags       :opt_flag
+
+    $S0 = <<'SOURCE_C'
+#include <%s>
+#include <stdio.h>
+
+int
+main(int argc, char* argv[])
+{
+    printf("%s OK\n");
+    return 0;
+}
+SOURCE_C
+    $P0 = new 'FixedStringArray'
+    set $P0, 2
+    $P0[0] = include
+    $P0[1] = include
+    $S0 = sprintf $S0, $P0
+    spew('probe.c', $S0)
+
+    .local string probe
+    $S0 = get_exe()
+    probe = "probe" . $S0
+    .local pmc config
+    config = get_config()
+    .local string cmd
+    cmd = config['cc']
+    cmd .= " "
+    $S0 = get_cflags()
+    cmd .= $S0
+    unless has_cflags goto L1
+    cmd .= " "
+    cmd .= cflags
+  L1:
+    cmd .= " probe.c -o "
+    cmd .= probe
+    system(cmd, verbose :named('verbose'), 1 :named('ignore_error'))
+
+    cmd = "./" . probe
+    $I0 = system(cmd, verbose :named('verbose'), 1 :named('ignore_error'))
+
+    unlink('probe.c', verbose :named('verbose'))
+    unlink(probe, verbose :named('verbose'))
+    .return ($I0)
+.end
+
 =back
 
 =head3 OS Utilities
@@ -3407,6 +3463,7 @@ Return the whole config
     $S0 .= "\n"
     die $S0
   L2:
+    .return ($I0)
 .end
 
 .include 'stat.pasm'
