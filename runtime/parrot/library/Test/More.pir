@@ -141,12 +141,17 @@ comparison.
 If there is a mismatch, the current implementation takes the type of C<left> as
 the proper type for the comparison, converting any numeric arguments to floats.
 Note that there is a hard-coded precision check to avoid certain rounding
-errors.  It's not entirely robust, but it's not completely awful either.
+errors.
 
-Patches very welcome.  Multi-dispatch is a bit tricky here.
+=item C<is( left, right, description, precision )>
 
-This probably doesn't handle all of the comparisons you want, but it's easy to
-add more.
+For C<Float> only, an optional 4th parameter is allowed, a numeric precision.
+If specified, then the floats are only compared within the tolerance of the
+precision: e.g.:
+
+ is(123.456, 123.457, 'close enough?', 1e-2)
+
+will pass.
 
 =cut
 
