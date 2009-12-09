@@ -72,7 +72,7 @@ Returns true if the hash size is not zero.
     VTABLE INTVAL get_integer_keyed(PMC *key) {
         Hash       *hash;
         const void *value;
-	
+
         GET_ATTR_hash(interp, SELF, hash);
         value = parrot_hash_get(INTERP, hash, key);
 
