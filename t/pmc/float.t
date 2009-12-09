@@ -116,8 +116,7 @@ Tests the Float PMC.
     is($S0, '123.45', 'get string')
 
     $P0 = "12.49"
-    $P1 = get_class ['Float']
-    is($P0, 12.49, 'setting value from string', PRECISION)
+    is($P0, 12.49, 'setting value from String', PRECISION)
 .end
 
 .sub 'add_number_to_self'
