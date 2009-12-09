@@ -412,14 +412,10 @@ sub rewrite_pccmethod {
     rewrite_pccinvoke( $self, $pmc );
 
     $e->emit( <<"END", __FILE__, __LINE__ + 1 );
-    PMC *_caller_ctx, *_ctx;
-    PMC *_ccont, *_call_object;
+    PMC * const _ctx         = CURRENT_CONTEXT(interp);
+    PMC * const _ccont       = Parrot_pcc_get_continuation(interp, _ctx);
+    PMC * const _call_object = Parrot_pcc_get_signature(interp, _ctx);
 
-    _ctx = CURRENT_CONTEXT(interp);
-    _ccont = Parrot_pcc_get_continuation(interp, _ctx);
-
-    _caller_ctx = Parrot_pcc_get_caller_ctx(interp, _ctx);
-    _call_object = Parrot_pcc_get_signature(interp, _ctx);
     Parrot_pcc_set_signature(interp, _ctx, NULL);
 
     { /* BEGIN PARMS SCOPE */
@@ -429,7 +425,7 @@ $params_declarations
 END
     if ($params_signature) {
         $e->emit( <<"END", __FILE__, __LINE__ + 1 );
-    Parrot_pcc_fill_params_from_c_args(interp, _call_object, "$params_signature",
+        Parrot_pcc_fill_params_from_c_args(interp, _call_object, "$params_signature",
             $params_varargs);
 END
     }
@@ -441,7 +437,7 @@ END
 
     } /* END PMETHOD BODY */
     } /* END PARAMS SCOPE */
-    no_return:
+  no_return:
     return;
 END
     $self->return_type('void');
