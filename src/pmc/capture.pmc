@@ -818,6 +818,9 @@ Mark the array.
     VTABLE void mark() {
         PMC *array, *hash;
 
+        if (!PMC_data(SELF))
+            return;
+
         GET_ATTR_array(INTERP, SELF, array);
         GET_ATTR_hash(INTERP, SELF, hash);
 
