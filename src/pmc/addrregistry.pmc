@@ -46,10 +46,7 @@ Initializes the instance.
                 int_compare,
                 key_hash_int);
 
-        Parrot_AddrRegistry_attributes *attrs =
-            (Parrot_AddrRegistry_attributes *) PMC_data(SELF);
-
-        SELF.set_pointer(registry);
+        SET_ATTR_hash(INTERP, SELF, registry);
         PObj_custom_mark_destroy_SETALL(SELF);
 
     }
