@@ -70,8 +70,11 @@ Returns true if the hash size is not zero.
 */
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
-        Hash   *hash  = (Hash *)SELF.get_pointer();
-        void   *value = parrot_hash_get(INTERP, hash, key);
+        Hash       *hash;
+        const void *value;
+	
+        GET_ATTR_hash(interp, SELF, hash);
+        value = parrot_hash_get(INTERP, hash, key);
 
         if (value)
             return (INTVAL)value;
@@ -80,11 +83,19 @@ Returns true if the hash size is not zero.
     }
 
     VTABLE INTVAL elements() {
-        return parrot_hash_size(INTERP, (Hash *)SELF.get_pointer());
+        const Hash *hash;
+
+        GET_ATTR_hash(interp, SELF, hash);
+
+        return parrot_hash_size(INTERP, hash);
     }
 
     VTABLE INTVAL get_bool() {
-        return parrot_hash_size(INTERP, (Hash *)SELF.get_pointer()) != 0;
+        const Hash *hash;
+
+        GET_ATTR_hash(interp, SELF, hash);
+
+        return parrot_hash_size(INTERP, hash) != 0;
     }
 /*
 
@@ -108,10 +119,14 @@ reaches 0, delete the entry.
 */
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
-        Hash       * const hash = (Hash *)SELF.get_pointer();
-        void       *oldval      = parrot_hash_get(INTERP, hash, key);
-        long        newval      = 1;
+        const void *oldval;
+        long        newval = 1;
+        Hash       *hash;
         UNUSED(value);
+
+        GET_ATTR_hash(interp, SELF, hash);
+
+        oldval = parrot_hash_get(INTERP, hash, key);
 
         if (oldval)
             newval += (long)oldval;
@@ -120,13 +135,17 @@ reaches 0, delete the entry.
     }
 
     VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
-        Hash *hash = (Hash *)SELF.get_pointer();
+        Hash *hash;
+        GET_ATTR_hash(interp, SELF, hash);
         parrot_hash_put(INTERP, hash, key, (void *)value);
     }
 
     VTABLE void delete_keyed(PMC *key) {
-        Hash       * const hash  = (Hash *)SELF.get_pointer();
-        void              *value = parrot_hash_get(INTERP, hash, key);
+        Hash       *hash;
+        void       *value;
+
+        GET_ATTR_hash(interp, SELF, hash);
+        value = parrot_hash_get(INTERP, hash, key);
 
         /* these casts look bad, but they avoid type punning warnings with -O */
         if (value) {
