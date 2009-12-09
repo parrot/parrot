@@ -135,9 +135,7 @@ UINTVAL     Parrot_hires_get_tick_duration(void);
 
 struct parrot_string_t;
 INTVAL Parrot_Run_OS_Command(Interp*, struct parrot_string_t *);
-void Parrot_Exec_OS_Command(Interp*, struct parrot_string_t *);
 INTVAL Parrot_Run_OS_Command_Argv(Interp*, struct PMC *);
-void Parrot_Exec_OS_Command_Argv(Interp*, struct PMC *);
 
 #endif /* PARROT_PLATFORM_INTERFACE_H_GUARD */
 

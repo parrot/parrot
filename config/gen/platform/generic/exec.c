@@ -127,28 +127,6 @@ Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)
 }
 
 /*
-
-=item C<void Parrot_Exec_OS_Command(PARROT_INTERP, STRING *command)>
-
-=cut
-
-*/
-
-void
-Parrot_Exec_OS_Command(PARROT_INTERP, STRING *command)
-{
-    /* Be horribly profligate with memory, since we're
-       about to be something else */
-    char *cmd  = Parrot_str_to_cstring(interp, command);
-    int status = execlp("sh", "sh", "-c", cmd, (void *)NULL);
-
-    /* if we get here, something's horribly wrong... */
-    if (status)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NOSPAWN,
-            "Exec failed, code %i", status);
-}
-
-/*
  * Local variables:
  *   c-file-style: "parrot"
  * End:
