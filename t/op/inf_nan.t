@@ -316,10 +316,13 @@ Tests for mathematical operations with Inf and Nan.
 .sub test_asec
     $N0 = 'Inf'
     $N1 = asec $N0
-    is($N1, '1.5707963267949', 'asec: asec Inf')
+    $P1 = new 'Float'
+    $P1 = $N1
+    is($P1, 1.5707963, 'asec: asec Inf',1e-6)
     $N0 = '-Inf'
     $N1 = asec $N0
-    is($N1, '1.5707963267949', '... asec -Inf')
+    $P1 = $N1
+    is($P1, 1.5707963, '... asec -Inf',1e-6)
     $N0 = 'NaN'
     $N1 = asec $N0
     is($N1, 'NaN', 'asec NaN')
