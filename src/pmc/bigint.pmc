@@ -37,18 +37,17 @@ typedef struct BIGINT {
 
 static void
 bigint_init(PARROT_INTERP, PMC *self) {
-    Parrot_BigInt_attributes *attrs =
-        mem_allocate_zeroed_typed(Parrot_BigInt_attributes);
-    attrs->bi = mem_allocate_zeroed_typed(BIGINT);
-    mpz_init(attrs->bi->b);
-    PMC_data(self) = attrs;
+    BIGINT * const bi = mem_allocate_zeroed_typed(BIGINT);
+    SETATTR_BigInt_bi(interp, self, bi);
+    mpz_init(bi->b);
 }
 
 static void
 bigint_clear(PARROT_INTERP, PMC *self) {
-    BIGINT *bi;
+    BIGINT * bi;
     GETATTR_BigInt_bi(interp, self, bi);
     mpz_clear(bi->b);
+    mem_sys_free(bi);
 }
 
 static void
@@ -562,7 +561,7 @@ bigint_bitwise_shr_bigint_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest)
 
 #endif /* ifdef PARROT_HAS_GMP */
 
-pmclass BigInt {
+pmclass BigInt auto_attrs {
     ATTR struct BIGINT * bi; /*bigint val*/
 
 /*
@@ -603,15 +602,7 @@ Return GMP version string "x.y.z".
     }
 
     VTABLE void destroy() {
-        BIGINT                   *bi;
-        Parrot_BigInt_attributes *attrs;
-
         bigint_clear(INTERP, SELF);
-
-        attrs = (Parrot_BigInt_attributes*)PMC_data(SELF);
-        mem_sys_free(attrs->bi);
-        mem_sys_free(attrs);
-        PMC_data(SELF) = NULL;
     }
 
 /*
