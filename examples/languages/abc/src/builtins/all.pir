@@ -9,88 +9,34 @@ src/builtins/all.pir -- abc builtin functions
 
 .namespace []
 
-.sub 'infix:=='
-    .param pmc a
-    .param pmc b
-    $I0 = iseq a, b
-    .return ($I0)
-.end
-
-
-.sub 'infix:!='
-    .param pmc a
-    .param pmc b
-    $I0 = isne a, b
-    .return ($I0)
-.end
-
-
-.sub 'infix:<='
-    .param pmc a
-    .param pmc b
-    $I0 = isle a, b
-    .return ($I0)
-.end
-
-
-.sub 'infix:>='
-    .param pmc a
-    .param pmc b
-    $I0 = isge a, b
-    .return ($I0)
-.end
-
-
-.sub 'infix:<'
-    .param pmc a
-    .param pmc b
-    $I0 = islt a, b
-    .return ($I0)
-.end
-
-
-.sub 'infix:>'
-    .param pmc a
-    .param pmc b
-    $I0 = isgt a, b
-    .return ($I0)
-.end
-
-
-.sub 'prefix:++'
+.sub '&prefix:<++>'
     .param pmc n
     inc n
     .return (n)
 .end
 
-.sub 'prefix:--'
+.sub '&prefix:<-->'
     .param pmc n
     dec n
     .return (n)
 .end
 
-.sub 'postfix:++'
+
+.sub '&postfix:<++>'
     .param pmc n
     $P0 = clone n
     inc n
     .return ($P0)
 .end
 
-.sub 'postfix:--'
+.sub '&postfix:<-->'
     .param pmc n
     $P0 = clone n
     dec n
     .return ($P0)
 .end
 
-.sub 'infix:^'
-    .param num a
-    .param num b
-    $N0 = pow a, b
-    .return ($N0)
-.end
-
-.sub 'infix:&&'
+.sub '&infix:<&&>'
     .param pmc a
     .param pmc b
     $I0 = istrue a
@@ -99,7 +45,7 @@ src/builtins/all.pir -- abc builtin functions
     .return ($I0)
 .end
 
-.sub 'infix:||'
+.sub '&infix:<||>'
     .param pmc a
     .param pmc b
     $I0 = istrue a

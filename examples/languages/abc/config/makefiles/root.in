@@ -17,8 +17,6 @@ O             := @o@
 
 # Various paths
 PERL6GRAMMAR  := @build_dir@/runtime/parrot/library/PGE/Perl6Grammar.pbc
-NQP           := @build_dir@/compilers/nqp/nqp.pbc
-PCT           := @build_dir@/runtime/parrot/library/PCT.pbc
 
 ## Setup some commands
 MAKE          := @make_c@
@@ -30,6 +28,7 @@ MKPATH        := @mkpath@
 RM_F          := @rm_f@
 RM_RF         := @rm_rf@
 POD2MAN       := pod2man
+NQP           := @build_dir@/parrot-nqp@exe@
 PARROT        := @build_dir@/parrot@exe@
 PBC_TO_EXE    := @build_dir@/pbc_to_exe@exe@
 #IF(darwin):
@@ -73,14 +72,13 @@ abc.pbc: $(SOURCES)
 abc@exe@: abc.pbc
 	$(PBC_TO_EXE) abc.pbc
 
-src/gen_grammar.pir: $(PERL6GRAMMAR) src/parser/grammar.pg src/parser/grammar-oper.pg
-	$(PARROT) $(PARROT_ARGS) $(PERL6GRAMMAR) \
+src/gen_grammar.pir: src/parser/grammar.pg
+	$(NQP) \
 	    --output=src/gen_grammar.pir \
-	    src/parser/grammar.pg \
-	    src/parser/grammar-oper.pg
+	    --target=pir src/parser/grammar.pg
 
-src/gen_actions.pir: $(NQP) src/parser/actions.pm
-	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/gen_actions.pir \
+src/gen_actions.pir: src/parser/actions.pm
+	$(NQP) --output=src/gen_actions.pir \
 	    --target=pir src/parser/actions.pm
 
 src/gen_builtins.pir: $(BUILTINS_PIR)

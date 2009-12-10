@@ -24,19 +24,53 @@ object.
 
 =cut
 
+.HLL 'abc'
+
+.sub '' :anon :load :init
+    load_bytecode 'PCT.pbc'
+    load_bytecode 'P6Regex.pbc'
+    load_bytecode 'nqp-rx.pbc'
+    .local pmc parrotns, hllns, exports
+    parrotns = get_root_namespace ['parrot']
+    hllns = get_hll_namespace
+    exports = split ' ', 'PAST PCT HLL NQP'
+    parrotns.'export_to'(hllns, exports)
+    .local pmc regexns
+    regexns = hllns.'make_namespace'('Regex')
+    $P0 = get_root_namespace ['parrot';'Regex';'Cursor']
+    regexns.'add_namespace'('Cursor', $P0)
+    $P0 = get_root_global ['parrot';'Regex'], 'Cursor'
+    regexns['Cursor'] = $P0
+    $P0 = get_root_namespace ['parrot';'Regex';'Match']
+    regexns.'add_namespace'('Match', $P0)
+    $P0 = get_root_global ['parrot';'Regex'], 'Match'
+    regexns['Match'] = $P0
+    $P0 = get_root_namespace ['parrot';'Regex';'P6Regex']
+    regexns.'add_namespace'('P6Regex', $P0)
+    $P0 = get_root_global ['parrot';'Regex'], 'P6Regex'
+    regexns['P6Regex'] = $P0
+.end
+
+.include 'src/gen_actions.pir'
+.include 'src/gen_grammar.pir'
+
 .namespace [ 'abc'; 'Compiler' ]
 
 .loadlib 'abc_group'
 
-.sub 'onload' :anon :load :init
-    load_bytecode 'PCT.pbc'
-
-    $P0 = get_hll_global ['PCT'], 'HLLCompiler'
-    $P1 = $P0.'new'()
-    $P1.'language'('abc')
-    $P1.'parsegrammar'('abc::Grammar')
-    $P1.'parseactions'('abc::Grammar::Actions')
+.sub '' :anon :load :init
+    .local pmc abc
+    $P0 = get_root_global ['parrot'], 'P6metaclass'
+    abc = $P0.'new_class'('abc::Compiler', 'parent'=>'HLL::Compiler')
+    abc.'language'('abc')
+    $P0 = get_hll_global ['abc'], 'Grammar'
+    abc.'parsegrammar'($P0)
+    $P0 = get_hll_global ['abc';'Grammar'], 'Actions'
+    abc.'parseactions'($P0)
 .end
+
+.namespace []
+.include 'src/gen_builtins.pir'
 
 =item main(args :slurpy)  :main
 
@@ -52,10 +86,6 @@ to the abc compiler.
     $P1 = $P0.'command_line'(args)
 .end
 
-
-.include 'src/gen_builtins.pir'
-.include 'src/gen_grammar.pir'
-.include 'src/gen_actions.pir'
 
 =back
 
