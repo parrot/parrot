@@ -328,7 +328,7 @@ static int
 is_abs_path(ARGIN(const STRING *file))
 {
     ASSERT_ARGS(is_abs_path)
-    const char * const file_name = Buffer_bufstart(file);
+    const char * const file_name = (const char *)Buffer_bufstart(file);
     if (file->strlen <= 1)
         return 0;
     PARROT_ASSERT(file->encoding == Parrot_fixed_8_encoding_ptr ||
