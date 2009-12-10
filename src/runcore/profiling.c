@@ -267,18 +267,20 @@ ARGIN(opcode_t *pc))
         PMC    *iglobals     = interp->iglobals;
         PMC    *executable   = VTABLE_get_pmc_keyed_int(interp, iglobals,
                                                         IGLOBALS_EXECUTABLE);
-        STRING *command_line = Parrot_str_join(interp, CONST_STRING(interp, " "), argv);
+        STRING *space    = CONST_STRING(interp, " ");
+        STRING *cli_args = Parrot_str_join(interp, space, argv);
+        STRING *cli_str;
+        char   *cli_cstr;
 
-        char   *exec_cstr, *cli_cstr, *full_cli_cstr;
-
-        exec_cstr = Parrot_str_to_cstring(interp,
-                VTABLE_get_string(interp, executable));
-        cli_cstr  = Parrot_str_to_cstring(interp, command_line);
+        cli_str  = Parrot_str_concat(interp, VTABLE_get_string(interp,
+                                     executable), space, 0);
+        cli_str  = Parrot_str_concat(interp, cli_str, cli_args, 0);
+        cli_cstr = Parrot_str_to_cstring(interp, cli_str);
 
         /* CLI line won't reflect any options passed to the parrot binary. */
-        fprintf(runcore->profile_fd, "CLI:%s %s\n", exec_cstr, cli_cstr);
+        runcore->pprof_data[PPROF_DATA_CLI] = (PPROF_DATA) cli_cstr;
+        runcore->output_fn(runcore, PPROF_LINE_CLI);
 
-        Parrot_str_free_cstring(exec_cstr);
         Parrot_str_free_cstring(cli_cstr);
 
         Profiling_have_printed_cli_SET(runcore);
@@ -286,6 +288,7 @@ ARGIN(opcode_t *pc))
 
     if (Profiling_first_loop_TEST(runcore)) {
 
+        runcore->pprof_data[PPROF_DATA_VERSION] = (PPROF_DATA) PPROF_VERSION;
         runcore->output_fn(runcore, PPROF_LINE_VERSION);
 
         /* make all separate runloops appear to come from a single source */
@@ -485,7 +488,8 @@ ARGIN_NULLOK(Parrot_profiling_line type))
             break;
 
         case PPROF_LINE_VERSION:
-            fprintf(runcore->profile_fd, "VERSION:%d\n", PPROF_VERSION);
+            fprintf(runcore->profile_fd, "VERSION:%d\n",
+                    (int) runcore->pprof_data[PPROF_DATA_VERSION]);
             break;
 
         case PPROF_LINE_END_OF_RUNLOOP:

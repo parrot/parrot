@@ -32,6 +32,7 @@ typedef enum Parrot_profiling_flags {
 typedef enum Parrot_profiling_line {
     PPROF_LINE_CONTEXT_SWITCH,
     PPROF_LINE_OP,
+    PPROF_LINE_ANNOTATION,
     PPROF_LINE_VERSION,
     PPROF_LINE_CLI,
     PPROF_LINE_END_OF_RUNLOOP
@@ -48,6 +49,9 @@ typedef enum Parrot_profiling_datatype {
     PPROF_DATA_OPNAME,
     PPROF_DATA_SUB_ADDR,
     PPROF_DATA_CTX_ADDR,
+    PPROF_DATA_ANNOTATION_NAME,
+    PPROF_DATA_ANNOTATION_VALUE,
+    PPROF_DATA_VERSION,
     PPROF_DATA_CLI,
     PPROF_DATA_MAX      /* this must be the last element */
 } Parrot_profiling_datatype;
