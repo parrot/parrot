@@ -153,16 +153,14 @@ typedef struct BIGNUM {
 
 static void
 bignum_init(PARROT_INTERP, PMC *self) {
-    Parrot_BigNum_attributes *attrs =
-        mem_allocate_zeroed_typed(Parrot_BigNum_attributes);
 #ifdef PARROT_HAS_GMP
-    attrs->bn = mem_allocate_zeroed_typed(BIGNUM);
-    mpf_clear(attrs->bn->b);
-    mpf_init(attrs->bn->b);
+    BIGNUM * const bn = mem_allocate_zeroed_typed(BIGNUM);
+    SETATTR_BigNum_bn(interp, self, bn);
+    mpf_clear(bn->b);
+    mpf_init(bn->b);
 #else
-    attrs->bn = NULL;
+    SETATTR_BigNum_bn(interp, SELF, NULL);
 #endif
-    PMC_data(self) = attrs;
 }
 
 
@@ -173,6 +171,7 @@ bignum_clear(PARROT_INTERP, PMC *self) {
     GETATTR_BigNum_bn(interp, self, bn);
     mpf_clear(bn->b);
 #endif
+    mem_sys_free(bn);
 }
 
 
@@ -225,10 +224,8 @@ bignum_set_str(PARROT_INTERP, PMC *self, char *value, int base) {
 static void
 bignum_set_bigint(PARROT_INTERP, PMC *self, struct BIGINT *value) {
     BIGNUM *bn;
-    struct BIGINT *bi;
     GETATTR_BigNum_bn(interp, self, bn);
-    bi->b = PARROT_BIGINT(value);
-    mpf_set(bn->b, (mpf_srcptr)bi->b);
+    mpf_set(bn->b, (mpf_srcptr)value->b);
 }
 #  endif
 
@@ -243,7 +240,7 @@ static void
 bignum_set_self(PARROT_INTERP, PMC *self, BIGNUM *value) {
     BIGNUM *bn;
     GETATTR_BigNum_bn(interp, self, bn);
-    mpf_set(bn->b, (mpf_srcptr)((BIGNUM*)value)->b);
+    mpf_set(bn->b, (mpf_srcptr)(value)->b);
 }
 
 static long
@@ -778,7 +775,7 @@ bignum_set_default_prec(PARROT_INTERP, PMC *self, INTVAL prec) {
 
 #endif /* ifdef PARROT_HAS_GMP */
 
-pmclass BigNum {
+pmclass BigNum auto_attrs {
     ATTR struct BIGNUM * bn; /*bignum val*/
 
 /*
@@ -819,17 +816,7 @@ Return GMP version string "x.y.z".
     }
 
     VTABLE void destroy() {
-        BIGNUM                   *bn;
-        Parrot_BigNum_attributes *attrs;
-
         bignum_clear(INTERP, SELF);
-
-        attrs = (Parrot_BigNum_attributes*)PMC_data(SELF);
-#ifdef PARROT_HAS_GMP
-        mem_sys_free(attrs->bn);
-#endif
-        mem_sys_free(attrs);
-        PMC_data(SELF) = NULL;
     }
 
 /*
