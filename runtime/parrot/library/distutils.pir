@@ -2476,7 +2476,16 @@ Same options as install.
         "test"     : {
             "type" : "parrot_setup"
         },
+        "smoke"    : {
+            "type" : "parrot_setup"
+        },
         "install"  : {
+            "type" : "parrot_setup"
+        },
+        "uninstall": {
+            "type" : "parrot_setup"
+        },
+        "clean"    : {
             "type" : "parrot_setup"
         }
     },
