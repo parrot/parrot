@@ -183,6 +183,10 @@ L<http://github.com/TiMBuS/fun/blob/master/setup.pir>
 
 L<http://code.google.com/p/decnum-dynpmcs/source/browse/trunk/setup.pir>
 
+L<http://github.com/Whiteknight/parrot-linear-algebra/blob/master/setup.pir>
+
+L<http://bitbucket.org/riffraff/shakespeare-parrot/src/tip/setup.pir>
+
 =cut
 
 .sub '__onload' :load :init :anon
@@ -1634,7 +1638,7 @@ The following Version Control System are handled :
 
 .sub '_update_hg' :anon
     .param pmc kv :slurpy :named
-    system('hg pull', 1 :named('verbose'))
+    system('hg pull --update', 1 :named('verbose'))
 .end
 
 =item SVN
