@@ -159,7 +159,7 @@ bignum_init(PARROT_INTERP, PMC *self) {
     mpf_clear(bn->b);
     mpf_init(bn->b);
 #else
-    SETATTR_BigNum_bn(interp, SELF, NULL);
+    SETATTR_BigNum_bn(interp, self, NULL);
 #endif
 }
 
@@ -170,8 +170,8 @@ bignum_clear(PARROT_INTERP, PMC *self) {
     BIGNUM *bn;
     GETATTR_BigNum_bn(interp, self, bn);
     mpf_clear(bn->b);
-#endif
     mem_sys_free(bn);
+#endif
 }
 
 
