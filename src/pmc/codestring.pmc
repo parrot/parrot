@@ -48,9 +48,8 @@ Initialize the CodeString.
 */
 
     VTABLE void init() {
-        Parrot_CodeString_attributes * const attrs = PARROT_CODESTRING(SELF);
         SUPER();
-        attrs->linepos = PMCNULL;
+        SET_ATTR_linepos(INTERP, SELF, PMCNULL);
         PObj_custom_mark_SET(SELF);
     }
 
@@ -65,10 +64,15 @@ Mark the CodeString as live.
 */
 
     VTABLE void mark() {
-        Parrot_CodeString_attributes * const attrs = PARROT_CODESTRING(SELF);
+        PMC *linepos;
+
         SUPER();
-        if (!attrs) return;
-        Parrot_gc_mark_PMC_alive(INTERP, attrs->linepos);
+        if (!PMC_data(SELF))
+            return;
+
+        GET_ATTR_linepos(INTERP, SELF, linepos);
+
+        Parrot_gc_mark_PMC_alive(INTERP, linepos);
     }
 
 /*
@@ -97,10 +101,10 @@ A newline is automatically added to the end of the fmt.
 */
 
   METHOD emit(STRING *fmt, PMC *args :slurpy, PMC *hash :slurpy :named) {
-    STRING *percent     = CONST_STRING(INTERP, "%");
-    STRING *comma       = CONST_STRING(INTERP, ",");
-    STRING *comma_space = CONST_STRING(INTERP, ", ");
-    STRING *newline     = CONST_STRING(INTERP, "\n");
+    STRING * const percent     = CONST_STRING(INTERP, "%");
+    STRING * const comma       = CONST_STRING(INTERP, ",");
+    STRING * const comma_space = CONST_STRING(INTERP, ", ");
+    STRING * const newline     = CONST_STRING(INTERP, "\n");
     STRING *key, *repl, *S0, *S1;
     INTVAL pos          = 0;
     INTVAL replen       = 0;
@@ -150,7 +154,7 @@ A newline is automatically added to the end of the fmt.
     }
 
     /* Add a newline if necessary */
-    if ('\n' != Parrot_str_indexed(INTERP, fmt, Parrot_str_byte_length(interp, fmt) - 1))
+    if ('\n' != Parrot_str_indexed(INTERP, fmt, Parrot_str_byte_length(INTERP, fmt) - 1))
         fmt = Parrot_str_concat(INTERP, fmt, newline, 0);
 
     GET_ATTR_str_val(INTERP, SELF, S1);
@@ -174,8 +178,8 @@ the first line is line number zero.
 
   METHOD lineof(INTVAL pos) {
     PMC    *linepos;
-    INTVAL  line;
     INTVAL  count;
+    INTVAL  line = 0;
 
     GET_ATTR_linepos(INTERP, SELF, linepos);
 
@@ -216,7 +220,6 @@ the first line is line number zero.
      * search for now, * perhaps a binary search would be better someday.
      */
     count = VTABLE_elements(INTERP, linepos);
-    line  = 0;
     while (line < count
           && VTABLE_get_integer_keyed_int(INTERP, linepos, line) <= pos)
         line++;
@@ -269,9 +272,9 @@ prefixed with 'unicode:'.
 */
 
   METHOD escape(STRING *str) {
-    STRING *escaped_str = Parrot_str_escape(INTERP, str);
-    STRING *quote       = CONST_STRING(INTERP, "\x22");
-    STRING *x           = CONST_STRING(INTERP, "\\x");
+    STRING *escaped_str  = Parrot_str_escape(INTERP, str);
+    STRING * const quote = CONST_STRING(INTERP, "\x22");
+    STRING * const x     = CONST_STRING(INTERP, "\\x");
     INTVAL x_pos;
     INTVAL is_unicode = 0;
     UNUSED(SELF);
@@ -283,17 +286,16 @@ prefixed with 'unicode:'.
     if (x_pos != -1) {
         is_unicode = 1;
     }
-    else
-    {
-        STRING *u = CONST_STRING(INTERP, "\\u");
+    else {
+        STRING * const u = CONST_STRING(INTERP, "\\u");
         INTVAL u_pos = Parrot_str_find_index(INTERP, escaped_str, u, 0);
         if (u_pos != -1)
             is_unicode = 1;
     }
 
     if (is_unicode) {
-        STRING *unicode = CONST_STRING(INTERP, "unicode:");
-        escaped_str     = Parrot_str_concat(INTERP, unicode, escaped_str, 1);
+        STRING * const unicode = CONST_STRING(INTERP, "unicode:");
+        escaped_str            = Parrot_str_concat(INTERP, unicode, escaped_str, 1);
     }
 
     RETURN(STRING *escaped_str);
@@ -313,17 +315,16 @@ codepoint value.  Returns -1 if an error occurs in conversion.
 
   METHOD charname_to_ord(STRING *name) {
 #if PARROT_HAS_ICU
-    UChar32    codepoint;
-    UErrorCode err       = U_ZERO_ERROR;
-    char       *cstr     = Parrot_str_to_cstring(INTERP, name);
-    codepoint = u_charFromName(U_EXTENDED_CHAR_NAME, cstr, &err);
+    UErrorCode   err       = U_ZERO_ERROR;
+    char * const cstr      = Parrot_str_to_cstring(INTERP, name);
+    UChar32      codepoint = u_charFromName(U_EXTENDED_CHAR_NAME, cstr, &err);
     Parrot_str_free_cstring(cstr);
     if (U_SUCCESS(err)) {
         RETURN(INTVAL codepoint);
     }
     RETURN(INTVAL -1);
 #else
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+    Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_LIBRARY_ERROR,
         "no ICU lib loaded");
 #endif
   }
@@ -340,20 +341,19 @@ For example, C<key('Foo', 'Bar')> returns C<["Foo";"Bar"]>.
 */
 
   METHOD key(PMC *args :slurpy) {
-    STRING *open_bracket  = CONST_STRING(INTERP, "[");
-    STRING *semi          = CONST_STRING(INTERP, ";");
-    STRING *close_bracket = CONST_STRING(INTERP, "]");
-    STRING *s_array       = CONST_STRING(INTERP, "array");
-    STRING *prefix        = NULL;
-    STRING *out           = open_bracket;
-    INTVAL elements, index;
-
-    elements     = VTABLE_elements(INTERP, args);
+    INTVAL         index;
+    INTVAL         elements      = VTABLE_elements(INTERP, args);
+    STRING * const open_bracket  = CONST_STRING(INTERP, "[");
+    STRING * const semi          = CONST_STRING(INTERP, ";");
+    STRING * const close_bracket = CONST_STRING(INTERP, "]");
+    STRING * const s_array       = CONST_STRING(INTERP, "array");
+    STRING *       prefix        = NULL;
+    STRING *       out           = open_bracket;
 
     for (index = 0; index < elements; index++) {
         PMC *P0      = VTABLE_get_pmc_keyed_int(INTERP, args, index);
         if (PMC_IS_NULL(P0)) continue;
-        else if (VTABLE_does(interp, P0, s_array)) {
+        else if (VTABLE_does(INTERP, P0, s_array)) {
             INTVAL elements2, index2;
             elements2 = VTABLE_elements(INTERP, P0);
             for (index2 = 0; index2 < elements2; index2++) {
