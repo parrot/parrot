@@ -2470,6 +2470,9 @@ Same options as install.
         "fetch"    : {
             "type" : "repository"
         },
+        "update"   : {
+            "type" : "parrot_setup"
+        },
         "build"    : {
             "type" : "parrot_setup"
         },
