@@ -136,14 +136,29 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
 {
     ASSERT_ARGS(init_profiling_core)
 
-    char *profile_filename, *profile_output_cstr, *profile_filename_cstr;
+    char *profile_filename, *output_cstr, *filename_cstr;
+
+    /* initialize the runcore struct */
+    runcore->runops  = (Parrot_runcore_runops_fn_t)  runops_profiling_core;
+    runcore->destroy = (Parrot_runcore_destroy_fn_t) destroy_profiling_core;
+
+    runcore->prev_ctx        = NULL;
+    runcore->profiling_flags = 0;
+    runcore->runloop_count   = 0;
+    runcore->level           = 0;
+    runcore->time_size       = 32;
+    runcore->line_cache      = parrot_new_pointer_hash(interp);
+    runcore->time            = mem_allocate_n_typed(runcore->time_size,
+                                                    UHUGEINTVAL);
 
     /* figure out where to write the output */
-    profile_filename_cstr = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_PROFILING_FILENAME"));
+    filename_cstr = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_PROFILING_FILENAME"));
 
-    if (profile_filename_cstr) {
+    if (filename_cstr) {
         STRING  *lc_filename;
-        runcore->profile_filename = Parrot_str_new(interp, profile_filename_cstr, 0);
+        runcore->profile_filename = Parrot_str_new(interp, filename_cstr, 0);
+        /* this is a little goofy, but it means that we unconditionally free
+         * profile_filename later in this function */
         profile_filename          = Parrot_str_to_cstring(interp, runcore->profile_filename);
         lc_filename               = Parrot_str_downcase(interp, runcore->profile_filename);
 
@@ -171,11 +186,11 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
     }
 
     /* figure out what format the output should be in */
-    profile_output_cstr = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_PROFILING_OUTPUT"));
+    output_cstr = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_PROFILING_OUTPUT"));
 
-    if (profile_output_cstr) {
+    if (output_cstr) {
 
-        STRING *profile_format_str = Parrot_str_new(interp, profile_output_cstr, 0);
+        STRING *profile_format_str = Parrot_str_new(interp, output_cstr, 0);
         if (Parrot_str_equal(interp, profile_format_str, CONST_STRING(interp, "pprof"))) {
             runcore->output_fn = record_values_ascii_pprof;
         }
@@ -183,7 +198,7 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
             runcore->output_fn = record_values_none;
         }
         else {
-            fprintf(stderr, "'%s' is not a valid profiling output format.\n", profile_output_cstr);
+            fprintf(stderr, "'%s' is not a valid profiling output format.\n", output_cstr);
             fprintf(stderr, "Valid values are pprof and none.  The default is pprof.\n");
             exit(1);
         }
@@ -192,22 +207,9 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
         runcore->output_fn = record_values_ascii_pprof;
     }
 
-    /* profile_filename gets collected if it's not marked or in the root set. */
+    /* put profile_filename in the gc root set so it won't get collected */
     gc_register_pmc(interp, (PMC *) runcore->profile_filename);
 
-
-    /* initialize the rest of the runcore struct */
-    runcore->runops  = (Parrot_runcore_runops_fn_t)  runops_profiling_core;
-    runcore->destroy = (Parrot_runcore_destroy_fn_t) destroy_profiling_core;
-
-    runcore->prev_ctx        = NULL;
-    runcore->profiling_flags = 0;
-    runcore->runloop_count   = 0;
-    runcore->level           = 0;
-    runcore->time_size       = 32;
-    runcore->line_cache      = parrot_new_pointer_hash(interp);
-    runcore->time            = mem_allocate_n_typed(runcore->time_size,
-                                                    UHUGEINTVAL);
     Profiling_first_loop_SET(runcore);
 
     Parrot_str_free_cstring(profile_filename);
