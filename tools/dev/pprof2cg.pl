@@ -242,6 +242,9 @@ sub process_input {
             # occur during the execution of a script, e.g. for :init subs.
             @$call_stack = ();
         }
+        elsif ($line =~ /^AN:/) {
+            #ignore annotations for now
+        }
         elsif ($line =~ /^#/) {
             #comments are always ignored
         }
