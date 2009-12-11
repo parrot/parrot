@@ -24,9 +24,11 @@ typedef struct profiling_runcore_t Parrot_profiling_runcore_t;
 #endif
 
 typedef enum Parrot_profiling_flags {
-    PROFILING_EXIT_CHECK_FLAG       = 1 << 0,
-    PROFILING_FIRST_LOOP_FLAG       = 1 << 1,
-    PROFILING_HAVE_PRINTED_CLI_FLAG = 1 << 2
+    PROFILING_EXIT_CHECK_FLAG         = 1 << 0,
+    PROFILING_FIRST_LOOP_FLAG         = 1 << 1,
+    PROFILING_HAVE_PRINTED_CLI_FLAG   = 1 << 2,
+    PROFILING_REPORT_ANNOTATIONS_FLAG = 1 << 3
+
 } Parrot_profiling_flags;
 
 typedef enum Parrot_profiling_line {
@@ -120,6 +122,13 @@ struct profiling_runcore_t {
     Profiling_flag_SET(o, PROFILING_HAVE_PRINTED_CLI_FLAG)
 #define Profiling_have_printed_cli_CLEAR(o) \
     Profiling_flag_CLEAR(o, PROFILING_HAVE_PRINTED_CLI_FLAG)
+
+#define Profiling_report_annotations_TEST(o) \
+    Profiling_flag_TEST(o, PROFILING_REPORT_ANNOTATIONS_FLAG)
+#define Profiling_report_annotations_SET(o) \
+    Profiling_flag_SET(o, PROFILING_REPORT_ANNOTATIONS_FLAG)
+#define Profiling_report_annotations_CLEAR(o) \
+    Profiling_flag_CLEAR(o, PROFILING_REPORT_ANNOTATIONS_FLAG)
 
 /* HEADERIZER BEGIN: src/runcore/profiling.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

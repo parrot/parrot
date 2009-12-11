@@ -1,0 +1,16 @@
+# Copyright (C) 2001-2005, Parrot Foundation.
+# $Id$
+
+=head1 Name
+
+docs/dev/profiling.pod - Profiling Parrot
+
+=head1 Description
+
+This file documents the use of Parrot's profiling runcore.
+
+=head2 Summary
+
+It does some stuff.
+
+=cut

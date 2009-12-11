@@ -136,7 +136,7 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
 {
     ASSERT_ARGS(init_profiling_core)
 
-    char *profile_filename, *output_cstr, *filename_cstr;
+    char *profile_filename, *output_cstr, *filename_cstr, *annotations_cstr;
 
     /* initialize the runcore struct */
     runcore->runops  = (Parrot_runcore_runops_fn_t)  runops_profiling_core;
@@ -205,6 +205,14 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
     }
     else {
         runcore->output_fn = record_values_ascii_pprof;
+    }
+
+    /* figure out if annotations are wanted */
+    annotations_cstr = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_PROFILING_ANNOTATIONS"));
+
+    if (annotations_cstr) {
+        mem_sys_free(annotations_cstr);
+        Profiling_report_annotations_SET(runcore);
     }
 
     /* put profile_filename in the gc root set so it won't get collected */
