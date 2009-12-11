@@ -84,6 +84,12 @@ my @hlls = (
     },
 
     {
+        name       => 'close',
+        scm        => 'SVN',
+        repository => 'http://close.googlecode.com/svn/trunk/'
+    },
+
+    {
         name       => 'dotnet',
         scm        => 'SVN',
         repository => 'https://svn.parrot.org/languages/dotnet/trunk'
@@ -303,6 +309,12 @@ my @hlls = (
         name       => 'urm',
         scm        => 'SVN',
         repository => 'https://svn.parrot.org/languages/urm/trunk'
+    },
+
+    {
+        name       => 'winexd',
+        scm        => 'SVN',
+        repository => 'http://winxed.googlecode.com/svn/trunk/'
     },
 
     {
