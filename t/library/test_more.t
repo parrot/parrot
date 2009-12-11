@@ -22,7 +22,7 @@
     exports = split " ", "plan test_out test_diag test_fail test_pass test_test"
     test_namespace.'export_to'(curr_namespace, exports)
 
-    plan( 106 )
+    plan( 108 )
 
     test_skip()
     test_todo()
@@ -300,6 +300,18 @@ CODE
     $P0 = 666.222
     is( $P0, 666.223, 'comparing Float PMC and a float with precision, success', 1e-2)
     test_test( 'passing test is() for comparing Float PMC and float with precision')
+
+    test_pass( 'comparing integer and a Float PMC with precision, success' )
+    $I0 = 42
+    is( $I0, 41.99, 'comparing integer and a Float PMC with precision, success', 0.1)
+    test_test( 'passing test is() for comparing Integer PMC and float with precision')
+
+    test_fail( 'comparing integer and a Float PMC with precision, failure' )
+    $I0 = 42
+    is( $I0, 41.99, 'comparing integer and a Float PMC with precision, failure', 1e-3)
+    test_diag( 'Have: 42' )
+    test_diag( 'Want: 41.99' )
+    test_test( 'failing test is() for comparing Integer PMC and float with precision')
 
     test_pass()
     is( 'bob', 'bob' )
