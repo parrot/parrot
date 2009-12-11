@@ -119,7 +119,7 @@ help:
 	@echo ""
 
 test: build
-	$(PERL) t/harness
+	prove t/*.t
 
 # basic run for missing libs
 test-installable: installable
