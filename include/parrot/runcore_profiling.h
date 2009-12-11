@@ -42,18 +42,27 @@ typedef void (*profiling_output_fn)(ARGIN(Parrot_profiling_runcore_t*), ARGIN_NU
 typedef        profiling_output_fn Parrot_profiling_output_fn;
 
 typedef enum Parrot_profiling_datatype {
-    PPROF_DATA_TIME = 0,
-    PPROF_DATA_FILENAME,
-    PPROF_DATA_LINE,
-    PPROF_DATA_NAMESPACE,
-    PPROF_DATA_OPNAME,
-    PPROF_DATA_SUB_ADDR,
-    PPROF_DATA_CTX_ADDR,
-    PPROF_DATA_ANNOTATION_NAME,
-    PPROF_DATA_ANNOTATION_VALUE,
-    PPROF_DATA_VERSION,
-    PPROF_DATA_CLI,
-    PPROF_DATA_MAX      /* this must be the last element */
+
+    /* context switch */
+    PPROF_DATA_NAMESPACE = 0,
+    PPROF_DATA_FILENAME  = 1,
+    PPROF_DATA_SUB_ADDR  = 2,
+    PPROF_DATA_CTX_ADDR  = 3,
+
+    /* op */
+    PPROF_DATA_LINE   = 0,
+    PPROF_DATA_TIME   = 1,
+    PPROF_DATA_OPNAME = 2,
+
+    /* annotation */
+    PPROF_DATA_ANNOTATION_NAME  = 0,
+    PPROF_DATA_ANNOTATION_VALUE = 1,
+
+    PPROF_DATA_VERSION = 0,
+
+    PPROF_DATA_CLI = 0,
+
+    PPROF_DATA_MAX = 3,
 } Parrot_profiling_datatype;
 
 struct profiling_runcore_t {
@@ -81,7 +90,7 @@ struct profiling_runcore_t {
     UINTVAL         time_size;  /* how big is the following array */
     UHUGEINTVAL    *time;       /* time spent between DO_OP and start/end of a runcore */
     Hash           *line_cache; /* hash for caching pc -> line mapping */
-    PPROF_DATA      pprof_data[PPROF_DATA_MAX]; /* array for storage of one line of profiling data */
+    PPROF_DATA      pprof_data[PPROF_DATA_MAX+1]; /* array for storage of one line of profiling data */
 };
 
 #define Profiling_flag_SET(runcore, flag) \
