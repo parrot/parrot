@@ -271,19 +271,6 @@ Parrot_gc_sweep_pool(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool))
     const UINTVAL       object_size = pool->object_size;
     UINTVAL             i;
 
-#if GC_VERBOSE
-    if (Interp_trace_TEST(interp, 1)) {
-        Interp * const tracer = interp->debugger;
-        PMC *pio       = Parrot_io_STDERR(interp);
-
-        Parrot_io_flush(interp, pio);
-
-        if (tracer) {
-            pio = Parrot_io_STDERR(tracer);
-            Parrot_io_flush(tracer, pio);
-        }
-    }
-#endif
 
     /* Run through all the PObj header pools and mark */
     for (cur_arena = pool->last_Arena; cur_arena; cur_arena = cur_arena->prev) {
@@ -304,15 +291,6 @@ Parrot_gc_sweep_pool(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool))
             else if (!PObj_on_free_list_TEST(b)) {
                 /* it must be dead */
 
-#if GC_VERBOSE
-                if (Interp_trace_TEST(interp, 1)) {
-                    fprintf(stderr, "Freeing pobject %p\n", b);
-                    if (PObj_is_PMC_TEST(b)) {
-                        fprintf(stderr, "\t = PMC type %s\n",
-                                (char*) ((PMC*)b)->vtable->whoami->strstart);
-                    }
-                }
-#endif
 
                 if (PObj_is_shared_TEST(b)) {
                     /* only mess with shared objects if we

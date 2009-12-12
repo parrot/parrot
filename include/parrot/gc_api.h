@@ -11,10 +11,6 @@
 #ifndef PARROT_GC_API_H_GUARD
 #define PARROT_GC_API_H_GUARD
 
-/* Set this to 1 to see if unanchored objects are found in system areas.
- * Please note: these objects might be bogus */
-#define GC_VERBOSE 0
-
 #include "parrot/parrot.h"
 
 /*

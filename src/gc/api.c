@@ -210,14 +210,6 @@ Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
     if (PObj_is_live_or_free_TESTALL(obj))
         return;
 
-#if ! DISABLE_GC_DEBUG
-#  if GC_VERBOSE
-    if (CONSERVATIVE_POINTER_CHASING)
-        fprintf(stderr, "GC Warning! Unanchored %s %p found in system areas \n",
-                PObj_is_PMC_TEST(obj) ? "PMC" : "Buffer", obj);
-
-#  endif
-#endif
     /* mark it live */
     PObj_live_SET(obj);
 
@@ -232,13 +224,6 @@ Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
         else if (PMC_metadata(p))
             Parrot_gc_mark_PMC_alive(interp, PMC_metadata(p));
     }
-#if GC_VERBOSE
-    /* buffer GC_DEBUG stuff */
-    if (GC_DEBUG(interp) && PObj_report_TEST(obj))
-        fprintf(stderr, "GC: buffer %p pointing to %p marked live\n",
-                obj, Buffer_bufstart((Buffer *)obj));
-#endif
-
 }
 
 /*
