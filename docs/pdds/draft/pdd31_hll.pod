@@ -53,11 +53,7 @@ names as well.
 
 =item C<compile>
 
-=begin PIR_FRAGMENT
-
     $P0 = compiler.'compile'(source [, options :named :slurpy])
-
-=end PIR_FRAGMENT
 
 Return the result of compiling C<source> according to C<options>.
 Common options include:
@@ -81,11 +77,7 @@ a dynamic compilation at runtime.
 
 =item C<eval>
 
-=begin PIR_FRAGMENT
-
     $P0 = compiler.'eval'(source [, options :named :slurpy])
-
-=end PIR_FRAGMENT
 
 Compile and evaluate (execute) the code given by C<source>
 according to C<options>.  The available options are generally
@@ -95,11 +87,7 @@ context for the evaluated source.
 
 =item C<parse_name>
 
-=begin PIR_FRAGMENT
-
     $P0 = compiler.'parse_name'(name)
-
-=end PIR_FRAGMENT
 
 Parse the string C<name> using the rules specific to C<compiler>,
 and return an array of individual name elements.
@@ -110,11 +98,7 @@ Perl's sigil rules would likely turn 'C<$a::b::c>' into C<['a','b','$c']>.
 
 =item C<load_module>
 
-=begin PIR_FRAGMENT
-
     module = compiler.'load_module'(name)
-
-=end PIR_FRAGMENT
 
 Locate and load the module given by C<name> using the rules for
 libraries specific to C<compiler>, and return a C<module> handle for
@@ -127,22 +111,14 @@ module, or a specific "handle" object).
 
 =item C<get_module>
 
-=begin PIR_FRAGMENT
-
     module = compiler.'get_module'(name)
-
-=end PIR_FRAGMENT
 
 Similar to C<load_module> above, this method returns a handle
 to an already-loaded module given by C<name>.
 
 =item C<get_exports>
 
-=begin PIR_FRAGMENT
-
     $P0 = compiler.'get_exports'(module [,name,name,...] [, 'tagset'=>tagset])
-
-=end PIR_FRAGMENT
 
 Requests the exported objects given by C<name> and/or C<tagset> for
 C<module> within the given C<compiler>.  The C<module> argument
@@ -195,11 +171,7 @@ semantics where needed.
 
 =item C<language>
 
-=begin PIR_FRAGMENT
-
     $S0 = compiler.'language'([name])
-
-=end PIR_FRAGMENT
 
 If C<name> is provided, sets the language name of the invocant
 and registers the invocant as the compiler for C<name> via
@@ -209,22 +181,14 @@ Returns the language name of the compiler.
 
 =item C<parse_name>
 
-=begin PIR_FRAGMENT
-
     $P0 = compiler.'parse_name'(name)
-
-=end PIR_FRAGMENT
 
 Splits a name based on double-colons, such that "C<A::B::C>"
 becomes C<['A','B','C']>.
 
 =item C<get_module>
 
-=begin PIR_FRAGMENT
-
     module = compiler.'get_module'(name)
-
-=end PIR_FRAGMENT
 
 Returns a handle to the HLL namespace associated with C<name>
 (which is processed via the invocant's C<parse_name> method
@@ -232,11 +196,7 @@ if needed).
 
 =item C<load_module>
 
-=begin PIR_FRAGMENT
-
     module = compiler.'load_module'(name)
-
-=end PIR_FRAGMENT
 
 Loads a module C<name> via the C<load_bytecode> opcode
 using both ".pbc" and ".pir" extensions.  Parrot's standard
@@ -248,11 +208,7 @@ not create an associated namespace).
 
 =item C<get_exports>
 
-=begin PIR_FRAGMENT
-
     $P0 = compiler.'get_exports'(module [,name,name,...] [, 'tagset'=>tagset])
-
-=end PIR_FRAGMENT
 
 Implements a simple exporting interface that meets the "Compiler API"
 above.  The C<module> argument is expected to be something that
@@ -285,11 +241,7 @@ and all other exports in the C<var> hash.
 
 =item C<import>
 
-=begin PIR_FRAGMENT
-
     compiler.'import'(target, export_hash)
-
-=end PIR_FRAGMENT
 
 Import the entries from C<export_hash> (typically obtained
 via C<get_exports> above) into C<target> according to the rules
