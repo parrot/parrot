@@ -339,7 +339,7 @@ push_opcode_number(PARROT_INTERP, ARGIN(IMAGE_IO *io), FLOATVAL v)
 {
     ASSERT_ARGS(push_opcode_number)
     UINTVAL   len    = PF_size_number() * sizeof (opcode_t);
-    opcode_t *buffer = mem_sys_allocate(len);
+    opcode_t *buffer = (opcode_t *)mem_sys_allocate(len);
     opcode_t *ignore = PF_store_number(buffer, &v);
     STRING   *number = Parrot_str_new_init(interp, (char *)buffer, len,
         Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
@@ -366,7 +366,7 @@ push_opcode_string(PARROT_INTERP, ARGIN(IMAGE_IO *io), ARGIN(STRING *v))
     ASSERT_ARGS(push_opcode_string)
 
     size_t    len    = PF_size_string(v) * sizeof (opcode_t);
-    opcode_t *buffer = mem_sys_allocate(len);
+    opcode_t *buffer = (opcode_t *)mem_sys_allocate(len);
     opcode_t *ignore = PF_store_string(buffer, v);
     STRING   *number = Parrot_str_new_init(interp, (char *)buffer, len,
         Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
