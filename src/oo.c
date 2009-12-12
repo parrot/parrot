@@ -955,7 +955,7 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
 
     mc   = interp->caches;
     type = _class->vtable->base_type;
-    bits = (((UINTVAL) method_name->strstart) >> 2) & TBL_SIZE_MASK;
+    bits = (((UINTVAL) Buffer_bufstart(method_name)) >> 2) & TBL_SIZE_MASK;
 
     if (type >= mc->mc_size) {
         if (mc->idx) {
@@ -976,7 +976,7 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
 
     e   = mc->idx[type][bits];
 
-    while (e && e->strstart != method_name->strstart) {
+    while (e && e->strstart != Buffer_bufstart(method_name)) {
         e   = e->next;
     }
 
@@ -988,7 +988,7 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
 
         e->pmc      = Parrot_find_method_direct(interp, _class, method_name);
         e->next     = NULL;
-        e->strstart = method_name->strstart;
+        e->strstart = Buffer_bufstart(method_name);
     }
 
     return e->pmc;
