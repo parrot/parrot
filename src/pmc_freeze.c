@@ -338,18 +338,15 @@ static void
 push_opcode_number(PARROT_INTERP, ARGIN(IMAGE_IO *io), FLOATVAL v)
 {
     ASSERT_ARGS(push_opcode_number)
+    UINTVAL   len    = PF_size_number() * sizeof (opcode_t);
+    opcode_t *buffer = mem_sys_allocate(len);
+    opcode_t *ignore = PF_store_number(buffer, &v);
+    STRING   *number = Parrot_str_new_init(interp, (char *)buffer, len,
+        Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
 
-    opcode_t      *ignored;
-    STRING * const s    = io->image;
-    const size_t   len  = PF_size_number() * sizeof (opcode_t);
-    const size_t   used = s->bufused;
-
-    op_check_size(interp, s, len);
-    ignored = PF_store_number((opcode_t *)((ptrcast_t)s->strstart + used), &v);
-    UNUSED(ignored);
-
-    s->bufused += len;
-    s->strlen  += len;
+    UNUSED(ignore);
+    io->image = Parrot_str_append(interp, io->image, number);
+    mem_sys_free(buffer);
 }
 
 
@@ -368,17 +365,15 @@ push_opcode_string(PARROT_INTERP, ARGIN(IMAGE_IO *io), ARGIN(STRING *v))
 {
     ASSERT_ARGS(push_opcode_string)
 
-    opcode_t      *ignored;
-    STRING * const s    = io->image;
-    const size_t   len  = PF_size_string(v) * sizeof (opcode_t);
-    const size_t   used = s->bufused;
+    size_t    len    = PF_size_string(v) * sizeof (opcode_t);
+    opcode_t *buffer = mem_sys_allocate(len);
+    opcode_t *ignore = PF_store_string(buffer, v);
+    STRING   *number = Parrot_str_new_init(interp, (char *)buffer, len,
+        Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
 
-    op_check_size(interp, s, len);
-    ignored = PF_store_string((opcode_t *)((ptrcast_t)s->strstart + used), v);
-    UNUSED(ignored);
-
-    s->bufused += len;
-    s->strlen += len;
+    UNUSED(ignore);
+    io->image = Parrot_str_append(interp, io->image, number);
+    mem_sys_free(buffer);
 }
 
 
