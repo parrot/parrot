@@ -297,16 +297,22 @@ for C<compiler>.  Any entries in C<export_hash['namespace']>
 are imported first, followed by entries in C<export_hash['sub']>,
 followed by entries in C<export_hash['var']>.
 
-For each entry, import takes place by calling a C<import_[type]>
-method on the compiler object if one exists (where C<[type]> is one of
-"namespace", "sub", or "var").  This represents a "typed import",
-and allows the compiler object to perform any name mangling or
-other operations needed to complete the import.
+Note that this method is not part of the abstract Compiler API --
+a HLL compiler is able to implement importing in any way it
+deems appropriate.  The C<HLL::Compiler> class provides this
+method as a useful default for many HLL compilers.
 
-If the compiler object doesn't define an C<import_[type]> method,
-C<import> attempts to use any C<add_[type]> that exists for
+For each exported item of C<export_hash>, import takes place by
+checking the invocant for an C<import_[type]> method and using
+that if it exists (where C<[type]> is one of "namespace", "sub",
+or "var").  These methods are used to implemented "typed imports",
+and allows the compiler object to perform any name mangling or
+other operations needed to properly import an object.
+
+If the compiler invocant doesn't define an C<import_[type]> method,
+C<import> attempts to use any C<add_[type]> method that exists on
 C<target> (e.g., for the case where C<target> is a namespace PMC
-supporting the typed interface defined in PDD 21).
+supporting the typed interface defined by PDD 21).
 
 If neither of these methods are available, then C<import>
 simply binds the symbol using C<target>'s hash interface.
