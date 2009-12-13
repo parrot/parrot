@@ -627,8 +627,6 @@ preserve key/value order.
 */
 
     VTABLE void visit(visit_info *info) {
-        info->container  = SELF;
-
         switch (info->what) {
           case VISIT_THAW_NORMAL:
           case VISIT_THAW_CONSTANTS:

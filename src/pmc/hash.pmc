@@ -1087,7 +1087,6 @@ Used during archiving to visit the elements in the hash.
 */
 
     VTABLE void visit(visit_info *info) {
-        info->container = SELF;
         parrot_hash_visit(INTERP, (Hash *)SELF.get_pointer(), info);
         SUPER(info);
     }

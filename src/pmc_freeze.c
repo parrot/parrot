@@ -559,7 +559,6 @@ ft_init(PARROT_INTERP, ARGIN(visit_info *info))
     info->id_list     = pmc_new(interp, enum_class_Array);
     info->id          = 0;
     info->extra_flags = EXTRA_IS_NULL;
-    info->container   = NULL;
 }
 
 
