@@ -11,7 +11,7 @@ New in 1.9.0
 - Compilers
   + Included latest nqp-rx compiler, with many improvements
 - Miscellaneous
-  + Portability updates for RTEMS and Intel architectures with GNU compilers
+  + Portability updates for RTEMS, and Intel architectures with GNU compilers
   + Completed conversion of ticket tracking system from RT to Trac
   + Several (build time, runtime) performance improvements
   + Converted many tests to PIR, reducing test execution time
