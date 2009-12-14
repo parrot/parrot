@@ -34,7 +34,7 @@ C<STRING> with a vtable.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void create_image(PARROT_INTERP,
+static void create_buffer(PARROT_INTERP,
     ARGIN_NULLOK(PMC *pmc),
     ARGMOD(visit_info *info))
         __attribute__nonnull__(1)
@@ -66,12 +66,8 @@ static void freeze_pmc(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static void ft_init(PARROT_INTERP, ARGIN(visit_info *info))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 PARROT_INLINE
-static void op_check_size(PARROT_INTERP, ARGIN(STRING *s), size_t len)
+static void ensure_buffer_size(PARROT_INTERP, ARGIN(visit_info *io), size_t len)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -135,7 +131,7 @@ static int thaw_pmc(PARROT_INTERP,
         FUNC_MODIFIES(*id)
         FUNC_MODIFIES(*type);
 
-static void todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info))
+static void todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info), ARGIN(STRING *input))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*info);
@@ -170,7 +166,7 @@ static void visit_todo_list_thaw(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-#define ASSERT_ARGS_create_image __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_create_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(info))
 #define ASSERT_ARGS_do_action __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -185,9 +181,9 @@ static void visit_todo_list_thaw(PARROT_INTERP,
 #define ASSERT_ARGS_ft_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(info))
-#define ASSERT_ARGS_op_check_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_ensure_buffer_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(s))
+    , PARROT_ASSERT_ARG(io))
 #define ASSERT_ARGS_push_opcode_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(io))
@@ -200,7 +196,7 @@ static void visit_todo_list_thaw(PARROT_INTERP,
     , PARROT_ASSERT_ARG(v))
 #define ASSERT_ARGS_run_thaw __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(image))
+    , PARROT_ASSERT_ARG(input))
 #define ASSERT_ARGS_shift_opcode_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(io))
 #define ASSERT_ARGS_shift_opcode_number __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -266,7 +262,7 @@ enum {
 
 =over 4
 
-=item C<static void op_check_size(PARROT_INTERP, STRING *s, size_t len)>
+=item C<static void ensure_buffer_size(PARROT_INTERP, visit_info *io, size_t len)>
 
 Checks the size of the "stream" buffer to see if it can accommodate
 C<len> more bytes. If not, expands the buffer.
@@ -277,19 +273,22 @@ C<len> more bytes. If not, expands the buffer.
 
 PARROT_INLINE
 static void
-op_check_size(PARROT_INTERP, ARGIN(STRING *s), size_t len)
+ensure_buffer_size(PARROT_INTERP, ARGIN(visit_info *io), size_t len)
 {
-    ASSERT_ARGS(op_check_size)
-    const size_t used      = s->bufused;
-    const int    need_free = (int)Buffer_buflen(s) - used - len;
+    ASSERT_ARGS(ensure_buffer_size)
+    Buffer *buf = io->buffer;
+    const size_t used      = io->pos - (char*)Buffer_bufstart(buf);
+    const int need_free = Buffer_buflen(buf) - used - len;
 
     /* grow by factor 1.5 or such */
     if (need_free <= 16) {
-        size_t new_size = (size_t) (Buffer_buflen(s) * 1.5);
-        if (new_size < Buffer_buflen(s) - need_free + 512)
-            new_size = Buffer_buflen(s) - need_free + 512;
-        Parrot_gc_reallocate_string_storage(interp, s, new_size);
-        PARROT_ASSERT(Buffer_buflen(s) - used - len >= 15);
+        size_t new_size = (size_t) (Buffer_buflen(buf) * 1.5);
+        if (new_size < Buffer_buflen(buf) - need_free + 512)
+            new_size = Buffer_buflen(buf) - need_free + 512;
+        Parrot_gc_reallocate_buffer_storage(interp, buf, new_size);
+        io->pos = (char *)Buffer_bufstart(buf) + used;
+
+        PARROT_ASSERT(Buffer_buflen(buf) - used - len >= 15);
     }
 
 #ifndef DISABLE_GC_DEBUG
@@ -330,12 +329,9 @@ static void
 push_opcode_integer(PARROT_INTERP, ARGIN(visit_info *io), INTVAL v)
 {
     ASSERT_ARGS(push_opcode_integer)
-    UINTVAL size = sizeof (opcode_t);
-    STRING   *op = Parrot_str_new_init(interp, (char *)&v, size,
-        Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
-
-    PARROT_ASSERT(sizeof (opcode_t) == sizeof (INTVAL));
-    io->image = Parrot_str_append(interp, io->image, op);
+    size_t len = PF_size_integer() * sizeof (opcode_t);
+    ensure_buffer_size(interp, io, len);
+    io->pos = (char *)PF_store_integer((opcode_t *)io->pos, v);
 }
 
 
@@ -354,15 +350,9 @@ static void
 push_opcode_number(PARROT_INTERP, ARGIN(visit_info *io), FLOATVAL v)
 {
     ASSERT_ARGS(push_opcode_number)
-    UINTVAL   len    = PF_size_number() * sizeof (opcode_t);
-    opcode_t *buffer = (opcode_t *)mem_sys_allocate(len);
-    opcode_t *ignore = PF_store_number(buffer, &v);
-    STRING   *number = Parrot_str_new_init(interp, (char *)buffer, len,
-        Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
-
-    UNUSED(ignore);
-    io->image = Parrot_str_append(interp, io->image, number);
-    mem_sys_free(buffer);
+    size_t len = PF_size_number() * sizeof (opcode_t);
+    ensure_buffer_size(interp, io, len);
+    io->pos = (char *)PF_store_number((opcode_t *)io->pos, &v);
 }
 
 
@@ -381,16 +371,9 @@ static void
 push_opcode_string(PARROT_INTERP, ARGIN(visit_info *io), ARGIN(STRING *v))
 {
     ASSERT_ARGS(push_opcode_string)
-
-    size_t    len    = PF_size_string(v) * sizeof (opcode_t);
-    opcode_t *buffer = (opcode_t *)mem_sys_allocate(len);
-    opcode_t *ignore = PF_store_string(buffer, v);
-    STRING   *number = Parrot_str_new_init(interp, (char *)buffer, len,
-        Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
-
-    UNUSED(ignore);
-    io->image = Parrot_str_append(interp, io->image, number);
-    mem_sys_free(buffer);
+    size_t len = PF_size_string(v) * sizeof (opcode_t);
+    ensure_buffer_size(interp, io, len);
+    io->pos = (char *)PF_store_string((opcode_t *)io->pos, v);
 }
 
 
@@ -404,20 +387,20 @@ Removes and returns an integer from the start of the C<*io> "stream".
 
 */
 
+static inline INTVAL OUTPUT_LENGTH(visit_info *io) {
+  return (io->pos - ((char *)Buffer_bufstart(io->buffer)));
+}
+static inline INTVAL INFO_HAS_DATA(visit_info *io) {
+  return (io->pos < (((char *)Buffer_bufstart(io->buffer)) + io->input_length));
+}
+#define BYTECODE_SHIFT_OK(io) PARROT_ASSERT((io)->pos <= (((char *)Buffer_bufstart((io)->buffer)) + (io)->input_length))
+
 static INTVAL
 shift_opcode_integer(SHIM_INTERP, ARGIN(visit_info *io))
 {
     ASSERT_ARGS(shift_opcode_integer)
-    const char * const   start  = (char *)io->image->strstart;
-    char               **opcode = &io->image->strstart;
-    const INTVAL i              = PF_fetch_integer(io->pf,
-                                    (const opcode_t **)opcode);
-
-    io->image->bufused -= ((char *)io->image->strstart - start);
-    io->image->strlen  -= ((char *)io->image->strstart - start);
-
-    PARROT_ASSERT((int)io->image->bufused >= 0);
-
+    const INTVAL i = PF_fetch_integer(io->pf, (const opcode_t **)&io->pos);
+    BYTECODE_SHIFT_OK(io);
     return i;
 }
 
@@ -436,17 +419,8 @@ static FLOATVAL
 shift_opcode_number(SHIM_INTERP, ARGIN(visit_info *io))
 {
     ASSERT_ARGS(shift_opcode_number)
-
-    const char * const   start  = (const char *)io->image->strstart;
-    char               **opcode = &io->image->strstart;
-    const FLOATVAL       f      = PF_fetch_number(io->pf,
-                                    (const opcode_t **)opcode);
-
-    io->image->bufused -= ((char *)io->image->strstart - start);
-    io->image->strlen  -= ((char *)io->image->strstart - start);
-
-    PARROT_ASSERT((int)io->image->bufused >= 0);
-
+    const FLOATVAL f  = PF_fetch_number(io->pf, (const opcode_t **)&io->pos);
+    BYTECODE_SHIFT_OK(io);
     return f;
 }
 
@@ -461,24 +435,15 @@ Removes and returns a string from the start of the C<*io> "stream".
 
 */
 
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING*
 shift_opcode_string(PARROT_INTERP, ARGIN(visit_info *io))
 {
     ASSERT_ARGS(shift_opcode_string)
-
-    char * const   start  = (char*)io->image->strstart;
-    char *         opcode = io->image->strstart;
-    STRING * const s      = PF_fetch_string(interp, io->pf,
-                                (const opcode_t **)&opcode);
-
-    io->image->strstart = opcode;
-    io->image->bufused -= (opcode - start);
-    io->image->strlen  -= (opcode - start);
-
-    PARROT_ASSERT((int)io->image->bufused >= 0);
-
+    STRING * const s = PF_fetch_string(interp, io->pf, (const opcode_t **)&io->pos);
+    BYTECODE_SHIFT_OK(io);
     return s;
 }
 
@@ -513,41 +478,42 @@ static image_funcs opcode_funcs = {
 
 /*
 
-=item C<static void ft_init(PARROT_INTERP, visit_info *info)>
+=item C<static void todo_list_init(PARROT_INTERP, visit_info *info)>
 
-Initializes the freeze/thaw subsystem.
+Initializes the C<*info> lists.
 
 =cut
 
 */
 
 static void
-ft_init(PARROT_INTERP, ARGIN(visit_info *info))
+todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info), ARGIN(STRING *input))
 {
-    ASSERT_ARGS(ft_init)
-    STRING   *s = info->image;
-    PackFile *pf;
-
+    ASSERT_ARGS(todo_list_init)
     /* We want to store a 16-byte aligned header, but the actual
      * header may be shorter. */
     const unsigned int header_length = PACKFILE_HEADER_BYTES +
         (PACKFILE_HEADER_BYTES % 16 ?
          16 - PACKFILE_HEADER_BYTES % 16 : 0);
 
-    info->vtable = &opcode_funcs;
+    PackFile *pf = info->pf = PackFile_new(interp, 0);
+    info->visit_pmc_now   = visit_todo_list;
 
-    pf = info->pf = PackFile_new(interp, 0);
+    /* we must use PMCs here so that they get marked properly */
+    info->todo = pmc_new(interp, enum_class_Array);
+    info->seen = pmc_new(interp, enum_class_Hash);
+    VTABLE_set_pointer(interp, info->seen, parrot_new_intval_hash(interp));
+
+    info->vtable = &opcode_funcs;
 
     if (info->what == VISIT_FREEZE_NORMAL
     ||  info->what == VISIT_FREEZE_AT_DESTRUCT) {
-
-        op_check_size(interp, s, header_length);
-        mem_sys_memcopy(s->strstart, pf->header, PACKFILE_HEADER_BYTES);
-        s->bufused += header_length;
-        s->strlen  += header_length;
+        ensure_buffer_size(interp, info, header_length);
+        mem_sys_memcopy(info->pos, pf->header, PACKFILE_HEADER_BYTES);
+        info->pos += header_length;
     }
     else {
-        if (Parrot_str_byte_length(interp, s) < header_length) {
+        if (Parrot_str_byte_length(interp, input) < header_length) {
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_STRING_REPRESENTATION,
                 "bad string to thaw");
@@ -561,44 +527,21 @@ ft_init(PARROT_INTERP, ARGIN(visit_info *info))
                     "can't thaw a PMC from Parrot %d.%d", pf->header->bc_major,
                     pf->header->bc_minor);
 
-        mem_sys_memcopy(pf->header, s->strstart, PACKFILE_HEADER_BYTES);
+        info->buffer = (Buffer *)input;
+        PARROT_ASSERT(input->_bufstart == input->strstart);
+        info->pos = Buffer_bufstart(info->buffer);
+        info->input_length = input->strlen;
+        mem_sys_memcopy(pf->header, info->pos, PACKFILE_HEADER_BYTES);
+
         PackFile_assign_transforms(pf);
 
-        s->bufused -= header_length;
-        s->strlen  -= header_length;
-
-        LVALUE_CAST(char *, s->strstart) += header_length;
+        info->pos += header_length;
     }
 
     info->last_type   = -1;
     info->id_list     = pmc_new(interp, enum_class_Array);
     info->id          = 0;
     info->extra_flags = EXTRA_IS_NULL;
-}
-
-
-/*
-
-=item C<static void todo_list_init(PARROT_INTERP, visit_info *info)>
-
-Initializes the C<*info> lists.
-
-=cut
-
-*/
-
-static void
-todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info))
-{
-    ASSERT_ARGS(todo_list_init)
-    info->visit_pmc_now   = visit_todo_list;
-
-    /* we must use PMCs here so that they get marked properly */
-    info->todo = pmc_new(interp, enum_class_Array);
-    info->seen = pmc_new(interp, enum_class_Hash);
-    VTABLE_set_pointer(interp, info->seen, parrot_new_intval_hash(interp));
-
-    ft_init(interp, info);
 }
 
 
@@ -1032,7 +975,7 @@ again:
     if (thawing) {
         INTVAL n;
         /* if image isn't consumed, there are some extra data to thaw */
-        if (info->image->bufused > 0) {
+        if (INFO_HAS_DATA(info)) {
             (info->visit_pmc_now)(interp, NULL, info);
             goto again;
         }
@@ -1063,9 +1006,9 @@ Allocate image to some estimated size.
 */
 
 static void
-create_image(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGMOD(visit_info *info))
+create_buffer(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGMOD(visit_info *info))
 {
-    ASSERT_ARGS(create_image)
+    ASSERT_ARGS(create_buffer)
     STRING *array = CONST_STRING(interp, "array");
     STRING *hash  = CONST_STRING(interp, "hash");
     INTVAL  len;
@@ -1079,8 +1022,9 @@ create_image(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGMOD(visit_info *info))
     else
         len = FREEZE_BYTES_PER_ITEM;
 
-    info->image = Parrot_str_new_init(interp, NULL, len,
-         Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
+    info->buffer = (Buffer *)Parrot_gc_new_bufferlike_header(interp, sizeof(Buffer));
+    Parrot_gc_allocate_buffer_storage_aligned(interp, info->buffer, len); 
+    info->pos = (char *)Buffer_bufstart(info->buffer);
 }
 
 
@@ -1104,14 +1048,12 @@ nested containers, for which another approach could be a win.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC*
-run_thaw(PARROT_INTERP, ARGIN(STRING* image), visit_enum_type what)
+run_thaw(PARROT_INTERP, ARGIN(STRING* input), visit_enum_type what)
 {
     ASSERT_ARGS(run_thaw)
     visit_info    info;
     int           gc_block = 0;
-    const UINTVAL bufused  = image->bufused;
 
-    info.image = image;
     /*
      * if we are thawing a lot of PMCs, it's cheaper to do
      * a GC run first and then block GC - the limit should be
@@ -1123,7 +1065,7 @@ run_thaw(PARROT_INTERP, ARGIN(STRING* image), visit_enum_type what)
      * info->thaw_ptr becomes invalid - seems that the hash got
      * collected under us.
      */
-    if (1 || (Parrot_str_byte_length(interp, image) > THAW_BLOCK_GC_SIZE)) {
+    if (1 || (Parrot_str_byte_length(interp, input) > THAW_BLOCK_GC_SIZE)) {
         Parrot_block_GC_mark(interp);
         Parrot_block_GC_sweep(interp);
         gc_block = 1;
@@ -1132,7 +1074,7 @@ run_thaw(PARROT_INTERP, ARGIN(STRING* image), visit_enum_type what)
     /* _NORMAL or _CONSTANTS */
     info.what = what;
 
-    todo_list_init(interp, &info);
+    todo_list_init(interp, &info, input);
     info.visit_pmc_now   = visit_todo_list_thaw;
 
     info.thaw_result = NULL;
@@ -1140,15 +1082,7 @@ run_thaw(PARROT_INTERP, ARGIN(STRING* image), visit_enum_type what)
     /* run thaw loop */
     visit_loop_todo_list(interp, NULL, &info);
 
-    /*
-     * thaw consumes the image string by incrementing strstart
-     * and decrementing bufused - restore that
-     */
-    LVALUE_CAST(char *, image->strstart) -= bufused;
-    image->bufused = bufused;
-    image->strlen += bufused;
-
-    PARROT_ASSERT(image->strstart >= (char *)Buffer_bufstart(image));
+    BYTECODE_SHIFT_OK(&info);
 
     if (gc_block) {
         Parrot_unblock_GC_mark(interp);
@@ -1189,15 +1123,19 @@ Parrot_freeze(PARROT_INTERP, ARGIN(PMC *pmc))
      * can call mark on the PMCs
      */
     visit_info info;
+    STRING *result;
 
     info.what = VISIT_FREEZE_NORMAL;
-    create_image(interp, pmc, &info);
-    todo_list_init(interp, &info);
+    create_buffer(interp, pmc, &info);
+    todo_list_init(interp, &info, NULL);
 
     visit_loop_todo_list(interp, pmc, &info);
 
+    result = Parrot_str_new_init(interp, (char *)Buffer_bufstart(info.buffer), OUTPUT_LENGTH(&info),
+      Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
+
     PackFile_destroy(interp, info.pf);
-    return info.image;
+    return result;
 }
 
 

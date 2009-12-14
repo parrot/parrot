@@ -55,8 +55,10 @@ typedef enum {
 typedef struct _visit_info {
     visit_f             visit_pmc_now;
     visit_f             visit_action;   /* freeze, thaw ... */
+    char               *pos;            /* current read/write position in buffer */
+    Buffer             *buffer;
+    size_t              input_length;   /* */
     INTVAL              what;
-    STRING             *image;
     PMC               **thaw_ptr;       /* where to thaw a new PMC */
     INTVAL              last_type;
     PMC                *seen;           /* seen hash */
