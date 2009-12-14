@@ -238,15 +238,14 @@ Used to archive the scheduler message.
 */
 
     VTABLE void freeze(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
         Parrot_SchedulerMessage_attributes * const core_struct =
             PARROT_SCHEDULERMESSAGE(SELF);
 
         /* 1) freeze message id */
-        VTABLE_push_integer(INTERP, io, core_struct->id);
+        VTABLE_push_integer(INTERP, info, core_struct->id);
 
         /* 2) freeze message type */
-        VTABLE_push_string(INTERP, io, core_struct->type);
+        VTABLE_push_string(INTERP, info, core_struct->type);
     }
 
 /*
@@ -260,13 +259,11 @@ Used to unarchive the scheduler message.
 */
 
     VTABLE void thaw(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
-
         /* 1. thaw message id */
-        const INTVAL id = VTABLE_shift_integer(INTERP, io);
+        const INTVAL id = VTABLE_shift_integer(INTERP, info);
 
         /* 2. thaw message type */
-        STRING * const type = VTABLE_shift_string(INTERP, io);
+        STRING * const type = VTABLE_shift_string(INTERP, info);
 
         /* Allocate the message's core data struct and set custom flags. */
         SELF.init();

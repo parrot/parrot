@@ -1184,9 +1184,8 @@ Used to archive the array.
 */
 
     VTABLE void freeze(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
         SUPER(info);
-        VTABLE_push_integer(INTERP, io, VTABLE_elements(INTERP, SELF));
+        VTABLE_push_integer(INTERP, info, VTABLE_elements(INTERP, SELF));
     }
 
 /*
@@ -1200,11 +1199,9 @@ Used to unarchive the array.
 */
 
     VTABLE void thaw(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
-
         SUPER(info);
         if (info->extra_flags == EXTRA_IS_NULL) {
-            SELF.set_integer_native(VTABLE_shift_integer(INTERP, io));
+            SELF.set_integer_native(VTABLE_shift_integer(INTERP, info));
     }
 }
 

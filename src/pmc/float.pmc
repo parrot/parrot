@@ -352,9 +352,8 @@ Used to archive the number.
 
 */
     VTABLE void freeze(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
         SUPER(info);
-        VTABLE_push_float(INTERP, io, SELF.get_number());
+        VTABLE_push_float(INTERP, info, SELF.get_number());
     }
 
 /*
@@ -367,10 +366,9 @@ Used to unarchive the number.
 
 */
     VTABLE void thaw(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
         SUPER(info);
         if (info->extra_flags == EXTRA_IS_NULL)
-            SET_ATTR_fv(INTERP, SELF, VTABLE_shift_float(INTERP, io));
+            SET_ATTR_fv(INTERP, SELF, VTABLE_shift_float(INTERP, info));
     }
 /*
 

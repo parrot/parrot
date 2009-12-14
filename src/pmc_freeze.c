@@ -18,7 +18,7 @@ C<< pmc->vtable->visit >>, which is called for the first PMC initially.
 Container PMCs call a "todo-callback" for all contained PMCs. The
 individual action vtable (freeze/thaw) is then called for all todo-PMCs.
 
-In the current implementation C<IMAGE_IO> is a stand-in for some kind of
+In the current implementation C<visit_info> is a stand-in for some kind of
 serializer PMC which will eventually be written. It associates a Parrot
 C<STRING> with a vtable.
 
@@ -76,19 +76,19 @@ static void op_check_size(PARROT_INTERP, ARGIN(STRING *s), size_t len)
         __attribute__nonnull__(2);
 
 static void push_opcode_integer(PARROT_INTERP,
-    ARGIN(IMAGE_IO *io),
+    ARGIN(visit_info *io),
     INTVAL v)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void push_opcode_number(PARROT_INTERP,
-    ARGIN(IMAGE_IO *io),
+    ARGIN(visit_info *io),
     FLOATVAL v)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void push_opcode_string(PARROT_INTERP,
-    ARGIN(IMAGE_IO *io),
+    ARGIN(visit_info *io),
     ARGIN(STRING *v))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -102,15 +102,15 @@ static PMC* run_thaw(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static INTVAL shift_opcode_integer(SHIM_INTERP, ARGIN(IMAGE_IO *io))
+static INTVAL shift_opcode_integer(SHIM_INTERP, ARGIN(visit_info *io))
         __attribute__nonnull__(2);
 
-static FLOATVAL shift_opcode_number(SHIM_INTERP, ARGIN(IMAGE_IO *io))
+static FLOATVAL shift_opcode_number(SHIM_INTERP, ARGIN(visit_info *io))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static STRING* shift_opcode_string(PARROT_INTERP, ARGIN(IMAGE_IO *io))
+static STRING* shift_opcode_string(PARROT_INTERP, ARGIN(visit_info *io))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -298,10 +298,25 @@ op_check_size(PARROT_INTERP, ARGIN(STRING *s), size_t len)
 
 }
 
+/*
+
+=item C<static INTVAL get_visit_integer(PARROT_INTERP, visit_info *io)>
+
+XXX TODO!!!
+
+=cut
+
+*/
+
+static INTVAL
+get_visit_integer(PARROT_INTERP, visit_info *io) {
+    return io->what;
+}
 
 /*
 
-=item C<static void push_opcode_integer(PARROT_INTERP, IMAGE_IO *io, INTVAL v)>
+=item C<static void push_opcode_integer(PARROT_INTERP, visit_info *io, INTVAL
+v)>
 
 Pushes the integer C<v> onto the end of the C<*io> "stream".
 
@@ -312,7 +327,7 @@ XXX assumes sizeof (opcode_t) == sizeof (INTVAL).
 */
 
 static void
-push_opcode_integer(PARROT_INTERP, ARGIN(IMAGE_IO *io), INTVAL v)
+push_opcode_integer(PARROT_INTERP, ARGIN(visit_info *io), INTVAL v)
 {
     ASSERT_ARGS(push_opcode_integer)
     UINTVAL size = sizeof (opcode_t);
@@ -326,7 +341,8 @@ push_opcode_integer(PARROT_INTERP, ARGIN(IMAGE_IO *io), INTVAL v)
 
 /*
 
-=item C<static void push_opcode_number(PARROT_INTERP, IMAGE_IO *io, FLOATVAL v)>
+=item C<static void push_opcode_number(PARROT_INTERP, visit_info *io, FLOATVAL
+v)>
 
 Pushes the number C<v> onto the end of the C<*io> "stream".
 
@@ -335,7 +351,7 @@ Pushes the number C<v> onto the end of the C<*io> "stream".
 */
 
 static void
-push_opcode_number(PARROT_INTERP, ARGIN(IMAGE_IO *io), FLOATVAL v)
+push_opcode_number(PARROT_INTERP, ARGIN(visit_info *io), FLOATVAL v)
 {
     ASSERT_ARGS(push_opcode_number)
     UINTVAL   len    = PF_size_number() * sizeof (opcode_t);
@@ -352,7 +368,8 @@ push_opcode_number(PARROT_INTERP, ARGIN(IMAGE_IO *io), FLOATVAL v)
 
 /*
 
-=item C<static void push_opcode_string(PARROT_INTERP, IMAGE_IO *io, STRING *v)>
+=item C<static void push_opcode_string(PARROT_INTERP, visit_info *io, STRING
+*v)>
 
 Pushes the string C<*v> onto the end of the C<*io> "stream".
 
@@ -361,7 +378,7 @@ Pushes the string C<*v> onto the end of the C<*io> "stream".
 */
 
 static void
-push_opcode_string(PARROT_INTERP, ARGIN(IMAGE_IO *io), ARGIN(STRING *v))
+push_opcode_string(PARROT_INTERP, ARGIN(visit_info *io), ARGIN(STRING *v))
 {
     ASSERT_ARGS(push_opcode_string)
 
@@ -379,7 +396,7 @@ push_opcode_string(PARROT_INTERP, ARGIN(IMAGE_IO *io), ARGIN(STRING *v))
 
 /*
 
-=item C<static INTVAL shift_opcode_integer(PARROT_INTERP, IMAGE_IO *io)>
+=item C<static INTVAL shift_opcode_integer(PARROT_INTERP, visit_info *io)>
 
 Removes and returns an integer from the start of the C<*io> "stream".
 
@@ -388,7 +405,7 @@ Removes and returns an integer from the start of the C<*io> "stream".
 */
 
 static INTVAL
-shift_opcode_integer(SHIM_INTERP, ARGIN(IMAGE_IO *io))
+shift_opcode_integer(SHIM_INTERP, ARGIN(visit_info *io))
 {
     ASSERT_ARGS(shift_opcode_integer)
     const char * const   start  = (char *)io->image->strstart;
@@ -407,7 +424,7 @@ shift_opcode_integer(SHIM_INTERP, ARGIN(IMAGE_IO *io))
 
 /*
 
-=item C<static FLOATVAL shift_opcode_number(PARROT_INTERP, IMAGE_IO *io)>
+=item C<static FLOATVAL shift_opcode_number(PARROT_INTERP, visit_info *io)>
 
 Removes and returns an number from the start of the C<*io> "stream".
 
@@ -416,7 +433,7 @@ Removes and returns an number from the start of the C<*io> "stream".
 */
 
 static FLOATVAL
-shift_opcode_number(SHIM_INTERP, ARGIN(IMAGE_IO *io))
+shift_opcode_number(SHIM_INTERP, ARGIN(visit_info *io))
 {
     ASSERT_ARGS(shift_opcode_number)
 
@@ -436,7 +453,7 @@ shift_opcode_number(SHIM_INTERP, ARGIN(IMAGE_IO *io))
 
 /*
 
-=item C<static STRING* shift_opcode_string(PARROT_INTERP, IMAGE_IO *io)>
+=item C<static STRING* shift_opcode_string(PARROT_INTERP, visit_info *io)>
 
 Removes and returns a string from the start of the C<*io> "stream".
 
@@ -447,7 +464,7 @@ Removes and returns a string from the start of the C<*io> "stream".
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-shift_opcode_string(PARROT_INTERP, ARGIN(IMAGE_IO *io))
+shift_opcode_string(PARROT_INTERP, ARGIN(visit_info *io))
 {
     ASSERT_ARGS(shift_opcode_string)
 
@@ -485,6 +502,7 @@ shift_opcode_string(PARROT_INTERP, ARGIN(IMAGE_IO *io))
  */
 
 static image_funcs opcode_funcs = {
+    get_visit_integer,
     push_opcode_integer,
     push_opcode_string,
     push_opcode_number,
@@ -516,12 +534,9 @@ ft_init(PARROT_INTERP, ARGIN(visit_info *info))
         (PACKFILE_HEADER_BYTES % 16 ?
          16 - PACKFILE_HEADER_BYTES % 16 : 0);
 
-    info->image_io         = mem_allocate_typed(IMAGE_IO);
-    info->image_io->image  = s = info->image;
+    info->vtable = &opcode_funcs;
 
-    info->image_io->vtable = &opcode_funcs;
-
-    pf = info->image_io->pf = PackFile_new(interp, 0);
+    pf = info->pf = PackFile_new(interp, 0);
 
     if (info->what == VISIT_FREEZE_NORMAL
     ||  info->what == VISIT_FREEZE_AT_DESTRUCT) {
@@ -605,12 +620,11 @@ freeze_pmc(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info),
         int seen, UINTVAL id)
 {
     ASSERT_ARGS(freeze_pmc)
-    IMAGE_IO * const io = info->image_io;
     INTVAL           type;
 
     if (PMC_IS_NULL(pmc)) {
         /* NULL + seen bit */
-        VTABLE_push_integer(interp, io, PackID_new(NULL, enum_PackID_seen));
+        VTABLE_push_integer(interp, info, PackID_new(NULL, enum_PackID_seen));
         return;
     }
 
@@ -622,8 +636,8 @@ freeze_pmc(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info),
     if (seen) {
         if (info->extra_flags) {
             PackID_set_FLAGS(id, enum_PackID_extra_info);
-            VTABLE_push_integer(interp, io, id);
-            VTABLE_push_integer(interp, io, info->extra_flags);
+            VTABLE_push_integer(interp, info, id);
+            VTABLE_push_integer(interp, info, info->extra_flags);
             return;
         }
 
@@ -632,11 +646,11 @@ freeze_pmc(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info),
     else if (type == info->last_type)
         PackID_set_FLAGS(id, enum_PackID_prev_type);
 
-    VTABLE_push_integer(interp, io, id);
+    VTABLE_push_integer(interp, info, id);
 
     if (PackID_get_FLAGS(id) == enum_PackID_normal) {
         /* write type */
-        VTABLE_push_integer(interp, io, type);
+        VTABLE_push_integer(interp, info, type);
         info->last_type = type;
     }
 }
@@ -671,8 +685,7 @@ thaw_pmc(PARROT_INTERP, ARGMOD(visit_info *info),
         ARGOUT(UINTVAL *id), ARGOUT(INTVAL *type))
 {
     ASSERT_ARGS(thaw_pmc)
-    IMAGE_IO * const io   = info->image_io;
-    UINTVAL          n    = VTABLE_shift_integer(interp, io);
+    UINTVAL          n    = VTABLE_shift_integer(interp, info);
     int              seen = 0;
 
     info->extra_flags     = EXTRA_IS_NULL;
@@ -680,7 +693,7 @@ thaw_pmc(PARROT_INTERP, ARGMOD(visit_info *info),
     switch (PackID_get_FLAGS(n)) {
       case enum_PackID_extra_info:
         /* pmc has extra data */
-        info->extra_flags = VTABLE_shift_integer(interp, io);
+        info->extra_flags = VTABLE_shift_integer(interp, info);
         break;
       case enum_PackID_seen:
         seen = 1;
@@ -692,7 +705,7 @@ thaw_pmc(PARROT_INTERP, ARGMOD(visit_info *info),
       default:
         /* type follows */
         {
-            *type           = VTABLE_shift_integer(interp, io);
+            *type           = VTABLE_shift_integer(interp, info);
             info->last_type = *type;
 
             if (*type <= 0)
@@ -1142,9 +1155,7 @@ run_thaw(PARROT_INTERP, ARGIN(STRING* image), visit_enum_type what)
         Parrot_unblock_GC_sweep(interp);
     }
 
-    PackFile_destroy(interp, info.image_io->pf);
-    mem_sys_free(info.image_io);
-    info.image_io = NULL;
+    PackFile_destroy(interp, info.pf);
     return info.thaw_result;
 }
 
@@ -1185,8 +1196,7 @@ Parrot_freeze(PARROT_INTERP, ARGIN(PMC *pmc))
 
     visit_loop_todo_list(interp, pmc, &info);
 
-    PackFile_destroy(interp, info.image_io->pf);
-    mem_sys_free(info.image_io);
+    PackFile_destroy(interp, info.pf);
     return info.image;
 }
 

@@ -560,26 +560,24 @@ Used to unarchive the array.
     }*/
 
     VTABLE void freeze(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
         INTVAL   *int_array;
         INTVAL    i, n;
 
         SUPER(info);
 
         GET_ATTR_size(INTERP, SELF, n);
-        VTABLE_push_integer(INTERP, io, n);
+        VTABLE_push_integer(INTERP, info, n);
         GET_ATTR_int_array(INTERP, SELF, int_array);
 
         for (i = 0; i < n; ++i)
-            VTABLE_push_integer(INTERP, io, int_array[i]);
+            VTABLE_push_integer(INTERP, info, int_array[i]);
     }
 
     VTABLE void thaw(visit_info *info) {
         PObj_custom_destroy_SET(SELF);
 
         if (info->extra_flags == EXTRA_IS_NULL) {
-            IMAGE_IO * const io = info->image_io;
-            const INTVAL n = VTABLE_shift_integer(INTERP, io);
+            const INTVAL n = VTABLE_shift_integer(INTERP, info);
 
             SET_ATTR_size(INTERP, SELF, 0);
             SET_ATTR_int_array(INTERP, SELF, NULL);
@@ -592,7 +590,7 @@ Used to unarchive the array.
                 GET_ATTR_int_array(INTERP, SELF, int_array);
 
                 for (i = 0; i < n; ++i)
-                    int_array[i] = VTABLE_shift_integer(INTERP, io);
+                    int_array[i] = VTABLE_shift_integer(INTERP, info);
             }
         }
         else

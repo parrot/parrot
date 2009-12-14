@@ -1477,15 +1477,14 @@ Used to archive the class.
 */
 
     VTABLE void freeze(visit_info *info) {
-        IMAGE_IO     * const io         = info->image_io;
         Parrot_Class_attributes * const class_data = PARROT_CLASS(SELF);
         STRING       *serial_namespace = CONST_STRING(interp, "");
 
         /* 1) freeze class id */
-        VTABLE_push_integer(INTERP, io, class_data->id);
+        VTABLE_push_integer(INTERP, info, class_data->id);
 
         /* 2) freeze class name */
-        VTABLE_push_string(INTERP, io, class_data->name);
+        VTABLE_push_string(INTERP, info, class_data->name);
 
         /* 3) serialize namespace name, including HLL */
         if (!PMC_IS_NULL(class_data->_namespace)) {
@@ -1494,7 +1493,7 @@ Used to archive the class.
             if (!PMC_IS_NULL(names))
                 serial_namespace = Parrot_str_join(interp, CONST_STRING(interp, ";"), names);
         }
-        VTABLE_push_string(INTERP, io, serial_namespace);
+        VTABLE_push_string(INTERP, info, serial_namespace);
     }
 
 /*
@@ -1516,16 +1515,14 @@ Used to unarchive the class.
             SUPER(info);
         }
         else if (info->extra_flags == EXTRA_IS_NULL) {
-            IMAGE_IO * const io = info->image_io;
-
             /* 1) thaw class id */
-            const INTVAL id = VTABLE_shift_integer(INTERP, io);
+            const INTVAL id = VTABLE_shift_integer(INTERP, info);
 
             /* 2) thaw class name */
-            STRING * const name = VTABLE_shift_string(INTERP, io);
+            STRING * const name = VTABLE_shift_string(INTERP, info);
 
             /* 3) deserialize namespace name, including HLL */
-            STRING * const serial_namespace = VTABLE_shift_string(INTERP, io);
+            STRING * const serial_namespace = VTABLE_shift_string(INTERP, info);
             STRING * const semicolon_str = CONST_STRING(INTERP, ";");
             PMC    * const namespace_array =
                 Parrot_str_split(INTERP, semicolon_str, serial_namespace);

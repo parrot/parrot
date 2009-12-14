@@ -140,12 +140,10 @@ The implementation of the Hash PMC is called.
 
 
     VTABLE void thaw(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
-
         if (info->extra_flags == EXTRA_IS_NULL) {
-            const INTVAL elems  = VTABLE_shift_integer(INTERP, io);
-            const INTVAL k_type = VTABLE_shift_integer(INTERP, io);
-            const INTVAL v_type = VTABLE_shift_integer(INTERP, io);
+            const INTVAL elems  = VTABLE_shift_integer(INTERP, info);
+            const INTVAL k_type = VTABLE_shift_integer(INTERP, info);
+            const INTVAL v_type = VTABLE_shift_integer(INTERP, info);
             Hash        *hash;
 
             UNUSED(k_type);

@@ -333,16 +333,14 @@ Unarchives the code.
 */
 
     VTABLE void freeze(visit_info *info) {
-        IMAGE_IO *io     = info->image_io;
         STRING   *packed = SELF.get_string();
-        VTABLE_push_string(INTERP, io, packed);
+        VTABLE_push_string(INTERP, info, packed);
 
         SUPER(info);
     }
 
     VTABLE void thaw(visit_info *info) {
-        IMAGE_IO         *io     = info->image_io;
-        STRING           *packed = VTABLE_shift_string(INTERP, io);
+        STRING           *packed = VTABLE_shift_string(INTERP, info);
         PackFile         *pf;
         PackFile_Segment *seg;
         Parrot_Sub_attributes *sub;

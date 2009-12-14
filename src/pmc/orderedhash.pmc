@@ -637,7 +637,6 @@ preserve key/value order.
           case VISIT_FREEZE_AT_DESTRUCT:
             {
                 Hash     * const hash = (Hash *)SELF.get_pointer();
-                IMAGE_IO * const io   = info->image_io;
                 const UINTVAL entries = hash->entries;
                 UINTVAL i;
 
@@ -647,7 +646,7 @@ preserve key/value order.
                     if (b) {
                         STRING * const key = (STRING *)b->key;
                         if (key) {
-                            VTABLE_push_string(interp, io, key);
+                            VTABLE_push_string(interp, info, key);
                             (info->visit_pmc_now)(interp, (PMC *)b->value, info);
                         }
                     }

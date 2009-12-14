@@ -26,16 +26,17 @@ typedef enum {
     VISIT_DESTRUCTION_ORDER
 } visit_enum_type;
 
-struct _image_io;
-#define IMAGE_IO struct _image_io
-typedef void (*push_integer_f)       (PARROT_INTERP, IMAGE_IO*, INTVAL);
-typedef void (*push_string_f)        (PARROT_INTERP, IMAGE_IO*, STRING*);
-typedef void (*push_number_f)        (PARROT_INTERP, IMAGE_IO*, FLOATVAL);
-typedef INTVAL (*shift_integer_f)    (PARROT_INTERP, IMAGE_IO*);
-typedef STRING* (*shift_string_f)    (PARROT_INTERP, IMAGE_IO*);
-typedef FLOATVAL (*shift_number_f)   (PARROT_INTERP, IMAGE_IO*);
+struct _visit_info;
+typedef INTVAL (*get_integer_f)      (PARROT_INTERP, struct _visit_info*);
+typedef void (*push_integer_f)       (PARROT_INTERP, struct _visit_info*, INTVAL);
+typedef void (*push_string_f)        (PARROT_INTERP, struct _visit_info*, STRING*);
+typedef void (*push_number_f)        (PARROT_INTERP, struct _visit_info*, FLOATVAL);
+typedef INTVAL (*shift_integer_f)    (PARROT_INTERP, struct _visit_info*);
+typedef STRING* (*shift_string_f)    (PARROT_INTERP, struct _visit_info*);
+typedef FLOATVAL (*shift_number_f)   (PARROT_INTERP, struct _visit_info*);
 
 typedef struct _image_funcs {
+    get_integer_f       get_integer;
     push_integer_f      push_integer;
     push_string_f       push_string;
     push_number_f       push_float;
@@ -43,12 +44,6 @@ typedef struct _image_funcs {
     shift_string_f      shift_string;
     shift_number_f      shift_float;
 } image_funcs;
-
-typedef struct _image_io {
-    STRING *image;
-    struct PackFile *pf;
-    const image_funcs *vtable;
-} image_io;
 
 typedef enum {
     EXTRA_IS_NULL,
@@ -71,7 +66,8 @@ typedef struct _visit_info {
     void               *extra;          /* PMC specific */
     INTVAL              extra_flags;    /* concerning to extra */
     PMC                *thaw_result;    /* 1st thawed */
-    IMAGE_IO           *image_io;
+    struct PackFile *pf;
+    const image_funcs *vtable;
 } visit_info;
 
 /*

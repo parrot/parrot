@@ -319,28 +319,26 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
     }
 
     void freeze(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
-
         /* write flags */
         const INTVAL flags  = (PObj_get_FLAGS(SELF) & KEY_type_FLAGS);
 
         /* write the contents of a register - else thaw can't restore
          * the register state */
-        VTABLE_push_integer(INTERP, io, flags & ~KEY_register_FLAG);
+        VTABLE_push_integer(INTERP, info, flags & ~KEY_register_FLAG);
 
         /* and contents of this key component */
         switch (flags) {
           case KEY_integer_FLAG:
           case KEY_integer_FLAG | KEY_register_FLAG:
-            VTABLE_push_integer(INTERP, io, key_integer(INTERP, SELF));
+            VTABLE_push_integer(INTERP, info, key_integer(INTERP, SELF));
             break;
           case KEY_number_FLAG:
           case KEY_number_FLAG | KEY_register_FLAG:
-            VTABLE_push_float(INTERP, io, key_number(INTERP, SELF));
+            VTABLE_push_float(INTERP, info, key_number(INTERP, SELF));
             break;
           case KEY_string_FLAG:
           case KEY_string_FLAG | KEY_register_FLAG:
-            VTABLE_push_string(INTERP, io, key_string(INTERP, SELF));
+            VTABLE_push_string(INTERP, info, key_string(INTERP, SELF));
             break;
           default:
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
@@ -350,8 +348,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
     }
 
     void thaw(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
-        const INTVAL flags  = VTABLE_shift_integer(INTERP, io) & KEY_type_FLAGS;
+        const INTVAL flags  = VTABLE_shift_integer(INTERP, info) & KEY_type_FLAGS;
 
         PObj_get_FLAGS(SELF) |= flags;
         PObj_custom_mark_SET(SELF);
@@ -362,13 +359,13 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
         /* get contents */
         switch (flags) {
           case KEY_integer_FLAG:
-            SET_ATTR_int_key(INTERP, SELF, VTABLE_shift_integer(INTERP, io));
+            SET_ATTR_int_key(INTERP, SELF, VTABLE_shift_integer(INTERP, info));
             break;
           case KEY_number_FLAG:
-            VTABLE_set_number_native(INTERP, SELF, VTABLE_shift_float(INTERP, io));
+            VTABLE_set_number_native(INTERP, SELF, VTABLE_shift_float(INTERP, info));
             break;
           case KEY_string_FLAG:
-            VTABLE_set_string_native(INTERP, SELF, VTABLE_shift_string(INTERP, io));
+            VTABLE_set_string_native(INTERP, SELF, VTABLE_shift_string(INTERP, info));
             break;
           default:
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
