@@ -62,7 +62,6 @@ typedef struct _visit_info {
     visit_f             visit_action;   /* freeze, thaw ... */
     INTVAL              what;
     STRING             *image;
-    PMC                *mark_ptr;
     PMC               **thaw_ptr;       /* where to thaw a new PMC */
     INTVAL              last_type;
     PMC                *seen;           /* seen hash */
