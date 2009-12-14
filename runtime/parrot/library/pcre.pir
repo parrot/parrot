@@ -67,8 +67,13 @@ LIB_DEFAULT:
     loadlib libpcre, 'libpcre.so'
     loaded = defined libpcre
     if loaded goto LIB_LOADED
-# soname of recent version
+# soname of recent versions
     loadlib libpcre, 'libpcre.so.3'
+    loaded = defined libpcre
+    if loaded goto LIB_LOADED
+
+    # See TT #578
+    loadlib libpcre, 'libpcre.so.0'
     loaded = defined libpcre
     if loaded goto LIB_LOADED
 
