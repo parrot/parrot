@@ -1,40 +1,26 @@
 # $Id$
 
 New in 1.9.0
-- Functionality
-  + garbage collectable contexts
-  + fixing codetest and manifest_tests failures
-  + implement some patches from bubaflub++ and kurahapo++
-  + fixing some tests
-  + investigate gc
-  + (re)factored the profiling runcore
-  + output is configurable and extensible, options atm are pprof and none (binary and possibly callgrind are planned)
-  + env var PARROT_PROFILING_OUTPUT now determines the output type, PARROT_PROFILING_FILENAME determines the filename
-  + updated pprof2cg.pl for some minor pprof format changes
+- Core
+  + Converted Contexts to garbage collectable structures
+  + Fixed codetest and manifest_tests failures
+  + Made profiling runcore output format configurable and extensible
+    options include "pprof" and "none" ("binary" and "callgrind" are planned)
+  + Added environment variables to specify output type and filename
+    (PARROT_PROFILING_OUTPUT and PARROT_PROFILING_FILENAME)
+  + Began merging Freeze/Thaw and Bytecode generator/loader (TT #1359)
 - Compilers
-  + renamed the parser example to stage 1 compiler
-  + modified harness to use it with both stages
-  + improved the stage 1 compiler
-  + some fixes in stage 0
+  + Included latest nqp-rx compiler, with many improvements
   + tried to get libjit_framebuilder working with a more recent parrot
-  + freeze/thaw Eval issues
-  + read up on freeze/thaw
-  + started implementing TT #1359
-- Platforms
-  + building and testing parrot on amd64/i386, with gcc/g++, with and without --optimize
 - Tests
-  + The following tests were translated from Perl to PIR :
-    t/pmc/bigint.t, t/compilers/pge/04-compile.t, t/compilers/pge/02-match.t,
-    t/compilers/json/from_parrot.t, t/library/protoobject.t, t/library/uuid.t,
-    t/library/md5.t, t/library/mt19937ar.t
-  + 10 Perl+PIR tests converted to pure PIR
-  + More tests converted to PIR
+  + Many tests converted to PIR, leading to reduced test execution time
 - Tools
   + A version of pprof2cg was written in NQP
 - Miscellaneous
-  + Cleared out RT in favor of Trac
+  + Portability updates for RTEMS and Intel architectures with GNU compilers
+  + Completed conversion of ticket tracking system from RT to Trac
 - Parrot Plumage
-  Parrot Plumage is the project name for the Parrot module ecosystem. It will include metadata handling, dependency resolution, module installation, etc.
+  + Parrot Plumage is the project name for the Parrot module ecosystem. It will include metadata handling, dependency resolution, module installation, etc.
   + Add accessor methods to Plumage::Project
   + Add project-dir command to plumage
   + Move responsibility for determining build sequence to Plumage::Project
