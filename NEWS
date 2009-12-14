@@ -10,9 +10,20 @@ New in 1.9.0
   + Began merging Freeze/Thaw and Bytecode generator/loader
 - Compilers
   + Included latest nqp-rx compiler, with many improvements
+    - GLOBAL:: package identifier
+    - dynamic variables look in global namespace
+    - $obj."$method" syntax
+    - :p(os) and :c(ontinue) option on regexes
+    - try/CATCH/CONTROL handling
+    - support leading & on subroutine declarations
+    - allow "category:<symbol>" names (for builtin operators)
+    - simple version of smartmatch operator
+    - simple regex matches
+    - updated HLL::Compiler with new import/export methods
 - Miscellaneous
   + Portability updates for RTEMS, and Intel architectures with GNU compilers
   + Completed conversion of ticket tracking system from RT to Trac
+  + New draft of PDD31 for HLL export API and import implementation
   + Several (build time, runtime) performance improvements
   + Converted many tests to PIR, reducing test execution time
   + Various bugfixes, code cleanups, and coding standard fixes
