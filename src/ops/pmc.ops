@@ -51,9 +51,7 @@ to do with the initializer.  See PDD17 and the init_pmc function for more.
 
 op new(out PMC, in STR) {
     STRING * const name   = $2;
-    PMC    * const _class = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp))
-                          ? Parrot_oo_get_class_str(interp, name)
-                          : PMCNULL;
+    PMC    * const _class = Parrot_oo_get_class_str(interp, name);
 
     if (!PMC_IS_NULL(_class))
         $1 = VTABLE_instantiate(interp, _class, PMCNULL);
@@ -71,9 +69,7 @@ op new(out PMC, in STR) {
 
 op new(out PMC, in STR, in PMC) {
     STRING * const name   = $2;
-    PMC    * const _class = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp))
-                          ? Parrot_oo_get_class_str(interp, name)
-                          : PMCNULL;
+    PMC    * const _class = Parrot_oo_get_class_str(interp, name);
 
     if (!PMC_IS_NULL(_class))
         $1 = VTABLE_instantiate(interp, _class, $3);
