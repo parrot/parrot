@@ -75,12 +75,13 @@ so this usage will not be allowed.
 
 L<https://trac.parrot.org/parrot/ticket/918>
 
-=item The IMAGE_IO structure and associated VTABLEs. [eligible in 2.1]
+=item The visit_info structure and associated VTABLEs. [eligible in 2.1]
 
-The current freeze/thaw implementation makes heavy use of the IMAGE_IO
+The current freeze/thaw implementation makes heavy use of the visit_info
 structure and the VTABLE interface attached to it. This structure will
 be replaced with a PMC of equivalent functionality and with a possibly
-similar interface.
+similar interface. The freeze and thaw vtables of all PMCs should be
+updated after this change is made.
 
 L<https://trac.parrot.org/parrot/ticket/1305>
 
