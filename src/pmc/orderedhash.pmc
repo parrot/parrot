@@ -627,7 +627,7 @@ preserve key/value order.
 */
 
     VTABLE void visit(visit_info *info) {
-        switch (info->what) {
+        switch (VTABLE_get_integer(INTERP, info)) {
           case VISIT_THAW_NORMAL:
           case VISIT_THAW_CONSTANTS:
             SUPER(info);
@@ -656,7 +656,7 @@ preserve key/value order.
           default:
             Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_OPERATION,
-                    "unhandled visit action (%d)", info->what);
+                    "unhandled visit action (%d)", VTABLE_get_integer(INTERP, info));
         }
     }
 }

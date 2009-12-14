@@ -708,8 +708,8 @@ Finish thawing.
          */
 
         /*  HLL_info */
-        if (info->what == VISIT_THAW_NORMAL ||
-                info->what == VISIT_THAW_CONSTANTS) {
+        if (VTABLE_get_integer(INTERP, info) == VISIT_THAW_NORMAL ||
+                VTABLE_get_integer(INTERP, info) == VISIT_THAW_CONSTANTS) {
             pos = &PMC_args(SELF);
         }
         else
@@ -733,7 +733,6 @@ Finish thawing.
             }
 
             PMC_interp(SELF) = INTERP;
-            info->what       = VISIT_THAW_CONSTANTS;
         }
     }
 
