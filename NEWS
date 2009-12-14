@@ -3,34 +3,19 @@
 New in 1.9.0
 - Core
   + Converted Contexts to garbage collectable structures
-  + Fixed codetest and manifest_tests failures
   + Made profiling runcore output format configurable and extensible
     options include "pprof" and "none" ("binary" and "callgrind" are planned)
-  + Added environment variables to specify output type and filename
+  + Added environment variables to specify profiling output type and filename
     (PARROT_PROFILING_OUTPUT and PARROT_PROFILING_FILENAME)
-  + Began merging Freeze/Thaw and Bytecode generator/loader (TT #1359)
+  + Began merging Freeze/Thaw and Bytecode generator/loader
 - Compilers
   + Included latest nqp-rx compiler, with many improvements
-  + tried to get libjit_framebuilder working with a more recent parrot
-- Tests
-  + Many tests converted to PIR, leading to reduced test execution time
-- Tools
-  + A version of pprof2cg was written in NQP
 - Miscellaneous
   + Portability updates for RTEMS and Intel architectures with GNU compilers
   + Completed conversion of ticket tracking system from RT to Trac
-- Parrot Plumage
-  + Parrot Plumage is the project name for the Parrot module ecosystem. It will include metadata handling, dependency resolution, module installation, etc.
-  + Add accessor methods to Plumage::Project
-  + Add project-dir command to plumage
-  + Move responsibility for determining build sequence to Plumage::Project
-  + Move responsibility for mkpath($build_root) to Plumage::Project's fetch action
-  + Excise %STAGES and supporting code from plumage.nqp
-  + Add stub of update stage to Plumage::Project, reusing (and falling back to) fetch
-  + Make harness exit(1) after failing test runs
-  + Fix broken test
-  + Tell plumage command_ subs what command invoked them;
-  + Collapse all plumage project action commands into one sub
+  + Several (build time, runtime) performance improvements
+  + Converted many tests to PIR, reducing test execution time
+  + Various bugfixes, code cleanups, and coding standard fixes
 
 New in 1.8.0
 - Functionality
