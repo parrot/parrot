@@ -152,6 +152,7 @@ my %C_TYPE = (
     HANDLE                  => 'void*',
     HPBUFFERARB             => 'void*',
     HPBUFFEREXT             => 'void*',
+    HVIDEOINPUTDEVICENV     => 'void*',
     HVIDEOOUTPUTDEVICENV    => 'void*',
     HPVIDEODEV              => 'void*',
     HPGPUNV                 => 'void*',
@@ -224,6 +225,7 @@ my %C_TYPE = (
     GLXPbufferSGIX          => 'unsigned long',
     GLXFBConfigIDSGIX       => 'unsigned long',
     GLXVideoSourceSGIX      => 'unsigned long',
+    GLXVideoCaptureDeviceNV => 'unsigned long',
 
     int64_t                 => 'long long',
     INT64                   => 'long long',
@@ -485,6 +487,7 @@ sub runstep {
 
 #         # Portability testing headers
 #         "$ENV{HOME}/src/gentoo3/*.h",
+#         "$ENV{HOME}/src/gentoo4/usr/include/GL/*.h",
 #         "$ENV{HOME}/src/osx/headers/GLUT/*.h",
 #         "$ENV{HOME}/src/osx/headers/OpenGL/*.h",
 #         "$ENV{HOME}/src/osx-10.4/GLUT/*.h",
@@ -659,6 +662,9 @@ sub gen_opengl_wrappers {
             next unless /API/ or /\bextern\b/ or /\bmui[A-Z]/;
             next if     /^#/;
             next if     /\btypedef\b/;
+
+            # Skip where we are explicitly told to do so
+            next if /\bFGUNUSED\b/;
 
             # Save a (space compressed) copy of the source line
             # for later error reporting
