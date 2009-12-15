@@ -59,20 +59,20 @@ number types.
     set $I0, 1234567890
     neg $I0
     is( $I0, "-1234567890", 'take_the_negative_of_a_native_integer' )
-   
+
     set $I0, -1234567890
     neg $I0
     is( $I0, "1234567890", 'take_the_negative_of_a_native_integer' )
-    
+
     set $I0, 0
     set $I1, 0
     neg $I1, $I0
     is( $I1, "0", 'take_the_negative_of_a_native_integer' )
-   
+
     set $I0, 1234567890
     neg $I1, $I0
     is( $I1, "-1234567890", 'take_the_negative_of_a_native_integer' )
-    
+
     set $I0, -1234567890
     neg $I1, $I0
     is( $I1, "1234567890", 'take_the_negative_of_a_native_integer' )
@@ -104,7 +104,7 @@ number types.
     abs $I1, $I0
     is( $I1, "1234567890", 'take_the_absolute_of_a_native_integer' )
 .end
- 
+
 #
 # first arg is INTVAL, second arg is INTVAL
 #
@@ -117,7 +117,7 @@ number types.
     add $I0, $I0, $I1
     is( $I0, "3877", 'add_native_integer_to_native_integer' )
 .end
- 
+
 .sub subtract_native_integer_from_native_integer
     set $I0, 4000
     set $I1, -123
@@ -127,7 +127,7 @@ number types.
     sub $I0, $I0, $I1
     is( $I0, "4123", 'subtract_native_integer_from_native_integer' )
 .end
- 
+
 .sub multiply_native_integer_with_native_integer
     set $I0, 4000
     set $I1, -123
@@ -137,7 +137,7 @@ number types.
     mul $I0, $I0, $I1
     is( $I0, "-492000", 'multiply_native_integer_with_native_integer' )
 .end
- 
+
 .sub divide_native_integer_by_native_integer
     set $I0, 4000
     set $I1, -123
@@ -147,7 +147,7 @@ number types.
     div $I0, $I0, $I1
     is( $I0, "-32", 'divide_native_integer_by_native_integer' )
 .end
- 
+
 #
 # print -0.0 as -0
 #
@@ -162,7 +162,8 @@ number types.
     is( $S0, "-0", '1' )
     goto End_test1
 Todo_test1:
-    todo(1, 'Faulty on this platform')
+    $I0 = $S0 == "-0"
+    todo($I0, 'Faulty on this platform')
 End_test1:
 
     set $N0, -0.0
@@ -183,10 +184,11 @@ End_test1:
     is( $S0, "-0", '4' )
     goto End_test4
 Todo_test4:
-    todo(1, 'Faulty on this platform')
+    $I0 = $S0 == "-0"
+    todo($I0, 'Faulty on this platform')
 End_test4:
 .end
- 
+
 #
 # Operations on a single NUMVAL
 #
@@ -207,7 +209,7 @@ End_test4:
     neg $N1, $N0
     is( $N1, "123.456789", 'negate_a_native_number' )
 .end
- 
+
 .sub take_the_absolute_of_a_native_number
     set $N0, 0
     abs $N0
@@ -245,7 +247,7 @@ End_test4:
     abs $N1, $N0
     is( $N1, "123.45678901", 'take_the_absolute_of_a_native_number' )
 .end
- 
+
 .sub ceil_of_a_native_number
     set $N0, 0
     ceil $N0
@@ -371,7 +373,7 @@ End_test4:
     is( $N0, "7876.877", 'add_native_integer_to_native_number' )
 
 .end
- 
+
 .sub subtract_native_integer_from_native_number
     set $I0, 4000
     set $N0, -123.123
@@ -385,7 +387,7 @@ End_test4:
     is( $N0, "-8123.123", 'subtract_native_integer_from_native_number' )
 
 .end
- 
+
 .sub multiply_native_number_with_native_integer
     set $I0, 4000
     set $N0, -123.123
@@ -418,7 +420,7 @@ End_test4:
     div $N0, 0.01
     is( $N0, "100", 'divide_native_number_by_native_integer' )
 .end
- 
+
 #
 # FLOATVAL and FLOATVAL tests
 #
@@ -431,7 +433,7 @@ End_test4:
     add $N0, $N0, $N2
     is( $N0, "3877.123", 'add_native_number_to_native_number' )
 .end
- 
+
 .sub subtract_native_number_from_native_number
     set $N2, 4000.246
     set $N0, -123.123
@@ -442,7 +444,7 @@ End_test4:
     is( $N0, "-4123.369", 'subtract_native_number_from_native_number' )
 
 .end
- 
+
 .sub multiply_native_number_with_native_number
     set $N2, 4000.246
     set $N0, -123.123
@@ -453,7 +455,7 @@ End_test4:
     is( $N0, "-492522.288258", 'multiply_native_number_with_native_number' )
 
 .end
- 
+
 .sub divide_native_number_by_native_number
     set $N2, 4000.246
     set $N0, -123.123
@@ -464,7 +466,7 @@ End_test4:
     is( $N0, "-0.0307788571002883", 'divide_native_number_by_native_number' )
 
 .end
- 
+
 .sub lcm_test
     set $I0, 10
     set $I1, 10
@@ -515,12 +517,12 @@ End_test4:
 .sub integer_overflow_with_pow
     .include "iglobals.pasm"
 
-    # Check that we aren't 32-bit INTVALs without GMP 
+    # Check that we aren't 32-bit INTVALs without GMP
     .local pmc interp     # a handle to our interpreter object.
     interp = getinterp
     .local pmc config
     config = interp[.IGLOBALS_CONFIG_HASH]
-    .local int intvalsize 
+    .local int intvalsize
     intvalsize = config['intvalsize']
     .local int gmp
     gmp = config['gmp']
