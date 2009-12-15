@@ -60,6 +60,7 @@ win32-x86-msvc_6.0            4   -    -     -   -   Y    Y/8   ?  20090315
 win32-x64-msvc_9.0            8   -    -     -   -   Y    Y/17  ?  20091020
 win32-x64-mingw_gcc3.4.5      8   Y    ?     ?   ?   Y    Y     ?  20090210
 win64-amd64-msvc_9.0          8   N    N     ?   ?   Y*1  N     ?  20090720
+opensol2009.06-x86-gcc3.4.3   4   ?    ?     ?   ?   Y    Y/2   Y  20091215
 
 
 Legend:
