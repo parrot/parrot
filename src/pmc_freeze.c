@@ -514,6 +514,7 @@ todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info), ARGIN(STRING *input))
     }
     else {
         if (Parrot_str_byte_length(interp, input) < header_length) {
+            PackFile_destroy(interp, pf);
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_STRING_REPRESENTATION,
                 "bad string to thaw");
@@ -521,11 +522,13 @@ todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info), ARGIN(STRING *input))
 
         /* TT #749: use the validation logic from Packfile_unpack */
         if (pf->header->bc_major != PARROT_PBC_MAJOR
-        ||  pf->header->bc_minor != PARROT_PBC_MINOR)
+        ||  pf->header->bc_minor != PARROT_PBC_MINOR) {
+            PackFile_destroy(interp, pf);
             Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_STRING_REPRESENTATION,
                     "can't thaw a PMC from Parrot %d.%d", pf->header->bc_major,
                     pf->header->bc_minor);
+        }
 
         info->buffer = (Buffer *)input;
         PARROT_ASSERT(input->_bufstart == input->strstart);
