@@ -69,7 +69,10 @@ typedef struct _visit_info {
     INTVAL              extra_flags;    /* concerning to extra */
     PMC                *thaw_result;    /* 1st thawed */
     const image_funcs *vtable;
+    struct _visit_info *image_io;       /* dummy backwards-compat pointer. */
 } visit_info;
+
+#define IMAGE_IO visit_info
 
 /*
  * public interfaces

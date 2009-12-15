@@ -504,6 +504,8 @@ todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info), ARGIN(STRING *input))
     info->seen = pmc_new(interp, enum_class_Hash);
     VTABLE_set_pointer(interp, info->seen, parrot_new_intval_hash(interp));
 
+    info->image_io = info; /* backwards-compat hack */
+
     info->vtable = &opcode_funcs;
 
     if (info->what == VISIT_FREEZE_NORMAL
