@@ -1,8 +1,19 @@
 # $Id$
 
+New in 2.0.0
+- Functionality
+- Compilers
+- Platforms
+- Performance
+- New deprecations
+- Realized deprecations
+- Tests
+- Documentation
+- Tools
+- Miscellaneous
+
 New in 1.9.0
 - Core
-  + Converted Contexts to garbage collectable structures
   + Made profiling runcore output format configurable and extensible
     options include "pprof" and "none" ("binary" and "callgrind" are planned)
   + Added environment variables to specify profiling output type and filename
