@@ -100,5 +100,6 @@ Starred release numbers indicate supported releases.
  Jerry       1.6.0          2009-Sep-15     "half-pie"
  dukeleto    1.7.0          2009-Oct-20     "African Grey"
  Barney      1.8.0          2009-Nov-17     "Zygodactyly"
+ Gerd        1.9.0          2009-Dec-15     "Blue-fronted Amazon"
 
 =cut
