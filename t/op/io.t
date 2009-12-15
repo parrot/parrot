@@ -136,7 +136,7 @@ Tests various io opcodes.
     .return ()
 
   open_pipe_for_writing_todoed:
-    todo(1, 'Unimplemented in this platform, TT #661')
+    todo(0, 'Unimplemented in this platform, TT #661')
 
 .end
 
