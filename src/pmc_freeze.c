@@ -274,7 +274,6 @@ static void visit_todo_list_thaw(PARROT_INTERP,
 enum {
     enum_PackID_normal     = 0,
     enum_PackID_seen       = 1,
-    enum_PackID_prev_type  = 2,
     enum_PackID_extra_info = 3
 };
 
@@ -450,7 +449,6 @@ hasn't been seen yet, it is also pushed onto the todo list.
 
 static void
 push_opcode_pmc(PARROT_INTERP, ARGIN(visit_info *io), ARGIN(PMC *v)) {
-    ASSERT_ARGS(push_opcode_pmc)
     io->thaw_ptr = &v;
     (io->visit_pmc_now)(interp, v, io);
 }
@@ -531,7 +529,6 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PMC *
 shift_opcode_pmc(PARROT_INTERP, ARGIN(visit_info *io)) {
-    ASSERT_ARGS(shift_opcode_pmc)
     PMC *result;
     io->thaw_ptr = &result;
     (io->visit_pmc_now)(interp, NULL, io);
@@ -582,7 +579,6 @@ Initializes the C<*info> lists.
 static void
 todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info), ARGIN(STRING *input))
 {
-    ASSERT_ARGS(todo_list_init)
     /* We want to store a 16-byte aligned header, but the actual
      * header may be shorter. */
     const unsigned int header_length = PACKFILE_HEADER_BYTES +
@@ -633,7 +629,6 @@ todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info), ARGIN(STRING *input))
         info->pos += header_length;
     }
 
-    info->last_type   = -1;
     info->id_list     = pmc_new(interp, enum_class_Array);
     info->id          = 0;
     info->extra_flags = EXTRA_IS_NULL;
@@ -681,15 +676,12 @@ freeze_pmc(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info),
 
         PackID_set_FLAGS(id, enum_PackID_seen);
     }
-    else if (type == info->last_type)
-        PackID_set_FLAGS(id, enum_PackID_prev_type);
 
     VTABLE_push_integer(interp, info, id);
 
     if (PackID_get_FLAGS(id) == enum_PackID_normal) {
         /* write type */
         VTABLE_push_integer(interp, info, type);
-        info->last_type = type;
     }
 }
 
@@ -736,15 +728,10 @@ thaw_pmc(PARROT_INTERP, ARGMOD(visit_info *info),
       case enum_PackID_seen:
         seen = 1;
         break;
-      case enum_PackID_prev_type:
-        /* prev PMC was same type */
-        *type = info->last_type;
-        break;
       default:
         /* type follows */
         {
             *type           = VTABLE_shift_integer(interp, info);
-            info->last_type = *type;
 
             if (*type <= 0)
                 Parrot_ex_throw_from_c_args(interp, NULL, 1,

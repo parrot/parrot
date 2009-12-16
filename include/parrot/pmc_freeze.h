@@ -64,7 +64,6 @@ typedef struct _visit_info {
     size_t              input_length;   /* */
     INTVAL              what;
     PMC               **thaw_ptr;       /* where to thaw a new PMC */
-    INTVAL              last_type;
     PMC                *seen;           /* seen hash */
     PMC                *todo;           /* todo list */
     PMC                *id_list;        /* seen list used by thaw */
