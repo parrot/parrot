@@ -384,7 +384,7 @@ To make a monthly release schedule possible, we spread the burden of
 releases across multiple release managers. Releases are scheduled for
 the 3rd Tuesday of each month.
 
-The starred releases are Parrot's twice-yearly supported releases, see
+The starred releases are Parrot's quarterly supported releases, see
 F<docs/project/support_policy.pod>.
 
 The calendar of releases is available at the comp.lang.parrot google calendar,

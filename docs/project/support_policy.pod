@@ -22,11 +22,9 @@ The Parrot team makes twelve releases a year, on the third Tuesday of
 every month. We make two kinds of releases, "supported" releases and
 "developer" releases.
 
-The supported releases happen in January and July. The January releases
-are numbered X.0 (the first X.0 release is in March). The July releases
-are numbered X.6, following 6 months after the January release (the
-first July release is 1.4, following 4 months after 1.0).  The supported
-releases:
+The supported releases happen quarterly, with the first release in
+January, numbered X.0.0, then X.1.0, etc. The X.0, X.3, X.6, and X.9
+releases are considered supported, they:
 
 =over 4
 
@@ -66,8 +64,8 @@ to remove.
 
 For example, if a feature exists in Parrot 2.0 (January 2010), and is
 not listed for deprecation in that release, the user can be confident
-that it will still exist at the next supported release, Parrot 2.6 (July
-2010).
+that it will still exist at the next supported release, Parrot 2.3
+(April 2010).
 
 After a feature is announced as deprecated, it might not appear in the
 next supported release. We sometimes delay removing deprecated features
@@ -183,9 +181,19 @@ of the public API (listed in docs/embed.pod)
 
 =item * Parrot internals hidden behind a public API
 
+=item * Items otherwise eligible but marked as "experimental" in F<DEPRECATED.pod>
+
 =back
 
 Note that all pointers passed to and returned from functions marked with
 C<PARROT_API> are considered opaque.  We do not guarantee backwards
 compatibility between monthly releases for the layout of these pointers;
 dereference them at your own risk.
+
+=head1 Historical Notes
+
+Before 1.0, version numbers were ad hoc. Our 1.0 release did not occur in
+January, so no 1.X releases are from the same months as their 2.X 
+counterparts.
+
+=cut
