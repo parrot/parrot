@@ -58,6 +58,13 @@ static void do_thaw(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_INLINE
+static void ensure_buffer_size(PARROT_INTERP,
+    ARGIN(visit_info *io),
+    size_t len)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_INLINE
 static void freeze_pmc(PARROT_INTERP,
     ARGIN_NULLOK(PMC *pmc),
     ARGIN(visit_info *info),
@@ -66,10 +73,17 @@ static void freeze_pmc(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-PARROT_INLINE
-static void ensure_buffer_size(PARROT_INTERP, ARGIN(visit_info *io), size_t len)
+static INTVAL get_visit_integer(PARROT_INTERP, ARGIN(visit_info *io))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+PARROT_INLINE
+static INTVAL INFO_HAS_DATA(ARGIN(visit_info *io))
+        __attribute__nonnull__(1);
+
+PARROT_INLINE
+static INTVAL OUTPUT_LENGTH(ARGIN(visit_info *io))
+        __attribute__nonnull__(1);
 
 static void push_opcode_integer(PARROT_INTERP,
     ARGIN(visit_info *io),
@@ -93,7 +107,7 @@ static void push_opcode_string(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC* run_thaw(PARROT_INTERP,
-    ARGIN(STRING* image),
+    ARGIN(STRING* input),
     visit_enum_type what)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -131,9 +145,12 @@ static int thaw_pmc(PARROT_INTERP,
         FUNC_MODIFIES(*id)
         FUNC_MODIFIES(*type);
 
-static void todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info), ARGIN(STRING *input))
+static void todo_list_init(PARROT_INTERP,
+    ARGOUT(visit_info *info),
+    ARGIN(STRING *input))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*info);
 
 PARROT_INLINE
@@ -175,15 +192,19 @@ static void visit_todo_list_thaw(PARROT_INTERP,
 #define ASSERT_ARGS_do_thaw __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(info))
-#define ASSERT_ARGS_freeze_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(info))
-#define ASSERT_ARGS_ft_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(info))
 #define ASSERT_ARGS_ensure_buffer_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(io))
+#define ASSERT_ARGS_freeze_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(info))
+#define ASSERT_ARGS_get_visit_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(io))
+#define ASSERT_ARGS_INFO_HAS_DATA __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(io))
+#define ASSERT_ARGS_OUTPUT_LENGTH __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(io))
 #define ASSERT_ARGS_push_opcode_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(io))
@@ -214,7 +235,8 @@ static void visit_todo_list_thaw(PARROT_INTERP,
     , PARROT_ASSERT_ARG(type))
 #define ASSERT_ARGS_todo_list_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(info))
+    , PARROT_ASSERT_ARG(info) \
+    , PARROT_ASSERT_ARG(input))
 #define ASSERT_ARGS_todo_list_seen __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc) \
@@ -262,7 +284,8 @@ enum {
 
 =over 4
 
-=item C<static void ensure_buffer_size(PARROT_INTERP, visit_info *io, size_t len)>
+=item C<static void ensure_buffer_size(PARROT_INTERP, visit_info *io, size_t
+len)>
 
 Checks the size of the "stream" buffer to see if it can accommodate
 C<len> more bytes. If not, expands the buffer.
@@ -299,16 +322,54 @@ ensure_buffer_size(PARROT_INTERP, ARGIN(visit_info *io), size_t len)
 
 /*
 
+=item C<static INTVAL OUTPUT_LENGTH(visit_info *io)>
+
+XXX TODO
+
+=cut
+
+*/
+
+PARROT_INLINE
+static INTVAL
+OUTPUT_LENGTH(ARGIN(visit_info *io)) {
+    ASSERT_ARGS(OUTPUT_LENGTH)
+    return (io->pos - ((char *)Buffer_bufstart(io->buffer)));
+}
+
+/*
+
+=item C<static INTVAL INFO_HAS_DATA(visit_info *io)>
+
+XXX TODO
+
+=cut
+
+*/
+
+PARROT_INLINE
+static INTVAL
+INFO_HAS_DATA(ARGIN(visit_info *io)) {
+    ASSERT_ARGS(INFO_HAS_DATA)
+    return (io->pos < (((char *)Buffer_bufstart(io->buffer)) + io->input_length));
+}
+
+#define BYTECODE_SHIFT_OK(io) \
+    PARROT_ASSERT((io)->pos <= (((char *)Buffer_bufstart((io)->buffer)) + (io)->input_length))
+
+/*
+
 =item C<static INTVAL get_visit_integer(PARROT_INTERP, visit_info *io)>
 
-XXX TODO!!!
+get the flags describing the visit action
 
 =cut
 
 */
 
 static INTVAL
-get_visit_integer(PARROT_INTERP, visit_info *io) {
+get_visit_integer(PARROT_INTERP, ARGIN(visit_info *io)) {
+    ASSERT_ARGS(get_visit_integer)
     return io->what;
 }
 
@@ -403,14 +464,6 @@ Removes and returns an integer from the start of the C<*io> "stream".
 =cut
 
 */
-
-static inline INTVAL OUTPUT_LENGTH(visit_info *io) {
-  return (io->pos - ((char *)Buffer_bufstart(io->buffer)));
-}
-static inline INTVAL INFO_HAS_DATA(visit_info *io) {
-  return (io->pos < (((char *)Buffer_bufstart(io->buffer)) + io->input_length));
-}
-#define BYTECODE_SHIFT_OK(io) PARROT_ASSERT((io)->pos <= (((char *)Buffer_bufstart((io)->buffer)) + (io)->input_length))
 
 static INTVAL
 shift_opcode_integer(SHIM_INTERP, ARGIN(visit_info *io))
@@ -517,7 +570,8 @@ static image_funcs opcode_funcs = {
 
 /*
 
-=item C<static void todo_list_init(PARROT_INTERP, visit_info *info)>
+=item C<static void todo_list_init(PARROT_INTERP, visit_info *info, STRING
+*input)>
 
 Initializes the C<*info> lists.
 
@@ -1038,9 +1092,9 @@ again:
 
 /*
 
-=item C<static void create_image(PARROT_INTERP, PMC *pmc, visit_info *info)>
+=item C<static void create_buffer(PARROT_INTERP, PMC *pmc, visit_info *info)>
 
-Allocate image to some estimated size.
+Allocate buffer to some estimated size.
 
 =cut
 
@@ -1063,15 +1117,15 @@ create_buffer(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGMOD(visit_info *info))
     else
         len = FREEZE_BYTES_PER_ITEM;
 
-    info->buffer = (Buffer *)Parrot_gc_new_bufferlike_header(interp, sizeof(Buffer));
-    Parrot_gc_allocate_buffer_storage_aligned(interp, info->buffer, len); 
+    info->buffer = (Buffer *)Parrot_gc_new_bufferlike_header(interp, sizeof (Buffer));
+    Parrot_gc_allocate_buffer_storage_aligned(interp, info->buffer, len);
     info->pos = (char *)Buffer_bufstart(info->buffer);
 }
 
 
 /*
 
-=item C<static PMC* run_thaw(PARROT_INTERP, STRING* image, visit_enum_type
+=item C<static PMC* run_thaw(PARROT_INTERP, STRING* input, visit_enum_type
 what)>
 
 Performs thawing. C<what> indicates what to be thawed.
