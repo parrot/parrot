@@ -2445,7 +2445,8 @@ Same options as install.
     name = get_name(kv :flat :named)
 
     .local string abstract
-    abstract = get_value('abstract', kv :flat :named)
+    $S0 = get_value('abstract', kv :flat :named)
+    abstract = _json_escape($S0)
 
     .local string authority
     authority = get_value('authority', kv :flat :named)
@@ -2460,10 +2461,12 @@ Same options as install.
     license_uri = get_value('license_uri', kv :flat :named)
 
     .local string copyright_holder
-    copyright_holder = get_value('copyright_holder', kv :flat :named)
+    $S0 = get_value('copyright_holder', kv :flat :named)
+    copyright_holder = _json_escape($S0)
 
     .local string description
-    description = get_value('description', kv :flat :named)
+    $S0 = get_value('description', kv :flat :named)
+    description = _json_escape($S0)
 
     .local string keywords
     keywords = ''
@@ -2573,6 +2576,13 @@ Same options as install.
 TEMPLATE
     $S0 = sprintf $S0, $P0
     print $S0
+.end
+
+.sub '_json_escape' :anon
+    .param string str
+    $P0 = split '"', str
+    str = join '\"', $P0
+    .return (str)
 .end
 
 =head3 Step manifest
