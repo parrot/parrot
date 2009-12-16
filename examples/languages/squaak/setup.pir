@@ -1,4 +1,4 @@
-#! /usr/local/bin/parrot
+#! ../../../parrot
 # Copyright (C) 2009, Parrot Foundation.
 # $Id$
 

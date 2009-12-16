@@ -587,9 +587,9 @@ the value is an array of PGE pathname or a single PGE pathname
     .local string cmd
     cmd = get_parrot()
     cmd .= " "
-    $S0 = get_libdir()
+    $S0 = get_library('PGE/Perl6Grammar.pbc')
     cmd .= $S0
-    cmd .= "/library/PGE/Perl6Grammar.pbc --output="
+    cmd .= " --output="
     cmd .= pir
     cmd .= " "
     cmd .= flags
@@ -632,9 +632,9 @@ the value is the TGE pathname
     .local string cmd
     cmd = get_parrot()
     cmd .= " "
-    $S0 = get_libdir()
+    $S0 = get_compiler('tge/tgc.pir')
     cmd .= $S0
-    cmd .= "/languages/tge/tgc.pir --output="
+    cmd .= " --output="
     cmd .= pir
     cmd .= " "
     cmd .= tge
@@ -684,9 +684,9 @@ the value is the NQP pathname
     .local string cmd
     cmd = get_parrot()
     cmd .= " "
-    $S0 = get_libdir()
+    $S0 = get_compiler('nqp/nqp.pbc')
     cmd .= $S0
-    cmd .= "/languages/nqp/nqp.pbc --target=pir --output="
+    cmd .= " --target=pir --output="
     cmd .= pir
     cmd .= " "
     cmd .= flags
@@ -769,7 +769,7 @@ the value is an array of PBC pathname
     if $I0 goto L1
     src = join ' ', srcs
     .local string cmd
-    cmd = get_pbc_merge()
+    cmd = get_executable('pbc_merge')
     cmd .= " -o "
     cmd .= pbc
     cmd .= " "
@@ -815,9 +815,7 @@ the value is the PBC pathname
     $I0 = newer($S1, pbc)
     if $I0 goto L1
     .local string cmd
-    cmd = get_bindir()
-    cmd .= "/pbc_to_exe"
-    cmd .= exe
+    cmd = get_executable('pbc_to_exe')
     cmd .= " "
     cmd .= pbc
     system(cmd, 1 :named('verbose'))
@@ -864,9 +862,7 @@ the value is the PBC pathname
     $I0 = newer($S1, pbc)
     if $I0 goto L1
     .local string cmd
-    cmd = get_bindir()
-    cmd .= "/pbc_to_exe"
-    cmd .= exe
+    cmd = get_executable('pbc_to_exe')
     cmd .= " "
     cmd .= pbc
     cmd .= " --install"
@@ -971,9 +967,9 @@ the value is the OPS pathname
     .local string cmd
     cmd = config['perl']
     cmd .= " "
-    $S0 = get_libdir()
+    $S0 = get_tool('build/ops2c.pl')
     cmd .= $S0
-    cmd .= "/tools/build/ops2c.pl "
+    cmd .= " "
     cmd .= core
     cmd .= " --dynamic "
     cmd .= src
@@ -1159,9 +1155,8 @@ the value is an array of PMC pathname
     .local string pmc2c
     pmc2c = config['perl']
     pmc2c .= " "
-    $S0 = get_libdir()
+    $S0 = get_tool('build/pmc2c.pl')
     pmc2c .= $S0
-    pmc2c .= "/tools/build/pmc2c.pl"
     .local string pmc2c_includes
     pmc2c_includes = "--include "
     $S0 = get_srcdir()
@@ -1219,9 +1214,9 @@ the value is an array of PMC pathname
     .local string cmd
     cmd = config['perl']
     cmd .= " "
-    $S0 = get_libdir()
+    $S0 = get_tool('build/pmc2c.pl')
     cmd .= $S0
-    cmd .= "/tools/build/pmc2c.pl --library "
+    cmd .= " --library "
 #    $S0 = dirname(src)
 #    cmd .= $S0
 #    cmd .= "/"
@@ -3226,6 +3221,28 @@ Return the whole config
     .return (flags)
 .end
 
+=item get_compiler
+
+=cut
+
+.sub 'get_compiler'
+    .param string name
+    $P0 = get_config()
+    $I0 = $P0['installed']
+    unless $I0 goto L1
+    $S0 = $P0['libdir']
+    $S1 = $P0['versiondir']
+    $S0 .= $S1
+    $S0 .= '/languages/'
+    goto L2
+  L1:
+    $S0 = $P0['prefix']
+    $S0 .= '/compilers/'
+  L2:
+    $S0 .= name
+    .return ($S0)
+.end
+
 =item get_exe
 
 =cut
@@ -3233,6 +3250,27 @@ Return the whole config
 .sub 'get_exe'
     $P0 = get_config()
     $S0 = $P0['exe']
+    .return ($S0)
+.end
+
+=item get_executable
+
+=cut
+
+.sub 'get_executable'
+    .param string name
+    $P0 = get_config()
+    $I0 = $P0['installed']
+    unless $I0 goto L1
+    $S0 = $P0['bindir']
+    goto L2
+  L1:
+    $S0 = $P0['prefix']
+  L2:
+    $S0 .= '/'
+    $S0 .= name
+    $S1 = $P0['exe']
+    $S0 .= $S1
     .return ($S0)
 .end
 
@@ -3257,6 +3295,28 @@ Return the whole config
     $S0 = $P0['libdir']
     $S1 = $P0['versiondir']
     $S0 .= $S1
+    .return ($S0)
+.end
+
+=item get_library
+
+=cut
+
+.sub 'get_library'
+    .param string name
+    $P0 = get_config()
+    $I0 = $P0['installed']
+    unless $I0 goto L1
+    $S0 = $P0['libdir']
+    $S1 = $P0['versiondir']
+    $S0 .= $S1
+    $S0 .= '/library/'
+    goto L2
+  L1:
+    $S0 = $P0['prefix']
+    $S0 .= '/runtime/parrot/library/'
+  L2:
+    $S0 .= name
     .return ($S0)
 .end
 
@@ -3305,25 +3365,7 @@ Return the whole config
 =cut
 
 .sub 'get_parrot'
-    $P0 = get_config()
-    $S0 = $P0['bindir']
-    $S0 .= '/parrot'
-    $S1 = $P0['exe']
-    $S0 .= $S1
-    .return ($S0)
-.end
-
-=item get_pbc_merge
-
-=cut
-
-.sub 'get_pbc_merge'
-    $P0 = get_config()
-    $S0 = $P0['bindir']
-    $S0 .= '/pbc_merge'
-    $S1 = $P0['exe']
-    $S0 .= $S1
-    .return ($S0)
+    .tailcall get_executable('parrot')
 .end
 
 =item get_nqp
@@ -3331,12 +3373,7 @@ Return the whole config
 =cut
 
 .sub 'get_nqp'
-    $P0 = get_config()
-    $S0 = $P0['bindir']
-    $S0 .= '/parrot-nqp'
-    $S1 = $P0['exe']
-    $S0 .= $S1
-    .return ($S0)
+    .tailcall get_executable('parrot-nqp')
 .end
 
 =item get_srcdir
@@ -3348,6 +3385,27 @@ Return the whole config
     $S0 = $P0['srcdir']
     $S1 = $P0['versiondir']
     $S0 .= $S1
+    .return ($S0)
+.end
+
+=item get_tool
+
+=cut
+
+.sub 'get_tool'
+    .param string name
+    $P0 = get_config()
+    $I0 = $P0['installed']
+    unless $I0 goto L1
+    $S0 = $P0['libdir']
+    $S1 = $P0['versiondir']
+    $S0 .= $S1
+    goto L2
+  L1:
+    $S0 = $P0['prefix']
+  L2:
+    $S0 .= '/tools/'
+    $S0 .= name
     .return ($S0)
 .end
 
