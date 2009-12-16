@@ -37,7 +37,7 @@ This is executed when you call F<getopt_demo.pir>.
 
   # Specification of command line arguments.
   .local pmc getopts
-  getopts = new "Getopt::Obj"
+  getopts = new ["Getopt";"Obj"]
   # getopts."notOptStop"(1)
 
   # --version, boolean

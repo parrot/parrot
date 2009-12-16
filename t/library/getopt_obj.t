@@ -37,7 +37,7 @@ pir_output_is( <<'CODE', <<'OUT', 'basic long options' );
 
         load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
-        getopts = new "Getopt::Obj"
+        getopts = new ['Getopt';'Obj']
 
         $P0 = getopts."add"()
         $P0."long"("foo")
@@ -96,7 +96,7 @@ pir_output_is( <<'CODE', <<'OUT', "basic short options" );
 
         load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
-        getopts = new "Getopt::Obj"
+        getopts = new ['Getopt';'Obj']
 
         $P0 = getopts."add"()
         $P0."short"("f")
@@ -142,7 +142,7 @@ pir_output_is( <<'CODE', <<'OUT', "simple array" );
 
         load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
-        getopts = new "Getopt::Obj"
+        getopts = new ['Getopt';'Obj']
 
         $P0 = getopts."add"()
         $P0."short"("I")
@@ -176,7 +176,7 @@ pir_output_is( <<'CODE', <<'OUT', "mixing long and short with array" );
 
         load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
-        getopts = new "Getopt::Obj"
+        getopts = new ['Getopt';'Obj']
 
         $P0 = getopts."add"()
         $P0."long"("include")
@@ -212,7 +212,7 @@ pir_output_is( <<'CODE', <<'OUT', "hash" );
 
         load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
-        getopts = new "Getopt::Obj"
+        getopts = new ['Getopt';'Obj']
 
         $P0 = getopts."add"()
         $P0."long"("define")
@@ -252,7 +252,7 @@ pir_output_is( <<'CODE', <<'OUT', "bundling short options" );
 
         load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
-        getopts = new "Getopt::Obj"
+        getopts = new ['Getopt';'Obj']
 
         $P0 = getopts."add"()
         $P0."short"("a")
@@ -295,7 +295,7 @@ pir_output_is( <<'CODE', <<'OUT', "ignored options" );
 
         load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
-        getopts = new "Getopt::Obj"
+        getopts = new ['Getopt';'Obj']
         getopts."notOptStop"(1)
 
         $P0 = getopts."add"()
@@ -330,7 +330,7 @@ pir_output_is( <<'CODE', <<'OUT', "double dash stop" );
 
         load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
-        getopts = new "Getopt::Obj"
+        getopts = new ['Getopt';'Obj']
 
         $P0 = getopts."add"()
         $P0."long"("foo")
@@ -373,7 +373,7 @@ pir_output_is( <<'CODE', <<'OUT', "notOptStop" );
 
         load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
-        getopts = new "Getopt::Obj"
+        getopts = new ['Getopt';'Obj']
         getopts."notOptStop"(1)
 
         $P0 = getopts."add"()
@@ -422,7 +422,7 @@ pir_output_is( <<'CODE', <<'OUT', "optarg" );
 
         load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
-        getopts = new "Getopt::Obj"
+        getopts = new ['Getopt';'Obj']
         getopts."notOptStop"(1)
 
         $P0 = getopts."add"()
@@ -476,7 +476,7 @@ pir_output_is( <<'CODE', <<'OUT', "pass through" );
 
         load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
-        getopts = new "Getopt::Obj"
+        getopts = new ['Getopt';'Obj']
 
         $P0 = getopts."add"()
         $P0."long"("foo")
@@ -524,7 +524,7 @@ pir_output_is( <<'CODE', <<'OUT', "lone dash" );
 
         load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
-        getopts = new "Getopt::Obj"
+        getopts = new ['Getopt';'Obj']
 
         $P0 = getopts."add"()
         $P0."long"("foo")
@@ -576,7 +576,7 @@ pir_output_is( <<'CODE', <<'OUT', "push interface" );
 
         load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
-        getopts = new "Getopt::Obj"
+        getopts = new ['Getopt';'Obj']
 
         push getopts, 'foo=s'
         push getopts, 'bar|b=s'
@@ -659,7 +659,7 @@ pir_error_output_like( <<'CODE', <<'OUT', "missing spec" );
         push argv, '--foo=file'
         load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
-        getopts = new "Getopt::Obj"
+        getopts = new ['Getopt';'Obj']
         $P1 = getopts."get_options"(argv)
         $S0 = $P1["foo"]
         print "foo is "
@@ -683,7 +683,7 @@ pir_error_output_like( <<'CODE', <<'OUT', "missing argument" );
         push argv, '--bar'
         load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
-        getopts = new "Getopt::Obj"
+        getopts = new ['Getopt';'Obj']
         push getopts, 'foo=s'
         push getopts, 'bar=s'
         $P1 = getopts."get_options"(argv)

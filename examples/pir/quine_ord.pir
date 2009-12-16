@@ -3512,7 +3512,7 @@ push code_as_data, 10
 
     # Specification of command line arguments.
     .local pmc getopts
-    getopts = new "Getopt::Obj"
+    getopts = new ["Getopt";"Obj"]
     push getopts, "print-code-as-data"
 
     # Looking at command line

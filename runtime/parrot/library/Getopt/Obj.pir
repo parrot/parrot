@@ -13,7 +13,7 @@ library/Getopt/Obj.pir - parse long and short command line options
     prog_name = shift argv
     load_bytecode "Getopt/Obj.pbc"
     .local pmc getopts
-    getopts = new "Getopt::Obj"
+    getopts = new ['Getopt';'Obj']
     getopts."notOptStop"(1)
 
      # these two are identical, with the exception of the call to name
@@ -71,11 +71,11 @@ the attributes they'll use.
 
 .sub __load :anon :load
     .local pmc obj, spec
-    obj = newclass "Getopt::Obj"
+    obj = newclass ['Getopt';'Obj']
     addattribute obj, "Specs"
     addattribute obj, "notOptStop"
 
-    spec = newclass "Getopt::Obj::Spec"
+    spec = newclass ["Getopt";"Obj";"Spec"]
     addattribute spec, "name"
     addattribute spec, "long"
     addattribute spec, "short"
@@ -93,7 +93,7 @@ Our nice little module.
 
 =cut
 
-.namespace ["Getopt::Obj"]
+.namespace ['Getopt';'Obj']
 
 =item C<init()>
 
@@ -454,7 +454,7 @@ Adds a new option to the parsing.  You don't need to know what class it is
 
 .sub "add" :method
     .local pmc spec, specs
-    spec = new "Getopt::Obj::Spec"
+    spec = new ["Getopt";"Obj";"Spec"]
     specs = getattribute self, "Specs"
     push specs, spec
     .return(spec)
@@ -567,7 +567,7 @@ This makes an easy holder for each possible match.
 
 =cut
 
-.namespace ["Getopt::Obj::Spec"]
+.namespace ["Getopt";"Obj";"Spec"]
 
 =item C<init()>
 

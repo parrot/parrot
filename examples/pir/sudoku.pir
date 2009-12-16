@@ -281,7 +281,7 @@ err:
     # Specification of command line arguments.
     # --version, --debug, --inv=nnn, --builtin=name, --nc, --help
     .local pmc getopts
-    getopts = new "Getopt::Obj"
+    getopts = new ["Getopt";"Obj"]
     push getopts, "version"
     push getopts, "debug"
     push getopts, "pairs"
