@@ -194,6 +194,8 @@ dereference them at your own risk.
 
 Before 1.0, version numbers were ad hoc. Our 1.0 release did not occur in
 January, so no 1.X releases are from the same months as their 2.X 
-counterparts.
+counterparts. Also, the frequency of supported releases is not constant
+over the life of the project. See F<docs/parrothist.pod> for details about
+which existing releases were considered supported.
 
 =cut
