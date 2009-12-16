@@ -134,7 +134,7 @@ any value type.
     $P0.'push'(.CONTROL_OK)
     $P0.'push'(.CONTROL_BREAK)
     $P0.'push'(.CONTROL_CONTINUE)
-    $P0.'push'(.CONTROL_ERROR)
+    #$P0.'push'(.CONTROL_ERROR)
     $P0.'push'(.CONTROL_TAKE)
     $P0.'push'(.CONTROL_LEAVE)
     $P0.'push'(.CONTROL_LOOP_NEXT)
@@ -142,14 +142,11 @@ any value type.
     $P0.'push'(.CONTROL_LOOP_REDO)
     controltypes['CONTROL']   = $P0
     $P0 = new 'ResizablePMCArray'
-    $P0.'push'(.CONTROL_TAKE)
-    controltypes['GATHER']   = $P0
+    $P0.'push'(.CONTROL_RETURN)
+    controltypes['RETURN']   = $P0
     $P0 = new 'ResizablePMCArray'
     $P0.'push'(.CONTROL_OK)
     controltypes['OK'] = $P0
-    $P0 = new 'ResizablePMCArray'
-    $P0.'push'(.CONTROL_LEAVE)
-    controltypes['LEAVE'] = $P0
     $P0 = new 'ResizablePMCArray'
     $P0.'push'(.CONTROL_BREAK)
     controltypes['BREAK'] = $P0
@@ -159,6 +156,12 @@ any value type.
     $P0 = new 'ResizablePMCArray'
     $P0.'push'(.CONTROL_ERROR)
     controltypes['ERROR'] = $P0
+    $P0 = new 'ResizablePMCArray'
+    $P0.'push'(.CONTROL_TAKE)
+    controltypes['GATHER']   = $P0
+    $P0 = new 'ResizablePMCArray'
+    $P0.'push'(.CONTROL_LEAVE)
+    controltypes['LEAVE'] = $P0
     $P0 = new 'ResizablePMCArray'
     $P0.'push'(.CONTROL_LOOP_NEXT)
     controltypes['NEXT'] = $P0
