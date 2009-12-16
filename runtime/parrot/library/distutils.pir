@@ -207,6 +207,8 @@ L<http://bitbucket.org/riffraff/shakespeare-parrot/src/tip/setup.pir>
     register_step_after('build', _build_pir_nqp_rx)
     .const 'Sub' _build_pbc_pir = '_build_pbc_pir'
     register_step_after('build', _build_pbc_pir)
+    .const 'Sub' _build_pbc_pbc = '_build_pbc_pbc'
+    register_step_after('build', _build_pbc_pbc)
     .const 'Sub' _build_exe_pbc = '_build_exe_pbc'
     register_step_after('build', _build_exe_pbc)
     .const 'Sub' _build_installable_pbc = '_build_installable_pbc'
@@ -228,6 +230,8 @@ L<http://bitbucket.org/riffraff/shakespeare-parrot/src/tip/setup.pir>
     register_step_after('clean', _clean_pir_nqp_rx)
     .const 'Sub' _clean_pbc_pir = '_clean_pbc_pir'
     register_step_after('clean', _clean_pbc_pir)
+    .const 'Sub' _clean_pbc_pbc = '_clean_pbc_pbc'
+    register_step_after('clean', _clean_pbc_pbc)
     .const 'Sub' _clean_exe_pbc = '_clean_exe_pbc'
     register_step_after('clean', _clean_exe_pbc)
     .const 'Sub' _clean_installable_pbc = '_clean_installable_pbc'
@@ -509,7 +513,7 @@ the others items of the array are just the dependencies
     .local string pbc, src
     pbc = shift $P0
     .local pmc depends
-    depends = $P0[pbc]
+    depends = hash[pbc]
     $I0 = does depends, 'array'
     unless $I0 goto L3
     $I0 = newer(pbc, depends)
@@ -568,7 +572,7 @@ the value is an array of PGE pathname or a single PGE pathname
     .local string pir, src
     pir = shift $P0
     .local pmc srcs
-    srcs = $P0[pir]
+    srcs = hash[pir]
     $I0 = does srcs, 'array'
     unless $I0 goto L3
     $I0 = newer(pir, srcs)
@@ -622,7 +626,7 @@ the value is the TGE pathname
     unless $P0 goto L2
     .local string pir, tge
     pir = shift $P0
-    tge = $P0[pir]
+    tge = hash[pir]
     $I0 = newer(pir, tge)
     if $I0 goto L1
     .local string cmd
@@ -674,7 +678,7 @@ the value is the NQP pathname
     unless $P0 goto L2
     .local string pir, nqp
     pir = shift $P0
-    nqp = $P0[pir]
+    nqp = hash[pir]
     $I0 = newer(pir, nqp)
     if $I0 goto L1
     .local string cmd
@@ -719,7 +723,7 @@ the value is the NQP pathname
     unless $P0 goto L2
     .local string pir, nqp
     pir = shift $P0
-    nqp = $P0[pir]
+    nqp = hash[pir]
     $I0 = newer(pir, nqp)
     if $I0 goto L1
     .local string cmd
@@ -728,6 +732,48 @@ the value is the NQP pathname
     cmd .= pir
     cmd .= " "
     cmd .= nqp
+    system(cmd, 1 :named('verbose'))
+    goto L1
+  L2:
+.end
+
+=item pbc_pbc
+
+hash
+
+the key is the PBC pathname
+
+the value is an array of PBC pathname
+
+=cut
+
+.sub '_build_pbc_pbc' :anon
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['pbc_pbc']
+    unless $I0 goto L1
+    $P0 = kv['pbc_pbc']
+    build_pbc_pbc($P0)
+  L1:
+.end
+
+.sub 'build_pbc_pbc'
+    .param pmc hash
+    $P0 = iter hash
+  L1:
+    unless $P0 goto L2
+    .local string pbc, src
+    pbc = shift $P0
+    .local pmc srcs
+    srcs = hash[pbc]
+    $I0 = newer(pbc, srcs)
+    if $I0 goto L1
+    src = join ' ', srcs
+    .local string cmd
+    cmd = get_pbc_merge()
+    cmd .= " -o "
+    cmd .= pbc
+    cmd .= " "
+    cmd .= src
     system(cmd, 1 :named('verbose'))
     goto L1
   L2:
@@ -761,7 +807,7 @@ the value is the PBC pathname
     unless $P0 goto L2
     .local string bin, pbc
     bin = shift $P0
-    pbc = $P0[bin]
+    pbc = hash[bin]
     $I0 = length pbc
     $I0 -= 4
     $S0 = substr pbc, 0, $I0
@@ -809,7 +855,7 @@ the value is the PBC pathname
     unless $P0 goto L2
     .local string bin, pbc
     bin = shift $P0
-    pbc = $P0[bin]
+    pbc = hash[bin]
     $I0 = length pbc
     $I0 -= 4
     $S0 = substr pbc, 0, $I0
@@ -1304,7 +1350,7 @@ the value is the POD pathname
     unless $P0 goto L2
     .local string html, pod
     html = shift $P0
-    pod = $P0[html]
+    pod = hash[html]
     $I0 = newer(html, pod)
     if $I0 goto L1
     .local string cmd
@@ -1397,6 +1443,19 @@ the value is the POD pathname
     $I0 = exists kv['pir_nqp-rx']
     unless $I0 goto L1
     $P0 = kv['pir_nqp-rx']
+    clean_key($P0)
+  L1:
+.end
+
+=item pbc_pbc
+
+=cut
+
+.sub '_clean_pbc_pbc' :anon
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['pbc_pbc']
+    unless $I0 goto L1
+    $P0 = kv['pbc_pbc']
     clean_key($P0)
   L1:
 .end
@@ -2538,6 +2597,8 @@ array of pathname or a single pathname
 
 =item pir_nqp-rx
 
+=item pbc_pbc
+
 =item exe_pbc
 
 =item installable_pbc
@@ -2572,7 +2633,7 @@ array of pathname or a single pathname
     needed = new 'Hash'
     generated = new 'Hash'
 
-    $P0 = split ' ', 'pbc_pir pir_pge pir_tge pir_nqp pir_nqp-rx exe_pbc installable_pbc dynops dynpmc html_pod'
+    $P0 = split ' ', 'pbc_pir pir_pge pir_tge pir_nqp pir_nqp-rx pbc_pbc exe_pbc installable_pbc dynops dynpmc html_pod'
   L1:
     unless $P0 goto L2
     $S0 = shift $P0
@@ -3237,6 +3298,19 @@ Return the whole config
     $P0 = get_config()
     $S0 = $P0['bindir']
     $S0 .= '/parrot'
+    $S1 = $P0['exe']
+    $S0 .= $S1
+    .return ($S0)
+.end
+
+=item get_pbc_merge
+
+=cut
+
+.sub 'get_pbc_merge'
+    $P0 = get_config()
+    $S0 = $P0['bindir']
+    $S0 .= '/pbc_merge'
     $S1 = $P0['exe']
     $S0 .= $S1
     .return ($S0)
