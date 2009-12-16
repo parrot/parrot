@@ -505,7 +505,6 @@ sub get_perl_exemption_regexp {
         compilers/nqp/
         compilers/ncigen/src/parser/actions.pm
         examples/sdl/
-        examples/languages/abc/src/parser/actions.pm
         examples/languages/squaak/src/parser/actions.pm
         lib/Digest/Perl/
         lib/File/

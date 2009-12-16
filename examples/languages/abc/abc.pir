@@ -70,7 +70,7 @@ object.
 .end
 
 .namespace []
-.include 'src/gen_builtins.pir'
+.include 'src/builtins/all.pir'
 
 =item main(args :slurpy)  :main
 
