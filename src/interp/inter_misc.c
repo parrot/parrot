@@ -341,9 +341,9 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
 
             else {
                 /* Need to strip back to what follows the final / or \. */
-                STRING *fullname   = VTABLE_get_string(interp, exe_name);
-                char   *fullname_c = Parrot_str_to_cstring(interp, fullname);
-                int     pos        = strlen(fullname_c) - 1;
+                STRING *       fullname   = VTABLE_get_string(interp, exe_name);
+                char   * const fullname_c = Parrot_str_to_cstring(interp, fullname);
+                int            pos        = strlen(fullname_c) - 1;
 
                 while (pos              >  0
                 &&     fullname_c[pos] != '/'
@@ -354,7 +354,7 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
                     pos++;
 
                 basename = Parrot_str_new(interp, fullname_c + pos, 0);
-                mem_sys_free(fullname_c);
+                Parrot_str_free_cstring(fullname_c);
 
                 return basename;
             }

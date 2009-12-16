@@ -233,8 +233,8 @@ dlopen_string(PARROT_INTERP, ARGIN(STRING *path))
 {
     ASSERT_ARGS(dlopen_string)
 
-    char *pathstr = Parrot_str_to_cstring(interp, path);
-    void *handle = Parrot_dlopen(pathstr);
+    char * const pathstr = Parrot_str_to_cstring(interp, path);
+    void *       handle  = Parrot_dlopen(pathstr);
     Parrot_str_free_cstring(pathstr);
     return handle;
 }

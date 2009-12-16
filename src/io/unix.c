@@ -764,7 +764,7 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
     }
 
 #  else
-    UNUSED(l);
+    UNUSED(filehandle);
     UNUSED(command);
     UNUSED(flags);
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,

@@ -54,11 +54,11 @@ Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)
     }
     else {
         /* child */
-        char *cmd    = Parrot_str_to_cstring(interp, command);
-        int   status = execlp("sh", "sh", "-c", cmd, (void *)NULL);
+        char * const cmd    = Parrot_str_to_cstring(interp, command);
+        int          status = execlp("sh", "sh", "-c", cmd, (void *)NULL);
 
         /* if we get here, something's horribly wrong, but free anyway... */
-        mem_sys_free(cmd);
+        Parrot_str_free_cstring(cmd);
 
         if (status)
             exit(status);
@@ -96,8 +96,7 @@ Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)
     if (child) {
         /* parent */
         int status;
-        pid_t returnstat;
-        returnstat = waitpid(child, &status, 0);
+        pid_t returnstat = waitpid(child, &status, 0);
         UNUSED(returnstat);
         return status;
     }
@@ -105,19 +104,18 @@ Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)
         /* child. Be horribly profligate with memory, since we're
            about to be something else */
         int status, i;
-        char **argv;
         STRING *s;
-        char *cmd;
+        char   *cmd;
+        char  **argv = mem_allocate_n_typed((len+1)*sizeof (char *), char**);
 
-        argv = (char **)mem_sys_allocate((len+1)*sizeof (char *));
         for (i = 0; i < len; ++i) {
             s = VTABLE_get_string_keyed_int(interp, cmdargs, i);
             argv[i] = Parrot_str_to_cstring(interp, s);
         }
-        cmd = argv[0];
-        argv[i] = NULL;
 
-        status = execvp(cmd, argv);
+        cmd     = argv[0];
+        argv[i] = NULL;
+        status  = execvp(cmd, argv);
         /* if we get here, something's horribly wrong... */
         if (status) {
             exit(status);

@@ -476,11 +476,11 @@ reads entries from a directory.
 */
     METHOD readdir(STRING *path) {
 #ifndef _MSC_VER
+        char  * const cpath = Parrot_str_to_cstring(interp, path);
+        DIR           *dir  = opendir(cpath);
         struct dirent *dirent;
         PMC           *array;
-        char          *cpath = Parrot_str_to_cstring(interp, path);
         STRING        *retval;
-        DIR           *dir   = opendir(cpath);
 
         Parrot_str_free_cstring(cpath);
 
