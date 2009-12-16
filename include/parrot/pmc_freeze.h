@@ -11,7 +11,7 @@
  */
 
 #ifndef PARROT_PMC_FREEZE_H_GUARD
-#define      PARROT_PMC_FREEZE_H_GUARD
+#define PARROT_PMC_FREEZE_H_GUARD
 
 struct _visit_info;
 typedef void (*visit_f)(PARROT_INTERP, ARGIN_NULLOK(PMC*), ARGIN(struct _visit_info*));
@@ -27,22 +27,26 @@ typedef enum {
 } visit_enum_type;
 
 struct _visit_info;
-typedef INTVAL (*get_integer_f)      (PARROT_INTERP, struct _visit_info*);
-typedef void (*push_integer_f)       (PARROT_INTERP, struct _visit_info*, INTVAL);
-typedef void (*push_string_f)        (PARROT_INTERP, struct _visit_info*, STRING*);
-typedef void (*push_number_f)        (PARROT_INTERP, struct _visit_info*, FLOATVAL);
-typedef INTVAL (*shift_integer_f)    (PARROT_INTERP, struct _visit_info*);
-typedef STRING* (*shift_string_f)    (PARROT_INTERP, struct _visit_info*);
-typedef FLOATVAL (*shift_number_f)   (PARROT_INTERP, struct _visit_info*);
+typedef INTVAL   (*get_integer_f)   (PARROT_INTERP, struct _visit_info*);
+typedef void     (*push_integer_f)  (PARROT_INTERP, struct _visit_info*, INTVAL);
+typedef void     (*push_string_f)   (PARROT_INTERP, struct _visit_info*, STRING*);
+typedef void     (*push_number_f)   (PARROT_INTERP, struct _visit_info*, FLOATVAL);
+typedef void     (*push_pmc_f)      (PARROT_INTERP, struct _visit_info*, PMC*);
+typedef INTVAL   (*shift_integer_f) (PARROT_INTERP, struct _visit_info*);
+typedef STRING*  (*shift_string_f)  (PARROT_INTERP, struct _visit_info*);
+typedef FLOATVAL (*shift_number_f)  (PARROT_INTERP, struct _visit_info*);
+typedef PMC*     (*shift_pmc_f)     (PARROT_INTERP, struct _visit_info*);
 
 typedef struct _image_funcs {
     get_integer_f       get_integer;
     push_integer_f      push_integer;
     push_string_f       push_string;
     push_number_f       push_float;
+    push_pmc_f          push_pmc;
     shift_integer_f     shift_integer;
     shift_string_f      shift_string;
     shift_number_f      shift_float;
+    shift_pmc_f         shift_pmc;
 } image_funcs;
 
 typedef enum {

@@ -376,6 +376,23 @@ push_opcode_string(PARROT_INTERP, ARGIN(visit_info *io), ARGIN(STRING *v))
     io->pos = (char *)PF_store_string((opcode_t *)io->pos, v);
 }
 
+/*
+
+=item C<static void push_opcode_pmc(PARROT_INTERP, visit_info *io, PMC *v)>
+
+Pushes a reference to pmc C<*v> onto the end of the C<*io> "stream". If C<*v>
+hasn't been seen yet, it is also pushed onto the todo list.
+
+=cut
+
+*/
+
+static void
+push_opcode_pmc(PARROT_INTERP, ARGIN(visit_info *io), ARGIN(PMC *v)) {
+    ASSERT_ARGS(push_opcode_pmc)
+    io->thaw_ptr = &v;
+    (io->visit_pmc_now)(interp, v, io);
+}
 
 /*
 
@@ -447,6 +464,26 @@ shift_opcode_string(PARROT_INTERP, ARGIN(visit_info *io))
     return s;
 }
 
+/*
+
+=item C<static PMC *shift_opcode_pmc(PARROT_INTERP, visit_info *io)>
+
+Removes and returns a reference to a pmc from the start of the C<*io> "stream".
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static PMC *
+shift_opcode_pmc(PARROT_INTERP, ARGIN(visit_info *io)) {
+    ASSERT_ARGS(shift_opcode_pmc)
+    PMC *result;
+    io->thaw_ptr = &result;
+    (io->visit_pmc_now)(interp, NULL, io);
+    return result;
+}
 
 /*
 
@@ -471,9 +508,11 @@ static image_funcs opcode_funcs = {
     push_opcode_integer,
     push_opcode_string,
     push_opcode_number,
+    push_opcode_pmc,
     shift_opcode_integer,
     shift_opcode_string,
-    shift_opcode_number
+    shift_opcode_number,
+    shift_opcode_pmc
 };
 
 /*

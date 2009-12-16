@@ -587,10 +587,8 @@ hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(visit_info *info))
         switch (hash->entry_type) {
           case enum_hash_pmc:
             {
-                /* this looks awful, but it avoids type-punning warnings */
-                void **ptr     = &b->value;
-                info->thaw_ptr = (PMC **)ptr;
-                (info->visit_pmc_now)(interp, NULL, info);
+                const PMC *p = (void *)VTABLE_shift_pmc(interp, info);
+                b->value = (void *)p;
                 break;
             }
           case enum_hash_int:
@@ -648,7 +646,7 @@ hash_freeze(PARROT_INTERP, ARGIN(const Hash * const hash), ARGMOD(visit_info *in
 
         switch (hash->entry_type) {
           case enum_hash_pmc:
-            (info->visit_pmc_now)(interp, (PMC *)b->value, info);
+            VTABLE_push_pmc(interp, info, (PMC *)b->value);
             break;
           case enum_hash_int:
             VTABLE_push_integer(interp, info, (INTVAL)b->value);
