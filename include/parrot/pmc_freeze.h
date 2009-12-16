@@ -68,6 +68,7 @@ typedef struct _visit_info {
     void               *extra;          /* PMC specific */
     INTVAL              extra_flags;    /* concerning to extra */
     PMC                *thaw_result;    /* 1st thawed */
+    struct PackFile *pf;
     const image_funcs *vtable;
     struct _visit_info *image_io;       /* dummy backwards-compat pointer. */
 } visit_info;

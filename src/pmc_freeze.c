@@ -399,7 +399,7 @@ static INTVAL
 shift_opcode_integer(SHIM_INTERP, ARGIN(visit_info *io))
 {
     ASSERT_ARGS(shift_opcode_integer)
-    const INTVAL i = PF_fetch_integer(NULL, (const opcode_t **)&io->pos);
+    const INTVAL i = PF_fetch_integer(io->pf, (const opcode_t **)&io->pos);
     BYTECODE_SHIFT_OK(io);
     return i;
 }
@@ -419,7 +419,7 @@ static FLOATVAL
 shift_opcode_number(SHIM_INTERP, ARGIN(visit_info *io))
 {
     ASSERT_ARGS(shift_opcode_number)
-    const FLOATVAL f  = PF_fetch_number(NULL, (const opcode_t **)&io->pos);
+    const FLOATVAL f  = PF_fetch_number(io->pf, (const opcode_t **)&io->pos);
     BYTECODE_SHIFT_OK(io);
     return f;
 }
@@ -442,7 +442,7 @@ static STRING*
 shift_opcode_string(PARROT_INTERP, ARGIN(visit_info *io))
 {
     ASSERT_ARGS(shift_opcode_string)
-    STRING * const s = PF_fetch_string(interp, NULL, (const opcode_t **)&io->pos);
+    STRING * const s = PF_fetch_string(interp, io->pf, (const opcode_t **)&io->pos);
     BYTECODE_SHIFT_OK(io);
     return s;
 }
@@ -496,7 +496,7 @@ todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info), ARGIN(STRING *input))
         (PACKFILE_HEADER_BYTES % 16 ?
          16 - PACKFILE_HEADER_BYTES % 16 : 0);
 
-    PackFile *pf = PackFile_new(interp, 0);
+    PackFile *pf = info->pf = PackFile_new(interp, 0);
     info->visit_pmc_now   = visit_todo_list;
 
     /* we must use PMCs here so that they get marked properly */
@@ -516,7 +516,6 @@ todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info), ARGIN(STRING *input))
     }
     else {
         if (Parrot_str_byte_length(interp, input) < header_length) {
-            PackFile_destroy(interp, pf);
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_STRING_REPRESENTATION,
                 "bad string to thaw");
@@ -524,13 +523,11 @@ todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info), ARGIN(STRING *input))
 
         /* TT #749: use the validation logic from Packfile_unpack */
         if (pf->header->bc_major != PARROT_PBC_MAJOR
-        ||  pf->header->bc_minor != PARROT_PBC_MINOR) {
-            PackFile_destroy(interp, pf);
+        ||  pf->header->bc_minor != PARROT_PBC_MINOR)
             Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_STRING_REPRESENTATION,
                     "can't thaw a PMC from Parrot %d.%d", pf->header->bc_major,
                     pf->header->bc_minor);
-        }
 
         info->buffer = (Buffer *)input;
         PARROT_ASSERT(input->_bufstart == input->strstart);
@@ -542,8 +539,6 @@ todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info), ARGIN(STRING *input))
 
         info->pos += header_length;
     }
-
-    PackFile_destroy(interp, pf);
 
     info->last_type   = -1;
     info->id_list     = pmc_new(interp, enum_class_Array);
@@ -1096,6 +1091,7 @@ run_thaw(PARROT_INTERP, ARGIN(STRING* input), visit_enum_type what)
         Parrot_unblock_GC_sweep(interp);
     }
 
+    PackFile_destroy(interp, info.pf);
     return info.thaw_result;
 }
 
@@ -1140,6 +1136,7 @@ Parrot_freeze(PARROT_INTERP, ARGIN(PMC *pmc))
     result = Parrot_str_new_init(interp, (char *)Buffer_bufstart(info.buffer), OUTPUT_LENGTH(&info),
       Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
 
+    PackFile_destroy(interp, info.pf);
     return result;
 }
 
