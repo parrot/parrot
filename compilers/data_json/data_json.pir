@@ -45,7 +45,7 @@ the documentation at L<http://www.json.org/>.
     $P1['\r'] = "\r"
     $P1['\t'] = "\t"
 
-    set_hll_global '$escapes', $P1
+    set_root_global ['parrot'; 'data_json'], '$escapes', $P1
 .end
 
 

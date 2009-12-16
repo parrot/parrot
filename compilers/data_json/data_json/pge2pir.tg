@@ -183,7 +183,7 @@ transform pir (string) {
     $S0 = chr $I0
     goto char
   escape:
-    $P0 = get_root_global [ 'JSON' ],  '$escapes'
+    $P0 = get_root_global ['parrot'; 'data_json'], '$escapes'
     $S0 = $P0[$S0]
   char:
     tmp .= $S0
