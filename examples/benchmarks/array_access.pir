@@ -26,7 +26,7 @@ Inspired by computer language shootout.
 
     # Specification of command line arguments.
     .local pmc getopts
-    getopts = new [ 'Getopt';'Obj' ]
+    getopts = new [ 'Getopt::Obj' ]
     push getopts, "arr-size=i"
 
     .local pmc opt

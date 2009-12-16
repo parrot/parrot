@@ -771,7 +771,7 @@ Performs option processing of command-line args
     .local string arg0
     arg0 = shift args
     .local pmc getopts
-    getopts = new ['Getopt';'Obj']
+    getopts = new 'Getopt::Obj'
     getopts.'notOptStop'(1)
     $P0 = getattribute self, '@cmdoptions'
     .local pmc it
