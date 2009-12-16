@@ -88,7 +88,7 @@ print the filename for each match
 	load_bytecode 'Getopt/Obj.pbc'
 	load_bytecode 'PGE.pbc'
 	.local pmc getopts
-	getopts = new 'Getopt::Obj'
+	getopts = new [ 'Getopt';'Obj' ]
 	getopts.'notOptStop'(1)
 	push getopts, 'with-filename|H'
 	push getopts, 'files-with-matches|l'
@@ -207,7 +207,7 @@ handler:
 	lineno = 1
 	matched = 0 # Only used for --files-without-matches
 	line = readline handle
-	linelen = length line 
+	linelen = length line
 
 	.local pmc p6rule_compile, cntrlchar
 	$S0 = '<+cntrl-[\t\r\n]>'
