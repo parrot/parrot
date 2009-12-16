@@ -147,10 +147,9 @@ static int thaw_pmc(PARROT_INTERP,
 
 static void todo_list_init(PARROT_INTERP,
     ARGOUT(visit_info *info),
-    ARGIN(STRING *input))
+    ARGIN_NULLOK(STRING *input))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
         FUNC_MODIFIES(*info);
 
 PARROT_INLINE
@@ -235,8 +234,7 @@ static void visit_todo_list_thaw(PARROT_INTERP,
     , PARROT_ASSERT_ARG(type))
 #define ASSERT_ARGS_todo_list_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(info) \
-    , PARROT_ASSERT_ARG(input))
+    , PARROT_ASSERT_ARG(info))
 #define ASSERT_ARGS_todo_list_seen __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc) \
@@ -577,8 +575,9 @@ Initializes the C<*info> lists.
 */
 
 static void
-todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info), ARGIN(STRING *input))
+todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info), ARGIN_NULLOK(STRING *input))
 {
+    ASSERT_ARGS(todo_list_init)
     /* We want to store a 16-byte aligned header, but the actual
      * header may be shorter. */
     const unsigned int header_length = PACKFILE_HEADER_BYTES +
@@ -620,7 +619,7 @@ todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info), ARGIN(STRING *input))
 
         info->buffer = (Buffer *)input;
         PARROT_ASSERT(input->_bufstart == input->strstart);
-        info->pos = Buffer_bufstart(info->buffer);
+        info->pos = (char *) Buffer_bufstart(info->buffer);
         info->input_length = input->strlen;
         mem_sys_memcopy(pf->header, info->pos, PACKFILE_HEADER_BYTES);
 
