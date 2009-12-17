@@ -471,11 +471,8 @@ usage: parrot setup.pir [target|--key value]*
 
         help:           Print this help message.
 USAGE
-    $I0 = exists kv['usage']
-    unless $I0 goto L1
-    msg = kv['usage']
-  L1:
-    say msg
+    $S0 = get_value('usage', msg :named('default'), kv :flat :named)
+    say $S0
 .end
 
 =head3 Step build
@@ -552,14 +549,9 @@ the value is an array of PGE pathname or a single PGE pathname
     .param pmc kv :slurpy :named
     $I0 = exists kv['pir_pge']
     unless $I0 goto L1
-    .local string flags
-    flags = ''
-    $I0 = exists kv['pir_pge_flags']
-    unless $I0 goto L2
-    flags = kv['pir_pge_flags']
-  L2:
     $P0 = kv['pir_pge']
-    build_pir_pge($P0, flags)
+    $S0 = get_value('pir_pge_flags', '' :named('default'), kv :flat :named)
+    build_pir_pge($P0, $S0)
   L1:
 .end
 
@@ -659,14 +651,9 @@ the value is the NQP pathname
     .param pmc kv :slurpy :named
     $I0 = exists kv['pir_nqp']
     unless $I0 goto L1
-    .local string flags
-    flags = ''
-    $I0 = exists kv['pir_nqp_flags']
-    unless $I0 goto L2
-    flags = kv['pir_nqp_flags']
-  L2:
     $P0 = kv['pir_nqp']
-    build_pir_nqp($P0, flags)
+    $S0 = get_value('pir_nqp_flags', '' :named('default'), kv :flat :named)
+    build_pir_nqp($P0, $S0)
   L1:
 .end
 
@@ -847,7 +834,7 @@ the value is the PBC pathname
     .local string exe
     exe = get_exe()
     .local int has_strip
-    has_strip = _has_strip('')
+    has_strip = _has_strip()
     $P0 = iter hash
   L1:
     unless $P0 goto L2
@@ -875,13 +862,16 @@ the value is the PBC pathname
 .end
 
 .sub '_has_strip' :anon
-    .param string cflags
+    .param string cflags        :optional
+    .param int has_cflags       :opt_flag
     .local pmc config
     config = get_config()
     $S0 = config['gccversion']
     unless $S0 goto L1
+    unless has_cflags goto L2
     $I0 = index cflags, '-g '
     unless $I0 < 0 goto L1
+  L2:
     $S0 = config['cflags']
     $I0 = index $S0, '-g '
     unless $I0 < 0 goto L1
@@ -909,16 +899,8 @@ the value is the OPS pathname
     $I0 = exists kv['dynops']
     unless $I0 goto L1
     .local string cflags, ldflags
-    cflags = ''
-    $I0 = exists kv['dynops_cflags']
-    unless $I0 goto L2
-    cflags = kv['dynops_cflags']
-  L2:
-    ldflags = ''
-    $I0 = exists kv['dynops_ldflags']
-    unless $I0 goto L3
-    ldflags = kv['dynops_ldflags']
-  L3:
+    cflags = get_value('dynops_cflags', '' :named('default'), kv :flat :named)
+    ldflags = get_value('dynops_ldflags', '' :named('default'), kv :flat :named)
     $P0 = kv['dynops']
     build_dynops($P0, cflags, ldflags)
   L1:
@@ -1097,16 +1079,8 @@ the value is an array of PMC pathname
     $I0 = exists kv['dynpmc']
     unless $I0 goto L1
     .local string cflags, ldflags
-    cflags = ''
-    $I0 = exists kv['dynpmc_cflags']
-    unless $I0 goto L2
-    cflags = kv['dynpmc_cflags']
-  L2:
-    ldflags = ''
-    $I0 = exists kv['dynpmc_ldflags']
-    unless $I0 goto L3
-    ldflags = kv['dynpmc_ldflags']
-  L3:
+    cflags = get_value('dynpmc_cflags', '' :named('default'), kv :flat :named)
+    ldflags = get_value('dynpmc_ldflags', '' :named('default'), kv :flat :named)
     $P0 = kv['dynpmc']
     build_dynpmc($P0, cflags, ldflags)
   L1:
@@ -1814,11 +1788,7 @@ the default value is "t/*.t"
     cmd .= "/tools/lib"
   L2:
     cmd .= " t/harness "
-    $S0 = "t/*.t" # default
-    $I0 = exists kv['harness_files']
-    unless $I0 goto L3
-    $S0 = kv['harness_files']
-  L3:
+    $S0 = get_value('harness_files', "t/*.t" :named('default'), kv :flat :named)
     cmd .= $S0
     system(cmd, 1 :named('verbose'))
 .end
@@ -1857,11 +1827,7 @@ the default value is "t/*.t"
     cmd .= "\""
   L1:
     cmd .= " "
-    $S0 = "t/*.t" # default
-    $I0 = exists kv['prove_files']
-    unless $I0 goto L3
-    $S0 = kv['prove_files']
-  L3:
+    $S0 = get_value('prove_files', "t/*.t" :named('default'), kv :flat :named)
     cmd .= $S0
     system(cmd, 1 :named('verbose'))
 .end
@@ -1879,12 +1845,12 @@ Unless t/harness exists, run : prove --archive t/*.t
     if $I0 goto L1
     .tailcall _smoke_prove(kv :flat :named)
   L1:
-    die "Don't known how to smoke."
+    die "Don't known how to smoke with t/harness."
 .end
 
 .sub '_clean_smoke' :anon
     .param pmc kv :slurpy :named
-    $S0 = get_prove_archive(kv :flat :named)
+    $S0 = get_value('prove_archive', "report.tar.gz" :named('default'), kv :flat :named)
     unlink($S0, 1 :named('verbose'))
     unlink('meta.yml', 1 :named('verbose'))
 .end
@@ -1942,15 +1908,11 @@ a hash
     cmd .= "\""
   L1:
     cmd .= " "
-    $S0 = "t/*.t" # default
-    $I0 = exists kv['prove_files']
-    unless $I0 goto L3
-    $S0 = kv['prove_files']
-  L3:
+    $S0 = get_value('prove_files', "t/*.t" :named('default'), kv :flat :named)
     cmd .= $S0
     cmd .= " --archive="
     .local string archive
-    archive = get_prove_archive(kv :flat :named)
+    archive = get_value('prove_archive', "report.tar.gz" :named('default'), kv :flat :named)
     cmd .= archive
     system(cmd, 1 :named('verbose'), 1 :named('ignore_error'))
 
@@ -2969,8 +2931,6 @@ Build an installer with Inno Setup.
     system("iscc inno.iss", 1 :named('verbose'))
 .end
 
-.include 'tm.pasm'
-
 .sub 'mk_inno_script' :anon
     .param pmc kv :slurpy :named
     .local pmc config
@@ -3495,32 +3455,13 @@ Return the whole config
     .return ($S0)
 .end
 
-=item get_prove_archive
-
-=cut
-
-.sub 'get_prove_archive'
-    .param string archive       :named('prove_archive') :optional
-    .param int has_archive      :opt_flag
-    .param pmc extra            :slurpy :named
-    unless has_archive goto L1
-    .return (archive)
-  L1:
-    .return ('report.tar.gz')
-.end
-
 =item get_version
 
 =cut
 
 .sub 'get_version'
-    .param string version       :named('version') :optional
-    .param int has_version      :opt_flag
-    .param pmc extra            :slurpy :named
-    unless has_version goto L1
-    .return (version)
-  L1:
-    .return ('HEAD')
+    .param pmc kv :slurpy :named
+    .tailcall get_value('version', 'HEAD' :named('default'), kv :flat :named)
 .end
 
 =item get_value
@@ -3529,12 +3470,17 @@ Return the whole config
 
 .sub 'get_value'
     .param string key
+    .param string default       :named('default') :optional
+    .param int has_default      :opt_flag
     .param pmc kv :slurpy :named
     $I0 = exists kv[key]
     unless $I0 goto L1
     $S0 = kv[key]
     .return ($S0)
   L1:
+    unless has_default goto L2
+    .return (default)
+  L2:
     $S0 = upcase key
     .return ($S0)
 .end
