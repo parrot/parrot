@@ -1014,8 +1014,8 @@ Perform a match for protoregex C<name>.
     if $I0 goto rx_array
     .local int rxaddr
     rxaddr = get_addr rx
-    result = mcalled[rxaddr]
-    unless null result goto token_next
+    $P0 = mcalled[rxaddr]
+    unless null $P0 goto token_next
     result = self.rx()
     mcalled[rxaddr] = mcalled
     if result goto done
@@ -1027,8 +1027,8 @@ Perform a match for protoregex C<name>.
     unless rx_it goto cand_done
     rx = shift rx_it
     rxaddr = get_addr rx
-    result = mcalled[rxaddr]
-    unless null result goto token_next
+    $P0 = mcalled[rxaddr]
+    unless null $P0 goto token_next
     result = self.rx()
     mcalled[rxaddr] = mcalled
     if result goto done
@@ -1046,7 +1046,11 @@ Perform a match for protoregex C<name>.
 
   fail:
     self.'!cursor_debug'('FAIL  ', name)
-    .return (0)
+    unless null result goto fail_1
+    result = self.'!cursor_start'()
+    result.'!cursor_fail'()
+  fail_1:
+    .return (result)
 .end
 
 
