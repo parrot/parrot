@@ -18,12 +18,8 @@ typedef void (*visit_f)(PARROT_INTERP, ARGIN_NULLOK(PMC*), ARGIN(struct _visit_i
 
 typedef enum {
     VISIT_FREEZE_NORMAL,
-    VISIT_FREEZE_AT_DESTRUCT,
-    VISIT_FREEZE_SIZE,
     VISIT_THAW_NORMAL,
     VISIT_THAW_CONSTANTS,
-    VISIT_CLONE,
-    VISIT_DESTRUCTION_ORDER
 } visit_enum_type;
 
 struct _visit_info;

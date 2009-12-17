@@ -634,7 +634,6 @@ preserve key/value order.
             break;
 
           case VISIT_FREEZE_NORMAL:
-          case VISIT_FREEZE_AT_DESTRUCT:
             {
                 Hash     * const hash = (Hash *)SELF.get_pointer();
                 const UINTVAL entries = hash->entries;

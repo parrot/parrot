@@ -598,8 +598,7 @@ todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info), ARGIN(STRING *input))
 
     info->vtable = &opcode_funcs;
 
-    if (info->what == VISIT_FREEZE_NORMAL
-    ||  info->what == VISIT_FREEZE_AT_DESTRUCT) {
+    if (info->what == VISIT_FREEZE_NORMAL) {
         ensure_buffer_size(interp, info, header_length);
         mem_sys_memcopy(info->pos, pf->header, PACKFILE_HEADER_BYTES);
         info->pos += header_length;
@@ -758,8 +757,7 @@ seen, UINTVAL id)>
 Called from C<visit_todo_list()> to perform the action specified in
 C<< info->what >>.
 
-Currently only C<VISIT_FREEZE_NORMAL> and C<VISIT_FREEZE_AT_DESTRUCT> are
-implemented.
+Currently only C<VISIT_FREEZE_NORMAL> is implemented.
 
 =cut
 
@@ -772,7 +770,6 @@ do_action(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info),
 {
     ASSERT_ARGS(do_action)
     switch (info->what) {
-      case VISIT_FREEZE_AT_DESTRUCT:
       case VISIT_FREEZE_NORMAL:
         freeze_pmc(interp, pmc, info, seen, id);
         if (pmc)

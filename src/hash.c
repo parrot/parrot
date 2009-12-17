@@ -685,7 +685,6 @@ parrot_hash_visit(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(void *pinfo))
         hash_thaw(interp, hash, info);
         break;
       case VISIT_FREEZE_NORMAL:
-      case VISIT_FREEZE_AT_DESTRUCT:
         hash_freeze(interp, hash, info);
         break;
       default:
