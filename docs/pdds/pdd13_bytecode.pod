@@ -11,9 +11,9 @@ interface through which they may be manipulated programmatically.
 =head2 Version
 
 $Revision$
- 
+
 =head2 Synopsis
- 
+
 Parrot bytecode is a binary representation of instructions and data for
 execution on the virtual machine.
 
@@ -370,8 +370,8 @@ code (opcode).
   +--------+--------+--------------------------------------------------------+
 
 Zero or more operands follow the opcode. All opcodes take a fixed number of
-operands.  An individual operand is always one word in length and may be of one
-of the following forms.
+operands.  An individual operand is always one word in length and may be of
+one of the following forms.
 
   +------------------+-------------------------------------------------------+
   | Operand Type     | Description                                           |
@@ -775,8 +775,8 @@ to do the right thing with this.
 Setting the uuid_type will not result in immediate re-computation of the
 UUID, but rather will only cause it to be computed using the selected
 algorithm when the packfile is serialized (by calling the C<get_string>
-vtable function). Setting an invalid uuid_type value will cause an exception to
-be thrown immediately.
+vtable function). Setting an invalid uuid_type value will cause an exception
+to be thrown immediately.
 
 =item * C<get_directory()>
 
@@ -1091,27 +1091,27 @@ Sets the name of the annotation.
 
 =item * C<get_integer> (vtable)
 
-Gets the integer value of the annotation. 
+Gets the integer value of the annotation.
 
 =item * C<set_integer> (vtable)
 
-Sets the integer value of the annotation. 
+Sets the integer value of the annotation.
 
 =item * C<get_string> (vtable)
 
-Gets the string value of the annotation. 
+Gets the string value of the annotation.
 
 =item * C<set_string> (vtable)
 
-Sets the string value of the annotation. 
+Sets the string value of the annotation.
 
 =item * C<get_number> (vtable)
 
-Gets the number value of the annotation. 
+Gets the number value of the annotation.
 
 =item * C<set_number> (vtable)
 
-Sets the number value of the annotation. 
+Sets the number value of the annotation.
 
 =back
 
