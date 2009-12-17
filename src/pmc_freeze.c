@@ -147,9 +147,10 @@ static int thaw_pmc(PARROT_INTERP,
 
 static void todo_list_init(PARROT_INTERP,
     ARGOUT(visit_info *info),
-    ARGIN_NULLOK(STRING *input))
+    ARGIN(STRING *input))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*info);
 
 PARROT_INLINE
@@ -234,7 +235,8 @@ static void visit_todo_list_thaw(PARROT_INTERP,
     , PARROT_ASSERT_ARG(type))
 #define ASSERT_ARGS_todo_list_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(info))
+    , PARROT_ASSERT_ARG(info) \
+    , PARROT_ASSERT_ARG(input))
 #define ASSERT_ARGS_todo_list_seen __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc) \
@@ -575,7 +577,7 @@ Initializes the C<*info> lists.
 */
 
 static void
-todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info), ARGIN_NULLOK(STRING *input))
+todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info), ARGIN(STRING *input))
 {
     ASSERT_ARGS(todo_list_init)
     /* We want to store a 16-byte aligned header, but the actual
@@ -1208,7 +1210,7 @@ Parrot_freeze(PARROT_INTERP, ARGIN(PMC *pmc))
 
     info.what = VISIT_FREEZE_NORMAL;
     create_buffer(interp, pmc, &info);
-    todo_list_init(interp, &info, NULL);
+    todo_list_init(interp, &info, STRINGNULL);
 
     visit_loop_todo_list(interp, pmc, &info);
 
