@@ -69,7 +69,7 @@ Output a skeleton for Plumage
 
 Create a source distribution
 
-=item bdist, bdist_wininst
+=item bdist, bdist_rpm, bdist_wininst, spec
 
 Create a binary package or Windows Installer.
 
@@ -292,6 +292,11 @@ L<http://bitbucket.org/riffraff/shakespeare-parrot/src/tip/setup.pir>
 
     .const 'Sub' _bdist = '_bdist'
     register_step('bdist', _bdist)
+
+    .const 'Sub' _spec_rpm = '_spec_rpm'
+    register_step('spec', _spec_rpm)
+    .const 'Sub' _bdist_rpm = '_bdist_rpm'
+    register_step('bdist_rpm', _bdist_rpm)
 
     $P0 = get_config()
     $S0 = $P0['osname']
@@ -2874,7 +2879,283 @@ On Windows calls bdist_wininst, otherwise ...
     unless $S0 == 'MSWin32' goto L1
     .tailcall run_step('bdist_wininst', kv :flat :named)
   L1:
-    die "no yet bdist"
+    .tailcall run_step('bdist_rpm', kv :flat :named)
+.end
+
+=head3 Step spec
+
+=item spec_dir
+
+the default value is ports/rpm
+
+=cut
+
+.sub '_spec_rpm' :anon
+    .param pmc kv :slurpy :named
+    $S0 = get_spec(kv :flat :named)
+    $S1 = mk_spec(kv :flat :named)
+    $I0 = file_exists($S0)
+    unless $I0 goto L1
+    print $S1
+    goto L2
+  L1:
+    $S2 = dirname($S0)
+    mkpath($S2, 1 :named('verbose'))
+    spew($S0, $S1, 1 :named('verbose'))
+  L2:
+.end
+
+.sub 'get_spec'
+    .param pmc kv :slurpy :named
+    $S0 = get_value('spec_dir', 'ports/rpm' :named('default'), kv :flat :named)
+    $S0 .= "/"
+    $S1 = get_name(kv :flat :named)
+    $S0 .= $S1
+    $S0 .= '.spec'
+    .return ($S0)
+.end
+
+.sub 'mk_spec'
+    .param pmc kv :slurpy :named
+
+    .local pmc config
+    config = get_config()
+
+    .local string parrot_version
+    $S1 = config['VERSION']
+    $S2 = config['DEVEL']
+    parrot_version = $S1 . $S2
+
+    .local string name
+    name = get_name(kv :flat :named)
+
+    .local string version
+    version = get_version(kv :flat :named)
+
+    .local string release
+    release = get_value('release', '1' :named('default'), kv :flat :named)
+
+    .local string abstract
+    $S0 = get_value('abstract', kv :flat :named)
+    abstract = _json_escape($S0)
+
+    .local string license_type
+    license_type = get_value('license_type', kv :flat :named)
+
+    .local string project_uri
+    project_uri =get_value('project_uri', kv :flat :named)
+
+    .local string tarball
+    tarball = get_tarname('.tar.gz', kv :flat :named)
+
+    .local string description
+    $S0 = get_value('description', kv :flat :named)
+    description = _json_escape($S0)
+
+    $P0 = new 'FixedStringArray'
+    set $P0, 9
+    $P0[0] = parrot_version
+    $P0[1] = name
+    $P0[2] = version
+    $P0[3] = release
+    $P0[4] = abstract
+    $P0[5] = license_type
+    $P0[6] = project_uri
+    $P0[7] = tarball
+    $P0[8] = description
+
+    $S0 = <<'TEMPLATE'
+%%define parrot_version %s
+
+Name:           %s
+Version:        %s
+Release:        %s
+Summary:        %s
+License:        %s
+Group:          Development/Libraries
+URL:            %s
+Source0:        %s
+BuildRoot:      %%{_tmppath}/%%{name}-%%{version}-%%{release}-root-%%(%%{__id_u} -n)
+BuildRequires:  parrot           >= %%parrot_version
+BuildRequires:  parrot-devel     >= %%parrot_version
+
+%%description
+%s
+
+%%prep
+
+%%build
+parrot setup.pir
+
+%%install
+parrot setup.pir install
+
+%%check
+parrot setup.pir test
+
+%%clean
+parrot setup.pir clean
+
+%%files
+%%defattr(-,root,root,-)
+TEMPLATE
+    .local string spec
+    spec = sprintf $S0, $P0
+
+    .local string bindir, libdir, load_ext
+    bindir = get_bindir()
+    libdir = get_libdir()
+    load_ext = get_load_ext()
+
+    $I0 = exists kv['dynops']
+    unless $I0 goto L11
+    .local pmc cores
+    cores = get_cores()
+    $P1 = kv['dynops']
+    $P2 = iter $P1
+  L12:
+    unless $P2 goto L11
+    .local string ops, suffix
+    ops = shift $P2
+    $P3 = iter cores
+  L13:
+    unless $P3 goto L12
+    $S0 = shift $P3
+    suffix = cores[$S0]
+    $S0 = _mk_path_dynops(ops, suffix, load_ext)
+    spec .= libdir
+    spec .= "/"
+    spec .= $S0
+    spec .= "\n"
+    goto L13
+  L11:
+
+    $I0 = exists kv['dynpmc']
+    unless $I0 goto L21
+    $P1 = kv['dynpmc']
+    $P2 = iter $P1
+  L22:
+    unless $P2 goto L21
+    $S0 = shift $P2
+    $S0 = _mk_path_dynpmc($S0, load_ext)
+    spec .= libdir
+    spec .= "/"
+    spec .= $S0
+    spec .= "\n"
+    goto L22
+  L21:
+
+    $I0 = exists kv['installable_pbc']
+    unless $I0 goto L31
+    $P1 = kv['installable_pbc']
+    $P2 = iter $P1
+  L32:
+    unless $P2 goto L31
+    $S0 = shift $P2
+    spec .= bindir
+    spec .= "/"
+    spec .= $S0
+    spec .= "\n"
+    goto L32
+  L31:
+
+    $I0 = exists kv['inst_inc']
+    unless $I0 goto L41
+    $P1 = kv['inst_inc']
+    $I0 = does $P1, 'array'
+    if $I0 goto L42
+    $S0 = $P1
+    spec .= libdir
+    spec .= "/include/"
+    spec .= $S0
+    spec .= "\n"
+    goto L41
+  L42:
+    $P2 = iter $P1
+  L43:
+    unless $P2 goto L41
+    $S0 = shift $P2
+    spec .= libdir
+    spec .= "/include/"
+    spec .= $S0
+    spec .= "\n"
+    goto L43
+  L41:
+
+    $I0 = exists kv['inst_lang']
+    unless $I0 goto L51
+    $P1 = kv['inst_lang']
+    $I0 = does $P1, 'array'
+    if $I0 goto L52
+    $S0 = $P1
+    spec .= libdir
+    spec .= "/languages/"
+    spec .= $S0
+    spec .= "\n"
+    goto L51
+  L52:
+    $P2 = iter $P1
+  L53:
+    unless $P2 goto L51
+    $S0 = shift $P2
+    spec .= libdir
+    spec .= "/languages/"
+    spec .= $S0
+    spec .= "\n"
+    goto L53
+  L51:
+
+    $I0 = exists kv['inst_lib']
+    unless $I0 goto L61
+    $P1 = kv['inst_lib']
+    $I0 = does $P1, 'array'
+    if $I0 goto L62
+    $S0 = $P1
+    spec .= libdir
+    spec .= "/library/"
+    spec .= $S0
+    spec .= "\n"
+    goto L61
+  L62:
+    $P2 = iter $P1
+  L63:
+    unless $P2 goto L61
+    $S0 = shift $P2
+    spec .= libdir
+    spec .= "/library/"
+    spec .= $S0
+    spec .= "\n"
+    goto L63
+  L61:
+
+    spec .= "\n\n%changelog\n* "
+    $I0 = time
+    $S0 = localtime $I0
+    $I0 = length $S0
+    dec $I0
+    $S0 = substr $S0, 0, $I0
+    spec .= $S0
+    spec .= " by distutils\n"
+    .return (spec)
+.end
+
+=head3 Step bdist_rpm
+
+=cut
+
+.sub '_bdist_rpm' :anon
+    .param pmc kv :slurpy :named
+    run_step('sdist_gztar', kv :flat :named)
+
+    $S0 = get_spec(kv :flat :named)
+    $I0 = file_exists($S0)
+    if $I0 goto L1
+    $S1 = dirname($S0)
+    mkpath($S1, 1 :named('verbose'))
+    $S1 = mk_spec(kv :flat :named)
+    spew($S0, $S1, 1 :named('verbose'))
+  L1:
+    die "no yet rpm"
 .end
 
 =head3 Step bdist_wininst
@@ -4057,6 +4338,13 @@ SOURCE_C
 .sub 'spew'
     .param string filename
     .param string content
+    .param int verbose          :named('verbose') :optional
+    .param int has_verbose      :opt_flag
+    unless has_verbose goto L1
+    unless verbose goto L1
+    print "creat "
+    say filename
+  L1:
     $P0 = new 'FileHandle'
     push_eh _handler
     $P0.'open'(filename, 'w')
@@ -4084,6 +4372,13 @@ SOURCE_C
 .sub 'append'
     .param string filename
     .param string content
+    .param int verbose          :named('verbose') :optional
+    .param int has_verbose      :opt_flag
+    unless has_verbose goto L1
+    unless verbose goto L1
+    print "append "
+    say filename
+  L1:
     $P0 = new 'FileHandle'
     push_eh _handler
     $P0.'open'(filename, 'a')
