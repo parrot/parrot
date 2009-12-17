@@ -326,8 +326,6 @@ an individual entry.
   |        |        |    0x04 - Bytecode Segment                             |
   |        |        |    0x05 - PIR Debug Segment                            |
   |        |        |    0x06 - Annotations Segment                          |
-  |        |        |    0x07 - PIC Data Segment                             |
-  |        |        |    0x08 - Dependencies Segment                         |
   +--------+--------+--------------------------------------------------------+
   | 1      | n      | The name of the segment, as a (NULL terminated) ASCII  |
   |        |        | C string. This must be padded with trailing NULL       |
@@ -367,19 +365,13 @@ code (opcode).
   +--------+--------+--------------------------------------------------------+
   | Offset | Length | Description                                            |
   +--------+--------+--------------------------------------------------------+
-  | 0      | 1      | A valid Parrot operation code, as specified in the     |
-  |        |        | operation codes list.                                  |
+  | 0      | 1      | A valid Parrot opcode, as specified in the opcode      |
+  |        |        | list include/parrot/oplib/ops.h.                       |
   +--------+--------+--------------------------------------------------------+
 
-Zero or more operands follow the opcode. Most instructions take a
-fixed number of operands but several of them take a variable number, with the
-first operand being used to determine the number of additional operands that
-follow. This tends to be stored as a PMC constant, meaning that decoding the
-instruction stream not only requires knowledge of the operands that each
-instruction takes but also the ability to thaw PMCs.
-
-An individual operand is always one word in length and may be of one of the
-following forms.
+Zero or more operands follow the opcode. All opcodes take a fixed number of
+operands.  An individual operand is always one word in length and may be of one
+of the following forms.
 
   +------------------+-------------------------------------------------------+
   | Operand Type     | Description                                           |
@@ -410,7 +402,6 @@ The first element is the number of constants contained.
   | Offset | Length | Description                                            |
   +--------+--------+--------------------------------------------------------+
   | 2      | 1      | The number of constants in the table.                  |
-  |        |        |    n                                                   |
   +--------+--------+--------------------------------------------------------+
 
 Following this are C<n> constants, each with a single word header specifying
@@ -449,23 +440,25 @@ the start of the constant including its type.
   +--------+--------+--------------------------------------------------------+
   | 2      | 1      | Character set; either the index of a built-in one or a |
   |        |        | dynamically loaded one whose index is in a range given |
-  |        |        | in the dependencies table.                             |
+  |        |        | in the dependencies table. Note that dynamically       |
+  |        |        | loaded character sets are not currently supported.     |
   +--------+--------+--------------------------------------------------------+
   | 3      | 1      | Encoding, either the index of a built-in one or a      |
   |        |        | dynamically loaded one whose index is in a range given |
-  |        |        | in the dependencies table.                             |
+  |        |        | in the dependencies table. Note that dynamically       |
+  |        |        | loaded encodings are not currently supported.          |
   +--------+--------+--------------------------------------------------------+
   | 4      | 1      | Length of the string data in bytes.                    |
   +--------+--------+--------------------------------------------------------+
   | 5      | n      | String data with trailing zero padding as required.    |
   +--------+--------+--------------------------------------------------------+
 
-Note: the Encoding field is not implemented yet.
+Note: The encoding field is not implemented yet and is set to 0.
 
 =item * PMC Constants
 
 PMCs that can be saved in packfiles as constants implement the freeze and thaw
-v-table methods. Their frozen data is placed in a string, stored in the same
+vtable functions. Their frozen data is placed in a string, stored in the same
 format as a string constant.
 
 =item * Key Constants
@@ -478,7 +471,6 @@ start of the constant.
   | Offset | Length | Description                                            |
   +--------+--------+--------------------------------------------------------+
   | 1      | 1      | Number of key components that follow.                  |
-  |        |        |    n                                                   |
   +--------+--------+--------------------------------------------------------+
 
 Following this are C<n> entries of two words each that specify the key's
@@ -513,8 +505,6 @@ The fixup segment maps names of subs to offsets in the bytecode stream.
 The number of fixup table entries, n, is given by the last field of the
 segment header.
 
-{{ TODO: I think label fixups are no longer used. Check if that is so. }}
-
 This is followed by n fixup table entries, of variable length, that take the
 following form.
 
@@ -531,7 +521,7 @@ following form.
   |        |        | length with zeroes in the 02.                          |
   +--------+--------+--------------------------------------------------------+
   | -      | 1      | This is an index into the constants table for the sub  |
-  |        |        |  PMC corresponding to the label.                       |
+  |        |        | PMC corresponding to the label.                        |
   +--------+--------+--------------------------------------------------------+
 
 
@@ -694,63 +684,6 @@ up the compiled form of a single line of code, only one line annotation is
 required. Note that this also implies that annotations must be placed in
 the same order as the instructions.
 
-
-=head4 Dependencies Segment
-
-This segment holds a table of external and possibly dynamically loaded items
-that are needed for this packfile to run. This includes:
-
-=over 4
-
-=item - Dynamic PMC libraries (.loadlib)
-
-=item - Dynamic opcode libraries (.loadlib)
-
-=item - Dynamically loaded string encoding
-
-=item - Dynamically loaded character set
-
-=back
-
-The segment starts with the number of entries in the table.
-
-  +--------+--------+--------------------------------------------------------+
-  | Offset | Length | Description                                            |
-  +--------+--------+--------------------------------------------------------+
-  | 1      | 1      | Number of entries in the dependencies table.           |
-  |        |        |    n                                                   |
-  +--------+--------+--------------------------------------------------------+
-
-Following this are C<n> entries of variable length, taking the following
-format:
-
-  +--------+--------+--------------------------------------------------------+
-  | Offset | Length | Description                                            |
-  +--------+--------+--------------------------------------------------------+
-  | 0      | 1      | Number of entries in the dependencies table.           |
-  |        |        |    0x00 - Dynamic PMC Library                          |
-  |        |        |    0x01 - Dynamic Opcode Library                       |
-  |        |        |    0x02 - Dynamically Loaded String Encoding           |
-  |        |        |    0x03 - Dynamically Loaded Character Set             |
-  +--------+--------+--------------------------------------------------------+
-  | 1      | n      | A hint for finding and loading the resource; usually   |
-  |        |        | the name of the dynamic library, but possibly a full   |
-  |        |        | path too. Given as an ASCII NULL-terminated string,    |
-  |        |        | zero-padded to a full word.                            |
-  +--------+--------+--------------------------------------------------------+
-  | n + 1  | 1      | The lowest index for the given type of resource that   |
-  |        |        | is contained in this dependency. For example, if this  |
-  |        |        | entry was for a dynamic opcode library containing ops  |
-  |        |        | numbered 5000 through 5042, this entry would be 5000.  |
-  +--------+--------+--------------------------------------------------------+
-  | n + 2  | 1      | The highest index for the given type of resource that  |
-  |        |        | is contained in this dependency. For example, if this  |
-  |        |        | entry was for a dynamic opcode library containing ops  |
-  |        |        | numbered 5000 through 5042, this entry would be 5042.  |
-  +--------+--------+--------------------------------------------------------+
-
-
-
 =head3 Packfile PMCs
 
 A packfile can be represented in memory by Parrot as a tree of PMCs. These
@@ -768,19 +701,19 @@ when reading a packfile. It implements the following methods.
 
 =over 4
 
-=item * C<get_string> (v-table)
+=item * C<get_string> (vtable)
 
 Serializes this packfile data structure into a bytestream ready to be written
 to disk (that is, maps from PMCs to on-disk representation).
 
-=item * C<set_string_native> (v-table)
+=item * C<set_string_native> (vtable)
 
 Takes a string containing an entire packfile in the on-disk format, attempts
 to unpack it into a tree of Packfile PMCs and sets this Packfile PMC to
 represent the top of that tree (that is, maps from on-disk representation to a
 tree of PMCs).
 
-=item * C<get_integer_keyed_str> (v-table)
+=item * C<get_integer_keyed_str> (vtable)
 
 Used to get data about fields in the header that have an integer value. Valid
 keys are:
@@ -807,7 +740,7 @@ keys are:
 
 =back
 
-=item * C<get_string_keyed_str> (v-table)
+=item * C<get_string_keyed_str> (vtable)
 
 Used to get data about fields in the header that have a string value. Valid
 keys are:
@@ -818,7 +751,7 @@ keys are:
 
 =back
 
-=item * C<set_integer_keyed_str> (v-table)
+=item * C<set_integer_keyed_str> (vtable)
 
 Used to set fields in the packfile header. Some fields are not allowed to be
 written since they are determined by the VM when serializing the packfile for
@@ -842,8 +775,8 @@ to do the right thing with this.
 Setting the uuid_type will not result in immediate re-computation of the
 UUID, but rather will only cause it to be computed using the selected
 algorithm when the packfile is serialized (by calling the C<get_string>
-v-table method). Setting an invalid uuid_type value will cause an exception
-to be thrown immediately.
+vtable function). Setting an invalid uuid_type value will cause an exception to
+be thrown immediately.
 
 =item * C<get_directory()>
 
@@ -880,29 +813,29 @@ PackfileSegment PMCs. It implements the following methods:
 
 =over 4
 
-=item * C<elements> (v-table)
+=item * C<elements> (vtable)
 
 Gets the number of segments listed in the directory.
 
-=item * C<get_pmc_keyed_str> (v-table)
+=item * C<get_pmc_keyed_str> (vtable)
 
 Searches the directory for a segment with the given name and, if one exists,
 returns a PackfileSegment PMC (or one of its subclasses) representing it.
 
-=item * C<set_pmc_keyed_str> (v-table)
+=item * C<set_pmc_keyed_str> (vtable)
 
 Adds a PackfileSegment PMC (or a subclass of it) to the directory with the
 name specified by the key. This is the only way to add another segment to the
 directory. If a segment of the given name already exists in the directory, it
 will be replaced with the supplied PMC.
 
-=item * C<delete_keyed_str> (v-table)
+=item * C<delete_keyed_str> (vtable)
 
 Removes the PackfileSegment PMC from the directory which has the name
 specified by the key.  This is the only way to remove a segment from the
 directory.
 
-=item * C<get_iter> (v-table)
+=item * C<get_iter> (vtable)
 
 Returns iterator for existing keys.
 
@@ -928,18 +861,18 @@ Set type of PackfileRawSegment.
 
 Returns iterator for Segment.
 
-=item * C<get_integer_keyed_int> (v-table)
+=item * C<get_integer_keyed_int> (vtable)
 
 Reads the integer at the specified offset into the segment, excluding the data
 in the common segment header but including the data making up additional
 fields in the header for a specific type of segment.
 
-=item * C<set_integer_keyed_int> (v-table)
+=item * C<set_integer_keyed_int> (vtable)
 
 Stores an integer at the specified offset into the segment. Will throw an
 exception if the segment is memory mapped.
 
-=item * C<elements> (v-table)
+=item * C<elements> (vtable)
 
 Gets the length of the segment in words, excluding the length of the common
 segment but including the data making up additional fields in the header for a
@@ -964,43 +897,43 @@ The PMC implements the following methods:
 
 Returns iterator for stored Constants.
 
-=item * C<elements> (v-table)
+=item * C<elements> (vtable)
 
 Gets the number of constants contained in the table.
 
-=item * C<get_number_keyed_int> (v-table)
+=item * C<get_number_keyed_int> (vtable)
 
 Gets the value of the number constant at the specified index in the constants
 table. If the constant at that position in the table is not a number, an
 exception will be thrown.
 
-=item * C<get_string_keyed_int> (v-table)
+=item * C<get_string_keyed_int> (vtable)
 
 Gets the value of the string constant at the specified index in the constants
 table. If the constant at that position in the table is not a string, an
 exception will be thrown.
 
-=item * C<get_pmc_keyed_int> (v-table)
+=item * C<get_pmc_keyed_int> (vtable)
 
 Gets the value of the PMC or key constant at the specified index in the
 constants table. If the constant at that position in the table is not a PMC
 or key, an exception will be thrown.
 
-=item * C<set_number_keyed_int> (v-table)
+=item * C<set_number_keyed_int> (vtable)
 
 Sets the value of the number constant at the specified index in the constants
 table. If the constant at that position in the table is not already a number
 constant, an exception will be thrown. If it does not exist, the table will be
 extended.
 
-=item * C<set_string_keyed_int> (v-table)
+=item * C<set_string_keyed_int> (vtable)
 
 Sets the value of the string constant at the specified index in the constants
 table. If the constant at that position in the table is not already a string
 constant, an exception will be thrown. If it does not exist, the table will be
 extended.
 
-=item * C<set_pmc_keyed_int> (v-table)
+=item * C<set_pmc_keyed_int> (vtable)
 
 Sets the value of the PMC or key constant at the specified index in the
 constants table. If the constant at that position in the table is not already
@@ -1040,16 +973,16 @@ following methods:
 
 Returns iterator for stored fixup entries.
 
-=item * C<elements> (v-table)
+=item * C<elements> (vtable)
 
 Gets the number of entries in the fixup table.
 
-=item * C<get_pmc_keyed_int> (v-table)
+=item * C<get_pmc_keyed_int> (vtable)
 
 Gets a PackfileFixupEntry PMC for the fixup entry at the position given in
 the key. If the index is out of range, an exception will be thrown.
 
-=item * C<set_pmc_keyed_int> (v-table)
+=item * C<set_pmc_keyed_int> (vtable)
 
 Used to add a PackfileFixupEntry PMC to the fixups table or to replace an
 existing one. If the PMC that is supplied is not of type PackfileFixupEntry,
@@ -1064,19 +997,19 @@ methods.
 
 =over 4
 
-=item * C<get_string> (v-table)
+=item * C<get_string> (vtable)
 
 Gets the label field of the fixup entry.
 
-=item * C<set_string_native> (v-table)
+=item * C<set_string_native> (vtable)
 
 Sets the label field of the fixup entry.
 
-=item * C<get_integer> (v-table)
+=item * C<get_integer> (vtable)
 
 Gets the offset field of the fixup entry.
 
-=item * C<set_integer_native> (v-table)
+=item * C<set_integer_native> (vtable)
 
 Sets the offset field of the fixup entry.
 
@@ -1099,21 +1032,21 @@ implemented:
 
 =over 4
 
-=item * C<elements> (v-table)
+=item * C<elements> (vtable)
 
 Gets the number of annotations in the table.
 
-=item * C<get_iter> (v-table)
+=item * C<get_iter> (vtable)
 
 Get iterator for stored annotations.
 
-=item * C<get_pmc_keyed_int> (v-table)
+=item * C<get_pmc_keyed_int> (vtable)
 
 Gets the annotation at the specified index. If there is no annotation at that
 index, an exception will be thrown. The PMC that is returned will always be a
 PackfileAnnotation PMC.
 
-=item * C<set_pmc_keyed_int> (v-table)
+=item * C<set_pmc_keyed_int> (vtable)
 
 Sets the annotation at the specified index. If there is no annotation at that
 index, it is added to the list of annotations. An exception will be thrown
@@ -1156,27 +1089,27 @@ Gets the name of the annotation.
 
 Sets the name of the annotation.
 
-=item * C<get_integer> (v-table)
+=item * C<get_integer> (vtable)
 
 Gets the integer value of the annotation. 
 
-=item * C<set_integer> (v-table)
+=item * C<set_integer> (vtable)
 
 Sets the integer value of the annotation. 
 
-=item * C<get_string> (v-table)
+=item * C<get_string> (vtable)
 
 Gets the string value of the annotation. 
 
-=item * C<set_string> (v-table)
+=item * C<set_string> (vtable)
 
 Sets the string value of the annotation. 
 
-=item * C<get_number> (v-table)
+=item * C<get_number> (vtable)
 
 Gets the number value of the annotation. 
 
-=item * C<set_number> (v-table)
+=item * C<set_number> (vtable)
 
 Sets the number value of the annotation. 
 
