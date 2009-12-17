@@ -1432,38 +1432,23 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 */
 
     VTABLE void visit(visit_info *info) {
-        Parrot_Class_attributes * const class_data = PARROT_CLASS(SELF);
-        PMC **pos;
-
         /* 1) visit the attribute description hash */
-        pos            = &class_data->attrib_metadata;
-        info->thaw_ptr = pos;
-        (info->visit_pmc_now)(INTERP, *pos, info);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Class, attrib_metadata);
 
         /* 2) visit list of parents */
-        pos            = &class_data->parents;
-        info->thaw_ptr = pos;
-        (info->visit_pmc_now)(INTERP, *pos, info);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Class, parents);
 
         /* 3) visit list of roles */
-        pos            = &class_data->roles;
-        info->thaw_ptr = pos;
-        (info->visit_pmc_now)(INTERP, *pos, info);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Class, roles);
 
         /* 4) visit hash of methods */
-        pos            = &class_data->methods;
-        info->thaw_ptr = pos;
-        (info->visit_pmc_now)(INTERP, *pos, info);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Class, methods);
 
         /* 5) visit hash of vtable overrides */
-        pos            = &class_data->vtable_overrides;
-        info->thaw_ptr = pos;
-        (info->visit_pmc_now)(INTERP, *pos, info);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Class, vtable_overrides);
 
         /* 6) visit list of resolve methods */
-        pos            = &class_data->resolve_method;
-        info->thaw_ptr = pos;
-        (info->visit_pmc_now)(INTERP, *pos, info);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Class, resolve_method);
     }
 
 /*
