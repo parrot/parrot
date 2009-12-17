@@ -2907,9 +2907,13 @@ On Windows calls bdist_wininst, otherwise ...
 
 =head3 Step spec
 
+=over 4
+
 =item spec_dir
 
 the default value is ports/rpm
+
+=back
 
 =cut
 
