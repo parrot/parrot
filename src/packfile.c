@@ -1438,7 +1438,6 @@ PackFile_funcs_register(SHIM_INTERP, ARGOUT(PackFile *pf), UINTVAL type,
                         const PackFile_funcs funcs)
 {
     ASSERT_ARGS(PackFile_funcs_register)
-    /* TODO dynamic registering */
     pf->PackFuncs[type] = funcs;
 }
 

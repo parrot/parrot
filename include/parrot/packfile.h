@@ -133,10 +133,10 @@ typedef struct PackFile_Header {
 typedef struct PackFile_Constant {
     opcode_t type;
     union {
-        opcode_t integer;
-        FLOATVAL number;
-        STRING *string;
-        PMC *key;
+        opcode_t  integer;
+        FLOATVAL  number;
+        STRING   *string;
+        PMC      *key;
     } u;
 } PackFile_Constant;
 
@@ -205,7 +205,7 @@ typedef struct PackFile_Segment {
     opcode_t            itype;          /* internal type/version */
     opcode_t            id;             /* internal id */
     size_t              size;           /* internal oparray size */
-    opcode_t            *data;          /* oparray e.g. bytecode */
+    opcode_t           *data;           /* oparray e.g. bytecode */
 } PackFile_Segment;
 
 typedef INTVAL (*PackFile_map_segments_func_t)(PARROT_INTERP, PackFile_Segment *seg, void *user_data);
@@ -326,32 +326,31 @@ typedef struct PackFile_Directory {
 
 
 typedef opcode_t (*packfile_fetch_op_t)(ARGIN(const unsigned char *));
-typedef INTVAL (*packfile_fetch_iv_t)(ARGIN(const unsigned char *));
-typedef void (*packfile_fetch_nv_t)(ARGOUT(unsigned char *), ARGIN(const unsigned char *));
+typedef INTVAL   (*packfile_fetch_iv_t)(ARGIN(const unsigned char *));
+typedef void     (*packfile_fetch_nv_t)(ARGOUT(unsigned char *), ARGIN(const unsigned char *));
 
 typedef struct PackFile {
     /* the packfile is its own directory */
     PackFile_Directory   directory;
-    PackFile_Directory   *dirp;  /* for freeing */
-    const opcode_t       *src;   /* the possible mmap()ed start of the PF */
-    size_t   size;               /* size in bytes */
-    INTVAL is_mmap_ped;          /* don't free it, munmap it at destroy */
+    PackFile_Directory  *dirp;        /* for freeing */
+    const opcode_t      *src;         /* possible mmap()ed start of the PF */
+    size_t               size;        /* size in bytes */
+    INTVAL               is_mmap_ped; /* don't free it, munmap it at destroy */
 
-    PackFile_Header     * header;
+    PackFile_Header     *header;
 
     /* directory hold all Segments */
-    /* TODO make this reallocatable */
-    PackFile_funcs      PackFuncs[PF_MAX_SEG];
+    PackFile_funcs       PackFuncs[PF_MAX_SEG];
 
-    PackFile_ByteCode  * cur_cs;   /* used during PF loading */
+    PackFile_ByteCode   *cur_cs;   /* used during PF loading */
 
-    INTVAL    options;
-    INTVAL    need_wordsize;
-    INTVAL    need_endianize;
+    INTVAL               options;
+    INTVAL               need_wordsize;
+    INTVAL               need_endianize;
 
-    packfile_fetch_op_t fetch_op;
-    packfile_fetch_iv_t fetch_iv;
-    packfile_fetch_nv_t fetch_nv;
+    packfile_fetch_op_t  fetch_op;
+    packfile_fetch_iv_t  fetch_iv;
+    packfile_fetch_nv_t  fetch_nv;
 } PackFile;
 
 
