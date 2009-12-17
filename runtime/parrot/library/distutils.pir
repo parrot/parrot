@@ -1839,6 +1839,11 @@ the default value is "t/*.t"
     .param pmc kv :slurpy :named
     .local string cmd
     cmd = "prove"
+    $S0 = get_executable('parrot-tapir')
+    $I0 = file_exists($S0)
+    unless $I0 goto L0
+    cmd = $S0
+  L0:
     $I0 = exists kv['prove_exec']
     unless $I0 goto L1
     cmd .= " --exec="
