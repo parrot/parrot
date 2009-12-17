@@ -1095,9 +1095,9 @@ create_buffer(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGMOD(visit_info *info))
 
     if (!PMC_IS_NULL(pmc)
     && (VTABLE_does(interp, pmc, array) || VTABLE_does(interp, pmc, hash))) {
-        const INTVAL items = VTABLE_elements(interp, pmc) || 1;
+        const INTVAL items = VTABLE_elements(interp, pmc);
         /* TODO check e.g. first item of aggregate and estimate size */
-        len = items * FREEZE_BYTES_PER_ITEM;
+        len = (items ? items : 1) * FREEZE_BYTES_PER_ITEM;
     }
     else
         len = FREEZE_BYTES_PER_ITEM;
