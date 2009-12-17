@@ -16,7 +16,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 ### .include 'gen/p6regex-grammar.pir'
 
 .namespace []
-.sub "_block11"  :anon :subid("10_1261019354.40264")
+.sub "_block11"  :anon :subid("10_1261064009.3328")
 .annotate "line", 0
     get_hll_global $P14, ["Regex";"P6Regex";"Grammar"], "_block13" 
     capture_lex $P14
@@ -30,9 +30,9 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace []
-.sub "" :load :init :subid("post158") :outer("10_1261019354.40264")
+.sub "" :load :init :subid("post158") :outer("10_1261064009.3328")
 .annotate "line", 0
-    .const 'Sub' $P12 = "10_1261019354.40264" 
+    .const 'Sub' $P12 = "10_1261064009.3328" 
     .local pmc block
     set block, $P12
     $P580 = get_root_global ["parrot"], "P6metaclass"
@@ -41,140 +41,140 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "_block13"  :subid("11_1261019354.40264") :outer("10_1261019354.40264")
+.sub "_block13"  :subid("11_1261064009.3328") :outer("10_1261064009.3328")
 .annotate "line", 3
-    .const 'Sub' $P571 = "156_1261019354.40264" 
+    .const 'Sub' $P571 = "156_1261064009.3328" 
     capture_lex $P571
-    .const 'Sub' $P563 = "154_1261019354.40264" 
+    .const 'Sub' $P563 = "154_1261064009.3328" 
     capture_lex $P563
-    .const 'Sub' $P555 = "152_1261019354.40264" 
+    .const 'Sub' $P555 = "152_1261064009.3328" 
     capture_lex $P555
-    .const 'Sub' $P534 = "147_1261019354.40264" 
+    .const 'Sub' $P534 = "147_1261064009.3328" 
     capture_lex $P534
-    .const 'Sub' $P499 = "141_1261019354.40264" 
+    .const 'Sub' $P499 = "141_1261064009.3328" 
     capture_lex $P499
-    .const 'Sub' $P487 = "138_1261019354.40264" 
+    .const 'Sub' $P487 = "138_1261064009.3328" 
     capture_lex $P487
-    .const 'Sub' $P474 = "135_1261019354.40264" 
+    .const 'Sub' $P474 = "135_1261064009.3328" 
     capture_lex $P474
-    .const 'Sub' $P468 = "133_1261019354.40264" 
+    .const 'Sub' $P468 = "133_1261064009.3328" 
     capture_lex $P468
-    .const 'Sub' $P457 = "130_1261019354.40264" 
+    .const 'Sub' $P457 = "130_1261064009.3328" 
     capture_lex $P457
-    .const 'Sub' $P446 = "127_1261019354.40264" 
+    .const 'Sub' $P446 = "127_1261064009.3328" 
     capture_lex $P446
-    .const 'Sub' $P437 = "123_1261019354.40264" 
+    .const 'Sub' $P437 = "123_1261064009.3328" 
     capture_lex $P437
-    .const 'Sub' $P431 = "121_1261019354.40264" 
+    .const 'Sub' $P431 = "121_1261064009.3328" 
     capture_lex $P431
-    .const 'Sub' $P425 = "119_1261019354.40264" 
+    .const 'Sub' $P425 = "119_1261064009.3328" 
     capture_lex $P425
-    .const 'Sub' $P419 = "117_1261019354.40264" 
+    .const 'Sub' $P419 = "117_1261064009.3328" 
     capture_lex $P419
-    .const 'Sub' $P413 = "115_1261019354.40264" 
+    .const 'Sub' $P413 = "115_1261064009.3328" 
     capture_lex $P413
-    .const 'Sub' $P402 = "113_1261019354.40264" 
+    .const 'Sub' $P402 = "113_1261064009.3328" 
     capture_lex $P402
-    .const 'Sub' $P391 = "111_1261019354.40264" 
+    .const 'Sub' $P391 = "111_1261064009.3328" 
     capture_lex $P391
-    .const 'Sub' $P383 = "109_1261019354.40264" 
+    .const 'Sub' $P383 = "109_1261064009.3328" 
     capture_lex $P383
-    .const 'Sub' $P377 = "107_1261019354.40264" 
+    .const 'Sub' $P377 = "107_1261064009.3328" 
     capture_lex $P377
-    .const 'Sub' $P371 = "105_1261019354.40264" 
+    .const 'Sub' $P371 = "105_1261064009.3328" 
     capture_lex $P371
-    .const 'Sub' $P365 = "103_1261019354.40264" 
+    .const 'Sub' $P365 = "103_1261064009.3328" 
     capture_lex $P365
-    .const 'Sub' $P359 = "101_1261019354.40264" 
+    .const 'Sub' $P359 = "101_1261064009.3328" 
     capture_lex $P359
-    .const 'Sub' $P353 = "99_1261019354.40264" 
+    .const 'Sub' $P353 = "99_1261064009.3328" 
     capture_lex $P353
-    .const 'Sub' $P347 = "97_1261019354.40264" 
+    .const 'Sub' $P347 = "97_1261064009.3328" 
     capture_lex $P347
-    .const 'Sub' $P341 = "95_1261019354.40264" 
+    .const 'Sub' $P341 = "95_1261064009.3328" 
     capture_lex $P341
-    .const 'Sub' $P335 = "93_1261019354.40264" 
+    .const 'Sub' $P335 = "93_1261064009.3328" 
     capture_lex $P335
-    .const 'Sub' $P323 = "89_1261019354.40264" 
+    .const 'Sub' $P323 = "89_1261064009.3328" 
     capture_lex $P323
-    .const 'Sub' $P311 = "87_1261019354.40264" 
+    .const 'Sub' $P311 = "87_1261064009.3328" 
     capture_lex $P311
-    .const 'Sub' $P304 = "85_1261019354.40264" 
+    .const 'Sub' $P304 = "85_1261064009.3328" 
     capture_lex $P304
-    .const 'Sub' $P287 = "83_1261019354.40264" 
+    .const 'Sub' $P287 = "83_1261064009.3328" 
     capture_lex $P287
-    .const 'Sub' $P280 = "81_1261019354.40264" 
+    .const 'Sub' $P280 = "81_1261064009.3328" 
     capture_lex $P280
-    .const 'Sub' $P274 = "79_1261019354.40264" 
+    .const 'Sub' $P274 = "79_1261064009.3328" 
     capture_lex $P274
-    .const 'Sub' $P268 = "77_1261019354.40264" 
+    .const 'Sub' $P268 = "77_1261064009.3328" 
     capture_lex $P268
-    .const 'Sub' $P261 = "75_1261019354.40264" 
+    .const 'Sub' $P261 = "75_1261064009.3328" 
     capture_lex $P261
-    .const 'Sub' $P254 = "73_1261019354.40264" 
+    .const 'Sub' $P254 = "73_1261064009.3328" 
     capture_lex $P254
-    .const 'Sub' $P247 = "71_1261019354.40264" 
+    .const 'Sub' $P247 = "71_1261064009.3328" 
     capture_lex $P247
-    .const 'Sub' $P240 = "69_1261019354.40264" 
+    .const 'Sub' $P240 = "69_1261064009.3328" 
     capture_lex $P240
-    .const 'Sub' $P234 = "67_1261019354.40264" 
+    .const 'Sub' $P234 = "67_1261064009.3328" 
     capture_lex $P234
-    .const 'Sub' $P228 = "65_1261019354.40264" 
+    .const 'Sub' $P228 = "65_1261064009.3328" 
     capture_lex $P228
-    .const 'Sub' $P222 = "63_1261019354.40264" 
+    .const 'Sub' $P222 = "63_1261064009.3328" 
     capture_lex $P222
-    .const 'Sub' $P216 = "61_1261019354.40264" 
+    .const 'Sub' $P216 = "61_1261064009.3328" 
     capture_lex $P216
-    .const 'Sub' $P210 = "59_1261019354.40264" 
+    .const 'Sub' $P210 = "59_1261064009.3328" 
     capture_lex $P210
-    .const 'Sub' $P205 = "57_1261019354.40264" 
+    .const 'Sub' $P205 = "57_1261064009.3328" 
     capture_lex $P205
-    .const 'Sub' $P200 = "55_1261019354.40264" 
+    .const 'Sub' $P200 = "55_1261064009.3328" 
     capture_lex $P200
-    .const 'Sub' $P194 = "53_1261019354.40264" 
+    .const 'Sub' $P194 = "53_1261064009.3328" 
     capture_lex $P194
-    .const 'Sub' $P188 = "51_1261019354.40264" 
+    .const 'Sub' $P188 = "51_1261064009.3328" 
     capture_lex $P188
-    .const 'Sub' $P182 = "49_1261019354.40264" 
+    .const 'Sub' $P182 = "49_1261064009.3328" 
     capture_lex $P182
-    .const 'Sub' $P166 = "44_1261019354.40264" 
+    .const 'Sub' $P166 = "44_1261064009.3328" 
     capture_lex $P166
-    .const 'Sub' $P154 = "42_1261019354.40264" 
+    .const 'Sub' $P154 = "42_1261064009.3328" 
     capture_lex $P154
-    .const 'Sub' $P147 = "40_1261019354.40264" 
+    .const 'Sub' $P147 = "40_1261064009.3328" 
     capture_lex $P147
-    .const 'Sub' $P140 = "38_1261019354.40264" 
+    .const 'Sub' $P140 = "38_1261064009.3328" 
     capture_lex $P140
-    .const 'Sub' $P133 = "36_1261019354.40264" 
+    .const 'Sub' $P133 = "36_1261064009.3328" 
     capture_lex $P133
-    .const 'Sub' $P114 = "31_1261019354.40264" 
+    .const 'Sub' $P114 = "31_1261064009.3328" 
     capture_lex $P114
-    .const 'Sub' $P101 = "28_1261019354.40264" 
+    .const 'Sub' $P101 = "28_1261064009.3328" 
     capture_lex $P101
-    .const 'Sub' $P94 = "26_1261019354.40264" 
+    .const 'Sub' $P94 = "26_1261064009.3328" 
     capture_lex $P94
-    .const 'Sub' $P82 = "24_1261019354.40264" 
+    .const 'Sub' $P82 = "24_1261064009.3328" 
     capture_lex $P82
-    .const 'Sub' $P75 = "22_1261019354.40264" 
+    .const 'Sub' $P75 = "22_1261064009.3328" 
     capture_lex $P75
-    .const 'Sub' $P63 = "20_1261019354.40264" 
+    .const 'Sub' $P63 = "20_1261064009.3328" 
     capture_lex $P63
-    .const 'Sub' $P56 = "18_1261019354.40264" 
+    .const 'Sub' $P56 = "18_1261064009.3328" 
     capture_lex $P56
-    .const 'Sub' $P46 = "15_1261019354.40264" 
+    .const 'Sub' $P46 = "15_1261064009.3328" 
     capture_lex $P46
-    .const 'Sub' $P38 = "13_1261019354.40264" 
+    .const 'Sub' $P38 = "13_1261064009.3328" 
     capture_lex $P38
-    .const 'Sub' $P15 = "12_1261019354.40264" 
+    .const 'Sub' $P15 = "12_1261064009.3328" 
     capture_lex $P15
-    .const 'Sub' $P571 = "156_1261019354.40264" 
+    .const 'Sub' $P571 = "156_1261064009.3328" 
     capture_lex $P571
     .return ($P571)
 .end
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "obs"  :subid("12_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "obs"  :subid("12_1261064009.3328") :method :outer("11_1261064009.3328")
     .param pmc param_18
     .param pmc param_19
     .param pmc param_20 :optional
@@ -222,7 +222,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "ws"  :subid("13_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "ws"  :subid("13_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx39_tgt
     .local int rx39_pos
@@ -304,7 +304,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__ws"  :subid("14_1261019354.40264") :method
+.sub "!PREFIX__ws"  :subid("14_1261064009.3328") :method
 .annotate "line", 3
     new $P41, "ResizablePMCArray"
     push $P41, ""
@@ -313,9 +313,9 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "normspace"  :subid("15_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "normspace"  :subid("15_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
-    .const 'Sub' $P52 = "17_1261019354.40264" 
+    .const 'Sub' $P52 = "17_1261064009.3328" 
     capture_lex $P52
     .local string rx47_tgt
     .local int rx47_pos
@@ -349,7 +349,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 10
   # rx subrule "before" subtype=zerowidth negate=
     rx47_cur."!cursor_pos"(rx47_pos)
-    .const 'Sub' $P52 = "17_1261019354.40264" 
+    .const 'Sub' $P52 = "17_1261064009.3328" 
     capture_lex $P52
     $P10 = rx47_cur."before"($P52)
     unless $P10, rx47_fail
@@ -377,7 +377,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__normspace"  :subid("16_1261019354.40264") :method
+.sub "!PREFIX__normspace"  :subid("16_1261064009.3328") :method
 .annotate "line", 3
     new $P49, "ResizablePMCArray"
     push $P49, ""
@@ -386,7 +386,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "_block51"  :anon :subid("17_1261019354.40264") :method :outer("15_1261019354.40264")
+.sub "_block51"  :anon :subid("17_1261064009.3328") :method :outer("15_1261064009.3328")
 .annotate "line", 10
     .local string rx53_tgt
     .local int rx53_pos
@@ -454,7 +454,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "arg"  :subid("18_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "arg"  :subid("18_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx57_tgt
     .local int rx57_pos
@@ -565,7 +565,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__arg"  :subid("19_1261019354.40264") :method
+.sub "!PREFIX__arg"  :subid("19_1261064009.3328") :method
 .annotate "line", 3
     new $P59, "ResizablePMCArray"
     push $P59, ""
@@ -576,7 +576,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "arglist"  :subid("20_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "arglist"  :subid("20_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx64_tgt
     .local int rx64_pos
@@ -682,7 +682,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__arglist"  :subid("21_1261019354.40264") :method
+.sub "!PREFIX__arglist"  :subid("21_1261064009.3328") :method
 .annotate "line", 3
     new $P66, "ResizablePMCArray"
     push $P66, ""
@@ -691,7 +691,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "TOP"  :subid("22_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "TOP"  :subid("22_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx76_tgt
     .local int rx76_pos
@@ -764,7 +764,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__TOP"  :subid("23_1261019354.40264") :method
+.sub "!PREFIX__TOP"  :subid("23_1261064009.3328") :method
 .annotate "line", 3
     $P78 = self."!PREFIX__!subrule"("nibbler", "")
     new $P79, "ResizablePMCArray"
@@ -774,7 +774,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "nibbler"  :subid("24_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "nibbler"  :subid("24_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx83_tgt
     .local int rx83_pos
@@ -942,7 +942,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__nibbler"  :subid("25_1261019354.40264") :method
+.sub "!PREFIX__nibbler"  :subid("25_1261064009.3328") :method
 .annotate "line", 3
     new $P85, "ResizablePMCArray"
     push $P85, ""
@@ -951,7 +951,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "termish"  :subid("26_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "termish"  :subid("26_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx95_tgt
     .local int rx95_pos
@@ -1019,7 +1019,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__termish"  :subid("27_1261019354.40264") :method
+.sub "!PREFIX__termish"  :subid("27_1261064009.3328") :method
 .annotate "line", 3
     new $P97, "ResizablePMCArray"
     push $P97, ""
@@ -1028,9 +1028,9 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "quantified_atom"  :subid("28_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "quantified_atom"  :subid("28_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
-    .const 'Sub' $P110 = "30_1261019354.40264" 
+    .const 'Sub' $P110 = "30_1261064009.3328" 
     capture_lex $P110
     .local string rx102_tgt
     .local int rx102_pos
@@ -1040,7 +1040,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     .local pmc rx102_cur
     (rx102_cur, rx102_pos, rx102_tgt) = self."!cursor_start"()
     rx102_cur."!cursor_debug"("START ", "quantified_atom")
-    rx102_cur."!cursor_caparray"("quantifier", "backmod")
+    rx102_cur."!cursor_caparray"("backmod", "quantifier")
     .lex unicode:"$\x{a2}", rx102_cur
     .local pmc match
     .lex "$/", match
@@ -1093,7 +1093,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
   alt108_1:
   # rx subrule "before" subtype=zerowidth negate=
     rx102_cur."!cursor_pos"(rx102_pos)
-    .const 'Sub' $P110 = "30_1261019354.40264" 
+    .const 'Sub' $P110 = "30_1261064009.3328" 
     capture_lex $P110
     $P10 = rx102_cur."before"($P110)
     unless $P10, rx102_fail
@@ -1131,7 +1131,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__quantified_atom"  :subid("29_1261019354.40264") :method
+.sub "!PREFIX__quantified_atom"  :subid("29_1261064009.3328") :method
 .annotate "line", 3
     $P104 = self."!PREFIX__!subrule"("atom", "")
     new $P105, "ResizablePMCArray"
@@ -1141,7 +1141,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "_block109"  :anon :subid("30_1261019354.40264") :method :outer("28_1261019354.40264")
+.sub "_block109"  :anon :subid("30_1261064009.3328") :method :outer("28_1261064009.3328")
 .annotate "line", 41
     .local string rx111_tgt
     .local int rx111_pos
@@ -1197,9 +1197,9 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "atom"  :subid("31_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "atom"  :subid("31_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
-    .const 'Sub' $P125 = "33_1261019354.40264" 
+    .const 'Sub' $P125 = "33_1261064009.3328" 
     capture_lex $P125
     .local string rx115_tgt
     .local int rx115_pos
@@ -1259,7 +1259,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
   rxquantg122_done:
   # rx subrule "before" subtype=zerowidth negate=
     rx115_cur."!cursor_pos"(rx115_pos)
-    .const 'Sub' $P125 = "33_1261019354.40264" 
+    .const 'Sub' $P125 = "33_1261064009.3328" 
     capture_lex $P125
     $P10 = rx115_cur."before"($P125)
     unless $P10, rx115_fail
@@ -1296,7 +1296,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__atom"  :subid("32_1261019354.40264") :method
+.sub "!PREFIX__atom"  :subid("32_1261064009.3328") :method
 .annotate "line", 3
     $P117 = self."!PREFIX__!subrule"("metachar", "")
     new $P118, "ResizablePMCArray"
@@ -1307,7 +1307,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "_block124"  :anon :subid("33_1261019354.40264") :method :outer("31_1261019354.40264")
+.sub "_block124"  :anon :subid("33_1261064009.3328") :method :outer("31_1261064009.3328")
 .annotate "line", 47
     .local string rx126_tgt
     .local int rx126_pos
@@ -1362,7 +1362,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "quantifier"  :subid("34_1261019354.40264") :method
+.sub "quantifier"  :subid("34_1261064009.3328") :method
 .annotate "line", 52
     $P130 = self."!protoregex"("quantifier")
     .return ($P130)
@@ -1370,7 +1370,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__quantifier"  :subid("35_1261019354.40264") :method
+.sub "!PREFIX__quantifier"  :subid("35_1261064009.3328") :method
 .annotate "line", 52
     $P132 = self."!PREFIX__!protoregex"("quantifier")
     .return ($P132)
@@ -1378,7 +1378,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "quantifier:sym<*>"  :subid("36_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "quantifier:sym<*>"  :subid("36_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx134_tgt
     .local int rx134_pos
@@ -1457,7 +1457,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__quantifier:sym<*>"  :subid("37_1261019354.40264") :method
+.sub "!PREFIX__quantifier:sym<*>"  :subid("37_1261064009.3328") :method
 .annotate "line", 3
     $P136 = self."!PREFIX__!subrule"("backmod", "*")
     new $P137, "ResizablePMCArray"
@@ -1467,7 +1467,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "quantifier:sym<+>"  :subid("38_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "quantifier:sym<+>"  :subid("38_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx141_tgt
     .local int rx141_pos
@@ -1546,7 +1546,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__quantifier:sym<+>"  :subid("39_1261019354.40264") :method
+.sub "!PREFIX__quantifier:sym<+>"  :subid("39_1261064009.3328") :method
 .annotate "line", 3
     $P143 = self."!PREFIX__!subrule"("backmod", "+")
     new $P144, "ResizablePMCArray"
@@ -1556,7 +1556,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "quantifier:sym<?>"  :subid("40_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "quantifier:sym<?>"  :subid("40_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx148_tgt
     .local int rx148_pos
@@ -1635,7 +1635,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__quantifier:sym<?>"  :subid("41_1261019354.40264") :method
+.sub "!PREFIX__quantifier:sym<?>"  :subid("41_1261064009.3328") :method
 .annotate "line", 3
     $P150 = self."!PREFIX__!subrule"("backmod", "?")
     new $P151, "ResizablePMCArray"
@@ -1645,7 +1645,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "quantifier:sym<**>"  :subid("42_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "quantifier:sym<**>"  :subid("42_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx155_tgt
     .local int rx155_pos
@@ -1834,7 +1834,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__quantifier:sym<**>"  :subid("43_1261019354.40264") :method
+.sub "!PREFIX__quantifier:sym<**>"  :subid("43_1261064009.3328") :method
 .annotate "line", 3
     new $P157, "ResizablePMCArray"
     push $P157, "**"
@@ -1843,9 +1843,9 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "backmod"  :subid("44_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "backmod"  :subid("44_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
-    .const 'Sub' $P175 = "46_1261019354.40264" 
+    .const 'Sub' $P175 = "46_1261064009.3328" 
     capture_lex $P175
     .local string rx167_tgt
     .local int rx167_pos
@@ -1915,7 +1915,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
   alt173_2:
   # rx subrule "before" subtype=zerowidth negate=1
     rx167_cur."!cursor_pos"(rx167_pos)
-    .const 'Sub' $P175 = "46_1261019354.40264" 
+    .const 'Sub' $P175 = "46_1261064009.3328" 
     capture_lex $P175
     $P10 = rx167_cur."before"($P175)
     if $P10, rx167_fail
@@ -1939,7 +1939,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__backmod"  :subid("45_1261019354.40264") :method
+.sub "!PREFIX__backmod"  :subid("45_1261064009.3328") :method
 .annotate "line", 3
     new $P169, "ResizablePMCArray"
     push $P169, ""
@@ -1948,7 +1948,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "_block174"  :anon :subid("46_1261019354.40264") :method :outer("44_1261019354.40264")
+.sub "_block174"  :anon :subid("46_1261064009.3328") :method :outer("44_1261064009.3328")
 .annotate "line", 71
     .local string rx176_tgt
     .local int rx176_pos
@@ -2004,7 +2004,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "metachar"  :subid("47_1261019354.40264") :method
+.sub "metachar"  :subid("47_1261064009.3328") :method
 .annotate "line", 73
     $P179 = self."!protoregex"("metachar")
     .return ($P179)
@@ -2012,7 +2012,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__metachar"  :subid("48_1261019354.40264") :method
+.sub "!PREFIX__metachar"  :subid("48_1261064009.3328") :method
 .annotate "line", 73
     $P181 = self."!PREFIX__!protoregex"("metachar")
     .return ($P181)
@@ -2020,7 +2020,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "metachar:sym<ws>"  :subid("49_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "metachar:sym<ws>"  :subid("49_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx183_tgt
     .local int rx183_pos
@@ -2076,7 +2076,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__metachar:sym<ws>"  :subid("50_1261019354.40264") :method
+.sub "!PREFIX__metachar:sym<ws>"  :subid("50_1261064009.3328") :method
 .annotate "line", 3
     $P185 = self."!PREFIX__!subrule"("", "")
     new $P186, "ResizablePMCArray"
@@ -2086,7 +2086,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "metachar:sym<[ ]>"  :subid("51_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "metachar:sym<[ ]>"  :subid("51_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx189_tgt
     .local int rx189_pos
@@ -2158,7 +2158,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__metachar:sym<[ ]>"  :subid("52_1261019354.40264") :method
+.sub "!PREFIX__metachar:sym<[ ]>"  :subid("52_1261064009.3328") :method
 .annotate "line", 3
     $P191 = self."!PREFIX__!subrule"("nibbler", "[")
     new $P192, "ResizablePMCArray"
@@ -2168,7 +2168,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "metachar:sym<( )>"  :subid("53_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "metachar:sym<( )>"  :subid("53_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx195_tgt
     .local int rx195_pos
@@ -2240,7 +2240,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__metachar:sym<( )>"  :subid("54_1261019354.40264") :method
+.sub "!PREFIX__metachar:sym<( )>"  :subid("54_1261064009.3328") :method
 .annotate "line", 3
     $P197 = self."!PREFIX__!subrule"("nibbler", "(")
     new $P198, "ResizablePMCArray"
@@ -2250,7 +2250,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "metachar:sym<'>"  :subid("55_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "metachar:sym<'>"  :subid("55_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx201_tgt
     .local int rx201_pos
@@ -2314,7 +2314,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__metachar:sym<'>"  :subid("56_1261019354.40264") :method
+.sub "!PREFIX__metachar:sym<'>"  :subid("56_1261064009.3328") :method
 .annotate "line", 3
     new $P203, "ResizablePMCArray"
     push $P203, "'"
@@ -2323,7 +2323,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "metachar:sym<\">"  :subid("57_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "metachar:sym<\">"  :subid("57_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx206_tgt
     .local int rx206_pos
@@ -2387,7 +2387,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__metachar:sym<\">"  :subid("58_1261019354.40264") :method
+.sub "!PREFIX__metachar:sym<\">"  :subid("58_1261064009.3328") :method
 .annotate "line", 3
     new $P208, "ResizablePMCArray"
     push $P208, "\""
@@ -2396,7 +2396,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "metachar:sym<.>"  :subid("59_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "metachar:sym<.>"  :subid("59_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx211_tgt
     .local int rx211_pos
@@ -2468,7 +2468,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__metachar:sym<.>"  :subid("60_1261019354.40264") :method
+.sub "!PREFIX__metachar:sym<.>"  :subid("60_1261064009.3328") :method
 .annotate "line", 3
     new $P213, "ResizablePMCArray"
     push $P213, "."
@@ -2477,7 +2477,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "metachar:sym<^>"  :subid("61_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "metachar:sym<^>"  :subid("61_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx217_tgt
     .local int rx217_pos
@@ -2549,7 +2549,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__metachar:sym<^>"  :subid("62_1261019354.40264") :method
+.sub "!PREFIX__metachar:sym<^>"  :subid("62_1261064009.3328") :method
 .annotate "line", 3
     new $P219, "ResizablePMCArray"
     push $P219, "^"
@@ -2558,7 +2558,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "metachar:sym<^^>"  :subid("63_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "metachar:sym<^^>"  :subid("63_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx223_tgt
     .local int rx223_pos
@@ -2630,7 +2630,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__metachar:sym<^^>"  :subid("64_1261019354.40264") :method
+.sub "!PREFIX__metachar:sym<^^>"  :subid("64_1261064009.3328") :method
 .annotate "line", 3
     new $P225, "ResizablePMCArray"
     push $P225, "^^"
@@ -2639,7 +2639,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "metachar:sym<$>"  :subid("65_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "metachar:sym<$>"  :subid("65_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx229_tgt
     .local int rx229_pos
@@ -2711,7 +2711,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__metachar:sym<$>"  :subid("66_1261019354.40264") :method
+.sub "!PREFIX__metachar:sym<$>"  :subid("66_1261064009.3328") :method
 .annotate "line", 3
     new $P231, "ResizablePMCArray"
     push $P231, "$"
@@ -2720,7 +2720,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "metachar:sym<$$>"  :subid("67_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "metachar:sym<$$>"  :subid("67_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx235_tgt
     .local int rx235_pos
@@ -2792,7 +2792,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__metachar:sym<$$>"  :subid("68_1261019354.40264") :method
+.sub "!PREFIX__metachar:sym<$$>"  :subid("68_1261064009.3328") :method
 .annotate "line", 3
     new $P237, "ResizablePMCArray"
     push $P237, "$$"
@@ -2801,7 +2801,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "metachar:sym<:::>"  :subid("69_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "metachar:sym<:::>"  :subid("69_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx241_tgt
     .local int rx241_pos
@@ -2878,7 +2878,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__metachar:sym<:::>"  :subid("70_1261019354.40264") :method
+.sub "!PREFIX__metachar:sym<:::>"  :subid("70_1261064009.3328") :method
 .annotate "line", 3
     $P243 = self."!PREFIX__!subrule"("", ":::")
     new $P244, "ResizablePMCArray"
@@ -2888,7 +2888,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "metachar:sym<::>"  :subid("71_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "metachar:sym<::>"  :subid("71_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx248_tgt
     .local int rx248_pos
@@ -2965,7 +2965,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__metachar:sym<::>"  :subid("72_1261019354.40264") :method
+.sub "!PREFIX__metachar:sym<::>"  :subid("72_1261064009.3328") :method
 .annotate "line", 3
     $P250 = self."!PREFIX__!subrule"("", "::")
     new $P251, "ResizablePMCArray"
@@ -2975,7 +2975,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "metachar:sym<lwb>"  :subid("73_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "metachar:sym<lwb>"  :subid("73_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx255_tgt
     .local int rx255_pos
@@ -3060,7 +3060,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__metachar:sym<lwb>"  :subid("74_1261019354.40264") :method
+.sub "!PREFIX__metachar:sym<lwb>"  :subid("74_1261064009.3328") :method
 .annotate "line", 3
     new $P257, "ResizablePMCArray"
     push $P257, unicode:"\x{ab}"
@@ -3070,7 +3070,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "metachar:sym<rwb>"  :subid("75_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "metachar:sym<rwb>"  :subid("75_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx262_tgt
     .local int rx262_pos
@@ -3155,7 +3155,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__metachar:sym<rwb>"  :subid("76_1261019354.40264") :method
+.sub "!PREFIX__metachar:sym<rwb>"  :subid("76_1261064009.3328") :method
 .annotate "line", 3
     new $P264, "ResizablePMCArray"
     push $P264, unicode:"\x{bb}"
@@ -3165,7 +3165,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "metachar:sym<bs>"  :subid("77_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "metachar:sym<bs>"  :subid("77_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx269_tgt
     .local int rx269_pos
@@ -3230,7 +3230,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__metachar:sym<bs>"  :subid("78_1261019354.40264") :method
+.sub "!PREFIX__metachar:sym<bs>"  :subid("78_1261064009.3328") :method
 .annotate "line", 3
     $P271 = self."!PREFIX__!subrule"("backslash", "\\")
     new $P272, "ResizablePMCArray"
@@ -3240,7 +3240,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "metachar:sym<mod>"  :subid("79_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "metachar:sym<mod>"  :subid("79_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx275_tgt
     .local int rx275_pos
@@ -3298,7 +3298,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__metachar:sym<mod>"  :subid("80_1261019354.40264") :method
+.sub "!PREFIX__metachar:sym<mod>"  :subid("80_1261064009.3328") :method
 .annotate "line", 3
     $P277 = self."!PREFIX__!subrule"("mod_internal", "")
     new $P278, "ResizablePMCArray"
@@ -3308,7 +3308,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "metachar:sym<~>"  :subid("81_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "metachar:sym<~>"  :subid("81_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx281_tgt
     .local int rx281_pos
@@ -3407,7 +3407,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__metachar:sym<~>"  :subid("82_1261019354.40264") :method
+.sub "!PREFIX__metachar:sym<~>"  :subid("82_1261064009.3328") :method
 .annotate "line", 3
     $P283 = self."!PREFIX__!subrule"("", "~")
     new $P284, "ResizablePMCArray"
@@ -3417,7 +3417,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "metachar:sym<{*}>"  :subid("83_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "metachar:sym<{*}>"  :subid("83_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx288_tgt
     .local int rx288_pos
@@ -3584,7 +3584,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__metachar:sym<{*}>"  :subid("84_1261019354.40264") :method
+.sub "!PREFIX__metachar:sym<{*}>"  :subid("84_1261064009.3328") :method
 .annotate "line", 3
     new $P290, "ResizablePMCArray"
     push $P290, "{*}"
@@ -3593,7 +3593,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "metachar:sym<assert>"  :subid("85_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "metachar:sym<assert>"  :subid("85_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx305_tgt
     .local int rx305_pos
@@ -3678,7 +3678,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__metachar:sym<assert>"  :subid("86_1261019354.40264") :method
+.sub "!PREFIX__metachar:sym<assert>"  :subid("86_1261064009.3328") :method
 .annotate "line", 3
     $P307 = self."!PREFIX__!subrule"("assertion", "<")
     new $P308, "ResizablePMCArray"
@@ -3688,7 +3688,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "metachar:sym<var>"  :subid("87_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "metachar:sym<var>"  :subid("87_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx312_tgt
     .local int rx312_pos
@@ -3850,7 +3850,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__metachar:sym<var>"  :subid("88_1261019354.40264") :method
+.sub "!PREFIX__metachar:sym<var>"  :subid("88_1261064009.3328") :method
 .annotate "line", 3
     new $P314, "ResizablePMCArray"
     push $P314, "$"
@@ -3860,7 +3860,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "metachar:sym<PIR>"  :subid("89_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "metachar:sym<PIR>"  :subid("89_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx324_tgt
     .local int rx324_pos
@@ -3951,7 +3951,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__metachar:sym<PIR>"  :subid("90_1261019354.40264") :method
+.sub "!PREFIX__metachar:sym<PIR>"  :subid("90_1261064009.3328") :method
 .annotate "line", 3
     new $P326, "ResizablePMCArray"
     push $P326, ":PIR{{"
@@ -3960,7 +3960,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "backslash"  :subid("91_1261019354.40264") :method
+.sub "backslash"  :subid("91_1261064009.3328") :method
 .annotate "line", 120
     $P332 = self."!protoregex"("backslash")
     .return ($P332)
@@ -3968,7 +3968,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__backslash"  :subid("92_1261019354.40264") :method
+.sub "!PREFIX__backslash"  :subid("92_1261064009.3328") :method
 .annotate "line", 120
     $P334 = self."!PREFIX__!protoregex"("backslash")
     .return ($P334)
@@ -3976,7 +3976,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "backslash:sym<w>"  :subid("93_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "backslash:sym<w>"  :subid("93_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx336_tgt
     .local int rx336_pos
@@ -4048,7 +4048,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__backslash:sym<w>"  :subid("94_1261019354.40264") :method
+.sub "!PREFIX__backslash:sym<w>"  :subid("94_1261064009.3328") :method
 .annotate "line", 3
     new $P338, "ResizablePMCArray"
     push $P338, "N"
@@ -4064,7 +4064,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "backslash:sym<b>"  :subid("95_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "backslash:sym<b>"  :subid("95_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx342_tgt
     .local int rx342_pos
@@ -4136,7 +4136,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__backslash:sym<b>"  :subid("96_1261019354.40264") :method
+.sub "!PREFIX__backslash:sym<b>"  :subid("96_1261064009.3328") :method
 .annotate "line", 3
     new $P344, "ResizablePMCArray"
     push $P344, "B"
@@ -4146,7 +4146,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "backslash:sym<e>"  :subid("97_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "backslash:sym<e>"  :subid("97_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx348_tgt
     .local int rx348_pos
@@ -4218,7 +4218,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__backslash:sym<e>"  :subid("98_1261019354.40264") :method
+.sub "!PREFIX__backslash:sym<e>"  :subid("98_1261064009.3328") :method
 .annotate "line", 3
     new $P350, "ResizablePMCArray"
     push $P350, "E"
@@ -4228,7 +4228,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "backslash:sym<f>"  :subid("99_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "backslash:sym<f>"  :subid("99_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx354_tgt
     .local int rx354_pos
@@ -4300,7 +4300,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__backslash:sym<f>"  :subid("100_1261019354.40264") :method
+.sub "!PREFIX__backslash:sym<f>"  :subid("100_1261064009.3328") :method
 .annotate "line", 3
     new $P356, "ResizablePMCArray"
     push $P356, "F"
@@ -4310,7 +4310,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "backslash:sym<h>"  :subid("101_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "backslash:sym<h>"  :subid("101_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx360_tgt
     .local int rx360_pos
@@ -4382,7 +4382,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__backslash:sym<h>"  :subid("102_1261019354.40264") :method
+.sub "!PREFIX__backslash:sym<h>"  :subid("102_1261064009.3328") :method
 .annotate "line", 3
     new $P362, "ResizablePMCArray"
     push $P362, "H"
@@ -4392,7 +4392,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "backslash:sym<r>"  :subid("103_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "backslash:sym<r>"  :subid("103_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx366_tgt
     .local int rx366_pos
@@ -4464,7 +4464,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__backslash:sym<r>"  :subid("104_1261019354.40264") :method
+.sub "!PREFIX__backslash:sym<r>"  :subid("104_1261064009.3328") :method
 .annotate "line", 3
     new $P368, "ResizablePMCArray"
     push $P368, "R"
@@ -4474,7 +4474,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "backslash:sym<t>"  :subid("105_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "backslash:sym<t>"  :subid("105_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx372_tgt
     .local int rx372_pos
@@ -4546,7 +4546,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__backslash:sym<t>"  :subid("106_1261019354.40264") :method
+.sub "!PREFIX__backslash:sym<t>"  :subid("106_1261064009.3328") :method
 .annotate "line", 3
     new $P374, "ResizablePMCArray"
     push $P374, "T"
@@ -4556,7 +4556,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "backslash:sym<v>"  :subid("107_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "backslash:sym<v>"  :subid("107_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx378_tgt
     .local int rx378_pos
@@ -4628,7 +4628,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__backslash:sym<v>"  :subid("108_1261019354.40264") :method
+.sub "!PREFIX__backslash:sym<v>"  :subid("108_1261064009.3328") :method
 .annotate "line", 3
     new $P380, "ResizablePMCArray"
     push $P380, "V"
@@ -4638,7 +4638,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "backslash:sym<c>"  :subid("109_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "backslash:sym<c>"  :subid("109_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx384_tgt
     .local int rx384_pos
@@ -4717,7 +4717,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__backslash:sym<c>"  :subid("110_1261019354.40264") :method
+.sub "!PREFIX__backslash:sym<c>"  :subid("110_1261064009.3328") :method
 .annotate "line", 3
     $P386 = self."!PREFIX__!subrule"("charspec", "C")
     $P387 = self."!PREFIX__!subrule"("charspec", "c")
@@ -4729,7 +4729,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "backslash:sym<o>"  :subid("111_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "backslash:sym<o>"  :subid("111_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx392_tgt
     .local int rx392_pos
@@ -4835,7 +4835,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__backslash:sym<o>"  :subid("112_1261019354.40264") :method
+.sub "!PREFIX__backslash:sym<o>"  :subid("112_1261064009.3328") :method
 .annotate "line", 3
     $P394 = self."!PREFIX__!subrule"("octints", "O[")
     $P395 = self."!PREFIX__!subrule"("octint", "O")
@@ -4851,7 +4851,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "backslash:sym<x>"  :subid("113_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "backslash:sym<x>"  :subid("113_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx403_tgt
     .local int rx403_pos
@@ -4957,7 +4957,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__backslash:sym<x>"  :subid("114_1261019354.40264") :method
+.sub "!PREFIX__backslash:sym<x>"  :subid("114_1261064009.3328") :method
 .annotate "line", 3
     $P405 = self."!PREFIX__!subrule"("hexints", "X[")
     $P406 = self."!PREFIX__!subrule"("hexint", "X")
@@ -4973,7 +4973,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "backslash:sym<A>"  :subid("115_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "backslash:sym<A>"  :subid("115_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx414_tgt
     .local int rx414_pos
@@ -5036,7 +5036,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__backslash:sym<A>"  :subid("116_1261019354.40264") :method
+.sub "!PREFIX__backslash:sym<A>"  :subid("116_1261064009.3328") :method
 .annotate "line", 3
     $P416 = self."!PREFIX__!subrule"("", "A")
     new $P417, "ResizablePMCArray"
@@ -5046,7 +5046,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "backslash:sym<z>"  :subid("117_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "backslash:sym<z>"  :subid("117_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx420_tgt
     .local int rx420_pos
@@ -5109,7 +5109,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__backslash:sym<z>"  :subid("118_1261019354.40264") :method
+.sub "!PREFIX__backslash:sym<z>"  :subid("118_1261064009.3328") :method
 .annotate "line", 3
     $P422 = self."!PREFIX__!subrule"("", "z")
     new $P423, "ResizablePMCArray"
@@ -5119,7 +5119,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "backslash:sym<Z>"  :subid("119_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "backslash:sym<Z>"  :subid("119_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx426_tgt
     .local int rx426_pos
@@ -5182,7 +5182,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__backslash:sym<Z>"  :subid("120_1261019354.40264") :method
+.sub "!PREFIX__backslash:sym<Z>"  :subid("120_1261064009.3328") :method
 .annotate "line", 3
     $P428 = self."!PREFIX__!subrule"("", "Z")
     new $P429, "ResizablePMCArray"
@@ -5192,7 +5192,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "backslash:sym<Q>"  :subid("121_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "backslash:sym<Q>"  :subid("121_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx432_tgt
     .local int rx432_pos
@@ -5255,7 +5255,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__backslash:sym<Q>"  :subid("122_1261019354.40264") :method
+.sub "!PREFIX__backslash:sym<Q>"  :subid("122_1261064009.3328") :method
 .annotate "line", 3
     $P434 = self."!PREFIX__!subrule"("", "Q")
     new $P435, "ResizablePMCArray"
@@ -5265,7 +5265,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "backslash:sym<misc>"  :subid("123_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "backslash:sym<misc>"  :subid("123_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx438_tgt
     .local int rx438_pos
@@ -5322,7 +5322,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__backslash:sym<misc>"  :subid("124_1261019354.40264") :method
+.sub "!PREFIX__backslash:sym<misc>"  :subid("124_1261064009.3328") :method
 .annotate "line", 3
     new $P440, "ResizablePMCArray"
     push $P440, ""
@@ -5331,7 +5331,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "assertion"  :subid("125_1261019354.40264") :method
+.sub "assertion"  :subid("125_1261064009.3328") :method
 .annotate "line", 138
     $P443 = self."!protoregex"("assertion")
     .return ($P443)
@@ -5339,7 +5339,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__assertion"  :subid("126_1261019354.40264") :method
+.sub "!PREFIX__assertion"  :subid("126_1261064009.3328") :method
 .annotate "line", 138
     $P445 = self."!PREFIX__!protoregex"("assertion")
     .return ($P445)
@@ -5347,9 +5347,9 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "assertion:sym<?>"  :subid("127_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "assertion:sym<?>"  :subid("127_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
-    .const 'Sub' $P454 = "129_1261019354.40264" 
+    .const 'Sub' $P454 = "129_1261064009.3328" 
     capture_lex $P454
     .local string rx447_tgt
     .local int rx447_pos
@@ -5393,7 +5393,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     rx447_cur."!mark_push"(0, rx447_pos, $I10)
   # rx subrule "before" subtype=zerowidth negate=
     rx447_cur."!cursor_pos"(rx447_pos)
-    .const 'Sub' $P454 = "129_1261019354.40264" 
+    .const 'Sub' $P454 = "129_1261064009.3328" 
     capture_lex $P454
     $P10 = rx447_cur."before"($P454)
     unless $P10, rx447_fail
@@ -5426,7 +5426,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__assertion:sym<?>"  :subid("128_1261019354.40264") :method
+.sub "!PREFIX__assertion:sym<?>"  :subid("128_1261064009.3328") :method
 .annotate "line", 3
     $P449 = self."!PREFIX__!subrule"("assertion", "?")
     new $P450, "ResizablePMCArray"
@@ -5437,7 +5437,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "_block453"  :anon :subid("129_1261019354.40264") :method :outer("127_1261019354.40264")
+.sub "_block453"  :anon :subid("129_1261064009.3328") :method :outer("127_1261064009.3328")
 .annotate "line", 140
     .local string rx455_tgt
     .local int rx455_pos
@@ -5493,9 +5493,9 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "assertion:sym<!>"  :subid("130_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "assertion:sym<!>"  :subid("130_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
-    .const 'Sub' $P465 = "132_1261019354.40264" 
+    .const 'Sub' $P465 = "132_1261064009.3328" 
     capture_lex $P465
     .local string rx458_tgt
     .local int rx458_pos
@@ -5539,7 +5539,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     rx458_cur."!mark_push"(0, rx458_pos, $I10)
   # rx subrule "before" subtype=zerowidth negate=
     rx458_cur."!cursor_pos"(rx458_pos)
-    .const 'Sub' $P465 = "132_1261019354.40264" 
+    .const 'Sub' $P465 = "132_1261064009.3328" 
     capture_lex $P465
     $P10 = rx458_cur."before"($P465)
     unless $P10, rx458_fail
@@ -5572,7 +5572,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__assertion:sym<!>"  :subid("131_1261019354.40264") :method
+.sub "!PREFIX__assertion:sym<!>"  :subid("131_1261064009.3328") :method
 .annotate "line", 3
     $P460 = self."!PREFIX__!subrule"("assertion", "!")
     new $P461, "ResizablePMCArray"
@@ -5583,7 +5583,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "_block464"  :anon :subid("132_1261019354.40264") :method :outer("130_1261019354.40264")
+.sub "_block464"  :anon :subid("132_1261064009.3328") :method :outer("130_1261064009.3328")
 .annotate "line", 141
     .local string rx466_tgt
     .local int rx466_pos
@@ -5639,7 +5639,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "assertion:sym<method>"  :subid("133_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "assertion:sym<method>"  :subid("133_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx469_tgt
     .local int rx469_pos
@@ -5705,7 +5705,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__assertion:sym<method>"  :subid("134_1261019354.40264") :method
+.sub "!PREFIX__assertion:sym<method>"  :subid("134_1261064009.3328") :method
 .annotate "line", 3
     $P471 = self."!PREFIX__!subrule"("assertion", ".")
     new $P472, "ResizablePMCArray"
@@ -5715,9 +5715,9 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "assertion:sym<name>"  :subid("135_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "assertion:sym<name>"  :subid("135_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
-    .const 'Sub' $P483 = "137_1261019354.40264" 
+    .const 'Sub' $P483 = "137_1261064009.3328" 
     capture_lex $P483
     .local string rx475_tgt
     .local int rx475_pos
@@ -5727,7 +5727,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     .local pmc rx475_cur
     (rx475_cur, rx475_pos, rx475_tgt) = self."!cursor_start"()
     rx475_cur."!cursor_debug"("START ", "assertion:sym<name>")
-    rx475_cur."!cursor_caparray"("nibbler", "arglist", "assertion")
+    rx475_cur."!cursor_caparray"("arglist", "nibbler", "assertion")
     .lex unicode:"$\x{a2}", rx475_cur
     .local pmc match
     .lex "$/", match
@@ -5782,7 +5782,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 150
   # rx subrule "before" subtype=zerowidth negate=
     rx475_cur."!cursor_pos"(rx475_pos)
-    .const 'Sub' $P483 = "137_1261019354.40264" 
+    .const 'Sub' $P483 = "137_1261064009.3328" 
     capture_lex $P483
     $P10 = rx475_cur."before"($P483)
     unless $P10, rx475_fail
@@ -5889,7 +5889,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__assertion:sym<name>"  :subid("136_1261019354.40264") :method
+.sub "!PREFIX__assertion:sym<name>"  :subid("136_1261064009.3328") :method
 .annotate "line", 3
     new $P477, "ResizablePMCArray"
     push $P477, ""
@@ -5898,7 +5898,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "_block482"  :anon :subid("137_1261019354.40264") :method :outer("135_1261019354.40264")
+.sub "_block482"  :anon :subid("137_1261064009.3328") :method :outer("135_1261064009.3328")
 .annotate "line", 150
     .local string rx484_tgt
     .local int rx484_pos
@@ -5954,9 +5954,9 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "assertion:sym<[>"  :subid("138_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "assertion:sym<[>"  :subid("138_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
-    .const 'Sub' $P493 = "140_1261019354.40264" 
+    .const 'Sub' $P493 = "140_1261064009.3328" 
     capture_lex $P493
     .local string rx488_tgt
     .local int rx488_pos
@@ -5991,7 +5991,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 158
   # rx subrule "before" subtype=zerowidth negate=
     rx488_cur."!cursor_pos"(rx488_pos)
-    .const 'Sub' $P493 = "140_1261019354.40264" 
+    .const 'Sub' $P493 = "140_1261064009.3328" 
     capture_lex $P493
     $P10 = rx488_cur."before"($P493)
     unless $P10, rx488_fail
@@ -6029,7 +6029,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__assertion:sym<[>"  :subid("139_1261019354.40264") :method
+.sub "!PREFIX__assertion:sym<[>"  :subid("139_1261064009.3328") :method
 .annotate "line", 3
     new $P490, "ResizablePMCArray"
     push $P490, ""
@@ -6038,7 +6038,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "_block492"  :anon :subid("140_1261019354.40264") :method :outer("138_1261019354.40264")
+.sub "_block492"  :anon :subid("140_1261064009.3328") :method :outer("138_1261064009.3328")
 .annotate "line", 158
     .local string rx494_tgt
     .local int rx494_pos
@@ -6118,9 +6118,9 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "cclass_elem"  :subid("141_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "cclass_elem"  :subid("141_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
-    .const 'Sub' $P511 = "143_1261019354.40264" 
+    .const 'Sub' $P511 = "143_1261064009.3328" 
     capture_lex $P511
     .local string rx500_tgt
     .local int rx500_pos
@@ -6223,7 +6223,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 164
   # rx subrule $P511 subtype=capture negate=
     rx500_cur."!cursor_pos"(rx500_pos)
-    .const 'Sub' $P511 = "143_1261019354.40264" 
+    .const 'Sub' $P511 = "143_1261064009.3328" 
     capture_lex $P511
     $P10 = rx500_cur.$P511()
     unless $P10, rx500_fail
@@ -6304,7 +6304,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__cclass_elem"  :subid("142_1261019354.40264") :method
+.sub "!PREFIX__cclass_elem"  :subid("142_1261064009.3328") :method
 .annotate "line", 3
     new $P502, "ResizablePMCArray"
     push $P502, ""
@@ -6315,13 +6315,13 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "_block510"  :anon :subid("143_1261019354.40264") :method :outer("141_1261019354.40264")
+.sub "_block510"  :anon :subid("143_1261064009.3328") :method :outer("141_1261064009.3328")
 .annotate "line", 164
-    .const 'Sub' $P526 = "146_1261019354.40264" 
+    .const 'Sub' $P526 = "146_1261064009.3328" 
     capture_lex $P526
-    .const 'Sub' $P521 = "145_1261019354.40264" 
+    .const 'Sub' $P521 = "145_1261064009.3328" 
     capture_lex $P521
-    .const 'Sub' $P517 = "144_1261019354.40264" 
+    .const 'Sub' $P517 = "144_1261064009.3328" 
     capture_lex $P517
     .local string rx512_tgt
     .local int rx512_pos
@@ -6392,7 +6392,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     add rx512_pos, 1
   # rx subrule $P517 subtype=capture negate=
     rx512_cur."!cursor_pos"(rx512_pos)
-    .const 'Sub' $P517 = "144_1261019354.40264" 
+    .const 'Sub' $P517 = "144_1261064009.3328" 
     capture_lex $P517
     $P10 = rx512_cur.$P517()
     unless $P10, rx512_fail
@@ -6403,7 +6403,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
   alt515_1:
   # rx subrule $P521 subtype=capture negate=
     rx512_cur."!cursor_pos"(rx512_pos)
-    .const 'Sub' $P521 = "145_1261019354.40264" 
+    .const 'Sub' $P521 = "145_1261064009.3328" 
     capture_lex $P521
     $P10 = rx512_cur.$P521()
     unless $P10, rx512_fail
@@ -6432,7 +6432,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     add rx512_pos, rx512_off, $I11
   # rx subrule $P526 subtype=capture negate=
     rx512_cur."!cursor_pos"(rx512_pos)
-    .const 'Sub' $P526 = "146_1261019354.40264" 
+    .const 'Sub' $P526 = "146_1261064009.3328" 
     capture_lex $P526
     $P10 = rx512_cur.$P526()
     unless $P10, rx512_fail
@@ -6461,7 +6461,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "_block516"  :anon :subid("144_1261019354.40264") :method :outer("143_1261019354.40264")
+.sub "_block516"  :anon :subid("144_1261064009.3328") :method :outer("143_1261064009.3328")
 .annotate "line", 166
     .local string rx518_tgt
     .local int rx518_pos
@@ -6513,7 +6513,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "_block520"  :anon :subid("145_1261019354.40264") :method :outer("143_1261019354.40264")
+.sub "_block520"  :anon :subid("145_1261064009.3328") :method :outer("143_1261064009.3328")
 .annotate "line", 166
     .local string rx522_tgt
     .local int rx522_pos
@@ -6569,7 +6569,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "_block525"  :anon :subid("146_1261019354.40264") :method :outer("143_1261019354.40264")
+.sub "_block525"  :anon :subid("146_1261064009.3328") :method :outer("143_1261064009.3328")
 .annotate "line", 166
     .local string rx527_tgt
     .local int rx527_pos
@@ -6621,9 +6621,9 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "mod_internal"  :subid("147_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "mod_internal"  :subid("147_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
-    .const 'Sub' $P543 = "149_1261019354.40264" 
+    .const 'Sub' $P543 = "149_1261064009.3328" 
     capture_lex $P543
     .local string rx535_tgt
     .local int rx535_pos
@@ -6673,7 +6673,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
   rxquantr541_loop:
   # rx subrule $P543 subtype=capture negate=
     rx535_cur."!cursor_pos"(rx535_pos)
-    .const 'Sub' $P543 = "149_1261019354.40264" 
+    .const 'Sub' $P543 = "149_1261064009.3328" 
     capture_lex $P543
     $P10 = rx535_cur.$P543()
     unless $P10, rx535_fail
@@ -6775,7 +6775,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__mod_internal"  :subid("148_1261019354.40264") :method
+.sub "!PREFIX__mod_internal"  :subid("148_1261064009.3328") :method
 .annotate "line", 3
     $P537 = self."!PREFIX__!subrule"("mod_ident", ":")
     new $P538, "ResizablePMCArray"
@@ -6786,7 +6786,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "_block542"  :anon :subid("149_1261019354.40264") :method :outer("147_1261019354.40264")
+.sub "_block542"  :anon :subid("149_1261064009.3328") :method :outer("147_1261064009.3328")
 .annotate "line", 176
     .local string rx544_tgt
     .local int rx544_pos
@@ -6854,7 +6854,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "mod_ident"  :subid("150_1261019354.40264") :method
+.sub "mod_ident"  :subid("150_1261064009.3328") :method
 .annotate "line", 181
     $P552 = self."!protoregex"("mod_ident")
     .return ($P552)
@@ -6862,7 +6862,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__mod_ident"  :subid("151_1261019354.40264") :method
+.sub "!PREFIX__mod_ident"  :subid("151_1261064009.3328") :method
 .annotate "line", 181
     $P554 = self."!PREFIX__!protoregex"("mod_ident")
     .return ($P554)
@@ -6870,7 +6870,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "mod_ident:sym<ignorecase>"  :subid("152_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "mod_ident:sym<ignorecase>"  :subid("152_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx556_tgt
     .local int rx556_pos
@@ -6955,7 +6955,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__mod_ident:sym<ignorecase>"  :subid("153_1261019354.40264") :method
+.sub "!PREFIX__mod_ident:sym<ignorecase>"  :subid("153_1261064009.3328") :method
 .annotate "line", 3
     new $P558, "ResizablePMCArray"
     push $P558, "i"
@@ -6964,7 +6964,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "mod_ident:sym<ratchet>"  :subid("154_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "mod_ident:sym<ratchet>"  :subid("154_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx564_tgt
     .local int rx564_pos
@@ -7049,7 +7049,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__mod_ident:sym<ratchet>"  :subid("155_1261019354.40264") :method
+.sub "!PREFIX__mod_ident:sym<ratchet>"  :subid("155_1261064009.3328") :method
 .annotate "line", 3
     new $P566, "ResizablePMCArray"
     push $P566, "r"
@@ -7058,7 +7058,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "mod_ident:sym<sigspace>"  :subid("156_1261019354.40264") :method :outer("11_1261019354.40264")
+.sub "mod_ident:sym<sigspace>"  :subid("156_1261064009.3328") :method :outer("11_1261064009.3328")
 .annotate "line", 3
     .local string rx572_tgt
     .local int rx572_pos
@@ -7143,7 +7143,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "!PREFIX__mod_ident:sym<sigspace>"  :subid("157_1261019354.40264") :method
+.sub "!PREFIX__mod_ident:sym<sigspace>"  :subid("157_1261064009.3328") :method
 .annotate "line", 3
     new $P574, "ResizablePMCArray"
     push $P574, "s"
@@ -7153,7 +7153,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 ### .include 'gen/p6regex-actions.pir'
 
 .namespace []
-.sub "_block11"  :anon :subid("10_1261019360.92342")
+.sub "_block11"  :anon :subid("10_1261064016.27984")
 .annotate "line", 0
     get_hll_global $P14, ["Regex";"P6Regex";"Actions"], "_block13" 
     capture_lex $P14
@@ -7167,9 +7167,9 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace []
-.sub "" :load :init :subid("post89") :outer("10_1261019360.92342")
+.sub "" :load :init :subid("post89") :outer("10_1261064016.27984")
 .annotate "line", 0
-    .const 'Sub' $P12 = "10_1261019360.92342" 
+    .const 'Sub' $P12 = "10_1261064016.27984" 
     .local pmc block
     set block, $P12
     $P1557 = get_root_global ["parrot"], "P6metaclass"
@@ -7178,115 +7178,115 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block13"  :subid("11_1261019360.92342") :outer("10_1261019360.92342")
+.sub "_block13"  :subid("11_1261064016.27984") :outer("10_1261064016.27984")
 .annotate "line", 4
-    .const 'Sub' $P1523 = "88_1261019360.92342" 
+    .const 'Sub' $P1523 = "88_1261064016.27984" 
     capture_lex $P1523
-    .const 'Sub' $P1454 = "84_1261019360.92342" 
+    .const 'Sub' $P1454 = "84_1261064016.27984" 
     capture_lex $P1454
-    .const 'Sub' $P1386 = "82_1261019360.92342" 
+    .const 'Sub' $P1386 = "82_1261064016.27984" 
     capture_lex $P1386
-    .const 'Sub' $P1313 = "79_1261019360.92342" 
+    .const 'Sub' $P1313 = "79_1261064016.27984" 
     capture_lex $P1313
-    .const 'Sub' $P1299 = "78_1261019360.92342" 
+    .const 'Sub' $P1299 = "78_1261064016.27984" 
     capture_lex $P1299
-    .const 'Sub' $P1275 = "77_1261019360.92342" 
+    .const 'Sub' $P1275 = "77_1261064016.27984" 
     capture_lex $P1275
-    .const 'Sub' $P1257 = "76_1261019360.92342" 
+    .const 'Sub' $P1257 = "76_1261064016.27984" 
     capture_lex $P1257
-    .const 'Sub' $P1243 = "75_1261019360.92342" 
+    .const 'Sub' $P1243 = "75_1261064016.27984" 
     capture_lex $P1243
-    .const 'Sub' $P1212 = "74_1261019360.92342" 
+    .const 'Sub' $P1212 = "74_1261064016.27984" 
     capture_lex $P1212
-    .const 'Sub' $P1181 = "73_1261019360.92342" 
+    .const 'Sub' $P1181 = "73_1261064016.27984" 
     capture_lex $P1181
-    .const 'Sub' $P1165 = "72_1261019360.92342" 
+    .const 'Sub' $P1165 = "72_1261064016.27984" 
     capture_lex $P1165
-    .const 'Sub' $P1149 = "71_1261019360.92342" 
+    .const 'Sub' $P1149 = "71_1261064016.27984" 
     capture_lex $P1149
-    .const 'Sub' $P1133 = "70_1261019360.92342" 
+    .const 'Sub' $P1133 = "70_1261064016.27984" 
     capture_lex $P1133
-    .const 'Sub' $P1117 = "69_1261019360.92342" 
+    .const 'Sub' $P1117 = "69_1261064016.27984" 
     capture_lex $P1117
-    .const 'Sub' $P1101 = "68_1261019360.92342" 
+    .const 'Sub' $P1101 = "68_1261064016.27984" 
     capture_lex $P1101
-    .const 'Sub' $P1085 = "67_1261019360.92342" 
+    .const 'Sub' $P1085 = "67_1261064016.27984" 
     capture_lex $P1085
-    .const 'Sub' $P1069 = "66_1261019360.92342" 
+    .const 'Sub' $P1069 = "66_1261064016.27984" 
     capture_lex $P1069
-    .const 'Sub' $P1045 = "65_1261019360.92342" 
+    .const 'Sub' $P1045 = "65_1261064016.27984" 
     capture_lex $P1045
-    .const 'Sub' $P1030 = "64_1261019360.92342" 
+    .const 'Sub' $P1030 = "64_1261064016.27984" 
     capture_lex $P1030
-    .const 'Sub' $P974 = "63_1261019360.92342" 
+    .const 'Sub' $P974 = "63_1261064016.27984" 
     capture_lex $P974
-    .const 'Sub' $P953 = "62_1261019360.92342" 
+    .const 'Sub' $P953 = "62_1261064016.27984" 
     capture_lex $P953
-    .const 'Sub' $P931 = "61_1261019360.92342" 
+    .const 'Sub' $P931 = "61_1261064016.27984" 
     capture_lex $P931
-    .const 'Sub' $P921 = "60_1261019360.92342" 
+    .const 'Sub' $P921 = "60_1261064016.27984" 
     capture_lex $P921
-    .const 'Sub' $P911 = "59_1261019360.92342" 
+    .const 'Sub' $P911 = "59_1261064016.27984" 
     capture_lex $P911
-    .const 'Sub' $P901 = "58_1261019360.92342" 
+    .const 'Sub' $P901 = "58_1261064016.27984" 
     capture_lex $P901
-    .const 'Sub' $P889 = "57_1261019360.92342" 
+    .const 'Sub' $P889 = "57_1261064016.27984" 
     capture_lex $P889
-    .const 'Sub' $P877 = "56_1261019360.92342" 
+    .const 'Sub' $P877 = "56_1261064016.27984" 
     capture_lex $P877
-    .const 'Sub' $P865 = "55_1261019360.92342" 
+    .const 'Sub' $P865 = "55_1261064016.27984" 
     capture_lex $P865
-    .const 'Sub' $P853 = "54_1261019360.92342" 
+    .const 'Sub' $P853 = "54_1261064016.27984" 
     capture_lex $P853
-    .const 'Sub' $P841 = "53_1261019360.92342" 
+    .const 'Sub' $P841 = "53_1261064016.27984" 
     capture_lex $P841
-    .const 'Sub' $P829 = "52_1261019360.92342" 
+    .const 'Sub' $P829 = "52_1261064016.27984" 
     capture_lex $P829
-    .const 'Sub' $P817 = "51_1261019360.92342" 
+    .const 'Sub' $P817 = "51_1261064016.27984" 
     capture_lex $P817
-    .const 'Sub' $P805 = "50_1261019360.92342" 
+    .const 'Sub' $P805 = "50_1261064016.27984" 
     capture_lex $P805
-    .const 'Sub' $P782 = "49_1261019360.92342" 
+    .const 'Sub' $P782 = "49_1261064016.27984" 
     capture_lex $P782
-    .const 'Sub' $P759 = "48_1261019360.92342" 
+    .const 'Sub' $P759 = "48_1261064016.27984" 
     capture_lex $P759
-    .const 'Sub' $P741 = "47_1261019360.92342" 
+    .const 'Sub' $P741 = "47_1261064016.27984" 
     capture_lex $P741
-    .const 'Sub' $P731 = "46_1261019360.92342" 
+    .const 'Sub' $P731 = "46_1261064016.27984" 
     capture_lex $P731
-    .const 'Sub' $P713 = "45_1261019360.92342" 
+    .const 'Sub' $P713 = "45_1261064016.27984" 
     capture_lex $P713
-    .const 'Sub' $P666 = "44_1261019360.92342" 
+    .const 'Sub' $P666 = "44_1261064016.27984" 
     capture_lex $P666
-    .const 'Sub' $P649 = "43_1261019360.92342" 
+    .const 'Sub' $P649 = "43_1261064016.27984" 
     capture_lex $P649
-    .const 'Sub' $P634 = "42_1261019360.92342" 
+    .const 'Sub' $P634 = "42_1261064016.27984" 
     capture_lex $P634
-    .const 'Sub' $P619 = "41_1261019360.92342" 
+    .const 'Sub' $P619 = "41_1261064016.27984" 
     capture_lex $P619
-    .const 'Sub' $P593 = "40_1261019360.92342" 
+    .const 'Sub' $P593 = "40_1261064016.27984" 
     capture_lex $P593
-    .const 'Sub' $P543 = "38_1261019360.92342" 
+    .const 'Sub' $P543 = "38_1261064016.27984" 
     capture_lex $P543
-    .const 'Sub' $P475 = "36_1261019360.92342" 
+    .const 'Sub' $P475 = "36_1261064016.27984" 
     capture_lex $P475
-    .const 'Sub' $P420 = "33_1261019360.92342" 
+    .const 'Sub' $P420 = "33_1261064016.27984" 
     capture_lex $P420
-    .const 'Sub' $P405 = "32_1261019360.92342" 
+    .const 'Sub' $P405 = "32_1261064016.27984" 
     capture_lex $P405
-    .const 'Sub' $P379 = "30_1261019360.92342" 
+    .const 'Sub' $P379 = "30_1261064016.27984" 
     capture_lex $P379
-    .const 'Sub' $P362 = "29_1261019360.92342" 
+    .const 'Sub' $P362 = "29_1261064016.27984" 
     capture_lex $P362
-    .const 'Sub' $P340 = "28_1261019360.92342" 
+    .const 'Sub' $P340 = "28_1261064016.27984" 
     capture_lex $P340
-    .const 'Sub' $P308 = "27_1261019360.92342" 
+    .const 'Sub' $P308 = "27_1261064016.27984" 
     capture_lex $P308
-    .const 'Sub' $P54 = "14_1261019360.92342" 
+    .const 'Sub' $P54 = "14_1261064016.27984" 
     capture_lex $P54
-    .const 'Sub' $P21 = "13_1261019360.92342" 
+    .const 'Sub' $P21 = "13_1261064016.27984" 
     capture_lex $P21
-    .const 'Sub' $P16 = "12_1261019360.92342" 
+    .const 'Sub' $P16 = "12_1261064016.27984" 
     capture_lex $P16
     get_global $P15, "@MODIFIERS"
     unless_null $P15, vivify_90
@@ -7294,23 +7294,23 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     set_global "@MODIFIERS", $P15
   vivify_90:
 .annotate "line", 6
-    .const 'Sub' $P16 = "12_1261019360.92342" 
+    .const 'Sub' $P16 = "12_1261064016.27984" 
     capture_lex $P16
     .lex "INIT", $P16
 .annotate "line", 475
-    .const 'Sub' $P21 = "13_1261019360.92342" 
+    .const 'Sub' $P21 = "13_1261064016.27984" 
     capture_lex $P21
     .lex "buildsub", $P21
 .annotate "line", 492
-    .const 'Sub' $P54 = "14_1261019360.92342" 
+    .const 'Sub' $P54 = "14_1261064016.27984" 
     capture_lex $P54
     .lex "capnames", $P54
 .annotate "line", 558
-    .const 'Sub' $P308 = "27_1261019360.92342" 
+    .const 'Sub' $P308 = "27_1261064016.27984" 
     capture_lex $P308
     .lex "backmod", $P308
 .annotate "line", 565
-    .const 'Sub' $P340 = "28_1261019360.92342" 
+    .const 'Sub' $P340 = "28_1261064016.27984" 
     capture_lex $P340
     .lex "subrule_alias", $P340
 .annotate "line", 4
@@ -7327,7 +7327,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "INIT"  :subid("12_1261019360.92342") :outer("11_1261019360.92342")
+.sub "INIT"  :subid("12_1261064016.27984") :outer("11_1261064016.27984")
 .annotate "line", 6
     new $P18, 'ExceptionHandler'
     set_addr $P18, control_17
@@ -7351,7 +7351,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "buildsub"  :subid("13_1261019360.92342") :outer("11_1261019360.92342")
+.sub "buildsub"  :subid("13_1261064016.27984") :outer("11_1261064016.27984")
     .param pmc param_24
     .param pmc param_25 :optional
     .param int has_param_25 :opt_flag
@@ -7428,19 +7428,19 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "capnames"  :subid("14_1261019360.92342") :outer("11_1261019360.92342")
+.sub "capnames"  :subid("14_1261064016.27984") :outer("11_1261064016.27984")
     .param pmc param_57
     .param pmc param_58
 .annotate "line", 492
-    .const 'Sub' $P283 = "25_1261019360.92342" 
+    .const 'Sub' $P283 = "25_1261064016.27984" 
     capture_lex $P283
-    .const 'Sub' $P220 = "22_1261019360.92342" 
+    .const 'Sub' $P220 = "22_1261064016.27984" 
     capture_lex $P220
-    .const 'Sub' $P178 = "20_1261019360.92342" 
+    .const 'Sub' $P178 = "20_1261064016.27984" 
     capture_lex $P178
-    .const 'Sub' $P136 = "18_1261019360.92342" 
+    .const 'Sub' $P136 = "18_1261064016.27984" 
     capture_lex $P136
-    .const 'Sub' $P69 = "15_1261019360.92342" 
+    .const 'Sub' $P69 = "15_1261064016.27984" 
     capture_lex $P69
     new $P56, 'ExceptionHandler'
     set_addr $P56, control_55
@@ -7496,21 +7496,21 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     set $S280, $P279
     iseq $I281, $S280, "quant"
     unless $I281, if_278_end
-    .const 'Sub' $P283 = "25_1261019360.92342" 
+    .const 'Sub' $P283 = "25_1261064016.27984" 
     capture_lex $P283
     $P283()
   if_278_end:
     goto if_215_end
   if_215:
 .annotate "line", 530
-    .const 'Sub' $P220 = "22_1261019360.92342" 
+    .const 'Sub' $P220 = "22_1261064016.27984" 
     capture_lex $P220
     $P220()
   if_215_end:
     goto if_168_end
   if_168:
 .annotate "line", 517
-    .const 'Sub' $P178 = "20_1261019360.92342" 
+    .const 'Sub' $P178 = "20_1261064016.27984" 
     capture_lex $P178
     $P178()
   if_168_end:
@@ -7530,7 +7530,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P130, loop165_done
     shift $P134, $P130
   loop165_redo:
-    .const 'Sub' $P136 = "18_1261019360.92342" 
+    .const 'Sub' $P136 = "18_1261064016.27984" 
     capture_lex $P136
     $P136($P134)
   loop165_next:
@@ -7549,7 +7549,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     goto if_64_end
   if_64:
 .annotate "line", 495
-    .const 'Sub' $P69 = "15_1261019360.92342" 
+    .const 'Sub' $P69 = "15_1261064016.27984" 
     capture_lex $P69
     $P69()
   if_64_end:
@@ -7573,9 +7573,9 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block282"  :anon :subid("25_1261019360.92342") :outer("14_1261019360.92342")
+.sub "_block282"  :anon :subid("25_1261064016.27984") :outer("14_1261064016.27984")
 .annotate "line", 547
-    .const 'Sub' $P294 = "26_1261019360.92342" 
+    .const 'Sub' $P294 = "26_1261064016.27984" 
     capture_lex $P294
 .annotate "line", 548
     new $P284, "Hash"
@@ -7604,7 +7604,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P289, loop299_done
     shift $P292, $P289
   loop299_redo:
-    .const 'Sub' $P294 = "26_1261019360.92342" 
+    .const 'Sub' $P294 = "26_1261064016.27984" 
     capture_lex $P294
     $P294($P292)
   loop299_next:
@@ -7634,7 +7634,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block293"  :anon :subid("26_1261019360.92342") :outer("25_1261019360.92342")
+.sub "_block293"  :anon :subid("26_1261064016.27984") :outer("25_1261064016.27984")
     .param pmc param_295
 .annotate "line", 549
     .lex "$_", param_295
@@ -7654,11 +7654,11 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block219"  :anon :subid("22_1261019360.92342") :outer("14_1261019360.92342")
+.sub "_block219"  :anon :subid("22_1261064016.27984") :outer("14_1261064016.27984")
 .annotate "line", 530
-    .const 'Sub' $P260 = "24_1261019360.92342" 
+    .const 'Sub' $P260 = "24_1261064016.27984" 
     capture_lex $P260
-    .const 'Sub' $P232 = "23_1261019360.92342" 
+    .const 'Sub' $P232 = "23_1261064016.27984" 
     capture_lex $P232
 .annotate "line", 531
     new $P221, "Undef"
@@ -7693,7 +7693,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P227, loop248_done
     shift $P230, $P227
   loop248_redo:
-    .const 'Sub' $P232 = "23_1261019360.92342" 
+    .const 'Sub' $P232 = "23_1261064016.27984" 
     capture_lex $P232
     $P232($P230)
   loop248_next:
@@ -7732,7 +7732,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P255, loop273_done
     shift $P258, $P255
   loop273_redo:
-    .const 'Sub' $P260 = "24_1261019360.92342" 
+    .const 'Sub' $P260 = "24_1261064016.27984" 
     capture_lex $P260
     $P260($P258)
   loop273_next:
@@ -7762,7 +7762,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block231"  :anon :subid("23_1261019360.92342") :outer("22_1261019360.92342")
+.sub "_block231"  :anon :subid("23_1261064016.27984") :outer("22_1261064016.27984")
     .param pmc param_233
 .annotate "line", 537
     .lex "$_", param_233
@@ -7802,7 +7802,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block259"  :anon :subid("24_1261019360.92342") :outer("22_1261019360.92342")
+.sub "_block259"  :anon :subid("24_1261064016.27984") :outer("22_1261064016.27984")
     .param pmc param_261
 .annotate "line", 542
     .lex "$_", param_261
@@ -7842,9 +7842,9 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block177"  :anon :subid("20_1261019360.92342") :outer("14_1261019360.92342")
+.sub "_block177"  :anon :subid("20_1261064016.27984") :outer("14_1261064016.27984")
 .annotate "line", 517
-    .const 'Sub' $P196 = "21_1261019360.92342" 
+    .const 'Sub' $P196 = "21_1261064016.27984" 
     capture_lex $P196
 .annotate "line", 518
     new $P179, "Undef"
@@ -7887,7 +7887,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P191, loop212_done
     shift $P194, $P191
   loop212_redo:
-    .const 'Sub' $P196 = "21_1261019360.92342" 
+    .const 'Sub' $P196 = "21_1261064016.27984" 
     capture_lex $P196
     $P196($P194)
   loop212_next:
@@ -7907,7 +7907,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block195"  :anon :subid("21_1261019360.92342") :outer("20_1261019360.92342")
+.sub "_block195"  :anon :subid("21_1261064016.27984") :outer("20_1261064016.27984")
     .param pmc param_197
 .annotate "line", 525
     .lex "$_", param_197
@@ -7947,10 +7947,10 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block135"  :anon :subid("18_1261019360.92342") :outer("14_1261019360.92342")
+.sub "_block135"  :anon :subid("18_1261064016.27984") :outer("14_1261064016.27984")
     .param pmc param_138
 .annotate "line", 509
-    .const 'Sub' $P147 = "19_1261019360.92342" 
+    .const 'Sub' $P147 = "19_1261064016.27984" 
     capture_lex $P147
 .annotate "line", 510
     new $P137, "Hash"
@@ -7973,7 +7973,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P142, loop160_done
     shift $P145, $P142
   loop160_redo:
-    .const 'Sub' $P147 = "19_1261019360.92342" 
+    .const 'Sub' $P147 = "19_1261064016.27984" 
     capture_lex $P147
     $P147($P145)
   loop160_next:
@@ -8003,7 +8003,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block146"  :anon :subid("19_1261019360.92342") :outer("18_1261019360.92342")
+.sub "_block146"  :anon :subid("19_1261064016.27984") :outer("18_1261064016.27984")
     .param pmc param_148
 .annotate "line", 511
     .lex "$_", param_148
@@ -8043,9 +8043,9 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block68"  :anon :subid("15_1261019360.92342") :outer("14_1261019360.92342")
+.sub "_block68"  :anon :subid("15_1261064016.27984") :outer("14_1261064016.27984")
 .annotate "line", 495
-    .const 'Sub' $P78 = "16_1261019360.92342" 
+    .const 'Sub' $P78 = "16_1261064016.27984" 
     capture_lex $P78
 .annotate "line", 496
     new $P70, "Undef"
@@ -8066,7 +8066,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P72, loop122_done
     shift $P76, $P72
   loop122_redo:
-    .const 'Sub' $P78 = "16_1261019360.92342" 
+    .const 'Sub' $P78 = "16_1261064016.27984" 
     capture_lex $P78
     $P78($P76)
   loop122_next:
@@ -8089,10 +8089,10 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block77"  :anon :subid("16_1261019360.92342") :outer("15_1261019360.92342")
+.sub "_block77"  :anon :subid("16_1261064016.27984") :outer("15_1261064016.27984")
     .param pmc param_80
 .annotate "line", 497
-    .const 'Sub' $P89 = "17_1261019360.92342" 
+    .const 'Sub' $P89 = "17_1261064016.27984" 
     capture_lex $P89
 .annotate "line", 498
     new $P79, "Hash"
@@ -8115,7 +8115,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P84, loop109_done
     shift $P87, $P84
   loop109_redo:
-    .const 'Sub' $P89 = "17_1261019360.92342" 
+    .const 'Sub' $P89 = "17_1261064016.27984" 
     capture_lex $P89
     $P89($P87)
   loop109_next:
@@ -8164,7 +8164,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block88"  :anon :subid("17_1261019360.92342") :outer("16_1261019360.92342")
+.sub "_block88"  :anon :subid("17_1261064016.27984") :outer("16_1261064016.27984")
     .param pmc param_90
 .annotate "line", 499
     .lex "$_", param_90
@@ -8223,7 +8223,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "backmod"  :subid("27_1261019360.92342") :outer("11_1261019360.92342")
+.sub "backmod"  :subid("27_1261064016.27984") :outer("11_1261064016.27984")
     .param pmc param_311
     .param pmc param_312
 .annotate "line", 558
@@ -8297,7 +8297,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "subrule_alias"  :subid("28_1261019360.92342") :outer("11_1261019360.92342")
+.sub "subrule_alias"  :subid("28_1261064016.27984") :outer("11_1261064016.27984")
     .param pmc param_343
     .param pmc param_344
 .annotate "line", 565
@@ -8341,7 +8341,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "arg"  :subid("29_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "arg"  :subid("29_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_365
 .annotate "line", 14
     new $P364, 'ExceptionHandler'
@@ -8397,10 +8397,10 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "arglist"  :subid("30_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "arglist"  :subid("30_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_382
 .annotate "line", 18
-    .const 'Sub' $P392 = "31_1261019360.92342" 
+    .const 'Sub' $P392 = "31_1261064016.27984" 
     capture_lex $P392
     new $P381, 'ExceptionHandler'
     set_addr $P381, control_380
@@ -8434,7 +8434,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P386, loop398_done
     shift $P390, $P386
   loop398_redo:
-    .const 'Sub' $P392 = "31_1261019360.92342" 
+    .const 'Sub' $P392 = "31_1261064016.27984" 
     capture_lex $P392
     $P392($P390)
   loop398_next:
@@ -8463,7 +8463,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block391"  :anon :subid("31_1261019360.92342") :outer("30_1261019360.92342")
+.sub "_block391"  :anon :subid("31_1261064016.27984") :outer("30_1261064016.27984")
     .param pmc param_393
 .annotate "line", 20
     .lex "$_", param_393
@@ -8476,7 +8476,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "TOP"  :subid("32_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "TOP"  :subid("32_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_408
 .annotate "line", 24
     new $P407, 'ExceptionHandler'
@@ -8518,14 +8518,14 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "nibbler"  :subid("33_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "nibbler"  :subid("33_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_423
     .param pmc param_424 :optional
     .param int has_param_424 :opt_flag
 .annotate "line", 30
-    .const 'Sub' $P458 = "35_1261019360.92342" 
+    .const 'Sub' $P458 = "35_1261064016.27984" 
     capture_lex $P458
-    .const 'Sub' $P432 = "34_1261019360.92342" 
+    .const 'Sub' $P432 = "34_1261064016.27984" 
     capture_lex $P432
     new $P422, 'ExceptionHandler'
     set_addr $P422, control_421
@@ -8546,7 +8546,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     set $S429, $P428
     iseq $I430, $S429, "open"
     unless $I430, if_427_end
-    .const 'Sub' $P432 = "34_1261019360.92342" 
+    .const 'Sub' $P432 = "34_1261064016.27984" 
     capture_lex $P432
     $P432()
   if_427_end:
@@ -8609,7 +8609,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P452, loop464_done
     shift $P456, $P452
   loop464_redo:
-    .const 'Sub' $P458 = "35_1261019360.92342" 
+    .const 'Sub' $P458 = "35_1261064016.27984" 
     capture_lex $P458
     $P458($P456)
   loop464_next:
@@ -8639,7 +8639,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block431"  :anon :subid("34_1261019360.92342") :outer("33_1261019360.92342")
+.sub "_block431"  :anon :subid("34_1261064016.27984") :outer("33_1261064016.27984")
 .annotate "line", 32
     new $P433, "Hash"
     .lex "%old", $P433
@@ -8679,7 +8679,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block457"  :anon :subid("35_1261019360.92342") :outer("33_1261019360.92342")
+.sub "_block457"  :anon :subid("35_1261064016.27984") :outer("33_1261064016.27984")
     .param pmc param_459
 .annotate "line", 45
     .lex "$_", param_459
@@ -8694,10 +8694,10 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "termish"  :subid("36_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "termish"  :subid("36_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_478
 .annotate "line", 55
-    .const 'Sub' $P491 = "37_1261019360.92342" 
+    .const 'Sub' $P491 = "37_1261064016.27984" 
     capture_lex $P491
     new $P477, 'ExceptionHandler'
     set_addr $P477, control_476
@@ -8740,7 +8740,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P485, loop536_done
     shift $P489, $P485
   loop536_redo:
-    .const 'Sub' $P491 = "37_1261019360.92342" 
+    .const 'Sub' $P491 = "37_1261064016.27984" 
     capture_lex $P491
     $P491($P489)
   loop536_next:
@@ -8769,7 +8769,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block490"  :anon :subid("37_1261019360.92342") :outer("36_1261019360.92342")
+.sub "_block490"  :anon :subid("37_1261064016.27984") :outer("36_1261064016.27984")
     .param pmc param_493
 .annotate "line", 59
     new $P492, "Undef"
@@ -8896,10 +8896,10 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "quantified_atom"  :subid("38_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "quantified_atom"  :subid("38_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_546
 .annotate "line", 76
-    .const 'Sub' $P555 = "39_1261019360.92342" 
+    .const 'Sub' $P555 = "39_1261064016.27984" 
     capture_lex $P555
     new $P545, 'ExceptionHandler'
     set_addr $P545, control_544
@@ -8962,7 +8962,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     goto if_551_end
   if_551:
 .annotate "line", 78
-    .const 'Sub' $P555 = "39_1261019360.92342" 
+    .const 'Sub' $P555 = "39_1261064016.27984" 
     capture_lex $P555
     $P555()
   if_551_end:
@@ -9016,7 +9016,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block554"  :anon :subid("39_1261019360.92342") :outer("38_1261019360.92342")
+.sub "_block554"  :anon :subid("39_1261064016.27984") :outer("38_1261064016.27984")
 .annotate "line", 80
     new $P556, "Undef"
     .lex "$qast", $P556
@@ -9055,7 +9055,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "atom"  :subid("40_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "atom"  :subid("40_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_596
 .annotate "line", 91
     new $P595, 'ExceptionHandler'
@@ -9133,7 +9133,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "quantifier:sym<*>"  :subid("41_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "quantifier:sym<*>"  :subid("41_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_622
 .annotate "line", 101
     new $P621, 'ExceptionHandler'
@@ -9173,7 +9173,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "quantifier:sym<+>"  :subid("42_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "quantifier:sym<+>"  :subid("42_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_637
 .annotate "line", 106
     new $P636, 'ExceptionHandler'
@@ -9213,7 +9213,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "quantifier:sym<?>"  :subid("43_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "quantifier:sym<?>"  :subid("43_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_652
 .annotate "line", 111
     new $P651, 'ExceptionHandler'
@@ -9257,7 +9257,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "quantifier:sym<**>"  :subid("44_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "quantifier:sym<**>"  :subid("44_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_669
 .annotate "line", 117
     new $P668, 'ExceptionHandler'
@@ -9397,7 +9397,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "metachar:sym<ws>"  :subid("45_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "metachar:sym<ws>"  :subid("45_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_716
 .annotate "line", 131
     new $P715, 'ExceptionHandler'
@@ -9449,7 +9449,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "metachar:sym<[ ]>"  :subid("46_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "metachar:sym<[ ]>"  :subid("46_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_734
 .annotate "line", 140
     new $P733, 'ExceptionHandler'
@@ -9481,7 +9481,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "metachar:sym<( )>"  :subid("47_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "metachar:sym<( )>"  :subid("47_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_744
 .annotate "line", 144
     new $P743, 'ExceptionHandler'
@@ -9529,7 +9529,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "metachar:sym<'>"  :subid("48_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "metachar:sym<'>"  :subid("48_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_762
 .annotate "line", 151
     new $P761, 'ExceptionHandler'
@@ -9585,7 +9585,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "metachar:sym<\">"  :subid("49_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "metachar:sym<\">"  :subid("49_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_785
 .annotate "line", 158
     new $P784, 'ExceptionHandler'
@@ -9641,7 +9641,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "metachar:sym<.>"  :subid("50_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "metachar:sym<.>"  :subid("50_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_808
 .annotate "line", 165
     new $P807, 'ExceptionHandler'
@@ -9672,7 +9672,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "metachar:sym<^>"  :subid("51_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "metachar:sym<^>"  :subid("51_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_820
 .annotate "line", 170
     new $P819, 'ExceptionHandler'
@@ -9703,7 +9703,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "metachar:sym<^^>"  :subid("52_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "metachar:sym<^^>"  :subid("52_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_832
 .annotate "line", 175
     new $P831, 'ExceptionHandler'
@@ -9734,7 +9734,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "metachar:sym<$>"  :subid("53_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "metachar:sym<$>"  :subid("53_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_844
 .annotate "line", 180
     new $P843, 'ExceptionHandler'
@@ -9765,7 +9765,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "metachar:sym<$$>"  :subid("54_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "metachar:sym<$$>"  :subid("54_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_856
 .annotate "line", 185
     new $P855, 'ExceptionHandler'
@@ -9796,7 +9796,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "metachar:sym<:::>"  :subid("55_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "metachar:sym<:::>"  :subid("55_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_868
 .annotate "line", 190
     new $P867, 'ExceptionHandler'
@@ -9827,7 +9827,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "metachar:sym<lwb>"  :subid("56_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "metachar:sym<lwb>"  :subid("56_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_880
 .annotate "line", 195
     new $P879, 'ExceptionHandler'
@@ -9858,7 +9858,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "metachar:sym<rwb>"  :subid("57_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "metachar:sym<rwb>"  :subid("57_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_892
 .annotate "line", 200
     new $P891, 'ExceptionHandler'
@@ -9889,7 +9889,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "metachar:sym<bs>"  :subid("58_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "metachar:sym<bs>"  :subid("58_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_904
 .annotate "line", 205
     new $P903, 'ExceptionHandler'
@@ -9921,7 +9921,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "metachar:sym<mod>"  :subid("59_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "metachar:sym<mod>"  :subid("59_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_914
 .annotate "line", 209
     new $P913, 'ExceptionHandler'
@@ -9953,7 +9953,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "metachar:sym<assert>"  :subid("60_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "metachar:sym<assert>"  :subid("60_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_924
 .annotate "line", 213
     new $P923, 'ExceptionHandler'
@@ -9985,7 +9985,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "metachar:sym<~>"  :subid("61_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "metachar:sym<~>"  :subid("61_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_934
 .annotate "line", 217
     new $P933, 'ExceptionHandler'
@@ -10047,7 +10047,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "metachar:sym<{*}>"  :subid("62_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "metachar:sym<{*}>"  :subid("62_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_956
 .annotate "line", 230
     new $P955, 'ExceptionHandler'
@@ -10108,7 +10108,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "metachar:sym<var>"  :subid("63_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "metachar:sym<var>"  :subid("63_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_977
 .annotate "line", 237
     new $P976, 'ExceptionHandler'
@@ -10268,7 +10268,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "metachar:sym<PIR>"  :subid("64_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "metachar:sym<PIR>"  :subid("64_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_1033
 .annotate "line", 257
     new $P1032, 'ExceptionHandler'
@@ -10307,7 +10307,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "backslash:sym<w>"  :subid("65_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "backslash:sym<w>"  :subid("65_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_1048
 .annotate "line", 265
     new $P1047, 'ExceptionHandler'
@@ -10373,7 +10373,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "backslash:sym<b>"  :subid("66_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "backslash:sym<b>"  :subid("66_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_1072
 .annotate "line", 271
     new $P1071, 'ExceptionHandler'
@@ -10416,7 +10416,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "backslash:sym<e>"  :subid("67_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "backslash:sym<e>"  :subid("67_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_1088
 .annotate "line", 277
     new $P1087, 'ExceptionHandler'
@@ -10459,7 +10459,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "backslash:sym<f>"  :subid("68_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "backslash:sym<f>"  :subid("68_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_1104
 .annotate "line", 283
     new $P1103, 'ExceptionHandler'
@@ -10502,7 +10502,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "backslash:sym<h>"  :subid("69_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "backslash:sym<h>"  :subid("69_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_1120
 .annotate "line", 289
     new $P1119, 'ExceptionHandler'
@@ -10545,7 +10545,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "backslash:sym<r>"  :subid("70_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "backslash:sym<r>"  :subid("70_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_1136
 .annotate "line", 295
     new $P1135, 'ExceptionHandler'
@@ -10588,7 +10588,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "backslash:sym<t>"  :subid("71_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "backslash:sym<t>"  :subid("71_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_1152
 .annotate "line", 301
     new $P1151, 'ExceptionHandler'
@@ -10631,7 +10631,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "backslash:sym<v>"  :subid("72_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "backslash:sym<v>"  :subid("72_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_1168
 .annotate "line", 307
     new $P1167, 'ExceptionHandler'
@@ -10674,7 +10674,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "backslash:sym<o>"  :subid("73_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "backslash:sym<o>"  :subid("73_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_1184
 .annotate "line", 314
     new $P1183, 'ExceptionHandler'
@@ -10757,7 +10757,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "backslash:sym<x>"  :subid("74_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "backslash:sym<x>"  :subid("74_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_1215
 .annotate "line", 323
     new $P1214, 'ExceptionHandler'
@@ -10840,7 +10840,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "backslash:sym<misc>"  :subid("75_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "backslash:sym<misc>"  :subid("75_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_1246
 .annotate "line", 332
     new $P1245, 'ExceptionHandler'
@@ -10873,7 +10873,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "assertion:sym<?>"  :subid("76_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "assertion:sym<?>"  :subid("76_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_1260
 .annotate "line", 338
     new $P1259, 'ExceptionHandler'
@@ -10933,7 +10933,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "assertion:sym<!>"  :subid("77_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "assertion:sym<!>"  :subid("77_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_1278
 .annotate "line", 348
     new $P1277, 'ExceptionHandler'
@@ -11001,7 +11001,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "assertion:sym<method>"  :subid("78_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "assertion:sym<method>"  :subid("78_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_1302
 .annotate "line", 361
     new $P1301, 'ExceptionHandler'
@@ -11044,12 +11044,12 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "assertion:sym<name>"  :subid("79_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "assertion:sym<name>"  :subid("79_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_1316
 .annotate "line", 368
-    .const 'Sub' $P1374 = "81_1261019360.92342" 
+    .const 'Sub' $P1374 = "81_1261064016.27984" 
     capture_lex $P1374
-    .const 'Sub' $P1338 = "80_1261019360.92342" 
+    .const 'Sub' $P1338 = "80_1261064016.27984" 
     capture_lex $P1338
     new $P1315, 'ExceptionHandler'
     set_addr $P1315, control_1314
@@ -11145,7 +11145,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P1365, loop1379_done
     shift $P1372, $P1365
   loop1379_redo:
-    .const 'Sub' $P1374 = "81_1261019360.92342" 
+    .const 'Sub' $P1374 = "81_1261064016.27984" 
     capture_lex $P1374
     $P1374($P1372)
   loop1379_next:
@@ -11185,7 +11185,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     goto if_1333_end
   if_1333:
 .annotate "line", 375
-    .const 'Sub' $P1338 = "80_1261019360.92342" 
+    .const 'Sub' $P1338 = "80_1261064016.27984" 
     capture_lex $P1338
     $P1338()
   if_1333_end:
@@ -11226,7 +11226,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block1373"  :anon :subid("81_1261019360.92342") :outer("79_1261019360.92342")
+.sub "_block1373"  :anon :subid("81_1261064016.27984") :outer("79_1261064016.27984")
     .param pmc param_1375
 .annotate "line", 397
     .lex "$_", param_1375
@@ -11238,7 +11238,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block1337"  :anon :subid("80_1261019360.92342") :outer("79_1261019360.92342")
+.sub "_block1337"  :anon :subid("80_1261064016.27984") :outer("79_1261064016.27984")
 .annotate "line", 376
     new $P1339, "Undef"
     .lex "$regexsym", $P1339
@@ -11269,10 +11269,10 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "assertion:sym<[>"  :subid("82_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "assertion:sym<[>"  :subid("82_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_1389
 .annotate "line", 403
-    .const 'Sub' $P1424 = "83_1261019360.92342" 
+    .const 'Sub' $P1424 = "83_1261064016.27984" 
     capture_lex $P1424
     new $P1388, 'ExceptionHandler'
     set_addr $P1388, control_1387
@@ -11364,7 +11364,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     islt $I1422, $N1419, $N1421
     unless $I1422, loop1447_done
   loop1447_redo:
-    .const 'Sub' $P1424 = "83_1261019360.92342" 
+    .const 'Sub' $P1424 = "83_1261064016.27984" 
     capture_lex $P1424
     $P1424()
   loop1447_next:
@@ -11392,7 +11392,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block1423"  :anon :subid("83_1261019360.92342") :outer("82_1261019360.92342")
+.sub "_block1423"  :anon :subid("83_1261064016.27984") :outer("82_1261064016.27984")
 .annotate "line", 417
     new $P1425, "Undef"
     .lex "$ast", $P1425
@@ -11443,12 +11443,12 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "cclass_elem"  :subid("84_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "cclass_elem"  :subid("84_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_1457
 .annotate "line", 430
-    .const 'Sub' $P1482 = "86_1261019360.92342" 
+    .const 'Sub' $P1482 = "86_1261064016.27984" 
     capture_lex $P1482
-    .const 'Sub' $P1466 = "85_1261019360.92342" 
+    .const 'Sub' $P1466 = "85_1261064016.27984" 
     capture_lex $P1466
     new $P1456, 'ExceptionHandler'
     set_addr $P1456, control_1455
@@ -11497,7 +11497,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     unless $P1476, loop1507_done
     shift $P1480, $P1476
   loop1507_redo:
-    .const 'Sub' $P1482 = "86_1261019360.92342" 
+    .const 'Sub' $P1482 = "86_1261064016.27984" 
     capture_lex $P1482
     $P1482($P1480)
   loop1507_next:
@@ -11521,7 +11521,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
     goto if_1462_end
   if_1462:
 .annotate "line", 433
-    .const 'Sub' $P1466 = "85_1261019360.92342" 
+    .const 'Sub' $P1466 = "85_1261064016.27984" 
     capture_lex $P1466
     $P1466()
   if_1462_end:
@@ -11553,10 +11553,10 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block1481"  :anon :subid("86_1261019360.92342") :outer("84_1261019360.92342")
+.sub "_block1481"  :anon :subid("86_1261064016.27984") :outer("84_1261064016.27984")
     .param pmc param_1483
 .annotate "line", 437
-    .const 'Sub' $P1489 = "87_1261019360.92342" 
+    .const 'Sub' $P1489 = "87_1261064016.27984" 
     capture_lex $P1489
     .lex "$_", param_1483
 .annotate "line", 438
@@ -11585,7 +11585,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 .annotate "line", 438
     goto if_1485_end
   if_1485:
-    .const 'Sub' $P1489 = "87_1261019360.92342" 
+    .const 'Sub' $P1489 = "87_1261064016.27984" 
     capture_lex $P1489
     $P1502 = $P1489()
     set $P1484, $P1502
@@ -11596,7 +11596,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block1488"  :anon :subid("87_1261019360.92342") :outer("86_1261019360.92342")
+.sub "_block1488"  :anon :subid("87_1261064016.27984") :outer("86_1261064016.27984")
 .annotate "line", 439
     new $P1490, "Undef"
     .lex "$a", $P1490
@@ -11660,7 +11660,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block1465"  :anon :subid("85_1261019360.92342") :outer("84_1261019360.92342")
+.sub "_block1465"  :anon :subid("85_1261064016.27984") :outer("84_1261064016.27984")
 .annotate "line", 434
     new $P1467, "Undef"
     .lex "$name", $P1467
@@ -11688,7 +11688,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "mod_internal"  :subid("88_1261019360.92342") :method :outer("11_1261019360.92342")
+.sub "mod_internal"  :subid("88_1261064016.27984") :method :outer("11_1261064016.27984")
     .param pmc param_1526
 .annotate "line", 468
     new $P1525, 'ExceptionHandler'

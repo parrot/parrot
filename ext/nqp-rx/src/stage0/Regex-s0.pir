@@ -2874,7 +2874,7 @@ second child of this node.
 
     .local pmc cur, pos, eos, tgt, fail, off
     (cur, pos, eos, tgt, fail, off) = self.'!rxregs'('cur pos eos tgt fail off')
-    .local pmc ops, cpast, cpost, lpast, lpost
+    .local pmc ops, lpast, lpost
     ops = self.'post_new'('Ops', 'node'=>node, 'result'=>cur)
 
     .local string subtype
@@ -2904,6 +2904,7 @@ second child of this node.
     $S0 = downcase $S0
     lpast = box $S0
   lpast_const:
+    unless lpast > '' goto done
     lpost = self.'as_post'(lpast, 'rtype'=>'~')
   lpast_done:
 
@@ -2920,8 +2921,6 @@ second child of this node.
     $S0 = lpast
     $I0 = length $S0
     litlen = $I0
-    if $I0 > 0 goto have_litlen
-    .return (cpost)
   have_litlen:
 
     # fail if there aren't enough characters left in string
@@ -2938,6 +2937,7 @@ second child of this node.
 
     # increase position by literal length and move on
     ops.'push_pirop'('add', pos, litlen)
+  done:
     .return (ops)
 .end
 
