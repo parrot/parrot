@@ -2407,6 +2407,29 @@ Same options as install.
 
 .sub '_plumage' :anon
     .param pmc kv :slurpy :named
+    $S0 = get_plumage(kv :flat :named)
+    $S1 = mk_plumage(kv :flat :named)
+    $I0 = file_exists($S0)
+    unless $I0 goto L1
+    print $S1
+    goto L2
+  L1:
+    $S2 = dirname($S0)
+    mkpath($S2, 1 :named('verbose'))
+    spew($S0, $S1, 1 :named('verbose'))
+  L2:
+.end
+
+.sub 'get_plumage'
+    .param pmc kv :slurpy :named
+    $S0 = get_name(kv :flat :named)
+    $S0 .= '.json'
+    $S0 = 'ports/plumage/' . $S0
+    .return ($S0)
+.end
+
+.sub 'mk_plumage' :anon
+    .param pmc kv :slurpy :named
 
     .local string name
     name = get_name(kv :flat :named)
@@ -2542,7 +2565,7 @@ Same options as install.
 }
 TEMPLATE
     $S0 = sprintf $S0, $P0
-    print $S0
+    .return ($S0)
 .end
 
 .sub '_json_escape' :anon
