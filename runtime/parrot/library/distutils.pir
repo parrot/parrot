@@ -2634,6 +2634,21 @@ array of pathname or a single pathname
 
 .sub '_manifest' :anon
     .param pmc kv :slurpy :named
+
+    $S0 = ''
+    $I0 = file_exists('MANIFEST')
+    unless $I0 goto L1
+    $S0 = slurp('MANIFEST')
+  L1:
+
+    $S1 = mk_manifest()
+    unless $S0 != $S1 goto L2
+    spew('MANIFEST', $S1, 1 :named('verbose'))
+  L2:
+.end
+
+.sub 'mk_manifest' :anon
+    .param pmc kv :slurpy :named
     .local pmc needed, generated
     needed = new 'Hash'
     generated = new 'Hash'
@@ -2730,7 +2745,7 @@ array of pathname or a single pathname
 
     $P0.'sort'()
     $S0 = join "\n", $P0
-    spew('MANIFEST', $S0)
+    .return ($S0)
 .end
 
 .sub '_manifest_add_hash' :anon
@@ -2831,15 +2846,20 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     .param pmc kv :slurpy :named
     run_step('manifest', kv :flat :named)
 
-    $S0 = get_tarname('.tar', kv :flat :named)
-
+    $S0 = slurp('MANIFEST')
+    $P0 = split "\n", $S0
+    $S0 = get_tarname('.tar.gz', kv :flat :named)
+    $I0 = newer($S0, $P0)
+    if $I0 goto L1
     .local string cmd
+    $S0 = get_tarname('.tar', kv :flat :named)
     cmd = 'tar -cvf ' . $S0
     cmd .= ' -T MANIFEST'
     system(cmd, 1 :named('verbose'))
 
     cmd = 'gzip --best ' . $S0
     system(cmd, 1 :named('verbose'))
+  L1:
 .end
 
 .sub '_clean_gztar' :anon
@@ -2872,15 +2892,20 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     .param pmc kv :slurpy :named
     run_step('manifest', kv :flat :named)
 
-    $S0 = get_tarname('.tar', kv :flat :named)
-
+    $S0 = slurp('MANIFEST')
+    $P0 = split "\n", $S0
+    $S0 = get_tarname('.tar.bz2', kv :flat :named)
+    $I0 = newer($S0, $P0)
+    if $I0 goto L1
     .local string cmd
+    $S0 = get_tarname('.tar', kv :flat :named)
     cmd = 'tar -cvf ' . $S0
     cmd .= ' -T MANIFEST'
     system(cmd, 1 :named('verbose'))
 
     cmd = 'bzip2 ' . $S0
     system(cmd, 1 :named('verbose'))
+  L1:
 .end
 
 .sub '_clean_bztar' :anon
@@ -2899,18 +2924,22 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     .param pmc kv :slurpy :named
     run_step('manifest', kv :flat :named)
 
+    $S0 = slurp('MANIFEST')
+    $P0 = split "\n", $S0
     $S0 = get_tarname('.zip', kv :flat :named)
-
+    $I0 = newer($S0, $P0)
+    if $I0 goto L1
     .local string cmd
     cmd = 'cat'
     $P0 = get_config()
     $S1 = $P0['osname']
-    unless $S1 == 'MSWin32' goto L1
+    unless $S1 == 'MSWin32' goto L2
     cmd = 'type'
-  L1:
+  L2:
     cmd .= ' MANIFEST | zip -9 -@ '
     cmd .= $S0
     system(cmd, 1 :named('verbose'))
+  L1:
 .end
 
 .sub '_clean_zip' :anon
