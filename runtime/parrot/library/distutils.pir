@@ -2641,7 +2641,7 @@ array of pathname or a single pathname
     $S0 = slurp('MANIFEST')
   L1:
 
-    $S1 = mk_manifest()
+    $S1 = mk_manifest(kv :flat :named)
     unless $S0 != $S1 goto L2
     spew('MANIFEST', $S1, 1 :named('verbose'))
   L2:
@@ -2851,13 +2851,19 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     $S0 = get_tarname('.tar.gz', kv :flat :named)
     $I0 = newer($S0, $P0)
     if $I0 goto L1
+    $S0 = get_tarname('', kv :flat :named)
+    copy_sdist($S0, $P0)
+
     .local string cmd
-    $S0 = get_tarname('.tar', kv :flat :named)
     cmd = 'tar -cvf ' . $S0
-    cmd .= ' -T MANIFEST'
+    cmd .= '.tar '
+    cmd .= $S0
     system(cmd, 1 :named('verbose'))
 
+    rmtree($S0)
+
     cmd = 'gzip --best ' . $S0
+    cmd .= '.tar'
     system(cmd, 1 :named('verbose'))
   L1:
 .end
@@ -2868,6 +2874,21 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     $S0 = get_tarname('.tar.gz', kv :flat :named)
     unlink($S0, 1 :named('verbose'))
     unlink('MANIFEST', 1 :named('verbose'))
+.end
+
+.sub 'copy_sdist'
+    .param string dirname
+    .param pmc files
+    mkdir(dirname)
+    $S1 = dirname . "/"
+    $P0 = iter files
+  L1:
+    unless $P0 goto L2
+    $S0 = shift $P0
+    $S2 = $S1 . $S0
+    install($S0, $S2)
+    goto L1
+  L2:
 .end
 
 .sub 'get_tarname' :anon
@@ -2897,13 +2918,19 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     $S0 = get_tarname('.tar.bz2', kv :flat :named)
     $I0 = newer($S0, $P0)
     if $I0 goto L1
+    $S0 = get_tarname('', kv :flat :named)
+    copy_sdist($S0, $P0)
+
     .local string cmd
-    $S0 = get_tarname('.tar', kv :flat :named)
     cmd = 'tar -cvf ' . $S0
-    cmd .= ' -T MANIFEST'
+    cmd .= '.tar '
+    cmd .= $S0
     system(cmd, 1 :named('verbose'))
 
+    rmtree($S0)
+
     cmd = 'bzip2 ' . $S0
+    cmd .= '.tar'
     system(cmd, 1 :named('verbose'))
   L1:
 .end
@@ -2930,15 +2957,16 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     $I0 = newer($S0, $P0)
     if $I0 goto L1
     .local string cmd
-    cmd = 'cat'
-    $P0 = get_config()
-    $S1 = $P0['osname']
-    unless $S1 == 'MSWin32' goto L2
-    cmd = 'type'
-  L2:
-    cmd .= ' MANIFEST | zip -9 -@ '
+    $S0 = get_tarname('', kv :flat :named)
+    copy_sdist($S0, $P0)
+
+    cmd = 'zip -9 -r '
+    cmd .= $S0
+    cmd .= '.zip '
     cmd .= $S0
     system(cmd, 1 :named('verbose'))
+
+    rmtree($S0)
   L1:
 .end
 
@@ -3095,8 +3123,8 @@ Group:          Development/Libraries
 URL:            %s
 Source0:        %s
 BuildRoot:      %%{_tmppath}/%%{name}-%%{version}-%%{release}
-#BuildRequires:  parrot           >= %%parrot_version
-#BuildRequires:  parrot-devel     >= %%parrot_version
+#BuildRequires:  parrot           = %%parrot_version
+#BuildRequires:  parrot-devel     = %%parrot_version
 
 %%description
 %s
@@ -3107,7 +3135,7 @@ BuildRoot:      %%{_tmppath}/%%{name}-%%{version}-%%{release}
 parrot setup.pir
 
 %%install
-parrot setup.pir install
+sudo parrot setup.pir install
 
 %%check
 parrot setup.pir test
@@ -4248,6 +4276,18 @@ SOURCE_C
     unlink($S0, verbose :named('verbose'))
     goto L3
   L2:
+.end
+
+=item rmtree
+
+=cut
+
+.sub 'rmtree'
+    .param string path
+    .param int verbose          :named('verbose') :optional
+    .param int has_verbose      :opt_flag
+    $S0 = 'perl -MExtUtils::Command -e rm_rf ' . path
+    system($S0, verbose :named('verbose'))
 .end
 
 =item basename
