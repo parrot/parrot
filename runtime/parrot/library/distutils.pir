@@ -2394,6 +2394,8 @@ Same options as install.
 
 =item copyright_holder
 
+=item packager
+
 =item generated_by
 
 =item description
@@ -2459,6 +2461,10 @@ Same options as install.
     $S0 = get_value('copyright_holder', kv :flat :named)
     copyright_holder = _json_escape($S0)
 
+    .local string packager
+    $S0 = get_value('packager', "distutils" :named('default'), kv :flat :named)
+    packager = _json_escape($S0)
+
     .local string description
     $S0 = get_value('description', kv :flat :named)
     description = _json_escape($S0)
@@ -2486,7 +2492,7 @@ Same options as install.
     project_uri =get_value('project_uri', kv :flat :named)
 
     $P0 = new 'FixedStringArray'
-    set $P0, 15
+    set $P0, 16
     $P0[0] = name
     $P0[1] = abstract
     $P0[2] = authority
@@ -2494,14 +2500,15 @@ Same options as install.
     $P0[4] = license_type
     $P0[5] = license_uri
     $P0[6] = copyright_holder
-    $P0[7] = keywords
-    $P0[8] = description
-    $P0[9] = name
-    $P0[10] = vcs
+    $P0[7] = packager
+    $P0[8] = keywords
+    $P0[9] = description
+    $P0[10] = name
     $P0[11] = vcs
-    $P0[12] = checkout_uri
-    $P0[13] = browser_uri
-    $P0[14] = project_uri
+    $P0[12] = vcs
+    $P0[13] = checkout_uri
+    $P0[14] = browser_uri
+    $P0[15] = project_uri
 
     $S0 = <<'TEMPLATE'
 {
@@ -2519,7 +2526,7 @@ Same options as install.
             "uri"  : "%s"
         },
         "copyright_holder" : "%s",
-        "generated_by"     : "distutils",
+        "generated_by"     : "%s",
         "keywords"         : [%s],
         "description"      : "%s"
     },
@@ -3030,6 +3037,8 @@ On Windows calls bdist_wininst, otherwise ...
 
 the default value is ports/rpm
 
+=item packager
+
 =back
 
 =cut
@@ -3083,8 +3092,7 @@ the default value is ports/rpm
     release = get_value('release', '1' :named('default'), kv :flat :named)
 
     .local string abstract
-    $S0 = get_value('abstract', kv :flat :named)
-    abstract = _json_escape($S0)
+    abstract = get_value('abstract', kv :flat :named)
 
     .local string license_type
     license_type = get_value('license_type', kv :flat :named)
@@ -3096,8 +3104,10 @@ the default value is ports/rpm
     tarball = get_tarname('.tar.gz', kv :flat :named)
 
     .local string description
-    $S0 = get_value('description', kv :flat :named)
-    description = _json_escape($S0)
+    description = get_value('description', kv :flat :named)
+
+    .local string packager
+    packager = get_value('packager', "you <you@you.org>" :named('default'), kv :flat :named)
 
     $P0 = new 'FixedStringArray'
     set $P0, 9
@@ -3285,7 +3295,9 @@ TEMPLATE
     spec .= $S1
     $S1 = substr $S0, 20
     spec .= $S1
-    spec .= " you <you@you.org>\n- created by distutils\n"
+    spec .= " "
+    spec .= packager
+    spec .= "\n- created by distutils\n"
     .return (spec)
 .end
 
