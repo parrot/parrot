@@ -65,11 +65,11 @@ Update from the repository.
 
 Output a skeleton for Plumage
 
-=item sdist, sdist_gztar, sdist_zip, manifest
+=item sdist, sdist_gztar, sdist_bztar, sdist_zip, sdist_rpm, manifest
 
-Create a source distribution
+Create a source distribution or a source package
 
-=item bdist, bdist_rpm, bdist_wininst, spec
+=item bdist, bdist_rpm, bdist_wininst, spec_rpm
 
 Create a binary package or Windows Installer.
 
@@ -240,6 +240,8 @@ L<http://bitbucket.org/riffraff/shakespeare-parrot/src/tip/setup.pir>
     register_step_after('clean', _clean_html_pod)
     .const 'Sub' _clean_gztar = '_clean_gztar'
     register_step_after('clean', _clean_gztar)
+    .const 'Sub' _clean_bztar = '_clean_bztar'
+    register_step_after('clean', _clean_bztar)
     .const 'Sub' _clean_zip = '_clean_zip'
     register_step_after('clean', _clean_zip)
     .const 'Sub' _clean_smoke = '_clean_smoke'
@@ -285,16 +287,19 @@ L<http://bitbucket.org/riffraff/shakespeare-parrot/src/tip/setup.pir>
     register_step('sdist', _sdist)
     .const 'Sub' _sdist_gztar = '_sdist_gztar'
     register_step('sdist_gztar', _sdist_gztar)
+    .const 'Sub' _sdist_bztar = '_sdist_bztar'
+    register_step('sdist_bztar', _sdist_bztar)
     .const 'Sub' _sdist_zip = '_sdist_zip'
     register_step('sdist_zip', _sdist_zip)
     .const 'Sub' _manifest = '_manifest'
     register_step('manifest', _manifest)
+    .const 'Sub' _sdist_rpm = '_sdist_rpm'
+    register_step('sdist_rpm', _sdist_rpm)
 
     .const 'Sub' _bdist = '_bdist'
     register_step('bdist', _bdist)
-
     .const 'Sub' _spec_rpm = '_spec_rpm'
-    register_step('spec', _spec_rpm)
+    register_step('spec_rpm', _spec_rpm)
     .const 'Sub' _bdist_rpm = '_bdist_rpm'
     register_step('bdist_rpm', _bdist_rpm)
 
@@ -2859,6 +2864,33 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     .return ($S0)
 .end
 
+=head3 Step sdist_bztar
+
+=cut
+
+.sub '_sdist_bztar' :anon
+    .param pmc kv :slurpy :named
+    run_step('manifest', kv :flat :named)
+
+    $S0 = get_tarname('.tar', kv :flat :named)
+
+    .local string cmd
+    cmd = 'tar -cvf ' . $S0
+    cmd .= ' -T MANIFEST'
+    system(cmd, 1 :named('verbose'))
+
+    cmd = 'bzip2 ' . $S0
+    system(cmd, 1 :named('verbose'))
+.end
+
+.sub '_clean_bztar' :anon
+    .param pmc kv :slurpy :named
+
+    $S0 = get_tarname('.tar.bz2', kv :flat :named)
+    unlink($S0, 1 :named('verbose'))
+    unlink('MANIFEST', 1 :named('verbose'))
+.end
+
 =head3 Step sdist_zip
 
 =cut
@@ -2889,6 +2921,26 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     unlink('MANIFEST', 1 :named('verbose'))
 .end
 
+=head3 Step sdist_rpm
+
+=cut
+
+.sub '_sdist_rpm' :anon
+    .param pmc kv :slurpy :named
+    run_step('sdist_gztar', kv :flat :named)
+
+    $S0 = get_spec(kv :flat :named)
+    $I0 = file_exists($S0)
+    if $I0 goto L1
+    $S1 = dirname($S0)
+    mkpath($S1, 1 :named('verbose'))
+    $S1 = mk_spec(kv :flat :named)
+    spew($S0, $S1, 1 :named('verbose'))
+  L1:
+
+    die "not yet rpms"
+.end
+
 =head3 Step bdist
 
 On Windows calls bdist_wininst, otherwise ...
@@ -2905,7 +2957,7 @@ On Windows calls bdist_wininst, otherwise ...
     .tailcall run_step('bdist_rpm', kv :flat :named)
 .end
 
-=head3 Step spec
+=head3 Step spec_rpm
 
 =over 4
 
@@ -3182,6 +3234,7 @@ TEMPLATE
     $S1 = mk_spec(kv :flat :named)
     spew($S0, $S1, 1 :named('verbose'))
   L1:
+
     die "no yet rpm"
 .end
 
