@@ -153,6 +153,8 @@ Introspection interface. C<key> can be:
     current_cont        ... return current Continuation
     current_object      ... return current Object (if in method call)
     current_namespace   ... return current Namespace
+
+Deprecated. Use attribute accessors.
 =cut
 
 */
@@ -190,6 +192,38 @@ Introspection interface. C<key> can be:
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
         return STATICSELF.get_pmc_keyed_str(VTABLE_get_string(INTERP, key));
+    }
+
+    VTABLE PMC *get_attr_str(STRING *key) {
+        Parrot_Context_attributes *ctx = PARROT_CONTEXT(SELF);
+
+        if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "caller_ctx")))
+            return ctx->caller_ctx;
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "lex_pad")))
+            return ctx->lex_pad;
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "outer_ctx")))
+            return ctx->outer_ctx;
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "current_sub")))
+            return ctx->current_sub;
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "current_cont")))
+            return ctx->current_cont;
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "current_object")))
+            return ctx->current_object;
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "current_namespace")))
+            return ctx->current_namespace;
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "handlers")))
+            return ctx->handlers;
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "results_signature")))
+            return ctx->results_signature;
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "current_HLL")))
+            /* This function from src/hash.c. */
+            /* We probably have to move it to more suitable place */
+            return get_integer_pmc(INTERP, ctx->current_HLL);
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "current_hll")))
+            return get_string_pmc(INTERP, Parrot_get_HLL_name(INTERP, ctx->current_HLL));
+
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
+                "No such item %Ss", key);
     }
 
 /*
