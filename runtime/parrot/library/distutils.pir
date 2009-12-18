@@ -2929,6 +2929,12 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     .param pmc kv :slurpy :named
     run_step('sdist_gztar', kv :flat :named)
 
+    .local string cmd
+    $S0 = get_tarname('.tar.gz', kv :flat :named)
+    cmd = "mv " . $S0
+    cmd .= " ~/rpmbuild/SOURCES/"
+    system(cmd, 1 :named('verbose'))
+
     $S0 = get_spec(kv :flat :named)
     $I0 = file_exists($S0)
     if $I0 goto L1
@@ -2938,7 +2944,9 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     spew($S0, $S1, 1 :named('verbose'))
   L1:
 
-    die "not yet rpms"
+    .local string cmd
+    cmd = "rpmbuild -bs -v " . $S0
+    system(cmd, 1 :named('verbose'))
 .end
 
 =head3 Step bdist
@@ -2981,6 +2989,9 @@ the default value is ports/rpm
     $S2 = dirname($S0)
     mkpath($S2, 1 :named('verbose'))
     spew($S0, $S1, 1 :named('verbose'))
+    .local string cmd
+    cmd = "rpmbuild --nobuild " . $S0
+    system(cmd, 1 :named('verbose'))
   L2:
 .end
 
@@ -3054,9 +3065,9 @@ License:        %s
 Group:          Development/Libraries
 URL:            %s
 Source0:        %s
-BuildRoot:      %%{_tmppath}/%%{name}-%%{version}-%%{release}-root-%%(%%{__id_u} -n)
-BuildRequires:  parrot           >= %%parrot_version
-BuildRequires:  parrot-devel     >= %%parrot_version
+BuildRoot:      %%{_tmppath}/%%{name}-%%{version}-%%{release}
+#BuildRequires:  parrot           >= %%parrot_version
+#BuildRequires:  parrot-devel     >= %%parrot_version
 
 %%description
 %s
@@ -3213,8 +3224,11 @@ TEMPLATE
     $I0 = length $S0
     dec $I0
     $S0 = substr $S0, 0, $I0
-    spec .= $S0
-    spec .= " by distutils\n"
+    $S1 = substr $S0, 0, 11
+    spec .= $S1
+    $S1 = substr $S0, 20
+    spec .= $S1
+    spec .= " you <you@you.org>\n- created by distutils\n"
     .return (spec)
 .end
 
@@ -3226,6 +3240,12 @@ TEMPLATE
     .param pmc kv :slurpy :named
     run_step('sdist_gztar', kv :flat :named)
 
+    .local string cmd
+    $S0 = get_tarname('.tar.gz', kv :flat :named)
+    cmd = "mv " . $S0
+    cmd .= " ~/rpmbuild/SOURCES/"
+    system(cmd, 1 :named('verbose'))
+
     $S0 = get_spec(kv :flat :named)
     $I0 = file_exists($S0)
     if $I0 goto L1
@@ -3235,7 +3255,8 @@ TEMPLATE
     spew($S0, $S1, 1 :named('verbose'))
   L1:
 
-    die "no yet rpm"
+    cmd = "rpmbuild -bb -v " . $S0
+    system(cmd, 1 :named('verbose'))
 .end
 
 =head3 Step bdist_wininst
