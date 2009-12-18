@@ -339,12 +339,12 @@ Utility function for polling a single IO stream with a timeout.
 
 Returns a 1 | 2 | 4 (read, write, error) value.
 
-This is not equivalent to any speficic POSIX or BSD socket call, however
+This is not equivalent to any specific POSIX or BSD socket call, but
 it is a useful, common primitive.
 
 Not at all usefule --leo.
 
-Also, a buffering layer above this may choose to reimpliment by checking
+Also, a buffering layer above this may choose to reimplement by checking
 the read buffer.
 
 =cut
