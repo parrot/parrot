@@ -46,7 +46,7 @@ Send the output to OUTFILE. By default, output is directed to STDOUT.
 
     # Process command line options
     .local pmc getopts
-    getopts = new "Getopt::Obj"
+    getopts = new ["Getopt";"Obj"]
     getopts."notOptStop"(1)
     push getopts, "output|o=s"
     push getopts, "help|h"

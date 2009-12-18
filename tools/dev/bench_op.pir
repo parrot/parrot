@@ -81,7 +81,7 @@ Print program version and exit.
 
     # Specification of command line arguments.
     .local pmc getopts
-    getopts = new "Getopt::Obj"
+    getopts = new ["Getopt";"Obj"]
     # getopts."notOptStop"(1)
     push getopts, "version"
     push getopts, "verbose=i"

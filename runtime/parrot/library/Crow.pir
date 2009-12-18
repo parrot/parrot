@@ -12,7 +12,7 @@
     load_bytecode 'Getopt/Obj.pbc'
 
     .local pmc getopts
-    getopts = new 'Getopt::Obj'
+    getopts = new ['Getopt';'Obj']
     getopts.'notOptStop'(1)
 
     getopts = push 'help|h'

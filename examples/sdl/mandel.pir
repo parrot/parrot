@@ -59,7 +59,7 @@ ex:
 .sub 'get_opts'
     .param pmc argv
     .local pmc opts, getopts
-    getopts = new 'Getopt::Obj'
+    getopts = new ['Getopt';'Obj']
     push getopts, "quit|q"
     push getopts, "threads"
     $S0 = shift argv
