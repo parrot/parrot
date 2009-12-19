@@ -4112,8 +4112,50 @@ SOURCE_C
     .param string path
     .param int verbose          :named('verbose') :optional
     .param int has_verbose      :opt_flag
-    $S0 = 'perl -MExtUtils::Command -e rm_rf ' . path
-    system($S0, verbose :named('verbose'))
+    $I0 = stat path, .STAT_EXISTS
+    unless $I0 goto L1
+    $I0 = stat path, .STAT_ISDIR
+    unless $I0 goto L1
+    unless has_verbose goto L2
+    unless verbose goto L2
+    print "rmtree "
+    say path
+  L2:
+    new $P0, 'OS'
+    $P1 = $P0.'readdir'(path)
+    push_eh _handler
+  L3:
+    unless $P1 goto L4
+    $S0 = shift $P1
+    if $S0 == '.' goto L3
+    if $S0 == '..' goto L3
+    $S1 = path . '/'
+    $S1 .= $S0
+    $I0 = stat $S1, .STAT_ISDIR
+    unless $I0 goto L5
+    rmtree($S1)
+    goto L3
+  L5:
+    $P0.'rm'($S1)
+    goto L3
+  L4:
+    push_eh _handler
+    $S1 = path
+    $P0.'rm'($S1)
+    pop_eh
+  L1:
+    .return ()
+  _handler:
+    .local pmc e
+    .get_results (e)
+    $S0 = "Can't remove '"
+    $S0 .= $S1
+    $S0 .= "' ("
+    $S1 = err
+    $S0 .= $S1
+    $S0 .= ")\n"
+    e = $S0
+    rethrow e
 .end
 
 =item basename
