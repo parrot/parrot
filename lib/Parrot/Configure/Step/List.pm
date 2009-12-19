@@ -31,7 +31,6 @@ my @steps = qw(
     inter::types
     auto::ops
     auto::pmc
-    auto::alignptrs
     auto::headers
     auto::sizes
     auto::byteorder
