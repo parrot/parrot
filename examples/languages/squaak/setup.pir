@@ -69,6 +69,8 @@ SOURCES
     # dist
     $P6 = glob('doc/*.pod examples/*.sq')
     $P0['manifest_includes'] = $P6
+    $P5 = split ' ', 'MAINTAINER README'
+    $P0['doc_files'] = $P5
 
     .tailcall setup(args :flat, $P0 :flat :named)
 .end

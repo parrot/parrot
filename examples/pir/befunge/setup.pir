@@ -58,6 +58,8 @@ SOURCES
     # dist
     $P4 = glob('*.bef')
     $P0['manifest_includes'] = $P4
+    $P5 = split ' ', 'Changes MAINTAINER README'
+    $P0['doc_files'] = $P5
 
     .tailcall setup(args :flat, $P0 :flat :named)
 .end
