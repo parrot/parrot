@@ -254,12 +254,6 @@ L<http://bitbucket.org/riffraff/shakespeare-parrot/src/tip/setup.pir>
 
     .const 'Sub' _install = '_install'
     register_step('install', _install)
-    .const 'Sub' _install_dynpmc = '_install_dynpmc'
-    register_step_after('install', _install_dynpmc)
-    .const 'Sub' _install_dynops = '_install_dynops'
-    register_step_after('install', _install_dynops)
-    .const 'Sub' _install_installable_pbc = '_install_installable_pbc'
-    register_step_after('install', _install_installable_pbc)
 
     .const 'Sub' _test = '_test'
     register_step('test', _test)
@@ -269,12 +263,6 @@ L<http://bitbucket.org/riffraff/shakespeare-parrot/src/tip/setup.pir>
 
     .const 'Sub' _uninstall = '_uninstall'
     register_step('uninstall', _uninstall)
-    .const 'Sub' _uninstall_dynpmc = '_uninstall_dynpmc'
-    register_step_after('uninstall', _uninstall_dynpmc)
-    .const 'Sub' _uninstall_dynops = '_uninstall_dynops'
-    register_step_after('uninstall', _uninstall_dynops)
-    .const 'Sub' _uninstall_installable_pbc = '_uninstall_installable_pbc'
-    register_step_after('uninstall', _uninstall_installable_pbc)
 
     .const 'Sub' _usage = '_usage'
     register_step('usage', _usage)
@@ -2006,11 +1994,11 @@ a hash
 
 =over 4
 
-=item inst_bin
+=item inst_bin ???
 
 array of pathname or a single pathname
 
-=item inst_dynext
+=item inst_dynext ???
 
 array of pathname or a single pathname
 
@@ -2026,59 +2014,94 @@ array of pathname or a single pathname
 
 array of pathname or a single pathname
 
+=item installable_pbc
+
+=item dynops
+
+=item dynpmc
+
 =cut
 
 .sub '_install' :anon
     .param pmc kv :slurpy :named
+
+    $P0 = get_install_files(kv :flat :named)
+    $P1 = iter $P0
+  L1:
+    unless $P1 goto L2
+    $S0 = shift $P1
+    $S1 = $P0[$S0]
+    install($S1, $S0, 1 :named('verbose'))
+    goto L1
+  L2:
+
+    $P0 = get_install_xfiles(kv :flat :named)
+    $P1 = iter $P0
+  L3:
+    unless $P1 goto L4
+    $S0 = shift $P1
+    $S1 = $P0[$S0]
+    install($S1, $S0, 1 :named('exe'), 1 :named('verbose'))
+    goto L3
+  L4:
+.end
+
+.sub 'get_install_files' :anon
+    .param pmc kv :slurpy :named
+    .local pmc files
+    files = new 'Hash'
     $I0 = exists kv['inst_bin']
     unless $I0 goto L1
     $P0 = kv['inst_bin']
-    install_bin($P0)
+    get_install_bin(files, $P0)
   L1:
     $I0 = exists kv['inst_dynext']
     unless $I0 goto L2
     $P0 = kv['inst_dynext']
-    install_lib("dynext", $P0)
+    get_install_lib(files, "dynext", $P0)
   L2:
     $I0 = exists kv['inst_inc']
     unless $I0 goto L3
     $P0 = kv['inst_inc']
-    install_lib("include", $P0)
+    get_install_lib(files, "include", $P0)
   L3:
     $I0 = exists kv['inst_lang']
     unless $I0 goto L4
     $P0 = kv['inst_lang']
-    install_lib("languages", $P0)
+    get_install_lib(files, "languages", $P0)
   L4:
     $I0 = exists kv['inst_lib']
     unless $I0 goto L5
     $P0 = kv['inst_lib']
-    install_lib("library", $P0)
+    get_install_lib(files, "library", $P0)
   L5:
+    .return (files)
 .end
 
-.sub 'install_bin'
+.sub 'get_install_bin' :anon
+    .param pmc files
     .param pmc array
     $S1 = get_bindir()
     $S1 .= "/"
     $I0 = does array, 'array'
-    if $I0 goto L0
+    if $I0 goto L1
     $S0 = array
     $S2 = $S1 . $S0
-    install($S0, $S2, 1 :named('verbose'))
+    files[$S2] = $S0
     goto L2
-  L0:
-    $P0 = iter array
   L1:
+    $P0 = iter array
+  L3:
     unless $P0 goto L2
     $S0 = shift $P0
     $S2 = $S1 . $S0
-    install($S0, $S2, 1 :named('verbose'))
-    goto L1
+    files[$S2] = $S0
+    goto L3
   L2:
 .end
 
-.sub 'install_lib'
+.sub 'get_install_lib' :anon
+    .param pmc files
     .param string dirname
     .param pmc array
     $S1 = get_libdir()
@@ -2086,36 +2109,46 @@ array of pathname or a single pathname
     $S1 .= dirname
     $S1 .= "/"
     $I0 = does array, 'array'
-    if $I0 goto L0
+    if $I0 goto L1
     $S0 = array
     $S2 = $S1 . $S0
-    install($S0, $S2, 1 :named('verbose'))
+    files[$S2] = $S0
     goto L2
-  L0:
-    $P0 = iter array
   L1:
+    $P0 = iter array
+  L3:
     unless $P0 goto L2
     $S0 = shift $P0
     $S2 = $S1 . $S0
-    install($S0, $S2, 1 :named('verbose'))
-    goto L1
+    files[$S2] = $S0
+    goto L3
   L2:
 .end
 
-=item installable_pbc
-
-=cut
-
-.sub '_install_installable_pbc' :anon
+.sub 'get_install_xfiles' :anon
     .param pmc kv :slurpy :named
+    .local pmc files
+    files = new 'Hash'
     $I0 = exists kv['installable_pbc']
     unless $I0 goto L1
     $P0 = kv['installable_pbc']
-    install_installable_pbc($P0)
+    get_install_installable_pbc(files, $P0)
   L1:
+    $I0 = exists kv['dynops']
+    unless $I0 goto L2
+    $P0 = kv['dynops']
+    get_install_dynops(files, $P0)
+  L2:
+    $I0 = exists kv['dynpmc']
+    unless $I0 goto L3
+    $P0 = kv['dynpmc']
+    get_install_dynpmc(files, $P0)
+  L3:
+    .return (files)
 .end
 
-.sub 'install_installable_pbc'
+.sub 'get_install_installable_pbc' :anon
+    .param pmc files
     .param pmc hash
     .local string bin, bindir, pbc, exe
     bindir = get_bindir()
@@ -2133,25 +2166,13 @@ array of pathname or a single pathname
     $S2 = bindir . '/'
     $S2 .= bin
     $S2 .= exe
-    install($S1, $S2, 1 :named('exe'), 1 :named('verbose'))
+    files[$S2] = $S1
     goto L1
   L2:
 .end
 
-=item dynops
-
-=cut
-
-.sub '_install_dynops' :anon
-    .param pmc kv :slurpy :named
-    $I0 = exists kv['dynops']
-    unless $I0 goto L1
-    $P0 = kv['dynops']
-    install_dynops($P0)
-  L1:
-.end
-
-.sub 'install_dynops'
+.sub 'get_install_dynops' :anon
+    .param pmc files
     .param pmc hash
     .local string libdir, load_ext, ops, suffix
     libdir = get_libdir()
@@ -2170,27 +2191,15 @@ array of pathname or a single pathname
     $S1 = _mk_path_dynops(ops, suffix, load_ext)
     $S2 = libdir . "/"
     $S2 .= $S1
-    install($S1, $S2, 1 :named('exe'), 1 :named('verbose'))
+    files[$S2] = $S1
     goto L3
   L4:
     goto L1
   L2:
 .end
 
-=item dynpmc
-
-=cut
-
-.sub '_install_dynpmc' :anon
-    .param pmc kv :slurpy :named
-    $I0 = exists kv['dynpmc']
-    unless $I0 goto L1
-    $P0 = kv['dynpmc']
-    install_dynpmc($P0)
-  L1:
-.end
-
-.sub 'install_dynpmc'
+.sub 'get_install_dynpmc' :anon
+    .param pmc files
     .param pmc hash
     .local string libdir, load_ext
     libdir = get_libdir()
@@ -2202,7 +2211,7 @@ array of pathname or a single pathname
     $S1 = _mk_path_dynpmc($S0, load_ext)
     $S2 = libdir . "/"
     $S2 .= $S1
-    install($S1, $S2, 1 :named('exe'), 1 :named('verbose'))
+    files[$S2] = $S1
     goto L1
   L2:
 .end
@@ -2217,163 +2226,24 @@ Same options as install.
 
 .sub '_uninstall' :anon
     .param pmc kv :slurpy :named
-    $I0 = exists kv['inst_bin']
-    unless $I0 goto L1
-    $P0 = kv['inst_bin']
-    uninstall_bin($P0)
-  L1:
-    $I0 = exists kv['inst_dynext']
-    unless $I0 goto L2
-    $P0 = kv['inst_dynext']
-    uninstall_lib("dynext", $P0)
-  L2:
-    $I0 = exists kv['inst_inc']
-    unless $I0 goto L3
-    $P0 = kv['inst_inc']
-    uninstall_lib("include", $P0)
-  L3:
-    $I0 = exists kv['inst_lang']
-    unless $I0 goto L4
-    $P0 = kv['inst_lang']
-    uninstall_lib("languages", $P0)
-  L4:
-    $I0 = exists kv['inst_lib']
-    unless $I0 goto L5
-    $P0 = kv['inst_lib']
-    uninstall_lib("library", $P0)
-  L5:
-.end
 
-.sub 'uninstall_bin'
-    .param pmc array
-    $S1 = get_bindir()
-    $S1 .= "/"
-    $I0 = does array, 'array'
-    if $I0 goto L0
-    $S0 = array
-    $S2 = $S1 . $S0
-    unlink($S2, 1 :named('verbose'))
-    goto L2
-  L0:
-    $P0 = iter array
+    $P0 = get_install_files(kv :flat :named)
+    $P1 = iter $P0
   L1:
-    unless $P0 goto L2
-    $S0 = shift $P0
-    $S2 = $S1 . $S0
-    unlink($S2, 1 :named('verbose'))
+    unless $P1 goto L2
+    $S0 = shift $P1
+    unlink($S0, 1 :named('verbose'))
     goto L1
   L2:
-.end
 
-.sub 'uninstall_lib'
-    .param string dirname
-    .param pmc array
-    $S1 = get_libdir()
-    $S1 .= "/"
-    $S1 .= dirname
-    $S1 .= "/"
-    $I0 = does array, 'array'
-    if $I0 goto L0
-    $S0 = array
-    $S2 = $S1 . $S0
-    unlink($S2, 1 :named('verbose'))
-    goto L2
-  L0:
-    $P0 = iter array
-  L1:
-    unless $P0 goto L2
-    $S0 = shift $P0
-    $S2 = $S1 . $S0
-    unlink($S2, 1 :named('verbose'))
-    goto L1
-  L2:
-.end
-
-.sub '_uninstall_installable_pbc' :anon
-    .param pmc kv :slurpy :named
-    $I0 = exists kv['installable_pbc']
-    unless $I0 goto L1
-    $P0 = kv['installable_pbc']
-    uninstall_installable_pbc($P0)
-  L1:
-.end
-
-.sub 'uninstall_installable_pbc'
-    .param pmc hash
-    .local string bin, bindir, exe
-    bindir = get_bindir()
-    exe = get_exe()
-    $P0 = iter hash
-  L1:
-    unless $P0 goto L2
-    bin = shift $P0
-    $S1 = bindir . '/'
-    $S1 .=  bin
-    $S1 .= exe
-    unlink($S1, 1 :named('verbose'))
-    goto L1
-  L2:
-.end
-
-.sub '_uninstall_dynops' :anon
-    .param pmc kv :slurpy :named
-    $I0 = exists kv['dynops']
-    unless $I0 goto L1
-    $P0 = kv['dynops']
-    uninstall_dynops($P0)
-  L1:
-.end
-
-.sub 'uninstall_dynops'
-    .param pmc hash
-    .local string libdir, load_ext, ops, suffix
-    libdir = get_libdir()
-    load_ext = get_load_ext()
-    .local pmc cores
-    cores = get_cores()
-    $P0 = iter hash
-  L1:
-    unless $P0 goto L2
-    ops = shift $P0
-    $P1 = iter cores
+    $P0 = get_install_xfiles(kv :flat :named)
+    $P1 = iter $P0
   L3:
     unless $P1 goto L4
     $S0 = shift $P1
-    suffix = cores[$S0]
-    $S0 = _mk_path_dynops(ops, suffix, load_ext)
-    $S1 = libdir . "/"
-    $S1 .= $S0
-    unlink($S1, 1 :named('verbose'))
+    unlink($S0, 1 :named('verbose'))
     goto L3
   L4:
-    goto L1
-  L2:
-.end
-
-.sub '_uninstall_dynpmc' :anon
-    .param pmc kv :slurpy :named
-    $I0 = exists kv['dynpmc']
-    unless $I0 goto L1
-    $P0 = kv['dynpmc']
-    uninstall_dynpmc($P0)
-  L1:
-.end
-
-.sub 'uninstall_dynpmc'
-    .param pmc hash
-    .local string libdir, load_ext
-    libdir = get_libdir()
-    load_ext = get_load_ext()
-    $P0 = iter hash
-  L1:
-    unless $P0 goto L2
-    $S0 = shift $P0
-    $S0 = _mk_path_dynpmc($S0, load_ext)
-    $S1 = libdir . "/"
-    $S1 .= $S0
-    unlink($S1, 1 :named('verbose'))
-    goto L1
-  L2:
 .end
 
 =head3 Step plumage
@@ -3184,131 +3054,28 @@ TEMPLATE
     goto L3
   L1:
 
-    .local string bindir, libdir, load_ext
-    bindir = get_bindir()
-    libdir = get_libdir()
-    load_ext = get_load_ext()
-
-    $I0 = exists kv['dynops']
-    unless $I0 goto L11
-    .local pmc cores
-    cores = get_cores()
-    $P1 = kv['dynops']
+    $P0 = new 'ResizablePMCArray'
+    # currently, ResizableStringArray hasn't the method sort.
+    # see TT #1356
+    $P1 = get_install_files(kv :flat :named)
     $P2 = iter $P1
-  L12:
-    unless $P2 goto L11
-    .local string ops, suffix
-    ops = shift $P2
-    $P3 = iter cores
-  L13:
-    unless $P3 goto L12
-    $S0 = shift $P3
-    suffix = cores[$S0]
-    $S0 = _mk_path_dynops(ops, suffix, load_ext)
-    spec .= libdir
-    spec .= "/"
-    spec .= $S0
-    spec .= "\n"
-    goto L13
   L11:
-
-    $I0 = exists kv['dynpmc']
-    unless $I0 goto L21
-    $P1 = kv['dynpmc']
-    $P2 = iter $P1
-  L22:
-    unless $P2 goto L21
+    unless $P2 goto L12
     $S0 = shift $P2
-    $S0 = _mk_path_dynpmc($S0, load_ext)
-    spec .= libdir
-    spec .= "/"
-    spec .= $S0
-    spec .= "\n"
-    goto L22
-  L21:
-
-    $I0 = exists kv['installable_pbc']
-    unless $I0 goto L31
-    $P1 = kv['installable_pbc']
+    push $P0, $S0
+    goto L11
+  L12:
+    $P1 = get_install_xfiles(kv :flat :named)
     $P2 = iter $P1
-  L32:
-    unless $P2 goto L31
+  L13:
+    unless $P2 goto L14
     $S0 = shift $P2
-    spec .= bindir
-    spec .= "/"
+    push $P0, $S0
+    goto L13
+  L14:
+    $P0.'sort'()
+    $S0 = join "\n", $P0
     spec .= $S0
-    spec .= "\n"
-    goto L32
-  L31:
-
-    $I0 = exists kv['inst_inc']
-    unless $I0 goto L41
-    $P1 = kv['inst_inc']
-    $I0 = does $P1, 'array'
-    if $I0 goto L42
-    $S0 = $P1
-    spec .= libdir
-    spec .= "/include/"
-    spec .= $S0
-    spec .= "\n"
-    goto L41
-  L42:
-    $P2 = iter $P1
-  L43:
-    unless $P2 goto L41
-    $S0 = shift $P2
-    spec .= libdir
-    spec .= "/include/"
-    spec .= $S0
-    spec .= "\n"
-    goto L43
-  L41:
-
-    $I0 = exists kv['inst_lang']
-    unless $I0 goto L51
-    $P1 = kv['inst_lang']
-    $I0 = does $P1, 'array'
-    if $I0 goto L52
-    $S0 = $P1
-    spec .= libdir
-    spec .= "/languages/"
-    spec .= $S0
-    spec .= "\n"
-    goto L51
-  L52:
-    $P2 = iter $P1
-  L53:
-    unless $P2 goto L51
-    $S0 = shift $P2
-    spec .= libdir
-    spec .= "/languages/"
-    spec .= $S0
-    spec .= "\n"
-    goto L53
-  L51:
-
-    $I0 = exists kv['inst_lib']
-    unless $I0 goto L61
-    $P1 = kv['inst_lib']
-    $I0 = does $P1, 'array'
-    if $I0 goto L62
-    $S0 = $P1
-    spec .= libdir
-    spec .= "/library/"
-    spec .= $S0
-    spec .= "\n"
-    goto L61
-  L62:
-    $P2 = iter $P1
-  L63:
-    unless $P2 goto L61
-    $S0 = shift $P2
-    spec .= libdir
-    spec .= "/library/"
-    spec .= $S0
-    spec .= "\n"
-    goto L63
-  L61:
 
     spec .= "\n\n%changelog\n* "
     $I0 = time
