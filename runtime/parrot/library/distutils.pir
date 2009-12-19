@@ -3024,18 +3024,20 @@ BuildRoot:      %%{_tmppath}/%%{name}-%%{version}-%%{release}
 %s
 
 %%prep
+%%setup -n parrot-%%{name}-%%{version}
 
 %%build
 parrot setup.pir
 
 %%install
+rm -rf $RPM_BUILD_ROOT
 parrot setup.pir --root $RPM_BUILD_ROOT install
 
 %%check
 parrot setup.pir test
 
 %%clean
-parrot setup.pir clean
+rm -rf $RPM_BUILD_ROOT
 
 %%files
 %%defattr(-,root,root,-)
