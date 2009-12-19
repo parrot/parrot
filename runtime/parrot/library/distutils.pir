@@ -2631,6 +2631,8 @@ array of pathname or a single pathname
 
 =item inst_lib
 
+=item doc_files
+
 =item harness_files
 
 =item prove_files
@@ -2671,7 +2673,7 @@ array of pathname or a single pathname
     goto L1
   L2:
 
-    $P0 = split ' ', 'inst_bin inst_dynext inst_inc inst_lang inst_lib'
+    $P0 = split ' ', 'inst_bin inst_dynext inst_inc inst_lang inst_lib doc_files'
   L3:
     unless $P0 goto L4
     $S0 = shift $P0
@@ -2698,7 +2700,7 @@ array of pathname or a single pathname
     _manifest_add_glob(needed, 't/*.t')
   L7:
 
-    $P0 = split ' ', 'CREDITS Changes MAINTAINER NEWS README TODO setup.pir setup.nqp t/harness'
+    $P0 = split ' ', 'setup.pir setup.nqp t/harness'
   L8:
     unless $P0 goto L9
     $S0 = shift $P0
@@ -3039,6 +3041,8 @@ the default value is ports/rpm
 
 =item packager
 
+=item doc_files
+
 =back
 
 =cut
@@ -3158,6 +3162,27 @@ parrot setup.pir clean
 TEMPLATE
     .local string spec
     spec = sprintf $S0, $P0
+
+    $I0 = exists kv['doc_files']
+    unless $I0 goto L1
+    $P1 = kv['doc_files']
+    $I0 = does $P1, 'array'
+    if $I0 goto L2
+    $S0 = $P1
+    spec .= "%doc "
+    spec .= $S0
+    spec .= "\n"
+    goto L1
+  L2:
+    $P2 = iter $P1
+  L3:
+    unless $P2 goto L1
+    $S0 = shift $P2
+    spec .= "%doc "
+    spec .= $S0
+    spec .= "\n"
+    goto L3
+  L1:
 
     .local string bindir, libdir, load_ext
     bindir = get_bindir()
