@@ -3144,6 +3144,8 @@ Build an installer with Inno Setup.
 
 =item inst_lib
 
+=item doc_files
+
 =item name
 
 =item version
@@ -3276,40 +3278,33 @@ TEMPLATE
     goto L24
   L23:
 
-    $I0 = exists kv['inst_lang']
-    unless $I0 goto L31
-    $P1 = kv['inst_lang']
-    $I0 = does $P1, 'array'
-    if $I0 goto L32
-    $S1 = $P1
-    $S0 = _mk_inno_line('languages', $S1)
+    $P1 = get_install_files(kv :flat :named)
+    $P2 = iter $P1
+  L31:
+    unless $P2 goto L32
+    $S0 = shift $P2
+    $S1 = $P1[$S0]
+    $S0 = _mk_inno_line($S1, $S0)
     script .= $S0
     goto L31
   L32:
-    $P2 = iter $P1
-  L33:
-    unless $P2 goto L31
-    $S1 = shift $P2
-    $S0 = _mk_inno_line('languages', $S1)
-    script .= $S0
-    goto L33
-  L31:
 
-    $I0 = exists kv['inst_lib']
+    $I0 = exists kv['doc_files']
     unless $I0 goto L41
-    $P1 = kv['inst_lib']
+    name = get_name(kv :flat :named)
+    $P1 = kv['doc_files']
     $I0 = does $P1, 'array'
     if $I0 goto L42
-    $S1 = $P1
-    $S0 = _mk_inno_line('library', $S1)
+    $S0 = $P1
+    $S0 = _mk_inno_line_doc($S0, name)
     script .= $S0
     goto L41
   L42:
     $P2 = iter $P1
   L43:
     unless $P2 goto L41
-    $S1 = shift $P2
-    $S0 = _mk_inno_line('library', $S1)
+    $S0 = shift $P2
+    $S0 = _mk_inno_line_doc($S0, name)
     script .= $S0
     goto L43
   L41:
@@ -3319,17 +3314,32 @@ TEMPLATE
 .end
 
 .sub '_mk_inno_line' :anon
+    .param string src
     .param string dest
-    .param string filename
     .local string line
     line = "Source: \".\\"
-    $S0 = _escape_path_win32(filename)
+    $S0 = _escape_path_win32(src)
     line .= $S0
-    line .= "\"; DestDir: \"{app}\\lib\\parrot\\"
-    line .= dest
-    line .= "\\"
-    $S0 = dirname(filename)
+    line .= "\"; DestDir: \"{app}\\"
+    $S0 = dirname(dest)
+    $I0 = index $S0, '/', 1
+    inc $I0
+    $S0 = substr $S0, $I0
     $S0 = _escape_path_win32($S0)
+    line .= $S0
+    line .= "\"; Flags:\n"
+    .return (line)
+.end
+
+.sub '_mk_inno_line_doc' :anon
+    .param string src
+    .param string dest
+    .local string line
+    line = "Source: \".\\"
+    $S0 = _escape_path_win32(src)
+    line .= $S0
+    line .= "\"; DestDir: \"{app}\\share\\doc\\parrot\\"
+    $S0 = dest
     line .= $S0
     line .= "\"; Flags:\n"
     .return (line)
