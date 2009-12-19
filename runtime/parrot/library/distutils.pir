@@ -2020,10 +2020,14 @@ array of pathname or a single pathname
 
 =item dynpmc
 
+=item root
+
 =cut
 
 .sub '_install' :anon
     .param pmc kv :slurpy :named
+    .local string root
+    root = get_value('root', '' :named('default'), kv :flat :named)
 
     $P0 = get_install_files(kv :flat :named)
     $P1 = iter $P0
@@ -2031,7 +2035,8 @@ array of pathname or a single pathname
     unless $P1 goto L2
     $S0 = shift $P1
     $S1 = $P0[$S0]
-    install($S1, $S0, 1 :named('verbose'))
+    $S2 = root . $S0
+    install($S1, $S2, 1 :named('verbose'))
     goto L1
   L2:
 
@@ -2041,7 +2046,8 @@ array of pathname or a single pathname
     unless $P1 goto L4
     $S0 = shift $P1
     $S1 = $P0[$S0]
-    install($S1, $S0, 1 :named('exe'), 1 :named('verbose'))
+    $S2 = root . $S0
+    install($S1, $S2, 1 :named('exe'), 1 :named('verbose'))
     goto L3
   L4:
 .end
@@ -2226,12 +2232,15 @@ Same options as install.
 
 .sub '_uninstall' :anon
     .param pmc kv :slurpy :named
+    .local string root
+    root = get_value('root', '' :named('default'), kv :flat :named)
 
     $P0 = get_install_files(kv :flat :named)
     $P1 = iter $P0
   L1:
     unless $P1 goto L2
     $S0 = shift $P1
+    $S0 = root . $S0
     unlink($S0, 1 :named('verbose'))
     goto L1
   L2:
@@ -2241,6 +2250,7 @@ Same options as install.
   L3:
     unless $P1 goto L4
     $S0 = shift $P1
+    $S0 = root . $S0
     unlink($S0, 1 :named('verbose'))
     goto L3
   L4:
@@ -3019,7 +3029,7 @@ BuildRoot:      %%{_tmppath}/%%{name}-%%{version}-%%{release}
 parrot setup.pir
 
 %%install
-sudo parrot setup.pir install
+parrot setup.pir --root $RPM_BUILD_ROOT install
 
 %%check
 parrot setup.pir test
