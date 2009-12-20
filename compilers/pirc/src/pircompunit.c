@@ -42,7 +42,7 @@ O(c) (constant) time.
 #include "parrot/oplib/ops.h"
 #include "parrot/string_funcs.h"
 #include "parrot/dynext.h"
-#include "pmc/pmc_context.h"
+#include "pmc/pmc_callcontext.h"
 
 
 static unsigned const prime_numbers[] = {113 /* XXX think of more primes */ };
