@@ -102,7 +102,7 @@ src/pmc/$pmc.dump : vtable.dump $parent_dumps src/pmc/$pmc.pmc \$(PMC2C_FILES) $
 
 src/pmc/$pmc\$(O): include/pmc/pmc_${pmc}.h src/pmc/$pmc.str \$(NONGEN_HEADERS) \\
     $parent_headers $include_headers include/pmc/pmc_continuation.h \\
-    include/pmc/pmc_context.h include/pmc/pmc_fixedintegerarray.h
+    include/pmc/pmc_callcontext.h include/pmc/pmc_fixedintegerarray.h
 
 END
     }

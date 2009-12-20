@@ -4,15 +4,15 @@
 
 =head1 NAME
 
-t/pmc/callsignature.t - test CallSignature PMC
+t/pmc/callcontext.t - test CallContext PMC
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/callsignature.t
+    % prove t/pmc/callcontext.t
 
 =head1 DESCRIPTION
 
-Tests the CallSignature PMC.
+Tests the CallContext PMC.
 
 =cut
 
@@ -33,12 +33,12 @@ Tests the CallSignature PMC.
 .end
 
 .sub 'test_instantiate'
-    $P0 = new ['CallSignature']
-    ok(1, 'Instantiated CallSignature')
+    $P0 = new ['CallContext']
+    ok(1, 'Instantiated CallContext')
 .end
 
 .sub 'test_get_set_attrs'
-    $P0 = new ['CallSignature']
+    $P0 = new ['CallContext']
     $P5 = new 'String'
 
     $P5 = 'moonbomb'
@@ -55,7 +55,7 @@ Tests the CallSignature PMC.
 .end
 
 .sub 'test_push_pop_indexed_access'
-    $P0 = new [ 'CallSignature' ]
+    $P0 = new [ 'CallContext' ]
     $P1 = new [ 'Integer' ]
     $P1 = 100
 
@@ -94,7 +94,7 @@ Tests the CallSignature PMC.
 .end
 
 .sub 'test_shift_unshift_indexed_access'
-    $P0 = new [ 'CallSignature' ]
+    $P0 = new [ 'CallContext' ]
     $P1 = new [ 'Integer' ]
     $P1 = 100
 
@@ -134,7 +134,7 @@ Tests the CallSignature PMC.
 .end
 
 .sub 'test_indexed_access'
-    $P0    = new [ 'CallSignature' ]
+    $P0    = new [ 'CallContext' ]
     $P0[0] = 100
 
     $I0 = elements $P0
@@ -193,7 +193,7 @@ Tests the CallSignature PMC.
 .end
 
 .sub 'test_indexed_boxing'
-    $P0    = new [ 'CallSignature' ]
+    $P0    = new [ 'CallContext' ]
     $P0[0] = 100
     $P0[1] = 1.11
 
@@ -234,7 +234,7 @@ Tests the CallSignature PMC.
 .end
 
 .sub 'test_keyed_access'
-    $P0        = new [ 'CallSignature' ]
+    $P0        = new [ 'CallContext' ]
 
     $P0['foo'] = 100
     $P0['bar'] = 1.11
@@ -262,7 +262,7 @@ Tests the CallSignature PMC.
 .end
 
 .sub 'test_exists'
-    $P0        = new [ 'CallSignature' ]
+    $P0        = new [ 'CallContext' ]
 
     $P0[0]     = 111
     $P0['foo'] = 100
@@ -281,7 +281,7 @@ Tests the CallSignature PMC.
 .end
 
 .sub 'test_clone'
-    $P0 = new ['CallSignature']
+    $P0 = new ['CallContext']
     $P0[0] = 42
     $P0[1] = "Hello Parrot"
     $P0['floatval'] = 3.14159

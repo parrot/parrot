@@ -1402,12 +1402,11 @@ src/pmc/arrayiterator.pmc                                   [devel]src
 src/pmc/bigint.pmc                                          [devel]src
 src/pmc/bignum.pmc                                          [devel]src
 src/pmc/boolean.pmc                                         [devel]src
-src/pmc/callsignature.pmc                                   [devel]src
+src/pmc/callcontext.pmc                                     [devel]src
 src/pmc/capture.pmc                                         [devel]src
 src/pmc/class.pmc                                           [devel]src
 src/pmc/codestring.pmc                                      [devel]src
 src/pmc/complex.pmc                                         [devel]src
-src/pmc/context.pmc                                         [devel]src
 src/pmc/continuation.pmc                                    [devel]src
 src/pmc/coroutine.pmc                                       [devel]src
 src/pmc/cpointer.pmc                                        [devel]src
@@ -1865,7 +1864,7 @@ t/pmc/arrayiterator.t                                       [test]
 t/pmc/bigint.t                                              [test]
 t/pmc/bignum.t                                              [test]
 t/pmc/boolean.t                                             [test]
-t/pmc/callsignature.t                                       [test]
+t/pmc/callcontext.t                                         [test]
 t/pmc/capture.t                                             [test]
 t/pmc/class.t                                               [test]
 t/pmc/codestring.t                                          [test]

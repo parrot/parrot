@@ -24,9 +24,9 @@ passing to and from subroutines following the Parrot Calling Conventions.
 #include "parrot/runcore_api.h"
 #include "args.str"
 #include "pmc/pmc_key.h"
-#include "pmc/pmc_callsignature.h"
+#include "pmc/pmc_callcontext.h"
 #include "pmc/pmc_fixedintegerarray.h"
-#include "pmc/pmc_context.h"
+#include "pmc/pmc_callcontext.h"
 
 /* HEADERIZER HFILE: include/parrot/call.h */
 
@@ -555,7 +555,7 @@ static STRING** string_param_from_op(PARROT_INTERP,
 PMC * const raw_sig, opcode_t * const raw_args)>
 
 Take a raw signature and argument list from a set_args opcode and
-convert it to a CallSignature PMC.
+convert it to a CallContext PMC.
 
 =cut
 
@@ -576,12 +576,12 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
     INTVAL          arg_index;
 
     if (PMC_IS_NULL(signature))
-        call_object = pmc_new(interp, enum_class_CallSignature);
+        call_object = pmc_new(interp, enum_class_CallContext);
     else
         call_object = signature;
 
     /* this macro is much, much faster than the VTABLE STRING comparisons */
-    SETATTR_CallSignature_arg_flags(interp, call_object, raw_sig);
+    SETATTR_CallContext_arg_flags(interp, call_object, raw_sig);
     GETATTR_FixedIntegerArray_size(interp, raw_sig, arg_count);
     GETATTR_FixedIntegerArray_int_array(interp, raw_sig, int_array);
 
@@ -667,7 +667,7 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
 STRING *name, PMC * const raw_sig, opcode_t * const raw_args, INTVAL arg_index)>
 
 Pulls in the next argument from a set_args opcode, and sets it as the
-value of a named argument in the CallSignature PMC.
+value of a named argument in the CallContext PMC.
 
 =cut
 
@@ -731,7 +731,7 @@ extract_named_arg_from_op(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(STRING 
 *aggregate)>
 
 Takes an aggregate PMC and splits it up into individual arguments,
-adding each one to the CallSignature PMC. If the aggregate is an array,
+adding each one to the CallContext PMC. If the aggregate is an array,
 its elements are added as positional arguments. If the aggregate is a
 hash, its key/value pairs are added as named arguments.
 
@@ -782,7 +782,7 @@ dissect_aggregate_arg(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(PMC *aggreg
 *signature, PMC *raw_sig, opcode_t *raw_args)>
 
 Take a raw signature and argument list from a set_results opcode and
-convert it to a CallSignature PMC. Uses an existing CallSignature PMC if
+convert it to a CallContext PMC. Uses an existing CallContext PMC if
 one was already created for set_args. Otherwise, creates a new one.
 
 =cut
@@ -805,7 +805,7 @@ Parrot_pcc_build_sig_object_returns_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *sig
     INTVAL          arg_count;
 
     if (PMC_IS_NULL(signature))
-        call_object = pmc_new(interp, enum_class_CallSignature);
+        call_object = pmc_new(interp, enum_class_CallContext);
     /* A hack to support 'get_results' as the way of fetching the
      * exception object inside an exception handler. The first argument
      * in the call object is the exception, stick it directly into the
@@ -820,7 +820,7 @@ Parrot_pcc_build_sig_object_returns_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *sig
         call_object = signature;
 
     /* a little encapsulation violation for great speed */
-    SETATTR_CallSignature_return_flags(interp, call_object, raw_sig);
+    SETATTR_CallContext_return_flags(interp, call_object, raw_sig);
 
     GETATTR_FixedIntegerArray_size(interp, raw_sig, arg_count);
     GETATTR_FixedIntegerArray_int_array(interp, raw_sig, int_array);
@@ -871,7 +871,7 @@ Parrot_pcc_build_sig_object_returns_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *sig
 =item C<PMC* Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, PMC *obj,
 const char *sig, va_list args)>
 
-Converts a varargs list into a CallSignature PMC. The CallSignature stores the
+Converts a varargs list into a CallContext PMC. The CallContext stores the
 original short signature string and an array of integer types to pass on to the
 multiple dispatch search.
 
@@ -890,7 +890,7 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
     PMC         *type_tuple         = PMCNULL;
     PMC         *arg_flags     = PMCNULL;
     PMC         *return_flags  = PMCNULL;
-    PMC         * const call_object = pmc_new(interp, enum_class_CallSignature);
+    PMC         * const call_object = pmc_new(interp, enum_class_CallContext);
     const INTVAL sig_len            = strlen(sig);
     INTVAL       in_return_sig      = 0;
     INTVAL       i;
@@ -1237,7 +1237,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         if (arg_index < positional_args) {
             PMC *arg_sig;
 
-            GETATTR_CallSignature_arg_flags(interp, call_object, arg_sig);
+            GETATTR_CallContext_arg_flags(interp, call_object, arg_sig);
 
             /* We've used up all the positional parameters, but have extra
              * positional args left over. */
@@ -1378,7 +1378,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         PMC  *named_arg_list;
         Hash *h;
         /* Early exit to avoid vtable call */
-        GETATTR_CallSignature_hash(interp, call_object, h);
+        GETATTR_CallContext_hash(interp, call_object, h);
         if (!h || !h->entries)
             return;
 
@@ -1632,7 +1632,7 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         return;
     }
 
-    GETATTR_CallSignature_return_flags(interp, call_object, result_sig);
+    GETATTR_CallContext_return_flags(interp, call_object, result_sig);
 
     result_count = csr_returns_count(interp, call_object);
     PARROT_ASSERT((result_count == 0) || !PMC_IS_NULL(result_sig));
@@ -2422,14 +2422,14 @@ Parrot_pcc_merge_signature_for_tailcall(PARROT_INTERP,
     if (PMC_IS_NULL(parent) || PMC_IS_NULL(tailcall) || (parent == tailcall))
         return;
     else {
-        /* Broke encapuslation. Direct poking into CallSignature is much faster */
+        /* Broke encapuslation. Direct poking into CallContext is much faster */
         void ** returns_values;
         void ** tailcall_returns_values;
         INTVAL  returns_size;
         PMC * return_flags;
 
-        GETATTR_CallSignature_returns_size(interp, parent, returns_size);
-        GETATTR_CallSignature_returns_values(interp, parent, returns_values);
+        GETATTR_CallContext_returns_size(interp, parent, returns_size);
+        GETATTR_CallContext_returns_values(interp, parent, returns_values);
 
         /* Resize tailcall.returns_values to new size */
         tailcall_returns_values = csr_reallocate_return_values(interp, tailcall, returns_size);
@@ -2438,8 +2438,8 @@ Parrot_pcc_merge_signature_for_tailcall(PARROT_INTERP,
         mem_copy_n_typed(tailcall_returns_values, returns_values, returns_size, void**);
 
         /* Store raw signature */
-        GETATTR_CallSignature_return_flags(interp, parent, return_flags);
-        SETATTR_CallSignature_return_flags(interp, tailcall, return_flags);
+        GETATTR_CallContext_return_flags(interp, parent, return_flags);
+        SETATTR_CallContext_return_flags(interp, tailcall, return_flags);
 
     }
 }
@@ -2828,7 +2828,7 @@ clone_key_arg(PARROT_INTERP, ARGIN(PMC *key))
 
 /*
 
-VTABLE functions from CallSignatureReturns. TODO Rename them appropriately.
+VTABLE functions from CallContextReturns. TODO Rename them appropriately.
 
 */
 
@@ -2856,8 +2856,8 @@ csr_reallocate_return_values(PARROT_INTERP, ARGIN(PMC *self), INTVAL size)
     void    **values = NULL;
     INTVAL    resize_threshold;
 
-    GETATTR_CallSignature_returns_values(interp, self, values);
-    GETATTR_CallSignature_returns_resize_threshold(interp, self, resize_threshold);
+    GETATTR_CallContext_returns_values(interp, self, values);
+    GETATTR_CallContext_returns_resize_threshold(interp, self, resize_threshold);
 
     /* Empty. Allocate 8 elements (arbitary number) */
     if (!values) {
@@ -2868,12 +2868,12 @@ csr_reallocate_return_values(PARROT_INTERP, ARGIN(PMC *self), INTVAL size)
         values = (void **)Parrot_gc_allocate_fixed_size_storage(interp,
                                  8 * sizeof (void *));
 
-        SETATTR_CallSignature_returns_values(interp, self, values);
-        SETATTR_CallSignature_returns_size(interp, self, size);
-        SETATTR_CallSignature_returns_resize_threshold(interp, self, 8);
+        SETATTR_CallContext_returns_values(interp, self, values);
+        SETATTR_CallContext_returns_size(interp, self, size);
+        SETATTR_CallContext_returns_resize_threshold(interp, self, 8);
     }
     else if (size <= resize_threshold) {
-        SETATTR_CallSignature_returns_size(interp, self, size);
+        SETATTR_CallContext_returns_size(interp, self, size);
     }
     else {
         void   *old_values;
@@ -2898,9 +2898,9 @@ csr_reallocate_return_values(PARROT_INTERP, ARGIN(PMC *self), INTVAL size)
 
         mem_realloc_n_typed(values, cur, void *);
 
-        SETATTR_CallSignature_returns_values(interp, self, values);
-        SETATTR_CallSignature_returns_size(interp, self, size);
-        SETATTR_CallSignature_returns_resize_threshold(interp, self, cur);
+        SETATTR_CallContext_returns_values(interp, self, values);
+        SETATTR_CallContext_returns_size(interp, self, size);
+        SETATTR_CallContext_returns_resize_threshold(interp, self, cur);
     }
 
     return values;
@@ -2921,7 +2921,7 @@ csr_returns_count(PARROT_INTERP, ARGIN(PMC *self))
 {
     ASSERT_ARGS(csr_returns_count)
     INTVAL size;
-    GETATTR_CallSignature_returns_size(interp, self, size);
+    GETATTR_CallContext_returns_size(interp, self, size);
     return size;
 }
 
@@ -2949,7 +2949,7 @@ csr_push_pointer(PARROT_INTERP, ARGIN(PMC *self), ARGIN_NULLOK(void *value), INT
 
     PARROT_ASSERT((type >= 0 && type < 4) || !"Wrong pointer type");
 
-    GETATTR_CallSignature_returns_size(interp, self, size);
+    GETATTR_CallContext_returns_size(interp, self, size);
     values = csr_reallocate_return_values(interp, self, size + 1);
 
     /* Tag pointer */
@@ -3121,10 +3121,10 @@ csr_get_pointer_keyed_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL key)
     void   **values;
     INTVAL   size;
 
-    GETATTR_CallSignature_returns_size(interp, self, size);
+    GETATTR_CallContext_returns_size(interp, self, size);
     PARROT_ASSERT((key < size) || !"Wrong index");
 
-    GETATTR_CallSignature_returns_values(interp, self, values);
+    GETATTR_CallContext_returns_values(interp, self, values);
     return values[key];
 }
 

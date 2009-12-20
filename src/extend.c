@@ -61,7 +61,7 @@ can.
 #include "parrot/parrot.h"
 #include "parrot/extend.h"
 #include "pmc/pmc_sub.h"
-#include "pmc/pmc_context.h"
+#include "pmc/pmc_callcontext.h"
 
 /* HEADERIZER HFILE: include/parrot/extend.h */
 

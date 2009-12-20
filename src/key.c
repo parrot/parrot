@@ -22,7 +22,7 @@ The base vtable calling functions.
 #include "parrot/key.h"
 #include "key.str"
 #include "pmc/pmc_key.h"
-#include "pmc/pmc_context.h"
+#include "pmc/pmc_callcontext.h"
 
 /* HEADERIZER HFILE: include/parrot/key.h */
 

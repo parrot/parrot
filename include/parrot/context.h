@@ -24,8 +24,8 @@ typedef union {
     INTVAL       *regs_i;
 } Regs_ni;
 
-#include <pmc/pmc_context.h>
-typedef struct Parrot_Context_attributes Parrot_Context;
+#include <pmc/pmc_callcontext.h>
+typedef struct Parrot_CallContext_attributes Parrot_Context;
 
 /*
  * Macros to make accessing registers more convenient/readable.

@@ -22,7 +22,7 @@ This file implements the Parrot embedding interface.
 #include "parrot/embed.h"
 #include "parrot/oplib/ops.h"
 #include "pmc/pmc_sub.h"
-#include "pmc/pmc_context.h"
+#include "pmc/pmc_callcontext.h"
 #include "parrot/runcore_api.h"
 
 #include "../compilers/imcc/imc.h"

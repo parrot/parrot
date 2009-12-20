@@ -93,7 +93,7 @@ Tests the ParrotInterpreter PMC.
     is($S0, 'bar', 'Got ParrotInterp.annotations')
 
     $P0 = interp['context';0]
-    $I0 = isa $P0, 'Context'
+    $I0 = isa $P0, 'CallContext'
     ok($I0, 'Got ParrotInterp.context')
     # Add more tests for Context. E.g. it is correct Context by inspecting it.
 

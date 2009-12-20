@@ -236,7 +236,7 @@ src/pmc/multisub.dump                             [devel]src
 src/pmc/object.dump                               [devel]src
 include/pmc/pmc_boolean.h                         [devel]include
 include/pmc/pmc_class.h                           [devel]include
-include/pmc/pmc_callsignature.h                   [devel]include
+include/pmc/pmc_callcontext.h                     [devel]include
 include/pmc/pmc_continuation.h                    [devel]include
 include/pmc/pmc_context.h                         [devel]include
 include/pmc/pmc_default.h                         [devel]include

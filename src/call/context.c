@@ -17,7 +17,7 @@ Parrot_Context functions.
 #include "parrot/parrot.h"
 #include "parrot/call.h"
 #include "pmc/pmc_sub.h"
-#include "pmc/pmc_context.h"
+#include "pmc/pmc_callcontext.h"
 
 /*
 
@@ -306,6 +306,15 @@ init_context(PARROT_INTERP, ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
                            ? NULL
                            : get_context_struct_fast(interp, pmcold);
 
+    PARROT_ASSERT(!PMC_IS_NULL(pmcctx) || !"Can't initialise Null CallContext");
+
+    /*
+     * FIXME Invoking corotine shouldn't initialise context. So just
+     * check ctx->current_sub. If it's not null return from here
+     */
+    if (!PMC_IS_NULL(ctx->current_sub))
+        return;
+
     ctx->current_results   = NULL;
     ctx->results_signature = NULL;
     ctx->lex_pad           = PMCNULL;
@@ -454,7 +463,7 @@ static void
 allocate_registers(PARROT_INTERP, ARGIN(PMC *pmcctx), ARGIN(const INTVAL *number_regs_used))
 {
     ASSERT_ARGS(allocate_registers)
-    Parrot_Context_attributes *ctx = PARROT_CONTEXT(pmcctx);
+    Parrot_CallContext_attributes *ctx = PARROT_CALLCONTEXT(pmcctx);
 
     const size_t size_i = sizeof (INTVAL)   * number_regs_used[REGNO_INT];
     const size_t size_n = sizeof (FLOATVAL) * number_regs_used[REGNO_NUM];
@@ -480,6 +489,8 @@ allocate_registers(PARROT_INTERP, ARGIN(PMC *pmcctx), ARGIN(const INTVAL *number
 
     /* ctx.bp_ps points to S0, which has Px on the left */
     ctx->bp_ps.regs_s = (STRING **)((char *)ctx->registers + size_nip);
+
+    clear_regs(interp, pmcctx);
 }
 
 
@@ -517,7 +528,7 @@ void
 Parrot_pcc_free_registers(PARROT_INTERP, ARGIN(PMC *pmcctx))
 {
     ASSERT_ARGS(Parrot_pcc_free_registers)
-    Parrot_Context_attributes * const ctx = PARROT_CONTEXT(pmcctx);
+    Parrot_CallContext_attributes * const ctx = PARROT_CALLCONTEXT(pmcctx);
     size_t reg_size;
 
     if (!ctx)
@@ -543,6 +554,8 @@ current context. Note that the register usage C<n_regs_used> is copied.  Use
 the init flag to indicate whether you want to initialize the new context
 (setting its default values and clearing its registers).
 
+TODO: Remove this function!
+
 =cut
 
 */
@@ -554,7 +567,7 @@ Parrot_alloc_context(PARROT_INTERP, ARGIN(const INTVAL *number_regs_used),
     ARGIN_NULLOK(PMC *old))
 {
     ASSERT_ARGS(Parrot_alloc_context)
-    PMC            *pmcctx = pmc_new(interp, enum_class_Context);
+    PMC            *pmcctx = pmc_new(interp, enum_class_CallContext);
 
     allocate_registers(interp, pmcctx, number_regs_used);
     init_context(interp, pmcctx, old);
@@ -562,6 +575,51 @@ Parrot_alloc_context(PARROT_INTERP, ARGIN(const INTVAL *number_regs_used),
     return pmcctx;
 }
 
+
+/*
+
+=item C<PMC * Parrot_pcc_allocate_empty_context(PARROT_INTERP, PMC *old)>
+
+Allocates and returns a new context.  Does not set this new context as the
+current context.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC *
+Parrot_pcc_allocate_empty_context(PARROT_INTERP, ARGIN_NULLOK(PMC *old))
+{
+    ASSERT_ARGS(Parrot_pcc_allocate_empty_context)
+    PMC            *pmcctx = pmc_new(interp, enum_class_CallContext);
+
+    init_context(interp, pmcctx, old);
+
+    return pmcctx;
+}
+
+/*
+
+=item C<PMC * Parrot_pcc_init_context(PARROT_INTERP, PMC *ctx, PMC *old)>
+
+Initialise new context from old.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_pcc_init_context(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *old))
+{
+    ASSERT_ARGS(Parrot_pcc_init_context)
+
+    init_context(interp, ctx, old);
+
+    return ctx;
+}
 
 /*
 

@@ -21,7 +21,7 @@ Access to global PMCs
 #include "parrot/parrot.h"
 #include "global.str"
 #include "pmc/pmc_sub.h"
-#include "pmc/pmc_context.h"
+#include "pmc/pmc_callcontext.h"
 
 /* HEADERIZER HFILE: include/parrot/global.h */
 /* HEADERIZER BEGIN: static */

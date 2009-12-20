@@ -7,7 +7,7 @@
 #include "pbc.h"
 #include "parrot/packfile.h"
 #include "pmc/pmc_sub.h"
-#include "pmc/pmc_context.h"
+#include "pmc/pmc_callcontext.h"
 
 /* HEADERIZER HFILE: compilers/imcc/pbc.h */
 

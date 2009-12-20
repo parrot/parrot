@@ -387,7 +387,14 @@ Invokes the subroutine.
 
         /* plain subroutine call
          * create new context, place it in interpreter */
-        context               = Parrot_set_new_context(INTERP, sub->n_regs_used);
+        context = Parrot_pcc_get_signature(INTERP, caller_ctx);
+        if (PMC_IS_NULL(context))
+            context = pmc_new(INTERP, enum_class_CallContext);
+        CURRENT_CONTEXT(INTERP) = context;
+        Parrot_pcc_set_caller_ctx(INTERP, context, caller_ctx);
+        Parrot_pcc_allocate_registers(INTERP, context, sub->n_regs_used);
+        Parrot_pcc_init_context(INTERP, context, caller_ctx);
+
         Parrot_pcc_set_sub(interp, context, SELF);
         Parrot_pcc_set_continuation(interp, context, ccont);
         Parrot_pcc_set_constants(interp, context, sub->seg->const_table->constants);

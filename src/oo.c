@@ -24,7 +24,7 @@ Handles class and object manipulation.
 #include "parrot/oo_private.h"
 #include "pmc/pmc_class.h"
 #include "pmc/pmc_object.h"
-#include "pmc/pmc_context.h"
+#include "pmc/pmc_callcontext.h"
 
 #include "oo.str"
 

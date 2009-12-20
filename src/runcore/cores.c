@@ -253,7 +253,7 @@ next opcode, or examine and manipulate data from the executing program.
 #include "parrot/dynext.h"
 
 #include "pmc/pmc_sub.h"
-#include "pmc/pmc_context.h"
+#include "pmc/pmc_callcontext.h"
 
 #ifdef HAVE_COMPUTED_GOTO
 #  include "parrot/oplib/core_ops_cg.h"

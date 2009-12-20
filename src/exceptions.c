@@ -23,7 +23,7 @@ Define the the core subsystem for exceptions.
 #include "parrot/exceptions.h"
 #include "exceptions.str"
 #include "pmc/pmc_continuation.h"
-#include "pmc/pmc_context.h"
+#include "pmc/pmc_callcontext.h"
 
 /* HEADERIZER HFILE: include/parrot/exceptions.h */
 

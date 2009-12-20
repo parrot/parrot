@@ -26,7 +26,7 @@ Functions controlling Parrot's profiling runcore.
 #include "profiling.str"
 
 #include "pmc/pmc_sub.h"
-#include "pmc/pmc_context.h"
+#include "pmc/pmc_callcontext.h"
 #include "pmc/pmc_namespace.h"
 
 #ifdef WIN32

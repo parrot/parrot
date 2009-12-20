@@ -32,7 +32,7 @@ the Parrot debugger, and the C<debug> ops.
 #include "parrot/runcore_trace.h"
 #include "debug.str"
 #include "pmc/pmc_continuation.h"
-#include "pmc/pmc_context.h"
+#include "pmc/pmc_callcontext.h"
 
 /* Hand switched debugger tracing
  * Set to 1 to enable tracing to stderr

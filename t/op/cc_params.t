@@ -32,7 +32,7 @@ Tests Parrot calling conventions for parameter matching and mismatching.
 .sub call_sig_with_no_args
     .param pmc sig :call_sig
     $S0 = typeof sig
-    is('CallSignature', $S0)
+    is('CallContext', $S0)
     $I0 = elements sig
     is(0, $I0)
 .end
@@ -40,7 +40,7 @@ Tests Parrot calling conventions for parameter matching and mismatching.
 .sub call_sig_with_positionals
     .param pmc sig :call_sig
     $S0 = typeof sig
-    is('CallSignature', $S0)
+    is('CallContext', $S0)
     $I0 = elements sig
     is(3, $I0)
     $I1 = sig[0]
@@ -54,7 +54,7 @@ Tests Parrot calling conventions for parameter matching and mismatching.
 .sub call_sig_with_named
     .param pmc sig :call_sig
     $S0 = typeof sig
-    is('CallSignature', $S0)
+    is('CallContext', $S0)
     $I0 = elements sig
     is(0, $I0)
     $I1 = sig["x"]
@@ -74,7 +74,7 @@ Tests Parrot calling conventions for parameter matching and mismatching.
 
     # Have call sig.
     $S0 = typeof sig
-    is('CallSignature', $S0)
+    is('CallContext', $S0)
 
     # First element is self.
     $P0 = sig[0]
@@ -95,7 +95,7 @@ Tests Parrot calling conventions for parameter matching and mismatching.
 
     # Have call sig.
     $S0 = typeof sig
-    is('CallSignature', $S0)
+    is('CallContext', $S0)
 
     # First element is self.
     $P0 = sig[0]

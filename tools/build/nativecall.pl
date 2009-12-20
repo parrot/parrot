@@ -224,7 +224,7 @@ sub print_head {
 #include "pmc/pmc_managedstruct.h"
 #include "pmc/pmc_nci.h"
 #include "pmc/pmc_pointer.h"
-#include "pmc/pmc_context.h"
+#include "pmc/pmc_callcontext.h"
 #include "nci.str"
 
 /* HEADERIZER HFILE: none */
