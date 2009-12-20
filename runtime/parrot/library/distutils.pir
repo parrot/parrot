@@ -141,9 +141,17 @@ curl
 
 Some coreutils : tar, gzip
 
+=item sdist_bztar
+
+bzip2
+
 =item sdist_zip
 
 zip
+
+=item spec_rpm, sdist_rpm, bdist_rpm
+
+rpmbuild
 
 =item bdist_wininst
 
@@ -3074,6 +3082,8 @@ TEMPLATE
   L11:
     unless $P2 goto L12
     $S0 = shift $P2
+    $P3 = split parrot_version, $S0
+    $S0 = join "%{parrot_version}", $P3
     push $P0, $S0
     goto L11
   L12:
@@ -3082,6 +3092,8 @@ TEMPLATE
   L13:
     unless $P2 goto L14
     $S0 = shift $P2
+    $P3 = split parrot_version, $S0
+    $S0 = join "%{parrot_version}", $P3
     push $P0, $S0
     goto L13
   L14:
