@@ -410,6 +410,7 @@ push code_as_data, 110
 push code_as_data, 101
 push code_as_data, 119
 push code_as_data, 32
+push code_as_data, 91
 push code_as_data, 34
 push code_as_data, 71
 push code_as_data, 101
@@ -417,12 +418,14 @@ push code_as_data, 116
 push code_as_data, 111
 push code_as_data, 112
 push code_as_data, 116
-push code_as_data, 58
-push code_as_data, 58
+push code_as_data, 34
+push code_as_data, 59
+push code_as_data, 34
 push code_as_data, 79
 push code_as_data, 98
 push code_as_data, 106
 push code_as_data, 34
+push code_as_data, 93
 push code_as_data, 10
 push code_as_data, 32
 push code_as_data, 32
