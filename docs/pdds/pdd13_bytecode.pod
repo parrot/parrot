@@ -544,7 +544,7 @@ generated from the PIR found in the given filename
 The length of the table of line numbers mapping is given by the last field
 of the segment header.
 
-Then come the table:
+Then comes the table:
 
   +--------+--------+--------------------------------------------------------+
   | Offset | Length | Description                                            |
@@ -552,7 +552,7 @@ Then come the table:
   | 0      | 1      | Line number for the offset in the bytecode.            |
   +--------+--------+--------------------------------------------------------+
 
-Then come an opcode with n, the number of file mappings.
+Then comes an opcode with n, the number of file mappings.
 
 Then come n mappings.
 
@@ -626,7 +626,6 @@ specify the number of entries in the table.
   | Offset | Length | Description                                            |
   +--------+--------+--------------------------------------------------------+
   | 1      | 1      | Number of annotation group entries that follow.        |
-  |        |        |    n                                                   |
   +--------+--------+--------------------------------------------------------+
 
 A group entry maps an offset in the bytecode segment to an offset in the list
@@ -697,7 +696,8 @@ consider switching these PMCs over to use them at some point. }}
 =head4 Packfile.pmc
 
 This PMC represents the packfile overall. It will be constructed by the VM
-when reading a packfile. It implements the following methods.
+when reading a packfile. It implements the following methods and vtable 
+functions.
 
 =over 4
 
@@ -969,7 +969,7 @@ following methods:
 
 =over 4
 
-=item * C<get_iter>
+=item * C<get_iter> (vtable)
 
 Returns iterator for stored fixup entries.
 
