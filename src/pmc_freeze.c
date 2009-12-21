@@ -42,15 +42,6 @@ static void create_buffer(PARROT_INTERP,
         FUNC_MODIFIES(*info);
 
 PARROT_INLINE
-static void do_action(PARROT_INTERP,
-    ARGIN_NULLOK(PMC *pmc),
-    ARGIN(visit_info *info),
-    int seen,
-    UINTVAL id)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
-PARROT_INLINE
 static void do_thaw(PARROT_INTERP,
     ARGIN_NULLOK(PMC *pmc),
     ARGIN(visit_info *info))
@@ -171,7 +162,7 @@ static void visit_loop_todo_list(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static void visit_todo_list(PARROT_INTERP,
+static void visit_todo_list_freeze(PARROT_INTERP,
     ARGIN_NULLOK(PMC* pmc),
     ARGIN(visit_info* info))
         __attribute__nonnull__(1)
@@ -184,9 +175,6 @@ static void visit_todo_list_thaw(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_create_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(info))
-#define ASSERT_ARGS_do_action __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(info))
 #define ASSERT_ARGS_do_thaw __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -245,7 +233,7 @@ static void visit_todo_list_thaw(PARROT_INTERP,
 #define ASSERT_ARGS_visit_loop_todo_list __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(info))
-#define ASSERT_ARGS_visit_todo_list __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_visit_todo_list_freeze __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(info))
 #define ASSERT_ARGS_visit_todo_list_thaw __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -587,7 +575,6 @@ todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info), ARGIN(STRING *input))
          16 - PACKFILE_HEADER_BYTES % 16 : 0);
 
     PackFile *pf = info->pf = PackFile_new(interp, 0);
-    info->visit_pmc_now   = visit_todo_list;
 
     /* we must use PMCs here so that they get marked properly */
     info->todo = pmc_new(interp, enum_class_Array);
@@ -746,39 +733,6 @@ thaw_pmc(PARROT_INTERP, ARGMOD(visit_info *info),
 
     *id = n;
     return seen;
-}
-
-
-/*
-
-=item C<static void do_action(PARROT_INTERP, PMC *pmc, visit_info *info, int
-seen, UINTVAL id)>
-
-Called from C<visit_todo_list()> to perform the action specified in
-C<< info->what >>.
-
-Currently only C<VISIT_FREEZE_NORMAL> is implemented.
-
-=cut
-
-*/
-
-PARROT_INLINE
-static void
-do_action(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info),
-        int seen, UINTVAL id)
-{
-    ASSERT_ARGS(do_action)
-    switch (info->what) {
-      case VISIT_FREEZE_NORMAL:
-        freeze_pmc(interp, pmc, info, seen, id);
-        if (pmc)
-            info->visit_action = pmc->vtable->freeze;
-        break;
-      default:
-        Parrot_ex_throw_from_c_args(interp, NULL, 1, "Illegal action %ld",
-                (long)info->what);
-    }
 }
 
 
@@ -945,7 +899,7 @@ todo_list_seen(PARROT_INTERP, ARGIN(PMC *pmc), ARGMOD(visit_info *info),
 
 /*
 
-=item C<static void visit_todo_list(PARROT_INTERP, PMC* pmc, visit_info* info)>
+=item C<static void visit_todo_list_freeze(PARROT_INTERP, PMC* pmc, visit_info* info)>
 
 Checks the seen PMC via the todo list.
 
@@ -954,9 +908,9 @@ Checks the seen PMC via the todo list.
 */
 
 static void
-visit_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc), ARGIN(visit_info* info))
+visit_todo_list_freeze(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc), ARGIN(visit_info* info))
 {
-    ASSERT_ARGS(visit_todo_list)
+    ASSERT_ARGS(visit_todo_list_freeze)
     int     seen;
     UINTVAL id = 0;
 
@@ -967,10 +921,10 @@ visit_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc), ARGIN(visit_info* info))
     else
         seen = todo_list_seen(interp, pmc, info, &id);
 
-    do_action(interp, pmc, info, seen, id);
+    freeze_pmc(interp, pmc, info, seen, id);
 
-    if (!seen)
-        (info->visit_action)(interp, pmc, info);
+    if (pmc && !seen)
+        VTABLE_freeze(interp, pmc, info);
 }
 
 
@@ -1152,10 +1106,10 @@ run_thaw(PARROT_INTERP, ARGIN(STRING* input), visit_enum_type what)
     }
 
     /* _NORMAL or _CONSTANTS */
-    info.what = what;
+    info.what          = what;
+    info.visit_pmc_now = visit_todo_list_thaw;
 
     todo_list_init(interp, &info, input);
-    info.visit_pmc_now   = visit_todo_list_thaw;
 
     info.thaw_result = NULL;
 
@@ -1205,7 +1159,8 @@ Parrot_freeze(PARROT_INTERP, ARGIN(PMC *pmc))
     visit_info info;
     STRING *result;
 
-    info.what = VISIT_FREEZE_NORMAL;
+    info.what          = VISIT_FREEZE_NORMAL;
+    info.visit_pmc_now = visit_todo_list_freeze;
     create_buffer(interp, pmc, &info);
     todo_list_init(interp, &info, STRINGNULL);
 
