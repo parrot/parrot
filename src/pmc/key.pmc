@@ -304,18 +304,11 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
 */
 
     VTABLE void visit(visit_info *info) {
-
-        Parrot_Key_attributes *attrs;
-        /* at end a PMCNULL is written during thaw, which should stop visiting
-         * the key */
-
         /* Sometimes visit gets an uninitialized Key.  Initialize it. */
         if (!PMC_data(SELF))
             SELF.init();
 
-        attrs = (Parrot_Key_attributes *)PMC_data(SELF);
-        info->thaw_ptr  = &attrs->next_key;
-        (info->visit_pmc_now)(INTERP, attrs->next_key, info);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Key, next_key);
     }
 
     void freeze(visit_info *info) {

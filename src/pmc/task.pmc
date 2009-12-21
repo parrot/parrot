@@ -396,13 +396,8 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 */
 
     VTABLE void visit(visit_info *info) {
-        Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
-        PMC **pos;
-
         /* 1) visit code block */
-        pos            = &core_struct->codeblock;
-        info->thaw_ptr = pos;
-        (info->visit_pmc_now)(INTERP, *pos, info);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Task, codeblock);
     }
 
 /*

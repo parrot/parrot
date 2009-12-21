@@ -626,18 +626,11 @@ Archives the subroutine.
 */
 
     VTABLE void visit(visit_info *info) {
-        Parrot_Sub_attributes *sub;
+        VISIT_PMC_ATTR(INTERP, info, SELF, Sub, namespace_name);
 
-        PMC_get_sub(INTERP, SELF, sub);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Sub, multi_signature);
 
-        info->thaw_ptr = &sub->namespace_name;
-        (info->visit_pmc_now)(INTERP, sub->namespace_name, info);
-
-        info->thaw_ptr = &sub->multi_signature;
-        (info->visit_pmc_now)(INTERP, sub->multi_signature, info);
-
-        info->thaw_ptr = &sub->outer_sub;
-        (info->visit_pmc_now)(INTERP, sub->outer_sub, info);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Sub, outer_sub);
 
         /*
          * XXX visit_pmc_now is wrong, because it breaks
@@ -647,8 +640,8 @@ Archives the subroutine.
          *
          * Therefore the hash must be last during visit for now.
          */
-        info->thaw_ptr = &sub->lex_info;
-        (info->visit_pmc_now)(INTERP, sub->lex_info, info);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Sub, lex_info);
+
         SUPER(info);
     }
 
