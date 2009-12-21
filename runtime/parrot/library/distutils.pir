@@ -29,6 +29,7 @@ A setup script can be as simple as this:
 
 Distutils could work with Plumage (L<https://trac.parrot.org/parrot/wiki/ModuleEcosystem>).
 Plumage handles setup.pir commands.
+
 Distutils could generate a skeleton of Pluamge metadata.
 
 =head3 Commands / Steps / Targets
@@ -2949,7 +2950,7 @@ the default value is ports/rpm
     spew($S0, $S1, 1 :named('verbose'))
     .local string cmd
     cmd = "rpmbuild --nobuild " . $S0
-    system(cmd, 1 :named('verbose'))
+    system(cmd, 1 :named('verbose'), 1 :named('ignore_error'))
   L2:
 .end
 
@@ -3985,6 +3986,14 @@ SOURCE_C
     cp(src, dst, verbose :named('verbose'))
     unless has_exe goto L3
     unless exe goto L3
+    $P0 = getinterp
+    $P0 = $P0[.IGLOBALS_CONFIG_HASH]
+    $I0 = $P0['cygwin']
+    if $I0 goto L4
+    $I0 = $P0['hpux']
+    if $I0 goto L4
+    goto L3
+  L4:
     chmod(dst, 0o755, verbose :named('verbose'))
   L3:
 .end
