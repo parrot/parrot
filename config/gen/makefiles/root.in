@@ -1205,7 +1205,7 @@ $(IO_DIR)/unix$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
 
 $(IO_DIR)/utf8$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
 
-$(IO_DIR)/win32$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
+$(IO_DIR)/win32$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h $(PMC_INC_DIR)/pmc/pmc_filehandle.h
 
 $(SRC_DIR)/gc/alloc_memory$(O) : $(GENERAL_H_FILES)
 
