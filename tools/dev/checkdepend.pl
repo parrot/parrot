@@ -52,6 +52,7 @@ my $rules;
 }
 $rules =~ s/\\\n/ /g;
 $rules =~ s/\Q$(SRC_DIR)\E/src/g;
+$rules =~ s/\Q$(IO_DIR)\E/src\/io/g;
 $rules =~ s/\Q$(PMC_INC_DIR)\E/include/g;
 $rules =~ s/\Q$(O)\E//g;
 
@@ -86,7 +87,7 @@ foreach my $file (keys %deps) {
 
             # this isn't the actual comparison, just to give nice output
             # on failure.
-            is($inc, $declared, $file);
+            is($declared, $inc, $file);
             $failed = 1;
         }
     }
