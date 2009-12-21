@@ -159,6 +159,11 @@ E: Bernhard.Schmalhofer@gmx.de
 N: Bob Diertens
 D: patch regarding macro argument expansion
 
+N: Bob Kuo
+D: Convert some perl tests to PIR
+E: bobjkuo@gmail.com
+U: bubaflub
+
 N: Bob Rogers
 D: Random small bug fixes, including one for the linguine bug.
 E: rogers-perl6@rgrjr.dyndns.org
