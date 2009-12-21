@@ -44,6 +44,7 @@ foreach my $file (sort split /\n/, $files) {
 
 plan('no_plan');
 
+die 'no Makefile.  run `perl Configure.pl` to generate one.' unless -e "Makefile";
 open my $mf, '<', "Makefile";
 my $rules;
 {
