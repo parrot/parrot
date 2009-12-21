@@ -220,7 +220,7 @@ Subs marked with C<:vtable> or C<:method> flags are no longer given a
 namespace entry by default.  Use the C<:nsentry> flag to cause this
 to happen.
 
-L<http://rt.perl.org/rt3/Ticket/Display.html?id=53302>
+L<https://trac.parrot.org/parrot/ticket/389>
 
 =item C API coding standards cleanup [eligible in 1.1]
 
@@ -402,8 +402,6 @@ L<https://trac.parrot.org/parrot/ticket/852>
 =item 1
 
 L<Trac|http://trac.parrot.org/> is parrot's primary issue tracking system.
-
-Older tickets may be listed at L<RT|https://rt.perl.org/rt3>.
 
 =item 2
 
