@@ -1337,13 +1337,13 @@ tokrx hash.
     context = $P0['context';1]
   caller_loop:
     if null context goto caller_done
-    $P0 = context['current_sub']
+    $P0 = getattribute context, 'current_sub'
     $S0 = $P0
     # stop if we find a name that doesn't begin with ! (33)
     $I0 = ord $S0
     if $I0 != 33 goto caller_done
     if $S0 == peekname goto subrule_none
-    context = context['caller_ctx']
+    context = getattribute context, 'caller_ctx'
     goto caller_loop
   caller_done:
 
