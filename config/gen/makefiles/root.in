@@ -889,12 +889,10 @@ $(SRC_DIR)/scheduler$(O) : $(INC_DIR)/parrot.h \
                            $(SRC_DIR)/pmc/timer.c     \
                            $(INC_DIR)/pbcversion.h
 
-$(IO_DIR)/core$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/pmc/socket.c
-$(IO_DIR)/socket_api$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/pmc/socket.c
-$(IO_DIR)/socket_unix$(O) : $(INC_DIR)/parrot.h $(INC_DIR)/pbcversion.h   \
-                            $(SRC_DIR)/pmc/socket.c $(PMC_INC_DIR)/pmc/pmc_filehandle.h
-$(IO_DIR)/socket_win32$(O) : $(INC_DIR)/parrot.h $(INC_DIR)/pbcversion.h   \
-                            $(SRC_DIR)/pmc/socket.c $(PMC_INC_DIR)/pmc/pmc_filehandle.h
+$(IO_DIR)/core$(O) : $(INC_DIR)/parrot.h $(IO_DIR)/io_private.h
+$(IO_DIR)/socket_api$(O) : $(INC_DIR)/parrot.h $(IO_DIR)/io_private.h $(IO_DIR)/api.str $(PMC_INC_DIR)/pmc/pmc_socket.h
+$(IO_DIR)/socket_unix$(O) : $(INC_DIR)/parrot.h $(PMC_INC_DIR)/pmc/pmc_socket.h $(IO_DIR)/io_private.h
+$(IO_DIR)/socket_win32$(O) : $(INC_DIR)/parrot.h $(IO_DIR)/io_private.h $(PMC_INC_DIR)/pmc/pmc_socket.h $(IO_DIR)/api.str
 
 lib_deps_object : $(O_FILES)
 	$(PERL) tools/dev/lib_deps.pl object $(O_FILES)
@@ -1201,9 +1199,9 @@ $(IO_DIR)/buffer$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
 
 $(IO_DIR)/portable$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
 
-$(IO_DIR)/unix$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
+$(IO_DIR)/unix$(O) : $(INC_DIR)/parrot.h $(IO_DIR)/io_private.h $(PMC_INC_DIR)/pmc/pmc_filehandle.h
 
-$(IO_DIR)/utf8$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
+$(IO_DIR)/utf8$(O) : $(INC_DIR)/parrot.h $(IO_DIR)/io_private.h $(SRC_DIR)/string/unicode.h
 
 $(IO_DIR)/win32$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h $(PMC_INC_DIR)/pmc/pmc_filehandle.h
 
