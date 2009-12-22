@@ -1,132 +1,115 @@
-#!perl
-# Copyright (C) 2001-2006, Parrot Foundation.
+#!parrot
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-
-use Test::More;
-use Parrot::Config;
-use Parrot::Test tests => 5;
-
-pir_output_is( <<'CODE', <<'OUT', "Positive and negative integers" );
 .sub test :main
+    .include 'test_more.pir'
+    plan(12)
+
+    test_positive_integers()
+    test_negative_integers()
+    test_positive_zero()
+    test_negative_zero()
+    test_positive_and_negative_floats()
+    test_float_zeros()
+    test_float_nan()
+.end
+
+.sub test_positive_integers
     $I0 = 1
     unless $I0 goto not_one
-    say "1 is true"
+    ok(1, "1 is true")
+    .return()
+  not_one:
+    ok(0, "1 is true")  
+.end
 
-    not_one:
+.sub test_negative_integers
     $I0 = -1
     unless $I0 goto not_neg_one
-    say "-1 is true"
-
-    not_neg_one:
-
-    end
+    ok(1, "-1 is true")
+    .return()
+  not_neg_one:
+    ok(0, "-1 is true")
 .end
-CODE
-1 is true
--1 is true
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "Integer zeros" );
-.sub test :main
+.sub test_positive_zero
     $I0 = 0
     if $I0 goto not_zero
-    say "0 is false"
+    ok(1, "0 is false")
+    .return()
+  not_zero:
+    ok(0, "0 is false")
+.end
 
-    not_zero:
+.sub test_negative_zero
     $I0 = -0
     if $I0 goto not_neg_zero
-    say "-0 is false"
-
-    not_neg_zero:
-
-    end
+    ok(1, "-0 is false")
+    .return()
+  not_neg_zero:
+    ok(0, "-0 is false")
 .end
-CODE
-0 is false
--0 is false
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "Positive and negative floats" );
-.sub test :main
+.sub test_positive_and_negative_floats
     $N0 = 1.0
     unless $N0 goto not_one
-    say "1.0 is true"
-
-    not_one:
+    ok(1, "1.0 is true")
+    goto neg_one
+  not_one:
+    ok(0, "1.0 is true")
+  neg_one:
     $N0 = -1.0
     unless $N0 goto not_neg_one
-    say "-1.0 is true"
-
-    not_neg_one:
+    ok(1, "-1.0 is true")
+    goto pfive
+  not_neg_one:
+    ok(0, "-1.0 is true")
+  pfive:
     $N0 = 0.5
     unless $N0 goto not_pfive
-    say "0.5 is true"
-
-    not_pfive:
+    ok(1, "0.5 is true")
+    goto small
+  not_pfive:
+    ok(0, "0.5 is true")
+  small:
     $N0 = 1e-33
     unless $N0 goto not_small
-    say "1e-33 is true"
-
-    not_small:
-    end
+    ok(1, "1e-33 is true")
+    .return()
+  not_small:
+    ok(0, "1e-33 is true")
 .end
-CODE
-1.0 is true
--1.0 is true
-0.5 is true
-1e-33 is true
-OUT
 
-#TODO: {
-
-#local $TODO = "Failing due to FLOAT_IS_ZERO macro";
-
-pir_output_is( <<'CODE', <<'OUT', "Float zeros" );
-.sub test :main
+.sub test_float_zeros
     $N0 = 0.0
     if $N0 goto not_zero
-    say "0.0 is false"
-
-    not_zero:
+    ok(1, "0.0 is false")
+    goto neg_zero
+  not_zero:
+    ok(0, "0.0 is false")
+  neg_zero: 
     $N0 = -0.0
     if $N0 goto not_neg_zero
-    say "-0.0 is false"
-
-    not_neg_zero:
-
-    end
+    ok(1, "-0.0 is false")
+    .return()
+  not_neg_zero:
+    ok(0, "-0.0 is false")
 .end
-CODE
-0.0 is false
--0.0 is false
-OUT
 
-#}
-
-
-pir_output_is( <<'CODE', <<'OUT', "Float NaN" );
-.sub test :main
+.sub test_float_nan
     $N0 = 'NaN'
-    say $N0
+    is($N0, 'NaN', 'Float NaN')
     unless $N0 goto not_nan
-    say "NaN is true"
-
-    not_nan:
-    end
+    ok(1, "NaN is true")
+    .return()
+  not_nan:
+    ok(0, "NaN is true")
 .end
-CODE
-NaN
-NaN is true
-OUT
-
 
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 filetype=pir:
