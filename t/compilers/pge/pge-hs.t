@@ -1,12 +1,6 @@
-#! perl
-# Copyright (C) 2001-2005, Parrot Foundation.
+#!parrot 
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( t . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 1;
 
 =head1 NAME
 
@@ -23,8 +17,14 @@ Grammar Engine Haskell Output tests
 =cut
 
 # 1
-pir_output_is( <<'CODE', <<'OUT', "PGE::Hs match" );
-.sub _main
+.sub main :main
+    .include 'test_more.pir'
+    plan(1)
+
+    test_pge_hs_match()
+.end
+
+.sub test_pge_hs_match
     .local pmc match, add_rule
     .local string result
 
@@ -36,19 +36,14 @@ pir_output_is( <<'CODE', <<'OUT', "PGE::Hs match" );
     add_rule("foo", "s")
     result = match("test", "t(.<foo>)t")
     eq result, "PGE_Match 0 4 [PGE_Match 1 3 [] [(\"foo\", PGE_Match 2 3 [] [])]] []\n", OK
-    print "not "
-
-OK:
-    print "ok 1\n"
-    end
+    ok(0, 'PGE::Hs match')
+  OK:
+    ok(1, 'PGE::Hs match')
 .end
-CODE
-ok 1
-OUT
 
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 filetype=pir:
