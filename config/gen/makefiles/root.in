@@ -1307,11 +1307,11 @@ src/dynpmc/subproxy$(O) : $(INC_DIR)/parrot.h $(INC_DIR)/extend.h \
   $(PMC_INC_DIR)/pmc/pmc_default.h
 
 compilers/pirc/src/pirparser$(O) : $(INC_DIR)/oplib/ops.h \
- compilers/pirc/pircompiler.h compilers/pirc/pircompunit.h \
- compilers/pirc/pirsymbol.h   compilers/pirc/piryy.h \
- compilers/pirc/pirmacro.h    compilers/pirc/pirpcc.h \
- compilers/pirc/pirerr.h      compilers/pirc/pirop.h \
- compilers/pirc/pirparser.h   compilers/pirc/pirlexer.h
+ compilers/pirc/src/pircompiler.h compilers/pirc/src/pircompunit.h \
+ compilers/pirc/src/pirsymbol.h   compilers/pirc/src/piryy.h \
+ compilers/pirc/src/pirmacro.h    compilers/pirc/src/pirpcc.h \
+ compilers/pirc/src/pirerr.h      compilers/pirc/src/pirop.h \
+ compilers/pirc/src/pirparser.h   compilers/pirc/src/pirlexer.h
 
 compilers/pirc/src/pirerr$(O) : compilers/pirc/src/pircompiler.h \
  compilers/pirc/src/pirparser.h compilers/pirc/src/piryy.h \
@@ -1346,8 +1346,8 @@ compilers/imcc/imc$(O) :  \
   compilers/imcc/optimizer.h
 
 compilers/pirc/src/pirregalloc$(O) : \
-  compilers/pirc/pircompiler.h \
-  compilers/pirc/pirregalloc.h \
+  compilers/pirc/src/pircompiler.h \
+  compilers/pirc/src/pirregalloc.h \
   $(INC_DIR)/parrot.h
 
 compilers/imcc/cfg$(O) : \
@@ -1446,6 +1446,32 @@ compilers/pirc/src/pirlexer$(O) : $(INC_DIR)/parrot.h \
 compilers/pirc/src/pirmacro$(O) : $(INC_DIR)/parrot.h \
   compilers/pirc/src/pircompiler.h \
   compilers/pirc/src/pirmacro.h \
+
+compilers/pirc/src/pirop$(O) : \
+  compilers/pirc/src/pircompiler.h \
+  compilers/pirc/src/pircompunit.h \
+  compilers/pirc/src/pirop.h \
+  compilers/pirc/src/pirerr.h \
+
+compilers/pirc/src/pirpcc$(O) : $(INC_DIR)/oplib/ops.h \
+  compilers/pirc/src/pirpcc.h \
+  compilers/pirc/src/pircompunit.h \
+  compilers/pirc/src/pircompiler.h \
+  compilers/pirc/src/pirerr.h \
+  compilers/pirc/src/pirsymbol.h \
+
+compilers/pirc/src/pirsymbol$(O) : \
+  compilers/pirc/src/pircompiler.h \
+  compilers/pirc/src/pirsymbol.h \
+  compilers/pirc/src/pircompunit.h \
+  compilers/pirc/src/piryy.h \
+  compilers/pirc/src/pirerr.h
+
+src/gc/malloc_trace$(O) : src/gc/malloc-trace.h src/gc/malloc.c
+
+src/packfile/pf_items$(O) : $(INC_DIR)/parrot.h
+
+src/gc/malloc$(O) : src/gc/malloc.h
 
 src/atomic/gcc_x86$(O) : $(INC_DIR)/parrot.h $(INC_DIR)/atomic/gcc_x86.h
 
