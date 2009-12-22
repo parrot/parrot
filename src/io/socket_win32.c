@@ -77,8 +77,8 @@ INTVAL
 Parrot_io_socket_win32(PARROT_INTERP, ARGIN(PMC * s), int fam, int type, int proto)
 {
     ASSERT_ARGS(Parrot_io_socket_win32)
-    int sock, i = 1;
-    sock = socket(fam, type, proto);
+    int       i    = 1;
+    const int sock = socket(fam, type, proto);
     if (sock >= 0) {
         setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const char*)&i, sizeof (i));
         Parrot_io_set_os_handle(interp, s, sock);
@@ -443,10 +443,8 @@ PMC *
 Parrot_io_sockaddr_in(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port)
 {
     ASSERT_ARGS(Parrot_io_sockaddr_in)
-    PMC * sockaddr;
-    char * s;
-
-    s = Parrot_str_to_cstring(interp, addr);
+    PMC  * sockaddr;
+    char * const s = Parrot_str_to_cstring(interp, addr);
     sockaddr = pmc_new(interp, enum_class_Sockaddr);
     get_sockaddr_in(interp, sockaddr, s, port);
     Parrot_str_free_cstring(s);

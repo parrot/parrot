@@ -701,8 +701,6 @@ Parrot_io_open_pipe_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
             NULL, NULL, TRUE, 0,
             NULL, NULL, &start, &procinfo) == 0)
         goto fail;
-    Parrot_str_free_cstring(cmd);
-    cmd = NULL;
     if (f_read) {
         Parrot_io_set_os_handle(interp, io, hread);
         CloseHandle(hwrite);
@@ -711,6 +709,8 @@ Parrot_io_open_pipe_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
         Parrot_io_set_os_handle(interp, io, hwrite);
         CloseHandle(hread);
     }
+
+    Parrot_str_free_cstring(cmd); 
     CloseHandle(procinfo.hThread);
     VTABLE_set_integer_keyed_int(interp, io, 0, (INTVAL)procinfo.hProcess);
     return io;
