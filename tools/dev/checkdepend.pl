@@ -26,7 +26,7 @@ required C files first.
 
 =cut
 
-my $files = `ack -fa . | grep '\\.c\$'`;
+my $files = `ack -fa {src,compilers} | grep '\\.c\$'`;
 
 my %deps;
 
@@ -54,6 +54,7 @@ my $rules;
 $rules =~ s/\\\n/ /g;
 $rules =~ s/\Q$(SRC_DIR)\E/src/g;
 $rules =~ s/\Q$(IO_DIR)\E/src\/io/g;
+$rules =~ s/\Q$(PIRC_DIR)\E/compilers\/pirc\/src/g;
 $rules =~ s/\Q$(PMC_INC_DIR)\E/include/g;
 $rules =~ s/\Q$(O)\E//g;
 
@@ -63,6 +64,7 @@ foreach my $file (keys %deps) {
     my $failed = 0;
     if (!defined($declared)) {
         $failed = 1;
+        is("", join(' ', @{$deps{$file}}), $file);
     }
     else
     {
@@ -92,7 +94,7 @@ foreach my $file (keys %deps) {
             $failed = 1;
         }
     }
-    pass("$file has proper deps") unless $failed;
+    pass($file) unless $failed;
 }
 
 sub collapse_path {
