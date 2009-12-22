@@ -691,10 +691,11 @@ Parrot_gc_reallocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer),
 
     if (!PObj_COW_TEST(buffer))
         pool->guaranteed_reclaimable += copysize;
+    else
+        pool->possibly_reclaimable   += copysize;
 
-    pool->possibly_reclaimable += copysize;
-    mem                         = (char *)mem_allocate(interp, new_size, pool);
-    mem                         = aligned_mem(buffer, mem);
+    mem = (char *)mem_allocate(interp, new_size, pool);
+    mem = aligned_mem(buffer, mem);
 
     /* We shouldn't ever have a 0 from size, but we do. If we can track down
      * those bugs, this can be removed which would make things cheaper */
@@ -805,8 +806,8 @@ Parrot_gc_reallocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str),
 
     if (!PObj_COW_TEST(str))
         pool->guaranteed_reclaimable += Buffer_buflen(str);
-
-    pool->possibly_reclaimable += Buffer_buflen(str);
+    else
+        pool->possibly_reclaimable   += Buffer_buflen(str);
 
     mem = (char *)mem_allocate(interp, new_size, pool);
     mem += sizeof (void *);
