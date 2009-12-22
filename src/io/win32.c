@@ -710,7 +710,7 @@ Parrot_io_open_pipe_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
         CloseHandle(hread);
     }
 
-    Parrot_str_free_cstring(cmd); 
+    Parrot_str_free_cstring(cmd);
     CloseHandle(procinfo.hThread);
     VTABLE_set_integer_keyed_int(interp, io, 0, (INTVAL)procinfo.hProcess);
     return io;
