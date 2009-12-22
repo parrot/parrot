@@ -1,33 +1,27 @@
-#!perl
-# Copyright (C) 2001-2005, Parrot Foundation.
+#!parrot
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Config;
-use Parrot::Test tests => 1;
+.sub main :main
+    .include 'test_more.pir'
+    plan(2)
 
-##############################
-pir_output_is( <<'CODE', <<'OUT', "global const" );
-.sub test :main
-	.globalconst string ok = "ok\n"
-	print ok
-	_sub()
-	end
+    test_global_const()
 .end
-.sub _sub
-	print ok
+
+.sub test_global_const
+	.globalconst string ok1 = "ok\n"
+	ok(1, 'global const')
+	_global_const_sub()
 .end
-CODE
-ok
-ok
-OUT
+
+.sub _global_const_sub
+	ok(1, 'global const')
+.end
 
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 filetype=pir:
