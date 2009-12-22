@@ -594,8 +594,7 @@ all : \
     $(PBCMERGE) \
     $(PDB) \
     $(PDUMP) \
-    $(NQP) \
-    $(PIRC)
+    $(NQP)
 
 corevm : \
     flags_dummy \
