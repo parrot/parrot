@@ -1,358 +1,298 @@
-#!perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+#!parrot
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Config;
-use Parrot::Test tests => 13;
+.sub main :main
+    .include 'test_more.pir'
+    plan(20)
 
+    test_different_namespace_declarations()
+    test_meth_call_syntax()
+    test_meth_call_syntax_m_o_arg()
+    test_meth_call_ret_o_m_arg()
+    test_meth_call_syntax_string()
+    test_initializer()
+    test_meth_call_syntax_method_self()
+    test_explicit_meth_call_syntax()
+    test_explicit_meth_call_syntax_meth_var()
+    test_explicit_meth_call_syntax_args()
+    test_explicit_meth_call_syntax_2()
+    test_meth_call_syntax_reserved_word()
+    test_vtable_implies_self()
+.end
 ##############################
 # ".namespace" sanity
 
-pir_output_is( <<'CODE', <<'OUT', "different namespace declarations");
-
+.sub test_different_namespace_declarations
+   lives_ok( <<'CODE', "different namespace declarations")
 .namespace ["Foo"]
 .namespace [ ]
 .namespace []
 
-.sub test :main
-    print "ok\n"
+.sub test 
+    $I0 = 42
 .end
 CODE
-ok
-OUT
+.end
 
 ##############################
 # Parrot Calling Conventions
 
-pir_output_is( <<'CODE', <<'OUT', "meth call syntax" );
-
-.sub test :main
+.sub test_meth_call_syntax
     .local pmc class
     .local pmc obj
     newclass class, "Foo"
     obj = new "Foo"
     obj.'_meth'()
-    print "done\n"
-    end
 .end
 
 .namespace [ "Foo" ]
 .sub _meth :method
-    print "in meth\n"
+    ok(1, 'meth call syntax')
 .end
-CODE
-in meth
-done
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "meth call syntax m.o(arg)" );
-.sub test :main
+# reset to default namespace
+.namespace []
+
+.sub test_meth_call_syntax_m_o_arg
     .local pmc class
     .local pmc obj
-    newclass class, "Foo"
-    obj = new "Foo"
+    newclass class, "Foo1"
+    obj = new "Foo1"
     $P0 = new 'String'
-    $P0 = "ok\n"
-    obj.'_meth'($P0)
-    print "done\n"
-    end
+    $P0 = "ok"
+    obj.'_meth1'($P0)
 .end
 
-.namespace [ "Foo" ]
-.sub _meth :method
+.namespace [ "Foo1" ]
+.sub _meth1 :method
     .param pmc s
-    print "in meth\n"
-    print s
+    is(s, 'ok','meth call syntax m.o(arg)')
 .end
-CODE
-in meth
-ok
-done
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "meth call ret = o.m(arg)" );
-.sub test :main
+# reset to default namespace
+.namespace []
+
+.sub test_meth_call_ret_o_m_arg
+# meth call ret = o.m(arg)
     .local pmc class
     .local pmc obj
-    newclass class, "Foo"
-    obj = new "Foo"
+    newclass class, "Foo2"
+    obj = new "Foo2"
     $P0 = new 'String'
-    $P0 = "ok\n"
+    $P0 = "ok"
     $S0 = obj.'_meth'($P0)
-    print $S0
-    end
 .end
 
-.namespace [ "Foo" ]
+.namespace [ "Foo2" ]
 .sub _meth :method
     .param pmc s
-    print "in meth\n"
-    print s
+    is(s, 'ok', 'meth call ret = o.m(arg)')
     .begin_return
     .set_return "done\n"
     .end_return
 .end
-CODE
-in meth
-ok
-done
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "meth call syntax, string" );
-.sub test :main
+# reset to default namespace
+.namespace []
+
+.sub test_meth_call_syntax_string
     .local pmc class
     .local pmc obj
     .local string meth
     meth = "_meth"
-    newclass class, "Foo"
-    obj = new "Foo"
+    newclass class, "Foo3"
+    obj = new "Foo3"
     obj."_meth"()
     set $S10, "_meth"
     obj.$S10()
     set $S10, "_meth"
     obj.$S10()
-    print "done\n"
-    end
 .end
-.namespace [ "Foo" ]
-.sub _meth :method
-    print "in meth\n"
-.end
-CODE
-in meth
-in meth
-in meth
-done
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "initializer" );
-.sub test :main
-    newclass $P1, "Foo"
-    subclass $P2, $P1, "Bar"
-    subclass $P3, $P2, "Baz"
-    $P3 = new "Baz"
+.namespace [ "Foo3" ]
+.sub _meth :method
+    ok(1, 'meth call syntax, string')
+.end
+
+# reset to default namespace
+.namespace []
+
+.sub test_initializer
+    newclass $P1, "Foo4"
+    subclass $P2, $P1, "Bar1"
+    subclass $P3, $P2, "Baz1"
+    $P3 = new "Baz1"
     get_global $P0, "_sub"
     invokecc $P0
-    print "done\n"
-    end
 .end
 
-.namespace ["Foo"]
+.namespace ["Foo4"]
 .sub init :vtable :method
-    print "foo_init\n"
+    ok(1, "initializer: foo_init")
 .end
 
-.namespace ["Bar"]
+.namespace ["Bar1"]
 .sub init :vtable :method
-    print "bar_init\n"
+    ok(1, "initializer: bar_init")
 .end
 
-.namespace ["Baz"]
+.namespace ["Baz1"]
 .sub init :vtable :method
-    print "baz_init\n"
+    ok(1, "initializer: baz_init")
 .end
 
 .namespace [] # main again
 .sub _sub
-    print "in sub\n"
+    ok(1, "initializer: in sub")
 .end
-CODE
-foo_init
-bar_init
-baz_init
-in sub
-done
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "meth call syntax - method, self" );
-
-.sub test :main
+.sub test_meth_call_syntax_method_self
+# meth call syntax - method, self
     .local pmc class
     .local pmc obj
-    newclass class, "Foo"
-    obj = new "Foo"
+    newclass class, "Foo5"
+    obj = new "Foo5"
     obj.'_meth'()
-    print "done\n"
-    end
 .end
 
-.namespace [ "Foo" ]
+.namespace [ "Foo5" ]
 .sub _meth :method
-    print "in meth\n"
-    isa $I0, self, "Foo"
+    isa $I0, self, "Foo5"
     if $I0, ok
-    print "not "
-ok:
-    print "ok\n"
+    ok(0, 'meth call syntax - method, self')
+    .return()
+  ok:
+    ok(1, 'meth call syntax - method, self')
 .end
-CODE
-in meth
-ok
-done
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "explicit meth call syntax" );
+# reset to default namespace
+.namespace []
 
-.sub test :main
+.sub test_explicit_meth_call_syntax
     .local pmc class
     .local pmc obj
-    newclass class, "Foo"
-    obj = new "Foo"
+    newclass class, "Foo6"
+    obj = new "Foo6"
     .begin_call
     .invocant obj
     .meth_call "_meth"
     .end_call
-    print "done\n"
-    end
 .end
 
-.namespace [ "Foo" ]
+.namespace [ "Foo6" ]
 .sub _meth :method
-    print "in meth\n"
+    ok(1, 'explicit meth call syntax')
 .end
-CODE
-in meth
-done
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "explicit meth call syntax, meth var" );
+# reset to default namespace
+.namespace []
 
-.sub test :main
+.sub test_explicit_meth_call_syntax_meth_var
     .local pmc class
     .local pmc obj
     .local string meth
-    newclass class, "Foo"
-    obj = new "Foo"
+    newclass class, "Foo7"
+    obj = new "Foo7"
     meth = "_me"
     meth = meth . "th"  # test concat to
     .begin_call
     .invocant obj
     .meth_call meth
     .end_call
-    print "done\n"
-    end
 .end
 
-.namespace [ "Foo" ]
+.namespace [ "Foo7" ]
 .sub _meth :method
-    print "in meth\n"
+    ok(1, 'explicit meth call syntax, meth var')
 .end
-CODE
-in meth
-done
-OUT
-pir_output_is( <<'CODE', <<'OUT', "explicit meth call syntax, args" );
 
-.sub test :main
+# reset to default namespace
+.namespace []
+
+.sub test_explicit_meth_call_syntax_args
     .local pmc class
     .local pmc obj
-    newclass class, "Foo"
-    obj = new "Foo"
+    newclass class, "Foo8"
+    obj = new "Foo8"
     .begin_call
     .set_arg "hello"
-    .set_arg "\n"
     .invocant obj
     .meth_call "_meth"
     .get_result $S0
     .end_call
-    print $S0
-    print "done\n"
-    end
+    is($S0, 'ok', 'explicit meth call syntax, args')
 .end
 
-.namespace [ "Foo" ]
+.namespace [ "Foo8" ]
+
 .sub _meth :method
     .param string p1
-    .param string p2
-    print "in meth\n"
-    print p1
-    print p2
+    is(p1, 'hello', 'explicit meth call syntax, args')
     .begin_return
-    .set_return "ok\n"
+    .set_return "ok"
     .end_return
 .end
-CODE
-in meth
-hello
-ok
-done
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "explicit meth call syntax" );
+# reset to default namespace
+.namespace []
 
-.sub test :main
+.sub test_explicit_meth_call_syntax_2
     .local pmc class
     .local pmc obj
-    newclass class, "Foo"
-    obj = new "Foo"
+    newclass class, "Foo9"
+    obj = new "Foo9"
     .begin_call
     .invocant obj
     .meth_call "_meth"
     .end_call
-    print "done\n"
-    end
 .end
 
-.namespace [ "Foo" ]
+.namespace [ "Foo9" ]
 .sub _meth :method
-    print "in meth\n"
+   ok(1, 'explicit meth call syntax')
 .end
-CODE
-in meth
-done
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "meth call syntax - reserved word" );
+# reset to default namespace
+.namespace []
 
-.sub test :main
+.sub test_meth_call_syntax_reserved_word
     .local pmc class
     .local pmc obj
-    newclass class, "Foo"
-    obj = new "Foo"
+    newclass class, "Foo10"
+    obj = new "Foo10"
     obj.'open'()
-    print "done\n"
-    end
 .end
 
-.namespace [ "Foo" ]
+.namespace [ "Foo10" ]
 .sub open :method
-    print "in meth\n"
+    ok(1, 'meth call syntax - reserved word')
 .end
-CODE
-in meth
-done
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', ":vtable implies self" );
-.sub 'main' :main
-    $P1 = newclass "Foo"
-    $P2 = new "Foo"
+# reset to default namespace
+.namespace []
+
+.sub test_vtable_implies_self
+    $P1 = newclass "Foo11"
+    $P2 = new "Foo11"
     $S1 = $P2
-    print $S1
+    is($S1, 'stringy thingy', ':vtable implies self')
 .end
 
-.namespace [ "Foo" ]
+.namespace [ "Foo11" ]
 
 .sub 'get_string' :vtable
     self.'bar'()
-    .return ("stringy thingy\n")
+    .return ("stringy thingy")
 .end
 
 .sub bar :method
-    print "called bar\n"
+    ok(1, ":vtable implies self - called bar")
 .end
-CODE
-called bar
-stringy thingy
-OUT
 
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 filetype=pir:
