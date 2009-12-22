@@ -5,7 +5,6 @@
 
 #include <stdio.h>
 #include "parrot/parrot.h"
-#include "../new/pirheredoc.h"
 
 /*
 

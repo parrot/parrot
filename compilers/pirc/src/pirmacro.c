@@ -7,7 +7,6 @@
 #include <string.h>
 #include "pirmacro.h"
 #include "pircompiler.h"
-#include "pirmacro.h"
 #include "parrot/parrot.h"
 
 
