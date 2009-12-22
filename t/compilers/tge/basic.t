@@ -1,12 +1,6 @@
-#!perl
+#!parrot
 # Copyright (C) 2005-2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw(t . lib ../lib ../../lib ../../../lib);
-use Test::More;
-use Parrot::Test tests => 3;
 
 =head1 NAME
 
@@ -22,9 +16,16 @@ testing a few basic components of TGE::Grammar and TGE::Tree
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', 'build up a basic rule in a grammar' );
+.sub main :main
+    .include 'test_more.pir'
+     plan(11)
 
-.sub _main :main
+     test_build_up_a_basic_rule_in_a_grammar()
+     test_agid_hash()
+     test_malformed_string_in_r11890_under_linux_i386()
+.end
+
+.sub test_build_up_a_basic_rule_in_a_grammar
     load_bytecode 'TGE.pbc'
 
     .local pmc AG
@@ -35,25 +36,14 @@ pir_output_is( <<'CODE', <<'OUT', 'build up a basic rule in a grammar' );
     .local pmc rule_obj
     rule_obj = $P1[0]
     $P2 = getattribute rule_obj, 'type'
-    print $P2
-    print "\n"
+    is($P2, 'Leaf', 'build up a basic rule in a grammar')
     $P3 = getattribute rule_obj, 'name'
-    print $P3
-    print "\n"
+    is($P3, 'min', 'build up a basic rule in a grammar')
     $P4 = getattribute rule_obj, 'parent'
-    print $P4
-    print "\n"
-    end
+    is($P4, '.', 'build up a basic rule in a grammar')
 .end
 
-CODE
-Leaf
-min
-.
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', 'agid hash' );
-.sub _main :main
+.sub test_agid_hash
     load_bytecode 'TGE.pbc'
     .local pmc tree
     tree = new ['TGE';'Tree']
@@ -61,54 +51,34 @@ pir_output_is( <<'CODE', <<'OUT', 'agid hash' );
 
     $P0 = new 'Integer'
     id = tree.'_lookup_id'($P0)
-    print id
-    print "\n"
+    is(id, 1, 'agid hash')
     $P1 = new 'Integer'
     id = tree.'_lookup_id'($P1)
-    print id
-    print "\n"
+    is(id, 2, 'agid hash')
     id = tree.'_lookup_id'($P0)
-    print id
-    print "\n"
+    is(id, 1, 'agid hash')
     $P2 = new 'Integer'
     id = tree.'_lookup_id'($P2)
-    print id
-    print "\n"
+    is(id, 3, 'agid hash')
     id = tree.'_lookup_id'($P0)
-    print id
-    print "\n"
+    is(id, 1, 'agid hash')
     id = tree.'_lookup_id'($P1)
-    print id
-    print "\n"
+    is(id, 2, 'agid hash')
     id = tree.'_lookup_id'($P2)
-    print id
-    print "\n"
-    end
+    is(id, 3, 'agid hash')
 .end
 
-CODE
-1
-2
-1
-3
-1
-2
-3
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', '"Malformed string" in r11890 under Linux i386' );
-
-.sub test
-  load_bytecode "TGE.pbc"
-  print "1\n"
+.sub test_malformed_string_in_r11890_under_linux_i386
+    lives_ok(<<'CODE', '"Malformed string" in r11890 under Linux i386')
+.sub main 
+    load_bytecode "TGE.pbc"
 .end
 CODE
-1
-OUT
+.end
 
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 filetype=pir:
