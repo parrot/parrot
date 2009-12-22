@@ -1,13 +1,6 @@
-#! perl
-# Copyright (C) 2005-2007, Parrot Foundation.
+#! parrot
+# Copyright (C) 2005-2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 2;
-use Parrot::Config;
 
 =head1 NAME
 
@@ -24,29 +17,32 @@ happens to be a Sub.
 
 =cut
 
-pir_output_is( << 'CODE', << 'OUTPUT', "loadlib" );
 .sub main :main
+    .include 'test_more.pir'
+    plan(3)
+
+    test_loadlib()
+    test_type_of_hll_mapped_sub()
+.end
+
+.sub test_loadlib
     .local pmc lib
     lib = loadlib "subproxy"
     unless lib goto not_loaded
-    print "ok\n"
-    end
-not_loaded:
-    print "not loaded\n"
+    ok(1, 'loadlib')
+    .return()
+  not_loaded:
+    ok(1, 'loadlib')
 .end
-CODE
-ok
-OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "test type of hll_map'ped .Sub" );
-.sub main :main
+.sub test_type_of_hll_mapped_sub
     .local pmc b, f
     b = get_global 'bar'
     $S0 = typeof b
-    say $S0
+    is($S0, 'Sub', "test type of hll_map'ped .Sub")
     f = get_root_global ['some'], 'foo'
     $S0 = typeof f
-    say $S0
+    is($S0, 'SubProxy', "test type of hll_map'ped .Sub")
 .end
 
 .sub bar
@@ -67,14 +63,10 @@ pir_output_is( << 'CODE', << 'OUTPUT', "test type of hll_map'ped .Sub" );
 .sub foo
     noop
 .end
-CODE
-Sub
-SubProxy
-OUTPUT
 
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 filetype=pir:
