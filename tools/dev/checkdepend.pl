@@ -37,7 +37,7 @@ foreach my $file (sort split /\n/, $files) {
         local undef $/;
         $guts = <$fh>;
     }
-    next if $file =~ m{src/(ops|dynoplibs)/};
+    next if $file =~ m{src/(ops|dynoplibs|dynpmc)/};
     my @includes = $guts =~ m/#include "(.*)"/g;
     $file =~ s/\.c$//;
     $deps{$file} = [ @includes ];
