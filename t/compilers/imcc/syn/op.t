@@ -1,533 +1,327 @@
-#!perl
-# Copyright (C) 2001-2006, Parrot Foundation.
+#!parrot
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-
-use Test::More;
-use Parrot::Config;
-use Parrot::Test tests => 32;
-
-pir_output_is( <<'CODE', <<'OUT', "+=" );
 .sub test :main
+    .include 'test_more.pir'
+    plan(59)
+
+    test_plus_equal()
+    test_minus_equal()
+    test_times_equal()
+    test_divide_equal()
+    test_mod_equal()
+    test_dot_equal()
+    test_and_equal()
+    test_pipe_equal()
+    test_tilde_equal()
+    test_double_shift_right_equal()
+    test_triple_shift_right_equal()
+    test_double_shift_left_equal()
+    test_x_defined()
+    test_x_clone()
+    test_x_length()
+    test_x_sin()
+    test_x_can()
+    test_x_isa()
+    test_x_add()
+    test_x_invoke()
+    test_empty_sub()
+    test_if_null_x_goto_y()
+    test_unless_null_x_goto_y()
+    test_if_null_x_goto_y_2()
+    test_unless_null_x_goto_y_p0()
+    test_x_equal_a_double_equal_b()
+    test_x_equal_a_less_than_b()
+    test_x_equals_a_greater_than_b()
+    test_x_equal_a_greater_than_equal_b()
+    test_x_equal_a_less_than_equal_b()
+    test_x_equal_a_not_equal_b()
+    test_octal_hex_bin_dec_numbers()
+.end
+
+.sub test_plus_equal
     $I0 = 10
     $I0 += 20
-    print $I0
-    print "\n"
+    is($I0, 30, '+=')
 
     $I0 += -20
-    print $I0
-    print "\n"
-    end
+    is($I0, 10, '+=')
 .end
-CODE
-30
-10
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "-=" );
-.sub test :main
+.sub test_minus_equal
     $I0 = 10
     $I0 -= 20
-    print $I0
-    print "\n"
+    is($I0, -10, '-=')
 
     $I0 -= -20
-    print $I0
-    print "\n"
-    end
+    is($I0, 10, '-=')
 .end
-CODE
--10
-10
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "*=" );
-.sub test :main
+.sub test_times_equal
     $I0 = 10
     $I0 *= 20
-    print $I0
-    print "\n"
+    is($I0, 200, '*=')
 
     $I0 *= -2
-    print $I0
-    print "\n"
-    end
+    is($I0, -400, '*=')
 .end
-CODE
-200
--400
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "/=" );
-.sub test :main
+.sub test_divide_equal
     $I0 = 20
     $I0 /= 2
-    print $I0
-    print "\n"
+    is($I0, 10, '/=')
 
     $N0 = 20
     $N0 /= .5
     $I0 = $N0
-    print $I0
-    print "\n"
-
-    end
+    is($I0, 40, '/=')
 .end
-CODE
-10
-40
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "%=" );
-.sub test :main
+.sub test_mod_equal
     $I0 = 20
     $I0 %= 7
-    print $I0
-    print "\n"
+    is($I0, 6, '%=')
 
     $I0 = 200
     $I0 %= 2
-    print $I0
-    print "\n"
-    end
+    is($I0, 0, '%=')
 .end
-CODE
-6
-0
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', ".=" );
-.sub test :main
+.sub test_dot_equal
     $S0 = "ab"
     $S0 .= "cd"
-    print $S0
-    print "\n"
+    is($S0, 'abcd', '.=')
 
     $S0 .= ""
-    print $S0
-    print "\n"
-    end
+    is($S0, 'abcd', '.=')
 .end
-CODE
-abcd
-abcd
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "&=" );
-.sub test :main
+.sub test_and_equal
     $I0 =  0b1011
     $I0 &= 0b1000
-    print $I0
-    print "\n"
+    is($I0, 8, '&=')
 
     $I0 &= 0b0000
-    print $I0
-    print "\n"
-    end
+    is($I0, 0, '&=')
 .end
-CODE
-8
-0
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "|=" );
-.sub test :main
+.sub test_pipe_equal
     $I0 =  0b1011
     $I0 |= 0b1000
-    print $I0
-    print "\n"
+    is($I0, 11, '|=')
 
     $I0 |= 0b0100
-    print $I0
-    print "\n"
-    end
+    is($I0, 15, '|=')
 .end
-CODE
-11
-15
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "~=" );
-.sub test :main
+.sub test_tilde_equal
     $I0 =  0b1011
     $I0 ~= 0b1000
-    print $I0
-    print "\n"
+    is($I0, 3, '~=')
 
     $I0 ~= 0b0011
-    print $I0
-    print "\n"
-    end
+    is($I0, 0, '~=')
 .end
-CODE
-3
-0
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', ">>=" );
-.sub test :main
+.sub test_double_shift_right_equal
     $I0 =  0b1011
     $I0 >>= 1
-    print $I0
-    print "\n"
-    end
+    is($I0, 5, '>>=')
 .end
-CODE
-5
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', ">>>=" );
-.sub test :main
+.sub test_triple_shift_right_equal
     $I0 =  0b1011
     $I0 >>>= 1
-    print $I0
-    print "\n"
-    end
+    is($I0, 5, '>>>=')
 .end
-CODE
-5
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "<<=" );
-.sub test :main
+.sub test_double_shift_left_equal
     $I0 =  0b1011
     $I0 <<= 1
-    print $I0
-    print "\n"
-    end
+    is($I0, 22, '<<=')
 .end
-CODE
-22
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "x = defined" );
-.sub test :main
+.sub test_x_defined
     .local pmc a
     a = new 'ResizablePMCArray'
     push a, 10
     $I0 = defined a
-    print $I0
+    is($I0, 1, 'x = defined')
     $I0 = defined a[0]
-    print $I0
+    is($I0, 1, 'x = defined')
     $I0 = defined a[1]
-    print $I0
-    print "\n"
-    end
+    is($I0, 0, 'x = defined')
 .end
-CODE
-110
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "x = clone" );
-.sub test :main
+.sub test_x_clone
     .local pmc a
     a = new 'Integer'
     a = 10
     .local pmc b
     b = clone a
-    print b
-    print "\n"
-    end
+    is(b, 10, 'x = clone')
 .end
-CODE
-10
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "x = length" );
-.sub test :main
+.sub test_x_length
     .local string s
     s = "abc"
     $I0 = length s
-    print $I0
-    print "\n"
+    is($I0, 3, 'x = length')
 
     s = ""
     $I0 = length s
-    print $I0
-    print "\n"
-    end
+    is($I0, 0, 'x = length')
 .end
-CODE
-3
-0
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "x = sin" );
-.sub test :main
+.sub test_x_sin
     $N0 = sin 0
-    print $N0
-    print "\n"
-    end
+    is($N0, 0, 'x = sin')
 .end
-CODE
-0
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "x = can" );
-.sub test :main
+.sub test_x_can
     $P0 = new 'FileHandle'
     $I0 = can $P0, "puts"
-    print $I0
-    print "\n"
-    end
+    is($I0, 1, 'x = can')
 .end
-CODE
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "x = isa" );
-.sub test :main
+.sub test_x_isa
     $P0 = new 'Integer'
     $I0 = isa $P0, "scalar"
-    print $I0
-    print "\n"
-    end
+    is($I0, 1, 'x = isa')
 .end
-CODE
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "x = add" );
-.sub test :main
+.sub test_x_add
     $I0 = 10
     $I1 = add $I0, 10
-    print $I1
-    print "\n"
-    end
+    is($I1, 20, 'x = add')
 .end
-CODE
-20
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "x = invoke" );
-.sub test :main
+.sub test_x_invoke
     $P0 = get_global "_s"
     $P0 = invokecc
-    $S0 = "done\n"
-    $S0 = print
-    end
 .end
+
 .sub _s
-    print "in sub\n"
+    ok(1, 'x = invoke')
     returncc
 .end
-CODE
-in sub
-done
-OUT
 
 # ticket 32393
-pir_output_is( <<'CODE', '', "empty sub" );
+.sub test_empty_sub
+    lives_ok( <<'CODE', "empty sub" )
 .sub _foo
 .end
 
 .sub _foo :anon
 .end
 CODE
+.end
 
-pir_output_is( <<'CODE', <<'OUT', "if null X goto Y" );
-.sub main :main
+.sub test_if_null_x_goto_y
     null $P0
     if null $P0 goto BLAH
-    print "NOT A "
-BLAH:
-   print "PASS\n"
+    ok(0, 'if null X goto Y')
+    .return()
+  BLAH:
+    ok(1, 'if null X goto Y')
 .end
-CODE
-PASS
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "unless null X goto Y" );
-.sub main :main
+.sub test_unless_null_x_goto_y
     null $P0
     unless null $P0 goto BLAH
-    print "PASS\n"
-    end
-BLAH:
-   print "FAIL"
+    ok(1, 'unless null X goto Y')
+    .return()
+  BLAH:
+    ok(0, 'unless null X goto Y')
 .end
-CODE
-PASS
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "if null X goto Y" );
-.sub main :main
+.sub test_if_null_x_goto_y_2
     $S0 = "hello"
     if null $S0 goto BLAH
-    print "PASS\n"
-    end
-BLAH:
-   print "FAIL"
+    ok(1, 'if null X goto Y 2')
+    .return()
+  BLAH:
+    ok(0, 'if null X goto Y 2')
 .end
-CODE
-PASS
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'unless null X goto Y, $P0 = null' );
-.sub main :main
+.sub test_unless_null_x_goto_y_p0
     $P0 = null
     unless null $P0 goto BLAH
-    print "PASS\n"
-    end
-BLAH:
-   print "FAIL"
+    ok(1, 'unless null X goto Y, $P0 = null')
+    .return()
+  BLAH:
+    ok(0, 'unless null X goto Y, $P0 = null')
 .end
-CODE
-PASS
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'X = A == B' );
-.sub main :main
+.sub test_x_equal_a_double_equal_b
     $I0 = 1 == 1
-    print $I0
-    print "\n"
-
+    is($I0, 1, 'X = A == B')
     $I0 = 1 == 0
-    print $I0
-    print "\n"
+    is($I0, 0, 'X = A == B')
 .end
-CODE
-1
-0
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'X = A < B' );
-.sub main :main
+.sub test_x_equal_a_less_than_b
     $I0 = 1 < 1
-    print $I0
-    print "\n"
-
+    is($I0, 0, 'X = A < B')
     $I0 = 0 < 1
-    print $I0
-    print "\n"
+    is($I0, 1, 'X = A < B')
 .end
-CODE
-0
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'X = A > B' );
-.sub main :main
+.sub test_x_equals_a_greater_than_b
     $I0 = 1 > 1
-    print $I0
-    print "\n"
-
+    is($I0, 0, 'X = A > B')
     $I0 = 4 > 1
-    print $I0
-    print "\n"
+    is($I0, 1, 'X = A > B')
 .end
-CODE
-0
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'X = A >= B' );
-.sub main :main
+.sub test_x_equal_a_greater_than_equal_b
     $I0 = 1 >= 1
-    print $I0
-    print "\n"
-
+    is($I0, 1, 'X = A >= B')
     $I0 = 4 >= 1
-    print $I0
-    print "\n"
-
+    is($I0, 1, 'X = A >= B')
     $I0 = 0 >= 1
-    print $I0
-    print "\n"
+    is($I0, 0, 'X = A >= B')
 .end
-CODE
-1
-1
-0
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'X = A <= B' );
-.sub main :main
+.sub test_x_equal_a_less_than_equal_b
     $I0 = 1 <= 1
-    print $I0
-    print "\n"
-
+    is($I0, 1, 'X = A <= B')
     $I0 = 4 <= 1
-    print $I0
-    print "\n"
-
+    is($I0, 0, 'X = A <= B')
     $I0 = 0 <= 1
-    print $I0
-    print "\n"
+    is($I0, 1, 'X = A <= B')
 .end
-CODE
-1
-0
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'X = A != B' );
-.sub main :main
+.sub test_x_equal_a_not_equal_b
     $I0 = 1 != 1
-    print $I0
-    print "\n"
-
+    is($I0, 0, 'X = A != B')
     $I0 = 4 != 1
-    print $I0
-    print "\n"
+    is($I0, 1, 'X = A != B')
 .end
-CODE
-0
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'Test octal/hex/bin/dec numbers' );
-.sub main :main
+.sub test_octal_hex_bin_dec_numbers
     $I0 = 0077
-    print $I0
-    print "\n"
-
+    is($I0, 77, 'Test octal/hex/bin/dec numbers')
     $I0 = 0o77
-    print $I0
-    print "\n"
-
+    is($I0, 63, 'Test octal/hex/bin/dec numbers')
     $I0 = 0xfF
-    print $I0
-    print "\n"
-
+    is($I0, 255, 'Test octal/hex/bin/dec numbers')
     $I0 = 0b1101
-    print $I0
-    print "\n"
-
+    is($I0, 13, 'Test octal/hex/bin/dec numbers')
     $I0 = 0O10
-    print $I0
-    print "\n"
-
+    is($I0, 8, 'Test octal/hex/bin/dec numbers')
     $I0 = 0X10
-    print $I0
-    print "\n"
-
+    is($I0, 16, 'Test octal/hex/bin/dec numbers')
     $I0 = 0B10
-    print $I0
-    print "\n"
-
+    is($I0, 2, 'Test octal/hex/bin/dec numbers')
     $I0 = 10
-    print $I0
-    print "\n"
-
+    is($I0, 10, 'Test octal/hex/bin/dec numbers')
 .end
-CODE
-77
-63
-255
-13
-8
-16
-2
-10
-OUT
 
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 filetype=pir:
