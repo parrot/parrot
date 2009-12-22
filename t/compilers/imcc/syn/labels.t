@@ -29,7 +29,7 @@
 .end
 
 .sub test_illegal_label
-    throws_like( <<'CODE', 'no\ label\ offset\ defined', 'illegal label' )
+    dies_ok( <<'CODE', 'illegal label' )
 .sub bogus :main
     goto _function
     print "never\n"
