@@ -37,6 +37,7 @@ Grammar Engine Haskell Output tests
     result = match("test", "t(.<foo>)t")
     eq result, "PGE_Match 0 4 [PGE_Match 1 3 [] [(\"foo\", PGE_Match 2 3 [] [])]] []\n", OK
     ok(0, 'PGE::Hs match')
+    .return()
   OK:
     ok(1, 'PGE::Hs match')
 .end
