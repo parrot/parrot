@@ -57,7 +57,7 @@ CUR_DIR         := .
 IMCC_DIR        := compilers/imcc
 
 # directory for the (experimental) PIR code compiler
-PIRC_DIR        := compilers/pirc/src
+PIRC_DIR        := compilers/pirc
 
 # directory for header files
 INC_DIR         := @inc@
@@ -373,10 +373,10 @@ IMCC_O_FILES := \
 
 # these are private to the PIRC subsystem
 PIRC_O_FILES := \
-    $(PIRC_DIR)/bcgen$(O) \
-    $(PIRC_DIR)/pircapi$(O) \
-    $(PIRC_DIR)/pirerr$(O) \
-    $(PIRC_DIR)/pirop$(O)
+    $(PIRC_DIR)/src/bcgen$(O) \
+    $(PIRC_DIR)/src/pircapi$(O) \
+    $(PIRC_DIR)/src/pirerr$(O) \
+    $(PIRC_DIR)/src/pirop$(O)
 
 # generated list of header files
 GENERAL_H_FILES   := $(NONGEN_HEADERS) $(GEN_HEADERS) @TEMP_cg_h@
@@ -1286,6 +1286,168 @@ $(SRC_DIR)/pbc_merge$(O) : $(SRC_DIR)/pbc_merge.c $(GENERAL_H_FILES) \
 	$(PMC_INC_DIR)/pmc/pmc_sub.h
 
 $(IO_DIR)/filehandle$(O) : $(INC_DIR)/parrot.h $(PMC_INC_DIR)/pmc/pmc_filehandle.h $(SRC_DIR)/io/io_private.h
+
+compilers/pirc/src/piremit$(O) : $(INC_DIR)/parrot.h \
+  compilers/pirc/src/piremit.h \
+  compilers/pirc/src/pircompunit.h \
+  compilers/pirc/src/pircompiler.h \
+  compilers/pirc/src/pirerr.h \
+  compilers/pirc/src/bcgen.h \
+  compilers/pirc/src/assert.h \
+  $(INC_DIR)/parrot/oplib/ops.h
+
+compilers/imcc/pcc$(O) : compilers/imcc/imc.h compilers/imcc/parser.h
+compilers/imcc/instructions$(O) : compilers/imcc/imc.h compilers/imcc/pbc.h \
+  compilers/imcc/optimizer.h  $(PMC_INC_DIR)/pmc/pmc_callcontext.h
+
+src/dynpmc/subproxy$(O) : $(INC_DIR)/parrot.h $(INC_DIR)/extend.h \
+  $(INC_DIR)/dynext.h $(PMC_INC_DIR)/pmc/pmc_subproxy.h \
+  $(PMC_INC_DIR)/pmc/pmc_sub.h $(PMC_INC_DIR)/pmc_default.h \
+  $(PMC_INC_DIR)/pmc/pmc_continuation.h $(PMC_INC_DIR)/pmc/pmc_callcontext.h \
+  $(PMC_INC_DIR)/pmc/pmc_default.h
+
+compilers/pirc/src/pirparser$(O) : $(INC_DIR)/oplib/ops.h \
+ compilers/pirc/pircompiler.h compilers/pirc/pircompunit.h \
+ compilers/pirc/pirsymbol.h   compilers/pirc/piryy.h \
+ compilers/pirc/pirmacro.h    compilers/pirc/pirpcc.h \
+ compilers/pirc/pirerr.h      compilers/pirc/pirop.h \
+ compilers/pirc/pirparser.h   compilers/pirc/pirlexer.h
+
+compilers/pirc/src/pirerr$(O) : compilers/pirc/src/pircompiler.h \
+ compilers/pirc/src/pirparser.h compilers/pirc/src/piryy.h \
+ compilers/pirc/src/pirlexer.h  compilers/pirc/src/pirerr.h
+
+compilers/imcc/pbc$(O) : $(INC_DIR)/packfile.h \
+  compilers/imcc/imc.h \
+  compilers/imcc/pbc.h \
+  $(PMC_INC_DIR)/pmc/pmc_sub.h \
+  $(PMC_INC_DIR)/pmc/pmc_callcontext.h
+
+compilers/imcc/parser_util$(O) : compilers/imcc/imc.h \
+  compilers/imcc/pbc.h \
+  compilers/imcc/parser.h \
+  compilers/imcc/optimizer.h \
+  $(INC_DIR)/dynext.h $(INC_DIR)/embed.h \
+  $(PMC_INC_DIR)/pmc/pmc_sub.h \
+  $(PMC_INC_DIR)/pmc/pmc_callcontext.h
+
+compilers/pirc/src/bcgen$(O) :  \
+  compilers/pirc/src/pirsymbol.h \
+  compilers/pirc/src/bcgen.h \
+  $(INC_DIR)/parrot.h \
+  $(INC_DIR)/embed.h \
+  $(INC_DIR)/parrot/interpreter.h \
+  $(PMC_INC_DIR)/pmc/pmc_sub.h \
+  $(PMC_INC_DIR)/pmc/pmc_namespace.h \
+  $(PMC_INC_DIR)/pmc/pmc_callcontext.h
+
+compilers/imcc/imc$(O) :  \
+  compilers/imcc/imc.h \
+  compilers/imcc/optimizer.h
+
+compilers/pirc/src/pirregalloc$(O) : \
+  compilers/pirc/pircompiler.h \
+  compilers/pirc/pirregalloc.h \
+  $(INC_DIR)/parrot.h
+
+compilers/imcc/cfg$(O) : \
+  compilers/imcc/imc.h compilers/imcc/optimizer.h
+
+compilers/imcc/debug$(O) : \
+  compilers/imcc/imc.h $(INC_DIR)/io.h
+
+compilers/imcc/imclexer$(O) : \
+  compilers/imcc/imc.h compilers/imcc/parser.h
+
+compilers/imcc/imcparser$(O) : \
+  compilers/imcc/imc.h compilers/imcc/parser.h compilers/imcc/pbc.h \
+  compilers/imcc/optimizer.h \
+  $(INC_DIR)/dynext.h $(PMC_INC_DIR)/pmc/pmc_callcontext.h
+
+compilers/imcc/main$(O) : \
+  compilers/imcc/imc.h compilers/imcc/parser.h compilers/imcc/pbc.h \
+  $(INC_DIR)/embed.h $(INC_DIR)/longopt.h $(PMC_INC_DIR)/pmc/pmc_callcontext.h \
+  $(INC_DIR)/imcc.h $(INC_DIR)/runcore_api.h
+
+compilers/imcc/optimizer$(O) : $(PMC_INC_DIR)/pmc/pmc_callcontext.h \
+  compilers/imcc/imc.h compilers/imcc/pbc.h compilers/imcc/optimizer.h \
+
+compilers/imcc/reg_alloc$(O) : compilers/imcc/imc.h compilers/imcc/optimizer.h
+
+compilers/imcc/sets$(O) : compilers/imcc/imc.h compilers/imcc/sets.h
+
+compilers/imcc/symreg$(O) : compilers/imcc/imc.h
+
+compilers/pirc/heredoc/heredocmain$(O) : $(INC_DIR)/parrot.h
+
+compilers/pirc/macro/macrolexer$(O) : $(INC_DIR)/parrot.h \
+ compilers/pirc/macro/macro.h  \
+ compilers/pirc/macro/lexer.h  \
+ compilers/pirc/macro/macroparser.h
+
+compilers/pirc/macro/macroparser$(O) :  $(INC_DIR)/parrot.h \
+ compilers/pirc/macro/macro.h  \
+ compilers/pirc/macro/lexer.h  \
+ compilers/pirc/macro/macroparser.h \
+ compilers/pirc/macro/macrolexer.h \
+ $(INC_DIR)/string_funcs.h
+
+
+compilers/pirc/src/hdocprep$(O) : $(INC_DIR)/parrot $(INC_DIR)/string_funcs.h \
+  $(INC_DIR)/embed.h compilers/pirc/src/pirheredoc.h
+
+compilers/pirc/src/main$(O) : \
+  compilers/pirc/src/pirparser.h \
+  compilers/pirc/src/pircompiler.h \
+  compilers/pirc/src/piremit.h \
+  compilers/pirc/src/piryy.h \
+  compilers/pirc/src/pirlexer.h \
+  compilers/pirc/src/pirheredoc.h \
+  compilers/pirc/src/pirregalloc.h \
+  compilers/pirc/src/pircapi.h
+
+compilers/pirc/src/pircapi$(O) : \
+  compilers/pirc/src/pirparser.h \
+  compilers/pirc/src/pircompiler.h \
+  compilers/pirc/src/piremit.h \
+  compilers/pirc/src/piryy.h \
+  compilers/pirc/src/pirlexer.h \
+  compilers/pirc/src/pircapi.h
+
+compilers/pirc/src/pircompiler$(O) : \
+  compilers/pirc/src/pircompiler.h \
+  $(INC_DIR)/parrot.h \
+  compilers/pirc/src/piryy.h \
+  compilers/pirc/src/pirmacro.h \
+  compilers/pirc/src/pirregalloc.h \
+  compilers/pirc/src/pirerr.h
+
+compilers/pirc/src/pircompunit$(O) : \
+  compilers/pirc/src/pircompunit.h \
+  compilers/pirc/src/pircompiler.h \
+  compilers/pirc/src/pirsymbol.h \
+  compilers/pirc/src/piryy.h \
+  compilers/pirc/src/pirdefines.h \
+  compilers/pirc/src/pirpcc.h \
+  compilers/pirc/src/pirerr.h \
+  compilers/pirc/src/pirop.h \
+  compilers/pirc/src/bcgen.h \
+  $(INC_DIR)/oplib/ops.h \
+  $(INC_DIR)/string_funcs.h \
+  $(INC_DIR)/dynext.h \
+  $(PMC_INC_DIR)/pmc/pmc_callcontext.h
+
+compilers/pirc/src/pirlexer$(O) : $(INC_DIR)/parrot.h \
+  compilers/pirc/src/pirparser.h \
+  compilers/pirc/src/pircompiler.h \
+  compilers/pirc/src/pirmacro.h \
+  compilers/pirc/src/pirerr.h
+
+compilers/pirc/src/pirmacro$(O) : $(INC_DIR)/parrot.h \
+  compilers/pirc/src/pircompiler.h \
+  compilers/pirc/src/pirmacro.h \
+
+src/atomic/gcc_x86$(O) : $(INC_DIR)/parrot.h $(INC_DIR)/atomic/gcc_x86.h
 
 $(OPS_DIR)/core_ops$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops.c \
 	$(PMC_INC_DIR)/pmc/pmc_continuation.h $(PMC_INC_DIR)/pmc/pmc_parrotlibrary.h
