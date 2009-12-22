@@ -58,7 +58,7 @@ $rules =~ s/\Q$(PIRC_DIR)\E/compilers\/pirc\/src/g;
 $rules =~ s/\Q$(PMC_INC_DIR)\E/include/g;
 $rules =~ s/\Q$(O)\E//g;
 
-foreach my $file (keys %deps) {
+foreach my $file (sort keys %deps) {
     $rules =~ /^$file\s*:\s*(.*)\s*$/m;
     my $declared = $1;
     my $failed = 0;
@@ -69,7 +69,7 @@ foreach my $file (keys %deps) {
     else
     {
         $declared =~ s/\s+/ /g;
-        foreach my $inc (@{$deps{$file}}) {
+        foreach my $inc (sort @{$deps{$file}}) {
             # Skip #include "parrot/foo.h". It's in GENERAL_H_FILES rule.
             next if $inc =~ m{^parrot/}o;
 
