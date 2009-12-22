@@ -38,6 +38,7 @@ foreach my $file (sort split /\n/, $files) {
         $guts = <$fh>;
     }
     my @includes = $guts =~ m/#include "(.*)"/g;
+    next if $file =~ m{ops/};
     $file =~ s/\.c$//;
     $deps{$file} = [ @includes ];
 }
