@@ -730,7 +730,7 @@ merge_pools(ARGMOD(Variable_Size_Pool *dest), ARGMOD(Variable_Size_Pool *source)
     }
 
     dest->guaranteed_reclaimable += source->guaranteed_reclaimable;
-    dest->possibly_reclaimable   += dest->possibly_reclaimable;
+    dest->possibly_reclaimable   += source->possibly_reclaimable;
 
     source->top_block              = NULL;
     source->total_allocated        = 0;
