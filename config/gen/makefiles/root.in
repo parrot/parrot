@@ -595,6 +595,7 @@ all : \
     $(PDB) \
     $(PDUMP) \
     $(NQP) \
+    $(PIRC)
 
 corevm : \
     flags_dummy \
