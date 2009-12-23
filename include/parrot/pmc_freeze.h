@@ -54,7 +54,7 @@ typedef enum {
 
 typedef struct _visit_info {
     visit_f             visit_pmc_now;
-    char               *pos;            /* current read/write position in buffer */
+    size_t              pos;            /* current read/write position in buffer */
     Buffer             *buffer;
     size_t              input_length;   /* */
     INTVAL              what;

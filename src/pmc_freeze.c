@@ -281,14 +281,29 @@ C<len> more bytes. If not, expands the buffer.
 
 */
 
+#define GET_VISIT_CURSOR(io) \
+    ((opcode_t *)(((char *)Buffer_bufstart((io)->buffer) + (io)->pos)))
+#define SET_VISIT_CURSOR(io, x) do {\
+    (io)->pos = ((char *)(x) - (char *)Buffer_bufstart((io)->buffer)); \
+} while (0)
+#define INC_VISIT_CURSOR(io, x) do {\
+    (io)->pos += (x); \
+} while (0)
+
+#define BYTECODE_SHIFT_OK(io) \
+    PARROT_ASSERT(GET_VISIT_CURSOR(io) <= \
+        (opcode_t *)(((char *)Buffer_bufstart((io)->buffer)) + (io)->input_length))
+
+
 PARROT_INLINE
 static void
 ensure_buffer_size(PARROT_INTERP, ARGIN(visit_info *io), size_t len)
 {
     ASSERT_ARGS(ensure_buffer_size)
     Buffer *buf = io->buffer;
-    const size_t used      = io->pos - (char*)Buffer_bufstart(buf);
-    const int need_free = Buffer_buflen(buf) - used - len;
+    const ptrdiff_t used =
+        (GET_VISIT_CURSOR(io) - (opcode_t *)Buffer_bufstart(buf)) * sizeof (opcode_t);
+    const int need_free  = Buffer_buflen(buf) - used - len;
 
     /* grow by factor 1.5 or such */
     if (need_free <= 16) {
@@ -296,9 +311,9 @@ ensure_buffer_size(PARROT_INTERP, ARGIN(visit_info *io), size_t len)
         if (new_size < Buffer_buflen(buf) - need_free + 512)
             new_size = Buffer_buflen(buf) - need_free + 512;
         Parrot_gc_reallocate_buffer_storage(interp, buf, new_size);
-        io->pos = (char *)Buffer_bufstart(buf) + used;
+        SET_VISIT_CURSOR(io, (char *)Buffer_bufstart(buf) + used);
 
-        PARROT_ASSERT(Buffer_buflen(buf) - used - len >= 15);
+        PARROT_ASSERT((char *)Buffer_buflen(buf) - used - len >= 15);
     }
 
 #ifndef DISABLE_GC_DEBUG
@@ -321,7 +336,7 @@ PARROT_INLINE
 static INTVAL
 OUTPUT_LENGTH(ARGIN(visit_info *io)) {
     ASSERT_ARGS(OUTPUT_LENGTH)
-    return (io->pos - ((char *)Buffer_bufstart(io->buffer)));
+    return sizeof (opcode_t) * (GET_VISIT_CURSOR(io) - ((opcode_t *)Buffer_bufstart(io->buffer)));
 }
 
 /*
@@ -338,11 +353,11 @@ PARROT_INLINE
 static INTVAL
 INFO_HAS_DATA(ARGIN(visit_info *io)) {
     ASSERT_ARGS(INFO_HAS_DATA)
-    return (io->pos < (((char *)Buffer_bufstart(io->buffer)) + io->input_length));
+    return sizeof (opcode_t) *
+        (GET_VISIT_CURSOR(io) <
+            (opcode_t *)(((char *)Buffer_bufstart(io->buffer)) + io->input_length));
 }
 
-#define BYTECODE_SHIFT_OK(io) \
-    PARROT_ASSERT((io)->pos <= (((char *)Buffer_bufstart((io)->buffer)) + (io)->input_length))
 
 /*
 
@@ -379,7 +394,7 @@ push_opcode_integer(PARROT_INTERP, ARGIN(visit_info *io), INTVAL v)
     ASSERT_ARGS(push_opcode_integer)
     size_t len = PF_size_integer() * sizeof (opcode_t);
     ensure_buffer_size(interp, io, len);
-    io->pos = (char *)PF_store_integer((opcode_t *)io->pos, v);
+    SET_VISIT_CURSOR(io, PF_store_integer(GET_VISIT_CURSOR(io), v));
 }
 
 
@@ -400,7 +415,7 @@ push_opcode_number(PARROT_INTERP, ARGIN(visit_info *io), FLOATVAL v)
     ASSERT_ARGS(push_opcode_number)
     size_t len = PF_size_number() * sizeof (opcode_t);
     ensure_buffer_size(interp, io, len);
-    io->pos = (char *)PF_store_number((opcode_t *)io->pos, &v);
+    SET_VISIT_CURSOR(io, PF_store_number(GET_VISIT_CURSOR(io), &v));
 }
 
 
@@ -421,7 +436,7 @@ push_opcode_string(PARROT_INTERP, ARGIN(visit_info *io), ARGIN(STRING *v))
     ASSERT_ARGS(push_opcode_string)
     size_t len = PF_size_string(v) * sizeof (opcode_t);
     ensure_buffer_size(interp, io, len);
-    io->pos = (char *)PF_store_string((opcode_t *)io->pos, v);
+    SET_VISIT_CURSOR(io, PF_store_string(GET_VISIT_CURSOR(io), v));
 }
 
 /*
@@ -455,7 +470,9 @@ static INTVAL
 shift_opcode_integer(SHIM_INTERP, ARGIN(visit_info *io))
 {
     ASSERT_ARGS(shift_opcode_integer)
-    const INTVAL i = PF_fetch_integer(io->pf, (const opcode_t **)&io->pos);
+    opcode_t *pos  = GET_VISIT_CURSOR(io);
+    const INTVAL i = PF_fetch_integer(io->pf, &pos);
+    SET_VISIT_CURSOR(io, pos);
     BYTECODE_SHIFT_OK(io);
     return i;
 }
@@ -475,7 +492,9 @@ static FLOATVAL
 shift_opcode_number(SHIM_INTERP, ARGIN(visit_info *io))
 {
     ASSERT_ARGS(shift_opcode_number)
-    const FLOATVAL f  = PF_fetch_number(io->pf, (const opcode_t **)&io->pos);
+    opcode_t *pos     = GET_VISIT_CURSOR(io);
+    const FLOATVAL f  = PF_fetch_number(io->pf, &pos);
+    SET_VISIT_CURSOR(io, pos);
     BYTECODE_SHIFT_OK(io);
     return f;
 }
@@ -498,7 +517,9 @@ static STRING*
 shift_opcode_string(PARROT_INTERP, ARGIN(visit_info *io))
 {
     ASSERT_ARGS(shift_opcode_string)
-    STRING * const s = PF_fetch_string(interp, io->pf, (const opcode_t **)&io->pos);
+    opcode_t *pos    = GET_VISIT_CURSOR(io);
+    STRING * const s = PF_fetch_string(interp, io->pf, &pos);
+    SET_VISIT_CURSOR(io, pos);
     BYTECODE_SHIFT_OK(io);
     return s;
 }
@@ -587,8 +608,8 @@ todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info), ARGIN(STRING *input))
 
     if (info->what == VISIT_FREEZE_NORMAL) {
         ensure_buffer_size(interp, info, header_length);
-        mem_sys_memcopy(info->pos, pf->header, PACKFILE_HEADER_BYTES);
-        info->pos += header_length;
+        mem_sys_memcopy(GET_VISIT_CURSOR(info), pf->header, PACKFILE_HEADER_BYTES);
+        INC_VISIT_CURSOR(info, header_length);
     }
     else {
         if (Parrot_str_byte_length(interp, input) < header_length) {
@@ -607,13 +628,13 @@ todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info), ARGIN(STRING *input))
 
         info->buffer = (Buffer *)input;
         PARROT_ASSERT(input->_bufstart == input->strstart);
-        info->pos = (char *) Buffer_bufstart(info->buffer);
+        SET_VISIT_CURSOR(info, Buffer_bufstart(info->buffer));
         info->input_length = input->strlen;
-        mem_sys_memcopy(pf->header, info->pos, PACKFILE_HEADER_BYTES);
+        mem_sys_memcopy(pf->header, GET_VISIT_CURSOR(info), PACKFILE_HEADER_BYTES);
 
         PackFile_assign_transforms(pf);
 
-        info->pos += header_length;
+        INC_VISIT_CURSOR(info, header_length);
     }
 
     info->id_list     = pmc_new(interp, enum_class_Array);
@@ -899,7 +920,8 @@ todo_list_seen(PARROT_INTERP, ARGIN(PMC *pmc), ARGMOD(visit_info *info),
 
 /*
 
-=item C<static void visit_todo_list_freeze(PARROT_INTERP, PMC* pmc, visit_info* info)>
+=item C<static void visit_todo_list_freeze(PARROT_INTERP, PMC* pmc, visit_info*
+info)>
 
 Checks the seen PMC via the todo list.
 
@@ -1058,7 +1080,7 @@ create_buffer(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGMOD(visit_info *info))
 
     info->buffer = (Buffer *)Parrot_gc_new_bufferlike_header(interp, sizeof (Buffer));
     Parrot_gc_allocate_buffer_storage_aligned(interp, info->buffer, len);
-    info->pos = (char *)Buffer_bufstart(info->buffer);
+    SET_VISIT_CURSOR(info, Buffer_bufstart(info->buffer));
 }
 
 
@@ -1166,8 +1188,14 @@ Parrot_freeze(PARROT_INTERP, ARGIN(PMC *pmc))
 
     visit_loop_todo_list(interp, pmc, &info);
 
-    result = Parrot_str_new_init(interp, (char *)Buffer_bufstart(info.buffer), OUTPUT_LENGTH(&info),
-      Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
+    result = Parrot_gc_new_string_header(interp, 0);
+    Buffer_bufstart(result) = Buffer_bufstart(info.buffer);
+    Buffer_buflen(result)   = Buffer_buflen(info.buffer);
+    result->bufused         = OUTPUT_LENGTH(&info);
+    result->strstart        = Buffer_bufstart(result);
+    result->strlen          = result->bufused;
+    result->encoding        = Parrot_fixed_8_encoding_ptr;
+    result->charset         = Parrot_binary_charset_ptr;
 
     PackFile_destroy(interp, info.pf);
     return result;
