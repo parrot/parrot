@@ -108,6 +108,8 @@ foreach my $file (sort keys %deps) {
         }
     }
     $declared =~ s/^\s+//;
+    $declared =~ s/\s+$//;
+    $declared =~ s/\s+/ /g;
     if ($declared ne "") {
        is($declared, '', "$file has extra dependencies.");
     }
