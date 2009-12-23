@@ -450,17 +450,17 @@ Introspection interface. C<key> can be:
         PMC    *nextkey, *cont;
         STRING *outer = NULL;
         STRING *item  = key_string(interp, key);
-        STRING *s     = CONST_STRING(interp, "globals");
+        STRING *name  = CONST_STRING(interp, "globals");
         int     level = 0;
 
         PMC *ctx;
 
-        if (Parrot_str_equal(interp, item, s))
+        if (Parrot_str_equal(interp, item, name))
             return interp->root_namespace;
 
-        s     = CONST_STRING(interp, "outer");
+        name  = CONST_STRING(interp, "outer");
 
-        if (Parrot_str_equal(interp, item, s)) {
+        if (Parrot_str_equal(interp, item, name)) {
             outer   = item;
             nextkey = key_next(INTERP, key);
 
@@ -510,34 +510,34 @@ Introspection interface. C<key> can be:
         if (item == outer)
             return Parrot_pcc_get_sub(interp, ctx);
 
-        s = CONST_STRING(interp, "context");
+        name = CONST_STRING(interp, "context");
 
-        if (Parrot_str_equal(interp, item, s))
+        if (Parrot_str_equal(interp, item, name))
             return ctx;
 
-        s = CONST_STRING(interp, "sub");
+        name = CONST_STRING(interp, "sub");
 
-        if (Parrot_str_equal(interp, item, s))
+        if (Parrot_str_equal(interp, item, name))
             return Parrot_pcc_get_sub(interp, ctx);
 
-        s = CONST_STRING(interp, "lexpad");
+        name = CONST_STRING(interp, "lexpad");
 
-        if (Parrot_str_equal(interp, item, s))
+        if (Parrot_str_equal(interp, item, name))
             return Parrot_pcc_get_lex_pad(interp, ctx);
 
-        s = CONST_STRING(interp, "namespace");
+        name = CONST_STRING(interp, "namespace");
 
-        if (Parrot_str_equal(interp, item, s))
+        if (Parrot_str_equal(interp, item, name))
             return Parrot_pcc_get_namespace(interp, ctx);
 
-        s = CONST_STRING(interp, "continuation");
+        name = CONST_STRING(interp, "continuation");
 
-        if (Parrot_str_equal(interp, item, s))
+        if (Parrot_str_equal(interp, item, name))
             return VTABLE_clone(interp, Parrot_pcc_get_continuation(interp, ctx));
 
-        s = CONST_STRING(interp, "annotations");
+        name = CONST_STRING(interp, "annotations");
 
-        if (Parrot_str_equal(interp, item, s)) {
+        if (Parrot_str_equal(interp, item, name)) {
             PMC        *sub_pmc = Parrot_pcc_get_sub(interp, ctx);
             if (ctx == CURRENT_CONTEXT(interp)) {
                 /* We can't know the current program counter for the currently
