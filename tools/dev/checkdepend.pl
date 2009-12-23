@@ -37,7 +37,9 @@ foreach my $file (sort split /\n/, $files) {
         local undef $/;
         $guts = <$fh>;
     }
-    next if $file =~ m{src/(ops|dynoplibs|dynpmc)/};
+    # For now, skip any files that have generated dependencies
+    next if $file =~ m{src/(ops|dynoplibs|dynpmc|pmc)/};
+    next if $file =~ m{src/string/(charset|encoding)/};
     my @includes = $guts =~ m/#include "(.*)"/g;
     $file =~ s/\.c$//;
     $deps{$file} = [ @includes ];
@@ -57,6 +59,8 @@ $rules =~ s/\Q$(SRC_DIR)\E/src/g;
 $rules =~ s/\Q$(IO_DIR)\E/src\/io/g;
 $rules =~ s/\Q$(PIRC_DIR)\E/compilers\/pirc\/src/g;
 $rules =~ s/\Q$(PMC_INC_DIR)\E/include/g;
+$rules =~ s/\Q$(INC_DIR)\E/include\/parrot/g;
+$rules =~ s/\Q$(OPS_DIR)\E/src\/ops/g;
 $rules =~ s/\Q$(O)\E//g;
 
 foreach my $file (sort keys %deps) {
@@ -71,9 +75,6 @@ foreach my $file (sort keys %deps) {
     {
         $declared =~ s/\s+/ /g;
         foreach my $inc (sort @{$deps{$file}}) {
-            # Skip #include "parrot/foo.h". It's in GENERAL_H_FILES rule.
-            next if $inc =~ m{^parrot/}o;
-
             # incs can be relative, but makefile is from top level
             my $file_dir = (File::Spec->splitpath($file))[1];
             my $make_dep = collapse_path(File::Spec->catfile($file_dir,$inc));
