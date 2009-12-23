@@ -102,7 +102,7 @@ foreach my $file (sort keys %deps) {
             # on failure.
             is($declared, $inc, "$file is missing this dependency.");
             $failed = 1;
-             
+
         }
     }
     $declared =~ s/^\s+//;
