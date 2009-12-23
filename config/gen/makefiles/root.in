@@ -1269,10 +1269,14 @@ $(SRC_DIR)/frame_builder$(O) : $(SRC_DIR)/frame_builder.h $(INC_DIR)/parrot.h \
         $(PMC_INC_DIR)/pmc/pmc_unmanagedstruct.h \
         $(PMC_INC_DIR)/pmc/pmc_managedstruct.h
 
+$(SRC_DIR)/frame_builder.h : $(INC_DIR)/parrot.h $(INC_DIR)/hash.h \
+        $(INC_DIR)/oplib/ops.h
+
 $(SRC_DIR)/vtables$(O) : $(INC_DIR)/parrot.h $(INC_DIR)/vtables.h \
         $(SRC_DIR)/vtables.c
 
 $(SRC_DIR)/gc/system$(O) : $(INC_DIR)/parrot.h  $(SRC_DIR)/gc/gc_private.h
+$(SRC_DIR)/gc/gc_private.h : $(INC_DIR)/settings.h
 
 $(SRC_DIR)/nci.c : $(SRC_DIR)/call_list.txt $(BUILD_TOOLS_DIR)/nativecall.pl \
 	$(PMC_INC_DIR)/pmc/pmc_nci.h
@@ -1339,6 +1343,8 @@ compilers/pirc/src/pirerr$(O) : compilers/pirc/src/pircompiler.h \
  compilers/pirc/src/pirparser.h compilers/pirc/src/piryy.h \
  compilers/pirc/src/pirlexer.h  compilers/pirc/src/pirerr.h
 
+compilers/imcc/parser.h : compilers/imcc/imcparser.h
+
 compilers/imcc/pbc$(O) : $(INC_DIR)/packfile.h \
   compilers/imcc/imc.h \
   compilers/imcc/pbc.h \
@@ -1363,9 +1369,33 @@ compilers/pirc/src/bcgen$(O) :  \
   $(PMC_INC_DIR)/pmc/pmc_namespace.h \
   $(PMC_INC_DIR)/pmc/pmc_callcontext.h
 
+compilers/pirc/src/bcgen.h : $(INC_DIR)/parrot.h $(INC_DIR)/embed.h \
+        compilers/pirc/src/pircompunit.h
+
+compilers/pirc/src/pircompunit.h : compilers/pirc/src/pirdefines.h \
+        compilers/pirc/src/bcgen.h
+
+compilers/pirc/src/pirerr.h : compilers/pirc/src/piryy.h
+compilers/pirc/src/pirop.h : compilers/pirc/src/pircompiler.h
+compilers/pirc/src/pirpcc.h : compilers/pirc/src/pircompiler.h \
+        compilers/pirc/src/pircompunit.h
+compilers/pirc/src/pirsymbol.h : compilers/pirc/src/pircompiler.h \
+        compilers/pirc/src/pircompunit.h \
+        compilers/pirc/src/pirregalloc.h
+compilers/pirc/src/pircompiler.h : compilers/pirc/src/pirsymbol.h \
+        compilers/pirc/src/pircompunit.h \
+        compilers/pirc/src/pirregalloc.h \
+        compilers/pirc/src/pirmacro.h \
+        $(INC_DIR)/embed.h $(INC_DIR)/parrot.h
+
 compilers/imcc/imc$(O) :  \
   compilers/imcc/imc.h \
   compilers/imcc/optimizer.h
+
+compilers/imcc/imc.h : $(INC_DIR)/parrot.h $(INC_DIR)/oplib/ops.h \
+        compilers/imcc/symreg.h compilers/imcc/instructions.h \
+        compilers/imcc/sets.h compilers/imcc/cfg.h compilers/imcc/unit.h \
+        compilers/imcc/debug.h
 
 compilers/pirc/src/pirregalloc$(O) : \
   compilers/pirc/src/pircompiler.h \
@@ -1393,6 +1423,8 @@ compilers/imcc/main$(O) : \
 
 compilers/imcc/optimizer$(O) : $(PMC_INC_DIR)/pmc/pmc_callcontext.h \
   compilers/imcc/imc.h compilers/imcc/pbc.h compilers/imcc/optimizer.h \
+
+compilers/imcc/optimizer.h : compilers/imcc/unit.h
 
 compilers/imcc/reg_alloc$(O) : compilers/imcc/imc.h compilers/imcc/optimizer.h
 

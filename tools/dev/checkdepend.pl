@@ -26,7 +26,7 @@ required C files first.
 
 =cut
 
-my $files = `ack -fa {src,compilers} | grep '\\.c\$'`;
+my $files = `ack -fa {src,compilers} | grep '\\.[ch]\$'`;
 
 my %deps;
 
@@ -41,7 +41,6 @@ foreach my $file (sort split /\n/, $files) {
     next if $file =~ m{src/(ops|dynoplibs|dynpmc|pmc)/};
     next if $file =~ m{src/string/(charset|encoding)/};
     my @includes = $guts =~ m/#include "(.*)"/g;
-    $file =~ s/\.c$//;
     $deps{$file} = [ @includes ];
 }
 
@@ -61,11 +60,21 @@ $rules =~ s/\Q$(PIRC_DIR)\E/compilers\/pirc\/src/g;
 $rules =~ s/\Q$(PMC_INC_DIR)\E/include/g;
 $rules =~ s/\Q$(INC_DIR)\E/include\/parrot/g;
 $rules =~ s/\Q$(OPS_DIR)\E/src\/ops/g;
-$rules =~ s/\Q$(O)\E//g;
 
 foreach my $file (sort keys %deps) {
-    $rules =~ /^$file\s*:\s*(.*)\s*$/m;
-    my $declared = $1;
+    my $rule = $file;
+
+    my $declared;
+    if ($rule =~ s/\.c$//) {
+        $rules =~ /^$rule\Q$(O)\E\s*:\s*(.*)\s*$/m;
+        $declared = $1;
+    } elsif ($rule =~ s/\.h$//) {
+        $rules =~ /^$rule\.h\s*:\s*(.*)\s*$/m;
+        $declared = $1;
+    } else {
+        die "unexpected file $file\n";
+    }
+
     my $failed = 0;
     if (!defined($declared)) {
         $failed = 1;
