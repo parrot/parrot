@@ -23,6 +23,7 @@ LINK          := @link@
 LINKFLAGS     := @linkflags@ @link_debug@ @ld_debug@
 LD            := @ld@
 LDFLAGS       := @ldflags@ @ld_debug@
+TOUCH		  := @touch@
 
 SOURCES       := \
   src/main.c \
@@ -70,6 +71,17 @@ pirc$(EXE): $(OBJS)
 	    $(OBJS) \
 	    @rpath_blib@ @libparrot_linkflags@ $(C_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+
+src/pir.y.flag src/pirparser.c src/pirparser.h : src/pir.y
+	cd src && $(YACC) pir.y -d -o pirparser.c
+	#$(PERL) $(BUILD_TOOLS_DIR)/fixup_gen_file.pl -noheaderizer src/pirparser.c src/pir.y
+	#$(PERL) $(BUILD_TOOLS_DIR)/fixup_gen_file.pl -noheaderizer src/pirparser.h src/pir.y
+	$(TOUCH) src/pir.y.flag src/pirparser.c src/pirparser.h
+
+src/pir.l.flag src/pirlexer.c : src/pir.l
+	cd src && $(LEX) -opirlexer.c pir.l
+	$(TOUCH) src/pir.l.flag src/pirlexer.c
+
 
 src/pirparser$(O): src/pirparser.c src/pirparser.h
 src/pirlexer$(O): src/pirlexer.c src/pirlexer.h
