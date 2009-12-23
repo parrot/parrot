@@ -8,8 +8,8 @@ BEGIN_OPS_PREAMBLE
 #include "parrot/dynext.h"
 #include "parrot/embed.h"
 #include "parrot/runcore_api.h"
-#include "../pmc/pmc_continuation.h"
-#include "../pmc/pmc_parrotlibrary.h"
+#include "pmc/pmc_continuation.h"
+#include "pmc/pmc_parrotlibrary.h"
 
 END_OPS_PREAMBLE
 
