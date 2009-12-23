@@ -70,10 +70,12 @@ foreach my $file (sort keys %deps) {
     if ($rule =~ s/\.c$//) {
         $rules =~ /^$rule\Q$(O)\E\s*:\s*(.*)\s*$/m;
         $declared = $1;
-    } elsif ($rule =~ s/\.h$//) {
+    }
+    elsif ($rule =~ s/\.h$//) {
         $rules =~ /^$rule\.h\s*:\s*(.*)\s*$/m;
         $declared = $1;
-    } else {
+    }
+    else {
         die "unexpected file $file\n";
     }
 
@@ -108,7 +110,8 @@ foreach my $file (sort keys %deps) {
     $declared =~ s/^\s+//;
     if ($declared ne "") {
        is($declared, '', "$file has extra dependencies.");
-    } elsif (!$failed) {
+    }
+    elsif (!$failed) {
         pass($file);
     }
 }
