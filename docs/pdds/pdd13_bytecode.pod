@@ -19,86 +19,23 @@ execution on the virtual machine.
 
 =head2 Description
 
-=over 4
+PBC, Parrot bytecode, is the binary format used internally by the Parrot VM to
+store the data necessary to execute a compiled PIR program.  The sequence of
+instructions making up a Parrot program, a constants table, an annotations
+table and any ancillary data are stored in a PBC.  These files usually have the
+extension C<.pbc>.
 
-=item - The sequence of instructions making up a Parrot program, a constants
-table and debug data are all stored in a binary format called a packfile or
-PBC (Parrot Bytecode file).
+The PBC format is designed so that any valid PBC file can be read and executed
+by Parrot on any platform, but may be encoded more optimally for a particular
+platform.
 
-=item - A PBC file can be read by Parrot on any platform, but may be encoded
-more optimally for a particular platform.
+It is possible to add arbitrary annotations to the instruction sequence, for
+example line numbers in high level languages and other debug data.
 
-=item - It is possible to add arbitrary annotations to the instruction
-sequence, for example line numbers in the high level language and other debug
-data.
-
-=item - PMCs will be used to represent packfiles and packfile segments to
-provide a programming interface to them, both from Parrot programs and the
-Parrot internals.
-
-=back
-
+PMCs are be used to represent packfiles and packfile segments to provide a
+programmatic interface, both to Parrot programs and Parrot internals.
 
 =head2 Implementation
-
-=head3 Changes
-
-A number of things in this PDD differ from the older implementation,
-and few items with the more convenient PMC access are not yet implemented.
-This section details these changes from the old implementation
-and some of the reasoning behind them.
-
-
-=head4 Packfile Header
-
-The format of the packfile header has changed completely, based upon a
-proposal at
-L<http://groups.google.com/group/perl.perl6.internals/browse_thread/thread/1f1af615edec7449/ebfdbb5180a9d813?lnk=gst>
-and the requirement to have a UUID. The old INT field in the previous header
-format is used nowhere in Parrot and was removed, the parrot patch version
-number along with the major and minor was added. The opcode type is also gone
-due to non-use. The opcode type is always long.
-
-The version number now reflects the earliest version of Parrot that is capable
-of running the bytecode file, to enable cross-version compatibility that will
-be needed in the future.
-
-
-=head4 Segment Header
-
-Having the type associated with the segment inside the VM is fine, but since
-it is in the directory segment anyway it seems odd to duplicate it here. Also
-removed the id (did not seem to be used anywhere) and the second size (always
-computable by knowing the size of this header, so it appears redundant).
-
-
-=head4 Fixup Segment
-
-We need to support unicode sub names, so fixup labels should be an index into
-the constants table to the relevant string instead of just a C string as they
-are now.
-
-
-=head4 Annotations Segment
-
-This is new and replaces and builds upon the debug segment. See here for some
-on-list discussion:
-
-L<http://groups.google.com/group/perl.perl6.internals/browse_thread/thread/b0d36dafb42d96c4/4d6ad2ad2243e677?lnk=gst&rnum=2#4d6ad2ad2243e677>
-
-
-=head4 Packfile PMCs
-
-This idea will see packfiles and segments within them being represented by
-PMCs, easing memory management and providing an interface to packfiles for
-Parrot programs.
-
-Here are mailing list comments that provide one of the motivations or hints
-of the original proposal.
-
-L<http://groups.google.com/group/perl.perl6.internals/browse_thread/thread/778ea0ac4c8676f7/b249306b543b040a?lnk=gst&q=packfile+PMCs&rnum=2#b249306b543b040a>
-
-
 
 =head3 Packfiles
 
@@ -308,7 +245,6 @@ header data, which specifies the number of entries in the directory.
   | Offset | Length | Description                                            |
   +--------+--------+--------------------------------------------------------+
   | 1      | 1      | The number of entries in the directory.                |
-  |        |        |    n                                                   |
   +--------+--------+--------------------------------------------------------+
 
 Following this are C<n> variable length entries formatted as described in the
@@ -494,8 +430,6 @@ into the constants table.
   | 1      | 1      | Value of the key.                                      |
   +--------+--------+--------------------------------------------------------+
 
-{{ TODO: Figure out slice bits and document them here. }}
-
 =back
 
 =head4 Fixup Segment
@@ -541,7 +475,7 @@ generated from the PIR found in the given filename
 
 =back
 
-The length of the table of line numbers mapping is given by the last field
+The length of the table of line number mappings is given by the last field
 of the segment header.
 
 Then comes the table:
@@ -1125,7 +1059,61 @@ None.
 
 =head2 Footnotes
 
-None.
+=head3 Changes From Previous Versions
+
+A number of things in this PDD differ from the older implementation,
+and few items with the more convenient PMC access are not yet implemented.
+This section details these changes from the old implementation
+and some of the reasoning behind them.
+
+=head4 Packfile Header
+
+The format of the packfile header changed completely, based upon a
+proposal at
+L<http://groups.google.com/group/perl.perl6.internals/browse_thread/thread/1f1af615edec7449/ebfdbb5180a9d813?lnk=gst>
+and the requirement to have a UUID. The old INT field in the previous header
+format is used nowhere in Parrot and was removed, the parrot patch version
+number along with the major and minor was added. The opcode type is also gone
+due to non-use. The opcode type is always long.
+
+The version number now reflects the earliest version of Parrot that is capable
+of running the bytecode file, to enable cross-version compatibility that will
+be needed in the future.
+
+
+=head4 Segment Header
+
+Having the type associated with the segment inside the VM is fine, but since
+it is in the directory segment anyway it seems odd to duplicate it here. Also
+removed the id (did not seem to be used anywhere) and the second size (always
+computable by knowing the size of this header, so it appears redundant).
+
+
+=head4 Fixup Segment
+
+We need to support unicode sub names, so fixup labels should be an index into
+the constants table to the relevant string instead of just a C string as they
+are now.
+
+
+=head4 Annotations Segment
+
+This is new and replaces and builds upon the debug segment. See here for some
+on-list discussion:
+
+L<http://groups.google.com/group/perl.perl6.internals/browse_thread/thread/b0d36dafb42d96c4/4d6ad2ad2243e677?lnk=gst&rnum=2#4d6ad2ad2243e677>
+
+
+=head4 Packfile PMCs
+
+This idea will see packfiles and segments within them being represented by
+PMCs, easing memory management and providing an interface to packfiles for
+Parrot programs.
+
+Here are mailing list comments that provide one of the motivations or hints
+of the original proposal.
+
+L<http://groups.google.com/group/perl.perl6.internals/browse_thread/thread/778ea0ac4c8676f7/b249306b543b040a?lnk=gst&q=packfile+PMCs&rnum=2#b249306b543b040a>
 
 =head2 References
 
