@@ -53,13 +53,15 @@ my $rules;
     local undef $/;
     $rules = <$mf>;
 }
+
+# convert all \-newline continuations into single lines for ease of processing.
 $rules =~ s/\\\n/ /g;
-$rules =~ s/\Q$(SRC_DIR)\E/src/g;
-$rules =~ s/\Q$(IO_DIR)\E/src\/io/g;
-$rules =~ s/\Q$(PIRC_DIR)\E/compilers\/pirc\/src/g;
-$rules =~ s/\Q$(PMC_INC_DIR)\E/include/g;
-$rules =~ s/\Q$(INC_DIR)\E/include\/parrot/g;
-$rules =~ s/\Q$(OPS_DIR)\E/src\/ops/g;
+
+# replace all _DIR variables with their expansions.
+while ($rules =~ s/^([A-Z_]+_DIR)\s*:?=\s*(\S*)$//m) {
+    my ($var,$val) = ($1, $2);
+    $rules =~ s/\$\($var\)/$val/g;
+}
 
 foreach my $file (sort keys %deps) {
     my $rule = $file;
