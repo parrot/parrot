@@ -66,7 +66,7 @@ while ($rules =~ s/^([A-Z_]+_DIR)\s*:?=\s*(\S*)$//m) {
 foreach my $file (sort keys %deps) {
     my $rule = $file;
 
-    my $declared;
+    my $declared = "";
     if ($rule =~ s/\.c$//) {
         $rules =~ /^$rule\Q$(O)\E\s*:\s*(.*)\s*$/m;
         $declared = $1;
@@ -80,7 +80,8 @@ foreach my $file (sort keys %deps) {
     my $failed = 0;
     if (!defined($declared)) {
         $failed = 1;
-        is("", join(' ', @{$deps{$file}}), $file);
+        is("", join(' ', @{$deps{$file}}), "$file has no dependencies");
+        next;
     }
     else
     {
@@ -91,23 +92,25 @@ foreach my $file (sort keys %deps) {
             my $make_dep = collapse_path(File::Spec->catfile($file_dir,$inc));
 
             # If it's include from src
-            next if defined($make_dep) && ($declared =~ /\b\Q$make_dep\E\b/);
+            next if defined($make_dep) && ($declared =~ s/\b\Q$make_dep\E\b//);
 
-            # Try to costruct "global" include
+            # Try to construct "global" include
             $make_dep = collapse_path(File::Spec->catfile('include', $inc));
-            next if defined($make_dep) && ($declared =~ /\b\Q$make_dep\E\b/);
-
-            # Try to costruct "pmc" include
-            $make_dep = collapse_path(File::Spec->catfile('include', 'pmc', $inc));
-            next if defined($make_dep) && ($declared =~ /\b\Q$make_dep\E\b/);
+            next if defined($make_dep) && ($declared =~ s/\b\Q$make_dep\E\b//);
 
             # this isn't the actual comparison, just to give nice output
             # on failure.
-            is($declared, $inc, $file);
+            is($declared, $inc, "$file is missing this dependency.");
             $failed = 1;
+             
         }
     }
-    pass($file) unless $failed;
+    $declared =~ s/^\s+//;
+    if ($declared ne "") {
+       is($declared, '', "$file has extra dependencies.");
+    } elsif (!$failed) {
+        pass($file);
+    }
 }
 
 sub collapse_path {
