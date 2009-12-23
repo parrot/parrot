@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2005, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 PDD 13: Bytecode
@@ -22,8 +22,8 @@ execution on the virtual machine.
 PBC, Parrot bytecode, is the binary format used internally by the Parrot VM to
 store the data necessary to execute a compiled PIR program.  The sequence of
 instructions making up a Parrot program, a constants table, an annotations
-table and any ancillary data are stored in a PBC.  These files usually have the
-extension C<.pbc>.
+table and any ancillary data are stored in a PBC.  These files usually have
+the extension C<.pbc>.
 
 The PBC format is designed so that any valid PBC file can be read and executed
 by Parrot on any platform, but may be encoded more optimally for a particular
@@ -630,7 +630,7 @@ consider switching these PMCs over to use them at some point. }}
 =head4 Packfile.pmc
 
 This PMC represents the packfile overall. It will be constructed by the VM
-when reading a packfile. It implements the following methods and vtable 
+when reading a packfile. It implements the following methods and vtable
 functions.
 
 =over 4
