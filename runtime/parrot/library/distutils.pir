@@ -2959,7 +2959,7 @@ the default value is ports/rpm
 .sub 'get_spec'
     .param pmc kv :slurpy :named
     $S0 = get_value('spec_dir', 'ports/rpm' :named('default'), kv :flat :named)
-    $S0 .= "/"
+    $S0 .= "/parrot-"
     $S1 = get_name(kv :flat :named)
     $S0 .= $S1
     $S0 .= '.spec'
@@ -3019,7 +3019,7 @@ the default value is ports/rpm
     $S0 = <<'TEMPLATE'
 %%define parrot_version %s
 
-Name:           %s
+Name:           parrot-%s
 Version:        %s
 Release:        %s
 Summary:        %s
@@ -3035,7 +3035,7 @@ BuildRoot:      %%{_tmppath}/%%{name}-%%{version}-%%{release}
 %s
 
 %%prep
-%%setup -n parrot-%%{name}-%%{version}
+%%setup -n %%{name}-%%{version}
 
 %%build
 parrot setup.pir
@@ -3180,7 +3180,7 @@ TEMPLATE
 
 .sub 'get_ebuild'
     .param pmc kv :slurpy :named
-    $S0 = "ports/gentoo/"
+    $S0 = "ports/gentoo/parrot-"
     $S1 = get_name(kv :flat :named)
     $S0 .= $S1
     $S0 .= "-"
