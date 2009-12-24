@@ -296,10 +296,9 @@ static void
 ensure_buffer_size(PARROT_INTERP, ARGIN(visit_info *io), size_t len)
 {
     ASSERT_ARGS(ensure_buffer_size)
-    Buffer *buf = io->buffer;
-    const ptrdiff_t used =
-        (GET_VISIT_CURSOR(io) - (opcode_t *)Buffer_bufstart(buf)) * sizeof (opcode_t);
-    const int need_free  = Buffer_buflen(buf) - used - len;
+    Buffer *buf         = io->buffer;
+    const size_t used   = io->pos;
+    const int need_free = Buffer_buflen(buf) - used - len;
 
     /* grow by factor 1.5 or such */
     if (need_free <= 16) {
@@ -307,9 +306,8 @@ ensure_buffer_size(PARROT_INTERP, ARGIN(visit_info *io), size_t len)
         if (new_size < Buffer_buflen(buf) - need_free + 512)
             new_size = Buffer_buflen(buf) - need_free + 512;
         Parrot_gc_reallocate_buffer_storage(interp, buf, new_size);
-        SET_VISIT_CURSOR(io, (char *)Buffer_bufstart(buf) + used);
 
-        PARROT_ASSERT((char *)Buffer_buflen(buf) - used - len >= 15);
+        PARROT_ASSERT(Buffer_buflen(buf) - used - len >= 15);
     }
 
 #ifndef DISABLE_GC_DEBUG
@@ -464,8 +462,8 @@ static INTVAL
 shift_opcode_integer(SHIM_INTERP, ARGIN(visit_info *io))
 {
     ASSERT_ARGS(shift_opcode_integer)
-    const opcode_t *pos  = GET_VISIT_CURSOR(io);
-    const INTVAL i = PF_fetch_integer(io->pf, &pos);
+    opcode_t *pos  = GET_VISIT_CURSOR(io);
+    const INTVAL i = PF_fetch_integer(io->pf, (const opcode_t **)&pos);
     SET_VISIT_CURSOR(io, pos);
     BYTECODE_SHIFT_OK(io);
     return i;
@@ -486,8 +484,8 @@ static FLOATVAL
 shift_opcode_number(SHIM_INTERP, ARGIN(visit_info *io))
 {
     ASSERT_ARGS(shift_opcode_number)
-    const opcode_t *pos     = GET_VISIT_CURSOR(io);
-    const FLOATVAL f  = PF_fetch_number(io->pf, &pos);
+    opcode_t *pos     = GET_VISIT_CURSOR(io);
+    const FLOATVAL f  = PF_fetch_number(io->pf, (const opcode_t **)&pos);
     SET_VISIT_CURSOR(io, pos);
     BYTECODE_SHIFT_OK(io);
     return f;
@@ -511,8 +509,8 @@ static STRING*
 shift_opcode_string(PARROT_INTERP, ARGIN(visit_info *io))
 {
     ASSERT_ARGS(shift_opcode_string)
-    const opcode_t *pos    = GET_VISIT_CURSOR(io);
-    STRING * const s = PF_fetch_string(interp, io->pf, &pos);
+    opcode_t *pos    = GET_VISIT_CURSOR(io);
+    STRING * const s = PF_fetch_string(interp, io->pf, (const opcode_t **)&pos);
     SET_VISIT_CURSOR(io, pos);
     BYTECODE_SHIFT_OK(io);
     return s;
@@ -611,6 +609,7 @@ visit_info_init(PARROT_INTERP, ARGOUT(visit_info *info),
         pf->options |= PFOPT_PMC_FREEZE_ONLY;
         unpacked_length = PackFile_unpack(interp, pf, GET_VISIT_CURSOR(info), info->input_length);
         if (!unpacked_length) {
+            PackFile_destroy(interp, info->pf);
             Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_STRING_REPRESENTATION,
                     "PackFile header failed during unpack");

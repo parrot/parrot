@@ -674,7 +674,7 @@ Parrot_str_new_from_buffer(PARROT_INTERP, ARGIN(const Buffer *buffer), const UIN
     result = Parrot_gc_new_string_header(interp, 0);
     Buffer_bufstart(result) = Buffer_bufstart(buffer);
     Buffer_buflen(result)   = Buffer_buflen(buffer);
-    result->strstart        = Buffer_bufstart(result);
+    result->strstart        = (char *) Buffer_bufstart(result);
     result->bufused         = len;
     result->strlen          = len;
     result->encoding        = Parrot_fixed_8_encoding_ptr;
