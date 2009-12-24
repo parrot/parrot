@@ -294,6 +294,8 @@ L<http://bitbucket.org/riffraff/shakespeare-parrot/src/tip/setup.pir>
     register_step('sdist_rpm', _sdist_rpm)
     .const 'Sub' _spec_rpm = '_spec_rpm'
     register_step('spec_rpm', _spec_rpm)
+    .const 'Sub' _control_deb = '_control_deb'
+    register_step('control', _control_deb)
     .const 'Sub' _ebuild_gentoo = '_ebuild_gentoo'
     register_step('ebuild', _ebuild_gentoo)
 
@@ -2318,7 +2320,7 @@ Same options as install.
   L2:
 .end
 
-.sub 'get_plumage'
+.sub 'get_plumage' :anon
     .param pmc kv :slurpy :named
     $S0 = get_name(kv :flat :named)
     $S0 .= '.json'
@@ -2776,7 +2778,7 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     unlink('MANIFEST', 1 :named('verbose'))
 .end
 
-.sub 'copy_sdist'
+.sub 'copy_sdist' :anon
     .param string dirname
     .param pmc files
     mkdir(dirname)
@@ -2956,7 +2958,7 @@ the default value is ports/rpm
   L2:
 .end
 
-.sub 'get_spec'
+.sub 'get_spec' :anon
     .param pmc kv :slurpy :named
     $S0 = get_value('spec_dir', 'ports/rpm' :named('default'), kv :flat :named)
     $S0 .= "/parrot-"
@@ -2966,7 +2968,7 @@ the default value is ports/rpm
     .return ($S0)
 .end
 
-.sub 'mk_spec'
+.sub 'mk_spec' :anon
     .param pmc kv :slurpy :named
 
     .local pmc config
@@ -3056,52 +3058,18 @@ TEMPLATE
     .local string spec
     spec = sprintf $S0, $P0
 
-    $I0 = exists kv['doc_files']
-    unless $I0 goto L1
-    $P1 = kv['doc_files']
-    $I0 = does $P1, 'array'
-    if $I0 goto L2
-    $S0 = $P1
+    $S0 = mk_deb_docs(kv :flat :named)
+    if $S0 == '' goto L1
     spec .= "%doc "
+    $P1 = split "\n", $S0
+    $S0 = join "\n%doc ", $P1
     spec .= $S0
     spec .= "\n"
-    goto L1
-  L2:
-    $P2 = iter $P1
-  L3:
-    unless $P2 goto L1
-    $S0 = shift $P2
-    spec .= "%doc "
-    spec .= $S0
-    spec .= "\n"
-    goto L3
   L1:
 
-    $P0 = new 'ResizablePMCArray'
-    # currently, ResizableStringArray hasn't the method sort.
-    # see TT #1356
-    $P1 = get_install_files(kv :flat :named)
-    $P2 = iter $P1
-  L11:
-    unless $P2 goto L12
-    $S0 = shift $P2
-    $P3 = split parrot_version, $S0
-    $S0 = join "%{parrot_version}", $P3
-    push $P0, $S0
-    goto L11
-  L12:
-    $P1 = get_install_xfiles(kv :flat :named)
-    $P2 = iter $P1
-  L13:
-    unless $P2 goto L14
-    $S0 = shift $P2
-    $P3 = split parrot_version, $S0
-    $S0 = join "%{parrot_version}", $P3
-    push $P0, $S0
-    goto L13
-  L14:
-    $P0.'sort'()
-    $S0 = join "\n", $P0
+    $S0 = mk_deb_install(kv :flat :named)
+    $P1 = split parrot_version, $S0
+    $S0 = join "%{parrot_version}", $P1
     spec .= $S0
 
     spec .= "\n\n%changelog\n* "
@@ -3147,6 +3115,237 @@ TEMPLATE
     system(cmd, 1 :named('verbose'))
 .end
 
+=head3 Step control_deb
+
+=over 4
+
+=item deb_dir
+
+the default value is ports/debian
+
+=item doc_files
+
+=back
+
+=cut
+
+.sub '_control_deb' :anon
+    .param pmc kv :slurpy :named
+
+    $S0 = get_deb('control', kv :flat :named)
+    $S1 = dirname($S0)
+    mkpath($S1, 1 :named('verbose'))
+    $S1 = mk_deb_control(kv :flat :named)
+    $I0 = file_exists($S0)
+    unless $I0 goto L1
+    print $S1
+    goto L2
+  L1:
+    spew($S0, $S1, 1 :named('verbose'))
+  L2:
+
+    $S0 = get_deb('rules', kv :flat :named)
+    $S1 = mk_deb_rules(kv :flat :named)
+    spew($S0, $S1, 1 :named('verbose'))
+
+    $S0 = get_deb_ext('.docs', kv :flat :named)
+    $S1 = mk_deb_docs(kv :flat :named)
+    spew($S0, $S1, 1 :named('verbose'))
+
+    $S0 = get_deb_ext('.install', kv :flat :named)
+    $S1 = mk_deb_install(kv :flat :named)
+    spew($S0, $S1, 1 :named('verbose'))
+.end
+
+.sub 'get_deb' :anon
+    .param string filename
+    .param pmc kv :slurpy :named
+    $S0 = get_value('deb_dir', 'ports/debian' :named('default'), kv :flat :named)
+    $S0 .= "/"
+    $S0 .= filename
+    .return ($S0)
+.end
+
+.sub 'get_deb_ext' :anon
+    .param string ext
+    .param pmc kv :slurpy :named
+    $S0 = get_value('deb_dir', 'ports/debian' :named('default'), kv :flat :named)
+    $S0 .= "/parrot-"
+    $S1 = get_name(kv :flat :named)
+    $S0 .= $S1
+    $S0 .= ext
+    .return ($S0)
+.end
+
+.sub 'mk_deb_control' :anon
+    .param pmc kv :slurpy :named
+
+    .local pmc config
+    config = get_config()
+
+    .local string parrot_version
+    $S1 = config['VERSION']
+    $S2 = config['DEVEL']
+    parrot_version = $S1 . $S2
+
+    .local string name
+    name = get_name(kv :flat :named)
+
+    .local string packager
+    packager = get_value('packager', "you <you@you.org>" :named('default'), kv :flat :named)
+
+    .local string description
+    description = get_value('description', kv :flat :named)
+
+    $P0 = new 'FixedStringArray'
+    set $P0, 6
+    $P0[0] = name
+    $P0[1] = packager
+    $P0[2] = parrot_version
+    $P0[3] = name
+    $P0[4] = parrot_version
+    $P0[5] = description
+
+    $S0 = <<'TEMPLATE'
+Source: parrot-%s
+Section: universe/interpreters
+Priority: optional
+Maintainer: %s
+Build-Depends: debhelper (>= 5.0.0), parrot-devel (= %s)
+Standards-Version: 3.8.0
+
+Package: parrot-%s
+Architecture: any
+Depends: parrot-minimal (= %s)
+Description: %s
+TEMPLATE
+    $S0 = sprintf $S0, $P0
+    .return ($S0)
+.end
+
+.sub 'mk_deb_rules' :anon
+    .param pmc kv :slurpy :named
+
+    .local string no_changelog
+    no_changelog = ''
+    $I0 = file_exists('ChangeLog')
+    if $I0 goto L1
+    no_changelog = "#"
+  L1:
+
+    $P0 = new 'FixedStringArray'
+    set $P0, 2
+    $P0[0] = no_changelog
+    $P0[1] = no_changelog
+
+    $S0 = <<'TEMPLATE'
+#!/usr/bin/make -f
+
+configure: configure-stamp
+
+configure-stamp:
+	dh_testdir
+	touch configure-stamp
+
+build: build-stamp
+
+build-stamp: configure-stamp
+	dh_testdir
+	parrot setup.pir build
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp configure-stamp
+	parrot setup.pir clean
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	parrot setup.pir --root $(CURDIR)/tmp install
+	dh_installdirs
+	find $(CURDIR)/debian/tmp -type f
+	dh_install --sourcedir=$(CURDIR)/tmp --list-missing
+
+# Build architecture-independent files here.
+binary-indep: build install
+	dh_testdir -i
+	dh_testroot -i
+%s	dh_installchangelogs -i ChangeLog
+	dh_installdocs -i
+	dh_fixperms -i
+	dh_installdeb -i
+	dh_gencontrol -i
+	dh_md5sums -i
+	dh_builddeb -i
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir -a
+	dh_testroot -a
+%s	dh_installchangelogs -a ChangeLog
+	dh_installdocs -a
+	dh_strip -a
+	dh_compress -a
+	dh_fixperms -a
+	dh_installdeb -a
+	dh_gencontrol -a
+	dh_md5sums -a
+	dh_builddeb -a
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install configure
+
+TEMPLATE
+    $S0 = sprintf $S0, $P0
+    .return ($S0)
+.end
+
+.sub 'mk_deb_docs' :anon
+    .param pmc kv :slurpy :named
+    $S0 = ''
+    $I0 = exists kv['doc_files']
+    unless $I0 goto L1
+    $P0 = kv['doc_files']
+    $I0 = does $P0, 'array'
+    if $I0 goto L2
+    $S0 = $P0
+    goto L1
+  L2:
+    $S0 = join "\n", $P0
+  L1:
+    .return ($S0)
+.end
+
+.sub 'mk_deb_install' :anon
+    .param pmc kv :slurpy :named
+    $P0 = new 'ResizablePMCArray'
+    # currently, ResizableStringArray hasn't the method sort.
+    # see TT #1356
+    $P1 = get_install_files(kv :flat :named)
+    $P2 = iter $P1
+  L1:
+    unless $P2 goto L2
+    $S0 = shift $P2
+    push $P0, $S0
+    goto L1
+  L2:
+    $P1 = get_install_xfiles(kv :flat :named)
+    $P2 = iter $P1
+  L3:
+    unless $P2 goto L4
+    $S0 = shift $P2
+    push $P0, $S0
+    goto L3
+  L4:
+    $P0.'sort'()
+    $S0 = join "\n", $P0
+    .return ($S0)
+.end
+
 =head3 Step ebuild
 
 =over 4
@@ -3178,7 +3377,7 @@ TEMPLATE
   L2:
 .end
 
-.sub 'get_ebuild'
+.sub 'get_ebuild' :anon
     .param pmc kv :slurpy :named
     $S0 = "ports/gentoo/parrot-"
     $S1 = get_name(kv :flat :named)
@@ -3190,7 +3389,7 @@ TEMPLATE
     .return ($S0)
 .end
 
-.sub 'mk_ebuild'
+.sub 'mk_ebuild' :anon
     .param pmc kv :slurpy :named
 
     .local string description
@@ -3250,9 +3449,8 @@ src_install() {
 %s
 }
 TEMPLATE
-    .local string ebuild
-    ebuild = sprintf $S0, $P0
-    .return (ebuild)
+    $S0 = sprintf $S0, $P0
+    .return ($S0)
 .end
 
 =head3 Step bdist_wininst
