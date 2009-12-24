@@ -292,11 +292,13 @@ L<http://bitbucket.org/riffraff/shakespeare-parrot/src/tip/setup.pir>
     register_step('manifest', _manifest)
     .const 'Sub' _sdist_rpm = '_sdist_rpm'
     register_step('sdist_rpm', _sdist_rpm)
+    .const 'Sub' _spec_rpm = '_spec_rpm'
+    register_step('spec_rpm', _spec_rpm)
+    .const 'Sub' _ebuild_gentoo = '_ebuild_gentoo'
+    register_step('ebuild', _ebuild_gentoo)
 
     .const 'Sub' _bdist = '_bdist'
     register_step('bdist', _bdist)
-    .const 'Sub' _spec_rpm = '_spec_rpm'
-    register_step('spec_rpm', _spec_rpm)
     .const 'Sub' _bdist_rpm = '_bdist_rpm'
     register_step('bdist_rpm', _bdist_rpm)
 
@@ -3143,6 +3145,114 @@ TEMPLATE
 
     cmd = "rpmbuild -bb -v " . $S0
     system(cmd, 1 :named('verbose'))
+.end
+
+=head3 Step ebuild
+
+=over 4
+
+=item description
+
+=item project_uri
+
+=item license_type
+
+=item doc_files
+
+=back
+
+=cut
+
+.sub '_ebuild_gentoo' :anon
+    .param pmc kv :slurpy :named
+    $S0 = get_ebuild(kv :flat :named)
+    $S1 = mk_ebuild(kv :flat :named)
+    $I0 = file_exists($S0)
+    unless $I0 goto L1
+    print $S1
+    goto L2
+  L1:
+    $S2 = dirname($S0)
+    mkpath($S2, 1 :named('verbose'))
+    spew($S0, $S1, 1 :named('verbose'))
+  L2:
+.end
+
+.sub 'get_ebuild'
+    .param pmc kv :slurpy :named
+    $S0 = "ports/gentoo/"
+    $S1 = get_name(kv :flat :named)
+    $S0 .= $S1
+    $S0 .= "-"
+    $S1 = get_version(kv :flat :named)
+    $S0 .= $S1
+    $S0 .= '.ebuild'
+    .return ($S0)
+.end
+
+.sub 'mk_ebuild'
+    .param pmc kv :slurpy :named
+
+    .local string description
+    $S0 = get_value('description', kv :flat :named)
+    description = _json_escape($S0)
+
+    .local string project_uri
+    project_uri =get_value('project_uri', kv :flat :named)
+
+    .local string license_type
+    license_type = get_value('license_type', kv :flat :named)
+
+    .local string doc
+    doc = ''
+    $I0 = exists kv['doc_files']
+    unless $I0 goto L1
+    doc = "    dodoc "
+    $P0 = kv['doc_files']
+    $I0 = does $P0, 'array'
+    if $I0 goto L2
+    $S0 = $P0
+    goto L3
+  L2:
+    $S0 = join " ", $P0
+  L3:
+    doc .= $S0
+    doc .= " || die"
+  L1:
+
+    $P0 = new 'FixedStringArray'
+    set $P0, 4
+    $P0[0] = description
+    $P0[1] = project_uri
+    $P0[2] = license_type
+    $P0[3] = doc
+
+    $S0 = <<'TEMPLATE'
+
+DESCRIPTION="%s"
+HOMEPAGE="%s"
+SRC_URI="./${P}.tar.gz"
+
+LICENSE="%s"
+SLOT="0"
+KEYWORDS="~arch"
+IUSE=""
+
+#DEPEND=""
+#RDEPEND=""
+
+src_compile() {
+    parrot setup.pir build || die "build failed"
+}
+
+src_install() {
+    parrot setup.pir --root ${D} install || die "install failed"
+%s
+}
+TEMPLATE
+    .local string ebuild
+    ebuild = sprintf $S0, $P0
+    .return (ebuild)
 .end
 
 =head3 Step bdist_wininst
