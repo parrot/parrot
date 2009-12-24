@@ -1129,17 +1129,7 @@ Parrot_freeze(PARROT_INTERP, ARGIN(PMC *pmc))
     STRING *result;
 
     visit_info_init(interp, &info, VISIT_FREEZE_NORMAL, STRINGNULL, pmc);
-
-    result = Parrot_gc_new_string_header(interp, 0);
-    Buffer_bufstart(result) = Buffer_bufstart(info.buffer);
-    Buffer_buflen(result)   = Buffer_buflen(info.buffer);
-    result->bufused         = OUTPUT_LENGTH(&info);
-    result->strstart        = Buffer_bufstart(result);
-    result->strlen          = result->bufused;
-    result->encoding        = Parrot_fixed_8_encoding_ptr;
-    result->charset         = Parrot_binary_charset_ptr;
-
-    return result;
+    return Parrot_str_new_from_buffer(interp, info.buffer, OUTPUT_LENGTH(&info));
 }
 
 

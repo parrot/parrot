@@ -650,6 +650,39 @@ Parrot_str_new(PARROT_INTERP, ARGIN_NULLOK(const char * const buffer), const UIN
                                      point? */
 }
 
+
+/*
+
+=item C<STRING * Parrot_str_new_from_buffer(PARROT_INTERP, const Buffer *buffer)>
+
+Make a Parrot string from a Buffer
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_str_new_from_buffer(PARROT_INTERP, ARGIN(const Buffer *buffer), const UINTVAL len)
+{
+    ASSERT_ARGS(Parrot_str_new)
+    STRING *result;
+
+    result = Parrot_gc_new_string_header(interp, 0);
+    Buffer_bufstart(result) = Buffer_bufstart(buffer);
+    Buffer_buflen(result)   = Buffer_buflen(buffer);
+    result->strstart        = Buffer_bufstart(result);
+    result->bufused         = len;
+    result->strlen          = len;
+    result->encoding        = Parrot_fixed_8_encoding_ptr;
+    result->charset         = Parrot_binary_charset_ptr;
+
+    return result;
+}
+
 /*
 
 =item C<const char* string_primary_encoding_for_representation(PARROT_INTERP,

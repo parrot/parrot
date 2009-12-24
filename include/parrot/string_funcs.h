@@ -276,6 +276,15 @@ STRING * Parrot_str_new(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+STRING * Parrot_str_new_from_buffer(PARROT_INTERP,
+    ARGIN_NULLOK(const Buffer * buffer),
+    const UINTVAL len)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_str_new_constant(PARROT_INTERP, ARGIN(const char *buffer))
         __attribute__nonnull__(1)
