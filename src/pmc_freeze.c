@@ -684,7 +684,8 @@ freeze_pmc_id(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info),
 
 /*
 
-=item C<static int thaw_pmc_id(PARROT_INTERP, visit_info *info, UINTVAL *id, INTVAL *type)>
+=item C<static int thaw_pmc_id(PARROT_INTERP, visit_info *info, UINTVAL *id,
+INTVAL *type)>
 
 Freeze and thaw a PMC (id).
 
