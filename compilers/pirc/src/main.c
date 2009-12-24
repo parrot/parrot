@@ -15,7 +15,6 @@
 #include "pirlexer.h"
 #include "pirheredoc.h"
 #include "pirregalloc.h"
-#include "piremit.h"
 #include "pircapi.h"
 
 /* global variable to set parser in debug mode.

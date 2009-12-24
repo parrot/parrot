@@ -37,7 +37,7 @@ The name of a test function is usually 'nci_<signature>'. E.g. the function
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <parrot/parrot.h>
+#include "parrot/parrot.h"
 
 #ifdef __cplusplus
 extern "C" {

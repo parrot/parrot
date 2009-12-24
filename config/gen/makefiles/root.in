@@ -854,26 +854,28 @@ install_config.fpmc : myconfig config_lib.pasm $(PARROT)
 	@echo "Invoking Parrot to generate install_config.fpmc"
 	$(PARROT) config_lib.pasm --install > $@
 
-$(SRC_DIR)/parrot_config$(O) : $(SRC_DIR)/parrot_config.c $(INC_DIR)/parrot.h
+$(SRC_DIR)/parrot_config$(O) : $(INC_DIR)/parrot.h
 
 $(SRC_DIR)/install_config$(O) : $(INC_DIR)/parrot.h
 
-$(SRC_DIR)/null_config$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/null_config.c
+$(SRC_DIR)/null_config$(O) : $(INC_DIR)/parrot.h
 
-$(SRC_DIR)/oo$(O) : $(INC_DIR)/parrot.h $(PMC_INC_DIR)/pmc/pmc_class.h $(PMC_INC_DIR)/pmc/pmc_object.h $(PMC_INC_DIR)/pmc/pmc_callcontext.h $(INC_DIR)/pbcversion.h $(SRC_DIR)/oo.str $(INC_DIR)/oo_private.h
-
+$(SRC_DIR)/oo$(O) : $(INC_DIR)/parrot.h $(PMC_INC_DIR)/pmc/pmc_class.h $(PMC_INC_DIR)/pmc/pmc_object.h $(PMC_INC_DIR)/pmc/pmc_callcontext.h $(SRC_DIR)/oo.str $(INC_DIR)/oo_private.h
 
 $(SRC_DIR)/scheduler$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/scheduler.str \
-        $(SRC_DIR)/pmc/scheduler.c $(PMC_INC_DIR)/pmc/pmc_callcontext.h \
+        $(PMC_INC_DIR)/pmc/pmc_callcontext.h \
         $(PMC_INC_DIR)/pmc/pmc_scheduler.h $(PMC_INC_DIR)/pmc/pmc_task.h \
-        $(PMC_INC_DIR)/pmc/pmc_timer.h $(SRC_DIR)/pmc/task.c \
-        $(SRC_DIR)/pmc/timer.c $(INC_DIR)/pbcversion.h \
+        $(PMC_INC_DIR)/pmc/pmc_timer.h \
         $(INC_DIR)/scheduler_private.h
 
 $(IO_DIR)/core$(O) : $(INC_DIR)/parrot.h $(IO_DIR)/io_private.h
 $(IO_DIR)/socket_api$(O) : $(INC_DIR)/parrot.h $(IO_DIR)/io_private.h $(IO_DIR)/api.str $(PMC_INC_DIR)/pmc/pmc_socket.h
 $(IO_DIR)/socket_unix$(O) : $(INC_DIR)/parrot.h $(PMC_INC_DIR)/pmc/pmc_socket.h $(IO_DIR)/io_private.h
-$(IO_DIR)/socket_win32$(O) : $(INC_DIR)/parrot.h $(IO_DIR)/io_private.h $(PMC_INC_DIR)/pmc/pmc_socket.h $(IO_DIR)/api.str
+
+$(IO_DIR)/socket_win32$(O) : \
+        $(INC_DIR)/parrot.h \
+        $(IO_DIR)/io_private.h \
+        $(PMC_INC_DIR)/pmc/pmc_socket.h
 
 lib_deps_object : $(O_FILES)
 	$(PERL) tools/dev/lib_deps.pl object $(O_FILES)
@@ -1080,10 +1082,10 @@ $(SRC_DIR)/key$(O) : $(INC_DIR)/parrot.h $(INC_DIR)/key.h $(SRC_DIR)/key.str \
 
 $(SRC_DIR)/gc/mark_sweep$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/gc/gc_private.h
 
-$(SRC_DIR)/gc/gc_ms$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/gc/gc_ms.c \
+$(SRC_DIR)/gc/gc_ms$(O) : $(INC_DIR)/parrot.h \
         $(SRC_DIR)/gc/gc_private.h
 
-$(SRC_DIR)/gc/gc_inf$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/gc/gc_inf.c \
+$(SRC_DIR)/gc/gc_inf$(O) : $(INC_DIR)/parrot.h \
         $(SRC_DIR)/gc/gc_private.h
 
 $(SRC_DIR)/gc/api$(O) : $(INC_DIR)/parrot.h $(INC_DIR)/gc_api.h \
@@ -1144,7 +1146,7 @@ $(SRC_DIR)/thread$(O) : $(INC_DIR)/parrot.h $(INC_DIR)/atomic.h \
 $(SRC_DIR)/extend$(O) : $(INC_DIR)/parrot.h $(INC_DIR)/extend.h \
 	$(PMC_INC_DIR)/pmc/pmc_sub.h $(PMC_INC_DIR)/pmc/pmc_callcontext.h
 
-$(SRC_DIR)/runcore/main$(O) : $(SRC_DIR)/runcore/main.c \
+$(SRC_DIR)/runcore/main$(O) : \
 	$(SRC_DIR)/runcore/main.str \
 	$(PMC_INC_DIR)/pmc/pmc_parrotlibrary.h \
 	$(PMC_INC_DIR)/pmc/pmc_callcontext.h \
@@ -1160,8 +1162,8 @@ $(SRC_DIR)/runcore/profiling$(O) : $(SRC_DIR)/runcore/profiling.str \
         $(INC_DIR)/oplib/core_ops.h $(INC_DIR)/runcore_api.h \
         $(INC_DIR)/runcore_profiling.h $(INC_DIR)/embed.h
 
-$(SRC_DIR)/call/args$(O) : $(SRC_DIR)/call/args.c \
-        $(INC_DIR)/packfile.h $(INC_DIR)/parrot.h $(INC_DIR)/oplib/ops.h \
+$(SRC_DIR)/call/args$(O) : \
+        $(INC_DIR)/parrot.h $(INC_DIR)/oplib/ops.h \
         $(INC_DIR)/runcore_api.h \
 	$(SRC_DIR)/call/args.str \
 	$(PMC_INC_DIR)/pmc/pmc_key.h $(PMC_INC_DIR)/pmc/pmc_callcontext.h \
@@ -1170,30 +1172,30 @@ $(SRC_DIR)/call/args$(O) : $(SRC_DIR)/call/args.c \
 $(SRC_DIR)/call/context_accessors$(O): $(INC_DIR)/call.h $(INC_DIR)/parrot.h \
 	$(PMC_INC_DIR)/pmc/pmc_callcontext.h
 
-$(SRC_DIR)/call/pcc$(O) : $(SRC_DIR)/call/pcc.c $(INC_DIR)/oplib/ops.h \
+$(SRC_DIR)/call/pcc$(O) : $(INC_DIR)/oplib/ops.h \
         $(INC_DIR)/parrot.h $(INC_DIR)/runcore_api.h \
-	$(SRC_DIR)/call/pcc.str $(PMC_INC_DIR)/pmc/pmc_fixedintegerarray.h \
+	$(SRC_DIR)/call/pcc.str \
 	$(PMC_INC_DIR)/pmc/pmc_key.h $(PMC_INC_DIR)/pmc/pmc_continuation.h \
 	$(PMC_INC_DIR)/pmc/pmc_callcontext.h
 
-$(SRC_DIR)/call/context$(O) : $(SRC_DIR)/call/context.c $(INC_DIR)/call.h \
+$(SRC_DIR)/call/context$(O) : $(INC_DIR)/call.h \
         $(INC_DIR)/parrot.h \
 	$(PMC_INC_DIR)/pmc/pmc_sub.h $(PMC_INC_DIR)/pmc/pmc_callcontext.h
 
-$(SRC_DIR)/interp/inter_cb$(O) : $(SRC_DIR)/interp/inter_cb.c \
+$(SRC_DIR)/interp/inter_cb$(O) : \
 	$(INC_DIR)/parrot.h $(SRC_DIR)/interp/inter_cb.str
 
-$(SRC_DIR)/interp/inter_misc$(O) : $(SRC_DIR)/interp/inter_misc.c \
+$(SRC_DIR)/interp/inter_misc$(O) : \
 	$(INC_DIR)/parrot.h $(INC_DIR)/has_header.h \
         $(INC_DIR)/runcore_api.h $(SRC_DIR)/interp/inter_misc.str \
 	$(PMC_INC_DIR)/pmc/pmc_callcontext.h compilers/imcc/imc.h
 
-$(SRC_DIR)/interp/inter_create$(O) : $(SRC_DIR)/interp/inter_create.c \
+$(SRC_DIR)/interp/inter_create$(O) : \
 	$(INC_DIR)/parrot.h $(INC_DIR)/oplib/core_ops.h \
         $(INC_DIR)/runcore_api.h $(SRC_DIR)/interp/inter_create.str \
 	$(PMC_INC_DIR)/pmc/pmc_callcontext.h compilers/imcc/imc.h
 
-$(SRC_DIR)/call/ops$(O) : $(SRC_DIR)/call/ops.c $(INC_DIR)/oplib/ops.h \
+$(SRC_DIR)/call/ops$(O) : $(INC_DIR)/oplib/ops.h \
 	$(INC_DIR)/parrot.h $(PMC_INC_DIR)/pmc/pmc_continuation.h
 
 $(IO_DIR)/api$(O) : $(INC_DIR)/parrot.h $(IO_DIR)/io_private.h \
@@ -1212,7 +1214,7 @@ $(IO_DIR)/win32$(O) : $(INC_DIR)/parrot.h $(IO_DIR)/io_private.h $(PMC_INC_DIR)/
 
 $(SRC_DIR)/gc/alloc_memory$(O) : $(INC_DIR)/parrot.h $(INC_DIR)/memory.h
 
-$(SRC_DIR)/main$(O) : $(SRC_DIR)/main.c $(INC_DIR)/imcc.h $(INC_DIR)/parrot.h \
+$(SRC_DIR)/main$(O) : $(INC_DIR)/imcc.h $(INC_DIR)/parrot.h \
         $(INC_DIR)/embed.h
 
 $(SRC_DIR)/multidispatch$(O) : $(INC_DIR)/compiler.h \
@@ -1244,25 +1246,22 @@ $(SRC_DIR)/tsq$(O) : $(INC_DIR)/parrot.h
 
 $(SRC_DIR)/embed$(O) : $(INC_DIR)/parrot.h $(INC_DIR)/embed.h \
         $(INC_DIR)/oplib/ops.h $(INC_DIR)/runcore_api.h \
-        $(INC_DIR)/debugger.h compilers/imcc/imc.h \
+        compilers/imcc/imc.h \
 	$(PMC_INC_DIR)/pmc/pmc_sub.h $(PMC_INC_DIR)/pmc/pmc_callcontext.h
 
 $(SRC_DIR)/dataypes$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/dataypes.c
 
-$(SRC_DIR)/exit$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/exit.c
+$(SRC_DIR)/exit$(O) : $(INC_DIR)/parrot.h
 
-$(SRC_DIR)/nci$(O) : $(SRC_DIR)/nci.c $(SRC_DIR)/nci.str \
+$(SRC_DIR)/nci$(O) : $(SRC_DIR)/nci.str \
         $(INC_DIR)/hash.h $(INC_DIR)/oplib/ops.h $(INC_DIR)/parrot.h \
         $(SRC_DIR)/frame_builder.h \
         $(PMC_INC_DIR)/pmc/pmc_callcontext.h \
-        $(PMC_INC_DIR)/pmc/pmc_unmanagedstruct.h \
         $(PMC_INC_DIR)/pmc/pmc_managedstruct.h \
         $(PMC_INC_DIR)/pmc/pmc_nci.h \
         $(PMC_INC_DIR)/pmc/pmc_pointer.h
 
 $(SRC_DIR)/frame_builder$(O) : $(SRC_DIR)/frame_builder.h $(INC_DIR)/parrot.h \
-        $(SRC_DIR)/frame_builder.c \
-        $(SRC_DIR)/frame_builder.str \
         $(PMC_INC_DIR)/pmc/pmc_fixedintegerarray.h \
         $(PMC_INC_DIR)/pmc/pmc_unmanagedstruct.h \
         $(PMC_INC_DIR)/pmc/pmc_managedstruct.h
@@ -1270,8 +1269,7 @@ $(SRC_DIR)/frame_builder$(O) : $(SRC_DIR)/frame_builder.h $(INC_DIR)/parrot.h \
 $(SRC_DIR)/frame_builder.h : $(INC_DIR)/parrot.h $(INC_DIR)/hash.h \
         $(INC_DIR)/oplib/ops.h
 
-$(SRC_DIR)/vtables$(O) : $(INC_DIR)/parrot.h $(INC_DIR)/vtables.h \
-        $(SRC_DIR)/vtables.c
+$(SRC_DIR)/vtables$(O) : $(INC_DIR)/parrot.h $(INC_DIR)/vtables.h
 
 $(SRC_DIR)/gc/system$(O) : $(INC_DIR)/parrot.h  $(SRC_DIR)/gc/gc_private.h
 $(SRC_DIR)/gc/gc_private.h : $(INC_DIR)/settings.h
@@ -1291,10 +1289,10 @@ $(SRC_DIR)/spf_render$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/spf_render.str \
 
 $(SRC_DIR)/spf_vtable$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/spf_vtable.str
 
-$(SRC_DIR)/string/encoding$(O) : $(SRC_DIR)/string/encoding.c \
-	$(INC_DIR)/config.h $(INC_DIR)/parrot.h
+$(SRC_DIR)/string/encoding$(O) : \
+	$(INC_DIR)/parrot.h
 
-$(SRC_DIR)/string/charset$(O) : $(SRC_DIR)/string/charset.c \
+$(SRC_DIR)/string/charset$(O) : \
         $(SRC_DIR)/string/encoding/fixed_8.h \
         $(SRC_DIR)/string/encoding/utf8.h \
         $(SRC_DIR)/string/encoding/utf16.h \
@@ -1305,12 +1303,12 @@ $(SRC_DIR)/string/charset$(O) : $(SRC_DIR)/string/charset.c \
         $(SRC_DIR)/string/charset/unicode.h \
         $(INC_DIR)/parrot.h
 
-$(SRC_DIR)/pbc_merge$(O) : $(SRC_DIR)/pbc_merge.c $(INC_DIR)/embed.h \
+$(SRC_DIR)/pbc_merge$(O) : $(INC_DIR)/embed.h \
 	$(PMC_INC_DIR)/pmc/pmc_sub.h $(INC_DIR)/oplib/ops.h $(INC_DIR)/parrot.h
 
 $(IO_DIR)/filehandle$(O) : $(INC_DIR)/parrot.h $(PMC_INC_DIR)/pmc/pmc_filehandle.h $(SRC_DIR)/io/io_private.h
 
-compilers/pirc/src/piremit$(O) : $(INC_DIR)/parrot.h \
+compilers/pirc/src/piremit$(O) : \
         compilers/pirc/src/piremit.h \
         compilers/pirc/src/pircompunit.h \
         compilers/pirc/src/pircompiler.h \
@@ -1450,14 +1448,14 @@ compilers/pirc/src/hdocprep$(O) : $(INC_DIR)/parrot.h \
         $(INC_DIR)/embed.h compilers/pirc/src/pirheredoc.h
 
 compilers/pirc/src/main$(O) : \
-  compilers/pirc/src/pirparser.h \
-  compilers/pirc/src/pircompiler.h \
-  compilers/pirc/src/piremit.h \
-  compilers/pirc/src/piryy.h \
-  compilers/pirc/src/pirlexer.h \
-  compilers/pirc/src/pirheredoc.h \
-  compilers/pirc/src/pirregalloc.h \
-  compilers/pirc/src/pircapi.h
+        compilers/pirc/src/pirparser.h \
+        compilers/pirc/src/pircompiler.h \
+        compilers/pirc/src/piremit.h \
+        compilers/pirc/src/piryy.h \
+        compilers/pirc/src/pirlexer.h \
+        compilers/pirc/src/pirheredoc.h \
+        compilers/pirc/src/pirregalloc.h \
+        compilers/pirc/src/pircapi.h
 
 compilers/pirc/src/pircapi$(O) : \
   compilers/pirc/src/pirparser.h \
@@ -2523,7 +2521,7 @@ exec : $(SRC_DIR)/parrot_config$(O) $(LIBPARROT)
 ###### OS depend targets ##########
 
 # for use by t/pmc/nci.t
-$(SRC_DIR)/nci_test$(O): $(GENERAL_H_FILES)
+$(SRC_DIR)/nci_test$(O): $(INC_DIR)/parrot.h
 
 $(LIBNCI_TEST_SO): $(SRC_DIR)/nci_test$(O) $(LIBPARROT)
 	$(LD) $(LD_LOAD_FLAGS) @ncilib_link_extra@ $(LDFLAGS) \

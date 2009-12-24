@@ -40,6 +40,7 @@ foreach my $file (sort split /\n/, $files) {
     # For now, skip any files that have generated dependencies
     next if $file =~ m{src/(ops|dynoplibs|dynpmc|pmc)/};
     next if $file =~ m{src/string/(charset|encoding)/};
+    next if $file eq 'src/string/private_cstring.h';
     my @includes = $guts =~ m/#include "(.*)"/g;
     $deps{$file} = [ @includes ];
 }
