@@ -67,6 +67,7 @@
 #  define PFOPT_ALIGN 8
 #  define PFOPT_VALUE 16
 #endif
+#define PFOPT_PMC_FREEZE_ONLY 32
 
 #if TRACE_PACKFILE
 /* Here we pass multipe args to a macro so the args may not be bracketed here! */
