@@ -40,7 +40,8 @@ tools/dev/pmcrenumber.pl - Renumber F<src/pmc/pmc.num>.
 
 =head1 DESCRIPTION
 
-This program should be used when adding or removing PMCs.
+This program should be used when adding PMCs. Note that it does not remove
+numbers assigned to PMCs that have been removed; this happens very rarely.
 
 =head1 SEE ALSO
 
