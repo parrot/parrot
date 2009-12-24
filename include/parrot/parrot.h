@@ -109,11 +109,6 @@ typedef jmp_buf Parrot_jump_buff;
 #define NUM_REGISTERS 32
 #define PARROT_MAGIC 0x13155a1
 
-#define OPCODE_TYPE_PERL 0x5045524c
-#define OPCODE_TYPE_PYTHON 0x5045524b
-#define OPCODE_TYPE_JAVA 4871757
-#define OPCODE_TYPE_MSNET 0x2e4e4554
-
 typedef void STRING_FUNCS;
 typedef struct parrot_interp_t Interp;
 
