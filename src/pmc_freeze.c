@@ -288,9 +288,7 @@ C<len> more bytes. If not, expands the buffer.
     (io)->pos += (x); \
 } while (0)
 
-#define BYTECODE_SHIFT_OK(io) \
-    PARROT_ASSERT(GET_VISIT_CURSOR(io) <= \
-        (opcode_t *)(((char *)Buffer_bufstart((io)->buffer)) + (io)->input_length))
+#define BYTECODE_SHIFT_OK(io) PARROT_ASSERT((io)->pos <= (io)->input_length)
 
 
 PARROT_INLINE
@@ -334,7 +332,7 @@ PARROT_INLINE
 static INTVAL
 OUTPUT_LENGTH(ARGIN(visit_info *io)) {
     ASSERT_ARGS(OUTPUT_LENGTH)
-    return sizeof (opcode_t) * (GET_VISIT_CURSOR(io) - ((opcode_t *)Buffer_bufstart(io->buffer)));
+    return io->pos;
 }
 
 /*
@@ -351,9 +349,7 @@ PARROT_INLINE
 static INTVAL
 INFO_HAS_DATA(ARGIN(visit_info *io)) {
     ASSERT_ARGS(INFO_HAS_DATA)
-    return sizeof (opcode_t) *
-        (GET_VISIT_CURSOR(io) <
-            (opcode_t *)(((char *)Buffer_bufstart(io->buffer)) + io->input_length));
+    return io->pos < io->input_length;
 }
 
 
