@@ -70,7 +70,7 @@ Output a skeleton for Plumage
 
 Create a source distribution or a source package
 
-=item bdist, bdist_rpm, bdist_wininst, spec_rpm
+=item bdist, bdist_rpm, bdist_wininst, spec
 
 Create a binary package or Windows Installer.
 
@@ -150,7 +150,7 @@ bzip2
 
 zip
 
-=item spec_rpm, sdist_rpm, bdist_rpm
+=item spec, sdist_rpm, bdist_rpm
 
 rpmbuild
 
@@ -293,7 +293,7 @@ L<http://bitbucket.org/riffraff/shakespeare-parrot/src/tip/setup.pir>
     .const 'Sub' _sdist_rpm = '_sdist_rpm'
     register_step('sdist_rpm', _sdist_rpm)
     .const 'Sub' _spec_rpm = '_spec_rpm'
-    register_step('spec_rpm', _spec_rpm)
+    register_step('spec', _spec_rpm)
     .const 'Sub' _control_deb = '_control_deb'
     register_step('control', _control_deb)
     .const 'Sub' _ebuild_gentoo = '_ebuild_gentoo'
@@ -351,12 +351,12 @@ Entry point.
     $P0 = iter steps
     if $P0 goto L11
     # default step
-    run_step('build', kv :flat :named)
+    run_step('build', 'build' :named('__target__'), kv :flat :named)
     goto L12
   L11:
     unless $P0 goto L12
     $S0 = shift $P0
-    $I0 = run_step($S0, kv :flat :named)
+    $I0 = run_step($S0, $S0 :named('__target__'), kv :flat :named)
     if $I0 goto L11
     print "unknown target : "
     say $S0
@@ -2894,16 +2894,8 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     cmd .= " ~/rpmbuild/SOURCES/"
     system(cmd, 1 :named('verbose'))
 
-    $S0 = get_spec(kv :flat :named)
-    $I0 = file_exists($S0)
-    if $I0 goto L1
-    $S1 = dirname($S0)
-    mkpath($S1, 1 :named('verbose'))
-    $S1 = mk_spec(kv :flat :named)
-    spew($S0, $S1, 1 :named('verbose'))
-  L1:
+    run_step('spec', kv :flat :named)
 
-    .local string cmd
     cmd = "rpmbuild -bs -v " . $S0
     system(cmd, 1 :named('verbose'))
 .end
@@ -2924,7 +2916,7 @@ On Windows calls bdist_wininst, otherwise ...
     .tailcall run_step('bdist_rpm', kv :flat :named)
 .end
 
-=head3 Step spec_rpm
+=head3 Step spec
 
 =over 4
 
@@ -2946,6 +2938,8 @@ the default value is ports/rpm
     $S1 = mk_spec(kv :flat :named)
     $I0 = file_exists($S0)
     unless $I0 goto L1
+    $S0 = kv['__target__']
+    unless $S0 == 'spec' goto L2
     print $S1
     goto L2
   L1:
@@ -3102,24 +3096,17 @@ TEMPLATE
     cmd .= " ~/rpmbuild/SOURCES/"
     system(cmd, 1 :named('verbose'))
 
-    $S0 = get_spec(kv :flat :named)
-    $I0 = file_exists($S0)
-    if $I0 goto L1
-    $S1 = dirname($S0)
-    mkpath($S1, 1 :named('verbose'))
-    $S1 = mk_spec(kv :flat :named)
-    spew($S0, $S1, 1 :named('verbose'))
-  L1:
+    run_step('spec', kv :flat :named)
 
     cmd = "rpmbuild -bb -v " . $S0
     system(cmd, 1 :named('verbose'))
 .end
 
-=head3 Step control_deb
+=head3 Step control
 
 =over 4
 
-=item deb_dir
+=item control_dir
 
 the default value is ports/debian
 
@@ -3138,8 +3125,10 @@ the default value is ports/debian
     $S1 = mk_deb_control(kv :flat :named)
     $I0 = file_exists($S0)
     unless $I0 goto L1
+    $S0 = kv['__target__']
+    unless $S0 == 'control' goto L2
     print $S1
-    goto L2
+    goto L3
   L1:
     spew($S0, $S1, 1 :named('verbose'))
   L2:
@@ -3155,12 +3144,13 @@ the default value is ports/debian
     $S0 = get_deb_ext('.install', kv :flat :named)
     $S1 = mk_deb_install(kv :flat :named)
     spew($S0, $S1, 1 :named('verbose'))
+  L3:
 .end
 
 .sub 'get_deb' :anon
     .param string filename
     .param pmc kv :slurpy :named
-    $S0 = get_value('deb_dir', 'ports/debian' :named('default'), kv :flat :named)
+    $S0 = get_value('control_dir', 'ports/debian' :named('default'), kv :flat :named)
     $S0 .= "/"
     $S0 .= filename
     .return ($S0)
@@ -3169,7 +3159,7 @@ the default value is ports/debian
 .sub 'get_deb_ext' :anon
     .param string ext
     .param pmc kv :slurpy :named
-    $S0 = get_value('deb_dir', 'ports/debian' :named('default'), kv :flat :named)
+    $S0 = get_value('control_dir', 'ports/debian' :named('default'), kv :flat :named)
     $S0 .= "/parrot-"
     $S1 = get_name(kv :flat :named)
     $S0 .= $S1
@@ -3368,6 +3358,8 @@ TEMPLATE
     $S1 = mk_ebuild(kv :flat :named)
     $I0 = file_exists($S0)
     unless $I0 goto L1
+    $S0 = kv['__target__']
+    unless $S0 == 'ebuild' goto L2
     print $S1
     goto L2
   L1:
