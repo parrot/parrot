@@ -587,8 +587,8 @@ hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(visit_info *info))
         switch (hash->entry_type) {
           case enum_hash_pmc:
             {
-                const PMC *p = VTABLE_shift_pmc(interp, info);
-                b->value     = (void *)p;
+                PMC *p   = VTABLE_shift_pmc(interp, info);
+                b->value = (void *)p;
                 break;
             }
           case enum_hash_int:

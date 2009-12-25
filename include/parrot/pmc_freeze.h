@@ -73,6 +73,18 @@ typedef struct _visit_info {
 
 #define IMAGE_IO visit_info
 
+#define VISIT_PMC(interp, visit, pmc) do {\
+    switch (VTABLE_get_integer((interp), (visit))) { \
+      case VISIT_FREEZE_NORMAL: \
+        VTABLE_push_pmc((interp), (visit), (pmc)); \
+        break; \
+      case VISIT_THAW_NORMAL: \
+      case VISIT_THAW_CONSTANTS: \
+        (pmc) = VTABLE_shift_pmc((interp), (visit)); \
+        break; \
+    } \
+} while (0)
+
 #define VISIT_PMC_ATTR(interp, visit, self, pmclass, attr_name) do {\
     PMC *_visit_pmc_attr; \
     switch (VTABLE_get_integer((interp), (visit))) { \

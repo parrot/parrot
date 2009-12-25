@@ -669,7 +669,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_str_new_from_buffer(PARROT_INTERP, ARGIN(const Buffer *buffer), const UINTVAL len)
 {
-    ASSERT_ARGS(Parrot_str_new)
+    ASSERT_ARGS(Parrot_str_new_from_buffer)
     STRING *result;
 
     result = Parrot_gc_new_string_header(interp, 0);

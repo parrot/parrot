@@ -128,23 +128,6 @@ static int thaw_pmc_id(PARROT_INTERP,
         FUNC_MODIFIES(*id)
         FUNC_MODIFIES(*type);
 
-static void visit_info_init(PARROT_INTERP,
-    ARGOUT(visit_info *info),
-    ARGIN(visit_enum_type what),
-    ARGIN(STRING *input),
-    ARGIN(PMC *pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*info);
-
-static void todo_list_init(PARROT_INTERP,
-    ARGOUT(visit_info *info),
-    ARGIN(STRING *input))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*info);
-
 PARROT_INLINE
 static int todo_list_seen(PARROT_INTERP,
     ARGIN(PMC *pmc),
@@ -156,6 +139,17 @@ static int todo_list_seen(PARROT_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*info)
         FUNC_MODIFIES(*id);
+
+static void visit_info_init(PARROT_INTERP,
+    ARGOUT(visit_info *info),
+    visit_enum_type what,
+    ARGIN(STRING *input),
+    ARGIN(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*info);
 
 static void visit_loop_todo_list(PARROT_INTERP,
     ARGIN_NULLOK(PMC *current),
@@ -219,15 +213,16 @@ static void visit_todo_list_thaw(PARROT_INTERP,
     , PARROT_ASSERT_ARG(info) \
     , PARROT_ASSERT_ARG(id) \
     , PARROT_ASSERT_ARG(type))
-#define ASSERT_ARGS_visit_info_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(info) \
-    , PARROT_ASSERT_ARG(input))
 #define ASSERT_ARGS_todo_list_seen __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc) \
     , PARROT_ASSERT_ARG(info) \
     , PARROT_ASSERT_ARG(id))
+#define ASSERT_ARGS_visit_info_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(info) \
+    , PARROT_ASSERT_ARG(input) \
+    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_visit_loop_todo_list __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(info))
@@ -580,7 +575,7 @@ Initializes the C<*info> lists.
 
 static void
 visit_info_init(PARROT_INTERP, ARGOUT(visit_info *info),
-  ARGIN(visit_enum_type what), ARGIN(STRING *input), ARGIN(PMC *pmc))
+  visit_enum_type what, ARGIN(STRING *input), ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(visit_info_init)
     /* We want to store a 16-byte aligned header, but the actual * header may be shorter. */
@@ -1086,7 +1081,7 @@ run_thaw(PARROT_INTERP, ARGIN(STRING* input), visit_enum_type what)
         gc_block = 1;
     }
 
-    visit_info_init(interp, &info, what, input, NULL);
+    visit_info_init(interp, &info, what, input, PMCNULL);
     BYTECODE_SHIFT_OK(&info);
 
     if (gc_block) {
