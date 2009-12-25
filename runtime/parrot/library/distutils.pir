@@ -2311,6 +2311,8 @@ Same options as install.
     $S1 = mk_plumage(kv :flat :named)
     $I0 = file_exists($S0)
     unless $I0 goto L1
+    $S0 = kv['__target__']
+    unless $S0 == 'plumage' goto L2
     print $S1
     goto L2
   L1:
@@ -2896,6 +2898,7 @@ On Windows calls sdist_zip, otherwise sdist_gztar
 
     run_step('spec', kv :flat :named)
 
+    $S0 = get_spec(kv :flat :named)
     cmd = "rpmbuild -bs -v " . $S0
     system(cmd, 1 :named('verbose'))
 .end
@@ -3098,6 +3101,7 @@ TEMPLATE
 
     run_step('spec', kv :flat :named)
 
+    $S0 = get_spec(kv :flat :named)
     cmd = "rpmbuild -bb -v " . $S0
     system(cmd, 1 :named('verbose'))
 .end
