@@ -245,15 +245,6 @@ typedef struct PackFile_FixupTable {
 
 /* &end_gen */
 
-enum PF_VARTYPE {                  /* s. also imcc/symreg.h */
-    PF_VT_START_SLICE = 1 << 10,   /* x .. y slice range */
-    PF_VT_END_SLICE   = 1 << 11,
-    PF_VT_START_ZERO  = 1 << 12,   /* .. y 0..start */
-    PF_VT_END_INF     = 1 << 13,   /* x..  start..inf */
-    PF_VT_SLICE_BITS  = PF_VT_START_SLICE | PF_VT_END_SLICE |
-                        PF_VT_START_ZERO | PF_VT_END_INF
-};
-
 typedef struct PackFile_ConstTable {
     PackFile_Segment           base;
     opcode_t                   const_count;

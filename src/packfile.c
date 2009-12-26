@@ -4038,10 +4038,7 @@ PackFile_Constant_unpack_key(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
 
     while (components-- > 0) {
         opcode_t       type       = PF_fetch_opcode(pf, &cursor);
-        const opcode_t slice_bits = type & PF_VT_SLICE_BITS;
         opcode_t        op;
-
-        type &= ~PF_VT_SLICE_BITS;
 
         if (tail) {
             SETATTR_Key_next_key(interp, tail, constant_pmc_new(interp, pmc_enum));
