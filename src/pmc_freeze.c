@@ -621,7 +621,6 @@ visit_info_init(PARROT_INTERP, ARGOUT(visit_info *info),
     info->id_list     = pmc_new(interp, enum_class_Array);
     info->id          = 0;
     info->extra_flags = EXTRA_IS_NULL;
-    info->thaw_result = NULL;
 
     visit_loop_todo_list(interp, pmc, info);
     PackFile_destroy(interp, info->pf);
@@ -767,11 +766,7 @@ do_thaw(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info))
 
     if (!id) {
         /* got a NULL PMC */
-        pmc = PMCNULL;
-        if (!info->thaw_result)
-            info->thaw_result = pmc;
-        else
-            *info->thaw_ptr = pmc;
+        *info->thaw_ptr = PMCNULL;
         return;
     }
 
@@ -818,11 +813,7 @@ do_thaw(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info))
         info->extra_flags = 0;
     }
 
-    if (!info->thaw_result)
-        info->thaw_result = pmc;
-    else
-        *info->thaw_ptr = pmc;
-
+    *info->thaw_ptr = pmc;
 
     Parrot_pmc_array_assign(interp, (List *)PMC_data(info->id_list), id, pmc, enum_type_PMC);
 
@@ -944,7 +935,6 @@ visit_loop_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC *current),
     PMC        **list_item;
     List        *finish_list    = NULL;
     List * const todo           = (List *)PMC_data(info->todo);
-    int          finished_first = 0;
     const int    thawing        = info->what == VISIT_THAW_CONSTANTS
                                || info->what == VISIT_THAW_NORMAL;
     int          i;
@@ -975,8 +965,6 @@ again:
         VTABLE_visit(interp, current, info);
 
         if (thawing) {
-            if (current == info->thaw_result)
-                finished_first = 1;
             if (current->vtable->thawfinish != interp->vtables[enum_class_default]->thawfinish)
                 Parrot_pmc_array_unshift(interp, finish_list, current, enum_type_PMC);
         }
@@ -991,11 +979,7 @@ again:
         }
 
         /* on thawing call thawfinish for each processed PMC */
-        if (!finished_first)
-            Parrot_pmc_array_unshift(interp, finish_list, info->thaw_result, enum_type_PMC);
-
         n = Parrot_pmc_array_length(interp, finish_list);
-
         for (i = 0; i < n ; ++i) {
             current = *(PMC**)Parrot_pmc_array_get(interp, finish_list, i, enum_type_PMC);
             if (!PMC_IS_NULL(current))
@@ -1061,8 +1045,9 @@ static PMC*
 run_thaw(PARROT_INTERP, ARGIN(STRING* input), visit_enum_type what)
 {
     ASSERT_ARGS(run_thaw)
-    visit_info    info;
-    int           gc_block = 0;
+    visit_info  info;
+    int         gc_block = 0;
+    PMC        *result;
 
     /*
      * if we are thawing a lot of PMCs, it's cheaper to do
@@ -1081,6 +1066,7 @@ run_thaw(PARROT_INTERP, ARGIN(STRING* input), visit_enum_type what)
         gc_block = 1;
     }
 
+    info.thaw_ptr = &result;
     visit_info_init(interp, &info, what, input, PMCNULL);
     BYTECODE_SHIFT_OK(&info);
 
@@ -1089,7 +1075,7 @@ run_thaw(PARROT_INTERP, ARGIN(STRING* input), visit_enum_type what)
         Parrot_unblock_GC_sweep(interp);
     }
 
-    return info.thaw_result;
+    return result;
 }
 
 
