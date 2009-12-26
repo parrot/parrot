@@ -2895,6 +2895,19 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
     ASSERT_ARGS(Parrot_debug_add_mapping)
     PackFile_ConstTable * const    ct         = debug->code->const_table;
     int                            insert_pos = 0;
+    opcode_t                       prev_filename_n;
+    STRING                        *filename_pstr;
+
+    /* If the previous mapping has the same filename, don't record it. */
+    if (debug->num_mappings) {
+        prev_filename_n = debug->mappings[debug->num_mappings-1]->filename;
+        filename_pstr = Parrot_str_new(interp, filename, 0);
+        if (ct->constants[prev_filename_n]->type == PFC_STRING &&
+                Parrot_str_equal(interp, filename_pstr,
+                    ct->constants[prev_filename_n]->u.string)) {
+            return;
+        }
+    }
 
     /* Allocate space for the extra entry. */
     mem_realloc_n_typed(debug->mappings, debug->num_mappings + 1,
