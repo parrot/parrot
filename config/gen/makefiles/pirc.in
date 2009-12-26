@@ -24,6 +24,8 @@ LINKFLAGS     := @linkflags@ @link_debug@ @ld_debug@
 LD            := @ld@
 LDFLAGS       := @ldflags@ @ld_debug@
 TOUCH		  := @touch@
+LEX			  := @lex@
+YACC	      := @yacc@
 
 SOURCES       := \
   src/main.c \
