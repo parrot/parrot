@@ -56,8 +56,6 @@ sub compile_cmd {
         $dynpmc_include = "-I" . $PATHQUOTE . $dynpmc_include . $PATHQUOTE . " ";
     }
 
-
-    # TT #288 - need long term solution for passing in include paths
     return
         "$CC " .
         '@cc_o_out@' . $target . " " .
