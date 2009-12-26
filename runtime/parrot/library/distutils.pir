@@ -2479,6 +2479,8 @@ TEMPLATE
     .param string str
     $P0 = split '"', str
     str = join '\"', $P0
+    $P0 = split "\n", str
+    str = join "\\n", $P0
     .return (str)
 .end
 
@@ -3108,6 +3110,8 @@ TEMPLATE
 
 =head3 Step control
 
+See L<http://www.debian.org/doc/maint-guide/>.
+
 =over 4
 
 =item control_dir
@@ -3136,6 +3140,20 @@ the default value is ports/debian
   L1:
     spew($S0, $S1, 1 :named('verbose'))
   L2:
+
+    $S0 = get_deb('changelog', kv :flat :named)
+    $I0 = file_exists($S0)
+    if $I0 goto L4
+    $S1 = mk_deb_changelog(kv :flat :named)
+    spew($S0, $S1, 1 :named('verbose'))
+  L4:
+
+    $S0 = get_deb('copyright', kv :flat :named)
+    $I0 = file_exists($S0)
+    if $I0 goto L5
+    $S1 = mk_deb_copyright(kv :flat :named)
+    spew($S0, $S1, 1 :named('verbose'))
+  L5:
 
     $S0 = get_deb('rules', kv :flat :named)
     $S1 = mk_deb_rules(kv :flat :named)
@@ -3188,17 +3206,23 @@ the default value is ports/debian
     .local string packager
     packager = get_value('packager', "you <you@you.org>" :named('default'), kv :flat :named)
 
+    .local string abstract
+    abstract = get_value('abstract', kv :flat :named)
+
     .local string description
-    description = get_value('description', kv :flat :named)
+    $S0 = get_value('description', kv :flat :named)
+    $P0 = split "\n", $S0
+    description = join "\n ", $P0
 
     $P0 = new 'FixedStringArray'
-    set $P0, 6
+    set $P0, 7
     $P0[0] = name
     $P0[1] = packager
     $P0[2] = parrot_version
     $P0[3] = name
     $P0[4] = parrot_version
-    $P0[5] = description
+    $P0[5] = abstract
+    $P0[6] = description
 
     $S0 = <<'TEMPLATE'
 Source: parrot-%s
@@ -3212,6 +3236,90 @@ Package: parrot-%s
 Architecture: any
 Depends: parrot-minimal (= %s)
 Description: %s
+ %s
+TEMPLATE
+    $S0 = sprintf $S0, $P0
+    .return ($S0)
+.end
+
+.sub 'mk_deb_changelog' :anon
+    .param pmc kv :slurpy :named
+
+    .local string name
+    name = get_name(kv :flat :named)
+
+    .local string version
+    version = get_version(kv :flat :named)
+
+    .local string release
+    release = get_value('release', '1' :named('default'), kv :flat :named)
+
+    .local string packager
+    packager = get_value('packager', "you <you@you.org>" :named('default'), kv :flat :named)
+
+    .local string timestamp
+    timestamp = get_timestamp()
+
+    $P0 = new 'FixedStringArray'
+    set $P0, 5
+    $P0[0] = name
+    $P0[1] = version
+    $P0[2] = release
+    $P0[3] = packager
+    $P0[4] = timestamp
+
+    $S0 = <<'TEMPLATE'
+parrot-%s (%s-%s) unstable; urgency=low
+
+  * Created by distutils.
+
+ -- %s  %s
+TEMPLATE
+    $S0 = sprintf $S0, $P0
+    .return ($S0)
+.end
+
+.sub 'mk_deb_copyright' :anon
+    .param pmc kv :slurpy :named
+
+    .local string packager
+    packager = get_value('packager', "you <you@you.org>" :named('default'), kv :flat :named)
+
+    .local string timestamp
+    timestamp = get_timestamp()
+
+    .local string project_uri
+    project_uri =get_value('project_uri', kv :flat :named)
+
+    .local string copyright_holder
+    copyright_holder = get_value('copyright_holder', kv :flat :named)
+
+    .local string license
+    license = ''
+    $S0 = get_license_file()
+    if $S0 == '' goto L1
+    license = slurp($S0)
+  L1:
+
+    $P0 = new 'FixedStringArray'
+    set $P0, 5
+    $P0[0] = packager
+    $P0[1] = timestamp
+    $P0[2] = project_uri
+    $P0[3] = copyright_holder
+    $P0[4] = license
+
+    $S0 = <<'TEMPLATE'
+This package was debianized by %s on
+%s
+
+It was downloaded from %s
+
+Copyright for the code is held by: %s
+
+License:
+
+%s
 TEMPLATE
     $S0 = sprintf $S0, $P0
     .return ($S0)
@@ -3234,15 +3342,16 @@ TEMPLATE
 
     $S0 = <<'TEMPLATE'
 #!/usr/bin/make -f
+# -*- makefile -*-
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
 
 configure: configure-stamp
-
 configure-stamp:
 	dh_testdir
 	touch configure-stamp
 
 build: build-stamp
-
 build-stamp: configure-stamp
 	dh_testdir
 	parrot setup.pir build
@@ -3259,10 +3368,10 @@ install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
-	parrot setup.pir --root $(CURDIR)/tmp install
+	parrot setup.pir --root $(CURDIR)/debian/tmp install
 	dh_installdirs
 	find $(CURDIR)/debian/tmp -type f
-	dh_install --sourcedir=$(CURDIR)/tmp --list-missing
+	dh_install --sourcedir=$(CURDIR)/debian/tmp --list-missing
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -3340,7 +3449,16 @@ TEMPLATE
     .return ($S0)
 .end
 
+.sub 'get_timestamp' :anon
+    $P0 = open 'date --rfc-2822', 'rp'
+    $S0 = $P0.'readline'()
+    $P0.'close'()
+    .return ($S0)
+.end
+
 =head3 Step ebuild
+
+See L<http://devmanual.gentoo.org/>.
 
 =over 4
 
@@ -3443,6 +3561,10 @@ src_compile() {
 src_install() {
     parrot setup.pir --root ${D} install || die "install failed"
 %s
+}
+
+src_test() {
+    parrot setup.pir test || die "test failed"
 }
 TEMPLATE
     $S0 = sprintf $S0, $P0
