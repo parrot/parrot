@@ -782,14 +782,13 @@ do_thaw(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info))
     }
 
     if (pos) {
+        PARROT_ASSERT(must_have_seen);
+
         if (info->extra_flags == EXTRA_IS_PROP_HASH) {
-            interp->vtables[enum_class_default]->thaw(interp, pmc, info);
+            info->thaw_ptr = &PMC_metadata(pmc);
+            (info->visit_pmc_now)(interp, PMC_metadata(pmc), info);
             return;
         }
-
-        /* else maybe VTABLE_thaw ... but there is no other extra stuff */
-
-        PARROT_ASSERT(must_have_seen);
 
         *info->thaw_ptr = pmc;
         return;

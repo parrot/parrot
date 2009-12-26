@@ -1110,12 +1110,7 @@ Initializes the PMC during unarchiving.
 
     VTABLE void thaw(visit_info *info) {
         /* default - initialize the PMC */
-        if (info->extra_flags == EXTRA_IS_PROP_HASH) {
-            info->thaw_ptr  = &PMC_metadata(SELF);
-            (info->visit_pmc_now)(INTERP, PMC_metadata(SELF), info);
-        }
-        else
-            SELF.init();
+        SELF.init();
     }
 
 /*

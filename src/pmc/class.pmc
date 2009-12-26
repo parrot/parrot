@@ -1496,10 +1496,7 @@ Used to unarchive the class.
          * anonymous class and later decide whether to link it into the
          * namespace.  */
 
-        if (info->extra_flags == EXTRA_IS_PROP_HASH) {
-            SUPER(info);
-        }
-        else if (info->extra_flags == EXTRA_IS_NULL) {
+        if (info->extra_flags == EXTRA_IS_NULL) {
             /* 1) thaw class id */
             const INTVAL id = VTABLE_shift_integer(INTERP, info);
 
