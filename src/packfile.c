@@ -2574,8 +2574,7 @@ byte_code_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
 =item C<static PackFile_Segment * byte_code_new(PARROT_INTERP, PackFile *pf,
 STRING *name, int add)>
 
-Creates a new C<PackFile_ByteCode> segment.  Ignores C<pf>, C<name>, and C<add>
-are ignored.
+Creates a new C<PackFile_ByteCode> segment.  Ignores C<pf>, C<name>, and C<add>.
 
 =cut
 
@@ -2805,23 +2804,6 @@ pf_debug_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
     }
 
     Parrot_io_printf(interp, "  ]\n");
-
-    j = self->data ? 0: self->file_offset + 4;
-
-    if (j % 8)
-        Parrot_io_printf(interp, "\n %04x:  ", (int) j);
-
-    for (; j < (self->data ? self->size :
-            self->file_offset + self->op_count); j++) {
-
-        if (j % 8 == 0)
-            Parrot_io_printf(interp, "\n %04x:  ", (int) j);
-
-        Parrot_io_printf(interp, "%08lx ", (unsigned long)
-                self->data ? self->data[j] : self->pf->src[j]);
-    }
-
-    Parrot_io_printf(interp, "\n]\n");
 }
 
 
