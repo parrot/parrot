@@ -3061,6 +3061,7 @@ TEMPLATE
     if $S0 == '' goto L1
     spec .= "%doc "
     $P1 = split "\n", $S0
+    $S0 = pop $P1
     $S0 = join "\n%doc ", $P1
     spec .= $S0
     spec .= "\n"
@@ -3071,7 +3072,7 @@ TEMPLATE
     $S0 = join "%{parrot_version}", $P1
     spec .= $S0
 
-    spec .= "\n\n%changelog\n* "
+    spec .= "\n%changelog\n* "
     $I0 = time
     $S0 = localtime $I0
     $I0 = length $S0
@@ -3206,6 +3207,9 @@ the default value is ports/debian
     .local string packager
     packager = get_value('packager', "you <you@you.org>" :named('default'), kv :flat :named)
 
+    .local string project_uri
+    project_uri =get_value('project_uri', kv :flat :named)
+
     .local string abstract
     abstract = get_value('abstract', kv :flat :named)
 
@@ -3215,22 +3219,24 @@ the default value is ports/debian
     description = join "\n ", $P0
 
     $P0 = new 'FixedStringArray'
-    set $P0, 7
+    set $P0, 8
     $P0[0] = name
     $P0[1] = packager
     $P0[2] = parrot_version
-    $P0[3] = name
-    $P0[4] = parrot_version
-    $P0[5] = abstract
-    $P0[6] = description
+    $P0[3] = project_uri
+    $P0[4] = name
+    $P0[5] = parrot_version
+    $P0[6] = abstract
+    $P0[7] = description
 
     $S0 = <<'TEMPLATE'
 Source: parrot-%s
-Section: universe/interpreters
+Section: interpreters
 Priority: optional
 Maintainer: %s
-Build-Depends: debhelper (>= 5.0.0), parrot-devel (= %s)
-Standards-Version: 3.8.0
+Build-Depends: debhelper (>= 7), parrot-devel (= %s)
+Standards-Version: 3.8.3
+Homepage: %s
 
 Package: parrot-%s
 Architecture: any
@@ -3298,7 +3304,9 @@ TEMPLATE
     license = ''
     $S0 = get_license_file()
     if $S0 == '' goto L1
-    license = slurp($S0)
+    $S0 = slurp($S0)
+    $P0 = split "\n", $S0
+    license = join "\n    ", $P0
   L1:
 
     $P0 = new 'FixedStringArray'
@@ -3311,7 +3319,7 @@ TEMPLATE
 
     $S0 = <<'TEMPLATE'
 This package was debianized by %s on
-%s
+%s.
 
 It was downloaded from %s
 
@@ -3319,7 +3327,7 @@ Copyright for the code is held by: %s
 
 License:
 
-%s
+    %s
 TEMPLATE
     $S0 = sprintf $S0, $P0
     .return ($S0)
@@ -3327,18 +3335,6 @@ TEMPLATE
 
 .sub 'mk_deb_rules' :anon
     .param pmc kv :slurpy :named
-
-    .local string no_changelog
-    no_changelog = ''
-    $I0 = file_exists('ChangeLog')
-    if $I0 goto L1
-    no_changelog = "#"
-  L1:
-
-    $P0 = new 'FixedStringArray'
-    set $P0, 2
-    $P0[0] = no_changelog
-    $P0[1] = no_changelog
 
     $S0 = <<'TEMPLATE'
 #!/usr/bin/make -f
@@ -3355,7 +3351,7 @@ build: build-stamp
 build-stamp: configure-stamp
 	dh_testdir
 	parrot setup.pir build
-	touch build-stamp
+	touch $@
 
 clean:
 	dh_testdir
@@ -3367,43 +3363,37 @@ clean:
 install: build
 	dh_testdir
 	dh_testroot
-	dh_clean -k
-	parrot setup.pir --root $(CURDIR)/debian/tmp install
+	dh_prep
 	dh_installdirs
-	find $(CURDIR)/debian/tmp -type f
+	parrot setup.pir --root $(CURDIR)/debian/tmp install
 	dh_install --sourcedir=$(CURDIR)/debian/tmp --list-missing
 
 # Build architecture-independent files here.
-binary-indep: build install
-	dh_testdir -i
-	dh_testroot -i
-%s	dh_installchangelogs -i ChangeLog
-	dh_installdocs -i
-	dh_fixperms -i
-	dh_installdeb -i
-	dh_gencontrol -i
-	dh_md5sums -i
-	dh_builddeb -i
+binary-indep: install
+# We have nothing to do by default.
 
 # Build architecture-dependent files here.
 binary-arch: build install
-	dh_testdir -a
-	dh_testroot -a
-%s	dh_installchangelogs -a ChangeLog
-	dh_installdocs -a
-	dh_strip -a
-	dh_compress -a
-	dh_fixperms -a
-	dh_installdeb -a
-	dh_gencontrol -a
-	dh_md5sums -a
-	dh_builddeb -a
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs
+	dh_installdocs
+	dh_installexamples
+	dh_installman
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install configure
 
 TEMPLATE
-    $S0 = sprintf $S0, $P0
     .return ($S0)
 .end
 
@@ -3420,6 +3410,7 @@ TEMPLATE
   L2:
     $S0 = join "\n", $P0
   L1:
+    $S0 .= "\n"
     .return ($S0)
 .end
 
@@ -3446,6 +3437,7 @@ TEMPLATE
   L4:
     $P0.'sort'()
     $S0 = join "\n", $P0
+    $S0 .= "\n"
     .return ($S0)
 .end
 
@@ -3453,6 +3445,7 @@ TEMPLATE
     $P0 = open 'date --rfc-2822', 'rp'
     $S0 = $P0.'readline'()
     $P0.'close'()
+    $S0 = chopn $S0, 1
     .return ($S0)
 .end
 
