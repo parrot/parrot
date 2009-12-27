@@ -1058,14 +1058,16 @@ Used by GC to mark the PMC.
         /* default - mark prop hash */
         if (PMC_metadata(SELF) &&
             info->extra_flags != EXTRA_IS_PROP_HASH) {
+            const INTVAL old_extra_flags = info->extra_flags;
             info->extra_flags = EXTRA_IS_PROP_HASH;
-            info->extra       = PMC_metadata(SELF);
 
             /* place escape mark */
             (info->visit_pmc_now)(INTERP, SELF, info);
 
             /* place and the prop hash */
             (info->visit_pmc_now)(INTERP, PMC_metadata(SELF), info);
+
+            info->extra_flags = old_extra_flags;
         }
     }
 

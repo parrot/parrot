@@ -61,7 +61,6 @@ typedef struct _visit_info {
     PMC                *todo;           /* todo list */
     PMC                *id_list;        /* seen list used by thaw */
     UINTVAL             id;             /* freze ID of PMC */
-    void               *extra;          /* PMC specific */
     INTVAL              extra_flags;    /* concerning to extra */
     struct PackFile    *pf;
     const image_funcs  *vtable;
