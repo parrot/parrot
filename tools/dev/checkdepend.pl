@@ -26,9 +26,9 @@ required C files first.
 
 =cut
 
-my $files = `ack -fa {src,compilers} | grep '\\.[ch]\$'`;
+my $files = `ack -fa {src,compilers,include} | grep '\\.[ch]\$'`;
 
-my %deps;
+our %deps;
 
 foreach my $file (sort split /\n/, $files) {
     open my $fh, '<', $file;
@@ -64,32 +64,36 @@ while ($rules =~ s/^([A-Z_]+_DIR)\s*:?=\s*(\S*)$//m) {
     $rules =~ s/\$\($var\)/$val/g;
 }
 
-foreach my $file (sort keys %deps) {
-    my $rule = $file;
+# expand PARROT_H_HEADERS
+$rules =~ m/^PARROT_H_HEADERS\s*:?=\s*(.*)$/m;
+my $phh = $1;
 
-    my $declared = "";
-    if ($rule =~ s/\.c$//) {
-        $rules =~ /^$rule\Q$(O)\E\s*:\s*(.*)\s*$/m;
-        $declared = $1;
-    }
-    elsif ($rule =~ s/\.h$//) {
-        $rules =~ /^$rule\.h\s*:\s*(.*)\s*$/m;
-        $declared = $1;
-    }
-    else {
-        die "unexpected file $file\n";
-    }
+$rules =~ s/\Q$(PARROT_H_HEADERS)/$phh/g;
+
+foreach my $header (sort grep {/\.h$/} (keys %deps)) {
+    # static headers shouldn't depend on anything else.
+    if ($rules =~ /^$header\s*:\s*(.*)\s*$/m) {
+        #is("", $1, "$header should have no dependencies");
+    } 
+}
+
+foreach my $file (sort grep {/\.c$/} (keys %deps)) {
+    my $rule = $file;
+    $rule =~ s/\.c$//;
+
+    $rules =~ /^$rule\Q$(O)\E\s*:\s*(.*)\s*$/m;
+    my $declared = $1;
 
     my $failed = 0;
     if (!defined($declared)) {
         $failed = 1;
-        is("", join(' ', @{$deps{$file}}), "$file has no dependencies");
+        is("", join(' ', (get_deps($file))), "$file has no dependencies");
         next;
     }
     else
     {
         $declared =~ s/\s+/ /g;
-        foreach my $inc (sort @{$deps{$file}}) {
+        foreach my $inc (sort (get_deps($file))) {
             # incs can be relative, but makefile is from top level
             my $file_dir = (File::Spec->splitpath($file))[1];
             my $make_dep = collapse_path(File::Spec->catfile($file_dir,$inc));
@@ -129,6 +133,30 @@ sub collapse_path {
 
     $path =~ s/^\Q$cwd\E\///;
     return $path;
+}
+
+sub get_deps {
+    my $file = shift;
+    my %all_deps;
+
+    if (! exists $deps{$file}) {
+        return;
+    }
+
+    # add explicit deps
+    my @pending_deps = @{$deps{$file}}; 
+
+    while (@pending_deps) {
+        my $dep = shift @pending_deps;
+        if (!exists $all_deps{$dep}) {
+            $all_deps{$dep} = 1;
+            if (exists $deps{"include/$dep"}) {
+                push @pending_deps, @{$deps{"include/$dep"}};
+            }
+        }
+    }
+    
+    return keys %all_deps;
 }
 
 # Local Variables:

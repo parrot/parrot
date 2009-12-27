@@ -22,7 +22,6 @@ and its utility functions.
 #define IN_SPF_SYSTEM
 
 #include "parrot/parrot.h"
-#include "parrot/string_funcs.h"
 #include "spf_render.str"
 
 typedef enum {

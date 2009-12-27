@@ -365,6 +365,67 @@ PIRC_O_FILES := \
     $(PIRC_DIR)/src/pirerr$(O) \
     $(PIRC_DIR)/src/pirop$(O)
 
+# parrot.h and all the includes it causes to be included
+PARROT_H_HEADERS := \
+        $(INC_DIR)/parrot.h \
+        $(INC_DIR)/config.h \
+        $(INC_DIR)/settings.h \
+        $(INC_DIR)/enums.h \
+        $(INC_DIR)/platform.h \
+        $(INC_DIR)/platform_interface.h \
+        $(INC_DIR)/global_setup.h \
+        $(INC_DIR)/caches.h \
+        $(INC_DIR)/interpreter.h \
+        $(INC_DIR)/datatypes.h \
+        $(INC_DIR)/encoding.h \
+        $(INC_DIR)/charset.h \
+        $(INC_DIR)/string.h \
+        $(INC_DIR)/string_primitives.h \
+        $(INC_DIR)/hash.h \
+        $(INC_DIR)/list.h \
+        $(INC_DIR)/pmc_freeze.h \
+        $(INC_DIR)/vtable.h \
+        $(INC_DIR)/context.h \
+        $(INC_DIR)/exceptions.h \
+        $(INC_DIR)/warnings.h \
+        $(INC_DIR)/memory.h \
+        $(INC_DIR)/packfile.h \
+        $(INC_DIR)/io.h \
+        $(INC_DIR)/op.h \
+        $(INC_DIR)/pmc.h \
+        $(INC_DIR)/events.h \
+        $(INC_DIR)/gc_api.h \
+        $(INC_DIR)/string_funcs.h \
+        $(INC_DIR)/misc.h \
+        $(INC_DIR)/sub.h \
+        $(INC_DIR)/call.h \
+        $(INC_DIR)/key.h \
+        $(INC_DIR)/exit.h \
+        $(INC_DIR)/nci.h \
+        $(INC_DIR)/thread.h \
+        $(INC_DIR)/scheduler.h \
+        $(INC_DIR)/tsq.h \
+        $(INC_DIR)/longopt.h \
+        $(INC_DIR)/oo.h \
+        $(INC_DIR)/vtables.h \
+        $(INC_DIR)/multidispatch.h \
+        $(INC_DIR)/library.h \
+        $(INC_DIR)/global.h \
+        $(INC_DIR)/stat.h \
+        $(INC_DIR)/hll.h \
+        $(INC_DIR)/pbcversion.h \
+        $(INC_DIR)/pobj.h \
+        $(INC_DIR)/platform_limits.h \
+        $(INC_DIR)/has_header.h \
+        $(INC_DIR)/oplib.h \
+        $(INC_DIR)/feature.h \
+        $(INC_DIR)/debugger.h \
+        $(INC_DIR)/core_types.h \
+        $(INC_DIR)/core_pmcs.h \
+        $(INC_DIR)/compiler.h \
+        $(INC_DIR)/cclass.h \
+        $(PMC_INC_DIR)/pmc/pmc_callcontext.h
+
 # generated list of header files
 GENERAL_H_FILES   := $(NONGEN_HEADERS) $(GEN_HEADERS) @TEMP_cg_h@
 
@@ -1284,8 +1345,7 @@ $(SRC_DIR)/misc$(O) : $(INC_DIR)/parrot.h
 
 $(SRC_DIR)/utils$(O) : $(INC_DIR)/parrot.h $(PMC_INC_DIR)/pmc/pmc_nci.h
 
-$(SRC_DIR)/spf_render$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/spf_render.str \
-        $(INC_DIR)/string_funcs.h
+$(SRC_DIR)/spf_render$(O) : $(PARROT_H_HEADERS) $(SRC_DIR)/spf_render.str
 
 $(SRC_DIR)/spf_vtable$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/spf_vtable.str
 
