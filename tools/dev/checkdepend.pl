@@ -77,7 +77,10 @@ foreach my $header (sort grep {/\.h$/} (keys %deps)) {
     } 
 }
 
-foreach my $file (sort grep {/\.c$/} (keys %deps)) {
+my @files = keys %deps;
+@files = @ARGV if @ARGV;
+
+foreach my $file (sort grep {/\.c$/} @files) {
     my $rule = $file;
     $rule =~ s/\.c$//;
 
