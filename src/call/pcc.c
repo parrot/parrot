@@ -20,12 +20,11 @@ value passing to and from subroutines.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/oplib/ops.h"
 #include "parrot/runcore_api.h"
+#include "parrot/oplib/ops.h"
 #include "pcc.str"
 #include "pmc/pmc_key.h"
 #include "pmc/pmc_continuation.h"
-#include "pmc/pmc_callcontext.h"
 
 /* HEADERIZER HFILE: include/parrot/call.h */
 

@@ -47,7 +47,6 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include "parrot/parrot.h"
-#include "parrot/string_funcs.h"
 #include "parrot/embed.h"
 #include "pirheredoc.h"
 

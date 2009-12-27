@@ -19,8 +19,6 @@ messages.
 
 #include "parrot/parrot.h"
 
-#include "pmc/pmc_callcontext.h"
-
 #include <stdarg.h>
 
 /* HEADERIZER HFILE: include/parrot/warnings.h */

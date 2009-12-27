@@ -23,7 +23,6 @@ I<What are these global variables?>
 
 #define INSIDE_GLOBAL_SETUP
 #include "parrot/parrot.h"
-#include "pmc/pmc_callcontext.h"
 #include "global_setup.str"
 
 /* These functions are defined in the auto-generated file core_pmcs.c */

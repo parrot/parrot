@@ -156,7 +156,6 @@
 
 #include "lexer.h"
 
-#include "parrot/string_funcs.h"
 #include "parrot/parrot.h"
 
 

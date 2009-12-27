@@ -685,7 +685,6 @@ static yyconst flex_int16_t yy_rule_linenum[21] =
 #include <stdlib.h>
 #include <stdarg.h>
 #include "parrot/parrot.h"
-#include "parrot/string_funcs.h"
 #include "parrot/embed.h"
 #include "pirheredoc.h"
 

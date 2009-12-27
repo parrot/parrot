@@ -15,8 +15,6 @@ Parrot_Context functions.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/call.h"
-#include "pmc/pmc_callcontext.h"
 
 /* HEADERIZER HFILE: include/parrot/context.h */
 

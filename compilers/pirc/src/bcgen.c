@@ -8,10 +8,8 @@
 
 #include "parrot/parrot.h"
 
-#include "parrot/interpreter.h"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_namespace.h"
-#include "pmc/pmc_callcontext.h"
 
 /* #include "parrot/embed.h" */
 

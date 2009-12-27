@@ -19,7 +19,6 @@ Functions to build and manipulate vtables
 */
 
 #include "parrot/parrot.h"
-#include "parrot/vtables.h"
 
 /* This function is defined in the auto-generated file core_pmcs.c */
 /* XXX Get it into some public place */

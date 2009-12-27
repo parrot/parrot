@@ -26,7 +26,6 @@ Configure will have checked for supported word sizes.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/packfile.h"
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 

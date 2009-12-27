@@ -21,7 +21,6 @@ This is only used by the PBC dumper C<pbc_dump>.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/packfile.h"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_key.h"
 

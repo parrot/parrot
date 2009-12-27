@@ -21,12 +21,9 @@ passing to and from subroutines following the Parrot Calling Conventions.
 
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
-#include "parrot/runcore_api.h"
 #include "args.str"
 #include "pmc/pmc_key.h"
-#include "pmc/pmc_callcontext.h"
 #include "pmc/pmc_fixedintegerarray.h"
-#include "pmc/pmc_callcontext.h"
 
 /* HEADERIZER HFILE: include/parrot/call.h */
 
