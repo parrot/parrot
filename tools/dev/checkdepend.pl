@@ -74,7 +74,7 @@ foreach my $header (sort grep {/\.h$/} (keys %deps)) {
     # static headers shouldn't depend on anything else.
     if ($rules =~ /^$header\s*:\s*(.*)\s*$/m) {
         #is("", $1, "$header should have no dependencies");
-    } 
+    }
 }
 
 my @files = keys %deps;
@@ -147,7 +147,7 @@ sub get_deps {
     }
 
     # add explicit deps
-    my @pending_deps = @{$deps{$file}}; 
+    my @pending_deps = @{$deps{$file}};
 
     while (@pending_deps) {
         my $dep = shift @pending_deps;
@@ -158,7 +158,7 @@ sub get_deps {
             }
         }
     }
-    
+
     return keys %all_deps;
 }
 
