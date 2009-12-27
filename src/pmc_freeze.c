@@ -42,13 +42,6 @@ static void create_buffer(PARROT_INTERP,
         FUNC_MODIFIES(*info);
 
 PARROT_INLINE
-static void do_thaw(PARROT_INTERP,
-    ARGIN_NULLOK(PMC *pmc),
-    ARGIN(visit_info *info))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
-PARROT_INLINE
 static void ensure_buffer_size(PARROT_INTERP,
     ARGIN(visit_info *io),
     size_t len)
@@ -164,15 +157,12 @@ static void visit_todo_list_freeze(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 static void visit_todo_list_thaw(PARROT_INTERP,
-    ARGIN_NULLOK(PMC* old),
+    ARGIN_NULLOK(PMC* pmc),
     ARGIN(visit_info* info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_create_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(info))
-#define ASSERT_ARGS_do_thaw __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(info))
 #define ASSERT_ARGS_ensure_buffer_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -740,88 +730,6 @@ thaw_pmc_id(PARROT_INTERP, ARGMOD(visit_info *info),
 
 /*
 
-=item C<static void do_thaw(PARROT_INTERP, PMC *pmc, visit_info *info)>
-
-Called by C<visit_todo_list_thaw()> to thaw and return a PMC.
-
-C<seen> is false if this is the first time the PMC has been encountered.
-
-=cut
-
-*/
-
-PARROT_INLINE
-static void
-do_thaw(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info))
-{
-    ASSERT_ARGS(do_thaw)
-    PMC **pos;
-
-    /* set below, but avoid compiler warning */
-    UINTVAL id             = 0;
-    INTVAL  type           = 0;
-    int     must_have_seen = thaw_pmc_id(interp, info, &id, &type);
-
-    id = PackID_get_PMCID(id);
-
-    if (!id) {
-        /* got a NULL PMC */
-        *info->thaw_ptr = PMCNULL;
-        return;
-    }
-
-    pos = (PMC **)Parrot_pmc_array_get(interp, (List *)PMC_data(info->id_list),
-        id, enum_type_PMC);
-
-    if (pos == (void *)-1)
-        pos = NULL;
-    else if (pos) {
-        pmc = *(PMC **)pos;
-        if (!pmc)
-            pos = NULL;
-    }
-
-    if (pos) {
-        PARROT_ASSERT(must_have_seen);
-
-        if (info->extra_flags == EXTRA_IS_PROP_HASH) {
-            info->thaw_ptr = &PMC_metadata(pmc);
-            (info->visit_pmc_now)(interp, PMC_metadata(pmc), info);
-            return;
-        }
-
-        *info->thaw_ptr = pmc;
-        return;
-    }
-
-    PARROT_ASSERT(!must_have_seen);
-
-    /* create appropriate pmc */
-    if (info->what == VISIT_THAW_NORMAL)
-        pmc = pmc_new_noinit(interp, type);
-    else if (info->what == VISIT_THAW_CONSTANTS)
-        pmc = constant_pmc_new_noinit(interp, type);
-    else
-        Parrot_ex_throw_from_c_args(interp, NULL, 1, "Illegal visit_next type");
-
-    VTABLE_thaw(interp, pmc, info);
-
-    if (info->extra_flags == EXTRA_CLASS_EXISTS) {
-        pmc               = (PMC *)info->extra;
-        info->extra       = NULL;
-        info->extra_flags = 0;
-    }
-
-    *info->thaw_ptr = pmc;
-
-    Parrot_pmc_array_assign(interp, (List *)PMC_data(info->id_list), id, pmc, enum_type_PMC);
-
-    /* remember nested aggregates depth first */
-    Parrot_pmc_array_unshift(interp, (List *)PMC_data(info->todo), pmc, enum_type_PMC);
-}
-
-/*
-
 =item C<static int todo_list_seen(PARROT_INTERP, PMC *pmc, visit_info *info,
 UINTVAL *id)>
 
@@ -896,22 +804,84 @@ visit_todo_list_freeze(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc), ARGIN(visit_info* 
 
 /*
 
-=item C<static void visit_todo_list_thaw(PARROT_INTERP, PMC* old, visit_info*
+=item C<static void visit_todo_list_thaw(PARROT_INTERP, PMC* pmc, visit_info*
 info)>
 
 Callback for thaw - action first.
 
-Todo-list and seen handling is all in C<do_thaw()>.
+C<seen> is false if this is the first time the PMC has been encountered.
 
 =cut
 
 */
 
 static void
-visit_todo_list_thaw(PARROT_INTERP, ARGIN_NULLOK(PMC* old), ARGIN(visit_info* info))
+visit_todo_list_thaw(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc), ARGIN(visit_info* info))
 {
     ASSERT_ARGS(visit_todo_list_thaw)
-    do_thaw(interp, old, info);
+    PMC **pos;
+
+    /* set below, but avoid compiler warning */
+    UINTVAL id             = 0;
+    INTVAL  type           = 0;
+    int     must_have_seen = thaw_pmc_id(interp, info, &id, &type);
+
+    id = PackID_get_PMCID(id);
+
+    if (!id) {
+        /* got a NULL PMC */
+        *info->thaw_ptr = PMCNULL;
+        return;
+    }
+
+    pos = (PMC **)Parrot_pmc_array_get(interp, (List *)PMC_data(info->id_list),
+        id, enum_type_PMC);
+
+    if (pos == (void *)-1)
+        pos = NULL;
+    else if (pos) {
+        pmc = *(PMC **)pos;
+        if (!pmc)
+            pos = NULL;
+    }
+
+    if (pos) {
+        PARROT_ASSERT(must_have_seen);
+
+        if (info->extra_flags == EXTRA_IS_PROP_HASH) {
+            info->thaw_ptr = &PMC_metadata(pmc);
+            (info->visit_pmc_now)(interp, PMC_metadata(pmc), info);
+            return;
+        }
+
+        *info->thaw_ptr = pmc;
+        return;
+    }
+
+    PARROT_ASSERT(!must_have_seen);
+
+    /* create appropriate pmc */
+    if (info->what == VISIT_THAW_NORMAL)
+        pmc = pmc_new_noinit(interp, type);
+    else if (info->what == VISIT_THAW_CONSTANTS)
+        pmc = constant_pmc_new_noinit(interp, type);
+    else
+        Parrot_ex_throw_from_c_args(interp, NULL, 1, "Illegal visit_next type");
+
+    VTABLE_thaw(interp, pmc, info);
+
+    if (info->extra_flags == EXTRA_CLASS_EXISTS) {
+        pmc               = (PMC *)info->extra;
+        info->extra       = NULL;
+        info->extra_flags = 0;
+    }
+
+    *info->thaw_ptr = pmc;
+
+    Parrot_pmc_array_assign(interp, (List *)PMC_data(info->id_list), id, pmc, enum_type_PMC);
+
+    /* remember nested aggregates depth first */
+    Parrot_pmc_array_unshift(interp, (List *)PMC_data(info->todo), pmc, enum_type_PMC);
 }
 
 
