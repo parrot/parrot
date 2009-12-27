@@ -870,12 +870,6 @@ visit_todo_list_thaw(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc), ARGIN(visit_info* in
 
     VTABLE_thaw(interp, pmc, info);
 
-    if (info->extra_flags == EXTRA_CLASS_EXISTS) {
-        pmc               = (PMC *)info->extra;
-        info->extra       = NULL;
-        info->extra_flags = 0;
-    }
-
     *info->thaw_ptr = pmc;
 
     Parrot_pmc_array_assign(interp, (List *)PMC_data(info->id_list), id, pmc, enum_type_PMC);

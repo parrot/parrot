@@ -47,9 +47,7 @@ typedef struct _image_funcs {
 
 typedef enum {
     EXTRA_IS_NULL,
-    EXTRA_IS_UNUSED,
     EXTRA_IS_PROP_HASH,
-    EXTRA_CLASS_EXISTS
 } extra_flags_enum;
 
 typedef struct _visit_info {
