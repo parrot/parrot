@@ -656,7 +656,7 @@ END_OF_FUNCTION
     .local pmc file
     file = new 'File'
     .local string manifest_file_name
-    manifest_file_name  = exefile
+    manifest_file_name  = clone exefile
     manifest_file_name .= '.manifest'
     .local pmc manifest_exists
     manifest_exists = file.'exists'( manifest_file_name )
