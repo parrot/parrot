@@ -4592,10 +4592,6 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
     for (i = 0; i < self->num_groups; i++)
         if (offset < self->groups[i]->bytecode_offset)
             break;
-
-
-    /* Check if the found file was actually bytecode (.pbc extension), or a
-     * source file (.pir or .pasm extension). */
         else
             start_entry = self->groups[i]->entries_offset;
 
