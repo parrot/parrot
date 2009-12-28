@@ -3,7 +3,7 @@
 Parrot was reported to compile and run tests successfully on the following
 platforms.
 See also http://www.parrot.org/smolder for recent test results.
-See also t/TESTS.STATUS.pod about the status of the test suite.
+See also t/TESTS_STATUS.pod about the status of the test suite.
 
 This list is divided into 2 sections: "Supported" (as defined by
 docs/parrot.pod) and "Extra".
