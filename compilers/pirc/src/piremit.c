@@ -4,6 +4,8 @@
  */
 
 #include <stdio.h>
+#include <assert.h>
+
 #include "piremit.h"
 #include "pircompunit.h"
 #include "pircompiler.h"
@@ -11,7 +13,6 @@
 #include "bcgen.h"
 
 #include "parrot/oplib/ops.h"
-#include "assert.h"
 
 /*
 
