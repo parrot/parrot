@@ -158,7 +158,6 @@ GEN_MAKEFILES := \
     compilers/tge/Makefile \
     editor/Makefile \
     ext/Makefile \
-    ext/nqp-rx/Makefile \
     src/dynoplibs/Makefile \
     src/dynpmc/Makefile
 
@@ -868,10 +867,6 @@ $(PIRC) : $(PARROT)
 	$(CP) compilers/pirc/pirc$(EXE) $(PIRC)
 	$(CHMOD) 0755 $(PIRC)
 
-$(NQP) : $(PBC_TO_EXE) compilers.dummy
-	$(CP) runtime/parrot/library/nqp-rx.pbc parrot-nqp.pbc
-	$(PBC_TO_EXE) parrot-nqp.pbc
-
 $(MINIPARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     lib/Parrot/OpLib/core.pm $(SRC_DIR)/null_config$(O)
 	$(LINK) @ld_out@$@ $(SRC_DIR)/main$(O) $(SRC_DIR)/null_config$(O) \
@@ -972,8 +967,43 @@ $(INSTALLABLECONFIG) : $(SRC_DIR)/install_config$(O) $(PARROT_CONFIG) $(PBC_TO_E
 $(INSTALLABLEPBCTOEXE) : $(PBC_TO_EXE) $(SRC_DIR)/install_config$(O)
 	$(PBC_TO_EXE) pbc_to_exe.pbc --install
 
-$(INSTALLABLENQP) : runtime/parrot/library/nqp-rx.pbc $(SRC_DIR)/install_config$(O) $(PBC_TO_EXE)
+#
+# ext/nqp-rx -> parrot-nqp
+#
+
+NQP_LIB_PBCS := \
+        runtime/parrot/library/Regex.pbc \
+        runtime/parrot/library/HLL.pbc \
+        runtime/parrot/library/P6Regex.pbc \
+        runtime/parrot/library/nqp-rx.pbc \
+        runtime/parrot/library/P6object.pbc
+
+runtime/parrot/library/Regex.pbc: ext/nqp-rx/src/stage0/Regex-s0.pir $(PARROT)
+	$(PARROT) -o runtime/parrot/library/Regex.pbc ext/nqp-rx/src/stage0/Regex-s0.pir
+
+runtime/parrot/library/HLL.pbc: ext/nqp-rx/src/stage0/HLL-s0.pir $(PARROT)
+	$(PARROT) -o runtime/parrot/library/HLL.pbc ext/nqp-rx/src/stage0/HLL-s0.pir
+
+runtime/parrot/library/P6Regex.pbc: ext/nqp-rx/src/stage0/P6Regex-s0.pir $(PARROT)
+	$(PARROT) -o runtime/parrot/library/P6Regex.pbc ext/nqp-rx/src/stage0/P6Regex-s0.pir
+
+runtime/parrot/library/nqp-rx.pbc: ext/nqp-rx/src/stage0/NQP-s0.pir $(PARROT)
+	$(PARROT) -o runtime/parrot/library/nqp-rx.pbc ext/nqp-rx/src/stage0/NQP-s0.pir
+
+## TT #1398 - pbc_to_exe cannot generate a specified target file
+parrot-nqp.pbc : runtime/parrot/library/nqp-rx.pbc
 	$(CP) runtime/parrot/library/nqp-rx.pbc parrot-nqp.pbc
+
+## compilers.dummy here is a stopgap until these two deps can be added to
+## NQP_LIB_PBCS above.
+
+## runtime/parrot/library/PCT/HLLCompiler.pbc
+## runtime/parrot/library/PCT/PAST.pbc
+
+$(NQP) : $(NQP_LIB_PBCS) $(PBC_TO_EXE) parrot-nqp.pbc compilers.dummy
+	$(PBC_TO_EXE) parrot-nqp.pbc
+
+$(INSTALLABLENQP) : $(NQP_LIB_PBCS) $(SRC_DIR)/install_config$(O) $(PBC_TO_EXE) parrot-nqp.pbc compilers.dummy
 	$(PBC_TO_EXE) parrot-nqp.pbc --install
 
 #
@@ -1852,7 +1882,6 @@ compilers.dummy : $(PARROT) $(GEN_LIBRARY)
 	$(MAKE) compilers/nqp
 	$(MAKE) compilers/json
 	$(MAKE) compilers/data_json
-	$(MAKE) ext/nqp-rx
 
 compilers-clean :
 	$(MAKE) compilers/pct clean
@@ -1864,12 +1893,7 @@ compilers-clean :
 	$(MAKE) compilers/pirc clean
 
 ext-clean:
-	$(MAKE) ext/nqp-rx clean
-	$(RM_RF) runtime/parrot/library/HLL.pbc \
-  runtime/parrot/library/P6Regex.pbc \
-  runtime/parrot/library/Regex.pbc \
-  runtime/parrot/library/nqp-rx.pbc \
-  parrot-nqp*
+	$(RM_RF) $(NQP_LIB_PBCS) parrot-nqp*
 
 ###############################################################################
 #
