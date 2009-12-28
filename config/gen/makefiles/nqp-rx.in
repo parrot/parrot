@@ -33,9 +33,6 @@ help:
 	@echo ""
 	@echo "  all:               nqp.pbc"
 	@echo "                     This is the default."
-	@echo "Testing:"
-	@echo "  test:              Run the test suite."
-	@echo "  testclean:         Clean up test results."
 	@echo ""
 	@echo "Cleaning:"
 	@echo "  clean:             Basic cleaning up."
@@ -45,9 +42,6 @@ help:
 	@echo "Misc:"
 	@echo "  help:              Print this help message."
 	@echo ""
-
-test: all
-	$(PERL) t/harness t
 
 # this target has nothing to do
 testclean:
