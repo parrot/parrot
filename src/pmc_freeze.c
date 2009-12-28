@@ -730,17 +730,13 @@ visit_loop_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC *current),
 {
     ASSERT_ARGS(visit_loop_todo_list)
     PMC        **list_item;
-    List        *finish_list    = NULL;
     List * const todo           = (List *)PMC_data(info->todo);
     const int    thawing        = info->what == VISIT_THAW_CONSTANTS
                                || info->what == VISIT_THAW_NORMAL;
-    int          i;
 
-    /* create a list that contains PMCs that need thawfinish */
-    if (thawing) {
-        PMC * const finish_list_pmc = pmc_new(interp, enum_class_Array);
-        finish_list                 = (List *)PMC_data(finish_list_pmc);
-    }
+    /* XXX As the name suggests, this pmc is useless. However, deleting this
+           line causes segfaults in testr t/pmc/eval.t */
+    PMC *garbage = thawing ? pmc_new(interp, enum_class_Undef) : PMCNULL;
 
     (info->visit_pmc_now)(interp, current, info);
 
@@ -760,27 +756,25 @@ again:
             PObj_constant_CLEAR(current);
 
         VTABLE_visit(interp, current, info);
-
-        if (thawing) {
-            if (current->vtable->thawfinish != interp->vtables[enum_class_default]->thawfinish)
-                Parrot_pmc_array_unshift(interp, finish_list, current, enum_type_PMC);
-        }
     }
 
     if (thawing) {
-        INTVAL n;
-        /* if image isn't consumed, there are some extra data to thaw */
         if (INFO_HAS_DATA(info)) {
+            /* if image isn't consumed, there are some extra data to thaw */
             (info->visit_pmc_now)(interp, NULL, info);
             goto again;
         }
+        else {
+            /* on thawing call thawfinish for each processed PMC */
+            List        *finish_list = (List *)PMC_data(info->id_list);
+            const INTVAL n           = Parrot_pmc_array_length(interp, finish_list);
+            int          i;
 
-        /* on thawing call thawfinish for each processed PMC */
-        n = Parrot_pmc_array_length(interp, finish_list);
-        for (i = 0; i < n ; ++i) {
-            current = *(PMC**)Parrot_pmc_array_get(interp, finish_list, i, enum_type_PMC);
-            if (!PMC_IS_NULL(current))
-                VTABLE_thawfinish(interp, current, info);
+            for (i = 0; i < n ; ++i) {
+                current = *(PMC**)Parrot_pmc_array_get(interp, finish_list, i, enum_type_PMC);
+                if (!PMC_IS_NULL(current))
+                    VTABLE_thawfinish(interp, current, info);
+            }
         }
     }
 }
