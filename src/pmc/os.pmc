@@ -85,13 +85,13 @@ Returns the current working directory.
 #  endif
 #endif
         if (cwd) {
-            STRING * const scwd = Parrot_str_new(interp, cwd, strlen(cwd));
+            STRING * const scwd = Parrot_str_new(INTERP, cwd, strlen(cwd));
             mem_sys_free(cwd);
             RETURN(STRING *scwd);
         }
         else {
             const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                 errmsg);
         }
     }
@@ -108,7 +108,7 @@ Changes the current working directory to the one specified by C<path>.
 
     METHOD chdir(STRING *path) {
         int error;
-        char * const cpath = Parrot_str_to_cstring(interp, path);
+        char * const cpath = Parrot_str_to_cstring(INTERP, path);
 #ifdef _MSC_VER
         error = _chdir(cpath);
 #else
@@ -117,7 +117,7 @@ Changes the current working directory to the one specified by C<path>.
         Parrot_str_free_cstring(cpath);
         if (error) {
             const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                 errmsg);
         }
     }
@@ -135,13 +135,13 @@ C<path>.
 
     METHOD rm(STRING *path) {
         struct stat info;
-        char * const cpath = Parrot_str_to_cstring(interp, path);
+        char * const cpath = Parrot_str_to_cstring(INTERP, path);
         int          error = stat(cpath, &info);
 
         if (error) {
             const char * const errmsg = strerror(errno);
             Parrot_str_free_cstring(cpath);
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                 errmsg);
         }
 
@@ -154,7 +154,7 @@ C<path>.
             Parrot_str_free_cstring(cpath);
             if (error) {
                 const char * const errmsg = strerror(errno);
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                     errmsg);
             }
         }
@@ -163,7 +163,7 @@ C<path>.
             Parrot_str_free_cstring(cpath);
             if (error) {
                 const char * const errmsg = strerror(errno);
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                     errmsg);
             }
         }
@@ -180,7 +180,7 @@ Creates a directory specified by C<path> with mode C<mode>.
 */
 
     METHOD mkdir(STRING *path, INTVAL mode) {
-        char * const cpath = Parrot_str_to_cstring(interp, path);
+        char * const cpath = Parrot_str_to_cstring(INTERP, path);
         /* should we validate mode? */
 #ifdef WIN32
         const int error = _mkdir(cpath);
@@ -190,7 +190,7 @@ Creates a directory specified by C<path> with mode C<mode>.
         Parrot_str_free_cstring(cpath);
         if (error) {
             const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                 errmsg);
         }
     }
@@ -226,46 +226,46 @@ https://trac.parrot.org/parrot/ticket/849
 
     METHOD stat(STRING *path) {
         struct stat   info;
-        char  * const cpath = Parrot_str_to_cstring(interp, path);
+        char  * const cpath = Parrot_str_to_cstring(INTERP, path);
         const int     error = stat(cpath, &info);
 
         Parrot_str_free_cstring(cpath);
 
         if (error) {
             const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                 errmsg);
         }
         else {
-            PMC * const array = pmc_new(interp, enum_class_FixedPMCArray);
-            VTABLE_set_integer_native(interp, array, 13);
+            PMC * const array = pmc_new(INTERP, enum_class_FixedPMCArray);
+            VTABLE_set_integer_native(INTERP, array, 13);
 
-            VTABLE_set_integer_keyed_int(interp, array,  0,
+            VTABLE_set_integer_keyed_int(INTERP, array,  0,
                     (INTVAL)info.st_dev);
-            VTABLE_set_integer_keyed_int(interp, array,  1,
+            VTABLE_set_integer_keyed_int(INTERP, array,  1,
                     (INTVAL)info.st_ino);
-            VTABLE_set_integer_keyed_int(interp, array,  2,
+            VTABLE_set_integer_keyed_int(INTERP, array,  2,
                     (INTVAL)info.st_mode);
-            VTABLE_set_integer_keyed_int(interp, array,  3,
+            VTABLE_set_integer_keyed_int(INTERP, array,  3,
                     (INTVAL)info.st_nlink);
-            VTABLE_set_integer_keyed_int(interp, array,  4,
+            VTABLE_set_integer_keyed_int(INTERP, array,  4,
                     (INTVAL)info.st_uid);
-            VTABLE_set_integer_keyed_int(interp, array,  5,
+            VTABLE_set_integer_keyed_int(INTERP, array,  5,
                     (INTVAL)info.st_gid);
-            VTABLE_set_integer_keyed_int(interp, array,  6,
+            VTABLE_set_integer_keyed_int(INTERP, array,  6,
                     (INTVAL)info.st_rdev);
-            VTABLE_set_integer_keyed_int(interp, array,  7,
+            VTABLE_set_integer_keyed_int(INTERP, array,  7,
                     (INTVAL)info.st_size);
-            VTABLE_set_integer_keyed_int(interp, array,  8,
+            VTABLE_set_integer_keyed_int(INTERP, array,  8,
                     (INTVAL)info.st_atime);
-            VTABLE_set_integer_keyed_int(interp, array,  9,
+            VTABLE_set_integer_keyed_int(INTERP, array,  9,
                     (INTVAL)info.st_mtime);
-            VTABLE_set_integer_keyed_int(interp, array, 10,
+            VTABLE_set_integer_keyed_int(INTERP, array, 10,
                     (INTVAL)info.st_ctime);
 #ifndef WIN32
-            VTABLE_set_integer_keyed_int(interp, array, 11,
+            VTABLE_set_integer_keyed_int(INTERP, array, 11,
                     (INTVAL)info.st_blksize);
-            VTABLE_set_integer_keyed_int(interp, array, 12,
+            VTABLE_set_integer_keyed_int(INTERP, array, 12,
                     (INTVAL)info.st_blocks);
 #endif
             RETURN(PMC *array);
@@ -301,7 +301,7 @@ Stats a file, and returns a 13 position array as in Perl:
     METHOD lstat(STRING *path) {
         struct stat info;
 
-        char * const cpath = Parrot_str_to_cstring(interp, path);
+        char * const cpath = Parrot_str_to_cstring(INTERP, path);
 #ifdef WIN32
         const int error = stat(cpath, &info);
 #else
@@ -311,39 +311,39 @@ Stats a file, and returns a 13 position array as in Perl:
 
         if (error) {
             const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                 errmsg);
         }
         else {
-            PMC * const array = pmc_new(interp, enum_class_FixedPMCArray);
-            VTABLE_set_integer_native(interp, array, 13);
+            PMC * const array = pmc_new(INTERP, enum_class_FixedPMCArray);
+            VTABLE_set_integer_native(INTERP, array, 13);
 
-            VTABLE_set_integer_keyed_int(interp, array,  0,
+            VTABLE_set_integer_keyed_int(INTERP, array,  0,
                     (INTVAL)info.st_dev);
-            VTABLE_set_integer_keyed_int(interp, array,  1,
+            VTABLE_set_integer_keyed_int(INTERP, array,  1,
                     (INTVAL)info.st_ino);
-            VTABLE_set_integer_keyed_int(interp, array,  2,
+            VTABLE_set_integer_keyed_int(INTERP, array,  2,
                     (INTVAL)info.st_mode);
-            VTABLE_set_integer_keyed_int(interp, array,  3,
+            VTABLE_set_integer_keyed_int(INTERP, array,  3,
                     (INTVAL)info.st_nlink);
-            VTABLE_set_integer_keyed_int(interp, array,  4,
+            VTABLE_set_integer_keyed_int(INTERP, array,  4,
                     (INTVAL)info.st_uid);
-            VTABLE_set_integer_keyed_int(interp, array,  5,
+            VTABLE_set_integer_keyed_int(INTERP, array,  5,
                     (INTVAL)info.st_gid);
-            VTABLE_set_integer_keyed_int(interp, array,  6,
+            VTABLE_set_integer_keyed_int(INTERP, array,  6,
                     (INTVAL)info.st_rdev);
-            VTABLE_set_integer_keyed_int(interp, array,  7,
+            VTABLE_set_integer_keyed_int(INTERP, array,  7,
                     (INTVAL)info.st_size);
-            VTABLE_set_integer_keyed_int(interp, array,  8,
+            VTABLE_set_integer_keyed_int(INTERP, array,  8,
                     (INTVAL)info.st_atime);
-            VTABLE_set_integer_keyed_int(interp, array,  9,
+            VTABLE_set_integer_keyed_int(INTERP, array,  9,
                     (INTVAL)info.st_mtime);
-            VTABLE_set_integer_keyed_int(interp, array, 10,
+            VTABLE_set_integer_keyed_int(INTERP, array, 10,
                     (INTVAL)info.st_ctime);
 #ifndef WIN32
-            VTABLE_set_integer_keyed_int(interp, array, 11,
+            VTABLE_set_integer_keyed_int(INTERP, array, 11,
                     (INTVAL)info.st_blksize);
-            VTABLE_set_integer_keyed_int(interp, array, 12,
+            VTABLE_set_integer_keyed_int(INTERP, array, 12,
                     (INTVAL)info.st_blocks);
 #endif
             RETURN(PMC *array);
@@ -362,8 +362,8 @@ Creates a symlink, where available
 
     METHOD symlink(STRING *from, STRING *to) {
 #ifndef WIN32
-        char * const cfrom = Parrot_str_to_cstring(interp, from);
-        char * const cto   = Parrot_str_to_cstring(interp, to);
+        char * const cfrom = Parrot_str_to_cstring(INTERP, from);
+        char * const cto   = Parrot_str_to_cstring(INTERP, to);
         const int error    = symlink(cfrom, cto);
 
         Parrot_str_free_cstring(cfrom);
@@ -371,11 +371,11 @@ Creates a symlink, where available
 
         if (error) {
             const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                 errmsg);
         }
 #else
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                 "Win32 does not support symlinks!");
 #endif
     }
@@ -392,8 +392,8 @@ Creates a hard link, where available(?)
 
     METHOD link(STRING *from, STRING *to) {
 #ifndef WIN32
-        char * const cfrom = Parrot_str_to_cstring(interp, from);
-        char * const cto   = Parrot_str_to_cstring(interp, to);
+        char * const cfrom = Parrot_str_to_cstring(INTERP, from);
+        char * const cto   = Parrot_str_to_cstring(INTERP, to);
         const int    error = link(cfrom, cto);
 
         Parrot_str_free_cstring(cfrom);
@@ -401,11 +401,11 @@ Creates a hard link, where available(?)
 
         if (error) {
             const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                 "link() failed for OS PMC: %s\n", errmsg);
         }
 #else
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                 "Win32 is not POSIX. Need win32 developer!");
 #endif
     }
@@ -426,7 +426,7 @@ previous one).
         const INTVAL old = umask((mode_t)mask);
         RETURN(INTVAL old);
 #else
-        Parrot_ex_throw_from_c_args(interp, NULL,
+        Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_UNIMPLEMENTED,
             "Win32 is not POSIX. Need Win32 developer!");
 #endif
@@ -448,18 +448,18 @@ idea to do the same with parrot.
 
     METHOD chroot(STRING *path) {
 #ifndef WIN32
-        char * const cpath = Parrot_str_to_cstring(interp, path);
+        char * const cpath = Parrot_str_to_cstring(INTERP, path);
         const int    error = chroot(cpath);
 
         Parrot_str_free_cstring(cpath);
 
         if (error) {
             const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                 errmsg);
         }
 #else
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                 "Win32 is not POSIX. Need Win32 developer!");
 #endif
     }
@@ -476,7 +476,7 @@ reads entries from a directory.
 */
     METHOD readdir(STRING *path) {
 #ifndef _MSC_VER
-        char  * const cpath = Parrot_str_to_cstring(interp, path);
+        char  * const cpath = Parrot_str_to_cstring(INTERP, path);
         DIR           *dir  = opendir(cpath);
         struct dirent *dirent;
         PMC           *array;
@@ -486,22 +486,22 @@ reads entries from a directory.
 
         if (!dir) {
             const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                 errmsg);
         }
 
-        array = pmc_new(interp, enum_class_ResizableStringArray);
+        array = pmc_new(INTERP, enum_class_ResizableStringArray);
 
         while ((dirent = readdir(dir)) != NULL) {
-            retval = Parrot_str_new(interp, dirent->d_name, 0) ;
-            VTABLE_push_string(interp, array, retval);
+            retval = Parrot_str_new(INTERP, dirent->d_name, 0) ;
+            VTABLE_push_string(INTERP, array, retval);
         }
 
         closedir(dir);
 
         RETURN(PMC *array);
 #else
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                 "Win32 is not POSIX. Need Win32 developer!");
 #endif
     }
@@ -515,8 +515,8 @@ thrown.
 
 */
     METHOD rename(STRING *oldpath, STRING *newpath) {
-        char * const coldpath = Parrot_str_to_cstring(interp, oldpath);
-        char * const cnewpath = Parrot_str_to_cstring(interp, newpath);
+        char * const coldpath = Parrot_str_to_cstring(INTERP, oldpath);
+        char * const cnewpath = Parrot_str_to_cstring(INTERP, newpath);
         const int    ret      = rename(coldpath, cnewpath);
 
         Parrot_str_free_cstring(coldpath);
@@ -524,7 +524,7 @@ thrown.
 
         if (ret < 0) {
             const char * const errmsg = strerror(errno) ;
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                 "%s", errmsg);
         }
     }
