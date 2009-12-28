@@ -21,33 +21,63 @@ tools/dev/checkdepend.pl
 A braindead script to check that every F<.c> file has makefile deps
 on its includes.
 
-Requires: a standard (possibly non C<-j>) C<make> run to generate all
-required C files first.
+=head1 REQUIREMENTS
+
+A built parrot (Configure and make) to generate all files so we can analyze
+them. Ack is used to find the files. We are not currently requiring ack
+for development, so this is an optional test.
 
 =cut
+
+die 'no Makefile found; This tool requires a full build for analysis.'
+    unless -e 'Makefile';
 
 my $files = `ack -fa {src,compilers,include} | grep '\\.[ch]\$'`;
 
 our %deps;
 
 foreach my $file (sort split /\n/, $files) {
+    # For now, skip any files that have generated dependencies
+    next if $file =~ m{src/(ops|dynoplibs|dynpmc|pmc)/};
+    next if $file =~ m{src/string/(charset|encoding)/};
+
     open my $fh, '<', $file;
     my $guts;
     {
         local undef $/;
         $guts = <$fh>;
     }
-    # For now, skip any files that have generated dependencies
-    next if $file =~ m{src/(ops|dynoplibs|dynpmc|pmc)/};
-    next if $file =~ m{src/string/(charset|encoding)/};
-    next if $file eq 'src/string/private_cstring.h';
+
+    # Ingore anything inside a c-style comment.
+    $guts =~ s{\Q/*\E.*?\Q*/}{}gm;
+
     my @includes = $guts =~ m/#include "(.*)"/g;
-    $deps{$file} = [ @includes ];
+
+    # Canonicalize each of these includes.
+
+    $deps{$file} = [ ];
+    foreach my $include (@includes) {
+        # same dir as file?
+        my $file_dir = (File::Spec->splitpath($file))[1];
+        my $make_dep = collapse_path(File::Spec->catfile($file_dir,$include));
+        if (defined($make_dep) && -f $make_dep) {
+            push @{$deps{$file}}, $make_dep;
+            next;
+        }
+
+        # global 'include' dir?
+        $make_dep = collapse_path(File::Spec->catfile('include',$include));
+        if (defined($make_dep) && -f $make_dep) {
+            push @{$deps{$file}}, $make_dep;
+            next;
+        }
+
+        diag "couldn't find $include, included from $file";
+    }
 }
 
 plan('no_plan');
 
-die 'no Makefile.  run `perl Configure.pl` to generate one.' unless -e "Makefile";
 open my $mf, '<', "Makefile";
 my $rules;
 {
@@ -56,7 +86,7 @@ my $rules;
 }
 
 # convert all \-newline continuations into single lines for ease of processing.
-$rules =~ s/\\\n/ /g;
+$rules =~ s/\\\n//g;
 
 # replace all _DIR variables with their expansions.
 while ($rules =~ s/^([A-Z_]+_DIR)\s*:?=\s*(\S*)$//m) {
@@ -97,20 +127,9 @@ foreach my $file (sort grep {/\.c$/} @files) {
     {
         $declared =~ s/\s+/ /g;
         foreach my $inc (sort (get_deps($file))) {
-            # incs can be relative, but makefile is from top level
-            my $file_dir = (File::Spec->splitpath($file))[1];
-            my $make_dep = collapse_path(File::Spec->catfile($file_dir,$inc));
+            next if $declared =~ s/\b\Q$inc\E\b//;
 
-            # If it's include from src
-            next if defined($make_dep) && ($declared =~ s/\b\Q$make_dep\E\b//);
-
-            # Try to construct "global" include
-            $make_dep = collapse_path(File::Spec->catfile('include', $inc));
-            next if defined($make_dep) && ($declared =~ s/\b\Q$make_dep\E\b//);
-
-            # this isn't the actual comparison, just to give nice output
-            # on failure.
-            is($declared, $inc, "$file is missing this dependency.");
+            is($declared, $inc, "$file is missing a dependency.");
             $failed = 1;
 
         }
@@ -153,8 +172,8 @@ sub get_deps {
         my $dep = shift @pending_deps;
         if (!exists $all_deps{$dep}) {
             $all_deps{$dep} = 1;
-            if (exists $deps{"include/$dep"}) {
-                push @pending_deps, @{$deps{"include/$dep"}};
+            if (exists $deps{$dep}) {
+                push @pending_deps, @{$deps{$dep}};
             }
         }
     }
