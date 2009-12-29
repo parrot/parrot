@@ -738,43 +738,40 @@ visit_loop_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC *current),
            line causes segfaults in testr t/pmc/eval.t */
     PMC *garbage = thawing ? pmc_new(interp, enum_class_Undef) : PMCNULL;
 
-    (info->visit_pmc_now)(interp, current, info);
 
     /* can't cache upper limit, visit may append items */
-again:
-    while ((list_item = (PMC **)Parrot_pmc_array_shift(interp, todo, enum_type_PMC))) {
-        current = *list_item;
-        if (!current)
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                "NULL current PMC in visit_loop_todo_list");
+    do {
+        (info->visit_pmc_now)(interp, current, info);
 
-        PARROT_ASSERT(current->vtable);
+        while ((list_item = (PMC **)Parrot_pmc_array_shift(interp, todo, enum_type_PMC))) {
+            current = *list_item;
+            if (!current)
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                        "NULL current PMC in visit_loop_todo_list");
 
-        /* Workaround for thawing constants. Clear constant flag */
-        /* See src/packfile.c:3999 */
-        if (thawing)
-            PObj_constant_CLEAR(current);
+            PARROT_ASSERT(current->vtable);
 
-        VTABLE_visit(interp, current, info);
+            /* Workaround for thawing constants. Clear constant flag */
+            /* See src/packfile.c:3999 */
+            if (thawing)
+                PObj_constant_CLEAR(current);
+
+            VTABLE_visit(interp, current, info);
+        }
+        current = NULL;
     }
+    while (thawing && INFO_HAS_DATA(info));
 
     if (thawing) {
-        if (INFO_HAS_DATA(info)) {
-            /* if image isn't consumed, there are some extra data to thaw */
-            (info->visit_pmc_now)(interp, NULL, info);
-            goto again;
-        }
-        else {
-            /* on thawing call thawfinish for each processed PMC */
-            List        *finish_list = (List *)PMC_data(info->id_list);
-            const INTVAL n           = Parrot_pmc_array_length(interp, finish_list);
-            int          i;
+        /* on thawing call thawfinish for each processed PMC */
+        List        *finish_list = (List *)PMC_data(info->id_list);
+        const INTVAL n           = Parrot_pmc_array_length(interp, finish_list);
+        int          i;
 
-            for (i = 0; i < n ; ++i) {
-                current = *(PMC**)Parrot_pmc_array_get(interp, finish_list, i, enum_type_PMC);
-                if (!PMC_IS_NULL(current))
-                    VTABLE_thawfinish(interp, current, info);
-            }
+        for (i = 0; i < n ; ++i) {
+            current = *(PMC**)Parrot_pmc_array_get(interp, finish_list, i, enum_type_PMC);
+            if (!PMC_IS_NULL(current))
+                VTABLE_thawfinish(interp, current, info);
         }
     }
 }
