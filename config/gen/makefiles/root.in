@@ -153,7 +153,6 @@ GEN_MAKEFILES := \
     compilers/json/Makefile \
     compilers/ncigen/Makefile \
     compilers/nqp/Makefile \
-    compilers/pct/Makefile \
     compilers/pge/Makefile \
     compilers/tge/Makefile \
     editor/Makefile \
@@ -174,7 +173,7 @@ GEN_CONFIGS := \
     lib/Parrot/Config/Generated.pm \
     lib/Parrot/PMC.pm \
     runtime/parrot/include/config.fpmc \
-    runtime/parrot/library/config.pir \
+    $(LIBRARY_DIR)/config.pir \
     $(SRC_DIR)/platform.c \
 #IF(platform_asm):    $(SRC_DIR)/platform_asm.s \
 #IF(has_opengl):    config/gen/call_list/opengl.in \
@@ -211,7 +210,7 @@ GEN_CONFIGS := \
 GEN_PASM_INCLUDES := \
     runtime/parrot/include/signal.pasm \
 #IF(has_opengl):    runtime/parrot/include/opengl_defines.pasm \
-#IF(has_opengl):    runtime/parrot/library/OpenGL_funcs.pir \
+#IF(has_opengl):    $(LIBRARY_DIR)/OpenGL_funcs.pir \
     @TEMP_gen_pasm_includes@
 
 CONFIGURE_GENERATED_FILES := \
@@ -259,6 +258,7 @@ GEN_MODULES := \
     lib/Parrot/OpLib/core.pm
 
 GEN_LIBRARY := \
+    $(PCT_LIB_PBCS) \
     $(LIBRARY_DIR)/CGI/QueryHash.pbc \
     $(LIBRARY_DIR)/Crow.pbc \
     $(LIBRARY_DIR)/config.pbc \
@@ -967,44 +967,9 @@ $(INSTALLABLECONFIG) : $(SRC_DIR)/install_config$(O) $(PARROT_CONFIG) $(PBC_TO_E
 $(INSTALLABLEPBCTOEXE) : $(PBC_TO_EXE) $(SRC_DIR)/install_config$(O)
 	$(PBC_TO_EXE) pbc_to_exe.pbc --install
 
-#
-# ext/nqp-rx -> parrot-nqp
-#
 
-NQP_LIB_PBCS := \
-        runtime/parrot/library/Regex.pbc \
-        runtime/parrot/library/HLL.pbc \
-        runtime/parrot/library/P6Regex.pbc \
-        runtime/parrot/library/nqp-rx.pbc \
-        runtime/parrot/library/P6object.pbc
-
-runtime/parrot/library/Regex.pbc: ext/nqp-rx/src/stage0/Regex-s0.pir $(PARROT)
-	$(PARROT) -o runtime/parrot/library/Regex.pbc ext/nqp-rx/src/stage0/Regex-s0.pir
-
-runtime/parrot/library/HLL.pbc: ext/nqp-rx/src/stage0/HLL-s0.pir $(PARROT)
-	$(PARROT) -o runtime/parrot/library/HLL.pbc ext/nqp-rx/src/stage0/HLL-s0.pir
-
-runtime/parrot/library/P6Regex.pbc: ext/nqp-rx/src/stage0/P6Regex-s0.pir $(PARROT)
-	$(PARROT) -o runtime/parrot/library/P6Regex.pbc ext/nqp-rx/src/stage0/P6Regex-s0.pir
-
-runtime/parrot/library/nqp-rx.pbc: ext/nqp-rx/src/stage0/NQP-s0.pir $(PARROT)
-	$(PARROT) -o runtime/parrot/library/nqp-rx.pbc ext/nqp-rx/src/stage0/NQP-s0.pir
-
-## TT #1398 - pbc_to_exe cannot generate a specified target file
-parrot-nqp.pbc : runtime/parrot/library/nqp-rx.pbc
-	$(CP) runtime/parrot/library/nqp-rx.pbc parrot-nqp.pbc
-
-## compilers.dummy here is a stopgap until these two deps can be added to
-## NQP_LIB_PBCS above.
-
-## runtime/parrot/library/PCT/HLLCompiler.pbc
-## runtime/parrot/library/PCT/PAST.pbc
-
-$(NQP) : $(NQP_LIB_PBCS) $(PBC_TO_EXE) parrot-nqp.pbc compilers.dummy
-	$(PBC_TO_EXE) parrot-nqp.pbc
-
-$(INSTALLABLENQP) : $(NQP_LIB_PBCS) $(SRC_DIR)/install_config$(O) $(PBC_TO_EXE) parrot-nqp.pbc compilers.dummy
-	$(PBC_TO_EXE) parrot-nqp.pbc --install
+include compilers/pct/Makefile.mak
+include ext/nqp-rx/Makefile.mak
 
 #
 # Parrot Debugger
@@ -1876,7 +1841,6 @@ dynoplibs-clean :
 compilers : compilers.dummy
 
 compilers.dummy : $(PARROT) $(GEN_LIBRARY)
-	$(MAKE) compilers/pct
 	$(MAKE) compilers/pge
 	$(MAKE) compilers/tge
 	$(MAKE) compilers/nqp
@@ -1884,7 +1848,6 @@ compilers.dummy : $(PARROT) $(GEN_LIBRARY)
 	$(MAKE) compilers/data_json
 
 compilers-clean :
-	$(MAKE) compilers/pct clean
 	$(MAKE) compilers/pge clean
 	$(MAKE) compilers/tge clean
 	$(MAKE) compilers/nqp clean
