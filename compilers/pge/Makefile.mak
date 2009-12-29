@@ -2,10 +2,10 @@
 
 PGE_LIB_PBCS := $(LIBRARY_DIR)/PGE.pbc
 
-## Two-stage build that reuses builtins_gen.pir
+## Two-stage build that reuses builtins_gen.pir ; use the Perl6Grammar.pir
+## of stage one to avoid a circular dependency.
 
 $(LIBRARY_DIR)/PGE.pbc: $(PARROT) \
-    $(LIBRARY_DIR)/PGE/Perl6Grammar.pir \
     compilers/pge/PGE.pir \
     compilers/pge/PGE/Exp.pir \
     compilers/pge/PGE/Match.pir \

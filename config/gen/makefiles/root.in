@@ -153,7 +153,6 @@ GEN_MAKEFILES := \
     compilers/json/Makefile \
     compilers/ncigen/Makefile \
     compilers/nqp/Makefile \
-    compilers/tge/Makefile \
     editor/Makefile \
     ext/Makefile \
     src/dynoplibs/Makefile \
@@ -257,6 +256,7 @@ GEN_MODULES := \
     lib/Parrot/OpLib/core.pm
 
 GEN_LIBRARY := \
+    $(TGE_LIB_PBCS) \
     $(PGE_LIB_PBCS) \
     $(PCT_LIB_PBCS) \
     $(LIBRARY_DIR)/CGI/QueryHash.pbc \
@@ -798,7 +798,7 @@ help :
 	@echo "  dynoplibs-clean:   Proxy for target 'clean' of src/dynoplibs/Makefile"
 	@echo ""
 	@echo "Language implementations:"
-	@echo "  compilers:         Proxy for default target of pge and tge compilers"
+	@echo "  compilers:         Proxy for default target of various compilers"
 	@echo ""
 	@echo "Fetch from source repository:"
 	@echo "  update:            svn update."
@@ -966,11 +966,6 @@ $(INSTALLABLECONFIG) : $(SRC_DIR)/install_config$(O) $(PARROT_CONFIG) $(PBC_TO_E
 
 $(INSTALLABLEPBCTOEXE) : $(PBC_TO_EXE) $(SRC_DIR)/install_config$(O)
 	$(PBC_TO_EXE) pbc_to_exe.pbc --install
-
-
-include compilers/pge/Makefile.mak
-include compilers/pct/Makefile.mak
-include ext/nqp-rx/Makefile.mak
 
 #
 # Parrot Debugger
@@ -1842,13 +1837,11 @@ dynoplibs-clean :
 compilers : compilers.dummy
 
 compilers.dummy : $(PARROT) $(GEN_LIBRARY)
-	$(MAKE) compilers/tge
 	$(MAKE) compilers/nqp
 	$(MAKE) compilers/json
 	$(MAKE) compilers/data_json
 
 compilers-clean :
-	$(MAKE) compilers/tge clean
 	$(MAKE) compilers/nqp clean
 	$(MAKE) compilers/json clean
 	$(MAKE) compilers/data_json clean
@@ -2749,6 +2742,12 @@ apilist: $(SRC_DIR)/core_pmcs.c
 
 malloclist: $(SRC_DIR)/core_pmcs.c
 	$(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl --macro=PARROT_MALLOC $(HEADERIZER_O_FILES)
+
+include runtime/parrot/library/Makefile.mak
+include compilers/tge/Makefile.mak
+include compilers/pge/Makefile.mak
+include compilers/pct/Makefile.mak
+include ext/nqp-rx/Makefile.mak
 
 # Local variables:
 #   mode: makefile
