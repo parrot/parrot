@@ -10,7 +10,7 @@ use Cwd;
 use Getopt::Long;
 use File::Spec::Functions;
 
-use Test::More tests => 32;
+use Test::More tests => 33;
 
 =head1 NAME
 
@@ -234,6 +234,22 @@ close $FH;
 $exe = "$parrot fun.pbc" unless (-e $exe);
 $out = `$exe $filename`;
 ok($out eq "Hello World!\n", "check fun");
+unlink($filename);
+}
+
+SKIP:
+{
+$exe = quote(catfile($pwd, $bindir, 'parrot-forth'));
+skip("fun", 1) unless (-d "$pwd/$langdir/forth" || -e $exe);
+chdir("$pwd/$langdir/forth");
+$filename = 'test.frt';
+open $FH, '>', $filename
+        or die "Can't open $filename ($!).\n";
+print $FH ".\" Hello World!\" CR";
+close $FH;
+$exe = "$parrot forth.pbc" unless (-e $exe);
+$out = `$exe $filename`;
+ok($out eq "Hello World!\n", "check forth");
 unlink($filename);
 }
 
