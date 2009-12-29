@@ -2,6 +2,9 @@
 TGE_LIB_PBCS := $(LIBRARY_DIR)/TGE.pbc
 
 $(LIBRARY_DIR)/TGE.pbc:  \
+    $(LIBRARY_DIR)/PGE.pbc \
+    $(LIBRARY_DIR)/PGE/Util.pbc \
+    $(LIBRARY_DIR)/P6object.pbc \
     compilers/tge/TGE.pir \
     compilers/tge/TGE/Rule.pir \
     compilers/tge/TGE/Parser.pir \

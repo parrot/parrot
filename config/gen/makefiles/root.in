@@ -150,7 +150,6 @@ GEN_MAKEFILES := \
     Makefile \
     docs/Makefile \
     compilers/data_json/Makefile \
-    compilers/json/Makefile \
     compilers/ncigen/Makefile \
     compilers/nqp/Makefile \
     editor/Makefile \
@@ -259,6 +258,7 @@ GEN_LIBRARY := \
     $(TGE_LIB_PBCS) \
     $(PGE_LIB_PBCS) \
     $(PCT_LIB_PBCS) \
+    $(JSON_LIB_PBCS) \
     $(LIBRARY_DIR)/CGI/QueryHash.pbc \
     $(LIBRARY_DIR)/Crow.pbc \
     $(LIBRARY_DIR)/config.pbc \
@@ -1838,12 +1838,10 @@ compilers : compilers.dummy
 
 compilers.dummy : $(PARROT) $(GEN_LIBRARY)
 	$(MAKE) compilers/nqp
-	$(MAKE) compilers/json
 	$(MAKE) compilers/data_json
 
 compilers-clean :
 	$(MAKE) compilers/nqp clean
-	$(MAKE) compilers/json clean
 	$(MAKE) compilers/data_json clean
 	$(MAKE) compilers/pirc clean
 
@@ -2744,9 +2742,10 @@ malloclist: $(SRC_DIR)/core_pmcs.c
 	$(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl --macro=PARROT_MALLOC $(HEADERIZER_O_FILES)
 
 include runtime/parrot/library/Makefile.mak
-include compilers/tge/Makefile.mak
 include compilers/pge/Makefile.mak
 include compilers/pct/Makefile.mak
+include compilers/tge/Makefile.mak
+include compilers/json/Makefile.mak
 include ext/nqp-rx/Makefile.mak
 
 # Local variables:
