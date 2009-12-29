@@ -1,7 +1,5 @@
 ## XXX does not cover .includes of core .pasm files
 
-## XXX compilers.dummy in this section is a stopgap.
-
 PCT_LIB_PBCS := \
     $(LIBRARY_DIR)/PCT.pbc \
     $(LIBRARY_DIR)/PCT/PAST.pbc \
@@ -22,14 +20,13 @@ $(LIBRARY_DIR)/PCT/PAST.pbc : compilers/pct/src/PAST.pir $(PARROT) \
     compilers/pct/src/POST/Compiler.pir
 	$(PARROT) -o $@ compilers/pct/src/PAST.pir
 
-## depends on $(LIBRARY_DIR)/PGE.pbc $(LIBRARY_DIR)/PGE/Util.pbc
 $(LIBRARY_DIR)/PCT/Grammar.pbc : compilers/pct/src/PCT/Grammar.pir $(PARROT) \
-    compilers.dummy
+    $(LIBRARY_DIR)/PGE.pbc $(LIBRARY_DIR)/PGE/Util.pbc
 	$(PARROT) -o $@ compilers/pct/src/PCT/Grammar.pir
 
-## depends on $(LIBRARY_DIR)/PGE/Dumper.pbc
 $(LIBRARY_DIR)/PCT/HLLCompiler.pbc : compilers/pct/src/PCT/HLLCompiler.pir \
     $(PARROT) \
+    $(LIBRARY_DIR)/PGE/Dumper.pbc \
     $(LIBRARY_DIR)/P6object.pbc \
     $(LIBRARY_DIR)/Parrot/Exception.pbc \
     $(LIBRARY_DIR)/config.pir \

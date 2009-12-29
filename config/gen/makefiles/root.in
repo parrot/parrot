@@ -153,7 +153,6 @@ GEN_MAKEFILES := \
     compilers/json/Makefile \
     compilers/ncigen/Makefile \
     compilers/nqp/Makefile \
-    compilers/pge/Makefile \
     compilers/tge/Makefile \
     editor/Makefile \
     ext/Makefile \
@@ -258,6 +257,7 @@ GEN_MODULES := \
     lib/Parrot/OpLib/core.pm
 
 GEN_LIBRARY := \
+    $(PGE_LIB_PBCS) \
     $(PCT_LIB_PBCS) \
     $(LIBRARY_DIR)/CGI/QueryHash.pbc \
     $(LIBRARY_DIR)/Crow.pbc \
@@ -968,6 +968,7 @@ $(INSTALLABLEPBCTOEXE) : $(PBC_TO_EXE) $(SRC_DIR)/install_config$(O)
 	$(PBC_TO_EXE) pbc_to_exe.pbc --install
 
 
+include compilers/pge/Makefile.mak
 include compilers/pct/Makefile.mak
 include ext/nqp-rx/Makefile.mak
 
@@ -1841,14 +1842,12 @@ dynoplibs-clean :
 compilers : compilers.dummy
 
 compilers.dummy : $(PARROT) $(GEN_LIBRARY)
-	$(MAKE) compilers/pge
 	$(MAKE) compilers/tge
 	$(MAKE) compilers/nqp
 	$(MAKE) compilers/json
 	$(MAKE) compilers/data_json
 
 compilers-clean :
-	$(MAKE) compilers/pge clean
 	$(MAKE) compilers/tge clean
 	$(MAKE) compilers/nqp clean
 	$(MAKE) compilers/json clean

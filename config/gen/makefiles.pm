@@ -40,8 +40,6 @@ sub _init {
             { SOURCE => 'compilers/ncigen/config/makefiles/ncigen.in' },
         'compilers/nqp/Makefile'     =>
             { SOURCE => 'config/gen/makefiles/nqp.in' },
-        'compilers/pge/Makefile'     =>
-            { SOURCE => 'config/gen/makefiles/pge.in' },
         'compilers/tge/Makefile'     =>
             { SOURCE => 'config/gen/makefiles/tge.in' },
         'compilers/json/Makefile'    =>
