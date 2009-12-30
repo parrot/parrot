@@ -1,5 +1,5 @@
 
-TGE_LIB_PBCS := $(LIBRARY_DIR)/TGE.pbc
+TGE_LIB_PBCS := $(LIBRARY_DIR)/TGE.pbc compilers/tge/tgc.pbc
 
 $(LIBRARY_DIR)/TGE.pbc:  \
     $(LIBRARY_DIR)/PGE.pbc \
@@ -13,7 +13,9 @@ $(LIBRARY_DIR)/TGE.pbc:  \
     compilers/tge/TGE/Tree.pir
 	$(PARROT) -o $@ compilers/tge/TGE.pir
 
+compilers/tge/tgc.pbc : $(LIBRARY_DIR)/TGE.pbc $(LIBRARY_DIR)/Getopt/Obj.pbc
+
 compilers/tge/TGE/Parser.pir: $(PARROT) \
     compilers/tge/TGE/Parser.pg \
-    $(LIBRARY_DIR)/PGE/Perl6Grammar.pbc
+    $(LIBRARY_DIR)/PGE/Perl6Grammar.pbc 
 	$(PARROT) $(LIBRARY_DIR)/PGE/Perl6Grammar.pbc --output=$@ compilers/tge/TGE/Parser.pg

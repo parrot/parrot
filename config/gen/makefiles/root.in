@@ -149,7 +149,6 @@ NONGEN_HEADERS   := @TEMP_nongen_headers@
 GEN_MAKEFILES := \
     Makefile \
     docs/Makefile \
-    compilers/data_json/Makefile \
     compilers/ncigen/Makefile \
     editor/Makefile \
     ext/Makefile \
@@ -602,7 +601,6 @@ all : \
     corevm \
     docs \
 #IF(has_glut):    $(LIBGLUTCB_SO) \
-    compilers \
     $(DIS) \
     $(PARROT_CONFIG) \
     $(PBC_TO_EXE) \
@@ -762,9 +760,6 @@ help :
 	@echo "  dynoplibs:         Proxy for default target of src/dynoplibs/Makefile"
 	@echo "  dynoplibs-test:    Proxy for target 'test' of src/dynoplibs/Makefile"
 	@echo "  dynoplibs-clean:   Proxy for target 'clean' of src/dynoplibs/Makefile"
-	@echo ""
-	@echo "Language implementations:"
-	@echo "  compilers:         Proxy for default target of various compilers"
 	@echo ""
 	@echo "Fetch from source repository:"
 	@echo "  update:            svn update."
@@ -1697,13 +1692,7 @@ dynoplibs-clean :
 #
 ###############################################################################
 
-compilers : compilers.dummy
-
-compilers.dummy : $(PARROT) $(GEN_LIBRARY)
-	$(MAKE) compilers/data_json
-
 compilers-clean :
-	$(MAKE) compilers/data_json clean
 	$(MAKE) compilers/pirc clean
 
 ext-clean:
@@ -2602,6 +2591,7 @@ include compilers/nqp/Makefile.mak
 include compilers/pge/Makefile.mak
 include compilers/pct/Makefile.mak
 include compilers/tge/Makefile.mak
+include compilers/data_json/Makefile.mak
 include compilers/json/Makefile.mak
 include ext/nqp-rx/Makefile.mak
 
