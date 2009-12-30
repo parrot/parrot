@@ -71,9 +71,6 @@ LIBRARY_DIR     := runtime/parrot/library
 # directory for *.ops file
 OPS_DIR         := src/ops
 
-# directory for packfile files
-PF_DIR          := src/packfile
-
 # source directory
 SRC_DIR         := src
 
@@ -492,7 +489,7 @@ INTERP_O_FILES := \
     $(SRC_DIR)/vtables$(O) \
     $(SRC_DIR)/warnings$(O) \
     \
-    $(PF_DIR)/pf_items$(O) \
+    src/packfile/pf_items$(O) \
     \
     @TEMP_cg_o@ \
     @TEMP_atomic_o@ \
@@ -1260,7 +1257,7 @@ $(SRC_DIR)/packfile$(O) : $(SRC_DIR)/packfile.str \
         $(INC_DIR)/embed.h $(INC_DIR)/extend.h $(INC_DIR)/extend_vtable.h \
         $(PARROT_H_HEADERS) $(INC_DIR)/runcore_api.h
 
-$(PF_DIR)/pf_items$(O) : $(PARROT_H_HEADERS)
+src/packfile/pf_items$(O) : $(PARROT_H_HEADERS)
 
 $(SRC_DIR)/packout$(O) : $(PARROT_H_HEADERS) $(PMC_INC_DIR)/pmc/pmc_key.h
 
