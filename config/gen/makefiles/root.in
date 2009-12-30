@@ -151,7 +151,6 @@ GEN_MAKEFILES := \
     docs/Makefile \
     compilers/data_json/Makefile \
     compilers/ncigen/Makefile \
-    compilers/nqp/Makefile \
     editor/Makefile \
     ext/Makefile \
     src/dynoplibs/Makefile \
@@ -584,9 +583,6 @@ MAKE := @make_c@
 #UNLESS(win32).S$(O) : # suffix rule (limited support)
 #UNLESS(win32)	@$(PERL) tools/dev/cc_flags.pl $(CUR_DIR)/CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
 
-# XXX These obviously require parrot: had trouble adding parrot as a dependency
-# here, though. Ignored on Mac OS X, at least.
-
 .pir.pbc : # suffix rule (limited support)
 	$(PARROT) -o $@ $<
 
@@ -679,10 +675,6 @@ PMC2CV := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --vtable @no_lines_flag@
 
 .pmc.c : # suffix rule (limited support)
 	$(PMC2CC) $<
-
-# not all makes might understand this, so the rules are generated
-#src/pmc/pmc_%.h : src/pmc/%.c
-#	$(PMC2CC) $<
 
 vtable.dump : src/vtable.tbl
 	$(PMC2CV)
@@ -1708,16 +1700,14 @@ dynoplibs-clean :
 compilers : compilers.dummy
 
 compilers.dummy : $(PARROT) $(GEN_LIBRARY)
-	$(MAKE) compilers/nqp
 	$(MAKE) compilers/data_json
 
 compilers-clean :
-	$(MAKE) compilers/nqp clean
 	$(MAKE) compilers/data_json clean
 	$(MAKE) compilers/pirc clean
 
 ext-clean:
-	$(RM_RF) $(NQP_LIB_PBCS) parrot-nqp*
+	$(RM_RF) $(NQPRX_LIB_PBCS) parrot-nqp*
 
 ###############################################################################
 #
@@ -1793,8 +1783,8 @@ test_core: test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS)
 
 # Test the NQP compiler
-nqp_test : test_prep
-	$(MAKE) compilers/nqp test
+nqp_test : test_prep compilers/nqp/nqp.pbc
+	$(PERL) compilers/nqp/t/harness
 
 # run the test suite, create a TAP archive and send it off to smolder
 smolder_test : test_prep
@@ -1950,6 +1940,7 @@ clean : \
 	$(RM_F) $(FLUID_FILES_1)
 	$(RM_F) $(FLUID_FILES_2)
 	$(RM_RF) lib/Parrot/OpLib
+	$(RM_F) $(NQP_CLEANUPS)
 
 prog-clean :
 	$(RM_F) \
@@ -2607,6 +2598,7 @@ malloclist: $(SRC_DIR)/core_pmcs.c
 	$(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl --macro=PARROT_MALLOC $(HEADERIZER_O_FILES)
 
 include runtime/parrot/library/Makefile.mak
+include compilers/nqp/Makefile.mak
 include compilers/pge/Makefile.mak
 include compilers/pct/Makefile.mak
 include compilers/tge/Makefile.mak

@@ -38,8 +38,6 @@ sub _init {
 
         'compilers/ncigen/Makefile'  =>
             { SOURCE => 'compilers/ncigen/config/makefiles/ncigen.in' },
-        'compilers/nqp/Makefile'     =>
-            { SOURCE => 'config/gen/makefiles/nqp.in' },
         'compilers/data_json/Makefile' =>
             { SOURCE => 'config/gen/makefiles/data_json.in' },
         'compilers/pirc/Makefile'    =>
