@@ -797,8 +797,7 @@ Used to unarchive the string.
 */
     VTABLE void thaw(visit_info *info) {
         SUPER(info);
-        if (info->extra_flags == EXTRA_IS_NULL)
-            SET_ATTR_str_val(INTERP, SELF, VTABLE_shift_string(INTERP, info));
+        SET_ATTR_str_val(INTERP, SELF, VTABLE_shift_string(INTERP, info));
     }
 /*
 

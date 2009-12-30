@@ -367,8 +367,7 @@ Used to unarchive the number.
 */
     VTABLE void thaw(visit_info *info) {
         SUPER(info);
-        if (info->extra_flags == EXTRA_IS_NULL)
-            SET_ATTR_fv(INTERP, SELF, VTABLE_shift_float(INTERP, info));
+        SET_ATTR_fv(INTERP, SELF, VTABLE_shift_float(INTERP, info));
     }
 /*
 

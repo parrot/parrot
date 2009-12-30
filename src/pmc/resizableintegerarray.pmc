@@ -309,27 +309,23 @@ Used to unarchive the array.
     }
 
     VTABLE void thaw(visit_info *info) {
-        if (info->extra_flags == EXTRA_IS_NULL) {
-            const INTVAL n = VTABLE_shift_integer(INTERP, info);
-            const INTVAL rt = VTABLE_shift_integer(INTERP, info);
+        const INTVAL n = VTABLE_shift_integer(INTERP, info);
+        const INTVAL rt = VTABLE_shift_integer(INTERP, info);
 
-            SET_ATTR_size(INTERP, SELF, 0);
-            SET_ATTR_resize_threshold(INTERP, SELF, rt);
-            SET_ATTR_int_array(INTERP, SELF, NULL);
+        SET_ATTR_size(INTERP, SELF, 0);
+        SET_ATTR_resize_threshold(INTERP, SELF, rt);
+        SET_ATTR_int_array(INTERP, SELF, NULL);
 
-            if (n) {
-                INTVAL  i;
-                INTVAL *int_array;
+        if (n) {
+            INTVAL  i;
+            INTVAL *int_array;
 
-                SELF.set_integer_native(n);
-                GET_ATTR_int_array(INTERP, SELF, int_array);
+            SELF.set_integer_native(n);
+            GET_ATTR_int_array(INTERP, SELF, int_array);
 
-                for (i = 0; i < n; ++i)
-                    int_array[i] = VTABLE_shift_integer(INTERP, info);
-            }
+            for (i = 0; i < n; ++i)
+                int_array[i] = VTABLE_shift_integer(INTERP, info);
         }
-        else
-            SUPER(info);
     }
 
 

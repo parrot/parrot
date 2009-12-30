@@ -1122,7 +1122,8 @@ Used to unarchive the hash.
 
     VTABLE void thaw(visit_info *info) {
         SUPER(info);
-        if (info->extra_flags == EXTRA_IS_NULL) {
+
+        {
             const INTVAL elems  = VTABLE_shift_integer(INTERP, info);
             const INTVAL k_type = VTABLE_shift_integer(INTERP, info);
             const INTVAL v_type = VTABLE_shift_integer(INTERP, info);

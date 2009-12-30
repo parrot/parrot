@@ -140,27 +140,22 @@ The implementation of the Hash PMC is called.
 
 
     VTABLE void thaw(visit_info *info) {
-        if (info->extra_flags == EXTRA_IS_NULL) {
-            const INTVAL elems  = VTABLE_shift_integer(INTERP, info);
-            const INTVAL k_type = VTABLE_shift_integer(INTERP, info);
-            const INTVAL v_type = VTABLE_shift_integer(INTERP, info);
-            Hash        *hash;
+        const INTVAL elems  = VTABLE_shift_integer(INTERP, info);
+        const INTVAL k_type = VTABLE_shift_integer(INTERP, info);
+        const INTVAL v_type = VTABLE_shift_integer(INTERP, info);
+        Hash        *hash;
 
-            UNUSED(k_type);
-            UNUSED(v_type);
+        UNUSED(k_type);
+        UNUSED(v_type);
 
-            PARROT_ASSERT(v_type == enum_hash_int);
-            /* TODO make a better interface for hash creation
-             * TODO create hash with needed types in the first place
-             */
+        PARROT_ASSERT(v_type == enum_hash_int);
+        /* TODO make a better interface for hash creation
+         * TODO create hash with needed types in the first place
+         */
 
-            SELF.init_pmc(NULL);
-            hash          = (Hash *)SELF.get_pointer();
-            hash->entries = elems;
-        }
-        else {
-            SUPER(info);
-        }
+        SELF.init_pmc(NULL);
+        hash          = (Hash *)SELF.get_pointer();
+        hash->entries = elems;
     }
 }
 

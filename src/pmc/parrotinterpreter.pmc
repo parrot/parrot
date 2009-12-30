@@ -720,17 +720,14 @@ Finish thawing.
     }
 
     VTABLE void thaw(visit_info *info) {
-        if (info->extra_flags == EXTRA_IS_NULL) {
-
-            if (!PMC_data(SELF)) {
-                Parrot_ParrotInterpreter_attributes *attrs =
-                    mem_allocate_zeroed_typed(Parrot_ParrotInterpreter_attributes);
-                PMC_data(SELF) = attrs;
-                PObj_custom_destroy_SET(SELF);
-            }
-
-            PMC_interp(SELF) = INTERP;
+        if (!PMC_data(SELF)) {
+            Parrot_ParrotInterpreter_attributes *attrs =
+                mem_allocate_zeroed_typed(Parrot_ParrotInterpreter_attributes);
+            PMC_data(SELF) = attrs;
+            PObj_custom_destroy_SET(SELF);
         }
+
+        PMC_interp(SELF) = INTERP;
     }
 
     VTABLE void thawfinish(visit_info *info) {

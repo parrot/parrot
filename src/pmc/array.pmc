@@ -1200,10 +1200,8 @@ Used to unarchive the array.
 
     VTABLE void thaw(visit_info *info) {
         SUPER(info);
-        if (info->extra_flags == EXTRA_IS_NULL) {
-            SELF.set_integer_native(VTABLE_shift_integer(INTERP, info));
+        SELF.set_integer_native(VTABLE_shift_integer(INTERP, info));
     }
-}
 
 /*
 

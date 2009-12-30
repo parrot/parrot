@@ -588,21 +588,18 @@ Used to unarchive the string.
 
 */
     VTABLE void thaw(visit_info *info) {
+        UINTVAL  i, size;
+        STRING **str_array;
+
+        SELF.init();
         SUPER(info);
 
-        if (info->extra_flags == EXTRA_IS_NULL) {
-            UINTVAL  i, size;
-            STRING **str_array;
+        size   = VTABLE_shift_integer(INTERP, info);
+        SELF.set_integer_native((INTVAL)size);
+        GET_ATTR_str_array(INTERP, SELF, str_array);
 
-            SELF.init();
-
-            size   = VTABLE_shift_integer(INTERP, info);
-            SELF.set_integer_native((INTVAL)size);
-            GET_ATTR_str_array(INTERP, SELF, str_array);
-
-            for (i = 0; i < size; ++i)
-                str_array[i] = VTABLE_shift_string(INTERP, info);
-        }
+        for (i = 0; i < size; ++i)
+            str_array[i] = VTABLE_shift_string(INTERP, info);
     }
 }
 
