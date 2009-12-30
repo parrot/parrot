@@ -53,9 +53,6 @@ BUILD_TOOLS_DIR := tools/build
 # current directory
 CUR_DIR         := .
 
-# directory for the intermediate code compiler
-IMCC_DIR        := compilers/imcc
-
 # directory for the (experimental) PIR code compiler
 PIRC_DIR        := compilers/pirc
 
@@ -191,12 +188,12 @@ GEN_CONFIGS := \
 #IF(has_crypto):    t/dynpmc/sha256.t \
 #IF(has_crypto):    t/dynpmc/sha512.t \
     CFLAGS \
-    $(IMCC_DIR)/CFLAGS \
+    compilers/imcc/CFLAGS \
     config_lib.pasm \
     $(BUILD_TOOLS_DIR)/dynpmc.pl \
     $(BUILD_TOOLS_DIR)/dynoplibs.pl \
     parrot.pc \
-    $(IMCC_DIR)/imcc.y.flag \
+    compilers/imcc/imcc.y.flag \
     $(OPS_DIR)/core_ops.c \
     $(OPS_DIR)/core_ops_switch.c
 
@@ -1947,7 +1944,7 @@ prog-clean :
     $(INSTALLABLENQP) \
     pbc_to_exe.pbc pbc_to_exe.c pbc_to_exe$(O) pbc_to_exe$(EXE) \
     parrot_config$(EXE) parrot_config.c parrot_config$(O) parrot_config.pbc \
-    $(IMCC_DIR)/main$(O) \
+    compilers/imcc/main$(O) \
     $(PDUMP) $(SRC_DIR)/pbc_dump$(O) $(SRC_DIR)/packdump$(O) \
     $(PDB) $(SRC_DIR)/parrot_debugger$(O) \
     $(PBCMERGE) $(SRC_DIR)/pbc_merge$(O) \
@@ -1982,7 +1979,7 @@ archclean: dynoplibs-clean dynpmc-clean dynext-clean
     $(INSTALLABLEPDB) \
     $(INSTALLABLECONFIG) \
     $(INSTALLABLENQP) \
-    $(IMCC_DIR)/main$(O) \
+    compilers/imcc/main$(O) \
     $(PDUMP) $(SRC_DIR)/pbc_dump$(O) $(SRC_DIR)/packdump$(O) \
     $(PDB) $(SRC_DIR)/parrot_debugger$(O) \
     $(PBCMERGE) $(SRC_DIR)/pbc_merge$(O) \
@@ -2319,7 +2316,7 @@ splint-all : $(PARROT)
 	$(MKPATH) $(SPLINT_TMP)
 	$(SPLINT) $(CC_INC) "-Iinclude/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
 	$(SPLINT_SOURCE) \
-	$(SPLINT) $(CC_INC) $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) $(IMCC_DIR)/main.c
+	$(SPLINT) $(CC_INC) $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) compilers/imcc/main.c
 
 # "splint" is the less-thorough splint target.  For cage cleaning work,
 # you'll probably want to specify SPLINT_SOURCE rather than work on the
@@ -2351,7 +2348,7 @@ COVER_DIRS := \
     $(BUILD_DIR) \
     $(BUILD_DIR)/t/perl \
     $(IO_DIR) \
-    $(IMCC_DIR)
+    compilers/imcc
 
 cover: \
     cover.dummy \
@@ -2578,7 +2575,7 @@ HEADERIZER_O_FILES := \
     $(PIRC_O_FILES)
 
 headerizer : $(SRC_DIR)/core_pmcs.c
-	$(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl $(HEADERIZER_O_FILES) $(IMCC_DIR)/imcc.y
+	$(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl $(HEADERIZER_O_FILES) compilers/imcc/imcc.y
 
 apilist: $(SRC_DIR)/core_pmcs.c
 	$(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl --macro=PARROT_EXPORT $(HEADERIZER_O_FILES)

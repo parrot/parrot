@@ -1,202 +1,202 @@
 # these are private to the IMCC subsystem
 IMCC_O_FILES := \
-    $(IMCC_DIR)/imcparser$(O) \
-    $(IMCC_DIR)/imclexer$(O) \
-    $(IMCC_DIR)/imc$(O) \
-    $(IMCC_DIR)/main$(O) \
-    $(IMCC_DIR)/symreg$(O) \
-    $(IMCC_DIR)/instructions$(O) \
-    $(IMCC_DIR)/cfg$(O) \
-    $(IMCC_DIR)/reg_alloc$(O) \
-    $(IMCC_DIR)/sets$(O) \
-    $(IMCC_DIR)/debug$(O) \
-    $(IMCC_DIR)/optimizer$(O) \
-    $(IMCC_DIR)/pbc$(O) \
-    $(IMCC_DIR)/parser_util$(O) \
-    $(IMCC_DIR)/pcc$(O)
+    compilers/imcc/imcparser$(O) \
+    compilers/imcc/imclexer$(O) \
+    compilers/imcc/imc$(O) \
+    compilers/imcc/main$(O) \
+    compilers/imcc/symreg$(O) \
+    compilers/imcc/instructions$(O) \
+    compilers/imcc/cfg$(O) \
+    compilers/imcc/reg_alloc$(O) \
+    compilers/imcc/sets$(O) \
+    compilers/imcc/debug$(O) \
+    compilers/imcc/optimizer$(O) \
+    compilers/imcc/pbc$(O) \
+    compilers/imcc/parser_util$(O) \
+    compilers/imcc/pcc$(O)
 
-$(IMCC_DIR)/pcc$(O) : \
-    $(IMCC_DIR)/cfg.h \
-    $(IMCC_DIR)/debug.h \
-    $(IMCC_DIR)/imc.h \
-    $(IMCC_DIR)/imcparser.h \
-    $(IMCC_DIR)/instructions.h \
-    $(IMCC_DIR)/parser.h \
-    $(IMCC_DIR)/sets.h \
-    $(IMCC_DIR)/symreg.h \
-    $(IMCC_DIR)/unit.h \
+compilers/imcc/pcc$(O) : \
+    compilers/imcc/cfg.h \
+    compilers/imcc/debug.h \
+    compilers/imcc/imc.h \
+    compilers/imcc/imcparser.h \
+    compilers/imcc/instructions.h \
+    compilers/imcc/parser.h \
+    compilers/imcc/sets.h \
+    compilers/imcc/symreg.h \
+    compilers/imcc/unit.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
 
-$(IMCC_DIR)/instructions$(O) : \
-    $(IMCC_DIR)/cfg.h \
-    $(IMCC_DIR)/debug.h \
-    $(IMCC_DIR)/imc.h \
-    $(IMCC_DIR)/instructions.h \
-    $(IMCC_DIR)/optimizer.h \
-    $(IMCC_DIR)/pbc.h \
-    $(IMCC_DIR)/sets.h \
-    $(IMCC_DIR)/symreg.h \
-    $(IMCC_DIR)/unit.h \
+compilers/imcc/instructions$(O) : \
+    compilers/imcc/cfg.h \
+    compilers/imcc/debug.h \
+    compilers/imcc/imc.h \
+    compilers/imcc/instructions.h \
+    compilers/imcc/optimizer.h \
+    compilers/imcc/pbc.h \
+    compilers/imcc/sets.h \
+    compilers/imcc/symreg.h \
+    compilers/imcc/unit.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
 
-$(IMCC_DIR)/pbc$(O) : \
-    $(IMCC_DIR)/cfg.h \
-    $(IMCC_DIR)/debug.h \
-    $(IMCC_DIR)/imc.h \
-    $(IMCC_DIR)/instructions.h \
-    $(IMCC_DIR)/pbc.h \
-    $(IMCC_DIR)/sets.h \
-    $(IMCC_DIR)/symreg.h \
-    $(IMCC_DIR)/unit.h \
+compilers/imcc/pbc$(O) : \
+    compilers/imcc/cfg.h \
+    compilers/imcc/debug.h \
+    compilers/imcc/imc.h \
+    compilers/imcc/instructions.h \
+    compilers/imcc/pbc.h \
+    compilers/imcc/sets.h \
+    compilers/imcc/symreg.h \
+    compilers/imcc/unit.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS) \
     $(PMC_INC_DIR)/pmc/pmc_sub.h
 
-$(IMCC_DIR)/parser_util$(O) : \
-    $(IMCC_DIR)/cfg.h \
-    $(IMCC_DIR)/debug.h \
-    $(IMCC_DIR)/imc.h \
-    $(IMCC_DIR)/imcparser.h \
-    $(IMCC_DIR)/instructions.h \
-    $(IMCC_DIR)/optimizer.h \
-    $(IMCC_DIR)/parser.h \
-    $(IMCC_DIR)/pbc.h \
-    $(IMCC_DIR)/sets.h \
-    $(IMCC_DIR)/symreg.h \
-    $(IMCC_DIR)/unit.h \
+compilers/imcc/parser_util$(O) : \
+    compilers/imcc/cfg.h \
+    compilers/imcc/debug.h \
+    compilers/imcc/imc.h \
+    compilers/imcc/imcparser.h \
+    compilers/imcc/instructions.h \
+    compilers/imcc/optimizer.h \
+    compilers/imcc/parser.h \
+    compilers/imcc/pbc.h \
+    compilers/imcc/sets.h \
+    compilers/imcc/symreg.h \
+    compilers/imcc/unit.h \
     $(INC_DIR)/dynext.h \
     $(INC_DIR)/embed.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS) \
     $(PMC_INC_DIR)/pmc/pmc_sub.h
 
-$(IMCC_DIR)/imc$(O) : \
-    $(IMCC_DIR)/cfg.h \
-    $(IMCC_DIR)/debug.h \
-    $(IMCC_DIR)/imc.h \
-    $(IMCC_DIR)/instructions.h \
-    $(IMCC_DIR)/optimizer.h \
-    $(IMCC_DIR)/sets.h \
-    $(IMCC_DIR)/symreg.h \
-    $(IMCC_DIR)/unit.h \
+compilers/imcc/imc$(O) : \
+    compilers/imcc/cfg.h \
+    compilers/imcc/debug.h \
+    compilers/imcc/imc.h \
+    compilers/imcc/instructions.h \
+    compilers/imcc/optimizer.h \
+    compilers/imcc/sets.h \
+    compilers/imcc/symreg.h \
+    compilers/imcc/unit.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
 
-$(IMCC_DIR)/cfg$(O) : \
-    $(IMCC_DIR)/cfg.h \
-    $(IMCC_DIR)/debug.h \
-    $(IMCC_DIR)/imc.h \
-    $(IMCC_DIR)/instructions.h \
-    $(IMCC_DIR)/optimizer.h \
-    $(IMCC_DIR)/sets.h \
-    $(IMCC_DIR)/symreg.h \
-    $(IMCC_DIR)/unit.h \
+compilers/imcc/cfg$(O) : \
+    compilers/imcc/cfg.h \
+    compilers/imcc/debug.h \
+    compilers/imcc/imc.h \
+    compilers/imcc/instructions.h \
+    compilers/imcc/optimizer.h \
+    compilers/imcc/sets.h \
+    compilers/imcc/symreg.h \
+    compilers/imcc/unit.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
 
-$(IMCC_DIR)/debug$(O) : \
-    $(IMCC_DIR)/cfg.h \
-    $(IMCC_DIR)/debug.h \
-    $(IMCC_DIR)/imc.h \
-    $(IMCC_DIR)/instructions.h \
-    $(IMCC_DIR)/sets.h \
-    $(IMCC_DIR)/symreg.h \
-    $(IMCC_DIR)/unit.h \
+compilers/imcc/debug$(O) : \
+    compilers/imcc/cfg.h \
+    compilers/imcc/debug.h \
+    compilers/imcc/imc.h \
+    compilers/imcc/instructions.h \
+    compilers/imcc/sets.h \
+    compilers/imcc/symreg.h \
+    compilers/imcc/unit.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
 
-$(IMCC_DIR)/imclexer$(O) : \
-    $(IMCC_DIR)/cfg.h \
-    $(IMCC_DIR)/debug.h \
-    $(IMCC_DIR)/imc.h \
-    $(IMCC_DIR)/imcparser.h \
-    $(IMCC_DIR)/instructions.h \
-    $(IMCC_DIR)/parser.h \
-    $(IMCC_DIR)/sets.h \
-    $(IMCC_DIR)/symreg.h \
-    $(IMCC_DIR)/unit.h \
+compilers/imcc/imclexer$(O) : \
+    compilers/imcc/cfg.h \
+    compilers/imcc/debug.h \
+    compilers/imcc/imc.h \
+    compilers/imcc/imcparser.h \
+    compilers/imcc/instructions.h \
+    compilers/imcc/parser.h \
+    compilers/imcc/sets.h \
+    compilers/imcc/symreg.h \
+    compilers/imcc/unit.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
 
-$(IMCC_DIR)/imcparser$(O) : \
-    $(IMCC_DIR)/cfg.h \
-    $(IMCC_DIR)/debug.h \
-    $(IMCC_DIR)/imc.h \
-    $(IMCC_DIR)/imcparser.h \
-    $(IMCC_DIR)/instructions.h \
-    $(IMCC_DIR)/optimizer.h \
-    $(IMCC_DIR)/parser.h \
-    $(IMCC_DIR)/pbc.h \
-    $(IMCC_DIR)/sets.h \
-    $(IMCC_DIR)/symreg.h \
-    $(IMCC_DIR)/unit.h \
+compilers/imcc/imcparser$(O) : \
+    compilers/imcc/cfg.h \
+    compilers/imcc/debug.h \
+    compilers/imcc/imc.h \
+    compilers/imcc/imcparser.h \
+    compilers/imcc/instructions.h \
+    compilers/imcc/optimizer.h \
+    compilers/imcc/parser.h \
+    compilers/imcc/pbc.h \
+    compilers/imcc/sets.h \
+    compilers/imcc/symreg.h \
+    compilers/imcc/unit.h \
     $(INC_DIR)/dynext.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
 
-$(IMCC_DIR)/main$(O) : \
-    $(IMCC_DIR)/cfg.h \
-    $(IMCC_DIR)/debug.h \
-    $(IMCC_DIR)/imc.h \
-    $(IMCC_DIR)/imcparser.h \
-    $(IMCC_DIR)/instructions.h \
-    $(IMCC_DIR)/parser.h \
-    $(IMCC_DIR)/pbc.h \
-    $(IMCC_DIR)/sets.h \
-    $(IMCC_DIR)/symreg.h \
-    $(IMCC_DIR)/unit.h \
+compilers/imcc/main$(O) : \
+    compilers/imcc/cfg.h \
+    compilers/imcc/debug.h \
+    compilers/imcc/imc.h \
+    compilers/imcc/imcparser.h \
+    compilers/imcc/instructions.h \
+    compilers/imcc/parser.h \
+    compilers/imcc/pbc.h \
+    compilers/imcc/sets.h \
+    compilers/imcc/symreg.h \
+    compilers/imcc/unit.h \
     $(INC_DIR)/embed.h \
     $(INC_DIR)/imcc.h \
     $(INC_DIR)/oplib/ops.h \
     $(INC_DIR)/runcore_api.h \
     $(PARROT_H_HEADERS)
 
-$(IMCC_DIR)/optimizer$(O) : \
-    $(IMCC_DIR)/cfg.h \
-    $(IMCC_DIR)/debug.h \
-    $(IMCC_DIR)/imc.h \
-    $(IMCC_DIR)/instructions.h \
-    $(IMCC_DIR)/optimizer.h \
-    $(IMCC_DIR)/pbc.h \
-    $(IMCC_DIR)/sets.h \
-    $(IMCC_DIR)/symreg.h \
-    $(IMCC_DIR)/unit.h \
+compilers/imcc/optimizer$(O) : \
+    compilers/imcc/cfg.h \
+    compilers/imcc/debug.h \
+    compilers/imcc/imc.h \
+    compilers/imcc/instructions.h \
+    compilers/imcc/optimizer.h \
+    compilers/imcc/pbc.h \
+    compilers/imcc/sets.h \
+    compilers/imcc/symreg.h \
+    compilers/imcc/unit.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
 
-$(IMCC_DIR)/reg_alloc$(O) : \
-    $(IMCC_DIR)/cfg.h \
-    $(IMCC_DIR)/debug.h \
-    $(IMCC_DIR)/imc.h \
-    $(IMCC_DIR)/instructions.h \
-    $(IMCC_DIR)/optimizer.h \
-    $(IMCC_DIR)/sets.h \
-    $(IMCC_DIR)/symreg.h \
-    $(IMCC_DIR)/unit.h \
+compilers/imcc/reg_alloc$(O) : \
+    compilers/imcc/cfg.h \
+    compilers/imcc/debug.h \
+    compilers/imcc/imc.h \
+    compilers/imcc/instructions.h \
+    compilers/imcc/optimizer.h \
+    compilers/imcc/sets.h \
+    compilers/imcc/symreg.h \
+    compilers/imcc/unit.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
 
-$(IMCC_DIR)/sets$(O) : \
-    $(IMCC_DIR)/cfg.h \
-    $(IMCC_DIR)/debug.h \
-    $(IMCC_DIR)/imc.h \
-    $(IMCC_DIR)/instructions.h \
-    $(IMCC_DIR)/sets.h \
-    $(IMCC_DIR)/symreg.h \
-    $(IMCC_DIR)/unit.h \
+compilers/imcc/sets$(O) : \
+    compilers/imcc/cfg.h \
+    compilers/imcc/debug.h \
+    compilers/imcc/imc.h \
+    compilers/imcc/instructions.h \
+    compilers/imcc/sets.h \
+    compilers/imcc/symreg.h \
+    compilers/imcc/unit.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
 
-$(IMCC_DIR)/symreg$(O) : \
-    $(IMCC_DIR)/cfg.h \
-    $(IMCC_DIR)/debug.h \
-    $(IMCC_DIR)/imc.h \
-    $(IMCC_DIR)/instructions.h \
-    $(IMCC_DIR)/sets.h \
-    $(IMCC_DIR)/symreg.h \
-    $(IMCC_DIR)/unit.h \
+compilers/imcc/symreg$(O) : \
+    compilers/imcc/cfg.h \
+    compilers/imcc/debug.h \
+    compilers/imcc/imc.h \
+    compilers/imcc/instructions.h \
+    compilers/imcc/sets.h \
+    compilers/imcc/symreg.h \
+    compilers/imcc/unit.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
 
@@ -207,18 +207,18 @@ $(IMCC_DIR)/symreg$(O) : \
 # Note that YACC or LEX may be null commands, so we must `touch` all the
 # target files, instead of just the .flag files.
 
-$(IMCC_DIR)/imcc.y.flag $(IMCC_DIR)/imcparser.c $(IMCC_DIR)/imcparser.h : $(IMCC_DIR)/imcc.y
-	$(YACC) $(IMCC_DIR)/imcc.y -d -o $(IMCC_DIR)/imcparser.c
-	$(PERL) $(BUILD_TOOLS_DIR)/fixup_gen_file.pl -noheaderizer $(IMCC_DIR)/imcparser.c $(IMCC_DIR)/imcc.y
-	$(PERL) $(BUILD_TOOLS_DIR)/fixup_gen_file.pl -noheaderizer $(IMCC_DIR)/imcparser.h $(IMCC_DIR)/imcc.y
-	$(TOUCH) $(IMCC_DIR)/imcc.y.flag $(IMCC_DIR)/imcparser.c $(IMCC_DIR)/imcparser.h
+compilers/imcc/imcc.y.flag compilers/imcc/imcparser.c compilers/imcc/imcparser.h : compilers/imcc/imcc.y
+	$(YACC) compilers/imcc/imcc.y -d -o compilers/imcc/imcparser.c
+	$(PERL) $(BUILD_TOOLS_DIR)/fixup_gen_file.pl -noheaderizer compilers/imcc/imcparser.c compilers/imcc/imcc.y
+	$(PERL) $(BUILD_TOOLS_DIR)/fixup_gen_file.pl -noheaderizer compilers/imcc/imcparser.h compilers/imcc/imcc.y
+	$(TOUCH) compilers/imcc/imcc.y.flag compilers/imcc/imcparser.c compilers/imcc/imcparser.h
 
-$(IMCC_DIR)/imcc.l.flag $(IMCC_DIR)/imclexer.c : $(IMCC_DIR)/imcc.l
-	$(LEX) -o$(IMCC_DIR)/imclexer.c $(IMCC_DIR)/imcc.l
-	$(TOUCH) $(IMCC_DIR)/imcc.l.flag $(IMCC_DIR)/imclexer.c
+compilers/imcc/imcc.l.flag compilers/imcc/imclexer.c : compilers/imcc/imcc.l
+	$(LEX) -ocompilers/imcc/imclexer.c compilers/imcc/imcc.l
+	$(TOUCH) compilers/imcc/imcc.l.flag compilers/imcc/imclexer.c
 
 imcc-clean:
 	$(RM_F) \
-    $(IMCC_DIR)/core \
-    "$(IMCC_DIR)/*$(O)" \
-    $(IMCC_DIR)/imcparser.output
+    compilers/imcc/core \
+    "compilers/imcc/*$(O)" \
+    compilers/imcc/imcparser.output
