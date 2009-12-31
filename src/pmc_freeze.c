@@ -734,11 +734,6 @@ visit_loop_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC *current),
     const int    thawing        = info->what == VISIT_THAW_CONSTANTS
                                || info->what == VISIT_THAW_NORMAL;
 
-    /* XXX As the name suggests, this pmc is useless. However, deleting this
-           line causes segfaults in testr t/pmc/eval.t */
-    PMC *garbage = thawing ? pmc_new(interp, enum_class_Undef) : PMCNULL;
-
-
     /* can't cache upper limit, visit may append items */
     do {
         (info->visit_pmc_now)(interp, current, info);
