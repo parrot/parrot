@@ -17,10 +17,27 @@ struct _visit_info;
 typedef void (*visit_f)(PARROT_INTERP, ARGIN_NULLOK(PMC*), ARGIN(struct _visit_info*));
 
 typedef enum {
-    VISIT_FREEZE_NORMAL,
-    VISIT_THAW_NORMAL,
-} visit_enum_type;
+    VISIT_HOW_PMC_TO_VISITOR     = 0x00, /* push to visitor */
+    VISIT_HOW_VISITOR_TO_PMC     = 0x01, /* shift from visitor */
+    VISIT_HOW_PMC_TO_PMC         = 0x02, /* push to visitor; then shift from visitor */
+    VISIT_HOW_VISITOR_TO_VISITOR = 0x03, /* shift from visitor; then push to visitor */
+} visit_how_enum_t;
 
+#define VISIT_HOW_MASK 0x03
+
+typedef enum {
+    VISIT_WHAT_PMC      = 0x04,
+    VISIT_WHAT_STRING   = 0x08,
+    VISIT_WHAT_FLOATVAL = 0x10,
+    VISIT_WHAT_INTVAL   = 0x20,
+} visit_what_enum_t;
+
+#define VISIT_WHAT_MASK 0x3c
+
+/* backwards-compat defns */
+#define visit_enum_type      INTVAL
+#define VISIT_FREEZE_NORMAL  (VISIT_HOW_PMC_TO_VISITOR | VISIT_WHAT_PMC)
+#define VISIT_THAW_NORMAL    (VISIT_HOW_VISITOR_TO_PMC | VISIT_WHAT_PMC)
 #define VISIT_THAW_CONSTANTS VISIT_THAW_NORMAL
 
 struct _visit_info;
@@ -71,27 +88,53 @@ typedef struct _visit_info {
 #define IMAGE_IO visit_info
 
 #define VISIT_PMC(interp, visit, pmc) do {\
-    switch (VTABLE_get_integer((interp), (visit))) { \
-      case VISIT_FREEZE_NORMAL: \
-        VTABLE_push_pmc((interp), (visit), (pmc)); \
-        break; \
-      case VISIT_THAW_NORMAL: \
-        (pmc) = VTABLE_shift_pmc((interp), (visit)); \
-        break; \
+    const INTVAL _visit_pmc_flags = VTABLE_get_integer((interp), (visit)); \
+    if (_visit_pmc_flags & VISIT_WHAT_PMC) { \
+        switch (_visit_pmc_flags & VISIT_HOW_MASK) { \
+          case VISIT_HOW_PMC_TO_VISITOR: \
+            VTABLE_push_pmc((interp), (visit), (pmc)); \
+            break; \
+          case VISIT_HOW_VISITOR_TO_PMC: \
+            (pmc) = VTABLE_shift_pmc((interp), (visit)); \
+            break; \
+          case VISIT_HOW_PMC_TO_PMC: \
+            VTABLE_push_pmc((interp), (visit), (pmc)); \
+            (pmc) = VTABLE_shift_pmc((interp), (visit)); \
+            break; \
+          case VISIT_HOW_VISITOR_TO_VISITOR: \
+            (pmc) = VTABLE_shift_pmc((interp), (visit)); \
+            VTABLE_push_pmc((interp), (visit), (pmc)); \
+            break; \
+        } \
     } \
 } while (0)
 
 #define VISIT_PMC_ATTR(interp, visit, self, pmclass, attr_name) do {\
-    PMC *_visit_pmc_attr; \
-    switch (VTABLE_get_integer((interp), (visit))) { \
-      case VISIT_FREEZE_NORMAL: \
-        GETATTR_ ## pmclass ## _ ## attr_name((interp), (self), _visit_pmc_attr); \
-        VTABLE_push_pmc((interp), (visit), _visit_pmc_attr); \
-        break; \
-      case VISIT_THAW_NORMAL: \
-        _visit_pmc_attr = VTABLE_shift_pmc((interp), (visit)); \
-        SETATTR_ ## pmclass ## _ ## attr_name((interp), (self), _visit_pmc_attr); \
-        break; \
+    const INTVAL _visit_pmc_attr_flags = VTABLE_get_integer((interp), (visit)); \
+    if (_visit_pmc_attr_flags & VISIT_WHAT_PMC) { \
+        PMC *_visit_pmc_attr; \
+        switch (_visit_pmc_attr_flags & VISIT_HOW_MASK) { \
+          case VISIT_HOW_PMC_TO_VISITOR: \
+            GETATTR_ ## pmclass ## _ ## attr_name((interp), (self), _visit_pmc_attr); \
+            VTABLE_push_pmc((interp), (visit), _visit_pmc_attr); \
+            break; \
+          case VISIT_HOW_VISITOR_TO_PMC: \
+            _visit_pmc_attr = VTABLE_shift_pmc((interp), (visit)); \
+            SETATTR_ ## pmclass ## _ ## attr_name((interp), (self), _visit_pmc_attr); \
+            break; \
+          case VISIT_HOW_PMC_TO_PMC: \
+            GETATTR_ ## pmclass ## _ ## attr_name((interp), (self), _visit_pmc_attr); \
+            VTABLE_push_pmc((interp), (visit), _visit_pmc_attr); \
+            _visit_pmc_attr = VTABLE_shift_pmc((interp), (visit)); \
+            SETATTR_ ## pmclass ## _ ## attr_name((interp), (self), _visit_pmc_attr); \
+            break; \
+          case VISIT_HOW_VISITOR_TO_VISITOR: \
+            _visit_pmc_attr = VTABLE_shift_pmc((interp), (visit)); \
+            SETATTR_ ## pmclass ## _ ## attr_name((interp), (self), _visit_pmc_attr); \
+            GETATTR_ ## pmclass ## _ ## attr_name((interp), (self), _visit_pmc_attr); \
+            VTABLE_push_pmc((interp), (visit), _visit_pmc_attr); \
+            break; \
+        } \
     } \
 } while (0)
 
