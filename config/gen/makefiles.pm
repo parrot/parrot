@@ -47,11 +47,6 @@ sub _init {
         'editor/Makefile'            =>
             { SOURCE => 'config/gen/makefiles/editor.in' },
 
-        'tools/build/dynpmc.pl' => {
-            SOURCE            => 'config/gen/makefiles/dynpmc_pl.in',
-            replace_slashes   => 0,
-            conditioned_lines => 1,
-        },
         'tools/build/dynoplibs.pl' => {
             SOURCE            => 'config/gen/makefiles/dynoplibs_pl.in',
             replace_slashes   => 0,
