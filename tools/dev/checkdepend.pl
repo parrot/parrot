@@ -44,7 +44,7 @@ foreach my $file (sort split /\n/, $files) {
     open my $fh, '<', $file;
     my $guts;
     {
-        local undef $/;
+        local $/;
         $guts = <$fh>;
     }
 
@@ -81,7 +81,7 @@ plan('no_plan');
 open my $mf, '<', "Makefile";
 my $rules;
 {
-    local undef $/;
+    local $/;
     $rules = <$mf>;
 }
 close $mf;
@@ -92,7 +92,7 @@ while ($rules =~ /^include\s+(.*)$/m) {
     open my $smf, '<', $sub_makefile;
     my $subrules;
     {
-        local undef $/;
+        local $/;
         $subrules = <$smf>;
     }
     close $smf;
