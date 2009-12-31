@@ -1,6 +1,6 @@
 # the default target
 
-PGE_LIB_PBCS := $(LIBRARY_DIR)/PGE.pbc
+PGE_LIB_PBCS = $(LIBRARY_DIR)/PGE.pbc
 
 ## Two-stage build that reuses builtins_gen.pir ; use the Perl6Grammar.pir
 ## of stage one to avoid a circular dependency.

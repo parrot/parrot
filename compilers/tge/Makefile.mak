@@ -1,5 +1,4 @@
-
-TGE_LIB_PBCS := $(LIBRARY_DIR)/TGE.pbc compilers/tge/tgc.pbc
+TGE_LIB_PBCS = $(LIBRARY_DIR)/TGE.pbc compilers/tge/tgc.pbc
 
 $(LIBRARY_DIR)/TGE.pbc:  \
     $(LIBRARY_DIR)/PGE.pbc \

@@ -1,6 +1,6 @@
-NQP_LIB_PBCS := compilers/nqp/nqp.pbc
+NQP_LIB_PBCS = compilers/nqp/nqp.pbc
 
-NQP_SOURCES := \
+NQP_SOURCES = \
     compilers/nqp/nqp.pir \
     compilers/nqp/src/Grammar.pg \
     compilers/nqp/src/Grammar/Actions.pir \
@@ -27,7 +27,7 @@ compilers/nqp/bootstrap/gen_actions.pir : $(PARROT) \
 
 compilers/nqp/bootstrap/nqp.pbc : $(LIBRARY)/PCT.pbc
 
-NQP_CLEANUPS := \
+NQP_CLEANUPS = \
     nqp.pbc \
     src/Grammar_gen.pir \
     bootstrap/gen_actions.pir \

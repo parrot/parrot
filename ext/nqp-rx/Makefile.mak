@@ -1,6 +1,6 @@
 ## XXX does not cover .includes of core .pasm files
 
-NQPRX_LIB_PBCS := \
+NQPRX_LIB_PBCS = \
     $(LIBRARY_DIR)/Regex.pbc \
     $(LIBRARY_DIR)/HLL.pbc \
     $(LIBRARY_DIR)/P6Regex.pbc \

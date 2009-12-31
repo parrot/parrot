@@ -1,5 +1,5 @@
 # these are private to the IMCC subsystem
-IMCC_O_FILES := \
+IMCC_O_FILES = \
     compilers/imcc/imcparser$(O) \
     compilers/imcc/imclexer$(O) \
     compilers/imcc/imc$(O) \
