@@ -18,19 +18,15 @@ A module author just must write a script C<setup.pir> (or C<setup.nqp> in future
 
 A setup script can be as simple as this:
 
-=begin perl
-
     pir::load_bytecode('distutils.pir');
-    setup( @ARGS,
+    setup( @steps,
         ... many key/values here ...
     );
-
-=end perl
 
 Distutils could work with Plumage (L<https://trac.parrot.org/parrot/wiki/ModuleEcosystem>).
 Plumage handles setup.pir commands.
 
-Distutils could generate a skeleton of Pluamge metadata.
+Distutils could generate a skeleton of Plumage metadata.
 
 =head3 Commands / Steps / Targets
 
@@ -68,15 +64,15 @@ Output a skeleton for Plumage
 
 =item sdist, sdist_gztar, sdist_bztar, sdist_zip, sdist_rpm, manifest
 
-Create a source distribution or a source package
+Create a source distribution or a source RPM package
 
-=item bdist, bdist_rpm, bdist_wininst, spec
+=item bdist, bdist_rpm, bdist_wininst, spec, control, ebuild
 
-Create a binary package or Windows Installer.
+Create a binary RPM package or Windows Installer.
 
 =item help
 
-Print this help message.
+Print a help message.
 
 =back
 
@@ -175,6 +171,8 @@ L<http://github.com/fperrad/lua-batteries/blob/master/setup.pir>
 L<https://trac.parrot.org/languages/browser/bf/trunk/setup.pir>
 
 L<https://trac.parrot.org/languages/browser/chitchat/trunk/setup.pir>
+
+L<https://trac.parrot.org/languages/browser/forth/trunk/setup.pir>
 
 L<https://trac.parrot.org/languages/browser/lolcode/trunk/setup.pir>
 
@@ -314,7 +312,7 @@ L<http://bitbucket.org/riffraff/shakespeare-parrot/src/tip/setup.pir>
   L1:
 .end
 
-=head3 Functions
+=head2 Functions
 
 =over 4
 
@@ -439,6 +437,8 @@ Insert a step
 .end
 
 =back
+
+=head2 Steps
 
 =head3 Step usage
 
@@ -2289,8 +2289,6 @@ Same options as install.
 
 =item packager
 
-=item generated_by
-
 =item description
 
 =item keywords
@@ -2496,43 +2494,16 @@ array of pathname or a single pathname
 
 array of pathname or a single pathname
 
-=item pbc_pir
-
-=item pir_pge
-
-=item pir_tge
-
-=item pir_nqp
-
-=item pir_nqp-rx
-
-=item pbc_pbc
-
-=item exe_pbc
-
-=item installable_pbc
-
-=item dynops
-
-=item dynpmc
-
-=item html_pod
-
-=item inst_bin
-
-=item inst_dynext
-
-=item inst_inc
-
-=item inst_lang
-
-=item inst_lib
-
 =item doc_files
 
-=item harness_files
+array of pathname or a single pathname
 
-=item prove_files
+=item pbc_pir, pir_pge, pir_tge, pir_nqp, pir_nqp-rx, pbc_pbc, exe_pbc,
+installable_pbc, dynops, dynpmc, html_pod
+
+=item inst_bin, inst_dynext, inst_inc, inst_lang, inst_lib
+
+=item harness_files, prove_files
 
 =back
 
@@ -2651,6 +2622,7 @@ array of pathname or a single pathname
 
     $P0.'sort'()
     $S0 = join "\n", $P0
+    $S0 .= "\n"
     .return ($S0)
 .end
 
@@ -2907,7 +2879,7 @@ On Windows calls sdist_zip, otherwise sdist_gztar
 
 =head3 Step bdist
 
-On Windows calls bdist_wininst, otherwise ...
+On Windows calls bdist_wininst, otherwise bdist_rpm
 
 =cut
 
@@ -2929,9 +2901,27 @@ On Windows calls bdist_wininst, otherwise ...
 
 the default value is ports/rpm
 
+=item name
+
+=item version
+
+=item release
+
+=item abstract
+
+=item license_type
+
+=item project_uri
+
+=item description
+
 =item packager
 
 =item doc_files
+
+=item installable_pbc, dynops, dynpmc
+
+=item inst_bin, inst_dynext, inst_inc, inst_lang, inst_lib
 
 =back
 
@@ -3119,7 +3109,25 @@ See L<http://www.debian.org/doc/maint-guide/>.
 
 the default value is ports/debian
 
+=item name
+
+=item packager
+
+=item project_uri
+
+=item abstract
+
+=item description
+
+=item release
+
+=item copyright_holder
+
 =item doc_files
+
+=item installable_pbc, dynops, dynpmc
+
+=item inst_bin, inst_dynext, inst_inc, inst_lang, inst_lib
 
 =back
 
@@ -3567,22 +3575,23 @@ TEMPLATE
 =head3 Step bdist_wininst
 
 Build an installer with Inno Setup.
+See L<http://www.jrsoftware.org/>.
 
 =over 4
-
-=item installable_pbc
-
-=item dynops & dynpmc
-
-=item inst_lang
-
-=item inst_lib
-
-=item doc_files
 
 =item name
 
 =item version
+
+=item copyright_holder
+
+=item project_uri
+
+=item installable_pbc, dynops, dynpmc
+
+=item inst_bin, inst_dynext, inst_inc, inst_lang, inst_lib
+
+=item doc_files
 
 =back
 
@@ -3829,7 +3838,7 @@ TEMPLATE
     unlink($S0, 1 :named('verbose'))
 .end
 
-=head3 Configuration Helpers
+=head2 Configuration Helpers
 
 =over 4
 
@@ -4238,7 +4247,7 @@ SOURCE_C
 
 =back
 
-=head3 OS Utilities
+=head2 OS Utilities
 
 =over 4
 
