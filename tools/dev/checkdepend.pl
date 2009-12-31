@@ -84,6 +84,20 @@ my $rules;
     local undef $/;
     $rules = <$mf>;
 }
+close $mf;
+
+# inline all "include"'d Makefiles;
+while ($rules =~ /^include\s+(.*)$/m) {
+    my $sub_makefile = $1;
+    open my $smf, '<', $sub_makefile;
+    my $subrules;
+    {
+        local undef $/;
+        $subrules = <$smf>;
+    }
+    close $smf;
+    $rules =~ s/^include\s+$sub_makefile$/$subrules/m;
+}
 
 # convert all \-newline continuations into single lines for ease of processing.
 $rules =~ s/\\\n//g;
