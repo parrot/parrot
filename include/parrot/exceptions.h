@@ -154,10 +154,6 @@ PMC * Parrot_ex_build_exception(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-size_t Parrot_ex_calc_handler_offset(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
 void Parrot_ex_mark_unhandled(PARROT_INTERP, ARGIN(PMC *exception))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -234,8 +230,6 @@ void Parrot_print_backtrace(void);
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(jp))
 #define ASSERT_ARGS_Parrot_ex_build_exception __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_ex_calc_handler_offset __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_ex_mark_unhandled __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

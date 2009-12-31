@@ -491,6 +491,8 @@ Parrot_ex_rethrow_from_c(PARROT_INTERP, ARGIN(PMC *exception))
 
 Mark an exception as unhandled, as part of rethrowing it.
 
+=back
+
 =cut
 
 */
@@ -504,40 +506,6 @@ Parrot_ex_mark_unhandled(PARROT_INTERP, ARGIN(PMC *exception))
 }
 
 /*
-
-=item C<size_t Parrot_ex_calc_handler_offset(PARROT_INTERP)>
-
-Retrieve an exception from the concurrency scheduler, prepare a call to the
-handler, and return the offset to the handler so it can become the next op in
-the runloop.
-
-TT #546: This function appears to be unused.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-size_t
-Parrot_ex_calc_handler_offset(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_ex_calc_handler_offset)
-    PMC * const exception = VTABLE_pop_pmc(interp, interp->scheduler);
-
-    /* now fill rest of exception, locate handler and get
-     * destination of handler */
-    opcode_t * const handler_address = Parrot_ex_throw_from_op(interp, exception, NULL);
-
-    if (handler_address == NULL)
-        PANIC(interp, "Unable to calculate opcode address for exception handler");
-
-    /* return the *offset* of the handler */
-    return handler_address - interp->code->base.data;
-}
-
-/*
-
-=back
 
 =head2 Error Functions
 

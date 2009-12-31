@@ -735,8 +735,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_ex_build_exception>
 
-=item C<Parrot_ex_calc_handler_offset>
-
 =item C<Parrot_exit>
 
 =item C<Parrot_ex_mark_unhandled>
