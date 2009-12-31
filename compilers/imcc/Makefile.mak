@@ -52,7 +52,7 @@ compilers/imcc/pbc$(O) : \
     compilers/imcc/unit.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS) \
-    $(PMC_INC_DIR)/pmc/pmc_sub.h
+    include/pmc/pmc_sub.h
 
 compilers/imcc/parser_util$(O) : \
     compilers/imcc/cfg.h \
@@ -70,7 +70,7 @@ compilers/imcc/parser_util$(O) : \
     $(INC_DIR)/embed.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS) \
-    $(PMC_INC_DIR)/pmc/pmc_sub.h
+    include/pmc/pmc_sub.h
 
 compilers/imcc/imc$(O) : \
     compilers/imcc/cfg.h \
