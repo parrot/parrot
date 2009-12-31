@@ -105,6 +105,8 @@ typedef struct _visit_info {
             (pmc) = VTABLE_shift_pmc((interp), (visit)); \
             VTABLE_push_pmc((interp), (visit), (pmc)); \
             break; \
+          default: \
+            do_panic((interp), "Bad VISIT_HOW in VISIT_PMC", __FILE__, __LINE__); \
         } \
     } \
 } while (0)
@@ -134,6 +136,8 @@ typedef struct _visit_info {
             GETATTR_ ## pmclass ## _ ## attr_name((interp), (self), _visit_pmc_attr); \
             VTABLE_push_pmc((interp), (visit), _visit_pmc_attr); \
             break; \
+          default: \
+            do_panic((interp), "Bad VISIT_HOW in VISIT_PMC_ATTR", __FILE__, __LINE__); \
         } \
     } \
 } while (0)
