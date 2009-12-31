@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # class
 
 plan(1);

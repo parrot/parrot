@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # lists and for
 
 plan(3);

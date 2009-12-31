@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # the ternary ?? !! operator
 
 plan(8);

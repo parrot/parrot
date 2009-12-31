@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # check comments
 
 say('1..2');

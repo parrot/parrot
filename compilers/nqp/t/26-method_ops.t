@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # method ops (just method calls for now)
 
 plan(3);

@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # check list access methods
 
 plan(7);

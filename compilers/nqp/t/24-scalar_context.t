@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # scalar context
 
 plan(1);

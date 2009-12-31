@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # check comparisons
 
 say('1..19');

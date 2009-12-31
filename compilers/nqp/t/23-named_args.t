@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # test named parameters and arguments
 
 plan(4);

@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # Testing boolean context operators, ! and ?
 
 plan(8);

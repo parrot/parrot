@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # list context
 
 plan(1);

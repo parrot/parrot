@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # checking basic operands and circumfix:( )
 
 plan(29);

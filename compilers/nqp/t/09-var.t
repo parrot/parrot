@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # check variables
 
 say('1..14');

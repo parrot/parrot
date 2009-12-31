@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # check literals
 
 say('1..8');
