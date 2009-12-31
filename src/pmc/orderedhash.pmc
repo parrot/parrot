@@ -629,7 +629,6 @@ preserve key/value order.
     VTABLE void visit(visit_info *info) {
         switch (VTABLE_get_integer(INTERP, info)) {
           case VISIT_THAW_NORMAL:
-          case VISIT_THAW_CONSTANTS:
             SUPER(info);
             break;
 

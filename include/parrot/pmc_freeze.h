@@ -19,8 +19,9 @@ typedef void (*visit_f)(PARROT_INTERP, ARGIN_NULLOK(PMC*), ARGIN(struct _visit_i
 typedef enum {
     VISIT_FREEZE_NORMAL,
     VISIT_THAW_NORMAL,
-    VISIT_THAW_CONSTANTS,
 } visit_enum_type;
+
+#define VISIT_THAW_CONSTANTS VISIT_THAW_NORMAL
 
 struct _visit_info;
 typedef INTVAL   (*get_integer_f)   (PARROT_INTERP, struct _visit_info*);
@@ -75,7 +76,6 @@ typedef struct _visit_info {
         VTABLE_push_pmc((interp), (visit), (pmc)); \
         break; \
       case VISIT_THAW_NORMAL: \
-      case VISIT_THAW_CONSTANTS: \
         (pmc) = VTABLE_shift_pmc((interp), (visit)); \
         break; \
     } \
@@ -89,7 +89,6 @@ typedef struct _visit_info {
         VTABLE_push_pmc((interp), (visit), _visit_pmc_attr); \
         break; \
       case VISIT_THAW_NORMAL: \
-      case VISIT_THAW_CONSTANTS: \
         _visit_pmc_attr = VTABLE_shift_pmc((interp), (visit)); \
         SETATTR_ ## pmclass ## _ ## attr_name((interp), (self), _visit_pmc_attr); \
         break; \

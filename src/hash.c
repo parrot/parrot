@@ -681,7 +681,6 @@ parrot_hash_visit(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(void *pinfo))
 
     switch (VTABLE_get_integer(interp, info)) {
       case VISIT_THAW_NORMAL:
-      case VISIT_THAW_CONSTANTS:
         hash_thaw(interp, hash, info);
         break;
       case VISIT_FREEZE_NORMAL:
