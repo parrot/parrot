@@ -257,7 +257,7 @@ date - thanks.
 
 =head1 AUTHOR
 
-Leopold Tötsch C<lt@toetsch.at>
+Leopold TÃ¶tsch C<lt@toetsch.at>
 
 =head1 VERSION
 

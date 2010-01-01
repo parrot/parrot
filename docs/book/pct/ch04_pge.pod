@@ -1350,7 +1350,7 @@ understands:
 
  proto infix:<+>                  # a + b
  proto postfix:'--'               # i--
- proto circumfix:«<>»             # <x>
+ proto circumfix:Â«<>Â»             # <x>
 
 The C<is> X<Parser, is> keyword defines a property of the rule. Examples
 include:
