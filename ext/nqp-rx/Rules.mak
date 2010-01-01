@@ -1,14 +1,5 @@
 ## XXX does not cover .includes of core .pasm files
 
-NQPRX_LIB_PBCS = \
-    $(LIBRARY_DIR)/Regex.pbc \
-    $(LIBRARY_DIR)/HLL.pbc \
-    $(LIBRARY_DIR)/P6Regex.pbc \
-    $(LIBRARY_DIR)/nqp-rx.pbc \
-    $(LIBRARY_DIR)/P6object.pbc \
-    $(LIBRARY_DIR)/PCT/HLLCompiler.pbc \
-    $(LIBRARY_DIR)/PCT/PAST.pbc
-
 $(LIBRARY_DIR)/Regex.pbc: ext/nqp-rx/src/stage0/Regex-s0.pir $(PARROT)
 	$(PARROT) -o $@ ext/nqp-rx/src/stage0/Regex-s0.pir
 

@@ -1,5 +1,3 @@
-DATA_JSON_LIB_PBCS = compilers/data_json/data_json.pbc
-
 compilers/data_json/data_json.pbc : $(PARROT) \
     compilers/data_json/data_json/grammar.pbc \
     compilers/data_json/data_json/pge2pir.pbc \

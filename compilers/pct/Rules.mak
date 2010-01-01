@@ -1,12 +1,5 @@
 ## XXX does not cover .includes of core .pasm files
 
-PCT_LIB_PBCS = \
-    $(LIBRARY_DIR)/PCT.pbc \
-    $(LIBRARY_DIR)/PCT/PAST.pbc \
-    $(LIBRARY_DIR)/PCT/Grammar.pbc \
-    $(LIBRARY_DIR)/PCT/HLLCompiler.pbc \
-    $(LIBRARY_DIR)/PCT/Dumper.pbc 
-
 $(LIBRARY_DIR)/PCT.pbc : $(PARROT) compilers/pct/PCT.pir \
     $(LIBRARY_DIR)/PCT/Grammar.pbc $(LIBRARY_DIR)/PCT/PAST.pbc
 	$(PARROT) -o $@ compilers/pct/PCT.pir

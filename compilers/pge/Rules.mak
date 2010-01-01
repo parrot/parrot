@@ -1,10 +1,3 @@
-# the default target
-
-PGE_LIB_PBCS = $(LIBRARY_DIR)/PGE.pbc
-
-## Two-stage build that reuses builtins_gen.pir ; use the Perl6Grammar.pir
-## of stage one to avoid a circular dependency.
-
 $(LIBRARY_DIR)/PGE.pbc: $(PARROT) \
     compilers/pge/PGE.pir \
     compilers/pge/PGE/Exp.pir \
@@ -19,3 +12,4 @@ $(LIBRARY_DIR)/PGE.pbc: $(PARROT) \
 	$(PARROT) -o $@ compilers/pge/PGE.pir
 	$(PARROT) $(LIBRARY_DIR)/PGE/Perl6Grammar.pir --output=compilers/pge/PGE/builtins_gen.pir compilers/pge/PGE/builtins.pg
 	$(PARROT) -o $@ compilers/pge/PGE.pir
+

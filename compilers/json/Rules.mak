@@ -1,5 +1,3 @@
-JSON_LIB_PBCS: compilers/json/JSON.pbc
-
 compilers/json/JSON.pbc : \
     $(LIBRARY_DIR)/PGE.pbc \
     $(LIBRARY_DIR)/PGE/Util.pbc \
