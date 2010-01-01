@@ -631,8 +631,6 @@ visit_todo_list_thaw(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc_not_used), ARGIN(visit
             /* BEGIN create appropriate pmc */
             if (info->what == VISIT_THAW_NORMAL)
                 pmc = pmc_new_noinit(interp, type);
-            else if (info->what == VISIT_THAW_CONSTANTS)
-                pmc = constant_pmc_new_noinit(interp, type);
             else
                 Parrot_ex_throw_from_c_args(interp, NULL, 1, "Illegal info->what type");
             /* END create appropriate pmc */
@@ -731,8 +729,7 @@ visit_loop_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC *current),
     ASSERT_ARGS(visit_loop_todo_list)
     PMC        **list_item;
     List * const todo           = (List *)PMC_data(info->todo);
-    const int    thawing        = info->what == VISIT_THAW_CONSTANTS
-                               || info->what == VISIT_THAW_NORMAL;
+    const int    thawing        = info->what == VISIT_THAW_NORMAL;
 
     /* can't cache upper limit, visit may append items */
     do {
@@ -745,11 +742,6 @@ visit_loop_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC *current),
                         "NULL current PMC in visit_loop_todo_list");
 
             PARROT_ASSERT(current->vtable);
-
-            /* Workaround for thawing constants. Clear constant flag */
-            /* See src/packfile.c:3999 */
-            if (thawing)
-                PObj_constant_CLEAR(current);
 
             VTABLE_visit(interp, current, info);
         }
@@ -918,6 +910,7 @@ Parrot_thaw(PARROT_INTERP, ARGIN(STRING *image))
 =item C<PMC* Parrot_thaw_constants(PARROT_INTERP, STRING *image)>
 
 Thaws constants, used by PackFile for unpacking PMC constants.
+This is a lie. It does nothing different from Parrot_thaw at the moment.
 
 =cut
 
@@ -930,7 +923,7 @@ PMC*
 Parrot_thaw_constants(PARROT_INTERP, ARGIN(STRING *image))
 {
     ASSERT_ARGS(Parrot_thaw_constants)
-    return run_thaw(interp, image, VISIT_THAW_CONSTANTS);
+    return Parrot_thaw(interp, image);
 }
 
 
