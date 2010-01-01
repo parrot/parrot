@@ -79,14 +79,6 @@ static void push_opcode_string(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PMC* run_thaw(PARROT_INTERP,
-    ARGIN(STRING* input),
-    visit_enum_type what)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static INTVAL shift_opcode_integer(SHIM_INTERP, ARGIN(visit_info *io))
         __attribute__nonnull__(2);
 
@@ -122,8 +114,9 @@ static void visit_todo_list_freeze(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+PARROT_INLINE
 static void visit_todo_list_thaw(PARROT_INTERP,
-    ARGIN_NULLOK(PMC* pmc),
+    ARGIN_NULLOK(PMC* pmc_not_used),
     ARGIN(visit_info* info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -151,9 +144,6 @@ static void visit_todo_list_thaw(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(io) \
     , PARROT_ASSERT_ARG(v))
-#define ASSERT_ARGS_run_thaw __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(input))
 #define ASSERT_ARGS_shift_opcode_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(io))
 #define ASSERT_ARGS_shift_opcode_number __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -799,63 +789,6 @@ create_buffer(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGMOD(visit_info *info))
 
 /*
 
-=item C<static PMC* run_thaw(PARROT_INTERP, STRING* input, visit_enum_type
-what)>
-
-Performs thawing. C<what> indicates what to be thawed.
-
-For now it seems cheaper to use a list for remembering contained
-aggregates. We could of course decide dynamically, which strategy to
-use, e.g.: given a big image, the first thawed item is a small
-aggregate. This implies, it probably contains (or some big strings) more
-nested containers, for which another approach could be a win.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PMC*
-run_thaw(PARROT_INTERP, ARGIN(STRING* input), visit_enum_type what)
-{
-    ASSERT_ARGS(run_thaw)
-    visit_info  info;
-    int         gc_block = 0;
-    PMC        *result;
-
-    /*
-     * if we are thawing a lot of PMCs, it's cheaper to do
-     * a GC run first and then block GC - the limit should be
-     * chosen so that no more then one GC run would be triggered
-     *
-     * XXX
-     *
-     * md5_3.pir shows a segfault during thawing the config hash
-     * info->thaw_ptr becomes invalid - seems that the hash got
-     * collected under us.
-     */
-    if (1 || (Parrot_str_byte_length(interp, input) > THAW_BLOCK_GC_SIZE)) {
-        Parrot_block_GC_mark(interp);
-        Parrot_block_GC_sweep(interp);
-        gc_block = 1;
-    }
-
-    info.thaw_ptr = &result;
-    visit_info_init(interp, &info, what, input, PMCNULL);
-    BYTECODE_SHIFT_OK(&info);
-
-    if (gc_block) {
-        Parrot_unblock_GC_mark(interp);
-        Parrot_unblock_GC_sweep(interp);
-    }
-
-    return result;
-}
-
-
-/*
-
 =back
 
 =head2 Public Interface
@@ -890,6 +823,12 @@ Parrot_freeze(PARROT_INTERP, ARGIN(PMC *pmc))
 
 Thaws a PMC.  Called from the C<thaw> opcode.
 
+For now it seems cheaper to use a list for remembering contained
+aggregates. We could of course decide dynamically, which strategy to
+use, e.g.: given a big image, the first thawed item is a small
+aggregate. This implies, it probably contains (or some big strings) more
+nested containers, for which another approach could be a win.
+
 =cut
 
 */
@@ -901,7 +840,38 @@ PMC*
 Parrot_thaw(PARROT_INTERP, ARGIN(STRING *image))
 {
     ASSERT_ARGS(Parrot_thaw)
-    return run_thaw(interp, image, VISIT_THAW_NORMAL);
+
+    visit_info  info;
+    int         gc_block = 0;
+    PMC        *result;
+
+    /*
+     * if we are thawing a lot of PMCs, it's cheaper to do
+     * a GC run first and then block GC - the limit should be
+     * chosen so that no more then one GC run would be triggered
+     *
+     * XXX
+     *
+     * md5_3.pir shows a segfault during thawing the config hash
+     * info->thaw_ptr becomes invalid - seems that the hash got
+     * collected under us.
+     */
+    if (1 || (Parrot_str_byte_length(interp, image) > THAW_BLOCK_GC_SIZE)) {
+        Parrot_block_GC_mark(interp);
+        Parrot_block_GC_sweep(interp);
+        gc_block = 1;
+    }
+
+    info.thaw_ptr = &result;
+    visit_info_init(interp, &info, VISIT_THAW_NORMAL, image, PMCNULL);
+    BYTECODE_SHIFT_OK(&info);
+
+    if (gc_block) {
+        Parrot_unblock_GC_mark(interp);
+        Parrot_unblock_GC_sweep(interp);
+    }
+
+    return result;
 }
 
 
