@@ -116,7 +116,7 @@ static void visit_todo_list_freeze(PARROT_INTERP,
 
 PARROT_INLINE
 static void visit_todo_list_thaw(PARROT_INTERP,
-    ARGIN_NULLOK(PMC* pmc_not_used),
+    SHIM(PMC* pmc_not_used),
     ARGIN(visit_info* info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -585,7 +585,7 @@ thaws and return a PMC.
 
 PARROT_INLINE
 static void
-visit_todo_list_thaw(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc_not_used), ARGIN(visit_info* info))
+visit_todo_list_thaw(PARROT_INTERP, SHIM(PMC* pmc_not_used), ARGIN(visit_info* info))
 {
     ASSERT_ARGS(visit_todo_list_thaw)
 
