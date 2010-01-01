@@ -1057,17 +1057,19 @@ Used by GC to mark the PMC.
     VTABLE void visit(visit_info *info) {
         /* default - mark prop hash */
         if (PMC_metadata(SELF) &&
-            info->extra_flags != EXTRA_IS_PROP_HASH) {
-            const INTVAL old_extra_flags = info->extra_flags;
-            info->extra_flags = EXTRA_IS_PROP_HASH;
-
+             info->extra_flags != EXTRA_IS_PROP_HASH) {
             /* place escape mark */
-            (info->visit_pmc_now)(INTERP, SELF, info);
+            {
+                const INTVAL old_extra_flags = info->extra_flags;
+                info->extra_flags = EXTRA_IS_PROP_HASH;
+
+                (info->visit_pmc_now)(INTERP, SELF, info);
+
+                info->extra_flags = old_extra_flags;
+            }
 
             /* place and the prop hash */
-            (info->visit_pmc_now)(INTERP, PMC_metadata(SELF), info);
-
-            info->extra_flags = old_extra_flags;
+            VISIT_PMC(INTERP, info, PMC_metadata(SELF));
         }
     }
 

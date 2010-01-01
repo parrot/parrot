@@ -592,23 +592,23 @@ visit_todo_list_thaw(PARROT_INTERP, SHIM(PMC* pmc_not_used), ARGIN(visit_info* i
     UINTVAL  n            = VTABLE_shift_integer(interp, info);
     UINTVAL  id           = PackID_get_PMCID(n);
     int      packid_flags = PackID_get_FLAGS(n);
-    PMC     *pmc;
-    info->extra_flags     = EXTRA_IS_NULL;
+    PMC     *pmc          = PMCNULL;
+    int      is_prophash  = 0;
+
+    PARROT_ASSERT(info->what == VISIT_THAW_NORMAL);
 
     switch (packid_flags) {
       case enum_PackID_extra_info: /* pmc has extra data */
-        info->extra_flags = VTABLE_shift_integer(interp, info);
+        is_prophash = 1;
         /* FALL THROUGH */
       case enum_PackID_seen:
         {
-            if (!id) /* got a NULL PMC */
-                pmc = PMCNULL;
-            else if ((pmc = id_list_get(interp, info, id))) {
-                if (info->extra_flags == EXTRA_IS_PROP_HASH) {
-                    info->thaw_ptr = &PMC_metadata(pmc);
-                    (info->visit_pmc_now)(interp, PMC_metadata(pmc), info);
-                    return;
-                }
+            if (id) /* got a non-NULL PMC */
+                pmc = id_list_get(interp, info, id);
+
+            if (is_prophash) {
+                VISIT_PMC(interp, info, PMC_metadata(pmc));
+                return;
             }
         }
         break;
@@ -618,13 +618,7 @@ visit_todo_list_thaw(PARROT_INTERP, SHIM(PMC* pmc_not_used), ARGIN(visit_info* i
             if (type <= 0 || type > interp->n_vtable_max)
                 Parrot_ex_throw_from_c_args(interp, NULL, 1, "Unknown PMC type to thaw %d", type);
 
-            /* BEGIN create appropriate pmc */
-            if (info->what == VISIT_THAW_NORMAL)
-                pmc = pmc_new_noinit(interp, type);
-            else
-                Parrot_ex_throw_from_c_args(interp, NULL, 1, "Illegal info->what type");
-            /* END create appropriate pmc */
-
+            pmc = pmc_new_noinit(interp, type);
             VTABLE_thaw(interp, pmc, info);
 
             {
@@ -663,6 +657,8 @@ visit_todo_list_freeze(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc), ARGIN(visit_info* 
     UINTVAL id;
     int packid_type;
 
+    PARROT_ASSERT(info->what == VISIT_FREEZE_NORMAL);
+
     if (PMC_IS_NULL(pmc)) {
         id   = 0;
         packid_type = enum_PackID_seen;
@@ -686,10 +682,7 @@ visit_todo_list_freeze(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc), ARGIN(visit_info* 
 
     VTABLE_push_integer(interp, info, PackID_new(id, packid_type));
 
-    if (packid_type == enum_PackID_extra_info) {
-        VTABLE_push_integer(interp, info, info->extra_flags);
-    }
-    else if (packid_type == enum_PackID_normal) {
+    if (packid_type == enum_PackID_normal) {
         Hash *hash = (Hash *)VTABLE_get_pointer(interp, info->seen);
         PARROT_ASSERT(pmc);
         VTABLE_push_integer(interp, info,
