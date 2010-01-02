@@ -177,7 +177,6 @@ GEN_CONFIGS := \
     CFLAGS \
     compilers/imcc/CFLAGS \
     config_lib.pasm \
-    $(BUILD_TOOLS_DIR)/dynoplibs.pl \
     parrot.pc \
     compilers/imcc/imcc.y.flag \
     src/ops/core_ops.c \
@@ -601,7 +600,7 @@ corevm : \
     $(LIBNCI_TEST_SO) \
     $(GEN_LIBRARY) \
     dynpmc \
-    dynoplibs \
+    dynoplibs
 
 $(GEN_LIBRARY) : $(PARROT)
 
