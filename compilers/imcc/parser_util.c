@@ -628,7 +628,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
     struct parser_state_t *next;
     void                  *yyscanner;
     PMC                   *ignored;
-    INTVAL regs_used[4] = {3, 3, 3, 3};
+    UINTVAL regs_used[4] = {3, 3, 3, 3};
     INTVAL eval_number;
 
     do_yylex_init(interp, &yyscanner);
@@ -912,7 +912,7 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
 
     /* need at least 3 regs for compilation of constant math e.g.
      * add_i_ic_ic - see also IMCC_subst_constants() */
-    INTVAL regs_used[4] = {3, 3, 3, 3};
+    UINTVAL regs_used[4] = {3, 3, 3, 3};
 
     if (IMCC_INFO(interp)->last_unit) {
         /* a reentrant compile */

@@ -36,33 +36,32 @@ print_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC *sub))
 }
 
 pmclass Sub auto_attrs {
-    ATTR PackFile_ByteCode *seg;     /* bytecode segment */
-    ATTR size_t   start_offs;        /* sub entry in ops from seg->base.data */
-    ATTR size_t   end_offs;
+    ATTR PackFile_ByteCode *seg;        /* bytecode segment */
+    ATTR size_t             start_offs; /* sub entry in ops from seg->base.data */
+    ATTR size_t             end_offs;
 
-    ATTR INTVAL   HLL_id;             /* see src/hll.c XXX or per segment? */
-    ATTR PMC      *namespace_name;    /* where this Sub is in - this is either
-                                  * a String or a [Key] and describes
-                                  * the relative path in the NameSpace
-                                  */
-    ATTR PMC      *namespace_stash;   /* the actual hash, HLL::namespace */
-    ATTR STRING   *name;              /* name of the sub */
-    ATTR STRING   *method_name;       /* method name of the sub */
-    ATTR STRING   *ns_entry_name;     /* ns entry name of the sub */
-    ATTR STRING   *subid;             /* The ID of the sub. */
-    ATTR INTVAL   vtable_index;       /* index in Parrot_vtable_slot_names */
-    ATTR PMC      *multi_signature;   /* list of types for MMD */
-    ATTR INTVAL   n_regs_used[4];     /* INSP in PBC */
+    ATTR INTVAL             HLL_id;         /* see src/hll.c XXX or per segment? */
+    ATTR PMC               *namespace_name; /* where this Sub is in - this is either
+                                             * a String or a [Key] and describes
+                                             * the relative path in the NameSpace
+                                             */
+    ATTR PMC               *namespace_stash; /* the actual hash, HLL::namespace */
+    ATTR STRING            *name;            /* name of the sub */
+    ATTR STRING            *method_name;     /* method name of the sub */
+    ATTR STRING            *ns_entry_name;   /* ns entry name of the sub */
+    ATTR STRING            *subid;           /* The ID of the sub. */
+    ATTR INTVAL             vtable_index;    /* index in Parrot_vtable_slot_names */
+    ATTR PMC               *multi_signature; /* list of types for MMD */
+    ATTR UINTVAL            n_regs_used[4];  /* INSP in PBC */
 
-    ATTR PMC      *lex_info;          /* LexInfo PMC */
-    ATTR PMC      *outer_sub;         /* :outer for closures */
-    ATTR PMC      *eval_pmc;          /* eval container / NULL */
-    ATTR PMC      *ctx;               /* the context this sub is in */
-    ATTR UINTVAL  comp_flags;         /* compile time and additional flags */
-    ATTR Parrot_sub_arginfo *arg_info;/* Argument counts and flags. */
+    ATTR PMC               *lex_info;        /* LexInfo PMC */
+    ATTR PMC               *outer_sub;       /* :outer for closures */
+    ATTR PMC               *eval_pmc;        /* eval container / NULL */
+    ATTR PMC               *ctx;             /* the context this sub is in */
+    ATTR UINTVAL            comp_flags;      /* compile time and additional flags */
+    ATTR Parrot_sub_arginfo *arg_info;       /* Argument counts and flags. */
 
-    /* - end common */
-    ATTR PMC      *outer_ctx;         /* outer context, if a closure */
+    ATTR PMC               *outer_ctx;       /* outer context, if a closure */
 
 /*
 

@@ -70,7 +70,7 @@ an available context is stored corresponds to the size of the context.
 
 static void allocate_registers(PARROT_INTERP,
     ARGIN(PMC *pmcctx),
-    ARGIN(const INTVAL *number_regs_used))
+    ARGIN(const UINTVAL *number_regs_used))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -201,7 +201,7 @@ void
 create_initial_context(PARROT_INTERP)
 {
     ASSERT_ARGS(create_initial_context)
-    static INTVAL   num_regs[] = {32, 32, 32, 32};
+    static UINTVAL   num_regs[] = {32, 32, 32, 32};
     PMC *ignored;
 
     /* Create some initial free_list slots. */
@@ -358,7 +358,7 @@ init_context(PARROT_INTERP, ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
 
 /*
 
-=item C<PMC * Parrot_push_context(PARROT_INTERP, const INTVAL *n_regs_used)>
+=item C<PMC * Parrot_push_context(PARROT_INTERP, const UINTVAL *n_regs_used)>
 
 Creates and sets the current context to a new context, remembering the old
 context in C<caller_ctx>.  Suitable to use with C<Parrot_pop_context>.
@@ -371,7 +371,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_push_context(PARROT_INTERP, ARGIN(const INTVAL *n_regs_used))
+Parrot_push_context(PARROT_INTERP, ARGIN(const UINTVAL *n_regs_used))
 {
     ASSERT_ARGS(Parrot_push_context)
     PMC * const old = CURRENT_CONTEXT(interp);
@@ -451,7 +451,7 @@ Parrot_pcc_calculate_registers_size(PARROT_INTERP, ARGIN(const UINTVAL *number_r
 
 /*
 
-=item C<static void allocate_registers(PARROT_INTERP, PMC *pmcctx, const INTVAL
+=item C<static void allocate_registers(PARROT_INTERP, PMC *pmcctx, const UINTVAL
 *number_regs_used)>
 
 Allocate registers inside Context.
@@ -460,7 +460,7 @@ Allocate registers inside Context.
 
 */
 static void
-allocate_registers(PARROT_INTERP, ARGIN(PMC *pmcctx), ARGIN(const INTVAL *number_regs_used))
+allocate_registers(PARROT_INTERP, ARGIN(PMC *pmcctx), ARGIN(const UINTVAL *number_regs_used))
 {
     ASSERT_ARGS(allocate_registers)
     Parrot_CallContext_attributes *ctx = PARROT_CALLCONTEXT(pmcctx);
@@ -497,7 +497,7 @@ allocate_registers(PARROT_INTERP, ARGIN(PMC *pmcctx), ARGIN(const INTVAL *number
 /*
 
 =item C<void Parrot_pcc_allocate_registers(PARROT_INTERP, PMC *pmcctx, const
-INTVAL *number_regs_used)>
+UINTVAL *number_regs_used)>
 
 Allocate registers in Context.
 
@@ -507,7 +507,7 @@ Allocate registers in Context.
 
 void
 Parrot_pcc_allocate_registers(PARROT_INTERP, ARGIN(PMC *pmcctx),
-        ARGIN(const INTVAL *number_regs_used))
+        ARGIN(const UINTVAL *number_regs_used))
 {
     ASSERT_ARGS(Parrot_pcc_allocate_registers)
     allocate_registers(interp, pmcctx, number_regs_used);
@@ -546,7 +546,7 @@ Parrot_pcc_free_registers(PARROT_INTERP, ARGIN(PMC *pmcctx))
 
 /*
 
-=item C<PMC * Parrot_alloc_context(PARROT_INTERP, const INTVAL
+=item C<PMC * Parrot_alloc_context(PARROT_INTERP, const UINTVAL
 *number_regs_used, PMC *old)>
 
 Allocates and returns a new context.  Does not set this new context as the
@@ -563,7 +563,7 @@ TODO: Remove this function!
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
-Parrot_alloc_context(PARROT_INTERP, ARGIN(const INTVAL *number_regs_used),
+Parrot_alloc_context(PARROT_INTERP, ARGIN(const UINTVAL *number_regs_used),
     ARGIN_NULLOK(PMC *old))
 {
     ASSERT_ARGS(Parrot_alloc_context)
@@ -623,7 +623,7 @@ Parrot_pcc_init_context(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *old))
 
 /*
 
-=item C<PMC * Parrot_set_new_context(PARROT_INTERP, const INTVAL
+=item C<PMC * Parrot_set_new_context(PARROT_INTERP, const UINTVAL
 *number_regs_used)>
 
 Allocates and returns a new context as the current context.  Note that the
@@ -636,7 +636,7 @@ register usage C<n_regs_used> is copied.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
-Parrot_set_new_context(PARROT_INTERP, ARGIN(const INTVAL *number_regs_used))
+Parrot_set_new_context(PARROT_INTERP, ARGIN(const UINTVAL *number_regs_used))
 {
     ASSERT_ARGS(Parrot_set_new_context)
     PMC *old = CURRENT_CONTEXT(interp);

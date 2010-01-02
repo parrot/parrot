@@ -429,7 +429,7 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
     void (*init_func)(PARROT_INTERP, PMC *);
     PMC *lib_pmc;
 
-    INTVAL regs_used[] = { 2, 2, 2, 2 }; /* Arbitrary values */
+    UINTVAL regs_used[]     = { 2, 2, 2, 2 }; /* Arbitrary values */
     const int parrot_hll_id = 0;
     PMC * context = Parrot_push_context(interp, regs_used);
     Parrot_pcc_set_HLL(interp, context, parrot_hll_id);

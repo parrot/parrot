@@ -449,7 +449,7 @@ void Parrot_pop_context(PARROT_INTERP)
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_push_context(PARROT_INTERP, ARGIN(const INTVAL *n_regs_used))
+PMC * Parrot_push_context(PARROT_INTERP, ARGIN(const UINTVAL *n_regs_used))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -459,7 +459,7 @@ void create_initial_context(PARROT_INTERP)
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_alloc_context(PARROT_INTERP,
-    ARGIN(const INTVAL *number_regs_used),
+    ARGIN(const UINTVAL *number_regs_used),
     ARGIN_NULLOK(PMC *old))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -472,7 +472,7 @@ PMC * Parrot_pcc_allocate_empty_context(PARROT_INTERP,
 
 void Parrot_pcc_allocate_registers(PARROT_INTERP,
     ARGIN(PMC *pmcctx),
-    ARGIN(const INTVAL *number_regs_used))
+    ARGIN(const UINTVAL *number_regs_used))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -491,7 +491,7 @@ PMC * Parrot_pcc_init_context(PARROT_INTERP,
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_set_new_context(PARROT_INTERP,
-    ARGIN(const INTVAL *number_regs_used))
+    ARGIN(const UINTVAL *number_regs_used))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

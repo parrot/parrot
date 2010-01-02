@@ -272,7 +272,7 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
     ASSERT_ARGS(Parrot_pcc_invoke_from_sig_object)
 
     opcode_t    *dest;
-    INTVAL       n_regs_used[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    UINTVAL      n_regs_used[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
     PMC         *ctx  = Parrot_push_context(interp, n_regs_used);
     PMC * const  ret_cont = new_ret_continuation_pmc(interp, NULL);
 
