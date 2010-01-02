@@ -188,7 +188,6 @@ static void visit_todo_list_thaw(PARROT_INTERP,
 enum {
     enum_PackID_normal     = 0,
     enum_PackID_seen       = 1,
-    enum_PackID_extra_info = 3
 };
 
 /*
@@ -593,14 +592,10 @@ visit_todo_list_thaw(PARROT_INTERP, SHIM(PMC* pmc_not_used), ARGIN(visit_info* i
     UINTVAL  id           = PackID_get_PMCID(n);
     int      packid_flags = PackID_get_FLAGS(n);
     PMC     *pmc          = PMCNULL;
-    int      is_prophash  = 0;
 
     PARROT_ASSERT(info->what == VISIT_THAW_NORMAL);
 
     switch (packid_flags) {
-      case enum_PackID_extra_info: /* pmc has extra data */
-        is_prophash = 1;
-        /* FALL THROUGH */
       case enum_PackID_seen:
         if (id) /* got a non-NULL PMC */
             pmc = id_list_get(interp, info, id);
@@ -661,10 +656,7 @@ visit_todo_list_freeze(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc), ARGIN(visit_info* 
         HashBucket * const b = parrot_hash_get_bucket(interp, hash, pmc);
         if (b) {
             id = (UINTVAL) b->value;
-            if (info->extra_flags)
-                packid_type = enum_PackID_extra_info;
-            else
-                packid_type = enum_PackID_seen;
+            packid_type = enum_PackID_seen;
         }
         else {
             info->id++; /* next id to freeze */
