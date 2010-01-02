@@ -27,6 +27,7 @@
 
 # please insert tab separated entries at the top of the list
 
+5.5	2010.01.01	plobsing	change prophash handling
 5.4	2009.12.02	bacek	remove CallSignatureReturns
 5.3	2009.10.23	bacek	add CallSignatureReturns
 5.2	2009.09.16	darbelo	remove pic.ops

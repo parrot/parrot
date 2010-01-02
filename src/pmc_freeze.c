@@ -602,15 +602,8 @@ visit_todo_list_thaw(PARROT_INTERP, SHIM(PMC* pmc_not_used), ARGIN(visit_info* i
         is_prophash = 1;
         /* FALL THROUGH */
       case enum_PackID_seen:
-        {
-            if (id) /* got a non-NULL PMC */
-                pmc = id_list_get(interp, info, id);
-
-            if (is_prophash) {
-                VISIT_PMC(interp, info, PMC_metadata(pmc));
-                return;
-            }
-        }
+        if (id) /* got a non-NULL PMC */
+            pmc = id_list_get(interp, info, id);
         break;
       case enum_PackID_normal:
         {
@@ -727,6 +720,8 @@ visit_loop_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC *current),
             PARROT_ASSERT(current->vtable);
 
             VTABLE_visit(interp, current, info);
+
+            VISIT_PMC(interp, info, PMC_metadata(current));
         }
         current = NULL;
     }
