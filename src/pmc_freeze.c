@@ -699,25 +699,25 @@ visit_loop_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC *current),
     List * const todo           = (List *)PMC_data(info->todo);
     const int    thawing        = info->what == VISIT_THAW_NORMAL;
 
+    (info->visit_pmc_now)(interp, current, info);
+
     /* can't cache upper limit, visit may append items */
-    do {
-        (info->visit_pmc_now)(interp, current, info);
+    while ((list_item = (PMC **)Parrot_pmc_array_shift(interp, todo, enum_type_PMC))) {
+        current = *list_item;
+        if (!current)
+            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                    "NULL current PMC in visit_loop_todo_list");
 
-        while ((list_item = (PMC **)Parrot_pmc_array_shift(interp, todo, enum_type_PMC))) {
-            current = *list_item;
-            if (!current)
-                Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                        "NULL current PMC in visit_loop_todo_list");
+        PARROT_ASSERT(current->vtable);
 
-            PARROT_ASSERT(current->vtable);
+        VTABLE_visit(interp, current, info);
 
-            VTABLE_visit(interp, current, info);
-
-            VISIT_PMC(interp, info, PMC_metadata(current));
-        }
-        current = NULL;
+        VISIT_PMC(interp, info, PMC_metadata(current));
     }
-    while (thawing && INFO_HAS_DATA(info));
+
+    if (thawing)
+        /* we're done reading the image */
+        PARROT_ASSERT(!INFO_HAS_DATA(info));
 
     if (thawing) {
         /* on thawing call thawfinish for each processed PMC */
