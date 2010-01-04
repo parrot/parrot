@@ -653,10 +653,12 @@ Parrot_str_new(PARROT_INTERP, ARGIN_NULLOK(const char * const buffer), const UIN
 
 /*
 
-=item C<STRING * Parrot_str_new_from_buffer(PARROT_INTERP, const Buffer *buffer,
-const UINTVAL len)>
+=item C<STRING * Parrot_str_new_from_buffer(PARROT_INTERP, Buffer *buffer, const
+UINTVAL len)>
 
-Make a Parrot string from a Buffer
+Make a Parrot string from a Buffer.
+
+The Buffer is nulled afterwards - only one PObj can point at a given string pool object.
 
 =cut
 
@@ -667,7 +669,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_str_new_from_buffer(PARROT_INTERP, ARGIN(const Buffer *buffer), const UINTVAL len)
+Parrot_str_new_from_buffer(PARROT_INTERP, ARGMOD(Buffer *buffer), const UINTVAL len)
 {
     ASSERT_ARGS(Parrot_str_new_from_buffer)
     STRING *result;
@@ -680,6 +682,9 @@ Parrot_str_new_from_buffer(PARROT_INTERP, ARGIN(const Buffer *buffer), const UIN
     result->strlen          = len;
     result->encoding        = Parrot_fixed_8_encoding_ptr;
     result->charset         = Parrot_binary_charset_ptr;
+
+    Buffer_bufstart(buffer) = NULL;
+    Buffer_buflen(buffer)   = 0;
 
     return result;
 }
