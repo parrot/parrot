@@ -102,7 +102,7 @@ TODO: Implement real tests when CallContext PMC will be migrated to use ATTRibut
     $P0 = getattribute ctx, 'handlers'
     $I0 = elements $P0
 
-    push_eh cought
+    push_eh caught
     # Now we should have one more handler
     $P0 = getattribute ctx, 'handlers'
     $I1 = elements $P0
@@ -113,7 +113,7 @@ TODO: Implement real tests when CallContext PMC will be migrated to use ATTRibut
     $I0 = 1
     $P0 = getattribute ctx, 'world_domination'
     $I0 = 0
-  cought:
+  caught:
     pop_eh
     ok($I0, "No world domination in this CallContext")
 
