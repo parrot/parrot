@@ -182,6 +182,7 @@ GEN_CONFIGS := \
     config_lib.pasm \
     parrot.pc \
     compilers/imcc/imcc.y.flag \
+    compilers/imcc/imcc.l.flag \
     src/ops/core_ops.c \
     src/ops/core_ops_switch.c
 
