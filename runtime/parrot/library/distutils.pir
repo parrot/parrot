@@ -2622,6 +2622,7 @@ installable_pbc, dynops, dynpmc, html_pod
 
     $P0.'sort'()
     $S0 = join "\n", $P0
+    $S0 .= "\n"
     .return ($S0)
 .end
 
@@ -2725,6 +2726,7 @@ On Windows calls sdist_zip, otherwise sdist_gztar
 
     $S0 = slurp('MANIFEST')
     $P0 = split "\n", $S0
+    $S0 = pop $P0
     $S0 = get_tarname('.tar.gz', kv :flat :named)
     $I0 = newer($S0, $P0)
     if $I0 goto L1
@@ -2792,6 +2794,7 @@ On Windows calls sdist_zip, otherwise sdist_gztar
 
     $S0 = slurp('MANIFEST')
     $P0 = split "\n", $S0
+    $S0 = pop $P0
     $S0 = get_tarname('.tar.bz2', kv :flat :named)
     $I0 = newer($S0, $P0)
     if $I0 goto L1
@@ -2830,6 +2833,7 @@ On Windows calls sdist_zip, otherwise sdist_gztar
 
     $S0 = slurp('MANIFEST')
     $P0 = split "\n", $S0
+    $S0 = pop $P0
     $S0 = get_tarname('.zip', kv :flat :named)
     $I0 = newer($S0, $P0)
     if $I0 goto L1
