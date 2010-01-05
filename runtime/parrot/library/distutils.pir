@@ -2622,7 +2622,6 @@ installable_pbc, dynops, dynpmc, html_pod
 
     $P0.'sort'()
     $S0 = join "\n", $P0
-    $S0 .= "\n"
     .return ($S0)
 .end
 
@@ -2864,16 +2863,25 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     .param pmc kv :slurpy :named
     run_step('sdist_gztar', kv :flat :named)
 
-    .local string cmd
-    $S0 = get_tarname('.tar.gz', kv :flat :named)
-    cmd = "mv " . $S0
-    cmd .= " ~/rpmbuild/SOURCES/"
-    system(cmd, 1 :named('verbose'))
+    .local string rpm_base
+    rpm_base = get_value('rpm_base', 'rpm' :named('default'), kv :flat :named)
+
+    $S1 = get_tarname('.tar.gz', kv :flat :named)
+    $S2 = rpm_base . "/SOURCES/"
+    $S2 .= $S1
+    install($S1, $S2, 1 :named('verbose'))
 
     run_step('spec', kv :flat :named)
 
+    .local string cmd
+    cmd = "rpmbuild --define '_topdir "
+    $S0 = cwd()
+    cmd .= $S0
+    cmd .= "/"
+    cmd .= rpm_base
+    cmd .= "' -bs -v "
     $S0 = get_spec(kv :flat :named)
-    cmd = "rpmbuild -bs -v " . $S0
+    cmd .= $S0
     system(cmd, 1 :named('verbose'))
 .end
 
@@ -2897,7 +2905,7 @@ On Windows calls bdist_wininst, otherwise bdist_rpm
 
 =over 4
 
-=item spec_dir
+=item rpm_base
 
 the default value is ports/rpm
 
@@ -2942,15 +2950,18 @@ the default value is ports/rpm
     mkpath($S2, 1 :named('verbose'))
     spew($S0, $S1, 1 :named('verbose'))
     .local string cmd
-    cmd = "rpmbuild --nobuild " . $S0
+    $S2 = dirname($S2)
+    cmd = "rpmbuild --define '_topdir " . $S2
+    cmd .= "' --nobuild "
+    cmd .= $S0
     system(cmd, 1 :named('verbose'), 1 :named('ignore_error'))
   L2:
 .end
 
 .sub 'get_spec' :anon
     .param pmc kv :slurpy :named
-    $S0 = get_value('spec_dir', 'ports/rpm' :named('default'), kv :flat :named)
-    $S0 .= "/parrot-"
+    $S0 = get_value('rpm_base', 'rpm' :named('default'), kv :flat :named)
+    $S0 .= "/SPECS/parrot-"
     $S1 = get_name(kv :flat :named)
     $S0 .= $S1
     $S0 .= '.spec'
@@ -3086,16 +3097,25 @@ TEMPLATE
     .param pmc kv :slurpy :named
     run_step('sdist_gztar', kv :flat :named)
 
-    .local string cmd
-    $S0 = get_tarname('.tar.gz', kv :flat :named)
-    cmd = "mv " . $S0
-    cmd .= " ~/rpmbuild/SOURCES/"
-    system(cmd, 1 :named('verbose'))
+    .local string rpm_base
+    rpm_base = get_value('rpm_base', 'rpm' :named('default'), kv :flat :named)
+
+    $S1 = get_tarname('.tar.gz', kv :flat :named)
+    $S2 = rpm_base . "/SOURCES/"
+    $S2 .= $S1
+    install($S1, $S2, 1 :named('verbose'))
 
     run_step('spec', kv :flat :named)
 
+    .local string cmd
+    cmd = "rpmbuild --define '_topdir "
+    $S0 = cwd()
+    cmd .= $S0
+    cmd .= "/"
+    cmd .= rpm_base
+    cmd .= "' -bb -v "
     $S0 = get_spec(kv :flat :named)
-    cmd = "rpmbuild -bb -v " . $S0
+    cmd .= $S0
     system(cmd, 1 :named('verbose'))
 .end
 
