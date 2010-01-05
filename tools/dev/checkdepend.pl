@@ -21,16 +21,29 @@ tools/dev/checkdepend.pl
 A braindead script to check that every F<.c> file has makefile deps
 on its includes.
 
+ checkdepend.pl [--dump]
+
+If called with C<--dump>, no tests are run, and the pre-processed makefile
+is dumped (in lieu of having C<cc>'s C<-E> for C<make>.
+
 =head1 REQUIREMENTS
 
 A built parrot (Configure and make) to generate all files so we can analyze
 them. Ack is used to find the files. We are not currently requiring ack
 for development, so this is an optional test.
 
+=heads BUGS
+
+The pre-processing of the makefile doesn't follow make's behavior: variables
+should have no value until they are defined; in our pre-processing, their
+values are propagated throughout the makefile regardless of order; This could
+cause false positives in the test output.
+
 =cut
 
 die 'no Makefile found; This tool requires a full build for analysis.'
     unless -e 'Makefile';
+
 
 my $files = `ack -fa {src,compilers,include} | grep '\\.[ch]\$'`;
 
@@ -76,8 +89,6 @@ foreach my $file (sort split /\n/, $files) {
     }
 }
 
-plan('no_plan');
-
 open my $mf, '<', "Makefile";
 my $rules;
 {
@@ -113,6 +124,13 @@ $rules =~ m/^PARROT_H_HEADERS\s*:?=\s*(.*)$/m;
 my $phh = $1;
 
 $rules =~ s/\Q$(PARROT_H_HEADERS)/$phh/g;
+
+if (@ARGV && $ARGV[0] eq '--dump') {
+    print $rules;
+    exit 0;
+}
+
+plan('no_plan');
 
 foreach my $header (sort grep {/\.h$/} (keys %deps)) {
     # static headers shouldn't depend on anything else.
