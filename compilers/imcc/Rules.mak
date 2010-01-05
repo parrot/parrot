@@ -199,9 +199,3 @@ compilers/imcc/imcc.y.flag compilers/imcc/imcparser.c compilers/imcc/imcparser.h
 compilers/imcc/imcc.l.flag compilers/imcc/imclexer.c : compilers/imcc/imcc.l
 	$(LEX) -ocompilers/imcc/imclexer.c compilers/imcc/imcc.l
 	$(TOUCH) compilers/imcc/imcc.l.flag compilers/imcc/imclexer.c
-
-imcc-clean:
-	$(RM_F) \
-    compilers/imcc/core \
-    "compilers/imcc/*$(O)" \
-    compilers/imcc/imcparser.output

@@ -8,7 +8,7 @@ NQP_SOURCES = \
     compilers/nqp/src/Grammar_gen.pir
 
 NQP_CLEANUPS = \
-    nqp.pbc \
-    src/Grammar_gen.pir \
-    bootstrap/gen_actions.pir \
-    bootstrap/nqp.pbc
+    compilers/nqp/nqp.pbc \
+    compilers/nqp/src/Grammar_gen.pir \
+    compilers/nqp/bootstrap/gen_actions.pir \
+    compilers/nqp/bootstrap/nqp.pbc

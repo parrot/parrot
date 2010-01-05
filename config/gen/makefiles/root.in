@@ -87,9 +87,11 @@ LINK_DYNAMIC     := @link_dynamic@
 LINK             := @link@
 LINKFLAGS        := @linkflags@ @link_debug@ @ld_debug@
 LD               := @ld@
+LD_OUT           := @ld_out@
 LDFLAGS          := @ldflags@ @ld_debug@
 INNO_SETUP       := iscc
 TEMPDIR          := @tempdir@
+RPATH_BLIB       := @rpath_blib@
 #IF(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
 
 ###############################################################################
@@ -110,6 +112,7 @@ LD_LOAD_FLAGS    := @ld_load_flags@
 NONGEN_HEADERS   := @TEMP_nongen_headers@
 
 include compilers/imcc/Defines.mak
+include compilers/pirc/Defines.mak
 include compilers/tge/Defines.mak
 include compilers/nqp/Defines.mak
 include compilers/pge/Defines.mak
@@ -319,13 +322,6 @@ FLUID_FILES_2 := \
 # OTHER FILE GROUPS:
 #
 ###############################################################################
-
-# these are private to the PIRC subsystem
-PIRC_O_FILES := \
-    compilers/pirc/src/bcgen$(O) \
-    compilers/pirc/src/pircapi$(O) \
-    compilers/pirc/src/pirerr$(O) \
-    compilers/pirc/src/pirop$(O)
 
 # parrot.h and all the includes it causes to be included
 PARROT_H_HEADERS := \
@@ -802,13 +798,6 @@ $(PBC_TO_EXE) : tools/dev/pbc_to_exe.pir runtime/parrot/library/config.pir $(PAR
 $(PARROT_CONFIG) : tools/util/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc tools/util/parrot-config.pir
 	$(PARROT) pbc_to_exe.pbc parrot_config.pbc
-
-#IF(win32):pirc : $(PIRC)
-
-$(PIRC) : $(PARROT)
-	$(MAKE) compilers/pirc
-	$(CP) compilers/pirc/pirc$(EXE) $(PIRC)
-	$(CHMOD) 0755 $(PIRC)
 
 $(MINIPARROT) : src/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     lib/Parrot/OpLib/core.pm src/null_config$(O)
@@ -1322,219 +1311,11 @@ src/pbc_merge$(O) : $(INC_DIR)/embed.h \
 
 src/io/filehandle$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_filehandle.h src/io/io_private.h
 
-compilers/pirc/src/piremit$(O) : $(PARROT_H_HEADERS) \
-        compilers/pirc/src/piremit.h \
-        compilers/pirc/src/pircompunit.h \
-        compilers/pirc/src/pircompiler.h \
-        compilers/pirc/src/pirerr.h \
-        compilers/pirc/src/bcgen.h \
-        compilers/pirc/src/pirdefines.h \
-        compilers/pirc/src/pirmacro.h \
-        compilers/pirc/src/pirregalloc.h \
-        compilers/pirc/src/pirsymbol.h \
-        compilers/pirc/src/piryy.h \
-        $(INC_DIR)/embed.h \
-        $(INC_DIR)/oplib/ops.h
-
 src/dynpmc/subproxy$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/extend.h \
   $(INC_DIR)/dynext.h include/pmc/pmc_subproxy.h \
   include/pmc/pmc_sub.h include/pmc_default.h \
   include/pmc/pmc_continuation.h include/pmc/pmc_callcontext.h \
   include/pmc/pmc_default.h
-
-compilers/pirc/src/pirparser$(O) : $(PARROT_H_HEADERS) \
-        compilers/pirc/src/pircompiler.h \
-        compilers/pirc/src/pircompunit.h \
-        compilers/pirc/src/pirdefines.h \
-        compilers/pirc/src/pirparser.h \
-        compilers/pirc/src/piryy.h \
-        compilers/pirc/src/pirlexer.h \
-        compilers/pirc/src/pirerr.h \
-        compilers/pirc/src/pirop.h \
-        compilers/pirc/src/pirpcc.h \
-        compilers/pirc/src/pirmacro.h \
-        compilers/pirc/src/pirregalloc.h \
-        compilers/pirc/src/pirsymbol.h \
-        compilers/pirc/src/bcgen.h \
-        $(INC_DIR)/oplib/ops.h \
-        $(INC_DIR)/embed.h
-
-compilers/pirc/src/pirerr$(O) : $(PARROT_H_HEADERS) \
-        compilers/pirc/src/pircompiler.h \
-        compilers/pirc/src/pircompunit.h \
-        compilers/pirc/src/pirdefines.h \
-        compilers/pirc/src/pirparser.h \
-        compilers/pirc/src/piryy.h \
-        compilers/pirc/src/pirlexer.h \
-        compilers/pirc/src/pirerr.h \
-        compilers/pirc/src/pirmacro.h \
-        compilers/pirc/src/pirregalloc.h \
-        compilers/pirc/src/pirsymbol.h \
-        compilers/pirc/src/bcgen.h \
-        $(INC_DIR)/embed.h
-
-compilers/pirc/src/bcgen$(O) :  \
-  compilers/pirc/src/pirsymbol.h \
-  compilers/pirc/src/pircompiler.h \
-  compilers/pirc/src/pirregalloc.h \
-  compilers/pirc/src/pircompunit.h \
-  compilers/pirc/src/pirdefines.h \
-  compilers/pirc/src/pirmacro.h \
-  compilers/pirc/src/bcgen.h \
-  $(PARROT_H_HEADERS) \
-  $(INC_DIR)/embed.h \
-  include/pmc/pmc_sub.h \
-  include/pmc/pmc_namespace.h
-
-compilers/pirc/src/pirregalloc$(O) : $(PARROT_H_HEADERS) \
-        compilers/pirc/src/pircompiler.h \
-        compilers/pirc/src/pircompunit.h \
-        compilers/pirc/src/pirdefines.h \
-        compilers/pirc/src/pirmacro.h \
-        compilers/pirc/src/pirregalloc.h \
-        compilers/pirc/src/pirsymbol.h \
-        compilers/pirc/src/bcgen.h \
-        $(INC_DIR)/embed.h
-
-compilers/pirc/heredoc/heredocmain$(O) : $(PARROT_H_HEADERS)
-
-compilers/pirc/macro/macrolexer$(O) : $(PARROT_H_HEADERS) \
-        compilers/pirc/macro/macro.h  \
-        compilers/pirc/macro/lexer.h  \
-        compilers/pirc/macro/macroparser.h
-
-compilers/pirc/macro/macroparser$(O) : $(PARROT_H_HEADERS) \
-        compilers/pirc/macro/macro.h  \
-        compilers/pirc/macro/lexer.h  \
-        compilers/pirc/macro/macroparser.h \
-        compilers/pirc/macro/macrolexer.h
-
-compilers/pirc/src/hdocprep$(O) : $(PARROT_H_HEADERS) \
-        $(INC_DIR)/embed.h compilers/pirc/src/pirheredoc.h
-
-compilers/pirc/src/main$(O) : \
-        $(PARROT_H_HEADERS) \
-        $(INC_DIR)/embed.h \
-        compilers/pirc/src/bcgen.h \
-        compilers/pirc/src/pirparser.h \
-        compilers/pirc/src/pircompiler.h \
-        compilers/pirc/src/pircompunit.h \
-        compilers/pirc/src/pirmacro.h \
-        compilers/pirc/src/pirdefines.h \
-        compilers/pirc/src/piremit.h \
-        compilers/pirc/src/piryy.h \
-        compilers/pirc/src/pirlexer.h \
-        compilers/pirc/src/pirheredoc.h \
-        compilers/pirc/src/pirsymbol.h \
-        compilers/pirc/src/pirregalloc.h \
-        compilers/pirc/src/pircapi.h
-
-compilers/pirc/src/pircapi$(O) : \
-        $(PARROT_H_HEADERS) \
-        compilers/pirc/src/bcgen.h \
-        compilers/pirc/src/pircompiler.h \
-        compilers/pirc/src/pirparser.h \
-        compilers/pirc/src/pircompunit.h \
-        compilers/pirc/src/pirsymbol.h \
-        compilers/pirc/src/pirregalloc.h \
-        compilers/pirc/src/pirmacro.h \
-        compilers/pirc/src/pirdefines.h \
-        compilers/pirc/src/piremit.h \
-        compilers/pirc/src/piryy.h \
-        compilers/pirc/src/pirlexer.h \
-        compilers/pirc/src/pircapi.h \
-        $(INC_DIR)/embed.h
-
-compilers/pirc/src/pircompiler$(O) : \
-        compilers/pirc/src/pircompiler.h \
-        $(PARROT_H_HEADERS) \
-        compilers/pirc/src/piryy.h \
-        compilers/pirc/src/pirmacro.h \
-        compilers/pirc/src/pirregalloc.h \
-        compilers/pirc/src/pirerr.h \
-        compilers/pirc/src/bcgen.h \
-        compilers/pirc/src/pircompunit.h \
-        compilers/pirc/src/pirsymbol.h \
-        compilers/pirc/src/pirdefines.h \
-        $(INC_DIR)/embed.h
-
-compilers/pirc/src/pircompunit$(O) : $(PARROT_H_HEADERS) \
-  compilers/pirc/src/pircompunit.h \
-  compilers/pirc/src/pircompiler.h \
-  compilers/pirc/src/pirsymbol.h \
-  compilers/pirc/src/piryy.h \
-  compilers/pirc/src/pirdefines.h \
-  compilers/pirc/src/pirregalloc.h \
-  compilers/pirc/src/pirpcc.h \
-  compilers/pirc/src/pirerr.h \
-  compilers/pirc/src/pirmacro.h \
-  compilers/pirc/src/pirop.h \
-  compilers/pirc/src/bcgen.h \
-  $(INC_DIR)/oplib/ops.h \
-  $(INC_DIR)/dynext.h \
-  $(INC_DIR)/embed.h
-
-compilers/pirc/src/pirlexer$(O) : $(PARROT_H_HEADERS) \
-  compilers/pirc/src/pirparser.h \
-  compilers/pirc/src/pirmacro.h \
-  compilers/pirc/src/pirerr.h \
-  compilers/pirc/src/pircompunit.h \
-  compilers/pirc/src/pircompiler.h \
-  compilers/pirc/src/pirsymbol.h \
-  compilers/pirc/src/piryy.h \
-  compilers/pirc/src/pirdefines.h \
-  compilers/pirc/src/pirregalloc.h \
-  compilers/pirc/src/bcgen.h \
-  $(INC_DIR)/embed.h
-
-compilers/pirc/src/pirmacro$(O) : $(PARROT_H_HEADERS) \
-  compilers/pirc/src/pirmacro.h \
-  compilers/pirc/src/pircompunit.h \
-  compilers/pirc/src/pircompiler.h \
-  compilers/pirc/src/pirsymbol.h \
-  compilers/pirc/src/pirdefines.h \
-  compilers/pirc/src/pirregalloc.h \
-  compilers/pirc/src/bcgen.h \
-  $(INC_DIR)/embed.h
-
-compilers/pirc/src/pirop$(O) : $(PARROT_H_HEADERS) \
-  compilers/pirc/src/pircompiler.h \
-  compilers/pirc/src/pircompunit.h \
-  compilers/pirc/src/pirop.h \
-  compilers/pirc/src/pirerr.h \
-  compilers/pirc/src/pirsymbol.h \
-  compilers/pirc/src/piryy.h \
-  compilers/pirc/src/pirdefines.h \
-  compilers/pirc/src/pirregalloc.h \
-  compilers/pirc/src/pirmacro.h \
-  compilers/pirc/src/bcgen.h \
-  $(INC_DIR)/embed.h
-
-compilers/pirc/src/pirpcc$(O) : $(PARROT_H_HEADERS) \
-  compilers/pirc/src/pirpcc.h \
-  compilers/pirc/src/pircompiler.h \
-  compilers/pirc/src/pirerr.h \
-  compilers/pirc/src/pircompunit.h \
-  compilers/pirc/src/pirsymbol.h \
-  compilers/pirc/src/piryy.h \
-  compilers/pirc/src/pirdefines.h \
-  compilers/pirc/src/pirregalloc.h \
-  compilers/pirc/src/pirmacro.h \
-  compilers/pirc/src/bcgen.h \
-  $(INC_DIR)/oplib/ops.h \
-  $(INC_DIR)/embed.h
-
-compilers/pirc/src/pirsymbol$(O) : $(PARROT_H_HEADERS) \
-  compilers/pirc/src/pircompiler.h \
-  compilers/pirc/src/pirsymbol.h \
-  compilers/pirc/src/piryy.h \
-  compilers/pirc/src/pirerr.h \
-  compilers/pirc/src/pircompunit.h \
-  compilers/pirc/src/pirdefines.h \
-  compilers/pirc/src/pirregalloc.h \
-  compilers/pirc/src/pirmacro.h \
-  compilers/pirc/src/bcgen.h \
-  $(INC_DIR)/embed.h
 
 src/gc/malloc_trace$(O) : src/gc/malloc.c
 
@@ -1671,9 +1452,6 @@ dynoplibs-clean :
 # compiler implementation targets:
 #
 ###############################################################################
-
-compilers-clean :
-	$(MAKE) compilers/pirc clean
 
 ext-clean:
 	$(RM_RF) $(NQPRX_LIB_PBCS) parrot-nqp*
@@ -1899,8 +1677,6 @@ clean : \
     dynpmc-clean \
     dynoplibs-clean \
     examples-clean \
-    imcc-clean \
-    compilers-clean \
     ext-clean \
 #UNLESS(win32):    cover-clean \
     editor-clean
@@ -1910,7 +1686,7 @@ clean : \
 	$(RM_F) $(FLUID_FILES_2)
 	$(RM_RF) lib/Parrot/OpLib
 	$(RM_F) $(NQP_CLEANUPS) $(PGE_CLEANUPS) $(TGE_CLEANUPS) $(JSON_CLEANUPS)
-	$(RM_F) pirc$(EXE)
+	$(RM_F) $(PIRC_CLEANUPS)
 
 prog-clean :
 	$(RM_F) \
@@ -2050,7 +1826,6 @@ test-clean :
 
 # a failing step of cleaning, usually doesn't concern the following steps
 realclean : clean
-	-$(MAKE) compilers/pirc  realclean
 	$(RM_RF) \
     $(CONFIGURE_GENERATED_FILES) \
     blib \
@@ -2569,6 +2344,7 @@ malloclist: src/core_pmcs.c
 
 include runtime/parrot/library/Rules.mak
 include compilers/imcc/Rules.mak
+include compilers/pirc/Rules.mak
 include compilers/nqp/Rules.mak
 include compilers/pge/Rules.mak
 include compilers/pct/Rules.mak
