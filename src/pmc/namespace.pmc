@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2009, Parrot Foundation.
+Copyright (C) 2005-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -20,7 +20,7 @@ These are the vtable functions for the namespace PMC.
 
 #include "pmc/pmc_sub.h"
 
-static void add_to_class(
+static int add_to_class(
         Interp *interp,
         Parrot_NameSpace_attributes * const nsinfo,
         PMC * const classobj,
@@ -28,18 +28,24 @@ static void add_to_class(
         PMC *value)
 {
     /* Insert it in class, if there is a class */
-    if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
+    if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj)) {
         VTABLE_add_method(interp, classobj, key, value);
+        return 1;
+    }
 
     /* Otherwise, store it in the namespace for the class to
      * retrieve later */
     else {
         /* If we don't have a place to hang methods, make one. */
+        int core_type = pmc_type(interp, nsinfo->name);
+
         if (PMC_IS_NULL(nsinfo->methods))
             nsinfo->methods = pmc_new(interp, enum_class_Hash);
 
         /* Insert it. */
         VTABLE_set_pmc_keyed_str(interp, nsinfo->methods, key, value);
+
+        return core_type == 0;
     }
 }
 
@@ -81,14 +87,13 @@ ns_insert_sub_keyed_str(PARROT_INTERP, PMC *self, STRING *key, PMC *value)
         STRING *method_name = key;
 
         if (Parrot_str_equal(interp, sub->method_name, CONST_STRING(interp, ""))) {
-            if (sub->vtable_index != -1 && vtable_key != NULL) {
+            if (sub->vtable_index != -1 && vtable_key)
                 method_name = Parrot_str_copy(interp, vtable_key);
-            }
         }
-        else {
+        else
             method_name = sub->method_name;
-        }
-        add_to_class(interp, nsinfo, classobj, method_name, value);
+
+        return add_to_class(interp, nsinfo, classobj, method_name, value);
     }
 
     return 0;
@@ -118,7 +123,8 @@ add_nci_to_namespace(PARROT_INTERP, PMC *SELF, STRING *key, PMC *value)
         PMC * const classobj = VTABLE_get_class(interp, SELF);
 
         /* Insert it in class, if there is a class */
-        add_to_class(interp, nsinfo, classobj, key, value);
+        int dummy = add_to_class(interp, nsinfo, classobj, key, value);
+        UNUSED(dummy);
     }
 }
 
@@ -145,11 +151,13 @@ add_multi_to_namespace(PARROT_INTERP, PMC *SELF, STRING *key, PMC *value)
                 STRING *empty_str   = CONST_STRING(interp, "");
                 STRING *method_name = key;
                 Hash   *hash;
+                int     dummy;
 
                 if (Parrot_str_not_equal(interp, sub->method_name, empty_str))
                     method_name = sub->method_name;
 
-                add_to_class(interp, nsinfo, classobj, method_name, value);
+                dummy = add_to_class(interp, nsinfo, classobj, method_name, value);
+                UNUSED(dummy);
 
                 GETATTR_NameSpace_hash(interp, SELF, hash);
 
