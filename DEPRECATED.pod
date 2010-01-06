@@ -108,6 +108,12 @@ using this PMC should migrate to ResizablePMCArray or something more suitable.
 
 L<https://trac.parrot.org/parrot/ticket/1303>
 
+=item OrderedHash PMC [eligible in 2.1]
+
+This PMC is old, haskish and will be reimplemented with some backward incompatible
+changes in semantic of handling removed elements.
+
+L<https://trac.parrot.org/parrot/ticket/1403>
 =back
 
 =head1 Opcodes
