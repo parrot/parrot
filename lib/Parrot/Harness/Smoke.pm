@@ -113,7 +113,7 @@ sub send_archive_to_smolder {
     my $report_file  = delete $test_env_data{report_file} || $SMOLDER_CONFIG{report_file};
     my $url
         =   $SMOLDER_CONFIG{server}
-          . '/app/developer_projects/process_add_report/'
+          . '/app/projects/process_add_report/'
           . $project_id;
     my $ua = LWP::UserAgent->new();
     $ua->agent( 'Parrot::Harness::Smoke' );
@@ -137,10 +137,10 @@ sub send_archive_to_smolder {
 
     if ($response->code == 302) {
         my ($report_id) = $response->content =~ /Reported #(\d+) added/i;
-        my $report_url = "$SMOLDER_CONFIG{server}/app/public_projects/report_details/$report_id";
+        my $report_url = "$SMOLDER_CONFIG{server}/app/projects/report_details/$report_id";
         my $project_url
             =   $SMOLDER_CONFIG{server}
-              . '/app/public_projects/smoke_reports/'
+              . '/app/projects/smoke_reports/'
               . $project_id;
         print "Test report successfully sent to Smolder at\n$report_url"
             . "\nYou can see other recent reports at\n$project_url .\n\n";
