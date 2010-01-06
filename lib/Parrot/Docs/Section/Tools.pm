@@ -55,7 +55,6 @@ sub new {
             '',
             $self->new_item( '', 'docs/configuration.pod' ),
             $self->new_item( '', 'tools/build/c2str.pl' ),
-            $self->new_item( '', 'tools/build/dynoplibs.pl' ),
             $self->new_item( '', 'tools/build/dynpmc.pl' ),
             $self->new_item( '', 'tools/build/ops2c.pl' ),
             $self->new_item( '', 'tools/build/ops2pm.pl' ),
