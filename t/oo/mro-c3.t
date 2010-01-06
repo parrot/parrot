@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -16,16 +16,7 @@ Tests the C3 Method Resolution order for the OO implementation.
 
 =cut
 
-.sub main :main
-    .include 'test_more.pir'
-
-    plan(12)
-
-    single_parent()
-    grandparent()
-    multiple_inheritance()
-    diamond_inheritance()
-.end
+.namespace [ 'Methods' ]
 
 .sub method_A :method
     .return('Method from A')
@@ -43,17 +34,34 @@ Tests the C3 Method Resolution order for the OO implementation.
     .return('Method from D')
 .end
 
-.sub single_parent
-    .local pmc A, B
+.namespace []
 
-    A = new 'Class'
-    $P0 = get_global 'method_A'
+.sub main :main
+    .include 'test_more.pir'
+
+    plan(12)
+    $P0 = newclass [ 'Methods' ]
+
+    single_parent()
+    grandparent()
+    multiple_inheritance()
+    diamond_inheritance()
+.end
+
+.sub single_parent
+    .local pmc A, B, M, methods
+
+    M       = get_class [ 'Methods' ]
+    methods = M.'methods'()
+
+    A   = new 'Class'
+    $P0 = methods['method_A']
     A.'add_method'('foo', $P0)
     A.'add_method'('bar', $P0)
 
-    B = new 'Class'
+    B   = new 'Class'
+    $P0 = methods['method_B']
     B.'add_parent'(A)
-    $P0 = get_global 'method_B'
     B.'add_method'('foo', $P0)
 
     $P0 = B.'new'()
@@ -64,23 +72,26 @@ Tests the C3 Method Resolution order for the OO implementation.
 .end
 
 .sub grandparent
-    .local pmc A, B, C
+    .local pmc A, B, C, M, methods
 
-    A = new 'Class'
-    $P0 = get_global 'method_A'
+    M       = get_class [ 'Methods' ]
+    methods = M.'methods'()
+
+    A   = new 'Class'
+    $P0 = methods['method_A']
     A.'add_method'('foo', $P0)
     A.'add_method'('bar', $P0)
     A.'add_method'('baz', $P0)
 
-    B = new 'Class'
+    B   = new 'Class'
+    $P0 = methods['method_B']
     B.'add_parent'(A)
-    $P0 = get_global 'method_B'
     B.'add_method'('foo', $P0)
     B.'add_method'('bar', $P0)
 
-    C = new 'Class'
+    C   = new 'Class'
+    $P0 = methods['method_C']
     C.'add_parent'(B)
-    $P0 = get_global 'method_C'
     C.'add_method'('foo', $P0)
 
     $P0 = C.'new'()
@@ -93,25 +104,28 @@ Tests the C3 Method Resolution order for the OO implementation.
 .end
 
 .sub multiple_inheritance
-    .local pmc A, B, C
- 
-    A = newclass 'MIA'
-    $P0 = get_global 'method_A'
+    .local pmc A, B, C, M, methods
+
+    M       = get_class ['Methods']
+    methods = M.'methods'()
+
+    A   = newclass 'MIA'
+    $P0 = methods['method_A']
     A.'add_method'('foo', $P0)
     A.'add_method'('bar', $P0)
     A.'add_method'('baz', $P0)
- 
-    B = newclass 'MIB'
-    $P0 = get_global 'method_B'
+
+    B   = newclass 'MIB'
+    $P0 = methods['method_B']
     B.'add_method'('foo', $P0)
     B.'add_method'('bar', $P0)
- 
-    C = newclass 'MIC'
+
+    C   = newclass 'MIC'
+    $P0 = methods['method_C']
     C.'add_parent'(B)
     C.'add_parent'(A)
-    $P0 = get_global 'method_C'
     C.'add_method'('foo', $P0)
- 
+
     $P0 = C.'new'()
     $S0 = $P0.'foo'()
     $S1 = $P0.'bar'()
@@ -122,32 +136,35 @@ Tests the C3 Method Resolution order for the OO implementation.
 .end
 
 .sub diamond_inheritance
-    .local pmc A, B, C, D
+    .local pmc A, B, C, D, M, methods
 
-    A = newclass 'DIA'
-    $P0 = get_global 'method_A'
+    M       = get_class ['Methods']
+    methods = M.'methods'()
+
+    A   = newclass 'DIA'
+    $P0 = methods['method_A']
     A.'add_method'('foo', $P0)
     A.'add_method'('bar', $P0)
     A.'add_method'('baz', $P0)
     A.'add_method'('wag', $P0)
 
-    B = newclass 'DIB'
+    B   = newclass 'DIB'
+    $P0 = methods['method_B']
     B.'add_parent'(A)
-    $P0 = get_global 'method_B'
     B.'add_method'('foo', $P0)
     B.'add_method'('bar', $P0)
     B.'add_method'('baz', $P0)
 
-    C = newclass 'DIC'
+    C   = newclass 'DIC'
+    $P0 = methods['method_C']
     C.'add_parent'(A)
-    $P0 = get_global 'method_C'
     C.'add_method'('foo', $P0)
     C.'add_method'('bar', $P0)
 
-    D = newclass 'DID'
+    D   = newclass 'DID'
+    $P0 = methods['method_D']
     D.'add_parent'(C)
     D.'add_parent'(B)
-    $P0 = get_global 'method_D'
     D.'add_method'('foo', $P0)
 
     $P0 = D.'new'()
