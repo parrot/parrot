@@ -114,6 +114,7 @@ This PMC is old, haskish and will be reimplemented with some backward incompatib
 changes in semantic of handling removed elements.
 
 L<https://trac.parrot.org/parrot/ticket/1403>
+
 =back
 
 =head1 Opcodes
@@ -141,7 +142,7 @@ get_label and set_label.
 All bitwise ops (all ops containing C<bitwise> in their names) will be provided
 by dynops.  B<NOTE>: Before removing the bitwise ops, make sure that the
 equivalent dynops are available and that the major HLLs (Rakudo, Partcl, Lua,
-etc) have switched to using them. 
+etc) have switched to using them.
 
 L<https://trac.parrot.org/parrot/ticket/1260>
 
