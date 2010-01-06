@@ -18,7 +18,6 @@ use warnings;
 
 use base qw(Parrot::Configure::Step);
 
-use Parrot::Configure::Utils qw(copy_if_diff);
 use Carp;
 
 
