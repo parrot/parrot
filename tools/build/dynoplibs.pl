@@ -7,7 +7,8 @@ tools/build/dynoplibs.pl - Build script for dynamic op libraries
 
 =head1 DESCRIPTION
 
-This script is used for building dynamic op libraries.
+This script is used for building dynamic op libraries. It is deprecated,
+L<http://trac.parrot.org/parrot/ticket/338>.
 
 =cut
 

@@ -7,7 +7,8 @@ tools/build/dynpmc.pl - Build script for dynamic PMCs
 
 =head1 DESCRIPTION
 
-This script is used for building dynamic PMCs.
+This script is used for building dynamic PMCs.  It is deprecated,
+L<http://trac.parrot.org/parrot/ticket/338>.
 
 =cut
 
