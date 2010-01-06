@@ -380,7 +380,6 @@ sub genfile {
         if ( $options{file_type} eq 'makefile' ) {
             $options{replace_slashes}   = 1;
             $options{conditioned_lines} = 1;
-            $options{no_simply_expanded_var} = ! $conf->data->get('gmake_version');
         }
     }
 
@@ -562,11 +561,6 @@ sub genfile {
 
             # replace \* with \\*, so make will not eat the \
             $line =~ s{(\\\*)}{\\$1}g;
-        }
-
-        if ( $options{no_simply_expanded_var} ) {
-            # replace := with =
-            $line =~ s{:=}{=};
         }
 
         print $out $line;
