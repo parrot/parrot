@@ -2654,6 +2654,14 @@ install-dev-only: installable
     --versiondir=$(VERSION_DIR) \
     MANIFEST MANIFEST.generated
 
+install-doc:
+	$(PERL) tools/dev/install_doc_files.pl \
+    --buildprefix=$(BUILDPREFIX) \
+    --prefix=$(PREFIX) \
+    --docdir=$(DOC_DIR) \
+    --versiondir=$(VERSION_DIR) \
+    MANIFEST MANIFEST.generated
+
 ###############################################################################
 #
 # release targets
