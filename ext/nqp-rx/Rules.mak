@@ -16,7 +16,7 @@ $(LIBRARY_DIR)/nqp-rx.pbc: ext/nqp-rx/src/stage0/NQP-s0.pir $(PARROT)
 parrot-nqp.pbc : $(LIBRARY_DIR)/nqp-rx.pbc
 	$(CP) $(LIBRARY_DIR)/nqp-rx.pbc $@
 
-$(NQP) : $(NQPRX_LIB_PBCS) $(PBC_TO_EXE) parrot-nqp.pbc
+$(NQP_RX) : $(NQPRX_LIB_PBCS) $(PBC_TO_EXE) parrot-nqp.pbc
 	$(PBC_TO_EXE) parrot-nqp.pbc
 
 $(INSTALLABLENQP) : $(NQPRX_LIB_PBCS) $(SRC_DIR)/install_config$(O) $(PBC_TO_EXE) parrot-nqp.pbc

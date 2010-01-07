@@ -239,10 +239,6 @@ GEN_MODULES = \
     lib/Parrot/OpLib/core.pm
 
 GEN_LIBRARY = \
-    $(TGE_LIB_PBCS) \
-    $(PGE_LIB_PBCS) \
-    $(PCT_LIB_PBCS) \
-    $(JSON_LIB_PBCS) \
     $(LIBRARY_DIR)/CGI/QueryHash.pbc \
     $(LIBRARY_DIR)/Crow.pbc \
     $(LIBRARY_DIR)/config.pbc \
@@ -499,7 +495,7 @@ PDB                 = ./parrot_debugger$(EXE)
 PBC_TO_EXE          = ./pbc_to_exe$(EXE)
 PARROT_CONFIG       = ./parrot_config$(EXE)
 PIRC                = ./pirc$(EXE)
-NQP                 = ./parrot-nqp$(EXE)
+NQP_RX              = ./parrot-nqp$(EXE)
 
 # Installable executables
 INSTALLABLEPARROT   = ./installable_parrot$(EXE)
@@ -564,10 +560,6 @@ MAKE = @make_c@
 .pir.pbc : # suffix rule (limited support)
 	$(PARROT) -o $@ $<
 
-.pbc$(O) : # suffix rule (limited support)
-	$(PARROT) -o $@ $<
-
-
 ###############################################################################
 #
 # USER TARGETS:
@@ -586,7 +578,12 @@ all : \
     $(PBCMERGE) \
     $(PDB) \
     $(PDUMP) \
-    $(NQP)
+    $(NQP_RX) \
+    $(TGE_LIB_PBCS) \
+    $(PGE_LIB_PBCS) \
+    $(PCT_LIB_PBCS) \
+    $(JSON_LIB_PBCS) \
+    $(NQP_LIB_PBCS)
 
 corevm : \
     flags_dummy \
@@ -1687,7 +1684,7 @@ clean : \
 	$(RM_F) $(FLUID_FILES_2)
 	$(RM_RF) lib/Parrot/OpLib
 	$(RM_F) $(NQP_CLEANUPS) $(PGE_CLEANUPS) $(TGE_CLEANUPS) $(JSON_CLEANUPS)
-	$(RM_F) $(PIRC_CLEANUPS)
+	$(RM_F) $(PIRC_CLEANUPS) $(PCT_CLEANUPS)
 
 prog-clean :
 	$(RM_F) \
