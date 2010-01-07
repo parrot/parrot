@@ -745,6 +745,7 @@ help :
 	@echo "  install-dev:       Same as 'install'."
 	@echo "  install-bin:       Install only files needed for Parrot runtime."
 	@echo "  install-dev-only:  Install only files needed for Parrot development."
+	@echo "  install-doc:       Install documentation files & examples."
 	@echo ""
 	@echo "Documentation:"
 	@echo "  help:              Print this help message."

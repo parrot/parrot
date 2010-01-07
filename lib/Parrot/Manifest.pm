@@ -229,12 +229,10 @@ sub _get_manifest_entry {
         $loc =
               exists( $special->{$_} ) ? $special->{$_}
             : !m[/]                           ? '[]'
-            : m[README]                       ? '[]doc'
-            : m[^docs/user/]                  ? '[main]doc'
-            : m[^docs/ops/]                   ? '[main]doc'
-            : m[^docs/pmc/]                   ? '[main]doc'
-            : m[^docs/pct/]                   ? '[pct]doc'
+            : m[^docs/book/draft/]            ? '[]'
+            : m[^docs/]                       ? '[doc]'
             : m[^examples/]                   ? '[examples]'
+            : m[README]                       ? '[]doc'
             : m[^include/]                    ? '[main]include'
             : m[^t/]                          ? '[test]'
             : m[/t/]                          ? '[test]'
@@ -246,11 +244,9 @@ sub _get_manifest_entry {
             : m[^src/pmc/.*\.pmc]             ? '[devel]src'
             : m[^src/dynpmc/.*\.pmc]          ? '[devel]src'
             : m[^runtime/parrot/library/PCT]  ? '[pct]'
-            : m[^docs/pct]                    ? '[pct]doc'
             : m[^runtime/parrot/library/PCT]  ? '[pge]'
             : m[^runtime/parrot/library/TGE]  ? '[tge]'
             : m[^runtime/parrot/library/JSON] ? '[json]'
-            : m[^docs/project]                ? '[devel]doc'
             :                                   '[]'; # default
     }
 
@@ -260,27 +256,24 @@ sub _get_manifest_entry {
 # See comments for _get_manifest_entry, above
 sub _get_special {
     my %special = qw(
+        CREDITS                                         [main]doc
+        DEPRECATED.pod                                  [devel]doc
+        DONORS.pod                                      [main]doc
         LICENSE                                         [main]doc
         NEWS                                            [main]doc
         PBC_COMPAT                                      [main]doc
         PLATFORMS                                       [devel]doc
         README                                          [devel]doc
-        README.win32.pod                                [devel]doc
-        README.win32.pod                                [devel]doc
+        README_win32.pod                                [devel]doc
+        README_cygwin.pod                               [devel]doc
         RESPONSIBLE_PARTIES                             [main]doc
-        parrot-config                                   [main]bin
-        docs/faq.pod                                    [main]doc
-        docs/gettingstarted.pod                         [main]doc
-        docs/glossary.pod                               [main]doc
-        docs/intro.pod                                  [main]doc
-        docs/compiler_faq.pod                           [devel]doc
-        docs/debug.pod                                  [devel]doc
-        docs/pmc2c.pod                                  [devel]doc
-        docs/vtables.pod                                [devel]doc
+        TODO                                            [devel]doc
+        VERSION                                         [devel]
         languages/t/harness                             [test]
+        lib/File/Which.pm                               [devel]lib
+        parrot-config                                   [main]bin
         src/ops/ops.num                                 [devel]src
         src/vtable.tbl                                  [devel]src
-        VERSION                                         [devel]
         tools/build/ops2c.pl                            [devel]
         tools/build/pmc2c.pl                            [devel]
         tools/dev/mk_language_shell.pl                  [devel]
@@ -288,7 +281,6 @@ sub _get_special {
         tools/dev/pbc_to_exe.pir                        [devel]
         tools/dev/gen_makefile.pl                       [devel]
         tools/dev/reconfigure.pl                        [devel]
-        lib/File/Which.pm                               [devel]lib
     );
 
     return \%special;

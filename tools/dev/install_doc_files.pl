@@ -80,7 +80,7 @@ my %options = (
     srcdir      => '/usr/src/',      # parrot/ subdir added below
     versiondir  => '',
     'dry-run'   => 0,
-    packages    => 'examples',
+    packages    => 'doc|examples',
 );
 
 my @manifests;
@@ -96,8 +96,18 @@ foreach (@ARGV) {
 my $parrotdir = $options{versiondir};
 
 # Set up transforms on filenames
-my(@transformorder) = (qw(examples));
+my(@transformorder) = (qw(doc examples));
 my(%metatransforms) = (
+    doc => {
+        optiondir => 'doc',
+        transform => sub {
+            my($filehash) = @_;
+            $filehash->{Dest} =~ s#^docs/resources#resources#; # resources go in the top level of docs
+            $filehash->{Dest} =~ s/^docs/pod/; # other docs are actually raw Pod
+            $filehash->{DestDirs} = [$parrotdir];
+            return($filehash);
+        },
+    },
     examples => {
         optiondir => 'doc',
         transform => sub {

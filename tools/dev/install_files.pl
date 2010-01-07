@@ -148,8 +148,6 @@ my(%metatransforms) = (
         optiondir => 'doc',
         transform => sub {
             my($filehash) = @_;
-            $filehash->{Dest} =~ s#^docs/resources#resources#; # resources go in the top level of docs
-            $filehash->{Dest} =~ s/^docs/pod/; # other docs are actually raw Pod
             $filehash->{DestDirs} = [$parrotdir];
             return($filehash);
         },
