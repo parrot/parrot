@@ -114,13 +114,13 @@ while ($rules =~ /^include\s+(.*)$/m) {
 $rules =~ s/\\\n//g;
 
 # replace all _DIR variables with their expansions.
-while ($rules =~ s/^([A-Z_]+_DIR)\s*:?=\s*(\S*)$//m) {
+while ($rules =~ s/^([A-Z_]+_DIR)\s*=\s*(\S*)$//m) {
     my ($var,$val) = ($1, $2);
     $rules =~ s/\$\($var\)/$val/g;
 }
 
 # expand PARROT_H_HEADERS
-$rules =~ m/^PARROT_H_HEADERS\s*:?=\s*(.*)$/m;
+$rules =~ m/^PARROT_H_HEADERS\s*=\s*(.*)$/m;
 my $phh = $1;
 
 $rules =~ s/\Q$(PARROT_H_HEADERS)/$phh/g;
