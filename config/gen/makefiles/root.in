@@ -239,6 +239,12 @@ GEN_MODULES = \
     lib/Parrot/OpLib/core.pm
 
 GEN_LIBRARY = \
+    runtime/parrot/include/cclass.pasm \
+    runtime/parrot/include/datatypes.pasm \
+    runtime/parrot/include/enums.pasm \
+    runtime/parrot/include/events.pasm \
+    runtime/parrot/include/hash_key_type.pasm \
+    runtime/parrot/include/io.pasm \
     $(LIBRARY_DIR)/CGI/QueryHash.pbc \
     $(LIBRARY_DIR)/Crow.pbc \
     $(LIBRARY_DIR)/config.pbc \
@@ -509,7 +515,7 @@ INSTALLABLENQP      = ./installable_parrot-nqp$(EXE)
 
 # Libraries
 LIBPARROT_STATIC    = @blib_dir@/@libparrot_static@
-#IF(darwin):export DYLD_LIBRARY_PATH = @blib_dir@:$(DYLD_LIBRARY_PATH)
+#IF(darwin):export DYLD_LIBRARY_PATH := @blib_dir@:$(DYLD_LIBRARY_PATH)
 #IF(win32):LIBPARROT_SHARED  = @libparrot_shared@
 #ELSE:LIBPARROT_SHARED  = @blib_dir@/@libparrot_shared@
 
@@ -1002,6 +1008,19 @@ $(INSTALLABLEPBCMERGE) : src/pbc_merge$(O) $(LIBPARROT) $(INSTALLABLECONFIG)
 # Other Dependencies and Build Rules:
 #
 ###############################################################################
+
+runtime/parrot/include/cclass.pasm : $(INC_DIR)/cclass.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/cclass.h > $@
+runtime/parrot/include/datatypes.pasm : $(INC_DIR)/datatypes.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/datatypes.h > $@
+runtime/parrot/include/enums.pasm : $(INC_DIR)/enums.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/enums.h > $@
+runtime/parrot/include/events.pasm : $(INC_DIR)/events.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/events.h > $@
+runtime/parrot/include/hash_key_type.pasm : $(INC_DIR)/hash.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/hash.h > $@
+runtime/parrot/include/io.pasm : $(INC_DIR)/io.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/io.h > $@
 
 $(INC_DIR)/oplib/ops.h lib/Parrot/OpLib/core.pm : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2pm.pl \
     lib/Parrot/OpsFile.pm lib/Parrot/Op.pm src/ops/ops.num src/ops/ops.skip
