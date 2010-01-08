@@ -102,10 +102,12 @@ foreach my $file (sort grep /\.pir$/, split /\n/, $files) {
     $guts =~ s{^=.*^=cut$}{}gsm;
 
     my @includes;
-    while ($guts =~ m/.include (["'])(.*)\1/g) {
+    while ($guts =~ m/\.include\s+(["'])(.*)\1/g) {
         push @includes, $2;
     } 
-    # XXX also check load_bytecode
+    while ($guts =~ m/\bload_bytecode\s+(["'])(.*)\1/g) {
+        push @includes, $2;
+    } 
 
     # Canonicalize each of these includes.
 
@@ -121,6 +123,11 @@ foreach my $file (sort grep /\.pir$/, split /\n/, $files) {
 
         # global 'runtime' dir?
         $make_dep = collapse_path(File::Spec->catfile('runtime/parrot/include',$include));
+        if (defined($make_dep) && -f $make_dep) {
+            push @{$deps{$file}}, $make_dep;
+            next;
+        }
+        $make_dep = collapse_path(File::Spec->catfile('runtime/parrot/library',$include));
         if (defined($make_dep) && -f $make_dep) {
             push @{$deps{$file}}, $make_dep;
             next;
