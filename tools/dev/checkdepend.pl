@@ -105,6 +105,7 @@ foreach my $file (sort grep /\.pir$/, split /\n/, $files) {
     while ($guts =~ m/.include (["'])(.*)\1/g) {
         push @includes, $2;
     } 
+    # XXX also check load_bytecode
 
     # Canonicalize each of these includes.
 
@@ -195,6 +196,41 @@ foreach my $file (sort grep {/\.c$/} @files) {
     $rule =~ s/\.c$//;
 
     $rules =~ /^$rule\Q$(O)\E\s*:\s*(.*)\s*$/m;
+    my $declared = $1;
+
+    my $failed = 0;
+    if (!defined($declared)) {
+        $failed = 1;
+        is("", join(' ', (get_deps($file))), "$file has no dependencies");
+        next;
+    }
+    else
+    {
+        $declared =~ s/\s+/ /g;
+        foreach my $inc (sort (get_deps($file))) {
+            next if $declared =~ s/\b\Q$inc\E\b//;
+
+            is($declared, $inc, "$file is missing a dependency.");
+            $failed = 1;
+
+        }
+    }
+    $declared =~ s/^\s+//;
+    $declared =~ s/\s+$//;
+    $declared =~ s/\s+/ /g;
+    if ($declared ne "") {
+       is($declared, '', "$file has extra dependencies.");
+    }
+    elsif (!$failed) {
+        pass($file);
+    }
+}
+
+foreach my $file (sort grep {/\.pir$/} @files) {
+    my $rule = $file;
+    $rule =~ s/\.c$//;
+
+    $rules =~ /^${rule}.pbc\s*:\s*(.*)\s*$/m;
     my $declared = $1;
 
     my $failed = 0;
