@@ -176,7 +176,7 @@ X<named variables>
 PIR also has named variables; the C<.local>
 directive declares them. As with register variables, there are four valid types:
 C<int>, C<num>, C<string>, and C<pmc>. You I<must> declare named variables; 
-otherwise they behave exactly the same as register variables.
+once declared, they behave exactly the same as register variables.
 
 =begin PIR_FRAGMENT
 
