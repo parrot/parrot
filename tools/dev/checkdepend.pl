@@ -18,7 +18,7 @@ tools/dev/checkdepend.pl
 
 =head1 DESCRIPTION
 
-A braindead script to check that every F<.c> file has makefile deps
+A braindead script to check that every file has makefile deps
 on its includes.
 
  checkdepend.pl [--dump]
@@ -44,12 +44,11 @@ cause false positives in the test output.
 die 'no Makefile found; This tool requires a full build for analysis.'
     unless -e 'Makefile';
 
-
-my $files = `ack -fa {src,compilers,include} | grep '\\.[ch]\$'`;
+my $files = `ack -fa {src,compilers,include} | ack '\\.(c|h|pir)\$'`;
 
 our %deps;
 
-foreach my $file (sort split /\n/, $files) {
+foreach my $file (sort grep /\.[hc]$/, split /\n/, $files) {
     # For now, skip any files that have generated dependencies
     next if $file =~ m{src/(ops|dynoplibs|dynpmc|pmc)/};
     next if $file =~ m{src/string/(charset|encoding)/};
@@ -61,7 +60,7 @@ foreach my $file (sort split /\n/, $files) {
         $guts = <$fh>;
     }
 
-    # Ingore anything inside a c-style comment.
+    # Ignore anything inside a c-style comment.
     $guts =~ s{\Q/*\E.*?\Q*/}{}gm;
 
     my @includes = $guts =~ m/#include "(.*)"/g;
@@ -88,6 +87,55 @@ foreach my $file (sort split /\n/, $files) {
         diag "couldn't find $include, included from $file";
     }
 }
+
+foreach my $file (sort grep /\.pir$/, split /\n/, $files) {
+    open my $fh, '<', $file;
+    my $guts;
+    {
+        local $/;
+        $guts = <$fh>;
+    }
+
+    # Ignore anything inside a # - comment.
+    $guts =~ s{^#.*$}{}gm;
+    # Ignore anything inside pod.
+    $guts =~ s{^=.*^=cut$}{}gsm;
+
+    my @includes;
+    while ($guts =~ m/.include (["'])(.*)\1/g) {
+        push @includes, $2;
+    } 
+
+    # Canonicalize each of these includes.
+
+    $deps{$file} = [ ];
+    foreach my $include (@includes) {
+        # same dir as file?
+        my $file_dir = (File::Spec->splitpath($file))[1];
+        my $make_dep = collapse_path(File::Spec->catfile($file_dir,$include));
+        if (defined($make_dep) && -f $make_dep) {
+            push @{$deps{$file}}, $make_dep;
+            next;
+        }
+
+        # global 'runtime' dir?
+        $make_dep = collapse_path(File::Spec->catfile('runtime/parrot/include',$include));
+        if (defined($make_dep) && -f $make_dep) {
+            push @{$deps{$file}}, $make_dep;
+            next;
+        }
+
+        # relative to top level?
+        $make_dep = collapse_path(File::Spec->catfile($include));
+        if (defined($make_dep) && -f $make_dep) {
+            push @{$deps{$file}}, $make_dep;
+            next;
+        }
+
+        diag "couldn't find $include, included from $file";
+    }
+}
+
 
 open my $mf, '<', "Makefile";
 my $rules;
