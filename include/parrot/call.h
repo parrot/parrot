@@ -53,6 +53,11 @@ typedef enum {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
+INTVAL Parrot_pcc_do_run_ops(PARROT_INTERP, ARGIN(PMC *sub_obj))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 void Parrot_pcc_invoke_from_sig_object(PARROT_INTERP,
     ARGIN(PMC *sub_obj),
     ARGIN(PMC *call_object))
@@ -93,6 +98,9 @@ void Parrot_PCCINVOKE(PARROT_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*method_name);
 
+#define ASSERT_ARGS_Parrot_pcc_do_run_ops __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(sub_obj))
 #define ASSERT_ARGS_Parrot_pcc_invoke_from_sig_object \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

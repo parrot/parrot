@@ -253,6 +253,24 @@ do_run_ops(PARROT_INTERP, ARGIN(PMC *sub_obj))
 
 /*
 
+=item C<INTVAL Parrot_pcc_do_run_ops(PARROT_INTERP, PMC *sub_obj)>
+
+Check if current object require running ops. Used in tailcall for updating
+RetContinuation.
+
+=cut
+
+*/
+PARROT_EXPORT
+INTVAL
+Parrot_pcc_do_run_ops(PARROT_INTERP, ARGIN(PMC *sub_obj))
+{
+    ASSERT_ARGS(Parrot_pcc_do_run_ops)
+    return do_run_ops(interp, sub_obj);
+}
+
+/*
+
 =item C<void Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, PMC *sub_obj, PMC
 *call_object)>
 
