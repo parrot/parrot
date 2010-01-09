@@ -68,7 +68,7 @@ C:\usr\lib), add the F<bin> directory to C<PATH>, and tell
 Configure.pl to use it.
 
     mkdir C:\usr\lib
-    unzip icu4c-4_2-Win32-msvc9.zip -d C:\usr\lib
+    unzip icu4c-4_2_1-Win32-msvc9.zip -d C:\usr\lib
     mkdir C:\usr\lib\data
     set PATH=%PATH%;C:\usr\lib\icu\bin
     cd <parrot directory>
@@ -122,7 +122,7 @@ L<http://ctags.sourceforge.net/>
 
 Inno Setup is a I<free> installer for Windows programs.
 
-The latest release of Inno Setup at the time of writing is 5.2.3.
+The latest release of Inno Setup at the time of writing is 5.3.7.
 
 The HomePage is on L<http://www.jrsoftware.org/>.
 
@@ -165,10 +165,10 @@ follow the directions.
 
 =item MinGW32 with GCC
 
-The latest release of MinGW package at the time of writing is 5.1.3,
+The latest release of MinGW package at the time of writing is 5.1.6,
 which contains gcc-3.4.5 as current release.
 It can be downloaded here:
-L<http://downloads.sourceforge.net/mingw/MinGW-5.1.3.exe>
+L<http://sourceforge.net/projects/mingw/files/>
 
 The HomePage is on L<http://www.mingw.org/>.
 
