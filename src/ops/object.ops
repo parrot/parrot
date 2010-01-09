@@ -138,6 +138,15 @@ op tailcallmethod(invar PMC, in STR) :object_base :flow {
     else {
         interp->current_cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
         PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL;
+        /* Detach continuation from current CallContext to avoid marking dead object. */
+        /* RetContinuation will kill itself after invoke */
+        if (interp->current_cont->vtable->base_type == enum_class_RetContinuation
+            && Parrot_pcc_do_run_ops(interp, method_pmc)) {
+            PMC * const ctx             = CURRENT_CONTEXT(interp);
+            PMC * const parent_ctx      = Parrot_pcc_get_caller_ctx(interp, ctx);
+            PMC_cont(interp->current_cont)->from_ctx = parent_ctx;
+            Parrot_pcc_set_continuation(interp, ctx, PMCNULL);
+        }
         interp->current_object = object;
         dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
     }
@@ -153,6 +162,16 @@ op tailcallmethod(invar PMC, invar PMC) :object_base :flow {
 
     interp->current_cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
     PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL;
+    /* Detach continuation from current CallContext to avoid marking dead object. */
+    /* RetContinuation will kill itself after invoke */
+    if (interp->current_cont->vtable->base_type == enum_class_RetContinuation
+        && Parrot_pcc_do_run_ops(interp, method_pmc)) {
+        PMC * const ctx             = CURRENT_CONTEXT(interp);
+        PMC * const parent_ctx      = Parrot_pcc_get_caller_ctx(interp, ctx);
+        PMC_cont(interp->current_cont)->from_ctx = parent_ctx;
+        Parrot_pcc_set_continuation(interp, ctx, PMCNULL);
+    }
+
     interp->current_object = object;
     dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
     goto ADDRESS(dest);
