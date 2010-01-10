@@ -65,8 +65,8 @@ use Parrot::Install qw(
     lines_to_files
 );
 
-# When run from the makefile, which is probably the only time this
-# script will ever be used, all of these defaults will get overridden.
+# When run from the makefile, or from a test script, which are probably the only times
+# this script will ever be used, all of these defaults will get overridden.
 my %options = (
     buildprefix => '',
     prefix      => '/usr',
