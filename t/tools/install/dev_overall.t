@@ -50,17 +50,6 @@ my $full_gen_pseudo = File::Spec->catfile( $cwd, $gen_pseudo );
             end     => File::Spec->catfile(
                         $libdir, $versiondir, 'languages', 'nqp', 'bootstrap', 'actions.pm' ),
         },
-        'docs/compiler_faq.pod' => {
-            start   => File::Spec->catfile( qw| . docs compiler_faq.pod | ),
-            end     => File::Spec->catfile(
-                        $docdir,  $versiondir, 'pod', 'compiler_faq.pod' ),
-        },
-        'docs/pct/past_building_blocks.pod' => {
-            start   => File::Spec->catfile(
-                        qw| . docs pct past_building_blocks.pod | ),
-            end     => File::Spec->catfile(
-                        $docdir,  $versiondir, 'pod', 'pct', 'past_building_blocks.pod' ),
-        },
         'lib/Parrot/Configure.pm' => {
             start   => File::Spec->catfile(
                         qw| . lib Parrot Configure.pm | ),

@@ -53,16 +53,6 @@ my $full_gen_pseudo = File::Spec->catfile( $cwd, $gen_pseudo );
             end     => File::Spec->catfile(
                         $docdir, $versiondir, 'LICENSE' )
         },
-        'docs/gettingstarted.pod' => {
-            start   => File::Spec->catfile( qw| . docs gettingstarted.pod | ),
-            end     => File::Spec->catfile(
-                        $docdir,  $versiondir, 'pod', 'gettingstarted.pod' ),
-        },
-        'docs/resources/phony_resource' => {
-            start   => File::Spec->catfile( qw| . docs resources phony_resource | ),
-            end     => File::Spec->catfile(
-                        $docdir,  $versiondir, 'resources', 'phony_resource' ),
-        },
         'include/parrot/charset.h' => {
             start   => File::Spec->catfile( qw| . include parrot charset.h | ),
             end     => File::Spec->catfile(
