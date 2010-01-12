@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2009, Parrot Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 # $Id$
 
 =head1 TITLE
@@ -152,15 +152,13 @@ the output to the correct output file.
     nstable[''] = $P0
 
     # get our initial match object
-    .local pmc match
-    $P0 = get_hll_global ['PGE'], 'Match'
+    .local pmc match, stmt
+    $P0   = get_hll_global ['PGE'], 'Match'
     match = $P0.'new'(source, 'grammar'=>'PGE::Perl6Grammar')
-
-    .local pmc stmtrule
-    stmtrule = get_hll_global ['PGE';'Perl6Grammar'], 'statement'
+    stmt  = find_method match, 'statement'
 
   stmt_loop:
-    match = stmtrule(match)
+    match = stmt(match)
     unless match goto stmt_end
     unless match > '' goto stmt_end
     $S0 = match['cmd']
