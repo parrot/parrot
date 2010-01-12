@@ -167,6 +167,92 @@ The same load-time behavior applies regardless of whether the loaded file is
 PIR source or bytecode.  Note that it is possible to mark a sub with both
 B<:load> and B<:init>.
 
+=head2 Defining subs
+
+A sub is defined by a block of code starting with C<.sub> and ending with
+C<.end>. Parameters which the sub can be called with are defined by C<.param>:
+
+=begin PIR
+
+    .sub do_something
+      .param pmc a_pmc
+      .param string some_string
+      #do something
+    .end
+
+=end PIR
+
+The set of C<.param> instructions are converted to a single C<get_params>
+instruction. The compiler will decide which registers to use.
+
+=begin PIR_FRAGMENT
+    
+    get_params '(0,0)', $P0, $S0
+
+=end PIR_FRAGMENT
+
+A parameter can be declared optional with the C<:optional> command. If an
+optional parameter is followed by parameter declared C<:opt_flag>, this
+parameter will store an integer indicating whether the optional parameter
+was used.
+
+=begin PIR_FRAGMENT
+
+    .param string maybe :optional
+    .param int has_maybe :opt_flag
+    unless has_maybe goto no_maybe
+    #do something with maybe
+    no_maybe:
+    #don't use maybe
+
+=end PIR_FRAGMENT
+
+A sub can accept an arbitrary number of parameters by declaring a C<:slurpy>
+parameter:
+
+=begin PIR_FRAGMENT
+
+    .param pmc all_params :slurpy
+
+=end PIR_FRAGMENT
+
+This creates a pmc containing an array of all parameters passed to the sub,
+these can be accessed like so:
+
+=begin PIR_FRAGMENT
+
+    $P0 = all_params[0]
+    $S0 = all_params[1]
+
+=end PIR_FRAGMENT
+
+A slurpy parameter can also be defined after a set of positional parameters, in
+which case it will only hold any additional parameters passed.
+
+A parameter may also be declared C<:named>, giving them a string which can be
+used when calling the sub to explicitly assign a parameter, ignoring position.
+
+=begin PIR_FRAGMENT
+
+    .param int counter :named("counter")
+
+=end PIR_FRAGMENT
+
+This can be combined with C<:optional> as well as C<:opt_flag>, so that the
+parameter need only be passed when necessary.
+
+If a parameter is declared with C<:slurpy> and C<:named> (with no string), it
+creates an associative array containing all named parameters which can be
+accessed like so:
+
+=begin PIR_FRAGMENT
+
+    .param pmc all_params :slurpy :named
+    $S0 = all_params['name']
+    $I0 = all_params['counter']
+
+=end PIR_FRAGMENT
+
 =head2 Calling the sub
 
 PIR sub invocation syntax is similar to HLL syntax:
@@ -205,6 +291,16 @@ For example, the '(0,0)' for C<set_args> is replaced internally with C<[2,
 values get the same register type coercion as sub parameters.  This is all
 described in much more detail in L<docs/pdds/pdd03_calling_conventions.pod>.
 
+Named parameters can be explicity called in one of two ways:
+
+=begin PIR_FRAGMENT
+
+    $P5 = do_something($I6 :named("counter"), $S4 :named("name))
+    #or equivalently
+    $P5 = do_something("counter" => $I6, "name" => $S4)
+
+=end PIR_FRAGMENT
+
 To receive multiple values, put the register names in parentheses:
 
 =begin PIR_FRAGMENT
@@ -224,10 +320,36 @@ with an integer register declared C<:opt_val>:
 
 =end PIR_FRAGMENT_INVALID
 
-Both of these affect only the signature provided via C<get_results>.
+A C<:slurpy> value can be declared, as in parameter declarations, to catch an
+arbitrary number of return values:
 
-[should also describe :flat, :slurpy, :named, ..., or at least provide a
-reference.  -- rgr, 25-May-08.]
+=begin PIR_FRAGMENT
+
+    ($P12, $P13 :slurpy) = do_something($P1, $S3)
+
+=end PIR_FRAGMENT
+
+Note that the parameters stored in a C<:slurpy>, or C<:slurpy> C<:named> array
+can be used as parameters for another call using the C<:flat> declaration:
+
+=begin PIR_FRAGMENT
+
+    ($P14, $P15) = do_something($P13 :flat)
+
+=end PIR_FRAGMENT
+
+Subs may also return C<:named> values, which can be explicitly accessed similar
+to parameter declarations:
+
+=begin PIR_FRAGMENT
+
+    ($I11 :named("counter"), $S4 :named("name")) = do_something($P1, $S3)
+
+=end PIR_FRAGMENT
+
+All of these affect only the signature provided via C<get_results>.
+
+[not sure what this is for, leaving it alone for now -aninhumer]
 
 =begin PIR_FRAGMENT
 
@@ -262,6 +384,9 @@ to:
 As for C<set_args>, the '(0,0,0)' is actually a placeholder for an integer
 array that describes the register types; it is replaced internally with C<[2,
 0, 1]>, which means "three arguments, of type PMC, integer, and string".
+
+All of the declarations allowed for calls to a sub can also be used with
+return values. (C<:named>, C<:flat>)
 
 Another way to return from a sub is to use tail-calling, which calls a new sub
 with the current continuation, so that the new sub returns directly to the
