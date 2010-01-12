@@ -381,7 +381,7 @@ Whereas the following is not:
     # ...
   .end
 
-=begin PIR_INVALID
+=end PIR_INVALID
 
 It's also possible to use named syntax when returning values from
 subroutines. Into the C<.return> command I'll use:
