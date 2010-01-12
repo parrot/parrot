@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -982,27 +982,34 @@ pir_output_is( <<'CODE', <<'OUTPUT', "OO argument passing" );
 .sub main :main
     .local pmc cl, o, f
     cl = newclass "Foo"
-    o = new "Foo"
-    o."bar"("ok 1\n")
-    f = get_global ["Foo"], "bar"
-    f(o, "ok 2\n")
-    o."baz"("ok 3\n")
-    f = get_global ["Foo"], "baz"
-    f(o, "ok 4\n")
+    o  = new "Foo"
+
+    o."bar"("ok 1")
+
+    f  = find_method o, "bar"
+    f(o, "ok 2")
+
+    o."baz"("ok 3")
+    f = find_method o, "baz"
+    f(o, "ok 4")
 .end
+
 .namespace ["Foo"]
+
 .sub bar :method
     .param string s
     print self
     print " "
-    print s
+    say s
 .end
+
 .sub baz :method
     .param string s
     print self
     print " "
-    print s
+    say s
 .end
+
 .sub get_string :vtable :method
     $S0 = typeof self
     .return ($S0)

@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -17,13 +17,13 @@ Tests the Class PMC.
 =cut
 
 
-.const int TESTS = 63 
+.const int TESTS = 63
 
 
 .sub 'main' :main
      load_bytecode 'Test/More.pbc'
      .local pmc exporter, test_ns
-     test_ns = get_namespace [ 'Test'; 'More' ]
+     test_ns  = get_namespace [ 'Test'; 'More' ]
      exporter = new ['Exporter']
      exporter.'import'( test_ns :named('source'), 'plan ok is isa_ok todo' :named('globals') )
 
@@ -243,13 +243,13 @@ Tests the Class PMC.
 
     # note this test depends on 'add_attribute' and 'attributes'
     class.'add_attribute'( 'foo', 'String' )
-    attribs = class.'attributes'()
+    attribs        = class.'attributes'()
     attribs['foo'] = 'bar'
 
     .const 'Sub' meth_to_add = 'foo'
 
     class.'add_method'( 'foo', meth_to_add )
-    attribs = class.'methods'()
+    attribs  = class.'methods'()
     test_val = attribs
     is(test_val, 1, 'add_method() one method added')
 
@@ -362,9 +362,9 @@ t_class_meth:
     .local string test_name
     .local int test_val
 
-    attrs = new ['Hash']
+    attrs         = new ['Hash']
     attrs['name'] = 'Monkey'
-    class = new ['Class'], attrs
+    class         = new ['Class'], attrs
     class.'add_attribute'('banana')
     class_instance = class.'new'()
     ok(1, 'clone() created class Monkey and instantiated it')
@@ -393,8 +393,8 @@ t_class_meth:
     .local string test_string_val
     .local int num_elems
 
-    class = new ['Hash']
-    class['name'] = 'Monkey2'
+    class          = new ['Hash']
+    class['name']  = 'Monkey2'
     class_instance = new ['Class'], class
     class_instance.'add_attribute'('banana')
     monkey = class_instance.'new'()
@@ -426,16 +426,20 @@ t_class_meth:
     .local pmc attr_val, result
     init_hash = new ['Hash']
 
+    # grab the methods from the 'Add' namespace
+    .local pmc add_class
+    add_class = newclass [ 'Add' ]
+
+    .local pmc methods
+    methods = inspect add_class, 'methods'
+
     # We'll have some attributes...
-    attrs = new ['ResizablePMCArray']
-    attrs[0] = 'x'
-    attrs[1] = 'y'
+    attrs                   = new ['ResizablePMCArray']
+    attrs[0]                = 'x'
+    attrs[1]                = 'y'
     init_hash['attributes'] = attrs
 
     # And a method.
-    methods = new ['Hash']
-    meth_to_add = get_global 'add'
-    methods['add'] = meth_to_add
     init_hash['methods'] = methods
 
     class = new ['Class'], init_hash
@@ -443,8 +447,9 @@ t_class_meth:
 
     # Instantiate and try setting each attribute.
     class_instance = class.'new'()
-    attr_val = new ['Integer']
-    attr_val = 37
+    attr_val       = new ['Integer']
+    attr_val       = 37
+
     setattribute class_instance, 'x', attr_val
     ok(1, 'new() set first attribute')
 
@@ -458,7 +463,9 @@ t_class_meth:
     is(result, 42, 'new() added method returns expected value')
 .end
 
-.sub add :method
+.namespace [ 'Add' ]
+
+.sub 'add' :method
     $P0 = getattribute self, "x"
     $P1 = getattribute self, "y"
     $P2 = new ['Integer']
@@ -466,6 +473,7 @@ t_class_meth:
     .return($P2)
 .end
 
+.namespace []
 
 # L<PDD15/Class PMC API/=item isa>
 .sub 'isa'

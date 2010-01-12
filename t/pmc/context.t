@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2009, Parrot Foundation.
+# Copyright (C) 2009-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -94,8 +94,8 @@ TODO: Implement real tests when CallContext PMC will be migrated to use ATTRibut
 
     $P0 = getattribute ctx, 'current_namespace'
     ok($P0, 'Got CallContext.current_namespace')
-    $P1 = $P0['test_inspect']
-    is($P1, 'test_inspect', '... with proper content')
+
+    is($P0, 'Foo', '... with proper content')
 
     # Checking handlers
     push_eh done

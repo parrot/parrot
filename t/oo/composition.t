@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -34,26 +34,36 @@ Tests role composition in the OO implementation.
     multi_composition()
 .end
 
+.namespace [ 'Methods' ]
+
 .sub badger :method
     .return('Badger!')
 .end
+
 .sub badger2 :method
     .return('Second Badger!')
 .end
+
 .sub mushroom :method
     .return('Mushroom!')
 .end
+
 .sub snake :method
     .return('Snake!')
 .end
+
+.namespace []
+
 .sub fire
     .return("You're FIRED!")
 .end
+
 .sub fire2
     .return('BURNINATION!')
 .end
-.sub give_payrise
-    .return('You all get a pay rise of 0.0005%.')
+
+.sub give_payraise
+    .return('You all get a pay raise of 0.0005%.')
 .end
 
 .sub role_with_no_methods
@@ -75,7 +85,11 @@ Tests role composition in the OO implementation.
     $P0 = new 'Role'
     $P1 = new 'Class'
 
-    $P2 = get_global "badger"
+    .local pmc mc, meths
+    mc    = newclass [ 'Methods' ]
+    meths = inspect mc, 'methods'
+    $P2   = meths['badger']
+
     $P0.'add_method'("badger", $P2)
     ok(1, 'added method to a role')
 
@@ -98,16 +112,20 @@ Tests role composition in the OO implementation.
     $P1 = new 'Role'
     $P2 = new 'Class'
 
-    $P3 = get_global "snake"
+    .local pmc mc, meths
+    mc    = get_class [ 'Methods' ]
+    meths = inspect mc, 'methods'
+    $P3   = meths['snake']
+
     $P2.'add_method'("snake", $P3)
     ok(1, 'class has a method')
 
-    $P3 = get_global "badger"
+    $P3 = meths['badger']
     $P0.'add_method'("badger", $P3)
     $P2.'add_role'($P0)
     ok(1, 'composed first role into the class')
 
-    $P3 = get_global "mushroom"
+    $P3 = meths['mushroom']
     $P1.'add_method'("mushroom", $P3)
     $P2.'add_role'($P1)
     ok(1, 'composed second role into the class')
@@ -131,12 +149,16 @@ Tests role composition in the OO implementation.
     $P1 = new 'Role'
     $P2 = new 'Class'
 
-    $P3 = get_global "badger"
+    .local pmc mc, meths
+    mc    = get_class [ 'Methods' ]
+    meths = inspect mc, 'methods'
+    $P3   = meths['badger']
+
     $P0.'add_method'("badger", $P3)
     $P2.'add_role'($P0)
     ok(1, 'composed first role into the class')
 
-    $P3 = get_global "badger2"
+    $P3 = meths['badger2']
     $P1.'add_method'("badger", $P3)
 
   try:
@@ -162,18 +184,22 @@ Tests role composition in the OO implementation.
     $P0 = new 'Role'
     $P1 = new 'Class'
 
-    $P2 = get_global "badger"
+    .local pmc mc, meths
+    mc    = get_class [ 'Methods' ]
+    meths = inspect mc, 'methods'
+    $P2   = meths['badger']
+
     $P1.'add_method'("badger", $P2)
     ok(1, 'class has a method')
 
-    $P2 = get_global "badger2"
+    $P2 = meths['badger2']
     $P0.'add_method'("badger", $P2)
 
   try:
     eh = new 'ExceptionHandler'
     eh.'handle_types'(.EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT)
     set_addr eh, catch
-    
+
     push_eh eh
     $P1.'add_role'($P0)
     $I0 = 1
@@ -191,13 +217,17 @@ Tests role composition in the OO implementation.
     $P0 = new 'Role'
     $P1 = new 'Class'
 
-    $P2 = get_global "badger"
+    .local pmc mc, meths
+    mc    = get_class [ 'Methods' ]
+    meths = inspect mc, 'methods'
+    $P2   = meths['badger']
+
     $P1.'add_method'("badger", $P2)
     ok(1, 'class has a method')
 
-    $P2 = get_global "badger2"
+    $P2 = meths['badger2']
     $P0.'add_method'("badger", $P2)
-    $P2 = get_global "snake"
+    $P2 = meths['snake']
     $P0.'add_method'("snake", $P2)
     $P3 = new 'ResizableStringArray'
     push $P3, "badger"
@@ -216,13 +246,17 @@ Tests role composition in the OO implementation.
     $P0 = new 'Role'
     $P1 = new 'Class'
 
-    $P2 = get_global 'badger'
+    .local pmc mc, meths
+    mc    = get_class [ 'Methods' ]
+    meths = inspect mc, 'methods'
+    $P2   = meths['badger']
+
     $P1.'add_method'('badger', $P2)
     ok(1, 'class has a method')
 
-    $P2 = get_global 'badger2'
+    $P2 = meths['badger2']
     $P0.'add_method'('badger', $P2)
-    $P2 = get_global 'snake'
+    $P2 = meths['snake']
     $P0.'add_method'('snake', $P2)
     $P3 = new 'Hash'
     $P3['badger'] = 'role_badger'
@@ -255,13 +289,17 @@ Tests role composition in the OO implementation.
     $S0 = $P4[0]
     is($S0, 'badger', 'got resolve list and it matched')
 
-    $P2 = get_global 'badger'
+    .local pmc mc, meths
+    mc    = get_class [ 'Methods' ]
+    meths = inspect mc, 'methods'
+    $P2   = meths['badger']
+
     $P1.'add_method'('badger', $P2)
     ok(1, 'class has a method')
 
-    $P2 = get_global 'badger2'
+    $P2 = meths['badger2']
     $P0.'add_method'('badger', $P2)
-    $P2 = get_global 'snake'
+    $P2 = meths['snake']
     $P0.'add_method'('snake', $P2)
     $P1.'add_role'($P0)
     ok(1, 'composition worked due to resolve')
@@ -282,8 +320,8 @@ Tests role composition in the OO implementation.
     FirePeople.'add_method'("fire", $P0)
 
     Manage = new 'Role'
-    $P0 = get_global 'give_payrise'
-    Manage.'add_method'("give_payrise", $P0)
+    $P0 = get_global 'give_payraise'
+    Manage.'add_method'("give_payraise", $P0)
     Manage.'add_role'(FirePeople)
     ok(1, 'adding one role to another happens')
 
@@ -292,8 +330,8 @@ Tests role composition in the OO implementation.
     ok(1, 'added one rule that does another role to the class')
 
     $P0 = PHB.'new'()
-    $S0 = $P0.'give_payrise'()
-    is($S0, 'You all get a pay rise of 0.0005%.', 'called method from direct role')
+    $S0 = $P0.'give_payraise'()
+    is($S0, 'You all get a pay raise of 0.0005%.', 'called method from direct role')
 
     $S1 = $P0.'fire'()
     is($S1, "You're FIRED!", 'called method from indirect role')
@@ -307,8 +345,8 @@ Tests role composition in the OO implementation.
     FirePeople.'add_method'('fire', $P0)
 
     Manage = new 'Role'
-    $P0 = get_global 'give_payrise'
-    FirePeople.'add_method'('give_payrise', $P0)
+    $P0 = get_global 'give_payraise'
+    FirePeople.'add_method'('give_payraise', $P0)
     Manage.'add_role'(FirePeople)
 
     Burninator = new 'Role'
