@@ -32,7 +32,7 @@ A built parrot (Configure and make) to generate all files so we can analyze
 them. Ack is used to find the files. We are not currently requiring ack
 for development, so this is an optional test.
 
-=heads BUGS
+=head1 BUGS
 
 The pre-processing of the makefile doesn't follow make's behavior: variables
 should have no value until they are defined; in our pre-processing, their
@@ -104,10 +104,10 @@ foreach my $file (sort grep /\.pir$/, split /\n/, $files) {
     my @includes;
     while ($guts =~ m/\.include\s+(["'])(.*)\1/g) {
         push @includes, $2;
-    } 
+    }
     while ($guts =~ m/\bload_bytecode\s+(["'])(.*)\1/g) {
         push @includes, $2;
-    } 
+    }
 
     # Canonicalize each of these includes.
 
