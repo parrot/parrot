@@ -241,33 +241,6 @@ reference.  -- rgr, 25-May-08.]
 PIR supports a convenient syntax for returning any number of values from a sub
 or closure:
 
-
-To test whether a value was returned, declare it C<:optional>, and follow it
-with an integer register declared C<:opt_val>:
-
-=begin PIR_FRAGMENT_INVALID
-
-    ($P10 :optional, $I10 :opt_val) = do_something($P1, $S3)
-
-=end PIR_FRAGMENT_INVALID
-
-Both of these affect only the signature provided via C<get_results>.
-
-[should also describe :flat, :slurpy, :named, ..., or at least provide a
-reference.  -- rgr, 25-May-08.]
-
-=begin PIR_FRAGMENT
-
-    # Call the sub in $P8, with continuation (created earlier) in $P9.
-    invoke $P8, $P9
-
-=end PIR_FRAGMENT
-
-=head2 Returning from a sub
-
-PIR supports a convenient syntax for returning any number of values from a sub
-or closure:
-
 =begin PIR
 
     .sub main 
@@ -281,7 +254,7 @@ to:
 
 =begin PIR_FRAGMENT
 
-    get_results '(0,0,0)', $P0, $I1, $S3
+    set_returns '(0,0,0)', $P0, $I1, $S3
     returncc	# return by calling the current continuation
 
 =end PIR_FRAGMENT
