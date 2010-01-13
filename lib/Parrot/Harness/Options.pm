@@ -92,6 +92,7 @@ sub remap_runcore_opts
     my %remap      = (
         'j' => '-runcore=fast',
         'g' => '-runcore=cgoto',
+        'G' => '-runcore=gcdebug',
         'C' => '-runcore=cgp',
         'S' => '-runcore=switch',
         'b' => '-runcore=bounds',

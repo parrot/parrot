@@ -36,7 +36,7 @@ $ENV{RUNNING_MAKE_TEST} = $longopts->{running_make_test};
 # Suck the short options into the TEST_PROG_ARGS
 # environmental variable.
 my %opts;
-getopts('wgjPCSefbvdr?hO:D:', \%opts);
+getopts('wgGjPCSefbvdr?hO:D:', \%opts);
 
 if ($opts{'?'} || $opts{h} || $longopts->{help}) {
     Usage();
@@ -140,6 +140,10 @@ Turn warnings on.
 =item C<-g>
 
 Run the C<CGoto> core.
+
+=item C<-G>
+
+Run the C<GCDebug> core.
 
 =item C<-j>
 
