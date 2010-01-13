@@ -47,12 +47,10 @@ and these methods:
 static void
 stop_GC(Interp *parent, Interp *thread)
 {
-#if 0
     Parrot_block_GC_mark(parent);
     Parrot_block_GC_mark(thread);
     Parrot_block_GC_sweep(parent);
     Parrot_block_GC_sweep(thread);
-#endif
 }
 
 /* XXX FIXME probably not the best interface [see also list post of
