@@ -208,18 +208,12 @@ was used.
 =end PIR_FRAGMENT
 
 A sub can accept an arbitrary number of parameters by declaring a C<:slurpy>
-parameter:
+parameter.  This creates a pmc containing an array of all parameters passed to
+the sub, these can be accessed like so:
 
 =begin PIR_FRAGMENT
 
     .param pmc all_params :slurpy
-
-=end PIR_FRAGMENT
-
-This creates a pmc containing an array of all parameters passed to the sub,
-these can be accessed like so:
-
-=begin PIR_FRAGMENT
 
     $P0 = all_params[0]
     $S0 = all_params[1]
@@ -295,7 +289,7 @@ Named parameters can be explicity called in one of two ways:
 
 =begin PIR_FRAGMENT
 
-    $P5 = do_something($I6 :named("counter"), $S4 :named("name))
+    $P5 = do_something($I6 :named("counter"), $S4 :named("name"))
     #or equivalently
     $P5 = do_something("counter" => $I6, "name" => $S4)
 
