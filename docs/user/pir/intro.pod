@@ -373,7 +373,7 @@ before the named parameters. So, the following is allowed:
 
 Whereas the following is not:
 
-=begin PIR_INVALID
+=begin PIR
 
   .sub main
     .param int a :named("name")
@@ -381,7 +381,7 @@ Whereas the following is not:
     # ...
   .end
 
-=end PIR_INVALID
+=end PIR
 
 It's also possible to use named syntax when returning values from
 subroutines. Into the C<.return> command I'll use:
