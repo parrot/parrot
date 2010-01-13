@@ -632,18 +632,11 @@ Archives the subroutine.
 */
 
     VTABLE void visit(visit_info *info) {
-        Parrot_Sub_attributes *sub;
+        VISIT_PMC_ATTR(INTERP, info, SELF, Sub, namespace_name);
 
-        PMC_get_sub(INTERP, SELF, sub);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Sub, multi_signature);
 
-        info->thaw_ptr = &sub->namespace_name;
-        (info->visit_pmc_now)(INTERP, sub->namespace_name, info);
-
-        info->thaw_ptr = &sub->multi_signature;
-        (info->visit_pmc_now)(INTERP, sub->multi_signature, info);
-
-        info->thaw_ptr = &sub->outer_sub;
-        (info->visit_pmc_now)(INTERP, sub->outer_sub, info);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Sub, outer_sub);
 
         /*
          * XXX visit_pmc_now is wrong, because it breaks
@@ -653,13 +646,12 @@ Archives the subroutine.
          *
          * Therefore the hash must be last during visit for now.
          */
-        info->thaw_ptr = &sub->lex_info;
-        (info->visit_pmc_now)(INTERP, sub->lex_info, info);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Sub, lex_info);
+
         SUPER(info);
     }
 
     VTABLE void freeze(visit_info *info) {
-        IMAGE_IO       * const io  = info->image_io;
         Parrot_Sub_attributes *sub;
         STRING                *hll_name;
         int i;
@@ -684,35 +676,35 @@ Archives the subroutine.
          * - subid
          */
 
-        VTABLE_push_integer(INTERP, io, (INTVAL) sub->start_offs);
-        VTABLE_push_integer(INTERP, io, (INTVAL) sub->end_offs);
-        VTABLE_push_integer(INTERP, io,
+        VTABLE_push_integer(INTERP, info, (INTVAL) sub->start_offs);
+        VTABLE_push_integer(INTERP, info, (INTVAL) sub->end_offs);
+        VTABLE_push_integer(INTERP, info,
             (INTVAL)(PObj_get_FLAGS(pmc) & SUB_FLAG_PF_MASK));
 
-        VTABLE_push_string(INTERP, io, sub->name);
+        VTABLE_push_string(INTERP, info, sub->name);
 
         if (!sub->method_name)
             sub->method_name = CONST_STRING(INTERP, "");
-        VTABLE_push_string(INTERP, io, sub->method_name);
+        VTABLE_push_string(INTERP, info, sub->method_name);
 
         if (!sub->ns_entry_name)
             sub->ns_entry_name = CONST_STRING(INTERP, "");
-        VTABLE_push_string(INTERP, io, sub->ns_entry_name);
+        VTABLE_push_string(INTERP, info, sub->ns_entry_name);
 
         hll_name = Parrot_get_HLL_name(INTERP, sub->HLL_id);
         if (!hll_name)
             hll_name = CONST_STRING(INTERP, "");
-        VTABLE_push_string(INTERP, io, hll_name);
+        VTABLE_push_string(INTERP, info, hll_name);
 
-        VTABLE_push_integer(INTERP, io, (INTVAL)sub->comp_flags);
-        VTABLE_push_integer(INTERP, io, sub->vtable_index);
+        VTABLE_push_integer(INTERP, info, (INTVAL)sub->comp_flags);
+        VTABLE_push_integer(INTERP, info, sub->vtable_index);
 
         for (i = 0; i < 4; ++i)
-            VTABLE_push_integer(INTERP, io, sub->n_regs_used[i]);
+            VTABLE_push_integer(INTERP, info, sub->n_regs_used[i]);
 
         if (!sub->subid)
             sub->subid = CONST_STRING(INTERP, "");
-        VTABLE_push_string(INTERP, io, sub->subid);
+        VTABLE_push_string(INTERP, info, sub->subid);
     }
 
 /*
@@ -726,36 +718,33 @@ Unarchives the subroutine.
 */
 
     VTABLE void thaw(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
+        Parrot_Sub_attributes *sub;
+        INTVAL flags;
+        int    i;
+
         SUPER(info);
 
-        if (info->extra_flags == EXTRA_IS_NULL) {
-            Parrot_Sub_attributes *sub;
-            INTVAL flags;
-            int    i;
+        PMC_get_sub(INTERP, SELF, sub);
 
-            PMC_get_sub(INTERP, SELF, sub);
+        /* we get relative offsets */
+        sub->start_offs   = (size_t) VTABLE_shift_integer(INTERP, info);
+        sub->end_offs     = (size_t) VTABLE_shift_integer(INTERP, info);
+        flags             = VTABLE_shift_integer(INTERP, info);
 
-            /* we get relative offsets */
-            sub->start_offs   = (size_t) VTABLE_shift_integer(INTERP, io);
-            sub->end_offs     = (size_t) VTABLE_shift_integer(INTERP, io);
-            flags             = VTABLE_shift_integer(INTERP, io);
+        PObj_get_FLAGS(SELF) |= flags & SUB_FLAG_PF_MASK;
 
-            PObj_get_FLAGS(SELF) |= flags & SUB_FLAG_PF_MASK;
+        sub->name           = VTABLE_shift_string(INTERP, info);
+        sub->method_name    = VTABLE_shift_string(INTERP, info);
+        sub->ns_entry_name  = VTABLE_shift_string(INTERP, info);
+        sub->HLL_id         = Parrot_get_HLL_id(INTERP,
+            VTABLE_shift_string(INTERP, info));
+        sub->comp_flags     = VTABLE_shift_integer(INTERP, info);
+        sub->vtable_index   = VTABLE_shift_integer(INTERP, info);
 
-            sub->name           = VTABLE_shift_string(INTERP, io);
-            sub->method_name    = VTABLE_shift_string(INTERP, io);
-            sub->ns_entry_name  = VTABLE_shift_string(INTERP, io);
-            sub->HLL_id         = Parrot_get_HLL_id(INTERP,
-                VTABLE_shift_string(INTERP, io));
-            sub->comp_flags     = VTABLE_shift_integer(INTERP, io);
-            sub->vtable_index   = VTABLE_shift_integer(INTERP, io);
+        for (i = 0; i < 4; ++i)
+            sub->n_regs_used[i] = VTABLE_shift_integer(INTERP, info);
 
-            for (i = 0; i < 4; ++i)
-                sub->n_regs_used[i] = VTABLE_shift_integer(INTERP, io);
-
-            sub->subid        = VTABLE_shift_string(INTERP, io);
-        }
+        sub->subid        = VTABLE_shift_string(INTERP, info);
     }
 
 /*

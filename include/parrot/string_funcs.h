@@ -291,6 +291,17 @@ STRING * Parrot_str_new_COW(PARROT_INTERP, ARGMOD(STRING *s))
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+STRING * Parrot_str_new_from_buffer(PARROT_INTERP,
+    ARGMOD(Buffer *buffer),
+    const UINTVAL len)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*buffer);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_str_new_init(PARROT_INTERP,
     ARGIN_NULLOK(const char *buffer),
@@ -629,6 +640,9 @@ STRING* Parrot_str_from_uint(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_str_new_COW __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_Parrot_str_new_from_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(buffer))
 #define ASSERT_ARGS_Parrot_str_new_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(encoding) \

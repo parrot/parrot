@@ -647,19 +647,19 @@ char * opt_mul(PARROT_INTERP, char *pc, int dest, INTVAL imm, int src);
 #else /* NUMVAL_SIZE */
 
 #  define jit_emit_fload_m_n(interp, pc, address) \
-      emitm_fldt((pc), emit_None, emit_None, emit_None, (address))
+      emitm_fldt((interp), (pc), emit_None, emit_None, emit_None, (address))
 
 #  define jit_emit_fload_mb_n(interp, pc, base, offs) \
-      emitm_fldt((pc), (base), emit_None, 1, (offs))
+      emitm_fldt((interp), (pc), (base), emit_None, 1, (offs))
 
 #  define jit_emit_fstore_m_n(pc, address) \
-      emitm_fstpt((pc), emit_None, emit_None, emit_None, (address))
+      emitm_fstpt((interp), (pc), emit_None, emit_None, emit_None, (address))
 
 #  define jit_emit_fstore_mb_n(interp, pc, base, offs) \
-      emitm_fstpt((pc), (base), emit_None, 1, (offs))
+      emitm_fstpt((interp), (pc), (base), emit_None, 1, (offs))
 
 #  define jit_emit_fst_mb_n(interp, pc, base, offs) \
-      emitm_fstt((pc), (base), emit_None, 1, (offs))
+      emitm_fstt((interp), (pc), (base), emit_None, 1, (offs))
 
 #endif /* NUMVAL_SIZE */
 

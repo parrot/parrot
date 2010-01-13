@@ -370,10 +370,10 @@ NULL PMC is returned.
 */
 
     VTABLE PMC *getprop(STRING *key) {
-        if (PMC_metadata(SELF))
-            return VTABLE_get_pmc_keyed_str(INTERP, PMC_metadata(SELF), key);
-        else
+        if (PMC_IS_NULL(PMC_metadata(SELF)))
             return check_get_std_props(interp, SELF, key);
+        else
+            return VTABLE_get_pmc_keyed_str(INTERP, PMC_metadata(SELF), key);
     }
 
 /*
@@ -390,13 +390,10 @@ Sets the property for C<*key> to C<*value>.
         if (check_set_std_props(INTERP, SELF, key, value))
             return;
 
-        if (PMC_metadata(SELF))
-            VTABLE_set_pmc_keyed_str(INTERP, PMC_metadata(SELF), key, value);
-        else {
-            PMC * const prop = make_prop_hash(INTERP, SELF);
+        if (PMC_IS_NULL(PMC_metadata(SELF)))
+            make_prop_hash(INTERP, SELF);
 
-            VTABLE_set_pmc_keyed_str(INTERP, prop, key, value);
-        }
+        VTABLE_set_pmc_keyed_str(INTERP, PMC_metadata(SELF), key, value);
     }
 
 /*
@@ -410,7 +407,7 @@ Deletes the property for C<*key>.
 */
 
     VTABLE void delprop(STRING *key) {
-        if (PMC_metadata(SELF))
+        if (!PMC_IS_NULL(PMC_metadata(SELF)))
             VTABLE_delete_keyed_str(INTERP, PMC_metadata(SELF), key);
     }
 
@@ -425,7 +422,7 @@ Returns the PMC's properties or the NULL PMC if no properties exist.
 */
 
     VTABLE PMC *getprops() {
-        if (!PMC_metadata(SELF)) {
+        if (PMC_IS_NULL(PMC_metadata(SELF))) {
             if (has_pending_std_props(SELF))
                 return make_prop_hash(INTERP, SELF);
             else
@@ -1055,18 +1052,6 @@ Used by GC to mark the PMC.
 */
 
     VTABLE void visit(visit_info *info) {
-        /* default - mark prop hash */
-        if (PMC_metadata(SELF) &&
-            info->extra_flags != EXTRA_IS_PROP_HASH) {
-            info->extra_flags = EXTRA_IS_PROP_HASH;
-            info->extra       = PMC_metadata(SELF);
-
-            /* place escape mark */
-            (info->visit_pmc_now)(INTERP, SELF, info);
-
-            /* place and the prop hash */
-            (info->visit_pmc_now)(INTERP, PMC_metadata(SELF), info);
-        }
     }
 
 /*
@@ -1110,12 +1095,7 @@ Initializes the PMC during unarchiving.
 
     VTABLE void thaw(visit_info *info) {
         /* default - initialize the PMC */
-        if (info->extra_flags == EXTRA_IS_PROP_HASH) {
-            info->thaw_ptr  = &PMC_metadata(SELF);
-            (info->visit_pmc_now)(INTERP, PMC_metadata(SELF), info);
-        }
-        else
-            SELF.init();
+        SELF.init();
     }
 
 /*

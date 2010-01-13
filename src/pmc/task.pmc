@@ -396,13 +396,8 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 */
 
     VTABLE void visit(visit_info *info) {
-        Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
-        PMC **pos;
-
         /* 1) visit code block */
-        pos            = &core_struct->codeblock;
-        info->thaw_ptr = pos;
-        (info->visit_pmc_now)(INTERP, *pos, info);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Task, codeblock);
     }
 
 /*
@@ -416,26 +411,25 @@ Used to archive the task.
 */
 
     VTABLE void freeze(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
         const Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
 
         /* 1) freeze task id */
-        VTABLE_push_integer(INTERP, io, core_struct->id);
+        VTABLE_push_integer(INTERP, info, core_struct->id);
 
         /* 2) freeze task birthtime */
-        VTABLE_push_float(INTERP, io, core_struct->birthtime);
+        VTABLE_push_float(INTERP, info, core_struct->birthtime);
 
         /* 3) freeze task priority */
-        VTABLE_push_integer(INTERP, io, core_struct->priority);
+        VTABLE_push_integer(INTERP, info, core_struct->priority);
 
         /* 4) freeze task type */
-        VTABLE_push_string(INTERP, io, core_struct->type);
+        VTABLE_push_string(INTERP, info, core_struct->type);
 
         /* 5) freeze task subtype */
-        VTABLE_push_string(INTERP, io, core_struct->subtype);
+        VTABLE_push_string(INTERP, info, core_struct->subtype);
 
         /* 6) freeze task status */
-        VTABLE_push_string(INTERP, io, core_struct->status);
+        VTABLE_push_string(INTERP, info, core_struct->status);
     }
 
 /*
@@ -449,25 +443,23 @@ Used to unarchive the task.
 */
 
     VTABLE void thaw(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
-
         /* 1. thaw task id */
-        const INTVAL id = VTABLE_shift_integer(INTERP, io);
+        const INTVAL id = VTABLE_shift_integer(INTERP, info);
 
         /* 2. thaw task birthtime */
-        const FLOATVAL birthtime = VTABLE_shift_float(INTERP, io);
+        const FLOATVAL birthtime = VTABLE_shift_float(INTERP, info);
 
         /* 3. thaw task priority */
-        const INTVAL priority = VTABLE_shift_integer(INTERP, io);
+        const INTVAL priority = VTABLE_shift_integer(INTERP, info);
 
         /* 4. thaw task type */
-        STRING * const type = VTABLE_shift_string(INTERP, io);
+        STRING * const type = VTABLE_shift_string(INTERP, info);
 
         /* 5. thaw task subtype */
-        STRING * const subtype = VTABLE_shift_string(INTERP, io);
+        STRING * const subtype = VTABLE_shift_string(INTERP, info);
 
         /* 6. thaw task status */
-        STRING * const status = VTABLE_shift_string(INTERP, io);
+        STRING * const status = VTABLE_shift_string(INTERP, info);
 
         /* Allocate the task's core data struct and set custom flags. */
         SELF.init();

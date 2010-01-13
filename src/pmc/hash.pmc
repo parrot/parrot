@@ -1102,13 +1102,12 @@ Used to archive the hash.
 */
 
     VTABLE void freeze(visit_info *info) {
-        IMAGE_IO * const io   = info->image_io;
         Hash     * const hash = (Hash *)SELF.get_pointer();;
 
         SUPER(info);
-        VTABLE_push_integer(INTERP, io, VTABLE_elements(INTERP, SELF));
-        VTABLE_push_integer(INTERP, io, (INTVAL)hash->key_type);
-        VTABLE_push_integer(INTERP, io, hash->entry_type);
+        VTABLE_push_integer(INTERP, info, VTABLE_elements(INTERP, SELF));
+        VTABLE_push_integer(INTERP, info, (INTVAL)hash->key_type);
+        VTABLE_push_integer(INTERP, info, hash->entry_type);
     }
 
 /*
@@ -1122,13 +1121,12 @@ Used to unarchive the hash.
 */
 
     VTABLE void thaw(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
-
         SUPER(info);
-        if (info->extra_flags == EXTRA_IS_NULL) {
-            const INTVAL elems  = VTABLE_shift_integer(INTERP, io);
-            const INTVAL k_type = VTABLE_shift_integer(INTERP, io);
-            const INTVAL v_type = VTABLE_shift_integer(INTERP, io);
+
+        {
+            const INTVAL elems  = VTABLE_shift_integer(INTERP, info);
+            const INTVAL k_type = VTABLE_shift_integer(INTERP, info);
+            const INTVAL v_type = VTABLE_shift_integer(INTERP, info);
             Hash        *hash;
 
             if (k_type == Hash_key_type_int && v_type == enum_hash_int) {

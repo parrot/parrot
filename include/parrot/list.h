@@ -220,11 +220,11 @@ void Parrot_pmc_array_unshift(PARROT_INTERP,
 PARROT_EXPORT
 void Parrot_pmc_array_visit(PARROT_INTERP,
     ARGIN(List *list),
-    ARGMOD(void *pinfo))
+    ARGMOD(visit_info *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*pinfo);
+        FUNC_MODIFIES(*info);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
@@ -284,7 +284,7 @@ INTVAL Parrot_pmc_array_length(SHIM_INTERP, ARGIN(const List *list))
 #define ASSERT_ARGS_Parrot_pmc_array_visit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(list) \
-    , PARROT_ASSERT_ARG(pinfo))
+    , PARROT_ASSERT_ARG(info))
 #define ASSERT_ARGS_Parrot_pmc_array_length __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(list))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

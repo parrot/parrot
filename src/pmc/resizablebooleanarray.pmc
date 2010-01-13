@@ -422,19 +422,18 @@ Used to archive the string.
         STRING           *s;
         UINTVAL           tail_pos, rounded_size, head_pos;
         unsigned char    *bit_array;
-        IMAGE_IO * const  io = info->image_io;
 
         GET_ATTR_size(INTERP, SELF, tail_pos);
         GET_ATTR_resize_threshold(INTERP, SELF, head_pos);
         GET_ATTR_bit_array(INTERP, SELF, bit_array);
         rounded_size = ROUND_BYTES(tail_pos);
 
-        VTABLE_push_integer(INTERP, io, head_pos);
-        VTABLE_push_integer(INTERP, io, tail_pos);
+        VTABLE_push_integer(INTERP, info, head_pos);
+        VTABLE_push_integer(INTERP, info, tail_pos);
 
         s = Parrot_str_new(INTERP, (char*)bit_array, rounded_size);
 
-        VTABLE_push_string(INTERP, io, s);
+        VTABLE_push_string(INTERP, info, s);
     }
 
 /*
@@ -448,10 +447,9 @@ Used to unarchive the string.
 */
     VTABLE void thaw(visit_info *info) {
         unsigned char   *bit_array;
-        IMAGE_IO * const io       = info->image_io;
-        const UINTVAL    head_pos = VTABLE_shift_integer(INTERP, io);
-        const UINTVAL    tail_pos = VTABLE_shift_integer(INTERP, io);
-        STRING * const   s        = VTABLE_shift_string(INTERP, io);
+        const UINTVAL    head_pos = VTABLE_shift_integer(INTERP, info);
+        const UINTVAL    tail_pos = VTABLE_shift_integer(INTERP, info);
+        STRING * const   s        = VTABLE_shift_string(INTERP, info);
 
         bit_array      = (unsigned char*)Parrot_str_to_cstring(INTERP, s);
         SET_ATTR_size(INTERP, SELF, tail_pos);

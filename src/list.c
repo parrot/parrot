@@ -1635,7 +1635,8 @@ Parrot_pmc_array_mark(PARROT_INTERP, ARGMOD(List *list))
 
 /*
 
-=item C<void Parrot_pmc_array_visit(PARROT_INTERP, List *list, void *pinfo)>
+=item C<void Parrot_pmc_array_visit(PARROT_INTERP, List *list, visit_info
+*info)>
 
 This is used by freeze/thaw to visit the contents of the list.
 
@@ -1647,11 +1648,10 @@ C<pinfo> is the visit info, (see include/parrot/pmc_freeze.h>).
 
 PARROT_EXPORT
 void
-Parrot_pmc_array_visit(PARROT_INTERP, ARGIN(List *list), ARGMOD(void *pinfo))
+Parrot_pmc_array_visit(PARROT_INTERP, ARGIN(List *list), ARGMOD(visit_info *info))
 {
     ASSERT_ARGS(Parrot_pmc_array_visit)
     List_chunk        *chunk;
-    visit_info * const info = (visit_info*) pinfo;
     UINTVAL            idx;
 
     const UINTVAL n = Parrot_pmc_array_length(interp, list);
@@ -1662,9 +1662,7 @@ Parrot_pmc_array_visit(PARROT_INTERP, ARGIN(List *list), ARGMOD(void *pinfo))
         if (!(chunk->flags & sparse)) {
             UINTVAL i;
             for (i = 0; i < chunk->items && idx < n; i++, idx++) {
-                PMC ** const pos = ((PMC **) Buffer_bufstart(&chunk->data)) + i;
-                info->thaw_ptr   = pos;
-                (info->visit_pmc_now)(interp, *pos, info);
+                VISIT_PMC(interp, info, ((PMC **)Buffer_bufstart(&chunk->data))[i]);
             }
         }
         /*

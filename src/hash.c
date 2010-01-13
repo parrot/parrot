@@ -555,7 +555,6 @@ static void
 hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(visit_info *info))
 {
     ASSERT_ARGS(hash_thaw)
-    IMAGE_IO * const io         = info->image_io;
 
     /* during thaw, info->extra is the key/value count */
     const size_t     num_entries = (size_t) hash->entries;
@@ -569,13 +568,13 @@ hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(visit_info *info))
         switch (hash->key_type) {
           case Hash_key_type_STRING:
             {
-                STRING * const s_key = VTABLE_shift_string(interp, io);
+                STRING * const s_key = VTABLE_shift_string(interp, info);
                 b = parrot_hash_put(interp, hash, s_key, NULL);
             }
             break;
           case Hash_key_type_int:
             {
-                const INTVAL i_key = VTABLE_shift_integer(interp, io);
+                const INTVAL i_key = VTABLE_shift_integer(interp, info);
                 b = parrot_hash_put(interp, hash, (void*)i_key, NULL);
             }
             break;
@@ -588,15 +587,13 @@ hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(visit_info *info))
         switch (hash->entry_type) {
           case enum_hash_pmc:
             {
-                /* this looks awful, but it avoids type-punning warnings */
-                void **ptr     = &b->value;
-                info->thaw_ptr = (PMC **)ptr;
-                (info->visit_pmc_now)(interp, NULL, info);
+                PMC *p   = VTABLE_shift_pmc(interp, info);
+                b->value = (void *)p;
                 break;
             }
           case enum_hash_int:
             {
-                const INTVAL i = VTABLE_shift_integer(interp, io);
+                const INTVAL i = VTABLE_shift_integer(interp, info);
                 b->value       = (void *)i;
                 break;
             }
@@ -629,7 +626,6 @@ static void
 hash_freeze(PARROT_INTERP, ARGIN(const Hash * const hash), ARGMOD(visit_info *info))
 {
     ASSERT_ARGS(hash_freeze)
-    IMAGE_IO * const io = info->image_io;
     size_t           i;
 
     for (i = 0; i < hash->entries; i++) {
@@ -637,10 +633,10 @@ hash_freeze(PARROT_INTERP, ARGIN(const Hash * const hash), ARGMOD(visit_info *in
 
         switch (hash->key_type) {
           case Hash_key_type_STRING:
-            VTABLE_push_string(interp, io, (STRING *)b->key);
+            VTABLE_push_string(interp, info, (STRING *)b->key);
             break;
           case Hash_key_type_int:
-            VTABLE_push_integer(interp, io, (INTVAL)b->key);
+            VTABLE_push_integer(interp, info, (INTVAL)b->key);
             break;
           default:
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
@@ -650,10 +646,10 @@ hash_freeze(PARROT_INTERP, ARGIN(const Hash * const hash), ARGMOD(visit_info *in
 
         switch (hash->entry_type) {
           case enum_hash_pmc:
-            (info->visit_pmc_now)(interp, (PMC *)b->value, info);
+            VTABLE_push_pmc(interp, info, (PMC *)b->value);
             break;
           case enum_hash_int:
-            VTABLE_push_integer(interp, io, (INTVAL)b->value);
+            VTABLE_push_integer(interp, info, (INTVAL)b->value);
             break;
           default:
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
@@ -683,13 +679,11 @@ parrot_hash_visit(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(void *pinfo))
     ASSERT_ARGS(parrot_hash_visit)
     visit_info* const info = (visit_info*) pinfo;
 
-    switch (info->what) {
+    switch (VTABLE_get_integer(interp, info)) {
       case VISIT_THAW_NORMAL:
-      case VISIT_THAW_CONSTANTS:
         hash_thaw(interp, hash, info);
         break;
       case VISIT_FREEZE_NORMAL:
-      case VISIT_FREEZE_AT_DESTRUCT:
         hash_freeze(interp, hash, info);
         break;
       default:

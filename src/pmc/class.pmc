@@ -1432,38 +1432,23 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 */
 
     VTABLE void visit(visit_info *info) {
-        Parrot_Class_attributes * const class_data = PARROT_CLASS(SELF);
-        PMC **pos;
-
         /* 1) visit the attribute description hash */
-        pos            = &class_data->attrib_metadata;
-        info->thaw_ptr = pos;
-        (info->visit_pmc_now)(INTERP, *pos, info);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Class, attrib_metadata);
 
         /* 2) visit list of parents */
-        pos            = &class_data->parents;
-        info->thaw_ptr = pos;
-        (info->visit_pmc_now)(INTERP, *pos, info);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Class, parents);
 
         /* 3) visit list of roles */
-        pos            = &class_data->roles;
-        info->thaw_ptr = pos;
-        (info->visit_pmc_now)(INTERP, *pos, info);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Class, roles);
 
         /* 4) visit hash of methods */
-        pos            = &class_data->methods;
-        info->thaw_ptr = pos;
-        (info->visit_pmc_now)(INTERP, *pos, info);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Class, methods);
 
         /* 5) visit hash of vtable overrides */
-        pos            = &class_data->vtable_overrides;
-        info->thaw_ptr = pos;
-        (info->visit_pmc_now)(INTERP, *pos, info);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Class, vtable_overrides);
 
         /* 6) visit list of resolve methods */
-        pos            = &class_data->resolve_method;
-        info->thaw_ptr = pos;
-        (info->visit_pmc_now)(INTERP, *pos, info);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Class, resolve_method);
     }
 
 /*
@@ -1477,15 +1462,14 @@ Used to archive the class.
 */
 
     VTABLE void freeze(visit_info *info) {
-        IMAGE_IO     * const io         = info->image_io;
         Parrot_Class_attributes * const class_data = PARROT_CLASS(SELF);
         STRING       *serial_namespace = CONST_STRING(interp, "");
 
         /* 1) freeze class id */
-        VTABLE_push_integer(INTERP, io, class_data->id);
+        VTABLE_push_integer(INTERP, info, class_data->id);
 
         /* 2) freeze class name */
-        VTABLE_push_string(INTERP, io, class_data->name);
+        VTABLE_push_string(INTERP, info, class_data->name);
 
         /* 3) serialize namespace name, including HLL */
         if (!PMC_IS_NULL(class_data->_namespace)) {
@@ -1494,7 +1478,7 @@ Used to archive the class.
             if (!PMC_IS_NULL(names))
                 serial_namespace = Parrot_str_join(interp, CONST_STRING(interp, ";"), names);
         }
-        VTABLE_push_string(INTERP, io, serial_namespace);
+        VTABLE_push_string(INTERP, info, serial_namespace);
     }
 
 /*
@@ -1512,46 +1496,39 @@ Used to unarchive the class.
          * anonymous class and later decide whether to link it into the
          * namespace.  */
 
-        if (info->extra_flags == EXTRA_IS_PROP_HASH) {
-            SUPER(info);
-        }
-        else if (info->extra_flags == EXTRA_IS_NULL) {
-            IMAGE_IO * const io = info->image_io;
+        /* 1) thaw class id */
+        const INTVAL id = VTABLE_shift_integer(INTERP, info);
 
-            /* 1) thaw class id */
-            const INTVAL id = VTABLE_shift_integer(INTERP, io);
+        /* 2) thaw class name */
+        STRING * const name = VTABLE_shift_string(INTERP, info);
 
-            /* 2) thaw class name */
-            STRING * const name = VTABLE_shift_string(INTERP, io);
+        /* 3) deserialize namespace name, including HLL */
+        STRING * const serial_namespace = VTABLE_shift_string(INTERP, info);
+        STRING * const semicolon_str = CONST_STRING(INTERP, ";");
+        PMC    * const namespace_array =
+            Parrot_str_split(INTERP, semicolon_str, serial_namespace);
+        PMC *ns = Parrot_get_namespace_keyed(interp,
+                INTERP->root_namespace, namespace_array);
 
-            /* 3) deserialize namespace name, including HLL */
-            STRING * const serial_namespace = VTABLE_shift_string(INTERP, io);
-            STRING * const semicolon_str = CONST_STRING(INTERP, ";");
-            PMC    * const namespace_array =
-                Parrot_str_split(INTERP, semicolon_str, serial_namespace);
-            PMC *ns = Parrot_get_namespace_keyed(interp,
+        /* If the namespace doesn't exist, we create it, and initialize
+         * ourselves in it */
+        if (PMC_IS_NULL(ns)) {
+            ns = Parrot_make_namespace_keyed(interp,
                     INTERP->root_namespace, namespace_array);
-
-            /* If the namespace doesn't exist, we create it, and initialize
-             * ourselves in it */
-            if (PMC_IS_NULL(ns)) {
-                ns = Parrot_make_namespace_keyed(interp,
-                        INTERP->root_namespace, namespace_array);
-                SELF.init_pmc(ns);
-            }
-            /* If the namespace exists already, we point to it, but otherwise
-             * act as an anonymous class. */
-            else {
-                SELF.init();
-                PARROT_CLASS(SELF)->_namespace = ns;
-            }
-
-            /* Set the class's short name to the frozen name */
-            PARROT_CLASS(SELF)->name = name;
-
-            /* Set the class's id the frozen id */
-            PARROT_CLASS(SELF)->id = id;
+            SELF.init_pmc(ns);
         }
+        /* If the namespace exists already, we point to it, but otherwise
+         * act as an anonymous class. */
+        else {
+            SELF.init();
+            PARROT_CLASS(SELF)->_namespace = ns;
+        }
+
+        /* Set the class's short name to the frozen name */
+        PARROT_CLASS(SELF)->name = name;
+
+        /* Set the class's id the frozen id */
+        PARROT_CLASS(SELF)->id = id;
     }
 
 /*

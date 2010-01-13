@@ -981,6 +981,13 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     PackFile        * const pf  = self;
 #endif
 
+    if (packed_size < PACKFILE_HEADER_BYTES) {
+        Parrot_io_eprintf(NULL, "PackFile_unpack: "
+            "Buffer length %d is shorter than PACKFILE_HEADER_BYTES %d\n",
+            packed_size, PACKFILE_HEADER_BYTES);
+        return 0;
+    }
+
     self->src  = packed;
     self->size = packed_size;
 
@@ -1045,13 +1052,21 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
         /* No UUID; fine, nothing more to do. */
     }
     else if (header->uuid_type == 1) {
+        if (packed_size < PACKFILE_HEADER_BYTES + header->uuid_size) {
+            Parrot_io_eprintf(NULL, "PackFile_unpack: "
+                    "Buffer length %d is shorter than PACKFILE_HEADER_BYTES + uuid_size %d\n",
+                    packed_size, PACKFILE_HEADER_BYTES + header->uuid_size);
+            return 0;
+        }
+
+
         /* Read in the UUID. We'll put it in a NULL-terminated string, just in
          * case people use it that way. */
         header->uuid_data = (unsigned char *)
             mem_sys_allocate(header->uuid_size + 1);
 
         memcpy(header->uuid_data, packed + PACKFILE_HEADER_BYTES,
-            header->uuid_size);
+                header->uuid_size);
 
         /* NULL terminate */
         header->uuid_data[header->uuid_size] = '\0';
@@ -1071,6 +1086,9 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
 
     /* Set what transforms we need to do when reading the rest of the file. */
     PackFile_assign_transforms(self);
+
+    if (self->options & PFOPT_PMC_FREEZE_ONLY)
+        return cursor - packed;
 
     /* Directory format. */
     header->dir_format = PF_fetch_opcode(self, &cursor);

@@ -292,7 +292,6 @@ Used to unarchive the array.
 */
 
     VTABLE void freeze(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
         INTVAL   *int_array;
         INTVAL    i, n, rt;
 
@@ -300,38 +299,33 @@ Used to unarchive the array.
 
         n  = SELF.get_integer();
         GET_ATTR_resize_threshold(INTERP, SELF, rt);
-        VTABLE_push_integer(INTERP, io, n);
-        VTABLE_push_integer(INTERP, io, rt);
+        VTABLE_push_integer(INTERP, info, n);
+        VTABLE_push_integer(INTERP, info, rt);
 
         GET_ATTR_int_array(INTERP, SELF, int_array);
 
         for (i = 0; i < n; ++i)
-            VTABLE_push_integer(INTERP, io, int_array[i]);
+            VTABLE_push_integer(INTERP, info, int_array[i]);
     }
 
     VTABLE void thaw(visit_info *info) {
-        if (info->extra_flags == EXTRA_IS_NULL) {
-            IMAGE_IO * const io = info->image_io;
-            const INTVAL n = VTABLE_shift_integer(INTERP, io);
-            const INTVAL rt = VTABLE_shift_integer(INTERP, io);
+        const INTVAL n = VTABLE_shift_integer(INTERP, info);
+        const INTVAL rt = VTABLE_shift_integer(INTERP, info);
 
-            SET_ATTR_size(INTERP, SELF, 0);
-            SET_ATTR_resize_threshold(INTERP, SELF, rt);
-            SET_ATTR_int_array(INTERP, SELF, NULL);
+        SET_ATTR_size(INTERP, SELF, 0);
+        SET_ATTR_resize_threshold(INTERP, SELF, rt);
+        SET_ATTR_int_array(INTERP, SELF, NULL);
 
-            if (n) {
-                INTVAL  i;
-                INTVAL *int_array;
+        if (n) {
+            INTVAL  i;
+            INTVAL *int_array;
 
-                SELF.set_integer_native(n);
-                GET_ATTR_int_array(INTERP, SELF, int_array);
+            SELF.set_integer_native(n);
+            GET_ATTR_int_array(INTERP, SELF, int_array);
 
-                for (i = 0; i < n; ++i)
-                    int_array[i] = VTABLE_shift_integer(INTERP, io);
-            }
+            for (i = 0; i < n; ++i)
+                int_array[i] = VTABLE_shift_integer(INTERP, info);
         }
-        else
-            SUPER(info);
     }
 
 

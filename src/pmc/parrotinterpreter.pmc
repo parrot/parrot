@@ -708,8 +708,8 @@ Finish thawing.
          */
 
         /*  HLL_info */
-        if (info->what == VISIT_THAW_NORMAL ||
-                info->what == VISIT_THAW_CONSTANTS) {
+        if (VTABLE_get_integer(INTERP, info) == VISIT_THAW_NORMAL ||
+            VTABLE_get_integer(INTERP, info) == VISIT_THAW_CONSTANTS) {
             pos = &PMC_args(SELF);
         }
         else
@@ -720,21 +720,14 @@ Finish thawing.
     }
 
     VTABLE void thaw(visit_info *info) {
-        if (info->extra_flags == EXTRA_IS_PROP_HASH) {
-            SUPER(info);
+        if (!PMC_data(SELF)) {
+            Parrot_ParrotInterpreter_attributes *attrs =
+                mem_allocate_zeroed_typed(Parrot_ParrotInterpreter_attributes);
+            PMC_data(SELF) = attrs;
+            PObj_custom_destroy_SET(SELF);
         }
-        else if (info->extra_flags == EXTRA_IS_NULL) {
 
-            if (!PMC_data(SELF)) {
-                Parrot_ParrotInterpreter_attributes *attrs =
-                    mem_allocate_zeroed_typed(Parrot_ParrotInterpreter_attributes);
-                PMC_data(SELF) = attrs;
-                PObj_custom_destroy_SET(SELF);
-            }
-
-            PMC_interp(SELF) = INTERP;
-            info->what       = VISIT_THAW_CONSTANTS;
-        }
+        PMC_interp(SELF) = INTERP;
     }
 
     VTABLE void thawfinish(visit_info *info) {

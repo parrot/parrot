@@ -567,16 +567,15 @@ Used to archive the string.
 
 */
     VTABLE void freeze(visit_info *info) {
-        IMAGE_IO * const   io  = info->image_io;
         STRING           **str_array;
         UINTVAL            size, i;
 
         GET_ATTR_size(INTERP, SELF, size);
         GET_ATTR_str_array(INTERP, SELF, str_array);
-        VTABLE_push_integer(INTERP, io, size);
+        VTABLE_push_integer(INTERP, info, size);
 
         for (i = 0; i < size; ++i)
-            VTABLE_push_string(INTERP, io, str_array[i]);
+            VTABLE_push_string(INTERP, info, str_array[i]);
     }
 
 /*
@@ -589,22 +588,18 @@ Used to unarchive the string.
 
 */
     VTABLE void thaw(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
+        UINTVAL  i, size;
+        STRING **str_array;
+
+        SELF.init();
         SUPER(info);
 
-        if (info->extra_flags == EXTRA_IS_NULL) {
-            UINTVAL  i, size;
-            STRING **str_array;
+        size   = VTABLE_shift_integer(INTERP, info);
+        SELF.set_integer_native((INTVAL)size);
+        GET_ATTR_str_array(INTERP, SELF, str_array);
 
-            SELF.init();
-
-            size   = VTABLE_shift_integer(INTERP, io);
-            SELF.set_integer_native((INTVAL)size);
-            GET_ATTR_str_array(INTERP, SELF, str_array);
-
-            for (i = 0; i < size; ++i)
-                str_array[i] = VTABLE_shift_string(INTERP, io);
-        }
+        for (i = 0; i < size; ++i)
+            str_array[i] = VTABLE_shift_string(INTERP, info);
     }
 }
 

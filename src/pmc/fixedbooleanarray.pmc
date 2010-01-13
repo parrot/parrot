@@ -516,7 +516,6 @@ Used to archive the string.
     VTABLE void freeze(visit_info *info) {
         UINTVAL          size, resize_threshold;
         unsigned char  * bit_array;
-        IMAGE_IO * const io = info->image_io;
         STRING   *       s;
         GET_ATTR_size(INTERP, SELF, size);
         GET_ATTR_resize_threshold(INTERP, SELF, resize_threshold);
@@ -525,8 +524,8 @@ Used to archive the string.
         s = Parrot_str_new(INTERP, (char*)bit_array,
                 (resize_threshold / BITS_PER_CHAR));
 
-        VTABLE_push_integer(INTERP, io, size);
-        VTABLE_push_string(INTERP, io, s);
+        VTABLE_push_integer(INTERP, info, size);
+        VTABLE_push_string(INTERP, info, s);
     }
 
 /*
@@ -539,14 +538,13 @@ Used to unarchive the string.
 
 */
     VTABLE void thaw(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
         SUPER(info);
 
-        if (info->extra_flags == EXTRA_IS_NULL) {
+        {
             unsigned char * bit_array;
             UINTVAL         threshold;
-            const INTVAL    size      = VTABLE_shift_integer(INTERP, io);
-            STRING * const  s         = VTABLE_shift_string(INTERP, io);
+            const INTVAL    size      = VTABLE_shift_integer(INTERP, info);
+            STRING * const  s         = VTABLE_shift_string(INTERP, info);
 
             bit_array = (unsigned char *)Parrot_str_to_cstring(INTERP, s);
             threshold = Parrot_str_byte_length(interp, s) * BITS_PER_CHAR;
