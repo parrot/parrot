@@ -394,8 +394,7 @@ CODE
 written
 OUTPUT
 
-TODO: {
-pir_output_is( <<"CODE", <<'OUTPUT', "eval.thaw", todo => 'TT #1142 not yet fixed' );
+pir_output_is( <<"CODE", <<'OUTPUT', "eval.thaw" );
 .sub main :main
     .local pmc io, e
     .local string file
@@ -415,7 +414,6 @@ CODE
 hello from foo_1
 hello from foo_1
 OUTPUT
-}
 
 pir_output_is( <<"CODE", <<'OUTPUT', "eval.freeze+thaw" );
 .sub main :main
