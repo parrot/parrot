@@ -36,10 +36,11 @@ END:
 .end
 
 .sub init :vtable :method
-    .local pmc close
+    .local pmc cl, close
+    cl    = get_class [ 'Stream'; 'Base' ]
+    close = cl.'find_method'( 'close' )
 
     # call our own close
-    close = get_hll_global ['Stream'; 'Base'], 'close'
     close(self)
 .end
 
@@ -348,7 +349,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2009, Parrot Foundation.
+Copyright (C) 2004-2010, Parrot Foundation.
 
 =cut
 
