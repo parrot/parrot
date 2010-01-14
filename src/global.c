@@ -655,6 +655,15 @@ Parrot_find_global_op(PARROT_INTERP, ARGIN(PMC *ns),
     res = Parrot_find_global_n(interp, ns, globalname);
     if (!res)
         res = PMCNULL;
+    else if (res->vtable->base_type == enum_class_Sub) {
+        Parrot_Sub_attributes *sub;
+        PMC_get_sub(interp, res, sub);
+
+        if (sub->comp_flags & SUB_COMP_FLAG_METHOD) {
+            Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_SYNTAX_ERROR,
+                "Fetching method from NS");
+        }
+    }
 
     return res;
 }
