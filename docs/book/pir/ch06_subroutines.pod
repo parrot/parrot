@@ -643,7 +643,7 @@ follows these scoping rules:
 
 =begin PIR_FRAGMENT
 
-      .local int foo
+      .local pmc foo
       .lex 'foo', foo
 
 =end PIR_FRAGMENT
