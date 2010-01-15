@@ -15,6 +15,14 @@ main()
         unsigned char b[sizeof (@iv@)/sizeof (unsigned char)];
         @iv@ w;
     } w;
+#if defined(__ARM__) || defined(__arm__)
+#   if defined(__ARMEB__)
+    printf("87654321\n");
+#   else
+    printf("1234\n");
+#   endif
+    return 0;
+#endif
     if (sizeof (w) == 4) {
         w.w = 0x04030201;
     }
