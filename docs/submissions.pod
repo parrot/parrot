@@ -109,9 +109,9 @@ Select "New Ticket" L<https://trac.parrot.org/parrot/newticket>.
 
 =item 4
 
-Give a clear and concise Summary.
-
-Prefix it with a C<[PATCH]> identifier.
+Give a clear and concise Summary.  You do B<NOT> need to prefix the Summary
+with a C<[PATCH]> identifier.  Instead, in the lower-right corner of the
+F<newticket> page, select status C<new> in the F<Patch status> drop-down box.
 
 =item 5
 
@@ -124,7 +124,8 @@ may be included at the bottom of the message body.
 
 Set the Type of the ticket to "patch". Set other relevant drop-down
 menus, such as Version (the version of Parrot where you encountered the
-problem), Platform, or Severity.
+problem), Platform, or Severity.  As mentioned above, select status C<new> in
+the F<Patch status> drop-down box.
 
 =item 7
 
