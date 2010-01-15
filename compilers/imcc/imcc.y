@@ -1942,19 +1942,33 @@ labeled_inst:
          }
    | LEXICAL STRINGC COMMA target
          {
-           SymReg *n;
-           char   *name = mem_sys_strdup($2 + 1);
-           name[strlen(name) - 1] = 0;
-           n = mk_const(interp, name, 'S');
-           set_lexical(interp, $4, n); $$ = 0;
-           mem_sys_free($2);
-           mem_sys_free(name);
+            if ($4->set != 'P') {
+                mem_sys_free($2);
+                IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
+                    "Cannot use %c register with .lex", $4->set);
+            }
+            else {
+               SymReg *n;
+               char   *name = mem_sys_strdup($2 + 1);
+               name[strlen(name) - 1] = 0;
+               n = mk_const(interp, name, 'S');
+               set_lexical(interp, $4, n); $$ = 0;
+               mem_sys_free($2);
+               mem_sys_free(name);
+            }
          }
    | LEXICAL USTRINGC COMMA target
          {
-           SymReg *n = mk_const(interp, $2, 'U');
-           set_lexical(interp, $4, n); $$ = 0;
-           mem_sys_free($2);
+            if ($4->set != 'P') {
+                mem_sys_free($2);
+                IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
+                    "Cannot use %c register with .lex", $4->set);
+            }
+            else {
+               SymReg *n = mk_const(interp, $2, 'U');
+               set_lexical(interp, $4, n); $$ = 0;
+               mem_sys_free($2);
+            }
          }
    | CONST { IMCC_INFO(interp)->is_def = 1; } type IDENTIFIER '=' const
          {

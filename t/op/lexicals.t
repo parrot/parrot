@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -14,7 +14,7 @@ $ENV{TEST_PROG_ARGS} ||= '';
 plan( skip_all => 'lexicals not thawed properly from PBC, TT #1171' )
     if $ENV{TEST_PROG_ARGS} =~ /--run-pbc/;
 
-plan( tests => 51 );
+plan( tests => 57 );
 
 =head1 NAME
 
@@ -1556,6 +1556,60 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'find_dynamic_lex two levels deep' );
 .end
 CODE
 main
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', '.lex should not accept $S#');
+.sub 'main'
+    $S0 = 'hello world'
+    .lex '$var', $S0
+.end
+CODE
+/error.*Cannot use S register with \.lex/
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', '.lex should not accept $I#');
+.sub 'main'
+    $I0 = 5
+    .lex '$var', $I0
+.end
+CODE
+/error.*Cannot use I register with \.lex/
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', '.lex should not accept $N#');
+.sub 'main'
+    $N0 = 3.14
+    .lex '$pi', $N0
+.end
+CODE
+/error.*Cannot use N register with \.lex/
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'store_lex should not accept $S#');
+.sub 'main'
+    $S0 = 'hello world'
+    store_lex '$var', $S0
+.end
+CODE
+/error/
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'store_lex should not accept $I#');
+.sub 'main'
+    $I0 = 5
+    store_lex '$var', $I0
+.end
+CODE
+/error/
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'store_lex should not accept $N#');
+.sub 'main'
+    $N0 = 3.14
+    store_lex '$pi', $N0
+.end
+CODE
+/error/
 OUTPUT
 
 # Local Variables:
