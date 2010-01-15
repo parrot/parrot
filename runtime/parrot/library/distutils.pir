@@ -880,11 +880,11 @@ the value is the PBC pathname
     $S0 = config['gccversion']
     unless $S0 goto L1
     unless has_cflags goto L2
-    $I0 = index cflags, '-g '
+    $I0 = index cflags, '-g'
     unless $I0 < 0 goto L1
   L2:
     $S0 = config['cflags']
-    $I0 = index $S0, '-g '
+    $I0 = index $S0, '-g'
     unless $I0 < 0 goto L1
     .return (1)
   L1:
