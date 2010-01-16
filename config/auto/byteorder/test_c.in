@@ -16,11 +16,11 @@ main()
         @iv@ w;
     } w;
 #if defined(__ARM__) || defined(__arm__)
-#   if defined(__ARMEB__)
+#  if defined(__ARMEB__)
     printf("87654321\n");
-#   else
+#  else
     printf("1234\n");
-#   endif
+#  endif
     return 0;
 #endif
     if (sizeof (w) == 4) {
