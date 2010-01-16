@@ -130,7 +130,6 @@ src/atomic/gcc_x86.c
 src/debug.c
 src/gc/generational_ms.c
 src/io/io_string.c
-src/nci_test.c
 src/pbc_dump.c
 src/string/charset/ascii.c
 src/string/charset/binary.c
