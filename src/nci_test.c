@@ -99,7 +99,7 @@ PARROT_DYNEXT_EXPORT short  nci_ssc(short, char);
 PARROT_DYNEXT_EXPORT char * nci_t(void);
 PARROT_DYNEXT_EXPORT char * nci_tb(void *);
 PARROT_DYNEXT_EXPORT char * nci_tB(void **);
-PARROT_DYNEXT_EXPORT char * nci_tt(void *);
+PARROT_DYNEXT_EXPORT char * nci_tt(char *);
 PARROT_DYNEXT_EXPORT void   nci_v(void);
 PARROT_DYNEXT_EXPORT void   nci_vP(void *);
 PARROT_DYNEXT_EXPORT void   nci_vpii(Outer *, int, int);
@@ -312,7 +312,7 @@ nci_ip(void *p)
 
 =item C<PARROT_DYNEXT_EXPORT int nci_it(void *p)>
 
-test calls this with a string
+Prints the first two characters in C<p>, in reversed order.  Returns 2.
 
 =cut
 
@@ -379,7 +379,7 @@ nci_t(void)
 
 =item C<PARROT_DYNEXT_EXPORT char * nci_tb(void *p)>
 
-Prints "xx worked", where "xx" is replaced with the first two character values
+Returns "xx worked", where "xx" is replaced with the first two character values
 of C<p>, in reverse order.
 
 =cut
@@ -399,9 +399,9 @@ nci_tb(void *p)
 
 /*
 
-=item C<PARROT_DYNEXT_EXPORT char * nci_tt(void *p)>
+=item C<PARROT_DYNEXT_EXPORT char * nci_tt(char *p)>
 
-Prints "xx worked", where "xx" is replaced with the first two character values
+Returns "xx worked", where "xx" is replaced with the first two character values
 of C<p>, in reverse order.
 
 =cut
@@ -411,10 +411,10 @@ of C<p>, in reverse order.
 static char s[] = "xx worked\n";
 
 PARROT_DYNEXT_EXPORT char *
-nci_tt(void *p)
+nci_tt(char *p)
 {
-    s[0] = ((char*) p)[1];
-    s[1] = ((char*) p)[0];
+    s[0] = p[1];
+    s[1] = p[0];
 
     return s;
 }
@@ -423,7 +423,7 @@ nci_tt(void *p)
 
 =item C<PARROT_DYNEXT_EXPORT char * nci_tB(void **p)>
 
-Prints "xx done", where "xx" is replaced with the first two character values
+Returns "xx done", where "xx" is replaced with the first two character values
 of C<p>, in reverse order.
 
 =cut
@@ -462,6 +462,7 @@ nci_pp(void *p)
 =item C<PARROT_DYNEXT_EXPORT int nci_iiii(int i1, int i2, int i3)>
 
 Prints three integers separated by whitespace to C<stderr>.
+Returns 2.
 
 =cut
 
@@ -725,7 +726,8 @@ Prints "ok" if C<PMC> is not null, prints "got null" otherwise.
 PARROT_DYNEXT_EXPORT void
 nci_vP(void *pmc)
 {
-    /* Disable this test until someone figures a way to check for
+    /* TODO:
+     * Disable this test until someone figures a way to check for
      * PMCNULL without using libparrot.
     if (!PMC_IS_NULL(pmc))
         puts("ok");
@@ -772,7 +774,8 @@ nci_cb_C1(cb_C1_func cb, void* user_data)
 
 =item C<PARROT_DYNEXT_EXPORT void nci_cb_C2(cb_C2_func cb, void* user_data)>
 
-Calls the function C<cb> with the pointer C<user_data>. No return value.
+Calls the function C<cb> with the integer 77 and the given C<user_data>.
+No return value.
 
 =cut
 
@@ -791,7 +794,8 @@ nci_cb_C2(cb_C2_func cb, void* user_data)
 
 =item C<PARROT_DYNEXT_EXPORT void nci_cb_C3(cb_C3_func cb, void* user_data)>
 
-Calls function C<cb> with data C<user_data>. No return value.
+Calls function C<cb> with C<&int_cb_C3> and the givn C<user_data>.
+No return value.
 
 =cut
 
@@ -812,7 +816,8 @@ nci_cb_C3(cb_C3_func cb, void* user_data)
 
 =item C<PARROT_DYNEXT_EXPORT void nci_cb_D1(cb_D1_func cb, void* user_data)>
 
-Calls function C<cb> with data C<user_data>. No return value.
+Calls function C<cb> with data C<user_data> and the string "succeeded".
+No return value.
 
 =cut
 
@@ -832,7 +837,8 @@ nci_cb_D1(cb_D1_func cb, void* user_data)
 
 =item C<PARROT_DYNEXT_EXPORT void nci_cb_D2(cb_D2_func cb, void* user_data)>
 
-Calls function C<cb> with data C<user_data>.
+Calls function C<cb> with data C<user_data> and the integer 88.
+No return value.
 
 =cut
 
@@ -851,7 +857,8 @@ nci_cb_D2(cb_D2_func cb, void* user_data)
 
 =item C<PARROT_DYNEXT_EXPORT void nci_cb_D3(cb_D3_func cb, void* user_data)>
 
-Calls function C<cb> with data C<user_data>.
+Calls function C<cb> with data C<user_data> and C<&int_cb_D3>.
+No return value.
 
 =cut
 
@@ -873,7 +880,9 @@ nci_cb_D3(cb_D3_func cb, void* user_data)
 =item C<PARROT_DYNEXT_EXPORT void nci_cb_D4(cb_D4_func times_ten, void*
 user_data)>
 
-Calls function C<times_ten> with data C<user_data> 10 times in a loop.
+Calls function C<times_ten> with data C<user_data> and C<&int_cb_D4> 10 times
+in a loop, incrementing C<int_cb_D4> after every call.
+No return value.
 
 =cut
 
@@ -916,7 +925,7 @@ nci_pip(int count, Rect_Like *rects)
 
 =item C<PARROT_DYNEXT_EXPORT int nci_i33(int *double_me, int *triple_me)>
 
-Returns the result C<*double_me * 2 + *triple_me * 3>.
+Doubles C<double_me> and triples C<triple_me>. Returns their sum.
 
 =cut
 
@@ -1076,7 +1085,7 @@ nci_vp(Opaque *inOpaque)
 
 =item C<PARROT_DYNEXT_EXPORT char * nci_ttt(char *s1, char *s2)>
 
-Prints "s2, s1, s1d"
+Prints and returns "s2, s2, s1"
 
 =cut
 
@@ -1085,14 +1094,15 @@ Prints "s2, s1, s1d"
 PARROT_DYNEXT_EXPORT char *
 nci_ttt(char *s1, char *s2)
 {
-    char* s = (char*) malloc(strlen(s2) + (2 * strlen(s1)) + 5);
+    char* s = (char*) malloc((2 * strlen(s2)) + strlen(s1) + 5);
     sprintf(s, "%s, %s, %s", s2, s2, s1);
     printf("%s\n", s);
     return s;
 }
 
 
-static void validate_float(float f, double checkval) {
+static void
+validate_float(float f, double checkval) {
     int valid;
     double error_ratio;
     error_ratio = (((double)f) - checkval) / checkval;
@@ -1104,7 +1114,8 @@ static void validate_float(float f, double checkval) {
 
 =item C<PARROT_DYNEXT_EXPORT void nci_vfff(float l1, float l2, float l3)>
 
-Returns the result of C<l1> / C<l2>.
+Checks that C<[ l1, l2, l3 ]> = C<[ 3456.54, 10.1999, 14245.567 ]> within an
+error of 0.01.
 
 =cut
 
@@ -1123,7 +1134,7 @@ nci_vfff(float l1, float l2, float l3)
 
 =item C<PARROT_DYNEXT_EXPORT void nci_vV(const char **ptr)>
 
-Returns the result of C<l1> / C<l2>.
+Sets C<*ptr> to "Hello bright new world\n".
 
 =cut
 
@@ -1140,7 +1151,8 @@ nci_vV(const char **ptr)
 =item C<PARROT_DYNEXT_EXPORT void nci_vVVV(const char **ptr1, const char **ptr2,
 const char **ptr3)>
 
-Returns the result of C<l1> / C<l2>.
+Sets C<*ptr1> to "Hello bright new world!\n", C<*ptr2> to "It is a beautiful
+day!\n", and C<*ptr3> to "Go suck a lemon.\n".
 
 =cut
 
