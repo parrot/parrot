@@ -1887,9 +1887,7 @@ editor-clean :
 #
 ###############################################################################
 
-# The --running-make-test argument is currently used by long-running tests
-# to disable GC_DEBUG.
-EXTRA_TEST_ARGS := --gc-debug --running-make-test
+EXTRA_TEST_ARGS := --gc-debug
 DISTRO_TEST_FILES := \
     t/distro/*.t
 BENCHMARK_TEST_FILES := \
