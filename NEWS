@@ -2,15 +2,33 @@
 
 New in 2.0.0
 - Functionality
+  + Context PMCs now support attribute-based introspection
+  + Context and CallSignature PMCs merged into CallContext
+  + .lex directive throws exceptions when used with incorrect register types
 - Compilers
+  + PIRC (new PIR compiler) built by default
 - Platforms
+  + Packaging improved for free OS distributions
+  + PPC, PPC64, and ARM now tested when running Linux
 - Performance
+  + Minor improvements to the profiling runcore
+  + Modest improvements from the CallContext PMC merge
 - New deprecations
+  + In/out parameters in STRING modification functions
+  + Void handling in NCI signatures
+  + Parameter passing opcodes order in PBC
 - Realized deprecations
 - Tests
+  + Continued migration of core tests from Perl 5 to PIR
 - Documentation
+  + Improved accuracy, removed typos
 - Tools
+  + dependency checker improved
 - Miscellaneous
+  + Deprecation cycle length changed to three months from six
+  + GC accuracy improved
+  + PMC freeze improvements; much more reliable
+  + Makefile improvements for dependency handling
 
 New in 1.9.0
 - Core
