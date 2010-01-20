@@ -101,7 +101,8 @@ END_FASTA
     # print code
 
     .local pmc fasta_rule
-    fasta_rule = get_global ['Bio';'Fasta'], "databank"
+    fasta_rule = get_global ['Bio'], 'Fasta'
+    fasta_rule = find_method fasta_rule, "databank"
     .local pmc match
     ( match ) = fasta_rule( fasta )
 
