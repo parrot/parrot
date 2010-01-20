@@ -100,12 +100,10 @@ foreach my $file (sort grep /\.pir$/, split /\n/, $files) {
     $guts =~ s{^#.*$}{}gm;
     # Ignore anything inside pod.
     $guts =~ s{^=.*^=cut$}{}gsm;
+    # XXX Ignore anything inside quotes.
 
     my @includes;
-    while ($guts =~ m/\.include\s+(["'])(.*)\1/g) {
-        push @includes, $2;
-    }
-    while ($guts =~ m/\bload_bytecode\s+(["'])(.*)\1/g) {
+    while ($guts =~ m/(?:\.include|\bload_bytecode)\s+(["'])(.*)\1/g) {
         push @includes, $2;
     }
 
@@ -235,7 +233,7 @@ foreach my $file (sort grep {/\.c$/} @files) {
 
 foreach my $file (sort grep {/\.pir$/} @files) {
     my $rule = $file;
-    $rule =~ s/\.c$//;
+    $rule =~ s/\.pir$//;
 
     $rules =~ /^${rule}.pbc\s*:\s*(.*)\s*$/m;
     my $declared = $1;
