@@ -225,12 +225,10 @@ GEN_PM_INCLUDES = \
 	lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm 
 
 CONFIGURE_GENERATED_FILES = \
-	$(GEN_PM_INCLUDES) \
     $(GEN_CONFIGS) \
     $(GEN_MAKEFILES) \
     ext/Parrot-Embed/Makefile.PL \
     myconfig  \
-    $(GEN_PASM_INCLUDES) \
     src/call_list.txt \
     MANIFEST.configure.generated \
     .configure_trace.sto \
@@ -1801,6 +1799,7 @@ clean : \
 	$(RM_RF) lib/Parrot/OpLib
 	$(RM_F) $(NQP_CLEANUPS) $(PGE_CLEANUPS) $(TGE_CLEANUPS) $(JSON_CLEANUPS)
 	$(RM_F) $(PIRC_CLEANUPS) $(PCT_CLEANUPS)
+	$(RM_F) $(GEN_PASM_INCLUDES) $(GEN_PM_INCLUDES)
 
 prog-clean :
 	$(RM_F) \
