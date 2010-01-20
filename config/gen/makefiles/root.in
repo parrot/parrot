@@ -221,7 +221,7 @@ GEN_PASM_INCLUDES = \
 	runtime/parrot/include/pmctypes.pasm \
 
 GEN_PM_INCLUDES = \
-	lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm 
+	lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm
 
 CONFIGURE_GENERATED_FILES = \
     $(GEN_CONFIGS) \
