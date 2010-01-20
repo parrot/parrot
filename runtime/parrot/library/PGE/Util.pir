@@ -35,11 +35,10 @@ of the match.
 
 =cut
 
-.sub 'die'
-    .param pmc mob                                 # match object
+.sub 'die' :method
     .param pmc list            :slurpy             # message arguments
 
-    .local pmc it
+    .local pmc it, mob
     .local string message
     message = ''
     it = iter list
@@ -54,7 +53,7 @@ of the match.
     .local string target
     .local int pos
     $P0 = get_hll_global ['PGE'], 'Match'
-    (mob, pos, target) = $P0.'new'(mob)
+    (mob, pos, target) = $P0.'new'(self)
     $I0 = length message
     dec $I0
     $I0 = is_cclass .CCLASS_NEWLINE, message, $I0
@@ -96,11 +95,10 @@ Emits the list of messages to stderr.
 
 =cut
 
-.sub 'warn'
-    .param pmc mob                                 # match object
+.sub 'warn' :method
     .param pmc list            :slurpy             # message arguments
 
-    .local pmc it
+    .local pmc it, mob
     .local string message
     message = ''
     it = iter list
@@ -115,7 +113,7 @@ Emits the list of messages to stderr.
     .local string target
     .local int pos
     $P0 = get_hll_global ['PGE'], 'Match'
-    (mob, pos, target) = $P0.'new'(mob)
+    (mob, pos, target) = $P0.'new'(self)
     $I0 = length message
     dec $I0
     $I0 = is_cclass .CCLASS_NEWLINE, message, $I0
