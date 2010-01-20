@@ -30,7 +30,7 @@ my $target  = $directive->{file};
 my $gen;
 if ($target =~ /\.pm$/) {
     $gen = join "\n", &const_to_perl(@defs);
-    $gen .= "1;\n";
+    $gen .= "\n1;";
 }
 else {
     $gen = join "\n", &const_to_parrot(@defs);
