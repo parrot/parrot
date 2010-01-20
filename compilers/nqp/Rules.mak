@@ -2,7 +2,7 @@ compilers/nqp/nqp.pbc : $(PARROT) $(NQP_SOURCES) \
     $(LIBRARY_DIR)/PCT.pbc \
     $(LIBRARY_DIR)/PGE.pbc
 
-compilers/nqp/src/Grammar_gen.pir : $(PARROT) $(LIBRARY_DIR)/PGE/Perl6Grammar.pir compilers/nqp/src/Grammar.pg $(LIBRARY_DIR)/PCT/HLLCompiler.pbc
+compilers/nqp/src/Grammar_gen.pir : $(PARROT) $(LIBRARY_DIR)/PGE/Perl6Grammar.pir compilers/nqp/src/Grammar.pg $(LIBRARY_DIR)/PCT/HLLCompiler.pbc $(LIBRARY_DIR)/PGE.pbc
 	$(PARROT) $(LIBRARY_DIR)/PGE/Perl6Grammar.pir --output=$@ compilers/nqp/src/Grammar.pg
 
 # Developer target to regnerate bootstrap. Unused?
