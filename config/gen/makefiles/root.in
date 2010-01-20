@@ -188,8 +188,6 @@ GEN_CONFIGS = \
 
 GEN_PASM_INCLUDES = \
 	runtime/parrot/include/signal.pasm \
-	runtime/parrot/include/opengl_defines.pasm \
-	runtime/parrot/library/OpenGL_funcs.pir \
 	runtime/parrot/include/cclass.pasm \
 	runtime/parrot/include/datatypes.pasm \
 	runtime/parrot/include/iterator.pasm \
