@@ -37,6 +37,7 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
     my $verbose = $conf->options->get('verbose');
+    return 1;
 
     # need vtable.h now
     system( $^X, "tools/build/vtable_h.pl" );

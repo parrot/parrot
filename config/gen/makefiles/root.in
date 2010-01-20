@@ -811,7 +811,7 @@ flags_dummy :
 	@echo "Compiling with:"
 	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS echo $(CC) $(CFLAGS) -I$(@D) @cc_o_out@ xx$(O) -c xx.c
 
-runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.pir $(PARROT)
+runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.pir $(PARROT) $(GEN_PASM_INCLUDES)
 	$(PARROT) -o $@ runtime/parrot/library/parrotlib.pir
 
 runtime/parrot/include/config.fpmc : myconfig config_lib.pasm $(MINIPARROT)
@@ -1104,7 +1104,7 @@ runtime/parrot/include/packfile_segments.pasm : $(INC_DIR)/packfile.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/packfile.h $@
 runtime/parrot/include/packfile_constants.pasm : $(INC_DIR)/packfile.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/packfile.h $@
-runtime/parrot/include/packfile_annotation_key_types.pasm : $(INC_DIR)/packfile.h $(H2INC)
+runtime/parrot/include/packfile_annotation_key_type.pasm : $(INC_DIR)/packfile.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/packfile.h $@
 
 runtime/parrot/include/except_types.pasm : $(INC_DIR)/exceptions.h $(H2INC)
