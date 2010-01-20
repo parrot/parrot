@@ -1108,12 +1108,12 @@ runtime/parrot/include/packfile_annotation_key_types.pasm : $(INC_DIR)/packfile.
 	$(PERL) $(H2INC) $(INC_DIR)/packfile.h $@
 
 runtime/parrot/include/except_types.pasm : $(INC_DIR)/exceptions.h $(H2INC)
-	$(PERL) $(H2INC) $(INC_DIR)/io.h $@
+	$(PERL) $(H2INC) $(INC_DIR)/exceptions.h $@
 runtime/parrot/include/except_severity.pasm : $(INC_DIR)/exceptions.h $(H2INC)
-	$(PERL) $(H2INC) $(INC_DIR)/io.h $@
+	$(PERL) $(H2INC) $(INC_DIR)/exceptions.h $@
 
 runtime/parrot/include/warnings.pasm : $(INC_DIR)/warnings.h $(H2INC)
-	$(PERL) $(H2INC) $(INC_DIR)/io.h $@
+	$(PERL) $(H2INC) $(INC_DIR)/warnings.h $@
 runtime/parrot/include/errors.pasm : $(INC_DIR)/warnings.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/warnings.h $@
 
