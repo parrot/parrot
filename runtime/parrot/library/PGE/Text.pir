@@ -36,8 +36,7 @@ of the extraction.
 
 =cut
 
-.sub "bracketed"
-    .param pmc tgt                                 # target to match
+.sub "bracketed" :method
     .param string delim        :optional           # optional delimiters
     .param int has_delim       :opt_flag
     .param pmc adverbs         :slurpy :named      # named options
@@ -51,7 +50,7 @@ of the extraction.
     .local pmc stack                               # lookket backtracking
 
     $P0 = get_hll_global ['PGE'], 'Match'
-    (mob, pos, target) = $P0.'new'(tgt)
+    (mob, pos, target) = $P0.'new'(self)
     from = pos
 
     if has_delim goto mkdelims
