@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-tools/build/h2pasm.pl
+tools/build/h2inc.pl
 
 =head1 DESCRIPTION
 
-Generate C<.pasm> files with constants based on C<.h> files.
+Generate C<.pasm> and C<.pm> files with constants based on C<.h> files.
 
 =cut
 
