@@ -182,7 +182,7 @@ sub parse_file {
     }
     $cur and die "Missing '&end_gen' in $in_file\n";
 
-    return undef;
+    return;
 }
 
 1;
