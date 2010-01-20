@@ -162,6 +162,10 @@ opcode_t /*@alt void@*/
 emit_opcode(ARGIN(bytecode * const bc), opcode_t op)
         __attribute__nonnull__(1);
 
+int emit_pbc_key(ARGIN(bytecode * const bc), ARGIN(struct key * const k))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 FLOATVAL get_num_const(ARGIN(bytecode * const bc), unsigned index)
         __attribute__nonnull__(1);
 
@@ -284,8 +288,6 @@ PMC *get_pmc_const(bytecode * const bc, unsigned index);
 FLOATVAL get_num_const(bytecode * const bc, unsigned index);
 
 STRING *get_string_const(bytecode * const bc, unsigned index);
-
-int emit_pbc_key(bytecode * const bc, struct key * const k);
 
 /*
 
