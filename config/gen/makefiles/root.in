@@ -232,7 +232,7 @@ CONFIGURE_GENERATED_FILES = \
     $(GEN_MAKEFILES) \
     ext/Parrot-Embed/Makefile.PL \
     myconfig  \
-    $(G	EN_PASM_INCLUDES) \
+    $(GEN_PASM_INCLUDES) \
     src/call_list.txt \
     MANIFEST.configure.generated \
     .configure_trace.sto \
@@ -1116,6 +1116,10 @@ runtime/parrot/include/warnings.pasm : $(INC_DIR)/warnings.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/warnings.h $@
 runtime/parrot/include/errors.pasm : $(INC_DIR)/warnings.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/warnings.h $@
+
+runtime/parrot/include/tm.pasm : src/utils.c $(H2INC)
+	$(PERL) $(H2INC) src/utils.c $@
+
 
 $(INC_DIR)/oplib/ops.h lib/Parrot/OpLib/core.pm : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2pm.pl \
     lib/Parrot/OpsFile.pm lib/Parrot/Op.pm src/ops/ops.num src/ops/ops.skip
