@@ -232,7 +232,7 @@ CONFIGURE_GENERATED_FILES = \
     $(GEN_MAKEFILES) \
     ext/Parrot-Embed/Makefile.PL \
     myconfig  \
-    $(GEN_PASM_INCLUDES) \
+    $(G	EN_PASM_INCLUDES) \
     src/call_list.txt \
     MANIFEST.configure.generated \
     .configure_trace.sto \
@@ -272,9 +272,6 @@ GEN_MODULES = \
     lib/Parrot/OpLib/core.pm
 
 GEN_LIBRARY = \
-    runtime/parrot/include/cclass.pasm \
-    runtime/parrot/include/datatypes.pasm \
-    runtime/parrot/include/hash_key_type.pasm \
     $(LIBRARY_DIR)/CGI/QueryHash.pbc \
     $(LIBRARY_DIR)/Crow.pbc \
     $(LIBRARY_DIR)/config.pbc \
@@ -633,7 +630,7 @@ corevm : \
     dynpmc \
     dynoplibs
 
-$(GEN_LIBRARY) : $(PARROT)
+$(GEN_LIBRARY) : $(PARROT) $(GEN_PASM_INCLUDES)
 
 # constant string support
 .c.str : # suffix rule (limited support)
