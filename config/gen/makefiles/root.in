@@ -1009,18 +1009,86 @@ $(INSTALLABLEPBCMERGE) : src/pbc_merge$(O) $(LIBPARROT) $(INSTALLABLECONFIG)
 #
 ###############################################################################
 
-runtime/parrot/include/cclass.pasm : $(INC_DIR)/cclass.h tools/build/h2pasm.pl
-	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/cclass.h $@
-runtime/parrot/include/datatypes.pasm : $(INC_DIR)/datatypes.h tools/build/h2pasm.pl
-	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/datatypes.h $@
-runtime/parrot/include/enums.pasm : $(INC_DIR)/enums.h tools/build/h2pasm.pl
-	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/enums.h $@
-runtime/parrot/include/events.pasm : $(INC_DIR)/events.h tools/build/h2pasm.pl
+
+runtime/parrot/include/interpflags.pasm : $(INC_DIR)/interpreter.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/interpreter.h $@
+runtime/parrot/include/interpdebug.pasm : $(INC_DIR)/interpreter.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/interpreter.h $@
+runtime/parrot/include/interptrace.pasm : $(INC_DIR)/interpreter.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/interpreter.h $@
+runtime/parrot/include/interpcores.pasm : $(INC_DIR)/interpreter.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/interpreter.h $@
+runtime/parrot/include/cloneflags.pasm  : $(INC_DIR)/interpreter.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/interpreter.h $@
+runtime/parrot/include/iglobals.pasm    : $(INC_DIR)/interpreter.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/interpreter.h $@
+runtime/parrot/include/sysinfo.pasm     : $(INC_DIR)/interpreter.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/interpreter.h $@
+
+runtime/parrot/include/interpinfo.pasm : $(INC_DIR)/gc_api.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/gc_api.h $@
+
+runtime/parrot/include/timer.pasm : $(INC_DIR)/scheduler.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/scheduler.h $@
+
+runtime/parrot/include/pmctypes.pasm : $(INC_DIR)/core_pmcs.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/core_pmcs.h $@
+
+runtime/parrot/include/stdio.pasm  : $(INC_DIR)/io.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/io.h $@
+runtime/parrot/include/socket.pasm : $(INC_DIR)/io.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/io.h $@
+
+runtime/parrot/include/socket.pasm : $(INC_DIR)/io.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/io.h $@
+
+runtime/parrot/include/io_thr_msg.pasm : $(INC_DIR)/events.h tools/build/h2pasm.pl
 	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/events.h $@
+
 runtime/parrot/include/hash_key_type.pasm : $(INC_DIR)/hash.h tools/build/h2pasm.pl
 	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/hash.h $@
-runtime/parrot/include/io.pasm : $(INC_DIR)/io.h tools/build/h2pasm.pl
+
+runtime/parrot/include/iterator.pasm : $(INC_DIR)/enums.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/enums.h $@
+runtime/parrot/include/call_bits.pasm : $(INC_DIR)/enums.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/enums.h $@
+lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm : $(INC_DIR)/enums.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/enums.h $@
+
+runtime/parrot/include/libpaths.pasm : $(INC_DIR)/library.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/library.h $@
+
+runtime/parrot/include/datatypes.pasm : $(INC_DIR)/datatypes.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/datatypes.h $@
+
+runtime/parrot/include/stat.pasm : $(INC_DIR)/stat.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/stat.h $@
+
+runtime/parrot/include/stringinfo.pasm : $(INC_DIR)/string.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/string.h $@
+
+runtime/parrot/include/longopt.pasm : $(INC_DIR)/longopt.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/longopt.h $@
+
+runtime/parrot/include/cclass.pasm : $(INC_DIR)/cclass.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/cclass.h $@
+
+runtime/parrot/include/packfile_segments.pasm : $(INC_DIR)/packfile.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/packfile.h $@
+runtime/parrot/include/packfile_constants.pasm : $(INC_DIR)/packfile.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/packfile.h $@
+runtime/parrot/include/packfile_annotation_key_types.pasm : $(INC_DIR)/packfile.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/packfile.h $@
+
+runtime/parrot/include/except_types.pasm : $(INC_DIR)/exceptions.h tools/build/h2pasm.pl
 	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/io.h $@
+runtime/parrot/include/except_severity.pasm : $(INC_DIR)/exceptions.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/io.h $@
+
+runtime/parrot/include/warnings.pasm : $(INC_DIR)/warnings.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/io.h $@
+runtime/parrot/include/errors.pasm : $(INC_DIR)/warnings.h tools/build/h2pasm.pl
+	$(PERL) tools/build/h2pasm.pl $(INC_DIR)/warnings.h $@
 
 $(INC_DIR)/oplib/ops.h lib/Parrot/OpLib/core.pm : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2pm.pl \
     lib/Parrot/OpsFile.pm lib/Parrot/Op.pm src/ops/ops.num src/ops/ops.skip
