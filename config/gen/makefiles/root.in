@@ -187,7 +187,6 @@ GEN_CONFIGS = \
     src/ops/core_ops_switch.c
 
 GEN_PASM_INCLUDES = \
-	runtime/parrot/include/signal.pasm \
 	runtime/parrot/include/cclass.pasm \
 	runtime/parrot/include/datatypes.pasm \
 	runtime/parrot/include/iterator.pasm \
@@ -232,7 +231,8 @@ CONFIGURE_GENERATED_FILES = \
     src/call_list.txt \
     MANIFEST.configure.generated \
     .configure_trace.sto \
-    .parrot_current_rev
+    .parrot_current_rev \
+    runtime/parrot/include/signal.pasm
 
 
 ###############################################################################
