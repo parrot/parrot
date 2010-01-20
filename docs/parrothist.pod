@@ -102,4 +102,6 @@ Starred release numbers indicate supported releases.
  Barney      1.8.0          2009-Nov-17     "Zygodactyly"
  Gerd        1.9.0          2009-Dec-15     "Blue-fronted Amazon"
 
+ chromatic   2.0.0 *        2010-Jan-19     "Inevitable"
+
 =cut

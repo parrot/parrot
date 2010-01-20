@@ -1,7 +1,7 @@
-This is Parrot, version 1.9.0
+This is Parrot, version 2.0.0
 ------------------------------
 
-Parrot is Copyright (C) 2001-2009, Parrot Foundation.
+Parrot is Copyright (C) 2001-2010, Parrot Foundation.
 
 $Id$
 
@@ -16,15 +16,15 @@ PREREQUISITES
 
 You need a C compiler, a linker, and a make program of course.
 
-If you will be linking with the ICU library you have to download and install it before
-configuring Parrot. Get it from http://site.icu-project.org/download
+If you will be linking with the ICU library you have to download and install it
+before configuring Parrot. Get it from http://site.icu-project.org/download
 
 You also need Perl 5.8.4 or newer, and Storable 2.12 or newer
 for running various configure and build scripts.
 
 For most of the platforms that we are supporting initially, Parrot should build
-out of the box. docs/parrot.pod lists the core platforms.
-PLATFORMS provides reports on the platforms on which Parrot has been built and tested. 
+out of the box. docs/parrot.pod lists the core platforms.  PLATFORMS provides
+reports on the platforms on which Parrot has been built and tested.
 
 INSTRUCTIONS
 ------------

@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 
 =head1 Release Instructions
@@ -42,7 +42,7 @@ L<https://trac.parrot.org/parrot/wiki/Languages>.
 On the Saturday before a release you should notify other developers to stop
 committing non-release related code to trunk.  This will help avoid
 complications. They are of course free to commit to branches as much as
-they like. You might also set the topic in #parrot, announcing the 
+they like. You might also set the topic in #parrot, announcing the
 time when you plan on starting the release procedure. This will help
 the committers with timing their last minute commits.
 
@@ -137,8 +137,10 @@ as these are only used in development and not relevant to the bytecode support
 policy. (Those changes are all included within the major version number
 increase for the supported release.)
 
-Once you've updated PBC_COMPAT, run C<tools/dev/mk_native_pbc> to update the
-pbc files used in the native pbc tests.
+Once you've updated PBC_COMPAT, run C<sh tools/dev/mk_native_pbc> to update the
+pbc files used in the native pbc tests.  Note that you must have Parrot already
+built for this to work, and that this script will reconfigure and rebuild
+Parrot with various primitive size options.
 
 =item h
 
@@ -391,7 +393,6 @@ The calendar of releases is available at the comp.lang.parrot google calendar,
 visible at
 L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.calendar.google.com>.
 
- - Jan 19, 2010      - 2.0* - chromatic
  - Feb 16, 2010      - 2.1  - darbelo
  - Mar 16, 2010      - 2.2  - cotto
  - Apr 20, 2010      - 2.3* - gerd
