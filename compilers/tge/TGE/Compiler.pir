@@ -29,7 +29,8 @@ structure.
     # Parse the source string and build a match tree
     .local pmc match
     .local pmc start_rule
-    start_rule = get_hll_global ['TGE';'Parser'], "start"
+    $P0 = get_hll_global ['TGE'], 'Parser'
+    start_rule = find_method $P0, "start"
     match = start_rule(source, 'grammar'=>'TGE::Parser')
     # Verify the parse
     unless match goto err_parse    # if parse fails, stop

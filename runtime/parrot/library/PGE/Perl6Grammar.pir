@@ -157,7 +157,8 @@ the output to the correct output file.
     match = $P0.'new'(source, 'grammar'=>'PGE::Perl6Grammar')
 
     .local pmc stmtrule
-    stmtrule = get_hll_global ['PGE';'Perl6Grammar'], 'statement'
+    $P0 = get_hll_global ['PGE'], 'Perl6Grammar'
+    stmtrule = find_method $P0, 'statement'
 
   stmt_loop:
     match = stmtrule(match)
