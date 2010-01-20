@@ -548,9 +548,15 @@ visit_info_init(PARROT_INTERP, ARGOUT(visit_info *info),
 
     /* we must use PMCs here so that they get marked properly */
     info->todo        = pmc_new(interp, enum_class_Array);
-    info->seen        = pmc_new(interp, enum_class_Hash);
-    VTABLE_set_pointer(interp, info->seen, parrot_new_intval_hash(interp));
-    info->id_list     = pmc_new(interp, enum_class_Array);
+    if (info->what == VISIT_FREEZE_NORMAL) {
+        info->seen    = pmc_new(interp, enum_class_Hash);
+        VTABLE_set_pointer(interp, info->seen, parrot_new_intval_hash(interp));
+        info->id_list = PMCNULL;
+    }
+    else {
+        info->seen    = PMCNULL;
+        info->id_list = pmc_new(interp, enum_class_Array);
+    }
     info->id          = 0;
     info->extra_flags = EXTRA_IS_NULL;
 
