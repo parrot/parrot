@@ -58,7 +58,8 @@ Tests various arguments to the compiler.
     .local pmc p6compiler
     p6compiler = compreg 'PGE::Perl6Regex'
     $P1 = p6compiler('.+', 'name'=>'xyz1', 'grammar'=>'PGE::Test')
-    $P2 = get_hll_global ['PGE';'Test'], 'xyz1'
+    $P0 = get_hll_global ['PGE'], 'Test'
+    $P2 = find_method $P0, 'xyz1'
     $P3 = $P2('ok 1')
     is($P3, 'ok 1', 'compile into a new grammar')
 .end
@@ -71,7 +72,8 @@ Tests various arguments to the compiler.
     p6compiler = compreg 'PGE::Perl6Regex'
     $P1 = p6compiler('.+', 'name'=>'abc', 'grammar'=>'PGE::Test')
     $P1 = p6compiler('.+', 'name'=>'xyz2', 'grammar'=>'PGE::Test')
-    $P2 = get_hll_global ['PGE';'Test'], 'abc'
+    $P0 = get_hll_global ['PGE'], 'Test'
+    $P2 = find_method $P0, 'abc'
     $P3 = $P2('ok 1')
     is($P3, 'ok 1', 'compile into a new grammar, 2x')
 .end
