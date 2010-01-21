@@ -43,7 +43,8 @@ GRAMMAR
     # Match against the source
     .local pmc match
     .local pmc start_rule
-    start_rule = get_global ['TGE';'Parser'], "start"
+    $P0 = get_global ['TGE'], 'Parser'
+    start_rule = find_method $P0, "start"
     match = start_rule(source)
 
     # Verify the match
@@ -72,7 +73,8 @@ GRAMMAR
 GRAMMAR
     .local pmc match
     .local pmc start_rule
-    start_rule = get_global ['TGE';'Parser'], "start"
+    $P0 = get_global ['TGE'], 'Parser'
+    start_rule = find_method $P0, "start"
     match = start_rule(source, 'grammar'=>'TGE::Parser') # should throw.
 .end
 CODE
