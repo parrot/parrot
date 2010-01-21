@@ -62,7 +62,8 @@ of the match.
     .local int lines
     .local pmc line_number
     #  FIXME: use 'line_number' method instead?
-    line_number = get_hll_global ['PGE';'Util'], 'line_number'
+    line_number = get_hll_global ['PGE'], 'Util'
+    line_number = find_method line_number, 'line_number'
     (lines) = mob.line_number(pos)
     inc lines
     message .= ' at line '
@@ -122,7 +123,8 @@ Emits the list of messages to stderr.
     .local int lines
     .local pmc line_number
     #  FIXME: use 'line_number' method instead?
-    line_number = get_hll_global ['PGE';'Util'], 'line_number'
+    line_number = get_hll_global ['PGE'], 'Util'
+    line_number = find_method line_number, 'line_number'
     (lines) = mob.line_number(pos)
     inc lines
     message .= ' at line '
@@ -148,19 +150,18 @@ string is treated as '0'.
 
 =cut
 
-.sub 'line_number'
-    .param pmc match
+.sub 'line_number' :method
     .param int pos             :optional
     .param int has_pos         :opt_flag
 
     if has_pos goto have_pos
-    pos = match.'from'()
+    pos = self.'from'()
   have_pos:
 
     # count newlines to the current position of the parse
     .local int npos, lines
     .local string target
-    $P99 = getattribute match, '$.target'
+    $P99 = getattribute self, '$.target'
     target = $P99
     npos = 0
     lines = 0

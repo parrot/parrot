@@ -103,9 +103,11 @@ applies to a child of the current node (generally inherited attributes).
 
     # import <die> and <line_number> rules from PGE::Util
     $P0 = get_class ['TGE';'Parser']
-    $P1 = get_hll_global ['PGE';'Util'], 'die'
+    $P1 = get_hll_global ['PGE'], 'Util'
+    $P1 = find_method $P1, 'die'
     $P0.'add_method'('die', $P1)
-    $P1 = get_hll_global ['PGE';'Util'], 'line_number'
+    $P1 = get_hll_global ['PGE'], 'Util'
+    $P1 = find_method $P1, 'line_number'
     $P0.'add_method'('line_number', $P1)
 
   end:
