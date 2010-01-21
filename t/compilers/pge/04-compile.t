@@ -47,7 +47,7 @@ Tests various arguments to the compiler.
     .local pmc p6compiler
     p6compiler = compreg 'PGE::Perl6Regex'
     $P1 = p6compiler('.+', 'name'=>'xyz', 'grammar'=>'')
-    $P2 = 'xyz'('ok 1')
+    $P2 = $P1('ok 1')
     is($P2, 'ok 1', 'compile into current namespace')
 .end
 

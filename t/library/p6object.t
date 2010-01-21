@@ -160,7 +160,8 @@ Testing Perl 6 objects.
     jklobj = p6obj_tests(jklproto, 'Foo::JKL', 'isa'=>'P6object', 'can'=>'foo', 'who'=>jklns)
 
     ##  add a method to a class
-    $P0 = get_hll_global ['ABC'], 'foo'
+    $P0 = get_hll_global 'ABC'
+    $P0 = find_method $P0, 'foo'
     p6meta.'add_method'('bar', $P0, 'to'=>jklproto)
     jklobj = new ['Foo';'JKL']
     $S0 = jklobj.'bar'()
