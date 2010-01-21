@@ -141,8 +141,10 @@ EOF_SIMPLE_GRAMMAR
                   test_name    = 'Simple::Test' . test_num_str
 
     $P0 = split '::', test_name
+    $S0 = pop $P0
     .local pmc parser
-               parser = get_hll_global $P0, 'main'
+               parser = get_hll_global $P0, $S0
+               parser = find_method parser, 'main'
 
   next_target:
     .local string target

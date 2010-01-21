@@ -32,7 +32,8 @@ pir_output_is( <<'CODE', <<'OUT', "bracketed" );
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Text.pbc'
 
-    bracketed = get_global ['PGE';'Text'], "bracketed"
+    bracketed = get_global ['PGE'], 'Text'
+    bracketed = find_method bracketed, "bracketed"
     .local pmc jmpstack
                jmpstack = new 'ResizableIntegerArray'
     $S0 = "{ nested { and } okay, () and <>,  escaped \\}'s } okay"

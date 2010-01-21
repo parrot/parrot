@@ -103,7 +103,8 @@
     optable.'newtok'('prefix:-', 'equiv'=>'prefix:++')
 
     .local pmc ident
-    ident = get_global ['PGE';'Match'], 'ident'
+    $P0 = get_hll_global ['PGE'], 'Match'
+    ident = find_method $P0, 'ident'
     optable.'newtok'('term:', 'tighter'=>'prefix:++', 'parsed'=>ident)
     optable.'newtok'('circumfix:( )', 'equiv'=>'term:')
     optable.'newtok'('circumfix:[ ]', 'equiv'=>'term:')

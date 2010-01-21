@@ -842,7 +842,9 @@ tree as a PIR code object that can be compiled.
         %L: # grammar subrule %0::%1
           captob = captscope.'new'(captscope, 'grammar'=>'%0')
           captob.'to'(pos)
-          $P0 = get_hll_global %2, '%1'
+          $P0 = get_root_global ['parrot'], 'P6metaclass'
+          $P0 = $P0.'get_proto'('%0')
+          $P0 = find_method $P0, '%1'
         CODE
     goto subrule_match
 

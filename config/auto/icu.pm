@@ -288,6 +288,7 @@ sub _try_icuconfig {
         print "Trying $arg->{icuconfig} with '--ldflags'\n"
             if $arg->{verbose};
         $icushared = capture_output("$arg->{icuconfig} --ldflags");
+        chomp $icushared;
         print "icushared:  captured $icushared\n"
             if $arg->{verbose};
         ($icushared, $arg->{without}) =
