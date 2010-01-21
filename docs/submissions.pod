@@ -11,8 +11,8 @@ How to submit bug reports, patches and new files to Parrot.
 
 =head1 How To Submit A Bug Report
 
-If you encounter an error while working with Parrot, and don't understand what
-is causing it, then create a bug report using the F<parrotbug> utility. The
+If you encounter an error while working with Parrot and don't understand what
+is causing it, create a bug report using the F<parrotbug> utility. The
 simplest way to use it is to run
 
     % ./parrotbug
@@ -22,17 +22,11 @@ in the distribution's root directory, and follow the prompts.
 However, if you do know how to fix the problem you encountered, then think
 about submitting a patch, or (see below) getting commit privileges.
 
-=head1 How To Submit A Patch
+=head1 How To Create A Patch
 
 Try to keep your patches specific to a single change, and ensure that your
 change does not break any tests.  Do this by running C<make test>.  If there is
 no test for the fixed bug, please provide one.
-
-=over
-
-=item 1
-
-Create the patch.
 
 In the following examples, F<parrot> contains the Parrot distribution, and
 F<workingdir> contains F<parrot>. The name F<workingdir> is just a placeholder
@@ -97,15 +91,25 @@ The format for entries in F<CREDITS> is defined at the top of the file.
 
 =back
 
-=item 2
+=head1 How To Submit A Patch
+
+=over 4
+
+=item 1
 
 Go to Parrot's ticket tracking system at
 L<https://trac.parrot.org/parrot/>. Log in, or create an account if you
 don't have one yet.
 
+=item 2
+
+If there is already a ticket for the bug or feature that your patch relates
+to, just attach the patch directly to the ticket.
+
 =item 3
 
-Select "New Ticket" L<https://trac.parrot.org/parrot/newticket>.
+Otherwise select "New Ticket" at the top of the site.
+L<https://trac.parrot.org/parrot/newticket>
 
 =item 4
 
@@ -129,9 +133,8 @@ the F<Patch status> drop-down box.
 
 =item 7
 
-Check the box for "I have files to attach to this ticket"
-
-Double-check that you've actually done this, because it's easy to forget.
+Check the box for "I have files to attach to this ticket". Double-check
+that you've actually done this, because it's easy to forget.
 
 B<DO NOT> paste the patch file content into the Description.
 
@@ -248,26 +251,22 @@ MANIFEST and your new file(s).
 
 =head1 What Happens Next?
 
-Trac creates a ticket for the submission, and you will receive an automatic reply
-with details of the ticket identifier. This identifier should be used in all
-further correspondence concerning the submission.
+If you created a new ticket for the submission, you will be taken to the page
+for the new ticket and can check on the progress of your submission there.
+This identifier should be used in all correspondence concerning the submission.
 
-Everyone on the list sees the submission, and can comment on it. A developer
-with SVN commit authority will commit it to SVN once it is clear that it is the
+Everyone on Trac sees the submission and can comment on it. A developer with
+SVN commit authority can commit it to SVN once it is clear that it is the
 right thing to do.
 
-Even developers with SVN commit authority stick to this scheme for larger or
-more complex changes, to allow time for peer review.
+However developers with SVN commit authority may not commit your changes
+immediately if they are large or complex, as we need time for peer review.
 
-You can check the progress of your submission at the Parrot bugs page
-L<http://bugs6.perl.org/>. If you have trouble logging in try username C<guest>
-with password C<guest>.
+A list of active tickets can be found here:
+L<http://trac.parrot.org/parrot/report/1>
 
-A Parrot Bug Summary page is also available from
-L<https://rt.perl.org/rt3/NoAuth/parrot/Overview.html>
-
-A list of all the unresolved patches is at
-L<http://www.parrotcode.org/openpatches.html>
+A list of all the unresolved patches is at:
+L<http://trac.parrot.org/parrot/report/15>
 
 =head1 Patches for the Parrot website
 
@@ -303,8 +302,8 @@ L<http://www.parrot.org/files/parrot_cla.pdf>
 =item 4
 
 Request commit access via the C<parrot-dev> mailing list, or via IRC
-(#parrot on irc.parrot.org).  The existing committers will discuss your request in
-the next couple of weeks.
+(#parrot on irc.parrot.org). The existing committers will discuss your
+request in the next couple of weeks.
 
 If approved, a metacommitter will update the permissions to allow you to commit
 to Parrot; see C<RESPONSIBLE_PARTIES> for the current list.  Welcome aboard!
