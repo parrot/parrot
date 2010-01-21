@@ -52,12 +52,13 @@ documentation at L<http://www.json.org/>.
     .param string json_string
 
    .local pmc parse, match
-   parse = get_root_global ['parrot'; 'JSON'], 'value'
+   $P0 = get_root_global ['parrot'], 'JSON'
+   parse = find_method $P0, 'value'
 
    $P0 = get_root_global ['parrot'; 'PGE'], 'Match'
    match = $P0.'new'(json_string)
    match.'to'(0)
-   match = parse(match)
+   match = parse(match, 'grammar' => 'JSON')
    unless match goto failed
 
    .local pmc pirgrammar, pirbuilder, pir
