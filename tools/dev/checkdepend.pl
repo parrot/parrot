@@ -44,11 +44,11 @@ cause false positives in the test output.
 die 'no Makefile found; This tool requires a full build for analysis.'
     unless -e 'Makefile';
 
-my $files = `ack -fa {src,compilers,include} | ack '\\.(c|h|pir)\$'`;
+my @files = split /\n/, `ack -fa src compilers include  | ack '\\.(c|h|pir)\$'`;
 
 our %deps;
 
-foreach my $file (sort grep /\.[hc]$/, split /\n/, $files) {
+foreach my $file (sort grep /\.[hc]$/, @files) {
     # For now, skip any files that have generated dependencies
     next if $file =~ m{src/(ops|dynoplibs|dynpmc|pmc)/};
     next if $file =~ m{src/string/(charset|encoding)/};
@@ -88,7 +88,7 @@ foreach my $file (sort grep /\.[hc]$/, split /\n/, $files) {
     }
 }
 
-foreach my $file (sort grep /\.pir$/, split /\n/, $files) {
+foreach my $file (sort grep /\.pir$/, @files) {
     open my $fh, '<', $file;
     my $guts;
     {
@@ -100,7 +100,11 @@ foreach my $file (sort grep /\.pir$/, split /\n/, $files) {
     $guts =~ s{^#.*$}{}gm;
     # Ignore anything inside pod.
     $guts =~ s{^=.*^=cut$}{}gsm;
-    # XXX Ignore anything inside quotes.
+    # Ignore anything inside strings that are assigned to a variable.
+    # (Avoid clobbering the strings used in .include 'foo.pir', etc.)
+    $guts =~ s{=\s*'[^']*'\s*$}{}gm;
+    $guts =~ s{=\s*"(?:[^"\\]+|\\.)*"\s*$}{}gm;
+    # XXX also, heredocs (wheeeee!)
 
     my @includes;
     while ($guts =~ m/(?:\.include|\bload_bytecode)\s+(["'])(.*)\1/g) {
