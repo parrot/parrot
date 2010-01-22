@@ -1,6 +1,6 @@
 #!perl
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id: trans.t 41970 2009-10-21 16:52:43Z darbelo $
+# $Id$
 
 use strict;
 use warnings;
