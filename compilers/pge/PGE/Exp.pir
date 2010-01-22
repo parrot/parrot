@@ -862,6 +862,10 @@ tree as a PIR code object that can be compiled.
           $P0 = find_method mob, '%0'
           goto %L_2
         %L_1:
+          $P0 = get_namespace
+          $P0 = get_class $P0
+          $P0 = $P0.'find_method'('%0')
+          unless null $P0 goto %L_2
           $P0 = find_name '%0'
           unless null $P0 goto %L_2
           die "Unable to find regex '%0'"
