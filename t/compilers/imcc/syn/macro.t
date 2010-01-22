@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 41;
+use Parrot::Test tests => 42;
 
 # macro tests
 
@@ -583,6 +583,27 @@ my_func_1 my_func_1
 entering macro create_inst
 leaving macro create_inst
 my_func_2 my_func_2
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'macro label outside of macro declaration (TT #902)' );
+.macro While(conditional, code)
+
+.label $beginwhile:
+    unless .conditional goto .$endwhile
+    .code
+  goto .$beginwhile
+.label $endwhile:
+.endm
+
+.sub main
+.While($I0 < 3, {
+say $I0
+goto .$endwhile
+inc $I0
+})
+.end
+CODE
+/Invalid LABEL outside of macro/
 OUTPUT
 
 # Local Variables:

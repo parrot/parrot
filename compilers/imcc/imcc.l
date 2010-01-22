@@ -718,8 +718,16 @@ SP              [ ]
     }
 
 <macro>".$"{ID} {
-        if (valp) {
-            const size_t len = strlen(IMCC_INFO(interp)->cur_macro_name) + yyleng + 12;
+    if (valp) {
+        if (!IMCC_INFO(interp)->cur_macro_name) {
+            if (valp->s)
+                mem_sys_free(valp->s);
+            IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
+                "Invalid LABEL outside of macro");
+        }
+        else {
+            const size_t len   = strlen(IMCC_INFO(interp)->cur_macro_name)
+                                + yyleng + 12;
             char * const label = (char *)mem_sys_allocate(len);
 
             snprintf(label, len, "local__%s__%s__$",
@@ -729,9 +737,10 @@ SP              [ ]
                 mem_sys_free(valp->s);
             valp->s = label;
         }
-
-        return IDENTIFIER;
     }
+
+    return IDENTIFIER;
+}
 
 <macro>^{WS}+                       /* skip leading ws */;
 <macro>{WS}+                        DUP_AND_RET(valp, ' ');
@@ -1139,7 +1148,7 @@ expand_macro(PARROT_INTERP, ARGIN(const char *name), void *yyscanner)
 
     m = find_macro(interp, name);
     if (m) {
-        int i,c,start_cond;
+        int i, c, start_cond;
 
         macro_frame_t * frame = new_frame(interp);
         frame->params         = &m->params;
