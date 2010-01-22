@@ -726,12 +726,15 @@ SP              [ ]
                 "Invalid LABEL outside of macro");
         }
         else {
-            const size_t len   = strlen(IMCC_INFO(interp)->cur_macro_name)
-                                + yyleng + 12;
-            char * const label = (char *)mem_sys_allocate(len);
+            char * const fmt    = "local__%s__%s__$";
+            const size_t fmtlen = strlen(fmt) - (2 * strlen("%s"));
+            const size_t len    = strlen(IMCC_INFO(interp)->cur_macro_name)
+                                + yyleng + fmtlen;
+            char * const label  = (char *)mem_sys_allocate(len);
 
-            snprintf(label, len, "local__%s__%s__$",
-                IMCC_INFO(interp)->cur_macro_name, yytext+2);
+            /* skip over ".$" prefix with the +2 */
+            snprintf(label, len, fmt,
+                IMCC_INFO(interp)->cur_macro_name, yytext + 2);
 
             if (valp->s)
                 mem_sys_free(valp->s);
