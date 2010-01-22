@@ -45,7 +45,8 @@ also included.
     p6meta.'new_class'('PCT::Grammar', 'parent'=>'PGE::Grammar')
     $P0 = split '::', 'PCT::Grammar'
     $P0 = get_class $P0
-    $P1 = get_hll_global ['PGE';'Util'], 'die'
+    $P1 = get_hll_global ['PGE'], 'Util'
+    $P1 = find_method $P1, 'die'
     $P0.'add_method'('panic', $P1)
     .return ()
 .end

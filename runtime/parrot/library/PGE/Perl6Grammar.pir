@@ -190,7 +190,7 @@ the output to the correct output file.
           p6meta = get_root_global ['parrot'], 'P6metaclass'
           $P0 = p6meta.'get_proto'('%0')
           unless null $P0 goto %2
-          p6meta.'new_class'('%0', 'parent'=>'%1')
+          $P0 = p6meta.'new_class'('%0', 'parent'=>'%1')
         %2:
         CODE
   ns_optable:
@@ -384,7 +384,7 @@ the output to the correct output file.
     $S0 = namespace
     $P0 = split '::', $S0
     $P0 = optable.'key'($P0 :flat)
-    optable.'emit'("          $P0 = get_hll_global %0, '%1'", $P0, arg)
+    optable.'emit'("          $P0 = find_method $P0, '%0'", arg)
     arg = '$P0'
     goto trait_arg_done
   trait_arg_null:
