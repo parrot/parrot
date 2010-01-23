@@ -200,73 +200,46 @@ foreach my $header (sort grep {/\.h$/} (keys %deps)) {
 my @files = keys %deps;
 @files = @ARGV if @ARGV;
 
-foreach my $file (sort grep {/\.c$/} @files) {
-    my $rule = $file;
-    $rule =~ s/\.c$//;
+check_files(\@files, '.c',   '\$\(O\)');
+check_files(\@files, '.pir', '.pbc');
 
-    $rules =~ /^$rule\Q$(O)\E\s*:\s*(.*)\s*$/m;
-    my $declared = $1;
+sub check_files {
+    
+    my ($possible_files, $src_ext, $obj_ext) = @_;
 
-    my $failed = 0;
-    if (!defined($declared)) {
-        $failed = 1;
-        is("", join(' ', (get_deps($file))), "$file has no dependencies");
-        next;
-    }
-    else
-    {
-        $declared =~ s/\s+/ /g;
-        foreach my $inc (sort (get_deps($file))) {
-            next if $declared =~ s/\b\Q$inc\E\b//;
+    foreach my $file (sort grep {/$src_ext$/} @$possible_files) {
+        my $rule = $file;
+        $rule =~ s/$src_ext$//;
 
-            is($declared, $inc, "$file is missing a dependency.");
+        $rules =~ /^${rule}${obj_ext}\s*:\s*(.*)\s*$/m;
+        my $declared = $1;
+
+        my $failed = 0;
+        if (!defined($declared)) {
             $failed = 1;
-
+            is("", join(' ', (get_deps($file))), "$file has no dependencies");
+            next;
         }
-    }
-    $declared =~ s/^\s+//;
-    $declared =~ s/\s+$//;
-    $declared =~ s/\s+/ /g;
-    if ($declared ne "") {
-       is($declared, '', "$file has extra dependencies.");
-    }
-    elsif (!$failed) {
-        pass($file);
-    }
-}
+        else
+        {
+            $declared =~ s/\s+/ /g;
+            foreach my $inc (sort (get_deps($file))) {
+                next if $declared =~ s/\b\Q$inc\E\b//;
 
-foreach my $file (sort grep {/\.pir$/} @files) {
-    my $rule = $file;
-    $rule =~ s/\.pir$//;
+                is($declared, $inc, "$file is missing a dependency.");
+                $failed = 1;
 
-    $rules =~ /^${rule}.pbc\s*:\s*(.*)\s*$/m;
-    my $declared = $1;
-
-    my $failed = 0;
-    if (!defined($declared)) {
-        $failed = 1;
-        is("", join(' ', (get_deps($file))), "$file has no dependencies");
-        next;
-    }
-    else
-    {
+            }
+        }
+        $declared =~ s/^\s+//;
+        $declared =~ s/\s+$//;
         $declared =~ s/\s+/ /g;
-        foreach my $inc (sort (get_deps($file))) {
-            next if $declared =~ s/\b\Q$inc\E\b//;
-
-            is($declared, $inc, "$file is missing a dependency.");
-            $failed = 1;
-
+        if ($declared ne "") {
+            is($declared, '', "$file has extra dependencies.");
         }
-    }
-    $declared =~ s/^\s+//;
-    $declared =~ s/\s+$//;
-    $declared =~ s/\s+/ /g;
-    if ($declared ne "") {
-       is($declared, '', "$file has extra dependencies.");
-    }
-    elsif (!$failed) {
-        pass($file);
+        elsif (!$failed) {
+            pass($file);
+        }
     }
 }
 
