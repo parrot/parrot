@@ -103,7 +103,7 @@ foreach my $file (sort grep /\.pir$/, @incfiles) {
     # Ignore anything inside strings that are assigned to a variable.
     # (Avoid clobbering the strings used in .include 'foo.pir', etc.)
     $guts =~ s{=\s*'[^']*'\s*$}{}gm;
-    $guts =~ s{=\s*"(?:[^"\\]+|\\.)*"\s*$}{}gm;
+    $guts =~ s{=\s*"(?:[^"\\]|\\.)*"\s*$}{}gm;
     # XXX also, heredocs (wheeeee!)
 
     my @includes;
@@ -212,30 +212,30 @@ sub check_files {
         $rule =~ s/$src_ext$//;
 
         $rules =~ /^${rule}${obj_ext}\s*:\s*(.*)\s*$/m;
-        my $declared = $1;
+        my $rule_deps = $1;
 
         my $failed = 0;
-        if (!defined($declared)) {
+        if (!defined($rule_deps)) {
             $failed = 1;
             is("", join(' ', (get_deps($file))), "$file has no dependencies");
             next;
         }
         else
         {
-            $declared =~ s/\s+/ /g;
+            $rule_deps =~ s/\s+/ /g;
             foreach my $inc (sort (get_deps($file))) {
-                next if $declared =~ s/\b\Q$inc\E\b//;
+                next if $rule_deps =~ s/\b\Q$inc\E\b//;
 
-                is($declared, $inc, "$file is missing a dependency.");
+                is($rule_deps, $inc, "$file is missing a dependency.");
                 $failed = 1;
 
             }
         }
-        $declared =~ s/^\s+//;
-        $declared =~ s/\s+$//;
-        $declared =~ s/\s+/ /g;
-        if ($declared ne "") {
-            is($declared, '', "$file has extra dependencies.");
+        $rule_deps =~ s/^\s+//;
+        $rule_deps =~ s/\s+$//;
+        $rule_deps =~ s/\s+/ /g;
+        if ($rule_deps ne "") {
+            is($rule_deps, '', "$file has extra dependencies.");
         }
         elsif (!$failed) {
             pass($file);
