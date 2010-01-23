@@ -22,9 +22,9 @@ my ($in_file, $out_file) = @ARGV;
 my $directive = parse_file($in_file, $out_file);
 die "invalid output file: '$out_file' for input '$in_file'" unless $directive;
 
-my @defs = perform_directive($directive);
+my $defs_ref = perform_directive($directive);
 
-my $generated_text = generate_text($directive, \@defs);
+my $generated_text = generate_text($directive, $defs_ref);
 
 print_generated_file( {
     in      => $in_file,
@@ -160,14 +160,14 @@ sub parse_file {
 
 =item * Arguments
 
-    @defs = perform_directive($directive);
+    $defs_ref = perform_directive($directive);
 
 Single hash reference (which is the return value from a successful run of
 C<parse_file()>.
 
 =item * Return Value
 
-List.
+Array reference.
 
 =back
 
@@ -180,7 +180,7 @@ sub perform_directive {
     if ( my $subst = $d->{subst} ) {
         @defs = transform_name( sub { local $_ = shift; eval $subst; $_ }, @defs );
     }
-    @defs;
+    return \@defs;
 }
 
 =head2 C<const_to_parrot()>
