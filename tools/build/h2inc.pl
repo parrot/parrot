@@ -49,6 +49,26 @@ $gen
 EOF
 close $out_fh;
 
+=head1 SUBROUTINES
+
+=head2 C<const_to_parrot()>
+
+=over 4
+
+=item * Arguments
+
+    $gen = join "\n", const_to_parrot(@defs);
+
+List.
+
+=item * Return Value
+
+String.
+
+=back
+
+=cut
+
 sub const_to_parrot {
 
     my $keylen = (sort { $a <=> $b } map { length($_->[0]) } @_ )[-1] ;
@@ -57,6 +77,24 @@ sub const_to_parrot {
     map {sprintf ".macro_const %-${keylen}s %${vallen}s", $_->[0], $_->[1]} @_;
 }
 
+=head2 C<const_to_perl()>
+
+=over 4
+
+=item * Arguments
+
+    $gen = join "\n", const_to_perl(@defs);
+
+List.
+
+=item * Return Value
+
+String.
+
+=back
+
+=cut
+
 sub const_to_perl {
 
     my $keylen = (sort { $a <=> $b } map { length($_->[0]) } @_ )[-1] ;
@@ -64,17 +102,74 @@ sub const_to_perl {
     map {sprintf "use constant %-${keylen}s => %s;", $_->[0], $_->[1]} @_;
 }
 
+=head2 C<transform_name()>
+
+=over 4
+
+=item * Arguments
+
+    transform_name( sub { $prefix . $_[0] }, @_ );
+
+List of two or more elements, the first element of which is a subroutine
+reference.
+
+=item * Return Value
+
+List which is a mapping of the transformations executed by the first argument
+upon the remaining arguments.
+
+=back
+
+=cut
+
 sub transform_name {
     my $action = shift;
 
     return map { [ $action->( $_->[0] ), $_->[1] ] } @_;
 }
 
+=head2 C<prepend_prefix()>
+
+=over 4
+
+=item * Arguments
+
+    @defs = prepend_prefix $d->{prefix}, @{ $d->{defs} };
+
+List of two or more elements, the first element of which is a string.
+
+=item * Return Value
+
+List.
+
+=back
+
+=cut
+
 sub prepend_prefix {
     my $prefix = shift;
 
     transform_name( sub { $prefix . $_[0] }, @_ );
 }
+
+=head2 C<perform_directive()>
+
+=over 4
+
+=item * Arguments
+
+    @defs = perform_directive($directive);
+
+Single hash reference (which is the return value from a successful run of
+C<parse_file()>.
+
+=item * Return Value
+
+List.
+
+=back
+
+=cut
 
 sub perform_directive {
     my ($d) = @_;
@@ -85,6 +180,25 @@ sub perform_directive {
     }
     @defs;
 }
+
+=head2 C<parse_file()>
+
+=over 4
+
+=item * Arguments
+
+    $directive = parse_file($in_file, $in_fh, $out_file);
+
+List of 3 elements: string holding name of incoming file; read handle to that
+file; string holding name of outgoing file.
+
+=item * Return Value
+
+If successful, returns a hash reference.
+
+=back
+
+=cut
 
 sub parse_file {
     my ( $in_file, $fh, $out_file) = @_;
