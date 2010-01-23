@@ -28,9 +28,6 @@ sub handle_long_options {
     my @argv = @_;
 
     my %longopts;
-    $longopts{running_make_test} = grep { $_ eq '--running-make-test' } @argv;
-    @argv = grep { $_ ne '--running-make-test' } @argv;
-
     $longopts{gc_debug} = grep { $_ eq '--gc-debug' } @argv;
     @argv = grep { $_ ne '--gc-debug' } @argv;
 
@@ -130,7 +127,6 @@ perl t/harness [options] [testfiles]
     -r         ... assemble to PBC run PBC
     -O[012]    ... optimize
     -D[number] ... pass debug flags to parrot interpreter
-    --running-make-test
     --gc-debug
     --core-tests
     --runcore-tests

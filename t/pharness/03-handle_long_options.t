@@ -13,7 +13,7 @@ eval {
 };
 plan( skip_all => 't/harness only runs once configuration has completed' )
     if $@;
-plan( tests => 12 );
+plan( tests => 11 );
 use Carp;
 use Parrot::Harness::Options qw( handle_long_options );
 
@@ -22,13 +22,11 @@ my %still_argv;
 @argv = qw(
     -wv
     -O2
-    --running-make-test
     --gc-debug
     t/postconfigure/*.t
 ); # */
 
 ($longopts, @argv) = handle_long_options(@argv);
-ok($longopts->{running_make_test}, "Captured long option");
 ok($longopts->{gc_debug}, "Captured long option");
 %still_argv = map {$_, 1} @argv;
 ok($still_argv{'-wv'}, "Combined short options still present in \@ARGV");
