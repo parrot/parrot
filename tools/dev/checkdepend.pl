@@ -104,7 +104,7 @@ foreach my $file (sort grep /\.pir$/, @incfiles) {
     # (Avoid clobbering the strings used in .include 'foo.pir', etc.)
     $guts =~ s{=\s*'[^']*'\s*$}{}gm;
     $guts =~ s{=\s*"(?:[^"\\]|\\.)*"\s*$}{}gm;
-    # XXX also, heredocs (wheeeee!)
+    # also, heredocs (wheeeee!)
 
     my @includes;
     while ($guts =~ m/(?:\.include|\bload_bytecode)\s+(["'])(.*)\1/g) {
@@ -162,7 +162,8 @@ sub get_rules {
             get_rules($1, $rules);
             $global_line_num = @$rules;
             $file_line_num++;
-        } else {
+        }
+        else {
             $rules->[$global_line_num] =
             {
                 filename => $filename,
