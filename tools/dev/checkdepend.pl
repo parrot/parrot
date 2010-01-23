@@ -146,45 +146,79 @@ foreach my $file (sort grep /\.pir$/, @incfiles) {
     }
 }
 
+sub get_rules {
 
-open my $mf, '<', "Makefile";
-my $rules;
-{
-    local $/;
-    $rules = <$mf>;
-}
-close $mf;
+    my ($filename, $rules) = @_;
 
-# inline all "include"'d Makefiles;
-while ($rules =~ /^include\s+(.*)$/m) {
-    my $sub_makefile = $1;
-    open my $smf, '<', $sub_makefile;
-    my $subrules;
-    {
-        local $/;
-        $subrules = <$smf>;
+    open my $mf, '<', "$filename";
+    my $global_line_num = @$rules;
+    my $file_line_num   = 1;
+    my $escape_start    = 1;
+
+    foreach (<$mf>) {
+        my $line = $_;
+        chomp $line;
+        if ($_ =~ /^include\s+(.*)$/m) {
+            get_rules($1, $rules);
+            $global_line_num = @$rules;
+            $file_line_num++;
+        } else {
+            $rules->[$global_line_num] =
+            {
+                filename => $filename,
+                line     => $line,
+                line_num => $file_line_num,
+            };
+
+            # Convert all \-newline continuations into single lines for ease of
+            # processing.  Leave blank lines to keep line numbers accurate.
+            if (exists $rules->[$escape_start]{line} &&
+                $rules->[$escape_start]{line}    !~ /\\$/ &&
+                $rules->[$global_line_num]{line} =~ /\\$/) {
+
+                $escape_start = $global_line_num;
+            }
+
+            if ($rules->[$escape_start]{line} && $rules->[$escape_start]{line} =~ /\\$/ &&
+                $escape_start != $global_line_num) {
+
+                $rules->[$escape_start]{line} =~ s/\\$//;
+                $rules->[$escape_start]{line} .= $rules->[$global_line_num]{line};
+                $rules->[$global_line_num]{line} = '';
+            }
+
+            $file_line_num++;
+            $global_line_num++;
+        }
     }
-    close $smf;
-    $rules =~ s/^include\s+$sub_makefile$/$subrules/m;
+    close $mf;
 }
 
-# convert all \-newline continuations into single lines for ease of processing.
-$rules =~ s/\\\n//g;
+our $rules = [];
+get_rules('Makefile', $rules);
 
-# replace all _DIR variables with their expansions.
-while ($rules =~ s/^([A-Z_]+_DIR)\s*=\s*(\S*)$//m) {
-    my ($var,$val) = ($1, $2);
-    $rules =~ s/\$\($var\)/$val/g;
+#expand all variables
+our %vars;
+foreach (@$rules) {
+    #expand any known variables
+    while ($_->{line} =~ /\$\(([A-Z_]+)\)/) {
+        my $var_name = $1;
+        if (exists $vars{$var_name}) {
+            $_->{line} =~ s/\$\($var_name\)/$vars{$var_name}/g;
+        }
+        else {
+            $_->{line} =~ s/\$\($var_name\)//g;
+        }
+    }
+
+    #store any new definitions
+    if ($_->{line} =~ /^(\w+)\s+=\s+(.*)$/) {
+        $vars{$1} = $2;
+    }
 }
-
-# expand PARROT_H_HEADERS
-$rules =~ m/^PARROT_H_HEADERS\s*=\s*(.*)$/m;
-my $phh = $1;
-
-$rules =~ s/\Q$(PARROT_H_HEADERS)/$phh/g;
 
 if (@ARGV && $ARGV[0] eq '--dump') {
-    print $rules;
+    print "$_->{line}\n" for (@$rules);
     exit 0;
 }
 
@@ -192,36 +226,44 @@ my $test_count = grep {/\.(c|pir)$/} (keys %deps);
 
 plan( tests => $test_count );
 
-foreach my $header (sort grep {/\.h$/} (keys %deps)) {
-    # static headers shouldn't depend on anything else.
-    if ($rules =~ /^$header\s*:\s*(.*)\s*$/m) {
-        #is("", $1, "$header should have no dependencies");
-    }
-}
+#foreach my $header (sort grep {/\.h$/} (keys %deps)) {
+#    # static headers shouldn't depend on anything else.
+#    if ($rules =~ /^$header\s*:\s*(.*)\s*$/m) {
+#        #is("", $1, "$header should have no dependencies");
+#    }
+#}
 
 my @files = keys %deps;
 @files = @ARGV if @ARGV;
 
-check_files(\@files, '.c',   '\$\(O\)');
-check_files(\@files, '.pir', '.pbc');
+check_files($rules, \@files, '.c',   $vars{O});
+check_files($rules, \@files, '.pir', '.pbc');
 
 sub check_files {
-    
-    my ($possible_files, $src_ext, $obj_ext) = @_;
+
+    my ($rules, $possible_files, $src_ext, $obj_ext) = @_;
 
     foreach my $file (sort grep {/$src_ext$/} @$possible_files) {
+        my ($active_makefile, $active_line_num);
         my $rule = $file;
         $rule =~ s/$src_ext$//;
 
-        $rules =~ /^${rule}${obj_ext}\s*:\s*(.*)\s*$/m;
-        my $rule_deps = defined $1 ? $1 : '';
+        #find the applicable rule for this file
+        my $rule_deps;
+        for (@$rules) {
+            if ($_->{line} =~ /^$rule$obj_ext\s*:\s*(.*)\s*$/) {
+                $rule_deps = $1;
+            }
+            last if defined($rule_deps);
+        }
 
-        my $expected_deps = join ' ', sort (get_deps($file));
         $rule_deps        = join ' ', sort split /\s+/, $rule_deps;
+        my $expected_deps = join ' ', sort (get_deps($file));
 
-        is($rule_deps, $expected_deps, "$file has correct dependencies.");
+        is($rule_deps, $expected_deps, "$file has correct dependencies (.");
     }
 }
+
 
 sub collapse_path {
     my $path = shift;
