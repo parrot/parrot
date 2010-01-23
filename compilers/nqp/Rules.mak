@@ -1,4 +1,6 @@
-compilers/nqp/nqp.pbc : $(PARROT) $(NQP_SOURCES) \
+compilers/nqp/nqp.pbc : compilers/nqp/src/builtins.pir \
+    compilers/nqp/src/Grammar/Actions.pir \
+    compilers/nqp/src/Grammar_gen.pir \
     $(LIBRARY_DIR)/PCT.pbc \
     $(LIBRARY_DIR)/PGE.pbc
 
