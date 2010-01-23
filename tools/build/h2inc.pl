@@ -23,15 +23,8 @@ my $directive = parse_file($in_file, $out_file);
 die "invalid output file: '$out_file' for input '$in_file'" unless $directive;
 
 my @defs = perform_directive($directive);
-my $target  = $directive->{file};
-my $generated_text;
-if ($target =~ /\.pm$/) {
-    $generated_text = join "\n", const_to_perl(@defs);
-    $generated_text .= "\n1;";
-}
-else {
-    $generated_text = join "\n", const_to_parrot(@defs);
-}
+
+my $generated_text = generate_text($directive, \@defs);
 
 print_generated_file( {
     in      => $in_file,
@@ -290,6 +283,64 @@ sub prepend_prefix {
 
     transform_name( sub { $prefix . $_[0] }, @_ );
 }
+
+=head2 C<generate_text()>
+
+=over 4
+
+=item * Argument
+
+    $generated_text = generate_text($directive, \@defs);
+
+List of two arguments: Directive hashref; reference to array of definitions.
+
+=item * Return Value
+
+String holding main text to be printed to new file.
+
+=back
+
+=cut
+
+sub generate_text {
+    my ($directive, $defs_ref) = @_;
+
+    my $target  = $directive->{file};
+    my $generated_text;
+    if ($target =~ /\.pm$/) {
+        $generated_text = join "\n", const_to_perl(@{ $defs_ref });
+        $generated_text .= "\n1;";
+    }
+    else {
+        $generated_text = join "\n", const_to_parrot(@{ $defs_ref });
+    }
+    return $generated_text;
+}
+
+=head2 C<print_generated_file()>
+
+=over 4
+
+=item * Argument
+
+    print_generated_file( {
+        in      => $in_file,
+        out     => $out_file,
+        script  => $0,
+        gen     => $generated_text,
+    } );
+
+Hash reference.  Elements pertain to file being read, file being created,
+calling program (typically, F<tools/build/h2inc.pl>) and string of text to be
+printed to file.
+
+=item * Return Value
+
+Implicitly returns true upon success.
+
+=back
+
+=cut
 
 sub print_generated_file {
     my $args = shift;
