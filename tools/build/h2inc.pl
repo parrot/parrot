@@ -16,24 +16,21 @@ use warnings;
 
 my $usage = "Usage: $0 <input_file> <output_file>\n";
 
-my $in_file  = shift or die $usage;
-my $out_file = shift or die $usage;
-die $usage if @ARGV;
+die $usage unless @ARGV == 2;
+my ($in_file, $out_file) = @ARGV;
 
-open my $in_fh, '<', $in_file or die "Can't open $in_file: $!\n";
-my $directive = parse_file($in_file, $in_fh, $out_file);
-close $in_fh;
+my $directive = parse_file($in_file, $out_file);
 die "invalid output file: '$out_file' for input '$in_file'" unless $directive;
 
 my @defs = perform_directive($directive);
 my $target  = $directive->{file};
 my $gen;
 if ($target =~ /\.pm$/) {
-    $gen = join "\n", &const_to_perl(@defs);
+    $gen = join "\n", const_to_perl(@defs);
     $gen .= "\n1;";
 }
 else {
-    $gen = join "\n", &const_to_parrot(@defs);
+    $gen = join "\n", const_to_parrot(@defs);
 }
 
 open my $out_fh, '>', $out_file or die "Can't open $out_file: $!\n";
@@ -174,7 +171,7 @@ List.
 sub perform_directive {
     my ($d) = @_;
 
-    my @defs = prepend_prefix $d->{prefix}, @{ $d->{defs} };
+    my @defs = prepend_prefix( $d->{prefix}, @{ $d->{defs} } );
     if ( my $subst = $d->{subst} ) {
         @defs = transform_name( sub { local $_ = shift; eval $subst; $_ }, @defs );
     }
@@ -187,10 +184,9 @@ sub perform_directive {
 
 =item * Arguments
 
-    $directive = parse_file($in_file, $in_fh, $out_file);
+    $directive = parse_file($in_file, $out_file);
 
-List of 3 elements: string holding name of incoming file; read handle to that
-file; string holding name of outgoing file.
+List of 2 elements: string holding name of incoming file; string holding name of outgoing file.
 
 =item * Return Value
 
@@ -201,9 +197,10 @@ If successful, returns a hash reference.
 =cut
 
 sub parse_file {
-    my ( $in_file, $fh, $out_file) = @_;
+    my ( $in_file, $out_file) = @_;
 
     my ( @directives, %values, $last_val, $cur, $or_continues );
+    open my $fh, '<', $in_file or die "Can't open $in_file: $!\n";
     while ( my $line = <$fh> ) {
         if (
             $line =~ m!
@@ -295,6 +292,7 @@ sub parse_file {
         }
     }
     $cur and die "Missing '&end_gen' in $in_file\n";
+    close $fh or die "Could not close handle to $in_file after reading: $!";
 
     return;
 }
