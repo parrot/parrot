@@ -23,7 +23,7 @@ You also need Perl 5.8.4 or newer, and Storable 2.12 or newer
 for running various configure and build scripts.
 
 For most of the platforms that we are supporting initially, Parrot should build
-out of the box. docs/parrot.pod lists the core platforms.  PLATFORMS provides
+out of the box. docs/parrot.pod lists the core platforms. PLATFORMS provides
 reports on the platforms on which Parrot has been built and tested.
 
 INSTRUCTIONS
@@ -85,13 +85,6 @@ By default, this installs in /usr/local, with the Parrot executable in
 But please note that dynamic libs will not be found for non-standard
 locations unless you set LD_LIBRARY_PATH or similar.
 
-If you want to build high level languages on top of Parrot, you should
-also run
-
-    make install-dev
-
-to install development files which compilers need in their build process.
-
 Look at docs/parrot.pod and docs/intro.pod for where to go from here.  If you
 have any problems, see the section "How To Submit A Bug Report" in
 docs/submissions.pod.  These documents are in POD format. You can view these
@@ -116,14 +109,16 @@ previous versions, please see NEWS.
 MAILING LISTS
 -------------
 
-The mailing list for Parrot is parrot-dev@lists.parrot.org. Subscribe by
-filling out the form at http://lists.parrot.org/mailman/listinfo/parrot-dev
-It is archived at http://lists.parrot.org/pipermail/parrot-dev/
+The Parrot user mailing list is parrot-users@lists.parrot.org. Subscribe by
+filling out the form at http://lists.parrot.org/mailman/listinfo/parrot-users .
+The list is archived at http://lists.parrot.org/pipermail/parrot-users/ .
+
+For development discussions see the information in docs/gettingstarted.pod.
 
 FEEDBACK, PATCHES, etc.
 -----------------------
 
-See F<docs/submissions.pod> for more information on reporting bugs and
+See docs/submissions.pod for more information on reporting bugs and
 submitting patches.
 
 WEB SITES
