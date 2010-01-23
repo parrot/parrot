@@ -188,7 +188,9 @@ if (@ARGV && $ARGV[0] eq '--dump') {
     exit 0;
 }
 
-plan('no_plan');
+my $test_count = grep {/\.(c|pir)$/} (keys %deps);
+
+plan( tests => $test_count );
 
 foreach my $header (sort grep {/\.h$/} (keys %deps)) {
     # static headers shouldn't depend on anything else.
@@ -212,34 +214,12 @@ sub check_files {
         $rule =~ s/$src_ext$//;
 
         $rules =~ /^${rule}${obj_ext}\s*:\s*(.*)\s*$/m;
-        my $rule_deps = $1;
+        my $rule_deps = defined $1 ? $1 : '';
 
-        my $failed = 0;
-        if (!defined($rule_deps)) {
-            $failed = 1;
-            is("", join(' ', (get_deps($file))), "$file has no dependencies");
-            next;
-        }
-        else
-        {
-            $rule_deps =~ s/\s+/ /g;
-            foreach my $inc (sort (get_deps($file))) {
-                next if $rule_deps =~ s/\b\Q$inc\E\b//;
+        my $expected_deps = join ' ', sort (get_deps($file));
+        $rule_deps        = join ' ', sort split /\s+/, $rule_deps;
 
-                is($rule_deps, $inc, "$file is missing a dependency.");
-                $failed = 1;
-
-            }
-        }
-        $rule_deps =~ s/^\s+//;
-        $rule_deps =~ s/\s+$//;
-        $rule_deps =~ s/\s+/ /g;
-        if ($rule_deps ne "") {
-            is($rule_deps, '', "$file has extra dependencies.");
-        }
-        elsif (!$failed) {
-            pass($file);
-        }
+        is($rule_deps, $expected_deps, "$file has correct dependencies.");
     }
 }
 
