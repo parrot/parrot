@@ -44,11 +44,11 @@ cause false positives in the test output.
 die 'no Makefile found; This tool requires a full build for analysis.'
     unless -e 'Makefile';
 
-my @files = split /\n/, `ack -fa src compilers include  | ack '\\.(c|h|pir)\$'`;
+my @incfiles = split /\n/, `ack -fa src compilers include  | ack '\\.(c|h|pir)\$'`;
 
 our %deps;
 
-foreach my $file (sort grep /\.[hc]$/, @files) {
+foreach my $file (sort grep /\.[hc]$/, @incfiles) {
     # For now, skip any files that have generated dependencies
     next if $file =~ m{src/(ops|dynoplibs|dynpmc|pmc)/};
     next if $file =~ m{src/string/(charset|encoding)/};
@@ -88,7 +88,7 @@ foreach my $file (sort grep /\.[hc]$/, @files) {
     }
 }
 
-foreach my $file (sort grep /\.pir$/, @files) {
+foreach my $file (sort grep /\.pir$/, @incfiles) {
     open my $fh, '<', $file;
     my $guts;
     {
