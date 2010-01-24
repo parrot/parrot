@@ -71,22 +71,22 @@ the attributes they'll use.
 
 .sub __load :anon :load
     .local pmc obj, spec, pns, ns
-    obj = newclass "Getopt::Obj"
+    obj = newclass ['Getopt';'Obj']
     addattribute obj, "Specs"
     addattribute obj, "notOptStop"
 
-    spec = newclass "Getopt::Obj::Spec"
+    spec = newclass ['Getopt';'Obj';'Spec']
     addattribute spec, "name"
     addattribute spec, "long"
     addattribute spec, "short"
     addattribute spec, "type"
     addattribute spec, "optarg"
 
-    ns = get_hll_namespace ["Getopt::Obj"]
+    ns = get_hll_namespace ['Getopt';'Obj']
     $P0 = get_hll_namespace
     pns = $P0.'make_namespace'('Getopt')
     pns.'add_namespace'('Obj', ns)
-    ns = get_hll_namespace ["Getopt::Obj::Spec"]
+    ns = get_hll_namespace ['Getopt';'Obj';'Spec']
     pns = get_hll_namespace ['Getopt';'Obj']
     pns.'add_namespace'('Spec', ns)
 .end
@@ -101,7 +101,7 @@ Our nice little module.
 
 =cut
 
-.namespace ["Getopt::Obj"]
+.namespace ['Getopt';'Obj']
 
 =item C<init()>
 
@@ -462,7 +462,7 @@ Adds a new option to the parsing.  You don't need to know what class it is
 
 .sub "add" :method
     .local pmc spec, specs
-    spec = new "Getopt::Obj::Spec"
+    spec = new ['Getopt';'Obj';'Spec']
     specs = getattribute self, "Specs"
     push specs, spec
     .return(spec)
@@ -568,14 +568,14 @@ When a required argument is missing, throws an exception with the message
 
 =head2 Class Getopt::Obj::Spec
 
-Internal use only, at least don't do any new "Getopt::Obj::Spec" yourself...
+Internal use only, at least don't do any C<new ['Getopt';'Obj';'Spec'> yourself...
 This makes an easy holder for each possible match.
 
 =over 4
 
 =cut
 
-.namespace ["Getopt::Obj::Spec"]
+.namespace ['Getopt';'Obj';'Spec']
 
 =item C<init()>
 
