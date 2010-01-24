@@ -254,14 +254,21 @@ sub check_files {
         for (@$rules) {
             if ($_->{line} =~ /^$rule$obj_ext\s*:\s*(.*)\s*$/) {
                 $rule_deps = $1;
+                $active_makefile = $_->{filename};
+                $active_line_num = $_->{line_num};
             }
             last if $rule_deps;
+        }
+
+        my $extra_info = "(no rule found for this file)";
+        if ($rule_deps) {
+            $extra_info = "($active_makefile: line $active_line_num)";
         }
 
         $rule_deps        = join ' ', sort split /\s+/, $rule_deps;
         my $expected_deps = join ' ', sort (get_deps($file));
 
-        is($rule_deps, $expected_deps, "$file has correct dependencies (.");
+        is($rule_deps, $expected_deps, "$file has correct dependencies $extra_info.");
     }
 }
 
