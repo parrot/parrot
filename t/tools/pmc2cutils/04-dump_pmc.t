@@ -19,7 +19,7 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 106;
+use Test::More tests => 108;
 use File::Basename;
 use File::Copy;
 use FindBin;
@@ -311,12 +311,12 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
         my $rv = copy( $pmcfile, qq{$temppmcdir/$basename} );
         $copycount++ if $rv;
     }
-    is( $copycount, $pmcfilecount, "all src/pmc/*.pmc files copied to tempdir" );
+    is( $copycount, $pmcfilecount,
+        "all src/pmc/*.pmc files copied to tempdir" );
     my @include = ( $tdir, $temppmcdir, @include_orig );
 
     @args = (
         qq{$temppmcdir/default.pmc},
-
         #    qq{$temppmcdir/scalar.pmc},
         qq{$temppmcdir/integer.pmc},
     );
@@ -332,15 +332,10 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     $dump_file = $self->dump_vtable("$main::topdir/src/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
-    TODO: {
-        local $TODO = q{needs reworking to work after 'make'};
-        eval { $self->dump_pmc(); };
-        like(
-            $@,
-            qr/^cannot find file 'scalar\.dump' in path/,
-            "ERROR WAS '$@', path is $temppmcdir"
-        );
-    }
+     $self->dump_pmc();
+    ok( -f qq{$temppmcdir/default.dump}, "default.dump created as expected" );
+    ok( ! -f qq{$temppmcdir/scalar.dump},  "scalar.dump not created as expected" );
+    ok( -f qq{$temppmcdir/integer.dump}, "integer.dump created as expected" );
 
     ok( chdir $cwd, "changed back to original directory" );
 }
@@ -590,10 +585,6 @@ James E Keenan
 =head1 SEE ALSO
 
 Parrot::Pmc2c, F<pmc2c.pl>.
-        "array.dump correctly overwritten");
-
-    ok(chdir $cwd, "changed back to original directory");
-}
 
 pass("Completed all tests in $0");
 
