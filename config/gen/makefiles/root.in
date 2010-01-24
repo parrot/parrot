@@ -216,8 +216,6 @@ GEN_PASM_INCLUDES = \
 	runtime/parrot/include/errors.pasm \
 	runtime/parrot/include/interpinfo.pasm \
 	runtime/parrot/include/tm.pasm \
-#IF(has_opengl):    runtime/parrot/include/opengl_defines.pasm \
-#IF(has_opengl):    $(LIBRARY_DIR)/OpenGL_funcs.pir \
 	runtime/parrot/include/pmctypes.pasm \
 
 GEN_PM_INCLUDES = \
