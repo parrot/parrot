@@ -104,7 +104,7 @@ foreach my $file (sort grep /\.pir$/, @incfiles) {
     # (Avoid clobbering the strings used in .include 'foo.pir', etc.)
     $guts =~ s{=\s*'[^']*'\s*$}{}gm;
     $guts =~ s{=\s*"(?:[^"\\]|\\.)*"\s*$}{}gm;
-    # also, heredocs (wheeeee!)
+    # XXX also, heredocs (wheeeee!)
 
     my @includes;
     while ($guts =~ m/(?:\.include|\bload_bytecode)\s+(["'])(.*)\1/g) {
