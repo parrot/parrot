@@ -250,12 +250,12 @@ sub check_files {
         $rule =~ s/$src_ext$//;
 
         #find the applicable rule for this file
-        my $rule_deps;
+        my $rule_deps = '';
         for (@$rules) {
             if ($_->{line} =~ /^$rule$obj_ext\s*:\s*(.*)\s*$/) {
                 $rule_deps = $1;
             }
-            last if defined($rule_deps);
+            last if $rule_deps;
         }
 
         $rule_deps        = join ' ', sort split /\s+/, $rule_deps;
