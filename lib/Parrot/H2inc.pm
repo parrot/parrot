@@ -3,6 +3,7 @@ package Parrot::H2inc;
 # $Id$
 
 use strict;
+use warnings;
 use Exporter;
 our @ISA = qw( Exporter );
 our @EXPORT_OK = qw(
