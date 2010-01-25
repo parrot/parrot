@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -651,10 +651,12 @@ Deletes the key C<*key> from the hash.
             INTVAL    intval = VTABLE_get_integer(INTERP, key);
             PMC * const next = VTABLE_shift_pmc(INTERP, key);
 
-            if (!next)
-                return STATICSELF.delete_keyed_int(intval);
+            if (next)
+                VTABLE_delete_keyed(INTERP, STATICSELF.get_pmc_keyed_int(intval), next);
+            else
+                STATICSELF.delete_keyed_int(intval);
 
-            return VTABLE_delete_keyed(INTERP, STATICSELF.get_pmc_keyed_int(intval), next);
+            return;
         }
 
         list_entry = VTABLE_get_pmc_keyed(INTERP, attrs->hash, key);
@@ -678,11 +680,11 @@ Deletes the key C<*key> from the hash.
             VTABLE_set_pmc_keyed_int(INTERP, next, ORDERED_HASH_ITEM_PREV, prev);
 
         /* And finally delete it */
-        return VTABLE_delete_keyed(INTERP, PARROT_ORDEREDHASH(SELF)->hash, key);
+        VTABLE_delete_keyed(INTERP, PARROT_ORDEREDHASH(SELF)->hash, key);
     }
 
     VTABLE void delete_keyed_str(STRING *key) {
-        return STATICSELF.delete_keyed(box_string(INTERP, key));
+        STATICSELF.delete_keyed(box_string(INTERP, key));
     }
 
     VTABLE void delete_keyed_int(INTVAL idx) {
