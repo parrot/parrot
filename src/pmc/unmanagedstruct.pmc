@@ -90,9 +90,10 @@ key_2_idx(PARROT_INTERP, PMC *pmc, PMC *key)
         PMC * const types = PARROT_UNMANAGEDSTRUCT(pmc)->init;
 
         if (types->vtable->base_type == enum_class_OrderedHash) {
-            Hash       * const hash = (Hash *)VTABLE_get_pointer(interp, types);
+            Hash       * const hash = (Hash *)VTABLE_get_pointer(interp,
+                    VTABLE_get_pmc(interp, types));
             HashBucket * const b    = parrot_hash_get_bucket(interp, hash,
-                VTABLE_get_string(interp, key));
+                    hash_key_from_string(interp, hash, VTABLE_get_string(interp, key)));
 
             if (!b)
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_KEY_NOT_FOUND,

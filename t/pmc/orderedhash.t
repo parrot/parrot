@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 23;
 
 =head1 NAME
 
@@ -310,16 +310,10 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "delete with int keys" );
     print I0
     exists I0, P0["ghi"]
     print I0
-    exists I0, P0[0]
-    print I0
-    exists I0, P0[1]
-    print I0
-    exists I0, P0[2]
-    print I0
     print "\n"
     end
 CODE
-101101
+101
 OUTPUT
 
 pasm_output_like( <<'CODE', '/[axj]/', "iterate over keys" );
@@ -636,113 +630,6 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "set/get compound key" );
-    new P0, ['OrderedHash']
-    set P0["a"], "Foo\n"
-    new P1, ['Hash']
-    set P1['foo'], "bar\n"
-    set P0["b"], P1
-    set P2, P0['b'; 'foo']
-    print P2
-    set P0['b'; 'foo'], "baz\n"
-    set P0['b'; 'quux'], "xyzzy\n"
-    set P2, P0['b'; 'foo']
-    print P2
-    set P2, P0['b'; 'quux']
-    print P2
-    print "--\n"
-    set P2, P0[0]
-    print P2
-    end
-CODE
-bar
-baz
-xyzzy
---
-Foo
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "exists compound key" );
-    new P0, ['OrderedHash']
-    set P0["a"], "Foo"
-    new P1, ['Hash']
-    set P1['foo'], "bar\n"
-    set P0["b"], P1
-    set P0['b'; 'quux'], "xyzzy\n"
-    exists I0, P0['a']
-    print I0
-    exists I0, P0['b'; 'foo']
-    print I0
-    exists I0, P0['b'; 'quux']
-    print I0
-    exists I0, P0['b'; 'nada']
-    print I0
-    exists I0, P0['c']
-    print I0
-    print "\n--\n"
-    exists I0, P0[0]
-    print I0
-    exists I0, P0[1; 'foo']
-    print I0
-    exists I0, P0[1; 'quux']
-    print I0
-    exists I0, P0[1; 'nada']
-    print I0
-    exists I0, P0[2]
-    print I0
-    print "\n"
-    end
-CODE
-11100
---
-11100
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "delete compound key" );
-    new P0, ['OrderedHash']
-    set P0["a"], "Foo"
-    new P1, ['Hash']
-    set P1['foo'], "bar\n"
-    set P0["b"], P1
-    set P0['b'; 'quux'], "xyzzy\n"
-    delete  P0['b'; 'foo']
-    exists I0, P0['a']
-    print I0
-    exists I0, P0['b'; 'foo']
-    print I0
-    exists I0, P0['b'; 'quux']
-    print I0
-    exists I0, P0['b'; 'nada']
-    print I0
-    exists I0, P0['c']
-    print I0
-    print "\n--\n"
-    exists I0, P0[0]
-    print I0
-    exists I0, P0[1; 'foo']
-    print I0
-    exists I0, P0[1; 'quux']
-    print I0
-    exists I0, P0[1; 'nada']
-    print I0
-    exists I0, P0[2]
-    print I0
-    print "\n--\n"
-    delete P0[1; 'quux']
-    exists I0, P0['b'; 'quux']
-    print I0
-    exists I0, P0[1; 'quux']
-    print I0
-    print "\n"
-    end
-CODE
-10100
---
-10100
---
-00
-OUTPUT
-
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw 1" );
     new P0, ['OrderedHash']
     set P0["a"], "Foo\n"
@@ -765,104 +652,6 @@ Foo
 Foo
 Bar
 Bar
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw 2" );
-    new P0, ['OrderedHash']
-    set P0["a"], "Foo\n"
-    new P1, ['Hash']
-    set P1['foo'], "bar\n"
-    set P0["b"], P1
-    set P0['b'; 'quux'], "xyzzy\n"
-
-    freeze S0, P0
-    thaw P1, S0
-    set P2, P1["a"]
-    print P2
-    set P2, P1[0]
-    print P2
-    set P2, P1["b";"foo"]
-    print P2
-    set P2, P1[1; "foo"]
-    print P2
-    set P2, P1["b";"quux"]
-    print P2
-    set P2, P1[1; "quux"]
-    print P2
-
-    end
-CODE
-Foo
-Foo
-bar
-bar
-xyzzy
-xyzzy
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', 'freeze/thaw 3' );
-.sub main :main
-    .local string frozen
-    frozen = get_frozen_hash()
-
-    sweep 1
-
-    .local pmc parent
-    parent = thaw frozen
-    $S0 = parent['a']
-    say $S0
-
-    $S0 = parent[0]
-    say $S0
-
-    .local pmc child
-    child = parent[1]
-    $S0   = child[0]
-    say $S0
-
-    $S0   = child['foo']
-    say $S0
-
-    $S0   = parent[1; 'foo']
-    say $S0
-
-    $S0   = parent['b'; 'foo']
-    say $S0
-
-    $S0   = parent['b'; 'quux']
-    say $S0
-
-    $S0   = parent['b'; 2]
-    say $S0
-    end
-.end
-
-.sub get_frozen_hash
-    .local pmc parent
-    parent      = new ['OrderedHash']
-    parent['a'] = 'Foo'
-
-    .local pmc child
-    child        = new ['OrderedHash']
-    child['foo'] = 'bar'
-    push child, 'baz'
-
-    parent['b']         = child
-    parent['b'; 'quux'] = 'qaax'
-
-    .local string frozen
-    frozen = freeze parent
-    .return( frozen )
-.end
-CODE
-Foo
-Foo
-bar
-bar
-bar
-bar
-qaax
-qaax
 OUTPUT
 
 # Local Variables:

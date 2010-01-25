@@ -80,6 +80,16 @@ struct _hash {
 
 typedef void (*value_free)(void *);
 
+/* To avoid creating OrderedHashItem PMC we reuse FixedPMCArray PMC */
+/* So, there is indexes to avoid using of "magick constants" */
+enum ORDERED_HASH_ITEM_PART {
+    ORDERED_HASH_ITEM_KEY   = 0,
+    ORDERED_HASH_ITEM_VALUE = 1,
+    ORDERED_HASH_ITEM_PREV  = 2,
+    ORDERED_HASH_ITEM_NEXT  = 3,
+    ORDERED_HASH_ITEM_MAX   = 4,
+};
+
 /* HEADERIZER BEGIN: src/hash.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 

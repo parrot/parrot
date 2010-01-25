@@ -731,7 +731,8 @@ visit_loop_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC *current),
         const INTVAL n           = Parrot_pmc_array_length(interp, finish_list);
         int          i;
 
-        for (i = 0; i < n ; ++i) {
+        /* Thaw in reverse order. We have to fully thaw younger PMCs before use them in older */
+        for (i = n-1; i >= 0; --i) {
             current = *(PMC**)Parrot_pmc_array_get(interp, finish_list, i, enum_type_PMC);
             if (!PMC_IS_NULL(current))
                 VTABLE_thawfinish(interp, current, info);

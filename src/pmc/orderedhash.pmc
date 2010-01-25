@@ -8,28 +8,66 @@ src/pmc/orderedhash.pmc - Ordered Hash
 
 =head1 DESCRIPTION
 
-C<OrderedHash> extends C<Hash> to provide the interfaces of C<array> and
-C<hash>. To achieve ordering, hash there are a few restrictions:
-C<delete_keyed> never removes items; they are just nulled.
+C<OrderedHash> provide the interfaces of C<array> and
+C<hash>.
 
-Please note that if values are set via integer idx, these indices have to be in
-strict order. Using C<push_xx> simplifies this task.  This creates a key
-"\1idx" for C<idx> and is therefore not fully transparent.
-
-There are two iterator interfaces:
+Some limitations:
 
 =over 4
 
-=item * retrieve values (in creation order)
+=item *
 
-Please note that after a C<delete_keyed> operation, iterating over
-values doesn't work any more.  You'll get an error 'No such key'.
+Keys are always STRING*.
 
-=item * retrieve keys (in creation order)
+=item *
+
+Values are always PMC*.
 
 =back
 
-See F<t/pmc/orderedhash.t>.
+To archive ordering for each item we store:
+
+=over 4
+
+=item * C<key>
+
+Original key
+
+=item * C<value>
+
+Original value
+
+=item * C<next>
+
+Pointer to next C<item>
+
+=item * C<prev>
+
+Pointer to previous C<item>
+
+=back
+
+OrderedHash stores next things:
+
+=over 4
+
+=item * C<hash>
+
+Lookup hash for values.
+
+=item * C<first>
+
+Pointer to first inserted value.
+
+=item * C<last>
+
+Pointer to last inserter value.
+
+=back
+
+See F<t/pmc/orderedhash.t> for test cases.
+
+Overall design heavily inspired by C<Tie::StoredOrderHash>.
 
 =head2 Methods
 
@@ -39,7 +77,108 @@ See F<t/pmc/orderedhash.t>.
 
 */
 
-pmclass OrderedHash extends Hash provides array provides hash {
+/* Create new stored item. FixedPMCArray of (key, value, prev, next). */
+static PMC*
+create_item(PARROT_INTERP, ARGIN(PMC *key), ARGIN(PMC *value)) {
+    PMC *ret = pmc_new(interp, enum_class_FixedPMCArray);
+    VTABLE_set_integer_native(interp, ret, ORDERED_HASH_ITEM_MAX);
+
+    VTABLE_set_pmc_keyed_int(interp, ret, ORDERED_HASH_ITEM_KEY, key);
+    VTABLE_set_pmc_keyed_int(interp, ret, ORDERED_HASH_ITEM_VALUE, value);
+    return ret;
+};
+
+/* Get list_item by index */
+static PMC*
+get_list_item(PARROT_INTERP, ARGIN(PMC *self), INTVAL idx) {
+    Parrot_OrderedHash_attributes *attrs = PARROT_ORDEREDHASH(self);
+    INTVAL                         n = VTABLE_elements(interp, attrs->hash);
+    INTVAL                         pos;
+    PMC                           *list_entry = attrs->first;
+
+    if (idx < -n)
+        idx = -idx - n - 1;
+    else if (idx < 0)
+        idx += n;
+
+    /* Iterate over linked list to get list_item */
+    for (pos = 0; pos < idx; ++pos) {
+        list_entry = VTABLE_get_pmc_keyed_int(interp, list_entry, ORDERED_HASH_ITEM_NEXT);
+    }
+    return list_entry;
+}
+
+/* Find first/last in cloned/thawed OrderedHash */
+/* Parameter C<pmc_hash> is Hash, not OrderedHash */
+static void
+find_bounds(PARROT_INTERP, PMC *pmc_hash, PMC **first, PMC **last) {
+    PMC *iter = VTABLE_get_iter(interp, pmc_hash);
+    while (VTABLE_get_bool(interp, iter)) {
+        PMC *item  = VTABLE_shift_pmc(interp, iter);
+        PMC *entry = VTABLE_get_pmc_keyed(interp, pmc_hash, item);
+        /* First entry doesn't have prev */
+        PMC *tmp   = VTABLE_get_pmc_keyed_int(interp, entry, ORDERED_HASH_ITEM_PREV);
+        if (PMC_IS_NULL(tmp))
+            *first = entry;
+        /* Last entry doesn't have next */
+        tmp   = VTABLE_get_pmc_keyed_int(interp, entry, ORDERED_HASH_ITEM_NEXT);
+        if (PMC_IS_NULL(tmp))
+            *last = entry;
+    }
+}
+
+/* Helpers for boxing values */
+static PMC*
+box_string(PARROT_INTERP, STRING *str) {
+    PMC * const ret = pmc_new(interp, Parrot_get_ctx_HLL_type(interp,
+                enum_class_String));
+    VTABLE_set_string_native(interp, ret, str);
+    return ret;
+}
+
+static PMC*
+box_integer(PARROT_INTERP, INTVAL val) {
+    PMC * const ret = pmc_new(interp, Parrot_get_ctx_HLL_type(interp,
+                enum_class_Integer));
+    VTABLE_set_integer_native(interp, ret, val);
+    return ret;
+}
+
+static PMC*
+box_number(PARROT_INTERP, FLOATVAL val) {
+    PMC * const ret = pmc_new(interp, Parrot_get_ctx_HLL_type(interp,
+                enum_class_Float));
+    VTABLE_set_number_native(interp, ret, val);
+    return ret;
+}
+
+
+pmclass OrderedHash need_ext provides array provides hash {
+    ATTR PMC    *hash;   /* key to item tuple */
+    ATTR PMC    *first;  /* Pointer to first inserted value  */
+    ATTR PMC    *last;   /* Pointer to last inserted value   */
+
+/*
+
+=item C<void init()>
+
+Create new instance of OrderedHash.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        Parrot_OrderedHash_attributes * const attrs =
+                mem_allocate_zeroed_typed(Parrot_OrderedHash_attributes);
+
+        PMC_data(SELF)  = attrs;
+        attrs->hash     = pmc_new(INTERP, enum_class_Hash);
+        attrs->first    = PMCNULL;
+        attrs->last     = PMCNULL;
+
+        PObj_custom_mark_destroy_SETALL(SELF);
+    }
 
 /*
 
@@ -52,26 +191,13 @@ Marks the OrderedHash as live.
 */
 
     VTABLE void mark() {
-        Hash * const h = (Hash *)SELF.get_pointer();
-        INTVAL  i;
+        Parrot_OrderedHash_attributes * const attrs =
+                PARROT_ORDEREDHASH(SELF);
 
-        if (!h)
-            return;
+        if (attrs->hash)
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *)attrs->hash);
 
-        for (i = h->mask; i >= 0; --i) {
-            HashBucket *b = h->bi[i];
-
-            while (b) {
-
-                if (b->key) {
-                    Parrot_gc_mark_PObj_alive(interp, (PObj *)b->key);
-                    if (b->value)
-                        Parrot_gc_mark_PObj_alive(interp, (PObj *)b->value);
-                }
-
-                b = b->next;
-            }
-        }
+        /* Don't mark C<first> and C<last>. They are in lookup hash anyway */
     }
 
 /*
@@ -90,6 +216,143 @@ Return a new iterator
 
 /*
 
+=item C<INTVAL elements()>
+
+=item C<INTVAL get_integer()>
+
+=item C<FLOATVAL get_number()>
+
+Returns the size of the hash.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer() {
+        return STATICSELF.elements();
+    }
+
+    VTABLE FLOATVAL get_number() {
+        return SELF.get_integer();
+    }
+
+    VTABLE INTVAL elements() {
+        return VTABLE_elements(INTERP, PARROT_ORDEREDHASH(SELF)->hash);
+    }
+
+/*
+
+=item C<set_pmc_keyed(PMC *key, PMC *value)>
+
+Main set function.
+
+=cut
+
+*/
+    VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
+        Parrot_OrderedHash_attributes *attrs =
+                PARROT_ORDEREDHASH(SELF);
+
+        /* Check for old entry */
+        PMC *list_entry = VTABLE_get_pmc_keyed(INTERP, attrs->hash, key);
+        if (!PMC_IS_NULL(list_entry)) {
+            /* We have old entry. Just update value */
+            PMC *nextkey = key_next(INTERP, key);
+            if (nextkey) {
+                PMC *old_value = VTABLE_get_pmc_keyed_int(INTERP, list_entry,
+                        ORDERED_HASH_ITEM_VALUE);
+                VTABLE_set_pmc_keyed(INTERP, value, nextkey, value);
+            }
+            else
+                VTABLE_set_pmc_keyed_int(INTERP, list_entry, ORDERED_HASH_ITEM_VALUE, value);
+            return;
+        }
+
+        /* Create new entry */
+        list_entry = pmc_new(INTERP, enum_class_FixedPMCArray);
+        VTABLE_set_integer_native(INTERP, list_entry, ORDERED_HASH_ITEM_MAX);
+        VTABLE_set_pmc_keyed_int(INTERP, list_entry, ORDERED_HASH_ITEM_VALUE, value);
+        VTABLE_set_pmc_keyed_int(INTERP, list_entry, ORDERED_HASH_ITEM_KEY, key);
+
+        /* .. and link it */
+        if (!PMC_IS_NULL(attrs->last)) {
+            VTABLE_set_pmc_keyed_int(INTERP, list_entry, ORDERED_HASH_ITEM_PREV, attrs->last);
+            VTABLE_set_pmc_keyed_int(INTERP, attrs->last, ORDERED_HASH_ITEM_NEXT, list_entry);
+        }
+        attrs->last = list_entry;
+        if (PMC_IS_NULL(attrs->first))
+            attrs->first = list_entry;
+
+        /* .. and store it */
+        VTABLE_set_pmc_keyed(INTERP, attrs->hash, key, list_entry);
+    }
+/*
+
+=item C<void set_integer_keyed(INTVAL key, INTVAL value)>
+
+=item C<void set_number_keyed(INTVAL key, FLOATVAL value)>
+
+=item C<void set_string_keyed(INTVAL key, STRING *value)>
+
+Sets the PMC value of the element at index C<key> to C<val>.
+
+=cut
+
+*/
+
+    VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
+        PMC * const v = box_integer(INTERP, value);
+        SELF.set_pmc_keyed(key, v);
+    }
+
+    VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
+        PMC * const v = box_number(INTERP, value);
+        SELF.set_pmc_keyed(key, v);
+    }
+
+    VTABLE void set_string_keyed(PMC *key, STRING *value) {
+        PMC * const v = box_string(INTERP, value);
+        SELF.set_pmc_keyed(key, v);
+    }
+
+/*
+
+=item C<void set_pmc_keyed_str(STRING *key, PMC *val)>
+
+=item C<void set_integer_keyed_str(STRING *key, INTVAL value)>
+
+=item C<void set_number_keyed_str(STRING *key, FLOATVAL value)>
+
+=item C<void set_string_keyed_str(STRING *key, STRING *value)>
+
+Sets the PMC value of the element at index C<key> to C<val>.
+
+=cut
+
+*/
+
+    VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
+        PMC *pkey = box_string(INTERP, key);
+        VTABLE_set_pmc_keyed(INTERP, SELF, pkey, value);
+    }
+
+    VTABLE void set_string_keyed_str(STRING *key, STRING *value) {
+        PMC * const v = box_string(INTERP, value);
+        STATICSELF.set_pmc_keyed_str(key, v);
+    }
+
+    VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) {
+        PMC * const v = box_integer(INTERP, value);
+        STATICSELF.set_pmc_keyed_str(key, v);
+    }
+
+    VTABLE void set_number_keyed_str(STRING *key, FLOATVAL value) {
+        PMC * const v = box_number(INTERP, value);
+        STATICSELF.set_pmc_keyed_str(key, v);
+    }
+
+/*
+
 =item C<PMC *get_pmc_keyed(PMC *key)>
 
 =item C<PMC *get_pmc_keyed_int(INTVAL key)>
@@ -101,40 +364,32 @@ Return a new iterator
 */
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL idx) {
-        Hash * const h = (Hash *)SELF.get_pointer();
-        const INTVAL n = h->entries;
-        HashBucket *b;
+        PMC *list_entry = get_list_item(INTERP, SELF, idx);
 
-        if (idx < 0)
-            idx += n;
+        if (PMC_IS_NULL(list_entry))
+            return PMCNULL;
 
-        if (idx < 0 || idx >= n)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
-                "OrderedHash: index out of bounds!");
-
-        b = h->bs + idx;
-
-        if (b->key)
-            return (PMC *)b->value;
-
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
-            "OrderedHash: No such key");
+        return VTABLE_get_pmc_keyed_int(INTERP, list_entry, ORDERED_HASH_ITEM_VALUE);
     }
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
+        PMC * item;
+        /* Access by integer index */
         if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_integer_FLAG) {
-            PMC * const item = SELF.get_pmc_keyed_int(VTABLE_get_integer(INTERP, key));
-            PMC * const next = VTABLE_shift_pmc(INTERP, key);
-
-            if (!next)
-                return item;
-
-            return VTABLE_get_pmc_keyed(INTERP, item, next);
+            return SELF.get_pmc_keyed_int(VTABLE_get_integer(INTERP, key));
         }
 
-        return INTERP->vtables[enum_class_Hash]->get_pmc_keyed(INTERP, SELF, key);
+        item = VTABLE_get_pmc_keyed(INTERP, PARROT_ORDEREDHASH(SELF)->hash, key);
+        if (PMC_IS_NULL(item))
+            return PMCNULL;
+        return VTABLE_get_pmc_keyed_int(INTERP, item, ORDERED_HASH_ITEM_VALUE);
     }
 
+    VTABLE PMC *get_pmc_keyed_str(STRING *key) {
+        PMC *pkey = pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_String));
+        VTABLE_set_string_native(INTERP, pkey, key);
+        return STATICSELF.get_pmc_keyed(pkey);
+    }
 /*
 
 =item C<STRING *get_string_keyed(PMC *key)>
@@ -148,39 +403,13 @@ Return a new iterator
 */
 
     VTABLE STRING *get_string_keyed_int(INTVAL idx) {
-        Hash * const h = (Hash *)SELF.get_pointer();
-        const INTVAL n = h->entries;
-
-        HashBucket *b;
-
-        if (idx < 0)
-            idx += n;
-
-        if (idx < 0 || idx >= n)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
-                "OrderedHash: index out of bounds!");
-
-        b = h->bs + idx;
-
-        if (b->key)
-            return VTABLE_get_string(INTERP, (PMC *)b->value);
-
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
-            "OrderedHash: No such key");
+        PMC * const item = VTABLE_get_pmc_keyed_int(INTERP, SELF, idx);
+        return VTABLE_get_string(INTERP, item);
     }
 
     VTABLE STRING *get_string_keyed(PMC *key) {
-        if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_integer_FLAG) {
-            PMC * const item = SELF.get_pmc_keyed_int(VTABLE_get_integer(INTERP, key));
-            PMC * const next = VTABLE_shift_pmc(INTERP, key);
-
-            if (!next)
-                return VTABLE_get_string(INTERP, item);
-
-            return VTABLE_get_string_keyed(INTERP, item, next);
-        }
-
-        return INTERP->vtables[enum_class_Hash]->get_string_keyed(INTERP, SELF, key);
+        PMC * const item = VTABLE_get_pmc_keyed(INTERP, SELF, key);
+        return VTABLE_get_string(INTERP, item);
     }
 /*
 
@@ -197,39 +426,13 @@ Returns the integer value associated with C<key>.
 */
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL idx) {
-        Hash * const h = (Hash *)SELF.get_pointer();
-        const INTVAL n = h->entries;
-        HashBucket *b;
-
-        if (idx < 0)
-            idx += n;
-
-        if (idx < 0 || idx >= n)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "OrderedHash: index out of bounds!");
-
-        b = h->bs + idx;
-
-        if (b->key)
-            return VTABLE_get_integer(INTERP, (PMC *)b->value);
-
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
-            "OrderedHash: No such key");
+        PMC * const item = VTABLE_get_pmc_keyed_int(INTERP, SELF, idx);
+        return VTABLE_get_integer(INTERP, item);
     }
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
-
-        if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_integer_FLAG) {
-            PMC * const item = SELF.get_pmc_keyed_int(VTABLE_get_integer(INTERP, key));
-            PMC * const next = VTABLE_shift_pmc(INTERP, key);
-
-            if (!next)
-                return VTABLE_get_integer(INTERP, item);
-
-            return VTABLE_get_integer_keyed(INTERP, item, next);
-        }
-
-        return INTERP->vtables[enum_class_Hash]->get_integer_keyed(INTERP, SELF, key);
+        PMC * const item = VTABLE_get_pmc_keyed(INTERP, SELF, key);
+        return VTABLE_get_integer(INTERP, item);
     }
 
 /*
@@ -247,38 +450,13 @@ Returns the floating-point value for the element at C<key>.
 */
 
     VTABLE FLOATVAL get_number_keyed_int(INTVAL idx) {
-        Hash * const h = (Hash *)SELF.get_pointer();
-        const INTVAL n = h->entries;
-        HashBucket *b;
-
-        if (idx < 0)
-            idx += n;
-
-        if (idx < 0 || idx >= n)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "OrderedHash: index out of bounds!");
-
-        b = h->bs + idx;
-
-        if (b->key)
-            return VTABLE_get_number(INTERP, (PMC *)b->value);
-
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
-            "OrderedHash: No such key");
+        PMC * const item = VTABLE_get_pmc_keyed_int(INTERP, SELF, idx);
+        return VTABLE_get_number(INTERP, item);
     }
 
     VTABLE FLOATVAL get_number_keyed(PMC *key) {
-        if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_integer_FLAG) {
-            PMC * const item = SELF.get_pmc_keyed_int(VTABLE_get_integer(INTERP, key));
-            PMC * const next = VTABLE_shift_pmc(INTERP, key);
-
-            if (!next)
-                return VTABLE_get_number(INTERP, item);
-
-            return VTABLE_get_number_keyed(INTERP, item, next);
-        }
-
-        return SUPER(key);
+        PMC * const item = VTABLE_get_pmc_keyed(INTERP, SELF, key);
+        return VTABLE_get_number(INTERP, item);
     }
 
 /*
@@ -299,9 +477,10 @@ The created key = "\1idx".
 */
 
     VTABLE void set_pmc_keyed_int(INTVAL idx, PMC *val) {
-        Hash * const     h = (Hash *)SELF.get_pointer();
-        const INTVAL     n = h->entries;
+        const INTVAL   n   = STATICSELF.elements();
         STRING * const fmt = CONST_STRING(INTERP, "\1%d");
+        PMC           *list_entry;
+        INTVAL         pos;
 
         if (idx < -n)
             idx = -idx - n - 1;
@@ -314,12 +493,9 @@ The created key = "\1idx".
             SELF.set_pmc_keyed_str(key, val);
         }
         else {
-            HashBucket * const b = h->bs + idx;
-
-            if (!b->key)
-                b->key = Parrot_sprintf_s(INTERP, fmt, idx);
-
-            b->value     = val;
+            list_entry = get_list_item(INTERP, SELF, idx);
+            PARROT_ASSERT(!PMC_IS_NULL(list_entry));
+            VTABLE_set_pmc_keyed_int(INTERP, list_entry, ORDERED_HASH_ITEM_VALUE, val);
         }
     }
 
@@ -390,60 +566,26 @@ The created key = "\1idx".
 */
 
     VTABLE INTVAL exists_keyed_int(INTVAL idx) {
-        Hash * const h = (Hash *)SELF.get_pointer();
-        const INTVAL n = h->entries;
-        HashBucket  *b;
-
-        if (idx < 0)
-            idx += n;
-
-        if (idx < 0 || idx >= n)
-            return 0;
-
-        b = h->bs + idx;
-
-        if (b->key)
-            return 1;
-
-        return 0;
+        return (idx >= 0) && (idx < STATICSELF.elements());
     }
 
     VTABLE INTVAL exists_keyed(PMC *key) {
-        if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
-            PMC        *item, *next;
-            HashBucket *b;
-            Hash       * const h   = (Hash *)SELF.get_pointer();
-            INTVAL             idx = VTABLE_get_integer(INTERP, key);
-            const INTVAL       n   = h->entries;
-
-            if (idx < 0)
-                idx += n;
-
-            if (idx < 0 || idx >= n)
-                return 0;
-
-            b = h->bs + idx;
-
-            if (!b->key)
-                return 0;
-
-            item = (PMC *)b->value;
-            next = VTABLE_shift_pmc(INTERP, key);
+        if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_integer_FLAG) {
+            /* Don't fetch item prematurely. It's costy */
+            INTVAL    intval = VTABLE_get_integer(INTERP, key);
+            PMC * const next = VTABLE_shift_pmc(INTERP, key);
 
             if (!next)
-                return 1;
+                return STATICSELF.exists_keyed_int(intval);
 
-            return VTABLE_exists_keyed(INTERP, item, next);
+            return VTABLE_exists_keyed(INTERP, STATICSELF.get_pmc_keyed_int(intval), next);
         }
 
-        return SUPER(key);
+        return VTABLE_exists_keyed_str(INTERP, SELF, VTABLE_get_string(INTERP, key));
     }
 
     VTABLE INTVAL exists_keyed_str(STRING *key) {
-        const Hash       * const h = (Hash *)SELF.get_pointer();
-        const HashBucket * const b = parrot_hash_get_bucket(INTERP, h, key);
-
-        return (b && b->key);
+        return VTABLE_exists_keyed_str(INTERP, PARROT_ORDEREDHASH(SELF)->hash, key);
     }
 
 /*
@@ -459,55 +601,32 @@ The created key = "\1idx".
 */
 
     VTABLE INTVAL defined_keyed(PMC *key) {
-        if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
-            Hash * const h   = (Hash *)SELF.get_pointer();
-            INTVAL       idx = VTABLE_get_integer(INTERP, key);
-            const INTVAL n   = h->entries;
+        /* We store list_item (which is defined). So fetch original PMC and check it */
+        PMC * const item = STATICSELF.get_pmc_keyed(key);
+        if (PMC_IS_NULL(item))
+            return 0;
+        return VTABLE_defined(INTERP, item);
+    }
 
-            HashBucket *b;
-            PMC        *item, *next;
-
-            if (idx < 0)
-                idx += n;
-
-            /* XXX non-existent is undefined - is this correct */
-            if (idx < 0 || idx >= n)
-                return 0;
-
-            b = h->bs + idx;
-
-            if (!b->key)
-                return 0;
-
-            item = (PMC *)b->value;
-            next = VTABLE_shift_pmc(INTERP, key);
-
-            if (!next)
-                return VTABLE_defined(INTERP, item);
-
-            return VTABLE_defined_keyed(INTERP, item, next);
-        }
-
-        return SUPER(key);
+    VTABLE INTVAL defined_keyed_str(STRING *key) {
+        PMC * const item = STATICSELF.get_pmc_keyed_str(key);
+        if (PMC_IS_NULL(item))
+            return 0;
+        return VTABLE_defined(INTERP, item);
     }
 
     VTABLE INTVAL defined_keyed_int(INTVAL idx) {
-        Hash * const h = (Hash *)SELF.get_pointer();
-        const INTVAL n = h->entries;
-        HashBucket  *b;
-
-        if (idx < 0)
-            idx += n;
-
-        if (idx < 0 || idx >= n)
+        PMC * item;
+        /* If item doesn't exists it's undefined */
+        if (!STATICSELF.exists_keyed_int(idx))
             return 0;
 
-        b = h->bs + idx;
+        /* Null is undefined */
+        item = STATICSELF.get_pmc_keyed_int(idx);
+        if (PMC_IS_NULL(item))
+            return 0;
 
-        if (b->key)
-            return VTABLE_defined(INTERP, (PMC *)b->value);
-
-        return 0;
+        return VTABLE_defined(INTERP, item);
     }
 
 /*
@@ -525,56 +644,55 @@ Deletes the key C<*key> from the hash.
 */
 
     VTABLE void delete_keyed(PMC *key) {
-        PMC * const next = key_next(INTERP, key);
+        Parrot_OrderedHash_attributes *attrs =
+                PARROT_ORDEREDHASH(SELF);
+        PMC *list_entry, *prev, *next;
+        if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_integer_FLAG) {
+            INTVAL    intval = VTABLE_get_integer(INTERP, key);
+            PMC * const next = VTABLE_shift_pmc(INTERP, key);
 
-        if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
-            if (next) {
-                PMC * const item = SELF.get_pmc_keyed_int(VTABLE_get_integer(INTERP, key));
-                VTABLE_delete_keyed(INTERP, item, next);
-                return;
-            }
+            if (!next)
+                return STATICSELF.delete_keyed_int(intval);
 
-            SELF.delete_keyed_int(VTABLE_get_integer(INTERP, key));
+            return VTABLE_delete_keyed(INTERP, STATICSELF.get_pmc_keyed_int(intval), next);
         }
-        else {
-            if (next) {
-                PMC * const item = SELF.get_pmc_keyed_str(VTABLE_get_string(INTERP, key));
-                VTABLE_delete_keyed(INTERP, item, next);
-                return;
-            }
-            SELF.delete_keyed_str(VTABLE_get_string(INTERP, key));
-        }
-    }
 
-    VTABLE void delete_keyed_int(INTVAL idx) {
-        Hash * const h = (Hash *)SELF.get_pointer();
-        const INTVAL n = h->entries;
-        HashBucket  *b;
-
-        if (idx < 0)
-            idx += n;
-
-        if (idx < 0 || idx >= n)
+        list_entry = VTABLE_get_pmc_keyed(INTERP, attrs->hash, key);
+        if (PMC_IS_NULL(list_entry))
             return;
 
-        b = h->bs + idx;
+        /* Unlink entry */
+        next = VTABLE_get_pmc_keyed_int(INTERP, list_entry, ORDERED_HASH_ITEM_NEXT);
+        prev = VTABLE_get_pmc_keyed_int(INTERP, list_entry, ORDERED_HASH_ITEM_PREV);
 
-        if (!b)
-            return;
+        if (attrs->first == list_entry)
+            attrs->first = next;
 
-        b->key       = NULL;
-        b->value     = NULL;
+        if (attrs->last == list_entry)
+            attrs->last = prev;
+
+        /* C<prev> and C<next> are list entries (FPA) */
+        if (!PMC_IS_NULL(prev))
+            VTABLE_set_pmc_keyed_int(INTERP, prev, ORDERED_HASH_ITEM_NEXT, next);
+        if (!PMC_IS_NULL(next))
+            VTABLE_set_pmc_keyed_int(INTERP, next, ORDERED_HASH_ITEM_PREV, prev);
+
+        /* And finally delete it */
+        return VTABLE_delete_keyed(INTERP, PARROT_ORDEREDHASH(SELF)->hash, key);
     }
 
     VTABLE void delete_keyed_str(STRING *key) {
-        const Hash * const h = (Hash *)SELF.get_pointer();
-        HashBucket * const b = parrot_hash_get_bucket(INTERP, h, key);
+        return STATICSELF.delete_keyed(box_string(INTERP, key));
+    }
 
-        if (!b)
+    VTABLE void delete_keyed_int(INTVAL idx) {
+        PMC *list_entry;
+        if (!STATICSELF.exists_keyed_int(idx))
             return;
 
-        b->key       = NULL;
-        b->value     = NULL;
+        list_entry = get_list_item(INTERP, SELF, idx);
+        STATICSELF.delete_keyed(
+            VTABLE_get_pmc_keyed_int(INTERP, list_entry, ORDERED_HASH_ITEM_KEY));
     }
 
 /*
@@ -590,18 +708,11 @@ the clone via integers has different indices, if items were deleted.
 
     VTABLE PMC *clone() {
         PMC  * const dest   = pmc_new(INTERP, SELF->vtable->base_type);
-        Hash * const hash   = (Hash *)SELF.get_pointer();
-        Hash * const h_dest = (Hash *)VTABLE_get_pointer(INTERP, dest);
-        UINTVAL     i;
+        Parrot_OrderedHash_attributes *clone_attrs =
+                PARROT_ORDEREDHASH(dest);
 
-        for (i = 0; i <= N_BUCKETS(hash->mask-1); i++) {
-            HashBucket * const b      = hash->bs + i;
-            void       * const key    = b->key;
-
-            if (key)
-                parrot_hash_put(INTERP, h_dest, key,
-                    (void *)VTABLE_clone(INTERP, (PMC *)b->value));
-        }
+        clone_attrs->hash   = VTABLE_clone(INTERP, PARROT_ORDEREDHASH(SELF)->hash);
+        find_bounds(INTERP, clone_attrs->hash, &clone_attrs->first, &clone_attrs->last);
 
         return dest;
     }
@@ -619,43 +730,35 @@ Used to archive the hash.
 
 Used to unarchive the hash.
 
-Freeze/thaw are inherited from hash.  Only thaw.visit is special, as we have to
-preserve key/value order.
-
 =cut
 
 */
 
     VTABLE void visit(visit_info *info) {
-        switch (VTABLE_get_integer(INTERP, info)) {
-          case VISIT_THAW_NORMAL:
-            SUPER(info);
-            break;
+        VISIT_PMC_ATTR(INTERP, info, SELF, OrderedHash, hash);
+        SUPER(info);
+    }
 
-          case VISIT_FREEZE_NORMAL:
-            {
-                Hash     * const hash = (Hash *)SELF.get_pointer();
-                const UINTVAL entries = hash->entries;
-                UINTVAL i;
+    VTABLE void thawfinish(visit_info *info) {
+        Parrot_OrderedHash_attributes *attrs = PARROT_ORDEREDHASH(SELF);
+        find_bounds(INTERP, attrs->hash, &attrs->first, &attrs->last);
+        SUPER(info);
+    }
 
-                for (i = 0; i < entries; i++) {
-                    HashBucket * const b   = hash->bs + i;
+/*
 
-                    if (b) {
-                        STRING * const key = (STRING *)b->key;
-                        if (key) {
-                            VTABLE_push_string(interp, info, key);
-                            (info->visit_pmc_now)(interp, (PMC *)b->value, info);
-                        }
-                    }
-                }
-            }
-            break;
-          default:
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_INVALID_OPERATION,
-                    "unhandled visit action (%d)", VTABLE_get_integer(INTERP, info));
-        }
+=item C<get_pmc()>
+
+Get underlying regular Hash. Used in UnManagedStruct.
+
+=cut
+
+*/
+
+    VTABLE PMC* get_pmc() {
+        PMC *hash;
+        GET_ATTR_hash(INTERP, SELF, hash);
+        return hash;
     }
 }
 
