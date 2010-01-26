@@ -30,13 +30,7 @@ F<config/gen/cflags/root.in>.
 use strict;
 use warnings;
 
-my $return_only;
 my $verbose;
-
-if ($ARGV[0] eq '--return-only') {
-    $return_only = 1;
-    shift;
-}
 
 if ($ARGV[0] eq '-v') {
     $verbose = 1;
@@ -138,11 +132,6 @@ if ($cfile) {
     else {
         print "$cfile\n";
     }
-}
-
-if ($return_only) {
-    print join ' ', @ARGV;
-    exit;
 }
 
 if ($verbose) {
