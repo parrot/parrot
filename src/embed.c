@@ -726,8 +726,7 @@ static PMC*
 set_current_sub(PARROT_INTERP)
 {
     ASSERT_ARGS(set_current_sub)
-    Parrot_Sub_attributes *sub_pmc_sub;
-    PMC        *sub_pmc;
+    PMC *sub_pmc;
 
     PackFile_ByteCode   * const cur_cs = interp->code;
     PackFile_FixupTable * const ft     = cur_cs->fixups;
@@ -761,11 +760,10 @@ set_current_sub(PARROT_INTERP)
         }
     }
 
-    /* if we didn't find anything, put a dummy PMC into current_sub */
-
+    /* If we didn't find anything, put a dummy PMC into current_sub.
+       The default values set by SUb.init are appropiate for the
+       dummy, don't need additional settings. */
     sub_pmc                      = pmc_new(interp, enum_class_Sub);
-    PMC_get_sub(interp, sub_pmc, sub_pmc_sub);
-    sub_pmc_sub->start_offs      = 0;
     Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), sub_pmc);
 
     return sub_pmc;
