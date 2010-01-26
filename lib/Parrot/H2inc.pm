@@ -44,6 +44,7 @@ If successful, returns a hash reference.
 
 sub parse_file {
     my ( $in_file, $out_file) = @_;
+    $out_file =~ s/\\/\//g; # transform Windows backslash
 
     my ( @directives, %values, $last_val, $cur, $or_continues );
     open my $fh, '<', $in_file or die "Can't open $in_file: $!\n";
