@@ -682,23 +682,7 @@ EOC
         Parrot_create_mro(interp, entry);
 EOC
 
-    # declare each nci method for this class
-    foreach my $method ( @{ $self->{methods} } ) {
-        next unless $method->type eq Parrot::Pmc2c::Method::NON_VTABLE;
-
-        #these differ for METHODs
-        my $method_name = $method->name;
-        my $symbol_name = $method->symbol;
-
-        $cout .= <<"EOC";
-        register_raw_nci_method_in_ns(interp, entry, F2DPTR(Parrot_${classname}_${method_name}), CONST_STRING_GEN(interp, "$symbol_name"));
-EOC
-        if ( $method->{attrs}{write} ) {
-            $cout .= <<"EOC";
-        Parrot_mark_method_writes(interp, entry, "$symbol_name");
-EOC
-        }
-    }
+        $cout .= $self->write_nci_methods();
 
     # include any class specific init code from the .pmc file
     if ($class_init_code) {
@@ -738,6 +722,38 @@ EOC
     }
 
     $cout;
+}
+
+=item C<write_nci_methods()>
+
+Returns the C code to register any NCI methods for the PMC.
+
+=cut
+
+sub write_nci_methods {
+    my $self      = shift;
+    my $cout      = '';
+    my $classname = $self->name;
+
+    # declare each nci method for this class
+    for my $method ( @{ $self->{methods} } ) {
+        next unless $method->type eq Parrot::Pmc2c::Method::NON_VTABLE;
+
+        #these differ for METHODs
+        my $method_name = $method->name;
+        my $symbol_name = $method->symbol;
+
+        $cout .= <<"EOC";
+        register_raw_nci_method_in_ns(interp, entry, F2DPTR(Parrot_${classname}_${method_name}), CONST_STRING_GEN(interp, "$symbol_name"));
+EOC
+        if ( $method->{attrs}{write} ) {
+            $cout .= <<"EOC";
+        Parrot_mark_method_writes(interp, entry, "$symbol_name");
+EOC
+        }
+    }
+
+    return $cout;
 }
 
 =item C<update_vtable_func()>
