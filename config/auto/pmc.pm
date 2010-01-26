@@ -98,7 +98,7 @@ src/pmc/$pmc.c : src/pmc/$pmc.dump
 src/pmc/$pmc.dump : vtable.dump $parent_dumps src/pmc/$pmc.pmc \$(PMC2C_FILES) $pccmethod_depend
 \t\$(PMC2CD) src/pmc/$pmc.pmc
 
-\$(PMC_INC_DIR)/pmc/pmc_$pmc.h: src/pmc/$pmc.c
+include/pmc/pmc_$pmc.h: src/pmc/$pmc.c
 
 src/pmc/$pmc\$(O): include/pmc/pmc_${pmc}.h src/pmc/$pmc.str \$(NONGEN_HEADERS) \\
     $parent_headers $include_headers include/pmc/pmc_continuation.h \\
@@ -173,7 +173,6 @@ PMC: for my $pmc_file ( split( /\s+/, $pmc_list ) ) {
         TEMP_pmc_classes_o   => $TEMP_pmc_classes_o,
         TEMP_pmc_classes_str => $TEMP_pmc_classes_str,
         TEMP_pmc_classes_pmc => $TEMP_pmc_classes_pmc,
-        pmc_inc              => 'include',
     );
 
     return 1;

@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # implicit and explicit returns from subs
 
 plan(3);

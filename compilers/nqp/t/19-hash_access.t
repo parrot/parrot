@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # check hash access methods
 
 plan(7);

@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # check module
 
 XYZ::sayfoo();

@@ -1,33 +1,33 @@
 # Copyright (C) 2003-2009, Parrot Foundation.
 # $Id$
 
-PERL          := @perl@
-RM_F          := @rm_f@
-CP            := @cp@
-CHMOD         := @chmod@
-LOAD_EXT      := @load_ext@
-BUILD_DIR     := @build_dir@
-RECONFIGURE   := $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
-INSTALL_DIR   := $(BUILD_DIR)@slash@runtime@slash@parrot@slash@dynext
-O             := @o@
-CC            := @cc@
-LD            := @ld@
-LDFLAGS       := @ldflags@ @ld_debug@ @rpath_blib@
-LD_LOAD_FLAGS := @ld_load_flags@
-CFLAGS        := @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@
-LIBPARROT     := @libparrot_ldflags@
+PERL          = @perl@
+RM_F          = @rm_f@
+CP            = @cp@
+CHMOD         = @chmod@
+LOAD_EXT      = @load_ext@
+BUILD_DIR     = @build_dir@
+RECONFIGURE   = $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
+INSTALL_DIR   = $(BUILD_DIR)@slash@runtime@slash@parrot@slash@dynext
+O             = @o@
+CC            = @cc@
+LD            = @ld@
+LDFLAGS       = @ldflags@ @ld_debug@ @rpath_blib@
+LD_LOAD_FLAGS = @ld_load_flags@
+CFLAGS        = @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@
+LIBPARROT     = @libparrot_ldflags@
 
-BUILD_TOOLS_DIR := $(BUILD_DIR)@slash@tools@slash@build
-BUILD_LIB_DIR   := $(BUILD_DIR)@slash@blib@slash@lib
-PMC2C           := $(PERL) $(BUILD_TOOLS_DIR)@slash@pmc2c.pl
-INCLUDES        := -I$(BUILD_DIR)@slash@include -I@build_dir@@slash@include@slash@pmc
-LINKARGS        := $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT) @icu_shared@ @libs@
+BUILD_TOOLS_DIR = $(BUILD_DIR)@slash@tools@slash@build
+BUILD_LIB_DIR   = $(BUILD_DIR)@slash@blib@slash@lib
+PMC2C           = $(PERL) $(BUILD_TOOLS_DIR)@slash@pmc2c.pl
+INCLUDES        = -I$(BUILD_DIR)@slash@include -I@build_dir@@slash@include@slash@pmc
+LINKARGS        = $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT) @icu_shared@ @libs@
 
-PMC2CD := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --dump
-PMC2CC := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --c
+PMC2CD = $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --dump
+PMC2CC = $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --c
 
 # add your dynamic pmcs here
-PMC_TARGETS := \
+PMC_TARGETS = \
   dynlexpad$(LOAD_EXT) \
   foo_group$(LOAD_EXT) \
   rotest$(LOAD_EXT) \
@@ -36,7 +36,7 @@ PMC_TARGETS := \
 #IF(has_crypto):  digest_group$(LOAD_EXT) \
   subproxy$(LOAD_EXT)
 
-PMCS_DIGEST := \
+PMCS_DIGEST = \
   md2.pmc \
   md4.pmc \
   md5.pmc \
@@ -46,7 +46,7 @@ PMCS_DIGEST := \
   sha256.pmc \
   sha512.pmc
 
-OBJS_DIGEST := \
+OBJS_DIGEST = \
   md2$(O) \
   md4$(O) \
   md5$(O) \
@@ -56,23 +56,23 @@ OBJS_DIGEST := \
   sha256$(O) \
   sha512$(O)
 
-PMCS_FOO := \
+PMCS_FOO = \
   foo.pmc \
   foo2.pmc
 
-OBJS_FOO := \
+OBJS_FOO = \
   foo$(O) \
   foo2$(O)
 
-#IF(win32 and cc==gcc):LIB_GDBM := -llibgdbm
-#ELSIF(win32):LIB_GDBM := libgdbm.lib
-#ELSE:LIB_GDBM := -lgdbm
+#IF(win32 and cc==gcc):LIB_GDBM = -llibgdbm
+#ELSIF(win32):LIB_GDBM = libgdbm.lib
+#ELSE:LIB_GDBM = -lgdbm
 
-#IF(win32 and cc==gcc):LIB_CRYPTO := -lcrypto
-#ELSIF(win32):LIB_CRYPTO := libcrypto.lib
-#ELSE:LIB_CRYPTO := -lcrypto
+#IF(win32 and cc==gcc):LIB_CRYPTO = -lcrypto
+#ELSIF(win32):LIB_CRYPTO = libcrypto.lib
+#ELSE:LIB_CRYPTO = -lcrypto
 
-CLEANUPS := \
+CLEANUPS = \
   "*.c" \
   "pmc_*.h" \
   "*_group.h" \

@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # while, until statements
 
 plan(8);

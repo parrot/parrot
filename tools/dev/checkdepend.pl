@@ -18,8 +18,13 @@ tools/dev/checkdepend.pl
 
 =head1 DESCRIPTION
 
-A braindead script to check that every F<.c> file has makefile deps
+A braindead script to check that every file has makefile deps
 on its includes.
+
+ checkdepend.pl [--dump]
+
+If called with C<--dump>, no tests are run, and the pre-processed makefile
+is dumped (in lieu of having C<cc>'s C<-E> for C<make>.
 
 =head1 REQUIREMENTS
 
@@ -27,16 +32,23 @@ A built parrot (Configure and make) to generate all files so we can analyze
 them. Ack is used to find the files. We are not currently requiring ack
 for development, so this is an optional test.
 
+=head1 BUGS
+
+The pre-processing of the makefile doesn't follow make's behavior: variables
+should have no value until they are defined; in our pre-processing, their
+values are propagated throughout the makefile regardless of order; This could
+cause false positives in the test output.
+
 =cut
 
 die 'no Makefile found; This tool requires a full build for analysis.'
     unless -e 'Makefile';
 
-my $files = `ack -fa {src,compilers,include} | grep '\\.[ch]\$'`;
+my @incfiles = split /\n/, `ack -fa src compilers include  | ack '\\.(c|h|pir)\$'`;
 
 our %deps;
 
-foreach my $file (sort split /\n/, $files) {
+foreach my $file (sort grep /\.[hc]$/, @incfiles) {
     # For now, skip any files that have generated dependencies
     next if $file =~ m{src/(ops|dynoplibs|dynpmc|pmc)/};
     next if $file =~ m{src/string/(charset|encoding)/};
@@ -44,11 +56,11 @@ foreach my $file (sort split /\n/, $files) {
     open my $fh, '<', $file;
     my $guts;
     {
-        local undef $/;
+        local $/;
         $guts = <$fh>;
     }
 
-    # Ingore anything inside a c-style comment.
+    # Ignore anything inside a c-style comment.
     $guts =~ s{\Q/*\E.*?\Q*/}{}gm;
 
     my @includes = $guts =~ m/#include "(.*)"/g;
@@ -76,74 +88,190 @@ foreach my $file (sort split /\n/, $files) {
     }
 }
 
-plan('no_plan');
+foreach my $file (sort grep /\.pir$/, @incfiles) {
+    open my $fh, '<', $file;
+    my $guts;
+    {
+        local $/;
+        $guts = <$fh>;
+    }
 
-open my $mf, '<', "Makefile";
-my $rules;
-{
-    local undef $/;
-    $rules = <$mf>;
-}
+    # Ignore anything inside a # - comment.
+    $guts =~ s{^#.*$}{}gm;
+    # Ignore anything inside pod.
+    $guts =~ s{^=.*^=cut$}{}gsm;
+    # Ignore anything inside strings that are assigned to a variable.
+    # (Avoid clobbering the strings used in .include 'foo.pir', etc.)
+    $guts =~ s{=\s*'[^']*'\s*$}{}gm;
+    $guts =~ s{=\s*"(?:[^"\\]|\\.)*"\s*$}{}gm;
+    # XXX also, heredocs (wheeeee!)
 
-# convert all \-newline continuations into single lines for ease of processing.
-$rules =~ s/\\\n//g;
+    my @includes;
+    while ($guts =~ m/(?:\.include|\bload_bytecode)\s+(["'])(.*)\1/g) {
+        push @includes, $2;
+    }
 
-# replace all _DIR variables with their expansions.
-while ($rules =~ s/^([A-Z_]+_DIR)\s*:?=\s*(\S*)$//m) {
-    my ($var,$val) = ($1, $2);
-    $rules =~ s/\$\($var\)/$val/g;
-}
+    # Canonicalize each of these includes.
 
-# expand PARROT_H_HEADERS
-$rules =~ m/^PARROT_H_HEADERS\s*:?=\s*(.*)$/m;
-my $phh = $1;
+    $deps{$file} = [ ];
+    foreach my $include (@includes) {
+        # same dir as file?
+        my $file_dir = (File::Spec->splitpath($file))[1];
+        my $make_dep = collapse_path(File::Spec->catfile($file_dir,$include));
+        if (defined($make_dep) && -f $make_dep) {
+            push @{$deps{$file}}, $make_dep;
+            next;
+        }
 
-$rules =~ s/\Q$(PARROT_H_HEADERS)/$phh/g;
+        # global 'runtime' dir?
+        $make_dep = collapse_path(File::Spec->catfile('runtime/parrot/include',$include));
+        if (defined($make_dep) && -f $make_dep) {
+            push @{$deps{$file}}, $make_dep;
+            next;
+        }
+        $make_dep = collapse_path(File::Spec->catfile('runtime/parrot/library',$include));
+        if (defined($make_dep) && -f $make_dep) {
+            push @{$deps{$file}}, $make_dep;
+            next;
+        }
 
-foreach my $header (sort grep {/\.h$/} (keys %deps)) {
-    # static headers shouldn't depend on anything else.
-    if ($rules =~ /^$header\s*:\s*(.*)\s*$/m) {
-        #is("", $1, "$header should have no dependencies");
+        # relative to top level?
+        $make_dep = collapse_path(File::Spec->catfile($include));
+        if (defined($make_dep) && -f $make_dep) {
+            push @{$deps{$file}}, $make_dep;
+            next;
+        }
+
+        diag "couldn't find $include, included from $file";
     }
 }
+
+sub get_rules {
+
+    my ($filename, $rules) = @_;
+
+    open my $mf, '<', "$filename";
+    my $global_line_num = @$rules;
+    my $file_line_num   = 1;
+    my $escape_start    = 1;
+
+    foreach (<$mf>) {
+        my $line = $_;
+        chomp $line;
+        if ($_ =~ /^include\s+(.*)$/m) {
+            get_rules($1, $rules);
+            $global_line_num = @$rules;
+            $file_line_num++;
+        }
+        else {
+            $rules->[$global_line_num] =
+            {
+                filename => $filename,
+                line     => $line,
+                line_num => $file_line_num,
+            };
+
+            # Convert all \-newline continuations into single lines for ease of
+            # processing.  Leave blank lines to keep line numbers accurate.
+            if (exists $rules->[$escape_start]{line} &&
+                $rules->[$escape_start]{line}    !~ /\\$/ &&
+                $rules->[$global_line_num]{line} =~ /\\$/) {
+
+                $escape_start = $global_line_num;
+            }
+
+            if ($rules->[$escape_start]{line} && $rules->[$escape_start]{line} =~ /\\$/ &&
+                $escape_start != $global_line_num) {
+
+                $rules->[$escape_start]{line} =~ s/\\$//;
+                $rules->[$escape_start]{line} .= $rules->[$global_line_num]{line};
+                $rules->[$global_line_num]{line} = '';
+            }
+
+            $file_line_num++;
+            $global_line_num++;
+        }
+    }
+    close $mf;
+}
+
+our $rules = [];
+get_rules('Makefile', $rules);
+
+#expand all variables
+our %vars;
+foreach (@$rules) {
+    #expand any known variables
+    while ($_->{line} =~ /\$\(([A-Z_]+)\)/) {
+        my $var_name = $1;
+        if (exists $vars{$var_name}) {
+            $_->{line} =~ s/\$\($var_name\)/$vars{$var_name}/g;
+        }
+        else {
+            $_->{line} =~ s/\$\($var_name\)//g;
+        }
+    }
+
+    #store any new definitions
+    if ($_->{line} =~ /^(\w+)\s+=\s+(.*)$/) {
+        $vars{$1} = $2;
+    }
+}
+
+if (@ARGV && $ARGV[0] eq '--dump') {
+    print "$_->{line}\n" for (@$rules);
+    exit 0;
+}
+
+my $test_count = grep {/\.(c|pir)$/} (keys %deps);
+
+plan( tests => $test_count );
+
+#foreach my $header (sort grep {/\.h$/} (keys %deps)) {
+#    # static headers shouldn't depend on anything else.
+#    if ($rules =~ /^$header\s*:\s*(.*)\s*$/m) {
+#        #is("", $1, "$header should have no dependencies");
+#    }
+#}
 
 my @files = keys %deps;
 @files = @ARGV if @ARGV;
 
-foreach my $file (sort grep {/\.c$/} @files) {
-    my $rule = $file;
-    $rule =~ s/\.c$//;
+check_files($rules, \@files, '.c',   $vars{O});
+check_files($rules, \@files, '.pir', '.pbc');
 
-    $rules =~ /^$rule\Q$(O)\E\s*:\s*(.*)\s*$/m;
-    my $declared = $1;
+sub check_files {
 
-    my $failed = 0;
-    if (!defined($declared)) {
-        $failed = 1;
-        is("", join(' ', (get_deps($file))), "$file has no dependencies");
-        next;
-    }
-    else
-    {
-        $declared =~ s/\s+/ /g;
-        foreach my $inc (sort (get_deps($file))) {
-            next if $declared =~ s/\b\Q$inc\E\b//;
+    my ($rules, $possible_files, $src_ext, $obj_ext) = @_;
 
-            is($declared, $inc, "$file is missing a dependency.");
-            $failed = 1;
+    foreach my $file (sort grep {/$src_ext$/} @$possible_files) {
+        my ($active_makefile, $active_line_num);
+        my $rule = $file;
+        $rule =~ s/$src_ext$//;
 
+        #find the applicable rule for this file
+        my $rule_deps = '';
+        for (@$rules) {
+            if ($_->{line} =~ /^$rule$obj_ext\s*:\s*(.*)\s*$/) {
+                $rule_deps = $1;
+                $active_makefile = $_->{filename};
+                $active_line_num = $_->{line_num};
+            }
+            last if $rule_deps;
         }
-    }
-    $declared =~ s/^\s+//;
-    $declared =~ s/\s+$//;
-    $declared =~ s/\s+/ /g;
-    if ($declared ne "") {
-       is($declared, '', "$file has extra dependencies.");
-    }
-    elsif (!$failed) {
-        pass($file);
+
+        my $extra_info = "(no rule found for this file)";
+        if ($rule_deps) {
+            $extra_info = "($active_makefile: line $active_line_num)";
+        }
+
+        $rule_deps        = join ' ', sort split /\s+/, $rule_deps;
+        my $expected_deps = join ' ', sort (get_deps($file));
+
+        is($rule_deps, $expected_deps, "$file has correct dependencies $extra_info.");
     }
 }
+
 
 sub collapse_path {
     my $path = shift;

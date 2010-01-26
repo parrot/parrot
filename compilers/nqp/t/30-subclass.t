@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # class inheritance
 
 plan(6);

@@ -16,7 +16,7 @@ TGE - A tree grammar engine.
     # and elsewhere...
 
     .sub _main :main
-        load_bytecode 'TGE.pir'
+        load_bytecode 'TGE.pbc'
 
         # Compile a grammar from the source grammar file
         .local pmc compiler

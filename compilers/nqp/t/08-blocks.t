@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # check blocks and statement enders
 
 say('1..7');

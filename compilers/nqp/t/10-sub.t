@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # check subs
 
 say('1..11');

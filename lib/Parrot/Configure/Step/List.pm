@@ -66,7 +66,6 @@ my @steps = qw(
     gen::config_h
     gen::core_pmcs
     gen::crypto
-    gen::parrot_include
     gen::opengl
     gen::call_list
     gen::makefiles

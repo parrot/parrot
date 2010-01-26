@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests =>  8;
 use FindBin;
 use lib ( "$FindBin::Bin/../../../lib", );
 use_ok('Parrot::Ops2pm');
@@ -16,37 +16,7 @@ ok( -f "$FindBin::Bin/../../../lib/Parrot/OpsFile.pm", "lib/Parrot/OpsFile.pm lo
 ok( -f "$FindBin::Bin/../../../src/ops/core.ops",      "src/ops/core.ops located" );
 ok( -f "$FindBin::Bin/../../../src/ops/ops.num",       "src/ops/ops.num located" );
 ok( -f "$FindBin::Bin/../../../src/ops/ops.skip",      "src/ops/ops.skip located" );
-ok(
-    !-e "$FindBin::Bin/../../../lib/Parrot/OpLib/core.pm",
-    "lib/Parrot/OpLib/core.pm correctly does not yet exist"
-);
-ok(
-    !-e "$FindBin::Bin/../../../include/parrot/oplib/ops.h",
-    "include/parrot/oplib/ops.h correctly does not yet exist"
-);
 
-my $message = <<END_OF_MESSAGE;
-
-
-The files in this directory test the publicly callable methods and
-subroutines of Parrot::Ops2pm and Parrot::Ops2pm::Auxiliary.
-By doing so, they test the functionality of the ops2pm.pl utility.
-
-Since ops2pm.pl is invoked only once during 'make' -- very near the
-beginning of the build process -- and since its purpose is to create files
-used later in that process, tests of its functionality can give meaningful
-results only if you run them when your file system under the top-level
-Parrot directory is in a 'pre-make' state, i.e., *before* you have run 'perl
-Configure.pl' but *after* you have run 'make'.  These tests should pass
-if run at that point in the build process, but if you have already
-executed 'make', some of these tests will necessarily fail. Hence, they
-should *not* be included in the set of tests run by 'make test'.
-
-In short, these are tests of Parrot::Ops2pm and
-Parrot::Ops2pm::Auxiliary but are *not* tests of Parrot itself.
-
-END_OF_MESSAGE
-pass($message);
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################

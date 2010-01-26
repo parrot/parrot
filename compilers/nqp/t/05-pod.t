@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # check pod
 
 say('1..4');

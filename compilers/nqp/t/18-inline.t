@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # inline
 
 plan(7);

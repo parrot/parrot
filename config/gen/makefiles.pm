@@ -36,24 +36,8 @@ sub _init {
             conditioned_lines => 1,
         },
 
-        'ext/nqp-rx/Makefile' => { SOURCE => 'config/gen/makefiles/nqp-rx.in' },
-
         'compilers/ncigen/Makefile'  =>
             { SOURCE => 'compilers/ncigen/config/makefiles/ncigen.in' },
-        'compilers/nqp/Makefile'     =>
-            { SOURCE => 'config/gen/makefiles/nqp.in' },
-        'compilers/pct/Makefile'     =>
-            { SOURCE => 'config/gen/makefiles/pct.in' },
-        'compilers/pge/Makefile'     =>
-            { SOURCE => 'config/gen/makefiles/pge.in' },
-        'compilers/tge/Makefile'     =>
-            { SOURCE => 'config/gen/makefiles/tge.in' },
-        'compilers/json/Makefile'    =>
-            { SOURCE => 'config/gen/makefiles/json.in' },
-        'compilers/data_json/Makefile' =>
-            { SOURCE => 'config/gen/makefiles/data_json.in' },
-        'compilers/pirc/Makefile'    =>
-            { SOURCE => 'config/gen/makefiles/pirc.in' },
         'src/dynpmc/Makefile'        =>
             { SOURCE => 'config/gen/makefiles/dynpmc.in' },
         'src/dynoplibs/Makefile'     =>
@@ -61,16 +45,6 @@ sub _init {
         'editor/Makefile'            =>
             { SOURCE => 'config/gen/makefiles/editor.in' },
 
-        'tools/build/dynpmc.pl' => {
-            SOURCE            => 'config/gen/makefiles/dynpmc_pl.in',
-            replace_slashes   => 0,
-            conditioned_lines => 1,
-        },
-        'tools/build/dynoplibs.pl' => {
-            SOURCE            => 'config/gen/makefiles/dynoplibs_pl.in',
-            replace_slashes   => 0,
-            conditioned_lines => 1,
-        },
         'parrot.pc'     => { SOURCE => 'config/gen/makefiles/parrot_pc.in' },
         'docs/Makefile' => { SOURCE => 'config/gen/makefiles/docs.in' },
     };

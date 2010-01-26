@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # check '||' and '&&'
 
 plan(4);

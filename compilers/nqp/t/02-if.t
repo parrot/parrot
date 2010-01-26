@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # check control structure 'if'
 
 say('1..4');

@@ -250,20 +250,20 @@ C<AND> and C<OR> is undefined.
 
 For instance:
 
-  #IF(win32): $(SRC_DIR)/atomic/gcc_x86$(O)
+  #IF(win32): src/atomic/gcc_x86$(O)
 
 will be included if the platform is win32.
 
-  #IF(cpuarch==i386): $(SRC_DIR)/atomic/gcc_x86$(O)
+  #IF(cpuarch==i386): src/atomic/gcc_x86$(O)
 
 will be included if the value of the config key "cpuarch" is "i386".
 
-  #IF(cpuarch==i386): $(SRC_DIR)/atomic/gcc_x86$(O)
-  #ELSIF(cpuarch==sparcv9): $(SRC_DIR)/atomic/sparc_v9.s
+  #IF(cpuarch==i386): src/atomic/gcc_x86$(O)
+  #ELSIF(cpuarch==sparcv9): src/atomic/sparc_v9.s
   #ELSE:
 
-will include " $(SRC_DIR)/atomic/gcc_x86$(O)" if the config key "cpuarch" is
-ste to "i386", will include " $(SRC_DIR)/atomic/sparc_v9.s" instead if
+will include " src/atomic/gcc_x86$(O)" if the config key "cpuarch" is
+ste to "i386", will include " src/atomic/sparc_v9.s" instead if
 "cpuarch" is set to "sparcv9", and will include an empty line otherwise.
 
   #IF(win32 and glut and not cygwin):
@@ -380,7 +380,6 @@ sub genfile {
         if ( $options{file_type} eq 'makefile' ) {
             $options{replace_slashes}   = 1;
             $options{conditioned_lines} = 1;
-            $options{no_simply_expanded_var} = ! $conf->data->get('gmake_version');
         }
     }
 
@@ -562,11 +561,6 @@ sub genfile {
 
             # replace \* with \\*, so make will not eat the \
             $line =~ s{(\\\*)}{\\$1}g;
-        }
-
-        if ( $options{no_simply_expanded_var} ) {
-            # replace := with =
-            $line =~ s{:=}{=};
         }
 
         print $out $line;

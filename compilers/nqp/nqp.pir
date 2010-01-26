@@ -22,11 +22,11 @@
     .tailcall $P0.'command_line'(args, 'encoding'=>'utf8', 'transcode'=>'ascii')
 .end
 
-.include 'src/Grammar_gen.pir'
+.include 'compilers/nqp/src/Grammar_gen.pir'
 
-.include 'src/Grammar/Actions.pir'
+.include 'compilers/nqp/src/Grammar/Actions.pir'
 
-.include 'src/builtins.pir'
+.include 'compilers/nqp/src/builtins.pir'
 
 # Local Variables:
 #   mode: pir

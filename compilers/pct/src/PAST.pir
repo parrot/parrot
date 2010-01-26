@@ -11,15 +11,15 @@ to build the PAST.pbc module.
 
 =cut
 
-.include 'src/PCT/Node.pir'
+.include 'compilers/pct/src/PCT/Node.pir'
 
-.include 'src/PAST/Node.pir'
+.include 'compilers/pct/src/PAST/Node.pir'
 
-.include 'src/PAST/Compiler.pir'
+.include 'compilers/pct/src/PAST/Compiler.pir'
 
-.include 'src/POST/Node.pir'
+.include 'compilers/pct/src/POST/Node.pir'
 
-.include 'src/POST/Compiler.pir'
+.include 'compilers/pct/src/POST/Compiler.pir'
 
 =head1 AUTHOR
 

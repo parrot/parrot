@@ -1,5 +1,3 @@
-#!./parrot nqp.pbc
-
 # positional arguments
 
 say('1..2');

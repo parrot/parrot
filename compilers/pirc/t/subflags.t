@@ -2,7 +2,7 @@
 # Copyright (C) 2008-2009, Parrot Foundation.
 # $Id$
 
-use lib "../../lib";
+use lib qw(lib);
 use Parrot::Test tests => 1;
 
 pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "a single const declaration");
