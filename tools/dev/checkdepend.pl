@@ -74,14 +74,14 @@ foreach my $file (sort grep /\.[hc]$/, @incfiles) {
     foreach my $include (@includes) {
         # same dir as file?
         my $file_dir = (File::Spec->splitpath($file))[1];
-        my $make_dep = collapse_path(File::Spec->catfile($file_dir,$include));
+        my $make_dep = collapse_path(File::Spec->catfile($file_dir, $include));
         if (defined($make_dep) && -f $make_dep) {
             push @{$deps{$file}}, $make_dep;
             next;
         }
 
         # global 'include' dir?
-        $make_dep = collapse_path(File::Spec->catfile('include',$include));
+        $make_dep = collapse_path(File::Spec->catfile('include', $include));
         if (defined($make_dep) && -f $make_dep) {
             push @{$deps{$file}}, $make_dep;
             next;
@@ -120,19 +120,19 @@ foreach my $file (sort grep /\.pir$/, @incfiles) {
     foreach my $include (@includes) {
         # same dir as file?
         my $file_dir = (File::Spec->splitpath($file))[1];
-        my $make_dep = collapse_path(File::Spec->catfile($file_dir,$include));
+        my $make_dep = collapse_path(File::Spec->catfile($file_dir, $include));
         if (defined($make_dep) && -f $make_dep) {
             push @{$deps{$file}}, $make_dep;
             next;
         }
 
         # global 'runtime' dir?
-        $make_dep = collapse_path(File::Spec->catfile('runtime/parrot/include',$include));
+        $make_dep = collapse_path(File::Spec->catfile('runtime/parrot/include', $include));
         if (defined($make_dep) && -f $make_dep) {
             push @{$deps{$file}}, $make_dep;
             next;
         }
-        $make_dep = collapse_path(File::Spec->catfile('runtime/parrot/library',$include));
+        $make_dep = collapse_path(File::Spec->catfile('runtime/parrot/library', $include));
         if (defined($make_dep) && -f $make_dep) {
             push @{$deps{$file}}, $make_dep;
             next;
