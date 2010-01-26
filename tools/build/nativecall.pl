@@ -454,18 +454,15 @@ SHIM(PMC *pmc_nci), NOTNULL(STRING *signature), SHIM(int *jitted))
     PMC        *b;
     PMC        *iglobals;
     PMC        *temp_pmc;
-    UINTVAL    signature_len;
 
     PMC        *HashPointer   = NULL;
 
     /* And in here is the platform-independent way. Which is to say
        "here there be hacks" */
-    signature_len = Parrot_str_byte_length(interp, signature);
 
-#ifndef CAN_BUILD_CALL_FRAMES
-    if (0 == signature_len)
-       return F2DPTR(pcf_v_);
-#endif
+    /* fixup empty signatures */
+    if (STRING_IS_EMPTY(signature))
+        signature = CONST_STRING(interp, "v");
 
     iglobals = interp->iglobals;
 
