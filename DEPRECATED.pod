@@ -155,14 +155,6 @@ get_results no longer used to fetch exception object.
 
 L<https://trac.parrot.org/parrot/ticket/1406>
 
-=item dlfunc signatures [eligible in 2.1]
-
-C<xv>-style signatures will no longer work. See PDD16 for details.
-
-F<pdds/draft/pdd16_native_call.pod>
-
-L<https://trac.parrot.org/parrot/ticket/1410>
-
 =back
 
 =head1 Bytecode

@@ -55,9 +55,7 @@ for adding additional functionality.
 
 Void. As a return type it indicates that there I<is> no return type.
 
-As a parameter it indicates that there are no parameters (this use is now
-deprecated (TT1410) - use an empty parameter string to indicate that there
-are no parameters). Can't be mixed with other parameter types.
+Not valid as a parameter type.
 
 =item c
 
