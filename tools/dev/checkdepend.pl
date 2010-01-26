@@ -18,8 +18,7 @@ tools/dev/checkdepend.pl
 
 =head1 DESCRIPTION
 
-A braindead script to check that every file has makefile deps
-on its includes.
+A script to check that every file has makefile deps on its includes.
 
  checkdepend.pl [--dump]
 
@@ -34,10 +33,14 @@ for development, so this is an optional test.
 
 =head1 BUGS
 
-The pre-processing of the makefile doesn't follow make's behavior: variables
-should have no value until they are defined; in our pre-processing, their
-values are propagated throughout the makefile regardless of order; This could
-cause false positives in the test output.
+This script will currently generate false positives.  This happens because it
+assumes that there must be a fixed relationship between source and object
+files, e.g. C<buz/baz/foo.pir> will be built into C<buz/baz/foo.pbc>.  This
+assumption holds in most cases but breaks down when a file with a dependency is
+not compiled into an object file of the same name.  A possible solution to this
+is to use C-style compilation with separate build and "link" targets using
+pbc_merge.  The other alternative involves making this script significantly
+smarter about figuring out which rules create a given object file.
 
 =cut
 
