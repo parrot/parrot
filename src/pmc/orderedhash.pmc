@@ -86,7 +86,7 @@ create_item(PARROT_INTERP, ARGIN(PMC *key), ARGIN(PMC *value)) {
     VTABLE_set_pmc_keyed_int(interp, ret, ORDERED_HASH_ITEM_KEY, key);
     VTABLE_set_pmc_keyed_int(interp, ret, ORDERED_HASH_ITEM_VALUE, value);
     return ret;
-};
+}
 
 /* Get list_item by index */
 static PMC*
