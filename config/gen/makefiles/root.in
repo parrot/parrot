@@ -1698,8 +1698,8 @@ testf : test_prep
 testg : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -g $(RUNCORE_TEST_FILES)
 
-# GC Debug core
-testG : test_prep
+# gcdebug core
+testgcd : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -G $(RUNCORE_TEST_FILES)
 
 # JIT core - target retained, but falls back to standard core
