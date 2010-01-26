@@ -681,7 +681,7 @@ PMC2CV = $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --vtable @no_lines_flag@
 .pmc.c : # suffix rule (limited support)
 	$(PMC2CC) $<
 
-vtable.dump : src/vtable.tbl
+vtable.dump : src/vtable.tbl lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm
 	$(PMC2CV)
 
 # This is a listing of all targets meant to be called by users
@@ -1117,7 +1117,10 @@ runtime/parrot/include/tm.pasm : src/utils.c $(H2INC)
 	$(PERL) $(H2INC) src/utils.c $@
 
 
-$(INC_DIR)/oplib/ops.h lib/Parrot/OpLib/core.pm : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2pm.pl \
+# ops.h is built by ops2pm.pl after it builds core.pm
+$(INC_DIR)/oplib/ops.h:  lib/Parrot/OpLib/core.pm
+
+lib/Parrot/OpLib/core.pm : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2pm.pl \
     lib/Parrot/OpsFile.pm lib/Parrot/Op.pm src/ops/ops.num src/ops/ops.skip
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2pm.pl @no_lines_flag@ $(OPS_FILES)
 
