@@ -23,7 +23,8 @@ A script to check that every file has makefile deps on its includes.
  checkdepend.pl [--dump]
 
 If called with C<--dump>, no tests are run, and the pre-processed makefile
-is dumped (in lieu of having C<cc>'s C<-E> for C<make>.
+is dumped (in lieu of having C<cc>'s C<-E> for C<make>. This option is only
+intended to be used by developers examining the build process.
 
 =head1 REQUIREMENTS
 
@@ -33,14 +34,7 @@ for development, so this is an optional test.
 
 =head1 BUGS
 
-This script will currently generate false positives.  This happens because it
-assumes that there must be a fixed relationship between source and object
-files, e.g. C<buz/baz/foo.pir> will be built into C<buz/baz/foo.pbc>.  This
-assumption holds in most cases but breaks down when a file with a dependency is
-not compiled into an object file of the same name.  A possible solution to this
-is to use C-style compilation with separate build and "link" targets using
-pbc_merge.  The other alternative involves making this script significantly
-smarter about figuring out which rules create a given object file.
+See L<http://trac.parrot.org/parrot/wiki/BuildTaskList>
 
 =cut
 
