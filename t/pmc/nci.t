@@ -2367,7 +2367,7 @@ SKIP:
     print "\n"
 
     .local pmc nci_vv
-    nci_vv = dlfunc libnci_test, "nci_vv", "vv"
+    nci_vv = dlfunc libnci_test, "nci_vv", ""
     nci_vv()
     $I1 = nci_dlvar_int[0]
     print $I1

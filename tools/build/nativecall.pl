@@ -467,13 +467,6 @@ SHIM(PMC *pmc_nci), NOTNULL(STRING *signature), SHIM(int *jitted))
        return F2DPTR(pcf_v_);
 #endif
 
-    /* remove deprecated void argument 'v' character */
-    if (2 == signature_len && 'v' == Parrot_str_indexed(interp, signature, 1)) {
-       Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG, "function signature argument character 'v' ignored");
-       Parrot_str_chopn_inplace(interp, signature, 1);
-       signature_len = Parrot_str_byte_length(interp, signature);
-    }
-
     iglobals = interp->iglobals;
 
     if (PMC_IS_NULL(iglobals))
