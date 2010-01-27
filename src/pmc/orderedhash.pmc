@@ -332,7 +332,13 @@ Sets the PMC value of the element at index C<key> to C<val>.
 */
 
     VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
-        PMC *pkey = box_string(INTERP, key);
+        /* Wallpapering problem with HLL Strings as keys */
+        /* Apparently HLL registry in Parrot uses OrderedHash */
+        /* Now we have chicken and egg problem during freeze/thaw */
+        /* When we try to thaw OrderedHash which stores HLL mapping */
+        /* Reported by François Perrad */
+        PMC *pkey = pmc_new(INTERP, enum_class_String);
+        VTABLE_set_string_native(INTERP, pkey, key);
         VTABLE_set_pmc_keyed(INTERP, SELF, pkey, value);
     }
 
