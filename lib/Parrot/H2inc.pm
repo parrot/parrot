@@ -60,7 +60,7 @@ sub parse_file {
             $cur and die "Missing '&end_gen' in $in_file\n";
             my $file;
             foreach (split ' ', $2) {
-                $file = $_ if $out_file =~ /$_$/i;
+                $file = $_ if $out_file =~ /$_$/;
             }
             $cur = {
                 type   => $1,
