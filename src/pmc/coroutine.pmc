@@ -140,7 +140,7 @@ Swaps the "context".
         opcode_t          *dest;
         PackFile_ByteCode *wanted_seg;
         opcode_t * const   next_op = (opcode_t *)next;
-        
+
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG))
             print_sub_name(INTERP, SELF);
 
