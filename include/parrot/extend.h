@@ -64,18 +64,6 @@ typedef const void * Parrot_VTABLE;
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-void * Parrot_call_method(PARROT_INTERP,
-    Parrot_PMC sub_pmc,
-    Parrot_PMC obj,
-    Parrot_String method,
-    ARGIN(const char *signature),
-    ...)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(5);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
 void * Parrot_call_sub(PARROT_INTERP,
     Parrot_PMC sub_pmc,
     ARGIN(const char *signature),
@@ -432,9 +420,6 @@ int Parrot_vfprintf(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-#define ASSERT_ARGS_Parrot_call_method __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(signature))
 #define ASSERT_ARGS_Parrot_call_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(signature))

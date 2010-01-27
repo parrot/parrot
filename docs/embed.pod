@@ -601,8 +601,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_ext_call>
 
-=item [DEPRECATED] C<Parrot_call_method>
-
 =item [DEPRECATED] C<Parrot_call_sub>
 
 =item [DEPRECATED] C<Parrot_call_sub_ret_float>

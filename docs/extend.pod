@@ -34,16 +34,7 @@ TODO
 
 =head2 Functions
 
-=over 4
-
-=item C<Parrot_call_method(PARROT_INTERP, Parrot_PMC sub
-       Parrot_PMC object, Parrot_String method, const char *signature, ...)>
-
-Calls a method on C<object> with the given signature and arguments. C<sub> is
-the method that's being called, and C<method> is the name of the method in the
-call stack. This is useful for calling aliased methods.
-
-=back
+TODO
 
 =head1 SEE ALSO
 
