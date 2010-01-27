@@ -362,10 +362,6 @@ Call a Parrot subroutine that returns a pointer using the supplied signature.
 
 Call a Parrot subroutine that returns an integer using the supplied signature.
 
-=item [DEPRECATED] C<Parrot_Float Parrot_call_sub_ret_float(PARROT_INTERP, Parrot_PMC sub, const_char *signature)>
-
-Call a Parrot subroutine that returns an float using the supplied signature.
-
 =back
 
 =head2 Objects
@@ -606,8 +602,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_ext_call>
 
 =item [DEPRECATED] C<Parrot_call_method>
-
-=item [DEPRECATED] C<Parrot_call_method_ret_float>
 
 =item [DEPRECATED] C<Parrot_call_method_ret_int>
 

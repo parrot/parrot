@@ -1324,47 +1324,6 @@ Parrot_call_method_ret_int(PARROT_INTERP, Parrot_PMC sub_pmc,
 
 /*
 
-=item C<Parrot_Float Parrot_call_method_ret_float(PARROT_INTERP, Parrot_PMC
-sub_pmc, Parrot_PMC obj, Parrot_String method, const char *signature, ...)>
-
-Call a parrot method for the given object.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-Parrot_Float
-Parrot_call_method_ret_float(PARROT_INTERP, Parrot_PMC sub_pmc,
-        Parrot_PMC obj, Parrot_String method, ARGIN(const char *signature), ...)
-{
-    ASSERT_ARGS(Parrot_call_method_ret_float)
-    va_list args;
-    PMC  *sig_object;
-    Parrot_Float result = 0.0;
-    char  return_sig = signature[0];
-    char *arg_sig = (char*)malloc(strlen(signature)+2);
-    Parrot_sub *sub;
-    arg_sig[0] = 'P';
-    arg_sig[1] = 'i';
-    arg_sig[2] = 0;
-    strcat(arg_sig, signature);
-
-    va_start(args, signature);
-    sig_object = Parrot_pcc_build_sig_object_from_varargs(interp, obj, arg_sig, args);
-    va_end(args);
-    free(arg_sig);
-
-    Parrot_pcc_append_result(interp, sig_object, Parrot_str_new_constant(interp, "N"), &result);
-    PMC_get_sub(interp, sub_pmc, sub);
-    Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp), sub->seg->const_table->constants);
-    Parrot_pcc_invoke_from_sig_object(interp, sub_pmc, sig_object);
-
-    return result;
-}
-
-/*
-
 =item C<Parrot_Int Parrot_get_intreg(PARROT_INTERP, Parrot_Int regnum)>
 
 Return the value of an integer register.
