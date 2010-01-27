@@ -312,7 +312,7 @@ my @hlls = (
     },
 
     {
-        name       => 'winexd',
+        name       => 'winxed',
         scm        => 'SVN',
         repository => 'http://winxed.googlecode.com/svn/trunk/'
     },
