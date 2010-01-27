@@ -4321,24 +4321,28 @@ SOURCE_C
     .param string target
     .param pmc depends
     $I0 = does depends, 'array'
-    if $I0 goto L0
+    if $I0 goto L1
     $S0 = depends
     .tailcall newer(target, $S0)
-  L0:
-    $I0 = stat target, .STAT_EXISTS
-    if $I0 goto L1
-    .return (0)
   L1:
-    $I0 = stat target, .STAT_MODIFYTIME
-    $P0 = iter depends
+    $I0 = stat target, .STAT_EXISTS
+    unless $I0 goto L2
+    $I0 = stat target, .STAT_FILESIZE
+    unless $I0 goto L2
+    goto L3
   L2:
-    unless $P0 goto L3
-    $S0 = shift $P0
-    if $S0 == '' goto L2
-    $I1 = stat $S0, .STAT_MODIFYTIME
-    if $I1 < $I0 goto L2
     .return (0)
   L3:
+    $I0 = stat target, .STAT_MODIFYTIME
+    $P0 = iter depends
+  L4:
+    unless $P0 goto L5
+    $S0 = shift $P0
+    if $S0 == '' goto L4
+    $I1 = stat $S0, .STAT_MODIFYTIME
+    if $I1 < $I0 goto L4
+    .return (0)
+  L5:
     .return (1)
 .end
 
@@ -4346,9 +4350,13 @@ SOURCE_C
     .param string target
     .param string depend
     $I0 = stat target, .STAT_EXISTS
-    if $I0 goto L1
-    .return (0)
+    unless $I0 goto L1
+    $I0 = stat target, .STAT_FILESIZE
+    unless $I0 goto L1
+    goto L2
   L1:
+    .return (0)
+  L2:
     $I1 = stat target, .STAT_MODIFYTIME
     $I2 = stat depend, .STAT_MODIFYTIME
     $I0 = $I1 > $I2
