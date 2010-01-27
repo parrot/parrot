@@ -4564,71 +4564,6 @@ make_annotation_value_pmc(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
     return result;
 }
 
-/*
-
-=item C<PMC * PackFile_Annotations_lookup_cursor(PARROT_INTERP,
-PackFile_Annotations *self, opcode_t offset, PackFile_Annotations_Cursor*
-cursor)>
-
-Iteratively look up the annotations in force at a bytecode offset, using the
-cursor to avoid redundantly fetching data when possible.  If an iterative
-lookup is not possible, this function falls back on
-PackFile_Annotations_lookup.
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-PMC *
-PackFile_Annotations_lookup_cursor(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
-        opcode_t offset, ARGIN(PackFile_Annotations_Cursor* cursor))
-{
-    ASSERT_ARGS(PackFile_Annotations_lookup_cursor)
-
-    Parrot_Context *ctx = (Parrot_Context *)PMC_data(CURRENT_CONTEXT(interp));
-
-    /* if the cached annotations haven't been stored or control flow was non-linear */
-    if (PMC_IS_NULL(cursor->annotations) || cursor->expected_pc != ctx->current_pc) {
-        INTVAL i, start_entry;
-
-        cursor->annotations = PackFile_Annotations_lookup(interp, self, offset, STRINGNULL);
-
-        /* find the right group */
-        for (i = 0; i < self->num_groups; i++)
-            if (offset < self->groups[i]->bytecode_offset)
-                break;
-            else
-                start_entry = self->groups[i]->entries_offset;
-        fprintf(stderr, "using group #%d\n", (int) i);
-
-        /* find the right entry */
-        for (i = start_entry; i < self->num_entries; i++)
-            if (self->entries[i]->bytecode_offset >= offset)
-                break;
-        fprintf(stderr, "using entry #%d\n", (int) i);
-
-        cursor->curr_entry = i;
-        fprintf(stderr, "annotations cache miss, pc is %x, expected %x\n",
-                (unsigned int) ctx->current_pc, (unsigned int) cursor->expected_pc);
-    }
-    else {
-        fprintf(stderr, "annotations cache hit\n");
-        while (cursor->curr_entry < self->num_entries &&
-                self->entries[ cursor->curr_entry ]->bytecode_offset <= offset) {
-
-            INTVAL         i        = cursor->curr_entry;
-            STRING * const key_name = PF_CONST(self->code, self->keys[i]->name)->u.string;
-            VTABLE_set_pmc_keyed_str(interp, cursor->annotations, key_name,
-                    make_annotation_value_pmc(interp, self,
-                        self->keys[i]->type, self->entries[i]->value));
-            fprintf(stderr, "added annotations key %s\n", key_name->strstart);
-            cursor->curr_entry++;
-        }
-    }
-
-    /* store predicted next pc in cursor->expected_pc */
-    cursor->expected_pc = ctx->current_pc + interp->op_info_table[*(ctx->current_pc)].op_count;
-    return cursor->annotations;
-}
 
 /*
 
@@ -4658,7 +4593,7 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
     /* If we have a key, look up its ID; if we don't find one. */
     opcode_t key_id = -1;
 
-    if (key && !STRING_IS_NULL(key)) {
+    if (key) {
         for (i = 0; i < self->num_keys; i++) {
             STRING * const test_key = PF_CONST(self->code, self->keys[i]->name)->u.string;
             if (Parrot_str_equal(interp, test_key, key)) {
