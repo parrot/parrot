@@ -175,10 +175,6 @@ L<https://trac.parrot.org/parrot/ticket/451>
 
 =back
 
-=head1 Class Features
-
-[Nothing at this time.]
-
 =head1 Debugger
 
 Assigning to registers [experimental]
