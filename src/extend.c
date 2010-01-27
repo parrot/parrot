@@ -1172,46 +1172,6 @@ Parrot_call_sub_ret_int(PARROT_INTERP, Parrot_PMC sub_pmc,
 
 /*
 
-=item C<Parrot_Float Parrot_call_sub_ret_float(PARROT_INTERP, Parrot_PMC
-sub_pmc, const char *signature, ...)>
-
-Like C<Parrot_call_sub>, with Parrot_Float return result.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-Parrot_Float
-Parrot_call_sub_ret_float(PARROT_INTERP, Parrot_PMC sub_pmc,
-                 ARGIN(const char *signature), ...)
-{
-    ASSERT_ARGS(Parrot_call_sub_ret_float)
-    va_list         args;
-    PMC            *sig_object;
-    Parrot_Float    result;
-    char            return_sig  = signature[0];
-    const char     *arg_sig     = signature;
-    Parrot_sub     *sub;
-
-    arg_sig++;
-    va_start(args, signature);
-    sig_object = Parrot_pcc_build_sig_object_from_varargs(interp, PMCNULL, arg_sig, args);
-    va_end(args);
-
-    /* Add the return argument onto the call signature object (a bit
-     * hackish, added for backward compatibility in deprecated API function,
-     * see TT #1145). */
-    Parrot_pcc_append_result(interp, sig_object, Parrot_str_new_constant(interp, "N"), &result);
-    PMC_get_sub(interp, sub_pmc, sub);
-    Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp), sub->seg->const_table->constants);
-    Parrot_pcc_invoke_from_sig_object(interp, sub_pmc, sig_object);
-
-    return result;
-}
-
-/*
-
 =item C<Parrot_Int Parrot_get_intreg(PARROT_INTERP, Parrot_Int regnum)>
 
 Return the value of an integer register.

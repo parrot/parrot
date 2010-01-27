@@ -72,14 +72,6 @@ void * Parrot_call_sub(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-Parrot_Float Parrot_call_sub_ret_float(PARROT_INTERP,
-    Parrot_PMC sub_pmc,
-    ARGIN(const char *signature),
-    ...)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
-PARROT_EXPORT
 Parrot_Int Parrot_call_sub_ret_int(PARROT_INTERP,
     Parrot_PMC sub_pmc,
     ARGIN(const char *signature),
@@ -421,9 +413,6 @@ int Parrot_vfprintf(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_Parrot_call_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(signature))
-#define ASSERT_ARGS_Parrot_call_sub_ret_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(signature))
 #define ASSERT_ARGS_Parrot_call_sub_ret_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
