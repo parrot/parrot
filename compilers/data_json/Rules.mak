@@ -1,3 +1,6 @@
+$(LIBRARY_DIR)/data_json.pbc: compilers/data_json/data_json.pbc
+	$(CP) compilers/data_json/data_json.pbc $@
+	
 compilers/data_json/data_json.pbc : \
     runtime/parrot/library/PGE.pbc \
     runtime/parrot/library/PGE/Util.pbc \
@@ -14,4 +17,4 @@ compilers/data_json/data_json/grammar.pir : $(PARROT) \
 compilers/data_json/data_json/pge2pir.pir : $(PARROT) \
     compilers/data_json/data_json/pge2pir.tg \
     compilers/tge/tgc.pbc
-	$(PARROT) compilers/tge/tgc.pbc --output=$@ compilers/data_json/pge2pir.tg
+	$(PARROT) compilers/tge/tgc.pbc --output=$@ compilers/data_json/data_json/pge2pir.tg
