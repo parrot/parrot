@@ -23,7 +23,7 @@ shipped, this feature may be removed in B<any> upcoming release, and
 you should no longer rely on it.
 
 Whenever deprecated items are removed, information
-regarding how to cope with the removal will be added to
+regarding how to cope with the removal should be added to
 L<https://trac.parrot.org/parrot/wiki/Deprecation>.
 
 When running parrot, you can receive warnings about deprecated opcodes.
