@@ -41,7 +41,7 @@ print_head( \@ARGV );
 my %sig_table = (
     p => {
         as_proto => "void *",
-        other_decl => "PMC * final_destination = PMCNULL;",
+        final_dest => "PMC * final_destination = PMCNULL;",
         sig_char => "P",
         ret_assign => "if (return_data != NULL) {\n" .
              "        final_destination = pmc_new(interp, enum_class_UnManagedStruct);\n" .
@@ -56,7 +56,7 @@ my %sig_table = (
     f => { as_proto => "float",  sig_char => "N", return_type => "FLOATVAL" },
     d => { as_proto => "double", sig_char => "N", return_type => "FLOATVAL" },
     t => { as_proto => "char *",
-           other_decl => "STRING *final_destination;",
+           final_dest => "STRING *final_destination;",
            ret_assign => "final_destination = Parrot_str_new(interp, return_data, 0);\n    Parrot_pcc_fill_returns_from_c_args(interp, call_object, \"S\", final_destination);",
            sig_char => "S" },
     v => { as_proto => "void",
@@ -152,7 +152,7 @@ while (<>) {
             $sig, $ret,
             $args, [@arg],
             $ret_sig->{as_return}, $ret_sig->{return_type_decl},
-            $ret_sig->{func_call_assign}, $ret_sig->{other_decl},
+            $ret_sig->{func_call_assign}, $ret_sig->{final_dest},
             $ret_sig->{ret_assign}, \@temps,
             \@fill_params, \@extra_preamble, \@extra_postamble,
             \@put_pointer_nci_too,
@@ -163,7 +163,7 @@ while (<>) {
             $sig, $ret,
             $args, [@arg],
             $ret_sig->{as_return}, $ret_sig->{return_type_decl},
-            $ret_sig->{func_call_assign}, $ret_sig->{other_decl},
+            $ret_sig->{func_call_assign}, $ret_sig->{final_dest},
             $ret_sig->{ret_assign}, \@temps,
             \@fill_params, \@extra_preamble, \@extra_postamble,
             \@put_pointer,
@@ -258,6 +258,12 @@ sub make_arg {
 
     local $_ = $argtype;
     my $temp_num = ${$temp_cnt_ref}++;
+    /[ilcsfdINSOP\@]/ && do {
+        my $ret_type = $sig_table{$_}{return_type};
+        push @{$temps_ref},       "$ret_type t_$temp_num;";
+        push @{$fill_params_ref}, "&t_$temp_num";
+        return "t_$temp_num";
+    };
     /p/ && do {
         push @{$temps_ref},       "PMC *t_$temp_num;";
         push @{$fill_params_ref}, "&t_$temp_num";
@@ -270,28 +276,6 @@ sub make_arg {
         push @{$extra_preamble_ref}, "v_$temp_num = VTABLE_get_pointer(interp, t_$temp_num);";
         push @{$extra_postamble_ref}, "VTABLE_set_pointer(interp, t_$temp_num, v_$temp_num);";
         return "&v_$temp_num";
-    };
-    /[INS]/ && do {
-        my $ret_type = $sig_table{$_}{return_type};
-        push @{$temps_ref},       "$ret_type t_$temp_num;";
-        push @{$fill_params_ref}, "&t_$temp_num";
-        return "t_$temp_num";
-    };
-    /[ilcs]/ && do {
-        my $ret_type = $sig_table{$_}{return_type};
-        push @{$temps_ref},          "$ret_type t_$temp_num;";
-        push @{$temps_ref},          "INTVAL ti_$temp_num;";
-        push @{$fill_params_ref},    "&ti_$temp_num";
-        push @{$extra_preamble_ref}, "t_$temp_num = ($ret_type)ti_$temp_num;";
-        return "t_$temp_num";
-    };
-    /[fd]/ && do {
-        my $ret_type = $sig_table{$_}{return_type};
-        push @{$temps_ref},          "$ret_type t_$temp_num;";
-        push @{$temps_ref},          "FLOATVAL tf_$temp_num;";
-        push @{$fill_params_ref},    "&tf_$temp_num";
-        push @{$extra_preamble_ref}, "t_$temp_num = ($ret_type)tf_$temp_num;";
-        return "t_$temp_num";
     };
     /[234]/ && do {
         my $ret_type = $sig_table{$_}{return_type};
@@ -329,27 +313,22 @@ sub make_arg {
     /J/ && do {
         return "interp";
     };
-    /[OP\@]/ && do {
-        push @{$temps_ref},       "PMC *t_$temp_num;";
-        push @{$fill_params_ref}, "&t_$temp_num";
-        return "t_$temp_num";
-    };
     return;
 }
 
 sub create_function {
     my (
         $sig,                 $return,          $params,          $args,
-        $ret_type,            $ret_type_decl,   $return_assign,   $other_decl,
+        $ret_type,            $ret_type_decl,   $return_assign,   $final_dest,
         $final_assign,        $temps_ref,       $fill_params_ref, $extra_preamble_ref,
         $extra_postamble_ref, $put_pointer_ref,
     ) = @_;
 
     my $func = '';
 
-    $other_decl ||= "";
+    $final_dest ||= "";
 
-    $other_decl .= join( "\n    ", @{$temps_ref} );
+    my $other_decl .= join( "\n    ", $final_dest, @{$temps_ref} );
     my $call_object_decl = <<"CALLOBJECT";
     PMC *ctx         = CURRENT_CONTEXT(interp);
     PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
