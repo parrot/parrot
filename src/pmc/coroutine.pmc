@@ -35,21 +35,23 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
 static void
 print_sub_name(PARROT_INTERP, PMC *sub_pmc)
 {
-    /* It's actually a Parrot_coro, but this avoids casting warnings. */
-    Parrot_Sub_attributes *co = PARROT_SUB(sub_pmc);
-    Interp      * const tracer = (interp->pdb && interp->pdb->debugger) ?
-        interp->pdb->debugger :
-        interp;
+    /* It's actually a Parrot_coroutine, but this avoids casting warnings. */
+    PMC           *ctx;
+    Interp * const tracer = (interp->pdb && interp->pdb->debugger) ?
+            interp->pdb->debugger :
+            interp;
 
-    Parrot_io_eprintf(tracer, "# %s coro '%Ss'",
+    GETATTR_Coroutine_ctx(interp, sub_pmc, ctx);
+
+    Parrot_io_eprintf(tracer, "# %s coroutine '%Ss'",
         !(PObj_get_FLAGS(sub_pmc) & SUB_FLAG_CORO_FF) ?
         "Calling" : "yielding from",
         Parrot_full_sub_name(interp, sub_pmc));
 
-    if (co->ctx && (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_CORO_FF)) {
+    if (ctx && (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_CORO_FF)) {
         Parrot_io_eprintf(tracer, " to '%Ss'",
                 Parrot_full_sub_name(interp,
-                    Parrot_pcc_get_sub(interp, Parrot_pcc_get_caller_ctx(interp, co->ctx))));
+                    Parrot_pcc_get_sub(interp, Parrot_pcc_get_caller_ctx(interp, ctx))));
     }
 
     Parrot_io_eprintf(tracer, "\n# ");
@@ -57,9 +59,9 @@ print_sub_name(PARROT_INTERP, PMC *sub_pmc)
 }
 
 pmclass Coroutine extends Sub auto_attrs {
+    ATTR INTVAL             yield;      /* yield in process */
+    ATTR opcode_t          *address;    /* next address to run - toggled each time */
     ATTR PackFile_ByteCode *caller_seg; /* bytecode segment */
-    ATTR opcode_t *address;             /* next address to run - toggled each time */
-    ATTR INTVAL yield;                  /* yield in process */
 
 /*
 
@@ -76,10 +78,8 @@ Clone the coroutine.
 */
 
     VTABLE void init() {
-        Parrot_Coroutine_attributes *attrs = PARROT_COROUTINE(SELF);
-
-        attrs->seg = INTERP->code;
-        attrs->ctx = PMCNULL;
+        SET_ATTR_seg(INTERP, SELF, INTERP->code);
+        SET_ATTR_ctx(INTERP, SELF, PMCNULL);
 
         PObj_custom_mark_destroy_SETALL(SELF);
     }
@@ -96,15 +96,17 @@ Clones the coroutine.
 */
 
     VTABLE PMC *clone() {
+        STRING     *name;
         PMC * const ret = pmc_new(INTERP, SELF->vtable->base_type);
-        Parrot_Coroutine_attributes * const sub      = PARROT_COROUTINE(SELF);
-        Parrot_Coroutine_attributes * const coro_sub = PARROT_COROUTINE(ret);
 
         PObj_custom_mark_destroy_SETALL(ret);
 
-        memcpy(coro_sub, sub, sizeof (Parrot_Coroutine_attributes));
+        memcpy((Parrot_Coroutine_attributes *)PMC_data(ret),
+                (Parrot_Coroutine_attributes *)PMC_data(SELF),
+                sizeof (Parrot_Coroutine_attributes));
 
-        coro_sub->name = Parrot_str_copy(INTERP, coro_sub->name);
+        GET_ATTR_name(INTERP, ret, name);
+        SET_ATTR_name(INTERP, ret, Parrot_str_copy(INTERP, name));
 
         return ret;
     }
@@ -134,92 +136,124 @@ Swaps the "context".
 */
 
     VTABLE opcode_t *invoke(void *next) {
+        PMC               *ctx;
+        opcode_t          *dest;
         PackFile_ByteCode *wanted_seg;
-        Parrot_Coroutine_attributes * const co = PARROT_COROUTINE(SELF);
-        opcode_t * dest = co->address;
-        opcode_t * const next_op = (opcode_t *)next;
-
+        opcode_t * const   next_op = (opcode_t *)next;
+        
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG))
             print_sub_name(INTERP, SELF);
 
-        if (PMC_IS_NULL(co->ctx)) {
-            PMC * const caller_ctx = CURRENT_CONTEXT(interp);
-            PMC *ctx;
-            PMC *ccont = INTERP->current_cont;
+        GET_ATTR_ctx(INTERP, SELF, ctx);
+
+        if (PMC_IS_NULL(ctx)) {
+            PackFile_ByteCode *seg;
+            size_t             start_offs;
+            const UINTVAL     *n_regs_used;
+            PMC               *lex_info;
+            PMC * const        caller_ctx = CURRENT_CONTEXT(INTERP);
+            PMC               *ctx        = Parrot_pcc_get_signature(INTERP, caller_ctx);
+            PMC               *ccont      = INTERP->current_cont;
 
             if (ccont == NEED_CONTINUATION)
-                ccont = (PMC *)new_ret_continuation_pmc(interp, next_op);
+                ccont = (PMC *)new_ret_continuation_pmc(INTERP, next_op);
 
             if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL)
                 Parrot_ex_throw_from_c_args(INTERP, NULL, CONTROL_ERROR,
-                        "tail call to coro not allowed");
+                        "tail call to coroutine not allowed");
 
             /* first time set current sub, cont, object */
-            ctx = Parrot_pcc_get_signature(INTERP, caller_ctx);
             if (PMC_IS_NULL(ctx))
                 ctx = pmc_new(INTERP, enum_class_CallContext);
+
             CURRENT_CONTEXT(INTERP) = ctx;
-            Parrot_pcc_allocate_registers(INTERP, ctx, co->n_regs_used);
+
+            GET_ATTR_n_regs_used(INTERP, SELF, n_regs_used);
+            Parrot_pcc_allocate_registers(INTERP, ctx, n_regs_used);
             Parrot_pcc_set_caller_ctx(INTERP, ctx, caller_ctx);
             Parrot_pcc_init_context(INTERP, ctx, caller_ctx);
 
-            co->ctx = ctx;
+            SET_ATTR_ctx(INTERP, SELF, ctx);
 
-            PARROT_CONTINUATION(ccont)->from_ctx = ctx;
+            SETATTR_Continuation_from_ctx(INTERP, ccont, ctx);
+
             Parrot_pcc_set_sub(INTERP, ctx, SELF);
             Parrot_pcc_set_continuation(INTERP, ctx, ccont);
-            Parrot_pcc_set_object(interp, ctx, PMCNULL);
+            Parrot_pcc_set_object(INTERP, ctx, PMCNULL);
+
             INTERP->current_object = PMCNULL;
             INTERP->current_cont   = PMCNULL;
 
+            GET_ATTR_lex_info(INTERP, SELF, lex_info);
+
             /* create pad if needed */
-            if (!PMC_IS_NULL(co->lex_info)) {
-                const INTVAL hlltype = Parrot_get_ctx_HLL_type(interp, enum_class_LexPad);
-                PMC * const lexpad = pmc_new_init(INTERP, hlltype, co->lex_info);
+            if (!PMC_IS_NULL(lex_info)) {
+                const INTVAL hlltype = Parrot_get_ctx_HLL_type(INTERP, enum_class_LexPad);
+                PMC * const lexpad = pmc_new_init(INTERP, hlltype, lex_info);
                 Parrot_pcc_set_lex_pad(INTERP, ctx, lexpad);
                 VTABLE_set_pointer(INTERP, lexpad, ctx);
             }
 
+            GET_ATTR_seg(INTERP, SELF, seg);
             PObj_get_FLAGS(SELF) |= SUB_FLAG_CORO_FF;
-            wanted_seg            = co->seg;
-            co->caller_seg        = INTERP->code;
-            co->address           = co->seg->base.data + co->start_offs;
+            wanted_seg            = seg;
+
+            GET_ATTR_start_offs(INTERP, SELF, start_offs);
+            SET_ATTR_caller_seg(INTERP, SELF, INTERP->code);
+            SET_ATTR_address(INTERP, SELF, seg->base.data + start_offs);
         }
 
         /* if calling the Coro we need the segment of the Coro */
         else if (!(PObj_get_FLAGS(SELF) & SUB_FLAG_CORO_FF)) {
-            PMC * const ctx   = co->ctx;
-            PMC * const ccont = Parrot_pcc_get_continuation(INTERP, ctx);
+            PackFile_ByteCode *seg;
+            PMC               *ctx;
+            PMC               *ccont;
+
+            GET_ATTR_ctx(INTERP, SELF, ctx);
+            ccont = Parrot_pcc_get_continuation(INTERP, ctx);
 
             PObj_get_FLAGS(SELF) |= SUB_FLAG_CORO_FF;
-            wanted_seg            = co->seg;
+
+            GET_ATTR_seg(INTERP, SELF, seg);
+            wanted_seg            = seg;
 
             /* remember segment of caller */
-            co->caller_seg        = INTERP->code;
+            SET_ATTR_caller_seg(INTERP, SELF, INTERP->code);
+
+
 
             /* and the recent call context */
-            PARROT_CONTINUATION(ccont)->to_ctx = CURRENT_CONTEXT(interp);
-            Parrot_pcc_set_caller_ctx(interp, ctx, CURRENT_CONTEXT(interp));
+            SETATTR_Continuation_to_ctx(INTERP, ccont, CURRENT_CONTEXT(INTERP));
+            Parrot_pcc_set_caller_ctx(INTERP, ctx, CURRENT_CONTEXT(INTERP));
 
-            /* set context to coro context */
-            CURRENT_CONTEXT(interp) = ctx;
+            /* set context to coroutine context */
+            CURRENT_CONTEXT(INTERP) = ctx;
         }
         else {
-            PMC * const ccont = Parrot_pcc_get_continuation(INTERP, co->ctx);
-            PMC * const ctx   = PARROT_CONTINUATION(ccont)->to_ctx;
-            INTVAL yield;
+            INTVAL             yield;
+            PMC               *ccont, *ctx, *to_ctx;
+            PackFile_ByteCode *caller_seg;
+
             GET_ATTR_yield(INTERP, SELF, yield);
-            if (! yield)
+
+            if (!yield)
                 Parrot_ex_throw_from_c_args(INTERP, NULL, CONTROL_ERROR,
                                "Cannot resume dead coroutine.");
+
             SET_ATTR_yield(INTERP, SELF, 0);
 
+            GET_ATTR_ctx(INTERP, SELF, ctx);
+            ccont = Parrot_pcc_get_continuation(INTERP, ctx);
+
+            GETATTR_Continuation_to_ctx(INTERP, ccont, to_ctx);
+
             PObj_get_FLAGS(SELF) &= ~SUB_FLAG_CORO_FF;
+            GET_ATTR_caller_seg(INTERP, SELF, caller_seg);
+
             /* switch back to last remembered code seg and context */
+            wanted_seg = caller_seg;
 
-            wanted_seg            = co->caller_seg;
-
-            if (PMC_IS_NULL(ctx)) {
+            if (PMC_IS_NULL(to_ctx)) {
                 /* This still isn't quite right, but it beats segfaulting.  See
                    the "Call an exited coroutine" case in t/pmc/coroutine.t; the
                    problem is that the defunct coroutine yields up one more
@@ -230,12 +264,12 @@ Swaps the "context".
                                "Cannot resume dead coroutine.");
             }
 
-            CURRENT_CONTEXT(interp) = ctx;
+            CURRENT_CONTEXT(INTERP) = to_ctx;
         }
 
         /* toggle address */
-        dest        = co->address;
-        co->address = (opcode_t *)next;
+        GET_ATTR_address(INTERP, SELF, dest);
+        SET_ATTR_address(INTERP, SELF, (opcode_t *)next);
 
         if (INTERP->code != wanted_seg)
             Parrot_switch_to_cs(INTERP, wanted_seg, 1);
