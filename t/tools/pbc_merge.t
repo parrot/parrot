@@ -25,11 +25,11 @@ use Test::More;
 use Parrot::Test;
 use Parrot::Config;
 
-my $PARROT   = ".$PConfig{slash}$PConfig{test_prog}";
-my $PBCMERGE = ".$PConfig{slash}pbc_merge$PConfig{exe}";
+my $PARROT    = ".$PConfig{slash}$PConfig{test_prog}";
+my $PBC_MERGE = ".$PConfig{slash}pbc_merge$PConfig{exe}";
 
 # Only test if we have the PBC merge tool built.
-if ( -e $PBCMERGE ) {
+if ( -e $PBC_MERGE ) {
     plan tests => 4;
 }
 else {
@@ -50,7 +50,7 @@ sub pir_to_pbc {
 sub pbc_merge {
     my $outname = "t$PConfig{slash}tools$PConfig{slash}" . shift() . ".pbc";
     my $inputs = join( ' ', map { "t$PConfig{slash}tools$PConfig{slash}$_.pbc" } @_ );
-    system("$PBCMERGE -o $outname $inputs");
+    system("$PBC_MERGE -o $outname $inputs");
 }
 
 sub run_pbc {

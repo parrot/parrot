@@ -518,7 +518,7 @@ PARROT              = ./@test_prog@$(EXE)
 MINIPARROT          = ./miniparrot$(EXE)
 DIS                 = ./pbc_disassemble$(EXE)
 PDUMP               = ./pbc_dump$(EXE)
-PBCMERGE            = ./pbc_merge$(EXE)
+PBC_MERGE           = ./pbc_merge$(EXE)
 PDB                 = ./parrot_debugger$(EXE)
 PBC_TO_EXE          = ./pbc_to_exe$(EXE)
 PARROT_CONFIG       = ./parrot_config$(EXE)
@@ -526,14 +526,14 @@ PIRC                = ./pirc$(EXE)
 NQP_RX              = ./parrot-nqp$(EXE)
 
 # Installable executables
-INSTALLABLEPARROT   = ./installable_parrot$(EXE)
-INSTALLABLEDIS      = ./installable_pbc_disassemble$(EXE)
-INSTALLABLEPDUMP    = ./installable_pbc_dump$(EXE)
-INSTALLABLEPBCMERGE = ./installable_pbc_merge$(EXE)
-INSTALLABLEPBCTOEXE = ./installable_pbc_to_exe$(EXE)
-INSTALLABLEPDB      = ./installable_parrot_debugger$(EXE)
-INSTALLABLECONFIG   = ./installable_parrot_config$(EXE)
-INSTALLABLENQP      = ./installable_parrot-nqp$(EXE)
+INSTALLABLEPARROT    = ./installable_parrot$(EXE)
+INSTALLABLEDIS       = ./installable_pbc_disassemble$(EXE)
+INSTALLABLEPDUMP     = ./installable_pbc_dump$(EXE)
+INSTALLABLEPBC_MERGE = ./installable_pbc_merge$(EXE)
+INSTALLABLEPBCTOEXE  = ./installable_pbc_to_exe$(EXE)
+INSTALLABLEPDB       = ./installable_parrot_debugger$(EXE)
+INSTALLABLECONFIG    = ./installable_parrot_config$(EXE)
+INSTALLABLENQP       = ./installable_parrot-nqp$(EXE)
 
 # Libraries
 LIBPARROT_STATIC    = @blib_dir@/@libparrot_static@
@@ -603,7 +603,7 @@ all : \
     $(DIS) \
     $(PARROT_CONFIG) \
     $(PBC_TO_EXE) \
-    $(PBCMERGE) \
+    $(PBC_MERGE) \
     $(PDB) \
     $(PDUMP) \
     $(NQP_RX) \
@@ -696,14 +696,14 @@ help :
 	@echo "  world:             'all' and 'parrot_utils'."
 	@echo "  installable:       same as 'world', but targets for installation"
 	@echo ""
-	@echo "  parrot_utils:      $(PDUMP), $(DIS), $(PDB), $(PBCMERGE) and $(PBC_TO_EXE) $(PARROT_CONFIG)"
+	@echo "  parrot_utils:      $(PDUMP), $(DIS), $(PDB), $(PBC_MERGE) and $(PBC_TO_EXE) $(PARROT_CONFIG)"
 	@echo " $(PDUMP):"
 	@echo "                     Parrot Dumper"
 	@echo " $(DIS):"
 	@echo "                     Parrot Disassembler"
 	@echo " $(PDB):"
 	@echo "                     Parrot Debugger"
-	@echo " $(PBCMERGE):"
+	@echo " $(PBC_MERGE):"
 	@echo "                     Merge bytecode files"
 	@echo " $(PBC_TO_EXE):"
 	@echo "                     Generate C, compile, and link bytecode files"
@@ -798,9 +798,9 @@ help :
 
 world : all parrot_utils
 
-parrot_utils : $(PDUMP) $(DIS) $(PDB) $(PBCMERGE) $(PBC_TO_EXE) $(PARROT_CONFIG)
+parrot_utils : $(PDUMP) $(DIS) $(PDB) $(PBC_MERGE) $(PBC_TO_EXE) $(PARROT_CONFIG)
 
-installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPDB) $(INSTALLABLEPBCMERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG) $(INSTALLABLENQP)
+installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPDB) $(INSTALLABLEPBC_MERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG) $(INSTALLABLENQP)
 
 
 flags_dummy :
@@ -1014,14 +1014,14 @@ $(INSTALLABLEPDUMP) : src/pbc_dump$(O) src/packdump$(O) \
 # Parrot Bytecode File Merger
 #
 
-$(PBCMERGE) : src/pbc_merge$(O) $(LIBPARROT) src/parrot_config$(O)
+$(PBC_MERGE) : src/pbc_merge$(O) $(LIBPARROT) src/parrot_config$(O)
 	$(LINK) @ld_out@$@ \
     src/pbc_merge$(O) \
     src/parrot_config$(O) \
     @rpath_blib@ $(ALL_PARROT_LIBS) $(LINK_DYNAMIC) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
-$(INSTALLABLEPBCMERGE) : src/pbc_merge$(O) $(LIBPARROT) $(INSTALLABLECONFIG)
+$(INSTALLABLEPBC_MERGE) : src/pbc_merge$(O) $(LIBPARROT) $(INSTALLABLECONFIG)
 	$(LINK) @ld_out@$@ \
     src/pbc_merge$(O) \
     src/install_config$(O) \
@@ -1817,7 +1817,7 @@ prog-clean :
     $(INSTALLABLEPARROT) \
     $(INSTALLABLEDIS) \
     $(INSTALLABLEPDUMP) \
-    $(INSTALLABLEPBCMERGE) \
+    $(INSTALLABLEPBC_MERGE) \
     $(INSTALLABLEPBCTOEXE) \
     $(INSTALLABLEPDB) \
     $(INSTALLABLECONFIG) \
@@ -1827,7 +1827,7 @@ prog-clean :
     compilers/imcc/main$(O) \
     $(PDUMP) src/pbc_dump$(O) src/packdump$(O) \
     $(PDB) src/parrot_debugger$(O) \
-    $(PBCMERGE) src/pbc_merge$(O) \
+    $(PBC_MERGE) src/pbc_merge$(O) \
     $(DIS) src/pbc_disassemble$(O)
 	$(RM_F) \
     src/main$(O) \
@@ -1855,14 +1855,14 @@ archclean: dynoplibs-clean dynpmc-clean dynext-clean
     $(INSTALLABLEPARROT) \
     $(INSTALLABLEDIS) \
     $(INSTALLABLEPDUMP) \
-    $(INSTALLABLEPBCMERGE) \
+    $(INSTALLABLEPBC_MERGE) \
     $(INSTALLABLEPDB) \
     $(INSTALLABLECONFIG) \
     $(INSTALLABLENQP) \
     compilers/imcc/main$(O) \
     $(PDUMP) src/pbc_dump$(O) src/packdump$(O) \
     $(PDB) src/parrot_debugger$(O) \
-    $(PBCMERGE) src/pbc_merge$(O) \
+    $(PBC_MERGE) src/pbc_merge$(O) \
     $(DIS) src/pbc_disassemble$(O) \
     $(PARROT_CONFIG) parrot_config$(O) parrot_config.c \
     src/parrot_config$(O) parrot_config.pbc \
