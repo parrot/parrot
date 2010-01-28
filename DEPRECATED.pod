@@ -413,12 +413,10 @@ L<https://trac.parrot.org/parrot/ticket/852>
 =item Library name changes [eligible in 2.1]
 
 The use of C<::> a namespace separator is deprecated.  Core libraries will
-change to use multi-level keys instead.  For example, C<Getopt::Obj> will
-change to C<Getopt; Obj>.  Affected libraries include C<Data::Dumper>,
-C<Getopt::Obj>, C<Parrot::Coroutine>, C<SDL>, C<Test::Builder>,
-C<YAML::Dumper>, and C<PCRE::NCI>.
-
-As well, anything under F<examples/> is subject to this change.
+change to use multi-level keys instead.  For example, C<Data::Dumper> will
+change to C<Data; Dumper>.  Affected libraries also include:
+C<Parrot::Coroutine>, C<SDL>, C<Test::Builder>, C<YAML::Dumper>, and
+C<PCRE::NCI>.
 
 =back
 
