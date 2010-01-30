@@ -398,7 +398,7 @@ TEMPLATE
     'fill_tmpls_ascending_ints'($P0)
     $P0 = 'grep_for_true'($P0)
     params_tdecl = join ";\n    ", $P0
-    
+
     .local string var_decls
     var_decls = 'sprintf'(<<'TEMPLATE', ret_csig, params_csig, ret_tdecl, params_tdecl)
     typedef %s(* func_t)(%s);
@@ -617,7 +617,7 @@ TEMPLATE
         $S0 = v['as_proto']
         v['as_return'] = $S0
     has_as_return:
-    
+
     $I0 = exists v['return_type']
     if $I0 goto has_return_type
         $S0 = v['as_proto']
