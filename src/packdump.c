@@ -138,7 +138,7 @@ pobj_flag_dump(PARROT_INTERP, long flags)
     INTVAL idx = 0;
     int printed_flag_p = 0;
 
-    Parrot_io_printf(interp, "\tFLAGS => 0x%04lx (", flags);
+    Parrot_io_printf(interp, "\t\tFLAGS    => 0x%04lx (", flags);
     while (flags) {
         if (flags & 1) {
             if (printed_flag_p)
@@ -284,9 +284,9 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                     const int n = VTABLE_get_integer(interp, pmc);
                     STRING* const out_buffer = VTABLE_get_repr(interp, pmc);
                     Parrot_io_printf(interp,
-                            "\tclass => %Ss,\n"
-                            "\telement count => %d,\n"
-                            "\telements => %Ss,\n",
+                            "\t\tclass => %Ss,\n"
+                            "\t\telement count => %d,\n"
+                            "\t\telements => %Ss,\n",
                             pmc->vtable->whoami,
                             n,
                             out_buffer);
@@ -318,15 +318,15 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                     namespace_description = null;
                 }
                 Parrot_io_printf(interp,
-                            "\tclass => %Ss,\n"
-                            "\tstart_offs => %d,\n"
-                            "\tend_offs => %d,\n"
-                            "\tname    => '%Ss',\n"
-                            "\tsubid   => '%Ss',\n"
-                            "\tmethod  => '%Ss',\n"
-                            "\tnsentry => '%Ss',\n"
-                            "\tnamespace => %Ss\n"
-                            "\tHLL_id => %d,\n",
+                            "\t\tclass => %Ss,\n"
+                            "\t\tstart_offs => %d,\n"
+                            "\t\tend_offs => %d,\n"
+                            "\t\tname    => '%Ss',\n"
+                            "\t\tsubid   => '%Ss',\n"
+                            "\t\tmethod  => '%Ss',\n"
+                            "\t\tnsentry => '%Ss',\n"
+                            "\t\tnamespace => %Ss\n"
+                            "\t\tHLL_id => %d,\n",
                             pmc->vtable->whoami,
                             sub->start_offs,
                             sub->end_offs,
@@ -339,15 +339,15 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                 break;
               case enum_class_FixedIntegerArray:
                 Parrot_io_printf(interp,
-                            "\tclass => %Ss,\n"
-                            "\trepr => '%Ss'\n",
+                            "\t\tclass => %Ss,\n"
+                            "\t\trepr => '%Ss'\n",
                             pmc->vtable->whoami,
                             VTABLE_get_repr(interp, pmc));
                 break;
               default:
-                Parrot_io_printf(interp, "\tno dump info for PMC %ld %Ss\n",
+                Parrot_io_printf(interp, "\t\tno dump info for PMC %ld %Ss\n",
                             pmc->vtable->base_type, pmc->vtable->whoami);
-                Parrot_io_printf(interp, "\tclass => %Ss,\n", pmc->vtable->whoami);
+                Parrot_io_printf(interp, "\t\tclass => %Ss,\n", pmc->vtable->whoami);
             }
         }
         Parrot_io_printf(interp, "    } ],\n");
