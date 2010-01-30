@@ -89,7 +89,6 @@ my %sig_table = (
 for (values %sig_table) {
     if (not exists $_->{as_return}) { $_->{as_return} = $_->{as_proto} }
     if (not exists $_->{return_type}) { $_->{return_type} = $_->{as_proto} }
-    if (not exists $_->{return_type_decl}) { $_->{return_type_decl} = $_->{return_type} }
     if (not exists $_->{ret_assign} and exists $_->{sig_char}) {
         $_->{ret_assign} = 'Parrot_pcc_fill_returns_from_c_args(interp, call_object, "'
                            . $_->{sig_char} . '", return_data);';
@@ -151,7 +150,7 @@ while (<>) {
         push @nci_defs, create_function(
             $sig, $ret,
             $args, [@arg],
-            $ret_sig->{as_return}, $ret_sig->{return_type_decl},
+            $ret_sig->{as_return}, $ret_sig->{return_type},
             $ret_sig->{func_call_assign}, $ret_sig->{final_dest},
             $ret_sig->{ret_assign}, \@temps,
             \@fill_params, \@extra_preamble, \@extra_postamble,
@@ -162,7 +161,7 @@ while (<>) {
         print {$NCI} create_function(
             $sig, $ret,
             $args, [@arg],
-            $ret_sig->{as_return}, $ret_sig->{return_type_decl},
+            $ret_sig->{as_return}, $ret_sig->{return_type},
             $ret_sig->{func_call_assign}, $ret_sig->{final_dest},
             $ret_sig->{ret_assign}, \@temps,
             \@fill_params, \@extra_preamble, \@extra_postamble,
