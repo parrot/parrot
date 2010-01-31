@@ -139,7 +139,10 @@ like(
 
 {
     my %tf_params = ( UNLINK => 1, );
-    $tf_params{SUFFIX} = '.exe' if 'MSWin32' eq $^O;
+    $tf_params{SUFFIX} = '.exe' if (
+        ( $^O eq 'MSWin32' ) ||
+        ( $^O eq 'cygwin'  )
+    );
     my ( $tmpfile, $fname ) = tempfile(%tf_params);
 
     local $ENV{PATH} = dirname($fname);
@@ -151,7 +154,10 @@ like(
 
 {
     my %tf_params = ( UNLINK => 1, );
-    $tf_params{SUFFIX} = '.exe' if 'MSWin32' eq $^O;
+    $tf_params{SUFFIX} = '.exe' if (
+        ( $^O eq 'MSWin32' ) ||
+        ( $^O eq 'cygwin'  )
+    );
     my ( $tmpfile, $fname ) = tempfile(%tf_params);
 
     local $ENV{PATH} = dirname($fname);
@@ -173,7 +179,10 @@ like(
 
 {
     my %tf_params = ( UNLINK => 1, );
-    $tf_params{SUFFIX} = '.exe' if 'MSWin32' eq $^O;
+    $tf_params{SUFFIX} = '.exe' if (
+        ( $^O eq 'MSWin32' ) ||
+        ( $^O eq 'cygwin'  )
+    );
     my ( $tmpfile, $fname ) = tempfile(%tf_params);
 
     local $ENV{PATH} = dirname($fname);
