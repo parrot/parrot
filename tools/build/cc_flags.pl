@@ -30,13 +30,6 @@ F<config/gen/cflags/root.in>.
 use strict;
 use warnings;
 
-my $verbose;
-
-if ($ARGV[0] eq '-v') {
-    $verbose = 1;
-    shift;
-}
-
 my $cflags = shift;
 
 open my $F, '<', $cflags or die "open $cflags: $!\n";
@@ -118,8 +111,6 @@ if ($cfile) {
         }
     }
 
-    # print "@ARGV\n";
-
     # Visual C++ already prints the source file name...
     if ( $ARGV[0] =~ /cl(?:\.exe)?/i ) {
 
@@ -132,10 +123,6 @@ if ($cfile) {
     else {
         print "$cfile\n";
     }
-}
-
-if ($verbose) {
-    print join ' ', @ARGV;
 }
 
 exit system(@ARGV) / 256;
