@@ -1759,6 +1759,8 @@ The following Version Control System are handled :
 
 If t/harness exists, run : t/harness
 
+If parrot-tapir exists, run it with t/*.t
+
 Else run : prove t/*.t
 
 =cut
@@ -1770,6 +1772,11 @@ Else run : prove t/*.t
     unless $I0 goto L1
     .tailcall _test_harness(kv :flat :named)
   L1:
+    $S0 = get_executable('parrot-tapir')
+    $I0 = file_exists($S0)
+    unless $I0 goto L2
+    .tailcall _test_tapir($S0, kv :flat :named)
+  L2:
     .tailcall _test_prove(kv :flat :named)
 .end
 
@@ -1820,11 +1827,48 @@ the default value is "t/*.t"
     .param pmc kv :slurpy :named
     .local string cmd
     cmd = "prove"
-    $S0 = get_executable('parrot-tapir')
-    $I0 = file_exists($S0)
-    unless $I0 goto L0
-    cmd = $S0
-  L0:
+    $I0 = exists kv['prove_exec']
+    unless $I0 goto L1
+    $S0 = get_prove_version()
+    $S0 = substr $S0, 0, 1
+    unless $S0 == "3" goto L3
+    cmd .= " --exec="
+    goto L4
+  L3:
+    cmd .= " --perl="
+  L4:
+    $S0 = kv['prove_exec']
+    $I0 = index $S0, ' '
+    if $I0 < 0 goto L2
+    cmd .= "\""
+  L2:
+    cmd .= $S0
+    if $I0 < 0 goto L1
+    cmd .= "\""
+  L1:
+    cmd .= " "
+    $S0 = get_value('prove_files', "t/*.t" :named('default'), kv :flat :named)
+    cmd .= $S0
+    system(cmd, 1 :named('verbose'))
+.end
+
+.sub 'get_prove_version' :anon
+    $P0 = open 'prove --version', 'rp'
+    $S0 = $P0.'readline'()
+    $P0.'close'()
+    $I1 = index $S0, "Test::Harness v"
+    $I1 += 15
+    $I2 = index $S0, " ", $I1
+    $I3 = $I2 - $I1
+    $S0 = substr $S0, $I1, $I3
+    .return ($S0)
+.end
+
+.sub '_test_tapir' :anon
+    .param string tapir
+    .param pmc kv :slurpy :named
+    .local string cmd
+    cmd = tapir
     $I0 = exists kv['prove_exec']
     unless $I0 goto L1
     cmd .= " --exec="
@@ -1854,7 +1898,12 @@ Unless t/harness exists, run : prove --archive t/*.t
     run_step('build', kv :flat :named)
     $I0 = file_exists('t/harness')
     if $I0 goto L1
+    $S0 = get_prove_version()
+    $S0 = substr $S0, 0, 1
+    unless $S0 == "3" goto L2
     .tailcall _smoke_prove(kv :flat :named)
+  L2:
+    die "Require Test::Harness v3.x (option --archive)."
   L1:
     die "Don't known how to smoke with t/harness."
 .end
