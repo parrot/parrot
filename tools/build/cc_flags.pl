@@ -6,11 +6,11 @@
 
 =head1 NAME
 
-tools/dev/cc_flags.pl - Process compiler flags
+tools/build/cc_flags.pl - Process compiler flags
 
 =head1 SYNOPSIS
 
-    % perl tools/dev/cc_flags.pl transform compiler flags
+    % perl tools/build/cc_flags.pl transform compiler flags
 
 =head1 DESCRIPTION
 

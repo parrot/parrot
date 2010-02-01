@@ -576,14 +576,14 @@ MAKE = @make_c@
 # arguments (etc) injected in the middle.
 # There is probably a better way to do this, but I can't work it out right now.
 .c$(O) : # suffix rule (limited support)
-	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
+	@$(PERL) tools/build/cc_flags.pl ./CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
 
 # XXX probably should detect assembler, but right now this is only used on Sparc
 
 .s$(O) : # suffix rule (limited support)
-	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
+	@$(PERL) tools/build/cc_flags.pl ./CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
 #UNLESS(win32).S$(O) : # suffix rule (limited support)
-#UNLESS(win32)	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
+#UNLESS(win32)	@$(PERL) tools/build/cc_flags.pl ./CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
 
 .pir.pbc : # suffix rule (limited support)
 	$(PARROT) -o $@ $<
@@ -805,7 +805,7 @@ installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(IN
 
 flags_dummy :
 	@echo "Compiling with:"
-	@$(PERL) tools/dev/cc_flags.pl ./CFLAGS echo $(CC) $(CFLAGS) -I$(@D) @cc_o_out@ xx$(O) -c xx.c
+	@$(PERL) tools/build/cc_flags.pl ./CFLAGS echo $(CC) $(CFLAGS) -I$(@D) @cc_o_out@ xx$(O) -c xx.c
 
 runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.pir $(PARROT) $(GEN_PASM_INCLUDES)
 	$(PARROT) -o $@ runtime/parrot/library/parrotlib.pir
