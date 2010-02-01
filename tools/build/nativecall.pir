@@ -1,17 +1,43 @@
 # Copyright (C) 2010, Parrot Foundation.
 # $Id$
 
-.sub 'main' :main
-    $P0 = 'gen_sigtable'()
-    $P1 = 'read_sigs'()
+=head1 NAME
 
-    $S0 = 'get_head'($P0, $P1)
+tools/build/nativecall.pir - Build up the native call routines
+
+=head1 SYNOPSIS
+
+    % ./parrot tools/build/nativecall.pir <src/call_list.txt >src/nci.c
+
+=head1 DESCRIPTION
+
+This script creates the Native Call Interface file F<src/nci.c>. It
+parses a file of function signatures of the form:
+
+ <return-type-specifier><ws><parameter-type-specifiers>[<ws>][#<comment>]
+    ...
+Empty lines and lines containing only whitespace or comment are ignored.
+The types specifiers are documented in F<src/call_list.txt>.
+
+=head1 SEE ALSO
+
+F<src/call_list.txt>.
+F<docs/pdds/pdd16_native_call.pod>.
+
+=cut
+
+.sub 'main' :main
+    .local pmc sig_table, sigs
+    sig_table = 'gen_sigtable'()
+    sigs = 'read_sigs'()
+
+    $S0 = 'get_head'(sig_table, sigs)
     say $S0
-    $S0 = 'get_thunks'($P0, $P1)
+    $S0 = 'get_thunks'(sig_table, sigs)
     say $S0
-    $S0 = 'get_loader'($P0, $P1)
+    $S0 = 'get_loader'(sig_table, sigs)
     say $S0
-    $S0 = 'get_coda'($P0, $P1)
+    $S0 = 'get_coda'(sig_table, sigs)
     say $S0
 .end
 
