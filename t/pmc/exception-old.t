@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 27;
 
 =head1 NAME
 
@@ -50,61 +50,6 @@ main
 caught it
 Exception
 just pining
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "exception attributes" );
-    print "main\n"
-    push_eh handler
-    new P1, ['Exception']
-    new P2, ['String']
-    set P2, "just pining"
-    setattribute P1, 'message', P2
-    new P3, ['Integer']
-    set P3, 5
-    setattribute P1, 'severity', P3
-    new P4, ['String']
-    set P4, "additional payload"
-    setattribute P1, 'payload', P4
-    new P5, ['Array']
-    set P5, 2
-    set P5[0], 'backtrace line 1'
-    set P5[1], 'backtrace line 2'
-    setattribute P1, 'backtrace', P5
-
-    throw P1
-    print "not reached\n"
-    end
-handler:
-    get_results "0", P0
-    set S0, P0
-    print "caught it\n"
-    getattribute P16, P0, 'message'
-    print P16
-    print "\n"
-    getattribute P17, P0, 'severity'
-    print P17
-    print "\n"
-    getattribute P18, P0, 'payload'
-    print P18
-    print "\n"
-    getattribute P19, P0, 'backtrace'
-    set P20, P19[0]
-    print P20
-    print "\n"
-    set P20, P19[1]
-    print P20
-    print "\n"
-    null P5
-    end
-
-CODE
-main
-caught it
-just pining
-5
-additional payload
-backtrace line 1
-backtrace line 2
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'Exception initialized with String' );

@@ -101,13 +101,6 @@ bitwise dynops.
 
 L<https://trac.parrot.org/parrot/ticket/1260>
 
-=item Array PMC [eligible in 2.1]
-
-This PMC is old, ill-used and is superseded by other array-like PMCs.  Any code
-using this PMC should migrate to ResizablePMCArray or something more suitable.
-
-L<https://trac.parrot.org/parrot/ticket/1303>
-
 =item CPointer PMC [eligible in 2.1]
 
 And all uses in the Parrot calling conventions.

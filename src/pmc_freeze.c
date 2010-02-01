@@ -547,7 +547,7 @@ visit_info_init(PARROT_INTERP, ARGOUT(visit_info *info),
     }
 
     /* we must use PMCs here so that they get marked properly */
-    info->todo        = pmc_new(interp, enum_class_Array);
+    info->todo        = pmc_new(interp, enum_class_ResizablePMCArray);
     if (info->what == VISIT_FREEZE_NORMAL) {
         info->seen    = pmc_new(interp, enum_class_Hash);
         VTABLE_set_pointer(interp, info->seen, parrot_new_intval_hash(interp));
@@ -555,7 +555,7 @@ visit_info_init(PARROT_INTERP, ARGOUT(visit_info *info),
     }
     else {
         info->seen    = PMCNULL;
-        info->id_list = pmc_new(interp, enum_class_Array);
+        info->id_list = pmc_new(interp, enum_class_ResizablePMCArray);
     }
     info->id          = 0;
     info->extra_flags = EXTRA_IS_NULL;
@@ -568,11 +568,10 @@ visit_info_init(PARROT_INTERP, ARGOUT(visit_info *info),
 PARROT_INLINE
 static PMC*
 id_list_get(PARROT_INTERP, ARGIN(visit_info *info), UINTVAL id) {
-    List * const id_list = (List *)PMC_data(info->id_list);
-    PMC **pos = (PMC **)Parrot_pmc_array_get(interp, id_list, id, enum_type_PMC);
+    PMC *pos = VTABLE_get_pmc_keyed_int(interp, info->id_list, id);
 
     if (pos && pos != ((void *)-1))
-        return *pos;
+        return pos;
     return NULL;
 }
 
@@ -615,13 +614,9 @@ visit_todo_list_thaw(PARROT_INTERP, SHIM(PMC* pmc_not_used), ARGIN(visit_info* i
             pmc = pmc_new_noinit(interp, type);
             VTABLE_thaw(interp, pmc, info);
 
-            {
-                List * const todo    = (List *)PMC_data(info->todo);
-                List * const id_list = (List *)PMC_data(info->id_list);
-                Parrot_pmc_array_assign(interp, id_list, id, pmc, enum_type_PMC);
-                /* remember nested aggregates depth first */
-                Parrot_pmc_array_unshift(interp, todo, pmc, enum_type_PMC);
-            }
+            VTABLE_set_pmc_keyed_int(interp, info->id_list, id, pmc);
+            /* remember nested aggregates depth first */
+            VTABLE_unshift_pmc(interp, info->todo, pmc);
         }
         break;
       default:
@@ -679,7 +674,7 @@ visit_todo_list_freeze(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc), ARGIN(visit_info* 
         VTABLE_push_integer(interp, info,
                 PObj_is_object_TEST(pmc) ? enum_class_Object : pmc->vtable->base_type);
         parrot_hash_put(interp, hash, pmc, (void *)id);
-        Parrot_pmc_array_unshift(interp, (List *)PMC_data(info->todo), pmc, enum_type_PMC);
+        VTABLE_unshift_pmc(interp, info->todo, pmc);
         VTABLE_freeze(interp, pmc, info);
     }
 }
@@ -701,23 +696,20 @@ visit_loop_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC *current),
         ARGIN(visit_info *info))
 {
     ASSERT_ARGS(visit_loop_todo_list)
-    PMC        **list_item;
-    List * const todo           = (List *)PMC_data(info->todo);
-    const int    thawing        = info->what == VISIT_THAW_NORMAL;
+    const int  thawing = (info->what == VISIT_THAW_NORMAL);
+    PMC * const todolist = info->todo;
 
     (info->visit_pmc_now)(interp, current, info);
 
     /* can't cache upper limit, visit may append items */
-    while ((list_item = (PMC **)Parrot_pmc_array_shift(interp, todo, enum_type_PMC))) {
-        current = *list_item;
+    while (VTABLE_elements(interp, todolist)) {
+        current = VTABLE_shift_pmc(interp, todolist);
         if (!current)
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
                     "NULL current PMC in visit_loop_todo_list");
 
         PARROT_ASSERT(current->vtable);
-
         VTABLE_visit(interp, current, info);
-
         VISIT_PMC(interp, info, PMC_metadata(current));
     }
 
@@ -727,13 +719,12 @@ visit_loop_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC *current),
 
     if (thawing) {
         /* on thawing call thawfinish for each processed PMC */
-        List        *finish_list = (List *)PMC_data(info->id_list);
-        const INTVAL n           = Parrot_pmc_array_length(interp, finish_list);
+        const INTVAL n           = VTABLE_elements(interp, info->id_list);
         int          i;
 
         /* Thaw in reverse order. We have to fully thaw younger PMCs before use them in older */
         for (i = n-1; i >= 0; --i) {
-            current = *(PMC**)Parrot_pmc_array_get(interp, finish_list, i, enum_type_PMC);
+            current = VTABLE_get_pmc_keyed_int(interp, info->id_list, i);
             if (!PMC_IS_NULL(current))
                 VTABLE_thawfinish(interp, current, info);
         }

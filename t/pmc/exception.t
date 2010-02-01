@@ -18,10 +18,11 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan( 14 )
+    plan( 19 )
     test_bool()
     test_int()
     test_attrs()
+    test_attributes()
     test_push_pop_eh()
     test_push_pop_eh_long()
     test_push_eh_throw()
@@ -45,7 +46,7 @@ _handler:
     die 3, 100
     say "not reached"
     .return()
-handler:
+  handler:
     ok(1,'die works')
 .end
 
@@ -90,7 +91,7 @@ handler:
     set_addr $P0, _handler
     ok($P0,'ExceptionHandler objects return true')
     .return()
-_handler:
+  _handler:
     say "howdy bool!"
 .end
 
@@ -101,7 +102,7 @@ _handler:
     $I0 = $P0
     ok(1,'get_integer on ExceptionHandler ')
     .return()
-_handler:
+  _handler:
     say "howdy int!"
 .end
 
@@ -110,7 +111,7 @@ _handler:
     set_addr $P0, _handler
     push_eh $P0
     throw $P0
-_handler:
+  _handler:
     get_results "0", $P0
     getattribute $P1, $P0, 'type'
     ok(1,'got type')
@@ -127,6 +128,47 @@ _handler:
     $I0 = 0
   done:
     ok($I0, "Can't fetch non-existent attribute")
+.end
+
+.sub test_attributes
+    push_eh handler
+    $P1 = new ['Exception']
+    $P2 = new ['String']
+    $P2 = "just pining"
+    setattribute $P1, 'message', $P2
+    $P3 = new ['Integer']
+    $P3 = 5
+    setattribute $P1, 'severity', $P3
+    $P4 = new ['String']
+    $P4 = "additional payload"
+    setattribute $P1, 'payload', $P4
+    $P5 = new ['ResizablePMCArray']
+    $P5 = 2
+    $P5[0] = 'backtrace line 1'
+    $P5[1] = 'backtrace line 2'
+    setattribute $P1, 'backtrace', $P5
+
+    throw $P1
+    is(0, "throwing exception failed")
+    .return()
+  handler:
+    .get_results($P0)
+
+    $P16 = getattribute $P0, 'message'
+    is($P16, "just pining")
+
+    $P17 = getattribute $P0, 'severity'
+    is($P17, 5)
+
+    $P18 = getattribute $P0, 'payload'
+    is($P18, "additional payload")
+
+    $P19 = getattribute $P0, 'backtrace'
+    $P20 = $P19[0]
+    is($P20, "backtrace line 1")
+
+    $P20 = $P19[1]
+    is($P20, "backtrace line 2")
 .end
 
 # Local Variables:

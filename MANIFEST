@@ -1039,7 +1039,6 @@ include/parrot/io_unix.h                                    [main]include
 include/parrot/io_win32.h                                   [main]include
 include/parrot/key.h                                        [main]include
 include/parrot/library.h                                    [main]include
-include/parrot/list.h                                       [main]include
 include/parrot/longopt.h                                    [main]include
 include/parrot/memory.h                                     [main]include
 include/parrot/misc.h                                       [main]include
@@ -1367,7 +1366,6 @@ src/io/win32.c                                              []
 src/key.c                                                   []
 src/libnci_test.def                                         []
 src/library.c                                               []
-src/list.c                                                  []
 src/longopt.c                                               []
 src/main.c                                                  []
 src/misc.c                                                  []
@@ -1399,7 +1397,6 @@ src/pbc_dump.c                                              []
 src/pbc_merge.c                                             []
 src/pmc.c                                                   []
 src/pmc/addrregistry.pmc                                    [devel]src
-src/pmc/array.pmc                                           [devel]src
 src/pmc/arrayiterator.pmc                                   [devel]src
 src/pmc/bigint.pmc                                          [devel]src
 src/pmc/bignum.pmc                                          [devel]src
@@ -1862,7 +1859,6 @@ t/pharness/04-Usage.t                                       [test]
 t/pir/macro.t                                               [test]
 t/pir/registernames.t                                       [test]
 t/pmc/addrregistry.t                                        [test]
-t/pmc/array.t                                               [test]
 t/pmc/arrayiterator.t                                       [test]
 t/pmc/bigint.t                                              [test]
 t/pmc/bignum.t                                              [test]

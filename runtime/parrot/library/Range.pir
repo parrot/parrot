@@ -131,7 +131,7 @@ Return the min and max attributes as a 2 element list.
 =cut
 
 .sub get_minmax :method
-  $P1 = new 'Array'
+  $P1 = new 'ResizablePMCArray'
   $P1 = 2
   .local pmc min, max
   min = self.'get_min'()

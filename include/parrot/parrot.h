@@ -260,7 +260,6 @@ typedef struct PackFile_ByteCode PackFile_ByteCode;
 #include "parrot/string_primitives.h"
 #include "parrot/hash.h"
 #include "parrot/pmc_freeze.h"
-#include "parrot/list.h"
 #include "parrot/vtable.h"
 #include "parrot/context.h"
 #include "parrot/exceptions.h"

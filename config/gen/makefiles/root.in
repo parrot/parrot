@@ -365,7 +365,6 @@ PARROT_H_HEADERS = \
         $(INC_DIR)/string.h \
         $(INC_DIR)/string_primitives.h \
         $(INC_DIR)/hash.h \
-        $(INC_DIR)/list.h \
         $(INC_DIR)/pmc_freeze.h \
         $(INC_DIR)/vtable.h \
         $(INC_DIR)/context.h \
@@ -471,7 +470,6 @@ INTERP_O_FILES = \
     src/call/context_accessors$(O) \
     src/key$(O) \
     src/library$(O) \
-    src/list$(O) \
     src/longopt$(O) \
     src/misc$(O) \
     src/multidispatch$(O) \
@@ -1177,8 +1175,6 @@ src/pmc$(O) : include/pmc/pmc_class.h \
 src/pmc_freeze$(O) : $(PARROT_H_HEADERS) src/pmc_freeze.str
 
 src/hash$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_key.h
-
-src/list$(O) : $(PARROT_H_HEADERS)
 
 src/library$(O) : $(PARROT_H_HEADERS) src/library.str \
         $(INC_DIR)/dynext.h

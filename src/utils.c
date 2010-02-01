@@ -544,10 +544,11 @@ PMC*
 tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
 {
     ASSERT_ARGS(tm_to_array)
-    /* TT #1270 Should make this a FixedIntegerArray instead of an Array */
-    PMC * const Array = pmc_new(interp, enum_class_Array);
 
+    PMC * const Array = pmc_new(interp,
+        Parrot_get_ctx_HLL_type(interp, enum_class_FixedIntegerArray));
     VTABLE_set_integer_native(interp, Array, 9);
+
     VTABLE_set_integer_keyed_int(interp, Array, 0, tm->tm_sec);
     VTABLE_set_integer_keyed_int(interp, Array, 1, tm->tm_min);
     VTABLE_set_integer_keyed_int(interp, Array, 2, tm->tm_hour);

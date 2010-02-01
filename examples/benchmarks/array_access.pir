@@ -42,7 +42,6 @@ Inspired by computer language shootout.
     arr_size = opt['arr-size']
   use_default_arr_size:
 
-    _bench( 'Array', arr_size )
     _bench( 'FixedFloatArray', arr_size )
     _bench( 'FixedIntegerArray', arr_size )
     _bench( 'FixedPMCArray', arr_size )

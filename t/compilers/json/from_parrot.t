@@ -139,7 +139,7 @@ Tests JSON->Parrot conversions.
 .sub test_create_json_of_an_array
     .local pmc array
 
-    new array, 'Array'
+    new array, 'ResizablePMCArray'
     array = 10
     array[0] = 0
     array[1] = 1
@@ -162,7 +162,7 @@ Tests JSON->Parrot conversions.
 .sub test_create_pretty_json_of_an_array
     .local pmc array
 
-    new array, 'Array'
+    new array, 'ResizablePMCArray'
     array = 10
     array[0] = 0
     array[1] = 1
@@ -198,7 +198,7 @@ OUTPUT
 .sub test_create_json_of_array_keep_element_ordering
     .local pmc array
 
-    new array, 'Array'
+    new array, 'ResizablePMCArray'
     array = 6
     array[0] = 35
     array[1] = 1
@@ -226,7 +226,7 @@ OUTPUT
 .sub test_create_json_of_a_mixed_array
     .local pmc array
 
-    new array, 'Array'
+    new array, 'ResizablePMCArray'
     array = 6
     array[0] = 0
     array[1] = 1500e-2

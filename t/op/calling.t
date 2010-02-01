@@ -1105,7 +1105,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "call :slurpy with :flat" );
         print "\n"
 .end
 .sub main :main
-        $P34 = new 'Array'
+        $P34 = new 'ResizablePMCArray'
         $P34 = 0
         ## normal flattening direct call, non-slurpy returns
         $P35 = _fn1($P34 :flat)
@@ -1135,7 +1135,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "call with :flat in the middle" );
     $P30 = 2
     $P31 = new 'Integer'
     $P31 = 3
-    $P34 = new 'Array'
+    $P34 = new 'ResizablePMCArray'
     $P34 = 2
     $P34[0] = $P30
     $P34[1] = $P31
@@ -1168,7 +1168,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "right number of args via :flat" );
     $P30 = 2
     $P31 = new 'Integer'
     $P31 = 3
-    $P34 = new 'Array'
+    $P34 = new 'ResizablePMCArray'
     $P34 = 3
     $P34[0] = $P30
     $P34[1] = $P31
@@ -1201,7 +1201,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "too many args via :flat" );
     $P30 = 2
     $P31 = new 'Integer'
     $P31 = 3
-    $P34 = new 'Array'
+    $P34 = new 'ResizablePMCArray'
     $P34 = 4
     $P34[0] = $P30
     $P34[1] = $P31
@@ -1235,7 +1235,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "too few args via :flat" );
     $P30 = 2
     $P31 = new 'Integer'
     $P31 = 3
-    $P34 = new 'Array'
+    $P34 = new 'ResizablePMCArray'
     $P34 = 2
     $P34[0] = $P30
     $P34[1] = $P31

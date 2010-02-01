@@ -661,9 +661,9 @@ CODE
 
     .local pmc left_array
     .local pmc right_array
-    left_array  = new 'Array'
+    left_array  = new 'ResizablePMCArray'
     left_array  = 3
-    right_array = new 'Array'
+    right_array = new 'ResizablePMCArray'
     right_array = 3
 
     left[  'array' ] = left_array

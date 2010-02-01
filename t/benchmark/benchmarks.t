@@ -32,10 +32,6 @@ my %outputs = (
     q{array_access.pir} => qr/
 1\s\*\s1000\s=\s1000\n
 100\s\*\s1000\s=\s100000\n
-Array:\s\d+\.\d+s\n
-\n
-1\s\*\s1000\s=\s1000\n
-100\s\*\s1000\s=\s100000\n
 FixedFloatArray:\s\d+\.\d+s\n
 \n
 1\s\*\s1000\s=\s1000\n

@@ -618,10 +618,18 @@ This handles comparisons of array-like and hash-like structures.
     l_elem = shift l_iter
     r_elem = shift r_iter
 
-    $S0 = typeof l_elem
+    # MMD can't handle Nulls. So replace elems with Undef.
+    unless null l_elem goto check_right
+    l_elem = new 'Undef'
+  check_right:
+    unless null r_elem goto compare
+    r_elem = new 'Undef'
+
+  compare:
     elems_equal = compare_elements( l_elem, r_elem, position )
     unless elems_equal goto elems_not_equal
 
+  iter_next:
     inc count
     goto iter_start
 

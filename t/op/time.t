@@ -140,7 +140,9 @@ t/op/time.t - Time and Sleep
     $I0 = $P0
     is($I0, 9, "decodetime result has 9 values")
     $S0 = typeof $P0
-    is($S0, "Array", "decodetime returns the correct PMC type")
+    # TODO: Actually, this should return whatever HLL type replaces
+    # FixedIntegerArray. We should test this behavior with a new HLL
+    is($S0, "FixedIntegerArray", "decodetime returns the correct PMC type")
 .end
 
 .sub test_localtime_s_i
@@ -156,7 +158,9 @@ t/op/time.t - Time and Sleep
     $I0 = $P0
     is($I0, 9, "decodelocaltime result has 9 values")
     $S0 = typeof $P0
-    is($S0, "Array", "decodelocaltime returns the correct PMC type")
+    # TODO: Actually, this should return whatever HLL type replaces
+    # FixedIntegerArray. We should test this behavior with a new HLL
+    is($S0, "FixedIntegerArray", "decodelocaltime returns the correct PMC type")
 .end
 
 

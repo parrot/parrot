@@ -3910,11 +3910,12 @@ YY_RULE_SETUP
         }
         else {
             char * const fmt    = "local__%s__%s__$";
-            const size_t fmtlen = strlen(fmt) - ( 2 * strlen("%s") );
+            const size_t fmtlen = strlen(fmt) - (2 * strlen("%s"));
             const size_t len    = strlen(IMCC_INFO(interp)->cur_macro_name)
                                 + yyleng + fmtlen;
             char * const label  = (char *)mem_sys_allocate(len);
 
+            /* skip over ".$" prefix with the +2 */
             snprintf(label, len, fmt,
                 IMCC_INFO(interp)->cur_macro_name, yytext + 2);
 
@@ -3929,49 +3930,49 @@ YY_RULE_SETUP
 	YY_BREAK
 case 141:
 YY_RULE_SETUP
-#line 747 "compilers/imcc/imcc.l"
+#line 748 "compilers/imcc/imcc.l"
 /* skip leading ws */;
 	YY_BREAK
 case 142:
 YY_RULE_SETUP
-#line 748 "compilers/imcc/imcc.l"
+#line 749 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, ' ');
 	YY_BREAK
 case 143:
 YY_RULE_SETUP
-#line 749 "compilers/imcc/imcc.l"
+#line 750 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, REG);
 	YY_BREAK
 case 144:
 YY_RULE_SETUP
-#line 750 "compilers/imcc/imcc.l"
+#line 751 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, REG);
 	YY_BREAK
 case 145:
 YY_RULE_SETUP
-#line 751 "compilers/imcc/imcc.l"
+#line 752 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, IDENTIFIER);
 	YY_BREAK
 case 146:
 YY_RULE_SETUP
-#line 752 "compilers/imcc/imcc.l"
+#line 753 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, MACRO);
 	YY_BREAK
 case 147:
 YY_RULE_SETUP
-#line 753 "compilers/imcc/imcc.l"
+#line 754 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, yytext[0]);
 	YY_BREAK
 case YY_STATE_EOF(macro):
-#line 754 "compilers/imcc/imcc.l"
+#line 755 "compilers/imcc/imcc.l"
 yyterminate();
 	YY_BREAK
 case 148:
 YY_RULE_SETUP
-#line 756 "compilers/imcc/imcc.l"
+#line 757 "compilers/imcc/imcc.l"
 ECHO;
 	YY_BREAK
-#line 3975 "compilers/imcc/imclexer.c"
+#line 3976 "compilers/imcc/imclexer.c"
 case YY_STATE_EOF(pod):
 case YY_STATE_EOF(cmt1):
 case YY_STATE_EOF(cmt2):
@@ -5173,7 +5174,7 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 
 #define YYTABLES_NAME "yytables"
 
-#line 756 "compilers/imcc/imcc.l"
+#line 757 "compilers/imcc/imcc.l"
 
 
 

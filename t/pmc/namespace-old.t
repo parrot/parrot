@@ -950,7 +950,7 @@ pir_output_like( <<'CODE', <<'OUTPUT', 'del_namespace() with error' );
 
 .sub main :main
     .local pmc not_a_ns
-    not_a_ns = new ['Array']
+    not_a_ns = new ['ResizablePMCArray']
 
     set_global 'Not_A_NS', not_a_ns
 
@@ -1040,7 +1040,7 @@ OUTPUT
 pir_output_like( <<'CODE', <<'OUTPUT', 'del_sub() with error' );
 .sub main :main
     .local pmc not_a_ns
-    not_a_ns = new ['Array']
+    not_a_ns = new ['ResizablePMCArray']
 
     set_global 'Not_A_Sub', not_a_ns
 
