@@ -19,10 +19,6 @@ compiler for each C file.
 
 See F<config/gen/makefiles/CFLAGS.in> for the transformation file format.
 
-=head1 SEE ALSO
-
-F<config/gen/cflags/root.in>.
-
 =cut
 
 ################################################################################
