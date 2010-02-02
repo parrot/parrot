@@ -363,7 +363,7 @@ Sets the location where to thaw a new PMC.
 */
 
 VTABLE void set_pointer(void* value) {
-    PARROT_IMAGEIO(SELF)->thaw_ptr = value;
+    PARROT_IMAGEIO(SELF)->thaw_ptr = (PMC**)value;
 }
 
 /*
