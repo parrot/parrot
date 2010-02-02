@@ -669,22 +669,8 @@ Parrot supports dynamic PMCs, loadable at runtime, to allow compiler writers
 to extend Parrot with additional types. For more information about writing
 PMCs, see L<tools/build/pmc2c.pl> and L<docs/pmc.pod>.
 
-To build dynamic PMCs, add something like the following to your Makefile:
-
-  PERL     = /usr/bin/perl
-  PMCBUILD = $(PERL) /path/to/parrot/tools/build/dynpmc.pl
-  DESTDIR  = /path/to/parrot/runtime/parrot/dynext
-  LOAD_EXT = .so
-
-  PMCDIR    = pmc
-  PMCS      = MyInteger MyFloat MyString MyObject
-  PMC_FILES = MyInteger.pmc MyFloat.pmc MyString.pmc MyObject.pmc
-
-  dynpmcs : $(PMC_FILES)
-      @cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)
-      @cd $(PMCDIR) && $(PMCBUILD) compile $(PMCS)
-      @cd $(PMCDIR) && $(PMCBUILD) linklibs $(PMCS)
-      @cd $(PMCDIR) && $(PMCBUILD) copy "--destination=$(DESTDIR)" $(PMCS)
+See L<src/dynpmc/Makefile> for an example of how to build your dynamic
+PMCS.
 
 =head2 How do I add another op to Parrot?
 

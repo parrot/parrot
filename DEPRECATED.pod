@@ -369,18 +369,6 @@ L<https://trac.parrot.org/parrot/ticket/842>
 
 =back
 
-=head1 build tools
-
-=over 4
-
-=item tools/build/dynpmc.pl [eligible in 1.1]
-
-Replaced with makefiles.
-
-L<https://trac.parrot.org/parrot/ticket/338>
-
-=back
-
 =head1 Parrot library
 
 =over 4
