@@ -385,7 +385,7 @@ Mark any referenced strings and PMCs.
 
 /*
 
-=item C<void visit(visit_info *info)>
+=item C<void visit(PMC *info)>
 
 This is used by freeze/thaw to visit the contents of the task.
 
@@ -395,14 +395,14 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 
 */
 
-    VTABLE void visit(visit_info *info) {
+    VTABLE void visit(PMC *info) {
         /* 1) visit code block */
         VISIT_PMC_ATTR(INTERP, info, SELF, Task, codeblock);
     }
 
 /*
 
-=item C<void freeze(visit_info *info)>
+=item C<void freeze(PMC *info)>
 
 Used to archive the task.
 
@@ -410,7 +410,7 @@ Used to archive the task.
 
 */
 
-    VTABLE void freeze(visit_info *info) {
+    VTABLE void freeze(PMC *info) {
         const Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
 
         /* 1) freeze task id */
@@ -434,7 +434,7 @@ Used to archive the task.
 
 /*
 
-=item C<void thaw(visit_info *info)>
+=item C<void thaw(PMC *info)>
 
 Used to unarchive the task.
 
@@ -442,7 +442,7 @@ Used to unarchive the task.
 
 */
 
-    VTABLE void thaw(visit_info *info) {
+    VTABLE void thaw(PMC *info) {
         /* 1. thaw task id */
         const INTVAL id = VTABLE_shift_integer(INTERP, info);
 
@@ -486,7 +486,7 @@ Used to unarchive the task.
 
 /*
 
-=item C<void thawfinish(visit_info *info)>
+=item C<void thawfinish(PMC *info)>
 
 Called after the task has been thawed.
 
@@ -494,7 +494,7 @@ Called after the task has been thawed.
 
 */
 
-    VTABLE void thawfinish(visit_info *info) {
+    VTABLE void thawfinish(PMC *info) {
         Parrot_Task_attributes * core_struct = PARROT_TASK(SELF);
 
         UNUSED(core_struct); /* TODO: Rebuild the task index. */

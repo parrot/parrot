@@ -690,17 +690,17 @@ of this array.
 
 /*
 
-=item C<void visit(visit_info *info)>
+=item C<void visit(PMC *info)>
 
 This is used by freeze/thaw to visit the contents of the array.
 
 C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 
-=item C<void freeze(visit_info *info)>
+=item C<void freeze(PMC *info)>
 
 Used to archive the array.
 
-=item C<void thaw(visit_info *info)>
+=item C<void thaw(PMC *info)>
 
 Used to unarchive the array.
 
@@ -708,25 +708,24 @@ Used to unarchive the array.
 
 */
 
-    VTABLE void visit(visit_info *info) {
+    VTABLE void visit(PMC *info) {
         INTVAL  i;
         const INTVAL n = VTABLE_elements(INTERP, SELF);
         PMC   **pos    = PMC_array(SELF);
 
         for (i = 0; i < n; ++i, ++pos) {
-            info->thaw_ptr = pos;
-            (info->visit_pmc_now)(INTERP, *pos, info);
+            VISIT_PMC(INTERP, info, *pos);
         }
 
         SUPER(info);
     }
 
-    VTABLE void freeze(visit_info *info) {
+    VTABLE void freeze(PMC *info) {
         SUPER(info);
         VTABLE_push_integer(INTERP, info, VTABLE_elements(INTERP, SELF));
     }
 
-    VTABLE void thaw(visit_info *info) {
+    VTABLE void thaw(PMC *info) {
         SUPER(info);
         SELF.set_integer_native(VTABLE_shift_integer(INTERP, info));
     }

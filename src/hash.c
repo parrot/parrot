@@ -55,7 +55,7 @@ static void expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
 
 static void hash_freeze(PARROT_INTERP,
     ARGIN(const Hash * const hash),
-    ARGMOD(visit_info *info))
+    ARGMOD(PMC *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -63,7 +63,7 @@ static void hash_freeze(PARROT_INTERP,
 
 static void hash_thaw(PARROT_INTERP,
     ARGMOD(Hash *hash),
-    ARGMOD(visit_info *info))
+    ARGMOD(PMC *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -541,7 +541,7 @@ parrot_mark_hash_both(PARROT_INTERP, ARGIN(Hash *hash))
 
 /*
 
-=item C<static void hash_thaw(PARROT_INTERP, Hash *hash, visit_info *info)>
+=item C<static void hash_thaw(PARROT_INTERP, Hash *hash, PMC *info)>
 
 Visits the contents of a hash during freeze/thaw.
 
@@ -552,7 +552,7 @@ C<pinfo> is the visit info, (see include/parrot/pmc_freeze.h>).
 */
 
 static void
-hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(visit_info *info))
+hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(PMC *info))
 {
     ASSERT_ARGS(hash_thaw)
 
@@ -608,8 +608,8 @@ hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(visit_info *info))
 
 /*
 
-=item C<static void hash_freeze(PARROT_INTERP, const Hash * const hash,
-visit_info *info)>
+=item C<static void hash_freeze(PARROT_INTERP, const Hash * const hash, PMC
+*info)>
 
 Freezes hash into a string.
 
@@ -623,7 +623,7 @@ Use by parrot_hash_visit.
 */
 
 static void
-hash_freeze(PARROT_INTERP, ARGIN(const Hash * const hash), ARGMOD(visit_info *info))
+hash_freeze(PARROT_INTERP, ARGIN(const Hash * const hash), ARGMOD(PMC *info))
 {
     ASSERT_ARGS(hash_freeze)
     size_t           i;
@@ -677,7 +677,7 @@ void
 parrot_hash_visit(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(void *pinfo))
 {
     ASSERT_ARGS(parrot_hash_visit)
-    visit_info* const info = (visit_info*) pinfo;
+    PMC* const info = (PMC*) pinfo;
 
     switch (VTABLE_get_integer(interp, info)) {
       case VISIT_THAW_NORMAL:

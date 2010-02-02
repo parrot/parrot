@@ -506,14 +506,14 @@ Return a new iterator for SELF.
 
 =over 4
 
-=item C<void freeze(visit_info *info)>
+=item C<void freeze(PMC *info)>
 
 Used to archive the string.
 
 =cut
 
 */
-    VTABLE void freeze(visit_info *info) {
+    VTABLE void freeze(PMC *info) {
         UINTVAL          size, resize_threshold;
         unsigned char  * bit_array;
         STRING   *       s;
@@ -530,14 +530,14 @@ Used to archive the string.
 
 /*
 
-=item C<void thaw(visit_info *info)>
+=item C<void thaw(PMC *info)>
 
 Used to unarchive the string.
 
 =cut
 
 */
-    VTABLE void thaw(visit_info *info) {
+    VTABLE void thaw(PMC *info) {
         SUPER(info);
 
         {

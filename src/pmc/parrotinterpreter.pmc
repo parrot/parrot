@@ -658,24 +658,24 @@ have the same thread id.
 
 /*
 
-=item C<void visit(visit_info *info)>
+=item C<void visit(PMC *info)>
 
 This is used by freeze/thaw to visit the contents of the interpreter.
 
 C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 
-=item C<void freeze(visit_info *info)>
+=item C<void freeze(PMC *info)>
 
 Used to archive the interpreter. Actually not the whole interpreter is
 frozen but the state of the interpreter, which includes everything that
 has changes since creating an empty interpreter.
 
-=item C<void thaw(visit_info *info)>
+=item C<void thaw(PMC *info)>
 
 Used to unarchive the interpreter. This merges the changes into this
 interpreter instance.
 
-=item C<void thawfinish(visit_info *info)>
+=item C<void thawfinish(PMC *info)>
 
 Finish thawing.
 
@@ -683,8 +683,7 @@ Finish thawing.
 
 */
 
-    VTABLE void visit(visit_info *info) {
-        PMC **pos;
+    VTABLE void visit(PMC *info) {
         /*
          * the information frozen here is part of all PBCs
          * we probably need to freeze all dynamic extensible
@@ -710,16 +709,14 @@ Finish thawing.
         /*  HLL_info */
         if (VTABLE_get_integer(INTERP, info) == VISIT_THAW_NORMAL ||
             VTABLE_get_integer(INTERP, info) == VISIT_THAW_CONSTANTS) {
-            pos = &PMC_args(SELF);
+            VISIT_PMC(interp, info, PMC_args(SELF));
         }
         else
-            pos = &INTERP->HLL_info;
+            VISIT_PMC(interp, info, INTERP->HLL_info);
 
-        info->thaw_ptr = pos;
-        (info->visit_pmc_now)(INTERP, *pos, info);
     }
 
-    VTABLE void thaw(visit_info *info) {
+    VTABLE void thaw(PMC *info) {
         if (!PMC_data(SELF)) {
             Parrot_ParrotInterpreter_attributes *attrs =
                 mem_allocate_zeroed_typed(Parrot_ParrotInterpreter_attributes);
@@ -730,7 +727,7 @@ Finish thawing.
         PMC_interp(SELF) = INTERP;
     }
 
-    VTABLE void thawfinish(visit_info *info) {
+    VTABLE void thawfinish(PMC *info) {
         PMC * const new_info = PMC_args(SELF);
         const INTVAL  m      = VTABLE_elements(INTERP, new_info);
         INTVAL  i;
@@ -845,5 +842,3 @@ This method is experimental. See TT #264.
  * End:
  * vim: expandtab shiftwidth=4:
  */
-
-

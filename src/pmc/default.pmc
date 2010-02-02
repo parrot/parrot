@@ -1043,7 +1043,7 @@ Add class C<parent> to the list of our parents.
 
 /*
 
-=item C<void visit(visit_info *info)>
+=item C<void visit(PMC *info)>
 
 Used by GC to mark the PMC.
 
@@ -1051,7 +1051,7 @@ Used by GC to mark the PMC.
 
 */
 
-    VTABLE void visit(visit_info *info) {
+    VTABLE void visit(PMC *info) {
     }
 
 /*
@@ -1070,7 +1070,7 @@ Clones this PMC.  By default, this just does a freeze and thaw.
 
 /*
 
-=item C<void freeze(visit_info *info)>
+=item C<void freeze(PMC *info)>
 
 Does nothing.
 
@@ -1078,14 +1078,14 @@ Does nothing.
 
 */
 
-    VTABLE void freeze(visit_info *info) {
+    VTABLE void freeze(PMC *info) {
         UNUSED(info)
         /* default - no action */
     }
 
 /*
 
-=item C<void thaw(visit_info *info)>
+=item C<void thaw(PMC *info)>
 
 Initializes the PMC during unarchiving.
 
@@ -1093,14 +1093,14 @@ Initializes the PMC during unarchiving.
 
 */
 
-    VTABLE void thaw(visit_info *info) {
+    VTABLE void thaw(PMC *info) {
         /* default - initialize the PMC */
         SELF.init();
     }
 
 /*
 
-=item C<void thawfinish(visit_info *info)>
+=item C<void thawfinish(PMC *info)>
 
 Does nothing.
 
@@ -1108,7 +1108,7 @@ Does nothing.
 
 */
 
-    VTABLE void thawfinish(visit_info *info) {
+    VTABLE void thawfinish(PMC *info) {
         UNUSED(info)
         /* default - no action */
     }

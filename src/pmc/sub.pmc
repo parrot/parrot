@@ -619,11 +619,11 @@ Returns whether the two subroutines are equal.
 
 /*
 
-=item C<void visit(visit_info *info)>
+=item C<void visit(PMC *info)>
 
 This is used by freeze/thaw to visit the contents of the sub.
 
-=item C<void freeze(visit_info *info)>
+=item C<void freeze(PMC *info)>
 
 Archives the subroutine.
 
@@ -631,7 +631,7 @@ Archives the subroutine.
 
 */
 
-    VTABLE void visit(visit_info *info) {
+    VTABLE void visit(PMC *info) {
         VISIT_PMC_ATTR(INTERP, info, SELF, Sub, namespace_name);
 
         VISIT_PMC_ATTR(INTERP, info, SELF, Sub, multi_signature);
@@ -651,7 +651,7 @@ Archives the subroutine.
         SUPER(info);
     }
 
-    VTABLE void freeze(visit_info *info) {
+    VTABLE void freeze(PMC *info) {
         Parrot_Sub_attributes *sub;
         STRING                *hll_name;
         int i;
@@ -709,7 +709,7 @@ Archives the subroutine.
 
 /*
 
-=item C<void thaw(visit_info *info)>
+=item C<void thaw(PMC *info)>
 
 Unarchives the subroutine.
 
@@ -717,7 +717,7 @@ Unarchives the subroutine.
 
 */
 
-    VTABLE void thaw(visit_info *info) {
+    VTABLE void thaw(PMC *info) {
         Parrot_Sub_attributes *sub;
         INTVAL flags;
         int    i;

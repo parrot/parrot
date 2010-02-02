@@ -277,7 +277,7 @@ Marks any referenced strings and PMCs as live.
 
 /*
 
-=item C<void visit(visit_info *info)>
+=item C<void visit(PMC *info)>
 
 Visits the contents of the scheduler (used by freeze/thaw).
 
@@ -287,7 +287,7 @@ C<*info> is the visit info (see F<include/parrot/pmc_freeze.h>).
 
 */
 
-    VTABLE void visit(visit_info *info) {
+    VTABLE void visit(PMC *info) {
         /* 1) visit task list */
         VISIT_PMC_ATTR(INTERP, info, SELF, Scheduler, task_list);
 
@@ -298,7 +298,7 @@ C<*info> is the visit info (see F<include/parrot/pmc_freeze.h>).
 
 /*
 
-=item C<void freeze(visit_info *info)>
+=item C<void freeze(PMC *info)>
 
 Archives the scheduler.
 
@@ -306,7 +306,7 @@ Archives the scheduler.
 
 */
 
-    VTABLE void freeze(visit_info *info) {
+    VTABLE void freeze(PMC *info) {
         Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
 
         /* 1) freeze scheduler id */
@@ -319,7 +319,7 @@ Archives the scheduler.
 
 /*
 
-=item C<void thaw(visit_info *info)>
+=item C<void thaw(PMC *info)>
 
 Unarchives the scheduler.
 
@@ -327,7 +327,7 @@ Unarchives the scheduler.
 
 */
 
-    VTABLE void thaw(visit_info *info) {
+    VTABLE void thaw(PMC *info) {
         /* 1. thaw scheduler id */
         const INTVAL id = VTABLE_shift_integer(INTERP, info);
 
@@ -347,7 +347,7 @@ Unarchives the scheduler.
 
 /*
 
-=item C<void thawfinish(visit_info *info)>
+=item C<void thawfinish(PMC *info)>
 
 Finishes thawing the scheduler.
 
@@ -355,7 +355,7 @@ Finishes thawing the scheduler.
 
 */
 
-    VTABLE void thawfinish(visit_info *info) {
+    VTABLE void thawfinish(PMC *info) {
         Parrot_cx_refresh_task_list(INTERP, SELF);
     }
 

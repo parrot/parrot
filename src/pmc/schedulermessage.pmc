@@ -206,7 +206,7 @@ Mark any referenced strings and PMCs.
 
 /*
 
-=item C<void visit(visit_info *info)>
+=item C<void visit(PMC *info)>
 
 This is used by freeze/thaw to visit the contents of the scheduler message.
 
@@ -216,20 +216,14 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 
 */
 
-    VTABLE void visit(visit_info *info) {
-        Parrot_SchedulerMessage_attributes * const core_struct =
-            PARROT_SCHEDULERMESSAGE(SELF);
-        PMC **pos;
-
-        /* 1) visit message data */
-        pos            = &core_struct->data;
-        info->thaw_ptr = pos;
-        (info->visit_pmc_now)(INTERP, *pos, info);
+    VTABLE void visit(PMC *info) {
+        /* visit message data */
+        VISIT_PMC(INTERP, info, PARROT_SCHEDULERMESSAGE(SELF)->data);
     }
 
 /*
 
-=item C<void freeze(visit_info *info)>
+=item C<void freeze(PMC *info)>
 
 Used to archive the scheduler message.
 
@@ -237,7 +231,7 @@ Used to archive the scheduler message.
 
 */
 
-    VTABLE void freeze(visit_info *info) {
+    VTABLE void freeze(PMC *info) {
         Parrot_SchedulerMessage_attributes * const core_struct =
             PARROT_SCHEDULERMESSAGE(SELF);
 
@@ -250,7 +244,7 @@ Used to archive the scheduler message.
 
 /*
 
-=item C<void thaw(visit_info *info)>
+=item C<void thaw(PMC *info)>
 
 Used to unarchive the scheduler message.
 
@@ -258,7 +252,7 @@ Used to unarchive the scheduler message.
 
 */
 
-    VTABLE void thaw(visit_info *info) {
+    VTABLE void thaw(PMC *info) {
         /* 1. thaw message id */
         const INTVAL id = VTABLE_shift_integer(INTERP, info);
 

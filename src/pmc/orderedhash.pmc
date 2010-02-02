@@ -726,15 +726,15 @@ the clone via integers has different indices, if items were deleted.
     }
 /*
 
-=item C<void visit(visit_info *info)>
+=item C<void visit(PMC *info)>
 
 Used during archiving to visit the elements in the hash.
 
-=item C<void freeze(visit_info *info)>
+=item C<void freeze(PMC *info)>
 
 Used to archive the hash.
 
-=item C<void thaw(visit_info *info)>
+=item C<void thaw(PMC *info)>
 
 Used to unarchive the hash.
 
@@ -742,12 +742,12 @@ Used to unarchive the hash.
 
 */
 
-    VTABLE void visit(visit_info *info) {
+    VTABLE void visit(PMC *info) {
         VISIT_PMC_ATTR(INTERP, info, SELF, OrderedHash, hash);
         SUPER(info);
     }
 
-    VTABLE void thawfinish(visit_info *info) {
+    VTABLE void thawfinish(PMC *info) {
         Parrot_OrderedHash_attributes *attrs = PARROT_ORDEREDHASH(SELF);
         find_bounds(INTERP, attrs->hash, &attrs->first, &attrs->last);
         SUPER(info);

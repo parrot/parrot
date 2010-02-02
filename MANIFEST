@@ -1428,6 +1428,7 @@ src/pmc/handle.pmc                                          [devel]src
 src/pmc/hash.pmc                                            [devel]src
 src/pmc/hashiterator.pmc                                    [devel]src
 src/pmc/hashiteratorkey.pmc                                 [devel]src
+src/pmc/imageio.pmc                                         [devel]src
 src/pmc/integer.pmc                                         [devel]src
 src/pmc/iterator.pmc                                        [devel]src
 src/pmc/key.pmc                                             [devel]src

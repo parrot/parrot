@@ -125,11 +125,11 @@ C<symbols>, which gets an array of the names of the symbols in this lexpad.
 
 /*
 
-=item C<void visit(visit_info *info)>
+=item C<void visit(PMC *info)>
 
-=item C<void freeze(visit_info *info)>
+=item C<void freeze(PMC *info)>
 
-=item C<void thaw(visit_info *info)>
+=item C<void thaw(PMC *info)>
 
 Freeze/thaw interface used during freeze/thaw of the Sub PMC.
 The implementation of the Hash PMC is called.
@@ -139,7 +139,7 @@ The implementation of the Hash PMC is called.
 */
 
 
-    VTABLE void thaw(visit_info *info) {
+    VTABLE void thaw(PMC *info) {
         const INTVAL elems  = VTABLE_shift_integer(INTERP, info);
         const INTVAL k_type = VTABLE_shift_integer(INTERP, info);
         const INTVAL v_type = VTABLE_shift_integer(INTERP, info);

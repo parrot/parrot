@@ -344,28 +344,28 @@ Sets C<dest> to the absolute value of SELF.
 
 /*
 
-=item C<void freeze(visit_info *info)>
+=item C<void freeze(PMC *info)>
 
 Used to archive the number.
 
 =cut
 
 */
-    VTABLE void freeze(visit_info *info) {
+    VTABLE void freeze(PMC *info) {
         SUPER(info);
         VTABLE_push_float(INTERP, info, SELF.get_number());
     }
 
 /*
 
-=item C<void thaw(visit_info *info)>
+=item C<void thaw(PMC *info)>
 
 Used to unarchive the number.
 
 =cut
 
 */
-    VTABLE void thaw(visit_info *info) {
+    VTABLE void thaw(PMC *info) {
         SUPER(info);
         SET_ATTR_fv(INTERP, SELF, VTABLE_shift_float(INTERP, info));
     }

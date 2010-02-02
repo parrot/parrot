@@ -404,14 +404,14 @@ Returns a copy of the array.
 
 =over 4
 
-=item C<void freeze(visit_info *info)>
+=item C<void freeze(PMC *info)>
 
 Used to archive the string.
 
 =cut
 
 */
-    VTABLE void freeze(visit_info *info) {
+    VTABLE void freeze(PMC *info) {
         /* XXX Dino - I'm concerned about freezing the entire
             allocated block of memory, it's dependent on the
             BITS_PER_CHAR value.
@@ -438,14 +438,14 @@ Used to archive the string.
 
 /*
 
-=item C<void thaw(visit_info *info)>
+=item C<void thaw(PMC *info)>
 
 Used to unarchive the string.
 
 =cut
 
 */
-    VTABLE void thaw(visit_info *info) {
+    VTABLE void thaw(PMC *info) {
         unsigned char   *bit_array;
         const UINTVAL    head_pos = VTABLE_shift_integer(INTERP, info);
         const UINTVAL    tail_pos = VTABLE_shift_integer(INTERP, info);

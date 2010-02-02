@@ -320,11 +320,11 @@ Returns the Sub PMC of the element at index C<key> or PMCNULL.
 
 /*
 
-=item C<void freeze(visit_info *info)>
+=item C<void freeze(PMC *info)>
 
 Archives the evaled code
 
-=item C<void thaw(visit_info *info)>
+=item C<void thaw(PMC *info)>
 
 Unarchives the code.
 
@@ -332,14 +332,14 @@ Unarchives the code.
 
 */
 
-    VTABLE void freeze(visit_info *info) {
+    VTABLE void freeze(PMC *info) {
         STRING   *packed = SELF.get_string();
         VTABLE_push_string(INTERP, info, packed);
 
         SUPER(info);
     }
 
-    VTABLE void thaw(visit_info *info) {
+    VTABLE void thaw(PMC *info) {
         STRING           *packed = VTABLE_shift_string(INTERP, info);
         PackFile         *pf;
         PackFile_Segment *seg;

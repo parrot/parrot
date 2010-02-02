@@ -1421,7 +1421,7 @@ Returns the integer type of the class.
 
 /*
 
-=item C<void visit(visit_info *info)>
+=item C<void visit(PMC *info)>
 
 This is used by freeze/thaw to visit the contents of the class.
 
@@ -1431,7 +1431,7 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 
 */
 
-    VTABLE void visit(visit_info *info) {
+    VTABLE void visit(PMC *info) {
         /* 1) visit the attribute description hash */
         VISIT_PMC_ATTR(INTERP, info, SELF, Class, attrib_metadata);
 
@@ -1453,7 +1453,7 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 
 /*
 
-=item C<void freeze(visit_info *info)>
+=item C<void freeze(PMC *info)>
 
 Used to archive the class.
 
@@ -1461,7 +1461,7 @@ Used to archive the class.
 
 */
 
-    VTABLE void freeze(visit_info *info) {
+    VTABLE void freeze(PMC *info) {
         Parrot_Class_attributes * const class_data = PARROT_CLASS(SELF);
         STRING       *serial_namespace = CONST_STRING(interp, "");
 
@@ -1483,7 +1483,7 @@ Used to archive the class.
 
 /*
 
-=item C<void thaw(visit_info *info)>
+=item C<void thaw(PMC *info)>
 
 Used to unarchive the class.
 
@@ -1491,7 +1491,7 @@ Used to unarchive the class.
 
 */
 
-    VTABLE void thaw(visit_info *info) {
+    VTABLE void thaw(PMC *info) {
         /* The class might already exist in the interpreter, so create it as an
          * anonymous class and later decide whether to link it into the
          * namespace.  */
@@ -1549,7 +1549,7 @@ with functions like pmc_new and pmc_reuse, which take type ID numbers still.
 
 /*
 
-=item C<void thawfinish(visit_info *info)>
+=item C<void thawfinish(PMC *info)>
 
 Called after the class has been thawed.
 
@@ -1557,7 +1557,7 @@ Called after the class has been thawed.
 
 */
 
-    VTABLE void thawfinish(visit_info *info) {
+    VTABLE void thawfinish(PMC *info) {
         Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
         UNUSED(info)
 

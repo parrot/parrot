@@ -279,11 +279,11 @@ Creates and returns a copy of the array.
 
 /*
 
-=item C<void freeze(visit_info *info)>
+=item C<void freeze(PMC *info)>
 
 Used to archive the array.
 
-=item C<void thaw(visit_info *info)>
+=item C<void thaw(PMC *info)>
 
 Used to unarchive the array.
 
@@ -291,7 +291,7 @@ Used to unarchive the array.
 
 */
 
-    VTABLE void freeze(visit_info *info) {
+    VTABLE void freeze(PMC *info) {
         INTVAL   *int_array;
         INTVAL    i, n, rt;
 
@@ -308,7 +308,7 @@ Used to unarchive the array.
             VTABLE_push_integer(INTERP, info, int_array[i]);
     }
 
-    VTABLE void thaw(visit_info *info) {
+    VTABLE void thaw(PMC *info) {
         const INTVAL n = VTABLE_shift_integer(INTERP, info);
         const INTVAL rt = VTABLE_shift_integer(INTERP, info);
 
