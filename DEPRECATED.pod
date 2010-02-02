@@ -48,12 +48,6 @@ L<https://trac.parrot.org/parrot/ticket/448>
 
 L<https://trac.parrot.org/parrot/ticket/452>
 
-=item Hash changes to AssociativePMCArray [eligible in 1.5]
-
-Also OrderedHash to OrderedAssociativePMCArray.
-
-L<https://trac.parrot.org/parrot/ticket/679>
-
 =item Method stdhandle in ParrotInterpreter [experimental]
 
 L<https://trac.parrot.org/parrot/ticket/264>
