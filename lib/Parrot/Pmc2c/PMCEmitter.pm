@@ -97,6 +97,7 @@ sub generate_c_file {
     $c->emit( $self->get_vtable_func );
     $c->emit( $self->get_mro_func );
     $c->emit( $self->get_isa_func );
+    $c->emit( $self->pmc_class_init_func );
     $c->emit( $self->init_func );
     $c->emit( $self->postamble );
 
@@ -474,6 +475,34 @@ sub gen_multi_name
     return $cache->{$name} = "mfl_$count";
 }
 
+=item C<pmc_class_init_func()>
+
+Returns the C code for the PMC's class_init function as a static
+function to be called from the exported class_init.
+
+=cut
+
+sub pmc_class_init_func {
+    my ($self) = @_;
+    my $class_init_code = "";
+
+    if ($self->has_method('class_init')) {
+        $class_init_code .= $self->get_method('class_init')->body;
+
+        $class_init_code =~ s/INTERP/interp/g;
+
+        # fix indenting
+        $class_init_code =~ s/^/    /mg;
+        $class_init_code = <<ENDOFCODE
+static void thispmc_class_init(PARROT_INTERP, int entry)
+{
+$class_init_code
+}
+ENDOFCODE
+    }
+    return $class_init_code;
+}
+
 =item C<init_func()>
 
 Returns the C code for the PMC's initialization method, or an empty
@@ -528,12 +557,7 @@ END_MULTI_LIST
     my $class_init_code = "";
 
     if ($self->has_method('class_init')) {
-        $class_init_code    = $self->get_method('class_init')->body;
-
-        $class_init_code =~ s/INTERP/interp/g;
-
-        # fix indenting
-        $class_init_code =~ s/^/        /mg;
+        $class_init_code .= "        thispmc_class_init(interp, entry);\n";
     }
 
     my %extra_vt;
@@ -703,10 +727,10 @@ EOC
     # include any class specific init code from the .pmc file
     if ($class_init_code) {
         $cout .= <<"EOC";
+
         /* class_init */
-        {
 $class_init_code
-        }
+
 EOC
     }
 
