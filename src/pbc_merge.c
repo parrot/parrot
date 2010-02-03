@@ -369,7 +369,9 @@ pbc_merge_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 /*
 
 =item C<static PackFile_ConstTable* pbc_merge_constants(PARROT_INTERP,
-pbc_merge_input **inputs, int num_inputs, PackFile *pf, PackFile_ByteCode *bc)>
+pbc_merge_input **inputs, int num_inputs, PackFile *pf, PackFile_ByteCode *bc,
+opcode_t *const_map)>
+
 
 This function merges the constants tables from the input PBC files.
 
