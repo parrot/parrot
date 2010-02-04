@@ -35,12 +35,16 @@ sub runstep {
     print "\n[ " if $verbose;
 
     my $hints_used = 0;
+    my $hints_file;
 
     my $osname = lc( $conf->data->get('OSNAME_provisional') );
     $osname = 'linux' if ($osname eq 'gnukfreebsd');
-    my $hints_file = catfile('config', 'init', 'hints', "$osname.pm");
+
+    my $hints_file_name = $conf->options->get('hintsfile') || $osname ;
+    $hints_file = catfile('config', 'init', 'hints', "$hints_file_name.pm");
+
     if ( -f $hints_file ) {
-        my $hints_pkg = "init::hints::" . $osname;
+        my $hints_pkg = "init::hints::" . $hints_file_name;
 
         print "$hints_pkg " if $verbose;
 

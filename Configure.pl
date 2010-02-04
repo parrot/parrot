@@ -201,6 +201,10 @@ disk, for later analysis by F<Parrot::Configure::Trace> methods.
 
 =over 4
 
+=item C<--hintsfile=filename>
+
+Use filename as the hints file.
+
 =item C<--darwin_no_fink>
 
 On Darwin, do not probe for Fink libraries.
