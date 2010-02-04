@@ -87,6 +87,13 @@ typedef enum _gc_sys_type_enum {
     INF /*infinite memory core*/
 } gc_sys_type_enum;
 
+/* how often to skip a full GC when this pool has nothing free */
+typedef enum _gc_skip_type_enum {
+    GC_NO_SKIP = 0,
+    GC_ONE_SKIP,
+    GC_ALWAYS_SKIP
+} gc_skip_type_enum;
+
 typedef struct GC_Subsystem {
     /* Which GC subsystem are we using? See PARROT_GC_DEFAULT_TYPE in
      * include/parrot/settings.h for possible values */

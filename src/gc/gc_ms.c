@@ -332,9 +332,9 @@ gc_ms_more_traceable_objects(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(gc_ms_more_traceable_objects)
 
-    if (pool->skip)
-        pool->skip = 0;
-    else {
+    if (pool->skip == GC_ONE_SKIP)
+        pool->skip = GC_NO_SKIP;
+    else if (pool->skip == GC_NO_SKIP) {
         Fixed_Size_Arena * const arena = pool->last_Arena;
         if (arena
         &&  arena->used == arena->total_objects)
