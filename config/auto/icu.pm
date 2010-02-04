@@ -322,6 +322,11 @@ sub _handle_icushared {
             $without = 1;
         }
     }
+
+    # on MacOS X there's sometimes an errornous \c at the end of the
+    # output line. Remove it.
+    $icushared =~ s/\s\\c$//;
+
     return ($icushared, $without);
 }
 
