@@ -45,12 +45,14 @@ segments from the input PBC files.
 
 /* This struct describes an input file. */
 typedef struct pbc_merge_input {
-    const char *filename;      /* Filename of the input file. */
-    PackFile *pf;  /* The loaded packfile. */
-    opcode_t code_start;    /* Where the bytecode is located in the merged
-                               packfile. */
-    opcode_t const_start;   /* Where the const table is located within the
-                               merged table. */
+    const char *filename;   /* name of the input file */
+    PackFile   *pf;         /* loaded packfile struct */
+    opcode_t    code_start; /* where the bytecode is located in the merged
+                               packfile */
+    opcode_t    const_start;/* where the const table is located within the
+                               merged table */
+    opcode_t   *const_map;  /* map constants from input files to their location
+                               in the output file */
 } pbc_merge_input;
 
 /* HEADERIZER HFILE: none */
@@ -89,8 +91,7 @@ static PackFile_ConstTable* pbc_merge_constants(PARROT_INTERP,
     ARGMOD(pbc_merge_input **inputs),
     int num_inputs,
     ARGMOD(PackFile *pf),
-    ARGMOD(PackFile_ByteCode *bc),
-    ARGIN(opcode_t *const_map))
+    ARGMOD(PackFile_ByteCode *bc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
@@ -369,9 +370,7 @@ pbc_merge_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 /*
 
 =item C<static PackFile_ConstTable* pbc_merge_constants(PARROT_INTERP,
-pbc_merge_input **inputs, int num_inputs, PackFile *pf, PackFile_ByteCode *bc,
-opcode_t *const_map)>
-
+pbc_merge_input **inputs, int num_inputs, PackFile *pf, PackFile_ByteCode *bc)>
 
 This function merges the constants tables from the input PBC files.
 
@@ -384,12 +383,14 @@ PARROT_CANNOT_RETURN_NULL
 static PackFile_ConstTable*
 pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                     int num_inputs, ARGMOD(PackFile *pf),
-                    ARGMOD(PackFile_ByteCode *bc), ARGIN(opcode_t *const_map))
+                    ARGMOD(PackFile_ByteCode *bc))
 {
     ASSERT_ARGS(pbc_merge_constants)
     int i, j;
     PackFile_Constant   **constants = mem_allocate_typed(PackFile_Constant *);
     opcode_t cursor = 0;
+    opcode_t output_const_num = 0;
+    opcode_t input_const_num  = 0;
 
     /* Add a constant table segment. */
     PackFile_ConstTable * const const_seg = (PackFile_ConstTable*)PackFile_Segment_new_seg(
@@ -402,6 +403,7 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 
     /* Loop over input files. */
     for (i = 0; i < num_inputs; i++) {
+
         /* Get the constant table segment from the input file. */
         PackFile_ConstTable * const in_seg = inputs[i]->pf->cur_cs->const_table;
         if (in_seg == NULL) {
@@ -413,6 +415,7 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 
         /* Store cursor as position where constant table starts. */
         inputs[i]->const_start = cursor;
+        input_const_num = 0;
 
         /* Allocate space for the constant list, provided we have some. */
         if (in_seg->const_count > 0) {
@@ -453,6 +456,10 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                     break;
                 }
             }
+
+            inputs[i]->const_map[input_const_num] = output_const_num;
+            input_const_num++;
+            output_const_num++;
 
             /* Slot it into the list. */
             constants[cursor] = copy;
@@ -612,7 +619,7 @@ pbc_merge_debugs(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
             PackFile_DebugFilenameMapping *mapping = mem_allocate_typed(
                 PackFile_DebugFilenameMapping);
             STRUCT_COPY(mapping, in_seg->mappings[j]);
-            mapping->offset += num_lines;
+            mapping->offset   += num_lines;
             mapping->filename += inputs[i]->const_start;
             mappings[num_mappings + j] = mapping;
         }
@@ -680,7 +687,7 @@ pbc_merge_ctpointers(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
               case PARROT_ARG_PC:
               case PARROT_ARG_SC:
               case PARROT_ARG_KC:
-                ops[cur_op] += inputs[cur_input]->const_start;
+                ops[cur_op] = inputs[cur_input]->const_map[ ops[cur_op] ];
                 break;
               default:
                 break;
@@ -706,7 +713,7 @@ pbc_merge_ctpointers(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                   case PARROT_ARG_PC:
                   case PARROT_ARG_SC:
                   case PARROT_ARG_KC:
-                    ops[cur_op] += inputs[cur_input]->const_start;
+                    ops[cur_op] = inputs[cur_input]->const_map[ ops[cur_op] ];
                     break;
                   default:
                     break;
@@ -736,7 +743,6 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
     ASSERT_ARGS(pbc_merge_begin)
     PackFile_ByteCode   *bc;
     PackFile_ConstTable *ct;
-    opcode_t            *const_map;
     opcode_t             const_count = 0;
     int                  i;
 
@@ -754,15 +760,15 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
         for (j = 0; j < pf_dir->num_segments; j++) {
             PackFile_Segment *seg = (PackFile_Segment *)pf_dir->segments[j];
             if (seg->type == PF_CONST_SEG) {
-                const_count += ((PackFile_ConstTable *)seg)->const_count;
+                opcode_t const_count = ((PackFile_ConstTable *)seg)->const_count;
+                inputs[i]->const_map   = mem_allocate_n_typed(const_count, opcode_t);
             }
         }
     }
-    const_map = mem_allocate_n_typed(const_count, opcode_t);
 
     /* Merge the various stuff. */
     bc = pbc_merge_bytecode(interp, inputs, num_inputs, merged);
-    ct = pbc_merge_constants(interp, inputs, num_inputs, merged, bc, const_map);
+    ct = pbc_merge_constants(interp, inputs, num_inputs, merged, bc);
     UNUSED(ct);
 
     pbc_merge_fixups(interp, inputs, num_inputs, merged, bc);
@@ -770,7 +776,10 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
 
     /* Walk bytecode and fix ops that reference the constants table. */
     pbc_merge_ctpointers(interp, inputs, num_inputs, bc);
-    mem_sys_free(const_map);
+
+    for (i = 0; i < num_inputs; i++) {
+        mem_sys_free(inputs[i]->const_map);
+    }
 
     /* Return merged result. */
     return merged;
