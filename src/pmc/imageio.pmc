@@ -14,11 +14,6 @@ Freezes and thaws other PMCs.
 
 #define GROW_TO_16_BYTE_BOUNDARY(size) ((size) + ((size) % 16 ? 16 - (size) % 16 : 0))
 
-/* when thawing a string longer then this size, we first do a GC run and then
- * block GC - the system can't give us more headers */
-
-#define THAW_BLOCK_GC_SIZE 100000
-
 /* preallocate freeze image for aggregates with this estimation */
 #define FREEZE_BYTES_PER_ITEM 9
 
