@@ -187,7 +187,6 @@ sub runstep {
         libparrot_soname => '',
 
         perl      => $^X,
-        perl_inc  => $self->find_perl_headers(),
         test_prog => 'parrot',
 
         # some utilities in Makefile
@@ -271,11 +270,6 @@ sub runstep {
     _set_default_tests($conf);
 
     return 1;
-}
-
-sub find_perl_headers {
-    my $self = shift;
-    return File::Spec->catdir( $Config::Config{archlib}, 'CORE' );
 }
 
 sub _64_bit_adjustments {
