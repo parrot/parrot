@@ -321,11 +321,12 @@ sub _handle_icushared {
         if (length $icushared == 0) {
             $without = 1;
         }
+        else {
+            # on MacOS X there's sometimes an errornous \c at the end of the
+            # output line. Remove it.
+            $icushared =~ s/\s\\c$//;
+        }
     }
-
-    # on MacOS X there's sometimes an errornous \c at the end of the
-    # output line. Remove it.
-    $icushared =~ s/\s\\c$//;
 
     return ($icushared, $without);
 }
