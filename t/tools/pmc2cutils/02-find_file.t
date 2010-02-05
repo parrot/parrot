@@ -37,7 +37,7 @@ $self    = Parrot::Pmc2c::Pmc2cMain->new(
 );
 
 my ( $file, $path );
-$file = q{array.pmc};
+$file = q{resizablepmcarray.pmc};
 
 $path = $self->find_file($file);
 ok( -f $path, "$file found" );
