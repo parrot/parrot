@@ -85,7 +85,6 @@ Transfers control to the calling context and frees the current context.
         /* recycle this PMC and make sure it doesn't get marked */
         if (!PMC_IS_NULL(from_ctx))
             Parrot_pcc_set_continuation(interp, from_ctx, NULL);
-        Parrot_gc_free_pmc_header(interp, SELF);
 
         if (INTERP->code != seg)
             Parrot_switch_to_cs(INTERP, seg, 1);
