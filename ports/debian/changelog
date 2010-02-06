@@ -1,3 +1,8 @@
+parrot (2.0.0-1) unstable; urgency=low
+  * New upstream release
+
+ -- Allison Randal <allison@parrot.org>  Sat, 06 Feb 2010 19:51:01 +0000
+
 parrot (1.4.0-1) unstable; urgency=low
   * New upstream release
   * debian/rules:
