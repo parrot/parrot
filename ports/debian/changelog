@@ -21,6 +21,9 @@ parrot (2.0.0-1) unstable; urgency=low
     - Generate and install manpage for parrot-nqp binary.
   * debian/README.source:
     - Added for use of quilt patch system.
+  * debian/copyright:
+    - Updated year.
+    - Added copyright notice for external nqp files in ext/.
 
  -- Allison Randal <allison@parrot.org>  Sun, 07 Feb 2010 05:22:29 +0000
 
