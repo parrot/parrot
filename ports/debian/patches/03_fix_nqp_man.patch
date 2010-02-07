@@ -1,0 +1,45 @@
+--- parrot-2.0.0.orig/ext/nqp-rx/parrot-nqp.pod
++++ parrot-2.0.0/ext/nqp-rx/parrot-nqp.pod
+@@ -0,0 +1,42 @@
++# Copyright (C) 2010, The Perl Foundation.
++# $Id: running.pod 42150 2009-10-28 01:24:50Z coke $
++
++=head1 NAME
++
++parrot-nqp - A Not Quite Perl compiler for Parrot
++
++=head1 DESCRIPTION
++
++"Not Quite Perl" (NQP) is a compiler for quickly generating PIR
++routines from Perl6-like code. The key feature of NQP is that it's
++designed to be a very small compiler and is focused on being a
++high-level way to create transformers for Parrot (especially hll
++compilers).
++
++=head1 SYNOPSIS
++
++ parrot-nqp [-options] <file>
++
++=head1 OPTIONS
++
++=over 4
++
++=item --encoding
++
++Specify the encoding of the input file.
++
++=item -h, --help
++
++Print a summary of command-line options.
++
++=item -o outputfile, --output=outputfile
++
++Specify a filename for the resulting compiled code.
++
++=item -v, --version
++
++Display the version of Parrot used to build the compiler.
++
++=back
++
++=cut
