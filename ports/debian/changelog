@@ -1,5 +1,12 @@
 parrot (2.0.0-1) unstable; urgency=low
   * New upstream release
+  * parrot-devel.install.in
+    - Install parrot-nqp binary and supporting library.
+  * debian/rules:
+    - Changed install target from 'install-dev' to 'install', they are
+      now identical.
+    - Added LD_LIBRARY_PATH to 'install' target, needed for the new parrot-nqp
+      binary.
 
  -- Allison Randal <allison@parrot.org>  Sat, 06 Feb 2010 19:51:01 +0000
 

@@ -4,6 +4,7 @@ usr/bin/pbc_dump
 usr/bin/pbc_merge
 usr/bin/pbc_to_exe
 usr/bin/parrot_config
+usr/bin/parrot-nqp
 usr/lib/parrot/@VERSION@/tools/*
 usr/lib/parrot/@VERSION@/languages/nqp/*
 usr/lib/parrot/@VERSION@/languages/pct/*
