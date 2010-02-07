@@ -22,10 +22,10 @@ parrot (2.0.0-1) unstable; urgency=low
   * debian/README.source:
     - Added for use of quilt patch system.
   * debian/copyright:
-    - Updated year.
+    - Updated copyright year.
     - Added copyright notice for external nqp files in ext/.
 
- -- Allison Randal <allison@parrot.org>  Sun, 07 Feb 2010 05:22:29 +0000
+ -- Allison Randal <allison@parrot.org>  Sun, 07 Feb 2010 14:26:29 +0000
 
 parrot (1.4.0-1) unstable; urgency=low
   * New upstream release
