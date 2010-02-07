@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-parrot_debugger
+parrot_debugger - The Parrot Debugger
 
 =head1 DESCRIPTION
 
