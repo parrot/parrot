@@ -1,5 +1,7 @@
 #!/usr/bin/make -f
 
+include /usr/share/quilt/quilt.make
+
 CFLAGS = -Wall -g
 VERSION = $(shell cat VERSION)
 SOVERSION = $(VERSION)
@@ -29,7 +31,7 @@ debian-control-stamp: $(CONTROL_FILES) VERSION
 	touch $@
 
 configure: configure-stamp
-configure-stamp: debian-control-stamp
+configure-stamp: debian-control-stamp $(QUILT_STAMPFN)
 	dh_testdir
 	perl Configure.pl --prefix=/usr --disable-rpath
 	touch configure-stamp
@@ -48,7 +50,7 @@ build-stamp: configure-stamp
 	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" tools/dev/pbc_to_exe.pir debian/pbc_to_exe.1
 	touch build-stamp
 
-clean: debian-control-stamp
+clean: debian-control-stamp unpatch
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp configure-stamp debian-control-stamp debian/parrot.1 debian/parrot_config.1 debian/pbc_dump.1 debian/pbc_disassemble.1 debian/parrot-debugger.1 debian/pbc_merge.1 debian/libparrot$(SOVERSION).install src/main.o installable_pbc_to_exe ext/Parrot-Embed/Makefile.PL test.c test.ldo
