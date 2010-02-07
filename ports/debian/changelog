@@ -6,6 +6,7 @@ parrot (2.0.0-1) unstable; urgency=low
     - Added 01_fix_doc_install.patch, from upstream, missing DESTDIR
       flag to new 'install-doc' target needed for package build.
   * debian/control.in:
+    - Bumped Standards-Version to 3.8.4.
     - Added quilt as Build-Depends for patch.
   * debian/rules:
     - Changed install target from 'install-dev' to 'install', they are
