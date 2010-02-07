@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-pbc_to_exe
+pbc_to_exe - Generate executables from Parrot bytecode
 
 =head1 DESCRIPTION
 
