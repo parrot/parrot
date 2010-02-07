@@ -5,19 +5,24 @@ parrot (2.0.0-1) unstable; urgency=low
   * debian/patches:
     - Added 01_fix_doc_install.patch, from upstream, missing DESTDIR
       flag to new 'install-doc' target needed for package build.
+    - Added 02_fix_man_whatis.patch, from upstream, resolve parsing
+      errors in pbc_to_exe and parrot_debugger manpages.
+    - Added 03_fix_nqp_man.patch, added manpage for new parrot-nqp
+      binary.
   * debian/control.in:
     - Bumped Standards-Version to 3.8.4.
-    - Added quilt as Build-Depends for patch.
+    - Added quilt as Build-Depends for patches.
   * debian/rules:
     - Changed install target from 'install-dev' to 'install', they are
       now identical.
     - Added LD_LIBRARY_PATH to 'install' target, needed for the new parrot-nqp
       binary.
-    - Added quilt support for patch.
+    - Added quilt support for patches.
+    - Generate and install manpage for parrot-nqp binary.
   * debian/README.source:
     - Added for use of quilt patch system.
 
- -- Allison Randal <allison@parrot.org>  Sat, 06 Feb 2010 19:51:01 +0000
+ -- Allison Randal <allison@parrot.org>  Sun, 07 Feb 2010 05:22:29 +0000
 
 parrot (1.4.0-1) unstable; urgency=low
   * New upstream release
