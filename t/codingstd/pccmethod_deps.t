@@ -33,7 +33,7 @@ sub contains_pccmethod {
 
     local $_;
     while (<$fh>) {
-        next unless /PCCMETHOD/;
+        next unless /METHOD/;
         return 1;
     }
 

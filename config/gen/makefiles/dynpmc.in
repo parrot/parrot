@@ -30,6 +30,7 @@ PMC2CC = $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --c
 PMC_TARGETS = \
   dynlexpad$(LOAD_EXT) \
   foo_group$(LOAD_EXT) \
+  pccmethod_test$(LOAD_EXT) \
   rotest$(LOAD_EXT) \
 #IF(has_gdbm):  gdbmhash$(LOAD_EXT) \
   rational$(LOAD_EXT) \
@@ -137,6 +138,19 @@ foo2.c: foo2.dump foo.pmc
 
 foo2.dump: foo2.pmc foo.dump
 	$(PMC2CD) foo2.pmc
+
+pccmethod_test$(LOAD_EXT): pccmethod_test$(O)
+	$(LD) @ld_out@pccmethod_test$(LOAD_EXT) pccmethod_test$(O) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+
+pccmethod_test$(O): pccmethod_test.c
+	$(CC) -c @cc_o_out@pccmethod_test$(O) $(INCLUDES) $(CFLAGS) pccmethod_test.c
+
+pccmethod_test.c: pccmethod_test.dump
+	$(PMC2CC) pccmethod_test.pmc
+
+pccmethod_test.dump: pccmethod_test.pmc
+	$(PMC2CD) pccmethod_test.pmc
 
 rotest$(LOAD_EXT): rotest$(O)
 	$(LD) @ld_out@rotest$(LOAD_EXT) rotest$(O) $(LINKARGS)

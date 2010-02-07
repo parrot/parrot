@@ -14,7 +14,7 @@ METHOD_Test PMC
 
 */
 
-pmclass PCCMETHOD_Test provides hash {
+pmclass PCCMETHOD_Test dynpmc provides hash {
 
 
     METHOD test_method()
