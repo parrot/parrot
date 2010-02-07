@@ -2353,6 +2353,7 @@ install-doc:
     --buildprefix=$(BUILDPREFIX) \
     --prefix=$(PREFIX) \
     --docdir=$(DOC_DIR) \
+    --destdir=$(DESTDIR) \
     --versiondir=$(VERSION_DIR) \
     MANIFEST MANIFEST.generated
 
