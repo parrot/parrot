@@ -3,7 +3,7 @@
 
 =head1 Ubuntu Packaging Guide
 
-This is a quick set of instructions for packaging Parrot for Ubuntu. See the he
+This is a quick set of instructions for packaging Parrot for Ubuntu. See the
 Ubuntu Packaging Guide (https://wiki.ubuntu.com/PackagingGuide) and the guide
 to the Person Package Archive (PPA) (https://help.launchpad.net/Packaging/PPA)
 for more details.
@@ -13,7 +13,7 @@ L<https://trac.parrot.org/parrot/wiki/ChrootSetup>, and also assumes that
 you've already built the corresponding Debian package for the release as
 documented in L<docs/project/debian_packaging_guide.pod>.
 
-To package Parrot for Debian:
+To package Parrot for Ubuntu:
 
 =over 4
 
