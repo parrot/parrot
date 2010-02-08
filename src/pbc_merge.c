@@ -661,6 +661,7 @@ pbc_merge_ctpointers(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
               case PARROT_ARG_NC:
               case PARROT_ARG_PC:
               case PARROT_ARG_SC:
+              case PARROT_ARG_NAME_SC:
               case PARROT_ARG_KC:
                 ops[cur_op] = inputs[cur_input]->const_map[ ops[cur_op] ];
                 break;
@@ -687,6 +688,7 @@ pbc_merge_ctpointers(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                   case PARROT_ARG_NC:
                   case PARROT_ARG_PC:
                   case PARROT_ARG_SC:
+                  case PARROT_ARG_NAME_SC:
                   case PARROT_ARG_KC:
                     ops[cur_op] = inputs[cur_input]->const_map[ ops[cur_op] ];
                     break;

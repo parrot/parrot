@@ -30,7 +30,7 @@ my $PBC_MERGE = ".$PConfig{slash}pbc_merge$PConfig{exe}";
 
 # Only test if we have the PBC merge tool built.
 if ( -e $PBC_MERGE ) {
-    plan tests => 4;
+    plan tests => 5;
 }
 else {
     plan skip_all => "PBC Merge tool not built or test disabled";
@@ -156,6 +156,37 @@ PIR
     is( run_pbc("pbc_merge_t4"), "spray" );
 }
 
+# Fifth test - passing constant-string-named arguments
+{
+    pir_to_pbc( "pbc_merge_t5_1", <<'PIR' );
+.sub main :main
+    t5_other_sub()
+.end
+
+.sub t5_say_arg
+    .param pmc args :named :slurpy
+
+    $S0 = args['t5_named_arg']
+    if null $S0 goto no_arg
+    print $S0
+    goto end
+
+no_arg:
+    print "got no named arg"
+
+end:
+.end
+PIR
+
+    pir_to_pbc( "pbc_merge_t5_2", <<'PIR' );
+.sub t5_other_sub
+    t5_say_arg('success' :named("t5_named_arg"))
+.end
+PIR
+
+    pbc_merge( "pbc_merge_t5", "pbc_merge_t5_1", "pbc_merge_t5_2" );
+    is( run_pbc( "pbc_merge_t5" ), "success");
+}
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
