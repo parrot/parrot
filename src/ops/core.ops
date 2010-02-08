@@ -467,14 +467,6 @@ inline op tailcall(invar PMC) :flow {
 
     Parrot_pcc_merge_signature_for_tailcall(interp, parent_call_sig, this_call_sig);
 
-    /* Detach continuation from current CallContext to avoid marking dead object. */
-    /* RetContinuation will kill itself after invoke */
-    if (interp->current_cont->vtable->base_type == enum_class_RetContinuation
-        && Parrot_pcc_do_run_ops(interp, p)) {
-        PMC_cont(interp->current_cont)->from_ctx = parent_ctx;
-        Parrot_pcc_set_continuation(interp, ctx, PMCNULL);
-    }
-
     SUB_FLAG_TAILCALL_SET(interp->current_cont);
     dest = VTABLE_invoke(interp, p, dest);
     goto ADDRESS(dest);
