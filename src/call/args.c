@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -567,7 +567,7 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
 {
     ASSERT_ARGS(Parrot_pcc_build_sig_object_from_op)
     PMC            *call_object;
-    PMC            *ctx        = CURRENT_CONTEXT(interp);
+    PMC            * const ctx = CURRENT_CONTEXT(interp);
     INTVAL         *int_array;
     INTVAL          arg_count;
     INTVAL          arg_index;
@@ -583,8 +583,7 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
     GETATTR_FixedIntegerArray_int_array(interp, raw_sig, int_array);
 
     for (arg_index = 0; arg_index < arg_count; arg_index++) {
-        INTVAL arg_flags = int_array[arg_index];
-
+        const INTVAL arg_flags = int_array[arg_index];
         const INTVAL constant  = PARROT_ARG_CONSTANT_ISSET(arg_flags);
         const INTVAL raw_index = raw_args[arg_index + 2];
 
@@ -676,10 +675,8 @@ extract_named_arg_from_op(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(STRING 
         INTVAL arg_index)
 {
     ASSERT_ARGS(extract_named_arg_from_op)
-    PMC   *ctx       = CURRENT_CONTEXT(interp);
-    INTVAL arg_flags = VTABLE_get_integer_keyed_int(interp,
-                    raw_sig, arg_index);
-
+    PMC   * const ctx = CURRENT_CONTEXT(interp);
+    const INTVAL arg_flags = VTABLE_get_integer_keyed_int(interp, raw_sig, arg_index);
     const INTVAL constant  = PARROT_ARG_CONSTANT_ISSET(arg_flags);
     const INTVAL raw_index = raw_args[arg_index + 2];
 
@@ -742,7 +739,7 @@ dissect_aggregate_arg(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(PMC *aggreg
 {
     ASSERT_ARGS(dissect_aggregate_arg)
     if (VTABLE_does(interp, aggregate, CONST_STRING(interp, "array"))) {
-        INTVAL elements = VTABLE_elements(interp, aggregate);
+        const INTVAL elements = VTABLE_elements(interp, aggregate);
         INTVAL index;
         for (index = 0; index < elements; index++) {
             VTABLE_push_pmc(interp, call_object,
@@ -750,16 +747,16 @@ dissect_aggregate_arg(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(PMC *aggreg
         }
     }
     else if (VTABLE_does(interp, aggregate, CONST_STRING(interp, "hash"))) {
-        INTVAL elements = VTABLE_elements(interp, aggregate);
+        const INTVAL elements = VTABLE_elements(interp, aggregate);
         INTVAL index;
-        PMC *key = pmc_new(interp, enum_class_Key);
+        PMC * const key = pmc_new(interp, enum_class_Key);
         VTABLE_set_integer_native(interp, key, 0);
         SETATTR_Key_next_key(interp, key, (PMC *)INITBucketIndex);
 
         /* Low-level hash iteration. */
         for (index = 0; index < elements; index++) {
             if (!PMC_IS_NULL(key)) {
-                STRING *name = (STRING *)parrot_hash_get_idx(interp,
+                STRING * const name = (STRING *)parrot_hash_get_idx(interp,
                                 (Hash *)VTABLE_get_pointer(interp, aggregate), key);
                 PARROT_ASSERT(name);
                 VTABLE_set_pmc_keyed_str(interp, call_object, name,
@@ -796,7 +793,7 @@ Parrot_pcc_build_sig_object_returns_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *sig
     ASSERT_ARGS(Parrot_pcc_build_sig_object_returns_from_op)
     PMC            *call_object;
     INTVAL         *int_array;
-    PMC            *ctx         = CURRENT_CONTEXT(interp);
+    PMC            * const ctx  = CURRENT_CONTEXT(interp);
     INTVAL          returns_pos = 0;
     INTVAL          arg_index;
     INTVAL          arg_count;
@@ -945,7 +942,7 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
                 break;
               case 'P':
                 {
-                    INTVAL type_lookahead = sig[i+1];
+                    const INTVAL type_lookahead = sig[i+1];
                     PMC * const pmc_arg = va_arg(args, PMC *);
                     if (type_lookahead == 'f') {
                          dissect_aggregate_arg(interp, call_object, pmc_arg);
@@ -1005,7 +1002,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
     ASSERT_ARGS(fill_params)
     PMC    *named_used_list = PMCNULL;
     INTVAL *raw_params;
-    INTVAL  param_count     = VTABLE_elements(interp, raw_sig);
+    const INTVAL param_count = VTABLE_elements(interp, raw_sig);
     INTVAL  param_index     = 0;
     INTVAL  arg_index       = 0;
     INTVAL  named_count     = 0;
@@ -1159,10 +1156,8 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
             /* Mark the option flag for the filled parameter. */
             if (param_flags & PARROT_ARG_OPTIONAL) {
-                INTVAL next_param_flags;
-
                 if (param_index + 1 < param_count) {
-                    next_param_flags = raw_params[param_index + 1];
+                    const int next_param_flags = raw_params[param_index + 1];
 
                     if (next_param_flags & PARROT_ARG_OPT_FLAG) {
                         param_index++;
@@ -1174,8 +1169,6 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         /* We have no more positional arguments, fill the optional parameter
          * with a default value. */
         else if (param_flags & PARROT_ARG_OPTIONAL) {
-            INTVAL next_param_flags;
-
             /* We don't handle optional named params here, handle them in the
              * next loop. */
             if (param_flags & PARROT_ARG_NAME)
@@ -1187,7 +1180,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
             /* Mark the option flag for the parameter to FALSE, it was filled
              * with a default value. */
             if (param_index + 1 < param_count) {
-                next_param_flags = raw_params[param_index + 1];
+                const INTVAL next_param_flags = raw_params[param_index + 1];
 
                 if (next_param_flags & PARROT_ARG_OPT_FLAG) {
                     param_index++;
@@ -1251,14 +1244,14 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         if (param_flags & PARROT_ARG_SLURPY_ARRAY) {
             PMC * const collect_named = pmc_new(interp,
                     Parrot_get_ctx_HLL_type(interp, enum_class_Hash));
-            PMC *named_arg_list = VTABLE_get_attr_str(interp, call_object, CONST_STRING(interp, "named"));
+            PMC * const named_arg_list = VTABLE_get_attr_str(interp, call_object, CONST_STRING(interp, "named"));
             if (!PMC_IS_NULL(named_arg_list)) {
                 INTVAL named_arg_count = VTABLE_elements(interp, named_arg_list);
                 INTVAL named_arg_index;
 
                 /* Named argument iteration. */
                 for (named_arg_index = 0; named_arg_index < named_arg_count; named_arg_index++) {
-                    STRING *name = VTABLE_get_string_keyed_int(interp,
+                    STRING * const name = VTABLE_get_string_keyed_int(interp,
                             named_arg_list, named_arg_index);
 
                     if ((PMC_IS_NULL(named_used_list)) ||
@@ -1328,10 +1321,8 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
                 /* Mark the option flag for the filled parameter. */
                 if (param_flags & PARROT_ARG_OPTIONAL) {
-                    INTVAL next_param_flags;
-
                     if (param_index + 1 < param_count) {
-                        next_param_flags = raw_params[param_index + 1];
+                        const INTVAL next_param_flags = raw_params[param_index + 1];
 
                         if (next_param_flags & PARROT_ARG_OPT_FLAG) {
                             param_index++;
@@ -1341,15 +1332,13 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                 }
             }
             else if (param_flags & PARROT_ARG_OPTIONAL) {
-                INTVAL next_param_flags;
-
                 assign_default_param_value(interp, param_index, param_flags,
                         arg_info, accessor);
 
                 /* Mark the option flag for the parameter to FALSE, it was filled
                  * with a default value. */
                 if (param_index + 1 < param_count) {
-                    next_param_flags = raw_params[param_index + 1];
+                    const INTVAL next_param_flags = raw_params[param_index + 1];
 
                     if (next_param_flags & PARROT_ARG_OPT_FLAG) {
                         param_index++;
@@ -1381,7 +1370,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
         named_arg_list = VTABLE_get_attr_str(interp, call_object, CONST_STRING(interp, "named"));
         if (!PMC_IS_NULL(named_arg_list)) {
-            INTVAL named_arg_count = VTABLE_elements(interp, named_arg_list);
+            const INTVAL named_arg_count = VTABLE_elements(interp, named_arg_list);
             if (PMC_IS_NULL(named_used_list))
                 return;
                 /* The 'return' above is a temporary hack to duplicate an old bug,
@@ -1596,7 +1585,7 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
     INTVAL *return_array;
     INTVAL *result_array;
     PMC    *result_sig         = NULL;
-    PMC    *ctx                = CURRENT_CONTEXT(interp);
+    PMC    * const ctx         = CURRENT_CONTEXT(interp);
     PMC    *named_used_list    = PMCNULL;
     PMC    *named_return_list  = PMCNULL;
     INTVAL  return_index       = 0;
@@ -1641,7 +1630,7 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
     /* the call obj doesn't have the returns as positionals.
      * instead count number of returns before first named return */
     for (i = 0; i < return_count; i++) {
-        INTVAL flags = return_array[i];
+        const INTVAL flags = return_array[i];
         if (flags & PARROT_ARG_NAME)
             break;
 
@@ -1857,10 +1846,8 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
             /* Mark the option flag for the filled result. */
             if (result_flags & PARROT_ARG_OPTIONAL) {
-                INTVAL next_result_flags;
-
                 if (result_index + 1 < result_count) {
-                    next_result_flags = result_array[result_index + 1];
+                    const INTVAL next_result_flags = result_array[result_index + 1];
                     if (next_result_flags & PARROT_ARG_OPT_FLAG) {
                         result_index++;
                         csr_fill_integer(interp, call_object, result_index, 1);
@@ -1871,8 +1858,6 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         /* We have no more positional returns, fill the optional result
          * with a default value. */
         else if (result_flags & PARROT_ARG_OPTIONAL) {
-            INTVAL next_result_flags;
-
             /* We don't handle optional named results here, handle them in the
              * next loop. */
             if (result_flags & PARROT_ARG_NAME)
@@ -1883,7 +1868,7 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
             /* Mark the option flag for the result to FALSE, it was filled
              * with a default value. */
             if (result_index + 1 < result_count) {
-                next_result_flags = result_array[result_index + 1];
+                const INTVAL next_result_flags = result_array[result_index + 1];
                 if (next_result_flags & PARROT_ARG_OPT_FLAG) {
                     result_index++;
                     csr_fill_integer(interp, call_object, result_index, 0);
@@ -1964,7 +1949,7 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
             break;
           case PARROT_ARG_PMC:
             if (0) {
-                PMC *return_item = (constant)
+                PMC * const return_item = (constant)
                                  ? accessor->pmc_constant(interp, return_info, return_index)
                                  : accessor->pmc(interp, return_info, return_index);
                 if (return_flags & PARROT_ARG_FLATTEN) {
@@ -2053,10 +2038,8 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
                 /* Mark the option flag for the filled result. */
                 if (result_flags & PARROT_ARG_OPTIONAL) {
-                    INTVAL next_result_flags;
-
                     if (result_index + 1 < result_count) {
-                        next_result_flags = return_array[result_index + 1];
+                        const INTVAL next_result_flags = return_array[result_index + 1];
                         if (next_result_flags & PARROT_ARG_OPT_FLAG) {
                             result_index++;
                             csr_fill_integer(interp, call_object, result_index, 1);
@@ -2065,14 +2048,12 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                 }
             }
             else if (result_flags & PARROT_ARG_OPTIONAL) {
-                INTVAL next_result_flags;
-
                 assign_default_result_value(interp, call_object, result_index, result_flags);
 
                 /* Mark the option flag for the result to FALSE, it was filled
                  * with a default value. */
                 if (result_index + 1 < result_count) {
-                    next_result_flags = result_array[result_index + 1];
+                    const INTVAL next_result_flags = result_array[result_index + 1];
                     if (next_result_flags & PARROT_ARG_OPT_FLAG) {
                         result_index++;
                         csr_fill_integer(interp, call_object, result_index, 1);
@@ -2095,7 +2076,7 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
     /* Double check that all named returns were assigned to results. */
     if (err_check) {
         if (!PMC_IS_NULL(named_return_list)) {
-            INTVAL named_return_count = VTABLE_elements(interp, named_return_list);
+            const INTVAL named_return_count = VTABLE_elements(interp, named_return_list);
             if (named_return_count > 0)
                     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                             "too many named returns: %d passed, %d used",
@@ -2123,7 +2104,7 @@ Parrot_pcc_fill_returns_from_op(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         ARGIN(PMC *raw_sig), ARGIN(opcode_t *raw_returns))
 {
     ASSERT_ARGS(Parrot_pcc_fill_returns_from_op)
-    INTVAL raw_return_count     = VTABLE_elements(interp, raw_sig);
+    const INTVAL raw_return_count = VTABLE_elements(interp, raw_sig);
     INTVAL err_check      = 0;
     static pcc_get_funcs function_pointers = {
         (intval_func_t)intval_arg_from_op,
@@ -2176,7 +2157,7 @@ Parrot_pcc_fill_returns_from_continuation(PARROT_INTERP, ARGMOD_NULLOK(PMC *call
         ARGIN(PMC *raw_sig), ARGIN(PMC *from_call_obj))
 {
     ASSERT_ARGS(Parrot_pcc_fill_returns_from_continuation)
-    INTVAL raw_return_count     = VTABLE_elements(interp, raw_sig);
+    const INTVAL raw_return_count = VTABLE_elements(interp, raw_sig);
     INTVAL err_check      = 0;
     static pcc_get_funcs function_pointers = {
         (intval_func_t)intval_arg_from_continuation,
@@ -2393,7 +2374,7 @@ Parrot_pcc_parse_signature_string(PARROT_INTERP, ARGIN(STRING *signature),
         ARGMOD(PMC **arg_flags), ARGMOD(PMC **return_flags))
 {
     ASSERT_ARGS(Parrot_pcc_parse_signature_string)
-    char *s        = Parrot_str_to_cstring(interp, signature);
+    char * const s = Parrot_str_to_cstring(interp, signature);
     *arg_flags    = PMCNULL;
     *return_flags = PMCNULL;
     parse_signature_string(interp, s, arg_flags, return_flags);
@@ -2571,7 +2552,7 @@ static STRING*
 string_arg_from_continuation(PARROT_INTERP, ARGIN(PMC *cs), INTVAL arg_index)
 {
     ASSERT_ARGS(string_arg_from_continuation)
-    STRING *ret      = VTABLE_get_string_keyed_int(interp, cs, arg_index);
+    STRING * const ret = VTABLE_get_string_keyed_int(interp, cs, arg_index);
     return ret;
 }
 
@@ -2580,7 +2561,7 @@ static PMC*
 pmc_arg_from_continuation(PARROT_INTERP, ARGIN(PMC *cs), INTVAL arg_index)
 {
     ASSERT_ARGS(pmc_arg_from_continuation)
-    PMC *ret      = VTABLE_get_pmc_keyed_int(interp, cs, arg_index);
+    PMC * const ret = VTABLE_get_pmc_keyed_int(interp, cs, arg_index);
     return ret;
 }
 
@@ -2873,12 +2854,12 @@ csr_reallocate_return_values(PARROT_INTERP, ARGIN(PMC *self), INTVAL size)
         SETATTR_CallContext_returns_size(interp, self, size);
     }
     else {
-        void   *old_values;
         INTVAL  cur = resize_threshold;
 
         /* Switch to system allocator */
         if (cur == 8) {
-            old_values = values;
+            void * const old_values = values;
+
             values     = mem_allocate_n_typed(8, void *);
             memcpy(values, old_values, 8 * sizeof (void *));
             Parrot_gc_free_fixed_size_storage(interp,
@@ -2888,7 +2869,7 @@ csr_reallocate_return_values(PARROT_INTERP, ARGIN(PMC *self), INTVAL size)
         if (cur < 8192)
             cur = size < 2 * cur ? 2 * cur : size;
         else {
-            INTVAL needed = size - cur;
+            const INTVAL needed = size - cur;
             cur          += needed + 4096;
             cur          &= ~0xfff;
         }
@@ -2979,8 +2960,8 @@ static void
 csr_fill_integer(PARROT_INTERP, ARGIN(PMC *self), INTVAL key, INTVAL value)
 {
     ASSERT_ARGS(csr_fill_integer)
-    void *cell = csr_get_pointer_keyed_int(interp, self, key);
-    void *ptr  = UNTAG_CELL(cell);
+    void * const cell = csr_get_pointer_keyed_int(interp, self, key);
+    void * const ptr  = UNTAG_CELL(cell);
 
     switch ((Call_bits_enum_t)CELL_TYPE_MASK(cell)) {
       case PARROT_ARG_INTVAL:
@@ -3004,8 +2985,8 @@ static void
 csr_fill_number(PARROT_INTERP, ARGIN(PMC *self), INTVAL key, FLOATVAL value)
 {
     ASSERT_ARGS(csr_fill_number)
-    void *cell = csr_get_pointer_keyed_int(interp, self, key);
-    void *ptr  = UNTAG_CELL(cell);
+    void * const cell = csr_get_pointer_keyed_int(interp, self, key);
+    void * const ptr  = UNTAG_CELL(cell);
 
     switch ((Call_bits_enum_t)CELL_TYPE_MASK(cell)) {
       case PARROT_ARG_INTVAL:
@@ -3029,8 +3010,8 @@ static void
 csr_fill_string(PARROT_INTERP, ARGIN(PMC *self), INTVAL key, ARGIN_NULLOK(STRING *value))
 {
     ASSERT_ARGS(csr_fill_string)
-    void *cell = csr_get_pointer_keyed_int(interp, self, key);
-    void *ptr  = UNTAG_CELL(cell);
+    void * const cell = csr_get_pointer_keyed_int(interp, self, key);
+    void * const ptr  = UNTAG_CELL(cell);
 
     switch ((Call_bits_enum_t)CELL_TYPE_MASK(cell)) {
       case PARROT_ARG_INTVAL:
@@ -3056,8 +3037,8 @@ static void
 csr_fill_pmc(PARROT_INTERP, ARGIN(PMC *self), INTVAL key, ARGIN_NULLOK(PMC *value))
 {
     ASSERT_ARGS(csr_fill_pmc)
-    void *cell = csr_get_pointer_keyed_int(interp, self, key);
-    void *ptr  = UNTAG_CELL(cell);
+    void * const cell = csr_get_pointer_keyed_int(interp, self, key);
+    void * const ptr  = UNTAG_CELL(cell);
 
     switch ((Call_bits_enum_t)CELL_TYPE_MASK(cell)) {
       case PARROT_ARG_INTVAL:
@@ -3093,8 +3074,8 @@ static STRING*
 csr_get_string_keyed_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL key)
 {
     ASSERT_ARGS(csr_get_string_keyed_int)
-    void *cell  = csr_get_pointer_keyed_int(interp, self, key);
-    void *ptr   = UNTAG_CELL(cell);
+    void * const cell  = csr_get_pointer_keyed_int(interp, self, key);
+    void * const ptr   = UNTAG_CELL(cell);
     return (STRING *)ptr;
 }
 
