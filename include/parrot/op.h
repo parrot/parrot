@@ -23,22 +23,22 @@ typedef enum {
 } op_type_t;
 
 typedef enum {
-    PARROT_ARG_IC = PARROT_ARG_INTVAL   | PARROT_ARG_CONSTANT,
-    PARROT_ARG_NC = PARROT_ARG_FLOATVAL | PARROT_ARG_CONSTANT,
-    PARROT_ARG_PC = PARROT_ARG_PMC      | PARROT_ARG_CONSTANT,
-    PARROT_ARG_SC = PARROT_ARG_STRING   | PARROT_ARG_CONSTANT,
-    PARROT_ARG_NAME_SC = PARROT_ARG_NAME | PARROT_ARG_STRING   | PARROT_ARG_CONSTANT,
+    PARROT_ARG_IC      = PARROT_ARG_INTVAL   | PARROT_ARG_CONSTANT,
+    PARROT_ARG_NC      = PARROT_ARG_FLOATVAL | PARROT_ARG_CONSTANT,
+    PARROT_ARG_PC      = PARROT_ARG_PMC      | PARROT_ARG_CONSTANT,
+    PARROT_ARG_SC      = PARROT_ARG_STRING   | PARROT_ARG_CONSTANT,
+    PARROT_ARG_NAME_SC = PARROT_ARG_NAME     | PARROT_ARG_STRING   | PARROT_ARG_CONSTANT,
 
-    PARROT_ARG_KEYED = 0x20,
-    PARROT_ARG_KC = PARROT_ARG_PC       | PARROT_ARG_KEYED,
-    PARROT_ARG_KIC= PARROT_ARG_IC       | PARROT_ARG_KEYED,
+    PARROT_ARG_KEYED   = 0x20,
+    PARROT_ARG_KC      = PARROT_ARG_PC       | PARROT_ARG_KEYED,
+    PARROT_ARG_KIC     = PARROT_ARG_IC       | PARROT_ARG_KEYED,
 
-    PARROT_ARG_I = PARROT_ARG_INTVAL,
-    PARROT_ARG_N = PARROT_ARG_FLOATVAL,
-    PARROT_ARG_P = PARROT_ARG_PMC,
-    PARROT_ARG_S = PARROT_ARG_STRING,
-    PARROT_ARG_K = PARROT_ARG_P         | PARROT_ARG_KEYED,
-    PARROT_ARG_KI= PARROT_ARG_I         | PARROT_ARG_KEYED
+    PARROT_ARG_I       = PARROT_ARG_INTVAL,
+    PARROT_ARG_N       = PARROT_ARG_FLOATVAL,
+    PARROT_ARG_P       = PARROT_ARG_PMC,
+    PARROT_ARG_S       = PARROT_ARG_STRING,
+    PARROT_ARG_K       = PARROT_ARG_P         | PARROT_ARG_KEYED,
+    PARROT_ARG_KI      = PARROT_ARG_I         | PARROT_ARG_KEYED
 } arg_type_t;
 
 typedef enum {
@@ -74,17 +74,15 @@ typedef void **(*op_func_prederef_t)(void **, PARROT_INTERP);
 */
 
 typedef struct op_info_t {
-    /* op_type_t type; unused */
-    const char *name;
-    const char *full_name;
-    const char *func_name;
-    /* const char *body; unused */
-    unsigned short jump;           /* s. above */
-    short op_count;               /* Includes opcode as one arg */
-    char types[PARROT_MAX_ARGS];   /* arg_type_t, 0 = 1st arg */
-    char dirs[PARROT_MAX_ARGS];    /* arg_dir_t   0 = 1st arg */
-    char labels[PARROT_MAX_ARGS];  /* 0/1         0 = 1st arg */
-    unsigned int flags;
+    const char    *name;
+    const char    *full_name;
+    const char    *func_name;
+    unsigned short jump;
+    short          op_count;                /* Includes opcode as one arg */
+    arg_type_t     types[PARROT_MAX_ARGS];  /* arg_type_t, 0 = 1st arg */
+    arg_dir_t      dirs[PARROT_MAX_ARGS];   /* arg_dir_t   0 = 1st arg */
+    char           labels[PARROT_MAX_ARGS]; /* 0/1         0 = 1st arg */
+    unsigned int   flags;
 } op_info_t;
 
 

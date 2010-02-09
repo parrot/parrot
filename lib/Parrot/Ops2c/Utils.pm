@@ -814,13 +814,13 @@ END_C
                 . join( ", ",
                 scalar $op->arg_types
                 ? map { sprintf( "PARROT_ARG_%s", uc $_ ) } $op->arg_types
-                : 0 )
-                . " }";
+                : '(arg_type_t) 0'
+                ) . " }";
             my $arg_dirs = "{ "
                 . join(
                 ", ", scalar $op->arg_dirs
                 ? map { $arg_dir_mapping{$_} } $op->arg_dirs
-                : 0
+                : '(arg_dir_t) 0'  
                 ) . " }";
             my $labels = "{ "
                 . join(
