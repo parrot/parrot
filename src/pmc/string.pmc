@@ -108,23 +108,6 @@ Returns the floating-point representation of the string.
 
 /*
 
-=item C<PMC *get_bignum()>
-
-Returns the big numbers representation of the string.
-
-=cut
-
-*/
-
-    VTABLE PMC *get_bignum() {
-        STRING * const s   = SELF.get_string();
-        PMC    * const ret = pmc_new(INTERP, enum_class_BigInt);
-        VTABLE_set_string_native(INTERP, ret, s);
-        return ret;
-    }
-
-/*
-
 =item C<STRING *get_string()>
 
 Returns the string itself.

@@ -63,7 +63,6 @@ s/^(\s*)(PMC\s+\*get_pmc\(\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(PMC\s+\*get_pmc_keyed\(PMC\s+\*\w*\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(PMC\s+\*get_pmc_keyed_int\(INTVAL\s+\w*\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(PMC\s+\*get_pmc_keyed_str\(STRING\s+\*\w*\)\s+{)/$1VTABLE $2/;
-s/^(\s*)(PMC\s+\*get_bignum\(\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(PMC\s+\*slice\(PMC\s+\*\w*,\s+INTVAL\s+\w*\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(void\s+\*get_pointer\(\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(void\s+\*get_pointer_keyed\(PMC\s+\*\w*\)\s+{)/$1VTABLE $2/;

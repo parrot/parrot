@@ -929,20 +929,6 @@ Returns the unsigned long conversion of the BigNum.
 
 /*
 
-=item C<PMC *get_bignum()>
-
-Returns SELF, keeping floating point precision.
-
-=cut
-
-*/
-
-    VTABLE PMC *get_bignum() {
-        return SELF;
-    }
-
-/*
-
 =item C<FLOATVAL get_bigint()>
 
 Trunc the BigNum to an BigInt.

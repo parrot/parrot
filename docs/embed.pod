@@ -1163,8 +1163,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_PMC_get_attr_str>
 
-=item C<Parrot_PMC_get_bignum>
-
 =item C<Parrot_PMC_get_bool>
 
 =item C<Parrot_PMC_get_class>

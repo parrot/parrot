@@ -666,10 +666,6 @@ Return the integer representation of the string.
 
 Return the floating-point representation of the string.
 
-=item get_bignum
-
-Return the big number representation of the string.
-
 =item get_string
 
 Return the string value of the String PMC.

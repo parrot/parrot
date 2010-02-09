@@ -41,8 +41,6 @@ FLOATVAL get_number_keyed(PMC* key)
 FLOATVAL get_number_keyed_int(INTVAL key)
 FLOATVAL get_number_keyed_str(STRING* key)
 
-PMC* get_bignum()
-
 STRING* get_string()
 STRING* get_repr()
 STRING* get_string_keyed(PMC* key)

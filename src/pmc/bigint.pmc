@@ -701,20 +701,6 @@ Returns the value of the integer.
 
 /*
 
-=item C<PMC *get_bignum()>
-
-Returns SELF
-
-=cut
-
-*/
-
-    VTABLE PMC *get_bignum() {
-        return SELF;
-    }
-
-/*
-
 =item C<INTVAL get_bool()>
 
 Returns the boolean value of the integer.
