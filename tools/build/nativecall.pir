@@ -26,18 +26,20 @@ F<docs/pdds/pdd16_native_call.pod>.
 
 =cut
 
+.macro_const SIG_TABLE_CONST_NAME 'signature_table'
+
 .sub 'main' :main
-    .local pmc sig_table, sigs
-    sig_table = 'gen_sigtable'()
+    .local pmc sigs
+    'gen_sigtable'()
     sigs = 'read_sigs'()
 
-    $S0 = 'get_head'(sig_table, sigs)
+    $S0 = 'get_head'(sigs)
     say $S0
-    $S0 = 'get_thunks'(sig_table, sigs)
+    $S0 = 'get_thunks'(sigs)
     say $S0
-    $S0 = 'get_loader'(sig_table, sigs)
+    $S0 = 'get_loader'(sigs)
     say $S0
-    $S0 = 'get_coda'(sig_table, sigs)
+    $S0 = 'get_coda'(sigs)
     say $S0
 .end
 
@@ -95,7 +97,6 @@ HEAD
 .end
 
 .sub 'get_thunks'
-    .param pmc sig_table
     .param pmc sigs
     .local string code
     .local int i, n
@@ -107,7 +108,7 @@ HEAD
 
         .local pmc sig
         sig = sigs[i]
-        $S0 = 'sig_to_fn_code'(sig_table, sig :flat)
+        $S0 = 'sig_to_fn_code'(sig :flat)
         code = concat code, $S0
 
         inc i
@@ -117,7 +118,6 @@ HEAD
 .end
 
 .sub 'get_loader'
-    .param pmc sig_table
     .param pmc sigs
     .local string code
     .local int i, n
@@ -211,7 +211,7 @@ FN_HEADER
         sig = shift sigs
 
         .local string fn_name
-        fn_name = 'sig_to_fn_name'(sig_table, sig :flat)
+        fn_name = 'sig_to_fn_name'(sig :flat)
 
         .local string key
         key = join '', sig
@@ -305,16 +305,15 @@ CODA
 .end
 
 .sub 'sig_to_postamble'
-    .param pmc sig_table
     .param string ret
     .param string params
 
     .local string final_assign
-    $P0 = 'map_from_sig_table'(sig_table, ret, 'ret_assign')
+    $P0 = 'map_from_sig_table'(ret, 'ret_assign')
     final_assign = $P0[0]
 
     .local string extra_postamble
-    $P0 = 'map_from_sig_table'(sig_table, params, 'postamble_tmpl')
+    $P0 = 'map_from_sig_table'(params, 'postamble_tmpl')
     'fill_tmpls_ascending_ints'($P0)
     extra_postamble = join "\n", $P0
 
@@ -327,16 +326,15 @@ TEMPLATE
 .end
 
 .sub 'sig_to_call'
-    .param pmc sig_table
     .param string ret
     .param string params
 
     .local string return_assign
-    $P0 = 'map_from_sig_table'(sig_table, ret, 'func_call_assign')
+    $P0 = 'map_from_sig_table'(ret, 'func_call_assign')
     return_assign = $P0[0]
 
     .local string ret_cast
-    $P0 = 'map_from_sig_table'(sig_table, ret, 'as_return')
+    $P0 = 'map_from_sig_table'(ret, 'as_return')
     ret_cast = $P0[0]
     if ret_cast == 'void' goto void_fn
         ret_cast = 'sprintf'('(%s)', ret_cast)
@@ -346,7 +344,7 @@ TEMPLATE
     end_ret_cast:
 
     .local string call_params
-    $P0 = 'map_from_sig_table'(sig_table, params, 'call_param_tmpl')
+    $P0 = 'map_from_sig_table'(params, 'call_param_tmpl')
     'fill_tmpls_ascending_ints'($P0)
     call_params = join ', ', $P0
 
@@ -360,23 +358,22 @@ TEMPLATE
 .end
 
 .sub 'sig_to_preamble'
-    .param pmc sig_table
     .param string ret
     .param string params
 
     unless params goto return
 
     .local string sig
-    $P0 = 'map_from_sig_table'(sig_table, params, 'sig_char')
+    $P0 = 'map_from_sig_table'(params, 'sig_char')
     sig = join "", $P0
 
     .local string fill_params
-    $P0 = 'map_from_sig_table'(sig_table, params, 'fill_params_tmpl')
+    $P0 = 'map_from_sig_table'(params, 'fill_params_tmpl')
     'fill_tmpls_ascending_ints'($P0)
     fill_params = join "", $P0
 
     .local string extra_preamble
-    $P0 = 'map_from_sig_table'(sig_table, params, 'preamble_tmpl')
+    $P0 = 'map_from_sig_table'(params, 'preamble_tmpl')
     'fill_tmpls_ascending_ints'($P0)
     extra_preamble = join "", $P0
 
@@ -391,28 +388,27 @@ TEMPLATE
 .end
 
 .sub 'sig_to_var_decls'
-    .param pmc sig_table
     .param string ret
     .param string params
 
     .local string ret_csig
-    $P0 = 'map_from_sig_table'(sig_table, ret, 'as_return')
+    $P0 = 'map_from_sig_table'(ret, 'as_return')
     ret_csig = $P0[0]
 
     .local string params_csig
-    $P0 = 'map_from_sig_table'(sig_table, params, 'as_proto')
+    $P0 = 'map_from_sig_table'(params, 'as_proto')
     params_csig = join ', ', $P0
 
     .local string ret_tdecl
     ret_tdecl = ""
-    $P0 = 'map_from_sig_table'(sig_table, ret, 'return_type')
+    $P0 = 'map_from_sig_table'(ret, 'return_type')
     $S0 = $P0[0]
     unless $S0 goto end_ret_type
     if $S0 == 'void' goto end_ret_type
         $S0 = 'sprintf'("%s return_data;\n", $S0)
         ret_tdecl = concat ret_tdecl, $S0
     end_ret_type:
-    $P0 = 'map_from_sig_table'(sig_table, ret, 'final_dest')
+    $P0 = 'map_from_sig_table'(ret, 'final_dest')
     $S0 = $P0[0]
     unless $S0 goto end_final_dest
         $S0 = concat $S0, "\n"
@@ -420,7 +416,7 @@ TEMPLATE
     end_final_dest:
 
     .local string params_tdecl
-    $P0 = 'map_from_sig_table'(sig_table, params, 'temp_tmpl')
+    $P0 = 'map_from_sig_table'(params, 'temp_tmpl')
     'fill_tmpls_ascending_ints'($P0)
     $P0 = 'grep_for_true'($P0)
     params_tdecl = join ";\n    ", $P0
@@ -440,10 +436,9 @@ TEMPLATE
 .end
 
 .sub 'sig_to_fn_decl'
-    .param pmc sig_table
     .param pmc sig :slurpy
     .local string fn_name, fn_decl
-    fn_name = 'sig_to_fn_name'(sig_table, sig :flat)
+    fn_name = 'sig_to_fn_name'(sig :flat)
     fn_decl = 'sprintf'(<<'TEMPLATE', fn_name)
 static void
 %s(PARROT_INTERP, PMC *self)
@@ -452,12 +447,11 @@ TEMPLATE
 .end
 
 .sub 'sig_to_fn_name'
-    .param pmc sig_table
     .param string ret
     .param string params
 
     .local string fix_params
-    $P0 = 'map_from_sig_table'(sig_table, params, 'cname')
+    $P0 = 'map_from_sig_table'(params, 'cname')
     fix_params = join '', $P0
 
     $S0 = 'sprintf'('pcf_%s_%s', ret, fix_params)
@@ -465,9 +459,11 @@ TEMPLATE
 .end
 
 .sub 'map_from_sig_table'
-    .param pmc sig_table
     .param string sig
     .param string field_name
+
+    .local pmc sig_table
+    sig_table = get_global .SIG_TABLE_CONST_NAME
 
     $P0 = split '', sig
 
@@ -603,7 +599,7 @@ TEMPLATE
     $S0 = 'sigtable_json'()
     $P0 = 'decode_table'($S0)
     'fixup_table'($P0)
-    .return ($P0)
+    set_global .SIG_TABLE_CONST_NAME, $P0
 .end
 
 .sub 'decode_table'
