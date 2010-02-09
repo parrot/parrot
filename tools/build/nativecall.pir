@@ -26,11 +26,15 @@ F<docs/pdds/pdd16_native_call.pod>.
 
 =cut
 
+.macro_const VERSION 0.01
 .macro_const SIG_TABLE_CONST_NAME 'signature_table'
 
 .sub 'main' :main
-    .local pmc sigs
+    .param pmc argv
+
+    .local pmc opts, sigs
     'gen_sigtable'()
+    opts = 'get_options'(argv)
     sigs = 'read_sigs'()
 
     $S0 = 'get_head'(sigs)
@@ -41,6 +45,76 @@ F<docs/pdds/pdd16_native_call.pod>.
     say $S0
     $S0 = 'get_coda'(sigs)
     say $S0
+.end
+
+.sub 'get_options'
+    .param pmc argv
+
+    load_bytecode 'Getopt/Obj.pbc'
+
+    .local pmc getopt
+    getopt = new ['Getopt';'Obj']
+    push getopt, 'help|h'
+    push getopt, 'version|v'
+    push getopt, 'target=s'
+    push getopt, 'thunk-storage-class=s'
+    push getopt, 'thunk-name-proto=s'
+    push getopt, 'loader-storage-class=s'
+    push getopt, 'loader-name=s'
+
+    .local string prog_name
+    prog_name = shift argv
+
+    .local pmc opt
+    opt = getopt.'get_options'(argv)
+
+    $I0 = opt['help']
+    if $I0 goto print_help
+
+    $I0 = opt['version']
+    if $I0 goto print_version
+
+    .return(opt)
+
+  print_help:
+    'usage'(prog_name)
+  print_version:
+    'version'(prog_name)
+.end
+
+.sub 'usage'
+    .param string prog_name
+    print prog_name
+    say ' - Parrot NCI thunk library creation utility'
+    say <<'USAGE'
+
+Creates a C file of routines suitable for use as Parrot NCI thunks.
+
+Usage ./parrot nativecall.pir [options] <input_signature_list.nci >output_c_file.c
+
+Options
+    --help              print this message and exit
+    --version           print the version number of this utility
+    --target <target>   select what to output (valid options are 'head', 'thunks',
+                        'loader', 'coda', 'all', 'names', and 'signatures'). Default value is 'all'
+    --thunk-storage-class <storage class>
+                        set the storage class used for the thunks. Default value is 'static'.
+    --thunk-name-proto <printf prototype>
+                        set the prototype used for the thunk function names. Must be a printf
+                        format with arity 1. Default value is 'pcf_%s'
+    --loader-storage-class 
+                        set the storage class used for the loader function. Default value is none.
+    --loader-name       set the name used for the loader function. Default value is 'Parrot_load_nci_thunks'.
+USAGE
+    end
+.end
+
+.sub 'version'
+    .param string prog_name
+    print prog_name
+    print ' version '
+    say .VERSION
+    end
 .end
 
 # get_{head,thunks,loader,coda} {{{
