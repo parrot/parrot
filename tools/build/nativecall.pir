@@ -102,7 +102,7 @@ Options
     --thunk-name-proto <printf prototype>
                         set the prototype used for the thunk function names. Must be a printf
                         format with arity 1. Default value is 'pcf_%s'
-    --loader-storage-class 
+    --loader-storage-class
                         set the storage class used for the loader function. Default value is none.
     --loader-name       set the name used for the loader function. Default value is 'Parrot_load_nci_thunks'.
 USAGE
