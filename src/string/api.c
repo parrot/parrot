@@ -179,18 +179,6 @@ Parrot_str_new_COW(PARROT_INTERP, ARGMOD(STRING *s))
         PObj_COW_SET(s);
         STRUCT_COPY(d, s);
         PObj_sysmem_CLEAR(d);
-#if 0
-        /* XXX FIXME hack to avoid cross-interpreter issue until it
-         * is fixed correctly. */
-        if (n_interpreters > 1 && PObj_is_movable_TESTALL(s) &&
-                !Parrot_gc_ptr_in_memory_pool(interp, Buffer_bufstart(s))) {
-            Parrot_str_write_COW(interp, d);
-            Parrot_io_eprintf(interp, "cross-interpreter copy of "
-                                     "relocatable string '%Ss' into tid %d\n",
-                        d,
-                        interp->thread_data->tid);
-        }
-#endif
     }
     return d;
 }

@@ -135,20 +135,24 @@ static void Parrot_gc_merge_buffer_pools(PARROT_INTERP,
         FUNC_MODIFIES(*source);
 
 static int sweep_cb_buf(PARROT_INTERP,
+    ARGIN(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool),
     SHIM(int flag),
     ARGIN(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(4)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(5)
         FUNC_MODIFIES(*pool);
 
 static int sweep_cb_pmc(PARROT_INTERP,
+    ARGIN(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool),
     SHIM(int flag),
     SHIM(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*pool);
 
 #define ASSERT_ARGS_fix_pmc_syncs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -170,10 +174,12 @@ static int sweep_cb_pmc(PARROT_INTERP,
     , PARROT_ASSERT_ARG(source))
 #define ASSERT_ARGS_sweep_cb_buf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(mem_pools) \
     , PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(arg))
 #define ASSERT_ARGS_sweep_cb_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(mem_pools) \
     , PARROT_ASSERT_ARG(pool))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -219,7 +225,7 @@ Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
         PMC * const p = (PMC *)obj;
 
         if (PObj_is_special_PMC_TEST(obj))
-            mark_special(interp, p);
+            mark_special(interp, interp->mem_pools, p);
 
         else if (PMC_metadata(p))
             Parrot_gc_mark_PMC_alive(interp, PMC_metadata(p));
@@ -342,9 +348,10 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
         break;
     }
 
-    initialize_var_size_pools(interp);
-    initialize_fixed_size_pools(interp);
-    Parrot_gc_initialize_fixed_size_pools(interp, GC_NUM_INITIAL_FIXED_SIZE_POOLS);
+    initialize_var_size_pools(interp, interp->mem_pools);
+    initialize_fixed_size_pools(interp, interp->mem_pools);
+    Parrot_gc_initialize_fixed_size_pools(interp, interp->mem_pools,
+                                          GC_NUM_INITIAL_FIXED_SIZE_POOLS);
 }
 
 /*
@@ -388,7 +395,8 @@ Parrot_gc_new_pmc_header(PARROT_INTERP, UINTVAL flags)
     Fixed_Size_Pool * const pool = flags & PObj_constant_FLAG
             ? interp->mem_pools->constant_pmc_pool
             : interp->mem_pools->pmc_pool;
-    PMC * const pmc = (PMC *)pool->get_free_object(interp, pool);
+    PMC * const pmc = (PMC *)pool->get_free_object(interp, interp->mem_pools,
+            pool);
 
     if (!pmc)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
@@ -424,7 +432,7 @@ Parrot_gc_free_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
     Parrot_pmc_destroy(interp, pmc);
 
     PObj_flags_SETTO((PObj *)pmc, PObj_on_free_list_FLAG);
-    pool->add_free_object(interp, pool, (PObj *)pmc);
+    pool->add_free_object(interp, interp->mem_pools, pool, (PObj *)pmc);
     pool->num_free_objects++;
 }
 
@@ -532,7 +540,7 @@ Parrot_gc_free_string_header(PARROT_INTERP, ARGMOD(STRING *s))
     ASSERT_ARGS(Parrot_gc_free_string_header)
     if (!PObj_constant_TEST(s)) {
         Fixed_Size_Pool * const pool = interp->mem_pools->string_header_pool;
-        pool->add_free_object(interp, pool, s);
+        pool->add_free_object(interp, interp->mem_pools, pool, s);
     }
 }
 
@@ -556,7 +564,7 @@ Parrot_gc_new_bufferlike_header(PARROT_INTERP, size_t size)
 {
     ASSERT_ARGS(Parrot_gc_new_bufferlike_header)
 
-    Fixed_Size_Pool * const pool = get_bufferlike_pool(interp, size);
+    Fixed_Size_Pool * const pool = get_bufferlike_pool(interp, interp->mem_pools, size);
 
     return get_free_buffer(interp, pool);
 }
@@ -579,7 +587,7 @@ static void *
 get_free_buffer(PARROT_INTERP, ARGIN(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(get_free_buffer)
-    return pool->get_free_object(interp, pool);
+    return pool->get_free_object(interp, interp->mem_pools, pool);
 }
 
 /*
@@ -599,8 +607,8 @@ Parrot_gc_free_bufferlike_header(PARROT_INTERP, ARGMOD(Buffer *obj),
     size_t size)
 {
     ASSERT_ARGS(Parrot_gc_free_bufferlike_header)
-    Fixed_Size_Pool * const pool = get_bufferlike_pool(interp, size);
-    pool->add_free_object(interp, pool, obj);
+    Fixed_Size_Pool * const pool = get_bufferlike_pool(interp, interp->mem_pools, size);
+    pool->add_free_object(interp, interp->mem_pools, pool, obj);
 }
 
 /*
@@ -627,7 +635,7 @@ Parrot_gc_allocate_buffer_storage_aligned(PARROT_INTERP,
     Buffer_buflen(buffer) = 0;
     Buffer_bufstart(buffer) = NULL;
     new_size = aligned_size(buffer, size);
-    mem = (char *)mem_allocate(interp, new_size,
+    mem = (char *)mem_allocate(interp, interp->mem_pools, new_size,
         interp->mem_pools->memory_pool);
     mem = aligned_mem(buffer, mem);
     Buffer_bufstart(buffer) = mem;
@@ -694,7 +702,7 @@ Parrot_gc_reallocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer),
     else
         pool->possibly_reclaimable   += copysize;
 
-    mem = (char *)mem_allocate(interp, new_size, pool);
+    mem = (char *)mem_allocate(interp, interp->mem_pools, new_size, pool);
     mem = aligned_mem(buffer, mem);
 
     /* We shouldn't ever have a 0 from size, but we do. If we can track down
@@ -744,7 +752,7 @@ Parrot_gc_allocate_string_storage(PARROT_INTERP, ARGOUT(STRING *str),
                 : interp->mem_pools->memory_pool;
 
     new_size = aligned_string_size(size);
-    mem      = (char *)mem_allocate(interp, new_size, pool);
+    mem      = (char *)mem_allocate(interp, interp->mem_pools, new_size, pool);
     mem     += sizeof (void*);
 
     Buffer_bufstart(str) = str->strstart = mem;
@@ -809,7 +817,7 @@ Parrot_gc_reallocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str),
     else
         pool->possibly_reclaimable   += Buffer_buflen(str);
 
-    mem = (char *)mem_allocate(interp, new_size, pool);
+    mem = (char *)mem_allocate(interp, interp->mem_pools, new_size, pool);
     mem += sizeof (void *);
 
     /* copy mem from strstart, *not* bufstart */
@@ -822,6 +830,142 @@ Parrot_gc_reallocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str),
      * those bugs, this can be removed which would make things cheaper */
     if (copysize)
         memcpy(mem, oldmem, copysize);
+}
+
+/*
+
+=item C<void * Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, PMC *pmc)>
+
+Allocates a new attribute structure for a PMC if it has the auto_attrs flag
+set.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+void *
+Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
+{
+    ASSERT_ARGS(Parrot_gc_allocate_pmc_attributes)
+    const size_t attr_size = pmc->vtable->attr_size;
+#if GC_USE_FIXED_SIZE_ALLOCATOR
+    PMC_Attribute_Pool * const pool = Parrot_gc_get_attribute_pool(interp,
+            interp->mem_pools, attr_size);
+    void * const attrs = Parrot_gc_get_attributes_from_pool(interp, pool);
+    memset(attrs, 0, attr_size);
+    PMC_data(pmc) = attrs;
+    return attrs;
+#else
+    void * const data =  mem_sys_allocate_zeroed(attr_size);
+    PMC_data(pmc) = data;
+    return data;
+#endif
+}
+
+/*
+
+=item C<void Parrot_gc_free_pmc_attributes(PARROT_INTERP, PMC *pmc)>
+
+Deallocates an attibutes structure from a PMC if it has the auto_attrs
+flag set.
+
+*/
+
+void
+Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
+{
+    ASSERT_ARGS(Parrot_gc_free_pmc_attributes)
+    void * const data = PMC_data(pmc);
+
+    if (data) {
+
+#if GC_USE_FIXED_SIZE_ALLOCATOR
+        const size_t attr_size = pmc->vtable->attr_size;
+        const size_t item_size = attr_size < sizeof (void *) ? sizeof (void *) : attr_size;
+        PMC_Attribute_Pool ** const pools = interp->mem_pools->attrib_pools;
+        const size_t idx = item_size - sizeof (void *);
+        Parrot_gc_free_attributes_from_pool(interp, pools[idx], data);
+#else
+        mem_sys_free(PMC_data(pmc));
+        PMC_data(pmc) = NULL;
+#endif
+    }
+}
+
+/*
+
+=item C<void * Parrot_gc_allocate_fixed_size_storage(PARROT_INTERP, size_t
+size)>
+
+Allocates a fixed-size chunk of memory for use. This memory is not manually
+managed and needs to be freed with C<Parrot_gc_free_fixed_size_storage>
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+void *
+Parrot_gc_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
+{
+    ASSERT_ARGS(Parrot_gc_allocate_fixed_size_storage)
+    PMC_Attribute_Pool *pool = NULL;
+    const size_t idx = (size < sizeof (void *)) ? 0 : (size - sizeof (void *));
+
+    /* get the pool directly, if possible, for great speed */
+    if (interp->mem_pools->num_attribs > idx)
+        pool = interp->mem_pools->attrib_pools[idx];
+
+    /* otherwise create it */
+    if (!pool)
+        pool = Parrot_gc_get_attribute_pool(interp, interp->mem_pools, size);
+
+    return Parrot_gc_get_attributes_from_pool(interp, pool);
+}
+
+/*
+
+=item C<void Parrot_gc_free_fixed_size_storage(PARROT_INTERP, size_t size, void
+*data)>
+
+Manually deallocates fixed size storage allocated with
+C<Parrot_gc_allocate_fixed_size_storage>
+
+*/
+
+void
+Parrot_gc_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGMOD(void *data))
+{
+    ASSERT_ARGS(Parrot_gc_free_fixed_size_storage)
+
+    const size_t item_size = size < sizeof (void *) ? sizeof (void *) : size;
+    const size_t idx   = size - sizeof (void *);
+    PMC_Attribute_Pool ** const pools = interp->mem_pools->attrib_pools;
+    Parrot_gc_free_attributes_from_pool(interp, pools[idx], data);
+}
+
+
+/*
+
+=item C<static void Parrot_gc_free_attributes_from_pool(PARROT_INTERP,
+PMC_Attribute_Pool *pool, void *data)>
+
+Frees a fixed-size data item back to the pool for later reallocation.  Private
+to this file.
+
+*/
+
+static void
+Parrot_gc_free_attributes_from_pool(PARROT_INTERP,
+    ARGMOD(PMC_Attribute_Pool *pool),
+    ARGMOD(void *data))
+{
+    ASSERT_ARGS(Parrot_gc_free_attributes_from_pool)
+    PMC_Attribute_Free_List * const item = (PMC_Attribute_Free_List *)data;
+
+    item->next      = pool->free_list;
+    pool->free_list = item;
+
+    pool->num_free_objects++;
 }
 
 /*
@@ -858,7 +1002,7 @@ void
 Parrot_gc_compact_memory_pool(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_gc_compact_memory_pool)
-    compact_pool(interp, interp->mem_pools->memory_pool);
+    compact_pool(interp, interp->mem_pools, interp->mem_pools->memory_pool);
 }
 
 /*
@@ -903,7 +1047,7 @@ Parrot_gc_merge_header_pools(ARGMOD(Interp *dest_interp),
         if (i >= dest_arena->num_sized
         || !dest_arena->sized_header_pools[i]) {
             Fixed_Size_Pool *ignored = get_bufferlike_pool(dest_interp,
-                    i * sizeof (void *));
+                    dest_interp->mem_pools, i * sizeof (void *));
             UNUSED(ignored);
             PARROT_ASSERT(dest_arena->sized_header_pools[i]);
         }
@@ -966,7 +1110,7 @@ Parrot_gc_merge_buffer_pools(PARROT_INTERP,
 
         total_objects   = cur_arena->total_objects;
 
-        Parrot_append_arena_in_pool(interp, dest, cur_arena,
+        Parrot_append_arena_in_pool(interp, interp->mem_pools, dest, cur_arena,
             cur_arena->total_objects);
 
         /* XXX needed? */
@@ -1047,12 +1191,12 @@ Parrot_gc_destroy_header_pools(PARROT_INTERP)
      */
     const INTVAL start = 2;
 
-    header_pools_iterate_callback(interp, POOL_PMC, NULL, sweep_cb_pmc);
-    header_pools_iterate_callback(interp, POOL_PMC | POOL_CONST, NULL,
+    header_pools_iterate_callback(interp, interp->mem_pools, POOL_PMC, NULL, sweep_cb_pmc);
+    header_pools_iterate_callback(interp, interp->mem_pools, POOL_PMC | POOL_CONST, NULL,
             sweep_cb_pmc);
 
     for (pass = start; pass <= 2; pass++) {
-        header_pools_iterate_callback(interp, POOL_BUFFER | POOL_CONST,
+        header_pools_iterate_callback(interp, interp->mem_pools, POOL_BUFFER | POOL_CONST,
                 (void *)pass, sweep_cb_buf);
     }
 
@@ -1086,8 +1230,8 @@ Parrot_gc_destroy_header_pools(PARROT_INTERP)
 
 /*
 
-=item C<static int sweep_cb_pmc(PARROT_INTERP, Fixed_Size_Pool *pool, int flag,
-void *arg)>
+=item C<static int sweep_cb_pmc(PARROT_INTERP, Memory_Pools *mem_pools,
+Fixed_Size_Pool *pool, int flag, void *arg)>
 
 Performs a garbage collection sweep of the given pmc pool, then frees it. Calls
 C<Parrot_gc_sweep_pool> to perform the sweep, and C<free_pool> to free the pool and
@@ -1098,19 +1242,21 @@ all its arenas. Always returns C<0>.
 */
 
 static int
-sweep_cb_pmc(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool),
+sweep_cb_pmc(PARROT_INTERP,
+        ARGIN(Memory_Pools *mem_pools),
+        ARGMOD(Fixed_Size_Pool *pool),
         SHIM(int flag), SHIM(void *arg))
 {
     ASSERT_ARGS(sweep_cb_pmc)
-    Parrot_gc_sweep_pool(interp, pool);
+    Parrot_gc_sweep_pool(interp, interp->mem_pools, pool);
     free_pool(pool);
     return 0;
 }
 
 /*
 
-=item C<static int sweep_cb_buf(PARROT_INTERP, Fixed_Size_Pool *pool, int flag,
-void *arg)>
+=item C<static int sweep_cb_buf(PARROT_INTERP, Memory_Pools *mem_pools,
+Fixed_Size_Pool *pool, int flag, void *arg)>
 
 Performs a final garbage collection sweep, then frees the pool. Calls
 C<Parrot_gc_sweep_pool> to perform the sweep, and C<free_pool> to free the pool and
@@ -1121,12 +1267,14 @@ all its arenas.
 */
 
 static int
-sweep_cb_buf(PARROT_INTERP, ARGMOD(Fixed_Size_Pool *pool), SHIM(int flag),
-        ARGIN(void *arg))
+sweep_cb_buf(PARROT_INTERP,
+        ARGIN(Memory_Pools *mem_pools),
+        ARGMOD(Fixed_Size_Pool *pool),
+        SHIM(int flag), ARGIN(void *arg))
 {
     ASSERT_ARGS(sweep_cb_buf)
     UNUSED(arg);
-    Parrot_gc_sweep_pool(interp, pool);
+    Parrot_gc_sweep_pool(interp, interp->mem_pools, pool);
     free_pool(pool);
 
     return 0;
@@ -1193,100 +1341,6 @@ Parrot_gc_destroy_memory_pools(PARROT_INTERP)
 
         mem_internal_free(pool);
     }
-}
-
-/*
-
-=item C<int Parrot_gc_ptr_in_memory_pool(PARROT_INTERP, void *bufstart)>
-
-Determines if the given C<bufstart> pointer points to a location inside the
-memory pool. Returns 1 if the pointer is in the memory pool, 0 otherwise.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-int
-Parrot_gc_ptr_in_memory_pool(PARROT_INTERP, ARGIN(void *bufstart))
-{
-    ASSERT_ARGS(Parrot_gc_ptr_in_memory_pool)
-    Variable_Size_Pool * const pool = interp->mem_pools->memory_pool;
-    Memory_Block * cur_block = pool->top_block;
-
-    while (cur_block) {
-        if ((char *)bufstart >= cur_block->start &&
-            (char *) bufstart < cur_block->start + cur_block->size) {
-            return 1;
-        }
-        cur_block = cur_block->prev;
-    }
-    return 0;
-}
-
-/*
-
-=item C<int Parrot_gc_ptr_is_pmc(PARROT_INTERP, void *ptr)>
-
-Determines if a given pointer is a PMC or not. It is a PMC if it is properly
-contained in one of this interpreters PMC pools.
-
-=cut
-
-*/
-
-int
-Parrot_gc_ptr_is_pmc(PARROT_INTERP, ARGIN(void *ptr))
-{
-    ASSERT_ARGS(Parrot_gc_ptr_is_pmc)
-        return contained_in_pool(interp, interp->mem_pools->pmc_pool, ptr) ||
-        contained_in_pool(interp, interp->mem_pools->constant_pmc_pool, ptr);
-}
-
-/*
-
-=item C<int Parrot_gc_get_pmc_index(PARROT_INTERP, PMC* pmc)>
-
-Gets the index of the PMC in the pool. The first PMC in the first pool is 1,
-the second is 2, etc.
-
-=cut
-
-*/
-
-int
-Parrot_gc_get_pmc_index(PARROT_INTERP, ARGIN(PMC* pmc))
-{
-    ASSERT_ARGS(Parrot_gc_get_pmc_index)
-    UINTVAL id = 1;     /* first PMC in first arena */
-    Fixed_Size_Arena *arena;
-    Fixed_Size_Pool *pool;
-
-    pool = interp->mem_pools->pmc_pool;
-    for (arena = pool->last_Arena; arena; arena = arena->prev) {
-        const ptrdiff_t ptr_diff = (ptrdiff_t)pmc - (ptrdiff_t)arena->start_objects;
-        if (ptr_diff >= 0 && ptr_diff <
-                (ptrdiff_t)(arena->used * pool->object_size)) {
-            PARROT_ASSERT(ptr_diff % pool->object_size == 0);
-            id += ptr_diff / pool->object_size;
-            return id;
-        }
-        id += arena->total_objects;
-    }
-
-    pool = interp->mem_pools->constant_pmc_pool;
-    for (arena = pool->last_Arena; arena; arena = arena->prev) {
-        const ptrdiff_t ptr_diff = (ptrdiff_t)pmc - (ptrdiff_t)arena->start_objects;
-        if (ptr_diff >= 0 && ptr_diff <
-                (ptrdiff_t)(arena->used * pool->object_size)) {
-            PARROT_ASSERT(ptr_diff % pool->object_size == 0);
-            id += ptr_diff / pool->object_size;
-            return id;
-        }
-        id += arena->total_objects;
-    }
-
-    Parrot_ex_throw_from_c_args(interp, NULL, 1, "Couldn't find PMC in arenas");
 }
 
 /*
@@ -1587,143 +1641,6 @@ Parrot_gc_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
     ASSERT_ARGS(Parrot_gc_pmc_needs_early_collection)
     PObj_needs_early_gc_SET(pmc);
     ++interp->mem_pools->num_early_gc_PMCs;
-}
-
-
-/*
-
-=item C<void * Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, PMC *pmc)>
-
-Allocates a new attribute structure for a PMC if it has the auto_attrs flag
-set.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-void *
-Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
-{
-    ASSERT_ARGS(Parrot_gc_allocate_pmc_attributes)
-    const size_t attr_size = pmc->vtable->attr_size;
-#if GC_USE_FIXED_SIZE_ALLOCATOR
-    PMC_Attribute_Pool * const pool = Parrot_gc_get_attribute_pool(interp,
-        attr_size);
-    void * const attrs = Parrot_gc_get_attributes_from_pool(interp, pool);
-    memset(attrs, 0, attr_size);
-    PMC_data(pmc) = attrs;
-    return attrs;
-#else
-    void * const data =  mem_sys_allocate_zeroed(attr_size);
-    PMC_data(pmc) = data;
-    return data;
-#endif
-}
-
-/*
-
-=item C<void Parrot_gc_free_pmc_attributes(PARROT_INTERP, PMC *pmc)>
-
-Deallocates an attibutes structure from a PMC if it has the auto_attrs
-flag set.
-
-*/
-
-void
-Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
-{
-    ASSERT_ARGS(Parrot_gc_free_pmc_attributes)
-    void * const data = PMC_data(pmc);
-
-    if (data) {
-
-#if GC_USE_FIXED_SIZE_ALLOCATOR
-        const size_t attr_size = pmc->vtable->attr_size;
-        const size_t item_size = attr_size < sizeof (void *) ? sizeof (void *) : attr_size;
-        PMC_Attribute_Pool ** const pools = interp->mem_pools->attrib_pools;
-        const size_t idx = item_size - sizeof (void *);
-        Parrot_gc_free_attributes_from_pool(interp, pools[idx], data);
-#else
-        mem_sys_free(PMC_data(pmc));
-        PMC_data(pmc) = NULL;
-#endif
-    }
-}
-
-/*
-
-=item C<void * Parrot_gc_allocate_fixed_size_storage(PARROT_INTERP, size_t
-size)>
-
-Allocates a fixed-size chunk of memory for use. This memory is not manually
-managed and needs to be freed with C<Parrot_gc_free_fixed_size_storage>
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-void *
-Parrot_gc_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
-{
-    ASSERT_ARGS(Parrot_gc_allocate_fixed_size_storage)
-    PMC_Attribute_Pool *pool = NULL;
-    const size_t idx = (size < sizeof (void *)) ? 0 : (size - sizeof (void *));
-
-    /* get the pool directly, if possible, for great speed */
-    if (interp->mem_pools->num_attribs > idx)
-        pool = interp->mem_pools->attrib_pools[idx];
-
-    /* otherwise create it */
-    if (!pool)
-        pool = Parrot_gc_get_attribute_pool(interp, size);
-
-    return Parrot_gc_get_attributes_from_pool(interp, pool);
-}
-
-/*
-
-=item C<void Parrot_gc_free_fixed_size_storage(PARROT_INTERP, size_t size, void
-*data)>
-
-Manually deallocates fixed size storage allocated with
-C<Parrot_gc_allocate_fixed_size_storage>
-
-*/
-
-void
-Parrot_gc_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGMOD(void *data))
-{
-    ASSERT_ARGS(Parrot_gc_free_fixed_size_storage)
-
-    const size_t item_size = size < sizeof (void *) ? sizeof (void *) : size;
-    const size_t idx   = size - sizeof (void *);
-    PMC_Attribute_Pool ** const pools = interp->mem_pools->attrib_pools;
-    Parrot_gc_free_attributes_from_pool(interp, pools[idx], data);
-}
-
-
-/*
-
-=item C<static void Parrot_gc_free_attributes_from_pool(PARROT_INTERP,
-PMC_Attribute_Pool *pool, void *data)>
-
-Frees a fixed-size data item back to the pool for later reallocation.  Private
-to this file.
-
-*/
-
-static void
-Parrot_gc_free_attributes_from_pool(PARROT_INTERP,
-    ARGMOD(PMC_Attribute_Pool *pool),
-    ARGMOD(void *data))
-{
-    ASSERT_ARGS(Parrot_gc_free_attributes_from_pool)
-    PMC_Attribute_Free_List * const item = (PMC_Attribute_Free_List *)data;
-
-    item->next      = pool->free_list;
-    pool->free_list = item;
-
-    pool->num_free_objects++;
 }
 
 /*

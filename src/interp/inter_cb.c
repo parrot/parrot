@@ -25,6 +25,7 @@ the C-library.
 */
 
 #include "parrot/parrot.h"
+#include "pmc/pmc_parrotinterpreter.h"
 #include "inter_cb.str"
 
 
@@ -159,6 +160,8 @@ verify_CD(ARGIN(char *external_data), ARGMOD_NULLOK(PMC *user_data))
     ASSERT_ARGS(verify_CD)
     PARROT_INTERP = NULL;
     size_t i;
+    PMC    *interp_pmc;
+    STRING *sc;
 
     /*
      * 1.) user_data is from external code so:
@@ -175,18 +178,15 @@ verify_CD(ARGIN(char *external_data), ARGMOD_NULLOK(PMC *user_data))
         PANIC(interp, "user_data doesn't look like a pointer");
 
     /*
-     * We don't yet know which interpreter this PMC is from, so run
-     * through all of the existing interpreters and check their PMC
-     * pools
+     * Fetch original interpeter from prop
      */
     LOCK(interpreter_array_mutex);
-    for (i = 0; i < n_interpreters; ++i) {
-        Parrot_Interp checkinterp = interpreter_array [i];
-        if (checkinterp && Parrot_gc_ptr_is_pmc(checkinterp, user_data)) {
-            interp = checkinterp;
-            break;
-        }
-    }
+
+    interp      = interpreter_array[0];
+    sc          = CONST_STRING(interp, "_interpreter");
+    interp_pmc  = VTABLE_getprop(interp, user_data, sc);
+    GETATTR_ParrotInterpreter_interp(interp, interp_pmc, interp);
+
     UNLOCK(interpreter_array_mutex);
     if (!interp)
         PANIC(interp, "interpreter not found for callback");

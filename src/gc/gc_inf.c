@@ -38,26 +38,35 @@ to activate this core.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void gc_inf_add_free_object(SHIM_INTERP,
+    ARGIN(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool),
     ARGIN(void *to_add))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
         FUNC_MODIFIES(*pool);
 
-static void gc_inf_alloc_objects(SHIM_INTERP, ARGMOD(Fixed_Size_Pool *pool))
+static void gc_inf_alloc_objects(SHIM_INTERP,
+    ARGIN(Memory_Pools *mem_pools),
+    ARGMOD(Fixed_Size_Pool *pool))
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*pool);
 
 PARROT_CANNOT_RETURN_NULL
 static void * gc_inf_get_free_object(SHIM_INTERP,
+    ARGIN(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool))
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*pool);
 
 static void gc_inf_mark_and_sweep(SHIM_INTERP, UINTVAL flags);
 static void gc_inf_more_traceable_objects(SHIM_INTERP,
+    ARGIN(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool))
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*pool);
 
 static void gc_inf_pool_init(SHIM_INTERP, ARGMOD(Fixed_Size_Pool *pool))
@@ -65,15 +74,19 @@ static void gc_inf_pool_init(SHIM_INTERP, ARGMOD(Fixed_Size_Pool *pool))
         FUNC_MODIFIES(*pool);
 
 #define ASSERT_ARGS_gc_inf_add_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(pool) \
+       PARROT_ASSERT_ARG(mem_pools) \
+    , PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(to_add))
 #define ASSERT_ARGS_gc_inf_alloc_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(pool))
+       PARROT_ASSERT_ARG(mem_pools) \
+    , PARROT_ASSERT_ARG(pool))
 #define ASSERT_ARGS_gc_inf_get_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(pool))
+       PARROT_ASSERT_ARG(mem_pools) \
+    , PARROT_ASSERT_ARG(pool))
 #define ASSERT_ARGS_gc_inf_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_inf_more_traceable_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(pool))
+       PARROT_ASSERT_ARG(mem_pools) \
+    , PARROT_ASSERT_ARG(pool))
 #define ASSERT_ARGS_gc_inf_pool_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pool))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -111,8 +124,8 @@ gc_inf_mark_and_sweep(SHIM_INTERP, UINTVAL flags)
 
 /*
 
-=item C<static void gc_inf_add_free_object(PARROT_INTERP, Fixed_Size_Pool *pool,
-void *to_add)>
+=item C<static void gc_inf_add_free_object(PARROT_INTERP, Memory_Pools
+*mem_pools, Fixed_Size_Pool *pool, void *to_add)>
 
 Manually frees a chunk of memory. Normally this would return the memory
 to the free list of the pool, but in this case we just return it to the
@@ -127,8 +140,10 @@ add items to the freelist from a freshly allocated arena.
 */
 
 static void
-gc_inf_add_free_object(SHIM_INTERP, ARGMOD(Fixed_Size_Pool *pool),
-    ARGIN(void *to_add))
+gc_inf_add_free_object(SHIM_INTERP,
+        ARGIN(Memory_Pools *mem_pools),
+        ARGMOD(Fixed_Size_Pool *pool),
+        ARGIN(void *to_add))
 {
     ASSERT_ARGS(gc_inf_add_free_object)
     if (to_add)
@@ -137,8 +152,8 @@ gc_inf_add_free_object(SHIM_INTERP, ARGMOD(Fixed_Size_Pool *pool),
 
 /*
 
-=item C<static void * gc_inf_get_free_object(PARROT_INTERP, Fixed_Size_Pool
-*pool)>
+=item C<static void * gc_inf_get_free_object(PARROT_INTERP, Memory_Pools
+*mem_pools, Fixed_Size_Pool *pool)>
 
 Gets a new object from the pool. Each pool specifies an object size in
 C<pool->object_size> so we can use that number to make the allocation. For
@@ -160,7 +175,9 @@ C<Parrot_Gc_get_new_pmc_header>
 
 PARROT_CANNOT_RETURN_NULL
 static void *
-gc_inf_get_free_object(SHIM_INTERP, ARGMOD(Fixed_Size_Pool *pool))
+gc_inf_get_free_object(SHIM_INTERP,
+        ARGIN(Memory_Pools *mem_pools),
+        ARGMOD(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(gc_inf_get_free_object)
     return calloc(pool->object_size, 1);
@@ -168,7 +185,8 @@ gc_inf_get_free_object(SHIM_INTERP, ARGMOD(Fixed_Size_Pool *pool))
 
 /*
 
-=item C<static void gc_inf_alloc_objects(PARROT_INTERP, Fixed_Size_Pool *pool)>
+=item C<static void gc_inf_alloc_objects(PARROT_INTERP, Memory_Pools *mem_pools,
+Fixed_Size_Pool *pool)>
 
 Allocates a new arena of objects from the system. This function is only
 really used internally by the core, the API functions don't need to call
@@ -182,7 +200,9 @@ for each special case pool.
 */
 
 static void
-gc_inf_alloc_objects(SHIM_INTERP, ARGMOD(Fixed_Size_Pool *pool))
+gc_inf_alloc_objects(SHIM_INTERP,
+        ARGIN(Memory_Pools *mem_pools),
+        ARGMOD(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(gc_inf_alloc_objects)
     UNUSED(pool);
@@ -190,8 +210,8 @@ gc_inf_alloc_objects(SHIM_INTERP, ARGMOD(Fixed_Size_Pool *pool))
 
 /*
 
-=item C<static void gc_inf_more_traceable_objects(PARROT_INTERP, Fixed_Size_Pool
-*pool)>
+=item C<static void gc_inf_more_traceable_objects(PARROT_INTERP, Memory_Pools
+*mem_pools, Fixed_Size_Pool *pool)>
 
 Would normally try to find new traceable objects by first running a GC sweep
 and then allocating a new arena from the system. Neither of these are
@@ -206,7 +226,9 @@ from the GC API. Different pools may have special requirements so multiple
 */
 
 static void
-gc_inf_more_traceable_objects(SHIM_INTERP, ARGMOD(Fixed_Size_Pool *pool))
+gc_inf_more_traceable_objects(SHIM_INTERP,
+        ARGIN(Memory_Pools *mem_pools),
+        ARGMOD(Fixed_Size_Pool *pool))
 {
     ASSERT_ARGS(gc_inf_more_traceable_objects)
     UNUSED(pool);
