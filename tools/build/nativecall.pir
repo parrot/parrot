@@ -27,16 +27,36 @@ F<docs/pdds/pdd16_native_call.pod>.
 =cut
 
 .macro_const VERSION 0.01
-.macro_const SIG_TABLE_CONST_NAME 'signature_table'
+
+.macro_const SIG_TABLE_GLOBAL_NAME  'signature_table'
+.macro_const OPTS_GLOBAL_NAME       'options'
 
 .sub 'main' :main
     .param pmc argv
 
-    .local pmc opts, sigs
+    # initialize global variables
     'gen_sigtable'()
-    opts = 'get_options'(argv)
+    'get_options'(argv)
+
+    .local string targ
+    targ = 'read_from_opts'('target')
+
+    .local pmc sigs
     sigs = 'read_sigs'()
 
+    if targ == 'head'   goto get_targ
+    if targ == 'thunks' goto get_targ
+    if targ == 'loader' goto get_targ
+    if targ == 'coda'   goto get_targ
+    if targ == 'all'    goto all
+    if targ == 'names'  goto names
+    if targ == 'signatures'   goto signatures
+
+    # unknown target
+    $S0 = 'sprintf'("Unknown target type '%s'", targ)
+    die $S0
+
+  all:
     $S0 = 'get_head'(sigs)
     say $S0
     $S0 = 'get_thunks'(sigs)
@@ -45,7 +65,28 @@ F<docs/pdds/pdd16_native_call.pod>.
     say $S0
     $S0 = 'get_coda'(sigs)
     say $S0
+    exit 0
+
+  get_targ:
+    $S0 = concat 'get_', targ
+    $P0 = get_global $S0
+    $S1 = $P0(sigs)
+    say $S1
+    exit 0
+
+  names:
+    die "names not yet implemented"
+  signatures:
+    die "signatures not yet implemented"
 .end
+
+# getopt stuff {{{
+
+.macro_const THUNK_STORAGE_CLASS    'thunk-storage-class'
+.macro_const THUNK_NAME_PROTO       'thunk-name-proto'
+.macro_const LOADER_STORAGE_CLASS   'loader-storage-class'
+.macro_const LOADER_NAME            'loader-name'
+
 
 .sub 'get_options'
     .param pmc argv
@@ -74,7 +115,10 @@ F<docs/pdds/pdd16_native_call.pod>.
     $I0 = opt['version']
     if $I0 goto print_version
 
-    .return(opt)
+    'fixup_opts'(opt)
+
+    set_global .OPTS_GLOBAL_NAME, opt
+    .return()
 
   print_help:
     'usage'(prog_name)
@@ -106,7 +150,7 @@ Options
                         set the storage class used for the loader function. Default value is none.
     --loader-name       set the name used for the loader function. Default value is 'Parrot_load_nci_thunks'.
 USAGE
-    end
+    exit 0
 .end
 
 .sub 'version'
@@ -114,8 +158,63 @@ USAGE
     print prog_name
     print ' version '
     say .VERSION
-    end
+    exit 0
 .end
+
+.sub 'fixup_opts'
+    .param pmc opts
+
+    $I0 = defined opts['target']
+    if $I0 goto end_target
+        opts['target'] = 'all'
+    end_target:
+
+    $I0 = defined opts['thunk-storage-class']
+    if $I0 goto end_thunk_storage_class
+        opts['thunk-storage-class'] = 'static'
+    end_thunk_storage_class:
+
+    $I0 = defined opts['thunk-name-proto']
+    if $I0 goto end_thunk_name_proto
+        opts['thunk-name-proto'] = 'pcf_%s'
+    end_thunk_name_proto:
+
+    $S0 = opts['thunk-name-proto']
+    $I0 = 'printf_arity'($S0)
+    if $I0 == 1 goto end_thunk_name_proto_printf_arity
+        'sprintf'("Provided proto for 'thunk-name-proto' is of incorrect arity %i (expected 1)", $I0)
+        die $S0
+    end_thunk_name_proto_printf_arity:
+
+    $I0 = defined opts['loader-storage-class']
+    if $I0 goto end_loader_storage_class
+        opts['loader-storage-class'] = ''
+    end_loader_storage_class:
+
+    $I0 = defined opts['loader-name']
+    if $I0 goto end_loader_name
+        opts['loader-name'] = 'Parrot_load_nci_thunks'
+    end_loader_name:
+.end
+
+.sub 'read_from_opts'
+    .param string key
+
+    .local pmc opts
+    opts = get_global .OPTS_GLOBAL_NAME
+
+    $I0 = defined opts[key]
+    unless $I0 goto not_present
+
+    $S0 = opts[key]
+    .return ($S0)
+
+  not_present:
+    $S0 = 'sprintf'("Parameter '%s' required but not provided", key)
+    die $S0
+.end
+
+# }}}
 
 # get_{head,thunks,loader,coda} {{{
 
@@ -150,7 +249,11 @@ USAGE
 #include "pmc/pmc_nci.h"
 #include "pmc/pmc_pointer.h"
 #include "pmc/pmc_callcontext.h"
-#include "nci.str"
+
+#ifdef PARROT_IN_CORE
+/* external libraries don't have to care about string subsystem */
+#  include "nci.str"
+#endif
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER STOP */
@@ -193,89 +296,32 @@ HEAD
 
 .sub 'get_loader'
     .param pmc sigs
+
+    $S0 = 'read_from_opts'(.LOADER_STORAGE_CLASS)
+    $S1 = 'read_from_opts'(.LOADER_NAME)
     .local string code
-    .local int i, n
-    code = <<'FN_HEADER'
+    code = 'sprintf'(<<'FN_HEADER', $S0, $S1)
 
-
-/* This function serves a single purpose. It takes the function
-   signature for a C function we want to call and returns a pointer
-   to a function that can call it. */
-void *
-build_call_func(PARROT_INTERP,
-#if defined(CAN_BUILD_CALL_FRAMES)
-PMC *pmc_nci, NOTNULL(STRING *signature), NOTNULL(int *jitted))
-#else
-SHIM(PMC *pmc_nci), NOTNULL(STRING *signature), SHIM(int *jitted))
-#endif
+%s void
+%s(PARROT_INTERP)
 {
-    char       *c;
-    STRING     *ns, *message;
-    PMC        *b;
     PMC        *iglobals;
     PMC        *temp_pmc;
 
     PMC        *HashPointer   = NULL;
 
-    /* And in here is the platform-independent way. Which is to say
-       "here there be hacks" */
-
-    /* fixup empty signatures */
-    if (STRING_IS_EMPTY(signature))
-        signature = CONST_STRING(interp, "v");
-
     iglobals = interp->iglobals;
-
     if (PMC_IS_NULL(iglobals))
         PANIC(interp, "iglobals isn't created yet");
+
     HashPointer = VTABLE_get_pmc_keyed_int(interp, iglobals,
             IGLOBALS_NCI_FUNCS);
+    if (PMC_IS_NULL(HashPointer))
+        PANIC(interp, "iglobals.nci_funcs isn't created yet");
 
-    if (!HashPointer) {
-        HashPointer = pmc_new(interp, enum_class_Hash);
-        VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FUNCS,
-                HashPointer);
-    }
-
-#if defined(CAN_BUILD_CALL_FRAMES)
-    /* Try if JIT code can build that signature. If yes, we are done */
-    b            = VTABLE_get_pmc_keyed_str(interp, HashPointer, signature);
-
-    PARROT_ASSERT(PMC_IS_NULL(b) || b->vtable);
-
-    if ((!PMC_IS_NULL(b)) && b->vtable->base_type == enum_class_ManagedStruct) {
-        *jitted = 1;
-        return F2DPTR(VTABLE_get_pointer(interp, b));
-    }
-    else {
-        int jit_size;
-        void * const result = Parrot_jit_build_call_func(interp, pmc_nci, signature, &jit_size);
-        if (result) {
-            struct jit_buffer_private_data *priv;
-            *jitted = 1;
-            temp_pmc = pmc_new(interp, enum_class_ManagedStruct);
-            VTABLE_set_pointer(interp, temp_pmc, (void *)result);
-#ifdef PARROT_HAS_EXEC_PROTECT
-            priv = (struct jit_buffer_private_data *)
-                mem_sys_allocate(sizeof(struct jit_buffer_private_data));
-            priv->size = jit_size;
-            SETATTR_ManagedStruct_custom_free_func(interp, temp_pmc, Parrot_jit_free_buffer);
-            SETATTR_ManagedStruct_custom_free_priv(interp, temp_pmc, priv);
-            SETATTR_ManagedStruct_custom_clone_func(interp, temp_pmc, Parrot_jit_clone_buffer);
-            SETATTR_ManagedStruct_custom_clone_priv(interp, temp_pmc, priv);
-#endif /* PARROT_HAS_EXEC_PROTECT */
-            VTABLE_set_pmc_keyed_str(interp, HashPointer, signature, temp_pmc);
-            return result;
-        }
-    }
-
-#endif
-
-    b = VTABLE_get_pmc_keyed_str(interp, HashPointer, signature);
-
-    if (PMC_IS_NULL(b)) {
 FN_HEADER
 
+    .local int i, n
     i = 0
     n = sigs
     loop:
@@ -291,9 +337,10 @@ FN_HEADER
         key = join '', sig
 
         $S0 = 'sprintf'(<<'TEMPLATE', fn_name, key)
-        temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
-        VTABLE_set_pointer(interp, temp_pmc, (void *)%s);
-        VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "%s"), temp_pmc);
+    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    VTABLE_set_pointer(interp, temp_pmc, (void *)%s);
+    VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "%s"), temp_pmc);
+
 TEMPLATE
         code = concat code, $S0
 
@@ -302,39 +349,9 @@ TEMPLATE
     end_loop:
 
     code = concat code, <<'FN_FOOTER'
-
-        b = VTABLE_get_pmc_keyed_str(interp, HashPointer, signature);
-    }
-
-    PARROT_ASSERT(PMC_IS_NULL(b) || b->vtable);
-
-    if ((!PMC_IS_NULL(b)) && b->vtable->base_type == enum_class_UnManagedStruct)
-        return F2DPTR(VTABLE_get_pointer(interp, b));
-
-    /*
-      These three lines have been added to aid debugging. I want to be able to
-      see which signature has an unknown type. I am sure someone can come up
-      with a neater way to do this.
-     */
-    ns = string_make(interp, " is an unknown signature type", 29, "ascii", 0);
-    message = Parrot_str_concat(interp, signature, ns, 0);
-
-#if defined(CAN_BUILD_CALL_FRAMES)
-    ns = string_make(interp, ".\\nCAN_BUILD_CALL_FRAMES is enabled, this should not happen", 58, "ascii", 0);
-#else
-    ns = string_make(interp, ".\\nCAN_BUILD_CALL_FRAMES is disabled, add the signature to src/call_list.txt", 75, "ascii", 0);
-#endif
-    message = Parrot_str_concat(interp, message, ns, 0);
-
-    /*
-     * I think there may be memory issues with this but if we get to here we are
-     * aborting.
-     */
-    c = Parrot_str_to_cstring(interp, message);
-    PANIC(interp, c);
 }
-
 FN_FOOTER
+
     .return (code)
 .end
 
@@ -375,6 +392,7 @@ CODA
 
     .local string fn_code
     fn_code = 'sprintf'("%s{\n%s%s%s%s}\n", fn_decl, var_decls, preamble, call, postamble)
+
     .return (fn_code)
 .end
 
@@ -511,10 +529,11 @@ TEMPLATE
 
 .sub 'sig_to_fn_decl'
     .param pmc sig :slurpy
-    .local string fn_name, fn_decl
+    .local string storage_class, fn_name, fn_decl
+    storage_class = 'read_from_opts'(.THUNK_STORAGE_CLASS)
     fn_name = 'sig_to_fn_name'(sig :flat)
-    fn_decl = 'sprintf'(<<'TEMPLATE', fn_name)
-static void
+    fn_decl = 'sprintf'(<<'TEMPLATE', storage_class, fn_name)
+%s void
 %s(PARROT_INTERP, PMC *self)
 TEMPLATE
     .return (fn_decl)
@@ -528,8 +547,11 @@ TEMPLATE
     $P0 = 'map_from_sig_table'(params, 'cname')
     fix_params = join '', $P0
 
-    $S0 = 'sprintf'('pcf_%s_%s', ret, fix_params)
-    .return ($S0)
+
+    $S0 = 'sprintf'('%s_%s', ret, fix_params)
+    $S1 = 'read_from_opts'(.THUNK_NAME_PROTO)
+    $S2 = 'sprintf'($S1, $S0)
+    .return ($S2)
 .end
 
 .sub 'map_from_sig_table'
@@ -537,7 +559,7 @@ TEMPLATE
     .param string field_name
 
     .local pmc sig_table
-    sig_table = get_global .SIG_TABLE_CONST_NAME
+    sig_table = get_global .SIG_TABLE_GLOBAL_NAME
 
     $P0 = split '', sig
 
@@ -673,7 +695,7 @@ TEMPLATE
     $S0 = 'sigtable_json'()
     $P0 = 'decode_table'($S0)
     'fixup_table'($P0)
-    set_global .SIG_TABLE_CONST_NAME, $P0
+    set_global .SIG_TABLE_GLOBAL_NAME, $P0
 .end
 
 .sub 'decode_table'
