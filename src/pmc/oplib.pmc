@@ -1,0 +1,12 @@
+#include "parrot/parrot.h"
+
+pmclass OpLib {
+    VTABLE PMC *get_pmc_keyed_string(STRING *name) {
+        /* TODO: lookup the name in the table. Create and return an OpFamily
+           PMC with all the names */
+    }
+
+    VTABLE PMC *get_pmc_keyed_int(INTVAL value) {
+        /* TODO: Return the Opcode PMC with the given number */
+    }
+}

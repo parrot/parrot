@@ -1,0 +1,23 @@
+#include "parrot/parrot.h"
+
+pmclass Opcode {
+    ATTR op_info_t *info;
+    ATTR STRING *full_name_cache;
+
+    VTABLE void set_pointer(void *i) {
+        Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        attrs->info = i;
+    }
+
+    VTABLE STRING *get_string() {
+        Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        if (attrs->full_name == NULL) {
+            const char * const name = attrs->info->full_name;
+            const INTVAL len = strlen(name);
+            STRING * const newstr = Parrot_str_new(INTERP, name, len);
+            attrs->full_name_cache = newstr;
+        }
+        return attrs->full_name_cache;
+    }
+
+}

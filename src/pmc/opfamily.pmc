@@ -1,0 +1,22 @@
+#include "parrot/parrot.h"
+
+pmclass OpFamily {
+    VTABLE void set_string_native(STRING *name) {
+        /* TODO: Set the name of this family. Look up in the oplib for all
+           ops with the same short-name and add them to the internal list */
+    }
+
+    VTABLE PMC *get_pmc_keyed_string(STRING *name) {
+        /* TODO: name will contain the signature "p_sc_i" of the specific op
+           to look up. Return a new Opcode PMC corresponding to that op */
+    }
+
+    VTABLE PMC *get_pmc_keyed_int(INTVAL value) {
+        /* TODO: Return the Opcode PMC with the given INTVAL number, PMCNULL
+           if it's not part of this family */
+    }
+
+    VTABLE STRING *get_string() {
+        /* TODO: Return the name of this family */
+    }
+}
