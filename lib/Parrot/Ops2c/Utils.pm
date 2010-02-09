@@ -820,7 +820,7 @@ END_C
                 . join(
                 ", ", scalar $op->arg_dirs
                 ? map { $arg_dir_mapping{$_} } $op->arg_dirs
-                : '(arg_dir_t) 0'  
+                : '(arg_dir_t) 0'
                 ) . " }";
             my $labels = "{ "
                 . join(
