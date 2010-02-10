@@ -259,7 +259,6 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
 {
     ASSERT_ARGS(Parrot_gc_initialize)
 
-    interp->gc_sys    = mem_allocate_zeroed_typed(GC_Subsystem);
     interp->lo_var_ptr                    = stacktop;
 
     /*Call appropriate initialization function for GC subsystem*/

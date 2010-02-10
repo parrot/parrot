@@ -24,6 +24,7 @@ Create or destroy a Parrot interpreter
 #include "parrot/oplib/core_ops.h"
 #include "../compilers/imcc/imc.h"
 #include "pmc/pmc_callcontext.h"
+#include "../gc/gc_private.h"
 #include "inter_create.str"
 
 /* HEADERIZER HFILE: include/parrot/interpreter.h */
@@ -182,6 +183,7 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     /* Allocate IMCC info */
     IMCC_INFO(interp) = mem_allocate_zeroed_typed(imc_info_t);
 
+    interp->gc_sys           = mem_allocate_zeroed_typed(GC_Subsystem);
     interp->gc_sys->sys_type = PARROT_GC_DEFAULT_TYPE;
 
     /* Done. Return and be done with it */
