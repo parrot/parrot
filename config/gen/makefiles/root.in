@@ -2399,7 +2399,15 @@ $(LIBNCI_TEST_SO): src/nci_test$(O) $(LIBPARROT)
 # for use by runtime/parrot/library/OpenGL.pir
 src/glut_callbacks$(O): $(GENERAL_H_FILES)
 
-$(LIBGLUTCB_SO): $(LIBPARROT) src/glut_callbacks$(O)
+src/glut_nci_thunks.c: $(PARROT) runtime/parrot/library/data_json.pbc tools/build/nativecall.pir
+	$(PARROT) tools/build/nativecall.pir \
+	    --loader-name=Parrot_glut_nci_loader \
+	    <src/glut_nci_thunks.nci \
+	    >src/glut_nci_thunks.c
+
+src/glut_nci_thunks$(O): $(GENERAL_H_FILES)
+
+$(LIBGLUTCB_SO): $(LIBPARROT) src/glut_callbacks$(O) src/glut_nci_thunks$(O)
 	$(LD) $(LD_LOAD_FLAGS) $(LDFLAGS) \
     @ld_out@$@ src/glut_callbacks$(O) \
     $(ALL_PARROT_LIBS) @opengl_lib@

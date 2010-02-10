@@ -15,7 +15,7 @@ Generates several files used by the OpenGL binding.  These include:
 
 =item F<runtime/parrot/library/OpenGL_funcs.pir>
 
-=item F<config/gen/call_list/opengl.in>
+=item F<src/glut_nci_thunks.nci>
 
 =item F<src/glut_callbacks.c>
 
@@ -436,7 +436,7 @@ my @SKIP = (
 
 my $MACRO_FILE = 'runtime/parrot/include/opengl_defines.pasm';
 my $FUNCS_FILE = 'runtime/parrot/library/OpenGL_funcs.pir';
-my $SIGS_FILE  = 'config/gen/call_list/opengl.in';
+my $SIGS_FILE  = 'src/glut_nci_thunks.nci';
 my $C_FILE     = 'src/glut_callbacks.c';
 
 

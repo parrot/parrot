@@ -242,13 +242,10 @@ USAGE
  *  Notes:
  *  References:
  */
+
+#define PARROT_IN_EXTENSION
 #include "parrot/parrot.h"
-#include "parrot/hash.h"
-#include "parrot/oplib/ops.h"
-#include "pmc/pmc_managedstruct.h"
 #include "pmc/pmc_nci.h"
-#include "pmc/pmc_pointer.h"
-#include "pmc/pmc_callcontext.h"
 
 #ifdef PARROT_IN_CORE
 /* external libraries don't have to care about string subsystem */
@@ -257,15 +254,6 @@ USAGE
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER STOP */
-
-/*
- * if the architecture can build some or all of these signatures
- * enable the define below
- * - the JITed function will be called first
- * - if it returns NULL, the hardcoded version will do the job
- */
-
-#include "frame_builder.h"
 
 /* All our static functions that call in various ways. Yes, terribly
    hackish, but that is just fine */
