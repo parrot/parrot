@@ -327,7 +327,7 @@ For more details, see the full text of the license in the LICENSE file\
 \n\
 included in the Parrot source tree.\n\n");
 
-    Parrot_exit(interp, 0);
+    exit(EXIT_SUCCESS);
 }
 /*
 
