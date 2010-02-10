@@ -406,7 +406,8 @@ PARROT_H_HEADERS = \
         $(INC_DIR)/core_pmcs.h \
         $(INC_DIR)/compiler.h \
         $(INC_DIR)/cclass.h \
-        include/pmc/pmc_callcontext.h
+        include/pmc/pmc_callcontext.h \
+        include/pmc/pmc_parrotinterpreter.h
 
 # generated list of header files
 GENERAL_H_FILES   = $(NONGEN_HEADERS) $(GEN_HEADERS) @TEMP_cg_h@
