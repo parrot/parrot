@@ -91,6 +91,7 @@ order.
     load_bytecode 'OpenGL_funcs.pbc'
     _load_opengl_libs()
     _wrap_opengl_entry_points()
+    _load_nci_thunks()
     _export_opengl_functions()
 .end
 
@@ -240,6 +241,25 @@ alternating function names and Parrot NCI signatures.
 
 
 =back
+
+=head2 Thunk Loading
+
+These routines ensure that all NCI thunks necessary for calling OpenGL functions are
+available to Parrot.
+
+=cut
+
+.sub _load_nci_thunks
+    # load the nci thunks
+    .local pmc ns, loader
+    ns = get_namespace
+    loader = ns['Parrot_glut_nci_loader']
+    loader()
+
+    # delete loader the function, it isn't for public consumption
+    $P0 = new ['Undef']
+    set_global 'Parrot_glut_nci_loader', $P0
+.end
 
 =head2 Symbol Export
 

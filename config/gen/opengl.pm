@@ -812,6 +812,8 @@ HEADER
 .sub _glutcb_func_list
     .local pmc glutcb_funcs
     glutcb_funcs = new 'ResizableStringArray'
+    push glutcb_funcs, 'Parrot_glut_nci_loader'
+    push glutcb_funcs, 'vJ'
     push glutcb_funcs, 'glutcbCloseFunc'
     push glutcb_funcs, 'vJP'
     push glutcb_funcs, 'glutcbDisplayFunc'

@@ -2402,6 +2402,7 @@ src/glut_callbacks$(O): $(GENERAL_H_FILES)
 src/glut_nci_thunks.c: $(PARROT) runtime/parrot/library/data_json.pbc tools/build/nativecall.pir
 	$(PARROT) tools/build/nativecall.pir \
 	    --loader-name=Parrot_glut_nci_loader \
+	    --loader-storage-class=PARROT_DYNEXT_EXPORT \
 	    <src/glut_nci_thunks.nci \
 	    >src/glut_nci_thunks.c
 
