@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -177,9 +177,7 @@ verify_CD(ARGIN(char *external_data), ARGMOD_NULLOK(PMC *user_data))
     if ((UINTVAL)user_data & 3)
         PANIC(interp, "user_data doesn't look like a pointer");
 
-    /*
-     * Fetch original interpeter from prop
-     */
+    /* Fetch original interpreter from prop */
     LOCK(interpreter_array_mutex);
 
     interp      = interpreter_array[0];

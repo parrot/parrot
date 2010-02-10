@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -116,7 +116,7 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     Interp *interp;
 
     interp = allocate_interpreter(parent, flags);
-    initialize_interpeter(interp, (void*)&stacktop);
+    initialize_interpreter(interp, (void*)&stacktop);
     return interp;
 }
 
@@ -124,12 +124,12 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 
 =item C<Parrot_Interp allocate_interpreter(Interp *parent, INTVAL flags)>
 
-Allocate new interpeter from system memory. Everything is preallocated but not
+Allocate new interpreter from system memory. Everything is preallocated but not
 initialized. Used in next cycle:
 
     allocate_interpreter
     parseflags
-    initialize_interpeter
+    initialize_interpreter
 
 for overriding subsystems (e.g. GC) which require early initialization.
 
@@ -192,9 +192,9 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 
 /*
 
-=item C<Parrot_Interp initialize_interpeter(PARROT_INTERP, void *stacktop)>
+=item C<Parrot_Interp initialize_interpreter(PARROT_INTERP, void *stacktop)>
 
-Initialize previously allocated interpeter.
+Initialize previously allocated interpreter.
 
 =cut
 
@@ -203,9 +203,9 @@ Initialize previously allocated interpeter.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Interp
-initialize_interpeter(PARROT_INTERP, ARGIN(void *stacktop))
+initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
 {
-    ASSERT_ARGS(initialize_interpeter)
+    ASSERT_ARGS(initialize_interpreter)
 
     /* Set up the memory allocation system */
     Parrot_gc_initialize(interp, stacktop);
