@@ -115,7 +115,7 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     Interp *interp;
 
     interp = allocate_interpreter(parent, flags);
-    initialize_interpeter(interp,(void*)&stacktop);
+    initialize_interpeter(interp, (void*)&stacktop);
     return interp;
 }
 

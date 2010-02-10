@@ -325,6 +325,7 @@ PARROT_CAN_RETURN_NULL
 static const char *
 parseflags(PARROT_INTERP, int *argc, char **argv[])
 {
+    ASSERT_ARGS(parseflags)
     struct longopt_opt_info opt  = LONGOPT_OPT_INFO_INIT;
     INTVAL                  core = 0;
     int                     status;
