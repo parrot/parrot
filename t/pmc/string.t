@@ -230,7 +230,7 @@ Tests the C<String> PMC.
     new $P1, ['Float']
     set $P1, 6.5
     repeat $P2, $P0, $P1
-    is( $P2, 'yyyyyy', 'Float arg to repeat' ) 
+    is( $P2, 'yyyyyy', 'Float arg to repeat' )
 
     set $P0, "z"
     new $P1, ['String']
@@ -256,7 +256,7 @@ Tests the C<String> PMC.
     new $P1, ['Float']
     set $P1, 6.5
     repeat $P3, $P0, $P1
-    is( $P3, 'yyyyyy', 'Float arg to repeat' ) 
+    is( $P3, 'yyyyyy', 'Float arg to repeat' )
 
     set $P0, "z"
     new $P1, ['String']
@@ -1026,11 +1026,11 @@ check:
     # Get
     $S0 = s[0]
     is($S0, 'B', 'Get string by index')
-    
+
     $I0 = s[1]
     $I1 = ord 'A'
     is($I0, $I1, 'Get integer by index')
-    
+
     $P0 = s[2]
     is($P0, 'R', 'Get PMC by index')
 

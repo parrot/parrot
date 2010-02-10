@@ -195,15 +195,13 @@ inline op bnots(out STR, in STR) :base_core {
 
 inline op bnots(invar PMC) :base_core {
     STRING * a = VTABLE_get_string(interp, $1);
-    STRING * b;
-    Parrot_str_bitwise_not(interp, a, &b);
+    STRING * b = Parrot_str_bitwise_not(interp, a, NULL);
     VTABLE_set_string_native(interp, $1, b);
 }
 
 inline op bnots(out PMC, invar PMC) :base_core {
     STRING * a = VTABLE_get_string(interp, $2);
-    STRING * b;
-    Parrot_str_bitwise_not(interp, a, &b);
+    STRING * b = Parrot_str_bitwise_not(interp, a, NULL);
     VTABLE_set_string_native(interp, $1, b);
 }
 
