@@ -47,10 +47,15 @@ static void Parrot_version(PARROT_INTERP)
 
 PARROT_CAN_RETURN_NULL
 static const char * parseflags(PARROT_INTERP,
-    int *argc,
-    char **argv[],
-    INTVAL *core)
-        __attribute__nonnull__(1);
+    ARGIN(int *argc),
+    ARGIN(char **argv[]),
+    ARGIN(INTVAL *core),
+    ARGIN(Parrot_trace_flags *trace))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
 static void usage(ARGMOD(FILE *fp))
         __attribute__nonnull__(1)
@@ -63,7 +68,11 @@ static void usage(ARGMOD(FILE *fp))
 #define ASSERT_ARGS_Parrot_version __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_parseflags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(argc) \
+    , PARROT_ASSERT_ARG(argv) \
+    , PARROT_ASSERT_ARG(core) \
+    , PARROT_ASSERT_ARG(trace))
 #define ASSERT_ARGS_usage __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(fp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -87,7 +96,9 @@ main(int argc, char * argv[])
     const char *execname;
     Interp     *interp;
     int         status;
-    INTVAL      core        = 0;
+
+    INTVAL             core  = 0;
+    Parrot_trace_flags trace = PARROT_NO_TRACE;
 
     /* internationalization setup */
     /* setlocale(LC_ALL, ""); */
@@ -104,12 +115,13 @@ main(int argc, char * argv[])
     execname = argv[0];
 
     /* Parse flags */
-    sourcefile = parseflags(interp, &argc, &argv, &core);
+    sourcefile = parseflags(interp, &argc, &argv, &core, &trace);
 
     /* Now initialize interpeter */
     initialize_interpeter(interp, (void*)&stacktop);
     imcc_initialize(interp);
 
+    Parrot_set_trace(interp, trace);
     Parrot_set_run_core(interp, (Parrot_Run_core_t) core);
     Parrot_set_executable_name(interp, Parrot_str_new(interp, execname, 0));
 
@@ -332,7 +344,7 @@ included in the Parrot source tree.\n\n");
 /*
 
 =item C<static const char * parseflags(PARROT_INTERP, int *argc, char **argv[],
-INTVAL *core)>
+INTVAL *core, Parrot_trace_flags *trace)>
 
 Parse Parrot's command line for options and set appropriate flags.
 
@@ -342,7 +354,9 @@ Parse Parrot's command line for options and set appropriate flags.
 
 PARROT_CAN_RETURN_NULL
 static const char *
-parseflags(PARROT_INTERP, int *argc, char **argv[], INTVAL *core)
+parseflags(PARROT_INTERP,
+        ARGIN(int *argc), ARGIN(char **argv[]),
+        ARGIN(INTVAL *core), ARGIN(Parrot_trace_flags *trace))
 {
     ASSERT_ARGS(parseflags)
     struct longopt_opt_info opt  = LONGOPT_OPT_INFO_INIT;
@@ -400,9 +414,9 @@ parseflags(PARROT_INTERP, int *argc, char **argv[], INTVAL *core)
             break;
           case 't':
             if (opt.opt_arg && is_all_hex_digits(opt.opt_arg))
-                SET_TRACE(strtoul(opt.opt_arg, NULL, 16));
+                *trace = strtoul(opt.opt_arg, NULL, 16);
             else
-                SET_TRACE(PARROT_TRACE_OPS_FLAG);
+                *trace = PARROT_TRACE_OPS_FLAG;
             break;
           case 'D':
             if (opt.opt_arg && is_all_hex_digits(opt.opt_arg)) {
