@@ -73,11 +73,54 @@ static void debug_print_buf(PARROT_INTERP, ARGIN(const Buffer *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void fix_pmc_syncs(
+    ARGMOD(Interp *dest_interp),
+    ARGIN(Fixed_Size_Pool *pool))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest_interp);
+
+static void free_pool(ARGMOD(Fixed_Size_Pool *pool))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*pool);
+
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static Variable_Size_Pool * new_memory_pool(
     size_t min_block,
     NULLOK(compact_f compact));
+
+static void Parrot_gc_merge_buffer_pools(PARROT_INTERP,
+    ARGIN(Memory_Pools * const mem_pools),
+    ARGMOD(Fixed_Size_Pool *dest),
+    ARGMOD(Fixed_Size_Pool *source))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*dest)
+        FUNC_MODIFIES(*source);
+
+static int sweep_cb_buf(PARROT_INTERP,
+    ARGIN(Memory_Pools *mem_pools),
+    ARGMOD(Fixed_Size_Pool *pool),
+    SHIM(int flag),
+    ARGIN(void *arg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*pool);
+
+static int sweep_cb_pmc(PARROT_INTERP,
+    ARGIN(Memory_Pools *mem_pools),
+    ARGMOD(Fixed_Size_Pool *pool),
+    SHIM(int flag),
+    SHIM(void *arg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*pool);
 
 #define ASSERT_ARGS_alloc_new_block __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -97,7 +140,26 @@ static Variable_Size_Pool * new_memory_pool(
 #define ASSERT_ARGS_debug_print_buf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(b))
+#define ASSERT_ARGS_fix_pmc_syncs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(dest_interp) \
+    , PARROT_ASSERT_ARG(pool))
+#define ASSERT_ARGS_free_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pool))
 #define ASSERT_ARGS_new_memory_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_gc_merge_buffer_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(mem_pools) \
+    , PARROT_ASSERT_ARG(dest) \
+    , PARROT_ASSERT_ARG(source))
+#define ASSERT_ARGS_sweep_cb_buf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(mem_pools) \
+    , PARROT_ASSERT_ARG(pool) \
+    , PARROT_ASSERT_ARG(arg))
+#define ASSERT_ARGS_sweep_cb_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(mem_pools) \
+    , PARROT_ASSERT_ARG(pool))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -950,6 +1012,350 @@ check_buffer_ptr(ARGMOD(Buffer * pobj), ARGMOD(Variable_Size_Pool * pool))
     }
     PARROT_ASSERT(0);
 }
+
+
+/*
+
+=item C<void Parrot_gc_destroy_header_pools(PARROT_INTERP, Memory_Pools * const
+mem_pools)>
+
+Performs a garbage collection sweep on all pools, then frees them.  Calls
+C<header_pools_iterate_callback> to loop over all the pools, passing
+C<sweep_cb_pmc> and C<sweep_cb_buf> callback routines. Frees the array of sized
+header pointers in the C<Memory_Pools> structure too.
+
+=cut
+
+*/
+
+void
+Parrot_gc_destroy_header_pools(PARROT_INTERP,
+        ARGIN(Memory_Pools * const mem_pools))
+{
+    ASSERT_ARGS(Parrot_gc_destroy_header_pools)
+    INTVAL pass;
+
+    /* const/non const COW strings life in different pools
+     * so in first pass
+     * COW refcount is done, in 2. refcounting
+     * in 3rd freeing
+     */
+    const INTVAL start = 2;
+
+    header_pools_iterate_callback(interp, mem_pools, POOL_PMC, NULL, sweep_cb_pmc);
+    header_pools_iterate_callback(interp, mem_pools, POOL_PMC | POOL_CONST, NULL,
+            sweep_cb_pmc);
+
+    for (pass = start; pass <= 2; pass++) {
+        header_pools_iterate_callback(interp, mem_pools, POOL_BUFFER | POOL_CONST,
+                (void *)pass, sweep_cb_buf);
+    }
+
+    mem_internal_free(mem_pools->sized_header_pools);
+
+    if (mem_pools->attrib_pools) {
+        unsigned int i;
+        for (i = 0; i < mem_pools->num_attribs; i++) {
+            PMC_Attribute_Pool  *pool  = mem_pools->attrib_pools[i];
+            PMC_Attribute_Arena *arena;
+
+            if (!pool)
+                continue;
+
+            arena = pool->top_arena;
+
+            while (arena) {
+                PMC_Attribute_Arena *next = arena->next;
+                mem_internal_free(arena);
+                arena = next;
+            }
+            mem_internal_free(pool);
+        }
+
+        mem_internal_free(mem_pools->attrib_pools);
+    }
+
+    mem_pools->attrib_pools       = NULL;
+    mem_pools->sized_header_pools = NULL;
+}
+
+/*
+
+=item C<static int sweep_cb_pmc(PARROT_INTERP, Memory_Pools *mem_pools,
+Fixed_Size_Pool *pool, int flag, void *arg)>
+
+Performs a garbage collection sweep of the given pmc pool, then frees it. Calls
+C<Parrot_gc_sweep_pool> to perform the sweep, and C<free_pool> to free the pool and
+all its arenas. Always returns C<0>.
+
+=cut
+
+*/
+
+static int
+sweep_cb_pmc(PARROT_INTERP,
+        ARGIN(Memory_Pools *mem_pools),
+        ARGMOD(Fixed_Size_Pool *pool),
+        SHIM(int flag), SHIM(void *arg))
+{
+    ASSERT_ARGS(sweep_cb_pmc)
+    Parrot_gc_sweep_pool(interp, mem_pools, pool);
+    free_pool(pool);
+    return 0;
+}
+
+/*
+
+=item C<static int sweep_cb_buf(PARROT_INTERP, Memory_Pools *mem_pools,
+Fixed_Size_Pool *pool, int flag, void *arg)>
+
+Performs a final garbage collection sweep, then frees the pool. Calls
+C<Parrot_gc_sweep_pool> to perform the sweep, and C<free_pool> to free the pool and
+all its arenas.
+
+=cut
+
+*/
+
+static int
+sweep_cb_buf(PARROT_INTERP,
+        ARGIN(Memory_Pools *mem_pools),
+        ARGMOD(Fixed_Size_Pool *pool),
+        SHIM(int flag), ARGIN(void *arg))
+{
+    ASSERT_ARGS(sweep_cb_buf)
+    UNUSED(arg);
+    Parrot_gc_sweep_pool(interp, mem_pools, pool);
+    free_pool(pool);
+
+    return 0;
+}
+
+/*
+
+=item C<static void free_pool(Fixed_Size_Pool *pool)>
+
+Frees a pool and all of its arenas. Loops through the list of arenas backwards
+and returns each to the memory manager. Then, frees the pool structure itself.
+
+=cut
+
+*/
+
+static void
+free_pool(ARGMOD(Fixed_Size_Pool *pool))
+{
+    ASSERT_ARGS(free_pool)
+    Fixed_Size_Arena *cur_arena;
+
+    for (cur_arena = pool->last_Arena; cur_arena;) {
+        Fixed_Size_Arena * const next = cur_arena->prev;
+        mem_internal_free(cur_arena->start_objects);
+        mem_internal_free(cur_arena);
+        cur_arena = next;
+    }
+    mem_internal_free(pool);
+}
+
+
+/*
+
+=item C<void Parrot_gc_destroy_memory_pools(PARROT_INTERP, Memory_Pools * const
+mem_pools)>
+
+Destroys the memory pool and the constant string pool. Loop through both
+pools and destroy all memory blocks contained in them. Once all the
+blocks are freed, free the pools themselves.
+
+=cut
+
+*/
+
+void
+Parrot_gc_destroy_memory_pools(PARROT_INTERP,
+        ARGIN(Memory_Pools * const mem_pools))
+{
+    ASSERT_ARGS(Parrot_gc_destroy_memory_pools)
+    int i;
+
+    for (i = 0; i < 2; i++) {
+        Variable_Size_Pool * const pool = i ?
+                mem_pools->constant_string_pool :
+                mem_pools->memory_pool;
+        Memory_Block *cur_block;
+
+        cur_block = pool->top_block;
+
+        while (cur_block) {
+            Memory_Block * const next_block = cur_block->prev;
+            mem_internal_free(cur_block);
+            cur_block = next_block;
+        }
+
+        mem_internal_free(pool);
+    }
+}
+
+/*
+
+=item C<void Parrot_gc_merge_memory_pools(Interp *dest_interp, Memory_Pools *
+const dest_arena, Memory_Pools * const source_arena)>
+
+Merges the header pools of C<source_interp> into those of C<dest_interp>.
+(Used to deal with shared objects left after interpreter destruction.)
+
+=cut
+
+*/
+
+void
+Parrot_gc_merge_memory_pools(ARGMOD(Interp *dest_interp),
+    ARGIN(Memory_Pools * const dest_arena),
+    ARGIN(Memory_Pools * const source_arena))
+{
+    ASSERT_ARGS(Parrot_gc_merge_memory_pools)
+
+    UINTVAL        i;
+
+    /* heavily borrowed from forall_header_pools */
+    fix_pmc_syncs(dest_interp, source_arena->constant_pmc_pool);
+    Parrot_gc_merge_buffer_pools(dest_interp, dest_arena,
+            dest_arena->constant_pmc_pool, source_arena->constant_pmc_pool);
+
+    fix_pmc_syncs(dest_interp, source_arena->pmc_pool);
+    Parrot_gc_merge_buffer_pools(dest_interp, dest_arena,
+            dest_arena->pmc_pool, source_arena->pmc_pool);
+
+    Parrot_gc_merge_buffer_pools(dest_interp, dest_arena,
+            dest_arena->constant_string_header_pool,
+            source_arena->constant_string_header_pool);
+
+    for (i = 0; i < source_arena->num_sized; ++i) {
+        if (!source_arena->sized_header_pools[i])
+            continue;
+
+        if (i >= dest_arena->num_sized
+        || !dest_arena->sized_header_pools[i]) {
+            Fixed_Size_Pool *ignored = get_bufferlike_pool(dest_interp,
+                    dest_arena, i * sizeof (void *));
+            UNUSED(ignored);
+            PARROT_ASSERT(dest_arena->sized_header_pools[i]);
+        }
+
+        Parrot_gc_merge_buffer_pools(dest_interp, dest_arena,
+            dest_arena->sized_header_pools[i],
+            source_arena->sized_header_pools[i]);
+    }
+}
+
+/*
+
+=item C<static void Parrot_gc_merge_buffer_pools(PARROT_INTERP, Memory_Pools *
+const mem_pools, Fixed_Size_Pool *dest, Fixed_Size_Pool *source)>
+
+Merge pool C<source> into pool C<dest>. Combines the free lists directly,
+moves all arenas to the new pool, and remove the old pool. To merge, the
+two pools must have the same object size, and the same name (if they have
+names).
+
+=cut
+
+*/
+
+static void
+Parrot_gc_merge_buffer_pools(PARROT_INTERP,
+        ARGIN(Memory_Pools * const mem_pools),
+        ARGMOD(Fixed_Size_Pool *dest), ARGMOD(Fixed_Size_Pool *source))
+{
+    ASSERT_ARGS(Parrot_gc_merge_buffer_pools)
+    Fixed_Size_Arena  *cur_arena;
+    GC_MS_PObj_Wrapper  *free_list_end;
+
+    PARROT_ASSERT(dest->object_size == source->object_size);
+    PARROT_ASSERT((dest->name == NULL && source->name == NULL)
+                || STREQ(dest->name, source->name));
+
+    dest->total_objects += source->total_objects;
+
+    /* append new free_list to old */
+    /* XXX this won't work with, e.g., gc_gms */
+    free_list_end = dest->free_list;
+
+    if (free_list_end == NULL)
+        dest->free_list = source->free_list;
+    else {
+        while (free_list_end->next_ptr)
+            free_list_end = free_list_end->next_ptr;
+
+        free_list_end->next_ptr = source->free_list;
+    }
+
+    /* now append source arenas */
+    cur_arena = source->last_Arena;
+
+    while (cur_arena) {
+        size_t                     total_objects;
+        Fixed_Size_Arena * const next_arena = cur_arena->prev;
+
+        cur_arena->next = cur_arena->prev = NULL;
+
+        total_objects   = cur_arena->total_objects;
+
+        Parrot_append_arena_in_pool(interp, mem_pools, dest, cur_arena,
+            cur_arena->total_objects);
+
+        /* XXX needed? */
+        cur_arena->total_objects = total_objects;
+
+        cur_arena = next_arena;
+    }
+
+    /* remove things from source */
+    source->last_Arena       = NULL;
+    source->free_list        = NULL;
+    source->total_objects    = 0;
+    source->num_free_objects = 0;
+}
+
+/*
+
+=item C<static void fix_pmc_syncs(Interp *dest_interp, Fixed_Size_Pool *pool)>
+
+Walks through the given arena, looking for all live and shared PMCs,
+transferring their sync values to the destination interpreter.
+
+=cut
+
+*/
+
+static void
+fix_pmc_syncs(ARGMOD(Interp *dest_interp), ARGIN(Fixed_Size_Pool *pool))
+{
+    ASSERT_ARGS(fix_pmc_syncs)
+    Fixed_Size_Arena *cur_arena;
+    const UINTVAL       object_size = pool->object_size;
+
+    for (cur_arena = pool->last_Arena; cur_arena; cur_arena = cur_arena->prev) {
+        PMC   *p = (PMC *)((char*)cur_arena->start_objects);
+        size_t i;
+
+        for (i = 0; i < cur_arena->used; i++) {
+            if (!PObj_on_free_list_TEST(p) && PObj_is_PMC_TEST(p)) {
+                if (PObj_is_PMC_shared_TEST(p))
+                    PMC_sync(p)->owner = dest_interp;
+                else
+                    Parrot_ex_throw_from_c_args(dest_interp, NULL,
+                        EXCEPTION_INTERP_ERROR,
+                        "Unshared PMC still alive after interpreter"
+                        "destruction. address=%p, base_type=%d\n",
+                        p, p->vtable->base_type);
+            }
+
+            p = (PMC *)((char *)p + object_size);
+        }
+    }
+}
+
 
 /*
 

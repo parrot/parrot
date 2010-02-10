@@ -76,7 +76,7 @@ create_buffer(PARROT_INTERP, PMC *pmc, PMC *info)
         len = FREEZE_BYTES_PER_ITEM;
 
     PARROT_IMAGEIO(info)->buffer =
-        (Buffer *)Parrot_gc_new_bufferlike_header(interp, sizeof (Buffer));
+        Parrot_gc_new_bufferlike_header(interp, sizeof (Buffer));
     Parrot_gc_allocate_buffer_storage_aligned(interp,
         PARROT_IMAGEIO(info)->buffer, len);
     SET_VISIT_CURSOR(info, (char *)Buffer_bufstart(PARROT_IMAGEIO(info)->buffer));
