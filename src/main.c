@@ -27,6 +27,9 @@ Start Parrot
 #include "parrot/runcore_api.h"
 #include "pmc/pmc_callcontext.h"
 
+/* For gc_sys_type_enum */
+#include "gc/gc_private.h"
+
 /* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
@@ -42,9 +45,11 @@ static int is_all_hex_digits(ARGIN(const char *s))
 static void Parrot_version(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static const char * parseflags(PARROT_INTERP, int *argc, char **argv[])
+static const char * parseflags(PARROT_INTERP,
+    int *argc,
+    char **argv[],
+    INTVAL *core)
         __attribute__nonnull__(1);
 
 static void usage(ARGMOD(FILE *fp))
@@ -77,9 +82,12 @@ The entry point from the command line into Parrot.
 int
 main(int argc, char * argv[])
 {
+    int         stacktop;
     const char *sourcefile;
+    const char *execname;
     Interp     *interp;
     int         status;
+    INTVAL      core        = 0;
 
     /* internationalization setup */
     /* setlocale(LC_ALL, ""); */
@@ -88,15 +96,23 @@ main(int argc, char * argv[])
 
     Parrot_set_config_hash();
 
-    interp = Parrot_new(NULL);
-    imcc_initialize(interp);
+    interp = allocate_interpreter(NULL, PARROT_NO_FLAGS);
 
     /* We parse the arguments, but first store away the name of the Parrot
        executable, since parsing destroys that and we want to make it
        available. */
-    Parrot_set_executable_name(interp, Parrot_str_new(interp, argv[0], 0));
+    execname = argv[0];
 
-    sourcefile = parseflags(interp, &argc, &argv);
+    /* Parse flags */
+    sourcefile = parseflags(interp, &argc, &argv, &core);
+
+    /* Now initialize interpeter */
+    initialize_interpeter(interp, (void*)&stacktop);
+    imcc_initialize(interp);
+
+    Parrot_set_run_core(interp, (Parrot_Run_core_t) core);
+    Parrot_set_executable_name(interp, Parrot_str_new(interp, execname, 0));
+
     status     = imcc_run(interp, sourcefile, argc, argv);
     UNUSED(status);
 
@@ -124,6 +140,7 @@ static struct longopt_opt_decl options[] = {
     { 'L', 'L', OPTION_required_FLAG, { "--library" } },
     { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
     { 'R', 'R', OPTION_required_FLAG, { "--runcore" } },
+    { 'g', 'g', OPTION_required_FLAG, { "--gc" } },
     { 'V', 'V', (OPTION_flags)0, { "--version" } },
     { 'X', 'X', OPTION_required_FLAG, { "--dynext" } },
     { '\0', OPT_DESTROY_FLAG, (OPTION_flags)0,
@@ -267,6 +284,7 @@ help(void)
     "    -G --no-gc\n"
     "       --gc-debug\n"
     "       --leak-test|--destroy-at-end\n"
+    "    -g --gc ms|inf set GC type\n"
     "    -. --wait    Read a keystroke before starting\n"
     "       --runtime-prefix\n"
     "   <Compiler options>\n"
@@ -313,7 +331,8 @@ included in the Parrot source tree.\n\n");
 }
 /*
 
-=item C<static const char * parseflags(PARROT_INTERP, int *argc, char **argv[])>
+=item C<static const char * parseflags(PARROT_INTERP, int *argc, char **argv[],
+INTVAL *core)>
 
 Parse Parrot's command line for options and set appropriate flags.
 
@@ -323,11 +342,10 @@ Parse Parrot's command line for options and set appropriate flags.
 
 PARROT_CAN_RETURN_NULL
 static const char *
-parseflags(PARROT_INTERP, int *argc, char **argv[])
+parseflags(PARROT_INTERP, int *argc, char **argv[], INTVAL *core)
 {
     ASSERT_ARGS(parseflags)
     struct longopt_opt_info opt  = LONGOPT_OPT_INFO_INIT;
-    INTVAL                  core = 0;
     int                     status;
 
     if (*argc == 1) {
@@ -342,32 +360,42 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
         switch (opt.opt_id) {
           case 'R':
             if (STREQ(opt.opt_arg, "slow") || STREQ(opt.opt_arg, "bounds"))
-                core = PARROT_SLOW_CORE;
+                *core = PARROT_SLOW_CORE;
             else if (STREQ(opt.opt_arg, "fast") || STREQ(opt.opt_arg, "function"))
-                core = PARROT_FAST_CORE;
+                *core = PARROT_FAST_CORE;
             else if (STREQ(opt.opt_arg, "switch"))
-                core = PARROT_SWITCH_CORE;
+                *core = PARROT_SWITCH_CORE;
             else if (STREQ(opt.opt_arg, "cgp"))
-                core = PARROT_CGP_CORE;
+                *core = PARROT_CGP_CORE;
             else if (STREQ(opt.opt_arg, "cgoto"))
-                core = PARROT_CGOTO_CORE;
+                *core = PARROT_CGOTO_CORE;
             else if (STREQ(opt.opt_arg, "jit"))
-                core = PARROT_FAST_CORE;
+                *core = PARROT_FAST_CORE;
             else if (STREQ(opt.opt_arg, "cgp-jit"))
-                core = PARROT_CGP_CORE;
+                *core = PARROT_CGP_CORE;
             else if (STREQ(opt.opt_arg, "switch-jit"))
-                core = PARROT_SWITCH_CORE;
+                *core = PARROT_SWITCH_CORE;
             else if (STREQ(opt.opt_arg, "exec"))
-                core = PARROT_EXEC_CORE;
+                *core = PARROT_EXEC_CORE;
             else if (STREQ(opt.opt_arg, "trace"))
-                core = PARROT_SLOW_CORE;
+                *core = PARROT_SLOW_CORE;
             else if (STREQ(opt.opt_arg, "profiling"))
-                core = PARROT_PROFILING_CORE;
+                *core = PARROT_PROFILING_CORE;
             else if (STREQ(opt.opt_arg, "gcdebug"))
-                core = PARROT_GC_DEBUG_CORE;
+                *core = PARROT_GC_DEBUG_CORE;
             else
                 Parrot_ex_throw_from_c_args(interp, NULL, 1,
                         "main: Unrecognized runcore '%s' specified."
+                        "\n\nhelp: parrot -h\n", opt.opt_arg);
+            break;
+          case 'g':
+            if (STREQ(opt.opt_arg, "ms"))
+                interp->gc_sys->sys_type = MS;
+            else if (STREQ(opt.opt_arg, "inf"))
+                interp->gc_sys->sys_type = INF;
+            else
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                        "main: Unrecognized GC '%s' specified."
                         "\n\nhelp: parrot -h\n", opt.opt_arg);
             break;
           case 't':
@@ -428,7 +456,7 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
             break;
           default:
             /* Delegate handling of IMCC flags to IMCC */
-            if (imcc_handle_flag(interp, &opt, &core))
+            if (imcc_handle_flag(interp, &opt, core))
                 break;
 
             /* PIRC flags handling goes here */
@@ -460,7 +488,6 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
     *argc -= opt.opt_index;
     *argv += opt.opt_index;
 
-    Parrot_set_run_core(interp, (Parrot_Run_core_t) core);
     return (*argv)[0];
 }
 /*
