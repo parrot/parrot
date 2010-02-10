@@ -2409,7 +2409,7 @@ src/glut_nci_thunks$(O): $(GENERAL_H_FILES)
 
 $(LIBGLUTCB_SO): $(LIBPARROT) src/glut_callbacks$(O) src/glut_nci_thunks$(O)
 	$(LD) $(LD_LOAD_FLAGS) $(LDFLAGS) \
-    @ld_out@$@ src/glut_callbacks$(O) \
+    @ld_out@$@ src/glut_callbacks$(O) src/glut_nci_thunks$(O) \
     $(ALL_PARROT_LIBS) @opengl_lib@
 
 # emacs etags
