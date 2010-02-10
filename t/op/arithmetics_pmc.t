@@ -20,7 +20,7 @@ Test handling C<dest> arg in 3-args arithmetic.
     .include 'test_more.pir'
     .include "iglobals.pasm"
 
-    plan(68)
+    plan(44)
 
     # Don't check BigInt or BigNum without gmp
     .local pmc interp     # a handle to our interpreter object.

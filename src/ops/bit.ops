@@ -503,9 +503,6 @@ inline op rot(out INT, in INT, in INT, inconst INT) {
     $1 = d;
 }
 
-
-}
-
 ########################################
 
 =item B<bxor>(inout INT, in INT)
