@@ -175,14 +175,6 @@ void i_modulus(PMC* value) :write
 void i_modulus_int(INTVAL value) :write
 void i_modulus_float(FLOATVAL value) :write
 
-PMC* pow(PMC* value, PMC* dest)
-PMC* pow_int(INTVAL value, PMC* dest)
-PMC* pow_float(FLOATVAL value, PMC* dest)
-
-void i_pow(PMC* value) :write
-void i_pow_int(INTVAL value) :write
-void i_pow_float(FLOATVAL value) :write
-
 void increment() :write
 void decrement() :write
 

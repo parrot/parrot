@@ -156,12 +156,6 @@ s/^(\s*)(PMC\s+\*cmodulus_float\(FLOATVAL\s+\w*,\s+PMC\s+\*\w*\)\s+{)/$1VTABLE $
 s/^(\s*)(void\s+i_cmodulus\(PMC\s+\*\w*\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(void\s+i_cmodulus_int\(INTVAL\s+\w*\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(void\s+i_cmodulus_float\(FLOATVAL\s+\w*\)\s+{)/$1VTABLE $2/;
-s/^(\s*)(PMC\s+\*pow\(PMC\s+\*\w*,\s+PMC\s+\*\w*\)\s+{)/$1VTABLE $2/;
-s/^(\s*)(PMC\s+\*pow_int\(INTVAL\s+\w*,\s+PMC\s+\*\w*\)\s+{)/$1VTABLE $2/;
-s/^(\s*)(PMC\s+\*pow_float\(FLOATVAL\s+\w*,\s+PMC\s+\*\w*\)\s+{)/$1VTABLE $2/;
-s/^(\s*)(void\s+i_pow\(PMC\s+\*\w*\)\s+{)/$1VTABLE $2/;
-s/^(\s*)(void\s+i_pow_int\(INTVAL\s+\w*\)\s+{)/$1VTABLE $2/;
-s/^(\s*)(void\s+i_pow_float\(FLOATVAL\s+\w*\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(void\s+increment\(\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(void\s+decrement\(\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(PMC\s+\*absolute\(PMC\s+\*\w*\)\s+{)/$1VTABLE $2/;

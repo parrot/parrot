@@ -887,17 +887,10 @@ Decrements the integer.
             "BigInt: no multiple dispatch variant 'i_multiply_float' for FLOATVAL");
     }
 
-    VTABLE PMC *pow_int(INTVAL value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        bigint_pow_bigint_int(INTERP, SELF, value, dest);
-        return dest;
-    }
-
-    MULTI PMC *pow(PMC *value, PMC *dest) {
+    METHOD pow(PMC *value) {
         /* XXX only Integer RHS currently */
         const INTVAL r = VTABLE_get_integer(INTERP, value);
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC *dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_pow_bigint_int(INTERP, SELF, r, dest);
         return dest;

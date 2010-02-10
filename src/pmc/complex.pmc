@@ -1775,9 +1775,12 @@ atanh = i atan(-ix)
 
 /*
 
-=item C<PMC *pow(PMC *value, PMC *dest)>
+=item C<METHOD PMC *pow(PMC *value)>
 
-Return SELF to the C<value>th power and return result in C<dest>.
+Raise SELF to the power of value. Replacement for the old pow() vtable, which
+was deleted.
+
+TODO: Requires testing
 
 =item C<METHOD PMC *sqrt()>
 
@@ -1792,38 +1795,19 @@ x ^ y = exp(y * ln x))
 
 */
 
-    MULTI PMC *pow(Complex value, PMC *dest) {
+    METHOD pow(PMC * value) {
         PMC *l = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC *log;
-
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
+        PMC *dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         Parrot_pcc_invoke_method_from_c_args(interp, SELF, CONST_STRING(interp, "ln"),
                     "->P", &log);
 
-        l = Parrot_Complex_multi_multiply_Complex_PMC(INTERP,
-                    log, value, l);
+        l = VTABLE_multiply(INTERP, log, value, l);
 
         Parrot_pcc_invoke_method_from_c_args(interp, l, CONST_STRING(interp, "exp"),
                     "->P", &dest);
-
-        return dest;
-    }
-
-    MULTI PMC *pow(DEFAULT value, PMC *dest) {
-        PMC *l = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        PMC *log;
-
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        Parrot_pcc_invoke_method_from_c_args(interp, SELF, CONST_STRING(interp, "ln"),
-                     "->P", &log);
-        l = Parrot_Complex_multi_multiply_DEFAULT_PMC(INTERP, log, value, l);
-        Parrot_pcc_invoke_method_from_c_args(interp, l, CONST_STRING(interp, "exp"),
-                     "->P", &dest);
-
-        return dest;
+        RETURN(PMC *dest);
     }
 
     METHOD sqrt() {
