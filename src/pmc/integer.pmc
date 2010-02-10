@@ -221,10 +221,6 @@ Morphs the integer to a C<Float> and sets the value from C<value>.
 
 Morphs the integer to a C<Boolean> and sets the value from C<value>.
 
-=item C<void set_bigint_int(INTVAL value)>
-
-Morphs the integer to a C<BigInt> and sets the value from C<value>.
-
 =item C<void set_string_native(STRING *value)>
 
 Morphs the integer to a C<String> and sets the value from C<value>.
@@ -244,11 +240,6 @@ Morphs the integer to a C<String> and sets the value from C<value>.
         SELF.set_bool(value);
     }
 
-
-    VTABLE void set_bignum_int(INTVAL value) {
-        pmc_reuse(INTERP, SELF, enum_class_BigInt, 0);
-        SELF.set_integer_native(value);
-    }
 
 
     VTABLE void set_string_native(STRING *value) {
@@ -375,14 +366,14 @@ Adds C<value> to C<SELF> inplace.
     }
 
 
-    VTABLE void i_add_int(INTVAL b) { //
-        const INTVAL a = SELF.get_integer(); //
-        const INTVAL c = a + b; //
+    VTABLE void i_add_int(INTVAL b) {
+        const INTVAL a = SELF.get_integer();
+        const INTVAL c = a + b;
 
-        if ((c^a) >= 0 || (c^b) >= 0) //
-            VTABLE_set_integer_native(INTERP, SELF, c); //
-        else { //
-            PMC *temp; //
+        if ((c^a) >= 0 || (c^b) >= 0)
+            VTABLE_set_integer_native(INTERP, SELF, c);
+        else {
+            PMC *temp;
             maybe_throw_overflow_error(interp);
             SELF = upgrade_self_to_bignum(interp, SELF);
             VTABLE_i_add_int(interp, SELF, b);
