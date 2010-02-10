@@ -188,7 +188,7 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 
 /*
 
-=item C<Parrot_Interp initialize_interpeter(PARROT_INTERP)>
+=item C<Parrot_Interp initialize_interpeter(PARROT_INTERP, void *stacktop)>
 
 Initialize previously allocated interpeter.
 

@@ -103,8 +103,6 @@ static int is_all_hex_digits(ARGIN(const char *s))
     , PARROT_ASSERT_ARG(output_file))
 #define ASSERT_ARGS_do_pre_process __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_help_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_imcc_get_optimization_description \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(opt_desc))
@@ -166,7 +164,8 @@ imcc_start_handling_flags(PARROT_INTERP)
 
 /*
 
-=item C<int imcc_handle_flag(PARROT_INTERP, struct longopt_opt_info *opt)>
+=item C<int imcc_handle_flag(PARROT_INTERP, struct longopt_opt_info *opt, INTVAL
+*core)>
 
 Handle Parrot's command line for IMCC related option and set appropriate flags.
 
