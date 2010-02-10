@@ -262,12 +262,6 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
     interp->gc_sys    = mem_allocate_zeroed_typed(GC_Subsystem);
     interp->lo_var_ptr                    = stacktop;
 
-    /*TODO: add ability to specify GC core at command line w/ --gc= */
-    if (0) /*If they chose sys_type with the --gc command line switch,*/
-        ; /* set sys_type to value they gave */
-    else
-        interp->gc_sys->sys_type = PARROT_GC_DEFAULT_TYPE;
-
     /*Call appropriate initialization function for GC subsystem*/
     switch (interp->gc_sys->sys_type) {
       case MS:
