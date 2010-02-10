@@ -1290,9 +1290,8 @@ void
 imcc_init(PARROT_INTERP)
 {
     ASSERT_ARGS(imcc_init)
-    PARROT_ASSERT(IMCC_INFO(interp) == NULL);
+    PARROT_ASSERT(IMCC_INFO(interp) != NULL);
 
-    IMCC_INFO(interp) = mem_allocate_zeroed_typed(imc_info_t);
     /* register PASM and PIR compilers to parrot core */
     register_compilers(interp);
 }
