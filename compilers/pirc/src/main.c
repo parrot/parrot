@@ -47,6 +47,8 @@ extern int yypirdebug = 0;
 
 void * process_file(void *a);
 
+/* HEADERIZER HFILE: none */
+
 /*
 
 =head1 FUNCTIONS
@@ -54,8 +56,7 @@ void * process_file(void *a);
 =over 4
 
 
-=item C<static void
-print_help(char const * const program_name)>
+=item C<static void print_help(char const * const program_name)>
 
 Routine to print usage of this program.
 
@@ -137,8 +138,7 @@ process_file(void *a) {
 
 /*
 
-=item C<static void
-runcode(PARROT_INTERP, int argc, char *argv[])>
+=item C<static void runcode(PARROT_INTERP, int argc, char *argv[])>
 
 This function runs the code in the interpreter's (in C<PARROT_INTERP>)
 code segment.
