@@ -158,7 +158,7 @@ GEN_CONFIGS = \
     $(LIBRARY_DIR)/config.pir \
     src/platform.c \
 #IF(platform_asm):    src/platform_asm.s \
-#IF(has_opengl):    config/gen/call_list/opengl.in \
+#IF(has_opengl):    src/glut_nci_thunks.nci \
 #IF(has_glut):    src/glut_callbacks.c \
     src/core_pmcs.c \
 #IF(has_crypto):    src/dynpmc/md2.pmc \
@@ -256,6 +256,7 @@ GEN_HEADERS = \
 GEN_SOURCES = \
     src/core_ops.c \
     src/nci.c \
+    src/glut_nci_thunks.c \
     src/core_ops_switch.c \
     src/parrot_config.c \
     src/null_config.c \
@@ -1834,6 +1835,7 @@ prog-clean :
     src/nci_test$(O) \
     $(LIBNCI_TEST_SO) \
     src/glut_callbacks$(O) \
+    src/glut_nci_thunks$(O) \
     $(LIBGLUTCB_SO) \
     install_config.fpmc
 	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl --init
