@@ -140,6 +140,7 @@ inline op bands(invar PMC, invar PMC, invar PMC) :base_core {
     STRING * const a = VTABLE_get_string(interp, $2);
     STRING * const b = VTABLE_get_string(interp, $3);
     STRING * const c = Parrot_str_bitwise_and(interp, a, b, NULL);
+    VTABLE_set_string_native(interp, $1, c);
 }
 
 ########################################
@@ -170,8 +171,8 @@ inline op bnot(invar PMC) :base_core {
 }
 
 inline op bnot(out PMC, invar PMC) :base_core {
-    const INTVAL a = VTABLE_get_integer(interp, $1);
-    VTABLE_set_integer_native(interp, $2, ~a);
+    const INTVAL a = VTABLE_get_integer(interp, $2);
+    VTABLE_set_integer_native(interp, $1, ~a);
 }
 
 =item B<bnots>(inout STR)
@@ -200,10 +201,10 @@ inline op bnots(invar PMC) :base_core {
 }
 
 inline op bnots(out PMC, invar PMC) :base_core {
-    STRING * a = VTABLE_get_string(interp, $1);
+    STRING * a = VTABLE_get_string(interp, $2);
     STRING * b;
     Parrot_str_bitwise_not(interp, a, &b);
-    VTABLE_set_string_native(interp, $2, b);
+    VTABLE_set_string_native(interp, $1, b);
 }
 
 ########################################
