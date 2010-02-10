@@ -19,12 +19,13 @@ Tests the C3 Method Resolution order for the OO implementation.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(12)
+    plan(13)
 
     single_parent()
     grandparent()
     multiple_inheritance()
     diamond_inheritance()
+    merge_two_pairs()
 .end
 
 .sub method_A :method
@@ -161,6 +162,38 @@ Tests the C3 Method Resolution order for the OO implementation.
     is($S3, 'Method from A', 'Diamond Inheritance - Method wag inherited from A')
 .end
 
+# See TT#1426
+.sub merge_two_pairs
+    .local pmc C, A, B
+
+    push_eh test_fail
+
+    C = newclass 'TPC'
+    $P0 = get_global 'method_C'
+    C.'add_method'('bar', $P0)
+
+    B = newclass 'TPB'
+    B.'add_parent'(C)
+    $P0 = get_global 'method_B'
+    B.'add_method'('bar', $P0)
+
+    A = newclass 'TPA'
+    A.'add_parent'(C)
+    A.'add_parent'(B)
+    $P0 = get_global 'method_A'
+    A.'add_method'('foo', $P0)
+
+
+    $P0 = A.'new'()
+    $S0 = $P0.'bar'()
+    is($S0, 'Method from B', 'Merge Two Pairs - Method A.bar added from B')
+    
+    .return ()
+
+test_fail:
+    pop_eh
+    todo(0, 'Merge Two Pairs - Method A.bar added from B', 'See TT#1426')
+.end
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
