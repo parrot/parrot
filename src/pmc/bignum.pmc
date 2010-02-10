@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2009, Parrot Foundation.
+Copyright (C) 2004-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -1240,13 +1240,13 @@ TODO: Only supports Integer values for now.
 
 */
 
-    METHOD pow(PMC *value) {
+    METHOD PMC *pow(PMC *value) {
         /* only Integer RHS currently. TODO: check number and bignum types */
         INTVAL r = VTABLE_get_integer(INTERP, value);
         PMC *dest = pmc_new(INTERP, SELF->vtable->base_type);
 
         bignum_pow_bignum_int(INTERP, SELF, r, dest);
-        return dest;
+        RETURN(PMC *dest);
     }
 
 /*
