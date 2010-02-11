@@ -262,6 +262,185 @@ gc_inf_pool_init(SHIM_INTERP, ARGMOD(Fixed_Size_Pool *pool))
 
 /*
 
+=item C<gc_inf_compact_memory_pool>
+
+Stub for compacting memory pools.
+
+=cut
+
+*/
+static void
+gc_inf_compact_memory_pool(PARROT_INTERP)
+{
+}
+
+/*
+
+=item C<gc_inf_allocate_pmc_header>
+
+=item C<gc_inf_free_pmc_header>
+
+=item C<gc_inf_allocate_string_header>
+
+=item C<gc_inf_free_string_header>
+
+=item C<gc_inf_allocate_bufferlike_header>
+
+=item C<gc_inf_free_bufferlike_header>
+
+=item C<gc_inf_allocate_pmc_attributes>
+
+=item C<gc_inf_free_pmc_attributes>
+
+=item C<gc_inf_allocate_string_storage>
+
+=item C<gc_inf_reallocate_string_storage>
+
+=item C<gc_inf_allocate_buffer_storage>
+
+=item C<gc_inf_reallocate_buffer_storage>
+
+=item C<gc_inf_allocate_fixed_size_storage>
+
+=item C<gc_inf_free_fixed_size_storage>
+
+Functions for allocating/deallocating various objects.
+
+*/
+
+static PMC* gc_inf_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
+{
+    return (PMC*)calloc(sizeof(PMC), 1);
+}
+
+static void gc_inf_free_pmc_header(PARROT_INTERP, PMC *pmc)
+{
+    if (pmc)
+        free(pmc);
+}
+
+
+static STRING* gc_inf_allocate_string_header(PARROT_INTERP, UINTVAL flags)
+{
+    return (STRING*)calloc(sizeof(STRING), 1);
+}
+
+static void gc_inf_free_string_header(PARROT_INTERP, STRING *s)
+{
+    if (s)
+        free(s);
+}
+
+
+static Buffer* gc_inf_allocate_bufferlike_header(PARROT_INTERP, size_t size)
+{
+    return (Buffer*)calloc(sizeof(Buffer), 1);
+}
+
+static void gc_inf_free_bufferlike_header(PARROT_INTERP, Buffer *b, size_t size)
+{
+    if (b)
+        free(b);
+}
+
+
+static void* gc_inf_allocate_pmc_attributes(PARROT_INTERP, PMC *pmc)
+{
+    const size_t attr_size = pmc->vtable->attr_size;
+    PMC_data(pmc) = calloc(attr_size, 1);
+    return PMC_data(pmc);
+}
+
+static void gc_inf_free_pmc_attributes(PARROT_INTERP, PMC *pmc)
+{
+    if (PMC_data(pmc))
+        free(PMC_data(pmc));
+}
+
+
+static void gc_inf_allocate_string_storage(PARROT_INTERP, STRING *str, size_t size)
+{
+    char *mem;
+
+    Buffer_buflen(str)   = 0;
+    Buffer_bufstart(str) = NULL;
+
+    if (size == 0)
+        return;
+
+    mem      = (char *)mem_sys_allocate(size);
+
+    Buffer_bufstart(str) = str->strstart = mem;
+    Buffer_buflen(str)   = size;
+}
+
+static void gc_inf_reallocate_string_storage(PARROT_INTERP, STRING *str, size_t size)
+{
+    char *mem;
+
+    mem      = (char *)mem_sys_realloc(Buffer_bufstart(str), size);
+
+    Buffer_bufstart(str) = str->strstart = mem;
+    Buffer_buflen(str)   = size;
+}
+
+
+static void gc_inf_allocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t size)
+{
+    char *mem;
+
+    Buffer_buflen(buffer)   = 0;
+    Buffer_bufstart(buffer) = NULL;
+
+    if (size == 0)
+        return;
+
+    mem      = (char *)mem_sys_allocate(size);
+
+    Buffer_bufstart(buffer) = mem;
+    Buffer_buflen(buffer)   = size;
+}
+
+static void gc_inf_reallocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t size)
+{
+    char *mem;
+
+    mem = (char *)mem_sys_realloc(Buffer_bufstart(buffer), size);
+
+    Buffer_bufstart(buffer) = mem;
+    Buffer_buflen(buffer)   = size;
+}
+
+
+static void* gc_inf_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
+{
+    return calloc(size, 1);
+}
+
+static void gc_inf_free_fixed_size_storage(PARROT_INTERP, size_t size, void *data)
+{
+    if (data)
+        free(data);
+}
+
+/*
+
+=item C<gc_inf_get_gc_info>
+
+Stub for GC introspection function.
+
+=cut
+
+*/
+static size_t
+gc_inf_get_gc_info(PARROT_INTERP, Interpinfo_enum what)
+{
+    return 0;
+}
+
+
+/*
+
 =item C<void Parrot_gc_inf_init(PARROT_INTERP)>
 
 Initializes the infinite memory collector. Installs the necessary function
@@ -282,7 +461,38 @@ Parrot_gc_inf_init(PARROT_INTERP)
 
     interp->gc_sys->do_gc_mark         = gc_inf_mark_and_sweep;
     interp->gc_sys->finalize_gc_system = NULL;
-    interp->gc_sys->init_pool          = gc_inf_pool_init;
+
+    interp->gc_sys->do_gc_mark              = gc_inf_mark_and_sweep;
+    interp->gc_sys->compact_string_pool     = gc_inf_compact_memory_pool;
+
+    /*
+    interp->gc_sys->mark_special                = gc_inf_mark_special;
+    interp->gc_sys->pmc_needs_early_collection  = gc_inf_pmc_needs_early_collection;
+    */
+
+    interp->gc_sys->allocate_pmc_header     = gc_inf_allocate_pmc_header;
+    interp->gc_sys->free_pmc_header         = gc_inf_free_pmc_header;
+
+    interp->gc_sys->allocate_string_header  = gc_inf_allocate_string_header;
+    interp->gc_sys->free_string_header      = gc_inf_free_string_header;
+
+    interp->gc_sys->allocate_bufferlike_header  = gc_inf_allocate_bufferlike_header;
+    interp->gc_sys->free_bufferlike_header      = gc_inf_free_bufferlike_header;
+
+    interp->gc_sys->allocate_pmc_attributes = gc_inf_allocate_pmc_attributes;
+    interp->gc_sys->free_pmc_attributes     = gc_inf_free_pmc_attributes;
+
+    interp->gc_sys->allocate_string_storage = gc_inf_allocate_string_storage;
+    interp->gc_sys->reallocate_string_storage = gc_inf_reallocate_string_storage;
+
+    interp->gc_sys->allocate_buffer_storage = gc_inf_allocate_buffer_storage;
+    interp->gc_sys->reallocate_buffer_storage = gc_inf_reallocate_buffer_storage;
+
+    interp->gc_sys->allocate_fixed_size_storage = gc_inf_allocate_fixed_size_storage;
+    interp->gc_sys->free_fixed_size_storage     = gc_inf_free_fixed_size_storage;
+
+    interp->gc_sys->get_gc_info      = gc_inf_get_gc_info;
+
 }
 
 
