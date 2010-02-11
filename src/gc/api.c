@@ -995,6 +995,7 @@ Retrieve the name of the currently active GC system.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_gc_sys_name(PARROT_INTERP) {
     switch (interp->gc_sys->sys_type) {

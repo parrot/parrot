@@ -285,6 +285,10 @@ void Parrot_gc_reallocate_string_storage(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*str);
 
+PARROT_CANNOT_RETURN_NULL
+STRING * Parrot_gc_sys_name(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 UINTVAL Parrot_gc_total_copied(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -409,6 +413,8 @@ int Parrot_gc_total_sized_buffers(PARROT_INTERP)
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str))
+#define ASSERT_ARGS_Parrot_gc_sys_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_total_copied __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_total_memory_allocated \
