@@ -262,7 +262,7 @@ gc_inf_pool_init(SHIM_INTERP, ARGMOD(Fixed_Size_Pool *pool))
 
 /*
 
-=item C<gc_inf_compact_memory_pool>
+=item C<static void gc_inf_compact_memory_pool(PARROT_INTERP)>
 
 Stub for compacting memory pools.
 
@@ -276,33 +276,42 @@ gc_inf_compact_memory_pool(PARROT_INTERP)
 
 /*
 
-=item C<gc_inf_allocate_pmc_header>
+=item C<static PMC* gc_inf_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)>
 
-=item C<gc_inf_free_pmc_header>
+=item C<static void gc_inf_free_pmc_header(PARROT_INTERP, PMC *pmc)>
 
-=item C<gc_inf_allocate_string_header>
+=item C<static STRING* gc_inf_allocate_string_header(PARROT_INTERP, UINTVAL
+flags)>
 
-=item C<gc_inf_free_string_header>
+=item C<static void gc_inf_free_string_header(PARROT_INTERP, STRING *s)>
 
-=item C<gc_inf_allocate_bufferlike_header>
+=item C<static Buffer* gc_inf_allocate_bufferlike_header(PARROT_INTERP, size_t
+size)>
 
-=item C<gc_inf_free_bufferlike_header>
+=item C<static void gc_inf_free_bufferlike_header(PARROT_INTERP, Buffer *b,
+size_t size)>
 
-=item C<gc_inf_allocate_pmc_attributes>
+=item C<static void* gc_inf_allocate_pmc_attributes(PARROT_INTERP, PMC *pmc)>
 
-=item C<gc_inf_free_pmc_attributes>
+=item C<static void gc_inf_free_pmc_attributes(PARROT_INTERP, PMC *pmc)>
 
-=item C<gc_inf_allocate_string_storage>
+=item C<static void gc_inf_allocate_string_storage(PARROT_INTERP, STRING *str,
+size_t size)>
 
-=item C<gc_inf_reallocate_string_storage>
+=item C<static void gc_inf_reallocate_string_storage(PARROT_INTERP, STRING *str,
+size_t size)>
 
-=item C<gc_inf_allocate_buffer_storage>
+=item C<static void gc_inf_allocate_buffer_storage(PARROT_INTERP, Buffer
+*buffer, size_t size)>
 
-=item C<gc_inf_reallocate_buffer_storage>
+=item C<static void gc_inf_reallocate_buffer_storage(PARROT_INTERP, Buffer
+*buffer, size_t size)>
 
-=item C<gc_inf_allocate_fixed_size_storage>
+=item C<static void* gc_inf_allocate_fixed_size_storage(PARROT_INTERP, size_t
+size)>
 
-=item C<gc_inf_free_fixed_size_storage>
+=item C<static void gc_inf_free_fixed_size_storage(PARROT_INTERP, size_t size,
+void *data)>
 
 Functions for allocating/deallocating various objects.
 
@@ -425,7 +434,7 @@ static void gc_inf_free_fixed_size_storage(PARROT_INTERP, size_t size, void *dat
 
 /*
 
-=item C<gc_inf_get_gc_info>
+=item C<static size_t gc_inf_get_gc_info(PARROT_INTERP, Interpinfo_enum what)>
 
 Stub for GC introspection function.
 
