@@ -145,7 +145,7 @@ imc_cleanup(PARROT_INTERP, ARGIN_NULLOK(void *yyscanner))
     IMCC_INFO(interp)->ghash.data = NULL;
 
     if (IMCC_INFO(interp)->state) {
-        free(IMCC_INFO(interp)->state->file);
+        mem_sys_free(IMCC_INFO(interp)->state->file);
         IMCC_INFO(interp)->state->file = NULL;
     }
 }
@@ -278,8 +278,8 @@ imc_free_unit(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
     if (unit->instance_of)
         mem_sys_free(unit->instance_of);
 
-    free(unit->hash.data);
-    free(unit);
+    mem_sys_free(unit->hash.data);
+    mem_sys_free(unit);
 }
 
 /*

@@ -1276,7 +1276,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
 
         if (real_name) {
             char * const p = mem_sys_strdup(real_name + 1);
-            free(r->name);
+            mem_sys_free(r->name);
             r->name = p;
         }
     }

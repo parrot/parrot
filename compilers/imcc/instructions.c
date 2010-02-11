@@ -650,9 +650,9 @@ void
 free_ins(ARGMOD(Instruction *ins))
 {
     ASSERT_ARGS(free_ins)
-    free(ins->format);
-    free(ins->opname);
-    free(ins);
+    mem_sys_free(ins->format);
+    mem_sys_free(ins->opname);
+    mem_sys_free(ins);
 }
 
 /*

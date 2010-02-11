@@ -533,7 +533,7 @@ imcc_write_pbc(PARROT_INTERP, ARGIN(const char *output_file))
             "Couldn't write %s\n", output_file);
     fclose(fp);
     IMCC_info(interp, 1, "%s written.\n", output_file);
-    free(packed);
+    mem_sys_free(packed);
 }
 
 /*

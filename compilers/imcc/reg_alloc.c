@@ -429,7 +429,7 @@ free_reglist(ARGMOD(IMC_Unit *unit))
     fprintf(stderr, "reg_alloc.c: free_reglist\n");
 #endif
     if (unit->interference_graph) {
-        free(unit->interference_graph);
+        mem_sys_free(unit->interference_graph);
         unit->interference_graph = NULL;
     }
 
@@ -439,7 +439,7 @@ free_reglist(ARGMOD(IMC_Unit *unit))
         for (i = 0; i < unit->n_symbols; i++)
             free_life_info(unit, unit->reglist[i]);
 
-        free(unit->reglist);
+        mem_sys_free(unit->reglist);
         unit->reglist   = NULL;
         unit->n_symbols = 0;
     }

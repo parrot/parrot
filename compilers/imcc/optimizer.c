@@ -366,7 +366,7 @@ if_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                               last->symregs, args, 0, 0);
                     last->opnum = tmp->opnum;
                     last->opsize = tmp->opsize;
-                    free(last->opname);
+                    mem_sys_free(last->opname);
                     last->opname = mem_sys_strdup(tmp->opname);
                     free_ins(tmp);
 
@@ -1293,7 +1293,7 @@ branch_cond_loop_swap(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction 
             changed = 1;
         }
 
-        free(label);
+        mem_sys_free(label);
     }
 
     return changed;
