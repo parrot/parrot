@@ -62,8 +62,7 @@ efficiency on reading non-native PBCs.
 
 /*
 
-=item C<static void
-const_dump(PARROT_INTERP, const PackFile_Segment *segp)>
+=item C<static void const_dump(PARROT_INTERP, const PackFile_Segment *segp)>
 
 Dump the constant table.
 
@@ -81,8 +80,7 @@ const_dump(PARROT_INTERP, const PackFile_Segment *segp)
 
 /*
 
-=item C<static void
-fixup_dump(PARROT_INTERP, const PackFile_Segment *segp)>
+=item C<static void fixup_dump(PARROT_INTERP, const PackFile_Segment *segp)>
 
 Dump the fixup table.
 
@@ -100,8 +98,7 @@ fixup_dump(PARROT_INTERP, const PackFile_Segment *segp)
 
 /*
 
-=item C<static void
-disas_dump(PARROT_INTERP, const PackFile_Segment *self)>
+=item C<static void disas_dump(PARROT_INTERP, const PackFile_Segment *self)>
 
 Disassemble and dump.
 
@@ -136,8 +133,7 @@ disas_dump(PARROT_INTERP, const PackFile_Segment *self)
 
 /*
 
-=item C<static void
-PackFile_header_dump(PARROT_INTERP, PackFile *pf)>
+=item C<static void PackFile_header_dump(PARROT_INTERP, PackFile *pf)>
 
 Dump the header.
 

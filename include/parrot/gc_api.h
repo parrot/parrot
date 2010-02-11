@@ -85,7 +85,8 @@ typedef enum {
     /* interpinfo_s constants */
     EXECUTABLE_FULLNAME,
     EXECUTABLE_BASENAME,
-    RUNTIME_PREFIX
+    RUNTIME_PREFIX,
+    GC_SYS_NAME
 } Interpinfo_enum;
 
 /* &end_gen */
