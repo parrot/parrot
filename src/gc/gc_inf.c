@@ -272,6 +272,7 @@ Stub for compacting memory pools.
 static void
 gc_inf_compact_memory_pool(PARROT_INTERP)
 {
+    ASSERT_ARGS(gc_inf_compact_memory_pool)
 }
 
 /*
@@ -319,11 +320,13 @@ Functions for allocating/deallocating various objects.
 
 static PMC* gc_inf_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
 {
+    ASSERT_ARGS(gc_inf_allocate_pmc_header)
     return (PMC*)calloc(sizeof (PMC), 1);
 }
 
 static void gc_inf_free_pmc_header(PARROT_INTERP, PMC *pmc)
 {
+    ASSERT_ARGS(gc_inf_free_pmc_header)
     if (pmc)
         free(pmc);
 }
@@ -331,11 +334,13 @@ static void gc_inf_free_pmc_header(PARROT_INTERP, PMC *pmc)
 
 static STRING* gc_inf_allocate_string_header(PARROT_INTERP, UINTVAL flags)
 {
+    ASSERT_ARGS(gc_inf_allocate_string_header)
     return (STRING*)calloc(sizeof (STRING), 1);
 }
 
 static void gc_inf_free_string_header(PARROT_INTERP, STRING *s)
 {
+    ASSERT_ARGS(gc_inf_free_string_header)
     if (s)
         free(s);
 }
@@ -343,11 +348,13 @@ static void gc_inf_free_string_header(PARROT_INTERP, STRING *s)
 
 static Buffer* gc_inf_allocate_bufferlike_header(PARROT_INTERP, size_t size)
 {
+    ASSERT_ARGS(gc_inf_allocate_bufferlike_header)
     return (Buffer*)calloc(sizeof (Buffer), 1);
 }
 
 static void gc_inf_free_bufferlike_header(PARROT_INTERP, Buffer *b, size_t size)
 {
+    ASSERT_ARGS(gc_inf_free_bufferlike_header)
     if (b)
         free(b);
 }
@@ -355,6 +362,7 @@ static void gc_inf_free_bufferlike_header(PARROT_INTERP, Buffer *b, size_t size)
 
 static void* gc_inf_allocate_pmc_attributes(PARROT_INTERP, PMC *pmc)
 {
+    ASSERT_ARGS(gc_inf_allocate_pmc_attributes)
     const size_t attr_size = pmc->vtable->attr_size;
     PMC_data(pmc) = calloc(attr_size, 1);
     return PMC_data(pmc);
@@ -362,6 +370,7 @@ static void* gc_inf_allocate_pmc_attributes(PARROT_INTERP, PMC *pmc)
 
 static void gc_inf_free_pmc_attributes(PARROT_INTERP, PMC *pmc)
 {
+    ASSERT_ARGS(gc_inf_free_pmc_attributes)
     if (PMC_data(pmc))
         free(PMC_data(pmc));
 }
@@ -369,6 +378,7 @@ static void gc_inf_free_pmc_attributes(PARROT_INTERP, PMC *pmc)
 
 static void gc_inf_allocate_string_storage(PARROT_INTERP, STRING *str, size_t size)
 {
+    ASSERT_ARGS(gc_inf_allocate_string_storage)
     char *mem;
 
     Buffer_buflen(str)   = 0;
@@ -385,6 +395,7 @@ static void gc_inf_allocate_string_storage(PARROT_INTERP, STRING *str, size_t si
 
 static void gc_inf_reallocate_string_storage(PARROT_INTERP, STRING *str, size_t size)
 {
+    ASSERT_ARGS(gc_inf_reallocate_string_storage)
     char *mem;
 
     mem      = (char *)mem_sys_realloc(Buffer_bufstart(str), size);
@@ -396,6 +407,7 @@ static void gc_inf_reallocate_string_storage(PARROT_INTERP, STRING *str, size_t 
 
 static void gc_inf_allocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t size)
 {
+    ASSERT_ARGS(gc_inf_allocate_buffer_storage)
     char *mem;
 
     Buffer_buflen(buffer)   = 0;
@@ -412,6 +424,7 @@ static void gc_inf_allocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer)
 
 static void gc_inf_reallocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t size)
 {
+    ASSERT_ARGS(gc_inf_reallocate_buffer_storage)
     char *mem;
 
     mem = (char *)mem_sys_realloc(Buffer_bufstart(buffer), size);
@@ -423,11 +436,13 @@ static void gc_inf_reallocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffe
 
 static void* gc_inf_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
 {
+    ASSERT_ARGS(gc_inf_allocate_fixed_size_storage)
     return calloc(size, 1);
 }
 
 static void gc_inf_free_fixed_size_storage(PARROT_INTERP, size_t size, void *data)
 {
+    ASSERT_ARGS(gc_inf_free_fixed_size_storage)
     if (data)
         free(data);
 }
@@ -444,6 +459,7 @@ Stub for GC introspection function.
 static size_t
 gc_inf_get_gc_info(PARROT_INTERP, Interpinfo_enum what)
 {
+    ASSERT_ARGS(gc_inf_get_gc_info)
     return 0;
 }
 
