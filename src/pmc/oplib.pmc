@@ -16,25 +16,23 @@ pmclass OpLib {
 
     /* Look up an opnumber given the name of the op. First we look for the
        specific name, then the more general short name. */
-    VTABLE INTVAL get_integer_keyed_string(STRING *name) {
+    VTABLE INTVAL get_integer_keyed_str(STRING *name) {
         const char * const cstr = Parrot_str_to_cstring(INTERP, name);
         INTVAL num = interp->op_lib->op_code(cstr, 1);
         if (num == -1)
             num = interp->op_lib->op_code(cstr, 0);
-        Parrot_str_free_cstring(INTERP, cstr);
+        Parrot_str_free_cstring(cstr);
         return num;
     }
 
-    VTABLE PMC *get_pmc_keyed_string(STRING *name) {
-        PMC * const family = pmc_new(INTERP, enum_class_OpFamily);
-        VTABLE_set_string_native(INTERP, name);
-        if (!VTABLE_elements(INTERP, family))
-            return PMCNULL;
-        return family;
+    VTABLE PMC* get_pmc_keyed_str(STRING *name) {
+        PMC * const op = pmc_new(INTERP, enum_class_Opcode);
+        VTABLE_set_string_native(INTERP, op, name);
+        return op;
     }
 
-    VTABLE PMC *get_pmc_keyed_int(INTVAL value) {
-        PMC * const op = pmc_new(INTERP, enum_class_Opcode)
+    VTABLE PMC* get_pmc_keyed_int(INTVAL value) {
+        PMC * const op = pmc_new(INTERP, enum_class_Opcode);
         VTABLE_set_integer_native(INTERP, op, value);
         return op;
     }
