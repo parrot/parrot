@@ -20,7 +20,7 @@ Tests the BigInt PMC.
 
     .include 'test_more.pir'
 
-    plan(34)
+    plan(45)
     check_libgmp_good()
 
     set_and_get()
