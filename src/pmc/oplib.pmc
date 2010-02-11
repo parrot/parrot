@@ -14,6 +14,17 @@ pmclass OpLib {
         OPLIB_PMC_INSTANCE = (PMC *)ptr;
     }
 
+    /* Look up an opnumber given the name of the op. First we look for the
+       specific name, then the more general short name. */
+    VTABLE INTVAL get_integer_keyed_string(STRING *name) {
+        const char * const cstr = Parrot_str_to_cstring(INTERP, name);
+        INTVAL num = interp->op_lib->op_code(cstr, 1);
+        if (num == -1)
+            num = interp->op_lib->op_code(cstr, 0);
+        Parrot_str_free_cstring(INTERP, cstr);
+        return num;
+    }
+
     VTABLE PMC *get_pmc_keyed_string(STRING *name) {
         PMC * const family = pmc_new(INTERP, enum_class_OpFamily);
         VTABLE_set_string_native(INTERP, name);
