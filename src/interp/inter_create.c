@@ -184,7 +184,9 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     IMCC_INFO(interp) = mem_allocate_zeroed_typed(imc_info_t);
 
     interp->gc_sys           = mem_allocate_zeroed_typed(GC_Subsystem);
-    interp->gc_sys->sys_type = PARROT_GC_DEFAULT_TYPE;
+    interp->gc_sys->sys_type = parent
+                                    ? parent->gc_sys->sys_type
+                                    : PARROT_GC_DEFAULT_TYPE;
 
     /* Done. Return and be done with it */
     return interp;
