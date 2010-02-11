@@ -2,11 +2,20 @@
 
 pmclass OpLib {
     VTABLE PMC *get_pmc_keyed_string(STRING *name) {
-        /* TODO: lookup the name in the table. Create and return an OpFamily
-           PMC with all the names */
+        PMC * const family = pmc_new(INTERP, enum_class_OpFamily);
+        VTABLE_set_string_native(INTERP, name);
+        if (!VTABLE_elements(INTERP, family))
+            return PMCNULL;
+        return family;
     }
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL value) {
-        /* TODO: Return the Opcode PMC with the given number */
+        PMC * const op = pmc_new(INTERP, enum_class_Opcode)
+        VTABLE_set_integer_native(INTERP, op, value);
+        return op;
+    }
+
+    VTABLE INTVAL get_integer() {
+        return interp->op_lib->op_count;
     }
 }
