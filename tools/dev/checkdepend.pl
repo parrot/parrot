@@ -11,6 +11,7 @@ use Fatal qw(open);
 use File::Spec;
 use Test::More;
 use Test::Harness;
+use Test::Differences;
 
 =head1 NAME
 
@@ -29,8 +30,9 @@ intended to be used by developers examining the build process.
 =head1 REQUIREMENTS
 
 A built parrot (Configure and make) to generate all files so we can analyze
-them. Ack is used to find the files. We are not currently requiring ack
-for development, so this is an optional test.
+them. App::Ack is used to find the files, and Test::Differences is used to
+make the test output usable - these non standard modules make this an
+optional test.
 
 =head1 BUGS
 
@@ -262,10 +264,10 @@ sub check_files {
             $extra_info = "($active_makefile: line $active_line_num)";
         }
 
-        $rule_deps        = join ' ', sort split /\s+/, $rule_deps;
-        my $expected_deps = join ' ', sort (get_deps($file));
+        $rule_deps        = join "\n", sort split /\s+/, $rule_deps;
+        my $expected_deps = join "\n", sort (get_deps($file));
 
-        is($rule_deps, $expected_deps, "$file has correct dependencies $extra_info.");
+        eq_or_diff_text($rule_deps, $expected_deps, "$file has correct dependencies $extra_info.", {context => 0});
     }
 }
 
