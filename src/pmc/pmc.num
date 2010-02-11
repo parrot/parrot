@@ -79,3 +79,6 @@ parrotobject.pmc    50
 
 os.pmc    51
 file.pmc    52
+
+oplib.pmc    53
+opcode.pmc    54
