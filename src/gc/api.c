@@ -904,7 +904,8 @@ void
 Parrot_block_GC_mark(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_block_GC_mark)
-    interp->gc_sys->block_mark(interp);
+    if (interp->gc_sys->block_mark)
+        interp->gc_sys->block_mark(interp);
 }
 
 PARROT_EXPORT
@@ -912,7 +913,8 @@ void
 Parrot_unblock_GC_mark(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_unblock_GC_mark)
-    interp->gc_sys->unblock_mark(interp);
+    if (interp->gc_sys->unblock_mark)
+        interp->gc_sys->unblock_mark(interp);
 }
 
 PARROT_EXPORT
@@ -920,7 +922,8 @@ void
 Parrot_block_GC_sweep(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_block_GC_sweep)
-    interp->gc_sys->block_sweep(interp);
+    if (interp->gc_sys->block_sweep)
+        interp->gc_sys->block_sweep(interp);
 }
 
 PARROT_EXPORT
@@ -928,7 +931,8 @@ void
 Parrot_unblock_GC_sweep(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_unblock_GC_sweep)
-    interp->gc_sys->unblock_sweep(interp);
+    if (interp->gc_sys->unblock_sweep)
+        interp->gc_sys->unblock_sweep(interp);
 }
 
 PARROT_EXPORT
@@ -936,7 +940,10 @@ unsigned int
 Parrot_is_blocked_GC_mark(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_is_blocked_GC_mark)
-    return interp->gc_sys->is_blocked_mark(interp);
+    if (interp->gc_sys->is_blocked_mark)
+        return interp->gc_sys->is_blocked_mark(interp);
+    else
+        return 0;
 }
 
 PARROT_EXPORT
@@ -944,7 +951,10 @@ unsigned int
 Parrot_is_blocked_GC_sweep(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_is_blocked_GC_sweep)
-    return interp->gc_sys->is_blocked_mark(interp);
+    if (interp->gc_sys->is_blocked_sweep)
+        return interp->gc_sys->is_blocked_mark(interp);
+    else
+        return 0;
 }
 
 void
