@@ -6,6 +6,8 @@ pmclass Opcode auto_attrs {
     ATTR STRING *full_name_cache;
 
     VTABLE void init() {
+        /* TODO: Throw an exception here. Opcode PMCs should be produced by
+                 the OpLib singleton PMC as a factory. */
         PObj_custom_mark_SET(SELF);
     }
 
@@ -17,12 +19,14 @@ pmclass Opcode auto_attrs {
 
     VTABLE void set_pointer(void *i) {
         Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        /* TODO: This should only be called once, from inside OpLib. If
+                 attrs->info already has a non-NULL value, throw an exception */
         attrs->info = (op_info_t *)i;
     }
 
     VTABLE void set_string_native(STRING *name) {
         const char * const cstr = Parrot_str_to_cstring(INTERP, name);
-        const INTVAL num = interp->op_lib->op_code(cstr, 1);
+        const INTVAL num = INTERP->op_lib->op_code(cstr, 1);
         Parrot_str_free_cstring(cstr);
         if (num == -1)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
@@ -38,12 +42,14 @@ pmclass Opcode auto_attrs {
     }
 
     VTABLE void set_integer_native(INTVAL value) {
-        const INTVAL opcount = interp->op_lib->op_count;
+        const INTVAL opcount = INTERP->op_lib->op_count;
         Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        /* TODO: This should only be called once, from inside OpLib. If
+                 attrs->info already has a non-NULL value, throw an exception */
         if (value >= opcount || value < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "Opcode: Opcode index %d out of bounds", value);
-        attrs->info = &(interp->op_info_table[value]);
+        attrs->info = &(INTERP->op_info_table[value]);
         attrs->op_number = value;
     }
 
