@@ -5,6 +5,16 @@ pmclass Opcode {
     ATTR INTVAL op_number;
     ATTR STRING *full_name_cache;
 
+    VTABLE void init() {
+        PObj_custom_mark_SET(SELF);
+    }
+
+    VTABLE void mark() {
+        Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        if (attrs->full_name_cache)
+            Parrot_gc_mark_STRING_alive(INTERP, attrs->full_name_cache);
+    }
+
     VTABLE void set_pointer(void *i) {
         Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
         attrs->info = i;

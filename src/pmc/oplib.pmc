@@ -1,6 +1,19 @@
 #include "parrot/parrot.h"
 
+static PMC *OPLIB_PMC_INSTANCE;
 pmclass OpLib {
+    void class_init() {
+        OPLIB_PMC_INSTANCE = NULL;
+    }
+
+    VTABLE void *get_pointer() {
+        return OPLIB_PMC_INSTANCE;
+    }
+
+    VTABLE void set_pointer(void *ptr) {
+        OPLIB_PMC_INSTANCE = (PMC *)ptr;
+    }
+
     VTABLE PMC *get_pmc_keyed_string(STRING *name) {
         PMC * const family = pmc_new(INTERP, enum_class_OpFamily);
         VTABLE_set_string_native(INTERP, name);
