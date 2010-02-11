@@ -998,14 +998,20 @@ Retrieve the name of the currently active GC system.
 PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_gc_sys_name(PARROT_INTERP) {
+    STRING *name = NULL;
     switch (interp->gc_sys->sys_type) {
         case MS:
-            return Parrot_str_new(interp, "ms", 2);
+            name = Parrot_str_new(interp, "ms", 2);
+            break;
         case INF:
-            return Parrot_str_new(interp, "inf", 3);
+            name = Parrot_str_new(interp, "inf", 3);
+            break;
         default:
-            return Parrot_str_new(interp, "unknown", 7);
+            name = Parrot_str_new(interp, "unknown", 7);
+            break;
     }
+    PARROT_ASSERT(name != NULL);
+    return name;
 }
 
 /*

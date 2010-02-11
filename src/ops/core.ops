@@ -1028,7 +1028,8 @@ op interpinfo(out PMC, in INT) {
 }
 
 op interpinfo(out STR, in INT) {
-    $1 = interpinfo_s(interp, $2);
+    STRING * s = interpinfo_s(interp, $2);
+    $1 = s;
 }
 
 =item B<warningson>(in INT)

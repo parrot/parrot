@@ -359,8 +359,10 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
         }
         case RUNTIME_PREFIX:
             return Parrot_get_runtime_path(interp);
-        case GC_SYS_NAME:
-            return Parrot_gc_sys_name(interp);
+        case GC_SYS_NAME: {
+            STRING * name = Parrot_gc_sys_name(interp);
+            return name;
+        }
       default:
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                 "illegal argument in interpinfo");

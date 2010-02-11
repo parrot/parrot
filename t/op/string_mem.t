@@ -41,7 +41,38 @@ pin/unpin
     plan(TESTS)
 
     test_stringinfo()
+    $S0 = interpinfo .INTERPINFO_GC_SYS_NAME
+    if $S0 == "inf" goto dont_run_hanging_tests
     test_pin_unpin()
+    goto test_end
+  dont_run_hanging_tests:
+    ok(1, "#TODO - Test disabled on gc_inf")
+    ok(1, "#TODO - Test disabled on gc_inf")
+  test_end:
+.end
+
+.sub test_stringinfo
+    .local pmc _
+
+    $S1 = "Hello, world"
+    $S0 = $S1
+    $I0 = stringinfo $S0, .STRINGINFO_STRSTART
+    $I1 = stringinfo $S1, .STRINGINFO_STRSTART
+    is($I0, $I1, "stringinfo - test STRSTART can see COW in action")
+
+    $I0 = stringinfo $S0, .STRINGINFO_HEADER
+    $I1 = stringinfo $S1, .STRINGINFO_HEADER
+    is($I0, $I1, "stringinfo - STRHEADER on full COW strings keeps same value")
+
+    $S2 = substr $S0, 7
+    is($S2, "world", "sanity check")
+    $I4 = stringinfo $S0, .STRINGINFO_STRSTART
+    $I2 = stringinfo $S2, .STRINGINFO_STRSTART
+    $I3 = $I2 - $I4
+    is($I3, 7, "stringinfo - STRSTART can see COW in action")
+
+    $I2 = stringinfo $S2, .STRINGINFO_HEADER
+    isnt($I0, $I2, "stringinfo - STRHEADER on different COW strings same value")
 .end
 
 .sub test_pin_unpin
@@ -104,30 +135,6 @@ pin/unpin
     $S0 = $I0
     say $S0
     ok( $I0, "location of string changed by unpin/collect" )
-.end
-
-.sub test_stringinfo
-    .local pmc _
-
-    $S1 = "Hello, world"
-    $S0 = $S1
-    $I0 = stringinfo $S0, .STRINGINFO_STRSTART
-    $I1 = stringinfo $S1, .STRINGINFO_STRSTART
-    is($I0, $I1, "stringinfo - test STRSTART can see COW in action")
-
-    $I0 = stringinfo $S0, .STRINGINFO_HEADER
-    $I1 = stringinfo $S1, .STRINGINFO_HEADER
-    is($I0, $I1, "stringinfo - STRHEADER on full COW strings keeps same value")
-
-    $S2 = substr $S0, 7
-    is($S2, "world", "sanity check")
-    $I4 = stringinfo $S0, .STRINGINFO_STRSTART
-    $I2 = stringinfo $S2, .STRINGINFO_STRSTART
-    $I3 = $I2 - $I4
-    is($I3, 7, "stringinfo - STRSTART can see COW in action")
-
-    $I2 = stringinfo $S2, .STRINGINFO_HEADER
-    isnt($I0, $I2, "stringinfo - STRHEADER on different COW strings same value")
 .end
 
 #.constant STRINGINFO_STRSTART	2
