@@ -981,7 +981,8 @@ void
 Parrot_gc_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_gc_pmc_needs_early_collection)
-    interp->gc_sys->pmc_needs_early_collection(interp, pmc);
+    if (interp->gc_sys->pmc_needs_early_collection)
+        interp->gc_sys->pmc_needs_early_collection(interp, pmc);
 }
 
 /*
