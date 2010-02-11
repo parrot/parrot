@@ -310,7 +310,7 @@ Functions for allocating/deallocating various objects.
 
 static PMC* gc_inf_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
 {
-    return (PMC*)calloc(sizeof(PMC), 1);
+    return (PMC*)calloc(sizeof (PMC), 1);
 }
 
 static void gc_inf_free_pmc_header(PARROT_INTERP, PMC *pmc)
@@ -322,7 +322,7 @@ static void gc_inf_free_pmc_header(PARROT_INTERP, PMC *pmc)
 
 static STRING* gc_inf_allocate_string_header(PARROT_INTERP, UINTVAL flags)
 {
-    return (STRING*)calloc(sizeof(STRING), 1);
+    return (STRING*)calloc(sizeof (STRING), 1);
 }
 
 static void gc_inf_free_string_header(PARROT_INTERP, STRING *s)
@@ -334,7 +334,7 @@ static void gc_inf_free_string_header(PARROT_INTERP, STRING *s)
 
 static Buffer* gc_inf_allocate_bufferlike_header(PARROT_INTERP, size_t size)
 {
-    return (Buffer*)calloc(sizeof(Buffer), 1);
+    return (Buffer*)calloc(sizeof (Buffer), 1);
 }
 
 static void gc_inf_free_bufferlike_header(PARROT_INTERP, Buffer *b, size_t size)
