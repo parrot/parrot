@@ -1,5 +1,5 @@
 #!parrot
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -20,7 +20,7 @@ Tests the BigInt PMC.
 
     .include 'test_more.pir'
 
-    plan(45)
+    plan(34)
     check_libgmp_good()
 
     set_and_get()
