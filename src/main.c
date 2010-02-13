@@ -398,9 +398,10 @@ parseflags(PARROT_INTERP,
             else if (STREQ(opt.opt_arg, "gcdebug"))
                 *core = PARROT_GC_DEBUG_CORE;
             else
-                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                fprintf(stderr,
                         "main: Unrecognized runcore '%s' specified."
                         "\n\nhelp: parrot -h\n", opt.opt_arg);
+                exit(EXIT_FAILURE);
             break;
           case 'g':
             if (STREQ(opt.opt_arg, "ms"))
@@ -408,9 +409,10 @@ parseflags(PARROT_INTERP,
             else if (STREQ(opt.opt_arg, "inf"))
                 interp->gc_sys->sys_type = INF;
             else
-                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                fprintf(stderr,
                         "main: Unrecognized GC '%s' specified."
                         "\n\nhelp: parrot -h\n", opt.opt_arg);
+                exit(EXIT_FAILURE);
             break;
           case 't':
             if (opt.opt_arg && is_all_hex_digits(opt.opt_arg))
@@ -438,6 +440,7 @@ parseflags(PARROT_INTERP,
             exit(EXIT_FAILURE);
             break;
           case OPT_RUNTIME_PREFIX:
+            /* FIXME It will die. STRING subsystem isn't initialized yet */
             Parrot_io_printf(interp, "%Ss\n",
                     Parrot_get_runtime_path(interp));
             exit(EXIT_SUCCESS);
@@ -475,9 +478,10 @@ parseflags(PARROT_INTERP,
                 break;
 
             /* PIRC flags handling goes here */
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            fprintf(stderr,
                     "main: Invalid flag '%s' used.\n\nhelp: parrot -h\n",
                     (*argv)[0]);
+            exit(EXIT_FAILURE);
         }
     }
 
