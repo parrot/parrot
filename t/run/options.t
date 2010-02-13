@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2005-2007, Parrot Foundation.
+# Copyright (C) 2005-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -80,7 +80,7 @@ is( `"$PARROT" --trace "$first_pir_file" "$second_pir_file" $redir`,
     for my $val (qw/ slow fast bounds trace /) {
         for my $opt ( '-R ', '--runcore ', '--runcore=' ) {
             $cmd = qq{"$PARROT" $opt$val "$second_pir_file" $redir};
-            is( qx{$cmd}, "second\n", "<$opt$val> option" );
+            is( qx{$cmd}, "second\n", "<$opt$val> option)" ) or diag $cmd;
         }
     }
 
