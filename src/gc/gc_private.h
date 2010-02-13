@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -273,7 +273,7 @@ typedef struct Memory_Pools {
                                                  * allocations from the
                                                  * system since the last
                                                  * compaction run */
-    size_t  header_allocs_since_last_collect;   /* The number of header
+    size_t  header_allocs_since_last_collect;   /* The size of header
                                                  * blocks allocated from
                                                  * the system since the last
                                                  * GC run */

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -1156,12 +1156,9 @@ gc_ms_more_traceable_objects(PARROT_INTERP,
 
     if (pool->skip == GC_ONE_SKIP)
         pool->skip = GC_NO_SKIP;
-    else if (pool->skip == GC_NO_SKIP) {
-        Fixed_Size_Arena * const arena = pool->last_Arena;
-        if (arena
-        &&  arena->used == arena->total_objects)
-                Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
-    }
+    else if (pool->skip == GC_NO_SKIP
+         &&  interp->mem_pools->header_allocs_since_last_collect >= 1024*1024)
+            Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 
     /* requires that num_free_objects be updated in Parrot_gc_mark_and_sweep.
        If gc is disabled, then we must check the free list directly. */
