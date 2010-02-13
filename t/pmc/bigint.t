@@ -77,14 +77,14 @@ Config2:
 
 NoLibGMP:
     say 'No BigInt Lib configured'
-    skip(45)
+    skip(34)
     exit 0
 
 OldLibGMP:
     print 'Buggy GMP version ['
     print $S3
     say '] with huge digit multiply - please upgrade'
-    skip(45)
+    skip(34)
     exit 0
 
 ret:
