@@ -628,12 +628,6 @@ Return the native integer value of the PMC.
 
 Return the native floating-point value of the PMC.
 
-=item get_bignum
-
-  PMC* get_bignum(INTERP, PMC *self)
-
-Return the extended precision numeric value of the PMC as a new bignum PMC.
-
 =item get_string
 
   STRING* get_string(INTERP, PMC *self)

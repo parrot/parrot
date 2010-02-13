@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2009, Parrot Foundation.
+Copyright (C) 2004-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -929,20 +929,6 @@ Returns the unsigned long conversion of the BigNum.
 
 /*
 
-=item C<PMC *get_bignum()>
-
-Returns SELF, keeping floating point precision.
-
-=cut
-
-*/
-
-    VTABLE PMC *get_bignum() {
-        return SELF;
-    }
-
-/*
-
 =item C<FLOATVAL get_bigint()>
 
 Trunc the BigNum to an BigInt.
@@ -1242,26 +1228,25 @@ Decrement the BigNum by 1.0.
 
 /*
 
-=item C<void pow()>
+=item C<METHOD PMC *pow()>
+
+Raises self to the power of value. Replacement method added when the pow()
+vtable was removed
+
+TODO: Needs testing.
+TODO: Only supports Integer values for now.
 
 =cut
 
 */
 
-    VTABLE PMC *pow_int(INTVAL value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        bignum_pow_bignum_int(INTERP, SELF, value, dest);
-        return dest;
-    }
-
-    MULTI PMC *pow(PMC *value, PMC *dest) {
+    METHOD PMC *pow(PMC *value) {
         /* only Integer RHS currently. TODO: check number and bignum types */
         INTVAL r = VTABLE_get_integer(INTERP, value);
-        dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *dest = pmc_new(INTERP, SELF->vtable->base_type);
 
         bignum_pow_bignum_int(INTERP, SELF, r, dest);
-        return dest;
+        RETURN(PMC *dest);
     }
 
 /*

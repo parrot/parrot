@@ -179,24 +179,6 @@ Returns the floating-point value of the integer.
 
 /*
 
-=item C<PMC *get_bignum()>
-
-Return a new BigInt PMC with the value of C<SELF>.
-
-=cut
-
-*/
-
-    VTABLE PMC *get_bignum() {
-        const INTVAL val = SELF.get_integer();
-        PMC * const  ret = pmc_new(INTERP, enum_class_BigInt);
-        VTABLE_set_integer_native(INTERP, ret, val);
-        return ret;
-    }
-
-
-/*
-
 =item C<STRING *get_string()>
 
 =item C<STRING *get_repr()>
@@ -239,10 +221,6 @@ Morphs the integer to a C<Float> and sets the value from C<value>.
 
 Morphs the integer to a C<Boolean> and sets the value from C<value>.
 
-=item C<void set_bigint_int(INTVAL value)>
-
-Morphs the integer to a C<BigInt> and sets the value from C<value>.
-
 =item C<void set_string_native(STRING *value)>
 
 Morphs the integer to a C<String> and sets the value from C<value>.
@@ -262,11 +240,6 @@ Morphs the integer to a C<String> and sets the value from C<value>.
         SELF.set_bool(value);
     }
 
-
-    VTABLE void set_bignum_int(INTVAL value) {
-        pmc_reuse(INTERP, SELF, enum_class_BigInt, 0);
-        SELF.set_integer_native(value);
-    }
 
 
     VTABLE void set_string_native(STRING *value) {
@@ -301,7 +274,8 @@ Adds C<value> to the integer and returns the result in C<*dest>.
         else {
             PMC * temp;
             maybe_throw_overflow_error(interp);
-            temp = VTABLE_get_bignum(interp, SELF);
+            temp = pmc_new(interp, enum_class_BigInt);
+            VTABLE_set_integer_native(interp, temp, a);
             return VTABLE_add(interp, temp, value, dest);
         }
     }
@@ -323,7 +297,8 @@ Adds C<value> to the integer and returns the result in C<*dest>.
     MULTI PMC *add(BigInt value, PMC *dest) {
         PMC *temp;
         maybe_throw_overflow_error(interp);
-        temp = VTABLE_get_bignum(interp, SELF);
+        temp = pmc_new(interp, enum_class_BigInt);
+        VTABLE_set_integer_native(interp, temp, SELF.get_integer());
         return VTABLE_add(interp, temp, value, dest);
     }
 
@@ -350,7 +325,8 @@ Adds C<value> to the integer and returns the result in C<*dest>.
         else {
             PMC *temp;
             maybe_throw_overflow_error(interp);
-            temp = VTABLE_get_bignum(interp, SELF);
+            temp = pmc_new(interp, enum_class_BigInt);
+            VTABLE_set_integer_native(interp, temp, a);
             return VTABLE_add_int(interp, temp, b, dest);
         }
     }
@@ -399,8 +375,8 @@ Adds C<value> to C<SELF> inplace.
         else {
             PMC *temp;
             maybe_throw_overflow_error(interp);
-            temp = VTABLE_get_bignum(interp, SELF);
-            VTABLE_i_add_int(interp, temp, b);
+            SELF = upgrade_self_to_bignum(interp, SELF);
+            VTABLE_i_add_int(interp, SELF, b);
         }
     }
 
@@ -439,7 +415,8 @@ C<get_integer> and C<set_integer_native> always.
         else {
             PMC *temp;
             maybe_throw_overflow_error(interp);
-            temp = VTABLE_get_bignum(interp, SELF);
+            temp = pmc_new(interp, enum_class_BigInt);
+            VTABLE_set_integer_native(interp, temp, a);
             return VTABLE_subtract(interp, temp, value, dest);
         }
     }
@@ -461,7 +438,8 @@ C<get_integer> and C<set_integer_native> always.
     MULTI PMC *subtract(BigInt value, PMC *dest) {
         PMC *temp;
         maybe_throw_overflow_error(interp);
-        temp = VTABLE_get_bignum(interp, SELF);
+        temp = pmc_new(interp, enum_class_BigInt);
+        VTABLE_set_integer_native(interp, temp, SELF.get_integer());
         return VTABLE_subtract(interp, temp, value, dest);
     }
 
@@ -498,7 +476,8 @@ Subtracts C<value> from the integer and returns the result in C<*dest>.
         else {
             PMC *temp;
             maybe_throw_overflow_error(interp);
-            temp = VTABLE_get_bignum(interp, SELF);
+            temp = pmc_new(interp, enum_class_BigInt);
+            VTABLE_set_integer_native(interp, temp, a);
             return VTABLE_subtract_int(interp, temp, b, dest);
         }
     }
@@ -597,7 +576,8 @@ Multiplies the integer by C<*value> and returns the result in C<*dest>.
         else {
             PMC *temp;
             maybe_throw_overflow_error(INTERP);
-            temp = VTABLE_get_bignum(INTERP, SELF);
+            temp = pmc_new(interp, enum_class_BigInt);
+            VTABLE_set_integer_native(interp, temp, a);
             return VTABLE_multiply(INTERP, temp, value, dest);
         }
     }
@@ -641,7 +621,8 @@ Multiplies the integer by C<*value> and returns the result in C<*dest>.
         else {
             PMC *temp;
             maybe_throw_overflow_error(INTERP);
-            temp = VTABLE_get_bignum(INTERP, SELF);
+            temp = pmc_new(interp, enum_class_BigInt);
+            VTABLE_set_integer_native(interp, temp, a);
             return VTABLE_multiply_int(INTERP, temp, b, dest);
         }
     }
@@ -727,7 +708,8 @@ Divides C<SELF> by C<value> inplace.
     MULTI PMC *divide(BigInt value, PMC *dest) {
         PMC *temp;
         maybe_throw_overflow_error(INTERP);
-        temp = VTABLE_get_bignum(INTERP, SELF);
+        temp = pmc_new(interp, enum_class_BigInt);
+        VTABLE_set_integer_native(interp, temp, SELF.get_integer());
         return VTABLE_divide(INTERP, temp, value, dest);
     }
 
@@ -787,7 +769,8 @@ Divides C<SELF> by C<value> inplace.
     MULTI PMC *floor_divide(BigInt value, PMC *dest) {
         PMC *temp;
         maybe_throw_overflow_error(INTERP);
-        temp = VTABLE_get_bignum(INTERP, SELF);
+        temp = pmc_new(interp, enum_class_BigInt);
+        VTABLE_set_integer_native(interp, temp, SELF.get_integer());
         return VTABLE_floor_divide(INTERP, temp, value, dest);
     }
 
@@ -909,7 +892,8 @@ Calculates modulus in place.
     MULTI PMC *modulus(BigInt value, PMC *dest) {
         PMC *temp;
         maybe_throw_overflow_error(INTERP);
-        temp = VTABLE_get_bignum(INTERP, SELF);
+        temp = pmc_new(interp, enum_class_BigInt);
+        VTABLE_set_integer_native(interp, temp, SELF.get_integer());
         return VTABLE_modulus(INTERP, temp, value, dest);
     }
 
@@ -992,97 +976,6 @@ Calculates modulus in place.
         VTABLE_set_integer_native(INTERP, SELF,
                 intval_mod(SELF.get_integer() , (INTVAL)value));
     }
-
-
-/*
-
-=item C<PMC *pow(PMC *value, PMC *dest)>
-
-=item C<PMC *pow_int(INTVAL value, PMC *dest)>
-
-Returns SELF to the C<value>th power in C<dest>.
-
-=item C<void i_pow(PMC *value)>
-
-=item C<void i_pow_int(INTVAL value)>
-
-Raises SELF to the C<value>th power.
-
-TODO:  TT #1228: Implement Complex and BigInt RHS values for the pow() functions
-
-=cut
-
-*/
-
-    MULTI PMC *pow(Integer value, PMC *dest) {
-        const INTVAL v = VTABLE_get_integer(INTERP, value);
-        return STATICSELF.pow_int(v, dest);
-    }
-
-
-    MULTI PMC *pow(DEFAULT value, PMC *dest) {
-        PMC * const auxval = pmc_new(INTERP, VTABLE_type(INTERP, value));
-        FLOATVAL selfval = SELF.get_integer();
-        VTABLE_set_number_native(INTERP, auxval, selfval);
-        return VTABLE_pow(INTERP, auxval, value, dest);
-    }
-
-
-    VTABLE PMC *pow_int(INTVAL b, PMC *dest) {
-        const INTVAL a      = SELF.get_integer();
-        const INTVAL orig_b = b;
-        INTVAL       r      = 1;
-
-        if (b < 0)
-            return SUPER(b, dest);
-
-        if (a) {
-            INTVAL temp = a;
-            while (b > 0) {
-                INTVAL prev = r;
-                if (b & 1) {
-                    r *= temp;
-                    if (r / temp != prev) {
-                        PMC *temp;
-                        maybe_throw_overflow_error(INTERP);
-                        temp = VTABLE_get_bignum(INTERP, SELF);
-                        return VTABLE_pow_int(INTERP, temp, orig_b, dest);
-                    }
-                }
-
-                b >>= 1;
-                if (!b)
-                    break;
-
-                prev  = temp;
-                temp *= temp;
-
-                if (prev != 0 && temp / prev != prev) {
-                    PMC *temp;
-                    maybe_throw_overflow_error(INTERP);
-                    temp = VTABLE_get_bignum(INTERP, SELF);
-                    return VTABLE_pow_int(INTERP, temp, orig_b, dest);
-                }
-            }
-        }
-
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        VTABLE_set_integer_native(INTERP, dest, r);
-        return dest;
-
-    }
-
-
-    VTABLE void i_pow(PMC *value) {
-        SELF.pow(value, SELF);
-    }
-
-
-    VTABLE void i_pow_int(INTVAL value) {
-        STATICSELF.pow_int(value, SELF);
-    }
-
 
 /*
 

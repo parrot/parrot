@@ -1053,46 +1053,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_PMC_assign_string_native>
 
-=item C<Parrot_PMC_bitwise_and>
-
-=item C<Parrot_PMC_bitwise_and_int>
-
-=item C<Parrot_PMC_bitwise_ands>
-
-=item C<Parrot_PMC_bitwise_ands_str>
-
-=item C<Parrot_PMC_bitwise_lsr>
-
-=item C<Parrot_PMC_bitwise_lsr_int>
-
-=item C<Parrot_PMC_bitwise_not>
-
-=item C<Parrot_PMC_bitwise_nots>
-
-=item C<Parrot_PMC_bitwise_or>
-
-=item C<Parrot_PMC_bitwise_or_int>
-
-=item C<Parrot_PMC_bitwise_ors>
-
-=item C<Parrot_PMC_bitwise_ors_str>
-
-=item C<Parrot_PMC_bitwise_shl>
-
-=item C<Parrot_PMC_bitwise_shl_int>
-
-=item C<Parrot_PMC_bitwise_shr>
-
-=item C<Parrot_PMC_bitwise_shr_int>
-
-=item C<Parrot_PMC_bitwise_xor>
-
-=item C<Parrot_PMC_bitwise_xor_int>
-
-=item C<Parrot_PMC_bitwise_xors>
-
-=item C<Parrot_PMC_bitwise_xors_str>
-
 =item C<Parrot_PMC_can>
 
 =item C<Parrot_PMC_clone>
@@ -1162,8 +1122,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_PMC_get_attr_keyed>
 
 =item C<Parrot_PMC_get_attr_str>
-
-=item C<Parrot_PMC_get_bignum>
 
 =item C<Parrot_PMC_get_bool>
 
@@ -1252,46 +1210,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_PMC_i_add_float>
 
 =item C<Parrot_PMC_i_add_int>
-
-=item C<Parrot_PMC_i_bitwise_and>
-
-=item C<Parrot_PMC_i_bitwise_and_int>
-
-=item C<Parrot_PMC_i_bitwise_ands>
-
-=item C<Parrot_PMC_i_bitwise_ands_str>
-
-=item C<Parrot_PMC_i_bitwise_lsr>
-
-=item C<Parrot_PMC_i_bitwise_lsr_int>
-
-=item C<Parrot_PMC_i_bitwise_not>
-
-=item C<Parrot_PMC_i_bitwise_nots>
-
-=item C<Parrot_PMC_i_bitwise_or>
-
-=item C<Parrot_PMC_i_bitwise_or_int>
-
-=item C<Parrot_PMC_i_bitwise_ors>
-
-=item C<Parrot_PMC_i_bitwise_ors_str>
-
-=item C<Parrot_PMC_i_bitwise_shl>
-
-=item C<Parrot_PMC_i_bitwise_shl_int>
-
-=item C<Parrot_PMC_i_bitwise_shr>
-
-=item C<Parrot_PMC_i_bitwise_shr_int>
-
-=item C<Parrot_PMC_i_bitwise_xor>
-
-=item C<Parrot_PMC_i_bitwise_xor_int>
-
-=item C<Parrot_PMC_i_bitwise_xors>
-
-=item C<Parrot_PMC_i_bitwise_xors_str>
 
 =item C<Parrot_PMC_i_concatenate>
 
@@ -1660,14 +1578,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_store_sub_in_namespace>
 
 =item C<Parrot_str_append>
-
-=item C<Parrot_str_bitwise_and>
-
-=item C<Parrot_str_bitwise_not>
-
-=item C<Parrot_str_bitwise_or>
-
-=item C<Parrot_str_bitwise_xor>
 
 =item C<Parrot_str_boolean>
 

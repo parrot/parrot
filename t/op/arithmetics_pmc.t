@@ -20,7 +20,7 @@ Test handling C<dest> arg in 3-args arithmetic.
     .include 'test_more.pir'
     .include "iglobals.pasm"
 
-    plan(68)
+    plan(44)
 
     # Don't check BigInt or BigNum without gmp
     .local pmc interp     # a handle to our interpreter object.
@@ -35,7 +35,7 @@ Test handling C<dest> arg in 3-args arithmetic.
 
     if gmp goto do_big_ones
         skip( 34, "will not test BigInt or BigNum without gmp" )
-        goto end   
+        goto end
 
   do_big_ones:
     run_tests_for('BigInt')
@@ -54,15 +54,9 @@ Test handling C<dest> arg in 3-args arithmetic.
     test_concatenate(type)
     test_logical_xor(type)
     test_logical_or(type)
-    test_bitwise_shr(type)
-    test_bitwise_or(type)
-    test_bitwise_shl(type)
-    test_bitwise_xor(type)
     test_modulus(type)
     test_pow(type)
     test_subtract(type)
-    test_bitwise_lsr(type)
-    test_bitwise_and(type)
 .end
 
 .sub test_add
@@ -86,7 +80,7 @@ Test handling C<dest> arg in 3-args arithmetic.
     add $P2, $P0, $P1
 
     $I0 = cmp $P99, 115200
-    
+
     is( $I0, 0, $S0 )
     goto end
 
@@ -116,7 +110,7 @@ Test handling C<dest> arg in 3-args arithmetic.
     div $P2, $P0, $P1
 
     $I0 = cmp $P99, 115200
-    
+
     is( $I0, 0, $S0 )
     goto end
 
@@ -146,7 +140,7 @@ Test handling C<dest> arg in 3-args arithmetic.
     mul $P2, $P0, $P1
 
     $I0 = cmp $P99, 115200
-    
+
     is( $I0, 0, $S0 )
     goto end
 
@@ -176,7 +170,7 @@ Test handling C<dest> arg in 3-args arithmetic.
     fdiv $P2, $P0, $P1
 
     $I0 = cmp $P99, 115200
-    
+
     is( $I0, 0, $S0 )
     goto end
 
@@ -206,7 +200,7 @@ Test handling C<dest> arg in 3-args arithmetic.
     and $P2, $P0, $P1
 
     $I0 = cmp $P99, 115200
-    
+
     is( $I0, 0, $S0 )
     goto end
 
@@ -236,7 +230,7 @@ Test handling C<dest> arg in 3-args arithmetic.
     concat $P2, $P0, $P1
 
     $I0 = cmp $P99, 115200
-    
+
     is( $I0, 0, $S0 )
     goto end
 
@@ -266,7 +260,7 @@ Test handling C<dest> arg in 3-args arithmetic.
     xor $P2, $P0, $P1
 
     $I0 = cmp $P99, 115200
-    
+
     is( $I0, 0, $S0 )
     goto end
 
@@ -296,127 +290,7 @@ Test handling C<dest> arg in 3-args arithmetic.
     or $P2, $P0, $P1
 
     $I0 = cmp $P99, 115200
-    
-    is( $I0, 0, $S0 )
-    goto end
 
-  done:
-    ok(1, 'ignoring exceptions')
-  end:
-.end
-
-.sub test_bitwise_shr
-    .param pmc type
-
-    $P0 = new type
-    $P0 = 40
-    $P1 = new type
-    $P1 = 2
-    $P2 = new type
-    $P2 = 115200
-
-    $P99 = $P2
-
-    $S0 = "original dest is untouched in bitwise_shr for "
-    $S1 = type
-    concat $S0, $S1
-
-    # ignore exceptions
-    push_eh done
-    shr $P2, $P0, $P1
-
-    $I0 = cmp $P99, 115200
-    
-    is( $I0, 0, $S0 )
-    goto end
-
-  done:
-    ok(1, 'ignoring exceptions')
-  end:
-.end
-
-.sub test_bitwise_or
-    .param pmc type
-
-    $P0 = new type
-    $P0 = 40
-    $P1 = new type
-    $P1 = 2
-    $P2 = new type
-    $P2 = 115200
-
-    $P99 = $P2
-
-    $S0 = "original dest is untouched in bitwise_or for "
-    $S1 = type
-    concat $S0, $S1
-
-    # ignore exceptions
-    push_eh done
-    bor $P2, $P0, $P1
-
-    $I0 = cmp $P99, 115200
-    
-    is( $I0, 0, $S0 )
-    goto end
-
-  done:
-    ok(1, 'ignoring exceptions')
-  end:
-.end
-
-.sub test_bitwise_shl
-    .param pmc type
-
-    $P0 = new type
-    $P0 = 40
-    $P1 = new type
-    $P1 = 2
-    $P2 = new type
-    $P2 = 115200
-
-    $P99 = $P2
-
-    $S0 = "original dest is untouched in bitwise_shl for "
-    $S1 = type
-    concat $S0, $S1
-
-    # ignore exceptions
-    push_eh done
-    shl $P2, $P0, $P1
-
-    $I0 = cmp $P99, 115200
-    
-    is( $I0, 0, $S0 )
-    goto end
-
-  done:
-    ok(1, 'ignoring exceptions')
-  end:
-.end
-
-.sub test_bitwise_xor
-    .param pmc type
-
-    $P0 = new type
-    $P0 = 40
-    $P1 = new type
-    $P1 = 2
-    $P2 = new type
-    $P2 = 115200
-
-    $P99 = $P2
-
-    $S0 = "original dest is untouched in bitwise_xor for "
-    $S1 = type
-    concat $S0, $S1
-
-    # ignore exceptions
-    push_eh done
-    bxor $P2, $P0, $P1
-
-    $I0 = cmp $P99, 115200
-    
     is( $I0, 0, $S0 )
     goto end
 
@@ -446,7 +320,7 @@ Test handling C<dest> arg in 3-args arithmetic.
     mod $P2, $P0, $P1
 
     $I0 = cmp $P99, 115200
-    
+
     is( $I0, 0, $S0 )
     goto end
 
@@ -476,7 +350,7 @@ Test handling C<dest> arg in 3-args arithmetic.
     pow $P2, $P0, $P1
 
     $I0 = cmp $P99, 115200
-    
+
     is( $I0, 0, $S0 )
     goto end
 
@@ -506,67 +380,7 @@ Test handling C<dest> arg in 3-args arithmetic.
     sub $P2, $P0, $P1
 
     $I0 = cmp $P99, 115200
-    
-    is( $I0, 0, $S0 )
-    goto end
 
-  done:
-    ok(1, 'ignoring exceptions')
-  end:
-.end
-
-.sub test_bitwise_lsr
-    .param pmc type
-
-    $P0 = new type
-    $P0 = 40
-    $P1 = new type
-    $P1 = 2
-    $P2 = new type
-    $P2 = 115200
-
-    $P99 = $P2
-
-    $S0 = "original dest is untouched in bitwise_lsr for "
-    $S1 = type
-    concat $S0, $S1
-
-    # ignore exceptions
-    push_eh done
-    lsr $P2, $P0, $P1
-
-    $I0 = cmp $P99, 115200
-    
-    is( $I0, 0, $S0 )
-    goto end
-
-  done:
-    ok(1, 'ignoring exceptions')
-  end:
-.end
-
-.sub test_bitwise_and
-    .param pmc type
-
-    $P0 = new type
-    $P0 = 40
-    $P1 = new type
-    $P1 = 2
-    $P2 = new type
-    $P2 = 115200
-
-    $P99 = $P2
-
-    $S0 = "original dest is untouched in bitwise_and for "
-    $S1 = type
-    concat $S0, $S1
-
-    # ignore exceptions
-    push_eh done
-    band $P2, $P0, $P1
-
-    $I0 = cmp $P99, 115200
-    
     is( $I0, 0, $S0 )
     goto end
 

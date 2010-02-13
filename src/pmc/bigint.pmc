@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2009, Parrot Foundation.
+Copyright (C) 2004-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -323,36 +323,6 @@ bigint_neg(PARROT_INTERP, PMC *self, PMC *dest) {
     mpz_neg(bi_dest->b, bi_self->b);
 }
 
-static void
-bigint_bitwise_shl_bigint_int(PARROT_INTERP, PMC *self,
-                              INTVAL value, PMC *dest)
-{
-    BIGINT *bi_self, *bi_dest;
-    GETATTR_BigInt_bi(interp, self, bi_self);
-    GETATTR_BigInt_bi(interp, dest, bi_dest);
-    /* The third args to mpz_mul_2exp and mpz_tdiv_q_2exp are unsigned, so we
-       need to do something sensible with negative values. */
-    if (value >= 0)
-        mpz_mul_2exp(bi_dest->b, bi_self->b, (unsigned long int)value);
-    else
-        mpz_tdiv_q_2exp(bi_dest->b, bi_self->b, (unsigned long int)-value);
-}
-
-static void
-bigint_bitwise_shr_bigint_int(PARROT_INTERP, PMC *self,
-                              INTVAL value, PMC *dest)
-{
-    BIGINT *bi_self, *bi_dest;
-    GETATTR_BigInt_bi(interp, self, bi_self);
-    GETATTR_BigInt_bi(interp, dest, bi_dest);
-    /* The third args to mpz_mul_2exp and mpz_tdiv_q_2exp are unsigned, so we
-       need to do something sensible with negative values. */
-    if (value >= 0)
-        mpz_tdiv_q_2exp(bi_dest->b, bi_self->b, (unsigned long int)value);
-    else
-        mpz_mul_2exp(bi_dest->b, bi_self->b, (unsigned long int)-value);
-}
-
 #else /* ifdef PARROT_HAS_GMP */
 
 typedef struct BIGINT {
@@ -533,32 +503,6 @@ bigint_neg(PARROT_INTERP, PMC *self, PMC *dest) {
         "no bigint lib loaded");
 }
 
-static void
-bigint_bitwise_shl_bigint(PARROT_INTERP, PMC *self, PMC *value, PMC *dest) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
-}
-
-static void
-bigint_bitwise_shl_bigint_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest)
-{
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
-}
-
-static void
-bigint_bitwise_shr_bigint(PARROT_INTERP, PMC *self, PMC *value, PMC *dest) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
-}
-
-static void
-bigint_bitwise_shr_bigint_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest)
-{
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
-}
-
 #endif /* ifdef PARROT_HAS_GMP */
 
 pmclass BigInt auto_attrs {
@@ -697,20 +641,6 @@ Returns the value of the integer.
 
     VTABLE INTVAL get_integer() {
         return bigint_get_long(INTERP, SELF);
-    }
-
-/*
-
-=item C<PMC *get_bignum()>
-
-Returns SELF
-
-=cut
-
-*/
-
-    VTABLE PMC *get_bignum() {
-        return SELF;
     }
 
 /*
@@ -957,20 +887,13 @@ Decrements the integer.
             "BigInt: no multiple dispatch variant 'i_multiply_float' for FLOATVAL");
     }
 
-    VTABLE PMC *pow_int(INTVAL value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        bigint_pow_bigint_int(INTERP, SELF, value, dest);
-        return dest;
-    }
-
-    MULTI PMC *pow(PMC *value, PMC *dest) {
+    METHOD PMC *pow(PMC *value) {
         /* XXX only Integer RHS currently */
         const INTVAL r = VTABLE_get_integer(INTERP, value);
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC *dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_pow_bigint_int(INTERP, SELF, r, dest);
-        return dest;
+        RETURN(PMC *dest);
     }
 
     MULTI PMC *divide(BigInt value, PMC *dest) {
@@ -1187,151 +1110,6 @@ Set C<dest> to the negated value of C<SELF>.
 
     VTABLE void i_neg() {
         bigint_neg(INTERP, SELF, SELF);
-    }
-
-/*
-
-=item C<PMC *bitwise_shl(PMC *value, PMC *dest)>
-
-=item C<PMC *bitwise_shl_int(INTVAL value, PMC *dest)>
-
-Returns in C<*dest> the shift left of the BigInt by C<*value>.
-
-=item C<void i_bitwise_shl(PMC *value)>
-
-=item C<void i_bitwise_shl_int(INTVAL value)>
-
-Inplace shift left.
-
-=cut
-
-*/
-
-    MULTI PMC *bitwise_shl(BigInt value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        bigint_bitwise_shl_bigint_int(INTERP, SELF,
-                                      VTABLE_get_integer(INTERP, value),
-                                      dest);
-        return dest;
-    }
-
-    MULTI PMC *bitwise_shl(Integer value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        bigint_bitwise_shl_bigint_int(INTERP, SELF,
-                VTABLE_get_integer(interp, value), dest);
-        return dest;
-    }
-    MULTI PMC *bitwise_shl(DEFAULT value, PMC *dest) {
-        UNUSED(dest)
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
-            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-            "BigInt: no multiple dispatch variant 'bitwise_shl' for %Ss",
-            VTABLE_name(interp, value));
-    }
-
-    VTABLE PMC *bitwise_shl_int(INTVAL value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        bigint_bitwise_shl_bigint_int(INTERP, SELF, value, dest);
-        return dest;
-    }
-
-
-    MULTI void i_bitwise_shl(BigInt value) {
-        bigint_bitwise_shl_bigint_int(INTERP, SELF,
-                                      VTABLE_get_integer(INTERP, value),
-                                      SELF);
-    }
-
-    MULTI void i_bitwise_shl(Integer value) {
-        bigint_bitwise_shl_bigint_int(INTERP, SELF,
-                VTABLE_get_integer(interp, value), SELF);
-    }
-
-    MULTI void i_bitwise_shl(DEFAULT value) {
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
-            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-            "BigInt: no multiple dispatch variant 'i_bitwise_shl' for %Ss",
-            VTABLE_name(interp, value));
-    }
-
-    VTABLE void i_bitwise_shl_int(INTVAL value) {
-        bigint_bitwise_shl_bigint_int(INTERP, SELF, value, SELF);
-    }
-
-/*
-
-=item C<PMC *bitwise_shr(PMC *value, PMC *dest)>
-
-=item C<PMC *bitwise_shr_int(INTVAL value, PMC *dest)>
-
-Returns in C<*dest> the shift right of the BigInt by C<*value>.
-
-=item C<void i_bitwise_shr(PMC *value)>
-
-=item C<void i_bitwise_shr_int(INTVAL value)>
-
-Inplace shift left.
-
-=cut
-
-*/
-
-    MULTI PMC *bitwise_shr(BigInt value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        bigint_bitwise_shr_bigint_int(INTERP, SELF,
-                                      VTABLE_get_integer(INTERP, value),
-                                      dest);
-        return dest;
-    }
-
-    MULTI PMC *bitwise_shr(Integer value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        bigint_bitwise_shr_bigint_int(INTERP, SELF,
-                VTABLE_get_integer(interp, value), dest);
-        return dest;
-    }
-
-    MULTI PMC *bitwise_shr(DEFAULT value, PMC *dest) {
-        UNUSED(dest)
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
-            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-            "BigInt: no multiple dispatch variant 'bitwise_shr' for %Ss",
-            VTABLE_name(interp, value));
-    }
-
-    VTABLE PMC *bitwise_shr_int(INTVAL value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        bigint_bitwise_shr_bigint_int(INTERP, SELF, value, dest);
-        return dest;
-    }
-
-
-    MULTI void i_bitwise_shr(BigInt value) {
-        bigint_bitwise_shr_bigint_int(INTERP, SELF,
-                                      VTABLE_get_integer(INTERP, value),
-                                      SELF);
-    }
-
-    MULTI void i_bitwise_shr(Integer value) {
-        bigint_bitwise_shr_bigint_int(INTERP, SELF,
-                VTABLE_get_integer(interp, value), SELF);
-    }
-
-    MULTI void i_bitwise_shr(DEFAULT value) {
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
-            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-            "BigInt: no multiple dispatch variant 'i_bitwise_shr' for %Ss",
-            VTABLE_name(interp, value));
-    }
-
-    VTABLE void i_bitwise_shr_int(INTVAL value) {
-        bigint_bitwise_shr_bigint_int(INTERP, SELF, value, SELF);
     }
 }
 

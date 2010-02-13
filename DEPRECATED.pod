@@ -52,13 +52,6 @@ L<https://trac.parrot.org/parrot/ticket/452>
 
 L<https://trac.parrot.org/parrot/ticket/264>
 
-=item various VTABLE functions [eligible in 1.5]
-
-The get_bigint, set_bigint_*, pow, i_pow and nextkey_keyed VTABLE functions are
-deprecated and will be removed.
-
-L<https://trac.parrot.org/parrot/ticket/866>
-
 =item Use of undocumented variables in class_init [eligible in 2.1]
 
 The current implementation allows the class_init vtable function body to
@@ -76,14 +69,6 @@ signature call arguments when there is no current object and is
 not already here. This allows the usage of $P0() instead of $P0($P0).
 
 L<https://trac.parrot.org/parrot/ticket/103>
-
-=item All bitwise VTABLE functions [eligible in 2.1]
-
-All bitwise VTABLE functions (all VTABLE functions containing C<bitwise> in
-their names) will be removed.  Equivalent functionality will by supplied by
-bitwise dynops.
-
-L<https://trac.parrot.org/parrot/ticket/1260>
 
 =item CPointer PMC [eligible in 2.1]
 
