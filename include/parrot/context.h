@@ -1,5 +1,5 @@
 /* context.h
- *  Copyright (C) 2009, Parrot Foundation.
+ *  Copyright (C) 2009-2010, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -329,13 +329,6 @@ void Parrot_pcc_set_pred_offset_func(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_set_results_func(PARROT_INTERP,
-    ARGIN(PMC *ctx),
-    ARGIN_NULLOK(opcode_t *pc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 void Parrot_pcc_set_results_signature_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN_NULLOK(PMC *sig))
@@ -512,9 +505,6 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
     , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_set_pred_offset_func \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_set_results_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_set_results_signature_func \
