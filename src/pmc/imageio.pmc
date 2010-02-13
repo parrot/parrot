@@ -324,7 +324,9 @@ Marks the PMC as alive.
 
 */
     VTABLE void mark() {
-        Parrot_gc_mark_PObj_alive(INTERP, (PObj *)(PARROT_IMAGEIO(SELF)->buffer));
+        PObj * buffer = (PObj *)(PARROT_IMAGEIO(SELF)->buffer);
+        if (buffer)
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *)(PARROT_IMAGEIO(SELF)->buffer));
         Parrot_gc_mark_PMC_alive(INTERP, PARROT_IMAGEIO(SELF)->todo);
         Parrot_gc_mark_PMC_alive(INTERP, PARROT_IMAGEIO(SELF)->seen);
         Parrot_gc_mark_PMC_alive(INTERP, PARROT_IMAGEIO(SELF)->id_list);
