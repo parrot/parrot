@@ -148,6 +148,7 @@ static struct longopt_opt_decl options[] = {
     { 'D', 'D', OPTION_optional_FLAG, { "--parrot-debug" } },
     { 'E', 'E', (OPTION_flags)0, { "--pre-process-only" } },
     { 'G', 'G', (OPTION_flags)0, { "--no-gc" } },
+    { 'H', 'H', OPTION_required_FLAG, { "--hash-seed" } },
     { 'I', 'I', OPTION_required_FLAG, { "--include" } },
     { 'L', 'L', OPTION_required_FLAG, { "--library" } },
     { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
@@ -283,6 +284,7 @@ help(void)
     "    -V --version\n"
     "    -I --include add path to include search\n"
     "    -L --library add path to library search\n"
+    "    -H --hash-seed F00F  specify hex value to use as hash seed\n"
     "    -X --dynext add path to dynamic extension search\n"
     "   <Run core options>\n"
     "    -R --runcore slow|bounds|fast|cgoto|cgp\n"
@@ -427,6 +429,12 @@ parseflags(PARROT_INTERP,
             else
                 SET_DEBUG(PARROT_MEM_STAT_DEBUG_FLAG);
             break;
+          case 'H':
+            if (opt.opt_arg && is_all_hex_digits(opt.opt_arg)) {
+                interp->hash_seed = strtoul(opt.opt_arg, NULL, 16);
+            }
+            break;
+
           case '.':  /* Give Windows Parrot hackers an opportunity to
                       * attach a debuggger. */
             fgetc(stdin);
