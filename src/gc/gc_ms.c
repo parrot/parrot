@@ -1322,11 +1322,12 @@ gc_ms_alloc_objects(PARROT_INTERP,
         pool->objects_per_alloc = POOL_MAX_BYTES / pool->object_size;
 }
 
+
 /*
 
 =item C<static void gc_ms_block_GC_mark(PARROT_INTERP)>
 
-Blocks the GC from performing it's mark phase.
+Blocks the GC from performing its mark phase.
 
 =item C<static void gc_ms_unblock_GC_mark(PARROT_INTERP)>
 
@@ -1334,7 +1335,7 @@ Unblocks the GC mark.
 
 =item C<static void gc_ms_block_GC_sweep(PARROT_INTERP)>
 
-Blocks the GC from performing it's sweep phase.
+Blocks the GC from performing its sweep phase.
 
 =item C<static void gc_ms_unblock_GC_sweep(PARROT_INTERP)>
 
