@@ -225,12 +225,6 @@ UINTVAL Parrot_pcc_get_recursion_depth_func(PARROT_INTERP, ARGIN(PMC *ctx))
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-opcode_t* Parrot_pcc_get_results_func(PARROT_INTERP, ARGIN(PMC *ctx))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
 PMC* Parrot_pcc_get_results_signature_func(PARROT_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -465,9 +459,6 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_results_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_get_results_signature_func \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -567,9 +558,6 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
 #  define Parrot_pcc_get_continuation(i, c) (__C(c)->current_cont)
 #  define Parrot_pcc_set_continuation(i, c, value) (__C(c)->current_cont = (value))
 
-#  define Parrot_pcc_get_results(i, c) (__C(c)->current_results)
-#  define Parrot_pcc_set_results(i, c, value) (__C(c)->current_results = (value))
-
 #  define Parrot_pcc_get_caller_ctx(i, c) (__C(c)->caller_ctx)
 #  define Parrot_pcc_set_caller_ctx(i, c, value) (__C(c)->caller_ctx = (value))
 
@@ -633,9 +621,6 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
 
 #  define Parrot_pcc_get_continuation(i, c) Parrot_pcc_get_continuation_func((i), (c))
 #  define Parrot_pcc_set_continuation(i, c, value) Parrot_pcc_set_continuation_func((i), (c), (value))
-
-#  define Parrot_pcc_get_results(i, c) Parrot_pcc_get_results_func((i), (c))
-#  define Parrot_pcc_set_results(i, c, value) Parrot_pcc_set_results_func((i), (c), (value))
 
 #  define Parrot_pcc_get_caller_ctx(i, c) Parrot_pcc_get_caller_ctx_func((i), (c))
 #  define Parrot_pcc_set_caller_ctx(i, c, value) Parrot_pcc_set_caller_ctx_func((i), (c), (value))

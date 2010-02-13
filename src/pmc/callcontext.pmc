@@ -405,7 +405,6 @@ pmclass CallContext provides array provides hash auto_attrs {
     ATTR PMC      *current_namespace;     /* The namespace we're currently in */
     ATTR PMC      *results_signature;     /* non-const results signature PMC */
     ATTR opcode_t *current_pc;            /* program counter of Sub invocation */
-    ATTR opcode_t *current_results;       /* ptr into code with get_results opcode */
     ATTR PMC      *current_sig;           /* temporary CallContext PMC for active call */
 
     /* deref the constants - we need it all the time */
