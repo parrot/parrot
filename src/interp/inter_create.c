@@ -229,8 +229,6 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
      */
     Parrot_str_init(interp);
 
-    Parrot_initialize_core_vtables(interp);
-
     /* Set up MMD; MMD cache for builtins. */
     interp->op_mmd_cache = Parrot_mmd_cache_create(interp);
 
@@ -239,6 +237,8 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
 
     /* initialize classes - this needs mmd func table */
     interp->HLL_info = NULL;
+
+    Parrot_initialize_core_vtables(interp);
     init_world_once(interp);
 
     /* context data */
