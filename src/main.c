@@ -399,11 +399,12 @@ parseflags(PARROT_INTERP,
                 *core = PARROT_PROFILING_CORE;
             else if (STREQ(opt.opt_arg, "gcdebug"))
                 *core = PARROT_GC_DEBUG_CORE;
-            else
+            else {
                 fprintf(stderr,
                         "main: Unrecognized runcore '%s' specified."
                         "\n\nhelp: parrot -h\n", opt.opt_arg);
                 exit(EXIT_FAILURE);
+            }
             break;
           case 'g':
             if (STREQ(opt.opt_arg, "ms"))
