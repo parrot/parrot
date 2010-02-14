@@ -20,7 +20,7 @@ number types.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(129)
+    plan(130)
 
     take_the_negative_of_a_native_integer()
     take_the_absolute_of_a_native_integer()
@@ -44,6 +44,7 @@ number types.
     lcm_test()
     gcd_test()
     integer_overflow_with_pow()
+    bnot_p_p_creates_destination()
     # END_OF_TESTS
 
 .end
@@ -556,6 +557,12 @@ End_test4:
     unless i2 > 40 goto next
 
   end:
+.end
+
+.sub 'bnot_p_p_creates_destination'
+    $P0 = box 3
+    $P1 = bnot $P0
+    is( $P1, -4, 'bnot_p_p_creates_destination')
 .end
 
 # Local Variables:
