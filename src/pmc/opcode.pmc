@@ -6,9 +6,8 @@ pmclass Opcode auto_attrs {
     ATTR STRING *full_name_cache;
 
     VTABLE void init() {
-        /* TODO: Throw an exception here. Opcode PMCs should be produced by
-                 the OpLib singleton PMC as a factory. */
-        PObj_custom_mark_SET(SELF);
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Opcode must be created from OpLib.");
     }
 
     VTABLE void mark() {
