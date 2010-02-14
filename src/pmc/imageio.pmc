@@ -497,7 +497,8 @@ Removes and returns a string from the start of the image.
     VTABLE STRING *shift_string()
     {
         opcode_t *pos    = GET_VISIT_CURSOR(SELF);
-        STRING * const s = PF_fetch_string(interp, PARROT_IMAGEIO(SELF)->pf, (const opcode_t **)&pos);
+        STRING * const s = PF_fetch_string(interp, PARROT_IMAGEIO(SELF)->pf,
+                                           (const opcode_t **)&pos);
         SET_VISIT_CURSOR(SELF, (char *)pos);
         BYTECODE_SHIFT_OK(SELF);
         return s;
