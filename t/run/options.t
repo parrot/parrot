@@ -20,7 +20,7 @@ use strict;
 use warnings;
 use lib qw( lib . ../lib ../../lib );
 
-use Test::More tests => 26;
+use Test::More tests => 27;
 use Parrot::Config;
 use File::Temp 0.13 qw/tempfile/;
 use File::Spec;
@@ -92,6 +92,9 @@ is( `"$PARROT" --trace "$first_pir_file" "$second_pir_file" $redir`,
 }
 
 ## TT #1150 test remaining options
+
+# Test --runtime-prefix
+like( qx{$PARROT --runtime-prefix}, qr/^.+$/, "--runtime-prefix" );
 
 # clean up temporary files
 unlink $first_pir_file;
