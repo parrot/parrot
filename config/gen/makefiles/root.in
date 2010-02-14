@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 ###############################################################################
@@ -1144,11 +1144,16 @@ hello: test_prep examples/pasm/hello$(EXE)
 examples/pasm/hello.pbc: examples/pasm/hello.pasm
 	$(PARROT) -o examples/pasm/hello.pbc examples/pasm/hello.pasm
 
-examples/pasm/hello$(O): examples/pasm/hello.pbc
-	$(PARROT) -o examples/pasm/hello$(O) examples/pasm/hello.pbc
-
-examples/pasm/hello$(EXE): examples/pasm/hello$(O)
-	$(MAKE) . EXEC=examples/pasm/hello exec
+# The -o option of parrot did not work with the object file extension ".o"
+# so as work around pbc_to_exe is used and the original commands are only
+# commented out so it can easy switched back
+#examples/pasm/hello$(O): examples/pasm/hello.pbc
+#	$(PARROT) -o examples/pasm/hello$(O) examples/pasm/hello.pbc
+#
+#examples/pasm/hello$(EXE): examples/pasm/hello$(O)
+#	$(MAKE) . EXEC=examples/pasm/hello exec
+examples/pasm/hello$(EXE): examples/pasm/hello.pbc
+	$(PBC_TO_EXE) examples/pasm/hello.pbc
 
 
 
