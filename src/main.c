@@ -370,7 +370,7 @@ parseflags_minimal(PARROT_INTERP, int argc, ARGIN(char *argv[]))
 
     int pos = 0;
     const char *arg;
-    while(pos < argc) {
+    while (pos < argc) {
         arg = argv[pos];
         if (STREQ(arg, "--gc")) {
             ++pos;
