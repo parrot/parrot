@@ -670,6 +670,10 @@ char *
 aligned_mem(ARGIN(const Buffer *buffer), ARGIN(char *mem))
 {
     ASSERT_ARGS(aligned_mem)
+#if 0
+    This code causing assert in compact_pool. Looks like STRINGs have
+    aligned flag set, but allocated less memory.
+    See C<aligned_string_size>.
     if (PObj_is_COWable_TEST(buffer))
         mem += sizeof (void*);
     if (PObj_aligned_TEST(buffer))
@@ -677,6 +681,9 @@ aligned_mem(ARGIN(const Buffer *buffer), ARGIN(char *mem))
                 BUFFER_ALIGN_MASK);
     else
         mem = (char*)(((unsigned long)(mem + WORD_ALIGN_1)) & WORD_ALIGN_MASK);
+#endif
+    mem += sizeof (void*);
+    mem = (char*)(((unsigned long)(mem + WORD_ALIGN_1)) & WORD_ALIGN_MASK);
 
     return mem;
 }
