@@ -301,8 +301,6 @@ int Parrot_gc_total_pmcs(PARROT_INTERP)
 int Parrot_gc_total_sized_buffers(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-STRING *Parrot_gc_sys_name(PARROT_INTERP);
-
 #define ASSERT_ARGS_Parrot_block_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_block_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
