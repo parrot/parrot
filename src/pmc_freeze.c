@@ -31,6 +31,8 @@ individual action vtable (freeze/thaw) is then called for all todo-PMCs.
 
 #define THAW_BLOCK_GC_SIZE 100000
 
+/* HEADERIZER HFILE: include/parrot/pmc_freeze.h */
+
 /*
 
 =head2 Public Interface
