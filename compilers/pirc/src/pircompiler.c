@@ -15,6 +15,8 @@
 #include "pirregalloc.h"
 #include "pirerr.h"
 
+/* HEADERIZER HFILE: none */
+
 /* XXX count memory, so we can check out mem. savings of string reuse
  * Only temporarily used, so no need to "fix" this.
  */
@@ -26,8 +28,7 @@ static int totalmem = 0;
 
 =over 4
 
-=item C<static allocated_mem_ptrs *
-new_mem_ptrs_block(void)>
+=item C<static allocated_mem_ptrs * new_mem_ptrs_block(void)>
 
 Create a new C<allocated_mem_ptrs> block; all pointers to allocated memory
 within pirc are stored in such blocks. One block has space for a number of
@@ -129,8 +130,8 @@ pir_mem_allocate(NOTNULL(lexer_state * const lexer), size_t numbytes) {
 
 /*
 
-=item C<void
-init_hashtable(lexer_state * const lexer, hashtable * const table, unsigned size)>
+=item C<void init_hashtable(lexer_state * const lexer, hashtable * const table,
+unsigned size)>
 
 Initialize the hashtable C<table> with space for C<size> buckets.
 
@@ -207,8 +208,7 @@ new_lexer(PARROT_INTERP, NULLOK(char * const filename), int flags) {
 
 /*
 
-=item C<bucket *
-new_bucket(lexer_state * const lexer)>
+=item C<bucket * new_bucket(lexer_state * const lexer)>
 
 Constructor for a bucket object.
 
@@ -313,8 +313,7 @@ dupstrn(NOTNULL(lexer_state * const lexer), NOTNULL(char * const source), size_t
 
 /*
 
-=item C<char *
-dupstr(lexer_state * const lexer, char const * const source)>
+=item C<char const * dupstr(lexer_state * const lexer, char * const source)>
 
 The C89 standard does not define a strdup() in the C library,
 so define our own strdup. Function names beginning with "str"
@@ -333,8 +332,7 @@ dupstr(NOTNULL(lexer_state * const lexer), NOTNULL(char * const source)) {
 
 /*
 
-=item C<void
-release_resources(lexer_state *lexer)>
+=item C<void release_resources(lexer_state *lexer)>
 
 Release all resources pointed to by C<lexer>.
 Free all memory that was allocated through C<pir_mem_allocate_zeroed()>.
@@ -375,8 +373,8 @@ release_resources(NOTNULL(lexer_state *lexer)) {
 
 /*
 
-=item C<void
-pirwarning(lexer_state * const lexer, int lineno, char const * const message, ...)>
+=item C<void pirwarning(lexer_state * const lexer, int lineno, char const *
+const message, ...)>
 
 Emit a warning message to C<stderr>. The line number (passed in C<lineno>) is reported,
 together with the message. The message can be formatted, meaning it can contain

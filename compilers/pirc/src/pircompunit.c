@@ -44,6 +44,7 @@ O(c) (constant) time.
 #include "parrot/dynext.h"
 #include "pmc/pmc_callcontext.h"
 
+/* HEADERIZER HFILE: none */
 
 static unsigned const prime_numbers[] = {113 /* XXX think of more primes */ };
 
@@ -159,8 +160,7 @@ set_sub_multi_types(lexer_state * const lexer, expression * const multitype) {
 
 /*
 
-=item C<static void
-add_self_parameter(lexer_state * const lexer)>
+=item C<static void add_self_parameter(lexer_state * const lexer)>
 
 Add a parameter named C<"self"> to the current subroutine, but only
 if both :vtable and :method flags have I<not> been set yet. If either
@@ -180,8 +180,7 @@ add_self_parameter(lexer_state * const lexer) {
 
 /*
 
-=item C<void
-set_sub_vtable(lexer_state * const lexer, char const * vtablename)>
+=item C<void set_sub_vtable(lexer_state * const lexer, char const * vtablename)>
 
 Set the :vtable() flag argument to the current subroutine. If C<vtablename>
 is NULL, the name of the current sub is taken to be the vtable method name.
@@ -300,8 +299,7 @@ set_sub_nsentry(lexer_state * const lexer, char const * const nsentry) {
 
 /*
 
-=item C<void
-set_sub_flag(lexer_state * const lexer, sub_flag flag)>
+=item C<void set_sub_flag(lexer_state * const lexer, sub_flag flag)>
 
 Set a subroutine flag on the current sub. The C<flag> parameter may encode
 multiple flags.
@@ -496,8 +494,8 @@ set_curarg(lexer_state * const lexer, argument * const arg) {
 
 /*
 
-=item C<int
-targets_equal(target const * const left, target const * const right)>
+=item C<int targets_equal(target const * const left, target const * const
+right)>
 
 Returns true if C<left> equals C<right>, false otherwise. C<left> is
 considered to be equal to C<right> if any of the following conditions
@@ -611,8 +609,8 @@ target_from_symbol(lexer_state * const lexer, symbol * const sym) {
 
 /*
 
-=item C<target *
-add_target(lexer_state * const lexer, target *last, target * const t)>
+=item C<target * add_target(lexer_state * const lexer, target *last, target *
+const t)>
 
 Add a new target to the list pointed to by C<list>. C<list> points to
 the last element, C<<last->next>> points to the first. The list is
@@ -722,8 +720,8 @@ set_param_alias(lexer_state * const lexer, char const * const alias) {
 
 /*
 
-=item C<void
-set_param_flag(lexer_state * const lexer, target * const param, target_flag flag)>
+=item C<target * set_param_flag(lexer_state * const lexer, target * const param,
+target_flag flag)>
 
 Set the flag C<flag> on parameter C<param>. The actual value
 of C<flag> may encode several flags at a time. Returns C<param>.
@@ -780,8 +778,7 @@ new_argument(lexer_state * const lexer, expression * const expr) {
 
 /*
 
-=item C<argument *
-add_arg(argument *last, argument * const newarg)>
+=item C<argument * add_arg(argument *last, argument * const newarg)>
 
 Add argument C<newarg> at the end of the list pointed to by C<last>.
 The list is circular linked, and C<last> points to the last item.
@@ -809,8 +806,7 @@ add_arg(argument *last, argument * const newarg) {
 
 /*
 
-=item C<void
-unshift_arg(invocation * const inv, argument * const newarg)>
+=item C<argument * unshift_arg(invocation * const inv, argument * const newarg)>
 
 Unshift argument C<newarg> on an invocation object. The number
 of arguments in the list of C<inv> is incremented to reflect
@@ -854,8 +850,7 @@ unshift_arg(invocation * const inv, argument * const newarg) {
 
 /*
 
-=item C<void
-set_arg_flag(argument * const arg, arg_flag flag)>
+=item C<argument * set_arg_flag(argument * const arg, arg_flag flag)>
 
 Set the flag C<flag> on argument C<arg>. Note the C<flag> may
 encode multiple flags. C<arg> is returned.
@@ -954,8 +949,7 @@ set_label(lexer_state * const lexer, char const * const labelname) {
 
 /*
 
-=item C<void
-set_instr(lexer_state * const lexer, char const * const opname)>
+=item C<void set_instr(lexer_state * const lexer, char const * const opname)>
 
 Sets C<opname> to the current instruction, without operands. This is a
 wrapper function for C<set_instrf> to prevent calls with an empty format
@@ -1023,8 +1017,8 @@ update_instr(lexer_state * const lexer, char const * const newop) {
 
 /*
 
-=item C<void
-set_instrf(lexer_state *lexer, char *opname, char const * const format, ...)>
+=item C<void set_instrf(lexer_state * const lexer, char const * const opname,
+char const * const format, ...)>
 
 Set the specified instruction, using the operands from the vararg list. The
 number and types of operands is specified by C<format>. The type of the
@@ -1092,8 +1086,8 @@ set_instrf(lexer_state * const lexer, char const * const opname, char const * co
 
 /*
 
-=item C<void
-add_operands(lexer_state * const lexer, char const * const format, ...)>
+=item C<void add_operands(lexer_state * const lexer, char const * const format,
+...)>
 
 Add operands to the current instruction. This is a variable argument function;
 C<format> contains placeholders, see the macro C<get_instr_var_arg> above
@@ -1132,8 +1126,7 @@ add_operands(lexer_state * const lexer, char const * const format, ...) {
 
 /*
 
-=item C<void
-set_op_labelflag(lexer_state * const lexer, int flag)>
+=item C<void set_op_labelflag(lexer_state * const lexer, int flag)>
 
 Set a flag on the current instruction that it contains labels as operands.
 The bit indicates which operand, count starting from bit 1.
@@ -1149,8 +1142,7 @@ set_op_labelflag(lexer_state * const lexer, int flag) {
 
 /*
 
-=item C<char *
-get_inverse(char *instr)>
+=item C<char const * get_inverse(char const * const instr)>
 
 Returns the instruction with inversed semantics; for instance
 C<if> becomes C<unless>, C<greater-than> becomes C<less-or-equals>.
@@ -1440,8 +1432,8 @@ new_named_const(lexer_state * const lexer, value_type type, char const * const n
 
 /*
 
-=item C<constdecl *
-new_pmc_const(char const * const type, char const * const name, constant * const value)>
+=item C<constdecl * new_pmc_const(lexer_state * const lexer, char const * const
+type, char const * const name, constant * const value)>
 
 Create a new PMC constant declaration of type C<type>, name C<name> and having a value C<value>.
 The type must be a string indicating a valid type name (e.g. "Sub"). C<name> is the name
@@ -1727,8 +1719,7 @@ expr_from_const(lexer_state * const lexer, constant * const c) {
 
 /*
 
-=item C<expression *
-expr_from_int(lexer_state * const lexer, int ival)>
+=item C<expression * expr_from_int(lexer_state * const lexer, int ival)>
 
 Create an expression node from an integer constant. This is a wrapper
 function, which uses C<expr_from_const()> and C<new_const()>.
@@ -1747,8 +1738,7 @@ expr_from_int(lexer_state * const lexer, int ival) {
 
 /*
 
-=item C<expression *
-expr_from_num(lexer_state * const lexer, double nval)>
+=item C<expression * expr_from_num(lexer_state * const lexer, double nval)>
 
 Same as C<expr_from_int()>, except it takes a C<double> parameter,
 not an C<int>.
@@ -1765,8 +1755,8 @@ expr_from_num(lexer_state * const lexer, double nval) {
 
 /*
 
-=item C<expression *
-expr_from_string(lexer_state * const lexer, char const * const sval)>
+=item C<expression * expr_from_string(lexer_state * const lexer, char const *
+const sval)>
 
 Same as C<expr_from_int()>, except it takes a C<string> parameter.
 
@@ -1913,8 +1903,7 @@ set_invocation_type(invocation * const inv, invoke_type type) {
 
 /*
 
-=item C<invocation *
-invoke(lexer_state * const lexer, invoke_type type, ...)>
+=item C<invocation * invoke(lexer_state * const lexer, invoke_type type, ...)>
 
 Create a new C<invocation> object of type C<type>. This can be one
 of the C<invoke_types> enumeration. Based on the type, this function
@@ -2054,8 +2043,8 @@ unshift_operand(lexer_state * const lexer, expression * const operand) {
 
 /*
 
-=item C<void
-push_operand(lexer_state * const lexer, expression * const operand)>
+=item C<void push_operand(lexer_state * const lexer, expression * const
+operand)>
 
 Add an operand at the end of the list of operands of the current instruction.
 
@@ -2152,8 +2141,8 @@ new_key(NOTNULL(lexer_state * const lexer), NOTNULL(expression * const expr)) {
 
 /*
 
-=item C<key *
-add_key(lexer_state * const lexer, key * const keylist, expression * const exprkey)>
+=item C<key * add_key(lexer_state * const lexer, key * const keylist, expression
+* const exprkey)>
 
 Adds a new, nested key (in C<exprkey>) to the current key,
 pointed to by C<keylist>. C<keylist> is returned.
@@ -2258,9 +2247,8 @@ is_parrot_op(lexer_state * const lexer, char const * const name) {
 
 /*
 
-=item C<void
-new_sub_instr(lexer_state * const lexer, int opcode, char const * const opname,
-              unsigned num_var_args)>
+=item C<void new_sub_instr(lexer_state * const lexer, int opcode, char const *
+const opname, unsigned num_var_args)>
 
 Create a new instruction node, and initialize the opcode and opinfo on that
 node. This function can be used to create an instruction of which the signature

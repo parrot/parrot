@@ -9,7 +9,7 @@
 #include "pircompiler.h"
 #include "parrot/parrot.h"
 
-
+/* HEADERIZER HFILE: none */
 
 /*
 
@@ -31,8 +31,8 @@ static void check_size(macro_def * const macro, unsigned length);
 
 /*
 
-=item C<macro_def *
-new_macro(macro_table * const table, char * const name, int lineno)>
+=item C<macro_def * new_macro(macro_table * const table, char const * const
+name, int lineno, int takes_args, unsigned initsize)>
 
 Create a new macro definition node and store it in the macro_table C<table>
 
@@ -106,8 +106,8 @@ add_macro_param(macro_def * const macro, char const * const name) {
 
 /*
 
-=item C<void
-new_macro_const(macro_table * const table, char const * const name, char const * const value)>
+=item C<void new_macro_const(macro_table * const table, char const * const name,
+char const * const value, int lineno)>
 
 Define a new C<.macro_const>, by name of C<name> as an alias for C<value> The new macro
 const is entered in the macro_table C<table>
@@ -179,8 +179,8 @@ store_macro_char(macro_def * const macro, char c) {
 
 /*
 
-=item C<void
-store_macro_string(macro_def * const macro, char * const str, ...)>
+=item C<void store_macro_string(macro_def * const macro, char const * const str,
+...)>
 
 Store the string C<str> in C<macro>'s body buffer. The total number
 of characters to be written should not exceed MAX_NUM_CHARS. It's not known
@@ -270,8 +270,7 @@ new_macro_table(macro_table * const current) {
 
 /*
 
-=item C<void
-delete_macro_table(macro_table * table)>
+=item C<void delete_macro_table(macro_table * table)>
 
 Free resources allocated for the macro_table C<table>.
 

@@ -405,6 +405,8 @@ int yypirlex(YYSTYPE *yylval, yyscan_t yyscanner);
 
 #endif
 
+/* HEADERIZER HFILE: none */
+
 char *expand_macro(yyscan_t yyscanner, macro_def * const macro, macro_param * args);
 
 /* Enumeration of mathematical operator types; these are used to index the opnames array. */
@@ -5450,8 +5452,7 @@ fold_s_s(yyscan_t yyscanner, NOTNULL(char const *a), pir_math_operator op, NOTNU
 
 /*
 
-=item C<static int
-evaluate_i_i(int a, pir_rel_operator op, double b)>
+=item C<static int evaluate_i_i(int a, pir_rel_operator op, int b)>
 
 Compare C<a> with C<b> according to the relational operator C<op>.
 Wrapper for C<evaluate_n_n>, which takes arguments of type double.
@@ -5467,8 +5468,7 @@ evaluate_i_i(int a, pir_rel_operator op, int b) {
 
 /*
 
-=item C<static int
-evaluate_n_i(int a, pir_rel_operator op, double b)>
+=item C<static int evaluate_n_i(double a, pir_rel_operator op, int b)>
 
 Compare C<a> with C<b> according to the relational operator C<op>.
 Wrapper for C<evaluate_n_n>, which takes arguments of type double.
@@ -5484,8 +5484,7 @@ evaluate_n_i(double a, pir_rel_operator op, int b) {
 
 /*
 
-=item C<static int
-evaluate_i_n(int a, pir_rel_operator op, double b)>
+=item C<static int evaluate_i_n(int a, pir_rel_operator op, double b)>
 
 Compare C<a> with C<b> according to the relational operator C<op>.
 Wrapper for C<evaluate_n_n>, which takes arguments of type double.
@@ -5633,8 +5632,8 @@ evaluate_c(NOTNULL(lexer_state * const lexer), NOTNULL(constant * const c)) {
 
 /*
 
-=item C<static char *
-concat_strings(lexer_state * const lexer, char const *a, char const *b)>
+=item C<static char * concat_strings(lexer_state * const lexer, char const * a,
+char const * b)>
 
 Concatenates two strings into a new buffer. The new string is returned.
 
@@ -5659,9 +5658,8 @@ concat_strings(NOTNULL(lexer_state * const lexer), NOTNULL(char const * a),
 
 /*
 
-=item C<static void
-create_if_instr(lexer_state *lexer, int invert, int hasnull,
-                char * const name, char * const label)>
+=item C<static void create_if_instr(lexer_state * const lexer, int invert, int
+hasnull, char const * const name, char const * const label)>
 
 Create an C<if> or C<unless> instruction; if C<invert> is non-zero (true), the
 C<if> instruction is inverted, effectively becoming C<unless>.
@@ -5908,8 +5906,7 @@ convert_3_to_2_args(int opcode, NOTNULL(int *second_op_index)) {
 
 /*
 
-=item C<static void
-do_strength_reduction(lexer_state * const lexer)>
+=item C<static void do_strength_reduction(lexer_state * const lexer)>
 
 Implement strength reduction for the math operators C<add>, C<sub>, C<mul>, C<div> and C<fdiv>.
 If the current instruction is any of these, then the first two operands are checked; if both
@@ -6043,8 +6040,8 @@ do_strength_reduction(lexer_state * const lexer) {
 
 /*
 
-=item C<static void
-check_first_arg_direction(lexer_state * const lexer, char * const opname)>
+=item C<static void check_first_arg_direction(lexer_state * const lexer, char
+const * const opname)>
 
 This function checks the first argument's  direction of the op C<opname>.
 If the direction is not C<OUT>, a syntax error is emitted. This function assumes
@@ -6217,8 +6214,8 @@ check_op_args_for_symbols(lexer_state * const lexer) {
 
 /*
 
-=item C<static void
-undeclared_symbol(lexer_state * const lexer, char * const symbol)>
+=item C<static void undeclared_symbol(lexer_state * const lexer, char const *
+const symbol)>
 
 Report an error message saying that C<symbol> was not declared. Then test
 whether the symbol is perhaps a PASM register identifier. The user may have

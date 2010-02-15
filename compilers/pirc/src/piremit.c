@@ -14,6 +14,8 @@
 
 #include "parrot/oplib/ops.h"
 
+/* HEADERIZER HFILE: none */
+
 /*
 
 =head1 DESCRIPTION
@@ -61,8 +63,7 @@ void print_statement(lexer_state * const lexer, subroutine * const sub);
 
 /*
 
-=item C<void
-print_key(lexer_state * const lexer, key * const k)>
+=item C<void print_key(lexer_state * const lexer, key * const k)>
 
 Print the key C<k>. The total key is enclosed in square brackets,
 and different key elements are separated by semicolons. Example:
@@ -95,8 +96,7 @@ print_key(lexer_state * const lexer, key * const k) {
 
 /*
 
-=item C<void
-print_target(lexer_state * const lexer, target * const t)>
+=item C<void print_target(lexer_state * const lexer, target * const t)>
 
 Print the target C<t>; if C<t> has a key, that key is
 printed as well. Examples:
@@ -118,8 +118,7 @@ print_target(lexer_state * const lexer, target * const t) {
 
 /*
 
-=item C<void
-print_constant(lexer_state * const lexer, constant * const c)>
+=item C<void print_constant(lexer_state * const lexer, constant * const c)>
 
 Print the value of constant C<c>. Based on C<c>'s type, the appropriate
 value is printed.
@@ -153,8 +152,7 @@ print_constant(lexer_state * const lexer, constant * const c) {
 
 /*
 
-=item C<void
-print_expr(lexer_state * const lexer, expression * const expr)>
+=item C<void print_expr(lexer_state * const lexer, expression * const expr)>
 
 Print the expression C<expr>. This is a dispatch function, calling
 a specialized function based on C<expr>'s type.
@@ -187,8 +185,8 @@ print_expr(lexer_state * const lexer, expression * const expr) {
 
 /*
 
-=item C<void
-print_expressions(expression * const expr)>
+=item C<void print_expressions(lexer_state * const lexer, expression * const
+expr)>
 
 Print the list of expressions pointed to by C<expr>,
 if C<expr> is not NULL. If C<expr> is NULL, the
@@ -254,8 +252,7 @@ print_instruction(lexer_state * const lexer, instruction * const ins) {
 
 /*
 
-=item C<void
-print_statement(lexer_state * const lexer, subroutine * const sub)>
+=item C<void print_statement(lexer_state * const lexer, subroutine * const sub)>
 
 XXX
 
@@ -280,8 +277,8 @@ print_statement(lexer_state * const lexer, subroutine * const sub) {
 
 /*
 
-=item C<static void
-print_sub_flags(lexer_state * const lexer, subroutine * const subiter)>
+=item C<static void print_sub_flags(lexer_state * const lexer, subroutine *
+const subiter)>
 
 Print the appropriate subflags.
 
@@ -320,8 +317,7 @@ print_sub_flags(lexer_state * const lexer, subroutine * const subiter) {
 
 /*
 
-=item C<void
-print_subs(struct lexer_state * const lexer)>
+=item C<void print_subs(struct lexer_state * const lexer)>
 
 Top-level function to print all generated code. This function
 iterates over all subs and prints their instructions.
@@ -371,8 +367,8 @@ print_subs(struct lexer_state * const lexer) {
 
 /*
 
-=item C<static void
-emit_pir_instruction(lexer_state * const lexer, instruction * const instr)>
+=item C<static void emit_pir_instruction(lexer_state * const lexer, instruction
+* const instr)>
 
 Print the PIR representation of C<instr>. If C<instr> has a label, that
 is printed first.
@@ -395,8 +391,8 @@ emit_pir_instruction(lexer_state * const lexer, instruction * const instr) {
 
 /*
 
-=item C<static void
-emit_pir_statement(lexer_state * const lexer, subroutine * const sub)>
+=item C<static void emit_pir_statement(lexer_state * const lexer, subroutine *
+const sub)>
 
 Emit all statements of the subroutine C<sub>. The statements
 are emitted in PIR format. If there are no statements in C<sub>,
@@ -424,8 +420,8 @@ emit_pir_statement(lexer_state * const lexer, subroutine * const sub) {
 
 /*
 
-=item C<void
-emit_pir_subs(lexer_state * const lexer)>
+=item C<void emit_pir_subs(lexer_state * const lexer, char const * const
+outfile)>
 
 Print the PIR representation of all subroutines stored
 in the C<lexer>. If there are no subroutines, thre function
@@ -474,8 +470,8 @@ emit_pir_subs(lexer_state * const lexer, char const * const outfile) {
 
 /*
 
-=item C<static void
-emit_pbc_const_arg(lexer_state * const lexer, constant * const c)>
+=item C<static void emit_pbc_const_arg(lexer_state * const lexer, constant *
+const c)>
 
 Emit a constant argument into the bytecode. An integer is emitted
 inline in the bytecode; other types are stored in the constant table,
@@ -538,8 +534,8 @@ emit_pbc_const_arg(lexer_state * const lexer, constant * const c) {
 
 /*
 
-=item C<static void
-emit_pbc_label_arg(lexer_state * const lexer, label * const l)>
+=item C<static void emit_pbc_label_arg(lexer_state * const lexer, label * const
+l)>
 
 Emit the value of the label offset of label C<l>.
 
@@ -558,8 +554,8 @@ emit_pbc_label_arg(lexer_state * const lexer, label * const l) {
 
 /*
 
-=item C<static void
-emit_pbc_target_arg(lexer_state * const lexer, target * const t)>
+=item C<static void emit_pbc_target_arg(lexer_state * const lexer, target *
+const t)>
 
 Emit the assigned register of target C<t>. The assigned register is
 stored in the C<color> field, of either the C<pir_reg> or C<symbol>
@@ -581,8 +577,8 @@ emit_pbc_target_arg(lexer_state * const lexer, target * const t) {
 
 /*
 
-=item C<static void
-emit_pbc_expr(lexer_state * const lexer, expression * const operand)>
+=item C<static void emit_pbc_expr(lexer_state * const lexer, expression * const
+operand)>
 
 Emit bytecode for the expression C<operand>. This is a dispatch
 function, invoking the appropriate function depending on C<operand>'s
@@ -620,8 +616,8 @@ emit_pbc_expr(lexer_state * const lexer, expression * const operand) {
 
 /*
 
-=item C<static void
-optimize_instr(lexer_state * const lexer, instruction * const instr)>
+=item C<static void optimize_instr(lexer_state * const lexer, instruction *
+const instr)>
 
 Optimize the instruction C<instr>. Currently, these instructions are optimized:
 
@@ -700,8 +696,8 @@ optimize_instr(lexer_state * const lexer, instruction * const instr) {
 
 /*
 
-=item C<static void
-emit_pbc_instr(lexer_state * const lexer, instruction * const instr)>
+=item C<static void emit_pbc_instr(lexer_state * const lexer, instruction *
+const instr)>
 
 Emit PBC for one instruction. If the C<opinfo> attribute of C<instr>
 is NULL, the function does nothing and returns.
@@ -766,8 +762,8 @@ emit_pbc_instr(lexer_state * const lexer, instruction * const instr) {
 
 /*
 
-=item C<static void
-emit_pbc_sub(lexer_state * const lexer, subroutine * const sub)>
+=item C<static void emit_pbc_sub(lexer_state * const lexer, subroutine * const
+sub)>
 
 Emit bytecode for the subroutine C<sub>.
 
@@ -803,8 +799,7 @@ emit_pbc_sub(lexer_state * const lexer, subroutine * const sub) {
 
 /*
 
-=item C<static void
-emit_pbc_annotations(lexer_state * const lexer)>
+=item C<static void emit_pbc_annotations(lexer_state * const lexer)>
 
 Emit all annotations into the PackFile. First a new annotations
 segment is created. Then, for each annotation, its value is stored
@@ -866,8 +861,7 @@ emit_pbc_annotations(lexer_state * const lexer) {
 
 /*
 
-=item C<void
-emit_pbc(lexer_state * const lexer, const char *outfile)>
+=item C<void emit_pbc(lexer_state * const lexer, const char *outfile)>
 
 Generate Parrot Byte Code from the abstract syntax tree.
 This is the top-level function. After all instructions

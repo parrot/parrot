@@ -88,6 +88,8 @@ int yypirlex(YYSTYPE *yylval, yyscan_t yyscanner);
 
 #endif
 
+/* HEADERIZER HFILE: none */
+
 char *expand_macro(yyscan_t yyscanner, macro_def * const macro, macro_param * args);
 
 /* Enumeration of mathematical operator types; these are used to index the opnames array. */

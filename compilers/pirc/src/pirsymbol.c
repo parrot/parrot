@@ -11,6 +11,7 @@
 #include <string.h>
 #include <stdio.h>
 
+/* HEADERIZER HFILE: none */
 
 /*
 
@@ -83,8 +84,7 @@ const int valuetype_pirtype_clut[10] = {
 
 /*
 
-=item C<static int
-next_register(lexer_state * const lexer, pir_type type)>
+=item C<static int next_register(lexer_state * const lexer, pir_type type)>
 
 Returns a new register of the specified type.
 This is the vanilla register allocator.
@@ -175,8 +175,7 @@ store_bucket(NOTNULL(hashtable * const table), NOTNULL(bucket * const buck), uns
 
 /*
 
-=item C<bucket *
-get_bucket(hashtable * const table, unsigned long hash)>
+=item C<bucket * get_bucket(hashtable * const table, unsigned long hash)>
 
 Return the bucket at hash index C<hash> from the hashtable C<table>.
 
@@ -216,8 +215,8 @@ new_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name),
 
 /*
 
-=item C<void
-declare_local(lexer_state * const lexer, pir_type type, symbol * const list)>
+=item C<void declare_local(lexer_state * const lexer, pir_type type, symbol *
+const list)>
 
 Declare the local variables in the list pointed to by C<list>, all of which
 are of the type C<type>. The variables are entered into the symbol table for
@@ -272,8 +271,7 @@ declare_local(NOTNULL(lexer_state * const lexer), pir_type type,
 
 /*
 
-=item C<void
-check_unused_symbols(lexer_state * const lexer)>
+=item C<void check_unused_symbols(lexer_state * const lexer)>
 
 Check all subroutines for unused symbols. If a symbol is declared but
 never used, a warning message is printed to C<stderr>. If there's
@@ -439,8 +437,8 @@ find_register(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
 
 /*
 
-=item C<static int
-use_register(lexer_state * const lexer, pir_type type, int regno, int pasmregno)>
+=item C<static int use_register(lexer_state * const lexer, pir_type type, int
+regno, int pasmregno)>
 
 This function registers (no pun intended) register C<regno> of type
 C<type>; it uses register C<pasmregno>; each subsequent
@@ -675,9 +673,8 @@ find_global_constant(NOTNULL(lexer_state * const lexer), NOTNULL(char const * co
 
 /*
 
-=item C<static local_label *
-new_local_label(lexer_state * const lexer, char const * const name,
-unsigned offset)>
+=item C<static local_label * new_local_label(lexer_state * const lexer, char
+const * const name, unsigned offset)>
 
 Constructor for a label. Create a new label structure, fill out the details
 and return it. C<name> is the name of the label; C<offset> is its current
@@ -700,8 +697,8 @@ new_local_label(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const n
 
 /*
 
-=item C<void
-store_local_label(lexer_state * const lexer, char const * const labelname, unsigned offset)>
+=item C<void store_local_label(lexer_state * const lexer, char const * const
+labelname, unsigned offset)>
 
 Store the (sub-)local label C<labelname>, having I<address> C<offset> in the current
 subroutine structure.

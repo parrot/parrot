@@ -7,6 +7,8 @@
 #include "pirregalloc.h"
 #include "parrot/parrot.h"
 
+/* HEADERIZER HFILE: none */
+
 /*
 
 =head1 DESCRIPTION
@@ -108,8 +110,7 @@ print_list(char *msg, live_interval *i) {
 
 /*
 
-=item C<void
-destroy_linear_scan_register_allocator(lsr_allocator *lsr)>
+=item C<void destroy_linear_scan_register_allocator(lsr_allocator *lsr)>
 
 Destructor for linear scan register allocator. All live_interval
 objects are destroyed as well.
@@ -234,8 +235,8 @@ add_live_interval(lsr_allocator * const lsr, live_interval * const i, pir_type t
 
 /*
 
-=item C<live_interval *
-new_live_interval(lsr_allocator * const lsr, unsigned firstuse_location, pir_type type)>
+=item C<live_interval * new_live_interval(lsr_allocator * const lsr, unsigned
+firstuse_location, pir_type type)>
 
 Constructor for a live_interval struct object. After creating the new interval object,
 its startpoint and endpoint are initialized to the value in C<firstuse_location>. Note
@@ -388,8 +389,8 @@ get_free_reg(lsr_allocator * const lsr, pir_type type) {
 
 /*
 
-=item C<static void
-add_free_reg(lsr_allocator * const lsr, unsigned regno, pir_type type)>
+=item C<static void add_free_reg(lsr_allocator * const lsr, unsigned regno,
+pir_type type)>
 
 Add register C<regno> to the list of free regs that can be reuse.
 
@@ -448,8 +449,8 @@ remove_from_active(live_interval *i) {
 
 /*
 
-=item C<static void
-expire_old_intervals(lsr_allocator * const lsr, live_interval * i, pir_type type)>
+=item C<static void expire_old_intervals(lsr_allocator * const lsr,
+live_interval * const i, pir_type type)>
 
 Go over all active intervals; if the endpoint of one of them is >= than
 C<i>'s start point, the action is aborted. This is why the C<active> list must be

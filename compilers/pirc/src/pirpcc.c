@@ -25,6 +25,7 @@ Conventions.
 
 #include "parrot/oplib/ops.h"
 
+/* HEADERIZER HFILE: none */
 
 
 /*
@@ -110,8 +111,8 @@ calculate_pcc_argument_flags(argument * const arg) {
 
 /*
 
-=item C<static target *
-generate_unique_pir_reg(lexer_state * const lexer, pir_type type)>
+=item C<static target * generate_unique_pir_reg(lexer_state * const lexer,
+pir_type type)>
 
 Generate a unique, temporary PIR register of type C<type>. It uses the C<reg>
 constructor to create a target node, and using C<pir_reg_generator>
@@ -131,8 +132,8 @@ generate_unique_pir_reg(lexer_state * const lexer, pir_type type) {
 
 /*
 
-=item C<static int
-generate_signature_pmc(lexer_state * const lexer, unsigned size)>
+=item C<static int generate_signature_pmc(lexer_state * const lexer, unsigned
+size)>
 
 Create a FixedIntegerArray PMC object that encodes the types and flags
 of parameters and add it to the PBC constant table. The index in that
@@ -161,8 +162,7 @@ generate_signature_pmc(lexer_state * const lexer, unsigned size) {
 
 /*
 
-=item C<void
-emit_sub_epilogue(lexer_state * const lexer)>
+=item C<void emit_sub_epilogue(lexer_state * const lexer)>
 
 Emit final instructions for the current subroutine. In case
 this is a C<:main> sub, the "end" instruction is emitted,
@@ -188,8 +188,8 @@ emit_sub_epilogue(lexer_state * const lexer) {
 
 /*
 
-=item C<static void
-add_alias_operand(lexer_state * const lexer, PMC *array, int index, char const * const alias)>
+=item C<static void add_alias_operand(lexer_state * const lexer, PMC *array, int
+index, char const * const alias)>
 
 Add an alias operand to current instruction; C<array> is the signature
 array, which must hold the right flags for this new operand (at position C<index>).
@@ -209,8 +209,8 @@ add_alias_operand(lexer_state * const lexer, PMC *array, int index, char const *
 
 /*
 
-=item C<static void
-targets_to_operands(lexer_state * const lexer, target * const targets)>
+=item C<static void targets_to_operands(lexer_state * const lexer, target *
+const targets, unsigned num_targets)>
 
 Convert a list of C<target> nodes into operands. Before the operands
 are added to the I<current> instruction, a FixedIntegerArray is created,
@@ -291,8 +291,8 @@ targets_to_operands(lexer_state * const lexer, target * const targets, unsigned 
 
 /*
 
-=item C<static void
-arguments_to_operands(lexer_state * const lexer, argument * const args)>
+=item C<static void arguments_to_operands(lexer_state * const lexer, argument *
+const args, unsigned num_arguments)>
 
 Convert a list of C<argument> nodes into operands. Before the operands are
 added to the I<current> instruction, a FixedIntegerArray PMC is created
@@ -347,8 +347,8 @@ arguments_to_operands(lexer_state * const lexer, argument * const args, unsigned
 
 /*
 
-=item C<void
-generate_parameters_instr(lexer_state * const lexer, unsigned num_parameters)>
+=item C<void generate_parameters_instr(lexer_state * const lexer, unsigned
+num_parameters)>
 
 Generate the "get_params" instruction, taking <num_parameters> variable arguments;
 this is the number of parameters of this function.
@@ -372,8 +372,8 @@ generate_parameters_instr(lexer_state * const lexer, unsigned num_parameters) {
 
 /*
 
-=item C<void
-generate_getresults_instr(lexer_state * const lexer, target * const targetlist)>
+=item C<void generate_getresults_instr(lexer_state * const lexer, target * const
+targetlist)>
 
 Generate instruction for the C<.get_results> statement.
 
@@ -397,9 +397,8 @@ generate_getresults_instr(lexer_state * const lexer, target * const targetlist) 
 
 /*
 
-=item C<static void
-save_global_reference(lexer_state * const lexer, instruction * const instr,
-                      char const * const label)>
+=item C<static void save_global_reference(lexer_state * const lexer, instruction
+* const instr, char const * const label)>
 
 Store the instruction C<instr>, which references the global label C<label> in a list.
 After the parse phase, this instruction can be patched, if C<label> can be resolved
@@ -494,8 +493,8 @@ get_invoked_sub(lexer_state * const lexer, target * const sub) {
 
 /*
 
-=item C<static void
-convert_pcc_call(lexer_state * const lexer, invocation * const inv)>
+=item C<static void convert_pcc_call(lexer_state * const lexer, invocation *
+const inv)>
 
 Generate instructions for a normal invocation using the Parrot Calling
 Conventions (PCC). This is the sequence of the following instructions:
@@ -541,8 +540,8 @@ convert_pcc_call(lexer_state * const lexer, invocation * const inv) {
 
 /*
 
-=item C<static void
-convert_pcc_tailcall(lexer_state * const lexer, invocation * const inv)>
+=item C<static void convert_pcc_tailcall(lexer_state * const lexer, invocation *
+const inv)>
 
 Generate instructions for a tailcall using the Parrot Calling Conventions (PCC).
 The sequence of instructions is:
@@ -568,8 +567,8 @@ convert_pcc_tailcall(lexer_state * const lexer, invocation * const inv) {
 
 /*
 
-=item C<static void
-convert_pcc_return(lexer_state * const lexer, invocation * const inv)>
+=item C<static void convert_pcc_return(lexer_state * const lexer, invocation *
+const inv)>
 
 Generate instructions for a normal return statement using the Parrot Calling
 Conventions (PCC). The sequence of instructions is:
@@ -589,8 +588,8 @@ convert_pcc_return(lexer_state * const lexer, invocation * const inv) {
 
 /*
 
-=item C<static void
-convert_nci_call(lexer_state * const lexer, invocation * const inv)>
+=item C<static void convert_nci_call(lexer_state * const lexer, invocation *
+const inv)>
 
 Generate instructions for a function invocation using the Native Call
 Interface (NCI). The sequence of instructions is:
@@ -620,8 +619,8 @@ convert_nci_call(lexer_state * const lexer, invocation * const inv) {
 
 /*
 
-=item C<static void
-convert_pcc_yield(lexer_state * const lexer, invocation * const inv)>
+=item C<static void convert_pcc_yield(lexer_state * const lexer, invocation *
+const inv)>
 
 Generate instructions for a yield statement using the Parrot Calling Conventions.
 The sequence of instructions is:
@@ -642,8 +641,8 @@ convert_pcc_yield(lexer_state * const lexer, invocation * const inv) {
 
 /*
 
-=item C<static void
-convert_pcc_methodcall(lexer_state * const lexer, invocation * const inv)>
+=item C<static void convert_pcc_methodcall(lexer_state * const lexer, invocation
+* const inv)>
 
 Generate instructions for a method call using the Parrot Calling Conventions (PCC).
 The sequence of instructions is:
@@ -673,8 +672,8 @@ convert_pcc_methodcall(lexer_state * const lexer, invocation * const inv) {
 
 /*
 
-=item C<static void
-convert_pcc_methodtailcall(lexer_state * const lexer, invocation * const inv)>
+=item C<static void convert_pcc_methodtailcall(lexer_state * const lexer,
+invocation * const inv)>
 
 Generate instructions for a method tailcall, using the Parrot Calling Conventions (PCC).
 The sequence of instructions is:
@@ -712,8 +711,8 @@ convert_pcc_methodtailcall(lexer_state * const lexer, invocation * const inv) {
 
 /*
 
-=item C<void
-convert_inv_to_instr(lexer_state * const lexer, invocation * const inv)>
+=item C<void convert_inv_to_instr(lexer_state * const lexer, invocation * const
+inv)>
 
 Convert an C<invocation> structure into a series of instructions. This is the
 dispatch function, which calls the appropriate conversion function, based
