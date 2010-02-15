@@ -1,5 +1,9 @@
 #include "parrot/parrot.h"
 
+/* TODO: Since Opcode PMCs are essentially read-only after initialization
+         here, we should cache them. A FixedPMCArray would be okay, an
+         INTVAL->PMC HASH might be better, since it's unlike that we will
+         need to cache even a majority of the ~1300 ops. */
 static PMC *OPLIB_PMC_INSTANCE;
 pmclass OpLib {
     void class_init() {
