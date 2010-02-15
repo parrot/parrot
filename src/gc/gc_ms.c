@@ -85,6 +85,15 @@ static void gc_ms_finalize_memory_pools(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void gc_ms_free_attributes_from_pool(PARROT_INTERP,
+    ARGMOD(PMC_Attribute_Pool *pool),
+    ARGMOD(void *data))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*pool)
+        FUNC_MODIFIES(*data);
+
 static void gc_ms_free_bufferlike_header(PARROT_INTERP,
     ARGMOD(Buffer *obj),
     size_t size)
@@ -181,15 +190,6 @@ static void gc_ms_unblock_GC_mark(PARROT_INTERP)
 static void gc_ms_unblock_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void gc_ms_free_attributes_from_pool(PARROT_INTERP,
-    ARGMOD(PMC_Attribute_Pool *pool),
-    ARGMOD(void *data))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*pool)
-        FUNC_MODIFIES(*data);
-
 #define ASSERT_ARGS_gc_ms_active_sized_buffers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(mem_pools))
@@ -223,6 +223,11 @@ static void gc_ms_free_attributes_from_pool(PARROT_INTERP,
 #define ASSERT_ARGS_gc_ms_finalize_memory_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(mem_pools))
+#define ASSERT_ARGS_gc_ms_free_attributes_from_pool \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pool) \
+    , PARROT_ASSERT_ARG(data))
 #define ASSERT_ARGS_gc_ms_free_bufferlike_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(obj))
@@ -275,11 +280,6 @@ static void gc_ms_free_attributes_from_pool(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms_unblock_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_gc_ms_free_attributes_from_pool \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pool) \
-    , PARROT_ASSERT_ARG(data))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

@@ -61,9 +61,7 @@ static void hash_freeze(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*info);
 
-static void hash_thaw(PARROT_INTERP,
-    ARGMOD(Hash *hash),
-    ARGMOD(PMC *info))
+static void hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(PMC *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
