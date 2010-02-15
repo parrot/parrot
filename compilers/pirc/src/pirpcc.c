@@ -27,6 +27,79 @@ Conventions.
 
 /* HEADERIZER HFILE: none */
 
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void add_alias_operand(
+    lexer_state * const lexer,
+    PMC *array,
+    int index,
+    char const * const alias);
+
+static void arguments_to_operands(
+    lexer_state * const lexer,
+    argument * const args,
+    unsigned num_arguments);
+
+static void convert_nci_call(
+    lexer_state * const lexer,
+    invocation * const inv);
+
+static void convert_pcc_call(
+    lexer_state * const lexer,
+    invocation * const inv);
+
+static void convert_pcc_methodcall(
+    lexer_state * const lexer,
+    invocation * const inv);
+
+static void convert_pcc_methodtailcall(
+    lexer_state * const lexer,
+    invocation * const inv);
+
+static void convert_pcc_return(
+    lexer_state * const lexer,
+    invocation * const inv);
+
+static void convert_pcc_tailcall(
+    lexer_state * const lexer,
+    invocation * const inv);
+
+static void convert_pcc_yield(
+    lexer_state * const lexer,
+    invocation * const inv);
+
+static int generate_signature_pmc(lexer_state * const lexer, unsigned size);
+static target * generate_unique_pir_reg(
+    lexer_state * const lexer,
+    pir_type type);
+
+static void save_global_reference(
+    lexer_state * const lexer,
+    instruction * const instr,
+    char const * const label);
+
+static void targets_to_operands(
+    lexer_state * const lexer,
+    target * const targets,
+    unsigned num_targets);
+
+#define ASSERT_ARGS_add_alias_operand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_arguments_to_operands __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_convert_nci_call __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_convert_pcc_call __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_convert_pcc_methodcall __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_convert_pcc_methodtailcall __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_convert_pcc_return __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_convert_pcc_tailcall __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_convert_pcc_yield __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_generate_signature_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_generate_unique_pir_reg __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_save_global_reference __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_targets_to_operands __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 
 /*
 

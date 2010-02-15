@@ -7,8 +7,6 @@
 #include "pirregalloc.h"
 #include "parrot/parrot.h"
 
-/* HEADERIZER HFILE: none */
-
 /*
 
 =head1 DESCRIPTION
@@ -71,6 +69,26 @@ reset_register_count(lsr_allocator * const lsr) {
     for (i = 0; i < 4; ++i)
         lsr->r[i] = 1;
 }
+
+/* HEADERIZER HFILE: none */
+
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void add_free_reg(
+    lsr_allocator * const lsr,
+    unsigned regno,
+    pir_type type);
+
+static void expire_old_intervals(
+    lsr_allocator * const lsr,
+    live_interval * const i,
+    pir_type type);
+
+#define ASSERT_ARGS_add_free_reg __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_expire_old_intervals __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
 
 /*
 

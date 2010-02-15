@@ -16,6 +16,55 @@
 
 /* HEADERIZER HFILE: none */
 
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void emit_pbc_annotations(lexer_state * const lexer);
+static void emit_pbc_const_arg(
+    lexer_state * const lexer,
+    constant * const c);
+
+static void emit_pbc_expr(
+    lexer_state * const lexer,
+    expression * const operand);
+
+static void emit_pbc_instr(
+    lexer_state * const lexer,
+    instruction * const instr);
+
+static void emit_pbc_label_arg(lexer_state * const lexer, label * const l);
+static void emit_pbc_sub(lexer_state * const lexer, subroutine * const sub);
+static void emit_pbc_target_arg(lexer_state * const lexer, target * const t);
+static void emit_pir_instruction(
+    lexer_state * const lexer,
+    instruction * const instr);
+
+static void emit_pir_statement(
+    lexer_state * const lexer,
+    subroutine * const sub);
+
+static void optimize_instr(
+    lexer_state * const lexer,
+    instruction * const instr);
+
+static void print_sub_flags(
+    lexer_state * const lexer,
+    subroutine * const subiter);
+
+#define ASSERT_ARGS_emit_pbc_annotations __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_emit_pbc_const_arg __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_emit_pbc_expr __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_emit_pbc_instr __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_emit_pbc_label_arg __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_emit_pbc_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_emit_pbc_target_arg __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_emit_pir_instruction __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_emit_pir_statement __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_optimize_instr __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_print_sub_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 /*
 
 =head1 DESCRIPTION

@@ -90,6 +90,12 @@ int yypirlex(YYSTYPE *yylval, yyscan_t yyscanner);
 
 /* HEADERIZER HFILE: none */
 
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 char *expand_macro(yyscan_t yyscanner, macro_def * const macro, macro_param * args);
 
 /* Enumeration of mathematical operator types; these are used to index the opnames array. */

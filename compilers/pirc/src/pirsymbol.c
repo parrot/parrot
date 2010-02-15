@@ -11,8 +11,6 @@
 #include <string.h>
 #include <stdio.h>
 
-/* HEADERIZER HFILE: none */
-
 /*
 
 =head1 NAME
@@ -49,6 +47,40 @@ Globally defined constants are stored in yet another separate list.
 
 */
 
+
+/* HEADERIZER HFILE: none */
+
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static local_label * new_local_label(
+    NOTNULL(lexer_state * const lexer),
+    NOTNULL(char const * const name),
+    unsigned offset)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static int next_register(NOTNULL(lexer_state * const lexer), pir_type type)
+        __attribute__nonnull__(1);
+
+static int use_register(
+    NOTNULL(lexer_state * const lexer),
+    pir_type type,
+    int regno,
+    int pasmregno)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_new_local_label __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_next_register __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer))
+#define ASSERT_ARGS_use_register __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
 
 
 

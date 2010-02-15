@@ -46,6 +46,14 @@ O(c) (constant) time.
 
 /* HEADERIZER HFILE: none */
 
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void add_self_parameter(lexer_state * const lexer);
+#define ASSERT_ARGS_add_self_parameter __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 static unsigned const prime_numbers[] = {113 /* XXX think of more primes */ };
 
 /*

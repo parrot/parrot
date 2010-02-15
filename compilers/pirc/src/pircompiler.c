@@ -17,6 +17,18 @@
 
 /* HEADERIZER HFILE: none */
 
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static allocated_mem_ptrs * new_mem_ptrs_block(void);
+
+#define ASSERT_ARGS_new_mem_ptrs_block __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 /* XXX count memory, so we can check out mem. savings of string reuse
  * Only temporarily used, so no need to "fix" this.
  */

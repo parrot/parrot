@@ -27,7 +27,7 @@ extern int yypirdebug = 0;
 
 #endif
 
-
+/* HEADERIZER HFILE: none */
 
 /* XXX use pthreads library to test thread safety.
    does not work currently on windows.
@@ -48,6 +48,19 @@ extern int yypirdebug = 0;
 void * process_file(void *a);
 
 /* HEADERIZER HFILE: none */
+
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void print_help(char const * const program_name);
+static void runcode(PARROT_INTERP, int argc, char *argv[])
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_print_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_runcode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
 
 /*
 
