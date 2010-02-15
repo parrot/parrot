@@ -803,13 +803,12 @@ gc_ms_allocate_buffer_storage(PARROT_INTERP,
 
     Buffer_buflen(buffer) = 0;
     Buffer_bufstart(buffer) = NULL;
-    new_size = aligned_size(buffer, size);
+    new_size = aligned_string_size(size);
     mem = (char *)mem_allocate(interp, interp->mem_pools, new_size,
         interp->mem_pools->memory_pool);
     mem = aligned_mem(buffer, mem);
     Buffer_bufstart(buffer) = mem;
-    if (PObj_is_COWable_TEST(buffer))
-        new_size -= sizeof (void*);
+    new_size -= sizeof (void*);
     Buffer_buflen(buffer) = new_size;
 }
 
@@ -852,8 +851,8 @@ gc_ms_reallocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer),
      * normally, which play ping pong with buffers.
      * The normal case is therefore always to allocate a new block
      */
-    new_size = aligned_size(buffer, newsize);
-    old_size = aligned_size(buffer, Buffer_buflen(buffer));
+    new_size = aligned_string_size(newsize);
+    old_size = aligned_string_size(Buffer_buflen(buffer));
     needed   = new_size - old_size;
 
     if ((pool->top_block->free >= needed)
@@ -881,8 +880,7 @@ gc_ms_reallocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer),
 
     Buffer_bufstart(buffer) = mem;
 
-    if (PObj_is_COWable_TEST(buffer))
-        new_size -= sizeof (void *);
+    new_size -= sizeof (void *);
 
     Buffer_buflen(buffer) = new_size;
 }

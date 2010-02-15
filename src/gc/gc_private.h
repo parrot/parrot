@@ -487,11 +487,6 @@ char * aligned_mem(ARGIN(const Buffer *buffer), ARGIN(char *mem))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_PURE_FUNCTION
-PARROT_WARN_UNUSED_RESULT
-size_t aligned_size(ARGIN(const Buffer *buffer), size_t len)
-        __attribute__nonnull__(1);
-
 PARROT_CONST_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 size_t aligned_string_size(size_t len);
@@ -558,8 +553,6 @@ void Parrot_gc_merge_memory_pools(
 #define ASSERT_ARGS_aligned_mem __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(buffer) \
     , PARROT_ASSERT_ARG(mem))
-#define ASSERT_ARGS_aligned_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(buffer))
 #define ASSERT_ARGS_aligned_string_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_check_buffer_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pobj) \

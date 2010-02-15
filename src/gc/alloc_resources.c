@@ -627,33 +627,6 @@ compact_pool(PARROT_INTERP,
 
 /*
 
-=item C<size_t aligned_size(const Buffer *buffer, size_t len)>
-
-Determines the size of Buffer C<buffer> which has nominal length C<len>.
-The actual size in RAM of the Buffer might be different because of
-alignment issues.
-
-=cut
-
-*/
-
-PARROT_PURE_FUNCTION
-PARROT_WARN_UNUSED_RESULT
-size_t
-aligned_size(ARGIN(const Buffer *buffer), size_t len)
-{
-    ASSERT_ARGS(aligned_size)
-    if (PObj_is_COWable_TEST(buffer))
-        len += sizeof (void*);
-    if (PObj_aligned_TEST(buffer))
-        len = (len + BUFFER_ALIGN_1) & BUFFER_ALIGN_MASK;
-    else
-        len = (len + WORD_ALIGN_1) & WORD_ALIGN_MASK;
-    return len;
-}
-
-/*
-
 =item C<char * aligned_mem(const Buffer *buffer, char *mem)>
 
 Returns a pointer to the aligned allocated storage for Buffer C<buffer>,
