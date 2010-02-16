@@ -447,6 +447,7 @@ PARROT_CANNOT_RETURN_NULL
 static pir_reg *
 new_pir_reg(ARGIN(lexer_state * const lexer), pir_type type, int regno)
 {
+    ASSERT_ARGS(new_pir_reg)
     pir_reg *r = pir_mem_allocate_zeroed_typed(lexer, pir_reg);
 
     r->info.type     = type;
@@ -639,6 +640,7 @@ static global_label *
 new_global_label(ARGIN(lexer_state * const lexer),
         ARGIN(char const * const name))
 {
+    ASSERT_ARGS(new_global_label)
     global_label *glob = pir_mem_allocate_zeroed_typed(lexer, global_label);
     glob->name         = name;
     glob->const_table_index = 0;
