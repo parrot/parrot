@@ -44,7 +44,7 @@ O(c) (constant) time.
 #include "parrot/dynext.h"
 #include "pmc/pmc_callcontext.h"
 
-/* HEADERIZER HFILE: none */
+/* HEADERIZER HFILE: compilers/pirc/src/pircompunit.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
