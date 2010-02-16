@@ -161,6 +161,7 @@ PARROT_CAN_RETURN_NULL
 lsr_allocator *
 new_linear_scan_register_allocator(ARGIN_NULLOK(struct lexer_state *lexer))
 {
+    ASSERT_ARGS(new_linear_scan_register_allocator)
     lsr_allocator *lsr = (lsr_allocator *)mem_sys_allocate_zeroed(sizeof (lsr_allocator));
 
     lsr->lexer = lexer;
@@ -198,6 +199,7 @@ objects are destroyed as well.
 void
 destroy_linear_scan_register_allocator(ARGMOD(lsr_allocator *lsr))
 {
+    ASSERT_ARGS(destroy_linear_scan_register_allocator)
     pir_type type;
     live_interval *i;
 
@@ -342,6 +344,7 @@ live_interval *
 new_live_interval(ARGIN(lsr_allocator * const lsr),
         unsigned firstuse_location, pir_type type)
 {
+    ASSERT_ARGS(new_live_interval)
     live_interval *i;
     /* check whether there's an interval object that we can re-use, to prevent
      * memory malloc() and free()s.
@@ -615,6 +618,7 @@ register; this can be one that was just expired.
 void
 linear_scan_register_allocation(ARGIN(lsr_allocator * const lsr))
 {
+    ASSERT_ARGS(linear_scan_register_allocation)
     live_interval * i;
     pir_type type = 0; /* types run from 0 to 4; see pircompunit.h */
 
