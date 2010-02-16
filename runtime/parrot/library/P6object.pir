@@ -819,7 +819,7 @@ will be used in lieu of this one.)
     # If this fails, and we want Any, and it's something form outside
     # of the Perl 6 world, we'd best just accept it.
     unless $S0 == 'Any' goto end
-    $I0 = isa topicwhat, 'Perl6Object'
+    $I0 = isa topicwhat, 'Mu'
     unless $I0 goto accept_anyway
     $I0 = 0
     goto end
