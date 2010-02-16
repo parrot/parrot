@@ -158,20 +158,6 @@ typedef struct lexer_state {
 /* accessor for current macro; always first on the list. */
 #define CURRENT_MACRO(X)    (X)->macros->definitions
 
-
-/* constructor for a lexer_state object */
-lexer_state *new_lexer(PARROT_INTERP, char * const filename, int flags);
-
-void release_resources(lexer_state *lexer);
-
-char const *dupstr(lexer_state * const lexer, char * const str);
-
-char const *dupstrn(lexer_state * const lexer, char * const str, size_t numchars);
-
-bucket *new_bucket(lexer_state * const lexer);
-
-void init_hashtable(lexer_state * const lexer, hashtable * const table, unsigned size);
-
 /* same trick as in parrot's memory system, for "automagic" casting */
 #define pir_mem_allocate_zeroed_typed(lxr, type) (type *)pir_mem_allocate_zeroed(lxr, sizeof (type))
 
@@ -179,11 +165,93 @@ void init_hashtable(lexer_state * const lexer, hashtable * const table, unsigned
  * allocated will be freed after the compilation. If you only need some memory temporarily
  * and freeing can be done soon after (manually), then use parrot's mem_sys_allocate().
  */
-void *pir_mem_allocate_zeroed(lexer_state * const lexer, size_t numbytes);
 
-void *pir_mem_allocate(lexer_state * const lexer, size_t numbytes);
+/* HEADERIZER BEGIN: compilers/pirc/src/pircompiler.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void pirwarning(lexer_state * const lexer, int lineno, char const * const message, ...);
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+char const * dupstr(
+    ARGIN(lexer_state * const lexer),
+    ARGIN(char * const source))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+char const * dupstrn(
+    ARGIN(lexer_state * const lexer),
+    ARGIN(char * const source),
+    size_t slen)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void init_hashtable(
+    ARGIN(lexer_state * const lexer),
+    ARGIN(hashtable * const table),
+    unsigned size)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+bucket * new_bucket(ARGIN(lexer_state * const lexer))
+        __attribute__nonnull__(1);
+
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+lexer_state * new_lexer(PARROT_INTERP,
+    NULLOK(char * const filename),
+    int flags)
+        __attribute__nonnull__(1);
+
+PARROT_MALLOC
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+void * pir_mem_allocate(ARGIN(lexer_state * const lexer), size_t numbytes)
+        __attribute__nonnull__(1);
+
+PARROT_MALLOC
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+void * pir_mem_allocate_zeroed(
+    ARGIN(lexer_state * const lexer),
+    size_t numbytes)
+        __attribute__nonnull__(1);
+
+void pirwarning(
+    lexer_state * const lexer,
+    int lineno,
+    char const * const message,
+    ...);
+
+void release_resources(ARGIN(lexer_state *lexer))
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_dupstr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(source))
+#define ASSERT_ARGS_dupstrn __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(source))
+#define ASSERT_ARGS_init_hashtable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(table))
+#define ASSERT_ARGS_new_bucket __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer))
+#define ASSERT_ARGS_new_lexer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_pir_mem_allocate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer))
+#define ASSERT_ARGS_pir_mem_allocate_zeroed __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer))
+#define ASSERT_ARGS_pirwarning __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_release_resources __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: compilers/pirc/src/pircompiler.c */
+
 
 #endif /* PARROT_PIR_PIRCOMPILER_H_GUARD */
 
