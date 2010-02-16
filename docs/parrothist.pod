@@ -103,5 +103,5 @@ Starred release numbers indicate supported releases.
  Gerd        1.9.0          2009-Dec-15     "Blue-fronted Amazon"
 
  chromatic   2.0.0 *        2010-Jan-19     "Inevitable"
-
+ darbelo     2.1.0          2010-Feb-26     "As Scheduled"
 =cut
