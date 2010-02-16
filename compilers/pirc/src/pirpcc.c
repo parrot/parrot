@@ -192,6 +192,7 @@ C<result>.
 static int
 calculate_pcc_target_flags(ARGIN(target * const result))
 {
+    ASSERT_ARGS(calculate_pcc_target_flags)
     int flag = 0;
 
 
@@ -227,6 +228,7 @@ argument C<arg>. An int encoding the flags is returned.
 static int
 calculate_pcc_argument_flags(ARGIN(argument * const arg))
 {
+    ASSERT_ARGS(calculate_pcc_argument_flags)
     int flag = 0;
 
     switch (arg->value->type) {
@@ -330,6 +332,7 @@ otherwise it's a standard return sequence.
 void
 emit_sub_epilogue(ARGIN(lexer_state * const lexer))
 {
+    ASSERT_ARGS(emit_sub_epilogue)
 
     if (TEST_FLAG(lexer->subs->flags, PIRC_SUB_FLAG_MAIN))
         new_sub_instr(lexer, PARROT_OP_end, "end", 0);
@@ -527,6 +530,7 @@ this is the number of parameters of this function.
 void
 generate_parameters_instr(ARGIN(lexer_state * const lexer), unsigned num_parameters)
 {
+    ASSERT_ARGS(generate_parameters_instr)
     if (TEST_FLAG(CURRENT_SUB(lexer)->flags , (PIRC_SUB_FLAG_METHOD | PIRC_SUB_FLAG_VTABLE))) {
         ++num_parameters; /* didn't count implicit "self" parameter yet. */
     }
@@ -553,6 +557,7 @@ void
 generate_getresults_instr(ARGIN(lexer_state * const lexer),
         ARGIN(target * const targetlist))
 {
+    ASSERT_ARGS(generate_getresults_instr)
     /* add this point we know that there's only 1 target, as that's the convention for
      * exception handlers:
      *
@@ -616,6 +621,7 @@ static target *
 get_invoked_sub(ARGIN(lexer_state * const lexer),
         ARGIN(target * const sub))
 {
+    ASSERT_ARGS(get_invoked_sub)
     target       *subreg = NULL;
     symbol       *sym    = NULL;
     global_label *glob   = NULL;
@@ -929,6 +935,7 @@ void
 convert_inv_to_instr(ARGIN(lexer_state * const lexer),
         ARGIN(invocation * const inv))
 {
+    ASSERT_ARGS(convert_inv_to_instr)
     switch (inv->type) {
       case CALL_PCC:
         convert_pcc_call(lexer, inv);
