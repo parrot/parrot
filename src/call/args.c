@@ -1000,14 +1000,16 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         ARGIN(PMC *raw_sig), ARGIN(void *arg_info), ARGIN(struct pcc_set_funcs *accessor))
 {
     ASSERT_ARGS(fill_params)
-    PMC    *named_used_list = PMCNULL;
     INTVAL *raw_params;
-    const INTVAL param_count = VTABLE_elements(interp, raw_sig);
+    PMC    *named_used_list = PMCNULL;
+    INTVAL  param_count     = 0;
     INTVAL  param_index     = 0;
     INTVAL  arg_index       = 0;
     INTVAL  named_count     = 0;
     INTVAL  err_check       = 0;
     INTVAL  positional_args;
+
+    GETATTR_FixedIntegerArray_size(interp, raw_sig, param_count);
 
     /* Check if we should be throwing errors. This is configured separately
      * for parameters and return values. */
@@ -1610,7 +1612,7 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
     if (PMC_IS_NULL(call_object)) {
         /* If the return_count is 0, then there are no return values waiting to
          * fill the results, so no error. */
-        if (return_count > 0 && (err_check))
+        if (return_count > 0 && err_check)
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_OPERATION,
                 "too few returns: 0 passed, %d expected", return_count);
@@ -2104,8 +2106,7 @@ Parrot_pcc_fill_returns_from_op(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         ARGIN(PMC *raw_sig), ARGIN(opcode_t *raw_returns))
 {
     ASSERT_ARGS(Parrot_pcc_fill_returns_from_op)
-    const INTVAL raw_return_count = VTABLE_elements(interp, raw_sig);
-    INTVAL err_check      = 0;
+
     static pcc_get_funcs function_pointers = {
         (intval_func_t)intval_arg_from_op,
         (numval_func_t)numval_arg_from_op,
@@ -2118,20 +2119,21 @@ Parrot_pcc_fill_returns_from_op(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         (pmc_func_t)pmc_constant_from_op,
     };
 
+    INTVAL raw_return_count = 0;
 
-    /* Check if we should be throwing errors. This is configured separately
-     * for parameters and return values. */
-    if (PARROT_ERRORS_test(interp, PARROT_ERRORS_RESULT_COUNT_FLAG))
-            err_check = 1;
+    GETATTR_FixedIntegerArray_size(interp, raw_sig, raw_return_count);
 
     /* A null call object is fine if there are no arguments and no returns. */
     if (PMC_IS_NULL(call_object)) {
-        if (raw_return_count > 0) {
-            if (err_check)
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                        "too many return values: %d passed, 0 expected",
-                        raw_return_count);
-        }
+
+        /* Check if we should be throwing errors. This is configured separately
+         * for parameters and return values. */
+        if (raw_return_count > 0
+        &&  PARROT_ERRORS_test(interp, PARROT_ERRORS_RESULT_COUNT_FLAG))
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_OPERATION,
+                "too many return values: %d passed, 0 expected",
+                raw_return_count);
         return;
     }
 
@@ -2139,6 +2141,8 @@ Parrot_pcc_fill_returns_from_op(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
     return;
 }
+
+
 /*
 
 =item C<void Parrot_pcc_fill_returns_from_continuation(PARROT_INTERP, PMC
@@ -2158,7 +2162,7 @@ Parrot_pcc_fill_returns_from_continuation(PARROT_INTERP, ARGMOD_NULLOK(PMC *call
 {
     ASSERT_ARGS(Parrot_pcc_fill_returns_from_continuation)
     const INTVAL raw_return_count = VTABLE_elements(interp, raw_sig);
-    INTVAL err_check      = 0;
+
     static pcc_get_funcs function_pointers = {
         (intval_func_t)intval_arg_from_continuation,
         (numval_func_t)numval_arg_from_continuation,
@@ -2171,20 +2175,17 @@ Parrot_pcc_fill_returns_from_continuation(PARROT_INTERP, ARGMOD_NULLOK(PMC *call
         (pmc_func_t)pmc_arg_from_continuation,
     };
 
-
-    /* Check if we should be throwing errors. This is configured separately
-     * for parameters and return values. */
-    if (PARROT_ERRORS_test(interp, PARROT_ERRORS_RESULT_COUNT_FLAG))
-            err_check = 1;
-
     /* A null call object is fine if there are no arguments and no returns. */
     if (PMC_IS_NULL(call_object)) {
-        if (raw_return_count > 0) {
-            if (err_check)
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                        "too many return values: %d passed, 0 expected",
-                        raw_return_count);
-        }
+
+        /* Check if we should be throwing errors. This is configured separately
+         * for parameters and return values. */
+        if (raw_return_count > 0
+        &&  PARROT_ERRORS_test(interp, PARROT_ERRORS_RESULT_COUNT_FLAG))
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "too many return values: %d passed, 0 expected",
+                    raw_return_count);
         return;
     }
 
@@ -2192,6 +2193,7 @@ Parrot_pcc_fill_returns_from_continuation(PARROT_INTERP, ARGMOD_NULLOK(PMC *call
 
     return;
 }
+
 
 /*
 
@@ -2219,7 +2221,6 @@ Parrot_pcc_fill_returns_from_c_args(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_objec
     ASSERT_ARGS(Parrot_pcc_fill_returns_from_c_args)
     va_list args;
     INTVAL raw_return_count = 0;
-    INTVAL err_check        = 0;
     PMC    *raw_sig         = PMCNULL;
     PMC    *invalid_sig     = PMCNULL;
 
@@ -2236,21 +2237,20 @@ Parrot_pcc_fill_returns_from_c_args(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_objec
     };
 
     parse_signature_string(interp, signature, &raw_sig, &invalid_sig);
+
     if (!PMC_IS_NULL(invalid_sig))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "parameters should not be included in the return signature");
 
     raw_return_count = VTABLE_elements(interp, raw_sig);
 
-    /* Check if we should be throwing errors. This is configured separately
-     * for parameters and return values. */
-    if (PARROT_ERRORS_test(interp, PARROT_ERRORS_RESULT_COUNT_FLAG))
-            err_check = 1;
-
     /* A null call object is fine if there are no arguments and no returns. */
     if (PMC_IS_NULL(call_object)) {
-        if (raw_return_count > 0)
-            if (err_check)
+
+        /* Check if we should be throwing errors. This is configured separately
+         * for parameters and return values. */
+        if (raw_return_count > 0
+        &&  PARROT_ERRORS_test(interp, PARROT_ERRORS_RESULT_COUNT_FLAG))
                 Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_OPERATION,
                     "too many return values: %d passed, 0 expected",
@@ -2262,6 +2262,7 @@ Parrot_pcc_fill_returns_from_c_args(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_objec
     fill_results(interp, call_object, raw_sig, &args, &function_pointers);
     va_end(args);
 }
+
 
 /*
 
