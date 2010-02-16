@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003-2009, Parrot Foundation.
+Copyright (C) 2003-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -72,7 +72,7 @@ Creates a copy of the string.
 
     VTABLE PMC *clone() {
         PMC * const dest = pmc_new(INTERP, SELF->vtable->base_type);
-        VTABLE_set_string_native(INTERP, dest, Parrot_str_copy(INTERP, SELF.get_string()));
+        VTABLE_set_string_native(INTERP, dest, SELF.get_string());
         return dest;
     }
 
@@ -87,8 +87,9 @@ Returns the integer representation of the string.
 */
 
     VTABLE INTVAL get_integer() {
-        STRING * const s = SELF.get_string();
-        return Parrot_str_to_int(INTERP, s);
+        STRING *str_val;
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        return Parrot_str_to_int(INTERP, str_val);
     }
 
 /*
@@ -102,8 +103,9 @@ Returns the floating-point representation of the string.
 */
 
     VTABLE FLOATVAL get_number() {
-        STRING * const s = SELF.get_string();
-        return Parrot_str_to_num(INTERP, s);
+        STRING *str_val;
+        GET_ATTR_str_val(interp, SELF, str_val);
+        return Parrot_str_to_num(INTERP, str_val);
     }
 
 /*
@@ -119,6 +121,7 @@ Returns the string itself.
     VTABLE STRING *get_string() {
         STRING *str_val;
         GET_ATTR_str_val(INTERP, SELF, str_val);
+
         return str_val ? Parrot_str_copy(INTERP, str_val) : NULL;
     }
 
@@ -133,8 +136,9 @@ Returns the boolean value of the string.
 */
 
     VTABLE INTVAL get_bool() {
-        STRING * const s = SELF.get_string();
-        return Parrot_str_boolean(INTERP, s);
+        STRING *str_val;
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        return Parrot_str_boolean(INTERP, str_val);
     }
 
 /*
@@ -183,9 +187,8 @@ Sets the value of the string to that of the specified C<string>.
 */
 
     VTABLE void set_string_native(STRING *value) {
-        /* in lieu of a STRINGNULL, promote any NULL STRINGs to empty ones */
         if (!value)
-            value = Parrot_str_new(INTERP, NULL, 0);
+            value = STRINGNULL;
 
         /* Only allow constant PMCs to embed constant strings */
         if (PObj_constant_TEST(SELF) && !PObj_constant_TEST(value)) {
@@ -210,9 +213,10 @@ Sets the value of the string to a copy of the specified C<string>.
 */
 
     VTABLE void assign_string_native(STRING *value) {
-        if (!STRING_IS_NULL(value))
+        if (!STRING_IS_NULL(value)) {
             SET_ATTR_str_val(INTERP, SELF,
-                    Parrot_str_set(INTERP, SELF.get_string(), value));
+                Parrot_str_set(INTERP, SELF.get_string(), value));
+        }
         else
             SET_ATTR_str_val(INTERP, SELF, NULL);
     }
@@ -242,9 +246,10 @@ they match.
 
 */
     VTABLE INTVAL is_equal(PMC *value) {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
+        STRING *str_val;
         STRING * const v = VTABLE_get_string(INTERP, value);
-        return (INTVAL)(Parrot_str_equal(INTERP, s, v));
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        return (INTVAL)(Parrot_str_equal(INTERP, str_val, v));
     }
 
     MULTI INTVAL is_equal(PMC *value) {
@@ -263,8 +268,13 @@ C<value>; returns true if they match.
 */
 
     VTABLE INTVAL is_equal_num(PMC *value) {
-        const FLOATVAL sf = Parrot_str_to_num(INTERP, VTABLE_get_string(INTERP, SELF));
+        STRING        *str_val;
+        FLOATVAL       sf;
         const FLOATVAL vf = VTABLE_get_number(INTERP, value);
+
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        sf = Parrot_str_to_num(INTERP, str_val);
+
         return (INTVAL)(sf == vf);
     }
 
@@ -279,9 +289,10 @@ Compares the string with C<value>; returns FALSE if they match.
 */
 
     VTABLE INTVAL is_equal_string(PMC *value) {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
+        STRING *str_val;
         STRING * const v = VTABLE_get_string(INTERP, value);
-        return Parrot_str_equal(INTERP, s, v);
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        return Parrot_str_equal(INTERP, str_val, v);
     }
 
 /*
@@ -296,9 +307,10 @@ is smaller.
 
 */
     VTABLE INTVAL cmp(PMC *value) {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
+        STRING *str_val;
         STRING * const v = VTABLE_get_string(INTERP, value);
-        return Parrot_str_compare(INTERP, s, v);
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        return Parrot_str_compare(INTERP, str_val, v);
     }
 
 /*
@@ -313,8 +325,11 @@ are equal, and 1 if C<value> is smaller.
 
 */
     VTABLE INTVAL cmp_num(PMC *value) {
-        const FLOATVAL sf = Parrot_str_to_num(INTERP, VTABLE_get_string(INTERP, SELF));
+        STRING        *str_val;
+        FLOATVAL       sf;
         const FLOATVAL vf = VTABLE_get_number(INTERP, value);
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        sf = Parrot_str_to_num(INTERP, str_val);
 
         if (sf < vf)
             return (INTVAL)(-1);
@@ -337,9 +352,10 @@ is smaller.
 
 */
     VTABLE INTVAL cmp_string(PMC *value) {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
+        STRING        *str_val;
         STRING * const v = VTABLE_get_string(INTERP, value);
-        return Parrot_str_compare(INTERP, s, v);
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        return Parrot_str_compare(INTERP, str_val, v);
     }
 
 /*
@@ -353,8 +369,9 @@ C<length>, and places it in C<dest>.
 
 */
     VTABLE void substr(INTVAL offset, INTVAL length, PMC *dest) {
-        STRING * const s  = VTABLE_get_string(INTERP, SELF);
-        STRING * const s2 = Parrot_str_substr(INTERP, s, offset, length, NULL, 0);
+        STRING *str_val, *s2;
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        s2 = Parrot_str_substr(INTERP, str_val, offset, length, NULL, 0);
         VTABLE_set_string_native(INTERP, dest, s2);
     }
 
@@ -369,8 +386,9 @@ C<length>, and returns it.
 
 */
     VTABLE STRING *substr_str(INTVAL offset, INTVAL length) {
-        STRING * const s = VTABLE_get_string(INTERP, SELF);
-        return Parrot_str_substr(INTERP, s, offset, length, NULL, 0);
+        STRING *str_val;
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        return Parrot_str_substr(INTERP, str_val, offset, length, NULL, 0);
     }
 
 /*
@@ -385,9 +403,14 @@ numbers count from the end.
 */
 
     VTABLE INTVAL exists_keyed(PMC *key) {
-        const INTVAL n = Parrot_str_byte_length(INTERP, VTABLE_get_string(INTERP, SELF));
+        STRING      *str_val;
+        INTVAL       n;
         const INTVAL k = VTABLE_get_integer(INTERP, key);
-        return (INTVAL)((k>=0 && k<=n) || (k<0 && -k<=n));
+
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        n = Parrot_str_byte_length(INTERP, str_val);
+
+        return (INTVAL)((k >= 0 && k <= n) || (k < 0 && -k <= n));
     }
 
 /*
@@ -418,8 +441,9 @@ Replace the string at C<key> with the chr of C<value>.
     }
 
     VTABLE STRING *get_string_keyed_int(INTVAL pos) {
-        STRING * const s = SELF.get_string();
-        return Parrot_str_substr(INTERP, s, pos, 1, NULL, 0);
+        STRING      *str_val;
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        return Parrot_str_substr(INTERP, str_val, pos, 1, NULL, 0);
     }
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
@@ -427,8 +451,9 @@ Replace the string at C<key> with the chr of C<value>.
     }
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL pos) {
-        STRING * const s = SELF.get_string();
-        return string_ord(INTERP, s, pos);
+        STRING      *str_val;
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        return string_ord(INTERP, str_val, pos);
     }
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
@@ -446,10 +471,10 @@ Replace the string at C<key> with the chr of C<value>.
     }
 
     VTABLE void set_string_keyed_int(INTVAL pos, STRING * const value) {
-        STRING * const s   = SELF.get_string();
-        const INTVAL   len = Parrot_str_byte_length(INTERP, value);
-        Parrot_str_replace(INTERP, s, pos, len, value, NULL);
-        VTABLE_set_string_native(INTERP, SELF, s);
+        STRING      *str_val;
+        const INTVAL len = Parrot_str_byte_length(INTERP, value);
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        Parrot_str_replace(INTERP, str_val, pos, len, value, &str_val);
     }
 
     VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
@@ -457,10 +482,10 @@ Replace the string at C<key> with the chr of C<value>.
     }
 
     VTABLE void set_integer_keyed_int(INTVAL pos, INTVAL value) {
-        STRING * const s = SELF.get_string();
+        STRING      *str_val;
         STRING * const c = string_chr(INTERP, (UINTVAL) value);
-        Parrot_str_replace(INTERP, s, pos, 1, c, NULL);
-        VTABLE_set_string_native(INTERP, SELF, s);
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        Parrot_str_replace(INTERP, str_val, pos, 1, c, &str_val);
     }
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
@@ -580,7 +605,9 @@ Return length of the string.
 */
 
     VTABLE INTVAL elements() {
-        return Parrot_str_byte_length(INTERP, VTABLE_get_string(INTERP, SELF));
+        STRING *str_val;
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        return Parrot_str_byte_length(INTERP, str_val);
     }
 
     VTABLE PMC *get_iter() {
@@ -603,8 +630,10 @@ Used to archive the string.
 
 */
     VTABLE void freeze(PMC *info) {
+        STRING *str_val;
         SUPER(info);
-        VTABLE_push_string(INTERP, info, VTABLE_get_string(INTERP, SELF));
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        VTABLE_push_string(INTERP, info, str_val);
     }
 
 /*
@@ -637,8 +666,11 @@ Downcase this string
 */
 
     METHOD lower() {
-        STRING * const s   = Parrot_str_downcase(INTERP,
-            VTABLE_get_string(INTERP, SELF));
+        STRING *str_val;
+        STRING *s;
+
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        s = Parrot_str_downcase(INTERP, str_val);
 
         RETURN(STRING *s);
     }
