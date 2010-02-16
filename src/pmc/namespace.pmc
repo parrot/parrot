@@ -423,6 +423,15 @@ really a public API.
 
             return VTABLE_get_pmc_keyed(INTERP, ns, key);
         }
+        else if (VTABLE_does(INTERP, key, CONST_STRING(INTERP, "array"))) {
+            INTVAL i = 0;
+            while (!PMC_IS_NULL(ns) && VTABLE_elements(INTERP, key)) {
+                STRING * const name = VTABLE_get_string_keyed_int(INTERP, key, i);
+                ns = Parrot_get_namespace_keyed_str(INTERP, ns, name);
+                i++;
+            }
+            return ns;
+        }
         else {
             STRING * const name = VTABLE_get_string(INTERP, key);
             ns = Parrot_get_namespace_keyed_str(INTERP, ns, name);
