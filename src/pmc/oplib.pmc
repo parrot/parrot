@@ -1,0 +1,54 @@
+#include "parrot/parrot.h"
+
+/* TODO: Since Opcode PMCs are essentially read-only after initialization
+         here, we should cache them. A FixedPMCArray would be okay, an
+         INTVAL->PMC HASH might be better, since it's unlike that we will
+         need to cache even a majority of the ~1300 ops. */
+static PMC *OPLIB_PMC_INSTANCE;
+pmclass OpLib {
+    void class_init() {
+        OPLIB_PMC_INSTANCE = NULL;
+    }
+
+    VTABLE void *get_pointer() {
+        return OPLIB_PMC_INSTANCE;
+    }
+
+    VTABLE void set_pointer(void *ptr) {
+        OPLIB_PMC_INSTANCE = (PMC *)ptr;
+    }
+
+    /* Look up an opnumber given the name of the op. First we look for the
+       specific name, then the more general short name. */
+    VTABLE INTVAL get_integer_keyed_str(STRING *name) {
+        const char * const cstr = Parrot_str_to_cstring(INTERP, name);
+        INTVAL num = INTERP->op_lib->op_code(cstr, 1);
+        if (num == -1)
+            num = INTERP->op_lib->op_code(cstr, 0);
+        Parrot_str_free_cstring(cstr);
+        return num;
+    }
+
+    VTABLE PMC* get_pmc_keyed_str(STRING *name) {
+        PMC * const op = pmc_new_noinit(INTERP, enum_class_Opcode);
+        VTABLE_set_string_native(INTERP, op, name);
+        PObj_custom_mark_SET(op);
+        return op;
+    }
+
+    VTABLE PMC* get_pmc_keyed(PMC *key) {
+        STRING * const strkey = VTABLE_get_string(INTERP, key);
+        return VTABLE_get_pmc_keyed_str(INTERP, SELF, strkey);
+    }
+
+    VTABLE PMC* get_pmc_keyed_int(INTVAL value) {
+        PMC * const op = pmc_new_noinit(INTERP, enum_class_Opcode);
+        VTABLE_set_integer_native(INTERP, op, value);
+        PObj_custom_mark_SET(op);
+        return op;
+    }
+
+    VTABLE INTVAL get_integer() {
+        return INTERP->op_lib->op_count;
+    }
+}

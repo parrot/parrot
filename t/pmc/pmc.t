@@ -51,7 +51,7 @@ OUTPUT
 my $checkTypes;
 my %types_we_cant_test
     = map { $_ => 1; } (    # These require initializers.
-    qw(default Null Iterator ArrayIterator HashIterator StringIterator OrderedHashIterator Enumerate ParrotObject ParrotThread BigInt LexInfo LexPad Object Handle),
+    qw(default Null Iterator ArrayIterator HashIterator StringIterator OrderedHashIterator Enumerate ParrotObject ParrotThread BigInt LexInfo LexPad Object Handle Opcode),
 
     # Instances of these appear to have other types.
     qw(PMCProxy Class) );

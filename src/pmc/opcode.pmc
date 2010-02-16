@@ -1,0 +1,67 @@
+#include "parrot/parrot.h"
+
+pmclass Opcode auto_attrs {
+    ATTR op_info_t *info;
+    ATTR INTVAL op_number;
+    ATTR STRING *full_name_cache;
+
+    VTABLE void init() {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Opcode must be created from OpLib.");
+    }
+
+    VTABLE void mark() {
+        Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        if (attrs->full_name_cache)
+            Parrot_gc_mark_STRING_alive(INTERP, attrs->full_name_cache);
+    }
+
+    VTABLE void set_pointer(void *i) {
+        Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        if (attrs->info)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Opcode has already been initialized");
+        attrs->info = (op_info_t *)i;
+    }
+
+    VTABLE void set_string_native(STRING *name) {
+        const char * const cstr = Parrot_str_to_cstring(INTERP, name);
+        const INTVAL num = INTERP->op_lib->op_code(cstr, 1);
+        Parrot_str_free_cstring(cstr);
+        if (num == -1)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "Opcode: Opcode %S not found", name);
+        VTABLE_set_integer_native(INTERP, SELF, num);
+    }
+
+    VTABLE INTVAL get_integer() {
+        Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        if (!attrs->info)
+            return -1;
+        return attrs->op_number;
+    }
+
+    VTABLE void set_integer_native(INTVAL value) {
+        const INTVAL opcount = INTERP->op_lib->op_count;
+        Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        if (attrs->info)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Opcode has already been initialized");
+        if (value >= opcount || value < 0)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "Opcode: Opcode index %d out of bounds", value);
+        attrs->info = &(INTERP->op_info_table[value]);
+        attrs->op_number = value;
+    }
+
+    VTABLE STRING* get_string() {
+        Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        if (attrs->full_name_cache == NULL) {
+            const char * const name = attrs->info->full_name;
+            const INTVAL len = strlen(name);
+            STRING * const newstr = Parrot_str_new(INTERP, name, len);
+            attrs->full_name_cache = newstr;
+        }
+        return attrs->full_name_cache;
+    }
+}
