@@ -336,6 +336,8 @@ Print the appropriate subflags.
 */
 static void
 print_sub_flags(lexer_state * const lexer, subroutine * const subiter) {
+    ASSERT_ARGS(print_sub_flags)
+
     if (TEST_FLAG(subiter->flags, PIRC_SUB_FLAG_INIT))
         fprintf(out, ":init ");
     if (TEST_FLAG(subiter->flags, PIRC_SUB_FLAG_LOAD))
@@ -427,6 +429,7 @@ is printed first.
 */
 static void
 emit_pir_instruction(lexer_state * const lexer, instruction * const instr) {
+    ASSERT_ARGS(emit_pir_instruction)
 
     if (instr->label)
         fprintf(out, "  %s:\n", instr->label);
@@ -452,6 +455,8 @@ this function returns.
 */
 static void
 emit_pir_statement(lexer_state * const lexer, subroutine * const sub) {
+    ASSERT_ARGS(emit_pir_statement)
+
     instruction *statiter;
 
     if (sub->statements == NULL)
@@ -531,6 +536,7 @@ and their index in the constant table is emitted into the bytecode.
 */
 static void
 emit_pbc_const_arg(lexer_state * const lexer, constant * const c) {
+    ASSERT_ARGS(emit_pbc_const_arg)
 
     switch (c->type) {
         case INT_VAL:
@@ -593,6 +599,8 @@ Emit the value of the label offset of label C<l>.
 */
 static void
 emit_pbc_label_arg(lexer_state * const lexer, label * const l) {
+    ASSERT_ARGS(emit_pbc_label_arg)
+
     emit_int_arg(lexer->bc, l->offset);
 }
 
@@ -616,6 +624,8 @@ respectively. If C<t> has a key, the key is emitted as well.
 */
 static void
 emit_pbc_target_arg(lexer_state * const lexer, target * const t) {
+    ASSERT_ARGS(emit_pbc_target_arg)
+
     emit_int_arg(lexer->bc, t->info->color);
 
     /* if t has a key, emit that as well */
@@ -638,6 +648,8 @@ type.
 */
 static void
 emit_pbc_expr(lexer_state * const lexer, expression * const operand) {
+    ASSERT_ARGS(emit_pbc_expr)
+
     switch (operand->type) {
       case EXPR_CONSTANT:
         emit_pbc_const_arg(lexer, operand->expr.c);
@@ -679,6 +691,7 @@ Optimize the instruction C<instr>. Currently, these instructions are optimized:
 */
 static void
 optimize_instr(lexer_state * const lexer, instruction * const instr) {
+    ASSERT_ARGS(optimize_instr)
 
     switch (instr->opcode) {
         case PARROT_OP_box_p_ic: {
@@ -756,6 +769,8 @@ is NULL, the function does nothing and returns.
 */
 static void
 emit_pbc_instr(lexer_state * const lexer, instruction * const instr) {
+    ASSERT_ARGS(emit_pbc_instr)
+
     int         i;
     expression *operand;
     opcode_t offset;
@@ -821,6 +836,8 @@ Emit bytecode for the subroutine C<sub>.
 */
 static void
 emit_pbc_sub(lexer_state * const lexer, subroutine * const sub) {
+    ASSERT_ARGS(emit_pbc_sub)
+
     instruction *iter;
 
     if (sub->statements == NULL)
@@ -859,6 +876,8 @@ in the constants table.
 */
 static void
 emit_pbc_annotations(lexer_state * const lexer) {
+    ASSERT_ARGS(emit_pbc_annotations)
+
     annotation *iter;
 
     if (lexer->annotations == NULL)
