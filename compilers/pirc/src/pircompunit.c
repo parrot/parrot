@@ -901,7 +901,7 @@ element of the list) is updated, and returned.
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 argument *
-add_arg(argument *last, argument * const newarg)
+add_arg(ARGMOD(argument *last), argument * const newarg)
 {
     PARROT_ASSERT(last);
     PARROT_ASSERT(newarg);
@@ -2193,7 +2193,7 @@ Add an operand at the end of the list of operands of the current instruction.
 
 */
 void
-push_operand(ARGIN(lexer_state * const lexer), NOTNULL(expression * const operand))
+push_operand(ARGIN(lexer_state * const lexer), ARGIN(expression * const operand))
 {
     PARROT_ASSERT(CURRENT_INSTRUCTION(lexer));
 
@@ -2236,7 +2236,7 @@ The returned expression node has type EXPR_KEY.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 expression *
-expr_from_key(ARGIN(lexer_state * const lexer), NOTNULL(key * const k))
+expr_from_key(ARGIN(lexer_state * const lexer), ARGIN(key * const k))
 {
     expression *e = new_expr(lexer, EXPR_KEY);
     e->expr.k     = k;
@@ -2278,7 +2278,7 @@ Wraps the expression C<expr> in a key node and returns that.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 key *
-new_key(ARGIN(lexer_state * const lexer), NOTNULL(expression * const expr))
+new_key(ARGIN(lexer_state * const lexer), ARGIN(expression * const expr))
 {
     key *k       = pir_mem_allocate_zeroed_typed(lexer, key);
     k->head      = new_key_entry(lexer, expr);
@@ -2301,8 +2301,8 @@ pointed to by C<keylist>. C<keylist> is returned.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 key *
-add_key(ARGIN(lexer_state * const lexer), NOTNULL(key * const keylist),
-        NOTNULL(expression * const exprkey))
+add_key(ARGIN(lexer_state * const lexer), ARGIN(key * const keylist),
+        ARGIN(expression * const exprkey))
 {
     key_entry *newkey = new_key_entry(lexer, exprkey);
     key_entry *iter   = keylist->head;
@@ -2444,7 +2444,7 @@ The C<opinfo>, C<opname> and C<opcode> fields of C<instr> are updated.
 
 */
 void
-update_op(ARGIN(lexer_state * const lexer), NOTNULL(instruction * const instr), int newop)
+update_op(ARGIN(lexer_state * const lexer), ARGIN(instruction * const instr), int newop)
 {
     /* Deduct number of ints needed for the old instruction, if there is one.
      * This is necessary during strength reduction and other optimizations, once

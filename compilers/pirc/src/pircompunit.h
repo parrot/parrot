@@ -399,14 +399,16 @@ struct lexer_state;
 
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
-argument * add_arg(argument *last, argument * const newarg);
+argument * add_arg(ARGMOD(argument *last), argument * const newarg)
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*last);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 key * add_key(
     ARGIN(lexer_state * const lexer),
-    NOTNULL(key * const keylist),
-    NOTNULL(expression * const exprkey))
+    ARGIN(key * const keylist),
+    ARGIN(expression * const exprkey))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -469,7 +471,7 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 expression * expr_from_key(
     ARGIN(lexer_state * const lexer),
-    NOTNULL(key * const k))
+    ARGIN(key * const k))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -543,7 +545,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 key * new_key(
     ARGIN(lexer_state * const lexer),
-    NOTNULL(expression * const expr))
+    ARGIN(expression * const expr))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -587,7 +589,7 @@ target * new_target(ARGIN(lexer_state * const lexer))
 
 void push_operand(
     ARGIN(lexer_state * const lexer),
-    NOTNULL(expression * const operand))
+    ARGIN(expression * const operand))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -756,7 +758,7 @@ void update_instr(
 
 void update_op(
     ARGIN(lexer_state * const lexer),
-    NOTNULL(instruction * const instr),
+    ARGIN(instruction * const instr),
     int newop)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -766,7 +768,8 @@ void update_sub_register_usage(
     unsigned reg_usage[NUM_PARROT_TYPES])
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_add_arg __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_add_arg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(last))
 #define ASSERT_ARGS_add_key __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lexer) \
     , PARROT_ASSERT_ARG(keylist) \
