@@ -94,7 +94,7 @@ typedef struct Interp {
  * or for the curious: look at the preprocessor output
  */
 
-#define OP(x) OP_ ## (x)
+#define OP(x) OP_##x
 typedef enum { OPCODES } opcodes;
 #undef OP
 
@@ -148,6 +148,8 @@ function(opcode_t *pc, Interp *interp) \
 
 =item C<static void run(Interp *interp, opcode_t *pc)>
 
+Execute a single opcode.
+
 =cut
 
 */
@@ -167,7 +169,7 @@ run(Interp *interp, opcode_t *pc)
         switch (*pc) {
 #    endif
 
-#    define CASE(x)         case OP_ ## (x):
+#    define CASE(x)         case OP_##x:
 #    define NEXT            continue;
 #    define DONE            return;
 #    define ENDDISPATCH     default : printf("illegal instruction"); \
@@ -228,11 +230,11 @@ ENDRUN
 
 #ifdef FUNC_CORE
 #  define DEF_OP(op) \
-    interp->op_func[OP_ ## op] = (op); \
-    interp->op_info[OP_ ## op] = #op
+    interp->op_func[OP_##op] = (op); \
+    interp->op_info[OP_##op] = #op
 #else
 #  define DEF_OP(op) \
-    interp->op_info[OP_ ## op] = #op
+    interp->op_info[OP_##op] = #op
 #endif
 
 /*
@@ -286,6 +288,8 @@ init(Interp *interp, opcode_t *prog)
 /*
 
 =item C<int main(int argc, char *argv[])>
+
+Initialize a minimal Parrotesque interpreter and run some hard-coded bytecode.
 
 =cut
 

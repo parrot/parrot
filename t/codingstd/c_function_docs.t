@@ -117,7 +117,6 @@ config/gen/platform/openbsd/math.c
 config/gen/platform/openbsd/memexec.c
 config/gen/platform/solaris/math.c
 config/gen/platform/solaris/time.c
-examples/c/nanoparrot.c
 examples/c/pbc_info.c
 examples/compilers/japhc.c
 src/atomic/gcc_x86.c
