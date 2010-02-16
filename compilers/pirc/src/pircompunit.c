@@ -172,7 +172,7 @@ created.
 
 */
 void
-set_namespace(ARGIN(lexer_state * const lexer), key * const ns)
+set_namespace(ARGIN(lexer_state * const lexer), ARGIN(key * const ns))
 {
     lexer->current_ns = ns;
 }
@@ -189,7 +189,8 @@ Thus, set the :outer() argument to the current subroutine.
 
 */
 void
-set_sub_outer(ARGIN(lexer_state * const lexer), char const * const outersub)
+set_sub_outer(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const outersub))
 {
     CURRENT_SUB(lexer)->info.outersub = outersub;
     SET_FLAG(lexer->subs->flags, PIRC_SUB_FLAG_HAS_OUTER);
@@ -208,7 +209,8 @@ Add the multi-method signature type in C<multitype> to the current subroutine.
 
 */
 void
-set_sub_multi_types(ARGIN(lexer_state * const lexer), expression * const multitype)
+set_sub_multi_types(ARGIN(lexer_state * const lexer),
+        ARGIN(expression * const multitype))
 {
     /* info.num_types is 1 higher than the actual number of types;
      * n=1 means :multi() without any types; therefore, subtract 1 for actual number.
@@ -280,7 +282,8 @@ in fact not a vtable method, an error message is emitted.
 
 */
 void
-set_sub_vtable(ARGIN(lexer_state * const lexer), char const * vtablename)
+set_sub_vtable(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * vtablename))
 {
     int vtable_index;
 
@@ -323,7 +326,8 @@ Set the name specified in the :subid flag on the sub.
 
 */
 void
-set_sub_subid(ARGIN(lexer_state * const lexer), char const * const subid)
+set_sub_subid(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const subid))
 {
     CURRENT_SUB(lexer)->info.subid = subid;
     SET_FLAG(lexer->subs->flags, PIRC_SUB_FLAG_SUBID);
@@ -341,7 +345,8 @@ the name by which the sub is stored as a method.
 
 */
 void
-set_sub_methodname(ARGIN(lexer_state * const lexer), char const * const methodname)
+set_sub_methodname(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const methodname))
 {
     if (methodname) /* :method("foo") */
         CURRENT_SUB(lexer)->methodname = methodname;
@@ -368,7 +373,8 @@ is experimental, and not actually used at this point.
 
 */
 void
-set_sub_instanceof(ARGIN(lexer_state * const lexer), char const * const classname)
+set_sub_instanceof(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const classname))
 {
     CURRENT_SUB(lexer)->info.instanceof = classname;
 }
@@ -385,7 +391,8 @@ by which the sub is stored in the namespace.
 
 */
 void
-set_sub_nsentry(ARGIN(lexer_state * const lexer), char const * const nsentry)
+set_sub_nsentry(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const nsentry))
 {
     CURRENT_SUB(lexer)->info.nsentry = nsentry;
 }
@@ -420,7 +427,7 @@ their thing.
 
 */
 void
-new_subr(ARGIN(lexer_state * const lexer), STRING *subname)
+new_subr(ARGIN(lexer_state * const lexer), ARGIN(STRING *subname))
 {
     subroutine *newsub       = pir_mem_allocate_zeroed_typed(lexer, subroutine);
     int         index;
@@ -481,7 +488,8 @@ Set the current subroutine's name to C<subname>.
 
 */
 void
-set_sub_name(ARGIN(lexer_state * const lexer), char const * const subname)
+set_sub_name(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const subname))
 {
     CURRENT_SUB(lexer)->info.subname = subname;
 }
@@ -568,7 +576,7 @@ make it accessible to other parse actions. C<t> is returned.
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 target *
-set_curtarget(ARGIN(lexer_state * const lexer), target * const t)
+set_curtarget(ARGIN(lexer_state * const lexer), ARGIN(target * const t))
 {
     lexer->curtarget = t;
     return t;
@@ -587,7 +595,8 @@ to make it accessible to other parse actions. C<arg> is returned.
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 argument *
-set_curarg(ARGIN(lexer_state * const lexer), argument * const arg)
+set_curarg(ARGIN(lexer_state * const lexer),
+        ARGIN(argument * const arg))
 {
     lexer->curarg = arg;
     return arg;
@@ -618,7 +627,8 @@ equals C<right>'s (PASM) register number.
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 int
-targets_equal(target const * const left, target const * const right)
+targets_equal(ARGIN(target const * const left),
+        ARGIN(target const * const right))
 {
 
 
@@ -681,7 +691,7 @@ Set the key C<k> on target C<t>. For instance:
 
 */
 void
-set_target_key(target * const t, key * const k)
+set_target_key(ARGIN(target * const t), ARGIN(key * const k))
 {
     t->key = k;
 }
@@ -700,7 +710,8 @@ a pointer to C<sym>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 target *
-target_from_symbol(ARGIN(lexer_state * const lexer), symbol * const sym)
+target_from_symbol(ARGIN(lexer_state * const lexer),
+        ARGIN(symbol * const sym))
 {
     target *t  = new_target(lexer);
 
@@ -727,7 +738,8 @@ its "next" pointer you get the first item in the list.)
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 target *
-add_target(ARGIN(lexer_state * const lexer), target *last, target * const t)
+add_target(ARGIN(lexer_state * const lexer),
+        ARGMOD(target *last), ARGIN(target * const t))
 {
     PARROT_ASSERT(last);
     PARROT_ASSERT(t);
@@ -755,7 +767,8 @@ current subroutine, and a new register is allocated for it.
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 target *
-add_param(ARGIN(lexer_state * const lexer), pir_type type, char const * const name)
+add_param(ARGIN(lexer_state * const lexer), pir_type type,
+        ARGIN(char const * const name))
 {
     target *targ = new_target(lexer);
     symbol *sym  = new_symbol(lexer, name, type);
@@ -805,7 +818,8 @@ this alias (and the :named flag) is set.
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 target *
-set_param_alias(ARGIN(lexer_state * const lexer), char const * const alias)
+set_param_alias(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const alias))
 {
     PARROT_ASSERT(lexer->curtarget != NULL);
 
@@ -838,7 +852,8 @@ of C<flag> may encode several flags at a time. Returns C<param>.
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 target *
-set_param_flag(ARGIN(lexer_state * const lexer), target * const param, target_flag flag)
+set_param_flag(ARGIN(lexer_state * const lexer),
+        ARGIN(target * const param), target_flag flag)
 {
     SET_FLAG(param->flags, flag);
 
@@ -874,7 +889,8 @@ is circular linked, meaning its C<next> pointer points to itself.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 argument *
-new_argument(ARGIN(lexer_state * const lexer), expression * const expr)
+new_argument(ARGIN(lexer_state * const lexer),
+        ARGIN(expression * const expr))
 {
     argument *arg = pir_mem_allocate_zeroed_typed(lexer, argument);
     arg->value    = expr;
@@ -901,7 +917,7 @@ element of the list) is updated, and returned.
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 argument *
-add_arg(ARGMOD(argument *last), argument * const newarg)
+add_arg(ARGMOD(argument *last), ARGIN(argument * const newarg))
 {
     PARROT_ASSERT(last);
     PARROT_ASSERT(newarg);
@@ -944,7 +960,7 @@ The function returns a pointer to the last node in the list.
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 argument *
-unshift_arg(invocation * const inv, argument * const newarg)
+unshift_arg(ARGIN(invocation * const inv), ARGIN(argument * const newarg))
 {
     ++inv->num_arguments;
 
@@ -971,7 +987,7 @@ encode multiple flags. C<arg> is returned.
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 argument *
-set_arg_flag(argument * const arg, arg_flag flag)
+set_arg_flag(ARGIN(argument * const arg), arg_flag flag)
 {
     SET_FLAG(arg->flags, flag);
     return arg;
@@ -993,7 +1009,8 @@ The argument on which the alias is set is returned.
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 argument *
-set_arg_alias(ARGIN(lexer_state * const lexer), char const * const alias)
+set_arg_alias(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const alias))
 {
     PARROT_ASSERT(lexer->curarg != NULL);
     lexer->curarg->alias = alias;
@@ -1012,7 +1029,8 @@ Load the library indicated by C<library>.
 
 */
 void
-load_library(ARGIN(lexer_state * const lexer), char const * const library)
+load_library(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const library))
 {
     /* see imcc.y:600 */
     STRING *libname       = Parrot_str_new(lexer->interp, library, strlen(library));
@@ -1032,7 +1050,8 @@ Set the label C<label> on the current instruction.
 
 */
 void
-set_label(ARGIN(lexer_state * const lexer), char const * const labelname)
+set_label(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const labelname))
 {
     instruction *instr = CURRENT_INSTRUCTION(lexer);
 
@@ -1072,7 +1091,8 @@ string.
 
 */
 void
-set_instr(ARGIN(lexer_state * const lexer), char const * const opname)
+set_instr(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const opname))
 {
     set_instrf(lexer, opname, "");
 }
@@ -1087,7 +1107,8 @@ Update the current instruction; the new opname is given by C<newop>.
 
 */
 void
-update_instr(ARGIN(lexer_state * const lexer), char const * const newop)
+update_instr(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const newop))
 {
     PARROT_ASSERT(CURRENT_INSTRUCTION(lexer));
     CURRENT_INSTRUCTION(lexer)->opname = newop;
@@ -1169,7 +1190,10 @@ refer to the (non-)terminals used in a Yacc/Bison specification.
 
 */
 void
-set_instrf(ARGIN(lexer_state * const lexer), char const * const opname, char const * const format, ...)
+set_instrf(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const opname),
+        ARGIN(char const * const format),
+        ...)
 {
     va_list  arg_ptr;       /* for the var. args */
     unsigned i;             /* loop iterator */
@@ -1213,7 +1237,9 @@ of operands passed to this function.
 
 */
 void
-add_operands(ARGIN(lexer_state * const lexer), char const * const format, ...)
+add_operands(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const format),
+        ...)
 {
     va_list  arg_ptr;       /* for the var. args */
     unsigned i;             /* loop iterator */
@@ -1270,7 +1296,7 @@ C<if> becomes C<unless>, C<greater-than> becomes C<less-or-equals>.
 PARROT_CONST_FUNCTION
 PARROT_CANNOT_RETURN_NULL
 char const *
-get_inverse(char const * const instr)
+get_inverse(ARGIN(char const * const instr))
 {
          if (STREQ(instr, "if")) return "unless";
     else if (STREQ(instr, "gt")) return "le";
@@ -1517,7 +1543,9 @@ Creates a new constdecl node of the given type, by the given name.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 constdecl *
-new_named_const(ARGIN(lexer_state * const lexer), value_type type, char const * const name, ...)
+new_named_const(ARGIN(lexer_state * const lexer), value_type type,
+        ARGIN(char const * const name),
+        ...)
 {
     constdecl *c = (constdecl *)pir_mem_allocate(lexer, sizeof (constdecl));
     va_list arg_ptr;
@@ -1566,8 +1594,10 @@ of the constant, and the value of the constant is passed as C<value>.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 constdecl *
-new_pmc_const(ARGIN(lexer_state * const lexer), char const * const type,
-              char const * const name, constant * const value)
+new_pmc_const(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const type),
+        ARGIN(char const * const name),
+        ARGIN(constant * const value))
 {
     /* get a STRING representation of the c-string type */
     STRING *classname    = Parrot_str_new(lexer->interp, type, strlen(type));
@@ -1814,7 +1844,8 @@ returned.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 expression *
-expr_from_target(ARGIN(lexer_state * const lexer), target * const t)
+expr_from_target(ARGIN(lexer_state * const lexer),
+        ARGIN(target * const t))
 {
     expression *e = new_expr(lexer, EXPR_TARGET);
     e->expr.t     = t;
@@ -1835,7 +1866,8 @@ created expression node.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 expression *
-expr_from_const(ARGIN(lexer_state * const lexer), constant * const c)
+expr_from_const(ARGIN(lexer_state * const lexer),
+        ARGIN(constant * const c))
 {
     expression *e = new_expr(lexer, EXPR_CONSTANT);
     e->expr.c     = c;
@@ -1893,7 +1925,8 @@ Same as C<expr_from_int()>, except it takes a C<string> parameter.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 expression *
-expr_from_string(ARGIN(lexer_state * const lexer), char const * const sval)
+expr_from_string(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const sval))
 {
     return expr_from_const(lexer, new_const(lexer, STRING_VAL, sval));
 }
@@ -1912,7 +1945,8 @@ Convert a ident to an expression node and returns it.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 expression *
-expr_from_ident(ARGIN(lexer_state * const lexer), char const * const id)
+expr_from_ident(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const id))
 {
     expression *e = new_expr(lexer, EXPR_IDENT);
     e->expr.id    = id;
@@ -1934,7 +1968,9 @@ C<inv> object.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 invocation *
-set_invocation_args(ARGIN(lexer_state * const lexer), invocation * const inv, argument * const args)
+set_invocation_args(ARGIN(lexer_state * const lexer),
+        ARGIN(invocation * const inv),
+        ARGIN(argument * const args))
 {
     argument *arg_iter;
     unsigned  arg_count = 0;
@@ -1987,7 +2023,9 @@ The invocation object C<inv> is returned.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 invocation *
-set_invocation_results(ARGIN(lexer_state * const lexer), invocation * const inv, target * const results)
+set_invocation_results(ARGIN(lexer_state * const lexer),
+        ARGIN(invocation * const inv),
+        ARGIN(target * const results))
 {
     target  *result_iter;
     unsigned result_count = 0;
@@ -2033,7 +2071,7 @@ Set the invocation type on the invocation object C<inv>.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 invocation *
-set_invocation_type(invocation * const inv, invoke_type type)
+set_invocation_type(ARGIN(invocation * const inv), invoke_type type)
 {
     inv->type = type;
     return inv;
@@ -2108,7 +2146,9 @@ the allocated register.
 
 */
 void
-set_lex_flag(ARGIN(lexer_state * const lexer), target * const t, char const * const name)
+set_lex_flag(ARGIN(lexer_state * const lexer),
+        ARGIN(target * const t),
+        ARGIN(char const * const name))
 {
     lexical *lex = CURRENT_SUB(lexer)->info.lexicals;
 
@@ -2147,7 +2187,8 @@ Code taken from imcc.y; needs testing.
 
 */
 void
-set_hll(ARGIN(lexer_state * const lexer), char const * const hll)
+set_hll(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const hll))
 {
     STRING * const hll_name             = Parrot_str_new(lexer->interp, hll, strlen(hll));
     CONTEXT(lexer->interp)->current_HLL = Parrot_register_HLL(lexer->interp, hll_name);
@@ -2167,7 +2208,8 @@ instruction.
 
 */
 void
-unshift_operand(ARGIN(lexer_state * const lexer), expression * const operand)
+unshift_operand(ARGIN(lexer_state * const lexer),
+        ARGIN(expression * const operand))
 {
     expression *last = CURRENT_INSTRUCTION(lexer)->operands;
     if (last) {
@@ -2193,7 +2235,8 @@ Add an operand at the end of the list of operands of the current instruction.
 
 */
 void
-push_operand(ARGIN(lexer_state * const lexer), ARGIN(expression * const operand))
+push_operand(ARGIN(lexer_state * const lexer),
+        ARGIN(expression * const operand))
 {
     PARROT_ASSERT(CURRENT_INSTRUCTION(lexer));
 
@@ -2334,7 +2377,7 @@ is inserted at the front of the list. C<list> is returned
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 symbol *
-add_local(symbol * const list, symbol * const local)
+add_local(ARGIN(symbol * const list), ARGIN(symbol * const local))
 {
     local->next = list->next;
     list->next  = local;
@@ -2344,8 +2387,8 @@ add_local(symbol * const list, symbol * const local)
 
 /*
 
-=item C<symbol *
-new_local(char * const name, int has_unique_reg)>
+=item C<symbol * new_local(lexer_state * const lexer, char const * const name,
+int has_unique_reg)>
 
 Create a new symbol node to represent the local C<name>.
 If C<has_unique_reg> is true, the C<:unique_reg> flag is set.
@@ -2357,7 +2400,9 @@ The newly created symbol node is returned.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 symbol *
-new_local(ARGIN(lexer_state * const lexer), char const * const name, int has_unique_reg){
+new_local(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const name), int has_unique_reg)
+{
     symbol *s = new_symbol(lexer, name, UNKNOWN_TYPE);
 
     if (has_unique_reg)
@@ -2380,7 +2425,8 @@ the arity and types of operands.
 
 */
 int
-is_parrot_op(ARGIN(lexer_state * const lexer), char const * const name)
+is_parrot_op(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const name))
 {
     int opcode = lexer->interp->op_lib->op_code(name, 0); /* check short name, e.g. "set" */
 
@@ -2411,9 +2457,8 @@ that C<opcode> has.
 
 */
 void
-new_sub_instr(ARGIN(lexer_state * const lexer), int opcode, char const * const opname,
-              unsigned num_var_args)
-
+new_sub_instr(ARGIN(lexer_state * const lexer), int opcode,
+        ARGIN(char const * const opname), unsigned num_var_args)
 {
     new_statement(lexer, opname);
     CURRENT_INSTRUCTION(lexer)->opinfo = &lexer->interp->op_info_table[opcode];
@@ -2444,7 +2489,8 @@ The C<opinfo>, C<opname> and C<opcode> fields of C<instr> are updated.
 
 */
 void
-update_op(ARGIN(lexer_state * const lexer), ARGIN(instruction * const instr), int newop)
+update_op(ARGIN(lexer_state * const lexer), ARGIN(instruction * const instr),
+        int newop)
 {
     /* Deduct number of ints needed for the old instruction, if there is one.
      * This is necessary during strength reduction and other optimizations, once
@@ -2702,7 +2748,8 @@ information in C<reg_usage>.
 
 */
 void
-update_sub_register_usage(ARGIN(lexer_state * const lexer), unsigned reg_usage[NUM_PARROT_TYPES])
+update_sub_register_usage(ARGIN(lexer_state * const lexer),
+        unsigned reg_usage[NUM_PARROT_TYPES])
 {
     int i;
     for (i = 0; i < NUM_PARROT_TYPES; ++i)
@@ -2721,7 +2768,9 @@ Add a new annotation with key C<key> and value C<value>.
 
 */
 void
-annotate(ARGIN(lexer_state * const lexer), char const * const key, constant * const value)
+annotate(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const key),
+        ARGIN(constant * const value))
 {
     annotation *ann     = (annotation *)pir_mem_allocate(lexer, sizeof (annotation));
     ann->key            = key;

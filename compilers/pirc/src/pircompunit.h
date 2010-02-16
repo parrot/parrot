@@ -399,8 +399,9 @@ struct lexer_state;
 
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
-argument * add_arg(ARGMOD(argument *last), argument * const newarg)
+argument * add_arg(ARGMOD(argument *last), ARGIN(argument * const newarg))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         FUNC_MODIFIES(*last);
 
 PARROT_WARN_UNUSED_RESULT
@@ -415,35 +416,44 @@ key * add_key(
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-symbol * add_local(symbol * const list, symbol * const local);
+symbol * add_local(ARGIN(symbol * const list), ARGIN(symbol * const local))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void add_operands(
     ARGIN(lexer_state * const lexer),
-    char const * const format,
+    ARGIN(char const * const format),
     ...)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 target * add_param(
     ARGIN(lexer_state * const lexer),
     pir_type type,
-    char const * const name)
-        __attribute__nonnull__(1);
+    ARGIN(char const * const name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 target * add_target(
     ARGIN(lexer_state * const lexer),
-    target *last,
-    target * const t)
-        __attribute__nonnull__(1);
+    ARGMOD(target *last),
+    ARGIN(target * const t))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*last);
 
 void annotate(
     ARGIN(lexer_state * const lexer),
-    char const * const key,
-    constant * const value)
-        __attribute__nonnull__(1);
+    ARGIN(char const * const key),
+    ARGIN(constant * const value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 void close_sub(ARGIN(lexer_state * const lexer))
         __attribute__nonnull__(1);
@@ -452,15 +462,17 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 expression * expr_from_const(
     ARGIN(lexer_state * const lexer),
-    constant * const c)
-        __attribute__nonnull__(1);
+    ARGIN(constant * const c))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 expression * expr_from_ident(
     ARGIN(lexer_state * const lexer),
-    char const * const id)
-        __attribute__nonnull__(1);
+    ARGIN(char const * const id))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -484,22 +496,25 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 expression * expr_from_string(
     ARGIN(lexer_state * const lexer),
-    char const * const sval)
-        __attribute__nonnull__(1);
+    ARGIN(char const * const sval))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 expression * expr_from_target(
     ARGIN(lexer_state * const lexer),
-    target * const t)
-        __attribute__nonnull__(1);
+    ARGIN(target * const t))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void fixup_global_labels(ARGIN(lexer_state * const lexer))
         __attribute__nonnull__(1);
 
 PARROT_CONST_FUNCTION
 PARROT_CANNOT_RETURN_NULL
-char const * get_inverse(char const * const instr);
+char const * get_inverse(ARGIN(char const * const instr))
+        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -521,20 +536,25 @@ PARROT_CANNOT_RETURN_NULL
 invocation * invoke(ARGIN(lexer_state * const lexer), invoke_type type, ...)
         __attribute__nonnull__(1);
 
-int is_parrot_op(ARGIN(lexer_state * const lexer), char const * const name)
-        __attribute__nonnull__(1);
+int is_parrot_op(
+    ARGIN(lexer_state * const lexer),
+    ARGIN(char const * const name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void load_library(
     ARGIN(lexer_state * const lexer),
-    char const * const library)
-        __attribute__nonnull__(1);
+    ARGIN(char const * const library))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 argument * new_argument(
     ARGIN(lexer_state * const lexer),
-    expression * const expr)
-        __attribute__nonnull__(1);
+    ARGIN(expression * const expr))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -551,21 +571,34 @@ key * new_key(
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+symbol * new_local(
+    ARGIN(lexer_state * const lexer),
+    ARGIN(char const * const name),
+    int has_unique_reg)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 constdecl * new_named_const(
     ARGIN(lexer_state * const lexer),
     value_type type,
-    char const * const name,
+    ARGIN(char const * const name),
     ...)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 constdecl * new_pmc_const(
     ARGIN(lexer_state * const lexer),
-    char const * const type,
-    char const * const name,
-    constant * const value)
-        __attribute__nonnull__(1);
+    ARGIN(char const * const type),
+    ARGIN(char const * const name),
+    ARGIN(constant * const value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -575,12 +608,14 @@ target * new_reg(ARGIN(lexer_state * const lexer), pir_type type, int regno)
 void new_sub_instr(
     ARGIN(lexer_state * const lexer),
     int opcode,
-    char const * const opname,
+    ARGIN(char const * const opname),
     unsigned num_var_args)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
-void new_subr(ARGIN(lexer_state * const lexer), STRING *subname)
-        __attribute__nonnull__(1);
+void new_subr(ARGIN(lexer_state * const lexer), ARGIN(STRING *subname))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -603,71 +638,96 @@ PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 argument * set_arg_alias(
     ARGIN(lexer_state * const lexer),
-    char const * const alias)
-        __attribute__nonnull__(1);
+    ARGIN(char const * const alias))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
-argument * set_arg_flag(argument * const arg, arg_flag flag);
+argument * set_arg_flag(ARGIN(argument * const arg), arg_flag flag)
+        __attribute__nonnull__(1);
 
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 argument * set_curarg(
     ARGIN(lexer_state * const lexer),
-    argument * const arg)
-        __attribute__nonnull__(1);
+    ARGIN(argument * const arg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
-target * set_curtarget(ARGIN(lexer_state * const lexer), target * const t)
-        __attribute__nonnull__(1);
+target * set_curtarget(
+    ARGIN(lexer_state * const lexer),
+    ARGIN(target * const t))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-void set_hll(ARGIN(lexer_state * const lexer), char const * const hll)
-        __attribute__nonnull__(1);
+void set_hll(
+    ARGIN(lexer_state * const lexer),
+    ARGIN(char const * const hll))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-void set_instr(ARGIN(lexer_state * const lexer), char const * const opname)
-        __attribute__nonnull__(1);
+void set_instr(
+    ARGIN(lexer_state * const lexer),
+    ARGIN(char const * const opname))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void set_instrf(
     ARGIN(lexer_state * const lexer),
-    char const * const opname,
-    char const * const format,
+    ARGIN(char const * const opname),
+    ARGIN(char const * const format),
     ...)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 invocation * set_invocation_args(
     ARGIN(lexer_state * const lexer),
-    invocation * const inv,
-    argument * const args)
-        __attribute__nonnull__(1);
+    ARGIN(invocation * const inv),
+    ARGIN(argument * const args))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 invocation * set_invocation_results(
     ARGIN(lexer_state * const lexer),
-    invocation * const inv,
-    target * const results)
-        __attribute__nonnull__(1);
+    ARGIN(invocation * const inv),
+    ARGIN(target * const results))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-invocation * set_invocation_type(invocation * const inv, invoke_type type);
+invocation * set_invocation_type(
+    ARGIN(invocation * const inv),
+    invoke_type type)
+        __attribute__nonnull__(1);
 
 void set_label(
     ARGIN(lexer_state * const lexer),
-    char const * const labelname)
-        __attribute__nonnull__(1);
+    ARGIN(char const * const labelname))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void set_lex_flag(
     ARGIN(lexer_state * const lexer),
-    target * const t,
-    char const * const name)
-        __attribute__nonnull__(1);
+    ARGIN(target * const t),
+    ARGIN(char const * const name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
-void set_namespace(ARGIN(lexer_state * const lexer), key * const ns)
-        __attribute__nonnull__(1);
+void set_namespace(ARGIN(lexer_state * const lexer), ARGIN(key * const ns))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void set_op_labelflag(ARGIN(lexer_state * const lexer), int flag)
         __attribute__nonnull__(1);
@@ -676,85 +736,109 @@ PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 target * set_param_alias(
     ARGIN(lexer_state * const lexer),
-    char const * const alias)
-        __attribute__nonnull__(1);
+    ARGIN(char const * const alias))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 target * set_param_flag(
     ARGIN(lexer_state * const lexer),
-    target * const param,
+    ARGIN(target * const param),
     target_flag flag)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void set_sub_flag(ARGIN(lexer_state * const lexer), sub_flag flag)
         __attribute__nonnull__(1);
 
 void set_sub_instanceof(
     ARGIN(lexer_state * const lexer),
-    char const * const classname)
-        __attribute__nonnull__(1);
+    ARGIN(char const * const classname))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void set_sub_methodname(
     ARGIN(lexer_state * const lexer),
-    char const * const methodname)
-        __attribute__nonnull__(1);
+    ARGIN(char const * const methodname))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void set_sub_multi_types(
     ARGIN(lexer_state * const lexer),
-    expression * const multitype)
-        __attribute__nonnull__(1);
+    ARGIN(expression * const multitype))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void set_sub_name(
     ARGIN(lexer_state * const lexer),
-    char const * const subname)
-        __attribute__nonnull__(1);
+    ARGIN(char const * const subname))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void set_sub_nsentry(
     ARGIN(lexer_state * const lexer),
-    char const * const nsentry)
-        __attribute__nonnull__(1);
+    ARGIN(char const * const nsentry))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void set_sub_outer(
     ARGIN(lexer_state * const lexer),
-    char const * const outersub)
-        __attribute__nonnull__(1);
+    ARGIN(char const * const outersub))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void set_sub_subid(
     ARGIN(lexer_state * const lexer),
-    char const * const subid)
-        __attribute__nonnull__(1);
+    ARGIN(char const * const subid))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void set_sub_vtable(
     ARGIN(lexer_state * const lexer),
-    char const * vtablename)
-        __attribute__nonnull__(1);
+    ARGIN(char const * vtablename))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-void set_target_key(target * const t, key * const k);
+void set_target_key(ARGIN(target * const t), ARGIN(key * const k))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 target * target_from_symbol(
     ARGIN(lexer_state * const lexer),
-    symbol * const sym)
-        __attribute__nonnull__(1);
+    ARGIN(symbol * const sym))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
-int targets_equal(target const * const left, target const * const right);
+int targets_equal(
+    ARGIN(target const * const left),
+    ARGIN(target const * const right))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
-argument * unshift_arg(invocation * const inv, argument * const newarg);
+argument * unshift_arg(
+    ARGIN(invocation * const inv),
+    ARGIN(argument * const newarg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void unshift_operand(
     ARGIN(lexer_state * const lexer),
-    expression * const operand)
-        __attribute__nonnull__(1);
+    ARGIN(expression * const operand))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void update_instr(
     ARGIN(lexer_state * const lexer),
-    char const * const newop)
-        __attribute__nonnull__(1);
+    ARGIN(char const * const newop))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void update_op(
     ARGIN(lexer_state * const lexer),
@@ -769,26 +853,37 @@ void update_sub_register_usage(
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_add_arg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(last))
+       PARROT_ASSERT_ARG(last) \
+    , PARROT_ASSERT_ARG(newarg))
 #define ASSERT_ARGS_add_key __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lexer) \
     , PARROT_ASSERT_ARG(keylist) \
     , PARROT_ASSERT_ARG(exprkey))
-#define ASSERT_ARGS_add_local __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_add_local __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(list) \
+    , PARROT_ASSERT_ARG(local))
 #define ASSERT_ARGS_add_operands __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(format))
 #define ASSERT_ARGS_add_param __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_add_target __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(last) \
+    , PARROT_ASSERT_ARG(t))
 #define ASSERT_ARGS_annotate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(key) \
+    , PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_close_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lexer))
 #define ASSERT_ARGS_expr_from_const __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(c))
 #define ASSERT_ARGS_expr_from_ident __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(id))
 #define ASSERT_ARGS_expr_from_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lexer))
 #define ASSERT_ARGS_expr_from_key __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -797,12 +892,15 @@ void update_sub_register_usage(
 #define ASSERT_ARGS_expr_from_num __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lexer))
 #define ASSERT_ARGS_expr_from_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(sval))
 #define ASSERT_ARGS_expr_from_target __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(t))
 #define ASSERT_ARGS_fixup_global_labels __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lexer))
-#define ASSERT_ARGS_get_inverse __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_get_inverse __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(instr))
 #define ASSERT_ARGS_get_operand __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lexer))
 #define ASSERT_ARGS_get_operand_count __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -814,26 +912,38 @@ void update_sub_register_usage(
 #define ASSERT_ARGS_invoke __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lexer))
 #define ASSERT_ARGS_is_parrot_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_load_library __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(library))
 #define ASSERT_ARGS_new_argument __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(expr))
 #define ASSERT_ARGS_new_const __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lexer))
 #define ASSERT_ARGS_new_key __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lexer) \
     , PARROT_ASSERT_ARG(expr))
+#define ASSERT_ARGS_new_local __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_new_named_const __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_new_pmc_const __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(type) \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_new_reg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lexer))
 #define ASSERT_ARGS_new_sub_instr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(opname))
 #define ASSERT_ARGS_new_subr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(subname))
 #define ASSERT_ARGS_new_target __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lexer))
 #define ASSERT_ARGS_push_operand __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -844,62 +954,98 @@ void update_sub_register_usage(
 #define ASSERT_ARGS_reset_register_allocator __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lexer))
 #define ASSERT_ARGS_set_arg_alias __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
-#define ASSERT_ARGS_set_arg_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(alias))
+#define ASSERT_ARGS_set_arg_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(arg))
 #define ASSERT_ARGS_set_curarg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(arg))
 #define ASSERT_ARGS_set_curtarget __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(t))
 #define ASSERT_ARGS_set_hll __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(hll))
 #define ASSERT_ARGS_set_instr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(opname))
 #define ASSERT_ARGS_set_instrf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(opname) \
+    , PARROT_ASSERT_ARG(format))
 #define ASSERT_ARGS_set_invocation_args __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(inv) \
+    , PARROT_ASSERT_ARG(args))
 #define ASSERT_ARGS_set_invocation_results __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
-#define ASSERT_ARGS_set_invocation_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(inv) \
+    , PARROT_ASSERT_ARG(results))
+#define ASSERT_ARGS_set_invocation_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(inv))
 #define ASSERT_ARGS_set_label __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(labelname))
 #define ASSERT_ARGS_set_lex_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(t) \
+    , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_set_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(ns))
 #define ASSERT_ARGS_set_op_labelflag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lexer))
 #define ASSERT_ARGS_set_param_alias __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(alias))
 #define ASSERT_ARGS_set_param_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(param))
 #define ASSERT_ARGS_set_sub_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lexer))
 #define ASSERT_ARGS_set_sub_instanceof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(classname))
 #define ASSERT_ARGS_set_sub_methodname __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(methodname))
 #define ASSERT_ARGS_set_sub_multi_types __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(multitype))
 #define ASSERT_ARGS_set_sub_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(subname))
 #define ASSERT_ARGS_set_sub_nsentry __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(nsentry))
 #define ASSERT_ARGS_set_sub_outer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(outersub))
 #define ASSERT_ARGS_set_sub_subid __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(subid))
 #define ASSERT_ARGS_set_sub_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
-#define ASSERT_ARGS_set_target_key __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(vtablename))
+#define ASSERT_ARGS_set_target_key __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(t) \
+    , PARROT_ASSERT_ARG(k))
 #define ASSERT_ARGS_target_from_symbol __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
-#define ASSERT_ARGS_targets_equal __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_unshift_arg __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(sym))
+#define ASSERT_ARGS_targets_equal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(left) \
+    , PARROT_ASSERT_ARG(right))
+#define ASSERT_ARGS_unshift_arg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(inv) \
+    , PARROT_ASSERT_ARG(newarg))
 #define ASSERT_ARGS_unshift_operand __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(operand))
 #define ASSERT_ARGS_update_instr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(newop))
 #define ASSERT_ARGS_update_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lexer) \
     , PARROT_ASSERT_ARG(instr))
