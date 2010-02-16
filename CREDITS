@@ -692,7 +692,10 @@ D: README.win32 spelling patch
 
 N: Michael H. Hind
 U: mikehh
-D: codingstd patches
+D: testing parrot and some HLL's
+D: fixing codetest failures
+D: adding function documentation
+D: tracwiki additions
 E: mike.hind@gmail.com
 
 N: Michael G. Schwern
