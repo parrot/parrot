@@ -170,6 +170,7 @@ void
 assign_vanilla_register(ARGIN(lexer_state * const lexer),
         ARGIN(symbol * const sym))
 {
+    ASSERT_ARGS(assign_vanilla_register)
     sym->info.color    = next_register(lexer, sym->info.type);
     /* fprintf(stderr, "assigning vanilla reg %d to symbol %s\n", sym->info.color,
                     sym->info.id.name);
@@ -206,6 +207,7 @@ PARROT_WARN_UNUSED_RESULT
 unsigned
 get_hashcode(ARGIN(char const * const str), unsigned num_buckets)
 {
+    ASSERT_ARGS(get_hashcode)
     unsigned long  key = 0;
     char const    *s;
 
@@ -229,6 +231,7 @@ void
 store_bucket(ARGIN(hashtable * const table),
         ARGIN(bucket * const buck), unsigned long hash)
 {
+    ASSERT_ARGS(store_bucket)
     buck->next = table->contents[hash];
     table->contents[hash] = buck;
 }
@@ -247,6 +250,7 @@ PARROT_CANNOT_RETURN_NULL
 bucket *
 get_bucket(ARGIN(hashtable * const table), unsigned long hash)
 {
+    ASSERT_ARGS(get_bucket)
     return table->contents[hash];
 }
 
@@ -266,6 +270,7 @@ symbol *
 new_symbol(ARGIN(lexer_state * const lexer),
         ARGIN(char const * const name), pir_type type)
 {
+    ASSERT_ARGS(new_symbol)
     symbol *sym = pir_mem_allocate_zeroed_typed(lexer, symbol);
 
     sym->info.id.name = name;
@@ -293,6 +298,7 @@ void
 declare_local(ARGIN(lexer_state * const lexer), pir_type type,
               ARGIN(symbol * const list))
 {
+    ASSERT_ARGS(declare_local)
     symbol    *iter  = list;
     hashtable *table = &CURRENT_SUB(lexer)->symbols;
 
@@ -346,6 +352,7 @@ no subroutines, the function will do nothing and return.
 void
 check_unused_symbols(ARGIN(lexer_state * const lexer))
 {
+    ASSERT_ARGS(check_unused_symbols)
     subroutine *subiter;
 
     /* if there's no subs, just return. */
@@ -396,6 +403,7 @@ symbol *
 find_symbol(ARGIN(lexer_state * const lexer),
         ARGIN(char const * const name))
 {
+    ASSERT_ARGS(find_symbol)
     hashtable    *table    = &CURRENT_SUB(lexer)->symbols;
     unsigned long hashcode = get_hashcode(name, table->size);
     bucket       *buck     = get_bucket(table, hashcode);
@@ -475,6 +483,7 @@ PARROT_CAN_RETURN_NULL
 pir_reg *
 find_register(ARGIN(lexer_state * const lexer), pir_type type, int regno)
 {
+    ASSERT_ARGS(find_register)
     /* should do a binary search. fix later.
      */
     pir_reg *iter = CURRENT_SUB(lexer)->registers[type];
@@ -591,6 +600,7 @@ and a new (pasm) register is allocated to it, which is returned.
 int
 color_reg(ARGIN(lexer_state * const lexer), pir_type type, int regno)
 {
+    ASSERT_ARGS(color_reg)
     pir_reg *reg = find_register(lexer, type, regno);
 
     /* was the register already used, then it was already colored by
@@ -661,6 +671,7 @@ void
 store_global_label(ARGIN(lexer_state * const lexer),
         ARGIN(char const * const name))
 {
+    ASSERT_ARGS(store_global_label)
     hashtable    *table = &lexer->globals;
     unsigned long hash  = get_hashcode(name, table->size);
     bucket *b           = new_bucket(lexer);
@@ -686,6 +697,7 @@ global_label *
 find_global_label(ARGIN(lexer_state * const lexer),
         ARGIN(char const * const name))
 {
+    ASSERT_ARGS(find_global_label)
     hashtable    *table    = &lexer->globals;
     unsigned long hashcode = get_hashcode(name, table->size);
     bucket *b              = get_bucket(table, hashcode);
@@ -713,6 +725,7 @@ void
 store_global_constant(ARGIN(lexer_state * const lexer),
         ARGIN(constdecl * const c))
 {
+    ASSERT_ARGS(store_global_constant)
     hashtable    *table  = &lexer->constants;
     unsigned long hash   = get_hashcode(c->name, table->size);
     bucket *b            = new_bucket(lexer);
@@ -737,6 +750,7 @@ constdecl *
 find_global_constant(ARGIN(lexer_state * const lexer),
         ARGIN(char const * const name))
 {
+    ASSERT_ARGS(find_global_constant)
     hashtable    *table    = &lexer->constants;
     unsigned long hashcode = get_hashcode(name, table->size);
     bucket *b              = get_bucket(table, hashcode);
@@ -798,6 +812,7 @@ store_local_label(ARGIN(lexer_state * const lexer),
         ARGIN(char const * const labelname),
         unsigned offset)
 {
+    ASSERT_ARGS(store_local_label)
     local_label  *l     = new_local_label(lexer, labelname, offset);
     hashtable    *table = &CURRENT_SUB(lexer)->labels;
     unsigned long hash  = get_hashcode(labelname, table->size);
@@ -822,6 +837,7 @@ unsigned
 find_local_label(ARGIN(lexer_state * const lexer),
         ARGIN(char const * const labelname))
 {
+    ASSERT_ARGS(find_local_label)
     hashtable    *table    = &CURRENT_SUB(lexer)->labels;
     unsigned long hashcode = get_hashcode(labelname, table->size);
     bucket *b              = get_bucket(table, hashcode);
