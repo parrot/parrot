@@ -179,6 +179,7 @@ has two elements: C<"hi"> and C<42>.
 void
 print_key(ARGIN(lexer_state * const lexer), ARGIN(key * const k))
 {
+    ASSERT_ARGS(print_key)
     key_entry *iter;
 
     fprintf(out, "[");
@@ -211,6 +212,7 @@ printed as well. Examples:
 void
 print_target(ARGIN(lexer_state * const lexer),  ARGIN(target * const t))
 {
+    ASSERT_ARGS(print_target)
     PARROT_ASSERT(t->info);
     fprintf(out, "%c%d", pir_register_types[t->info->type], t->info->color);
 
@@ -233,6 +235,7 @@ void
 print_constant(ARGIN(lexer_state * const lexer),
         ARGIN(constant * const c))
 {
+    ASSERT_ARGS(print_constant)
     switch (c->type) {
       case INT_VAL:
         fprintf(out, "%d", c->val.ival);
@@ -269,6 +272,7 @@ void
 print_expr(ARGIN(lexer_state * const lexer),
         ARGIN(expression * const expr))
 {
+    ASSERT_ARGS(print_expr)
     switch (expr->type) {
       case EXPR_TARGET:
         print_target(lexer, expr->expr.t);
@@ -307,6 +311,7 @@ void
 print_expressions(ARGIN(lexer_state * const lexer),
         ARGIN(expression * const expr))
 {
+    ASSERT_ARGS(print_expressions)
     expression *iter;
 
     if (expr == NULL)
@@ -337,7 +342,7 @@ void
 print_instruction(ARGIN(lexer_state * const lexer),
         ARGIN(instruction * const ins))
 {
-    PARROT_ASSERT(ins != NULL);
+    ASSERT_ARGS(print_instruction)
 
     if (ins->label) {
         if (TEST_FLAG(lexer->flags, LEXER_FLAG_EMIT_PASM))
@@ -374,6 +379,7 @@ void
 print_statement(ARGIN(lexer_state * const lexer),
         ARGIN(subroutine * const sub))
 {
+    ASSERT_ARGS(print_statement)
     instruction *statiter;
 
     if (sub->statements == NULL)
@@ -445,6 +451,7 @@ iterates over all subs and prints their instructions.
 void
 print_subs(struct ARGIN(lexer_state * const lexer))
 {
+    ASSERT_ARGS(print_subs)
     subroutine *subiter;
 
     if (lexer->subs == NULL)
@@ -559,6 +566,7 @@ void
 emit_pir_subs(ARGIN(lexer_state * const lexer),
         ARGIN(char const * const outfile))
 {
+    ASSERT_ARGS(emit_pir_subs)
     subroutine *subiter;
 
     if (lexer->subs == NULL)
@@ -1031,6 +1039,7 @@ void
 emit_pbc(ARGIN(lexer_state * const lexer),
         ARGIN(const char *outfile))
 {
+    ASSERT_ARGS(emit_pbc)
     subroutine *subiter;
 
     if (!outfile)
