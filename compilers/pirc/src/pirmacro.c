@@ -54,6 +54,7 @@ new_macro(ARGIN(macro_table * const table),
         ARGIN(char const * const name), int lineno, int takes_args,
         unsigned initsize)
 {
+    ASSERT_ARGS(new_macro_table)
     macro_def *macro   = (macro_def *)mem_sys_allocate(sizeof (macro_def));
 
     macro->name        = name;
@@ -89,6 +90,7 @@ PARROT_CANNOT_RETURN_NULL
 macro_param *
 new_macro_param(ARGIN(char const * const value))
 {
+    ASSERT_ARGS(new_macro_param)
     macro_param *param = (macro_param *)mem_sys_allocate(sizeof (macro_param));
     param->name        = value;
     param->next        = NULL;
@@ -109,6 +111,7 @@ void
 add_macro_param(ARGIN*macro_def * const macro),
         ARGIN(char const * const name))
 {
+    ASSERT_ARGS(add_macro_param)
     macro_param *param = new_macro_param(name);
     param->next        = macro->parameters;
     macro->parameters  = param;
@@ -131,6 +134,7 @@ new_macro_const(ARGIN(macro_table * const table),
         ARGIN(char const * const name),
         ARGIN(char const * const value), int lineno)
 {
+    ASSERT_ARGS(new_macro_const)
     /* macro constants are just macros, but they have no body; the value is already
      * parsed and allocated in memory.
      */
@@ -182,6 +186,7 @@ Store the character C<c> in C<macro>'s body buffer.
 void
 store_macro_char(ARGIN(macro_def * const macro), char c)
 {
+    ASSERT_ARGS(store_macro_char)
     /* if buffer is full, resize it. */
     check_size(macro, 1);
     *(macro->cursor)++ = c;
@@ -207,6 +212,7 @@ store_macro_string(ARGIN(macro_def * const macro),
         ARGIN(char const * const str),
         ...)
 {
+    ASSERT_ARGS(store_macro_string)
     va_list arg_ptr;
 
 #define MAX_NUM_CHARS_IN_STRING   256
@@ -237,6 +243,7 @@ macro_def *
 find_macro(ARGIN(macro_table * const table),
         ARGIN(char const * const name))
 {
+    ASSERT_ARGS(find_macro)
     macro_def *iter = table->definitions;
 
     PARROT_ASSERT(name != NULL);
@@ -298,6 +305,7 @@ Free resources allocated for the macro_table C<table>.
 void
 delete_macro_table(ARGMOD(macro_table * table))
 {
+    ASSERT_ARGS(delete_macro_table)
     mem_sys_free(table);
 }
 
@@ -315,6 +323,7 @@ void
 declare_macro_local(ARGIN(macro_def * const macro),
         ARGIN(char const * const name))
 {
+    ASSERT_ARGS(declare_macro_local)
     macro_param * param = new_macro_param(name);
     param->next         = macro->macrolocals;
     macro->macrolocals  = param;
@@ -336,6 +345,7 @@ int
 is_macro_local(ARGIN(macro_def * const macro),
         ARGIN(char const * const name))
 {
+    ASSERT_ARGS(is_macro_local)
     macro_param *iter = macro->macrolocals;
 
     while (iter) {
