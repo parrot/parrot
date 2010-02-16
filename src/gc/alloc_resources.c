@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -1140,6 +1140,31 @@ free_pool(ARGMOD(Fixed_Size_Pool *pool))
 
 /*
 
+=item C<static void free_memory_pool(Variable_Size_Pool *pool)>
+
+Frees a memory pool; helper function for C<Parrot_gc_destroy_memory_pools>.
+
+=cut
+
+*/
+
+static void
+free_memory_pool(Variable_Size_Pool *pool)
+{
+    Memory_Block *cur_block = pool->top_block;
+
+    while (cur_block) {
+        Memory_Block * const next_block = cur_block->prev;
+        mem_internal_free(cur_block);
+        cur_block = next_block;
+    }
+
+    mem_internal_free(pool);
+}
+
+
+/*
+
 =item C<void Parrot_gc_destroy_memory_pools(PARROT_INTERP, Memory_Pools * const
 mem_pools)>
 
@@ -1156,24 +1181,9 @@ Parrot_gc_destroy_memory_pools(PARROT_INTERP,
         ARGIN(Memory_Pools * const mem_pools))
 {
     ASSERT_ARGS(Parrot_gc_destroy_memory_pools)
-    int i;
 
-    for (i = 0; i < 2; i++) {
-        Variable_Size_Pool * const pool = i ?
-                mem_pools->constant_string_pool :
-                mem_pools->memory_pool;
-        Memory_Block *cur_block;
-
-        cur_block = pool->top_block;
-
-        while (cur_block) {
-            Memory_Block * const next_block = cur_block->prev;
-            mem_internal_free(cur_block);
-            cur_block = next_block;
-        }
-
-        mem_internal_free(pool);
-    }
+    free_memory_pool(mem_pools->constant_string_pool);
+    free_memory_pool(mem_pools->memory_pool);
 }
 
 /*
