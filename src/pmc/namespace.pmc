@@ -427,6 +427,11 @@ really a public API.
             INTVAL i = 0;
             while (!PMC_IS_NULL(ns) && VTABLE_elements(INTERP, key)) {
                 STRING * const name = VTABLE_get_string_keyed_int(INTERP, key, i);
+                if (name == NULL || name == STRINGNULL) {
+                    ns = PMCNULL;
+                    // TODO: Throw an exception or something?
+                    break;
+                }
                 ns = Parrot_get_namespace_keyed_str(INTERP, ns, name);
                 i++;
             }
