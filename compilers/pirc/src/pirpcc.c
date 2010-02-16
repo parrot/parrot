@@ -199,6 +199,8 @@ mapped to a PASM register, so using negative PIR register is safe.
 */
 static target *
 generate_unique_pir_reg(lexer_state * const lexer, pir_type type) {
+    ASSERT_ARGS(generate_unique_pir_reg)
+
     return new_reg(lexer, type, --lexer->pir_reg_generator);
 }
 
@@ -217,6 +219,8 @@ PBC constant table is returned.
 */
 static int
 generate_signature_pmc(lexer_state * const lexer, unsigned size) {
+    ASSERT_ARGS(generate_signature_pmc)
+
     PMC *fixed_int_array;
     int  array_index;
 
@@ -273,6 +277,8 @@ The alias name is passed in C<alias>.
 */
 static void
 add_alias_operand(lexer_state * const lexer, PMC *array, int index, char const * const alias) {
+    ASSERT_ARGS(add_alias_operand)
+
     PARROT_ASSERT(alias);
     /* set flags for being a string constant, and being a :named operand. */
     VTABLE_set_integer_keyed_int(lexer->interp, array, index, PARROT_ARG_NAME | PARROT_ARG_SC);
@@ -305,6 +311,8 @@ with value "answer".
 */
 static void
 targets_to_operands(lexer_state * const lexer, target * const targets, unsigned num_targets) {
+    ASSERT_ARGS(targets_to_operands)
+
     target  *iter;
     int      array_index;
     PMC     *signature_array;
@@ -377,6 +385,8 @@ at index C<i> encodes the type and flags (such as C<:flat>) for operand C<i>.
 */
 static void
 arguments_to_operands(lexer_state * const lexer, argument * const args, unsigned num_arguments) {
+    ASSERT_ARGS(arguments_to_operands)
+
     argument *argiter;
     int       array_index;
     unsigned  i;
@@ -483,8 +493,9 @@ during compile time.
 static void
 save_global_reference(lexer_state * const lexer, instruction * const instr,
                       char const * const label)
-
 {
+    ASSERT_ARGS(save_global_reference)
+
     global_fixup *ref = pir_mem_allocate_zeroed_typed(lexer, global_fixup);
 
     ref->instr = instr;
@@ -590,6 +601,8 @@ For "foo"() and foo():
 */
 static void
 convert_pcc_call(lexer_state * const lexer, invocation * const inv) {
+    ASSERT_ARGS(convert_pcc_call)
+
     target *sub;
 
     new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc", inv->num_arguments);
@@ -627,6 +640,8 @@ The sequence of instructions is:
 */
 static void
 convert_pcc_tailcall(lexer_state * const lexer, invocation * const inv) {
+    ASSERT_ARGS(convert_pcc_tailcall)
+
     target *sub;
 
     new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc", inv->num_arguments);
@@ -654,6 +669,8 @@ Conventions (PCC). The sequence of instructions is:
 */
 static void
 convert_pcc_return(lexer_state * const lexer, invocation * const inv) {
+    ASSERT_ARGS(convert_pcc_return)
+
     new_sub_instr(lexer, PARROT_OP_set_returns_pc, "set_returns_pc", inv->num_arguments);
     arguments_to_operands(lexer, inv->arguments, inv->num_arguments);
     new_sub_instr(lexer, PARROT_OP_returncc, "returncc", 0);
@@ -676,6 +693,8 @@ Interface (NCI). The sequence of instructions is:
 */
 static void
 convert_nci_call(lexer_state * const lexer, invocation * const inv) {
+    ASSERT_ARGS(convert_nci_call)
+
     target *sub;
 
     new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc", inv->num_arguments);
@@ -706,6 +725,8 @@ The sequence of instructions is:
 */
 static void
 convert_pcc_yield(lexer_state * const lexer, invocation * const inv) {
+    ASSERT_ARGS(convert_pcc_yield)
+
     new_sub_instr(lexer, PARROT_OP_set_returns_pc, "set_returns_pc", inv->num_arguments);
     arguments_to_operands(lexer, inv->arguments, inv->num_arguments);
     new_sub_instr(lexer, PARROT_OP_yield, "yield", 0);
@@ -729,6 +750,8 @@ The sequence of instructions is:
 */
 static void
 convert_pcc_methodcall(lexer_state * const lexer, invocation * const inv) {
+    ASSERT_ARGS(convert_pcc_methodcall)
+
     /* in a methodcall, the invocant object is passed as the first argument */
     unshift_arg(inv, new_argument(lexer, expr_from_target(lexer, inv->sub)));
     new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc", inv->num_arguments);
@@ -759,6 +782,8 @@ The sequence of instructions is:
 */
 static void
 convert_pcc_methodtailcall(lexer_state * const lexer, invocation * const inv) {
+    ASSERT_ARGS(convert_pcc_methodtailcall)
+
     unshift_arg(inv, new_argument(lexer, expr_from_target(lexer, inv->sub)));
     new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc", inv->num_arguments);
 
