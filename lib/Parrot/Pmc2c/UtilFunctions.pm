@@ -173,7 +173,7 @@ EOC
         my $lhs = $info->{flags}{no_init} ? "" : "type$class = ";
         $cout .= <<"EOC";
     whoami = CONST_STRING_GEN(interp, "$class");
-    ${lhs}pmc_register(interp, whoami);
+    ${lhs}Parrot_pmc_register_new_type(interp, whoami);
 EOC
     }
     $cout .= <<"EOC";
