@@ -60,7 +60,7 @@ void Parrot_pmc_destroy(PARROT_INTERP, ARGMOD(PMC *pmc))
         FUNC_MODIFIES(*pmc);
 
 PARROT_EXPORT
-INTVAL PMC_is_null(SHIM_INTERP, ARGIN_NULLOK(const PMC *pmc));
+INTVAL Parrot_pmc_is_null(SHIM_INTERP, ARGIN_NULLOK(const PMC *pmc));
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -158,7 +158,7 @@ PMC * temporary_pmc_new(PARROT_INTERP, INTVAL base_type)
 #define ASSERT_ARGS_Parrot_pmc_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
-#define ASSERT_ARGS_PMC_is_null __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_pmc_is_null __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_pmc_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_pmc_new_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

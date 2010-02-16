@@ -72,7 +72,7 @@ PMC * PMCNULL;
 
 /*
 
-=item C<INTVAL PMC_is_null(PARROT_INTERP, const PMC *pmc)>
+=item C<INTVAL Parrot_pmc_is_null(PARROT_INTERP, const PMC *pmc)>
 
 Tests if the given pmc is null.
 
@@ -82,9 +82,9 @@ Tests if the given pmc is null.
 
 PARROT_EXPORT
 INTVAL
-PMC_is_null(SHIM_INTERP, ARGIN_NULLOK(const PMC *pmc))
+Parrot_pmc_is_null(SHIM_INTERP, ARGIN_NULLOK(const PMC *pmc))
 {
-    ASSERT_ARGS(PMC_is_null)
+    ASSERT_ARGS(Parrot_pmc_is_null)
 #if PARROT_CATCH_NULL
     return pmc == PMCNULL || pmc == NULL;
 #else
