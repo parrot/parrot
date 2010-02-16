@@ -84,13 +84,41 @@ typedef struct linear_scan_register_allocator {
 
 } lsr_allocator;
 
-lsr_allocator *new_linear_scan_register_allocator(struct lexer_state *lexer);
+/* HEADERIZER BEGIN: compilers/pirc/src/pirregalloc.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void destroy_linear_scan_register_allocator(lsr_allocator *lsr);
+void destroy_linear_scan_register_allocator(ARGMOD(lsr_allocator *lsr))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*lsr);
 
-live_interval * new_live_interval(lsr_allocator * const lsr, unsigned firstuse, pir_type type);
+void linear_scan_register_allocation(ARGIN(lsr_allocator * const lsr))
+        __attribute__nonnull__(1);
 
-void linear_scan_register_allocation(lsr_allocator * const lsr);
+PARROT_CAN_RETURN_NULL
+lsr_allocator * new_linear_scan_register_allocator(
+    ARGIN_NULLOK(struct lexer_state *lexer));
+
+PARROT_CAN_RETURN_NULL
+PARROT_MALLOC
+PARROT_WARN_UNUSED_RESULT
+live_interval * new_live_interval(
+    ARGIN(lsr_allocator * const lsr),
+    unsigned firstuse_location,
+    pir_type type)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_destroy_linear_scan_register_allocator \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lsr))
+#define ASSERT_ARGS_linear_scan_register_allocation \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lsr))
+#define ASSERT_ARGS_new_linear_scan_register_allocator \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_new_live_interval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lsr))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: compilers/pirc/src/pirregalloc.c */
 
 #endif /* PARROT_PIR_PIRREGALLOC_H_GUARD */
 

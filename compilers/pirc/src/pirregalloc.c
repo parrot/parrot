@@ -71,7 +71,7 @@ reset_register_count(ARGIN(lsr_allocator * const lsr))
         lsr->r[i] = 1;
 }
 
-/* HEADERIZER HFILE: none */
+/* HEADERIZER HFILE: compilers/pirc/src/pirregalloc.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
