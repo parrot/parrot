@@ -387,7 +387,8 @@ really a public API.
     }
 
     VTABLE PMC *get_pmc_keyed_str(STRING *key) {
-        PMC *ns = (PMC *)parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(), key);
+        Hash * const hash = (Hash *)SELF.get_pointer();
+        PMC *ns = (PMC *)parrot_hash_get(INTERP, hash, key);
 
         if (!ns)
             return PMCNULL;
@@ -400,8 +401,8 @@ really a public API.
     }
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
-        /* PMC    *ns = SUPER(key); */
-        PMC    *ns = INTERP->vtables[enum_class_Hash]->get_pmc_keyed(INTERP, SELF, key);
+        PMC *ns = SUPER(key);
+        //PMC    *ns = INTERP->vtables[enum_class_Hash]->get_pmc_keyed(INTERP, SELF, key);
 
         if (!PMC_IS_NULL(ns))
             return ns;
@@ -422,9 +423,13 @@ really a public API.
 
             return VTABLE_get_pmc_keyed(INTERP, ns, key);
         }
-
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
-            "Invalid namespace key in get_pmc_keyed_str");
+        else {
+            STRING * const name = VTABLE_get_string(INTERP, key);
+            ns = Parrot_get_namespace_keyed_str(INTERP, ns, name);
+            return ns;
+        }
+        //Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
+        //    "Invalid namespace key in get_pmc_keyed_str");
     }
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
