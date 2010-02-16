@@ -52,13 +52,18 @@ void * process_file(void *a);
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void print_help(char const * const program_name);
-static void runcode(PARROT_INTERP, int argc, char *argv[])
+static void print_help(ARGIN(char const * const program_name))
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_print_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+static void runcode(PARROT_INTERP, int argc, ARGIN(char *argv[]))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+#define ASSERT_ARGS_print_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(program_name))
 #define ASSERT_ARGS_runcode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(argv))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -77,7 +82,7 @@ Routine to print usage of this program.
 
 */
 static void
-print_help(char const * const program_name)
+print_help(ARGIN(char const * const program_name))
 {
     fprintf(stderr, "Usage: %s [options] <file>\n", program_name);
     fprintf(stderr, "Options:\n\n"
@@ -130,8 +135,10 @@ temporary function for the thread-testing code.
 Unpack the arguments and invoke parse_file().
 
 */
+PARROT_CAN_RETURN_NULL
 void *
-process_file(void *a) {
+process_file(ARGIN(void *a))
+{
 
 
     /* unpack the arguments from the structure parser_args */
@@ -160,7 +167,8 @@ code segment.
 
 */
 static void
-runcode(PARROT_INTERP, int argc, char *argv[]) {
+runcode(PARROT_INTERP, int argc, ARGIN(char *argv[]))
+{
 
     /* runs :init functions */
     PackFile_fixup_subs(interp, PBC_MAIN, NULL);
@@ -172,8 +180,7 @@ runcode(PARROT_INTERP, int argc, char *argv[]) {
 
 /*
 
-=item C<int
-main(int argc, char *argv[])>
+=item C<int main(int argc, char *argv[])>
 
 Main compiler driver.
 
