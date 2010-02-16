@@ -71,7 +71,7 @@ Creates a copy of the string.
 */
 
     VTABLE PMC *clone() {
-        PMC * const dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_string_native(INTERP, dest, Parrot_str_copy(INTERP, SELF.get_string()));
         return dest;
     }
@@ -436,7 +436,7 @@ Replace the string at C<key> with the chr of C<value>.
     }
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL pos) {
-        PMC * const dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_string_native(INTERP, dest, SELF.get_string_keyed_int(pos));
         return dest;
     }
@@ -511,7 +511,7 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
 */
 
     METHOD to_int(INTVAL base) {
-        PMC *result = pmc_new(INTERP, Parrot_get_ctx_HLL_type(interp,
+        PMC *result = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(interp,
                         enum_class_Integer));
 
         /* TODO verify encoding */
@@ -584,7 +584,7 @@ Return length of the string.
     }
 
     VTABLE PMC *get_iter() {
-        return pmc_new_init(INTERP, enum_class_StringIterator, SELF);
+        return Parrot_pmc_new_init(INTERP, enum_class_StringIterator, SELF);
     }
 
 /*

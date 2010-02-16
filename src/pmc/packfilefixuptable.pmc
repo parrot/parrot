@@ -42,7 +42,7 @@ Create empty PackfileFixupTable.
         Parrot_PackfileFixupTable_attributes * attrs =
                 PMC_data_typed(SELF, Parrot_PackfileFixupTable_attributes*);
 
-        attrs->entries = pmc_new(interp, enum_class_ResizablePMCArray);
+        attrs->entries = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
         PObj_custom_mark_SET(SELF);
     }
@@ -89,7 +89,7 @@ Initialize from PackFile_FixupTable pointer.
 
         for (i = 0; i < table->fixup_count; ++i) {
             val = table->fixups[i];
-            entry = pmc_new(interp, enum_class_PackfileFixupEntry);
+            entry = Parrot_pmc_new(interp, enum_class_PackfileFixupEntry);
             VTABLE_set_pointer(interp, entry, (void*)val);
             VTABLE_set_pmc_keyed_int(interp, attrs->entries, i, entry);
         }

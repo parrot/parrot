@@ -148,7 +148,7 @@ Set pending standard properties in C<prop_hash>.
 static void
 propagate_std_props(PARROT_INTERP, PMC *self, PMC *prop_hash) {
     if (self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG)){
-        PMC * const pmc_true  = pmc_new(interp, enum_class_Integer);
+        PMC * const pmc_true  = Parrot_pmc_new(interp, enum_class_Integer);
         VTABLE_set_integer_native(interp, pmc_true, 1);
         VTABLE_set_pmc_keyed_str(interp, prop_hash, CONST_STRING(interp, "_ro"), pmc_true);
     }
@@ -189,7 +189,7 @@ static PMC*
 check_get_std_props(PARROT_INTERP, PMC *self, STRING *key) {
     if ((self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG))
        && Parrot_str_equal(interp, key, CONST_STRING(interp, "_ro"))) {
-        PMC * const ret_val  = pmc_new(interp, enum_class_Integer);
+        PMC * const ret_val  = Parrot_pmc_new(interp, enum_class_Integer);
         VTABLE_set_integer_native(interp, ret_val, 1);
         return ret_val;
     }
@@ -214,7 +214,7 @@ static PMC*
 make_prop_hash(PARROT_INTERP, PMC *self) {
     PMC *prop;
 
-    PMC_metadata(self) = prop = pmc_new(interp, enum_class_Hash);
+    PMC_metadata(self) = prop = Parrot_pmc_new(interp, enum_class_Hash);
     propagate_std_props(interp, self, prop);
     return prop;
 }
@@ -332,16 +332,16 @@ calls init().
     VTABLE PMC *instantiate(PMC *init) {
         const INTVAL type = VTABLE_type(INTERP, SELF);
 
-        /* Ensure no looping, as pmc_new calls the instantiate vtable entry for
+        /* Ensure no looping, as Parrot_pmc_new calls the instantiate vtable entry for
          * classes. */
         if (PObj_is_class_TEST(SELF))
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
                     "All high-level classes should override instantiate");
 
         if (!PMC_IS_NULL(init))
-            return pmc_new_init(INTERP, type, init);
+            return Parrot_pmc_new_init(INTERP, type, init);
 
-        return pmc_new(INTERP, type);
+        return Parrot_pmc_new(INTERP, type);
     }
 
 /*
@@ -936,7 +936,7 @@ Provides introspection of a specific piece of information about the PMC.
 
     VTABLE PMC *inspect_str(STRING *name) {
         if (Parrot_str_equal(interp, name, CONST_STRING(interp, "flags"))) {
-            PMC *found = pmc_new(interp, enum_class_Integer);
+            PMC *found = Parrot_pmc_new(interp, enum_class_Integer);
             VTABLE_set_integer_native(interp, found,
                     (INTVAL)PObj_get_FLAGS(SELF));
             return found;
@@ -960,7 +960,7 @@ inspect_str.
 
 */
     VTABLE PMC *inspect() {
-        PMC    *metadata           = pmc_new(interp, enum_class_Hash);
+        PMC    *metadata           = Parrot_pmc_new(interp, enum_class_Hash);
         STRING * const flags_str   = CONST_STRING(interp, "flags");
 
         VTABLE_set_pmc_keyed_str(interp, metadata, flags_str,
@@ -987,9 +987,9 @@ Returns SELF. A PMC is its own class.
 
         if (PMC_IS_NULL(_class)) {
             INTVAL type      = VTABLE_type(interp, SELF);
-            PMC   *type_num  = pmc_new(interp, enum_class_Integer);
+            PMC   *type_num  = Parrot_pmc_new(interp, enum_class_Integer);
             VTABLE_set_integer_native(interp, type_num, type);
-            return pmc_new_init(interp, enum_class_PMCProxy, type_num);
+            return Parrot_pmc_new_init(interp, enum_class_PMCProxy, type_num);
         }
 
         return _class;
@@ -1158,7 +1158,7 @@ Default fallback. Performs a multiple dispatch call for 'add_float'.
 */
 
     VTABLE PMC *add_float(FLOATVAL value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
                 SELF.get_number() + value);

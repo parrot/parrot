@@ -76,7 +76,7 @@ Creates and returns a copy of the array.
     VTABLE PMC *clone() {
 
         STRING    **my_str_array, **dest_str_array;
-        PMC        *const dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC        *const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         GET_ATTR_str_array(INTERP, SELF, my_str_array);
 
@@ -150,7 +150,7 @@ Gets an iterator for the array.
 
 */
     VTABLE PMC *get_iter() {
-        return pmc_new_init(INTERP, enum_class_ArrayIterator, SELF);
+        return Parrot_pmc_new_init(INTERP, enum_class_ArrayIterator, SELF);
     }
 
 /*
@@ -296,7 +296,7 @@ Returns the PMC value of the element at index C<key>.
 */
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
-        PMC    * const ret = pmc_new(INTERP, enum_class_String);
+        PMC    * const ret = Parrot_pmc_new(INTERP, enum_class_String);
         STRING * const val = SELF.get_string_keyed_int(key);
 
         VTABLE_set_string_native(INTERP, ret, val);

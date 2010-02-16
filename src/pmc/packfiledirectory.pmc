@@ -42,7 +42,7 @@ Initialize PackfileDirectory.
         Parrot_PackfileDirectory_attributes * attrs =
                 PMC_data_typed(SELF, Parrot_PackfileDirectory_attributes*);
 
-        attrs->hash = pmc_new(interp, enum_class_Hash);
+        attrs->hash = Parrot_pmc_new(interp, enum_class_Hash);
 
         PObj_custom_mark_SET(SELF);
     }
@@ -110,7 +110,7 @@ Initialize PackfileDirectory from PackFile_Directory.
                 break;
             }
 
-            segment = pmc_new(interp, pmc_type);
+            segment = Parrot_pmc_new(interp, pmc_type);
             name    = pfseg->name;
             VTABLE_set_pmc_keyed_str(interp, SELF, name, segment);
 

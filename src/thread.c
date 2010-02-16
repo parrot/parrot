@@ -188,7 +188,7 @@ make_local_copy(PARROT_INTERP, ARGIN(Parrot_Interp from), ARGIN(PMC *arg))
     else if (VTABLE_isa(from, arg, _multi_sub)) {
         INTVAL i = 0;
         const INTVAL n = VTABLE_elements(from, arg);
-        ret_val  = pmc_new(interp, enum_class_MultiSub);
+        ret_val  = Parrot_pmc_new(interp, enum_class_MultiSub);
 
         for (i = 0; i < n; ++i) {
             PMC *const orig = VTABLE_get_pmc_keyed_int(from, arg, i);
@@ -288,7 +288,7 @@ make_local_args_copy(PARROT_INTERP, ARGIN(Parrot_Interp old_interp), ARGIN_NULLO
     old_size = VTABLE_get_integer(old_interp, args);
 
     /* XXX should this be a different type? */
-    ret_val = pmc_new(interp, enum_class_FixedPMCArray);
+    ret_val = Parrot_pmc_new(interp, enum_class_FixedPMCArray);
     VTABLE_set_integer_native(interp, ret_val, old_size);
 
     for (i = 0; i < old_size; ++i) {
@@ -620,7 +620,7 @@ pt_ns_clone(PARROT_INTERP, ARGOUT(Parrot_Interp d), ARGOUT(PMC *dest_ns),
             PMC *sub_ns = VTABLE_get_pmc_keyed_str(d, dest_ns, key);
             if (PMC_IS_NULL(sub_ns) || sub_ns->vtable->base_type !=
                     enum_class_NameSpace) {
-                sub_ns = pmc_new(d, enum_class_NameSpace);
+                sub_ns = Parrot_pmc_new(d, enum_class_NameSpace);
                 VTABLE_set_pmc_keyed_str(d, dest_ns, key, sub_ns);
             }
             pt_ns_clone(s, d, sub_ns, s, val);
@@ -752,7 +752,7 @@ pt_thread_run(PARROT_INTERP, ARGOUT(PMC *dest_interp), ARGIN(PMC *sub), ARGIN_NU
      * XXX FIXME move this elsewhere? at least the set_pmc_keyed_int
      */
     old_dest_interp = dest_interp;
-    dest_interp     = pmc_new_noinit(interpreter, enum_class_ParrotThread);
+    dest_interp     = Parrot_pmc_new_noinit(interpreter, enum_class_ParrotThread);
 
     /* so it's not accidentally deleted */
     VTABLE_set_pointer(interp, old_dest_interp, NULL);

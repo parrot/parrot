@@ -686,7 +686,7 @@ optimize_instr(lexer_state * const lexer, instruction * const instr) {
 
             /* the last operand, which is the second in this case */
             expression *second_operand = instr->operands;
-            PMC *intconst = pmc_new(lexer->interp,
+            PMC *intconst = Parrot_pmc_new(lexer->interp,
                                     Parrot_get_ctx_HLL_type(lexer->interp, enum_class_Integer));
             int index     = add_pmc_const(lexer->bc, intconst);
             VTABLE_set_integer_native(lexer->interp, intconst, second_operand->expr.c->val.ival);
@@ -703,7 +703,7 @@ optimize_instr(lexer_state * const lexer, instruction * const instr) {
 
             /* the last operand, which is the second in this case */
             expression *second_operand = instr->operands;
-            PMC *numconst = pmc_new(lexer->interp,
+            PMC *numconst = Parrot_pmc_new(lexer->interp,
                                     Parrot_get_ctx_HLL_type(lexer->interp, enum_class_Float));
             int index     = add_pmc_const(lexer->bc, numconst);
             VTABLE_set_number_native(lexer->interp, numconst, second_operand->expr.c->val.nval);
@@ -721,7 +721,7 @@ optimize_instr(lexer_state * const lexer, instruction * const instr) {
 
             /* the last operand, which is the second in this case */
             expression *second_operand = instr->operands;
-            PMC *strconst = pmc_new(lexer->interp,
+            PMC *strconst = Parrot_pmc_new(lexer->interp,
                                     Parrot_get_ctx_HLL_type(lexer->interp, enum_class_String));
             int index     = add_pmc_const(lexer->bc, strconst);
 

@@ -104,7 +104,7 @@ parrot_set_config_hash_interpreter(PARROT_INTERP)
         config_hash = Parrot_thaw(interp, config_string);
     }
     else {
-        config_hash = pmc_new(interp, enum_class_Hash);
+        config_hash = Parrot_pmc_new(interp, enum_class_Hash);
     }
 
     VTABLE_set_pmc_keyed_int(interp, iglobals,
@@ -172,7 +172,7 @@ init_world(PARROT_INTERP)
     VTABLE_set_pmc_keyed_int(interp, iglobals,
             (INTVAL)IGLOBALS_CLASSNAME_HASH, interp->class_hash);
 
-    self           = pmc_new_noinit(interp, enum_class_ParrotInterpreter);
+    self           = Parrot_pmc_new_noinit(interp, enum_class_ParrotInterpreter);
     VTABLE_set_pointer(interp, self, interp);
     /* PMC_data(self) = interp; */
 
@@ -185,10 +185,10 @@ init_world(PARROT_INTERP)
     parrot_init_library_paths(interp);
 
     /* load_bytecode and dynlib loaded hash */
-    pmc = pmc_new(interp, enum_class_Hash);
+    pmc = Parrot_pmc_new(interp, enum_class_Hash);
     VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_PBC_LIBS, pmc);
 
-    pmc = pmc_new(interp, enum_class_Hash);
+    pmc = Parrot_pmc_new(interp, enum_class_Hash);
     VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_DYN_LIBS, pmc);
 }
 
@@ -212,18 +212,18 @@ parrot_global_setup_2(PARROT_INTERP)
     create_initial_context(interp);
 
     /* create the namespace root stash */
-    interp->root_namespace = pmc_new(interp, enum_class_NameSpace);
+    interp->root_namespace = Parrot_pmc_new(interp, enum_class_NameSpace);
     Parrot_init_HLL(interp);
 
     Parrot_pcc_set_namespace(interp, CURRENT_CONTEXT(interp),
         VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace, 0));
 
     /* We need a class hash */
-    interp->class_hash = classname_hash = pmc_new(interp, enum_class_NameSpace);
+    interp->class_hash = classname_hash = Parrot_pmc_new(interp, enum_class_NameSpace);
     Parrot_register_core_pmcs(interp, classname_hash);
 
     /* init the interpreter globals array */
-    iglobals         = pmc_new(interp, enum_class_FixedPMCArray);
+    iglobals         = Parrot_pmc_new(interp, enum_class_FixedPMCArray);
     interp->iglobals = iglobals;
     VTABLE_set_integer_native(interp, iglobals, (INTVAL)IGLOBALS_SIZE);
 

@@ -148,7 +148,7 @@ visit_todo_list_thaw(PARROT_INTERP, SHIM(PMC* pmc_not_used), ARGIN(PMC* info))
             if (type <= 0 || type > interp->n_vtable_max)
                 Parrot_ex_throw_from_c_args(interp, NULL, 1, "Unknown PMC type to thaw %d", type);
 
-            pmc = pmc_new_noinit(interp, type);
+            pmc = Parrot_pmc_new_noinit(interp, type);
             VTABLE_thaw(interp, pmc, info);
 
             {
@@ -290,7 +290,7 @@ Initializes the PMC.
     VTABLE void init() {
         PARROT_IMAGEIO(SELF)->thaw_ptr    = NULL;
         PARROT_IMAGEIO(SELF)->buffer      = NULL;
-        PARROT_IMAGEIO(SELF)->todo        = pmc_new(INTERP, enum_class_ResizablePMCArray);
+        PARROT_IMAGEIO(SELF)->todo        = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
         PARROT_IMAGEIO(SELF)->seen        = PMCNULL;
         PARROT_IMAGEIO(SELF)->id_list     = PMCNULL;
         PARROT_IMAGEIO(SELF)->id          = 0;
@@ -533,7 +533,7 @@ Removes and returns a reference to a pmc from the start of the image.
                 PARROT_IMAGEIO(SELF)->pf->header, PACKFILE_HEADER_BYTES);
             INC_VISIT_CURSOR(SELF, header_length);
 
-            PARROT_IMAGEIO(SELF)->seen = pmc_new(INTERP, enum_class_Hash);
+            PARROT_IMAGEIO(SELF)->seen = Parrot_pmc_new(INTERP, enum_class_Hash);
             VTABLE_set_pointer(INTERP, PARROT_IMAGEIO(SELF)->seen,
                 parrot_new_intval_hash(INTERP));
 
@@ -547,7 +547,7 @@ Removes and returns a reference to a pmc from the start of the image.
             PARROT_IMAGEIO(SELF)->what          = VISIT_THAW_NORMAL;
             PARROT_IMAGEIO(SELF)->visit_pmc_now = visit_todo_list_thaw;
             PARROT_IMAGEIO(SELF)->buffer        = (Buffer *)image;
-            PARROT_IMAGEIO(SELF)->id_list       = pmc_new(INTERP, enum_class_ResizablePMCArray);
+            PARROT_IMAGEIO(SELF)->id_list       = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
 
             PARROT_ASSERT(image->_bufstart == image->strstart);
 

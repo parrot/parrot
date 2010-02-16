@@ -67,7 +67,7 @@ Creates and returns a clone of the pointer.
 */
 
     VTABLE PMC *clone() {
-        PMC * const dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PMC * const dest = Parrot_pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_SET(dest);
         PMC_data(dest) = PMC_data(SELF);
         return dest;

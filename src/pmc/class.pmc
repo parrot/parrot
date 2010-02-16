@@ -106,7 +106,7 @@ cache_class_attribs(PARROT_INTERP, PMC *cur_class, PMC *attrib_index,
     /* Build a string representing the fully qualified class name. */
     /* Retrieve the fully qualified class name for the class. */
     STRING       * const fq_class    = VTABLE_get_string(interp, cur_class);
-    PMC          * const class_cache = pmc_new(interp, enum_class_Hash);
+    PMC          * const class_cache = Parrot_pmc_new(interp, enum_class_Hash);
     VTABLE_set_pmc_keyed_str(interp, cache, fq_class, class_cache);
 
     /* Iterate over the attributes. */
@@ -138,8 +138,8 @@ build_attrib_index(PARROT_INTERP, PMC *self)
 {
     Parrot_Class_attributes * const _class      = PARROT_CLASS(self);
     int                  cur_index    = 0;
-    PMC * const          attrib_index = pmc_new(interp, enum_class_Hash);
-    PMC * const          cache        = pmc_new(interp, enum_class_Hash);
+    PMC * const          attrib_index = Parrot_pmc_new(interp, enum_class_Hash);
+    PMC * const          cache        = Parrot_pmc_new(interp, enum_class_Hash);
     const int            num_classes  = VTABLE_elements(interp, _class->all_parents);
     int                  i;
 
@@ -344,7 +344,7 @@ initialize_parents(PARROT_INTERP, PMC *object, PMC *all_parents)
 
         if (!PMC_IS_NULL(meth)) {
             /* build an empty signature; it has an invocant but no args/retvals */
-            PMC * const sig_obj = pmc_new(interp, enum_class_CallContext);
+            PMC * const sig_obj = Parrot_pmc_new(interp, enum_class_CallContext);
             /* preserve current_object */
             PMC * const old_object = interp->current_object;
             VTABLE_set_string_native(interp, sig_obj, CONST_STRING(interp, "Pi->"));
@@ -504,18 +504,18 @@ arguments. The class is attached to the current HLL namespace.
         /* Set up the object. */
         _class->name            = CONST_STRING(interp, "");
         _class->_namespace      = PMCNULL;
-        _class->parents         = pmc_new(interp, enum_class_ResizablePMCArray);
-        _class->all_parents     = pmc_new(interp, enum_class_ResizablePMCArray);
-        _class->roles           = pmc_new(interp, enum_class_ResizablePMCArray);
-        _class->methods         = pmc_new(interp, enum_class_Hash);
-        _class->attrib_metadata = pmc_new(interp, enum_class_Hash);
+        _class->parents         = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        _class->all_parents     = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        _class->roles           = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        _class->methods         = Parrot_pmc_new(interp, enum_class_Hash);
+        _class->attrib_metadata = Parrot_pmc_new(interp, enum_class_Hash);
         _class->attrib_index    = PMCNULL;
         _class->attrib_cache    = PMCNULL;
         _class->meth_cache      = PMCNULL;
-        _class->resolve_method  = pmc_new(interp, enum_class_ResizablePMCArray);
+        _class->resolve_method  = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
-        _class->vtable_overrides = pmc_new(interp, enum_class_Hash);
-        _class->parent_overrides = pmc_new(interp, enum_class_Hash);
+        _class->vtable_overrides = Parrot_pmc_new(interp, enum_class_Hash);
+        _class->parent_overrides = Parrot_pmc_new(interp, enum_class_Hash);
 
         /* We put ourself on the all parents list. */
         VTABLE_push_pmc(interp, _class->all_parents, SELF);
@@ -542,7 +542,7 @@ arguments. The class is attached to the current HLL namespace.
           case enum_class_ResizableStringArray:
           case enum_class_NameSpace:
             /* set only the name property */
-            arg = pmc_new(interp, enum_class_Hash);
+            arg = Parrot_pmc_new(interp, enum_class_Hash);
             VTABLE_set_pmc_keyed_str(interp, arg, name_str, init_data);
             break;
 
@@ -556,7 +556,7 @@ arguments. The class is attached to the current HLL namespace.
              || VTABLE_isa(interp, init_data, CONST_STRING(interp, "Key"))
              || VTABLE_isa(interp, init_data, CONST_STRING(interp, "ResizableStringArray"))) {
                 /* set only the name property */
-                arg = pmc_new(interp, enum_class_Hash);
+                arg = Parrot_pmc_new(interp, enum_class_Hash);
                 VTABLE_set_pmc_keyed_str(interp, arg, name_str, init_data);
             }
 
@@ -631,7 +631,7 @@ Returns an error if an attribute of C<name> already exists.
 
     VTABLE void add_attribute(STRING *name, PMC *type) {
         Parrot_Class_attributes * const _class        = PARROT_CLASS(SELF);
-        PMC          * const new_attribute = pmc_new(interp, enum_class_Hash);
+        PMC          * const new_attribute = Parrot_pmc_new(interp, enum_class_Hash);
 
         /* If we've been instantiated already, not allowed. */
         if (_class->instantiated)
@@ -960,11 +960,11 @@ Array of Class PMCs representing the direct parents of this class.
             found = _class->parents;
         }
         else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "name"))) {
-            found = pmc_new(interp, enum_class_String);
+            found = Parrot_pmc_new(interp, enum_class_String);
             VTABLE_set_string_native(interp, found, _class->name);
         }
         else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "id"))) {
-            found = pmc_new(interp, enum_class_Integer);
+            found = Parrot_pmc_new(interp, enum_class_Integer);
             VTABLE_set_integer_native(interp, found, _class->id);
         }
         else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "namespace"))) {
@@ -987,7 +987,7 @@ Array of Class PMCs representing the direct parents of this class.
             found = _class->roles;
         }
         else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "flags"))) {
-            found = pmc_new(interp, enum_class_Integer);
+            found = Parrot_pmc_new(interp, enum_class_Integer);
             VTABLE_set_integer_native(interp, found,
                 (INTVAL)PObj_get_FLAGS(SELF));
         }
@@ -1002,7 +1002,7 @@ Array of Class PMCs representing the direct parents of this class.
         if (found->vtable->base_type == enum_class_Hash) {
             /* for Hash return values, create and return a shallow
              * clone because the VTABLE_clone does a deep clone */
-            PMC * const hash  = pmc_new(interp, enum_class_Hash);
+            PMC * const hash  = Parrot_pmc_new(interp, enum_class_Hash);
             PMC * const iter  = VTABLE_get_iter(interp, found);
             while (VTABLE_get_bool(interp, iter)) {
                 STRING * const key   = VTABLE_shift_string(interp, iter);
@@ -1029,7 +1029,7 @@ inspect_str.
     VTABLE PMC *inspect() {
         /* Create a hash, then use inspect_str to get all of the data to
          * fill it up with. */
-        PMC    * const metadata    = pmc_new(interp, enum_class_Hash);
+        PMC    * const metadata    = Parrot_pmc_new(interp, enum_class_Hash);
         STRING * const name_str    = CONST_STRING(interp, "name");
         STRING * const ns_str      = CONST_STRING(interp, "namespace");
         STRING * const attrs_str   = CONST_STRING(interp, "attributes");
@@ -1191,7 +1191,7 @@ Creates a new PMC object of the type of the class and calls init().
         _class->instantiated = 1;
 
         /* Create object. */
-        object = pmc_new_noinit(interp, enum_class_Object);
+        object = Parrot_pmc_new_noinit(interp, enum_class_Object);
 
         /* Set custom GC mark and destroy on the object. */
         PObj_custom_mark_destroy_SETALL(object);
@@ -1207,7 +1207,7 @@ Creates a new PMC object of the type of the class and calls init().
             Parrot_Object_attributes * const objattr =
                 PMC_data_typed(object, Parrot_Object_attributes *);
             objattr->_class       = SELF;
-            objattr->attrib_store = pmc_new(interp, enum_class_ResizablePMCArray);
+            objattr->attrib_store = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
         }
 
         if (!PMC_IS_NULL(init)) {
@@ -1537,7 +1537,7 @@ Used to unarchive the class.
 
 This is just a temporary hack. Type ID numbers shouldn't be externally
 visible to the average PIR user. However, we need this for now to interface
-with functions like pmc_new and pmc_reuse, which take type ID numbers still.
+with functions like Parrot_pmc_new and pmc_reuse, which take type ID numbers still.
 
 =cut
 
@@ -1563,7 +1563,7 @@ Called after the class has been thawed.
 
         /* Recalculate full MRO from thawed parents */
         _class->all_parents         = Parrot_ComputeMRO_C3(interp, SELF);
-        _class->parent_overrides    = pmc_new(interp, enum_class_Hash);
+        _class->parent_overrides    = Parrot_pmc_new(interp, enum_class_Hash);
 
         /* Rebuild attribute index from thawed attribute metadata */
         build_attrib_index(interp, SELF);
@@ -1591,7 +1591,7 @@ Sets the name of the class, and updates the namespace accordingly.
         if (has_name) {
             /* We'll build a hash just containing the name, then give this to
              * init_class_from_hash - saves some code duplication. */
-            PMC    * const naming_hash = pmc_new(interp, enum_class_Hash);
+            PMC    * const naming_hash = Parrot_pmc_new(interp, enum_class_Hash);
             STRING * const name_str    = CONST_STRING(interp, "name");
 
             VTABLE_set_string_keyed_str(interp, naming_hash, name_str, name);

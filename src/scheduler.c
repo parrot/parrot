@@ -79,7 +79,7 @@ Parrot_cx_init_scheduler(PARROT_INTERP)
         /* Add the very first interpreter to the list of interps. */
         pt_add_to_interpreters(interp, NULL);
 
-        scheduler = pmc_new(interp, enum_class_Scheduler);
+        scheduler = Parrot_pmc_new(interp, enum_class_Scheduler);
         scheduler = VTABLE_share_ro(interp, scheduler);
 
         interp->scheduler = scheduler;
@@ -290,7 +290,7 @@ Parrot_cx_schedule_timer(PARROT_INTERP,
         INTVAL repeat, ARGIN_NULLOK(PMC *sub))
 {
     ASSERT_ARGS(Parrot_cx_schedule_timer)
-    PMC * const timer = pmc_new(interp, enum_class_Timer);
+    PMC * const timer = Parrot_pmc_new(interp, enum_class_Timer);
 
     VTABLE_set_number_keyed_int(interp, timer, PARROT_TIMER_NSEC, duration);
     VTABLE_set_number_keyed_int(interp, timer, PARROT_TIMER_INTERVAL, interval);
@@ -356,7 +356,7 @@ Parrot_cx_schedule_callback(PARROT_INTERP,
         ARGIN(PMC *user_data), ARGIN(char *ext_data))
 {
     ASSERT_ARGS(Parrot_cx_schedule_callback)
-    PMC *callback = pmc_new(interp, enum_class_Task);
+    PMC *callback = Parrot_pmc_new(interp, enum_class_Task);
     Parrot_Task_attributes * const task_struct = PARROT_TASK(callback);
 
     task_struct->type    = CONST_STRING(interp, "callback");
@@ -483,7 +483,7 @@ Parrot_cx_add_handler_local(PARROT_INTERP, ARGIN(PMC *handler))
 {
     ASSERT_ARGS(Parrot_cx_add_handler_local)
     if (PMC_IS_NULL(Parrot_pcc_get_handlers(interp, interp->ctx)))
-        Parrot_pcc_set_handlers(interp, interp->ctx, pmc_new(interp, enum_class_ResizablePMCArray));
+        Parrot_pcc_set_handlers(interp, interp->ctx, Parrot_pmc_new(interp, enum_class_ResizablePMCArray));
 
     VTABLE_unshift_pmc(interp, Parrot_pcc_get_handlers(interp, interp->ctx), handler);
 
@@ -730,7 +730,7 @@ Parrot_cx_send_message(PARROT_INTERP, ARGIN(STRING *messagetype), SHIM(PMC *payl
     ASSERT_ARGS(Parrot_cx_send_message)
     if (interp->scheduler) {
         Parrot_Scheduler_attributes * sched_struct = PARROT_SCHEDULER(interp->scheduler);
-        PMC *message = pmc_new(interp, enum_class_SchedulerMessage);
+        PMC *message = Parrot_pmc_new(interp, enum_class_SchedulerMessage);
         VTABLE_set_string_native(interp, message, messagetype);
         message = VTABLE_share_ro(interp, message);
 

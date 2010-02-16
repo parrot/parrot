@@ -703,7 +703,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
          *
          * TODO if a sub was denoted :main return that instead
          */
-        sub                  = pmc_new(interp, enum_class_Eval);
+        sub                  = Parrot_pmc_new(interp, enum_class_Eval);
         PMC_get_sub(interp, sub, sub_data);
         sub_data->seg        = new_cs;
         sub_data->start_offs = 0;

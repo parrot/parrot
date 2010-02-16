@@ -945,7 +945,7 @@ Parrot_PMC_new(PARROT_INTERP, Parrot_Int type)
     ASSERT_ARGS(Parrot_PMC_new)
     Parrot_PMC newpmc;
     PARROT_CALLIN_START(interp);
-    newpmc = pmc_new_noinit(interp, type);
+    newpmc = Parrot_pmc_new_noinit(interp, type);
     VTABLE_init(interp, newpmc);
     PARROT_CALLIN_END(interp);
     return newpmc;
@@ -1473,7 +1473,7 @@ Parrot_sub_new_from_c_func(PARROT_INTERP,
     ASSERT_ARGS(Parrot_sub_new_from_c_func)
     Parrot_String sig = Parrot_new_string(interp, signature, strlen(signature),
         (char *) NULL, 0);
-    Parrot_PMC sub = pmc_new(interp, enum_class_NCI);
+    Parrot_PMC sub = Parrot_pmc_new(interp, enum_class_NCI);
     VTABLE_set_pointer_keyed_str(interp, sub, sig, F2DPTR(func));
     PObj_get_FLAGS(sub) |= PObj_private1_FLAG;
     return sub;
@@ -1497,7 +1497,7 @@ Parrot_PMC_newclass(PARROT_INTERP, Parrot_PMC classtype)
     Parrot_PMC result;
     PARROT_CALLIN_START(interp);
 
-    result = pmc_new_init(interp, enum_class_Class, classtype);
+    result = Parrot_pmc_new_init(interp, enum_class_Class, classtype);
 
     PARROT_CALLIN_END(interp);
     return result;

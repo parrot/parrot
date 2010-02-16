@@ -269,15 +269,15 @@ autobox_pmc(PARROT_INTERP, Pcc_cell *cell)
 
     switch (CELL_TYPE_MASK(cell)) {
       case INTCELL:
-        result = pmc_new(interp, HLL_TYPE(enum_class_Integer));
+        result = Parrot_pmc_new(interp, HLL_TYPE(enum_class_Integer));
         VTABLE_set_integer_native(interp, result, CELL_INT(cell));
         break;
       case FLOATCELL:
-        result = pmc_new(interp, HLL_TYPE(enum_class_Float));
+        result = Parrot_pmc_new(interp, HLL_TYPE(enum_class_Float));
         VTABLE_set_number_native(interp, result, CELL_FLOAT(cell));
         break;
       case STRINGCELL:
-        result = pmc_new(interp, HLL_TYPE(enum_class_String));
+        result = Parrot_pmc_new(interp, HLL_TYPE(enum_class_String));
         VTABLE_set_string_native(interp, result, CELL_STRING(cell));
         break;
       case PMCCELL:
@@ -363,7 +363,7 @@ get_named_names(PARROT_INTERP, ARGIN(PMC *SELF))
     /* yes, this *looks* risky, but it's a Parrot STRING hash internally */
     if (hash && hash->entries) {
         UINTVAL i, j = 0;
-        result  = pmc_new(interp, enum_class_FixedStringArray);
+        result  = Parrot_pmc_new(interp, enum_class_FixedStringArray);
         VTABLE_set_integer_native(interp, result, hash->entries);
 
         for (i = 0; i <= hash->mask; i++) {
@@ -1407,7 +1407,7 @@ Creates and returns a clone of the signature.
         Pcc_cell    *cell;
         STRING      *short_sig;
         PMC         *type_tuple, *arg_flags, *return_flags;
-        PMC * const dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         GET_ATTR_positionals(INTERP, SELF, cell);
 
@@ -1489,13 +1489,13 @@ sub, or for the point of the call a level deeper for the rest.
 */
 
     METHOD backtrace(PMC *resume :optional, INTVAL has_resume :opt_flag) {
-        PMC *result  = pmc_new(interp, enum_class_ResizablePMCArray);
+        PMC *result  = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
         PMC *cur_ctx = SELF;
         Parrot_Continuation_attributes *cont = has_resume ? PMC_cont(resume) : NULL;
 
         /* Get starting context, then loop over them. */
         while (cur_ctx) {
-            PMC        *frame       = pmc_new(interp, enum_class_Hash);
+            PMC        *frame       = Parrot_pmc_new(interp, enum_class_Hash);
             PMC        *annotations = NULL;
             Parrot_Sub_attributes *sub;
 
@@ -1524,7 +1524,7 @@ sub, or for the point of the call a level deeper for the rest.
             }
 
             if (!annotations)
-                annotations = pmc_new(interp, enum_class_Hash);
+                annotations = Parrot_pmc_new(interp, enum_class_Hash);
 
             VTABLE_set_pmc_keyed_str(interp, frame, CONST_STRING(interp, "annotations"), annotations);
 

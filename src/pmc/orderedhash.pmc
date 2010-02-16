@@ -80,7 +80,7 @@ Overall design heavily inspired by C<Tie::StoredOrderHash>.
 /* Create new stored item. FixedPMCArray of (key, value, prev, next). */
 static PMC*
 create_item(PARROT_INTERP, ARGIN(PMC *key), ARGIN(PMC *value)) {
-    PMC *ret = pmc_new(interp, enum_class_FixedPMCArray);
+    PMC *ret = Parrot_pmc_new(interp, enum_class_FixedPMCArray);
     VTABLE_set_integer_native(interp, ret, ORDERED_HASH_ITEM_MAX);
 
     VTABLE_set_pmc_keyed_int(interp, ret, ORDERED_HASH_ITEM_KEY, key);
@@ -130,7 +130,7 @@ find_bounds(PARROT_INTERP, PMC *pmc_hash, PMC **first, PMC **last) {
 /* Helpers for boxing values */
 static PMC*
 box_string(PARROT_INTERP, STRING *str) {
-    PMC * const ret = pmc_new(interp, Parrot_get_ctx_HLL_type(interp,
+    PMC * const ret = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp,
                 enum_class_String));
     VTABLE_set_string_native(interp, ret, str);
     return ret;
@@ -138,7 +138,7 @@ box_string(PARROT_INTERP, STRING *str) {
 
 static PMC*
 box_integer(PARROT_INTERP, INTVAL val) {
-    PMC * const ret = pmc_new(interp, Parrot_get_ctx_HLL_type(interp,
+    PMC * const ret = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp,
                 enum_class_Integer));
     VTABLE_set_integer_native(interp, ret, val);
     return ret;
@@ -146,7 +146,7 @@ box_integer(PARROT_INTERP, INTVAL val) {
 
 static PMC*
 box_number(PARROT_INTERP, FLOATVAL val) {
-    PMC * const ret = pmc_new(interp, Parrot_get_ctx_HLL_type(interp,
+    PMC * const ret = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp,
                 enum_class_Float));
     VTABLE_set_number_native(interp, ret, val);
     return ret;
@@ -173,7 +173,7 @@ Create new instance of OrderedHash.
                 mem_allocate_zeroed_typed(Parrot_OrderedHash_attributes);
 
         PMC_data(SELF)  = attrs;
-        attrs->hash     = pmc_new(INTERP, enum_class_Hash);
+        attrs->hash     = Parrot_pmc_new(INTERP, enum_class_Hash);
         attrs->first    = PMCNULL;
         attrs->last     = PMCNULL;
 
@@ -211,7 +211,7 @@ Return a new iterator
 */
 
     VTABLE PMC *get_iter() {
-        return pmc_new_init(INTERP, enum_class_OrderedHashIterator, SELF);
+        return Parrot_pmc_new_init(INTERP, enum_class_OrderedHashIterator, SELF);
     }
 
 /*
@@ -269,7 +269,7 @@ Main set function.
         }
 
         /* Create new entry */
-        list_entry = pmc_new(INTERP, enum_class_FixedPMCArray);
+        list_entry = Parrot_pmc_new(INTERP, enum_class_FixedPMCArray);
         VTABLE_set_integer_native(INTERP, list_entry, ORDERED_HASH_ITEM_MAX);
         VTABLE_set_pmc_keyed_int(INTERP, list_entry, ORDERED_HASH_ITEM_VALUE, value);
         VTABLE_set_pmc_keyed_int(INTERP, list_entry, ORDERED_HASH_ITEM_KEY, key);
@@ -337,7 +337,7 @@ Sets the PMC value of the element at index C<key> to C<val>.
         /* Now we have chicken and egg problem during freeze/thaw */
         /* When we try to thaw OrderedHash which stores HLL mapping */
         /* Reported by François Perrad */
-        PMC *pkey = pmc_new(INTERP, enum_class_String);
+        PMC *pkey = Parrot_pmc_new(INTERP, enum_class_String);
         VTABLE_set_string_native(INTERP, pkey, key);
         VTABLE_set_pmc_keyed(INTERP, SELF, pkey, value);
     }
@@ -392,7 +392,7 @@ Sets the PMC value of the element at index C<key> to C<val>.
     }
 
     VTABLE PMC *get_pmc_keyed_str(STRING *key) {
-        PMC *pkey = pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_String));
+        PMC *pkey = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_String));
         VTABLE_set_string_native(INTERP, pkey, key);
         return STATICSELF.get_pmc_keyed(pkey);
     }
@@ -506,21 +506,21 @@ The created key = "\1idx".
     }
 
     VTABLE void set_integer_keyed_int(INTVAL idx, INTVAL value) {
-        PMC * const v = pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+        PMC * const v = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
                     enum_class_Integer));
         VTABLE_set_integer_native(INTERP, v, value);
         SELF.set_pmc_keyed_int(idx, v);
     }
 
     VTABLE void set_number_keyed_int(INTVAL idx, FLOATVAL value) {
-        PMC * const v = pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+        PMC * const v = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
                     enum_class_Float));
         VTABLE_set_number_native(INTERP, v, value);
         SELF.set_pmc_keyed_int(idx, v);
     }
 
     VTABLE void set_string_keyed_int(INTVAL idx, STRING *value) {
-        PMC * const v = pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+        PMC * const v = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
                     enum_class_String));
         VTABLE_set_string_native(INTERP, v, value);
         SELF.set_pmc_keyed_int(idx, v);
@@ -715,7 +715,7 @@ the clone via integers has different indices, if items were deleted.
 */
 
     VTABLE PMC *clone() {
-        PMC  * const dest   = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC  * const dest   = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         Parrot_OrderedHash_attributes *clone_attrs =
                 PARROT_ORDEREDHASH(dest);
 

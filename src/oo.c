@@ -280,7 +280,7 @@ Parrot_oo_clone_object(PARROT_INTERP, ARGIN(PMC *pmc),
     }
     else {
         obj    = PARROT_OBJECT(pmc);
-        cloned = pmc_new_noinit(interp, enum_class_Object);
+        cloned = Parrot_pmc_new_noinit(interp, enum_class_Object);
     }
 
     _class = PARROT_CLASS(obj->_class);
@@ -371,9 +371,9 @@ get_pmc_proxy(PARROT_INTERP, INTVAL type)
 
         /* Create proxy if not found */
         if (PMC_IS_NULL(proxy)) {
-            PMC * const type_num = pmc_new(interp, enum_class_Integer);
+            PMC * const type_num = Parrot_pmc_new(interp, enum_class_Integer);
             VTABLE_set_integer_native(interp, type_num, type);
-            proxy = pmc_new_init(interp, enum_class_PMCProxy, type_num);
+            proxy = Parrot_pmc_new_init(interp, enum_class_PMCProxy, type_num);
             Parrot_pcc_invoke_method_from_c_args(interp, pmc_ns, CONST_STRING(interp, "set_class"), "P->", proxy);
         }
         return proxy;
@@ -434,14 +434,14 @@ PMC *
 Parrot_oo_newclass_from_str(PARROT_INTERP, ARGIN(STRING *name))
 {
     ASSERT_ARGS(Parrot_oo_newclass_from_str)
-    PMC * const namearg  = pmc_new(interp, enum_class_String);
-    PMC * const namehash = pmc_new(interp, enum_class_Hash);
+    PMC * const namearg  = Parrot_pmc_new(interp, enum_class_String);
+    PMC * const namehash = Parrot_pmc_new(interp, enum_class_Hash);
     PMC        *classobj;
 
     VTABLE_set_string_native(interp, namearg, name);
     VTABLE_set_pmc_keyed_str(interp, namehash, CONST_STRING(interp, "name"), namearg);
 
-    classobj = pmc_new_init(interp, enum_class_Class, namehash);
+    classobj = Parrot_pmc_new_init(interp, enum_class_Class, namehash);
 
     PARROT_ASSERT(classobj);
     return classobj;
@@ -516,7 +516,7 @@ Parrot_oo_find_vtable_override(PARROT_INTERP,
                 break;
         }
         if (PMC_IS_NULL(result))
-            result = pmc_new(interp, enum_class_Undef);
+            result = Parrot_pmc_new(interp, enum_class_Undef);
         VTABLE_set_pmc_keyed_str(interp, _class->parent_overrides, name, result);
     }
     if (result->vtable->base_type == enum_class_Undef)
@@ -683,7 +683,7 @@ Parrot_oo_register_type(PARROT_INTERP, ARGIN(PMC *name), ARGIN(PMC *_namespace))
     {
         if (!typeid_exists) {
             PMC * const classname_hash = interp->class_hash;
-            PMC * const item           = pmc_new(interp, enum_class_Integer);
+            PMC * const item           = Parrot_pmc_new(interp, enum_class_Integer);
             /* set entry in name->type hash */
             VTABLE_set_integer_native(interp, item, type);
 
@@ -1159,7 +1159,7 @@ C3_merge(PARROT_INTERP, ARGIN(PMC *merge_list))
 
     /* If we never found any candidates, return an empty list. */
     if (cand_count == 0)
-        return pmc_new(interp, enum_class_ResizablePMCArray);
+        return Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     /* If we didn't find anything to accept, error. */
     if (PMC_IS_NULL(accepted))
@@ -1229,7 +1229,7 @@ Parrot_ComputeMRO_C3(PARROT_INTERP, ARGIN(PMC *_class))
 
     if (parent_count == 0) {
         /* No parents - MRO just contains this class. */
-        result = pmc_new(interp, enum_class_ResizablePMCArray);
+        result = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
         VTABLE_push_pmc(interp, result, _class);
         return result;
     }
@@ -1246,7 +1246,7 @@ Parrot_ComputeMRO_C3(PARROT_INTERP, ARGIN(PMC *_class))
 
         /* instantiated lazily */
         if (PMC_IS_NULL(merge_list))
-            merge_list = pmc_new(interp, enum_class_ResizablePMCArray);
+            merge_list = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
         VTABLE_push_pmc(interp, merge_list, lin);
     }
@@ -1318,7 +1318,7 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
     /* We need to check for conflicts before we do the composition. We
      * put each method that would be OK to add into a proposal list, and
      * bail out right away if we find a problem. */
-    proposed_add_methods = pmc_new(interp, enum_class_Hash);
+    proposed_add_methods = Parrot_pmc_new(interp, enum_class_Hash);
     methods_iter         = VTABLE_get_iter(interp, methods);
 
     while (VTABLE_get_bool(interp, methods_iter)) {

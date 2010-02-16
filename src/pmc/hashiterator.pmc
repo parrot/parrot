@@ -229,7 +229,7 @@ the next one.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        ret = pmc_new(INTERP, enum_class_HashIteratorKey);
+        ret = Parrot_pmc_new(INTERP, enum_class_HashIteratorKey);
         VTABLE_set_pointer_keyed_int(INTERP, ret, 0, attrs->parrot_hash);
         VTABLE_set_pointer_keyed_int(INTERP, ret, 1, attrs->bucket);
 

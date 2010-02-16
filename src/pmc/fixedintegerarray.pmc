@@ -81,8 +81,8 @@ Creates and returns a copy of the array.
         INTVAL * int_array;
         PMC    * const dest =
             PObj_constant_TEST(SELF)
-                ? constant_pmc_new(INTERP, SELF->vtable->base_type)
-                : pmc_new(INTERP, SELF->vtable->base_type);
+                ? constant_Parrot_pmc_new(INTERP, SELF->vtable->base_type)
+                : Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         GET_ATTR_int_array(INTERP, SELF, int_array);
 
@@ -294,7 +294,7 @@ Returns the PMC value of the element at index C<key>.
 */
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
-        PMC  * const ret = pmc_new(INTERP, enum_class_Integer);
+        PMC  * const ret = Parrot_pmc_new(INTERP, enum_class_Integer);
         const INTVAL val = SELF.get_integer_keyed_int(key);
         VTABLE_set_integer_native(INTERP, ret, val);
         return ret;
@@ -422,7 +422,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 
     VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
         INTVAL tempInt;
-        PMC  * const tempPMC = temporary_pmc_new(INTERP, enum_class_Integer);
+        PMC  * const tempPMC = temporary_Parrot_pmc_new(INTERP, enum_class_Integer);
         VTABLE_set_string_native(INTERP, tempPMC, value);
         tempInt        = VTABLE_get_integer(INTERP, tempPMC);
         temporary_pmc_free(interp, tempPMC);
@@ -532,7 +532,7 @@ Return a new Iterator for this PMC.
 */
 
     VTABLE PMC *get_iter() {
-        return pmc_new_init(INTERP, enum_class_ArrayIterator, SELF);
+        return Parrot_pmc_new_init(INTERP, enum_class_ArrayIterator, SELF);
     }
 
 /*

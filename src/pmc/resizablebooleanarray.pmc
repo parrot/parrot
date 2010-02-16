@@ -373,7 +373,7 @@ Returns a copy of the array.
         UINTVAL         tail_pos, head_pos;
         unsigned char * my_bit_array, * dest_bit_array;
 
-        PMC * const     dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const     dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         GET_ATTR_bit_array(INTERP, SELF, my_bit_array);
         GET_ATTR_size(INTERP, SELF, tail_pos);

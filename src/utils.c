@@ -545,7 +545,7 @@ tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
 {
     ASSERT_ARGS(tm_to_array)
 
-    PMC * const Array = pmc_new(interp,
+    PMC * const Array = Parrot_pmc_new(interp,
         Parrot_get_ctx_HLL_type(interp, enum_class_FixedIntegerArray));
     VTABLE_set_integer_native(interp, Array, 9);
 

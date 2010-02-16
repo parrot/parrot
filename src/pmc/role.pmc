@@ -230,9 +230,9 @@ C<init_data>.
         /* Set up the object. */
         role->name            = CONST_STRING(interp, "");
         role->_namespace      = PMCNULL;
-        role->roles           = pmc_new(interp, enum_class_ResizablePMCArray);
-        role->methods         = pmc_new(interp, enum_class_Hash);
-        role->attrib_metadata = pmc_new(interp, enum_class_Hash);
+        role->roles           = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        role->methods         = Parrot_pmc_new(interp, enum_class_Hash);
+        role->attrib_metadata = Parrot_pmc_new(interp, enum_class_Hash);
     }
 
     VTABLE void init_pmc(PMC *init_data) {
@@ -276,7 +276,7 @@ Enters the attribute in the C<attributes> array.
 
     VTABLE void add_attribute(STRING *name, PMC *type) {
         Parrot_Role_attributes * const role  = PARROT_ROLE(SELF);
-        PMC           * const new_attribute  = pmc_new(interp, enum_class_Hash);
+        PMC           * const new_attribute  = Parrot_pmc_new(interp, enum_class_Hash);
 
         /* Set name and type. */
         VTABLE_set_string_keyed_str(interp, new_attribute, CONST_STRING(interp, "name"), name);
@@ -388,7 +388,7 @@ composed into this role.
         PMC         *found;
 
         if (Parrot_str_equal(interp, what, CONST_STRING(interp, "name"))) {
-            found = pmc_new(interp, enum_class_String);
+            found = Parrot_pmc_new(interp, enum_class_String);
             VTABLE_set_string_native(interp, found, role->name);
         }
         else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "namespace"))) {
@@ -414,7 +414,7 @@ composed into this role.
         if (found->vtable->base_type == enum_class_Hash) {
             /* for Hash return values, create and return a shallow
              * clone because the VTABLE_clone does a deep clone */
-            PMC * const hash = pmc_new(interp, enum_class_Hash);
+            PMC * const hash = Parrot_pmc_new(interp, enum_class_Hash);
             PMC * const iter = VTABLE_get_iter(interp, found);
             while (VTABLE_get_bool(interp, iter)) {
                 STRING * key = VTABLE_shift_string(interp, iter);
@@ -441,7 +441,7 @@ inspect_str.
     VTABLE PMC *inspect() {
         /* Create a hash, then use inspect_str to get all of the data to
          * fill it up with. */
-        PMC * const metadata = pmc_new(interp, enum_class_Hash);
+        PMC * const metadata = Parrot_pmc_new(interp, enum_class_Hash);
 
         STRING * const name       = CONST_STRING(interp, "name");
         STRING * const _namespace = CONST_STRING(interp, "namespace");
@@ -583,7 +583,7 @@ Sets the name of the role, and updates the namespace accordingly.
         if (got_name) {
             /* We'll build a hash just containing the name, then give this to
              * init_role_from_hash - saves some code duplication. */
-            PMC *naming_hash = pmc_new(interp, enum_class_Hash);
+            PMC *naming_hash = Parrot_pmc_new(interp, enum_class_Hash);
             VTABLE_set_string_keyed_str(interp, naming_hash, CONST_STRING(interp, "name"), name);
             init_role_from_hash(interp, SELF, naming_hash);
         }

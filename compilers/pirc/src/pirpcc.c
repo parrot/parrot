@@ -221,7 +221,7 @@ generate_signature_pmc(lexer_state * const lexer, unsigned size) {
     int  array_index;
 
     /* flags and types are encoded in a FixedIntegerArray PMC */
-    fixed_int_array = pmc_new(lexer->interp, enum_class_FixedIntegerArray);
+    fixed_int_array = Parrot_pmc_new(lexer->interp, enum_class_FixedIntegerArray);
 
     if (size > 0) /* can't resize a fixed integer array to 0 elements, default size is 0. */
         VTABLE_set_integer_native(lexer->interp, fixed_int_array, size);

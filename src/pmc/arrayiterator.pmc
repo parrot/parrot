@@ -128,7 +128,7 @@ Marks the current idx/key and the aggregate as live.
         GET_ATTR_pos(interp, SELF, pos);
         GET_ATTR_reverse(interp, SELF, reverse);
 
-        clone = pmc_new_init(INTERP, enum_class_ArrayIterator, array);
+        clone = Parrot_pmc_new_init(INTERP, enum_class_ArrayIterator, array);
 
         SET_ATTR_pos(interp, clone, pos);
         SET_ATTR_reverse(interp, clone, reverse);

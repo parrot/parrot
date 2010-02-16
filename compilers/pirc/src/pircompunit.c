@@ -1508,7 +1508,7 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
             symbol *constsym  = new_symbol(lexer, name, PMC_TYPE);
             target *consttarg = target_from_symbol(lexer, constsym);
 
-            PMC *intconst = pmc_new(lexer->interp,
+            PMC *intconst = Parrot_pmc_new(lexer->interp,
                                     Parrot_get_ctx_HLL_type(lexer->interp, enum_class_Integer));
             int index     = add_pmc_const(lexer->bc, intconst);
             VTABLE_set_integer_native(lexer->interp, intconst, value->val.ival);
@@ -1543,7 +1543,7 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
             symbol *constsym  = new_symbol(lexer, name, PMC_TYPE);
             target *consttarg = target_from_symbol(lexer, constsym);
 
-            PMC *numconst     = pmc_new(lexer->interp,
+            PMC *numconst     = Parrot_pmc_new(lexer->interp,
                                         Parrot_get_ctx_HLL_type(lexer->interp, enum_class_Float));
             int index         = add_pmc_const(lexer->bc, numconst);
             VTABLE_set_number_native(lexer->interp, numconst, value->val.nval);
@@ -1573,7 +1573,7 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
             symbol *constsym  = new_symbol(lexer, name, PMC_TYPE);
             target *consttarg = target_from_symbol(lexer, constsym);
 
-            PMC    *strconst  = pmc_new(lexer->interp,
+            PMC    *strconst  = Parrot_pmc_new(lexer->interp,
                                     Parrot_get_ctx_HLL_type(lexer->interp, enum_class_String));
 
             int     index     = add_pmc_const(lexer->bc, strconst);

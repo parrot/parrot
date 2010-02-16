@@ -106,7 +106,7 @@ Creates and returns a clone of the hash.
 */
 
     VTABLE PMC *clone() {
-        PMC * const dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         parrot_hash_clone(INTERP, (Hash *)SELF.get_pointer(),
                    (Hash *)VTABLE_get_pointer(INTERP, dest));
@@ -445,7 +445,7 @@ Returns the integer value for the element at C<*key>.
             box = hash_value_to_pmc(INTERP, hash, b->value);
         else {
             /* autovivify an Hash */
-            box = pmc_new(INTERP, SELF.type());
+            box = Parrot_pmc_new(INTERP, SELF.type());
             parrot_hash_put(INTERP, hash, keystr,
                     hash_value_from_pmc(INTERP, hash, box));
         }
@@ -625,7 +625,7 @@ Returns the string value for the element at C<*key>.
             box = hash_value_to_pmc(INTERP, hash, b->value);
         else {
             /* autovivify an Hash */
-            box = pmc_new(INTERP, SELF.type());
+            box = Parrot_pmc_new(INTERP, SELF.type());
             parrot_hash_put(INTERP, hash, keystr,
                     hash_value_from_pmc(INTERP, hash, box));
         }
@@ -753,7 +753,7 @@ Returns the PMC value for the element at C<*key>.
 
         /* autovivify an Hash */
         if (PMC_IS_NULL(box))
-            box = pmc_new(INTERP, SELF.type());
+            box = Parrot_pmc_new(INTERP, SELF.type());
 
         VTABLE_set_number_keyed(INTERP, box, nextkey, value);
     }
@@ -799,7 +799,7 @@ Sets C<value> as the value for C<*key>.
             box = hash_value_to_pmc(INTERP, hash, b->value);
         else {
             /* autovivify an Hash */
-            box = pmc_new(INTERP, SELF.type());
+            box = Parrot_pmc_new(INTERP, SELF.type());
             parrot_hash_put(INTERP, hash, keystr,
                     hash_value_from_pmc(INTERP, hash, box));
         }
@@ -994,7 +994,7 @@ Return a new iterator.
 */
 
     VTABLE PMC *get_iter() {
-        return pmc_new_init(INTERP, enum_class_HashIterator, SELF);
+        return Parrot_pmc_new_init(INTERP, enum_class_HashIterator, SELF);
     }
 
 /*

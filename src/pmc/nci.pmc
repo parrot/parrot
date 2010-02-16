@@ -254,7 +254,7 @@ Creates and returns a clone of the NCI.
         Parrot_NCI_attributes *nci_info_ret;
         void                  *orig_func;
 
-        PMC * const ret     = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const ret     = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         nci_info_ret        = PARROT_NCI(ret);
 
         /* FIXME if data is malloced (JIT/i386!) then we need

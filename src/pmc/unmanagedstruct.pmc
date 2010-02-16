@@ -386,7 +386,7 @@ ret_pmc(PARROT_INTERP, PMC *pmc, char *p, int type, INTVAL idx)
             PMC *sig = VTABLE_getprop(interp, ptr, signature_str);
             if (VTABLE_defined(interp, sig)) {
                 STRING *sig_str = VTABLE_get_string(interp, sig);
-                ret             = pmc_new(interp, enum_class_NCI);
+                ret             = Parrot_pmc_new(interp, enum_class_NCI);
                 VTABLE_set_pointer_keyed_str(interp, ret, sig_str,
                             *(PMC **)p);
             }
@@ -703,7 +703,7 @@ Return a clone of this PMC.
 */
 
     VTABLE PMC *clone() {
-        PMC *clone = pmc_new(INTERP, enum_class_UnManagedStruct);
+        PMC *clone = Parrot_pmc_new(INTERP, enum_class_UnManagedStruct);
         mem_sys_memmove(PMC_data(clone), PMC_data(SELF),
                 sizeof (Parrot_UnManagedStruct_attributes));
         PARROT_UNMANAGEDSTRUCT(clone)->init =

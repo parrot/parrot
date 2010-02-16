@@ -73,7 +73,7 @@ Marks the current idx/key and the aggregate as live.
         Parrot_StringIterator_attributes * const attrs =
                 PARROT_STRINGITERATOR(SELF);
         PMC                              * const clone =
-                pmc_new_init(INTERP, enum_class_StringIterator, attrs->string);
+                Parrot_pmc_new_init(INTERP, enum_class_StringIterator, attrs->string);
         Parrot_StringIterator_attributes * const clone_attrs =
                 PARROT_STRINGITERATOR(clone);
 
@@ -184,7 +184,7 @@ Shift next character from C<string> as PMC.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        ret = pmc_new(INTERP, Parrot_get_ctx_HLL_type(interp, enum_class_String));
+        ret = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(interp, enum_class_String));
         VTABLE_set_string_native(INTERP, ret,
                 VTABLE_get_string_keyed_int(INTERP, attrs->string, attrs->pos++));
         return ret;
@@ -248,7 +248,7 @@ Shift "next" character from C<string> for reverse iterator as PMC.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        ret = pmc_new(INTERP, Parrot_get_ctx_HLL_type(interp, enum_class_String));
+        ret = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(interp, enum_class_String));
         VTABLE_set_string_native(INTERP, ret,
                 VTABLE_get_string_keyed_int(INTERP, attrs->string, --attrs->pos));
         return ret;

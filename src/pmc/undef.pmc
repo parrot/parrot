@@ -217,7 +217,7 @@ Returns 1.
 */
 
     VTABLE PMC *logical_not(PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         VTABLE_set_bool(INTERP, dest, 1);
         return dest;
     }
@@ -264,7 +264,7 @@ Clones the current Undef PMC.
 */
 
     VTABLE PMC *clone() {
-        return pmc_new(INTERP, SELF->vtable->base_type);
+        return Parrot_pmc_new(INTERP, SELF->vtable->base_type);
     }
 
 /*

@@ -1044,9 +1044,9 @@ mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
 
     /* a :multi sub with no arguments */
     if (!pcc_sub->multi[0])
-        return pmc_new(interp, enum_class_FixedIntegerArray);
+        return Parrot_pmc_new(interp, enum_class_FixedIntegerArray);
 
-    multi_sig = pmc_new(interp, enum_class_FixedPMCArray);
+    multi_sig = Parrot_pmc_new(interp, enum_class_FixedPMCArray);
     VTABLE_set_integer_native(interp, multi_sig, n);
     ct        = interp->code->const_table;
 
@@ -1061,11 +1061,11 @@ mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
             const INTVAL type_num    = pmc_type(interp, type_name);
 
             if (type_num == enum_type_undef) {
-                sig_pmc = pmc_new(interp, enum_class_String);
+                sig_pmc = Parrot_pmc_new(interp, enum_class_String);
                 VTABLE_set_string_native(interp, sig_pmc, type_name);
             }
             else {
-                sig_pmc = pmc_new(interp, enum_class_Integer);
+                sig_pmc = Parrot_pmc_new(interp, enum_class_Integer);
                 VTABLE_set_integer_native(interp, sig_pmc, type_num);
             }
         }
@@ -1116,7 +1116,7 @@ create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub_pmc),
             if (r->set == 'P' && r->usage & U_LEXICAL) {
                 SymReg *n;
                 if (!lex_info) {
-                    lex_info = pmc_new_noinit(interp, lex_info_id);
+                    lex_info = Parrot_pmc_new_noinit(interp, lex_info_id);
                     VTABLE_init_pmc(interp, lex_info, sub_pmc);
                 }
 
@@ -1149,7 +1149,7 @@ create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub_pmc),
     }
 
     if (!lex_info && (unit->outer || need_lex)) {
-        lex_info = pmc_new_noinit(interp, lex_info_id);
+        lex_info = Parrot_pmc_new_noinit(interp, lex_info_id);
         VTABLE_init_pmc(interp, lex_info, sub_pmc);
     }
 
@@ -1297,7 +1297,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NO_CLASS,
                     "Class '%Ss' specified in :instanceof(...) not found",
                     classname);
-            sub_pmc = pmc_new(interp, type);
+            sub_pmc = Parrot_pmc_new(interp, type);
         }
     }
     else {
@@ -1305,7 +1305,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
         type = Parrot_get_ctx_HLL_type(interp, type);
 
         /* TODO create constant - see also src/packfile.c */
-        sub_pmc = pmc_new(interp, type);
+        sub_pmc = Parrot_pmc_new(interp, type);
     }
 
     /* Set flags and get the sub info. */
@@ -1348,7 +1348,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
             ns_pmc = ct->constants[ns_const]->u.key;
             break;
           case PFC_STRING:
-            ns_pmc = constant_pmc_new(interp, enum_class_String);
+            ns_pmc = constant_Parrot_pmc_new(interp, enum_class_String);
             VTABLE_set_string_native(interp, ns_pmc, ct->constants[ns_const]->u.string);
             break;
           default:
@@ -1805,7 +1805,7 @@ make_pmc_const(PARROT_INTERP, ARGMOD(SymReg *r))
     else
         s = Parrot_str_unescape(interp, r->name, 0, NULL);
 
-    p  = constant_pmc_new(interp, r->pmc_type);
+    p  = constant_Parrot_pmc_new(interp, r->pmc_type);
 
     switch (r->pmc_type) {
       case enum_class_Integer:

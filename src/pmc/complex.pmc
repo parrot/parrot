@@ -234,7 +234,7 @@ C<complex> object according to 2.1. Built-in Functions.
 */
     VTABLE opcode_t *invoke(void *next) {
         const int   argcP = REG_INT(interp, 3);
-        PMC * const res   = pmc_new(INTERP, enum_class_Complex);
+        PMC * const res   = Parrot_pmc_new(INTERP, enum_class_Complex);
 
         if (argcP == 1) {
             PMC * const arg = REG_PMC(interp, 5);
@@ -316,7 +316,7 @@ Creates an identical copy of the complex number.
     }
 
     VTABLE PMC *clone() {
-        PMC * const dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         FLOATVAL re, im;
 
         GET_ATTR_re(INTERP, SELF, re);
@@ -436,7 +436,7 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
     }
 
     VTABLE PMC *get_pmc_keyed_str(STRING *key) {
-        PMC * const    ret = pmc_new(INTERP, enum_class_Float);
+        PMC * const    ret = Parrot_pmc_new(INTERP, enum_class_Float);
         const FLOATVAL val = SELF.get_number_keyed_str(key);
         VTABLE_set_number_native(INTERP, ret, val);
         return ret;
@@ -453,7 +453,7 @@ Returns the requested number (real part for C<0> and imaginary for C<1>).
 */
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
-        PMC * const    ret = pmc_new(INTERP, enum_class_Float);
+        PMC * const    ret = Parrot_pmc_new(INTERP, enum_class_Float);
         const FLOATVAL val = SELF.get_number_keyed_int(key);
         VTABLE_set_number_native(INTERP, ret, val);
         return ret;
@@ -635,7 +635,7 @@ Adds C<value> to the complex number, placing the result in C<dest>.
 
     MULTI PMC *add(Complex value, PMC *dest) {
         FLOATVAL self_re, self_im, val_re, val_im;
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         GET_ATTR_re(INTERP, SELF, self_re);
         GET_ATTR_im(INTERP, SELF, self_im);
@@ -651,7 +651,7 @@ Adds C<value> to the complex number, placing the result in C<dest>.
 
     MULTI PMC *add(DEFAULT value, PMC *dest) {
         FLOATVAL re, im;
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
@@ -667,7 +667,7 @@ Adds C<value> to the complex number, placing the result in C<dest>.
 
     VTABLE PMC *add_float(FLOATVAL value, PMC *dest) {
         FLOATVAL re, im;
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
@@ -724,7 +724,7 @@ Subtracts C<value> from the complex number, placing the result in C<dest>.
 
     MULTI PMC *subtract(Complex value, PMC *dest) {
         FLOATVAL self_re, self_im, val_re, val_im;
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         GET_ATTR_re(INTERP, SELF, self_re);
         GET_ATTR_im(INTERP, SELF, self_im);
@@ -740,7 +740,7 @@ Subtracts C<value> from the complex number, placing the result in C<dest>.
 
     MULTI PMC *subtract(DEFAULT value, PMC *dest) {
         FLOATVAL re, im;
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
@@ -756,7 +756,7 @@ Subtracts C<value> from the complex number, placing the result in C<dest>.
 
     VTABLE PMC *subtract_float(FLOATVAL value, PMC *dest) {
         FLOATVAL re, im;
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
@@ -827,7 +827,7 @@ Multiplies the complex number SELF inplace with C<value>.
     MULTI PMC *multiply(Complex value, PMC *dest) {
         FLOATVAL a, b, c, d;
 
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         GET_ATTR_re(INTERP, SELF, a);
         GET_ATTR_im(INTERP, SELF, b);
@@ -841,7 +841,7 @@ Multiplies the complex number SELF inplace with C<value>.
 
     MULTI PMC *multiply(DEFAULT value, PMC *dest) {
         FLOATVAL re, im;
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
@@ -857,7 +857,7 @@ Multiplies the complex number SELF inplace with C<value>.
 
     VTABLE PMC *multiply_float(FLOATVAL value, PMC *dest) {
         FLOATVAL re, im;
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
@@ -940,7 +940,7 @@ http://docs.sun.com/source/806-3568/ncg_goldberg.html
         FLOATVAL self_re, self_im, val_re, val_im;
 
         complex_check_divide_zero(INTERP, value);
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         GET_ATTR_re(INTERP, SELF, self_re);
         GET_ATTR_im(INTERP, SELF, self_im);
@@ -970,7 +970,7 @@ http://docs.sun.com/source/806-3568/ncg_goldberg.html
         FLOATVAL re, im;
         const FLOATVAL d = VTABLE_get_number(INTERP, value);
         float_check_divide_zero(INTERP, d);
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
@@ -984,7 +984,7 @@ http://docs.sun.com/source/806-3568/ncg_goldberg.html
     VTABLE PMC *divide_int(INTVAL value, PMC *dest) {
         FLOATVAL re, im;
         int_check_divide_zero(INTERP, value);
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
@@ -998,7 +998,7 @@ http://docs.sun.com/source/806-3568/ncg_goldberg.html
     VTABLE PMC *divide_float(FLOATVAL value, PMC *dest) {
         FLOATVAL re, im;
         float_check_divide_zero(INTERP, value);
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
@@ -1085,7 +1085,7 @@ Set C<dest> to the negated value of C<SELF>.
 
     VTABLE PMC *neg(PMC *dest) {
         FLOATVAL re, im;
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
@@ -1164,7 +1164,7 @@ Sets C<dest> to the absolute value of SELF that is the distance from (0.0).
         GET_ATTR_im(INTERP, SELF, im);
         d = sqrt(re*re + im*im);
 
-        dest = pmc_new(INTERP,
+        dest = Parrot_pmc_new(INTERP,
             Parrot_get_ctx_HLL_type(INTERP, enum_class_Float));
 
         VTABLE_set_number_native(INTERP, dest, d);
@@ -1202,7 +1202,7 @@ ln(+-i) = +- (pi i)/2
 */
 
     METHOD ln() {
-        PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         FLOATVAL re, im, result_re, result_im;
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
@@ -1236,7 +1236,7 @@ exp(a + bi) = exp(a) * (cos(b) + i * sin(b))
 */
 
     METHOD exp() {
-        PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         FLOATVAL re, im, f;
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
@@ -1290,7 +1290,7 @@ Returns C<FUNC>(SELF).
 */
 
     METHOD sin() {
-        PMC * const d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         FLOATVAL re, im, result_re, result_im;
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
@@ -1320,7 +1320,7 @@ Returns C<FUNC>(SELF).
     }
 
     METHOD cos() {
-        PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         FLOATVAL re, im, result_re, result_im;
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
@@ -1345,8 +1345,8 @@ Returns C<FUNC>(SELF).
     }
 
     METHOD tan() {
-        PMC * const d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        PMC * const e = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const e = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         (PMC *d) = PCCINVOKE(INTERP, SELF, "sin");
         (PMC *e) = PCCINVOKE(INTERP, SELF, "cos");
@@ -1357,8 +1357,8 @@ Returns C<FUNC>(SELF).
     }
 
     METHOD cot() {
-        PMC * const d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        PMC * const e = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const e = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         (PMC *d) = PCCINVOKE(INTERP, SELF, "cos");
         (PMC *e) = PCCINVOKE(INTERP, SELF, "sin");
 
@@ -1368,8 +1368,8 @@ Returns C<FUNC>(SELF).
     }
 
     METHOD sec() {
-        PMC * const d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        PMC * const e = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const e = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_re(INTERP, d, 1.0);
         SET_ATTR_im(INTERP, d, 0.0);
         (PMC *e) = PCCINVOKE(INTERP, SELF, "cos");
@@ -1380,8 +1380,8 @@ Returns C<FUNC>(SELF).
     }
 
     METHOD csc() {
-        PMC * const d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        PMC * const e = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const e = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         SET_ATTR_re(INTERP, d, 1.0);
         SET_ATTR_im(INTERP, d, 0.0);
@@ -1428,8 +1428,8 @@ Returns the inverse function of SELF.
 
     METHOD asin() {
         FLOATVAL d_re, d_im, e_re, e_im, self_re, self_im;
-        PMC * const d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        PMC *       e = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC *       e = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         GET_ATTR_re(INTERP, SELF, self_re);
         GET_ATTR_im(INTERP, SELF, self_im);
 
@@ -1456,8 +1456,8 @@ Returns the inverse function of SELF.
 
     METHOD acos() {
         FLOATVAL d_re, d_im, e_re, e_im, self_re, self_im;
-        PMC * const d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        PMC *       e = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC *       e = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         GET_ATTR_re(INTERP, SELF, self_re);
         GET_ATTR_im(INTERP, SELF, self_im);
 
@@ -1483,8 +1483,8 @@ Returns the inverse function of SELF.
     }
 
     METHOD atan() {
-        PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        PMC * const e  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const e  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         FLOATVAL re, im, d_re, d_im;
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
@@ -1507,7 +1507,7 @@ Returns the inverse function of SELF.
     }
 
     METHOD acot() {
-        PMC * const d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC     *e;
         FLOATVAL re, im;
         GET_ATTR_re(INTERP, SELF, re);
@@ -1521,7 +1521,7 @@ Returns the inverse function of SELF.
     }
 
     METHOD acsc() {
-        PMC * const d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC     *e;
         FLOATVAL re, im;
         GET_ATTR_re(INTERP, SELF, re);
@@ -1535,7 +1535,7 @@ Returns the inverse function of SELF.
     }
 
     METHOD asec() {
-        PMC * const d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC     *e;
         FLOATVAL re, im;
         GET_ATTR_re(INTERP, SELF, re);
@@ -1569,7 +1569,7 @@ tanh(z) = sinh(z) / cosh(z)
 */
 
     METHOD sinh() {
-        PMC * const d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         FLOATVAL re, im;
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
@@ -1581,7 +1581,7 @@ tanh(z) = sinh(z) / cosh(z)
     }
 
     METHOD cosh() {
-        PMC * const d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         FLOATVAL re, im;
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
@@ -1598,8 +1598,8 @@ tanh(z) = sinh(z) / cosh(z)
     }
 
     METHOD tanh() {
-        PMC * const d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        PMC * const e = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const e = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         (PMC *d) = PCCINVOKE(INTERP, SELF, "sinh");
         (PMC *e) = PCCINVOKE(INTERP, SELF, "cosh");
@@ -1611,7 +1611,7 @@ tanh(z) = sinh(z) / cosh(z)
 
     METHOD coth() {
         FLOATVAL re, im;
-        PMC * const d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         (PMC *d) = PCCINVOKE(INTERP, SELF, "tanh");
         GET_ATTR_re(INTERP, d, re);
@@ -1625,7 +1625,7 @@ tanh(z) = sinh(z) / cosh(z)
 
     METHOD csch() {
         FLOATVAL re, im;
-        PMC * const d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         (PMC *d) = PCCINVOKE(INTERP, SELF, "sinh");
         GET_ATTR_re(INTERP, d, re);
@@ -1639,7 +1639,7 @@ tanh(z) = sinh(z) / cosh(z)
 
     METHOD sech() {
         FLOATVAL re, im;
-        PMC * const d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         (PMC *d) = PCCINVOKE(INTERP, SELF, "cosh");
         GET_ATTR_re(INTERP, d, re);
@@ -1681,8 +1681,8 @@ atanh = i atan(-ix)
 
     METHOD asinh() {
         FLOATVAL re, im;
-        PMC * const d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        PMC * const e = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const e = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
@@ -1700,8 +1700,8 @@ atanh = i atan(-ix)
 
     METHOD acosh() {
         FLOATVAL re, im;
-        PMC * const d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        PMC * const e = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const e = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         (PMC *d) = PCCINVOKE(INTERP, SELF, "acos");
         GET_ATTR_re(INTERP, d, re);
@@ -1714,8 +1714,8 @@ atanh = i atan(-ix)
 
     METHOD atanh() {
         FLOATVAL re, im;
-        PMC * const d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        PMC * const e = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const e = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
@@ -1732,7 +1732,7 @@ atanh = i atan(-ix)
     }
 
     METHOD acoth() {
-        PMC * const d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC     *e;
         FLOATVAL re, im;
         GET_ATTR_re(INTERP, SELF, re);
@@ -1746,7 +1746,7 @@ atanh = i atan(-ix)
     }
 
     METHOD acsch() {
-        PMC * const d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC     *e;
         FLOATVAL re, im;
         GET_ATTR_re(INTERP, SELF, re);
@@ -1760,7 +1760,7 @@ atanh = i atan(-ix)
     }
 
     METHOD asech() {
-        PMC * const d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC     *e;
         FLOATVAL re, im;
         GET_ATTR_re(INTERP, SELF, re);
@@ -1796,9 +1796,9 @@ x ^ y = exp(y * ln x))
 */
 
     METHOD pow(PMC * value) {
-        PMC *l = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC *l = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC *log;
-        PMC *dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC *dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         Parrot_pcc_invoke_method_from_c_args(interp, SELF, CONST_STRING(interp, "ln"),
                     "->P", &log);
@@ -1811,7 +1811,7 @@ x ^ y = exp(y * ln x))
     }
 
     METHOD sqrt() {
-        PMC * const result = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const result = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         const FLOATVAL absval = SELF.get_number();
         FLOATVAL sx, sy, rx, ry;
         GET_ATTR_re(INTERP, SELF, sx);

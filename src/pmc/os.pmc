@@ -237,7 +237,7 @@ https://trac.parrot.org/parrot/ticket/849
                 errmsg);
         }
         else {
-            PMC * const array = pmc_new(INTERP, enum_class_FixedPMCArray);
+            PMC * const array = Parrot_pmc_new(INTERP, enum_class_FixedPMCArray);
             VTABLE_set_integer_native(INTERP, array, 13);
 
             VTABLE_set_integer_keyed_int(INTERP, array,  0,
@@ -315,7 +315,7 @@ Stats a file, and returns a 13 position array as in Perl:
                 errmsg);
         }
         else {
-            PMC * const array = pmc_new(INTERP, enum_class_FixedPMCArray);
+            PMC * const array = Parrot_pmc_new(INTERP, enum_class_FixedPMCArray);
             VTABLE_set_integer_native(INTERP, array, 13);
 
             VTABLE_set_integer_keyed_int(INTERP, array,  0,
@@ -490,7 +490,7 @@ reads entries from a directory.
                 errmsg);
         }
 
-        array = pmc_new(INTERP, enum_class_ResizableStringArray);
+        array = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
 
         while ((dirent = readdir(dir)) != NULL) {
             retval = Parrot_str_new(INTERP, dirent->d_name, 0) ;
