@@ -33,6 +33,7 @@ Platform                     B8  Runloops   Feature Comp Test Inst YYYYMMDD
                                 CGoto EXEC   Thr Sig
 --------------------------------------------------------------------------------
 cygwin1.7.0-x86-gcc4.3.2      4   Y    -     -   -   Y    Y     Y  20090315
+darwin9.8.0-x86-gcc4.0.1          Y    ?     Y   ?   Y    Y     Y  20100215
 dragonfly2.2.0-i386-gcc-4.1.2 4   Y    -     Y   Y   Y    Y     ?  20090427
 freebsd-x86-gcc-4.2.1         4   Y    Y     ?   ?   Y    Y     Y  20090415
 freebsd-amd64-gcc-4.2.1       8   Y    -     ?   ?   Y    Y     Y  20090720
@@ -40,7 +41,7 @@ linux-amd64-clang-r73854      8   ?    =     Y   Y   Y/4  Y/1   ?  20090622
 linux-amd64-clang-r75433      8   Y    ?     ?   ?   Y    Y*2   ?  20090913
 linux-amd64-gcc4.3.2          8   Y    -     Y   Y   Y    Y/1   Y  20091020
 linux-amd64-gcc4.3.3          8   Y    ?     Y   Y   Y    Y     ?  20090712
-linux-amd64-gcc4.4.1          8   Y    ?     Y   Y   Y    Y     Y  20091020
+linux-amd64-gcc4.4.1          8   Y    ?     Y   ?   Y    Y     Y  20100215
 linux-amd64-g++4.4.1          8   Y    ?     Y   Y   Y    Y     Y  20091116
 linux-ppc-gcc_4.4.2               Y    Y     Y   Y   Y    Y     Y  20100118
 linux-ppc64-gcc_4.4.2             Y    Y     Y   Y   Y    Y     Y  20100118
