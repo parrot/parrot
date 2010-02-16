@@ -417,6 +417,8 @@ Add register C<regno> to the list of free regs that can be reuse.
 */
 static void
 add_free_reg(lsr_allocator * const lsr, unsigned regno, pir_type type) {
+    ASSERT_ARGS(add_free_reg)
+
     free_reg *reg;
 
     /* fprintf(stderr, "add_free_reg(): %u\n", regno); */
@@ -480,6 +482,8 @@ active, as it has expired. (the variable is no longer needed).
 */
 static void
 expire_old_intervals(lsr_allocator * const lsr, live_interval * const i, pir_type type) {
+    ASSERT_ARGS(expire_old_intervals)
+
     live_interval *j;
 
     for (j = lsr->active[type]; j != NULL; j = j->nexta) {
