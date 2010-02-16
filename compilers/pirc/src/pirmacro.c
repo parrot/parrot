@@ -9,7 +9,7 @@
 #include "pircompiler.h"
 #include "parrot/parrot.h"
 
-/* HEADERIZER HFILE: none */
+/* HEADERIZER HFILE: compilers/pirc/src/pirmacro.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -50,8 +50,9 @@ PARROT_MALLOC
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 macro_def *
-new_macro(macro_table * const table, char const * const name, int lineno, int takes_args,
-          unsigned initsize)
+new_macro(ARGIN(macro_table * const table),
+        ARGIN(char const * const name), int lineno, int takes_args,
+        unsigned initsize)
 {
     macro_def *macro   = (macro_def *)mem_sys_allocate(sizeof (macro_def));
 
@@ -96,7 +97,8 @@ new_macro_param(ARGIN(char const * const value))
 
 /*
 
-=item C<void add_macro_param(macro_def * const macro, char const * const name)>
+=item C<void add_macro_param(ARGIN*macro_def * const macro), char const * const
+name)>
 
 Add a macro parameter by name of C<name> to the macro definition C<macro>.
 
@@ -104,7 +106,8 @@ Add a macro parameter by name of C<name> to the macro definition C<macro>.
 
 */
 void
-add_macro_param(macro_def * const macro, char const * const name)
+add_macro_param(ARGIN*macro_def * const macro),
+        ARGIN(char const * const name))
 {
     macro_param *param = new_macro_param(name);
     param->next        = macro->parameters;
@@ -124,8 +127,9 @@ const is entered in the macro_table C<table>
 
 */
 void
-new_macro_const(macro_table * const table, char const * const name, char const * const value,
-                      int lineno)
+new_macro_const(ARGIN(macro_table * const table),
+        ARGIN(char const * const name),
+        ARGIN(char const * const value), int lineno)
 {
     /* macro constants are just macros, but they have no body; the value is already
      * parsed and allocated in memory.
@@ -199,7 +203,9 @@ beforehand how much space we need in the buffer due to the var. arg. list.
 
 */
 void
-store_macro_string(macro_def * const macro, char const * const str, ...)
+store_macro_string(ARGIN(macro_def * const macro),
+        ARGIN(char const * const str),
+        ...)
 {
     va_list arg_ptr;
 
@@ -228,7 +234,8 @@ NULL is returned.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 macro_def *
-find_macro(macro_table * const table, char const * const name)
+find_macro(ARGIN(macro_table * const table),
+        ARGIN(char const * const name))
 {
     macro_def *iter = table->definitions;
 
@@ -289,7 +296,7 @@ Free resources allocated for the macro_table C<table>.
 
 */
 void
-delete_macro_table(macro_table * table)
+delete_macro_table(ARGMOD(macro_table * table))
 {
     mem_sys_free(table);
 }
@@ -305,7 +312,8 @@ Declare C<name> as a C<.macro_local> for the macro definition C<macro>.
 
 */
 void
-declare_macro_local(macro_def * const macro, char const * const name)
+declare_macro_local(ARGIN(macro_def * const macro),
+        ARGIN(char const * const name))
 {
     macro_param * param = new_macro_param(name);
     param->next         = macro->macrolocals;
@@ -325,7 +333,8 @@ definition C<macro>.
 */
 PARROT_WARN_UNUSED_RESULT
 int
-is_macro_local(macro_def * const macro, char const * const name)
+is_macro_local(ARGIN(macro_def * const macro),
+        ARGIN(char const * const name))
 {
     macro_param *iter = macro->macrolocals;
 

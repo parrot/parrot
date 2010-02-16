@@ -80,33 +80,113 @@ typedef struct macro_table {
 } macro_table;
 
 
+/* HEADERIZER BEGIN: compilers/pirc/src/pirmacro.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+void add_macro_param(
+    ARGIN*macro_def * const macro),
+    ARGIN(char const * const name))
+        __attribute__nonnull__(2);
 
+void declare_macro_local(
+    ARGIN(macro_def * const macro),
+    ARGIN(char const * const name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-macro_def *new_macro(macro_table * const table, char const * const name, int lineno,
-                     int takes_args, unsigned initsize);
+void delete_macro_table(ARGMOD(macro_table * table))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(* table);
 
-void add_macro_param(macro_def * const macro, char const * const name);
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+macro_def * find_macro(
+    ARGIN(macro_table * const table),
+    ARGIN(char const * const name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-void new_macro_const(macro_table * const table, char const * const name,
-                     char const * const value, int lineno);
+PARROT_WARN_UNUSED_RESULT
+int is_macro_local(
+    ARGIN(macro_def * const macro),
+    ARGIN(char const * const name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
+PARROT_MALLOC
+PARROT_IGNORABLE_RESULT
+PARROT_CAN_RETURN_NULL
+macro_def * new_macro(
+    ARGIN(macro_table * const table),
+    ARGIN(char const * const name),
+    int lineno,
+    int takes_args,
+    unsigned initsize)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-macro_def *find_macro(macro_table * const table, char const * const name);
+void new_macro_const(
+    ARGIN(macro_table * const table),
+    ARGIN(char const * const name),
+    ARGIN(char const * const value),
+    int lineno)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
-macro_table * new_macro_table(macro_table * const current);
+PARROT_MALLOC
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+macro_param * new_macro_param(ARGIN(char const * const value))
+        __attribute__nonnull__(1);
 
-void store_macro_char(macro_def * const macro, char c) ;
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+macro_table * new_macro_table(ARGIN(macro_table * const current))
+        __attribute__nonnull__(1);
 
-void store_macro_string(macro_def * const macro, char const * const str, ...);
+void store_macro_char(ARGIN(macro_def * const macro), char c)
+        __attribute__nonnull__(1);
 
-macro_param * new_macro_param(char const * const value);
+void store_macro_string(
+    ARGIN(macro_def * const macro),
+    ARGIN(char const * const str),
+    ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-void declare_macro_local(macro_def * const macro, char const * const name);
-
-int is_macro_local(macro_def * const macro, char const * const name);
-
-void delete_macro_table(macro_table * table);
+#define ASSERT_ARGS_add_macro_param __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_declare_macro_local __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(macro) \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_delete_macro_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(table))
+#define ASSERT_ARGS_find_macro __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(table) \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_is_macro_local __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(macro) \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_new_macro __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(table) \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_new_macro_const __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(table) \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_new_macro_param __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_new_macro_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(current))
+#define ASSERT_ARGS_store_macro_char __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(macro))
+#define ASSERT_ARGS_store_macro_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(macro) \
+    , PARROT_ASSERT_ARG(str))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: compilers/pirc/src/pirmacro.c */
 
 #endif /* PARROT_PIR_PIRMACRO_H_GUARD */
 
