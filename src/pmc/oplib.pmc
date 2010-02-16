@@ -21,7 +21,7 @@ pmclass OpLib {
     /* Look up an opnumber given the name of the op. First we look for the
        specific name, then the more general short name. */
     VTABLE INTVAL get_integer_keyed_str(STRING *name) {
-        const char * const cstr = Parrot_str_to_cstring(INTERP, name);
+        char * cstr = Parrot_str_to_cstring(INTERP, name);
         INTVAL num = INTERP->op_lib->op_code(cstr, 1);
         if (num == -1)
             num = INTERP->op_lib->op_code(cstr, 0);
