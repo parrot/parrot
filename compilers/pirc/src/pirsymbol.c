@@ -167,7 +167,7 @@ Assign a new register to symbol C<sym>, and create a new live interval for C<sym
 
 */
 void
-assign_vanilla_register(NOTNULL(lexer_state * const lexer),
+assign_vanilla_register(ARGIN(lexer_state * const lexer),
         ARGMOD(symbol * const sym))
 {
     sym->info.color    = next_register(lexer, sym->info.type);
@@ -204,7 +204,7 @@ This code is taken from IMCC.
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 unsigned
-get_hashcode(NOTNULL(char const * const str), unsigned num_buckets)
+get_hashcode(ARGIN(char const * const str), unsigned num_buckets)
 {
     unsigned long  key = 0;
     char const    *s;
@@ -226,8 +226,8 @@ Store the bucket C<buck> in the hashtable C<table> at index C<hash>.
 
 */
 void
-store_bucket(NOTNULL(hashtable * const table),
-        NOTNULL(bucket * const buck), unsigned long hash)
+store_bucket(ARGIN(hashtable * const table),
+        ARGIN(bucket * const buck), unsigned long hash)
 {
     buck->next = table->contents[hash];
     table->contents[hash] = buck;
@@ -245,7 +245,7 @@ Return the bucket at hash index C<hash> from the hashtable C<table>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 bucket *
-get_bucket(NOTNULL(hashtable * const table), unsigned long hash)
+get_bucket(ARGIN(hashtable * const table), unsigned long hash)
 {
     return table->contents[hash];
 }
@@ -263,8 +263,8 @@ Create a new symbol node, returns it after initialization.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 symbol *
-new_symbol(NOTNULL(lexer_state * const lexer),
-        NOTNULL(char const * const name), pir_type type)
+new_symbol(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const name), pir_type type)
 {
     symbol *sym = pir_mem_allocate_zeroed_typed(lexer, symbol);
 
@@ -290,8 +290,8 @@ own symbol table).
 
 */
 void
-declare_local(NOTNULL(lexer_state * const lexer), pir_type type,
-              NOTNULL(symbol * const list))
+declare_local(ARGIN(lexer_state * const lexer), pir_type type,
+              ARGIN(symbol * const list))
 {
     symbol    *iter  = list;
     hashtable *table = &CURRENT_SUB(lexer)->symbols;
@@ -344,7 +344,7 @@ no subroutines, the function will do nothing and return.
 
 */
 void
-check_unused_symbols(NOTNULL(lexer_state * const lexer))
+check_unused_symbols(ARGIN(lexer_state * const lexer))
 {
     subroutine *subiter;
 
@@ -393,8 +393,8 @@ allocate a PASM register for it.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 symbol *
-find_symbol(NOTNULL(lexer_state * const lexer),
-        NOTNULL(char const * const name))
+find_symbol(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const name))
 {
     hashtable    *table    = &CURRENT_SUB(lexer)->symbols;
     unsigned long hashcode = get_hashcode(name, table->size);

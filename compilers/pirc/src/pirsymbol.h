@@ -79,22 +79,22 @@ extern const int valuetype_pirtype_clut[10];
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 void assign_vanilla_register(
-    NOTNULL(lexer_state * const lexer),
+    ARGIN(lexer_state * const lexer),
     ARGMOD(symbol * const sym))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(* const sym);
 
-void check_unused_symbols(NOTNULL(lexer_state * const lexer))
+void check_unused_symbols(ARGIN(lexer_state * const lexer))
         __attribute__nonnull__(1);
 
 int color_reg(ARGIN(lexer_state * const lexer), pir_type type, int regno)
         __attribute__nonnull__(1);
 
 void declare_local(
-    NOTNULL(lexer_state * const lexer),
+    ARGIN(lexer_state * const lexer),
     pir_type type,
-    NOTNULL(symbol * const list))
+    ARGIN(symbol * const list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -132,33 +132,33 @@ pir_reg * find_register(
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 symbol * find_symbol(
-    NOTNULL(lexer_state * const lexer),
-    NOTNULL(char const * const name))
+    ARGIN(lexer_state * const lexer),
+    ARGIN(char const * const name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-bucket * get_bucket(NOTNULL(hashtable * const table), unsigned long hash)
+bucket * get_bucket(ARGIN(hashtable * const table), unsigned long hash)
         __attribute__nonnull__(1);
 
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
-unsigned get_hashcode(NOTNULL(char const * const str), unsigned num_buckets)
+unsigned get_hashcode(ARGIN(char const * const str), unsigned num_buckets)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 symbol * new_symbol(
-    NOTNULL(lexer_state * const lexer),
-    NOTNULL(char const * const name),
+    ARGIN(lexer_state * const lexer),
+    ARGIN(char const * const name),
     pir_type type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void store_bucket(
-    NOTNULL(hashtable * const table),
-    NOTNULL(bucket * const buck),
+    ARGIN(hashtable * const table),
+    ARGIN(bucket * const buck),
     unsigned long hash)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
