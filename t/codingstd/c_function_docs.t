@@ -99,12 +99,6 @@ compilers/imcc/pcc.c
 compilers/imcc/reg_alloc.c
 compilers/imcc/symreg.c
 compilers/pirc/src/pircapi.c
-compilers/pirc/src/pircompiler.c
-compilers/pirc/src/piremit.c
-compilers/pirc/src/pirmacro.c
-compilers/pirc/src/pirpcc.c
-compilers/pirc/src/pirregalloc.c
-compilers/pirc/src/pirsymbol.c
 config/gen/platform/ansi/dl.c
 config/gen/platform/ansi/exec.c
 config/gen/platform/ansi/time.c
