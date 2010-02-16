@@ -58,6 +58,7 @@ type (string, num, int, pmc).
 static void
 reset_register_count(ARGIN(lsr_allocator * const lsr))
 {
+    ASSERT_ARGS(reset_register_count)
     int i;
     /* the "r" field keeps track of the number of registers that must be allocated by
      * parrot. In the original implementation, "r" is constant, and indicates the number
@@ -232,6 +233,7 @@ Return length of list C<list>
 static unsigned
 lengthi(ARGIN_NULLOK(live_interval *list))
 {
+    ASSERT_ARGS(lengthi)
     unsigned len = 0;
 
     while (list) {
@@ -256,6 +258,7 @@ static void
 add_live_interval(ARGIN(lsr_allocator * const lsr),
     ARGIN(live_interval * const i), pir_type type)
 {
+    ASSERT_ARGS(add_live_interval)
     live_interval *iter = lsr->intervals[type];
 
     /* if there's no interval for the specified type, insert i as the first one and return */
@@ -384,6 +387,7 @@ static void
 add_interval_to_active(ARGIN(lsr_allocator *lsr),
         ARGIN(live_interval * const i), pir_type type)
 {
+    ASSERT_ARGS(add_interval_to_active)
     live_interval *iter = lsr->active[type];
 
     /* if there's no active intervals, set i as first */
@@ -452,6 +456,7 @@ such a second-hand register; otherwise, allocate a brand new one.
 static unsigned
 get_free_reg(ARGIN(lsr_allocator * const lsr), pir_type type)
 {
+    ASSERT_ARGS(get_free_reg)
     /* if there's any second hand register for the requested type, return that. */
     if (lsr->free_regs[type]) {
         free_reg *available  = lsr->free_regs[type];
@@ -525,6 +530,7 @@ Remove interval C<i> from the list of active intervals.
 static void
 remove_from_active(ARGMOD(live_interval *i))
 {
+    ASSERT_ARGS(remove_from_active)
     /* if it has a previous node, that previous node's next is set
      * to i's next.
      */
@@ -590,6 +596,7 @@ static void
 cache_interval_object(ARGIN(lsr_allocator * const lsr),
         ARGIN(live_interval * interval))
 {
+    ASSERT_ARGS(cache_interval_object)
     interval->nextc = lsr->cached_intervals;
     lsr->cached_intervals = interval;
 }
