@@ -126,6 +126,8 @@ This is the vanilla register allocator.
 */
 static int
 next_register(NOTNULL(lexer_state * const lexer), pir_type type) {
+    ASSERT_ARGS(next_register)
+
     CURRENT_SUB(lexer)->info.regs_used[type]++; /* count number of registers used */
     /* fprintf(stderr, "vanilla reg: %d of type %d\n", lexer->curregister[type], type); */
     return lexer->curregister[type]++;
@@ -485,6 +487,8 @@ The function returns the allocated PASM register.
 */
 static int
 use_register(NOTNULL(lexer_state * const lexer), pir_type type, int regno, int pasmregno) {
+    ASSERT_ARGS(use_register)
+
     pir_reg *reg;
 
     /* create a new node representing this PIR register */
@@ -721,6 +725,8 @@ static local_label *
 new_local_label(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name),
                 unsigned offset)
 {
+    ASSERT_ARGS(new_local_label)
+
     local_label *l = pir_mem_allocate_zeroed_typed(lexer, local_label);
     l->name        = name;
     l->offset      = offset;
