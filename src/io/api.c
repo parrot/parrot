@@ -89,7 +89,7 @@ PMC *
 Parrot_io_new_pmc(PARROT_INTERP, INTVAL flags)
 {
     ASSERT_ARGS(Parrot_io_new_pmc)
-    PMC * const new_io = pmc_new(interp, enum_class_FileHandle);
+    PMC * const new_io = Parrot_pmc_new(interp, enum_class_FileHandle);
 
     Parrot_io_set_flags(interp, new_io, flags);
 
@@ -125,7 +125,7 @@ Parrot_io_open(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
     if (PMC_IS_NULL(pmc)) {
         /* TODO: We should look up the HLL mapped type, instead of always
            using FileHandle here */
-        new_filehandle = pmc_new(interp, enum_class_FileHandle);
+        new_filehandle = Parrot_pmc_new(interp, enum_class_FileHandle);
         PARROT_ASSERT(new_filehandle->vtable->base_type == enum_class_FileHandle);
     }
     else

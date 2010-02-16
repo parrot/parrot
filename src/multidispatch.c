@@ -442,7 +442,7 @@ static PMC*
 mmd_build_type_tuple_from_type_list(PARROT_INTERP, ARGIN(PMC *type_list))
 {
     ASSERT_ARGS(mmd_build_type_tuple_from_type_list)
-    PMC   *multi_sig   = constant_Parrot_pmc_new(interp, enum_class_FixedIntegerArray);
+    PMC   *multi_sig   = Parrot_pmc_new_constant(interp, enum_class_FixedIntegerArray);
     INTVAL param_count = VTABLE_elements(interp, type_list);
     INTVAL i;
 
@@ -461,7 +461,7 @@ mmd_build_type_tuple_from_type_list(PARROT_INTERP, ARGIN(PMC *type_list))
         else if (Parrot_str_equal(interp, type_name, CONST_STRING(interp, "FLOATVAL")))
             type = enum_type_FLOATVAL;
         else
-            type = pmc_type(interp, type_name);
+            type = Parrot_pmc_get_type_str(interp, type_name);
 
         VTABLE_set_integer_keyed_int(interp, multi_sig, i, type);
     }
@@ -633,7 +633,7 @@ mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
             if (!sig)
                 return PMCNULL;
 
-            type = pmc_type(interp, sig);
+            type = Parrot_pmc_get_type_str(interp, sig);
 
             if (type == enum_type_undef)
                 return PMCNULL;
@@ -642,7 +642,7 @@ mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
             type = VTABLE_get_integer(interp, sig_elem);
         }
         else
-            type = pmc_type_p(interp, sig_elem);
+            type = Parrot_pmc_get_type(interp, sig_elem);
 
         /* create destination PMC only as necessary */
         if (PMC_IS_NULL(ar)) {
@@ -1061,7 +1061,7 @@ mmd_add_multi_global(PARROT_INTERP, ARGIN(STRING *sub_name), ARGIN(PMC *sub_obj)
     PMC           *multi_sub = Parrot_get_global(interp, ns, sub_name);
 
     if (PMC_IS_NULL(multi_sub)) {
-        multi_sub = constant_Parrot_pmc_new(interp, enum_class_MultiSub);
+        multi_sub = Parrot_pmc_new_constant(interp, enum_class_MultiSub);
         Parrot_set_global(interp, ns, sub_name, multi_sub);
     }
 
@@ -1094,7 +1094,7 @@ mmd_add_multi_to_namespace(PARROT_INTERP, ARGIN(STRING *ns_name),
     PMC        *multi_sub = Parrot_get_global(interp, ns, sub_name);
 
     if (PMC_IS_NULL(multi_sub)) {
-        multi_sub = constant_Parrot_pmc_new(interp, enum_class_MultiSub);
+        multi_sub = Parrot_pmc_new_constant(interp, enum_class_MultiSub);
         Parrot_set_global(interp, ns, sub_name, multi_sub);
     }
 
@@ -1172,7 +1172,7 @@ Parrot_mmd_add_multi_from_c_args(PARROT_INTERP,
     STRING *ns_name       = VTABLE_get_string_keyed_int(interp, type_list, 0);
 
     /* Create an NCI sub for the C function */
-    PMC    *sub_obj       = constant_Parrot_pmc_new(interp, enum_class_NCI);
+    PMC    *sub_obj       = Parrot_pmc_new_constant(interp, enum_class_NCI);
     PMC    *multi_sig     = mmd_build_type_tuple_from_long_sig(interp,
                                 long_sig_str);
 
@@ -1219,7 +1219,7 @@ Parrot_mmd_add_multi_list_from_c_args(PARROT_INTERP,
         STRING   *ns_name   = mmd_info[i].ns_name;
 
         /* Create an NCI sub for the C function */
-        PMC    *sub_obj       = constant_Parrot_pmc_new(interp, enum_class_NCI);
+        PMC    *sub_obj       = Parrot_pmc_new_constant(interp, enum_class_NCI);
 
         VTABLE_set_pointer_keyed_str(interp, sub_obj, short_sig,
                                      F2DPTR(func_ptr));

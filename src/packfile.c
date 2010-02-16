@@ -4059,11 +4059,11 @@ PackFile_Constant_unpack_key(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
         opcode_t        op;
 
         if (tail) {
-            SETATTR_Key_next_key(interp, tail, constant_Parrot_pmc_new(interp, pmc_enum));
+            SETATTR_Key_next_key(interp, tail, Parrot_pmc_new_constant(interp, pmc_enum));
             GETATTR_Key_next_key(interp, tail, tail);
         }
         else
-            head = tail = constant_Parrot_pmc_new(interp, pmc_enum);
+            head = tail = Parrot_pmc_new_constant(interp, pmc_enum);
 
         op = PF_fetch_opcode(pf, &cursor);
 

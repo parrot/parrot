@@ -1364,7 +1364,7 @@ pt_thread_join(NOTNULL(Parrot_Interp parent), UINTVAL tid)
              * dying interpreter, so register it in parent's GC registry
              * XXX is this still needed?
              */
-            gc_register_pmc(parent, parent_ret);
+            Parrot_pmc_gc_register(parent, parent_ret);
             Parrot_unblock_GC_mark(parent);
             retval = parent_ret;
         }
@@ -1388,7 +1388,7 @@ pt_thread_join(NOTNULL(Parrot_Interp parent), UINTVAL tid)
          * value, caller gets it now
          */
         if (retval)
-            gc_unregister_pmc(parent, retval);
+            Parrot_pmc_gc_unregister(parent, retval);
 
         return retval;
     }

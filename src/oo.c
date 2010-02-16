@@ -236,9 +236,9 @@ Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
         if (base_type == enum_class_Key
          || base_type == enum_class_ResizableStringArray
          || base_type == enum_class_String)
-            type = pmc_type_p(interp, key);
+            type = Parrot_pmc_get_type(interp, key);
         else
-            type = pmc_type(interp, VTABLE_get_string(interp, key));
+            type = Parrot_pmc_get_type_str(interp, VTABLE_get_string(interp, key));
 
         classobj = get_pmc_proxy(interp, type);
     }
@@ -411,7 +411,7 @@ Parrot_oo_get_class_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
 
         /* If not found, check for a PMC */
         if (PMC_IS_NULL(_class))
-            return get_pmc_proxy(interp, pmc_type(interp, name));
+            return get_pmc_proxy(interp, Parrot_pmc_get_type_str(interp, name));
         else
             return _class;
     }
@@ -678,7 +678,7 @@ Parrot_oo_register_type(PARROT_INTERP, ARGIN(PMC *name), ARGIN(PMC *_namespace))
      * pt_shared_fixup() can safely do a type lookup. */
     LOCK_INTERPRETER(interp);
     {
-        type = get_new_vtable_index(interp);
+        type = Parrot_pmc_get_new_vtable_index(interp);
     }
     {
         if (!typeid_exists) {
@@ -874,7 +874,7 @@ Parrot_invalidate_method_cache(PARROT_INTERP, ARGIN_NULLOK(STRING *_class))
         return;
     }
 
-    type = pmc_type(interp, _class);
+    type = Parrot_pmc_get_type_str(interp, _class);
 
     if (type == 0)
         invalidate_all_caches(interp);

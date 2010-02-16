@@ -46,7 +46,7 @@ static PMC * get_new_pmc_header(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
-static PMC* pmc_reuse_no_init(PARROT_INTERP,
+static PMC* Parrot_pmc_reuse_noinit(PARROT_INTERP,
     ARGIN(PMC *pmc),
     INTVAL new_type,
     SHIM(UINTVAL flags))
@@ -59,7 +59,7 @@ static PMC* pmc_reuse_no_init(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_get_new_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_pmc_reuse_no_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_pmc_reuse_noinit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -169,7 +169,7 @@ Parrot_pmc_new(PARROT_INTERP, INTVAL base_type)
 
 /*
 
-=item C<PMC * pmc_reuse(PARROT_INTERP, PMC *pmc, INTVAL new_type, UINTVAL
+=item C<PMC * Parrot_pmc_reuse(PARROT_INTERP, PMC *pmc, INTVAL new_type, UINTVAL
 flags)>
 
 Reuse an existing PMC, turning it into an empty PMC of the new type. Any
@@ -188,11 +188,11 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
 PMC *
-pmc_reuse(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
-          UINTVAL flags)
+Parrot_pmc_reuse(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
+    UINTVAL flags)
 {
-    ASSERT_ARGS(pmc_reuse)
-    pmc = pmc_reuse_no_init(interp, pmc, new_type, flags);
+    ASSERT_ARGS(Parrot_pmc_reuse)
+    pmc = Parrot_pmc_reuse_noinit(interp, pmc, new_type, flags);
 
     /* Call the base init for the redone pmc. Warning, this should not
        be called on Object PMCs. */
@@ -203,8 +203,8 @@ pmc_reuse(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
 
 /*
 
-=item C<PMC * pmc_reuse_init(PARROT_INTERP, PMC *pmc, INTVAL new_type, PMC
-*init, UINTVAL flags)>
+=item C<PMC * Parrot_pmc_reuse_init(PARROT_INTERP, PMC *pmc, INTVAL new_type,
+PMC *init, UINTVAL flags)>
 
 Reuse an existing PMC, turning it into an PMC of the new type. Any
 required internal structure will be put in place (such as the extension area)
@@ -222,11 +222,11 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
 PMC *
-pmc_reuse_init(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type, ARGIN(PMC *init),
+Parrot_pmc_reuse_init(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type, ARGIN(PMC *init),
           UINTVAL flags)
 {
-    ASSERT_ARGS(pmc_reuse_init)
-    pmc = pmc_reuse_no_init(interp, pmc, new_type, flags);
+    ASSERT_ARGS(Parrot_pmc_reuse_init)
+    pmc = Parrot_pmc_reuse_noinit(interp, pmc, new_type, flags);
 
     /* Call the base init for the redone pmc. Warning, this should not
        be called on Object PMCs. */
@@ -237,8 +237,8 @@ pmc_reuse_init(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type, ARGIN(PMC *init)
 
 /*
 
-=item C<static PMC* pmc_reuse_no_init(PARROT_INTERP, PMC *pmc, INTVAL new_type,
-UINTVAL flags)>
+=item C<static PMC* Parrot_pmc_reuse_noinit(PARROT_INTERP, PMC *pmc, INTVAL
+new_type, UINTVAL flags)>
 
 Prepare pmc for reuse. Do all scuffolding except initing.
 
@@ -247,10 +247,10 @@ Prepare pmc for reuse. Do all scuffolding except initing.
 */
 PARROT_CANNOT_RETURN_NULL
 static PMC*
-pmc_reuse_no_init(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
+Parrot_pmc_reuse_noinit(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
     SHIM(UINTVAL flags)) {
 
-    ASSERT_ARGS(pmc_reuse_no_init)
+    ASSERT_ARGS(Parrot_pmc_reuse_noinit)
     VTABLE *new_vtable;
     INTVAL  has_ext, new_flags = 0;
 
@@ -281,8 +281,8 @@ pmc_reuse_no_init(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
 
 /*
 
-=item C<PMC * pmc_reuse_by_class(PARROT_INTERP, PMC *pmc, PMC *class_, UINTVAL
-flags)>
+=item C<PMC * Parrot_pmc_reuse_by_class(PARROT_INTERP, PMC *pmc, PMC *class_,
+UINTVAL flags)>
 
 Reuse an existing PMC. Convert it to the type specified by the given Class
 PMC. At the moment, this means we can only use this function to reuse PMCs
@@ -297,10 +297,10 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
 PMC *
-pmc_reuse_by_class(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(PMC *class_),
+Parrot_pmc_reuse_by_class(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(PMC *class_),
     UINTVAL flags)
 {
-    ASSERT_ARGS(pmc_reuse_by_class)
+    ASSERT_ARGS(Parrot_pmc_reuse_by_class)
     const INTVAL   new_type   = PARROT_CLASS(class_)->id;
     VTABLE * const new_vtable = interp->vtables[new_type];
     INTVAL         new_flags  = flags;
@@ -494,7 +494,7 @@ Parrot_pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
 
 /*
 
-=item C<PMC * constant_Parrot_pmc_new_noinit(PARROT_INTERP, INTVAL base_type)>
+=item C<PMC * Parrot_pmc_new_constant(PARROT_INTERP, INTVAL base_type)>
 
 Creates a new constant PMC of type C<base_type>.
 
@@ -505,16 +505,16 @@ Creates a new constant PMC of type C<base_type>.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-constant_Parrot_pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
+Parrot_pmc_new_constant_noinit(PARROT_INTERP, INTVAL base_type)
 {
-    ASSERT_ARGS(constant_Parrot_pmc_new_noinit)
+    ASSERT_ARGS(Parrot_pmc_new_constant_noinit)
     return get_new_pmc_header(interp, base_type, PObj_constant_FLAG);
 }
 
 
 /*
 
-=item C<PMC * constant_Parrot_pmc_new(PARROT_INTERP, INTVAL base_type)>
+=item C<PMC * Parrot_pmc_new_constant(PARROT_INTERP, INTVAL base_type)>
 
 Creates a new constant PMC of type C<base_type>, then calls its C<init>.
 
@@ -525,9 +525,9 @@ Creates a new constant PMC of type C<base_type>, then calls its C<init>.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-constant_Parrot_pmc_new(PARROT_INTERP, INTVAL base_type)
+Parrot_pmc_new_constant(PARROT_INTERP, INTVAL base_type)
 {
-    ASSERT_ARGS(constant_Parrot_pmc_new)
+    ASSERT_ARGS(Parrot_pmc_new_constant)
     PMC * const pmc = get_new_pmc_header(interp, base_type, PObj_constant_FLAG);
     VTABLE_init(interp, pmc);
     return pmc;
@@ -564,7 +564,8 @@ Parrot_pmc_new_init(PARROT_INTERP, INTVAL base_type, ARGOUT(PMC *init))
 
 /*
 
-=item C<PMC * constant_Parrot_pmc_new_init(PARROT_INTERP, INTVAL base_type, PMC *init)>
+=item C<PMC * Parrot_pmc_new_constant_init(PARROT_INTERP, INTVAL base_type, PMC
+*init)>
 
 As C<constant_Parrot_pmc_new>, but passes C<init> to the PMC's C<init_pmc> vtable
 entry.
@@ -576,9 +577,9 @@ entry.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-constant_Parrot_pmc_new_init(PARROT_INTERP, INTVAL base_type, ARGIN_NULLOK(PMC *init))
+Parrot_pmc_new_constant_init(PARROT_INTERP, INTVAL base_type, ARGIN_NULLOK(PMC *init))
 {
-    ASSERT_ARGS(constant_Parrot_pmc_new_init)
+    ASSERT_ARGS(Parrot_pmc_new_constant_init)
     PMC * const pmc = get_new_pmc_header(interp, base_type, PObj_constant_FLAG);
     VTABLE_init_pmc(interp, pmc, init);
     return pmc;
@@ -587,7 +588,7 @@ constant_Parrot_pmc_new_init(PARROT_INTERP, INTVAL base_type, ARGIN_NULLOK(PMC *
 
 /*
 
-=item C<PMC * temporary_Parrot_pmc_new(PARROT_INTERP, INTVAL base_type)>
+=item C<PMC * Parrot_pmc_new_temporary(PARROT_INTERP, INTVAL base_type)>
 
 Creates a new temporary PMC of type C<base_type>, then call C<init>. Cannot
 be used to create PMC Objects which have been defined from PIR.
@@ -615,9 +616,9 @@ never B<ever> add C<PARROT_EXPORT> to either function.)
 
 PARROT_CANNOT_RETURN_NULL
 PMC *
-temporary_Parrot_pmc_new(PARROT_INTERP, INTVAL base_type)
+Parrot_pmc_new_temporary(PARROT_INTERP, INTVAL base_type)
 {
-    ASSERT_ARGS(temporary_Parrot_pmc_new)
+    ASSERT_ARGS(Parrot_pmc_new_temporary)
     PMC * const pmc = get_new_pmc_header(interp, base_type, PObj_constant_FLAG);
     VTABLE_init(interp, pmc);
     return pmc;
@@ -626,7 +627,7 @@ temporary_Parrot_pmc_new(PARROT_INTERP, INTVAL base_type)
 
 /*
 
-=item C<void temporary_pmc_free(PARROT_INTERP, PMC *pmc)>
+=item C<void Parrot_pmc_free_temporary(PARROT_INTERP, PMC *pmc)>
 
 Frees a new temporary PMC created by C<temporary_Parrot_pmc_new()>.  Do not call
 this with any other type of PMC.  Do not forget to call this (or you'll leak
@@ -638,16 +639,16 @@ you're tempted to use this.
 */
 
 void
-temporary_pmc_free(PARROT_INTERP, ARGMOD(PMC *pmc))
+Parrot_pmc_free_temporary(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
-    ASSERT_ARGS(temporary_pmc_free)
+    ASSERT_ARGS(Parrot_pmc_free_temporary)
     Parrot_gc_free_pmc_header(interp, pmc);
 }
 
 
 /*
 
-=item C<INTVAL get_new_vtable_index(PARROT_INTERP)>
+=item C<INTVAL Parrot_pmc_get_new_vtable_index(PARROT_INTERP)>
 
 Get a new unique identifier number and allocate a new vtable structure for a
 new PMC type.
@@ -657,9 +658,9 @@ new PMC type.
 */
 
 INTVAL
-get_new_vtable_index(PARROT_INTERP)
+Parrot_pmc_get_new_vtable_index(PARROT_INTERP)
 {
-    ASSERT_ARGS(get_new_vtable_index)
+    ASSERT_ARGS(Parrot_pmc_get_new_vtable_index)
     const INTVAL type_id = interp->n_vtable_max++;
 
     /* Have we overflowed the table? */
@@ -671,7 +672,7 @@ get_new_vtable_index(PARROT_INTERP)
 
 /*
 
-=item C<INTVAL pmc_register(PARROT_INTERP, STRING *name)>
+=item C<INTVAL Parrot_pmc_register_new_type(PARROT_INTERP, STRING *name)>
 
 Registers the name of a new PMC type with Parrot, returning the INTVAL
 representing that type.
@@ -682,12 +683,12 @@ representing that type.
 
 PARROT_EXPORT
 INTVAL
-pmc_register(PARROT_INTERP, ARGIN(STRING *name))
+Parrot_pmc_register_new_type(PARROT_INTERP, ARGIN(STRING *name))
 {
-    ASSERT_ARGS(pmc_register)
+    ASSERT_ARGS(Parrot_pmc_register_new_type)
     /* If they're looking to register an existing class, return that
        class' type number */
-    INTVAL type = pmc_type(interp, name);
+    INTVAL type = Parrot_pmc_get_type_str(interp, name);
 
     if (type > enum_type_undef)
         return type;
@@ -696,7 +697,7 @@ pmc_register(PARROT_INTERP, ARGIN(STRING *name))
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
             "undefined type already exists - can't register PMC");
 
-    type = get_new_vtable_index(interp);
+    type = Parrot_pmc_get_new_vtable_index(interp);
 
     /* set entry in name->type hash */
     VTABLE_set_integer_keyed_str(interp, interp->class_hash, name, type);
@@ -707,7 +708,7 @@ pmc_register(PARROT_INTERP, ARGIN(STRING *name))
 
 /*
 
-=item C<INTVAL pmc_type(PARROT_INTERP, STRING *name)>
+=item C<INTVAL Parrot_pmc_get_type_str(PARROT_INTERP, STRING *name)>
 
 Returns the PMC type for C<name>.
 
@@ -718,9 +719,9 @@ Returns the PMC type for C<name>.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-pmc_type(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
+Parrot_pmc_get_type_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
 {
-    ASSERT_ARGS(pmc_type)
+    ASSERT_ARGS(Parrot_pmc_get_type_str)
     if (!name)
         return enum_type_undef;
     else {
@@ -743,7 +744,7 @@ pmc_type(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
 
 /*
 
-=item C<INTVAL pmc_type_p(PARROT_INTERP, PMC *name)>
+=item C<INTVAL Parrot_pmc_get_type(PARROT_INTERP, PMC *name)>
 
 Returns the PMC type for C<name>.
 
@@ -753,9 +754,9 @@ Returns the PMC type for C<name>.
 
 PARROT_EXPORT
 INTVAL
-pmc_type_p(PARROT_INTERP, ARGIN(PMC *name))
+Parrot_pmc_get_type(PARROT_INTERP, ARGIN(PMC *name))
 {
-    ASSERT_ARGS(pmc_type_p)
+    ASSERT_ARGS(Parrot_pmc_get_type)
     PMC * const classname_hash = interp->class_hash;
     PMC * item;
 
@@ -813,7 +814,7 @@ create_class_pmc(PARROT_INTERP, INTVAL type)
 
 /*
 
-=item C<void Parrot_create_mro(PARROT_INTERP, INTVAL type)>
+=item C<void Parrot_pmc_create_mro(PARROT_INTERP, INTVAL type)>
 
 Create the MRO (method resolution order) array for this type.
 
@@ -823,9 +824,9 @@ Create the MRO (method resolution order) array for this type.
 
 PARROT_EXPORT
 void
-Parrot_create_mro(PARROT_INTERP, INTVAL type)
+Parrot_pmc_create_mro(PARROT_INTERP, INTVAL type)
 {
-    ASSERT_ARGS(Parrot_create_mro)
+    ASSERT_ARGS(Parrot_pmc_create_mro)
     PMC    *_class, *mro;
     VTABLE *vtable   = interp->vtables[type];
     PMC    *mro_list = vtable->mro;
@@ -848,7 +849,7 @@ Parrot_create_mro(PARROT_INTERP, INTVAL type)
 
     for (i = 0; i < count; ++i) {
         STRING *class_name  = VTABLE_get_string_keyed_int(interp, mro_list, i);
-        INTVAL  parent_type = pmc_type(interp, class_name);
+        INTVAL  parent_type = Parrot_pmc_get_type_str(interp, class_name);
 
         /* abstract classes don't have a vtable */
         if (!parent_type)
@@ -884,7 +885,7 @@ Parrot_create_mro(PARROT_INTERP, INTVAL type)
 
 =over 4
 
-=item C<void gc_register_pmc(PARROT_INTERP, PMC *pmc)>
+=item C<void Parrot_pmc_gc_register(PARROT_INTERP, PMC *pmc)>
 
 Registers the PMC with the interpreter's GC registry.
 
@@ -894,9 +895,9 @@ Registers the PMC with the interpreter's GC registry.
 
 PARROT_EXPORT
 void
-gc_register_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
+Parrot_pmc_gc_register(PARROT_INTERP, ARGIN(PMC *pmc))
 {
-    ASSERT_ARGS(gc_register_pmc)
+    ASSERT_ARGS(Parrot_pmc_gc_register)
     /* Better not trigger a GC run with a potentially unanchored PMC */
     Parrot_block_GC_mark(interp);
 
@@ -906,10 +907,9 @@ gc_register_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
     Parrot_unblock_GC_mark(interp);
 }
 
-
 /*
 
-=item C<void gc_unregister_pmc(PARROT_INTERP, PMC *pmc)>
+=item C<void Parrot_pmc_gc_unregister(PARROT_INTERP, PMC *pmc)>
 
 Unregisters the PMC from the interpreter's GC registry.
 
@@ -919,14 +919,13 @@ Unregisters the PMC from the interpreter's GC registry.
 
 PARROT_EXPORT
 void
-gc_unregister_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
+Parrot_pmc_gc_unregister(PARROT_INTERP, ARGIN(PMC *pmc))
 {
-    ASSERT_ARGS(gc_unregister_pmc)
+    ASSERT_ARGS(Parrot_pmc_gc_unregister)
     PARROT_ASSERT(interp->gc_registry);
 
     VTABLE_delete_keyed(interp, interp->gc_registry, pmc);
 }
-
 
 /*
 
@@ -946,7 +945,6 @@ Initial version by Simon on 2001.10.20.
 =cut
 
 */
-
 
 /*
  * Local variables:

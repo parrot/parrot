@@ -110,7 +110,7 @@ Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
             "unhandled signature '%Ss' in make_cb", cb_signature);
 
-    cb_sig = pmc_new(interp, enum_class_String);
+    cb_sig = Parrot_pmc_new(interp, enum_class_String);
     VTABLE_set_string_native(interp, cb_sig, cb_signature);
     sc = CONST_STRING(interp, "_signature");
     VTABLE_setprop(interp, user_data, sc, cb_sig);
@@ -122,14 +122,14 @@ Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
      * we need to anchor it.
      *
      */
-    gc_register_pmc(interp, user_data);
+    Parrot_pmc_gc_register(interp, user_data);
 
     /*
      * Finally, the external lib awaits a function pointer.
      * Create a PMC that points to Parrot_callback_C (or _D);
      * it can be passed on with signature 'p'.
      */
-    cb = pmc_new(interp, enum_class_UnManagedStruct);
+    cb = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     /*
      * Currently, we handle only 2 types:
      * _C ... user_data is 2nd parameter
@@ -139,7 +139,7 @@ Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
         VTABLE_set_pointer(interp, cb, F2DPTR(Parrot_callback_C));
     else
         VTABLE_set_pointer(interp, cb, F2DPTR(Parrot_callback_D));
-    gc_register_pmc(interp, cb);
+    Parrot_pmc_gc_register(interp, cb);
 
     return cb;
 }
@@ -345,7 +345,7 @@ case_I:
 #endif
       case 'p':
         /* created a UnManagedStruct */
-        p_param = pmc_new(interp, enum_class_UnManagedStruct);
+        p_param = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
         VTABLE_set_pointer(interp, p_param, external_data);
         pasm_sig[1] = 'P';
         param = (void*) p_param;

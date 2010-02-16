@@ -54,7 +54,7 @@ Create ParrotIO object in $1 as a copy of file descriptor $2.
 inline op fdopen(out PMC, in INT, in STR) :filesys_open {
     $1 = Parrot_io_fdopen(interp, PMCNULL, (PIOHANDLE)$2, $3);
     if (!$1)
-        $1 = pmc_new(interp, enum_class_Undef);
+        $1 = Parrot_pmc_new(interp, enum_class_Undef);
 }
 
 =item B<getstdin>(out PMC)

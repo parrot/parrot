@@ -282,7 +282,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
 */
     VTABLE PMC *clone() {
       #ifdef PARROT_HAS_GMP
-        PMC * const ret = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const ret = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         mpq_set(RT(ret), RT(SELF));
         return ret;
       #else
@@ -522,7 +522,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
     MULTI PMC *add(Rational value, PMC* dest) {
       #ifdef PARROT_HAS_GMP
-        dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         mpq_add(RT(dest), RT(SELF), RT(value));
         return dest;
@@ -633,7 +633,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
     MULTI PMC *subtract(Rational value, PMC* dest) {
       #ifdef PARROT_HAS_GMP
-        dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         mpq_sub(RT(dest), RT(SELF), RT(value));
         return dest;
       #else
@@ -743,7 +743,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
     MULTI PMC *multiply(Rational value, PMC* dest) {
       #ifdef PARROT_HAS_GMP
-        dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         mpq_mul(RT(dest), RT(SELF), RT(value));
         return dest;
       #else
@@ -853,7 +853,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
     MULTI PMC *divide(Rational value, PMC* dest) {
       #ifdef PARROT_HAS_GMP
-        dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         mpq_div(RT(dest), RT(SELF), RT(value));
         return dest;
       #else
@@ -951,7 +951,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 */
     VTABLE PMC *neg(PMC* dest) {
       #ifdef PARROT_HAS_GMP
-        dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         mpq_neg(RT(dest), RT(SELF));
         return dest;
@@ -984,7 +984,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 */
     VTABLE PMC *absolute(PMC* dest) {
       #ifdef PARROT_HAS_GMP
-        dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         mpq_abs(RT(dest), RT(SELF));
         return dest;

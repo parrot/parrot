@@ -44,7 +44,7 @@ my %sig_table = (
         final_dest => "PMC * final_destination = PMCNULL;",
         sig_char => "P",
         ret_assign => "if (return_data != NULL) {\n" .
-             "        final_destination = pmc_new(interp, enum_class_UnManagedStruct);\n" .
+             "        final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);\n" .
              "        VTABLE_set_pointer(interp, final_destination, return_data);\n" .
              "    }\n" .
              "    Parrot_pcc_fill_returns_from_c_args(interp, call_object, \"P\", final_destination);",
@@ -398,7 +398,7 @@ HEADER
     );
 
     push @{$put_pointer_ref}, <<"PUT_POINTER";
-        temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
         VTABLE_set_pointer(interp, temp_pmc, (void *)$value);
         VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "$key"), temp_pmc);
 PUT_POINTER
@@ -450,7 +450,7 @@ SHIM(PMC *pmc_nci), NOTNULL(STRING *signature), SHIM(int *jitted))
             IGLOBALS_NCI_FUNCS);
 
     if (!HashPointer) {
-        HashPointer = pmc_new(interp, enum_class_Hash);
+        HashPointer = Parrot_pmc_new(interp, enum_class_Hash);
         VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FUNCS,
                 HashPointer);
     }
@@ -471,7 +471,7 @@ SHIM(PMC *pmc_nci), NOTNULL(STRING *signature), SHIM(int *jitted))
         if (result) {
             struct jit_buffer_private_data *priv;
             *jitted = 1;
-            temp_pmc = pmc_new(interp, enum_class_ManagedStruct);
+            temp_pmc = Parrot_pmc_new(interp, enum_class_ManagedStruct);
             VTABLE_set_pointer(interp, temp_pmc, (void *)result);
 #ifdef PARROT_HAS_EXEC_PROTECT
             priv = (struct jit_buffer_private_data *)

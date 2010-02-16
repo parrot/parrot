@@ -573,7 +573,7 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
     INTVAL          arg_index;
 
     if (PMC_IS_NULL(signature))
-        call_object = pmc_new(interp, enum_class_CallContext);
+        call_object = Parrot_pmc_new(interp, enum_class_CallContext);
     else
         call_object = signature;
 
@@ -749,7 +749,7 @@ dissect_aggregate_arg(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(PMC *aggreg
     else if (VTABLE_does(interp, aggregate, CONST_STRING(interp, "hash"))) {
         const INTVAL elements = VTABLE_elements(interp, aggregate);
         INTVAL index;
-        PMC * const key = pmc_new(interp, enum_class_Key);
+        PMC * const key = Parrot_pmc_new(interp, enum_class_Key);
         VTABLE_set_integer_native(interp, key, 0);
         SETATTR_Key_next_key(interp, key, (PMC *)INITBucketIndex);
 
@@ -799,7 +799,7 @@ Parrot_pcc_build_sig_object_returns_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *sig
     INTVAL          arg_count;
 
     if (PMC_IS_NULL(signature))
-        call_object = pmc_new(interp, enum_class_CallContext);
+        call_object = Parrot_pmc_new(interp, enum_class_CallContext);
     /* A hack to support 'get_results' as the way of fetching the
      * exception object inside an exception handler. The first argument
      * in the call object is the exception, stick it directly into the
@@ -884,7 +884,7 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
     PMC         *type_tuple         = PMCNULL;
     PMC         *arg_flags     = PMCNULL;
     PMC         *return_flags  = PMCNULL;
-    PMC         * const call_object = pmc_new(interp, enum_class_CallContext);
+    PMC         * const call_object = Parrot_pmc_new(interp, enum_class_CallContext);
     const INTVAL sig_len            = strlen(sig);
     INTVAL       in_return_sig      = 0;
     INTVAL       i;
@@ -1087,7 +1087,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                         EXCEPTION_INVALID_OPERATION,
                         "named parameters must follow all positional parameters");
 
-            collect_positional = pmc_new(interp,
+            collect_positional = Parrot_pmc_new(interp,
                     Parrot_get_ctx_HLL_type(interp, enum_class_ResizablePMCArray));
             for (; arg_index < positional_args; arg_index++) {
                 VTABLE_push_pmc(interp, collect_positional,
@@ -1119,7 +1119,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
                 /* Mark the name as used, cannot be filled again. */
                 if (PMC_IS_NULL(named_used_list)) /* Only created if needed. */
-                    named_used_list = pmc_new(interp, enum_class_Hash);
+                    named_used_list = Parrot_pmc_new(interp, enum_class_Hash);
 
                 VTABLE_set_integer_keyed_str(interp, named_used_list, param_name, 1);
             }
@@ -1242,7 +1242,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
         /* Collected ("slurpy") named parameter */
         if (param_flags & PARROT_ARG_SLURPY_ARRAY) {
-            PMC * const collect_named = pmc_new(interp,
+            PMC * const collect_named = Parrot_pmc_new(interp,
                     Parrot_get_ctx_HLL_type(interp, enum_class_Hash));
             PMC * const named_arg_list = VTABLE_get_attr_str(interp, call_object, CONST_STRING(interp, "named"));
             if (!PMC_IS_NULL(named_arg_list)) {
@@ -1260,7 +1260,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                                 VTABLE_get_pmc_keyed_str(interp, call_object, name));
                         /* Mark the name as used, cannot be filled again. */
                         if (PMC_IS_NULL(named_used_list)) /* Only created if needed. */
-                            named_used_list = pmc_new(interp, enum_class_Hash);
+                            named_used_list = Parrot_pmc_new(interp, enum_class_Hash);
                         VTABLE_set_integer_keyed_str(interp, named_used_list, name, 1);
                         named_count++;
                     }
@@ -1291,7 +1291,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
                 /* Mark the name as used, cannot be filled again. */
                 if (PMC_IS_NULL(named_used_list)) /* Only created if needed. */
-                    named_used_list = pmc_new(interp, enum_class_Hash);
+                    named_used_list = Parrot_pmc_new(interp, enum_class_Hash);
                 VTABLE_set_integer_keyed_str(interp, named_used_list, param_name, 1);
                 named_count++;
 
@@ -1680,7 +1680,7 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                         EXCEPTION_INVALID_OPERATION,
                         "named results must follow all positional results");
 
-            collect_positional = pmc_new(interp,
+            collect_positional = Parrot_pmc_new(interp,
                     Parrot_get_ctx_HLL_type(interp, enum_class_ResizablePMCArray));
 
             /* Iterate over all positional returns in the list. */
@@ -1768,7 +1768,7 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
                 /* Mark the name as used, cannot be filled again. */
                 if (PMC_IS_NULL(named_used_list)) /* Only created if needed. */
-                    named_used_list = pmc_new(interp,
+                    named_used_list = Parrot_pmc_new(interp,
                             Parrot_get_ctx_HLL_type(interp, enum_class_Hash));
                 VTABLE_set_integer_keyed_str(interp, named_used_list, result_name, 1);
             }
@@ -1921,7 +1921,7 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         return_flags = return_array[return_index];
 
         if (PMC_IS_NULL(named_return_list)) /* Only created if needed. */
-            named_return_list = pmc_new(interp,
+            named_return_list = Parrot_pmc_new(interp,
                     Parrot_get_ctx_HLL_type(interp, enum_class_Hash));
 
         if (VTABLE_exists_keyed_str(interp, named_return_list, return_name))
@@ -1987,7 +1987,7 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         /* Collected ("slurpy") named result */
         if (result_flags & PARROT_ARG_SLURPY_ARRAY) {
             if (PMC_IS_NULL(named_return_list))
-                named_return_list = pmc_new(interp,
+                named_return_list = Parrot_pmc_new(interp,
                         Parrot_get_ctx_HLL_type(interp, enum_class_Hash));
 
             csr_fill_pmc(interp, call_object, result_index, named_return_list);
@@ -2288,7 +2288,7 @@ parse_signature_string(PARROT_INTERP, ARGIN(const char *signature),
     INTVAL set = 0;
 
     if (PMC_IS_NULL(*arg_flags))
-        *arg_flags = pmc_new(interp, enum_class_ResizableIntegerArray);
+        *arg_flags = Parrot_pmc_new(interp, enum_class_ResizableIntegerArray);
     current_array = *arg_flags;
 
     for (x = signature; *x != '\0'; x++) {
@@ -2307,7 +2307,7 @@ parse_signature_string(PARROT_INTERP, ARGIN(const char *signature),
 
             /* Switch to the return argument flags. */
             if (PMC_IS_NULL(*return_flags))
-                *return_flags = pmc_new(interp, enum_class_ResizableIntegerArray);
+                *return_flags = Parrot_pmc_new(interp, enum_class_ResizableIntegerArray);
             current_array = *return_flags;
         }
         /* parse arg type */
@@ -3142,7 +3142,7 @@ Parrot_pcc_append_result(PARROT_INTERP, ARGIN(PMC *sig_object), ARGIN(STRING *ty
     return_flags = VTABLE_get_attr_str(interp, sig_object, return_flags_name);
     if (PMC_IS_NULL(return_flags)) {
         /* Create return_flags for single element */
-        return_flags = pmc_new(interp, enum_class_FixedIntegerArray);
+        return_flags = Parrot_pmc_new(interp, enum_class_FixedIntegerArray);
         return_flags_size = 0;
         VTABLE_set_integer_native(interp, return_flags, 1);
         VTABLE_set_attr_str(interp, sig_object, return_flags_name, return_flags);

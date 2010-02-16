@@ -236,13 +236,13 @@ namespace, or string PMC.
 =cut
 
 inline op newclass(out PMC, in STR) :object_classes {
-    PMC * const name = pmc_new(interp, enum_class_String);
+    PMC * const name = Parrot_pmc_new(interp, enum_class_String);
     VTABLE_set_string_native(interp, name, $2);
-    $1 = pmc_new_init(interp, enum_class_Class, name);
+    $1 = Parrot_pmc_new_init(interp, enum_class_Class, name);
 }
 
 inline op newclass(out PMC, in PMC) :object_classes {
-    $1 = pmc_new_init(interp, enum_class_Class, $2);
+    $1 = Parrot_pmc_new_init(interp, enum_class_Class, $2);
 }
 
 =item B<subclass>(out PMC, in PMC)
@@ -267,7 +267,7 @@ inline op subclass(out PMC, in PMC) :object_classes :flow {
             "Class '%Ss' doesn't exist", VTABLE_get_string(interp, $2));
         goto ADDRESS(handler);
     }
-    $1 = pmc_new(interp, enum_class_Class);
+    $1 = Parrot_pmc_new(interp, enum_class_Class);
     VTABLE_add_parent(interp, $1, parent_class);
     goto ADDRESS(next);
 }
@@ -297,7 +297,7 @@ inline op subclass(out PMC, in PMC, in PMC) :object_classes :flow {
             "Class '%Ss' doesn't exist", VTABLE_get_string(interp, $2));
         goto ADDRESS(handler);
     }
-    $1 = pmc_new_init(interp, enum_class_Class, $3);
+    $1 = Parrot_pmc_new_init(interp, enum_class_Class, $3);
     VTABLE_add_parent(interp, $1, parent_class);
     goto ADDRESS(next);
 }
@@ -326,7 +326,7 @@ op subclass(out PMC, in STR) :object_classes :flow {
         goto ADDRESS(handler);
     }
 
-    $1 = pmc_new(interp, enum_class_Class);
+    $1 = Parrot_pmc_new(interp, enum_class_Class);
     VTABLE_add_parent(interp, $1, parent_class);
     goto ADDRESS(next);
 }
@@ -358,7 +358,7 @@ op subclass(out PMC, in STR, in PMC) :object_classes :flow {
         goto ADDRESS(handler);
     }
 
-    $1 = pmc_new_init(interp, enum_class_Class, $3);
+    $1 = Parrot_pmc_new_init(interp, enum_class_Class, $3);
     VTABLE_add_parent(interp, $1, parent_class);
     goto ADDRESS(next);
 }

@@ -207,7 +207,7 @@ EOA
     }
     elsif ($attrtype eq "INTVAL") {
         $decl .= <<"EOA";
-            PMC * const attr_value = pmc_new(interp, enum_class_Integer); \\
+            PMC * const attr_value = Parrot_pmc_new(interp, enum_class_Integer); \\
             VTABLE_set_integer_native(interp, attr_value, value); \\
             VTABLE_set_attr_str(interp, pmc, \\
                               Parrot_str_new_constant(interp, "$attrname"), attr_value); \\
@@ -215,7 +215,7 @@ EOA
     }
     elsif ($attrtype eq "FLOATVAL") {
         $decl .= <<"EOA";
-            PMC * const attr_value = pmc_new(interp, enum_class_Float); \\
+            PMC * const attr_value = Parrot_pmc_new(interp, enum_class_Float); \\
             VTABLE_set_number_native(interp, attr_value, value); \\
             VTABLE_set_attr_str(interp, pmc, \\
                               Parrot_str_new_constant(interp, "$attrname"), attr_value); \\
@@ -223,7 +223,7 @@ EOA
     }
     elsif ($attrtype =~ $isptrtostring) {
         $decl .= <<"EOA";
-            PMC * const attr_value = pmc_new(interp, enum_class_String); \\
+            PMC * const attr_value = Parrot_pmc_new(interp, enum_class_String); \\
             VTABLE_set_string_native(interp, attr_value, value); \\
             VTABLE_set_attr_str(interp, pmc, \\
                               Parrot_str_new_constant(interp, "$attrname"), attr_value); \\

@@ -102,7 +102,7 @@ Parrot_io_sockaddr_in(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port)
     ASSERT_ARGS(Parrot_io_sockaddr_in)
 
     char * const s        = Parrot_str_to_cstring(interp, addr);
-    PMC  * const sockaddr = pmc_new(interp, enum_class_Sockaddr);
+    PMC  * const sockaddr = Parrot_pmc_new(interp, enum_class_Sockaddr);
 
     get_sockaddr_in(interp, sockaddr, s, port);
     Parrot_str_free_cstring(s);
@@ -258,7 +258,7 @@ Parrot_io_accept_unix(PARROT_INTERP, ARGMOD(PMC *socket))
     int newsock;
 
     PARROT_SOCKET(newio)->local  = PARROT_SOCKET(socket)->local;
-    PARROT_SOCKET(newio)->remote = pmc_new(interp, enum_class_Sockaddr);
+    PARROT_SOCKET(newio)->remote = Parrot_pmc_new(interp, enum_class_Sockaddr);
     saddr                        = SOCKADDR_REMOTE(newio);
 
     newsock = accept(io->os_handle, (struct sockaddr *)saddr, &addrlen);

@@ -172,7 +172,7 @@ inline op bnot(invar PMC) :base_core {
 
 inline op bnot(out PMC, invar PMC) :base_core {
     const INTVAL a = VTABLE_get_integer(interp, $2);
-    PMC * const b = pmc_new(interp, VTABLE_type(interp, $2));
+    PMC * const b = Parrot_pmc_new(interp, VTABLE_type(interp, $2));
     VTABLE_set_integer_native(interp, b, ~a);
     $1 = b;
 }

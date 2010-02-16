@@ -606,7 +606,7 @@ inline op result_info(out PMC) {
 
     /* If no elements, hand back empty array; otherwise PMC. */
     if (!sig)
-        $1 = pmc_new(interp, enum_class_FixedIntegerArray);
+        $1 = Parrot_pmc_new(interp, enum_class_FixedIntegerArray);
     else
         $1 = sig;
 }
@@ -758,7 +758,7 @@ return; C<1> means an exception has been raised.
 =cut
 
 inline op push_eh(inconst LABEL) {
-    PMC * const eh = pmc_new(interp, enum_class_ExceptionHandler);
+    PMC * const eh = Parrot_pmc_new(interp, enum_class_ExceptionHandler);
     VTABLE_set_pointer(interp, eh, CUR_OPCODE + $1);
     Parrot_cx_add_handler_local(interp, eh);
 }
@@ -874,7 +874,7 @@ inline op exit(in INT) :flow {
 }
 
 inline op pushmark(in INT) {
-    PMC * const newint = pmc_new(interp, enum_class_Integer);
+    PMC * const newint = Parrot_pmc_new(interp, enum_class_Integer);
     VTABLE_set_integer_native(interp, newint, $1);
     VTABLE_push_pmc(interp, interp->dynamic_env, newint);
 }
@@ -1319,10 +1319,10 @@ op dlfunc(out PMC, invar PMC, in STR, in STR) {
         const char * err = Parrot_dlerror();
         Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
                 "Symbol '%s' not found: %s\n", name, err ? err : "unknown reason");
-        $1 = pmc_new(interp, enum_class_Undef);
+        $1 = Parrot_pmc_new(interp, enum_class_Undef);
     }
     else {
-        $1 = pmc_new(interp, enum_class_NCI);
+        $1 = Parrot_pmc_new(interp, enum_class_NCI);
         VTABLE_set_pointer_keyed_str(interp, $1, $4, F2DPTR(p));
         PObj_get_FLAGS($1) |= PObj_private1_FLAG;
     }
@@ -1342,12 +1342,12 @@ op dlvar(out PMC, invar PMC, in STR) {
         const char * const err = Parrot_dlerror();
         Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
                 "Symbol '%s' not found: %s\n", name, err ? err : "unknown reason");
-        $1 = pmc_new(interp, enum_class_Undef);
+        $1 = Parrot_pmc_new(interp, enum_class_Undef);
     }
     else {
         /* At this point we have the symbol's address. We just need to build
            a PMC with it so we can get and set the value */
-        $1 = pmc_new(interp, enum_class_UnManagedStruct);
+        $1 = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
         VTABLE_set_pointer(interp, $1, p);
     }
     Parrot_str_free_cstring(name);
@@ -1399,7 +1399,7 @@ inline op annotations(out PMC) {
                 cur_pos, NULL);
     }
     else {
-        $1 = pmc_new(interp, enum_class_Hash);
+        $1 = Parrot_pmc_new(interp, enum_class_Hash);
     }
     goto NEXT();
 }

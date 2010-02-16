@@ -703,7 +703,7 @@ EOC
         }
 
         /* set up MRO and _namespace */
-        Parrot_create_mro(interp, entry);
+        Parrot_pmc_create_mro(interp, entry);
 EOC
 
     # declare each nci method for this class
@@ -870,7 +870,7 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC* Parrot_${classname}_get_mro(PARROT_INTERP, PMC* mro) {
     if (PMC_IS_NULL(mro)) {
-        mro = pmc_new(interp, enum_class_ResizableStringArray);
+        mro = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
     }
 $get_mro
     VTABLE_unshift_string(interp, mro,

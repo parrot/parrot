@@ -289,11 +289,11 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
     interp->code            = NULL;
 
     /* create the root set registry */
-    interp->gc_registry     = pmc_new(interp, enum_class_AddrRegistry);
+    interp->gc_registry     = Parrot_pmc_new(interp, enum_class_AddrRegistry);
 
     /* And a dynamic environment stack */
     /* TODO: We should really consider removing this (TT #876) */
-    interp->dynamic_env = pmc_new(interp, enum_class_ResizablePMCArray);
+    interp->dynamic_env = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     /* create exceptions list */
     interp->current_runloop_id    = 0;
