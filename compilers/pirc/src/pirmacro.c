@@ -11,6 +11,17 @@
 
 /* HEADERIZER HFILE: none */
 
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void check_size(ARGIN(macro_def * const macro), unsigned length)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_check_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(macro))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 /*
 
 =head1 FUNCTIONS
@@ -23,10 +34,6 @@ Actual expansion of the macros is completely handled in the lexer (pir.l).
 =cut
 
 */
-
-static void check_size(macro_def * const macro, unsigned length);
-
-
 
 
 /*
@@ -41,6 +48,7 @@ Create a new macro definition node and store it in the macro_table C<table>
 */
 PARROT_MALLOC
 PARROT_IGNORABLE_RESULT
+PARROT_CAN_RETURN_NULL
 macro_def *
 new_macro(macro_table * const table, char const * const name, int lineno, int takes_args,
           unsigned initsize)
@@ -65,8 +73,7 @@ new_macro(macro_table * const table, char const * const name, int lineno, int ta
 
 /*
 
-=item C<macro_param *
-new_macro_param(char const * const value)>
+=item C<macro_param * new_macro_param(char const * const value)>
 
 Constructor for a C<macro_param> struct object. Initializes
 the C<name> attribute of the C<macro_param> object to C<value>.
@@ -79,7 +86,8 @@ PARROT_MALLOC
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 macro_param *
-new_macro_param(char const * const value) {
+new_macro_param(char const * const value)
+{
     macro_param *param = (macro_param *)mem_sys_allocate(sizeof (macro_param));
     param->name        = value;
     param->next        = NULL;
@@ -88,8 +96,7 @@ new_macro_param(char const * const value) {
 
 /*
 
-=item C<void
-add_macro_param(macro_def * const macro, char * const name)>
+=item C<void add_macro_param(macro_def * const macro, char const * const name)>
 
 Add a macro parameter by name of C<name> to the macro definition C<macro>.
 
@@ -97,7 +104,8 @@ Add a macro parameter by name of C<name> to the macro definition C<macro>.
 
 */
 void
-add_macro_param(macro_def * const macro, char const * const name) {
+add_macro_param(macro_def * const macro, char const * const name)
+{
     macro_param *param = new_macro_param(name);
     param->next        = macro->parameters;
     macro->parameters  = param;
@@ -130,8 +138,7 @@ new_macro_const(macro_table * const table, char const * const name, char const *
 
 /*
 
-=item C<void
-check_size(macro_def * const macro, unsigned length)>
+=item C<static void check_size(macro_def * const macro, unsigned length)>
 
 Check C<macro>'s buffer size whether C<length> bytes can be added;
 if not, then the buffer is doubled in size.
@@ -140,7 +147,8 @@ if not, then the buffer is doubled in size.
 
 */
 static void
-check_size(macro_def * const macro, unsigned length) {
+check_size(ARGIN(macro_def * const macro), unsigned length)
+{
     unsigned used = macro->cursor - macro->body;
     if (used + length >= macro->buffersize) {
         unsigned  newsize = macro->buffersize << 1;
@@ -159,8 +167,7 @@ check_size(macro_def * const macro, unsigned length) {
 
 /*
 
-=item C<void
-store_macro_char(macro_def * const macro, char c)>
+=item C<void store_macro_char(macro_def * const macro, char c)>
 
 Store the character C<c> in C<macro>'s body buffer.
 
@@ -168,7 +175,8 @@ Store the character C<c> in C<macro>'s body buffer.
 
 */
 void
-store_macro_char(macro_def * const macro, char c) {
+store_macro_char(ARGIN(macro_def * const macro), char c)
+{
     /* if buffer is full, resize it. */
     check_size(macro, 1);
     *(macro->cursor)++ = c;
@@ -190,7 +198,8 @@ beforehand how much space we need in the buffer due to the var. arg. list.
 
 */
 void
-store_macro_string(macro_def * const macro, char const * const str, ...) {
+store_macro_string(macro_def * const macro, char const * const str, ...)
+{
     va_list arg_ptr;
 
 #define MAX_NUM_CHARS_IN_STRING   256
@@ -206,8 +215,8 @@ store_macro_string(macro_def * const macro, char const * const str, ...) {
 
 /*
 
-=item C<macro_def *
-find_macro(constant_table * const table, char * const name)>
+=item C<macro_def * find_macro(macro_table * const table, char const * const
+name)>
 
 Find the specified macro. If the specified macro does not exist,
 NULL is returned.
@@ -218,7 +227,8 @@ NULL is returned.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 macro_def *
-find_macro(macro_table * const table, char const * const name) {
+find_macro(macro_table * const table, char const * const name)
+{
     macro_def *iter = table->definitions;
 
     PARROT_ASSERT(name != NULL);
@@ -243,8 +253,7 @@ find_macro(macro_table * const table, char const * const name) {
 
 /*
 
-=item C<macro_table *
-new_macro_table(macro_table * const current)>
+=item C<macro_table * new_macro_table(macro_table * const current)>
 
 Create a new macro_table structure; set C<current> as its previous.
 The newly created table is returned.
@@ -256,7 +265,8 @@ PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 macro_table *
-new_macro_table(macro_table * const current) {
+new_macro_table(ARGIN(macro_table * const current))
+{
     macro_table *table       = (macro_table *)mem_sys_allocate_zeroed(sizeof (macro_table));
     table->definitions       = NULL;
     table->prev = NULL;
@@ -278,14 +288,15 @@ Free resources allocated for the macro_table C<table>.
 
 */
 void
-delete_macro_table(macro_table * table) {
+delete_macro_table(macro_table * table)
+{
     mem_sys_free(table);
 }
 
 /*
 
-=item C<void
-declare_macro_local(macro_def * const macro, char * const name)>
+=item C<void declare_macro_local(macro_def * const macro, char const * const
+name)>
 
 Declare C<name> as a C<.macro_local> for the macro definition C<macro>.
 
@@ -293,7 +304,8 @@ Declare C<name> as a C<.macro_local> for the macro definition C<macro>.
 
 */
 void
-declare_macro_local(macro_def * const macro, char const * const name) {
+declare_macro_local(macro_def * const macro, char const * const name)
+{
     macro_param * param = new_macro_param(name);
     param->next         = macro->macrolocals;
     macro->macrolocals  = param;
@@ -302,8 +314,7 @@ declare_macro_local(macro_def * const macro, char const * const name) {
 
 /*
 
-=item C<int
-is_macro_local(macro_def * const macro, char * const name)>
+=item C<int is_macro_local(macro_def * const macro, char const * const name)>
 
 Check whether C<name> was declared as a C<.macro_local> in the macro
 definition C<macro>.
@@ -313,7 +324,8 @@ definition C<macro>.
 */
 PARROT_WARN_UNUSED_RESULT
 int
-is_macro_local(macro_def * const macro, char const * const name) {
+is_macro_local(macro_def * const macro, char const * const name)
+{
     macro_param *iter = macro->macrolocals;
 
     while (iter) {
