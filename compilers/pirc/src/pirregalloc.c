@@ -76,17 +76,36 @@ reset_register_count(lsr_allocator * const lsr) {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void add_free_reg(
-    lsr_allocator * const lsr,
+    ARGIN(lsr_allocator * const lsr),
     unsigned regno,
-    pir_type type);
+    pir_type type)
+        __attribute__nonnull__(1);
+
+static void cache_interval_object(
+    ARGMOD(lsr_allocator * const lsr),
+    live_interval * interval)
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(* const lsr);
 
 static void expire_old_intervals(
-    lsr_allocator * const lsr,
+    ARGMOD(lsr_allocator * const lsr),
     live_interval * const i,
-    pir_type type);
+    pir_type type)
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(* const lsr);
 
-#define ASSERT_ARGS_add_free_reg __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_expire_old_intervals __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+static void remove_from_active(ARGMOD(live_interval *i))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*i);
+
+#define ASSERT_ARGS_add_free_reg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lsr))
+#define ASSERT_ARGS_cache_interval_object __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lsr))
+#define ASSERT_ARGS_expire_old_intervals __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lsr))
+#define ASSERT_ARGS_remove_from_active __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(i))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -416,7 +435,7 @@ Add register C<regno> to the list of free regs that can be reuse.
 
 */
 static void
-add_free_reg(lsr_allocator * const lsr, unsigned regno, pir_type type) {
+add_free_reg(ARGIN(lsr_allocator * const lsr), unsigned regno, pir_type type) {
     ASSERT_ARGS(add_free_reg)
 
     free_reg *reg;
@@ -443,8 +462,7 @@ add_free_reg(lsr_allocator * const lsr, unsigned regno, pir_type type) {
 
 /*
 
-=item C<static void
-remove_from_active(live_interval *i)>
+=item C<static void remove_from_active(live_interval *i)>
 
 Remove interval C<i> from the list of active intervals.
 
@@ -452,7 +470,8 @@ Remove interval C<i> from the list of active intervals.
 
 */
 static void
-remove_from_active(live_interval *i) {
+remove_from_active(ARGMOD(live_interval *i))
+{
     /* if it has a previous node, that previous node's next is set
      * to i's next.
      */
@@ -481,7 +500,9 @@ active, as it has expired. (the variable is no longer needed).
 
 */
 static void
-expire_old_intervals(lsr_allocator * const lsr, live_interval * const i, pir_type type) {
+expire_old_intervals(ARGMOD(lsr_allocator * const lsr),
+        live_interval * const i, pir_type type)
+{
     ASSERT_ARGS(expire_old_intervals)
 
     live_interval *j;
@@ -513,15 +534,15 @@ a new one.
 
 */
 static void
-cache_interval_object(lsr_allocator * const lsr, live_interval * interval) {
+cache_interval_object(ARGMOD(lsr_allocator * const lsr), live_interval * interval)
+{
     interval->nextc = lsr->cached_intervals;
     lsr->cached_intervals = interval;
 }
 
 /*
 
-=item C<void
-linear_scan_register_allocation(lsr_allocator * const lsr)>
+=item C<void linear_scan_register_allocation(lsr_allocator * const lsr)>
 
 Go over all live intervals; before handling any interval, expire all old ones;
 they might have expired (see expire_old_intervals()). Then, allocate a new
@@ -531,7 +552,8 @@ register; this can be one that was just expired.
 
 */
 void
-linear_scan_register_allocation(lsr_allocator * const lsr) {
+linear_scan_register_allocation(ARGMOD(lsr_allocator * const lsr))
+{
     live_interval * i;
     pir_type type = 0; /* types run from 0 to 4; see pircompunit.h */
 
