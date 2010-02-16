@@ -14,7 +14,7 @@
 
 #include "parrot/oplib/ops.h"
 
-/* HEADERIZER HFILE: none */
+/* HEADERIZER HFILE: compilers/pirc/src/piremit.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -177,7 +177,7 @@ has two elements: C<"hi"> and C<42>.
 
 */
 void
-print_key(ARGIN(lexer_state * const lexer), key * const k)
+print_key(ARGIN(lexer_state * const lexer), ARGIN(key * const k))
 {
     key_entry *iter;
 
@@ -209,7 +209,7 @@ printed as well. Examples:
 
 */
 void
-print_target(ARGIN(lexer_state * const lexer), target * const t)
+print_target(ARGIN(lexer_state * const lexer),  ARGIN(target * const t))
 {
     PARROT_ASSERT(t->info);
     fprintf(out, "%c%d", pir_register_types[t->info->type], t->info->color);
@@ -230,7 +230,8 @@ value is printed.
 
 */
 void
-print_constant(ARGIN(lexer_state * const lexer), constant * const c)
+print_constant(ARGIN(lexer_state * const lexer),
+        ARGIN(constant * const c))
 {
     switch (c->type) {
       case INT_VAL:
@@ -265,7 +266,8 @@ a specialized function based on C<expr>'s type.
 
 */
 void
-print_expr(ARGIN(lexer_state * const lexer), expression * const expr)
+print_expr(ARGIN(lexer_state * const lexer),
+        ARGIN(expression * const expr))
 {
     switch (expr->type) {
       case EXPR_TARGET:
@@ -302,7 +304,8 @@ separated by commas.
 
 */
 void
-print_expressions(ARGIN(lexer_state * const lexer), expression * const expr)
+print_expressions(ARGIN(lexer_state * const lexer),
+        ARGIN(expression * const expr))
 {
     expression *iter;
 
@@ -331,7 +334,8 @@ Print the instruction C<ins>.
 
 */
 void
-print_instruction(ARGIN(lexer_state * const lexer), instruction * const ins)
+print_instruction(ARGIN(lexer_state * const lexer),
+        ARGIN(instruction * const ins))
 {
     PARROT_ASSERT(ins != NULL);
 
@@ -367,7 +371,8 @@ XXX
 
 */
 void
-print_statement(ARGIN(lexer_state * const lexer), subroutine * const sub)
+print_statement(ARGIN(lexer_state * const lexer),
+        ARGIN(subroutine * const sub))
 {
     instruction *statiter;
 
@@ -551,7 +556,8 @@ does nothing and returns.
 
 */
 void
-emit_pir_subs(ARGIN(lexer_state * const lexer), char const * const outfile)
+emit_pir_subs(ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const outfile))
 {
     subroutine *subiter;
 
