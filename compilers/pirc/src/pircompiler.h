@@ -202,7 +202,7 @@ PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 lexer_state * new_lexer(PARROT_INTERP,
-    NULLOK(char * const filename),
+    ARGIN_NULLOK(char * const filename),
     int flags)
         __attribute__nonnull__(1);
 
@@ -221,10 +221,12 @@ void * pir_mem_allocate_zeroed(
         __attribute__nonnull__(1);
 
 void pirwarning(
-    lexer_state * const lexer,
+    ARGIN(lexer_state * const lexer),
     int lineno,
-    char const * const message,
-    ...);
+    ARGIN(char const * const message),
+    ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 void release_resources(ARGIN(lexer_state *lexer))
         __attribute__nonnull__(1);
@@ -246,7 +248,9 @@ void release_resources(ARGIN(lexer_state *lexer))
        PARROT_ASSERT_ARG(lexer))
 #define ASSERT_ARGS_pir_mem_allocate_zeroed __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lexer))
-#define ASSERT_ARGS_pirwarning __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_pirwarning __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(message))
 #define ASSERT_ARGS_release_resources __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lexer))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

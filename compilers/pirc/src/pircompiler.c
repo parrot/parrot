@@ -205,7 +205,7 @@ PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 lexer_state *
-new_lexer(PARROT_INTERP, NULLOK(char * const filename), int flags)
+new_lexer(PARROT_INTERP, ARGIN_NULLOK(char * const filename), int flags)
 {
     lexer_state *lexer       = mem_allocate_zeroed_typed(lexer_state);
     lexer->filename          = filename;
@@ -437,7 +437,10 @@ C<vfprintf()>.
 
 */
 void
-pirwarning(lexer_state * const lexer, int lineno, char const * const message, ...)
+pirwarning(ARGIN(lexer_state * const lexer),
+        int lineno,
+        ARGIN(char const * const message),
+        ...)
 {
     va_list arg_ptr;
     fprintf(stderr, "warning (line %d): ", lineno);
