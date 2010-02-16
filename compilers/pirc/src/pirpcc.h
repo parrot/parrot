@@ -14,16 +14,18 @@
 
 void convert_inv_to_instr(
     ARGIN(lexer_state * const lexer),
-    invocation * const inv)
-        __attribute__nonnull__(1);
+    ARGIN(invocation * const inv))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void emit_sub_epilogue(ARGIN(lexer_state * const lexer))
         __attribute__nonnull__(1);
 
 void generate_getresults_instr(
     ARGIN(lexer_state * const lexer),
-    target * const targetlist)
-        __attribute__nonnull__(1);
+    ARGIN(target * const targetlist))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void generate_parameters_instr(
     ARGIN(lexer_state * const lexer),
@@ -31,11 +33,13 @@ void generate_parameters_instr(
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_convert_inv_to_instr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(inv))
 #define ASSERT_ARGS_emit_sub_epilogue __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lexer))
 #define ASSERT_ARGS_generate_getresults_instr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(targetlist))
 #define ASSERT_ARGS_generate_parameters_instr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lexer))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

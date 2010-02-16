@@ -48,7 +48,7 @@ Globally defined constants are stored in yet another separate list.
 */
 
 
-/* HEADERIZER HFILE: none */
+/* HEADERIZER HFILE: compilers/pirc/src/pirsymbol.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

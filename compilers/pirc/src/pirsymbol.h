@@ -75,49 +75,158 @@ typedef struct local_label {
 /* lookup table to convert value_type and pir_type values into one another. */
 extern const int valuetype_pirtype_clut[10];
 
+/* HEADERIZER BEGIN: compilers/pirc/src/pirsymbol.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-/* symbol constructor */
-symbol *new_symbol(struct lexer_state * const lexer, char const * const name, pir_type type);
+void assign_vanilla_register(
+    NOTNULL(lexer_state * const lexer),
+    ARGMOD(symbol * const sym))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* const sym);
 
-/* to enter a symbol in the symbol table */
-void declare_local(struct lexer_state * const lexer, pir_type type, symbol * const list);
+void check_unused_symbols(NOTNULL(lexer_state * const lexer))
+        __attribute__nonnull__(1);
 
-/* to find a symbol in the symbol table */
-symbol *find_symbol(struct lexer_state * const lexer, char const * const name);
+int color_reg(ARGIN(lexer_state * const lexer), pir_type type, int regno)
+        __attribute__nonnull__(1);
 
+void declare_local(
+    NOTNULL(lexer_state * const lexer),
+    pir_type type,
+    NOTNULL(symbol * const list))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
-pir_reg *find_register(struct lexer_state * const lexer, pir_type type, int regno);
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+constdecl * find_global_constant(
+    ARGIN(lexer_state * const lexer),
+    ARGIN(char const * const name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+global_label * find_global_label(
+    ARGIN(lexer_state * const lexer),
+    ARGIN(char const * const name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-/* to find declared symbols that are never referenced */
-void check_unused_symbols(struct lexer_state * const lexer);
+PARROT_WARN_UNUSED_RESULT
+unsigned find_local_label(
+    ARGIN(lexer_state * const lexer),
+    ARGIN(char const * const labelname))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-/* find specified register; if it was not used yet, assign a PASM register to it */
-int color_reg(struct lexer_state * const lexer, pir_type type, int regno);
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+pir_reg * find_register(
+    ARGIN(lexer_state * const lexer),
+    pir_type type,
+    int regno)
+        __attribute__nonnull__(1);
 
-/* store a global identifier (label) */
-void store_global_label(struct lexer_state * const lexer, char const * const name);
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+symbol * find_symbol(
+    NOTNULL(lexer_state * const lexer),
+    NOTNULL(char const * const name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-/* find a global identifier */
-global_label *find_global_label(struct lexer_state * const lexer, char const * const name);
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+bucket * get_bucket(NOTNULL(hashtable * const table), unsigned long hash)
+        __attribute__nonnull__(1);
 
-/* store a global .const symbol */
-void store_global_constant(struct lexer_state * const lexer, constdecl * const c);
+PARROT_PURE_FUNCTION
+PARROT_WARN_UNUSED_RESULT
+unsigned get_hashcode(NOTNULL(char const * const str), unsigned num_buckets)
+        __attribute__nonnull__(1);
 
-/* find a global .const symbol */
-constdecl *find_global_constant(struct lexer_state * const lexer, char const * const name);
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+symbol * new_symbol(
+    NOTNULL(lexer_state * const lexer),
+    NOTNULL(char const * const name),
+    pir_type type)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-void assign_vanilla_register(struct lexer_state * const lexer, symbol * const sym);
+void store_bucket(
+    NOTNULL(hashtable * const table),
+    NOTNULL(bucket * const buck),
+    unsigned long hash)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-void store_local_label(struct lexer_state * const lexer, char const * const label, unsigned offset);
+void store_global_constant(
+    ARGIN(lexer_state * const lexer),
+    ARGIN(constdecl * const c))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-unsigned find_local_label(struct lexer_state * const lexer, char const * const label);
+void store_global_label(
+    ARGIN(lexer_state * const lexer),
+    ARGIN(char const * const name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-unsigned get_hashcode(char const * const str, unsigned num_buckets);
+void store_local_label(
+    ARGIN(lexer_state * const lexer),
+    ARGIN(char const * const labelname),
+    unsigned offset)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-bucket *get_bucket(hashtable * const table, unsigned long hash);
-
-void store_bucket(hashtable * const table, bucket * const buck, unsigned long hash);
+#define ASSERT_ARGS_assign_vanilla_register __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(sym))
+#define ASSERT_ARGS_check_unused_symbols __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer))
+#define ASSERT_ARGS_color_reg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer))
+#define ASSERT_ARGS_declare_local __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(list))
+#define ASSERT_ARGS_find_global_constant __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_find_global_label __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_find_local_label __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(labelname))
+#define ASSERT_ARGS_find_register __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer))
+#define ASSERT_ARGS_find_symbol __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_get_bucket __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(table))
+#define ASSERT_ARGS_get_hashcode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(str))
+#define ASSERT_ARGS_new_symbol __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_store_bucket __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(table) \
+    , PARROT_ASSERT_ARG(buck))
+#define ASSERT_ARGS_store_global_constant __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(c))
+#define ASSERT_ARGS_store_global_label __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_store_local_label __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(labelname))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: compilers/pirc/src/pirsymbol.c */
 
 #endif /* PARROT_PIR_PIRSYMBOL_H_GUARD */
 
