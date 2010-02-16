@@ -86,7 +86,7 @@ PARROT_MALLOC
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 macro_param *
-new_macro_param(char const * const value)
+new_macro_param(ARGIN(char const * const value))
 {
     macro_param *param = (macro_param *)mem_sys_allocate(sizeof (macro_param));
     param->name        = value;
@@ -149,6 +149,7 @@ if not, then the buffer is doubled in size.
 static void
 check_size(ARGIN(macro_def * const macro), unsigned length)
 {
+    ASSERT_ARGS(check_size)
     unsigned used = macro->cursor - macro->body;
     if (used + length >= macro->buffersize) {
         unsigned  newsize = macro->buffersize << 1;
