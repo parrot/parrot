@@ -496,21 +496,9 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(STRING *a),
     ASSERT_ARGS(Parrot_str_concat)
     if (a && a->strlen) {
         if (b && b->strlen) {
-            const ENCODING *enc;
-            const CHARSET  *cs = string_rep_compatible(interp, a, b, &enc);
-            STRING         *result;
-
-            if (!cs) {
-                cs  = a->charset;
-                enc = a->encoding;
-            }
-            result = Parrot_str_new_init(interp, NULL, a->bufused + b->bufused,
-                        enc, cs, 0);
-
-            result = Parrot_str_append(interp, result, a);
-            result = Parrot_str_append(interp, result, b);
-
-            return result;
+            STRING *result = Parrot_str_copy(interp, a);
+            Parrot_str_write_COW(interp, result);
+            return Parrot_str_append(interp, result, b);
         }
 
         return Parrot_str_copy(interp, a);
@@ -573,10 +561,10 @@ Parrot_str_append(PARROT_INTERP, ARGMOD_NULLOK(STRING *a), ARGIN_NULLOK(STRING *
     }
     else {
         /* upgrade strings for concatenation */
-        enc = (a->encoding == Parrot_utf16_encoding_ptr ||
-                  b->encoding == Parrot_utf16_encoding_ptr ||
-                  a->encoding == Parrot_ucs2_encoding_ptr ||
-                  b->encoding == Parrot_ucs2_encoding_ptr)
+        enc = (a->encoding == Parrot_utf16_encoding_ptr
+           ||  b->encoding == Parrot_utf16_encoding_ptr
+           ||  a->encoding == Parrot_ucs2_encoding_ptr
+           ||  b->encoding == Parrot_ucs2_encoding_ptr)
               ? Parrot_utf16_encoding_ptr
               : Parrot_utf8_encoding_ptr;
 
