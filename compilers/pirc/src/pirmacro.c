@@ -54,7 +54,7 @@ new_macro(ARGIN(macro_table * const table),
         ARGIN(char const * const name), int lineno, int takes_args,
         unsigned initsize)
 {
-    ASSERT_ARGS(new_macro_table)
+    ASSERT_ARGS(new_macro)
     macro_def *macro   = (macro_def *)mem_sys_allocate(sizeof (macro_def));
 
     macro->name        = name;
@@ -282,6 +282,7 @@ PARROT_WARN_UNUSED_RESULT
 macro_table *
 new_macro_table(ARGIN(macro_table * const current))
 {
+    ASSERT_ARGS(new_macro_table)
     macro_table *table       = (macro_table *)mem_sys_allocate_zeroed(sizeof (macro_table));
     table->definitions       = NULL;
     table->prev = NULL;
