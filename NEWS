@@ -1,5 +1,21 @@
 # $Id$
 
+New in 2.1.0
+- Core changes
+  + GC performance and encapsulation were greatly improved.
+  + PMC freeze refactored.
+  + More Makefile and build improvements.
+- API Changes
+  + The Array PMC was removed.
+  + Several deprecated vtables were removed.
+  + The OrderedHash PMC was substantialy improved.
+- Platforms
+  + Packaging improvements on some operating systems.
+- Tools
+  + Some cases in pbc_merge are now handled.
+  + Improvements were made to the dependency checker.
+  + New tool nativecall.pir added.
+
 New in 2.0.0
 - Features
   + Context PMCs now support attribute-based introspection
