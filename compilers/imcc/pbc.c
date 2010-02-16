@@ -1058,7 +1058,7 @@ mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
 
         if (r->set == 'S') {
             STRING * const type_name = ct->constants[r->color]->u.string;
-            const INTVAL type_num    = pmc_type(interp, type_name);
+            const INTVAL type_num    = Parrot_pmc_get_type_str(interp, type_name);
 
             if (type_num == enum_type_undef) {
                 sig_pmc = Parrot_pmc_new(interp, enum_class_String);
@@ -1292,7 +1292,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
         if (!PMC_IS_NULL(classobj))
             sub_pmc = VTABLE_instantiate(interp, classobj, PMCNULL);
         else {
-            const INTVAL type = pmc_type(interp, classname);
+            const INTVAL type = Parrot_pmc_get_type_str(interp, classname);
             if (type <= 0)
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NO_CLASS,
                     "Class '%Ss' specified in :instanceof(...) not found",
@@ -1348,7 +1348,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
             ns_pmc = ct->constants[ns_const]->u.key;
             break;
           case PFC_STRING:
-            ns_pmc = constant_Parrot_pmc_new(interp, enum_class_String);
+            ns_pmc = Parrot_pmc_new_constant(interp, enum_class_String);
             VTABLE_set_string_native(interp, ns_pmc, ct->constants[ns_const]->u.string);
             break;
           default:
@@ -1805,7 +1805,7 @@ make_pmc_const(PARROT_INTERP, ARGMOD(SymReg *r))
     else
         s = Parrot_str_unescape(interp, r->name, 0, NULL);
 
-    p  = constant_Parrot_pmc_new(interp, r->pmc_type);
+    p  = Parrot_pmc_new_constant(interp, r->pmc_type);
 
     switch (r->pmc_type) {
       case enum_class_Integer:

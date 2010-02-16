@@ -38,7 +38,7 @@ upgrade_self_to_bignum(PARROT_INTERP, PMC *self)
     /* Do an in-place upgrade to a Bignum of SELF and return a pointer
        to it (which is probably redundant, but whatever). */
     const INTVAL a = VTABLE_get_integer(interp, self);
-    pmc_reuse(interp, self, enum_class_BigInt, 0);
+    Parrot_pmc_reuse(interp, self, enum_class_BigInt, 0);
     VTABLE_set_integer_native(interp, self, a);
     return self;
 }
@@ -230,20 +230,20 @@ Morphs the integer to a C<String> and sets the value from C<value>.
 */
 
     VTABLE void set_number_native(FLOATVAL value) {
-        pmc_reuse(INTERP, SELF, enum_class_Float, 0);
+        Parrot_pmc_reuse(INTERP, SELF, enum_class_Float, 0);
         SELF.set_number_native(value);
     }
 
 
     VTABLE void set_bool(INTVAL value) {
-        pmc_reuse(INTERP, SELF, enum_class_Boolean, 0);
+        Parrot_pmc_reuse(INTERP, SELF, enum_class_Boolean, 0);
         SELF.set_bool(value);
     }
 
 
 
     VTABLE void set_string_native(STRING *value) {
-        pmc_reuse(INTERP, SELF, enum_class_String, 0);
+        Parrot_pmc_reuse(INTERP, SELF, enum_class_String, 0);
         SELF.set_string_native(value);
     }
 
@@ -354,7 +354,7 @@ Adds C<value> to C<SELF> inplace.
     MULTI void i_add(Complex value) {
         const INTVAL a = SELF.get_integer();
 
-        pmc_reuse(INTERP, SELF, enum_class_Complex, 0);
+        Parrot_pmc_reuse(INTERP, SELF, enum_class_Complex, 0);
         VTABLE_set_number_native(INTERP, SELF,
                 SELF.get_integer() + VTABLE_get_number(INTERP, value));
     }
@@ -515,7 +515,7 @@ Subtracts C<value> from C<SELF> inplace.
     MULTI void i_subtract(Complex value) {
         const INTVAL a = SELF.get_integer();
 
-        pmc_reuse(INTERP, SELF, enum_class_Complex, 0);
+        Parrot_pmc_reuse(INTERP, SELF, enum_class_Complex, 0);
         VTABLE_set_number_native(INTERP, SELF,
                 (FLOATVAL)a - VTABLE_get_number_keyed_int(INTERP, value, 0));
         VTABLE_set_number_keyed_int(INTERP, SELF, 1,
@@ -1107,7 +1107,7 @@ Increments the integer.
         if ((c^a) >= 0 || (c^1) >= 0)
             SET_ATTR_iv(interp, SELF, c);
         else {
-            pmc_reuse(interp, SELF, enum_class_BigInt, 0);
+            Parrot_pmc_reuse(interp, SELF, enum_class_BigInt, 0);
             VTABLE_set_integer_native(interp, SELF, a);
             VTABLE_increment(interp, SELF);
         }
@@ -1131,7 +1131,7 @@ Decrements the integer.
         if ((c^a) >= 0 || (c^~1) >= 0)
             VTABLE_set_integer_native(interp, SELF, c);
         else {
-            pmc_reuse(INTERP, SELF, enum_class_BigInt, 0);
+            Parrot_pmc_reuse(INTERP, SELF, enum_class_BigInt, 0);
             VTABLE_set_integer_native(interp, SELF, a);
             VTABLE_decrement(interp, SELF);
         }

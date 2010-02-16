@@ -154,7 +154,7 @@ iNEW(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(SymReg *r0),
     SymReg *regs[3];
     SymReg *pmc;
     int nargs;
-    const int pmc_num = pmc_type(interp,
+    const int pmc_num = Parrot_pmc_get_type_str(interp,
             Parrot_str_new(interp, *type == '.' ? type + 1 : type, 0));
 
     snprintf(fmt, sizeof (fmt), "%d", pmc_num);

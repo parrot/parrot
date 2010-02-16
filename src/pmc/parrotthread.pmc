@@ -71,7 +71,7 @@ static INTVAL do_thread_run(PARROT_INTERP, PMC *thread,
     interp->flags &= ~PARROT_THR_COPY_INTERP; /* XXX */
     pt_thread_run(interp, thread, sub, args);
 
-    pmc_reuse(interp, thread, enum_class_ParrotRunningThread, 0);
+    Parrot_pmc_reuse(interp, thread, enum_class_ParrotRunningThread, 0);
 
     PObj_custom_mark_CLEAR(thread);
     VTABLE_set_integer_native(interp, thread, tid);

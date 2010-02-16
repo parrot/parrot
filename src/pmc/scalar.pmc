@@ -39,15 +39,15 @@ according to the type of C<*value>.
 
         if (self_type == enum_class_Boolean)
             /* doesn't morph */
-            pmc_reuse(INTERP, SELF, val_type, 0);
+            Parrot_pmc_reuse(INTERP, SELF, val_type, 0);
 
         if (val_type == enum_class_Undef) {
-            pmc_reuse(INTERP, SELF, val_type, 0);
+            Parrot_pmc_reuse(INTERP, SELF, val_type, 0);
             return;
         }
 
         if (VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "Undef"))) {
-            pmc_reuse(INTERP, SELF, enum_class_Undef, 0);
+            Parrot_pmc_reuse(INTERP, SELF, enum_class_Undef, 0);
             return;
         }
 
@@ -68,7 +68,7 @@ according to the type of C<*value>.
             SELF.set_string_native(v);
             return;
         }
-        pmc_reuse(INTERP, SELF, val_type, 0);
+        Parrot_pmc_reuse(INTERP, SELF, val_type, 0);
         SELF.set_pmc(value);
     }
 
@@ -148,7 +148,7 @@ Adds C<value> to C<SELF> inplace.
     MULTI void i_add(Complex value) {
         const FLOATVAL a = SELF.get_number();
 
-        pmc_reuse(INTERP, SELF, enum_class_Complex, 0);
+        Parrot_pmc_reuse(INTERP, SELF, enum_class_Complex, 0);
         VTABLE_set_number_native(INTERP, SELF,
                 a + VTABLE_get_number_keyed_int(INTERP, value, 0));
         VTABLE_set_number_keyed_int(INTERP, SELF, 1,
@@ -230,7 +230,7 @@ Subtracts C<value> from C<SELF> inplace.
     MULTI void i_subtract(Complex value) {
         const FLOATVAL a = SELF.get_number();
 
-        pmc_reuse(INTERP, SELF, enum_class_Complex, 0);
+        Parrot_pmc_reuse(INTERP, SELF, enum_class_Complex, 0);
         VTABLE_set_number_native(INTERP, SELF,
                 a - VTABLE_get_number_keyed_int(INTERP, value, 0));
         VTABLE_set_number_keyed_int(INTERP, SELF, 1,

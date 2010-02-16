@@ -41,7 +41,7 @@ appropriate type.
 
     VTABLE void set_pmc(PMC *other) {
         if (!PObj_is_object_TEST(other)) {
-            pmc_reuse(INTERP, SELF, other->vtable->base_type, 0);
+            Parrot_pmc_reuse(INTERP, SELF, other->vtable->base_type, 0);
             VTABLE_set_pmc(INTERP, SELF, other);
         }
         else {
@@ -127,7 +127,7 @@ Morphs the current PMC to an C<Integer> and sets the value from C<value>.
 */
 
     VTABLE void set_integer_native(INTVAL value) {
-        pmc_reuse(INTERP, SELF, enum_class_Integer, 0);
+        Parrot_pmc_reuse(INTERP, SELF, enum_class_Integer, 0);
         VTABLE_set_integer_native(INTERP, SELF, value);
     }
 
@@ -156,7 +156,7 @@ Morphs the current PMC to a C<Float> and sets the value from C<value>.
 */
 
     VTABLE void set_number_native(FLOATVAL value) {
-        pmc_reuse(INTERP, SELF, enum_class_Float, 0);
+        Parrot_pmc_reuse(INTERP, SELF, enum_class_Float, 0);
         VTABLE_set_number_native(INTERP, SELF, value);
     }
 
@@ -188,7 +188,7 @@ Morphs the current PMC to a C<String> and sets the value from C<value>.
 */
 
     VTABLE void set_string_native(STRING *value) {
-        pmc_reuse(interp, SELF, enum_class_String, 0);
+        Parrot_pmc_reuse(interp, SELF, enum_class_String, 0);
         VTABLE_set_string_native(INTERP, SELF, value);
     }
 

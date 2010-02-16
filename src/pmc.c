@@ -567,7 +567,7 @@ Parrot_pmc_new_init(PARROT_INTERP, INTVAL base_type, ARGOUT(PMC *init))
 =item C<PMC * Parrot_pmc_new_constant_init(PARROT_INTERP, INTVAL base_type, PMC
 *init)>
 
-As C<constant_Parrot_pmc_new>, but passes C<init> to the PMC's C<init_pmc> vtable
+As C<Parrot_pmc_new_constant>, but passes C<init> to the PMC's C<init_pmc> vtable
 entry.
 
 =cut

@@ -1108,7 +1108,7 @@ get_namespace_pmc(ARGIN(bytecode * const bc), ARGIN_NULLOK(multi_type * const ns
 
     switch (ns->entry_type) {
         case MULTI_TYPE_IDENT: {
-            PMC *namespace_pmc = constant_Parrot_pmc_new(bc->interp, enum_class_String);
+            PMC *namespace_pmc = Parrot_pmc_new_constant(bc->interp, enum_class_String);
             PARROT_NAMESPACE(namespace_pmc)->name =
                 add_string_const_from_cstring(bc, ns->entry.ident);
             break;

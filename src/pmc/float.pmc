@@ -134,12 +134,12 @@ Returns a Parrot string representation of the number.
 */
 
     VTABLE void set_integer_native(INTVAL value) {
-        pmc_reuse(INTERP, SELF, enum_class_Integer, 0);
+        Parrot_pmc_reuse(INTERP, SELF, enum_class_Integer, 0);
         SELF.set_integer_native(value);
     }
 
     VTABLE void set_bool(INTVAL value) {
-        pmc_reuse(INTERP, SELF, enum_class_Boolean, 0);
+        Parrot_pmc_reuse(INTERP, SELF, enum_class_Boolean, 0);
         SELF.set_bool(value);
     }
 
@@ -170,7 +170,7 @@ Note that this method morphs the number into a C<String>.
 */
 
     VTABLE void set_string_native(STRING *value) {
-        pmc_reuse(INTERP, SELF, enum_class_String, 0);
+        Parrot_pmc_reuse(INTERP, SELF, enum_class_String, 0);
         SELF.set_string_native(value);
     }
 

@@ -222,7 +222,7 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
     }
 
     /* put profile_filename in the gc root set so it won't get collected */
-    gc_register_pmc(interp, (PMC *) runcore->profile_filename);
+    Parrot_pmc_gc_register(interp, (PMC *) runcore->profile_filename);
 
     Profiling_first_loop_SET(runcore);
 

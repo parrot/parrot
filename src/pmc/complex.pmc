@@ -1176,7 +1176,7 @@ Sets C<dest> to the absolute value of SELF that is the distance from (0.0).
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
         d = sqrt(re*re + im*im);
-        pmc_reuse(INTERP, SELF, enum_class_Float, 0);
+        Parrot_pmc_reuse(INTERP, SELF, enum_class_Float, 0);
         VTABLE_set_number_native(INTERP, SELF, d);
     }
 

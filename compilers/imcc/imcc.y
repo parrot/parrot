@@ -532,7 +532,7 @@ mk_pmc_const_named(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
     }
 
     r[1]          = rhs;
-    rhs->pmc_type = pmc_type(interp,
+    rhs->pmc_type = Parrot_pmc_get_type_str(interp,
         Parrot_str_new(interp, unquoted_name, name_length));
 
     mem_sys_free(unquoted_name);
@@ -2026,7 +2026,7 @@ classname:
          {
            /* there'd normally be a mem_sys_strdup() here, but the lexer already
             * copied the string, so it's safe to use directly */
-           if ((IMCC_INFO(interp)->cur_pmc_type = pmc_type(interp,
+           if ((IMCC_INFO(interp)->cur_pmc_type = Parrot_pmc_get_type_str(interp,
                Parrot_str_new(interp, $1, 0))) <= 0) {
                IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                     "Unknown PMC type '%s'\n", $1);

@@ -246,7 +246,7 @@ the next one.
     VTABLE STRING* shift_string() {
         PMC    * const key = SELF.shift_pmc();
         STRING * const ret = VTABLE_get_string(INTERP, key);
-        temporary_pmc_free(INTERP, key);
+        Parrot_pmc_free_temporary(INTERP, key);
         return ret;
     }
 
