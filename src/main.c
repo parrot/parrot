@@ -49,7 +49,7 @@ PARROT_CAN_RETURN_NULL
 static const char * parseflags(PARROT_INTERP,
     ARGIN(int *argc),
     ARGIN(char **argv[]),
-    ARGIN(INTVAL *core),
+    ARGIN(Parrot_Run_core_t *core),
     ARGIN(Parrot_trace_flags *trace))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -104,7 +104,7 @@ main(int argc, char * argv[])
     Interp     *interp;
     int         status;
 
-    INTVAL             core  = 0;
+    Parrot_Run_core_t  core  = PARROT_SLOW_CORE;
     Parrot_trace_flags trace = PARROT_NO_TRACE;
 
     /* internationalization setup */
@@ -412,7 +412,7 @@ PARROT_CAN_RETURN_NULL
 static const char *
 parseflags(PARROT_INTERP,
         ARGIN(int *argc), ARGIN(char **argv[]),
-        ARGIN(INTVAL *core), ARGIN(Parrot_trace_flags *trace))
+        ARGIN(Parrot_Run_core_t *core), ARGIN(Parrot_trace_flags *trace))
 {
     ASSERT_ARGS(parseflags)
     struct longopt_opt_info opt  = LONGOPT_OPT_INFO_INIT;

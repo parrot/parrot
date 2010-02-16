@@ -178,7 +178,8 @@ Return 1 if flag handled, 0 if not.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 int
-imcc_handle_flag(PARROT_INTERP, struct longopt_opt_info *opt, INTVAL *core)
+imcc_handle_flag(PARROT_INTERP, struct longopt_opt_info *opt,
+    Parrot_Run_core_t *core)
 {
     PARROT_ASSERT(opt);
     PARROT_ASSERT(core);
