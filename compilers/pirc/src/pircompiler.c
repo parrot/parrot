@@ -55,6 +55,7 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static allocated_mem_ptrs *
 new_mem_ptrs_block(void) {
+    ASSERT_ARGS(new_mem_ptrs_block)
     return mem_allocate_zeroed_typed(allocated_mem_ptrs);
 }
 
