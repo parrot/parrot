@@ -168,7 +168,7 @@ Assign a new register to symbol C<sym>, and create a new live interval for C<sym
 */
 void
 assign_vanilla_register(ARGIN(lexer_state * const lexer),
-        ARGMOD(symbol * const sym))
+        ARGIN(symbol * const sym))
 {
     sym->info.color    = next_register(lexer, sym->info.type);
     /* fprintf(stderr, "assigning vanilla reg %d to symbol %s\n", sym->info.color,

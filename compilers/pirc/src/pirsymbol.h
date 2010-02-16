@@ -80,10 +80,9 @@ extern const int valuetype_pirtype_clut[10];
 
 void assign_vanilla_register(
     ARGIN(lexer_state * const lexer),
-    ARGMOD(symbol * const sym))
+    ARGIN(symbol * const sym))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(* const sym);
+        __attribute__nonnull__(2);
 
 void check_unused_symbols(ARGIN(lexer_state * const lexer))
         __attribute__nonnull__(1);

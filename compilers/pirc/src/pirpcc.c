@@ -122,9 +122,10 @@ static void save_global_reference(
 
 static void targets_to_operands(
     ARGIN(lexer_state * const lexer),
-    target * const targets,
+    ARGIN(target * const targets),
     unsigned num_targets)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_add_alias_operand __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lexer) \
@@ -170,7 +171,8 @@ static void targets_to_operands(
     , PARROT_ASSERT_ARG(instr) \
     , PARROT_ASSERT_ARG(label))
 #define ASSERT_ARGS_targets_to_operands __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lexer))
+       PARROT_ASSERT_ARG(lexer) \
+    , PARROT_ASSERT_ARG(targets))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -389,7 +391,8 @@ with value "answer".
 
 */
 static void
-targets_to_operands(ARGIN(lexer_state * const lexer), target * const targets, unsigned num_targets)
+targets_to_operands(ARGIN(lexer_state * const lexer),
+        ARGIN(target * const targets), unsigned num_targets)
 {
     ASSERT_ARGS(targets_to_operands)
 
