@@ -221,8 +221,12 @@ destroy_linear_scan_register_allocator(ARGMOD(lsr_allocator *lsr))
 
 /*
 
+=item C<static unsigned lengthi(live_interval *list)>
+
 XXX debug function only.
 Return length of list C<list>
+
+=cut
 
 */
 static unsigned
@@ -572,8 +576,8 @@ expire_old_intervals(ARGIN(lsr_allocator * const lsr),
 
 /*
 
-=item C<static void
-cache_interval_objects(lsr_allocator * const lsr, live_interval * interval)>
+=item C<static void cache_interval_object(lsr_allocator * const lsr,
+live_interval * interval)>
 
 Store the interval C<interval> on a caching list; whenever a new C<live_interval>
 object is requested, these interval objects can be re-used, instead of malloc()ing
