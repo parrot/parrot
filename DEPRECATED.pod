@@ -117,6 +117,11 @@ get_results no longer used to fetch exception object.
 
 L<https://trac.parrot.org/parrot/ticket/1406>
 
+=item GC_SYS_NAME option to interpinfo_s_i [experimental]
+
+Ability to get the string name of the current GC core from the interpinfo_s_i.
+See r43900 and r43904 for details.
+
 =back
 
 =head1 Bytecode
