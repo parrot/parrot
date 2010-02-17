@@ -1,3 +1,19 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/opcode.pmc
+
+=head1 DESCRIPTION
+
+Implements opcode VTABLEs.
+
+=cut
+
+*/
+
 #include "parrot/parrot.h"
 
 pmclass Opcode auto_attrs {
@@ -65,3 +81,10 @@ pmclass Opcode auto_attrs {
         return attrs->full_name_cache;
     }
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
