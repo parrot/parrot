@@ -136,10 +136,12 @@ D: Pugs, a Perl6->Parrot implementation.
 
 N: Austin Hastings
 U: Austin
+U: Austin_Hastings
 A: austin_hastings@yahoo.com
 A: austin_h...@yahoo.com
 E: austin_hastings@yahoo.com
 D: Close
+D: Kakapo
 
 N: Benjamin Goldberg
 D: Numerous improvements and proposals.

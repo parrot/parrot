@@ -35,6 +35,8 @@ Test::More - Parrot extension for testing modules
 
     is( some_pmc, another_pmc, 'pmc comparison uses "eq" op' )
 
+    is_null( some_pmc, 'pmc was null' )
+    
     diag( 'this may take a while' )
     is_deeply( some_deep_pmc, another_deep_pmc, 'deep structure comparison' )
 
@@ -155,6 +157,20 @@ will pass.
 
 =cut
 
+.sub one_or_both_null
+    .param pmc left
+    .param pmc right
+    
+    .local int one
+    .local int both
+
+    $I0 = isnull left
+    $I1 = isnull right
+    or one, $I0, $I1
+    and both, $I0, $I1
+    .return (one, both)
+.end
+  
 .sub is :multi(PMC, Integer)
     .param pmc left
     .param pmc right
@@ -164,11 +180,17 @@ will pass.
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
 
-    .local int l, r, pass
+    .local int pass
+    ($I0, pass) = one_or_both_null(left, right)
+    if $I0 goto report
+    
+    .local int l, r
     l    = left
     r    = right
+    
     pass = iseq l, r
-
+    
+report:
     test.'ok'( pass, description )
     if pass goto done
 
@@ -176,17 +198,27 @@ will pass.
     .local string l_string
     .local string r_string
 
+    l_string    = 'null'
+    if null left goto r_str
     l_string    = left
+    
+r_str:
+    r_string    = 'null'
+    if null right goto diag
     r_string    = right
-
+    
+diag:
     diagnostic = _make_diagnostic( l_string, r_string )
     test.'diag'( diagnostic )
   done:
 .end
 
-.sub is :multi(_, Float)
-    .param num    left
-    .param num    right
+#.sub is :multi(_, Float)
+#    .param num    left
+#    .param num    right
+.sub is :multi(PMC, Float)
+    .param pmc left
+    .param pmc right
     .param string description :optional
     .param int    have_desc   :opt_flag
     .param num    precision   :optional
@@ -195,15 +227,23 @@ will pass.
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
 
+    .local int pass
+    
+    ($I0, pass) = one_or_both_null(left, right)
+    if $I0 goto report
+    
+    .local num l, r
+    l = left
+    r = right
+    
     if have_prec goto check_precision
 
-    .local int pass
-    pass = iseq left, right
+    pass = iseq l, r
     goto report
 
   check_precision:
     .local num diff
-    diff = left - right
+    diff = l - r
     diff = abs diff
     pass = isle diff, precision
 
@@ -215,10 +255,17 @@ will pass.
     .local string l_string
     .local string r_string
 
+    l_string    = 'null'
+    if null left goto r_str
     l_string    = left
+    
+r_str:
+    r_string    = 'null'
+    if null right goto diag
     r_string    = right
-
-    diagnostic = _make_diagnostic( left, right )
+    
+diag:
+    diagnostic = _make_diagnostic( l_string, r_string )
     test.'diag'( diagnostic )
   done:
 .end
@@ -232,12 +279,16 @@ will pass.
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
 
-    .local string l, r
     .local int pass
-    l    = left
-    r    = right
+    ($I0, pass) = one_or_both_null(left, right)
+    if $I0 goto report
+
+    .local string l, r
+    l = left
+    r = right
     pass = iseq l, r
 
+report:
     test.'ok'( pass, description )
     if pass goto done
 
@@ -245,9 +296,16 @@ will pass.
     .local string l_string
     .local string r_string
 
+    l_string    = 'null'
+    if null left goto r_str
     l_string    = left
+    
+r_str:
+    r_string    = 'null'
+    if null right goto diag
     r_string    = right
 
+diag:
     diagnostic = _make_diagnostic( l_string, r_string )
     test.'diag'( diagnostic )
   done:
@@ -263,8 +321,11 @@ will pass.
     get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local int pass
-    .local int does_type
+    
+    ($I0, pass) = one_or_both_null(left, right)
+    if $I0 goto result
 
+    .local int does_type
     does_type = does right, 'String'
     if does_type goto check_string
 
@@ -300,9 +361,16 @@ will pass.
     .local string l_string
     .local string r_string
 
+    l_string    = 'null'
+    if null left goto r_str
     l_string    = left
+
+r_str:
+    r_string    = 'null'
+    if null right goto diag
     r_string    = right
 
+diag:
     diagnostic = _make_diagnostic( l_string, r_string )
     test.'diag'( diagnostic )
   done:
@@ -324,7 +392,9 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local int pass
-    pass       = 0
+    
+    ($I0, pass) = one_or_both_null(left, right)
+    if $I0 goto report
 
     if left != right goto pass_it
     goto report
@@ -359,7 +429,9 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local int pass
-    pass = 0
+    
+    ($I0, pass) = one_or_both_null(left, right)
+    if $I0 goto report
 
     ne left, right, pass_it
     goto report
@@ -394,7 +466,9 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local int pass
-    pass = 0
+    
+    ($I0, pass) = one_or_both_null(left, right)
+    if $I0 goto report
 
     ne left, right, pass_it
     goto report
@@ -428,8 +502,12 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
 
-    # this comparison may not work in general, but it's worth trying
     .local int pass
+    
+    ($I0, pass) = one_or_both_null(left, right)
+    if $I0 goto report
+    
+    # this comparison may not work in general, but it's worth trying
     pass = isne left, right
 
   report:
@@ -846,6 +924,37 @@ This handles comparisons of array-like and hash-like structures.
   compare_hash:
     equal = compare_hash( left, right, position )
     .return( equal )
+.end
+
+=item C<is_null( pmc, description )>
+
+Records a passing test if the PMC passed in is null, fails otherwise.
+
+=cut
+
+.sub is_null
+    .param pmc victim
+    .param string description :optional
+
+    .local pmc test
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
+
+    .local int passed
+    passed = isnull victim
+
+    test.'ok'( passed, description )
+    if passed goto done
+    
+    .local string v_string
+    v_string    = 'null'
+    if null victim goto diag
+    v_string    = victim
+
+  diag:
+    .local string diagnostic
+    diagnostic = _make_diagnostic( v_string, 'null')
+    test.'diag'( diagnostic )
+  done:
 .end
 
 =item C<dies_ok( codestring, description )>

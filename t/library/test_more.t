@@ -15,14 +15,14 @@
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
     test_namespace = get_namespace [ 'Test'; 'More' ]
-    exports = split " ", "ok nok is diag like skip todo is_deeply isa_ok isnt throws_like lives_ok dies_ok"
+    exports = split " ", "ok nok is diag like skip todo is_deeply is_null isa_ok isnt throws_like lives_ok dies_ok"
     test_namespace.'export_to'(curr_namespace, exports)
 
     test_namespace = get_namespace [ 'Test'; 'Builder'; 'Tester' ]
     exports = split " ", "plan test_out test_diag test_fail test_pass test_test"
     test_namespace.'export_to'(curr_namespace, exports)
 
-    plan( 108 )
+    plan( 117 )
 
     test_skip()
     test_todo()
@@ -32,6 +32,7 @@
     test_isnt()
     test_like()
     test_is_deeply()
+    test_is_null()
     test_diagnostics()
     test_lives_ok()
     test_dies_ok()
@@ -369,7 +370,62 @@ CODE
     test_diag( 'Have: 1' )
     test_diag( expected )
     is( left, right, 'comparing two pmcs' )
-    test_test( 'failing test is() for pmcs with description')
+    test_test( 'failing test is() for pmcs with description' )
+    
+    test_pass( 'comparing two nulls' )
+    null left
+    null right
+    is( left, right, 'comparing two nulls' )
+    test_test( 'passing test is() for nulls')
+    
+    test_fail('comparing null with Int')
+    null left
+    right = box 1
+    is( left, right, 'comparing null with Int')
+    test_diag( 'Have: null' )
+    test_diag( 'Want: 1' )
+    test_test('failing test is() for null vs. pmc 1')
+    
+    test_fail('comparing Int with null')
+    left = box 10
+    null right
+    is( left, right, 'comparing Int with null')
+    test_diag( 'Have: 10' )
+    test_diag( 'Want: null' )
+    test_test('failing test is() for pmc 10 vs. null')
+
+    test_fail('comparing null with Float')
+    null left
+    right = box 1.01
+    is( left, right, 'comparing null with Float')
+    test_diag( 'Have: null' )
+    test_diag( 'Want: 1.01' )
+    test_test('failing test is() for null vs. pmc 1.01')
+    
+    test_fail('comparing Float with null')
+    left = box 2.787
+    null right
+    is( left, right, 'comparing Float with null')
+    test_diag( 'Have: 2.787' )
+    test_diag( 'Want: null' )
+    test_test('failing test is() for pmc 2.787 vs. null')
+
+    test_fail('comparing null with String')
+    null left
+    right = box 'September, when it comes'
+    is( left, right, 'comparing null with String')
+    test_diag( 'Have: null' )
+    test_diag( 'Want: September, when it comes' )
+    test_test('failing test is() for null vs. String pmc')
+    
+    test_fail('comparing String with null')
+    left = box 'I cannot move a mountain now'
+    null right
+    is( left, right, 'comparing String with null')
+    test_diag( 'Have: I cannot move a mountain now' )
+    test_diag( 'Want: null' )
+    test_test('failing test is() for String pmc vs. null')
+
 .end
 
 .sub test_isnt
@@ -802,6 +858,20 @@ CODE
     isa_ok(Spot, 'daschund', "Spot")
     test_test( 'failing test isnt() for PMC/string')
 
+.end
+
+.sub test_is_null
+    test_pass( 'null is_null')
+    null $P0
+    is_null($P0, 'null is_null')
+    test_test( 'passing is_null with null')
+
+    test_fail( 'String is not null' )
+    $P0 = box 'Concerto'
+    is_null($P0, 'String is not null')
+    test_diag( "Have: Concerto" )
+    test_diag( "Want: null" )
+    test_test( 'failing test is_null for String pmc')
 .end
 # Local Variables:
 #   mode: pir
