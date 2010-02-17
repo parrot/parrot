@@ -152,35 +152,6 @@ Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, ARGIN(PMC *self), ARGIN(
 
 /*
 
-=item C<PMC * Parrot_oo_get_namespace(PARROT_INTERP, const PMC *classobj)>
-
-Lookup a namespace object from a class PMC.
-
-This function is deprecated, see TT #1069.
-Use the inspect interface in the Class PMC instead.
-
-=cut
-
-*/
-
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC *
-Parrot_oo_get_namespace(SHIM_INTERP, ARGIN(const PMC *classobj))
-{
-    ASSERT_ARGS(Parrot_oo_get_namespace)
-    Parrot_Class_attributes * const _class     = PARROT_CLASS(classobj);
-    PMC          * const _namespace = _class->_namespace;
-
-    if (PMC_IS_NULL(_namespace))
-        return PMCNULL;
-
-    return _namespace;
-}
-
-
-/*
-
 =item C<PMC * Parrot_oo_get_class(PARROT_INTERP, PMC *key)>
 
 Lookup a class object from a namespace, string, or key PMC.
