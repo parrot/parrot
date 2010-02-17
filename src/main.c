@@ -400,7 +400,7 @@ parseflags_minimal(PARROT_INTERP, int argc, ARGIN(char *argv[]))
 /*
 
 =item C<static const char * parseflags(PARROT_INTERP, int *argc, char **argv[],
-INTVAL *core, Parrot_trace_flags *trace)>
+Parrot_Run_core_t *core, Parrot_trace_flags *trace)>
 
 Parse Parrot's command line for options and set appropriate flags.
 
