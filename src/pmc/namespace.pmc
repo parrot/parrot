@@ -402,7 +402,9 @@ really a public API.
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
         PMC *ns = SUPER(key);
-        //PMC    *ns = INTERP->vtables[enum_class_Hash]->get_pmc_keyed(INTERP, SELF, key);
+        /* Is this equivalent?
+        PMC    *ns = INTERP->vtables[enum_class_Hash]->get_pmc_keyed(INTERP, SELF, key);
+        */
 
         if (!PMC_IS_NULL(ns))
             return ns;
@@ -429,7 +431,7 @@ really a public API.
                 STRING * const name = VTABLE_get_string_keyed_int(INTERP, key, i);
                 if (name == NULL || name == STRINGNULL) {
                     ns = PMCNULL;
-                    // TODO: Throw an exception or something?
+                    /* What to do here? Throw an exception or something? */
                     break;
                 }
                 ns = Parrot_get_namespace_keyed_str(INTERP, ns, name);
@@ -442,8 +444,10 @@ really a public API.
             ns = Parrot_get_namespace_keyed_str(INTERP, ns, name);
             return ns;
         }
-        //Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
-        //    "Invalid namespace key in get_pmc_keyed_str");
+        /* If we get the wrong type, should we throw an exception?
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
+            "Invalid namespace key in get_pmc_keyed_str");
+        */
     }
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
