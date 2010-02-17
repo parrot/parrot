@@ -296,38 +296,6 @@ L<https://trac.parrot.org/parrot/ticket/868>
 
 =back
 
-=head2 Not Quite Perl (NQP)
-
-=over 4
-
-=item C< $(...) > syntax  [eligible in 1.5]
-
-The C< $(...) > syntax for obtaining a result object from a Match
-object will no longer work.  The new syntax is to invoke the
-C<.ast> method on the Match object.
-
-L<https://trac.parrot.org/parrot/ticket/459>
-
-=item Quoted items [eligible in 1.5]
-
-Double-quoted strings will interpret unescaped $-names
-as interpolated variables in the string.  Bare slashes
-will introduce regular expressions.  The C<< <foo bar> >>
-syntax will produce an array of strings instead of a single
-string.
-
-L<https://trac.parrot.org/parrot/ticket/837>
-
-=item C<< PIR q:to:<xyz> >> inline PIR [eligible in 1.5]
-
-The C<< PIR q:to:<xyz> >> form of inline PIR in NQP scripts is
-deprecated.  Use C< Q:PIR { ... } >  or C< Q:PIR {{ ... }} >
-instead.
-
-L<https://trac.parrot.org/parrot/ticket/842>
-
-=back
-
 =head1 Compilers
 
 =over 4
@@ -336,6 +304,12 @@ L<https://trac.parrot.org/parrot/ticket/842>
 
 The json compiler was dupicated into data_json some time ago. If you're
 using json, just use data_json instead, it's the same code. See TT #1461.
+
+=item nqp [eligible in 2.4]
+
+Replaced by ext/nqp-rx and parrot-nqp.
+
+L<http://trac.parrot.org/parrot/ticket/1462>
 
 =back
 
@@ -391,6 +365,8 @@ L<Trac|http://trac.parrot.org/> is parrot's primary issue tracking system.
 For an item to be considered experimental, it can B<never> have shipped in
 a stable release without the C<[experimental]> tag; otherwise, it must be
 deprecated normally before removal or incompatible change.
+
+Note that anything in the ext/
 
 =back
 
