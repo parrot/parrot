@@ -333,6 +333,17 @@ L<https://trac.parrot.org/parrot/ticket/842>
 
 =back
 
+=head1 Compilers
+
+=over 4
+
+=item json [eligible in 2.4]
+
+The json compiler was dupicated into data_json some time ago. If you're
+using json, just use data_json instead, it's the same code. See TT #1461.
+
+=back
+
 =head1 Parrot library
 
 =over 4
