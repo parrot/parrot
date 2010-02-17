@@ -36,7 +36,7 @@ Test::More - Parrot extension for testing modules
     is( some_pmc, another_pmc, 'pmc comparison uses "eq" op' )
 
     is_null( some_pmc, 'pmc was null' )
-    
+
     diag( 'this may take a while' )
     is_deeply( some_deep_pmc, another_deep_pmc, 'deep structure comparison' )
 
@@ -160,7 +160,7 @@ will pass.
 .sub one_or_both_null
     .param pmc left
     .param pmc right
-    
+
     .local int one
     .local int both
 
@@ -170,7 +170,7 @@ will pass.
     and both, $I0, $I1
     .return (one, both)
 .end
-  
+
 .sub is :multi(PMC, Integer)
     .param pmc left
     .param pmc right
@@ -183,13 +183,13 @@ will pass.
     .local int pass
     ($I0, pass) = one_or_both_null(left, right)
     if $I0 goto report
-    
+
     .local int l, r
     l    = left
     r    = right
-    
+
     pass = iseq l, r
-    
+
 report:
     test.'ok'( pass, description )
     if pass goto done
@@ -201,12 +201,12 @@ report:
     l_string    = 'null'
     if null left goto r_str
     l_string    = left
-    
+
 r_str:
     r_string    = 'null'
     if null right goto diag
     r_string    = right
-    
+
 diag:
     diagnostic = _make_diagnostic( l_string, r_string )
     test.'diag'( diagnostic )
@@ -228,14 +228,14 @@ diag:
     get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local int pass
-    
+
     ($I0, pass) = one_or_both_null(left, right)
     if $I0 goto report
-    
+
     .local num l, r
     l = left
     r = right
-    
+
     if have_prec goto check_precision
 
     pass = iseq l, r
@@ -258,12 +258,12 @@ diag:
     l_string    = 'null'
     if null left goto r_str
     l_string    = left
-    
+
 r_str:
     r_string    = 'null'
     if null right goto diag
     r_string    = right
-    
+
 diag:
     diagnostic = _make_diagnostic( l_string, r_string )
     test.'diag'( diagnostic )
@@ -299,7 +299,7 @@ report:
     l_string    = 'null'
     if null left goto r_str
     l_string    = left
-    
+
 r_str:
     r_string    = 'null'
     if null right goto diag
@@ -321,7 +321,7 @@ diag:
     get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local int pass
-    
+
     ($I0, pass) = one_or_both_null(left, right)
     if $I0 goto result
 
@@ -392,7 +392,7 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local int pass
-    
+
     ($I0, pass) = one_or_both_null(left, right)
     if $I0 goto report
 
@@ -429,7 +429,7 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local int pass
-    
+
     ($I0, pass) = one_or_both_null(left, right)
     if $I0 goto report
 
@@ -466,7 +466,7 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local int pass
-    
+
     ($I0, pass) = one_or_both_null(left, right)
     if $I0 goto report
 
@@ -503,10 +503,10 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local int pass
-    
+
     ($I0, pass) = one_or_both_null(left, right)
     if $I0 goto report
-    
+
     # this comparison may not work in general, but it's worth trying
     pass = isne left, right
 
@@ -944,7 +944,7 @@ Records a passing test if the PMC passed in is null, fails otherwise.
 
     test.'ok'( passed, description )
     if passed goto done
-    
+
     .local string v_string
     v_string    = 'null'
     if null victim goto diag
