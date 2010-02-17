@@ -132,11 +132,11 @@ main(int argc, char * argv[])
         PMC *env = pmc_new(interp, enum_class_Env);
         STRING *path = VTABLE_get_string_keyed_str(interp, env,
                 Parrot_str_new_constant(interp, "PARROT_LIBRARY"));
-        if (!STRING_IS_NULL(path) && Parrot_str_length(interp, path) > 0)
+        if (!STRING_is_null(interp, path) && Parrot_str_length(interp, path) > 0)
             Parrot_lib_add_path(interp, path, PARROT_LIB_PATH_LIBRARY);
         path = VTABLE_get_string_keyed_str(interp, env,
                 Parrot_str_new_constant(interp, "PARROT_INCLUDE"));
-        if (!STRING_IS_NULL(path) && Parrot_str_length(interp, path) > 0)
+        if (!STRING_is_null(interp, path) && Parrot_str_length(interp, path) > 0)
             Parrot_lib_add_path(interp, path, PARROT_LIB_PATH_INCLUDE);
     }
 
