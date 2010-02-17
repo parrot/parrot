@@ -189,9 +189,8 @@ L<https://trac.parrot.org/parrot/ticket/389>
 =item C API coding standards cleanup [eligible in 1.1]
 
 All C API functions that aren't currently named according to the
-'Parrot_<system>_*' scheme will be renamed. If you depend on these
-functions in an extending/embedding interface or C-level custom PMCs,
-check in 1.4 or 2.0 for the new names.
+'Parrot_<system>_*' scheme will be renamed. A list of renamed
+functions will be kept in the ticket at:
 
 L<https://trac.parrot.org/parrot/ticket/443>
 
