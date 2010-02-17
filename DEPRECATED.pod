@@ -160,11 +160,6 @@ if the arg is a Namespace or Class PMC
 
 L<https://trac.parrot.org/parrot/ticket/159>
 
-=item load or include paths prefixed with 'library/' or 'include/'
-[eligible in 1.5]
-
-L<https://trac.parrot.org/parrot/ticket/511>
-
 =item continuation-based ExceptionHandlers [eligible in 2.1]
 
 L<https://trac.parrot.org/parrot/ticket/1091>
