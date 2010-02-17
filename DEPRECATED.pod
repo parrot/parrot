@@ -224,10 +224,6 @@ diagnostic message.
 
 L<https://trac.parrot.org/parrot/ticket/872>
 
-=item Parrot_oo_get_namespace [eligible in 2.1]
-
-L<https://trac.parrot.org/parrot/ticket/1069>
-
 =item STRING Out parameters in Parrot_str_* functions [eligible in 2.1]
 
 All STRING modification functions will return a STRING pointer; capture and use
@@ -365,8 +361,6 @@ L<Trac|http://trac.parrot.org/> is parrot's primary issue tracking system.
 For an item to be considered experimental, it can B<never> have shipped in
 a stable release without the C<[experimental]> tag; otherwise, it must be
 deprecated normally before removal or incompatible change.
-
-Note that anything in the ext/
 
 =back
 
