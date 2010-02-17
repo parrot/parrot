@@ -1,6 +1,6 @@
 #! parrot
 # Copyright (C) 2001-2009, Parrot Foundation.
-# $Id: fixedpmcarray.t 42684 2009-11-21 13:40:19Z jkeenan $
+# $Id$
 
 =head1 NAME
 
