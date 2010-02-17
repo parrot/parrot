@@ -52,16 +52,6 @@ L<https://trac.parrot.org/parrot/ticket/452>
 
 L<https://trac.parrot.org/parrot/ticket/264>
 
-=item Use of undocumented variables in class_init [eligible in 2.1]
-
-The current implementation allows the class_init vtable function body to
-use local symbols from the generated part. For example, some PMC used
-to use the pass counter. In the future, the class_init body from the PMC
-file may not be inserted directly in the body of the generated one,
-so this usage will not be allowed.
-
-L<https://trac.parrot.org/parrot/ticket/918>
-
 =item Overriding vtable invoke in PIR objects [experimental]
 
 The VTABLE invoke in object.pmc puts SELF at the start of the
