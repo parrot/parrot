@@ -40,7 +40,7 @@ typedef enum Parrot_profiling_line {
     PPROF_LINE_END_OF_RUNLOOP
 } Parrot_profiling_line;
 
-typedef void (*profiling_output_fn)(ARGIN(Parrot_profiling_runcore_t*), ARGIN_NULLOK(Parrot_profiling_line));
+typedef void (*profiling_output_fn)(ARGIN(Parrot_profiling_runcore_t*), ARGIN(PPROF_DATA*), ARGIN_NULLOK(Parrot_profiling_line));
 typedef        profiling_output_fn Parrot_profiling_output_fn;
 
 typedef enum Parrot_profiling_datatype {
@@ -92,7 +92,6 @@ struct profiling_runcore_t {
     UINTVAL         time_size;  /* how big is the following array */
     UHUGEINTVAL    *time;       /* time spent between DO_OP and start/end of a runcore */
     Hash           *line_cache; /* hash for caching pc -> line mapping */
-    PPROF_DATA      pprof_data[PPROF_DATA_MAX+1]; /* array for storage of one line of profiling data */
 };
 
 #define Profiling_flag_SET(runcore, flag) \
