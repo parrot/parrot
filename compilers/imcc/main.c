@@ -164,8 +164,8 @@ imcc_start_handling_flags(PARROT_INTERP)
 
 /*
 
-=item C<int imcc_handle_flag(PARROT_INTERP, struct longopt_opt_info *opt, INTVAL
-*core)>
+=item C<int imcc_handle_flag(PARROT_INTERP, struct longopt_opt_info *opt,
+Parrot_Run_core_t *core)>
 
 Handle Parrot's command line for IMCC related option and set appropriate flags.
 
