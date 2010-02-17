@@ -56,7 +56,7 @@ Although NameSpace.'export_to'() is used in test_more.pir.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(70)
+    plan(74)
 
     create_namespace_pmc()
     verify_namespace_type()
