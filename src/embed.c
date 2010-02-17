@@ -37,8 +37,9 @@ PARROT_OBSERVER
 static const char * op_name(PARROT_INTERP, int k)
         __attribute__nonnull__(1);
 
-static void print_constant_table(PARROT_INTERP)
-        __attribute__nonnull__(1);
+static void print_constant_table(PARROT_INTERP, ARGIN(PMC *output))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
         __attribute__nonnull__(1);
@@ -55,7 +56,8 @@ static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
 #define ASSERT_ARGS_op_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_print_constant_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(output))
 #define ASSERT_ARGS_print_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_set_current_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -868,7 +870,7 @@ Parrot_debug(PARROT_INTERP, NOTNULL(Parrot_Interp debugger), opcode_t * pc)
 
 /*
 
-=item C<static void print_constant_table(PARROT_INTERP)>
+=item C<static void print_constant_table(PARROT_INTERP, PMC *output)>
 
 Prints the contents of the constants table.
 
@@ -876,41 +878,41 @@ Prints the contents of the constants table.
 
 */
 static void
-print_constant_table(PARROT_INTERP)
+print_constant_table(PARROT_INTERP, ARGIN(PMC *output))
 {
     ASSERT_ARGS(print_constant_table)
     const INTVAL numconstants = interp->code->const_table->const_count;
     INTVAL i;
 
     /* TODO: would be nice to print the name of the file as well */
-    Parrot_io_printf(interp, "=head1 Constant-table\n\n");
+    Parrot_io_fprintf(interp, output, "=head1 Constant-table\n\n");
 
     for (i = 0; i < numconstants; ++i) {
         const PackFile_Constant * const c = interp->code->const_table->constants[i];
 
         switch (c->type) {
           case PFC_NUMBER:
-            Parrot_io_printf(interp, "PMC_CONST(%d): %f\n", i, c->u.number);
+            Parrot_io_fprintf(interp, output, "PMC_CONST(%d): %f\n", i, c->u.number);
             break;
           case PFC_STRING:
-            Parrot_io_printf(interp, "PMC_CONST(%d): %S\n", i, c->u.string);
+            Parrot_io_fprintf(interp, output, "PMC_CONST(%d): %S\n", i, c->u.string);
             break;
           case PFC_KEY:
-            Parrot_io_printf(interp, "PMC_CONST(%d): ", i);
+            Parrot_io_fprintf(interp, output, "PMC_CONST(%d): ", i);
             /* XXX */
             /* Parrot_print_p(interp, c->u.key); */
-            Parrot_io_printf(interp, "(PMC constant)");
-            Parrot_io_printf(interp, "\n");
+            Parrot_io_fprintf(interp, output, "(PMC constant)");
+            Parrot_io_fprintf(interp, output, "\n");
             break;
           case PFC_PMC:
             {
-                Parrot_io_printf(interp, "PMC_CONST(%d): ", i);
+                Parrot_io_fprintf(interp, output, "PMC_CONST(%d): ", i);
 
                 switch (c->u.key->vtable->base_type) {
                     /* each PBC file has a ParrotInterpreter, but it can't
                      * stringify by itself */
                   case enum_class_ParrotInterpreter:
-                    Parrot_io_printf(interp, "'ParrotInterpreter'");
+                    Parrot_io_fprintf(interp, output, "'ParrotInterpreter'");
                     break;
 
                     /* FixedIntegerArrays used for signatures, handy to print */
@@ -918,15 +920,15 @@ print_constant_table(PARROT_INTERP)
                     {
                         INTVAL n = VTABLE_elements(interp, c->u.key);
                         INTVAL i;
-                        Parrot_io_printf(interp, "[");
+                        Parrot_io_fprintf(interp, output, "[");
 
                         for (i = 0; i < n; ++i) {
                             INTVAL val = VTABLE_get_integer_keyed_int(interp, c->u.key, i);
-                            Parrot_io_printf(interp, "%d", val);
+                            Parrot_io_fprintf(interp, output, "%d", val);
                             if (i < n - 1)
-                                Parrot_io_printf(interp, ",");
+                                Parrot_io_fprintf(interp, output, ",");
                         }
-                        Parrot_io_printf(interp, "]");
+                        Parrot_io_fprintf(interp, output, "]");
                         break;
                     }
                   case enum_class_NameSpace:
@@ -937,28 +939,28 @@ print_constant_table(PARROT_INTERP)
                         /*Parrot_print_p(interp, c->u.key);*/
                         STRING * const s = VTABLE_get_string(interp, c->u.key);
                         if (s)
-                            Parrot_io_printf(interp, "%Ss", s);
+                            Parrot_io_fprintf(interp, output, "%Ss", s);
                         break;
                     }
                   case enum_class_Sub:
-                    Parrot_io_printf(interp, "%S", VTABLE_get_string(interp, c->u.key));
+                    Parrot_io_fprintf(interp, output, "%S", VTABLE_get_string(interp, c->u.key));
                     break;
                   default:
-                    Parrot_io_printf(interp, "(PMC constant)");
+                    Parrot_io_fprintf(interp, output, "(PMC constant)");
                     break;
                 }
 
-                Parrot_io_printf(interp, "\n");
+                Parrot_io_fprintf(interp, output, "\n");
                 break;
             }
           default:
-            Parrot_io_printf(interp, "wrong constant type in constant table!\n");
+            Parrot_io_fprintf(interp, output,  "wrong constant type in constant table!\n");
             /* XXX throw an exception? Is it worth the trouble? */
             break;
         }
     }
 
-    Parrot_io_printf(interp, "\n=cut\n\n");
+    Parrot_io_fprintf(interp, output, "\n=cut\n\n");
 }
 
 
@@ -977,7 +979,7 @@ This is used by the Parrot disassembler.
 
 PARROT_EXPORT
 void
-Parrot_disassemble(PARROT_INTERP, SHIM(const char *outfile), Parrot_disassemble_options options)
+Parrot_disassemble(PARROT_INTERP, ARGIN(const char *outfile), Parrot_disassemble_options options)
 {
     PDB_line_t *line;
     PDB_t * const pdb   = mem_allocate_zeroed_typed(PDB_t);
@@ -985,6 +987,15 @@ Parrot_disassemble(PARROT_INTERP, SHIM(const char *outfile), Parrot_disassemble_
     int curr_mapping    = 0;
     int op_code_seq_num = 0;
     int debugs;
+    PMC *output;
+
+    if (outfile != NULL) {
+        output = Parrot_io_open(interp, PMCNULL,
+                Parrot_str_new(interp, outfile, 0),
+                Parrot_str_new_constant(interp, "tw"));
+    }
+    else
+        output = Parrot_io_stdhandle(interp, PIO_STDOUT_FILENO, PMCNULL);
 
     interp->pdb     = pdb;
     pdb->cur_opcode = interp->code->base.data;
@@ -994,26 +1005,26 @@ Parrot_disassemble(PARROT_INTERP, SHIM(const char *outfile), Parrot_disassemble_
     line   = pdb->file->line;
     debugs = (interp->code->debugs != NULL);
 
-    print_constant_table(interp);
+    print_constant_table(interp, output);
     if (options & enum_DIS_HEADER)
         return;
 
     if (!(options & enum_DIS_BARE))
-        Parrot_io_printf(interp, "# %12s-%12s", "Seq_Op_Num", "Relative-PC");
+        Parrot_io_fprintf(interp, output, "# %12s-%12s", "Seq_Op_Num", "Relative-PC");
 
     if (debugs) {
         if (!(options & enum_DIS_BARE))
-            Parrot_io_printf(interp, " %6s:\n", "SrcLn#");
+            Parrot_io_fprintf(interp, output, " %6s:\n", "SrcLn#");
         num_mappings = interp->code->debugs->num_mappings;
     }
     else {
-        Parrot_io_printf(interp, "\n");
+        Parrot_io_fprintf(interp, output, "\n");
     }
 
     while (line->next) {
         const char *c;
 
-        /* Parrot_io_printf(interp, "%i < %i %i == %i \n", curr_mapping,
+        /* Parrot_io_fprintf(interp, output, "%i < %i %i == %i \n", curr_mapping,
          * num_mappings, op_code_seq_num,
          * interp->code->debugs->mappings[curr_mapping]->offset); */
 
@@ -1021,35 +1032,37 @@ Parrot_disassemble(PARROT_INTERP, SHIM(const char *outfile), Parrot_disassemble_
             if (op_code_seq_num == interp->code->debugs->mappings[curr_mapping]->offset) {
                 const int filename_const_offset =
                     interp->code->debugs->mappings[curr_mapping]->filename;
-                Parrot_io_printf(interp, "# Current Source Filename '%Ss'\n",
+                Parrot_io_fprintf(interp, output, "# Current Source Filename '%Ss'\n",
                         interp->code->const_table->constants[filename_const_offset]->u.string);
                 curr_mapping++;
             }
         }
 
         if (!(options & enum_DIS_BARE))
-            Parrot_io_printf(interp, "%012i-%012i",
+            Parrot_io_fprintf(interp, output, "%012i-%012i",
                              op_code_seq_num, line->opcode - interp->code->base.data);
 
         if (debugs && !(options & enum_DIS_BARE))
-            Parrot_io_printf(interp, " %06i: ",
+            Parrot_io_fprintf(interp, output, " %06i: ",
                     interp->code->debugs->base.data[op_code_seq_num]);
 
         /* If it has a label print it */
         if (line->label)
-            Parrot_io_printf(interp, "L%li:\t", line->label->number);
+            Parrot_io_fprintf(interp, output, "L%li:\t", line->label->number);
         else
-            Parrot_io_printf(interp, "\t");
+            Parrot_io_fprintf(interp, output, "\t");
 
         c = pdb->file->source + line->source_offset;
 
         while (c && *c != '\n')
-            Parrot_io_printf(interp, "%c", *(c++));
+            Parrot_io_fprintf(interp, output, "%c", *(c++));
 
-        Parrot_io_printf(interp, "\n");
+        Parrot_io_fprintf(interp, output, "\n");
         line = line->next;
         op_code_seq_num++;
     }
+    if (outfile != NULL)
+        Parrot_io_close(interp, output);
 
     return;
 }
