@@ -319,12 +319,6 @@ L<https://trac.parrot.org/parrot/ticket/1429>
 A way to provide an equivalent of -L and -I parrot command line options
 to language that doesn't support it.
 
-=item MT19937 [eligible in 2.1]
-
-L<https://trac.parrot.org/parrot/ticket/1278> - latest version now hosted
-at L<http://github.com/fperrad/parrot-MT19937>. After 2.0, users will have
-to install via C<plumage>.
-
 =item JSON, JSON, and Config;JSON [eligible in 1.5]
 
 L<https://trac.parrot.org/parrot/ticket/508>
