@@ -208,7 +208,7 @@ L<https://trac.parrot.org/parrot/ticket/1145>
  Parrot_gc_free_pmc_attributes
 
 These items and related helper functions are added as experimental support
-for TT #895
+for L<https://trac.parrot.org/parrot/ticket/895>
 
 =item PDB_compile and PDB_eval [eligible in 2.1]
 
