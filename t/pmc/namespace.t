@@ -56,11 +56,12 @@ Although NameSpace.'export_to'() is used in test_more.pir.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(70)
+    plan(74)
 
     create_namespace_pmc()
     verify_namespace_type()
     get_namespace_class()
+    keyed_namespace_lookup()
     get_global_opcode()
     get_sub_from_namespace_hash()
     access_sub_in_namespace()
@@ -165,6 +166,40 @@ Although NameSpace.'export_to'() is used in test_more.pir.
     $S0 = typeof $P2
     is($S0, "Foo", "Object created from class has name of NameSpace")
 
+.end
+
+.sub keyed_namespace_lookup
+    # Tests to verify behavior of TT #1449
+    $P0 = get_root_namespace
+
+    # Keyed lookup
+    $P1 = $P0["parrot";"Foo";"Bar"]
+    $I0 = isnull $P1
+    is($I0, 0, "can lookup nested namespace by Key")
+    # TODO: Get the function from this namespace and call it to verify we have
+    #       the correct one.
+
+    # Array lookup
+    $P1 = new ['ResizableStringArray']
+    $P1[0] = "parrot"
+    $P1[1] = "Foo"
+    $P1[2] = "Bar"
+    $P1[3] = "Baz"
+    $P2 = $P0[$P1]
+    $I0 = isnull $P1
+    is($I0, 0, "can lookup nested namespace by RSA")
+    # TODO: Get the function from this namespace and call it to verify we have
+    #       the correct one.
+
+    # String lookup
+    $P1 = $P0["parrot"]
+    $P2 = $P1["Foo"]
+    $I0 = isnull $P1
+    is($I0, 0, "can lookup namespace by string")
+    $I0 = isnull $P2
+    is($I0, 0, "can lookup namespace by string")
+    # TODO: Get the function from this namespace and call it to verify we have
+    #       the correct one.
 .end
 
 # L<PDD21//>
@@ -486,7 +521,7 @@ CODE
 
     # ...now we do!
     $P1 = $P0.'make_namespace'("NewNamespace1")
-    $P2 = $P1["baz"]    
+    $P2 = $P1["baz"]
     $I0 = isnull $P2
     is($I0, 1, "make_namespace also creates new namespaces")
 
@@ -630,6 +665,12 @@ CODE
 .namespace ["Foo";"Bar"]
 .sub 'baz'
     .return("Foo::Bar")
+.end
+
+# Namespace "Foo";"Bar";"Baz". Nested namespace
+.namespace ["Foo";"Bar";"Baz"]
+.sub 'widget'
+    .return("Foo::Bar::Baz")
 .end
 
 # Namespace specified in ISO-8859-1
