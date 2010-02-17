@@ -1,3 +1,19 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/oplib.pmc
+
+=head1 DESCRIPTION
+
+Implements oplib  VTABLEs.
+
+=cut
+
+*/
+
 #include "parrot/parrot.h"
 
 /* TODO: Since Opcode PMCs are essentially read-only after initialization
@@ -52,3 +68,10 @@ pmclass OpLib {
         return INTERP->op_lib->op_count;
     }
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
