@@ -337,6 +337,13 @@ L<https://trac.parrot.org/parrot/ticket/842>
 
 =over 4
 
+=item PARROT_LIBRARY and PARROT_INCLUDE environment variables [experimental]
+
+L<https://trac.parrot.org/parrot/ticket/1429>
+
+A way to provide an equivalent of -L and -I parrot command line options
+to language that doesn't support it.
+
 =item MT19937 [eligible in 2.1]
 
 L<https://trac.parrot.org/parrot/ticket/1278> - latest version now hosted
