@@ -330,6 +330,14 @@ D: PGE tests and fixes
 D: POD for the Undef PMC
 E: david.romano+p6i@gmail.com
 
+N: David E. Wheeler
+E: david@justatheory.com
+W: http://justatheory.com/
+U: theory
+A: theory
+A: David Wheeler
+S: Portland, OR
+
 N: Dennis Rieks
 D: Win32 config and build
 
