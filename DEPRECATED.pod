@@ -193,20 +193,6 @@ L<https://trac.parrot.org/parrot/ticket/1145>
 These items and related helper functions are added as experimental support
 for L<https://trac.parrot.org/parrot/ticket/895>
 
-=item PDB_compile and PDB_eval [eligible in 2.1]
-
-The function PDB_compile doesn't work since some time, and his implementation
-was a hack. His functionality may be reimplemented in another way. Until the
-end of deprecation cycle it just throws an exception.
-
-The PDB_eval function, that used in the debugger to support the eval
-command, was using PDB_compile. His functionality must be reimplemented
-in another way and with a name that follows current conventions, in the
-meantime and until the end of the deprecation cycle it just shows a
-diagnostic message.
-
-L<https://trac.parrot.org/parrot/ticket/872>
-
 =item STRING Out parameters in Parrot_str_* functions [eligible in 2.1]
 
 All STRING modification functions will return a STRING pointer; capture and use

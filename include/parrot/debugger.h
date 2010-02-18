@@ -240,11 +240,6 @@ char PDB_check_condition(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_CAN_RETURN_NULL
-opcode_t * PDB_compile(PARROT_INTERP, ARGIN(const char *command))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_CAN_RETURN_NULL
 PDB_condition_t * PDB_cond(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -391,9 +386,6 @@ void PDB_watchpoint(PARROT_INTERP, ARGIN(const char *command))
 #define ASSERT_ARGS_PDB_check_condition __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(condition))
-#define ASSERT_ARGS_PDB_compile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(command))
 #define ASSERT_ARGS_PDB_cond __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(command))
