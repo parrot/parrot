@@ -88,6 +88,18 @@ In fact, don't count on it sticking around.  It may not.  Then again, it might.
     .local pmc libsdl
     .local pmc sdl_function
 
+    .local pmc env
+    env = new 'Env'
+    .local string sdlpath
+    say'Hu'
+    sdlpath = env['SDLLIBPATH']
+    if sdlpath == '' goto default_locations
+    say sdlpath
+    loadlib libsdl, sdlpath
+    if libsdl goto OK
+    goto failed
+
+default_locations:
     loadlib libsdl, 'libSDL'
     if libsdl goto OK
 
@@ -103,6 +115,7 @@ In fact, don't count on it sticking around.  It may not.  Then again, it might.
     loadlib libsdl, 'cygSDL-1-2-0'
     if libsdl goto OK
 
+failed:
     # failed to load libSDL
     $P0 = new 'Exception'
     $P0 = "libSDL not found!"
