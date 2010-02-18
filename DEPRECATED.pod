@@ -144,22 +144,6 @@ Assigning to registers [experimental]
 
 L<https://trac.parrot.org/parrot/ticket/906>
 
-=item named class/pmc lookup in pir syntax such as new, isa, subclass,
-    get_class, etc [eligible in 1.1]
-
-Class PMC name resolution will be the following.
-
-if the arg is a STRING
-  Relative to the current Namespace
-
-if the arg is a Array (of any sort) or Key
-  Relative to the current HLL Namespace
-
-if the arg is a Namespace or Class PMC
-  The passed in class or the class attached to the passed in namespace.
-
-L<https://trac.parrot.org/parrot/ticket/159>
-
 =item continuation-based ExceptionHandlers [eligible in 2.1]
 
 L<https://trac.parrot.org/parrot/ticket/1091>
