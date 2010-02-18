@@ -695,7 +695,7 @@ the value is the NQP pathname
   L2:
 .end
 
-=item pir_nqp-rx
+=item pir_nqp-rx / pir_nqprx
 
 hash
 
@@ -712,6 +712,11 @@ the value is the NQP pathname
     $P0 = kv['pir_nqp-rx']
     build_pir_nqp_rx($P0)
   L1:
+    $I0 = exists kv['pir_nqprx']
+    unless $I0 goto L2
+    $P0 = kv['pir_nqprx']
+    build_pir_nqp_rx($P0)
+  L2:
 .end
 
 .sub 'build_pir_nqp_rx'
@@ -1414,7 +1419,7 @@ the value is the POD pathname
   L1:
 .end
 
-=item pir_nqp-rx
+=item pir_nqp-rx / pir_nqprx
 
 =cut
 
@@ -1425,6 +1430,11 @@ the value is the POD pathname
     $P0 = kv['pir_nqp-rx']
     clean_key($P0)
   L1:
+    $I0 = exists kv['pir_nqprx']
+    unless $I0 goto L2
+    $P0 = kv['pir_nqprx']
+    clean_key($P0)
+  L2:
 .end
 
 =item pbc_pbc
@@ -2547,7 +2557,7 @@ array of pathname or a single pathname
 
 array of pathname or a single pathname
 
-=item pbc_pir, pir_pge, pir_tge, pir_nqp, pir_nqp-rx, pbc_pbc, exe_pbc,
+=item pbc_pir, pir_pge, pir_tge, pir_nqp, pir_nqp-rx, pir_nqprx, pbc_pbc, exe_pbc,
 installable_pbc, dynops, dynpmc, html_pod
 
 =item inst_bin, inst_dynext, inst_inc, inst_lang, inst_lib
@@ -2579,7 +2589,7 @@ installable_pbc, dynops, dynpmc, html_pod
     needed = new 'Hash'
     generated = new 'Hash'
 
-    $P0 = split ' ', 'pbc_pir pir_pge pir_tge pir_nqp pir_nqp-rx pbc_pbc exe_pbc installable_pbc dynops dynpmc html_pod'
+    $P0 = split ' ', 'pbc_pir pir_pge pir_tge pir_nqp pir_nqp-rx pir_nqprx pbc_pbc exe_pbc installable_pbc dynops dynpmc html_pod'
   L1:
     unless $P0 goto L2
     $S0 = shift $P0
