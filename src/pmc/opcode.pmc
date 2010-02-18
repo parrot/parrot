@@ -80,6 +80,12 @@ pmclass Opcode auto_attrs {
         }
         return attrs->full_name_cache;
     }
+
+    METHOD op_count() {
+        Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        INTVAL count = attrs->info->op_count;
+        RETURN(INTVAL count);
+    }
 }
 
 /*
