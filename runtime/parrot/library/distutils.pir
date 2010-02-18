@@ -1,4 +1,4 @@
-# Copyright (C) 2009, Parrot Foundation.
+# Copyright (C) 2009-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -194,6 +194,8 @@ L<http://github.com/Whiteknight/parrot-linear-algebra/blob/master/setup.pir>
 
 L<http://bitbucket.org/riffraff/shakespeare-parrot/src/tip/setup.pir>
 
+L<http://gitorious.org/kakapo/kakapo/blobs/master/setup.nqp>
+
 =cut
 
 .sub '__onload' :load :init :anon
@@ -212,6 +214,8 @@ L<http://bitbucket.org/riffraff/shakespeare-parrot/src/tip/setup.pir>
     register_step_after('build', _build_pir_nqp)
     .const 'Sub' _build_pir_nqp_rx = '_build_pir_nqp_rx'
     register_step_after('build', _build_pir_nqp_rx)
+    .const 'Sub' _build_pir_pir = '_build_pir_pir'
+    register_step_after('build', _build_pir_pir)
     .const 'Sub' _build_pbc_pir = '_build_pbc_pir'
     register_step_after('build', _build_pbc_pir)
     .const 'Sub' _build_pbc_pbc = '_build_pbc_pbc'
@@ -235,6 +239,8 @@ L<http://bitbucket.org/riffraff/shakespeare-parrot/src/tip/setup.pir>
     register_step_after('clean', _clean_pir_nqp)
     .const 'Sub' _clean_pir_nqp_rx = '_clean_pir_nqp_rx'
     register_step_after('clean', _clean_pir_nqp_rx)
+    .const 'Sub' _clean_pir_pir = '_clean_pir_pir'
+    register_step_after('clean', _clean_pir_pir)
     .const 'Sub' _clean_pbc_pir = '_clean_pbc_pir'
     register_step_after('clean', _clean_pbc_pir)
     .const 'Sub' _clean_pbc_pbc = '_clean_pbc_pbc'
@@ -736,6 +742,50 @@ the value is the NQP pathname
     cmd .= " "
     cmd .= nqp
     system(cmd, 1 :named('verbose'))
+    goto L1
+  L2:
+.end
+
+=item pir_pir (concat)
+
+hash
+
+the key is the PIR pathname
+
+the value is an array of PIR pathname
+
+=cut
+
+.sub '_build_pir_pir' :anon
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['pir_pir']
+    unless $I0 goto L1
+    $P0 = kv['pir_pir']
+    build_pir_pir($P0)
+  L1:
+.end
+
+.sub 'build_pir_pir'
+    .param pmc hash
+    $P0 = iter hash
+  L1:
+    unless $P0 goto L2
+    .local string pir, src
+    pir = shift $P0
+    .local pmc srcs
+    srcs = hash[pir]
+    $I0 = newer(pir, srcs)
+    if $I0 goto L1
+    spew(pir, '', 1 :named('verbose'))
+    $P1 = iter srcs
+  L3:
+    unless $P1 goto L4
+    .local string src
+    src = shift $P1
+    $S0 = slurp(src)
+    append(pir, $S0)
+    goto L3
+  L4:
     goto L1
   L2:
 .end
@@ -1378,6 +1428,19 @@ the value is the POD pathname
      unlink($S0, 1 :named('verbose'))
      goto L1
   L2:
+.end
+
+=item pir_pir
+
+=cut
+
+.sub '_clean_pir_pir' :anon
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['pir_pir']
+    unless $I0 goto L1
+    $P0 = kv['pir_pir']
+    clean_key($P0)
+  L1:
 .end
 
 =item pir_pge
@@ -2557,8 +2620,8 @@ array of pathname or a single pathname
 
 array of pathname or a single pathname
 
-=item pbc_pir, pir_pge, pir_tge, pir_nqp, pir_nqp-rx, pir_nqprx, pbc_pbc, exe_pbc,
-installable_pbc, dynops, dynpmc, html_pod
+=item pbc_pir, pir_pge, pir_tge, pir_nqp, pir_nqp-rx, pir_nqprx, pir_pir
+pbc_pbc, exe_pbc, installable_pbc, dynops, dynpmc, html_pod
 
 =item inst_bin, inst_dynext, inst_inc, inst_lang, inst_lib
 
@@ -2589,7 +2652,7 @@ installable_pbc, dynops, dynpmc, html_pod
     needed = new 'Hash'
     generated = new 'Hash'
 
-    $P0 = split ' ', 'pbc_pir pir_pge pir_tge pir_nqp pir_nqp-rx pir_nqprx pbc_pbc exe_pbc installable_pbc dynops dynpmc html_pod'
+    $P0 = split ' ', 'pbc_pir pir_pge pir_tge pir_nqp pir_nqp-rx pir_nqprx pir_pir pbc_pbc exe_pbc installable_pbc dynops dynpmc html_pod'
   L1:
     unless $P0 goto L2
     $S0 = shift $P0
