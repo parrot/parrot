@@ -80,6 +80,7 @@ static void fix_pmc_syncs(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*dest_interp);
 
+static void free_memory_pool(Variable_Size_Pool *pool);
 static void free_pool(ARGMOD(Fixed_Size_Pool *pool))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*pool);
@@ -143,6 +144,7 @@ static int sweep_cb_pmc(PARROT_INTERP,
 #define ASSERT_ARGS_fix_pmc_syncs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest_interp) \
     , PARROT_ASSERT_ARG(pool))
+#define ASSERT_ARGS_free_memory_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_free_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pool))
 #define ASSERT_ARGS_new_memory_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -1151,6 +1153,8 @@ Frees a memory pool; helper function for C<Parrot_gc_destroy_memory_pools>.
 static void
 free_memory_pool(Variable_Size_Pool *pool)
 {
+    ASSERT_ARGS(free_memory_pool)
+
     Memory_Block *cur_block = pool->top_block;
 
     while (cur_block) {
