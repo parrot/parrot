@@ -45,6 +45,7 @@ extern void *flush_reg_store(void);
 #define UNITS_PER_ALLOC_GROWTH_FACTOR          1.75
 
 #define POOL_MAX_BYTES                         65536 * 128
+#define GC_SIZE_THRESHOLD                      1024  * 1024
 
 #define PMC_HEADERS_PER_ALLOC     4096 * 10 / sizeof (PMC)
 #define BUFFER_HEADERS_PER_ALLOC  4096      / sizeof (Buffer)
@@ -91,7 +92,8 @@ typedef enum _gc_sys_type_enum {
 typedef enum _gc_skip_type_enum {
     GC_NO_SKIP = 0,
     GC_ONE_SKIP,
-    GC_ALWAYS_SKIP
+    GC_ALWAYS_SKIP,
+    GC_NEVER_SKIP
 } gc_skip_type_enum;
 
 typedef struct GC_Subsystem {
