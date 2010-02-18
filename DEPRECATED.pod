@@ -66,6 +66,22 @@ And all uses in the Parrot calling conventions.
 
 L<https://trac.parrot.org/parrot/ticket/1407>
 
+=item Digest dynpmcs [eligible in 2.4]
+
+The digest dynpmcs are, since the posting of this notice, available on
+http://gitorious.org/digest-dynpmcs and will no longer be distributed
+with parrot after 2.3.
+
+L<https://trac.parrot.org/parrot/ticket/1467>
+
+=item gdbmhash dynpmc [eligible in 2.4]
+
+The gdbmhash dynpmc is, since the posting of this notice, available on
+http://gitorious.org/dbm-dynpmcs and will no longer be distributed
+with parrot after 2.3.
+
+L<https://trac.parrot.org/parrot/ticket/1469>
+
 =back
 
 =head1 Opcodes
