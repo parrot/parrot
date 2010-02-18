@@ -989,8 +989,7 @@ B<compreg> opcode or the Parrot_compreg function. This will be something like
 "Perl5", "Perl6", "Perl5RE", "Perl6RE", "Python", "Ruby"... you get the
 picture.
 
-Parrot knows of a "PASM1" compiler, i.e. a one statement PASM compiler
-implemented as PDB_eval. Imcc registers "PASM" and "PIR" compilers.
+Imcc registers "PASM" and "PIR" compilers automatically.
 
 This is a high-level op, with the assumption that the resulting sub will be
 called. It's the equivalent of perl 5's string eval, except for the actual

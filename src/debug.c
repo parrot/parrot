@@ -3363,33 +3363,6 @@ PDB_eval(PARROT_INTERP, ARGIN(const char *command))
 
 /*
 
-=item C<opcode_t * PDB_compile(PARROT_INTERP, const char *command)>
-
-Compiles instructions with the PASM compiler.
-
-Appends an C<end> op.
-
-This may be called from C<PDB_eval> above or from the compile opcode
-which generates a malloced string.
-
-=cut
-
-*/
-
-PARROT_CAN_RETURN_NULL
-opcode_t *
-PDB_compile(PARROT_INTERP, ARGIN(const char *command))
-{
-    ASSERT_ARGS(PDB_compile)
-
-    UNUSED(command);
-    Parrot_ex_throw_from_c_args(interp, NULL,
-        EXCEPTION_UNIMPLEMENTED,
-        "PDB_compile ('PASM1' compiler) has been deprecated");
-}
-
-/*
-
 =item C<void PDB_print(PARROT_INTERP, const char *command)>
 
 Print interp registers.

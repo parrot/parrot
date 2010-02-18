@@ -232,17 +232,6 @@ this rather than relying on in-place modification of an existing pointer.
 
 =head1 Compiler tools
 
-=head2 PASM1 compiler
-
-=over 4
-
-=item C<PASM1 compiler> [eligible in 2.1]
-
-See PDB_compile. Note that the current version of the C<PASM1> compiler
-issues a warning and is not functional. (However, it used to segfault.)
-
-=back
-
 =head2 Parrot Grammar Engine (PGE)
 
 =over 4

@@ -37,9 +37,6 @@ static int is_env_var_set(PARROT_INTERP, ARGIN(STRING* var))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void setup_default_compreg(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 #define ASSERT_ARGS_is_env_var_set __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(var))
@@ -74,26 +71,6 @@ is_env_var_set(PARROT_INTERP, ARGIN(STRING* var))
     else
         retval = !STREQ(value, "0");
     return retval;
-}
-
-/*
-
-=item C<static void setup_default_compreg(PARROT_INTERP)>
-
-Setup default compiler for PASM.
-
-=cut
-
-*/
-
-static void
-setup_default_compreg(PARROT_INTERP)
-{
-    ASSERT_ARGS(setup_default_compreg)
-    STRING * const pasm1 = CONST_STRING(interp, "PASM1");
-
-    /* register the nci compiler object */
-    Parrot_compreg(interp, pasm1, (Parrot_compiler_func_t)PDB_compile);
 }
 
 /*
@@ -298,9 +275,6 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
     /* create exceptions list */
     interp->current_runloop_id    = 0;
     interp->current_runloop_level = 0;
-
-    /* register assembler/compilers */
-    setup_default_compreg(interp);
 
     /* setup stdio PMCs */
     Parrot_io_init(interp);
