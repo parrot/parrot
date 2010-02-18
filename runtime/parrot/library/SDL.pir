@@ -224,7 +224,7 @@ SDL::Font library anyway, which calls this for you.
 
   initialize:
     .local pmc nci_sub
-    dlfunc nci_sub, ttf_lib, 'TTF_Init', 'iv'
+    dlfunc nci_sub, ttf_lib, 'TTF_Init', 'i'
     unless nci_sub goto error
 
     set_hll_global ['SDL::NCI::TTF'], 'Init', nci_sub
@@ -238,7 +238,7 @@ SDL::Font library anyway, which calls this for you.
   error:
     .local pmc e
     e    = new 'Exception'
-    e[0] = "SDL_ttf not initialized\n"
+    e['message'] = "SDL_ttf not initialized\n"
     throw e
 
   success:

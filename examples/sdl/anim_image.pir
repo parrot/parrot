@@ -96,7 +96,7 @@ To run this file, run the following command from the Parrot directory:
     .local pmc rect
 
     .local pmc rect_array
-    rect_array = new 'Array'
+    rect_array = new 'ResizablePMCArray'
     set rect_array, 2
 
 _loop:
