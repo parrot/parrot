@@ -8,7 +8,7 @@ MKPATH  = @mkpath@
 TOUCH   = @touch@
 RM_F    = @rm_f@
 RM_RF   = @rm_rf@
-PERLDOC = @perldoc@
+PERLDOC_BIN = @perldoc@
 VERSION = @VERSION@@DEVEL@
 
 # long list of .pod files
@@ -41,8 +41,8 @@ doc-prep:
 	$(TOUCH) doc-prep
 
 packfile-c.pod: ../src/packfile.c
-#IF(new_perldoc):	$(PERLDOC) -ud packfile-c.pod ../src/packfile.c
-#ELSE:	$(PERLDOC) -u ../src/packfile.c > packfile-c.pod
+#IF(new_perldoc):	$(PERLDOC_BIN) -ud packfile-c.pod ../src/packfile.c
+#ELSE:	$(PERLDOC_BIN) -u ../src/packfile.c > packfile-c.pod
 
 clean:
 	$(RM_F) packfile-c.pod $(POD) doc-prep

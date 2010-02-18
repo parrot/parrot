@@ -68,7 +68,7 @@ E_NOTE
         if ( $new_perldoc ) {
             $TEMP_pod_build .= <<"END"
 ops$slash$pod: ..${slash}src${slash}ops${slash}$ops
-\t\$(PERLDOC) -ud ops${slash}$pod ..${slash}src${slash}ops${slash}$ops
+\t\$(PERLDOC_BIN) -ud ops${slash}$pod ..${slash}src${slash}ops${slash}$ops
 \t\$(CHMOD) 0644 ops${slash}$pod
 
 END
@@ -76,7 +76,7 @@ END
         else {
             $TEMP_pod_build .= <<"END"
 ops$slash$pod: ..${slash}src${slash}ops${slash}$ops
-\t\$(PERLDOC) -u ..${slash}ops${slash}$ops > ops${slash}$pod
+\t\$(PERLDOC_BIN) -u ..${slash}ops${slash}$ops > ops${slash}$pod
 \t\$(CHMOD) 0644 ..${slash}ops${slash}$pod
 
 END
