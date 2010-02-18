@@ -275,11 +275,7 @@ Functions to call Parrot subroutines and methods
 
 =over 4
 
-=item C<Parrot_call_sub(interp, Parrot_PMC sub, Parrot_Int argcount, ...)>
-
-Calls a Parrot subroutine, with C<argcount> PMC parameters. This function sets
-up Parrot's registers in line with the Parrot calling conventions; see
-L<pdd03_calling_conventions.pod> for more details.
+    TODO: Add new call functions here
 
 =back
 

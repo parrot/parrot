@@ -446,7 +446,7 @@ the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
 
     Parrot_pbc_load(interp, pf);
     sub = Parrot_find_global_cur(interp, name);
-    Parrot_call_sub(interp, sub, "v");
+    Parrot_ext_call(interp, sub, "->");
     Parrot_eprintf(interp, "back\\n");
 
     /* win32 seems to buffer stderr ? */
@@ -459,7 +459,7 @@ the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
     Parrot_PMC_set_string_native(interp, arg,
                  Parrot_str_new(interp, "hello ", 0));
 
-    Parrot_call_sub(interp, sub, "vP", arg);
+    Parrot_ext_call(interp, sub, "P->", arg);
     Parrot_eprintf(interp, "back\\n");
 
     return NULL;
@@ -657,7 +657,7 @@ the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
         interp->current_runloop_id++;
 
         Parrot_ex_add_c_handler(interp, &jump_point);
-        Parrot_call_sub(interp, sub, "v");
+        Parrot_ext_call(interp, sub, "->");
     }
 
     Parrot_eprintf(interp, "back\\n");
@@ -781,7 +781,7 @@ main(int argc, char* argv[])
     foo_name = Parrot_str_new_constant( interp, "foo" );
     sub      = Parrot_find_global_cur( interp, foo_name );
 
-    retval   = (PMC *) Parrot_call_sub( interp, sub, "V", "" );
+    Parrot_ext_call(interp, sub, "->");
 
     Parrot_exit(interp, 0);
     return 0;
@@ -812,7 +812,7 @@ main(int argc, char* argv[])
     Parrot_pbc_load( interp, pf );
 
     sub      = Parrot_find_global_cur( interp, Parrot_str_new_constant( interp, "add" ) );
-    result   = Parrot_call_sub_ret_int( interp, sub, "III", 100, 200 );
+    Parrot_ext_call(interp, sub, "II->I", 100, 200, &result);
     printf( "Result is %d.\\n", result );
 
     Parrot_exit(interp, 0);

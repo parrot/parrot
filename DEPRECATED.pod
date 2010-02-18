@@ -178,13 +178,6 @@ functions will be kept in the ticket at:
 
 L<https://trac.parrot.org/parrot/ticket/443>
 
-=item Sub/method invocation functions [eligible in 2.1]
-
-The old 'Parrot_call_*' functions for invoking a sub/method object from C are
-deprecated, replaced by 'Parrot_ext_call'.
-
-L<https://trac.parrot.org/parrot/ticket/1145>
-
 =item PMC Attributes Allocation Functions [experimental]
 
  Parrot_gc_allocate_pmc_attributes

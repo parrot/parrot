@@ -203,7 +203,7 @@ int cotorra_main(Parrot_Interp interp, int argc, char **argv)
         Parrot_String compiler = create_string(interp, "PIR");
         Parrot_String errstr;
         Parrot_PMC code = Parrot_compile_string(interp, compiler, exec, &errstr);
-        void *discard = Parrot_call_sub(interp, code, "v");
+        Parrot_ext_call(interp, code, "->");
         return 0;
     }
 
@@ -224,8 +224,7 @@ int cotorra_main(Parrot_Interp interp, int argc, char **argv)
         Parrot_PMC parrotns = Parrot_PMC_get_pmc_strkey(interp, rootns, parrotname);
         Parrot_String name = create_string(interp, stname);
         Parrot_PMC start = Parrot_PMC_get_pmc_strkey(interp, parrotns, name);
-        void *discard;
-        discard = Parrot_call_sub(interp, start, "v");
+        Parrot_ext_call(interp, start, "->");
     }
     else {
         Parrot_runcode(interp, argc - i, argv + i);
