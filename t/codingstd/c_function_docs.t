@@ -114,9 +114,7 @@ config/gen/platform/netbsd/math.c
 config/gen/platform/openbsd/math.c
 config/gen/platform/solaris/math.c
 config/gen/platform/solaris/time.c
-examples/c/pbc_info.c
 examples/compilers/japhc.c
-src/atomic/gcc_x86.c
 src/gc/generational_ms.c
 src/io/io_string.c
 src/string/charset/ascii.c
@@ -124,7 +122,6 @@ src/string/charset/binary.c
 src/string/charset/iso-8859-1.c
 src/string/charset/unicode.c
 src/tsq.c
-include/parrot/atomic/gcc_pcc.h
 
 # Local Variables:
 #   mode: cperl
