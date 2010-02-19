@@ -94,7 +94,7 @@ Create a copy of the stringhandle.
 
     VTABLE PMC *clone() {
         Parrot_StringHandle_attributes * const old_struct  = PARROT_STRINGHANDLE(SELF);
-        PMC * const copy = pmc_new(INTERP, enum_class_StringHandle);
+        PMC * const copy = Parrot_pmc_new(INTERP, enum_class_StringHandle);
         Parrot_StringHandle_attributes * const data_struct = PARROT_STRINGHANDLE(copy);
 
         if (old_struct->stringhandle != NULL)

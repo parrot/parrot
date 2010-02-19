@@ -229,7 +229,7 @@ the next one.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        ret = pmc_new(INTERP, enum_class_HashIteratorKey);
+        ret = Parrot_pmc_new(INTERP, enum_class_HashIteratorKey);
         VTABLE_set_pointer_keyed_int(INTERP, ret, 0, attrs->parrot_hash);
         VTABLE_set_pointer_keyed_int(INTERP, ret, 1, attrs->bucket);
 
@@ -246,7 +246,7 @@ the next one.
     VTABLE STRING* shift_string() {
         PMC    * const key = SELF.shift_pmc();
         STRING * const ret = VTABLE_get_string(INTERP, key);
-        temporary_pmc_free(INTERP, key);
+        Parrot_pmc_free_temporary(INTERP, key);
         return ret;
     }
 

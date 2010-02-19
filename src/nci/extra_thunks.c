@@ -207,7 +207,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(interp);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -231,7 +231,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(interp, PMC_IS_NULL((PMC*)t_1) ? (void *)NULL : VTABLE_get_pointer(interp, t_1));
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -445,7 +445,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(interp, t_1, t_2, t_3, t_4);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -1397,7 +1397,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(interp, t_1);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -1424,7 +1424,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(interp, t_1, PMC_IS_NULL((PMC*)t_2) ? (void *)NULL : VTABLE_get_pointer(interp, t_2), PMC_IS_NULL((PMC*)t_3) ? (void *)NULL : VTABLE_get_pointer(interp, t_3));
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -1453,7 +1453,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(interp, Buffer_bufstart(t_1), t_2, PMC_IS_NULL((PMC*)t_3) ? (void *)NULL : VTABLE_get_pointer(interp, t_3));
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -2001,7 +2001,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -2026,7 +2026,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0));
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -2111,7 +2111,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, t_3, t_4, t_5, t_6, t_7);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -2246,7 +2246,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -2273,7 +2273,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -2323,7 +2323,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), PMC_IS_NULL((PMC*)t_1) ? (void *)NULL : VTABLE_get_pointer(interp, t_1));
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -2422,7 +2422,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, t_3, t_4, t_5, t_6, t_7);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -2457,7 +2457,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(t_0, t_1, &t_2, &i_3, t_4);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -2489,7 +2489,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(t_0, t_1, PMC_IS_NULL((PMC*)t_2) ? (void *)NULL : VTABLE_get_pointer(interp, t_2), &i_3, t_4);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -2586,7 +2586,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, PMC_IS_NULL((PMC*)t_3) ? (void *)NULL : VTABLE_get_pointer(interp, t_3), PMC_IS_NULL((PMC*)t_4) ? (void *)NULL : VTABLE_get_pointer(interp, t_4), PMC_IS_NULL((PMC*)t_5) ? (void *)NULL : VTABLE_get_pointer(interp, t_5), PMC_IS_NULL((PMC*)t_6) ? (void *)NULL : VTABLE_get_pointer(interp, t_6), t_7);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -2623,7 +2623,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, &i_2, &i_3, t_4, PMC_IS_NULL((PMC*)t_5) ? (void *)NULL : VTABLE_get_pointer(interp, t_5), t_6);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -2657,7 +2657,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, t_3, PMC_IS_NULL((PMC*)t_4) ? (void *)NULL : VTABLE_get_pointer(interp, t_4));
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -2691,7 +2691,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, PMC_IS_NULL((PMC*)t_3) ? (void *)NULL : VTABLE_get_pointer(interp, t_3), PMC_IS_NULL((PMC*)t_4) ? (void *)NULL : VTABLE_get_pointer(interp, t_4), PMC_IS_NULL((PMC*)t_5) ? (void *)NULL : VTABLE_get_pointer(interp, t_5), t_6);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -2723,7 +2723,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), PMC_IS_NULL((PMC*)t_1) ? (void *)NULL : VTABLE_get_pointer(interp, t_1), t_2);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -2752,7 +2752,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(t_0, t_1, t_2, t_3);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -2827,7 +2827,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -2879,7 +2879,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, t_3);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -2907,7 +2907,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(t_0, t_1);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -2934,7 +2934,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, PMC_IS_NULL((PMC*)t_2) ? (void *)NULL : VTABLE_get_pointer(interp, t_2));
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -4688,7 +4688,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)();
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -4712,7 +4712,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(&t_0);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -4736,7 +4736,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(Buffer_bufstart(t_0));
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -4760,7 +4760,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(interp, t_1);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -4785,7 +4785,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(t_0);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -4810,7 +4810,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(t_0, t_1);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -4838,7 +4838,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(t_0, t_1, t_2, t_3);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -4870,7 +4870,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(t_0, t_1, t_2, t_3, t_4, t_5);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -4906,7 +4906,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(t_0, t_1, t_2, t_3, t_4, t_5, t_6, t_7);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -4939,7 +4939,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -4969,7 +4969,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), t_1, t_2, t_3, t_4);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -4997,7 +4997,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(t_0);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -5023,7 +5023,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(t_0, PMC_IS_NULL((PMC*)t_1) ? (void *)NULL : VTABLE_get_pointer(interp, t_1), PMC_IS_NULL((PMC*)t_2) ? (void *)NULL : VTABLE_get_pointer(interp, t_2));
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -5055,7 +5055,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(t_0, t_1, t_2, t_3, t_4, t_5, t_6);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -5472,7 +5472,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(t_0, PMC_IS_NULL((PMC*)t_1) ? (void *)NULL : VTABLE_get_pointer(interp, t_1));
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -5690,7 +5690,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), PMC_IS_NULL((PMC*)t_1) ? (void *)NULL : VTABLE_get_pointer(interp, t_1), t_2, t_3, t_4);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -5726,7 +5726,7 @@ PMC * final_destination = PMCNULL;
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (void *)(*fn_pointer)(PMC_IS_NULL((PMC*)t_0) ? (void *)NULL : VTABLE_get_pointer(interp, t_0), PMC_IS_NULL((PMC*)t_1) ? (void *)NULL : VTABLE_get_pointer(interp, t_1), t_2, t_3, t_4, t_5, t_6, t_7, t_8);
     if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", final_destination);
@@ -6210,1019 +6210,1019 @@ Parrot_nci_load_extra_thunks(PARROT_INTERP)
     if (PMC_IS_NULL(HashPointer))
         PANIC(interp, "iglobals.nci_funcs isn't created yet");
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_J);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vJ"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_ip);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iip"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_JPip);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iJPip"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_JpP);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iJpP"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_Jpii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iJpii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_p);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ip"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_tp);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "itp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_J);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "pJ"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_Jp);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "pJp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_t_J);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "tJ"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_t_Jpti);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "tJpti"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_t_p);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "tp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_t_pt);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "tpt"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_p);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_pit);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vpit"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_ptt);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vptt"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_Jtiiipt);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vJtiiipt"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_JttPP);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "pJttPP"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_P_Jtpi);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "PJtpi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_Vppp);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iVppp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_JpPP);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vJpPP"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_pt);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vpt"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_Jpt);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vJpt"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "v"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_Jiiip);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vJiiip"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_i);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_ii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_illllllll);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "villllllll"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_l);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vl"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_pbip);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vpbip"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_pi);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vpi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_piiii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vpiiii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_pl);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vpl"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_pp);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vpp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_JPP);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iJPP"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_P_JP);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "PJP"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_P_JPP);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "PJPP"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_P_JO);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "PJO"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_S_JO);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "SJO"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_P);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iP"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_P_JOPP);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "PJOPP"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_P_JOPPP);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "PJOPPP"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_JOPP);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vJOPP"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_JOPPP);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vJOPPP"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_P_JOPPPP);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "PJOPPPP"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_P_JOPPPPP);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "PJOPPPPP"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_I_JOSI);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "IJOSI"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_P_JOSII);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "PJOSII"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_t_p3);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "tp3"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pp3p);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipp3p"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pp3);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipp3"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_ppd);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ippd"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_ptii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iptii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pipi);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipipi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_t_ptti);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "tptti"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_t_pti);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "tpti"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_t_pttti);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "tpttti"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_Ji);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "pJi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_Jipp);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "pJipp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_Jbip);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "pJbip"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_Jp);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vJp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_JS);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vJS"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_t_tt);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ttt"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_I_JOt);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "IJOt"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_JOSI);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vJOSI"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_S_JOi);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "SJOi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_JOi);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vJOi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_I_JO);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "IJO"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_N_JO);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "NJO"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_JON);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vJON"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_P_JOi);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "PJOi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_JOI);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vJOI"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_P_JOI);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "PJOI"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_P_JOIS);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "PJOIS"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_S_JOSP);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "SJOSP"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "i"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_i3i);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ii3i"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_ibi);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iibi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_l_lttl);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "llttl"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pip);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipip"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_piS);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipiS"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_S_i);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "Si"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_l_p);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "lp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_c_p);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "cp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_pi);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ppi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_p);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "pp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pttttt);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipttttt"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_c_pttt);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "cpttt"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_pttttiti);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ppttttiti"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pt);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipt"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_ptl);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iptl"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pi);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pl);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipl"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_l_);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "l"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_pt);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ppt"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_ptt);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "pptt"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pit);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipit"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_pp);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ppp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_l_ttl);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "lttl"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_l_pttl);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "lpttl"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_t);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vt"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_pttttitl);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ppttttitl"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_tiB3P);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ptiB3P"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_tip3P);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ptip3P"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pPtiiipi);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipPtiiipi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_tpiibi);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "itpiibi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_ptippppi);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "pptippppi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_pi33ipi);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ppi33ipi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_pttip);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ppttip"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_ptipppi);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "pptipppi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_ppP);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "pppP"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_iiil);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "piiil"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_ppl);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ippl"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_pip);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vpip"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_pti);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ppti"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_ppp);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ippp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_ptii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "pptii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_ti);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "pti"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_ptp);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "pptp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pt33);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipt33"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_c_);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "c"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_c_pi);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "cpi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_d_);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "d"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_d_d);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "dd"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_f_);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "f"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_f_ff);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "fff"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_f_is);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "fis"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_b);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ib"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_d);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "id"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_i);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_ii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_ii4);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iii4"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_ii4i);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iii4i"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_iiii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iiiii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_iiilsp);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iiiilsp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_iil);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iiil"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_iili);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iiili"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_iip);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iiip"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_iit);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iiit"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_iiti);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iiiti"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_ilsp);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iilsp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_iti);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iiti"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_l);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "il"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_li);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ili"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_lp);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ilp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_lsp);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ilsp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_p33);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ip33"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_p333);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ip333"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_p333333);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ip333333"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_p4);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ip4"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_p42p);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ip42p"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_p4i);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ip4i"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pb);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipb"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pii4);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipii4"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pii4i);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipii4i"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_piii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipiii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_piiiiii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipiiiiii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_piiilsp);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipiiilsp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_piil);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipiil"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_piili);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipiili"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_piit);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipiit"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_piiti);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipiiti"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pilsp);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipilsp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pli);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipli"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pll);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipll"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pllllllll);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipllllllll"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_plp);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iplp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_plsp);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iplsp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pp);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_ppi);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ippi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_ppiiiiiiii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ippiiiiiiii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pppp);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipppp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_psp);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipsp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pti);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipti"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pitl);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipitl"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_s);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "is"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_s22);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "is22"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_s222);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "is222"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_sp);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "isp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_sss);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "isss"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_ssss);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "issss"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_t);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "it"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_ti);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iti"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_4);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "i4"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_4i);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "i4i"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_42p);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "i42p"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_l_ii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "lii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_l_l4);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ll4"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_l_pi);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "lpi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_l_pii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "lpii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_l_p33l);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "lp33l"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_l_33l);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "l33l"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "p"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_B);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "pB"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_b);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "pb"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_Jt);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "pJt"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_i);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "pi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_ii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "pii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_iiii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "piiii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_iiiiii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "piiiiii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_iiiiiiii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "piiiiiiii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_pii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ppii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_piiii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ppiiii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_t);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "pt"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_tpp);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ptpp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_ttttttt);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "pttttttt"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_s_);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "s"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_t_);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "t"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_t_i);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ti"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_t_ii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "tii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_t_pi);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "tpi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_t_pii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "tpii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_t_t);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "tt"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_t_tl4);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ttl4"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_t_t4);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "tt4"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_sc);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "isc"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_s_sc);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ssc"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_c_sc);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "csc"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_iii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iiii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_i3);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ii3"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_t_b);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "tb"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_t_B);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "tB"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_P);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vP"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_pP);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vpP"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_ip);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "pip"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_33);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "i33"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_pii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vpii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_JO);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vJO"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_JO);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iJO"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_JOi);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iJOi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_JOt);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iJOt"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_Jt);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iJt"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_Ji);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iJi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_Vi);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vVi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_ppiii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "pppiii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_p_ppiiiiiii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "pppiiiiiii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_ppii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ippii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_ppiii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ippiii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_ppiiii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ippiiii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_ppiiiii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ippiiiii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_ppiiiiii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ippiiiiii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_ppt);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ippt"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pppi);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipppi"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pppii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipppii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pppiiii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipppiiii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_ppppiiiiii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ippppiiiiii"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_fff);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vfff"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_V);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vV"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_VVV);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "vVVV"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_tV);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "itV"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_ptiVp);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "iptiVp"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pid);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipid"), temp_pmc);
 
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pitii);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "ipitii"), temp_pmc);
 

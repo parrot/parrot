@@ -49,7 +49,7 @@ Initialize PackfileAnnotations.
         Parrot_PackfileAnnotations_attributes * attrs =
                 PMC_data_typed(SELF, Parrot_PackfileAnnotations_attributes*);
 
-        attrs->annotations = pmc_new(interp, enum_class_ResizablePMCArray);
+        attrs->annotations = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
         /*
         Don't initialize C<const_table>. It will be set to NULL bu auto_attrs
         handling. And should be set to proper PMC in set_directory.
@@ -220,7 +220,7 @@ Initialize PackfileAnnotations from PackFile_Annotations*.
         for (i = 0; i < a->num_entries; ++i) {
             PackFile_Annotations_Entry *entry = a->entries[i];
             PackFile_Annotations_Key   *key   = a->keys[entry->key];
-            annotation = pmc_new(interp, enum_class_PackfileAnnotation);
+            annotation = Parrot_pmc_new(interp, enum_class_PackfileAnnotation);
 
             /* Poke directly to annotation attributes. */
             annotation_attrs         = PARROT_PACKFILEANNOTATION(annotation);
@@ -289,9 +289,9 @@ Create PackFile_Annotations* from self.
                 ...
             ]
         */
-        keys        = pmc_new(interp, enum_class_Hash);
-        names       = pmc_new(interp, enum_class_ResizableIntegerArray);
-        types       = pmc_new(interp, enum_class_ResizableIntegerArray);
+        keys        = Parrot_pmc_new(interp, enum_class_Hash);
+        names       = Parrot_pmc_new(interp, enum_class_ResizableIntegerArray);
+        types       = Parrot_pmc_new(interp, enum_class_ResizableIntegerArray);
         last_key_id = -1;
 
         /* Iterate over stored annotations and create Key if required. */
@@ -306,7 +306,7 @@ Create PackFile_Annotations* from self.
             PMC * key_array = VTABLE_get_pmc_keyed_str(interp, keys, entity_attrs->name);
             if (PMC_IS_NULL(key_array)) {
                 /* Never see this name before. Create new FIA and add to keys. */
-                key_array = pmc_new(interp, enum_class_FixedIntegerArray);
+                key_array = Parrot_pmc_new(interp, enum_class_FixedIntegerArray);
                 VTABLE_set_integer_native(interp, key_array, 3);
                 VTABLE_set_integer_keyed_int(interp, key_array, 0, -1);
                 VTABLE_set_integer_keyed_int(interp, key_array, 1, -1);

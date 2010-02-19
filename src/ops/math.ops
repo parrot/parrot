@@ -205,7 +205,7 @@ inline op cmod(invar PMC, invar PMC, in INT) :base_core {
 
     result = VTABLE_get_integer(interp, $2) % $3;
 
-    $1 = pmc_new(interp, VTABLE_type(interp, $2));
+    $1 = Parrot_pmc_new(interp, VTABLE_type(interp, $2));
     VTABLE_set_integer_native(interp, $1, result);
 }
 
@@ -222,7 +222,7 @@ inline op cmod(invar PMC, invar PMC, invar PMC) :base_core {
 
     result = VTABLE_get_integer(interp, $2) % value;
 
-    $1 = pmc_new(interp, VTABLE_type(interp, $2));
+    $1 = Parrot_pmc_new(interp, VTABLE_type(interp, $2));
     VTABLE_set_integer_native(interp, $1, result);
 }
 
@@ -283,7 +283,7 @@ inline op cmod(invar PMC, invar PMC, in NUM) :base_core {
 
     result = fmod(VTABLE_get_integer(interp, $2), value);
 
-    $1 = pmc_new(interp, VTABLE_type(interp, $2));
+    $1 = Parrot_pmc_new(interp, VTABLE_type(interp, $2));
     VTABLE_set_integer_native(interp, $1, (INTVAL) result);
 }
 
@@ -816,9 +816,9 @@ inline op pow(invar PMC, invar PMC, invar PMC) :base_core {
     const FLOATVAL b = VTABLE_get_number(interp, $3);
     const FLOATVAL c = pow(a, b);
     if (PMC_IS_NULL($1))
-        $1 = pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
+        $1 = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
     else
-        $1 = pmc_new(interp, $1->vtable->base_type);
+        $1 = Parrot_pmc_new(interp, $1->vtable->base_type);
     VTABLE_set_number_native(interp, $1, c);
 }
 
@@ -827,9 +827,9 @@ inline op pow(invar PMC, invar PMC, in INT) :base_core {
     const FLOATVAL b = (FLOATVAL)$3;
     const FLOATVAL c = pow(a, b);
     if (PMC_IS_NULL($1))
-        $1 = pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
+        $1 = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
     else
-        $1 = pmc_new(interp, $1->vtable->base_type);
+        $1 = Parrot_pmc_new(interp, $1->vtable->base_type);
     VTABLE_set_number_native(interp, $1, c);
 }
 
@@ -837,9 +837,9 @@ inline op pow(invar PMC, invar PMC, in NUM) :base_core {
     const FLOATVAL a = VTABLE_get_number(interp, $2);
     const FLOATVAL c = pow(a, $3);
     if (PMC_IS_NULL($1))
-        $1 = pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
+        $1 = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
     else
-        $1 = pmc_new(interp, $1->vtable->base_type);
+        $1 = Parrot_pmc_new(interp, $1->vtable->base_type);
     VTABLE_set_number_native(interp, $1, c);
 }
 

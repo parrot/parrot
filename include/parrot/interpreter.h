@@ -606,7 +606,7 @@ typedef void * *(*native_func_t)(PARROT_INTERP,
 #endif   /* PARROT_IN_CORE */
 
 #ifndef PMC_IS_NULL
-#  define PMC_IS_NULL(pmc) PMC_is_null(NULL, (pmc))
+#  define PMC_IS_NULL(pmc) Parrot_pmc_is_null(NULL, (pmc))
 #endif
 #ifndef STRING_IS_NULL
 #  define STRING_IS_NULL(s) ((s) == NULL || STRING_is_null(NULL, (s))

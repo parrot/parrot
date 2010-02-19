@@ -291,7 +291,7 @@ Returns the PMC value for the element at C<*key>.
 
     VTABLE PMC* get_pmc_keyed(PMC* key) {
         STRING * ret_string = SELF.get_string_keyed(key);
-        PMC *ret_pmc = pmc_new(interp, enum_class_String);
+        PMC *ret_pmc = Parrot_pmc_new(interp, enum_class_String);
 
         VTABLE_set_string_native(interp, ret_pmc, ret_string);
 
@@ -311,7 +311,7 @@ Convert C<value> to a string and set the string for the C<key>.
     VTABLE void set_integer_keyed(PMC* key, INTVAL value) {
         PMC *temp;
 
-        temp = pmc_new(interp, enum_class_String);
+        temp = Parrot_pmc_new(interp, enum_class_String);
         VTABLE_set_integer_native(interp, temp, value);
         SELF.set_pmc_keyed(key, temp);
     }
@@ -330,7 +330,7 @@ Convert C<value> to a string and set the string for the C<key>.
     VTABLE void set_number_keyed(PMC* key, FLOATVAL value) {
         PMC *temp;
 
-        temp = pmc_new(interp, enum_class_String);
+        temp = Parrot_pmc_new(interp, enum_class_String);
         VTABLE_set_number_native(interp, temp, value);
         SELF.set_pmc_keyed(key, temp);
     }

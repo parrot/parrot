@@ -454,7 +454,7 @@ the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
 
     name = Parrot_str_new_constant(interp, "_sub2");
     sub  = Parrot_find_global_cur(interp, name);
-    arg  = pmc_new(interp, enum_class_String);
+    arg  = Parrot_pmc_new(interp, enum_class_String);
 
     Parrot_PMC_set_string_native(interp, arg,
                  Parrot_str_new(interp, "hello ", 0));
@@ -512,7 +512,7 @@ the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
 
     name = Parrot_str_new_constant(interp, "_sub2");
     sub  = Parrot_find_global_cur(interp, name);
-    arg  = pmc_new(interp, enum_class_String);
+    arg  = Parrot_pmc_new(interp, enum_class_String);
 
     Parrot_PMC_set_string_native(interp, arg,
                  Parrot_str_new(interp, "hello ", 0));
@@ -581,7 +581,7 @@ the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
 
     Parrot_pbc_load(interp, pf);
     sub  = Parrot_find_global_cur(interp, name);
-    arg  = pmc_new(interp, enum_class_String);
+    arg  = Parrot_pmc_new(interp, enum_class_String);
 
     Parrot_PMC_set_string_native(interp, arg,
                  Parrot_str_new(interp, "hello ", 0));

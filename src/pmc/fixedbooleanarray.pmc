@@ -90,7 +90,7 @@ Creates and returns a copy of the array.
     VTABLE PMC *clone() {
         unsigned char * my_bit_array, * clone_bit_array;
         UINTVAL         resize_threshold, size;
-        PMC *   const   dest   = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *   const   dest   = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         GET_ATTR_bit_array(INTERP, SELF, my_bit_array);
         GET_ATTR_size(INTERP, SELF, size);
@@ -296,7 +296,7 @@ Returns the PMC value of the element at index C<key>.
 */
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
-        PMC  * const ret = pmc_new(INTERP, enum_class_Boolean);
+        PMC  * const ret = Parrot_pmc_new(INTERP, enum_class_Boolean);
         const INTVAL val = SELF.get_integer_keyed_int(key);
         VTABLE_set_integer_native(INTERP, ret, val);
         return ret;
@@ -427,7 +427,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 
     VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
         INTVAL tempInt;
-        PMC * const tempPMC = pmc_new(INTERP, enum_class_Boolean);
+        PMC * const tempPMC = Parrot_pmc_new(INTERP, enum_class_Boolean);
 
         VTABLE_set_string_native(INTERP, tempPMC, value);
         tempInt = VTABLE_get_integer(INTERP, tempPMC);
@@ -493,7 +493,7 @@ Return a new iterator for SELF.
 */
 
     VTABLE PMC *get_iter() {
-        return pmc_new_init(INTERP, enum_class_ArrayIterator, SELF);
+        return Parrot_pmc_new_init(INTERP, enum_class_ArrayIterator, SELF);
     }
 
 

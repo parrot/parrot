@@ -231,7 +231,7 @@ Throws an exception if an unknown PMC type is passed.
 
         if (got_glb) {
             STRING * const s_empty      = CONST_STRING(interp, "");
-            PMC           *temp_globals = pmc_new(interp, enum_class_Hash);
+            PMC           *temp_globals = Parrot_pmc_new(interp, enum_class_Hash);
 
             if (PMC_IS_NULL(glb)) {
                 temp_globals = PMCNULL;

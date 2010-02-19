@@ -129,7 +129,7 @@ main(int argc, char * argv[])
     imcc_initialize(interp);
 
     { /* EXPERIMENTAL: add library and include paths from environment */
-        PMC *env = pmc_new(interp, enum_class_Env);
+        PMC *env = Parrot_pmc_new(interp, enum_class_Env);
         STRING *path = VTABLE_get_string_keyed_str(interp, env,
                 Parrot_str_new_constant(interp, "PARROT_LIBRARY"));
         if (!STRING_is_null(interp, path) && Parrot_str_length(interp, path) > 0)

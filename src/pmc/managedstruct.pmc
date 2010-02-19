@@ -142,7 +142,7 @@ of knowing how to make a deep copy of the pointer contents.
             void *clone_data = PARROT_MANAGEDSTRUCT(SELF)->custom_clone_priv;
             return clone_func(interp, SELF, clone_data);
         }
-        dest = pmc_new_init(interp, SELF->vtable->base_type,
+        dest = Parrot_pmc_new_init(interp, SELF->vtable->base_type,
             PARROT_MANAGEDSTRUCT(SELF)->init);
 
         if (PARROT_MANAGEDSTRUCT(SELF)->ptr)

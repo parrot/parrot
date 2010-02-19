@@ -180,7 +180,7 @@ Create a copy of the task, resetting status, ID, and birthtime.
     VTABLE PMC *clone() {
         /* Create the new task PMC, of the same type of this one (we may
          * have been subclassed). */
-        PMC * const copy  = pmc_new(interp, SELF->vtable->base_type);
+        PMC * const copy  = Parrot_pmc_new(interp, SELF->vtable->base_type);
         Parrot_Task_attributes * const new_struct = PARROT_TASK(copy);
         Parrot_Task_attributes * const old_struct = PARROT_TASK(SELF);
 
@@ -206,27 +206,27 @@ Gets the value of an attribute for this task.
         PMC *value;
 
         if (Parrot_str_equal(interp, name, CONST_STRING(interp, "id"))) {
-            value = pmc_new(interp, enum_class_Integer);
+            value = Parrot_pmc_new(interp, enum_class_Integer);
             VTABLE_set_integer_native(interp, value, core_struct->id);
         }
         else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "type"))) {
-            value = pmc_new(interp, enum_class_String);
+            value = Parrot_pmc_new(interp, enum_class_String);
             VTABLE_set_string_native(interp, value, core_struct->type);
         }
         else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "subtype"))) {
-            value = pmc_new(interp, enum_class_String);
+            value = Parrot_pmc_new(interp, enum_class_String);
             VTABLE_set_string_native(interp, value, core_struct->subtype);
         }
         else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "priority"))) {
-            value = pmc_new(interp, enum_class_Integer);
+            value = Parrot_pmc_new(interp, enum_class_Integer);
             VTABLE_set_integer_native(interp, value, core_struct->priority);
         }
         else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "status"))) {
-            value = pmc_new(interp, enum_class_String);
+            value = Parrot_pmc_new(interp, enum_class_String);
             VTABLE_set_string_native(interp, value, core_struct->status);
         }
         else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "birthtime"))) {
-            value = pmc_new(interp, enum_class_Float);
+            value = Parrot_pmc_new(interp, enum_class_Float);
             VTABLE_set_number_native(interp, value, core_struct->birthtime);
         }
         else {

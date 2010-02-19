@@ -53,7 +53,7 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
     /* we block GC runs while cloning since C<d> is not yet running */
     Parrot_block_GC_mark(d);
 
-    d->scheduler = pmc_new(d, enum_class_Scheduler);
+    d->scheduler = Parrot_pmc_new(d, enum_class_Scheduler);
     d->scheduler = VTABLE_share_ro(d, d->scheduler);
 
     /* can't copy directly, unless you want double-frees */
@@ -305,7 +305,7 @@ Sets C<struct_val> to C<*value>.
     VTABLE void set_pointer(void *value) {
 
         /* XXX: init_world in src/global_setup.c needs to create a
-         * ParrotInterpreter through pmc_new_noinit.  If this PMC hasn't been
+         * ParrotInterpreter through Parrot_pmc_new_noinit.  If this PMC hasn't been
          * initialized, cheat by initializing instead. */
         if (!PMC_data(SELF)) {
             Parrot_ParrotInterpreter_attributes *attrs =
@@ -559,7 +559,7 @@ Introspection interface. C<key> can be:
                         pc - seg->base.data, NULL);
             }
 
-            return pmc_new(interp, enum_class_Hash);
+            return Parrot_pmc_new(interp, enum_class_Hash);
         }
 
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
@@ -621,7 +621,7 @@ XXX this should of course call C<Parrot_clone()> and use freeze/thaw.
 */
 
     VTABLE PMC *clone() {
-        PMC * const dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         clone_interpreter(PMC_interp(dest),
                           PMC_interp(SELF), PARROT_CLONE_DEFAULT);

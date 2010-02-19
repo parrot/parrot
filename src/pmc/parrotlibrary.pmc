@@ -77,7 +77,7 @@ Creates and returns a clone of the library.
 */
 
     VTABLE PMC *clone() {
-        PMC * const dest     = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const dest     = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         PMC_oplib_init(dest) = PMC_oplib_init(SELF);
         PMC_dlhandle(dest)   = PMC_dlhandle(SELF);
 

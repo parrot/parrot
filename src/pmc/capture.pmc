@@ -22,13 +22,13 @@ These are the vtable functions for the Capture PMC.
     do { \
         GETATTR_Capture_array((i), (obj), array); \
         if (!array) \
-            SETATTR_Capture_array((i), (obj), pmc_new((i), enum_class_ResizablePMCArray)); \
+            SETATTR_Capture_array((i), (obj), Parrot_pmc_new((i), enum_class_ResizablePMCArray)); \
     } while (0)
 #define CAPTURE_hash_CREATE(i, obj) \
     do { \
         GETATTR_Capture_hash((i), (obj), hash); \
         if (!hash) \
-            SETATTR_Capture_hash((i), (obj),  pmc_new((i), enum_class_Hash)); \
+            SETATTR_Capture_hash((i), (obj),  Parrot_pmc_new((i), enum_class_Hash)); \
     } while (0)
 
 pmclass Capture auto_attrs {
@@ -61,7 +61,7 @@ Creates an identical copy of the Capture.
 
     VTABLE PMC *clone() {
         PMC *array, *hash;
-        PMC *dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC *dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         GET_ATTR_array(INTERP, SELF, array);
         GET_ATTR_hash(INTERP, SELF, hash);
         if (array)

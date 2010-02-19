@@ -88,7 +88,7 @@ new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
 
     PMC *entry_id;
 
-    PMC * const entry = constant_pmc_new(interp, enum_class_FixedPMCArray);
+    PMC * const entry = Parrot_pmc_new_constant(interp, enum_class_FixedPMCArray);
 
     if (entry_name && !STRING_IS_EMPTY(entry_name)) {
         VTABLE_set_pmc_keyed_str(interp, hll_info, entry_name, entry);
@@ -98,7 +98,7 @@ new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
 
     VTABLE_set_integer_native(interp, entry, e_HLL_MAX);
 
-    entry_id = constant_pmc_new(interp, enum_class_Integer);
+    entry_id = Parrot_pmc_new_constant(interp, enum_class_Integer);
     VTABLE_set_integer_native(interp, entry_id, id);
     VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_id, entry_id);
 
@@ -122,9 +122,9 @@ Parrot_init_HLL(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_init_HLL)
     interp->HLL_info      =
-        pmc_new(interp, enum_class_OrderedHash);
+        Parrot_pmc_new(interp, enum_class_OrderedHash);
     interp->HLL_namespace =
-        constant_pmc_new(interp, enum_class_ResizablePMCArray);
+        Parrot_pmc_new_constant(interp, enum_class_ResizablePMCArray);
 
     Parrot_register_HLL(interp, CONST_STRING(interp, "parrot"));
 }
@@ -168,7 +168,7 @@ Parrot_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
     entry    = new_hll_entry(interp, hll_name);
 
     /* register HLL name */
-    name     = constant_pmc_new(interp, enum_class_String);
+    name     = Parrot_pmc_new_constant(interp, enum_class_String);
 
     VTABLE_set_string_native(interp, name, hll_name);
     VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_name, name);
@@ -188,7 +188,7 @@ Parrot_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
     VTABLE_set_pmc_keyed_int(interp, interp->HLL_namespace, idx, ns_hash);
 
     /* create HLL typemap hash */
-    type_hash = constant_pmc_new(interp, enum_class_Hash);
+    type_hash = Parrot_pmc_new_constant(interp, enum_class_Hash);
     VTABLE_set_pointer(interp, type_hash, parrot_new_intval_hash(interp));
     VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_typemap, type_hash);
 
@@ -243,7 +243,7 @@ Parrot_register_HLL_lib(PARROT_INTERP, ARGIN(STRING *hll_lib))
     VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_name, PMCNULL);
 
     /* register dynlib */
-    name    = constant_pmc_new(interp, enum_class_String);
+    name    = Parrot_pmc_new_constant(interp, enum_class_String);
 
     VTABLE_set_string_native(interp, name, hll_lib);
     VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_lib, name);

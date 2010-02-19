@@ -346,7 +346,7 @@ PMC *
 Parrot_io_new_socket_pmc(PARROT_INTERP, INTVAL flags)
 {
     ASSERT_ARGS(Parrot_io_new_socket_pmc)
-    PMC * const new_io = pmc_new(interp, enum_class_Socket);
+    PMC * const new_io = Parrot_pmc_new(interp, enum_class_Socket);
 
     Parrot_io_set_flags(interp, new_io, flags);
 

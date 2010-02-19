@@ -44,7 +44,7 @@ Create empty PackfileRawSegment.
         Parrot_PackfileRawSegment_attributes * attrs =
                 PMC_data_typed(SELF, Parrot_PackfileRawSegment_attributes*);
 
-        attrs->opcodes = pmc_new(interp, enum_class_ResizableIntegerArray);
+        attrs->opcodes = Parrot_pmc_new(interp, enum_class_ResizableIntegerArray);
         attrs->type    = PF_BYTEC_SEG;
 
         PObj_custom_mark_SET(SELF);

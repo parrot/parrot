@@ -188,7 +188,7 @@ PARROT_EXPORT
 void
 Parrot_set_executable_name(PARROT_INTERP, Parrot_String name)
 {
-    PMC * const name_pmc = pmc_new(interp, enum_class_String);
+    PMC * const name_pmc = Parrot_pmc_new(interp, enum_class_String);
     VTABLE_set_string_native(interp, name_pmc, name);
     VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_EXECUTABLE,
         name_pmc);
@@ -637,7 +637,7 @@ static PMC*
 setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
 {
     ASSERT_ARGS(setup_argv)
-    PMC   *userargv = pmc_new(interp, enum_class_ResizableStringArray);
+    PMC   *userargv = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
     INTVAL i;
 
     if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
@@ -765,7 +765,7 @@ set_current_sub(PARROT_INTERP)
     /* If we didn't find anything, put a dummy PMC into current_sub.
        The default values set by SUb.init are appropiate for the
        dummy, don't need additional settings. */
-    sub_pmc                      = pmc_new(interp, enum_class_Sub);
+    sub_pmc                      = Parrot_pmc_new(interp, enum_class_Sub);
     Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), sub_pmc);
 
     return sub_pmc;

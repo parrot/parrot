@@ -371,7 +371,7 @@ FN_HEADER
         key = join '', sig
 
         $S0 = 'sprintf'(<<'TEMPLATE', fn_name, key)
-    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)%s);
     VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "%s"), temp_pmc);
 
@@ -825,7 +825,7 @@ TEMPLATE
            "sig_char":   "P",
            "call_param_tmpl": "PMC_IS_NULL((PMC*)t_%i) ? (void *)NULL : VTABLE_get_pointer(interp, t_%i)",
            "ret_assign": "if (return_data != NULL) {
-                             final_destination = pmc_new(interp, enum_class_UnManagedStruct);
+                             final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
                           Parrot_pcc_fill_returns_from_c_args(interp, call_object, \"P\", final_destination);" },

@@ -97,7 +97,7 @@ Clones the coroutine.
 
     VTABLE PMC *clone() {
         STRING     *name;
-        PMC * const ret = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const ret = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         PObj_custom_mark_destroy_SETALL(ret);
 
@@ -164,7 +164,7 @@ Swaps the "context".
 
             /* first time set current sub, cont, object */
             if (PMC_IS_NULL(ctx))
-                ctx = pmc_new(INTERP, enum_class_CallContext);
+                ctx = Parrot_pmc_new(INTERP, enum_class_CallContext);
 
             CURRENT_CONTEXT(INTERP) = ctx;
 
@@ -189,7 +189,7 @@ Swaps the "context".
             /* create pad if needed */
             if (!PMC_IS_NULL(lex_info)) {
                 const INTVAL hlltype = Parrot_get_ctx_HLL_type(INTERP, enum_class_LexPad);
-                PMC * const lexpad = pmc_new_init(INTERP, hlltype, lex_info);
+                PMC * const lexpad = Parrot_pmc_new_init(INTERP, hlltype, lex_info);
                 Parrot_pcc_set_lex_pad(INTERP, ctx, lexpad);
                 VTABLE_set_pointer(INTERP, lexpad, ctx);
             }

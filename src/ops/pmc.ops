@@ -58,14 +58,14 @@ op new(out PMC, in STR) {
     if (!PMC_IS_NULL(_class))
         $1 = VTABLE_instantiate(interp, _class, PMCNULL);
     else {
-        const INTVAL type = pmc_type(interp, name);
+        const INTVAL type = Parrot_pmc_get_type_str(interp, name);
         if (type <= 0) {
             opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", name);
             goto ADDRESS(dest);
         }
-        $1 = pmc_new(interp, type);
+        $1 = Parrot_pmc_new(interp, type);
     }
 }
 
@@ -78,14 +78,14 @@ op new(out PMC, in STR, in PMC) {
     if (!PMC_IS_NULL(_class))
         $1 = VTABLE_instantiate(interp, _class, $3);
     else {
-        const INTVAL type = pmc_type(interp, name);
+        const INTVAL type = Parrot_pmc_get_type_str(interp, name);
         if (type <= 0) {
             opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", name);
             goto ADDRESS(dest);
         }
-        $1 = pmc_new_init(interp, type, $3);
+        $1 = Parrot_pmc_new_init(interp, type, $3);
     }
 }
 
@@ -96,14 +96,14 @@ inline op new(out PMC, in PMC) :object_classes {
     if (!PMC_IS_NULL(_class))
         $1 = VTABLE_instantiate(interp, _class, PMCNULL);
     else {
-        const INTVAL type = pmc_type_p(interp, name_key);
+        const INTVAL type = Parrot_pmc_get_type(interp, name_key);
         if (type <= 0) {
             opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
             goto ADDRESS(dest);
         }
-        $1 = pmc_new(interp, type);
+        $1 = Parrot_pmc_new(interp, type);
     }
 }
 
@@ -114,14 +114,14 @@ op new(out PMC, in PMC, in PMC) {
     if (!PMC_IS_NULL(_class))
         $1 = VTABLE_instantiate(interp, _class, $3);
     else {
-        const INTVAL type = pmc_type_p(interp, name_key);
+        const INTVAL type = Parrot_pmc_get_type(interp, name_key);
         if (type <= 0) {
             opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
             goto ADDRESS(dest);
         }
-        $1 = pmc_new_init(interp, type, $3);
+        $1 = Parrot_pmc_new_init(interp, type, $3);
     }
 }
 
@@ -627,11 +627,11 @@ Remove one reference of $1.
 =cut
 
 op register(invar PMC) {
-    gc_register_pmc(interp, $1);
+    Parrot_pmc_gc_register(interp, $1);
 }
 
 op unregister(invar PMC) {
-    gc_unregister_pmc(interp, $1);
+    Parrot_pmc_gc_unregister(interp, $1);
 }
 
 
@@ -648,17 +648,17 @@ Create a HLL-mapped PMC containing the provided primitive.
 =cut
 
 op box(out PMC, in INT) {
-    $1 = pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
+    $1 = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
     VTABLE_set_integer_native(interp, $1, $2);
 }
 
 op box(out PMC, in NUM) {
-    $1 = pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
+    $1 = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
     VTABLE_set_number_native(interp, $1, $2);
 }
 
 op box(out PMC, in STR) {
-    $1 = pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_String));
+    $1 = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_String));
     VTABLE_set_string_native(interp, $1, $2);
 }
 

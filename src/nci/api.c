@@ -21,7 +21,7 @@
 static void
 init_nci_funcs(PARROT_INTERP) {
     VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_NCI_FUNCS,
-        pmc_new(interp, enum_class_Hash));
+        Parrot_pmc_new(interp, enum_class_Hash));
     Parrot_nci_load_core_thunks(interp);
     Parrot_nci_load_extra_thunks(interp);
 }

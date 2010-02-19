@@ -102,7 +102,7 @@ Creates and returns a copy of the array.
 */
 
     VTABLE PMC *clone() {
-        PMC * const dest  = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const dest  = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         const INTVAL size = PMC_size(SELF);
 
         if (size) {
@@ -346,7 +346,7 @@ Returns the PMC value of the element at index C<*key>.
         box = SELF.get_pmc_keyed_int(k);
 
         if (box == NULL)
-            box = pmc_new(INTERP, enum_class_Undef);
+            box = Parrot_pmc_new(INTERP, enum_class_Undef);
 
         return VTABLE_get_pmc_keyed(INTERP, box, nextkey);
     }
@@ -418,7 +418,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        PMC * const val = pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+        PMC * const val = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
                     enum_class_Integer));
 
         VTABLE_set_integer_native(INTERP, val, value);
@@ -436,7 +436,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
-        PMC * const val = pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+        PMC * const val = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
                     enum_class_Integer));
 
         VTABLE_set_integer_native(INTERP, val, value);
@@ -457,7 +457,7 @@ C<value>.
 */
 
     VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-        PMC * const val = pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+        PMC * const val = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
                     enum_class_Float));
 
         VTABLE_set_number_native(INTERP, val, value);
@@ -487,7 +487,7 @@ C<value>.
 
             /* TT #1295: autovivify an Array and insert it in SELF */
             if (!box)
-                box = pmc_new(INTERP, SELF.type());
+                box = Parrot_pmc_new(INTERP, SELF.type());
 
             VTABLE_set_number_keyed(INTERP, box, nextkey, value);
         }
@@ -504,7 +504,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 */
 
     VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
-        PMC * const val = pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+        PMC * const val = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
                     enum_class_String));
 
         VTABLE_set_string_native(INTERP, val, value);
@@ -523,7 +523,7 @@ C<value>.
 */
 
     VTABLE void set_string_keyed(PMC *key, STRING *value) {
-        PMC * const val = pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
+        PMC * const val = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(INTERP,
                     enum_class_String));
 
         VTABLE_set_string_native(INTERP, val, value);
@@ -575,7 +575,7 @@ Sets the PMC at index C<key> to C<value>.
 
             /* TT #1295: autovivify an Array and insert it in SELF */
             if (!box)
-                box = pmc_new(INTERP, SELF.type());
+                box = Parrot_pmc_new(INTERP, SELF.type());
 
             VTABLE_set_pmc_keyed(INTERP, box, nextkey, value);
         }
@@ -632,7 +632,7 @@ Return a new iterator for SELF.
 */
 
     VTABLE PMC *get_iter() {
-        return pmc_new_init(INTERP, enum_class_ArrayIterator, SELF);
+        return Parrot_pmc_new_init(INTERP, enum_class_ArrayIterator, SELF);
     }
 
 /*

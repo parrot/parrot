@@ -45,7 +45,7 @@ lexinfo.
             (Parrot_DynLexPad_attributes *) PMC_data(SELF);
 
         if (VTABLE_elements(interp, lexinfo)) {
-            attrs->init = pmc_new_init(interp, enum_class_LexPad, lexinfo);
+            attrs->init = Parrot_pmc_new_init(interp, enum_class_LexPad, lexinfo);
         }
         else
             attrs->init = NULL;

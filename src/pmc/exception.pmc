@@ -541,30 +541,30 @@ Retrieve an attribute value for the exception object.
         if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "type"))) {
                 INTVAL type;
                 GET_ATTR_type(interp, SELF, type);
-                value = pmc_new(interp, enum_class_Integer);
+                value = Parrot_pmc_new(interp, enum_class_Integer);
                 VTABLE_set_integer_native(interp, value, type);
         }
         else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "severity"))) {
                 INTVAL severity;
                 GET_ATTR_severity(interp, SELF, severity);
-                value = pmc_new(interp, enum_class_Integer);
+                value = Parrot_pmc_new(interp, enum_class_Integer);
                 VTABLE_set_integer_native(interp, value, severity);
         }
         else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "exit_code"))) {
                 INTVAL exit_code;
                 GET_ATTR_exit_code(interp, SELF, exit_code);
-                value = pmc_new(interp, enum_class_Integer);
+                value = Parrot_pmc_new(interp, enum_class_Integer);
                 VTABLE_set_integer_native(interp, value, exit_code);
         }
         else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "handled"))) {
                 INTVAL handled;
                 GET_ATTR_handled(interp, SELF, handled);
-                value = pmc_new(interp, enum_class_Integer);
+                value = Parrot_pmc_new(interp, enum_class_Integer);
                 VTABLE_set_integer_native(interp, value, handled);
         }
         else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "message"))) {
                 STRING *message = SELF.get_string();
-                value = pmc_new(interp, enum_class_String);
+                value = Parrot_pmc_new(interp, enum_class_String);
                 VTABLE_set_string_native(interp, value, message);
         }
         else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "payload"))) {
@@ -709,7 +709,7 @@ annotation. If not, returns a Hash of all of them.
         /* If we didn't have a key specified and we found no annotations to
          * return, should return an empty hash. */
         if (!have_name && PMC_IS_NULL(result))
-            result = pmc_new(interp, enum_class_Hash);
+            result = Parrot_pmc_new(interp, enum_class_Hash);
 
         RETURN(PMC *result);
     }

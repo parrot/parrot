@@ -71,7 +71,7 @@ Initialize the structure.  (Create a blank PackFile object.)
         PackFile                   *pf;
 
         attrs->uuid     = Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
-        attrs->directory = pmc_new(INTERP, enum_class_PackfileDirectory);
+        attrs->directory = Parrot_pmc_new(INTERP, enum_class_PackfileDirectory);
 
         /* Create dummy PackFile and copy default attributes to self */
         pf = PackFile_new(interp, 0);

@@ -163,7 +163,7 @@ EOC
     int pass;
 
     /* create a library PMC */
-    pmc = constant_pmc_new(interp, enum_class_ParrotLibrary);
+    pmc = Parrot_pmc_new_constant(interp, enum_class_ParrotLibrary);
 
     /* TODO: stuff some info into this PMC's props */
 
@@ -173,7 +173,7 @@ EOC
         my $lhs = $info->{flags}{no_init} ? "" : "type$class = ";
         $cout .= <<"EOC";
     whoami = CONST_STRING_GEN(interp, "$class");
-    ${lhs}pmc_register(interp, whoami);
+    ${lhs}Parrot_pmc_register_new_type(interp, whoami);
 EOC
     }
     $cout .= <<"EOC";

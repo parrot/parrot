@@ -157,7 +157,7 @@ Creates and returns a clone of the continuation.
 
     VTABLE PMC *clone() {
         /* Start to prepare for subclassable continuations */
-        return pmc_new_init(INTERP, SELF->vtable->base_type, SELF);
+        return Parrot_pmc_new_init(INTERP, SELF->vtable->base_type, SELF);
     }
 
 /*

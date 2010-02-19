@@ -388,7 +388,7 @@ Invokes the subroutine.
          * create new context, place it in interpreter */
         context = Parrot_pcc_get_signature(INTERP, caller_ctx);
         if (PMC_IS_NULL(context))
-            context = pmc_new(INTERP, enum_class_CallContext);
+            context = Parrot_pmc_new(INTERP, enum_class_CallContext);
         CURRENT_CONTEXT(INTERP) = context;
         Parrot_pcc_set_caller_ctx(INTERP, context, caller_ctx);
         Parrot_pcc_allocate_registers(INTERP, context, sub->n_regs_used);
@@ -425,7 +425,7 @@ Invokes the subroutine.
          *      and factor out common code with coroutine pmc
          */
         if (!PMC_IS_NULL(sub->lex_info)) {
-            Parrot_pcc_set_lex_pad(interp, context, pmc_new_init(INTERP,
+            Parrot_pcc_set_lex_pad(interp, context, Parrot_pmc_new_init(INTERP,
                     Parrot_get_ctx_HLL_type(interp, enum_class_LexPad),
                     sub->lex_info));
             VTABLE_set_pointer(INTERP, Parrot_pcc_get_lex_pad(interp, context), context);
@@ -458,7 +458,7 @@ Invokes the subroutine.
                     Parrot_pcc_set_sub(interp, dummy, outer_pmc);
 
                     if (!PMC_IS_NULL(outer_sub->lex_info)) {
-                        Parrot_pcc_set_lex_pad(interp, dummy, pmc_new_init(INTERP,
+                        Parrot_pcc_set_lex_pad(interp, dummy, Parrot_pmc_new_init(INTERP,
                                Parrot_get_ctx_HLL_type(interp, enum_class_LexPad),
                                outer_sub->lex_info));
                         VTABLE_set_pointer(INTERP, Parrot_pcc_get_lex_pad(interp, dummy), dummy);
@@ -506,7 +506,7 @@ Creates and returns a clone of the subroutine.
 */
 
     VTABLE PMC *clone() {
-        PMC        * const ret = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC        * const ret = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         Parrot_Sub_attributes *dest_sub;
         Parrot_Sub_attributes *sub;
 
@@ -761,7 +761,7 @@ Returns the full set of meta-data about the sub.
     {
         /* Create a hash, then use inspect_str to get all of the data to
          * fill it up with. */
-        PMC    * const metadata           = pmc_new(interp, enum_class_Hash);
+        PMC    * const metadata           = Parrot_pmc_new(interp, enum_class_Hash);
         STRING * const pos_required_str   = CONST_STRING(interp, "pos_required");
         STRING * const pos_optional_str   = CONST_STRING(interp, "pos_optional");
         STRING * const named_required_str = CONST_STRING(interp, "named_required");
@@ -908,7 +908,7 @@ The number of optional named arguments
                 "Unknown introspection value '%S'", what);
         }
 
-        retval = pmc_new(INTERP, enum_class_Integer);
+        retval = Parrot_pmc_new(INTERP, enum_class_Integer);
         VTABLE_set_integer_native(INTERP, retval, count_found);
         return retval;
     }
@@ -1064,7 +1064,7 @@ slurpy arguments).
         if (PMC_IS_NULL(sub->lex_info)) {
             const INTVAL lex_info_id = Parrot_get_ctx_HLL_type(interp,
                                            enum_class_LexInfo);
-            sub->lex_info = pmc_new_init(interp, lex_info_id, SELF);
+            sub->lex_info = Parrot_pmc_new_init(interp, lex_info_id, SELF);
         }
 
         /* If we've got a context around for the outer sub, set it as the

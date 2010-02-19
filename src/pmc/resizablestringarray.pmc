@@ -144,7 +144,7 @@ Removes and returns the last element in the array.
 
     VTABLE PMC *pop_pmc() {
         STRING *strval = SELF.pop_string();
-        PMC    *value  = pmc_new(INTERP, enum_class_String);
+        PMC    *value  = Parrot_pmc_new(INTERP, enum_class_String);
 
         VTABLE_set_string_native(INTERP, value, strval);
 
@@ -308,7 +308,7 @@ Removes and returns the first element in the array.
 
     VTABLE PMC *shift_pmc() {
         STRING *strval = SELF.shift_string();
-        PMC    *value  = pmc_new(INTERP, enum_class_String);
+        PMC    *value  = Parrot_pmc_new(INTERP, enum_class_String);
 
         VTABLE_set_string_native(INTERP, value, strval);
 
@@ -374,7 +374,7 @@ the array.
 */
 
     VTABLE void push_integer(INTVAL value) {
-        PMC    *ret = pmc_new(INTERP, enum_class_String);
+        PMC    *ret = Parrot_pmc_new(INTERP, enum_class_String);
         STRING *val;
 
         VTABLE_set_integer_native(INTERP, ret, value);
@@ -394,7 +394,7 @@ the array.
 */
 
     VTABLE void push_float(FLOATVAL value) {
-        PMC    *ret = pmc_new(INTERP, enum_class_String);
+        PMC    *ret = Parrot_pmc_new(INTERP, enum_class_String);
         STRING *val;
 
         VTABLE_set_number_native(INTERP, ret, value);
@@ -424,7 +424,7 @@ Removes and returns a String PMC from the start of the array.
                     "ResizableStringArray: Can't shift from an empty array!");
 
         value = SELF.get_string_keyed_int(0);
-        ret   = pmc_new(INTERP, enum_class_String);
+        ret   = Parrot_pmc_new(INTERP, enum_class_String);
 
         VTABLE_set_string_native(INTERP, ret, value);
         SELF.delete_keyed_int(0);
@@ -486,7 +486,7 @@ the array.
 */
 
     VTABLE void unshift_integer(INTVAL value) {
-        PMC    *ret = pmc_new(INTERP, enum_class_String);
+        PMC    *ret = Parrot_pmc_new(INTERP, enum_class_String);
         STRING *val;
 
         VTABLE_set_integer_native(INTERP, ret, value);
@@ -506,7 +506,7 @@ the array.
 */
 
     VTABLE void unshift_float(FLOATVAL value) {
-        PMC    *ret = pmc_new(INTERP, enum_class_String);
+        PMC    *ret = Parrot_pmc_new(INTERP, enum_class_String);
         STRING *val;
 
         VTABLE_set_number_native(INTERP, ret, value);

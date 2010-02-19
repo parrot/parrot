@@ -126,7 +126,7 @@ cache_method(PARROT_INTERP, PMC *_class, STRING *name, PMC *method)
     GETATTR_Class_meth_cache(interp, _class, cache);
 
     if (PMC_IS_NULL(cache)) {
-        cache = pmc_new(interp, enum_class_Hash);
+        cache = Parrot_pmc_new(interp, enum_class_Hash);
         SETATTR_Class_meth_cache(interp, _class, cache);
     }
 
@@ -812,7 +812,7 @@ Used to mark a PMC as read-only shared.
         UNLOCK_INTERPRETER(master);
 
         ret = SELF;
-        _true = pmc_new(INTERP, enum_class_Integer);
+        _true = Parrot_pmc_new(INTERP, enum_class_Integer);
 
         /* Setting the '_ro' property switches to the read-only vtable */
         VTABLE_set_integer_native(INTERP, _true, 1);

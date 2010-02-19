@@ -95,7 +95,7 @@ C<symbols>, which gets an array of the names of the symbols in this lexpad.
 
     VTABLE PMC *inspect_str(STRING *what) {
         if (Parrot_str_equal(interp, what, CONST_STRING(interp, "symbols"))) {
-            PMC *result     = pmc_new(interp, enum_class_ResizableStringArray);
+            PMC *result     = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
             Hash *hash      = (Hash *)SELF.get_pointer();
             UINTVAL entries = hash->entries;
             UINTVAL found   = 0;

@@ -68,7 +68,7 @@ Parrot_ex_build_exception(PARROT_INTERP, INTVAL severity,
         long error, ARGIN_NULLOK(STRING *msg))
 {
     ASSERT_ARGS(Parrot_ex_build_exception)
-    PMC *exception = pmc_new(interp, enum_class_Exception);
+    PMC *exception = Parrot_pmc_new(interp, enum_class_Exception);
 
     VTABLE_set_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"), severity);
     VTABLE_set_integer_keyed_str(interp, exception, CONST_STRING(interp, "type"), error);
@@ -176,7 +176,7 @@ void
 Parrot_ex_add_c_handler(PARROT_INTERP, ARGIN(Parrot_runloop *jp))
 {
     ASSERT_ARGS(Parrot_ex_add_c_handler)
-    PMC * const handler = pmc_new(interp, enum_class_ExceptionHandler);
+    PMC * const handler = Parrot_pmc_new(interp, enum_class_ExceptionHandler);
     /* Flag to mark a C exception handler */
     PObj_get_FLAGS(handler) |= SUB_FLAG_C_HANDLER;
     VTABLE_set_pointer(interp, handler, jp);

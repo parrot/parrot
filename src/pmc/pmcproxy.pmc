@@ -79,7 +79,7 @@ Initializes a PMCProxy PMC.
     VTABLE void init() {
         Parrot_Class_attributes * const _pmc =
                 (Parrot_Class_attributes *) PMC_data(SELF);
-        PMC          * const new_attribute   = pmc_new(interp, enum_class_Hash);
+        PMC          * const new_attribute   = Parrot_pmc_new(interp, enum_class_Hash);
         STRING       * const name            = CONST_STRING(interp, "proxy");
 
         /* Set flag for custom GC mark. */
@@ -89,16 +89,16 @@ Initializes a PMCProxy PMC.
         _pmc->id               = 0;
         _pmc->name             = CONST_STRING(interp, "");
         _pmc->_namespace       = PMCNULL;
-        _pmc->parents          = pmc_new(interp, enum_class_ResizablePMCArray);
-        _pmc->all_parents      = pmc_new(interp, enum_class_ResizablePMCArray);
-        _pmc->roles            = pmc_new(interp, enum_class_ResizablePMCArray);
-        _pmc->methods          = pmc_new(interp, enum_class_Hash);
-        _pmc->vtable_overrides = pmc_new(interp, enum_class_Hash);
-        _pmc->parent_overrides = pmc_new(interp, enum_class_Hash);
-        _pmc->attrib_metadata  = pmc_new(interp, enum_class_Hash);
+        _pmc->parents          = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        _pmc->all_parents      = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        _pmc->roles            = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        _pmc->methods          = Parrot_pmc_new(interp, enum_class_Hash);
+        _pmc->vtable_overrides = Parrot_pmc_new(interp, enum_class_Hash);
+        _pmc->parent_overrides = Parrot_pmc_new(interp, enum_class_Hash);
+        _pmc->attrib_metadata  = Parrot_pmc_new(interp, enum_class_Hash);
         _pmc->attrib_index     = PMCNULL;
         _pmc->attrib_cache     = PMCNULL;
-        _pmc->resolve_method   = pmc_new(interp, enum_class_ResizablePMCArray);
+        _pmc->resolve_method   = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
         /* Set up the attribute storage for the proxy instance */
         VTABLE_set_string_keyed_str(interp, new_attribute, CONST_STRING(interp, "name"), name);
@@ -194,9 +194,9 @@ Creates an instance of the PMC.
         Parrot_Class_attributes * const _pmc = PARROT_CLASS(SELF);
 
         if (!PMC_IS_NULL(init))
-            return pmc_new_init(interp, _pmc->id, init);
+            return Parrot_pmc_new_init(interp, _pmc->id, init);
 
-        return pmc_new(interp, _pmc->id);
+        return Parrot_pmc_new(interp, _pmc->id);
     }
 
 /*
@@ -315,7 +315,7 @@ Returns whether the class does the role with the given C<*rolename>.
     VTABLE INTVAL does(STRING *role_name) {
         Parrot_Class_attributes *_class  = PARROT_CLASS(SELF);
         INTVAL                   id      = _class->id;
-        PMC                     *proxied = pmc_new(interp, id);
+        PMC                     *proxied = Parrot_pmc_new(interp, id);
 
         if (VTABLE_does(interp, proxied, role_name))
             return 1;
@@ -359,7 +359,7 @@ inspect_str.
         STRING * const meth_str    = CONST_STRING(interp, "methods");
         STRING * const parents_str = CONST_STRING(interp, "parents");
 
-        PMC * const metadata = pmc_new(interp, enum_class_Hash);
+        PMC * const metadata = Parrot_pmc_new(interp, enum_class_Hash);
 
         VTABLE_set_pmc_keyed_str(interp, metadata, name_str,
             VTABLE_inspect_str(interp, SELF, name_str));

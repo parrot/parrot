@@ -189,7 +189,7 @@ the first line is line number zero.
         INTVAL  eos;
         INTVAL  jpos;
 
-        linepos = pmc_new(INTERP, enum_class_ResizableIntegerArray);
+        linepos = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
         /* get the string itself */
         GET_ATTR_str_val(INTERP, SELF, str);
         eos  = Parrot_str_byte_length(INTERP, str);

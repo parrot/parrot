@@ -168,7 +168,7 @@ parrot_init_library_paths(PARROT_INTERP)
                                 (INTVAL)IGLOBALS_CONFIG_HASH);
 
     /* create the lib_paths array */
-    PMC * const lib_paths   = pmc_new(interp, enum_class_FixedPMCArray);
+    PMC * const lib_paths   = Parrot_pmc_new(interp, enum_class_FixedPMCArray);
 
     VTABLE_set_integer_native(interp, lib_paths, PARROT_LIB_PATH_SIZE);
     VTABLE_set_pmc_keyed_int(interp, iglobals,
@@ -191,7 +191,7 @@ parrot_init_library_paths(PARROT_INTERP)
 
     /* each is an array of strings */
     /* define include paths */
-    paths = pmc_new(interp, enum_class_ResizableStringArray);
+    paths = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
     VTABLE_set_pmc_keyed_int(interp, lib_paths,
             PARROT_LIB_PATH_INCLUDE, paths);
     if (!STRING_IS_NULL(builddir)) {
@@ -209,7 +209,7 @@ parrot_init_library_paths(PARROT_INTERP)
 
 
     /* define library paths */
-    paths = pmc_new(interp, enum_class_ResizableStringArray);
+    paths = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
     VTABLE_set_pmc_keyed_int(interp, lib_paths,
             PARROT_LIB_PATH_LIBRARY, paths);
     if (!STRING_IS_NULL(builddir)) {
@@ -224,7 +224,7 @@ parrot_init_library_paths(PARROT_INTERP)
     }
 
     /* define languages paths */
-    paths = pmc_new(interp, enum_class_ResizableStringArray);
+    paths = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
     VTABLE_set_pmc_keyed_int(interp, lib_paths,
             PARROT_LIB_PATH_LANG, paths);
     if (!STRING_IS_NULL(builddir)) {
@@ -239,7 +239,7 @@ parrot_init_library_paths(PARROT_INTERP)
     }
 
     /* define dynext paths */
-    paths = pmc_new(interp, enum_class_ResizableStringArray);
+    paths = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
     VTABLE_set_pmc_keyed_int(interp, lib_paths,
             PARROT_LIB_PATH_DYNEXT, paths);
     if (!STRING_IS_NULL(builddir)) {
@@ -254,7 +254,7 @@ parrot_init_library_paths(PARROT_INTERP)
     }
 
     /* shared exts */
-    paths = pmc_new(interp, enum_class_ResizableStringArray);
+    paths = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
     VTABLE_set_pmc_keyed_int(interp, lib_paths,
             PARROT_LIB_DYN_EXTS, paths);
     /* no CONST_STRING here - the c2str.pl preprocessor needs "real strs" */

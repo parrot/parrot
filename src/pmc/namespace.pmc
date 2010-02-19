@@ -36,7 +36,7 @@ static void add_to_class(
     else {
         /* If we don't have a place to hang methods, make one. */
         if (PMC_IS_NULL(nsinfo->methods))
-            nsinfo->methods = pmc_new(interp, enum_class_Hash);
+            nsinfo->methods = Parrot_pmc_new(interp, enum_class_Hash);
 
         /* Insert it. */
         VTABLE_set_pmc_keyed_str(interp, nsinfo->methods, key, value);
@@ -70,7 +70,7 @@ ns_insert_sub_keyed_str(PARROT_INTERP, PMC *self, STRING *key, PMC *value)
         else {
             /* If we don't have a place to hang vtable methods, make one. */
             if (PMC_IS_NULL(vtable))
-                nsinfo->vtable = vtable = pmc_new(interp, enum_class_Hash);
+                nsinfo->vtable = vtable = Parrot_pmc_new(interp, enum_class_Hash);
 
             /* Insert it. */
             VTABLE_set_pmc_keyed_int(interp, vtable, sub->vtable_index, value);
@@ -312,7 +312,7 @@ really a public API.
             }
             else {
                 /* create new tuple */
-                new_tuple = pmc_new(INTERP, enum_class_FixedPMCArray);
+                new_tuple = Parrot_pmc_new(INTERP, enum_class_FixedPMCArray);
 
                 /* flag it as special */
                 PObj_get_FLAGS(new_tuple) |= FPA_is_ns_ext;
@@ -657,7 +657,7 @@ Returns the name of the namespace as an array of strings.
 */
 
     METHOD get_name() {
-        PMC * const ar = pmc_new(INTERP, enum_class_ResizableStringArray);
+        PMC * const ar = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
         INTVAL elements = 0;
         PMC *ns        = SELF;
 

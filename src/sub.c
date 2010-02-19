@@ -64,7 +64,7 @@ PMC *
 new_ret_continuation_pmc(PARROT_INTERP, ARGIN_NULLOK(opcode_t *address))
 {
     ASSERT_ARGS(new_ret_continuation_pmc)
-    PMC* const continuation = pmc_new(interp, enum_class_RetContinuation);
+    PMC* const continuation = Parrot_pmc_new(interp, enum_class_RetContinuation);
     VTABLE_set_pointer(interp, continuation, address);
     return continuation;
 }
@@ -612,7 +612,7 @@ Parrot_get_sub_pmc_from_subclass(PARROT_INTERP, ARGIN(PMC *subclass)) {
         }
 
         /* Get the Sub PMC itself. */
-        key = pmc_new(interp, enum_class_String);
+        key = Parrot_pmc_new(interp, enum_class_String);
         VTABLE_set_string_native(interp, key, CONST_STRING(interp, "Sub"));
         sub_pmc = VTABLE_get_attr_keyed(interp, subclass, key, CONST_STRING(interp, "proxy"));
         if (sub_pmc->vtable->base_type == enum_class_Sub) {

@@ -80,7 +80,7 @@ Creates and returns a clone of the pointer.
 */
 
     VTABLE PMC *clone() {
-        PMC * const dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         memcpy(PARROT_SOCKADDR(dest)->pointer, PARROT_SOCKADDR(SELF)->pointer,
                 sizeof (struct sockaddr_in));
         return dest;

@@ -798,10 +798,10 @@ generate_multi_signature(ARGIN(bytecode * const bc),
     /* A type_count of 1 means there was a :multi flag, but no :multi types.
      * therefore, create a special signature and return that.  */
     if (type_count == 1)
-        return pmc_new(bc->interp, enum_class_FixedIntegerArray);
+        return Parrot_pmc_new(bc->interp, enum_class_FixedIntegerArray);
 
     /* create a FixedPMCArray to store all multi types */
-    multi_signature = pmc_new(bc->interp, enum_class_FixedPMCArray);
+    multi_signature = Parrot_pmc_new(bc->interp, enum_class_FixedPMCArray);
 
     /* set its size as specified in type_count */
     VTABLE_set_integer_native(bc->interp, multi_signature, type_count);
@@ -818,7 +818,7 @@ generate_multi_signature(ARGIN(bytecode * const bc),
                 /* add the string to the constant table, retrieve a pointer to the STRING */
                 STRING * typestring = add_string_const_from_cstring(bc, types[i].entry.ident);
                 /* create a new String PMC. */
-                sig_pmc = pmc_new(bc->interp, enum_class_String);
+                sig_pmc = Parrot_pmc_new(bc->interp, enum_class_String);
                 /* set the STRING in the String PMC */
                 VTABLE_set_string_native(bc->interp, sig_pmc, typestring);
                 break;
@@ -977,7 +977,7 @@ create_lexinfo(ARGIN(bytecode * const bc), ARGIN(PMC * sub),
     STRING * const method      = string_from_literal(bc->interp, "declare_lex_preg");
 
     /* create a lexinfo PMC */
-    PMC * lex_info             = pmc_new_noinit(bc->interp, lex_info_id);
+    PMC * lex_info             = Parrot_pmc_new_noinit(bc->interp, lex_info_id);
     VTABLE_init_pmc(bc->interp, lex_info, sub);
 
     /* walk through the list of lexicals and register them */
@@ -1001,7 +1001,7 @@ create_lexinfo(ARGIN(bytecode * const bc), ARGIN(PMC * sub),
      * :lex flag, then create the lex_info anyway.
      */
     if (lex_info == NULL && needlex) {
-        lex_info = pmc_new_noinit(bc->interp, lex_info_id);
+        lex_info = Parrot_pmc_new_noinit(bc->interp, lex_info_id);
         VTABLE_init_pmc(bc->interp, lex_info, sub);
     }
 
@@ -1108,7 +1108,7 @@ get_namespace_pmc(ARGIN(bytecode * const bc), ARGIN_NULLOK(multi_type * const ns
 
     switch (ns->entry_type) {
         case MULTI_TYPE_IDENT: {
-            PMC *namespace_pmc = constant_pmc_new(bc->interp, enum_class_String);
+            PMC *namespace_pmc = Parrot_pmc_new_constant(bc->interp, enum_class_String);
             PARROT_NAMESPACE(namespace_pmc)->name =
                 add_string_const_from_cstring(bc, ns->entry.ident);
             break;
@@ -1161,7 +1161,7 @@ create_sub_pmc(ARGIN(bytecode * const bc), int iscoroutine,
                 Parrot_ex_throw_from_c_args(bc->interp, NULL, EXCEPTION_NO_CLASS,
                     "Requested sub class '%Ss' in :instanceof() not found", classname);
 
-            return pmc_new(bc->interp, type);
+            return Parrot_pmc_new(bc->interp, type);
         }
 
     }
@@ -1175,7 +1175,7 @@ create_sub_pmc(ARGIN(bytecode * const bc), int iscoroutine,
      * TODO create constant - see also src/packfile.c
      * XXX is this (still) necessary?
      */
-    return pmc_new(bc->interp, type);
+    return Parrot_pmc_new(bc->interp, type);
 }
 
 /*

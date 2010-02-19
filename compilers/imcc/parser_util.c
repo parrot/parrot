@@ -154,7 +154,7 @@ iNEW(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(SymReg *r0),
     SymReg *regs[3];
     SymReg *pmc;
     int nargs;
-    const int pmc_num = pmc_type(interp,
+    const int pmc_num = Parrot_pmc_get_type_str(interp,
             Parrot_str_new(interp, *type == '.' ? type + 1 : type, 0));
 
     snprintf(fmt, sizeof (fmt), "%d", pmc_num);
@@ -703,7 +703,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
          *
          * TODO if a sub was denoted :main return that instead
          */
-        sub                  = pmc_new(interp, enum_class_Eval);
+        sub                  = Parrot_pmc_new(interp, enum_class_Eval);
         PMC_get_sub(interp, sub, sub_data);
         sub_data->seg        = new_cs;
         sub_data->start_offs = 0;

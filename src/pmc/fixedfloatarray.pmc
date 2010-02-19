@@ -60,7 +60,7 @@ Creates and returns a copy of the array.
         INTVAL    size;
         FLOATVAL *self_float_array, *dest_float_array;
         size_t mem_size;
-        PMC   * const dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC   * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         GET_ATTR_float_array(INTERP, SELF, self_float_array);
 
         if (!self_float_array)
@@ -89,7 +89,7 @@ Return an Iterator for this PMC.
 */
 
     VTABLE PMC *get_iter() {
-        return pmc_new_init(INTERP, enum_class_ArrayIterator, SELF);
+        return Parrot_pmc_new_init(INTERP, enum_class_ArrayIterator, SELF);
     }
 
 /*
@@ -248,7 +248,7 @@ Returns the PMC value of the element at index C<key>.
 */
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
-        PMC    * const ret = pmc_new(INTERP, enum_class_Float);
+        PMC    * const ret = Parrot_pmc_new(INTERP, enum_class_Float);
         const FLOATVAL val = SELF.get_number_keyed_int(key);
 
         VTABLE_set_number_native(INTERP, ret, val);
@@ -374,7 +374,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 
     VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
         FLOATVAL tempNum;
-        PMC * const tempPMC = pmc_new(INTERP, enum_class_Float);
+        PMC * const tempPMC = Parrot_pmc_new(INTERP, enum_class_Float);
 
         VTABLE_set_string_native(INTERP, tempPMC, value);
         tempNum = VTABLE_get_number(INTERP, tempPMC);

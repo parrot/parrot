@@ -51,7 +51,7 @@ pmclass OpLib {
     }
 
     VTABLE PMC* get_pmc_keyed_str(STRING *name) {
-        PMC * const op = pmc_new_noinit(INTERP, enum_class_Opcode);
+        PMC * const op = Parrot_pmc_new_noinit(INTERP, enum_class_Opcode);
         VTABLE_set_string_native(INTERP, op, name);
         PObj_custom_mark_SET(op);
         return op;
@@ -63,7 +63,7 @@ pmclass OpLib {
     }
 
     VTABLE PMC* get_pmc_keyed_int(INTVAL value) {
-        PMC * const op = pmc_new_noinit(INTERP, enum_class_Opcode);
+        PMC * const op = Parrot_pmc_new_noinit(INTERP, enum_class_Opcode);
         VTABLE_set_integer_native(INTERP, op, value);
         PObj_custom_mark_SET(op);
         return op;
