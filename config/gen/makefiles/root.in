@@ -477,7 +477,9 @@ INTERP_O_FILES = \
     src/misc$(O) \
     src/multidispatch$(O) \
     src/frame_builder$(O) \
-    src/nci$(O) \
+    src/nci/api$(O) \
+    src/nci/core_thunks$(O) \
+    src/nci/extra_thunks$(O) \
     src/oo$(O) \
     src/packfile$(O) \
     src/packout$(O) \
@@ -650,7 +652,9 @@ STR_FILES = \
     src/library.str \
     src/multidispatch.str \
     src/frame_builder.str \
-    src/nci.str \
+    src/nci/api.str \
+    src/nci/core_thunks.str \
+    src/nci/extra_thunks.str \
     src/packfile.str \
     src/pmc.str \
     src/pmc_freeze.str \
@@ -1381,12 +1385,20 @@ src/dataypes$(O) : $(GENERAL_H_FILES) src/dataypes.c
 
 src/exit$(O) : $(PARROT_H_HEADERS)
 
-src/nci$(O) : src/nci.str \
-        $(INC_DIR)/oplib/ops.h $(PARROT_H_HEADERS) \
-        src/frame_builder.h \
-        include/pmc/pmc_managedstruct.h \
-        include/pmc/pmc_nci.h \
-        include/pmc/pmc_pointer.h
+src/nci/api$(O) : src/nci/api.str \
+        $(PARROT_H_HEADERS) \
+        include/pmc/pmc_unmanagedstruct.h \
+        include/pmc/pmc_nci.h
+
+src/nci/core_thunks$(O) : src/nci/core_thunks.str \
+        $(PARROT_H_HEADERS) \
+        include/pmc/pmc_unmanagedstruct.h \
+        include/pmc/pmc_nci.h
+
+src/nci/extra_thunks$(O) : src/nci/extra_thunks.str \
+        $(PARROT_H_HEADERS) \
+        include/pmc/pmc_unmanagedstruct.h \
+        include/pmc/pmc_nci.h
 
 src/frame_builder$(O) : $(PARROT_H_HEADERS) src/frame_builder.h \
         include/pmc/pmc_fixedintegerarray.h \
@@ -1398,10 +1410,6 @@ src/vtables$(O) : $(PARROT_H_HEADERS)
 
 src/gc/system$(O) : $(PARROT_H_HEADERS)  src/gc/gc_private.h
 src/gc/gc_private.h : $(INC_DIR)/settings.h
-
-src/nci.c : src/call_list.txt $(BUILD_TOOLS_DIR)/nativecall.pl \
-	include/pmc/pmc_nci.h
-	$(PERL) $(BUILD_TOOLS_DIR)/nativecall.pl src/call_list.txt
 
 src/warnings$(O) : $(PARROT_H_HEADERS)
 
@@ -2411,8 +2419,8 @@ src/glut_nci_thunks.c: $(PARROT) runtime/parrot/library/data_json.pbc tools/buil
 	$(PARROT) tools/build/nativecall.pir \
 	    --loader-name=Parrot_glut_nci_loader \
 	    --loader-storage-class=PARROT_DYNEXT_EXPORT \
-	    <src/glut_nci_thunks.nci \
-	    >src/glut_nci_thunks.c
+	    --output=src/glut_nci_thunks.c \
+	    <src/glut_nci_thunks.nci
 
 src/glut_nci_thunks$(O): $(GENERAL_H_FILES)
 
