@@ -1130,9 +1130,11 @@ the value is the OPS pathname
 
 hash
 
-the key is the group name
+the key is the PMC name
 
-the value is an array of PMC pathname
+the value is an array of PMC pathname or a single PPC pathname
+
+an array creates a PMC group
 
 =item dynpmc_cflags
 
@@ -1163,10 +1165,12 @@ the value is an array of PMC pathname
     $P0 = iter hash
   L1:
     unless $P0 goto L2
-    .local string group
-    group = shift $P0
+    .local string name
+    name = shift $P0
     .local pmc srcs
-    srcs = hash[group]
+    srcs = hash[name]
+    $I0 = does srcs, 'array'
+    unless $I0 goto L5
     $P1 = iter srcs
   L3:
     unless $P1 goto L4
@@ -1178,11 +1182,18 @@ the value is an array of PMC pathname
     __build_dynpmc(src, cflags)
     goto L3
   L4:
-    if group == '' goto L1
-    $S0 = _mk_path_dynpmc(group, load_ext)
+    $S0 = _mk_path_dynpmc(name, load_ext)
     $I0 = newer($S0, srcs)
     if $I0 goto L1
-    __build_dynpmc_group(srcs, group, cflags, ldflags)
+    __build_dynpmc_group(srcs, name, cflags, ldflags)
+    goto L1
+  L5:
+    src = srcs
+    $S0 = _mk_path_dynpmc(name, load_ext)
+    $I0 = newer($S0, src)
+    if $I0 goto L1
+    __build_dynpmc(src, cflags)
+    __build_dynpmc_alone(src, name, cflags, ldflags)
     goto L1
   L2:
 .end
@@ -1302,6 +1313,50 @@ the value is an array of PMC pathname
     cmd .= " "
     goto L3
   L4:
+    $S0 = get_ldflags()
+    cmd .= $S0
+    cmd .= " "
+    $S0 = config['ld_load_flags']
+    cmd .= $S0
+    cmd .= " "
+    $I0 = config['parrot_is_shared']
+    unless $I0 goto L5
+    $S0 = config['inst_libparrot_ldflags']
+    cmd .= $S0
+    cmd .= " "
+  L5:
+    cmd .= ldflags
+    system(cmd, 1 :named('verbose'))
+
+    $I0 = _has_strip(cflags)
+    unless $I0 goto L6
+    cmd = "strip " . dynext
+    system(cmd, 1 :named('verbose'))
+  L6:
+.end
+
+.sub '__build_dynpmc_alone' :anon
+    .param string src
+    .param string name
+    .param string cflags
+    .param string ldflags
+    .local pmc config
+    config = get_config()
+
+    .local string dynext
+    $S0 = config['load_ext']
+    dynext = _mk_path_dynpmc(name, $S0)
+    .local string cmd
+    cmd = config['ld']
+    cmd .= " "
+    $S0 = config['ld_out']
+    cmd .= $S0
+    cmd .= dynext
+    cmd .= " "
+    $S0 = config['o']
+    $S0 = _mk_path_gen_dynpmc(src, $S0)
+    cmd .= $S0
+    cmd .= " "
     $S0 = get_ldflags()
     cmd .= $S0
     cmd .= " "
@@ -1653,12 +1708,14 @@ the value is the POD pathname
     $P0 = iter hash
   L1:
     unless $P0 goto L2
-    .local string group
-    group = shift $P0
+    .local string name
+    name = shift $P0
     .local pmc srcs
-    srcs = hash[group]
-    $S0 = _mk_path_dynpmc(group, load_ext)
+    srcs = hash[name]
+    $S0 = _mk_path_dynpmc(name, load_ext)
     unlink($S0, 1 :named('verbose'))
+    $I0 = does srcs, 'array'
+    unless $I0 goto L5
     $P1 = iter srcs
   L3:
     unless $P1 goto L4
@@ -1675,11 +1732,22 @@ the value is the POD pathname
     goto L3
   L4:
     src = srcs[0]
-    $S0 = _mk_path_gen_dynpmc_group(src, group, '.c')
+    $S0 = _mk_path_gen_dynpmc_group(src, name, '.c')
     unlink($S0, 1 :named('verbose'))
-    $S0 = _mk_path_gen_dynpmc_group(src, group, '.h')
+    $S0 = _mk_path_gen_dynpmc_group(src, name, '.h')
     unlink($S0, 1 :named('verbose'))
-    $S0 = _mk_path_gen_dynpmc_group(src, group, obj)
+    $S0 = _mk_path_gen_dynpmc_group(src, name, obj)
+    unlink($S0, 1 :named('verbose'))
+    goto L1
+  L5:
+    src = srcs
+    $S0 = _mk_path_gen_dynpmc(src, '.c')
+    unlink($S0, 1 :named('verbose'))
+    $S0 = _mk_path_gen_dynpmc(src, '.h')
+    unlink($S0, 1 :named('verbose'))
+    $S0 = _mk_path_gen_dynpmc(src, '.dump')
+    unlink($S0, 1 :named('verbose'))
+    $S0 = _mk_path_gen_dynpmc(src, obj)
     unlink($S0, 1 :named('verbose'))
     goto L1
   L2:
