@@ -37,7 +37,6 @@ pin/unpin
 .sub _main :main
     .include 'test_more.pir'
 
-    .local pmc _
     plan(TESTS)
 
     test_stringinfo()
@@ -52,7 +51,6 @@ pin/unpin
 .end
 
 .sub test_stringinfo
-    .local pmc _
 
     $S1 = "Hello, world"
     $S0 = $S1
