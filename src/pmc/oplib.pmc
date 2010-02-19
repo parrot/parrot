@@ -45,6 +45,11 @@ pmclass OpLib {
         return num;
     }
 
+    VTABLE INTVAL get_integer_keyed(PMC *key) {
+        STRING *str_key = key_string(INTERP, key);
+        return SELF.get_integer_keyed_str(str_key);
+    }
+
     VTABLE PMC* get_pmc_keyed_str(STRING *name) {
         PMC * const op = pmc_new_noinit(INTERP, enum_class_Opcode);
         VTABLE_set_string_native(INTERP, op, name);

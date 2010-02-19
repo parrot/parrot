@@ -2,7 +2,7 @@
 #$Id$
 # Sample creating of "Hello World" program using Packfile PMCs.
 .sub 'main'
-    .local pmc pf, pfdir, pffixup, pfbc, pfconst
+    .local pmc pf, pfdir, pffixup, pfbc, pfconst, oplib
 
     # Hello World is something like
     # .sub 'hello'
@@ -40,15 +40,19 @@
 
     # Generate bytecode
     pfbc = new 'PackfileRawSegment'
+    oplib = new 'OpLib'
 
-    # There is our function
-    pfbc[0] = 0x1d1 # say_sc
+    # Here is our function
+    $I0 = oplib['say_sc']
+    pfbc[0] = $I0 
     pfbc[1] = 0x002 # constant id.
 
-    pfbc[2] = 0x026 # set_return_pc
+    $I0 = oplib['set_returns_pc']
+    pfbc[2] = $I0
     pfbc[3] = 0x001 # id of FIA
 
-    pfbc[4] = 0x020 # returncc
+    $I0 = oplib['returncc']
+    pfbc[4] = $I0
 
     # Store bytecode
     pfdir['BYTECODE_hello.pir'] = pfbc
