@@ -62,24 +62,6 @@ typedef const void * Parrot_VTABLE;
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-void * Parrot_call_sub(PARROT_INTERP,
-    Parrot_PMC sub_pmc,
-    ARGIN(const char *signature),
-    ...)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
-PARROT_EXPORT
-Parrot_Int Parrot_call_sub_ret_int(PARROT_INTERP,
-    Parrot_PMC sub_pmc,
-    ARGIN(const char *signature),
-    ...)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
-PARROT_EXPORT
 int Parrot_eprintf(NULLOK_INTERP, ARGIN(const char *s), ...)
         __attribute__nonnull__(2);
 
@@ -412,12 +394,6 @@ int Parrot_vfprintf(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-#define ASSERT_ARGS_Parrot_call_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(signature))
-#define ASSERT_ARGS_Parrot_call_sub_ret_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(signature))
 #define ASSERT_ARGS_Parrot_eprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_Parrot_ext_call __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
