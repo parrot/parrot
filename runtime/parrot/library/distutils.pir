@@ -4485,6 +4485,13 @@ SOURCE_C
     .return ($I0)
 .end
 
+.sub 'newer' :multi(pmc, pmc)
+    .param string target
+    .param string depend
+    $S0 = target
+    .tailcall newer($S0, depend)
+.end
+
 =item mkpath
 
 =cut
