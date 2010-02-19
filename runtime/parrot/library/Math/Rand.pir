@@ -52,9 +52,7 @@ Portage of the following C implementation, given as example by ISO/IEC 9899:1999
 .namespace [ 'Math'; 'Rand' ]
 
 .sub '__onload' :anon :load
-#    print "__onload Math::Rand\n"
-    new $P0, 'Integer'
-    set $P0, 1
+    $P0 = box 1
     set_global 'next', $P0
 .end
 
