@@ -547,7 +547,8 @@ Removes and returns a reference to a pmc from the start of the image.
             PARROT_IMAGEIO(SELF)->what          = VISIT_THAW_NORMAL;
             PARROT_IMAGEIO(SELF)->visit_pmc_now = visit_todo_list_thaw;
             PARROT_IMAGEIO(SELF)->buffer        = (Buffer *)image;
-            PARROT_IMAGEIO(SELF)->id_list       = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+            PARROT_IMAGEIO(SELF)->id_list       = Parrot_pmc_new(INTERP,
+                                                                 enum_class_ResizablePMCArray);
 
             PARROT_ASSERT(image->_bufstart == image->strstart);
 
