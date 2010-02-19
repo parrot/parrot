@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008, Parrot Foundation.
+Copyright (C) 2008-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -69,7 +69,7 @@ pmclass @TEMP_md_name@
 */
     VTABLE PMC* clone() {
 @TEMP_md_guard@
-        PMC     *retval  = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PMC     *retval  = Parrot_pmc_new_noinit(INTERP, SELF->vtable->base_type);
         @TEMP_md_ctx@ *c       = mem_allocate_zeroed_typed(@TEMP_md_ctx@);
 
         memcpy(c, PMC_data(SELF), sizeof (@TEMP_md_ctx@));
