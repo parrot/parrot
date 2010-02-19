@@ -135,10 +135,6 @@ my @permitted_duplicate_copyright_files = (
         reason  => 'sample code used in testing',
     },
     {
-        file    => 'tools/build/nativecall.pl',
-        reason  => 'heredoc text for generated file',
-    },
-    {
         file    => 'tools/build/vtable_extend.pl',
         reason  => 'heredoc text for generated file',
     },
