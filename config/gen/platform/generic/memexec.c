@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2004-2006, Parrot Foundation.
+ * Copyright (C) 2004-2010, Parrot Foundation.
  */
 
 /*
@@ -59,7 +59,7 @@ mem_alloc_executable(size_t size)
 
 /*
 
-=item C<void mem_free_executable(void *p, size_t)>
+=item C<void mem_free_executable(void *p, size_t size)>
 
 Free a buffer allocated with mem_alloc_executable().
 
@@ -81,7 +81,8 @@ mem_free_executable(void *p, size_t size)
 
 /*
 
-=item C<void * mem_realloc_executable(void* oldp, size_t oldsize, size_t newsize)>
+=item C<void * mem_realloc_executable(void* oldp, size_t oldsize, size_t
+newsize)>
 
 Reallocate executable memory.
 Rounds up to page size because the whole page will be marked as executable.

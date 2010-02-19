@@ -108,7 +108,6 @@ config/gen/platform/generic/dl.c
 config/gen/platform/generic/exec.c
 config/gen/platform/generic/math.c
 config/gen/platform/generic/memalign.c
-config/gen/platform/generic/memexec.c
 config/gen/platform/generic/stat.c
 config/gen/platform/generic/time.c
 config/gen/platform/netbsd/math.c
