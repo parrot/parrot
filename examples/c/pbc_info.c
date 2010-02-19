@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -27,6 +27,8 @@ over the main directory.
 #include "parrot/embed.h"
 
 /*
+=item C<static INTVAL iter(PARROT_INTERP, PackFile_Segment *seg, void
+*user_data)>
 
 =item C<static INTVAL iter(PARROT_INTERP, PackFile_Segment *seg, void *user_data)>
 
