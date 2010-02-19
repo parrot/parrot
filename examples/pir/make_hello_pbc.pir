@@ -44,7 +44,7 @@
 
     # Here is our function
     $I0 = oplib['say_sc']
-    pfbc[0] = $I0 
+    pfbc[0] = $I0
     pfbc[1] = 0x002 # constant id.
 
     $I0 = oplib['set_returns_pc']
