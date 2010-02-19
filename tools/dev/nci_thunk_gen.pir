@@ -723,7 +723,7 @@ TEMPLATE
 
 # get_sigtable {{{
 
-.sub 'get_sigtable' :anon :immediate 
+.sub 'get_sigtable' :anon :immediate
     .const string json_table = <<'JSON'
 {
     "p": { "as_proto":   "void *",
