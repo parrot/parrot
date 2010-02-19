@@ -115,58 +115,6 @@ static $decs $ret${newl}Parrot_${pmcname}_$meth(PARROT_INTERP, $pmcarg$args)$sem
 EOC
 }
 
-=item C<proto($type,$parameters)>
-
-Determines the prototype (argument signature) for a method body
-(see F<src/call_list>).
-
-=cut
-
-my %calltype = (
-    'char'     => 'c',
-    'short'    => 's',
-    'char'     => 'c',
-    'short'    => 's',
-    'int'      => 'i',
-    'INTVAL'   => 'I',
-    'float'    => 'f',
-    'FLOATVAL' => 'N',
-    'double'   => 'd',
-    'STRING*'  => 'S',
-    'STRING *' => 'S',
-    'char*'    => 't',
-    'char *'   => 't',
-    'PMC*'     => 'P',
-    'PMC *'    => 'P',
-    'short*'   => '2',
-    'short *'  => '2',
-    'int*'     => '3',
-    'int *'    => '3',
-    'long*'    => '4',
-    'long *'   => '4',
-    'void'     => 'v',
-    'void*'    => 'b',
-    'void *'   => 'b',
-    'void**'   => 'B',
-    'void **'  => 'B',
-);
-
-sub proto {
-    my ( $type, $parameters ) = @_;
-
-    # reduce to a comma separated set of types
-    $parameters =~ s/\w+(,|$)/,/g;
-    $parameters =~ s/ //g;
-
-    # type method(interp, self, parameters...)
-    my $ret = $calltype{ $type or "void" };
-    $ret .= "JO" . join( '',
-        map { $calltype{$_} or die "Unknown signature type '$_'" }
-        split( /,/, $parameters ) );
-
-    return $ret;
-}
-
 =item C<rewrite_nci_method($self, $pmc )>
 
 Rewrites the method body performing the various macro substitutions for
