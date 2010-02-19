@@ -1,5 +1,5 @@
 /* atomic/gcc_x86.c
- *  Copyright (C) 2006, Parrot Foundation.
+ *  Copyright (C) 2006-2010, Parrot Foundation.
  *  SVN Info
  *     $Id$
  */
@@ -34,7 +34,8 @@ assembly suppport.
  */
 /*
 
-=item C<void * parrot_i386_cmpxchg>
+=item C<void * parrot_i386_cmpxchg(void *volatile *ptr, void *expect, void
+*update)>
 
 The CMPXCHG assembly instruction is a single cycle x86 instruction
 that compares C<expect> and C<*ptr>. If they are equal, sets
@@ -68,7 +69,7 @@ parrot_i386_cmpxchg(ARGMOD(void *volatile *ptr), ARGIN_NULLOK(void *expect),
 
 /*
 
-=item C<long parrot_i386_xadd>
+=item C<long parrot_i386_xadd(volatile long *l, long amount)>
 
 C<xadd> is an x86 instruction that performs the following operation:
 Temporary = C<result>;
