@@ -1,5 +1,5 @@
 /* atomic/gcc_pcc.h
- *  Copyright (C) 2006-2008, Parrot Foundation.
+ *  Copyright (C) 2006-2010, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -23,6 +23,18 @@ typedef struct Parrot_atomic_pointer {
 
 #  define PARROT_ATOMIC_PTR_SET(a, b) (a).val = (void *) (b)
 
+/*
+
+=over 4
+
+=item C<inline static void *parrot_ppc_cmpset(void * volatile *ptr, void
+*expect, void *update)>
+
+Generate ppc cmpset
+
+=cut
+
+*/
 inline static void *parrot_ppc_cmpset(void * volatile *ptr,
                                       void *expect, void *update)
 {
@@ -46,6 +58,18 @@ inline static void *parrot_ppc_cmpset(void * volatile *ptr,
                             "memory");
     return tmp;
 }
+
+/*
+
+=item C<inline static long parrot_ppc_add(volatile long *val, long what)>
+
+Generate ppc add
+
+=back
+
+=cut
+
+*/
 
 inline static long parrot_ppc_add(volatile long *val, long what)
 {
