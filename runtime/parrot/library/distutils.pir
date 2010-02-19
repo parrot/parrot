@@ -4486,8 +4486,8 @@ SOURCE_C
 .end
 
 .sub 'newer' :multi(pmc, pmc)
-    .param string target
-    .param string depend
+    .param pmc target
+    .param pmc depend
     $S0 = target
     .tailcall newer($S0, depend)
 .end
