@@ -112,7 +112,6 @@ config/gen/platform/generic/stat.c
 config/gen/platform/generic/time.c
 config/gen/platform/netbsd/math.c
 config/gen/platform/openbsd/math.c
-config/gen/platform/openbsd/memexec.c
 config/gen/platform/solaris/math.c
 config/gen/platform/solaris/time.c
 examples/c/pbc_info.c
