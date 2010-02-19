@@ -18,6 +18,14 @@
 /* HEADERIZER HFILE: include/parrot/nci.h */
 /* HEADERIZER STOP */
 
+static void
+init_nci_funcs(PARROT_INTERP) {
+    VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_NCI_FUNCS,
+        pmc_new(interp, enum_class_Hash));
+    Parrot_nci_load_core_thunks(interp);
+    Parrot_nci_load_extra_thunks(interp);
+}
+
 /* This function serves a single purpose. It takes the function
    signature for a C function we want to call and returns a pointer
    to a function that can call it. */
@@ -37,8 +45,10 @@ build_call_func(PARROT_INTERP, SHIM(PMC *pmc_nci), NOTNULL(STRING *signature), S
         PANIC(interp, "iglobals isn't created yet");
 
     nci_funcs = VTABLE_get_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FUNCS);
-    if (PMC_IS_NULL(nci_funcs))
-        PANIC(interp, "iglobals.nci_funcs isn't created yet");
+    if (PMC_IS_NULL(nci_funcs)) {
+        init_nci_funcs(interp);
+        nci_funcs = VTABLE_get_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FUNCS);
+    }
 
     thunk = VTABLE_get_pmc_keyed_str(interp, nci_funcs, signature);
 

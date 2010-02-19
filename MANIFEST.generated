@@ -64,7 +64,6 @@ installable_pbc_merge.exe                         [main]bin
 installable_pbc_merge                             [main]bin
 installable_pbc_to_exe.exe                        [main]bin
 installable_pbc_to_exe                            [main]bin
-installable_parrot_nci_thunk_gen		  [main]bin
 installable_parrot-nqp.exe                        [main]bin
 installable_parrot-nqp                            [main]bin
 lib/Parrot/Config/Generated.pm                    [devel]lib
