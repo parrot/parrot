@@ -1,6 +1,6 @@
 #!./parrot
 # Copyright (C) 2010, Parrot Foundation.
-# $Id: string_mem.t 43904 2010-02-11 13:49:42Z whiteknight $
+# $Id$
 
 =head1 NAME
 
