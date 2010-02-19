@@ -46,13 +46,15 @@ F<docs/pdds/pdd16_native_call.pod>.
     $P0 = open $S0, 'w'
     setstdout $P0
 
-    if targ == 'head'   goto get_targ
-    if targ == 'thunks' goto get_targ
-    if targ == 'loader' goto get_targ
-    if targ == 'coda'   goto get_targ
-    if targ == 'all'    goto all
-    if targ == 'names'  goto names
-    if targ == 'signatures'   goto signatures
+    if targ == 'head'          goto get_targ
+    if targ == 'thunks'        goto get_targ
+    if targ == 'loader'        goto get_targ
+    if targ == 'dynext-loader' goto get_dynext_loader
+    if targ == 'coda'          goto get_targ
+    if targ == 'all'           goto all
+    if targ == 'all-dynext'    goto all_dynext
+    if targ == 'names'         goto names
+    if targ == 'signatures'    goto signatures
 
     # unknown target
     $S0 = 'sprintf'("Unknown target type '%s'", targ)
@@ -66,6 +68,22 @@ F<docs/pdds/pdd16_native_call.pod>.
     $S0 = 'get_loader'(sigs)
     say $S0
     $S0 = 'get_coda'(sigs)
+    say $S0
+    exit 0
+
+  all_dynext:
+    $S0 = 'get_head'(sigs)
+    say $S0
+    $S0 = 'get_thunks'(sigs)
+    say $S0
+    $S0 = 'get_dynext_loader'(sigs)
+    say $S0
+    $S0 = 'get_coda'(sigs)
+    say $S0
+    exit 0
+
+  get_dynext_loader:
+    $S0 = 'get_dynext_loader'(sigs)
     say $S0
     exit 0
 
@@ -101,6 +119,7 @@ F<docs/pdds/pdd16_native_call.pod>.
     push getopt, 'help|h'
     push getopt, 'version|v'
     push getopt, 'core'
+    push getopt, 'dynext'
     push getopt, 'output|o=s'
     push getopt, 'target=s'
     push getopt, 'thunk-storage-class=s'
@@ -179,6 +198,30 @@ USAGE
         opts['core'] = 'true'
     end_core:
 
+    $I0 = defined opts['dynext']
+    if $I0 goto is_dynext
+        opts['dynext'] = ''
+        goto end_dynext
+    is_dynext:
+        $I0 = defined opts['target']
+        if $I0 goto end_dynext_target
+            opts['target'] = 'all-dynext'
+        end_dynext_target:
+
+        $I0 = defined opts['loader-storage-class']
+        if $I0 goto end_dynext_loader_storage_class
+            opts['loader-storage-class'] = 'PARROT_DYNEXT_EXPORT'
+        end_dynext_loader_storage_class:
+
+        $I0 = defined opts['loader-name']
+        if $I0 goto end_dynext_loader_name
+            $S0 = opts['output']
+            ($S0, $S1, $S2) = 'file_basename'($S0, '.c')
+            $S0 = 'sprintf'('Parrot_lib_%s_init', $S1)
+            opts['loader-name'] = $S0
+        end_dynext_loader_name:
+    end_dynext:
+
     $I0 = defined opts['target']
     if $I0 goto end_target
         opts['target'] = 'all'
@@ -231,7 +274,7 @@ USAGE
 
 # }}}
 
-# get_{head,thunks,loader,coda} {{{
+# get_{head,thunks,loader,dynext_loader,coda} {{{
 
 .sub 'get_head'
     .param pmc ignored :slurpy
@@ -249,15 +292,8 @@ USAGE
     c_file = 'read_from_opts'(.OUTPUT)
 
     .local string str_file
-    str_file = clone c_file
-    substr str_file, -2, 2, '.str'
-    strip_str_file_loop:
-        $I0 = index str_file, '/'
-        if $I0 < 0 goto end_strip_str_file_loop
-        $I0 += 1
-        str_file = substr str_file, $I0
-        goto strip_str_file_loop
-    end_strip_str_file_loop:
+    ($S0, str_file, $S1) = 'file_basename'(c_file, '.c')
+    str_file = concat str_file, '.str'
 
     .local string head
     head = 'sprintf'(<<'HEAD', c_file, ext_defn, str_file)
@@ -343,13 +379,70 @@ HEAD
     PMC        *HashPointer   = NULL;
 
     iglobals = interp->iglobals;
-    if (PMC_IS_NULL(iglobals))
-        PANIC(interp, "iglobals isn't created yet");
+    PARROT_ASSERT(!PMC_IS_NULL(iglobals));
 
     HashPointer = VTABLE_get_pmc_keyed_int(interp, iglobals,
             IGLOBALS_NCI_FUNCS);
-    if (PMC_IS_NULL(HashPointer))
-        PANIC(interp, "iglobals.nci_funcs isn't created yet");
+    PARROT_ASSERT(!PMC_IS_NULL(HashPointer));
+
+FN_HEADER
+
+    .local int i, n
+    i = 0
+    n = sigs
+    loop:
+        if i >= n goto end_loop
+
+        .local pmc sig
+        sig = shift sigs
+
+        .local string fn_name
+        fn_name = 'sig_to_fn_name'(sig :flat)
+
+        .local string key
+        key = join '', sig
+
+        $S0 = 'sprintf'(<<'TEMPLATE', fn_name, key)
+    temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+    VTABLE_set_pointer(interp, temp_pmc, (void *)%s);
+    VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "%s"), temp_pmc);
+
+TEMPLATE
+        code = concat code, $S0
+
+        inc i
+        goto loop
+    end_loop:
+
+    code = concat code, <<'FN_FOOTER'
+}
+FN_FOOTER
+
+    .return (code)
+.end
+
+.sub 'get_dynext_loader'
+    .param pmc sigs
+
+    $S0 = 'read_from_opts'(.LOADER_STORAGE_CLASS)
+    $S1 = 'read_from_opts'(.LOADER_NAME)
+    .local string code
+    code = 'sprintf'(<<'FN_HEADER', $S0, $S1)
+
+%s void
+%s(PARROT_INTERP, SHIM(PMC *lib))
+{
+    PMC        *iglobals;
+    PMC        *temp_pmc;
+
+    PMC        *HashPointer   = NULL;
+
+    iglobals = interp->iglobals;
+    PARROT_ASSERT(!PMC_IS_NULL(iglobals));
+
+    HashPointer = VTABLE_get_pmc_keyed_int(interp, iglobals,
+            IGLOBALS_NCI_FUNCS);
+    PARROT_ASSERT(!PMC_IS_NULL(HashPointer));
 
 FN_HEADER
 
@@ -988,6 +1081,41 @@ JSON
         goto loop
     end_loop:
     .return (output)
+.end
+
+.sub 'file_basename'
+    .param string full_path
+    .param pmc extns :slurpy
+
+    .local string dir, file, extn
+
+    file = clone full_path
+
+    extn_loop:
+        unless extns goto end_extn_loop
+        $S0 = shift extns
+        $I0 = length $S0
+        $I1 = -$I0
+        $S1 = substr file, $I1, $I0
+        unless $S1 == $S0 goto extn_loop
+        extn = $S1
+        substr file, $I1, $I0, ''
+    end_extn_loop:
+
+    # TODO: make this portable
+    .const string file_sep = '/'
+
+    strip_dir_loop:
+        $I0 = index file, file_sep
+        if $I0 < 0 goto end_strip_dir_loop
+        inc $I0
+        $S0 = substr file, 0, $I0
+        dir = concat dir, $S0
+        file = substr file, $I0
+        goto strip_dir_loop
+    end_strip_dir_loop:
+
+    .return (dir, file, extn)
 .end
 
 # }}}

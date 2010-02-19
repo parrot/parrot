@@ -557,6 +557,7 @@ ALL_PARROT_LIBS     = @libparrot_linkflags@ $(ICU_SHARED) $(C_LIBS)
 DYNEXT_DIR          = runtime/parrot/dynext
 LIBNCI_TEST_SO      = $(DYNEXT_DIR)/libnci_test$(LOAD_EXT)
 LIBGLUTCB_SO        = $(DYNEXT_DIR)/libglutcb$(LOAD_EXT)
+EXTRANCITHUNKS_SO = $(DYNEXT_DIR)/extra_nci_thunks$(LOAD_EXT)
 
 ###############################################################################
 #
@@ -604,6 +605,7 @@ all : \
     corevm \
     docs \
 #IF(has_glut):    $(LIBGLUTCB_SO) \
+    $(EXTRANCITHUNKS_SO) \
     $(DIS) \
     $(PARROT_CONFIG) \
     $(PBC_TO_EXE) \
@@ -1864,6 +1866,8 @@ prog-clean :
     src/glut_callbacks$(O) \
     src/glut_nci_thunks$(O) \
     $(LIBGLUTCB_SO) \
+    src/extra_nci_thunks$(O) \
+    $(EXTRANCITHUNKS_SO) \
     install_config.fpmc
 	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl --init
 	$(RM_F) \
@@ -1902,6 +1906,8 @@ archclean: dynoplibs-clean dynpmc-clean dynext-clean
     $(LIBNCI_TEST_SO) \
     src/glut_callbacks$(O) \
     $(LIBGLUTCB_SO) \
+    src/extra_nci_thunks$(O) \
+    $(EXTRA_NCI_THUNKS) \
     $(LIBPARROT_STATIC) \
     $(LIBPARROT_SHARED)
 
@@ -2442,6 +2448,16 @@ $(LIBGLUTCB_SO): $(LIBPARROT) src/glut_callbacks$(O) src/glut_nci_thunks$(O)
 	$(LD) $(LD_LOAD_FLAGS) $(LDFLAGS) \
     @ld_out@$@ src/glut_callbacks$(O) src/glut_nci_thunks$(O) \
     $(ALL_PARROT_LIBS) @opengl_lib@
+
+src/extra_nci_thunks.c : src/nci/extra_thunks.nci $(PARROT_NCI_THUNK_GEN)
+	$(PARROT_NCI_THUNK_GEN) --dynext --output=src/extra_nci_thunks.c <src/nci/extra_thunks.nci
+
+src/extra_nci_thunks$(O): $(GENERAL_H_FILES)
+
+$(EXTRANCITHUNKS_SO) : $(LIBPARROT) src/extra_nci_thunks$(O)
+	$(LD) $(LD_LOAD_FLAGS) $(LDFLAGS) \
+    @ld_out@$@ src/extra_nci_thunks$(O) \
+    $(ALL_PARROT_LIBS)
 
 # emacs etags
 # this needs exuberant-ctags

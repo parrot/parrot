@@ -190,6 +190,11 @@ init_world(PARROT_INTERP)
 
     pmc = pmc_new(interp, enum_class_Hash);
     VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_DYN_LIBS, pmc);
+
+    pmc = pmc_new(interp, enum_class_Hash);
+    VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FUNCS, pmc);
+    Parrot_nci_load_core_thunks(interp);
+    Parrot_nci_load_extra_thunks(interp);
 }
 
 /*

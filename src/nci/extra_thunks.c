@@ -6202,13 +6202,11 @@ Parrot_nci_load_extra_thunks(PARROT_INTERP)
     PMC        *HashPointer   = NULL;
 
     iglobals = interp->iglobals;
-    if (PMC_IS_NULL(iglobals))
-        PANIC(interp, "iglobals isn't created yet");
+    PARROT_ASSERT(!PMC_IS_NULL(iglobals));
 
     HashPointer = VTABLE_get_pmc_keyed_int(interp, iglobals,
             IGLOBALS_NCI_FUNCS);
-    if (PMC_IS_NULL(HashPointer))
-        PANIC(interp, "iglobals.nci_funcs isn't created yet");
+    PARROT_ASSERT(!PMC_IS_NULL(HashPointer));
 
     temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_v_J);
