@@ -7,21 +7,21 @@ tools/build/nativecall.pir - Build up the native call routines
 
 =head1 SYNOPSIS
 
-    % ./parrot tools/build/nativecall.pir <src/call_list.txt >src/nci.c
+    % ./parrot tools/build/nativecall.pir -o src/nci/extra_thunks.c <src/nci/extra_thunks.nci
 
 =head1 DESCRIPTION
 
-This script creates the Native Call Interface file F<src/nci.c>. It
-parses a file of function signatures of the form:
+This script creates Native Call Interface files. It parses a file of function
+signatures of the form:
 
  <return-type-specifier><ws><parameter-type-specifiers>[<ws>][#<comment>]
     ...
 Empty lines and lines containing only whitespace or comment are ignored.
-The types specifiers are documented in F<src/call_list.txt>.
+The types specifiers are documented in F<src/nci/extra_thunks.nci>.
 
 =head1 SEE ALSO
 
-F<src/call_list.txt>.
+F<src/nci/extra_thunks.nci>.
 F<docs/pdds/pdd16_native_call.pod>.
 
 =cut
@@ -141,7 +141,7 @@ F<docs/pdds/pdd16_native_call.pod>.
 
 Creates a C file of routines suitable for use as Parrot NCI thunks.
 
-Usage ./parrot nativecall.pir [options] <input_signature_list.nci
+Usage ./parrot nativecall.pir [options] -o output_c_file.c <input_signature_list.nci
 
 Options
     --help              print this message and exit

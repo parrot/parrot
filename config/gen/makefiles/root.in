@@ -226,7 +226,6 @@ CONFIGURE_GENERATED_FILES = \
     $(GEN_MAKEFILES) \
     ext/Parrot-Embed/Makefile.PL \
     myconfig  \
-    src/call_list.txt \
     MANIFEST.configure.generated \
     .configure_trace.sto \
     .parrot_current_rev \

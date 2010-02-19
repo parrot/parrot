@@ -66,7 +66,7 @@ build_call_func(PARROT_INTERP, SHIM(PMC *pmc_nci), NOTNULL(STRING *signature), S
         STRING *ns = CONST_STRING(interp, " is an unknown signature type");
         STRING *message = Parrot_str_concat(interp, signature, ns, 0);
 
-        ns = CONST_STRING(interp, ".\nCAN_BUILD_CALL_FRAMES is disabled, add the signature to src/nci/extra_call_list.nci");
+        ns = CONST_STRING(interp, ".\nCAN_BUILD_CALL_FRAMES is disabled, add the signature to src/nci/extra_thunks.nci");
         message = Parrot_str_concat(interp, message, ns, 0);
 
         /*

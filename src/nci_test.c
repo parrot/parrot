@@ -67,7 +67,7 @@ typedef struct Opaque {
 /* Function declarations.
 
 *** If you add a new test function here,
-*** please update src/libnci_test.def and src/call_list.txt too. ***
+*** please update src/libnci_test.def and src/nci/extra_thunks.nci too. ***
 
 */
 

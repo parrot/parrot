@@ -21,7 +21,8 @@ work, see F<examples/nci/PQt.C> for more information.
 
 Note that this will either need JIT for building the NCI-functions on
 the fly. If this is not available try adding missing signatures to
-F<src/call_list.txt> and rebuilding Parrot.
+F<src/nci/extra_thunks.nci>, running F<tools/dev/mk_nci_thunks.pl>, and
+rebuilding Parrot.
 
 =cut
 
