@@ -229,6 +229,8 @@ CONFIGURE_GENERATED_FILES = \
     MANIFEST.configure.generated \
     .configure_trace.sto \
     .parrot_current_rev \
+#IF(has_opengl):    runtime/parrot/include/opengl_defines.pasm \
+#IF(has_opengl):    runtime/parrot/library/OpenGL_funcs.pir \
     runtime/parrot/include/signal.pasm
 
 
@@ -290,8 +292,6 @@ GEN_LIBRARY = \
 #IF(has_opengl):    $(LIBRARY_DIR)/OpenGL.pbc \
 #IF(has_opengl):    $(LIBRARY_DIR)/OpenGL_funcs.pbc \
 #IF(has_opengl):    $(LIBRARY_DIR)/OpenGL/Math.pbc \
-#IF(has_opengl):    runtime/parrot/include/opengl_defines.pasm \
-#IF(has_opengl):    runtime/parrot/library/OpenGL_funcs.pir \
     $(LIBRARY_DIR)/P6object.pbc \
     $(LIBRARY_DIR)/parrotlib.pbc \
     $(LIBRARY_DIR)/pcore.pbc \
