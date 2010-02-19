@@ -494,7 +494,7 @@ Parrot_pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
 
 /*
 
-=item C<PMC * Parrot_pmc_new_constant(PARROT_INTERP, INTVAL base_type)>
+=item C<PMC * Parrot_pmc_new_constant_noinit(PARROT_INTERP, INTVAL base_type)>
 
 Creates a new constant PMC of type C<base_type>.
 
