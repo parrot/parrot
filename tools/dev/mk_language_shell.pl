@@ -665,10 +665,10 @@ Returns a vector-like PMC.
             * specify it?
             */
             /*
-            array_t = pmc_type(INTERP,
+            array_t = Parrot_pmc_get_type_str(INTERP,
                 string_from_literal(INTERP, "@lang@"));
             */
-            property = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+            property = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
             VTABLE_set_integer_native(INTERP, property, 1);
             VTABLE_set_integer_keyed_int(INTERP, property, 0,
