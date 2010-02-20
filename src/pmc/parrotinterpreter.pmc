@@ -194,7 +194,7 @@ pmclass ParrotInterpreter no_ro {
 
 Yield the current thread
 
-=item C<recursion_limit(INTVAL l :optional)
+=item C<recursion_limit(INTVAL l :optional, INTVAL has_l :opt_flag )>
 
 Gets the recursion limit of the interpreter, optionally setting it to something
 new.
