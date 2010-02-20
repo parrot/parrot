@@ -44,15 +44,19 @@ Pure PIR, without any dependencies.
     .param string tmpl
     .param string outfile
     .param pmc config
+    .param int verbose          :named('verbose') :optional
+    .param int has_verbose      :opt_flag
     $S0 = slurp(tmpl)
     $S0 = conditioned_line($S0, config)
     $S0 = interpolate_var($S0, config)
     $S1 = sysinfo .SYSINFO_PARROT_OS
     $S0 = replace_slash($S0, $S1)
     spew(outfile, $S0)
-    printerr "\n\tGenerating '"
-    printerr outfile
-    printerr "'\n\n"
+    unless has_verbose goto L1
+    unless verbose goto L1
+    print "generate "
+    say outfile
+  L1:
 .end
 
 .sub 'slurp' :anon
