@@ -92,7 +92,7 @@ sub check_parens {
         for my $line (@lines) {
             # skip #defines and typedefs
             next if $line =~ m{(?:(#\s*define|^\s*typedef))};
-            if ( $line =~ m{ ( (?<!\w) (?:$keywords) (?: \( | \ \s+ \( ) ) }xo ) {
+            if ( $line =~ m{ ( (?<!\w) (?:$keywords) (?: \( ) ) }xo ) {
                 my $paren = $1;
 
                 # ops use the same names as some C keywords, so skip
