@@ -79,12 +79,6 @@ static INTVAL do_thread_run(PARROT_INTERP, PMC *thread,
     return tid;
 }
 
-static INTVAL do_thread_run_clone_default(PARROT_INTERP,
-                                          PMC *thread, PMC *sub, PMC *args) {
-    return do_thread_run(interp, thread, PARROT_CLONE_DEFAULT, sub, args);
-}
-
-
 pmclass ParrotThread extends ParrotInterpreter no_ro {
 
 /*
@@ -103,16 +97,16 @@ Equivalent to calling run with PARROT_CLONE_DEFAULT.
 
 */
 
-    void class_init() {
-        const int typ = enum_class_ParrotThread;
-
-        register_nci_method(INTERP, typ,
-                F2DPTR(do_thread_run), "run", "IJOIP@");
-
-        /* XXX appropriate name given that this won't clone globals? */
-        register_nci_method(INTERP, typ,
-                F2DPTR(do_thread_run_clone_default), "run_clone", "IJOP@");
+    METHOD run(INTVAL clone_flags, PMC *sub, PMC *args :slurpy) {
+        const INTVAL retval = do_thread_run(INTERP, SELF, clone_flags, sub, args);
+        RETURN(INTVAL retval);
     }
+
+    METHOD run_clone(PMC *sub, PMC *args :slurpy) {
+        const INTVAL retval = do_thread_run(INTERP, SELF, PARROT_CLONE_DEFAULT, sub, args);
+        RETURN(INTVAL retval)
+    }
+
 
 /*
 

@@ -176,16 +176,6 @@ create_interp(PMC *self, Parrot_Interp parent)
     new_interp->current_cont = NEED_CONTINUATION;
 }
 
-static int
-recursion_limit(PARROT_INTERP, PMC *self, int l)
-{
-    const int ret           = interp->recursion_limit;
-    UNUSED(self)
-
-    interp->recursion_limit = l;
-    return ret;
-}
-
 pmclass ParrotInterpreter no_ro {
     ATTR struct parrot_interp_t *interp; /* this PMC's interpreter */
     ATTR INTVAL                  tid;    /* thread id */
@@ -200,24 +190,28 @@ pmclass ParrotInterpreter no_ro {
 
 =over 4
 
-=item C<void class_init()>
+=item C<yield>
 
-Class initialization.
+Yield the current thread
+
+=item C<recursion_limit(INTVAL l :optional)
+
+Gets the recursion limit of the interpreter, optionally setting it to something
+new.
 
 =cut
 
 */
 
-    void class_init() {
-        const int typ = enum_class_ParrotInterpreter;
+    METHOD yield() {
+        pt_thread_yield();
+    }
 
-        /* TODO unify and fix signatures */
-        register_nci_method(INTERP, typ,
-                F2DPTR(pt_thread_yield), "yield", "v");
-
-        /* misc functions */
-        register_nci_method(INTERP, typ,
-                F2DPTR(recursion_limit), "recursion_limit", "iJOi");
+    METHOD recursion_limit(INTVAL l :optional, INTVAL has_l :opt_flag) {
+        const INTVAL ret = INTERP->recursion_limit;
+        if (has_l)
+            INTERP->recursion_limit = l;
+        RETURN(INTVAL ret);
     }
 
 /*
