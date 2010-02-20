@@ -323,6 +323,29 @@ Get the type of the specified constant.  Possible type IDs:
 
 /*
 
+=item C<void set_main(INTVAL index)>
+
+Set the :main flag in a Sub in the constant table.
+
+Experimental. Use with care. There is no way to set the
+private flags from PIR, so we need something like this.
+
+If something goes wrong, blame NotFound.
+
+=cut
+
+*/
+    METHOD set_main(INTVAL index) {
+        PMC *mainsub = SELF.get_pmc_keyed_int(index);
+        if (mainsub->vtable->base_type != enum_class_Sub)
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_OPERATION,
+                "Attempt to set main flag in a non Sub");
+        SUB_FLAG_flag_SET(PF_MAIN, mainsub);
+    }
+
+/*
+
 =item C<INTVAL get_or_create_constant()>
 
 Get or create constant for passed value.
