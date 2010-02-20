@@ -28,14 +28,12 @@ F<docs/pdds/pdd16_native_call.pod>.
 
 .macro_const VERSION 0.01
 
-.macro_const SIG_TABLE_GLOBAL_NAME  'signature_table'
 .macro_const OPTS_GLOBAL_NAME       'options'
 
 .sub 'main' :main
     .param pmc argv
 
     # initialize global variables
-    'gen_sigtable'()
     'get_options'(argv)
 
     .local string targ
@@ -593,7 +591,7 @@ TEMPLATE
     .param string field_name
 
     .local pmc sig_table
-    sig_table = get_global .SIG_TABLE_GLOBAL_NAME
+    .const 'Sub' sig_table = 'get_sigtable'
 
     $P0 = split '', sig
 
@@ -723,101 +721,10 @@ TEMPLATE
 
 #}}}
 
-# gen_sigtable {{{
+# get_sigtable {{{
 
-.sub 'gen_sigtable'
-    $S0 = 'sigtable_json'()
-    $P0 = 'decode_table'($S0)
-    'fixup_table'($P0)
-    set_global .SIG_TABLE_GLOBAL_NAME, $P0
-.end
-
-.sub 'decode_table'
-    .param string json
-
-    .local pmc compiler
-    load_bytecode 'data_json.pbc'
-    compiler = compreg 'data_json'
-
-    .local pmc table
-    $P0 = compiler.'compile'(json)
-    table = $P0()
-
-    .return (table)
-.end
-
-.sub 'fixup_table'
-    .param pmc table
-
-    .local pmc table_iter
-    table_iter = iter table
-  iter_loop:
-    unless table_iter goto iter_end
-
-    .local string k
-    .local pmc v
-    k = shift table_iter
-    v = table[k]
-
-    $I0 = exists v['cname']
-    if $I0 goto has_cname
-        v['cname'] = k
-    has_cname:
-
-    $I0 = exists v['as_return']
-    if $I0 goto has_as_return
-        $S0 = v['as_proto']
-        v['as_return'] = $S0
-    has_as_return:
-
-    $I0 = exists v['return_type']
-    if $I0 goto has_return_type
-        $S0 = v['as_proto']
-        v['return_type'] = $S0
-    has_return_type:
-
-    $I0 = exists v['ret_assign']
-    $I1 = exists v['sig_char']
-    $I1 = !$I1
-    $I0 = $I0 || $I1 # not (not exists v[ret_assign] and exists v[sig_char])
-    if $I0 goto has_ret_assign
-        $S0 = 'Parrot_pcc_fill_returns_from_c_args(interp, call_object, "'
-        $S1 = v['sig_char']
-        $S0 = concat $S0, $S1
-        $S0 = concat $S0, '", return_data);'
-        v['ret_assign'] = $S0
-    has_ret_assign:
-
-    $I0 = exists v['func_call_assign']
-    if $I0 goto has_func_call_assign
-        v['func_call_assign'] = 'return_data = '
-    has_func_call_assign:
-
-    $I0 = exists v['temp_tmpl']
-    if $I0 goto has_temp_tmpl
-        $S0 = v['return_type']
-        $S0 = concat $S0, " t_%i"
-        v['temp_tmpl'] = $S0
-    has_temp_tmpl:
-
-    $I0 = exists v['fill_params_tmpl']
-    if $I0 goto has_fill_params_tmpl
-        v['fill_params_tmpl'] = ', &t_%i'
-    has_fill_params_tmpl:
-
-    $I0 = exists v['call_param_tmpl']
-    if $I0 goto has_call_param_tmpl
-        v['call_param_tmpl'] = 't_%i'
-    has_call_param_tmpl:
-
-    goto iter_loop
-  iter_end:
-
-    .return ()
-.end
-
-.sub 'sigtable_json'
-    .const string retv = <<'JSON'
+.sub 'get_sigtable' :anon :immediate
+    .const string json_table = <<'JSON'
 {
     "p": { "as_proto":   "void *",
            "final_dest": "PMC * final_destination = PMCNULL;",
@@ -910,7 +817,82 @@ TEMPLATE
     "@": { "as_proto": "PMC *", "as_return": "", "cname": "xAT_", "sig_char": "Ps" }
 }
 JSON
-    .return (retv)
+
+    # decode table
+    .local pmc compiler
+    load_bytecode 'data_json.pbc'
+    compiler = compreg 'data_json'
+
+    .local pmc table
+    $P0 = compiler.'compile'(json_table)
+    table = $P0()
+
+    # fixup table
+    .local pmc table_iter
+    table_iter = iter table
+  iter_loop:
+    unless table_iter goto iter_end
+
+    .local string k
+    .local pmc v
+    k = shift table_iter
+    v = table[k]
+
+    $I0 = exists v['cname']
+    if $I0 goto has_cname
+        v['cname'] = k
+    has_cname:
+
+    $I0 = exists v['as_return']
+    if $I0 goto has_as_return
+        $S0 = v['as_proto']
+        v['as_return'] = $S0
+    has_as_return:
+
+    $I0 = exists v['return_type']
+    if $I0 goto has_return_type
+        $S0 = v['as_proto']
+        v['return_type'] = $S0
+    has_return_type:
+
+    $I0 = exists v['ret_assign']
+    $I1 = exists v['sig_char']
+    $I1 = !$I1
+    $I0 = $I0 || $I1 # not (not exists v[ret_assign] and exists v[sig_char])
+    if $I0 goto has_ret_assign
+        $S0 = 'Parrot_pcc_fill_returns_from_c_args(interp, call_object, "'
+        $S1 = v['sig_char']
+        $S0 = concat $S0, $S1
+        $S0 = concat $S0, '", return_data);'
+        v['ret_assign'] = $S0
+    has_ret_assign:
+
+    $I0 = exists v['func_call_assign']
+    if $I0 goto has_func_call_assign
+        v['func_call_assign'] = 'return_data = '
+    has_func_call_assign:
+
+    $I0 = exists v['temp_tmpl']
+    if $I0 goto has_temp_tmpl
+        $S0 = v['return_type']
+        $S0 = concat $S0, " t_%i"
+        v['temp_tmpl'] = $S0
+    has_temp_tmpl:
+
+    $I0 = exists v['fill_params_tmpl']
+    if $I0 goto has_fill_params_tmpl
+        v['fill_params_tmpl'] = ', &t_%i'
+    has_fill_params_tmpl:
+
+    $I0 = exists v['call_param_tmpl']
+    if $I0 goto has_call_param_tmpl
+        v['call_param_tmpl'] = 't_%i'
+    has_call_param_tmpl:
+
+    goto iter_loop
+  iter_end:
+
+    .return (table)
 .end
 
 # }}}
