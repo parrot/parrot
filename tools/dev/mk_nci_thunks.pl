@@ -25,7 +25,7 @@ foreach (qw( core_thunks extra_thunks )) {
     my $nci_file = "src/nci/$_.nci";
     my $loader_name = "Parrot_nci_load_$_";
     print "$nci_file > $c_file\n";
-    system("./parrot tools/build/nativecall.pir " .
+    system("./parrot tools/dev/nci_thunk_gen.pir " .
             "--core " .
             "--loader-name=$loader_name " .
             "--output=$c_file " .

@@ -2414,8 +2414,8 @@ $(LIBNCI_TEST_SO): src/nci_test$(O) $(LIBPARROT)
 # for use by runtime/parrot/library/OpenGL.pir
 src/glut_callbacks$(O): $(GENERAL_H_FILES)
 
-src/glut_nci_thunks.c: $(PARROT) runtime/parrot/library/data_json.pbc tools/build/nativecall.pir
-	$(PARROT) tools/build/nativecall.pir \
+src/glut_nci_thunks.c: $(PARROT) runtime/parrot/library/data_json.pbc tools/dev/nci_thunk_gen.pir
+	$(PARROT) tools/dev/nci_thunk_gen.pir \
 	    --loader-name=Parrot_glut_nci_loader \
 	    --loader-storage-class=PARROT_DYNEXT_EXPORT \
 	    --output=src/glut_nci_thunks.c \
