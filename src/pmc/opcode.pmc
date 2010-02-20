@@ -81,10 +81,19 @@ pmclass Opcode auto_attrs {
         return attrs->full_name_cache;
     }
 
-    METHOD op_count() {
+    VTABLE INTVAL elements() {
         Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
-        INTVAL count = attrs->info->op_count;
-        RETURN(INTVAL count);
+        if (!attrs->info)
+            return -1;
+        return attrs->info->op_count - 1;
+    }
+
+    VTABLE INTVAL get_integer_keyed_int(INTVAL i) {
+        Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        INTVAL type = i < attrs->info->op_count - 1 ?
+            attrs->info->types[i] :
+            -1;
+        return type;
     }
 }
 
