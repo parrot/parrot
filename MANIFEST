@@ -1431,6 +1431,7 @@ src/pmc/hash.pmc                                            [devel]src
 src/pmc/hashiterator.pmc                                    [devel]src
 src/pmc/hashiteratorkey.pmc                                 [devel]src
 src/pmc/imageio.pmc                                         [devel]src
+src/pmc/imageiosize.pmc                                     [devel]src
 src/pmc/integer.pmc                                         [devel]src
 src/pmc/iterator.pmc                                        [devel]src
 src/pmc/key.pmc                                             [devel]src
@@ -1899,6 +1900,8 @@ t/pmc/handle.t                                              [test]
 t/pmc/hash.t                                                [test]
 t/pmc/hashiterator.t                                        [test]
 t/pmc/hashiteratorkey.t                                     [test]
+t/pmc/imageio.t                                             [test]
+t/pmc/imageiosize.t                                         [test]
 t/pmc/integer.t                                             [test]
 t/pmc/io.t                                                  [test]
 t/pmc/io_iterator.t                                         [test]

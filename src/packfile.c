@@ -3866,7 +3866,6 @@ PackFile_Constant_pack_size(PARROT_INTERP, ARGIN(const PackFile_Constant *self))
 {
     ASSERT_ARGS(PackFile_Constant_pack_size)
     PMC    *component;
-    STRING *image;
     size_t  packed_size;
 
     switch (self->type) {
@@ -3890,13 +3889,8 @@ PackFile_Constant_pack_size(PARROT_INTERP, ARGIN(const PackFile_Constant *self))
       case PFC_PMC:
         component = self->u.key; /* the pmc (Sub, ...) */
 
-        /*
-         * TODO create either
-         * a) a frozen_size freeze entry or
-         * b) change packout.c so that component size isn't needed
-         */
-        image       = Parrot_freeze(interp, component);
-        packed_size = PF_size_string(image);
+        packed_size =
+            PF_size_string(STRINGNULL) + Parrot_freeze_size(interp, component) / sizeof (opcode_t);
         break;
 
       default:

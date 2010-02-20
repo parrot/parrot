@@ -1,0 +1,237 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/imageiosize.pmc - ImageIOSize PMC
+
+=head1 DESCRIPTION
+
+Gets the size of an ImageIO image without the allocation costs.
+
+=cut
+
+*/
+
+#define GROW_TO_16_BYTE_BOUNDARY(size) ((size) + ((size) % 16 ? 16 - (size) % 16 : 0))
+
+static void
+visit_todo_list_freeze(PARROT_INTERP, PMC* pmc, PMC* info) {
+    int is_new = 0;
+
+    if (!PMC_IS_NULL(pmc)) {
+        Hash *hash = (Hash *)VTABLE_get_pointer(interp, PARROT_IMAGEIOSIZE(info)->seen);
+        HashBucket * const b = parrot_hash_get_bucket(interp, hash, pmc);
+        is_new = !b;
+    }
+
+    VTABLE_push_integer(interp, info, 0);
+
+    if (is_new) {
+        Hash *hash = (Hash *)VTABLE_get_pointer(interp, PARROT_IMAGEIOSIZE(info)->seen);
+        parrot_hash_put(interp, hash, pmc, pmc);
+        VTABLE_push_integer(interp, info, pmc->vtable->base_type);
+        VTABLE_push_pmc(interp, PARROT_IMAGEIOSIZE(info)->todo, pmc);
+        VTABLE_freeze(interp, pmc, info);
+    }
+}
+
+pmclass ImageIOSize auto_attrs {
+    ATTR PMC             *seen;           /* seen hash */
+    ATTR PMC             *todo;           /* todo list */
+    ATTR struct PackFile *pf;
+    ATTR INTVAL           size;
+
+/*
+
+=head1 VTABLES
+
+=over 4
+
+=cut
+
+*/
+
+/*
+
+=item C<void init()>
+
+Initializes the PMC.
+
+=cut
+
+*/
+    VTABLE void init() {
+        PARROT_IMAGEIOSIZE(SELF)->todo = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        PARROT_IMAGEIOSIZE(SELF)->pf   = PackFile_new(INTERP, 0);
+        PARROT_IMAGEIOSIZE(SELF)->size = 0;
+
+        PARROT_IMAGEIOSIZE(SELF)->seen = Parrot_pmc_new(INTERP, enum_class_Hash);
+        VTABLE_set_pointer(INTERP, PARROT_IMAGEIOSIZE(SELF)->seen,
+            parrot_new_intval_hash(INTERP));
+
+        PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+
+/*
+
+=item C<void destroy()>
+
+Destroys the PMC.
+
+=cut
+
+*/
+    VTABLE void destroy() {
+        PackFile_destroy(INTERP, PARROT_IMAGEIOSIZE(SELF)->pf);
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the PMC as alive.
+
+=cut
+
+*/
+    VTABLE void mark() {
+        Parrot_gc_mark_PMC_alive(INTERP, PARROT_IMAGEIOSIZE(SELF)->todo);
+        Parrot_gc_mark_PMC_alive(INTERP, PARROT_IMAGEIOSIZE(SELF)->seen);
+    }
+
+/*
+
+=item C<VTABLE PMC *get_pmc()>
+
+Gets the result PMC after a thaw.
+
+=cut
+
+*/
+
+    VTABLE PMC *get_pmc() {
+        PMC *ret = Parrot_pmc_new(INTERP, enum_class_Integer);
+        VTABLE_set_integer_native(INTERP, ret, PARROT_IMAGEIOSIZE(SELF)->size);
+        return ret;
+    }
+
+/*
+
+=item C<VTABLE PMC *get_iter()>
+
+Get the C<todo> list for this freeze/thaw for iterating over.
+
+=cut
+
+*/
+
+    VTABLE PMC *get_iter() {
+        return PARROT_IMAGEIOSIZE(SELF)->todo;
+    }
+
+/*
+
+=item C<VTABLE INTVAL get_integer()>
+
+Returns the flags describing the visit action
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer() {
+        return VISIT_FREEZE_NORMAL;
+    }
+
+/*
+
+=item C<VTABLE void push_integer(INTVAL v)>
+
+Pushes the integer C<v> onto the end of the image.
+
+=cut
+
+*/
+
+    VTABLE void push_integer(INTVAL v) {
+        size_t len = PF_size_integer() * sizeof (opcode_t);
+        PARROT_IMAGEIOSIZE(SELF)->size += len;
+    }
+
+
+/*
+
+=item C<VTABLE void push_float(FLOATVAL v)>
+
+Pushes the float C<v> onto the end of the image.
+
+=cut
+
+*/
+
+    VTABLE void push_float(FLOATVAL v)
+    {
+        size_t len = PF_size_number() * sizeof (opcode_t);
+        PARROT_IMAGEIOSIZE(SELF)->size += len;
+    }
+
+
+/*
+
+=item C<VTABLE void push_string(STRING *v)>
+
+Pushes the string C<*v> onto the end of the image.
+
+=cut
+
+*/
+
+    VTABLE void push_string(STRING *v)
+    {
+        size_t len = PF_size_string(v) * sizeof (opcode_t);
+        PARROT_IMAGEIOSIZE(SELF)->size += len;
+    }
+
+/*
+
+=item C<VTABLE void push_pmc(PMC *v)>
+
+Pushes a reference to pmc C<*v> onto the end of the image. If C<*v>
+hasn't been seen yet, it is also pushed onto the todo list.
+
+=cut
+
+*/
+
+    VTABLE void push_pmc(PMC *v) {
+        visit_todo_list_freeze(INTERP, v, SELF);
+    }
+
+    VTABLE void set_pmc(PMC *p)
+    {
+        UINTVAL header_length = GROW_TO_16_BYTE_BOUNDARY(PACKFILE_HEADER_BYTES);
+        PARROT_IMAGEIOSIZE(SELF)->size += header_length;
+
+        visit_todo_list_freeze(INTERP, p, SELF);
+        Parrot_visit_loop_visit(INTERP, SELF);
+    }
+
+/*
+
+=back
+
+=cut
+
+*/
+
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

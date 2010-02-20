@@ -10,6 +10,8 @@ src/pmc/imageio.pmc - ImageIO PMC
 
 Freezes and thaws other PMCs.
 
+=cut
+
 */
 
 #define GROW_TO_16_BYTE_BOUNDARY(size) ((size) + ((size) % 16 ? 16 - (size) % 16 : 0))
@@ -123,12 +125,12 @@ INFO_HAS_DATA(ARGIN(PMC *io)) {
 PARROT_INLINE
 static PMC*
 id_list_get(PARROT_INTERP, PMC *io, UINTVAL id) {
-    return VTABLE_get_pmc_keyed_int(interp, PARROT_IMAGEIO(io)->id_list, id);
+    return VTABLE_get_pmc_keyed_int(interp, PARROT_IMAGEIO(io)->todo, id - 1);
 }
 
 PARROT_INLINE
-static void
-visit_todo_list_thaw(PARROT_INTERP, SHIM(PMC* pmc_not_used), ARGIN(PMC* info))
+static PMC *
+visit_todo_list_thaw(PARROT_INTERP, ARGIN(PMC* info))
 {
     UINTVAL  n            = VTABLE_shift_integer(interp, info);
     UINTVAL  id           = PackID_get_PMCID(n);
@@ -153,10 +155,7 @@ visit_todo_list_thaw(PARROT_INTERP, SHIM(PMC* pmc_not_used), ARGIN(PMC* info))
 
             {
                 PMC * const todo    = PARROT_IMAGEIO(info)->todo;
-                PMC * const id_list = PARROT_IMAGEIO(info)->id_list;
-                VTABLE_set_pmc_keyed_int(interp, id_list, id, pmc);
-                /* remember nested aggregates depth first */
-                VTABLE_push_pmc(interp, todo, pmc);
+                VTABLE_set_pmc_keyed_int(interp, todo, id - 1, pmc);
             }
         }
         break;
@@ -165,7 +164,7 @@ visit_todo_list_thaw(PARROT_INTERP, SHIM(PMC* pmc_not_used), ARGIN(PMC* info))
         break;
     }
 
-    *(PARROT_IMAGEIO(info)->thaw_ptr) = pmc;
+    return pmc;
 }
 
 static void
@@ -207,65 +206,14 @@ visit_todo_list_freeze(PARROT_INTERP, PMC* pmc, PMC* info)
     }
 }
 
-static void
-visit_loop_todo_list(PARROT_INTERP, PMC *current, PMC *info)
-{
-    PMC * const todo     = PARROT_IMAGEIO(info)->todo;
-    const int    thawing = PARROT_IMAGEIO(info)->what == VISIT_THAW_NORMAL;
-
-    (PARROT_IMAGEIO(info)->visit_pmc_now)(interp, current, info);
-
-    /* can't cache upper limit, visit may append items */
-    while (VTABLE_get_bool(interp, todo)) {
-        current = VTABLE_pop_pmc(interp, todo);
-        if (!current)
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "NULL current PMC in visit_loop_todo_list");
-
-        PARROT_ASSERT(current->vtable);
-
-        VTABLE_visit(interp, current, info);
-
-        VISIT_PMC(interp, info, PMC_metadata(current));
-    }
-
-    if (thawing)
-        /* we're done reading the image */
-        PARROT_ASSERT(!INFO_HAS_DATA(info));
-
-    if (thawing) {
-        /* on thawing call thawfinish for each processed PMC */
-        const INTVAL n = VTABLE_elements(interp, PARROT_IMAGEIO(info)->id_list);
-        int          i;
-
-        /*
-         * Thaw in reverse order. We have to fully thaw younger PMCs
-         * before use them in older.
-         *
-         * XXX There are no younger or older pmcs in a directed graph
-         *     that allows cycles. Any code that requires a specific
-         *      order here is likely broken.
-         */
-        for (i = n-1; i >= 0; --i) {
-            current = VTABLE_get_pmc_keyed_int(interp, PARROT_IMAGEIO(info)->id_list, i);
-            if (!PMC_IS_NULL(current))
-                VTABLE_thawfinish(interp, current, info);
-        }
-    }
-}
-
 pmclass ImageIO auto_attrs {
-    ATTR visit_f          visit_pmc_now;
     ATTR Buffer          *buffer;         /* buffer to store the image */
     ATTR size_t           pos;            /* current read/write position in buffer */
     ATTR size_t           input_length;
     ATTR INTVAL           what;
-    ATTR PMC            **thaw_ptr;       /* where to thaw a new PMC */
     ATTR PMC             *seen;           /* seen hash */
     ATTR PMC             *todo;           /* todo list */
-    ATTR PMC             *id_list;        /* seen list used by thaw */
     ATTR UINTVAL          id;             /* freze ID of PMC */
-    ATTR INTVAL           extra_flags;    /* concerning to extra */
     ATTR struct PackFile *pf;
 
 /*
@@ -288,13 +236,10 @@ Initializes the PMC.
 
 */
     VTABLE void init() {
-        PARROT_IMAGEIO(SELF)->thaw_ptr    = NULL;
         PARROT_IMAGEIO(SELF)->buffer      = NULL;
         PARROT_IMAGEIO(SELF)->todo        = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
         PARROT_IMAGEIO(SELF)->seen        = PMCNULL;
-        PARROT_IMAGEIO(SELF)->id_list     = PMCNULL;
         PARROT_IMAGEIO(SELF)->id          = 0;
-        PARROT_IMAGEIO(SELF)->extra_flags = EXTRA_IS_NULL;
         PARROT_IMAGEIO(SELF)->pf          = PackFile_new(INTERP, 0);
 
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -329,7 +274,6 @@ Marks the PMC as alive.
             Parrot_gc_mark_PObj_alive(INTERP, (PObj *)(PARROT_IMAGEIO(SELF)->buffer));
         Parrot_gc_mark_PMC_alive(INTERP, PARROT_IMAGEIO(SELF)->todo);
         Parrot_gc_mark_PMC_alive(INTERP, PARROT_IMAGEIO(SELF)->seen);
-        Parrot_gc_mark_PMC_alive(INTERP, PARROT_IMAGEIO(SELF)->id_list);
     }
 
 /*
@@ -347,20 +291,33 @@ Returns the content of the image as a string.
                                           PARROT_IMAGEIO(SELF)->buffer,
                                           PARROT_IMAGEIO(SELF)->pos);
     }
-/*
 
 /*
 
-=item C<VTABLE void set_pointer()>
+=item C<VTABLE PMC *get_pmc()>
 
-Sets the location where to thaw a new PMC.
+Gets the result PMC after a thaw.
 
 =cut
 
 */
 
-    VTABLE void set_pointer(void* value) {
-        PARROT_IMAGEIO(SELF)->thaw_ptr = (PMC**)value;
+    VTABLE PMC *get_pmc() {
+        return VTABLE_get_pmc_keyed_int(INTERP, (PARROT_IMAGEIO(SELF))->todo, 0);
+    }
+
+/*
+
+=item C<VTABLE PMC *get_iter()>
+
+Get the C<todo> list for this freeze/thaw for iterating over.
+
+=cut
+
+*/
+
+    VTABLE PMC *get_iter() {
+        return PARROT_IMAGEIO(SELF)->todo;
     }
 
 /*
@@ -441,8 +398,7 @@ hasn't been seen yet, it is also pushed onto the todo list.
 */
 
     VTABLE void push_pmc(PMC *v) {
-        VTABLE_set_pointer(interp, SELF, &v);
-        (PARROT_IMAGEIO(SELF)->visit_pmc_now)(INTERP, v, SELF);
+        visit_todo_list_freeze(INTERP, v, SELF);
     }
 
 /*
@@ -515,60 +471,59 @@ Removes and returns a reference to a pmc from the start of the image.
 */
 
     VTABLE PMC *shift_pmc() {
-        PMC *result;
-        VTABLE_set_pointer(interp, SELF, &result);
-        (PARROT_IMAGEIO(SELF)->visit_pmc_now)(interp, NULL, SELF);
-        return result;
+        return visit_todo_list_thaw(INTERP, SELF);
     }
 
     VTABLE void set_pmc(PMC *p)
     {
-            UINTVAL header_length = GROW_TO_16_BYTE_BOUNDARY(PACKFILE_HEADER_BYTES);
+        UINTVAL header_length = GROW_TO_16_BYTE_BOUNDARY(PACKFILE_HEADER_BYTES);
 
-            PARROT_IMAGEIO(SELF)->what = VISIT_FREEZE_NORMAL;
-            PARROT_IMAGEIO(SELF)->visit_pmc_now  = visit_todo_list_freeze;
-            create_buffer(INTERP, p, SELF);
-            ensure_buffer_size(INTERP, SELF, header_length);
-            mem_sys_memcopy(GET_VISIT_CURSOR(SELF),
-                PARROT_IMAGEIO(SELF)->pf->header, PACKFILE_HEADER_BYTES);
-            INC_VISIT_CURSOR(SELF, header_length);
+        PARROT_IMAGEIO(SELF)->what = VISIT_FREEZE_NORMAL;
+        create_buffer(INTERP, p, SELF);
+        ensure_buffer_size(INTERP, SELF, header_length);
+        mem_sys_memcopy(GET_VISIT_CURSOR(SELF),
+            PARROT_IMAGEIO(SELF)->pf->header, PACKFILE_HEADER_BYTES);
+        INC_VISIT_CURSOR(SELF, header_length);
 
-            PARROT_IMAGEIO(SELF)->seen = Parrot_pmc_new(INTERP, enum_class_Hash);
-            VTABLE_set_pointer(INTERP, PARROT_IMAGEIO(SELF)->seen,
-                parrot_new_intval_hash(INTERP));
+        PARROT_IMAGEIO(SELF)->seen = Parrot_pmc_new(INTERP, enum_class_Hash);
+        VTABLE_set_pointer(INTERP, PARROT_IMAGEIO(SELF)->seen,
+            parrot_new_intval_hash(INTERP));
 
-            visit_loop_todo_list(INTERP, p, SELF);
+        visit_todo_list_freeze(INTERP, p, SELF);
+        Parrot_visit_loop_visit(INTERP, SELF);
     }
 
     VTABLE void set_string_native(STRING *image) {
-            UINTVAL header_length = GROW_TO_16_BYTE_BOUNDARY(PACKFILE_HEADER_BYTES);
-            int unpacked_length;
+        UINTVAL header_length = GROW_TO_16_BYTE_BOUNDARY(PACKFILE_HEADER_BYTES);
+        int unpacked_length;
 
-            PARROT_IMAGEIO(SELF)->what          = VISIT_THAW_NORMAL;
-            PARROT_IMAGEIO(SELF)->visit_pmc_now = visit_todo_list_thaw;
-            PARROT_IMAGEIO(SELF)->buffer        = (Buffer *)image;
-            PARROT_IMAGEIO(SELF)->id_list       = Parrot_pmc_new(INTERP,
-                                                                 enum_class_ResizablePMCArray);
+        PARROT_IMAGEIO(SELF)->what          = VISIT_THAW_NORMAL;
+        PARROT_IMAGEIO(SELF)->buffer        = (Buffer *)image;
 
-            PARROT_ASSERT(image->_bufstart == image->strstart);
+        PARROT_ASSERT(image->_bufstart == image->strstart);
 
-            SET_VISIT_CURSOR(SELF, (char *)Buffer_bufstart(PARROT_IMAGEIO(SELF)->buffer));
-            PARROT_IMAGEIO(SELF)->input_length = image->strlen;
+        SET_VISIT_CURSOR(SELF, (char *)Buffer_bufstart(PARROT_IMAGEIO(SELF)->buffer));
+        PARROT_IMAGEIO(SELF)->input_length = image->strlen;
 
-            PARROT_IMAGEIO(SELF)->pf->options |= PFOPT_PMC_FREEZE_ONLY;
-            unpacked_length = PackFile_unpack(interp, PARROT_IMAGEIO(SELF)->pf,
-                GET_VISIT_CURSOR(SELF), PARROT_IMAGEIO(SELF)->input_length);
+        PARROT_IMAGEIO(SELF)->pf->options |= PFOPT_PMC_FREEZE_ONLY;
+        unpacked_length = PackFile_unpack(interp, PARROT_IMAGEIO(SELF)->pf,
+            GET_VISIT_CURSOR(SELF), PARROT_IMAGEIO(SELF)->input_length);
 
-            if (!unpacked_length) {
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                        EXCEPTION_INVALID_STRING_REPRESENTATION,
-                        "PackFile header failed during unpack");
-            }
-            else {
-                INC_VISIT_CURSOR(SELF, header_length);
-            }
+        if (!unpacked_length) {
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_STRING_REPRESENTATION,
+                    "PackFile header failed during unpack");
+        }
+        else {
+            INC_VISIT_CURSOR(SELF, header_length);
+        }
 
-            visit_loop_todo_list(interp, pmc, SELF);
+        visit_todo_list_thaw(INTERP, SELF);
+        Parrot_visit_loop_visit(INTERP, SELF);
+
+        /* we're done reading the image */
+        PARROT_ASSERT(!INFO_HAS_DATA(SELF));
+        Parrot_visit_loop_thawfinish(INTERP, SELF);
     }
 
 /*
