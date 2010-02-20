@@ -526,6 +526,7 @@ PBC_TO_EXE          = ./pbc_to_exe$(EXE)
 PARROT_CONFIG       = ./parrot_config$(EXE)
 PIRC                = ./pirc$(EXE)
 NQP_RX              = ./parrot-nqp$(EXE)
+NCI_THUNK_GEN	    = ./parrot_nci_thunk_gen$(EXE)
 
 # Installable executables
 INSTALLABLEPARROT    = ./installable_parrot$(EXE)
@@ -828,6 +829,12 @@ $(PARROT) : src/main$(O) $(GEN_HEADERS) $(LIBPARROT) CFLAGS \
 $(PBC_TO_EXE) : tools/dev/pbc_to_exe.pir runtime/parrot/library/config.pir $(PARROT)
 	$(PARROT) -o pbc_to_exe.pbc tools/dev/pbc_to_exe.pir
 	$(PARROT) pbc_to_exe.pbc pbc_to_exe.pbc
+
+parrot_nci_thunk_gen.pbc : tools/dev/nci_thunk_gen.pir $(LIBRARY_DIR)/data_json.pbc $(PARROT)
+	$(PARROT) -o parrot_nci_thunk_gen.pbc tools/dev/nci_thunk_gen.pir
+
+$(NCI_THUNK_GEN) : parrot_nci_thunk_gen.pbc $(PBC_TO_EXE)
+	$(PBC_TO_EXE) parrot_nci_thunk_gen.pbc
 
 $(PARROT_CONFIG) : tools/util/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc tools/util/parrot-config.pir
@@ -1834,6 +1841,7 @@ prog-clean :
     $(INSTALLABLECONFIG) \
     $(INSTALLABLENQP) \
     pbc_to_exe.pbc pbc_to_exe.c pbc_to_exe$(O) pbc_to_exe$(EXE) \
+    $(NCI_THUNK_GEN) parrot_nci_thunk_gen.c parrot_nci_thunk_gen$(O) parrot_nci_thunk_gen.pbc \
     parrot_config$(EXE) parrot_config.c parrot_config$(O) parrot_config.pbc \
     compilers/imcc/main$(O) \
     $(PDUMP) src/pbc_dump$(O) src/packdump$(O) \
