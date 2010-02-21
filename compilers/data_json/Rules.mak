@@ -1,10 +1,10 @@
 $(LIBRARY_DIR)/data_json.pbc: compilers/data_json/data_json.pbc
 	$(CP) compilers/data_json/data_json.pbc $@
-	
+
 compilers/data_json/data_json.pbc : \
-    runtime/parrot/library/PGE.pbc \
-    runtime/parrot/library/PGE/Util.pbc \
-    runtime/parrot/library/TGE.pbc \
+    $(LIBRARY_DIR)/PGE.pbc \
+    $(LIBRARY_DIR)/PGE/Util.pbc \
+    $(LIBRARY_DIR)/TGE.pbc \
     compilers/data_json/data_json/grammar.pir \
     compilers/data_json/data_json/pge2pir.pir
 
