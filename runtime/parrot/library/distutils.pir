@@ -14,7 +14,7 @@ Its goal is to make Parrot modules and extensions easily available
 to a wider audience with very little overhead for build/release/install mechanics.
 
 All the rules needed (dynops, dynpmc, pbc_to_exe, nqp, ...) are coded in this module distutils.
-A module author just must write a script C<setup.pir> (or C<setup.nqp> in future).
+A module author just must write a script C<setup.pir> or C<setup.nqp>.
 
 A setup script can be as simple as this:
 
@@ -456,15 +456,27 @@ Display a helpful message
 
 Overload the default message
 
+=item setup
+
+the default value is setup.pir
+
 =back
 
 =cut
 
 .sub '_usage' :anon
     .param pmc kv :slurpy :named
-    .local string msg
-    msg = <<'USAGE'
-usage: parrot setup.pir [target|--key value]*
+    .local string setup
+    setup = get_value('setup', "setup.pir" :named('default'), kv :flat :named)
+    .local string command
+    command = _command_setup(setup)
+
+    $P0 = new 'FixedStringArray'
+    set $P0, 1
+    $P0[0] = command
+
+    $S0 = <<'USAGE'
+usage: %s [target|--key value]*
 
     Default targets are :
 
@@ -488,7 +500,8 @@ usage: parrot setup.pir [target|--key value]*
 
         help:           Print this help message.
 USAGE
-    $S0 = get_value('usage', msg :named('default'), kv :flat :named)
+    $S0 = sprintf $S0, $P0
+    $S0 = get_value('usage', $S0 :named('default'), kv :flat :named)
     say $S0
 .end
 
@@ -2489,6 +2502,10 @@ Same options as install.
 
 =item project_uri
 
+=item setup
+
+the default value is setup.pir
+
 =back
 
 =cut
@@ -2562,6 +2579,11 @@ Same options as install.
     keywords .= "\""
   L10:
 
+    .local string setup
+    setup = get_value('setup', "setup.pir" :named('default'), kv :flat :named)
+    .local string instruction
+    instruction = _plumage_instruction(setup)
+
     .local string vcs
     vcs = get_vcs()
 
@@ -2575,7 +2597,7 @@ Same options as install.
     project_uri =get_value('project_uri', kv :flat :named)
 
     $P0 = new 'FixedStringArray'
-    set $P0, 16
+    set $P0, 23
     $P0[0] = name
     $P0[1] = abstract
     $P0[2] = authority
@@ -2586,12 +2608,19 @@ Same options as install.
     $P0[7] = packager
     $P0[8] = keywords
     $P0[9] = description
-    $P0[10] = name
-    $P0[11] = vcs
-    $P0[12] = vcs
-    $P0[13] = checkout_uri
-    $P0[14] = browser_uri
-    $P0[15] = project_uri
+    $P0[10] = instruction
+    $P0[11] = instruction
+    $P0[12] = instruction
+    $P0[13] = instruction
+    $P0[14] = instruction
+    $P0[15] = instruction
+    $P0[16] = instruction
+    $P0[17] = name
+    $P0[18] = vcs
+    $P0[19] = vcs
+    $P0[20] = checkout_uri
+    $P0[21] = browser_uri
+    $P0[22] = project_uri
 
     $S0 = <<'TEMPLATE'
 {
@@ -2618,25 +2647,25 @@ Same options as install.
             "type" : "repository"
         },
         "update"   : {
-            "type" : "parrot_setup"
+            "type" : "%s"
         },
         "build"    : {
-            "type" : "parrot_setup"
+            "type" : "%s"
         },
         "test"     : {
-            "type" : "parrot_setup"
+            "type" : "%s"
         },
         "smoke"    : {
-            "type" : "parrot_setup"
+            "type" : "%s"
         },
         "install"  : {
-            "type" : "parrot_setup"
+            "type" : "%s"
         },
         "uninstall": {
-            "type" : "parrot_setup"
+            "type" : "%s"
         },
         "clean"    : {
-            "type" : "parrot_setup"
+            "type" : "%s"
         }
     },
     "dependency-info"  : {
@@ -2672,6 +2701,18 @@ TEMPLATE
     .return (str)
 .end
 
+.sub '_plumage_instruction' :anon
+    .param string setup
+    .local string instruction
+    instruction = "parrot_setup"
+    $I0 = index setup, "."
+    $S0 = substr setup, $I0
+    unless $S0 == '.nqp' goto L1
+    instruction = "nqp_setup"
+  L1:
+    .return (instruction)
+.end
+
 =head3 Step manifest
 
 =over 4
@@ -2694,6 +2735,10 @@ pbc_pbc, exe_pbc, installable_pbc, dynops, dynpmc, html_pod
 =item inst_bin, inst_dynext, inst_inc, inst_lang, inst_lib
 
 =item harness_files, prove_files
+
+=item setup
+
+the default value is setup.pir
 
 =back
 
@@ -2758,7 +2803,9 @@ pbc_pbc, exe_pbc, installable_pbc, dynops, dynpmc, html_pod
     _manifest_add_glob(needed, 't/*.t')
   L7:
 
-    $P0 = split ' ', 'setup.pir setup.nqp t/harness'
+    $P0 = split ' ', 't/harness'
+    $S0 = get_value('setup', 'setup.pir' :named('default'), kv :flat :named)
+    push $P0, $S0
   L8:
     unless $P0 goto L9
     $S0 = shift $P0
@@ -3125,7 +3172,11 @@ the default value is ports/rpm
 
 =item inst_bin, inst_dynext, inst_inc, inst_lang, inst_lib
 
-=back
+=item setup
+
+the default value is setup.pir
+
+back
 
 =cut
 
@@ -3200,8 +3251,13 @@ the default value is ports/rpm
     .local string packager
     packager = get_value('packager', "you <you@you.org>" :named('default'), kv :flat :named)
 
+    .local string setup
+    setup = get_value('setup', "setup.pir" :named('default'), kv :flat :named)
+    .local string command
+    command = _command_setup(setup)
+
     $P0 = new 'FixedStringArray'
-    set $P0, 9
+    set $P0, 12
     $P0[0] = parrot_version
     $P0[1] = name
     $P0[2] = version
@@ -3211,6 +3267,9 @@ the default value is ports/rpm
     $P0[6] = project_uri
     $P0[7] = tarball
     $P0[8] = description
+    $P0[9] = command
+    $P0[10] = command
+    $P0[11] = command
 
     $S0 = <<'TEMPLATE'
 %%define parrot_version %s
@@ -3234,14 +3293,14 @@ BuildRoot:      %%{_tmppath}/%%{name}-%%{version}-%%{release}
 %%setup -n %%{name}-%%{version}
 
 %%build
-parrot setup.pir
+%s
 
 %%install
 rm -rf $RPM_BUILD_ROOT
-parrot setup.pir --root $RPM_BUILD_ROOT install
+%s --root $RPM_BUILD_ROOT install
 
 %%check
-parrot setup.pir test
+%s test
 
 %%clean
 rm -rf $RPM_BUILD_ROOT
@@ -3281,6 +3340,18 @@ TEMPLATE
     spec .= packager
     spec .= "\n- created by distutils\n"
     .return (spec)
+.end
+
+.sub '_command_setup' :anon
+    .param string setup
+    .local string command
+    command = "parrot setup.pir"
+    $I0 = index setup, "."
+    $S0 = substr setup, $I0
+    unless $S0 == '.nqp' goto L1
+    command = "parrot-nqp setup.nqp"
+  L1:
+    .return (command)
 .end
 
 =head3 Step bdist_rpm
@@ -3342,6 +3413,10 @@ the default value is ports/debian
 =item installable_pbc, dynops, dynpmc
 
 =item inst_bin, inst_dynext, inst_inc, inst_lang, inst_lib
+
+=item setup
+
+the default value is setup.pir
 
 =back
 
@@ -3558,6 +3633,17 @@ TEMPLATE
 .sub 'mk_deb_rules' :anon
     .param pmc kv :slurpy :named
 
+    .local string setup
+    setup = get_value('setup', "setup.pir" :named('default'), kv :flat :named)
+    .local string command
+    command = _command_setup(setup)
+
+    $P0 = new 'FixedStringArray'
+    set $P0, 3
+    $P0[0] = command
+    $P0[1] = command
+    $P0[2] = command
+
     $S0 = <<'TEMPLATE'
 #!/usr/bin/make -f
 # -*- makefile -*-
@@ -3572,14 +3658,14 @@ configure-stamp:
 build: build-stamp
 build-stamp: configure-stamp
 	dh_testdir
-	parrot setup.pir build
+	%s build
 	touch $@
 
 clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp configure-stamp
-	parrot setup.pir clean
+	%s clean
 	dh_clean
 
 install: build
@@ -3587,7 +3673,7 @@ install: build
 	dh_testroot
 	dh_prep
 	dh_installdirs
-	parrot setup.pir --root $(CURDIR)/debian/tmp install
+	%s --root $(CURDIR)/debian/tmp install
 	dh_install --sourcedir=$(CURDIR)/debian/tmp --list-missing
 
 # Build architecture-independent files here.
@@ -3616,6 +3702,7 @@ binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install configure
 
 TEMPLATE
+    $S0 = sprintf $S0, $P0
     .return ($S0)
 .end
 
@@ -3685,6 +3772,10 @@ See L<http://devmanual.gentoo.org/>.
 
 =item doc_files
 
+=item setup
+
+the default value is setup.pir
+
 =back
 
 =cut
@@ -3731,6 +3822,11 @@ See L<http://devmanual.gentoo.org/>.
     .local string license_type
     license_type = get_value('license_type', kv :flat :named)
 
+    .local string setup
+    setup = get_value('setup', "setup.pir" :named('default'), kv :flat :named)
+    .local string command
+    command = _command_setup(setup)
+
     .local string doc
     doc = ''
     $I0 = exists kv['doc_files']
@@ -3749,11 +3845,14 @@ See L<http://devmanual.gentoo.org/>.
   L1:
 
     $P0 = new 'FixedStringArray'
-    set $P0, 4
+    set $P0, 7
     $P0[0] = description
     $P0[1] = project_uri
     $P0[2] = license_type
-    $P0[3] = doc
+    $P0[3] = command
+    $P0[4] = command
+    $P0[5] = doc
+    $P0[6] = command
 
     $S0 = <<'TEMPLATE'
 
@@ -3770,16 +3869,16 @@ IUSE=""
 #RDEPEND=""
 
 src_compile() {
-    parrot setup.pir build || die "build failed"
+    %s build || die "build failed"
 }
 
 src_install() {
-    parrot setup.pir --root ${D} install || die "install failed"
+    %s --root ${D} install || die "install failed"
 %s
 }
 
 src_test() {
-    parrot setup.pir test || die "test failed"
+    %s test || die "test failed"
 }
 TEMPLATE
     $S0 = sprintf $S0, $P0
