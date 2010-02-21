@@ -266,6 +266,7 @@ Returns whether the class is or inherits from C<*classname>.
 
         return 0;
     }
+
 /*
 
 =item C<INTVAL isa(STRING *classname)>
@@ -382,6 +383,7 @@ Gets the name of the PMC.
 =cut
 
 */
+
     METHOD name() {
         Parrot_Class_attributes * const _pmc     = PARROT_CLASS(SELF);
         STRING       * const ret_name = _pmc->name;
@@ -397,6 +399,7 @@ Gets the namespace that this class is attached to.
 =cut
 
 */
+
     METHOD get_namespace() {
         Parrot_Class_attributes * const _pmc          = PARROT_CLASS(SELF);
         PMC          * const ret_namespace = _pmc->_namespace;
@@ -412,6 +415,7 @@ Creates an instance of the PMC.
 =cut
 
 */
+
     METHOD new(PMC *args :optional, int got_args :opt_flag) {
         PMC * const obj = VTABLE_instantiate(interp, SELF, args);
         UNUSED(got_args);
@@ -427,6 +431,7 @@ Return a hash where the keys are method names and the values are methods.
 =cut
 
 */
+
     METHOD methods() {
         PMC * const ret_methods = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "methods"));
         RETURN(PMC *ret_methods);
@@ -441,6 +446,7 @@ Return the parents array PMC.
 =cut
 
 */
+
     METHOD parents() {
         PMC * const ret_parents = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "parents"));
         RETURN(PMC *ret_parents);
@@ -456,6 +462,7 @@ parameter is supplied, a particular item of introspection data.
 =cut
 
 */
+
     METHOD inspect(STRING *what :optional, int got_what :opt_flag) {
         /* Just delegate to the appropriate vtable method. */
         PMC * const found =
