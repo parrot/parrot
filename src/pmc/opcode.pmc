@@ -90,10 +90,9 @@ pmclass Opcode auto_attrs {
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL i) {
         Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
-        INTVAL type = i < attrs->info->op_count - 1 ?
-            attrs->info->types[i] :
-            -1;
-        return type;
+        return i < attrs->info->op_count - 1
+               ? (INTVAL)attrs->info->types[i]
+               : -1;
     }
 }
 
