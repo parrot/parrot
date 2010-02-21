@@ -4405,37 +4405,22 @@ Return the whole config
     .return ($S0)
 .end
 
-=item probe_include
+=item cc_run
 
 =cut
 
-.sub 'probe_include'
-    .param string include
-    .param int verbose          :named('verbose') :optional
+.sub 'cc_run'
+    .param string source
     .param string cflags        :named('cflags') :optional
     .param int has_cflags       :opt_flag
-
-    $S0 = <<'SOURCE_C'
-#include <%s>
-#include <stdio.h>
-
-int
-main(int argc, char* argv[])
-{
-    printf("%s OK\n");
-    return 0;
-}
-SOURCE_C
-    $P0 = new 'FixedStringArray'
-    set $P0, 2
-    $P0[0] = include
-    $P0[1] = include
-    $S0 = sprintf $S0, $P0
-    spew('probe.c', $S0)
-
-    .local string probe
+    .param string ldflags       :named('ldflags') :optional
+    .param int has_ldflags      :opt_flag
+    .param int verbose          :named('verbose') :optional
+    .const string srcname = 'tmp.c'
+    spew(srcname, source)
+    .local string exename
     $S0 = get_exe()
-    probe = "probe" . $S0
+    exename = 'tmp' . $S0
     .local pmc config
     config = get_config()
     .local string cmd
@@ -4447,15 +4432,55 @@ SOURCE_C
     cmd .= " "
     cmd .= cflags
   L1:
-    cmd .= " probe.c -o "
-    cmd .= probe
+    cmd .= " "
+    $S0 = get_ldflags()
+    cmd .= $S0
+    unless has_ldflags goto L2
+    cmd .= " "
+    cmd .= ldflags
+  L2:
+    cmd .= " "
+    cmd .= srcname
+    cmd .= " -o "
+    cmd .= exename
     system(cmd, verbose :named('verbose'), 1 :named('ignore_error'))
+    unlink(srcname, verbose :named('verbose'))
 
-    cmd = "./" . probe
-    $I0 = system(cmd, verbose :named('verbose'), 1 :named('ignore_error'))
+    cmd = "./" . exename
+    $P0 = open cmd, 'rp'
+    $S0 = $P0.'readall'()
+    $P0.'close'()
 
-    unlink('probe.c', verbose :named('verbose'))
-    unlink(probe, verbose :named('verbose'))
+    unlink(exename, verbose :named('verbose'))
+    .return ($S0)
+.end
+
+
+=item probe_include
+
+=cut
+
+.sub 'probe_include'
+    .param string include
+    .param string cflags        :named('cflags') :optional
+    .param int verbose          :named('verbose') :optional
+    $P0 = new 'FixedStringArray'
+    set $P0, 2
+    $P0[0] = include
+    $P0[1] = include
+    $S0 = sprintf <<'SOURCE_C', $P0
+#include <%s>
+#include <stdio.h>
+
+int
+main(int argc, char* argv[])
+{
+    printf("OK %s\n");
+    return 0;
+}
+SOURCE_C
+    $S0 = cc_run($S0, cflags :named('cflags'), verbose :named('verbose'))
+    $I0 = index $S0, 'OK '
     .return ($I0)
 .end
 
