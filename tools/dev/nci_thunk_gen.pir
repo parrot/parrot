@@ -337,6 +337,8 @@ USAGE
 /* All our static functions that call in various ways. Yes, terribly
    hackish, but that is just fine */
 
+PARROT_DYNEXT_EXPORT void Parrot_glut_nci_loader(PARROT_INTERP);
+
 HEAD
     .return (head)
 .end
