@@ -1584,8 +1584,8 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         ARGIN(PMC *raw_sig), ARGIN(void *return_info), ARGIN(struct pcc_get_funcs *accessor))
 {
     ASSERT_ARGS(fill_results)
-    INTVAL *return_array;
-    INTVAL *result_array;
+    INTVAL *return_array       = NULL;
+    INTVAL *result_array       = NULL;
     PMC    *result_sig         = NULL;
     PMC    * const ctx         = CURRENT_CONTEXT(interp);
     PMC    *named_used_list    = PMCNULL;
