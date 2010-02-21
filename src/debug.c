@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -1254,7 +1254,6 @@ PDB_get_command(PARROT_INTERP)
         strcpy(pdb->cur_command, buf);
     }
     else {
-
         /* update the last command */
         if (pdb->cur_command[0] != '\0')
             strcpy(pdb->last_command, pdb->cur_command);
@@ -1263,44 +1262,26 @@ PDB_get_command(PARROT_INTERP)
 
         c = pdb->cur_command;
 
-        /*Parrot_io_eprintf(pdb->debugger, "\n(pdb) ");*/
         Parrot_io_eprintf(pdb->debugger, "\n");
 
-        /* skip leading whitespace */
-/*
-        do {
-            ch = fgetc(stdin);
-        } while (isspace((unsigned char)ch) && ch != '\n');
-*/
         {
-        Interp * interpdeb = interp->pdb->debugger;
-        STRING * readline = CONST_STRING(interpdeb, "readline_interactive");
-        STRING * prompt = CONST_STRING(interpdeb, "(pdb) ");
-        STRING *s= Parrot_str_new(interpdeb, NULL, 0);
-        PMC *tmp_stdin = Parrot_io_stdhandle(interpdeb, 0, NULL);
+            Interp *interpdeb = interp->pdb->debugger;
+            STRING *readline  = CONST_STRING(interpdeb, "readline_interactive");
+            STRING *prompt    = CONST_STRING(interpdeb, "(pdb) ");
+            STRING *s         = Parrot_str_new(interpdeb, NULL, 0);
+            PMC    *tmp_stdin = Parrot_io_stdhandle(interpdeb, 0, NULL);
 
-        Parrot_pcc_invoke_method_from_c_args(interpdeb,
-            tmp_stdin, readline,
-            "S->S", prompt, & s);
-        {
-        char * const aux = Parrot_str_to_cstring(interpdeb, s);
-        strcpy(c, aux);
-        Parrot_str_free_cstring(aux);
-        }
-        ch = '\n';
-        }
+            Parrot_pcc_invoke_method_from_c_args(interpdeb,
+                tmp_stdin, readline,
+                "S->S", prompt, & s);
+            {
+                char * const aux = Parrot_str_to_cstring(interpdeb, s);
+                strcpy(c, aux);
+                Parrot_str_free_cstring(aux);
+            }
 
-        /* generate string (no more than buffer length) */
-/*
-        while (ch != EOF && ch != '\n' && (i < DEBUG_CMD_BUFFER_LENGTH)) {
-            c[i++] = (char)ch;
-            ch     = fgetc(tmp_stdin);
+            ch = '\n';
         }
-
-        c[i] = '\0';
-*/
-        if (ch == -1)
-            strcpy(c, "quit");
     }
 }
 
