@@ -469,6 +469,7 @@ really a public API.
 Return the given namespace item or PMCNULL. If the named item is either
 a NameSpace or a var, the var is returned.
 
+TT #1472
 TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
 
 =cut
