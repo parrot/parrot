@@ -18,12 +18,14 @@ Implements oplib  VTABLEs.
 
 /* TODO: Since Opcode PMCs are essentially read-only after initialization
          here, we should cache them. A FixedPMCArray would be okay, an
-         INTVAL->PMC HASH might be better, since it's unlike that we will
+         INTVAL->PMC HASH might be better, since it's unlikely that we will
          need to cache even a majority of the ~1300 ops. */
 static PMC *OPLIB_PMC_INSTANCE;
+static PMC *OPLIB_OPCODE_CACHE;
 pmclass OpLib {
     void class_init() {
         OPLIB_PMC_INSTANCE = NULL;
+        OPLIB_OPCODE_CACHE = NULL;
     }
 
     VTABLE void *get_pointer() {
@@ -32,6 +34,16 @@ pmclass OpLib {
 
     VTABLE void set_pointer(void *ptr) {
         OPLIB_PMC_INSTANCE = (PMC *)ptr;
+    }
+
+    VTABLE void init() {
+        if (OPLIB_OPCODE_CACHE == NULL)
+            OPLIB_OPCODE_CACHE = Parrot_pmc_new(INTERP, enum_class_Hash);
+    }
+
+    VTABLE void mark() {
+        if (OPLIB_OPCODE_CACHE != NULL)
+            Parrot_gc_mark_PMC_alive(INTERP, OPLIB_OPCODE_CACHE);
     }
 
     /* Look up an opnumber given the name of the op. First we look for the
@@ -51,10 +63,16 @@ pmclass OpLib {
     }
 
     VTABLE PMC* get_pmc_keyed_str(STRING *name) {
-        PMC * const op = Parrot_pmc_new_noinit(INTERP, enum_class_Opcode);
-        VTABLE_set_string_native(INTERP, op, name);
-        PObj_custom_mark_SET(op);
-        return op;
+        if (VTABLE_defined_keyed_str(INTERP, OPLIB_OPCODE_CACHE, name)) {
+            PMC * const op = VTABLE_get_pmc_keyed_str(INTERP, OPLIB_OPCODE_CACHE, name);
+            return op;
+        } else {
+            PMC * const op = Parrot_pmc_new_noinit(INTERP, enum_class_Opcode);
+            VTABLE_set_string_native(INTERP, op, name);
+            PObj_custom_mark_SET(op);
+            VTABLE_set_pmc_keyed_str(INTERP, OPLIB_OPCODE_CACHE, name, op);
+            return op;
+        }
     }
 
     VTABLE PMC* get_pmc_keyed(PMC *key) {
@@ -63,10 +81,15 @@ pmclass OpLib {
     }
 
     VTABLE PMC* get_pmc_keyed_int(INTVAL value) {
-        PMC * const op = Parrot_pmc_new_noinit(INTERP, enum_class_Opcode);
-        VTABLE_set_integer_native(INTERP, op, value);
-        PObj_custom_mark_SET(op);
-        return op;
+        if (value > interp->op_lib->op_count)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "OpLib: Opcode index %d out of bounds", value);
+        else {
+            const char * const name = interp->op_info_table[value].full_name;
+            const INTVAL len = strlen(name);
+            STRING * const newstr = Parrot_str_new(INTERP, name, len);
+            return VTABLE_get_pmc_keyed_str(INTERP, SELF, newstr);
+        }
     }
 
     VTABLE INTVAL get_integer() {
