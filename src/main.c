@@ -477,7 +477,7 @@ parseflags(PARROT_INTERP,
             break;
           case 't':
             if (opt.opt_arg && is_all_hex_digits(opt.opt_arg))
-                *trace = (Parrot_trace_flags)strtoul(opt.opt_arg, NULL, 16);
+                *trace = strtoul(opt.opt_arg, NULL, 16);
             else
                 *trace = PARROT_TRACE_OPS_FLAG;
             break;
