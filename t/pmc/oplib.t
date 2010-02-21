@@ -14,7 +14,7 @@ t/pmc/oplib.t - OpLib PMC
 
 .sub main :main
     .include 'test_more.pir'
-    plan(1)
+    plan(2)
     get_singleton()
 .end
 
@@ -23,8 +23,12 @@ t/pmc/oplib.t - OpLib PMC
     $I0 = isnull $P0
     is($I0, 0)
 
-    # TODO: How to test that this is actually a singleton?
-    #$P1 = new ['OpLib']
-    #is($P0, $P1)
+    $P1 = new ['OpLib']
+    eq_addr $P0, $P1, ok
+    ok(0, "all OpLibs aren't identical")
+    goto end
+ok:
+    ok(1, "all OpLibs are identical")
+end:
 .end
 
