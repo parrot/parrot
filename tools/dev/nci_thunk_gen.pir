@@ -373,19 +373,16 @@ HEAD
 %s void
 %s(PARROT_INTERP)
 {
-    PMC        *iglobals;
-    PMC        *temp_pmc;
-
-    PMC        *HashPointer   = NULL;
+    PMC *iglobals;
+    PMC *nci_funcs;
+    PMC *temp_pmc;
 
     iglobals = interp->iglobals;
-    if (PMC_IS_NULL(iglobals))
-        PANIC(interp, "iglobals isn't created yet");
+    PARROT_ASSERT(!(PMC_IS_NULL(iglobals)));
 
-    HashPointer = VTABLE_get_pmc_keyed_int(interp, iglobals,
+    nci_funcs = VTABLE_get_pmc_keyed_int(interp, iglobals,
             IGLOBALS_NCI_FUNCS);
-    if (PMC_IS_NULL(HashPointer))
-        PANIC(interp, "iglobals.nci_funcs isn't created yet");
+    PARROT_ASSERT(!(PMC_IS_NULL(nci_funcs)));
 
 FN_HEADER
 
@@ -407,7 +404,7 @@ FN_HEADER
         $S0 = 'sprintf'(<<'TEMPLATE', fn_name, key)
     temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)%s);
-    VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "%s"), temp_pmc);
+    VTABLE_set_pmc_keyed_str(interp, nci_funcs, CONST_STRING(interp, "%s"), temp_pmc);
 
 TEMPLATE
         code = concat code, $S0
@@ -434,19 +431,16 @@ FN_FOOTER
 %s void
 %s(PARROT_INTERP, SHIM(PMC *lib))
 {
-    PMC        *iglobals;
-    PMC        *temp_pmc;
-
-    PMC        *HashPointer   = NULL;
+    PMC *iglobals;
+    PMC *nci_funcs;
+    PMC *temp_pmc;
 
     iglobals = interp->iglobals;
-    if (PMC_IS_NULL(iglobals))
-        PANIC(interp, "iglobals isn't created yet");
+    PARROT_ASSERT(!(PMC_IS_NULL(iglobals)));
 
-    HashPointer = VTABLE_get_pmc_keyed_int(interp, iglobals,
+    nci_funcs = VTABLE_get_pmc_keyed_int(interp, iglobals,
             IGLOBALS_NCI_FUNCS);
-    if (PMC_IS_NULL(HashPointer))
-        PANIC(interp, "iglobals.nci_funcs isn't created yet");
+    PARROT_ASSERT(!(PMC_IS_NULL(nci_funcs)));
 
 FN_HEADER
 
@@ -468,7 +462,7 @@ FN_HEADER
         $S0 = 'sprintf'(<<'TEMPLATE', fn_name, key)
     temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)%s);
-    VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "%s"), temp_pmc);
+    VTABLE_set_pmc_keyed_str(interp, nci_funcs, CONST_STRING(interp, "%s"), temp_pmc);
 
 TEMPLATE
         code = concat code, $S0
