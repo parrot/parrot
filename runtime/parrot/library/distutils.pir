@@ -364,7 +364,7 @@ Entry point.
     if $I0 goto L11
     print "unknown target : "
     say $S0
-    run_step('usage')
+    run_step('usage', kv :flat :named)
   L12:
     pop_eh
     end
@@ -3345,12 +3345,13 @@ TEMPLATE
 .sub '_command_setup' :anon
     .param string setup
     .local string command
-    command = "parrot setup.pir"
-    $I0 = index setup, "."
+    command = "parrot "
+    $I0 = index setup, '.'
     $S0 = substr setup, $I0
     unless $S0 == '.nqp' goto L1
-    command = "parrot-nqp setup.nqp"
+    command = "parrot-nqp "
   L1:
+    command .= setup
     .return (command)
 .end
 
