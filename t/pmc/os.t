@@ -238,7 +238,8 @@ done:
         end
 .end
 CODE
-} else {
+}
+else {
   SKIP: {
     skip 'broken test TT #457', 1 if $solaris;
 

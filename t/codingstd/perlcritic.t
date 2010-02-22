@@ -80,7 +80,8 @@ if ( !@ARGV ) {
              map  { $_->path }
              grep { $_->read !~ m/use v6;/ }
              $dist->get_perl_language_files();
-} else {
+}
+else {
     @files = <@ARGV>;
 }
 

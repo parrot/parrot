@@ -290,7 +290,8 @@ $line = line_num(+21);
 my $location;
 if ($Test::Builder::VERSION <= eval '0.33') {
     $location = "in $0 at line $line";
-} else {
+}
+else {
     $location = "at $0 line $line";
 }
 test_out("not ok 1 - $desc # TODO foo");
@@ -300,10 +301,10 @@ $err = <<"ERR";
 # Expected error but exited cleanly
 # Received:
 # foo
-# 
+#
 # Expected:
 # /bar/
-# 
+#
 ERR
 chomp $err;
 test_err($err);
@@ -316,7 +317,8 @@ CODE
 OUTPUT
 if($Test::Builder::VERSION == 0.84) {
     test_test(title => $desc, skip_err => 1);
-} else {
+}
+else {
     test_test($desc);
 }
 

@@ -27,7 +27,7 @@ Test the examples in F<examples/tutorial>.
 my $manifest = maniread('MANIFEST');
 my %files;
 foreach my $file (keys %$manifest) {
-  next unless $file =~ m{examples/tutorial/.*pir$}; 
+  next unless $file =~ m{examples/tutorial/.*pir$};
   $files{$file}=undef;
 }
 
@@ -85,7 +85,7 @@ END_EXPECTED
 
     ##Note extra whitespace after 3rd hello
     '21_string_ops_repeat.pir' => << 'END_EXPECTED',
-Hello Hello Hello 
+Hello Hello Hello
 END_EXPECTED
 
     '22_string_ops_length.pir' => << 'END_EXPECTED',
@@ -244,7 +244,8 @@ foreach my $tutorial (sort keys %files) {
             @todo = (todo => $reason) if defined $reason;
         }
         example_output_is( $tutorial, $expected, @todo );
-    } else {
+    }
+    else {
         fail($tutorial);
     }
 }
