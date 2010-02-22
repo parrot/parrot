@@ -4525,10 +4525,15 @@ Return the whole config
     .const string srcname = 'tmp.c'
     spew(srcname, source)
     .local string exename
-    $S0 = get_exe()
-    exename = 'tmp' . $S0
+    exename = 'tmp'
     .local pmc config
     config = get_config()
+    $S0 = config['osname']
+    if $S0 == 'MSWin32' goto L0
+    exename = './' . exename
+  L0:
+    $S0 = get_exe()
+    exename .= $S0
     .local string cmd
     cmd = config['cc']
     cmd .= " "
@@ -4552,8 +4557,7 @@ Return the whole config
     system(cmd, verbose :named('verbose'), 1 :named('ignore_error'))
     unlink(srcname, verbose :named('verbose'))
 
-    cmd = "./" . exename
-    $P0 = open cmd, 'rp'
+    $P0 = open exename, 'rp'
     $S0 = $P0.'readall'()
     $P0.'close'()
 
