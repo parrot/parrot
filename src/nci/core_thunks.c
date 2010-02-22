@@ -1040,10 +1040,12 @@ pcf_P_Ji(PARROT_INTERP, PMC *self)
 
 }
 
-
  void
 Parrot_nci_load_core_thunks(PARROT_INTERP)
-{
+;
+ void
+Parrot_nci_load_core_thunks(PARROT_INTERP)
+ {
     PMC *iglobals;
     PMC *nci_funcs;
     PMC *temp_pmc;
@@ -1230,6 +1232,7 @@ Parrot_nci_load_core_thunks(PARROT_INTERP)
     temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_P_Ji);
     VTABLE_set_pmc_keyed_str(interp, nci_funcs, CONST_STRING(interp, "PJi"), temp_pmc);
+
 
 }
 

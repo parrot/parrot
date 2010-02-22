@@ -337,8 +337,6 @@ USAGE
 /* All our static functions that call in various ways. Yes, terribly
    hackish, but that is just fine */
 
-PARROT_DYNEXT_EXPORT void Parrot_glut_nci_loader(PARROT_INTERP);
-
 HEAD
     .return (head)
 .end
@@ -367,72 +365,58 @@ HEAD
 .sub 'get_loader'
     .param pmc sigs
 
+    $S0 = 'get_loader_decl'(sigs)
+    $S1 = 'get_loader_body'(sigs)
+    $S2 = 'sprintf'(<<'LOADER', $S0, $S0, $S1)
+%s;
+%s {
+%s
+}
+LOADER
+    .return ($S2)
+.end
+
+.sub 'get_loader_decl'
+    .param pmc sigs
     $S0 = 'read_from_opts'(.LOADER_STORAGE_CLASS)
     $S1 = 'read_from_opts'(.LOADER_NAME)
-    .local string code
-    code = 'sprintf'(<<'FN_HEADER', $S0, $S1)
-
+    $S2 = 'sprintf'(<<'DECL', $S0, $S1)
 %s void
 %s(PARROT_INTERP)
-{
-    PMC *iglobals;
-    PMC *nci_funcs;
-    PMC *temp_pmc;
-
-    iglobals = interp->iglobals;
-    PARROT_ASSERT(!(PMC_IS_NULL(iglobals)));
-
-    nci_funcs = VTABLE_get_pmc_keyed_int(interp, iglobals,
-            IGLOBALS_NCI_FUNCS);
-    PARROT_ASSERT(!(PMC_IS_NULL(nci_funcs)));
-
-FN_HEADER
-
-    .local int i, n
-    i = 0
-    n = sigs
-    loop:
-        if i >= n goto end_loop
-
-        .local pmc sig
-        sig = shift sigs
-
-        .local string fn_name
-        fn_name = 'sig_to_fn_name'(sig :flat)
-
-        .local string key
-        key = join '', sig
-
-        $S0 = 'sprintf'(<<'TEMPLATE', fn_name, key)
-    temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
-    VTABLE_set_pointer(interp, temp_pmc, (void *)%s);
-    VTABLE_set_pmc_keyed_str(interp, nci_funcs, CONST_STRING(interp, "%s"), temp_pmc);
-
-TEMPLATE
-        code = concat code, $S0
-
-        inc i
-        goto loop
-    end_loop:
-
-    code = concat code, <<'FN_FOOTER'
-}
-FN_FOOTER
-
-    .return (code)
+DECL
+    .return ($S2)
 .end
 
 .sub 'get_dynext_loader'
     .param pmc sigs
 
+    $S0 = 'get_dynext_loader_decl'(sigs)
+    $S1 = 'get_loader_body'(sigs)
+    $S2 = 'sprintf'(<<'LOADER', $S0, $S0, $S1)
+%s;
+%s {
+%s
+}
+LOADER
+    .return ($S2)
+.end
+
+.sub 'get_dynext_loader_decl'
+    .param pmc sigs
+
     $S0 = 'read_from_opts'(.LOADER_STORAGE_CLASS)
     $S1 = 'read_from_opts'(.LOADER_NAME)
-    .local string code
-    code = 'sprintf'(<<'FN_HEADER', $S0, $S1)
-
+    $S2 = 'sprintf'(<<'DECL', $S0, $S1)
 %s void
 %s(PARROT_INTERP, SHIM(PMC *lib))
-{
+DECL
+    .return ($S2)
+.end
+
+.sub 'get_loader_body'
+    .param pmc sigs
+    .local string code
+    code = 'sprintf'(<<'HEADER', $S0, $S1)
     PMC *iglobals;
     PMC *nci_funcs;
     PMC *temp_pmc;
@@ -444,7 +428,7 @@ FN_FOOTER
             IGLOBALS_NCI_FUNCS);
     PARROT_ASSERT(!(PMC_IS_NULL(nci_funcs)));
 
-FN_HEADER
+HEADER
 
     .local int i, n
     i = 0
@@ -472,10 +456,6 @@ TEMPLATE
         inc i
         goto loop
     end_loop:
-
-    code = concat code, <<'FN_FOOTER'
-}
-FN_FOOTER
 
     .return (code)
 .end

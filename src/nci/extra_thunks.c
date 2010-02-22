@@ -6192,10 +6192,12 @@ if (t_2) Parrot_str_free_cstring(t_2);
 
 }
 
-
  void
 Parrot_nci_load_extra_thunks(PARROT_INTERP)
-{
+;
+ void
+Parrot_nci_load_extra_thunks(PARROT_INTERP)
+ {
     PMC *iglobals;
     PMC *nci_funcs;
     PMC *temp_pmc;
@@ -7222,6 +7224,7 @@ Parrot_nci_load_extra_thunks(PARROT_INTERP)
     temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
     VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_i_pitii);
     VTABLE_set_pmc_keyed_str(interp, nci_funcs, CONST_STRING(interp, "ipitii"), temp_pmc);
+
 
 }
 
