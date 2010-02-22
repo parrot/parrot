@@ -328,7 +328,7 @@ Entry point.
 
 =cut
 
-.sub 'setup'
+.sub 'setup' :multi()
     .param pmc args :slurpy
     .param pmc kv :slurpy :named
     .local pmc steps
@@ -372,6 +372,12 @@ Entry point.
     .local pmc ex
     .get_results (ex)
     rethrow ex
+.end
+
+.sub 'setup' :multi(ResizableStringArray,Hash)
+    .param pmc array
+    .param pmc hash
+    .tailcall setup(array :flat, hash :flat :named)
 .end
 
 =item run_step
