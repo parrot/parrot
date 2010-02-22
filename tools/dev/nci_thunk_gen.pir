@@ -1071,8 +1071,15 @@ JSON
     .param pmc extns :slurpy
 
     .local string dir, file, extn
-    $P0 = split "\\", full_path
+
+    # replace native file separator with '/'
+    $S0 = 'native_file_separator'()
+    $P0 = split $S0, full_path
     file = join "/", $P0
+
+    $P0 = split '/', file
+    file = pop $P0
+    dir = join '/', $P0
 
     extn_loop:
         unless extns goto end_extn_loop
@@ -1085,19 +1092,14 @@ JSON
         substr file, $I1, $I0, ''
     end_extn_loop:
 
-    .const string file_sep = '/'
-
-    strip_dir_loop:
-        $I0 = index file, file_sep
-        if $I0 < 0 goto end_strip_dir_loop
-        inc $I0
-        $S0 = substr file, 0, $I0
-        dir = concat dir, $S0
-        file = substr file, $I0
-        goto strip_dir_loop
-    end_strip_dir_loop:
-
     .return (dir, file, extn)
+.end
+
+.sub 'native_file_separator'
+    load_bytecode 'config.pbc'
+    $P0 = '_config'()
+    $S0 = $P0['slash']
+    .return ($S0)
 .end
 
 .sub 'alternate_whitespaces' :anon :immediate
