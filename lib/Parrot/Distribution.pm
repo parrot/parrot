@@ -608,7 +608,7 @@ sub is_pir {
 
     # test files (.t) files might need testing.
     # ignore everything else.
-    return 0 unless $filename !~ /\.t$/;
+    return 0 if $filename !~ /\.t$/;
 
     # Now let's check to see if there's a plain parrot shebang.
     open my $file_handle, '<', $filename
