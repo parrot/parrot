@@ -1,4 +1,6 @@
 #! parrot
+# Copyright (C) 2008-2010, Parrot Foundation.
+# $Id$
 
 .sub 'init_test_builder_tester'
     load_bytecode 'Test/Builder/Tester.pbc'
@@ -76,7 +78,7 @@
 .sub 'shutdown' :method
     ok( 1, 'shutdown called' )
 .end
-
+t/codingstd/svn_id.t
 .sub 'setup' :method
     ok( 1, 'setup one' )
     ok( 1, 'setup two' )
@@ -96,3 +98,9 @@
     ok( 4, 'bar second' )
     ok( 5, 'bar third' )
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
