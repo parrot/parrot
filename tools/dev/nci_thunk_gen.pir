@@ -1071,7 +1071,8 @@ JSON
     .param pmc extns :slurpy
 
     .local string dir, file, extn
-    file = clone full_path
+    $P0 = split "\\", full_path
+    file = join "/", $P0
 
     extn_loop:
         unless extns goto end_extn_loop
@@ -1084,7 +1085,6 @@ JSON
         substr file, $I1, $I0, ''
     end_extn_loop:
 
-    # TODO: make this portable
     .const string file_sep = '/'
 
     strip_dir_loop:
