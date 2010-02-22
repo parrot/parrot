@@ -66,7 +66,8 @@ pmclass OpLib singleton {
         if (VTABLE_defined_keyed_str(INTERP, OPLIB_OPCODE_CACHE, name)) {
             PMC * const op = VTABLE_get_pmc_keyed_str(INTERP, OPLIB_OPCODE_CACHE, name);
             return op;
-        } else {
+        }
+        else {
             PMC * const op = Parrot_pmc_new_noinit(INTERP, enum_class_Opcode);
             VTABLE_set_string_native(INTERP, op, name);
             PObj_custom_mark_SET(op);
