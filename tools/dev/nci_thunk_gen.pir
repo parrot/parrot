@@ -745,18 +745,21 @@ TEMPLATE
     end_comment:
 
     # convert whitespace into spaces
-    $S0 = '\t'
-    whitespace_loop:
-        $I0 = index line, $S0
-        if $I0 < 0 goto end_whitespace_loop
-        substr line, $I0, 1, ' '
-        goto whitespace_loop
-    end_whitespace_loop:
+    .const 'Sub' $P0 = 'alternate_whitespaces'
+    $P1 = iter $P0
+    outer_whitespace_loop:
+        unless $P1 goto end_outer_whitespace_loop
+        $S0 = shift $P1
 
-    if $S0 == "\n" goto end_whitespace
-        $S0 = "\n"
-        goto whitespace_loop
-    end_whitespace:
+        inner_whitespace_loop:
+            $I0 = index line, $S0
+            if $I0 < 0 goto end_inner_whitespace_loop
+            substr line, $I0, 1, ' '
+            goto inner_whitespace_loop
+        end_inner_whitespace_loop:
+
+        goto outer_whitespace_loop
+    end_outer_whitespace_loop:
 
     # turn multiple spaces into a single space
     multispace_loop:
@@ -1095,6 +1098,14 @@ JSON
     end_strip_dir_loop:
 
     .return (dir, file, extn)
+.end
+
+.sub 'alternate_whitespaces' :anon :immediate
+    $P0 = new ['ResizableStringArray']
+    push $P0, "\t"
+    push $P0, "\n"
+    push $P0, "\r"
+    .return ($P0)
 .end
 
 # }}}
