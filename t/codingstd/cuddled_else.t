@@ -23,7 +23,8 @@ t/codingstd/cuddled_else.t - checks for cuddled elses in source and headers
 
 =head1 DESCRIPTION
 
-Checks that files do not use cuddled else a.k.a C<} else {>.
+Checks that files do not use cuddled else, that is an else on the same
+line as the closing brace of the if part.
 
 =head1 SEE ALSO
 
