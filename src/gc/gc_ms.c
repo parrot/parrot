@@ -17,6 +17,15 @@ This code implements the default mark and sweep garbage collector.
 #include "parrot/parrot.h"
 #include "gc_private.h"
 
+PARROT_DOES_NOT_RETURN
+static void failed_allocation(unsigned int line, unsigned long size) /* HEADERIZER SKIP */
+{
+    fprintf(stderr, "Failed allocation of %lu bytes\n", size);
+    do_panic(NULL, "Out of mem", __FILE__, line);
+}
+
+#define PANIC_OUT_OF_MEM(size) failed_allocation(__LINE__, (size))
+
 /* HEADERIZER HFILE: src/gc/gc_private.h */
 
 /* HEADERIZER BEGIN: static */
@@ -1113,22 +1122,46 @@ static void *
 gc_ms_allocate_memory_chunk(PARROT_INTERP, size_t size)
 {
     ASSERT_ARGS(gc_ms_allocate_memory_chunk)
-    return mem_sys_allocate(size);
+    void * const ptr = malloc(size);
+#ifdef DETAIL_MEMORY_DEBUG
+    fprintf(stderr, "Allocated %i at %p\n", size, ptr);
+#endif
+    if (!ptr)
+        PANIC_OUT_OF_MEM(size);
+    return ptr;
 }
 
 static void *
-gc_ms_reallocate_memory_chunk(PARROT_INTERP, ARGFREE(void *data), size_t newsize)
+gc_ms_reallocate_memory_chunk(PARROT_INTERP, ARGFREE(void *from), size_t size)
 {
     ASSERT_ARGS(gc_ms_reallocate_memory_chunk)
-    return mem_sys_realloc(data, newsize);
+    void *ptr;
+#ifdef DETAIL_MEMORY_DEBUG
+    fprintf(stderr, "Freed %p (realloc -- %i bytes)\n", from, size);
+#endif
+    if (from)
+        ptr = realloc(from, size);
+    else
+        ptr = calloc(1, size);
+#ifdef DETAIL_MEMORY_DEBUG
+    fprintf(stderr, "Allocated %i at %p\n", size, ptr);
+#endif
+    if (!ptr)
+        PANIC_OUT_OF_MEM(size);
+    return ptr;
 }
 
 static void *
 gc_ms_allocate_memory_chunk_zeroed(PARROT_INTERP, size_t size)
 {
     ASSERT_ARGS(gc_ms_allocate_memory_chunk_zeroed)
-    /* FIXME UB of realloc to clear allocated memory */
-    return mem_sys_realloc(NULL, size);
+    void * const ptr = calloc(1, (size_t)size);
+#ifdef DETAIL_MEMORY_DEBUG
+    fprintf(stderr, "Allocated %i at %p\n", size, ptr);
+#endif
+    if (!ptr)
+        PANIC_OUT_OF_MEM(size);
+    return ptr;
 }
 
 static void *
@@ -1146,7 +1179,11 @@ static void
 gc_ms_free_memory_chunk(PARROT_INTERP, ARGFREE(void *data))
 {
     ASSERT_ARGS(gc_ms_free_memory_chunk)
-    mem_sys_free(data);
+#ifdef DETAIL_MEMORY_DEBUG
+    fprintf(stderr, "Freed %p\n", data);
+#endif
+    if (data)
+        free(data);
 }
 
 
