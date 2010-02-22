@@ -20,7 +20,7 @@ The Socket PMC performs network I/O operations.
 
 #include "../src/io/io_private.h"
 
-pmclass Socket extends Handle auto_attrs {
+pmclass Socket extends Handle provides socket auto_attrs {
     ATTR PMC *local;           /* Local addr                   */
     ATTR PMC *remote;          /* Remote addr                  */
 
@@ -63,21 +63,6 @@ Create a copy of the socket handle.
         data_struct->remote     = VTABLE_clone(interp, old_struct->remote);
 
         return SELF;
-    }
-
-/*
-
-=item C<INTVAL does(STRING * role)>
-
-=cut
-
-*/
-
-    VTABLE INTVAL does(STRING * role) {
-        Parrot_Socket_attributes * const attrs = PARROT_SOCKET(SELF);
-        if (Parrot_str_equal(interp, role, CONST_STRING(interp, "socket")))
-            return 1;
-        return SUPER(role);
     }
 
 /*
