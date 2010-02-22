@@ -78,7 +78,7 @@
 .sub 'shutdown' :method
     ok( 1, 'shutdown called' )
 .end
-t/codingstd/svn_id.t
+
 .sub 'setup' :method
     ok( 1, 'setup one' )
     ok( 1, 'setup two' )
