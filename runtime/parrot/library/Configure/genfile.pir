@@ -46,17 +46,28 @@ Pure PIR, without any dependencies.
     .param pmc config
     .param int verbose          :named('verbose') :optional
     .param int has_verbose      :opt_flag
+    .local int flag_replace_slash
+    flag_replace_slash = 1
+    $I0 = index outfile, '.'
+    if $I0 < 0 goto L1
+    $S0 = substr outfile, $I0
+    $I0 = index '.c .h .pir .pmc .t', $S0
+    if $I0 < 0 goto L1
+    flag_replace_slash = 0
+  L1:
     $S0 = slurp(tmpl)
     $S0 = conditioned_line($S0, config)
     $S0 = interpolate_var($S0, config)
     $S1 = sysinfo .SYSINFO_PARROT_OS
+    unless flag_replace_slash goto L2
     $S0 = replace_slash($S0, $S1)
+  L2:
     spew(outfile, $S0)
-    unless has_verbose goto L1
-    unless verbose goto L1
+    unless has_verbose goto L3
+    unless verbose goto L3
     print "generate "
     say outfile
-  L1:
+  L3:
 .end
 
 .sub 'slurp' :anon
