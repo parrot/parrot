@@ -1,5 +1,6 @@
 #!parrot
-# Copyright (C) 2006-2009, Parrot Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
+# $Id$
 
 =head1 NAME
 
@@ -14,7 +15,7 @@ t/pmc/packfileannotation.t - test the PackfileAnnotation PMC
 Tests the PackfileAnnotation PMC.
 
 =cut
-
+t/codingstd/pir_code_coda.t
 # PackfileAnnotation constructor
 .sub 'test' :main
 .include 'test_more.pir'
