@@ -4544,14 +4544,14 @@ Return the whole config
     cmd .= cflags
   L1:
     cmd .= " "
+    cmd .= srcname
+    cmd .= " "
     $S0 = get_ldflags()
     cmd .= $S0
     unless has_ldflags goto L2
     cmd .= " "
     cmd .= ldflags
   L2:
-    cmd .= " "
-    cmd .= srcname
     cmd .= " -o "
     cmd .= exename
     system(cmd, verbose :named('verbose'), 1 :named('ignore_error'))
