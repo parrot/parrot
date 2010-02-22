@@ -313,7 +313,7 @@ Get the size of native datatype $2 in $1.
 
 =cut
 
-inline op sizeof (out INT, in INT) {
+inline op sizeof (out INT, in INT) :deprecated {
     if ($2 < enum_first_type || $2 >= enum_last_type)
         $1 = -1;
     else
