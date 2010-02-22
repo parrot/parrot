@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 202007, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 # pmctree.t
 

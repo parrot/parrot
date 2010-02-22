@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2007-2008 Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -30,7 +30,7 @@ compile.
 my $manifest = maniread('MANIFEST');
 my %files;
 foreach my $file (keys %$manifest) {
-  next unless $file =~ m{^examples/.*(pir|pasm)$}; 
+  next unless $file =~ m{^examples/.*(pir|pasm)$};
   next if $file =~ m{^examples/tutorial}; # all are tested in tutorial.t
   next if $file =~ m{^examples/pir/befunge}; # language, not testable here
   next if $file =~ m{^examples/languages}; # language, not testable here
@@ -43,7 +43,7 @@ foreach my $file (keys %$manifest) {
 plan tests => scalar keys %files;
 
 foreach my $file (sort keys %files) {
-    my $cmd = File::Spec->curdir() . $PConfig{slash} . 
+    my $cmd = File::Spec->curdir() . $PConfig{slash} .
               $PConfig{test_prog} . " -o " . File::Spec->devnull() . " " .
               $file;
 

@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2009, The Perl Foundation.
+# Copyright (C) 2009-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -58,19 +58,19 @@ sub compile_ok {
     my $cmd = File::Spec->curdir() . $PConfig{slash} .
               $PConfig{test_prog} . " -o " . File::Spec->devnull() . " " .
               $tempfile . ' 2> ' . $err_tempfile;
- 
+
     my $description = join (':', map {$snippet->{$_}}
         qw(file line type modifier));
 
     my $rc = system($cmd);
     open my $errout_fh, '<', $err_tempfile;
 
-    my $error_output; 
+    my $error_output;
     {
         undef local $/;
         $error_output = <$errout_fh>;
     }
- 
+
     my $todo = 0;
     $todo = 1 if ($snippet->{modifier} =~ /TODO|INVALID/);
     TODO: {
@@ -78,7 +78,7 @@ sub compile_ok {
         local $TODO = 'invalid code' if $todo;
 
         is ($error_output,'',$description);
-    } 
+    }
 }
 
 sub get_samples {
@@ -112,7 +112,7 @@ sub get_samples {
             $snippet->{line} = $.;
             $snippet->{type} = $2;
             $snippet->{modifier} = defined($4) ? $4 : '';
-            $target = $1; 
+            $target = $1;
         }
     }
 
@@ -152,7 +152,7 @@ like:
 
 C<PASM> and C<PIR> are both valid target languages.
 
-Additionally, you can add the following modifiers (prepending with an 
+Additionally, you can add the following modifiers (prepending with an
 underscore).
 
 =over 4
@@ -173,7 +173,7 @@ For example, this PIR fragment uses an old, invalid opcode and needs
 to be updated:
 
  =begin PIR_FRAGMENT_INVALID
-   
+
     find_type $I1, 'Integer'
 
  =end PIR_FRAGMENT_INVALID
