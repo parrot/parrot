@@ -42,7 +42,7 @@ Parrot_on_exit(PARROT_INTERP, NOTNULL(exit_handler_f function), ARGIN_NULLOK(voi
 {
     ASSERT_ARGS(Parrot_on_exit)
 
-    handler_node_t * const new_node = mem_allocate_typed(handler_node_t);
+    handler_node_t * const new_node = mem_internal_allocate_typed(handler_node_t);
 
     new_node->function        = function;
     new_node->arg             = arg;
@@ -88,7 +88,7 @@ Parrot_exit(PARROT_INTERP, int status)
         handler_node_t * const next = node->next;
 
         (node->function)(interp, status, node->arg);
-        mem_sys_free(node);
+        mem_internal_free(node);
         node = next;
     }
 

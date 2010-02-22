@@ -283,6 +283,7 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/Getopt/Obj.pbc \
     $(LIBRARY_DIR)/Iter.pbc \
     $(LIBRARY_DIR)/JSON.pbc \
+    $(LIBRARY_DIR)/data_json.pbc \
     $(LIBRARY_DIR)/Math/Rand.pbc \
     $(LIBRARY_DIR)/MIME/Base64.pbc \
     $(LIBRARY_DIR)/NCI/Utils.pbc \

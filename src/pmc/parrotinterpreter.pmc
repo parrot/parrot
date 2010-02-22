@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -232,7 +232,7 @@ Initializes the interpreter.
          */
         if (!PMC_data(SELF)) {
             Parrot_ParrotInterpreter_attributes *attrs =
-                mem_allocate_zeroed_typed(Parrot_ParrotInterpreter_attributes);
+                mem_gc_allocate_zeroed_typed(INTERP, Parrot_ParrotInterpreter_attributes);
             PMC_data(SELF) = attrs;
         }
         if (!PMC_interp(SELF)) {
@@ -258,7 +258,7 @@ C<parent> and uses that thread.
 
         if (!PMC_data(SELF)) {
             Parrot_ParrotInterpreter_attributes *attrs =
-                mem_allocate_zeroed_typed(Parrot_ParrotInterpreter_attributes);
+                mem_gc_allocate_zeroed_typed(INTERP, Parrot_ParrotInterpreter_attributes);
             PMC_data(SELF) = attrs;
         }
         if (!PMC_interp(SELF)) {
@@ -280,7 +280,7 @@ Destroys the PMC.
 
     VTABLE void destroy() {
         if (PMC_data(SELF)) {
-            mem_sys_free(PMC_data(SELF));
+            mem_gc_free(INTERP, PMC_data(SELF));
             PMC_data(SELF) = NULL;
         }
     }
@@ -303,7 +303,7 @@ Sets C<struct_val> to C<*value>.
          * initialized, cheat by initializing instead. */
         if (!PMC_data(SELF)) {
             Parrot_ParrotInterpreter_attributes *attrs =
-                mem_allocate_zeroed_typed(Parrot_ParrotInterpreter_attributes);
+                mem_gc_allocate_zeroed_typed(INTERP, Parrot_ParrotInterpreter_attributes);
             PMC_data(SELF) = attrs;
             PObj_custom_destroy_SET(SELF);
         }
@@ -713,7 +713,7 @@ Finish thawing.
     VTABLE void thaw(PMC *info) {
         if (!PMC_data(SELF)) {
             Parrot_ParrotInterpreter_attributes *attrs =
-                mem_allocate_zeroed_typed(Parrot_ParrotInterpreter_attributes);
+                mem_gc_allocate_zeroed_typed(INTERP, Parrot_ParrotInterpreter_attributes);
             PMC_data(SELF) = attrs;
             PObj_custom_destroy_SET(SELF);
         }

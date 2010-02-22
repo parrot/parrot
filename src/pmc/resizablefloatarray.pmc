@@ -130,8 +130,7 @@ equal to three quarters of the old size).
                 cur          &= ~0xfff;
             }
             SET_ATTR_float_array(INTERP, SELF,
-                    (FLOATVAL*)mem_sys_realloc(float_array,
-                    cur * sizeof (FLOATVAL)));
+                    mem_gc_realloc_n_typed(INTERP, float_array, cur, FLOATVAL));
             SET_ATTR_size(INTERP, SELF, size);
             SET_ATTR_resize_threshold(INTERP, SELF, cur);
         }

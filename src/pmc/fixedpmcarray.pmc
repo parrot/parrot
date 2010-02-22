@@ -88,7 +88,7 @@ Destroys the array.
 
     VTABLE void destroy() {
         if (PMC_array(SELF))
-            mem_sys_free(PMC_array(SELF));
+            mem_gc_free(INTERP, PMC_array(SELF));
     }
 
 /*
@@ -107,7 +107,7 @@ Creates and returns a copy of the array.
 
         if (size) {
             PMC_size(dest)  = size;
-            PMC_array(dest) = mem_allocate_n_typed(size, PMC *);
+            PMC_array(dest) = mem_gc_allocate_n_zeroed_typed(INTERP, size, PMC *);
             mem_copy_n_typed(PMC_array(dest), PMC_array(SELF), size, PMC *);
             PObj_custom_mark_destroy_SETALL(dest);
         }
@@ -377,7 +377,7 @@ array.
                     _("FixedPMCArray: Cannot set array size to a negative number"));
 
         PMC_size(SELF) = size;
-        data           = mem_allocate_n_typed(size, PMC *);
+        data           = mem_gc_allocate_n_zeroed_typed(INTERP, size, PMC *);
 
         for (i = 0; i < size; i++)
             data[i] = PMCNULL;
@@ -397,10 +397,10 @@ array.
                     _("Can't set self from this type"));
 
         if (PMC_array(SELF))
-            mem_sys_free(PMC_array(SELF));
+            mem_gc_free(INTERP, PMC_array(SELF));
 
         size            = PMC_size(SELF) = VTABLE_elements(INTERP, value);
-        PMC_array(SELF) = mem_allocate_n_zeroed_typed(size, PMC *);
+        PMC_array(SELF) = mem_gc_allocate_n_zeroed_typed(INTERP, size, PMC *);
 
         for (i = 0; i < size; i++)
             (PMC_array(SELF))[i] = VTABLE_get_pmc_keyed_int(INTERP, value, i);

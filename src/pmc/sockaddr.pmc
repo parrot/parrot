@@ -46,7 +46,8 @@ Initializes the pointer object.
         Parrot_Sockaddr_attributes * const pdata_struct =
             (Parrot_Sockaddr_attributes *) PMC_data(SELF);
 
-        pdata_struct->pointer = mem_allocate_zeroed_typed(struct sockaddr_in);
+        pdata_struct->pointer = mem_gc_allocate_zeroed_typed(INTERP,
+                struct sockaddr_in);
         PObj_custom_destroy_SET(SELF);
     }
 

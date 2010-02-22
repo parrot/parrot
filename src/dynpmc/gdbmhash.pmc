@@ -73,7 +73,7 @@ static STRING* make_hash_key(PARROT_INTERP, NOTNULL(PMC * key))
 }
 
 
-pmclass GDBMHash provides hash dynpmc lib gdbm {
+pmclass GDBMHash provides hash dynpmc lib gdbm auto_attrs {
     ATTR struct GDBM_FH *db_handle;
 
 /*
@@ -100,18 +100,14 @@ So we do a bit of cheating here, and load it during class initialization.
     }
 
     VTABLE void init() {
-        Parrot_GDBMHash_attributes *attrs =
-            mem_allocate_zeroed_typed(Parrot_GDBMHash_attributes);
-
-        attrs->db_handle = mem_allocate_zeroed_typed(GDBM_FH);
-        PMC_data(SELF)   = attrs;
+        Parrot_GDBMHash_attributes *attrs = PARROT_GDBMHASH(SELF);
+        attrs->db_handle = mem_gc_allocate_zeroed_typed(INTERP, GDBM_FH);
         PObj_custom_destroy_SET(SELF);
     }
 
     VTABLE void destroy() {
-        mem_sys_free(
-                ((Parrot_GDBMHash_attributes *)PMC_data(SELF))->db_handle);
-        mem_sys_free(PMC_data(SELF));
+        Parrot_GDBMHash_attributes *attrs = PARROT_GDBMHASH(SELF);
+        mem_gc_free(INTERP, attrs->db_handle);
         PMC_data(SELF) = NULL;
     }
 

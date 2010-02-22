@@ -28,7 +28,7 @@ void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_in
     char    param_buf[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
     char   *param_sig    = sig_length <= 7
                          ? param_buf
-                         : mem_allocate_n_typed(sig_length, char);
+                         : mem_gc_allocate_n_typed(interp, sig_length, char);
     size_t  j            = 0;
     size_t  i;
 

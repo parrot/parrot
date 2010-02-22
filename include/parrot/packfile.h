@@ -451,9 +451,10 @@ void do_sub_pragmas(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void PackFile_add_segment(SHIM_INTERP,
+void PackFile_add_segment(PARROT_INTERP,
     ARGMOD(PackFile_Directory *dir),
     ARGIN(PackFile_Segment *seg))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*dir);
@@ -470,28 +471,32 @@ void PackFile_Annotations_add_entry(PARROT_INTERP,
         FUNC_MODIFIES(*self);
 
 PARROT_EXPORT
-void PackFile_Annotations_add_group(SHIM_INTERP,
+void PackFile_Annotations_add_group(PARROT_INTERP,
     ARGMOD(PackFile_Annotations *self),
     opcode_t offset)
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*self);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PackFile_Segment * PackFile_Annotations_new(SHIM_INTERP,
+PackFile_Segment * PackFile_Annotations_new(PARROT_INTERP,
     SHIM(struct PackFile *pf),
     SHIM(STRING *name),
-    NULLOK(int add));
+    NULLOK(int add))
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void PackFile_Constant_destroy(SHIM_INTERP,
+void PackFile_Constant_destroy(PARROT_INTERP,
     ARGMOD_NULLOK(PackFile_Constant *self))
+        __attribute__nonnull__(1)
         FUNC_MODIFIES(*self);
 
 PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-PackFile_Constant * PackFile_Constant_new(SHIM_INTERP);
+PackFile_Constant * PackFile_Constant_new(PARROT_INTERP)
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -655,10 +660,11 @@ void PackFile_Segment_dump(PARROT_INTERP, ARGIN(PackFile_Segment *self))
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PackFile_Segment * PackFile_Segment_new(SHIM_INTERP,
+PackFile_Segment * PackFile_Segment_new(PARROT_INTERP,
     SHIM(PackFile *pf),
     SHIM(STRING *name),
-    NULLOK(int add));
+    NULLOK(int add))
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -781,8 +787,9 @@ void default_dump_header(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 void mark_const_subs(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void PackFile_Annotations_destroy(SHIM_INTERP,
+void PackFile_Annotations_destroy(PARROT_INTERP,
     ARGMOD(PackFile_Segment *seg))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*seg);
 
@@ -830,7 +837,8 @@ void Parrot_trace_eprintf(ARGIN(const char *s), ...)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_PackFile_add_segment __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(dir) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(dir) \
     , PARROT_ASSERT_ARG(seg))
 #define ASSERT_ARGS_PackFile_Annotations_add_entry \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -838,10 +846,14 @@ void Parrot_trace_eprintf(ARGIN(const char *s), ...)
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_PackFile_Annotations_add_group \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(self))
-#define ASSERT_ARGS_PackFile_Annotations_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_PackFile_Constant_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_PackFile_Constant_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_PackFile_Annotations_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_PackFile_Constant_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_PackFile_Constant_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PackFile_Constant_pack_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
@@ -904,7 +916,8 @@ void Parrot_trace_eprintf(ARGIN(const char *s), ...)
 #define ASSERT_ARGS_PackFile_Segment_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
-#define ASSERT_ARGS_PackFile_Segment_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_PackFile_Segment_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PackFile_Segment_new_seg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(dir) \
@@ -954,7 +967,8 @@ void Parrot_trace_eprintf(ARGIN(const char *s), ...)
 #define ASSERT_ARGS_mark_const_subs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PackFile_Annotations_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(seg))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(seg))
 #define ASSERT_ARGS_PackFile_Annotations_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(seg))
@@ -1025,9 +1039,12 @@ void PackFile_assign_transforms(ARGMOD(PackFile *pf))
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-char * PF_fetch_cstring(ARGIN(PackFile *pf), ARGIN(const opcode_t **cursor))
+char * PF_fetch_cstring(PARROT_INTERP,
+    ARGIN(PackFile *pf),
+    ARGIN(const opcode_t **cursor))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL PF_fetch_integer(
@@ -1112,7 +1129,8 @@ opcode_t* PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
 #define ASSERT_ARGS_PackFile_assign_transforms __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pf))
 #define ASSERT_ARGS_PF_fetch_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(pf) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pf) \
     , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_PF_fetch_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(stream))

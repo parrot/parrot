@@ -153,7 +153,7 @@ box_number(PARROT_INTERP, FLOATVAL val) {
 }
 
 
-pmclass OrderedHash need_ext provides array provides hash {
+pmclass OrderedHash need_ext provides array provides hash auto_attrs {
     ATTR PMC    *hash;   /* key to item tuple */
     ATTR PMC    *first;  /* Pointer to first inserted value  */
     ATTR PMC    *last;   /* Pointer to last inserted value   */
@@ -170,9 +170,8 @@ Create new instance of OrderedHash.
 
     VTABLE void init() {
         Parrot_OrderedHash_attributes * const attrs =
-                mem_allocate_zeroed_typed(Parrot_OrderedHash_attributes);
+                (Parrot_OrderedHash_attributes*) PMC_data(SELF);
 
-        PMC_data(SELF)  = attrs;
         attrs->hash     = Parrot_pmc_new(INTERP, enum_class_Hash);
         attrs->first    = PMCNULL;
         attrs->last     = PMCNULL;

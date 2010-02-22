@@ -35,27 +35,30 @@ between blocks.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void analyse_life_block(
+static void analyse_life_block(PARROT_INTERP,
     ARGIN(const Basic_block* bb),
     ARGMOD(SymReg *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*r);
 
-static void analyse_life_symbol(
+static void analyse_life_symbol(PARROT_INTERP,
     ARGIN(const IMC_Unit *unit),
     ARGMOD(SymReg* r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(* r);
 
-static void bb_add_edge(
+static void bb_add_edge(PARROT_INTERP,
     ARGMOD(IMC_Unit *unit),
     ARGIN(Basic_block *from),
     ARGMOD(Basic_block *to))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
         FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(*to);
 
@@ -110,17 +113,19 @@ static void free_loops(ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*unit);
 
-static void init_basic_blocks(ARGMOD(IMC_Unit *unit))
+static void init_basic_blocks(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static Basic_block* make_basic_block(
+static Basic_block* make_basic_block(PARROT_INTERP,
     ARGMOD(IMC_Unit *unit),
     ARGMOD(Instruction *ins))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(*ins);
 
@@ -145,13 +150,16 @@ static void sort_loops(PARROT_INTERP, ARGIN(IMC_Unit *unit))
         __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_analyse_life_block __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(bb) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(bb) \
     , PARROT_ASSERT_ARG(r))
 #define ASSERT_ARGS_analyse_life_symbol __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(unit) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(r))
 #define ASSERT_ARGS_bb_add_edge __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(unit) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(from) \
     , PARROT_ASSERT_ARG(to))
 #define ASSERT_ARGS_bb_check_set_addr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -180,9 +188,11 @@ static void sort_loops(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 #define ASSERT_ARGS_free_loops __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_init_basic_blocks __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(unit))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_make_basic_block __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(unit) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(ins))
 #define ASSERT_ARGS_mark_loop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -267,7 +277,7 @@ find_basic_blocks(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int first)
     unsigned int          i;
 
     IMCC_info(interp, 2, "find_basic_blocks\n");
-    init_basic_blocks(unit);
+    init_basic_blocks(interp, unit);
 
     for (i = 0; i < hsh->size; i++) {
         SymReg *r;
@@ -288,7 +298,7 @@ find_basic_blocks(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int first)
 
     ins->index = i = 0;
 
-    bb         = make_basic_block(unit, ins);
+    bb         = make_basic_block(interp, unit, ins);
 
     if (ins->type & ITBRANCH) {
         SymReg * const addr = get_branch_reg(bb->end);
@@ -326,7 +336,7 @@ find_basic_blocks(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int first)
             nu = 0;
         else if (ins->type & ITLABEL) {
             bb->end = ins->prev;
-            bb      = make_basic_block(unit, ins);
+            bb      = make_basic_block(interp, unit, ins);
         }
 
         /* a branch is the end of a basic block
@@ -342,7 +352,7 @@ find_basic_blocks(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int first)
                 continue;
 
             if (ins->next)
-                bb = make_basic_block(unit, ins->next);
+                bb = make_basic_block(interp, unit, ins->next);
 
             nu = 1;
         }
@@ -380,8 +390,8 @@ bb_check_set_addr(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
                     ins->symregs[1]->name);
 
             /* connect this block with first and last block */
-            bb_add_edge(unit, unit->bb_list[0], bb);
-            bb_add_edge(unit, unit->bb_list[unit->n_basic_blocks - 1], bb);
+            bb_add_edge(interp, unit, unit->bb_list[0], bb);
+            bb_add_edge(interp, unit, unit->bb_list[unit->n_basic_blocks - 1], bb);
 
             /* and mark the instruction as being kind of a branch */
             bb->start->type |= ITADDR;
@@ -419,7 +429,7 @@ build_cfg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
         /* if the block can fall-through */
         if (i > 0 && ! (last->end->type & IF_goto))
-            bb_add_edge(unit, last, bb);
+            bb_add_edge(interp, unit, last, bb);
 
         /* check first ins, if label try to find a set_addr op */
         if (bb->start->type & ITLABEL)
@@ -433,7 +443,7 @@ build_cfg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         else if (STREQ(bb->start->opname, "invoke")
              ||  STREQ(bb->start->opname, "invokecc")) {
             if (check_invoke_type(interp, unit, bb->start) == INVOKE_SUB_LOOP)
-                bb_add_edge(unit, bb, unit->bb_list[0]);
+                bb_add_edge(interp, unit, bb, unit->bb_list[0]);
         }
 
         last = bb;
@@ -486,14 +496,14 @@ bb_findadd_edge(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Basic_block *from),
     const SymReg * const r = find_sym(interp, label->name);
 
     if (r && (r->type & VTADDRESS) && r->first_ins)
-        bb_add_edge(unit, from, unit->bb_list[r->first_ins->bbindex]);
+        bb_add_edge(interp, unit, from, unit->bb_list[r->first_ins->bbindex]);
     else {
         IMCC_debug(interp, DEBUG_CFG, "register branch %I ", from->end);
         for (ins = from->end; ins; ins = ins->prev) {
             if ((ins->type & ITBRANCH)
             &&   STREQ(ins->opname, "set_addr")
             &&   ins->symregs[1]->first_ins) {
-                bb_add_edge(unit, from,
+                bb_add_edge(interp, unit, from,
                     unit-> bb_list[ins->symregs[1]->first_ins->bbindex]);
                 IMCC_debug(interp, DEBUG_CFG, "(%s) ", ins->symregs[1]->name);
                 break;
@@ -538,8 +548,8 @@ blocks_are_connected(ARGIN(const Basic_block *from),
 
 /*
 
-=item C<static void bb_add_edge(IMC_Unit *unit, Basic_block *from, Basic_block
-*to)>
+=item C<static void bb_add_edge(PARROT_INTERP, IMC_Unit *unit, Basic_block
+*from, Basic_block *to)>
 
 Adds an edge between the two given blocks.
 
@@ -548,8 +558,10 @@ Adds an edge between the two given blocks.
 */
 
 static void
-bb_add_edge(ARGMOD(IMC_Unit *unit), ARGIN(Basic_block  *from),
-                                    ARGMOD(Basic_block *to))
+bb_add_edge(PARROT_INTERP,
+        ARGMOD(IMC_Unit *unit),
+        ARGIN(Basic_block  *from),
+        ARGMOD(Basic_block *to))
 {
     ASSERT_ARGS(bb_add_edge)
     Edge *e;
@@ -558,7 +570,7 @@ bb_add_edge(ARGMOD(IMC_Unit *unit), ARGIN(Basic_block  *from),
 
     /* we assume that the data is correct, and thus if the edge is not
      * on the predecessors of 'from', it won't be on the successors of 'to' */
-    e             = mem_allocate_typed(Edge);
+    e             = mem_gc_allocate_typed(interp, Edge);
 
     e->succ_next  = from->succ_list;
     e->from       = from;
@@ -708,13 +720,14 @@ life_analysis(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
     IMCC_info(interp, 2, "life_analysis\n");
 
     for (i = 0; i < unit->n_symbols; i++)
-        analyse_life_symbol(unit, reglist[i]);
+        analyse_life_symbol(interp, unit, reglist[i]);
 }
 
 
 /*
 
-=item C<static void analyse_life_symbol(const IMC_Unit *unit, SymReg* r)>
+=item C<static void analyse_life_symbol(PARROT_INTERP, const IMC_Unit *unit,
+SymReg* r)>
 
 Analyzes the lifetime for a given symbol.
 
@@ -723,7 +736,8 @@ Analyzes the lifetime for a given symbol.
 */
 
 static void
-analyse_life_symbol(ARGIN(const IMC_Unit *unit), ARGMOD(SymReg* r))
+analyse_life_symbol(PARROT_INTERP,
+        ARGIN(const IMC_Unit *unit), ARGMOD(SymReg* r))
 {
     ASSERT_ARGS(analyse_life_symbol)
     unsigned int i;
@@ -735,13 +749,13 @@ analyse_life_symbol(ARGIN(const IMC_Unit *unit), ARGMOD(SymReg* r))
     if (r->life_info)
         free_life_info(unit, r);
 
-    r->life_info = mem_allocate_n_zeroed_typed(unit->n_basic_blocks,
+    r->life_info = mem_gc_allocate_n_zeroed_typed(interp, unit->n_basic_blocks,
                                                Life_range *);
 
     /* First we make a pass to each block to gather the information
      * that can be obtained locally */
     for (i = 0; i < unit->n_basic_blocks; i++) {
-        analyse_life_block(unit->bb_list[i], r);
+        analyse_life_block(interp, unit->bb_list[i], r);
     }
 
     /* Now we need to consider the relations between blocks */
@@ -807,7 +821,8 @@ free_life_info(ARGIN(const IMC_Unit *unit), ARGMOD(SymReg *r))
 
 /*
 
-=item C<static void analyse_life_block(const Basic_block* bb, SymReg *r)>
+=item C<static void analyse_life_block(PARROT_INTERP, const Basic_block* bb,
+SymReg *r)>
 
 Studies the state of the var r in the block bb.
 
@@ -819,10 +834,10 @@ the block where the var is alive.
 */
 
 static void
-analyse_life_block(ARGIN(const Basic_block* bb), ARGMOD(SymReg *r))
+analyse_life_block(PARROT_INTERP, ARGIN(const Basic_block* bb), ARGMOD(SymReg *r))
 {
     ASSERT_ARGS(analyse_life_block)
-    Life_range  * const l        = make_life_range(r, bb->index);
+    Life_range  * const l        = make_life_range(interp, r, bb->index);
     Instruction         *special = NULL;
     Instruction         *ins;
 
@@ -985,19 +1000,19 @@ compute_dominators(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
     const unsigned int n = unit->n_basic_blocks;
     IMCC_info(interp, 2, "compute_dominators\n");
 
-    unit->idoms          = mem_allocate_n_zeroed_typed(n, int);
-    dominators           = mem_allocate_n_zeroed_typed(n, Set *);
+    unit->idoms          = mem_gc_allocate_n_zeroed_typed(interp, n, int);
+    dominators           = mem_gc_allocate_n_zeroed_typed(interp, n, Set *);
     unit->dominators     = dominators;
 
-    dominators[0]        = set_make(n);
+    dominators[0]        = set_make(interp, n);
     set_add(dominators[0], 0);
 
     for (i = n - 1; i; --i) {
         if (unit->bb_list[i]->pred_list) {
-            dominators[i] = set_make_full(n);
+            dominators[i] = set_make_full(interp, n);
         }
         else {
-            dominators[i] = set_make(n);
+            dominators[i] = set_make(interp, n);
             set_add(dominators[i], i);
         }
     }
@@ -1034,7 +1049,7 @@ compute_dominators(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
         /* TODO: This 'for' should be a breadth-first search for speed */
         for (i = 1; i < n; i++) {
-            Set  * const s = set_copy(dominators[i]);
+            Set  * const s = set_copy(interp, dominators[i]);
             Edge *edge;
 
             for (edge = unit->bb_list[i]->pred_list;
@@ -1113,12 +1128,12 @@ compute_dominance_frontiers(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
     const int    n                   = unit->n_basic_blocks;
     Set ** const dominance_frontiers = unit->dominance_frontiers =
-        mem_allocate_n_typed(n, Set *);
+            mem_gc_allocate_n_typed(interp, n, Set *);
 
     IMCC_info(interp, 2, "compute_dominance_frontiers\n");
 
     for (i = 0; i < n; i++) {
-        dominance_frontiers[i] = set_make(n);
+        dominance_frontiers[i] = set_make(interp, n);
     }
 
     /* for all nodes, b */
@@ -1416,7 +1431,7 @@ mark_loop(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const Edge *e))
                 "\tcan't determine loop entry block (%d found)\n" , i);
     }
 
-    loop = set_make(unit->n_basic_blocks);
+    loop = set_make(interp, unit->n_basic_blocks);
     set_add(loop, footer->index);
     set_add(loop, header->index);
 
@@ -1427,7 +1442,7 @@ mark_loop(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const Edge *e))
         search_predecessors_not_in(footer, loop);
     }
 
-    exits = set_make(unit->n_basic_blocks);
+    exits = set_make(interp, unit->n_basic_blocks);
 
     for (i = 1; i < unit->n_basic_blocks; i++) {
         if (set_contains(loop, i)) {
@@ -1443,15 +1458,18 @@ mark_loop(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const Edge *e))
 
     /* now 'loop' contains the set of nodes inside the loop.  */
     n_loops                       = unit->n_loops;
-    loop_info                     = mem_realloc_n_typed(unit->loop_info,
-                                        n_loops + 1, Loop_info *);
-    loop_info[n_loops]            = mem_allocate_typed(Loop_info);
+    loop_info                     = mem_gc_realloc_n_typed(interp,
+                                            unit->loop_info,
+                                            n_loops + 1, Loop_info *);
+    loop_info[n_loops]            = mem_gc_allocate_typed(interp, Loop_info);
     loop_info[n_loops]->loop      = loop;
     loop_info[n_loops]->exits     = exits;
     loop_info[n_loops]->depth     = footer->loop_depth;
     loop_info[n_loops]->n_entries = i;
     loop_info[n_loops]->header    = header->index;
     loop_info[n_loops]->preheader = natural_preheader(unit, loop_info[n_loops]);
+
+    unit->loop_info = loop_info;
 
     unit->n_loops++;
 }
@@ -1518,7 +1536,7 @@ search_predecessors_not_in(ARGIN(const Basic_block *node), ARGMOD(Set *s))
 
 /*
 
-=item C<static void init_basic_blocks(IMC_Unit *unit)>
+=item C<static void init_basic_blocks(PARROT_INTERP, IMC_Unit *unit)>
 
 Initializes the basic blocks memory for this unit.
 
@@ -1527,7 +1545,7 @@ Initializes the basic blocks memory for this unit.
 */
 
 static void
-init_basic_blocks(ARGMOD(IMC_Unit *unit))
+init_basic_blocks(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     ASSERT_ARGS(init_basic_blocks)
 
@@ -1537,8 +1555,8 @@ init_basic_blocks(ARGMOD(IMC_Unit *unit))
     unit->n_basic_blocks = 0;
     unit->edge_list      = NULL;
     unit->bb_list_size   = 256;
-    unit->bb_list        = mem_allocate_n_zeroed_typed(unit->bb_list_size,
-                                                     Basic_block *);
+    unit->bb_list        = mem_gc_allocate_n_zeroed_typed(interp,
+                                    unit->bb_list_size, Basic_block *);
 }
 
 
@@ -1576,7 +1594,8 @@ clear_basic_blocks(ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static Basic_block* make_basic_block(IMC_Unit *unit, Instruction *ins)>
+=item C<static Basic_block* make_basic_block(PARROT_INTERP, IMC_Unit *unit,
+Instruction *ins)>
 
 Creates, initializes, and returns a new Basic_block.
 
@@ -1587,10 +1606,10 @@ Creates, initializes, and returns a new Basic_block.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static Basic_block*
-make_basic_block(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins))
+make_basic_block(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins))
 {
     ASSERT_ARGS(make_basic_block)
-    Basic_block * const bb = mem_allocate_typed(Basic_block);
+    Basic_block * const bb = mem_gc_allocate_typed(interp, Basic_block);
     int                 n  = unit->n_basic_blocks;
 
     bb->start      = ins;
@@ -1605,7 +1624,8 @@ make_basic_block(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins))
 
     if (n == unit->bb_list_size) {
         unit->bb_list_size *= 2;
-        mem_realloc_n_typed(unit->bb_list, unit->bb_list_size, Basic_block *);
+        unit->bb_list = mem_gc_realloc_n_typed(interp, unit->bb_list,
+                    unit->bb_list_size, Basic_block *);
     }
 
     unit->bb_list[n] = bb;
@@ -1617,7 +1637,7 @@ make_basic_block(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins))
 
 /*
 
-=item C<Life_range * make_life_range(SymReg *r, int idx)>
+=item C<Life_range * make_life_range(PARROT_INTERP, SymReg *r, int idx)>
 
 Creates and returns a Life_range for the given register at the specified index.
 
@@ -1628,10 +1648,10 @@ Creates and returns a Life_range for the given register at the specified index.
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Life_range *
-make_life_range(ARGMOD(SymReg *r), int idx)
+make_life_range(PARROT_INTERP, ARGMOD(SymReg *r), int idx)
 {
     ASSERT_ARGS(make_life_range)
-    Life_range * const l = mem_allocate_zeroed_typed(Life_range);
+    Life_range * const l = mem_gc_allocate_zeroed_typed(interp, Life_range);
     r->life_info[idx]    = l;
 
     return l;

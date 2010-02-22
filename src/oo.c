@@ -720,7 +720,7 @@ void
 init_object_cache(PARROT_INTERP)
 {
     ASSERT_ARGS(init_object_cache)
-    Caches * const mc = interp->caches = mem_allocate_zeroed_typed(Caches);
+    Caches * const mc = interp->caches = mem_gc_allocate_zeroed_typed(interp, Caches);
     mc->idx = NULL;
 }
 
@@ -749,8 +749,8 @@ destroy_object_cache(PARROT_INTERP)
             invalidate_type_caches(interp, i);
     }
 
-    mem_sys_free(mc->idx);
-    mem_sys_free(mc);
+    mem_gc_free(interp, mc->idx);
+    mem_gc_free(interp, mc);
 }
 
 
@@ -783,12 +783,12 @@ invalidate_type_caches(PARROT_INTERP, UINTVAL type)
         Meth_cache_entry *e = mc->idx[type][i];
         while (e) {
             Meth_cache_entry * const next = e->next;
-            mem_sys_free(e);
+            mem_gc_free(interp, e);
             e = next;
         }
     }
 
-    mem_sys_free(mc->idx[type]);
+    mem_gc_free(interp, mc->idx[type]);
     mc->idx[type] = NULL;
 }
 
@@ -929,19 +929,18 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
 
     if (type >= mc->mc_size) {
         if (mc->idx) {
-            mc->idx = (Meth_cache_entry ***)mem_sys_realloc_zeroed(mc->idx,
-                sizeof (Meth_cache_entry ***) * (type + 1),
-                sizeof (Meth_cache_entry ***) * mc->mc_size);
+            mc->idx = mem_gc_realloc_n_typed_zeroed(interp, mc->idx,
+                    type + 1, mc->mc_size, Meth_cache_entry**);
         }
         else {
-            mc->idx = mem_allocate_n_zeroed_typed(type + 1, Meth_cache_entry**);
+            mc->idx = mem_gc_allocate_n_zeroed_typed(interp, type + 1, Meth_cache_entry**);
         }
         mc->mc_size = type + 1;
     }
 
     if (mc->idx[type] == NULL) {
-        mc->idx[type] = (Meth_cache_entry **)mem_sys_allocate_zeroed(
-            sizeof (Meth_cache_entry *) * TBL_SIZE);
+        mc->idx[type] = mem_gc_allocate_n_zeroed_typed(interp,
+                TBL_SIZE, Meth_cache_entry*);
     }
 
     e   = mc->idx[type][bits];
@@ -952,7 +951,7 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
 
     if (!e) {
         /* when here no or no correct entry was at [bits] */
-        e     = mem_allocate_typed(Meth_cache_entry);
+        e     = mem_gc_allocate_typed(interp, Meth_cache_entry);
 
         mc->idx[type][bits] = e;
 

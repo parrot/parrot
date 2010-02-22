@@ -120,7 +120,7 @@ Implementation note: all hard stuff done by PackfileDirectory.
 
         /* Calculate required memory */
         length  = PackFile_pack_size(interp, pf) * sizeof (opcode_t);
-        ptr     = (opcode_t*)mem_sys_allocate(length);
+        ptr     = (opcode_t*)Parrot_gc_allocate_memory_chunk(INTERP, length);
 
         /* Copy related attributes to header */
         pf->header->major     = attrs->version_major;
@@ -133,7 +133,7 @@ Implementation note: all hard stuff done by PackfileDirectory.
 
         str = Parrot_str_new_init(interp, (const char*)ptr, length,
                 PARROT_FIXED_8_ENCODING, PARROT_BINARY_CHARSET, 0);
-        mem_sys_free(ptr);
+        Parrot_gc_free_memory_chunk(INTERP, ptr);
 
         PackFile_destroy(interp, pf);
         return str;

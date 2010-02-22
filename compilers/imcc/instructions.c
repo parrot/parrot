@@ -149,7 +149,7 @@ imcc_init_tables(PARROT_INTERP)
     if (!w_special[0]) {
         size_t i;
         for (i = 0; i < N_ELEMENTS(writes); i++) {
-            const int n = interp->op_lib->op_code(writes[i], 1);
+            const int n = interp->op_lib->op_code(interp, writes[i], 1);
             PARROT_ASSERT(n);
             w_special[i] = n;
         }

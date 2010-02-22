@@ -17,7 +17,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-.const int TESTS = 36
+.const int TESTS = 37
 
 .sub 'test' :main
     .include 'test_more.pir'
@@ -292,18 +292,17 @@ out-of-bounds test. Checks INT and PMC keys.
     size = 1564
     $P0 = size
 
-    $P0.'fill'(0)
+    # Fresh array is empty.
     i = 0
     result = 0
-    $I1 = 0
-  fill_false_loop:
-    unless i < size goto fill_false_end
+  initial_false_loop:
+    unless i < size goto initial_false_end
     $I0 = $P0[i]
     result = or result, $I0
     inc i
-    goto fill_false_loop
-  fill_false_end:
-    nok(result, "Fill with 0")
+    goto initial_false_loop
+  initial_false_end:
+    nok(result, "Fresh array filled with 0")
 
     $P0.'fill'(1)
     i = 0
@@ -317,6 +316,20 @@ out-of-bounds test. Checks INT and PMC keys.
     goto fill_true_loop
   fill_true_end:
     ok(result, "Fill with 1")
+
+    $P0.'fill'(0)
+    i = 0
+    result = 0
+    $I1 = 0
+  fill_false_loop:
+    unless i < size goto fill_false_end
+    $I0 = $P0[i]
+    result = or result, $I0
+    inc i
+    goto fill_false_loop
+  fill_false_end:
+    nok(result, "Fill with 0")
+
 .end
 
 

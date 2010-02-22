@@ -374,7 +374,7 @@ QUEUE*
 queue_init(UINTVAL prio)
 {
     ASSERT_ARGS(queue_init)
-    QUEUE * const queue = mem_allocate_typed(QUEUE);
+    QUEUE * const queue = mem_internal_allocate_typed(QUEUE);
 
     queue->head = queue->tail = NULL;
     queue->max_prio = prio;

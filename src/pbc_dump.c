@@ -290,7 +290,7 @@ main(int argc, const char **argv)
 
         size = PackFile_pack_size(interp,
                 interp->code->base.pf) * sizeof (opcode_t);
-        pack = (opcode_t*) mem_sys_allocate(size);
+        pack = (opcode_t*) Parrot_gc_allocate_memory_chunk(interp, size);
         if (!pack) {
             printf("out of mem\n");
             exit(EXIT_FAILURE);
@@ -308,7 +308,7 @@ main(int argc, const char **argv)
             exit(EXIT_FAILURE);
         }
         fclose(fp);
-        mem_sys_free(pack);
+        Parrot_gc_free_memory_chunk(interp, pack);
         Parrot_exit(interp, 0);
     }
 

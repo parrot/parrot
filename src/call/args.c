@@ -2861,7 +2861,7 @@ csr_reallocate_return_values(PARROT_INTERP, ARGIN(PMC *self), INTVAL size)
         if (cur == 8) {
             void * const old_values = values;
 
-            values     = mem_allocate_n_typed(8, void *);
+            values     = mem_gc_allocate_n_typed(interp, 8, void *);
             memcpy(values, old_values, 8 * sizeof (void *));
             Parrot_gc_free_fixed_size_storage(interp,
                 8 * sizeof (void *), old_values);
@@ -2875,7 +2875,8 @@ csr_reallocate_return_values(PARROT_INTERP, ARGIN(PMC *self), INTVAL size)
             cur          &= ~0xfff;
         }
 
-        mem_realloc_n_typed(values, cur, void *);
+        values = mem_gc_realloc_n_typed_zeroed(interp, values,
+                cur, resize_threshold, void *);
 
         SETATTR_CallContext_returns_values(interp, self, values);
         SETATTR_CallContext_returns_size(interp, self, size);

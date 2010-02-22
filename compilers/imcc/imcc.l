@@ -787,7 +787,7 @@ int yywrap(void* yyscanner) {
 static macro_frame_t *
 new_frame(PARROT_INTERP) {
     static int label   = 0;
-    macro_frame_t * const tmp = mem_allocate_zeroed_typed(macro_frame_t);
+    macro_frame_t * const tmp = mem_gc_allocate_zeroed_typed(interp, macro_frame_t);
 
     tmp->label         = ++label;
     tmp->s.line        = IMCC_INFO(interp)->line;
@@ -1107,7 +1107,7 @@ define_macro(PARROT_INTERP, ARGIN(const char *name), ARGIN(const params_t *param
         m->expansion = NULL;
     }
     else {
-        m = mem_allocate_zeroed_typed(macro_t);
+        m = mem_gc_allocate_zeroed_typed(interp, macro_t);
 
         if (!IMCC_INFO(interp)->macros)
             IMCC_INFO(interp)->macros = parrot_new_cstring_hash(interp);

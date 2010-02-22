@@ -197,7 +197,7 @@ sub new {
 
     my ( $op_info, $op_func, $getop );
     $op_info = $op_func = 'NULL';
-    $getop = '( int (*)(const char *, int) )NULL';
+    $getop = '( int (*)(PARROT_INTERP, const char *, int) )NULL';
 
     if ($self->{suffix} eq '') {
         $op_func = $self->{bs} . "op_func_table";
@@ -559,7 +559,7 @@ END_C
 
     if ( $self->{suffix} eq '' && !$self->{flag}->{dynamic} ) {
         print $fh <<END_C_2;
-static int get_op(const char * name, int full);
+static int get_op(PARROT_INTERP, const char * name, int full);
 
 END_C_2
     }
@@ -892,9 +892,9 @@ typedef struct hop {
 } HOP;
 static HOP **hop;
 
-static void hop_init(void);
+static void hop_init(PARROT_INTERP);
 static size_t hash_str(const char *str);
-static void store_op(op_info_t *info, int full);
+static void store_op(PARROT_INTERP, op_info_t *info, int full);
 
 /* XXX on changing interpreters, this should be called,
    through a hook */
@@ -923,8 +923,8 @@ static size_t hash_str(const char *str) {
     return key;
 }
 
-static void store_op(op_info_t *info, int full) {
-    HOP * const p     = mem_allocate_typed(HOP);
+static void store_op(PARROT_INTERP, op_info_t *info, int full) {
+    HOP * const p     = mem_gc_allocate_zeroed_typed(interp, HOP);
     const size_t hidx =
         hash_str(full ? info->full_name : info->name) % OP_HASH_SIZE;
 
@@ -932,12 +932,12 @@ static void store_op(op_info_t *info, int full) {
     p->next   = hop[hidx];
     hop[hidx] = p;
 }
-static int get_op(const char * name, int full) {
+static int get_op(PARROT_INTERP, const char * name, int full) {
     const HOP * p;
     const size_t hidx = hash_str(name) % OP_HASH_SIZE;
     if (!hop) {
-        hop = mem_allocate_n_zeroed_typed(OP_HASH_SIZE,HOP *);
-        hop_init();
+        hop = mem_gc_allocate_n_zeroed_typed(interp, OP_HASH_SIZE,HOP *);
+        hop_init(interp);
     }
     for (p = hop[hidx]; p; p = p->next) {
         if(STREQ(name, full ? p->info->full_name : p->info->name))
@@ -945,16 +945,16 @@ static int get_op(const char * name, int full) {
     }
     return -1;
 }
-static void hop_init(void) {
+static void hop_init(PARROT_INTERP) {
     size_t i;
     op_info_t * const info = $self->{bs}op_lib.op_info_table;
     /* store full names */
     for (i = 0; i < $self->{bs}op_lib.op_count; i++)
-        store_op(info + i, 1);
+        store_op(interp, info + i, 1);
     /* plus one short name */
     for (i = 0; i < $self->{bs}op_lib.op_count; i++)
-        if (get_op(info[i].name, 0) == -1)
-            store_op(info + i, 0);
+        if (get_op(interp, info[i].name, 0) == -1)
+            store_op(interp, info + i, 0);
 }
 static void hop_deinit(void)
 {

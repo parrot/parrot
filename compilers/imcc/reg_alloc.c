@@ -59,7 +59,8 @@ static void build_interference_graph(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
-static void build_reglist(NULLOK_INTERP, ARGMOD(IMC_Unit *unit))
+static void build_reglist(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
@@ -73,11 +74,12 @@ static void compute_one_du_chain(ARGMOD(SymReg *r), ARGIN(IMC_Unit *unit))
         FUNC_MODIFIES(*r);
 
 PARROT_WARN_UNUSED_RESULT
-static unsigned int first_avail(
+static unsigned int first_avail(PARROT_INTERP,
     ARGIN(const IMC_Unit *unit),
     int reg_set,
     ARGOUT_NULLOK(Set **avail))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         FUNC_MODIFIES(*avail);
 
 PARROT_WARN_UNUSED_RESULT
@@ -162,7 +164,8 @@ static void try_allocate(PARROT_INTERP, ARGIN(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void vanilla_reg_alloc(SHIM_INTERP, ARGMOD(IMC_Unit *unit))
+static void vanilla_reg_alloc(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
@@ -179,14 +182,16 @@ static void vanilla_reg_alloc(SHIM_INTERP, ARGMOD(IMC_Unit *unit))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_build_reglist __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(unit))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_compute_du_chain __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_compute_one_du_chain __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(r) \
     , PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_first_avail __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(unit))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_ig_allocate __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_ig_find_color __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(unit) \
@@ -223,7 +228,8 @@ static void vanilla_reg_alloc(SHIM_INTERP, ARGMOD(IMC_Unit *unit))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_vanilla_reg_alloc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(unit))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(unit))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -636,7 +642,7 @@ sort_reglist(ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static void build_reglist(NULLOK_INTERP, IMC_Unit *unit)>
+=item C<static void build_reglist(PARROT_INTERP, IMC_Unit *unit)>
 
 make a linear list of IDENTs and VARs, set n_symbols
 TODO
@@ -654,7 +660,7 @@ Run through them and allocate all that don't overlap in one bunch.
 */
 
 static void
-build_reglist(NULLOK_INTERP, ARGMOD(IMC_Unit *unit))
+build_reglist(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     ASSERT_ARGS(build_reglist)
     SymHash  const *hsh = &unit->hash;
@@ -670,7 +676,7 @@ build_reglist(NULLOK_INTERP, ARGMOD(IMC_Unit *unit))
     if (count == 0)
         return;
 
-    unit->reglist = mem_allocate_n_typed(count, SymReg *);
+    unit->reglist = mem_gc_allocate_n_typed(interp, count, SymReg *);
 
     for (i = count = 0; i < hsh->size; i++) {
         SymReg *r;
@@ -1043,7 +1049,7 @@ try_allocate(PARROT_INTERP, ARGIN(IMC_Unit *unit))
     if (!n)
         return;
 
-    avail = mem_allocate_n_typed(n, char);
+    avail = mem_gc_allocate_n_typed(interp, n, char);
 
     for (i = 0; i < unit->n_symbols; ++i) {
         int     already_allocated, color;
@@ -1122,8 +1128,8 @@ map_colors(ARGIN(const IMC_Unit* unit), int x, ARGIN(unsigned int *graph),
 
 /*
 
-=item C<static unsigned int first_avail(const IMC_Unit *unit, int reg_set, Set
-**avail)>
+=item C<static unsigned int first_avail(PARROT_INTERP, const IMC_Unit *unit, int
+reg_set, Set **avail)>
 
 find first available register of the given reg_set
 
@@ -1133,13 +1139,15 @@ find first available register of the given reg_set
 
 PARROT_WARN_UNUSED_RESULT
 static unsigned int
-first_avail(ARGIN(const IMC_Unit *unit), int reg_set, ARGOUT_NULLOK(Set **avail))
+first_avail(PARROT_INTERP,
+        ARGIN(const IMC_Unit *unit), int reg_set,
+        ARGOUT_NULLOK(Set **avail))
 {
     ASSERT_ARGS(first_avail)
     int n                     = (int)unit->n_symbols > unit->max_color
                               ? (int)unit->n_symbols
                               : unit->max_color;
-    Set         *allocated    = set_make((unsigned int)n + 1);
+    Set         *allocated    = set_make(interp, (unsigned int)n + 1);
 
     const SymHash * const hsh = &unit->hash;
 
@@ -1205,7 +1213,7 @@ allocate_uniq(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int usage)
                 Set         *avail     = sets[j];
                 unsigned int first_reg = avail
                                        ? set_first_zero(avail)
-                                       : first_avail(unit, (int)r->set, &avail);
+                                       : first_avail(interp, unit, (int)r->set, &avail);
                 set_add(avail, first_reg);
                 r->color = first_reg++;
 
@@ -1244,7 +1252,7 @@ allocate_uniq(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int usage)
 */
 
 static void
-vanilla_reg_alloc(SHIM_INTERP, ARGMOD(IMC_Unit *unit))
+vanilla_reg_alloc(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     ASSERT_ARGS(vanilla_reg_alloc)
     const char   type[] = "INSP";
@@ -1266,7 +1274,7 @@ vanilla_reg_alloc(SHIM_INTERP, ARGMOD(IMC_Unit *unit))
     /* Assign new colors. */
     for (j = 0; j < 4; j++) {
         reg_set   = type[j];
-        first_reg = first_avail(unit, reg_set, &avail);
+        first_reg = first_avail(interp, unit, reg_set, &avail);
 
         /* XXX Use a different loop variable that doesn't shadow outer i */
         for (i = 0; i < hsh->size; i++) {
@@ -1276,7 +1284,7 @@ vanilla_reg_alloc(SHIM_INTERP, ARGMOD(IMC_Unit *unit))
                     continue;
                 if (REG_NEEDS_ALLOC(r) && (r->color == -1) && r->use_count) {
                     if (set_contains(avail, first_reg))
-                        first_reg = first_avail(unit, reg_set, NULL);
+                        first_reg = first_avail(interp, unit, reg_set, NULL);
 
                     set_add(avail, first_reg);
                     r->color = first_reg++;

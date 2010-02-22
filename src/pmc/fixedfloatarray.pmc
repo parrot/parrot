@@ -43,7 +43,7 @@ Destroys the array.
         FLOATVAL *float_array;
         GET_ATTR_float_array(INTERP, SELF, float_array);
         if (float_array)
-            mem_sys_free(float_array);
+            mem_gc_free(INTERP, float_array);
     }
 
 /*
@@ -70,7 +70,7 @@ Creates and returns a copy of the array.
         SET_ATTR_size(INTERP, dest, size);
         mem_size          = size * sizeof (FLOATVAL);
 
-        dest_float_array  = (FLOATVAL*)mem_sys_allocate(mem_size);
+        dest_float_array  = (FLOATVAL*)Parrot_gc_allocate_memory_chunk(INTERP, mem_size);
         mem_sys_memcopy(dest_float_array, self_float_array, mem_size);
         SET_ATTR_float_array(INTERP, dest, dest_float_array);
         PObj_custom_destroy_SET(dest);
@@ -289,7 +289,7 @@ Resizes the array to C<size> elements.
 
         SET_ATTR_size(INTERP, SELF, new_size);
         SET_ATTR_float_array(INTERP, SELF,
-                mem_allocate_n_typed(new_size, FLOATVAL));
+                mem_gc_allocate_n_typed(INTERP, new_size, FLOATVAL));
         PObj_custom_destroy_SET(SELF);
     }
 

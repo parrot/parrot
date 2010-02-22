@@ -71,7 +71,7 @@ Initializes the struct with C<*value>.
 Destroys the struct, freeing the allocated memory.
 
 If the "custom_free_func" attribute is set, it is called to free the pointer.
-Otherwise, mem_sys_free() is used.
+Otherwise, mem_gc_free() is used.
 
 =cut
 
@@ -83,9 +83,9 @@ Otherwise, mem_sys_free() is used.
             custom_free_func_t free_func = PARROT_MANAGEDSTRUCT(SELF)->custom_free_func;
             if (free_func) {
                 void *free_data = PARROT_MANAGEDSTRUCT(SELF)->custom_free_priv;
-                free_func(interp, ptr, free_data);
+                free_func(INTERP, ptr, free_data);
             } else
-                mem_sys_free(ptr);
+                mem_gc_free(INTERP, ptr);
         }
     }
 
@@ -100,20 +100,24 @@ Otherwise, mem_sys_free() is used.
 */
 
     VTABLE void set_integer_native(INTVAL value) {
-        if (PARROT_MANAGEDSTRUCT(SELF)->ptr && !value) {
-            mem_sys_free(PARROT_MANAGEDSTRUCT(SELF)->ptr);
-            PARROT_MANAGEDSTRUCT(SELF)->ptr  = NULL;
-            PARROT_MANAGEDSTRUCT(SELF)->size = 0;
+        Parrot_ManagedStruct_attributes * attrs = PARROT_MANAGEDSTRUCT(SELF);
+
+        if (attrs->ptr && !value) {
+            mem_gc_free(INTERP, attrs->ptr);
+            attrs->ptr  = NULL;
+            attrs->size = 0;
         }
-        else if (value && !PARROT_MANAGEDSTRUCT(SELF)->ptr) {
-            PARROT_MANAGEDSTRUCT(SELF)->ptr  = mem_sys_allocate_zeroed((size_t)value);
-            PARROT_MANAGEDSTRUCT(SELF)->size = value;
+        else if (value && !attrs->ptr) {
+            attrs->ptr  = Parrot_gc_allocate_memory_chunk_with_interior_pointers(
+                    INTERP, (size_t)value);
+            attrs->size = value;
         }
-        else if (value && PARROT_MANAGEDSTRUCT(SELF)->ptr) {
-            if (PARROT_MANAGEDSTRUCT(SELF)->size != value) {
-                PARROT_MANAGEDSTRUCT(SELF)->ptr =
-                    mem_sys_realloc(PARROT_MANAGEDSTRUCT(SELF)->ptr, (size_t)value);
-                PARROT_MANAGEDSTRUCT(SELF)->size = value;
+        else if (value && attrs->ptr) {
+            if (attrs->size != value) {
+                attrs->ptr =
+                    Parrot_gc_reallocate_memory_chunk_with_interior_pointers(INTERP,
+                        attrs->ptr, (size_t)value, attrs->size);
+                attrs->size = value;
             }
         }
 

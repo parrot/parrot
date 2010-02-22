@@ -64,12 +64,12 @@ Parrot_io_init(PARROT_INTERP)
     }
 
 
-    interp->piodata = mem_allocate_typed(ParrotIOData);
+    interp->piodata = mem_gc_allocate_zeroed_typed(interp, ParrotIOData);
     if (interp->piodata == NULL)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "PIO alloc piodata failure.");
     interp->piodata->table         =
-        (PMC **)mem_sys_allocate_zeroed(PIO_NR_OPEN * sizeof (PMC *));
+            mem_gc_allocate_n_zeroed_typed(interp, PIO_NR_OPEN, PMC *);
 
     if (!interp->piodata->table)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
@@ -95,9 +95,9 @@ Parrot_io_finish(PARROT_INTERP)
     /*
      * TODO free IO of std-handles
      */
-    mem_sys_free(interp->piodata->table);
+    mem_gc_free(interp, interp->piodata->table);
     interp->piodata->table = NULL;
-    mem_sys_free(interp->piodata);
+    mem_gc_free(interp, interp->piodata);
     interp->piodata = NULL;
 
 }

@@ -129,7 +129,7 @@ Set pointer to underlying PackFile_ConstTable
         Parrot_PackfileConstantTable_attributes * attrs =
                 PARROT_PACKFILECONSTANTTABLE(SELF);
         PackFile_ConstTable * pftable =
-                mem_allocate_zeroed_typed(PackFile_ConstTable);
+                mem_gc_allocate_zeroed_typed(INTERP, PackFile_ConstTable);
         PackFile_Constant   * value;
         opcode_t              i;
 
@@ -137,8 +137,8 @@ Set pointer to underlying PackFile_ConstTable
 
         /* Copy all constanst with respect of type */
         pftable->const_count = VTABLE_get_integer(interp, attrs->constants);
-        pftable->constants   = mem_allocate_n_typed(pftable->const_count,
-                PackFile_Constant*);
+        pftable->constants   = mem_gc_allocate_n_typed(INTERP,
+                pftable->const_count, PackFile_Constant*);
 
         for (i = 0; i < pftable->const_count; ++i) {
             value = PackFile_Constant_new(interp);

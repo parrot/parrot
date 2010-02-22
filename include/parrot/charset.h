@@ -101,7 +101,8 @@ INTVAL Parrot_charset_number_of_str(SHIM_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_charsets_encodings_deinit(SHIM_INTERP);
+void Parrot_charsets_encodings_deinit(PARROT_INTERP)
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 void Parrot_charsets_encodings_init(PARROT_INTERP)
@@ -149,20 +150,23 @@ INTVAL Parrot_make_default_charset(SHIM_INTERP,
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_MALLOC
-CHARSET * Parrot_new_charset(SHIM_INTERP);
+CHARSET * Parrot_new_charset(PARROT_INTERP)
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
-INTVAL Parrot_register_charset(SHIM_INTERP,
+INTVAL Parrot_register_charset(PARROT_INTERP,
     ARGIN(const char *charsetname),
     ARGIN(CHARSET *charset))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-void Parrot_register_charset_converter(SHIM_INTERP,
+void Parrot_register_charset_converter(PARROT_INTERP,
     ARGIN(const CHARSET *lhs),
     ARGIN(CHARSET *rhs),
     ARGIN(charset_converter_t func))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
@@ -175,7 +179,8 @@ void Parrot_register_charset_converter(SHIM_INTERP,
 #define ASSERT_ARGS_Parrot_charset_number_of_str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_Parrot_charsets_encodings_deinit \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_charsets_encodings_init \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -191,13 +196,16 @@ void Parrot_register_charset_converter(SHIM_INTERP,
     , PARROT_ASSERT_ARG(charsetname))
 #define ASSERT_ARGS_Parrot_make_default_charset __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(charset))
-#define ASSERT_ARGS_Parrot_new_charset __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_new_charset __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_register_charset __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(charsetname) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(charsetname) \
     , PARROT_ASSERT_ARG(charset))
 #define ASSERT_ARGS_Parrot_register_charset_converter \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lhs) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(lhs) \
     , PARROT_ASSERT_ARG(rhs) \
     , PARROT_ASSERT_ARG(func))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

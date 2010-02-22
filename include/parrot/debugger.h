@@ -214,12 +214,13 @@ void PDB_script_file(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-long PDB_add_label(
+long PDB_add_label(PARROT_INTERP,
     ARGMOD(PDB_file_t *file),
     ARGIN(const opcode_t *cur_opcode),
     opcode_t offset)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*file);
 
 void PDB_assign(PARROT_INTERP, ARGIN(const char *command))
@@ -251,7 +252,9 @@ void PDB_delete_breakpoint(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_delete_condition(SHIM_INTERP, ARGMOD(PDB_breakpoint_t *breakpoint))
+void PDB_delete_condition(PARROT_INTERP,
+    ARGMOD(PDB_breakpoint_t *breakpoint))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*breakpoint);
 
@@ -284,8 +287,9 @@ void PDB_enable_breakpoint(PARROT_INTERP, ARGIN(const char *command))
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PARROT_MALLOC
-char * PDB_escape(ARGIN(const char *string), UINTVAL length)
-        __attribute__nonnull__(1);
+char * PDB_escape(PARROT_INTERP, ARGIN(const char *string), UINTVAL length)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void PDB_eval(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(1)
@@ -298,7 +302,9 @@ PDB_breakpoint_t * PDB_find_breakpoint(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_free_file(SHIM_INTERP, ARGIN_NULLOK(PDB_file_t *file));
+void PDB_free_file(PARROT_INTERP, ARGIN_NULLOK(PDB_file_t *file))
+        __attribute__nonnull__(1);
+
 void PDB_get_command(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -374,7 +380,8 @@ void PDB_watchpoint(PARROT_INTERP, ARGIN(const char *command))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(command))
 #define ASSERT_ARGS_PDB_add_label __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(file) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(file) \
     , PARROT_ASSERT_ARG(cur_opcode))
 #define ASSERT_ARGS_PDB_assign __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -395,7 +402,8 @@ void PDB_watchpoint(PARROT_INTERP, ARGIN(const char *command))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(command))
 #define ASSERT_ARGS_PDB_delete_condition __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(breakpoint))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(breakpoint))
 #define ASSERT_ARGS_PDB_disable_breakpoint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(command))
@@ -410,14 +418,16 @@ void PDB_watchpoint(PARROT_INTERP, ARGIN(const char *command))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(command))
 #define ASSERT_ARGS_PDB_escape __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(string))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(string))
 #define ASSERT_ARGS_PDB_eval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(command))
 #define ASSERT_ARGS_PDB_find_breakpoint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(command))
-#define ASSERT_ARGS_PDB_free_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_PDB_free_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PDB_get_command __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PDB_hasinstruction __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

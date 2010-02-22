@@ -227,7 +227,7 @@ static void rat_power_int(PARROT_INTERP, PMC *self, int value) {
 
 */
 
-pmclass Rational dynpmc provides scalar {
+pmclass Rational dynpmc provides scalar auto_attrs {
     ATTR struct RATIONAL *rational;
 /*
 
@@ -265,9 +265,8 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
     VTABLE void init() {
       #ifdef PARROT_HAS_GMP
         Parrot_Rational_attributes *attrs =
-            mem_allocate_zeroed_typed(Parrot_Rational_attributes);
-        PMC_data(SELF)     = attrs;
-        PMC_rational(SELF) = (RATIONAL *)malloc(sizeof (RATIONAL));
+            PARROT_RATIONAL(SELF);
+        attrs->rational = mem_gc_allocate_zeroed_typed(INTERP, RATIONAL);
         mpq_init(RT(SELF));
         PObj_custom_destroy_SET(SELF);
       #endif
@@ -300,9 +299,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
     VTABLE void destroy() {
       #ifdef PARROT_HAS_GMP
         mpq_clear(RT(SELF));
-        mem_sys_free(RT(SELF));
-        mem_sys_free(PMC_data(SELF));
-        PMC_data(SELF) = NULL;
+        mem_gc_free(INTERP, RT(SELF));
       #else
         RAISE_EXCEPTION
       #endif

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -260,8 +260,6 @@ mem__internal_realloc(ARGFREE(void *from), size_t size,
     return ptr;
 }
 
-#if 0
-
 /*
 
 =item C<void * mem__internal_realloc_zeroed(void *from, size_t size, size_t
@@ -284,15 +282,15 @@ mem__internal_realloc_zeroed(ARGFREE(void *from), size_t size, size_t old_size,
 {
     ASSERT_ARGS(mem__internal_realloc_zeroed)
     void * const ptr = realloc(from, size);
-#  ifdef DETAIL_MEMORY_DEBUG
+#ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "internal free of %p (realloc -- %i bytes) (%s/%d)\n",
             from, size, file, line);
     fprintf(stderr, "Internal malloc %i at %p (%s/%d)\n",
             size, ptr, file, line);
-#  else
+#else
     UNUSED(file);
     UNUSED(line);
-#  endif
+#endif
     if (!ptr)
         PANIC_OUT_OF_MEM(size);
     if (size > old_size)
@@ -300,8 +298,6 @@ mem__internal_realloc_zeroed(ARGFREE(void *from), size_t size, size_t old_size,
 
     return ptr;
 }
-
-#endif
 
 /*
 

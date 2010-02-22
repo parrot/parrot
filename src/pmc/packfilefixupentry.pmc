@@ -95,7 +95,7 @@ Create PackFile_FixupEntry* from self.
         Parrot_PackfileFixupEntry_attributes * attrs =
                 PARROT_PACKFILEFIXUPENTRY(SELF);
         PackFile_FixupEntry                  * entry =
-                mem_allocate_zeroed_typed(PackFile_FixupEntry);
+                mem_gc_allocate_zeroed_typed(INTERP, PackFile_FixupEntry);
 
         entry->type     = attrs->type;
         entry->name     = strdup(Parrot_string_cstring(interp, attrs->name));

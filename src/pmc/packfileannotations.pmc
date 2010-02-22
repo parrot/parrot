@@ -260,7 +260,8 @@ Create PackFile_Annotations* from self.
     VTABLE void *get_pointer() {
         Parrot_PackfileAnnotations_attributes *attrs =
                 PARROT_PACKFILEANNOTATIONS(SELF);
-        PackFile_Annotations *res = mem_allocate_zeroed_typed(PackFile_Annotations);
+        PackFile_Annotations *res = mem_gc_allocate_zeroed_typed(INTERP,
+                PackFile_Annotations);
         INTVAL                i, num;
         INTVAL                key_type;
         PMC                  *keys;             /* Temporary representation of Keys */
@@ -297,7 +298,7 @@ Create PackFile_Annotations* from self.
         /* Iterate over stored annotations and create Key if required. */
         num = VTABLE_elements(interp, attrs->annotations);
         res->num_entries = num;
-        res->entries = mem_allocate_n_typed(num, PackFile_Annotations_Entry*);
+        res->entries = mem_gc_allocate_n_typed(INTERP, num, PackFile_Annotations_Entry*);
         for (i = 0; i < num; ++i) {
             PMC  *entity = VTABLE_get_pmc_keyed_int(interp, attrs->annotations, i);
             Parrot_PackfileAnnotation_attributes *entity_attrs = PARROT_PACKFILEANNOTATION(entity);
@@ -336,7 +337,8 @@ Create PackFile_Annotations* from self.
 
             /* At this point we have create (if nesassary) key and name constant. */
             /* Start storing real entity */
-            res->entries[i] = mem_allocate_zeroed_typed(PackFile_Annotations_Entry);
+            res->entries[i] = mem_gc_allocate_zeroed_typed(INTERP,
+                    PackFile_Annotations_Entry);
 
             res->entries[i]->bytecode_offset = entity_attrs->offset;
             res->entries[i]->key             = key_id;
@@ -365,9 +367,10 @@ Create PackFile_Annotations* from self.
         /* Time to pack keys */
         num = VTABLE_elements(interp, types);
         res->num_keys = num;
-        res->keys = mem_allocate_n_typed(num, PackFile_Annotations_Key*);
+        res->keys = mem_gc_allocate_n_zeroed_typed(INTERP, num,
+                PackFile_Annotations_Key*);
         for (i = 0; i < num; ++i) {
-            res->keys[i] = mem_allocate_typed(PackFile_Annotations_Key);
+            res->keys[i] = mem_gc_allocate_typed(INTERP, PackFile_Annotations_Key);
             res->keys[i]->name = VTABLE_get_integer_keyed_int(interp, names, i);
             res->keys[i]->type = VTABLE_get_integer_keyed_int(interp, types, i);
         }

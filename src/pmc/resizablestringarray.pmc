@@ -241,8 +241,8 @@ Resizes the array to C<size> elements.
             }
 
             SET_ATTR_str_array(INTERP, SELF,
-                    (STRING **)mem_sys_realloc(
-                        str_array, cur * sizeof (STRING*)));
+                    mem_gc_realloc_n_typed_zeroed(INTERP, str_array,
+                            cur, resize_threshold, STRING*));
             GET_ATTR_str_array(INTERP, SELF, str_array);
 
             for (; i < cur; i++)

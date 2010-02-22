@@ -357,11 +357,11 @@ add_const_table(PARROT_INTERP)
     /* Update the constant count and reallocate */
     if (interp->code->const_table->constants)
         interp->code->const_table->constants =
-            mem_realloc_n_typed(interp->code->const_table->constants,
+            mem_gc_realloc_n_typed(interp, interp->code->const_table->constants,
                 newcount, PackFile_Constant *);
     else
         interp->code->const_table->constants =
-            mem_allocate_n_typed(newcount, PackFile_Constant *);
+            mem_gc_allocate_n_typed(interp, newcount, PackFile_Constant *);
 
     interp->code->const_table->constants[oldcount] = new_constant;
     interp->code->const_table->const_count         = newcount;
@@ -432,10 +432,10 @@ int
 e_pbc_open(PARROT_INTERP, SHIM(void *param))
 {
     ASSERT_ARGS(e_pbc_open)
-    code_segment_t * const cs = mem_allocate_zeroed_typed(code_segment_t);
+    code_segment_t * const cs = mem_gc_allocate_zeroed_typed(interp, code_segment_t);
 
     if (!IMCC_INFO(interp)->globals)
-        IMCC_INFO(interp)->globals = mem_allocate_zeroed_typed(imcc_globals);
+        IMCC_INFO(interp)->globals = mem_gc_allocate_zeroed_typed(interp, imcc_globals);
 
     if (IMCC_INFO(interp)->globals->cs)
         clear_sym_hash(&IMCC_INFO(interp)->globals->cs->key_consts);
@@ -445,7 +445,7 @@ e_pbc_open(PARROT_INTERP, SHIM(void *param))
     }
 
     /* free previous cached key constants if any */
-    create_symhash(&cs->key_consts);
+    create_symhash(interp, &cs->key_consts);
 
     cs->next     = NULL;
     cs->prev     = IMCC_INFO(interp)->globals->cs;
@@ -496,7 +496,7 @@ static void
 make_new_sub(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 {
     ASSERT_ARGS(make_new_sub)
-    subs_t * const s = mem_allocate_zeroed_typed(subs_t);
+    subs_t * const s = mem_gc_allocate_zeroed_typed(interp, subs_t);
 
     s->prev          = IMCC_INFO(interp)->globals->cs->subs;
     s->unit          = unit;
@@ -510,7 +510,7 @@ make_new_sub(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 
     IMCC_INFO(interp)->globals->cs->subs = s;
 
-    create_symhash(&s->fixup);
+    create_symhash(interp, &s->fixup);
 }
 
 
@@ -615,7 +615,7 @@ store_key_const(PARROT_INTERP, ARGIN(const char *str), int idx)
 {
     ASSERT_ARGS(store_key_const)
     SymReg * const c =
-        _mk_const(&IMCC_INFO(interp)->globals->cs->key_consts, str, 0);
+        _mk_const(interp, &IMCC_INFO(interp)->globals->cs->key_consts, str, 0);
     c->color = idx;
 }
 
@@ -826,7 +826,7 @@ fixup_globals(PARROT_INTERP)
                     SymReg * const nam = mk_const(interp, fixup->name,
                             fixup->type & VT_ENCODED ? 'U' : 'S');
 
-                    const int op = interp->op_lib->op_code("find_sub_not_null_p_sc", 1);
+                    const int op = interp->op_lib->op_code(interp, "find_sub_not_null_p_sc", 1);
                     PARROT_ASSERT(op);
 
                     interp->code->base.data[addr] = op;
@@ -1478,7 +1478,7 @@ add_const_key(PARROT_INTERP, ARGIN(const opcode_t *key), int size, ARGIN(const c
     if (r)
         return r->color;
 
-    pfc = mem_allocate_typed(PackFile_Constant);
+    pfc = mem_gc_allocate_typed(interp, PackFile_Constant);
     rc  = PackFile_Constant_unpack_key(interp,
             interp->code->const_table, pfc, key);
 
@@ -2188,7 +2188,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
             /* need a dummy to hold register usage */
             SymReg * const r = mk_sub_label(interp, "(null)");
             r->type          = VT_PCC_SUB;
-            r->pcc_sub       = mem_allocate_zeroed_typed(pcc_sub_t);
+            r->pcc_sub       = mem_gc_allocate_zeroed_typed(interp, pcc_sub_t);
 
             add_const_pmc_sub(interp, r, oldsize, oldsize + code_size);
         }

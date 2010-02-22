@@ -82,7 +82,7 @@ Parrot_jit_clone_buffer(PARROT_INTERP, PMC *pmc, void *priv)
         GETATTR_ManagedStruct_custom_free_priv(interp , pmc, freepriv);
         GETATTR_ManagedStruct_custom_clone_priv(interp, pmc, clonepriv);
         if (freepriv) {
-            void *tmp = mem_sys_allocate(sizeof (struct jit_buffer_private_data));
+            void *tmp = mem_gc_allocate_zeroed_typed(interp, struct jit_buffer_private_data);
             memcpy(tmp, freepriv, sizeof (struct jit_buffer_private_data));
             SETATTR_ManagedStruct_custom_free_priv(interp, rv , tmp);
             if (clonepriv == freepriv) {
@@ -92,7 +92,7 @@ Parrot_jit_clone_buffer(PARROT_INTERP, PMC *pmc, void *priv)
             }
         }
         if (clonepriv) {
-            void *tmp = mem_sys_allocate(sizeof (struct jit_buffer_private_data));
+            void *tmp = mem_gc_allocate_zeroed_typed(interp, struct jit_buffer_private_data);
             memcpy(tmp, clonepriv, sizeof (struct jit_buffer_private_data));
             SETATTR_ManagedStruct_custom_clone_priv(interp, rv , tmp);
         }

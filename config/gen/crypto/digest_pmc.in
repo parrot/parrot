@@ -34,7 +34,7 @@ pmclass @TEMP_md_name@
 */
     VTABLE void init() {
 @TEMP_md_guard@
-        @TEMP_md_ctx@ *c    = mem_allocate_zeroed_typed(@TEMP_md_ctx@);
+        @TEMP_md_ctx@ *c    = mem_gc_allocate_zeroed_typed(INTERP, @TEMP_md_ctx@);
         PMC_data(SELF) = c;
         PObj_custom_destroy_SET(SELF);
 #else
@@ -54,7 +54,7 @@ pmclass @TEMP_md_name@
 @TEMP_md_guard@
         @TEMP_md_ctx@ *c = PMC_data_typed(SELF, @TEMP_md_ctx@ *);
         if (c) {
-            mem_sys_free(c);
+            mem_gc_free(INTERP, c);
             PMC_data(SELF) = NULL;
         }
 #endif

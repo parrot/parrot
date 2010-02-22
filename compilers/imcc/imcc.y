@@ -43,57 +43,62 @@
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void add_pcc_named_arg(
+static void add_pcc_named_arg(PARROT_INTERP,
     ARGMOD(SymReg *cur_call),
     ARGMOD(SymReg *name),
     ARGMOD(SymReg *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
         FUNC_MODIFIES(*cur_call)
         FUNC_MODIFIES(*name)
         FUNC_MODIFIES(*value);
 
-static void add_pcc_named_arg_var(
+static void add_pcc_named_arg_var(PARROT_INTERP,
     ARGMOD(SymReg *cur_call),
     ARGMOD(SymReg *name),
     ARGMOD(SymReg *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
         FUNC_MODIFIES(*cur_call)
         FUNC_MODIFIES(*name)
         FUNC_MODIFIES(*value);
 
-static void add_pcc_named_param(
+static void add_pcc_named_param(PARROT_INTERP,
     ARGMOD(SymReg *cur_call),
     ARGMOD(SymReg *name),
     ARGMOD(SymReg *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
         FUNC_MODIFIES(*cur_call)
         FUNC_MODIFIES(*name)
         FUNC_MODIFIES(*value);
 
-static void add_pcc_named_result(
+static void add_pcc_named_result(PARROT_INTERP,
     ARGMOD(SymReg *cur_call),
     ARGMOD(SymReg *name),
     ARGMOD(SymReg *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
         FUNC_MODIFIES(*cur_call)
         FUNC_MODIFIES(*name)
         FUNC_MODIFIES(*value);
 
-static void add_pcc_named_return(
+static void add_pcc_named_return(PARROT_INTERP,
     ARGMOD(SymReg *cur_call),
     ARGMOD(SymReg *name),
     ARGMOD(SymReg *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
         FUNC_MODIFIES(*cur_call)
         FUNC_MODIFIES(*name)
         FUNC_MODIFIES(*value);
@@ -251,23 +256,28 @@ static void set_lexical(PARROT_INTERP,
         FUNC_MODIFIES(*name);
 
 #define ASSERT_ARGS_add_pcc_named_arg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(cur_call) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(cur_call) \
     , PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_add_pcc_named_arg_var __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(cur_call) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(cur_call) \
     , PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_add_pcc_named_param __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(cur_call) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(cur_call) \
     , PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_add_pcc_named_result __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(cur_call) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(cur_call) \
     , PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_add_pcc_named_return __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(cur_call) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(cur_call) \
     , PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_adv_named_set __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -648,7 +658,7 @@ iSUBROUTINE(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), ARGMOD(SymReg *r))
     Instruction * const i = iLABEL(interp, unit, r);
 
     r->type    = (r->type & VT_ENCODED) ? VT_PCC_SUB|VT_ENCODED : VT_PCC_SUB;
-    r->pcc_sub = mem_allocate_zeroed_typed(pcc_sub_t);
+    r->pcc_sub = mem_gc_allocate_zeroed_typed(interp, pcc_sub_t);
 
     IMCC_INFO(interp)->cur_call = r;
     i->line                     = IMCC_INFO(interp)->line;
@@ -899,105 +909,111 @@ set_lexical(PARROT_INTERP, ARGMOD(SymReg *r), ARGMOD(SymReg *name))
 
 /*
 
-=item C<static void add_pcc_named_arg(SymReg *cur_call, SymReg *name, SymReg
-*value)>
+=item C<static void add_pcc_named_arg(PARROT_INTERP, SymReg *cur_call, SymReg
+*name, SymReg *value)>
 
 =cut
 
 */
 
 static void
-add_pcc_named_arg(ARGMOD(SymReg *cur_call),
+add_pcc_named_arg(PARROT_INTERP,
+        ARGMOD(SymReg *cur_call),
         ARGMOD(SymReg *name),
         ARGMOD(SymReg *value))
 {
     ASSERT_ARGS(add_pcc_named_arg)
     name->type  |= VT_NAMED;
 
-    add_pcc_arg(cur_call, name);
-    add_pcc_arg(cur_call, value);
+    add_pcc_arg(interp, cur_call, name);
+    add_pcc_arg(interp, cur_call, value);
 }
 
 /*
 
-=item C<static void add_pcc_named_arg_var(SymReg *cur_call, SymReg *name, SymReg
-*value)>
+=item C<static void add_pcc_named_arg_var(PARROT_INTERP, SymReg *cur_call,
+SymReg *name, SymReg *value)>
 
 =cut
 
 */
 
 static void
-add_pcc_named_arg_var(ARGMOD(SymReg *cur_call),
-    ARGMOD(SymReg *name), ARGMOD(SymReg *value))
+add_pcc_named_arg_var(PARROT_INTERP,
+        ARGMOD(SymReg *cur_call),
+        ARGMOD(SymReg *name),
+        ARGMOD(SymReg *value))
 {
     ASSERT_ARGS(add_pcc_named_arg_var)
     name->type |= VT_NAMED;
-    add_pcc_arg(cur_call, name);
-    add_pcc_arg(cur_call, value);
+    add_pcc_arg(interp, cur_call, name);
+    add_pcc_arg(interp, cur_call, value);
 }
 
 /*
 
-=item C<static void add_pcc_named_result(SymReg *cur_call, SymReg *name, SymReg
-*value)>
+=item C<static void add_pcc_named_result(PARROT_INTERP, SymReg *cur_call, SymReg
+*name, SymReg *value)>
 
 =cut
 
 */
 
 static void
-add_pcc_named_result(ARGMOD(SymReg *cur_call),
+add_pcc_named_result(PARROT_INTERP,
+        ARGMOD(SymReg *cur_call),
         ARGMOD(SymReg *name),
         ARGMOD(SymReg *value))
 {
     ASSERT_ARGS(add_pcc_named_result)
     name->type         |= VT_NAMED;
 
-    add_pcc_result(cur_call, name);
-    add_pcc_result(cur_call, value);
+    add_pcc_result(interp, cur_call, name);
+    add_pcc_result(interp, cur_call, value);
 }
 
 /*
 
-=item C<static void add_pcc_named_param(SymReg *cur_call, SymReg *name, SymReg
-*value)>
+=item C<static void add_pcc_named_param(PARROT_INTERP, SymReg *cur_call, SymReg
+*name, SymReg *value)>
 
 =cut
 
 */
 
 static void
-add_pcc_named_param(ARGMOD(SymReg *cur_call),
+add_pcc_named_param(PARROT_INTERP,
+        ARGMOD(SymReg *cur_call),
         ARGMOD(SymReg *name),
         ARGMOD(SymReg *value))
 {
     ASSERT_ARGS(add_pcc_named_param)
     name->type         |= VT_NAMED;
 
-    add_pcc_arg(cur_call, name);
-    add_pcc_arg(cur_call, value);
+    add_pcc_arg(interp, cur_call, name);
+    add_pcc_arg(interp, cur_call, value);
 }
 
 /*
 
-=item C<static void add_pcc_named_return(SymReg *cur_call, SymReg *name, SymReg
-*value)>
+=item C<static void add_pcc_named_return(PARROT_INTERP, SymReg *cur_call, SymReg
+*name, SymReg *value)>
 
 =cut
 
 */
 
 static void
-add_pcc_named_return(ARGMOD(SymReg *cur_call),
+add_pcc_named_return(PARROT_INTERP,
+        ARGMOD(SymReg *cur_call),
         ARGMOD(SymReg *name),
         ARGMOD(SymReg *value))
 {
     ASSERT_ARGS(add_pcc_named_return)
     name->type         |= VT_NAMED;
 
-    add_pcc_result(cur_call, name);
-    add_pcc_result(cur_call, value);
+    add_pcc_result(interp, cur_call, name);
+    add_pcc_result(interp, cur_call, value);
 }
 
 /*
@@ -1387,12 +1403,12 @@ sub_params:
    | sub_params sub_param '\n'
          {
            if (IMCC_INFO(interp)->adv_named_id) {
-                 add_pcc_named_param(IMCC_INFO(interp)->cur_call,
+                 add_pcc_named_param(interp, IMCC_INFO(interp)->cur_call,
                                      IMCC_INFO(interp)->adv_named_id, $2);
                  IMCC_INFO(interp)->adv_named_id = NULL;
            }
            else
-               add_pcc_arg(IMCC_INFO(interp)->cur_call, $2);
+               add_pcc_arg(interp, IMCC_INFO(interp)->cur_call, $2);
          }
    ;
 
@@ -1516,17 +1532,17 @@ subid:
 multi_types:
      /* empty */
          {
-           add_pcc_multi(IMCC_INFO(interp)->cur_call, NULL);
+           add_pcc_multi(interp, IMCC_INFO(interp)->cur_call, NULL);
          }
    | multi_types COMMA multi_type
          {
            $$ = 0;
-           add_pcc_multi(IMCC_INFO(interp)->cur_call, $3);
+           add_pcc_multi(interp, IMCC_INFO(interp)->cur_call, $3);
          }
    | multi_type
          {
            $$ = 0;
-           add_pcc_multi(IMCC_INFO(interp)->cur_call, $1);
+           add_pcc_multi(interp, IMCC_INFO(interp)->cur_call, $1);
          }
    ;
 
@@ -1673,7 +1689,7 @@ pcc_call:
 
 pcc_args:
      /* empty */               { $$ = 0; }
-   | pcc_args pcc_arg '\n'     { add_pcc_arg(IMCC_INFO(interp)->cur_call, $2); }
+   | pcc_args pcc_arg '\n'     { add_pcc_arg(interp, IMCC_INFO(interp)->cur_call, $2); }
    ;
 
 pcc_arg:
@@ -1686,7 +1702,7 @@ pcc_results:
    | pcc_results pcc_result '\n'
          {
            if ($2)
-               add_pcc_result(IMCC_INFO(interp)->cur_call, $2);
+               add_pcc_result(interp, IMCC_INFO(interp)->cur_call, $2);
          }
    ;
 
@@ -1745,12 +1761,12 @@ pcc_returns:
    | pcc_returns '\n'
          {
            if ($1)
-               add_pcc_result(IMCC_INFO(interp)->sr_return, $1);
+               add_pcc_result(interp, IMCC_INFO(interp)->sr_return, $1);
          }
    | pcc_returns pcc_return '\n'
          {
            if ($2)
-               add_pcc_result(IMCC_INFO(interp)->sr_return, $2);
+               add_pcc_result(interp, IMCC_INFO(interp)->sr_return, $2);
          }
    ;
 
@@ -1759,12 +1775,12 @@ pcc_yields:
    | pcc_yields '\n'
          {
            if ($1)
-               add_pcc_result(IMCC_INFO(interp)->sr_return, $1);
+               add_pcc_result(interp, IMCC_INFO(interp)->sr_return, $1);
          }
    | pcc_yields pcc_set_yield '\n'
          {
            if ($2)
-               add_pcc_result(IMCC_INFO(interp)->sr_return, $2);
+               add_pcc_result(interp, IMCC_INFO(interp)->sr_return, $2);
          }
    ;
 
@@ -1799,32 +1815,32 @@ var_returns:
    | arg
          {
            if (IMCC_INFO(interp)->adv_named_id) {
-               add_pcc_named_return(IMCC_INFO(interp)->sr_return,
+               add_pcc_named_return(interp, IMCC_INFO(interp)->sr_return,
                                     IMCC_INFO(interp)->adv_named_id, $1);
                IMCC_INFO(interp)->adv_named_id = NULL;
            }
            else
-               add_pcc_result(IMCC_INFO(interp)->sr_return, $1);
+               add_pcc_result(interp, IMCC_INFO(interp)->sr_return, $1);
          }
    | STRINGC ADV_ARROW var
          {
             SymReg * const name = mk_const(interp, $1, 'S');
-            add_pcc_named_return(IMCC_INFO(interp)->sr_return, name, $3);
+            add_pcc_named_return(interp, IMCC_INFO(interp)->sr_return, name, $3);
          }
    | var_returns COMMA arg
          {
            if (IMCC_INFO(interp)->adv_named_id) {
-               add_pcc_named_return(IMCC_INFO(interp)->sr_return,
+               add_pcc_named_return(interp, IMCC_INFO(interp)->sr_return,
                                     IMCC_INFO(interp)->adv_named_id, $3);
                IMCC_INFO(interp)->adv_named_id = NULL;
              }
              else
-                 add_pcc_result(IMCC_INFO(interp)->sr_return, $3);
+                 add_pcc_result(interp, IMCC_INFO(interp)->sr_return, $3);
          }
    | var_returns COMMA STRINGC ADV_ARROW var
          {
            SymReg * const name = mk_const(interp, $3, 'S');
-           add_pcc_named_return(IMCC_INFO(interp)->sr_return, name, $5);
+           add_pcc_named_return(interp, IMCC_INFO(interp)->sr_return, name, $5);
          }
    ;
 
@@ -1908,7 +1924,7 @@ id_list :
 id_list_id :
      IDENTIFIER opt_unique_reg
          {
-           IdList* const l = mem_allocate_n_zeroed_typed(1, IdList);
+           IdList* const l = mem_gc_allocate_n_zeroed_typed(interp, 1, IdList);
            l->id           = $1;
            l->unique_reg   = $2;
            $$ = l;
@@ -2053,7 +2069,7 @@ assignment:
      /* Subroutine call the short way */
    | target  '=' sub_call
          {
-           add_pcc_result($3->symregs[0], $1);
+           add_pcc_result(interp, $3->symregs[0], $1);
            IMCC_INFO(interp)->cur_call = NULL;
            $$ = 0;
          }
@@ -2209,38 +2225,38 @@ arglist:
          {
            $$ = 0;
            if (IMCC_INFO(interp)->adv_named_id) {
-               add_pcc_named_arg(IMCC_INFO(interp)->cur_call, IMCC_INFO(interp)->adv_named_id, $3);
+               add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call, IMCC_INFO(interp)->adv_named_id, $3);
                IMCC_INFO(interp)->adv_named_id = NULL;
            }
            else
-               add_pcc_arg(IMCC_INFO(interp)->cur_call, $3);
+               add_pcc_arg(interp, IMCC_INFO(interp)->cur_call, $3);
          }
    | arg
          {
            $$ = 0;
            if (IMCC_INFO(interp)->adv_named_id) {
-               add_pcc_named_arg(IMCC_INFO(interp)->cur_call, IMCC_INFO(interp)->adv_named_id, $1);
+               add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call, IMCC_INFO(interp)->adv_named_id, $1);
                IMCC_INFO(interp)->adv_named_id = NULL;
            }
            else
-               add_pcc_arg(IMCC_INFO(interp)->cur_call, $1);
+               add_pcc_arg(interp, IMCC_INFO(interp)->cur_call, $1);
          }
    | arglist COMMA STRINGC ADV_ARROW var
          {
            $$ = 0;
-           add_pcc_named_arg(IMCC_INFO(interp)->cur_call,
+           add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call,
                 mk_const(interp, $3, 'S'), $5);
            mem_sys_free($3);
          }
    | var ADV_ARROW var
          {
            $$ = 0;
-           add_pcc_named_arg_var(IMCC_INFO(interp)->cur_call, $1, $3);
+           add_pcc_named_arg_var(interp, IMCC_INFO(interp)->cur_call, $1, $3);
          }
    | STRINGC ADV_ARROW var
          {
            $$ = 0;
-           add_pcc_named_arg(IMCC_INFO(interp)->cur_call,
+           add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call,
                 mk_const(interp, $1, 'S'), $3);
            mem_sys_free($1);
          }
@@ -2274,31 +2290,31 @@ targetlist:
          {
            $$ = 0;
            if (IMCC_INFO(interp)->adv_named_id) {
-               add_pcc_named_result(IMCC_INFO(interp)->cur_call, IMCC_INFO(interp)->adv_named_id, $3);
+               add_pcc_named_result(interp, IMCC_INFO(interp)->cur_call, IMCC_INFO(interp)->adv_named_id, $3);
                IMCC_INFO(interp)->adv_named_id = NULL;
            }
            else
-               add_pcc_result(IMCC_INFO(interp)->cur_call, $3);
+               add_pcc_result(interp, IMCC_INFO(interp)->cur_call, $3);
          }
    | targetlist COMMA STRINGC ADV_ARROW target
          {
-            add_pcc_named_result(IMCC_INFO(interp)->cur_call,
-            mk_const(interp, $3, 'S'), $5);
+            add_pcc_named_result(interp, IMCC_INFO(interp)->cur_call,
+                    mk_const(interp, $3, 'S'), $5);
             mem_sys_free($3);
          }
    | result
          {
            $$ = 0;
            if (IMCC_INFO(interp)->adv_named_id) {
-               add_pcc_named_result(IMCC_INFO(interp)->cur_call, IMCC_INFO(interp)->adv_named_id, $1);
+               add_pcc_named_result(interp, IMCC_INFO(interp)->cur_call, IMCC_INFO(interp)->adv_named_id, $1);
                IMCC_INFO(interp)->adv_named_id = NULL;
            }
            else
-               add_pcc_result(IMCC_INFO(interp)->cur_call, $1);
+               add_pcc_result(interp, IMCC_INFO(interp)->cur_call, $1);
          }
    | STRINGC ADV_ARROW target
          {
-           add_pcc_named_result(IMCC_INFO(interp)->cur_call, mk_const(interp, $1, 'S'), $3);
+           add_pcc_named_result(interp, IMCC_INFO(interp)->cur_call, mk_const(interp, $1, 'S'), $3);
            mem_sys_free($1);
          }
    | /* empty */                { $$ = 0; }

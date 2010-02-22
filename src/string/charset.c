@@ -64,11 +64,12 @@ static All_charsets *all_charsets;
 static void Parrot_str_internal_register_charset_names(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static INTVAL register_charset(
+static INTVAL register_charset(PARROT_INTERP,
     ARGIN(const char *charsetname),
     ARGIN(CHARSET *charset))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void register_static_converters(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -77,7 +78,8 @@ static void register_static_converters(PARROT_INTERP)
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_register_charset __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(charsetname) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(charsetname) \
     , PARROT_ASSERT_ARG(charset))
 #define ASSERT_ARGS_register_static_converters __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -98,10 +100,10 @@ PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_MALLOC
 CHARSET *
-Parrot_new_charset(SHIM_INTERP)
+Parrot_new_charset(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_new_charset)
-    return mem_allocate_typed(CHARSET);
+    return mem_gc_allocate_zeroed_typed(interp, CHARSET);
 }
 
 /*
@@ -117,7 +119,7 @@ that holds the charsets back to the system.
 
 PARROT_EXPORT
 void
-Parrot_charsets_encodings_deinit(SHIM_INTERP)
+Parrot_charsets_encodings_deinit(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_charsets_encodings_deinit)
     int i;
@@ -125,13 +127,13 @@ Parrot_charsets_encodings_deinit(SHIM_INTERP)
 
     for (i = 0; i < n; ++i) {
         if (all_charsets->set[i].n_converters)
-            mem_sys_free(all_charsets->set[i].to_converters);
-        mem_sys_free(all_charsets->set[i].charset);
+            mem_gc_free(interp, all_charsets->set[i].to_converters);
+        mem_gc_free(interp, all_charsets->set[i].charset);
     }
-    mem_sys_free(all_charsets->set);
-    mem_sys_free(all_charsets);
+    mem_gc_free(interp, all_charsets->set);
+    mem_gc_free(interp, all_charsets);
     all_charsets = NULL;
-    parrot_deinit_encodings();
+    parrot_deinit_encodings(interp);
 }
 
 /*
@@ -311,8 +313,8 @@ Parrot_charset_c_name(SHIM_INTERP, INTVAL number_of_charset)
 
 /*
 
-=item C<static INTVAL register_charset(const char *charsetname, CHARSET
-*charset)>
+=item C<static INTVAL register_charset(PARROT_INTERP, const char *charsetname,
+CHARSET *charset)>
 
 Adds a new charset C<charset> with name <charsetname> to the list of
 all charsets. Returns 0 and does nothing if a charset with that name
@@ -323,7 +325,8 @@ already exists. Returns 1 otherwise.
 */
 
 static INTVAL
-register_charset(ARGIN(const char *charsetname), ARGIN(CHARSET *charset))
+register_charset(PARROT_INTERP, ARGIN(const char *charsetname),
+        ARGIN(CHARSET *charset))
 {
     ASSERT_ARGS(register_charset)
     int i;
@@ -339,10 +342,10 @@ register_charset(ARGIN(const char *charsetname), ARGIN(CHARSET *charset))
      * loading of charsets from inside threads
      */
     if (!n)
-        all_charsets->set = mem_allocate_typed(One_charset);
+        all_charsets->set = mem_gc_allocate_zeroed_typed(interp, One_charset);
     else
-        all_charsets->set = (One_charset *)mem_sys_realloc(all_charsets->set,
-                (n + 1) * sizeof (One_charset));
+        all_charsets->set = mem_gc_realloc_n_typed_zeroed(interp,
+                all_charsets->set, n + 1, n, One_charset);
 
     all_charsets->n_charsets++;
     all_charsets->set[n].charset      = charset;
@@ -429,29 +432,29 @@ failed, for any reason.
 
 PARROT_EXPORT
 INTVAL
-Parrot_register_charset(SHIM_INTERP, ARGIN(const char *charsetname),
+Parrot_register_charset(PARROT_INTERP, ARGIN(const char *charsetname),
         ARGIN(CHARSET *charset))
 {
     ASSERT_ARGS(Parrot_register_charset)
     if (!all_charsets) {
-        all_charsets             = mem_allocate_typed(All_charsets);
+        all_charsets             = mem_gc_allocate_zeroed_typed(interp, All_charsets);
         all_charsets->set        = NULL;
         all_charsets->n_charsets = 0;
     }
 
     if (STREQ("binary", charsetname)) {
         Parrot_binary_charset_ptr = charset;
-        return register_charset(charsetname, charset);
+        return register_charset(interp, charsetname, charset);
     }
 
     if (STREQ("iso-8859-1", charsetname)) {
         Parrot_iso_8859_1_charset_ptr = charset;
-        return register_charset(charsetname, charset);
+        return register_charset(interp, charsetname, charset);
     }
 
     if (STREQ("unicode", charsetname)) {
         Parrot_unicode_charset_ptr = charset;
-        return register_charset(charsetname, charset);
+        return register_charset(interp, charsetname, charset);
     }
 
     if (STREQ("ascii", charsetname)) {
@@ -459,7 +462,7 @@ Parrot_register_charset(SHIM_INTERP, ARGIN(const char *charsetname),
             Parrot_default_charset_ptr = charset;
 
         Parrot_ascii_charset_ptr = charset;
-        return register_charset(charsetname, charset);
+        return register_charset(interp, charsetname, charset);
     }
 
     return 0;
@@ -594,7 +597,7 @@ Registers a converter C<func> from charset C<lhs> to C<rhs>.
 
 PARROT_EXPORT
 void
-Parrot_register_charset_converter(SHIM_INTERP,
+Parrot_register_charset_converter(PARROT_INTERP,
         ARGIN(const CHARSET *lhs), ARGIN(CHARSET *rhs),
         ARGIN(charset_converter_t func))
 {
@@ -608,11 +611,11 @@ Parrot_register_charset_converter(SHIM_INTERP,
             const int nc = left->n_converters++;
 
             if (nc) {
-                left->to_converters = (To_converter *)mem_sys_realloc(
-                        left->to_converters, sizeof (To_converter) * (nc + 1));
+                left->to_converters = mem_gc_realloc_n_typed_zeroed(interp,
+                        left->to_converters, nc + 1, nc, To_converter);
             }
             else
-                left->to_converters = (To_converter *)mem_sys_allocate(sizeof (To_converter));
+                left->to_converters = mem_gc_allocate_zeroed_typed(interp, To_converter);
             left->to_converters[nc].to = rhs;
             left->to_converters[nc].func = func;
         }

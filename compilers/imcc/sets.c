@@ -38,7 +38,7 @@ An implementation of sets -- used for tracking register usage.
 
 /*
 
-=item C<Set* set_make(unsigned int length)>
+=item C<Set* set_make(PARROT_INTERP, unsigned int length)>
 
 Creates a new Set object.
 
@@ -49,13 +49,13 @@ Creates a new Set object.
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Set*
-set_make(unsigned int length)
+set_make(PARROT_INTERP, unsigned int length)
 {
     ASSERT_ARGS(set_make)
-    Set * const s = mem_allocate_zeroed_typed(Set);
+    Set * const s = mem_gc_allocate_zeroed_typed(interp, Set);
     s->length     = length;
-    s->bmp        = mem_allocate_n_zeroed_typed(NUM_BYTES(length),
-                        unsigned char);
+    s->bmp        = mem_gc_allocate_n_zeroed_typed(interp,
+                            NUM_BYTES(length), unsigned char);
 
     return s;
 }
@@ -63,7 +63,7 @@ set_make(unsigned int length)
 
 /*
 
-=item C<Set* set_make_full(unsigned int length)>
+=item C<Set* set_make_full(PARROT_INTERP, unsigned int length)>
 
 Creates a new Set object of C<length> items, setting them all to full.
 
@@ -74,10 +74,10 @@ Creates a new Set object of C<length> items, setting them all to full.
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Set*
-set_make_full(unsigned int length)
+set_make_full(PARROT_INTERP, unsigned int length)
 {
     ASSERT_ARGS(set_make_full)
-    Set * const s      = set_make(length);
+    Set * const s      = set_make(interp, length);
     const size_t bytes = NUM_BYTES(length);
 
     if (bytes)
@@ -128,7 +128,7 @@ set_clear(ARGMOD(Set *s))
 
 /*
 
-=item C<Set* set_copy(const Set *s)>
+=item C<Set* set_copy(PARROT_INTERP, const Set *s)>
 
 Copies the set C<s>, returning a new set pointer.
 
@@ -139,10 +139,10 @@ Copies the set C<s>, returning a new set pointer.
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Set*
-set_copy(ARGIN(const Set *s))
+set_copy(PARROT_INTERP, ARGIN(const Set *s))
 {
     ASSERT_ARGS(set_copy)
-    Set * const d = set_make(s->length);
+    Set * const d = set_make(interp, s->length);
 
     memcpy(d->bmp, s->bmp, NUM_BYTES(d->length));
     return d;
@@ -286,7 +286,7 @@ set_contains(ARGIN(const Set *s), unsigned int element)
 
 /*
 
-=item C<Set * set_union(const Set *s1, const Set *s2)>
+=item C<Set * set_union(PARROT_INTERP, const Set *s1, const Set *s2)>
 
 Computes the union of the two Set arguments, returning it as a new Set.
 
@@ -299,11 +299,11 @@ Raises a fatal error if the two Sets have different lengths.
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Set *
-set_union(ARGIN(const Set *s1), ARGIN(const Set *s2))
+set_union(PARROT_INTERP, ARGIN(const Set *s1), ARGIN(const Set *s2))
 {
     ASSERT_ARGS(set_union)
     unsigned int i;
-    Set * const s = set_make(s1->length);
+    Set * const s = set_make(interp, s1->length);
 
     if (s1->length != s2->length)
         fatal(1, "set_union", "Sets don't have the same length\n");
@@ -318,7 +318,7 @@ set_union(ARGIN(const Set *s1), ARGIN(const Set *s2))
 
 /*
 
-=item C<Set * set_intersec(const Set *s1, const Set *s2)>
+=item C<Set * set_intersec(PARROT_INTERP, const Set *s1, const Set *s2)>
 
 Creates a new Set object that is the intersection of the Set arguments (defined
 through the binary C<and> operator.)
@@ -332,11 +332,11 @@ Raises a fatal error if the two Sets have different lengths.
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Set *
-set_intersec(ARGIN(const Set *s1), ARGIN(const Set *s2))
+set_intersec(PARROT_INTERP, ARGIN(const Set *s1), ARGIN(const Set *s2))
 {
     ASSERT_ARGS(set_intersec)
     unsigned int i;
-    Set * const  s = set_make(s1->length);
+    Set * const  s = set_make(interp, s1->length);
 
     if (s1->length != s2->length)
         fatal(1, "set_intersec", "Sets don't have the same length\n");

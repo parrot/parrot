@@ -608,7 +608,7 @@ to_encoding(PARROT_INTERP, ARGMOD(STRING *src), ARGMOD_NULLOK(STRING *dest))
 
     if (in_place) {
         /* need intermediate memory */
-        p = (unsigned char *)mem_sys_allocate(src_len);
+        p = mem_gc_allocate_n_typed(interp, src_len, unsigned char);
     }
     else {
         Parrot_gc_reallocate_string_storage(interp, dest, src_len);
@@ -631,7 +631,7 @@ to_encoding(PARROT_INTERP, ARGMOD(STRING *src), ARGMOD_NULLOK(STRING *dest))
                     need = 16;
                 dest_len += need;
                 if (in_place)
-                    p = (unsigned char *)mem_sys_realloc(p, dest_len);
+                    p = mem_gc_realloc_n_typed(interp, p, dest_len, unsigned char);
                 else {
                     result->bufused = dest_pos;
                     Parrot_gc_reallocate_string_storage(interp, dest, dest_len);
@@ -648,7 +648,7 @@ to_encoding(PARROT_INTERP, ARGMOD(STRING *src), ARGMOD_NULLOK(STRING *dest))
     if (in_place) {
         Parrot_gc_reallocate_string_storage(interp, src, src->bufused);
         memcpy(src->strstart, p, src->bufused);
-        mem_sys_free(p);
+        mem_gc_free(interp, p);
     }
     return result;
 }

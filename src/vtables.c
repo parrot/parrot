@@ -43,7 +43,7 @@ VTABLE *
 Parrot_new_vtable(SHIM_INTERP)
 {
     ASSERT_ARGS(Parrot_new_vtable)
-    return mem_allocate_zeroed_typed(VTABLE);
+    return mem_internal_allocate_zeroed_typed(VTABLE);
 }
 
 /*
@@ -63,7 +63,7 @@ VTABLE *
 Parrot_clone_vtable(PARROT_INTERP, ARGIN(const VTABLE *base_vtable))
 {
     ASSERT_ARGS(Parrot_clone_vtable)
-    VTABLE * const new_vtable = mem_allocate_typed(VTABLE);
+    VTABLE * const new_vtable = mem_internal_allocate_typed(VTABLE);
 
     STRUCT_COPY(new_vtable, base_vtable);
 
@@ -108,7 +108,7 @@ Parrot_destroy_vtable(PARROT_INTERP, ARGMOD(VTABLE *vtable))
             ro_vtable->isa_hash = NULL;
         }
 
-        mem_sys_free(ro_vtable);
+        mem_internal_free(ro_vtable);
         vtable->ro_variant_vtable = NULL;
     }
 
@@ -117,7 +117,7 @@ Parrot_destroy_vtable(PARROT_INTERP, ARGMOD(VTABLE *vtable))
         vtable->isa_hash = NULL;
     }
 
-    mem_sys_free(vtable);
+    mem_internal_free(vtable);
 }
 
 /*
@@ -134,7 +134,7 @@ void
 parrot_alloc_vtables(PARROT_INTERP)
 {
     ASSERT_ARGS(parrot_alloc_vtables)
-    interp->vtables          = mem_allocate_n_zeroed_typed(PARROT_MAX_CLASSES, VTABLE *);
+    interp->vtables          = mem_internal_allocate_n_zeroed_typed(PARROT_MAX_CLASSES, VTABLE *);
     interp->n_vtable_max     = enum_class_core_max;
     interp->n_vtable_alloced = PARROT_MAX_CLASSES - 1;
 }
@@ -162,7 +162,7 @@ parrot_realloc_vtables(PARROT_INTERP)
 
     /* arrays start at zero, but we compare type numbers starting at 1 */
     interp->n_vtable_alloced = new_max - 1;
-    interp->vtables          = (VTABLE **)mem_sys_realloc_zeroed(
+    interp->vtables          = (VTABLE **)mem_internal_realloc_zeroed(
         interp->vtables, new_size, old_size);
 }
 
@@ -187,7 +187,7 @@ parrot_free_vtables(PARROT_INTERP)
     for (i = 0; i < interp->n_vtable_max; i++)
         Parrot_destroy_vtable(interp, interp->vtables[i]);
 
-    mem_sys_free(interp->vtables);
+    mem_internal_free(interp->vtables);
 }
 
 /*

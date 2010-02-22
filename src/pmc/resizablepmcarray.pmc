@@ -92,7 +92,8 @@ Resizes the array to C<size> elements.
             if (cur < 8)
                 cur = 8;
 
-            PMC_array(SELF) = mem_realloc_n_typed(PMC_array(SELF), cur, PMC *);
+            PMC_array(SELF) = mem_gc_realloc_n_typed_zeroed(INTERP,
+                    PMC_array(SELF), cur, i, PMC *);
 
             for (; i < cur; i++) {
                 (PMC_array(SELF))[i] = PMCNULL;

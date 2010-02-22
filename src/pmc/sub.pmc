@@ -184,7 +184,8 @@ surboutine is fully constructed but not attached to interpreter.
         if (VTABLE_exists_keyed_str(INTERP, init, field)) {
             PMC   *tmp = VTABLE_get_pmc_keyed_str(INTERP, init, field);
             /* Allocate structure to store argument information in. */
-            attrs->arg_info = mem_allocate_zeroed_typed(Parrot_sub_arginfo);
+            attrs->arg_info = mem_gc_allocate_zeroed_typed(INTERP,
+                    Parrot_sub_arginfo);
             /*
             Hash.get_integer_keyed_str return 0 if key doesn't exists.
             So, don't check existence of key, just use it.
@@ -222,7 +223,7 @@ Destroys the subroutine.
 
         if (sub) {
             if (sub->arg_info)
-                mem_sys_free(sub->arg_info);
+                mem_gc_free(INTERP, sub->arg_info);
         }
     }
 
@@ -843,7 +844,8 @@ The number of optional named arguments
             const opcode_t *pc = sub->seg->base.data + sub->start_offs;
 
             /* Allocate structure to store argument information in. */
-            sub->arg_info = mem_allocate_zeroed_typed(Parrot_sub_arginfo);
+            sub->arg_info = mem_gc_allocate_zeroed_typed(INTERP,
+                    Parrot_sub_arginfo);
 
             /* If the first instruction is a get_params... */
             if (*pc == PARROT_OP_get_params_pc) {

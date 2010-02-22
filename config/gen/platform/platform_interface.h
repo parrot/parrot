@@ -44,9 +44,9 @@ void *mem_alloc_executable(size_t);
 void mem_free_executable(void *, size_t);
 void *mem_realloc_executable(void *, size_t, size_t);
 #else
-#  define mem_alloc_executable mem_sys_allocate
-#  define mem_free_executable(a, b) mem_sys_free(a)
-#  define mem_realloc_executable(a, b, c) mem_sys_realloc((a), (c))
+#  define mem_alloc_executable mem_internal_allocate
+#  define mem_free_executable(a, b) mem_internal_free(a)
+#  define mem_realloc_executable(a, b, c) mem_internal_realloc((a), (c))
 #endif
 
 /*

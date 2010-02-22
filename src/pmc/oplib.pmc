@@ -50,9 +50,9 @@ pmclass OpLib singleton {
        specific name, then the more general short name. */
     VTABLE INTVAL get_integer_keyed_str(STRING *name) {
         char * cstr = Parrot_str_to_cstring(INTERP, name);
-        INTVAL num = INTERP->op_lib->op_code(cstr, 1);
+        INTVAL num = INTERP->op_lib->op_code(INTERP, cstr, 1);
         if (num == -1)
-            num = INTERP->op_lib->op_code(cstr, 0);
+            num = INTERP->op_lib->op_code(INTERP, cstr, 0);
         Parrot_str_free_cstring(cstr);
         return num;
     }

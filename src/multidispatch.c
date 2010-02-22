@@ -1278,14 +1278,14 @@ mmd_cache_key_from_values(PARROT_INTERP, ARGIN(const char *name),
     const INTVAL num_values = VTABLE_elements(interp, values);
     const INTVAL name_len   = name ? strlen(name) + 1: 0;
     const size_t id_size    = num_values * sizeof (INTVAL) + name_len;
-    INTVAL *type_ids        = (INTVAL *)mem_sys_allocate(id_size);
+    INTVAL *type_ids        = mem_gc_allocate_n_typed(interp, num_values + name_len, INTVAL);
     STRING *key;
     INTVAL  i;
 
     for (i = 0; i < num_values; i++) {
         const INTVAL id = VTABLE_type(interp, VTABLE_get_pmc_keyed_int(interp, values, i));
         if (id == 0) {
-            mem_sys_free(type_ids);
+            mem_gc_free(interp, type_ids);
             return NULL;
         }
 
@@ -1296,7 +1296,7 @@ mmd_cache_key_from_values(PARROT_INTERP, ARGIN(const char *name),
         strcpy((char *)(type_ids + num_values), name);
 
     key = Parrot_str_new(interp, (char *)type_ids, id_size);
-    mem_sys_free(type_ids);
+    mem_gc_free(interp, type_ids);
 
     return key;
 }
@@ -1378,7 +1378,7 @@ mmd_cache_key_from_types(PARROT_INTERP, ARGIN(const char *name),
     const INTVAL num_types  = VTABLE_elements(interp, types);
     const INTVAL name_len   = name ? strlen(name) + 1: 0;
     const size_t id_size    = num_types * sizeof (INTVAL) + name_len;
-    INTVAL * const type_ids = (INTVAL *)mem_sys_allocate(id_size);
+    INTVAL * const type_ids = mem_gc_allocate_n_typed(interp, num_types + name_len, INTVAL);
 
     STRING *key;
     INTVAL  i;
@@ -1387,7 +1387,7 @@ mmd_cache_key_from_types(PARROT_INTERP, ARGIN(const char *name),
         const INTVAL id = VTABLE_get_integer_keyed_int(interp, types, i);
 
         if (id == 0) {
-            mem_sys_free(type_ids);
+            mem_gc_free(interp, type_ids);
             return NULL;
         }
 
@@ -1399,7 +1399,7 @@ mmd_cache_key_from_types(PARROT_INTERP, ARGIN(const char *name),
 
     key = Parrot_str_new(interp, (char *)type_ids, id_size);
 
-    mem_sys_free(type_ids);
+    mem_gc_free(interp, type_ids);
     return key;
 }
 

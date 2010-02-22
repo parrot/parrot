@@ -148,8 +148,9 @@ Resizes the array to C<size> elements.
         /* Nothing allocated yet */
         GET_ATTR_bit_array(INTERP, SELF, bit_array);
         if (!bit_array) {
-            SET_ATTR_bit_array(INTERP, SELF,
-                    (unsigned char *)mem_sys_allocate_zeroed(new_size_in_bytes));
+            void *new_bit_array = Parrot_gc_allocate_memory_chunk(INTERP, new_size_in_bytes);
+            memset(new_bit_array, 0, new_size_in_bytes);
+            SET_ATTR_bit_array(INTERP, SELF, (unsigned char *)new_bit_array);
 
         /* The size is different, and doesn't fit within the current
          * allocation */
@@ -157,15 +158,16 @@ Resizes the array to C<size> elements.
         else if (new_size_in_bytes != old_size_in_bytes) {
             unsigned char * old_store = bit_array;
             unsigned char * new_store =
-                (unsigned char *)mem_sys_allocate_zeroed(new_tail_pos);
+                (unsigned char *)Parrot_gc_allocate_memory_chunk(INTERP, new_tail_pos);
             size_t          copy_size =
                 new_size_in_bytes < old_size_in_bytes ? new_size_in_bytes : old_size_in_bytes;
+            memset(new_store, 0, new_tail_pos);
 
             /* Replace old array with new array, and free old array */
             SET_ATTR_bit_array(INTERP, SELF,
                     (unsigned char *)mem_sys_memmove(
                         new_store, old_store, copy_size));
-            mem_sys_free(old_store);
+            mem_gc_free(INTERP, old_store);
         }
     }
 
@@ -249,7 +251,8 @@ beginning.
 
             /* Allocate an extra allocation unit of space in new array */
             new_mem_size  = ROUND_BYTES(tail_pos+ MIN_ALLOC);
-            new_bit_array = (unsigned char *)mem_sys_allocate_zeroed(new_mem_size);
+            new_bit_array = (unsigned char *)Parrot_gc_allocate_memory_chunk(INTERP, new_mem_size);
+            memset(new_bit_array, 0, new_mem_size);
 
             /* Copy contents of old array to new array, moving the head
              * position forward by one allocation unit (in bytes). */
@@ -259,7 +262,7 @@ beginning.
 
             /* Replace old array with new array, and free old array */
             SET_ATTR_bit_array(INTERP, SELF, new_bit_array);
-            mem_sys_free(old_bit_array);
+            mem_gc_free(INTERP, old_bit_array);
 
             /* Added one allocation unit to the head position offset */
             SET_ATTR_size(INTERP, SELF, tail_pos + MIN_ALLOC);
@@ -309,7 +312,8 @@ Removes and returns the first element.
             GET_ATTR_size(INTERP, SELF, tail_pos);
             new_mem_size  = ROUND_BYTES(tail_pos - MIN_ALLOC);
             new_bit_array =
-                (unsigned char *)mem_sys_allocate_zeroed(new_mem_size);
+                (unsigned char *)Parrot_gc_allocate_memory_chunk(INTERP, new_mem_size);
+            memset(new_bit_array, 0, new_mem_size);
 
             /* Copy contents of old array to new array, move the head position
              * offset back by one allocation unit (in bytes) */
@@ -319,7 +323,7 @@ Removes and returns the first element.
 
             /* Replace old array with new array, and free old array */
             SET_ATTR_bit_array(INTERP, SELF, new_bit_array);
-            mem_sys_free(old_bit_array);
+            mem_gc_free(INTERP, old_bit_array);
 
             /* Removed one allocation unit from the head position offset */
             SET_ATTR_size(INTERP, SELF, tail_pos - MIN_ALLOC);
@@ -384,7 +388,7 @@ Returns a copy of the array.
 
         if (my_bit_array) {
             size_t size_in_bits = tail_pos / BITS_PER_CHAR + 1;
-            dest_bit_array = (unsigned char *)mem_sys_allocate(size_in_bits);
+            dest_bit_array = (unsigned char *)Parrot_gc_allocate_memory_chunk(INTERP, size_in_bits);
             mem_sys_memcopy(dest_bit_array, my_bit_array, size_in_bits);
         }
         else

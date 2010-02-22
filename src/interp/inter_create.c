@@ -122,7 +122,7 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     Interp *interp;
 
     /* Get an empty interpreter from system memory */
-    interp = mem_allocate_zeroed_typed(Interp);
+    interp = mem_internal_allocate_zeroed_typed(Interp);
 
     interp->lo_var_ptr = NULL;
 
@@ -156,9 +156,9 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     interp->current_runloop_level = 0;
 
     /* Allocate IMCC info */
-    IMCC_INFO(interp) = mem_allocate_zeroed_typed(imc_info_t);
+    IMCC_INFO(interp) = mem_internal_allocate_zeroed_typed(imc_info_t);
 
-    interp->gc_sys           = mem_allocate_zeroed_typed(GC_Subsystem);
+    interp->gc_sys           = mem_internal_allocate_zeroed_typed(GC_Subsystem);
     interp->gc_sys->sys_type = parent
                                     ? parent->gc_sys->sys_type
                                     : PARROT_GC_DEFAULT_TYPE;

@@ -86,7 +86,7 @@ Returns the current working directory.
 #endif
         if (cwd) {
             STRING * const scwd = Parrot_str_new(INTERP, cwd, strlen(cwd));
-            mem_sys_free(cwd);
+            free(cwd);
             RETURN(STRING *scwd);
         }
         else {

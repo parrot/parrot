@@ -472,7 +472,7 @@ void
 Parrot_schedule_event(PARROT_INTERP, ARGMOD(parrot_event* ev))
 {
     ASSERT_ARGS(Parrot_schedule_event)
-    QUEUE_ENTRY * const entry = mem_allocate_typed(QUEUE_ENTRY);
+    QUEUE_ENTRY * const entry = mem_internal_allocate_typed(QUEUE_ENTRY);
     entry->next = NULL;
     ev->interp  = interp;
     entry->data = ev;
@@ -509,8 +509,8 @@ static void
 schedule_signal_event(int signum)
 {
     ASSERT_ARGS(schedule_signal_event)
-    parrot_event* const ev    = mem_allocate_typed(parrot_event);
-    QUEUE_ENTRY * const entry = mem_allocate_typed(QUEUE_ENTRY);
+    parrot_event* const ev    = mem_internal_allocate_typed(parrot_event);
+    QUEUE_ENTRY * const entry = mem_internal_allocate_typed(QUEUE_ENTRY);
 
     entry->next  = NULL;
     entry->type  = QUEUE_ENTRY_TYPE_EVENT;
@@ -541,7 +541,7 @@ Parrot_new_timer_event(PARROT_INTERP, ARGIN_NULLOK(PMC *timer), FLOATVAL diff,
         FLOATVAL interval, int repeat, ARGIN_NULLOK(PMC *sub), parrot_event_type_enum typ)
 {
     ASSERT_ARGS(Parrot_new_timer_event)
-    parrot_event* const ev = mem_allocate_typed(parrot_event);
+    parrot_event* const ev = mem_internal_allocate_typed(parrot_event);
 
     const FLOATVAL now = Parrot_floatval_time();
 
@@ -573,8 +573,8 @@ void
 Parrot_new_cb_event(PARROT_INTERP, ARGIN(PMC *cbi), ARGIN(char *ext))
 {
     ASSERT_ARGS(Parrot_new_cb_event)
-    parrot_event* const ev    = mem_allocate_typed(parrot_event);
-    QUEUE_ENTRY*  const entry = mem_allocate_typed(QUEUE_ENTRY);
+    parrot_event* const ev    = mem_internal_allocate_typed(parrot_event);
+    QUEUE_ENTRY*  const entry = mem_internal_allocate_typed(QUEUE_ENTRY);
 
     entry->next = NULL;
     entry->data = ev;
@@ -636,7 +636,7 @@ void
 Parrot_new_terminate_event(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_new_terminate_event)
-    parrot_event* const ev = mem_allocate_typed(parrot_event);
+    parrot_event* const ev = mem_internal_allocate_typed(parrot_event);
     ev->type = EVENT_TYPE_TERMINATE;
     Parrot_schedule_event(interp, ev);
 }
@@ -658,9 +658,9 @@ Parrot_new_suspend_for_gc_event(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_new_suspend_for_gc_event)
     QUEUE_ENTRY *qe;
-    parrot_event* const ev = mem_allocate_typed(parrot_event);
+    parrot_event* const ev = mem_internal_allocate_typed(parrot_event);
     ev->type = EVENT_TYPE_SUSPEND_FOR_GC;
-    qe = mem_allocate_typed(QUEUE_ENTRY);
+    qe = mem_internal_allocate_typed(QUEUE_ENTRY);
     qe->next = NULL;
     qe->data = ev;
     qe->type = QUEUE_ENTRY_TYPE_EVENT;
@@ -685,7 +685,7 @@ void
 Parrot_kill_event_loop(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_kill_event_loop)
-    parrot_event* const ev = mem_allocate_typed(parrot_event);
+    parrot_event* const ev = mem_internal_allocate_typed(parrot_event);
     ev->type = EVENT_TYPE_EVENT_TERMINATE;
     Parrot_schedule_event(interp, ev);
 }
@@ -786,13 +786,13 @@ Parrot_schedule_broadcast_qentry(ARGIN(struct QUEUE_ENTRY *entry))
             }
             break;
           default:
-            mem_sys_free(entry);
-            mem_sys_free(event);
+            mem_internal_free(entry);
+            mem_internal_free(event);
         }
         break;
       default:
-        mem_sys_free(entry);
-        mem_sys_free(event);
+        mem_internal_free(entry);
+        mem_internal_free(event);
         exit_fatal(1, "Unknown event to broadcast");
         break;
     }
@@ -828,11 +828,12 @@ store_io_event(ARGMOD(pending_io_events *ios), ARGIN(parrot_event *ev))
     ASSERT_ARGS(store_io_event)
     if (!ios->alloced) {
         ios->alloced = 16;
-        ios->events  = mem_allocate_n_zeroed_typed(ios->alloced, parrot_event *);
+        ios->events  = mem_internal_allocate_n_zeroed_typed(ios->alloced, parrot_event *);
     }
     else if (ios->n >= ios->alloced) {
+        ios->events  = mem_internal_realloc_n_zeroed_typed(ios->events,
+                ios->alloced * 2, ios->alloced, parrot_event *);
         ios->alloced *= 2;
-        mem_realloc_n_typed(ios->events, ios->alloced, parrot_event *);
     }
     ios->events[ios->n++] = ev;
 }
@@ -965,7 +966,7 @@ io_thread(SHIM(void *data))
                                 PMC * const pio = buf.ev->u.io_event.pio;
                                 const int fd = Parrot_io_getfd(buf.ev->interp, pio);
                                 if (FD_ISSET(fd, &act_rfds)) {
-                                    mem_sys_free(buf.ev);
+                                    mem_internal_free(buf.ev);
                                     break;
                                 }
                                 FD_SET(fd, &act_rfds);
@@ -1048,7 +1049,7 @@ Parrot_event_add_io_event(PARROT_INTERP,
 {
     ASSERT_ARGS(Parrot_event_add_io_event)
     io_thread_msg buf;
-    parrot_event * const event = mem_allocate_typed(parrot_event);
+    parrot_event * const event = mem_internal_allocate_typed(parrot_event);
 
     event->type   = EVENT_TYPE_IO;
     event->interp = interp;
@@ -1093,11 +1094,11 @@ static QUEUE_ENTRY*
 dup_entry(ARGIN(const QUEUE_ENTRY *entry))
 {
     ASSERT_ARGS(dup_entry)
-    QUEUE_ENTRY * const new_entry = mem_allocate_typed(QUEUE_ENTRY);
+    QUEUE_ENTRY * const new_entry = mem_internal_allocate_typed(QUEUE_ENTRY);
 
     new_entry->next = NULL;
     new_entry->type = entry->type;
-    new_entry->data = mem_allocate_typed(parrot_event);
+    new_entry->data = mem_internal_allocate_typed(parrot_event);
 
     mem_sys_memcopy(new_entry->data, entry->data, sizeof (parrot_event));
     return new_entry;
@@ -1188,13 +1189,13 @@ process_events(ARGMOD(QUEUE *event_q))
         }
         PARROT_ASSERT(event);
         if (event->type == EVENT_TYPE_NONE) {
-            mem_sys_free(entry);
-            mem_sys_free(event);
+            mem_internal_free(entry);
+            mem_internal_free(event);
             continue;
         }
         else if (event->type == EVENT_TYPE_EVENT_TERMINATE) {
-            mem_sys_free(entry);
-            mem_sys_free(event);
+            mem_internal_free(entry);
+            mem_internal_free(event);
 
             return 0;
         }
@@ -1323,7 +1324,7 @@ wait_for_wakeup(PARROT_INTERP, ARGIN_NULLOK(opcode_t *next))
         QUEUE_ENTRY  * const entry = wait_for_entry(tq);
         parrot_event * const event = (parrot_event*)entry->data;
 
-        mem_sys_free(entry);
+        mem_internal_free(entry);
         edebug((stderr, "got ev %s head : %p\n", et(event), tq->head));
         next = do_event(interp, event, next);
     }
@@ -1497,7 +1498,7 @@ do_event(PARROT_INTERP, ARGIN(parrot_event* event), ARGIN_NULLOK(opcode_t *next)
         fprintf(stderr, "Unhandled event type %d\n", (int)event->type);
         break;
     }
-    mem_sys_free(event);
+    mem_internal_free(event);
     return next;
 }
 
@@ -1533,7 +1534,7 @@ Parrot_do_handle_events(PARROT_INTERP, int restore, ARGIN_NULLOK(opcode_t *next)
         QUEUE_ENTRY  * const entry = pop_entry(tq);
         parrot_event * const event = (parrot_event*)entry->data;
 
-        mem_sys_free(entry);
+        mem_internal_free(entry);
         next = do_event(interp, event, next);
     }
 

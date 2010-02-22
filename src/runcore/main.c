@@ -166,11 +166,12 @@ INTVAL
 Parrot_runcore_register(PARROT_INTERP, ARGIN(Parrot_runcore_t *coredata))
 {
     ASSERT_ARGS(Parrot_runcore_register)
-    size_t num_cores = ++interp->num_cores;
+    size_t i = interp->num_cores++;
 
-    mem_realloc_n_typed(interp->cores, num_cores, Parrot_runcore_t *);
+    interp->cores = mem_gc_realloc_n_typed_zeroed(interp, interp->cores,
+            interp->num_cores, i, Parrot_runcore_t *);
 
-    interp->cores[num_cores - 1] = coredata;
+    interp->cores[i] = coredata;
 
     return 1;
 }
@@ -383,13 +384,15 @@ do_prederef(ARGIN(void **pc_prederef), PARROT_INTERP, ARGIN(Parrot_runcore_t *ru
             if (nb < 8)
                 nb = (size_t)8;
 
-            pi->branches    = mem_allocate_n_typed(nb, Prederef_branch);
+            pi->branches    = mem_gc_allocate_n_zeroed_typed(interp, nb, Prederef_branch);
             pi->n_allocated = nb;
             pi->n_branches  = 0;
         }
         else if (pi->n_branches >= pi->n_allocated) {
+            size_t old = pi->n_allocated;
             pi->n_allocated = (size_t) (pi->n_allocated * 1.5);
-            mem_realloc_n_typed(pi->branches, pi->n_allocated, Prederef_branch);
+            pi->branches = mem_gc_realloc_n_typed_zeroed(interp,
+                    pi->branches, pi->n_allocated, old, Prederef_branch);
         }
 
         pi->branches[pi->n_branches].offs = offset;
@@ -481,7 +484,7 @@ stop_prederef(PARROT_INTERP)
     interp->op_func_table = PARROT_CORE_OPLIB_INIT(1)->op_func_table;
 
     if (interp->evc_func_table) {
-        mem_sys_free(interp->evc_func_table);
+        mem_gc_free(interp, interp->evc_func_table);
         interp->evc_func_table = NULL;
     }
 
@@ -589,7 +592,7 @@ Parrot_setup_event_func_ptrs(PARROT_INTERP)
     if (!interp->evc_func_table) {
         size_t i;
 
-        interp->evc_func_table = mem_allocate_n_typed(n, op_func_t);
+        interp->evc_func_table = mem_gc_allocate_n_zeroed_typed(interp, n, op_func_t);
 
         for (i = 0; i < n; ++i)
             interp->evc_func_table[i] = (op_func_t)
@@ -623,11 +626,11 @@ Parrot_runcore_destroy(PARROT_INTERP)
         if (destroy)
             (*destroy)(interp, core);
 
-        mem_sys_free(core);
+        mem_gc_free(interp, core);
     }
 
     if (interp->cores)
-        mem_sys_free(interp->cores);
+        mem_gc_free(interp, interp->cores);
 
     interp->cores    = NULL;
     interp->run_core = NULL;
@@ -640,17 +643,17 @@ Parrot_runcore_destroy(PARROT_INTERP)
     cg_lib = PARROT_CORE_CGP_OPLIB_INIT(1);
 
     if (cg_lib->op_func_table)
-        mem_sys_free(cg_lib->op_func_table);
+        mem_gc_free(interp, cg_lib->op_func_table);
     cg_lib->op_func_table = NULL;
 
     cg_lib = PARROT_CORE_CG_OPLIB_INIT(1);
     if (cg_lib->op_func_table)
-        mem_sys_free(cg_lib->op_func_table);
+        mem_gc_free(interp, cg_lib->op_func_table);
     cg_lib->op_func_table = NULL;
 #endif
 
-    mem_sys_free(interp->op_info_table);
-    mem_sys_free(interp->op_func_table);
+    mem_gc_free(interp, interp->op_info_table);
+    mem_gc_free(interp, interp->op_func_table);
     interp->op_info_table = NULL;
     interp->op_func_table = NULL;
 }
@@ -697,11 +700,11 @@ dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
     }
 
     if (!interp->all_op_libs)
-        interp->all_op_libs = (op_lib_t **)mem_sys_allocate(
-                sizeof (op_lib_t *) * (interp->n_libs + 1));
+        interp->all_op_libs = mem_gc_allocate_n_zeroed_typed(interp,
+                interp->n_libs + 1, op_lib_t*);
     else
-        mem_realloc_n_typed(interp->all_op_libs, interp->n_libs + 1,
-                op_lib_t *);
+        mem_gc_realloc_n_typed_zeroed(interp, interp->all_op_libs,
+                interp->n_libs + 1, interp->n_libs, op_lib_t *);
 
     init_func = get_dynamic_op_lib_init(interp, lib_pmc);
     lib       = init_func(1);
@@ -726,18 +729,18 @@ dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
 
     PARROT_ASSERT(interp->op_count == core->op_count);
 
-    new_evc_func_table = (op_func_t *)mem_sys_realloc(interp->evc_func_table,
-            sizeof (op_func_t) * n_tot);
+    new_evc_func_table = mem_gc_realloc_n_typed_zeroed(interp,
+            interp->evc_func_table, n_tot, n_old, op_func_t);
     if (core->flags & OP_FUNC_IS_ALLOCATED) {
-        new_func_table = (op_func_t *)mem_sys_realloc(core->op_func_table,
-                sizeof (op_func_t) * n_tot);
-        new_info_table = (op_info_t *)mem_sys_realloc(core->op_info_table,
-                sizeof (op_info_t) * n_tot);
+        new_func_table = mem_gc_realloc_n_typed_zeroed(interp,
+                core->op_func_table, n_tot, n_old, op_func_t);
+        new_info_table = mem_gc_realloc_n_typed_zeroed(interp,
+                core->op_info_table, n_tot, n_old, op_info_t);
     }
     else {
         /* allocate new op_func and info tables */
-        new_func_table = mem_allocate_n_typed(n_tot, op_func_t);
-        new_info_table = mem_allocate_n_typed(n_tot, op_info_t);
+        new_func_table = mem_gc_allocate_n_zeroed_typed(interp, n_tot, op_func_t);
+        new_info_table = mem_gc_allocate_n_zeroed_typed(interp, n_tot, op_info_t);
 
         /* copy old */
         for (i = 0; i < n_old; ++i) {
@@ -811,13 +814,13 @@ dynop_register_xx(PARROT_INTERP,
     PMC *lib_variant;
 
     if (cg_lib->flags & OP_FUNC_IS_ALLOCATED) {
-        ops_addr = (op_func_t *)mem_sys_realloc(cg_lib->op_func_table,
-                n_tot * sizeof (op_func_t));
+        ops_addr = mem_gc_realloc_n_typed_zeroed(interp,
+                cg_lib->op_func_table, n_tot, n_old, op_func_t);
     }
     else {
         size_t i;
 
-        ops_addr      = mem_allocate_n_typed(n_tot, op_func_t);
+        ops_addr      = mem_gc_allocate_n_zeroed_typed(interp, n_tot, op_func_t);
         cg_lib->flags = OP_FUNC_IS_ALLOCATED;
 
         for (i = 0; i < n_old; ++i)

@@ -595,7 +595,7 @@ Mark any referenced strings and PMCs.
                 Parrot_gc_free_fixed_size_storage(INTERP,
                     8 * sizeof (void *), returns_values);
             else
-                mem_sys_free(returns_values);
+                mem_gc_free(INTERP, returns_values);
         }
 
         Parrot_pcc_free_registers(INTERP, SELF);

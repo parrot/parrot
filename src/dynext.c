@@ -587,10 +587,10 @@ Parrot_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_pmc))
         if (d->n_libs != s->n_libs) {
             INTVAL i;
             if (d->all_op_libs)
-                d->all_op_libs = (op_lib_t **)mem_sys_realloc(d->all_op_libs,
+                d->all_op_libs = (op_lib_t **)mem_internal_realloc(d->all_op_libs,
                     sizeof (op_lib_t *) * s->n_libs);
             else
-                d->all_op_libs = (op_lib_t **)mem_sys_allocate(sizeof (op_lib_t *) *
+                d->all_op_libs = (op_lib_t **)mem_internal_allocate(sizeof (op_lib_t *) *
                     s->n_libs);
             for (i = d->n_libs; i < s->n_libs; ++i)
                 d->all_op_libs[i] = s->all_op_libs[i];

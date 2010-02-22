@@ -60,7 +60,7 @@ Destroys the array.
         GET_ATTR_str_array(INTERP, SELF, str_array);
 
         if (str_array)
-            mem_sys_free(str_array);
+            mem_gc_free(INTERP, str_array);
     }
 
 /*
@@ -87,7 +87,7 @@ Creates and returns a copy of the array.
             GET_ATTR_size(INTERP, SELF, size);
             mem_size = size * sizeof (STRING *);
 
-            dest_str_array = mem_allocate_n_zeroed_typed(size, STRING *);
+            dest_str_array = mem_gc_allocate_n_zeroed_typed(INTERP, size, STRING *);
             mem_sys_memcopy(dest_str_array, my_str_array, mem_size);
             SET_ATTR_str_array(INTERP, dest, dest_str_array);
             SET_ATTR_size(INTERP, dest, size);
@@ -341,7 +341,7 @@ cause an exception to be thrown.
 
         SET_ATTR_size(INTERP, SELF, new_size);
         SET_ATTR_str_array(INTERP, SELF,
-                (STRING**)mem_sys_allocate_zeroed(new_size * sizeof (STRING*)));
+                mem_gc_allocate_n_zeroed_typed(INTERP, new_size, STRING*));
 
         PObj_custom_mark_destroy_SETALL(SELF);
     }

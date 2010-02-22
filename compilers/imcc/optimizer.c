@@ -802,7 +802,7 @@ eval_ins(PARROT_INTERP, ARGIN(const char *op), size_t ops, ARGIN(SymReg **r))
     int i;
     op_info_t *op_info;
 
-    opnum = interp->op_lib->op_code(op, 1);
+    opnum = interp->op_lib->op_code(interp, op, 1);
     if (opnum < 0)
         IMCC_fatal(interp, 1, "eval_ins: op '%s' not found\n", op);
     op_info = interp->op_info_table + opnum;

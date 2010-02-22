@@ -357,7 +357,7 @@ str_dup_remove_quotes(ARGIN(const char *old))
 
     /* 2 for the beginning and ending quote chars */
     const size_t newlen = oldlen - 2;
-    char * const copy   = (char *)mem_sys_allocate(newlen);
+    char * const copy   = (char *)mem_internal_allocate(newlen);
 
     memcpy(copy, old + 1, newlen);
     copy[newlen - 1] = 0;

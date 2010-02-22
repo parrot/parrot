@@ -142,7 +142,7 @@ new_runloop_jump_point(PARROT_INTERP)
         interp->runloop_jmp_free_list = jump_point->prev;
     }
     else
-        jump_point = mem_allocate_typed(Parrot_runloop);
+        jump_point = mem_gc_allocate_zeroed_typed(interp, Parrot_runloop);
 
     jump_point->prev        = interp->current_runloop;
     interp->current_runloop = jump_point;

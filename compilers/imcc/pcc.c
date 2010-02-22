@@ -108,9 +108,12 @@ static int recursive_tail_call(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static void unshift_self(ARGIN(SymReg *sub), ARGIN(SymReg *obj))
+static void unshift_self(PARROT_INTERP,
+    ARGIN(SymReg *sub),
+    ARGIN(SymReg *obj))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_insert_tail_call __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -143,7 +146,8 @@ static void unshift_self(ARGIN(SymReg *sub), ARGIN(SymReg *obj))
     , PARROT_ASSERT_ARG(ins) \
     , PARROT_ASSERT_ARG(sub))
 #define ASSERT_ARGS_unshift_self __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(sub) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(sub) \
     , PARROT_ASSERT_ARG(obj))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -267,15 +271,15 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
     SymReg *regcache[PCC_GET_ARGS_LIMIT + 1];
     char bufcache[sizeof (pref) + sizeof (item) * PCC_GET_ARGS_LIMIT + sizeof (subf)];
 
-    SymReg ** const regs  = n < PCC_GET_ARGS_LIMIT ?
-        regcache :
-        mem_allocate_n_zeroed_typed(n + 1, SymReg *);
+    SymReg ** const regs  = n < PCC_GET_ARGS_LIMIT
+                                ? regcache
+                                : mem_gc_allocate_n_zeroed_typed(interp, n + 1, SymReg *);
 
     unsigned int  bufpos  = 0;
     unsigned int  bufsize = lenpref + lenitem * n + lensubf;
-    char         *buf     = n < PCC_GET_ARGS_LIMIT ?
-        bufcache :
-        mem_allocate_n_typed(bufsize, char);
+    char         *buf     = n < PCC_GET_ARGS_LIMIT
+                                ? bufcache
+                                : mem_gc_allocate_n_typed(interp, bufsize, char);
 
     memcpy(buf, pref, lenpref);
     bufpos += lenpref;
@@ -362,7 +366,7 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
 
 /*
 
-=item C<static void unshift_self(SymReg *sub, SymReg *obj)>
+=item C<static void unshift_self(PARROT_INTERP, SymReg *sub, SymReg *obj)>
 
 prepend the object to args or self to params
 
@@ -371,15 +375,15 @@ prepend the object to args or self to params
 */
 
 static void
-unshift_self(ARGIN(SymReg *sub), ARGIN(SymReg *obj))
+unshift_self(PARROT_INTERP, ARGIN(SymReg *sub), ARGIN(SymReg *obj))
 {
     ASSERT_ARGS(unshift_self)
     struct pcc_sub_t * const pcc_sub = sub->pcc_sub;
     const int                n       = pcc_sub->nargs;
     int                      i;
 
-    mem_realloc_n_typed(pcc_sub->args,      n + 1, SymReg *);
-    mem_realloc_n_typed(pcc_sub->arg_flags, n + 1, int);
+    pcc_sub->args       = mem_gc_realloc_n_typed(interp, pcc_sub->args,      n + 1, SymReg *);
+    pcc_sub->arg_flags  = mem_gc_realloc_n_typed(interp, pcc_sub->arg_flags, n + 1, int);
 
     for (i = n; i; --i) {
         pcc_sub->args[i]      = pcc_sub->args[i - 1];
@@ -419,7 +423,7 @@ expand_pcc_sub(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
             self->type = VTIDENTIFIER;
         }
 
-        unshift_self(sub, self);
+        unshift_self(interp, sub, self);
     }
 
     /* Don't generate any parameter checking code if there
@@ -821,7 +825,7 @@ expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *i
     }
 
     if (sub->pcc_sub->object)
-        unshift_self(sub, sub->pcc_sub->object);
+        unshift_self(interp, sub, sub->pcc_sub->object);
 
     /* insert arguments */
     n   = sub->pcc_sub->nargs;

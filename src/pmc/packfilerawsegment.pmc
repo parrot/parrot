@@ -111,7 +111,7 @@ Initialize PackfileRawSegment from PackFile_Segment
 
     VTABLE void *get_pointer() {
         PackFile_Segment * pfseg =
-                (PackFile_Segment*)mem_allocate_zeroed_typed(PackFile_ByteCode);
+                (PackFile_Segment*)mem_gc_allocate_zeroed_typed(INTERP, PackFile_ByteCode);
         Parrot_PackfileRawSegment_attributes * attrs =
                 PARROT_PACKFILERAWSEGMENT(SELF);
         PMC * opcodes = attrs->opcodes;
@@ -119,7 +119,7 @@ Initialize PackfileRawSegment from PackFile_Segment
 
         pfseg->type     = attrs->type;
         pfseg->size     = VTABLE_get_integer(interp, opcodes);
-        pfseg->data     = mem_allocate_n_typed(pfseg->size, opcode_t);
+        pfseg->data     = mem_gc_allocate_n_typed(INTERP, pfseg->size, opcode_t);
 
         /* Not very efficient... */
         for (i = 0; i < pfseg->size; ++i) {

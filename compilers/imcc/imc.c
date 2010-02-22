@@ -39,12 +39,14 @@ static void imc_free_unit(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
-static IMC_Unit * imc_new_unit(IMC_Unit_Type t);
+static IMC_Unit * imc_new_unit(PARROT_INTERP, IMC_Unit_Type t)
+        __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_imc_free_unit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(unit))
-#define ASSERT_ARGS_imc_new_unit __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_imc_new_unit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -153,7 +155,7 @@ imc_cleanup(PARROT_INTERP, ARGIN_NULLOK(void *yyscanner))
 
 /*
 
-=item C<static IMC_Unit * imc_new_unit(IMC_Unit_Type t)>
+=item C<static IMC_Unit * imc_new_unit(PARROT_INTERP, IMC_Unit_Type t)>
 
 Creates a new IMC_Unit of the given IMC_Unit_Type C<t>.
 
@@ -164,11 +166,11 @@ Creates a new IMC_Unit of the given IMC_Unit_Type C<t>.
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
 static IMC_Unit *
-imc_new_unit(IMC_Unit_Type t)
+imc_new_unit(PARROT_INTERP, IMC_Unit_Type t)
 {
     ASSERT_ARGS(imc_new_unit)
-    IMC_Unit * const unit = mem_allocate_zeroed_typed(IMC_Unit);
-    create_symhash(&unit->hash);
+    IMC_Unit * const unit = mem_gc_allocate_zeroed_typed(interp, IMC_Unit);
+    create_symhash(interp, &unit->hash);
     unit->type = t;
     return unit;
 }
@@ -191,14 +193,14 @@ IMC_Unit *
 imc_open_unit(PARROT_INTERP, IMC_Unit_Type t)
 {
     ASSERT_ARGS(imc_open_unit)
-    IMC_Unit   * const unit     = imc_new_unit(t);
+    IMC_Unit   * const unit     = imc_new_unit(interp, t);
     imc_info_t * const imc_info = IMCC_INFO(interp);
 
     if (!imc_info->imc_units)
         imc_info->imc_units = unit;
 
     if (!imc_info->ghash.data)
-        create_symhash(&imc_info->ghash);
+        create_symhash(interp, &imc_info->ghash);
 
     unit->prev = imc_info->last_unit;
 

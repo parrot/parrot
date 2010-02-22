@@ -154,7 +154,7 @@ typedef struct BIGNUM {
 static void
 bignum_init(PARROT_INTERP, PMC *self) {
 #ifdef PARROT_HAS_GMP
-    BIGNUM * const bn = mem_allocate_zeroed_typed(BIGNUM);
+    BIGNUM * const bn = mem_gc_allocate_zeroed_typed(interp, BIGNUM);
     SETATTR_BigNum_bn(interp, self, bn);
     mpf_clear(bn->b);
     mpf_init(bn->b);
@@ -170,7 +170,7 @@ bignum_clear(PARROT_INTERP, PMC *self) {
     BIGNUM *bn;
     GETATTR_BigNum_bn(interp, self, bn);
     mpf_clear(bn->b);
-    mem_sys_free(bn);
+    mem_gc_free(interp, bn);
 #endif
 }
 
@@ -282,7 +282,7 @@ bignum_get_string(PARROT_INTERP, PMC *self, int base) {
 
     GETATTR_BigNum_bn(interp, self, bn);
     n = (mpf_get_prec(bn->b)) / log(base) * log(2);
-    s = (char *)mem_sys_allocate(n + 5);
+    s = mem_gc_allocate_n_typed(interp, n + 5, char);
     return mpf_get_str(s, &exponent, base, 0, bn->b);
 }
 
@@ -294,7 +294,7 @@ bignum_get_string_size(PARROT_INTERP, PMC *self, int base, int digits) {
     mp_exp_t exponent;
 
     GETATTR_BigNum_bn(interp, self, bn);
-    s = (char *)mem_sys_allocate(digits + 5);
+    s = mem_gc_allocate_n_typed(interp, digits + 5, char);
     return mpf_get_str(s, &exponent, base, digits, bn->b);
 }
 
@@ -987,21 +987,21 @@ appended.
     VTABLE STRING *get_string() {
         char   *s  = bignum_get_string(INTERP, SELF, 10);
         STRING *ps = Parrot_str_new(INTERP, s, 0);
-        mem_sys_free(s);
+        mem_gc_free(interp, s);
         return ps;
     }
 
     VTABLE STRING *get_string_keyed_int(INTVAL base) {
         char   *s  = bignum_get_string(INTERP, SELF, base);
         STRING *ps = Parrot_str_new(INTERP, s, 0);
-        mem_sys_free(s);
+        mem_gc_free(interp, s);
         return ps;
     }
 
     VTABLE STRING *get_string_keyed_int_int(INTVAL base, INTVAL digits) {
         char   *s  = bignum_get_string_size(INTERP, SELF, base, digits);
         STRING *ps = Parrot_str_new(INTERP, s, 0);
-        mem_sys_free(s);
+        mem_gc_free(interp, s);
         return ps;
     }
 
