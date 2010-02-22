@@ -1,4 +1,6 @@
-#!/usr/bin/perl
+#!perl
+# Copyright (C) 2008-2010, Parrot Foundation.
+# $Id$
 
 use lib ('./lib', '../../lib');
 use Parrot::Test::NCIGENAST;
@@ -26,3 +28,10 @@ typedef struct sqlite3 sqlite3;
 int sqlite3_open( const char *filename, sqlite3 **ppDb);
 CODE
 
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
