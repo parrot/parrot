@@ -414,7 +414,7 @@ HASH1_IS_3:
 .end
 
 # Local Variables:
-#   mode: cperl
+#   mode: pir
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
