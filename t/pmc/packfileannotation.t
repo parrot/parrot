@@ -15,7 +15,7 @@ t/pmc/packfileannotation.t - test the PackfileAnnotation PMC
 Tests the PackfileAnnotation PMC.
 
 =cut
-t/codingstd/pir_code_coda.t
+
 # PackfileAnnotation constructor
 .sub 'test' :main
 .include 'test_more.pir'
