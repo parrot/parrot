@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2006-2007, Parrot Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -701,3 +701,9 @@ CODE
 .sub 'baz'
     .return("MyHLL")
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
