@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -678,7 +678,7 @@ DONE:
     s1 = get_repr h
     s2 = get_repr cloned
     if s1 != s2 goto fail
-    
+
     goto end
 fail:
     all_ok = 0
@@ -755,7 +755,7 @@ end:
     s1 = get_repr h
     s2 = get_repr cloned
     if s1 != s2 goto fail
-    
+
     goto end
 fail:
     all_ok = 0
@@ -1437,7 +1437,7 @@ postit_end:
     types[$S0] = 1
     goto loop
   done:
-    
+
     $I0 = elements types
     is($I0, 3, "Got 3 different types of PMC keys")
     $I0 = types['ResizableStringArray']

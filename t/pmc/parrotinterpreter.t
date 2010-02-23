@@ -1,5 +1,5 @@
 #!parrot
-# Copyright (C) 2006-2009, Parrot Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -83,11 +83,11 @@ Tests the ParrotInterpreter PMC.
     $P0 = interp['namespace';0]
     $I0 = isa $P0, 'NameSpace'
     ok($I0, 'Got ParrotInterp.namespace')
-    
+
     $P0 = interp['continuation';0]
     $I0 = isa $P0, 'Continuation'
     ok($I0, 'Got ParrotInterp.continuation')
-    
+
     $P0 = interp['annotations';1]
     $S0 = $P0['foo']
     is($S0, 'bar', 'Got ParrotInterp.annotations')

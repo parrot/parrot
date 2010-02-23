@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2006-2007, Parrot Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -39,7 +39,7 @@ end:
 .sub inspect_test
     .lex "$a", $P0
     .lex "$b", $P1
-    
+
     $P2 = new 'ParrotInterpreter'
     $P2 = $P2['sub']
     $P2 = $P2.'get_lexinfo'()

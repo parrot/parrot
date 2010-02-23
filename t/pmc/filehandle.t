@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2006-2008, Parrot Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -258,7 +258,7 @@ pir_output_is( <<"CODE", <<'OUT', 'readline 10,000 lines' );
 
     counter = 0
   read_loop:
-    inc counter 
+    inc counter
     # read in the file one line at a time...
     \$I0 = filehandle.'eof'()
     if \$I0 goto end_read_loop
@@ -444,7 +444,7 @@ pir_output_is( <<"CODE", <<'OUT', 'encoding - read/write' );
 
     \$P0.'print'(1234567890)
     \$P0.'print'("\\n")
-    \$S0 = iso-8859-1:"TÖTSCH" 
+    \$S0 = iso-8859-1:"TÖTSCH"
     \$P0.'print'(\$S0)
     \$P0.'close'()
 
@@ -551,7 +551,7 @@ pir_output_is( <<"CODE", <<"OUTPUT", "readall() - utf8 on closed filehandle" );
     .local pmc ifh
     ifh = new ['FileHandle']
     ifh.'encoding'('utf8')
-   
+
     \$S0 = ifh.'readall'('$temp_file')
 
     \$I0 = encoding \$S0

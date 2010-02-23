@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -79,7 +79,7 @@ a variety of keys and values.
 
     $I0 = capt[11]
     is($I0, 7, 'get_integer_keyed_int')
-    
+
     $P0 = capt[10]
     is($P0, 'six', 'get_pmc_keyed_int')
 
@@ -106,13 +106,13 @@ a variety of keys and values.
 
     $I0 = shift capt
     is($I0, 11, 'shift an integer')
-    
+
     $P0 = shift capt
     is($P0, 'ten', 'shift a PMC')
-    
+
     $N0 = shift capt
     is($N0, 9.5, 'shift a number')
-    
+
     $S0 = shift capt
     is($S0, '8', 'shift a string')
 
@@ -136,7 +136,7 @@ a variety of keys and values.
 
     $P0 = capt['gamma']
     is($P0, 'fourteen', 'get_pmc_keyed_str')
-    
+
     $N0 = capt['beta']
     is($N0, 13.5, 'get_number_keyed_str')
 

@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -1425,12 +1425,12 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'set_outer and eval' );
 PIR
     $P1 = compreg 'PIR'
     $P1 = $P1($S1)
-    
+
     $P3 = new 'ParrotInterpreter'
     $P3 = $P3['sub']
     $P2 = $P1[0]
     $P2.'set_outer'($P3)
-    
+
     $P1()
 .end
 CODE
@@ -1637,11 +1637,11 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', 'init_pmc' );
 .sub 'main'
     .local pmc init, s, regs, arg_info
-    
+
     init = new ['Hash']
     init['start_offs']  = 42
     init['end_offs']    = 115200
-    
+
     regs = new ['FixedIntegerArray']
     regs = 4
     regs[0] = 1
@@ -1694,7 +1694,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'init_pmc' );
     $P0 = inspect s, 'pos_optional'
     print 'pos_optional '
     say $P0
-    
+
     $P0 = inspect s, 'pos_slurpy'
     print 'pos_slurpy '
     say $P0

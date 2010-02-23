@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -164,7 +164,7 @@ out-of-bounds test. Checks INT and PMC keys.
     $P0[1023] = $P1
 
     $P2 = new ['Key']
-    
+
     $P2 = 25
     $I0 = $P0[$P2]
     is($I0, 125, "Get INTVAL via Key works")
@@ -218,7 +218,7 @@ out-of-bounds test. Checks INT and PMC keys.
     a2 = new ['FixedIntegerArray']
 
     is(a1, a2, "Empty arrays are equal")
-    
+
     a1 = 3
     isnt(a1, a2, "Different size arrays aren't equal")
 
@@ -230,7 +230,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
     a1[1] = 84
     isnt(a1, a2, "Not equal when second element differ")
-    
+
     a2[1] = 84
     is(a1, a2, "Equal when second element same")
 .end

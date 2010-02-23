@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2006-2007, Parrot Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -225,7 +225,7 @@ eh_label:
 
 =pod
 
-TT #1036: should this work? 
+TT #1036: should this work?
 
 .sub resizablepmcarray_recursive
     .local pmc foo
