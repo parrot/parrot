@@ -119,7 +119,7 @@ my ( $tie, $msg, @lines );
     #create a dump for default.pmc
     Parrot::Pmc2c::Pmc2cMain->new(
         {
-            include => \@include, 
+            include => \@include,
             opt=>\%opt,
             args=>[qq{$temppmcdir/default.pmc}],
             bin=>$Bin
@@ -228,7 +228,7 @@ my ( $tie, $msg, @lines );
     for my $pmc ( qq{$temppmcdir/default.pmc},  qq{$temppmcdir/class.pmc} ) {
         Parrot::Pmc2c::Pmc2cMain->new(
             {
-                include => \@include, 
+                include => \@include,
                 opt=>\%opt,
                 args=>[$pmc],
                 bin=>$Bin
