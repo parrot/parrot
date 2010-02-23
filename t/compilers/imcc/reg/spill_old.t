@@ -1,6 +1,6 @@
 #!perl
 # Copyright (C) 2001-2008, Parrot Foundation.
-# $Id: spill.t 37201 2009-03-08 12:07:48Z fperrad $
+# $Id$
 
 use strict;
 use warnings;
