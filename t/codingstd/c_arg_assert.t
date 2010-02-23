@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2008-2009, Parrot Foundation.
+# Copyright (C) 2008-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -51,7 +51,7 @@ sub check_asserts {
             if ( my ($func) = $line =~ m/^#define ASSERT_ARGS_([_a-zA-Z0-9]+)\s/s ) {
                 push @defines, [$func, $path];
             }
-            
+
             if ( my ($func) = $line =~ m/^\s+ASSERT_ARGS\(([_a-zA-Z0-9]+)\)$/ ) {
                 $usages{$func} = 1;
 

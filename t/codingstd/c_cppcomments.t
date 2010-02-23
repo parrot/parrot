@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -50,7 +50,7 @@ Parrot::Test::Util::Runloop->testloop(
 );
 
 # TT # 414 (https://trac.parrot.org/parrot/ticket/414):
-# In the POD inside a C source code file, a hyperlink such as 
+# In the POD inside a C source code file, a hyperlink such as
 # https://trac.parrot.org will be inaccurately reported as a C++-style
 # comment.
 # Quick fix added
