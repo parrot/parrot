@@ -96,7 +96,7 @@ pir_output_is( <<'CODE', <<OUTPUT, "MATHEMATICAL BOLD CAPITAL A" );
     print $S0
     print "\n"
     end
-.end 
+.end
 CODE
 aaaaaa\xf0\x9d\x90\x80-aaaaaa
 OUTPUT
