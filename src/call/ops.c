@@ -31,6 +31,19 @@ B<Calling Ops>:  Various functions that call the run loop.
 static int
 runloop_id_counter = 0;          /* for synthesizing runloop ids. */
 
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void really_destroy_runloop_jump_points(PARROT_INTERP,
+    ARGFREE(Parrot_runloop *jump_point))
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_really_destroy_runloop_jump_points \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 /*
 
 =item C<void runops(PARROT_INTERP, size_t offs)>
@@ -190,8 +203,8 @@ destroy_runloop_jump_points(PARROT_INTERP)
 
 /*
 
-=item C<void really_destroy_runloop_jump_points(PARROT_INTERP, Parrot_runloop
-*jump_point)>
+=item C<static void really_destroy_runloop_jump_points(PARROT_INTERP,
+Parrot_runloop *jump_point)>
 
 Takes a pointer to a runloop jump point (which had better be the last one in
 the list). Walks back through the list, freeing the memory of each one, until
@@ -201,7 +214,7 @@ it encounters NULL. Used by C<destroy_runloop_jump_points>.
 
 */
 
-void
+static void
 really_destroy_runloop_jump_points(PARROT_INTERP,
         ARGFREE(Parrot_runloop *jump_point))
 {
