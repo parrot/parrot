@@ -76,3 +76,4 @@ src/nci/extra_thunks.c
 t/examples/pir.t
 t/perl/Parrot_Test.t
 t/library/getopt_obj.t
+t/run/options.t
