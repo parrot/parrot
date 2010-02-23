@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2008, Parrot Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -226,7 +226,7 @@ EOT
     test.'ok'($I0, 'con is false after finish')
     test.'finish'()
     end
-no_pg:	
+no_pg:
     .local pmc ex
     .local string msg
     .get_results(ex)

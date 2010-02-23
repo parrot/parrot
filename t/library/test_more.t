@@ -1,5 +1,5 @@
 #!parrot
-# Copyright (C) 2005-2009, Parrot Foundation.
+# Copyright (C) 2005-2010, Parrot Foundation.
 # $Id$
 
 .sub _main :main
@@ -371,13 +371,13 @@ CODE
     test_diag( expected )
     is( left, right, 'comparing two pmcs' )
     test_test( 'failing test is() for pmcs with description' )
-    
+
     test_pass( 'comparing two nulls' )
     null left
     null right
     is( left, right, 'comparing two nulls' )
     test_test( 'passing test is() for nulls')
-    
+
     test_fail('comparing null with Int')
     null left
     right = box 1
@@ -385,7 +385,7 @@ CODE
     test_diag( 'Have: null' )
     test_diag( 'Want: 1' )
     test_test('failing test is() for null vs. pmc 1')
-    
+
     test_fail('comparing Int with null')
     left = box 10
     null right
@@ -401,7 +401,7 @@ CODE
     test_diag( 'Have: null' )
     test_diag( 'Want: 1.01' )
     test_test('failing test is() for null vs. pmc 1.01')
-    
+
     test_fail('comparing Float with null')
     left = box 2.787
     null right
@@ -417,7 +417,7 @@ CODE
     test_diag( 'Have: null' )
     test_diag( 'Want: September, when it comes' )
     test_test('failing test is() for null vs. String pmc')
-    
+
     test_fail('comparing String with null')
     left = box 'I cannot move a mountain now'
     null right
@@ -873,6 +873,7 @@ CODE
     test_diag( "Want: null" )
     test_test( 'failing test is_null for String pmc')
 .end
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
