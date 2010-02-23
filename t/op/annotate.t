@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2009, Parrot Foundation.
+# Copyright (C) 2009-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -218,7 +218,7 @@ END_PIR
     .get_results($P3)
     pop_eh
     $P3 = $P3.'backtrace'()
-    
+
     $P4 = $P3[0]
     $P4 = $P4['annotations']
     $S0 = $P4['file']
@@ -236,7 +236,7 @@ END_PIR
 
 
 # Local Variables:
-#   mode: pir 
+#   mode: pir
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4 ft=pir:

@@ -1,5 +1,5 @@
 #!parrot
-# Copyright (C) 2009, Parrot Foundation.
+# Copyright (C) 2009-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -67,7 +67,7 @@ Tests Parrot calling conventions for parameter matching and mismatching.
 .namespace ['OMGClass']
 .sub 'lolmethod' :method
     .param pmc sig :call_sig
-    
+
     # Self is set up correctly.
     $S0 = typeof self
     is('OMGClass', $S0)
@@ -88,7 +88,7 @@ Tests Parrot calling conventions for parameter matching and mismatching.
 
 .sub 'wtfmethod' :method
     .param pmc sig :call_sig
-    
+
     # Self is set up correctly.
     $S0 = typeof self
     is('OMGClass', $S0)

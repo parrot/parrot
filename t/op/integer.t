@@ -1,5 +1,5 @@
 #!parrot
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -691,7 +691,7 @@ Tests the use of Parrot integer registers.
 
     $I2 = xor $I1, $I1
     is($I2, 0, 'xor - nilpotent on 2')
-    
+
     $I2 = xor $I2, $I2
     is($I2, 0, 'xor - nilpotent on other')
 .end
