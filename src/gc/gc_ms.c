@@ -1103,8 +1103,8 @@ gc_ms_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGMOD(void *data))
 
 =item C<static void * gc_ms_allocate_memory_chunk(PARROT_INTERP, size_t size)>
 
-=item C<static void * gc_ms_reallocate_memory_chunk(PARROT_INTERP, void *data,
-size_t newsize)>
+=item C<static void * gc_ms_reallocate_memory_chunk(PARROT_INTERP, void *from,
+size_t size)>
 
 =item C<static void * gc_ms_allocate_memory_chunk_zeroed(PARROT_INTERP, size_t
 size)>
