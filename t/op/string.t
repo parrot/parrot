@@ -182,25 +182,25 @@ Tests Parrot string registers and operations.
 .sub set_s_s_sc
     set $S4, "JAPH"
     set $S5, $S4
-    
+
     is( $S4, "JAPH", '' )
     is( $S5, "JAPH", '' )
 .end
- 
+
 .sub test_clone
     set   $S0, "Foo1"
     clone $S1, $S0
-   
+
     is( $S0, "Foo1", '' )
     is( $S1, "Foo1", '' )
-   
+
     clone $S1, "Bar1"
     is( $S1, "Bar1", '' )
 
-    chopn $S1, 1   
+    chopn $S1, 1
     is( $S1, "Bar", 'the contents of $S1 are no longer constant' )
 .end
- 
+
 .sub clone_null
     null $S0
     clone $S1, $S0
@@ -235,7 +235,7 @@ Tests Parrot string registers and operations.
     is( $S5, "japh", '' )
     is( $S3, "JAPHxyzw", '' )
 .end
- 
+
 .sub chopn_with_set
     set $S4, "JAPHxyzw"
     set $S5, "japhXYZW"
@@ -265,44 +265,44 @@ Tests Parrot string registers and operations.
     chopn   $S1, 1000
     is( $S1, "", '' )
 .end
- 
+
 .sub three_argument_chopn
     set $S1, "Parrot"
     chopn   $S2, $S1, 0
     is( $S1, "Parrot", '' )
     is( $S2, "Parrot", '' )
-    
+
     chopn   $S2, $S1, 1
     is( $S1, "Parrot", '' )
     is( $S2, "Parro", '' )
-    
+
     set     $I0, 2
     chopn   $S2, $S1, $I0
     is( $S1, "Parrot", '' )
     is( $S2, "Parr", '' )
-    
+
     chopn   $S2, "Parrot", 3
     is( $S2, "Par", '' )
-    
+
     chopn   $S1, $S1, 5
     is( $S1, "P", '' )
-    
+
     set     $S1, "Parrot"
     set     $S3, $S1
     chopn   $S2, $S1, 3
     is( $S3, "Parrot", '' )
-   
+
     set     $S3, $S1
     chopn   $S1, 3
     is( $S3, "Par", '' )
 .end
-# 
+#
 .sub three_argument_chopn__oob_values
     set $S1, "Parrot"
     chopn   $S2, $S1, 7
     is( $S1, "Parrot", '' )
     is( $S2, "", '' )
-    
+
     chopn   $S2, $S1, -1
     is( $S1, "Parrot", '' )
     is( $S2, "P", '' )
@@ -347,7 +347,7 @@ Tests Parrot string registers and operations.
     is( $S0, "A string of length 21", '' )
     is( $S1, "length", '' )
 .end
- 
+
 # This asks for substring that shouldn't be allowed...
 .sub exception_substr_oob
     set $S0, "A string of length 21"
@@ -389,7 +389,7 @@ handler:
     is( $S0, "A string of length 21", '' )
     is( $S1, "length 21", '' )
 .end
- 
+
 .sub five_arg_substr_w_rep_eq_length
     set $S0, "abcdefghijk"
     set $S1, "xyz"
@@ -890,20 +890,20 @@ WHILE:
     repeat $S1, $S0, 12
     is( $S0, "x", 'repeat_s_s|sc_i|ic' )
     is( $S1, "xxxxxxxxxxxx", 'repeat_s_s|sc_i|ic' )
-    
+
     set $I0, 12
     set $S2, "X"
     repeat $S3, $S2, $I0
     is( $S2, "X", 'repeat_s_s|sc_i|ic' )
     is( $S3, "XXXXXXXXXXXX", 'repeat_s_s|sc_i|ic' )
-    
+
     repeat $S4, "~", 12
     is( $S4, "~~~~~~~~~~~~", 'repeat_s_s|sc_i|ic' )
-    
+
     repeat $S5, "~", $I0
     is( $S5, "~~~~~~~~~~~~", 'repeat_s_s|sc_i|ic' )
-   
-  
+
+
     repeat $S6, "***", 0
     is( $S6, "", 'repeat_s_s|sc_i|ic' )
 .end
@@ -951,7 +951,7 @@ WHILE:
     set $S1, "rot"
     index $I1, $S0, $S1
     is( $I1, "3", 'index, 3-arg form' )
-    
+
     set $S1, "bar"
     index $I1, $S0, $S1
     is( $I1, "-1", 'index, 3-arg form' )
@@ -962,10 +962,10 @@ WHILE:
     set $S1, "ar"
     index $I1, $S0, $S1, 0
     is( $I1, "1", 'index, 4-arg form' )
-    
+
     index $I1, $S0, $S1, 2
     is( $I1, "4", 'index, 4-arg form' )
-    
+
     set $S1, "qwx"
     index $I1, $S0, $S1, 0
     is( $I1, "-1", 'index, 4-arg form' )
@@ -976,7 +976,7 @@ WHILE:
     set $S0, " is "
     index $I0, $S1, $S0, 0
     is( $I0, "4", 'index, 4-arg form, bug 22718' )
-    
+
     set $S0, "is"
     index $I0, $S1, $S0, 0
     is( $I0, "2", 'index, 4-arg form, bug 22718' )
@@ -987,29 +987,29 @@ WHILE:
     set $S1, ""
     index $I1, $S0, $S1
     is( $I1, "-1", 'index, null strings' )
-    
+
     index $I1, $S0, $S1, 0
     is( $I1, "-1", 'index, null strings' )
-   
+
     index $I1, $S0, $S1, 5
     is( $I1, "-1", 'index, null strings' )
-    
+
     index $I1, $S0, $S1, 6
     is( $I1, "-1", 'index, null strings' )
-    
+
     set $S0, ""
     set $S1, "a"
     index $I1, $S0, $S1
     is( $I1, "-1", 'index, null strings' )
-    
+
     index $I1, $S0, $S1, 0
     is( $I1, "-1", 'index, null strings' )
-    
+
     set $S0, "Parrot"
     null $S1
     index $I1, $S0, $S1
     is( $I1, "-1", 'index, null strings' )
-    
+
     null $S0
     null $S1
     index $I1, $S0, $S1
@@ -1021,7 +1021,7 @@ WHILE:
     set $S1, "\0"
     index $I1, $S0, $S1
     is( $I1, "3", 'index, embedded nulls' )
-    
+
     index $I1, $S0, $S1, 4
     is( $I1, "4", 'index, embedded nulls' )
 .end
@@ -1033,10 +1033,10 @@ WHILE:
     repeat $S1, $S1, 500
     index $I1, $S0, $S1
     is( $I1, "0", 'index, big strings' )
-   
+
     index $I1, $S0, $S1, 1234
     is( $I1, "1234", 'index, big strings' )
-    
+
     index $I1, $S0, $S1, 9501
     is( $I1, "-1", 'index, big strings' )
 .end
@@ -1148,15 +1148,15 @@ WHILE:
     set $S0, " 1"
     set $I0, $S0
     is( $I0, "1", 'string to int' )
-    
+
     set $S0, "-1"
     set $I0, $S0
     is( $I0, "-1", 'string to int' )
-    
+
     set     $S0, "Not a number"
     set $I0, $S0
     is( $I0, "0", 'string to int' )
-    
+
     set $S0, ""
     set $I0, $S0
     is( $I0, "0", 'string to int' )
@@ -1169,7 +1169,7 @@ WHILE:
     concat $S2, $S2, $S0
     concat $S2, $S2, $S1
     is( $S2, "<JAPH>", 'concat/substr (COW)' )
-   
+
     substr $S0, $S2, 1, 4
     is( $S0, "JAPH", 'concat/substr (COW)' )
 .end
@@ -1422,7 +1422,7 @@ WHILE:
     interp = getinterp
     .local pmc config
     config = interp[.IGLOBALS_CONFIG_HASH]
-    .local int intvalsize 
+    .local int intvalsize
     intvalsize = config['intvalsize']
 
     $S0 = ''
@@ -1436,7 +1436,7 @@ WHILE:
     concat $S0, ' '
     inc $I0
     le $I0, 20, padding_loop
-    
+
     # Now see what sprintf comes up with
     $P0 = new 'ResizablePMCArray'
     $P0[0] = -1
@@ -1450,7 +1450,7 @@ WHILE:
     exchange $S0, $S1
     is( $S0, "String #1", 'exchange' )
     is( $S1, "String #0", 'exchange' )
-    
+
     set $S2, "String #2"
     exchange $S2, $S2
     is( $S2, "String #2", 'exchange' )
@@ -1529,13 +1529,13 @@ WHILE:
     set $S1, ""
     bands $S1, $S2
     nok( $S1, 'ok2' )
-    
+
     null $S2
     set $S1, "abc"
     bands $S1, $S2
     null $S3
     is( $S1, $S3, 'ok3' )
-    
+
     set $S2, ""
     bands $S1, $S2
     nok( $S1, 'ok4' )
@@ -1577,7 +1577,7 @@ WHILE:
     bors $S1, $S2
     null $S3
     is( $S1, $S3, 'bors NULL string' )
- 
+
     bors $S2, $S1
     is( $S2, $S3, 'bors NULL string' )
 
@@ -1687,7 +1687,7 @@ WHILE:
     bxors $S1, $S2
     is( $S1, "%Ec", 'bxors 2' )
     is( $S2, "Dw", 'bxors 2' )
-    
+
     set $S1, "abc"
     set $S2, "   X"
     bxors $S1, $S2
@@ -1702,7 +1702,7 @@ WHILE:
     is( $S0, "%Ec", 'bxors 3' )
     is( $S1, "a2c", 'bxors 3' )
     is( $S2, "Dw", 'bxors 3' )
-    
+
     set $S1, "abc"
     set $S2, "   Y"
     bxors $S0, $S1, $S2
@@ -1730,7 +1730,7 @@ WHILE:
     bnots $S1, $S2
     null $S3
     is( $S1, $S3, 'bnots NULL string' )
-    
+
     bnots $S2, $S1
     is( $S2, $S3, 'bnots NULL string' )
 .end
@@ -1744,10 +1744,10 @@ WHILE:
     # bnots $S2, $S1
     # is( $S1, "a2c", 'bnots 2' )
     # is( $S2, "\xC2\x9E\xC3\x8D\xC2\x9C", 'bnots 2' )
-    # 
+    #
     # bnots $S1, $S1
     # is( $S1, "\xC2\x9E\xC3\x8D\xC2\x9C", 'bnots 2' )
-    # 
+    #
     # bnots $S1, $S1
     # is( $S1, "a2c", 'bnots 2' )
 .end
@@ -1782,14 +1782,14 @@ WHILE:
     split $P1, "", ""
     set $I1, $P1
     is( $I1, "0", 'split on empty string' )
-    
+
     split $P0, "", "ab"
     set $I0, $P0
     is( $I0, "2", 'split on empty string' )
-    
+
     set $S0, $P0[0]
     is( $S0, "a", 'split on empty string' )
-    
+
     set $S0, $P0[1]
     is( $S0, "b", 'split on empty string' )
 .end
@@ -1798,7 +1798,7 @@ WHILE:
     split $P0, "a", "afooabara"
     set $I0, $P0
     is( $I0, "5", 'split on non-empty string' )
-    
+
     set $S0, $P0[0]
     is( $S0, "", 'split on non-empty string' )
     set $S0, $P0[1]
@@ -1819,7 +1819,7 @@ WHILE:
     push $P0, "a"
     join $S0, "--", $P0
     is( $S0, "a", 'join' )
-    
+
     new $P0, 'ResizablePMCArray'
     push $P0, "a"
     push $P0, "b"
@@ -1883,21 +1883,21 @@ WHILE:
     if_null $S0, ERROR
       $I99 = 1
   ERROR:
-    ok($I99, 'if_null s_ic' ) 
+    ok($I99, 'if_null s_ic' )
 
     null $S0
     $I99 = 1
     if_null $S0, OK
         $I99 = 0
-  OK: 
-    ok($I99, 'if_null s_ic' ) 
+  OK:
+    ok($I99, 'if_null s_ic' )
 .end
 
 .sub test_upcase
     set $S0, "abCD012yz"
     upcase $S1, $S0
     is( $S1, "ABCD012YZ", 'upcase' )
-    
+
     upcase $S0
     is( $S0, "ABCD012YZ", 'upcase inplace' )
 
@@ -1932,7 +1932,7 @@ null2:
     set $S0, "ABcd012YZ"
     downcase $S1, $S0
     is( $S1, "abcd012yz", 'downcase' )
-    
+
     downcase $S0
     is( $S0, "abcd012yz", 'downcase inplace' )
 
@@ -1967,7 +1967,7 @@ null2:
     set $S0, "aBcd012YZ"
     titlecase $S1, $S0
     is( $S1, "Abcd012yz", 'titlecase' )
-    
+
     titlecase $S0
     is( $S0, "Abcd012yz", 'titlecase inplace' )
 
@@ -2111,7 +2111,7 @@ null2:
     is( s, "Foo/Bar", 'bug 60030' )
 .end
 .sub constant_string_and_modify_in_situ_op_rt_bug_60030
-    
+
     doit_sub_for_but_60030('Foo::Bar')
     # repeat to prove that the constant 'Foo4::Bar4' remains unchanged
     doit_sub_for_but_60030('Foo::Bar')

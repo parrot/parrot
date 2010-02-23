@@ -61,7 +61,7 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
         );
         like($stderr, qr/Bad reference passed in \$files/, "Catches non-HASH files");
 
-        like( $stdout, qr/Installing \.\.\./, 
+        like( $stdout, qr/Installing \.\.\./,
             'Got expected installation message' );
     }
 }
@@ -241,7 +241,7 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
         );
         ok( $rv, 'install_files() handled non-existent file as expected' );
 
-        like( $stdout, qr/Installing \.\.\./, 
+        like( $stdout, qr/Installing \.\.\./,
             'Got expected installation message' );
     }
 }
