@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -52,7 +52,7 @@ Tests OO features related to instantiating new objects.
 #
 .sub _test_instance
     .param pmc obj
-    .param string in_str 
+    .param string in_str
 
     # Set up local variables
     .local pmc key_pmc
@@ -467,7 +467,7 @@ Tests OO features related to instantiating new objects.
     $P0 = new [ 'Foo'; 'Bar'; 'Baz' ]
     $I0 = 1
     goto finally
-    
+
   catch:
     .local pmc exception
     .get_results(exception)

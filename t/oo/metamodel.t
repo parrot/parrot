@@ -1,5 +1,5 @@
 #!parrot
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -71,9 +71,9 @@ Tests the metamodel for the OO implementation.
     unless $I0 goto FAILTAIL
     is($P1, "long", "tail attribute has expected value")
     goto NEXTTAIL
-FAILTAIL:	
+FAILTAIL:
     fail("no attribute")
-NEXTTAIL:	
+NEXTTAIL:
 
     $P1 = getattribute $P0, "bark"
     $I0 = defined $P1
@@ -81,9 +81,9 @@ NEXTTAIL:
     unless $I0 goto FAIL
     is($P1, "Wooof", "bark attribute has expected value")
     goto NEXT
-FAIL:	
+FAIL:
     fail("no attribute")
-NEXT:	
+NEXT:
 
     todo(0, "new opcode makes working objects", "not implemented")
 #    $P0 = new "Dog"

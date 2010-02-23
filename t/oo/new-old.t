@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2009, Parrot Foundation.
+# Copyright (C) 2009-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -19,7 +19,7 @@ t/oo/new-old.t - old style tests for new
 
 =head1 DESCRIPTION
 
-Tests instantiation 
+Tests instantiation
 
 =cut
 
@@ -56,3 +56,9 @@ pir_output_is( <<'CODE', <<'OUT', "exception in new", todo => 'TT #1151' );
 CODE
 ok #test exception from init vtable
 OUT
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

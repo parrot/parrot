@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -173,7 +173,7 @@ Tests role composition in the OO implementation.
     eh = new 'ExceptionHandler'
     eh.'handle_types'(.EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT)
     set_addr eh, catch
-    
+
     push_eh eh
     $P1.'add_role'($P0)
     $I0 = 1

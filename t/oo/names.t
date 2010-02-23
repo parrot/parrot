@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -46,12 +46,12 @@ Tests OO features related to names and namespaces.
     $S0 = $P0
     ok (1, 'HLL obj created w/ same name as parrot obj')
     .return()
-OK_1:    
+OK_1:
     ok (0, 'HLL obj w/ same name as parrot obj not created')
 .end
 
 # Local Variables:
-#   mode: pir 
+#   mode: pir
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4 ft=pir:
