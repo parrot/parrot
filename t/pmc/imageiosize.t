@@ -71,4 +71,4 @@ Tests the ImageIOSize PMC.
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4 ft=pir
+# vim: expandtab shiftwidth=4 ft=pir:
