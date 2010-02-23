@@ -50,8 +50,7 @@ Tests the PackfileAnnotation PMC.
 .end
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4 ft=pir:
