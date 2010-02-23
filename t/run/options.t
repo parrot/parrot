@@ -51,11 +51,11 @@ my $redir = '2>' . File::Spec->devnull();
 # This is just sanity testing
 my $expected_preprocesses_pir = <<'END_PIR';
 
-.macro
+.macro 
 
 .sub main :main
 
-say "first"
+say "first" 
 
 .end
 
