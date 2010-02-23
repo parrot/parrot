@@ -2448,7 +2448,8 @@ $(LIBGLUTCB_SO): $(LIBPARROT) src/glut_callbacks$(O) src/glut_nci_thunks$(O)
     $(ALL_PARROT_LIBS) @opengl_lib@
 
 src/extra_nci_thunks.c : src/nci/extra_thunks.nci $(NCI_THUNK_GEN)
-	$(NCI_THUNK_GEN) --dynext --output=src/extra_nci_thunks.c <src/nci/extra_thunks.nci
+	$(NCI_THUNK_GEN) --dynext --no-warn-dups \
+	    --output=src/extra_nci_thunks.c <src/nci/extra_thunks.nci
 
 src/extra_nci_thunks$(O) : $(GENERAL_H_FILES)
 
