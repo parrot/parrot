@@ -475,10 +475,11 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
                 interp->thread_data = NULL;
             }
 
+            parrot_free_vtables(interp);
+
             /* Finalyze GC */
             Parrot_gc_finalize(interp);
 
-            parrot_free_vtables(interp);
             mem_internal_free(interp);
         }
     }
