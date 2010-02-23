@@ -85,7 +85,7 @@ END_EXPECTED
 
     ##Note extra whitespace after 3rd hello
     '21_string_ops_repeat.pir' => << 'END_EXPECTED',
-Hello Hello Hello
+Hello Hello Hello 
 END_EXPECTED
 
     '22_string_ops_length.pir' => << 'END_EXPECTED',

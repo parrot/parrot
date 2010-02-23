@@ -36,7 +36,6 @@ L<docs/pdds/pdd07_codingstd.pod>
 =cut
 
 my $DIST = Parrot::Distribution->new;
-
 my @files = @ARGV ? <@ARGV> : (
     $DIST->get_c_language_files(),
     $DIST->get_make_language_files(),
@@ -74,6 +73,7 @@ __DATA__
 src/nci/core_thunks.c
 src/nci/extra_thunks.c
 t/examples/pir.t
-t/perl/Parrot_Test.t
+t/examples/tutorial.t
 t/library/getopt_obj.t
+t/perl/Parrot_Test.t
 t/run/options.t
