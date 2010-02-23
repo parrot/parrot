@@ -1,5 +1,5 @@
 #!parrot
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 .sub main :main
@@ -29,7 +29,7 @@
 .namespace [ ]
 .namespace []
 
-.sub test 
+.sub test
     $I0 = 42
 .end
 CODE

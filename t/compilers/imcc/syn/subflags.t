@@ -1,10 +1,10 @@
 #!./parrot
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
 
-t/compilers/imcc/syn/subflags.t 
+t/compilers/imcc/syn/subflags.t
 
 =head1 SYNOPSIS
 
