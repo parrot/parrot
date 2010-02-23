@@ -96,7 +96,7 @@ my $stored = $conf->data->get($problematic_flag);
       $defaults{architectures}, $stored, $flagsref, $flag
     );
     like(
-        $flagsref->{$flag}, 
+        $flagsref->{$flag},
         qr{-someflag -someotherflag},
         "_strip_arch_flags_engine(): '-arch' flags and extra whitespace removed",
     );
@@ -162,7 +162,7 @@ my $stored = $conf->data->get($problematic_flag);
     like($flagsref->{$flag},
         qr/-someflag -someotherflag/,
         "_strip_arch_flags(): '-arch' flags and extra whitespace removed",
-    );    
+    );
 
     my ($stdout, $stderr);
     capture(
