@@ -8,7 +8,7 @@ src/pmc/oplib.pmc
 
 =head1 DESCRIPTION
 
-Implements oplib  VTABLEs.
+Implements oplib VTABLEs.
 
 =cut
 
@@ -82,13 +82,12 @@ pmclass OpLib singleton {
     }
 
     VTABLE PMC* get_pmc_keyed_int(INTVAL value) {
-        if (value > interp->op_lib->op_count)
+        if ((UINTVAL)value > interp->op_lib->op_count)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "OpLib: Opcode index %d out of bounds", value);
         else {
-            const char * const name = interp->op_info_table[value].full_name;
-            const INTVAL len = strlen(name);
-            STRING * const newstr = Parrot_str_new(INTERP, name, len);
+            const char * const name   = interp->op_info_table[value].full_name;
+            STRING     * const newstr = Parrot_str_new(INTERP, name, 0);
             return VTABLE_get_pmc_keyed_str(INTERP, SELF, newstr);
         }
     }
