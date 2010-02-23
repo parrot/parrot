@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 # 008-file_based_configuration.t
 
@@ -20,17 +20,17 @@ use Parrot::Configure::Options qw| process_options |;
     my $configfile = q{examples/config/file/configwithfatalstep};
     my ($args, $steps_list_ref) = _test_good_config_file($configfile);
 
-    ok(! defined $args->{maintainer}, 
+    ok(! defined $args->{maintainer},
         "Configuring from testfoobar: 'maintainer' not defined, as expected");
     is($args->{'verbose-step'}, 'init::hints',
         "Configuring from testfoobar: 'init::hints' is verbose step");
     is($args->{'fatal-step'}, 'init::hints',
         "Configuring from testfoobar: 'init::hints' is fatal step");
-    ok($args->{nomanicheck}, 
+    ok($args->{nomanicheck},
         "Configuring from testfoobar: will omit check of MANIFEST");
     is($args->{file}, $configfile,
         "Configuring from testfoobar: config file correctly stored");
-    ok($args->{debugging}, 
+    ok($args->{debugging},
         "Configuring from testfoobar: debugging turned on");
     my %steps_seen = map {$_ => 1} @{ $steps_list_ref };
     ok(exists $steps_seen{'init::manifest'},
@@ -42,18 +42,18 @@ use Parrot::Configure::Options qw| process_options |;
 {
     my $configfile = q{examples/config/file/configcompiler};
     my ($args, $steps_list_ref) = _test_good_config_file($configfile);
-    
+
     my $c_compiler = '/usr/bin/gcc';
     my $cplusplus_compiler = '/usr/bin/g++';
-    ok(! defined $args->{maintainer}, 
+    ok(! defined $args->{maintainer},
         "Configuring from yourfoobar: 'maintainer' not defined as expected");
     is($args->{'verbose-step'}, 'init::hints',
         "Configuring from yourfoobar: 'init::hints' is verbose step");
-    ok($args->{nomanicheck}, 
+    ok($args->{nomanicheck},
         "Configuring from yourfoobar: will omit check of MANIFEST");
     is($args->{file}, $configfile,
         "Configuring from yourfoobar: config file correctly stored");
-    ok($args->{debugging}, 
+    ok($args->{debugging},
         "Configuring from yourfoobar: debugging turned on");
     is($args->{cc}, $c_compiler,
         "Configuring from yourfoobar: C compiler is $c_compiler");
@@ -76,13 +76,13 @@ use Parrot::Configure::Options qw| process_options |;
     my $configfile = q{t/configure/testlib/verbosefoobar};
     my ($args, $steps_list_ref) = _test_good_config_file($configfile);
 
-    ok(! defined $args->{maintainer}, 
+    ok(! defined $args->{maintainer},
         "Configuring from verbosefoobar: 'maintainer' not defined as expected");
-    ok($args->{nomanicheck}, 
+    ok($args->{nomanicheck},
         "Configuring from verbosefoobar: will omit check of MANIFEST");
     is($args->{file}, $configfile,
         "Configuring from verbosefoobar: config file correctly stored");
-    ok($args->{debugging}, 
+    ok($args->{debugging},
         "Configuring from verbosefoobar: debugging turned on");
     is($args->{verbose}, 1,
         "Configuring from verbosefoobar: verbose output is on");
