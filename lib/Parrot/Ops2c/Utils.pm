@@ -477,7 +477,7 @@ sub _print_preamble_header {
 #include "parrot/parrot.h"
 #include "parrot/oplib.h"
 
-$self->{sym_export} op_lib_t *$self->{init_func}(long init);
+$self->{sym_export} op_lib_t *$self->{init_func}(PARROT_INTERP, long init);
 
 END_C
     return 1;
@@ -899,7 +899,7 @@ static void store_op(PARROT_INTERP, op_info_t *info, int full);
 /* XXX on changing interpreters, this should be called,
    through a hook */
 
-static void hop_deinit(void);
+static void hop_deinit(PARROT_INTERP);
 
 /*
  * find a short or full opcode
@@ -956,7 +956,7 @@ static void hop_init(PARROT_INTERP) {
         if (get_op(interp, info[i].name, 0) == -1)
             store_op(interp, info + i, 0);
 }
-static void hop_deinit(void)
+static void hop_deinit(PARROT_INTERP)
 {
     if (hop) {
         size_t i;
@@ -964,7 +964,7 @@ static void hop_deinit(void)
             HOP *p = hop[i];
             while (p) {
                 HOP * const next = p->next;
-                mem_sys_free(p);
+                mem_gc_free(interp, p);
                 p = next;
             }
         }
@@ -977,7 +977,7 @@ END_C
     }
     else {
         print $fh <<END_C;
-static void hop_deinit(void) {}
+static void hop_deinit(SHIM_INTERP) {}
 END_C
     }
     return 1;
@@ -1026,11 +1026,11 @@ sub _generate_init_func {
 
     print $fh <<END_C;
 op_lib_t *
-$self->{init_func}(long init) {
+$self->{init_func}(PARROT_INTERP, long init) {
     /* initialize and return op_lib ptr */
     if (init == 1) {
 $init1_code
-    return &$self->{bs}op_lib;
+        return &$self->{bs}op_lib;
     }
     /* set op_lib to the passed ptr (in init) */
     else if (init) {
@@ -1038,7 +1038,7 @@ $init_set_dispatch
     }
     /* deinit - free resources */
     else {
-    hop_deinit();
+        hop_deinit(interp);
     }
     return NULL;
 }

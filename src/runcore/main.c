@@ -55,7 +55,9 @@ have the same number of elements because there is a one-to-one mapping.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void dynop_register_switch(size_t n_old, size_t n_new);
+static void dynop_register_switch(PARROT_INTERP, size_t n_old, size_t n_new)
+        __attribute__nonnull__(1);
+
 static void dynop_register_xx(PARROT_INTERP,
     size_t n_old,
     size_t n_new,
@@ -91,7 +93,8 @@ static void stop_prederef(PARROT_INTERP)
 static void turn_ev_check(PARROT_INTERP, int on)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_dynop_register_switch __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_dynop_register_switch __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_dynop_register_xx __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_get_dynamic_op_lib_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -481,7 +484,7 @@ static void
 stop_prederef(PARROT_INTERP)
 {
     ASSERT_ARGS(stop_prederef)
-    interp->op_func_table = PARROT_CORE_OPLIB_INIT(1)->op_func_table;
+    interp->op_func_table = PARROT_CORE_OPLIB_INIT(interp, 1)->op_func_table;
 
     if (interp->evc_func_table) {
         mem_gc_free(interp, interp->evc_func_table);
@@ -580,7 +583,7 @@ Parrot_setup_event_func_ptrs(PARROT_INTERP)
     ASSERT_ARGS(Parrot_setup_event_func_ptrs)
     const size_t       n         = interp->op_count;
     const oplib_init_f init_func = get_core_op_lib_init(interp, interp->run_core);
-    op_lib_t * const   lib       = init_func(1);
+    op_lib_t * const   lib       = init_func(interp, 1);
 
     /* remember op_func_table */
     interp->save_func_table      = lib->op_func_table;
@@ -640,13 +643,13 @@ Parrot_runcore_destroy(PARROT_INTERP)
         return;
 
 #ifdef HAVE_COMPUTED_GOTO
-    cg_lib = PARROT_CORE_CGP_OPLIB_INIT(1);
+    cg_lib = PARROT_CORE_CGP_OPLIB_INIT(interp, 1);
 
     if (cg_lib->op_func_table)
         mem_gc_free(interp, cg_lib->op_func_table);
     cg_lib->op_func_table = NULL;
 
-    cg_lib = PARROT_CORE_CG_OPLIB_INIT(1);
+    cg_lib = PARROT_CORE_CG_OPLIB_INIT(interp, 1);
     if (cg_lib->op_func_table)
         mem_gc_free(interp, cg_lib->op_func_table);
     cg_lib->op_func_table = NULL;
@@ -707,7 +710,7 @@ dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
                 interp->n_libs + 1, interp->n_libs, op_lib_t *);
 
     init_func = get_dynamic_op_lib_init(interp, lib_pmc);
-    lib       = init_func(1);
+    lib       = init_func(interp, 1);
 
     interp->all_op_libs[interp->n_libs++] = lib;
 
@@ -725,7 +728,7 @@ dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
     n_old = interp->op_count;
     n_new = lib->op_count;
     n_tot = n_old + n_new;
-    core  = PARROT_CORE_OPLIB_INIT(1);
+    core  = PARROT_CORE_OPLIB_INIT(interp, 1);
 
     PARROT_ASSERT(interp->op_count == core->op_count);
 
@@ -766,7 +769,7 @@ dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
     interp->save_func_table = new_func_table;
 
     /* deinit core, so that it gets rehashed */
-    (void) PARROT_CORE_OPLIB_INIT(0);
+    (void) PARROT_CORE_OPLIB_INIT(interp, 0);
 
     /* set table */
     core->op_func_table = interp->op_func_table = new_func_table;
@@ -780,7 +783,7 @@ dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
     dynop_register_xx(interp, n_old, n_new, PARROT_CORE_CG_OPLIB_INIT);
 #endif
 
-    dynop_register_switch(n_old, n_new);
+    dynop_register_switch(interp, n_old, n_new);
 }
 
 
@@ -802,7 +805,7 @@ dynop_register_xx(PARROT_INTERP,
     ASSERT_ARGS(dynop_register_xx)
     const size_t n_tot    = n_old + n_new;
     op_func_t   *ops_addr = NULL;
-    op_lib_t    *cg_lib   = init_func(1);
+    op_lib_t    *cg_lib   = init_func(interp, 1);
     op_lib_t    *new_lib;
 
 #if 0
@@ -893,13 +896,14 @@ dynop_register_xx(PARROT_INTERP,
     /* tell the cg_core about the new jump table */
     cg_lib->op_func_table = ops_addr;
     cg_lib->op_count      = n_tot;
-    init_func((long) ops_addr);
+    init_func(interp, (long) ops_addr);
 }
 
 
 /*
 
-=item C<static void dynop_register_switch(size_t n_old, size_t n_new)>
+=item C<static void dynop_register_switch(PARROT_INTERP, size_t n_old, size_t
+n_new)>
 
 Used only at the end of dynop_register.  Sums the old and new op_counts
 storing the result into the operations count field of the interpreter
@@ -910,10 +914,10 @@ object.
 */
 
 static void
-dynop_register_switch(size_t n_old, size_t n_new)
+dynop_register_switch(PARROT_INTERP, size_t n_old, size_t n_new)
 {
     ASSERT_ARGS(dynop_register_switch)
-    op_lib_t * const lib = PARROT_CORE_SWITCH_OPLIB_INIT(1);
+    op_lib_t * const lib = PARROT_CORE_SWITCH_OPLIB_INIT(interp, 1);
     lib->op_count        = n_old + n_new;
 }
 
@@ -934,7 +938,7 @@ notify_func_table(PARROT_INTERP, ARGIN(op_func_t *table), int on)
     ASSERT_ARGS(notify_func_table)
     const oplib_init_f init_func = get_core_op_lib_init(interp, interp->run_core);
 
-    init_func((long) table);
+    init_func(interp, (long) table);
 
     if (PARROT_RUNCORE_FUNC_TABLE_TEST(interp->run_core)) {
         PARROT_ASSERT(table);

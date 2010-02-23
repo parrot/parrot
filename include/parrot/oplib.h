@@ -41,7 +41,7 @@ typedef enum {
 } op_lib_flags_enum;
 
 /* when init = true initialize, else de_initialize */
-typedef op_lib_t *(*oplib_init_f)(long init);
+typedef op_lib_t *(*oplib_init_f)(PARROT_INTERP, long init);
 
 /* core.ops special opcode numbers */
 typedef enum {

@@ -1052,7 +1052,7 @@ load_prederef(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore))
     int (*get_op)(PARROT_INTERP, const char * name, int full);
 
     get_op          = interp->op_lib->op_code;
-    interp->op_lib  = init_func(1);
+    interp->op_lib  = init_func(interp, 1);
 
     /* preserve the get_op function */
     interp->op_lib->op_code = get_op;
