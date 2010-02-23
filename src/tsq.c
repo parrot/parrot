@@ -402,7 +402,7 @@ queue_destroy(ARGMOD(QUEUE *queue))
 
     COND_DESTROY(queue->queue_condition);
     MUTEX_DESTROY(queue->queue_mutex);
-    mem_sys_free(queue);
+    mem_internal_free(queue);
 }
 
 /*

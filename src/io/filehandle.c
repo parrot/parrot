@@ -552,12 +552,12 @@ it can be cleanly changed later.
 
 PARROT_CAN_RETURN_NULL
 void
-Parrot_io_clear_buffer(SHIM_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_clear_buffer(PARROT_INTERP, ARGIN(PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_clear_buffer)
     Parrot_FileHandle_attributes * const io = PARROT_FILEHANDLE(filehandle);
     if (io->buffer_start && (io->flags & PIO_BF_MALLOC)) {
-        mem_sys_free(io->buffer_start);
+        mem_gc_free(interp, io->buffer_start);
         io->buffer_start = NULL;
     }
 }

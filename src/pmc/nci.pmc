@@ -78,7 +78,7 @@ void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_in
             break;
           default:
             if (sig_length > 7)
-                mem_sys_free(param_sig);
+                mem_gc_free(interp, param_sig);
             Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_JIT_ERROR,
                     "Unknown param Signature %c\n", (char)c);
@@ -97,7 +97,7 @@ void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_in
         nci_info->pcc_params_signature = CONST_STRING(interp, "");
 
     if (sig_length > 7)
-        mem_sys_free(param_sig);
+        mem_gc_free(interp, param_sig);
 }
 
 /* actually build the NCI thunk */

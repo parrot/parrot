@@ -65,7 +65,7 @@ Destroys the PMC and frees all allocated memory.
         Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
 
         if (data) {
-            mem_sys_free(data->pointer);
+            mem_gc_free(INTERP, data->pointer);
             data->pointer = NULL;
         }
     }

@@ -153,7 +153,7 @@ Free structures.
             }
 
             if (data_struct->buffer_start)
-                mem_sys_free(data_struct->buffer_start);
+                mem_gc_free(INTERP, data_struct->buffer_start);
         }
     }
 
@@ -374,7 +374,7 @@ Read a line from the filehandle and return it in a string.
                 add_history(r);
 
             string_result = Parrot_str_new(INTERP, r, 0);
-            mem_sys_free(r);
+            mem_internal_free(r);
         }
 #else
         if (got_prompt)
