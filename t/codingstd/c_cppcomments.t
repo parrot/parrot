@@ -60,9 +60,9 @@ sub check_cppcomments {
                    (?: ' (?: \\\\ | \\' | [^'] )* ' )  # remove ' string
                  | (?: " (?: \\\\ | \\" | [^"] )* " )  # remove " string
                  | /\* .*? \*/                         # remove C comment
-		 | https?:\/\/                         # TT # 414 quick fix
+                 | https?:\/\/                         # TT # 414 quick fix
                )
-            }{}gsx;
+             }{}gsx;
 
     return $buf !~ m{ ( .*? // .* ) }x;
 }
