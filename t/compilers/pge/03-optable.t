@@ -1,7 +1,6 @@
 #!parrot
+# Copyright (C) 2006-2010, Parrot Foundation.
 # $Id$
-
-# Copyright (C) 2006-2009, Parrot Foundation.
 
 .sub main :main
     .include 'test_more.pir'
@@ -184,8 +183,7 @@
 .end
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4 filetype=pir:
+# vim: expandtab shiftwidth=4 ft=pir:
