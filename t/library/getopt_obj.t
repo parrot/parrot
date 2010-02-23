@@ -358,7 +358,7 @@ pir_output_is( <<'CODE', <<'OUT', "double dash stop" );
 .end
 CODE
 foo is 1
-bar is
+bar is 
 argv[0] is --bar
 OUT
 
@@ -406,7 +406,7 @@ pir_output_is( <<'CODE', <<'OUT', "notOptStop" );
 .end
 CODE
 foo is 1
-bar is
+bar is 
 argv[0] is foo
 argv[1] is --bar
 OUT
@@ -459,8 +459,8 @@ pir_output_is( <<'CODE', <<'OUT', "optarg" );
 
 .end
 CODE
-foo is
-f is
+foo is 
+f is 
 b is bar
 OUT
 
@@ -642,7 +642,7 @@ CODE
 foo is file
 bar is file.txt
 bax is file.t
-baz is
+baz is 
 I[0] is texta
 I[1] is textb
 define[foo] is bar
