@@ -175,8 +175,8 @@ static void gc_ms_reallocate_buffer_storage(PARROT_INTERP,
         FUNC_MODIFIES(*buffer);
 
 static void * gc_ms_reallocate_memory_chunk(PARROT_INTERP,
-    ARGFREE(void *data),
-    size_t newsize)
+    ARGFREE(void *from),
+    size_t size)
         __attribute__nonnull__(1);
 
 static void * gc_ms_reallocate_memory_chunk_zeroed(PARROT_INTERP,

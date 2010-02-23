@@ -665,7 +665,8 @@ void Parrot_io_set_os_handle(SHIM_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_CAN_RETURN_NULL
-void Parrot_io_clear_buffer(SHIM_INTERP, ARGIN(PMC *filehandle))
+void Parrot_io_clear_buffer(PARROT_INTERP, ARGIN(PMC *filehandle))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CAN_RETURN_NULL
@@ -751,7 +752,8 @@ void Parrot_io_set_buffer_start(SHIM_INTERP,
 #define ASSERT_ARGS_Parrot_io_set_os_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(filehandle))
 #define ASSERT_ARGS_Parrot_io_clear_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(filehandle))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(filehandle))
 #define ASSERT_ARGS_Parrot_io_get_buffer_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(filehandle))
 #define ASSERT_ARGS_Parrot_io_get_buffer_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

@@ -113,7 +113,8 @@ void parrot_hash_delete(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key))
         FUNC_MODIFIES(*hash);
 
 PARROT_EXPORT
-void parrot_hash_destroy(SHIM_INTERP, ARGMOD(Hash *hash))
+void parrot_hash_destroy(PARROT_INTERP, ARGMOD(Hash *hash))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*hash);
 
@@ -400,7 +401,8 @@ int STRING_compare(PARROT_INTERP,
     , PARROT_ASSERT_ARG(hash) \
     , PARROT_ASSERT_ARG(key))
 #define ASSERT_ARGS_parrot_hash_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(hash))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(hash))
 #define ASSERT_ARGS_parrot_hash_exists __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash) \
