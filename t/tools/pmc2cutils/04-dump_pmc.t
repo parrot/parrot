@@ -111,7 +111,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     #create a dump for default.pmc
     Parrot::Pmc2c::Pmc2cMain->new(
         {
-            include => \@include, 
+            include => \@include,
             opt=>\%opt,
             args=>[qq{$temppmcdir/default.pmc}],
             bin=>$Bin
@@ -215,7 +215,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     #create a dump for default.pmc
     Parrot::Pmc2c::Pmc2cMain->new(
         {
-            include => \@include, 
+            include => \@include,
             opt=>\%opt,
             args=>[qq{$temppmcdir/default.pmc}],
             bin=>$Bin
@@ -272,7 +272,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     for my $pmc ( qq{$temppmcdir/default.pmc},  qq{$temppmcdir/scalar.pmc}, qq{$temppmcdir/integer.pmc} ) {
         Parrot::Pmc2c::Pmc2cMain->new(
             {
-                include => \@include, 
+                include => \@include,
                 opt=>\%opt,
                 args=>[$pmc],
                 bin=>$Bin
@@ -376,7 +376,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     #create a dump for default.pmc
     Parrot::Pmc2c::Pmc2cMain->new(
         {
-            include => \@include, 
+            include => \@include,
             opt=>\%opt,
             args=>[qq{$temppmcdir/default.pmc}],
             bin=>$Bin
@@ -470,7 +470,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     #create a dump for default.pmc
     Parrot::Pmc2c::Pmc2cMain->new(
         {
-            include => \@include, 
+            include => \@include,
             opt=>\%opt,
             args=>[qq{$temppmcdir/default.pmc}],
             bin=>$Bin
@@ -538,7 +538,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     #create a dump for default.pmc
     Parrot::Pmc2c::Pmc2cMain->new(
         {
-            include => \@include, 
+            include => \@include,
             opt=>\%opt,
             args=>[qq{$temppmcdir/default.pmc}],
             bin=>$Bin
