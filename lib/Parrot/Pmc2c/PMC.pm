@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2008, Parrot Foundation.
+# Copyright (C) 2004-2010, Parrot Foundation.
 # $Id$
 #
 
@@ -340,7 +340,6 @@ sub vtable_method_does_multi {
     my ( $self, $methodname ) = @_;
 
     return 1 if ($methodname =~ m/^
-                (?:i_)?
                 (?:add|subtract|multiply|divide|floor_divide|modulus)
                 (?:_int|_float)?
               $/x);

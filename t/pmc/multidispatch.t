@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -9,7 +9,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 45;
+use Parrot::Test tests => 46;
 
 =head1 NAME
 
@@ -1491,6 +1491,29 @@ GoodbyeTa ta2
 100200400
 77.788.8
 77.788.899.9
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'Integer subclass and MMD - TT #784' );
+.sub main :main
+    .local pmc int_c
+    int_c = get_class "Integer"
+
+    .local pmc sub_c
+    sub_c = subclass int_c, "MyInt"
+
+    $P1 = new 'Integer'
+    $P1 = 4
+    $P1 -= 3
+    say $P1
+
+    $P1 = new 'MyInt'
+    $P1 = 4
+    $P1 -= 3
+    say $P1
+.end
+CODE
+1
+1
 OUTPUT
 
 # Local Variables:
