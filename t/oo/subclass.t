@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -55,13 +55,13 @@ Tests OO features related to subclassing.
     parent_class = newclass "PreFoo"
     foo_class = subclass parent_class, "Foo"
 
-    $S1 = typeof foo_class 
+    $S1 = typeof foo_class
     is ($S1, 'Class', 'created Foo as subclass of Pre')
 
     $I3 = isa foo_class, "Class"
     ok ($I3, 'Foo isa Class')
 
-    foo_object = new foo_class 
+    foo_object = new foo_class
     $S1 = typeof foo_object
     is ($S1, 'Foo', 'instance is typeof Foo')
 
@@ -142,7 +142,7 @@ Tests OO features related to subclassing.
 
 .sub instance_from_class_object_method
     # instantiate from class object method
-    .local pmc parent_class, baz_class, baz_object 
+    .local pmc parent_class, baz_class, baz_object
     parent_class = newclass "PreBaz"
     baz_class = subclass "PreBaz", "Baz"
     baz_object = baz_class.'new'()
@@ -160,7 +160,7 @@ Tests OO features related to subclassing.
 
 .sub instance_from_string_name
     # instantiate from string name
-    .local pmc parent_class, qux_class, qux_object 
+    .local pmc parent_class, qux_class, qux_object
     parent_class = newclass "PreQux"
     qux_class = subclass "PreQux", "Qux"
     qux_object = new 'Qux'
@@ -239,7 +239,7 @@ Tests OO features related to subclassing.
 
 .end
 
-.sub instance_from_key_pmc_name 
+.sub instance_from_key_pmc_name
     # instantiate from key PMC name
     .local pmc parent_class, barbaz_class, barbaz_object
     parent_class = newclass "Snork"

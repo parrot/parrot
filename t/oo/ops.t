@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -18,7 +18,7 @@ Tests opcodes related to the OO implementation.
 
 .sub main :main
     .include 'except_types.pasm'
-    .include 'test_more.pir' 
+    .include 'test_more.pir'
 
     plan(18)
 
@@ -91,7 +91,7 @@ Tests opcodes related to the OO implementation.
 
 .end
 
-.sub op_get_class_p_p 
+.sub op_get_class_p_p
     $P0 = new 'Hash'
     $P4 = new 'String'
     $P4 = 'Ape'
@@ -177,7 +177,7 @@ finally:
 
 .namespace ["Baz"]
 .sub bar :method
-    .return (1) 
+    .return (1)
 .end
 
 # Local Variables:
