@@ -48,7 +48,17 @@ Tests the C<GDBMHash> PMC.
 .sub unlink
     .param string filename
     new $P0, 'OS'
+    push_eh _handler
     $P0.'rm'(filename)
+    .return ()
+  _handler:
+    .local pmc e
+    .get_results (e)
+    printerr "# Cannot unlink "
+    printerr filename
+    printerr " ("
+    printerr e
+    printerr ")\n"
 .end
 
 .sub test_typeof
