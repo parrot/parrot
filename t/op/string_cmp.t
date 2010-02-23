@@ -98,7 +98,7 @@ Tests Parrot string registers and operations.
     ok( 1, 'eq_s_s_ic' )
     goto END
   ERROR:
-   ok( 0, 'eq_s_s_ic' ) 
+   ok( 0, 'eq_s_s_ic' )
    END:
 .end
 
@@ -141,7 +141,7 @@ Tests Parrot string registers and operations.
     ok( 1, 'eq_sc_s_ic' )
     goto END
   ERROR:
-   ok( 0, 'eq_sc_s_ic' ) 
+   ok( 0, 'eq_sc_s_ic' )
    END:
 .end
 
@@ -184,7 +184,7 @@ Tests Parrot string registers and operations.
     ok( 1, 'eq_s_sc_ic' )
     goto END
   ERROR:
-   ok( 0, 'eq_s_sc_ic' ) 
+   ok( 0, 'eq_s_sc_ic' )
    END:
 .end
 
@@ -216,7 +216,7 @@ Tests Parrot string registers and operations.
     ok( 1, 'eq_sc_sc_ic' )
     goto END
   ERROR:
-   ok( 0, 'eq_sc_sc_ic' ) 
+   ok( 0, 'eq_sc_sc_ic' )
    END:
 .end
 
@@ -277,7 +277,7 @@ Tests Parrot string registers and operations.
     ok( 1, 'ne_s_s_ic' )
     goto END
   ERROR:
-   ok( 0, 'ne_s_s_ic' ) 
+   ok( 0, 'ne_s_s_ic' )
    END:
 .end
 
@@ -327,7 +327,7 @@ Tests Parrot string registers and operations.
     ok( 1, 'ne_sc_s_ic' )
     goto END
   ERROR:
-   ok( 0, 'ne_sc_s_ic' ) 
+   ok( 0, 'ne_sc_s_ic' )
    END:
 .end
 
@@ -377,7 +377,7 @@ Tests Parrot string registers and operations.
     ok( 1, 'ne_s_sc_ic' )
     goto END
   ERROR:
-   ok( 0, 'ne_s_sc_ic' ) 
+   ok( 0, 'ne_s_sc_ic' )
    END:
 .end
 
@@ -416,7 +416,7 @@ Tests Parrot string registers and operations.
     ok( 1, 'ne_sc_sc_ic' )
     goto END
   ERROR:
-   ok( 0, 'ne_sc_sc_ic' ) 
+   ok( 0, 'ne_sc_sc_ic' )
    END:
 .end
 
@@ -472,7 +472,7 @@ Tests Parrot string registers and operations.
     ok( 1, 'lt_s_s_ic' )
     goto END
   ERROR:
-   ok( 0, 'lt_s_s_ic' ) 
+   ok( 0, 'lt_s_s_ic' )
    END:
 .end
 
@@ -517,7 +517,7 @@ Tests Parrot string registers and operations.
     ok( 1, 'lt_sc_s_ic' )
     goto END
   ERROR:
-   ok( 0, 'lt_sc_s_ic' ) 
+   ok( 0, 'lt_sc_s_ic' )
    END:
 .end
 
@@ -562,7 +562,7 @@ Tests Parrot string registers and operations.
     ok( 1, 'lt_s_sc_ic' )
     goto END
   ERROR:
-   ok( 0, 'lt_s_sc_ic' ) 
+   ok( 0, 'lt_s_sc_ic' )
    END:
 .end
 
@@ -596,7 +596,7 @@ Tests Parrot string registers and operations.
     ok( 1, 'lt_sc_sc_ic' )
     goto END
   ERROR:
-   ok( 0, 'lt_sc_sc_ic' ) 
+   ok( 0, 'lt_sc_sc_ic' )
    END:
 .end
 
@@ -654,7 +654,7 @@ Tests Parrot string registers and operations.
     ok( 1, 'le_s_s_ic' )
     goto END
   ERROR:
-   ok( 0, 'le_s_s_ic' ) 
+   ok( 0, 'le_s_s_ic' )
    END:
 .end
 
@@ -701,7 +701,7 @@ Tests Parrot string registers and operations.
     ok( 1, 'le_sc_s_ic' )
     goto END
   ERROR:
-   ok( 0, 'le_sc_s_ic' ) 
+   ok( 0, 'le_sc_s_ic' )
    END:
 .end
 
@@ -748,7 +748,7 @@ Tests Parrot string registers and operations.
     ok( 1, 'le_s_sc_ic' )
     goto END
   ERROR:
-   ok( 0, 'le_s_sc_ic' ) 
+   ok( 0, 'le_s_sc_ic' )
    END:
 .end
 
@@ -784,7 +784,7 @@ Tests Parrot string registers and operations.
     ok( 1, 'le_sc_sc_ic' )
     goto END
   ERROR:
-   ok( 0, 'le_sc_sc_ic' ) 
+   ok( 0, 'le_sc_sc_ic' )
    END:
 .end
 
@@ -841,7 +841,7 @@ Tests Parrot string registers and operations.
     ok( 1, 'gt_s_s_ic' )
     goto END
   ERROR:
-   ok( 0, 'gt_s_s_ic' ) 
+   ok( 0, 'gt_s_s_ic' )
    END:
 .end
 
@@ -887,7 +887,7 @@ Tests Parrot string registers and operations.
     ok( 1, 'gt_sc_s_ic' )
     goto END
   ERROR:
-   ok( 0, 'gt_sc_s_ic' ) 
+   ok( 0, 'gt_sc_s_ic' )
    END:
 .end
 
@@ -933,7 +933,7 @@ Tests Parrot string registers and operations.
     ok( 1, 'gt_s_sc_ic' )
     goto END
   ERROR:
-   ok( 0, 'gt_s_sc_ic' ) 
+   ok( 0, 'gt_s_sc_ic' )
    END:
 .end
 
@@ -968,7 +968,7 @@ Tests Parrot string registers and operations.
     ok( 1, 'gt_sc_sc_ic' )
     goto END
   ERROR:
-   ok( 0, 'gt_sc_sc_ic' ) 
+   ok( 0, 'gt_sc_sc_ic' )
    END:
 .end
 
@@ -1027,7 +1027,7 @@ Tests Parrot string registers and operations.
     ok( 1, 'ge_s_s_ic' )
     goto END
   ERROR:
-   ok( 0, 'ge_s_s_ic' ) 
+   ok( 0, 'ge_s_s_ic' )
    END:
 .end
 
@@ -1075,7 +1075,7 @@ Tests Parrot string registers and operations.
     ok( 1, 'ge_sc_s_ic' )
     goto END
   ERROR:
-   ok( 0, 'ge_sc_s_ic' ) 
+   ok( 0, 'ge_sc_s_ic' )
    END:
 .end
 
@@ -1123,7 +1123,7 @@ Tests Parrot string registers and operations.
     ok( 1, 'ge_s_sc_ic' )
     goto END
   ERROR:
-   ok( 0, 'ge_s_sc_ic' ) 
+   ok( 0, 'ge_s_sc_ic' )
    END:
 .end
 
