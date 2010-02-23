@@ -1,5 +1,5 @@
 #!parrot
-# Copyright (C) 2005-2009, Parrot Foundation.
+# Copyright (C) 2005-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -70,7 +70,7 @@ testing a few basic components of TGE::Grammar and TGE::Tree
 
 .sub test_malformed_string_in_r11890_under_linux_i386
     lives_ok(<<'CODE', '"Malformed string" in r11890 under Linux i386')
-.sub main 
+.sub main
     load_bytecode "TGE.pbc"
 .end
 CODE
