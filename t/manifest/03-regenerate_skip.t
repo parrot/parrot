@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 # 03-regenerate_skip.t
 
@@ -21,16 +21,16 @@ SKIP: {
         unless (-e 'DEVELOPING');
 
     use_ok('Parrot::Manifest');
-    
+
     my $script = $0;
     my $mani = Parrot::Manifest->new( { script => $script, } );
     isa_ok( $mani, 'Parrot::Manifest' );
-    
+
     my $cwd       = cwd();
     my $sk        = q{MANIFEST.SKIP};
     my $print_str = $mani->prepare_manifest_skip();
     ok( $print_str, "prepare_manifest_skip() returned" );
-    
+
     # 1:  Copy the real MANIFEST.SKIP unaltered to the tempdir.
     # Assuming the real MANIFEST.SKIP was correct going in to this test, the
     # absence of any change in it will mean that there will be no need to
@@ -48,7 +48,7 @@ SKIP: {
         chdir $cwd
             or croak "Unable to change back from temporary directory after testing";
     }
-    
+
     # 2:  Copy the real MANIFEST.SKIP to the tempdir but mangle it there.
     # The alteration in the copied MANIFEST.SKIP will be sufficient to require
     # regeneration of MANIFEST.SKIP.
@@ -62,7 +62,7 @@ SKIP: {
         my @lines;
         tie @lines, 'Tie::File', qq{$tdir/$sk}
             or croak "Unable to tie to $sk in tempdir";
-    
+
         for ( 1 .. 10 ) {
             if ( defined( $lines[-1] ) ) {
                 pop @lines;

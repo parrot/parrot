@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 # 04-alt_file.t
 
@@ -17,10 +17,10 @@ SKIP: {
         unless (-e 'DEVELOPING');
 
     use_ok('Parrot::Manifest');
-    
+
     my $script = $0;
     my $g      = q{something_other_than_MANIFEST};
-    
+
     my $mani = Parrot::Manifest->new(
         {
             script => $script,
@@ -28,10 +28,10 @@ SKIP: {
         }
     );
     isa_ok( $mani, 'Parrot::Manifest' );
-    
+
     my $manifest_lines_ref = $mani->prepare_manifest();
     ok( $manifest_lines_ref, "prepare_manifest_skip() returned" );
-    
+
     ok( !-f $g, "No $g found" );
     my $need_for_file = $mani->determine_need_for_manifest($manifest_lines_ref);
     ok( $need_for_file, "Need to regenerate $g" );

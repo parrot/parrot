@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 # 02-regenerate_file.t
 
@@ -21,17 +21,17 @@ SKIP: {
         unless (-e 'DEVELOPING');
 
     use_ok('Parrot::Manifest');
-    
+
     my $script = $0;
     my $mani = Parrot::Manifest->new( { script => $script, } );
     isa_ok( $mani, 'Parrot::Manifest' );
-    
+
     my $cwd = cwd();
     my $f   = q{MANIFEST};
-    
+
     my $manifest_lines_ref = $mani->prepare_manifest();
     ok( $manifest_lines_ref, "prepare_manifest_skip() returned" );
-    
+
     # 1:  Copy the real MANIFEST unaltered to the tempdir.
     # Assuming the real MANIFEST was correct going in to this test, the
     # absence of any change in it will mean that there will be no need to
@@ -49,7 +49,7 @@ SKIP: {
             or croak "Unable to change back from temporary directory after testing";
         unlink qq{$tdir/$f} or croak "Unable to delete file from tempdir";
     }
-    
+
     # 2:  Copy the real MANIFEST to the tempdir but mangle it there.
     # The alteration in the copied MANIFEST will be sufficient to require
     # regeneration of MANIFEST.  And for good measure, toss in a line of all
@@ -64,7 +64,7 @@ SKIP: {
         my @lines;
         tie @lines, 'Tie::File', qq{$tdir/$f}
             or croak "Unable to tie to $f in tempdir";
-    
+
         for ( 1 .. 10 ) {
             if ( defined( $lines[-1] ) ) {
                 pop @lines;
@@ -81,7 +81,7 @@ SKIP: {
         chdir $cwd
             or croak "Unable to change back from temporary directory after testing";
     }
-    
+
     # 3:  Go to a tempdir which lacks a MANIFEST.  Confirm that you need to
     # regenerate MANIFEST (but do not bother to actually do it there).
     {
