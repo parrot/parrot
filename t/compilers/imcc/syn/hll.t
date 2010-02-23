@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -81,3 +81,10 @@ CODE
 Stack
 OUT
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
