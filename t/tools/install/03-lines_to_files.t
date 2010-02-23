@@ -232,7 +232,7 @@ Parrot::Install, F<tools/dev/install_files.pl>, F<tools/dev/install_dev_files.pl
 
 __END__
 
-# Can't safely run lines_to_files() more than once in a program until it's been fixed, 
+# Can't safely run lines_to_files() more than once in a program until it's been fixed,
 # and we can't fix it until its tested, so I've commented most of these out until we've
 # fixed lines_to_files() not to use @ARGV
 
@@ -254,8 +254,8 @@ __END__
 #
 #    # Second lines_to_files test
 ##    eval { lines_to_files(
-##        $metatransforms, $transformorder, 
-##        [qw(MANIFEST MANIFEST.generated)], 
+##        $metatransforms, $transformorder,
+##        [qw(MANIFEST MANIFEST.generated)],
 ##        $options, $parrotdir
 ##    ); };
 ##    ok($@ =~ /^Unknown install location in MANIFEST for file/, 'fails for install locations not specified in transforms');
@@ -282,8 +282,8 @@ __END__
 #    };
 #
 #    ($files, $installable_exe, $directories) = lines_to_files(
-#        $metatransforms, $othertransforms, 
-#        [qw(MANIFEST MANIFEST.generated)], 
+#        $metatransforms, $othertransforms,
+#        [qw(MANIFEST MANIFEST.generated)],
 #        { packages => 'main' }, $parrotdir
 #    );
 #    ok((ref($files) and ref($installable_exe) and ref($directories)), 'lines_to_files returns something vaguely sensible');

@@ -30,7 +30,7 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
 
     {
         my ( $stdout, $stderr, $rv );
-    
+
         eval {
             capture(
                 sub { $rv = install_files($tdir, 1); },
@@ -60,7 +60,7 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
             \$stderr,
         );
         like($stderr, qr/Bad reference passed in \$files/, "Catches non-HASH files");
-    
+
         like( $stdout, qr/Installing \.\.\./, 
             'Got expected installation message' );
     }
@@ -87,7 +87,7 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
             \$stderr,
         );
         ok( $rv, 'install_files() completed successfully in dry-run case' );
-    
+
         my $files_created = 0;
         foreach my $el (@$files_ref) {
             $files_created++ if -f $tdir . $el->{Dest};
@@ -107,7 +107,7 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
             \$stderr,
         );
         ok( $rv, 'install_files() completed successfully in production case' );
-    
+
         my $files_created = 0;
         foreach my $el (@$files_ref) {
             $files_created++ if -f "$tdir$el->{Dest}";
@@ -152,7 +152,7 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
             \$stderr,
         );
         ok( $rv, 'install_files() completed successfully in mock-Cygwin case' );
-    
+
         my $files_created = 0;
         foreach my $el (@$files_ref) {
             $files_created++ if -f "$tdir$el->{Dest}";
@@ -202,7 +202,7 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
             \$stderr,
         );
         ok( $rv, 'install_files() completed successfully in mock-Cygwin case' );
-    
+
         my $files_created = 0;
         foreach my $el (@$files_ref) {
             $files_created++ if -f "$tdir$el->{Dest}";
@@ -240,7 +240,7 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
             \$stderr,
         );
         ok( $rv, 'install_files() handled non-existent file as expected' );
-    
+
         like( $stdout, qr/Installing \.\.\./, 
             'Got expected installation message' );
     }
