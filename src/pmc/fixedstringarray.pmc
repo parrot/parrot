@@ -183,6 +183,20 @@ Returns the number of elements in the array.
         return SELF.elements();
     }
 
+/*
+
+=item C<FLOATVAL get_number()>
+
+Returns the number of elements in the array.
+
+=cut
+
+*/
+
+    VTABLE FLOATVAL get_number() {
+        const INTVAL e = SELF.elements();
+        return (FLOATVAL)e;
+    }
 
 /*
 

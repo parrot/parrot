@@ -19,7 +19,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(44)
+    plan(46)
 
     'test_set_size'()       # 2 tests
     'test_reset_size'()     # 1 test
@@ -37,6 +37,7 @@ out-of-bounds test. Checks INT and PMC keys.
     'test_get_string'()     # 1 test
     'test_equality'()       # 5 tests
     'test_gc'()             # 4 tests
+    'test_number'()         # 2 tests
 .end
 
 .sub 'test_set_size'
@@ -361,6 +362,18 @@ out-of-bounds test. Checks INT and PMC keys.
     null s
     a2[1] = s
     isnt(a1, a2, "Not equal when second element is null")
+.end
+
+
+.sub 'test_number'
+    .local pmc fsa
+    fsa = new ['FixedStringArray']
+    fsa = 3
+
+    $I0 = fsa
+    is($I0, 3, "get_integer returns correct size")
+    $N0 = fsa
+    is($N0, 3.0, "get_number returns correct size")
 .end
 
 
