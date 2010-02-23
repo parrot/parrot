@@ -125,3 +125,9 @@ Tests various transcendental operations
     is($N0, 1.557408, "tan(1)", epsilon)
 .end
 
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
+

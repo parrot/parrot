@@ -1,5 +1,5 @@
 #!parrot
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -165,8 +165,7 @@ t/op/time.t - Time and Sleep
 
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4 filetype=pir:
+# vim: expandtab shiftwidth=4 ft=pir:

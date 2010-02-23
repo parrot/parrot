@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -145,4 +145,4 @@ pin/unpin
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
