@@ -613,7 +613,7 @@ destroy_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore)
 
     if (runcore->output_fn != record_values_none)
         fclose(runcore->profile_fd);
-    mem_sys_free(runcore->time);
+    mem_gc_free(interp, runcore->time);
 
     return NULL;
 }

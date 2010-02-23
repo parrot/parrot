@@ -184,13 +184,14 @@ void
 destroy_runloop_jump_points(PARROT_INTERP)
 {
     ASSERT_ARGS(destroy_runloop_jump_points)
-    really_destroy_runloop_jump_points(interp->current_runloop);
-    really_destroy_runloop_jump_points(interp->runloop_jmp_free_list);
+    really_destroy_runloop_jump_points(interp, interp->current_runloop);
+    really_destroy_runloop_jump_points(interp, interp->runloop_jmp_free_list);
 }
 
 /*
 
-=item C<void really_destroy_runloop_jump_points(Parrot_runloop *jump_point)>
+=item C<void really_destroy_runloop_jump_points(PARROT_INTERP, Parrot_runloop
+*jump_point)>
 
 Takes a pointer to a runloop jump point (which had better be the last one in
 the list). Walks back through the list, freeing the memory of each one, until
@@ -201,12 +202,13 @@ it encounters NULL. Used by C<destroy_runloop_jump_points>.
 */
 
 void
-really_destroy_runloop_jump_points(ARGIN_NULLOK(Parrot_runloop *jump_point))
+really_destroy_runloop_jump_points(PARROT_INTERP,
+        ARGFREE(Parrot_runloop *jump_point))
 {
     ASSERT_ARGS(really_destroy_runloop_jump_points)
     while (jump_point) {
         Parrot_runloop * const prev = jump_point->prev;
-        mem_sys_free(jump_point);
+        mem_gc_free(interp, jump_point);
         jump_point = prev;
     }
 }
