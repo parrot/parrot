@@ -33,8 +33,8 @@ my $pipp_x = $interp->find_global( 'Pipp' );
     isa_ok( $pipp_x, 'Parrot::PMC' );
 }
 
-# TODO: get hll id of Pipp
-# TODO: set hll namespace root to 'pipp'
+# todo: get hll id of Pipp
+# todo: set hll namespace root to 'pipp'
 # find sub 'eval' and hll namespace 'pipp'
 my $pipp_eval = $interp->find_global( 'pipp', 'eval' );
 # isa_ok( $pipp_eval, 'Parrot::PMC', todo => '$pipp_eval is not found'  );
