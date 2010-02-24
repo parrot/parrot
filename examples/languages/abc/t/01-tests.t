@@ -79,7 +79,7 @@ my @test_files = map { "$abcdir/t/$_" } @files;
 # calculate total number of tests
 my $numtests = 0;
 foreach my $f (@test_files) {
-    open my( $TEST_FILE ), $f;
+    open my $TEST_FILE, '<', $f;
 
     # for each line in the given files if it's not a comment line
     # or an empty line, the it's a test
@@ -91,7 +91,7 @@ plan tests => $numtests;
 
 # main loop
 foreach my $file (@test_files) {
-    open my $TEST_FILE, "<$file" or die "can't open file";
+    open my $TEST_FILE, '<', $file or die "can't open file";
     while (<$TEST_FILE>) {
         chomp;
         s/\r//g;
