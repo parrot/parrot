@@ -35,24 +35,6 @@ my $serialized = $conf->pcfreeze();
 $conf->options->set(%{$args});
 my $step = test_step_constructor_and_description($conf);
 
-# The test of runstep() below will need to be TODO-ed until such time as
-# we can test with all the data which the Parrot::Configure object would
-# normally have during regular configuration at the onset of this step.
-# That's because runstep() consists almost solely of calls to C
-# programs.  We can't refactor runstep()'s guts out into internal
-# subroutines and test them explicitly as we've been able to do for
-# other configuration steps.  We won't lose any coverage by commenting
-# out the TODO block for the time being, as the coverage analysis will,
-# at the very least, pick up runstep() while running the step itself.
-#
-#TODO: {
-#    # http://rt.perl.org/rt3/Ticket/Display.html?id=47391
-#    local $TODO =
-#        q<Reported failing where vendor-supplied Perl 5 Config.pm does not match true state of system available for Parrot configuration>;
-#    ok($step->runstep($conf), "runstep() returned true value");
-#} #'
-
-
 $conf->replenish($serialized);
 
 ########## _evaluate_snprintf() ##########
