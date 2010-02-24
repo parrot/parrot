@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2008-2009, Parrot Foundation.
+# Copyright (C) 2008-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -73,3 +73,11 @@ if (0)
     ok( $pmc, 'invoke() should return a PMC, given that signature' );
     is( $pmc->get_string(), 42, 'value returned in the PMC' );
 }
+
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
