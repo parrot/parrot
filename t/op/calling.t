@@ -2466,7 +2466,7 @@ foo
 OUTPUT
 
 # See Rakudo queue http://rt.perl.org/rt3/Ticket/Display.html?id=62730
-pir_output_is( <<'CODE', <<'OUTPUT', "Handling :flat of emtpy arguments" );
+pir_output_is( <<'CODE', <<'OUTPUT', "Handling :flat of empty arguments" );
 .sub 'main'
     $P0   = new ['Undef']
     ($P0) = foo()
