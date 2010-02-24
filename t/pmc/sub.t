@@ -27,6 +27,8 @@ C<Continuation> PMCs.
 
 =cut
 
+my @todo;
+
 pasm_output_is( <<'CODE', <<'OUTPUT', "PASM subs - invokecc" );
     .const 'Sub' P0 = "func"
 
@@ -835,9 +837,14 @@ the_sub
 main
 OUTPUT
 
-my @todo = ( todo => 'broken with JIT (TT #983)' )
-    if ( defined $ENV{TEST_PROG_ARGS} and
-        $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/ );
+@todo = (
+    defined $ENV{TEST_PROG_ARGS}
+        and
+    $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/
+)
+    ? ( todo => 'broken with JIT (TT #983)' )
+    : ();
+
 pir_output_is( <<'CODE', <<'OUTPUT', "caller introspection via interp", @todo );
 .sub main :main
 .include "interpinfo.pasm"
