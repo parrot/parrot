@@ -340,14 +340,6 @@ Call a Parrot subroutine using the supplied signature. Variables to be filled
 with return values are passed as references in the varargs list, after all
 arguments.
 
-=item [DEPRECATED] C<void *Parrot_call_sub(PARROT_INTERP, Parrot_PMC sub, const_char *signature)>
-
-Call a Parrot subroutine that returns a pointer using the supplied signature.
-
-=item [DEPRECATED] C<Parrot_Int Parrot_call_sub_ret_int(PARROT_INTERP, Parrot_PMC sub, const_char *signature)>
-
-Call a Parrot subroutine that returns an integer using the supplied signature.
-
 =back
 
 =head2 Objects
@@ -490,7 +482,7 @@ future.
         sub = Parrot_find_global_cur(interp, pstr);
 
         /* run foo(), which returns nothing */
-        Parrot_call_sub(interp, sub, "v");
+	Parrot_ext_call(interp, sub, "->");
 
         Parrot_destroy(interp);
 
@@ -586,10 +578,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_callback_D>
 
 =item C<Parrot_ext_call>
-
-=item [DEPRECATED] C<Parrot_call_sub>
-
-=item [DEPRECATED] C<Parrot_call_sub_ret_int>
 
 =item C<Parrot_char_digit_value>
 
