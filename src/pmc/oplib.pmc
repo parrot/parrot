@@ -22,7 +22,7 @@ Implements oplib VTABLEs.
          need to cache even a majority of the ~1300 ops. */
 static PMC *OPLIB_PMC_INSTANCE;
 static PMC *OPLIB_OPCODE_CACHE;
-pmclass OpLib singleton {
+pmclass OpLib {
     void class_init() {
         OPLIB_PMC_INSTANCE = NULL;
         OPLIB_OPCODE_CACHE = NULL;
@@ -39,6 +39,7 @@ pmclass OpLib singleton {
     VTABLE void init() {
         if (OPLIB_OPCODE_CACHE == NULL)
             OPLIB_OPCODE_CACHE = Parrot_pmc_new(INTERP, enum_class_Hash);
+        PObj_custom_mark_SET(SELF);
     }
 
     VTABLE void mark() {
