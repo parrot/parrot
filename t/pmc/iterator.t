@@ -23,7 +23,7 @@ Tests the C<Iterator> PMC.
 
 =cut
 
-# XXX Split this test into aggregate specific one.
+# TT #1478: Split this test into aggregate specific one.
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "new iter" );
     new P2, ['ResizablePMCArray']
