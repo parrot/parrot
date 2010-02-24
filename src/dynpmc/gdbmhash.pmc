@@ -390,6 +390,40 @@ Deletes the element associated with C<*key>.
 
         return;
     }
+
+/*
+
+=back
+
+=head2 Specific Methods
+
+=over 4
+
+=item C<void open(STRING* value)>
+
+Open a or create a new dbm file.
+
+=cut
+
+*/
+
+    METHOD void open(STRING* value) {
+        VTABLE_set_string_native(interp, SELF, value);
+    }
+
+/*
+
+=item C<void close()>
+
+Close current dbm file.
+
+=cut
+
+*/
+
+    METHOD void close() {
+        gdbm_close(PMC_dbfh(SELF));
+    }
 }
 
 /*
