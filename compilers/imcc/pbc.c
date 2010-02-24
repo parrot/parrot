@@ -357,11 +357,11 @@ add_const_table(PARROT_INTERP)
     /* Update the constant count and reallocate */
     if (interp->code->const_table->constants)
         interp->code->const_table->constants =
-            mem_gc_realloc_n_typed(interp, interp->code->const_table->constants,
-                newcount, PackFile_Constant *);
+            mem_gc_realloc_n_typed_zeroed(interp, interp->code->const_table->constants,
+                newcount, oldcount, PackFile_Constant *);
     else
         interp->code->const_table->constants =
-            mem_gc_allocate_n_typed(interp, newcount, PackFile_Constant *);
+            mem_gc_allocate_n_zeroed_typed(interp, newcount, PackFile_Constant *);
 
     interp->code->const_table->constants[oldcount] = new_constant;
     interp->code->const_table->const_count         = newcount;
