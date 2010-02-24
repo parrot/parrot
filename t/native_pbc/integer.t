@@ -90,7 +90,7 @@ sub this_arch {
       . "_"
       . (substr($PConfig{byteorder},0,2) eq '12' ? "le" : "be");
 }
-sub bc_version($) {
+sub bc_version {
     my $f = shift;
     my $b;
     open my $F, "<", "$f" or return "Can't open $f: $!";
