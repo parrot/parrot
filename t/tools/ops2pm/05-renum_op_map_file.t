@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 # 05-renum_op_map_file.t
 
@@ -126,4 +126,11 @@ sub get_last_opcode {
         unless (defined $lastcode and defined $lastnumber);
     return ($lastcode, $lastnumber);
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
 
