@@ -58,7 +58,8 @@ ok #test exception from init vtable
 OUT
 
 # Local Variables:
-#   mode: pir
+#   mode: cperl
+#   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4 ft=pir:
+# vim: expandtab shiftwidth=4:
