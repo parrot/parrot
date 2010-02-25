@@ -1422,7 +1422,7 @@ sub_param_type_def:
            if ($3 & VT_UNIQUE_REG)
                $$ = mk_ident_ur(interp, $2, $1);
            else if ($3 & VT_OPT_FLAG && $1 != 'I') {
-               char *type;
+               const char *type;
                switch ($1) {
                     case 'N': type = "num";     break;
                     case 'S': type = "string";  break;

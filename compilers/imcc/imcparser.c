@@ -3699,7 +3699,7 @@ yyreduce:
            if ((yyvsp[(3) - (3)].t) & VT_UNIQUE_REG)
                (yyval.sr) = mk_ident_ur(interp, (yyvsp[(2) - (3)].s), (yyvsp[(1) - (3)].t));
            else if ((yyvsp[(3) - (3)].t) & VT_OPT_FLAG && (yyvsp[(1) - (3)].t) != 'I') {
-               char *type;
+               const char *type;
                switch ((yyvsp[(1) - (3)].t)) {
                     case 'N': type = "num";     break;
                     case 'S': type = "string";  break;

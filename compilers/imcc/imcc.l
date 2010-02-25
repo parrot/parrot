@@ -726,7 +726,7 @@ SP              [ ]
                 "Invalid LABEL outside of macro");
         }
         else {
-            char * const fmt    = "local__%s__%s__$";
+            const char * const fmt    = "local__%s__%s__$";
             const size_t fmtlen = strlen(fmt) - (2 * strlen("%s"));
             const size_t len    = strlen(IMCC_INFO(interp)->cur_macro_name)
                                 + yyleng + fmtlen;
