@@ -412,9 +412,10 @@ _srand48(long seed)
 
 =item C<FLOATVAL Parrot_float_rand(INTVAL how_random)>
 
-Returns a C<FLOATVAL> in the interval C<[0.0, 1.0)>.
+Returns a C<FLOATVAL> uniformly distributed in the in the interval
+C<[0.0, 1.0]>.
 
-C<how_random> is ignored.
+C<how_random> is currently ignored.
 
 =cut
 
@@ -434,7 +435,7 @@ Parrot_float_rand(INTVAL how_random)
 
 =item C<INTVAL Parrot_uint_rand(INTVAL how_random)>
 
-Returns an C<INTVAL> in the interval C<[0, 2^31)>.
+Returns an C<INTVAL> uniformly distributed in the interval C<[0, 2^31)>.
 
 C<how_random> is ignored.
 
@@ -491,8 +492,16 @@ INTVAL
 Parrot_range_rand(INTVAL from, INTVAL to, INTVAL how_random)
 {
     ASSERT_ARGS(Parrot_range_rand)
-    return (INTVAL)(from + ((double)(to - from))
-                     * Parrot_float_rand(how_random));
+    const double spread = (double)(to - from + 1);
+    const double randpart = Parrot_float_rand(how_random);
+    const INTVAL raw = (INTVAL)(spread * randpart);
+
+    /* This shouldn't be necessary since Parrot_float_rand is supposed to
+       return a value between [0.0, 1.0), but let's just try to avoid the
+       unlikely fencepost errors anyway. */
+    if (raw == to)
+        raw--;
+    return raw;
 }
 
 /*
