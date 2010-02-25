@@ -494,13 +494,8 @@ Parrot_range_rand(INTVAL from, INTVAL to, INTVAL how_random)
     ASSERT_ARGS(Parrot_range_rand)
     const double spread = (double)(to - from + 1);
     const double randpart = Parrot_float_rand(how_random);
-    INTVAL raw = from + (INTVAL)(spread * randpart);
+    const INTVAL raw = from + (INTVAL)(spread * randpart);
 
-    /* This shouldn't be necessary since Parrot_float_rand is supposed to
-       return a value between [0.0, 1.0), but let's just try to avoid the
-       unlikely fencepost errors anyway. */
-    if (raw == to)
-        raw--;
     return raw;
 }
 
