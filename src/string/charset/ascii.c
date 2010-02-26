@@ -596,31 +596,37 @@ mixed_cs_index(PARROT_INTERP, ARGIN(STRING *src), ARGIN(STRING *search),
 {
     ASSERT_ARGS(mixed_cs_index)
     String_iter src_iter, search_iter;
-    UINTVAL len;
-    INTVAL start;
+    UINTVAL len, next_pos;
+    INTVAL found_at;
 
     ENCODING_ITER_INIT(interp, src, &src_iter);
     src_iter.set_position(interp, &src_iter, offs);
     ENCODING_ITER_INIT(interp, search, &search_iter);
     len = search->strlen;
 
-    start = -1;
-    for (; len && offs < src->strlen; ++offs) {
+    found_at = -1;
+    next_pos = offs;
+
+    for (; len && offs < src->strlen ;) {
         const UINTVAL c1 = src_iter.get_and_advance(interp, &src_iter);
         const UINTVAL c2 = search_iter.get_and_advance(interp, &search_iter);
+
         if (c1 == c2) {
             --len;
-            if (start == -1)
-                start = offs;
+            if (found_at == -1)
+                found_at = offs;
+            ++offs;
         }
         else {
             len = search->strlen;
-            start = -1;
+            found_at = -1;
+            offs = ++next_pos;
+            src_iter.set_position(interp, &src_iter, offs);
             search_iter.set_position(interp, &search_iter, 0);
         }
     }
     if (len == 0)
-        return start;
+        return found_at;
     return -1;
 }
 

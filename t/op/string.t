@@ -19,7 +19,7 @@ Tests Parrot string registers and operations.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(411)
+    plan(412)
 
     set_s_s_sc()
     test_clone()
@@ -98,6 +98,7 @@ Tests Parrot string registers and operations.
     index_three_arg_form()
     index_four_arg_form()
     index_four_arg_form_bug_twenty_two_thousand_seven_hundred_and_eighteen()
+    index_trac_1482()
     index_null_strings()
     index_embedded_nulls()
     index_big_strings()
@@ -980,6 +981,14 @@ WHILE:
     set $S0, "is"
     index $I0, $S1, $S0, 0
     is( $I0, "2", 'index, 4-arg form, bug 22718' )
+.end
+
+.sub index_trac_1482
+    $S0 = unicode:"bubuc"
+    $S1 = unicode:"buc"
+
+    $I0 = index $S0, $S1, 0
+    is ($I0, 2, 'index, 4-arg, partial-match causes failure: TT #1482')
 .end
 
 .sub index_null_strings
