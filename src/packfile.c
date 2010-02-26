@@ -3915,9 +3915,7 @@ PackFile_Constant_pack_size(PARROT_INTERP, ARGIN(const PackFile_Constant *self))
 
       case PFC_PMC:
         component = self->u.key; /* the pmc (Sub, ...) */
-
-        packed_size =
-            PF_size_string(STRINGNULL) + Parrot_freeze_size(interp, component) / sizeof (opcode_t);
+        packed_size = PF_size_strlen(Parrot_freeze_size(interp, component));
         break;
 
       default:

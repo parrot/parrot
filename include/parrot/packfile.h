@@ -1091,6 +1091,9 @@ PARROT_PURE_FUNCTION
 size_t PF_size_string(ARGIN(const STRING *s))
         __attribute__nonnull__(1);
 
+PARROT_PURE_FUNCTION
+size_t PF_size_strlen(const UINTVAL len);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t* PF_store_cstring(ARGOUT(opcode_t *cursor), ARGIN(const char *s))
@@ -1148,6 +1151,7 @@ opcode_t* PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
 #define ASSERT_ARGS_PF_size_opcode __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_PF_size_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_PF_size_strlen __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_PF_store_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(cursor) \
     , PARROT_ASSERT_ARG(s))

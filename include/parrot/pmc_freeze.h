@@ -121,7 +121,7 @@ STRING* Parrot_freeze(PARROT_INTERP, ARGIN(PMC *pmc))
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-INTVAL Parrot_freeze_size(PARROT_INTERP, ARGIN(PMC *pmc))
+UINTVAL Parrot_freeze_size(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

@@ -1402,7 +1402,7 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
 
 /*
 
-=item C<size_t PF_size_string(const STRING *s)>
+=item C<size_t PF_size_strlen(const STRING *s)>
 
 Reports stored size of C<STRING> in C<opcode_t> units.
 
@@ -1415,7 +1415,27 @@ size_t
 PF_size_string(ARGIN(const STRING *s))
 {
     ASSERT_ARGS(PF_size_string)
-    opcode_t padded_size = s->bufused;
+    /* TODO: don't break encapsulation on strings */
+    const UINTVAL len = s->bufused;
+    return PF_size_strlen(len);
+}
+
+/*
+
+=item C<size_t PF_size_string(const UINTVAL len)>
+
+Reports stored size of C<STRING> in C<opcode_t> units given its in-memory byte length.
+
+=cut
+
+*/
+
+PARROT_PURE_FUNCTION
+size_t
+PF_size_strlen(const UINTVAL len)
+{
+    ASSERT_ARGS(PF_size_strlen)
+    opcode_t padded_size = len;
 
     if (padded_size % sizeof (opcode_t)) {
         padded_size += sizeof (opcode_t) - (padded_size % sizeof (opcode_t));
