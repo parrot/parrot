@@ -619,9 +619,14 @@ mixed_cs_index(PARROT_INTERP, ARGIN(STRING *src), ARGIN(STRING *search),
         }
         else {
             len = search->strlen;
+            ++offs;
+            ++next_pos;
+            if (offs != next_pos) {
+                src_iter.set_position(interp, &src_iter, next_pos);
+                offs = next_pos;
+            }
+
             found_at = -1;
-            offs = ++next_pos;
-            src_iter.set_position(interp, &src_iter, offs);
             search_iter.set_position(interp, &search_iter, 0);
         }
     }
