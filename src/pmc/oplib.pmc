@@ -96,6 +96,24 @@ pmclass OpLib {
     VTABLE INTVAL get_integer() {
         return INTERP->op_lib->op_count;
     }
+
+    METHOD ops_by_shortname(STRING *shortname)
+    {
+        char *sname = Parrot_str_to_cstring(INTERP, shortname);
+        const op_lib_t * const op_lib = INTERP->op_lib;
+        const op_info_t * const table = op_lib->op_info_table;
+        PMC *result = PMCNULL;
+        UINTVAL i;
+        for (i = 0; i < op_lib->op_count; ++i) {
+            if (strcmp(table[i].name, sname) == 0) {
+                if (PMC_IS_NULL(result))
+                    result = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+                VTABLE_push_pmc(INTERP, result, SELF.get_pmc_keyed_int(i));
+            }
+        }
+        Parrot_str_free_cstring(sname);
+        RETURN(PMC *result);
+    }
 }
 
 /*
