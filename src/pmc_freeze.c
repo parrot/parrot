@@ -84,14 +84,6 @@ Parrot_freeze_size(PARROT_INTERP, ARGIN(PMC *pmc))
     VTABLE_set_pmc(interp, visitor, pmc);
     pmc_result = VTABLE_get_pmc(interp, visitor);
     int_result = VTABLE_get_integer(interp, pmc_result);
-
-    {
-        /* XXX remove once bug found */
-        STRING *image = Parrot_freeze(interp, pmc);
-        const UINTVAL check_result =image->bufused;
-        PARROT_ASSERT(check_result == int_result);
-    }
-
     return int_result;
 }
 
