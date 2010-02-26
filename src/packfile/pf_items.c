@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -1402,7 +1402,7 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
 
 /*
 
-=item C<size_t PF_size_strlen(const STRING *s)>
+=item C<size_t PF_size_string(const STRING *s)>
 
 Reports stored size of C<STRING> in C<opcode_t> units.
 
@@ -1422,7 +1422,7 @@ PF_size_string(ARGIN(const STRING *s))
 
 /*
 
-=item C<size_t PF_size_string(const UINTVAL len)>
+=item C<size_t PF_size_strlen(const UINTVAL len)>
 
 Reports stored size of C<STRING> in C<opcode_t> units given its in-memory byte length.
 
