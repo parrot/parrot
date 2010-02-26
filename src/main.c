@@ -476,8 +476,11 @@ parseflags(PARROT_INTERP,
             /* Handled in parseflags_minimal */
             break;
           case 't':
-            if (opt.opt_arg && is_all_hex_digits(opt.opt_arg))
-                *trace = (Parrot_trace_flags)strtoul(opt.opt_arg, NULL, 16);
+            if (opt.opt_arg && is_all_hex_digits(opt.opt_arg)) {
+                const unsigned long _temp = strtoul(opt.opt_arg, NULL, 16);
+                const Parrot_trace_flags _temp_flag = (Parrot_trace_flags)_temp;
+                *trace = _temp_flag;
+            }
             else
                 *trace = PARROT_TRACE_OPS_FLAG;
             break;
