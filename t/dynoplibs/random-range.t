@@ -362,4 +362,8 @@ loop:
 	if $I0 < num_tries goto loop
 
 .end
-
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
