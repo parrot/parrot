@@ -607,6 +607,9 @@ TEMPLATE
     .local string params_csig
     $P0 = 'map_from_sig_table'(params, 'as_proto')
     params_csig = join ', ', $P0
+    if params_csig goto end_default_params_csig_to_void
+        params_csig = 'void'
+    end_default_params_csig_to_void:
 
     .local string ret_tdecl
     ret_tdecl = ""

@@ -574,7 +574,7 @@ if (t_2) Parrot_str_free_cstring(t_2);
 static void
 pcf_v_(PARROT_INTERP, PMC *self)
 {
-    typedef void(* func_t)();
+    typedef void(* func_t)(void);
     func_t fn_pointer;
     void *orig_func;
     PMC *ctx         = CURRENT_CONTEXT(interp);
@@ -1794,7 +1794,7 @@ pcf_S_JOSP(PARROT_INTERP, PMC *self)
 static void
 pcf_i_(PARROT_INTERP, PMC *self)
 {
-    typedef int(* func_t)();
+    typedef int(* func_t)(void);
     func_t fn_pointer;
     void *orig_func;
     PMC *ctx         = CURRENT_CONTEXT(interp);
@@ -2213,7 +2213,7 @@ pcf_i_pl(PARROT_INTERP, PMC *self)
 static void
 pcf_l_(PARROT_INTERP, PMC *self)
 {
-    typedef long(* func_t)();
+    typedef long(* func_t)(void);
     func_t fn_pointer;
     void *orig_func;
     PMC *ctx         = CURRENT_CONTEXT(interp);
@@ -2970,7 +2970,7 @@ VTABLE_set_integer_native(interp, t_3, i_3);
 static void
 pcf_c_(PARROT_INTERP, PMC *self)
 {
-    typedef char(* func_t)();
+    typedef char(* func_t)(void);
     func_t fn_pointer;
     void *orig_func;
     PMC *ctx         = CURRENT_CONTEXT(interp);
@@ -3008,7 +3008,7 @@ pcf_c_pi(PARROT_INTERP, PMC *self)
 static void
 pcf_d_(PARROT_INTERP, PMC *self)
 {
-    typedef double(* func_t)();
+    typedef double(* func_t)(void);
     func_t fn_pointer;
     void *orig_func;
     PMC *ctx         = CURRENT_CONTEXT(interp);
@@ -3044,7 +3044,7 @@ pcf_d_d(PARROT_INTERP, PMC *self)
 static void
 pcf_f_(PARROT_INTERP, PMC *self)
 {
-    typedef float(* func_t)();
+    typedef float(* func_t)(void);
     func_t fn_pointer;
     void *orig_func;
     PMC *ctx         = CURRENT_CONTEXT(interp);
@@ -4675,7 +4675,7 @@ VTABLE_set_integer_native(interp, t_1, i_1);
 static void
 pcf_p_(PARROT_INTERP, PMC *self)
 {
-    typedef void *(* func_t)();
+    typedef void *(* func_t)(void);
     func_t fn_pointer;
     void *orig_func;
     PMC *ctx         = CURRENT_CONTEXT(interp);
@@ -5070,7 +5070,7 @@ if (t_6) Parrot_str_free_cstring(t_6);
 static void
 pcf_s_(PARROT_INTERP, PMC *self)
 {
-    typedef short(* func_t)();
+    typedef short(* func_t)(void);
     func_t fn_pointer;
     void *orig_func;
     PMC *ctx         = CURRENT_CONTEXT(interp);
@@ -5087,7 +5087,7 @@ pcf_s_(PARROT_INTERP, PMC *self)
 static void
 pcf_t_(PARROT_INTERP, PMC *self)
 {
-    typedef char *(* func_t)();
+    typedef char *(* func_t)(void);
     func_t fn_pointer;
     void *orig_func;
     PMC *ctx         = CURRENT_CONTEXT(interp);
