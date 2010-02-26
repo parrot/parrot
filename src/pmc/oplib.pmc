@@ -97,7 +97,7 @@ pmclass OpLib {
         return INTERP->op_lib->op_count;
     }
 
-    METHOD ops_by_shortname(STRING *shortname)
+    METHOD op_family(STRING *shortname)
     {
         char *sname = Parrot_str_to_cstring(INTERP, shortname);
         const op_lib_t * const op_lib = INTERP->op_lib;
