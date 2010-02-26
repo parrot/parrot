@@ -25,33 +25,33 @@ Tests random range using chi-square
 	.param num p_025
 	.param num p_01
 	.param num p_001
-	
+
 	$P0 = new ['FixedFloatArray']
 	$P0 = 5
-	
+
 	$P0[0] = p_10
 	$P0[1] = p_05
 	$P0[2] = p_025
 	$P0[3] = p_01
 	$P0[4] = p_001
-	
+
 	table[nu] = $P0
 .end
 
 .sub compute_chi_square
 	.param pmc histogram
 	.param int num_samples
-	
+
 	.local int possible_values
 	possible_values = elements histogram
-	
+
 	.local num expected
 	expected = num_samples
 	expected /= possible_values
-	
+
 	.local num K
 	K = 0.0
-	
+
 	$I0 = possible_values
 	if $I0 == 0 goto end
 chi2_loop:
@@ -62,11 +62,11 @@ chi2_loop:
 	$N0 -= expected
 	$N0 *= $N0
 	$N0 /= expected
-	
+
 	K += $N0
-	
+
 	unless $I0 == 0 goto chi2_loop
-	
+
 	#~ print "Chi-squared K is: "
 	#~ say K
 end:
@@ -76,13 +76,13 @@ end:
 .sub make_chi2_table
 	# This info comes from http://itl.nist.gov/div898/handbook/eda/section3/eda3674.htm
 	# Obtained 26 Feb 2010 -- Austin
-	
+
 	#	Probability of exceeding the critical value
 	# nu	0.10	0.05	0.025	0.01	0.001
 
 	.local pmc table
 	table = new ['ResizablePMCArray']
-	
+
 	add_chi2_entry(table, 1, 2.706, 3.841, 5.024, 6.635, 10.828)
 	add_chi2_entry(table, 2, 4.605, 5.991, 7.378, 9.210, 13.816)
 	add_chi2_entry(table, 3, 6.251, 7.815, 9.348, 11.345, 16.266)
@@ -183,7 +183,7 @@ end:
 	add_chi2_entry(table, 98, 116.315, 122.108, 127.282, 133.476, 147.010)
 	add_chi2_entry(table, 99, 117.407, 123.225, 128.422, 134.642, 148.230)
 	add_chi2_entry(table, 100, 118.498, 124.342, 129.561, 135.807, 149.449)
-	
+
 	.return (table)
 .end
 
@@ -203,24 +203,24 @@ get_pv:
 	.local pmc histogram
 	histogram = new ['FixedIntegerArray']
 	histogram = possible_values
-	
+
 	$I0 = max - min
 init:
 	histogram[$I0] = 0
 	dec $I0
 	unless $I0 < 0 goto init
-	
+
 	$I0 = num_samples
 	if $I0 == 0 goto loop_done
 loop:
 	.local int random
 	random = rand min, max
-	
+
 	random -= min
 	$I1 = histogram[random]
 	inc $I1
 	histogram[random] = $I1
-	
+
 	dec $I0
 	unless $I0 <= 0 goto loop
 loop_done:
@@ -236,11 +236,11 @@ loop_done:
 	expected = num_samples
 	$I0 = elements histogram
 	expected /= $I0
-	
+
 	.local pmc sprintf_args
 	sprintf_args = new ['FixedPMCArray']
 	sprintf_args = 2
-	
+
 	$I0 = elements histogram
 hist_loop:
 	dec $I0
@@ -249,7 +249,7 @@ hist_loop:
 	$N0 /= expected
 	$P0 = box $N0
 	sprintf_args[0] = $P0
-	
+
 	$N1 = $N0 * 40
 	$I1 = $N1
 	$I1 -= 6	# width of printed $N0, plus space
@@ -263,17 +263,17 @@ make_stars:
 
 	$S0 = sprintf "%5.3f %s", sprintf_args
 	say $S0
-	
+
 	unless $I0 <= 0 goto hist_loop
 
 end:
 .end
-	
+
 .sub test_histogram
 	.param pmc histogram
 	.param num K
 	.param pmc table
-	
+
 	.local int degrees_of_freedom
 	$I0 = elements histogram
 	degrees_of_freedom = $I0 - 1
@@ -289,23 +289,23 @@ end:
 	$S0 = sprintf "Don't have chi2 data for %d degrees of freedom", sprintf_args
 	skip(1, $S0)
 	goto end
-	
+
 get_data:
-	
+
 	.local pmc chi2_data
 	chi2_data = table[degrees_of_freedom]
 	$N0 = chi2_data[0]
-	
+
 	$I0 = islt K, $N0
 
 	$P0 = box $N0
 	unshift sprintf_args, $P0
 	$P0= box K
 	unshift sprintf_args, $P0
-	
+
 	$S0 = sprintf "K (%5.3f) should be less than limit (%5.3f) for %d degrees of freedom", sprintf_args
 	todo($I0, $S0)
-	
+
 end:
 	.return ($I0)
 .end
@@ -314,32 +314,32 @@ end:
 	.param int range
 	.param int times
 	.param pmc table
-	
+
 	.local int num_samples
 	num_samples = range * times
 
 	.local int min, max
 	min = 10
 	max = min + range
-	
+
 	.local pmc histogram
 	histogram = make_random_hist(min, max, num_samples)
-	
+
 	.local num K
 	K = compute_chi_square(histogram, num_samples)
-	
+
 	$I0 = test_histogram(histogram, K, table)
-	
+
 	#if $I0 goto end
 	#print_histogram(histogram, num_samples)
 end:
-.end	
-	
+.end
+
 .sub main :main
 	.include 'test_more.pir'
 
 	.const int TIMES = 10000
-	
+
 	.local int num_tries
 	num_tries = 101
 
@@ -351,7 +351,7 @@ end:
 	$P0[1] = $S0
 	$S0 = join '', $P0
 	diag($S0)
-	
+
 	.local pmc table
 	table = make_chi2_table()
 
@@ -360,6 +360,6 @@ loop:
 	inc $I0
 	test_random_range($I0, TIMES, table)
 	if $I0 < num_tries goto loop
-	
+
 .end
 
