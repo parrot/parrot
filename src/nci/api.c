@@ -45,10 +45,8 @@ build_call_func(PARROT_INTERP, SHIM(PMC *pmc_nci), NOTNULL(STRING *signature), S
         PANIC(interp, "iglobals isn't created yet");
 
     nci_funcs = VTABLE_get_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FUNCS);
-    if (PMC_IS_NULL(nci_funcs)) {
-        init_nci_funcs(interp);
-        nci_funcs = VTABLE_get_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FUNCS);
-    }
+    if (PMC_IS_NULL(nci_funcs))
+        PANIC(interp, "iglobals.nci_funcs isn't created_yet");
 
     thunk = VTABLE_get_pmc_keyed_str(interp, nci_funcs, signature);
 
