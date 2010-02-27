@@ -730,16 +730,25 @@ sub update_vtable_func {
     my $export = $self->is_dynamic ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_EXPORT';
 
     # Sets the attr_size field:
-    # If the auto_attrs flag is set, use the current data,
-    # else check if this PMC has init or init_pmc vtable functions,
+    # - If the auto_attrs flag is set, use the current data.
+    # - If manual_attrs is set, set to 0.
+    # - If none is set, check if this PMC has init or init_pmc vtable functions,
     # setting it to 0 in that case, and keeping the value from the
     # parent otherwise.
     my $set_attr_size = '';
-    if ( @{$self->attributes} && $self->{flags}{auto_attrs} ) {
+    my $flag_auto_attrs = $self->{flags}{auto_attrs};
+    my $flag_manual_attrs = $self->{flags}{manual_attrs};
+    die 'manual_attrs and auto_attrs can not be used together'
+        if ($flag_auto_attrs && $flag_manual_attrs);
+    warn 'PMC has attributes but no auto_attrs or manual_attrs'
+        if (@{$self->attributes} && ! ($flag_auto_attrs || $flag_manual_attrs));
+
+    if ( @{$self->attributes} &&  $flag_auto_attrs) {
         $set_attr_size .= "sizeof(Parrot_${classname}_attributes)";
     }
     else {
-        $set_attr_size .= "0" if exists($self->{has_method}{init}) ||
+        $set_attr_size .= "0" if $flag_manual_attrs ||
+                                 exists($self->{has_method}{init}) ||
                                  exists($self->{has_method}{init_pmc});
     }
     $set_attr_size =     "    vt->attr_size = " . $set_attr_size . ";\n"

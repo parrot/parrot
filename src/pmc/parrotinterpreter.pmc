@@ -176,7 +176,7 @@ create_interp(PMC *self, Parrot_Interp parent)
     new_interp->current_cont = NEED_CONTINUATION;
 }
 
-pmclass ParrotInterpreter no_ro {
+pmclass ParrotInterpreter no_ro manual_attrs {
     ATTR struct parrot_interp_t *interp; /* this PMC's interpreter */
     ATTR INTVAL                  tid;    /* thread id */
     ATTR PMC                    *args;   /* args passed to this thread */
