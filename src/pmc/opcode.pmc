@@ -94,6 +94,46 @@ pmclass Opcode auto_attrs {
                ? (INTVAL)attrs->info->types[i]
                : -1;
     }
+
+    METHOD family_name() {
+        const char * const name = PARROT_OPCODE(SELF)->info->name;
+        const INTVAL len = strlen(name);
+        STRING * result = Parrot_str_new(INTERP, name, len);
+        RETURN(STRING *result);
+    }
+
+    METHOD jump() {
+        const op_info_t * const info = PARROT_OPCODE(SELF)->info;
+        const INTVAL jump = info->jump;
+        RETURN(INTVAL jump);
+    }
+
+    METHOD dirs() {
+        const op_info_t * const info = PARROT_OPCODE(SELF)->info;
+        PMC *result = Parrot_pmc_new(INTERP, enum_class_FixedIntegerArray);
+        INTVAL arg_count = info->op_count - 1;
+        if (arg_count > 0) {
+            VTABLE_set_integer_native(INTERP, result, arg_count);
+            INTVAL i;
+            for (i = 0; i < arg_count; ++i)
+                VTABLE_set_integer_keyed_int(INTERP, result, i, (INTVAL) info->dirs[i]);
+        }
+        RETURN(PMC *result);
+    }
+
+    METHOD labels() {
+        const op_info_t * const info = PARROT_OPCODE(SELF)->info;
+        PMC *result = Parrot_pmc_new(INTERP, enum_class_FixedIntegerArray);
+        INTVAL arg_count = info->op_count - 1;
+        if (arg_count > 0) {
+            VTABLE_set_integer_native(INTERP, result, arg_count);
+            INTVAL i;
+            for (i = 0; i < arg_count; ++i)
+                VTABLE_set_integer_keyed_int(INTERP, result, i, (INTVAL) info->labels[i]);
+        }
+        RETURN(PMC *result);
+    }
+
 }
 
 /*
