@@ -113,8 +113,8 @@ pmclass Opcode auto_attrs {
         PMC *result = Parrot_pmc_new(INTERP, enum_class_FixedIntegerArray);
         INTVAL arg_count = info->op_count - 1;
         if (arg_count > 0) {
-            VTABLE_set_integer_native(INTERP, result, arg_count);
             INTVAL i;
+            VTABLE_set_integer_native(INTERP, result, arg_count);
             for (i = 0; i < arg_count; ++i)
                 VTABLE_set_integer_keyed_int(INTERP, result, i, (INTVAL) info->dirs[i]);
         }
@@ -126,8 +126,8 @@ pmclass Opcode auto_attrs {
         PMC *result = Parrot_pmc_new(INTERP, enum_class_FixedIntegerArray);
         INTVAL arg_count = info->op_count - 1;
         if (arg_count > 0) {
-            VTABLE_set_integer_native(INTERP, result, arg_count);
             INTVAL i;
+            VTABLE_set_integer_native(INTERP, result, arg_count);
             for (i = 0; i < arg_count; ++i)
                 VTABLE_set_integer_keyed_int(INTERP, result, i, (INTVAL) info->labels[i]);
         }
