@@ -1497,6 +1497,7 @@ sub, or for the point of the call a level deeper for the rest.
         while (cur_ctx) {
             PMC        *frame       = Parrot_pmc_new(interp, enum_class_Hash);
             PMC        *annotations = NULL;
+            Parrot_Context_info info;
             Parrot_Sub_attributes *sub;
 
             /* Get sub and put it in the hash. */
@@ -1528,6 +1529,16 @@ sub, or for the point of the call a level deeper for the rest.
 
             VTABLE_set_pmc_keyed_str(interp, frame, CONST_STRING(interp, "annotations"), annotations);
 
+            if (Parrot_Context_get_info(interp, cur_ctx, &info)) {
+                PMC *hash = Parrot_pmc_new(interp, enum_class_Hash);
+                VTABLE_set_string_keyed_str(interp, hash, CONST_STRING(interp, "fullname"), info.fullname);
+                VTABLE_set_string_keyed_str(interp, hash, CONST_STRING(interp, "nsname"), info.nsname);
+                VTABLE_set_string_keyed_str(interp, hash, CONST_STRING(interp, "subname"), info.subname);
+                VTABLE_set_integer_keyed_str(interp, hash, CONST_STRING(interp, "pc"), info.pc);
+                VTABLE_set_string_keyed_str(interp, hash, CONST_STRING(interp, "file"), info.file);
+                VTABLE_set_integer_keyed_str(interp, hash, CONST_STRING(interp, "line"), info.line);
+                VTABLE_set_pmc_keyed_str(interp, frame, CONST_STRING(interp, "info"), hash);
+            }
             /* Push frame and go to next caller. */
             VTABLE_push_pmc(interp, result, frame);
             cur_ctx = Parrot_pcc_get_caller_ctx(interp, cur_ctx);

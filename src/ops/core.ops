@@ -801,7 +801,7 @@ inline op throw(invar PMC, invar PMC) :flow {
 
 inline op rethrow(invar PMC) :flow {
     opcode_t * dest;
-    if (PMC_IS_NULL($1) || $1->vtable->base_type != enum_class_Exception) {
+    if (PMC_IS_NULL($1) || ! VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "Exception"))) {
         opcode_t * const ret = expr NEXT();
         PMC * except = Parrot_ex_build_exception(interp, EXCEPT_fatal,
                 EXCEPTION_UNIMPLEMENTED,
