@@ -1745,15 +1745,8 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 
     /* If there is a source file use line number, else opcode position */
 
-
-    if (pdb->file) {
+    if (pdb->file && pdb->file->size) {
         TRACEDEB_MSG("PDB_set_break file");
-
-        if (!pdb->file->size) {
-            Parrot_io_eprintf(pdb->debugger,
-                "Can't set a breakpoint in empty file\n");
-            return;
-        }
 
         /* If no line number was specified, set it at the current line */
         if (ln != 0) {

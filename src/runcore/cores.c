@@ -930,6 +930,7 @@ runops_debugger_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(opco
 
         Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), pc);
         DO_OP(pc, interp);
+        interp->pdb->cur_opcode = pc;
 
         if (interp->pdb->state & PDB_STOPPED) {
             Parrot_debugger_start(interp, pc);
