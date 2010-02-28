@@ -34,7 +34,7 @@ PIR implementation of Perl 5's Data::Dumper module to dump YAML format.
     say ''
     say "    .local pmc foo, yaml_dumper"
     say "    foo         = new 'ResizablePMCArray'"
-    say "    yaml_dumper =  new 'YAML::Dumper'"
+    say "    yaml_dumper =  new ['YAML'; 'Dumper']"
     say ''
     say "    yaml_dumper.'yaml'( foo, 'foo' )"
     say ".end"
@@ -148,13 +148,13 @@ Returns the global dumper instance used by the non object interface.
     .local pmc yd_class
     .local int is_defined
 
-    get_class yd_class, "YAML::Dumper"
+    get_class yd_class, ['YAML'; 'Dumper']
     if null yd_class goto load_yd_pir
     goto TYPE_OK
 
   load_yd_pir:
     load_bytecode "YAML/Dumper.pbc"
-    get_class yd_class, "YAML::Dumper"
+    get_class yd_class, ['YAML'; 'Dumper']
     if null yd_class goto no_class
     goto TYPE_OK
 
@@ -164,13 +164,13 @@ Returns the global dumper instance used by the non object interface.
 TYPE_OK:
 
     errorsoff .PARROT_ERRORS_GLOBALS_FLAG
-    self = get_global ['YAML::Dumper'], 'global'
+    self = get_global ['YAML'; 'Dumper'], 'global'
     errorson .PARROT_ERRORS_GLOBALS_FLAG
     if null self goto create_type
 
 create_type:
-    new self, "YAML::Dumper"
-    set_global ['YAML::Dumper'], 'global', self
+    new self, ['YAML'; 'Dumper']
+    set_global ['YAML'; 'Dumper'], 'global', self
 
 END:
     .return( self )

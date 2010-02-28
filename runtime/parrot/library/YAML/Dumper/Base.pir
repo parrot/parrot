@@ -28,12 +28,12 @@ A YAML::Dumper::Base object has the following methods:
 
 .sub __library_data_dumper_base_onload :load
     .local pmc ydb_class
-    ydb_class = get_class "YAML::Dumper::Base"
+    ydb_class = get_class ['YAML'; 'Dumper'; 'Base']
     if null ydb_class goto create_ydb
     goto END
 
   create_ydb:
-    newclass $P0, "YAML::Dumper::Base"
+    newclass $P0, ['YAML'; 'Dumper'; 'Base']
     addattribute $P0, "yaml"
     addattribute $P0, "level"
     addattribute $P0, "indention"
@@ -43,7 +43,7 @@ END:
     .return ()
 .end
 
-.namespace ["YAML::Dumper::Base"]
+.namespace ['YAML'; 'Dumper'; 'Base']
 
 =item style."prepare"( yaml, indent )
 
