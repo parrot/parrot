@@ -1,10 +1,10 @@
 #! perl
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
 
-tools/dev/mk_language_shell.pl -- create initial files for a new language
+tools/dev/mk_language_shell.pl -- create initial files for a new language implementation
 
 =head1 SYNOPSIS
 
@@ -19,8 +19,8 @@ option:
 =head1 DESCRIPTION
 
 This script populates a directory with files for building a
-new language translator in Parrot.  The first argument is the
-name of the language to be built.  The C<path> argument
+new language translator in Parrot. The first argument is the
+name of the language to be built. The C<path> argument
 says where to populate the directory, if no C<path> is specified
 then it is taken to be a subdirectory of the current directory
 with the same name as the language (converted to lowercase).
@@ -61,12 +61,15 @@ to verify that the new language compiles and configures properly.
 
 use strict;
 use warnings;
-use File::Path;
-use File::Spec;
-use Getopt::Long;
+
 use FindBin qw($Bin);
 use lib "$Bin/../lib";    # install location
 use lib "$Bin/../../lib"; # build location
+
+use File::Path;
+use File::Spec;
+use Getopt::Long;
+
 use Parrot::Config qw/ %PConfig /;
 
 my ($with_doc, $with_ops, $with_pmc);
@@ -96,8 +99,7 @@ my $no_pmc = $with_pmc ? '' : '#';
 
 ##  get the path from the command line, or if not supplied then
 ##  use $lclang.
-my $path = $ARGV[1] ||
-           "$lclang";
+my $path = $ARGV[1] || $lclang;
 
 ##  now loop through the file information (see below), substituting
 ##  any instances of @lang@, @lclang@, @UCLANG@, and @Id@ with
@@ -163,6 +165,8 @@ sub start_new_file {
     }
     print "creating $filepath\n";
     open $fh, '>', $filepath;
+
+    return;
 }
 
 
