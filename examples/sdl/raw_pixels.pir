@@ -26,7 +26,7 @@ To run this file, run the following command from the Parrot directory:
 	.local pmc app
 	.local int app_type
 
-	app = new 'SDL::App'
+	app = new ['SDL'; 'App']
 	app.'init'( 'height' => 480, 'width' => 640, 'bpp' => 0, 'flags' => 1 )
 
 	# fetch the SDL::Surface representing the main window
@@ -37,17 +37,17 @@ To run this file, run the following command from the Parrot directory:
 	# create an SDL::Rect representing the entire main screen
 	.local pmc rect
 	.local int rect_type
-	rect = new 'SDL::Rect'
+	rect = new ['SDL'; 'Rect']
 	rect.'init'( 'height' => 480, 'width' => 640, 'x' => 0, 'y' => 0 )
 
 	# create a white color to paint the background; make new pixels show up
 	.local pmc white
-	white = new 'SDL::Color'
+	white = new ['SDL'; 'Color']
 	white.'init'( 'r' => 255, 'g' => 255, 'b' => 255 )
 
 	# create a blue color to paint the new pixels
 	.local pmc blue
-	blue = new 'SDL::Color'
+	blue = new ['SDL'; 'Color']
 	blue.'init'( 'r' => 0, 'g' => 0, 'b' => 255 )
 
 	# draw the background

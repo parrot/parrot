@@ -11,7 +11,7 @@ SDL::Surface - Parrot class representing surfaces in Parrot SDL
     load_bytecode 'SDL/Surface.pir'
 
     # create a new SDL::Surface object
-    surface = new 'SDL::Surface'
+    surface = new ['SDL'; 'Surface']
     surface.'init'( 'height' => 480, 'width' => 640 )
 
     # ... blit to, fill, update, and flip this surface as necessary
@@ -32,16 +32,16 @@ All SDL::Surface objects have the following methods:
 
 =cut
 
-.namespace [ 'SDL::Surface' ]
+.namespace [ 'SDL'; 'Surface' ]
 
 .sub _initialize :load
     .local pmc class
-    class = get_class 'SDL::Surface'
+    class = get_class ['SDL'; 'Surface']
     if_null class, create_class
     .return()
 
   create_class:
-    newclass     class, 'SDL::Surface'
+    newclass     class, ['SDL'; 'Surface']
     addattribute class, 'surface'
 .end
 
@@ -92,7 +92,7 @@ depth of each component.
     alpha = 0
 
   create_surface:
-    SDL_CreateRGBSurface = get_hll_global ['SDL::NCI'], 'CreateRGBSurface'
+    SDL_CreateRGBSurface = get_hll_global ['SDL'; 'NCI'], 'CreateRGBSurface'
 
     .local pmc surface
     surface = SDL_CreateRGBSurface( flags, width, height, depth, red, green, blue, alpha )
@@ -115,7 +115,7 @@ you have little reason to use it directly.
     .param pmc surface_struct
 
     .local pmc  fetch_layout
-    get_hll_global fetch_layout, ['SDL::NCI'], 'fetch_layout'
+    get_hll_global fetch_layout, ['SDL'; 'NCI'], 'fetch_layout'
 
     .local pmc layout
     layout = fetch_layout( 'Surface' )
@@ -207,7 +207,7 @@ representing a color, fills a portion of this surface with the given color.
     .param pmc color_object
 
     .local pmc SDL_FillRect
-    SDL_FillRect = get_hll_global ['SDL::NCI'], 'FillRect'
+    SDL_FillRect = get_hll_global ['SDL'; 'NCI'], 'FillRect'
 
     .local pmc surface
     getattribute surface, self, 'surface'
@@ -248,7 +248,7 @@ Do this on the main surface to see your changes.
     width  = rect.'width'()
 
     .local pmc SDL_UpdateRect
-    SDL_UpdateRect = get_hll_global ['SDL::NCI'], 'UpdateRect'
+    SDL_UpdateRect = get_hll_global ['SDL'; 'NCI'], 'UpdateRect'
 
     SDL_UpdateRect( surface, x, y, width, height )
 .end
@@ -267,7 +267,7 @@ at once.  Pass in an C<Array> of rects to update.
     set count, rects
 
     .local pmc  fetch_layout
-    get_hll_global fetch_layout, ['SDL::NCI'], 'fetch_layout'
+    get_hll_global fetch_layout, ['SDL'; 'NCI'], 'fetch_layout'
 
     .local pmc rect_array_layout
 
@@ -309,7 +309,7 @@ loop:
     getattribute surface, self, 'surface'
 
     .local pmc UpdateRects
-    UpdateRects = get_hll_global ['SDL::NCI'], 'UpdateRects'
+    UpdateRects = get_hll_global ['SDL'; 'NCI'], 'UpdateRects'
 
     UpdateRects( surface, count, rect_array )
 .end
@@ -327,7 +327,7 @@ case) to the main buffer, so you can see it.
     getattribute surface, self, 'surface'
 
     .local pmc SDL_Flip
-    SDL_Flip = get_hll_global ['SDL::NCI'], 'Flip'
+    SDL_Flip = get_hll_global ['SDL'; 'NCI'], 'Flip'
 
     SDL_Flip( surface )
 
@@ -351,7 +351,7 @@ understand.
     .param pmc dest
 
     .local pmc SDL_BlitSurface
-    SDL_BlitSurface = get_hll_global ['SDL::NCI'], 'BlitSurface'
+    SDL_BlitSurface = get_hll_global ['SDL'; 'NCI'], 'BlitSurface'
 
     .local pmc source_surface
     .local pmc dest_surface
@@ -400,7 +400,7 @@ if I add flag options.
     getattribute surface, self, 'surface'
 
     .local pmc SetColorKey
-    SetColorKey = get_hll_global ['SDL::NCI'], 'SetColorKey'
+    SetColorKey = get_hll_global ['SDL'; 'NCI'], 'SetColorKey'
 
     SetColorKey( surface, 8, color_value )
 .end
@@ -435,7 +435,7 @@ while you hold the lock.
     surface = self.'surface'()
 
     .local pmc  LockSurface
-    get_hll_global LockSurface, ['SDL::NCI'], 'LockSurface'
+    get_hll_global LockSurface, ['SDL'; 'NCI'], 'LockSurface'
 
     LockSurface( surface )
 
@@ -453,7 +453,7 @@ Unlocks the surface after you've finished raw pixel operations.
     surface = self.'surface'()
 
     .local pmc  UnlockSurface
-    get_hll_global UnlockSurface, ['SDL::NCI'], 'UnlockSurface'
+    get_hll_global UnlockSurface, ['SDL'; 'NCI'], 'UnlockSurface'
 
     UnlockSurface( surface )
 

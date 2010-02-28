@@ -72,7 +72,7 @@ ex:
     .param pmc opts
     # create an SDL::App subclass
     .local pmc app, cl
-    cl = subclass 'SDL::App', 'Mandel'
+    cl = subclass ['SDL'; 'App'], 'Mandel'
     addattribute cl, 'xstart'
     addattribute cl, 'ystart'
     addattribute cl, 'xend'
@@ -128,7 +128,7 @@ ex:
 
     # create an SDL::Rect representing the entire main screen
     .local pmc rect
-    rect = new 'SDL::Rect'
+    rect = new ['SDL'; 'Rect']
     rect.'init'( 'height' => h, 'width' => w, 'x' => 0, 'y' => 0 )
     setattribute self, 'rect', rect
 
@@ -397,11 +397,11 @@ done:
 # init event system
 .sub 'init_events' :method
     .local pmc event, args, event_handler
-    event = new 'SDL::Event'
+    event = new ['SDL'; 'Event']
     event.'init'()
     setattribute self, 'event', event
 
-    $P0 = subclass 'SDL::EventHandler', ['Mandel'; 'EventHandler']
+    $P0 = subclass ['SDL'; 'EventHandler'], ['Mandel'; 'EventHandler']
     event_handler = new ['Mandel'; 'EventHandler']
     event_handler.'init'(self)	# XXX unused
     setattribute self, 'event_handler', event_handler
@@ -444,7 +444,7 @@ loop_r:
 loop_g:
     b = 0
 loop_b:
-    col = new 'SDL::Color'
+    col = new ['SDL'; 'Color']
     col.'init'( 'r' => r, 'g' => g, 'b' => b )
     push palette, col
     b += 36

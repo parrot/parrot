@@ -11,7 +11,7 @@ SDL::Button - A multi state SDL Button
     $P0 = "filename/to/image.png"
 
     # create the button
-    button = new 'SDL::Button', $P0
+    button = new ['SDL'; 'Button'], $P0
 
     # set the position
     button.'xpos'( 10 )
@@ -41,16 +41,16 @@ An SDL::Button object has the following methods:
 
 =cut
 
-.namespace ['SDL::Button']
+.namespace ['SDL'; 'Button']
 
 .sub __onload :load
     .local pmc class
-    class = get_class 'SDL::Button'
+    class = get_class ['SDL'; 'Button']
     if_null class, define_class
     .return()
 
   define_class:
-    newclass     class, 'SDL::Button'
+    newclass     class, ['SDL'; 'Button']
     addattribute class, 'image'
     addattribute class, 'status'
     addattribute class, 'states'
@@ -66,7 +66,7 @@ An SDL::Button object has the following methods:
 .sub init_pmc :vtable :method
     .param pmc name
 
-    $P0 = new 'SDL::Image', name
+    $P0 = new ['SDL'; 'Image'], name
     setattribute self, 'image', $P0
 
     $P0 = new 'Integer'
@@ -77,7 +77,7 @@ An SDL::Button object has the following methods:
     $P0 = 1
     setattribute self, 'states', $P0
 
-    $P0 = new 'SDL::Rect'
+    $P0 = new ['SDL'; 'Rect']
     setattribute self, 'rect', $P0
 
     $P0 = new 'Integer'
@@ -173,7 +173,7 @@ An SDL::Button object has the following methods:
     drect   = getattribute self, 'rect'
     clicked = getattribute self, 'clicked'
 
-    srect   = new 'SDL::Rect'
+    srect   = new ['SDL'; 'Rect']
 
     $I1 = drect.'height'()
     srect.'height'( $I1 )

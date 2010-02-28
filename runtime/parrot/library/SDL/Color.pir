@@ -11,7 +11,7 @@ SDL::Color - Parrot class representing colors in Parrot SDL
 
     # create a new SDL::Color object
     .local pmc color
-    color = new 'SDL::Color'
+    color = new ['SDL'; 'Color']
 
     # set the color values; this one's blue
     color.'init'( 'r' => 0, 'g' => 0, 'b' => 255 )
@@ -41,13 +41,13 @@ SDL::Color objects have the following methods:
 
 =cut
 
-.namespace [ 'SDL::Color' ]
+.namespace [ 'SDL'; 'Color' ]
 
 .sub _initialize  :load
 
     .local pmc color_class
 
-    newclass color_class, 'SDL::Color'
+    newclass color_class, ['SDL'; 'Color']
 
     addattribute color_class, 'color'
     addattribute color_class, 'r'
@@ -86,7 +86,7 @@ is none and 255 is the maximum possible.
     .param int blue  :named( 'b' )
 
     .local pmc fetch_layout
-    get_hll_global fetch_layout, ['SDL::NCI'], 'fetch_layout'
+    get_hll_global fetch_layout, ['SDL'; 'NCI'], 'fetch_layout'
 
     .local pmc layout
     layout = fetch_layout( 'Color' )

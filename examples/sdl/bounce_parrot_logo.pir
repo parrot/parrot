@@ -27,22 +27,22 @@ Use the Escape key or close the window when you've had enough.
     load_bytecode "SDL/Event.pir"
 
     .local pmc app
-    app = new 'SDL::App'
+    app = new ['SDL'; 'App']
     app.'init'( 'width' => 640, 'height' => 480, 'bpp' => 0, 'flags' => 0 )
 
     .local pmc main_screen
     main_screen = app.'surface'()
 
     .local pmc black
-    black = new 'SDL::Color'
+    black = new ['SDL'; 'Color']
     black.'init'( 'r' => 0, 'g' => 0, 'b' => 0 )
 
     .local pmc image
-    image = new 'SDL::Image'
+    image = new ['SDL'; 'Image']
     image.'init'( 'examples/sdl/parrot_small.png' )
 
     .local pmc sprite
-    sprite = new 'SDL::Sprite'
+    sprite = new ['SDL'; 'Sprite']
     sprite.'init'( 'surface' => image, 'source_x' => 0, 'source_y' => 0, 'dest_x' => 270, 'dest_y' => 212, 'bgcolor' => black )
 
     _main_loop( main_screen, sprite )
@@ -55,14 +55,14 @@ Use the Escape key or close the window when you've had enough.
 
     .local pmc parent_class
     .local pmc class_type
-    get_class parent_class, 'SDL::EventHandler'
+    get_class parent_class, ['SDL'; 'EventHandler']
     subclass class_type, parent_class, 'MoveLogo::EventHandler'
 
     .local pmc event_handler
     event_handler = new 'MoveLogo::EventHandler'
 
     .local pmc event
-    event = new 'SDL::Event'
+    event = new ['SDL'; 'Event']
     event.'init'()
 
     .local pmc handler_args

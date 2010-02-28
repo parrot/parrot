@@ -8,7 +8,7 @@ SDL::LCD - A LCD object
 =head1 SYNOPSIS
 
     # create an LCD
-    lcd = new 'SDL::LCD'
+    lcd = new ['SDL'; 'LCD']
 
     # set the LCD position
     lcd."xpos"( 10 )
@@ -36,11 +36,11 @@ An SDL::LCD object has the following methods:
 
 =cut
 
-.namespace ["SDL::LCD"]
+.namespace ['SDL'; 'LCD']
 
 .sub __onload :load
     .local pmc class
-    class = get_class 'SDL::LCD'
+    class = get_class ['SDL'; 'LCD']
     if_null class, create_class
     .return()
 
@@ -49,11 +49,11 @@ An SDL::LCD object has the following methods:
     load_bytecode 'SDL/Rect.pir'
 
     .local pmc digits
-    digits = new 'SDL::Image'
+    digits = new ['SDL'; 'Image']
     digits.'init'( 'runtime/parrot/library/SDL/LCD.png' )
     set_global 'digits', digits
 
-    newclass class, 'SDL::LCD'
+    newclass class, ['SDL'; 'LCD']
     addattribute class, 'value'
     addattribute class, 'numdigits'
     addattribute class, 'xpos'
@@ -162,14 +162,14 @@ NO_AUTOLEN:
     val = $S0
 LEN_OK:
 
-    rect           = new 'SDL::Rect'
+    rect           = new ['SDL'; 'Rect']
     rect.'init'()
     rect.'width'( 21 )
     rect.'height'( 21 )
     rect.'x'( 0 )
     rect.'y'( 0 )
 
-    drect          = new 'SDL::Rect'
+    drect          = new ['SDL'; 'Rect']
     drect.'init'()
     drect.'width'( 10 )
     drect.'height'( 21 )

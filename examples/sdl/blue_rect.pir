@@ -21,7 +21,7 @@ To run this file, run the following command from the Parrot directory:
 
     # create an SDL::App object
     .local pmc app
-    app = new 'SDL::App'
+    app = new ['SDL'; 'App']
     app.'init'( 'height' => 480, 'width' => 640, 'bpp' => 32, 'flags' => 1 )
 
     # fetch the SDL::Surface representing the main window
@@ -30,12 +30,12 @@ To run this file, run the following command from the Parrot directory:
 
     # create an SDL::Rect object
     .local pmc rect
-    new rect, 'SDL::Rect'
+    new rect, ['SDL'; 'Rect']
     rect.'init'( 'height' => 100, 'width'  => 100, 'x' => 270, 'y' => 190 )
 
     # create an SDL::Color object
     .local pmc color
-    new color, 'SDL::Color'
+    new color, ['SDL'; 'Color']
     color.'init'( 'r' => 0, 'g' => 0, 'b' => 255 )
 
     # draw the rectangle to the surface and update it

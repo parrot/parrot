@@ -308,9 +308,9 @@ L<https://trac.parrot.org/parrot/ticket/852>
 
 =item Library name changes [eligible in 2.1]
 
-The use of C<::> a namespace separator is deprecated.  Core libraries will
+The use of C<::> as a namespace separator is deprecated.  Core libraries will
 change to use multi-level keys instead.  For example, C<'YAML::Dumper'> changes
-to C<['YAML'; 'Dumper']>.  Affected libraries include C<SDL>.
+to C<['YAML'; 'Dumper']>.
 
 =back
 

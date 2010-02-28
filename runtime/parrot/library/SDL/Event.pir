@@ -12,7 +12,7 @@ SDL::Event - Parrot extension representing SDL Events
 
     # create a new SDL::Event object
     .local pmc event
-    event = new 'SDL::Event'
+    event = new ['SDL'; 'Event']
 
     # ... create a new event_handler and its hander_args
 
@@ -39,12 +39,12 @@ The SDL::Event object has the following methods:
 
 =cut
 
-.namespace [ 'SDL::Event' ]
+.namespace [ 'SDL'; 'Event' ]
 
 .sub _initialize :load
     .local pmc   event_class
 
-    newclass     event_class, 'SDL::Event'
+    newclass     event_class, ['SDL'; 'Event']
     addattribute event_class, 'event'
 .end
 
@@ -60,7 +60,7 @@ away.
 
 .sub 'init' :method
     .local pmc  fetch_layout
-    get_hll_global fetch_layout, ['SDL::NCI'], 'fetch_layout'
+    get_hll_global fetch_layout, ['SDL'; 'NCI'], 'fetch_layout'
 
     .local pmc layout
     layout = fetch_layout( 'Event::Generic' )
@@ -92,7 +92,7 @@ this directly, unless you're working with raw SDL calls.
 
   assign_event:
     .local pmc  fetch_layout
-    get_hll_global fetch_layout, ['SDL::NCI'], 'fetch_layout'
+    get_hll_global fetch_layout, ['SDL'; 'NCI'], 'fetch_layout'
 
     .local pmc layout
     .local string ename
@@ -189,7 +189,7 @@ C<unknown> instead.
     key_sym = event['sym']
 
     .local pmc key_names
-    get_hll_global key_names, ['SDL::Constants'], 'key_names'
+    get_hll_global key_names, ['SDL'; 'Constants'], 'key_names'
 
     .local string key_name
     key_name = key_names[ key_sym ]
@@ -241,13 +241,13 @@ should, somehow.
 
     if check_interval < 0.0001 goto use_wait
     polling  = 1
-    GetEvent = get_hll_global ['SDL::NCI'], 'PollEvent'
+    GetEvent = get_hll_global ['SDL'; 'NCI'], 'PollEvent'
 
     branch loop
 
 use_wait:
     polling  = 0
-    GetEvent = get_hll_global ['SDL::NCI'], 'WaitEvent'
+    GetEvent = get_hll_global ['SDL'; 'NCI'], 'WaitEvent'
 
 loop:
     event    = self.'event'( 'Generic' )
@@ -288,7 +288,7 @@ Use this method inside your own loop structure.
     event = self.'event'()
 
     .local pmc  PollEvent
-    get_hll_global PollEvent, ['SDL::NCI'], 'PollEvent'
+    get_hll_global PollEvent, ['SDL'; 'NCI'], 'PollEvent'
 
     .local int event_waiting
     event_waiting = PollEvent( event )

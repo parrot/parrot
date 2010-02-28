@@ -29,7 +29,7 @@ royalty-free font file.  Maybe soon.
 
     # create an SDL::App object
     .local pmc app
-    app = new 'SDL::App'
+    app = new ['SDL'; 'App']
     app.'init'( 'height' => 480, 'width' => 640, 'bpp' => 0, 'flags' => 1 )
 
     # fetch the SDL::Surface representing the main window
@@ -38,16 +38,16 @@ royalty-free font file.  Maybe soon.
 
     # create an SDL::Rect object
     .local pmc rect
-    new rect, 'SDL::Rect'
+    new rect, ['SDL'; 'Rect']
     rect.'init'( 'height' => 100, 'width' => 100, 'x' => 194, 'y' => 208 )
 
     # create SDL::Color objects
     .local pmc blue
-    new blue, 'SDL::Color'
+    new blue, ['SDL'; 'Color']
     blue.'init'( 'r' => 0, 'g' => 0, 'b' => 255 )
 
     .local pmc white
-    new white, 'SDL::Color'
+    new white, ['SDL'; 'Color']
     white.'init'( 'r' => 255, 'g' => 255, 'b' => 255 )
 
     .local pmc file_pmc
@@ -62,11 +62,11 @@ royalty-free font file.  Maybe soon.
 
   have_font:
     .local pmc font
-    new font,  'SDL::Font'
+    new font, ['SDL'; 'Font']
     font.'init'( 'font_file'  => 'times.ttf', 'point_size' => 48 )
 
     .local pmc full_rect
-    full_rect = new 'SDL::Rect'
+    full_rect = new ['SDL'; 'Rect']
     full_rect.'init'( 'width'  => 640, 'height' => 480, 'x' => 0, 'y' => 0 )
 
     main_screen.'fill_rect'( full_rect, white )

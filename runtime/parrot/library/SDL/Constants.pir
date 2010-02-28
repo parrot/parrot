@@ -24,7 +24,7 @@ This library declares the following constants:
 
 =cut
 
-.namespace [ 'SDL::Constants' ]
+.namespace [ 'SDL'; 'Constants' ]
 
 .sub _initialize :load
 
@@ -47,7 +47,7 @@ For example, C<8> corresponds to C<backspace>.
 
 	key_names = new 'FixedPMCArray'
 	key_names = 323
-	set_hll_global ['SDL::Constants'], 'key_names', key_names
+	set_hll_global ['SDL'; 'Constants'], 'key_names', key_names
 
 	# list created with:
 	# $ cat /usr/include/SDL/SDL_keysym.h |

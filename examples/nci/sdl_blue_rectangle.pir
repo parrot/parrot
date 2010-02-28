@@ -26,11 +26,11 @@
     .local pmc new_SDL_Rect
     .local object screen
 
-    SDL_Init       = global "SDL::SDL_Init"
-    SetVideoMode   = global "SDL::SDL_SetVideoMode"
-    SDL_Quit       = global "SDL::SDL_Quit"
-    SDL_UpdateRect = global "SDL::SDL_UpdateRect"
-    SDL_FillRect   = global "SDL::SDL_FillRect"
+    SDL_Init       = global ['SDL'; 'SDL_Init']
+    SetVideoMode   = global ['SDL'; 'SDL_SetVideoMode']
+    SDL_Quit       = global ['SDL'; 'SDL_Quit']
+    SDL_UpdateRect = global ['SDL'; 'SDL_UpdateRect']
+    SDL_FillRect   = global ['SDL'; 'SDL_FillRect']
     new_SDL_Rect   = global "new_SDL_Rect"
 
     .begin_call

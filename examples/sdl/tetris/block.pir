@@ -439,7 +439,7 @@ This method returns nothing.
     rect["y"] = yp
     rect["width"] = i
     rect["height"] = i
-    temp = new "SDL::Rect", rect
+    temp = new ['SDL'; 'Rect'], rect
 
     surface."fill_rect"( temp, color )
     sub i, 2
@@ -450,7 +450,7 @@ This method returns nothing.
     rect["y"] = yp
     rect["width"] = i
     rect["height"] = i
-    temp = new "SDL::Rect", rect
+    temp = new ['SDL'; 'Rect'], rect
 
     # lookup the color value
     $P0 = app."color"( 0 )
@@ -478,7 +478,7 @@ LOOPx:
     rect["y"] = yp
     rect["width"] = extent
     rect["height"] = extent
-    temp = new "SDL::Rect", rect
+    temp = new ['SDL'; 'Rect'], rect
     inc extent
     surface."fill_rect"( temp, color )
 SKIP:

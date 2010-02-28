@@ -12,7 +12,7 @@ SDL::Rect - Parrot class representing rectangles in Parrot SDL
 
     # create a new SDL::Rect object
     .local pmc rect
-    rect = new 'SDL::Rect'
+    rect = new ['SDL'; 'Rect']
 
     # now set the arguments on the object
     rect.'init'( 'x' => 270, 'y' => 190, 'height' => 100, 'width'=> 100 )
@@ -33,16 +33,16 @@ An SDL::Rect object has the following methods:
 
 =cut
 
-.namespace [ 'SDL::Rect' ]
+.namespace [ 'SDL'; 'Rect' ]
 
 .sub _initialize :load
     .local pmc class
-    class = get_class 'SDL::Rect'
+    class = get_class ['SDL'; 'Rect']
     if_null class, create_class
     .return()
 
   create_class:
-    newclass     class, 'SDL::Rect'
+    newclass     class, ['SDL'; 'Rect']
     addattribute class, '_rect'
     .return ()
 .end
@@ -105,7 +105,7 @@ The name of this method may change, as per discussion on p6i.
 
   check_done:
     .local pmc  fetch_layout
-    get_hll_global fetch_layout, ['SDL::NCI'], 'fetch_layout'
+    get_hll_global fetch_layout, ['SDL'; 'NCI'], 'fetch_layout'
 
     .local pmc layout
     layout = fetch_layout( 'Rect' )

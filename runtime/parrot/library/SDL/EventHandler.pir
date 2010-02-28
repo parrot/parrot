@@ -15,8 +15,8 @@ SDL::EventHandler - base class for application-specific SDL event handlers
     .local pmc parent_class
     .local pmc class_type
 
-    get_class parent_class, 'SDL::EventHandler'
-    subclass class_type, parent_class, 'My::Event::Handler'
+    get_class parent_class, ['SDL'; 'EventHandler']
+    subclass class_type, parent_class, ['My'; 'Event'; 'Handler']
 
     # define your overridden methods
     .sub key_down_down :method
@@ -40,7 +40,7 @@ SDL::EventHandler - base class for application-specific SDL event handlers
 
     # create a new event object
     .local pmc event
-    event = new 'SDL::Event'
+    event = new ['SDL'; 'Event']
 
     # ... and process events
     event.'process_events'( event_handler, handler_args )
@@ -59,12 +59,12 @@ SDL::EventHandler provides the following methods:
 
 =cut
 
-.namespace [ 'SDL::EventHandler' ]
+.namespace [ 'SDL'; 'EventHandler' ]
 
 .sub _initialize :load
     .local pmc   handler_class
 
-    newclass     handler_class, 'SDL::EventHandler'
+    newclass     handler_class, ['SDL'; 'EventHandler']
     addattribute handler_class, 'args'
 
     .return()

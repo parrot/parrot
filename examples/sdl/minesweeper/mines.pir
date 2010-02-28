@@ -48,7 +48,7 @@ The main function.
     $P0["flags"]  =   5
 
     # create the SDL object
-    $P0 = new "SDL::App", $P0
+    $P0 = new ['SDL'; 'App'], $P0
     screen = $P0."surface"()
 
     # choose a "random" field
@@ -71,7 +71,7 @@ The main function.
     field.'draw'()
 
     # runloop
-    $P0 = new "SDL::Event"
+    $P0 = new ['SDL'; 'Event']
     $P1 = new "Mines::EventHandler"
     $P0."process_events"( 0.1, $P1, field )
 

@@ -25,7 +25,7 @@ To run this file, run the following command from the Parrot directory:
 	.local pmc app
 	.local int app_type
 
-	app = new 'SDL::App'
+	app = new ['SDL'; 'App']
 
 	app.'init'( 'width' => 640, 'height' => 480, 'bpp' => 0, 'flags' => 0 )
 
@@ -35,7 +35,7 @@ To run this file, run the following command from the Parrot directory:
 	.local pmc black
 	.local int color_type
 
-	black = new 'SDL::Color'
+	black = new ['SDL'; 'Color']
 	black.'init'( 'r' => 0, 'g' => 0, 'b' => 0 )
 
 	.local pmc    image
@@ -43,7 +43,7 @@ To run this file, run the following command from the Parrot directory:
 	.local string filename
 
 
-	image    = new 'SDL::Image'
+	image    = new ['SDL'; 'Image']
 
 	filename = 'examples/sdl/parrot_small.png'
 	image.'init'( 'file' => filename )
@@ -53,12 +53,12 @@ To run this file, run the following command from the Parrot directory:
 	.local pmc sprite
 	.local int sprite_type
 
-	sprite = new 'SDL::Sprite'
+	sprite = new ['SDL'; 'Sprite']
 	sprite.'init'( 'surface'  => image, 'source_x' =>     0, 'source_y' =>     0, 'dest_x'   =>   270, 'dest_y'   =>   212, 'bgcolor'  => black )
 
 	.local pmc parent_class
 	.local pmc class_type
-	get_class parent_class, 'SDL::EventHandler'
+	get_class parent_class, ['SDL'; 'EventHandler']
 	subclass class_type, parent_class, 'MoveLogo::EventHandler'
 
 	.local pmc event_handler
@@ -69,7 +69,7 @@ To run this file, run the following command from the Parrot directory:
 	.local pmc event
 	.local int event_type
 
-	event = new 'SDL::Event'
+	event = new ['SDL'; 'Event']
 	event.'init'()
 
 	.local pmc handler_args

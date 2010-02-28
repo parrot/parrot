@@ -92,7 +92,7 @@ This method throws an exception if an error occurs.
     $P0["flags"]  =   1
 
     # create the SDL object
-    $P0 = new "SDL::App", $P0
+    $P0 = new ['SDL'; 'App'], $P0
 
     # store the SDL object
     setattribute self, 'SDL', $P0
@@ -177,7 +177,7 @@ An exception is thrown if an error occurs.
 
     getattribute eh, self, 'EventHandler'
 
-    loop = new "SDL::Event"
+    loop = new ['SDL'; 'Event']
 
     self."enableTimer"()
     loop."process_events"( 0.1, eh, self )
@@ -329,7 +329,7 @@ NOT_BRIGHT:
     hash["r"] = r
     hash["g"] = g
     hash["b"] = b
-    color = new "SDL::Color", hash
+    color = new ['SDL'; 'Color'], hash
 
     push palette, color
     inc i
@@ -837,7 +837,7 @@ FORCE:
     rect["height"] = 480
     rect["x"] = 0
     rect["y"] = 0
-    temp = new "SDL::Rect", rect
+    temp = new ['SDL'; 'Rect'], rect
     color = self."color"( 3 )
 
     screen."fill_rect"( temp, color )
@@ -856,7 +856,7 @@ NO_MAINBACKGROUND:
     rect["height"] = 480
     rect["x"] = 0
     rect["y"] = 0
-    temp = new "SDL::Rect", rect
+    temp = new ['SDL'; 'Rect'], rect
     screen."update_rect"( temp )
 
     self."enableTimer"()

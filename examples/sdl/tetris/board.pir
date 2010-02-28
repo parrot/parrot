@@ -648,7 +648,7 @@ NO_CLEAR_CACHE:
     rect["y"] = ypos
     rect["width"] = xp
     rect["height"] = yp
-    temp = new "SDL::Rect", rect
+    temp = new ['SDL'; 'Rect'], rect
     color = palette[15]
     surface."fill_rect"( temp, color )
 NO_FIELDBACKGROUND:
@@ -682,7 +682,7 @@ LOOPx:
     rect["y"] = yp
     rect["width"] = $I0
     rect["height"] = $I0
-    temp = new "SDL::Rect", rect
+    temp = new ['SDL'; 'Rect'], rect
 
     $I0 = self[i]
     $I1 = cache[i]
@@ -734,7 +734,7 @@ LOOPend:
     rect["y"] = yp
     rect["width"] = w
     rect["height"] = h
-    temp = new "SDL::Rect", rect
+    temp = new ['SDL'; 'Rect'], rect
     color = palette[15]
     surface."fill_rect"( temp, color )
     inc xp
@@ -745,7 +745,7 @@ LOOPend:
     rect["y"] = yp
     rect["width"] = w
     rect["height"] = h
-    temp = new "SDL::Rect", rect
+    temp = new ['SDL'; 'Rect'], rect
     color = palette[0]
     surface."fill_rect"( temp, color )
     getprop temp, "nextblock", self

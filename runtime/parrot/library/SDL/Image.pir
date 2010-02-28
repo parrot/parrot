@@ -12,7 +12,7 @@ SDL::Image - Parrot class representing images in Parrot SDL
 
     # create a new SDL::Image object
     .local pmc image
-    image = new 'SDL::Image'
+    image = new ['SDL'; 'Image']
     image.'init'( file => 'examples/sdl/parrot_small.png' )
 
     # blit and update this object as you like!
@@ -33,12 +33,12 @@ An SDL::Image object has the following methods:
 
 =cut
 
-.namespace [ 'SDL::Image' ]
+.namespace [ 'SDL'; 'Image' ]
 
 .sub _initialize :load
     .local pmc image_class
 
-    image_class = get_class 'SDL::Image'
+    image_class = get_class ['SDL'; 'Image']
     if_null image_class, create_class
     .return()
 
@@ -47,7 +47,7 @@ An SDL::Image object has the following methods:
     init_image = get_hll_global ['SDL'], '_init_image'
     init_image()
 
-    subclass image_class, 'SDL::Surface', 'SDL::Image'
+    subclass image_class, ['SDL'; 'Surface'], ['SDL'; 'Image']
     .return()
 .end
 
@@ -62,7 +62,7 @@ image.
     .param string filename :named( 'file' )
 
     .local pmc IMG_Load
-    IMG_Load = get_hll_global ['SDL::NCI'], 'IMG_Load'
+    IMG_Load = get_hll_global ['SDL'; 'NCI'], 'IMG_Load'
 
     .local pmc image
 

@@ -132,11 +132,11 @@ SDL surface to use for drawing.
     field  = new 'ResizablePMCArray'
     cache  = new 'ResizablePMCArray'
 
-    watch = new 'SDL::StopWatch', screen
+    watch = new ['SDL'; 'StopWatch'], screen
     watch.'xpos'( 515 )
     watch.'ypos'( 5 )
 
-    lcd = new 'SDL::LCD'
+    lcd = new ['SDL'; 'LCD']
     # This seems to call __init() with too many parameters
     # lcd = 0
     lcd.'_digits'( 4 )
@@ -172,7 +172,7 @@ SDL surface to use for drawing.
     # button
     $P0 = new 'String'
     $P0 = "examples/sdl/minesweeper/smiley.png"
-    $P0 = new "SDL::Button", $P0
+    $P0 = new ['SDL'; 'Button'], $P0
     $P0.'states'( 5 )
     $P0.'pos'( 305, 2 )
     $P0.'size'( 30, 30 )
@@ -324,10 +324,10 @@ IMAGE_OK:
     $P0['y'] = 0
     $P0['width']  = 0
     $P0['height'] = 0
-    dest_rect = new "SDL::Rect", $P0
+    dest_rect = new ['SDL'; 'Rect'], $P0
     $P0['width']  = FIELD_WIDTH
     $P0['height'] = FIELD_HEIGHT
-    src_rect = new "SDL::Rect", $P0
+    src_rect = new ['SDL'; 'Rect'], $P0
 
     set size, width
     mul size, height
@@ -975,12 +975,12 @@ This method is called automatically when this module is loaded.
 
     $P0 = new 'String'
     $P0 = "examples/sdl/minesweeper/mines.png"
-    image = new "SDL::Image", $P0
+    image = new ['SDL'; 'Image'], $P0
     set_hll_global [ "Mines::Field" ], "field", image
 
     $P0 = new 'String'
     $P0 = "examples/sdl/minesweeper/mines_debug.png"
-    image = new "SDL::Image", $P0
+    image = new ['SDL'; 'Image'], $P0
     set_hll_global [ "Mines::Field" ], "field_debug", image
 
     newclass $P0, "Mines::Field"
