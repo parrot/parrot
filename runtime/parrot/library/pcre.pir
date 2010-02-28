@@ -105,23 +105,23 @@ LIB_LOADED:
     #            const char **errptr, int *erroffset,
     #            const unsigned char *tableptr
     dlfunc pcre_function, libpcre, 'pcre_compile', 'ptiB3P'
-    set_hll_global ['PCRE::NCI'], 'PCRE_compile', pcre_function
+    set_hll_global ['PCRE'; 'NCI'], 'PCRE_compile', pcre_function
 
     #int pcre_exec(const pcre *code, const pcre_extra *extra,
     #        const char *subject, int length, int startoffset,
     #        int options, int *ovector, int ovecsize);
     dlfunc pcre_function, libpcre, 'pcre_exec', 'ipPtiiipi'
-    set_hll_global ['PCRE::NCI'], 'PCRE_exec', pcre_function
+    set_hll_global ['PCRE'; 'NCI'], 'PCRE_exec', pcre_function
 
     #int pcre_copy_substring(const char *subject, int *ovector,
     #        int stringcount, int stringnumber, char *buffer,
     #        int buffersize);
     dlfunc pcre_function, libpcre, 'pcre_copy_substring', 'itpiibi'
-    set_hll_global ['PCRE::NCI'], 'PCRE_copy_substring', pcre_function
+    set_hll_global ['PCRE'; 'NCI'], 'PCRE_copy_substring', pcre_function
 
     # const char *pcre_version(void);
     dlfunc pcre_function, libpcre, 'pcre_version', 't'
-    set_hll_global ['PCRE::NCI'], 'PCRE_version', pcre_function
+    set_hll_global ['PCRE'; 'NCI'], 'PCRE_version', pcre_function
 
     .return( libpcre )
 
@@ -142,7 +142,7 @@ Returns pmc B<regex>, string B<error> and int B<errptr>.
     .param int options
     .local pmc pcre_function
 
-    pcre_function= get_hll_global ['PCRE::NCI'], 'compile'
+    pcre_function= get_hll_global ['PCRE'; 'NCI'], 'compile'
 
     .local pmc regex
     .local string error
@@ -170,7 +170,7 @@ in pmc B<result>.
     .param int options
     .local pmc pcre_function
 
-    pcre_function= get_hll_global ['PCRE::NCI'], 'exec'
+    pcre_function= get_hll_global ['PCRE'; 'NCI'], 'exec'
 
     .local int ok
     .local pmc res
@@ -195,7 +195,7 @@ Returns the match.
     .param int n
     .local pmc pcre_function
 
-    pcre_function= get_hll_global ['PCRE::NCI'], 'result'
+    pcre_function= get_hll_global ['PCRE'; 'NCI'], 'result'
 
     .local string matched
 
@@ -212,7 +212,7 @@ Returns the match.
 .sub version
     .local pmc pcre_function
 
-    pcre_function = get_hll_global ['PCRE::NCI'], 'PCRE_version'
+    pcre_function = get_hll_global ['PCRE'; 'NCI'], 'PCRE_version'
 
     .local string ver
 
