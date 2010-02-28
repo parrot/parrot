@@ -30,20 +30,20 @@ This class provides the following methods:
     addattribute tbtb_class, 'todo'
 
     .local pmc tbtp_class
-    subclass tbtp_class, tbtb_class, 'Test::Builder::Test::Pass'
+    subclass tbtp_class, tbtb_class, ['Test'; 'Builder'; 'Test'; 'Pass']
 
     .local pmc tbtf_class
-    subclass tbtf_class, tbtb_class, 'Test::Builder::Test::Fail'
+    subclass tbtf_class, tbtb_class, ['Test'; 'Builder'; 'Test'; 'Fail']
 
     .local pmc tbtwr_class
-    subclass tbtwr_class, tbtb_class, 'Test::Builder::Test::WithReason'
+    subclass tbtwr_class, tbtb_class, ['Test'; 'Builder'; 'Test'; 'WithReason']
     addattribute tbtwr_class, 'reason'
 
     .local pmc tbts_class
-    subclass tbts_class, tbtwr_class, 'Test::Builder::Test::Skip'
+    subclass tbts_class, tbtwr_class, ['Test'; 'Builder'; 'Test'; 'SKIP'] 
 
     .local pmc tbtt_class
-    subclass tbtt_class, tbtwr_class, 'Test::Builder::Test::TODO'
+    subclass tbtt_class, tbtwr_class, ['Test'; 'Builder'; 'Test'; 'TODO'] 
 .end
 
 =item C<create( args_hash )>
@@ -93,25 +93,25 @@ The returned object is a subclass of Test::Builder::Test.
     type_flag = args['todo']
     unless type_flag goto CHECK_SKIP
 
-    test_class = 'Test::Builder::Test::TODO'
+    test_class = ['Test'; 'Builder'; 'Test'; 'TODO']
     goto CREATE_TEST
 
   CHECK_SKIP:
     type_flag = args['skip']
     unless type_flag goto CHECK_PASS
 
-    test_class = 'Test::Builder::Test::Skip'
+    test_class = ['Test'; 'Builder'; 'Test'; 'Skip']
     goto CREATE_TEST
 
   CHECK_PASS:
     type_flag = args['passed']
     unless type_flag goto CHECK_FAIL
 
-    test_class = 'Test::Builder::Test::Pass'
+    test_class = ['Test'; 'Builder'; 'Test'; 'Pass']
     goto CREATE_TEST
 
   CHECK_FAIL:
-    test_class = 'Test::Builder::Test::Fail'
+    test_class = ['Test'; 'Builder'; 'Test'; 'Fail']
     goto CREATE_TEST
 
   CREATE_TEST:
@@ -246,12 +246,12 @@ Returns the TAP-compatible string representation of this test.
 .end
 
 # no code here
-.namespace [ 'Test::Builder::Test::Pass' ]
+.namespace [ 'Test'; 'Builder'; 'Test'; 'Pass' ]
 
 # no code here either
-.namespace [ 'Test::Builder::Test::Fail' ]
+.namespace [ 'Test'; 'Builder'; 'Test'; 'Fail' ]
 
-.namespace [ 'Test::Builder::Test::WithReason' ]
+.namespace [ 'Test'; 'Builder'; 'Test'; 'WithReason' ]
 
 .sub init_pmc :vtable :method
     .param pmc args
@@ -282,7 +282,7 @@ Returns the TAP-compatible string representation of this test.
     .local pmc status
     .local pmc parent_status
 
-    parent_status = get_hll_global ['Test::Builder::Test::WithReason'], 'status'
+    parent_status = get_hll_global ['Test'; 'Builder'; 'Test'; 'WithReason'], 'status'
     status        = parent_status()
     reason        = self.'reason'()
 
@@ -291,7 +291,7 @@ Returns the TAP-compatible string representation of this test.
     .return( status )
 .end
 
-.namespace [ 'Test::Builder::Test::Skip' ]
+.namespace [ 'Test'; 'Builder'; 'Test'; 'Skip' ]
 
 .sub report :method
     .local pmc    reason
@@ -317,14 +317,14 @@ Returns the TAP-compatible string representation of this test.
     .local pmc status
     .local pmc parent_status
 
-    parent_status = get_hll_global ['Test::Builder::Test::WithReason'], 'status'
+    parent_status = get_hll_global ['Test'; 'Builder'; 'Test'; 'WithReason'], 'status'
     status        = parent_status()
 
     set status['skip'], 1
     .return( status )
 .end
 
-.namespace [ 'Test::Builder::Test::TODO' ]
+.namespace [ 'Test'; 'Builder'; 'Test'; 'TODO' ]
 
 .sub report :method
     .local pmc    passed
@@ -362,7 +362,7 @@ Returns the TAP-compatible string representation of this test.
     .local pmc status
     .local pmc parent_status
 
-    parent_status = get_hll_global ['Test::Builder::Test::WithReason'], 'status'
+    parent_status = get_hll_global ['Test'; 'Builder'; 'Test'; 'WithReason'], 'status'
     status        = parent_status()
     passed        = self.'passed'()
 
