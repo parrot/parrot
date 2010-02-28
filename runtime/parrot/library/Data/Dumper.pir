@@ -3,19 +3,19 @@
 
 .sub __library_data_dumper_onload :load
     .local pmc dd_class
-    dd_class = get_class "Data::Dumper"
+    dd_class = get_class ['Data'; 'Dumper']
     if null dd_class goto load_library
 
     goto END
 
   load_library:
         load_bytecode "Data/Dumper/Default.pbc"
-        newclass $P0, "Data::Dumper"
+        newclass $P0, ['Data'; 'Dumper']
 END:
     .return ()
 .end
 
-.namespace ["Data::Dumper"]
+.namespace ['Data'; 'Dumper']
 
 .sub dumper :method
     .param pmc dump
@@ -36,7 +36,7 @@ no_def_name:
     .local pmc ddd_class
 
     push_eh ERROR2
-        ddd_class = get_class "Data::Dumper::Default"
+        ddd_class = get_class ['Data'; 'Dumper'; 'Default']
         style     = ddd_class."new"()
     pop_eh
 
@@ -49,14 +49,14 @@ no_def_name:
 
 ERROR2:
     pop_eh
-    print "can not find class Data::Dumper::Default!\n"
+    print "can not find class ['Data'; 'Dumper'; 'Default']!\n"
     end
     .return ( 0 )
 ERROR:
     print "Syntax:\n"
-    print "Data::Dumper::dumper( pmc )\n"
-    print "Data::Dumper::dumper( pmc, name )\n"
-    print "Data::Dumper::dumper( pmc, name, indent )\n"
+    print "dumper( pmc )\n"
+    print "dumper( pmc, name )\n"
+    print "dumper( pmc, name, indent )\n"
     .return ( 0 )
 .end
 

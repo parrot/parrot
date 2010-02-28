@@ -20,19 +20,19 @@ This module provides the default output style of C<Data::Dumper>.
 
 .sub __library_data_dumper_default_onload :load
     .local pmc ddb_class
-    ddb_class = get_class "Data::Dumper::Default"
+    ddb_class = get_class ['Data'; 'Dumper'; 'Default']
     if null ddb_class goto create_ddb
     goto END
 
   create_ddb:
     load_bytecode 'Data/Dumper/Base.pbc'
-    get_class $P0, "Data::Dumper::Base"
-    subclass $P0, $P0, "Data::Dumper::Default"
+    get_class $P0, ['Data'; 'Dumper'; 'Base']
+    subclass $P0, $P0, ['Data'; 'Dumper'; 'Default']
 END:
     .return ()
 .end
 
-.namespace ["Data::Dumper::Default"]
+.namespace ['Data'; 'Dumper'; 'Default']
 
 =head1 METHODS
 
