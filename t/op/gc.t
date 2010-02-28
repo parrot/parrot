@@ -200,22 +200,22 @@ GC related bugs.
 
 
 #Fail if regsave is not marked
-.namespace ["Source"]
+.namespace ['Source']
 .sub get_string :method :vtable # buffer
     $P4  = self
     $P2 = getprop "buffer", $P4
     sweep 1
     unless_null $P2, buffer_ok
-    $P2 = new "Source::Buffer"
-    $P3 = new "String"
-    $P3 = "hello"
-    $P2 = setprop "buf", $P3
-    $P4  = setprop "buffer", $P2
+    $P2 = new ['Source'; 'Buffer']
+    $P3 = new 'String'
+    $P3 = 'hello'
+    $P2 = setprop 'buf', $P3
+    $P4  = setprop 'buffer', $P2
 buffer_ok:
     .return($P2)
 .end
 
-.namespace ["Source::Buffer"]
+.namespace ['Source'; 'Buffer']
 .sub get_string :method :vtable
     $P4 = self
     sweep 1
@@ -227,9 +227,9 @@ buffer_ok:
 .namespace [ ]
 
 .sub regsave_marked
-    $P0  = newclass "Source"
-    $P1 = newclass "Source::Buffer"
-    $P2 = new "Source"
+    $P0  = newclass 'Source'
+    $P1 = newclass ['Source'; 'Buffer']
+    $P2 = new 'Source'
 
     $S1 = $P2
     is($S1, "hello")
