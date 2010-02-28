@@ -145,9 +145,9 @@ done:
 	.param pmc tree2
 
 	.local pmc coro_class
-    coro_class = get_class 'Parrot::Coroutine'
+    coro_class = get_class ['Parrot'; 'Coroutine']
     unless null coro_class goto found
-	printerr "Bug:  Can't find 'Parrot::Coroutine' class.\n"
+	printerr "Bug:  Can't find ['Parrot'; 'Coroutine'] class.\n"
 	die 5, 1
 found:
 	.local pmc coro1, coro2

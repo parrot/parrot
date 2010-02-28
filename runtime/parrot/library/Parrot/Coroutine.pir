@@ -59,7 +59,7 @@ Parrot::Coroutine - A pure PIR implementation of coroutines
         .local int coro_class, idx
         .local pmc coro
         .const 'Sub' coro_sub = "enumerate_tree"
-        coro = new 'Parrot::Coroutine', coro_sub
+        coro = new ['Parrot'; 'Coroutine'], coro_sub
         ($P0 :optional, $I0 :opt_flag) = coro.'resume'(coro, tree)
         idx = 0
 
@@ -83,9 +83,9 @@ in pure PIR using continuations.
 =cut
 
 .sub onload_create_class :load
-    $P0 = get_class "Parrot::Coroutine"
+    $P0 = get_class ['Parrot'; 'Coroutine']
     unless null $P0 goto END
-    $P0 = newclass "Parrot::Coroutine"
+    $P0 = newclass ['Parrot'; 'Coroutine']
     addattribute $P0, "state"       ## State:  1 is new/valid, 0 is dead.
     addattribute $P0, "initial_sub" ## Initial sub.
     addattribute $P0, "yield_cont"  ## Continuation to for yielding.
@@ -94,7 +94,7 @@ END:
     .return ()
 .end
 
-.namespace ["Parrot::Coroutine"]
+.namespace ['Parrot'; 'Coroutine']
 
 .include "interpinfo.pasm"
 
@@ -106,7 +106,7 @@ This method is normally called via the C<new> op:
 
     .local pmc coro
     .const 'Sub' coro_sub = "enumerate_tree"
-    coro_class = get_class 'Parrot::Coroutine'
+    coro_class = get_class ['Parrot'; 'Coroutine']
     coro = coro_class.'new'('initial_sub' => coro_sub)
 
 Given a sub, it initializes a new C<Parrot::Coroutine> object.
@@ -125,8 +125,7 @@ Given a sub, it initializes a new C<Parrot::Coroutine> object.
 
 ## [it would be nice to include a pointer value.  -- rgr, 8-Oct-06.]
 .sub get_string :vtable :method
-    $S0 = '<Parrot::Coroutine ?>'
-    .return ($S0)
+    .return ('<Parrot::Coroutine ?>')
 .end
 
 =head3 B<coro.resume(args...)>
