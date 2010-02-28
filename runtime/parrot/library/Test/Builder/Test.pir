@@ -40,7 +40,7 @@ This class provides the following methods:
     addattribute tbtwr_class, 'reason'
 
     .local pmc tbts_class
-    subclass tbts_class, tbtwr_class, ['Test'; 'Builder'; 'Test'; 'SKIP'] 
+    subclass tbts_class, tbtwr_class, ['Test'; 'Builder'; 'Test'; 'Skip'] 
 
     .local pmc tbtt_class
     subclass tbtt_class, tbtwr_class, ['Test'; 'Builder'; 'Test'; 'TODO'] 
