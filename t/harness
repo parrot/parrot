@@ -4,7 +4,6 @@
 
 use strict;
 use warnings;
-use Data::Dumper;$Data::Dumper::Indent=1;
 use lib qw( lib );
 
 use Getopt::Std;
