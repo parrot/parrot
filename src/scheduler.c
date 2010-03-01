@@ -856,6 +856,7 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
     PMC            *iter        = PMCNULL;
     STRING * const  handled_str = CONST_STRING(interp, "handled");
     STRING * const  iter_str    = CONST_STRING(interp, "handler_iter");
+    STRING * const  ex_str      = CONST_STRING(interp, "Exception");
 
     if (already_doing) {
         Parrot_io_eprintf(interp,
@@ -878,7 +879,7 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
 
         /* Exceptions store the handler iterator for rethrow, other kinds of
          * tasks don't (though they could). */
-        if (task->vtable->base_type == enum_class_Exception
+        if (VTABLE_isa(interp, task, ex_str)
         && VTABLE_get_integer_keyed_str(interp, task, handled_str) == -1) {
             iter    = VTABLE_get_attr_str(interp, task, iter_str);
             context = (PMC *)VTABLE_get_pointer(interp, task);
