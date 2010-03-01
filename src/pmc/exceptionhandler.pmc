@@ -24,10 +24,9 @@ exception object's C<_P5> attribute.
 
 pmclass ExceptionHandler extends Continuation auto_attrs {
 
-    ATTR PMC    *handled_types;
-    ATTR PMC    *handled_types_except;
-    ATTR PMC    *handled_classes;
-    ATTR PMC    *handled_classes_except;
+    ATTR PMC    *handled_items;
+    ATTR INTVAL inclusive;
+    ATTR INTVAL class_based;
     ATTR INTVAL min_severity;
     ATTR INTVAL max_severity;
 
@@ -47,10 +46,9 @@ Initializes the exception handler.
         attrs->invoked              = 0;
         attrs->min_severity         = 0;
         attrs->max_severity         = 0;
-        attrs->handled_types        = PMCNULL;
-        attrs->handled_types_except = PMCNULL;
-        attrs->handled_classes        = PMCNULL;
-        attrs->handled_classes_except = PMCNULL;
+        attrs->inclusive            = -1;
+        attrs->class_based          = -1;
+        attrs->handled_items        = PMCNULL;
 
         /* an exception handler has no separate context; it's only a snapshot
          * of an "earlier" context, which is contained in the interpreter's
@@ -72,10 +70,7 @@ Mark any active exception handler data as live.
     VTABLE void mark() {
         Parrot_ExceptionHandler_attributes * const attrs =
             PARROT_EXCEPTIONHANDLER(SELF);
-        Parrot_gc_mark_PMC_alive(interp, attrs->handled_types);
-        Parrot_gc_mark_PMC_alive(interp, attrs->handled_types_except);
-        Parrot_gc_mark_PMC_alive(interp, attrs->handled_classes);
-        Parrot_gc_mark_PMC_alive(interp, attrs->handled_classes_except);
+        Parrot_gc_mark_PMC_alive(interp, attrs->handled_items);
         SUPER();
     }
 
@@ -168,13 +163,12 @@ Report whether the exception handler can handle a particular type of exception.
 
         if (exception->vtable->base_type == enum_class_Exception
         ||  VTABLE_isa(INTERP, exception, ex_str)) {
-            PMC *handled_types;
-            PMC *handled_types_except;
-            INTVAL min_severity, max_severity;
-            GET_ATTR_handled_types(INTERP, SELF, handled_types);
-            GET_ATTR_handled_types_except(INTERP, SELF, handled_types_except);
+            PMC *handled_items;
+            INTVAL inclusive, min_severity, max_severity;
+            GET_ATTR_handled_items(INTERP, SELF, handled_items);
             GET_ATTR_max_severity(INTERP, SELF, max_severity);
             GET_ATTR_min_severity(INTERP, SELF, min_severity);
+            GET_ATTR_inclusive(INTERP, SELF, inclusive);
 
             if (severity < min_severity) {
                 RETURN(INTVAL 0);
@@ -182,33 +176,21 @@ Report whether the exception handler can handle a particular type of exception.
             if (max_severity > 0 &&  severity > max_severity) {
                 RETURN(INTVAL 0);
             }
-            if (! PMC_IS_NULL(handled_types)) {
-                const INTVAL elems = VTABLE_elements(interp, handled_types);
+            if (! PMC_IS_NULL(handled_items)) {
+                const INTVAL elems = VTABLE_elements(interp, handled_items);
                 const INTVAL type  = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "type"));
                 INTVAL i;
+                INTVAL match     = inclusive ? 1 : 0;
+                INTVAL not_match = inclusive ? 0 : 1;
 
                 for (i = 0; i < elems; i++) {
                     INTVAL handled_type = VTABLE_get_integer_keyed_int(interp,
-                            handled_types, i);
+                            handled_items, i);
                     if (handled_type == type)
-                        RETURN(INTVAL 1);
+                        RETURN(INTVAL match);
                 }
 
-                RETURN(INTVAL 0);
-            }
-            if (handled_types_except != PMCNULL) {
-                const INTVAL elems = VTABLE_elements(interp, handled_types_except);
-                const INTVAL type  = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "type"));
-                INTVAL i;
-
-                for (i = 0; i < elems; i++) {
-                    const INTVAL handled_type = VTABLE_get_integer_keyed_int(interp,
-                            handled_types_except, i);
-                    if (handled_type == type)
-                        RETURN(INTVAL 0);
-                }
-
-                RETURN(INTVAL 1);
+                RETURN(INTVAL not_match);
             }
             else if (max_severity > 0 || min_severity > 0) {
                 RETURN(INTVAL 1);
@@ -277,10 +259,12 @@ Set the exception types that the ExceptionHandler will handle.
     METHOD handle_types(PMC *types :slurpy) {
         Parrot_ExceptionHandler_attributes * const attrs =
                     PARROT_EXCEPTIONHANDLER(SELF);
-        attrs->handled_types =
+        attrs->handled_items =
             VTABLE_elements(interp, types) > 0
                 ? types
                 : PMCNULL;
+        attrs->inclusive   = 1;
+        attrs->class_based = 0;
     }
 
 /*
@@ -296,10 +280,12 @@ Set the exception types that the ExceptionHandler will not handle.
     METHOD handle_types_except(PMC *types :slurpy) {
         Parrot_ExceptionHandler_attributes * const attrs =
                     PARROT_EXCEPTIONHANDLER(SELF);
-        attrs->handled_types_except =
+        attrs->handled_items =
             VTABLE_elements(interp, types) > 0
                 ? types
                 : PMCNULL;
+        attrs->inclusive   = 0;
+        attrs->class_based = 0;
     }
 
 /*
@@ -315,10 +301,12 @@ Set the exception classes that the ExceptionHandler will handle.
     METHOD handle_classes(PMC *classes :slurpy) {
         Parrot_ExceptionHandler_attributes * const attrs =
                     PARROT_EXCEPTIONHANDLER(SELF);
-        attrs->handled_classes =
+        attrs->handled_items =
             VTABLE_elements(interp, classes) > 0
                 ? classes
                 : PMCNULL;
+        attrs->inclusive   = 1;
+        attrs->class_based = 1;
     }
 
 /*
@@ -334,10 +322,12 @@ Set the exception classes that the ExceptionHandler will not handle.
     METHOD handle_classes_except(PMC *classes :slurpy) {
         Parrot_ExceptionHandler_attributes * const attrs =
                     PARROT_EXCEPTIONHANDLER(SELF);
-        attrs->handled_classes_except =
+        attrs->handled_items =
             VTABLE_elements(interp, classes) > 0
                 ? classes
                 : PMCNULL;
+        attrs->inclusive   = 0;
+        attrs->class_based = 1;
     }
 
 }
