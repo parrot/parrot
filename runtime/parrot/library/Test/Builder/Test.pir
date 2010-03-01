@@ -40,10 +40,10 @@ This class provides the following methods:
     addattribute tbtwr_class, 'reason'
 
     .local pmc tbts_class
-    subclass tbts_class, tbtwr_class, ['Test'; 'Builder'; 'Test'; 'Skip'] 
+    subclass tbts_class, tbtwr_class, ['Test'; 'Builder'; 'Test'; 'Skip']
 
     .local pmc tbtt_class
-    subclass tbtt_class, tbtwr_class, ['Test'; 'Builder'; 'Test'; 'TODO'] 
+    subclass tbtt_class, tbtwr_class, ['Test'; 'Builder'; 'Test'; 'TODO']
 .end
 
 =item C<create( args_hash )>
@@ -379,7 +379,7 @@ to the Perl 6 internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2005-2008, Parrot Foundation.
+Copyright (C) 2005-2010, Parrot Foundation.
 
 =cut
 
