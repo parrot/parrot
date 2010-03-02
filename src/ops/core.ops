@@ -52,7 +52,7 @@ Halts the interpreter. (Must be op #0, CORE_OPS_end). See also B<exit>.
 =cut
 
 inline op end() :base_core :check_event :flow {
-    HALT();
+    goto ADDRESS(0);
 }
 
 

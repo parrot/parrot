@@ -130,11 +130,6 @@ Transforms to C<X>, an absolute address.
 
 Transforms to C<S>, the size of an op.
 
-=item C<HALT()>
-
-Transforms to C<PC' = 0>. Halts run loop, and resets the current
-position to the start of the Parrot code, without resuming.
-
 =item C<restart OFFSET(X)>
 
 Transforms to C<PC' = 0> and restarts at C<PC + X>.
@@ -501,8 +496,6 @@ END_CODE
         #   expr ADDRESS(X)    {{^X}}   X             Absolute address
         #   OP_SIZE            {{^S}}   S             op size
         #
-        #   HALT()             {{=0}}   PC' = 0       Halts run_ops loop, no resume
-        #
         #   restart OFFSET(X)  {{=0,+=X}}   PC' = 0   Restarts at PC + X
         #   restart NEXT()     {{=0,+=S}}   PC' = 0   Restarts at PC + S
         #
@@ -535,7 +528,6 @@ END_CODE
         $next     ||= $body =~ s/\bexpr\s+NEXT\(\)/{{^+$op_size}}/mg;
                       $body =~ s/\bgoto\s+NEXT\(\)/{{+=$op_size}}/mg;
 
-        $body =~ s/\bHALT\(\)/{{=0}}/mg;
         $body =~ s/\bOP_SIZE\b/{{^$op_size}}/mg;
 
         if ( $body =~ s/\brestart\s+OFFSET\((.*?)\)/{{=0,+=$1}}/mg ) {
@@ -663,7 +655,6 @@ sub preamble {
 
         #s/goto\s+NEXT\(\)/{{+=$op_size}}/mg;   #not supported--dependent on op size
         s/goto\s+ADDRESS\((.*)\)/{{=$1}}/mg;
-        s/HALT\(\)/{{=0}}/mg;
 
         $_ = Parrot::Op->rewrite_body( $_, $trans, 'preamble' );
     }
