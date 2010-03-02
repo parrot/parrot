@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 package Parrot::Ops2c::Utils;
 use strict;
@@ -605,7 +605,7 @@ sub _iterate_over_ops {
     $prev_src = '';
     foreach my $op ( $self->{ops}->ops ) {
         my $func_name = $op->func_name( $self->{trans} );
-        my $prototype = 
+        my $prototype =
           "$self->{sym_export} opcode_t * $func_name (opcode_t *, PARROT_INTERP)";
         my $definition;
         my $comment = '';
