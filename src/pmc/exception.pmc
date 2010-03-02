@@ -463,6 +463,20 @@ Sets the PMC value for C<*key>.
 
 /*
 
+=item C<void set_pmc_keyed_str(STRING *key, PMC *value)>
+
+Sets the PMC value for C<*key>.
+
+=cut
+
+*/
+
+    VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
+        SELF.set_attr_str(key, value);
+    }
+
+/*
+
 =item C<void set_pointer(void *context)>
 
 Store a context for the handler iterator.

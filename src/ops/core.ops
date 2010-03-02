@@ -782,7 +782,7 @@ inline op throw(invar PMC) :flow {
                 EXCEPTION_UNIMPLEMENTED,
                 Parrot_str_new_constant(interp, "Not a throwable object"));
 
-    VTABLE_set_attr_str(interp, except, Parrot_str_new_constant(interp, "resume"), resume);
+    VTABLE_set_pmc_keyed_str(interp, except, Parrot_str_new_constant(interp, "resume"), resume);
     dest = Parrot_ex_throw_from_op(interp, except, ret);
     goto ADDRESS(dest);
 }
