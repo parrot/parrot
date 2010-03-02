@@ -671,6 +671,8 @@ inline op get_addr(out INT, invar PMC) {
 Register a task with the concurrency scheduler. Details about the task are
 stored within the task PMC.
 
+=cut
+
 inline op schedule(invar PMC) {
     Parrot_cx_schedule_task(interp, $1);
 }
@@ -679,6 +681,8 @@ inline op schedule(invar PMC) {
 
 Add an event or exception handler to the concurrency scheduler. Details about
 the handler are stored within the handler PMC.
+
+=cut
 
 inline op addhandler(invar PMC) {
     Parrot_cx_add_handler(interp, $1);
