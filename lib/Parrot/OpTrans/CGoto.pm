@@ -283,7 +283,6 @@ Returns the run core C code for section after the address table.
 
 sub run_core_after_addr_table {
     my ( $self, $bs ) = @_;
-    my $t = $self->opsarraytype;
     return <<END_C;
 
     if (!${bs}ops_addr)

@@ -186,7 +186,6 @@ sub new {
     $argsref->{preamble}     = $preamble;
     $argsref->{init_func}    = $init_func;
     $argsref->{bs}           = "$argsref->{base}$argsref->{suffix}_";
-    $argsref->{opsarraytype} = $argsref->{trans}->opsarraytype();
 
     # Invoked as:  ${defines}
     $argsref->{defines} = $argsref->{trans}->defines();
@@ -606,9 +605,8 @@ sub _iterate_over_ops {
     $prev_src = '';
     foreach my $op ( $self->{ops}->ops ) {
         my $func_name = $op->func_name( $self->{trans} );
-        my $arg_types = "$self->{opsarraytype} *, PARROT_INTERP";
-        my $prototype = "$self->{sym_export} $self->{opsarraytype} * $func_name ($arg_types)";
-        my $args      = "$self->{opsarraytype} *cur_opcode, PARROT_INTERP";
+        my $prototype = 
+          "$self->{sym_export} opcode_t * $func_name (opcode_t *, PARROT_INTERP)";
         my $definition;
         my $comment = '';
         my $one_op  = "";
@@ -622,7 +620,7 @@ sub _iterate_over_ops {
             $comment    = "/* " . $op->full_name() . " */";
         }
         else {
-            $definition = "$self->{opsarraytype} *\n$func_name ($args)";
+            $definition = "opcode_t *\n$func_name (opcode_t *cur_opcode, PARROT_INTERP)";
         }
 
         my $src = $op->source( $self->{trans} );
