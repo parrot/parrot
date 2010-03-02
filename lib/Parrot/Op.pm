@@ -300,23 +300,6 @@ sub jump {
     return $self->{JUMP};
 }
 
-=item C<full_body()>
-
-For manual ops, C<full_body()> is the same as C<body()>. For auto ops
-this method adds a final C<goto NEXT()> line to the code to represent
-the auto-computed return value. See the note on op types above.
-
-=cut
-
-sub full_body {
-    my $self = shift;
-    my $body = $self->body;
-
-    $body .= sprintf( "  {{+=%d}};\n", $self->size ) if $self->type eq 'auto';
-
-    return $body;
-}
-
 # Called from rewrite_body() to perform the actual substitutions.
 sub _substitute {
     my $self           = shift;
@@ -382,7 +365,7 @@ sub rewrite_body {
 
 =item C<source($trans)>
 
-Returns the L<C<full_body()>> of the op with substitutions made by
+Returns the L<C<body()>> of the op with substitutions made by
 C<$trans> (a subclass of C<Parrot::OpTrans>).
 
 =cut
@@ -402,7 +385,7 @@ sub source {
                 ? $trans->add_body_prelude()
                 : '';
 
-    return $self->rewrite_body( $prelude . $self->full_body, $trans );
+    return $self->rewrite_body( $prelude . $self->body, $trans );
 }
 
 =item C<size()>
