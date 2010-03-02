@@ -334,7 +334,6 @@ pasm_output_is( <<"CODE", <<'OUTPUT', 'atan, part 2' );
         atan N4, -0.0, -0.0
         .fp_eq_pasm   (N4, -3.1415926, EQ1)
         print "not "
-        print N4
 EQ1:    print "ok 1\\n"
         end
 CODE
