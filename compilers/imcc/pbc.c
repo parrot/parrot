@@ -981,14 +981,32 @@ static int
 add_const_str(PARROT_INTERP, ARGIN(const SymReg *r))
 {
     ASSERT_ARGS(add_const_str)
-    const int      k = add_const_table(interp);
+
+    PackFile_ConstTable *table = interp->code->const_table;
     STRING * const s = IMCC_string_from_reg(interp, r);
-    PackFile_Constant * const constant = interp->code->const_table->constants[k];
-
-    constant->type     = PFC_STRING;
-    constant->u.string = s;
-
-
+    int k = -1;
+    int i;
+    for (i = 0; i < table->const_count; ++i) {
+        PackFile_Constant * const constant = table->constants[i];
+        if (constant->type == PFC_STRING) {
+            STRING * const sc = constant->u.string;
+            if (Parrot_charset_number_of_str(interp, s) ==
+                    Parrot_charset_number_of_str(interp, sc) &&
+                    Parrot_encoding_number_of_str(interp, s) ==
+                    Parrot_encoding_number_of_str(interp, sc) &&
+                    Parrot_str_equal(interp, s, sc)) {
+                k = i;
+		break;
+	    }
+        }
+    }
+    if (k < 0) {
+        PackFile_Constant * constant;
+        k = add_const_table(interp);
+        constant = table->constants[k];
+        constant->type     = PFC_STRING;
+        constant->u.string = s;
+    }
     return k;
 }
 
