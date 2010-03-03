@@ -4018,13 +4018,7 @@ PackFile_Constant_unpack_pmc(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
     interp->code                      = pf->cur_cs;
     image                             = PF_fetch_string(interp, pf, &cursor);
 
-    /*
-     * TODO use thaw_constants
-     * current issue: a constant Sub with attached properties
-     *                doesn't GC mark the properties
-     * for a constant PMC *all* contents have to be in the constant pools
-     */
-    pmc         = Parrot_thaw(interp, image);
+    pmc         = Parrot_thaw_constants(interp, image);
 
     /* place item in const_table */
     self->type  = PFC_PMC;
