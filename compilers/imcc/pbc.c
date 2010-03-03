@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2009, Parrot Foundation.
+ * Copyright (C) 2002-2010, Parrot Foundation.
  * $Id$
  */
 
@@ -996,8 +996,8 @@ add_const_str(PARROT_INTERP, ARGIN(const SymReg *r))
                     Parrot_encoding_number_of_str(interp, sc) &&
                     Parrot_str_equal(interp, s, sc)) {
                 k = i;
-		break;
-	    }
+                break;
+            }
         }
     }
     if (k < 0) {
