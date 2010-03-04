@@ -1019,7 +1019,6 @@ include/parrot/dynext.h                                     [main]include
 include/parrot/embed.h                                      [main]include
 include/parrot/encoding.h                                   [main]include
 include/parrot/enums.h                                      [main]include
-include/parrot/events.h                                     [main]include
 include/parrot/exceptions.h                                 [main]include
 include/parrot/exit.h                                       [main]include
 include/parrot/extend.h                                     [main]include
@@ -1064,7 +1063,6 @@ include/parrot/sub.h                                        [main]include
 include/parrot/thr_pthread.h                                [main]include
 include/parrot/thr_windows.h                                [main]include
 include/parrot/thread.h                                     [main]include
-include/parrot/tsq.h                                        [main]include
 include/parrot/vtables.h                                    [main]include
 include/parrot/warnings.h                                   [main]include
 include/pmc/dummy                                           [main]include
@@ -1325,7 +1323,6 @@ src/dynpmc/rational.pmc                                     [devel]src
 src/dynpmc/rotest.pmc                                       [devel]src
 src/dynpmc/subproxy.pmc                                     [devel]src
 src/embed.c                                                 []
-src/events.c                                                []
 src/exceptions.c                                            []
 src/exit.c                                                  []
 src/extend.c                                                []
@@ -1517,7 +1514,6 @@ src/string/primitives.c                                     []
 src/string/unicode.h                                        []
 src/sub.c                                                   []
 src/thread.c                                                []
-src/tsq.c                                                   []
 src/utils.c                                                 []
 src/vtable.tbl                                              [devel]src
 src/vtables.c                                               []

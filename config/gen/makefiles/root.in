@@ -191,7 +191,6 @@ GEN_PASM_INCLUDES = \
 	runtime/parrot/include/datatypes.pasm \
 	runtime/parrot/include/iterator.pasm \
 	runtime/parrot/include/call_bits.pasm \
-	runtime/parrot/include/io_thr_msg.pasm \
 	runtime/parrot/include/timer.pasm \
 	runtime/parrot/include/except_types.pasm \
 	runtime/parrot/include/except_severity.pasm \
@@ -375,7 +374,6 @@ PARROT_H_HEADERS = \
         $(INC_DIR)/io.h \
         $(INC_DIR)/op.h \
         $(INC_DIR)/pmc.h \
-        $(INC_DIR)/events.h \
         $(INC_DIR)/gc_api.h \
         $(INC_DIR)/string_funcs.h \
         $(INC_DIR)/misc.h \
@@ -386,7 +384,6 @@ PARROT_H_HEADERS = \
         $(INC_DIR)/nci.h \
         $(INC_DIR)/thread.h \
         $(INC_DIR)/scheduler.h \
-        $(INC_DIR)/tsq.h \
         $(INC_DIR)/longopt.h \
         $(INC_DIR)/oo.h \
         $(INC_DIR)/vtables.h \
@@ -446,7 +443,6 @@ INTERP_O_FILES = \
     src/dynext$(O) \
     src/embed$(O) \
     src/string/encoding$(O) \
-    src/events$(O) \
     src/exceptions$(O) \
     src/exit$(O) \
     src/extend$(O) \
@@ -494,7 +490,6 @@ INTERP_O_FILES = \
     src/sub$(O) \
     src/thread$(O) \
     src/runcore/trace$(O) \
-    src/tsq$(O) \
     src/utils$(O) \
     src/vtables$(O) \
     src/warnings$(O) \
@@ -640,7 +635,6 @@ $(GEN_LIBRARY) : $(PARROT) $(GEN_PASM_INCLUDES)
 STR_FILES = \
     src/debug.str \
     src/dynext.str \
-    src/events.str \
     src/exceptions.str \
     src/global.str \
     src/global_setup.str \
@@ -1082,9 +1076,6 @@ runtime/parrot/include/stdio.pasm  : $(INC_DIR)/io.h $(H2INC)
 runtime/parrot/include/socket.pasm : $(INC_DIR)/io.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/io.h $@
 
-runtime/parrot/include/io_thr_msg.pasm : $(INC_DIR)/events.h $(H2INC)
-	$(PERL) $(H2INC) $(INC_DIR)/events.h $@
-
 runtime/parrot/include/hash_key_type.pasm : $(INC_DIR)/hash.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/hash.h $@
 
@@ -1258,8 +1249,6 @@ src/exceptions$(O) : $(PARROT_H_HEADERS) \
         src/exceptions.str \
 	include/pmc/pmc_continuation.h
 
-src/events$(O) : $(PARROT_H_HEADERS) src/events.str
-
 src/thread$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/atomic.h \
         include/pmc/pmc_sub.h \
 	include/pmc/pmc_parrotinterpreter.h
@@ -1379,8 +1368,6 @@ src/runcore/cores$(O) : src/runcore/cores.str \
         $(INC_DIR)/oplib/core_ops_switch.h $(INC_DIR)/oplib/ops.h \
         $(INC_DIR)/runcore_api.h $(INC_DIR)/runcore_trace.h \
         $(PARROT_H_HEADERS)
-
-src/tsq$(O) : $(PARROT_H_HEADERS)
 
 src/embed$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/embed.h \
         $(INC_DIR)/oplib/ops.h $(INC_DIR)/runcore_api.h \

@@ -97,10 +97,6 @@ static void pt_thread_wait(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_CAN_RETURN_NULL
-static QUEUE_ENTRY * remove_queued_suspend_gc(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_CAN_RETURN_NULL
 static void* thread_func(ARGIN_NULLOK(void *arg));
 
 #define ASSERT_ARGS_detach __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -959,62 +955,6 @@ is_suspended_for_gc(PARROT_INTERP)
         return 1;
     else
         return 0;
-}
-
-/*
-
-=item C<static QUEUE_ENTRY * remove_queued_suspend_gc(PARROT_INTERP)>
-
-Removes an event requesting that the interpreter suspend itself for a
-garbage-collection run from the event queue.
-
-=cut
-
-*/
-
-PARROT_CAN_RETURN_NULL
-static QUEUE_ENTRY *
-remove_queued_suspend_gc(PARROT_INTERP)
-{
-    ASSERT_ARGS(remove_queued_suspend_gc)
-    parrot_event *ev    = NULL;
-    QUEUE * const queue = interp->task_queue;
-    QUEUE_ENTRY  *prev  = NULL;
-    QUEUE_ENTRY  *cur;
-
-    queue_lock(queue);
-    cur = queue->head;
-
-    while (cur) {
-        ev   = (parrot_event *)cur->data;
-
-        if (ev->type == EVENT_TYPE_SUSPEND_FOR_GC)
-            break;
-
-        prev = cur;
-        cur  = cur->next;
-    }
-
-    if (cur) {
-        if (prev)
-            prev->next  = cur->next;
-        else
-            queue->head = cur->next;
-
-        if (cur == queue->tail)
-            queue->tail = prev;
-
-        if (cur == queue->head)
-            queue->head = cur->next;
-
-        mem_internal_free(ev);
-        mem_internal_free(cur);
-        cur = NULL;
-        DEBUG_ONLY(fprintf(stderr, "%p: remove_queued_suspend_gc: got one\n", interp));
-    }
-
-    queue_unlock(queue);
-    return cur;
 }
 
 /*
