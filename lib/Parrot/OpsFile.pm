@@ -457,10 +457,8 @@ sub make_op {
         $argdirs, $line, $file, $labels,     $flags, $nolines
     ) = @_;
     my $counter  = 0;
-    my $absolute = 0;
     my $branch   = 0;
     my $pop      = 0;
-    my $restart  = 0;
 
     if (exists($$flags{deprecated})) {
         $body = <<"END_CODE" . $body;
@@ -512,10 +510,10 @@ END_CODE
         # with labels, etc.).
         #
 
-        $absolute ||= $body =~ s/\bgoto\s+ADDRESS\(\( (.*?) \)\)/{{=$1}}/mg;
-                      $body =~ s/\bexpr\s+ADDRESS\(\( (.*?) \)\)/{{^$1}}/mg;
-        $absolute ||= $body =~ s/\bgoto\s+ADDRESS\((.*?)\)/{{=$1}}/mg;
-                      $body =~ s/\bexpr\s+ADDRESS\((.*?)\)/{{^$1}}/mg;
+        $body =~ s/\bgoto\s+ADDRESS\(\( (.*?) \)\)/{{=$1}}/mg;
+        $body =~ s/\bexpr\s+ADDRESS\(\( (.*?) \)\)/{{^$1}}/mg;
+        $body =~ s/\bgoto\s+ADDRESS\((.*?)\)/{{=$1}}/mg;
+        $body =~ s/\bexpr\s+ADDRESS\((.*?)\)/{{^$1}}/mg;
 
         $branch   ||= $short_name =~ /runinterp/;
         $branch   ||= $body =~ s/\bgoto\s+OFFSET\(\( (.*?) \)\)/{{+=$1}}/mg;
@@ -525,21 +523,16 @@ END_CODE
 
         $short_name =~ /runinterp/;
         $body =~ s/\bexpr\s+NEXT\(\)/{{^+$op_size}}/mg;
-                      $body =~ s/\bgoto\s+NEXT\(\)/{{+=$op_size}}/mg;
+        $body =~ s/\bgoto\s+NEXT\(\)/{{+=$op_size}}/mg;
 
         $body =~ s/\bOP_SIZE\b/{{^$op_size}}/mg;
 
         if ( $body =~ s/\brestart\s+OFFSET\((.*?)\)/{{=0,+=$1}}/mg ) {
             $branch  = 1;
-            $restart = 1;
-        }
-        elsif ( $body =~ s/\brestart\s+NEXT\(\)/{{=0,+=$op_size}}/mg ) {
-            $restart = 1;
-        }
-        elsif ( $body =~ s/\brestart\s+ADDRESS\((.*?)\)/{{=$1}}/mg ) {
-            $restart = 1;
         }
 
+        $body =~ s/\brestart\s+NEXT\(\)/{{=0,+=$op_size}}/mg;
+        $body =~ s/\brestart\s+ADDRESS\((.*?)\)/{{=$1}}/mg;
         $body =~ s/\$(\d+)/{{\@$1}}/mg;
 
         # We can only reference as many parameters as we declare
@@ -555,7 +548,6 @@ END_CODE
         $op->body( $nolines ? $body : qq{#line $line "$file_escaped"\n$body} );
 
         # Constants here are defined in include/parrot/op.h
-        or_flag( \$jumps, "PARROT_JUMP_ADDRESS"  ) if $absolute;
         or_flag( \$jumps, "PARROT_JUMP_RELATIVE" ) if $branch;
 
         $op->jump($jumps);

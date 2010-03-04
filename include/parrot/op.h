@@ -51,8 +51,7 @@ typedef enum {
 
 /* See lib/Parrot/OpsFile.pm if the names of these values change */
 typedef enum {
-    PARROT_JUMP_RELATIVE = 1,
-    PARROT_JUMP_ADDRESS  = 2
+    PARROT_JUMP_RELATIVE = 1
 } op_jump_t;
 
 /* NOTE: Sure wish we could put the types here... */
