@@ -88,16 +88,6 @@ Internal opcode to wrap unknown ops from loaded opcode libs.
 Don't use.
 (Must be op #5, CORE_OPS_wrapper__).
 
-=item B<prederef__>()
-
-Internal opcode to prederef opcodes on the fly.
-Don't use.
-(Must be op #6, CORE_OPS_prederef__).
-
-=item B<reserved>(inconst INT)
-
-Reserve 1 more fix entry.
-
 =item B<load_bytecode>(in STR)
 
 Load Parrot bytecode from file $1, and search the library path to locate the
@@ -146,21 +136,6 @@ inline op wrapper__() :internal :flow {
     opcode_t *pc = CUR_OPCODE;
     DO_OP(pc, interp);
     goto ADDRESS(pc);
-}
-
-inline op prederef__() :internal :flow {
-    opcode_t * const _this = CUR_OPCODE;
-    if (PARROT_RUNCORE_CGOTO_OPS_TEST(interp->run_core)) {
-        /* must be CGP then - check for events in not yet prederefed code */
-        Parrot_cx_runloop_wake(interp, interp->scheduler);
-    /*    _this = CHECK_EVENTS(interp, _this); */
-    }
-    do_prederef((void**)cur_opcode, interp, interp->run_core);
-    goto ADDRESS(_this); /* force this being a branch op */
-}
-
-inline op reserved(inconst INT) {
-    /* reserve 1 entries */
 }
 
 inline op load_bytecode(in STR) :load_file {
