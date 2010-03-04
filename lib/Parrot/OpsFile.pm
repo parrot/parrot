@@ -561,14 +561,6 @@ END_CODE
         or_flag( \$jumps, "PARROT_JUMP_ADDRESS"  ) if $absolute;
         or_flag( \$jumps, "PARROT_JUMP_RELATIVE" ) if $branch;
         or_flag( \$jumps, "PARROT_JUMP_ENEXT"    ) if $next;
-        or_flag( \$jumps, "PARROT_JUMP_RESTART"  ) if $restart;
-
-        # I'm assuming the op branches to the value in the last argument.
-        if ( ($jumps)
-            && ( $fixedargs[ @fixedargs - 1 ] )
-            && ( $fixedargs[ @fixedargs - 1 ] eq 'i' ) ) {
-            or_flag( \$jumps, "PARROT_JUMP_GNEXT" );
-        }
 
         $op->jump($jumps);
         $self->push_op($op);
