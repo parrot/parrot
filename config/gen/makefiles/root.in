@@ -1698,6 +1698,7 @@ fulltest :
 #IF(cg_flag):	testg \
 	testr \
 	testS \
+	testO2 \
 	src_tests \
 	run_tests \
 	perl_tests \
@@ -1740,6 +1741,10 @@ testr : test_prep
 # switched core
 testS : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -S $(RUNCORE_TEST_FILES)
+
+# enable imcc/pirc optimizations
+testO2 : test_prep
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -O2 $(RUNCORE_TEST_FILES)
 
 # Computed goto jitted core - target retained, but falls back to standard core
 testCj : test_prep
