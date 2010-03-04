@@ -826,7 +826,6 @@ END_C
                 ? $op->labels
                 : 0
                 ) . " }";
-            my $flags = 0;
 
             print $fh <<END_C;
   { /* $self->{index} */
@@ -839,8 +838,7 @@ END_C
     $arg_count,
     $arg_types,
     $arg_dirs,
-    $labels,
-    $flags
+    $labels
   },
 END_C
 

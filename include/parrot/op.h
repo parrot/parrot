@@ -76,7 +76,6 @@ typedef struct op_info_t {
     arg_type_t     types[PARROT_MAX_ARGS];  /* arg_type_t, 0 = 1st arg */
     arg_dir_t      dirs[PARROT_MAX_ARGS];   /* arg_dir_t   0 = 1st arg */
     char           labels[PARROT_MAX_ARGS]; /* 0/1         0 = 1st arg */
-    unsigned int   flags;
 } op_info_t;
 
 
