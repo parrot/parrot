@@ -40,7 +40,13 @@ use Parrot::Config qw(%PConfig);
 use Parrot::Distribution;
 use Test::More;
 
-# There's no point in continuing if we're missing some certain modules.
+# There's no point in continuing if we're missing some certain modules, or
+# if the developer doesn't want to.
+
+if (exists $ENV{'PARROT_TEST_NO_PERLCRITIC'}) {
+  give_up('absence of PARROT_TEST_NO_PERLCRITIC environment variable');
+}
+
 eval { require Test::Perl::Critic };
 if ($@) {
   give_up('Test::Perl::Critic');
