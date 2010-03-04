@@ -126,10 +126,6 @@ Transforms to C<PC + S>, the position of the next op.
 
 Transforms to C<X>, an absolute address.
 
-=item C<OP_SIZE>
-
-Transforms to C<S>, the size of an op.
-
 =item C<restart OFFSET(X)>
 
 Transforms to C<PC' = 0> and restarts at C<PC + X>.
@@ -491,7 +487,6 @@ END_CODE
         #   expr OFFSET(X)     {{^+X}}  PC + X        Relative address
         #   expr NEXT()        {{^+S}}  PC + S        Where S is op size
         #   expr ADDRESS(X)    {{^X}}   X             Absolute address
-        #   OP_SIZE            {{^S}}   S             op size
         #
         #   restart OFFSET(X)  {{=0,+=X}}   PC' = 0   Restarts at PC + X
         #   restart NEXT()     {{=0,+=S}}   PC' = 0   Restarts at PC + S
@@ -509,30 +504,27 @@ END_CODE
         # on the mode of operation (function calls, switch statements, gotos
         # with labels, etc.).
         #
+        if ($body =~ /(goto|restart)\s+OFFSET\(.*?\)/ || $short_name =~ /runinterp/) {
+            $branch = 1;
+        }
 
         $body =~ s/\bgoto\s+ADDRESS\(\( (.*?) \)\)/{{=$1}}/mg;
         $body =~ s/\bexpr\s+ADDRESS\(\( (.*?) \)\)/{{^$1}}/mg;
         $body =~ s/\bgoto\s+ADDRESS\((.*?)\)/{{=$1}}/mg;
         $body =~ s/\bexpr\s+ADDRESS\((.*?)\)/{{^$1}}/mg;
 
-        $branch   ||= $short_name =~ /runinterp/;
-        $branch   ||= $body =~ s/\bgoto\s+OFFSET\(\( (.*?) \)\)/{{+=$1}}/mg;
-                      $body =~ s/\bexpr\s+OFFSET\(\( (.*?) \)\)/{{^+$1}}/mg;
-        $branch   ||= $body =~ s/\bgoto\s+OFFSET\((.*?)\)/{{+=$1}}/mg;
-                      $body =~ s/\bexpr\s+OFFSET\((.*?)\)/{{^+$1}}/mg;
+        $body =~ s/\bgoto\s+OFFSET\(\( (.*?) \)\)/{{+=$1}}/mg;
+        $body =~ s/\bexpr\s+OFFSET\(\( (.*?) \)\)/{{^+$1}}/mg;
+        $body =~ s/\bgoto\s+OFFSET\((.*?)\)/{{+=$1}}/mg;
+        $body =~ s/\bexpr\s+OFFSET\((.*?)\)/{{^+$1}}/mg;
 
-        $short_name =~ /runinterp/;
         $body =~ s/\bexpr\s+NEXT\(\)/{{^+$op_size}}/mg;
         $body =~ s/\bgoto\s+NEXT\(\)/{{+=$op_size}}/mg;
 
-        $body =~ s/\bOP_SIZE\b/{{^$op_size}}/mg;
-
-        if ( $body =~ s/\brestart\s+OFFSET\((.*?)\)/{{=0,+=$1}}/mg ) {
-            $branch  = 1;
-        }
-
+        $body =~ s/\brestart\s+OFFSET\((.*?)\)/{{=0,+=$1}}/mg;
         $body =~ s/\brestart\s+NEXT\(\)/{{=0,+=$op_size}}/mg;
         $body =~ s/\brestart\s+ADDRESS\((.*?)\)/{{=$1}}/mg;
+
         $body =~ s/\$(\d+)/{{\@$1}}/mg;
 
         # We can only reference as many parameters as we declare
