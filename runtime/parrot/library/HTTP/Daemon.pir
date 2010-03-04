@@ -433,7 +433,7 @@ not_found:
 .end
 
 # close all sockets
-# this needs enabling of SIGHUP in src/events.c but still doesn't
+# this needs enabling of SIGHUP but still doesn't
 # help against FIN_WAIT2 / TIME_WAIT state of connections
 .sub 'shutdown' :method
     .local pmc active, sock

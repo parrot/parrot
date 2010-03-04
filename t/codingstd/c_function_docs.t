@@ -121,7 +121,6 @@ src/string/charset/ascii.c
 src/string/charset/binary.c
 src/string/charset/iso-8859-1.c
 src/string/charset/unicode.c
-src/tsq.c
 
 # Local Variables:
 #   mode: cperl

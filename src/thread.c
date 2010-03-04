@@ -136,8 +136,6 @@ static void* thread_func(ARGIN_NULLOK(void *arg));
     , PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_pt_thread_wait __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_remove_queued_suspend_gc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_thread_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */

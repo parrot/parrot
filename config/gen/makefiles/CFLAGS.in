@@ -7,7 +7,6 @@
 #
 src/platform.c      -{-Wcast-qual}          # noisy
 src/spf_render.c    -{-Wformat-nonliteral}  # noisy
-src/tsq.c           -{@optimize@}           # never optimize tsq.c!
 
 # The src/ops/core_ops*.c files are challenging to optimize.
 # gcc can usually handle it, but don't assume any other compilers can,
