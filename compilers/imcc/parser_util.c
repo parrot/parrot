@@ -548,7 +548,7 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         }
     }
 
-    if (op_info->jump && op_info->jump != PARROT_JUMP_ENEXT) {
+    if (op_info->jump) {
         ins->type |= ITBRANCH;
         /* TODO use opnum constants */
         if (STREQ(name, "branch")

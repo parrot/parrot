@@ -460,7 +460,6 @@ sub make_op {
     my $absolute = 0;
     my $branch   = 0;
     my $pop      = 0;
-    my $next     = 0;
     my $restart  = 0;
 
     if (exists($$flags{deprecated})) {
@@ -524,8 +523,8 @@ END_CODE
         $branch   ||= $body =~ s/\bgoto\s+OFFSET\((.*?)\)/{{+=$1}}/mg;
                       $body =~ s/\bexpr\s+OFFSET\((.*?)\)/{{^+$1}}/mg;
 
-        $next     ||= $short_name =~ /runinterp/;
-        $next     ||= $body =~ s/\bexpr\s+NEXT\(\)/{{^+$op_size}}/mg;
+        $short_name =~ /runinterp/;
+        $body =~ s/\bexpr\s+NEXT\(\)/{{^+$op_size}}/mg;
                       $body =~ s/\bgoto\s+NEXT\(\)/{{+=$op_size}}/mg;
 
         $body =~ s/\bOP_SIZE\b/{{^$op_size}}/mg;
@@ -536,10 +535,8 @@ END_CODE
         }
         elsif ( $body =~ s/\brestart\s+NEXT\(\)/{{=0,+=$op_size}}/mg ) {
             $restart = 1;
-            $next    = 1;
         }
         elsif ( $body =~ s/\brestart\s+ADDRESS\((.*?)\)/{{=$1}}/mg ) {
-            $next    = 0;
             $restart = 1;
         }
 
@@ -560,7 +557,6 @@ END_CODE
         # Constants here are defined in include/parrot/op.h
         or_flag( \$jumps, "PARROT_JUMP_ADDRESS"  ) if $absolute;
         or_flag( \$jumps, "PARROT_JUMP_RELATIVE" ) if $branch;
-        or_flag( \$jumps, "PARROT_JUMP_ENEXT"    ) if $next;
 
         $op->jump($jumps);
         $self->push_op($op);
