@@ -7,16 +7,16 @@ docs/tests.pod - Testing Parrot
 
 =head1 A basic guide to writing and running tests for Parrot
 
-This is quick and dirty pointer to how the Parrot test suite is executed and
-to how new tests for Parrot should be written.
-The testing system is liable to change in the future, but tests written
-following the guidelines below should be easy to port into a new test suite.
+This is quick and dirty primer on to how the Parrot test suite is executed and
+to how new tests for Parrot should be written.  The testing system is liable to
+change in the future, but tests written following the guidelines below should be
+easy to port into a new test suite.
 
 =head1 How to test parrot
 
-The easy way to test parrot is running C<make test>. If you have
-updated your code recently and tests began failing, go for a C<make
-realclean> and recompile parrot before complaining.
+The easy way to test parrot is running C<make test>. If you have updated your
+code recently and tests began failing, go for a C<make realclean> and recompile
+parrot before complaining.
 
 C<make languages-test> runs the test suite for most language implementations
 in the languages directory.
@@ -26,41 +26,47 @@ in the languages directory.
 Parrot has a status page with smoke test results at
 L<http://smolder.plusthree.com/app/public_projects/details/8>.
 
-You can supply new tests results by just running C<make smoke>. 
-It will run the same tests as C<make test> would, but will upload
-the test results to the website.
+You can supply new tests results by just running C<make smoke>.  It will run the
+same tests as C<make test> would, but will upload the test results to the
+website.
 
 =head1 Location of the test files
 
 The parrot test files, the F<*.t> files, can be found in the F<t> directory.
-A quick overview over the subdirs in F<t> can be found in F<t/README>. 
+A quick overview over the subdirs in F<t> can be found in F<t/README>.
 
 The language implementations usually have their test files in F<languages/*/t>.
 
-New tests should be added to an existing F<*.t> file.
-If a previously untested feature is tested,
-it might also make sense to create a new F<*.t> file.
+New tests should be added to an existing F<*.t> file.  If a previously untested
+feature is tested, it might also make sense to create a new F<*.t> file. You
+may also see tests named like foo-old.t, which are Perl tests that are in the
+process of being translated to PIR.
 
 =head1 How to write a test
 
 Test scripts must emit text that conforms to the C<Test Anything Protocol>.
-Test scripts are currently usually written in Perl 5 or PIR.
-The Perl 5 module C<Parrot::Test>
-and the PIR module C<Test;More> help with writing tests.
+Test scripts are currently usually written in PIR or Perl 5.  The Perl 5 module
+C<Parrot::Test> and the PIR module C<Test;More> help with writing tests.
+Writing tests in PIR is preferred, but there are some cases where the
+proper framework is not available. If you can, write your tests in PIR.
 
 The testing framework needs to know how many tests it should expect.  So the
 number of planned tests needs to be incremented when adding a new test. This
 is done near the top of a test file, in a line that looks like:
 
+  plan(42)
+
+in PIR tests and
+
   use Parrot::Test tests => 8;
 
-for Perl 5 based test scripts.
+for Perl 5 test scripts.
 
 =head2 Testing Parrot Assembler
 
 PASM tests are mostly used for testing ops.  Appropriate test files for basic
-ops are F<t/op/*.t>.  Polymorphic Containers are tested in F<t/pmc/*.t>.  Add the
-new test like this:
+ops are F<t/op/*.t>.  Polymorphic Containers are tested in F<t/pmc/*.t>.  Add
+the new test like this:
 
     pasm_output_is(<<'CODE', <<'OUTPUT', "name for test");
         *** a big chunk of assembler, eg:

@@ -106,8 +106,6 @@ tag C<all> is allowed for todo tests that should fail on any system.
     skip_tests = 'set_skip_info'()
 
     # how many tests to run?
-    # XXX: this should be summed automatically from test_files data
-    #      until then, it's set to no plan
     test.'plan'(TESTS)
 
   outer_loop:
