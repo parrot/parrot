@@ -116,7 +116,6 @@ static void no_such_register(PARROT_INTERP,
     UINTVAL register_num)
         __attribute__nonnull__(1);
 
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static const char * skip_whitespace(ARGIN(const char *cmd))

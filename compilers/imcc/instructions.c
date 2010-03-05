@@ -50,7 +50,7 @@ static int e_file_emit(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(4);
 
-static int e_file_open(PARROT_INTERP, ARGIN(const char *file))
+static int e_file_open(PARROT_INTERP, ARGIN(const char *param))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -785,7 +785,7 @@ static char *output;
 
 /*
 
-=item C<static int e_file_open(PARROT_INTERP, const char *file)>
+=item C<static int e_file_open(PARROT_INTERP, const char *param)>
 
 Prints a message to STDOUT.
 
