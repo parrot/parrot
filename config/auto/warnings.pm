@@ -129,6 +129,7 @@ sub _init {
         -Wmissing-field-initializers
         -Wno-missing-format-attribute
         -Wmissing-include-dirs
+        -Wmultichar
         -Wpacked
         -Wparentheses
         -Wpointer-arith
@@ -179,7 +180,6 @@ sub _init {
         -Wdeprecated-declarations
         -Wno-format-extra-args
         -Wno-import
-        -Wno-multichar
         -Wunreachable-code
         -Wunused
         -Wunused-function
