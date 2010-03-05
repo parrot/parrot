@@ -132,6 +132,7 @@ sub _init {
         -Wpacked
         -Wparentheses
         -Wpointer-arith
+        -Wpointer-sign
         -Wreturn-type
         -Wsequence-point
         -Wno-shadow
@@ -179,7 +180,6 @@ sub _init {
         -Wno-format-extra-args
         -Wno-import
         -Wno-multichar
-        -Wno-pointer-sign
         -Wunreachable-code
         -Wunused
         -Wunused-function
