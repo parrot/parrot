@@ -522,7 +522,7 @@ PBC_TO_EXE          = .@slash@pbc_to_exe$(EXE)
 PARROT_CONFIG       = .@slash@parrot_config$(EXE)
 PIRC                = .@slash@pirc$(EXE)
 NQP_RX              = .@slash@parrot-nqp$(EXE)
-NCI_THUNK_GEN       = ./parrot_nci_thunk_gen$(EXE)
+NCI_THUNK_GEN       = .@slash@parrot_nci_thunk_gen$(EXE)
 
 # Installable executables
 INSTALLABLEPARROT    = .@slash@installable_parrot$(EXE)
@@ -533,7 +533,7 @@ INSTALLABLEPBCTOEXE  = .@slash@installable_pbc_to_exe$(EXE)
 INSTALLABLEPDB       = .@slash@installable_parrot_debugger$(EXE)
 INSTALLABLECONFIG    = .@slash@installable_parrot_config$(EXE)
 INSTALLABLENQP       = .@slash@installable_parrot-nqp$(EXE)
-INSTALLABLENCITHUNKGEN = ./installable_parrot_nci_thunk_gen$(EXE)
+INSTALLABLENCITHUNKGEN = .@slash@installable_parrot_nci_thunk_gen$(EXE)
 
 # Libraries
 LIBPARROT_STATIC    = @blib_dir@/@libparrot_static@
