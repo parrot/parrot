@@ -19,6 +19,7 @@ number types.
 
 .sub main :main
     .include 'test_more.pir'
+    .include 'iglobals.pasm'
 
     plan(130)
 
@@ -153,18 +154,21 @@ number types.
 # print -0.0 as -0
 #
 .sub negate_minus_zero_point_zero
-    .include 'sysinfo.pasm'
-    $S9 = sysinfo .SYSINFO_PARROT_OS
+    .local pmc interp, config_hash
+    .local string has_negative_zero
+    interp = getinterp
+    config_hash = interp[.IGLOBALS_CONFIG_HASH]
+    has_negative_zero = config_hash['has_negative_zero']
 
     set $N0, 0
     neg $N0
     $S0 = $N0
-    if $S9 == 'MSWin32' goto Todo_test1
+    unless has_negative_zero goto Todo_test1
     is( $S0, "-0", '1' )
     goto End_test1
 Todo_test1:
     $I0 = $S0 == "-0"
-    todo($I0, 'Faulty on this platform')
+    todo($I0, 'negative zero, TT #313')
 End_test1:
 
     set $N0, -0.0
@@ -181,12 +185,12 @@ End_test1:
     set $N1, 1
     neg $N1, $N0
     $S0 = $N1
-    if $S9 == 'MSWin32' goto Todo_test4
+    unless has_negative_zero goto Todo_test4
     is( $S0, "-0", '4' )
     goto End_test4
 Todo_test4:
     $I0 = $S0 == "-0"
-    todo($I0, 'Faulty on this platform')
+    todo($I0, 'negative zero, TT #313')
 End_test4:
 .end
 
