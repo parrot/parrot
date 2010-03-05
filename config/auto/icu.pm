@@ -339,8 +339,7 @@ sub _handle_icuheaders {
         if (! -d $icuheaders) {
             $without = 1;
         }
-        my $slash = $conf->data->get('slash');
-        $icuheaders .= "${slash}include";
+        $icuheaders .= "/include";
         if (! -d $icuheaders) {
             $without = 1;
         }

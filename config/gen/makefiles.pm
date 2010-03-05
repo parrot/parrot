@@ -27,12 +27,18 @@ sub _init {
     $data{description} = q{Generate makefiles and other build files};
     $data{result}      = q{};
     $data{makefiles}   = {
-        'Makefile' => { SOURCE => 'config/gen/makefiles/root.in' },
-        'ext/Makefile' => { SOURCE => 'config/gen/makefiles/ext.in', },
+        'Makefile' => {
+            SOURCE => 'config/gen/makefiles/root.in',
+        },
+        'ext/Makefile' => {
+            SOURCE => 'config/gen/makefiles/ext.in',
+        },
+        'compilers/imcc/Rules.mak' => {
+             SOURCE => 'compilers/imcc/Rules.in',
+        },
 
         'ext/Parrot-Embed/Makefile.PL' => {
             SOURCE            => 'config/gen/makefiles/parrot_embed_pl.in',
-            replace_slashes   => 0,
             conditioned_lines => 1,
         },
 
@@ -48,7 +54,6 @@ sub _init {
         'parrot.pc'     => { SOURCE => 'config/gen/makefiles/parrot_pc.in' },
         'docs/Makefile' => { SOURCE => 'config/gen/makefiles/docs.in' },
     };
-    $data{CFLAGS_source} = 'config/gen/makefiles/CFLAGS.in';
     return \%data;
 }
 
@@ -56,34 +61,8 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     $self->makefiles($conf);
-    $self->cflags($conf);
 
     return 1;
-}
-
-sub cflags {
-    my ( $self, $conf ) = @_;
-
-    $conf->genfile( $self->{CFLAGS_source} => 'CFLAGS',
-        comment_type                     => '#'
-    );
-
-    open( my $CFLAGS, ">>", "CFLAGS" ) or die "open >> CFLAGS: $!";
-
-    # Why is this here?  I'd think this information belongs
-    # in the CFLAGS.in file. -- A.D.  March 12, 2004
-    if ( $conf->data->get('cpuarch') =~ /sun4|sparc64/ ) {
-
-        # CFLAGS entries must be left-aligned.
-        print {$CFLAGS} <<"EOF";
-src/jit_cpu.c -{-Wcast-align}        # lots of noise!
-src/nci.c     -{-Wstrict-prototypes} # lots of noise!
-EOF
-    }
-
-    close $CFLAGS;
-
-    return;
 }
 
 sub makefiles {
@@ -96,7 +75,6 @@ sub makefiles {
         : keys %{ $self->{makefiles} };
 
     foreach my $target (@targets) {
-        $target =~ s/\\/\//g if $^O eq 'MSWin32';
         my $args   = $self->{makefiles}->{$target};
         my $source = delete $args->{SOURCE};
 

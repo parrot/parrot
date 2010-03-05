@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 package Parrot::Configure::Step::List;
 use strict;
@@ -23,6 +23,8 @@ my @steps = qw(
     auto::msvc
     auto::attributes
     auto::warnings
+    auto::arch
+    auto::cpu
     init::optimize
     inter::shlibs
     inter::libparrot
@@ -37,10 +39,8 @@ my @steps = qw(
     auto::va_ptr
     auto::format
     auto::isreg
-    auto::arch
     auto::jit
     auto::frames
-    auto::cpu
     auto::cgoto
     auto::inline
     auto::gc

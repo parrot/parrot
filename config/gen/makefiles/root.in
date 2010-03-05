@@ -82,7 +82,9 @@ CC               = @cc@
 CC_INC           = @cc_inc@
 C_LIBS           = @libs@
 CC_SHARED        = @cc_shared@
-CFLAGS           = $(CC_INC) @ccflags@ @cc_build_call_frames@ @cc_debug@ @ccwarn@ @cg_flag@ @gc_flag@ @clock_best@ $(CC_SHARED)
+CC_O_OUT         = @cc_o_out@
+CC_WARN          = @ccwarn@
+CFLAGS           = $(CC_INC) @ccflags@ @cc_build_call_frames@ @cc_debug@ @cg_flag@ @gc_flag@ @clock_best@ $(CC_SHARED)
 LINK_DYNAMIC     = @link_dynamic@
 LINK             = @link@
 LINKFLAGS        = @linkflags@ @link_debug@ @ld_debug@
@@ -140,7 +142,8 @@ GEN_MAKEFILES = \
     editor/Makefile \
     ext/Makefile \
     src/dynoplibs/Makefile \
-    src/dynpmc/Makefile
+    src/dynpmc/Makefile \
+    compilers/imcc/Rules.mak
 
 GEN_CONFIGS = \
     $(INC_DIR)/config.h \
@@ -177,8 +180,6 @@ GEN_CONFIGS = \
 #IF(has_crypto):    t/dynpmc/sha1.t \
 #IF(has_crypto):    t/dynpmc/sha256.t \
 #IF(has_crypto):    t/dynpmc/sha512.t \
-    CFLAGS \
-    compilers/imcc/CFLAGS \
     config_lib.pasm \
     parrot.pc \
     compilers/imcc/imcc.y.flag \
@@ -407,7 +408,9 @@ PARROT_H_HEADERS = \
         include/pmc/pmc_parrotinterpreter.h
 
 # generated list of header files
-GENERAL_H_FILES   = $(NONGEN_HEADERS) $(GEN_HEADERS) @TEMP_cg_h@
+GENERAL_H_FILES   = $(NONGEN_HEADERS) $(GEN_HEADERS) \
+#IF(cg_flag): $(INC_DIR)/oplib/core_ops_cg.h $(INC_DIR)/oplib/core_ops_cgp.h
+
 
 CHARSET_O_FILES   = @TEMP_charset_o@
 CLASS_PMC_FILES   = @TEMP_pmc_classes_pmc@
@@ -493,13 +496,12 @@ INTERP_O_FILES = \
     src/utils$(O) \
     src/vtables$(O) \
     src/warnings$(O) \
-    \
     src/packfile/pf_items$(O) \
-    \
-    @TEMP_cg_o@ \
     @TEMP_atomic_o@ \
     @TEMP_gc_o@ \
 #IF(platform_asm):    src/platform_asm$(O) \
+#IF(cg_flag):     src/ops/core_ops_cg$(O) src/ops/core_ops_cgp$(O) \
+
 
 OPS_FILES = @ops@ $(GEN_OPSFILES)
 
@@ -510,27 +512,27 @@ OPS_FILES = @ops@ $(GEN_OPSFILES)
 ###############################################################################
 
 # Executables
-PARROT              = ./@test_prog@$(EXE)
-MINIPARROT          = ./miniparrot$(EXE)
-DIS                 = ./pbc_disassemble$(EXE)
-PDUMP               = ./pbc_dump$(EXE)
-PBC_MERGE           = ./pbc_merge$(EXE)
-PDB                 = ./parrot_debugger$(EXE)
-PBC_TO_EXE          = ./pbc_to_exe$(EXE)
-PARROT_CONFIG       = ./parrot_config$(EXE)
-PIRC                = ./pirc$(EXE)
-NQP_RX              = ./parrot-nqp$(EXE)
+PARROT              = .@slash@@test_prog@$(EXE)
+MINIPARROT          = .@slash@miniparrot$(EXE)
+DIS                 = .@slash@pbc_disassemble$(EXE)
+PDUMP               = .@slash@pbc_dump$(EXE)
+PBC_MERGE           = .@slash@pbc_merge$(EXE)
+PDB                 = .@slash@parrot_debugger$(EXE)
+PBC_TO_EXE          = .@slash@pbc_to_exe$(EXE)
+PARROT_CONFIG       = .@slash@parrot_config$(EXE)
+PIRC                = .@slash@pirc$(EXE)
+NQP_RX              = .@slash@parrot-nqp$(EXE)
 NCI_THUNK_GEN       = ./parrot_nci_thunk_gen$(EXE)
 
 # Installable executables
-INSTALLABLEPARROT    = ./installable_parrot$(EXE)
-INSTALLABLEDIS       = ./installable_pbc_disassemble$(EXE)
-INSTALLABLEPDUMP     = ./installable_pbc_dump$(EXE)
-INSTALLABLEPBC_MERGE = ./installable_pbc_merge$(EXE)
-INSTALLABLEPBCTOEXE  = ./installable_pbc_to_exe$(EXE)
-INSTALLABLEPDB       = ./installable_parrot_debugger$(EXE)
-INSTALLABLECONFIG    = ./installable_parrot_config$(EXE)
-INSTALLABLENQP       = ./installable_parrot-nqp$(EXE)
+INSTALLABLEPARROT    = .@slash@installable_parrot$(EXE)
+INSTALLABLEDIS       = .@slash@installable_pbc_disassemble$(EXE)
+INSTALLABLEPDUMP     = .@slash@installable_pbc_dump$(EXE)
+INSTALLABLEPBC_MERGE = .@slash@installable_pbc_merge$(EXE)
+INSTALLABLEPBCTOEXE  = .@slash@installable_pbc_to_exe$(EXE)
+INSTALLABLEPDB       = .@slash@installable_parrot_debugger$(EXE)
+INSTALLABLECONFIG    = .@slash@installable_parrot_config$(EXE)
+INSTALLABLENQP       = .@slash@installable_parrot-nqp$(EXE)
 INSTALLABLENCITHUNKGEN = ./installable_parrot_nci_thunk_gen$(EXE)
 
 # Libraries
@@ -569,23 +571,26 @@ MAKE = @make_c@
 
 .SUFFIXES : .c .S .s .pmc .dump $(O) .str .pir .pbc
 
-# Passing an empty argument in @ARGV to cc_flags.pl to indicate where extra -Is
-# (etc) should go. Otherwise it will insert them after the first space, which
-# makes life go horribly wrong if $(CC) contains spaces but can't have -I
-# arguments (etc) injected in the middle.
-# There is probably a better way to do this, but I can't work it out right now.
 .c$(O) : # suffix rule (limited support)
-	@$(PERL) tools/build/cc_flags.pl ./CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
-
-# XXX probably should detect assembler, but right now this is only used on Sparc
+	$(CC) $(CFLAGS) @optimize@ $(CC_WARN) -I$(@D) @cc_o_out@$@ -c $<
 
 .s$(O) : # suffix rule (limited support)
-	@$(PERL) tools/build/cc_flags.pl ./CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
+	$(CC) $(CFLAGS) @optimize@ $(CC_WARN) -I$(@D) @cc_o_out@$@ -c $<
 #UNLESS(win32).S$(O) : # suffix rule (limited support)
-#UNLESS(win32)	@$(PERL) tools/build/cc_flags.pl ./CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
+#UNLESS(win32)	$(CC) $(CFLAGS) @optimize@ $(CC_WARN) -I$(@D) @cc_o_out@$@ -c $<
 
 .pir.pbc : # suffix rule (limited support)
 	$(PARROT) -o $@ $<
+
+# Note: Several rules in this makefile are tagged with a "SUFFIX OVERRIDE"
+# comment; this indicates that we have an explicit compilation rule for
+# that particular C file; this is done so that we override various
+# options for that file - to change optimization levels, or twiddle
+# warnings. Each of those overrides should use the most specific settings
+# possible for that file. When file-specific overrides are added during
+# Configure, the override must be allowed for in this file.
+# These will eventually be automatically generated.
+
 
 ###############################################################################
 #
@@ -615,7 +620,6 @@ all : \
     $(NQP_LIB_PBCS)
 
 corevm : \
-    flags_dummy \
 	$(GEN_PM_INCLUDES) \
     PARROT_LIBS \
     $(PARROT) \
@@ -805,17 +809,13 @@ parrot_utils : $(PDUMP) $(DIS) $(PDB) $(PBC_MERGE) $(PBC_TO_EXE) $(PARROT_CONFIG
 installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPDB) $(INSTALLABLEPBC_MERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG) $(INSTALLABLENQP) $(INSTALLABLENCITHUNKGEN)
 
 
-flags_dummy :
-	@echo "Compiling with:"
-	@$(PERL) tools/build/cc_flags.pl ./CFLAGS echo $(CC) $(CFLAGS) -I$(@D) @cc_o_out@ xx$(O) -c xx.c
-
 runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.pir $(PARROT) $(GEN_PASM_INCLUDES)
 	$(PARROT) -o $@ runtime/parrot/library/parrotlib.pir
 
 runtime/parrot/include/config.fpmc : myconfig config_lib.pasm $(MINIPARROT)
 	$(MINIPARROT) config_lib.pasm > $@
 
-$(PARROT) : src/main$(O) $(GEN_HEADERS) $(LIBPARROT) CFLAGS \
+$(PARROT) : src/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     lib/Parrot/OpLib/core.pm src/parrot_config$(O) \
     $(MINIPARROT)
 	$(LINK) @ld_out@$@ \
@@ -1148,7 +1148,7 @@ examples-clean:
 
 # hello
 hello: test_prep examples/pasm/hello$(EXE)
-	./examples/pasm/hello$(EXE) "from your friendly makefile"
+	.@slash@examples@slash@pasm@slash@hello$(EXE) "from your friendly makefile"
 
 examples/pasm/hello.pbc: examples/pasm/hello.pasm
 	$(PARROT) -o examples/pasm/hello.pbc examples/pasm/hello.pasm
@@ -1253,8 +1253,10 @@ src/thread$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/atomic.h \
         include/pmc/pmc_sub.h \
 	include/pmc/pmc_parrotinterpreter.h
 
+## SUFFIX OVERRIDE - dynloaded files need cc_shared
 src/extend$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/extend.h \
-	include/pmc/pmc_sub.h $(INC_DIR)/extend_vtable.h
+    include/pmc/pmc_sub.h $(INC_DIR)/extend_vtable.h src/extend.c
+	$(CC) $(CFLAGS) @optimize::src/extend.c@ @ccwarn::src/extend.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/extend.c
 
 src/runcore/main$(O) : \
 	src/runcore/main.str \
@@ -1394,10 +1396,13 @@ src/nci/core_thunks$(O) : src/nci/core_thunks.str \
         include/pmc/pmc_unmanagedstruct.h \
         include/pmc/pmc_nci.h
 
+## SUFFIX OVERRIDE
 src/nci/extra_thunks$(O) : src/nci/extra_thunks.str \
-        $(PARROT_H_HEADERS) \
-        include/pmc/pmc_unmanagedstruct.h \
-        include/pmc/pmc_nci.h
+    $(PARROT_H_HEADERS) \
+    include/pmc/pmc_unmanagedstruct.h \
+    include/pmc/pmc_nci.h \
+    src/nci/extra_thunks.c
+	$(CC) $(CFLAGS) @optimize::src/nci/extra_thunks.c@ @ccwarn::src/nci/extra_thunks.c@ @cc_shared@ -I$(@D) @cc_o_out@ $@ -c src/nci/extra_thunks.c
 
 src/frame_builder$(O) : $(PARROT_H_HEADERS) src/frame_builder.h \
         include/pmc/pmc_fixedintegerarray.h \
@@ -1407,7 +1412,10 @@ src/frame_builder$(O) : $(PARROT_H_HEADERS) src/frame_builder.h \
 
 src/vtables$(O) : $(PARROT_H_HEADERS)
 
+## SUFFIX OVERRIDE
 src/gc/system$(O) : $(PARROT_H_HEADERS)  src/gc/gc_private.h
+	$(CC) $(CFLAGS) @optimize::src/gc/system.c@ @ccwarn::src/gc/system.c@ @cc_shared@ -I$(@D) @cc_o_out@ $@ -c src/gc/system.c
+
 src/gc/gc_private.h : $(INC_DIR)/settings.h
 
 src/warnings$(O) : $(PARROT_H_HEADERS)
@@ -1416,7 +1424,9 @@ src/misc$(O) : $(PARROT_H_HEADERS)
 
 src/utils$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_nci.h
 
+## SUFFIX OVERRIDE
 src/spf_render$(O) : $(PARROT_H_HEADERS) src/spf_render.str
+	$(CC) $(CFLAGS) @optimize::src/spf_render.c@ @ccwarn::src/spf_render.c@ @cc_shared@ -I$(@D) @cc_o_out@ $@ -c src/spf_render.c
 
 src/spf_vtable$(O) : $(PARROT_H_HEADERS) src/spf_vtable.str
 
@@ -1449,15 +1459,14 @@ src/packfile/pf_items$(O) : $(PARROT_H_HEADERS)
 
 src/atomic/gcc_x86$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/atomic/gcc_x86.h
 
-src/ops/core_ops$(O) : src/ops/core_ops.c \
-	include/pmc/pmc_callcontext.h \
-	include/pmc/pmc_continuation.h \
-        include/pmc/pmc_parrotlibrary.h \
-        src/io/io_private.h $(INC_DIR)/dynext.h $(INC_DIR)/embed.h \
-        $(INC_DIR)/oplib/core_ops.h $(INC_DIR)/runcore_api.h
-
 # core_ops depends upon config.h so that it gets updated along with
 # updates to config.h's version numbers
+src/ops/core_ops$(O) : src/ops/core_ops.c \
+    include/pmc/pmc_callcontext.h \
+    include/pmc/pmc_continuation.h \
+    include/pmc/pmc_parrotlibrary.h \
+    src/io/io_private.h $(INC_DIR)/dynext.h $(INC_DIR)/embed.h \
+    $(INC_DIR)/oplib/core_ops.h $(INC_DIR)/runcore_api.h
 
 # .h files are built along with .c
 $(INC_DIR)/oplib/core_ops.h: src/ops/core_ops.c
@@ -1468,8 +1477,10 @@ src/ops/core_ops.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl \
 	include/pmc/pmc_continuation.h
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --core @no_lines_flag@
 
+## SUFFIX OVERRIDE
 src/ops/core_ops_switch$(O) : $(GENERAL_H_FILES) src/ops/core_ops_switch.c \
 	include/pmc/pmc_parrotlibrary.h
+	$(CC) $(CFLAGS) @optimize::src/ops/core_ops_switch.c@ @ccwarn::src/ops/core_ops_switch.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/ops/core_ops_switch.c
 
 $(INC_DIR)/oplib/core_ops_switch.h : src/ops/core_ops_switch.c
 
@@ -1479,7 +1490,27 @@ src/ops/core_ops_switch.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl \
 	lib/Parrot/OpTrans/CPrederef.pm
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl CSwitch --core @no_lines_flag@
 
-@TEMP_cg_c@
+## SUFFIX OVERRIDE
+src/ops/core_ops_cg$(O): $(GENERAL_H_FILES) src/ops/core_ops_cg.c \
+        include/pmc/pmc_parrotlibrary.h
+	$(CC) $(CFLAGS) @optimize::src/ops/core_ops_cg.c@ @ccwarn::src/ops/core_ops_cg.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/ops/core_ops_cg.c
+
+## SUFFIX OVERRIDE
+src/ops/core_ops_cgp$(O): $(GENERAL_H_FILES) src/ops/core_ops_cgp.c \
+        include/pmc/pmc_parrotlibrary.h
+	$(CC) $(CFLAGS) @optimize::src/ops/core_ops_cgp.c@ @ccwarn::src/ops/core_ops_cgp.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/ops/core_ops_cgp.c
+
+src/runcore/cores.c: $(INC_DIR)/oplib/core_ops_cgp.h
+
+$(INC_DIR)/oplib/core_ops_cg.h: src/ops/core_ops_cg.c
+
+src/ops/core_ops_cg.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm lib/Parrot/OpTrans/CGoto.pm lib/Parrot/OpLib/core.pm
+	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl CGoto --core
+
+$(INC_DIR)/oplib/core_ops_cgp.h: src/ops/core_ops_cgp.c
+
+src/ops/core_ops_cgp.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm lib/Parrot/OpTrans/CGP.pm lib/Parrot/OpLib/core.pm lib/Parrot/OpTrans/CPrederef.pm
+	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl CGP --core
 
 @TEMP_gc_c@
 
@@ -1810,7 +1841,8 @@ clean : \
     ext-clean \
 #UNLESS(win32):    cover-clean \
     editor-clean
-	@TEMP_cg_r@
+	$(RM_F) $(INC_DIR)/oplib/core_ops_cg.h src/ops/core_ops_cg.c \
+    $(INC_DIR)/oplib/core_ops_cgp.h src/ops/core_ops_cgp.c
 	$(RM_F) chartypes "*.s" "*~"
 	$(RM_F) $(FLUID_FILES_1)
 	$(RM_F) $(FLUID_FILES_2)
@@ -2411,7 +2443,9 @@ exec : src/parrot_config$(O) $(LIBPARROT)
 ###### OS depend targets ##########
 
 # for use by t/pmc/nci.t
-src/nci_test$(O): $(PARROT_H_HEADERS)
+## SUFFIX OVERRIDE - dynloaded files need cc_shared
+src/nci_test$(O): $(PARROT_H_HEADERS) src/nci_test.c
+	$(CC) $(CFLAGS) @optimize::src/nci_test.c@ @ccwarn::src/nci_test.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/nci_test.c
 
 $(LIBNCI_TEST_SO): src/nci_test$(O) $(LIBPARROT)
 	$(LD) $(LD_LOAD_FLAGS) @ncilib_link_extra@ $(LDFLAGS) \
@@ -2438,7 +2472,9 @@ src/extra_nci_thunks.c : src/nci/extra_thunks.nci $(NCI_THUNK_GEN)
 	$(NCI_THUNK_GEN) --dynext --no-warn-dups \
 	    --output=src/extra_nci_thunks.c <src/nci/extra_thunks.nci
 
-src/extra_nci_thunks$(O) : $(GENERAL_H_FILES)
+## SUFFIX OVERRIDE
+src/extra_nci_thunks$(O) : $(GENERAL_H_FILES) src/extra_nci_thunks.c
+	$(CC) $(CFLAGS) @optimize::src/extra_nci_thunks.c@ @ccwarn::src/extra_nci_thunks.c@ @cc_shared@ -I$(@D) @cc_o_out@ $@ -c src/extra_nci_thunks.c
 
 $(EXTRANCITHUNKS_SO) : $(LIBPARROT) src/extra_nci_thunks$(O)
 	$(LD) $(LD_LOAD_FLAGS) $(LDFLAGS) \

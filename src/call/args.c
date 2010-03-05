@@ -794,7 +794,6 @@ Parrot_pcc_build_sig_object_returns_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *sig
     PMC            *call_object;
     INTVAL         *int_array;
     PMC            * const ctx  = CURRENT_CONTEXT(interp);
-    INTVAL          returns_pos = 0;
     INTVAL          arg_index;
     INTVAL          arg_count;
 
@@ -820,7 +819,6 @@ Parrot_pcc_build_sig_object_returns_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *sig
     GETATTR_FixedIntegerArray_int_array(interp, raw_sig, int_array);
 
     for (arg_index = 0; arg_index < arg_count; arg_index++) {
-        STRING * const signature = CONST_STRING(interp, "signature");
         const INTVAL arg_flags = int_array[arg_index];
         const INTVAL raw_index = raw_args[arg_index + 2];
 
@@ -881,7 +879,6 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
         ARGIN(const char *sig), va_list args)
 {
     ASSERT_ARGS(Parrot_pcc_build_sig_object_from_varargs)
-    PMC         *type_tuple         = PMCNULL;
     PMC         *arg_flags     = PMCNULL;
     PMC         *return_flags  = PMCNULL;
     PMC         * const call_object = Parrot_pmc_new(interp, enum_class_CallContext);
@@ -902,7 +899,6 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
         const INTVAL type = sig[i];
 
         if (in_return_sig) {
-            STRING * const signature = CONST_STRING(interp, "signature");
             /* Returns store the original passed-in pointer so they can pass
              * the result back to the caller. */
             switch (type) {
@@ -1587,13 +1583,11 @@ fill_results(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
     INTVAL *return_array       = NULL;
     INTVAL *result_array       = NULL;
     PMC    *result_sig         = NULL;
-    PMC    * const ctx         = CURRENT_CONTEXT(interp);
     PMC    *named_used_list    = PMCNULL;
     PMC    *named_return_list  = PMCNULL;
     INTVAL  return_index       = 0;
     INTVAL  return_subindex    = 0;
     INTVAL  result_index       = 0;
-    INTVAL  positional_index   = 0;
     INTVAL  named_count        = 0;
     INTVAL  err_check          = 0;
     INTVAL  positional_returns = 0; /* initialized by a loop later */
@@ -2740,6 +2734,7 @@ static INTVAL
 intval_constant_from_varargs(PARROT_INTERP, ARGIN(void *data), INTVAL index)
 {
     ASSERT_ARGS(intval_constant_from_varargs)
+    UNUSED(index);
     PARROT_ASSERT(!"Wrong call");
     return 0;
 }
@@ -2748,6 +2743,7 @@ static FLOATVAL
 numval_constant_from_varargs(PARROT_INTERP, ARGIN(void *data), INTVAL index)
 {
     ASSERT_ARGS(numval_constant_from_varargs)
+    UNUSED(index);
     PARROT_ASSERT(!"Wrong call");
     return 0.0;
 }
@@ -2757,6 +2753,7 @@ static STRING*
 string_constant_from_varargs(PARROT_INTERP, ARGIN(void *data), INTVAL index)
 {
     ASSERT_ARGS(string_constant_from_varargs)
+    UNUSED(index);
     PARROT_ASSERT(!"Wrong call");
     return NULL;
 }
@@ -2766,6 +2763,7 @@ static PMC*
 pmc_constant_from_varargs(PARROT_INTERP, ARGIN(void *data), INTVAL index)
 {
     ASSERT_ARGS(pmc_constant_from_varargs)
+    UNUSED(index);
     PARROT_ASSERT(!"Wrong call");
     return PMCNULL;
 }
@@ -3133,7 +3131,6 @@ Parrot_pcc_append_result(PARROT_INTERP, ARGIN(PMC *sig_object), ARGIN(STRING *ty
     INTVAL  int_type;
 
     Parrot_String return_flags_name = Parrot_str_new_constant(interp, "return_flags");
-    Parrot_String sig_name          = Parrot_str_new_constant(interp, "signature");
 
     full_sig = VTABLE_get_string(interp, sig_object);
     /* Append ->[T] */

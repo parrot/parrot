@@ -75,8 +75,7 @@ END
     }
 
     # build list of libraries for link line in Makefile
-    my $slash = $conf->data->get('slash');
-    $TEMP_encoding_o =~ s/^| / src${slash}string${slash}encoding${slash}/g;
+    $TEMP_encoding_o =~ s{^| }{ src/string/encoding/}g;
 
     $conf->data->set(
         encoding            => $encoding_list,

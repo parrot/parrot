@@ -193,34 +193,6 @@ static void rat_divide_float(PARROT_INTERP, PMC *self, double value) {
 
 /*
 
-=item * static void rat_power_int(PARROT_INTERP, PMC *self, int value)
-
-Calculates the power of a Rational-PMC to an exponent value in-place.
-
-=cut
-
-*/
-static void rat_power_int(PARROT_INTERP, PMC *self, int value) {
-  #ifdef PARROT_HAS_GMP
-    mpz_t num, den;
-
-    mpq_get_num(num, RT(self));
-    mpq_get_den(den, RT(self));
-
-    mpz_pow_ui(num, num, (unsigned int) value);
-    mpq_set_num(RT(self), num);
-    mpz_clear(num);
-
-    mpz_pow_ui(den, den, (unsigned int) value);
-    mpq_set_den(RT(self), den);
-    mpz_clear(den);
-  #else
-    RAISE_EXCEPTION
-  #endif
-}
-
-/*
-
 =back
 
 =cut

@@ -2826,7 +2826,6 @@ pf_debug_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
     const PackFile_Debug * const debug = (const PackFile_Debug *)self;
 
     opcode_t i;
-    size_t   j;
 
     default_dump_header(interp, self);
 

@@ -2822,9 +2822,6 @@ Parrot_str_unescape(PARROT_INTERP,
     const CHARSET  *charset;
     const ENCODING *encoding = NULL;
 
-    /* the default encoding is ascii */
-    const char     *enc_name = enc_char ? enc_char : "ascii";
-
     /* does the encoding have a character set? */
     const char     *p        = enc_char ? strchr(enc_char, ':') : NULL;
     size_t          clength  = strlen(cstring);

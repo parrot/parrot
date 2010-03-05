@@ -41,12 +41,6 @@ static void free_buffer(SHIM_INTERP,
         FUNC_MODIFIES(*pool)
         FUNC_MODIFIES(*b);
 
-static void free_buffer_malloc(SHIM_INTERP,
-    SHIM(Fixed_Size_Pool *pool),
-    ARGMOD(Buffer *b))
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*b);
-
 static void free_pmc_in_pool(PARROT_INTERP,
     ARGIN(Memory_Pools *mem_pools),
     SHIM(Fixed_Size_Pool *pool),
@@ -98,8 +92,6 @@ static PMC_Attribute_Pool * Parrot_gc_create_attrib_pool(PARROT_INTERP,
        PARROT_ASSERT_ARG(mem_pools) \
     , PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(b))
-#define ASSERT_ARGS_free_buffer_malloc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(b))
 #define ASSERT_ARGS_free_pmc_in_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(mem_pools) \
@@ -287,8 +279,6 @@ Parrot_gc_sweep_pool(PARROT_INTERP,
     gc_object_fn_type   gc_object   = pool->gc_object;
     UINTVAL             total_used  = 0;
     const UINTVAL       object_size = pool->object_size;
-    UINTVAL             i;
-
 
     /* Run through all the PObj header pools and mark */
     for (cur_arena = pool->last_Arena; cur_arena; cur_arena = cur_arena->prev) {
@@ -472,7 +462,6 @@ Parrot_add_to_free_list(PARROT_INTERP,
         ARGMOD(Fixed_Size_Arena *arena))
 {
     ASSERT_ARGS(Parrot_add_to_free_list)
-    UINTVAL  i;
     void    *object;
     const UINTVAL num_objects = pool->objects_per_alloc;
 
@@ -704,42 +693,6 @@ new_string_pool(PARROT_INTERP,
     pool->objects_per_alloc = STRING_HEADERS_PER_ALLOC;
 
     return pool;
-}
-
-/*
-
-=item C<static void free_buffer_malloc(PARROT_INTERP, Fixed_Size_Pool *pool,
-Buffer *b)>
-
-Frees the given buffer, returning the storage space to the operating system
-and removing it from Parrot's memory management system. If the buffer is COW,
-The buffer is not freed if the reference count is greater then 1.
-
-=cut
-
-*/
-
-static void
-free_buffer_malloc(SHIM_INTERP, SHIM(Fixed_Size_Pool *pool),
-        ARGMOD(Buffer *b))
-{
-    ASSERT_ARGS(free_buffer_malloc)
-    /* free allocated space at (int *)bufstart - 1, but not if it used COW or is
-     * external */
-    Buffer_buflen(b) = 0;
-
-    if (!Buffer_bufstart(b) || PObj_is_external_or_free_TESTALL(b))
-        return;
-
-    if (PObj_COW_TEST(b)) {
-        INTVAL * const refcount = Buffer_bufrefcountptr(b);
-
-        if (--(*refcount) == 0) {
-            mem_sys_free(refcount); /* the actual bufstart */
-        }
-    }
-    else
-        mem_sys_free(Buffer_bufrefcountptr(b));
 }
 
 /*
@@ -1035,9 +988,8 @@ static void
 Parrot_gc_allocate_new_attributes_arena(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool *pool))
 {
     ASSERT_ARGS(Parrot_gc_allocate_new_attributes_arena)
-    PMC_Attribute_Free_List *list, *next, *first;
+    PMC_Attribute_Free_List *next;
 
-    size_t       i;
     const size_t num_items  = pool->objects_per_alloc;
     const size_t item_size  = pool->attr_size;
     const size_t item_space = item_size * num_items;

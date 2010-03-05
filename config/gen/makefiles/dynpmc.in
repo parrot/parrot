@@ -8,19 +8,19 @@ CHMOD         = @chmod@
 LOAD_EXT      = @load_ext@
 BUILD_DIR     = @build_dir@
 RECONFIGURE   = $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
-INSTALL_DIR   = $(BUILD_DIR)@slash@runtime@slash@parrot@slash@dynext
+INSTALL_DIR   = $(BUILD_DIR)/runtime/parrot/dynext
 O             = @o@
 CC            = @cc@
 LD            = @ld@
 LDFLAGS       = @ldflags@ @ld_debug@ @rpath_blib@
 LD_LOAD_FLAGS = @ld_load_flags@
-CFLAGS        = @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@
+CFLAGS        = @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@ @optimize@
 LIBPARROT     = @libparrot_ldflags@
 
-BUILD_TOOLS_DIR = $(BUILD_DIR)@slash@tools@slash@build
-BUILD_LIB_DIR   = $(BUILD_DIR)@slash@blib@slash@lib
-PMC2C           = $(PERL) $(BUILD_TOOLS_DIR)@slash@pmc2c.pl
-INCLUDES        = -I$(BUILD_DIR)@slash@include -I@build_dir@@slash@include@slash@pmc
+BUILD_TOOLS_DIR = $(BUILD_DIR)/tools/build
+BUILD_LIB_DIR   = $(BUILD_DIR)/blib/lib
+PMC2C           = $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl
+INCLUDES        = -I$(BUILD_DIR)/include -I@build_dir@/include/pmc
 LINKARGS        = $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT) @icu_shared@ @libs@
 
 PMC2CD = $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --dump

@@ -77,17 +77,6 @@ Overall design heavily inspired by C<Tie::StoredOrderHash>.
 
 */
 
-/* Create new stored item. FixedPMCArray of (key, value, prev, next). */
-static PMC*
-create_item(PARROT_INTERP, ARGIN(PMC *key), ARGIN(PMC *value)) {
-    PMC *ret = Parrot_pmc_new(interp, enum_class_FixedPMCArray);
-    VTABLE_set_integer_native(interp, ret, ORDERED_HASH_ITEM_MAX);
-
-    VTABLE_set_pmc_keyed_int(interp, ret, ORDERED_HASH_ITEM_KEY, key);
-    VTABLE_set_pmc_keyed_int(interp, ret, ORDERED_HASH_ITEM_VALUE, value);
-    return ret;
-}
-
 /* Get list_item by index */
 static PMC*
 get_list_item(PARROT_INTERP, ARGIN(PMC *self), INTVAL idx) {

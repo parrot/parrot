@@ -101,7 +101,6 @@ sub runstep {
             ar_flags            => '',
             ar_out              => '-out:',
             slash               => '\\',
-            blib_dir            => 'blib\\lib',
             ccflags             => $ccflags,
             ccwarn              => $ccwarn,
             has_dynamic_linking => 1,
@@ -153,7 +152,6 @@ sub runstep {
             ar_flags            => '',
             ar_out              => '-out:',
             slash               => '\\',
-            blib_dir            => 'blib\\lib',
             ccflags             => $ccflags,
             ccwarn              => '',
             has_dynamic_linking => 1
@@ -200,7 +198,6 @@ sub runstep {
             ar_out   => '',
             ar_extra => '',
             slash    => '\\',
-            blib_dir => 'blib\\lib',
             make_and => "\n\t",
         );
     }
@@ -261,7 +258,6 @@ sub runstep {
             sym_export          => '__declspec(dllexport)',
             sym_import          => '__declspec(dllimport)',
             slash               => '\\',
-            blib_dir            => 'blib\\lib',
         );
     }
 }

@@ -14,12 +14,12 @@ CC            = @cc@
 LD            = @ld@
 LDFLAGS       = @ldflags@ @ld_debug@ @rpath_blib@ @linkflags@
 LD_LOAD_FLAGS = @ld_load_flags@
-CFLAGS        = @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@
+CFLAGS        = @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@ @optimize@
 LIBPARROT     = @libparrot_ldflags@
 
-BUILD_TOOLS_DIR = $(BUILD_DIR)@slash@tools@slash@build
-OPS2C           = $(PERL) -I$(BUILD_DIR)@slash@lib $(BUILD_TOOLS_DIR)@slash@ops2c.pl
-INCLUDES        = -I$(BUILD_DIR)@slash@include -I@build_dir@@slash@src@slash@pmc
+BUILD_TOOLS_DIR = $(BUILD_DIR)/tools/build
+OPS2C           = $(PERL) -I$(BUILD_DIR)/lib $(BUILD_TOOLS_DIR)/ops2c.pl
+INCLUDES        = -I$(BUILD_DIR)/include -I@build_dir@/src/pmc
 LINKARGS        = $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT) @icu_shared@ @libs@
 
 OPS_TARGETS = \

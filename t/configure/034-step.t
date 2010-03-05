@@ -114,7 +114,7 @@ END_DUMMY
         \$stderr
     );
     ok($rv, "genfile() returned true when warning expected" );
-    like( $stderr, qr/value for 'foobar'/, "got expected warning" );
+    like( $stderr, qr/value for '\@foobar\@'/, "got expected warning" );
 
     unlink $dummy or croak "Unable to delete file after testing";
     chdir $cwd    or croak "Unable to change back to starting directory";

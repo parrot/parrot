@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2005, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -21,10 +21,10 @@ use base qw(Parrot::Configure::Step);
 
 sub _init {
     my $self = shift;
-    my %data;
-    $data{description} = q{Enable optimization};
-    $data{result}      = q{};
-    return \%data;
+    return {
+        'description', 'Enable optimization',
+        'result',      '',
+    };
 }
 
 our $verbose;
@@ -41,41 +41,53 @@ sub runstep {
     # A plain --optimize means use perl5's $Config{optimize}.  If an argument
     # is given, however, use that instead.
     my $optimize = $conf->options->get('optimize');
-    if ( defined $optimize ) {
-        $self->set_result('yes');
 
-        # disable debug flags
-        $conf->data->set( cc_debug => '' );
-        $conf->data->add( ' ', ccflags => "-DDISABLE_GC_DEBUG=1 -DNDEBUG" );
-        if ( $optimize eq "1" ) {
+    if (! defined $optimize) {
+        $self->set_result('no');
+        print "(none requested) " if $conf->options->get('verbose');
+        return 1;
+    }
 
-            # use perl5's value
-            # gcc 4.1 doesn't like -mcpu=xx, i.e. it's deprecated
-            my $opts = $conf->data->get('optimize_provisional');
-            my $gccversion = $conf->data->get( 'gccversion' );
-            my $arch_opt = 'cpu';
-            if ( defined $gccversion and $gccversion > 3.3 ) {
-                $arch_opt = 'arch';
-            }
-            $opts =~ s/-mcpu=/-m$arch_opt=/;
-            $conf->data->add( ' ', ccflags => $opts );
-            print "opts: ", $opts, "\n" if $verbose;
+    $self->set_result('yes');
+    my $gccversion = $conf->data->get( 'gccversion' );
 
-            # record what optimization was enabled
-            $conf->data->set( optimize => $opts );
-        }
-        else {
+    my $options;
+    if ( $optimize eq "1" ) {
+        # start with perl5's flags ...
+        $options = $conf->data->get('optimize_provisional');
 
-            # use what was passed to --optimize on the CLI
-            $conf->data->add( ' ', ccflags => $optimize );
-
-            # record what optimization was enabled
-            $conf->data->set( optimize => $optimize );
+        # ... but gcc 4.1 doesn't like -mcpu=xx, i.e. it's deprecated
+        if ( defined $gccversion and $gccversion > 3.3 ) {
+            $options =~ s/-mcpu=/-march=/;
         }
     }
     else {
-        $self->set_result('no');
-        print "(none requested) " if $conf->options->get('verbose');
+        # use the command line verbatim
+        $options = $optimize;
+    }
+
+    # save the options, however we got them.
+    $conf->data->set( optimize => $options );
+    print "optimize options: ", $options, "\n" if $verbose;
+
+    # disable debug flags.
+    $conf->data->set( cc_debug => '' );
+    $conf->data->add( ' ', ccflags => "-DDISABLE_GC_DEBUG=1 -DNDEBUG" );
+
+    # per file overrides - not every compiler can optimize every file.
+
+    # The src/ops/core_ops*.c files are challenging to optimize.
+    # gcc can usually handle it, but don't assume any other compilers can,
+    # until there is specific evidence otherwise.
+    if ( ! defined($gccversion)) {
+        $conf->data->set('optimize::src/ops/core_ops_cg.c','');
+        $conf->data->set('optimize::src/ops/core_ops_cgp.c','');
+        $conf->data->set('optimize::src/ops/core_ops_switch.c','');
+    }
+
+    # TT #405
+    if ($conf->data->get('cpuarch') eq 'amd64') {
+        $conf->data->set('optimize::src/gc/system.c','');
     }
 
     return 1;

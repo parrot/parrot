@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  45;
+use Test::More tests =>  25;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::cgoto');
@@ -37,10 +37,6 @@ my $step = test_step_constructor_and_description($conf);
 my $ret = $step->runstep($conf);
 ok( $ret, "runstep() returned true value" );
 ok(defined($step->result()), "A result was defined");
-ok(defined($conf->data->get('TEMP_cg_h')), "An attribute has been defined");
-ok(defined($conf->data->get('TEMP_cg_c')), "An attribute has been defined");
-ok(defined($conf->data->get('TEMP_cg_o')), "An attribute has been defined");
-ok(defined($conf->data->get('TEMP_cg_r')), "An attribute has been defined");
 ok(defined($conf->data->get('cg_flag')), "An attribute has been defined");
 
 $conf->replenish($serialized);
@@ -68,18 +64,10 @@ ok(defined(auto::cgoto::_probe_for_cgoto($conf)),
 ########### _evaluate_cgoto() ###########
 
 $step->_evaluate_cgoto($conf, 1);
-ok($conf->data->get('TEMP_cg_h'), "An attribute was set to true value");
-ok($conf->data->get('TEMP_cg_c'), "An attribute was set to true value");
-ok($conf->data->get('TEMP_cg_o'), "An attribute was set to true value");
-ok($conf->data->get('TEMP_cg_r'), "An attribute was set to true value");
 ok($conf->data->get('cg_flag'), "An attribute was set to true value");
 is($step->result(), q{yes}, "Expected result was set");
 
 $step->_evaluate_cgoto($conf, 0);
-is($conf->data->get('TEMP_cg_h'), q{}, "An attribute was set to empty string");
-is($conf->data->get('TEMP_cg_c'), q{}, "An attribute was set to empty string");
-is($conf->data->get('TEMP_cg_o'), q{}, "An attribute was set to empty string");
-is($conf->data->get('TEMP_cg_r'), q{}, "An attribute was set to empty string");
 is($conf->data->get('cg_flag'), q{}, "An attribute was set to empty string");
 is($step->result(), q{no}, "Expected result was set");
 
@@ -99,10 +87,6 @@ $step = test_step_constructor_and_description($conf);
         sub { $step->_evaluate_cgoto($conf, 1) },
         \$stdout
     );
-    ok($conf->data->get('TEMP_cg_h'), "An attribute was set to true value");
-    ok($conf->data->get('TEMP_cg_c'), "An attribute was set to true value");
-    ok($conf->data->get('TEMP_cg_o'), "An attribute was set to true value");
-    ok($conf->data->get('TEMP_cg_r'), "An attribute was set to true value");
     ok($conf->data->get('cg_flag'), "An attribute was set to true value");
     is($step->result(), q{yes}, "Expected result was set");
 }
@@ -113,14 +97,6 @@ $step = test_step_constructor_and_description($conf);
         sub { $step->_evaluate_cgoto($conf, 0) },
         \$stdout
     );
-    is($conf->data->get('TEMP_cg_h'), q{},
-        "An attribute was set to empty string");
-    is($conf->data->get('TEMP_cg_c'), q{},
-        "An attribute was set to empty string");
-    is($conf->data->get('TEMP_cg_o'), q{},
-        "An attribute was set to empty string");
-    is($conf->data->get('TEMP_cg_r'), q{},
-        "An attribute was set to empty string");
     is($conf->data->get('cg_flag'), q{},
         "An attribute was set to empty string");
     is($step->result(), q{no}, "Expected result was set");

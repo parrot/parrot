@@ -39,7 +39,7 @@ the ManagedStruct PMC as it is garbage collected.
 */
 
 void
-Parrot_jit_free_buffer(PARROT_INTERP, void *ptr, void *priv)
+Parrot_jit_free_buffer(SHIM_INTERP, void *ptr, void *priv)
 {
     const struct jit_buffer_private_data * const jit = (struct jit_buffer_private_data*)priv;
     mem_free_executable(ptr, jit->size);
@@ -311,6 +311,8 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
     int args_offset        = st_offset - stack_space_needed;
     int temp_calls_offset  = args_offset - 16;
     int total_stack_needed = -temp_calls_offset;
+
+    UNUSED(pmc_nci);
 
     /*
      * ESP

@@ -724,7 +724,6 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
     ASSERT_ARGS(pbc_merge_begin)
     PackFile_ByteCode   *bc;
     PackFile_ConstTable *ct;
-    opcode_t             const_count = 0;
     int                  i;
 
     /* Create a new empty packfile. */

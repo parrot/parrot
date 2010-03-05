@@ -45,7 +45,6 @@ sub new {
             'Configuration',
             '',
             $self->new_item( '', 'tools/dev/as2c.pl' ),
-            $self->new_item( '', 'tools/build/cc_flags.pl' ),
             $self->new_item( '', 'tools/build/vtable_h.pl' ),
             $self->new_item( '', 'tools/build/vtable_extend.pl' ),
         ),

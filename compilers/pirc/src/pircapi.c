@@ -180,6 +180,7 @@ void
 parse_string(PARROT_INTERP, ARGIN(char *pirstring), int flags, int pasminput,
     unsigned macro_size)
 {
+    ASSERT_ARGS(parse_string)
     yyscan_t            yyscanner;
     lexer_state        *lexer = NULL;
     char                name[64];

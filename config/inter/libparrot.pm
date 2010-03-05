@@ -105,7 +105,7 @@ sub runstep {
                                      && $conf->data->get('rpath') )
         ? $conf->data->get('rpath')
             . $conf->data->get('build_dir')
-            . $conf->data->get('slash')
+            . '/'
             . $conf->data->get('blib_dir')
         : ''
     );
@@ -144,7 +144,7 @@ sub runstep {
         $conf->data->set(libparrot_linkflags =>
         '-L'
         . $conf->data->get('build_dir')
-        . $conf->data->get('slash')
+        . '/'
         . $conf->data->get('blib_dir')
         . ' -lparrot'
         );

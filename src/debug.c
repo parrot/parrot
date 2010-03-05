@@ -111,45 +111,11 @@ static unsigned long get_ulong(ARGMOD(const char **cmd), unsigned long def)
 static void list_breakpoints(ARGIN(PDB_t *pdb))
         __attribute__nonnull__(1);
 
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static const char * nextarg(ARGIN_NULLOK(const char *command));
-
 static void no_such_register(PARROT_INTERP,
     char register_type,
     UINTVAL register_num)
         __attribute__nonnull__(1);
 
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static const char * parse_int(ARGIN(const char *str), ARGOUT(int *intP))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*intP);
-
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static const char* parse_key(PARROT_INTERP,
-    ARGIN(const char *str),
-    ARGOUT(PMC **keyP))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*keyP);
-
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static const char * parse_string(PARROT_INTERP,
-    ARGIN(const char *str),
-    ARGOUT(STRING **strP))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*strP);
-
-PARROT_CANNOT_RETURN_NULL
-static const char * skip_command(ARGIN(const char *str))
-        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -178,22 +144,8 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
        PARROT_ASSERT_ARG(cmd))
 #define ASSERT_ARGS_list_breakpoints __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pdb))
-#define ASSERT_ARGS_nextarg __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_no_such_register __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_parse_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(str) \
-    , PARROT_ASSERT_ARG(intP))
-#define ASSERT_ARGS_parse_key __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(str) \
-    , PARROT_ASSERT_ARG(keyP))
-#define ASSERT_ARGS_parse_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(str) \
-    , PARROT_ASSERT_ARG(strP))
-#define ASSERT_ARGS_skip_command __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_skip_whitespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(cmd))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -746,193 +698,6 @@ chop_newline(ARGMOD(char * buf))
 
     if (l > 0 && buf [l - 1] == '\n')
         buf [l - 1] = '\0';
-}
-
-/*
-
-=item C<static const char * nextarg(const char *command)>
-
-Returns the position just past the current argument in the PASM instruction
-C<command>. This is not the same as C<skip_command()>, which is intended for
-debugger commands. This function is used for C<eval>.
-
-=cut
-
-*/
-
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static const char *
-nextarg(ARGIN_NULLOK(const char *command))
-{
-    ASSERT_ARGS(nextarg)
-    /* as long as the character pointed to by command is not NULL,
-     * and it is either alphanumeric, a comma or a closing bracket,
-     * continue looking for the next argument.
-     */
-    if (command) {
-        while (isalnum((unsigned char) *command) || *command == ',' || *command == ']')
-            command++;
-
-        /* eat as much space as possible */
-        command = skip_whitespace(command);
-    }
-
-    return command;
-}
-
-/*
-
-=item C<static const char * skip_command(const char *str)>
-
-Returns the pointer past the current debugger command. (This is an
-alternative to the C<skip_command()> macro above.)
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-static const char *
-skip_command(ARGIN(const char *str))
-{
-    ASSERT_ARGS(skip_command)
-    /* while str is not null and it contains a command (no spaces),
-     * skip the character
-     */
-    while (*str && !isspace((unsigned char) *str))
-        str++;
-
-    /* eat all space after that */
-    return skip_whitespace(str);
-}
-
-/*
-
-=item C<static const char * parse_int(const char *str, int *intP)>
-
-Parse an C<int> out of a string and return a pointer to just after the C<int>.
-The output parameter C<intP> contains the parsed value.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static const char *
-parse_int(ARGIN(const char *str), ARGOUT(int *intP))
-{
-    ASSERT_ARGS(parse_int)
-    char *end;
-
-    *intP = strtol(str, &end, 0);
-
-    return end;
-}
-
-/*
-
-=item C<static const char * parse_string(PARROT_INTERP, const char *str, STRING
-**strP)>
-
-Parse a double-quoted string out of a C string and return a pointer to
-just after the string. The parsed string is converted to a Parrot
-C<STRING> and placed in the output parameter C<strP>.
-
-=cut
-
-*/
-
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static const char *
-parse_string(PARROT_INTERP, ARGIN(const char *str), ARGOUT(STRING **strP))
-{
-    ASSERT_ARGS(parse_string)
-    const char *string_start;
-
-    /* if this is not a quoted string, there's nothing to parse */
-    if (*str != '"')
-        return NULL;
-
-    /* skip the quote */
-    str++;
-
-    string_start = str;
-
-    /* parse while there's no closing quote */
-    while (*str && *str != '"') {
-        /* skip any potentially escaped quotes */
-        if (*str == '\\' && str[1])
-            str += 2;
-        else
-            str++;
-    }
-
-    /* create the output STRING */
-    *strP = string_make(interp, string_start, (UINTVAL)(str - string_start),
-        NULL, 0);
-
-    /* skip the closing quote */
-    if (*str)
-        str++;
-
-    return str;
-}
-
-/*
-
-=item C<static const char* parse_key(PARROT_INTERP, const char *str, PMC
-**keyP)>
-
-Parse an aggregate key out of a string and return a pointer to just
-after the key. Currently only string and integer keys are allowed.
-
-=cut
-
-*/
-
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static const char*
-parse_key(PARROT_INTERP, ARGIN(const char *str), ARGOUT(PMC **keyP))
-{
-    ASSERT_ARGS(parse_key)
-    /* clear output parameter */
-    *keyP = NULL;
-
-    /* make sure it's a key */
-    if (*str != '[')
-        return NULL;
-
-    /* Skip [ */
-    str++;
-
-    /* if this is a string key, create a Parrot STRING */
-    if (*str == '"') {
-        STRING *parrot_string;
-        str   = parse_string(interp, str, &parrot_string);
-        *keyP = key_new_string(interp, parrot_string);
-    }
-    /* if this is a numeric key */
-    else if (isdigit((unsigned char) *str)) {
-        int value;
-        str   = parse_int(str, &value);
-        *keyP = key_new_integer(interp, (INTVAL) value);
-    }
-    /* unsupported case; neither a string nor a numeric key */
-    else {
-        return NULL;
-    }
-
-    /* hm, but if this doesn't match, it's probably an error */
-    /* XXX str can be NULL from parse_string() */
-    if (*str != ']')
-        return NULL;
-
-    /* skip the closing brace on the key */
-    return ++str;
 }
 
 /*
@@ -1800,10 +1565,7 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     /* Allocate the new break point */
     newbreak = mem_gc_allocate_zeroed_typed(interp, PDB_breakpoint_t);
 
-    if (command) {
-        /*command = skip_command(command);*/
-    }
-    else {
+    if (! command) {
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
             "NULL command passed to PDB_set_break");
     }
@@ -3328,7 +3090,6 @@ PDB_eval(PARROT_INTERP, ARGIN(const char *command))
 {
     ASSERT_ARGS(PDB_eval)
 
-    PDB_t         *pdb = interp->pdb;
     Interp *warninterp = (interp->pdb && interp->pdb->debugger) ?
         interp->pdb->debugger : interp;
     TRACEDEB_MSG("PDB_eval");

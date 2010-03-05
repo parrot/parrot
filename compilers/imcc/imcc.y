@@ -5,7 +5,7 @@
  * Intermediate Code Compiler for Parrot.
  *
  * Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
- * Copyright (C) 2002-2009, Parrot Foundation.
+ * Copyright (C) 2002-2010, Parrot Foundation.
  *
  * Grammar of the PIR language parser.
  *
@@ -28,7 +28,7 @@
 
 /* prevent declarations of malloc() and free() in the generated parser. */
 #define YYMALLOC
-#define YYFREE
+#define YYFREE(Ptr) do { /* empty */; } while (YYID (0))
 
 #ifndef YYENABLE_NLS
 #  define YYENABLE_NLS 0

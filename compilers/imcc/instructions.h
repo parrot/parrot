@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2002-2009, Parrot Foundation.
+ * Copyright (C) 2002-2010, Parrot Foundation.
  */
 
 #ifndef PARROT_IMCC_INSTRUCTIONS_H_GUARD
@@ -79,7 +79,7 @@ typedef enum {
 /* Globals */
 
 typedef struct _emittert {
-    int (*open)(PARROT_INTERP, void *param);
+    int (*open)(PARROT_INTERP, const char *param);
     int (*emit)(PARROT_INTERP, void *param, const IMC_Unit *, const Instruction *ins);
     int (*new_sub)(PARROT_INTERP, void *param, IMC_Unit *);
     int (*end_sub)(PARROT_INTERP, void *param, IMC_Unit *);
@@ -103,7 +103,7 @@ int emit_flush(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-int emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(void *param))
+int emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(const char *param))
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT

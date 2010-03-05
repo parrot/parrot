@@ -5441,7 +5441,6 @@ read_macro(YYSTYPE *valp, PARROT_INTERP, void *yyscanner)
     }
 
     while (c != ENDM) {
-        char *old_s = valp->s;
         int   elem_len;
 
         if (c <= 0) {

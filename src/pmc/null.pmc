@@ -41,17 +41,21 @@ Overrides the default to do nothing.
 */
 
     VTABLE void init() {
+        UNUSED(interp)
     }
 
     VTABLE void *get_pointer() {
+        UNUSED(interp)
         return PMCNULL;
     }
 
     VTABLE void set_pointer(void *p) {
+        UNUSED(interp)
         PMCNULL = (PMC *)p;
     }
 
     VTABLE INTVAL does(STRING *what) {
+        UNUSED(interp)
         UNUSED(what)
         /* XXX maybe a hack to get TGE running again */
         return 0;

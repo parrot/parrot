@@ -613,8 +613,8 @@ static int
 reg_sort_f(ARGIN(const void *a), ARGIN(const void *b))
 {
     ASSERT_ARGS(reg_sort_f)
-    const SymReg * const ra = *(SymReg**)a;
-    const SymReg * const rb = *(SymReg**)b;
+    const SymReg * const ra = *(const SymReg * const *)a;
+    const SymReg * const rb = *(const SymReg * const *)b;
 
     if (ra->first_ins->index < rb->first_ins->index)
         return -1;

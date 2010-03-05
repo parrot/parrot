@@ -90,6 +90,10 @@ END
             }
         }
         my $include_headers = get_includes($pmc_fname);
+        my $cc_shared = $conf->data->get('cc_shared');
+        my $cc_o_out  = $conf->data->get('cc_o_out');
+        my $warnings  = $conf->data->get('ccwarn');
+        my $optimize  = $conf->data->get('optimize');
 
         $TEMP_pmc_build .= <<END
 src/pmc/$pmc.c : src/pmc/$pmc.dump
@@ -100,20 +104,21 @@ src/pmc/$pmc.dump : vtable.dump $parent_dumps src/pmc/$pmc.pmc \$(PMC2C_FILES) $
 
 include/pmc/pmc_$pmc.h: src/pmc/$pmc.c
 
-src/pmc/$pmc\$(O): include/pmc/pmc_${pmc}.h src/pmc/$pmc.str \$(NONGEN_HEADERS) \\
+## SUFFIX OVERRIDE -Warnings
+src/pmc/$pmc\$(O): include/pmc/pmc_$pmc.h src/pmc/$pmc.str \$(NONGEN_HEADERS) \\
     $parent_headers $include_headers include/pmc/pmc_continuation.h \\
-    include/pmc/pmc_callcontext.h include/pmc/pmc_fixedintegerarray.h
+    include/pmc/pmc_callcontext.h include/pmc/pmc_fixedintegerarray.h \\
+    src/pmc/$pmc.c
+\t\$(CC) \$(CFLAGS) $optimize $cc_shared $warnings -I\$(\@D) $cc_o_out \$@ -c src/pmc/$pmc.c
 
 END
     }
 
-    # src/pmc/$pmc\$(O): \$(NONGEN_HEADERS) $parent_headers include/pmc/pmc_$pmc.h
 
     # build list of libraries for link line in Makefile
-    my $slash = $conf->data->get('slash');
-    ( my $TEMP_pmc_classes_o   = $TEMP_pmc_o )   =~ s/^| / src${slash}pmc${slash}/g;
-    ( my $TEMP_pmc_classes_str = $TEMP_pmc_str ) =~ s/^| / src${slash}pmc${slash}/g;
-    ( my $TEMP_pmc_classes_pmc = $pmc_list )     =~ s/^| / src${slash}pmc${slash}/g;
+    ( my $TEMP_pmc_classes_o   = $TEMP_pmc_o )   =~ s{^| }{ src/pmc/}g;
+    ( my $TEMP_pmc_classes_str = $TEMP_pmc_str ) =~ s{^| }{ src/pmc/}g;
+    ( my $TEMP_pmc_classes_pmc = $pmc_list )     =~ s{^| }{ src/pmc/}g;
 
     # Gather the actual names (with MixedCase) of all of the non-abstract
     # built-in PMCs in rough hierarchical order.

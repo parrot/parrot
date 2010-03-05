@@ -32,11 +32,6 @@ This file implements the Parrot embedding interface.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_CANNOT_RETURN_NULL
-PARROT_OBSERVER
-static const char * op_name(PARROT_INTERP, int k)
-        __attribute__nonnull__(1);
-
 static void print_constant_table(PARROT_INTERP, ARGIN(PMC *output))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -53,8 +48,6 @@ static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-#define ASSERT_ARGS_op_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_print_constant_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(output))
@@ -664,26 +657,6 @@ setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
     }
 
     return userargv;
-}
-
-
-/*
-
-=item C<static const char * op_name(PARROT_INTERP, int k)>
-
-Returns the name of the opcode.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_OBSERVER
-static const char *
-op_name(PARROT_INTERP, int k)
-{
-    ASSERT_ARGS(op_name)
-    return interp->op_info_table[k].full_name;
 }
 
 

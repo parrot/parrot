@@ -75,8 +75,7 @@ END
     }
 
     # build list of libraries for link line in Makefile
-    my $slash = $conf->data->get('slash');
-    $TEMP_charset_o =~ s/^| / src${slash}string${slash}charset${slash}/g;
+    $TEMP_charset_o =~ s{^| }{ src/string/charset/}g;
 
     $conf->data->set(
         charset            => $charset_list,
