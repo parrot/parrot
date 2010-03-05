@@ -144,6 +144,7 @@ sub _init {
         -Wundef
         -Wno-unused
         -Wunknown-pragmas
+        -Wunreachable-code
         -Wvariadic-macros
         -Wwrite-strings
     );
@@ -180,7 +181,6 @@ sub _init {
         -Wno-import
         -Wno-multichar
         -Wno-pointer-sign
-        -Wunreachable-code
         -Wunused
         -Wunused-function
         -Wunused-label
