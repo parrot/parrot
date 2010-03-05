@@ -437,7 +437,6 @@ END
 
     } /* END PMETHOD BODY */
     } /* END PARAMS SCOPE */
-  no_return:
     return;
 END
     $self->return_type('void');
