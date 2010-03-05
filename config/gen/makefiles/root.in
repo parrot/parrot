@@ -1402,7 +1402,7 @@ src/nci/extra_thunks$(O) : src/nci/extra_thunks.str \
     include/pmc/pmc_unmanagedstruct.h \
     include/pmc/pmc_nci.h \
     src/nci/extra_thunks.c
-	$(CC) $(CFLAGS) @optimize::src/nci/extra_thunks.c@ @ccwarn::src/nci/extra_thunks.c@ @cc_shared@ -I$(@D) @cc_o_out@ $@ -c src/nci/extra_thunks.c
+	$(CC) $(CFLAGS) @optimize::src/nci/extra_thunks.c@ @ccwarn::src/nci/extra_thunks.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/nci/extra_thunks.c
 
 src/frame_builder$(O) : $(PARROT_H_HEADERS) src/frame_builder.h \
         include/pmc/pmc_fixedintegerarray.h \
@@ -1414,7 +1414,7 @@ src/vtables$(O) : $(PARROT_H_HEADERS)
 
 ## SUFFIX OVERRIDE
 src/gc/system$(O) : $(PARROT_H_HEADERS)  src/gc/gc_private.h
-	$(CC) $(CFLAGS) @optimize::src/gc/system.c@ @ccwarn::src/gc/system.c@ @cc_shared@ -I$(@D) @cc_o_out@ $@ -c src/gc/system.c
+	$(CC) $(CFLAGS) @optimize::src/gc/system.c@ @ccwarn::src/gc/system.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/gc/system.c
 
 src/gc/gc_private.h : $(INC_DIR)/settings.h
 
@@ -1426,7 +1426,7 @@ src/utils$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_nci.h
 
 ## SUFFIX OVERRIDE
 src/spf_render$(O) : $(PARROT_H_HEADERS) src/spf_render.str
-	$(CC) $(CFLAGS) @optimize::src/spf_render.c@ @ccwarn::src/spf_render.c@ @cc_shared@ -I$(@D) @cc_o_out@ $@ -c src/spf_render.c
+	$(CC) $(CFLAGS) @optimize::src/spf_render.c@ @ccwarn::src/spf_render.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/spf_render.c
 
 src/spf_vtable$(O) : $(PARROT_H_HEADERS) src/spf_vtable.str
 
@@ -2474,7 +2474,7 @@ src/extra_nci_thunks.c : src/nci/extra_thunks.nci $(NCI_THUNK_GEN)
 
 ## SUFFIX OVERRIDE
 src/extra_nci_thunks$(O) : $(GENERAL_H_FILES) src/extra_nci_thunks.c
-	$(CC) $(CFLAGS) @optimize::src/extra_nci_thunks.c@ @ccwarn::src/extra_nci_thunks.c@ @cc_shared@ -I$(@D) @cc_o_out@ $@ -c src/extra_nci_thunks.c
+	$(CC) $(CFLAGS) @optimize::src/extra_nci_thunks.c@ @ccwarn::src/extra_nci_thunks.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/extra_nci_thunks.c
 
 $(EXTRANCITHUNKS_SO) : $(LIBPARROT) src/extra_nci_thunks$(O)
 	$(LD) $(LD_LOAD_FLAGS) $(LDFLAGS) \

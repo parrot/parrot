@@ -104,7 +104,7 @@ compilers/imcc/imclexer$(O) : \
     compilers/imcc/unit.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
-	$(CC) $(CFLAGS) @optimize::compilers/imcc/imclexer.c@ @ccwarn::compilers/imcc/imclexer.c@ @cc_shared@ -I$(@D) @cc_o_out@ $@ -c compilers/imcc/imclexer.c
+	$(CC) $(CFLAGS) @optimize::compilers/imcc/imclexer.c@ @ccwarn::compilers/imcc/imclexer.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c compilers/imcc/imclexer.c
 
 ## SUFFIX OVERRIDE - Warnings (This is generated code)
 compilers/imcc/imcparser$(O) : \
@@ -123,7 +123,7 @@ compilers/imcc/imcparser$(O) : \
     $(INC_DIR)/dynext.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
-	$(CC) $(CFLAGS) @optimize::compilers/imcc/imcparser.c@ @ccwarn::compilers/imcc/imcparser.c@ @cc_shared@ -I$(@D) @cc_o_out@ $@ -c compilers/imcc/imcparser.c
+	$(CC) $(CFLAGS) @optimize::compilers/imcc/imcparser.c@ @ccwarn::compilers/imcc/imcparser.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c compilers/imcc/imcparser.c
 
 compilers/imcc/main$(O) : \
     compilers/imcc/cfg.h \
@@ -156,7 +156,7 @@ compilers/imcc/optimizer$(O) : \
     compilers/imcc/unit.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
-	$(CC) $(CFLAGS) @optimize::compilers/imcc/optimizer.c@ @ccwarn::compilers/imcc/optimizer.c@ @cc_shared@ -I$(@D) @cc_o_out@ $@ -c compilers/imcc/optimizer.c
+	$(CC) $(CFLAGS) @optimize::compilers/imcc/optimizer.c@ @ccwarn::compilers/imcc/optimizer.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c compilers/imcc/optimizer.c
 
 compilers/imcc/reg_alloc$(O) : \
     compilers/imcc/cfg.h \
