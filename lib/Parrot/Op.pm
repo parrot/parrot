@@ -343,15 +343,6 @@ method >> >>> to C<VTABLE_I<method>>.
 sub rewrite_body {
     my ( $self, $body, $trans, $preamble_only ) = @_;
 
-    # use vtable macros
-    $body =~ s!
-        (?:
-            {{\@\d+\}}
-            |
-            \b\w+(?:->\w+)*
-        )->vtable->\s*(\w+)\(
-        !VTABLE_$1(!sgx;
-
     while (1) {
         my $new_body = $self->_substitute( $body, $trans, !!$preamble_only );
 
