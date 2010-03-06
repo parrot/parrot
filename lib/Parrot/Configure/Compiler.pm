@@ -603,8 +603,6 @@ sub cond_eval_single {
     }
 }
 
-sub truth { $_[0] ? "true" : "false"; }
-
 # Recursively evaluate boolean expressions with multiple keys and | & ! ops.
 # Order of precedence: Just "!" and "NOT" binds tighter than AND and OR.
 # There's no precedence for AND over OR defined, just left to right.
