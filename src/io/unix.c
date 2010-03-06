@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -181,17 +181,19 @@ Parrot_io_open_unix(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle),
          */
         if ((oflags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL)) {
             close(fd);
-            Parrot_str_free_cstring(spath); /* returning before C string freed */
+
+            /* returning before C string freed */
+            Parrot_str_free_cstring(spath);
             return PMCNULL;
         }
-        /*
-         * Check for truncate?
-         */
+
+        /* Check for truncate?  */
         if (oflags & O_TRUNC) {
             int tfd;
             while ((tfd = creat(spath, PIO_DEFAULTMODE)) < 0 && errno == EINTR)
                 errno = 0;
-            close(tfd);
+            if (tfd > 0)
+                close(tfd);
         }
     }
     else if (oflags & O_CREAT) {
@@ -199,10 +201,10 @@ Parrot_io_open_unix(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle),
         while ((fd = creat(spath, PIO_DEFAULTMODE)) < 0 && errno == EINTR)
             errno = 0;
         if (!(oflags & O_WRONLY)) {
-            close(fd);
-            /*
-             * File created, reopen with read+write
-             */
+            if (fd > 0)
+                close(fd);
+
+            /* File created, reopen with read+write */
             while ((fd = open(spath, oflags & (O_WRONLY | O_RDWR),
                               DEFAULT_OPEN_MODE)) < 0 && errno == EINTR)
                 errno = 0;
