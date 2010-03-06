@@ -485,7 +485,7 @@ dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
         interp->all_op_libs = mem_gc_allocate_n_zeroed_typed(interp,
                 interp->n_libs + 1, op_lib_t*);
     else
-        mem_gc_realloc_n_typed_zeroed(interp, interp->all_op_libs,
+        interp->all_op_libs = mem_gc_realloc_n_typed_zeroed(interp, interp->all_op_libs,
                 interp->n_libs + 1, interp->n_libs, op_lib_t *);
 
     init_func = get_dynamic_op_lib_init(interp, lib_pmc);
