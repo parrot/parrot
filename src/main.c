@@ -405,6 +405,13 @@ parseflags_minimal(PARROT_INTERP, int argc, ARGIN(char *argv[]))
             }
             break;
         }
+        else if (STREQ(arg, "--hash-seed")) {
+            ++pos;
+            arg = argv[pos];
+            if (is_all_hex_digits(arg)) {
+                interp->hash_seed = strtoul(arg, NULL, 16);
+            }
+        }
         ++pos;
     }
 }
@@ -496,11 +503,6 @@ parseflags(PARROT_INTERP,
             else
                 SET_DEBUG(PARROT_MEM_STAT_DEBUG_FLAG);
             break;
-          case 'H':
-            if (opt.opt_arg && is_all_hex_digits(opt.opt_arg)) {
-                interp->hash_seed = strtoul(opt.opt_arg, NULL, 16);
-            }
-            break;
 
           case '.':  /* Give Windows Parrot hackers an opportunity to
                       * attach a debuggger. */
@@ -509,6 +511,9 @@ parseflags(PARROT_INTERP,
           case 'h':
             help();
             exit(EXIT_FAILURE);
+            break;
+          case 'H':
+            /* handled in parseflags_minimal */
             break;
           case OPT_HELP_DEBUG:
             help_debug();
