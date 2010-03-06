@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -357,9 +357,12 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         }
 
         got = Parrot_io_fill_readbuf(interp, filehandle);
-        len = (len < got)
-            ? len
-            : (got > 0) ? got : 0;
+
+        /* got is never < 0, but C's type system can't tell */
+        if (got < 0)
+            got = 0;
+
+        len = (len < got) ? len : got;
     }
 
     /* read from the read_buffer */
