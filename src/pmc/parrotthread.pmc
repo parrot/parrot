@@ -79,7 +79,7 @@ static INTVAL do_thread_run(PARROT_INTERP, PMC *thread,
     return tid;
 }
 
-pmclass ParrotThread extends ParrotInterpreter no_ro {
+pmclass ParrotThread extends ParrotInterpreter no_ro manual_attrs {
 
 /*
 
