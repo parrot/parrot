@@ -2237,7 +2237,7 @@ SPLINTFLAGS = $(SPLINTFLAGS) \
 # +redef, +redecl: Ops currently have tons of redefinitions
 
 # added to splint target to simplify experimentation,
-# ex: make SPLINTFLAGS_TEST='-posixstrictlib +posixlib' splint
+# example: make SPLINTFLAGS_TEST='-posixstrictlib +posixlib' splint
 
 SPLINT_SOURCE = `echo $(O_FILES) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@`
 
