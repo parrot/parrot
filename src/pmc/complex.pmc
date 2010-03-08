@@ -224,37 +224,6 @@ pmclass Complex auto_attrs {
 
 /*
 
-=item C<opcode_t *invoke(void *next)>
-
-Pythonic object constructor. SELF is a Complex Class object. Return a new
-C<complex> object according to 2.1. Built-in Functions.
-
-=cut
-
-*/
-    VTABLE opcode_t *invoke(void *next) {
-        const int   argcP = REG_INT(interp, 3);
-        PMC * const res   = Parrot_pmc_new(INTERP, enum_class_Complex);
-
-        if (argcP == 1) {
-            PMC * const arg = REG_PMC(interp, 5);
-
-            if (arg->vtable->base_type == enum_class_String)
-                VTABLE_set_string_native(INTERP, res, VTABLE_get_string(interp, arg));
-            else
-                SET_ATTR_re(INTERP, res, VTABLE_get_number(INTERP, arg));
-        }
-        else if (argcP == 2) {
-            SET_ATTR_re(INTERP, res, VTABLE_get_number(INTERP, REG_PMC(interp, 5)));
-            SET_ATTR_im(INTERP, res, VTABLE_get_number(INTERP, REG_PMC(interp, 6)));
-        }
-
-        REG_PMC(interp, 5) = res;
-        return (opcode_t *)next;
-    }
-
-/*
-
 =back
 
 =head2 Methods
