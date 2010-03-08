@@ -22,6 +22,8 @@ files and directories.
 #if defined(_MSC_VER)
 #  include <direct.h>
 #  include <io.h>
+#  include <tchar.h>
+#  include <windows.h>
 #elif defined(__BORLANDC__)
 #  include <dir.h>
 #  include <dirent.h>
@@ -475,11 +477,11 @@ reads entries from a directory.
 
 */
     METHOD readdir(STRING *path) {
+        PMC   * array = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
 #ifndef _MSC_VER
         char  * const cpath = Parrot_str_to_cstring(INTERP, path);
         DIR           *dir  = opendir(cpath);
         struct dirent *dirent;
-        PMC           *array;
         STRING        *retval;
 
         Parrot_str_free_cstring(cpath);
@@ -490,20 +492,43 @@ reads entries from a directory.
                 errmsg);
         }
 
-        array = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
-
         while ((dirent = readdir(dir)) != NULL) {
             retval = Parrot_str_new(INTERP, dirent->d_name, 0) ;
             VTABLE_push_string(INTERP, array, retval);
         }
 
         closedir(dir);
-
-        RETURN(PMC *array);
 #else
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-                "Win32 is not POSIX. Need Win32 developer!");
+        WIN32_FIND_DATA file_find_data;
+        char * cpath;
+        HANDLE hFind = INVALID_HANDLE_VALUE;
+        
+        /* Add \* to the directory name and start search. */
+        cpath = Parrot_str_to_cstring(interp, Parrot_str_concat(interp,
+                path, string_from_literal(interp, "\\*"), 0));
+        hFind = FindFirstFile(cpath, &file_find_data);
+        Parrot_str_free_cstring(cpath);
+        if (hFind == INVALID_HANDLE_VALUE)
+        {
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
+                "Unable to readdir");
+        }
+        
+        /* Loop over all directories and add to result array. */
+        do
+        {
+            VTABLE_push_string(INTERP, array, Parrot_str_new(INTERP, 
+                    file_find_data.cFileName, 0));
+        }
+        while (FindNextFile(hFind, &file_find_data) != 0);
+        if (GetLastError() != ERROR_NO_MORE_FILES) 
+        {
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
+                "Error during readdir");
+        }
+        FindClose(hFind);
 #endif
+        RETURN(PMC *array);
     }
 /*
 =item C<rename(STRING *oldpath, STRING *newpath)>
