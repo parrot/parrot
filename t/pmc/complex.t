@@ -21,7 +21,7 @@ Tests the Complex PMC.
     .include 'fp_equality.pasm'
     .include "iglobals.pasm"
 
-    plan(458)
+    plan(459)
 
     string_parsing()
     exception_malformed_string__real_part()
@@ -50,6 +50,7 @@ Tests the Complex PMC.
     instantiate__pir__s()
     test_complex_neg()
     test_clone()
+    test_freeze_thaw()
     test_sub()
     test_i_sub()
     sprintf_with_a_complex()
@@ -589,6 +590,14 @@ handler:
      set $N1, $P1[1]
      .fp_eq_ok($N0, 1.0, 'no change to cloned after setting orig')
      .fp_eq_ok($N1, -3.0, '... nor to imag portion')
+.end
+
+.sub test_freeze_thaw
+    $P0 = new ['Complex']
+    set $P0, "1 - 3i"
+    $S0 = freeze $P0
+    $P1 = thaw $S0
+    is($P0, $P1, 'roundtrip serialize Complex PMC')
 .end
 
 .sub test_sub

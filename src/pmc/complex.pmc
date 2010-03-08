@@ -329,6 +329,42 @@ Creates an identical copy of the complex number.
 
 /*
 
+=item C<void freeze(PMC *visit)>
+
+=item C<void thaw(PMC *visit)>
+
+Serialize/deserialize this object for bytecode.
+
+=cut
+
+*/
+
+    VTABLE void freeze(PMC *visit) {
+        FLOATVAL re, im;
+
+        SUPER(visit);
+
+        GET_ATTR_re(INTERP, SELF, re);
+        VTABLE_push_float(INTERP, visit, re);
+
+        GET_ATTR_im(INTERP, SELF, im);
+        VTABLE_push_float(INTERP, visit, im);
+    }
+
+    VTABLE void thaw(PMC *visit) {
+        FLOATVAL re, im;
+
+        SUPER(visit);
+
+        re = VTABLE_shift_float(INTERP, visit);
+        SET_ATTR_re(INTERP, SELF, re);
+
+        im = VTABLE_shift_float(INTERP, visit);
+        SET_ATTR_im(INTERP, SELF, im);
+    }
+
+/*
+
 =item C<INTVAL get_integer()>
 
 Returns the modulus of the complex number as an integer.
