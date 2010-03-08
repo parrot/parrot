@@ -502,7 +502,7 @@ reads entries from a directory.
         WIN32_FIND_DATA file_find_data;
         char * cpath;
         HANDLE hFind = INVALID_HANDLE_VALUE;
-        
+
         /* Add \* to the directory name and start search. */
         cpath = Parrot_str_to_cstring(interp, Parrot_str_concat(interp,
                 path, string_from_literal(interp, "\\*"), 0));
@@ -513,15 +513,15 @@ reads entries from a directory.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                 "Unable to readdir");
         }
-        
+
         /* Loop over all directories and add to result array. */
         do
         {
-            VTABLE_push_string(INTERP, array, Parrot_str_new(INTERP, 
+            VTABLE_push_string(INTERP, array, Parrot_str_new(INTERP,
                     file_find_data.cFileName, 0));
         }
         while (FindNextFile(hFind, &file_find_data) != 0);
-        if (GetLastError() != ERROR_NO_MORE_FILES) 
+        if (GetLastError() != ERROR_NO_MORE_FILES)
         {
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                 "Error during readdir");
