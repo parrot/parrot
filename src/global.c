@@ -813,7 +813,8 @@ Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub_pmc))
         store_sub_in_multi(interp, sub_pmc, ns);
 
     /* store other subs (as long as they're not :anon) */
-    else if (!(PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_ANON)) {
+    else if (!(PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_ANON)
+        || sub->vtable_index != -1) {
         STRING * const ns_entry_name = sub->ns_entry_name;
         PMC    * const nsname        = sub->namespace_name;
 
