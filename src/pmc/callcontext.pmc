@@ -655,7 +655,7 @@ Returns the short signature for the CallContext.
                 res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "P"));
                 break;
               default:
-                PARROT_ASSERT(!"Impossible flag");
+                PARROT_FAILURE("Impossible flag");
                 break;
             }
             c = NEXT_CELL(c);

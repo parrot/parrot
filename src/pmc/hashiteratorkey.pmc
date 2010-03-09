@@ -84,7 +84,7 @@ Set pointers to Hash and HashBucket. Not really part of public API.
         Parrot_HashIteratorKey_attributes *attrs =
                 PARROT_HASHITERATORKEY(SELF);
 
-        PARROT_ASSERT(value || !"Can't set NULL pointer into HashIteratorKey");
+        PARROT_ASSERT_MSG(value, "Can't set NULL pointer into HashIteratorKey");
 
         if (key == 0) {
             attrs->parrot_hash = (Hash*)value;
