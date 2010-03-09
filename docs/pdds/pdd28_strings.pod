@@ -626,9 +626,9 @@ strings, and not terribly useful even there.
 Unsafe, and behavior handled by Parrot_str_to_cstring.
 
 
-=head4 Parrot_string_split
+=head4 Parrot_str_split
 
-Is the same as Parrot_str_split.
+Splits the string C<str> at the delimiter C<delim>.
 
 =head4 Parrot_str_free (was string_free)
 

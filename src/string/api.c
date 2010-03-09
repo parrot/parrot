@@ -73,6 +73,25 @@ static const CHARSET * string_rep_compatible(SHIM_INTERP,
 
 /*
 
+=item C<INTVAL Parrot_str_is_null(PARROT_INTERP, const STRING *s)>
+
+Tests if the given STRING is STRINGNULL.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+INTVAL
+Parrot_str_is_null(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
+{
+    ASSERT_ARGS(Parrot_str_is_null)
+    return !s || s == STRINGNULL;
+}
+
+
+/*
+
 =item C<INTVAL STRING_is_null(PARROT_INTERP, const STRING *s)>
 
 Tests if the given STRING is STRINGNULL.

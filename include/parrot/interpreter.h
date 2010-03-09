@@ -609,7 +609,7 @@ typedef void * *(*native_func_t)(PARROT_INTERP,
 #  define PMC_IS_NULL(pmc) Parrot_pmc_is_null(NULL, (pmc))
 #endif
 #ifndef STRING_IS_NULL
-#  define STRING_IS_NULL(s) ((s) == NULL || STRING_is_null(NULL, (s))
+#  define STRING_IS_NULL(s) ((s) == NULL || Parrot_str_is_null(NULL, (s))
 #endif
 
 #endif   /* PARROT_INTERPRETER_H_GUARD */

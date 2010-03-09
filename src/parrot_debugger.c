@@ -251,7 +251,7 @@ main(int argc, char *argv[])
         const char source []= ".sub aux :main\nexit 0\n.end\n";
         Parrot_compile_string(interp, compiler, source, &errstr);
 
-        if (!STRING_is_null(interp, errstr))
+        if (!Parrot_str_is_null(interp, errstr))
             Parrot_io_eprintf(interp, "%Ss\n", errstr);
     }
 

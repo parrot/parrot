@@ -214,6 +214,18 @@ for L<https://trac.parrot.org/parrot/ticket/895>
 All STRING modification functions will return a STRING pointer; capture and use
 this rather than relying on in-place modification of an existing pointer.
 
+=item STRING_is_null function [eligible in 2.4]
+
+renamed to Parrot_str_is_null
+
+=item Parrot_string_* [eligible in 2.4]
+
+rename Parrot_string_cstring to Parrot_str_cstring
+
+=item STRING functions which don't have Parrot_str_ prefix
+
+The string subsytem is gradually getting an overhaul.
+
 =back
 
 =head1 Compiler tools
