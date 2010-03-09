@@ -473,7 +473,7 @@ op find_name(out PMC, in STR) {
 =item B<find_sub_not_null>(out PMC, in STR)
 
 Do the same thing as C<find_name>, but throw an exception if the name isn't
-found.    
+found.
 
 =cut
 
