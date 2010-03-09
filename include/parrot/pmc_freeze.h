@@ -17,7 +17,7 @@ typedef enum {
     VISIT_HOW_PMC_TO_VISITOR     = 0x00, /* push to visitor */
     VISIT_HOW_VISITOR_TO_PMC     = 0x01, /* shift from visitor */
     VISIT_HOW_PMC_TO_PMC         = 0x02, /* push to visitor; then shift from visitor */
-    VISIT_HOW_VISITOR_TO_VISITOR = 0x03, /* shift from visitor; then push to visitor */
+    VISIT_HOW_VISITOR_TO_VISITOR = 0x03 /* shift from visitor; then push to visitor */
 } visit_how_enum_t;
 
 #define VISIT_HOW_MASK 0x03
@@ -26,7 +26,7 @@ typedef enum {
     VISIT_WHAT_PMC      = 0x04,
     VISIT_WHAT_STRING   = 0x08,
     VISIT_WHAT_FLOATVAL = 0x10,
-    VISIT_WHAT_INTVAL   = 0x20,
+    VISIT_WHAT_INTVAL   = 0x20
 } visit_what_enum_t;
 
 #define VISIT_WHAT_MASK 0x3c
@@ -39,7 +39,7 @@ typedef enum {
 
 typedef enum {
     EXTRA_IS_NULL,
-    EXTRA_IS_PROP_HASH,
+    EXTRA_IS_PROP_HASH
 } extra_flags_enum;
 
 #define VISIT_PMC(interp, visit, pmc) do {\

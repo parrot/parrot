@@ -64,7 +64,7 @@ typedef enum Parrot_profiling_datatype {
 
     PPROF_DATA_CLI = 0,
 
-    PPROF_DATA_MAX = 3,
+    PPROF_DATA_MAX = 3
 } Parrot_profiling_datatype;
 
 struct profiling_runcore_t {
