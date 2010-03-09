@@ -315,15 +315,12 @@ sub _substitute {
 
     s/{{=0,=([^{]*?)}}/   $trans->restart_address($1) . "; {{=0}}"; /me;
     s/{{=0,\+=([^{]*?)}}/ $trans->restart_offset($1)  . "; {{=0}}"; /me;
-    s/{{=0,-=([^{]*?)}}/  $trans->restart_offset(-$1) . "; {{=0}}"; /me;
 
     s/{{\+=([^{]*?)}}/    $trans->goto_offset($1);  /me;
-    s/{{-=([^{]*?)}}/     $trans->goto_offset(-$1); /me;
     s/{{=([^*][^{]*?)}}/  $trans->goto_address($1); /me;
 
-    s/{{\^(-?\d+)}}/      $1                        /me;
+    s/{{\^(\d+)}}/        $1                        /me;
     s/{{\^\+([^{]*?)}}/   $trans->expr_offset($1);  /me;
-    s/{{\^-([^{]*?)}}/    $trans->expr_offset(-$1); /me;
     s/{{\^([^{]*?)}}/     $trans->expr_address($1); /me;
 
     return $_;
