@@ -1,0 +1,99 @@
+#
+# Each opslib must be compiled with several variants.
+#
+
+$(DYNEXT_DIR)/obscure_ops$(LOAD_EXT): src/dynoplibs/obscure_ops$(O) $(LIBPARROT)
+	$(LD) @ld_out@$@ $< $(LINKFLAGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+#IF(cygwin or hpux):	$(CHMOD) 0775 $@
+
+src/dynoplibs/obscure_ops$(O): include/pmc/pmc_parrotlibrary.h include/pmc/pmc_callcontext.h src/dynoplibs/obscure_ops.c $(PARROT_H_HEADERS)
+
+src/dynoplibs/obscure_ops.h: src/dynoplibs/obscure_ops.c
+
+src/dynoplibs/obscure_ops.c: src/dynoplibs/obscure.ops $(BUILD_TOOLS_DIR)/ops2c.pl
+	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --dynamic $<
+
+$(DYNEXT_DIR)/obscure_ops_switch$(LOAD_EXT): src/dynoplibs/obscure_ops_switch$(O) $(LIBPARROT)
+	$(LD) @ld_out@$@ $< $(LINKFLAGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+#IF(cygwin or hpux):	$(CHMOD) 0775 $@
+
+src/dynoplibs/obscure_ops_switch$(O): include/pmc/pmc_parrotlibrary.h include/pmc/pmc_callcontext.h src/dynoplibs/obscure_ops_switch.c $(PARROT_H_HEADERS)
+
+src/dynoplibs/obscure_ops_switch.h: src/dynoplibs/obscure_ops_switch.c
+
+src/dynoplibs/obscure_ops_switch.c: src/dynoplibs/obscure.ops $(BUILD_TOOLS_DIR)/ops2c.pl
+	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl CSwitch --dynamic $<
+
+$(DYNEXT_DIR)/obscure_ops_cg$(LOAD_EXT): src/dynoplibs/obscure_ops_cg$(O) $(LIBPARROT)
+	$(LD) @ld_out@$@ $< $(LINKFLAGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+#IF(cygwin or hpux):	$(CHMOD) 0775 $@
+
+src/dynoplibs/obscure_ops_cg$(O): include/pmc/pmc_parrotlibrary.h include/pmc/pmc_callcontext.h src/dynoplibs/obscure_ops_cg.c $(PARROT_H_HEADERS)
+
+src/dynoplibs/obscure_ops_cg.h: src/dynoplibs/obscure_ops_cg.c
+
+src/dynoplibs/obscure_ops_cg.c: src/dynoplibs/obscure.ops $(BUILD_TOOLS_DIR)/ops2c.pl
+	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl CGoto --dynamic $<
+
+$(DYNEXT_DIR)/obscure_ops_cgp$(LOAD_EXT): src/dynoplibs/obscure_ops_cgp$(O) $(LIBPARROT)
+	$(LD) @ld_out@$@ $< $(LINKFLAGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+#IF(cygwin or hpux):	$(CHMOD) 0775 $@
+
+src/dynoplibs/obscure_ops_cgp$(O): include/pmc/pmc_parrotlibrary.h include/pmc/pmc_callcontext.h src/dynoplibs/obscure_ops_cgp.c $(PARROT_H_HEADERS)
+
+src/dynoplibs/obscure_ops_cgp.h: src/dynoplibs/obscure_ops_cgp.c
+
+src/dynoplibs/obscure_ops_cgp.c: src/dynoplibs/obscure.ops $(BUILD_TOOLS_DIR)/ops2c.pl
+	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl CGP --dynamic $<
+
+$(DYNEXT_DIR)/math_ops$(LOAD_EXT): src/dynoplibs/math_ops$(O) $(LIBPARROT)
+	$(LD) @ld_out@$@ $< $(LINKFLAGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+#IF(cygwin or hpux):	$(CHMOD) 0775 $@
+
+src/dynoplibs/math_ops.c: src/dynoplibs/math.ops $(BUILD_TOOLS_DIR)/ops2c.pl
+	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --dynamic $<
+
+src/dynoplibs/math_ops$(O): include/pmc/pmc_parrotlibrary.h include/pmc/pmc_callcontext.h src/dynoplibs/math_ops.c $(PARROT_H_HEADERS)
+
+src/dynoplibs/math_ops.h: src/dynoplibs/math_ops.c
+
+$(DYNEXT_DIR)/math_ops_switch$(LOAD_EXT): src/dynoplibs/math_ops_switch$(O) $(LIBPARROT)
+	$(LD) @ld_out@$@ $< $(LINKFLAGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+#IF(cygwin or hpux):	$(CHMOD) 0775 $@
+
+src/dynoplibs/math_ops_switch$(O): include/pmc/pmc_parrotlibrary.h include/pmc/pmc_callcontext.h src/dynoplibs/math_ops_switch.c $(PARROT_H_HEADERS)
+
+src/dynoplibs/math_ops_switch.h: src/dynoplibs/math_ops_switch.c
+
+src/dynoplibs/math_ops_switch.c: src/dynoplibs/math.ops $(BUILD_TOOLS_DIR)/ops2c.pl
+	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl CSwitch --dynamic $<
+
+$(DYNEXT_DIR)/math_ops_cg$(LOAD_EXT): src/dynoplibs/math_ops_cg$(O) $(LIBPARROT)
+	$(LD) @ld_out@$@ $< $(LINKFLAGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+#IF(cygwin or hpux):	$(CHMOD) 0775 $@
+
+src/dynoplibs/math_ops_cg$(O): include/pmc/pmc_parrotlibrary.h include/pmc/pmc_callcontext.h src/dynoplibs/math_ops_cg.c $(PARROT_H_HEADERS)
+
+src/dynoplibs/math_ops_cg.h: src/dynoplibs/math_ops_cg.c
+
+src/dynoplibs/math_ops_cg.c: src/dynoplibs/math.ops $(BUILD_TOOLS_DIR)/ops2c.pl
+	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl CGoto --dynamic $<
+
+$(DYNEXT_DIR)/math_ops_cgp$(LOAD_EXT): src/dynoplibs/math_ops_cgp$(O) $(LIBPARROT)
+	$(LD) @ld_out@$@ $< $(LINKFLAGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+#IF(cygwin or hpux):	$(CHMOD) 0775 $@
+
+src/dynoplibs/math_ops_cgp$(O): include/pmc/pmc_parrotlibrary.h include/pmc/pmc_callcontext.h src/dynoplibs/math_ops_cgp.c $(PARROT_H_HEADERS)
+
+src/dynoplibs/math_ops_cgp.h: src/dynoplibs/math_ops_cgp.c
+
+src/dynoplibs/math_ops_cgp.c: src/dynoplibs/math.ops $(BUILD_TOOLS_DIR)/ops2c.pl
+	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl CGP --dynamic $<
