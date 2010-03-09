@@ -162,6 +162,10 @@ sub _handle_icc_ccflags {
     # which is *not* the default behavior. ahem.
     $ccflags .= ' -we147';
 
+    # TT #1488. ICC optimizes floating-point too aggressively and loses support
+    # for negative zero without this.
+    $ccflags .= ' -fp-model source';
+
     $verbose and print " ccflags: $ccflags\n";
     return $ccflags;
 }
