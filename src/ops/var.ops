@@ -472,6 +472,11 @@ op find_name(out PMC, in STR) {
 
 =item B<find_sub_not_null>(out PMC, in STR)
 
+Do the same thing as C<find_name>, but throw an exception if the name isn't
+found.    
+
+=cut
+
 inline op find_sub_not_null(out PMC, in STR) :base_core {
     opcode_t *dest = expr NEXT();
     PMC *sub = Parrot_find_name_op(interp, $2, dest);
