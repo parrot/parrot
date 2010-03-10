@@ -617,16 +617,17 @@ all : \
     $(PCT_LIB_PBCS) \
     $(JSON_LIB_PBCS) \
     $(DATA_JSON_LIB_PBCS) \
-    $(NQP_LIB_PBCS)
+    $(NQP_LIB_PBCS) \
+    $(GEN_LIBRARY) \
+    $(LIBNCI_TEST_SO)
 
 corevm : \
-	$(GEN_PM_INCLUDES) \
+    $(GEN_PM_INCLUDES) \
     PARROT_LIBS \
     $(PARROT) \
     runtime/parrot/include/parrotlib.pbc \
     runtime/parrot/include/config.fpmc \
-    $(LIBNCI_TEST_SO) \
-    $(GEN_LIBRARY) \
+    $(LIBRARY_DIR)/Test/More.pbc \
     dynpmc \
     dynoplibs
 
