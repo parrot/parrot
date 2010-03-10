@@ -3054,7 +3054,7 @@ csr_fill_pmc(PARROT_INTERP, ARGIN(PMC *self), INTVAL key, ARGIN_NULLOK(PMC *valu
         *(PMC **)ptr = value;
         break;
       default:
-        PARROT_FAILURE(!"Impossible type");
+        PARROT_FAILURE("Impossible type");
     }
 }
 
