@@ -281,3 +281,5 @@ void visit (PMC* info)
 void share()
 
 PMC* share_ro()
+
+void init_int(INTVAL initializer)

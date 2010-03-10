@@ -235,6 +235,62 @@ inline op vivify(out PMC, in PMC, in STR, in PMC) :base_core {
     }
 }
 
+=over 4
+
+=item B<new>(out PMC, in STR, in INT)
+
+=item B<new>(out PMC, in PMC, in INT)
+
+=back
+
+=cut
+
+
+op new(out PMC, in STR, in INT) {
+    STRING * const name   = $2;
+    PMC    * const _class = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp))
+                          ? Parrot_oo_get_class_str(interp, name)
+                          : PMCNULL;
+
+    if (!PMC_IS_NULL(_class)) {
+        PMC *initial = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
+        VTABLE_set_integer_native(interp, initial, $3);
+        $1 = VTABLE_instantiate(interp, _class, initial);
+    }
+    else {
+        const INTVAL type = Parrot_pmc_get_type_str(interp, name);
+        if (type <= 0) {
+            opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+                EXCEPTION_NO_CLASS,
+                "Class '%Ss' not found", name);
+            goto ADDRESS(dest);
+        }
+        $1 = Parrot_pmc_new_init_int(interp, type, $3);
+    }
+}
+
+
+op new(out PMC, in PMC, in INT) {
+    PMC * const name_key = $2;
+    PMC * const _class   = Parrot_oo_get_class(interp, name_key);
+
+    if (!PMC_IS_NULL(_class)) {
+        PMC *initial = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
+        VTABLE_set_integer_native(interp, initial, $3);
+        $1 = VTABLE_instantiate(interp, _class, initial);
+    }
+    else {
+        const INTVAL type = Parrot_pmc_get_type(interp, name_key);
+        if (type <= 0) {
+            opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+                EXCEPTION_NO_CLASS,
+                "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
+            goto ADDRESS(dest);
+        }
+        $1 = Parrot_pmc_new_init_int(interp, type, $3);
+    }
+}
+
 =head1 COPYRIGHT
 
 Copyright (C) 2001-2009, Parrot Foundation.

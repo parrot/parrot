@@ -89,6 +89,13 @@ PMC * Parrot_pmc_new_init(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PMC * Parrot_pmc_new_init_int(PARROT_INTERP,
+    INTVAL base_type,
+    INTVAL init)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
         __attribute__nonnull__(1);
 
