@@ -47,7 +47,6 @@ typedef op_lib_t *(*oplib_init_f)(PARROT_INTERP, long init);
 typedef enum {
     CORE_OPS_end,               /* halt the runloop */
     CORE_OPS_noop,              /* do nothing */
-    CORE_OPS_cpu_ret,           /* __asm("ret") */
     CORE_OPS_check_events,      /* explicit event check */
     CORE_OPS_check_events__,    /* inserted into op dispatch when an event
                                    got scheduled */

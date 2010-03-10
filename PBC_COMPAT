@@ -27,6 +27,7 @@
 
 # please insert tab separated entries at the top of the list
 
+6.5	2010.03.09	cotto	remove cpu_ret op
 6.4	2010.03.02	cotto	remove prederef__ and reserved
 6.3	2010.02.16	whiteknight	Add OpLib and Opcode PMCs
 6.2	2010.01.31	cotto	serialization-related changes to ParrotInterpreter
