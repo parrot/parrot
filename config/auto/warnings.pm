@@ -97,6 +97,7 @@ sub _init {
     # begin gcc/g++
     my $gcc = {};
     my $gpp = {};
+    my $icc = {};
 
     my @gcc_or_gpp = qw(
         -falign-functions=16
@@ -217,8 +218,38 @@ sub _init {
         ],
     };
 
+    $icc->{'basic'} = [ qw(
+        -wd269
+        -wd1572
+        -wd1599
+        -wd181
+        -wd869
+        -wd981
+        -wd1419
+        -wd117
+        -wd810
+        -wd177
+        -wd1296
+        -Wall
+        -Wcheck
+        -w2
+        -Wabi
+        -Wcomment
+        -Wdeprecated
+        -Wmain
+        -Wmissing-prototypes
+        -Wpointer-arith
+        -Wreturn-type
+        -Wstrict-prototypes
+        -Wuninitialized
+        -Wunknown-pragmas
+        -Wunused-function
+        -Wunused-variable
+    )];
+
     $data->{'warnings'}{'gcc'} = $gcc;
     $data->{'warnings'}{'g++'} = $gpp;
+    $data->{'warnings'}{'icc'} = $icc;
 
     ## end gcc/g++
 
@@ -234,6 +265,9 @@ sub runstep {
     my $compiler = '';
     if ( defined $conf->data->get('gccversion') ) {
         $compiler = $conf->data->get('g++') ? 'g++' : 'gcc';
+    }
+    elsif ( $conf->option_or_data('cc') =~ /icc/ ) {
+        $compiler = 'icc';
     }
 
     if ($compiler eq '') {
