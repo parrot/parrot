@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -564,7 +564,8 @@ Parrot_pmc_new_init(PARROT_INTERP, INTVAL base_type, ARGOUT(PMC *init))
 
 /*
 
-=item C<PMC * Parrot_pmc_new_init(PARROT_INTERP, INTVAL base_type, INTVAL init)>
+=item C<PMC * Parrot_pmc_new_init_int(PARROT_INTERP, INTVAL base_type, INTVAL
+init)>
 
 As C<Parrot_pmc_new()>, but passes C<init> to the PMC's C<init_int()> vtable entry.
 
