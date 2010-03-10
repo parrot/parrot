@@ -1,6 +1,6 @@
 package Parrot::Pmc2c::PMC::Object;
 
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 
 use base 'Parrot::Pmc2c::PMC';
@@ -69,12 +69,8 @@ sub pre_method_gen {
             Parrot_pcc_invoke_sub_from_c_args(interp, meth, "Pi$pcc_sig", pmc$pcc_args);
             $pcc_return_stmt
         }
-        /* method name is $vt_method_name */
-EOC
 
-        # Multiply dispatched math opcodes shouldn't be invoked on a proxy object.
-        unless ($self->vtable_method_does_multi($vt_method_name)) {
-            $method_body_text .= <<"EOC";
+        /* method name is $vt_method_name */
         if (cur_class->vtable->base_type == enum_class_PMCProxy) {
             /* Get the PMC instance and call the vtable method on that. */
             STRING * const proxy      = CONST_STRING_GEN(interp, "proxy");
@@ -85,11 +81,8 @@ EOC
                 $void_return
             }
         }
-EOC
-        }
-
-        $method_body_text .= <<"EOC";
     }
+
     ${return}SUPER($superargs);
     $void_return
 EOC
