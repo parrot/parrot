@@ -39,6 +39,7 @@ out-of-bounds test. Checks INT and PMC keys.
     'clone'()
     get_iter()
     fill()
+#    'test_new_style_init'()
 .end
 
 .sub 'setting_array_size'
@@ -332,6 +333,12 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .end
 
+.sub 'test_new_style_init'
+    $P0 = new ['FixedBooleanArray'], 10
+
+    $I0 = $P0
+    is($I0, 10, "New style init creates the correct # of elements")
+.end
 
 # Local Variables:
 #   mode: pir

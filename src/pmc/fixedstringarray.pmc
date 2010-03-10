@@ -45,6 +45,23 @@ Initializes the array.
 
 /*
 
+=item C<void init_int(INTVAL size)>
+
+Initializes the array.
+
+=cut
+
+*/
+
+    VTABLE void init_int(INTVAL size) {
+        SET_ATTR_size(INTERP, SELF, size);
+        SET_ATTR_str_array(INTERP, SELF, mem_gc_allocate_n_zeroed_typed(INTERP, size, STRING*));
+        PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+
+/*
+
 =item C<void destroy()>
 
 Destroys the array.

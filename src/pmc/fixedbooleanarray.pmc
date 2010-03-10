@@ -62,6 +62,26 @@ Initializes the array.
 
 /*
 
+=item C<void init_int(INTVAL size)>
+
+Initializes the array.
+
+=cut
+
+*/
+
+    VTABLE void init_int(INTVAL size) {
+        const size_t size_in_bytes = get_size_in_bytes(size);
+
+        SET_ATTR_size(INTERP, SELF, size);
+        SET_ATTR_resize_threshold(INTERP, SELF, size_in_bytes * BITS_PER_CHAR);
+        SET_ATTR_bit_array(INTERP, SELF, mem_gc_allocate_n_zeroed_typed(INTERP, size_in_bytes, unsigned char));
+        PObj_custom_destroy_SET(SELF);
+    }
+
+
+/*
+
 =item C<void destroy()>
 
 Destroys the array.

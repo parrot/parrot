@@ -38,6 +38,7 @@ out-of-bounds test. Checks INT and PMC keys.
     'test_equality'()       # 5 tests
     'test_gc'()             # 4 tests
     'test_number'()         # 2 tests
+#    'test_new_style_init'() # 1 test
 .end
 
 .sub 'test_set_size'
@@ -376,6 +377,12 @@ out-of-bounds test. Checks INT and PMC keys.
     is($N0, 3.0, "get_number returns correct size")
 .end
 
+.sub 'test_new_style_init'
+    $P0 = new ['FixedStringArray'], 10
+
+    $I0 = $P0
+    is($I0, 10, "New style init creates the correct # of elements")
+.end
 
 # Local Variables:
 #   mode: pir

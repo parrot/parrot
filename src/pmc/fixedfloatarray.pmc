@@ -48,6 +48,22 @@ Destroys the array.
 
 /*
 
+=item C<void init_int(INTVAL size)>
+
+Initializes the array.
+
+=cut
+
+*/
+
+    VTABLE void init_int(INTVAL new_size) {
+        SET_ATTR_size(INTERP, SELF, new_size);
+        SET_ATTR_float_array(INTERP, SELF, mem_gc_allocate_n_typed(INTERP, new_size, FLOATVAL));
+        PObj_custom_destroy_SET(SELF);
+    }
+
+/*
+
 =item C<PMC *clone()>
 
 Creates and returns a copy of the array.

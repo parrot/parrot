@@ -46,6 +46,7 @@ out-of-bounds test. Checks INT and PMC keys.
     test_splice()
     test_sort()
     test_exists()
+#    'test_new_style_init'()
 .end
 
 .sub test_exists
@@ -664,6 +665,13 @@ CODE
     set $I0, $P0
 
     is($I0,1,'size of FixedPMCArray is 1')
+.end
+
+.sub 'test_new_style_init'
+    $P0 = new ['FixedPMCArray'], 10
+
+    $I0 = $P0
+    is($I0, 10, "New style init creates the correct # of elements")
 .end
 
 # Local Variables:
