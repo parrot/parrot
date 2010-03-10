@@ -342,7 +342,7 @@ Tests the Float PMC.
     neg $P0
 
     $S0 = $P0
-    is($S0, "-0")
+    is($S0, "-0", "negative 0.0 to string")
     .return ()
 
   negative_zero_todoed:

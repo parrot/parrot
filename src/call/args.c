@@ -2735,7 +2735,7 @@ intval_constant_from_varargs(PARROT_INTERP, ARGIN(void *data), INTVAL index)
 {
     ASSERT_ARGS(intval_constant_from_varargs)
     UNUSED(index);
-    PARROT_ASSERT(!"Wrong call");
+    PARROT_FAILURE("Wrong call");
     return 0;
 }
 
@@ -2744,7 +2744,7 @@ numval_constant_from_varargs(PARROT_INTERP, ARGIN(void *data), INTVAL index)
 {
     ASSERT_ARGS(numval_constant_from_varargs)
     UNUSED(index);
-    PARROT_ASSERT(!"Wrong call");
+    PARROT_FAILURE("Wrong call");
     return 0.0;
 }
 
@@ -2754,7 +2754,7 @@ string_constant_from_varargs(PARROT_INTERP, ARGIN(void *data), INTVAL index)
 {
     ASSERT_ARGS(string_constant_from_varargs)
     UNUSED(index);
-    PARROT_ASSERT(!"Wrong call");
+    PARROT_FAILURE("Wrong call");
     return NULL;
 }
 
@@ -2764,7 +2764,7 @@ pmc_constant_from_varargs(PARROT_INTERP, ARGIN(void *data), INTVAL index)
 {
     ASSERT_ARGS(pmc_constant_from_varargs)
     UNUSED(index);
-    PARROT_ASSERT(!"Wrong call");
+    PARROT_FAILURE("Wrong call");
     return PMCNULL;
 }
 
@@ -2925,7 +2925,7 @@ csr_push_pointer(PARROT_INTERP, ARGIN(PMC *self), ARGIN_NULLOK(void *value), INT
     void   **values;
     INTVAL   size;
 
-    PARROT_ASSERT((type >= 0 && type < 4) || !"Wrong pointer type");
+    PARROT_ASSERT_MSG((type >= 0 && type < 4), "Wrong pointer type");
 
     GETATTR_CallContext_returns_size(interp, self, size);
     values = csr_reallocate_return_values(interp, self, size + 1);
@@ -2977,7 +2977,7 @@ csr_fill_integer(PARROT_INTERP, ARGIN(PMC *self), INTVAL key, INTVAL value)
         *(PMC **)ptr = get_integer_pmc(interp, value);
         break;
       default:
-        PARROT_ASSERT(!"Impossible type");
+        PARROT_FAILURE("Impossible type");
     }
 }
 
@@ -3002,7 +3002,7 @@ csr_fill_number(PARROT_INTERP, ARGIN(PMC *self), INTVAL key, FLOATVAL value)
         *(PMC **)ptr = get_number_pmc(interp, value);
         break;
       default:
-        PARROT_ASSERT(!"Impossible type");
+        PARROT_FAILURE("Impossible type");
     }
 }
 
@@ -3029,7 +3029,7 @@ csr_fill_string(PARROT_INTERP, ARGIN(PMC *self), INTVAL key, ARGIN_NULLOK(STRING
                 get_string_pmc(interp, value);
         break;
       default:
-        PARROT_ASSERT(!"Impossible type");
+        PARROT_FAILURE("Impossible type");
     }
 }
 
@@ -3054,7 +3054,7 @@ csr_fill_pmc(PARROT_INTERP, ARGIN(PMC *self), INTVAL key, ARGIN_NULLOK(PMC *valu
         *(PMC **)ptr = value;
         break;
       default:
-        PARROT_ASSERT(!"Impossible type");
+        PARROT_FAILURE(!"Impossible type");
     }
 }
 
@@ -3100,7 +3100,7 @@ csr_get_pointer_keyed_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL key)
     INTVAL   size;
 
     GETATTR_CallContext_returns_size(interp, self, size);
-    PARROT_ASSERT((key < size) || !"Wrong index");
+    PARROT_ASSERT_MSG(key < size, "Wrong index");
 
     GETATTR_CallContext_returns_values(interp, self, values);
     return values[key];

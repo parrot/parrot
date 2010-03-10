@@ -306,7 +306,7 @@ init_context(PARROT_INTERP, ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
                            ? NULL
                            : get_context_struct_fast(interp, pmcold);
 
-    PARROT_ASSERT(!PMC_IS_NULL(pmcctx) || !"Can't initialise Null CallContext");
+    PARROT_ASSERT_MSG(!PMC_IS_NULL(pmcctx), "Can't initialise Null CallContext");
 
     /*
      * FIXME Invoking corotine shouldn't initialise context. So just

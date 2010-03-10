@@ -272,10 +272,14 @@ void Parrot_print_backtrace(void);
 #ifdef NDEBUG
 #  define PARROT_ASSERT(x) /*@-noeffect@*/((void)0)/*@=noeffect@*/
 #  define PARROT_ASSERT_ARG(x) (0)
+#  define PARROT_FAILURE(x) /*@-noeffect@*/((void)0)/*@=noeffect@*/
+#  define PARROT_ASSERT_MSG(x, s) /*@-noeffect@*/((void)0)/*@=noeffect@*/
 #  define ASSERT_ARGS(a)
 #else
 #  define PARROT_ASSERT(x) (x) ? ((void)0) : Parrot_confess(#x, __FILE__, __LINE__)
 #  define PARROT_ASSERT_ARG(x) ((x) ? (0) : (Parrot_confess(#x, __FILE__, __LINE__), 0))
+#  define PARROT_FAILURE(x) Parrot_confess(x, __FILE__, __LINE__)
+#  define PARROT_ASSERT_MSG(x, s) ((x) ? (0) : (Parrot_confess(s, __FILE__, __LINE__), 0))
 
 #  ifdef __GNUC__
 #    define ASSERT_ARGS(a) ASSERT_ARGS_ ## a ;
