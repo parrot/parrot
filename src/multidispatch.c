@@ -308,8 +308,8 @@ Parrot_mmd_multi_dispatch_from_c_args(PARROT_INTERP,
 
     if (PMC_IS_NULL(sub))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_METHOD_NOT_FOUND,
-                "Multiple Dispatch: No suitable candidate found for '%s',"
-                " with signature '%s'", name, sig);
+        "Multiple Dispatch: No suitable candidate found for '%s',"
+            " with signature '%s'", name, sig);
 
 #if MMD_DEBUG
     Parrot_io_eprintf(interp, "candidate found for '%s', with signature '%s'\n",
@@ -513,17 +513,17 @@ PMC*
 Parrot_mmd_build_type_tuple_from_sig_obj(PARROT_INTERP, ARGIN(PMC *sig_obj))
 {
     ASSERT_ARGS(Parrot_mmd_build_type_tuple_from_sig_obj)
-    PMC * const  type_tuple = pmc_new(interp, enum_class_ResizableIntegerArray);
-    STRING      *string_sig = VTABLE_get_string(interp, sig_obj);
-    INTVAL       tuple_size = 0;
-    INTVAL       args_ended = 0;
-    INTVAL       i, seen_invocant = 0;
+    PMC * const  type_tuple    = pmc_new(interp, enum_class_ResizableIntegerArray);
+    STRING      *string_sig    = VTABLE_get_string(interp, sig_obj);
+    INTVAL       tuple_size    = 0;
+    INTVAL       args_ended    = 0;
+    INTVAL       seen_invocant = 0;
     INTVAL       sig_len;
+    INTVAL       i;
 
-    if (STRING_IS_NULL(string_sig)) {
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "Call has no signature, unable to dispatch.\n");
-    }
+    if (STRING_IS_NULL(string_sig))
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            "Call has no signature, unable to dispatch.\n");
 
     sig_len = Parrot_str_byte_length(interp, string_sig);
 
@@ -638,9 +638,8 @@ mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
             if (type == enum_type_undef)
                 return PMCNULL;
         }
-        else if (sig_elem->vtable->base_type == enum_class_Integer) {
+        else if (sig_elem->vtable->base_type == enum_class_Integer)
             type = VTABLE_get_integer(interp, sig_elem);
-        }
         else
             type = pmc_type_p(interp, sig_elem);
 

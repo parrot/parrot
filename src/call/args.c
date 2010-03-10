@@ -882,13 +882,13 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
 {
     ASSERT_ARGS(Parrot_pcc_build_sig_object_from_varargs)
     PMC         *type_tuple         = PMCNULL;
-    PMC         *arg_flags     = PMCNULL;
-    PMC         *return_flags  = PMCNULL;
+    PMC         *arg_flags          = PMCNULL;
+    PMC         *return_flags       = PMCNULL;
     PMC         * const call_object = pmc_new(interp, enum_class_CallContext);
     const INTVAL sig_len            = strlen(sig);
     INTVAL       in_return_sig      = 0;
-    INTVAL       i;
     int          append_pi          = 1;
+    INTVAL       i;
 
     if (!sig_len)
         return call_object;

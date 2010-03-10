@@ -71,6 +71,16 @@ sub pre_method_gen {
         }
 
         /* method name is $vt_method_name */
+EOC
+
+        if ($self->vtable_method_does_multi($vt_method_name)) {
+            $method_body_text .= <<"EOC";
+        if (cur_class->vtable->base_type == enum_class_PMCProxy)
+            break;
+EOC
+        }
+        else {
+            $method_body_text .= <<"EOC";
         if (cur_class->vtable->base_type == enum_class_PMCProxy) {
             /* Get the PMC instance and call the vtable method on that. */
             STRING * const proxy      = CONST_STRING_GEN(interp, "proxy");
@@ -81,6 +91,10 @@ sub pre_method_gen {
                 $void_return
             }
         }
+EOC
+        }
+
+        $method_body_text .= <<"EOC";
     }
 
     ${return}SUPER($superargs);
