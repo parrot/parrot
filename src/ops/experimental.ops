@@ -271,23 +271,32 @@ op new(out PMC, in STR, in INT) {
 
 
 op new(out PMC, in PMC, in INT) {
-    PMC * const name_key = $2;
-    PMC * const _class   = Parrot_oo_get_class(interp, name_key);
+    PMC * const  name_key = $2;
 
-    if (!PMC_IS_NULL(_class)) {
-        PMC *initial = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
-        VTABLE_set_integer_native(interp, initial, $3);
-        $1 = VTABLE_instantiate(interp, _class, initial);
-    }
-    else {
-        const INTVAL type = Parrot_pmc_get_type(interp, name_key);
-        if (type <= 0) {
-            opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
-                EXCEPTION_NO_CLASS,
-                "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
-            goto ADDRESS(dest);
+    /* get_class() returns a PMCProxy for core types, so check for core PMCs */
+    const INTVAL type = Parrot_pmc_get_type(interp, name_key);
+
+    /* if it's clearly a PIR-level PMC */
+    if (type > enum_class_core_max) {
+        PMC * const _class = Parrot_oo_get_class(interp, name_key);
+        if (!PMC_IS_NULL(_class)) {
+            PMC *initial = Parrot_pmc_new(interp,
+                Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
+            VTABLE_set_integer_native(interp, initial, $3);
+            $1 = VTABLE_instantiate(interp, _class, initial);
         }
+    }
+
+    /* if it's a core PMC */
+    else if (type > enum_class_default )
         $1 = Parrot_pmc_new_init_int(interp, type, $3);
+
+    /* it's a typo */
+    else {
+        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            EXCEPTION_NO_CLASS,
+            "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
+        goto ADDRESS(dest);
     }
 }
 
