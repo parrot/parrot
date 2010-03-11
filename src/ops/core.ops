@@ -722,7 +722,7 @@ inline op push_eh(invar PMC) {
 
 inline op pop_eh() {
     Parrot_cx_delete_handler_local(interp,
-            Parrot_str_new(interp, "exception", 9));
+            Parrot_str_new_constant(interp, "exception"));
 }
 
 inline op throw(invar PMC) :flow {
@@ -768,7 +768,7 @@ inline op rethrow(invar PMC) :flow {
 
 inline op count_eh(out INT) {
     $1 = Parrot_cx_count_handlers_local(interp,
-            Parrot_str_new(interp, "exception", 9));
+            Parrot_str_new_constant(interp, "exception"));
 }
 
 inline op die(in STR) :flow {
