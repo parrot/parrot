@@ -300,6 +300,14 @@ op new(out PMC, in PMC, in INT) {
     }
 }
 
+=over 4
+
+=item B<root_new>(out PMC, in PMC, in INT)
+
+=back
+
+=cut
+
 op root_new(out PMC, in PMC, in INT) {
     PMC * const  name_key = $2;
 
