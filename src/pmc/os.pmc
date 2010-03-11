@@ -504,8 +504,11 @@ reads entries from a directory.
         HANDLE hFind = INVALID_HANDLE_VALUE;
 
         /* Add \* to the directory name and start search. */
+        STRING *last_char = Parrot_str_substr(interp, path, Parrot_str_length(interp, path) - 1, 1, NULL, 0);
+        int trailing_slash = Parrot_str_equal(interp, last_char, string_from_literal(interp, "\\")) ||
+                             Parrot_str_equal(interp, last_char, string_from_literal(interp, "/"));
         cpath = Parrot_str_to_cstring(interp, Parrot_str_concat(interp,
-                path, string_from_literal(interp, "\\*"), 0));
+                path, string_from_literal(interp, trailing_slash ? "*" : "\\*"), 0));
         hFind = FindFirstFile(cpath, &file_find_data);
         Parrot_str_free_cstring(cpath);
         if (hFind == INVALID_HANDLE_VALUE)
