@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 13;
 use Math::Trig qw( tan sec atan asin acos asec cosh sinh tanh sech );
 
 =head1 NAME
@@ -28,124 +28,6 @@ Tests the transcendental mathematical operations.
 # fp_ne N, N, LABEL
 # which will conditionally branch
 # to LABEL if abs(n,n) < epsilon
-
-pasm_output_is( <<"CODE", <<OUTPUT, "sec" );
-        .include 'fp_equality.pasm'
-        set N1, 1.0
-        sec N2, N1
-        .fp_eq_pasm  (N2, 1.850816, EQ1)
-        print "not "
-EQ1:    print "ok 1\\n"
-
-        set I1, 1
-        sec N2, I1
-        .fp_eq_pasm  (N2, 1.850816, EQ2)
-        print "not "
-EQ2:    print "ok 2\\n"
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
-
-pasm_output_is( <<"CODE", <<OUTPUT, "atan" );
-        .include 'fp_equality.pasm'
-        set N1, 1.0
-        atan N2, N1
-        .fp_eq_pasm  (N2, 0.785398, EQ1)
-        print "not "
-EQ1:    print "ok 1\\n"
-
-        set I1, 1
-        atan N2, I1
-        .fp_eq_pasm  (N2,0.785398 , EQ2)
-        print "not "
-EQ2:    print "ok 2\\n"
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
-
-pasm_output_is( <<"CODE", <<OUTPUT, "asin" );
-        .include 'fp_equality.pasm'
-        set N1, 1.0
-        asin N2, N1
-        .fp_eq_pasm  (N2, 1.570796, EQ1)
-        print "not "
-EQ1:    print "ok 1\\n"
-
-        set I1, 1
-        asin N2, I1
-        .fp_eq_pasm  (N2, 1.570796 , EQ2)
-        print "not "
-EQ2:    print "ok 2\\n"
-
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
-
-pasm_output_is( <<"CODE", <<OUTPUT, "acos" );
-        .include 'fp_equality.pasm'
-        set N1, 1.0
-        acos N2, N1
-        .fp_eq_pasm  (N2, 0.000000, EQ1)
-        print "not "
-EQ1:    print "ok 1\\n"
-
-        set I1, 1
-        acos N2, I1
-        .fp_eq_pasm  (N2, 0.000000, EQ2)
-        print "not "
-EQ2:    print "ok 2\\n"
-
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
-
-pasm_output_is( <<"CODE", <<OUTPUT, "asec" );
-        .include 'fp_equality.pasm'
-        set N1, 1.0
-        asec N2, N1
-        .fp_eq_pasm  (N2, 0.000000, EQ1)
-        print "not "
-EQ1:    print "ok 1\\n"
-
-        set I1, 1
-        asec N2, I1
-        .fp_eq_pasm  (N2, 0.000000, EQ2)
-        print "not "
-EQ2:    print "ok 2\\n"
-
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
-
-pasm_output_is( <<"CODE", <<OUTPUT, "cosh" );
-        .include 'fp_equality.pasm'
-        set N1, 1.0
-        cosh N2, N1
-        .fp_eq_pasm  (N2, 1.543081, EQ1)
-        print "not "
-EQ1:    print "ok 1\\n"
-
-        set I1, 1
-        cosh N2, I1
-        .fp_eq_pasm  (N2, 1.543081, EQ2)
-        print "not "
-EQ2:    print "ok 2\\n"
-
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
 
 my $runcore = $ENV{TEST_PROG_ARGS} || '';
 my @bsdtodo = (

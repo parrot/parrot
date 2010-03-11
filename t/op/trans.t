@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-t/op/trans.t - Bitwise Ops
+t/op/trans.t - Trancendental Mathematical Ops
 
 =head1 SYNOPSIS
 
@@ -18,15 +18,29 @@ Tests various transcendental operations
 
 .sub main :main
     .include 'test_more.pir'
+    .local num epsilon
+    epsilon = _epsilon()
 
-    plan(16)
+    plan(28)
 
-    test_sin_n()
-    test_sin_i()
-    test_cos_n()
-    test_cos_i()
-    test_tan_n()
-    test_tan_i()
+    test_sin_n(epsilon)
+    test_sin_i(epsilon)
+    test_cos_n(epsilon)
+    test_cos_i(epsilon)
+    test_tan_n(epsilon)
+    test_tan_i(epsilon)
+    test_sec_n(epsilon)
+    test_sec_i(epsilon)
+    test_atan_n(epsilon)
+    test_atan_i(epsilon)
+    test_asin_n(epsilon)
+    test_asin_i(epsilon)
+    test_acos_n(epsilon)
+    test_acos_i(epsilon)
+    test_asec_n(epsilon)
+    test_asec_i(epsilon)
+    test_cosh_n(epsilon)
+    test_cosh_i(epsilon)
 .end
 
 .sub _pi
@@ -42,8 +56,7 @@ Tests various transcendental operations
 .end
 
 .sub test_sin_n
-    .local num epsilon
-    epsilon = _epsilon()
+    .param num epsilon
 
     $N0 = sin 0.0
     is($N0, 0.0, "sin(0.0)", epsilon)
@@ -62,8 +75,7 @@ Tests various transcendental operations
 .end
 
 .sub test_sin_i
-    .local num epsilon
-    epsilon = _epsilon()
+    .param num epsilon
 
     $N0 = sin 0
     is($N0, 0.0, "sin(0)", epsilon)
@@ -73,8 +85,7 @@ Tests various transcendental operations
 .end
 
 .sub test_cos_n
-    .local num epsilon
-    epsilon = _epsilon()
+    .param num epsilon
 
     $N0 = cos 0.0
     is($N0, 1.0, "cos(0.0)", epsilon)
@@ -93,8 +104,7 @@ Tests various transcendental operations
 .end
 
 .sub test_cos_i
-    .local num epsilon
-    epsilon = _epsilon()
+    .param num epsilon
 
     $N0 = cos 0
     is($N0, 1.0, "cos(0)", epsilon)
@@ -104,8 +114,7 @@ Tests various transcendental operations
 .end
 
 .sub test_tan_n
-    .local num epsilon
-    epsilon = _epsilon()
+    .param num epsilon
 
     $N0 = tan 0.0
     is($N0, 0.0, "tan(0.0)", epsilon)
@@ -115,14 +124,116 @@ Tests various transcendental operations
 .end
 
 .sub test_tan_i
-    .local num epsilon
-    epsilon = _epsilon()
+    .param num epsilon
 
     $N0 = tan 0
     is($N0, 0.0, "tan(0)", epsilon)
 
     $N0 = tan 1
     is($N0, 1.557408, "tan(1)", epsilon)
+.end
+
+.sub test_sec_n
+    .param num epsilon
+
+    $N1 = 1.0
+    $N2 = sec $N1
+    is($N2, 1.850816, "sec(1.0)", epsilon)
+.end
+
+.sub test_sec_i
+    .param num epsilon
+
+    $I1 = 1
+    $N1 = sec $I1
+    is($N1, 1.850816, "sec(1)", epsilon)
+.end
+
+.sub test_atan_n
+    .param num epsilon
+
+    $N1 = 1.0
+    $N2 = atan $N1
+    is($N2, 0.785398, "atan(1.0)", epsilon)
+.end
+
+.sub test_atan_i
+    .param num epsilon
+
+    $I1 = 1
+    $N1 = atan $I1
+    is($N1, 0.785398, "atan(1)", epsilon)
+.end
+
+.sub test_asin_n
+    .param num epsilon
+    .local num pi2
+    pi2 = _pi()
+    pi2 /= 2
+
+    $N1 = 1.0
+    $N2 = asin $N1
+    is($N2, pi2, "asin(1.0)", epsilon)
+.end
+
+.sub test_asin_i
+    .param num epsilon
+    .local num pi2
+    pi2 = _pi()
+    pi2 /= 2
+
+    $I1 = 1
+    $N1 = asin $I1
+    is($N1, pi2, "asin(1)", epsilon)
+.end
+
+.sub test_acos_n
+    .param num epsilon
+
+    $N1 = 1.0
+    $N2 = acos $N1
+    is($N2, 0.0, "acos(1.0)", epsilon)
+.end
+
+.sub test_acos_i
+    .param num epsilon
+
+    $I1 = 1
+    $N1 = acos $I1
+    is($N1, 0.0, "acos(1)", epsilon)
+.end
+
+.sub test_asec_n
+    .param num epsilon
+
+    $N1 = 1.0
+    $N2 = asec $N1
+    is($N2, 0.0, "asec(1.0)", epsilon)
+.end
+
+.sub test_asec_i
+    .param num epsilon
+
+    $I1 = 1
+    $N1 = asec $I1
+    is($N1, 0.0, "asec(1)", epsilon)
+.end
+
+.sub test_cosh_n
+    .param num epsilon
+    .local num result
+
+    $N1 = 1.0
+    $N2 = cosh $N1
+    is($N2, 1.543081, "cosh(1.0)", epsilon)
+.end
+
+.sub test_cosh_i
+    .param num epsilon
+
+    $I1 = 1
+    $N1 = cosh $I1
+    is($N1, 1.543081, "cosh(1)", epsilon)
 .end
 
 # Local Variables:
