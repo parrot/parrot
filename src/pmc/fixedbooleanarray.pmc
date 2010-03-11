@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -75,7 +75,8 @@ Initializes the array.
 
         SET_ATTR_size(INTERP, SELF, size);
         SET_ATTR_resize_threshold(INTERP, SELF, size_in_bytes * BITS_PER_CHAR);
-        SET_ATTR_bit_array(INTERP, SELF, mem_gc_allocate_n_zeroed_typed(INTERP, size_in_bytes, unsigned char));
+        SET_ATTR_bit_array(INTERP, SELF, mem_gc_allocate_n_zeroed_typed(INTERP, size_in_bytes,
+                                                                        unsigned char));
         PObj_custom_destroy_SET(SELF);
     }
 
