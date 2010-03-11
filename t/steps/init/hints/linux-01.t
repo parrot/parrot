@@ -39,7 +39,7 @@ $conf->include_config_results( $args );
 my $ccflags = '';
 my $verbose = 0;
 $ccflags = init::hints::linux::_handle_icc_ccflags($ccflags, $verbose);
-like( $ccflags, qr/\s-wd269/, "On icc, 'cc_flags' set as expected" );
+like( $ccflags, qr/\s-we147/, "On icc, 'cc_flags' set as expected" );
 
 $ccflags = '';
 $verbose = 1;
@@ -51,9 +51,9 @@ $verbose = 1;
         \$stdout,
         \$stderr,
     );
-    like( $ccflags, qr/\s-wd269/, "On icc, 'cc_flags' set as expected" );
+    like( $ccflags, qr/\s-we147/, "On icc, 'cc_flags' set as expected" );
     like( $stdout,
-        qr/\sccflags:.*?-wd269/,
+        qr/\sccflags:.*?-we147/,
         "On icc, got expected verbose output for 'cc_flags'" );
 }
 
