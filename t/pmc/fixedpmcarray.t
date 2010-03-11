@@ -19,7 +19,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(78)
+    plan(79)
     test_setting_array_size()
     test_assign_from_another()
     test_assign_self()
@@ -46,7 +46,7 @@ out-of-bounds test. Checks INT and PMC keys.
     test_splice()
     test_sort()
     test_exists()
-#    'test_new_style_init'()
+    test_new_style_init()
 .end
 
 .sub test_exists
@@ -668,7 +668,7 @@ CODE
 .end
 
 .sub 'test_new_style_init'
-    $P0 = new ['FixedPMCArray'], 10
+    $P0 = new 'FixedPMCArray', 10
 
     $I0 = $P0
     is($I0, 10, "New style init creates the correct # of elements")

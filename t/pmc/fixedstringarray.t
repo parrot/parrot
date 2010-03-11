@@ -19,26 +19,26 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(46)
+    plan(47)
 
-    'test_set_size'()       # 2 tests
-    'test_reset_size'()     # 1 test
-    'test_set_first'()      # 3 tests
-    'test_set_second'()     # 3 tests
-    'test_out_of_bounds'()  # 4 tests
-    'test_set_via_pmc'()    # 3 tests
-    'test_get_via_pmc'()    # 4 tests
-    'test_interface_done'() # 3 tests
-    'test_clone'()          # 3 tests
-    'test_clone_unitialized'() # 2 tests
-    'test_truth'()          # 2 tests
-    'test_get_iter'()       # 1 test
-    'test_freez_thaw'()     # 1 test
-    'test_get_string'()     # 1 test
-    'test_equality'()       # 5 tests
-    'test_gc'()             # 4 tests
-    'test_number'()         # 2 tests
-#    'test_new_style_init'() # 1 test
+    test_set_size()
+    test_reset_size()
+    test_set_first()
+    test_set_second()
+    test_out_of_bounds()
+    test_set_via_pmc()
+    test_get_via_pmc()
+    test_interface_done()
+    test_clone()
+    test_clone_unitialized()
+    test_truth()
+    test_get_iter()
+    test_freez_thaw()
+    test_get_string()
+    test_equality()
+    test_gc()
+    test_number()
+    test_new_style_init()
 .end
 
 .sub 'test_set_size'
@@ -378,7 +378,7 @@ out-of-bounds test. Checks INT and PMC keys.
 .end
 
 .sub 'test_new_style_init'
-    $P0 = new ['FixedStringArray'], 10
+    $P0 = new 'FixedStringArray', 10
 
     $I0 = $P0
     is($I0, 10, "New style init creates the correct # of elements")

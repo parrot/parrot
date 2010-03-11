@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -20,7 +20,7 @@ out-of-bounds test. Checks INT and PMC keys.
 .sub main :main
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
-    plan(26)
+    plan(27)
 
     array_size_tests()
     element_set_tests()
@@ -30,7 +30,7 @@ out-of-bounds test. Checks INT and PMC keys.
     what_is_truth()
     interface_check()
     get_iter_test()
-#    'test_new_style_init'()
+    test_new_style_init()
 .end
 
 .sub array_size_tests
@@ -246,8 +246,8 @@ loop:
     is($S0, "1.1,99.99,-345.001,", "get_iter works")
 .end
 
-.sub 'test_new_style_init'
-    $P0 = new ['FixedFloatArray'], 10
+.sub test_new_style_init
+    $P0 = new 'FixedFloatArray', 10
 
     $I0 = $P0
     is($I0, 10, "New style init creates the correct # of elements")
