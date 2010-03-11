@@ -19,7 +19,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(30)
+    plan(31)
 
     test_set_size()
     test_reset_size()
@@ -39,6 +39,11 @@ out-of-bounds test. Checks INT and PMC keys.
 
     $I0 = $P0
     is($I0, 10, "New style init creates the correct # of elements")
+
+    $P0 = new ['FixedIntegerArray'], 10
+
+    $I0 = $P0
+    is($I0, 10, "New style init creates the correct # of elements for a key constant")
 .end
 
 .sub 'test_set_size'

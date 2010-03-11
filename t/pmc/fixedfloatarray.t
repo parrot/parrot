@@ -20,7 +20,7 @@ out-of-bounds test. Checks INT and PMC keys.
 .sub main :main
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
-    plan(27)
+    plan(28)
 
     array_size_tests()
     element_set_tests()
@@ -251,6 +251,11 @@ loop:
 
     $I0 = $P0
     is($I0, 10, "New style init creates the correct # of elements")
+
+    $P0 = new ['FixedFloatArray'], 10
+
+    $I0 = $P0
+    is($I0, 10, "New style init creates the correct # of elements for a key constant")
 .end
 
 # Local Variables:
