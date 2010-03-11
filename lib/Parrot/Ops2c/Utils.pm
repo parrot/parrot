@@ -123,11 +123,15 @@ sub new {
     my $source = "src/ops/$base_ops_stub.c.temp";
 
     if ( $flagref->{dynamic} ) {
+        $flagref->{dynamic} = 1;
+
         $source =~ s!src/ops/!!;
         $header = $base_ops_h;
         $base =~ s!^.*[/\\]!!;
-        $include = $base_ops_h;
-        $flagref->{dynamic} = 1;
+
+        # the compiler invocation has -Ipath/to/dir, so only include by name.
+        use File::Basename qw(fileparse);
+        $include = (fileparse($base_ops_h))[0];
     }
 
     my $sym_export =
