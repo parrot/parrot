@@ -300,6 +300,38 @@ op new(out PMC, in PMC, in INT) {
     }
 }
 
+op root_new(out PMC, in PMC, in INT) {
+    PMC * const  name_key = $2;
+
+    /* get_class() returns a PMCProxy for core types, so check for core PMCs */
+    const INTVAL type = Parrot_pmc_get_type(interp, name_key);
+
+    /* if it's clearly a PIR-level PMC */
+    if (type > enum_class_core_max) {
+        PMC * const root_ns  = interp->root_namespace;
+        PMC * const ns       = Parrot_get_namespace_keyed(interp, root_ns, name_key);
+        PMC * const _class   = Parrot_oo_get_class(interp, ns);
+        if (!PMC_IS_NULL(_class)) {
+            PMC *initial = Parrot_pmc_new(interp,
+                Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
+            VTABLE_set_integer_native(interp, initial, $3);
+            $1 = VTABLE_instantiate(interp, _class, initial);
+        }
+    }
+
+    /* if it's a core PMC */
+    else if (type > enum_class_default)
+        $1 = Parrot_pmc_new_init_int(interp, type, $3);
+
+    /* it's a typo */
+    else {
+        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            EXCEPTION_NO_CLASS,
+            "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
+        goto ADDRESS(dest);
+    }
+}
+
 =head1 COPYRIGHT
 
 Copyright (C) 2001-2010, Parrot Foundation.
