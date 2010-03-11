@@ -92,7 +92,7 @@ Initializes the array.
 
         if (size < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                    _("FixedPMCArray: Cannot set array size to a negative number"));
+                    _("FixedPMCArray: Cannot set array size to a negative number (%d)"),size);
 
         SET_ATTR_size(INTERP, SELF, size);
         data           = mem_gc_allocate_n_typed(INTERP, size, PMC *);

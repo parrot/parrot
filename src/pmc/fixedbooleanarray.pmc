@@ -73,6 +73,10 @@ Initializes the array.
     VTABLE void init_int(INTVAL size) {
         const size_t size_in_bytes = get_size_in_bytes(size);
 
+        if (size < 0)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                _("FixedBooleanArray: Cannot set array size to a negative number (%d)"), size);
+
         SET_ATTR_size(INTERP, SELF, size);
         SET_ATTR_resize_threshold(INTERP, SELF, size_in_bytes * BITS_PER_CHAR);
         SET_ATTR_bit_array(INTERP, SELF, mem_gc_allocate_n_zeroed_typed(INTERP, size_in_bytes,

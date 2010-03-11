@@ -54,6 +54,9 @@ Initializes the array.
 */
 
     VTABLE void init_int(INTVAL size) {
+        if (size < 0)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                _("FixedIntegerArray: Cannot set array size to a negative number (%d)"), size);
         SET_ATTR_size(INTERP, SELF, size);
         SET_ATTR_int_array(INTERP, SELF, mem_gc_allocate_n_typed(INTERP, size, INTVAL));
         PObj_custom_destroy_SET(SELF);

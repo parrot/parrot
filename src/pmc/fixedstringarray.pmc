@@ -56,7 +56,7 @@ Initializes the array.
     VTABLE void init_int(INTVAL size) {
         if (size < 0)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "Cannot instantiate PMC with negative size %d", size);
+                _("FixedStringArray: Cannot set array size to a negative number (%d)"), size);
         SET_ATTR_size(INTERP, SELF, size);
         SET_ATTR_str_array(INTERP, SELF, mem_gc_allocate_n_zeroed_typed(INTERP, size, STRING *));
         PObj_custom_mark_destroy_SETALL(SELF);
