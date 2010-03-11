@@ -288,7 +288,7 @@ op new(out PMC, in PMC, in INT) {
     }
 
     /* if it's a core PMC */
-    else if (type > enum_class_default )
+    else if (type > enum_class_default)
         $1 = Parrot_pmc_new_init_int(interp, type, $3);
 
     /* it's a typo */
@@ -302,7 +302,7 @@ op new(out PMC, in PMC, in INT) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 LICENSE
 
