@@ -19,7 +19,7 @@ Tests the Integer PMC.
 .sub 'test' :main
     .include 'test_more.pir'
 
-    plan(64)
+    plan(62)
     test_init()
     test_basic_math()
     test_truthiness_and_definedness()
@@ -39,7 +39,6 @@ Tests the Integer PMC.
     test_get_as_base_bounds_check()
     test_cmp_subclass()
     test_cmp_RT59336()
-    test_hll_mmd_tt562()
 .end
 
 .sub test_init
@@ -414,25 +413,6 @@ test_1000:
 pass2:
     ok(1)
 fin:
-.end
-
-.sub test_hll_mmd_tt562
-    # Test for issues described in TT #562, where subclasses of basic arithmetic
-    # types have troubles in MMD vtable operations
-    $P0 = subclass 'Integer', '562Integer'
-
-    $P0 = new 'Integer'
-    $P0 = 10
-    $P1 = sub $P0, 1
-    $I0 = $P1
-    is($I0, 9, "Integer MMD subtract")
-
-    $P0 = new 'FooInt'
-    $P0 = 10
-    $P1 = new '562Integer'
-    $P1 = sub $P0, 1
-    $I0 = $P1
-    is($I0, 9, "Integer subclass MMD subtract")
 .end
 
 # Local Variables:
