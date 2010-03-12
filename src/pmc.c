@@ -578,7 +578,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_pmc_new_init_int(PARROT_INTERP, INTVAL base_type, INTVAL init)
 {
-    ASSERT_ARGS(Parrot_pmc_new_init)
+    ASSERT_ARGS(Parrot_pmc_new_init_int)
     PMC *const classobj = interp->vtables[base_type]->pmc_class;
 
     if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj)) {
