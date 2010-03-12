@@ -195,7 +195,7 @@ static void gc_ms_reallocate_string_storage(PARROT_INTERP,
 static int gc_ms_sweep_cb(PARROT_INTERP,
     ARGIN(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool),
-    int flag,
+    SHIM(int flag),
     ARGMOD(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
