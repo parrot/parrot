@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -31,7 +31,6 @@ Most tests are skipped when the F<libnci_test.so> shared library is not found.
 =cut
 
 $ENV{TEST_PROG_ARGS} ||= '';
-        use Test::Builder;
 
 SKIP: {
     unless ( -e "runtime/parrot/dynext/libnci_test$PConfig{load_ext}" ) {
