@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -504,8 +504,10 @@ reads entries from a directory.
         HANDLE hFind = INVALID_HANDLE_VALUE;
 
         /* Add \* to the directory name and start search. */
-        STRING *last_char = Parrot_str_substr(interp, path, Parrot_str_length(interp, path) - 1, 1, NULL, 0);
-        int trailing_slash = Parrot_str_equal(interp, last_char, string_from_literal(interp, "\\")) ||
+        STRING *last_char = Parrot_str_substr(interp, path,
+                                              Parrot_str_length(interp, path) - 1, 1, NULL, 0);
+        int trailing_slash = Parrot_str_equal(interp, last_char, string_from_literal(interp, "\\"))
+                             ||
                              Parrot_str_equal(interp, last_char, string_from_literal(interp, "/"));
         cpath = Parrot_str_to_cstring(interp, Parrot_str_concat(interp,
                 path, string_from_literal(interp, trailing_slash ? "*" : "\\*"), 0));
