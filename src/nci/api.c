@@ -18,14 +18,6 @@
 /* HEADERIZER HFILE: include/parrot/nci.h */
 /* HEADERIZER STOP */
 
-static void
-init_nci_funcs(PARROT_INTERP) {
-    VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_NCI_FUNCS,
-        Parrot_pmc_new(interp, enum_class_Hash));
-    Parrot_nci_load_core_thunks(interp);
-    Parrot_nci_load_extra_thunks(interp);
-}
-
 /* This function serves a single purpose. It takes the function
    signature for a C function we want to call and returns a pointer
    to a function that can call it. */

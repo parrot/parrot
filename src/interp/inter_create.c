@@ -118,7 +118,6 @@ Parrot_Interp
 allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 {
     ASSERT_ARGS(allocate_interpreter)
-    int stacktop;
     Interp *interp;
 
     /* Get an empty interpreter from system memory */

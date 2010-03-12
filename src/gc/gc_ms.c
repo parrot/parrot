@@ -1093,7 +1093,6 @@ gc_ms_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGMOD(void *data))
 {
     ASSERT_ARGS(gc_ms_free_fixed_size_storage)
 
-    const size_t item_size = size < sizeof (void *) ? sizeof (void *) : size;
     const size_t idx   = size - sizeof (void *);
     PMC_Attribute_Pool ** const pools = interp->mem_pools->attrib_pools;
     gc_ms_free_attributes_from_pool(interp, pools[idx], data);
@@ -1231,7 +1230,7 @@ static int
 gc_ms_sweep_cb(PARROT_INTERP,
         ARGIN(Memory_Pools *mem_pools),
         ARGMOD(Fixed_Size_Pool *pool),
-        int flag, ARGMOD(void *arg))
+        SHIM(int flag), ARGMOD(void *arg))
 {
     ASSERT_ARGS(gc_ms_sweep_cb)
     int * const total_free = (int *) arg;

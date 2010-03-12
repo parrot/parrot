@@ -11,7 +11,7 @@ src/gc/api.c - general Parrot API for GC functions
 This file implements the external-facing API for Parrot's garbage collector.
 The collector itself is composed of various interchangable cores that each
 may operate very differently internally. The functions in this file can be used
-throughtout Parrot without having to be concerned about the internal operations
+throughout Parrot without having to be concerned about the internal operations
 of the GC. This is documented in PDD 9 with supplementary notes in
 F<docs/memory_internals.pod>.
 
@@ -99,29 +99,6 @@ implementation, and malloc wrappers for various purposes. These are unused.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void fix_pmc_syncs(
-    ARGMOD(Interp *dest_interp),
-    ARGIN(Fixed_Size_Pool *pool))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*dest_interp);
-
-static void Parrot_gc_merge_buffer_pools(PARROT_INTERP,
-    ARGMOD(Fixed_Size_Pool *dest),
-    ARGMOD(Fixed_Size_Pool *source))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*dest)
-        FUNC_MODIFIES(*source);
-
-#define ASSERT_ARGS_fix_pmc_syncs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(dest_interp) \
-    , PARROT_ASSERT_ARG(pool))
-#define ASSERT_ARGS_Parrot_gc_merge_buffer_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(source))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

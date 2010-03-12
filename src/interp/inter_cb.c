@@ -159,7 +159,6 @@ verify_CD(ARGIN(char *external_data), ARGMOD_NULLOK(PMC *user_data))
 {
     ASSERT_ARGS(verify_CD)
     PARROT_INTERP = NULL;
-    size_t i;
     PMC    *interp_pmc;
     STRING *sc;
 
