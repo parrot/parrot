@@ -631,7 +631,7 @@ static PMC*
 setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
 {
     ASSERT_ARGS(setup_argv)
-    PMC   *userargv = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
+    PMC   * const userargv = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
     INTVAL i;
 
     if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
@@ -718,7 +718,7 @@ set_current_sub(PARROT_INTERP)
     for (i = 0; i < ft->fixup_count; i++) {
         if (ft->fixups[i]->type == enum_fixup_sub) {
             const opcode_t ci      = ft->fixups[i]->offset;
-            PMC           *sub_pmc = ct->constants[ci]->u.key;
+            PMC    * const sub_pmc = ct->constants[ci]->u.key;
             Parrot_Sub_attributes *sub;
 
             PMC_get_sub(interp, sub_pmc, sub);
@@ -816,7 +816,6 @@ PARROT_CAN_RETURN_NULL
 opcode_t *
 Parrot_debug(PARROT_INTERP, NOTNULL(Parrot_Interp debugger), opcode_t * pc)
 {
-    const char *command;
     PDB_t      * const pdb = debugger->pdb;
 
     pdb->cur_opcode        = pc;
@@ -833,6 +832,8 @@ Parrot_debug(PARROT_INTERP, NOTNULL(Parrot_Interp debugger), opcode_t * pc)
     PDB_disassemble(interp, NULL);
 
     while (!(pdb->state & PDB_EXIT)) {
+        const char *command;
+
         PDB_get_command(debugger);
         command = pdb->cur_command;
         PDB_run_command(debugger, command);
@@ -892,12 +893,12 @@ print_constant_table(PARROT_INTERP, ARGIN(PMC *output))
                     /* FixedIntegerArrays used for signatures, handy to print */
                   case enum_class_FixedIntegerArray:
                     {
-                        INTVAL n = VTABLE_elements(interp, c->u.key);
+                        const INTVAL n = VTABLE_elements(interp, c->u.key);
                         INTVAL i;
                         Parrot_io_fprintf(interp, output, "[");
 
                         for (i = 0; i < n; ++i) {
-                            INTVAL val = VTABLE_get_integer_keyed_int(interp, c->u.key, i);
+                            const INTVAL val = VTABLE_get_integer_keyed_int(interp, c->u.key, i);
                             Parrot_io_fprintf(interp, output, "%d", val);
                             if (i < n - 1)
                                 Parrot_io_fprintf(interp, output, ",");
@@ -1129,10 +1130,6 @@ Parrot_compile_string(PARROT_INTERP, Parrot_String type,
 =head1 SEE ALSO
 
 F<include/parrot/embed.h> and F<docs/embed.pod>.
-
-=head1 HISTORY
-
-Initial version by Brent Dax on 2002.1.28.
 
 =cut
 
