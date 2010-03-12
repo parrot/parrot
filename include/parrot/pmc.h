@@ -89,9 +89,7 @@ PMC * Parrot_pmc_new_init(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_pmc_new_init_int(PARROT_INTERP,
-    INTVAL base_type,
-    INTVAL init)
+PMC * Parrot_pmc_new_init_int(PARROT_INTERP, INTVAL base_type, INTVAL init)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -179,6 +177,8 @@ PMC * Parrot_pmc_new_temporary(PARROT_INTERP, INTVAL base_type)
 #define ASSERT_ARGS_Parrot_pmc_new_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(init))
+#define ASSERT_ARGS_Parrot_pmc_new_init_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pmc_new_noinit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pmc_register_new_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

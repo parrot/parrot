@@ -250,6 +250,9 @@ INTVAL Parrot_str_is_cclass(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+INTVAL Parrot_str_is_null(SHIM_INTERP, ARGIN_NULLOK(const STRING *s));
+
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING* Parrot_str_join(PARROT_INTERP,
@@ -493,9 +496,6 @@ STRING * string_increment(PARROT_INTERP, ARGIN(const STRING *s))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-INTVAL Parrot_str_is_null(SHIM_INTERP, ARGIN_NULLOK(const STRING *s));
-
-PARROT_EXPORT
 INTVAL STRING_is_null(SHIM_INTERP, ARGIN_NULLOK(const STRING *s));
 
 PARROT_EXPORT
@@ -630,6 +630,7 @@ STRING* Parrot_str_from_uint(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_str_is_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_Parrot_str_is_null __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_str_join __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ar))
@@ -714,7 +715,6 @@ STRING* Parrot_str_from_uint(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_STRING_is_null __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_str_is_null __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_string_make __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_string_make_from_charset __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
