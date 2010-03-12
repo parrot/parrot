@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 71;
+use Parrot::Test;
 use Parrot::Config qw(%PConfig);
 
 =head1 NAME
@@ -31,11 +31,13 @@ Most tests are skipped when the F<libnci_test.so> shared library is not found.
 =cut
 
 $ENV{TEST_PROG_ARGS} ||= '';
+        use Test::Builder;
 
 SKIP: {
     unless ( -e "runtime/parrot/dynext/libnci_test$PConfig{load_ext}" ) {
-        skip( "Please make libnci_test$PConfig{load_ext}", Test::Builder->expected_tests() );
+        plan skip_all => "Please make libnci_test$PConfig{load_ext}";
     }
+    plan tests => 71;
 
     pir_output_is( << 'CODE', << 'OUTPUT', 'load library fails' );
 .sub test :main
