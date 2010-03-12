@@ -7,4 +7,4 @@ Name: parrot
 Description: virtual machine to execute bytecode for interpreted languages
 Version: @VERSION@
 Libs: -L${libdir} -lparrot @icu_shared@ @libs@
-Cflags: -I${includedir}
+Cflags: -I${includedir}@versiondir@
