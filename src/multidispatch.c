@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003-2009, Parrot Foundation.
+Copyright (C) 2003-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -456,82 +456,7 @@ PMC*
 Parrot_mmd_build_type_tuple_from_sig_obj(PARROT_INTERP, ARGIN(PMC *sig_obj))
 {
     ASSERT_ARGS(Parrot_mmd_build_type_tuple_from_sig_obj)
-    PMC * const  type_tuple = Parrot_pmc_new(interp, enum_class_ResizableIntegerArray);
-    STRING      *string_sig = VTABLE_get_string(interp, sig_obj);
-    INTVAL       args_ended = 0;
-    INTVAL       i, seen_invocant = 0;
-    INTVAL       sig_len;
-
-    if (STRING_IS_NULL(string_sig)) {
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "Call has no signature, unable to dispatch.\n");
-    }
-
-    sig_len = Parrot_str_byte_length(interp, string_sig);
-
-    for (i = 0; i < sig_len; ++i) {
-        INTVAL type = Parrot_str_indexed(interp, string_sig, i + seen_invocant);
-        if (args_ended)
-            break;
-
-        /* Regular arguments just set the value */
-        switch (type) {
-          case 'I':
-            VTABLE_set_integer_keyed_int(interp, type_tuple,
-                        i, enum_type_INTVAL);
-            break;
-          case 'N':
-            VTABLE_set_integer_keyed_int(interp, type_tuple,
-                        i, enum_type_FLOATVAL);
-            break;
-          case 'S':
-            {
-                INTVAL type_lookahead = Parrot_str_indexed(interp, string_sig, (i + 1));
-                if (type_lookahead == 'n') {
-                    args_ended = 1;
-                    break;
-                }
-                VTABLE_set_integer_keyed_int(interp, type_tuple,
-                            i, enum_type_STRING);
-                break;
-            }
-          case 'P':
-            {
-                INTVAL type_lookahead = Parrot_str_indexed(interp, string_sig, (i + 1));
-                if (type_lookahead == 'i') {
-                    if (i != 0)
-                        Parrot_ex_throw_from_c_args(interp, NULL,
-                            EXCEPTION_INVALID_OPERATION,
-                            "Multiple Dispatch: only the first argument can be an invocant");
-                    seen_invocant = 1;
-                }
-                else if (type_lookahead == 'f') {
-                    args_ended = 1;
-                    break;
-                }
-                else {
-                    PMC *pmc_arg = VTABLE_get_pmc_keyed_int(interp, sig_obj, i);
-                    if (PMC_IS_NULL(pmc_arg))
-                        VTABLE_set_integer_keyed_int(interp, type_tuple,
-                                i, enum_type_PMC);
-                    else
-                        VTABLE_set_integer_keyed_int(interp, type_tuple, i,
-                                VTABLE_type(interp, pmc_arg));
-                }
-
-                break;
-            }
-          case '-':
-            args_ended = 1;
-            break;
-          default:
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_INVALID_OPERATION,
-                    "Multiple Dispatch: invalid argument type %c!", type);
-        }
-    }
-
-    return type_tuple;
+    return VTABLE_get_pmc(interp, sig_obj);
 }
 
 

@@ -687,12 +687,55 @@ CallContext.
         GET_ATTR_type_tuple(INTERP, SELF, type_tuple);
 
         if (PMC_IS_NULL(type_tuple)) {
-            type_tuple = Parrot_mmd_build_type_tuple_from_sig_obj(INTERP, SELF);
+            Pcc_cell *c;
+            INTVAL    num_positionals;
+            INTVAL    i = 0;
+
+            GET_ATTR_positionals(INTERP, SELF, c);
+            GET_ATTR_num_positionals(INTERP, SELF, num_positionals);
+
+            type_tuple = Parrot_pmc_new_init_int(interp,
+                enum_class_ResizableIntegerArray, num_positionals);
+
+            while (c) {
+                switch (CELL_TYPE_MASK(c)) {
+                    case INTCELL:
+                        VTABLE_set_integer_keyed_int(interp, type_tuple,
+                            i, enum_type_INTVAL);
+                        break;
+                    case FLOATCELL:
+                        VTABLE_set_integer_keyed_int(interp, type_tuple,
+                            i, enum_type_FLOATVAL);
+                        break;
+                    case STRINGCELL:
+                        VTABLE_set_integer_keyed_int(interp, type_tuple,
+                            i, enum_type_STRING);
+                        break;
+                    case PMCCELL:
+                    {
+                        PMC *pmc_arg = CELL_PMC(c);
+                        if (PMC_IS_NULL(pmc_arg))
+                            VTABLE_set_integer_keyed_int(interp, type_tuple,
+                                    i, enum_type_PMC);
+                        else
+                            VTABLE_set_integer_keyed_int(interp, type_tuple, i,
+                                    VTABLE_type(interp, pmc_arg));
+                        break;
+                    }
+                    default:
+                        Parrot_ex_throw_from_c_args(interp, NULL,
+                            EXCEPTION_INVALID_OPERATION,
+                            "Multiple Dispatch: invalid argument type!");
+                }
+
+                i++;
+                c = NEXT_CELL(c);
+            }
+
             SET_ATTR_type_tuple(INTERP, SELF, type_tuple);
         }
 
         return type_tuple;
-
     }
 
 /*
