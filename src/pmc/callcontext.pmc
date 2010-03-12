@@ -695,39 +695,27 @@ CallContext.
             GET_ATTR_num_positionals(INTERP, SELF, num_positionals);
 
             type_tuple = Parrot_pmc_new_init_int(interp,
-                enum_class_ResizableIntegerArray, num_positionals);
+                enum_class_FixedIntegerArray, num_positionals);
 
             while (c) {
+                INTVAL type;
+
                 switch (CELL_TYPE_MASK(c)) {
-                    case INTCELL:
-                        VTABLE_set_integer_keyed_int(interp, type_tuple,
-                            i, enum_type_INTVAL);
-                        break;
-                    case FLOATCELL:
-                        VTABLE_set_integer_keyed_int(interp, type_tuple,
-                            i, enum_type_FLOATVAL);
-                        break;
-                    case STRINGCELL:
-                        VTABLE_set_integer_keyed_int(interp, type_tuple,
-                            i, enum_type_STRING);
-                        break;
+                    case INTCELL:    type = enum_type_INTVAL;   break;
+                    case FLOATCELL:  type = enum_type_FLOATVAL; break;
+                    case STRINGCELL: type = enum_type_STRING;   break;
                     case PMCCELL:
-                    {
-                        PMC *pmc_arg = CELL_PMC(c);
-                        if (PMC_IS_NULL(pmc_arg))
-                            VTABLE_set_integer_keyed_int(interp, type_tuple,
-                                    i, enum_type_PMC);
-                        else
-                            VTABLE_set_integer_keyed_int(interp, type_tuple, i,
-                                    VTABLE_type(interp, pmc_arg));
+                        type = PMC_IS_NULL(CELL_PMC(c))
+                             ? enum_type_PMC
+                             : VTABLE_type(interp, CELL_PMC(c));
                         break;
-                    }
                     default:
                         Parrot_ex_throw_from_c_args(interp, NULL,
                             EXCEPTION_INVALID_OPERATION,
                             "Multiple Dispatch: invalid argument type!");
                 }
 
+                VTABLE_set_integer_keyed_int(interp, type_tuple, i, type);
                 i++;
                 c = NEXT_CELL(c);
             }
@@ -737,6 +725,7 @@ CallContext.
 
         return type_tuple;
     }
+
 
 /*
 
