@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -22,6 +22,7 @@ The base vtable calling functions
 #include "pmc.str"
 #include "pmc/pmc_class.h"
 #include "pmc/pmc_callcontext.h"
+#include "pmc/pmc_namespace.h"
 
 /* HEADERIZER HFILE: include/parrot/pmc.h */
 
@@ -157,7 +158,8 @@ pmc_new(PARROT_INTERP, INTVAL base_type)
     {
         PMC *const classobj = interp->vtables[base_type]->pmc_class;
 
-        if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
+        if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj)
+        && classobj->vtable->base_type != enum_class_PMCProxy)
             return VTABLE_instantiate(interp, classobj, PMCNULL);
         else {
             PMC * const pmc = get_new_pmc_header(interp, base_type, 0);
@@ -485,7 +487,8 @@ pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
     ASSERT_ARGS(pmc_new_noinit)
     PMC *const classobj = interp->vtables[base_type]->pmc_class;
 
-    if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
+    if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj)
+    && classobj->vtable->base_type != enum_class_PMCProxy)
         return VTABLE_instantiate(interp, classobj, PMCNULL);
 
     return get_new_pmc_header(interp, base_type, 0);
@@ -552,7 +555,8 @@ pmc_new_init(PARROT_INTERP, INTVAL base_type, ARGOUT(PMC *init))
     ASSERT_ARGS(pmc_new_init)
     PMC *const classobj = interp->vtables[base_type]->pmc_class;
 
-    if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
+    if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj)
+    && classobj->vtable->base_type != enum_class_PMCProxy)
         return VTABLE_instantiate(interp, classobj, init);
     else {
         PMC * const pmc = get_new_pmc_header(interp, base_type, 0);
@@ -858,20 +862,30 @@ Parrot_create_mro(PARROT_INTERP, INTVAL type)
 
         if (!vtable->_namespace) {
             /* need a namespace Hash, anchor at parent, name it */
-            PMC * const ns     = pmc_new(interp,
+            PMC * const ns = pmc_new(interp,
                     Parrot_get_ctx_HLL_type(interp, enum_class_NameSpace));
             vtable->_namespace = ns;
 
             /* anchor at parent, aka current_namespace, that is 'parrot' */
             VTABLE_set_pmc_keyed_str(interp,
-                    Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp)), class_name, ns);
+                Parrot_pcc_get_namespace(interp, CURRENT_CONTEXT(interp)),
+                class_name, ns);
         }
 
-        _class = vtable->pmc_class;
-        if (!_class)
-            _class = create_class_pmc(interp, parent_type);
+        if (!vtable->pmc_class) {
+            PMC * const typenum = temporary_pmc_new(interp, enum_class_Integer);
+            PMC *       proxy;
+            VTABLE_set_integer_native(interp, typenum, type);
 
-        VTABLE_push_pmc(interp, mro, _class);
+            proxy  = pmc_new_init(interp, enum_class_PMCProxy, typenum);
+
+            vtable->pmc_class                            = proxy;
+            PARROT_NAMESPACE(vtable->_namespace)->_class = proxy;
+            PARROT_CLASS(proxy)->_namespace              = vtable->_namespace;
+        }
+
+        VTABLE_push_pmc(interp, mro,
+            get_new_pmc_header(interp, parent_type, PObj_constant_FLAG));
     }
 }
 

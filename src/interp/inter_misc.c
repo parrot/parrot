@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -84,13 +84,17 @@ register_raw_nci_method_in_ns(PARROT_INTERP, const int type, ARGIN(void *func),
         ARGIN(STRING *name))
 {
     ASSERT_ARGS(register_raw_nci_method_in_ns)
-    PMC    * const method      = pmc_new(interp, enum_class_NCI);
+    PMC    * const method = pmc_new(interp, enum_class_NCI);
 
     /* setup call func */
     VTABLE_set_pointer(interp, method, func);
 
+    /* insert into PMCProxy */
+    if (interp->vtables[type]->pmc_class)
+        VTABLE_add_method(interp, interp->vtables[type]->pmc_class, name, method);
     /* insert it into namespace */
-    VTABLE_set_pmc_keyed_str(interp, interp->vtables[type]->_namespace,
+    else
+        VTABLE_set_pmc_keyed_str(interp, interp->vtables[type]->_namespace,
             name, method);
 }
 

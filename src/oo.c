@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007-2009, Parrot Foundation.
+Copyright (C) 2007-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -53,7 +53,7 @@ static INTVAL fail_if_type_exists(PARROT_INTERP, ARGIN(PMC *name))
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC * find_method_direct_1(PARROT_INTERP,
-    ARGIN(PMC *_class),
+    ARGIN(PMC const *_class),
     ARGIN(STRING *method_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -906,7 +906,6 @@ Parrot_find_method_direct(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *metho
     if (!PMC_IS_NULL(found))
         return found;
 
-
     if (Parrot_str_equal(interp, method_name, CONST_STRING(interp, "__get_string")))
         return find_method_direct_1(interp, _class, CONST_STRING(interp, "__get_repr"));
 
@@ -1066,26 +1065,31 @@ Find the method with the given name in the specified class.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC *
-find_method_direct_1(PARROT_INTERP, ARGIN(PMC *_class),
+find_method_direct_1(PARROT_INTERP, ARGIN(PMC const *_class),
                               ARGIN(STRING *method_name))
 {
     ASSERT_ARGS(find_method_direct_1)
-    INTVAL i;
 
-    PMC * const  mro = _class->vtable->mro;
-    const INTVAL n   = VTABLE_elements(interp, mro);
+    PMC *mro   = _class->vtable->mro;
+    PMC *proxy = _class->vtable->pmc_class;
+    PMC *parent = VTABLE_get_pmc_keyed_int(interp, mro, 1);
 
-    for (i = 0; i < n; ++i) {
-        PMC *method, *ns;
+    if (!PMC_IS_NULL(proxy)) {
+        PMC *methods, *method;
 
-        _class = VTABLE_get_pmc_keyed_int(interp, mro, i);
-        ns     = VTABLE_get_namespace(interp, _class);
-        method = VTABLE_get_pmc_keyed_str(interp, ns, method_name);
+        GETATTR_Class_methods(interp, proxy, methods);
+        method = VTABLE_get_pmc_keyed_str(interp, methods, method_name);
 
         TRACE_FM(interp, _class, method_name, method);
 
         if (!PMC_IS_NULL(method))
             return method;
+        else {
+            PMC *parent = VTABLE_get_pmc_keyed_int(interp, mro, 1);
+
+            if (!PMC_IS_NULL(parent))
+                return find_method_direct_1(interp, parent, method_name);
+        }
     }
 
     TRACE_FM(interp, _class, method_name, NULL);
