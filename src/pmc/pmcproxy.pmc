@@ -53,6 +53,32 @@ NOTE: No doubt we will need other things later; this is a start.
 
 #include "parrot/oo_private.h"
 
+static void
+create_inherited_attributes(PARROT_INTERP, PMC *SELF, INTVAL type_num)
+{
+    /* Each attribute is prefixed with his type and terminated by an space
+     * the list is '\0' terminated */
+    const char *attr = interp->vtables[type_num]->attribute_defs;
+
+    while (*attr) {
+        const char * const current  = attr + 1;
+        char               attrtype = *attr;
+        size_t             l;
+
+        while (*attr != ' ')
+            ++attr;
+
+        l = attr - current;
+
+        if (attrtype != ':') {
+            STRING *sattr = Parrot_str_new(interp, current, l);
+            VTABLE_add_attribute(interp, SELF, sattr, NULL);
+        }
+
+        ++attr;
+    }
+}
+
 /*
 
 =head2 Functions
@@ -148,9 +174,8 @@ Initializes a PMCProxy PMC.
             VTABLE_push_pmc(interp, proxy_info->parents,
                     VTABLE_get_pmc_keyed_int(interp, proxy_info->all_parents, 1));
 
-        if (!PMC_IS_NULL(proxy_info->_namespace) &&
-            PMC_IS_NULL(VTABLE_get_class(interp, proxy_info->_namespace))) {
-
+        if (!PMC_IS_NULL(proxy_info->_namespace)
+        &&   PMC_IS_NULL(VTABLE_get_class(interp, proxy_info->_namespace))) {
             /* Link the proxy and the namespace, caching the proxy object for
              * later retrieval on class lookup. */
              Parrot_pcc_invoke_method_from_c_args(interp, proxy_info->_namespace, CONST_STRING(interp, "set_class"), "P->", SELF);
@@ -160,25 +185,7 @@ Initializes a PMCProxy PMC.
                     proxy_info->_namespace);
         }
 
-        { /* Create inherited attributes */
-            /* Each attribute is prefixed with his type
-             * and terminated by an space,
-             * the list is '\0' terminated
-             */
-            const char * attr = interp->vtables[type_num]->attribute_defs;
-            while (* attr) {
-                const char * const current = attr + 1;
-                size_t l;
-                char attrtype = * attr;
-                while (* attr != ' ') ++attr;
-                l= attr - current;
-                if (attrtype != ':') {
-                    STRING *sattr = Parrot_str_new(interp, current, l);
-                    SELF.add_attribute(sattr, NULL);
-                }
-                ++attr;
-            }
-        }
+        create_inherited_attributes(interp, SELF, type_num);
     }
 
 /*
