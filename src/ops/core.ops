@@ -1277,7 +1277,6 @@ op dlfunc(out PMC, invar PMC, in STR, in STR) {
     else {
         $1 = Parrot_pmc_new(interp, enum_class_NCI);
         VTABLE_set_pointer_keyed_str(interp, $1, $4, F2DPTR(p));
-        PObj_get_FLAGS($1) |= PObj_private1_FLAG;
     }
     Parrot_str_free_cstring(name);
 }

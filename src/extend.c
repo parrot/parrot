@@ -1361,7 +1361,6 @@ Parrot_sub_new_from_c_func(PARROT_INTERP,
         (char *) NULL, 0);
     Parrot_PMC sub = Parrot_pmc_new(interp, enum_class_NCI);
     VTABLE_set_pointer_keyed_str(interp, sub, sig, F2DPTR(func));
-    PObj_get_FLAGS(sub) |= PObj_private1_FLAG;
     return sub;
 }
 
