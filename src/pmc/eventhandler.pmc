@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007-2009, Parrot Foundation.
+Copyright (C) 2007-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -230,11 +230,12 @@ Runs the contained code, if any; this is what handles the event.
 */
     VTABLE opcode_t *invoke(void *next) {
         Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
-        void *unused;
 
         /* can't invoke on INTERP and can't return its result; this may not be
          * the right interpreter */
         if (e) {
+            void *unused;
+
             unused = VTABLE_invoke(PMC_data_typed(e->interp, Parrot_Interp),
                     e->code, next);
             UNUSED(unused);
@@ -266,14 +267,15 @@ Report whether the event handler can handle a particular type of event.
 */
 
     METHOD can_handle(PMC *event) {
-        Parrot_EventHandler_attributes * const handler_struct = PARROT_EVENTHANDLER(SELF);
+
         if (event->vtable->base_type == enum_class_Task) {
-            PMC *type = VTABLE_get_attr_str(interp, event, CONST_STRING(interp, "type"));
-            STRING *type_str = VTABLE_get_string(interp, type);
+            PMC    * const type     = VTABLE_get_attr_str(interp, event, CONST_STRING(interp, "type"));
+            STRING * const type_str = VTABLE_get_string(interp, type);
 
             if (Parrot_str_equal(interp, type_str, CONST_STRING(interp, "event"))) {
-                PMC *subtype = VTABLE_get_attr_str(interp, event, CONST_STRING(interp, "subtype"));
-                STRING *subtype_str = VTABLE_get_string(interp, subtype);
+                Parrot_EventHandler_attributes * const handler_struct = PARROT_EVENTHANDLER(SELF);
+                PMC    * const subtype     = VTABLE_get_attr_str(interp, event, CONST_STRING(interp, "subtype"));
+                STRING * const subtype_str = VTABLE_get_string(interp, subtype);
 
                 if (Parrot_str_equal(interp, subtype_str, handler_struct->type)) {
                     RETURN(INTVAL 1);
