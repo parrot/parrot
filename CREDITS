@@ -922,6 +922,11 @@ D: Fix for string_to_num
 N: Stefan Lidman
 D: sqrt ops
 
+N: Stefan O'Rear
+E: stefanor@cox.net
+D: Perl 5 interoperability, Blizkost
+U: sorear
+
 N: Stéphane Payrard
 D: Various code fixes and improvements
 
