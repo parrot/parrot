@@ -21,12 +21,17 @@ while(<$fh>) {
     my $email = lc $1;
     next if $email eq 'svn@perl.org' or
             $email eq 'cvs@perl.org';
-    $urls{$email} = gravatar_url(
-        email   => $email,
-        rating  => 'r',
-        size    => 80,
-        default => 'wavatar',
-    );
+    if (!exists $urls{$email}) {
+        $urls{$email} = gravatar_url(
+            email   => $email,
+            rating  => 'r',
+            size    => 80,
+            default => 'wavatar',
+        );
+    }
+    else {
+        warn "duplicated email address in CREDITS: $email\n";
+    }
 }
 
 foreach my $email (sort keys %urls) {
