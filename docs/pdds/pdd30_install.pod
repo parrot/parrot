@@ -115,7 +115,7 @@ Building core Parrot depends on Perl (including F<perldoc>, which may be a
 separate package), F<libgdm> and F<libreadline>.
 
 Building a language depends on a series of Parrot build tools, installed in
-F</usr/lib/parrot/E<lt>version/tools>. These tools will generally not be
+F</usr/lib/parrot/E<lt>versionE<gt>/tools>. These tools will generally not be
 included in the default C<parrot> package on most systems, languages will
 require a C<parrot-dev> package to be installed before they can be built.
 
