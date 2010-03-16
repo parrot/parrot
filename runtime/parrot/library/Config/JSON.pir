@@ -37,11 +37,9 @@ If the data is not valid, an exception will be thrown.
 
     # Convert the text to an object and return it.
     .local pmc json, code, config
-    load_language  'data_json'
-    json = compreg 'data_json'
-    code = json.'compile'(text)
-
-    .tailcall code()
+    load_bytecode 'compilers/json/JSON.pbc'
+    json = compreg 'JSON'
+    .tailcall json(text)
 .end
 
 =head2 WriteConfig(config, filename, ?:compact)
