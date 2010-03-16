@@ -173,7 +173,7 @@ sub _init {
 
     my $gcc_or_gpp_cage = [ qw(
         -std=c89
-        -Werror-implicit-function-declaration
+        -Werror=implicit-function-declaration
         -Wformat=2
         -Wlarger-than-4096
         -Wlong-long
