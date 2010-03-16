@@ -2,8 +2,7 @@
     "release.version"  : "2.2.0",
     "release.name"     : "Like Clockwork",
     "release.day"      : "Tuesday",
-    "release.date"     : "16 Februuary 2010",
-    "release.date"     : "16 Februuary 2010",
+    "release.date"     : "16 March 2010",
     "release.nextdate" : "20 April 2010",
 
     "web.root"         : "http://parrot.org/",
