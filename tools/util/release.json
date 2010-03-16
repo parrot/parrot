@@ -1,9 +1,10 @@
 {
-    "release.version"  : "2.0.0",
-    "release.name"     : "Inevitable",
+    "release.version"  : "2.2.0",
+    "release.name"     : "Like Clockwork",
     "release.day"      : "Tuesday",
     "release.date"     : "16 Februuary 2010",
-    "release.nextdate" : "16 March 2010",
+    "release.date"     : "16 Februuary 2010",
+    "release.nextdate" : "20 April 2010",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -17,7 +18,7 @@
     "wiki.bugday"      : "bug_day_2010_03_13",
 
     "cpan.search"      : "http://search.cpan.org/dist/parrot",
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/devel/stable/2.1.0/",
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/2.2.0/",
     "subversion.root"  : "http://subversion.tigris.org/",
     "svk.root"         : "http://svk.bestpractical.com/"
 }

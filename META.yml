@@ -4,7 +4,7 @@
 # See http://module-build.sourceforge.net/META-spec-current.html for details.
 ---
 name: parrot
-version: 2.1.0
+version: 2.2.0
 author: parrot-dev@lists.parrot.org
 abstract: a virtual machine designed for dynamic languages
 license: artistic2
