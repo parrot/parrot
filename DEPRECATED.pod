@@ -37,6 +37,12 @@ specifically by including this C<PIR> code:
 
 =over 4
 
+=item RetContinuation [eligible in 2.4]
+
+In future, just use Continuation.
+
+L<https://trac.parrot.org/parrot/ticket/1427>
+
 =item moved to dynpmc [eligible in 1.1]
 
 AddrRegistry, CodeString, Env, Eval, File, OS, PCCMETHOD_Test, StringHandle,
