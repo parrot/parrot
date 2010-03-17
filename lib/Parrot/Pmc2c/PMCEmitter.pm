@@ -623,18 +623,15 @@ EOC
         my $k_flags = $self->$k->vtable_flags;
         $cout .= <<"EOC";
         {
-            VTABLE                   *vt_$k;
-            vt_${k}                 = Parrot_${classname}_${k}_get_vtable(interp);
-            vt_${k}->base_type      = $enum_name;
-            vt_${k}->flags          = $k_flags;
-
-            vt_${k}->attribute_defs = attr_defs;
-
+            VTABLE *vt_$k;
+            vt_${k}                      = Parrot_${classname}_${k}_get_vtable(interp);
+            vt_${k}->flags               = $k_flags;
+            vt_${k}->attribute_defs      = attr_defs;
             vt_${k}->base_type           = entry;
             vt_${k}->whoami              = vt->whoami;
             vt_${k}->provides_str        = vt->provides_str;
             vt->${k}_variant_vtable      = vt_${k};
-            vt_${k}->${k}_variant_vtable = vt;
+            vt_${k}->${k}_variant_vtable   = vt;
             vt_${k}->isa_hash            = vt->isa_hash;
         }
 
@@ -669,17 +666,15 @@ EOC
     }
 
         $cout .= <<"EOC";
-        {
-            VTABLE * const vt  = interp->vtables[entry];
+        VTABLE * const vt  = interp->vtables[entry];
 
-            vt->mro = Parrot_${classname}_get_mro(interp, PMCNULL);
-
-            if (vt->ro_variant_vtable)
-                vt->ro_variant_vtable->mro = vt->mro;
-        }
-
-        /* set up MRO and _namespace */
+        /* set up MRO, _class and _namespace */
+        vt->mro = Parrot_${classname}_get_mro(interp, PMCNULL);
         Parrot_create_mro(interp, entry);
+        if (vt->ro_variant_vtable) {
+            vt->ro_variant_vtable->mro = vt->mro;
+            vt->ro_variant_vtable->pmc_class = vt->pmc_class;
+        }
 EOC
 
         $cout .= $self->write_nci_methods();

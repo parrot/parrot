@@ -24,6 +24,7 @@ NCI function setup, compiler registration, C<interpinfo>, and C<sysinfo> opcodes
 #include "../compilers/imcc/imc.h"
 #include "parrot/runcore_api.h"
 #include "pmc/pmc_callcontext.h"
+#include "pmc/pmc_class.h"
 
 #include "parrot/has_header.h"
 
@@ -116,8 +117,9 @@ Parrot_mark_method_writes(PARROT_INTERP, int type, ARGIN(const char *name))
     ASSERT_ARGS(Parrot_mark_method_writes)
     STRING *const str_name = Parrot_str_new_constant(interp, name);
     PMC    *const pmc_true = pmc_new(interp, enum_class_Integer);
-    PMC    *const method   = VTABLE_get_pmc_keyed_str(
-        interp, interp->vtables[type]->_namespace, str_name);
+    PMC * const pmc_class = interp->vtables[type]->pmc_class;
+    Parrot_Class_attributes * const class_info = PARROT_CLASS(pmc_class);
+    PMC *const method = VTABLE_get_pmc_keyed_str(interp, class_info->methods, str_name);
     VTABLE_set_integer_native(interp, pmc_true, 1);
     VTABLE_setprop(interp, method, CONST_STRING(interp, "write"), pmc_true);
 }
