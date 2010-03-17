@@ -249,6 +249,8 @@ sub runstep {
         no_lines_flag => $conf->options->get('no-line-directives') ? '--no-lines' : '',
 
         tempdir => File::Spec->tmpdir,
+
+        PKGCONFIG_DIR => $conf->options->get('pkgconfigdir') || '',
     );
 
     # TT #855:  Profiling options are too specific to GCC

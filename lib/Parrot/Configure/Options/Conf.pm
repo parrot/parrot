@@ -157,6 +157,8 @@ Install Options:
     --oldincludedir=DIR   C header files for non-gcc [/usr/include]
     --infodir=DIR         info documentation [PREFIX/info]
     --mandir=DIR          man documentation [PREFIX/man]
+    --pkgconfigdir=DIR    subdirectory of <libdir> for pkgconfig
+                              [<libdir>/pkgconfig/<version>]
 
 EOT
     return 1;
