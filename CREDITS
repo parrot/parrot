@@ -573,7 +573,8 @@ U: jisom
 D: Getopt/Obj.pir
 
 N: Julian Albo
-U: julianalbo
+U: NotFound
+A: julianalbo
 E: julian.notfound@gmail.com
 
 N: Julian Fondren
@@ -766,10 +767,6 @@ E: nnunley@gmail.com
 
 N: Nigelsandever
 D: Win32 patches
-
-N: Notfound
-D: Bugfixing and cage cleaning.
-E: julian.notfound@gmail.com
 
 N: Nuno 'smash' Carvalho
 U: smash
