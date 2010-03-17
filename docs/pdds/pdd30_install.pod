@@ -1,4 +1,4 @@
-# Copyright (C) 2008-2009, Parrot Foundation.
+# Copyright (C) 2008-2010, Parrot Foundation.
 # $Id$
 
 =head1 PDD 30: Installation
@@ -7,8 +7,8 @@
 
 This PDD outlines Parrot's installation system and support. Parrot's core
 installation system will provide support for binary packages, a working C<make
-install> target, compiled installables, and FHS compliant search paths for the
-installables.
+install> target, compiled installables, and Filesystem Hierarchy Standard (FHS)
+compliant search paths for the installables.
 
 =head2 Version
 
@@ -33,9 +33,8 @@ Language installation process (from the language source directory):
 
 =head2 Description
 
-Parrot uses Filesystem Hierarchy Standard (FHS) compliant install directories
-by default. Each install location is configurable with options passed to the
-configure script.
+Parrot uses FHS compliant install directories by default. Each install location
+is configurable with options passed to the configure script.
 
 =over
 
@@ -84,7 +83,7 @@ F<include> for PIR or PASM includes.
 It is recommended that languages follow a standard pattern in installing their
 libraries so a bytecode compiled version of a module in the C<mylang> HLL
 named C<['Foo';'Bar']> is stored in
-F<usr/lib/parrot/E<lt>versionE<gt>/languages/E<lt>mylangE<gt>/library/Foo/Bar.pbc>
+F</usr/lib/parrot/E<lt>versionE<gt>/languages/E<lt>mylangE<gt>/library/Foo/Bar.pbc>
 
 =item F</usr/lib/parrot/E<lt>versionE<gt>/tools/>
 
