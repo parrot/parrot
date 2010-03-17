@@ -332,6 +332,7 @@ done:
 
 
 .sub sort_subclass
+    push_eh sort_subclass_handler
     .local pmc subrpa, arr
     subrpa = subclass ['ResizablePMCArray'], 'ssRPA'
     arr = new subrpa
@@ -350,6 +351,11 @@ done:
     aux = join '-', arr
     concat s, aux
     is(s, 'ssRPA:z-p-a', "sort works in a pir subclass, TT #218")
+    goto _done
+  sort_subclass_handler:
+    ok(0, "sorting a subclass is broken")
+  _done:
+    .return()
 .end
 
 .sub compare_reverse
@@ -979,12 +985,12 @@ end:
     push array, 2
     push array, 5
     push array, 1
-   
-    .local string unsorted 
+
+    .local string unsorted
     unsorted = join ' ', array
     is(unsorted,"4 5 3 2 5 1", "unsorted array")
 
-    ## sort using a non-tailcall function 
+    ## sort using a non-tailcall function
     .const 'Sub' cmp_normal = 'cmp_normal_tailcall'
     $P1 = clone array
     $P1.'sort'(cmp_normal)
