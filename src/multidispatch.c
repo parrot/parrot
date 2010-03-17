@@ -633,16 +633,23 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
             continue;
 
         /* promote primitives to their PMC equivalents, as PCC will autobox
-         * the distance penalty makes primitive variants look cheaper */
+         * them. If it's a direct autobox, int->Integer, str->String, or
+         * num->Num, the distance is 1 and we move to the next arg. If it's
+         * autoboxing to "any" PMC type, we increment the distance and continue
+         * weighing other things. A direct autobox should be cheaper than an
+         * autobox plus type conversion or implicit type acceptance. */
         switch (type_call) {
           case enum_type_INTVAL:
             if (type_sig == enum_class_Integer) { dist++; continue; }
+            if (type_sig == enum_type_PMC) dist++;
             break;
           case enum_type_FLOATVAL:
             if (type_sig == enum_class_Float)   { dist++; continue; }
+            if (type_sig == enum_type_PMC) dist++;
             break;
           case enum_type_STRING:
             if (type_sig == enum_class_String)  { dist++; continue; }
+            if (type_sig == enum_type_PMC) dist++;
             break;
           default:
             break;
