@@ -220,21 +220,9 @@ sub _init {
 
     # Warning flags docs
     # http://software.intel.com/sites/products/documentation/hpc/compilerpro/en-us/cpp/lin/compiler_c/index.htm
+
     $icc->{'basic'} = [ qw(
         -w2
-
-        -wd117
-        -wd177
-        -wd181
-        -wd269
-        -wd810
-        -wd869
-        -wd981
-        -wd1296
-        -wd1419
-        -wd1572
-        -wd1599
-
         -Wabi
         -Wall
         -Wcheck
