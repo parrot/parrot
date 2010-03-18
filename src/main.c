@@ -160,6 +160,7 @@ main(int argc, char * argv[])
 #define OPT_HELP_DEBUG     130
 #define OPT_PBC_OUTPUT     131
 #define OPT_RUNTIME_PREFIX 132
+#define OPT_HASH_SEED      133
 
 #define SET_FLAG(flag)   Parrot_set_flag(interp, (flag))
 #define SET_DEBUG(flag)  Parrot_set_debug(interp, (flag))
@@ -170,7 +171,7 @@ static struct longopt_opt_decl options[] = {
     { 'D', 'D', OPTION_optional_FLAG, { "--parrot-debug" } },
     { 'E', 'E', (OPTION_flags)0, { "--pre-process-only" } },
     { 'G', 'G', (OPTION_flags)0, { "--no-gc" } },
-    { 'H', 'H', OPTION_required_FLAG, { "--hash-seed" } },
+    { '\0', OPT_HASH_SEED, OPTION_required_FLAG, { "--hash-seed" } },
     { 'I', 'I', OPTION_required_FLAG, { "--include" } },
     { 'L', 'L', OPTION_required_FLAG, { "--library" } },
     { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
@@ -306,7 +307,7 @@ help(void)
     "    -V --version\n"
     "    -I --include add path to include search\n"
     "    -L --library add path to library search\n"
-    "    -H --hash-seed F00F  specify hex value to use as hash seed\n"
+    "       --hash-seed F00F  specify hex value to use as hash seed\n"
     "    -X --dynext add path to dynamic extension search\n"
     "   <Run core options>\n"
     "    -R --runcore slow|bounds|fast|cgoto|cgp\n"
@@ -405,12 +406,23 @@ parseflags_minimal(PARROT_INTERP, int argc, ARGIN(char *argv[]))
             }
             break;
         }
-        else if (STREQ(arg, "--hash-seed")) {
-            ++pos;
-            arg = argv[pos];
+        else if (!strncmp(arg, "--hash-seed", 11)) {
+
+            arg = strrchr(arg, '=')+1;
+            if (!arg) {
+                ++pos;
+                arg = argv[pos];
+            }
             if (is_all_hex_digits(arg)) {
                 interp->hash_seed = strtoul(arg, NULL, 16);
             }
+            else {
+                fprintf(stderr, "error: invalid hash seed specified:"
+                        "'%s'\n", arg);
+                exit(EXIT_FAILURE);
+            }
+            ++pos;
+            arg = argv[pos];
         }
         ++pos;
     }
@@ -512,7 +524,7 @@ parseflags(PARROT_INTERP,
             help();
             exit(EXIT_FAILURE);
             break;
-          case 'H':
+          case OPT_HASH_SEED:
             /* handled in parseflags_minimal */
             break;
           case OPT_HELP_DEBUG:
