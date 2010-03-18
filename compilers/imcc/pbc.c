@@ -1193,7 +1193,6 @@ find_outer(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
     ASSERT_ARGS(find_outer)
     subs_t      *s;
     PMC         *current;
-    STRING      *cur_name;
     char        *cur_name_str;
     Parrot_Sub_attributes *sub;
     size_t      len;
@@ -1227,7 +1226,6 @@ find_outer(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
                    unit->outer->name);
 
     PMC_get_sub(interp, current, sub);
-    cur_name = sub->name;
 
     cur_name_str = Parrot_str_to_cstring(interp,  sub->name);
     if (strlen(cur_name_str) == len
