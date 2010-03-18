@@ -32,13 +32,10 @@ foreach my $pdd (@pddfiles) {
     }
 }
 
-my $errmsg = q{};
-if ( @diagnostics ) {
-    $errmsg = join ("\n" => @diagnostics) . "\n";
+for my $msg (@diagnostics) {
+    diag($msg);
 }
-
-$errmsg ? fail( qq{\n$errmsg} )
-        : pass( q{All PDDs are formatted correctly} );
+cmp_ok( scalar(@diagnostics), '==', 0, 'PDDs are formatted correctly' );
 
 sub check_pdd_formatting {
     my $pdd = shift;
