@@ -998,10 +998,10 @@ init_prederef(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore))
         void        *pred_func;
         opcode_t    *pc = interp->code->base.data;
         const size_t N  = interp->code->base.size;
-        size_t       i, n_pics;
+        size_t       i;
 
-        void **temp = (void **)Parrot_memalign_if_possible(256,
-                N * sizeof (void *));
+        void ** const temp =
+            (void **)Parrot_memalign_if_possible(256, N * sizeof (void *));
         /* calc and remember pred_offset */
         CONTEXT(interp)->pred_offset = pc - (opcode_t *)temp;
 
@@ -1015,7 +1015,7 @@ init_prederef(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore))
                     interp->op_lib->op_func_table)[CORE_OPS_prederef__];
         }
 
-        for (i = n_pics = 0; i < N;) {
+        for (i = 0; i < N;) {
             op_info_t * const opinfo = &interp->op_info_table[*pc];
             size_t            n      = opinfo->op_count;
 
