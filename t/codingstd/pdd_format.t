@@ -57,7 +57,7 @@ sub check_pdd_formatting {
         Implementation
         References
     );
-    my %sections_seen = map { $_, 0 } @sections_needed;
+    my %sections_seen;
     my @lines;
     tie @lines, 'Tie::File', $pdd
         or croak "Unable to tie to $pdd: $!";
@@ -69,8 +69,8 @@ sub check_pdd_formatting {
         ) {
             push @toolong, ($i + 1);
         }
-        foreach my $need ( @sections_needed ) {
-            $sections_seen{$need}++ if $lines[$i] =~ m{^=head2\s+$need};
+        if ( $lines[$i] =~ m{^=head2\s+(.+?)\s*$} ) {
+            $sections_seen{$1}++;
         }
     }
     untie @lines or croak "Unable to untie from $pdd: $!";
@@ -80,7 +80,7 @@ sub check_pdd_formatting {
             scalar(@toolong) .
             qq{ lines > 78 chars:  @toolong\n};
     }
-    foreach my $need ( keys %sections_seen ) {
+    foreach my $need (@sections_needed) {
         if ( ! $sections_seen{$need} ) {
             $diag .= qq{$base lacks 'head2' $need section\n};
         }
