@@ -966,8 +966,6 @@ void
 PDB_get_command(PARROT_INTERP)
 {
     ASSERT_ARGS(PDB_get_command)
-    unsigned int  i;
-    int           ch;
     char         *c;
     PDB_t        * const pdb = interp->pdb;
 
@@ -1022,8 +1020,6 @@ PDB_get_command(PARROT_INTERP)
         if (pdb->cur_command[0] != '\0')
             strcpy(pdb->last_command, pdb->cur_command);
 
-        i = 0;
-
         c = pdb->cur_command;
 
         Parrot_io_eprintf(pdb->debugger, "\n");
@@ -1043,8 +1039,6 @@ PDB_get_command(PARROT_INTERP)
                 strcpy(c, aux);
                 Parrot_str_free_cstring(aux);
             }
-
-            ch = '\n';
         }
     }
 }
@@ -1302,7 +1296,6 @@ PDB_cond(PARROT_INTERP, ARGIN(const char *command))
     char             str[DEBUG_CMD_BUFFER_LENGTH + 1];
     unsigned short   cond_argleft;
     unsigned short   cond_type;
-    unsigned char    regleft;
     int              i, reg_number;
 
     TRACEDEB_MSG("PDB_cond");
@@ -1322,7 +1315,7 @@ PDB_cond(PARROT_INTERP, ARGIN(const char *command))
 
     /* get the register number */
     auxcmd = ++command;
-    regleft = (unsigned char)get_uint(&command, 0);
+    get_uint(&command, 0);
     if (auxcmd == command) {
         Parrot_io_eprintf(interp->pdb->debugger, "Invalid register\n");
             return NULL;
