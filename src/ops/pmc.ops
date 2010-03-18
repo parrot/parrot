@@ -240,7 +240,7 @@ op find_method(out PMC, invar PMC, in STR) :flow {
             VTABLE_get_string(interp, VTABLE_get_class(interp, $2)));
         goto ADDRESS(dest);
     }
-    restart ADDRESS(resume);
+    goto ADDRESS(resume);
 }
 
 ########################################
