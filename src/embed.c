@@ -894,13 +894,13 @@ print_constant_table(PARROT_INTERP, ARGIN(PMC *output))
                   case enum_class_FixedIntegerArray:
                     {
                         const INTVAL n = VTABLE_elements(interp, c->u.key);
-                        INTVAL i;
+                        INTVAL j;
                         Parrot_io_fprintf(interp, output, "[");
 
-                        for (i = 0; i < n; ++i) {
-                            const INTVAL val = VTABLE_get_integer_keyed_int(interp, c->u.key, i);
+                        for (j = 0; j < n; ++j) {
+                            const INTVAL val = VTABLE_get_integer_keyed_int(interp, c->u.key, j);
                             Parrot_io_fprintf(interp, output, "%d", val);
-                            if (i < n - 1)
+                            if (j < n - 1)
                                 Parrot_io_fprintf(interp, output, ",");
                         }
                         Parrot_io_fprintf(interp, output, "]");
