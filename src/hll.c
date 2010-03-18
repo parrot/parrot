@@ -217,7 +217,6 @@ Parrot_register_HLL_lib(PARROT_INTERP, ARGIN(STRING *hll_lib))
 {
     ASSERT_ARGS(Parrot_register_HLL_lib)
     PMC   *hll_info = interp->HLL_info;
-    PMC   *entry, *name;
     INTVAL nelements, i;
 
     START_WRITE_HLL_INFO(interp, hll_info);
@@ -229,28 +228,30 @@ Parrot_register_HLL_lib(PARROT_INTERP, ARGIN(STRING *hll_lib))
         PMC * const lib_name = VTABLE_get_pmc_keyed_int(interp, entry, e_HLL_lib);
 
         if (!PMC_IS_NULL(lib_name)) {
-            const STRING * const name = VTABLE_get_string(interp, lib_name);
-            if (Parrot_str_equal(interp, name, hll_lib))
+            const STRING * const lib_name_str = VTABLE_get_string(interp, lib_name);
+            if (Parrot_str_equal(interp, lib_name_str, hll_lib))
                 break;
         }
     }
 
     if (i < nelements)
         return i;
+    else {
+        PMC * const new_entry = new_hll_entry(interp, NULL);
+        PMC *name;
 
-    entry    = new_hll_entry(interp, NULL);
+        VTABLE_set_pmc_keyed_int(interp, new_entry, e_HLL_name, PMCNULL);
 
-    VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_name, PMCNULL);
+        /* register dynlib */
+        name    = Parrot_pmc_new_constant(interp, enum_class_String);
 
-    /* register dynlib */
-    name    = Parrot_pmc_new_constant(interp, enum_class_String);
+        VTABLE_set_string_native(interp, name, hll_lib);
+        VTABLE_set_pmc_keyed_int(interp, new_entry, e_HLL_lib, name);
 
-    VTABLE_set_string_native(interp, name, hll_lib);
-    VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_lib, name);
+        END_WRITE_HLL_INFO(interp, hll_info);
 
-    END_WRITE_HLL_INFO(interp, hll_info);
-
-    return 0;
+        return 0;
+    }
 }
 
 /*
