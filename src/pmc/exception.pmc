@@ -733,7 +733,6 @@ sub, or for the point of the call a level deeper for the rest.
     METHOD backtrace() {
         PMC *result = PMCNULL;
         PMC *resume;
-        PMC *cur_ctx;
         Parrot_Continuation_attributes    *cont;
 
         /* Get starting context, then loop over them. */
@@ -745,6 +744,7 @@ sub, or for the point of the call a level deeper for the rest.
             Parrot_pcc_invoke_method_from_c_args(INTERP, cont->to_ctx, CONST_STRING(interp, "backtrace"), "P->P", resume, &result);
         }
         else {
+            PMC *cur_ctx;
             /* No return continuation. Assuming we're being called  */
             cont = NULL;
             GET_ATTR_thrower(interp, SELF, cur_ctx);
