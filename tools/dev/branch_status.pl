@@ -43,7 +43,7 @@ if (!$human) {
         Branch Revisions Creator Authors Created
         Updated Components Commits LastMergeRev
     ));
-} 
+}
 
 
 foreach my $branch (@branches) {
