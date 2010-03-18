@@ -985,7 +985,7 @@ PDB_get_command(PARROT_INTERP)
     PARROT_ASSERT(pdb->cur_command);
 
     if (interp->pdb->script_file) {
-        FILE *fd = interp->pdb->script_file;
+        FILE * const fd = interp->pdb->script_file;
         char buf[DEBUG_CMD_BUFFER_LENGTH+1];
         const char *ptr;
 
@@ -1025,15 +1025,15 @@ PDB_get_command(PARROT_INTERP)
         Parrot_io_eprintf(pdb->debugger, "\n");
 
         {
-            Interp *interpdeb = interp->pdb->debugger;
-            STRING *readline  = CONST_STRING(interpdeb, "readline_interactive");
-            STRING *prompt    = CONST_STRING(interpdeb, "(pdb) ");
-            STRING *s         = Parrot_str_new(interpdeb, NULL, 0);
-            PMC    *tmp_stdin = Parrot_io_stdhandle(interpdeb, 0, NULL);
+            Interp * const interpdeb = interp->pdb->debugger;
+            STRING * const readline  = CONST_STRING(interpdeb, "readline_interactive");
+            STRING * const prompt    = CONST_STRING(interpdeb, "(pdb) ");
+            STRING * const s         = Parrot_str_new(interpdeb, NULL, 0);
+            PMC    * const tmp_stdin = Parrot_io_stdhandle(interpdeb, 0, NULL);
 
             Parrot_pcc_invoke_method_from_c_args(interpdeb,
                 tmp_stdin, readline,
-                "S->S", prompt, & s);
+                "S->S", prompt, &s);
             {
                 char * const aux = Parrot_str_to_cstring(interpdeb, s);
                 strcpy(c, aux);
@@ -1946,7 +1946,7 @@ char
 PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
 {
     ASSERT_ARGS(PDB_check_condition)
-    PMC *ctx = CURRENT_CONTEXT(interp);
+    PMC * const ctx = CURRENT_CONTEXT(interp);
 
     TRACEDEB_MSG("PDB_check_condition");
 
