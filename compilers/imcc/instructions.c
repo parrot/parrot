@@ -275,7 +275,7 @@ instruction_writes(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
 {
     ASSERT_ARGS(instruction_writes)
     const int f = ins->flags;
-    int i;
+    int j;
 
     /*
      * a get_results opcode is before the actual sub call
@@ -336,9 +336,9 @@ instruction_writes(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
         return 0;
     }
 
-    for (i = 0; i < ins->symreg_count; i++)
-        if (f & (1 << (16 + i)))
-            if (ins->symregs[i] == r)
+    for (j = 0; j < ins->symreg_count; j++)
+        if (f & (1 << (16 + j)))
+            if (ins->symregs[j] == r)
                 return 1;
 
     return 0;
