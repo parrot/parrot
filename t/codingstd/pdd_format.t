@@ -16,11 +16,11 @@ my @pdddirs = qw(
 
 my @pddfiles = ();
 foreach my $dir (@pdddirs) {
-    opendir my $DIRH, $dir
-        or croak "Unable to open directory handle: $!";
-    my @pdds = map { qq|$dir/$_| } grep { m/^pdd\d{2,}_.*\.pod$/ }
-        readdir $DIRH;
-    closedir $DIRH or croak "Unable to close directory handle: $!";
+    die "Directory '$dir' is not found, or not a directory" if not -d $dir;
+
+    my @pdds = glob "$dir/pdd*.pod"
+        or warn "No PDD files found in directory '$dir'";
+
     push @pddfiles, @pdds;
 }
 
