@@ -190,6 +190,7 @@ Parrot_io_socket(PARROT_INTERP, ARGMOD_NULLOK(PMC *socket), INTVAL fam,
                 PIO_F_SOCKET|PIO_F_READ|PIO_F_WRITE);
     else
         new_socket = socket;
+    /* XXX new_socket is assigned, but never used. Probably a bug? */
 
     return PIO_SOCKET(interp, socket, fam, type, proto);
 }
