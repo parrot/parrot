@@ -19,19 +19,27 @@ Tests the Rational PMC.
 .sub main :main
     .include 'test_more.pir'
     .include 'iglobals.pasm'
-    loadlib $P1, 'rational'
     .local pmc config_hash, interp
 
-    plan(55)
     interp = getinterp
     config_hash = interp[.IGLOBALS_CONFIG_HASH]
     $S0 = config_hash['gmp']
 
-    test_init()
-    test_version()
+    unless $S0 goto no_gmp
+    plan(55)
+    goto gmp_tests
+
+  no_gmp:
+    # seems like plan(0) is not supported currently
+    plan(1)
+    ok(1,'GMP not found, skipping Rational tests')
+    .return()
 
     # The following tests only run if GMP is installed
-    unless $S0 goto done
+ gmp_tests:
+    loadlib $P1, 'rational'
+    test_init()
+    test_version()
     test_set_get_native_int()
     test_set_get_native_float()
     test_set_get_native_string()
@@ -69,8 +77,6 @@ Tests the Rational PMC.
     test_abs()
     test_cmp()
     #test_equal_tt1517()
-  done:
-    .return()
 .end
 
 .sub test_neg
