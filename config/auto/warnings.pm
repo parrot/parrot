@@ -245,7 +245,9 @@ sub _init {
         -Wunused-function
         -Wunused-variable
         -Wwrite-strings
-    )];
+        ),
+        '-diag-disable 981', # Ignore values evaluated in unknown order
+    ];
 
     $data->{'warnings'}{'gcc'} = $gcc;
     $data->{'warnings'}{'g++'} = $gpp;
