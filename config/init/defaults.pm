@@ -80,6 +80,7 @@ sub runstep {
     my $ccdlflags = $Config{ccdlflags};
     $ccdlflags =~ s/\s*-Wl,-rpath,\S*//g if $conf->options->get('disable-rpath');
 
+    my $cc_option = $conf->options->get('cc');
     # We need a Glossary somewhere!
     $conf->data->set(
         debugging => $conf->options->get('debugging') ? 1 : 0,
@@ -92,9 +93,10 @@ sub runstep {
 
         # Compiler -- used to turn .c files into object files.
         # (Usually cc or cl, or something like that.)
-        cc      => $Config{cc},
-        ccflags => $Config{ccflags},
-        ccwarn  => exists( $Config{ccwarn} ) ? $Config{ccwarn} : '',
+        cc      => $cc_option ? $cc_option : $Config{cc},
+        # If we specify a compiler, we can't use existing ccflags and ccwarn.
+        ccflags => $cc_option ? ''         : $Config{ccflags},
+        ccwarn  => $cc_option ? ''         : $Config{ccwarn},
 
         # Flags used to indicate this object file is to be compiled
         # with position-independent code suitable for dynamic loading.

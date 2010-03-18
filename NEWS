@@ -7,6 +7,7 @@ New in 2.3.0
 - Deprecations
 - API
 - Platforms
+  + Improved handling of new compilers
 - Bugfix
 - Tests
 - Tools
