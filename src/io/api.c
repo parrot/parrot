@@ -369,9 +369,8 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
         if (length == 0)
             result = Parrot_str_copy(interp, string_orig);
         else {
-            INTVAL orig_length, read_length;
-            read_length = length;
-            orig_length = Parrot_str_byte_length(interp, string_orig);
+            INTVAL read_length = length;
+            const INTVAL orig_length = Parrot_str_byte_length(interp, string_orig);
 
             GETATTR_StringHandle_read_offset(interp, pmc, offset);
 
