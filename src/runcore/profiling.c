@@ -148,7 +148,7 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
 {
     ASSERT_ARGS(init_profiling_core)
 
-    char *profile_filename, *output_cstr, *filename_cstr, *annotations_cstr;
+    char *profile_filename, *output_cstr, *filename_cstr;
 
     /* initialize the runcore struct */
     runcore->runops  = (Parrot_runcore_runops_fn_t)  runops_profiling_core;
@@ -227,10 +227,12 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
     }
 
     /* figure out if annotations are wanted */
-    annotations_cstr = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_PROFILING_ANNOTATIONS"));
-
-    if (annotations_cstr) {
+    if (Parrot_getenv(interp, CONST_STRING(interp, "PARROT_PROFILING_ANNOTATIONS"))) {
         Profiling_report_annotations_SET(runcore);
+    }
+
+    if (Parrot_getenv(interp, CONST_STRING(interp, "PARROT_PROFILING_CANONICAL_OUTPUT"))) {
+        Profiling_canonical_output_SET(runcore);
     }
 
     /* put profile_filename in the gc root set so it won't get collected */
@@ -395,8 +397,16 @@ ARGIN(opcode_t *pc))
 
                 pprof_data[PPROF_DATA_NAMESPACE] = (PPROF_DATA) full_ns_cstr;
                 pprof_data[PPROF_DATA_FILENAME]  = (PPROF_DATA) filename_cstr;
-                pprof_data[PPROF_DATA_SUB_ADDR]  = (PPROF_DATA) preop_ctx->current_sub;
-                pprof_data[PPROF_DATA_CTX_ADDR]  = (PPROF_DATA) preop_ctx;
+
+                if (Profiling_canonical_output_TEST(runcore)) {
+                    pprof_data[PPROF_DATA_SUB_ADDR]  = (PPROF_DATA) 0x3;
+                    pprof_data[PPROF_DATA_CTX_ADDR]  = (PPROF_DATA) 0x3;
+                }
+                else {
+                    pprof_data[PPROF_DATA_SUB_ADDR]  = (PPROF_DATA) preop_ctx->current_sub;
+                    pprof_data[PPROF_DATA_CTX_ADDR]  = (PPROF_DATA) preop_ctx;
+                }
+
                 runcore->output_fn(runcore, pprof_data, PPROF_LINE_CONTEXT_SWITCH);
 
                 Parrot_str_free_cstring(full_ns_cstr);
@@ -443,8 +453,13 @@ ARGIN(opcode_t *pc))
             }
         }
 
+        if (Profiling_canonical_output_TEST(runcore)) {
+            pprof_data[PPROF_DATA_TIME] = 1;
+        }
+        else {
+            pprof_data[PPROF_DATA_TIME] = op_time;
+        }
         pprof_data[PPROF_DATA_LINE]   = preop_line;
-        pprof_data[PPROF_DATA_TIME]   = op_time;
         pprof_data[PPROF_DATA_OPNAME] = (PPROF_DATA)(interp->op_info_table)[*preop_pc].name;
         runcore->output_fn(runcore, pprof_data, PPROF_LINE_OP);
     }

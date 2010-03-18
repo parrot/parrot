@@ -55,6 +55,19 @@ profile.  Annotations are necessary when profiling HLL code, but will cause the
 profiling runcore to run more slowly.  By default, they are disabled.  Set this
 value to enable them.
 
+=item C<PARROT_PROFILING_CANONICAL_OUPUT> 
+
+When this is set, the profiling runcore will record all addresses as a single
+constant value and all times as 1.  This options is useful primarily for
+testing, where it's helpful to have a way to ensure that a given chunk of code
+will always produce exactly the same profile.  If you want this feature
+enabled, you also probably want to pass a fixed hash seed to Parrot via
+C<--hash-seed 1324> to avoid any non-deterministic behavior that hash seed
+randomization may cause.
+
+This variable is not useful apart from testing the profiling runcore and will
+most certainly not help you find hotspots in your code.
+
 =back
 
 =cut
