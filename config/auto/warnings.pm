@@ -240,15 +240,23 @@ sub _init {
         -Wcheck
         -Wcomment
         -Wdeprecated
+        -Weffc++
+        -Wextra-tokens
+        -Wformat
+        -Wformat-security
         -Wmain
+        -Wmissing-declarations
         -Wmissing-prototypes
         -Wpointer-arith
+        -Wport
         -Wreturn-type
+        -Wshadow
         -Wstrict-prototypes
         -Wuninitialized
         -Wunknown-pragmas
         -Wunused-function
         -Wunused-variable
+        -Wwrite-strings
     )];
 
     $data->{'warnings'}{'gcc'} = $gcc;
