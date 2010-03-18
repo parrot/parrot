@@ -154,7 +154,7 @@ sub _init {
     $gcc->{'basic'} = [ @gcc_or_gpp ];
     $gpp->{'basic'} = [ @gcc_or_gpp ];
 
-    # Add some gcc only warnings that would break g++
+    # Add some gcc-only warnings that would break g++
     push @{$gcc->{'basic'}}, qw(
         -Wbad-function-cast
         -Wc++-compat
