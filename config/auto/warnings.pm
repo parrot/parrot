@@ -246,7 +246,9 @@ sub _init {
         -Wunused-variable
         -Wwrite-strings
         ),
-        '-diag-disable 981', # Ignore values evaluated in unknown order
+        # Disable some warnings and notifications that are overly noisy
+        '-diag-disable 981',  # Operands are evaluated in unspecified order
+        '-diag-disable 2259', # Non-pointer conversion from "typeA" to "typeB" may lose significant bits
     ];
 
     $data->{'warnings'}{'gcc'} = $gcc;
