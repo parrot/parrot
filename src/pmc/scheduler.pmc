@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -160,7 +160,7 @@ recalculates it before retrieving the next task.
          * deleted tasks. */
         while (PMC_IS_NULL(task)
         &&     VTABLE_elements(INTERP, core_struct->task_index) > 0) {
-            INTVAL tid = VTABLE_shift_integer(INTERP, core_struct->task_index);
+            const INTVAL tid = VTABLE_shift_integer(INTERP, core_struct->task_index);
 
             if (tid > 0)
                 task = VTABLE_get_pmc_keyed_int(INTERP,
@@ -198,8 +198,9 @@ Removes the task with the given task ID from the task list.
 */
 
     VTABLE void delete_keyed_int(INTVAL key) {
-        Parrot_Scheduler_attributes *core_struct = PARROT_SCHEDULER(SELF);
-        STRING           *task_id_str = Parrot_str_from_int(INTERP, key);
+        Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
+        STRING                      * const task_id_str = Parrot_str_from_int(INTERP, key);
+
         VTABLE_delete_keyed_str(INTERP, core_struct->task_list, task_id_str);
         SCHEDULER_cache_valid_CLEAR(SELF);
     }
@@ -401,8 +402,8 @@ Deletes a handler from the scheduler.
     METHOD delete_handler(STRING *type :optional, INTVAL have_type :opt_flag) {
         PMC    *handlers;
         INTVAL  elements, index;
-        STRING *except_str = CONST_STRING(INTERP, "exception");
-        STRING *event_str  = CONST_STRING(INTERP, "event");
+        STRING * const except_str = CONST_STRING(INTERP, "exception");
+        STRING * const event_str  = CONST_STRING(INTERP, "event");
 
         GET_ATTR_handlers(INTERP, SELF, handlers);
         elements = VTABLE_elements(INTERP, handlers);
@@ -412,7 +413,7 @@ Deletes a handler from the scheduler.
 
         /* Loop from newest handler to oldest handler. */
         for (index = 0; index < elements; ++index) {
-            PMC *handler = VTABLE_get_pmc_keyed_int(INTERP, handlers, index);
+            const PMC * const handler = VTABLE_get_pmc_keyed_int(INTERP, handlers, index);
             if (!PMC_IS_NULL(handler)) {
                 if (Parrot_str_equal(INTERP, type, except_str)
                 &&  handler->vtable->base_type == enum_class_ExceptionHandler) {
@@ -465,11 +466,11 @@ PMCNULL.
 
         /* Loop from newest handler to oldest handler. */
         while (VTABLE_get_bool(interp, iter)) {
-            PMC *handler = VTABLE_shift_pmc(INTERP, iter);
+            PMC * const handler = VTABLE_shift_pmc(INTERP, iter);
 
             INTVAL valid_handler = 0;
             if (!PMC_IS_NULL(handler)) {
-                (INTVAL valid_handler) = PCCINVOKE(INTERP, handler, "can_handle", PMC *task);
+                (const INTVAL valid_handler) = PCCINVOKE(INTERP, handler, "can_handle", PMC *task);
                 if (valid_handler) {
                     if (task->vtable->base_type == enum_class_Exception)
                         VTABLE_set_integer_native(interp, handler, 1);
@@ -509,9 +510,9 @@ If no type argument is passed, counts all handlers.
             RETURN(INTVAL elements);
 
         for (index = 0; index < elements; ++index) {
-            PMC    *handler   = VTABLE_get_pmc_keyed_int(INTERP, handlers, index);
-            STRING *exception = CONST_STRING(INTERP, "exception");
-            STRING *event     = CONST_STRING(INTERP, "event");
+            const PMC * const handler   = VTABLE_get_pmc_keyed_int(INTERP, handlers, index);
+            STRING    * const exception = CONST_STRING(INTERP, "exception");
+            STRING    * const event     = CONST_STRING(INTERP, "event");
 
             if (!PMC_IS_NULL(handler)) {
                 if ((Parrot_str_equal(INTERP, type, exception)
