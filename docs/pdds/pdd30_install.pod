@@ -7,8 +7,8 @@
 
 This PDD outlines Parrot's installation system and support. Parrot's core
 installation system will provide support for binary packages, a working C<make
-install> target, compiled installables, and Filesystem Hierarchy Standard (FHS)
-compliant search paths for the installables.
+install> target, compiled installables, and Filesystem Hierarchy Standard
+(FHS) compliant search paths for the installables.
 
 =head2 Version
 
@@ -33,8 +33,8 @@ Language installation process (from the language source directory):
 
 =head2 Description
 
-Parrot uses FHS compliant install directories by default. Each install location
-is configurable with options passed to the configure script.
+Parrot uses FHS compliant install directories by default. Each install
+location is configurable with options passed to the configure script.
 
 =over
 
