@@ -382,7 +382,8 @@ Sets the PMC value of the element at index C<key> to C<val>.
     }
 
     VTABLE PMC *get_pmc_keyed_str(STRING *key) {
-        PMC * const pkey = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_String));
+        PMC * const pkey =
+            Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_String));
         VTABLE_set_string_native(INTERP, pkey, key);
         return STATICSELF.get_pmc_keyed(pkey);
     }
