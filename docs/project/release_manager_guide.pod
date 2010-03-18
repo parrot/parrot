@@ -218,9 +218,10 @@ create the new directory in F<~/ftp/releases/stable> instead.
 
  $ mkdir ~/ftp/releases/stable/a.b.c
 
-Copy the tarball from your machine into the new directory.
+Copy the different compressed tarballs from your machine into the new directory.
 
- $ scp parrot-a.b.c.tar.gz <USERNAME>@ftp-osl.osuosl.org:~/ftp/releases/devel/a.b.c/.
+ $ scp parrot-a.b.c.tar.gz parrot-a.b.c.tar.bz2 \
+   <USERNAME>@ftp-osl.osuosl.org:~/ftp/releases/devel/a.b.c/.
 
 (Or using C<wget> or whatever tool you prefer.)
 
