@@ -68,6 +68,7 @@ Tests the Rational PMC.
     test_neg()
     test_abs()
     test_cmp()
+    #test_equal_tt1517()
   done:
     .return()
 .end
@@ -93,6 +94,18 @@ Tests the Rational PMC.
     abs $P2
     is($P2,'3/2','abs')
     is($P3,'3/2','abs')
+.end
+
+.sub test_equal_tt1517
+    new $P2, 'Rational'
+    new $P3, 'Integer'
+    $P2 = "2/1"
+    $P3 = 2
+    if $P2 == $P3 goto pass
+    ok(0,'== on Rational and Integer PMC')
+    .return()
+  pass:
+    ok(1,'== on Rational and Integer PMC')
 .end
 
 .sub test_cmp
