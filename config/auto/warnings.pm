@@ -218,7 +218,11 @@ sub _init {
         ) ],
     };
 
+    # Warning flags docs
+    # http://software.intel.com/sites/products/documentation/hpc/compilerpro/en-us/cpp/lin/compiler_c/index.htm
     $icc->{'basic'} = [ qw(
+        -w2
+
         -wd117
         -wd177
         -wd181
@@ -230,10 +234,10 @@ sub _init {
         -wd1419
         -wd1572
         -wd1599
+
+        -Wabi
         -Wall
         -Wcheck
-        -w2
-        -Wabi
         -Wcomment
         -Wdeprecated
         -Wmain
