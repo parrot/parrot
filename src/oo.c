@@ -1139,11 +1139,11 @@ C3_merge(PARROT_INTERP, ARGIN(PMC *merge_list))
     /* Otherwise, remove what was accepted from the merge lists. */
     for (i = 0; i < list_count; i++) {
 
-        PMC * const list       = VTABLE_get_pmc_keyed_int(interp, merge_list, i);
-        const INTVAL list_count = VTABLE_elements(interp, list);
+        PMC * const list           = VTABLE_get_pmc_keyed_int(interp, merge_list, i);
+        const INTVAL sublist_count = VTABLE_elements(interp, list);
         INTVAL j;
 
-        for (j = 0; j < list_count; j++) {
+        for (j = 0; j < sublist_count; j++) {
             if (VTABLE_get_pmc_keyed_int(interp, list, j) == accepted) {
                 VTABLE_delete_keyed_int(interp, list, j);
                 break;
@@ -1191,7 +1191,7 @@ Parrot_ComputeMRO_C3(PARROT_INTERP, ARGIN(PMC *_class))
     INTVAL parent_count;
 
     /* Now get immediate parents list. */
-    if (!immediate_parents)
+    if (PMC_IS_NULL(immediate_parents))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_METHOD_NOT_FOUND,
             "Failed to get parents list from class!");
 
