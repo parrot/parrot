@@ -3,6 +3,8 @@
 package Parrot::Ops2pm::Base;
 use strict;
 use warnings;
+use Cwd;
+use File::Spec;
 use lib qw ( lib );
 use Parrot::OpsFile;
 
@@ -94,6 +96,9 @@ sub new {
     $argsref->{argv} = \@argv;
     $argsref->{num_file}    = "src/ops/ops.num";
     $argsref->{skip_file}   = "src/ops/ops.skip";
+    $argsref->{opsenum_file} = File::Spec->catfile(
+        cwd(), qw(  include parrot opsenum.h )
+    );
     return bless $argsref, $class;
 }
 

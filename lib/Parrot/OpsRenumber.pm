@@ -134,7 +134,7 @@ sub renum_op_map_file {
     # above the DYNAMIC line.  For the purpose of renumbering, we create
     # an index $n.
 
-    my $opsenumfn = "include/parrot/opsenum.h";
+    my $opsenumfn = $self->{opsenum_file};
     open my $OPSENUM, '>', $opsenumfn or die "Can't open $opsenumfn, error $!";
     print $OPSENUM $OPSENUM_PREAMBLE;
     open $OP, '>', $file

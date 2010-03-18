@@ -33,6 +33,8 @@ ok(-d $samplesdir, "Able to locate samples directory");
     chdir $tdir or croak "Unable to change to testing directory: $!";
     my $opsdir = File::Spec->catdir ( $tdir, 'src', 'ops' );
     mkpath( [ $opsdir ], 0, 0755 ) or croak "Unable to make testing directory";
+    my $incpardir = File::Spec->catdir ( $tdir, 'include', 'parrot' );
+    mkpath( [ $incpardir ], 0, 0755 ) or croak "Unable to make testing directory";
 
     ##### Stage 1:  Generate ops.num de novo #####
 
