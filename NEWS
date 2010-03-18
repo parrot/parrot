@@ -1,5 +1,18 @@
 # $Id$
 
+New in 2.3.0
+- Features
+- Core
+- Compilers
+- Deprecations
+- API
+- Platforms
+- Bugfix
+- Tests
+- Tools
+- Documentation
+- Miscellaneous
+
 New in 2.2.0
 - Core changes
   + Most internal allocations now use the GC
