@@ -7,13 +7,11 @@ use warnings;
 
 use Test::More tests =>  1;
 use Carp;
-use Cwd;
 use Tie::File;
 
-my $cwd = cwd();
-my @pdddirs = (
-    qq{$cwd/docs/pdds},
-    qq{$cwd/docs/pdds/draft},
+my @pdddirs = qw(
+    ./docs/pdds
+    ./docs/pdds/draft
 );
 
 my @pddfiles = ();
@@ -44,10 +42,7 @@ $errmsg ? fail( qq{\n$errmsg} )
 
 sub check_pdd_formatting {
     my $pdd = shift;
-    my $base = $pdd;
-    if ($pdd =~ m{((draft/)?[^/]+)$}) {
-        $base = $1;
-    }
+
     my $diag = q{};
     my @toolong = ();
     my @sections_needed = qw(
@@ -76,13 +71,13 @@ sub check_pdd_formatting {
     untie @lines or croak "Unable to untie from $pdd: $!";
     if ( @toolong ) {
         $diag .=
-            qq{$base has } .
+            qq{$pdd has } .
             scalar(@toolong) .
             qq{ lines > 78 chars:  @toolong\n};
     }
     foreach my $need (@sections_needed) {
         if ( ! $sections_seen{$need} ) {
-            $diag .= qq{$base lacks 'head2' $need section\n};
+            $diag .= qq{$pdd lacks 'head2' $need section\n};
         }
     }
     return $diag;
