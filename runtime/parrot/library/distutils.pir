@@ -558,6 +558,8 @@ the others items of the array are just the dependencies
     $I0 = newer(pbc, src)
     if $I0 goto L1
   L4:
+    $S0 = dirname(pbc)
+    mkpath($S0, 1 :named('verbose'))
     .local string cmd
     cmd = get_parrot()
     cmd .= " -o "
@@ -612,6 +614,8 @@ the value is an array of PGE pathname or a single PGE pathname
     $I0 = newer(pir, src)
     if $I0 goto L1
   L4:
+    $S0 = dirname(pir)
+    mkpath($S0, 1 :named('verbose'))
     .local string cmd
     cmd = get_parrot()
     cmd .= " "
@@ -657,6 +661,8 @@ the value is the TGE pathname
     tge = hash[pir]
     $I0 = newer(pir, tge)
     if $I0 goto L1
+    $S0 = dirname(pir)
+    mkpath($S0, 1 :named('verbose'))
     .local string cmd
     cmd = get_parrot()
     cmd .= " "
@@ -704,6 +710,8 @@ the value is the NQP pathname
     nqp = hash[pir]
     $I0 = newer(pir, nqp)
     if $I0 goto L1
+    $S0 = dirname(pir)
+    mkpath($S0, 1 :named('verbose'))
     .local string cmd
     cmd = get_parrot()
     cmd .= " "
@@ -754,6 +762,8 @@ the value is the NQP pathname
     nqp = hash[pir]
     $I0 = newer(pir, nqp)
     if $I0 goto L1
+    $S0 = dirname(pir)
+    mkpath($S0, 1 :named('verbose'))
     .local string cmd
     cmd = get_nqp()
     cmd .= " --target=pir --output="
@@ -795,6 +805,8 @@ the value is an array of PIR pathname
     srcs = hash[pir]
     $I0 = newer(pir, srcs)
     if $I0 goto L1
+    $S0 = dirname(pir)
+    mkpath($S0, 1 :named('verbose'))
     spew(pir, '', 1 :named('verbose'))
     $P1 = iter srcs
   L3:
@@ -833,19 +845,21 @@ the value is an array of PBC pathname
     $P0 = iter hash
   L1:
     unless $P0 goto L2
-    .local string pbc, src
+    .local string pbc
     pbc = shift $P0
     .local pmc srcs
     srcs = hash[pbc]
     $I0 = newer(pbc, srcs)
     if $I0 goto L1
-    src = join ' ', srcs
+    $S0 = dirname(pbc)
+    mkpath($S0, 1 :named('verbose'))
     .local string cmd
     cmd = get_executable('pbc_merge')
     cmd .= " -o "
     cmd .= pbc
     cmd .= " "
-    cmd .= src
+    $S0 = join " ", srcs
+    cmd .= $S0
     system(cmd, 1 :named('verbose'))
     goto L1
   L2:
@@ -1462,6 +1476,8 @@ the value is the POD pathname
     pod = hash[html]
     $I0 = newer(html, pod)
     if $I0 goto L1
+    $S0 = dirname(html)
+    mkpath($S0, 1 :named('verbose'))
     .local string cmd
     cmd = "pod2html --infile "
     cmd .= pod
