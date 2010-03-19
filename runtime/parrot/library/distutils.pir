@@ -2232,11 +2232,15 @@ a hash
 
 =over 4
 
-=item inst_bin ???
+=item inst_bin (useful ?)
 
 array of pathname or a single pathname
 
-=item inst_dynext ???
+=item inst_data
+
+array of pathname or a single pathname
+
+=item inst_dynext (useful ?)
 
 array of pathname or a single pathname
 
@@ -2319,6 +2323,11 @@ array of pathname or a single pathname
     $P0 = kv['inst_lib']
     get_install_lib(files, "library", $P0)
   L5:
+    $I0 = exists kv['inst_data']
+    unless $I0 goto L6
+    $P0 = kv['inst_data']
+    get_install_data(files, $P0)
+  L6:
     .return (files)
 .end
 
@@ -2326,6 +2335,28 @@ array of pathname or a single pathname
     .param pmc files
     .param pmc array
     $S1 = get_bindir()
+    $S1 .= "/"
+    $I0 = does array, 'array'
+    if $I0 goto L1
+    $S0 = array
+    $S2 = $S1 . $S0
+    files[$S2] = $S0
+    goto L2
+  L1:
+    $P0 = iter array
+  L3:
+    unless $P0 goto L2
+    $S0 = shift $P0
+    $S2 = $S1 . $S0
+    files[$S2] = $S0
+    goto L3
+  L2:
+.end
+
+.sub 'get_install_data' :anon
+    .param pmc files
+    .param pmc array
+    $S1 = get_datadir()
     $S1 .= "/"
     $I0 = does array, 'array'
     if $I0 goto L1
@@ -2754,7 +2785,7 @@ array of pathname or a single pathname
 =item pbc_pir, pir_pge, pir_tge, pir_nqp, pir_nqp-rx, pir_nqprx, pir_pir
 pbc_pbc, exe_pbc, installable_pbc, dynops, dynpmc, html_pod
 
-=item inst_bin, inst_dynext, inst_inc, inst_lang, inst_lib
+=item inst_bin, inst_data, inst_dynext, inst_inc, inst_lang, inst_lib
 
 =item harness_files, prove_files
 
@@ -2798,7 +2829,7 @@ the default value is setup.pir
     goto L1
   L2:
 
-    $P0 = split ' ', 'inst_bin inst_dynext inst_inc inst_lang inst_lib doc_files'
+    $P0 = split ' ', 'inst_bin inst_data inst_dynext inst_inc inst_lang inst_lib doc_files'
   L3:
     unless $P0 goto L4
     $S0 = shift $P0
@@ -3192,7 +3223,7 @@ the default value is ports/rpm
 
 =item installable_pbc, dynops, dynpmc
 
-=item inst_bin, inst_dynext, inst_inc, inst_lang, inst_lib
+=item inst_bin, inst_data, inst_dynext, inst_inc, inst_lang, inst_lib
 
 =item setup
 
@@ -3435,7 +3466,7 @@ the default value is ports/debian
 
 =item installable_pbc, dynops, dynpmc
 
-=item inst_bin, inst_dynext, inst_inc, inst_lang, inst_lib
+=item inst_bin, inst_data, inst_dynext, inst_inc, inst_lang, inst_lib
 
 =item setup
 
@@ -3925,7 +3956,7 @@ See L<http://www.jrsoftware.org/>.
 
 =item installable_pbc, dynops, dynpmc
 
-=item inst_bin, inst_dynext, inst_inc, inst_lang, inst_lib
+=item inst_bin, inst_data, inst_dynext, inst_inc, inst_lang, inst_lib
 
 =item doc_files
 
@@ -4247,6 +4278,16 @@ Return the whole config
     $S0 .= '/compilers/'
   L2:
     $S0 .= name
+    .return ($S0)
+.end
+
+=item get_datadir
+
+=cut
+
+.sub 'get_datadir'
+    $P0 = get_config()
+    $S0 = $P0['datadir']
     .return ($S0)
 .end
 
