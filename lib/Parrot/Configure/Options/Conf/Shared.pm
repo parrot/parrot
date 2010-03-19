@@ -11,6 +11,7 @@ our @EXPORT_OK = qw(
 
 our @shared_valid_options = qw{
     bindir
+    builddir
     cage
     cc
     ccflags

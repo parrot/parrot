@@ -86,7 +86,9 @@ sub runstep {
         debugging => $conf->options->get('debugging') ? 1 : 0,
         optimize  => '',
         verbose   => $conf->options->get('verbose'),
-        build_dir => abs_path($FindBin::Bin),
+        build_dir => defined($conf->options->get('builddir'))
+          ? abs_path($conf->options->get('builddir'))
+          : abs_path($FindBin::Bin),
         configured_from_file =>
             $conf->options->get('configured_from_file') || '',
         configuration_steps => ( join q{ } => $conf->get_list_of_steps() ),
