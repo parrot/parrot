@@ -66,12 +66,6 @@ not already here. This allows the usage of $P0() instead of $P0($P0).
 
 L<https://trac.parrot.org/parrot/ticket/103>
 
-=item CPointer PMC [eligible in 2.1]
-
-And all uses in the Parrot calling conventions.
-
-L<https://trac.parrot.org/parrot/ticket/1407>
-
 =item Digest dynpmcs [eligible in 2.4]
 
 The digest dynpmcs are, since the posting of this notice, available on
