@@ -222,10 +222,6 @@ renamed to Parrot_str_is_null
 
 rename Parrot_string_cstring to Parrot_str_cstring
 
-=item STRING functions which don't have Parrot_str_ prefix
-
-The string subsytem is gradually getting an overhaul.
-
 =back
 
 =head1 Compiler tools
