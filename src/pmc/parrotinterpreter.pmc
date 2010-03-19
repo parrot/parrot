@@ -441,7 +441,7 @@ Introspection interface. C<key> can be:
 */
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
-        PMC    *nextkey, *cont;
+        PMC    *nextkey;
         STRING *outer = NULL;
         STRING *item  = key_string(interp, key);
         STRING *name  = CONST_STRING(interp, "globals");
@@ -487,7 +487,7 @@ Introspection interface. C<key> can be:
         }
         else {
             for (; level; --level) {
-                cont = Parrot_pcc_get_continuation(interp, ctx);
+                PMC * const cont = Parrot_pcc_get_continuation(interp, ctx);
 
                 if (PMC_IS_NULL(cont) || !PARROT_CONTINUATION(cont)->seg)
                     Parrot_ex_throw_from_c_args(interp, NULL,
@@ -712,7 +712,7 @@ Finish thawing.
 
     VTABLE void thaw(PMC *info) {
         if (!PMC_data(SELF)) {
-            Parrot_ParrotInterpreter_attributes *attrs =
+            Parrot_ParrotInterpreter_attributes * const attrs =
                 mem_gc_allocate_zeroed_typed(INTERP, Parrot_ParrotInterpreter_attributes);
             PMC_data(SELF) = attrs;
             PObj_custom_destroy_SET(SELF);
@@ -746,22 +746,18 @@ Finish thawing.
             }
 
             if (!PMC_IS_NULL(lib_pmc)) {
-                STRING *lib_name = VTABLE_get_string(INTERP, lib_pmc);
-                PMC    *ignored;
+                STRING * const lib_name = VTABLE_get_string(INTERP, lib_pmc);
 
                 if (!STRING_IS_EMPTY(lib_name)) {
-                    INTVAL id;
-                    ignored      = Parrot_load_lib(INTERP, lib_name, NULL);
-                    id           = Parrot_register_HLL_lib(INTERP, lib_name);
+                    PMC * const ignored = Parrot_load_lib(INTERP, lib_name, NULL);
+                    const INTVAL id     = Parrot_register_HLL_lib(INTERP, lib_name);
                     UNUSED(id);
                 }
-
-                UNUSED(ignored);
             }
 
             if (hll_id >= 0 && !PMC_IS_NULL(typemap)) {
-                PMC   *iter = VTABLE_get_iter(INTERP, typemap);
-                INTVAL e    = VTABLE_get_integer(INTERP, typemap);
+                PMC   * const iter = VTABLE_get_iter(INTERP, typemap);
+                const INTVAL e     = VTABLE_get_integer(INTERP, typemap);
                 INTVAL i;
 
                 for (i = 0; i < e; ++i) {
@@ -792,9 +788,9 @@ Map core_type to hll_type.
 */
 
     METHOD hll_map(PMC *core_type, PMC *hll_type) {
-        INTVAL core_type_id = VTABLE_type(INTERP, core_type);
-        INTVAL hll_type_id  = VTABLE_type(INTERP, hll_type);
-        INTVAL hll_id       = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp));
+        const INTVAL core_type_id = VTABLE_type(INTERP, core_type);
+        const INTVAL hll_type_id  = VTABLE_type(INTERP, hll_type);
+        const INTVAL hll_id       = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp));
         Parrot_register_HLL_type(INTERP, hll_id, core_type_id, hll_type_id);
     }
 
@@ -815,7 +811,7 @@ This method is experimental. See TT #264.
 */
 
     METHOD stdhandle(INTVAL fileno, PMC *newhandle :optional) {
-        PMC * handle = Parrot_io_stdhandle(interp, fileno, newhandle);
+        PMC * const handle = Parrot_io_stdhandle(interp, fileno, newhandle);
         RETURN(PMC *handle);
     }
 
