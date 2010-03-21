@@ -42,29 +42,15 @@ build_call_func(PARROT_INTERP, SHIM(PMC *pmc_nci), NOTNULL(STRING *signature), S
 
     thunk = VTABLE_get_pmc_keyed_str(interp, nci_funcs, signature);
 
-    PARROT_ASSERT(PMC_IS_NULL(thunk) || thunk->vtable);
-
-    if ((!PMC_IS_NULL(thunk)) && thunk->vtable->base_type == enum_class_UnManagedStruct)
+    if (!PMC_IS_NULL(thunk)) {
+        PARROT_ASSERT(thunk->vtable);
+        PARROT_ASSERT(thunk->vtable->base_type == enum_class_UnManagedStruct);
         return F2DPTR(VTABLE_get_pointer(interp, thunk));
-
-    /*
-      These lines have been added to aid debugging. I want to be able to
-      see which signature has an unknown type. I am sure someone can come up
-      with a neater way to do this.
-     */
-    {
-        STRING *ns = CONST_STRING(interp, " is an unknown signature type");
-        STRING *message = Parrot_str_concat(interp, signature, ns, 0);
-
-        ns = CONST_STRING(interp, ".\nCAN_BUILD_CALL_FRAMES is disabled, add the signature to src/nci/extra_thunks.nci");
-        message = Parrot_str_concat(interp, message, ns, 0);
-
-        /*
-         * I think there may be memory issues with this but if we get to here we are
-         * aborting.
-         */
-        PANIC(interp, Parrot_str_to_cstring(interp, message));
     }
+
+    Parrot_ex_throw_from_c_args(interp, NULL,
+        EXCEPTION_UNIMPLEMENTED,
+        "No NCI thunk available for signature '%S'", signature);
 }
 
 /*
