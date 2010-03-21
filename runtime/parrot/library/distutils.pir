@@ -540,6 +540,8 @@ the others items of the array are just the dependencies
 
 .sub 'build_pbc_pir'
     .param pmc hash
+    .local pmc jobs
+    jobs = new 'ResizableStringArray'
     $P0 = iter hash
   L1:
     unless $P0 goto L2
@@ -566,7 +568,18 @@ the others items of the array are just the dependencies
     cmd .= pbc
     cmd .= " "
     cmd .= src
-    system(cmd, 1 :named('verbose'))
+    push jobs, cmd
+    goto L1
+  L2:
+    .tailcall run_jobs(jobs)
+.end
+
+.sub 'run_jobs'
+    .param pmc jobs
+  L1:
+    unless jobs goto L2
+    $S0 = shift jobs
+    system($S0, 1 :named('verbose'))
     goto L1
   L2:
 .end
@@ -596,6 +609,8 @@ the value is an array of PGE pathname or a single PGE pathname
 .sub 'build_pir_pge'
     .param pmc hash
     .param string flags
+    .local pmc jobs
+    jobs = new 'ResizableStringArray'
     $P0 = iter hash
   L1:
     unless $P0 goto L2
@@ -627,9 +642,10 @@ the value is an array of PGE pathname or a single PGE pathname
     cmd .= flags
     cmd .= " "
     cmd .= src
-    system(cmd, 1 :named('verbose'))
+    push jobs, cmd
     goto L1
   L2:
+    .tailcall run_jobs(jobs)
 .end
 
 =item pir_tge
@@ -653,6 +669,8 @@ the value is the TGE pathname
 
 .sub 'build_pir_tge'
     .param pmc hash
+    .local pmc jobs
+    jobs = new 'ResizableStringArray'
     $P0 = iter hash
   L1:
     unless $P0 goto L2
@@ -672,9 +690,10 @@ the value is the TGE pathname
     cmd .= pir
     cmd .= " "
     cmd .= tge
-    system(cmd, 1 :named('verbose'))
+    push jobs, cmd
     goto L1
   L2:
+    .tailcall run_jobs(jobs)
 .end
 
 =item pir_nqp
@@ -702,6 +721,8 @@ the value is the NQP pathname
 .sub 'build_pir_nqp'
     .param pmc hash
     .param string flags
+    .local pmc jobs
+    jobs = new 'ResizableStringArray'
     $P0 = iter hash
   L1:
     unless $P0 goto L2
@@ -723,9 +744,10 @@ the value is the NQP pathname
     cmd .= flags
     cmd .= " "
     cmd .= nqp
-    system(cmd, 1 :named('verbose'))
+    push jobs, cmd
     goto L1
   L2:
+    .tailcall run_jobs(jobs)
 .end
 
 =item pir_nqp-rx / pir_nqprx
@@ -754,6 +776,8 @@ the value is the NQP pathname
 
 .sub 'build_pir_nqp_rx'
     .param pmc hash
+    .local pmc jobs
+    jobs = new 'ResizableStringArray'
     $P0 = iter hash
   L1:
     unless $P0 goto L2
@@ -770,9 +794,10 @@ the value is the NQP pathname
     cmd .= pir
     cmd .= " "
     cmd .= nqp
-    system(cmd, 1 :named('verbose'))
+    push jobs, cmd
     goto L1
   L2:
+    .tailcall run_jobs(jobs)
 .end
 
 =item pir_pir (concat)
@@ -842,6 +867,8 @@ the value is an array of PBC pathname
 
 .sub 'build_pbc_pbc'
     .param pmc hash
+    .local pmc jobs
+    jobs = new 'ResizableStringArray'
     $P0 = iter hash
   L1:
     unless $P0 goto L2
@@ -860,9 +887,10 @@ the value is an array of PBC pathname
     cmd .= " "
     $S0 = join " ", srcs
     cmd .= $S0
-    system(cmd, 1 :named('verbose'))
+    push jobs, cmd
     goto L1
   L2:
+    .tailcall run_jobs(jobs)
 .end
 
 =item exe_pbc
@@ -886,6 +914,8 @@ the value is the PBC pathname
 
 .sub 'build_exe_pbc'
     .param pmc hash
+    .local pmc jobs
+    jobs = new 'ResizableStringArray'
     .local string exe
     exe = get_exe()
     $P0 = iter hash
@@ -904,9 +934,10 @@ the value is the PBC pathname
     cmd = get_executable('pbc_to_exe')
     cmd .= " "
     cmd .= pbc
-    system(cmd, 1 :named('verbose'))
+    push jobs, cmd
     goto L1
   L2:
+    .tailcall run_jobs(jobs)
 .end
 
 =item installable_pbc
@@ -930,6 +961,8 @@ the value is the PBC pathname
 
 .sub 'build_installable_pbc'
     .param pmc hash
+    .local pmc jobs
+    jobs = new 'ResizableStringArray'
     .local string exe
     exe = get_exe()
     .local int has_strip
@@ -952,12 +985,14 @@ the value is the PBC pathname
     cmd .= " "
     cmd .= pbc
     cmd .= " --install"
-    system(cmd, 1 :named('verbose'))
-    unless has_strip goto L1
-    cmd = "strip " . $S1
-    system(cmd, 1 :named('verbose'))
+    unless has_strip goto L3
+    cmd .= " && strip "
+    cmd .= $S1
+  L3:
+    push jobs, cmd
     goto L1
   L2:
+    .tailcall run_jobs(jobs)
 .end
 
 .sub '_has_strip' :anon
