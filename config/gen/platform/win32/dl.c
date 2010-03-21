@@ -23,7 +23,7 @@ Functions for working with dynamic libraries under windows.
 
 /*
 
-=item C<void * Parrot_dlopen(const char *filename)>
+=item C<void * Parrot_dlopen(const char *filename, Parrot_dlopen_flags flags)>
 
 Opens a dynamic library, and returns a system handle to that library.
 Returns Parrot_dlerror() on failure.
@@ -33,7 +33,7 @@ Returns Parrot_dlerror() on failure.
 */
 
 void *
-Parrot_dlopen(const char *filename)
+Parrot_dlopen(const char *filename, SHIM(Parrot_dlopen_flags flags))
 {
     return LoadLibrary(filename);
 }

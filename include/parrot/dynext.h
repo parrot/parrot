@@ -41,7 +41,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_load_lib(PARROT_INTERP,
     ARGIN_NULLOK(STRING *lib),
-    SHIM(PMC *initializer))
+    PMC *parameters)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_Parrot_clone_lib_into __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

@@ -73,7 +73,25 @@ char * Parrot_getenv(PARROT_INTERP, STRING *name);
 ** Dynamic Loading:
 */
 
-void *Parrot_dlopen(const char *filename);
+/*
+ * The second argument to Parrot_dlopen below provides portable access to
+ * non-default behavior of dynamic linkers.
+ *
+ * All flags will be ignored on platforms for which they are inapplicable.
+ */
+
+/* &gen_from_enum(dlopenflags.pasm) */
+typedef enum Parrot_dlopen_enum {
+    /*
+     * Activates RTLD_GLOBAL on *NIX systems, making symbols from the newly
+     * loaded library visible to other libraries; this is usually needed if
+     * it will load libraries itself.
+     */
+    Parrot_dlopen_global_FLAG   = 0x01,
+} Parrot_dlopen_flags;
+/* &end_gen */
+
+void *Parrot_dlopen(const char *filename, Parrot_dlopen_flags flags);
 const char *Parrot_dlerror(void);
 void *Parrot_dlsym(void *handle, const char *symbol);
 int Parrot_dlclose(void *handle);

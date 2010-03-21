@@ -209,6 +209,7 @@ GEN_PASM_INCLUDES = \
 	runtime/parrot/include/stdio.pasm \
 	runtime/parrot/include/socket.pasm \
 	runtime/parrot/include/libpaths.pasm \
+	runtime/parrot/include/dlopenflags.pasm \
 	runtime/parrot/include/longopt.pasm \
 	runtime/parrot/include/packfile_segments.pasm \
 	runtime/parrot/include/packfile_constants.pasm \
@@ -1087,6 +1088,9 @@ lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm : $(INC_DIR)/enums.h $(H2INC)
 
 runtime/parrot/include/libpaths.pasm : $(INC_DIR)/library.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/library.h $@
+
+runtime/parrot/include/dlopenflags.pasm : $(INC_DIR)/platform_interface.h $(H2INC)
+	$(PERL) $(H2INC) $(INC_DIR)/platform_interface.h $@
 
 runtime/parrot/include/datatypes.pasm : $(INC_DIR)/datatypes.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/datatypes.h $@

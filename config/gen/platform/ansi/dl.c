@@ -23,14 +23,15 @@ Dynlib stuff.  (Currently, just placeholders.)
 
 /*
 
-=item C<void * Parrot_dlopen(const char *filename)>
+=item C<void * Parrot_dlopen(const char *filename, SHIM(Parrot_dlopen_flags
+flags)>
 
 =cut
 
 */
 
 void *
-Parrot_dlopen(const char *filename)
+Parrot_dlopen(const char *filename, SHIM(Parrot_dlopen_flags flags))
 {
     Parrot_warn(NULL, PARROT_WARNINGS_PLATFORM_FLAG, "Parrot_dlopen not implemented");
     return NULL;

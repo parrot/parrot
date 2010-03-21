@@ -1209,7 +1209,21 @@ Opcodes for interfacing with C functions in shared libraries.
 
 =item B<loadlib>(out PMC, in STR)
 
-Load a dynamic link library named $2 and store it in $1.
+=item B<loadlib>(out PMC, in STR, in PMC)
+
+Load a dynamic link library named $2 and store it in $1. $3, if
+provided, controls library loading and initialization; currently,
+we expect a bitmask accessible as an integer.  Bit definitions are
+accessible from PASM if F<dlopenflags.pasm> is included.  The current
+bits are:
+
+=over 4
+
+=item PARROT_DLOPEN_GLOBAL
+
+Make any symbols in the library accessible to other libraries loaded.
+
+=back
 
 =item B<dlfunc>(out PMC, invar PMC, in STR, in STR)
 
@@ -1248,6 +1262,10 @@ the callback function.
 
 inline op loadlib(out PMC, in STR) {
     $1 = Parrot_load_lib(interp, $2, NULL);
+}
+
+inline op loadlib(out PMC, in STR, in PMC) {
+    $1 = Parrot_load_lib(interp, $2, $3);
 }
 
 op dlfunc(out PMC, invar PMC, in STR, in STR) {

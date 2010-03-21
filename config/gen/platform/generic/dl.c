@@ -29,17 +29,18 @@ Dynlib stuff
 
 /*
 
-=item C<void * Parrot_dlopen(const char *filename)>
+=item C<void * Parrot_dlopen(const char *filename, Parrot_dlopen_flags flags)>
 
 =cut
 
 */
 
 void *
-Parrot_dlopen(const char *filename)
+Parrot_dlopen(const char *filename, Parrot_dlopen_flags flags)
 {
 #ifdef PARROT_HAS_HEADER_DLFCN
-    return dlopen(filename, PARROT_DLOPEN_FLAGS);
+    return dlopen(filename, PARROT_DLOPEN_FLAGS
+                    | ((flags & Parrot_dlopen_global_FLAG) ? RTLD_GLOBAL : 0));
 #else
     return 0;
 #endif
