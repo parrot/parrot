@@ -674,7 +674,7 @@ gc_ms_allocate_string_header(PARROT_INTERP, UINTVAL flags)
             ? interp->mem_pools->constant_string_header_pool
             : interp->mem_pools->string_header_pool;
 
-    return (STRING*)pool->get_free_object(interp, interp->mem_pools, pool);
+    return (STRING *)pool->get_free_object(interp, interp->mem_pools, pool);
 }
 
 
@@ -888,9 +888,7 @@ gc_ms_reallocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer),
     Variable_Size_Pool * const pool = interp->mem_pools->memory_pool;
     size_t new_size, needed, old_size;
 
-    /*
-     * we don't shrink buffers
-     */
+    /* we don't shrink buffers */
     if (newsize <= Buffer_buflen(buffer))
         return;
 

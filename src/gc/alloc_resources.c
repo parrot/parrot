@@ -632,7 +632,7 @@ compact_pool(PARROT_INTERP,
 =item C<char * aligned_mem(const Buffer *buffer, char *mem)>
 
 Returns a pointer to the aligned allocated storage for Buffer C<buffer>,
-which might not be the same as the pointer to C<buffeR> because of
+which might not be the same as the pointer to C<buffer> because of
 memory alignment.
 
 =cut
@@ -680,7 +680,7 @@ size_t
 aligned_string_size(size_t len)
 {
     ASSERT_ARGS(aligned_string_size)
-    len += sizeof (void*);
+    len += sizeof (void *);
     len = (len + WORD_ALIGN_1) & WORD_ALIGN_MASK;
     return len;
 }
