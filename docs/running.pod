@@ -142,6 +142,7 @@ may be available on your system:
                 debugging GC problems)
   switch        switch core
   trace         bounds checking core w/ trace info (see 'parrot --help-debug')
+  profiling     see F<docs/dev/profilling.pod>
 
 The C<jit>, C<switch-jit>, and C<cgp-jit> options are currently aliases for the
 C<fast>, C<switch>, and C<cgp> options, respectively.  We do not recommend
