@@ -66,7 +66,8 @@ END_PIR
 ok( $eval, 'compile() should compile PIR code and return a PMC' );
 isa_ok( $eval, 'Parrot::PMC' );
 
-=cut
+=for comment
+
 TODO:
 {
     local $TODO = 'compile_string() returns wrong results';
@@ -80,7 +81,9 @@ my $foo = $interp->find_global('foo');
 $pmc = $foo->invoke( 'S->P', 'BAR' );
 is( $pmc->get_string(), 'BAR FOO ',
     '... and compiled sub should work just like any other Sub pmc' );
+
 =cut
+
 my $foo;
 
 {
