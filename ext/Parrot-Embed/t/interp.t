@@ -1,12 +1,12 @@
 #!perl
 
-# Copyright (C) 2006-2009, Parrot Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 
-use Test::More tests => 26;
+use Test::More tests => 23;
 use File::Spec;
 
 my $hello_pbc = File::Spec->catfile( 't', 'greet.pbc' );
@@ -45,7 +45,7 @@ ok( !$interp->find_global( 'goat', 'Elsewhere' ),
     '... but again, not if there is no global of that name there' );
 
 can_ok( $global_greet, 'invoke' );
-my $pmc = $global_greet->invoke( 'PS', 'Bob' );
+my $pmc = $global_greet->invoke( 'S->P', 'Bob' );
 ok( $pmc, 'invoke() should return a PMC, given that signature' );
 
 is( $pmc->get_string(), 'Hello, Bob!', '... containing a string returned in the PMC' );
@@ -66,19 +66,22 @@ END_PIR
 ok( $eval, 'compile() should compile PIR code and return a PMC' );
 isa_ok( $eval, 'Parrot::PMC' );
 
+=cut
 TODO:
 {
     local $TODO = 'compile_string() returns wrong results';
-    ok( !$interp->compile('blah'), '... but only for valid PIR' );
+    #  ok( !$interp->compile('blah'), '... but only for valid PIR' );
 }
 
-$pmc = $else_greet->invoke( 'P', '' );
+$pmc = $else_greet->invoke( 'S->P', '' );
 is( $pmc->get_string(), 'Hiya!', '... calling the passed-in subroutine' );
 
 my $foo = $interp->find_global('foo');
-$pmc = $foo->invoke( 'PS', 'BAR' );
+$pmc = $foo->invoke( 'S->P', 'BAR' );
 is( $pmc->get_string(), 'BAR FOO ',
     '... and compiled sub should work just like any other Sub pmc' );
+=cut
+my $foo;
 
 {
     my $die_interp = $module->new($interp);
@@ -86,7 +89,7 @@ is( $pmc->get_string(), 'BAR FOO ',
     $foo = $die_interp->find_global('greet');
 }
 
-$pmc = $foo->invoke( 'PS', 'out of scope' );
+$pmc = $foo->invoke( 'S->P', 'out of scope' );
 is(
     $pmc->get_string(),
     'Hello, out of scope!',

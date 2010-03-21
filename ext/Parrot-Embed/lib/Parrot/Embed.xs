@@ -223,7 +223,7 @@ CODE:
     pmc_actual = pmc->pmc;
     interp     = get_interp( pmc->interp );
     arg_string = Parrot_str_new_constant( interp, argument );
-    Parrot_ext_call( interp, pmc_actual, signature, arg_string, &out_pmc );
+    Parrot_pcc_invoke_sub_from_c_args( interp, pmc_actual, signature, arg_string, &out_pmc );
     RETVAL     = make_pmc( aTHX_ pmc->interp, out_pmc );
 OUTPUT:
     RETVAL
