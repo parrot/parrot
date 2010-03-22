@@ -126,14 +126,11 @@ static void pbc_merge_debugs(PARROT_INTERP,
 static void pbc_merge_fixups(PARROT_INTERP,
     ARGIN(pbc_merge_input **inputs),
     int num_inputs,
-    ARGMOD(PackFile *pf),
-    ARGMOD(PackFile_ByteCode *bc))
+    ARGMOD(PackFile *pf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
-        FUNC_MODIFIES(*pf)
-        FUNC_MODIFIES(*bc);
+        FUNC_MODIFIES(*pf);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -176,8 +173,7 @@ static void pbc_merge_write(PARROT_INTERP,
 #define ASSERT_ARGS_pbc_merge_fixups __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(inputs) \
-    , PARROT_ASSERT_ARG(pf) \
-    , PARROT_ASSERT_ARG(bc))
+    , PARROT_ASSERT_ARG(pf))
 #define ASSERT_ARGS_pbc_merge_loadpbc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(fullname))
@@ -464,7 +460,7 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 /*
 
 =item C<static void pbc_merge_fixups(PARROT_INTERP, pbc_merge_input **inputs,
-int num_inputs, PackFile *pf, PackFile_ByteCode *bc)>
+int num_inputs, PackFile *pf)>
 
 This function merges the fixups tables from the input PBC files.
 
@@ -474,7 +470,7 @@ This function merges the fixups tables from the input PBC files.
 
 static void
 pbc_merge_fixups(PARROT_INTERP, ARGIN(pbc_merge_input **inputs),
-                 int num_inputs, ARGMOD(PackFile *pf), ARGMOD(PackFile_ByteCode *bc))
+                 int num_inputs, ARGMOD(PackFile *pf))
 {
     ASSERT_ARGS(pbc_merge_fixups)
     PackFile_FixupTable  *fixup_seg;
@@ -756,7 +752,7 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
     ct = pbc_merge_constants(interp, inputs, num_inputs, merged, bc);
     UNUSED(ct);
 
-    pbc_merge_fixups(interp, inputs, num_inputs, merged, bc);
+    pbc_merge_fixups(interp, inputs, num_inputs, merged);
     pbc_merge_debugs(interp, inputs, num_inputs, merged, bc);
 
     /* Walk bytecode and fix ops that reference the constants table. */
