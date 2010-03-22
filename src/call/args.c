@@ -1218,7 +1218,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                 }
             }
 
-            /* We don't have an argument for the parameter, and it's not 
+            /* We don't have an argument for the parameter, and it's not
              * optional, so it's an error. */
             else {
                 if (err_check)
