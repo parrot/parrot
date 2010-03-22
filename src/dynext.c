@@ -641,7 +641,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_load_lib(PARROT_INTERP, ARGIN_NULLOK(STRING *lib), PMC *parameters)
+Parrot_load_lib(PARROT_INTERP, ARGIN_NULLOK(STRING *lib), ARGIN_NULLOK(PMC *parameters))
 {
     ASSERT_ARGS(Parrot_load_lib)
     void   *handle;
@@ -694,10 +694,6 @@ Parrot_load_lib(PARROT_INTERP, ARGIN_NULLOK(STRING *lib), PMC *parameters)
 =head1 SEE ALSO
 
 F<include/parrot/dynext.h> and F<src/pmc/parrotlibrary.pmc>.
-
-=head1 HISTORY
-
-Initial rev by leo 2003.08.06.
 
 =cut
 
