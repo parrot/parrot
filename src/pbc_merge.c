@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2009, Parrot Foundation.
+Copyright (C) 2005-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -428,17 +428,17 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
             /* If it's a sub PMC, need to deal with offsets. */
             if (copy->type == PFC_PMC) {
                 switch (copy->u.key->vtable->base_type) {
-                  case enum_class_Sub:
-                  case enum_class_Coroutine:
-                    {
-                        Parrot_Sub_attributes *sub;
-                        PMC_get_sub(interp, copy->u.key, sub);
-                        sub->start_offs += inputs[i]->code_start;
-                        sub->end_offs += inputs[i]->code_start;
-                    }
-                    break;
-                  default:
-                    break;
+                    case enum_class_Sub:
+                    case enum_class_Coroutine:
+                        {
+                            Parrot_Sub_attributes *sub;
+                            PMC_get_sub(interp, copy->u.key, sub);
+                            sub->start_offs += inputs[i]->code_start;
+                            sub->end_offs += inputs[i]->code_start;
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
 
@@ -481,7 +481,7 @@ pbc_merge_fixups(PARROT_INTERP, ARGIN(pbc_merge_input **inputs),
     PackFile_FixupEntry **fixups = mem_gc_allocate_typed(interp,
             PackFile_FixupEntry *);
     opcode_t              cursor = 0;
-    int                   i, j;
+    int                   i;
 
     /* Add a fixup table segment. */
     fixup_seg = (PackFile_FixupTable*)PackFile_Segment_new_seg(
@@ -496,6 +496,8 @@ pbc_merge_fixups(PARROT_INTERP, ARGIN(pbc_merge_input **inputs),
     for (i = 0; i < num_inputs; i++) {
         /* Get the fixup segment from the input file. */
         PackFile_FixupTable * const in_seg = inputs[i]->pf->cur_cs->fixups;
+        int j;
+
         if (in_seg == NULL) {
             Parrot_io_eprintf(interp,
                 "PBC Merge: Cannot locate fixup segment in %s",
@@ -513,10 +515,10 @@ pbc_merge_fixups(PARROT_INTERP, ARGIN(pbc_merge_input **inputs),
            the offsets into the bytecode. */
         for (j = 0; j < in_seg->fixup_count; j++) {
             /* Get the entry and allocate space for copies. */
-            PackFile_FixupEntry *cur_entry = in_seg->fixups[j];
-            PackFile_FixupEntry *copy      = mem_gc_allocate_typed(interp,
-                    PackFile_FixupEntry);
-            char *name_copy = mem_gc_allocate_n_typed(interp,
+            const PackFile_FixupEntry * const cur_entry = in_seg->fixups[j];
+            PackFile_FixupEntry * const copy =
+                mem_gc_allocate_typed(interp, PackFile_FixupEntry);
+            char * const name_copy = mem_gc_allocate_n_typed(interp,
                     strlen(cur_entry->name) + 1, char);
 
             /* Copy type and name. */
@@ -526,15 +528,15 @@ pbc_merge_fixups(PARROT_INTERP, ARGIN(pbc_merge_input **inputs),
 
             /* Set new offset and bytecode pointer. */
             switch (copy->type) {
-              case enum_fixup_label:
-                copy->offset = cur_entry->offset + inputs[i]->code_start;
-                break;
-              case enum_fixup_sub:
-                copy->offset = cur_entry->offset + inputs[i]->const_start;
-                break;
-              default:
-                Parrot_io_eprintf(interp, "PBC Merge: Unknown fixup type");
-                Parrot_exit(interp, 1);
+                case enum_fixup_label:
+                    copy->offset = cur_entry->offset + inputs[i]->code_start;
+                    break;
+                case enum_fixup_sub:
+                    copy->offset = cur_entry->offset + inputs[i]->const_start;
+                    break;
+                default:
+                    Parrot_io_eprintf(interp, "PBC Merge: Unknown fixup type");
+                    Parrot_exit(interp, 1);
             }
 
             /* Slot it into the list. */
@@ -664,15 +666,15 @@ pbc_merge_ctpointers(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         for (cur_arg = 1; cur_arg < op->op_count; cur_arg++) {
             /* Pick out any indexes into the constant table and correct them. */
             switch (op->types[cur_arg - 1]) {
-              case PARROT_ARG_NC:
-              case PARROT_ARG_PC:
-              case PARROT_ARG_SC:
-              case PARROT_ARG_NAME_SC:
-              case PARROT_ARG_KC:
-                ops[cur_op] = inputs[cur_input]->const_map[ ops[cur_op] ];
-                break;
-              default:
-                break;
+                case PARROT_ARG_NC:
+                case PARROT_ARG_PC:
+                case PARROT_ARG_SC:
+                case PARROT_ARG_NAME_SC:
+                case PARROT_ARG_KC:
+                    ops[cur_op] = inputs[cur_input]->const_map[ ops[cur_op] ];
+                    break;
+                default:
+                    break;
             }
 
             /* Move along the bytecode array. */
@@ -691,15 +693,15 @@ pbc_merge_ctpointers(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
             const int sig_items = VTABLE_elements(interp, sig);
             for (cur_arg = 0; cur_arg < sig_items; cur_arg++) {
                 switch (VTABLE_get_integer_keyed_int(interp, sig, cur_arg)) {
-                  case PARROT_ARG_NC:
-                  case PARROT_ARG_PC:
-                  case PARROT_ARG_SC:
-                  case PARROT_ARG_NAME_SC:
-                  case PARROT_ARG_KC:
-                    ops[cur_op] = inputs[cur_input]->const_map[ ops[cur_op] ];
-                    break;
-                  default:
-                    break;
+                    case PARROT_ARG_NC:
+                    case PARROT_ARG_PC:
+                    case PARROT_ARG_SC:
+                    case PARROT_ARG_NAME_SC:
+                    case PARROT_ARG_KC:
+                        ops[cur_op] = inputs[cur_input]->const_map[ ops[cur_op] ];
+                        break;
+                    default:
+                        break;
                 }
                 cur_op++;
             }
@@ -843,17 +845,17 @@ main(int argc, const char **argv)
     }
     while ((status = longopt_get(interp, argc, argv, options, &opt)) > 0) {
         switch (opt.opt_id) {
-          case 'o':
-            if (output_file == NULL)
-                output_file = opt.opt_arg;
-            else
+            case 'o':
+                if (output_file == NULL)
+                    output_file = opt.opt_arg;
+                else
+                    help(interp);
+                break;
+            case '?':
                 help(interp);
-            break;
-          case '?':
-            help(interp);
-            break;
-          default:
-            break;
+                break;
+            default:
+                break;
         }
     }
     if (status == -1 || !output_file) {
