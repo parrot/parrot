@@ -22,7 +22,7 @@ Implements oplib VTABLEs.
          need to cache even a majority of the ~1300 ops. */
 static PMC *OPLIB_PMC_INSTANCE;
 static PMC *OPLIB_OPCODE_CACHE;
-pmclass OpLib {
+pmclass OpLib singleton {
     void class_init() {
         OPLIB_PMC_INSTANCE = NULL;
         OPLIB_OPCODE_CACHE = NULL;
