@@ -120,6 +120,7 @@ Mathematics*, Second Edition. Addison-Wesley, 1994.
 */
 
 PARROT_CONST_FUNCTION
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 intval_mod(INTVAL i2, INTVAL i3)
 {
@@ -167,6 +168,7 @@ Includes a workaround for buggy code generation in the C<lcc> compiler.
 */
 
 PARROT_CONST_FUNCTION
+PARROT_WARN_UNUSED_RESULT
 FLOATVAL
 floatval_mod(FLOATVAL n2, FLOATVAL n3)
 {
@@ -422,6 +424,7 @@ C<how_random> is currently ignored.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 FLOATVAL
 Parrot_float_rand(INTVAL how_random)
 {
@@ -444,6 +447,7 @@ C<how_random> is ignored.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_uint_rand(INTVAL how_random)
 {
@@ -466,6 +470,7 @@ C<how_random> is ignored.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_int_rand(INTVAL how_random)
 {
@@ -488,6 +493,7 @@ C<how_random> is ignored.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_range_rand(INTVAL from, INTVAL to, INTVAL how_random)
 {
@@ -582,6 +588,7 @@ Returns an offset value if it is found, or -1 if no match.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_byte_index(SHIM_INTERP, ARGIN(const STRING *base),
         ARGIN(const STRING *search), UINTVAL start_offset)
@@ -989,12 +996,6 @@ Parrot_quicksort(PARROT_INTERP, ARGMOD(void **data), UINTVAL n, ARGIN(PMC *cmp))
 /*
 
 =back
-
-=head1 HISTORY
-
-Initial version by leo 2003.09.09.
-
-=cut
 
 */
 

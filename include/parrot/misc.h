@@ -34,6 +34,7 @@ typedef int (*reg_move_func)(PARROT_INTERP, unsigned char d, unsigned char s, vo
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_byte_index(SHIM_INTERP,
     ARGIN(const STRING *base),
     ARGIN(const STRING *search),
@@ -51,12 +52,15 @@ INTVAL Parrot_byte_rindex(SHIM_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 FLOATVAL Parrot_float_rand(INTVAL how_random);
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_int_rand(INTVAL how_random);
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_range_rand(INTVAL from, INTVAL to, INTVAL how_random);
 
 PARROT_EXPORT
@@ -78,12 +82,15 @@ PARROT_EXPORT
 void Parrot_srand(INTVAL seed);
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_uint_rand(INTVAL how_random);
 
 PARROT_CONST_FUNCTION
+PARROT_WARN_UNUSED_RESULT
 FLOATVAL floatval_mod(FLOATVAL n2, FLOATVAL n3);
 
 PARROT_CONST_FUNCTION
+PARROT_WARN_UNUSED_RESULT
 INTVAL intval_mod(INTVAL i2, INTVAL i3);
 
 void Parrot_quicksort(PARROT_INTERP,
@@ -145,7 +152,9 @@ STRING * Parrot_psprintf(PARROT_INTERP,
         FUNC_MODIFIES(*ary);
 
 PARROT_EXPORT
-int Parrot_secret_snprintf(
+PARROT_IGNORABLE_RESULT
+int /*@alt void@*/
+Parrot_secret_snprintf(
     ARGOUT(char *buffer),
     NULLOK(const size_t len),
     ARGIN(const char *format),
@@ -192,6 +201,7 @@ void Parrot_vsnprintf(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 STRING * Parrot_vsprintf_c(PARROT_INTERP,
     ARGIN(const char *pat),
     va_list args)
