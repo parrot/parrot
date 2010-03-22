@@ -51,8 +51,7 @@ sub dump_pmc {
     @files = glob $files[0] if $files[0] eq 'src/pmc/*.pmc';
 
     # make sure that a default.dump will always be created if it doesn't
-    # already exist; do so by adding default.pmc to list of files for dumping
-    unshift @files, 'default.pmc' unless -e './src/pmc/default.dump';
+    $pmc2cMain->find_file('default.dump') or unshift @files, 'default.pmc';
 
     # load and parse all pmc files in @files
     for my $filename (@files) {
