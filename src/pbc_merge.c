@@ -574,13 +574,14 @@ pbc_merge_debugs(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     opcode_t num_mappings = 0;
     opcode_t num_lines    = 0;
 
-    int      i, j;
+    int i;
 
     /* We need to merge both the mappings and the list of line numbers.
        The line numbers can just be concatenated. The mappings must have
        their offsets fixed up. */
     for (i = 0; i < num_inputs; i++) {
-        PackFile_Debug *in_seg = inputs[i]->pf->cur_cs->debugs;
+        const PackFile_Debug * const in_seg = inputs[i]->pf->cur_cs->debugs;
+        int j;
 
         /* Concatenate line numbers. */
         lines = mem_gc_realloc_n_typed(interp, lines,
@@ -595,8 +596,9 @@ pbc_merge_debugs(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                 PackFile_DebugFilenameMapping*);
 
         for (j = 0; j < in_seg->num_mappings; j++) {
-            PackFile_DebugFilenameMapping *mapping = mem_gc_allocate_typed(
-                    interp, PackFile_DebugFilenameMapping);
+            PackFile_DebugFilenameMapping * const mapping =
+                mem_gc_allocate_typed(interp, PackFile_DebugFilenameMapping);
+
             STRUCT_COPY(mapping, in_seg->mappings[j]);
             mapping->offset   += num_lines;
             mapping->filename += inputs[i]->const_start;
