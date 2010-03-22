@@ -81,7 +81,7 @@ my $foo = $interp->find_global('foo');
 $pmc = $foo->invoke( 'S->P', 'BAR' );
 is( $pmc->get_string(), 'BAR FOO ',
     '... and compiled sub should work just like any other Sub pmc' );
-=cut
+
 my $foo;
 
 =cut
