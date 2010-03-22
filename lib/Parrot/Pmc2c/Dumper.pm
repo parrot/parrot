@@ -71,7 +71,7 @@ sub dump_pmc {
     }
 
     for my $pmc ( values %$pmcs ) {
-        next if $pmc->name =~ /default$/ && $pmc->dump_is_current;
+        next if $pmc->name =~ /default$/ && $pmc->dump_is_current($pmc2cMain->find_file('default.dump'));
 
         gen_parent_lookup_info( $pmc, $pmc2cMain, $pmcs );
         gen_parent_reverse_lookup_info( $pmc, $pmcs, $vtable_dump );

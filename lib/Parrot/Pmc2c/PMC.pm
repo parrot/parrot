@@ -432,11 +432,13 @@ B<Comments:>  Called within C<dump_pmc()>.
 =cut
 
 sub dump_is_current {
-    my ($self)   = @_;
-    my $dumpfile = $self->filename('.dump');
+    my ($self, $dumpfile)   = @_;
+    $dumpfile ||= $self->filename('.dump');
     return 0 unless -e $dumpfile;
 
     my $pmcfile  = $self->filename('.pmc');
+    return 1 unless -e $pmcfile;
+
     return ( stat $dumpfile )[9] >= ( stat $pmcfile )[9];
 }
 
