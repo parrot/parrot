@@ -1419,7 +1419,7 @@ parrot_hash_clone(PARROT_INTERP, ARGIN(const Hash *hash), ARGOUT(Hash *dest))
             if (PMC_IS_NULL((PMC *)b->value))
                 valtmp = (void *)PMCNULL;
             else
-                valtmp = (void *)VTABLE_clone(interp, (PMC*)b->value);
+                valtmp = b->value;
             break;
 
           default:

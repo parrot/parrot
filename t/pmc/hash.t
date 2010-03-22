@@ -566,7 +566,7 @@ DONE:
     set $P1["a"], "A"
 
     # $P0 = { a => "a", b => [undef, undef, undef], c => 4 }
-    # $P1 = { a => "A", b => [undef, undef] }
+    # $P1 = { a => "A", b => [undef, undef, undef] }
 
     set $S0, $P0["a"]
     is( $S0, "a", 'original hash lookup pre-clone value' )
@@ -583,7 +583,7 @@ DONE:
 
     set $P5, $P1["b"]
     set $I0, $P5
-    is( $I0, 2, 'cloned hash lookup pre-clone complex value' )
+    is( $I0, 3, 'cloned hash lookup pre-clone complex value' )
 
 # XXX: this should return undef or something, but it dies instead.
 #     set $P3, $P0["c"]
