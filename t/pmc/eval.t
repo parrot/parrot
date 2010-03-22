@@ -28,8 +28,8 @@ Tests on-the-fly PASM, PIR and PAST compilation and invocation.
 pasm_output_is( <<'CODE', <<'OUTPUT', "eval_sc" );
     compreg P1, "PASM"	# get compiler
     set_args "0", "print \"in eval\\n\"\nset_returns \"()\"\nreturncc\n"
-    get_results "0", P0
     invokecc P1			# compile
+    get_results "0", P0
     invokecc P0			# eval code P0
     print "back again\n"
     end

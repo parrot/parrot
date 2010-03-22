@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2009, Parrot Foundation.
+# Copyright (C) 2009-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -32,7 +32,7 @@ Warning! With --install there must be no directory prefix in the first arg yet.
     .local string objfile
     .local string exefile
 
-    (infile, cfile, objfile, exefile) = 'handle_args'(argv)
+    (infile :optional, cfile :optional, objfile :optional, exefile :optional) = 'handle_args'(argv)
     unless infile > '' goto err_infile
 
     .local string code_type
@@ -155,8 +155,8 @@ MAIN
   check_install:
     .local string infile, install
 
-    $P0    = shift args
-    infile = shift args
+    $P0     = shift args
+    infile  = shift args
     install = shift args
     if install == '--install' goto proper_install
     .return ()

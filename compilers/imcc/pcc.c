@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2009, Parrot Foundation.
+ * Copyright (C) 2003-2010, Parrot Foundation.
  * $Id$
  */
 
@@ -416,7 +416,8 @@ expand_pcc_sub(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
     SymReg      *regs[2];
 
     /* if this sub is a method, unshift 'self' as first param */
-    if ((unit->type & IMC_HAS_SELF) || (sub->pcc_sub->pragma & (P_METHOD | P_VTABLE))) {
+    if ((unit->type & IMC_HAS_SELF)
+    ||  (sub->pcc_sub->pragma & (P_METHOD | P_VTABLE))) {
         SymReg *self = get_sym(interp, "self");
         if (!self) {
             self       = mk_symreg(interp, "self", 'P');
@@ -866,11 +867,6 @@ expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *i
         return;
     }
 
-    /* handle return results */
-    n   = sub->pcc_sub->nret;
-    ins = pcc_get_args(interp, unit, ins, "get_results", n,
-            sub->pcc_sub->ret, sub->pcc_sub->ret_flags);
-
     /* insert the call */
     if (meth_call) {
         regs[0] = sub->pcc_sub->object;
@@ -899,6 +895,11 @@ expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *i
     }
 
     ins->type |= ITPCCSUB;
+
+    /* handle return results */
+    n   = sub->pcc_sub->nret;
+    ins = pcc_get_args(interp, unit, ins, "get_results", n,
+            sub->pcc_sub->ret, sub->pcc_sub->ret_flags);
 }
 
 /*

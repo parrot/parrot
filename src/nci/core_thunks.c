@@ -56,7 +56,7 @@ pcf_d_JOd(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (double)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "N", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "N", return_data);
     
 
 
@@ -78,7 +78,7 @@ pcf_I_JOS(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
@@ -100,7 +100,7 @@ pcf_P_JOl(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
@@ -121,7 +121,7 @@ pcf_P_Jt(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 if (t_1) Parrot_str_free_cstring(t_1);
 }
@@ -142,7 +142,7 @@ pcf_S_JOS(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (STRING *)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "S", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "S", return_data);
     
 
 
@@ -163,7 +163,7 @@ pcf_I_JI(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 }
@@ -230,7 +230,7 @@ pcf_P_JOS(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
@@ -252,7 +252,7 @@ pcf_I_JOI(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
@@ -274,7 +274,7 @@ pcf_P_JOP(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
@@ -297,7 +297,7 @@ pcf_P_JOPS(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2, t_3);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
@@ -531,7 +531,7 @@ pcf_P_JPPP(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2, t_3);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
@@ -555,7 +555,7 @@ pcf_P_JPIP(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2, t_3);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
@@ -579,7 +579,7 @@ pcf_P_JPSP(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2, t_3);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
@@ -603,7 +603,7 @@ pcf_P_JPNP(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2, t_3);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
@@ -626,7 +626,7 @@ pcf_I_JPP(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
@@ -648,7 +648,7 @@ pcf_I_JPS(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
@@ -670,7 +670,7 @@ pcf_I_JPN(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
@@ -691,7 +691,7 @@ pcf_i_JP(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(interp, t_1);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 }
@@ -732,7 +732,7 @@ pcf_i_JPi(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
@@ -755,7 +755,7 @@ pcf_i_JPii(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(interp, t_1, t_2, t_3);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
@@ -780,7 +780,7 @@ pcf_i_JPiii(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(interp, t_1, t_2, t_3, t_4);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
@@ -804,7 +804,7 @@ pcf_i_JPt(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 if (t_2) Parrot_str_free_cstring(t_2);
@@ -828,7 +828,7 @@ pcf_P_JOSSS(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2, t_3, t_4);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
@@ -876,7 +876,7 @@ pcf_S_JOI(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (STRING *)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "S", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "S", return_data);
     
 
 
@@ -921,7 +921,7 @@ pcf_i_JOPxAT_(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(interp, t_1, t_2, t_3);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
@@ -945,7 +945,7 @@ pcf_I_JOPxAT_(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1, t_2, t_3);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
@@ -970,7 +970,7 @@ pcf_I_JOIPxAT_(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1, t_2, t_3, t_4);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "I", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
@@ -993,7 +993,7 @@ pcf_P_JO(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 }
@@ -1035,7 +1035,7 @@ pcf_P_Ji(PARROT_INTERP, PMC *self)
     GETATTR_NCI_orig_func(interp, self, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1);
-    Parrot_pcc_fill_returns_from_c_args(interp, call_object, "P", return_data);
+    Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 }

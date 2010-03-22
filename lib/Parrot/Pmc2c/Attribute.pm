@@ -140,7 +140,10 @@ sub generate_accessor {
 /* Generated macro accessors for '$attrname' attribute of $pmcname PMC. */
 #define GETATTR_${pmcname}_${attrname}(interp, pmc, dest) \\
     do { \\
-        if (PObj_is_object_TEST(pmc)) { \\
+        if (!PObj_is_object_TEST(pmc)) { \\
+            (dest) = ((Parrot_${pmcname}_attributes *)PMC_data(pmc))->$attrname; \\
+        } \\
+        else { \\
 EOA
 
     if ($isfuncptr == 1) {
@@ -189,8 +192,6 @@ EOA
 
     $decl .= <<"EOA";
         } \\
-        else \\
-            (dest) = ((Parrot_${pmcname}_attributes *)PMC_data(pmc))->$attrname; \\
     } while (0)
 
 #define SETATTR_${pmcname}_${attrname}(interp, pmc, value) \\

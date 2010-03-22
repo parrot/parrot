@@ -262,19 +262,7 @@ destination to continue execution.
         Parrot_continuation_rewind_environment(INTERP, SELF);
 
         if (!PMC_IS_NULL(from_obj)) {
-            STRING * const string_sig = VTABLE_get_string(INTERP, from_obj);
-            /* If there is no string - there is no args */
-            if (string_sig) {
-                PMC *raw_sig, *invalid_sig;
-                Parrot_pcc_parse_signature_string(INTERP, string_sig, &raw_sig, &invalid_sig);
-
-                /* Build results signature for continuation */
-                if (*pc == PARROT_OP_get_results_pc)
-                    call_obj = Parrot_pcc_build_sig_object_returns_from_op(INTERP, call_obj,
-                        Parrot_pcc_get_pmc_constant(INTERP, to_ctx, pc[1]), pc);
-
-                Parrot_pcc_fill_returns_from_continuation(INTERP, call_obj, raw_sig, from_obj);
-            }
+            Parrot_pcc_set_signature(INTERP, CURRENT_CONTEXT(INTERP), from_obj);
         }
 
         /* switch segment */

@@ -486,20 +486,6 @@ Invokes the subroutine.
         if (INTERP->code != sub->seg)
             Parrot_switch_to_cs(INTERP, sub->seg, 1);
 
-        if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
-            if (!(*pc    == PARROT_OP_get_params_pc
-            ||   (*pc    == PARROT_OP_push_eh_ic
-            &&     pc[2] == PARROT_OP_get_params_pc))) {
-
-                /* TODO keep it or resize it */
-                Parrot_pcc_dec_recursion_depth(INTERP, context);
-
-                PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
-                Parrot_pcc_set_caller_ctx(interp, context,
-                        Parrot_pcc_get_caller_ctx(interp, caller_ctx));
-            }
-        }
-
         return pc;
     }
 

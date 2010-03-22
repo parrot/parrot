@@ -570,6 +570,7 @@ Parrot_continuation_rewind_environment(PARROT_INTERP, ARGIN(PMC *pmc))
     ASSERT_ARGS(Parrot_continuation_rewind_environment)
 
     PMC * const to_ctx = PARROT_CONTINUATION(pmc)->to_ctx;
+    PMC * const sig    = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
     /* debug print before context is switched */
     if (Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG)) {
@@ -582,6 +583,7 @@ Parrot_continuation_rewind_environment(PARROT_INTERP, ARGIN(PMC *pmc))
 
     /* set context */
     CURRENT_CONTEXT(interp) = to_ctx;
+    Parrot_pcc_set_signature(interp, to_ctx, sig);
 }
 
 

@@ -1271,7 +1271,9 @@ find_name_p_s                  1246
 find_name_p_sc                 1247
 find_sub_not_null_p_s          1248
 find_sub_not_null_p_sc         1249
-loadlib_p_s_p                  1250
-loadlib_p_sc_p                 1251
-loadlib_p_s_pc                 1252
-loadlib_p_sc_pc                1253
+set_result_info_p              1250
+set_result_info_pc             1251
+loadlib_p_s_p                  1252
+loadlib_p_sc_p                 1253
+loadlib_p_s_pc                 1254
+loadlib_p_sc_pc                1255

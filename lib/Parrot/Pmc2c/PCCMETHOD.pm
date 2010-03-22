@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2008, Parrot Foundation.
+# Copyright (C) 2004-2010, Parrot Foundation.
 # $Id$
 
 package Parrot::Pmc2c::PCCMETHOD;
@@ -258,7 +258,8 @@ END
     /*BEGIN RETURN $returns */
 END
         $e->emit( <<"END", __FILE__, __LINE__ + 1 );
-    Parrot_pcc_fill_returns_from_c_args(interp, _call_object, "$returns_signature",
+    interp->current_object = PMCNULL;
+    Parrot_pcc_build_call_from_c_args(interp, _call_object, "$returns_signature",
             $returns_varargs);
     return;
     /*END RETURN $returns */
@@ -415,8 +416,6 @@ sub rewrite_pccmethod {
     PMC * const _ctx         = CURRENT_CONTEXT(interp);
     PMC * const _ccont       = Parrot_pcc_get_continuation(interp, _ctx);
     PMC * const _call_object = Parrot_pcc_get_signature(interp, _ctx);
-
-    Parrot_pcc_set_signature(interp, _ctx, NULL);
 
     { /* BEGIN PARMS SCOPE */
 END

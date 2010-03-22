@@ -261,7 +261,7 @@ setup_exception_args(PARROT_INTERP, ARGIN(const char *sig), ...)
     PMC     *sig_obj;
 
     va_start(args, sig);
-    sig_obj = Parrot_pcc_build_sig_object_from_varargs(interp, PMCNULL, sig, args);
+    sig_obj = Parrot_pcc_build_call_from_varargs(interp, PMCNULL, sig, &args);
     va_end(args);
 
     CALLSIGNATURE_is_exception_SET(sig_obj);

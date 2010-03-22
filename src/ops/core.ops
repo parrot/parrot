@@ -483,21 +483,6 @@ op set_args(inconst PMC) :flow {
     goto OFFSET(argc + 2);
 }
 
-op get_results(inconst PMC) :flow {
-    opcode_t * const raw_returns = CUR_OPCODE;
-    PMC * const signature = $1;
-    PMC * call_sig;
-    INTVAL argc;
-
-    call_sig = Parrot_pcc_build_sig_object_returns_from_op(interp,
-            Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp)),
-            signature, raw_returns);
-    Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_sig);
-
-    argc = VTABLE_elements(interp, signature);
-    goto OFFSET(argc + 2);
-}
-
 op get_params(inconst PMC) :flow {
     opcode_t * const raw_params = CUR_OPCODE;
     PMC *caller_ctx, *ctx;
@@ -511,7 +496,8 @@ op get_params(inconst PMC) :flow {
     caller_ctx  = Parrot_pcc_get_caller_ctx(interp, ctx);
     call_object = Parrot_pcc_get_signature(interp, caller_ctx);
 
-    Parrot_pcc_fill_params_from_op(interp, call_object, signature, raw_params);
+    Parrot_pcc_fill_params_from_op(interp, call_object, signature, raw_params,
+            PARROT_ERRORS_PARAM_COUNT_FLAG);
 
     /* TODO Factor out with Sub.invoke */
     if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
@@ -524,18 +510,47 @@ op get_params(inconst PMC) :flow {
 }
 
 op set_returns(inconst PMC) :flow {
-    opcode_t * const raw_returns = CUR_OPCODE;
-    PMC      *signature          = $1;
-    PMC      *ctx                = CURRENT_CONTEXT(interp);
-    PMC      *caller_ctx         = Parrot_pcc_get_caller_ctx(interp, ctx);
-    PMC      *call_object        = Parrot_pcc_get_signature(interp, caller_ctx);
-    INTVAL    argc               = VTABLE_elements(interp, signature);
+    opcode_t * const raw_args  = CUR_OPCODE;
+    PMC      * const signature = $1;
+    PMC      *       call_sig  = Parrot_pcc_build_sig_object_from_op(interp,
+                Parrot_pcc_get_signature(interp,
+                Parrot_pcc_get_caller_ctx(interp, CURRENT_CONTEXT(interp))),
+                    signature, raw_args);
+    INTVAL argc;
 
-    Parrot_pcc_fill_returns_from_op(interp, call_object, signature, raw_returns);
+    Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_sig);
 
-    Parrot_pcc_set_signature(interp, ctx, NULL);
-
+    argc = VTABLE_elements(interp, signature);
     goto OFFSET(argc + 2);
+}
+
+op get_results(inconst PMC) :flow {
+    opcode_t * const raw_params  = CUR_OPCODE;
+    PMC      * const signature   = $1;
+    PMC             *ctx         = CURRENT_CONTEXT(interp);
+    PMC             *ccont       = Parrot_pcc_get_continuation(interp, ctx);
+    PMC             *call_object = Parrot_pcc_get_signature(interp, ctx);
+
+    INTVAL argc;
+
+    Parrot_pcc_fill_params_from_op(interp, call_object, signature, raw_params,
+            PARROT_ERRORS_RESULT_COUNT_FLAG);
+
+    argc = VTABLE_elements(interp, signature);
+    goto OFFSET(argc + 2);
+}
+
+=item B<set_result_info>(in PMC)
+
+Set result_info. See also C<result_info>.
+
+=cut
+
+inline op set_result_info(in PMC) {
+    PMC *ctx = CURRENT_CONTEXT(interp);
+    VTABLE_set_attr_str(interp, ctx,
+            Parrot_str_new_constant(interp, "return_flags"),
+            $1);
 }
 
 =item B<result_info>(out PMC)
@@ -549,8 +564,7 @@ specified in F<docs/pdds/pdd03_calling_conventions.pod>.
 
 inline op result_info(out PMC) {
     PMC *caller_ctx  = Parrot_pcc_get_caller_ctx(interp, CURRENT_CONTEXT(interp));
-    PMC *call_object = Parrot_pcc_get_signature(interp, caller_ctx);
-    PMC *sig = VTABLE_get_attr_str(interp, call_object,
+    PMC *sig = VTABLE_get_attr_str(interp, caller_ctx,
             Parrot_str_new_constant(interp, "return_flags"));
 
     /* If no elements, hand back empty array; otherwise PMC. */
@@ -1399,7 +1413,7 @@ inline op annotations(out PMC, in STR) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 LICENSE
 

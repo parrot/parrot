@@ -140,6 +140,8 @@ Swaps the "context".
         opcode_t          *dest;
         PackFile_ByteCode *wanted_seg;
         opcode_t * const   next_op = (opcode_t *)next;
+        PMC               *signature = Parrot_pcc_get_signature(interp,
+                                            CURRENT_CONTEXT(interp));
 
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG))
             print_sub_name(INTERP, SELF);
@@ -266,6 +268,8 @@ Swaps the "context".
 
             CURRENT_CONTEXT(INTERP) = to_ctx;
         }
+
+        Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), signature);
 
         /* toggle address */
         GET_ATTR_address(INTERP, SELF, dest);

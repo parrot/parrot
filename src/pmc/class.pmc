@@ -343,15 +343,9 @@ initialize_parents(PARROT_INTERP, PMC *object, PMC *all_parents)
         meth = Parrot_oo_find_vtable_override_for_class(interp, parent, name);
 
         if (!PMC_IS_NULL(meth)) {
-            /* build an empty signature; it has an invocant but no args/retvals */
-            PMC * const sig_obj = Parrot_pmc_new(interp, enum_class_CallContext);
             /* preserve current_object */
             PMC * const old_object = interp->current_object;
-            VTABLE_set_string_native(interp, sig_obj, CONST_STRING(interp, "Pi->"));
-            /* add the invocant */
-            VTABLE_unshift_pmc(interp, sig_obj, object);
-            interp->current_object = object;
-            Parrot_pcc_invoke_from_sig_object(interp, meth, sig_obj);
+            Parrot_pcc_invoke_sub_from_c_args(interp, meth, "Pi->", object);
             interp->current_object = old_object;
         }
     }

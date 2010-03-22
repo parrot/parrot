@@ -25,6 +25,7 @@ src/test_main.c
 
 #include "parrot/runcore_trace.h"
 #include "parrot/oplib/ops.h"
+#include "parrot/context.h"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
 
@@ -337,7 +338,7 @@ trace_op_dump(PARROT_INTERP,
                 len += Parrot_io_eprintf(debugger, "%vd", o);
                 break;
               case PARROT_ARG_NC:
-                len += Parrot_io_eprintf(debugger, "%vg", PCONST(o)->u.number);
+                len += Parrot_io_eprintf(debugger, "%vg", Parrot_pcc_get_num_constant(interp, CURRENT_CONTEXT(interp), o));
                 break;
               case PARROT_ARG_PC:
                 if (var_args)
@@ -350,7 +351,7 @@ trace_op_dump(PARROT_INTERP,
                 {
                     STRING* const escaped = Parrot_str_escape_truncate(
                             interp,
-                            PCONST(o)->u.string, 20);
+                            Parrot_pcc_get_string_constant(interp, CURRENT_CONTEXT(interp), o), 20);
                     if (escaped)
                         len += Parrot_io_eprintf(debugger, "\"%Ss\"", escaped);
                     else
@@ -358,7 +359,7 @@ trace_op_dump(PARROT_INTERP,
                 }
                 break;
               case PARROT_ARG_KC:
-                len += trace_key_dump(interp, PCONST(o)->u.key);
+                len += trace_key_dump(interp, Parrot_pcc_get_pmc_constant(interp, CURRENT_CONTEXT(interp), o));
                 break;
               case PARROT_ARG_KIC:
                 len += Parrot_io_eprintf(debugger, "[%vd]", o);
@@ -425,7 +426,7 @@ trace_op_dump(PARROT_INTERP,
                 break;
               case PARROT_ARG_PC:
                 Parrot_io_eprintf(debugger, "PC%vd=", o);
-                trace_pmc_dump(interp, PCONST(o)->u.key);
+                trace_pmc_dump(interp, Parrot_pcc_get_pmc_constant(interp, CURRENT_CONTEXT(interp), o));
                 break;
               case PARROT_ARG_P:
                 Parrot_io_eprintf(debugger, "P%vd=", o);

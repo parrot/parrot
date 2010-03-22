@@ -225,12 +225,6 @@ UINTVAL Parrot_pcc_get_recursion_depth_func(PARROT_INTERP, ARGIN(PMC *ctx))
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_pcc_get_results_signature_func(PARROT_INTERP, ARGIN(PMC *ctx))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
 PMC* Parrot_pcc_get_signature_func(PARROT_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -325,13 +319,6 @@ PARROT_EXPORT
 void Parrot_pcc_set_pred_offset_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     size_t pred_offset)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-void Parrot_pcc_set_results_signature_func(PARROT_INTERP,
-    ARGIN(PMC *ctx),
-    ARGIN_NULLOK(PMC *sig))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -452,10 +439,6 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_results_signature_func \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_get_signature_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
@@ -507,10 +490,6 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_set_results_signature_func \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_set_signature_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
@@ -550,9 +529,6 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
 
 #  define Parrot_pcc_get_caller_ctx(i, c) (__C(c)->caller_ctx)
 #  define Parrot_pcc_set_caller_ctx(i, c, value) (__C(c)->caller_ctx = (value))
-
-#  define Parrot_pcc_get_results_signature(i, c) (__C(c)->results_signature)
-#  define Parrot_pcc_set_results_signature(i, c, value) (__C(c)->results_signature = (value))
 
 #  define Parrot_pcc_get_namespace(i, c) (__C(c)->current_namespace)
 #  define Parrot_pcc_set_namespace(i, c, value) (__C(c)->current_namespace = (value))
@@ -614,9 +590,6 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
 
 #  define Parrot_pcc_get_caller_ctx(i, c) Parrot_pcc_get_caller_ctx_func((i), (c))
 #  define Parrot_pcc_set_caller_ctx(i, c, value) Parrot_pcc_set_caller_ctx_func((i), (c), (value))
-
-#  define Parrot_pcc_get_results_signature(i, c) Parrot_pcc_get_results_signature_func((i), (c))
-#  define Parrot_pcc_set_results_signature(i, c, value) Parrot_pcc_set_results_signature_func((i), (c), (value))
 
 #  define Parrot_pcc_get_namespace(i, c) Parrot_pcc_get_namespace_func((i), (c))
 #  define Parrot_pcc_set_namespace(i, c, value) Parrot_pcc_set_namespace_func((i), (c), (value))
