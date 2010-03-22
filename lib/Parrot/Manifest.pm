@@ -241,8 +241,6 @@ sub _get_manifest_entry {
             : m[^lib/Parrot/]                 ? '[devel]lib'
             : m[^runtime/]                    ? '[library]'
             : m[^src/pmc/.*\.h]               ? '[devel]include'
-            : m[^src/pmc/.*\.pmc]             ? '[devel]src'
-            : m[^src/dynpmc/.*\.pmc]          ? '[devel]src'
             : m[^runtime/parrot/library/PCT]  ? '[pct]'
             : m[^runtime/parrot/library/PCT]  ? '[pge]'
             : m[^runtime/parrot/library/TGE]  ? '[tge]'
