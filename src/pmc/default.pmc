@@ -1058,14 +1058,14 @@ Used by GC to mark the PMC.
 
 =item C<PMC* clone()>
 
-Clones this PMC.  By default, this just does a freeze and thaw.
+Clones this PMC.  By default, just creates a new, uninitialized instance.
 
 =cut
 
 */
 
     VTABLE PMC* clone() {
-        return Parrot_thaw(interp, Parrot_freeze(interp, SELF));
+        return Parrot_pmc_new_noinit(INTERP, SELF->vtable->base_type);
     }
 
 /*
