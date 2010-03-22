@@ -41,7 +41,7 @@ typedef struct Pcc_cell
     (Pcc_cell *)Parrot_gc_allocate_fixed_size_storage((i), sizeof (Pcc_cell))
 
 #define FREE_CELL(i, c) \
-    Parrot_gc_free_fixed_size_storage((i), sizeof (Pcc_cell), c)
+    Parrot_gc_free_fixed_size_storage((i), sizeof (Pcc_cell), (c))
 
 #define CELL_TYPE_MASK(c) (c)->type
 
