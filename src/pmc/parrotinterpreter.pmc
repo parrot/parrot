@@ -127,10 +127,11 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
                     PObj_is_class_TEST(s->vtables[i]->pmc_class)) {
                 /* Cloning the class into the new interpreter ought
                  * to be sufficient to instantiate the class.  */
-                PMC          *source       = s->vtables[i]->pmc_class;
-                PMC          *dest         = Parrot_clone(d, source);
-                Parrot_Class_attributes *source_class = PARROT_CLASS(source);
-                Parrot_Class_attributes *dest_class   = PARROT_CLASS(dest);
+                PMC                     * const source       = s->vtables[i]->pmc_class;
+                PMC                     * const dest         = Parrot_clone(d, source);
+                Parrot_Class_attributes * const source_class = PARROT_CLASS(source);
+                Parrot_Class_attributes * const dest_class   = PARROT_CLASS(dest);
+
                 dest_class->name           = Parrot_str_copy(d, source_class->name);
                 dest_class->_namespace     = VTABLE_clone(d, source_class->_namespace);
             }
