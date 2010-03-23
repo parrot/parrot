@@ -18,12 +18,12 @@
 /* HEADERIZER HFILE: include/parrot/nci.h */
 /* HEADERIZER STOP */
 
-/* This function serves a single purpose. It takes the function
-   signature for a C function we want to call and returns a pointer
-   to a function that can call it. */
+/* This function serves a single purpose. It takes the function signature for a
+   C function we want to call and returns a PMC with a pointer to a function
+   that can call it. */
 
-void *
-build_call_func(PARROT_INTERP, SHIM(PMC *pmc_nci), NOTNULL(STRING *signature)) {
+PMC *
+build_call_func(PARROT_INTERP, NOTNULL(STRING *signature)) {
     PMC *iglobals;
     PMC *nci_funcs;
     PMC *thunk;
@@ -45,7 +45,7 @@ build_call_func(PARROT_INTERP, SHIM(PMC *pmc_nci), NOTNULL(STRING *signature)) {
     if (!PMC_IS_NULL(thunk)) {
         PARROT_ASSERT(thunk->vtable);
         PARROT_ASSERT(thunk->vtable->base_type == enum_class_UnManagedStruct);
-        return F2DPTR(VTABLE_get_pointer(interp, thunk));
+        return thunk;
     }
 
     Parrot_ex_throw_from_c_args(interp, NULL,

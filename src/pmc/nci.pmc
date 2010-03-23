@@ -114,7 +114,8 @@ nci_sub_t build_func(PARROT_INTERP, PMC *pmc, Parrot_NCI_attributes *nci_info)
     nci_info->arity       = key_length - 1;
 
     /* Build call function. */
-    nci_info->func        = (PMC *)(build_call_func(interp, pmc, key));
+    nci_info->fb_info     = build_call_func(interp, key);
+    nci_info->func        = F2DPTR(VTABLE_get_pointer(interp, nci_info->fb_info));
 
     return (nci_sub_t)nci_info->func;
 }
@@ -123,6 +124,7 @@ nci_sub_t build_func(PARROT_INTERP, PMC *pmc, Parrot_NCI_attributes *nci_info)
 pmclass NCI auto_attrs {
     ATTR STRING    *signature;              /* The signature. */
     ATTR void      *func;                   /* Function pointer to call. */
+    ATTR PMC       *fb_info;                /* Frame-builder info */
     ATTR void      *orig_func;              /* Function pointer
                                              * used to create func */
     ATTR STRING    *pcc_params_signature;   /* The signature. */
@@ -228,6 +230,7 @@ Mark any referenced strings and PMCs.
         if (PARROT_NCI(SELF)) {
             Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
 
+            Parrot_gc_mark_PMC_alive(interp, nci_info->fb_info);
             Parrot_gc_mark_STRING_alive(interp, nci_info->signature);
             Parrot_gc_mark_STRING_alive(interp, nci_info->pcc_params_signature);
             Parrot_gc_mark_STRING_alive(interp, nci_info->long_signature);
@@ -258,6 +261,7 @@ Creates and returns a clone of the NCI.
          * ManagedStruct or Buffer?
          */
         nci_info_ret->func                  = nci_info_self->func;
+        nci_info_ret->fb_info               = nci_info_self->fb_info;
         nci_info_ret->orig_func             = nci_info_self->orig_func;
         nci_info_ret->signature             = nci_info_self->signature;
         nci_info_ret->pcc_params_signature  = nci_info_self->pcc_params_signature;
