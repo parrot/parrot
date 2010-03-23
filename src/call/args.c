@@ -491,6 +491,8 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
                     VTABLE_push_pmc(interp, call_object, PMC_IS_NULL(pmc_value)
                             ? PMCNULL
                             : clone_key_arg(interp, pmc_value));
+                    if (arg_flags & PARROT_ARG_INVOCANT)
+                        Parrot_pcc_set_object(interp, call_object, pmc_value);
                 }
 
                 break;
@@ -718,6 +720,7 @@ Parrot_pcc_build_call_from_varargs(PARROT_INTERP,
                     else {
                         VTABLE_push_pmc(interp, call_object, pmc_arg);
                         i++; /* skip 'i' */
+                        Parrot_pcc_set_object(interp, call_object, pmc_arg);
                     }
                 }
                 else

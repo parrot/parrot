@@ -296,7 +296,6 @@ struct parrot_interp_t {
     /* during a call sequencer the caller fills these objects
      * inside the invoke these get moved to the context structure */
     PMC *current_cont;                        /* the return continuation PMC */
-    PMC *current_object;                      /* invocant, if a method call */
 };
 
 /* typedef struct parrot_interp_t Interp;    done in parrot.h so that

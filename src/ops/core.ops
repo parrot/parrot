@@ -376,8 +376,11 @@ Create a closure of the given subroutine PMC by cloning the sub's state.
 inline op invokecc(invar PMC) :flow {
     PMC      * const p     = $1;
     opcode_t *dest         = expr NEXT();
+    PMC      *signature    = Parrot_pcc_get_signature(interp,
+                                    CURRENT_CONTEXT(interp));
 
-    interp->current_object = NULL;
+    if (!PMC_IS_NULL(signature))
+        Parrot_pcc_set_object(interp, signature, NULL);
     interp->current_cont   = NEED_CONTINUATION;
     dest                   = VTABLE_invoke(interp, p, dest);
 
@@ -387,8 +390,11 @@ inline op invokecc(invar PMC) :flow {
 inline op invoke(invar PMC, invar PMC) :flow {
     opcode_t   *dest       = expr NEXT();
     PMC * const p          = $1;
+    PMC        *signature  = Parrot_pcc_get_signature(interp,
+                                    CURRENT_CONTEXT(interp));
 
-    interp->current_object = NULL;
+    if (!PMC_IS_NULL(signature))
+        Parrot_pcc_set_object(interp, signature, NULL);
     interp->current_cont   = $2;
 
     dest = VTABLE_invoke(interp, p, dest);

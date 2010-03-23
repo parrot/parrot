@@ -258,7 +258,6 @@ END
     /*BEGIN RETURN $returns */
 END
         $e->emit( <<"END", __FILE__, __LINE__ + 1 );
-    interp->current_object = PMCNULL;
     Parrot_pcc_build_call_from_c_args(interp, _call_object, "$returns_signature",
             $returns_varargs);
     return;

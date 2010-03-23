@@ -175,7 +175,6 @@ Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
              "Method '%Ss' not found", method_name);
 
     /* Invoke the subroutine object with the given CallSignature object */
-    interp->current_object = pmc;
     Parrot_pcc_invoke_from_sig_object(interp, sub_obj, sig_obj);
 }
 
@@ -291,8 +290,6 @@ static int
 do_run_ops(PARROT_INTERP, ARGIN(PMC *sub_obj))
 {
     ASSERT_ARGS(do_run_ops)
-    if (!PMC_IS_NULL(interp->current_object))
-        return 0;
 
     if (sub_obj->vtable->base_type < enum_class_core_max)
         return sub_obj->vtable->base_type == enum_class_Sub

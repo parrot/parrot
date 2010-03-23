@@ -345,8 +345,9 @@ Invokes the subroutine.
 */
 
     VTABLE opcode_t *invoke(void *next) {
-        PMC *caller_ctx = CURRENT_CONTEXT(interp);
+        PMC *caller_ctx = CURRENT_CONTEXT(INTERP);
         PMC *ccont      = INTERP->current_cont;
+        PMC *object;
 
         /* plain subroutine call
          * create new context, place it in interpreter */
@@ -395,7 +396,10 @@ Invokes the subroutine.
         CURRENT_CONTEXT(INTERP) = context;
         Parrot_pcc_set_caller_ctx(INTERP, context, caller_ctx);
         Parrot_pcc_allocate_registers(INTERP, context, sub->n_regs_used);
+        /* Preserve object */
+        object = Parrot_pcc_get_object(INTERP, context);
         Parrot_pcc_init_context(INTERP, context, caller_ctx);
+        Parrot_pcc_set_object(INTERP, context, object);
 
         Parrot_pcc_set_sub(interp, context, SELF);
         Parrot_pcc_set_continuation(interp, context, ccont);
@@ -416,11 +420,6 @@ Invokes the subroutine.
             sub->ctx = context;
             /* convert retcontinuation to a continuation */
             ccont->vtable = interp->vtables[enum_class_Continuation];
-        }
-
-        if (!PMC_IS_NULL(INTERP->current_object)) {
-            Parrot_pcc_set_object(interp, context, INTERP->current_object);
-            INTERP->current_object  = NULL;
         }
 
         /* create pad if needed

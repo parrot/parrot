@@ -344,9 +344,7 @@ initialize_parents(PARROT_INTERP, PMC *object, PMC *all_parents)
 
         if (!PMC_IS_NULL(meth)) {
             /* preserve current_object */
-            PMC * const old_object = interp->current_object;
             Parrot_pcc_invoke_sub_from_c_args(interp, meth, "Pi->", object);
-            interp->current_object = old_object;
         }
     }
 }

@@ -777,10 +777,6 @@ pt_thread_run(PARROT_INTERP, ARGOUT(PMC *dest_interp), ARGIN(PMC *sub), ARGIN_NU
             make_local_args_copy(interpreter, interp, arg));
 
     /*
-     * set regs according to pdd03
-     */
-    interpreter->current_object = dest_interp;
-    /*
      * create a joinable thread
      */
     interpreter->thread_data->state = THREAD_STATE_JOINABLE;
