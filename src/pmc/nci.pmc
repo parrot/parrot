@@ -298,6 +298,7 @@ class, the PMC arguments are shifted down.
     VTABLE opcode_t *invoke(void *next) {
         Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         nci_thunk_t                   func;
+        PMC                          *fb_info;
         char                         *sig_str;
         void                         *orig_func;
         PMC                          *cont;
@@ -306,6 +307,8 @@ class, the PMC arguments are shifted down.
         func = PObj_flag_TEST(private2, SELF)
             ? (nci_thunk_t) D2FPTR(orig_func)
             : (nci_thunk_t) D2FPTR(nci_info->func);
+
+        GET_ATTR_fb_info(INTERP, SELF, fb_info);
 
         if (!func) {
             /* build the thunk only when necessary */
@@ -317,7 +320,7 @@ class, the PMC arguments are shifted down.
                     "attempt to call NULL function");
         }
 
-        func(INTERP, SELF);
+        func(INTERP, SELF, fb_info);
         cont = INTERP->current_cont;
 
         /*

@@ -15,7 +15,7 @@
 
 #include "parrot/parrot.h"
 
-typedef void (*nci_thunk_t)(PARROT_INTERP, PMC *);
+typedef void (*nci_thunk_t)(PARROT_INTERP, PMC *, PMC *);
 
 PMC *build_call_func(PARROT_INTERP, NOTNULL(STRING *signature));
 

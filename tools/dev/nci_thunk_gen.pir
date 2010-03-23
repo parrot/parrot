@@ -561,7 +561,7 @@ TEMPLATE
 
     .local string call
     call = 'sprintf'(<<'TEMPLATE', return_assign, ret_cast, call_params)
-    GETATTR_NCI_orig_func(interp, self, orig_func);
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     %s %s(*fn_pointer)(%s);
 TEMPLATE
@@ -656,7 +656,7 @@ TEMPLATE
     fn_name = 'sig_to_fn_name'(sig :flat)
     fn_decl = 'sprintf'(<<'TEMPLATE', storage_class, fn_name)
 %s void
-%s(PARROT_INTERP, PMC *self)
+%s(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 TEMPLATE
     .return (fn_decl)
 .end
