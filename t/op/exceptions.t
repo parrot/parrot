@@ -423,11 +423,6 @@ CODE
 No exception handler/
 OUTPUT
 
-#
-# this test is hanging in testr since pcc_hackathon_6Mar10 branch merge at r45108
-# converting to skip at the moment
-#
-
 pir_output_is( <<'CODE', <<'OUTPUT', "exit_handler via exit exception" );
 .sub main :main
     .local pmc a
