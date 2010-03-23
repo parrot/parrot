@@ -448,6 +448,14 @@ $ENV{TEST_PROG_ARGS} ||= '';
 my @todo = $ENV{TEST_PROG_ARGS} =~ /--run-pbc/
     ? ( todo => '.tailcall and lexical maps not thawed from PBC, TT #1172' )
     : ();
+#
+# this test is hanging in testr since pcc_hackathon_6Mar10 branch merge at r45108
+# converting to skip at the moment
+#
+
+SKIP: {
+    skip ".tailcall and lexical maps not thawed from PBC - hangs", 1 if @todo;
+
 pir_output_is( <<'CODE', <<'OUTPUT', "exit_handler via exit exception", @todo );
 .sub main :main
     .local pmc a
@@ -471,6 +479,8 @@ CODE
 at_exit
 a = 42
 OUTPUT
+
+}
 
 ## Regression test for r14697.  This probably won't be needed when PDD23 is
 ## fully implemented.
