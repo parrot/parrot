@@ -15,6 +15,8 @@
 
 #include "parrot/parrot.h"
 
+typedef void (*nci_thunk_t)(PARROT_INTERP, PMC *);
+
 PMC *build_call_func(PARROT_INTERP, NOTNULL(STRING *signature));
 
 void Parrot_nci_load_core_thunks(PARROT_INTERP);
