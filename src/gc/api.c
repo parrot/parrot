@@ -252,7 +252,6 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
     };
 
     /* Assertions that GC subsystem has complete API */
-    PARROT_ASSERT(interp->gc_sys->finalize_gc_system);
     PARROT_ASSERT(interp->gc_sys->destroy_child_interp);
 
     PARROT_ASSERT(interp->gc_sys->do_gc_mark);
