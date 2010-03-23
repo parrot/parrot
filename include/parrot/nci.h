@@ -15,7 +15,7 @@
 
 #include "parrot/parrot.h"
 
-void *build_call_func(PARROT_INTERP, SHIM(PMC *pmc_nci), NOTNULL(STRING *signature), NOTNULL(int *jitted));
+void *build_call_func(PARROT_INTERP, SHIM(PMC *pmc_nci), NOTNULL(STRING *signature));
 
 void Parrot_nci_load_core_thunks(PARROT_INTERP);
 

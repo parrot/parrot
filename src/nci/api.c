@@ -23,7 +23,7 @@
    to a function that can call it. */
 
 void *
-build_call_func(PARROT_INTERP, SHIM(PMC *pmc_nci), NOTNULL(STRING *signature), SHIM(int *jitted)) {
+build_call_func(PARROT_INTERP, SHIM(PMC *pmc_nci), NOTNULL(STRING *signature)) {
     PMC *iglobals;
     PMC *nci_funcs;
     PMC *thunk;

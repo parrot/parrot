@@ -19,7 +19,6 @@ The vtable functions for the native C call functions.
 */
 
 typedef INTVAL (*nci_sub_t)(PARROT_INTERP, PMC *);
-typedef INTVAL (*nci_jit_sub_t)(PARROT_INTERP, PMC *, char *);
 
 void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_info,
                 size_t sig_length);
@@ -108,7 +107,6 @@ nci_sub_t build_func(PARROT_INTERP, PMC *pmc, Parrot_NCI_attributes *nci_info)
 {
     STRING    *key        = nci_info->signature;
     size_t     key_length = Parrot_str_byte_length(interp, key);
-    int       jitted      = 0;
 
     pcc_params(interp, key, nci_info, key_length);
 
@@ -116,8 +114,7 @@ nci_sub_t build_func(PARROT_INTERP, PMC *pmc, Parrot_NCI_attributes *nci_info)
     nci_info->arity       = key_length - 1;
 
     /* Build call function. */
-    nci_info->func        = (PMC *)(build_call_func(interp, pmc, key, &jitted));
-    nci_info->jitted      = jitted;
+    nci_info->func        = (PMC *)(build_call_func(interp, pmc, key));
 
     return (nci_sub_t)nci_info->func;
 }
@@ -132,7 +129,6 @@ pmclass NCI auto_attrs {
     ATTR STRING    *long_signature;         /* The full signature. */
     ATTR PMC       *multi_sig;              /* type tuple array (?) */
     ATTR INTVAL     arity;                  /* Cached arity of the NCI. */
-    ATTR INTVAL     jitted;                 /* Is this a jitted NCI stub. */
 
 /*
 
@@ -266,7 +262,6 @@ Creates and returns a clone of the NCI.
         nci_info_ret->signature             = nci_info_self->signature;
         nci_info_ret->pcc_params_signature  = nci_info_self->pcc_params_signature;
         nci_info_ret->arity                 = nci_info_self->arity;
-        nci_info_ret->jitted                = nci_info_self->jitted;
         PObj_get_FLAGS(ret)                |= (PObj_get_FLAGS(SELF) & 0x7);
 
         return ret;
@@ -320,23 +315,7 @@ class, the PMC arguments are shifted down.
                     "attempt to call NULL function");
         }
 
-        if (nci_info->jitted) {
-            nci_jit_sub_t jit_func = (nci_jit_sub_t) D2FPTR(nci_info->func);
-
-            /* Parrot_eprintf(interp, "JITTED %S\n", nci_info->signature); */
-            sig_str = Parrot_str_to_cstring(interp, nci_info->pcc_params_signature);
-            jit_func(INTERP, SELF, sig_str);
-            Parrot_str_free_cstring(sig_str);
-        }
-        else {
-            if (PObj_flag_TEST(private2, SELF)) {
-                /* Parrot_eprintf(interp, "RAW NCI CALL\n"); */
-            }
-            else {
-                /* Parrot_eprintf(interp, "HACKED %S\n", nci_info->signature); */
-            }
-            func(INTERP, SELF);
-        }
+        func(INTERP, SELF);
         cont = INTERP->current_cont;
 
         /*
