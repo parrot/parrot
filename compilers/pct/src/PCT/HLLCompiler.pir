@@ -63,14 +63,12 @@ running compilers from a command line.
     if $S0 goto _revision_lab
     $P2 .= 'version '
     $S0 = $P0['VERSION']
-    $P2 .= $S0
-    $P2 .= '.'
     goto _is_version
   _revision_lab:
     $P2 .= 'revision '
+  _is_version:
     $P2 .= $S0
     $P2 .= '.'
-  _is_version:
     setattribute self, '$version', $P2
 .end
 
