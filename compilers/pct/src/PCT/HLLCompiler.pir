@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2009, Parrot Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -55,13 +55,22 @@ running compilers from a command line.
 
     $S0  = '???'
     push_eh _handler
-    $P0  = _config()    # currently works in the build tree, but not in the install tree
-    $S0  = $P0['revision']
+    $P0  = _config()
+    $S0  = $P0['revision']   # also $I0 = P0['installed'] could be used
   _handler:
     pop_eh
-    $P2  = box 'This compiler is built with the Parrot Compiler Toolkit, parrot revision '
+    $P2  = box 'This compiler is built with the Parrot Compiler Toolkit, parrot '
+    if $S0 goto _revision_lab
+    $P2 .= 'version '
+    $S0 = $P0['VERSION']
     $P2 .= $S0
     $P2 .= '.'
+    goto _is_version
+  _revision_lab:
+    $P2 .= 'revision '
+    $P2 .= $S0
+    $P2 .= '.'
+  _is_version:
     setattribute self, '$version', $P2
 .end
 
