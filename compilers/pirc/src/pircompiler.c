@@ -33,9 +33,10 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static allocated_mem_ptrs * new_mem_ptrs_block(void);
 
-static void register_ptr(ARGIN(lexer_state *lexer), ARGIN(void *ptr))
+static void register_ptr(ARGMOD(lexer_state *lexer), ARGIN(void *ptr))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*lexer);
 
 static void store_string(
     ARGIN(lexer_state * const lexer),
@@ -98,7 +99,7 @@ is invoked, C<ptr> will be freed through C<mem_sys_free()>.
 
 */
 static void
-register_ptr(ARGIN(lexer_state *lexer), ARGIN(void *ptr))
+register_ptr(ARGMOD(lexer_state *lexer), ARGIN(void *ptr))
 {
     ASSERT_ARGS(register_ptr)
     allocated_mem_ptrs *ptrs = lexer->mem_allocations;
@@ -106,7 +107,7 @@ register_ptr(ARGIN(lexer_state *lexer), ARGIN(void *ptr))
     PARROT_ASSERT(ptrs);
 
     if (ptrs->allocs_in_this_block == NUM_MEM_ALLOCS_PER_BLOCK) {
-        allocated_mem_ptrs *newblock = new_mem_ptrs_block();
+        allocated_mem_ptrs * const newblock = new_mem_ptrs_block();
         newblock->next               = ptrs;
         lexer->mem_allocations       = newblock;
         ptrs                         = newblock;
@@ -118,8 +119,7 @@ register_ptr(ARGIN(lexer_state *lexer), ARGIN(void *ptr))
 
 /*
 
-=item C<void * pir_mem_allocate_zeroed(lexer_state * const lexer, size_t
-numbytes)>
+=item C<void * pir_mem_allocate_zeroed(lexer_state *lexer, size_t numbytes)>
 
 Memory allocation function for all PIR internal functions. Memory is allocated
 through Parrot's allocation functions, but the pointer to the allocated memory
@@ -135,9 +135,9 @@ PARROT_MALLOC
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 void *
-pir_mem_allocate_zeroed(ARGIN(lexer_state * const lexer), size_t numbytes)
+pir_mem_allocate_zeroed(ARGMOD(lexer_state *lexer), size_t numbytes)
 {
-    void *ptr = mem_sys_allocate_zeroed(numbytes);
+    void * const ptr = mem_sys_allocate_zeroed(numbytes);
 
     totalmem += numbytes;
 

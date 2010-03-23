@@ -386,8 +386,7 @@ check_unused_symbols(ARGIN(lexer_state * const lexer))
 
 /*
 
-=item C<symbol * find_symbol(lexer_state * const lexer, char const * const
-name)>
+=item C<symbol * find_symbol(lexer_state *lexer, const const * name)>
 
 Return the node for the symbol or NULL if the symbol
 is not defined. If an attempt is made to find a symbol,
@@ -400,8 +399,7 @@ allocate a PASM register for it.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 symbol *
-find_symbol(ARGIN(lexer_state * const lexer),
-        ARGIN(char const * const name))
+find_symbol(ARGMOD(lexer_state *lexer), ARGIN(const const * name))
 {
     ASSERT_ARGS(find_symbol)
     hashtable    *table    = &CURRENT_SUB(lexer)->symbols;
@@ -411,7 +409,7 @@ find_symbol(ARGIN(lexer_state * const lexer),
 
 
     while (buck) {
-        symbol *sym = bucket_symbol(buck);
+        symbol * const sym = bucket_symbol(buck);
 
         if (STREQ(sym->info.id.name, name)) {
 

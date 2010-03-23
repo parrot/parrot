@@ -215,10 +215,9 @@ void * pir_mem_allocate(ARGIN(lexer_state * const lexer), size_t numbytes)
 PARROT_MALLOC
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-void * pir_mem_allocate_zeroed(
-    ARGIN(lexer_state * const lexer),
-    size_t numbytes)
-        __attribute__nonnull__(1);
+void * pir_mem_allocate_zeroed(ARGMOD(lexer_state *lexer), size_t numbytes)
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*lexer);
 
 void pirwarning(
     ARGIN(lexer_state * const lexer),

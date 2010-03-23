@@ -660,7 +660,7 @@ targets_equal(ARGIN(target const * const left),
 
 /*
 
-=item C<target * new_target(lexer_state * const lexer)>
+=item C<target * new_target(lexer_state *lexer)>
 
 Create a new target node. The node's next pointer is initialized to itself.
 
@@ -670,16 +670,16 @@ Create a new target node. The node's next pointer is initialized to itself.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 target *
-new_target(ARGIN(lexer_state * const lexer))
+new_target(ARGMOD(lexer_state *lexer))
 {
-    target *t       = pir_mem_allocate_zeroed_typed(lexer, target);
+    target * const t = pir_mem_allocate_zeroed_typed(lexer, target);
     t->key          = NULL;
     t->next         = t; /* circly linked list */
     return t;
 }
 
 /*
-=item C<void set_target_key(target * const t, key * const k)>
+=item C<void set_target_key(target *t, key *k)>
 
 Set the key C<k> on target C<t>. For instance:
 
@@ -691,15 +691,14 @@ Set the key C<k> on target C<t>. For instance:
 
 */
 void
-set_target_key(ARGIN(target * const t), ARGIN(key * const k))
+set_target_key(ARGMOD(target *t), ARGIN(key *k))
 {
     t->key = k;
 }
 
 /*
 
-=item C<target * target_from_symbol(lexer_state * const lexer, symbol * const
-sym)>
+=item C<target * target_from_symbol(lexer_state * lexer, symbol *sym)>
 
 Convert symbol C<sym> into a target node. The resulting target has
 a pointer to C<sym>.
@@ -710,10 +709,9 @@ a pointer to C<sym>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 target *
-target_from_symbol(ARGIN(lexer_state * const lexer),
-        ARGIN(symbol * const sym))
+target_from_symbol(ARGMOD(lexer_state * lexer), ARGIN(symbol *sym))
 {
-    target *t  = new_target(lexer);
+    target * const t = new_target(lexer);
 
     t->flags   = sym->flags; /* copy the flags */
     t->info    = &sym->info;
@@ -738,7 +736,7 @@ its "next" pointer you get the first item in the list.)
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 target *
-add_target(ARGIN(lexer_state * const lexer),
+add_target(SHIM(lexer_state * const lexer),
         ARGMOD(target *last), ARGIN(target * const t))
 {
     PARROT_ASSERT(last);
@@ -1429,7 +1427,7 @@ get_operands(ARGIN(lexer_state * const lexer), int bitmask, ...)
 
 /*
 
-=item C<unsigned get_operand_count(lexer_state * const lexer)>
+=item C<unsigned get_operand_count(lexer_state *lexer)>
 
 Returns the number of operands of the I<current> instruction.
 This function assumes there is an instruction in place
@@ -1440,7 +1438,7 @@ This function assumes there is an instruction in place
 */
 PARROT_WARN_UNUSED_RESULT
 unsigned
-get_operand_count(ARGIN(lexer_state * const lexer))
+get_operand_count(ARGIN(lexer_state *lexer))
 {
     unsigned count = 0;
     expression *first, *operand;
