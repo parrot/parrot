@@ -1049,6 +1049,7 @@ Parrot_ext_call(PARROT_INTERP, ARGIN(Parrot_PMC sub_pmc),
     va_list args;
     PMC  *call_obj;
     char *arg_sig, *ret_sig;
+    PMC    *old_call_obj = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
     Parrot_pcc_split_signature_string(interp, signature, &arg_sig, &ret_sig);
 
     va_start(args, signature);
@@ -1059,6 +1060,7 @@ Parrot_ext_call(PARROT_INTERP, ARGIN(Parrot_PMC sub_pmc),
     Parrot_pcc_fill_params_from_varargs(interp, call_obj, ret_sig, &args,
             PARROT_ERRORS_RESULT_COUNT_FLAG);
     va_end(args);
+    Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), old_call_obj);
 }
 
 /*
