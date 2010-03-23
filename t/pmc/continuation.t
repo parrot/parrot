@@ -18,7 +18,7 @@ Tests the Continuation PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(2)
+    plan(3)
 
     test_new()
     invoke_with_init()
