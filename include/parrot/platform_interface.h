@@ -1,6 +1,6 @@
 /*
+ * Copyright (C) 2003-2010, Parrot Foundation.
  * $Id$
- * Copyright (C) 2003-2008, Parrot Foundation.
  */
 
 #ifndef PARROT_PLATFORM_INTERFACE_H_GUARD
@@ -87,7 +87,7 @@ typedef enum Parrot_dlopen_enum {
      * loaded library visible to other libraries; this is usually needed if
      * it will load libraries itself.
      */
-    Parrot_dlopen_global_FLAG   = 0x01,
+    Parrot_dlopen_global_FLAG   = 0x01
 } Parrot_dlopen_flags;
 /* &end_gen */
 
