@@ -222,6 +222,8 @@ L<http://gitorious.org/kakapo/kakapo/blobs/master/setup.nqp>
     register_step_after('build', _build_pbc_pir)
     .const 'Sub' _build_pbc_pbc = '_build_pbc_pbc'
     register_step_after('build', _build_pbc_pbc)
+    .const 'Sub' _build_hll_hook = '_build_hll_hook'
+    register_step_after('build', _build_hll_hook)
     .const 'Sub' _build_exe_pbc = '_build_exe_pbc'
     register_step_after('build', _build_exe_pbc)
     .const 'Sub' _build_installable_pbc = '_build_installable_pbc'
@@ -943,6 +945,21 @@ the value is an array of PBC pathname
     goto L1
   L2:
     .tailcall run_jobs(jobs)
+.end
+
+=item hll_hook
+
+a subroutine
+
+=cut
+
+.sub '_build_hll_hook' :anon
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['hll_hook']
+    unless $I0 goto L1
+    $P0 = kv['hll_hook']
+    $P0(kv :flat :named)
+  L1:
 .end
 
 =item exe_pbc
