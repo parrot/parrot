@@ -3,6 +3,10 @@
 New in 2.3.0
 - Features
 - Core
+  + Allow passing parameters to the dynamic linker ('dlopen' improved)
+  + loadlib opcode added
+  + Merge of pcc_hackatron branch
+  + Recursive make for src/dynpmc removed
 - Compilers
 - Deprecations
 - API
