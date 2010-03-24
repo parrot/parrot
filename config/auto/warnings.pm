@@ -104,7 +104,6 @@ sub _init {
         -fvisibility=hidden
         -funit-at-a-time
         -maccumulate-outgoing-args
-        -pedantic
         -W
         -Wall
         -Waggregate-return
