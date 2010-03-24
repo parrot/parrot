@@ -758,6 +758,8 @@ the key is the PIR pathname
 
 the value is the NQP pathname
 
+=item pir_nqp_flags
+
 =cut
 
 .sub '_build_pir_nqp_rx' :anon
@@ -765,17 +767,20 @@ the value is the NQP pathname
     $I0 = exists kv['pir_nqp-rx']
     unless $I0 goto L1
     $P0 = kv['pir_nqp-rx']
-    build_pir_nqp_rx($P0)
+    $S0 = get_value('pir_nqp_flags', '' :named('default'), kv :flat :named)
+    build_pir_nqp_rx($P0, $S0)
   L1:
     $I0 = exists kv['pir_nqprx']
     unless $I0 goto L2
     $P0 = kv['pir_nqprx']
-    build_pir_nqp_rx($P0)
+    $S0 = get_value('pir_nqp_flags', '' :named('default'), kv :flat :named)
+    build_pir_nqp_rx($P0, $S0)
   L2:
 .end
 
 .sub 'build_pir_nqp_rx'
     .param pmc hash
+    .param string flags
     .local pmc jobs
     jobs = new 'ResizableStringArray'
     $P0 = iter hash
@@ -792,6 +797,8 @@ the value is the NQP pathname
     cmd = get_nqp()
     cmd .= " --target=pir --output="
     cmd .= pir
+    cmd .= " "
+    cmd .= flags
     cmd .= " "
     cmd .= nqp
     push jobs, cmd
@@ -1266,7 +1273,7 @@ an array creates a PMC group
   L2:
 .end
 
-.sub '__build_dynpmc' :anon
+.sub '__build_dynpmc'
     .param string src
     .param string cflags
     .local pmc config
