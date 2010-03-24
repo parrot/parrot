@@ -580,11 +580,9 @@ This is to exclude automatically generated PIR-language files Parrot might have.
 
 =cut
 
-{
-    sub is_pir_exemption {
-        my ( $self, $file ) = @_;
-        $file->path =~ m{/ext/};
-    }
+sub is_pir_exemption {
+    my ( $self, $file ) = @_;
+    return $file->path =~ m{/ext/};
 }
 
 
