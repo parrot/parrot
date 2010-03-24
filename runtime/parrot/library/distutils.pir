@@ -392,7 +392,7 @@ Call a step by its name.
 
 =cut
 
-.sub 'run_step'
+.sub 'run_step' :multi()
     .param string name
     .param pmc kv :slurpy :named
     $P0 = get_global '%step'
@@ -409,6 +409,12 @@ Call a step by its name.
     goto L2
   L3:
     .return (1)
+.end
+
+.sub 'run_step' :multi(String,Hash)
+    .param string name
+    .param pmc hash
+    .tailcall run_step(name, hash :flat :named)
 .end
 
 =item register_step
