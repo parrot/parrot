@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -39,32 +39,24 @@ static size_t find_common_mask(PARROT_INTERP, size_t val1, size_t val2)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
-static size_t get_max_buffer_address(PARROT_INTERP,
-    ARGIN(Memory_Pools * const mem_pools))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+static size_t get_max_buffer_address(ARGIN(const Memory_Pools *mem_pools))
+        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
-static size_t get_max_pmc_address(PARROT_INTERP,
-    ARGIN(Memory_Pools * const mem_pools))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+static size_t get_max_pmc_address(ARGIN(const Memory_Pools *mem_pools))
+        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
-static size_t get_min_buffer_address(PARROT_INTERP,
-    ARGIN(Memory_Pools * const mem_pools))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+static size_t get_min_buffer_address(ARGIN(const Memory_Pools *mem_pools))
+        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
-static size_t get_min_pmc_address(PARROT_INTERP,
-    ARGIN(Memory_Pools * const mem_pools))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+static size_t get_min_pmc_address(ARGIN(const Memory_Pools *mem_pools))
+        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 static int is_buffer_ptr(PARROT_INTERP,
-    ARGIN(Memory_Pools * const mem_pools),
+    ARGIN(const Memory_Pools *mem_pools),
     ARGIN(const void *ptr))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -72,38 +64,34 @@ static int is_buffer_ptr(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 static int is_pmc_ptr(PARROT_INTERP,
-    ARGIN(Memory_Pools * const mem_pools),
+    ARGIN(const Memory_Pools *mem_pools),
     ARGIN(const void *ptr))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 static void trace_mem_block(PARROT_INTERP,
-    ARGIN(Memory_Pools * const mem_pools),
+    ARGIN(const Memory_Pools *mem_pools),
     size_t lo_var_ptr,
     size_t hi_var_ptr)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void trace_system_stack(PARROT_INTERP,
-    ARGIN(Memory_Pools * const mem_pools))
+    ARGIN(const Memory_Pools *mem_pools))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_find_common_mask __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_get_max_buffer_address __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mem_pools))
+       PARROT_ASSERT_ARG(mem_pools))
 #define ASSERT_ARGS_get_max_pmc_address __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mem_pools))
+       PARROT_ASSERT_ARG(mem_pools))
 #define ASSERT_ARGS_get_min_buffer_address __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mem_pools))
+       PARROT_ASSERT_ARG(mem_pools))
 #define ASSERT_ARGS_get_min_pmc_address __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mem_pools))
+       PARROT_ASSERT_ARG(mem_pools))
 #define ASSERT_ARGS_is_buffer_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(mem_pools) \
@@ -245,8 +233,8 @@ trace_system_areas(PARROT_INTERP,
 
 /*
 
-=item C<static void trace_system_stack(PARROT_INTERP, Memory_Pools * const
-mem_pools)>
+=item C<static void trace_system_stack(PARROT_INTERP, const Memory_Pools
+*mem_pools)>
 
 Traces the memory block starting at C<< interp->lo_var_ptr >>. This should be
 the address of a local variable which has been created on the stack early in
@@ -259,7 +247,7 @@ variable in this function, which should be at the "top" of the stack.
 
 static void
 trace_system_stack(PARROT_INTERP,
-        ARGIN(Memory_Pools * const mem_pools))
+        ARGIN(const Memory_Pools *mem_pools))
 {
     ASSERT_ARGS(trace_system_stack)
     /* Create a local variable on the system stack. This represents the
@@ -275,8 +263,7 @@ trace_system_stack(PARROT_INTERP,
 
 /*
 
-=item C<static size_t get_max_buffer_address(PARROT_INTERP, Memory_Pools * const
-mem_pools)>
+=item C<static size_t get_max_buffer_address(const Memory_Pools *mem_pools)>
 
 Calculates the maximum buffer address and returns it. This is done by looping
 through all the sized pools, and finding the pool whose C<end_arena_memory>
@@ -290,8 +277,7 @@ list may not be located at the highest memory address.
 
 PARROT_WARN_UNUSED_RESULT
 static size_t
-get_max_buffer_address(PARROT_INTERP,
-        ARGIN(Memory_Pools * const mem_pools))
+get_max_buffer_address(ARGIN(const Memory_Pools *mem_pools))
 {
     ASSERT_ARGS(get_max_buffer_address)
     size_t         max        = 0;
@@ -310,8 +296,7 @@ get_max_buffer_address(PARROT_INTERP,
 
 /*
 
-=item C<static size_t get_min_buffer_address(PARROT_INTERP, Memory_Pools * const
-mem_pools)>
+=item C<static size_t get_min_buffer_address(const Memory_Pools *mem_pools)>
 
 Calculates the minimum buffer address and returns it. Loops through all sized
 pools, and finds the one with the smallest C<start_arena_memory> field. Notice
@@ -326,18 +311,17 @@ memory manager).
 
 PARROT_WARN_UNUSED_RESULT
 static size_t
-get_min_buffer_address(PARROT_INTERP,
-        ARGIN(Memory_Pools * const mem_pools))
+get_min_buffer_address(ARGIN(const Memory_Pools *mem_pools))
 {
     ASSERT_ARGS(get_min_buffer_address)
     size_t         min        = (size_t) -1;
     UINTVAL        i;
 
     for (i = 0; i < mem_pools->num_sized; i++) {
-        if (mem_pools->sized_header_pools[i]
-        &&  mem_pools->sized_header_pools[i]->start_arena_memory) {
-            if (mem_pools->sized_header_pools[i]->start_arena_memory < min)
-                min = mem_pools->sized_header_pools[i]->start_arena_memory;
+        const Fixed_Size_Pool * const pool = mem_pools->sized_header_pools[i];
+        if (pool && pool->start_arena_memory) {
+            if (pool->start_arena_memory < min)
+                min = pool->start_arena_memory;
         }
     }
 
@@ -347,8 +331,7 @@ get_min_buffer_address(PARROT_INTERP,
 
 /*
 
-=item C<static size_t get_max_pmc_address(PARROT_INTERP, Memory_Pools * const
-mem_pools)>
+=item C<static size_t get_max_pmc_address(const Memory_Pools *mem_pools)>
 
 Returns the maximum memory address used by the C<pmc_pool>.
 
@@ -358,8 +341,7 @@ Returns the maximum memory address used by the C<pmc_pool>.
 
 PARROT_WARN_UNUSED_RESULT
 static size_t
-get_max_pmc_address(PARROT_INTERP,
-        ARGIN(Memory_Pools * const mem_pools))
+get_max_pmc_address(ARGIN(const Memory_Pools *mem_pools))
 {
     ASSERT_ARGS(get_max_pmc_address)
     return mem_pools->pmc_pool->end_arena_memory;
@@ -368,8 +350,7 @@ get_max_pmc_address(PARROT_INTERP,
 
 /*
 
-=item C<static size_t get_min_pmc_address(PARROT_INTERP, Memory_Pools * const
-mem_pools)>
+=item C<static size_t get_min_pmc_address(const Memory_Pools *mem_pools)>
 
 Returns the minimum memory address used by the C<pmc_pool>. Notice that the
 memory region between C<get_min_pmc_address> and C<get_max_pmc_address> may be
@@ -381,8 +362,7 @@ fragmented, and not all of it may be used directly by Parrot for storing PMCs.
 
 PARROT_WARN_UNUSED_RESULT
 static size_t
-get_min_pmc_address(PARROT_INTERP,
-        ARGIN(Memory_Pools * const mem_pools))
+get_min_pmc_address(ARGIN(const Memory_Pools *mem_pools))
 {
     ASSERT_ARGS(get_min_pmc_address)
     return mem_pools->pmc_pool->start_arena_memory;
@@ -432,8 +412,8 @@ find_common_mask(PARROT_INTERP, size_t val1, size_t val2)
 
 /*
 
-=item C<static void trace_mem_block(PARROT_INTERP, Memory_Pools * const
-mem_pools, size_t lo_var_ptr, size_t hi_var_ptr)>
+=item C<static void trace_mem_block(PARROT_INTERP, const Memory_Pools
+*mem_pools, size_t lo_var_ptr, size_t hi_var_ptr)>
 
 Traces the memory block between C<lo_var_ptr> and C<hi_var_ptr>.
 Attempt to find pointers to PObjs or buffers, and mark them as "alive"
@@ -446,17 +426,17 @@ areas.
 
 static void
 trace_mem_block(PARROT_INTERP,
-        ARGIN(Memory_Pools * const mem_pools),
+        ARGIN(const Memory_Pools *mem_pools),
         size_t lo_var_ptr, size_t hi_var_ptr)
 {
     ASSERT_ARGS(trace_mem_block)
     size_t    prefix;
     ptrdiff_t cur_var_ptr;
 
-    const size_t buffer_min = get_min_buffer_address(interp, mem_pools);
-    const size_t buffer_max = get_max_buffer_address(interp, mem_pools);
-    const size_t pmc_min    = get_min_pmc_address(interp, mem_pools);
-    const size_t pmc_max    = get_max_pmc_address(interp, mem_pools);
+    const size_t buffer_min = get_min_buffer_address(mem_pools);
+    const size_t buffer_max = get_max_buffer_address(mem_pools);
+    const size_t pmc_min    = get_min_pmc_address(mem_pools);
+    const size_t pmc_max    = get_max_pmc_address(mem_pools);
 
     const size_t mask       =
         find_common_mask(interp,
@@ -504,7 +484,7 @@ trace_mem_block(PARROT_INTERP,
 
 /*
 
-=item C<static int is_buffer_ptr(PARROT_INTERP, Memory_Pools * const mem_pools,
+=item C<static int is_buffer_ptr(PARROT_INTERP, const Memory_Pools *mem_pools,
 const void *ptr)>
 
 Checks whether the given C<ptr> is located within one of the sized
@@ -516,9 +496,7 @@ header pools. Returns C<1> if it is, and C<0> if not.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-is_buffer_ptr(PARROT_INTERP,
-        ARGIN(Memory_Pools * const mem_pools),
-        ARGIN(const void *ptr))
+is_buffer_ptr(PARROT_INTERP, ARGIN(const Memory_Pools *mem_pools), ARGIN(const void *ptr))
 {
     ASSERT_ARGS(is_buffer_ptr)
     UINTVAL        i;
@@ -534,7 +512,7 @@ is_buffer_ptr(PARROT_INTERP,
 
 /*
 
-=item C<static int is_pmc_ptr(PARROT_INTERP, Memory_Pools * const mem_pools,
+=item C<static int is_pmc_ptr(PARROT_INTERP, const Memory_Pools *mem_pools,
 const void *ptr)>
 
 Checks that C<ptr> is actually a PMC pointer. Returns C<1> if it is, C<0>
@@ -546,9 +524,7 @@ otherwise.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-is_pmc_ptr(PARROT_INTERP,
-        ARGIN(Memory_Pools * const mem_pools),
-        ARGIN(const void *ptr))
+is_pmc_ptr(PARROT_INTERP, ARGIN(const Memory_Pools *mem_pools), ARGIN(const void *ptr))
 {
     ASSERT_ARGS(is_pmc_ptr)
         return contained_in_pool(interp, mem_pools->pmc_pool, ptr);
