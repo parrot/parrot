@@ -44,7 +44,6 @@ include/parrot/oplib/core_ops_switch.h            [main]include
 include/parrot/oplib/ops.h                        [main]include
 include/parrot/pbcversion.h                       [devel]include
 include/parrot/platform.h                         [main]include
-include/parrot/platform_interface.h               [main]include
 include/parrot/platform_limits.h                  [devel]include
 include/parrot/vtable.h                           [main]include
 install_config.fpmc                               [main]lib
