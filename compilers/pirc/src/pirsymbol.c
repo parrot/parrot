@@ -73,10 +73,11 @@ static local_label * new_local_label(
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static pir_reg * new_pir_reg(
-    ARGIN(lexer_state * const lexer),
+    ARGMOD(lexer_state *lexer),
     pir_type type,
     int regno)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*lexer);
 
 static int next_register(ARGIN(lexer_state * const lexer), pir_type type)
         __attribute__nonnull__(1);
@@ -439,8 +440,8 @@ find_symbol(ARGMOD(lexer_state *lexer), ARGIN(const char *name))
 
 /*
 
-=item C<static pir_reg * new_pir_reg(lexer_state *lexer, pir_type type,
-int regno)>
+=item C<static pir_reg * new_pir_reg(lexer_state *lexer, pir_type type, int
+regno)>
 
 Create a new PIR register node representing PIR/symbolic register
 identified by C<regno> and of type C<type>.
