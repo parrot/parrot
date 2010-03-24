@@ -130,7 +130,7 @@ pir_reg * find_register(
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-symbol * find_symbol(ARGMOD(lexer_state *lexer), ARGIN(const const * name))
+symbol * find_symbol(ARGMOD(lexer_state *lexer), ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*lexer);
