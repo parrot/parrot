@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008-2009, Parrot Foundation.
+Copyright (C) 2008-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -64,6 +64,7 @@ subroutine.
 
         /* Set value type to INTVAL */
         Parrot_pcc_invoke_method_from_c_args(interp, SELF, CONST_STRING(INTERP, "set_value_type"), "I->", (INTVAL)enum_type_INTVAL);
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 
 /*
