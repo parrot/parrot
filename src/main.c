@@ -42,20 +42,22 @@ PARROT_PURE_FUNCTION
 static int is_all_hex_digits(ARGIN(const char *s))
         __attribute__nonnull__(1);
 
-static void Parrot_version(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
+static void Parrot_version(void);
 PARROT_CAN_RETURN_NULL
 static const char * parseflags(PARROT_INTERP,
-    ARGIN(int *argc),
-    ARGIN(char **argv[]),
-    ARGIN(Parrot_Run_core_t *core),
-    ARGIN(Parrot_trace_flags *trace))
+    ARGMOD(int *argc),
+    ARGMOD(char **argv[]),
+    ARGMOD(Parrot_Run_core_t *core),
+    ARGMOD(Parrot_trace_flags *trace))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*argc)
+        FUNC_MODIFIES(*argv[])
+        FUNC_MODIFIES(*core)
+        FUNC_MODIFIES(*trace);
 
 static void parseflags_minimal(PARROT_INTERP, int argc, ARGIN(char *argv[]))
         __attribute__nonnull__(1)
@@ -69,8 +71,7 @@ static void usage(ARGMOD(FILE *fp))
 #define ASSERT_ARGS_help_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_is_all_hex_digits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
-#define ASSERT_ARGS_Parrot_version __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_version __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_parseflags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(argc) \
@@ -342,7 +343,7 @@ help(void)
 
 /*
 
-=item C<static void Parrot_version(PARROT_INTERP)>
+=item C<static void Parrot_version(void)>
 
 Print out parrot version number.
 
@@ -351,7 +352,7 @@ Print out parrot version number.
 */
 
 static void
-Parrot_version(PARROT_INTERP)
+Parrot_version(void)
 {
     ASSERT_ARGS(Parrot_version)
     printf("This is Parrot version " PARROT_VERSION);
@@ -382,9 +383,10 @@ parseflags_minimal(PARROT_INTERP, int argc, ARGIN(char *argv[]))
     ASSERT_ARGS(parseflags_minimal)
 
     int pos = 0;
-    const char *arg;
+
     while (pos < argc) {
-        arg = argv[pos];
+        const char *arg = argv[pos];
+
         if (STREQ(arg, "--gc")) {
             ++pos;
             if (pos == argc) {
@@ -442,8 +444,8 @@ Parse Parrot's command line for options and set appropriate flags.
 PARROT_CAN_RETURN_NULL
 static const char *
 parseflags(PARROT_INTERP,
-        ARGIN(int *argc), ARGIN(char **argv[]),
-        ARGIN(Parrot_Run_core_t *core), ARGIN(Parrot_trace_flags *trace))
+        ARGMOD(int *argc), ARGMOD(char **argv[]),
+        ARGMOD(Parrot_Run_core_t *core), ARGMOD(Parrot_trace_flags *trace))
 {
     ASSERT_ARGS(parseflags)
     struct longopt_opt_info opt  = LONGOPT_OPT_INFO_INIT;
@@ -461,8 +463,7 @@ parseflags(PARROT_INTERP,
 
     imcc_start_handling_flags(interp);
 
-    while ((status = longopt_get(interp, *argc, _tempargv, options,
-            &opt)) > 0) {
+    while ((status = longopt_get(interp, *argc, _tempargv, options, &opt)) > 0) {
         switch (opt.opt_id) {
           case 'R':
             if (STREQ(opt.opt_arg, "slow") || STREQ(opt.opt_arg, "bounds"))
@@ -536,7 +537,7 @@ parseflags(PARROT_INTERP,
                     Parrot_get_runtime_path(interp));
             exit(EXIT_SUCCESS);
           case 'V':
-            Parrot_version(interp);
+            Parrot_version();
             break;
 
           case OPT_GC_DEBUG:

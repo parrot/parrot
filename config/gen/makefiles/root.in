@@ -2520,6 +2520,7 @@ cagecritic:
 
 HEADERIZER_O_FILES = \
     $(O_FILES) \
+    src/main$(O) \
     src/packdump$(O) \
     src/pbc_merge$(O) \
     $(PIRC_O_FILES)
