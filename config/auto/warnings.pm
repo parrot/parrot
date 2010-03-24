@@ -104,6 +104,7 @@ sub _init {
         -fvisibility=hidden
         -funit-at-a-time
         -maccumulate-outgoing-args
+        -pedantic
         -W
         -Wall
         -Waggregate-return
@@ -256,6 +257,7 @@ sub _init {
     $data->{'warnings'}{'gcc'} = $gcc;
     $data->{'warnings'}{'g++'} = $gpp;
     $data->{'warnings'}{'icc'} = $icc;
+    $data->{'warnings'}{'clang'} = $gcc;
 
     ## end gcc/g++
 
@@ -274,6 +276,9 @@ sub runstep {
     }
     elsif ( $conf->option_or_data('cc') =~ /icc/ ) {
         $compiler = 'icc';
+    }
+    elsif ( $conf->option_or_data('cc') =~ /clang/ ) {
+        $compiler = 'clang';
     }
 
     if ($compiler eq '') {
