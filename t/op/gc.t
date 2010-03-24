@@ -77,7 +77,6 @@ GC related bugs.
 
 # sweep 0, with object that needs destroy/destroy
 .sub sweep_0_need_destroy_destroy_obj
-    sweep 1
     $P0 = new 'Undef'
     needs_destroy $P0
     $I1 = interpinfo .INTERPINFO_GC_MARK_RUNS   # How many GC mark runs have we done already?

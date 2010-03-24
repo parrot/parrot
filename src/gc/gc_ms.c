@@ -523,10 +523,6 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     --mem_pools->gc_mark_block_level;
     mem_pools->header_allocs_since_last_collect = 0;
 
-    /* Clean early GC */
-    if (!mem_pools->lazy_gc)
-        mem_pools->num_early_gc_PMCs = 0;
-
     return;
 }
 

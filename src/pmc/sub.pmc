@@ -417,10 +417,10 @@ Invokes the subroutine.
          * to the new context (refcounted) and convert the
          * retcontinuation to a normal continuation.  */
         if (PObj_get_FLAGS(SELF) & SUB_FLAG_IS_OUTER) {
+            sub->ctx = context;
             /* convert retcontinuation to a continuation */
             ccont->vtable = interp->vtables[enum_class_Continuation];
         }
-        sub->ctx = context;
 
         /* create pad if needed
          * TODO move this up in front of argument passing
@@ -632,6 +632,7 @@ Archives the subroutine.
     VTABLE void visit(PMC *info) {
         VISIT_PMC_ATTR(INTERP, info, SELF, Sub, namespace_name);
         VISIT_PMC_ATTR(INTERP, info, SELF, Sub, multi_signature);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Sub, outer_sub);
 
         /*
          * XXX visit_pmc_now is wrong, because it breaks
@@ -702,14 +703,6 @@ Archives the subroutine.
             sub->subid = CONST_STRING(INTERP, "");
 
         VTABLE_push_string(INTERP, info, sub->subid);
-
-        /* Store name of outer sub */
-        if (!PMC_IS_NULL(sub->outer_sub)) {
-            VTABLE_push_string(INTERP, info, VTABLE_get_string(INTERP, sub->outer_sub));
-        }
-        else {
-            VTABLE_push_string(INTERP, info, CONST_STRING(INTERP, ""));
-        }
     }
 
 
@@ -727,7 +720,6 @@ Unarchives the subroutine.
         Parrot_Sub_attributes *sub;
         INTVAL flags;
         int    i;
-        STRING *outer_name;
 
         SUPER(info);
 
@@ -752,14 +744,6 @@ Unarchives the subroutine.
             sub->n_regs_used[i] = VTABLE_shift_integer(INTERP, info);
 
         sub->subid        = VTABLE_shift_string(INTERP, info);
-
-        outer_name = VTABLE_shift_string(INTERP, info);
-        if (!Parrot_str_equal(INTERP, outer_name, CONST_STRING(INTERP, ""))) {
-            sub->outer_sub = Parrot_find_name_op(INTERP, outer_name, NULL);
-        }
-        else {
-            sub->outer_sub = PMCNULL;
-        }
     }
 
 
