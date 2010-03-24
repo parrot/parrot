@@ -329,8 +329,7 @@ next:
 
 /*
 
-=item C<INTVAL contained_in_pool(PARROT_INTERP, const Fixed_Size_Pool *pool,
-const void *ptr)>
+=item C<INTVAL contained_in_pool(const Fixed_Size_Pool *pool, const void *ptr)>
 
 Returns whether the given C<*ptr> points to a location in C<pool>.
 
@@ -340,7 +339,7 @@ Returns whether the given C<*ptr> points to a location in C<pool>.
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-contained_in_pool(PARROT_INTERP, ARGIN(const Fixed_Size_Pool *pool), ARGIN(const void *ptr))
+contained_in_pool(ARGIN(const Fixed_Size_Pool *pool), ARGIN(const void *ptr))
 {
     ASSERT_ARGS(contained_in_pool)
     const Fixed_Size_Arena *arena;
