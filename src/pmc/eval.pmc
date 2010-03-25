@@ -210,14 +210,9 @@ Invokes the first subroutine in the eval code.
             cur_cs->fixups = NULL;
         }
 
-/* XXX Commenting out this to fix TT #995 and related problems.
- * May leak some memory, need further revision.
-
         seg = (PackFile_Segment *)cur_cs;
         if (seg)
             PackFile_Segment_destroy(INTERP, seg);
- * XXX End of commented out section.
- */
 
         sub_data->seg = NULL;
 
