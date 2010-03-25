@@ -713,7 +713,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
         *error_message = NULL;
     }
     else {
-        PackFile_Segment_destroy(interp, new_cs);
+        PackFile_Segment_destroy(interp, (PackFile_Segment *)new_cs);
         *error_message = IMCC_INFO(interp)->error_message;
     }
 
