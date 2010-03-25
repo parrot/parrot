@@ -788,7 +788,7 @@ gc_ms_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
         const size_t idx = item_size - sizeof (void *);
         gc_ms_free_attributes_from_pool(pools[idx], data);
 #else
-        gc_ms_free_memory_chunk(intepr,PMC_data(pmc));
+        gc_ms_free_memory_chunk(intepr, PMC_data(pmc));
         PMC_data(pmc) = NULL;
 #endif
     }
