@@ -1105,7 +1105,8 @@ Parrot_compile_string(PARROT_INTERP, Parrot_String type,
 
     if (!interp->initial_pf) {
         /* SIDE EFFECT: PackFile_new_dummy sets interp->initial_pf */
-        PackFile_new_dummy(interp, Parrot_str_new_constant(interp, "compile_string"));
+        interp->initial_pf = PackFile_new_dummy(interp,
+            Parrot_str_new_constant(interp, "compile_string"));
         /* Assumption: there is no valid reason to fail to create it.
          * If the assumption changes, replace the assertion with a
          * runtime check */
