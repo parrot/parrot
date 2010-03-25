@@ -107,7 +107,7 @@ static void trace_system_stack(PARROT_INTERP,
 
 /*
 
-=item C<void trace_system_areas(PARROT_INTERP, Memory_Pools * const mem_pools)>
+=item C<void trace_system_areas(PARROT_INTERP, const Memory_Pools *mem_pools)>
 
 Initiates a trace of the system stack, looking for pointers which are being
 used by functions in the call chain, but which might not be marked as alive
@@ -120,8 +120,7 @@ tracing the stack is very straightforward.
 */
 
 void
-trace_system_areas(PARROT_INTERP,
-        ARGIN(Memory_Pools * const mem_pools))
+trace_system_areas(PARROT_INTERP, ARGIN(const Memory_Pools *mem_pools))
 {
     ASSERT_ARGS(trace_system_areas)
     {
@@ -242,8 +241,7 @@ variable in this function, which should be at the "top" of the stack.
 */
 
 static void
-trace_system_stack(PARROT_INTERP,
-        ARGIN(const Memory_Pools *mem_pools))
+trace_system_stack(PARROT_INTERP, ARGIN(const Memory_Pools *mem_pools))
 {
     ASSERT_ARGS(trace_system_stack)
     /* Create a local variable on the system stack. This represents the

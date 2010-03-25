@@ -314,8 +314,7 @@ typedef struct Memory_Pools {
 /* HEADERIZER BEGIN: src/gc/system.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void trace_system_areas(PARROT_INTERP,
-    ARGIN(Memory_Pools * const mem_pools))
+void trace_system_areas(PARROT_INTERP, ARGIN(const Memory_Pools *mem_pools))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -338,10 +337,11 @@ INTVAL contained_in_pool(
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Fixed_Size_Pool * get_bufferlike_pool(PARROT_INTERP,
-    ARGIN(Memory_Pools * const mem_pools),
+    ARGMOD(Memory_Pools *mem_pools),
     size_t buffer_size)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*mem_pools);
 
 PARROT_IGNORABLE_RESULT
 int /*@alt void@*/
@@ -360,43 +360,41 @@ void initialize_fixed_size_pools(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 void mark_special(PARROT_INTERP,
-    ARGIN(Memory_Pools * const mem_pools),
+    ARGMOD(Memory_Pools *mem_pools),
     ARGIN(PMC *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*mem_pools);
 
-void Parrot_add_to_free_list(PARROT_INTERP,
+void Parrot_add_to_free_list(SHIM_INTERP,
     ARGMOD(Fixed_Size_Pool *pool),
     ARGMOD(Fixed_Size_Arena *arena))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pool)
         FUNC_MODIFIES(*arena);
 
-void Parrot_append_arena_in_pool(PARROT_INTERP,
-    ARGIN(Memory_Pools * const mem_pools),
+void Parrot_append_arena_in_pool(SHIM_INTERP,
+    ARGMOD(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool),
     ARGMOD(Fixed_Size_Arena *new_arena),
     size_t size)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
+        FUNC_MODIFIES(*mem_pools)
         FUNC_MODIFIES(*pool)
         FUNC_MODIFIES(*new_arena);
 
-void Parrot_gc_clear_live_bits(PARROT_INTERP,
+void Parrot_gc_clear_live_bits(SHIM_INTERP,
     ARGIN(const Fixed_Size_Pool *pool))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-PMC_Attribute_Pool * Parrot_gc_get_attribute_pool(PARROT_INTERP,
+PMC_Attribute_Pool * Parrot_gc_get_attribute_pool(SHIM_INTERP,
     ARGIN(Memory_Pools * const mem_pools),
     size_t attrib_size)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
@@ -406,30 +404,30 @@ void * Parrot_gc_get_attributes_from_pool(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(* pool);
 
-void Parrot_gc_initialize_fixed_size_pools(PARROT_INTERP,
+void Parrot_gc_initialize_fixed_size_pools(SHIM_INTERP,
     ARGIN(Memory_Pools * const mem_pools),
     size_t init_num_pools)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void Parrot_gc_run_init(PARROT_INTERP,
-    ARGIN(Memory_Pools * const mem_pools))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+void Parrot_gc_run_init(SHIM_INTERP, ARGMOD(Memory_Pools *mem_pools))
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*mem_pools);
 
 void Parrot_gc_sweep_pool(PARROT_INTERP,
-    ARGIN(Memory_Pools * const mem_pools),
+    ARGMOD(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
+        FUNC_MODIFIES(*mem_pools)
         FUNC_MODIFIES(*pool);
 
 int Parrot_gc_trace_root(PARROT_INTERP,
-    ARGIN(Memory_Pools * const mem_pools),
+    ARGMOD(Memory_Pools *mem_pools),
     Parrot_gc_trace_type trace)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*mem_pools);
 
 #define ASSERT_ARGS_contained_in_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pool) \
@@ -449,31 +447,25 @@ int Parrot_gc_trace_root(PARROT_INTERP,
     , PARROT_ASSERT_ARG(mem_pools) \
     , PARROT_ASSERT_ARG(obj))
 #define ASSERT_ARGS_Parrot_add_to_free_list __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pool) \
+       PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(arena))
 #define ASSERT_ARGS_Parrot_append_arena_in_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mem_pools) \
+       PARROT_ASSERT_ARG(mem_pools) \
     , PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(new_arena))
 #define ASSERT_ARGS_Parrot_gc_clear_live_bits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pool))
+       PARROT_ASSERT_ARG(pool))
 #define ASSERT_ARGS_Parrot_gc_get_attribute_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mem_pools))
+       PARROT_ASSERT_ARG(mem_pools))
 #define ASSERT_ARGS_Parrot_gc_get_attributes_from_pool \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pool))
 #define ASSERT_ARGS_Parrot_gc_initialize_fixed_size_pools \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mem_pools))
+       PARROT_ASSERT_ARG(mem_pools))
 #define ASSERT_ARGS_Parrot_gc_run_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mem_pools))
+       PARROT_ASSERT_ARG(mem_pools))
 #define ASSERT_ARGS_Parrot_gc_sweep_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(mem_pools) \
