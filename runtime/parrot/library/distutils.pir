@@ -2255,8 +2255,6 @@ a string
 
 a hash
 
-=back
-
 =cut
 
 .sub '_smoke_prove' :anon
@@ -2373,8 +2371,6 @@ a hash
   L1:
 .end
 
-=item
-
 =item harness_exec
 
 the default value is with perl
@@ -2390,6 +2386,8 @@ the default value is report.tar.gz
 =item harness_files
 
 the default value is "t/*.t"
+
+=back
 
 =cut
 
