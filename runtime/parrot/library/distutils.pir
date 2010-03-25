@@ -2085,6 +2085,10 @@ Else run : prove t/*.t
 
 the default value is with perl
 
+=item harness_options
+
+the default value is empty
+
 =item harness_files
 
 the default value is "t/*.t"
@@ -2105,6 +2109,9 @@ the default value is "t/*.t"
     cmd .= "/tools/lib"
   L2:
     cmd .= " t/harness "
+    $S0 = get_value('harness_options', '' :named('default'), kv :flat :named)
+    cmd .= $S0
+    cmd .= " "
     $S0 = get_value('harness_files', "t/*.t" :named('default'), kv :flat :named)
     cmd .= $S0
     system(cmd, 1 :named('verbose'))
@@ -2204,12 +2211,14 @@ Unless t/harness exists, run : prove --archive t/*.t
   L2:
     die "Require Test::Harness v3.x (option --archive)."
   L1:
-    die "Don't known how to smoke with t/harness."
+    .tailcall _smoke_harness(kv :flat :named)
 .end
 
 .sub '_clean_smoke' :anon
     .param pmc kv :slurpy :named
     $S0 = get_value('prove_archive', "report.tar.gz" :named('default'), kv :flat :named)
+    unlink($S0, 1 :named('verbose'))
+    $S0 = get_value('harness_archive', "report.tar.gz" :named('default'), kv :flat :named)
     unlink($S0, 1 :named('verbose'))
     unlink('meta.yml', 1 :named('verbose'))
 .end
@@ -2275,8 +2284,16 @@ a hash
     cmd .= archive
     system(cmd, 1 :named('verbose'), 1 :named('ignore_error'))
 
+    add_extra_properties(archive, kv :flat :named)
+    smolder_post(archive, kv :flat :named)
+.end
+
+.sub 'add_extra_properties' :anon
+    .param string archive
+    .param pmc kv :slurpy :named
+    .local string cmd
     $I0 = exists kv['smolder_extra_properties']
-    unless $I0 goto L4
+    unless $I0 goto L1
     system('perl -MExtUtils::Command -e rm_rf tmp')
     cmd = "mkdir tmp && cd tmp && tar xzf ../"
     cmd .= archive
@@ -2293,42 +2310,7 @@ a hash
     cmd .= " *"
     system(cmd, 1 :named('verbose'))
     system('perl -MExtUtils::Command -e rm_rf tmp')
-  L4:
-
-    $I0 = exists kv['smolder_url']
-    unless $I0 goto L5
-    .local pmc config
-    config = get_config()
-    cmd = "curl -F architecture="
-    $S0 = config['cpuarch']
-    cmd .= $S0
-    cmd .= " -F platform="
-    $S0 = config['osname']
-    cmd .= $S0
-    cmd .= " -F revision="
-    $S0 = config['revision']
-    cmd .= $S0
-    $I0 = exists kv['smolder_tags']
-    unless $I0 goto L6
-    cmd .= " -F tags=\""
-    $S0 = kv['smolder_tags']
-    cmd .= $S0
-    cmd .= "\""
-  L6:
-    $I0 = exists kv['smolder_comments']
-    unless $I0 goto L7
-    cmd .= " -F comments=\""
-    $S0 = kv['smolder_comments']
-    cmd .= $S0
-    cmd .= "\""
-  L7:
-    cmd .= " -F report_file=@"
-    cmd .= archive
-    cmd .= " "
-    $S0 = kv['smolder_url']
-    cmd .= $S0
-    system(cmd, 1 :named('verbose'))
-  L5:
+  L1:
 .end
 
 .sub 'mk_extra_properties' :anon
@@ -2349,6 +2331,95 @@ a hash
     goto L1
   L2:
     .return ($S0)
+.end
+
+.sub 'smolder_post' :anon
+    .param string archive
+    .param pmc kv :slurpy :named
+    .local string cmd
+    $I0 = exists kv['smolder_url']
+    unless $I0 goto L1
+    .local pmc config
+    config = get_config()
+    cmd = "curl -F architecture="
+    $S0 = config['cpuarch']
+    cmd .= $S0
+    cmd .= " -F platform="
+    $S0 = config['osname']
+    cmd .= $S0
+    cmd .= " -F revision="
+    $S0 = config['revision']
+    cmd .= $S0
+    $I0 = exists kv['smolder_tags']
+    unless $I0 goto L2
+    cmd .= " -F tags=\""
+    $S0 = kv['smolder_tags']
+    cmd .= $S0
+    cmd .= "\""
+  L2:
+    $I0 = exists kv['smolder_comments']
+    unless $I0 goto L3
+    cmd .= " -F comments=\""
+    $S0 = kv['smolder_comments']
+    cmd .= $S0
+    cmd .= "\""
+  L3:
+    cmd .= " -F report_file=@"
+    cmd .= archive
+    cmd .= " "
+    $S0 = kv['smolder_url']
+    cmd .= $S0
+    system(cmd, 1 :named('verbose'))
+  L1:
+.end
+
+=item
+
+=item harness_exec
+
+the default value is with perl
+
+=item harness_options
+
+the default value is empty
+
+=item harness_archive
+
+the default value is report.tar.gz
+
+=item harness_files
+
+the default value is "t/*.t"
+
+=cut
+
+.sub '_smoke_harness' :anon
+    .param pmc kv :slurpy :named
+    .local string cmd
+    $I0 = exists kv['harness_exec']
+    unless $I0 goto L1
+    cmd = kv['harness_exec']
+    goto L2
+  L1:
+    cmd = "perl -I"
+    $S0 = get_libdir()
+    cmd .= $S0
+    cmd .= "/tools/lib"
+  L2:
+    cmd .= " t/harness "
+    $S0 = get_value('harness_options', '' :named('default'), kv :flat :named)
+    cmd .= $S0
+    cmd .= " --archive="
+    .local string archive
+    archive = get_value('harness_archive', "report.tar.gz" :named('default'), kv :flat :named)
+    cmd .= archive
+    cmd .= " "
+    $S0 = get_value('harness_files', "t/*.t" :named('default'), kv :flat :named)
+    cmd .= $S0
+    system(cmd, 1 :named('verbose'), 1 :named('ignore_error'))
+
+    add_extra_properties(archive, kv :flat :named)
+    smolder_post(archive, kv :flat :named)
 .end
 
 =head3 Step install
