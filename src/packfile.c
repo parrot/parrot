@@ -2682,9 +2682,7 @@ pf_debug_new(PARROT_INTERP, SHIM(PackFile *pf), SHIM(STRING *name), SHIM(int add
     ASSERT_ARGS(pf_debug_new)
     PackFile_Debug * const debug = mem_gc_allocate_zeroed_typed(interp, PackFile_Debug);
 
-    debug->mappings              = mem_gc_allocate_zeroed_typed(interp,
-            PackFile_DebugFilenameMapping *);
-    debug->mappings[0]           = NULL;
+    /* don't create initial mappings here; they'll get overwritten later */
 
     return (PackFile_Segment *)debug;
 }
