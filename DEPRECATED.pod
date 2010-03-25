@@ -226,6 +226,16 @@ renamed to Parrot_str_is_null
 
 rename Parrot_string_cstring to Parrot_str_cstring
 
+=item Parrot_PMC_* in src/extend.c [eligible in 2.4]
+
+These are duplicates of functions in src/extend_vtable.c. Exceptions:
+
+  Parrot_PMC_new
+  Parrot_PMC_typenum
+  Parrot_PMC_null
+  Parrot_PMC_set_vtable
+  Parrot_PMC_newclass
+
 =back
 
 =head1 Compiler tools
