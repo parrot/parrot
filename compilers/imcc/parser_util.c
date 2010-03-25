@@ -654,7 +654,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
     eval_number = ++eval_nr;
     UNLOCK(eval_nr_lock);
 
-    name = Parrot_sprintf_c(interp, "EVAL_" INTVAL_FMT, eval_number);
+    name   = Parrot_sprintf_c(interp, "EVAL_" INTVAL_FMT, eval_number);
     new_cs = PF_create_default_segs(interp, name, 0);
     old_cs = Parrot_switch_to_cs(interp, new_cs, 0);
 
@@ -713,6 +713,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
         *error_message = NULL;
     }
     else {
+        PackFile_Segment_destroy(interp, new_cs);
         *error_message = IMCC_INFO(interp)->error_message;
     }
 
