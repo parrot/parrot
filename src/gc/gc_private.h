@@ -175,7 +175,7 @@ typedef struct Memory_Block {
 
 typedef struct Variable_Size_Pool {
     Memory_Block *top_block;
-    void (*compact)(PARROT_INTERP, struct Memory_Pools *const, struct Variable_Size_Pool *);
+    void (*compact)(PARROT_INTERP, struct Memory_Pools *, struct Variable_Size_Pool *);
     size_t minimum_block_size;
     size_t total_allocated; /* total bytes allocated to this pool */
     size_t guaranteed_reclaimable;     /* bytes that can definitely be reclaimed*/
@@ -346,18 +346,20 @@ Fixed_Size_Pool * get_bufferlike_pool(PARROT_INTERP,
 PARROT_IGNORABLE_RESULT
 int /*@alt void@*/
 header_pools_iterate_callback(PARROT_INTERP,
-    ARGIN(Memory_Pools *mem_pools),
+    ARGMOD(Memory_Pools *mem_pools),
     int flag,
     ARGIN_NULLOK(void *arg),
     NOTNULL(pool_iter_fn func))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*mem_pools);
 
 void initialize_fixed_size_pools(PARROT_INTERP,
-    ARGIN(Memory_Pools * const mem_pools))
+    ARGMOD(Memory_Pools *mem_pools))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*mem_pools);
 
 void mark_special(PARROT_INTERP,
     ARGMOD(Memory_Pools *mem_pools),
@@ -501,27 +503,30 @@ void check_buffer_ptr(
         FUNC_MODIFIES(* pool);
 
 void compact_pool(PARROT_INTERP,
-    ARGIN(Memory_Pools * const mem_pools),
+    ARGMOD(Memory_Pools *mem_pools),
     ARGMOD(Variable_Size_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
+        FUNC_MODIFIES(*mem_pools)
         FUNC_MODIFIES(*pool);
 
 void initialize_var_size_pools(PARROT_INTERP,
-    ARGIN(Memory_Pools * const mem_pools))
+    ARGMOD(Memory_Pools *mem_pools))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*mem_pools);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void * mem_allocate(PARROT_INTERP,
-    ARGIN(Memory_Pools * const mem_pools),
+    ARGMOD(Memory_Pools *mem_pools),
     size_t size,
     ARGMOD(Variable_Size_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
+        FUNC_MODIFIES(*mem_pools)
         FUNC_MODIFIES(*pool);
 
 void merge_pools(
@@ -533,23 +538,26 @@ void merge_pools(
         FUNC_MODIFIES(*source);
 
 void Parrot_gc_destroy_header_pools(PARROT_INTERP,
-    ARGIN(Memory_Pools * const mem_pools))
+    ARGMOD(Memory_Pools *mem_pools))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*mem_pools);
 
 void Parrot_gc_destroy_memory_pools(PARROT_INTERP,
-    ARGIN(Memory_Pools * const mem_pools))
+    ARGMOD(Memory_Pools *mem_pools))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*mem_pools);
 
 void Parrot_gc_merge_memory_pools(
     ARGMOD(Interp *dest_interp),
-    ARGIN(Memory_Pools * const dest_arena),
-    ARGIN(Memory_Pools * const source_arena))
+    ARGMOD(Memory_Pools *dest_arena),
+    ARGIN(const Memory_Pools *source_arena))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*dest_interp);
+        FUNC_MODIFIES(*dest_interp)
+        FUNC_MODIFIES(*dest_arena);
 
 #define ASSERT_ARGS_aligned_mem __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(buffer) \

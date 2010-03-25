@@ -765,8 +765,8 @@ get_bufferlike_pool(PARROT_INTERP,
 
 /*
 
-=item C<void initialize_fixed_size_pools(PARROT_INTERP, Memory_Pools * const
-mem_pools)>
+=item C<void initialize_fixed_size_pools(PARROT_INTERP, Memory_Pools
+*mem_pools)>
 
 The initialization routine for the interpreter's header pools. Initializes
 pools for string headers, constant string headers, buffers, PMCs and
@@ -780,8 +780,7 @@ sized pools, although no other sized pools are created here.
 */
 
 void
-initialize_fixed_size_pools(PARROT_INTERP,
-        ARGIN(Memory_Pools * const mem_pools))
+initialize_fixed_size_pools(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools))
 {
     ASSERT_ARGS(initialize_fixed_size_pools)
 
@@ -856,7 +855,7 @@ the function returns a non-zero value, iteration will stop.
 PARROT_IGNORABLE_RESULT
 int
 header_pools_iterate_callback(PARROT_INTERP,
-        ARGIN(Memory_Pools *mem_pools),
+        ARGMOD(Memory_Pools *mem_pools),
         int flag, ARGIN_NULLOK(void *arg),
         NOTNULL(pool_iter_fn func))
 {
