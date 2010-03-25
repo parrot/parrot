@@ -236,6 +236,14 @@ These are duplicates of functions in src/extend_vtable.c. Exceptions:
   Parrot_PMC_set_vtable
   Parrot_PMC_newclass
 
+=item Parrot_VTABLE, Parrot_get_vtable, Parrot_PMC_set_vtable [eligible in 2.4]
+
+These do not expose any functionality that should be available to code outside
+of parrot core.
+
+These might get revived in some form to allow for creating new types and adding
+vtable-overrides, if that functionality becomes desired.
+
 =back
 
 =head1 Compiler tools
