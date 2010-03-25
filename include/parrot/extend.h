@@ -244,6 +244,12 @@ void Parrot_PMC_push_pmcval(PARROT_INTERP, Parrot_PMC pmc, Parrot_PMC value)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+void Parrot_PMC_push_string(PARROT_INTERP,
+    Parrot_PMC pmc,
+    Parrot_String value)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 void Parrot_PMC_set_cstring(PARROT_INTERP,
     Parrot_PMC pmc,
     ARGIN_NULLOK(const char *value))
@@ -463,6 +469,8 @@ int Parrot_vfprintf(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_PMC_push_numval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_PMC_push_pmcval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_PMC_push_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_PMC_set_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
