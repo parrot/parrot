@@ -1204,7 +1204,7 @@ PackFile_add_segment(PARROT_INTERP, ARGMOD(PackFile_Directory *dir),
 {
     ASSERT_ARGS(PackFile_add_segment)
     dir->segments = mem_gc_realloc_n_typed_zeroed(interp, dir->segments,
-            dir->num_segments+1, dir->num_segments, PackFile_Segment *);
+            dir->num_segments + 1, dir->num_segments, PackFile_Segment *);
     dir->segments[dir->num_segments] = seg;
     dir->num_segments++;
     seg->dir = dir;
@@ -2063,7 +2063,7 @@ static const opcode_t *
 directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opcode_t *cursor))
 {
     ASSERT_ARGS(directory_unpack)
-    PackFile_Directory * const dir = (PackFile_Directory *) segp;
+    PackFile_Directory * const dir = (PackFile_Directory *)segp;
     PackFile           * const pf  = dir->base.pf;
     const opcode_t            *pos;
     size_t                     i;
@@ -2094,7 +2094,7 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
 
         /* create it */
         name = Parrot_str_new(interp, buf, strlen(buf));
-        seg = PackFile_Segment_new_seg(interp, dir, type, name, 0);
+        seg  = PackFile_Segment_new_seg(interp, dir, type, name, 0);
         mem_gc_free(interp, buf);
 
         seg->file_offset = PF_fetch_opcode(pf, &cursor);
@@ -2133,7 +2133,7 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
         }
 
         if (i) {
-            PackFile_Segment *last = dir->segments[i-1];
+            PackFile_Segment *last = dir->segments[i - 1];
             if (last->file_offset + last->op_count != seg->file_offset)
                 fprintf(stderr, "section: sections are not back to back\n");
         }
@@ -2227,18 +2227,13 @@ directory_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
         /* Prevent repeated destruction */
         dir->segments[i] = NULL;
 
-        /* XXX Black magic here.
-         * There are some failures that looks like a segment directory
-         * inserted into another. Until that problems gets fixed,
-         * these checks are a workaround.
-         */
-        if (segment && segment != self && segment->type != PF_DIR_SEG)
+        if (segment && segment != self)
             PackFile_Segment_destroy(interp, segment);
     }
 
     if (dir->segments) {
         mem_gc_free(interp, dir->segments);
-        dir->segments = NULL;
+        dir->segments     = NULL;
         dir->num_segments = 0;
     }
 }
@@ -4720,7 +4715,7 @@ compile_or_load_file(PARROT_INTERP, ARGIN(STRING *path),
         pf->header = NULL;
         mem_gc_free(interp, pf->dirp);
         pf->dirp   = NULL;
-
+        /* no need to free pf here, as directory_destroy will get it */
     }
     else {
         STRING *err;
