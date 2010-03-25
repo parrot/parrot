@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -1049,11 +1049,14 @@ Parrot_ext_call(PARROT_INTERP, ARGIN(Parrot_PMC sub_pmc),
     va_list args;
     PMC  *call_obj;
     char *arg_sig, *ret_sig;
-    PMC    *old_call_obj = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
+
+    PMC  *old_call_obj = Parrot_pcc_get_signature(interp,
+        CURRENT_CONTEXT(interp));
     Parrot_pcc_split_signature_string(interp, signature, &arg_sig, &ret_sig);
 
     va_start(args, signature);
-    call_obj = Parrot_pcc_build_call_from_varargs(interp, PMCNULL, arg_sig, &args);
+    call_obj = Parrot_pcc_build_call_from_varargs(interp, PMCNULL,
+        arg_sig, &args);
 
     Parrot_pcc_invoke_from_sig_object(interp, sub_pmc, call_obj);
     call_obj = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
@@ -1061,7 +1064,10 @@ Parrot_ext_call(PARROT_INTERP, ARGIN(Parrot_PMC sub_pmc),
             PARROT_ERRORS_RESULT_COUNT_FLAG);
     va_end(args);
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), old_call_obj);
+    mem_gc_free(interp, arg_sig);
+    mem_gc_free(interp, ret_sig);
 }
+
 
 /*
 
