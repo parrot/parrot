@@ -1704,6 +1704,7 @@ fulltest :
 	testS \
 	src_tests \
 	run_tests \
+	buildtools_tests \
 	perl_tests \
 	library_tests \
 	nqp_test \
