@@ -864,27 +864,6 @@ Parrot_PMC_push_numval(PARROT_INTERP, Parrot_PMC pmc, Parrot_Float value)
 
 /*
 
-=item C<void Parrot_PMC_push_string(PARROT_INTERP, Parrot_PMC pmc, Parrot_String
-value)>
-
-Push the passed-in Parrot string onto the passed in PMC
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_PMC_push_string(PARROT_INTERP, Parrot_PMC pmc, Parrot_String value)
-{
-    ASSERT_ARGS(Parrot_PMC_push_string)
-    PARROT_CALLIN_START(interp);
-    VTABLE_push_string(interp, pmc, value);
-    PARROT_CALLIN_END(interp);
-}
-
-/*
-
 =item C<void Parrot_PMC_push_pmcval(PARROT_INTERP, Parrot_PMC pmc, Parrot_PMC
 value)>
 
