@@ -236,11 +236,11 @@ Initializes the PMC.
 
 */
     VTABLE void init() {
-        PARROT_IMAGEIO(SELF)->buffer      = NULL;
-        PARROT_IMAGEIO(SELF)->todo        = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-        PARROT_IMAGEIO(SELF)->seen        = PMCNULL;
-        PARROT_IMAGEIO(SELF)->id          = 0;
-        PARROT_IMAGEIO(SELF)->pf          = PackFile_new(INTERP, 0);
+        PARROT_IMAGEIO(SELF)->buffer = NULL;
+        PARROT_IMAGEIO(SELF)->todo   = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        PARROT_IMAGEIO(SELF)->seen   = PMCNULL;
+        PARROT_IMAGEIO(SELF)->id     = 0;
+        PARROT_IMAGEIO(SELF)->pf     = PackFile_new(INTERP, 0);
 
         PObj_custom_mark_destroy_SETALL(SELF);
     }
@@ -257,6 +257,7 @@ Destroys the PMC.
 */
     VTABLE void destroy() {
         PackFile_destroy(INTERP, PARROT_IMAGEIO(SELF)->pf);
+        PARROT_IMAGEIO(SELF)->pf = NULL;
     }
 
 /*
