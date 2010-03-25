@@ -83,6 +83,7 @@ static void Parrot_gc_allocate_new_attributes_arena(
         FUNC_MODIFIES(*pool);
 
 PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
 static PMC_Attribute_Pool * Parrot_gc_create_attrib_pool(size_t attrib_idx);
 
 #define ASSERT_ARGS_free_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -814,8 +815,8 @@ initialize_fixed_size_pools(PARROT_INTERP,
 
 /*
 
-=item C<int header_pools_iterate_callback(PARROT_INTERP, Memory_Pools * const
-mem_pools, int flag, void *arg, pool_iter_fn func)>
+=item C<int header_pools_iterate_callback(PARROT_INTERP, Memory_Pools
+*mem_pools, int flag, void *arg, pool_iter_fn func)>
 
 Iterates through header pools, invoking the given callback function on each
 pool in the list matching the given criteria. Determines which pools to iterate
@@ -855,7 +856,7 @@ the function returns a non-zero value, iteration will stop.
 PARROT_IGNORABLE_RESULT
 int
 header_pools_iterate_callback(PARROT_INTERP,
-        ARGIN(Memory_Pools * const mem_pools),
+        ARGIN(Memory_Pools *mem_pools),
         int flag, ARGIN_NULLOK(void *arg),
         NOTNULL(pool_iter_fn func))
 {
@@ -914,13 +915,13 @@ information on the size of the item to allocate already.
 
 Allocate a new arena of fixed-sized data structures for the given pool.
 
-=item C<void Parrot_gc_initialize_fixed_size_pools(PARROT_INTERP, Memory_Pools *
-const mem_pools, size_t init_num_pools)>
+=item C<void Parrot_gc_initialize_fixed_size_pools(PARROT_INTERP, Memory_Pools
+*mem_pools, size_t init_num_pools)>
 
 Initialize the pools (zeroize)
 
 =item C<PMC_Attribute_Pool * Parrot_gc_get_attribute_pool(PARROT_INTERP,
-Memory_Pools * const mem_pools, size_t attrib_size)>
+Memory_Pools *mem_pools, size_t attrib_size)>
 
 Find a fixed-sized data structure pool given the size of the object to
 allocate. If the pool does not exist, create it.
@@ -1009,7 +1010,7 @@ Parrot_gc_allocate_new_attributes_arena(ARGMOD(PMC_Attribute_Pool *pool))
 
 void
 Parrot_gc_initialize_fixed_size_pools(SHIM_INTERP,
-        ARGIN(Memory_Pools * const mem_pools),
+        ARGMOD(Memory_Pools *mem_pools),
         size_t init_num_pools)
 {
     ASSERT_ARGS(Parrot_gc_initialize_fixed_size_pools)
@@ -1027,7 +1028,7 @@ Parrot_gc_initialize_fixed_size_pools(SHIM_INTERP,
 PARROT_CANNOT_RETURN_NULL
 PMC_Attribute_Pool *
 Parrot_gc_get_attribute_pool(SHIM_INTERP,
-        ARGIN(Memory_Pools * const mem_pools),
+        ARGMOD(Memory_Pools *mem_pools),
         size_t attrib_size)
 {
     ASSERT_ARGS(Parrot_gc_get_attribute_pool)
@@ -1060,6 +1061,7 @@ Parrot_gc_get_attribute_pool(SHIM_INTERP,
 }
 
 PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
 static PMC_Attribute_Pool *
 Parrot_gc_create_attrib_pool(size_t attrib_idx)
 {

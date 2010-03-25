@@ -31,16 +31,13 @@ static void failed_allocation(unsigned int line, unsigned long size) /* HEADERIZ
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static int gc_ms_active_sized_buffers(PARROT_INTERP,
-    ARGIN(Memory_Pools * const mem_pools))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+static int gc_ms_active_sized_buffers(ARGIN(const Memory_Pools *mem_pools))
+        __attribute__nonnull__(1);
 
 static void gc_ms_add_free_object(SHIM_INTERP,
-    ARGIN(Memory_Pools *mem_pools),
+    SHIM(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool),
     ARGIN(void *to_add))
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*pool);
@@ -67,13 +64,11 @@ static Buffer * gc_ms_allocate_bufferlike_header(PARROT_INTERP, size_t size)
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-static void * gc_ms_allocate_memory_chunk(PARROT_INTERP, size_t size)
-        __attribute__nonnull__(1);
+static void * gc_ms_allocate_memory_chunk(SHIM_INTERP, size_t size);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-static void * gc_ms_allocate_memory_chunk_zeroed(PARROT_INTERP, size_t size)
-        __attribute__nonnull__(1);
+static void * gc_ms_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size);
 
 PARROT_CAN_RETURN_NULL
 static PMC* gc_ms_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
@@ -104,12 +99,11 @@ static void gc_ms_finalize_memory_pools(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_ms_free_attributes_from_pool(PARROT_INTERP,
+static void gc_ms_free_attributes_from_pool(
     ARGMOD(PMC_Attribute_Pool *pool),
     ARGMOD(void *data))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
         FUNC_MODIFIES(*pool)
         FUNC_MODIFIES(*data);
 
@@ -120,9 +114,7 @@ static void gc_ms_free_bufferlike_header(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*obj);
 
-static void gc_ms_free_memory_chunk(PARROT_INTERP, ARGFREE(void *data))
-        __attribute__nonnull__(1);
-
+static void gc_ms_free_memory_chunk(SHIM_INTERP, ARGFREE(void *data));
 static void gc_ms_free_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -180,18 +172,16 @@ static void gc_ms_reallocate_buffer_storage(PARROT_INTERP,
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-static void * gc_ms_reallocate_memory_chunk(PARROT_INTERP,
+static void * gc_ms_reallocate_memory_chunk(SHIM_INTERP,
     ARGFREE(void *from),
-    size_t size)
-        __attribute__nonnull__(1);
+    size_t size);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-static void * gc_ms_reallocate_memory_chunk_zeroed(PARROT_INTERP,
+static void * gc_ms_reallocate_memory_chunk_zeroed(SHIM_INTERP,
     ARGFREE(void *data),
     size_t newsize,
-    size_t oldsize)
-        __attribute__nonnull__(1);
+    size_t oldsize);
 
 static void gc_ms_reallocate_string_storage(PARROT_INTERP,
     ARGMOD(STRING *str),
@@ -212,10 +202,8 @@ static int gc_ms_sweep_cb(PARROT_INTERP,
         FUNC_MODIFIES(*pool)
         FUNC_MODIFIES(*arg);
 
-static int gc_ms_total_sized_buffers(PARROT_INTERP,
-    ARGIN(Memory_Pools * const mem_pools))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+static int gc_ms_total_sized_buffers(ARGIN(const Memory_Pools *mem_pools))
+        __attribute__nonnull__(1);
 
 static int gc_ms_trace_active_PMCs(PARROT_INTERP,
     Parrot_gc_trace_type trace)
@@ -228,11 +216,9 @@ static void gc_ms_unblock_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_gc_ms_active_sized_buffers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mem_pools))
+       PARROT_ASSERT_ARG(mem_pools))
 #define ASSERT_ARGS_gc_ms_add_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(mem_pools) \
-    , PARROT_ASSERT_ARG(pool) \
+       PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(to_add))
 #define ASSERT_ARGS_gc_ms_alloc_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -244,11 +230,9 @@ static void gc_ms_unblock_GC_sweep(PARROT_INTERP)
 #define ASSERT_ARGS_gc_ms_allocate_bufferlike_header \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_gc_ms_allocate_memory_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms_allocate_memory_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_ms_allocate_memory_chunk_zeroed \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_ms_allocate_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms_allocate_string_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -267,14 +251,12 @@ static void gc_ms_unblock_GC_sweep(PARROT_INTERP)
     , PARROT_ASSERT_ARG(mem_pools))
 #define ASSERT_ARGS_gc_ms_free_attributes_from_pool \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pool) \
+       PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(data))
 #define ASSERT_ARGS_gc_ms_free_bufferlike_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(obj))
-#define ASSERT_ARGS_gc_ms_free_memory_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms_free_memory_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_ms_free_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
@@ -306,11 +288,9 @@ static void gc_ms_unblock_GC_sweep(PARROT_INTERP)
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(buffer))
-#define ASSERT_ARGS_gc_ms_reallocate_memory_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms_reallocate_memory_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_ms_reallocate_memory_chunk_zeroed \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_ms_reallocate_string_storage \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -321,8 +301,7 @@ static void gc_ms_unblock_GC_sweep(PARROT_INTERP)
     , PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(arg))
 #define ASSERT_ARGS_gc_ms_total_sized_buffers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mem_pools))
+       PARROT_ASSERT_ARG(mem_pools))
 #define ASSERT_ARGS_gc_ms_trace_active_PMCs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms_unblock_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -807,9 +786,9 @@ gc_ms_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
         const size_t item_size = attr_size < sizeof (void *) ? sizeof (void *) : attr_size;
         PMC_Attribute_Pool ** const pools = interp->mem_pools->attrib_pools;
         const size_t idx = item_size - sizeof (void *);
-        gc_ms_free_attributes_from_pool(interp, pools[idx], data);
+        gc_ms_free_attributes_from_pool(pools[idx], data);
 #else
-        gc_ms_free_memory_chunk(PMC_data(pmc));
+        gc_ms_free_memory_chunk(intepr,PMC_data(pmc));
         PMC_data(pmc) = NULL;
 #endif
     }
@@ -817,8 +796,8 @@ gc_ms_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<static void gc_ms_free_attributes_from_pool(PARROT_INTERP,
-PMC_Attribute_Pool *pool, void *data)>
+=item C<static void gc_ms_free_attributes_from_pool(PMC_Attribute_Pool *pool,
+void *data)>
 
 Frees a fixed-size data item back to the pool for later reallocation.  Private
 to this file.
@@ -826,9 +805,7 @@ to this file.
 */
 
 static void
-gc_ms_free_attributes_from_pool(PARROT_INTERP,
-    ARGMOD(PMC_Attribute_Pool *pool),
-    ARGMOD(void *data))
+gc_ms_free_attributes_from_pool(ARGMOD(PMC_Attribute_Pool *pool), ARGMOD(void *data))
 {
     ASSERT_ARGS(gc_ms_free_attributes_from_pool)
     PMC_Attribute_Free_List * const item = (PMC_Attribute_Free_List *)data;
@@ -1101,7 +1078,7 @@ gc_ms_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGMOD(void *data))
 
     const size_t idx   = size - sizeof (void *);
     PMC_Attribute_Pool ** const pools = interp->mem_pools->attrib_pools;
-    gc_ms_free_attributes_from_pool(interp, pools[idx], data);
+    gc_ms_free_attributes_from_pool(pools[idx], data);
 }
 
 /*
@@ -1126,7 +1103,7 @@ TODO Write docu.
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static void *
-gc_ms_allocate_memory_chunk(PARROT_INTERP, size_t size)
+gc_ms_allocate_memory_chunk(SHIM_INTERP, size_t size)
 {
     ASSERT_ARGS(gc_ms_allocate_memory_chunk)
     void * const ptr = malloc(size);
@@ -1141,7 +1118,7 @@ gc_ms_allocate_memory_chunk(PARROT_INTERP, size_t size)
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static void *
-gc_ms_reallocate_memory_chunk(PARROT_INTERP, ARGFREE(void *from), size_t size)
+gc_ms_reallocate_memory_chunk(SHIM_INTERP, ARGFREE(void *from), size_t size)
 {
     ASSERT_ARGS(gc_ms_reallocate_memory_chunk)
     void *ptr;
@@ -1163,7 +1140,7 @@ gc_ms_reallocate_memory_chunk(PARROT_INTERP, ARGFREE(void *from), size_t size)
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static void *
-gc_ms_allocate_memory_chunk_zeroed(PARROT_INTERP, size_t size)
+gc_ms_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size)
 {
     ASSERT_ARGS(gc_ms_allocate_memory_chunk_zeroed)
     void * const ptr = calloc(1, (size_t)size);
@@ -1178,7 +1155,7 @@ gc_ms_allocate_memory_chunk_zeroed(PARROT_INTERP, size_t size)
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static void *
-gc_ms_reallocate_memory_chunk_zeroed(PARROT_INTERP, ARGFREE(void *data),
+gc_ms_reallocate_memory_chunk_zeroed(SHIM_INTERP, ARGFREE(void *data),
         size_t newsize, size_t oldsize)
 {
     ASSERT_ARGS(gc_ms_reallocate_memory_chunk_zeroed)
@@ -1189,7 +1166,7 @@ gc_ms_reallocate_memory_chunk_zeroed(PARROT_INTERP, ARGFREE(void *data),
 }
 
 static void
-gc_ms_free_memory_chunk(PARROT_INTERP, ARGFREE(void *data))
+gc_ms_free_memory_chunk(SHIM_INTERP, ARGFREE(void *data))
 {
     ASSERT_ARGS(gc_ms_free_memory_chunk)
 #ifdef DETAIL_MEMORY_DEBUG
@@ -1336,7 +1313,7 @@ the PObj flags to indicate that the item is free.
 
 static void
 gc_ms_add_free_object(SHIM_INTERP,
-        ARGIN(Memory_Pools *mem_pools),
+        SHIM(Memory_Pools *mem_pools),
         ARGMOD(Fixed_Size_Pool *pool),
         ARGIN(void *to_add))
 {
@@ -1580,11 +1557,11 @@ gc_ms_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
             return mem_pools->pmc_pool->total_objects -
                    mem_pools->pmc_pool->num_free_objects;
         case ACTIVE_BUFFERS:
-            return gc_ms_active_sized_buffers(interp, mem_pools);
+            return gc_ms_active_sized_buffers(mem_pools);
         case TOTAL_PMCS:
             return mem_pools->pmc_pool->total_objects;
         case TOTAL_BUFFERS:
-            return gc_ms_total_sized_buffers(interp, mem_pools);
+            return gc_ms_total_sized_buffers(mem_pools);
         case HEADER_ALLOCS_SINCE_COLLECT:
             return mem_pools->header_allocs_since_last_collect;
         case MEM_ALLOCS_SINCE_COLLECT:
@@ -1604,8 +1581,7 @@ gc_ms_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
 
 /*
 
-=item C<static int gc_ms_active_sized_buffers(PARROT_INTERP, Memory_Pools *
-const mem_pools)>
+=item C<static int gc_ms_active_sized_buffers(const Memory_Pools *mem_pools)>
 
 Returns the number of actively used sized buffers.
 
@@ -1614,8 +1590,7 @@ Returns the number of actively used sized buffers.
 */
 
 static int
-gc_ms_active_sized_buffers(PARROT_INTERP,
-        ARGIN(Memory_Pools * const mem_pools))
+gc_ms_active_sized_buffers(ARGIN(const Memory_Pools *mem_pools))
 {
     ASSERT_ARGS(gc_ms_active_sized_buffers)
     int j, ret = 0;
@@ -1631,8 +1606,7 @@ gc_ms_active_sized_buffers(PARROT_INTERP,
 
 /*
 
-=item C<static int gc_ms_total_sized_buffers(PARROT_INTERP, Memory_Pools * const
-mem_pools)>
+=item C<static int gc_ms_total_sized_buffers(const Memory_Pools *mem_pools)>
 
 Returns the total number of sized buffers that we are managing.
 
@@ -1641,8 +1615,7 @@ Returns the total number of sized buffers that we are managing.
 */
 
 static int
-gc_ms_total_sized_buffers(PARROT_INTERP,
-        ARGIN(Memory_Pools * const mem_pools))
+gc_ms_total_sized_buffers(ARGIN(const Memory_Pools *mem_pools))
 {
     ASSERT_ARGS(gc_ms_total_sized_buffers)
     int j, ret = 0;

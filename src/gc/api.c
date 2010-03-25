@@ -382,7 +382,7 @@ Frees the PMC_sync field of the PMC, if one exists.
 */
 
 void
-Parrot_gc_free_pmc_sync(PARROT_INTERP, ARGMOD(PMC *p))
+Parrot_gc_free_pmc_sync(SHIM_INTERP, ARGMOD(PMC *p))
 {
     ASSERT_ARGS(Parrot_gc_free_pmc_sync)
 

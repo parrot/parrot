@@ -346,7 +346,7 @@ Fixed_Size_Pool * get_bufferlike_pool(PARROT_INTERP,
 PARROT_IGNORABLE_RESULT
 int /*@alt void@*/
 header_pools_iterate_callback(PARROT_INTERP,
-    ARGIN(Memory_Pools * const mem_pools),
+    ARGIN(Memory_Pools *mem_pools),
     int flag,
     ARGIN_NULLOK(void *arg),
     NOTNULL(pool_iter_fn func))
@@ -393,9 +393,10 @@ void Parrot_gc_clear_live_bits(SHIM_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 PMC_Attribute_Pool * Parrot_gc_get_attribute_pool(SHIM_INTERP,
-    ARGIN(Memory_Pools * const mem_pools),
+    ARGMOD(Memory_Pools *mem_pools),
     size_t attrib_size)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*mem_pools);
 
 PARROT_CANNOT_RETURN_NULL
 void * Parrot_gc_get_attributes_from_pool(PARROT_INTERP,
@@ -405,9 +406,10 @@ void * Parrot_gc_get_attributes_from_pool(PARROT_INTERP,
         FUNC_MODIFIES(* pool);
 
 void Parrot_gc_initialize_fixed_size_pools(SHIM_INTERP,
-    ARGIN(Memory_Pools * const mem_pools),
+    ARGMOD(Memory_Pools *mem_pools),
     size_t init_num_pools)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*mem_pools);
 
 void Parrot_gc_run_init(SHIM_INTERP, ARGMOD(Memory_Pools *mem_pools))
         __attribute__nonnull__(2)
