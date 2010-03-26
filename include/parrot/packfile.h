@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001-2009, Parrot Foundation.
+ * Copyright (C) 2001-2010, Parrot Foundation.
  */
 
 /* packfile.h
@@ -1015,20 +1015,6 @@ void PackFile_Fixup_dump(PARROT_INTERP,
     , PARROT_ASSERT_ARG(ft))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/packdump.c */
-
-/* HEADERIZER BEGIN: src/fingerprint.c */
-
-PARROT_EXPORT
-PARROT_PURE_FUNCTION
-int PackFile_check_fingerprint(ARGIN(const void *cursor))
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-size_t PackFile_write_fingerprint(NOTNULL(void *cursor))
-        __attribute__nonnull__(1);
-
-/* HEADERIZER END: src/fingerprint.c */
-
 
 /* HEADERIZER BEGIN: src/packfile/pf_items.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
