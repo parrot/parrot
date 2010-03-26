@@ -1,5 +1,5 @@
 /* gdbmhash.pmc
- *  Copyright (C) 2005-2009, Parrot Foundation.
+ *  Copyright (C) 2005-2010, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -28,8 +28,8 @@ PMC insert values are converted to STRINGs.
 
 =head2 fetch
 
-get_integer_keyed() and get_number_keyed() probably don't make any sense,
-as integers usually can't be converted.
+C<get_integer_keyed()> and C<get_number_keyed()> probably don't make
+any sense, as integers usually can't be converted.
 
 When a PMC is requested, a String PMC is returned.
 
@@ -62,14 +62,13 @@ Returns a Parrot string for C<*key>.
 
 */
 
-static STRING* make_hash_key(PARROT_INTERP, NOTNULL(PMC * key))
+static STRING* make_hash_key(PARROT_INTERP, ARGIN(PMC * key))
 {
     if (key)
         return VTABLE_get_string(interp, key);
 
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
         "Hash: Cannot use NULL key");
-
 }
 
 
@@ -269,9 +268,8 @@ Convert C<value> to a string and set the string for the C<key>.
 */
 
     VTABLE void set_pmc_keyed(PMC* key, PMC* value) {
-        STRING *temp;
+        STRING * const temp = VTABLE_get_string(interp, value);
 
-        temp = VTABLE_get_string(interp, value);
         SELF.set_string_keyed(key, temp);
     }
 
@@ -286,8 +284,8 @@ Returns the PMC value for the element at C<*key>.
 */
 
     VTABLE PMC* get_pmc_keyed(PMC* key) {
-        STRING * ret_string = SELF.get_string_keyed(key);
-        PMC *ret_pmc = Parrot_pmc_new(interp, enum_class_String);
+        STRING * const ret_string = SELF.get_string_keyed(key);
+        PMC    * const ret_pmc    = Parrot_pmc_new(interp, enum_class_String);
 
         VTABLE_set_string_native(interp, ret_pmc, ret_string);
 
@@ -305,9 +303,8 @@ Convert C<value> to a string and set the string for the C<key>.
 */
 
     VTABLE void set_integer_keyed(PMC* key, INTVAL value) {
-        PMC *temp;
+        PMC * const temp = Parrot_pmc_new(interp, enum_class_String);
 
-        temp = Parrot_pmc_new(interp, enum_class_String);
         VTABLE_set_integer_native(interp, temp, value);
         SELF.set_pmc_keyed(key, temp);
     }
@@ -324,9 +321,8 @@ Convert C<value> to a string and set the string for the C<key>.
 */
 
     VTABLE void set_number_keyed(PMC* key, FLOATVAL value) {
-        PMC *temp;
+        PMC * const temp = Parrot_pmc_new(interp, enum_class_String);
 
-        temp = Parrot_pmc_new(interp, enum_class_String);
         VTABLE_set_number_native(interp, temp, value);
         SELF.set_pmc_keyed(key, temp);
     }
