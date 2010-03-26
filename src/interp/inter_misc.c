@@ -131,14 +131,13 @@ Register a parser/compiler function.
 
 PARROT_EXPORT
 void
-Parrot_compreg(PARROT_INTERP, ARGIN(STRING *type),
-                    NOTNULL(Parrot_compiler_func_t func))
+Parrot_compreg(PARROT_INTERP, ARGIN(STRING *type), ARGIN(Parrot_compiler_func_t func))
 {
     ASSERT_ARGS(Parrot_compreg)
-    PMC* const iglobals = interp->iglobals;
-    PMC        *nci     = Parrot_pmc_new(interp, enum_class_NCI);
-    STRING     *sc      = CONST_STRING(interp, "PJt");
-    PMC        *hash    = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
+    PMC    * const iglobals = interp->iglobals;
+    PMC    * const nci      = Parrot_pmc_new(interp, enum_class_NCI);
+    STRING * const sc       = CONST_STRING(interp, "PJt");
+    PMC    * hash           = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
                               IGLOBALS_COMPREG_HASH);
 
     if (!hash) {
@@ -323,15 +322,14 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
     ASSERT_ARGS(interpinfo_s)
     switch (what) {
         case EXECUTABLE_FULLNAME: {
-            PMC *exe_name = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
+            PMC * const exe_name = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
                     IGLOBALS_EXECUTABLE);
             if (PMC_IS_NULL(exe_name))
                 return string_from_literal(interp, "");
             return VTABLE_get_string(interp, exe_name);
         }
         case EXECUTABLE_BASENAME: {
-            STRING *basename;
-            PMC    *exe_name = VTABLE_get_pmc_keyed_int(interp,
+            PMC    * const exe_name = VTABLE_get_pmc_keyed_int(interp,
                                 interp->iglobals, IGLOBALS_EXECUTABLE);
 
             if (PMC_IS_NULL(exe_name))
@@ -339,9 +337,10 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
 
             else {
                 /* Need to strip back to what follows the final / or \. */
-                STRING *       fullname   = VTABLE_get_string(interp, exe_name);
+                STRING * const fullname   = VTABLE_get_string(interp, exe_name);
                 char   * const fullname_c = Parrot_str_to_cstring(interp, fullname);
                 int            pos        = strlen(fullname_c) - 1;
+                STRING *basename;
 
                 while (pos              >  0
                 &&     fullname_c[pos] != '/'

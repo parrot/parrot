@@ -586,7 +586,7 @@ Loads the C<PackFile> returned by C<Parrot_pbc_read()>.
 
 PARROT_EXPORT
 void
-Parrot_pbc_load(PARROT_INTERP, NOTNULL(PackFile *pf))
+Parrot_pbc_load(PARROT_INTERP, ARGIN(PackFile *pf))
 {
     if (!pf) {
         Parrot_io_eprintf(interp, "Invalid packfile\n");
@@ -803,7 +803,7 @@ Parrot_runcode(PARROT_INTERP, int argc, ARGIN(char **argv))
 /*
 
 =item C<opcode_t * Parrot_debug(PARROT_INTERP, Parrot_Interp debugger, opcode_t
-* pc)>
+*pc)>
 
 Runs the interpreter's bytecode in debugging mode.
 
@@ -814,7 +814,7 @@ Runs the interpreter's bytecode in debugging mode.
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 opcode_t *
-Parrot_debug(PARROT_INTERP, NOTNULL(Parrot_Interp debugger), opcode_t * pc)
+Parrot_debug(PARROT_INTERP, ARGIN(Parrot_Interp debugger), ARGIN(opcode_t *pc))
 {
     PDB_t      * const pdb = debugger->pdb;
 

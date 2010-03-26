@@ -508,7 +508,7 @@ void * Parrot_compile_file(PARROT_INTERP,
 PARROT_EXPORT
 void Parrot_compreg(PARROT_INTERP,
     ARGIN(STRING *type),
-    NOTNULL(Parrot_compiler_func_t func))
+    ARGIN(Parrot_compiler_func_t func))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);

@@ -112,7 +112,7 @@ END_C
 
 /* This isn't strictly true, but the headerizer should not bother */
 
-void Parrot_register_core_pmcs(PARROT_INTERP, NOTNULL(PMC *registry))
+void Parrot_register_core_pmcs(PARROT_INTERP, ARGIN(PMC *registry))
     __attribute__nonnull__(1)
     __attribute__nonnull__(2);
 
@@ -132,14 +132,14 @@ END_C
     print {$OUT} <<'END_C';
 }
 
-static void register_pmc(PARROT_INTERP, NOTNULL(PMC *registry), int pmc_id)
+static void register_pmc(PARROT_INTERP, ARGIN(PMC *registry), int pmc_id)
 {
     STRING * const key = interp->vtables[pmc_id]->whoami;
     VTABLE_set_integer_keyed_str(interp, registry, key, pmc_id);
 }
 
 void
-Parrot_register_core_pmcs(PARROT_INTERP, NOTNULL(PMC *registry))
+Parrot_register_core_pmcs(PARROT_INTERP, ARGIN(PMC *registry))
 {
 END_C
 

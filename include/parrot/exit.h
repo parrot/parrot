@@ -1,5 +1,5 @@
 /* exit.h
- *  Copyright (C) 2001-2007, Parrot Foundation.
+ *  Copyright (C) 2001-2010, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -34,7 +34,7 @@ void Parrot_exit(PARROT_INTERP, int status)
 
 PARROT_EXPORT
 void Parrot_on_exit(PARROT_INTERP,
-    NOTNULL(exit_handler_f function),
+    ARGIN(exit_handler_f function),
     ARGIN_NULLOK(void *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
