@@ -620,6 +620,7 @@ PARROT_DOES_NOT_RETURN
 static void
 failed_allocation(unsigned int line, unsigned long size)
 {
+    ASSERT_ARGS(failed_allocation)
     fprintf(stderr, "Failed allocation of %lu bytes\n", size);
     do_panic(NULL, "Out of mem", __FILE__, line);
 }
