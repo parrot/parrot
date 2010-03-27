@@ -674,10 +674,8 @@ Parrot_pcc_build_call_from_varargs(PARROT_INTERP,
     PMC         * arg_flags         = PMCNULL;
     PMC         * ignored_flags     = PMCNULL;
     PMC         * call_object;
-    INTVAL       sig_len            = strlen(sig);
-    INTVAL       in_return_sig      = 0;
+    const INTVAL  sig_len           = strlen(sig);
     INTVAL       i                  = 0;
-    int          append_pi          = 1;
 
     if (PMC_IS_NULL(signature))
         call_object = Parrot_pmc_new(interp, enum_class_CallContext);
@@ -730,7 +728,7 @@ Parrot_pcc_build_call_from_varargs(PARROT_INTERP,
                 break;
             }
           case '-':
-            in_return_sig = 1;
+            return call_object;
             break;
           default:
             Parrot_ex_throw_from_c_args(interp, NULL,
@@ -1461,30 +1459,14 @@ Parrot_pcc_split_signature_string(PARROT_INTERP, ARGIN(const char *signature),
 {
     ASSERT_ARGS(Parrot_pcc_split_signature_string)
     const char *cur;
-    int arg_len = 0;
-    int ret_len = 0;
-    char *arg_tmp;
-    char *ret_tmp;
 
     for (cur = signature; *cur != '\0'; cur++) {
         if (*cur == '-')
             break;
-        else
-            arg_len++;
     }
-    ret_len = strlen(signature) - arg_len - 2;
-    if (ret_len < 1)
-        ret_len = 0;
 
-    arg_tmp = (char *) malloc(arg_len + 1);
-    ret_tmp = (char *) malloc(ret_len + 1);
-    strncpy(arg_tmp, signature, arg_len);
-    strncpy(ret_tmp, cur + 2, ret_len);
-    arg_tmp[arg_len] = '\0';
-    ret_tmp[ret_len] = '\0';
-
-    *arg_sig = arg_tmp;
-    *return_sig = ret_tmp;
+    *arg_sig    = signature;
+    *return_sig = cur + 2;
 }
 
 /*
@@ -1518,9 +1500,9 @@ parse_signature_string(PARROT_INTERP, ARGIN(const char *signature),
     for (x = signature; *x != '\0'; x++) {
 
         /* detect -> separator */
-        if (*x == '-') {
+        if (*x == '-')
             break;
-        }
+
         /* parse arg type */
         else if (isupper((unsigned char)*x)) {
             /* Starting a new argument, so store the previous argument,
@@ -1593,8 +1575,6 @@ Parrot_pcc_parse_signature_string(PARROT_INTERP, ARGIN(STRING *signature),
     parse_signature_string(interp, arg_sig, arg_flags);
     parse_signature_string(interp, ret_sig, return_flags);
     Parrot_str_free_cstring(s);
-    Parrot_str_free_cstring(arg_sig);
-    Parrot_str_free_cstring(ret_sig);
 }
 
 /*

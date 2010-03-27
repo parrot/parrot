@@ -1064,8 +1064,6 @@ Parrot_ext_call(PARROT_INTERP, ARGIN(Parrot_PMC sub_pmc),
             PARROT_ERRORS_RESULT_COUNT_FLAG);
     va_end(args);
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), old_call_obj);
-    mem_gc_free(interp, arg_sig);
-    mem_gc_free(interp, ret_sig);
 }
 
 

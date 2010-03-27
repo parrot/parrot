@@ -272,8 +272,6 @@ Parrot_mmd_multi_dispatch_from_c_args(PARROT_INTERP,
     va_start(args, sig);
     call_obj = Parrot_pcc_build_call_from_varargs(interp, PMCNULL, arg_sig, &args);
 
-    mem_gc_free(interp, arg_sig);
-
     /* Check the cache. */
     sub = Parrot_mmd_cache_lookup_by_types(interp, interp->op_mmd_cache, name,
             VTABLE_get_pmc(interp, call_obj));
@@ -287,12 +285,10 @@ Parrot_mmd_multi_dispatch_from_c_args(PARROT_INTERP,
                     VTABLE_get_pmc(interp, call_obj), sub);
     }
 
-    if (PMC_IS_NULL(sub)) {
-        mem_gc_free(interp, ret_sig);
+    if (PMC_IS_NULL(sub))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_METHOD_NOT_FOUND,
                 "Multiple Dispatch: No suitable candidate found for '%s',"
                 " with signature '%s'", name, sig);
-    }
 
 #if MMD_DEBUG
     Parrot_io_eprintf(interp, "candidate found for '%s', with signature '%s'\n",
@@ -305,7 +301,6 @@ Parrot_mmd_multi_dispatch_from_c_args(PARROT_INTERP,
     call_obj = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
     Parrot_pcc_fill_params_from_varargs(interp, call_obj, ret_sig, &args,
             PARROT_ERRORS_RESULT_COUNT_FLAG);
-    mem_gc_free(interp, ret_sig);
     va_end(args);
 }
 
