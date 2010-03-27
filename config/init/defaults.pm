@@ -193,7 +193,7 @@ sub runstep {
 
         # some utilities in Makefile
         cat       => '$(PERL) -MExtUtils::Command -e cat',
-        chmod     => '$(PERL) -MExtUtils::Command -e ExtUtils::Command::chmod',
+        chmod     => '$(PERL) -MExtUtils::Command -e chmod',
         cp        => '$(PERL) -MExtUtils::Command -e cp',
         mkpath    => '$(PERL) -MExtUtils::Command -e mkpath',
         mv        => '$(PERL) -MExtUtils::Command -e mv',
