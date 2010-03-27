@@ -32,10 +32,15 @@ to activate this core.
 #include "parrot/parrot.h"
 #include "gc_private.h"
 
+#define PANIC_OUT_OF_MEM(size) failed_allocation(__LINE__, (size))
+
 /* HEADERIZER HFILE: src/gc/gc_private.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_DOES_NOT_RETURN
+static void failed_allocation(unsigned int line, unsigned long size);
 
 static void gc_inf_allocate_buffer_storage(PARROT_INTERP,
     ARGMOD(Buffer *buffer),
@@ -52,6 +57,14 @@ static Buffer* gc_inf_allocate_bufferlike_header(PARROT_INTERP,
 PARROT_CAN_RETURN_NULL
 static void* gc_inf_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
         __attribute__nonnull__(1);
+
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+static void * gc_inf_allocate_memory_chunk(SHIM_INTERP, size_t size);
+
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+static void * gc_inf_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size);
 
 PARROT_CAN_RETURN_NULL
 static void* gc_inf_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
@@ -90,6 +103,7 @@ static void gc_inf_free_fixed_size_storage(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*data);
 
+static void gc_inf_free_memory_chunk(SHIM_INTERP, ARGFREE(void *data));
 static void gc_inf_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -113,6 +127,19 @@ static void gc_inf_reallocate_buffer_storage(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*buffer);
 
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+static void * gc_inf_reallocate_memory_chunk(SHIM_INTERP,
+    ARGFREE(void *from),
+    size_t size);
+
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+static void * gc_inf_reallocate_memory_chunk_zeroed(SHIM_INTERP,
+    ARGFREE(void *data),
+    size_t newsize,
+    size_t oldsize);
+
 static void gc_inf_reallocate_string_storage(PARROT_INTERP,
     ARGMOD(STRING *str),
     size_t size)
@@ -120,6 +147,7 @@ static void gc_inf_reallocate_string_storage(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*str);
 
+#define ASSERT_ARGS_failed_allocation __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_inf_allocate_buffer_storage \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -130,6 +158,9 @@ static void gc_inf_reallocate_string_storage(PARROT_INTERP,
 #define ASSERT_ARGS_gc_inf_allocate_fixed_size_storage \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_inf_allocate_memory_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_gc_inf_allocate_memory_chunk_zeroed \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_inf_allocate_pmc_attributes \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -150,6 +181,7 @@ static void gc_inf_reallocate_string_storage(PARROT_INTERP,
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(data))
+#define ASSERT_ARGS_gc_inf_free_memory_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_inf_free_pmc_attributes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
@@ -164,6 +196,10 @@ static void gc_inf_reallocate_string_storage(PARROT_INTERP,
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(buffer))
+#define ASSERT_ARGS_gc_inf_reallocate_memory_chunk \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_gc_inf_reallocate_memory_chunk_zeroed \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_inf_reallocate_string_storage \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -472,9 +508,122 @@ Parrot_gc_inf_init(PARROT_INTERP)
     interp->gc_sys->allocate_fixed_size_storage = gc_inf_allocate_fixed_size_storage;
     interp->gc_sys->free_fixed_size_storage     = gc_inf_free_fixed_size_storage;
 
+    /* We don't distinguish between chunk and chunk_with_pointers */
+    interp->gc_sys->allocate_memory_chunk   = gc_inf_allocate_memory_chunk;
+    interp->gc_sys->reallocate_memory_chunk = gc_inf_reallocate_memory_chunk;
+    interp->gc_sys->allocate_memory_chunk_with_interior_pointers
+                = gc_inf_allocate_memory_chunk_zeroed;
+    interp->gc_sys->reallocate_memory_chunk_with_interior_pointers
+                = gc_inf_reallocate_memory_chunk_zeroed;
+    interp->gc_sys->free_memory_chunk       = gc_inf_free_memory_chunk;
+
     interp->gc_sys->get_gc_info      = gc_inf_get_gc_info;
 
 }
+
+/*
+
+=item C<static void * gc_inf_allocate_memory_chunk(PARROT_INTERP, size_t size)>
+
+=item C<static void * gc_inf_reallocate_memory_chunk(PARROT_INTERP, void *from,
+size_t size)>
+
+=item C<static void * gc_inf_allocate_memory_chunk_zeroed(PARROT_INTERP, size_t
+size)>
+
+=item C<static void * gc_inf_reallocate_memory_chunk_zeroed(PARROT_INTERP, void
+*data, size_t newsize, size_t oldsize)>
+
+=item C<static void gc_inf_free_memory_chunk(PARROT_INTERP, void *data)>
+
+TODO Write docu.
+
+*/
+
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+static void *
+gc_inf_allocate_memory_chunk(SHIM_INTERP, size_t size)
+{
+    ASSERT_ARGS(gc_inf_allocate_memory_chunk)
+    void * const ptr = malloc(size);
+#ifdef DETAIL_MEMORY_DEBUG
+    fprintf(stderr, "Allocated %i at %p\n", size, ptr);
+#endif
+    if (!ptr)
+        PANIC_OUT_OF_MEM(size);
+    return ptr;
+}
+
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+static void *
+gc_inf_reallocate_memory_chunk(SHIM_INTERP, ARGFREE(void *from), size_t size)
+{
+    ASSERT_ARGS(gc_inf_reallocate_memory_chunk)
+    void *ptr;
+#ifdef DETAIL_MEMORY_DEBUG
+    fprintf(stderr, "Freed %p (realloc -- %i bytes)\n", from, size);
+#endif
+    if (from)
+        ptr = realloc(from, size);
+    else
+        ptr = calloc(1, size);
+#ifdef DETAIL_MEMORY_DEBUG
+    fprintf(stderr, "Allocated %i at %p\n", size, ptr);
+#endif
+    if (!ptr)
+        PANIC_OUT_OF_MEM(size);
+    return ptr;
+}
+
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+static void *
+gc_inf_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size)
+{
+    ASSERT_ARGS(gc_inf_allocate_memory_chunk_zeroed)
+    void * const ptr = calloc(1, (size_t)size);
+#ifdef DETAIL_MEMORY_DEBUG
+    fprintf(stderr, "Allocated %i at %p\n", size, ptr);
+#endif
+    if (!ptr)
+        PANIC_OUT_OF_MEM(size);
+    return ptr;
+}
+
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+static void *
+gc_inf_reallocate_memory_chunk_zeroed(SHIM_INTERP, ARGFREE(void *data),
+        size_t newsize, size_t oldsize)
+{
+    ASSERT_ARGS(gc_inf_reallocate_memory_chunk_zeroed)
+    void * const ptr = realloc(data, newsize);
+    if (newsize > oldsize)
+        memset((char*)ptr + oldsize, 0, newsize - oldsize);
+    return ptr;
+}
+
+static void
+gc_inf_free_memory_chunk(SHIM_INTERP, ARGFREE(void *data))
+{
+    ASSERT_ARGS(gc_inf_free_memory_chunk)
+#ifdef DETAIL_MEMORY_DEBUG
+    fprintf(stderr, "Freed %p\n", data);
+#endif
+    if (data)
+        free(data);
+}
+
+PARROT_DOES_NOT_RETURN
+static void
+failed_allocation(unsigned int line, unsigned long size)
+{
+    fprintf(stderr, "Failed allocation of %lu bytes\n", size);
+    do_panic(NULL, "Out of mem", __FILE__, line);
+}
+
 
 
 /*
