@@ -121,7 +121,7 @@ void parrot_hash_destroy(PARROT_INTERP, ARGMOD(Hash *hash))
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL parrot_hash_exists(PARROT_INTERP,
-    ARGIN(Hash *hash),
+    ARGIN(const Hash *hash),
     ARGIN(void *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

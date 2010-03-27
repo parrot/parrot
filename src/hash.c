@@ -1204,7 +1204,7 @@ parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(cons
         UINTVAL        i;
 
         for (i = 0; i < entries; i++) {
-            HashBucket *bucket = hash->bs + i;
+            HashBucket * const bucket = hash->bs + i;
 
             /* the hash->compare cost is too high for this fast path */
             if (bucket->key == key)
@@ -1256,7 +1256,7 @@ parrot_hash_get(PARROT_INTERP, ARGIN(Hash *hash), ARGIN(const void *key))
 
 /*
 
-=item C<INTVAL parrot_hash_exists(PARROT_INTERP, Hash *hash, void *key)>
+=item C<INTVAL parrot_hash_exists(PARROT_INTERP, const Hash *hash, void *key)>
 
 Returns whether the key exists in the hash.
 
@@ -1267,7 +1267,7 @@ Returns whether the key exists in the hash.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-parrot_hash_exists(PARROT_INTERP, ARGIN(Hash *hash), ARGIN(void *key))
+parrot_hash_exists(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(void *key))
 {
     ASSERT_ARGS(parrot_hash_exists)
     const HashBucket * const bucket = parrot_hash_get_bucket(interp, hash, key);
