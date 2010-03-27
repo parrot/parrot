@@ -1352,16 +1352,13 @@ gc_ms_get_free_object(PARROT_INTERP,
     PObj *free_list = (PObj *)pool->free_list;
 
 #if GC_USE_LAZY_ALLOCATOR
-    if (!free_list && !pool->newfree) {
-        (*pool->more_objects)(interp, mem_pools, pool);
-        free_list = (PObj *)pool->free_list;
-    }
 
+  HAVE_FREE:
     if (free_list) {
         ptr             = free_list;
         pool->free_list = ((GC_MS_PObj_Wrapper *)ptr)->next_ptr;
     }
-    else {
+    else if (pool->newfree) {
         Fixed_Size_Arena * const arena = pool->last_Arena;
         ptr           = (PObj *)pool->newfree;
         pool->newfree = (void *)((char *)pool->newfree + pool->object_size);
@@ -1371,6 +1368,11 @@ gc_ms_get_free_object(PARROT_INTERP,
             pool->newfree = NULL;
 
         PARROT_ASSERT(ptr < (PObj *)pool->newlast);
+    }
+    else {
+        (*pool->more_objects)(interp, mem_pools, pool);
+        free_list = (PObj *)pool->free_list;
+        goto HAVE_FREE;
     }
 #else
     /* if we don't have any objects */
