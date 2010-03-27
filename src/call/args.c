@@ -1444,7 +1444,7 @@ Parrot_pcc_fill_params_from_varargs(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_objec
 /*
 
 =item C<void Parrot_pcc_split_signature_string(PARROT_INTERP, const char
-*signature, char **arg_sig, char **return_sig)>
+*signature, const char **arg_sig, const char **return_sig)>
 
 Splits a full signature string and creates call and return signature strings.
 The two result strings should be passed in as references to a C string.
@@ -1456,10 +1456,10 @@ The two result strings should be passed in as references to a C string.
 PARROT_CAN_RETURN_NULL
 void
 Parrot_pcc_split_signature_string(PARROT_INTERP, ARGIN(const char *signature),
-        ARGMOD(char **arg_sig), ARGMOD(char **return_sig))
+        ARGMOD(const char **arg_sig), ARGMOD(const char **return_sig))
 {
     ASSERT_ARGS(Parrot_pcc_split_signature_string)
-    char *cur;
+    const char *cur;
     *arg_sig = signature;
 
     for (cur = signature; *cur != '\0'; cur++) {
@@ -1571,8 +1571,10 @@ Parrot_pcc_parse_signature_string(PARROT_INTERP, ARGIN(STRING *signature),
 {
     ASSERT_ARGS(Parrot_pcc_parse_signature_string)
     char * const s = Parrot_str_to_cstring(interp, signature);
-    char *arg_sig, *ret_sig;
+    const char *arg_sig, *ret_sig;
+
     Parrot_pcc_split_signature_string(interp, s, &arg_sig, &ret_sig);
+
     *arg_flags    = PMCNULL;
     *return_flags = PMCNULL;
     parse_signature_string(interp, arg_sig, arg_flags);

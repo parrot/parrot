@@ -75,10 +75,10 @@ Parrot_pcc_invoke_sub_from_c_args(PARROT_INTERP, ARGIN(PMC *sub_obj),
         ARGIN(const char *sig), ...)
 {
     ASSERT_ARGS(Parrot_pcc_invoke_sub_from_c_args)
-    PMC    *call_obj;
-    va_list args;
-    char   *arg_sig, *ret_sig;
-    PMC    *old_call_obj = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
+    PMC         *call_obj;
+    va_list      args;
+    const char  *arg_sig, *ret_sig;
+    PMC         *old_call_obj = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
     Parrot_pcc_split_signature_string(interp, sig, &arg_sig, &ret_sig);
 
@@ -224,11 +224,12 @@ Parrot_pcc_invoke_method_from_c_args(PARROT_INTERP, ARGIN(PMC* pmc),
         ARGIN(const char *signature), ...)
 {
     ASSERT_ARGS(Parrot_pcc_invoke_method_from_c_args)
-    PMC    *call_obj;
-    PMC    *sub_obj;
-    va_list args;
-    char *arg_sig, *ret_sig;
-    PMC    *old_call_obj = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
+    PMC        *call_obj;
+    PMC        *sub_obj;
+    va_list     args;
+    const char *arg_sig, *ret_sig;
+    PMC        *old_call_obj = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
+
     Parrot_pcc_split_signature_string(interp, signature, &arg_sig, &ret_sig);
 
     va_start(args, signature);
