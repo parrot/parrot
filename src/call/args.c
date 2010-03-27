@@ -674,7 +674,6 @@ Parrot_pcc_build_call_from_varargs(PARROT_INTERP,
     PMC         * arg_flags         = PMCNULL;
     PMC         * ignored_flags     = PMCNULL;
     PMC         * call_object;
-    const INTVAL  sig_len           = strlen(sig);
     INTVAL       i                  = 0;
 
     if (PMC_IS_NULL(signature))
@@ -688,7 +687,7 @@ Parrot_pcc_build_call_from_varargs(PARROT_INTERP,
     VTABLE_set_attr_str(interp, call_object, CONST_STRING(interp, "arg_flags"), arg_flags);
 
     /* Process the varargs list */
-    for (; i < sig_len; ++i) {
+    for (; sig[i] != '\0'; ++i) {
         const INTVAL type = sig[i];
 
         /* Regular arguments just set the value */
@@ -764,19 +763,19 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
     PMC         * type_tuple        = PMCNULL;
     PMC         * arg_flags         = PMCNULL;
     PMC         * const call_object = Parrot_pmc_new(interp, enum_class_CallContext);
-    const INTVAL sig_len            = strlen(sig);
     INTVAL       in_return_sig      = 0;
     INTVAL       i;
     int          append_pi          = 1;
 
-    if (!sig_len)
+    /* empty args or empty returns */
+    if (*sig == '-' || *sig == '\0')
         return call_object;
 
     parse_signature_string(interp, sig, &arg_flags);
     VTABLE_set_attr_str(interp, call_object, CONST_STRING(interp, "arg_flags"), arg_flags);
 
     /* Process the varargs list */
-    for (i = 0; i < sig_len; ++i) {
+    for (i = 0; sig[i] != '\0'; ++i) {
         const INTVAL type = sig[i];
 
         /* Don't process returns */
@@ -810,9 +809,10 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
                         if (i != 0)
                             Parrot_ex_throw_from_c_args(interp, NULL,
                                 EXCEPTION_INVALID_OPERATION,
-                                "Dispatch: only the first argument can be an invocant");
-                        i++; /* skip 'i' */
-                        append_pi = 0; /* Don't append Pi in front of signature */
+                                "Dispatch: only the first argument "
+                                "can be an invocant");
+                        i++;           /* skip 'i' */
+                        append_pi = 0; /* Don't prepend Pi to signature */
                     }
                 }
                 break;
@@ -827,7 +827,7 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
         }
     }
 
-    /* Check if we have an invocant, and add it to the front of the arguments iff needed */
+    /* Add invocant to the front of the arguments iff needed */
     if (!PMC_IS_NULL(obj) && append_pi)
         VTABLE_unshift_pmc(interp, call_object, obj);
 
@@ -1431,7 +1431,8 @@ Parrot_pcc_fill_params_from_varargs(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_objec
         (pmc_func_t)pmc_constant_from_varargs,
     };
 
-    if (strlen(signature) < 1)
+    /* empty args or empty returns */
+    if (*signature == '-' || *signature == '\0')
         return;
 
     parse_signature_string(interp, signature, &raw_sig);
