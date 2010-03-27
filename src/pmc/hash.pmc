@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -229,6 +229,9 @@ NB: this method will destroy all old data!
         It will create STRING* keys hash. Because we can't use STRING_compare
         directly - it declared static in F<src/hash.c>
         */
+        if (old_hash && old_hash->entry_type == type)
+            return;
+
         if (!old_hash)
             old_hash = parrot_new_hash(INTERP);
 
