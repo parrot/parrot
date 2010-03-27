@@ -1309,17 +1309,13 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
 {
     ASSERT_ARGS(PF_fetch_string)
     STRING   *s;
-    UINTVAL   flags    = PF_fetch_opcode(pf, cursor);
-    const int wordsize = pf ? pf->header->wordsize : sizeof (opcode_t);
-    size_t    size;
-    opcode_t  charset_nr;
+    UINTVAL   flags      = PF_fetch_opcode(pf, cursor);
+    opcode_t  charset_nr = PF_fetch_opcode(pf, cursor);
+    size_t    size       = (size_t)PF_fetch_opcode(pf, cursor);
+    const int wordsize   = pf ? pf->header->wordsize : sizeof (opcode_t);
 
     /* don't let PBC mess our internals - only constant or not */
     flags      &= (PObj_constant_FLAG | PObj_private7_FLAG);
-    charset_nr  = PF_fetch_opcode(pf, cursor);
-
-    /* These may need to be separate */
-    size        = (size_t)PF_fetch_opcode(pf, cursor);
 
     TRACE_PRINTF(("PF_fetch_string(): flags=0x%04x, ", flags));
     TRACE_PRINTF(("charset_nr=%ld, ", charset_nr));
