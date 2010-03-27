@@ -18,11 +18,12 @@ Tests the Continuation PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(3)
+    plan(4)
 
     test_new()
     invoke_with_init()
     returns_tt1511()
+    returns_tt1528()
 .end
 
 .sub test_new
@@ -43,6 +44,7 @@ end:
 .end
 
 .sub 'choose'
+    .param int do_tailcall
     .param pmc options :slurpy
     .local pmc cc
     .local pmc chosen
@@ -63,7 +65,11 @@ end:
     .return (chosen)
 
   recurse:
-    .tailcall 'choose'(options :flat)
+    if do_tailcall goto tail
+    $P0 = 'choose'(do_tailcall, options :flat)
+    .return($P0)
+  tail:
+    .tailcall 'choose'(do_tailcall, options :flat)
 .end
 
 .sub 'fail'
@@ -83,6 +89,8 @@ end:
 .end
 
 .sub 'blob'
+    .param int do_tailcall
+
     .local pmc city
     .local pmc store
     .local pmc bx
@@ -91,7 +99,7 @@ end:
     paths = new 'ResizablePMCArray'
     set_global '!paths', paths
 
-    city = 'choose'("la", "ny", "bos")
+    city = 'choose'(do_tailcall, "la", "ny", "bos")
     $P0  = get_global '!results'
     push $P0, city
     push $P0, ' '
@@ -110,10 +118,27 @@ end:
     $P0 = new 'ResizableStringArray'
     set_global '!results', $P0
 
-    'blob'()
+    'blob'(1)
   final_failure:
     $S0 = join '', $P0
     is('lala nyny bosbos ', $S0, 'Results processed correctly')
+.end
+
+.sub 'returns_tt1528'
+    .local pmc cc
+
+    # Install top-level cc in global.
+    cc = new 'Continuation'
+    set_addr cc, final_failure
+    set_global '!topcc', cc
+
+    $P0 = new 'ResizableStringArray'
+    set_global '!results', $P0
+
+    'blob'(0)
+  final_failure:
+    $S0 = join '', $P0
+    is('lala nyny bosbos ', $S0, 'Results processed correctly - without .tailcall')
 .end
 
 # end of tests.
