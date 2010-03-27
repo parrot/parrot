@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -2638,7 +2638,7 @@ Parrot_str_to_hashval(PARROT_INTERP, ARGMOD_NULLOK(STRING *s))
     UINTVAL     offs;
     size_t      hashval = interp->hash_seed;
 
-    if (!s)
+    if (!s || !s->strlen)
         return hashval;
 
     /* ZZZZZ workaround for something not setting up encodings right */
