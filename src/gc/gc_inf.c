@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -535,6 +535,8 @@ size)>
 *data, size_t newsize, size_t oldsize)>
 
 =item C<static void gc_inf_free_memory_chunk(PARROT_INTERP, void *data)>
+
+=item C<static void failed_allocation(unsigned int line, unsigned long size)>
 
 TODO Write docu.
 
