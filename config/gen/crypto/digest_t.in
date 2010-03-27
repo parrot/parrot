@@ -8,7 +8,7 @@ t/dynpmc/@TEMP_md_file@.t - test the @TEMP_md_name@ PMC (part of digest_group)
 
 =head1 SYNOPSIS
 
-        % perl -Ilib t/dynpmc/@TEMP_md_file@.t
+        % parrot -Ilib t/dynpmc/@TEMP_md_file@.t
 
 =head1 DESCRIPTION
 
