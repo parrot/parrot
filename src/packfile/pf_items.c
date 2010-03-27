@@ -984,14 +984,16 @@ fetch_op_le_4(ARGIN(const unsigned char *b))
         unsigned char buf[4];
         opcode_t o;
     } u;
-    fetch_buf_le_4(u.buf, b);
 #if PARROT_BIGENDIAN
+    fetch_buf_le_4(u.buf, b);
 #  if OPCODE_T_SIZE == 8
     return (Parrot_Int4)(u.o >> 32);
 #  else
     return (opcode_t) fetch_iv_be((INTVAL)u.o);
 #  endif
 #else
+    /* inlining the effects of the fetch_buf_le_4() call is worth it */
+    memcpy(u.buf, b, 4);
 #  if OPCODE_T_SIZE == 8
     /* without the cast we would not get a negative int, the vtable indices */
     return (Parrot_Int4)(u.o & 0xffffffff);
