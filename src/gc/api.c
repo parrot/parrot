@@ -286,14 +286,6 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
     PARROT_ASSERT(interp->gc_sys->reallocate_memory_chunk_with_interior_pointers);
     PARROT_ASSERT(interp->gc_sys->free_memory_chunk);
 
-    PARROT_ASSERT(interp->gc_sys->block_mark);
-    PARROT_ASSERT(interp->gc_sys->unblock_mark);
-    PARROT_ASSERT(interp->gc_sys->is_blocked_mark);
-
-    PARROT_ASSERT(interp->gc_sys->block_sweep);
-    PARROT_ASSERT(interp->gc_sys->unblock_sweep);
-    PARROT_ASSERT(interp->gc_sys->is_blocked_sweep);
-
     PARROT_ASSERT(interp->gc_sys->get_gc_info);
 }
 
