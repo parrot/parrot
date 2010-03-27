@@ -1459,15 +1459,17 @@ Parrot_pcc_split_signature_string(PARROT_INTERP, ARGIN(const char *signature),
         ARGMOD(char **arg_sig), ARGMOD(char **return_sig))
 {
     ASSERT_ARGS(Parrot_pcc_split_signature_string)
-    const char *cur;
+    char *cur;
+    *arg_sig = signature;
 
     for (cur = signature; *cur != '\0'; cur++) {
-        if (*cur == '-')
-            break;
+        if (*cur == '-') {
+            *return_sig = cur + 2;
+            return;
+        }
     }
 
-    *arg_sig    = signature;
-    *return_sig = cur + 2;
+    *return_sig = cur;
 }
 
 /*
