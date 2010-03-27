@@ -1,13 +1,6 @@
-#!perl
+#!parrot
 # Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( t . lib ../lib ../../lib );
-
-use Test::More;
-use Parrot::Test tests => 15;
 
 =head1 NAME
 
@@ -24,10 +17,30 @@ module F<runtime/parrot/library/Getopt/Obj.pir>.
 
 =cut
 
-# 1
-pir_output_is( <<'CODE', <<'OUT', 'basic long options' );
-
 .sub main :main
+    .include 'test_more.pir'
+    load_bytecode "Getopt/Obj.pbc"
+    plan(48)
+
+    test_basic_long_options()
+    test_basic_short_options()
+    test_simple_array()
+    test_mixing_long_and_short_with_array()
+    test_hash()
+    test_bundling_short_options()
+    test_ignored_options()
+    test_double_dash_stop()
+    test_notOptStop()
+    test_optarg()
+    test_pass_through()
+    test_lone_dash()
+    test_push_interface()
+    test_missing_spec()
+    test_missing_argument()
+.end
+
+# 1
+.sub test_basic_long_options
         .local pmc argv
         argv = new 'ResizablePMCArray'
         push argv, '--foo=bar'
@@ -35,7 +48,6 @@ pir_output_is( <<'CODE', <<'OUT', 'basic long options' );
         push argv, '--bax=3'
         push argv, '--baz'
 
-        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new ['Getopt';'Obj']
 
@@ -57,36 +69,20 @@ pir_output_is( <<'CODE', <<'OUT', 'basic long options' );
         $P1 = getopts."get_options"(argv)
 
         $S0 = $P1["foo"]
-        print "foo is "
-        print $S0
-        print "\n"
+        is($S0, 'bar', 'basic long options')
 
         $S0 = $P1["bar"]
-        print "bar is "
-        print $S0
-        print "\n"
+        is($S0, 3.14, 'basic long options')
 
         $S0 = $P1["bax"]
-        print "bax is "
-        print $S0
-        print "\n"
+        is($S0, 3, 'basic long options')
 
         $S0 = $P1["baz"]
-        print "baz is "
-        print $S0
-        print "\n"
+        is($S0, 1, 'basic long options')
 .end
 
-CODE
-foo is bar
-bar is 3.14
-bax is 3
-baz is 1
-OUT
-
 # 2
-pir_output_is( <<'CODE', <<'OUT', "basic short options" );
-.sub main :main
+.sub test_basic_short_options
         .local pmc argv
         argv = new 'ResizablePMCArray'
         push argv, '-f'
@@ -94,7 +90,6 @@ pir_output_is( <<'CODE', <<'OUT', "basic short options" );
         push argv, '-Abc'
         push argv, '-c'
 
-        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new ['Getopt';'Obj']
 
@@ -112,35 +107,22 @@ pir_output_is( <<'CODE', <<'OUT', "basic short options" );
         $P1 = getopts."get_options"(argv)
 
         $S0 = $P1["f"]
-        print "f is "
-        print $S0
-        print "\n"
+        is($S0, 'bar', 'basic short options')
 
         $S0 = $P1["A"]
-        print "A is "
-        print $S0
-        print "\n"
+        is($S0, 'bc', 'basic short options')
 
         $S0 = $P1["c"]
-        print "c is "
-        print $S0
-        print "\n"
+        is($S0, '1', 'basic short options')
 .end
-CODE
-f is bar
-A is bc
-c is 1
-OUT
 
 # 3
-pir_output_is( <<'CODE', <<'OUT', "simple array" );
-.sub main :main
+.sub test_simple_array
         .local pmc argv
         argv = new 'ResizablePMCArray'
         push argv, '-Iinca'
         push argv, '-Iincb'
 
-        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new ['Getopt';'Obj']
 
@@ -151,30 +133,20 @@ pir_output_is( <<'CODE', <<'OUT', "simple array" );
         $P1 = getopts."get_options"(argv)
 
         $S0 = $P1["I";0]
-        print "0 is "
-        print $S0
-        print "\n"
+        is($S0, 'inca', 'simple array')
 
         $S0 = $P1["I";1]
-        print "1 is "
-        print $S0
-        print "\n"
+        is($S0, 'incb', 'simple array')
 
 .end
-CODE
-0 is inca
-1 is incb
-OUT
 
 # 4
-pir_output_is( <<'CODE', <<'OUT', "mixing long and short with array" );
-.sub main :main
+.sub test_mixing_long_and_short_with_array
         .local pmc argv
         argv = new 'ResizablePMCArray'
         push argv, '-Iinca'
         push argv, '--include=incb'
 
-        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new ['Getopt';'Obj']
 
@@ -186,31 +158,21 @@ pir_output_is( <<'CODE', <<'OUT', "mixing long and short with array" );
         $P1 = getopts."get_options"(argv)
 
         $S0 = $P1["include";0]
-        print "0 is "
-        print $S0
-        print "\n"
+        is($S0, 'inca', 'mixing long and short with array')
 
         $S0 = $P1["include";1]
-        print "1 is "
-        print $S0
-        print "\n"
+        is($S0, 'incb', 'mixing long and short with array')
 
 .end
-CODE
-0 is inca
-1 is incb
-OUT
 
 # 5
-pir_output_is( <<'CODE', <<'OUT', "hash" );
-.sub main :main
+.sub test_hash
         .local pmc argv
         argv = new 'ResizablePMCArray'
         push argv, '-Dfoo=bar'
         push argv, '--define=bax=baz'
         push argv, '-Dfoobar'
 
-        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new ['Getopt';'Obj']
 
@@ -222,35 +184,22 @@ pir_output_is( <<'CODE', <<'OUT', "hash" );
         $P1 = getopts."get_options"(argv)
 
         $S0 = $P1["define";"foo"]
-        print "foo is "
-        print $S0
-        print "\n"
+        is($S0, 'bar', 'hash')
 
         $S0 = $P1["define";"bax"]
-        print "bax is "
-        print $S0
-        print "\n"
+        is($S0, 'baz', 'hash')
 
         $S0 = $P1["define";"foobar"]
-        print "foobar is "
-        print $S0
-        print "\n"
+        is($S0, 1, 'hash')
 
 .end
-CODE
-foo is bar
-bax is baz
-foobar is 1
-OUT
 
 # 6
-pir_output_is( <<'CODE', <<'OUT', "bundling short options" );
-.sub main :main
+.sub test_bundling_short_options
         .local pmc argv
         argv = new 'ResizablePMCArray'
         push argv, '-abc'
 
-        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new ['Getopt';'Obj']
 
@@ -264,36 +213,23 @@ pir_output_is( <<'CODE', <<'OUT', "bundling short options" );
         $P1 = getopts."get_options"(argv)
 
         $S0 = $P1["a"]
-        print "a is "
-        print $S0
-        print "\n"
+        is($S0, 1, 'bundling short options')
 
         $S0 = $P1["b"]
-        print "b is "
-        print $S0
-        print "\n"
+        is($S0, 1, 'bundling short options')
 
         $S0 = $P1["c"]
-        print "c is "
-        print $S0
-        print "\n"
+        is($S0, 1, 'bundling short options')
 
 .end
-CODE
-a is 1
-b is 1
-c is 1
-OUT
 
 # 7
-pir_output_is( <<'CODE', <<'OUT', "ignored options" );
-.sub main :main
+.sub test_ignored_options
         .local pmc argv
         argv = new 'ResizablePMCArray'
         push argv, '--ignore'
         push argv, '--foo'
 
-        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new ['Getopt';'Obj']
         getopts."notOptStop"(1)
@@ -304,31 +240,21 @@ pir_output_is( <<'CODE', <<'OUT', "ignored options" );
         $P1 = getopts."get_options"(argv)
 
         $S0 = $P1["foo"]
-        print "foo is "
-        print $S0
-        print "\n"
+        is($S0, '1', 'ignored options')
 
         $S0 = argv[0]
-        print "argv[0] is "
-        print $S0
-        print "\n"
+        is($S0, '--ignore', 'ignored options')
 
 .end
-CODE
-foo is 1
-argv[0] is --ignore
-OUT
 
 # 8
-pir_output_is( <<'CODE', <<'OUT', "double dash stop" );
-.sub main :main
+.sub test_double_dash_stop
         .local pmc argv
         argv = new 'ResizablePMCArray'
         push argv, '--foo'
         push argv, '--'
         push argv, '--bar'
 
-        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new ['Getopt';'Obj']
 
@@ -340,38 +266,25 @@ pir_output_is( <<'CODE', <<'OUT', "double dash stop" );
         $P1 = getopts."get_options"(argv)
 
         $S0 = $P1["foo"]
-        print "foo is "
-        print $S0
-        print "\n"
+        is($S0, 1, 'double dash stop')
 
         # Hash sets an nonexistant value to ''
         $S0 = $P1["bar"]
-        print "bar is "
-        print $S0
-        print "\n"
+        is($S0, '', 'double dash stop')
 
         $S0 = argv[0]
-        print "argv[0] is "
-        print $S0
-        print "\n"
+        is($S0, '--bar', 'double dash stop')
 
 .end
-CODE
-foo is 1
-bar is 
-argv[0] is --bar
-OUT
 
 # 9
-pir_output_is( <<'CODE', <<'OUT', "notOptStop" );
-.sub main :main
+.sub test_notOptStop
         .local pmc argv
         argv = new 'ResizablePMCArray'
         push argv, '--foo'
         push argv, 'foo'
         push argv, '--bar'
 
-        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new ['Getopt';'Obj']
         getopts."notOptStop"(1)
@@ -384,43 +297,27 @@ pir_output_is( <<'CODE', <<'OUT', "notOptStop" );
         $P1 = getopts."get_options"(argv)
 
         $S0 = $P1["foo"]
-        print "foo is "
-        print $S0
-        print "\n"
+        is($S0, 1, 'notOptStop')
 
         $S0 = $P1["bar"]
-        print "bar is "
-        print $S0
-        print "\n"
+        is($S0, '', 'notOptStop')
 
         $S0 = argv[0]
-        print "argv[0] is "
-        print $S0
-        print "\n"
+        is($S0, 'foo', 'notOptStop')
 
         $S0 = argv[1]
-        print "argv[1] is "
-        print $S0
-        print "\n"
+        is($S0, '--bar', 'notOptStop')
 
 .end
-CODE
-foo is 1
-bar is 
-argv[0] is foo
-argv[1] is --bar
-OUT
 
 # 10
-pir_output_is( <<'CODE', <<'OUT', "optarg" );
-.sub main :main
+.sub test_optarg
         .local pmc argv
         argv = new 'ResizablePMCArray'
         push argv, '--foo'
         push argv, '-f'
         push argv, '-bbar'
 
-        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new ['Getopt';'Obj']
         getopts."notOptStop"(1)
@@ -443,30 +340,18 @@ pir_output_is( <<'CODE', <<'OUT', "optarg" );
         $P1 = getopts."get_options"(argv)
 
         $S0 = $P1["foo"]
-        print "foo is "
-        print $S0
-        print "\n"
+        is($S0, '', 'optarg')
 
         $S0 = $P1["f"]
-        print "f is "
-        print $S0
-        print "\n"
+        is($S0, '', 'optarg')
 
         $S0 = $P1["b"]
-        print "b is "
-        print $S0
-        print "\n"
+        is($S0, 'bar', 'optarg')
 
 .end
-CODE
-foo is 
-f is 
-b is bar
-OUT
 
 # 11
-pir_output_is( <<'CODE', <<'OUT', "pass through" );
-.sub main :main
+.sub test_pass_through
         .local pmc argv
         argv = new 'ResizablePMCArray'
         push argv, '--foo'
@@ -474,7 +359,6 @@ pir_output_is( <<'CODE', <<'OUT', "pass through" );
         push argv, '--bar'
         push argv, 'bar'
 
-        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new ['Getopt';'Obj']
 
@@ -486,43 +370,27 @@ pir_output_is( <<'CODE', <<'OUT', "pass through" );
         $P1 = getopts."get_options"(argv)
 
         $S0 = $P1["foo"]
-        print "foo is "
-        print $S0
-        print "\n"
+        is($S0, 1, 'pass through')
 
         $S0 = $P1["bar"]
-        print "bar is "
-        print $S0
-        print "\n"
+        is($S0, 1, 'pass through')
 
         $S0 = argv[0]
-        print "argv[0] is "
-        print $S0
-        print "\n"
+        is($S0, 'foo', 'pass through')
 
         $S0 = argv[1]
-        print "argv[1] is "
-        print $S0
-        print "\n"
+        is($S0, 'bar', 'pass through')
 
 .end
-CODE
-foo is 1
-bar is 1
-argv[0] is foo
-argv[1] is bar
-OUT
 
 # 12
-pir_output_is( <<'CODE', <<'OUT', "lone dash" );
-.sub main :main
+.sub test_lone_dash
         .local pmc argv
         argv = new 'ResizablePMCArray'
         push argv, '--foo'
         push argv, '-'
         push argv, '--bar'
 
-        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new ['Getopt';'Obj']
 
@@ -534,30 +402,18 @@ pir_output_is( <<'CODE', <<'OUT', "lone dash" );
         $P1 = getopts."get_options"(argv)
 
         $S0 = $P1["foo"]
-        print "foo is "
-        print $S0
-        print "\n"
+        is($S0, 1, 'lone dash')
 
         $S0 = $P1["bar"]
-        print "bar is "
-        print $S0
-        print "\n"
+        is($S0, 1, 'lone dash')
 
         $S0 = argv[0]
-        print "argv[0] is "
-        print $S0
-        print "\n"
+        is($S0, '-', 'lone dash')
 
 .end
-CODE
-foo is 1
-bar is 1
-argv[0] is -
-OUT
 
 # 13
-pir_output_is( <<'CODE', <<'OUT', "push interface" );
-.sub main :main
+.sub test_push_interface
         .local pmc argv
         argv = new 'ResizablePMCArray'
         push argv, '--foo=file'
@@ -574,7 +430,6 @@ pir_output_is( <<'CODE', <<'OUT', "push interface" );
         push argv, '--define=bax=baz'
         push argv, '-Dfoobar'
 
-        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new ['Getopt';'Obj']
 
@@ -588,71 +443,40 @@ pir_output_is( <<'CODE', <<'OUT', "push interface" );
         $P1 = getopts."get_options"(argv)
 
         $S0 = $P1["foo"]
-        print "foo is "
-        print $S0
-        print "\n"
+        is($S0, 'file', 'push interface')
 
         $S0 = $P1["bar"]
-        print "bar is "
-        print $S0
-        print "\n"
+        is($S0, 'file.txt', 'push interface')
 
         $S0 = $P1["bax"]
-        print "bax is "
-        print $S0
-        print "\n"
+        is($S0, 'file.t', 'push interface')
 
         $S0 = $P1["baz"]
-        print "baz is "
-        print $S0
-        print "\n"
+        is($S0, '', 'push interface')
 
         $S0 = $P1["I";0]
-        print "I[0] is "
-        print $S0
-        print "\n"
+        is($S0, 'texta', 'push interface')
 
         $S0 = $P1["I";1]
-        print "I[1] is "
-        print $S0
-        print "\n"
+        is($S0, 'textb', 'push interface')
 
         $S0 = $P1["define";"foo"]
-        print "define[foo] is "
-        print $S0
-        print "\n"
+        is($S0, 'bar', 'push interface')
 
         $S0 = $P1["define";"bax"]
-        print "define[bax] is "
-        print $S0
-        print "\n"
+        is($S0, 'baz', 'push interface')
 
         $S0 = $P1["define";"foobar"]
-        print "define[foobar] is "
-        print $S0
-        print "\n"
+        is($S0, 1, 'push interface')
 
         $S0 = argv[0]
-        print "argv[0] is "
-        print $S0
-        print "\n"
+        is($S0, 'text', 'push interface')
 
 .end
-CODE
-foo is file
-bar is file.txt
-bax is file.t
-baz is 
-I[0] is texta
-I[1] is textb
-define[foo] is bar
-define[bax] is baz
-define[foobar] is 1
-argv[0] is text
-OUT
 
 # 14
-pir_error_output_like( <<'CODE', <<'OUT', "missing spec" );
+.sub test_missing_spec
+    dies_ok(<<'CODE', 'missing_spec')
 .sub main :main
         .local pmc argv
         argv = new 'ResizablePMCArray'
@@ -671,11 +495,11 @@ pir_error_output_like( <<'CODE', <<'OUT', "missing spec" );
         print "\n"
 .end
 CODE
-/Option 'foo' not in specs/
-OUT
+.end
 
 # 15
-pir_error_output_like( <<'CODE', <<'OUT', "missing argument" );
+.sub test_missing_argument
+  dies_ok(<<'CODE', "missing argument")
 .sub main :main
         .local pmc argv
         argv = new 'ResizablePMCArray'
@@ -697,8 +521,7 @@ pir_error_output_like( <<'CODE', <<'OUT', "missing argument" );
         print "\n"
 .end
 CODE
-/Missing a required argument for option 'bar'/
-OUT
+.end
 
 =head1 AUTHOR
 
@@ -711,8 +534,7 @@ F<runtime/parrot/library/Getopt/Obj.pir>
 =cut
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
