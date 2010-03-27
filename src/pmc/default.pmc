@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -960,7 +960,7 @@ inspect_str.
 
 */
     VTABLE PMC *inspect() {
-        PMC    *metadata           = Parrot_pmc_new(interp, enum_class_Hash);
+        PMC    * const metadata    = Parrot_pmc_new(interp, enum_class_Hash);
         STRING * const flags_str   = CONST_STRING(interp, "flags");
 
         VTABLE_set_pmc_keyed_str(interp, metadata, flags_str,
@@ -979,15 +979,16 @@ Returns SELF. A PMC is its own class.
 
 */
     VTABLE PMC *get_class() {
-        PMC *ns     = VTABLE_get_namespace(interp, SELF);
+        PMC * const ns     = VTABLE_get_namespace(interp, SELF);
         PMC *_class = PMCNULL;
 
         if (!PMC_IS_NULL(ns))
             _class = VTABLE_get_class(interp, ns);
 
         if (PMC_IS_NULL(_class)) {
-            INTVAL type      = VTABLE_type(interp, SELF);
-            PMC   *type_num  = Parrot_pmc_new(interp, enum_class_Integer);
+            const INTVAL type      = VTABLE_type(interp, SELF);
+            PMC   * const type_num = Parrot_pmc_new(interp, enum_class_Integer);
+
             VTABLE_set_integer_native(interp, type_num, type);
             return Parrot_pmc_new_init(interp, enum_class_PMCProxy, type_num);
         }
@@ -1766,7 +1767,7 @@ Default fallback. Performs a multiple dispatch call for 'cmp_pmc'.
         /* Don't multidispatch if you've got two pointers to the same PMC. They
          * are equal. */
         if (SELF == value)
-            return 0;
+            return NULL;
 
         Parrot_mmd_multi_dispatch_from_c_args(interp,
                 "cmp_pmc", "PP->P", SELF, value, &retval);
