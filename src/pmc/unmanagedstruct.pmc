@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -28,15 +28,22 @@ bounds access will very likely segfault.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_WARN_UNUSED_RESULT
 static int calc_align(PARROT_INTERP,
-    PMC *pmc,
-    PMC *type_pmc,
+    ARGIN(PMC *type_pmc),
     int type,
     size_t offs)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-static size_t calc_offsets(PARROT_INTERP, PMC *pmc, PMC *value, size_t toff)
-        __attribute__nonnull__(1);
+PARROT_WARN_UNUSED_RESULT
+static size_t calc_offsets(PARROT_INTERP,
+    ARGIN(PMC *pmc),
+    ARGIN(PMC *value),
+    size_t toff)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static char * char_offset_int(PARROT_INTERP, PMC *pmc, INTVAL ix, int *type)
         __attribute__nonnull__(1);
@@ -69,9 +76,12 @@ static void set_string(PARROT_INTERP, char *p, int type, STRING *value)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_calc_align __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(type_pmc))
 #define ASSERT_ARGS_calc_offsets __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc) \
+    , PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_char_offset_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_char_offset_key __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -572,8 +582,8 @@ set_string(PARROT_INTERP, char *p, int type, STRING *value)
 
 /*
 
-=item C<static int calc_align(PARROT_INTERP, PMC *pmc, PMC *type_pmc, int type,
-size_t offs)>
+=item C<static int calc_align(PARROT_INTERP, PMC *type_pmc, int type, size_t
+offs)>
 
 Alignment of contained structures is the alignment of the biggest item in that
 C<struct>.
@@ -586,9 +596,9 @@ This is recursive as structure definitions.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static int
-calc_align(PARROT_INTERP, PMC *pmc, PMC *type_pmc,
-        int type, size_t offs)
+calc_align(PARROT_INTERP, ARGIN(PMC *type_pmc), int type, size_t offs)
 {
     int  align       = data_types[type - enum_first_type].size;
     PMC *nested      = NULL;
@@ -601,7 +611,8 @@ calc_align(PARROT_INTERP, PMC *pmc, PMC *type_pmc,
         nested_init = PARROT_UNMANAGEDSTRUCT(nested)->init;
     }
     if (type == enum_type_struct) {
-        INTVAL i, n    = (size_t)VTABLE_elements(interp, nested_init);
+        INTVAL i;
+        const INTVAL n = (size_t)VTABLE_elements(interp, nested_init);
         int    a_max   = 0;
         int    new_offs;
 
@@ -610,11 +621,11 @@ calc_align(PARROT_INTERP, PMC *pmc, PMC *type_pmc,
                     "Illegal initializer for struct");
 
         for (i = 0; i < n; i += 3) {
-            PMC *nested_type_pmc = VTABLE_get_pmc_keyed_int(interp,
+            PMC * const nested_type_pmc = VTABLE_get_pmc_keyed_int(interp,
                     nested_init, i);
-            int  nested_type     = (int)VTABLE_get_integer(interp,
+            const int nested_type     = (int)VTABLE_get_integer(interp,
                 nested_type_pmc);
-            new_offs             = calc_align(interp, nested,
+            new_offs             = calc_align(interp,
                     nested_type_pmc, nested_type, offs);
 
             if (new_offs > a_max)
@@ -647,23 +658,25 @@ of C<*value>.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static size_t
-calc_offsets(PARROT_INTERP, PMC *pmc, PMC *value, size_t toff)
+calc_offsets(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *value), size_t toff)
 {
-    STRING *_struct = CONST_STRING(interp, "_struct");
-    INTVAL  n       = (size_t)VTABLE_elements(interp, value);
+    STRING * const _struct = CONST_STRING(interp, "_struct");
+    const INTVAL n         = (size_t)VTABLE_elements(interp, value);
     INTVAL  i;
-    int     size;
 
     if (n % 3)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Illegal initializer for struct");
 
     for (i = 0; i < n; i += 3) {
-        PMC *type_pmc = VTABLE_get_pmc_keyed_int(interp, value, i);
-        int  type     = (int)VTABLE_get_integer(interp, type_pmc);
+        PMC * const type_pmc = VTABLE_get_pmc_keyed_int(interp, value, i);
+        const int type       = (int)VTABLE_get_integer(interp, type_pmc);
+
         int  count    = (int)VTABLE_get_integer_keyed_int(interp, value, i + 1);
         int  offs     = (int)VTABLE_get_integer_keyed_int(interp, value, i + 2);
+        int  size;
 
         if (type < enum_first_type || type >= enum_last_type)
             Parrot_ex_throw_from_c_args(interp, NULL,
@@ -676,18 +689,18 @@ calc_offsets(PARROT_INTERP, PMC *pmc, PMC *value, size_t toff)
         }
 
         if (offs <= 0) {
-            offs = toff = calc_align(interp, pmc, type_pmc, type, toff);
+            offs = toff = calc_align(interp, type_pmc, type, toff);
             VTABLE_set_integer_keyed_int(interp, value, i + 2, offs);
         }
         else
             toff = offs;
 
         if (type == enum_type_struct) {
-            PMC *nested = VTABLE_getprop(interp, type_pmc, _struct);
+            PMC * const nested = VTABLE_getprop(interp, type_pmc, _struct);
             size        = VTABLE_get_integer(interp, nested);
         }
         else if (type == enum_type_struct_ptr) {
-            PMC *nested = VTABLE_getprop(interp, type_pmc, _struct);
+            PMC * const nested = VTABLE_getprop(interp, type_pmc, _struct);
 
             /* must clone this struct so as not to share its memory */
             if (nested->vtable->base_type == enum_class_ManagedStruct)
