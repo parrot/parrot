@@ -36,6 +36,7 @@ static void print_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC *sub))
 static void
 print_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC *sub))
 {
+    ASSERT_ARGS(print_sub_name)
     Interp * const tracer = (interp->pdb && interp->pdb->debugger)
                           ? interp->pdb->debugger
                           : interp;
