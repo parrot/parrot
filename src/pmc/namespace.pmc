@@ -42,12 +42,11 @@ static void add_nci_to_namespace(PARROT_INTERP,
 
 static void add_to_class(PARROT_INTERP,
     ARGMOD(Parrot_NameSpace_attributes *nsinfo),
-    ARGMOD(PMC *classobj),
+    ARGMOD_NULLOK(PMC *classobj),
     ARGIN(STRING *key),
     ARGIN(PMC *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
         FUNC_MODIFIES(*nsinfo)
@@ -81,7 +80,6 @@ static int ns_insert_sub_keyed_str(PARROT_INTERP,
 #define ASSERT_ARGS_add_to_class __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(nsinfo) \
-    , PARROT_ASSERT_ARG(classobj) \
     , PARROT_ASSERT_ARG(key) \
     , PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_maybe_add_sub_to_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
