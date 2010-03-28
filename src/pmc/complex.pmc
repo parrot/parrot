@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2009, Parrot Foundation.
+Copyright (C) 2004-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -26,14 +26,16 @@ but those starting with => are the ones used
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void complex_check_divide_zero(PARROT_INTERP, PMC *value)
-        __attribute__nonnull__(1);
+static void complex_check_divide_zero(PARROT_INTERP, ARGIN(PMC *value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void float_check_divide_zero(PARROT_INTERP, FLOATVAL value)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_complex_check_divide_zero __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_float_check_divide_zero __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -224,7 +226,7 @@ float_check_divide_zero(PARROT_INTERP, FLOATVAL value) {
 }
 
 static void
-complex_check_divide_zero(PARROT_INTERP, PMC *value) {
+complex_check_divide_zero(PARROT_INTERP, ARGIN(PMC *value)) {
     /* Throw an exception if we are dividing by zero. Check both the real part
      * and the imaginary part.*/
     if (FLOAT_IS_ZERO(VTABLE_get_number_keyed_int(interp, value, 0))

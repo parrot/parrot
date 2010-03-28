@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -36,17 +36,19 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void print_sub_name(PARROT_INTERP, PMC *sub_pmc)
-        __attribute__nonnull__(1);
+static void print_sub_name(PARROT_INTERP, ARGIN(PMC *sub_pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_print_sub_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(sub_pmc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 
 static void
-print_sub_name(PARROT_INTERP, PMC *sub_pmc)
+print_sub_name(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 {
     /* It's actually a Parrot_coroutine, but this avoids casting warnings. */
     PMC           *ctx;
@@ -61,7 +63,7 @@ print_sub_name(PARROT_INTERP, PMC *sub_pmc)
         "Calling" : "yielding from",
         Parrot_full_sub_name(interp, sub_pmc));
 
-    if (ctx && (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_CORO_FF)) {
+    if (!PMC_IS_NULL(ctx) && (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_CORO_FF)) {
         Parrot_io_eprintf(tracer, " to '%Ss'",
                 Parrot_full_sub_name(interp,
                     Parrot_pcc_get_sub(interp, Parrot_pcc_get_caller_ctx(interp, ctx))));
@@ -153,7 +155,7 @@ Swaps the "context".
         opcode_t          *dest;
         PackFile_ByteCode *wanted_seg;
         opcode_t * const   next_op = (opcode_t *)next;
-        PMC               *signature = Parrot_pcc_get_signature(interp,
+        PMC      * const signature = Parrot_pcc_get_signature(interp,
                                             CURRENT_CONTEXT(interp));
 
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG))
