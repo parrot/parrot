@@ -231,10 +231,10 @@ float_check_divide_zero(PARROT_INTERP, FLOATVAL value) {
 
 static void
 complex_check_divide_zero(PARROT_INTERP, ARGIN(PMC *value)) {
-    /* Throw an exception if we are dividing by zero. Check both the real part
-     * and the imaginary part.*/
     ASSERT_ARGS(complex_check_divide_zero)
 
+    /* Throw an exception if we are dividing by zero. Check both the real part
+     * and the imaginary part.*/
 
     if (FLOAT_IS_ZERO(VTABLE_get_number_keyed_int(interp, value, 0))
             && FLOAT_IS_ZERO(VTABLE_get_number_keyed_int(interp, value, 1)))
