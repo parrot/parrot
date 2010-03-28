@@ -183,6 +183,7 @@ PARROT_CAN_RETURN_NULL
 static char *
 char_offset_int(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL ix, ARGMOD(int *type))
 {
+    ASSERT_ARGS(char_offset_int)
     size_t offs, n;
     ix *= 3;
 
@@ -221,6 +222,7 @@ PARROT_WARN_UNUSED_RESULT
 static INTVAL
 key_2_idx(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *key))
 {
+    ASSERT_ARGS(key_2_idx)
     int ix = 0;
 
     if (!PARROT_UNMANAGEDSTRUCT(pmc)->init)
@@ -271,6 +273,7 @@ PARROT_CAN_RETURN_NULL
 static char *
 char_offset_key(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *key), ARGMOD(int *type))
 {
+    ASSERT_ARGS(char_offset_key)
     size_t offs, count, size, max;
     int    ix;
     PMC   *next, *init;
@@ -375,6 +378,7 @@ PARROT_WARN_UNUSED_RESULT
 static INTVAL
 ret_int(PARROT_INTERP, ARGIN(const char *p), int type)
 {
+    ASSERT_ARGS(ret_int)
     switch (type) {
       case enum_type_INTVAL:
         return *(const INTVAL*) p;
@@ -443,6 +447,7 @@ PARROT_WARN_UNUSED_RESULT
 static FLOATVAL
 ret_float(PARROT_INTERP, ARGIN(const char *p), int type)
 {
+    ASSERT_ARGS(ret_float)
     switch (type) {
       case enum_type_FLOATVAL:
         return (FLOATVAL) *(const FLOATVAL *)p;
@@ -471,6 +476,7 @@ PARROT_CAN_RETURN_NULL
 static STRING*
 ret_string(PARROT_INTERP, ARGIN(char *p), int type)
 {
+    ASSERT_ARGS(ret_string)
     if (type == enum_type_cstr) {
         char  *cstr = *(char **) p;
         if (cstr) {
@@ -509,6 +515,7 @@ PARROT_CANNOT_RETURN_NULL
 static PMC*
 ret_pmc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(char *p), int type, INTVAL idx)
 {
+    ASSERT_ARGS(ret_pmc)
     PMC * const init = PARROT_UNMANAGEDSTRUCT(pmc)->init;
     PMC * const ptr  = VTABLE_get_pmc_keyed_int(interp, init, idx * 3);
     PMC *ret  = NULL;
@@ -563,6 +570,7 @@ ret_pmc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(char *p), int type, INTVAL idx)
 static void
 set_int(PARROT_INTERP, ARGIN(char *p), int type, INTVAL value)
 {
+    ASSERT_ARGS(set_int)
     switch (type) {
       case enum_type_uint8:
       case enum_type_int8:
@@ -602,6 +610,7 @@ C<value>.
 static void
 set_float(PARROT_INTERP, ARGIN(char *p), int type, FLOATVAL value)
 {
+    ASSERT_ARGS(set_float)
     switch (type) {
       case enum_type_FLOATVAL:
         *(FLOATVAL *)p = (FLOATVAL)value;
@@ -633,6 +642,7 @@ C<*value>.
 static void
 set_string(PARROT_INTERP, ARGIN(char *p), int type, ARGIN(STRING *value))
 {
+    ASSERT_ARGS(set_string)
     if (type == enum_type_cstr) {
         /* assuming 0-terminated C-string here;
          * we can't use Parrot_str_to_cstring easily */
@@ -664,6 +674,7 @@ PARROT_WARN_UNUSED_RESULT
 static int
 calc_align(PARROT_INTERP, ARGIN(PMC *type_pmc), int type, size_t offs)
 {
+    ASSERT_ARGS(calc_align)
     int  align       = data_types[type - enum_first_type].size;
     PMC *nested      = NULL;
     PMC *nested_init = NULL;
@@ -726,6 +737,7 @@ PARROT_WARN_UNUSED_RESULT
 static size_t
 calc_offsets(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *value), size_t toff)
 {
+    ASSERT_ARGS(calc_offsets)
     STRING * const _struct = CONST_STRING(interp, "_struct");
     const INTVAL n         = (size_t)VTABLE_elements(interp, value);
     INTVAL  i;
