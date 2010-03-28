@@ -51,6 +51,7 @@ PARROT_INLINE
 static int
 encoding_is_utf8(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
 {
+    ASSERT_ARGS(encoding_is_utf8)
     if (STRING_IS_NULL(s))
         return 0;
     else
