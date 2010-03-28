@@ -72,6 +72,7 @@ static void init_role_from_hash(PARROT_INTERP,
 static void
 init_role_from_hash(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *info))
 {
+    ASSERT_ARGS(init_role_from_hash)
     Parrot_Role_attributes * const role     = PARROT_ROLE(self);
     STRING * const ns_string     = CONST_STRING(interp, "NameSpace");
     STRING * const name_str      = CONST_STRING(interp, "name");
