@@ -42,6 +42,8 @@ PARROT_INLINE
 static UINTVAL
 get_size_in_bytes(UINTVAL size)
 {
+    ASSERT_ARGS(get_size_in_bytes)
+
     return (size + BITS_PER_CHAR - 1) / BITS_PER_CHAR;
 }
 
