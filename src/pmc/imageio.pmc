@@ -124,6 +124,8 @@ INC_VISIT_CURSOR(PMC *pmc, UINTVAL inc) {
 static void
 create_buffer(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGMOD(PMC *info))
 {
+    ASSERT_ARGS(create_buffer)
+
     INTVAL  len;
 
     if (!PMC_IS_NULL(pmc)) {
@@ -159,6 +161,8 @@ PARROT_INLINE
 static void
 ensure_buffer_size(PARROT_INTERP, ARGIN(PMC *io), size_t len)
 {
+    ASSERT_ARGS(ensure_buffer_size)
+
     Buffer *buf         = PARROT_IMAGEIO(io)->buffer;
     const size_t used   = PARROT_IMAGEIO(io)->pos;
     const int need_free = Buffer_buflen(buf) - used - len;
@@ -182,6 +186,8 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_INLINE
 static INTVAL
 INFO_HAS_DATA(ARGIN(PMC *io)) {
+    ASSERT_ARGS(INFO_HAS_DATA)
+
     return PARROT_IMAGEIO(io)->pos < PARROT_IMAGEIO(io)->input_length;
 }
 
@@ -190,6 +196,8 @@ PARROT_CAN_RETURN_NULL
 PARROT_INLINE
 static PMC*
 id_list_get(PARROT_INTERP, ARGIN(const PMC *io), UINTVAL id) {
+    ASSERT_ARGS(id_list_get)
+
     return VTABLE_get_pmc_keyed_int(interp, PARROT_IMAGEIO(io)->todo, id - 1);
 }
 
@@ -199,6 +207,8 @@ PARROT_INLINE
 static PMC *
 visit_todo_list_thaw(PARROT_INTERP, ARGIN(PMC* info))
 {
+    ASSERT_ARGS(visit_todo_list_thaw)
+
     const UINTVAL  n            = VTABLE_shift_integer(interp, info);
     const UINTVAL  id           = PackID_get_PMCID(n);
     const int      packid_flags = PackID_get_FLAGS(n);
@@ -237,6 +247,8 @@ visit_todo_list_thaw(PARROT_INTERP, ARGIN(PMC* info))
 static void
 visit_todo_list_freeze(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc), ARGMOD(PMC* info))
 {
+    ASSERT_ARGS(visit_todo_list_freeze)
+
     UINTVAL id;
     int packid_type;
 
