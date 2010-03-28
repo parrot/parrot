@@ -1035,7 +1035,7 @@ bignum_set_double(PARROT_INTERP, ARGIN(PMC *self), double value) {
 }
 
 static void
-bignum_set_str(PARROT_INTERP, ARGIN(PMC *self), char *value, int base) {
+bignum_set_str(PARROT_INTERP, ARGIN(PMC *self), const char *value, int base) {
     THROW_NYI;
 }
 
