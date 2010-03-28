@@ -373,13 +373,6 @@ static void bignum_set(PARROT_INTERP, ARGMOD(PMC *dest), ARGIN(PMC *src))
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
-static void bignum_set_bigint(PARROT_INTERP,
-    ARGIN(PMC *self),
-    ARGIN(struct BIGINT *value))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
 static void bignum_set_default_prec(PARROT_INTERP,
     ARGIN(PMC *self),
     INTVAL prec)
@@ -556,10 +549,6 @@ static void bignum_sub_bignum_int(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(dest) \
     , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_bignum_set_bigint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self) \
-    , PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_bignum_set_default_prec __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
@@ -676,14 +665,6 @@ bignum_set_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(const char *value), int ba
     mpf_set_str(bn->b, value, base);
 }
 
-#  ifdef PARROT_BIGNUM_CAN_BIGINT
-static void
-bignum_set_bigint(PARROT_INTERP, ARGIN(PMC *self), ARGIN(struct BIGINT *value)) {
-    BIGNUM *bn;
-    GETATTR_BigNum_bn(interp, self, bn);
-    mpf_set(bn->b, (mpf_srcptr)value->b);
-}
-#  endif
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -778,26 +759,6 @@ bignum_get_float(PARROT_INTERP, ARGIN(PMC *self)) {
     GETATTR_BigNum_bn(interp, self, bn);
     return mpf_get_d(bn->b);
 }
-
-#  ifdef PARROT_BIGNUM_CAN_BIGINT
-PARROT_WARN_UNUSED_RESULT
-static struct BIGINT
-bignum_get_bigint(PARROT_INTERP, ARGIN(PMC *self)) {
-    BIGNUM *bn;
-    struct BIGINT *bi_dest;
-    GETATTR_BigNum_bn(interp, self, bn);
-    mpz_clear(bi_dest->b);
-    mpz_init(bi_dest->b);
-    if ( mpf_fits_slong_p(bn->b)) {
-        bi_dest->b = mpf_get_ui(bn->b);
-    }
-    else {
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
-            "bignum_get_bigint: Precision loss");
-    }
-    return bi_dest;
-}
-#  endif
 
 static void
 bignum_add_bignum(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value), ARGMOD(PMC *dest)) {
@@ -1039,6 +1000,34 @@ bignum_set_default_prec(PARROT_INTERP, ARGIN(PMC *self), INTVAL prec) {
 }
 
 /* HEADERIZER STOP */
+/* Don't headerize these BIGINT funcs */
+
+#  ifdef PARROT_BIGNUM_CAN_BIGINT
+PARROT_WARN_UNUSED_RESULT
+static struct BIGINT
+bignum_get_bigint(PARROT_INTERP, ARGIN(PMC *self)) {
+    BIGNUM *bn;
+    struct BIGINT *bi_dest;
+    GETATTR_BigNum_bn(interp, self, bn);
+    mpz_clear(bi_dest->b);
+    mpz_init(bi_dest->b);
+    if ( mpf_fits_slong_p(bn->b)) {
+        bi_dest->b = mpf_get_ui(bn->b);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            "bignum_get_bigint: Precision loss");
+    }
+    return bi_dest;
+}
+
+static void
+bignum_set_bigint(PARROT_INTERP, ARGIN(PMC *self), ARGIN(struct BIGINT *value)) {
+    BIGNUM *bn;
+    GETATTR_BigNum_bn(interp, self, bn);
+    mpf_set(bn->b, (mpf_srcptr)value->b);
+}
+#  endif
 
 #else /* ifdef PARROT_HAS_GMP */
 
@@ -1400,7 +1389,7 @@ Trunc the BigNum to an BigInt.
         return bignum_get_bigint(INTERP, SELF);
 #else
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-            "no bigint support in bigint");
+            "no bigint support in bignum");
 #endif
     }
 
