@@ -98,7 +98,7 @@ static int ns_insert_sub_keyed_str(PARROT_INTERP,
 
 static void
 add_to_class(PARROT_INTERP, ARGMOD(Parrot_NameSpace_attributes *nsinfo),
-        ARGMOD(PMC *classobj), ARGIN(STRING *key), ARGIN(PMC *value))
+        ARGMOD_NULLOK(PMC *classobj), ARGIN(STRING *key), ARGIN(PMC *value))
 {
     ASSERT_ARGS(add_to_class)
 
