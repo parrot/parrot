@@ -46,6 +46,8 @@ static PMC* upgrade_self_to_bignum(PARROT_INTERP, ARGMOD(PMC *self))
 static void
 maybe_throw_overflow_error(PARROT_INTERP)
 {
+    ASSERT_ARGS(maybe_throw_overflow_error)
+
     /* check to see what the behavior is. If the interpreter is set
        to throw an exception on overflow. If so, throw the exception,
        otherwise, chill out it's no big deal. */
@@ -59,6 +61,8 @@ PARROT_CANNOT_RETURN_NULL
 static PMC*
 upgrade_self_to_bignum(PARROT_INTERP, ARGMOD(PMC *self))
 {
+    ASSERT_ARGS(upgrade_self_to_bignum)
+
     /* Do an in-place upgrade to a Bignum of SELF and return a pointer
        to it (which is probably redundant, but whatever). */
     const INTVAL a = VTABLE_get_integer(interp, self);
