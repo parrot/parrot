@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -98,8 +98,9 @@ An empty ResizablePMCArray PMC is allocated during initialization.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void build_attrib_index(PARROT_INTERP, PMC *self)
-        __attribute__nonnull__(1);
+static void build_attrib_index(PARROT_INTERP, ARGIN(PMC *self))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static int cache_class_attribs(PARROT_INTERP,
     PMC *cur_class,
@@ -111,8 +112,12 @@ static int cache_class_attribs(PARROT_INTERP,
 static void calculate_mro(PARROT_INTERP, PMC *SELF, INTVAL num_parents)
         __attribute__nonnull__(1);
 
-static void init_class_from_hash(PARROT_INTERP, PMC *self, PMC *info)
-        __attribute__nonnull__(1);
+static void init_class_from_hash(PARROT_INTERP,
+    ARGMOD(PMC *self),
+    ARGIN_NULLOK(PMC *info))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*self);
 
 static void initialize_parents(PARROT_INTERP, PMC *object, PMC *all_parents)
         __attribute__nonnull__(1);
@@ -127,13 +132,15 @@ static STRING * make_class_name(PARROT_INTERP, PMC *SELF)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_build_attrib_index __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_cache_class_attribs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_calculate_mro __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_init_class_from_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_initialize_parents __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_initialize_parents_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -183,7 +190,7 @@ cache_class_attribs(PARROT_INTERP, PMC *cur_class, PMC *attrib_index,
 /* This function builds the attribute index (table to map class name and
  * attribute name to an index) for the current class. */
 static void
-build_attrib_index(PARROT_INTERP, PMC *self)
+build_attrib_index(PARROT_INTERP, ARGIN(PMC *self))
 {
     Parrot_Class_attributes * const _class      = PARROT_CLASS(self);
     int                  cur_index    = 0;
@@ -209,9 +216,10 @@ build_attrib_index(PARROT_INTERP, PMC *self)
     _class->attrib_index = attrib_index;
     _class->attrib_cache = cache;
 }
+
 /* Takes a hash and initializes the class based on it. */
 static void
-init_class_from_hash(PARROT_INTERP, PMC *self, PMC *info)
+init_class_from_hash(PARROT_INTERP, ARGMOD(PMC *self), ARGIN_NULLOK(PMC *info))
 {
     Parrot_Class_attributes * const _class      = PARROT_CLASS(self);
     STRING       * const name_str    = CONST_STRING(interp, "name");
