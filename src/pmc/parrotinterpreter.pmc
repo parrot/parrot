@@ -40,8 +40,13 @@ These are the vtable functions for the ParrotInterpreter base class
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void create_interp(PMC *self, Parrot_Interp parent);
-#define ASSERT_ARGS_create_interp __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+static void create_interp(
+    ARGIN(PMC *self),
+    ARGIN_NULLOK(Parrot_Interp parent))
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_create_interp __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(self))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -167,7 +172,7 @@ Creates a new child interpreter of C<parent>.
 */
 
 static void
-create_interp(PMC *self, Parrot_Interp parent)
+create_interp(ARGIN(PMC *self), ARGIN_NULLOK(Parrot_Interp parent))
 {
     Interp_flags flag  = PARROT_NO_FLAGS;
     Parrot_Interp new_interp;

@@ -54,17 +54,23 @@ An empty Hash PMC is allocated during initialization.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void init_role_from_hash(PARROT_INTERP, PMC *self, PMC *info)
-        __attribute__nonnull__(1);
+static void init_role_from_hash(PARROT_INTERP,
+    ARGIN(PMC *self),
+    ARGIN(PMC *info))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_init_role_from_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(info))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /* Takes a hash and initializes the role based on it. */
 static void
-init_role_from_hash(PARROT_INTERP, PMC *self, PMC *info)
+init_role_from_hash(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *info))
 {
     Parrot_Role_attributes * const role     = PARROT_ROLE(self);
     STRING * const ns_string     = CONST_STRING(interp, "NameSpace");
