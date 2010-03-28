@@ -100,6 +100,8 @@ static void
 add_to_class(PARROT_INTERP, ARGMOD(Parrot_NameSpace_attributes *nsinfo),
         ARGMOD(PMC *classobj), ARGIN(STRING *key), ARGIN(PMC *value))
 {
+    ASSERT_ARGS(add_to_class)
+
     /* Insert it in class, if there is a class */
     if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
         VTABLE_add_method(interp, classobj, key, value);
@@ -120,6 +122,8 @@ static int
 ns_insert_sub_keyed_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *key),
         ARGIN_NULLOK(PMC *value))
 {
+    ASSERT_ARGS(ns_insert_sub_keyed_str)
+
     Parrot_NameSpace_attributes * const nsinfo   = PARROT_NAMESPACE(self);
     PMC              *       vtable   = nsinfo->vtable;
     PMC              * const classobj = VTABLE_get_class(interp, self);
@@ -172,6 +176,8 @@ static int
 maybe_add_sub_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
         ARGIN(PMC *value))
 {
+    ASSERT_ARGS(maybe_add_sub_to_namespace)
+
     STRING * const sub_str = CONST_STRING(interp, "Sub");
 
     if (!PMC_IS_NULL(value)
@@ -186,6 +192,8 @@ static void
 add_nci_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
         ARGIN_NULLOK(PMC *value))
 {
+    ASSERT_ARGS(add_nci_to_namespace)
+
     STRING * const nci_str = CONST_STRING(interp, "NCI");
 
     if (!PMC_IS_NULL(value)
@@ -202,6 +210,8 @@ static void
 add_multi_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
         ARGIN_NULLOK(PMC *value))
 {
+    ASSERT_ARGS(add_multi_to_namespace)
+
     STRING * const multi_str = CONST_STRING(interp, "MultiSub");
 
     if (!PMC_IS_NULL(value)
