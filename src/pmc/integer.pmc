@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003-2008, Parrot Foundation.
+Copyright (C) 2003-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -28,13 +28,18 @@ integer type without going to an I register.
 static void maybe_throw_overflow_error(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static PMC* upgrade_self_to_bignum(PARROT_INTERP, PMC *self)
-        __attribute__nonnull__(1);
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static PMC* upgrade_self_to_bignum(PARROT_INTERP, ARGMOD(PMC *self))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*self);
 
 #define ASSERT_ARGS_maybe_throw_overflow_error __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_upgrade_self_to_bignum __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -49,8 +54,10 @@ maybe_throw_overflow_error(PARROT_INTERP)
             "Integer overflow");
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PMC*
-upgrade_self_to_bignum(PARROT_INTERP, PMC *self)
+upgrade_self_to_bignum(PARROT_INTERP, ARGMOD(PMC *self))
 {
     /* Do an in-place upgrade to a Bignum of SELF and return a pointer
        to it (which is probably redundant, but whatever). */
