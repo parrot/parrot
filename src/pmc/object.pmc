@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -26,38 +26,68 @@ Implements an instance of a class.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void cache_method(PARROT_INTERP,
-    PMC *_class,
-    STRING *name,
-    PMC *method)
-        __attribute__nonnull__(1);
+    ARGIN(PMC *_class),
+    ARGIN(STRING *name),
+    ARGIN(PMC *method))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
-static PMC * find_cached(PARROT_INTERP, PMC *_class, STRING *name)
-        __attribute__nonnull__(1);
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static PMC * find_cached(PARROT_INTERP,
+    ARGIN(PMC *_class),
+    ARGIN(STRING *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
-static INTVAL get_attrib_index(PARROT_INTERP, PMC *self, STRING *name)
-        __attribute__nonnull__(1);
+PARROT_WARN_UNUSED_RESULT
+static INTVAL get_attrib_index(PARROT_INTERP,
+    ARGIN(PMC *self),
+    ARGIN(STRING *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
 static INTVAL get_attrib_index_keyed(PARROT_INTERP,
-    PMC *self,
-    PMC *key,
-    STRING *name)
-        __attribute__nonnull__(1);
+    ARGIN(PMC *self),
+    ARGIN(PMC *key),
+    ARGIN(STRING *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 #define ASSERT_ARGS_cache_method __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(_class) \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(method))
 #define ASSERT_ARGS_find_cached __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(_class) \
+    , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_get_attrib_index __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_get_attrib_index_keyed __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(key) \
+    , PARROT_ASSERT_ARG(name))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /* This finds the index of an attribute in an object's attribute store and
  * returns it. Returns -1 if the attribute does not exist. */
+
+PARROT_WARN_UNUSED_RESULT
 static INTVAL
-get_attrib_index(PARROT_INTERP, PMC *self, STRING *name)
+get_attrib_index(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *name))
 {
     Parrot_Class_attributes * const _class  = PARROT_CLASS(self);
     const INTVAL                    cur_hll = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp));
@@ -111,8 +141,9 @@ get_attrib_index(PARROT_INTERP, PMC *self, STRING *name)
  * parent's attribute in an object's attribute store and returns it. Returns -1
  * if the attribute does not exist. */
 
+PARROT_WARN_UNUSED_RESULT
 static INTVAL
-get_attrib_index_keyed(PARROT_INTERP, PMC *self, PMC *key, STRING *name)
+get_attrib_index_keyed(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *key), ARGIN(STRING *name))
 {
     Parrot_Class_attributes * const _class       = PARROT_CLASS(self);
     PMC          * const class_cache  = VTABLE_get_pmc_keyed_str(interp,
@@ -140,8 +171,10 @@ get_attrib_index_keyed(PARROT_INTERP, PMC *self, PMC *key, STRING *name)
     return -1;
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC *
-find_cached(PARROT_INTERP, PMC *_class, STRING *name)
+find_cached(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *name))
 {
     PMC *cache;
     GETATTR_Class_meth_cache(interp, _class, cache);
@@ -153,7 +186,7 @@ find_cached(PARROT_INTERP, PMC *_class, STRING *name)
 }
 
 static void
-cache_method(PARROT_INTERP, PMC *_class, STRING *name, PMC *method)
+cache_method(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *name), ARGIN(PMC *method))
 {
     PMC *cache;
     GETATTR_Class_meth_cache(interp, _class, cache);
