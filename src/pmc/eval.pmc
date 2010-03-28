@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -55,6 +55,8 @@ static void mark_subs(PARROT_INTERP, ARGIN(PMC *self))
 static void
 clear_fixups(PARROT_INTERP, ARGIN(const Parrot_Sub_attributes *sub_data))
 {
+    ASSERT_ARGS(clear_fixups)
+
     INTVAL               i;
     PackFile_ByteCode   * const seg = sub_data->seg;
     PackFile_FixupTable *ft;
@@ -88,6 +90,8 @@ PARROT_CAN_RETURN_NULL
 static PMC*
 get_sub(PARROT_INTERP, ARGIN(PMC *self), int idx)
 {
+    ASSERT_ARGS(get_sub)
+
     INTVAL                 i, n;
     Parrot_Sub_attributes *sub;
     PackFile_ByteCode     *seg;
@@ -125,6 +129,8 @@ get_sub(PARROT_INTERP, ARGIN(PMC *self), int idx)
 static void
 mark_subs(PARROT_INTERP, ARGIN(PMC *self))
 {
+    ASSERT_ARGS(mark_subs)
+
     Parrot_Sub_attributes *sub;
     PackFile_ByteCode   *seg;
     PackFile_FixupTable *ft;
