@@ -28,6 +28,10 @@ C<Parrot_register_pmc> if it isn't visible to Parrot.
 #include "parrot/hash.h"
 #include "pmc/pmc_hash.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass AddrRegistry extends Hash provides hash auto_attrs {
 /*
 

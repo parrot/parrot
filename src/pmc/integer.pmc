@@ -21,6 +21,23 @@ integer type without going to an I register.
 
 #include "pmc/pmc_bigint.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void maybe_throw_overflow_error(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+static PMC* upgrade_self_to_bignum(PARROT_INTERP, PMC *self)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_maybe_throw_overflow_error __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_upgrade_self_to_bignum __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 static void
 maybe_throw_overflow_error(PARROT_INTERP)
 {

@@ -63,6 +63,10 @@ NOTE: No doubt we will need other things later; this is a start.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 
 pmclass PMCProxy extends Class auto_attrs {
 

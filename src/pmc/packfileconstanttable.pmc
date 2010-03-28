@@ -24,6 +24,10 @@ PDD13 for the design spec.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass PackfileConstantTable auto_attrs extends PackfileSegment {
     /* ResizablePMCArray for storing constants */
     ATTR PMC *constants;

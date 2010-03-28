@@ -16,6 +16,10 @@ Implements oplib VTABLEs.
 
 #include "parrot/parrot.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 /* TODO: Since Opcode PMCs are essentially read-only after initialization
          here, we should cache them. A FixedPMCArray would be okay, an
          INTVAL->PMC HASH might be better, since it's unlikely that we will

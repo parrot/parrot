@@ -17,8 +17,18 @@ than an external file. Commonly used as a mock FileHandle for testing.
 
 #include "../src/io/io_private.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
 PARROT_INLINE
-static int encoding_is_utf8(PARROT_INTERP, ARGIN_NULLOK(STRING *s));
+static int encoding_is_utf8(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_encoding_is_utf8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
 
 /*
 
@@ -26,7 +36,7 @@ static int encoding_is_utf8(PARROT_INTERP, ARGIN_NULLOK(STRING *s));
 
 =over 4
 
-=item C<static int encoding_is_utf8()>
+=item C<static int encoding_is_utf8(PARROT_INTERP, STRING *s)>
 
 Helper function for internal usage. Return 1 if the string argument is
 not null and has utf8 encoding, 0 otherwise.
@@ -38,7 +48,8 @@ not null and has utf8 encoding, 0 otherwise.
 */
 
 PARROT_INLINE
-static int encoding_is_utf8(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
+static int
+encoding_is_utf8(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
 {
     if (STRING_IS_NULL(s))
         return 0;

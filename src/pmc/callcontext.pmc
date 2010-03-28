@@ -52,6 +52,84 @@ typedef struct Pcc_cell
 
 #define HLL_TYPE(i) Parrot_get_ctx_HLL_type(interp, (i))
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static FLOATVAL autobox_floatval(PARROT_INTERP, Pcc_cell *cell)
+        __attribute__nonnull__(1);
+
+static INTVAL autobox_intval(PARROT_INTERP, Pcc_cell *cell)
+        __attribute__nonnull__(1);
+
+static PMC * autobox_pmc(PARROT_INTERP, Pcc_cell *cell)
+        __attribute__nonnull__(1);
+
+static STRING * autobox_string(PARROT_INTERP, Pcc_cell *cell)
+        __attribute__nonnull__(1);
+
+static void ensure_positionals_storage(PARROT_INTERP,
+    ARGIN(PMC *self),
+    INTVAL size)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static Pcc_cell* get_cell_at(PARROT_INTERP, ARGIN(PMC *self), INTVAL key)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static Hash * get_hash(PARROT_INTERP, ARGIN(PMC *SELF))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static PMC * get_named_names(PARROT_INTERP, ARGIN(PMC *SELF))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void mark_cell(PARROT_INTERP, ARGIN(Pcc_cell *c))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void mark_hash(PARROT_INTERP, ARGIN(Hash *h))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void mark_positionals(PARROT_INTERP, ARGIN(PMC *self))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_autobox_floatval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_autobox_intval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_autobox_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_autobox_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_ensure_positionals_storage __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_get_cell_at __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_get_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(SELF))
+#define ASSERT_ARGS_get_named_names __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(SELF))
+#define ASSERT_ARGS_mark_cell __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(c))
+#define ASSERT_ARGS_mark_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(h))
+#define ASSERT_ARGS_mark_positionals __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 static void
 ensure_positionals_storage(PARROT_INTERP, ARGIN(PMC *self), INTVAL size)
 {

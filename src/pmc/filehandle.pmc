@@ -31,6 +31,10 @@ extern "C" {
 #endif
 #endif
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass FileHandle extends Handle auto_attrs {
     ATTR INTVAL flags;                /* Filehandle flags             */
     ATTR STRING *filename;            /* The opened path and filename */

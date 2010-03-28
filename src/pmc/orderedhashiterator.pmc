@@ -21,6 +21,10 @@ Implementation of Iterator for OrderedHash.
 #include "pmc/pmc_orderedhash.h"
 #include "pmc/pmc_hashiteratorkey.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass OrderedHashIterator extends Iterator no_ro auto_attrs {
     ATTR PMC        *pmc_hash;      /* the Hash which this Iterator iterates */
     ATTR PMC        *next_entry;    /* Next entry to shift/pop */

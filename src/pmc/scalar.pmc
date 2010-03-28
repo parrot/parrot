@@ -20,6 +20,10 @@ These are the vtable functions for the scalar base PMC class
 
 #include "pmc/pmc_bigint.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass scalar {
 
 /*

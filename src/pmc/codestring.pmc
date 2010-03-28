@@ -34,6 +34,10 @@ C<emit> method.
 #  include <unicode/uchar.h>
 #endif
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass CodeString extends String provides string auto_attrs {
     ATTR PMC *linepos;            /* start of line positions */
 

@@ -22,6 +22,23 @@ but those starting with => are the ones used
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void complex_check_divide_zero(PARROT_INTERP, PMC *value)
+        __attribute__nonnull__(1);
+
+static void float_check_divide_zero(PARROT_INTERP, FLOATVAL value)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_complex_check_divide_zero __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_float_check_divide_zero __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 /*
 
 =item C<static void
@@ -264,8 +281,8 @@ Creates an identical copy of the complex number.
           case enum_class_FixedIntegerArray:
           case enum_class_ResizableIntegerArray:
             if (VTABLE_get_integer(interp, initializer) == 2) {
-                FLOATVAL re = VTABLE_get_number_keyed_int(interp, initializer, 0);
-                FLOATVAL im = VTABLE_get_number_keyed_int(interp, initializer, 1);
+                const FLOATVAL re = VTABLE_get_number_keyed_int(interp, initializer, 0);
+                const FLOATVAL im = VTABLE_get_number_keyed_int(interp, initializer, 1);
                 SET_ATTR_re(INTERP, SELF, re);
                 SET_ATTR_im(INTERP, SELF, im);
                 break;
@@ -273,7 +290,7 @@ Creates an identical copy of the complex number.
             /* else let it fall to default */
           default:
             if (VTABLE_isa(interp, initializer, CONST_STRING(interp, "String"))) {
-                STRING * s = VTABLE_get_string(interp, initializer);
+                STRING * const s = VTABLE_get_string(interp, initializer);
                 SELF.set_string_native(s);
             }
             else {

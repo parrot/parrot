@@ -90,6 +90,10 @@ A Null PMC is allocated during initialization.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass Exporter auto_attrs {
 
     ATTR PMC *ns_src;

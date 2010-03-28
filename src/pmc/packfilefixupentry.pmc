@@ -19,6 +19,10 @@ PackfileFixupTable segment of the .pbc file.  See PDD13 for a design spec.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass PackfileFixupEntry auto_attrs {
     ATTR INTVAL     type;
     ATTR STRING     *name;

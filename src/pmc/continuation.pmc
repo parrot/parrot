@@ -36,6 +36,10 @@ more information.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 
 /*
  * A Continuation (and RetContinuation, ExceptionHandler) has in its

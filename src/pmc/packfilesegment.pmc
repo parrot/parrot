@@ -23,6 +23,10 @@ spec.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass PackfileSegment auto_attrs {
     /*
     Directory which owns this segment. Required for correct pack/unpack

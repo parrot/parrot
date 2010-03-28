@@ -19,6 +19,10 @@ stored FLOATVALs.  It uses Float PMCs to do all necessary conversions.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass FixedFloatArray auto_attrs provides array {
     ATTR INTVAL    size;
     ATTR FLOATVAL *float_array;

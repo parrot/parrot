@@ -23,6 +23,10 @@ after invocation.
 
 #include "parrot/oplib/ops.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass RetContinuation extends Continuation auto_attrs {
 
 /*

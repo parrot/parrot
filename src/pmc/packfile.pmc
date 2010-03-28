@@ -21,6 +21,10 @@ the top level parser and serializer for *.pbc files.
 
 #include "pmc/pmc_packfiledirectory.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 /*
 Copy attributes from PackFile* to Packfile PMC.
 */

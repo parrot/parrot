@@ -48,6 +48,10 @@ These are the vtable functions for the Hash PMC.
 #include "pmc/pmc_key.h"
 #include "pmc/pmc_hashiteratorkey.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass Hash provides hash auto_attrs {
     ATTR Hash *hash;
 

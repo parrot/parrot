@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -88,7 +88,7 @@ main();
 
 =head1 FUNCTIONS
 
-=head2 extract_function_declarations( $source_file_text )
+=head2 extract_function_declarations( $sourcefile_text )
 
 Rips apart a C file to get the function declarations.
 
@@ -131,7 +131,10 @@ sub extract_function_declarations {
     @funcs = grep { !/YY_DECL/ } @funcs;
 
     # Ignore anything with magic words HEADERIZER SKIP
-    @funcs = grep !m{/\*\s*HEADERIZER SKIP\s*\*/}, @funcs;
+    @funcs = grep { !m{/\*\s*HEADERIZER SKIP\s*\*/} } @funcs;
+
+    # pmclass declarations in PMC files are no good
+    @funcs = grep { !m{^pmclass } } @funcs;
 
     # Variables are of no use to us
     @funcs = grep !/=/, @funcs;
@@ -217,8 +220,9 @@ sub function_components_from_declaration {
     my $args = join( ' ', @lines );
 
     $args =~ s/\s+/ /g;
+
     $args =~ s{([^(]+)\s*\((.+)\);?}{$2}
-        or die qq{Couldn't handle "$proto"};
+        or die qq{Couldn't handle "$proto" in $file\n};
 
     my $name = $1;
     $args = $2;
@@ -449,12 +453,12 @@ sub write_file {
 
 sub replace_headerized_declarations {
     my $source_code = shift;
-    my $cfile       = shift;
+    my $sourcefile = shift;
     my $hfile       = shift;
     my @funcs       = @_;
 
     # Allow a way to not headerize statics
-    if ( $source_code =~ m{/\*\s*HEADERIZER NONE:\s*$cfile\s*\*/} ) {
+    if ( $source_code =~ m{/\*\s*HEADERIZER NONE:\s*$sourcefile\s*\*/} ) {
         return $source_code;
     }
 
@@ -463,14 +467,14 @@ sub replace_headerized_declarations {
     my @function_decls = make_function_decls(@funcs);
 
     my $function_decls = join( "\n", @function_decls );
-    my $STARTMARKER    = qr#/\* HEADERIZER BEGIN: $cfile \*/\n#;
-    my $ENDMARKER      = qr#/\* HEADERIZER END: $cfile \*/\n?#;
+    my $STARTMARKER    = qr{/\* HEADERIZER BEGIN: $sourcefile \*/\n};
+    my $ENDMARKER      = qr{/\* HEADERIZER END: $sourcefile \*/\n?};
     my $DO_NOT_TOUCH   = q{/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */};
 
     $source_code =~
         s{($STARTMARKER)(?:.*?)($ENDMARKER)}
          {$1$DO_NOT_TOUCH\n\n$function_decls\n$DO_NOT_TOUCH\n$2}s
-        or die "Need begin/end HEADERIZER markers for $cfile in $hfile\n";
+        or die "Need begin/end HEADERIZER markers for $sourcefile in $hfile\n";
 
     return $source_code;
 }
@@ -486,15 +490,15 @@ sub main {
         'macro=s' => \$macro_match,
     ) or exit(1);
 
-    die "No files specified.\n" unless @ARGV;
+    die 'No files specified.' unless @ARGV;
     my %ofiles;
     ++$ofiles{$_} for @ARGV;
     my @ofiles = sort keys %ofiles;
     for (@ofiles) {
         print "$_ is specified more than once.\n" if $ofiles{$_} > 1;
     }
-    my %cfiles;
-    my %cfiles_with_statics;
+    my %sourcefiles;
+    my %sourcefiles_with_statics;
     my %api;
 
     # Walk the object files and find corresponding source (either .c or .pmc)
@@ -517,31 +521,35 @@ sub main {
         my $pmcfile = $ofile;
         $pmcfile =~ s/\Q$PConfig{o}\E$/.pmc/;
 
-        my $csource = read_file($cfile);
-        die "can't find HEADERIZER HFILE directive in '$cfile'"
-            unless $csource =~
+        my $from_pmc = -f $pmcfile && !$is_yacc;
+
+        my $sourcefile = $from_pmc ? $pmcfile : $cfile;
+
+        my $source_code = read_file( $sourcefile );
+        die qq{can't find HEADERIZER HFILE directive in "$sourcefile"}
+            unless $source_code =~
                 m{ /\* \s+ HEADERIZER\ HFILE: \s+ ([^*]+?) \s+ \*/ }sx;
 
         my $hfile = $1;
         if ( ( $hfile ne 'none' ) && ( not -f $hfile ) ) {
-            die "'$hfile' not found (referenced from '$cfile')";
+            die qq{"$hfile" not found (referenced from "$sourcefile")};
         }
 
         my @decls;
-        if ( $macro_match || (-f $pmcfile && !$is_yacc) ) {
-            @decls = extract_function_declarations( $csource );
+        if ( $macro_match ) {
+            @decls = extract_function_declarations( $source_code );
         }
         else {
-            @decls = extract_function_declarations_and_update_source( $cfile );
+            @decls = extract_function_declarations_and_update_source( $sourcefile );
         }
 
         for my $decl (@decls) {
-            my $components = function_components_from_declaration( $cfile, $decl );
-            push( @{ $cfiles{$hfile}->{$cfile} }, $components ) unless $hfile eq 'none';
-            push( @{ $cfiles_with_statics{$cfile} }, $components ) if $components->{is_static};
+            my $components = function_components_from_declaration( $sourcefile, $decl );
+            push( @{ $sourcefiles{$hfile}->{$sourcefile} }, $components ) unless $hfile eq 'none';
+            push( @{ $sourcefiles_with_statics{$sourcefile} }, $components ) if $components->{is_static};
             if ( $macro_match ) {
                 if ( grep { $_ eq $macro_match } @{$components->{macros}} ) {
-                    push( @{ $api{$cfile} }, $components );
+                    push( @{ $api{$sourcefile} }, $components );
                 }
             }
         }
@@ -562,13 +570,13 @@ sub main {
     }
     else { # Normal headerization and updating
         # Update all the .h files
-        for my $hfile ( sort keys %cfiles ) {
-            my $cfiles = $cfiles{$hfile};
+        for my $hfile ( sort keys %sourcefiles ) {
+            my $sourcefiles = $sourcefiles{$hfile};
 
             my $header = read_file($hfile);
 
-            for my $cfile ( sort keys %{$cfiles} ) {
-                my @funcs = @{ $cfiles->{$cfile} };
+            for my $cfile ( sort keys %{$sourcefiles} ) {
+                my @funcs = @{ $sourcefiles->{$cfile} };
                 @funcs = grep { not $_->{is_static} } @funcs;    # skip statics
 
                 $header = replace_headerized_declarations( $header, $cfile, $hfile, @funcs );
@@ -578,8 +586,8 @@ sub main {
         }
 
         # Update all the .c files in place
-        for my $cfile ( sort keys %cfiles_with_statics ) {
-            my @funcs = @{ $cfiles_with_statics{$cfile} };
+        for my $cfile ( sort keys %sourcefiles_with_statics ) {
+            my @funcs = @{ $sourcefiles_with_statics{$cfile} };
             @funcs = grep { $_->{is_static} } @funcs;
 
             my $source = read_file($cfile);

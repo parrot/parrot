@@ -33,6 +33,51 @@ enum {
     enum_PackID_seen       = 1,
 };
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void create_buffer(PARROT_INTERP, PMC *pmc, PMC *info)
+        __attribute__nonnull__(1);
+
+PARROT_INLINE
+static void ensure_buffer_size(PARROT_INTERP, ARGIN(PMC *io), size_t len)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_INLINE
+static PMC* id_list_get(PARROT_INTERP, PMC *io, UINTVAL id)
+        __attribute__nonnull__(1);
+
+PARROT_INLINE
+static INTVAL INFO_HAS_DATA(ARGIN(PMC *io))
+        __attribute__nonnull__(1);
+
+static void visit_todo_list_freeze(PARROT_INTERP, PMC* pmc, PMC* info)
+        __attribute__nonnull__(1);
+
+PARROT_INLINE
+static PMC * visit_todo_list_thaw(PARROT_INTERP, ARGIN(PMC* info))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_create_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_ensure_buffer_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(io))
+#define ASSERT_ARGS_id_list_get __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_INFO_HAS_DATA __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(io))
+#define ASSERT_ARGS_visit_todo_list_freeze __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_visit_todo_list_thaw __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(info))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 PARROT_INLINE
 static opcode_t *
 GET_VISIT_CURSOR(PMC *pmc){

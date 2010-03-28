@@ -18,6 +18,10 @@ C<Float> extends C<scalar> to provide floating-point number operations.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass Float extends scalar provides float provides scalar auto_attrs {
     ATTR FLOATVAL fv;
 

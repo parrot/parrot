@@ -21,6 +21,28 @@ evaluation and execution.
 
 #include "pmc/pmc_sub.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void clear_fixups(PARROT_INTERP, Parrot_Sub_attributes *sub_data)
+        __attribute__nonnull__(1);
+
+static PMC* get_sub(PARROT_INTERP, PMC *self, int idx)
+        __attribute__nonnull__(1);
+
+static void mark_subs(PARROT_INTERP, PMC *self)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_clear_fixups __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_get_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_mark_subs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 static void
 clear_fixups(PARROT_INTERP, Parrot_Sub_attributes *sub_data)
 {

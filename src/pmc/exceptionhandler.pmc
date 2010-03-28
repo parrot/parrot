@@ -22,6 +22,10 @@ exception object's C<_P5> attribute.
 
 #include "parrot/oplib/ops.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass ExceptionHandler extends Continuation auto_attrs {
 
     ATTR PMC    *handled_types;

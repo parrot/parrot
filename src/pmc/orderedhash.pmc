@@ -77,6 +77,10 @@ Overall design heavily inspired by C<Tie::StoredOrderHash>.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 /* Get list_item by index */
 static PMC*
 get_list_item(PARROT_INTERP, ARGIN(PMC *self), INTVAL idx) {

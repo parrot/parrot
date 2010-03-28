@@ -27,6 +27,17 @@ Auxiliar function to avoid repeating the size evaluation.
 
 #define BITS_PER_CHAR 8
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_INLINE
+static UINTVAL get_size_in_bytes(UINTVAL size);
+
+#define ASSERT_ARGS_get_size_in_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 PARROT_INLINE
 static UINTVAL
 get_size_in_bytes(UINTVAL size)

@@ -22,6 +22,10 @@ C<struct> values that Parrot is responsible for disposing of.
 typedef void (*custom_free_func_t)(PARROT_INTERP, void *ptr, void *priv);
 typedef PMC * (*custom_clone_func_t)(PARROT_INTERP, PMC *ptr, void *priv);
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass ManagedStruct extends UnManagedStruct auto_attrs {
     /* if custom_free_func and ptr (inherited from UnManagedStruct) are both set,
      * custom_free_func is called before the normal destroy() function does any

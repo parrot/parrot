@@ -19,6 +19,10 @@ stores Parrot strings.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass FixedStringArray auto_attrs provides array {
     ATTR STRING **str_array; /* where the STRINGs are stored */
     ATTR UINTVAL  size;      /* element count */

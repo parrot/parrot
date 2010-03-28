@@ -22,6 +22,10 @@ C<File> is a singleton class which provides access to File functions.
 #  include <direct.h>
 #endif
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 /* TT #1050 apparently, strerror_r is thread-safe and should be used instead.*/
 
 static PMC *File_PMC;

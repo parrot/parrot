@@ -29,6 +29,10 @@ extern "C" {
 }
 #endif
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass Sockaddr auto_attrs {
     ATTR void   *pointer; /* The stored pointer. */
 

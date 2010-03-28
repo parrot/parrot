@@ -26,9 +26,60 @@ generated from F<src/vtable.tbl> by F<tools/build/pmc2c.pl>.
 /* undef 'interface' to keep MSVC happy */
 #undef interface
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static STRING * caller(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
+        __attribute__nonnull__(1);
+
+PARROT_DOES_NOT_RETURN
+static void cant_do_method(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), int index)
+        __attribute__nonnull__(1);
+
+PARROT_DOES_NOT_RETURN
+static void cant_do_write_method(PARROT_INTERP,
+    ARGIN_NULLOK(PMC *pmc),
+    int index)
+        __attribute__nonnull__(1);
+
+static INTVAL check_set_std_props(PARROT_INTERP,
+    PMC *pmc,
+    STRING *key,
+    PMC *value)
+        __attribute__nonnull__(1);
+
+static INTVAL does_isa(PARROT_INTERP,
+    const STRING *method,
+    const STRING *what)
+        __attribute__nonnull__(1);
+
+static INTVAL has_pending_std_props(ARGIN(const PMC *self))
+        __attribute__nonnull__(1);
+
+static PMC* make_prop_hash(PARROT_INTERP, PMC *self)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_caller __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_cant_do_method __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_cant_do_write_method __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_check_set_std_props __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_does_isa __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_has_pending_std_props __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_make_prop_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 /*
 
-=item C<static STRING *caller(PARROT_INTERP, PMC *pmc)>
+=item C<static STRING * caller(PARROT_INTERP, PMC *pmc)>
 
 Returns a C string for the name of C<*pmc>.
 
@@ -37,18 +88,17 @@ Returns a C string for the name of C<*pmc>.
 */
 
 static STRING *
-caller(PARROT_INTERP, PMC *pmc /*NULLOK*/)
+caller(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
 {
     STRING * const null_str = CONST_STRING(interp, "(null)");
 
-    return pmc && pmc->vtable && pmc->vtable->whoami
+    return !PMC_IS_NULL(pmc) && pmc->vtable && pmc->vtable->whoami
                 ? VTABLE_name(interp, pmc) : null_str;
 }
 
 /*
 
-=item C<static void cant_do_method(PARROT_INTERP, PMC *pmc,
-                                   int index)>
+=item C<static void cant_do_method(PARROT_INTERP, PMC *pmc, int index)>
 
 Throws an exception "$methname() not implemented in class '$class'", used by
 all unimplemented messages.
@@ -59,7 +109,7 @@ all unimplemented messages.
 
 PARROT_DOES_NOT_RETURN
 static void
-cant_do_method(PARROT_INTERP, PMC *pmc /*NULLOK*/, int index)
+cant_do_method(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), int index)
 {
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ILL_INHERIT,
             "%s() not implemented in class '%Ss'",
@@ -70,8 +120,7 @@ cant_do_method(PARROT_INTERP, PMC *pmc /*NULLOK*/, int index)
 
 /*
 
-=item C<static void cant_do_write_method(PARROT_INTERP, PMC *pmc,
-                                   int index)>
+=item C<static void cant_do_write_method(PARROT_INTERP, PMC *pmc, int index)>
 
 Throws an exception "$methname() on read-only instance of '$class'", used by
 all updating messages on read-only instances.
@@ -82,7 +131,7 @@ all updating messages on read-only instances.
 
 PARROT_DOES_NOT_RETURN
 static void
-cant_do_write_method(PARROT_INTERP, PMC *pmc /*NULLOK*/, int index)
+cant_do_write_method(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), int index)
 {
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_WRITE_TO_CONSTCLASS,
             "%s() in read-only instance of '%Ss'",
@@ -92,8 +141,8 @@ cant_do_write_method(PARROT_INTERP, PMC *pmc /*NULLOK*/, int index)
 
 /*
 
-=item C<static INTVAL
-check_set_std_props(PARROT_INTERP, PMC *pmc, STRING *key, PMC *value)>
+=item C<static INTVAL check_set_std_props(PARROT_INTERP, PMC *pmc, STRING *key,
+PMC *value)>
 
 Called from C<setprop()>.
 
@@ -156,8 +205,7 @@ propagate_std_props(PARROT_INTERP, PMC *self, PMC *prop_hash) {
 
 /*
 
-=item C<static INTVAL
-has_pending_std_props(ARGIN(const PMC *self))>
+=item C<static INTVAL has_pending_std_props(const PMC *self)>
 
 Returns true if propagate_std_props() would create a non-empty prophash.
 
@@ -199,8 +247,7 @@ check_get_std_props(PARROT_INTERP, PMC *self, STRING *key) {
 
 /*
 
-=item C<static PMC *
-make_prop_hash(PARROT_INTERP, PMC *self)>
+=item C<static PMC* make_prop_hash(PARROT_INTERP, PMC *self)>
 
 Create a property hash for C<self>. Returns the created hash. Inferred
 properties will be added to the hash and it will be set as
@@ -221,8 +268,8 @@ make_prop_hash(PARROT_INTERP, PMC *self) {
 
 /*
 
-=item C<static INTVAL
-does_isa(PARROT_INTERP, STRING *method, STRING *what)>
+=item C<static INTVAL does_isa(PARROT_INTERP, const STRING *method, const STRING
+*what)>
 
 Compares C<*method> and C<*what>.
 Returns true (1) if B<method> is found in B<what>, false (0) otherwise.

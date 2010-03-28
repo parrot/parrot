@@ -20,6 +20,10 @@ Implements the basic task behavior for the concurrency scheduler.
 
 #include "parrot/scheduler_private.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass Task auto_attrs {
     ATTR INTVAL        id;        /* The task ID. */
     ATTR INTVAL        priority;  /* The priority of the task. */

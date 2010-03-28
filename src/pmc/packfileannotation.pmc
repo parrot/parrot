@@ -19,6 +19,10 @@ PackfileAnnotations segment of the .pbc file.  See PDD13 for a design spec.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass PackfileAnnotation auto_attrs {
     ATTR STRING    *name;
     ATTR INTVAL     offset;

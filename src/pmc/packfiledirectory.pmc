@@ -25,6 +25,10 @@ PDD13 for the design spec.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass PackfileDirectory auto_attrs extends PackfileSegment {
     /* Directory is a hash of Segments */
     ATTR PMC *hash;

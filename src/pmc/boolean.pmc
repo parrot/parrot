@@ -21,6 +21,8 @@ it doesn't morph to other types. Only its value is changed.
 
 */
 
+/* HEADERIZER HFILE: none */
+
 pmclass Boolean extends Integer provides boolean provides scalar auto_attrs {
 
 /*

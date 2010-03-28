@@ -20,6 +20,10 @@ The Socket PMC performs network I/O operations.
 
 #include "../src/io/io_private.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass Socket extends Handle provides socket auto_attrs {
     ATTR PMC *local;           /* Local addr                   */
     ATTR PMC *remote;          /* Remote addr                  */

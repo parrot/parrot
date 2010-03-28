@@ -21,6 +21,39 @@ Implements an instance of a class.
 #include "parrot/oo_private.h"
 #include "pmc/pmc_class.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void cache_method(PARROT_INTERP,
+    PMC *_class,
+    STRING *name,
+    PMC *method)
+        __attribute__nonnull__(1);
+
+static PMC * find_cached(PARROT_INTERP, PMC *_class, STRING *name)
+        __attribute__nonnull__(1);
+
+static INTVAL get_attrib_index(PARROT_INTERP, PMC *self, STRING *name)
+        __attribute__nonnull__(1);
+
+static INTVAL get_attrib_index_keyed(PARROT_INTERP,
+    PMC *self,
+    PMC *key,
+    STRING *name)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_cache_method __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_find_cached __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_get_attrib_index __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_get_attrib_index_keyed __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 /* This finds the index of an attribute in an object's attribute store and
  * returns it. Returns -1 if the attribute does not exist. */
 static INTVAL

@@ -20,6 +20,10 @@ These are the vtable functions for the lexinfo PMC.
 
 #include "pmc/pmc_hash.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 /*
  * LexInfo contains a constant Hash with constant string
  * keys and integer indices

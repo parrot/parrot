@@ -25,6 +25,10 @@ This is the base-class for all IO-related PMCs.
 #include "parrot/parrot.h"
 #include "../src/io/io_private.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass Handle provides Handle manual_attrs {
     /* TODO: Consider encapsulating PIOHANDLE as a PMC type, for subclassing */
     ATTR PIOHANDLE os_handle;         /* Low level OS descriptor      */

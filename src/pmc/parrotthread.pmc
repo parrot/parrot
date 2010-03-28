@@ -40,6 +40,15 @@ and these methods:
 
 #define PMC_interp(x) ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->interp
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void stop_GC(Interp *parent, Interp *thread);
+#define ASSERT_ARGS_stop_GC __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 /*
  * can't do multi-threaded GC yet
  * XXX a quick hack to pass the few tests

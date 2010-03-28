@@ -51,6 +51,10 @@ to avoid this caveat.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass ArrayIterator extends Iterator no_ro auto_attrs {
     ATTR PMC    *array;     /* the array which this Iterator iterates */
     ATTR INTVAL  pos;       /* Current position of iterator for forward iterator */

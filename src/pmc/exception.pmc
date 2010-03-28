@@ -52,6 +52,10 @@ These arguments can be retrieved with the C<get_results> opcode.
 #include "parrot/exceptions.h"
 #include "pmc/pmc_sub.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass Exception auto_attrs {
 
     ATTR INTVAL          id;           /* The task ID in the scheduler. */

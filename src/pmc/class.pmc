@@ -94,6 +94,55 @@ An empty ResizablePMCArray PMC is allocated during initialization.
 #include "pmc/pmc_object.h"
 #include "pmc/pmc_namespace.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void build_attrib_index(PARROT_INTERP, PMC *self)
+        __attribute__nonnull__(1);
+
+static int cache_class_attribs(PARROT_INTERP,
+    PMC *cur_class,
+    PMC *attrib_index,
+    PMC *cache,
+    int cur_index)
+        __attribute__nonnull__(1);
+
+static void calculate_mro(PARROT_INTERP, PMC *SELF, INTVAL num_parents)
+        __attribute__nonnull__(1);
+
+static void init_class_from_hash(PARROT_INTERP, PMC *self, PMC *info)
+        __attribute__nonnull__(1);
+
+static void initialize_parents(PARROT_INTERP, PMC *object, PMC *all_parents)
+        __attribute__nonnull__(1);
+
+static void initialize_parents_pmc(PARROT_INTERP,
+    PMC *object,
+    PMC *all_parents,
+    PMC *init)
+        __attribute__nonnull__(1);
+
+static STRING * make_class_name(PARROT_INTERP, PMC *SELF)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_build_attrib_index __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_cache_class_attribs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_calculate_mro __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_init_class_from_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_initialize_parents __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_initialize_parents_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_make_class_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 static int
 cache_class_attribs(PARROT_INTERP, PMC *cur_class, PMC *attrib_index,
     PMC *cache, int cur_index)

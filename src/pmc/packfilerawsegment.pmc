@@ -24,6 +24,10 @@ PDD13 for the design spec.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass PackfileRawSegment auto_attrs extends PackfileSegment {
     /* Type of segment */
     ATTR INTVAL  type;

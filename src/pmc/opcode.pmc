@@ -16,6 +16,10 @@ Implements opcode VTABLEs.
 
 #include "parrot/parrot.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass Opcode auto_attrs {
     ATTR op_info_t *info;
     ATTR INTVAL op_number;

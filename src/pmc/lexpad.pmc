@@ -26,6 +26,10 @@ These are the vtable functions for the lexpad PMC.
  * pmc_val    ... LexInfo
  */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass LexPad provides hash no_ro auto_attrs {
     ATTR PMC *lexinfo;
     ATTR PMC *ctx;

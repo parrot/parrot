@@ -20,6 +20,10 @@ Implements the core concurrency scheduler.
 
 #include "parrot/scheduler_private.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass Scheduler auto_attrs {
 
     ATTR INTVAL        id;         /* The scheduler's ID. */

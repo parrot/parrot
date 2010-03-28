@@ -24,13 +24,81 @@ bounds access will very likely segfault.
 
 #include "parrot/compiler.h"
 
-static INTVAL key_2_idx(PARROT_INTERP, PMC *pmc, PMC *key);
-static size_t calc_offsets(PARROT_INTERP, PMC*, PMC *init, size_t toff);
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static int calc_align(PARROT_INTERP,
+    PMC *pmc,
+    PMC *type_pmc,
+    int type,
+    size_t offs)
+        __attribute__nonnull__(1);
+
+static size_t calc_offsets(PARROT_INTERP, PMC *pmc, PMC *value, size_t toff)
+        __attribute__nonnull__(1);
+
+static char * char_offset_int(PARROT_INTERP, PMC *pmc, INTVAL ix, int *type)
+        __attribute__nonnull__(1);
+
+static char * char_offset_key(PARROT_INTERP, PMC *pmc, PMC *key, int *type)
+        __attribute__nonnull__(1);
+
+static INTVAL key_2_idx(PARROT_INTERP, PMC *pmc, PMC *key)
+        __attribute__nonnull__(1);
+
+static FLOATVAL ret_float(PARROT_INTERP, const char *p, int type)
+        __attribute__nonnull__(1);
+
+static INTVAL ret_int(PARROT_INTERP, const char *p, int type)
+        __attribute__nonnull__(1);
+
+static PMC* ret_pmc(PARROT_INTERP, PMC *pmc, char *p, int type, INTVAL idx)
+        __attribute__nonnull__(1);
+
+static STRING* ret_string(PARROT_INTERP, char *p, int type)
+        __attribute__nonnull__(1);
+
+static void set_float(PARROT_INTERP, char *p, int type, FLOATVAL value)
+        __attribute__nonnull__(1);
+
+static void set_int(PARROT_INTERP, char *p, int type, INTVAL value)
+        __attribute__nonnull__(1);
+
+static void set_string(PARROT_INTERP, char *p, int type, STRING *value)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_calc_align __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_calc_offsets __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_char_offset_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_char_offset_key __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_key_2_idx __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_ret_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_ret_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_ret_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_ret_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_set_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_set_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_set_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
 
 /*
 
-=item C<static char *
-char_offset_int(PARROT_INTERP, PMC *pmc, INTVAL ix, int *type)>
+=item C<static char * char_offset_int(PARROT_INTERP, PMC *pmc, INTVAL ix, int
+*type)>
 
 Returns the pointer for the element at index C<ix>, and sets the element
 type in C<*type>.
@@ -67,8 +135,7 @@ char_offset_int(PARROT_INTERP, PMC *pmc, INTVAL ix, int *type)
 
 /*
 
-=item C<static INTVAL
-key_2_idx(PARROT_INTERP, PMC *pmc, PMC *key)>
+=item C<static INTVAL key_2_idx(PARROT_INTERP, PMC *pmc, PMC *key)>
 
 Returns the index for the element associated with key C<*key>. Raises an
 exception if the key doesn't exist.
@@ -115,8 +182,8 @@ key_2_idx(PARROT_INTERP, PMC *pmc, PMC *key)
 
 /*
 
-=item C<static char *
-char_offset_key(PARROT_INTERP, PMC *pmc, PMC *key, int *type)>
+=item C<static char * char_offset_key(PARROT_INTERP, PMC *pmc, PMC *key, int
+*type)>
 
 Returns the pointer for the element associated with key C<*key>, and
 sets the element type in C<*type>.
@@ -217,8 +284,7 @@ char_offset_key(PARROT_INTERP, PMC *pmc, PMC *key, int *type)
 
 /*
 
-=item C<static INTVAL
-ret_int(PARROT_INTERP, const char *p, int type)>
+=item C<static INTVAL ret_int(PARROT_INTERP, const char *p, int type)>
 
 Returns the element of type C<type> starting at C<*p> as an C<INTVAL>.
 
@@ -292,8 +358,7 @@ ret_int(PARROT_INTERP, const char *p, int type)
 
 /*
 
-=item C<static FLOATVAL
-ret_float(PARROT_INTERP, const char *p, int type)>
+=item C<static FLOATVAL ret_float(PARROT_INTERP, const char *p, int type)>
 
 Returns the element of type C<type> starting at C<*p> as a C<FLOATVAL>.
 
@@ -323,8 +388,7 @@ ret_float(PARROT_INTERP, const char *p, int type)
 
 /*
 
-=item C<static STRING*
-ret_string(PARROT_INTERP, char *p, int type)>
+=item C<static STRING* ret_string(PARROT_INTERP, char *p, int type)>
 
 Returns the element of type C<type> starting at C<*p> as a Parrot string.
 
@@ -359,8 +423,8 @@ ret_string(PARROT_INTERP, char *p, int type)
 
 /*
 
-=item C<static PMC*
-ret_pmc(PARROT_INTERP, PMC *pmc, char *p, int type, INTVAL idx)>
+=item C<static PMC* ret_pmc(PARROT_INTERP, PMC *pmc, char *p, int type, INTVAL
+idx)>
 
 Returns the element of type C<type> starting at C<*p> as a PMC.
 
@@ -416,8 +480,7 @@ ret_pmc(PARROT_INTERP, PMC *pmc, char *p, int type, INTVAL idx)
 
 /*
 
-=item C<static void
-set_int(PARROT_INTERP, char *p, int type, INTVAL value)>
+=item C<static void set_int(PARROT_INTERP, char *p, int type, INTVAL value)>
 
 =cut
 
@@ -453,8 +516,7 @@ set_int(PARROT_INTERP, char *p, int type, INTVAL value)
 
 /*
 
-=item C<static void
-set_float(PARROT_INTERP, char *p, int type, FLOATVAL value)>
+=item C<static void set_float(PARROT_INTERP, char *p, int type, FLOATVAL value)>
 
 Sets the value of the element of type C<type> starting at C<*p> to
 C<value>.
@@ -485,8 +547,7 @@ set_float(PARROT_INTERP, char *p, int type, FLOATVAL value)
 
 /*
 
-=item C<static void
-set_string(PARROT_INTERP, char *p, int type, STRING *value)>
+=item C<static void set_string(PARROT_INTERP, char *p, int type, STRING *value)>
 
 Sets the value of the element of type C<type> starting at C<*p> to
 C<*value>.
@@ -511,9 +572,8 @@ set_string(PARROT_INTERP, char *p, int type, STRING *value)
 
 /*
 
-=item C<static int
-calc_align(PARROT_INTERP, PMC *pmc, PMC *type_pmc,
-        int type, size_t offs)>
+=item C<static int calc_align(PARROT_INTERP, PMC *pmc, PMC *type_pmc, int type,
+size_t offs)>
 
 Alignment of contained structures is the alignment of the biggest item in that
 C<struct>.
@@ -577,8 +637,8 @@ calc_align(PARROT_INTERP, PMC *pmc, PMC *type_pmc,
 
 /*
 
-=item C<static size_t
-calc_offsets(PARROT_INTERP, PMC *pmc, PMC *value, size_t toff)>
+=item C<static size_t calc_offsets(PARROT_INTERP, PMC *pmc, PMC *value, size_t
+toff)>
 
 Calculates the offsets for the C<struct>. See C<init_pmc()> for a description
 of C<*value>.

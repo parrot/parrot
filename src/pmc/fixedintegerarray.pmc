@@ -19,6 +19,10 @@ INTVALs.  It uses Integer PMCs for all of the conversions.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass FixedIntegerArray auto_attrs provides array {
     ATTR INTVAL   size;  /* number of INTVALs stored in this array */
     ATTR INTVAL * int_array; /* INTVALs are stored here */

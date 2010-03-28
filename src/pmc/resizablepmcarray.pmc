@@ -23,6 +23,10 @@ It puts things into Integer, Float, or String PMCs as appropriate.
 #define PMC_array(x)     ((Parrot_ResizablePMCArray_attributes *)PMC_data(x))->pmc_array
 #define PMC_threshold(x) ((Parrot_ResizablePMCArray_attributes *)PMC_data(x))->resize_threshold
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass ResizablePMCArray extends FixedPMCArray auto_attrs provides array {
     ATTR INTVAL resize_threshold; /* max size before array needs resizing */
 

@@ -20,6 +20,10 @@ conversions.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass ResizableIntegerArray extends FixedIntegerArray auto_attrs provides array {
     ATTR INTVAL resize_threshold; /* max size before array needs to be resized */
 

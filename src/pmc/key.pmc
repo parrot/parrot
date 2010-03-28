@@ -18,6 +18,10 @@ These are the vtable functions for the Key PMC class.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass Key auto_attrs {
     ATTR PMC      *next_key; /* Sometimes it's the next key, sometimes it's
                                 not.  The Key code is like that. */

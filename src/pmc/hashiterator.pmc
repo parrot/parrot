@@ -49,6 +49,10 @@ Generic iterator for traversing Hash.
 #include "pmc/pmc_hash.h"
 #include "pmc/pmc_hashiteratorkey.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 /*
 
 Advance to next position. Return found (if any) HashBucket.

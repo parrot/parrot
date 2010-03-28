@@ -18,6 +18,10 @@ method called.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass ResizableStringArray extends FixedStringArray auto_attrs provides array {
     ATTR UINTVAL resize_threshold; /*max capacity before resizing */
 

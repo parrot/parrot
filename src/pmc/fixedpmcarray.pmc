@@ -27,6 +27,10 @@ never be set for user arrays.
 #define PMC_size(x)  ((Parrot_FixedPMCArray_attributes *)PMC_data(x))->size
 #define PMC_array(x) ((Parrot_FixedPMCArray_attributes *)PMC_data(x))->pmc_array
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass FixedPMCArray auto_attrs provides array {
     ATTR INTVAL   size;      /* number of elements in the array */
     ATTR PMC    **pmc_array; /* pointer to PMC array */

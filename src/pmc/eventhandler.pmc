@@ -19,6 +19,11 @@ Event.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+
 pmclass EventHandler extends Sub auto_attrs {
 
     ATTR STRING *type;          /* the type of the event to handle */

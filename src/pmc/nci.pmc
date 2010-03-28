@@ -18,10 +18,14 @@ The vtable functions for the native C call functions.
 
 */
 
-void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_info,
-                size_t sig_length);
-void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_info,
-                size_t sig_length) {
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+void
+pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_info,
+                size_t sig_length)
+{
     char    param_buf[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
     char   *param_sig    = sig_length <= 7
                          ? param_buf

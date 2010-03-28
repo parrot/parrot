@@ -41,91 +41,112 @@ Make auto-upgrading/downgrading work.
 
 =over 4
 
-=item C<static void bignum_init(Interp*, PMC *self)>
+=item C<static void bignum_init(PARROT_INTERP, PMC *self)>
 
-=item C<static void bignum_clear(Interp*, PMC *self)>
+=item C<static void bignum_clear(PARROT_INTERP, PMC *self)>
 
-=item C<static void bignum_set(Interp*, PMC *dest, PMC *src)>
+=item C<static void bignum_set(PARROT_INTERP, PMC *dest, PMC *src)>
 
-=item C<static void bignum_set_si(Interp*, PMC *self, long value)>
+=item C<static void bignum_set_si(PARROT_INTERP, PMC *self, long value)>
 
-=item C<static void bignum_set_ui(Interp*, PMC *self, unsigned long value)>
+=item C<static void bignum_set_ui(PARROT_INTERP, PMC *self, unsigned long
+value)>
 
-=item C<static void bignum_set_float(Interp*, PMC *self, FLOATVAL value)>
+=item C<static void bignum_set_float(PARROT_INTERP, PMC *self, FLOATVAL value)>
 
-=item C<static void bignum_set_double(Interp*, PMC *self, double value)>
+=item C<static void bignum_set_double(PARROT_INTERP, PMC *self, double value)>
 
-=item C<static void bignum_set_str(Interp*, PMC *self, char *value, int base)>
+=item C<static void bignum_set_str(PARROT_INTERP, PMC *self, char *value, int
+base)>
 
-=item C<static void bignum_set_bigint(Interp*, PMC *self, struct BIGINT *value)>
+=item C<static void bignum_set_bigint(PARROT_INTERP, PMC *self, struct BIGINT
+*value)>
 
-=item C<static BIGNUM* bignum_get_self(Interp*, PMC *self)>
+=item C<static BIGNUM* bignum_get_self(PARROT_INTERP, PMC *self)>
 
-=item C<static void bignum_set_self(Interp*, PMC *self, BIGNUM *value)>
+=item C<static void bignum_set_self(PARROT_INTERP, PMC *self, BIGNUM *value)>
 
-=item C<static long bignum_get_si(Interp*, PMC *self)>
+=item C<static long bignum_get_si(PARROT_INTERP, PMC *self)>
 
-=item C<static unsigned long bignum_get_ui(Interp*, PMC *self)>
+=item C<static unsigned long bignum_get_ui(PARROT_INTERP, PMC *self)>
 
-=item C<static int bignum_get_bool(Interp*, PMC *self)>
+=item C<static INTVAL bignum_get_bool(PARROT_INTERP, PMC *self)>
 
-=item C<static char* bignum_get_string(Interp*, PMC *self, int base)>
+=item C<static char * bignum_get_string(PARROT_INTERP, PMC *self, int base)>
 
-=item C<static char* bignum_get_string_size(Interp*, PMC *self, int base, int digits)>
+=item C<static char * bignum_get_string_size(PARROT_INTERP, PMC *self, int base,
+int digits)>
 
-=item C<static double bignum_get_double(Interp*, PMC *self)>
+=item C<static double bignum_get_double(PARROT_INTERP, PMC *self)>
 
-=item C<static FLOATVAL bignum_get_float(Interp*, PMC *self)>
+=item C<static FLOATVAL bignum_get_float(PARROT_INTERP, PMC *self)>
 
 =item C<static BIGINT bignum_get_bigint(Interp*, PMC *self)>
 
-=item C<static void bignum_add_bignum(Interp*, PMC *self, PMC *value, PMC *dest)>
+=item C<static void bignum_add_bignum(PARROT_INTERP, PMC *self, PMC *value, PMC
+*dest)>
 
-=item C<static void bignum_add_bignum_int(Interp*, PMC *self, INTVAL value, PMC *dest)>
+=item C<static void bignum_add_bignum_int(PARROT_INTERP, PMC *self, INTVAL
+value, PMC *dest)>
 
-=item C<static void bignum_add_bignum_float(Interp*, PMC *self, FLOATVAL value, PMC *dest)>
+=item C<static void bignum_add_bignum_float(PARROT_INTERP, PMC *self, FLOATVAL
+value, PMC *dest)>
 
-=item C<static void bignum_sub_bignum(Interp*, PMC *self, PMC *value, PMC *dest)>
+=item C<static void bignum_sub_bignum(PARROT_INTERP, PMC *self, PMC *value, PMC
+*dest)>
 
-=item C<static void bignum_sub_bignum_int(Interp*, PMC *self, INTVAL value, PMC *dest)>
+=item C<static void bignum_sub_bignum_int(PARROT_INTERP, PMC *self, INTVAL
+value, PMC *dest)>
 
-=item C<static void bignum_sub_bignum_float(Interp*, PMC *self, FLOATVAL value, PMC *dest)>
+=item C<static void bignum_sub_bignum_float(PARROT_INTERP, PMC *self, FLOATVAL
+value, PMC *dest)>
 
-=item C<static void bignum_mul_bignum(Interp*, PMC *self, PMC *value, PMC *dest)>
+=item C<static void bignum_mul_bignum(PARROT_INTERP, PMC *self, PMC *value, PMC
+*dest)>
 
-=item C<static void bignum_mul_bignum_int(Interp*, PMC *self, INTVAL value, PMC *dest)>
+=item C<static void bignum_mul_bignum_int(PARROT_INTERP, PMC *self, INTVAL
+value, PMC *dest)>
 
-=item C<static void bignum_mul_bignum_float(Interp*, PMC *self, FLOATVAL value, PMC *dest)>
+=item C<static void bignum_mul_bignum_float(PARROT_INTERP, PMC *self, FLOATVAL
+value, PMC *dest)>
 
-=item C<static void bignum_pow_bignum_int(Interp*, PMC *self, INTVAL value, PMC *dest)>
+=item C<static void bignum_pow_bignum_int(PARROT_INTERP, PMC *self, INTVAL
+value, PMC *dest)>
 
 =item C<static void bignum_check_divide_zero(Interp*, PMC *value)>
 
-=item C<static void bignum_div_bignum(Interp*, PMC *self, PMC *value, PMC *dest)>
+=item C<static void bignum_div_bignum(PARROT_INTERP, PMC *self, PMC *value, PMC
+*dest)>
 
-=item C<static void bignum_div_bignum_int(Interp*, PMC *self, INTVAL value, PMC *dest)>
+=item C<static void bignum_div_bignum_int(PARROT_INTERP, PMC *self, INTVAL
+value, PMC *dest)>
 
-=item C<static void bignum_div_bignum_float(Interp*, PMC *self, FLOATVAL value, PMC *dest)>
+=item C<static void bignum_div_bignum_float(PARROT_INTERP, PMC *self, FLOATVAL
+value, PMC *dest)>
 
-=item C<static void bignum_fdiv_bignum(Interp*, PMC *self, PMC *value, PMC *dest)>
+=item C<static void bignum_fdiv_bignum(PARROT_INTERP, PMC *self, PMC *value, PMC
+*dest)>
 
-=item C<static void bignum_fdiv_bignum_int(Interp*, PMC *self, INTVAL value, PMC *dest)>
+=item C<static void bignum_fdiv_bignum_int(PARROT_INTERP, PMC *self, INTVAL
+value, PMC *dest)>
 
-=item C<static INTVAL bignum_cmp(Interp*, PMC *self, PMC *value)>
+=item C<static INTVAL bignum_cmp(PARROT_INTERP, PMC *self, PMC *value)>
 
-=item C<static INTVAL bignum_cmp_double(Interp*, PMC *self, double value)>
+=item C<static INTVAL bignum_cmp_double(PARROT_INTERP, PMC *self, double value)>
 
-=item C<static INTVAL bignum_cmp_int(Interp*, PMC *self, INTVAL value)>
+=item C<static INTVAL bignum_cmp_int(PARROT_INTERP, PMC *self, INTVAL value)>
 
-=item C<static INTVAL bignum_cmp_ulong(Interp*, PMC *self, unsigned long value)>
+=item C<static INTVAL bignum_cmp_ulong(PARROT_INTERP, PMC *self, unsigned long
+value)>
 
-=item C<static void bignum_abs(Interp*, PMC *self, PMC *dest)>
+=item C<static void bignum_abs(PARROT_INTERP, PMC *self, PMC *dest)>
 
-=item C<static void bignum_neg(Interp*, PMC *self, PMC *dest)>
+=item C<static void bignum_neg(PARROT_INTERP, PMC *self, PMC *dest)>
 
-=item C<static INTVAL bignum_get_default_prec(Interp*, PMC *self)>
+=item C<static INTVAL bignum_get_default_prec(PARROT_INTERP, PMC *self)>
 
-=item C<static void bignum_set_default_prec(Interp*, PMC *self, INTVAL prec)>
+=item C<static void bignum_set_default_prec(PARROT_INTERP, PMC *self, INTVAL
+prec)>
 
 =cut
 
@@ -135,13 +156,6 @@ Make auto-upgrading/downgrading work.
 #  undef PARROT_HAS_GMP /* splint barfs on the gmp.h header */
 #endif /* S_SPLINT_S */
 
-/* Uncomment to easily disable it */
-/*
-#ifdef PARROT_HAS_GMP
-#  undef PARROT_HAS_GMP
-#endif
-*/
-#undef PARROT_BIGNUM_CAN_BIGINT
 
 #ifdef PARROT_HAS_GMP
 #  include "pmc_bigint.h"
@@ -150,6 +164,517 @@ typedef struct BIGNUM {
     mpf_t b;
 } BIGNUM;
 #endif
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void bignum_abs(PARROT_INTERP, PMC *self, PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_abs(PARROT_INTERP, PMC *self, PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_add_bignum(PARROT_INTERP,
+    PMC *self,
+    PMC *value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_add_bignum(PARROT_INTERP,
+    PMC *self,
+    PMC *value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_add_bignum_float(PARROT_INTERP,
+    PMC *self,
+    FLOATVAL value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_add_bignum_float(PARROT_INTERP,
+    PMC *self,
+    FLOATVAL value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_add_bignum_int(PARROT_INTERP,
+    PMC *self,
+    INTVAL value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_add_bignum_int(PARROT_INTERP,
+    PMC *self,
+    INTVAL value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_clear(PARROT_INTERP, PMC *self)
+        __attribute__nonnull__(1);
+
+static void bignum_clear(PARROT_INTERP, PMC *self)
+        __attribute__nonnull__(1);
+
+static INTVAL bignum_cmp(PARROT_INTERP, PMC *self, PMC *value)
+        __attribute__nonnull__(1);
+
+static INTVAL bignum_cmp(PARROT_INTERP, PMC *self, PMC *value)
+        __attribute__nonnull__(1);
+
+static INTVAL bignum_cmp_double(PARROT_INTERP, PMC *self, double value)
+        __attribute__nonnull__(1);
+
+static INTVAL bignum_cmp_float(PARROT_INTERP, PMC *self, FLOATVAL value)
+        __attribute__nonnull__(1);
+
+static INTVAL bignum_cmp_int(PARROT_INTERP, PMC *self, INTVAL value)
+        __attribute__nonnull__(1);
+
+static INTVAL bignum_cmp_int(PARROT_INTERP, PMC *self, INTVAL value)
+        __attribute__nonnull__(1);
+
+static INTVAL bignum_cmp_ulong(PARROT_INTERP,
+    PMC *self,
+    unsigned long value)
+        __attribute__nonnull__(1);
+
+static void bignum_div_bignum(PARROT_INTERP,
+    PMC *self,
+    PMC *value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_div_bignum(PARROT_INTERP,
+    PMC *self,
+    PMC *value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_div_bignum_float(PARROT_INTERP,
+    PMC *self,
+    FLOATVAL value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_div_bignum_float(PARROT_INTERP,
+    PMC *self,
+    FLOATVAL value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_div_bignum_int(PARROT_INTERP,
+    PMC *self,
+    INTVAL value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_div_bignum_int(PARROT_INTERP,
+    PMC *self,
+    INTVAL value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_fdiv_bignum(PARROT_INTERP,
+    PMC *self,
+    PMC *value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_fdiv_bignum(PARROT_INTERP,
+    PMC *self,
+    PMC *value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_fdiv_bignum_float(PARROT_INTERP,
+    PMC *self,
+    FLOATVAL value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_fdiv_bignum_int(PARROT_INTERP,
+    PMC *self,
+    INTVAL value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_fdiv_bignum_int(PARROT_INTERP,
+    PMC *self,
+    INTVAL value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static INTVAL bignum_get_bool(PARROT_INTERP, PMC *self)
+        __attribute__nonnull__(1);
+
+static INTVAL bignum_get_default_prec(PARROT_INTERP, PMC *self)
+        __attribute__nonnull__(1);
+
+static INTVAL bignum_get_default_prec(PARROT_INTERP, PMC *self)
+        __attribute__nonnull__(1);
+
+static double bignum_get_double(PARROT_INTERP, PMC *self)
+        __attribute__nonnull__(1);
+
+static double bignum_get_double(PARROT_INTERP, PMC *self)
+        __attribute__nonnull__(1);
+
+static FLOATVAL bignum_get_float(PARROT_INTERP, PMC *self)
+        __attribute__nonnull__(1);
+
+static BIGNUM* bignum_get_self(PARROT_INTERP, PMC *self)
+        __attribute__nonnull__(1);
+
+static BIGNUM* bignum_get_self(PARROT_INTERP, PMC *self)
+        __attribute__nonnull__(1);
+
+static long bignum_get_si(PARROT_INTERP, PMC *self)
+        __attribute__nonnull__(1);
+
+static long bignum_get_si(PARROT_INTERP, PMC *self)
+        __attribute__nonnull__(1);
+
+static char * bignum_get_string(PARROT_INTERP, PMC *self, int base)
+        __attribute__nonnull__(1);
+
+static char * bignum_get_string(PARROT_INTERP, PMC *self, int base)
+        __attribute__nonnull__(1);
+
+static char * bignum_get_string_size(PARROT_INTERP,
+    PMC *self,
+    int base,
+    int digits)
+        __attribute__nonnull__(1);
+
+static char * bignum_get_string_size(PARROT_INTERP,
+    PMC *self,
+    int base,
+    int digits)
+        __attribute__nonnull__(1);
+
+static unsigned long bignum_get_ui(PARROT_INTERP, PMC *self)
+        __attribute__nonnull__(1);
+
+static unsigned long bignum_get_ui(PARROT_INTERP, PMC *self)
+        __attribute__nonnull__(1);
+
+static void bignum_init(PARROT_INTERP, PMC *self)
+        __attribute__nonnull__(1);
+
+static void bignum_init(PARROT_INTERP, PMC *self)
+        __attribute__nonnull__(1);
+
+static void bignum_mul_bignum(PARROT_INTERP,
+    PMC *self,
+    PMC *value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_mul_bignum(PARROT_INTERP,
+    PMC *self,
+    PMC *value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_mul_bignum_float(PARROT_INTERP,
+    PMC *self,
+    FLOATVAL value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_mul_bignum_float(PARROT_INTERP,
+    PMC *self,
+    FLOATVAL value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_mul_bignum_int(PARROT_INTERP,
+    PMC *self,
+    INTVAL value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_mul_bignum_int(PARROT_INTERP,
+    PMC *self,
+    INTVAL value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_neg(PARROT_INTERP, PMC *self, PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_neg(PARROT_INTERP, PMC *self, PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_pow_bignum_float(PARROT_INTERP,
+    PMC *self,
+    FLOATVAL value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_pow_bignum_int(PARROT_INTERP,
+    PMC *self,
+    INTVAL value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_pow_bignum_int(PARROT_INTERP,
+    PMC *self,
+    INTVAL value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_set(PARROT_INTERP, PMC *dest, PMC *src)
+        __attribute__nonnull__(1);
+
+static void bignum_set(PARROT_INTERP, PMC *dest, PMC *src)
+        __attribute__nonnull__(1);
+
+static void bignum_set_bigint(PARROT_INTERP,
+    PMC *self,
+    struct BIGINT *value)
+        __attribute__nonnull__(1);
+
+static void bignum_set_default_prec(PARROT_INTERP, PMC *self, INTVAL prec)
+        __attribute__nonnull__(1);
+
+static void bignum_set_default_prec(PARROT_INTERP, PMC *self, INTVAL prec)
+        __attribute__nonnull__(1);
+
+static void bignum_set_double(PARROT_INTERP, PMC *self, double value)
+        __attribute__nonnull__(1);
+
+static void bignum_set_double(PARROT_INTERP, PMC *self, double value)
+        __attribute__nonnull__(1);
+
+static void bignum_set_float(PARROT_INTERP, PMC *self, FLOATVAL value)
+        __attribute__nonnull__(1);
+
+static void bignum_set_self(PARROT_INTERP, PMC *self, BIGNUM *value)
+        __attribute__nonnull__(1);
+
+static void bignum_set_self(PARROT_INTERP, PMC *self, BIGNUM *value)
+        __attribute__nonnull__(1);
+
+static void bignum_set_si(PARROT_INTERP, PMC *self, long value)
+        __attribute__nonnull__(1);
+
+static void bignum_set_si(PARROT_INTERP, PMC *self, long value)
+        __attribute__nonnull__(1);
+
+static void bignum_set_str(PARROT_INTERP, PMC *self, char *value, int base)
+        __attribute__nonnull__(1);
+
+static void bignum_set_str(PARROT_INTERP, PMC *self, char *value, int base)
+        __attribute__nonnull__(1);
+
+static void bignum_set_ui(PARROT_INTERP, PMC *self, unsigned long value)
+        __attribute__nonnull__(1);
+
+static void bignum_sub_bignum(PARROT_INTERP,
+    PMC *self,
+    PMC *value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_sub_bignum(PARROT_INTERP,
+    PMC *self,
+    PMC *value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_sub_bignum_float(PARROT_INTERP,
+    PMC *self,
+    FLOATVAL value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_sub_bignum_float(PARROT_INTERP,
+    PMC *self,
+    FLOATVAL value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_sub_bignum_int(PARROT_INTERP,
+    PMC *self,
+    INTVAL value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+static void bignum_sub_bignum_int(PARROT_INTERP,
+    PMC *self,
+    INTVAL value,
+    PMC *dest)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_bignum_abs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_abs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_add_bignum __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_add_bignum __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_add_bignum_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_add_bignum_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_add_bignum_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_add_bignum_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_clear __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_clear __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_cmp __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_cmp __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_cmp_double __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_cmp_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_cmp_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_cmp_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_cmp_ulong __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_div_bignum __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_div_bignum __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_div_bignum_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_div_bignum_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_div_bignum_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_div_bignum_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_fdiv_bignum __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_fdiv_bignum __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_fdiv_bignum_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_fdiv_bignum_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_fdiv_bignum_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_get_bool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_get_default_prec __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_get_default_prec __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_get_double __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_get_double __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_get_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_get_self __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_get_self __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_get_si __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_get_si __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_get_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_get_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_get_string_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_get_string_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_get_ui __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_get_ui __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_mul_bignum __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_mul_bignum __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_mul_bignum_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_mul_bignum_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_mul_bignum_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_mul_bignum_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_neg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_neg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_pow_bignum_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_pow_bignum_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_pow_bignum_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_set __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_set __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_set_bigint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_set_default_prec __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_set_default_prec __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_set_double __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_set_double __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_set_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_set_self __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_set_self __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_set_si __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_set_si __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_set_str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_set_str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_set_ui __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_sub_bignum __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_sub_bignum __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_sub_bignum_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_sub_bignum_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_sub_bignum_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bignum_sub_bignum_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
+/* Uncomment to easily disable it */
+/*
+#ifdef PARROT_HAS_GMP
+#  undef PARROT_HAS_GMP
+#endif
+*/
+#undef PARROT_BIGNUM_CAN_BIGINT
 
 static void
 bignum_init(PARROT_INTERP, PMC *self) {
@@ -263,7 +788,7 @@ bignum_get_ui(PARROT_INTERP, PMC *self) {
     Parrot_ex_throw_from_c_args(interp, NULL, 1, "bignum_get_ui: number too big");
 }
 
-static int
+static INTVAL
 bignum_get_bool(PARROT_INTERP, PMC *self) {
     BIGNUM *bn;
     GETATTR_BigNum_bn(interp, self, bn);
@@ -641,7 +1166,7 @@ bignum_get_si(PARROT_INTERP, PMC *self) {
     THROW_NYI;
 }
 
-static long
+static INTVAL
 bignum_get_bool(PARROT_INTERP, PMC *self) {
     THROW_NYI;
 }

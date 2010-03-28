@@ -22,6 +22,10 @@ Implementation of Iterator for String PMC.
 */
 
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass StringIterator auto_attrs extends Iterator {
     ATTR PMC    *string;    /* String to iterate over */
     ATTR INTVAL  pos;       /* Current position of iterator for forward iterator */

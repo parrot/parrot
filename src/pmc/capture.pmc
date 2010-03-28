@@ -18,6 +18,10 @@ These are the vtable functions for the Capture PMC.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 #define CAPTURE_array_CREATE(i, obj) \
     do { \
         GETATTR_Capture_array((i), (obj), array); \

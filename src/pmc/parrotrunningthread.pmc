@@ -32,6 +32,10 @@ unrelated thread.
 
 #define PMC_tid(x) (PARROT_PARROTRUNNINGTHREAD(x))->tid
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass ParrotRunningThread no_ro auto_attrs {
     ATTR INTVAL tid; /* thread id */
 

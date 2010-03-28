@@ -29,6 +29,10 @@ PackfileConstantTable. Otherwise PackfileAnnotationKey can't be created.
 
 #include "pmc/pmc_packfileannotation.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass PackfileAnnotations auto_attrs extends PackfileSegment {
     /* ConstantTable used for names lookup */
     ATTR PMC *const_table;

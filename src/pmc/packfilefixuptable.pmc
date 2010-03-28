@@ -24,6 +24,10 @@ PDD13 for the design spec.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass PackfileFixupTable auto_attrs extends PackfileSegment {
     /* RPA of entries */
     ATTR PMC *entries;

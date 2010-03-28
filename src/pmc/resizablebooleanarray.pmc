@@ -30,6 +30,10 @@ C<ResizableBooleanArray PMC> extends the C<FixedBooleanArray PMC>.
 /* Convert a size in bits to a size in bytes */
 #define BITS_TO_BYTES(size) ((size) / BITS_PER_CHAR)
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass ResizableBooleanArray extends FixedBooleanArray auto_attrs provides array {
     /* RBA uses the same attributes as FBA, but in RBA they're used as follows:
        size:             position of the last element (a.k.a tail_pos)

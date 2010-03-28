@@ -21,6 +21,10 @@ Sub PMCs with the same short name, but different long names.
 
 #include "pmc/pmc_callcontext.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass MultiSub extends ResizablePMCArray auto_attrs provides array {
 
     VTABLE STRING * get_string() {

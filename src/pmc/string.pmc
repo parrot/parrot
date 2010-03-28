@@ -20,6 +20,10 @@ functions in F<src/string.c>.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass String extends scalar provides string provides scalar auto_attrs {
     ATTR STRING * str_val;
 

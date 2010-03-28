@@ -20,6 +20,10 @@ Implements a message passed between concurrency schedulers.
 
 #include "parrot/scheduler_private.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass SchedulerMessage auto_attrs {
     ATTR INTVAL  id;        /* The message's ID. */
     ATTR STRING *type;      /* The message's type. */

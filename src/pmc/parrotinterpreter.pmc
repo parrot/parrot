@@ -36,10 +36,18 @@ These are the vtable functions for the ParrotInterpreter base class
 #define PMC_args(x)   ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->args
 #define PMC_sub(x)    ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->sub
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void create_interp(PMC *self, Parrot_Interp parent);
+#define ASSERT_ARGS_create_interp __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 /*
 
-=item C<void
-clone_interpreter(Parrot_Interp dest, const Parrot_Interp source, INTVAL flags)>
+=item C<void clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)>
 
 Clones the interpreter as specified by the flags.
 
@@ -150,8 +158,7 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
 
 /*
 
-=item C<static void
-create_interp(PMC *self, Parrot_Interp parent)>
+=item C<static void create_interp(PMC *self, Parrot_Interp parent)>
 
 Creates a new child interpreter of C<parent>.
 
