@@ -290,12 +290,6 @@ static FLOATVAL bignum_get_float(PARROT_INTERP, ARGIN(PMC *self))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static BIGNUM* bignum_get_self(PARROT_INTERP, ARGIN(PMC *self))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
 static long bignum_get_si(PARROT_INTERP, ARGIN(PMC *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -388,13 +382,6 @@ static void bignum_set_float(PARROT_INTERP,
     FLOATVAL value)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
-
-static void bignum_set_self(PARROT_INTERP,
-    ARGIN(PMC *self),
-    ARGIN(BIGNUM *value))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
 
 static void bignum_set_si(PARROT_INTERP, ARGIN(PMC *self), long value)
         __attribute__nonnull__(1)
@@ -506,9 +493,6 @@ static void bignum_sub_bignum_int(PARROT_INTERP,
 #define ASSERT_ARGS_bignum_get_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
-#define ASSERT_ARGS_bignum_get_self __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_bignum_get_si __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
@@ -558,10 +542,6 @@ static void bignum_sub_bignum_int(PARROT_INTERP,
 #define ASSERT_ARGS_bignum_set_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
-#define ASSERT_ARGS_bignum_set_self __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self) \
-    , PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_bignum_set_si __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
@@ -665,22 +645,6 @@ bignum_set_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(const char *value), int ba
     mpf_set_str(bn->b, value, base);
 }
 
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static BIGNUM*
-bignum_get_self(PARROT_INTERP, ARGIN(PMC *self)) {
-    BIGNUM *bn;
-    GETATTR_BigNum_bn(interp, self, bn);
-    return bn;
-}
-
-static void
-bignum_set_self(PARROT_INTERP, ARGIN(PMC *self), ARGIN(BIGNUM *value)) {
-    BIGNUM *bn;
-    GETATTR_BigNum_bn(interp, self, bn);
-    mpf_set(bn->b, (mpf_srcptr)(value)->b);
-}
 
 PARROT_WARN_UNUSED_RESULT
 static long
@@ -1000,7 +964,24 @@ bignum_set_default_prec(PARROT_INTERP, ARGIN(PMC *self), INTVAL prec) {
 }
 
 /* HEADERIZER STOP */
-/* Don't headerize these BIGINT funcs */
+/* Don't headerize these BIGINT and BIGNUM funcs */
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static BIGNUM*
+bignum_get_self(PARROT_INTERP, ARGIN(PMC *self)) {
+    BIGNUM *bn;
+    GETATTR_BigNum_bn(interp, self, bn);
+    return bn;
+}
+
+static void
+bignum_set_self(PARROT_INTERP, ARGIN(PMC *self), ARGIN(BIGNUM *value)) {
+    BIGNUM *bn;
+    GETATTR_BigNum_bn(interp, self, bn);
+    mpf_set(bn->b, (mpf_srcptr)(value)->b);
+}
+
 
 #  ifdef PARROT_BIGNUM_CAN_BIGINT
 PARROT_WARN_UNUSED_RESULT
