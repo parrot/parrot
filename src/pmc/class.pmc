@@ -103,14 +103,20 @@ static void build_attrib_index(PARROT_INTERP, ARGIN(PMC *self))
         __attribute__nonnull__(2);
 
 static int cache_class_attribs(PARROT_INTERP,
-    PMC *cur_class,
-    PMC *attrib_index,
-    PMC *cache,
+    ARGIN(PMC *cur_class),
+    ARGIN(PMC *attrib_index),
+    ARGIN(PMC *cache),
     int cur_index)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
-static void calculate_mro(PARROT_INTERP, PMC *SELF, INTVAL num_parents)
-        __attribute__nonnull__(1);
+static void calculate_mro(PARROT_INTERP,
+    ARGIN(PMC *SELF),
+    INTVAL num_parents)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void init_class_from_hash(PARROT_INTERP,
     ARGMOD(PMC *self),
@@ -119,41 +125,62 @@ static void init_class_from_hash(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*self);
 
-static void initialize_parents(PARROT_INTERP, PMC *object, PMC *all_parents)
-        __attribute__nonnull__(1);
+static void initialize_parents(PARROT_INTERP,
+    ARGIN(PMC *object),
+    ARGIN(PMC *all_parents))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void initialize_parents_pmc(PARROT_INTERP,
-    PMC *object,
-    PMC *all_parents,
-    PMC *init)
-        __attribute__nonnull__(1);
+    ARGIN(PMC *object),
+    ARGIN(PMC *all_parents),
+    ARGIN(PMC *init))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
-static STRING * make_class_name(PARROT_INTERP, PMC *SELF)
-        __attribute__nonnull__(1);
+PARROT_CANNOT_RETURN_NULL
+static STRING * make_class_name(PARROT_INTERP, ARGIN(PMC *SELF))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_build_attrib_index __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_cache_class_attribs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(cur_class) \
+    , PARROT_ASSERT_ARG(attrib_index) \
+    , PARROT_ASSERT_ARG(cache))
 #define ASSERT_ARGS_calculate_mro __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(SELF))
 #define ASSERT_ARGS_init_class_from_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_initialize_parents __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(object) \
+    , PARROT_ASSERT_ARG(all_parents))
 #define ASSERT_ARGS_initialize_parents_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(object) \
+    , PARROT_ASSERT_ARG(all_parents) \
+    , PARROT_ASSERT_ARG(init))
 #define ASSERT_ARGS_make_class_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(SELF))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 static int
-cache_class_attribs(PARROT_INTERP, PMC *cur_class, PMC *attrib_index,
-    PMC *cache, int cur_index)
+cache_class_attribs(PARROT_INTERP,
+        ARGIN(PMC *cur_class), ARGIN(PMC *attrib_index),
+        ARGIN(PMC *cache), int cur_index)
 {
+    ASSERT_ARGS(cache_class_attribs)
     /* The attribute metadata hash. */
     Parrot_Class_attributes * const class_info = PARROT_CLASS(cur_class);
     PMC          * const attribs     = class_info->attrib_metadata;
@@ -192,6 +219,7 @@ cache_class_attribs(PARROT_INTERP, PMC *cur_class, PMC *attrib_index,
 static void
 build_attrib_index(PARROT_INTERP, ARGIN(PMC *self))
 {
+    ASSERT_ARGS(build_attrib_index)
     Parrot_Class_attributes * const _class      = PARROT_CLASS(self);
     int                  cur_index    = 0;
     PMC * const          attrib_index = Parrot_pmc_new(interp, enum_class_Hash);
@@ -221,6 +249,7 @@ build_attrib_index(PARROT_INTERP, ARGIN(PMC *self))
 static void
 init_class_from_hash(PARROT_INTERP, ARGMOD(PMC *self), ARGIN_NULLOK(PMC *info))
 {
+    ASSERT_ARGS(init_class_from_hash)
     Parrot_Class_attributes * const _class      = PARROT_CLASS(self);
     STRING       * const name_str    = CONST_STRING(interp, "name");
     STRING       * const parents_str = CONST_STRING(interp, "parents");
@@ -379,8 +408,9 @@ init_class_from_hash(PARROT_INTERP, ARGMOD(PMC *self), ARGIN_NULLOK(PMC *info))
 }
 
 static void
-initialize_parents(PARROT_INTERP, PMC *object, PMC *all_parents)
+initialize_parents(PARROT_INTERP, ARGIN(PMC *object), ARGIN(PMC *all_parents))
 {
+    ASSERT_ARGS(initialize_parents)
     INTVAL  parent_index = VTABLE_elements(interp, all_parents) - 1;
     STRING * const name  = CONST_STRING(interp, "init");
 
@@ -407,8 +437,10 @@ initialize_parents(PARROT_INTERP, PMC *object, PMC *all_parents)
 }
 
 static void
-initialize_parents_pmc(PARROT_INTERP, PMC *object, PMC *all_parents, PMC *init)
+initialize_parents_pmc(PARROT_INTERP, ARGIN(PMC *object),
+        ARGIN(PMC *all_parents), ARGIN(PMC *init))
 {
+    ASSERT_ARGS(initialize_parents_pmc)
     INTVAL parent_index = VTABLE_elements(interp, all_parents) - 1;
     STRING * const name  = CONST_STRING(interp, "init_pmc");
 
@@ -437,9 +469,11 @@ initialize_parents_pmc(PARROT_INTERP, PMC *object, PMC *all_parents, PMC *init)
  * directly.  VTABLE_isa() uses the name without copying it, for efficiency
  * reasons, as it does not modify the STRING.  VTABLE_get_string() makes a copy
  * of the STRING, so its callers are free to modify it. */
+PARROT_CANNOT_RETURN_NULL
 static STRING *
-make_class_name(PARROT_INTERP, PMC *SELF)
+make_class_name(PARROT_INTERP, ARGIN(PMC *SELF))
 {
+    ASSERT_ARGS(make_class_name)
     Parrot_Class_attributes * const  _class    = PARROT_CLASS(SELF);
     PMC          * const _namespace = _class->_namespace;
 
@@ -471,8 +505,9 @@ make_class_name(PARROT_INTERP, PMC *SELF)
  * see the documentation associated with C<Parrot_ComputeMRO_C3>.
  */
 static void
-calculate_mro(PARROT_INTERP, PMC *SELF, INTVAL num_parents)
+calculate_mro(PARROT_INTERP, ARGIN(PMC *SELF), INTVAL num_parents)
 {
+    ASSERT_ARGS(calculate_mro)
     Parrot_Class_attributes  * const _class = PARROT_CLASS(SELF);
 
     /* SELF is already on the all_parents */
