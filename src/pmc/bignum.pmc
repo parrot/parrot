@@ -578,6 +578,8 @@ static void bignum_sub_bignum_int(PARROT_INTERP,
 
 static void
 bignum_init(PARROT_INTERP, ARGIN(PMC *self)) {
+    ASSERT_ARGS(bignum_init)
+
 #ifdef PARROT_HAS_GMP
     BIGNUM * const bn = mem_gc_allocate_zeroed_typed(interp, BIGNUM);
     SETATTR_BigNum_bn(interp, self, bn);
@@ -591,6 +593,8 @@ bignum_init(PARROT_INTERP, ARGIN(PMC *self)) {
 
 static void
 bignum_clear(PARROT_INTERP, ARGIN(PMC *self)) {
+    ASSERT_ARGS(bignum_clear)
+
 #ifdef PARROT_HAS_GMP
     BIGNUM *bn;
     GETATTR_BigNum_bn(interp, self, bn);
@@ -604,6 +608,8 @@ bignum_clear(PARROT_INTERP, ARGIN(PMC *self)) {
 
 static void
 bignum_set(PARROT_INTERP, ARGMOD(PMC *dest), ARGIN(PMC *src)) {
+    ASSERT_ARGS(bignum_set)
+
     BIGNUM *bn_dest, *bn_src;
     GETATTR_BigNum_bn(interp, dest, bn_dest);
     GETATTR_BigNum_bn(interp, src,  bn_src);
@@ -612,6 +618,8 @@ bignum_set(PARROT_INTERP, ARGMOD(PMC *dest), ARGIN(PMC *src)) {
 
 static void
 bignum_set_si(PARROT_INTERP, ARGIN(PMC *self), long value) {
+    ASSERT_ARGS(bignum_set_si)
+
     BIGNUM *bn;
     GETATTR_BigNum_bn(interp, self, bn);
     mpf_set_si(bn->b, value);
@@ -619,6 +627,8 @@ bignum_set_si(PARROT_INTERP, ARGIN(PMC *self), long value) {
 
 static void
 bignum_set_ui(PARROT_INTERP, ARGIN(PMC *self), unsigned long value) {
+    ASSERT_ARGS(bignum_set_ui)
+
     BIGNUM *bn;
     GETATTR_BigNum_bn(interp, self, bn);
     mpf_set_ui(bn->b, value);
@@ -626,6 +636,8 @@ bignum_set_ui(PARROT_INTERP, ARGIN(PMC *self), unsigned long value) {
 
 static void
 bignum_set_float(PARROT_INTERP, ARGIN(PMC *self), FLOATVAL value) {
+    ASSERT_ARGS(bignum_set_float)
+
     BIGNUM *bn;
     GETATTR_BigNum_bn(interp, self, bn);
     mpf_set_d(bn->b, (double)value);
@@ -633,6 +645,8 @@ bignum_set_float(PARROT_INTERP, ARGIN(PMC *self), FLOATVAL value) {
 
 static void
 bignum_set_double(PARROT_INTERP, ARGIN(PMC *self), double value) {
+    ASSERT_ARGS(bignum_set_double)
+
     BIGNUM *bn;
     GETATTR_BigNum_bn(interp, self, bn);
     mpf_set_d(bn->b, value);
@@ -640,6 +654,8 @@ bignum_set_double(PARROT_INTERP, ARGIN(PMC *self), double value) {
 
 static void
 bignum_set_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(const char *value), int base) {
+    ASSERT_ARGS(bignum_set_str)
+
     BIGNUM *bn;
     GETATTR_BigNum_bn(interp, self, bn);
     mpf_set_str(bn->b, value, base);
@@ -649,6 +665,8 @@ bignum_set_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(const char *value), int ba
 PARROT_WARN_UNUSED_RESULT
 static long
 bignum_get_si(PARROT_INTERP, ARGIN(PMC *self)) {
+    ASSERT_ARGS(bignum_get_si)
+
     BIGNUM *bn;
     GETATTR_BigNum_bn(interp, self, bn);
     if (mpf_fits_slong_p(bn->b))
@@ -660,6 +678,8 @@ bignum_get_si(PARROT_INTERP, ARGIN(PMC *self)) {
 PARROT_WARN_UNUSED_RESULT
 static unsigned long
 bignum_get_ui(PARROT_INTERP, ARGIN(PMC *self)) {
+    ASSERT_ARGS(bignum_get_ui)
+
     BIGNUM *bn;
     GETATTR_BigNum_bn(interp, self, bn);
     if (mpf_fits_slong_p(bn->b))
@@ -683,6 +703,8 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static char *
 bignum_get_string(PARROT_INTERP, ARGIN(PMC *self), int base) {
+    ASSERT_ARGS(bignum_get_string)
+
     BIGNUM *bn;
     size_t  n;
     char   *s;
@@ -698,6 +720,8 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static char *
 bignum_get_string_size(PARROT_INTERP, ARGIN(PMC *self), int base, int digits) {
+    ASSERT_ARGS(bignum_get_string_size)
+
     BIGNUM *bn;
     size_t  n;
     char   *s;
@@ -711,6 +735,8 @@ bignum_get_string_size(PARROT_INTERP, ARGIN(PMC *self), int base, int digits) {
 PARROT_WARN_UNUSED_RESULT
 static double
 bignum_get_double(PARROT_INTERP, ARGIN(PMC *self)) {
+    ASSERT_ARGS(bignum_get_double)
+
     BIGNUM *bn;
     GETATTR_BigNum_bn(interp, self, bn);
     return mpf_get_d(bn->b);
@@ -719,6 +745,8 @@ bignum_get_double(PARROT_INTERP, ARGIN(PMC *self)) {
 PARROT_WARN_UNUSED_RESULT
 static FLOATVAL
 bignum_get_float(PARROT_INTERP, ARGIN(PMC *self)) {
+    ASSERT_ARGS(bignum_get_float)
+
     BIGNUM *bn;
     GETATTR_BigNum_bn(interp, self, bn);
     return mpf_get_d(bn->b);
@@ -726,6 +754,8 @@ bignum_get_float(PARROT_INTERP, ARGIN(PMC *self)) {
 
 static void
 bignum_add_bignum(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value), ARGMOD(PMC *dest)) {
+    ASSERT_ARGS(bignum_add_bignum)
+
     BIGNUM *bn_self, *bn_value, *bn_dest;
     GETATTR_BigNum_bn(interp, self, bn_self);
     GETATTR_BigNum_bn(interp, value, bn_value);
@@ -735,6 +765,8 @@ bignum_add_bignum(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value), ARGMOD(PMC
 
 static void
 bignum_add_bignum_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC *dest)) {
+    ASSERT_ARGS(bignum_add_bignum_int)
+
     BIGNUM *bn_self, *bn_dest;
     GETATTR_BigNum_bn(interp, self, bn_self);
     GETATTR_BigNum_bn(interp, dest, bn_dest);
@@ -746,6 +778,8 @@ bignum_add_bignum_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC 
 
 static void
 bignum_add_bignum_float(PARROT_INTERP, ARGIN(PMC *self), FLOATVAL value, ARGMOD(PMC *dest)) {
+    ASSERT_ARGS(bignum_add_bignum_float)
+
     BIGNUM *bn_value, *bn_self, *bn_dest;
     GETATTR_BigNum_bn(interp, self, bn_value);
     GETATTR_BigNum_bn(interp, self, bn_self);
@@ -756,6 +790,8 @@ bignum_add_bignum_float(PARROT_INTERP, ARGIN(PMC *self), FLOATVAL value, ARGMOD(
 
 static void
 bignum_sub_bignum(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value), ARGMOD(PMC *dest)) {
+    ASSERT_ARGS(bignum_sub_bignum)
+
     BIGNUM *bn_self, *bn_value, *bn_dest;
     GETATTR_BigNum_bn(interp, self, bn_self);
     GETATTR_BigNum_bn(interp, value, bn_value);
@@ -765,6 +801,8 @@ bignum_sub_bignum(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value), ARGMOD(PMC
 
 static void
 bignum_sub_bignum_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC *dest)) {
+    ASSERT_ARGS(bignum_sub_bignum_int)
+
     BIGNUM *bn_self, *bn_dest;
     GETATTR_BigNum_bn(interp, self, bn_self);
     GETATTR_BigNum_bn(interp, dest, bn_dest);
@@ -776,6 +814,8 @@ bignum_sub_bignum_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC 
 
 static void
 bignum_sub_bignum_float(PARROT_INTERP, ARGIN(PMC *self), FLOATVAL value, ARGMOD(PMC *dest)) {
+    ASSERT_ARGS(bignum_sub_bignum_float)
+
     BIGNUM *bn_tmp, *bn_self, *bn_dest;
     GETATTR_BigNum_bn(interp, self, bn_tmp);
     GETATTR_BigNum_bn(interp, self, bn_self);
@@ -786,6 +826,8 @@ bignum_sub_bignum_float(PARROT_INTERP, ARGIN(PMC *self), FLOATVAL value, ARGMOD(
 
 static void
 bignum_mul_bignum(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value), ARGMOD(PMC *dest)) {
+    ASSERT_ARGS(bignum_mul_bignum)
+
     BIGNUM *bn_self, *bn_value, *bn_dest;
     GETATTR_BigNum_bn(interp, self, bn_self);
     GETATTR_BigNum_bn(interp, value, bn_value);
@@ -795,6 +837,8 @@ bignum_mul_bignum(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value), ARGMOD(PMC
 
 static void
 bignum_mul_bignum_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC *dest)) {
+    ASSERT_ARGS(bignum_mul_bignum_int)
+
     BIGNUM *bn_self, *bn_dest;
     GETATTR_BigNum_bn(interp, self, bn_self);
     GETATTR_BigNum_bn(interp, dest, bn_dest);
@@ -803,6 +847,8 @@ bignum_mul_bignum_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC 
 
 static void
 bignum_mul_bignum_float(PARROT_INTERP, ARGIN(PMC *self), FLOATVAL value, ARGMOD(PMC *dest)) {
+    ASSERT_ARGS(bignum_mul_bignum_float)
+
     BIGNUM *bn_tmp, *bn_self, *bn_dest;
     GETATTR_BigNum_bn(interp, self, bn_tmp);
     GETATTR_BigNum_bn(interp, self, bn_self);
@@ -813,6 +859,8 @@ bignum_mul_bignum_float(PARROT_INTERP, ARGIN(PMC *self), FLOATVAL value, ARGMOD(
 
 static void
 bignum_pow_bignum_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC *dest)) {
+    ASSERT_ARGS(bignum_pow_bignum_int)
+
     BIGNUM *bn_self, *bn_dest;
     GETATTR_BigNum_bn(interp, self, bn_self);
     GETATTR_BigNum_bn(interp, dest, bn_dest);
@@ -838,6 +886,8 @@ bignum_check_divide_zero(PARROT_INTERP, ARGIN(PMC *value)) {
 
 static void
 bignum_div_bignum(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value), ARGMOD(PMC *dest)) {
+    ASSERT_ARGS(bignum_div_bignum)
+
     BIGNUM *bn_self, *bn_value, *bn_dest;
     bignum_check_divide_zero(interp, value);
     GETATTR_BigNum_bn(interp, self, bn_self);
@@ -848,6 +898,8 @@ bignum_div_bignum(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value), ARGMOD(PMC
 
 static void
 bignum_div_bignum_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC *dest)) {
+    ASSERT_ARGS(bignum_div_bignum_int)
+
     BIGNUM *bn_self, *bn_dest;
     GETATTR_BigNum_bn(interp, self, bn_self);
     GETATTR_BigNum_bn(interp, dest, bn_dest);
@@ -864,6 +916,8 @@ bignum_div_bignum_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC 
 
 static void
 bignum_div_bignum_float(PARROT_INTERP, ARGIN(PMC *self), FLOATVAL value, ARGMOD(PMC *dest)) {
+    ASSERT_ARGS(bignum_div_bignum_float)
+
     BIGNUM bn, *bn_self, *bn_dest;
     GETATTR_BigNum_bn(interp, self, bn_self);
     GETATTR_BigNum_bn(interp, dest, bn_dest);
@@ -885,6 +939,8 @@ bignum_div_bignum_float(PARROT_INTERP, ARGIN(PMC *self), FLOATVAL value, ARGMOD(
 /* There's no such mpf_fdiv, only mpz_fdiv and mpf_div */
 static void
 bignum_fdiv_bignum(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value), ARGMOD(PMC *dest)) {
+    ASSERT_ARGS(bignum_fdiv_bignum)
+
     BIGNUM *bn_self, *bn_value, *bn_dest;
     GETATTR_BigNum_bn(interp, self, bn_self);
     GETATTR_BigNum_bn(interp, value, bn_value);
@@ -895,6 +951,8 @@ bignum_fdiv_bignum(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value), ARGMOD(PM
 
 static void
 bignum_fdiv_bignum_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC *dest)) {
+    ASSERT_ARGS(bignum_fdiv_bignum_int)
+
     BIGNUM *bn_self, *bn_dest;
     GETATTR_BigNum_bn(interp, self, bn_self);
     GETATTR_BigNum_bn(interp, dest, bn_dest);
@@ -910,6 +968,8 @@ bignum_fdiv_bignum_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC
 
 static INTVAL
 bignum_cmp(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value)) {
+    ASSERT_ARGS(bignum_cmp)
+
     BIGNUM *bn_self, *bn_value;
     GETATTR_BigNum_bn(interp, self,  bn_self);
     GETATTR_BigNum_bn(interp, value, bn_value);
@@ -918,6 +978,8 @@ bignum_cmp(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value)) {
 
 static INTVAL
 bignum_cmp_double(PARROT_INTERP, ARGIN(PMC *self), double value) {
+    ASSERT_ARGS(bignum_cmp_double)
+
     BIGNUM *bn;
     GETATTR_BigNum_bn(interp, self, bn);
     return mpf_cmp_d(bn->b, value);
@@ -925,6 +987,8 @@ bignum_cmp_double(PARROT_INTERP, ARGIN(PMC *self), double value) {
 
 static INTVAL
 bignum_cmp_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value) {
+    ASSERT_ARGS(bignum_cmp_int)
+
     BIGNUM *bn;
     GETATTR_BigNum_bn(interp, self, bn);
     return mpf_cmp_si(bn->b, value);
@@ -932,6 +996,8 @@ bignum_cmp_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value) {
 
 static INTVAL
 bignum_cmp_ulong(PARROT_INTERP, ARGIN(PMC *self), unsigned long value) {
+    ASSERT_ARGS(bignum_cmp_ulong)
+
     BIGNUM *bn;
     GETATTR_BigNum_bn(interp, self, bn);
     return mpf_cmp_ui(bn->b, value);
@@ -939,6 +1005,8 @@ bignum_cmp_ulong(PARROT_INTERP, ARGIN(PMC *self), unsigned long value) {
 
 static void
 bignum_abs(PARROT_INTERP, ARGIN(PMC *self), ARGMOD(PMC *dest)) {
+    ASSERT_ARGS(bignum_abs)
+
     BIGNUM *bn_self, *bn_dest;
     GETATTR_BigNum_bn(interp, self, bn_self);
     GETATTR_BigNum_bn(interp, dest, bn_dest);
@@ -947,6 +1015,8 @@ bignum_abs(PARROT_INTERP, ARGIN(PMC *self), ARGMOD(PMC *dest)) {
 
 static void
 bignum_neg(PARROT_INTERP, ARGIN(PMC *self), ARGMOD(PMC *dest)) {
+    ASSERT_ARGS(bignum_neg)
+
     BIGNUM *bn_self, *bn_dest;
     GETATTR_BigNum_bn(interp, self, bn_self);
     GETATTR_BigNum_bn(interp, dest, bn_dest);
@@ -955,11 +1025,15 @@ bignum_neg(PARROT_INTERP, ARGIN(PMC *self), ARGMOD(PMC *dest)) {
 
 static INTVAL
 bignum_get_default_prec(PARROT_INTERP, ARGIN(PMC *self)) {
+    ASSERT_ARGS(bignum_get_default_prec)
+
     return mpf_get_default_prec();
 }
 
 static void
 bignum_set_default_prec(PARROT_INTERP, ARGIN(PMC *self), INTVAL prec) {
+    ASSERT_ARGS(bignum_set_default_prec)
+
     mpf_set_default_prec(prec);
 }
 
