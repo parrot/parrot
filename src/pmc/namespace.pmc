@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2009, Parrot Foundation.
+Copyright (C) 2005-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -20,13 +20,85 @@ These are the vtable functions for the namespace PMC.
 
 #include "pmc/pmc_sub.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void add_multi_to_namespace(PARROT_INTERP,
+    ARGIN(PMC *SELF),
+    ARGIN(STRING *key),
+    ARGIN_NULLOK(PMC *value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static void add_nci_to_namespace(PARROT_INTERP,
+    ARGIN(PMC *SELF),
+    ARGIN(STRING *key),
+    ARGIN_NULLOK(PMC *value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static void add_to_class(PARROT_INTERP,
+    ARGMOD(Parrot_NameSpace_attributes *nsinfo),
+    ARGMOD(PMC *classobj),
+    ARGIN(STRING *key),
+    ARGIN(PMC *value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*nsinfo)
+        FUNC_MODIFIES(*classobj);
+
+static int maybe_add_sub_to_namespace(PARROT_INTERP,
+    ARGIN(PMC *SELF),
+    ARGIN(STRING *key),
+    ARGIN(PMC *value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
+
+static int ns_insert_sub_keyed_str(PARROT_INTERP,
+    ARGIN(PMC *self),
+    ARGIN(STRING *key),
+    ARGIN_NULLOK(PMC *value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+#define ASSERT_ARGS_add_multi_to_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(SELF) \
+    , PARROT_ASSERT_ARG(key))
+#define ASSERT_ARGS_add_nci_to_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(SELF) \
+    , PARROT_ASSERT_ARG(key))
+#define ASSERT_ARGS_add_to_class __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(nsinfo) \
+    , PARROT_ASSERT_ARG(classobj) \
+    , PARROT_ASSERT_ARG(key) \
+    , PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_maybe_add_sub_to_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(SELF) \
+    , PARROT_ASSERT_ARG(key) \
+    , PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_ns_insert_sub_keyed_str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(key))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 static void
-add_to_class(
-        Interp *interp,
-        Parrot_NameSpace_attributes * const nsinfo,
-        PMC * const classobj,
-        STRING *key,
-        PMC *value)
+add_to_class(PARROT_INTERP, ARGMOD(Parrot_NameSpace_attributes *nsinfo),
+        ARGMOD(PMC *classobj), ARGIN(STRING *key), ARGIN(PMC *value))
 {
     /* Insert it in class, if there is a class */
     if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
@@ -45,7 +117,8 @@ add_to_class(
 }
 
 static int
-ns_insert_sub_keyed_str(PARROT_INTERP, PMC *self, STRING *key, PMC *value)
+ns_insert_sub_keyed_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *key),
+        ARGIN_NULLOK(PMC *value))
 {
     Parrot_NameSpace_attributes * const nsinfo   = PARROT_NAMESPACE(self);
     PMC              *       vtable   = nsinfo->vtable;
@@ -96,9 +169,10 @@ ns_insert_sub_keyed_str(PARROT_INTERP, PMC *self, STRING *key, PMC *value)
 }
 
 static int
-maybe_add_sub_to_namespace(PARROT_INTERP, PMC *SELF, STRING *key, PMC *value)
+maybe_add_sub_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
+        ARGIN(PMC *value))
 {
-    STRING *sub_str = CONST_STRING(interp, "Sub");
+    STRING * const sub_str = CONST_STRING(interp, "Sub");
 
     if (!PMC_IS_NULL(value)
     &&   VTABLE_isa(interp, value, sub_str)
@@ -109,9 +183,10 @@ maybe_add_sub_to_namespace(PARROT_INTERP, PMC *SELF, STRING *key, PMC *value)
 }
 
 static void
-add_nci_to_namespace(PARROT_INTERP, PMC *SELF, STRING *key, PMC *value)
+add_nci_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
+        ARGIN_NULLOK(PMC *value))
 {
-    STRING *nci_str = CONST_STRING(interp, "NCI");
+    STRING * const nci_str = CONST_STRING(interp, "NCI");
 
     if (!PMC_IS_NULL(value)
     &&   VTABLE_isa(interp, value, nci_str)) {
@@ -124,9 +199,10 @@ add_nci_to_namespace(PARROT_INTERP, PMC *SELF, STRING *key, PMC *value)
 }
 
 static void
-add_multi_to_namespace(PARROT_INTERP, PMC *SELF, STRING *key, PMC *value)
+add_multi_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
+        ARGIN_NULLOK(PMC *value))
 {
-    STRING *multi_str = CONST_STRING(interp, "MultiSub");
+    STRING * const multi_str = CONST_STRING(interp, "MultiSub");
 
     if (!PMC_IS_NULL(value)
     &&   VTABLE_isa(interp, value, multi_str)) {
@@ -138,12 +214,12 @@ add_multi_to_namespace(PARROT_INTERP, PMC *SELF, STRING *key, PMC *value)
             PMC * const classobj = VTABLE_get_class(interp, SELF);
 
             /* Extract the first alternate and check if it is a method */
-            PMC *pmc_sub = VTABLE_get_pmc_keyed_int(interp, value, 0);
+            PMC * const pmc_sub = VTABLE_get_pmc_keyed_int(interp, value, 0);
             Parrot_Sub_attributes *sub;
             PMC_get_sub(interp, pmc_sub, sub);
 
             if (sub->comp_flags & SUB_COMP_FLAG_METHOD) {
-                STRING *empty_str   = CONST_STRING(interp, "");
+                STRING * const empty_str   = CONST_STRING(interp, "");
                 STRING *method_name = key;
                 Hash   *hash;
 
@@ -181,53 +257,6 @@ typedef enum {
 } NS_slot_enum;
 
 #define FPA_is_ns_ext PObj_private0_FLAG
-
-/* HEADERIZER HFILE: none */
-/* HEADERIZER BEGIN: static */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-static void add_multi_to_namespace(PARROT_INTERP,
-    PMC *SELF,
-    STRING *key,
-    PMC *value)
-        __attribute__nonnull__(1);
-
-static void add_nci_to_namespace(PARROT_INTERP,
-    PMC *SELF,
-    STRING *key,
-    PMC *value)
-        __attribute__nonnull__(1);
-
-static void add_to_class(
-     Interp *interp,
-    Parrot_NameSpace_attributes * const nsinfo,
-    PMC * const classobj,
-    STRING *key,
-    PMC *value);
-
-static int maybe_add_sub_to_namespace(PARROT_INTERP,
-    PMC *SELF,
-    STRING *key,
-    PMC *value)
-        __attribute__nonnull__(1);
-
-static int ns_insert_sub_keyed_str(PARROT_INTERP,
-    PMC *self,
-    STRING *key,
-    PMC *value)
-        __attribute__nonnull__(1);
-
-#define ASSERT_ARGS_add_multi_to_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_add_nci_to_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_add_to_class __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_maybe_add_sub_to_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_ns_insert_sub_keyed_str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: static */
 
 pmclass NameSpace extends Hash provides hash no_ro auto_attrs {
 
