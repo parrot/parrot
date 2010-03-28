@@ -89,6 +89,7 @@ PARROT_WARN_UNUSED_RESULT
 static INTVAL
 get_attrib_index(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *name))
 {
+    ASSERT_ARGS(get_attrib_index)
     Parrot_Class_attributes * const _class  = PARROT_CLASS(self);
     const INTVAL                    cur_hll = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp));
     int                             num_classes, i;
@@ -145,6 +146,7 @@ PARROT_WARN_UNUSED_RESULT
 static INTVAL
 get_attrib_index_keyed(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *key), ARGIN(STRING *name))
 {
+    ASSERT_ARGS(get_attrib_index_keyed)
     Parrot_Class_attributes * const _class       = PARROT_CLASS(self);
     PMC          * const class_cache  = VTABLE_get_pmc_keyed_str(interp,
                     _class->attrib_cache, VTABLE_get_string(interp, key));
@@ -176,6 +178,7 @@ PARROT_CAN_RETURN_NULL
 static PMC *
 find_cached(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *name))
 {
+    ASSERT_ARGS(find_cached)
     PMC *cache;
     GETATTR_Class_meth_cache(interp, _class, cache);
 
@@ -188,6 +191,7 @@ find_cached(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *name))
 static void
 cache_method(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *name), ARGIN(PMC *method))
 {
+    ASSERT_ARGS(cache_method)
     PMC *cache;
     GETATTR_Class_meth_cache(interp, _class, cache);
 
