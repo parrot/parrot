@@ -16,6 +16,8 @@ string parsing/generating and basic mathematical operations.
 =over 4
 
 =cut
+    ASSERT_ARGS()
+
 
 Equations used are sometimes listed.  At times, multiple equations are given,
 but those starting with => are the ones used
@@ -220,6 +222,8 @@ int_check_divide_zero(PARROT_INTERP, INTVAL value) {
 
 static void
 float_check_divide_zero(PARROT_INTERP, FLOATVAL value) {
+    ASSERT_ARGS(float_check_divide_zero)
+
     if (FLOAT_IS_ZERO(value))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
@@ -229,6 +233,9 @@ static void
 complex_check_divide_zero(PARROT_INTERP, ARGIN(PMC *value)) {
     /* Throw an exception if we are dividing by zero. Check both the real part
      * and the imaginary part.*/
+    ASSERT_ARGS(complex_check_divide_zero)
+
+
     if (FLOAT_IS_ZERO(VTABLE_get_number_keyed_int(interp, value, 0))
             && FLOAT_IS_ZERO(VTABLE_get_number_keyed_int(interp, value, 1)))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_DIV_BY_ZERO,
