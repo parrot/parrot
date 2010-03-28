@@ -47,7 +47,7 @@ static void cant_do_write_method(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 static INTVAL check_set_std_props(PARROT_INTERP,
-    ARGMOD(PMC *pmc),
+    ARGMOD(PMC *pmc)heck_set_std_props,
     ARGIN(const STRING *key),
     ARGIN(PMC *value))
         __attribute__nonnull__(1)
@@ -101,6 +101,7 @@ PARROT_WARN_UNUSED_RESULT
 static STRING *
 caller(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
 {
+    ASSERT_ARGS(caller)
 
     return !PMC_IS_NULL(pmc) && pmc->vtable && pmc->vtable->whoami
                 ? VTABLE_name(interp, pmc)
@@ -122,6 +123,8 @@ PARROT_DOES_NOT_RETURN
 static void
 cant_do_method(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), int index)
 {
+    ASSERT_ARGS(cant_do_method)
+
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ILL_INHERIT,
             "%s() not implemented in class '%Ss'",
             Parrot_get_vtable_name(interp, index),
@@ -144,6 +147,8 @@ PARROT_DOES_NOT_RETURN
 static void
 cant_do_write_method(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), int index)
 {
+    ASSERT_ARGS(cant_do_write_method)
+
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_WRITE_TO_CONSTCLASS,
             "%s() in read-only instance of '%Ss'",
             Parrot_get_vtable_name(interp, index),
@@ -169,6 +174,8 @@ PARROT_WARN_UNUSED_RESULT
 static INTVAL
 check_set_std_props(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const STRING *key), ARGIN(PMC *value))
 {
+    ASSERT_ARGS(check_set_std_props)
+
     /*
      * s2 in Parrot_str_equal is freed here
      */
@@ -227,6 +234,8 @@ Returns true if propagate_std_props() would create a non-empty prophash.
 
 static INTVAL
 has_pending_std_props(ARGIN(const PMC *self)) {
+    ASSERT_ARGS(has_pending_std_props)
+
     if (self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG))
         return 1;
     else
@@ -295,6 +304,8 @@ Returns true (1) if B<method> is found in B<what>, false (0) otherwise.
 static INTVAL
 does_isa(PARROT_INTERP, ARGIN(const STRING *method), ARGIN(const STRING *what))
 {
+    ASSERT_ARGS(does_isa)
+
     const INTVAL length = Parrot_str_byte_length(interp, what);
     INTVAL  pos    = 0;
 
