@@ -47,7 +47,7 @@ static void cant_do_write_method(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 static INTVAL check_set_std_props(PARROT_INTERP,
-    ARGMOD(PMC *pmc)heck_set_std_props,
+    ARGMOD(PMC *pmc),
     ARGIN(const STRING *key),
     ARGIN(PMC *value))
         __attribute__nonnull__(1)
