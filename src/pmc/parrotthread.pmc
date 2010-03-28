@@ -61,6 +61,7 @@ static void stop_GC(ARGIN(Interp *parent), ARGIN(Interp *thread))
 static void
 stop_GC(ARGIN(Interp *parent), ARGIN(Interp *thread))
 {
+    ASSERT_ARGS(stop_GC)
     Parrot_block_GC_mark(parent);
     Parrot_block_GC_mark(thread);
     Parrot_block_GC_sweep(parent);
