@@ -992,7 +992,7 @@ bignum_get_bigint(PARROT_INTERP, ARGIN(PMC *self)) {
     GETATTR_BigNum_bn(interp, self, bn);
     mpz_clear(bi_dest->b);
     mpz_init(bi_dest->b);
-    if ( mpf_fits_slong_p(bn->b)) {
+    if (mpf_fits_slong_p(bn->b)) {
         bi_dest->b = mpf_get_ui(bn->b);
     }
     else {
