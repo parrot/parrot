@@ -56,17 +56,23 @@ typedef struct Pcc_cell
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static FLOATVAL autobox_floatval(PARROT_INTERP, Pcc_cell *cell)
-        __attribute__nonnull__(1);
+static FLOATVAL autobox_floatval(PARROT_INTERP, ARGIN(Pcc_cell *cell))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-static INTVAL autobox_intval(PARROT_INTERP, Pcc_cell *cell)
-        __attribute__nonnull__(1);
+static INTVAL autobox_intval(PARROT_INTERP, ARGIN(Pcc_cell *cell))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-static PMC * autobox_pmc(PARROT_INTERP, Pcc_cell *cell)
-        __attribute__nonnull__(1);
+PARROT_CANNOT_RETURN_NULL
+static PMC * autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-static STRING * autobox_string(PARROT_INTERP, Pcc_cell *cell)
-        __attribute__nonnull__(1);
+PARROT_CANNOT_RETURN_NULL
+static STRING * autobox_string(PARROT_INTERP, ARGIN(Pcc_cell *cell))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void ensure_positionals_storage(PARROT_INTERP,
     ARGIN(PMC *self),
@@ -74,14 +80,17 @@ static void ensure_positionals_storage(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 static Pcc_cell* get_cell_at(PARROT_INTERP, ARGIN(PMC *self), INTVAL key)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 static Hash * get_hash(PARROT_INTERP, ARGIN(PMC *SELF))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CAN_RETURN_NULL
 static PMC * get_named_names(PARROT_INTERP, ARGIN(PMC *SELF))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -99,13 +108,17 @@ static void mark_positionals(PARROT_INTERP, ARGIN(PMC *self))
         __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_autobox_floatval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(cell))
 #define ASSERT_ARGS_autobox_intval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(cell))
 #define ASSERT_ARGS_autobox_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(cell))
 #define ASSERT_ARGS_autobox_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(cell))
 #define ASSERT_ARGS_ensure_positionals_storage __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
@@ -133,6 +146,7 @@ static void mark_positionals(PARROT_INTERP, ARGIN(PMC *self))
 static void
 ensure_positionals_storage(PARROT_INTERP, ARGIN(PMC *self), INTVAL size)
 {
+    ASSERT_ARGS(ensure_positionals_storage)
     INTVAL num_positionals, allocated_positionals;
     Pcc_cell *array, *new_array;
 
@@ -168,9 +182,11 @@ ensure_positionals_storage(PARROT_INTERP, ARGIN(PMC *self), INTVAL size)
     SETATTR_CallContext_positionals(interp, self, new_array);
 }
 
+PARROT_CANNOT_RETURN_NULL
 static Pcc_cell*
 get_cell_at(PARROT_INTERP, ARGIN(PMC *self), INTVAL key)
 {
+    ASSERT_ARGS(get_cell_at)
     Pcc_cell *cells;
     ensure_positionals_storage(interp, self, key + 1);
     GETATTR_CallContext_positionals(interp, self, cells);
@@ -178,8 +194,9 @@ get_cell_at(PARROT_INTERP, ARGIN(PMC *self), INTVAL key)
 }
 
 static INTVAL
-autobox_intval(PARROT_INTERP, Pcc_cell *cell)
+autobox_intval(PARROT_INTERP, ARGIN(Pcc_cell *cell))
 {
+    ASSERT_ARGS(autobox_intval)
     switch (CELL_TYPE_MASK(cell)) {
       case INTCELL:
         return CELL_INT(cell);
@@ -200,8 +217,9 @@ autobox_intval(PARROT_INTERP, Pcc_cell *cell)
 }
 
 static FLOATVAL
-autobox_floatval(PARROT_INTERP, Pcc_cell *cell)
+autobox_floatval(PARROT_INTERP, ARGIN(Pcc_cell *cell))
 {
+    ASSERT_ARGS(autobox_floatval)
     switch (CELL_TYPE_MASK(cell)) {
       case INTCELL:
         return (FLOATVAL)CELL_INT(cell);
@@ -221,9 +239,11 @@ autobox_floatval(PARROT_INTERP, Pcc_cell *cell)
     return 0.0;
 }
 
+PARROT_CANNOT_RETURN_NULL
 static STRING *
-autobox_string(PARROT_INTERP, Pcc_cell *cell)
+autobox_string(PARROT_INTERP, ARGIN(Pcc_cell *cell))
 {
+    ASSERT_ARGS(autobox_string)
     switch (CELL_TYPE_MASK(cell)) {
       case INTCELL:
         return Parrot_str_from_int(interp, CELL_INT(cell));
@@ -243,9 +263,11 @@ autobox_string(PARROT_INTERP, Pcc_cell *cell)
     return NULL;
 }
 
+PARROT_CANNOT_RETURN_NULL
 static PMC *
-autobox_pmc(PARROT_INTERP, Pcc_cell *cell)
+autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell))
 {
+    ASSERT_ARGS(autobox_pmc)
     PMC *result = PMCNULL;
 
     switch (CELL_TYPE_MASK(cell)) {
@@ -271,9 +293,11 @@ autobox_pmc(PARROT_INTERP, Pcc_cell *cell)
     return result;
 }
 
+PARROT_CANNOT_RETURN_NULL
 static Hash *
 get_hash(PARROT_INTERP, ARGIN(PMC *SELF))
 {
+    ASSERT_ARGS(get_hash)
     Hash   *hash;
 
     GETATTR_CallContext_hash(interp, SELF, hash);
@@ -294,6 +318,7 @@ get_hash(PARROT_INTERP, ARGIN(PMC *SELF))
 static void
 mark_cell(PARROT_INTERP, ARGIN(Pcc_cell *c))
 {
+    ASSERT_ARGS(mark_cell)
     switch (CELL_TYPE_MASK(c)) {
         case STRINGCELL:
             if (CELL_STRING(c))
@@ -314,6 +339,7 @@ mark_cell(PARROT_INTERP, ARGIN(Pcc_cell *c))
 static void
 mark_positionals(PARROT_INTERP, ARGIN(PMC *self))
 {
+    ASSERT_ARGS(mark_positionals)
     INTVAL size, i;
     Pcc_cell *cells;
 
@@ -328,6 +354,7 @@ mark_positionals(PARROT_INTERP, ARGIN(PMC *self))
 static void
 mark_hash(PARROT_INTERP, ARGIN(Hash *h))
 {
+    ASSERT_ARGS(mark_hash)
     UINTVAL entries = h->entries;
     INTVAL  i;
 
@@ -342,9 +369,11 @@ mark_hash(PARROT_INTERP, ARGIN(Hash *h))
     }
 }
 
+PARROT_CAN_RETURN_NULL
 static PMC *
 get_named_names(PARROT_INTERP, ARGIN(PMC *SELF))
 {
+    ASSERT_ARGS(get_named_names)
     Hash *hash;
     PMC  *result = PMCNULL;
 
