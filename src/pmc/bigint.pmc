@@ -133,6 +133,7 @@ static BIGINT* bigint_get_self(PARROT_INTERP, ARGIN(PMC *self))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static char * bigint_get_string(PARROT_INTERP, ARGIN(PMC *self), int base)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -159,10 +160,11 @@ static void bigint_mod_bigint_int(PARROT_INTERP,
 
 static void bigint_mul_bigint(PARROT_INTERP,
     ARGIN(PMC *self),
-    PMC *value,
+    ARGIN(PMC *value),
     ARGMOD(PMC *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*dest);
 
@@ -190,35 +192,48 @@ static void bigint_pow_bigint_int(PARROT_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*dest);
 
-static void bigint_set(PARROT_INTERP, PMC *dest, PMC *src)
-        __attribute__nonnull__(1);
-
-static void bigint_set_double(PARROT_INTERP, ARGIN(PMC *self), double value)
+static void bigint_set(PARROT_INTERP, ARGMOD(PMC *dest), ARGIN(PMC *src))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*dest);
 
-static void bigint_set_long(PARROT_INTERP, ARGIN(PMC *self), long value)
+static void bigint_set_double(PARROT_INTERP,
+    ARGMOD(PMC *self),
+    double value)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*self);
 
-static void bigint_set_self(PARROT_INTERP, ARGIN(PMC *self), BIGINT *value)
+static void bigint_set_long(PARROT_INTERP, ARGMOD(PMC *self), long value)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*self);
+
+static void bigint_set_self(PARROT_INTERP,
+    ARGMOD(PMC *self),
+    ARGIN(BIGINT *value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*self);
 
 static void bigint_set_str(PARROT_INTERP,
-    ARGIN(PMC *self),
+    ARGMOD(PMC *self),
     ARGIN(const char *value),
     int base)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*self);
 
 static void bigint_sub_bigint(PARROT_INTERP,
     ARGIN(PMC *self),
-    PMC *value,
+    ARGIN(PMC *value),
     ARGMOD(PMC *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*dest);
 
@@ -296,6 +311,7 @@ static void bigint_sub_bigint_int(PARROT_INTERP,
 #define ASSERT_ARGS_bigint_mul_bigint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(value) \
     , PARROT_ASSERT_ARG(dest))
 #define ASSERT_ARGS_bigint_mul_bigint_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -310,7 +326,9 @@ static void bigint_sub_bigint_int(PARROT_INTERP,
     , PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(dest))
 #define ASSERT_ARGS_bigint_set __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(dest) \
+    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_bigint_set_double __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
@@ -319,7 +337,8 @@ static void bigint_sub_bigint_int(PARROT_INTERP,
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_bigint_set_self __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_bigint_set_str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
@@ -327,6 +346,7 @@ static void bigint_sub_bigint_int(PARROT_INTERP,
 #define ASSERT_ARGS_bigint_sub_bigint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(value) \
     , PARROT_ASSERT_ARG(dest))
 #define ASSERT_ARGS_bigint_sub_bigint_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -352,7 +372,7 @@ bigint_clear(PARROT_INTERP, ARGIN(PMC *self)) {
 }
 
 static void
-bigint_set(PARROT_INTERP, PMC *dest, PMC *src) {
+bigint_set(PARROT_INTERP, ARGMOD(PMC *dest), ARGIN(PMC *src)) {
     BIGINT *bi_dest, *bi_src;
     GETATTR_BigInt_bi(interp, dest, bi_dest);
     GETATTR_BigInt_bi(interp, src,  bi_src);
@@ -362,21 +382,21 @@ bigint_set(PARROT_INTERP, PMC *dest, PMC *src) {
 }
 
 static void
-bigint_set_long(PARROT_INTERP, ARGIN(PMC *self), long value) {
+bigint_set_long(PARROT_INTERP, ARGMOD(PMC *self), long value) {
     BIGINT *bi;
     GETATTR_BigInt_bi(interp, self, bi);
     mpz_set_si(bi->b, value);
 }
 
 static void
-bigint_set_double(PARROT_INTERP, ARGIN(PMC *self), double value) {
+bigint_set_double(PARROT_INTERP, ARGMOD(PMC *self), double value) {
     BIGINT *bi;
     GETATTR_BigInt_bi(interp, self, bi);
     mpz_set_d(bi->b, value);
 }
 
 static void
-bigint_set_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(const char *value), int base) {
+bigint_set_str(PARROT_INTERP, ARGMOD(PMC *self), ARGIN(const char *value), int base) {
     BIGINT *bi;
     GETATTR_BigInt_bi(interp, self, bi);
     mpz_set_str(bi->b, value, base);
@@ -392,7 +412,7 @@ bigint_get_self(PARROT_INTERP, ARGIN(PMC *self)) {
 }
 
 static void
-bigint_set_self(PARROT_INTERP, ARGIN(PMC *self), BIGINT *value) {
+bigint_set_self(PARROT_INTERP, ARGMOD(PMC *self), ARGIN(BIGINT *value)) {
     BIGINT *bi;
     GETATTR_BigInt_bi(interp, self, bi);
     mpz_set(bi->b, (mpz_srcptr)((BIGINT*)value)->b);
@@ -421,6 +441,7 @@ bigint_get_bool(PARROT_INTERP, ARGIN(PMC *self)) {
 }
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static char *
 bigint_get_string(PARROT_INTERP, ARGIN(PMC *self), int base) {
     BIGINT *bi;
@@ -462,7 +483,7 @@ bigint_add_bigint_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC 
 }
 
 static void
-bigint_sub_bigint(PARROT_INTERP, ARGIN(PMC *self), PMC *value, ARGMOD(PMC *dest)) {
+bigint_sub_bigint(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value), ARGMOD(PMC *dest)) {
     BIGINT *bi_self, *bi_value, *bi_dest;
     GETATTR_BigInt_bi(interp, self, bi_self);
     GETATTR_BigInt_bi(interp, value, bi_value);
@@ -482,7 +503,7 @@ bigint_sub_bigint_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC 
 }
 
 static void
-bigint_mul_bigint(PARROT_INTERP, ARGIN(PMC *self), PMC *value, ARGMOD(PMC *dest)) {
+bigint_mul_bigint(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value), ARGMOD(PMC *dest)) {
     BIGINT *bi_self, *bi_value, *bi_dest;
     GETATTR_BigInt_bi(interp, self, bi_self);
     GETATTR_BigInt_bi(interp, value, bi_value);
