@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -36,6 +36,7 @@ PARROT_DOES_NOT_RETURN
 static void
 null_pmc_access(PARROT_INTERP, int index)
 {
+    ASSERT_ARGS(null_pmc_access)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NULL_REG_ACCESS,
             "Null PMC access in %s()",
             Parrot_get_vtable_name(interp, index));
