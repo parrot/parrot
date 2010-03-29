@@ -68,15 +68,14 @@ Mark the CodeString as live.
 */
 
     VTABLE void mark() {
-        PMC *linepos;
-
         SUPER();
-        if (!PMC_data(SELF))
-            return;
+        if (PMC_data(SELF)) {
+            PMC *linepos;
 
-        GET_ATTR_linepos(INTERP, SELF, linepos);
+            GET_ATTR_linepos(INTERP, SELF, linepos);
 
-        Parrot_gc_mark_PMC_alive(INTERP, linepos);
+            Parrot_gc_mark_PMC_alive(INTERP, linepos);
+        }
     }
 
 /*
@@ -109,36 +108,38 @@ A newline is automatically added to the end of the fmt.
     STRING * const comma       = CONST_STRING(INTERP, ",");
     STRING * const comma_space = CONST_STRING(INTERP, ", ");
     STRING * const newline     = CONST_STRING(INTERP, "\n");
-    STRING *key, *repl, *S0, *S1;
+    STRING *key, *repl, *S1;
     INTVAL pos          = 0;
     INTVAL replen       = 0;
-    INTVAL I0, I1;
 
     fmt = Parrot_str_new_COW(INTERP, fmt);
 
     while (pos >= 0) {
         pos += replen;
         pos = Parrot_str_find_index(INTERP, fmt, percent, pos);
-        if (pos < 0) break;
+        if (pos < 0)
+            break;
 
         key = Parrot_str_substr(INTERP, fmt, pos+1, 1, &key, 0);
 
         if (VTABLE_exists_keyed_str(INTERP, hash, key)) {
             repl = VTABLE_get_string_keyed_str(INTERP, hash, key);
         }
-        else if (Parrot_str_is_cclass(INTERP, enum_cclass_numeric, fmt,
-                (UINTVAL)pos + 1)) {
-            I0   = Parrot_str_to_int(INTERP, key);
+        else if (Parrot_str_is_cclass(INTERP, enum_cclass_numeric, fmt, (UINTVAL)pos + 1)) {
+            const INTVAL I0 = Parrot_str_to_int(INTERP, key);
             repl = VTABLE_get_string_keyed_int(INTERP, args, I0);
         }
         else if (Parrot_str_equal(INTERP, key, comma)) {
+            INTVAL I0;
+            INTVAL I1;
+
             repl = VTABLE_get_string_keyed_int(INTERP, args, 0);
             repl = Parrot_str_new_COW(INTERP, repl);
             I1   = VTABLE_elements(INTERP, args);
             I0   = 1;
 
             while (I0 < I1) {
-                S0   = VTABLE_get_string_keyed_int(INTERP, args, I0);
+                STRING * const S0 = VTABLE_get_string_keyed_int(INTERP, args, I0);
                 repl = Parrot_str_append(INTERP, repl, comma_space);
                 repl = Parrot_str_append(INTERP, repl, S0);
                 I0++;
@@ -248,7 +249,7 @@ counting at 10 (so that the values 0..9 can be considered "safe").
 
   METHOD unique(STRING *format :optional, int has_fmt :opt_flag) {
     static INTVAL counter = 10;
-    STRING *counter_as_string = Parrot_str_from_int(INTERP, counter);
+    STRING * const counter_as_string = Parrot_str_from_int(INTERP, counter);
     UNUSED(SELF);
 
     counter++;
@@ -292,7 +293,7 @@ prefixed with 'unicode:'.
     }
     else {
         STRING * const u = CONST_STRING(INTERP, "\\u");
-        INTVAL u_pos = Parrot_str_find_index(INTERP, escaped_str, u, 0);
+        const INTVAL u_pos = Parrot_str_find_index(INTERP, escaped_str, u, 0);
         if (u_pos != -1)
             is_unicode = 1;
     }
@@ -346,7 +347,7 @@ For example, C<key('Foo', 'Bar')> returns C<["Foo";"Bar"]>.
 
   METHOD key(PMC *args :slurpy) {
     INTVAL         index;
-    INTVAL         elements      = VTABLE_elements(INTERP, args);
+    const INTVAL   elements      = VTABLE_elements(INTERP, args);
     STRING * const open_bracket  = CONST_STRING(INTERP, "[");
     STRING * const semi          = CONST_STRING(INTERP, ";");
     STRING * const close_bracket = CONST_STRING(INTERP, "]");
@@ -355,25 +356,30 @@ For example, C<key('Foo', 'Bar')> returns C<["Foo";"Bar"]>.
     STRING *       out           = open_bracket;
 
     for (index = 0; index < elements; index++) {
-        PMC *P0      = VTABLE_get_pmc_keyed_int(INTERP, args, index);
-        if (PMC_IS_NULL(P0)) continue;
-        else if (VTABLE_does(INTERP, P0, s_array)) {
-            INTVAL elements2, index2;
-            elements2 = VTABLE_elements(INTERP, P0);
-            for (index2 = 0; index2 < elements2; index2++) {
-                STRING *S0   = VTABLE_get_string_keyed_int(INTERP, P0, index2);
+        PMC * const P0 = VTABLE_get_pmc_keyed_int(INTERP, args, index);
+
+        if (!PMC_IS_NULL(P0)) {
+            if (VTABLE_does(INTERP, P0, s_array)) {
+                const INTVAL elements2 = VTABLE_elements(INTERP, P0);
+                INTVAL index2;
+
+                for (index2 = 0; index2 < elements2; index2++) {
+                    STRING *S0   = VTABLE_get_string_keyed_int(INTERP, P0, index2);
+                    (STRING *S0) = PCCINVOKE(INTERP, SELF, "escape", STRING *S0);
+                    if (prefix)
+                        out = Parrot_str_append(INTERP, out, prefix);
+                    out    = Parrot_str_append(INTERP, out, S0);
+                    prefix = semi;
+                }
+            }
+            else {
+                STRING *S0   = VTABLE_get_string_keyed_int(INTERP, args, index);
                 (STRING *S0) = PCCINVOKE(INTERP, SELF, "escape", STRING *S0);
-                if (prefix) out = Parrot_str_append(INTERP, out, prefix);
+                if (prefix)
+                    out = Parrot_str_append(INTERP, out, prefix);
                 out    = Parrot_str_append(INTERP, out, S0);
                 prefix = semi;
             }
-        }
-        else {
-            STRING *S0   = VTABLE_get_string_keyed_int(INTERP, args, index);
-            (STRING *S0) = PCCINVOKE(INTERP, SELF, "escape", STRING *S0);
-            if (prefix) out = Parrot_str_append(INTERP, out, prefix);
-            out    = Parrot_str_append(INTERP, out, S0);
-            prefix = semi;
         }
     }
 
