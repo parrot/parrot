@@ -198,6 +198,42 @@ Keyed version of C<Parrot_PMC_set_cstringn>. Converts the first C<length>
 characters of C<value> to a Parrot_String and assigns the resulting string to
 the PMC stored at element <key> of the passed-in PMC.
 
+=item C<Parrot_PMC_push_float( interp, Parrot_PMC pmc, Parrot_Float value )>
+
+Push a float onto an aggregate PMC, such as a ResizablePMCArray.
+Returns void.
+
+=item C<Parrot_PMC_push_integer( interp, Parrot_PMC pmc, Parrot_Int value )>
+
+Push a integer onto an aggregate PMC, such as a ResizableIntegerArray.
+Returns void.
+
+=item C<Parrot_PMC_push_pmc( interp, Parrot_PMC pmc, Parrot_PMC value )>
+
+Push a PMC value onto an aggregate PMC, such as a ResizablePMCArray.
+Returns void.
+
+=item C<Parrot_PMC_push_string( interp, Parrot_PMC pmc, Parrot_String value )>
+
+Push a Parrot_String onto an aggregate PMC, such as a ResizableStringArray.
+Returns void.
+
+=item C<Parrot_PMC_pop_float( interp, Parrot_PMC pmc )>
+
+Pop a Parrot_Float off of an aggregate PMC and returns it.
+
+=item C<Parrot_PMC_pop_integer( interp, Parrot_PMC pmc )>
+
+Pop a Parrot_Int off of an aggregate PMC and returns it.
+
+=item C<Parrot_PMC_pop_pmc( interp, Parrot_PMC pmc )>
+
+Pop a PMC off of an aggregate PMC and returns it.
+
+=item C<Parrot_PMC_pop_string( interp, Parrot_PMC pmc )>
+
+Pop a Parrot_String off of an aggregate PMC and returns it.
+
 =back
 
 =head4 Creation and destruction
