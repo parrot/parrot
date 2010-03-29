@@ -1351,6 +1351,10 @@ an array creates a PMC group
     pmc2c .= " "
     $S0 = get_tool('build/pmc2c.pl')
     pmc2c .= $S0
+    $S0 = config['osname']
+    unless $S0 == 'solaris' goto L1
+    pmc2c .= " --no-lines"
+  L1:
     .local string pmc2c_includes
     pmc2c_includes = "--include "
     $S0 = get_srcdir()
@@ -1410,6 +1414,10 @@ an array creates a PMC group
     cmd .= " "
     $S0 = get_tool('build/pmc2c.pl')
     cmd .= $S0
+    $S0 = config['osname']
+    unless $S0 == 'solaris' goto L0
+    cmd .= " --no-lines"
+  L0:
     cmd .= " --library "
 #    $S0 = dirname(src)
 #    cmd .= $S0
