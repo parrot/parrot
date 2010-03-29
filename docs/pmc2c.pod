@@ -133,9 +133,20 @@ Requires the C<hll> flag. Note that multiple mappings can be specified:
 
 =item 3.
 
-A list of vtable method implementations
+A list of attribute declarations:
+
+  ATTR INTVAL id;
+
+The ATTR declaration keyword is followed by the type of the attribute and the
+name of the attribute. Any valid C type is a valid attribute type, but only
+INTVAL, FLOATVAL, STRING *, and PMC * can be handled directly from PIR. Other
+types are generally only used by low-level internal PMCs.
 
 =item 4.
+
+A list of vtable method implementations
+
+=item 5.
 
 The final close C<}>
 
