@@ -1362,31 +1362,21 @@ an array creates a PMC group
     pmc2c_includes .= " --include "
     pmc2c_includes .= $S0
     pmc2c_includes .= "/pmc"
-    .local string current_dir
-    current_dir = cwd()
-    $S0 = dirname(src)
-    chdir($S0)
 
     .local string cmd
     cmd = clone pmc2c
     cmd .= " --dump "
     cmd .= pmc2c_includes
     cmd .= " "
-#    cmd .= src
-    $S0 = basename(src)
-    cmd .= $S0
+    cmd .= src
     system(cmd, 1 :named('verbose'))
 
     cmd = clone pmc2c
     cmd .= " --c "
     cmd .= pmc2c_includes
     cmd .= " "
-#    cmd .= src
-    $S0 = basename(src)
-    cmd .= $S0
+    cmd .= src
     system(cmd, 1 :named('verbose'))
-
-    chdir(current_dir)
 
     $S0 = config['o']
     $S1 = _mk_path_gen_dynpmc(src, $S0)
@@ -1404,10 +1394,6 @@ an array creates a PMC group
     .local string src, obj
     src = srcs[0]
     obj = config['o']
-    .local string current_dir
-    current_dir = cwd()
-    $S0 = dirname(src)
-    chdir($S0)
 
     .local string cmd
     cmd = config['perl']
@@ -1419,25 +1405,14 @@ an array creates a PMC group
     cmd .= " --no-lines"
   L0:
     cmd .= " --library "
-#    $S0 = dirname(src)
-#    cmd .= $S0
-#    cmd .= "/"
+    $S0 = dirname(src)
+    cmd .= $S0
+    cmd .= "/"
     cmd .= group
     cmd .= " --c "
-#    $S0 = join " ", srcs
-#    cmd .= $S0
-    $P0 = iter srcs
-  L1:
-    unless $P0 goto L2
-    src = shift $P0
-    $S0 = basename(src)
+    $S0 = join " ", srcs
     cmd .= $S0
-    cmd .= " "
-    goto L1
-  L2:
     system(cmd, 1 :named('verbose'))
-
-    chdir(current_dir)
 
     $S1 = _mk_path_gen_dynpmc_group(src, group, obj)
     $S2 = _mk_path_gen_dynpmc_group(src, group, '.c')
