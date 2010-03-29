@@ -17,7 +17,7 @@ Tests the Class PMC.
 =cut
 
 
-.const int TESTS = 63
+.const int TESTS = 73
 
 
 .sub 'main' :main
@@ -46,6 +46,7 @@ Tests the Class PMC.
      'does'()
      'more does'()
      'anon_inherit'()
+     'method_cache_tt1497'()
 .end
 
 
@@ -600,6 +601,88 @@ t_class_meth:
     addparent $P2, $P0
     addparent $P2, $P1
     ok(1, 'inheritance of two different anonymous classes works')
+.end
+
+.sub 'method_cache_tt1497'
+    $P0 = new ["tt1497_Object"]
+
+    $P1 = find_method $P0, "foo"
+    $I0 = isnull $P1
+    is($I0, 0, "can find foo. Sanity")
+    $I0 = $P0.$P1()
+    is($I0, 1, "found the correct foo")
+
+    $P9 = box 2
+    setattribute $P0, "state", $P9
+
+    $P1 = find_method $P0, "foo"
+    $I0 = isnull $P1
+    is($I0, 0, "can find foo. Sanity")
+    $I0 = $P0.$P1()
+    is($I0, 1, "we've cached the old foo")
+
+    $P2 = get_class "tt1497_Object"
+    $P2.'clear_method_cache'()
+
+    $P1 = find_method $P0, "foo"
+    $I0 = isnull $P1
+    is($I0, 0, "can find foo. Sanity")
+    $I0 = $P0.$P1()
+    is($I0, 2, "cleared cache, can find the next foo")
+
+    $P3 = $P2.'get_method_cache'()
+    $P1 = $P3["foo"]
+    $I0 = isnull $P1
+    is($I0, 0, "can find foo in method cache")
+    $I0 = $P0.$P1()
+    is($I0, 2, "cleared cache, can find the next foo")
+
+    $P9 = box 1
+    setattribute $P0, "state", $P9
+
+    $P3 = $P2.'get_method_cache'()
+    $P1 = $P3["foo"]
+    $I0 = isnull $P1
+    is($I0, 0, "can find foo in method cache")
+    $I0 = $P0.$P1()
+    is($I0, 2, "cleared cache, can find the next foo")
+.end
+
+.namespace ["tt1497_Object"]
+
+.sub '__tt1497_init' :anon :load :init
+    $P0 = newclass "tt1497_Object"
+    addattribute $P0, "state"
+.end
+
+.sub 'foo1'
+    .return(1)
+.end
+
+.sub 'foo2'
+    .return(2)
+.end
+
+.sub 'find_method' :vtable
+    .param string name
+    $P0 = getattribute self, "state"
+    unless null $P0 goto have_state
+    $P0 = box 1
+    setattribute self, "state", $P0
+  have_state:
+    if $P0 == 1 goto getfoo1
+    if $P0 == 2 goto getfoo2
+    $P0 = null
+    goto return_meth
+  getfoo1:
+    .const 'Sub' foo1 = "foo1"
+    $P0 = foo1
+    goto return_meth
+  getfoo2:
+    .const 'Sub' foo2 = "foo2"
+    $P0 = foo2
+  return_meth:
+    .return($P0)
 .end
 
 # Local Variables:
