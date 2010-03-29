@@ -53,6 +53,7 @@ INTVAL Parrot_pmc_get_type_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_pmc_is_null(SHIM_INTERP, ARGIN_NULLOK(const PMC *pmc));
 
 PARROT_EXPORT

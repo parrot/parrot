@@ -81,6 +81,7 @@ Tests if the given pmc is null.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_pmc_is_null(SHIM_INTERP, ARGIN_NULLOK(const PMC *pmc))
 {
@@ -982,7 +983,7 @@ Parrot_pmc_type_does(PARROT_INTERP, ARGIN(STRING *role), INTVAL type)
 
     do {
         INTVAL len;
-        INTVAL idx = Parrot_str_find_index(interp, what, role, (INTVAL)pos);
+        const INTVAL idx = Parrot_str_find_index(interp, what, role, (INTVAL)pos);
 
         if (idx < 0)
             return 0;
