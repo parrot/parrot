@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -43,7 +43,7 @@ Create empty PackfileAnnotation.
 */
 
     VTABLE void init() {
-        Parrot_PackfileAnnotation_attributes * attrs =
+        Parrot_PackfileAnnotation_attributes * const attrs =
                 PMC_data_typed(SELF, Parrot_PackfileAnnotation_attributes*);
 
         PObj_custom_mark_SET(SELF);
@@ -61,7 +61,7 @@ Marks the object as live.
 */
 
     VTABLE void mark() {
-        Parrot_PackfileAnnotation_attributes * attrs =
+        Parrot_PackfileAnnotation_attributes * const attrs =
                 PARROT_PACKFILEANNOTATION(SELF);
 
         Parrot_gc_mark_STRING_alive(interp, attrs->name);
@@ -137,7 +137,7 @@ Fetch the integer value of the annotation.
 
 */
     VTABLE INTVAL get_integer() {
-        Parrot_PackfileAnnotation_attributes * attrs = PARROT_PACKFILEANNOTATION(SELF);
+        Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
         if (attrs->value_type != PF_ANNOTATION_KEY_TYPE_INT)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Trying to fetch wrong type of value from annotation");
@@ -155,7 +155,7 @@ Set the integer value of the annotation.
 
 */
     VTABLE void set_integer_native(INTVAL value) {
-        Parrot_PackfileAnnotation_attributes * attrs = PARROT_PACKFILEANNOTATION(SELF);
+        Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
         attrs->value_type = PF_ANNOTATION_KEY_TYPE_INT;
         attrs->int_value  = value;
     }
@@ -170,7 +170,7 @@ Fetch the string value of the annotation.
 
 */
     VTABLE STRING * get_string() {
-        Parrot_PackfileAnnotation_attributes * attrs = PARROT_PACKFILEANNOTATION(SELF);
+        Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
         if (attrs->value_type != PF_ANNOTATION_KEY_TYPE_STR)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Trying to fetch wrong type of value from annotation");
@@ -188,7 +188,7 @@ Set the string value of the annotation.
 
 */
     VTABLE void set_string_native(STRING * value) {
-        Parrot_PackfileAnnotation_attributes * attrs = PARROT_PACKFILEANNOTATION(SELF);
+        Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
         attrs->value_type = PF_ANNOTATION_KEY_TYPE_STR;
         attrs->str_value  = value;
     }
@@ -203,7 +203,7 @@ Fetch the float value of the annotation.
 
 */
     VTABLE FLOATVAL get_number() {
-        Parrot_PackfileAnnotation_attributes * attrs = PARROT_PACKFILEANNOTATION(SELF);
+        Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
         if (attrs->value_type != PF_ANNOTATION_KEY_TYPE_NUM)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Trying to fetch wrong type of value from annotation");
@@ -221,7 +221,7 @@ Set the float value of the annotation.
 
 */
     VTABLE void set_number_native(FLOATVAL value) {
-        Parrot_PackfileAnnotation_attributes * attrs = PARROT_PACKFILEANNOTATION(SELF);
+        Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
         attrs->value_type = PF_ANNOTATION_KEY_TYPE_NUM;
         attrs->num_value  = value;
     }

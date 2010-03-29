@@ -462,7 +462,7 @@ Pushes the string C<*v> onto the end of the image.
 
     VTABLE void push_string(STRING *v)
     {
-        size_t len = PF_size_string(v) * sizeof (opcode_t);
+        const size_t len = PF_size_string(v) * sizeof (opcode_t);
         ensure_buffer_size(INTERP, SELF, len);
         SET_VISIT_CURSOR(SELF, (char *)PF_store_string(GET_VISIT_CURSOR(SELF), v));
     }
@@ -575,7 +575,7 @@ Removes and returns a reference to a pmc from the start of the image.
     }
 
     VTABLE void set_string_native(STRING *image) {
-        UINTVAL header_length = GROW_TO_16_BYTE_BOUNDARY(PACKFILE_HEADER_BYTES);
+        const UINTVAL header_length = GROW_TO_16_BYTE_BOUNDARY(PACKFILE_HEADER_BYTES);
         int unpacked_length;
 
         PARROT_IMAGEIO(SELF)->what          = VISIT_THAW_NORMAL;
