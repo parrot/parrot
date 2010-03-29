@@ -49,6 +49,12 @@ static void ensure_buffer_size(PARROT_INTERP, ARGIN(PMC *io), size_t len)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_INLINE
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static opcode_t * GET_VISIT_CURSOR(ARGIN(const PMC *pmc))
+        __attribute__nonnull__(1);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PARROT_INLINE
@@ -56,10 +62,21 @@ static PMC* id_list_get(PARROT_INTERP, ARGIN(const PMC *io), UINTVAL id)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_INLINE
+static void INC_VISIT_CURSOR(ARGMOD(PMC *pmc), UINTVAL inc)
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*pmc);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_INLINE
-static INTVAL INFO_HAS_DATA(ARGIN(PMC *io))
+static INTVAL INFO_HAS_DATA(ARGIN(const PMC *io))
         __attribute__nonnull__(1);
+
+PARROT_INLINE
+static void SET_VISIT_CURSOR(ARGMOD(PMC *pmc), ARGIN(const char *cursor))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pmc);
 
 static void visit_todo_list_freeze(PARROT_INTERP,
     ARGIN_NULLOK(PMC* pmc),
@@ -81,11 +98,18 @@ static PMC * visit_todo_list_thaw(PARROT_INTERP, ARGIN(PMC* info))
 #define ASSERT_ARGS_ensure_buffer_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(io))
+#define ASSERT_ARGS_GET_VISIT_CURSOR __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_id_list_get __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(io))
+#define ASSERT_ARGS_INC_VISIT_CURSOR __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_INFO_HAS_DATA __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(io))
+#define ASSERT_ARGS_SET_VISIT_CURSOR __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pmc) \
+    , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_visit_todo_list_freeze __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(info))
@@ -96,23 +120,28 @@ static PMC * visit_todo_list_thaw(PARROT_INTERP, ARGIN(PMC* info))
 /* HEADERIZER END: static */
 
 PARROT_INLINE
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static opcode_t *
-GET_VISIT_CURSOR(PMC *pmc){
-    char  *buf = (char *)Buffer_bufstart(PARROT_IMAGEIO(pmc)->buffer);
-    size_t pos = PARROT_IMAGEIO(pmc)->pos;
+GET_VISIT_CURSOR(ARGIN(const PMC *pmc))
+{
+    char * const buf = (char *)Buffer_bufstart(PARROT_IMAGEIO(pmc)->buffer);
+    const size_t pos = PARROT_IMAGEIO(pmc)->pos;
     return (opcode_t *)(buf + pos);
 }
 
 PARROT_INLINE
 static void
-SET_VISIT_CURSOR(PMC *pmc, char *cursor) {
-    char *bufstart  = (char *)Buffer_bufstart(PARROT_IMAGEIO(pmc)->buffer);
+SET_VISIT_CURSOR(ARGMOD(PMC *pmc), ARGIN(const char *cursor))
+{
+    const char *bufstart  = (char *)Buffer_bufstart(PARROT_IMAGEIO(pmc)->buffer);
     PARROT_IMAGEIO(pmc)->pos = (cursor - bufstart);
 }
 
 PARROT_INLINE
 static void
-INC_VISIT_CURSOR(PMC *pmc, UINTVAL inc) {
+INC_VISIT_CURSOR(ARGMOD(PMC *pmc), UINTVAL inc)
+{
     PARROT_IMAGEIO(pmc)->pos += inc;
 }
 
@@ -185,7 +214,8 @@ ensure_buffer_size(PARROT_INTERP, ARGIN(PMC *io), size_t len)
 PARROT_WARN_UNUSED_RESULT
 PARROT_INLINE
 static INTVAL
-INFO_HAS_DATA(ARGIN(PMC *io)) {
+INFO_HAS_DATA(ARGIN(const PMC *io))
+{
     ASSERT_ARGS(INFO_HAS_DATA)
 
     return PARROT_IMAGEIO(io)->pos < PARROT_IMAGEIO(io)->input_length;
@@ -195,7 +225,8 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PARROT_INLINE
 static PMC*
-id_list_get(PARROT_INTERP, ARGIN(const PMC *io), UINTVAL id) {
+id_list_get(PARROT_INTERP, ARGIN(const PMC *io), UINTVAL id)
+{
     ASSERT_ARGS(id_list_get)
 
     return VTABLE_get_pmc_keyed_int(interp, PARROT_IMAGEIO(io)->todo, id - 1);
@@ -426,7 +457,7 @@ Pushes the integer C<v> onto the end of the image.
 */
 
     VTABLE void push_integer(INTVAL v) {
-        size_t len = PF_size_integer() * sizeof (opcode_t);
+        const size_t len = PF_size_integer() * sizeof (opcode_t);
         ensure_buffer_size(interp, SELF, len);
         SET_VISIT_CURSOR(SELF, (char *)PF_store_integer(GET_VISIT_CURSOR(SELF), v));
     }
