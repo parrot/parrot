@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2006, Parrot Foundation.
+# Copyright (C) 2002-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -68,7 +68,7 @@ END
 
 sub add_body_prelude {
     my ($self) = @_;
-    return "    Parrot_Context const * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);\n";
+    return "    const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);\n";
 }
 
 =item C<gen_goto($where)>
