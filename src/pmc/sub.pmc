@@ -187,7 +187,7 @@ surboutine is fully constructed but not attached to interpreter.
 
         field = CONST_STRING(INTERP, "n_regs_used");
         if (VTABLE_exists_keyed_str(INTERP, init, field)) {
-            PMC   *tmp = VTABLE_get_pmc_keyed_str(INTERP, init, field);
+            PMC * const tmp = VTABLE_get_pmc_keyed_str(INTERP, init, field);
             INTVAL i;
             for (i = 0; i < 4; ++i)
                 attrs->n_regs_used[i] = VTABLE_get_integer_keyed_int(INTERP, tmp, i);
@@ -195,7 +195,7 @@ surboutine is fully constructed but not attached to interpreter.
 
         field = CONST_STRING(INTERP, "arg_info");
         if (VTABLE_exists_keyed_str(INTERP, init, field)) {
-            PMC   *tmp = VTABLE_get_pmc_keyed_str(INTERP, init, field);
+            PMC * const tmp = VTABLE_get_pmc_keyed_str(INTERP, init, field);
             /* Allocate structure to store argument information in. */
             attrs->arg_info = mem_gc_allocate_zeroed_typed(INTERP,
                     Parrot_sub_arginfo);
@@ -230,7 +230,7 @@ Destroys the subroutine.
 */
 
     VTABLE void destroy() {
-        Parrot_Sub_attributes *sub = PARROT_SUB(SELF);
+        Parrot_Sub_attributes * const sub = PARROT_SUB(SELF);
 
         if (sub && sub->arg_info)
             mem_gc_free(INTERP, sub->arg_info);
@@ -358,7 +358,7 @@ Invokes the subroutine.
 */
 
     VTABLE opcode_t *invoke(void *next) {
-        PMC *caller_ctx = CURRENT_CONTEXT(INTERP);
+        PMC * const caller_ctx = CURRENT_CONTEXT(INTERP);
         PMC *ccont      = INTERP->current_cont;
         PMC *object;
 
@@ -863,10 +863,10 @@ The number of optional named arguments
             /* If the first instruction is a get_params... */
             if (*pc == PARROT_OP_get_params_pc) {
                 /* Get the signature (the next thing in the bytecode). */
-                PMC    *sig        = PF_CONST(sub->seg, *(++pc))->u.key;
+                PMC * const sig = PF_CONST(sub->seg, *(++pc))->u.key;
 
                 /* Iterate over the signature and compute argument counts. */
-                INTVAL  sig_length = VTABLE_elements(INTERP, sig);
+                const INTVAL sig_length = VTABLE_elements(INTERP, sig);
                 int     i;
 
                 ASSERT_SIG_PMC(sig);
@@ -1014,7 +1014,7 @@ slurpy arguments).
     METHOD __get_regs_used(STRING *reg) {
         /* TODO switch to canonical NiSP order
          * see also imcc/reg_alloc.c */
-        STRING                *types = CONST_STRING(INTERP, "INSP");
+        STRING                * const types = CONST_STRING(INTERP, "INSP");
         Parrot_Sub_attributes *sub;
         INTVAL                 regs_used;
         INTVAL                 kind;
