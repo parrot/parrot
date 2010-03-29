@@ -492,8 +492,8 @@ Morphs the PMC in $1 to the type of the PMC in $2, then assigns $2 to $1.
 
 inline op copy(inout PMC, invar PMC) :base_mem {
     if (PMC_IS_NULL($1)) {
-        const opcode_t * const dest = expr NEXT();
-        const opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, dest,
+        opcode_t * const dest = expr NEXT();
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, dest,
                 EXCEPTION_NULL_REG_ACCESS, "Null PMC in copy");
         goto ADDRESS(handler);
     }
