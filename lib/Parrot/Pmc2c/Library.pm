@@ -24,6 +24,7 @@ package Parrot::Pmc2c::Library;
 
 use strict;
 use warnings;
+use File::Basename qw(basename);
 use Parrot::Pmc2c::PMCEmitter ();
 use Parrot::Pmc2c::UtilFunctions qw(dont_edit dynext_load_code c_code_coda spew);
 
@@ -36,8 +37,9 @@ use Parrot::Pmc2c::UtilFunctions qw(dont_edit dynext_load_code c_code_coda spew)
 sub generate_library {
     my ( $class, $library_name, $pmcs ) = @_;
 
-    spew( "$library_name.c", gen_c( $library_name, $pmcs ) );
-    spew( "$library_name.h", gen_h($library_name) );
+    my $basename = basename($library_name);
+    spew( $library_name . '.c', gen_c( $basename, $pmcs ) );
+    spew( $library_name . '.h', gen_h( $basename ) );
 }
 
 =item C<gen_h>
