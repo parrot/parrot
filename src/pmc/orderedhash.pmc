@@ -79,11 +79,66 @@ Overall design heavily inspired by C<Tie::StoredOrderHash>.
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static PMC* box_integer(PARROT_INTERP, INTVAL val)
+        __attribute__nonnull__(1);
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static PMC* box_number(PARROT_INTERP, FLOATVAL val)
+        __attribute__nonnull__(1);
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static PMC* box_string(PARROT_INTERP, ARGIN(STRING *str))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void find_bounds(PARROT_INTERP,
+    ARGIN(PMC *pmc_hash),
+    ARGMOD(PMC **first),
+    ARGMOD(PMC **last))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*first)
+        FUNC_MODIFIES(*last);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static PMC* get_list_item(PARROT_INTERP, ARGIN(PMC *self), INTVAL idx)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_box_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_box_number __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_box_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(str))
+#define ASSERT_ARGS_find_bounds __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc_hash) \
+    , PARROT_ASSERT_ARG(first) \
+    , PARROT_ASSERT_ARG(last))
+#define ASSERT_ARGS_get_list_item __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /* Get list_item by index */
+/* XXX Can this actually return NULL or not? */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static PMC*
-get_list_item(PARROT_INTERP, ARGIN(PMC *self), INTVAL idx) {
+get_list_item(PARROT_INTERP, ARGIN(PMC *self), INTVAL idx)
+{
     const Parrot_OrderedHash_attributes * const attrs = PARROT_ORDEREDHASH(self);
     const INTVAL n = VTABLE_elements(interp, attrs->hash);
     INTVAL                         pos;
@@ -104,7 +159,8 @@ get_list_item(PARROT_INTERP, ARGIN(PMC *self), INTVAL idx) {
 /* Find first/last in cloned/thawed OrderedHash */
 /* Parameter C<pmc_hash> is Hash, not OrderedHash */
 static void
-find_bounds(PARROT_INTERP, PMC *pmc_hash, PMC **first, PMC **last) {
+find_bounds(PARROT_INTERP, ARGIN(PMC *pmc_hash), ARGMOD(PMC **first), ARGMOD(PMC **last))
+{
     PMC * const iter = VTABLE_get_iter(interp, pmc_hash);
 
     while (VTABLE_get_bool(interp, iter)) {
@@ -122,24 +178,33 @@ find_bounds(PARROT_INTERP, PMC *pmc_hash, PMC **first, PMC **last) {
 }
 
 /* Helpers for boxing values */
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static PMC*
-box_string(PARROT_INTERP, STRING *str) {
+box_string(PARROT_INTERP, ARGIN(STRING *str))
+{
     PMC * const ret = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp,
                 enum_class_String));
     VTABLE_set_string_native(interp, ret, str);
     return ret;
 }
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static PMC*
-box_integer(PARROT_INTERP, INTVAL val) {
+box_integer(PARROT_INTERP, INTVAL val)
+{
     PMC * const ret = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp,
                 enum_class_Integer));
     VTABLE_set_integer_native(interp, ret, val);
     return ret;
 }
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static PMC*
-box_number(PARROT_INTERP, FLOATVAL val) {
+box_number(PARROT_INTERP, FLOATVAL val)
+{
     PMC * const ret = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp,
                 enum_class_Float));
     VTABLE_set_number_native(interp, ret, val);
