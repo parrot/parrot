@@ -318,15 +318,12 @@ Returns whether the class does the role with the given C<*rolename>.
 */
 
     VTABLE INTVAL does(STRING *role_name) {
-        Parrot_Class_attributes *_class  = PARROT_CLASS(SELF);
-        INTVAL                   id      = _class->id;
-        PMC                     *proxied = Parrot_pmc_new(interp, id);
-
-        if (VTABLE_does(interp, proxied, role_name))
+        Parrot_Class_attributes * const attrs = PARROT_CLASS(SELF);
+        const INTVAL id = attrs->id;
+        const INTVAL type_does = Parrot_pmc_type_does(INTERP, role_name, id);
+        if (type_does)
             return 1;
-
-        return VTABLE_isa(interp, proxied, role_name);
-
+        return VTABLE_isa(INTERP, SELF, role_name);
     }
 
 /*

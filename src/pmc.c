@@ -963,6 +963,53 @@ Parrot_pmc_gc_unregister(PARROT_INTERP, ARGIN(PMC *pmc))
 
 /*
 
+=item C<INTVAL Parrot_pmc_type_does(PARROT_INTERP, STRING *role, INTVAL type)>
+
+Checks to see if PMCs of the given type does the given role. Checks
+C<<vtable->provides_str>> to find a match.
+Returns true (1) if B<role> is found, false (0) otherwise.
+
+=cut
+
+*/
+
+INTVAL
+Parrot_pmc_type_does(PARROT_INTERP, ARGIN(STRING *role), INTVAL type)
+{
+    INTVAL pos = 0;
+    STRING * const what = interp->vtables[type]->provides_str;
+    INTVAL length = Parrot_str_byte_length(interp, what);
+
+    do {
+        INTVAL len;
+        INTVAL idx = Parrot_str_find_index(interp, what, role, (INTVAL)pos);
+
+        if (idx < 0)
+            return 0;
+
+        pos = idx;
+
+        if (pos >= length)
+            return 0;
+
+        len = Parrot_str_byte_length(interp, role);
+
+        if (pos && Parrot_str_indexed(interp, what, pos - 1) != 32) {
+            pos += len;
+            continue;
+        }
+
+        if (pos + len < length && Parrot_str_indexed(interp, what, pos + len) != 32) {
+            pos += len;
+            continue;
+        }
+
+        return 1;
+    } while (1);
+}
+
+/*
+
 =back
 
 =head1 SEE ALSO

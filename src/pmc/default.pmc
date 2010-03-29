@@ -289,54 +289,6 @@ make_prop_hash(PARROT_INTERP, ARGMOD(PMC *self)) {
     return prop;
 }
 
-/*
-
-=item C<static INTVAL does_isa(PARROT_INTERP, const STRING *method, const STRING
-*what)>
-
-Compares C<*method> and C<*what>.
-Returns true (1) if B<method> is found in B<what>, false (0) otherwise.
-
-=cut
-
-*/
-
-static INTVAL
-does_isa(PARROT_INTERP, ARGIN(const STRING *method), ARGIN(const STRING *what))
-{
-    ASSERT_ARGS(does_isa)
-
-    const INTVAL length = Parrot_str_byte_length(interp, what);
-    INTVAL  pos    = 0;
-
-    do {
-        INTVAL len;
-        INTVAL idx = Parrot_str_find_index(interp, what, method, (INTVAL)pos);
-
-        if (idx < 0)
-            return 0;
-
-        pos = idx;
-
-        if (pos >= length)
-            return 0;
-
-        len = Parrot_str_byte_length(interp, method);
-
-        if (pos && Parrot_str_indexed(interp, what, pos - 1) != 32) {
-            pos += len;
-            continue;
-        }
-
-        if (pos + len < length && Parrot_str_indexed(interp, what, pos + len) != 32) {
-            pos += len;
-            continue;
-        }
-
-        return 1;
-    } while (1);
-}
-
 pmclass default abstract {
 
 /*
@@ -930,7 +882,7 @@ true (1) is returned; otherwise, false (0) is returned.
 */
 
     VTABLE INTVAL does(STRING *_interface) {
-        return does_isa(INTERP, _interface, SELF->vtable->provides_str);
+        return Parrot_pmc_type_does(INTERP, _interface, SELF->vtable->base_type);
     }
 
 /*
