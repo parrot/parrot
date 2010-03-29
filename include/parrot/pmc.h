@@ -148,9 +148,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_pmc_new_temporary(PARROT_INTERP, INTVAL base_type)
         __attribute__nonnull__(1);
 
-INTVAL Parrot_pmc_type_does(PARROT_INTERP,
-    ARGIN(STRING *method),
-    INTVAL type)
+INTVAL Parrot_pmc_type_does(PARROT_INTERP, ARGIN(STRING *role), INTVAL type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -211,7 +209,7 @@ INTVAL Parrot_pmc_type_does(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pmc_type_does __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(method))
+    , PARROT_ASSERT_ARG(role))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/pmc.c */
 

@@ -56,13 +56,6 @@ static INTVAL check_set_std_props(PARROT_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*pmc);
 
-static INTVAL does_isa(PARROT_INTERP,
-    ARGIN(const STRING *method),
-    ARGIN(const STRING *what))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
 static INTVAL has_pending_std_props(ARGIN(const PMC *self))
         __attribute__nonnull__(1);
 
@@ -77,10 +70,6 @@ static INTVAL has_pending_std_props(ARGIN(const PMC *self))
     , PARROT_ASSERT_ARG(pmc) \
     , PARROT_ASSERT_ARG(key) \
     , PARROT_ASSERT_ARG(value))
-#define ASSERT_ARGS_does_isa __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(method) \
-    , PARROT_ASSERT_ARG(what))
 #define ASSERT_ARGS_has_pending_std_props __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(self))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

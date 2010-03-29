@@ -94,6 +94,8 @@ static void free_old_mem_blocks(PARROT_INTERP,
         FUNC_MODIFIES(*new_block);
 
 static void free_pool(ARGFREE(Fixed_Size_Pool *pool));
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static char * move_one_buffer(PARROT_INTERP,
     ARGMOD(Buffer *old_buf),
     ARGMOD(char *new_pool_ptr))
@@ -584,10 +586,10 @@ memory block to the new memory block and marks that it has been moved.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static char *
-move_one_buffer(PARROT_INTERP,
-        ARGMOD(Buffer *old_buf),
-        ARGMOD(char *new_pool_ptr))
+move_one_buffer(PARROT_INTERP, ARGMOD(Buffer *old_buf), ARGMOD(char *new_pool_ptr))
 {
     ASSERT_ARGS(move_one_buffer)
     /* ! (on_free_list | constant | external | sysmem) */
