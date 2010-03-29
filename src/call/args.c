@@ -670,9 +670,7 @@ Parrot_pcc_build_call_from_varargs(PARROT_INTERP,
         ARGMOD(va_list *args))
 {
     ASSERT_ARGS(Parrot_pcc_build_call_from_varargs)
-    PMC         * type_tuple        = PMCNULL;
     PMC         * arg_flags         = PMCNULL;
-    PMC         * ignored_flags     = PMCNULL;
     PMC         * call_object;
     INTVAL       i                  = 0;
 
@@ -760,7 +758,6 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
         ARGIN(const char *sig), va_list args)
 {
     ASSERT_ARGS(Parrot_pcc_build_sig_object_from_varargs)
-    PMC         * type_tuple        = PMCNULL;
     PMC         * arg_flags         = PMCNULL;
     PMC         * const call_object = Parrot_pmc_new(interp, enum_class_CallContext);
     INTVAL       in_return_sig      = 0;
@@ -904,7 +901,6 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
     /* First iterate over positional args and positional parameters. */
     arg_index       = 0;
     param_index     = 0;
-    positional_args;
     GETATTR_CallContext_num_positionals(interp, call_object, positional_args);
 
     while (1) {
