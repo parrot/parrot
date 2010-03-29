@@ -53,7 +53,7 @@ op callmethodcc(invar PMC, in STR) :object_base :flow {
 
     PMC      * const method_pmc = VTABLE_find_method(interp, object, meth);
     opcode_t *dest              = NULL;
-    PMC      *       signature  = Parrot_pcc_get_signature(interp,
+    PMC      * const signature  = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
 
     if (PMC_IS_NULL(method_pmc)) {

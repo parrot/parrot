@@ -121,7 +121,7 @@ inline op bands(invar PMC, in STR) :base_core {
 
 inline op bands(invar PMC, invar PMC) :base_core {
     STRING * a = VTABLE_get_string(interp, $1);
-    STRING * b = VTABLE_get_string(interp, $2);
+    STRING * const b = VTABLE_get_string(interp, $2);
     a = Parrot_str_bitwise_and(interp, a, b, NULL);
     VTABLE_set_string_native(interp, $1, a);
 }
@@ -196,14 +196,14 @@ inline op bnots(out STR, in STR) :base_core {
 }
 
 inline op bnots(invar PMC) :base_core {
-    STRING * a = VTABLE_get_string(interp, $1);
-    STRING * b = Parrot_str_bitwise_not(interp, a, NULL);
+    STRING * const a = VTABLE_get_string(interp, $1);
+    STRING * const b = Parrot_str_bitwise_not(interp, a, NULL);
     VTABLE_set_string_native(interp, $1, b);
 }
 
 inline op bnots(out PMC, invar PMC) :base_core {
-    STRING * a = VTABLE_get_string(interp, $2);
-    STRING * b = Parrot_str_bitwise_not(interp, a, NULL);
+    STRING * const a = VTABLE_get_string(interp, $2);
+    STRING * const b = Parrot_str_bitwise_not(interp, a, NULL);
     VTABLE_set_string_native(interp, $1, b);
 }
 
@@ -584,15 +584,15 @@ inline op bxors(inout STR, in STR) :base_core {
 }
 
 inline op bxors(invar PMC, in STR) :base_core {
-    STRING *a = VTABLE_get_string(interp, $1);
-    STRING *b = Parrot_str_bitwise_xor(interp, a, $2, NULL);
+    STRING * const a = VTABLE_get_string(interp, $1);
+    STRING * const b = Parrot_str_bitwise_xor(interp, a, $2, NULL);
     VTABLE_set_string_native(interp, $1, b);
 }
 
 inline op bxors(invar PMC, invar PMC) :base_core {
-    STRING *a = VTABLE_get_string(interp, $1);
-    STRING *b = VTABLE_get_string(interp, $2);
-    STRING *c = Parrot_str_bitwise_xor(interp, a, b, NULL);
+    STRING * const a = VTABLE_get_string(interp, $1);
+    STRING * const b = VTABLE_get_string(interp, $2);
+    STRING * const c = Parrot_str_bitwise_xor(interp, a, b, NULL);
     VTABLE_set_string_native(interp, $1, c);
 }
 
@@ -601,15 +601,15 @@ inline op bxors(out STR, in STR, in STR) :base_core {
 }
 
 inline op bxors(invar PMC, invar PMC, in STR) :base_core {
-    STRING *a = VTABLE_get_string(interp, $2);
-    STRING *b = Parrot_str_bitwise_xor(interp, a, $3, NULL);
+    STRING * const a = VTABLE_get_string(interp, $2);
+    STRING * const b = Parrot_str_bitwise_xor(interp, a, $3, NULL);
     VTABLE_set_string_native(interp, $1, b);
 }
 
 inline op bxors(invar PMC, invar PMC, invar PMC) :base_core {
-    STRING *a = VTABLE_get_string(interp, $2);
-    STRING *b = VTABLE_get_string(interp, $3);
-    STRING *c = Parrot_str_bitwise_xor(interp, a, b, NULL);
+    STRING * const a = VTABLE_get_string(interp, $2);
+    STRING * const b = VTABLE_get_string(interp, $3);
+    STRING * const c = Parrot_str_bitwise_xor(interp, a, b, NULL);
     VTABLE_set_string_native(interp, $1, c);
 }
 
@@ -621,7 +621,7 @@ inline op bxors(invar PMC, invar PMC, invar PMC) :base_core {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 LICENSE
 

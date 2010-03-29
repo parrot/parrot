@@ -60,7 +60,7 @@ op new(out PMC, in STR) {
     else {
         const INTVAL type = Parrot_pmc_get_type_str(interp, name);
         if (type <= 0) {
-            opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            const opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", name);
             goto ADDRESS(dest);
@@ -80,7 +80,7 @@ op new(out PMC, in STR, in PMC) {
     else {
         const INTVAL type = Parrot_pmc_get_type_str(interp, name);
         if (type <= 0) {
-            opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            const opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", name);
             goto ADDRESS(dest);
@@ -98,7 +98,7 @@ inline op new(out PMC, in PMC) :object_classes {
     else {
         const INTVAL type = Parrot_pmc_get_type(interp, name_key);
         if (type <= 0) {
-            opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            const opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
             goto ADDRESS(dest);
@@ -116,7 +116,7 @@ op new(out PMC, in PMC, in PMC) {
     else {
         const INTVAL type = Parrot_pmc_get_type(interp, name_key);
         if (type <= 0) {
-            opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            const opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
                 EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
             goto ADDRESS(dest);
@@ -151,7 +151,7 @@ op root_new(out PMC, in PMC) {
     if (!PMC_IS_NULL(classobj))
         $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
     else {
-        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        const opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_NO_CLASS,
             "Class '%Ss' not found", VTABLE_get_repr(interp, key));
         goto ADDRESS(dest);
@@ -169,7 +169,7 @@ op root_new(out PMC, in PMC, in PMC) {
     if (!PMC_IS_NULL(classobj))
         $1 = VTABLE_instantiate(interp, classobj, $3);
     else {
-        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        const opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_NO_CLASS,
             "Class '%Ss' not found", VTABLE_get_repr(interp, key));
         goto ADDRESS(dest);
@@ -231,10 +231,10 @@ PMC in $1.
 =cut
 
 op find_method(out PMC, invar PMC, in STR) :flow {
-    opcode_t * const resume = expr NEXT();
+    const opcode_t * const resume = expr NEXT();
     $1 = VTABLE_find_method(interp, $2, $3);
     if (PMC_IS_NULL($1) || !VTABLE_defined(interp, $1)) {
-        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, resume,
+        const opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, resume,
             EXCEPTION_METHOD_NOT_FOUND,
             "Method '%Ss' not found for invocant of class '%Ss'", $3,
             VTABLE_get_string(interp, VTABLE_get_class(interp, $2)));
@@ -690,7 +690,7 @@ inline op morph(invar PMC, in PMC) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 LICENSE
 
