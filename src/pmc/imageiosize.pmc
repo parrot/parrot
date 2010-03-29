@@ -18,14 +18,30 @@ Gets the size of an ImageIO image without the allocation costs.
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void visit_todo_list_freeze(PARROT_INTERP,
+    ARGIN(PMC* pmc),
+    ARGMOD(PMC* info))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* info);
+
+#define ASSERT_ARGS_visit_todo_list_freeze __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc) \
+    , PARROT_ASSERT_ARG(info))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 static void
-visit_todo_list_freeze(PARROT_INTERP, PMC* pmc, PMC* info) {
+visit_todo_list_freeze(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(PMC* info))
+{
     int is_new = 0;
 
     if (!PMC_IS_NULL(pmc)) {
-        Hash *hash = (Hash *)VTABLE_get_pointer(interp, PARROT_IMAGEIOSIZE(info)->seen);
+        Hash * const hash = (Hash *)VTABLE_get_pointer(interp, PARROT_IMAGEIOSIZE(info)->seen);
         HashBucket * const b = parrot_hash_get_bucket(interp, hash, pmc);
         is_new = !b;
     }
@@ -33,7 +49,8 @@ visit_todo_list_freeze(PARROT_INTERP, PMC* pmc, PMC* info) {
     VTABLE_push_integer(interp, info, 0);
 
     if (is_new) {
-        Hash *hash = (Hash *)VTABLE_get_pointer(interp, PARROT_IMAGEIOSIZE(info)->seen);
+        Hash * const hash = (Hash *)VTABLE_get_pointer(interp, PARROT_IMAGEIOSIZE(info)->seen);
+
         parrot_hash_put(interp, hash, pmc, pmc);
         VTABLE_push_integer(interp, info, pmc->vtable->base_type);
         VTABLE_push_pmc(interp, PARROT_IMAGEIOSIZE(info)->todo, pmc);
@@ -117,7 +134,7 @@ Gets the result PMC after a thaw.
 */
 
     VTABLE PMC *get_pmc() {
-        PMC *ret = Parrot_pmc_new(INTERP, enum_class_Integer);
+        PMC * const ret = Parrot_pmc_new(INTERP, enum_class_Integer);
         VTABLE_set_integer_native(INTERP, ret, PARROT_IMAGEIOSIZE(SELF)->size);
         return ret;
     }
@@ -161,7 +178,7 @@ Pushes the integer C<v> onto the end of the image.
 */
 
     VTABLE void push_integer(INTVAL v) {
-        size_t len = PF_size_integer() * sizeof (opcode_t);
+        const size_t len = PF_size_integer() * sizeof (opcode_t);
         PARROT_IMAGEIOSIZE(SELF)->size += len;
     }
 
@@ -178,7 +195,7 @@ Pushes the float C<v> onto the end of the image.
 
     VTABLE void push_float(FLOATVAL v)
     {
-        size_t len = PF_size_number() * sizeof (opcode_t);
+        const size_t len = PF_size_number() * sizeof (opcode_t);
         PARROT_IMAGEIOSIZE(SELF)->size += len;
     }
 
@@ -195,7 +212,7 @@ Pushes the string C<*v> onto the end of the image.
 
     VTABLE void push_string(STRING *v)
     {
-        size_t len = PF_size_string(v) * sizeof (opcode_t);
+        const size_t len = PF_size_string(v) * sizeof (opcode_t);
         PARROT_IMAGEIOSIZE(SELF)->size += len;
     }
 
