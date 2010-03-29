@@ -57,8 +57,6 @@ ok 1
 ok 2
 OUTPUT
 
-# TT #1249:  rework tests since we don't really have thread types?
-
 SKIP: {
     skip 'busted on win32' => 2 if $^O eq 'MSWin32';
 
