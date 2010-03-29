@@ -2008,14 +2008,14 @@ false otherwise.
     }
 
     METHOD clear_method_cache() {
-        Parrot_Class_attributes * const attrs = PARROT_OBJECT(SELF);
+        Parrot_Class_attributes * const attrs = PARROT_CLASS(SELF);
         PMC * const cache = attrs->meth_cache;
         if (cache)
             attrs->meth_cache = PMCNULL;
     }
 
     METHOD get_method_cache() {
-        Parrot_Class_attributes * const attrs = PARROT_OBJECT(SELF);
+        Parrot_Class_attributes * const attrs = PARROT_CLASS(SELF);
         PMC * cache = attrs->meth_cache;
         if (!cache) {
             cache = Parrot_pmc_new(INTERP, enum_class_Hash);
