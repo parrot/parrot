@@ -9,7 +9,7 @@ use Fatal qw(open close);
 
 use base qw( Exporter );
 our @EXPORT_OK = qw( count_newlines return_statement dont_edit dynext_load_code
-    c_code_coda slurp spew filename escape_filename
+    c_code_coda slurp spew filename
     args_from_parameter_list
     passable_args_from_parameter_list
 );
@@ -72,11 +72,6 @@ Returns the number of newlines (C<\n>) in C<$string>.
 
 sub count_newlines {
     return scalar $_[0] =~ tr/\n//;
-}
-
-sub escape_filename {
-    ( my $filename = shift ) =~ s|(\\)|$1$1|g;
-    return $filename;
 }
 
 =item C<dont_edit($pmcfile)>

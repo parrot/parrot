@@ -3,7 +3,7 @@
 package Parrot::Pmc2c::Emitter;
 use strict;
 use warnings;
-use Parrot::Pmc2c::UtilFunctions qw(count_newlines spew escape_filename);
+use Parrot::Pmc2c::UtilFunctions qw(count_newlines spew);
 use Parrot::Pmc2c::Pmc2cMain ();
 use overload '""'   => \&stringify;
 use overload 'bool' => \&boolify;
@@ -129,8 +129,8 @@ sub annotate_worker {
         }
         else {
             $line = $self->{current_line} if $line == -1;
-            my $filename_escaped = escape_filename($filename);
             if (!$Parrot::Pmc2c::Pmc2cMain::OPTIONS->{nolines}) {
+                ( my $filename_escaped = $filename ) =~ s|\\|/|g;
                 $data .= "#line $line \"$filename_escaped\"\n";
             }
             $data .= $it->{data};
