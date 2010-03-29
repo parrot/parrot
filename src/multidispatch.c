@@ -634,7 +634,7 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
     /* now go through args */
     for (i = 0; i < n; ++i) {
         const INTVAL type_sig  = VTABLE_get_integer_keyed_int(interp, multi_sig, i);
-        const INTVAL type_call = VTABLE_get_integer_keyed_int(interp, arg_tuple, i);
+        INTVAL type_call = VTABLE_get_integer_keyed_int(interp, arg_tuple, i);
         if (type_sig == type_call)
             continue;
 
@@ -647,15 +647,27 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
         switch (type_call) {
           case enum_type_INTVAL:
             if (type_sig == enum_class_Integer) { dist++; continue; }
-            if (type_sig == enum_type_PMC) dist++;
+            if (type_sig == enum_type_PMC ||
+                (type_sig >= enum_class_default && type_sig < enum_class_core_max)) {
+                dist++;
+                type_call = enum_class_Integer;
+            }
             break;
           case enum_type_FLOATVAL:
             if (type_sig == enum_class_Float)   { dist++; continue; }
-            if (type_sig == enum_type_PMC) dist++;
+            if (type_sig == enum_type_PMC ||
+                (type_sig >= enum_class_default && type_sig < enum_class_core_max)) {
+                dist++;
+                type_call = enum_class_Float;
+            }
             break;
           case enum_type_STRING:
             if (type_sig == enum_class_String)  { dist++; continue; }
-            if (type_sig == enum_type_PMC) dist++;
+            if (type_sig == enum_type_PMC ||
+                (type_sig >= enum_class_default && type_sig < enum_class_core_max)) {
+                dist++;
+                type_call = enum_class_String;
+            }
             break;
           default:
             break;

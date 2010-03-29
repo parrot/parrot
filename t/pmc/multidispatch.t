@@ -9,7 +9,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 46;
+use Parrot::Test tests => 47;
 
 =head1 NAME
 
@@ -1515,6 +1515,30 @@ CODE
 1
 1
 OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'int autoboxes to scalar - TT #1133' );
+    .sub 'foo' :multi(['scalar'])
+        .param pmc x
+        say "Scalar!"
+    .end
+
+    .sub 'foo' :multi()
+        .param pmc x
+        $I0 = isa x, 'scalar'
+        print "Scalar? "
+        say $I0
+    .end
+
+    .sub 'main' :main
+        'foo'(1)
+        $P0 = box 1
+        'foo'($P0)
+    .end
+CODE
+Scalar!
+Scalar!
+OUTPUT
+
 
 # Local Variables:
 #   mode: cperl
