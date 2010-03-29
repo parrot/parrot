@@ -977,6 +977,8 @@ Returns true (1) if B<role> is found, false (0) otherwise.
 INTVAL
 Parrot_pmc_type_does(PARROT_INTERP, ARGIN(STRING *role), INTVAL type)
 {
+    ASSERT_ARGS(Parrot_pmc_type_does)
+
     INTVAL pos = 0;
     STRING * const what = interp->vtables[type]->provides_str;
     INTVAL length = Parrot_str_byte_length(interp, what);
