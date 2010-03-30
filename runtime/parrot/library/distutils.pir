@@ -1362,6 +1362,9 @@ an array creates a PMC group
     pmc2c_includes .= " --include "
     pmc2c_includes .= $S0
     pmc2c_includes .= "/pmc"
+    $S0 = dirname(src)
+    pmc2c_includes .= " --include "
+    pmc2c_includes .= $S0
 
     .local string cmd
     cmd = clone pmc2c
