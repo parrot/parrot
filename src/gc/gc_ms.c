@@ -839,7 +839,7 @@ gc_ms_allocate_buffer_storage(PARROT_INTERP,
         (char *)mem_allocate(interp,
         interp->mem_pools, new_size, interp->mem_pools->memory_pool));
 
-    Buffer_bufstart(buffer) = mem;
+    Buffer_bufstart(buffer) = (void *)mem;
     Buffer_buflen(buffer)   = new_size - sizeof (void *);
 }
 
