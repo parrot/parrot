@@ -129,6 +129,7 @@ Parrot_str_write_COW(PARROT_INTERP, ARGMOD(STRING *s))
     /* COW_FLAG | constant_FLAG | external_FLAG) */
     if (PObj_is_cowed_TESTALL(s)) {
         STRING for_alloc;
+        size_t alloc_size;
 
         /* Create new pool data for this header to use,
          * independent of the original COW data */
@@ -137,22 +138,21 @@ Parrot_str_write_COW(PARROT_INTERP, ARGMOD(STRING *s))
         /* constant may have been marked */
         PObj_live_CLEAR(s);
 
-        /*
-         * allocate a dummy strings memory
-         * buflen might be bigger and used, so pass this length
-         * also be sure not to allocate from the constant pool
-         */
-        PObj_flags_CLEARALL(&for_alloc);
-        Parrot_gc_allocate_string_storage(interp, &for_alloc, Buffer_buflen(s));
+        if (Buffer_buflen(s)) {
+            PObj_flags_CLEARALL(&for_alloc);
+            alloc_size = s->bufused;
+            Parrot_gc_allocate_string_storage(interp, &for_alloc, alloc_size);
 
-        /* now copy memory over */
-        mem_sys_memcopy(for_alloc.strstart, s->strstart, s->bufused);
+            /* now copy memory over */
+            mem_sys_memcopy(for_alloc.strstart, s->strstart, alloc_size);
 
-        /* and finally use that string memory */
+            /* and finally use that string memory */
 
-        Buffer_bufstart(s) = Buffer_bufstart(&for_alloc);
-        s->strstart      = for_alloc.strstart;
-        Buffer_buflen(s)   = Buffer_buflen(&for_alloc);
+            Buffer_bufstart(s) = Buffer_bufstart(&for_alloc);
+            s->strstart      = for_alloc.strstart;
+            Buffer_buflen(s)   = Buffer_buflen(&for_alloc);
+            PARROT_ASSERT(Buffer_buflen(s) >= alloc_size);
+        }
 
         /* COW_FLAG | external_FLAG */
         PObj_is_external_CLEARALL(s);
@@ -1397,6 +1397,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(STRING *src),
             "replace: subend somehow is less than substart");
 
     /* Now do the replacement */
+    Parrot_str_write_COW(interp, src);
 
     /*
      * If the replacement string fits inside the original substring
@@ -1406,7 +1407,6 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(STRING *src),
 
     if (diff >= 0
     || ((INTVAL)src->bufused - (INTVAL)Buffer_buflen(src)) <= diff) {
-        Parrot_str_write_COW(interp, src);
 
         if (diff != 0) {
             mem_sys_memmove((char *)src->strstart + start_byte + rep->bufused,
