@@ -1028,7 +1028,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
         mpq_init(t);
         mpq_set_ui(t, VTABLE_get_integer(INTERP, value), 1);
 
-        eq = (INTVAL) mpq_equal(RT(SELF), RT(value));
+        eq = (INTVAL) mpq_equal(RT(SELF), t);
         mpq_clear(t);
 
         return eq;

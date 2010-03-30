@@ -26,7 +26,7 @@ Tests the Rational PMC.
     $S0 = config_hash['gmp']
 
     unless $S0 goto no_gmp
-    plan(55)
+    plan(56)
     goto gmp_tests
 
   no_gmp:
@@ -76,7 +76,7 @@ Tests the Rational PMC.
     test_neg()
     test_abs()
     test_cmp()
-    #test_equal_tt1517()
+    test_equal_tt1517()
 .end
 
 .sub test_neg
