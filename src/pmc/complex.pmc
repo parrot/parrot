@@ -32,21 +32,42 @@ static void complex_check_divide_zero(PARROT_INTERP, ARGIN(PMC *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void complex_parse_string(PARROT_INTERP,
+    ARGOUT(FLOATVAL *re),
+    ARGOUT(FLOATVAL *im),
+    ARGIN(STRING *value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*re)
+        FUNC_MODIFIES(*im);
+
 static void float_check_divide_zero(PARROT_INTERP, FLOATVAL value)
+        __attribute__nonnull__(1);
+
+static void int_check_divide_zero(PARROT_INTERP, INTVAL value)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_complex_check_divide_zero __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_complex_parse_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(re) \
+    , PARROT_ASSERT_ARG(im) \
+    , PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_float_check_divide_zero __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_int_check_divide_zero __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*
 
-=item C<static void
-complex_parse_string(PARROT_INTERP, FLOATVAL *re, FLOATVAL *im, STRING *value)>
+=item C<static void complex_parse_string(PARROT_INTERP, FLOATVAL *re, FLOATVAL
+*im, STRING *value)>
 
 Parses the string in C<value> to produce a complex number, represented
 by the real (C<*re>) and imaginary (C<*im>) parts. Raises an exception
@@ -59,7 +80,8 @@ use C<j> instead of C<i>.
 */
 
 static void
-complex_parse_string(PARROT_INTERP, FLOATVAL *re, FLOATVAL *im, STRING *value) {
+complex_parse_string(PARROT_INTERP, ARGOUT(FLOATVAL *re), ARGOUT(FLOATVAL *im), ARGIN(STRING *value))
+{
     char   * const str        = Parrot_str_to_cstring(interp, value);
     char   *t                 = str;
     char   *first_num_offset  = str;
@@ -214,14 +236,16 @@ complex_parse_string(PARROT_INTERP, FLOATVAL *re, FLOATVAL *im, STRING *value) {
 }
 
 static void
-int_check_divide_zero(PARROT_INTERP, INTVAL value) {
+int_check_divide_zero(PARROT_INTERP, INTVAL value)
+{
     if (value == 0)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
 }
 
 static void
-float_check_divide_zero(PARROT_INTERP, FLOATVAL value) {
+float_check_divide_zero(PARROT_INTERP, FLOATVAL value)
+{
     ASSERT_ARGS(float_check_divide_zero)
 
     if (FLOAT_IS_ZERO(value))
@@ -230,7 +254,8 @@ float_check_divide_zero(PARROT_INTERP, FLOATVAL value) {
 }
 
 static void
-complex_check_divide_zero(PARROT_INTERP, ARGIN(PMC *value)) {
+complex_check_divide_zero(PARROT_INTERP, ARGIN(PMC *value))
+{
     ASSERT_ARGS(complex_check_divide_zero)
 
     /* Throw an exception if we are dividing by zero. Check both the real part
