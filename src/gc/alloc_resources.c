@@ -53,7 +53,7 @@ static void alloc_new_block(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static const char * buffer_location(PARROT_INTERP, ARGIN(const PObj *b))
+static const char * buffer_location(PARROT_INTERP, ARGIN(const Buffer *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -384,18 +384,17 @@ string C<"???">.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const char *
-buffer_location(PARROT_INTERP, ARGIN(const PObj *b))
+buffer_location(PARROT_INTERP, ARGIN(const Buffer *b))
 {
     ASSERT_ARGS(buffer_location)
-    int i;
+    Parrot_Context * const ctx = CONTEXT(interp);
     static char reg[10];
-
-    Parrot_Context* const ctx = CONTEXT(interp);
+    UINTVAL i;
 
     for (i = 0; i < ctx->n_regs_used[REGNO_STR]; ++i) {
-        PObj * const obj = (PObj *) CTX_REG_STR(interp, ctx, i);
-        if (obj == b) {
-            sprintf(reg, "S%d", i);
+        PObj * const obj = (PObj *)Parrot_pcc_get_STRING_reg(interp, ctx, i);
+        if ((PObj *)obj == b) {
+            sprintf(reg, "S%d", (int)i);
             return reg;
         }
     }
