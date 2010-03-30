@@ -125,6 +125,8 @@ PARROT_WARN_UNUSED_RESULT
 static opcode_t *
 GET_VISIT_CURSOR(ARGIN(const PMC *pmc))
 {
+    ASSERT_ARGS(GET_VISIT_CURSOR)
+
     char * const buf = (char *)Buffer_bufstart(PARROT_IMAGEIO(pmc)->buffer);
     const size_t pos = PARROT_IMAGEIO(pmc)->pos;
     return (opcode_t *)(buf + pos);
@@ -134,6 +136,8 @@ PARROT_INLINE
 static void
 SET_VISIT_CURSOR(ARGMOD(PMC *pmc), ARGIN(const char *cursor))
 {
+    ASSERT_ARGS(SET_VISIT_CURSOR)
+
     const char *bufstart  = (char *)Buffer_bufstart(PARROT_IMAGEIO(pmc)->buffer);
     PARROT_IMAGEIO(pmc)->pos = (cursor - bufstart);
 }
@@ -142,6 +146,8 @@ PARROT_INLINE
 static void
 INC_VISIT_CURSOR(ARGMOD(PMC *pmc), UINTVAL inc)
 {
+    ASSERT_ARGS(INC_VISIT_CURSOR)
+
     PARROT_IMAGEIO(pmc)->pos += inc;
 }
 
