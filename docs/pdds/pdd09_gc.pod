@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 PDD 9: Garbage Collection Subsystem
@@ -295,7 +295,7 @@ C<finalize_gc_system>. It holds various accounting information for the GC
 subsystem, including how many GC runs have been completed, amount of memory
 allocated since the last run, and total memory allocated. This accounting
 information is updated by the GC system. The current block level for GC mark
-and sweep phases is stored in the C<Memory_Pools> structure. 
+and sweep phases is stored in the C<Memory_Pools> structure.
 (See L<Blocking GC>.)
 
 The pointer C<void *gc_private> is reserved for use by the currently active GC
@@ -303,18 +303,18 @@ subsystem (with freedom for variation between GC implementations).
 
 =head4 The Var_Size_Pool structure
 
-The C<Var_Size_Pool> structure is a simple memory pool. It contains a pointer 
+The C<Var_Size_Pool> structure is a simple memory pool. It contains a pointer
 to the top block of the allocated pool, the total allocated size of the pool,
-the block size, and some details on the reclamation characteristics of the 
+the block size, and some details on the reclamation characteristics of the
 pool.
 
 =head4 The Fixed_Size_Pool structure
 
-The C<Fixed_Size_Pool> structure is a richer memory pool for object 
-allocation. It tracks details like the number of allocated and free objects 
-in the pool, a list of free objects, and for the generational GC 
-implementation maintains linked lists of white, black, and gray PMCs. It 
-contains a pointer to a simple C<Var_Size_Pool> (the base storage of the 
+The C<Fixed_Size_Pool> structure is a richer memory pool for object
+allocation. It tracks details like the number of allocated and free objects
+in the pool, a list of free objects, and for the generational GC
+implementation maintains linked lists of white, black, and gray PMCs. It
+contains a pointer to a simple C<Var_Size_Pool> (the base storage of the
 pool). It holds function pointers for adding and retrieving free objects in
 the pool, and for allocating objects.
 
@@ -350,7 +350,7 @@ member.
 
 =head4 Memory_Pools structure function pointers
 
-Each GC system declares 3 function pointers, stored in the Memory_Pools 
+Each GC system declares 3 function pointers, stored in the Memory_Pools
 structure.
 
 =over 4
@@ -421,8 +421,8 @@ proper operation.
 =item C<void (*finalize_gc_system) (Interp *)>
 
 Called during interpreter destruction. Free used resources and memory pools.
-All PMCs must be swept, and PMCs with custom destroy VTABLE functions must have
-those called.
+All PMCs must be swept, and PMCs with custom destroy VTABLE functions must
+have those called.
 
 =item C<void (*init_pool) (Interp *, Fixed_Size_Pool *)>
 
