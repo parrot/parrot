@@ -62,7 +62,7 @@ An empty Hash PMC is allocated during initialization.
 
 =item C<vtable_overrides>
 
-A directory of vtable method names and method bodies this class overrides.
+A directory of vtable function names and method bodies this class overrides.
 An empty Hash PMC is allocated during initialization.
 
 =item C<attrib_metadata>
@@ -851,7 +851,7 @@ Adds the given sub PMC as a vtable override with the given name.
                 EXCEPTION_METHOD_NOT_FOUND,
                 "'%S' is not a valid vtable function name.", name);
 
-        /* Add it to vtable methods list. */
+        /* Add it to vtable list. */
         VTABLE_set_pmc_keyed_str(interp, _class->vtable_overrides, name, sub);
     }
 
@@ -1654,7 +1654,7 @@ Called after the class has been thawed.
     }
 
     /* **********************************************************************
-     * Below here are non-vtable methods that eventually will go in a role
+     * Below here are methods that eventually will go in a role
      * that is composed into here to optionally give a nice interface from
      * PIR (ParrotClass isa Class does ClassMethods or something like this).
      * **********************************************************************/
@@ -1798,7 +1798,7 @@ Return a hash where the keys are method names and the values are methods.
 =item C<void add_method(STRING *name, PMC *sub)>
 
 Adds the given sub PMC as a method with the given name. Delegates to the
-C<add_method> vtable method.
+C<add_method> vtable.
 
 =cut
 
@@ -1812,7 +1812,7 @@ C<add_method> vtable method.
 =item C<void add_vtable_override(STRING *name, PMC *sub)>
 
 Adds the given sub PMC as a vtable override with the given name. Delegates to
-the C<add_vtable_override> vtable method.
+the C<add_vtable_override> vtable.
 
 =cut
 
@@ -1967,7 +1967,7 @@ parameter is supplied, a particular item of introspection data.
     METHOD inspect(STRING *what :optional, int has_what :opt_flag) {
         PMC *found;
 
-        /* Just delegate to the appropriate vtable method. */
+        /* Just delegate to the appropriate vtable. */
         if (has_what)
             found = SELF.inspect_str(what);
         else

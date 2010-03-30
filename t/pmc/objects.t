@@ -1377,11 +1377,11 @@ l1:
 
     $P1 = new 'Foo41'
     $S1 = $P1
-    is( $S1, 'Hello world', 'get_string method' )
+    is( $S1, 'Hello world', 'get_string :vtable :method' )
 
     $P1 = new 'Bar41'
     $S1 = $P1
-    is( $S1, 'Hello world', 'vtable method get_string' )
+    is( $S1, 'Hello world', 'get_string :method :vtable' )
 .end
 
 .namespace [ 'Foo41' ]

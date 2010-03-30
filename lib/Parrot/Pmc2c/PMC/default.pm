@@ -32,7 +32,7 @@ Always true.
 sub pre_method_gen {
     my ($self) = @_;
 
-    # vtable methods
+    # vtables
     foreach my $method ( @{ $self->vtable->methods } ) {
         my $vt_method_name = $method->name;
         next unless $self->unimplemented_vtable($vt_method_name);

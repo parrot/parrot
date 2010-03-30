@@ -573,7 +573,7 @@ Returns whether the class does the givne C<*role>.
     }
 
     /*
-     * Below here are non-vtable methods that eventually will go in a role
+     * Below here are methods that eventually will go in a role
      * that is composed into here to optionally give a nice interface from
      * PIR (ParrotRole isa Role does RoleMethods or something like this).
      */
@@ -770,7 +770,7 @@ parameter is supplied, a particular item of introspection data.
     METHOD inspect(STRING *what :optional, int got_what :opt_flag) {
         PMC *found;
 
-        /* Just delegate to the appropriate vtable method. */
+        /* Just delegate to the appropriate vtable. */
         if (got_what)
             found = VTABLE_inspect_str(interp, SELF, what);
         else

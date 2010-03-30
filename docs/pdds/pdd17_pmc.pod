@@ -1656,7 +1656,7 @@ C<ResizablePMCArray>, but that's likely to change.
 =head4 Array types
 
 Note that for the following types you can set the size of the array by using
-the VTABLE_set_integer_native() method. Assigning an integer to the array as a
+the VTABLE_set_integer_native() function. Assigning an integer to the array as a
 whole sets the array to that size.
 
 Size-changing operations (such as push, pop, shift, unshift, and splice)

@@ -1395,7 +1395,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
         STRING *vtable_name;
         INTVAL  vtable_index;
 
-        /* Work out the name of the vtable method. */
+        /* Work out the name of the vtable function. */
         if (unit->vtable_name) {
             vtable_name = Parrot_str_new(interp, unit->vtable_name + 1,
                     strlen(unit->vtable_name) - 2);
@@ -1404,7 +1404,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
         else
             vtable_name = sub->name;
 
-        /* Check this is a valid vtable method to override. */
+        /* Check this is a valid vtable function to override. */
         vtable_index = Parrot_get_vtable_index(interp, vtable_name);
 
         if (vtable_index == -1) {

@@ -132,7 +132,7 @@ Determines if a given PMC type is dynamically loaded or not.
 
 =item C<implements_vtable($method)>
 
-True if pmc generates code for vtable method C<$method>.
+True if pmc generates code for vtable C<$method>.
 
 =cut
 
@@ -321,7 +321,7 @@ sub method_attrs {
 
 =item C<vtable_method_does_write($method)>
 
-Returns true if the vtable method C<$method> writes our value.
+Returns true if the vtable C<$method> writes our value.
 
 =back
 

@@ -359,7 +359,7 @@ CODE
 /Mark 500 not found/
 OUTPUT
 
-# stringification is handled by a vtable method, which runs in a second
+# stringification is handled by a vtable, which runs in a second
 # runloop. when an error in the method tries to go to a Error_Handler defined
 # outside it, it winds up going to the inner runloop, giving strange results.
 pir_output_is( <<'CODE', <<'OUTPUT', 'pop_eh out of context (2)', todo => 'runloop shenanigans' );

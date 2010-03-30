@@ -67,7 +67,7 @@ Returns a reference to an array containing
 
   [ return_type method_name parameters section MMD_type attributes ]
 
-for each vtable method defined in C<$file>. If C<$file> is unspecified it
+for each vtable function defined in C<$file>. If C<$file> is unspecified it
 defaults to F<src/vtable.tbl>.  If it is not an MMD method, C<MMD_type> is -1.
 
 =cut
@@ -209,7 +209,7 @@ sub vtbl_macros {
 
 /*
  * vtable accessor macros
- * as vtable methods might get moved around internally
+ * as vtable functions might get moved around internally
  * these macros hide the details
  */
 
@@ -281,7 +281,7 @@ EOM
 
 =item C<vtbl_embed($vtable)>
 
-Returns the C function definitions to call the vtable methods on a PMC for the
+Returns the C function definitions to call the vtable functions on a PMC for the
 elements in the referenced vtable array.
 
 =cut

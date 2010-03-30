@@ -144,7 +144,7 @@ types are generally only used by low-level internal PMCs.
 
 =item 4.
 
-A list of vtable method implementations
+A list of vtable function implementations
 
 =item 5.
 
@@ -154,7 +154,7 @@ The final close C<}>
 
 =head2 Method Body Substitutions
 
-The vtable method bodies can use the following substitutions:
+The vtable function bodies can use the following substitutions:
 
 =over 4
 
@@ -168,11 +168,11 @@ Converted to the interpreter object.
 
 =item C<OtherClass.SELF.method(a,b,c)>
 
-Calls the static vtable method 'method' in C<OtherClass>.
+Calls the static vtable or method 'method' in C<OtherClass>.
 
 =item C<SELF.method(a,b,c)>
 
-Calls the vtable method 'method' using the dynamic type of C<SELF>.
+Calls the vtable or method 'method' using the dynamic type of C<SELF>.
 
 =item C<SELF(a,b,c)>
 
@@ -180,7 +180,7 @@ Same as above, but calls the current method.
 
 =item C<STATICSELF.method(a,b,c)>
 
-Calls the vtable method 'method' using the static type of C<SELF> (in
+Calls the vtable or method 'method' using the static type of C<SELF> (in
 other words, calls another method defined in the same file).
 
 =item C<OtherClass.SUPER(a,b,c)>

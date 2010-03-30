@@ -79,7 +79,7 @@ The basic scheme of operation looks like this:
 =head2 The visit_info structure
 
 This structure holds all necessary information and function pointers specific
-to the desired functionality. It gets passed on to all vtable methods and
+to the desired functionality. It gets passed on to all vtable functions and
 callback functions.
 
 =head2 Working loop
@@ -99,7 +99,7 @@ thread-safe.
 This is done by a callback function inside the B<visit_info> structure called
 B<visit_pmc_now>. It gets called initially to put the first item on the list
 and is called thereafter from all PMCs for contained PMCs inside the B<visit>
-vtable method.
+vtable function.
 
 
 =head2 The visit() vtable
@@ -140,19 +140,19 @@ amount of time.
 
 So after all we finally arrived at the point to actually perform the desired
 functionality. First the PMC-specific part is done inside F<pmc_freeze.c> then
-the specific vtable method B<freeze>, B<thaw>, whatever, is called, again via a
-function pointer called B<visit_action>.
+the specific vtable function B<freeze>, B<thaw>, whatever, is called, again
+via a function pointer called B<visit_action>.
 
 =head1 Freeze and thaw
 
 As stated PMCs are currently processed inside the core, PMC-specific parts are
-done by calling the PMCs vtable method. This parts could of course be moved to
+done by calling the PMCs vtable function. This parts could of course be moved to
 F<default.pmc> too, so that it's simpler to override the functionality.
 
 =head2 Serializer interface
 
 During initialization the B<visit_info>s B<image_io> data pointer is filled
-with an object having B<vtable> methods that remarkably look like a PMCs
+with an object having B<vtable> functions that remarkably look like a PMCs
 vtable. So B<io-E<gt>vtable-E<gt>push_integer> spits out an INTVAL to the
 frozen B<image>, while B<shift_integer> gets an INTVAL from the frozen stream.
 

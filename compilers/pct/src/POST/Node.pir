@@ -82,7 +82,7 @@ as the result of the current node.
 .end
 
 
-=item get_string()   # vtable method
+=item get_string()
 
 Returns the result of the current node as a string.
 

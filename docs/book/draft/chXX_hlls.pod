@@ -211,9 +211,9 @@ at the data level? There are two ways:
 
 =over 4
 
-=item * VTable methods
+=item * VTable Functions
 
-VTable methods are the standard interface for PMC data types, and all PMCs
+VTable functions are the standard interface for PMC data types, and all PMCs
 have them. If the PMCs were written properly to satisfy this interface
 all the necessary information from those PMCs. Operate on the PMCs at the
 VTable level, and we can safely ignore the implementation details of them.

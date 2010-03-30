@@ -26,7 +26,7 @@ been defined may throw an exception or cause a bigger problem.
 =pod
 
 Most PMC's, but not all, should return true for C<defined>.  It all
-depends on how the PMC implements its vtable method for C<defined>.
+depends on how the PMC implements its vtable function for C<defined>.
 For example the C<Undef> PMC always returns false (0) for C<defined>.
 
 =cut

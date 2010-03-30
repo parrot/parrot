@@ -274,9 +274,9 @@ add_self_parameter(ARGIN(lexer_state * const lexer))
 =item C<void set_sub_vtable(lexer_state * const lexer, char const * vtablename)>
 
 Set the :vtable() flag argument to the current subroutine. If C<vtablename>
-is NULL, the name of the current sub is taken to be the vtable method name.
-If the vtable method name (either specified or the current sub's name) is
-in fact not a vtable method, an error message is emitted.
+is NULL, the name of the current sub is taken to be the vtable name.
+If the vtable name (either specified or the current sub's name) is
+not a valid vtable, an error message is emitted.
 
 =cut
 
@@ -290,15 +290,15 @@ set_sub_vtable(ARGIN(lexer_state * const lexer),
     if (vtablename == NULL)  /* the sub's name I<is> the vtablename */
         vtablename = CURRENT_SUB(lexer)->info.subname;
 
-    /* get the index number of this vtable method */
+    /* get the index number of this vtable */
     vtable_index = Parrot_get_vtable_index(lexer->interp,
                                            Parrot_str_new(lexer->interp, vtablename,
                                                                strlen(vtablename)));
 
-    /* now check whether the method name actually a vtable method */
+    /* now check whether the method name actually a vtable */
     if (vtable_index == -1)
         yypirerror(lexer->yyscanner, lexer,
-                   "'%s' is not a vtable method but was used with :vtable flag", vtablename);
+                   "'%s' is not a vtable but was used with :vtable flag", vtablename);
 
     else {
         /* test for duplicate :vtable on a sub */

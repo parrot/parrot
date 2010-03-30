@@ -500,7 +500,7 @@ Invoke the PIR-defined vtable override, or call the default get_integer.
         Parrot_Class_attributes  * const _class    = PARROT_CLASS(obj->_class);
         STRING * const meth_name = CONST_STRING(interp, "get_integer");
 
-        /* Walk and search for the vtable method. */
+        /* Walk and search for the vtable. */
         const int num_classes = VTABLE_elements(interp, _class->all_parents);
         int i;
         for (i = 0; i < num_classes; i++) {
@@ -517,7 +517,7 @@ Invoke the PIR-defined vtable override, or call the default get_integer.
             }
             /* method name is get_integer */
             if (cur_class->vtable->base_type == enum_class_PMCProxy) {
-                /* Get the PMC instance and call the vtable method on that. */
+                /* Get the PMC instance and call the vtable function on that. */
                 STRING * const proxy      = CONST_STRING(interp, "proxy");
                 PMC    * const del_object = VTABLE_get_attr_str(interp, pmc, proxy);
 
@@ -713,7 +713,7 @@ Invokes the object (if this vtable function is overridden).
         Parrot_Object_attributes * const obj    = PARROT_OBJECT(pmc);
         Parrot_Class_attributes  * const _class = PARROT_CLASS(obj->_class);
 
-        /* Walk and search for the vtable method. */
+        /* Walk and search for the vtable. */
         const int num_classes = VTABLE_elements(interp, _class->all_parents);
         int i;
 
@@ -738,7 +738,7 @@ Invokes the object (if this vtable function is overridden).
             }
 
             if (cur_class->vtable->base_type == enum_class_PMCProxy) {
-                /* Get the PMC instance and call the vtable method on that. */
+                /* Get the PMC instance and call the vtable function on that. */
                 PMC * const del_object =
                     VTABLE_get_attr_keyed(interp, pmc, cur_class, proxy);
 

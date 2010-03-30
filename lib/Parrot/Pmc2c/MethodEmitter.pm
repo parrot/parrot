@@ -163,7 +163,7 @@ sub rewrite_nci_method {
 =item C<rewrite_vtable_method($self, $pmc, $super, $super_table)>
 
 Rewrites the method body performing the various macro substitutions for
-vtable method bodies (see F<tools/build/pmc2c.pl>).
+vtable function bodies (see F<tools/build/pmc2c.pl>).
 
 =cut
 
@@ -180,7 +180,7 @@ sub rewrite_vtable_method {
     # Some MMD variants don't have a super mapping.
     if ($super) {
         my $supertype = "enum_class_$super";
-        die "$pmcname defines unknown vtable method '$name'\n" unless defined $super_table->{$name};
+        die "$pmcname defines unknown vtable function '$name'\n" unless defined $super_table->{$name};
         my $supermethod = "Parrot_" . $super_table->{$name} . "_$name";
 
         # Rewrite OtherClass.SUPER(args...)

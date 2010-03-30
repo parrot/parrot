@@ -904,7 +904,7 @@ Parrot_io_make_offset32(INTVAL hi, INTVAL lo)
 
 =item C<PIOOFF_T Parrot_io_make_offset_pmc(PARROT_INTERP, PMC *pmc)>
 
-Returns the return value of the C<get_integer> vtable method on C<*pmc>.
+Returns the return value of the C<get_integer> vtable on C<*pmc>.
 
 =cut
 

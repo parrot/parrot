@@ -172,7 +172,7 @@ of the form:
 where register_type is 0x100, 0x200, 0x400, or 0x800 for PMC, string, integer,
 or number respectively. So N19 would be 0x413.
 
-B<Note>: Instructions tagged with a * will call a vtable method to handle the
+B<Note>: Instructions tagged with a * will call a vtable function to handle the
 instruction if used on PMC registers.
 
 In all cases, the letters x, y, and z refer to register numbers. The letter t
@@ -244,7 +244,7 @@ does a value assignment, as:
 
     $foo = $bar;
 
-X's assign vtable method is invoked and it does whatever is appropriate.
+X's assign vtable function is invoked and it does whatever is appropriate.
 
 =item clone Px, Py
 

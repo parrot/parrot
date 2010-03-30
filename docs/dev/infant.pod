@@ -142,15 +142,15 @@ opcodes, so that there is no chance of unanchored temporaries.
  + Fast mark phase (GC already manipulates the flags)
  - Generation count must be maintained
  - Disallows recursive opcode calls (necessary for eg implementing
-   vtable methods in pasm)
+   vtable functions in pasm)
  - Can temporarily use more memory (dead objects accumulate during the
    current generation)
 
 In order to allow recursive opcode calls, we could increment the generation
 count in more places and make sure nothing is left unanchored at those points,
 but that would gradually remove all advantages of this scheme and make it more
-difficult to call existing vtable methods (since you never know when they might
-start running pasm code.)
+difficult to call existing vtable functions (since you never know when they
+might start running pasm code.)
 
 =head2 Variant 5: generation stack
 

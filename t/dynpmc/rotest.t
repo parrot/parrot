@@ -49,7 +49,7 @@ CODE
     my %tests = (
 
         # these first two tests would test overriding of the default
-        # read-onlyness notion of vtable methods
+        # read-onlyness notion of vtables
         q{value = 42}  => [ 1, 0 ],
         q{$I0 = value} => [ 0, 0 ],
 

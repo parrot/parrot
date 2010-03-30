@@ -465,7 +465,7 @@ parameter is supplied, a particular item of introspection data.
 */
 
     METHOD inspect(STRING *what :optional, int got_what :opt_flag) {
-        /* Just delegate to the appropriate vtable method. */
+        /* Just delegate to the appropriate vtable. */
         PMC * const found =
             got_what
                 ? VTABLE_inspect_str(interp, SELF, what)

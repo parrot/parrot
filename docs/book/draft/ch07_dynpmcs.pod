@@ -195,7 +195,7 @@ when building Parrot.
 =head3 VTABLE Functions Parameters
 
 VTABLE functions are defined just like ordinary C functions, almost. Here's
-a normal definition for a VTABLE method:
+a normal definition for a VTABLE function:
 
   VTABLE VTABLENAME (PARAMETERS) {
     /* ordinary C here, almost */

@@ -91,7 +91,7 @@ manipulate keys, can be found in F<include/parrot/key.h>
 =head3 Aggregate and non-aggregate PMCs
 
 We've already said that what separates the aggregate PMCs from the
-non-aggregates is their implementation of the C<_keyed> vtable methods. So it
+non-aggregates is their implementation of the C<_keyed> vtable functions. So it
 is Hereby Decreed that the default vtable which everyone inherits from defines
 the C<_keyed> forms to throw an exception.
 
@@ -105,9 +105,9 @@ screw-up, since code which indexes a non-aggregate shouldn't be generated.
 
 =back
 
-=head3 C<_keyed> vtable methods
+=head3 C<_keyed> vtable functions
 
-So what of these magical C<_keyed> vtable methods? They are generated when you
+So what of these magical C<_keyed> vtable functions? They are generated when you
 add the C<keyed> tag to the appropriate entry in F<src/vtable.tbl>. They are
 constructed by following B<every> C<PMC> argument with a second C<PMC>
 argument which acts as the key for that argument; the name of the second
@@ -123,7 +123,7 @@ and
 
     $a = @b[$c]
 
-use the same vtable method, reducing the multiplicity of methods.  Secondly, a
+use the same vtable function, reducing the multiplicity of methods.  Secondly, a
 three-argument C<assign> as suggested by the code above would be ambiguous -
 the code above uses 3 PMCs in different ways.
 
@@ -296,7 +296,7 @@ list. - steve@fink.com
 =item Fri Mar  8 18:47:34 GMT 2002 : Version 1.1
 
 updated to reflect Dan's comments that non-aggregates also support C<_keyed>
-variant vtable methods.
+variant vtable functions.
 
 =back
 

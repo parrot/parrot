@@ -144,7 +144,7 @@ ns_insert_sub_keyed_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *key),
         /* Otherwise, store it in the namespace for the class to
          * retrieve later */
         else {
-            /* If we don't have a place to hang vtable methods, make one. */
+            /* If we don't have a place to hang vtables, make one. */
             if (PMC_IS_NULL(vtable))
                 nsinfo->vtable = vtable = Parrot_pmc_new(interp, enum_class_Hash);
 
@@ -1093,7 +1093,7 @@ the namespace.
 
 =item C<METHOD get_associated_vtable_methods()>
 
-Gets the Hash of vtable methods associated with this namespace and removes it
+Gets the Hash of vtables associated with this namespace and removes it
 from the namespace.
 
 =cut

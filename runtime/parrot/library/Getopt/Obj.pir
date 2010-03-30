@@ -357,7 +357,7 @@ finish:
 
 =item C<push_string(STRING format)>
 
-A vtable method, invoked by e.g. C<push getopts, "foo|f=s">.  The format is as such.
+A vtable, invoked by e.g. C<push getopts, "foo|f=s">.  The format is:
 
 =over 4
 

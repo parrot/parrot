@@ -40,7 +40,7 @@ Generic iterator for traversing arrays.
 
 NB: for different direction you have to use different ops!
 
-TODO: Discuss idea of having separate get_iter/get_reverse_iter VTABLE methods
+TODO: Discuss idea of having separate get_iter/get_reverse_iter VTABLEs
 to avoid this caveat.
 
 =head1 Methods

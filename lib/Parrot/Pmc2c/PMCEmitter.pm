@@ -167,7 +167,7 @@ sub hdecls {
     my $name    = $self->name;
     my $lc_name = $self->name;
 
-    # generate decls for all vtable methods in this PMC
+    # generate decls for all vtables in this PMC
     foreach my $vt_method_name ( @{ $self->vtable->names } ) {
         if ( $self->implements_vtable($vt_method_name) ) {
             $hout .=
@@ -274,7 +274,7 @@ Returns the C code for the pmc methods.
 sub gen_methods {
     my ($self) = @_;
 
-    # vtable methods
+    # vtables
     foreach my $method ( @{ $self->vtable->methods } ) {
         my $vt_method_name = $method->name;
         next if $vt_method_name eq 'class_init';
@@ -284,7 +284,7 @@ sub gen_methods {
         }
     }
 
-    # non-vtable methods
+    # methods
     foreach my $method ( @{ $self->methods } ) {
         next if $method->is_vtable;
         $method->generate_body($self);
@@ -718,7 +718,7 @@ EOC
 
 =item C<update_vtable_func()>
 
-Returns the C code for the PMC's update_vtable method.
+Returns the C code for the PMC's update_vtable.
 
 =cut
 
@@ -887,7 +887,7 @@ EOC
 
 =item C<get_vtable_func()>
 
-Returns the C code for the PMC's update_vtable method.
+Returns the C code for the PMC's update_vtable.
 
 =cut
 
@@ -989,7 +989,7 @@ sub gen_switch_vtable {
         push @{ $multi_methods{ $name } }, [ $sig[1], $ssig, $fsig, $ns, $func, $method ];
     }
 
-    # vtable methods
+    # vtables
     foreach my $method ( @{ $self->vtable->methods } ) {
         my $vt_method_name = $method->name;
         next if $vt_method_name eq 'class_init';

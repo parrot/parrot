@@ -130,7 +130,7 @@ Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, ARGIN(PMC *self), ARGIN(
         }
     }
 
-    /* Import any vtable methods. */
+    /* Import any vtables. */
     Parrot_pcc_invoke_method_from_c_args(interp, ns, CONST_STRING(interp, "get_associated_vtable_methods"), "->P", &vtable_overrides);
 
     if (!PMC_IS_NULL(vtable_overrides)) {
@@ -471,7 +471,7 @@ Parrot_oo_find_vtable_override(PARROT_INTERP,
         VTABLE_get_pmc_keyed_str(interp, _class->parent_overrides, name);
 
     if (PMC_IS_NULL(result)) {
-        /* Walk and search for the vtable method. */
+        /* Walk and search for the vtable. */
         const INTVAL num_classes = VTABLE_elements(interp, _class->all_parents);
         INTVAL       i;
 

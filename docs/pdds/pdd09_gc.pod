@@ -421,7 +421,7 @@ proper operation.
 =item C<void (*finalize_gc_system) (Interp *)>
 
 Called during interpreter destruction. Free used resources and memory pools.
-All PMCs must be swept, and PMCs with custom destroy VTABLE methods must have
+All PMCs must be swept, and PMCs with custom destroy VTABLE functions must have
 those called.
 
 =item C<void (*init_pool) (Interp *, Fixed_Size_Pool *)>
@@ -563,7 +563,7 @@ within C<src/gc/api.c:Parrot_gc_free_pmc>.
 The C<mark> vtable slot will be called during the GC mark phase. The mark
 function must call C<Parrot_gc_mark_PObj_alive> for all non-NULL objects
 (Buffers and PMCs) that PMC refers to. This flag is typically tested and the
-custom mark VTABLE method called from C<src/gc/api.c:mark_special>.
+custom mark VTABLE function called from C<src/gc/api.c:mark_special>.
 
 =item PObj_external_FLAG
 

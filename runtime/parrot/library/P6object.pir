@@ -727,7 +727,7 @@ Multimethod helper to return the parrotclass for C<x>.
 
 =over 4
 
-=item get_string()  (vtable method)
+=item get_string()
 
 Returns the "shortname" of the protoobject's class and parens.
 
@@ -743,7 +743,7 @@ Returns the "shortname" of the protoobject's class and parens.
     .return ($S0)
 .end
 
-=item defined()  (vtable method)
+=item defined()
 
 Protoobjects are always treated as being undefined.
 
@@ -754,7 +754,7 @@ Protoobjects are always treated as being undefined.
 .end
 
 
-=item name()  (vtable method)
+=item name()
 
 Have protoobjects return their longname in response to a
 C<typeof_s_p> opcode.

@@ -10,7 +10,7 @@ docs/dev/pccmethods.pod - Parrot Calling Conventions in C
 A C<PCCMETHOD> is a PMC method that follows Parrot Calling Conventions
 (a.k.a. PCC). This allows PIR code to call PMC methods using slurpy, named,
 and other types of arguments as specified in F<PDD03>. This offers flexibility
-not found in a PMC C<METHOD> or a vtable method using C calling conventions.
+not found in a PMC C<METHOD> or a vtable function using C calling conventions.
 
 C<PCCINVOKE> is used to call a method using the Parrot Calling Conventions.
 It uses the standard find_method/invoke approach that the callmethodcc opcode
@@ -113,7 +113,7 @@ not next to the type.
 
 =head2 Performance
 
-When a C<METHOD> or vtable method is called, C<NCI> is used to map the
+When a C<METHOD> or vtable function is called, C<NCI> is used to map the
 arguments held in the current Parrot_Context onto the C calling conventions.
 That is, you still end up involving the Parrot Calling Conventions anyway,
 so there is no reason to expect a C<PCCMETHOD> to be any slower. It may well
