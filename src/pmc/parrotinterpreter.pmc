@@ -245,7 +245,7 @@ Initializes the interpreter.
          * so we check, if the interpreter is already set up
          */
         if (!PMC_data(SELF)) {
-            Parrot_ParrotInterpreter_attributes *attrs =
+            Parrot_ParrotInterpreter_attributes * const attrs =
                 mem_gc_allocate_zeroed_typed(INTERP, Parrot_ParrotInterpreter_attributes);
             PMC_data(SELF) = attrs;
         }
@@ -268,10 +268,11 @@ C<parent> and uses that thread.
 */
 
     VTABLE void init_pmc(PMC *parent) {
+        /* XXX Can this be moved inside the block where it's used */
         Parrot_Interp p = PMC_interp(parent);
 
         if (!PMC_data(SELF)) {
-            Parrot_ParrotInterpreter_attributes *attrs =
+            Parrot_ParrotInterpreter_attributes * const attrs =
                 mem_gc_allocate_zeroed_typed(INTERP, Parrot_ParrotInterpreter_attributes);
             PMC_data(SELF) = attrs;
         }
@@ -316,7 +317,7 @@ Sets C<struct_val> to C<*value>.
          * ParrotInterpreter through Parrot_pmc_new_noinit.  If this PMC hasn't been
          * initialized, cheat by initializing instead. */
         if (!PMC_data(SELF)) {
-            Parrot_ParrotInterpreter_attributes *attrs =
+            Parrot_ParrotInterpreter_attributes * const attrs =
                 mem_gc_allocate_zeroed_typed(INTERP, Parrot_ParrotInterpreter_attributes);
             PMC_data(SELF) = attrs;
             PObj_custom_destroy_SET(SELF);
