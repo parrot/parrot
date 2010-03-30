@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 20;
+use Parrot::Test tests => 21;
 
 pir_error_output_like( <<'CODE', <<'OUT', 'invalid get_results syntax');
 .sub main :main
@@ -226,6 +226,14 @@ pir_output_is( <<'CODE', <<'OUT', 'exit is last op in sub (TT #1009)');
     exit 0
 .end
 CODE
+OUT
+
+pir_error_output_like( <<'CODE', <<'OUT', 'over long keys should not segfault (TT #641)');
+.sub main
+ $P0 = new [0;0;0;0;0;0;0;0;0;0;0;0] # more than KEYLEN.
+.end
+CODE
+/key too complex/
 OUT
 
 # This test probably belongs in subflags.t
