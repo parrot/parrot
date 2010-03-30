@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 PDD 17: Polymorphic Containers
@@ -1656,8 +1656,8 @@ C<ResizablePMCArray>, but that's likely to change.
 =head4 Array types
 
 Note that for the following types you can set the size of the array by using
-the VTABLE_set_integer_native() function. Assigning an integer to the array as a
-whole sets the array to that size.
+the VTABLE_set_integer_native() function. Assigning an integer to the array
+as a whole sets the array to that size.
 
 Size-changing operations (such as push, pop, shift, unshift, and splice)
 on statically-sized arrays will throw an exception.
