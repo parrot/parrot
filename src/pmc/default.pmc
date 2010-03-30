@@ -46,6 +46,15 @@ static void cant_do_write_method(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static PMC* check_get_std_props(PARROT_INTERP,
+    ARGIN(const PMC *self),
+    ARGIN(const STRING *key))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_WARN_UNUSED_RESULT
 static INTVAL check_set_std_props(PARROT_INTERP,
     ARGMOD(PMC *pmc),
     ARGIN(const STRING *key),
@@ -59,12 +68,30 @@ static INTVAL check_set_std_props(PARROT_INTERP,
 static INTVAL has_pending_std_props(ARGIN(const PMC *self))
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static PMC* make_prop_hash(PARROT_INTERP, ARGMOD(PMC *self))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*self);
+
+static void propagate_std_props(PARROT_INTERP,
+    ARGIN(PMC *self),
+    ARGIN(PMC *prop_hash))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 #define ASSERT_ARGS_caller __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_cant_do_method __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_cant_do_write_method __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_check_get_std_props __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(key))
 #define ASSERT_ARGS_check_set_std_props __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc) \
@@ -72,6 +99,13 @@ static INTVAL has_pending_std_props(ARGIN(const PMC *self))
     , PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_has_pending_std_props __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_make_prop_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_propagate_std_props __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(prop_hash))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -193,8 +227,8 @@ check_set_std_props(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const STRING *key), A
 
 /*
 
-=item C<static void
-propagate_std_props(PARROT_INTERP, PMC *self, PMC *prop_hash)>
+=item C<static void propagate_std_props(PARROT_INTERP, PMC *self, PMC
+*prop_hash)>
 
 Set pending standard properties in C<prop_hash>.
 
@@ -203,7 +237,8 @@ Set pending standard properties in C<prop_hash>.
 */
 
 static void
-propagate_std_props(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *prop_hash)) {
+propagate_std_props(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *prop_hash))
+{
     if (self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG)){
         PMC * const pmc_true  = Parrot_pmc_new(interp, enum_class_Integer);
         VTABLE_set_integer_native(interp, pmc_true, 1);
@@ -222,7 +257,8 @@ Returns true if propagate_std_props() would create a non-empty prophash.
 */
 
 static INTVAL
-has_pending_std_props(ARGIN(const PMC *self)) {
+has_pending_std_props(ARGIN(const PMC *self))
+{
     ASSERT_ARGS(has_pending_std_props)
 
     if (self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG))
@@ -234,8 +270,8 @@ has_pending_std_props(ARGIN(const PMC *self)) {
 
 /*
 
-=item C<static PMC*
-check_get_std_props(PARROT_INTERPeter, PMC *self, STRING *key)>
+=item C<static PMC* check_get_std_props(PARROT_INTERP, const PMC *self, const
+STRING *key)>
 
 Checks if we can infer the value of C<key> property from C<self> without
 looking at its prophash. Returns C<PMCNULL> if not, returns the value otherwise.
@@ -246,7 +282,8 @@ looking at its prophash. Returns C<PMCNULL> if not, returns the value otherwise.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC*
-check_get_std_props(PARROT_INTERP, ARGIN(const PMC *self), ARGIN(const STRING *key)) {
+check_get_std_props(PARROT_INTERP, ARGIN(const PMC *self), ARGIN(const STRING *key))
+{
     if ((self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG))
        && Parrot_str_equal(interp, key, CONST_STRING(interp, "_ro"))) {
         PMC * const ret_val  = Parrot_pmc_new(interp, enum_class_Integer);
@@ -269,8 +306,11 @@ C<PMC_metadata(self)>.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static PMC*
-make_prop_hash(PARROT_INTERP, ARGMOD(PMC *self)) {
+make_prop_hash(PARROT_INTERP, ARGMOD(PMC *self))
+{
     PMC * const prop = Parrot_pmc_new(interp, enum_class_Hash);
 
     PMC_metadata(self) = prop;
