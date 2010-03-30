@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 [DRAFT] PDD 8: PMC Keys
@@ -91,9 +91,9 @@ manipulate keys, can be found in F<include/parrot/key.h>
 =head3 Aggregate and non-aggregate PMCs
 
 We've already said that what separates the aggregate PMCs from the
-non-aggregates is their implementation of the C<_keyed> vtable functions. So it
-is Hereby Decreed that the default vtable which everyone inherits from defines
-the C<_keyed> forms to throw an exception.
+non-aggregates is their implementation of the C<_keyed> vtable functions. So
+it is Hereby Decreed that the default vtable which everyone inherits from
+defines the C<_keyed> forms to throw an exception.
 
 =over 3
 
@@ -107,9 +107,9 @@ screw-up, since code which indexes a non-aggregate shouldn't be generated.
 
 =head3 C<_keyed> vtable functions
 
-So what of these magical C<_keyed> vtable functions? They are generated when you
-add the C<keyed> tag to the appropriate entry in F<src/vtable.tbl>. They are
-constructed by following B<every> C<PMC> argument with a second C<PMC>
+So what of these magical C<_keyed> vtable functions? They are generated when
+you add the C<keyed> tag to the appropriate entry in F<src/vtable.tbl>. They
+are constructed by following B<every> C<PMC> argument with a second C<PMC>
 argument which acts as the key for that argument; the name of the second
 C<PMC> argument is formed by adding C<_key> onto the end of the first C<PMC>
 argument.
@@ -123,8 +123,8 @@ and
 
     $a = @b[$c]
 
-use the same vtable function, reducing the multiplicity of methods.  Secondly, a
-three-argument C<assign> as suggested by the code above would be ambiguous -
+use the same vtable function, reducing the multiplicity of methods. Secondly,
+a three-argument C<assign> as suggested by the code above would be ambiguous -
 the code above uses 3 PMCs in different ways.
 
 Also, operations which take an aggregate key for one of their arguments should
