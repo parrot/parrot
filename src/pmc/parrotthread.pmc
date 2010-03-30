@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -91,6 +91,8 @@ static INTVAL
 do_thread_run(PARROT_INTERP, ARGIN(PMC *thread),
                             INTVAL clone_flags, ARGIN(PMC *sub), ARGIN(PMC *args))
 {
+    ASSERT_ARGS(do_thread_run)
+
     const INTVAL tid = VTABLE_get_integer(interp, thread);
 
     if (PMC_IS_NULL(sub)) {
