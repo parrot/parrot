@@ -3836,7 +3836,7 @@ PackFile_Constant *
 PackFile_Constant_new(PARROT_INTERP)
 {
     ASSERT_ARGS(PackFile_Constant_new)
-    PackFile_Constant * const self = mem_gc_allocate_zeroed_typed(interp,
+    PackFile_Constant * const self = mem_gc_allocate_typed(interp,
             PackFile_Constant);
 
     self->type = PFC_NONE;
