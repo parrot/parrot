@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -65,7 +65,7 @@ Marks the object as live.
 */
 
     VTABLE void mark() {
-        Parrot_PackfileRawSegment_attributes * attrs =
+        Parrot_PackfileRawSegment_attributes * const attrs =
                 PARROT_PACKFILERAWSEGMENT(SELF);
 
         Parrot_gc_mark_PMC_alive(interp, attrs->opcodes);
@@ -87,15 +87,16 @@ Initialize PackfileRawSegment from PackFile_Segment
     VTABLE void set_pointer(void * pointer) {
         const PackFile_Segment * const pfseg =
                 (const PackFile_Segment *)pointer;
-        Parrot_PackfileRawSegment_attributes * attrs =
+        Parrot_PackfileRawSegment_attributes * const attrs =
                 PARROT_PACKFILERAWSEGMENT(SELF);
-        PMC * opcodes = attrs->opcodes;
-        size_t i;
+        PMC * const opcodes = attrs->opcodes;
 
         /* Preserve type of unpacked segment */
         attrs->type = pfseg->type;
 
         if (pfseg->size) {
+            size_t i;
+
             /* copy data to own array */
             VTABLE_set_integer_native(interp, opcodes, pfseg->size);
             /* Not very efficient... */
@@ -116,7 +117,7 @@ Initialize PackfileRawSegment from PackFile_Segment
     VTABLE void *get_pointer() {
         PackFile_Segment * pfseg =
                 (PackFile_Segment*)mem_gc_allocate_zeroed_typed(INTERP, PackFile_ByteCode);
-        Parrot_PackfileRawSegment_attributes * attrs =
+        Parrot_PackfileRawSegment_attributes * const attrs =
                 PARROT_PACKFILERAWSEGMENT(SELF);
         PMC * opcodes = attrs->opcodes;
         size_t i;
@@ -203,7 +204,7 @@ TODO: Don't allow create Directory, Annotations, etc segments.
 */
 
     METHOD type(INTVAL type :optional, INTVAL got_type :opt_flag) {
-        Parrot_PackfileRawSegment_attributes * attrs =
+        Parrot_PackfileRawSegment_attributes * const attrs =
                 PARROT_PACKFILERAWSEGMENT(SELF);
         INTVAL res;
 
