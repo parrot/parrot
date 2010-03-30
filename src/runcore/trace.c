@@ -289,7 +289,7 @@ trace_op_dump(PARROT_INTERP,
     sig = NULL; /* silence compiler uninit warning */
 
     s = 1;
-    len = Parrot_io_eprintf(debugger, "%6vu ", (UINTVAL)(pc - code_start));
+    len = Parrot_io_eprintf(debugger, "%04vx ", (UINTVAL)(pc - code_start));
     len += Parrot_io_eprintf(debugger, "%s", info->name);
 
     n = info->op_count;

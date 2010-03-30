@@ -81,8 +81,8 @@ pasm_output_like(
     end
 CODE
 /^ok\s1\n
-(?:\s+8.*)?\n
-(?:\s+10.*)?\n
+(?:0+8.*)?\n
+(?:0+a.*)?\n
 ok\s2\n$/x
 OUTPUT
 
