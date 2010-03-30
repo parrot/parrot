@@ -1666,8 +1666,8 @@ make_writable(PARROT_INTERP, ARGMOD(STRING **s),
 =item C<STRING * Parrot_str_bitwise_and(PARROT_INTERP, const STRING *s1, const
 STRING *s2, STRING **dest)>
 
-Performs a bitwise C<AND> on two Parrot string, performing type and encoding
-conversions if necessary. If the second string is not C<NULL> then it is
+Performs a bitwise C<AND> on two Parrot strings, performing type and encoding
+conversions if necessary. If the third string is not C<NULL> then it is
 reused.  Otherwise a new Parrot string is created.
 
 =cut
@@ -1895,7 +1895,7 @@ Parrot_str_bitwise_or(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
 STRING *s2, STRING **dest)>
 
 Performs a bitwise C<XOR> on two Parrot strings, performing type and encoding
-conversions if necessary. If the second string is not C<NULL>, then it is
+conversions if necessary. If the third string is not C<NULL>, then it is
 reused.  Otherwise a new Parrot string is created.
 
 =cut
