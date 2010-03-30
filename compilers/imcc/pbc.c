@@ -1407,11 +1407,10 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
         /* Check this is a valid vtable function to override. */
         vtable_index = Parrot_get_vtable_index(interp, vtable_name);
 
-        if (vtable_index == -1) {
+        if (vtable_index == -1)
             IMCC_fatal(interp, 1,
-                "'%S' is not a v-table method, but was used with :vtable.\n",
+                "'%S' is not a vtable, but was used with :vtable.\n",
                 vtable_name);
-        }
 
         /* TODO check for duplicates */
         sub->vtable_index = vtable_index;
