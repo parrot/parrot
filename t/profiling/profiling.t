@@ -10,7 +10,7 @@ INIT {
 
 plan(12);
 
-my $pir_code := 
+my $pir_code :=
 '.sub main
   say "what"
 .end';
@@ -30,7 +30,7 @@ ok( $matcher.matches($prof), "profile has a version number");
 #Does the profile have a CLI invocation?
 $matcher := ProfTest::Matcher.new(
     cli()
-); 
+);
 
 ok( $matcher.matches($prof), "profile contains a CLI string");
 
@@ -61,7 +61,7 @@ $matcher := ProfTest::Matcher.new(
     any(:except('cs')),
     op('say'),
 );
- 
+
 ok( $matcher.matches($prof), "profile shows 'say' inside main sub");
 
 
@@ -172,7 +172,7 @@ $prof := ProfTest::NQPProfile.new($nqp_code);
 
 $matcher := ProfTest::Matcher.new(
     cs(:ns('parrot;main') ),
-    any(:except('cs')), 
+    any(:except('cs')),
     op('say'),
 );
 
