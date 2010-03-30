@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 [DRAFT] PDD 6: Parrot Assembly Language (PASM)
@@ -172,8 +172,8 @@ of the form:
 where register_type is 0x100, 0x200, 0x400, or 0x800 for PMC, string, integer,
 or number respectively. So N19 would be 0x413.
 
-B<Note>: Instructions tagged with a * will call a vtable function to handle the
-instruction if used on PMC registers.
+B<Note>: Instructions tagged with a * will call a vtable function to handle
+the instruction if used on PMC registers.
 
 In all cases, the letters x, y, and z refer to register numbers. The letter t
 refers to a generic register (P, S, I, or N). A lowercase p, s, i, or n means
