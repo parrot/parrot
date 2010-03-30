@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -20,21 +20,50 @@ The vtable functions for the native C call functions.
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_IGNORABLE_RESULT
+static nci_thunk_t /*@alt void@*/
+build_func(PARROT_INTERP,
+    ARGMOD(Parrot_NCI_attributes *nci_info))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*nci_info);
+
+static void pcc_params(PARROT_INTERP,
+    ARGIN(STRING *sig),
+    ARGMOD(Parrot_NCI_attributes *nci_info),
+    size_t sig_length)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*nci_info);
+
+#define ASSERT_ARGS_build_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(nci_info))
+#define ASSERT_ARGS_pcc_params __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(sig) \
+    , PARROT_ASSERT_ARG(nci_info))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-void
-pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_info,
+
+static void
+pcc_params(PARROT_INTERP, ARGIN(STRING *sig), ARGMOD(Parrot_NCI_attributes *nci_info),
                 size_t sig_length)
 {
     char    param_buf[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    char   *param_sig    = sig_length <= 7
+    const int do_alloc = (sig_length > 7);
+    char   *param_sig    = !do_alloc
                          ? param_buf
                          : mem_gc_allocate_n_typed(interp, sig_length, char);
     size_t  j            = 0;
     size_t  i;
 
     for (i = 1; i < sig_length; i++) {
-        INTVAL c = Parrot_str_indexed(interp, sig, i);
+        const INTVAL c = Parrot_str_indexed(interp, sig, i);
 
         switch (c) {
           case (INTVAL)'0':    /* null ptr or such - doesn't consume a reg */
@@ -78,7 +107,7 @@ pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_info,
             param_sig[j++] = 'S';
             break;
           default:
-            if (sig_length > 7)
+            if (do_alloc)
                 mem_gc_free(interp, param_sig);
             Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_JIT_ERROR,
@@ -102,13 +131,13 @@ pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_info,
 }
 
 /* actually build the NCI thunk */
-static nci_thunk_t build_func(PARROT_INTERP, PMC *, Parrot_NCI_attributes *);
 
-static
-nci_thunk_t build_func(PARROT_INTERP, PMC *pmc, Parrot_NCI_attributes *nci_info)
+PARROT_IGNORABLE_RESULT
+static nci_thunk_t
+build_func(PARROT_INTERP, ARGMOD(Parrot_NCI_attributes *nci_info))
 {
-    STRING    *key        = nci_info->signature;
-    size_t     key_length = Parrot_str_byte_length(interp, key);
+    STRING * const key      = nci_info->signature;
+    const size_t key_length = Parrot_str_byte_length(interp, key);
 
     pcc_params(interp, key, nci_info, key_length);
 
@@ -210,7 +239,7 @@ Sets the specified function pointer and signature (C<*key>).
         /* ensure that the STRING signature is constant */
         if (!PObj_constant_TEST(key)) {
             char * const key_c      = Parrot_str_to_cstring(INTERP, key);
-            size_t       key_length = Parrot_str_byte_length(interp, key);
+            const size_t key_length = Parrot_str_byte_length(interp, key);
             key                     = string_make(interp, key_c, key_length,
                                         NULL, PObj_constant_FLAG);
             Parrot_str_free_cstring(key_c);
@@ -316,7 +345,7 @@ class, the PMC arguments are shifted down.
 
         if (!func) {
             /* build the thunk only when necessary */
-            func = build_func(interp, SELF, nci_info);
+            func = build_func(interp, nci_info);
 
             if (!func)
                 Parrot_ex_throw_from_c_args(INTERP, NULL,
@@ -356,7 +385,7 @@ Returns the function pointer as an integer.
     VTABLE INTVAL get_integer() {
         Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         if (!nci_info->func)
-            build_func(INTERP, SELF, nci_info);
+            build_func(INTERP, nci_info);
         return (INTVAL)nci_info->func;
     }
 
@@ -390,7 +419,7 @@ Return the arity of the NCI (the number of arguments).
 
         if (nci_info) {
             if (!nci_info->func)
-                build_func(INTERP, SELF, nci_info);
+                build_func(INTERP, nci_info);
             if (nci_info->func) {
                 arity = nci_info->arity;
                 RETURN(INTVAL arity);
