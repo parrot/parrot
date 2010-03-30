@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 39;
+use Test::More tests => 37;
 use Carp;
 use Cwd;
 use File::Copy;
@@ -85,7 +85,6 @@ $step = test_step_constructor_and_description($conf);
 
 $conf->data->set( archname => 'x86_64' );
 $conf->data->set( cc => 'cc' );
-$conf->data->set( cxx => 'c++' );
 $conf->data->set( link => 'cc' );
 $conf->data->set( ld => 'env cc' );
 $conf->data->set( ld_load_flags => '-bundle -L/usr/local/lib64' );
@@ -96,7 +95,6 @@ ok(init::defaults::_64_bit_adjustments($conf),
     "_64_bit_adjustments() returned true");
 is($conf->data->get( 'archname' ), 'i386', "Got expected value for 'archname'");
 is($conf->data->get( 'cc' ), 'cc -m32', "Got expected value for 'cc'");
-is($conf->data->get( 'cxx' ), 'c++ -m32', "Got expected value for 'cxx'");
 is($conf->data->get( 'link' ), 'cc -m32', "Got expected value for 'link'");
 is($conf->data->get( 'ld' ), 'env cc -m32', "Got expected value for 'ld'");
 is($conf->data->get( 'ld_load_flags' ), '-bundle -L/usr/local/lib',
@@ -124,7 +122,6 @@ $step = test_step_constructor_and_description($conf);
 
 $conf->data->set( archname => 'x86_64' );
 $conf->data->set( cc => 'cc' );
-$conf->data->set( cxx => 'c++' );
 $conf->data->set( link => 'cc' );
 $conf->data->set( ld => 'env cc' );
 $conf->data->set( ld_load_flags => '-bundle -L/usr/local/lib64' );
@@ -135,7 +132,6 @@ ok(init::defaults::_64_bit_adjustments($conf),
     "_64_bit_adjustments() returned true");
 is($conf->data->get( 'archname' ), 'x86_64', "Got expected value for 'archname'");
 is($conf->data->get( 'cc' ), 'cc', "Got expected value for 'cc'");
-is($conf->data->get( 'cxx' ), 'c++', "Got expected value for 'cxx'");
 is($conf->data->get( 'link' ), 'cc', "Got expected value for 'link'");
 is($conf->data->get( 'ld' ), 'env cc', "Got expected value for 'ld'");
 is($conf->data->get( 'ld_load_flags' ), '-bundle -L/usr/local/lib64',

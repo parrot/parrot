@@ -56,7 +56,6 @@ foreach my $p (
         linkflags
         ldflags
         libs
-        cxx
     |
     )
 {
