@@ -54,6 +54,8 @@ static void
 pcc_params(PARROT_INTERP, ARGIN(STRING *sig), ARGMOD(Parrot_NCI_attributes *nci_info),
                 size_t sig_length)
 {
+    ASSERT_ARGS(pcc_params)
+
     char    param_buf[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
     const int do_alloc = (sig_length > 7);
     char   *param_sig    = !do_alloc
@@ -136,6 +138,8 @@ PARROT_IGNORABLE_RESULT
 static nci_thunk_t
 build_func(PARROT_INTERP, ARGMOD(Parrot_NCI_attributes *nci_info))
 {
+    ASSERT_ARGS(build_func)
+
     STRING * const key      = nci_info->signature;
     const size_t key_length = Parrot_str_byte_length(interp, key);
 
