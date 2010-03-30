@@ -295,6 +295,11 @@ GEN_LIBRARY = \
 #IF(has_opengl):    $(LIBRARY_DIR)/OpenGL_funcs.pbc \
 #IF(has_opengl):    $(LIBRARY_DIR)/OpenGL/Math.pbc \
     $(LIBRARY_DIR)/P6object.pbc \
+    $(LIBRARY_DIR)/ProfTest.pbc \
+	$(LIBRARY_DIR)/ProfTest/PIRProfile.pir \
+	$(LIBRARY_DIR)/ProfTest/NQPProfile.pir \
+	$(LIBRARY_DIR)/ProfTest/Matcher.pir \
+	$(LIBRARY_DIR)/ProfTest/Want.pir \
     $(LIBRARY_DIR)/parrotlib.pbc \
     $(LIBRARY_DIR)/pcore.pbc \
     $(LIBRARY_DIR)/pcre.pbc \
@@ -1037,6 +1042,46 @@ $(INSTALLABLEPBC_MERGE) : src/pbc_merge$(O) $(LIBPARROT) $(INSTALLABLECONFIG)
     src/install_config$(O) \
     @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+
+#
+# Profiling runcore test supporting code
+#
+
+$(LIBRARY_DIR)/ProfTest.pbc: $(LIBRARY_DIR)/ProfTest/PIRProfile.pbc \
+	$(LIBRARY_DIR)/ProfTest/NQPProfile.pbc $(LIBRARY_DIR)/ProfTest/Matcher.pbc \
+	$(LIBRARY_DIR)/ProfTest/Want.pbc
+	$(PBC_MERGE) -o $@ $(LIBRARY_DIR)/ProfTest/PIRProfile.pbc \
+	$(LIBRARY_DIR)/ProfTest/NQPProfile.pbc $(LIBRARY_DIR)/ProfTest/Matcher.pbc \
+	$(LIBRARY_DIR)/ProfTest/Want.pbc
+
+
+$(LIBRARY_DIR)/ProfTest/PIRProfile.pbc: $(LIBRARY_DIR)/ProfTest/PIRProfile.pir
+	$(PARROT) -o $@ $(LIBRARY_DIR)/ProfTest/PIRProfile.pir
+
+$(LIBRARY_DIR)/ProfTest/PIRProfile.pir: $(LIBRARY_DIR)/ProfTest/PIRProfile.nqp $(NQP_RX)
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/PIRProfile.nqp > $@
+
+
+$(LIBRARY_DIR)/ProfTest/NQPProfile.pbc: $(LIBRARY_DIR)/ProfTest/NQPProfile.pir
+	$(PARROT) -o $@ $(LIBRARY_DIR)/ProfTest/NQPProfile.pir
+
+$(LIBRARY_DIR)/ProfTest/NQPProfile.pir: $(LIBRARY_DIR)/ProfTest/NQPProfile.nqp $(NQP_RX)
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/NQPProfile.nqp > $@
+
+
+$(LIBRARY_DIR)/ProfTest/Want.pbc: $(LIBRARY_DIR)/ProfTest/Want.pir
+	$(PARROT) -o $@ $(LIBRARY_DIR)/ProfTest/Want.pir
+
+$(LIBRARY_DIR)/ProfTest/Want.pir: $(LIBRARY_DIR)/ProfTest/Want.nqp $(NQP_RX)
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/Want.nqp > $@
+
+
+$(LIBRARY_DIR)/ProfTest/Matcher.pbc: $(LIBRARY_DIR)/ProfTest/Matcher.pir
+	$(PARROT) -o $@ $(LIBRARY_DIR)/ProfTest/Matcher.pir
+
+$(LIBRARY_DIR)/ProfTest/Matcher.pir: $(LIBRARY_DIR)/ProfTest/Matcher.nqp $(NQP_RX)
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/Matcher.nqp > $@
+
 
 
 ###############################################################################

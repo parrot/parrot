@@ -86,6 +86,7 @@ our @EXPORT_OK = qw(
     t/compilers/tge/*.t
     t/library/*.t
     t/tools/*.t
+    t/profiling/*.t
 );
 
 # configure tests are tests to be run at the beginning of 'make test';
