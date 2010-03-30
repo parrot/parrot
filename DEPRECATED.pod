@@ -139,6 +139,10 @@ See r43900 and r43904 for details.
 
 Ability to use non-default dynamic loading behaviour.
 
+=item pushaction, pushmark, popmark [eligible in 2.4]
+
+L<https://trac.parrot.org/parrot/ticket/876>
+
 =back
 
 =head1 Bytecode
