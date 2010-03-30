@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -51,6 +51,17 @@ Generic iterator for traversing Hash.
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void advance_to_next(PARROT_INTERP, ARGMOD(PMC *self))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*self);
+
+#define ASSERT_ARGS_advance_to_next __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*
@@ -58,8 +69,10 @@ Generic iterator for traversing Hash.
 Advance to next position. Return found (if any) HashBucket.
 
 */
-static HashBucket*
-advance_to_next(PARROT_INTERP, PMC *self) {
+
+static void
+advance_to_next(PARROT_INTERP, ARGMOD(PMC *self))
+{
     Parrot_HashIterator_attributes * const attrs  = PARROT_HASHITERATOR(self);
     HashBucket                            *bucket = attrs->bucket;
 
@@ -76,7 +89,8 @@ advance_to_next(PARROT_INTERP, PMC *self) {
     }
     attrs->bucket = bucket;
     attrs->elements--;
-    return bucket;
+
+    return;
 }
 
 pmclass HashIterator extends Iterator no_ro auto_attrs {
@@ -129,7 +143,7 @@ Marks the hash as live.
 */
 
     VTABLE void mark() {
-        PMC *hash = PARROT_HASHITERATOR(SELF)->pmc_hash;
+        PMC * const hash = PARROT_HASHITERATOR(SELF)->pmc_hash;
         Parrot_gc_mark_PMC_alive(INTERP, hash);
         /* We don't mark underlying parrot_hash. Hash PMC will mark it */
     }
