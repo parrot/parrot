@@ -46,6 +46,8 @@ Copy attributes from PackFile* to Packfile PMC.
 static void
 copy_packfile_header(PARROT_INTERP, ARGMOD(PMC *self), ARGIN(PackFile *pf))
 {
+    ASSERT_ARGS(copy_packfile_header)
+
     Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(self);
 
     attrs->wordsize         = pf->header->wordsize;
