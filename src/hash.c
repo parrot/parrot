@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -988,13 +988,8 @@ parrot_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_
 
     for (i = 0, --bp; i < N_BUCKETS(INITIAL_BUCKETS); ++i, --bp) {
         bp->next        = hash->free_list;
-        bp->key         = NULL;
-        bp->value       = NULL;
         hash->free_list = bp;
     }
-
-    for (i = 0; i < INITIAL_BUCKETS; ++i)
-        hash->bi[i] = NULL;
 
     return hash;
 }
