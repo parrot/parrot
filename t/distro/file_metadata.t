@@ -32,6 +32,14 @@ Note: These tests would benefit from judicial application of Iterators.
 
 =cut
 
+BEGIN {
+    unless ( -e 'DEVELOPING' ) {
+        plan skip_all => "Don't bother running these in a tarball.";
+        exit(0);
+    }
+}
+
+
 my $cmd = -d '.svn' ? 'svn' : 'svk';
 my @git_svn_metadata;    # set in BEGIN block
 
