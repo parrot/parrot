@@ -464,7 +464,6 @@ compact_pool(PARROT_INTERP,
     mem_pools->header_allocs_since_last_collect = 0;
     mem_pools->gc_collect_runs++;
 
-
     /* Snag a block big enough for everything */
     total_size = pad_pool_size(interp, pool);
     alloc_new_block(interp, mem_pools, total_size, pool, "inside compact");
@@ -506,8 +505,8 @@ compact_pool(PARROT_INTERP,
             (size_t)new_block->start);
 
     /* How much is free. That's the total size minus the amount we used */
-    new_block->free = new_block->size - (new_block->top - new_block->start);
-    mem_pools->memory_collected += (new_block->top - new_block->start);
+    new_block->free = new_block->size - (cur_spot - new_block->start);
+    mem_pools->memory_collected +=      (cur_spot - new_block->start);
 
     free_old_mem_blocks(interp, mem_pools, pool, new_block, total_size);
 
@@ -552,7 +551,7 @@ pad_pool_size(PARROT_INTERP,
     UINTVAL total_size = 0;
 
     while (cur_block) {
-        total_size += cur_block->size - cur_block->free;
+        total_size += (cur_block->size - cur_block->free);
         cur_block   = cur_block->prev;
     }
 
@@ -612,11 +611,10 @@ move_one_buffer(PARROT_INTERP, ARGMOD(Buffer *old_buf), ARGMOD(char *new_pool_pt
         }
 
         /* buffer has already been moved; just change the header */
-        if (PObj_COW_TEST(old_buf) &&
-            (ref_count && *ref_count & Buffer_moved_FLAG)) {
+        if (PObj_COW_TEST(old_buf)
+        && (ref_count && *ref_count & Buffer_moved_FLAG)) {
             /* Find out who else references our data */
             Buffer * const hdr = *((Buffer **)Buffer_bufstart(old_buf));
-
 
             PARROT_ASSERT(PObj_is_COWable_TEST(old_buf));
 
@@ -630,10 +628,9 @@ move_one_buffer(PARROT_INTERP, ARGMOD(Buffer *old_buf), ARGMOD(char *new_pool_pt
             /* And if we're a string, update strstart */
             /* Somewhat of a hack, but if we get per-pool
              * collections, it should help ease the pain */
-            if (PObj_is_string_TEST(old_buf)) {
-                ((STRING *)old_buf)->strstart = (char *)Buffer_bufstart(old_buf) +
-                        offset;
-            }
+            if (PObj_is_string_TEST(old_buf))
+                ((STRING *)old_buf)->strstart =
+                    (char *)Buffer_bufstart(old_buf) + offset;
         }
         else {
             new_pool_ptr = aligned_mem(old_buf, new_pool_ptr);
@@ -644,7 +641,8 @@ move_one_buffer(PARROT_INTERP, ARGMOD(Buffer *old_buf), ARGMOD(char *new_pool_pt
             }
 
             /* Copy our memory to the new pool */
-            memcpy(new_pool_ptr, Buffer_bufstart(old_buf), Buffer_buflen(old_buf));
+            memcpy(new_pool_ptr, Buffer_bufstart(old_buf),
+                                 Buffer_buflen(old_buf));
 
             /* If we're COW */
             if (PObj_COW_TEST(old_buf)) {
@@ -666,10 +664,9 @@ move_one_buffer(PARROT_INTERP, ARGMOD(Buffer *old_buf), ARGMOD(char *new_pool_pt
 
             Buffer_bufstart(old_buf) = new_pool_ptr;
 
-            if (PObj_is_string_TEST(old_buf)) {
-                ((STRING *)old_buf)->strstart = (char *)Buffer_bufstart(old_buf) +
-                        offset;
-            }
+            if (PObj_is_string_TEST(old_buf))
+                ((STRING *)old_buf)->strstart =
+                     (char *)Buffer_bufstart(old_buf) + offset;
 
             new_pool_ptr += Buffer_buflen(old_buf);
         }
@@ -761,8 +758,8 @@ aligned_mem(ARGIN(const Buffer *buffer), ARGIN(char *mem))
     else
         mem = (char*)(((unsigned long)(mem + WORD_ALIGN_1)) & WORD_ALIGN_MASK);
 #endif
-    mem += sizeof (void*);
-    mem = (char*)(((unsigned long)(mem + WORD_ALIGN_1)) & WORD_ALIGN_MASK);
+    mem += sizeof (void *);
+    mem  = (char *)(((unsigned long)(mem + WORD_ALIGN_1)) & WORD_ALIGN_MASK);
 
     return mem;
 }
@@ -784,8 +781,9 @@ size_t
 aligned_string_size(size_t len)
 {
     ASSERT_ARGS(aligned_string_size)
+
     len += sizeof (void *);
-    len = (len + WORD_ALIGN_1) & WORD_ALIGN_MASK;
+    len  = (len + WORD_ALIGN_1) & WORD_ALIGN_MASK;
     return len;
 }
 

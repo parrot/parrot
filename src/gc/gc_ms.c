@@ -493,8 +493,8 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
         /* We've done the mark, now do the sweep. Pass the sweep callback
            function to the PMC pool and all the sized pools. */
-        header_pools_iterate_callback(interp, interp->mem_pools, POOL_BUFFER | POOL_PMC,
-            (void*)&total_free, gc_ms_sweep_cb);
+       header_pools_iterate_callback(interp, interp->mem_pools,
+            POOL_BUFFER | POOL_PMC, (void *)&total_free, gc_ms_sweep_cb);
 
     }
     else {
@@ -834,18 +834,13 @@ gc_ms_allocate_buffer_storage(PARROT_INTERP,
     ARGOUT(Buffer *buffer), size_t size)
 {
     ASSERT_ARGS(gc_ms_allocate_buffer_storage)
-    size_t new_size;
-    char *mem;
+    const size_t new_size   = aligned_string_size(size);
+    const char * const mem  = aligned_mem(buffer,
+        (char *)mem_allocate(interp,
+        interp->mem_pools, new_size, interp->mem_pools->memory_pool));
 
-    Buffer_buflen(buffer) = 0;
-    Buffer_bufstart(buffer) = NULL;
-    new_size = aligned_string_size(size);
-    mem = (char *)mem_allocate(interp, interp->mem_pools, new_size,
-        interp->mem_pools->memory_pool);
-    mem = aligned_mem(buffer, mem);
     Buffer_bufstart(buffer) = mem;
-    new_size -= sizeof (void*);
-    Buffer_buflen(buffer) = new_size;
+    Buffer_buflen(buffer)   = new_size - sizeof (void *);
 }
 
 /*
@@ -893,7 +888,7 @@ gc_ms_reallocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer),
     &&  (pool->top_block->top  == (char *)Buffer_bufstart(buffer) + old_size)) {
         pool->top_block->free -= needed;
         pool->top_block->top  += needed;
-        Buffer_buflen(buffer) = newsize;
+        Buffer_buflen(buffer)  = newsize;
         return;
     }
 
@@ -954,10 +949,10 @@ gc_ms_allocate_string_storage(PARROT_INTERP, ARGOUT(STRING *str),
 
     new_size = aligned_string_size(size);
     mem      = (char *)mem_allocate(interp, interp->mem_pools, new_size, pool);
-    mem     += sizeof (void*);
+    mem     += sizeof (void *);
 
     Buffer_bufstart(str) = str->strstart = mem;
-    Buffer_buflen(str)   = new_size - sizeof (void*);
+    Buffer_buflen(str)   = new_size - sizeof (void *);
 }
 
 /*
@@ -1004,7 +999,7 @@ gc_ms_reallocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str),
     &&  pool->top_block->top  == (char *)Buffer_bufstart(str) + old_size) {
         pool->top_block->free -= needed;
         pool->top_block->top  += needed;
-        Buffer_buflen(str) = new_size - sizeof (void*);
+        Buffer_buflen(str) = new_size - sizeof (void *);
         return;
     }
 
@@ -1025,7 +1020,7 @@ gc_ms_reallocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str),
     oldmem             = str->strstart;
     Buffer_bufstart(str) = (void *)mem;
     str->strstart      = mem;
-    Buffer_buflen(str)   = new_size - sizeof (void*);
+    Buffer_buflen(str)   = new_size - sizeof (void *);
 
     /* We shouldn't ever have a 0 from size, but we do. If we can track down
      * those bugs, this can be removed which would make things cheaper */
