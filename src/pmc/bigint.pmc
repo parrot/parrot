@@ -387,6 +387,8 @@ static void int_check_divide_zero(PARROT_INTERP, INTVAL value)
 static void
 bigint_init(PARROT_INTERP, ARGIN(PMC *self))
 {
+    ASSERT_ARGS(bigint_init)
+
     BIGINT * const bi = mem_gc_allocate_zeroed_typed(interp, BIGINT);
     SETATTR_BigInt_bi(interp, self, bi);
     mpz_init(bi->b);
@@ -486,6 +488,8 @@ PARROT_WARN_UNUSED_RESULT
 static int
 bigint_get_bool(PARROT_INTERP, ARGIN(PMC *self))
 {
+    ASSERT_ARGS(bigint_get_bool)
+
     BIGINT *bi;
     GETATTR_BigInt_bi(interp, self, bi);
     if (mpz_sgn(bi->b) != 0)
@@ -619,6 +623,8 @@ int_check_divide_zero(PARROT_INTERP, INTVAL value)
 static void
 bigint_check_divide_zero(PARROT_INTERP, ARGIN(PMC *value))
 {
+    ASSERT_ARGS(bigint_check_divide_zero)
+
     /* Throw an exception if we are dividing by zero. */
     BIGINT *bi;
     GETATTR_BigInt_bi(interp, value, bi);
