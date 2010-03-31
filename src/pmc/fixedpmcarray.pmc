@@ -91,20 +91,13 @@ Initializes the array.
 */
 
     VTABLE void init_int(INTVAL size) {
-        PMC **data;
-        int i;
-
         if (size < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     _("FixedPMCArray: Cannot set array size to a negative number (%d)"), size);
 
-        SET_ATTR_size(INTERP, SELF, size);
-        data           = mem_gc_allocate_n_typed(INTERP, size, PMC *);
+        SELF.set_integer_native(size);
 
-        for (i = 0; i < size; i++)
-            data[i] = PMCNULL;
-
-        PObj_custom_destroy_SET(SELF);
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 
 /*
