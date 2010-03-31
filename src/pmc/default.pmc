@@ -315,6 +315,8 @@ PARROT_WARN_UNUSED_RESULT
 static PMC*
 make_prop_hash(PARROT_INTERP, ARGMOD(PMC *self))
 {
+    ASSERT_ARGS(make_prop_hash)
+
     PMC * const prop = Parrot_pmc_new(interp, enum_class_Hash);
 
     PMC_metadata(self) = prop;
