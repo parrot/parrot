@@ -777,7 +777,12 @@ Parrot_str_new_constant(PARROT_INTERP, ARGIN(const char *buffer))
 }
 
 /*
-=item C<Parrot_str_new_constant>
+=item C<STRING * Parrot_str_new_constant_ex(PARROT_INTERP, const char *buffer,
+UINTVAL len, const ENCODING *encoding, const CHARSET *charset, UINTVAL flags)>
+
+Creates and returns a constant Parrot string.
+
+Use AVL tree for cache.
 
 =cut
 */
