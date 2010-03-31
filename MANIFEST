@@ -1003,6 +1003,7 @@ include/parrot/atomic/fallback.h                            [main]include
 include/parrot/atomic/gcc_pcc.h                             [main]include
 include/parrot/atomic/gcc_x86.h                             [main]include
 include/parrot/atomic/sparc.h                               [main]include
+include/parrot/avl_tree.h                                   [main]include
 include/parrot/caches.h                                     [main]include
 include/parrot/call.h                                       [main]include
 include/parrot/cclass.h                                     [main]include
