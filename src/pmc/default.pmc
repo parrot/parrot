@@ -239,6 +239,8 @@ Set pending standard properties in C<prop_hash>.
 static void
 propagate_std_props(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *prop_hash))
 {
+    ASSERT_ARGS(propagate_std_props)
+
     if (self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG)){
         PMC * const pmc_true  = Parrot_pmc_new(interp, enum_class_Integer);
         VTABLE_set_integer_native(interp, pmc_true, 1);
@@ -284,6 +286,8 @@ PARROT_CAN_RETURN_NULL
 static PMC*
 check_get_std_props(PARROT_INTERP, ARGIN(const PMC *self), ARGIN(const STRING *key))
 {
+    ASSERT_ARGS(check_get_std_props)
+
     if ((self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG))
        && Parrot_str_equal(interp, key, CONST_STRING(interp, "_ro"))) {
         PMC * const ret_val  = Parrot_pmc_new(interp, enum_class_Integer);
