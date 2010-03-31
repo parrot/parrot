@@ -1,6 +1,6 @@
-##! perl
+#! perl
 # $Id$
-# Copyright (C) 2006-2009, Parrot Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -40,7 +40,7 @@ tools/dev/mk_manifest_and_skip.pl - Recreate MANIFEST and MANIFEST.SKIP
 
 Recreates MANIFEST and MANIFEST.SKIP from the subversion properties
 and the output of C<svn status>. .
-So far tested with svn 1.2.0 and svn 1.4.2. 
+So far tested with svn 1.2.0 and svn 1.4.2.
 
 This won't work for git-svn.
 
