@@ -1313,6 +1313,7 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
     opcode_t  charset_nr = PF_fetch_opcode(pf, cursor);
     size_t    size       = (size_t)PF_fetch_opcode(pf, cursor);
     const int wordsize   = pf ? pf->header->wordsize : sizeof (opcode_t);
+    const CHARSET *charset;
 
     /* don't let PBC mess our internals - only constant or not */
     flags      &= (PObj_constant_FLAG | PObj_private7_FLAG);
@@ -1321,8 +1322,13 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
     TRACE_PRINTF(("charset_nr=%ld, ", charset_nr));
     TRACE_PRINTF(("size=%ld.\n", size));
 
-    s            = string_make_from_charset(interp, (const char *)*cursor,
-                        size, charset_nr, flags);
+    charset = Parrot_get_charset(interp, charset_nr);
+    if (!charset)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+            "Invalid charset number '%d' specified", charset_nr);
+
+    s = Parrot_str_new_constant_ex(interp, (const char *)*cursor, size,
+            charset->preferred_encoding, charset, flags);
 
     /* print only printable characters */
     TRACE_PRINTF_VAL(("PF_fetch_string(): string is '%s' at 0x%x\n",
