@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -145,6 +145,10 @@ my @permitted_duplicate_copyright_files = (
     {
         file    => 'examples/pir/quine_ord.pir',
         reason  => 'quine',
+    },
+    {
+        file    => 'include/parrot/avl_tree.h',
+        reason  => 'copyright for use permission',
     },
 );
 my $cwd = cwd();
