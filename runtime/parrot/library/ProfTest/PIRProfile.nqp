@@ -32,7 +32,7 @@ method build_profile_array() {
         rule variable_line { <line_type> ':' <variable_data>* }
         rule variable_data { '{x{' <field_name> ':' <field_data> '}x}' }
         rule field_name    { <.ident> }
-        #XXX: really need to find something better 
+        #XXX(cotto): really need to find something better 
         rule field_data    { <[a..zA..Z0..9_\-;\/.]>* }
     }
 
@@ -46,14 +46,16 @@ method build_profile_array() {
 
 method build_pir_profile() {
 
-    my $tmp_pir := '/tmp/test.pir';
-    my $tmp_pprof := '/tmp/test.pprof';
+    my %config    := self.get_config();
+    #XXX(cotto) use a random filename (requires randomness from pir)
+    my $tmp_pir   := %config<tempdir> ~ %config<slash> ~ 'test.pir';
+    my $tmp_pprof := %config<tempdir> ~ %config<slash> ~ 'test.pprof';
+
     my $fh := pir::new__p_sc('FileHandle');
     $fh.open($tmp_pir, "w");
     $fh.puts(self<pir_code>);
     $fh.close();
 
-    my %config := self.get_config();
     my $parrot_exe := %config<prefix> ~ %config<slash> ~ %config<test_prog>;
     my $hash_seed_opt := '';
 
