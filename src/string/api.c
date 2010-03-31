@@ -723,9 +723,21 @@ string_node_compare(ARGIN(AVLStringNode *lhs), ARGIN(AVLStringNode *rhs))
         return -1;
     else if (lhs->length > rhs->length)
         return 1;
-    /* TODO Check encoding and charset */
 
-    return strcmp(lhs->str, rhs->str);
+    /* Use pointer comparision here. encoding and charset are singletons */
+    if (lhs->encoding < rhs->encoding)
+        return -1;
+    else if (lhs->encoding > rhs->encoding)
+        return 1;
+
+    if (lhs->charset < rhs->charset)
+        return -1;
+    else if (lhs->charset > rhs->charset)
+        return 1;
+
+    /* At this point strings are in same encoding with same charset */
+    /* Just use memcmp */
+    return memcmp(lhs->str, rhs->str, lhs->length);
 }
 
 typedef TREE_HEAD(_Tree, avl_string_node_t) ConstStringTree;
