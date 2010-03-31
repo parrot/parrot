@@ -68,7 +68,7 @@ sub new {
     my %data = (
         id         => '$' . 'Id$',
         time       => scalar gmtime,
-        cmd        => -d '.svn' ? 'svn' : 'svk',
+        cmd        => 'svn',
         script     => $argsref->{script},
         file       => $argsref->{file}      ? $argsref->{file}      : q{MANIFEST},
         skip       => $argsref->{skip}      ? $argsref->{skip}      : q{MANIFEST.SKIP},
