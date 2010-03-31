@@ -73,6 +73,8 @@ Advance to next position. Return found (if any) HashBucket.
 static void
 advance_to_next(PARROT_INTERP, ARGMOD(PMC *self))
 {
+    ASSERT_ARGS(advance_to_next)
+
     Parrot_HashIterator_attributes * const attrs  = PARROT_HASHITERATOR(self);
     HashBucket                            *bucket = attrs->bucket;
 
