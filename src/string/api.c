@@ -791,6 +791,9 @@ Parrot_str_new_constant_ex(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINT
 {
     ASSERT_ARGS(Parrot_str_new_constant_ex)
     ConstStringTree *tree = interp->const_string_cache;
+    /* We should always allocate new constant string from root interpret */
+    /* Otherwise string will be destroyed */
+    Parrot_Interp    root_interp;
 
     /* Lookup old value */
     AVLStringNode node = {
@@ -806,20 +809,24 @@ Parrot_str_new_constant_ex(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINT
     if (vv)
         return vv->value;
 
+    root_interp = interp;
+    while (root_interp->parent_interpreter)
+        root_interp = root_interp->parent_interpreter;
+
     /* Not found. Allocate new node and insert */
-    vv = (AVLStringNode*)Parrot_gc_allocate_fixed_size_storage(interp,
+    vv = (AVLStringNode*)Parrot_gc_allocate_fixed_size_storage(root_interp,
             sizeof (AVLStringNode));
     memset(vv, 0, sizeof (AVLStringNode));
 
     /* Fill it */
-    vv->str      = node.str;
     vv->length   = node.length;
     vv->encoding = node.encoding;
     vv->charset  = node.charset;
 
-    vv->value = Parrot_str_new_init(interp, buffer, len,
+    vv->value = Parrot_str_new_init(root_interp, buffer, len,
                        encoding, charset,
                        flags|PObj_constant_FLAG);
+    vv->str      = vv->value->strstart;
 
     TREE_INSERT(tree, avl_string_node_t, tree, vv);
 
