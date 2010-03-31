@@ -194,6 +194,13 @@ parrot_init_library_paths(PARROT_INTERP)
     paths = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
     VTABLE_set_pmc_keyed_int(interp, lib_paths,
             PARROT_LIB_PATH_INCLUDE, paths);
+    { /* EXPERIMENTAL: add include path from environment */
+        const char *envvar = Parrot_getenv(interp, Parrot_str_new_constant(interp, "PARROT_INCLUDE"));
+        if (envvar != NULL  && envvar[0]) {
+            entry = Parrot_str_new(interp, envvar, 0);
+            VTABLE_push_string(interp, paths, entry);
+        }
+    }
     if (!STRING_IS_NULL(builddir)) {
         entry = Parrot_str_concat(interp, builddir, CONST_STRING(interp, "/"), 0);
         VTABLE_push_string(interp, paths, entry);
@@ -207,11 +214,17 @@ parrot_init_library_paths(PARROT_INTERP)
         VTABLE_push_string(interp, paths, entry);
     }
 
-
     /* define library paths */
     paths = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
     VTABLE_set_pmc_keyed_int(interp, lib_paths,
             PARROT_LIB_PATH_LIBRARY, paths);
+    { /* EXPERIMENTAL: add library path from environment */
+        const char *envvar = Parrot_getenv(interp, Parrot_str_new_constant(interp, "PARROT_LIBRARY"));
+        if (envvar != NULL && envvar[0]) {
+            entry = Parrot_str_new(interp, envvar, 0);
+            VTABLE_push_string(interp, paths, entry);
+        }
+    }
     if (!STRING_IS_NULL(builddir)) {
         entry = Parrot_str_concat(interp, builddir, CONST_STRING(interp, "/runtime/parrot/library/"), 0);
         VTABLE_push_string(interp, paths, entry);
