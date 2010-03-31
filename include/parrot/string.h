@@ -20,6 +20,7 @@
 
 #include "parrot/pobj.h"
 #include "parrot/parrot.h"
+#include "parrot/avl_tree.h"
 
 typedef struct parrot_string_t STRING;
 
@@ -52,6 +53,25 @@ typedef struct string_iterator_t {
 #define STRINGINFO_STRLEN   6
 
 /* &end_gen */
+
+
+typedef struct avl_string_node_t AVLStringNode;
+
+/* AVL node. */
+/* We duplicate valuable information to avoid messing with STRING
+ * and simplify lookups */
+struct avl_string_node_t
+{
+    const char *      str;
+    size_t            length;
+    struct _encoding *encoding;
+    struct _charset  *charset;
+
+    STRING                  *value;
+
+    TREE_ENTRY(avl_string_node_t)   tree;
+};
+
 
 #endif /* PARROT_IN_CORE */
 #endif /* PARROT_STRING_H_GUARD */

@@ -713,6 +713,22 @@ string_primary_encoding_for_representation(PARROT_INTERP,
         "invalid string representation");
 }
 
+static int
+string_node_compare(AVLStringNode *lhs, AVLStringNode *rhs)
+{
+    if (lhs->length < rhs->length)
+        return -1;
+    else if (lhs->length > rhs->length)
+        return 1;
+    /* TODO Check encoding and charset */
+
+    return strcmp(lhs->str, rhs->str);
+}
+
+typedef TREE_HEAD(_Tree, avl_string_node_t) ConstStringTree;
+TREE_DEFINE(avl_string_node_t, tree);
+
+
 /*
 
 =item C<STRING * Parrot_str_new_constant(PARROT_INTERP, const char *buffer)>
@@ -731,22 +747,36 @@ Parrot_str_new_constant(PARROT_INTERP, ARGIN(const char *buffer))
 {
     ASSERT_ARGS(Parrot_str_new_constant)
     DECL_CONST_CAST;
-    STRING *s;
-    Hash   * const cstring_cache = (Hash *)interp->const_cstring_hash;
 
-    s = (STRING *)parrot_hash_get(interp, cstring_cache, buffer);
+    static ConstStringTree tree = TREE_INITIALIZER(string_node_compare);
 
-    if (s)
-        return s;
+    /* Lookup old value */
+    AVLStringNode node = {
+        buffer,
+        strlen(buffer),
+        NULL, NULL, NULL
+    };
 
-    s = Parrot_str_new_init(interp, buffer, strlen(buffer),
+    AVLStringNode *vv = TREE_FIND(&tree, avl_string_node_t, tree, &node);
+    if (vv)
+        return vv->value;
+
+    /* Not found. Allocate new node and insert */
+    vv = mem_gc_allocate_zeroed_typed(interp, AVLStringNode);
+
+    /* Fill it */
+    vv->str      = node.str;
+    vv->length   = node.length;
+    vv->encoding = node.encoding;
+    vv->charset  = node.charset;
+
+    vv->value = Parrot_str_new_init(interp, buffer, strlen(buffer),
                        PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
                        PObj_external_FLAG|PObj_constant_FLAG);
 
-    parrot_hash_put(interp, cstring_cache,
-        PARROT_const_cast(char *, buffer), (void *)s);
+    TREE_INSERT(&tree, avl_string_node_t, tree, vv);
 
-    return s;
+    return vv->value;
 }
 
 
