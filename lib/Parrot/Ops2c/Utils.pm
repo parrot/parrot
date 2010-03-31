@@ -893,8 +893,8 @@ typedef struct hop {
 static HOP **hop;
 
 static void hop_init(PARROT_INTERP);
-static size_t hash_str(const char *str);
-static void store_op(PARROT_INTERP, op_info_t *info, int full);
+static size_t hash_str(ARGIN_NULLOK(const char *str));
+static void store_op(PARROT_INTERP, ARGIN(op_info_t *info), int full);
 
 /* XXX on changing interpreters, this should be called,
    through a hook */
@@ -911,7 +911,8 @@ static void hop_deinit(PARROT_INTERP);
  * returns >= 0 (found idx into info_table), -1 if not
  */
 
-static size_t hash_str(const char *str) {
+static size_t hash_str(ARGIN_NULLOK(const char *str))
+{
     size_t      key = 0;
     const char *s   = str;
 
@@ -923,7 +924,8 @@ static size_t hash_str(const char *str) {
     return key;
 }
 
-static void store_op(PARROT_INTERP, op_info_t *info, int full) {
+static void store_op(PARROT_INTERP, ARGIN(op_info_t *info), int full)
+{
     HOP * const p     = mem_gc_allocate_zeroed_typed(interp, HOP);
     const size_t hidx =
         hash_str(full ? info->full_name : info->name) % OP_HASH_SIZE;
@@ -945,7 +947,8 @@ static int get_op(PARROT_INTERP, const char * name, int full) {
     }
     return -1;
 }
-static void hop_init(PARROT_INTERP) {
+static void hop_init(PARROT_INTERP)
+{
     size_t i;
     op_info_t * const info = $self->{bs}op_lib.op_info_table;
     /* store full names */
