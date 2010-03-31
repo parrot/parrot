@@ -72,6 +72,7 @@ struct avl_string_node_t
     TREE_ENTRY(avl_string_node_t)   tree;
 };
 
+typedef TREE_HEAD(_Tree, avl_string_node_t) ConstStringTree;
 
 #endif /* PARROT_IN_CORE */
 #endif /* PARROT_STRING_H_GUARD */

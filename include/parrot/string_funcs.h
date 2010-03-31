@@ -575,6 +575,12 @@ STRING* Parrot_str_from_uint(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*tc);
 
+int Parrot_str_string_node_compare(
+    ARGIN(AVLStringNode *lhs),
+    ARGIN(AVLStringNode *rhs))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 #define ASSERT_ARGS_Parrot_str_append __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_str_bitwise_and __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -750,6 +756,10 @@ STRING* Parrot_str_from_uint(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_str_from_uint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(tc))
+#define ASSERT_ARGS_Parrot_str_string_node_compare \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lhs) \
+    , PARROT_ASSERT_ARG(rhs))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/string/api.c */
 
