@@ -211,7 +211,7 @@ static void
 parrot_global_setup_2(PARROT_INTERP)
 {
     ASSERT_ARGS(parrot_global_setup_2)
-    PMC *classname_hash, *iglobals;
+    PMC *classname_hash;
     int  i;
 
     create_initial_context(interp);
@@ -228,13 +228,8 @@ parrot_global_setup_2(PARROT_INTERP)
     Parrot_register_core_pmcs(interp, classname_hash);
 
     /* init the interpreter globals array */
-    iglobals         = Parrot_pmc_new(interp, enum_class_FixedPMCArray);
-    interp->iglobals = iglobals;
-    VTABLE_set_integer_native(interp, iglobals, (INTVAL)IGLOBALS_SIZE);
-
-    /* clear the array */
-    for (i = 0; i < (INTVAL)IGLOBALS_SIZE; i++)
-        VTABLE_set_pmc_keyed_int(interp, iglobals, i, NULL);
+    interp->iglobals = Parrot_pmc_new_init_int(interp,
+            enum_class_FixedPMCArray, (INTVAL)IGLOBALS_SIZE);
 }
 
 /*
