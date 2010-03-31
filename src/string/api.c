@@ -305,14 +305,18 @@ Parrot_str_init(PARROT_INTERP)
     if (interp->parent_interpreter) {
         interp->const_cstring_table =
             interp->parent_interpreter->const_cstring_table;
-        interp->const_cstring_hash  =
-            interp->parent_interpreter->const_cstring_hash;
+        interp->const_string_cache  =
+            interp->parent_interpreter->const_string_cache;
         return;
     }
 
     /* Set up the cstring cache, then load the basic encodings and charsets */
-    const_cstring_hash          = parrot_new_cstring_hash(interp);
-    interp->const_cstring_hash  = const_cstring_hash;
+    interp->const_string_cache  =
+            (ConstStringTree*)Parrot_gc_allocate_fixed_size_storage(interp,
+                sizeof (ConstStringTree));
+    interp->const_string_cache->th_root = 0;
+    interp->const_string_cache->th_cmp  = Parrot_str_string_node_compare;
+
     Parrot_charsets_encodings_init(interp);
 
     /* initialize STRINGNULL, but not in the constant table */
@@ -326,13 +330,11 @@ Parrot_str_init(PARROT_INTERP)
     for (i = 0; i < n_parrot_cstrings; ++i) {
         DECL_CONST_CAST;
         STRING * const s =
-            Parrot_str_new_init(interp,
+            Parrot_str_new_constant_ex(interp,
                 parrot_cstrings[i].string,
                 parrot_cstrings[i].len,
                 PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
                 PObj_external_FLAG|PObj_constant_FLAG);
-        parrot_hash_put(interp, const_cstring_hash,
-            PARROT_const_cast(char *, parrot_cstrings[i].string), (void *)s);
         interp->const_cstring_table[i] = s;
     }
 }
@@ -357,7 +359,9 @@ Parrot_str_finish(PARROT_INTERP)
         mem_internal_free(interp->const_cstring_table);
         interp->const_cstring_table = NULL;
         Parrot_charsets_encodings_deinit(interp);
-        parrot_hash_destroy(interp, interp->const_cstring_hash);
+        /* Don't deallocate const_string_cache. */
+        /* It's allocated from Fixed Size Allocator and will be cleaned */
+        /* automatically. */
     }
 }
 
@@ -786,7 +790,7 @@ Parrot_str_new_constant_ex(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINT
         ARGIN(const ENCODING *encoding), ARGIN(const CHARSET *charset), UINTVAL flags)
 {
     ASSERT_ARGS(Parrot_str_new_constant_ex)
-    static ConstStringTree tree = TREE_INITIALIZER(Parrot_str_string_node_compare);
+    ConstStringTree *tree = interp->const_string_cache;
 
     /* Lookup old value */
     AVLStringNode node = {
@@ -794,10 +798,11 @@ Parrot_str_new_constant_ex(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINT
         len,
         encoding,
         charset,
-        NULL
+        NULL,
+        { NULL, NULL, 0 }
     };
 
-    AVLStringNode *vv = TREE_FIND(&tree, avl_string_node_t, tree, &node);
+    AVLStringNode *vv = TREE_FIND(tree, avl_string_node_t, tree, &node);
     if (vv)
         return vv->value;
 
@@ -816,7 +821,7 @@ Parrot_str_new_constant_ex(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINT
                        encoding, charset,
                        flags|PObj_constant_FLAG);
 
-    TREE_INSERT(&tree, avl_string_node_t, tree, vv);
+    TREE_INSERT(tree, avl_string_node_t, tree, vv);
 
     return vv->value;
 }
