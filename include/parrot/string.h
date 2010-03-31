@@ -62,10 +62,10 @@ typedef struct avl_string_node_t AVLStringNode;
  * and simplify lookups */
 struct avl_string_node_t
 {
-    const char *      str;
-    size_t            length;
-    struct _encoding *encoding;
-    struct _charset  *charset;
+    const char              *str;
+    size_t                   length;
+    const struct _encoding  *encoding;
+    const struct _charset   *charset;
 
     STRING                  *value;
 

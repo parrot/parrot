@@ -49,6 +49,7 @@ static void make_writable(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*s);
 
+static int string_node_compare(AVLStringNode *lhs, AVLStringNode *rhs);
 PARROT_INLINE
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -64,6 +65,7 @@ static const CHARSET * string_rep_compatible(SHIM_INTERP,
 #define ASSERT_ARGS_make_writable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_string_node_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_string_rep_compatible __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(a) \
     , PARROT_ASSERT_ARG(b) \
@@ -714,8 +716,9 @@ string_primary_encoding_for_representation(PARROT_INTERP,
 }
 
 static int
-string_node_compare(AVLStringNode *lhs, AVLStringNode *rhs)
+string_node_compare(ARGIN(AVLStringNode *lhs), ARGIN(AVLStringNode *rhs))
 {
+    ASSERT_ARGS(string_node_compare)
     if (lhs->length < rhs->length)
         return -1;
     else if (lhs->length > rhs->length)
@@ -746,15 +749,34 @@ STRING *
 Parrot_str_new_constant(PARROT_INTERP, ARGIN(const char *buffer))
 {
     ASSERT_ARGS(Parrot_str_new_constant)
-    DECL_CONST_CAST;
+    return Parrot_str_new_constant_ex(interp, buffer, strlen(buffer),
+            PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+            PObj_external_FLAG);
+}
 
+/*
+=item C<Parrot_str_new_constant>
+
+=cut
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_str_new_constant_ex(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len,
+        ARGIN(const ENCODING *encoding), ARGIN(const CHARSET *charset), UINTVAL flags)
+{
+    ASSERT_ARGS(Parrot_str_new_constant_ex)
     static ConstStringTree tree = TREE_INITIALIZER(string_node_compare);
 
     /* Lookup old value */
     AVLStringNode node = {
         buffer,
-        strlen(buffer),
-        NULL, NULL, NULL
+        len,
+        encoding,
+        charset,
+        NULL
     };
 
     AVLStringNode *vv = TREE_FIND(&tree, avl_string_node_t, tree, &node);
@@ -770,9 +792,9 @@ Parrot_str_new_constant(PARROT_INTERP, ARGIN(const char *buffer))
     vv->encoding = node.encoding;
     vv->charset  = node.charset;
 
-    vv->value = Parrot_str_new_init(interp, buffer, strlen(buffer),
-                       PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
-                       PObj_external_FLAG|PObj_constant_FLAG);
+    vv->value = Parrot_str_new_init(interp, buffer, len,
+                       encoding, charset,
+                       flags|PObj_constant_FLAG);
 
     TREE_INSERT(&tree, avl_string_node_t, tree, vv);
 
