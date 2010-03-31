@@ -1285,7 +1285,7 @@ src/sub$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/oplib/ops.h \
 	include/pmc/pmc_sub.h include/pmc/pmc_continuation.h
 
 src/string/api$(O) : $(PARROT_H_HEADERS) src/string/api.str \
-        src/string/private_cstring.h
+        src/string/private_cstring.h include/parrot/avl_tree.h
 
 src/string/primitives$(O) : $(PARROT_H_HEADERS)
 
