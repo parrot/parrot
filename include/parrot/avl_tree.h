@@ -60,9 +60,9 @@
 
 #define TREE_INITIALIZER(cmp) { 0, cmp }
 
-#define TREE_DELTA(self, field)                                                         \
-  (( (((self)->field.avl_left)  ? (self)->field.avl_left->field.avl_height  : 0))       \
-   - (((self)->field.avl_right) ? (self)->field.avl_right->field.avl_height : 0))
+#define TREE_DELTA(self, field)                                                 \
+  (((self)->field.avl_left  ? (self)->field.avl_left->field.avl_height  : 0)    \
+  -((self)->field.avl_right ? (self)->field.avl_right->field.avl_height : 0))
 
 /* Recursion prevents the following from being defined as macros. */
 
@@ -76,12 +76,10 @@ struct node *TREE_ROTR_##node(struct node *self);                               
                                                                                 \
 struct node *TREE_BALANCE_##node(struct node *self);                            \
                                                                                 \
-struct node *TREE_INSERT_##node(                                                \
-    struct node *self, struct node *elm,                                        \
+struct node *TREE_INSERT_##node(struct node *self, struct node *elm,            \
     int (*compare)(struct node *lhs, struct node *rhs));                        \
                                                                                 \
-struct node *TREE_FIND_##node(                                                  \
-    struct node *self, struct node *elm,                                        \
+struct node *TREE_FIND_##node(struct node *self, struct node *elm,              \
     int (*compare)(struct node *lhs, struct node *rhs));                        \
                                                                                 \
 struct node *TREE_MOVE_RIGHT_##node(struct node *self, struct node *rhs);       \
@@ -91,7 +89,7 @@ TREE_REMOVE_##node(struct node *self, struct node *elm,                         
         int (*compare)(struct node *lhs, struct node *rhs));                    \
                                                                                 \
 void                                                                            \
-TREE_FORWARD_APPLY_ALL_##node (struct node *self,                               \
+TREE_FORWARD_APPLY_ALL_##node(struct node *self,                                \
         void (*function)(struct node *node, void *data),                        \
         void *data);                                                            \
                                                                                 \
@@ -100,7 +98,9 @@ TREE_REVERSE_APPLY_ALL_##node(struct node *self,                                
         void (*function)(struct node *node, void *data),                        \
         void *data);                                                            \
                                                                                 \
-struct node *TREE_ROTL_##node(struct node *self)                                \
+                                                                                \
+struct node *                                                                   \
+TREE_ROTL_##node(struct node *self)                                             \
 {                                                                               \
     struct node *r = self->field.avl_right;                                     \
     self->field.avl_right = r->field.avl_left;                                  \
@@ -108,7 +108,8 @@ struct node *TREE_ROTL_##node(struct node *self)                                
     return TREE_BALANCE_##node(r);                                              \
 }                                                                               \
                                                                                 \
-struct node *TREE_ROTR_##node(struct node *self)                                \
+struct node *                                                                   \
+TREE_ROTR_##node(struct node *self)                                             \
 {                                                                               \
     struct node *l = self->field.avl_left;                                      \
     self->field.avl_left = l->field.avl_right;                                  \
@@ -116,7 +117,8 @@ struct node *TREE_ROTR_##node(struct node *self)                                
     return TREE_BALANCE_##node(l);                                              \
 }                                                                               \
                                                                                 \
-struct node *TREE_BALANCE_##node(struct node *self)                             \
+struct node *                                                                   \
+TREE_BALANCE_##node(struct node *self)                                          \
 {                                                                               \
     int delta = TREE_DELTA(self, field);                                        \
                                                                                 \
@@ -210,7 +212,7 @@ TREE_REMOVE_##node(struct node *self, struct node *elm,                         
 }                                                                               \
                                                                                 \
 void                                                                            \
-TREE_FORWARD_APPLY_ALL_##node (struct node *self,                               \
+TREE_FORWARD_APPLY_ALL_##node(struct node *self,                                \
         void (*function)(struct node *node, void *data),                        \
         void *data)                                                             \
 {                                                                               \
