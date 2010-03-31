@@ -1,3 +1,12 @@
+/*
+ * avl_tree.h
+ *
+ * Copyright (C) 2010, Parrot Foundation.
+ *
+ * $Id$
+ *
+ */
+
 /* tree.h -- AVL trees (in the spirit of BSD's 'queue.h')       -*- C -*-       */
 
 /* Copyright (c) 2005 Ian Piumarta
