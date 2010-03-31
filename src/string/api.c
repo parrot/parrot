@@ -796,7 +796,9 @@ Parrot_str_new_constant_ex(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINT
         return vv->value;
 
     /* Not found. Allocate new node and insert */
-    vv = mem_gc_allocate_zeroed_typed(interp, AVLStringNode);
+    vv = (AVLStringNode*)Parrot_gc_allocate_fixed_size_storage(interp,
+            sizeof (AVLStringNode));
+    memset(vv, 0, sizeof (AVLStringNode));
 
     /* Fill it */
     vv->str      = node.str;
