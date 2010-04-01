@@ -515,8 +515,10 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(STRING *a),
     ASSERT_ARGS(Parrot_str_concat)
     if (a && a->strlen) {
         if (b && b->strlen) {
-            STRING *result = Parrot_str_copy(interp, a);
-            Parrot_str_write_COW(interp, result);
+            /* don't make a copy; get the size right from the start */
+            STRING *result = Parrot_str_new_init(interp, NULL,
+                a->strlen + b->strlen, a->encoding, a->charset, Uflags);
+            result = Parrot_str_append(interp, result, a);
             return Parrot_str_append(interp, result, b);
         }
 
