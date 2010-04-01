@@ -230,6 +230,12 @@ renamed to Parrot_str_is_null
 
 rename Parrot_string_cstring to Parrot_str_cstring
 
+=item STRING COW [eligible in 2.4]
+
+COW strings to be removed as well all "inplace" string modification functions.
+
+L<https://trac.parrot.org/parrot/ticket/1540>
+
 =item Parrot_PMC_* in src/extend.c [eligible in 2.4]
 
 These are duplicates of functions in src/extend_vtable.c. Exceptions:
