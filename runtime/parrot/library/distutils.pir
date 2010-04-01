@@ -999,10 +999,7 @@ the value is the PBC pathname
     .local string bin, pbc
     bin = shift $P0
     pbc = hash[bin]
-    $I0 = length pbc
-    $I0 -= 4
-    $S0 = substr pbc, 0, $I0
-    $S1 = $S0 . exe
+    $S1 = _mk_path_exe(pbc, exe)
     $I0 = newer($S1, pbc)
     if $I0 goto L1
     .local string cmd
@@ -1013,6 +1010,16 @@ the value is the PBC pathname
     goto L1
   L2:
     .tailcall run_jobs(jobs)
+.end
+
+.sub '_mk_path_exe' :anon
+    .param string pbcname
+    .param string exe
+    $I0 = length pbcname
+    $I0 -= 4
+    $S0 = substr pbcname, 0, $I0
+    $S1 = $S0 . exe
+    .return ($S1)
 .end
 
 =item installable_pbc
@@ -1048,11 +1055,7 @@ the value is the PBC pathname
     .local string bin, pbc
     bin = shift $P0
     pbc = hash[bin]
-    $I0 = length pbc
-    $I0 -= 4
-    $S0 = substr pbc, 0, $I0
-    $S1 = "installable_" . $S0
-    $S1 .= exe
+    $S1 = _mk_path_installable(pbc, exe)
     $I0 = newer($S1, pbc)
     if $I0 goto L1
     .local string cmd
@@ -1068,6 +1071,17 @@ the value is the PBC pathname
     goto L1
   L2:
     .tailcall run_jobs(jobs)
+.end
+
+.sub '_mk_path_installable' :anon
+    .param string pbcname
+    .param string exe
+    $I0 = length pbcname
+    $I0 -= 4
+    $S0 = substr pbcname, 0, $I0
+    $S1 = "installable_" . $S0
+    $S1 .= exe
+    .return ($S1)
 .end
 
 .sub '_has_strip' :anon
@@ -1735,14 +1749,11 @@ the value is the POD pathname
     unless $P0 goto L2
     bin = shift $P0
     pbc = hash[bin]
-    $I0 = length pbc
-    $I0 -= 4
-    $S0 = substr pbc, 0, $I0
-    $S1 = $S0 . exe
+    $S1 = _mk_path_exe(pbc, exe)
     unlink($S1, 1 :named('verbose'))
-    $S1 = $S0 . '.c'
+    $S1 = _mk_path_exe(pbc, '.c')
     unlink($S1, 1 :named('verbose'))
-    $S1 = $S0 . obj
+    $S1 = _mk_path_exe(pbc, obj)
     unlink($S1, 1 :named('verbose'))
     goto L1
   L2:
@@ -1771,15 +1782,11 @@ the value is the POD pathname
     unless $P0 goto L2
     bin = shift $P0
     pbc = hash[bin]
-    $I0 = length pbc
-    $I0 -= 4
-    $S0 = substr pbc, 0, $I0
-    $S1 = 'installable_' . $S0
-    $S1 .= exe
+    $S1 = _mk_path_installable(pbc, exe)
     unlink($S1, 1 :named('verbose'))
-    $S1 = $S0 . '.c'
+    $S1 = _mk_path_exe(pbc, '.c')
     unlink($S1, 1 :named('verbose'))
-    $S1 = $S0 . obj
+    $S1 = _mk_path_exe(pbc, obj)
     unlink($S1, 1 :named('verbose'))
     goto L1
   L2:
@@ -2611,11 +2618,7 @@ array of pathname or a single pathname
     unless $P0 goto L2
     bin = shift $P0
     pbc = hash[bin]
-    $I0 = length pbc
-    $I0 -= 4
-    $S0 = substr pbc, 0, $I0
-    $S1 = 'installable_' . $S0
-    $S1 .= exe
+    $S1 = _mk_path_installable(pbc, exe)
     $S2 = bindir . '/'
     $S2 .= bin
     $S2 .= exe
