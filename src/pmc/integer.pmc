@@ -28,7 +28,7 @@ integer type without going to an I register.
 static void maybe_throw_overflow_error(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_WARN_UNUSED_RESULT
+PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PMC* upgrade_self_to_bignum(PARROT_INTERP, ARGMOD(PMC *self))
         __attribute__nonnull__(1)
@@ -56,7 +56,7 @@ maybe_throw_overflow_error(PARROT_INTERP)
             "Integer overflow");
 }
 
-PARROT_WARN_UNUSED_RESULT
+PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PMC*
 upgrade_self_to_bignum(PARROT_INTERP, ARGMOD(PMC *self))
@@ -381,6 +381,7 @@ Adds C<value> to C<SELF> inplace.
 
     MULTI void i_add(Complex value) {
         const INTVAL a = SELF.get_integer();
+        UNUSED(a);
 
         Parrot_pmc_reuse(INTERP, SELF, enum_class_Complex, 0);
         VTABLE_set_number_native(INTERP, SELF,
@@ -401,7 +402,6 @@ Adds C<value> to C<SELF> inplace.
         if ((c^a) >= 0 || (c^b) >= 0)
             VTABLE_set_integer_native(INTERP, SELF, c);
         else {
-            PMC *temp;
             maybe_throw_overflow_error(interp);
             SELF = upgrade_self_to_bignum(interp, SELF);
             VTABLE_i_add_int(interp, SELF, b);
@@ -882,7 +882,6 @@ Divides C<SELF> by C<value> inplace.
 
     VTABLE void i_floor_divide_float(FLOATVAL value) {
         FLOATVAL f;
-        INTVAL   self_val;
 
         if (FLOAT_IS_ZERO(value))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
