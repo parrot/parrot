@@ -1076,11 +1076,15 @@ the value is the PBC pathname
 .sub '_mk_path_installable' :anon
     .param string pbcname
     .param string exe
-    $I0 = length pbcname
+    $P0 = split '/', pbcname
+    $S0 = $P0[-1]
+    $I0 = length $S0
     $I0 -= 4
-    $S0 = substr pbcname, 0, $I0
+    $S0 = substr $S0, 0, $I0
     $S1 = "installable_" . $S0
     $S1 .= exe
+    $P0[-1] = $S1
+    $S1 = join '/', $P0
     .return ($S1)
 .end
 
