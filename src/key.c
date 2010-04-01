@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -452,10 +452,7 @@ key_string(PARROT_INTERP, ARGIN(PMC *key))
             INTVAL int_key;
             STRING *s;
             GETATTR_Key_int_key(interp, key, int_key);
-            s = REG_STR(interp, int_key);
-            if (s)
-                s = Parrot_str_new_COW(interp, s);
-            return s;
+            return REG_STR(interp, int_key);
         }
       case KEY_pmc_FLAG | KEY_register_FLAG:
         {
