@@ -136,9 +136,8 @@ void Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
         FUNC_MODIFIES(*obj);
 
 PARROT_EXPORT
-void Parrot_gc_mark_STRING_alive_fun(PARROT_INTERP,
+void Parrot_gc_mark_STRING_alive_fun(SHIM_INTERP,
     ARGMOD_NULLOK(STRING *obj))
-        __attribute__nonnull__(1)
         FUNC_MODIFIES(*obj);
 
 PARROT_EXPORT
@@ -349,8 +348,7 @@ int Parrot_gc_total_sized_buffers(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(obj))
 #define ASSERT_ARGS_Parrot_gc_mark_STRING_alive_fun \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_gc_reallocate_memory_chunk \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
