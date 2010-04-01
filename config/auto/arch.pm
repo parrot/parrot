@@ -60,12 +60,11 @@ sub runstep {
     # the above split fails because archname is "darwin-thread-multi-2level".
     if ( $cpuarch =~ /darwin/ ) {
         $osname = 'darwin';
-         if ( $conf->data->get('byteorder') =~ /^1234/ ) {
-            $cpuarch = 'i386';
-        }
-        else {
-            $cpuarch = 'ppc';
-        }
+        my $unamep = `uname -p`;
+        chomp $unamep;
+        $cpuarch = ( $unamep eq 'powerpc' )
+            ? 'ppc'
+            : 'i386';
     }
 
     # cpuarch and osname are reversed in archname on windows
