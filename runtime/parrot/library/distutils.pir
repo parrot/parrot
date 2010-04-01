@@ -2575,7 +2575,12 @@ array of pathname or a single pathname
     $I0 = does array, 'array'
     if $I0 goto L1
     $S0 = array
-    $S2 = $S1 . $S0
+    $S3 = $S0
+    $S2 = $S1 . $S3
+    $I0 = index $S0, "build/"
+    unless $I0 == 0 goto L0
+    $S3 = substr $S0, 6
+  L0:
     files[$S2] = $S0
     goto L2
   L1:
@@ -2583,7 +2588,12 @@ array of pathname or a single pathname
   L3:
     unless $P0 goto L2
     $S0 = shift $P0
-    $S2 = $S1 . $S0
+    $S3 = $S0
+    $I0 = index $S0, "build/"
+    unless $I0 == 0 goto L4
+    $S3 = substr $S0, 6
+  L4:
+    $S2 = $S1 . $S3
     files[$S2] = $S0
     goto L3
   L2:
