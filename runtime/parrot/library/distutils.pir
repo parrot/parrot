@@ -4173,11 +4173,7 @@ See L<http://www.jrsoftware.org/>.
     unless $P1 goto L1
     bin = shift $P1
     pbc = $P0[bin]
-    $I0 = length pbc
-    $I0 -= 4
-    $S0 = substr pbc, 0, $I0
-    $S1 = 'installable_' . $S0
-    $S1 .= exe
+    $S1 = _mk_path_installable(pbc, exe)
     $S2 = bin . exe
     $I0 = newer($S2, $S1)
     if $I0 goto L2
