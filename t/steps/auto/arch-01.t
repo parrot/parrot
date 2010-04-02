@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan); # tests =>  81;
+use Test::More tests =>  83;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::arch');
@@ -15,8 +15,6 @@ use Parrot::Configure::Test qw(
     test_step_constructor_and_description
 );
 use IO::CaptureOutput qw| capture |;
-
-########## Darwin special case ##########
 
 my ($args, $step_list_ref) = process_options( {
     argv => [ ],
@@ -33,6 +31,9 @@ my $pkg = q{auto::arch};
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
+my $ret = $step->runstep($conf);
+ok( $ret, "runstep() returned true value" );
+is($step->result(), q{}, "Result was empty string as expected");
 
 $conf->replenish($serialized);
 
@@ -74,7 +75,7 @@ $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
 my $pseudoarch = q{foobar};
 $conf->data->set('archname' => $pseudoarch);
-my $ret = $step->runstep($conf);
+$ret = $step->runstep($conf);
 ok( $ret, "runstep() returned true value: $pseudoarch" );
 is($step->result(), q{}, "Result was empty string as expected");
 is($conf->data->get('cpuarch'), q{},
@@ -84,53 +85,51 @@ is($conf->data->get('osname'), $pseudoarch,
 
 $conf->replenish($serialized);
 
-########### mock darwin ##########
-#
-#($args, $step_list_ref) = process_options( {
-#    argv => [ ],
-#    mode => q{configure},
-#} );
-#
-#$conf->add_steps($pkg);
-#$conf->options->set( %{$args} );
-#$step = test_step_constructor_and_description($conf);
-#$pseudoarch = q{darwin-thread-multi-2level};
-#$conf->data->set('archname' => $pseudoarch);
-#my $pseudobyteorder = 1234;
-#$conf->data->set('byteorder' => $pseudobyteorder);
-#$ret = $step->runstep($conf);
-#ok( $ret, "runstep() returned true value: $pseudoarch" );
-#is($step->result(), q{}, "Result was empty string as expected");
-#is($conf->data->get('cpuarch'), q{i386},
-#    "'cpuarch' was set as expected");
-#is($conf->data->get('osname'), q{darwin},
-#    "'osname' was set as expected");
-#
-#$conf->replenish($serialized);
-#
-########### mock darwin ##########
-#
-#($args, $step_list_ref) = process_options( {
-#    argv => [ ],
-#    mode => q{configure},
-#} );
-#
-#$conf->add_steps($pkg);
-#$conf->options->set( %{$args} );
-#$step = test_step_constructor_and_description($conf);
-#$pseudoarch = q{darwin-thread-multi-2level};
-#$conf->data->set('archname' => $pseudoarch);
-#$pseudobyteorder = 4321;
-#$conf->data->set('byteorder' => $pseudobyteorder);
-#$ret = $step->runstep($conf);
-#ok( $ret, "runstep() returned true value: $pseudoarch" );
-#is($step->result(), q{}, "Result was empty string as expected");
-#is($conf->data->get('cpuarch'), q{ppc},
-#    "'cpuarch' was set as expected");
-#is($conf->data->get('osname'), q{darwin},
-#    "'osname' was set as expected");
-#
-#$conf->replenish($serialized);
+########## mock darwin ##########
+
+($args, $step_list_ref) = process_options( {
+    argv => [ ],
+    mode => q{configure},
+} );
+
+$conf->add_steps($pkg);
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+$step->{unamep} = 'powerpc';
+$pseudoarch = q{darwin-thread-multi-2level};
+$conf->data->set('archname' => $pseudoarch);
+$ret = $step->runstep($conf);
+ok( $ret, "runstep() returned true value: $pseudoarch" );
+is($step->result(), q{}, "Result was empty string as expected");
+is($conf->data->get('cpuarch'), q{ppc},
+    "'cpuarch' was set as expected");
+is($conf->data->get('osname'), q{darwin},
+    "'osname' was set as expected");
+
+$conf->replenish($serialized);
+
+######### mock darwin ##########
+
+($args, $step_list_ref) = process_options( {
+    argv => [ ],
+    mode => q{configure},
+} );
+
+$conf->add_steps($pkg);
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+$step->{unamep} = 'i386';
+$pseudoarch = q{darwin-thread-multi-2level};
+$conf->data->set('archname' => $pseudoarch);
+$ret = $step->runstep($conf);
+ok( $ret, "runstep() returned true value: $pseudoarch" );
+is($step->result(), q{}, "Result was empty string as expected");
+is($conf->data->get('cpuarch'), q{i386},
+    "'cpuarch' was set as expected");
+is($conf->data->get('osname'), q{darwin},
+    "'osname' was set as expected");
+
+$conf->replenish($serialized);
 
 ########## mock win32 ##########
 

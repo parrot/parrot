@@ -29,6 +29,13 @@ sub _init {
     my %data;
     $data{description} = q{Determine CPU architecture and OS};
     $data{result}      = q{};
+    my $unamep;
+    eval {
+       chomp( $unamep  = `uname -p` );
+    };
+    $data{unamep} = (! $@ and $unamep)
+        ? $unamep
+        : undef;
     return \%data;
 }
 
@@ -60,9 +67,7 @@ sub runstep {
     # the above split fails because archname is "darwin-thread-multi-2level".
     if ( $cpuarch =~ /darwin/ ) {
         $osname = 'darwin';
-        my $unamep = `uname -p`;
-        chomp $unamep;
-        $cpuarch = ( $unamep eq 'powerpc' )
+        $cpuarch = ( $self->{unamep} eq 'powerpc' )
             ? 'ppc'
             : 'i386';
     }
