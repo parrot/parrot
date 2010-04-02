@@ -1064,8 +1064,7 @@ mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
     if (!pcc_sub->multi[0])
         return Parrot_pmc_new(interp, enum_class_FixedIntegerArray);
 
-    multi_sig = Parrot_pmc_new(interp, enum_class_FixedPMCArray);
-    VTABLE_set_integer_native(interp, multi_sig, n);
+    multi_sig = Parrot_pmc_new_init_int(interp, enum_class_FixedPMCArray, n);
     ct        = interp->code->const_table;
 
     for (i = 0; i < n; ++i) {
