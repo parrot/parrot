@@ -391,11 +391,10 @@ static PMC*
 mmd_build_type_tuple_from_type_list(PARROT_INTERP, ARGIN(PMC *type_list))
 {
     ASSERT_ARGS(mmd_build_type_tuple_from_type_list)
-    PMC   *multi_sig   = Parrot_pmc_new_constant(interp, enum_class_FixedIntegerArray);
     INTVAL param_count = VTABLE_elements(interp, type_list);
+    PMC   *multi_sig   = Parrot_pmc_new_constant_init_int(interp,
+            enum_class_FixedIntegerArray, param_count);
     INTVAL i;
-
-    VTABLE_set_integer_native(interp, multi_sig, param_count);
 
     for (i = 0; i < param_count; i++) {
         STRING *type_name = VTABLE_get_string_keyed_int(interp, type_list, i);
