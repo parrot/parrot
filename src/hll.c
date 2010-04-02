@@ -88,15 +88,14 @@ new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
 
     PMC *entry_id;
 
-    PMC * const entry = Parrot_pmc_new_constant(interp, enum_class_FixedPMCArray);
+    PMC * const entry = Parrot_pmc_new_constant_init_int(interp,
+            enum_class_FixedPMCArray, e_HLL_MAX);
 
     if (entry_name && !STRING_IS_EMPTY(entry_name)) {
         VTABLE_set_pmc_keyed_str(interp, hll_info, entry_name, entry);
     }
     else
         VTABLE_push_pmc(interp, hll_info, entry);
-
-    VTABLE_set_integer_native(interp, entry, e_HLL_MAX);
 
     entry_id = Parrot_pmc_new_constant(interp, enum_class_Integer);
     VTABLE_set_integer_native(interp, entry_id, id);

@@ -397,13 +397,12 @@ really a public API.
             }
             else {
                 /* create new tuple */
-                new_tuple = Parrot_pmc_new(INTERP, enum_class_FixedPMCArray);
+                /* for a fully typed namespace, we'd need 3 or 4 */
+                new_tuple = Parrot_pmc_new_init_int(INTERP,
+                        enum_class_FixedPMCArray, NS_max_slots);
 
                 /* flag it as special */
                 PObj_get_FLAGS(new_tuple) |= FPA_is_ns_ext;
-
-                /* for a fully typed namespace, we'd need 3 or 4 */
-                VTABLE_set_integer_native(INTERP, new_tuple, NS_max_slots);
             }
         }
 
