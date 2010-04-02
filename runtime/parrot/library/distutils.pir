@@ -5028,12 +5028,8 @@ SOURCE_C
     unless exe goto L3
     $P0 = getinterp
     $P0 = $P0[.IGLOBALS_CONFIG_HASH]
-    $I0 = $P0['cygwin']
-    if $I0 goto L4
-    $I0 = $P0['hpux']
-    if $I0 goto L4
-    goto L3
-  L4:
+    $I0 = $P0['win32']
+    if $I0 goto L3
     chmod(dst, 0o755, verbose :named('verbose'))
   L3:
 .end
