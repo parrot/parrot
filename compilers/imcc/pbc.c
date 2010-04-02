@@ -1540,7 +1540,7 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
     SymReg   *reg;
 
     char      s_key[KEYLEN * 10];
-    opcode_t  key[KEYLEN];
+    opcode_t  key[KEYLEN + 1]; /* [0] -> length, [1..] -> keys */
     opcode_t  size;
     int       key_length;     /* P0["hi;there"; S0; 2] has length 3 */
     int       k;
