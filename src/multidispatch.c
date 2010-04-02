@@ -517,10 +517,8 @@ mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
             type = Parrot_pmc_get_type(interp, sig_elem);
 
         /* create destination PMC only as necessary */
-        if (PMC_IS_NULL(ar)) {
-            ar = Parrot_pmc_new(interp, enum_class_FixedIntegerArray);
-            VTABLE_set_integer_native(interp, ar, n);
-        }
+        if (PMC_IS_NULL(ar))
+            ar = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
 
         VTABLE_set_integer_keyed_int(interp, ar, i, type);
     }
