@@ -114,14 +114,16 @@ pmclass Opcode auto_attrs {
 
     METHOD dirs() {
         const op_info_t * const info = PARROT_OPCODE(SELF)->info;
-        PMC *result = Parrot_pmc_new(INTERP, enum_class_FixedIntegerArray);
+        PMC *result;
         INTVAL arg_count = info->op_count - 1;
         if (arg_count > 0) {
             INTVAL i;
-            VTABLE_set_integer_native(INTERP, result, arg_count);
+            result = Parrot_pmc_new_init_int(INTERP, enum_class_FixedIntegerArray, arg_count);
             for (i = 0; i < arg_count; ++i)
                 VTABLE_set_integer_keyed_int(INTERP, result, i, (INTVAL) info->dirs[i]);
         }
+        else
+            result = Parrot_pmc_new(INTERP, enum_class_FixedIntegerArray);
         RETURN(PMC *result);
     }
 
