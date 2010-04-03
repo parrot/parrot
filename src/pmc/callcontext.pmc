@@ -382,8 +382,7 @@ get_named_names(PARROT_INTERP, ARGIN(PMC *SELF))
     /* yes, this *looks* risky, but it's a Parrot STRING hash internally */
     if (hash && hash->entries) {
         UINTVAL i, j = 0;
-        result = Parrot_pmc_new(interp, enum_class_FixedStringArray);
-        VTABLE_set_integer_native(interp, result, hash->entries);
+        result = Parrot_pmc_new_init_int(interp, enum_class_FixedStringArray, hash->entries);
 
         for (i = 0; i <= hash->mask; i++) {
             HashBucket *b = hash->bi[i];
