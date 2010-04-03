@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -86,7 +86,7 @@ Resizes the array to C<size> elements.
             INTVAL i, cur, needed;
             i = cur = PMC_threshold(SELF);
             if (cur < 8192)
-                cur = size < 2 * cur ? 2 * cur : size;
+                cur = (size < 2 * cur) ? (2 * cur) : size;
             else {
                 needed = size - cur;
                 cur   += needed + 4096;
@@ -285,8 +285,8 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
     }
 
     VTABLE void delete_keyed_int(INTVAL idx) {
-        PMC   **data = PMC_array(SELF);
-        INTVAL  n    = PMC_size(SELF);
+        PMC ** const data = PMC_array(SELF);
+        const INTVAL  n   = PMC_size(SELF);
         INTVAL  i;
 
         for (i = idx; i < n - 1; ++i)
@@ -320,7 +320,7 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
     }
 
     VTABLE INTVAL exists_keyed(PMC *key) {
-        INTVAL ix = VTABLE_get_integer(INTERP, key);
+        const INTVAL ix = VTABLE_get_integer(INTERP, key);
         return SELF.exists_keyed_int(ix);
     }
 
@@ -370,8 +370,8 @@ the array.
 
     VTABLE void push_float(FLOATVAL value) {
 
-        INTVAL size = PMC_size(SELF);
-        PMC   *val  = Parrot_pmc_new(INTERP, enum_class_Float);
+        const INTVAL size = PMC_size(SELF);
+        PMC   * const val = Parrot_pmc_new(INTERP, enum_class_Float);
 
         VTABLE_set_number_native(INTERP, val, value);
         SELF.set_pmc_keyed_int(size, val);
@@ -381,8 +381,8 @@ the array.
 
     VTABLE void push_integer(INTVAL value) {
 
-        INTVAL size = PMC_size(SELF);
-        PMC   *val  = Parrot_pmc_new(INTERP, enum_class_Integer);
+        const INTVAL size = PMC_size(SELF);
+        PMC   * const val = Parrot_pmc_new(INTERP, enum_class_Integer);
 
         VTABLE_set_integer_native(INTERP, val, value);
         SELF.set_pmc_keyed_int(size, val);
@@ -392,7 +392,7 @@ the array.
 
     VTABLE void push_pmc(PMC *value) {
 
-        INTVAL size = PMC_size(SELF);
+        const INTVAL size = PMC_size(SELF);
         SELF.set_integer_native(size + 1);
         ((PMC **)PMC_array(SELF))[size] = value;
 
@@ -401,8 +401,8 @@ the array.
 
     VTABLE void push_string(STRING *value) {
 
-        INTVAL size = PMC_size(SELF);
-        PMC   *val  = Parrot_pmc_new(INTERP, enum_class_String);
+        const INTVAL size = PMC_size(SELF);
+        PMC   * const val = Parrot_pmc_new(INTERP, enum_class_String);
 
         VTABLE_assign_string_native(INTERP, val, value);
         SELF.set_pmc_keyed_int(size, val);
@@ -505,8 +505,8 @@ the array.
 
     VTABLE void unshift_float(FLOATVAL value) {
 
-        INTVAL  size = PMC_size(SELF);
-        PMC    *val  = Parrot_pmc_new(INTERP, enum_class_Float);
+        const INTVAL size = PMC_size(SELF);
+        PMC * const val   = Parrot_pmc_new(INTERP, enum_class_Float);
         PMC   **data;
         INTVAL  i;
 
@@ -525,8 +525,8 @@ the array.
 
     VTABLE void unshift_integer(INTVAL value) {
 
-        INTVAL  size = PMC_size(SELF);
-        PMC    *val  = Parrot_pmc_new(INTERP, enum_class_Integer);
+        const INTVAL size = PMC_size(SELF);
+        PMC * const val   = Parrot_pmc_new(INTERP, enum_class_Integer);
         PMC    **data;
         INTVAL   i;
 
@@ -545,7 +545,7 @@ the array.
 
     VTABLE void unshift_pmc(PMC *value) {
 
-        INTVAL  size = PMC_size(SELF);
+        const INTVAL size = PMC_size(SELF);
         PMC   **data;
         INTVAL  i;
 
@@ -563,8 +563,8 @@ the array.
 
     VTABLE void unshift_string(STRING *value) {
 
-        INTVAL  size = PMC_size(SELF);
-        PMC    *val  = Parrot_pmc_new(INTERP, enum_class_String);
+        const INTVAL size = PMC_size(SELF);
+        PMC * const val  = Parrot_pmc_new(INTERP, enum_class_String);
         PMC   **data;
         INTVAL  i;
 
@@ -592,7 +592,7 @@ Creates and returns a copy of the array.
 */
 
     VTABLE PMC *clone() {
-        PMC *copy = SUPER();
+        PMC * const copy = SUPER();
 
         /* copy trimmed extra space */
         PMC_threshold(copy) = PMC_size(SELF);
@@ -612,9 +612,8 @@ Append the other array to this array.
 
     METHOD append(PMC *other) {
 
-        INTVAL i;
-        INTVAL n = VTABLE_elements(INTERP, SELF);
-        INTVAL m = VTABLE_elements(INTERP, other);
+        const INTVAL n = VTABLE_elements(INTERP, SELF);
+        const INTVAL m = VTABLE_elements(INTERP, other);
 
         if (!m)
             RETURN(void);
@@ -624,14 +623,15 @@ Append the other array to this array.
 
         if (other->vtable->base_type == SELF->vtable->base_type
         ||  other->vtable->base_type == enum_class_FixedPMCArray) {
-            PMC **other_data = PMC_array(other);
-            PMC **this_data  = PMC_array(SELF);
+            PMC ** const other_data = PMC_array(other);
+            PMC ** const this_data  = PMC_array(SELF);
 
             /* libc is faster at copying data than a manual loop here */
             memmove(this_data + n, other_data, m  * sizeof (PMC *));
         }
         else {
-            PMC **this_data = PMC_array(SELF);
+            PMC ** const this_data = PMC_array(SELF);
+            INTVAL i;
 
             for (i = 0; i < m; ++i)
                 this_data[n + i] = VTABLE_get_pmc_keyed_int(INTERP, other, i);
@@ -650,11 +650,11 @@ Returns the Parrot string representation C<ResizablePMCArray>.
     VTABLE STRING *get_repr() {
 
         INTVAL  j;
-        INTVAL  n   = VTABLE_elements(INTERP, SELF);
+        const INTVAL n = VTABLE_elements(INTERP, SELF);
         STRING *res = CONST_STRING(INTERP, "[ ");
 
         for (j = 0; j < n; ++j) {
-            PMC *val = SELF.get_pmc_keyed_int(j);
+            PMC * const val = SELF.get_pmc_keyed_int(j);
             res      = Parrot_str_append(INTERP, res, VTABLE_get_repr(INTERP, val));
 
             if (j < n - 1)
@@ -684,7 +684,7 @@ everything via the VTABLE api.
 
         const INTVAL length = VTABLE_elements(INTERP, SELF);
         const INTVAL elems  = VTABLE_elements(INTERP, value);
-        INTVAL       shift  = elems - count;
+        const INTVAL shift  = elems - count;
         INTVAL       i;
 
         /* start from end? */
@@ -735,12 +735,12 @@ end of the array.
 */
 
     METHOD shift() {
-        PMC *value = VTABLE_shift_pmc(INTERP, SELF);
+        PMC * const value = VTABLE_shift_pmc(INTERP, SELF);
         RETURN(PMC *value);
     }
 
     METHOD pop() {
-        PMC *value = VTABLE_pop_pmc(INTERP, SELF);
+        PMC * const value = VTABLE_pop_pmc(INTERP, SELF);
         RETURN(PMC *value);
     }
 
