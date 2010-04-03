@@ -296,10 +296,10 @@ GEN_LIBRARY = \
 #IF(has_opengl):    $(LIBRARY_DIR)/OpenGL/Math.pbc \
     $(LIBRARY_DIR)/P6object.pbc \
     $(LIBRARY_DIR)/ProfTest.pbc \
-	$(LIBRARY_DIR)/ProfTest/PIRProfile.pir \
-	$(LIBRARY_DIR)/ProfTest/NQPProfile.pir \
-	$(LIBRARY_DIR)/ProfTest/Matcher.pir \
-	$(LIBRARY_DIR)/ProfTest/Want.pir \
+    $(LIBRARY_DIR)/ProfTest/PIRProfile.pir \
+    $(LIBRARY_DIR)/ProfTest/NQPProfile.pir \
+    $(LIBRARY_DIR)/ProfTest/Matcher.pir \
+    $(LIBRARY_DIR)/ProfTest/Want.pir \
     $(LIBRARY_DIR)/parrotlib.pbc \
     $(LIBRARY_DIR)/pcore.pbc \
     $(LIBRARY_DIR)/pcre.pbc \
@@ -347,6 +347,10 @@ FLUID_FILES_1 = \
 
 FLUID_FILES_2 = \
     $(GEN_LIBRARY) \
+    $(LIBRARY_DIR)/ProfTest/PIRProfile.pbc \
+    $(LIBRARY_DIR)/ProfTest/NQPProfile.pbc \
+    $(LIBRARY_DIR)/ProfTest/Matcher.pbc \
+    $(LIBRARY_DIR)/ProfTest/Want.pbc \
     runtime/parrot/include/parrotlib.pbc
 
 
