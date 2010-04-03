@@ -39,15 +39,14 @@ typedef void (*compact_f) (Interp *, Memory_Pools * const, Variable_Size_Pool *)
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void alloc_new_block(PARROT_INTERP,
-    ARGMOD(Memory_Pools *mem_pools),
+static void alloc_new_block(
+     ARGMOD(Memory_Pools *mem_pools),
     size_t size,
     ARGMOD(Variable_Size_Pool *pool),
     ARGIN(const char *why))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
         FUNC_MODIFIES(*mem_pools)
         FUNC_MODIFIES(*pool);
 
@@ -80,15 +79,14 @@ static void fix_pmc_syncs(
         FUNC_MODIFIES(*dest_interp);
 
 static void free_memory_pool(ARGFREE(Variable_Size_Pool *pool));
-static void free_old_mem_blocks(PARROT_INTERP,
-    ARGMOD(Memory_Pools *mem_pools),
+static void free_old_mem_blocks(
+     ARGMOD(Memory_Pools *mem_pools),
     ARGMOD(Variable_Size_Pool *pool),
     ARGMOD(Memory_Block *new_block),
     UINTVAL total_size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
         FUNC_MODIFIES(*mem_pools)
         FUNC_MODIFIES(*pool)
         FUNC_MODIFIES(*new_block);
@@ -113,9 +111,8 @@ static Variable_Size_Pool * new_memory_pool(
     ARGIN_NULLOK(compact_f compact));
 
 PARROT_CANNOT_RETURN_NULL
-static UINTVAL pad_pool_size(PARROT_INTERP, ARGIN(Variable_Size_Pool *pool))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+static UINTVAL pad_pool_size(ARGIN(const Variable_Size_Pool *pool))
+        __attribute__nonnull__(1);
 
 static void Parrot_gc_merge_buffer_pools(PARROT_INTERP,
     ARGMOD(Memory_Pools *mem_pools),
@@ -149,8 +146,7 @@ static int sweep_cb_pmc(PARROT_INTERP,
         FUNC_MODIFIES(*pool);
 
 #define ASSERT_ARGS_alloc_new_block __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mem_pools) \
+       PARROT_ASSERT_ARG(mem_pools) \
     , PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(why))
 #define ASSERT_ARGS_buffer_location __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -171,8 +167,7 @@ static int sweep_cb_pmc(PARROT_INTERP,
     , PARROT_ASSERT_ARG(pool))
 #define ASSERT_ARGS_free_memory_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_free_old_mem_blocks __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mem_pools) \
+       PARROT_ASSERT_ARG(mem_pools) \
     , PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(new_block))
 #define ASSERT_ARGS_free_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -182,8 +177,7 @@ static int sweep_cb_pmc(PARROT_INTERP,
     , PARROT_ASSERT_ARG(new_pool_ptr))
 #define ASSERT_ARGS_new_memory_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_pad_pool_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pool))
+       PARROT_ASSERT_ARG(pool))
 #define ASSERT_ARGS_Parrot_gc_merge_buffer_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(mem_pools) \
@@ -202,8 +196,8 @@ static int sweep_cb_pmc(PARROT_INTERP,
 
 /*
 
-=item C<static void alloc_new_block(PARROT_INTERP, Memory_Pools *mem_pools,
-size_t size, Variable_Size_Pool *pool, const char *why)>
+=item C<static void alloc_new_block( Memory_Pools *mem_pools, size_t size,
+Variable_Size_Pool *pool, const char *why)>
 
 Allocate a new memory block. We allocate either the requested size or the
 default size, whichever is larger. Add the new block to the given memory
@@ -214,7 +208,7 @@ pool. The given C<char *why> text is used for debugging.
 */
 
 static void
-alloc_new_block(PARROT_INTERP,
+alloc_new_block(
         ARGMOD(Memory_Pools *mem_pools),
         size_t size,
         ARGMOD(Variable_Size_Pool *pool),
@@ -348,7 +342,7 @@ mem_allocate(PARROT_INTERP,
              * Mark the block as big block (it has just one item)
              * And don't set big blocks as the top_block.
              */
-            alloc_new_block(interp, mem_pools, size, pool, "compact failed");
+            alloc_new_block(mem_pools, size, pool, "compact failed");
 
             mem_pools->mem_allocs_since_last_collect++;
 
@@ -465,8 +459,8 @@ compact_pool(PARROT_INTERP,
     mem_pools->gc_collect_runs++;
 
     /* Snag a block big enough for everything */
-    total_size = pad_pool_size(interp, pool);
-    alloc_new_block(interp, mem_pools, total_size, pool, "inside compact");
+    total_size = pad_pool_size(pool);
+    alloc_new_block(mem_pools, total_size, pool, "inside compact");
 
     new_block = pool->top_block;
 
@@ -508,14 +502,14 @@ compact_pool(PARROT_INTERP,
     new_block->free = new_block->size - (cur_spot - new_block->start);
     mem_pools->memory_collected +=      (cur_spot - new_block->start);
 
-    free_old_mem_blocks(interp, mem_pools, pool, new_block, total_size);
+    free_old_mem_blocks(mem_pools, pool, new_block, total_size);
 
     --mem_pools->gc_sweep_block_level;
 }
 
 /*
 
-=item C<static UINTVAL pad_pool_size(PARROT_INTERP, Variable_Size_Pool *pool)>
+=item C<static UINTVAL pad_pool_size(const Variable_Size_Pool *pool)>
 
 Calculate the size of the new pool. The currently used size equals the total
 size minus the reclaimable size. Add a minimum block to the current amount, so
@@ -542,11 +536,10 @@ problem easily.
 
 PARROT_CANNOT_RETURN_NULL
 static UINTVAL
-pad_pool_size(PARROT_INTERP,
-        ARGIN(Variable_Size_Pool *pool))
+pad_pool_size(ARGIN(const Variable_Size_Pool *pool))
 {
     ASSERT_ARGS(pad_pool_size)
-    Memory_Block *cur_block = pool->top_block;
+    const Memory_Block *cur_block = pool->top_block;
 
     UINTVAL total_size = 0;
 
@@ -677,7 +670,7 @@ move_one_buffer(PARROT_INTERP, ARGMOD(Buffer *old_buf), ARGMOD(char *new_pool_pt
 
 /*
 
-=item C<static void free_old_mem_blocks(PARROT_INTERP, Memory_Pools *mem_pools,
+=item C<static void free_old_mem_blocks( Memory_Pools *mem_pools,
 Variable_Size_Pool *pool, Memory_Block *new_block, UINTVAL total_size)>
 
 The compact_pool operation collects disjointed blocks of memory allocated on a
@@ -693,7 +686,7 @@ block of memory on its free list.
 */
 
 static void
-free_old_mem_blocks(PARROT_INTERP,
+free_old_mem_blocks(
         ARGMOD(Memory_Pools *mem_pools),
         ARGMOD(Variable_Size_Pool *pool),
         ARGMOD(Memory_Block *new_block),
@@ -743,7 +736,7 @@ memory alignment.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 char *
-aligned_mem(ARGIN(const Buffer *buffer), ARGIN(char *mem))
+aligned_mem(SHIM(const Buffer *buffer), ARGIN(char *mem))
 {
     ASSERT_ARGS(aligned_mem)
 #if 0
@@ -839,16 +832,16 @@ for both.
 */
 
 void
-initialize_var_size_pools(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools))
+initialize_var_size_pools(SHIM_INTERP, ARGMOD(Memory_Pools *mem_pools))
 {
     ASSERT_ARGS(initialize_var_size_pools)
 
     mem_pools->memory_pool   = new_memory_pool(POOL_SIZE, &compact_pool);
-    alloc_new_block(interp, mem_pools, POOL_SIZE, mem_pools->memory_pool, "init");
+    alloc_new_block(mem_pools, POOL_SIZE, mem_pools->memory_pool, "init");
 
     /* Constant strings - not compacted */
     mem_pools->constant_string_pool = new_memory_pool(POOL_SIZE, NULL);
-    alloc_new_block(interp, mem_pools, POOL_SIZE, mem_pools->constant_string_pool, "init");
+    alloc_new_block(mem_pools, POOL_SIZE, mem_pools->constant_string_pool, "init");
 }
 
 
@@ -1282,8 +1275,7 @@ blocks are freed, free the pools themselves.
 */
 
 void
-Parrot_gc_destroy_memory_pools(PARROT_INTERP,
-        ARGMOD(Memory_Pools *mem_pools))
+Parrot_gc_destroy_memory_pools(SHIM_INTERP, ARGMOD(Memory_Pools *mem_pools))
 {
     ASSERT_ARGS(Parrot_gc_destroy_memory_pools)
 

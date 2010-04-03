@@ -486,8 +486,7 @@ int Parrot_gc_trace_root(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-char * aligned_mem(ARGIN(const Buffer *buffer), ARGIN(char *mem))
-        __attribute__nonnull__(1)
+char * aligned_mem(SHIM(const Buffer *buffer), ARGIN(char *mem))
         __attribute__nonnull__(2);
 
 PARROT_CONST_FUNCTION
@@ -511,9 +510,7 @@ void compact_pool(PARROT_INTERP,
         FUNC_MODIFIES(*mem_pools)
         FUNC_MODIFIES(*pool);
 
-void initialize_var_size_pools(PARROT_INTERP,
-    ARGMOD(Memory_Pools *mem_pools))
-        __attribute__nonnull__(1)
+void initialize_var_size_pools(SHIM_INTERP, ARGMOD(Memory_Pools *mem_pools))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*mem_pools);
 
@@ -543,9 +540,8 @@ void Parrot_gc_destroy_header_pools(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*mem_pools);
 
-void Parrot_gc_destroy_memory_pools(PARROT_INTERP,
+void Parrot_gc_destroy_memory_pools(SHIM_INTERP,
     ARGMOD(Memory_Pools *mem_pools))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*mem_pools);
 
@@ -560,8 +556,7 @@ void Parrot_gc_merge_memory_pools(
         FUNC_MODIFIES(*dest_arena);
 
 #define ASSERT_ARGS_aligned_mem __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(buffer) \
-    , PARROT_ASSERT_ARG(mem))
+       PARROT_ASSERT_ARG(mem))
 #define ASSERT_ARGS_aligned_string_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_check_buffer_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pobj) \
@@ -571,8 +566,7 @@ void Parrot_gc_merge_memory_pools(
     , PARROT_ASSERT_ARG(mem_pools) \
     , PARROT_ASSERT_ARG(pool))
 #define ASSERT_ARGS_initialize_var_size_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mem_pools))
+       PARROT_ASSERT_ARG(mem_pools))
 #define ASSERT_ARGS_mem_allocate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(mem_pools) \
@@ -586,8 +580,7 @@ void Parrot_gc_merge_memory_pools(
     , PARROT_ASSERT_ARG(mem_pools))
 #define ASSERT_ARGS_Parrot_gc_destroy_memory_pools \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mem_pools))
+       PARROT_ASSERT_ARG(mem_pools))
 #define ASSERT_ARGS_Parrot_gc_merge_memory_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest_interp) \
     , PARROT_ASSERT_ARG(dest_arena) \
