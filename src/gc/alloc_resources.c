@@ -59,10 +59,8 @@ static const char * buffer_location(PARROT_INTERP, ARGIN(const Buffer *b))
 static void check_fixed_size_obj_pool(ARGIN(const Fixed_Size_Pool *pool))
         __attribute__nonnull__(1);
 
-static void check_memory_system(PARROT_INTERP,
-    ARGIN(const Memory_Pools *mem_pools))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+static void check_memory_system(ARGIN(const Memory_Pools *mem_pools))
+        __attribute__nonnull__(1);
 
 static void check_var_size_obj_pool(ARGIN(const Variable_Size_Pool *pool))
         __attribute__nonnull__(1);
@@ -155,8 +153,7 @@ static int sweep_cb_pmc(PARROT_INTERP,
 #define ASSERT_ARGS_check_fixed_size_obj_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pool))
 #define ASSERT_ARGS_check_memory_system __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mem_pools))
+       PARROT_ASSERT_ARG(mem_pools))
 #define ASSERT_ARGS_check_var_size_obj_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pool))
 #define ASSERT_ARGS_debug_print_buf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -891,8 +888,7 @@ merge_pools(ARGMOD(Variable_Size_Pool *dest), ARGMOD(Variable_Size_Pool *source)
 
 /*
 
-=item C<static void check_memory_system(PARROT_INTERP, const Memory_Pools
-*mem_pools)>
+=item C<static void check_memory_system(const Memory_Pools *mem_pools)>
 
 Checks the memory system of parrot on any corruptions, including
 the string system.
@@ -902,7 +898,7 @@ the string system.
 */
 
 static void
-check_memory_system(PARROT_INTERP, ARGIN(const Memory_Pools *mem_pools))
+check_memory_system(ARGIN(const Memory_Pools *mem_pools))
 {
     ASSERT_ARGS(check_memory_system)
     size_t i;

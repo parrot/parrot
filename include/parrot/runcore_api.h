@@ -147,9 +147,8 @@ void runops_int(PARROT_INTERP, size_t offset)
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-oplib_init_f get_core_op_lib_init(PARROT_INTERP,
+oplib_init_f get_core_op_lib_init(SHIM_INTERP,
     ARGIN(Parrot_runcore_t *runcore))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CAN_RETURN_NULL
@@ -186,8 +185,7 @@ void Parrot_runcore_switch_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_get_core_op_lib_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(runcore))
+       PARROT_ASSERT_ARG(runcore))
 #define ASSERT_ARGS_init_prederef __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(runcore))

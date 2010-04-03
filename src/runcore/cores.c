@@ -272,10 +272,9 @@ next opcode, or examine and manipulate data from the executing program.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t * runops_cgoto_core(PARROT_INTERP,
-    ARGIN(Parrot_runcore_t *runcore),
+    SHIM(Parrot_runcore_t *runcore),
     ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
@@ -290,10 +289,9 @@ static opcode_t * runops_cgp_core(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t * runops_debugger_core(PARROT_INTERP,
-    ARGIN(Parrot_runcore_t *runcore),
+    SHIM(Parrot_runcore_t *runcore),
     ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
@@ -308,28 +306,25 @@ static opcode_t * runops_exec_core(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t * runops_fast_core(PARROT_INTERP,
-    ARGIN(Parrot_runcore_t *runcore),
+    SHIM(Parrot_runcore_t *runcore),
     ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t * runops_gc_debug_core(PARROT_INTERP,
-    ARGIN(Parrot_runcore_t *runcore),
+    SHIM(Parrot_runcore_t *runcore),
     ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t * runops_slow_core(PARROT_INTERP,
-    ARGIN(Parrot_runcore_t *runcore),
+    SHIM(Parrot_runcore_t *runcore),
     ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
@@ -343,16 +338,12 @@ static opcode_t * runops_switch_core(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static opcode_t * runops_trace_core(PARROT_INTERP,
-    ARGIN(Parrot_runcore_t *runcore),
-    ARGIN(opcode_t *pc))
+static opcode_t * runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_runops_cgoto_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(runcore) \
     , PARROT_ASSERT_ARG(pc))
 #define ASSERT_ARGS_runops_cgp_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -360,7 +351,6 @@ static opcode_t * runops_trace_core(PARROT_INTERP,
     , PARROT_ASSERT_ARG(pc))
 #define ASSERT_ARGS_runops_debugger_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(runcore) \
     , PARROT_ASSERT_ARG(pc))
 #define ASSERT_ARGS_runops_exec_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -368,15 +358,12 @@ static opcode_t * runops_trace_core(PARROT_INTERP,
     , PARROT_ASSERT_ARG(pc))
 #define ASSERT_ARGS_runops_fast_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(runcore) \
     , PARROT_ASSERT_ARG(pc))
 #define ASSERT_ARGS_runops_gc_debug_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(runcore) \
     , PARROT_ASSERT_ARG(pc))
 #define ASSERT_ARGS_runops_slow_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(runcore) \
     , PARROT_ASSERT_ARG(pc))
 #define ASSERT_ARGS_runops_switch_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -384,7 +371,6 @@ static opcode_t * runops_trace_core(PARROT_INTERP,
     , PARROT_ASSERT_ARG(pc))
 #define ASSERT_ARGS_runops_trace_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(runcore) \
     , PARROT_ASSERT_ARG(pc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -405,7 +391,7 @@ Parrot_runcore_slow_init(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_runcore_slow_init)
 
-    Parrot_runcore_t *coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_runcore_t);
+    Parrot_runcore_t * const coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_runcore_t);
     coredata->name             = CONST_STRING(interp, "slow");
     coredata->id               = PARROT_SLOW_CORE;
     coredata->opinit           = PARROT_CORE_OPLIB_INIT;
@@ -435,7 +421,7 @@ Parrot_runcore_fast_init(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_runcore_fast_init)
 
-    Parrot_runcore_t *coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_runcore_t);
+    Parrot_runcore_t * const coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_runcore_t);
     coredata->name             = CONST_STRING(interp, "fast");
     coredata->id               = PARROT_FAST_CORE;
     coredata->opinit           = PARROT_CORE_OPLIB_INIT;
@@ -465,7 +451,7 @@ Parrot_runcore_switch_init(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_runcore_switch_init)
 
-    Parrot_runcore_t *coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_runcore_t);
+    Parrot_runcore_t * const coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_runcore_t);
     coredata->name             = CONST_STRING(interp, "switch");
     coredata->id               = PARROT_SWITCH_CORE;
     coredata->opinit           = PARROT_CORE_SWITCH_OPLIB_INIT;
@@ -495,7 +481,7 @@ Parrot_runcore_exec_init(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_runcore_exec_init)
 
-    Parrot_runcore_t *coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_runcore_t);
+    Parrot_runcore_t * const coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_runcore_t);
     coredata->name             = CONST_STRING(interp, "exec");
     coredata->id               = PARROT_EXEC_CORE;
     coredata->opinit           = PARROT_CORE_OPLIB_INIT;
@@ -523,7 +509,7 @@ Parrot_runcore_gc_debug_init(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_runcore_gc_debug_init)
 
-    Parrot_runcore_t *coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_runcore_t);
+    Parrot_runcore_t * const coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_runcore_t);
     coredata->name             = CONST_STRING(interp, "gc_debug");
     coredata->id               = PARROT_GC_DEBUG_CORE;
     coredata->opinit           = PARROT_CORE_OPLIB_INIT;
@@ -553,7 +539,7 @@ Parrot_runcore_debugger_init(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_runcore_debugger_init)
 
-    Parrot_runcore_t *coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_runcore_t);
+    Parrot_runcore_t * const coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_runcore_t);
     coredata->name             = CONST_STRING(interp, "debugger");
     coredata->id               = PARROT_DEBUGGER_CORE;
     coredata->opinit           = PARROT_CORE_OPLIB_INIT;
@@ -585,7 +571,7 @@ Parrot_runcore_cgp_init(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_runcore_cgp_init)
 
-    Parrot_runcore_t *coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_runcore_t);
+    Parrot_runcore_t * const coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_runcore_t);
     coredata->name             = CONST_STRING(interp, "cgp");
     coredata->id               = PARROT_CGP_CORE;
     coredata->opinit           = PARROT_CORE_CGP_OPLIB_INIT;
@@ -618,7 +604,7 @@ Parrot_runcore_cgoto_init(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_runcore_cgoto_init)
 
-    Parrot_runcore_t *coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_runcore_t);
+    Parrot_runcore_t * const coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_runcore_t);
     coredata->name             = CONST_STRING(interp, "cgoto");
     coredata->id               = PARROT_CGOTO_CORE;
     coredata->opinit           = PARROT_CORE_CG_OPLIB_INIT;
@@ -652,7 +638,7 @@ operations.  This performs no bounds checking, profiling, or tracing.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t *
-runops_fast_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(opcode_t *pc))
+runops_fast_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcode_t *pc))
 {
     ASSERT_ARGS(runops_fast_core)
 
@@ -692,7 +678,7 @@ If computed C<goto> is not available then Parrot exits with exit code 1.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t *
-runops_cgoto_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(opcode_t *pc))
+runops_cgoto_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcode_t *pc))
 {
     ASSERT_ARGS(runops_cgoto_core)
 
@@ -724,8 +710,7 @@ runops_cgoto_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(opcode_
 
 /*
 
-=item C<static opcode_t * runops_trace_core(PARROT_INTERP, Parrot_runcore_t
-*runcore, opcode_t *pc)>
+=item C<static opcode_t * runops_trace_core(PARROT_INTERP, opcode_t *pc)>
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations, using the tracing interpreter.
@@ -737,7 +722,7 @@ operations, using the tracing interpreter.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t *
-runops_trace_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(opcode_t *pc))
+runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
     ASSERT_ARGS(runops_trace_core)
 
@@ -827,12 +812,12 @@ operations, with tracing and bounds checking enabled.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t *
-runops_slow_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(opcode_t *pc))
+runops_slow_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcode_t *pc))
 {
     ASSERT_ARGS(runops_slow_core)
 
     if (Interp_trace_TEST(interp, PARROT_TRACE_OPS_FLAG))
-        return runops_trace_core(interp, runcore, pc);
+        return runops_trace_core(interp, pc);
 #if 0
     if (interp->debugger && interp->debugger->pdb)
         return Parrot_debug(interp, interp->debugger, pc);
@@ -868,7 +853,7 @@ it's also a very quick way to find GC problems.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t *
-runops_gc_debug_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(opcode_t *pc))
+runops_gc_debug_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcode_t *pc))
 {
     ASSERT_ARGS(runops_gc_debug_core)
     while (pc) {
@@ -903,7 +888,7 @@ Used by the debugger, under construction
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t *
-runops_debugger_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(opcode_t *pc))
+runops_debugger_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcode_t *pc))
 {
     ASSERT_ARGS(runops_debugger_core)
 
@@ -1016,8 +1001,8 @@ init_prederef(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore))
         }
 
         for (i = 0; i < N;) {
-            op_info_t * const opinfo = &interp->op_info_table[*pc];
-            size_t            n      = opinfo->op_count;
+            const op_info_t * const opinfo = &interp->op_info_table[*pc];
+            size_t n = opinfo->op_count;
 
             temp[i] = pred_func;
 
@@ -1079,7 +1064,7 @@ Returns an opcode's library C<op_lib> init function.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 oplib_init_f
-get_core_op_lib_init(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore))
+get_core_op_lib_init(SHIM_INTERP, ARGIN(Parrot_runcore_t *runcore))
 {
     ASSERT_ARGS(get_core_op_lib_init)
     return runcore->opinit;
@@ -1105,6 +1090,7 @@ runops_exec_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(opcode_t
     ASSERT_ARGS(runops_exec_core)
 
     UNUSED(interp);
+    UNUSED(runcore);
     UNUSED(pc);
 
     return NULL;
