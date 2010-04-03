@@ -614,7 +614,7 @@ sub is_pir {
     my $line = <$file_handle>;
     close $file_handle;
 
-    if ( $line && $line =~ /^#!.*parrot/ ) {
+    if ( $line && $line =~ /^#!.*parrot(?:\s|$)/ ) {
         # something that specifies a pir or pbc is probably a HLL, skip it
         return 0 if $line =~ /\.(?:pir|pbc)/;
         return 1;
