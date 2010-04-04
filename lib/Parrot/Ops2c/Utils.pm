@@ -926,7 +926,7 @@ static size_t hash_str(ARGIN_NULLOK(const char *str))
 
 static void store_op(PARROT_INTERP, ARGIN(op_info_t *info), int full)
 {
-    HOP * const p     = mem_gc_allocate_zeroed_typed(interp, HOP);
+    HOP * const p     = mem_gc_allocate_typed(interp, HOP);
     const size_t hidx =
         hash_str(full ? info->full_name : info->name) % OP_HASH_SIZE;
 
@@ -934,31 +934,40 @@ static void store_op(PARROT_INTERP, ARGIN(op_info_t *info), int full)
     p->next   = hop[hidx];
     hop[hidx] = p;
 }
+
 static int get_op(PARROT_INTERP, const char * name, int full) {
-    const HOP * p;
+    const HOP *p;
+
     const size_t hidx = hash_str(name) % OP_HASH_SIZE;
+
     if (!hop) {
-        hop = mem_gc_allocate_n_zeroed_typed(interp, OP_HASH_SIZE,HOP *);
+        hop = mem_gc_allocate_n_zeroed_typed(interp, OP_HASH_SIZE, HOP *);
         hop_init(interp);
     }
+
     for (p = hop[hidx]; p; p = p->next) {
-        if(STREQ(name, full ? p->info->full_name : p->info->name))
+        if (STREQ(name, full ? p->info->full_name : p->info->name))
             return p->info - $self->{bs}op_lib.op_info_table;
     }
+
     return -1;
 }
+
 static void hop_init(PARROT_INTERP)
 {
     size_t i;
     op_info_t * const info = $self->{bs}op_lib.op_info_table;
+
     /* store full names */
     for (i = 0; i < $self->{bs}op_lib.op_count; i++)
         store_op(interp, info + i, 1);
+
     /* plus one short name */
     for (i = 0; i < $self->{bs}op_lib.op_count; i++)
         if (get_op(interp, info[i].name, 0) == -1)
             store_op(interp, info + i, 0);
 }
+
 static void hop_deinit(PARROT_INTERP)
 {
     if (hop) {
