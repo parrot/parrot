@@ -79,21 +79,25 @@ typedef INTVAL (*encoding_converter_t)(PARROT_INTERP, ENCODING *lhs, ENCODING *r
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 const ENCODING * Parrot_default_encoding(SHIM_INTERP);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const char * Parrot_encoding_c_name(SHIM_INTERP, INTVAL number_of_encoding);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING* Parrot_encoding_name(SHIM_INTERP, INTVAL number_of_encoding);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_encoding_number(PARROT_INTERP,
     ARGIN(const STRING *encodingname))
@@ -101,11 +105,13 @@ INTVAL Parrot_encoding_number(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_encoding_number_of_str(SHIM_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const ENCODING * Parrot_find_encoding(SHIM_INTERP,
@@ -122,6 +128,7 @@ encoding_converter_t Parrot_find_encoding_converter(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const ENCODING* Parrot_get_encoding(SHIM_INTERP, INTVAL number_of_encoding);

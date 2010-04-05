@@ -301,6 +301,7 @@ Returns the type of C<key>.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 key_type(SHIM_INTERP, ARGIN(const PMC *key))
@@ -540,9 +541,9 @@ PMC *
 key_next(PARROT_INTERP, ARGIN(PMC *key))
 {
     ASSERT_ARGS(key_next)
-    PMC *next_key;
 
     if (VTABLE_isa(interp, key, CONST_STRING(interp, "Key"))) {
+        PMC *next_key;
         GETATTR_Key_next_key(interp, key, next_key);
         return next_key;
     }
@@ -721,10 +722,6 @@ key_set_to_string(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
 =head1 SEE ALSO
 
 F<include/parrot/key.h>.
-
-=head1 HISTORY
-
-Initial version by Jeff G. on 2001.12.05.
 
 =cut
 

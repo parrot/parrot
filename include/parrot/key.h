@@ -161,6 +161,7 @@ STRING * key_set_to_string(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 INTVAL key_type(SHIM_INTERP, ARGIN(const PMC *key))
         __attribute__nonnull__(2);

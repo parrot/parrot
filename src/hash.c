@@ -76,7 +76,7 @@ static size_t key_hash_cstring(SHIM_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
+PARROT_CONST_FUNCTION
 static size_t key_hash_pointer(SHIM_INTERP,
     ARGIN(const void *value),
     size_t seed)
@@ -93,6 +93,12 @@ static void parrot_mark_hash_keys(PARROT_INTERP, ARGIN(Hash *hash))
 static void parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CONST_FUNCTION
+static int pointer_compare(SHIM_INTERP,
+    ARGIN_NULLOK(const void *a),
+    ARGIN_NULLOK(const void *b));
 
 #define ASSERT_ARGS_cstring_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(a) \
@@ -121,6 +127,7 @@ static void parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
 #define ASSERT_ARGS_parrot_mark_hash_values __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))
+#define ASSERT_ARGS_pointer_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -185,7 +192,7 @@ STRING_compare(PARROT_INTERP, ARGIN(const void *search_key), ARGIN_NULLOK(const 
 
 /*
 
-=item C<int pointer_compare(PARROT_INTERP, const void *a, const void *b)>
+=item C<static int pointer_compare(PARROT_INTERP, const void *a, const void *b)>
 
 Compares the two pointers, returning 0 if they are identical
 
@@ -194,8 +201,8 @@ Compares the two pointers, returning 0 if they are identical
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-int
+PARROT_CONST_FUNCTION
+static int
 pointer_compare(SHIM_INTERP, ARGIN_NULLOK(const void *a), ARGIN_NULLOK(const void *b))
 {
     ASSERT_ARGS(pointer_compare)
@@ -215,7 +222,7 @@ Returns a hashvalue for a pointer.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
+PARROT_CONST_FUNCTION
 static size_t
 key_hash_pointer(SHIM_INTERP, ARGIN(const void *value), size_t seed)
 {
@@ -1008,10 +1015,10 @@ parrot_chash_destroy.
 
 PARROT_EXPORT
 void
-parrot_hash_destroy(PARROT_INTERP, ARGMOD(Hash *hash))
+parrot_hash_destroy(PARROT_INTERP, ARGFREE(Hash *hash))
 {
     ASSERT_ARGS(parrot_hash_destroy)
-    HashBucket *bp = (HashBucket*)((char*)hash + sizeof (Hash));
+    HashBucket * const bp = (HashBucket*)((char*)hash + sizeof (Hash));
     if (bp != hash->bs)
         mem_gc_free(interp, hash->bs);
     mem_gc_free(interp, hash);
