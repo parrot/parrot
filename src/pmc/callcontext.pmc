@@ -56,11 +56,11 @@ typedef struct Pcc_cell
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static FLOATVAL autobox_floatval(PARROT_INTERP, ARGIN(Pcc_cell *cell))
+static FLOATVAL autobox_floatval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static INTVAL autobox_intval(PARROT_INTERP, ARGIN(Pcc_cell *cell))
+static INTVAL autobox_intval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -70,7 +70,7 @@ static PMC * autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell))
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING * autobox_string(PARROT_INTERP, ARGIN(Pcc_cell *cell))
+static STRING * autobox_string(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -194,7 +194,7 @@ get_cell_at(PARROT_INTERP, ARGIN(PMC *self), INTVAL key)
 }
 
 static INTVAL
-autobox_intval(PARROT_INTERP, ARGIN(Pcc_cell *cell))
+autobox_intval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
 {
     ASSERT_ARGS(autobox_intval)
     switch (CELL_TYPE_MASK(cell)) {
@@ -217,7 +217,7 @@ autobox_intval(PARROT_INTERP, ARGIN(Pcc_cell *cell))
 }
 
 static FLOATVAL
-autobox_floatval(PARROT_INTERP, ARGIN(Pcc_cell *cell))
+autobox_floatval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
 {
     ASSERT_ARGS(autobox_floatval)
     switch (CELL_TYPE_MASK(cell)) {
@@ -241,7 +241,7 @@ autobox_floatval(PARROT_INTERP, ARGIN(Pcc_cell *cell))
 
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-autobox_string(PARROT_INTERP, ARGIN(Pcc_cell *cell))
+autobox_string(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
 {
     ASSERT_ARGS(autobox_string)
     switch (CELL_TYPE_MASK(cell)) {
@@ -284,7 +284,7 @@ autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell))
         VTABLE_set_string_native(interp, result, CELL_STRING(cell));
         break;
       case PMCCELL:
-        return CELL_PMC(cell);
+        result = CELL_PMC(cell);
       default:
         /* exception */
         break;
@@ -355,7 +355,6 @@ static void
 mark_hash(PARROT_INTERP, ARGIN(Hash *h))
 {
     ASSERT_ARGS(mark_hash)
-    UINTVAL entries = h->entries;
     INTVAL  i;
 
     for (i = h->mask; i >= 0; --i) {
@@ -542,18 +541,17 @@ Mark any referenced strings and PMCs.
 
         GET_ATTR_bp_ps(INTERP, SELF, bp_ps);
         for (i = 0; i < n_regs_used[REGNO_PMC]; ++i) {
-            PMC *p = bp_ps.regs_p[-1L-(i)];
+            PMC * const p = bp_ps.regs_p[-1L-(i)];
             /* Original code from CTX_REG_PMC */
             if (p)
                 Parrot_gc_mark_PMC_alive(interp, p);
         }
 
         for (i = 0; i < n_regs_used[REGNO_STR]; ++i) {
-            STRING *s = bp_ps.regs_s[i];
+            STRING * const s = bp_ps.regs_s[i];
             if (s)
                 Parrot_gc_mark_STRING_alive(interp, s);
         }
-
     }
 
 /*
@@ -1097,7 +1095,7 @@ return current Namespace
     }
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        Pcc_cell *cell = get_cell_at(INTERP, SELF, key);
+        Pcc_cell * const cell = get_cell_at(INTERP, SELF, key);
         INTVAL    pos;
 
         cell->u.i   = value;
@@ -1109,7 +1107,7 @@ return current Namespace
     }
 
     VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-        Pcc_cell *cell = get_cell_at(INTERP, SELF, key);
+        Pcc_cell * const cell = get_cell_at(INTERP, SELF, key);
         INTVAL    pos;
 
         cell->u.n   = value;
@@ -1121,7 +1119,7 @@ return current Namespace
     }
 
     VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
-        Pcc_cell *cell = get_cell_at(INTERP, SELF, key);
+        Pcc_cell * const cell = get_cell_at(INTERP, SELF, key);
         INTVAL    pos;
 
         cell->u.s   = value;
@@ -1134,7 +1132,7 @@ return current Namespace
 
     VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
         INTVAL    pos;
-        Pcc_cell *cell = get_cell_at(INTERP, SELF, key);
+        Pcc_cell * const cell = get_cell_at(INTERP, SELF, key);
 
         cell->u.p   = value;
         cell->type  = PMCCELL;
@@ -1145,7 +1143,7 @@ return current Namespace
     }
 
     VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) {
-        Hash     *hash = get_hash(INTERP, SELF);
+        Hash     * const hash = get_hash(INTERP, SELF);
         Pcc_cell *cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, (void *)key);
 
         if (!cell) {
@@ -1158,7 +1156,7 @@ return current Namespace
     }
 
     VTABLE void set_number_keyed_str(STRING *key, FLOATVAL value) {
-        Hash     *hash = get_hash(INTERP, SELF);
+        Hash     * const hash = get_hash(INTERP, SELF);
         Pcc_cell *cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, (void *)key);
 
         if (!cell) {
@@ -1171,7 +1169,7 @@ return current Namespace
     }
 
     VTABLE void set_string_keyed_str(STRING *key, STRING *value) {
-        Hash     *hash = get_hash(INTERP, SELF);
+        Hash     * const hash = get_hash(INTERP, SELF);
         Pcc_cell *cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, (void *)key);
 
         if (!cell) {
@@ -1184,7 +1182,7 @@ return current Namespace
     }
 
     VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
-        Hash     *hash = get_hash(INTERP, SELF);
+        Hash     * const hash = get_hash(INTERP, SELF);
         Pcc_cell *cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, (void *)key);
 
         if (!cell) {
@@ -1197,8 +1195,8 @@ return current Namespace
     }
 
     VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
-        Hash     *hash = get_hash(INTERP, SELF);
-        void     *k    = hash_key_from_pmc(INTERP, hash, key);
+        Hash     * const hash = get_hash(INTERP, SELF);
+        void     * const k    = hash_key_from_pmc(INTERP, hash, key);
         Pcc_cell *cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, k);
 
         if (!cell) {
@@ -1211,8 +1209,8 @@ return current Namespace
     }
 
     VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
-        Hash     *hash = get_hash(INTERP, SELF);
-        void     *k    = hash_key_from_pmc(INTERP, hash, key);
+        Hash     * const hash = get_hash(INTERP, SELF);
+        void     * const k    = hash_key_from_pmc(INTERP, hash, key);
         Pcc_cell *cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, k);
 
         if (!cell) {
@@ -1225,8 +1223,8 @@ return current Namespace
     }
 
     VTABLE void set_string_keyed(PMC *key, STRING *value) {
-        Hash     *hash = get_hash(INTERP, SELF);
-        void     *k    = hash_key_from_pmc(INTERP, hash, key);
+        Hash     * const hash = get_hash(INTERP, SELF);
+        void     * const k    = hash_key_from_pmc(INTERP, hash, key);
         Pcc_cell *cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, k);
 
         if (!cell) {
@@ -1239,8 +1237,8 @@ return current Namespace
     }
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
-        Hash     *hash = get_hash(INTERP, SELF);
-        void     *k    = hash_key_from_pmc(INTERP, hash, key);
+        Hash     * const hash = get_hash(INTERP, SELF);
+        void     * const k    = hash_key_from_pmc(INTERP, hash, key);
         Pcc_cell *cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, k);
 
         if (!cell) {
@@ -1253,11 +1251,11 @@ return current Namespace
     }
 
     VTABLE INTVAL get_integer_keyed_str(STRING *key) {
-        Hash *hash = get_hash(INTERP, SELF);
+        Hash * const hash = get_hash(INTERP, SELF);
 
         if (hash) {
-            void     *k    = hash_key_from_string(INTERP, hash, key);
-            Pcc_cell *cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, k);
+            void     * const k    = hash_key_from_string(INTERP, hash, key);
+            Pcc_cell * const cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, k);
 
             if (cell)
                 return autobox_intval(INTERP, cell);
@@ -1267,11 +1265,11 @@ return current Namespace
     }
 
     VTABLE FLOATVAL get_number_keyed_str(STRING *key) {
-        Hash *hash = get_hash(INTERP, SELF);
+        Hash * const hash = get_hash(INTERP, SELF);
 
         if (hash) {
-            void     *k    = hash_key_from_string(INTERP, hash, key);
-            Pcc_cell *cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, k);
+            void     * const k    = hash_key_from_string(INTERP, hash, key);
+            Pcc_cell * const cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, k);
 
             if (cell)
                 return autobox_floatval(INTERP, cell);
@@ -1282,11 +1280,11 @@ return current Namespace
 
 
     VTABLE STRING * get_string_keyed_str(STRING *key) {
-        Hash *hash = get_hash(INTERP, SELF);
+        Hash * const hash = get_hash(INTERP, SELF);
 
         if (hash) {
-            void     *k    = hash_key_from_string(INTERP, hash, key);
-            Pcc_cell *cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, k);
+            void     * const k    = hash_key_from_string(INTERP, hash, key);
+            Pcc_cell * const cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, k);
 
             if (cell)
                 return autobox_string(INTERP, cell);
@@ -1296,11 +1294,11 @@ return current Namespace
     }
 
     VTABLE PMC * get_pmc_keyed_str(STRING *key) {
-        Hash *hash = get_hash(INTERP, SELF);
+        Hash * const hash = get_hash(INTERP, SELF);
 
         if (hash) {
-            void     *k    = hash_key_from_string(INTERP, hash, key);
-            Pcc_cell *cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, k);
+            void     * const k    = hash_key_from_string(INTERP, hash, key);
+            Pcc_cell * const cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, k);
 
             if (cell)
                 return autobox_pmc(INTERP, cell);
@@ -1310,11 +1308,11 @@ return current Namespace
     }
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
-        Hash *hash = get_hash(INTERP, SELF);
+        Hash * const hash = get_hash(INTERP, SELF);
 
         if (hash) {
-            void     *k    = hash_key_from_pmc(INTERP, hash, key);
-            Pcc_cell *cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, k);
+            void     * const k    = hash_key_from_pmc(INTERP, hash, key);
+            Pcc_cell * const cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, k);
 
             if (cell)
                 return autobox_intval(INTERP, cell);
@@ -1324,11 +1322,11 @@ return current Namespace
     }
 
     VTABLE FLOATVAL get_number_keyed(PMC *key) {
-        Hash *hash = get_hash(INTERP, SELF);
+        Hash * const hash = get_hash(INTERP, SELF);
 
         if (hash) {
-            void     *k    = hash_key_from_pmc(INTERP, hash, key);
-            Pcc_cell *cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, k);
+            void     * const k    = hash_key_from_pmc(INTERP, hash, key);
+            Pcc_cell * const cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, k);
 
             if (cell)
                 return autobox_floatval(INTERP, cell);
@@ -1338,11 +1336,11 @@ return current Namespace
     }
 
     VTABLE STRING * get_string_keyed(PMC *key) {
-        Hash *hash = get_hash(INTERP, SELF);
+        Hash * const hash = get_hash(INTERP, SELF);
 
         if (hash) {
-            void     *k    = hash_key_from_pmc(INTERP, hash, key);
-            Pcc_cell *cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, k);
+            void     * const k    = hash_key_from_pmc(INTERP, hash, key);
+            Pcc_cell * const cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, k);
 
             if (cell)
                 return autobox_string(INTERP, cell);
@@ -1352,11 +1350,11 @@ return current Namespace
     }
 
     VTABLE PMC * get_pmc_keyed(PMC *key) {
-        Hash *hash = get_hash(INTERP, SELF);
+        Hash * const hash = get_hash(INTERP, SELF);
 
         if (hash) {
-            void     *k    = hash_key_from_pmc(INTERP, hash, key);
-            Pcc_cell *cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, k);
+            void     * const k    = hash_key_from_pmc(INTERP, hash, key);
+            Pcc_cell * const cell = (Pcc_cell *)parrot_hash_get(INTERP, hash, k);
 
             if (cell)
                 return autobox_pmc(INTERP, cell);
@@ -1366,10 +1364,10 @@ return current Namespace
     }
 
     VTABLE INTVAL exists_keyed(PMC *key) {
-        Hash *hash = get_hash(INTERP, SELF);
+        Hash * const hash = get_hash(INTERP, SELF);
 
         if (hash) {
-            void *k = hash_key_from_pmc(INTERP, hash, key);
+            void * const k = hash_key_from_pmc(INTERP, hash, key);
             return parrot_hash_exists(INTERP, hash, k);
         }
 
@@ -1377,10 +1375,10 @@ return current Namespace
     }
 
     VTABLE INTVAL exists_keyed_str(STRING *key) {
-        Hash *hash = get_hash(INTERP, SELF);
+        Hash * const hash = get_hash(INTERP, SELF);
 
         if (hash) {
-            void *k = hash_key_from_string(INTERP, hash, key);
+            void * const k = hash_key_from_string(INTERP, hash, key);
             return parrot_hash_exists(INTERP, hash, k);
         }
 
@@ -1463,11 +1461,11 @@ sub, or for the point of the call a level deeper for the rest.
     METHOD backtrace(PMC *resume :optional, INTVAL has_resume :opt_flag) {
         PMC *result  = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
         PMC *cur_ctx = SELF;
-        Parrot_Continuation_attributes *cont = has_resume ? PMC_cont(resume) : NULL;
+        Parrot_Continuation_attributes * const cont = has_resume ? PMC_cont(resume) : NULL;
 
         /* Get starting context, then loop over them. */
         while (cur_ctx) {
-            PMC        *frame       = Parrot_pmc_new(interp, enum_class_Hash);
+            PMC        * const frame       = Parrot_pmc_new(interp, enum_class_Hash);
             PMC        *annotations = NULL;
             Parrot_Sub_attributes *sub;
 
