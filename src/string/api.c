@@ -82,6 +82,7 @@ Tests if the given STRING is STRINGNULL.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 INTVAL
 Parrot_str_is_null(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
 {
@@ -101,6 +102,7 @@ Tests if the given STRING is STRINGNULL.
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 INTVAL
 STRING_is_null(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
 {
@@ -128,9 +130,6 @@ Parrot_str_write_COW(PARROT_INTERP, ARGMOD(STRING *s))
 
     /* COW_FLAG | constant_FLAG | external_FLAG) */
     if (PObj_is_cowed_TESTALL(s)) {
-        STRING for_alloc;
-        size_t alloc_size;
-
         /* Create new pool data for this header to use,
          * independent of the original COW data */
         PObj_constant_CLEAR(s);
@@ -139,6 +138,9 @@ Parrot_str_write_COW(PARROT_INTERP, ARGMOD(STRING *s))
         PObj_live_CLEAR(s);
 
         if (Buffer_buflen(s)) {
+            STRING for_alloc;
+            size_t alloc_size;
+
             PObj_flags_CLEARALL(&for_alloc);
             alloc_size = s->bufused;
             Parrot_gc_allocate_string_storage(interp, &for_alloc, alloc_size);
@@ -1173,6 +1175,7 @@ of characters in the specified Parrot string's representation.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 INTVAL
 string_max_bytes(SHIM_INTERP, ARGIN(const STRING *s), UINTVAL nchars)
 {
@@ -2527,7 +2530,7 @@ sorts of leak potential otherwise.
 
 PARROT_EXPORT
 void
-Parrot_str_free_cstring(ARGIN_NULLOK(char *p))
+Parrot_str_free_cstring(ARGFREE(char *p))
 {
     ASSERT_ARGS(Parrot_str_free_cstring)
     mem_internal_free((void *)p);

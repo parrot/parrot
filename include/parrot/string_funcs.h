@@ -1,6 +1,5 @@
-#define ASSERT_ARGS_STRING_is_null __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* string_funcs.h
- *  Copyright (C) 2001-2008, Parrot Foundation.
+ *  Copyright (C) 2001-2010, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -214,7 +213,7 @@ STRING * Parrot_str_format_data(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_str_free_cstring(ARGIN_NULLOK(char *p));
+void Parrot_str_free_cstring(ARGFREE(char *p));
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -250,6 +249,7 @@ INTVAL Parrot_str_is_cclass(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 INTVAL Parrot_str_is_null(SHIM_INTERP, ARGIN_NULLOK(const STRING *s));
 
 PARROT_EXPORT
@@ -496,6 +496,7 @@ STRING * string_increment(PARROT_INTERP, ARGIN(const STRING *s))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 INTVAL STRING_is_null(SHIM_INTERP, ARGIN_NULLOK(const STRING *s));
 
 PARROT_EXPORT
@@ -520,6 +521,7 @@ STRING * string_make_from_charset(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
 INTVAL string_max_bytes(SHIM_INTERP, ARGIN(const STRING *s), UINTVAL nchars)
         __attribute__nonnull__(2);
 
