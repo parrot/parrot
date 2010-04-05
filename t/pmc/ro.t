@@ -66,13 +66,14 @@ Tests automatically generated read-only PMC support.
     foo = 43
     pop_eh
     ok( 0, "integer_set_read_only_is_not_writable" )
-    end
+    goto end
 
 eh_label:
     .local string message
     .get_results($P0)
     message = $P0['message']
     is( message, "set_integer_native() in read-only instance of 'Integer'", "integer_set_read_only_is_not_writable" )
+end:
 .end
 
 .sub integer_set_read_only_can_be_read
@@ -127,12 +128,14 @@ eh_label:
     pop_eh
 
     ok(0, 'integer_add')
+    goto end
 
 eh_label:
     .local string message
     .get_results($P0)
     message = $P0['message']
     is( message, "i_add_int() in read-only instance of 'Integer'", 'integer_add' )
+end:
 .end
 
 .sub complex_i_add
@@ -151,13 +154,14 @@ eh_label:
     add foo, 4
     pop_eh
     ok( 0, 'complex_i_add')
+    goto end
 
 eh_label:
     .local string message
     .get_results($P0)
     message = $P0['message']
     is( message, "i_add_int() in read-only instance of 'Complex'", 'complex_i_add' )
-
+end:
 .end
 
 .sub resizablepmcarray_non_recursive_part
@@ -184,12 +188,14 @@ eh_label:
     pop_eh
 
     ok(0, 'resizablepmcarray_non_recursive_part')
+    goto end
 
 eh_label:
     .local string message
     .get_results($P0)
     message = $P0['message']
     is( message, "set_pmc_keyed_int() in read-only instance of 'ResizablePMCArray'", 'resizablepmcarray_non_recursive_part' )
+end:
 .end
 
 .sub objects
@@ -201,7 +207,6 @@ eh_label:
     eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_WRITE_TO_CONSTCLASS)
     set_addr eh, eh_label
-
 
     fooclass = newclass 'Foo'
     addattribute fooclass, 'bar'
@@ -215,12 +220,14 @@ eh_label:
     pop_eh
 
     ok( 0, 'objects')
+    goto end
 
 eh_label:
     .local string message
     .get_results($P0)
     message = $P0['message']
     is( message, "set_attr_str() in read-only instance of 'Foo'", 'objects' )
+end:
 .end
 
 =pod
