@@ -2528,7 +2528,7 @@ tags-emacs: tags.emacs.dummy
         --links=no --totals \
         -R --exclude=blib --exclude=.svn  \
         --languages=c,perl --langmap=c:+.h,c:+.pmc,c:+.ops \
-        -I NOTNULL,NULLOK,ARGIN,ARGMOD,ARGOUT,ARGINOUT,ARGIN_NULLOK,ARGOUT_NULLOK,ARGMOD_NULLOK \
+        -I NOTNULL,NULLOK,ARGIN,ARGMOD,ARGOUT,ARGINOUT,ARGIN_NULLOK,ARGOUT_NULLOK,ARGMOD_NULLOK,ARGFREE \
         .
 
 # this works with an old etags (XEmacs 21.5*)
@@ -2548,7 +2548,7 @@ tags-vi: tags.vi.dummy
     --links=no --totals \
     -R --exclude=blib --exclude=.svn  \
     --languages=c,perl --langmap=c:+.h,c:+.pmc,c:+.ops \
-    -I NOTNULL,NULLOK,ARGIN,ARGMOD,ARGOUT,ARGINOUT,ARGIN_NULLOK,ARGOUT_NULLOK,ARGMOD_NULLOK \
+    -I NOTNULL,NULLOK,ARGIN,ARGMOD,ARGOUT,ARGINOUT,ARGIN_NULLOK,ARGOUT_NULLOK,ARGMOD_NULLOK,ARGFREE \
     .
 	$(PERL) $(BUILD_TOOLS_DIR)/addopstags.pl $(OPS_FILES)
 
