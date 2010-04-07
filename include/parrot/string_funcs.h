@@ -352,13 +352,6 @@ STRING * Parrot_str_replace(PARROT_INTERP,
         FUNC_MODIFIES(*d);
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-STRING * Parrot_str_resize(PARROT_INTERP, ARGMOD(STRING *s), UINTVAL addlen)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*s);
-
-PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC* Parrot_str_split(PARROT_INTERP,
@@ -634,9 +627,6 @@ STRING* Parrot_str_from_uint(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src) \
     , PARROT_ASSERT_ARG(rep))
-#define ASSERT_ARGS_Parrot_str_resize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_Parrot_str_split __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_str_substr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

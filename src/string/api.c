@@ -753,31 +753,6 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
 
 /*
 
-=item C<STRING * Parrot_str_resize(PARROT_INTERP, STRING *s, UINTVAL addlen)>
-
-Grows the Parrot string's buffer by the specified number of characters.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-STRING *
-Parrot_str_resize(PARROT_INTERP, ARGMOD(STRING *s), UINTVAL addlen)
-{
-    ASSERT_ARGS(Parrot_str_resize)
-    Parrot_str_write_COW(interp, s);
-
-    /* Don't check buflen, if we are here, we already checked. */
-    Parrot_gc_reallocate_string_storage(interp,
-        s, Buffer_buflen(s) + string_max_bytes(interp, s, addlen));
-    return s;
-}
-
-
-/*
-
 =back
 
 =head2 Ordinary user-visible string operations
