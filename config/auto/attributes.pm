@@ -1,4 +1,4 @@
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -40,8 +40,11 @@ our @potential_attributes = qw(
     HASATTRIBUTE_PURE
     HASATTRIBUTE_UNUSED
     HASATTRIBUTE_WARN_UNUSED_RESULT
+    HASATTRIBUTE_HOT
+    HASATTRIBUTE_COLD
     HASATTRIBUTE_NEVER_WORKS
 );
+# HASATTRIBUTE_NEVER_WORKS is at the end just to prove that it's possible to fail.
 
 sub runstep {
     my ( $self, $conf ) = @_;

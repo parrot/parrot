@@ -32,6 +32,16 @@ int
 purefunc(int x);
 
 
+__attribute__hot__
+int
+hotfunc(int x);
+
+
+__attribute__cold__
+int
+coldfunc(int x);
+
+
 static int
 useless(void) { int x __attribute__unused__; return 0; }
 

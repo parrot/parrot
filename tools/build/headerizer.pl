@@ -82,6 +82,8 @@ my %valid_macros = map { ( $_, 1 ) } qw(
     PARROT_DOES_NOT_RETURN_WHEN_FALSE
     PARROT_MALLOC
     PARROT_OBSERVER
+    PARROT_HOT
+    PARROT_COLD
 );
 
 main();

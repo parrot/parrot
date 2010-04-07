@@ -1,5 +1,5 @@
 /* compiler.h
- *  Copyright (C) 2007-2008, Parrot Foundation.
+ *  Copyright (C) 2007-2010, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -59,6 +59,12 @@
 #ifdef HASATTRIBUTE_WARN_UNUSED_RESULT
 #  define __attribute__warn_unused_result__ __attribute__((__warn_unused_result__))
 #endif
+#ifdef HASATTRIBUTE_HOT
+#  define __attribute__hot__                __attribute__((__hot__))
+#endif
+#ifdef HASATTRIBUTE_COLD
+#  define __attribute__cold__               __attribute__((__cold__))
+#endif
 
 /* If we haven't defined the attributes yet, define them to blank. */
 #ifndef __attribute__deprecated__
@@ -87,6 +93,12 @@
 #endif
 #ifndef __attribute__warn_unused_result__
 #  define __attribute__warn_unused_result__
+#endif
+#ifndef __attribute__hot__
+#  define __attribute__hot__
+#endif
+#ifndef __attribute__cold__
+#  define __attribute__cold__
 #endif
 
 
@@ -133,6 +145,10 @@
 #define PARROT_DOES_NOT_RETURN              /*@noreturn@*/ __attribute__noreturn__
 #define PARROT_DOES_NOT_RETURN_WHEN_FALSE   /*@noreturnwhenfalse@*/
 #define PARROT_MALLOC                       /*@only@*/ __attribute__malloc__ __attribute__warn_unused_result__
+
+/* Hot functions can be optimized by the compiler. */
+#define PARROT_HOT                          __attribute__hot__
+#define PARROT_COLD                         __attribute__cold__
 
 /* Macros for exposure tracking for splint. */
 /* See http://www.splint.org/manual/html/all.html section 6.2 */
