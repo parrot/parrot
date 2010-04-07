@@ -487,7 +487,7 @@ scheme) for the stringhandle.
         }
 
         GET_ATTR_encoding(INTERP, SELF, encoding);
-        RETURN(STRING *encoding_copy);
+        RETURN(STRING *encoding);
     }
 
 /*

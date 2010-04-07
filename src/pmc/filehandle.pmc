@@ -644,7 +644,7 @@ scheme) for the filehandle.
         }
 
         GET_ATTR_encoding(INTERP, SELF, encoding);
-        RETURN(STRING *encoding_copy);
+        RETURN(STRING *encoding);
     }
 
 
