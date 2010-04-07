@@ -136,14 +136,6 @@ STRING * Parrot_str_concat(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-STRING * Parrot_str_copy(PARROT_INTERP, ARGMOD(STRING *s))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*s);
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
 STRING * Parrot_str_downcase(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         __attribute__nonnull__(1);
@@ -555,9 +547,6 @@ STRING* Parrot_str_from_uint(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_str_concat __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_str_copy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_Parrot_str_downcase __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_str_downcase_inplace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

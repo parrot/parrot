@@ -923,26 +923,6 @@ string_chr(PARROT_INTERP, UINTVAL character)
 }
 
 
-/*
-
-=item C<STRING * Parrot_str_copy(PARROT_INTERP, STRING *s)>
-
-Creates and returns a copy of the specified Parrot string.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-STRING *
-Parrot_str_copy(PARROT_INTERP, ARGMOD(STRING *s))
-{
-    ASSERT_ARGS(Parrot_str_copy)
-    return Parrot_str_new_COW(interp, s);
-}
-
 
 /*
 
