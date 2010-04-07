@@ -125,8 +125,7 @@ Returns the string itself.
     VTABLE STRING *get_string() {
         STRING *str_val;
         GET_ATTR_str_val(INTERP, SELF, str_val);
-
-        return str_val ? Parrot_str_copy(INTERP, str_val) : NULL;
+        return str_val;
     }
 
 /*
@@ -217,12 +216,7 @@ Sets the value of the string to a copy of the specified C<string>.
 */
 
     VTABLE void assign_string_native(STRING *value) {
-        if (!STRING_IS_NULL(value)) {
-            SET_ATTR_str_val(INTERP, SELF,
-                Parrot_str_set(INTERP, SELF.get_string(), value));
-        }
-        else
-            SET_ATTR_str_val(INTERP, SELF, NULL);
+        SET_ATTR_str_val(INTERP, SELF, value);
     }
 
 /*

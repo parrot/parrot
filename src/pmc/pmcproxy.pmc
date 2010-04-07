@@ -486,9 +486,7 @@ Return the name of the low-level class (without the HLL namespace).
 
     VTABLE STRING *get_string() {
         Parrot_Class_attributes * const proxy_info = PARROT_CLASS(SELF);
-
-        /* Copy the stored string name of the proxy. */
-        return Parrot_str_copy(interp, proxy_info->name);
+        return proxy_info->name;
     }
 
 

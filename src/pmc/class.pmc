@@ -668,7 +668,7 @@ Returns the name of the class (without the HLL namespace).
 */
 
     VTABLE STRING *get_string() {
-        return Parrot_str_copy(interp, make_class_name(interp, SELF));
+        return make_class_name(interp, SELF);
     }
 
 /*

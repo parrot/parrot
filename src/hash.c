@@ -1414,7 +1414,7 @@ parrot_hash_clone(PARROT_INTERP, ARGIN(const Hash *hash), ARGOUT(Hash *dest))
             break;
 
           case enum_type_STRING:
-            valtmp = (void *)Parrot_str_copy(interp, (STRING *)b->value);
+            valtmp = b->value;
             break;
 
           case enum_type_PMC:

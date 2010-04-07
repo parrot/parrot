@@ -515,7 +515,7 @@ Return the name of the role (without the HLL namespace).
         }
 
         /* Otherwise, copy the stored string name of the class. */
-        return Parrot_str_copy(interp, role->name);
+        return role->name;
     }
 
 /*
