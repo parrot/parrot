@@ -454,9 +454,7 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
             {
                 STRING *string_value;
                 if (constant)
-                    /* ensure that callees don't modify constant caller strings */
-                    string_value = Parrot_str_new_COW(interp,
-                            Parrot_pcc_get_string_constant(interp, ctx, raw_index));
+                    string_value = Parrot_pcc_get_string_constant(interp, ctx, raw_index);
                 else
                     string_value = CTX_REG_STR(ctx, raw_index);
 
@@ -547,10 +545,8 @@ extract_named_arg_from_op(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(STRING 
         break;
       case PARROT_ARG_STRING:
         if (constant)
-            /* ensure that callees don't modify constant caller strings */
             VTABLE_set_string_keyed_str(interp, call_object, name,
-                        Parrot_str_new_COW(interp,
-                                Parrot_pcc_get_string_constant(interp, ctx, raw_index)));
+                    Parrot_pcc_get_string_constant(interp, ctx, raw_index));
         else
             VTABLE_set_string_keyed_str(interp, call_object, name,
                         CTX_REG_STR(ctx, raw_index));
