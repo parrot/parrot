@@ -359,11 +359,11 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(STRING *a),
             return Parrot_str_append(interp, result, b);
         }
 
-        return Parrot_str_copy(interp, a);
+        return a;
     }
 
     return b
-        ? Parrot_str_copy(interp, b)
+        ? b
         : string_make(interp, NULL, 0, NULL, Uflags);
 }
 
@@ -401,7 +401,7 @@ Parrot_str_append(PARROT_INTERP, ARGMOD_NULLOK(STRING *a), ARGIN_NULLOK(STRING *
 
     /* Is A real? */
     if (a == NULL || Buffer_bufstart(a) == NULL)
-        return Parrot_str_copy(interp, b);
+        return b;
 
     saneify_string(a);
     saneify_string(b);
