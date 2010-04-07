@@ -29,6 +29,7 @@ typedef struct _handler_node_t {
 
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
+PARROT_COLD
 void Parrot_exit(PARROT_INTERP, int status)
         __attribute__nonnull__(1);
 

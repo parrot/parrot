@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -89,6 +89,7 @@ Print a stack trace for C<exception>, a message if there is one, and then exit.
 */
 
 PARROT_DOES_NOT_RETURN
+PARROT_COLD
 void
 die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
 {
@@ -326,6 +327,7 @@ the exception can be stored in the exception's payload.
 
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
+PARROT_COLD
 void
 Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
 {
@@ -423,6 +425,7 @@ See also C<Parrot_ex_throw_from_op> and C<exit_fatal()>.
 
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
+PARROT_COLD
 void
 Parrot_ex_throw_from_c_args(PARROT_INTERP, SHIM(void *ret_addr),
         int exitcode, ARGIN(const char *format), ...)
@@ -476,6 +479,7 @@ and throws it again.
 
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
+PARROT_COLD
 void
 Parrot_ex_rethrow_from_c(PARROT_INTERP, ARGIN(PMC *exception))
 {
@@ -544,6 +548,7 @@ Prints a backtrace and message for a failed assertion.
 
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
+PARROT_COLD
 void
 Parrot_confess(ARGIN(const char *cond), ARGIN(const char *file), unsigned int line)
 {
@@ -637,6 +642,7 @@ require an interpreter).
 
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
+PARROT_COLD
 void
 exit_fatal(int exitcode, ARGIN(const char *format), ...)
 {
@@ -675,6 +681,7 @@ developers
 */
 
 PARROT_DOES_NOT_RETURN
+PARROT_COLD
 void
 do_panic(NULLOK_INTERP, ARGIN_NULLOK(const char *message),
          ARGIN_NULLOK(const char *file), unsigned int line)
