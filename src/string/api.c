@@ -103,35 +103,6 @@ STRING_is_null(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
 
 /*
 
-=item C<STRING * Parrot_str_set(PARROT_INTERP, STRING *dest, STRING *src)>
-
-Makes the contents of first Parrot string a copy of the contents of
-second.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-STRING *
-Parrot_str_set(PARROT_INTERP, ARGIN_NULLOK(STRING *dest), ARGMOD(STRING *src))
-{
-    ASSERT_ARGS(Parrot_str_set)
-    if (dest == src)
-        return dest;
-    if (dest) { /* && dest != src */
-        /* they are different, dest is not an external string */
-        dest = Parrot_str_reuse_COW(interp, src, dest);
-    }
-    else
-        dest = Parrot_str_new_COW(interp, src);
-    return dest;
-}
-
-
-/*
-
 =back
 
 =head2 Basic String Functions
