@@ -25,7 +25,7 @@
 #  endif
 #endif
 #ifdef HASATTRIBUTE_FORMAT
-#  define __attribute__format__(x, y, z)    __attribute__((format(x,y,z)))
+#  define __attribute__format__(x, y, z)    __attribute__((format((x),(y),(z))))
 #endif
 #ifdef HASATTRIBUTE_MALLOC
 #  define __attribute__malloc__             __attribute__((__malloc__))
