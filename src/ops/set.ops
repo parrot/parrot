@@ -247,7 +247,7 @@ inline op assign(invar PMC, in STR) :base_core {
 }
 
 inline op assign(out STR, in STR) :base_core {
-    $1 = Parrot_str_set(interp, $1, $2);
+    $1 = $2;
 }
 
 inline op setref(invar PMC, invar PMC) :base_core {
