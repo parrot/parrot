@@ -41,14 +41,6 @@ STRING *STRINGNULL;
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void make_writable(PARROT_INTERP,
-    ARGMOD(STRING **s),
-    const size_t len,
-    parrot_string_representation_t representation)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*s);
-
 PARROT_INLINE
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -61,9 +53,6 @@ static const CHARSET * string_rep_compatible(SHIM_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*e);
 
-#define ASSERT_ARGS_make_writable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_string_rep_compatible __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(a) \
     , PARROT_ASSERT_ARG(b) \
@@ -110,133 +99,6 @@ STRING_is_null(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(STRING_is_null)
     return !s || s == STRINGNULL;
-}
-
-
-/*
-
-=item C<void Parrot_str_write_COW(PARROT_INTERP, STRING *s)>
-
-If the specified Parrot string is copy-on-write then the memory is
-copied over and the copy-on-write flag is cleared.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_str_write_COW(PARROT_INTERP, ARGMOD(STRING *s))
-{
-    ASSERT_ARGS(Parrot_str_write_COW)
-
-    /* COW_FLAG | constant_FLAG | external_FLAG) */
-    if (PObj_is_cowed_TESTALL(s)) {
-        /* Create new pool data for this header to use,
-         * independent of the original COW data */
-        PObj_constant_CLEAR(s);
-
-        /* constant may have been marked */
-        PObj_live_CLEAR(s);
-
-        if (Buffer_buflen(s)) {
-            STRING for_alloc;
-            size_t alloc_size;
-
-            PObj_flags_CLEARALL(&for_alloc);
-            alloc_size = s->bufused;
-            Parrot_gc_allocate_string_storage(interp, &for_alloc, alloc_size);
-
-            /* now copy memory over */
-            mem_sys_memcopy(for_alloc.strstart, s->strstart, alloc_size);
-
-            /* and finally use that string memory */
-
-            Buffer_bufstart(s) = Buffer_bufstart(&for_alloc);
-            s->strstart      = for_alloc.strstart;
-            Buffer_buflen(s)   = Buffer_buflen(&for_alloc);
-            PARROT_ASSERT(Buffer_buflen(s) >= alloc_size);
-        }
-
-        /* COW_FLAG | external_FLAG */
-        PObj_is_external_CLEARALL(s);
-    }
-
-    s->hashval = 0;
-}
-
-/*
-
-=item C<STRING * Parrot_str_new_COW(PARROT_INTERP, STRING *s)>
-
-Creates a copy-on-write string, cloning a string header without
-allocating a new buffer.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-STRING *
-Parrot_str_new_COW(PARROT_INTERP, ARGMOD(STRING *s))
-{
-    ASSERT_ARGS(Parrot_str_new_COW)
-    STRING *d;
-
-    if (PObj_constant_TEST(s)) {
-        d = Parrot_gc_new_string_header(interp,
-            PObj_get_FLAGS(s) & ~PObj_constant_FLAG);
-        PObj_COW_SET(s);
-        STRUCT_COPY(d, s);
-        /* we can't move the memory, because constants aren't
-         * scanned in compact_pool, therefore the other end
-         * would point to garbage.
-         */
-        PObj_constant_CLEAR(d);
-        PObj_external_SET(d);
-    }
-    else {
-        d = Parrot_gc_new_string_header(interp, PObj_get_FLAGS(s));
-        PObj_COW_SET(s);
-        STRUCT_COPY(d, s);
-        PObj_sysmem_CLEAR(d);
-    }
-    return d;
-}
-
-/*
-
-=item C<STRING * Parrot_str_reuse_COW(PARROT_INTERP, STRING *s, STRING *d)>
-
-Creates a copy-on-write string by cloning a string header without
-allocating a new buffer. Doesn't allocate a new string header, instead
-using the one passed in and returns it.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-STRING *
-Parrot_str_reuse_COW(SHIM_INTERP, ARGMOD(STRING *s), ARGOUT(STRING *d))
-{
-    ASSERT_ARGS(Parrot_str_reuse_COW)
-
-    if (PObj_constant_TEST(s)) {
-        PObj_COW_SET(s);
-        STRUCT_COPY(d, s);
-        PObj_constant_CLEAR(d);
-        PObj_external_SET(d);
-    }
-    else {
-        PObj_COW_SET(s);
-        STRUCT_COPY(d, s);
-        PObj_sysmem_CLEAR(d);
-    }
-    return d;
 }
 
 /*
@@ -1638,33 +1500,6 @@ Parrot_str_equal(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(con
      * both strings have same length
      */
     return !CHARSET_COMPARE(interp, s1, s2);
-}
-
-
-/*
-
-=item C<static void make_writable(PARROT_INTERP, STRING **s, const size_t len,
-parrot_string_representation_t representation)>
-
-Makes the specified Parrot string writable with minimum length C<len>.  The
-C<representation> argument is required in case a new Parrot string has to be
-created.
-
-=cut
-
-*/
-
-static void
-make_writable(PARROT_INTERP, ARGMOD(STRING **s),
-    const size_t len, parrot_string_representation_t representation)
-{
-    ASSERT_ARGS(make_writable)
-    if (!*s)
-        *s = Parrot_str_new_noinit(interp, representation, len);
-    else if ((*s)->strlen < len)
-        Parrot_str_resize(interp, *s, (UINTVAL)(len - (*s)->strlen));
-    else if (PObj_is_cowed_TESTALL(*s))
-        Parrot_str_write_COW(interp, *s);
 }
 
 
