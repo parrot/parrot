@@ -63,6 +63,8 @@ my %valid_macros = map { ( $_, 1 ) } qw(
     PARROT_DOES_NOT_RETURN
     PARROT_MALLOC
     PARROT_OBSERVER
+    PARROT_HOT
+    PARROT_COLD
 );
 
 =item C<extract_function_declarations($text)>
@@ -237,7 +239,7 @@ sub generate_documentation_signature {
     my $function_decl = shift;
 
     # strip out any PARROT_* function modifiers
-    foreach my $key (%valid_macros) {
+    foreach my $key (keys %valid_macros) {
         $function_decl =~ s/^$key$//m;
     }
 

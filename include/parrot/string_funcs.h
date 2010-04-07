@@ -249,6 +249,7 @@ INTVAL Parrot_str_is_cclass(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+PARROT_HOT
 PARROT_PURE_FUNCTION
 INTVAL Parrot_str_is_null(SHIM_INTERP, ARGIN_NULLOK(const STRING *s));
 
@@ -496,6 +497,7 @@ STRING * string_increment(PARROT_INTERP, ARGIN(const STRING *s))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_HOT
 PARROT_PURE_FUNCTION
 INTVAL STRING_is_null(SHIM_INTERP, ARGIN_NULLOK(const STRING *s));
 
