@@ -1429,7 +1429,7 @@ Creates and returns a clone of the signature.
             SET_ATTR_type_tuple(INTERP, dest, VTABLE_clone(INTERP, type_tuple));
 
         if (short_sig)
-            SET_ATTR_short_sig(INTERP, dest, short_sig);
+            SET_ATTR_short_sig(INTERP, dest, Parrot_str_copy(INTERP, short_sig));
 
         if (!PMC_IS_NULL(arg_flags))
             SET_ATTR_arg_flags(INTERP, dest, VTABLE_clone(INTERP, arg_flags));

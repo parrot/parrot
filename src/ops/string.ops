@@ -529,7 +529,8 @@ op charset(out INT, in STR) :base_core {
 }
 
 op charsetname(out STR, in INT) :base_core {
-    $1 = Parrot_charset_name(interp, $2);
+    STRING * const name = Parrot_charset_name(interp, $2);
+    $1 = name ? Parrot_str_copy(interp, name) : NULL;
 }
 
 op find_charset(out INT, in STR) :base_core {
@@ -584,7 +585,8 @@ op encoding(out INT, in STR) :base_core {
 }
 
 op encodingname(out STR, in INT) :base_core {
-    $1 = Parrot_encoding_name(interp, $2);
+    STRING * const name = Parrot_encoding_name(interp, $2);
+    $1 = name ? Parrot_str_copy(interp, name) : NULL;
 }
 
 op find_encoding(out INT, in STR) :base_core {

@@ -505,7 +505,7 @@ path_concat(PARROT_INTERP, ARGMOD(STRING *l_path), ARGMOD(STRING *r_path))
     ASSERT_ARGS(path_concat)
     STRING* join;
 
-    join = l_path;
+    join = Parrot_str_copy(interp, l_path);
     join = path_guarantee_trailing_separator(interp, join);
     join = Parrot_str_append(interp, join, r_path);
 
@@ -532,7 +532,9 @@ try_load_path(PARROT_INTERP, ARGMOD(STRING* path))
     ASSERT_ARGS(try_load_path)
     STRING *final;
 
-    final = path_finalize(interp, path);
+    final = Parrot_str_copy(interp, path);
+
+    final = path_finalize(interp, final);
 
     if (Parrot_stat_info_intval(interp, final, STAT_EXISTS)) {
         return final;
@@ -715,7 +717,8 @@ Parrot_locate_runtime_file_str(PARROT_INTERP, ARGMOD(STRING *file),
         STRING * const path = VTABLE_get_string_keyed_int(interp, paths, i);
         STRING *found_name;
 
-        full_name = path_append(interp, path, file);
+        full_name = Parrot_str_copy(interp, path);
+        full_name = path_append(interp, full_name, file);
 
         found_name =
             (type & PARROT_RUNTIME_FT_DYNEXT)
@@ -926,11 +929,11 @@ parrot_split_path_ext(PARROT_INTERP, ARGMOD(STRING *in),
     }
     else if (pos_sl) {
         stem = Parrot_str_substr(interp, in, pos_sl, len - pos_sl, NULL, 0);
-        *wo_ext = in;
+        *wo_ext = Parrot_str_copy(interp, in);
         *ext = NULL;
     }
     else {
-        stem = in;
+        stem = Parrot_str_copy(interp, in);
         *wo_ext = stem;
         *ext = NULL;
     }

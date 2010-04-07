@@ -253,10 +253,10 @@ filehandle, rather than modifying the invocant).
                                 "Cannot reopen already open filehandle");
 
         if (got_mode && !STRING_IS_NULL(mode))
-            SET_ATTR_mode(INTERP, SELF, mode);
+            SET_ATTR_mode(INTERP, SELF, Parrot_str_copy(INTERP, mode));
 
         if (got_filename && !STRING_IS_NULL(filename))
-            SET_ATTR_filename(INTERP, SELF, filename);
+            SET_ATTR_filename(INTERP, SELF, Parrot_str_copy(INTERP, filename));
 
         /* Open the file. With no options, reopen the same file as before */
         GET_ATTR_filename(INTERP, SELF, open_filename);
@@ -619,7 +619,10 @@ Retrieve the read mode string for the filehandle.
 
     METHOD mode() {
         STRING *mode, *mode_copy;
+
         GET_ATTR_mode(INTERP, SELF, mode);
+        mode_copy = Parrot_str_copy(INTERP, mode);
+
         RETURN(STRING *mode_copy);
     }
 
@@ -637,14 +640,20 @@ scheme) for the filehandle.
 
     METHOD encoding(STRING *new_encoding :optional, INTVAL got_encoding :opt_flag) {
         STRING *encoding;
+        STRING *encoding_copy = NULL;
 
         if (got_encoding) {
-            SET_ATTR_encoding(INTERP, SELF, new_encoding);
+            if (!STRING_IS_NULL(new_encoding))
+                encoding_copy = Parrot_str_copy(INTERP, new_encoding);
+            SET_ATTR_encoding(INTERP, SELF, encoding_copy);
             RETURN(STRING *new_encoding);
         }
 
         GET_ATTR_encoding(INTERP, SELF, encoding);
-        RETURN(STRING *encoding);
+        if (!STRING_IS_NULL(encoding))
+            encoding_copy = Parrot_str_copy(INTERP, encoding);
+
+        RETURN(STRING *encoding_copy);
     }
 
 

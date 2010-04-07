@@ -148,7 +148,7 @@ Creates PackFile for given directory.
             PackFile_Segment * const pfseg = (PackFile_Segment *)VTABLE_get_pointer(interp, seg);
 
             pfseg->pf   = pf;
-            pfseg->name = name;
+            pfseg->name = Parrot_str_copy(interp, name);
             PackFile_add_segment(interp, pfdir, pfseg);
         }
 

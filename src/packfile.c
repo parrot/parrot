@@ -2452,7 +2452,7 @@ segment_init(PARROT_INTERP, ARGOUT(PackFile_Segment *self), ARGIN(PackFile *pf),
     self->size        = 0;
     self->data        = NULL;
     self->id          = 0;
-    self->name        = name;
+    self->name        = Parrot_str_copy(interp, name);
 }
 
 

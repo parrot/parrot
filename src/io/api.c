@@ -367,7 +367,7 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
                 "Cannot read from a closed filehandle");
 
         if (length == 0)
-            result = string_orig;
+            result = Parrot_str_copy(interp, string_orig);
         else {
             INTVAL read_length = length;
             const INTVAL orig_length = Parrot_str_byte_length(interp, string_orig);

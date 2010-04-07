@@ -361,7 +361,7 @@ static STRING*
 compose(PARROT_INTERP, ARGIN(STRING *src))
 {
     ASSERT_ARGS(compose)
-    return src;
+    return Parrot_str_copy(interp, src);
 }
 
 /* A noop. can't decompose ascii */
@@ -381,7 +381,7 @@ static STRING*
 decompose(PARROT_INTERP, ARGMOD(STRING *src))
 {
     ASSERT_ARGS(decompose)
-    return src;
+    return Parrot_str_copy(interp, src);
 }
 
 /*

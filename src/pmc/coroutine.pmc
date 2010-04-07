@@ -120,6 +120,9 @@ Clones the coroutine.
                 (Parrot_Coroutine_attributes *)PMC_data(SELF),
                 sizeof (Parrot_Coroutine_attributes));
 
+        GET_ATTR_name(INTERP, ret, name);
+        SET_ATTR_name(INTERP, ret, Parrot_str_copy(INTERP, name));
+
         return ret;
     }
 

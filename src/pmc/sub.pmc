@@ -252,14 +252,20 @@ Sets the name of the subroutine.
 */
 
     VTABLE STRING *get_string() {
-        STRING *name;
-        GET_ATTR_name(INTERP, SELF, name);
-        return name;
+        Parrot_Sub_attributes *sub;
+        PMC_get_sub(INTERP, SELF, sub);
+
+        if (sub->name)
+            return Parrot_str_copy(INTERP, sub->name);
+
+        return NULL;
     }
 
 
     VTABLE void set_string_native(STRING *subname) {
-        SET_ATTR_name(INTERP, SELF, subname);
+        Parrot_Sub_attributes *sub;
+        PMC_get_sub(INTERP, SELF, sub);
+        sub->name = Parrot_str_copy(INTERP, subname);
     }
 
 
@@ -522,6 +528,9 @@ Creates and returns a clone of the subroutine.
         /* first set the sub struct, Parrot_str_copy may cause GC */
         *sub = *dest_sub;
 
+        if (sub->name)
+            sub->name = Parrot_str_copy(INTERP, sub->name);
+
         /* Be sure not to share arg_info. */
         dest_sub->arg_info = NULL;
 
@@ -554,6 +563,10 @@ Set SELF to the data in other.
 
             /* copy the sub struct */
             memmove(my_sub, other_sub, sizeof (Parrot_Sub_attributes));
+
+            /* copy the name so it's a different string in memory */
+            if (my_sub->name)
+                my_sub->name = Parrot_str_copy(INTERP, my_sub->name);
         }
         else
             Parrot_ex_throw_from_c_args(INTERP, NULL,

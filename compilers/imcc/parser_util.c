@@ -708,7 +708,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
         sub_data->seg        = new_cs;
         sub_data->start_offs = 0;
         sub_data->end_offs   = new_cs->base.size;
-        sub_data->name       = name;
+        sub_data->name       = Parrot_str_copy(interp, name);
 
         *error_message = NULL;
     }

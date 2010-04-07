@@ -145,7 +145,7 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
                 Parrot_Class_attributes * const source_class = PARROT_CLASS(source);
                 Parrot_Class_attributes * const dest_class   = PARROT_CLASS(dest);
 
-                dest_class->name           = source_class->name;
+                dest_class->name           = Parrot_str_copy(d, source_class->name);
                 dest_class->_namespace     = VTABLE_clone(d, source_class->_namespace);
             }
         }

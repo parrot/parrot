@@ -444,6 +444,8 @@ key_string(PARROT_INTERP, ARGIN(PMC *key))
         {
             STRING *s;
             GETATTR_Key_str_key(interp, key, s);
+            if (s)
+                s = Parrot_str_new_COW(interp, s);
             return s;
         }
       case KEY_string_FLAG | KEY_register_FLAG:
