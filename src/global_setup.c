@@ -212,7 +212,6 @@ parrot_global_setup_2(PARROT_INTERP)
 {
     ASSERT_ARGS(parrot_global_setup_2)
     PMC *classname_hash;
-    int  i;
 
     create_initial_context(interp);
 
