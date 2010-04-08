@@ -105,6 +105,10 @@ sub extract_function_declarations {
     my $self = shift;
     my $text = shift;
 
+    # Only check the YACC C code if we find what looks like YACC file
+    $text =~ s/%\{(.*)%\}.*/$1/sm;
+
+    # Drop all text after HEADERIZER STOP
     $text =~ s{/\*\s*HEADERIZER STOP.+}{}s;
 
     # Strip blocks of comments
@@ -136,6 +140,9 @@ sub extract_function_declarations {
 
     # Ignore anything with magic words HEADERIZER SKIP
     @funcs = grep { !m{/\*\s*HEADERIZER SKIP\s*\*/} } @funcs;
+
+    # pmclass declarations in PMC files are no good
+    @funcs = grep { !m{^pmclass } } @funcs;
 
     # Variables are of no use to us
     @funcs = grep { !/=/ } @funcs;

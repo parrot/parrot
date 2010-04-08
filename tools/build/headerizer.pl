@@ -73,74 +73,6 @@ main();
 
 =head1 FUNCTIONS
 
-=head2 extract_function_declarations( $sourcefile_text )
-
-Rips apart a C file to get the function declarations.
-
-=cut
-
-sub extract_function_declarations {
-    my $text = shift;
-
-    # Only check the YACC C code if we find what looks like YACC file
-    $text =~ s[%\{(.*)%\}.*][$1]sm;
-
-    # Drop all text after HEADERIZER STOP
-    $text =~ s[/\*\s*HEADERIZER STOP.+][]s;
-
-    # Strip blocks of comments
-    $text =~ s[^/\*.*?\*/][]mxsg;
-
-    # Strip # compiler directives (Thanks, Audrey!)
-    $text =~ s[^#(\\\n|.)*][]mg;
-
-    # Strip code blocks
-    $text =~ s[^{.+?^}][]msg;
-
-    # Split on paragraphs
-    my @funcs = split /\n{2,}/, $text;
-
-    # If it doesn't start in the left column, it's not a func
-    @funcs = grep /^\S/, @funcs;
-
-    # Typedefs, enums and externs are no good
-    @funcs = grep { !/^(typedef|enum|extern)\b/ } @funcs;
-
-    # Structs are OK if they're not alone on the line
-    @funcs = grep { !/^struct.+;\n/ } @funcs;
-
-    # Structs are OK if they're not being defined
-    @funcs = grep { !/^(static\s+)?struct.+{\n/ } @funcs;
-
-    # Ignore magic function name YY_DECL
-    @funcs = grep { !/YY_DECL/ } @funcs;
-
-    # Ignore anything with magic words HEADERIZER SKIP
-    @funcs = grep { !m{/\*\s*HEADERIZER SKIP\s*\*/} } @funcs;
-
-    # pmclass declarations in PMC files are no good
-    @funcs = grep { !m{^pmclass } } @funcs;
-
-    # Variables are of no use to us
-    @funcs = grep !/=/, @funcs;
-
-    # Get rid of any blocks at the end
-    s/\s*{.*//s for @funcs;
-
-    # Toast anything non-whitespace
-    @funcs = grep /\S/, @funcs;
-
-    # If it's got a semicolon, it's not a function header
-    @funcs = grep !/;/, @funcs;
-
-    # remove any remaining }'s
-    @funcs = grep {! /^}/} @funcs;
-
-    chomp @funcs;
-
-    return @funcs;
-}
-
 =head2 extract_function_declaration_and_update_source( $cfile_name )
 
 Extract all the function declarations from the C file specified by
@@ -155,7 +87,7 @@ sub extract_function_declarations_and_update_source {
     my $text = join( '', <$fhin> );
     close $fhin;
 
-    my @func_declarations = extract_function_declarations( $text );
+    my @func_declarations = $headerizer->extract_function_declarations( $text );
     for my $decl ( @func_declarations ) {
         my $specs = function_components_from_declaration( $cfile_name, $decl );
         my $name = $specs->{name};
@@ -522,7 +454,7 @@ sub main {
 
         my @decls;
         if ( $macro_match ) {
-            @decls = extract_function_declarations( $source_code );
+            @decls = $headerizer->extract_function_declarations( $source_code );
         }
         else {
             @decls = extract_function_declarations_and_update_source( $sourcefile );
