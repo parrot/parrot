@@ -20,6 +20,7 @@
  *  References:
  */
 
+
 #include "parrot/parrot.h"
 #include "pmc/pmc_nci.h"
 
@@ -1129,19 +1130,14 @@ pcf_P_Ji(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 
  void
 Parrot_nci_load_core_thunks(PARROT_INTERP)
-;
- void
-Parrot_nci_load_core_thunks(PARROT_INTERP)
  {
-    PMC *iglobals;
+    PMC * const iglobals = interp->iglobals;
     PMC *nci_funcs;
     PMC *temp_pmc;
 
-    iglobals = interp->iglobals;
     PARROT_ASSERT(!(PMC_IS_NULL(iglobals)));
 
-    nci_funcs = VTABLE_get_pmc_keyed_int(interp, iglobals,
-            IGLOBALS_NCI_FUNCS);
+    nci_funcs = VTABLE_get_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FUNCS);
     PARROT_ASSERT(!(PMC_IS_NULL(nci_funcs)));
 
     temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
