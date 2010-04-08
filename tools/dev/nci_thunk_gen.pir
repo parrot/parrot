@@ -640,10 +640,11 @@ TEMPLATE
     typedef %s(* func_t)(%s);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    const PMC * const ctx   = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     %s
     %s;
+    UNUSED(return_data); /* Potentially unused, at least */
 TEMPLATE
 
     .return (var_decls)
