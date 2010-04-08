@@ -94,7 +94,7 @@ sub valid_macros {
     return sort keys %{$self->{valid_macros}};
 }
 
-=item C<extract_function_declarations($text)>
+=item $headerizer->extract_function_declarations($text)
 
 Extracts the function declarations from the text argument, and returns an
 array of strings containing the function declarations.
@@ -114,7 +114,7 @@ sub extract_function_declarations {
     # Strip blocks of comments
     $text =~ s{^/\*.*?\*/}{}mxsg;
 
-    # Strip # compiler directives (Thanks, Audrey!)
+    # Strip # compiler directives
     $text =~ s{^#(\\\n|.)*}{}mg;
 
     # Strip code blocks
@@ -172,13 +172,14 @@ $proto => the function declaration
 Returns an anonymous hash of function components:
 
         file        => $file,
-        name        => $name,
-        args        => \@args,
-        macros      => \@macros,
-        is_static   => $is_static,
-        is_inline   => $parrot_inline,
-        is_api      => $parrot_api,
-        return_type => $return_type,
+        name         => $name,
+        args         => \@args,
+        macros       => \@macros,
+        is_static    => $is_static,
+        is_inline    => $parrot_inline,
+        is_api       => $parrot_api,
+        is_ignorable => $is_ignorable,
+        return_type  => $return_type,
 
 =cut
 
@@ -210,7 +211,7 @@ sub function_components_from_declaration {
 
     $args =~ s/\s+/ /g;
     $args =~ s{([^(]+)\s*\((.+)\);?}{$2}
-        or die qq{Couldn't handle "$proto"};
+        or die qq{Couldn't handle "$proto" in $file\n};
 
     my $name = $1;
     $args = $2;
@@ -226,6 +227,7 @@ sub function_components_from_declaration {
             or die "Bad args in $proto";
     }
 
+    my $is_ignorable = 0;
     my $is_static = 0;
     $is_static = $2 if $return_type =~ s/^((static)\s+)?//i;
 
@@ -236,6 +238,9 @@ sub function_components_from_declaration {
         $macros{$macro} = 1;
         if (not $self->valid_macro($macro)) {
             $self->squawk( $file, $name, "Invalid macro $macro" );
+        }
+        if ( $macro eq 'PARROT_IGNORABLE_RESULT' ) {
+            $is_ignorable = 1;
         }
     }
     if ( $return_type =~ /\*/ ) {
@@ -250,14 +255,15 @@ sub function_components_from_declaration {
     }
 
     return {
-        file        => $file,
-        name        => $name,
-        args        => \@args,
-        macros      => \@macros,
-        is_static   => $is_static,
-        is_inline   => $parrot_inline,
-        is_api      => $parrot_api,
-        return_type => $return_type,
+        file         => $file,
+        name         => $name,
+        args         => \@args,
+        macros       => \@macros,
+        is_static    => $is_static,
+        is_inline    => $parrot_inline,
+        is_api       => $parrot_api,
+        is_ignorable => $is_ignorable,
+        return_type  => $return_type,
     };
 }
 

@@ -89,7 +89,7 @@ sub extract_function_declarations_and_update_source {
 
     my @func_declarations = $headerizer->extract_function_declarations( $text );
     for my $decl ( @func_declarations ) {
-        my $specs = function_components_from_declaration( $cfile_name, $decl );
+        my $specs = $headerizer->function_components_from_declaration( $cfile_name, $decl );
         my $name = $specs->{name};
 
         my $heading = $headerizer->generate_documentation_signature($decl);
@@ -104,96 +104,6 @@ sub extract_function_declarations_and_update_source {
     return @func_declarations;
 }
 
-=head2 function_components_from_declaration( $file, $proto )
-
-Takes a declaration of a function and returns an ad-hoc hashref of
-properties for use elsewhere.
-
-=cut
-
-sub function_components_from_declaration {
-    my $file  = shift;
-    my $proto = shift;
-
-    my @lines = split( /\n/, $proto );
-    chomp @lines;
-
-    my @macros;
-    my $parrot_api;
-    my $parrot_inline;
-
-    while ( @lines && ( $lines[0] =~ /^PARROT_/ ) ) {
-        my $macro = shift @lines;
-        if ( $macro eq 'PARROT_EXPORT' ) {
-            $parrot_api = 1;
-        }
-        elsif ( $macro eq 'PARROT_INLINE' ) {
-            $parrot_inline = 1;
-        }
-        push( @macros, $macro );
-    }
-
-    my $return_type = shift @lines;
-    my $args = join( ' ', @lines );
-
-    $args =~ s/\s+/ /g;
-
-    $args =~ s{([^(]+)\s*\((.+)\);?}{$2}
-        or die qq{Couldn't handle "$proto" in $file\n};
-
-    my $name = $1;
-    $args = $2;
-
-    die "Can't have both PARROT_EXPORT and PARROT_INLINE on $name\n" if $parrot_inline && $parrot_api;
-
-    my @args = split( /\s*,\s*/, $args );
-    for (@args) {
-        /\S+\s+\S+/
-            || ( $_ eq '...' )
-            || ( $_ eq 'void' )
-            || ( $_ =~ /(PARROT|NULLOK|SHIM)_INTERP/ )
-            or die "Bad args in $proto";
-    }
-
-    my $is_ignorable = 0;
-    my $is_static = 0;
-    $is_static = $2 if $return_type =~ s/^((static)\s+)?//i;
-
-    die "$file $name: Impossible to have both static and PARROT_EXPORT" if $parrot_api && $is_static;
-
-    my %macros;
-    for my $macro (@macros) {
-        $macros{$macro} = 1;
-        if ( not $headerizer->valid_macro($macro) ) {
-            squawk( $file, $name, "Invalid macro $macro" );
-        }
-        if ( $macro eq 'PARROT_IGNORABLE_RESULT' ) {
-            $is_ignorable = 1;
-        }
-    }
-    if ( $return_type =~ /\*/ ) {
-        if ( !$macros{PARROT_CAN_RETURN_NULL} && !$macros{PARROT_CANNOT_RETURN_NULL} ) {
-            squawk( $file, $name,
-                "Returns a pointer, but no PARROT_CAN(NOT)_RETURN_NULL macro found." );
-        }
-        elsif ( $macros{PARROT_CAN_RETURN_NULL} && $macros{PARROT_CANNOT_RETURN_NULL} ) {
-            squawk( $file, $name,
-                "Can't have both PARROT_CAN_RETURN_NULL and PARROT_CANNOT_RETURN_NULL together." );
-        }
-    }
-
-    return {
-        file         => $file,
-        name         => $name,
-        args         => \@args,
-        macros       => \@macros,
-        is_static    => $is_static,
-        is_inline    => $parrot_inline,
-        is_api       => $parrot_api,
-        is_ignorable => $is_ignorable,
-        return_type  => $return_type,
-    };
-}
 
 sub attrs_from_args {
     my $func = shift;
@@ -461,7 +371,7 @@ sub main {
         }
 
         for my $decl (@decls) {
-            my $components = function_components_from_declaration( $sourcefile, $decl );
+            my $components = $headerizer->function_components_from_declaration( $sourcefile, $decl );
             push( @{ $sourcefiles{$hfile}->{$sourcefile} }, $components ) unless $hfile eq 'none';
             push( @{ $sourcefiles_with_statics{$sourcefile} }, $components ) if $components->{is_static};
             if ( $macro_match ) {
