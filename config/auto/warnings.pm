@@ -252,6 +252,11 @@ sub _init {
         '-diag-disable 1572', # floating-point equality and inequality comparisons are unreliable
         '-diag-disable 2259', # non-pointer conversion from "typeA" to "typeB" may lose significant bits
     ];
+    $icc->{'cage'} = [
+        # http://software.intel.com/sites/products/documentation/hpc/compilerpro/en-us/cpp/lin/compiler_c/bldaps_cls/common/bldaps_svover.htm
+        '-diag-enable sc3',
+        '-diag-enable sc-include',
+    ];
 
     $data->{'warnings'}{'gcc'} = $gcc;
     $data->{'warnings'}{'g++'} = $gpp;
