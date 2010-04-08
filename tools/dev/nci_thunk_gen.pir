@@ -431,15 +431,13 @@ DECL
     .param pmc sigs
     .local string code
     code = 'sprintf'(<<'HEADER', $S0, $S1)
-    PMC *iglobals;
+    PMC * const iglobals = interp->iglobals;
     PMC *nci_funcs;
     PMC *temp_pmc;
 
-    iglobals = interp->iglobals;
     PARROT_ASSERT(!(PMC_IS_NULL(iglobals)));
 
-    nci_funcs = VTABLE_get_pmc_keyed_int(interp, iglobals,
-            IGLOBALS_NCI_FUNCS);
+    nci_funcs = VTABLE_get_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FUNCS);
     PARROT_ASSERT(!(PMC_IS_NULL(nci_funcs)));
 
 HEADER
