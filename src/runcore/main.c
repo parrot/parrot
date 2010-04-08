@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -590,13 +590,13 @@ dynop_register_xx(PARROT_INTERP,
     op_func_t   *ops_addr = NULL;
     op_lib_t    *cg_lib   = init_func(interp, 1);
 
-#if 0
+#  if 0
     /* related to CG and CGP ops issue below */
     op_lib_t    *new_lib;
     STRING *op_variant;
     oplib_init_f new_init_func;
     PMC *lib_variant;
-#endif
+#  endif
 
     if (cg_lib->flags & OP_FUNC_IS_ALLOCATED) {
         ops_addr = mem_gc_realloc_n_typed_zeroed(interp,
@@ -631,7 +631,7 @@ dynop_register_xx(PARROT_INTERP,
      *  compiled big switch statement with the new cases. We have
      *  always to use the wrapper__ opcode called from the default case.
      */
-#if 0
+#  if 0
     /* check if the lib_pmc exists with a _xx flavor */
     new_init_func = get_op_lib_init(0, 0, lib_pmc);
     new_lib       = new_init_func(1);
@@ -655,7 +655,7 @@ dynop_register_xx(PARROT_INTERP,
         new_init_func((long) ops_addr);
     }
     else
-#endif
+#  endif
     {
         size_t i;
 
