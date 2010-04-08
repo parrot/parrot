@@ -451,7 +451,6 @@ key_string(PARROT_INTERP, ARGIN(PMC *key))
       case KEY_string_FLAG | KEY_register_FLAG:
         {
             INTVAL int_key;
-            STRING *s;
             GETATTR_Key_int_key(interp, key, int_key);
             return REG_STR(interp, int_key);
         }
