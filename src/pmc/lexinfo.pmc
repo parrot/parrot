@@ -61,9 +61,6 @@ subroutine.
     }
 
     VTABLE void init_pmc(PMC *sub) {
-        Parrot_LexInfo_attributes *attrs =
-            (Parrot_LexInfo_attributes *) PMC_data(SELF);
-
         PARROT_ASSERT(PObj_constant_TEST(SELF));
 
         /* Set value type to INTVAL */
@@ -100,9 +97,10 @@ C<symbols>, which gets an array of the names of the symbols in this lexpad.
 
     VTABLE PMC *inspect_str(STRING *what) {
         if (Parrot_str_equal(interp, what, CONST_STRING(interp, "symbols"))) {
-            PMC *result     = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
-            Hash *hash      = (Hash *)SELF.get_pointer();
-            UINTVAL entries = hash->entries;
+            PMC * const result    = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
+            const Hash *hash      = (Hash *)SELF.get_pointer();
+            const UINTVAL entries = hash->entries;
+
             UINTVAL found   = 0;
             INTVAL  i;
 
