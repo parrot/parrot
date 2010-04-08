@@ -16,15 +16,16 @@
 #include "api.str"
 
 /* HEADERIZER HFILE: include/parrot/nci.h */
-/* HEADERIZER STOP */
 
 /* This function serves a single purpose. It takes the function signature for a
    C function we want to call and returns a PMC with a pointer to a function
    that can call it. */
 
+PARROT_CAN_RETURN_NULL
 PMC *
-build_call_func(PARROT_INTERP, NOTNULL(STRING *signature)) {
-    PMC *iglobals;
+build_call_func(PARROT_INTERP, ARGIN(STRING *signature))
+{
+    PMC * const iglobals = interp->iglobals;
     PMC *nci_funcs;
     PMC *thunk;
 
@@ -32,7 +33,6 @@ build_call_func(PARROT_INTERP, NOTNULL(STRING *signature)) {
     if (STRING_IS_EMPTY(signature))
         signature = CONST_STRING(interp, "v");
 
-    iglobals = interp->iglobals;
     if (PMC_IS_NULL(iglobals))
         PANIC(interp, "iglobals isn't created yet");
 

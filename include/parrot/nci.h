@@ -17,7 +17,19 @@
 
 typedef void (*nci_thunk_t)(PARROT_INTERP, PMC *, PMC *);
 
-PMC *build_call_func(PARROT_INTERP, NOTNULL(STRING *signature));
+/* HEADERIZER BEGIN: src/nci/api.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_CAN_RETURN_NULL
+PMC * build_call_func(PARROT_INTERP, ARGIN(STRING *signature))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_build_call_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(signature))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: src/nci/api.c */
 
 void Parrot_nci_load_core_thunks(PARROT_INTERP);
 
