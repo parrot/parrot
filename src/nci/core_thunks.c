@@ -20,7 +20,6 @@
  *  References:
  */
 
-#define PARROT_IN_EXTENSION
 #include "parrot/parrot.h"
 #include "pmc/pmc_nci.h"
 
