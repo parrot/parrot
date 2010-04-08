@@ -885,7 +885,7 @@ ERROR
     "2": { "as_proto": "short *",
            "sig_char": "P",
            "return_type": "short",
-           "ret_assign": "Parrot_pcc_build_call_from_c_args(interp, call_object, \"I\", return_data);",
+           "ret_assign": "call_object = Parrot_pcc_build_call_from_c_args(interp, call_object, \"I\", return_data);",
            "temp_tmpl": "PMC *t_%i; short i_%i",
            "preamble_tmpl": "i_%i = VTABLE_get_integer(interp, t_%i);",
            "call_param_tmpl": "&i_%i",
