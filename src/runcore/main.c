@@ -397,13 +397,15 @@ void
 Parrot_runcore_destroy(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_runcore_destroy)
+#ifdef HAVE_COMPUTED_GOTO
     op_lib_t         *cg_lib;
+#endif
     size_t            num_cores = interp->num_cores;
     size_t            i;
 
     for (i = 0; i < num_cores; ++i) {
-        Parrot_runcore_t        *core    = interp->cores[i];
-        runcore_destroy_fn_type  destroy = core->destroy;
+        Parrot_runcore_t * const core = interp->cores[i];
+        const runcore_destroy_fn_type destroy = core->destroy;
 
         if (destroy)
             (*destroy)(interp, core);
@@ -577,6 +579,8 @@ Register C<op_lib> with other cores.
 
 */
 
+#ifdef HAVE_COMPUTED_GOTO
+
 static void
 dynop_register_xx(PARROT_INTERP,
         size_t n_old, size_t n_new, oplib_init_f init_func)
@@ -676,6 +680,8 @@ dynop_register_xx(PARROT_INTERP,
     cg_lib->op_count      = n_tot;
     init_func(interp, (long) ops_addr);
 }
+
+#endif
 
 
 /*
