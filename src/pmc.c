@@ -251,29 +251,26 @@ static PMC*
 Parrot_pmc_reuse_noinit(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type)
 {
     ASSERT_ARGS(Parrot_pmc_reuse_noinit)
-    VTABLE *new_vtable;
 
-    if (pmc->vtable->base_type == new_type)
-        return pmc;
+    if (pmc->vtable->base_type != new_type) {
+        VTABLE * const new_vtable = interp->vtables[new_type];
 
-    new_vtable = interp->vtables[new_type];
+        /* Singleton/const PMCs/types are not eligible */
+        check_pmc_reuse_flags(interp, pmc->vtable->flags, new_vtable->flags);
 
-    /* Singleton/const PMCs/types are not eligible */
-    check_pmc_reuse_flags(interp, pmc->vtable->flags, new_vtable->flags);
+        /* Free the old PMC resources. */
+        Parrot_pmc_destroy(interp, pmc);
 
-    /* Free the old PMC resources. */
-    Parrot_pmc_destroy(interp, pmc);
+        PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG);
 
-    PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG);
+        /* Set the right vtable */
+        pmc->vtable = new_vtable;
 
-    /* Set the right vtable */
-    pmc->vtable = new_vtable;
-
-    if (new_vtable->attr_size)
-        Parrot_gc_allocate_pmc_attributes(interp, pmc);
-
-    else
-        PMC_data(pmc) = NULL;
+        if (new_vtable->attr_size)
+            Parrot_gc_allocate_pmc_attributes(interp, pmc);
+        else
+            PMC_data(pmc) = NULL;
+    }
 
     return pmc;
 }
@@ -301,26 +298,25 @@ Parrot_pmc_reuse_by_class(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(PMC *class_),
 {
     ASSERT_ARGS(Parrot_pmc_reuse_by_class)
     const INTVAL   new_type   = PARROT_CLASS(class_)->id;
-    VTABLE * const new_vtable = interp->vtables[new_type];
-    const INTVAL   new_flags  = flags;
 
-    if (pmc->vtable->base_type == new_type)
-        return pmc;
+    if (pmc->vtable->base_type != new_type) {
+        VTABLE * const new_vtable = interp->vtables[new_type];
 
-    /* Singleton/const PMCs/types are not eligible */
-    check_pmc_reuse_flags(interp, pmc->vtable->flags, new_vtable->flags);
+        /* Singleton/const PMCs/types are not eligible */
+        check_pmc_reuse_flags(interp, pmc->vtable->flags, new_vtable->flags);
 
-    Parrot_pmc_destroy(interp, pmc);
+        Parrot_pmc_destroy(interp, pmc);
 
-    PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG | new_flags);
+        PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG | flags);
 
-    /* Set the right vtable */
-    pmc->vtable = new_vtable;
+        /* Set the right vtable */
+        pmc->vtable = new_vtable;
 
-    if (new_vtable->attr_size)
-        Parrot_gc_allocate_pmc_attributes(interp, pmc);
-    else
-        PMC_data(pmc) = NULL;
+        if (new_vtable->attr_size)
+            Parrot_gc_allocate_pmc_attributes(interp, pmc);
+        else
+            PMC_data(pmc) = NULL;
+    }
 
     return pmc;
 }
