@@ -381,8 +381,7 @@ HEAD
 
     $S0 = 'get_loader_decl'(sigs)
     $S1 = 'get_loader_body'(sigs)
-    $S2 = 'sprintf'(<<'LOADER', $S0, $S0, $S1)
-%s;
+    $S2 = 'sprintf'(<<'LOADER', $S0, $S1)
 %s {
 %s
 }
@@ -406,8 +405,7 @@ DECL
 
     $S0 = 'get_dynext_loader_decl'(sigs)
     $S1 = 'get_loader_body'(sigs)
-    $S2 = 'sprintf'(<<'LOADER', $S0, $S0, $S1)
-%s;
+    $S2 = 'sprintf'(<<'LOADER', $S0, $S1)
 %s {
 %s
 }
