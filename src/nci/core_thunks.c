@@ -47,6 +47,7 @@ pcf_d_JOd(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     FLOATVAL return_data;
 
     PMC * t_1;
@@ -57,7 +58,7 @@ pcf_d_JOd(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (double)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "N", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "N", return_data);
     
 
 
@@ -70,6 +71,7 @@ pcf_I_JOS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
@@ -80,7 +82,7 @@ pcf_I_JOS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
@@ -93,6 +95,7 @@ pcf_P_JOl(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
     PMC * t_1;
@@ -103,7 +106,7 @@ pcf_P_JOl(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
@@ -116,6 +119,7 @@ pcf_P_Jt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
     char *t_1; STRING *ts_1;
@@ -125,7 +129,7 @@ pcf_P_Jt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 if (t_1) Parrot_str_free_cstring(t_1);
 }
@@ -137,6 +141,7 @@ pcf_S_JOS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     STRING * return_data;
 
     PMC * t_1;
@@ -147,7 +152,7 @@ pcf_S_JOS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (STRING *)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "S", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "S", return_data);
     
 
 
@@ -160,6 +165,7 @@ pcf_I_JI(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     INTVAL t_1;
@@ -169,7 +175,7 @@ pcf_I_JI(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 }
@@ -181,6 +187,7 @@ pcf_v_JOSP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
@@ -206,6 +213,7 @@ pcf_v_JOS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
@@ -229,6 +237,7 @@ pcf_P_JOS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
     PMC * t_1;
@@ -239,7 +248,7 @@ pcf_P_JOS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
@@ -252,6 +261,7 @@ pcf_I_JOI(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
@@ -262,7 +272,7 @@ pcf_I_JOI(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
@@ -275,6 +285,7 @@ pcf_P_JOP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
     PMC * t_1;
@@ -285,7 +296,7 @@ pcf_P_JOP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
@@ -298,6 +309,7 @@ pcf_P_JOPS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
     PMC * t_1;
@@ -309,7 +321,7 @@ pcf_P_JOPS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2, t_3);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
@@ -323,6 +335,7 @@ pcf_v_JOPSP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
@@ -350,6 +363,7 @@ pcf_v_JPPP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
@@ -375,6 +389,7 @@ pcf_v_JPIP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
@@ -400,6 +415,7 @@ pcf_v_JPSP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
@@ -425,6 +441,7 @@ pcf_v_JPNP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
@@ -450,6 +467,7 @@ pcf_v_JPP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
@@ -473,6 +491,7 @@ pcf_v_JPI(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
@@ -496,6 +515,7 @@ pcf_v_JPS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
@@ -519,6 +539,7 @@ pcf_v_JPN(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
@@ -542,6 +563,7 @@ pcf_P_JPPP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
     PMC * t_1;
@@ -553,7 +575,7 @@ pcf_P_JPPP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2, t_3);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
@@ -567,6 +589,7 @@ pcf_P_JPIP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
     PMC * t_1;
@@ -578,7 +601,7 @@ pcf_P_JPIP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2, t_3);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
@@ -592,6 +615,7 @@ pcf_P_JPSP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
     PMC * t_1;
@@ -603,7 +627,7 @@ pcf_P_JPSP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2, t_3);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
@@ -617,6 +641,7 @@ pcf_P_JPNP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
     PMC * t_1;
@@ -628,7 +653,7 @@ pcf_P_JPNP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2, t_3);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
@@ -642,6 +667,7 @@ pcf_I_JPP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
@@ -652,7 +678,7 @@ pcf_I_JPP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
@@ -665,6 +691,7 @@ pcf_I_JPS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
@@ -675,7 +702,7 @@ pcf_I_JPS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
@@ -688,6 +715,7 @@ pcf_I_JPN(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
@@ -698,7 +726,7 @@ pcf_I_JPN(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
@@ -711,6 +739,7 @@ pcf_i_JP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
@@ -720,7 +749,7 @@ pcf_i_JP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(interp, t_1);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 }
@@ -732,6 +761,7 @@ pcf_v_JP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
@@ -753,6 +783,7 @@ pcf_i_JPi(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
@@ -763,7 +794,7 @@ pcf_i_JPi(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
@@ -776,6 +807,7 @@ pcf_i_JPii(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
@@ -787,7 +819,7 @@ pcf_i_JPii(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(interp, t_1, t_2, t_3);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
@@ -801,6 +833,7 @@ pcf_i_JPiii(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
@@ -813,7 +846,7 @@ pcf_i_JPiii(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(interp, t_1, t_2, t_3, t_4);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
@@ -828,6 +861,7 @@ pcf_i_JPt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
@@ -838,7 +872,7 @@ pcf_i_JPt(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 if (t_2) Parrot_str_free_cstring(t_2);
@@ -851,6 +885,7 @@ pcf_P_JOSSS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
     PMC * t_1;
@@ -863,7 +898,7 @@ pcf_P_JOSSS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1, t_2, t_3, t_4);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 
@@ -878,6 +913,7 @@ pcf_v_JOSS(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
@@ -903,6 +939,7 @@ pcf_S_JOI(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     STRING * return_data;
 
     PMC * t_1;
@@ -913,7 +950,7 @@ pcf_S_JOI(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (STRING *)(*fn_pointer)(interp, t_1, t_2);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "S", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "S", return_data);
     
 
 
@@ -926,6 +963,7 @@ pcf_v_JOb(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
@@ -949,6 +987,7 @@ pcf_i_JOPxAT_(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
@@ -960,7 +999,7 @@ pcf_i_JOPxAT_(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (int)(*fn_pointer)(interp, t_1, t_2, t_3);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
@@ -974,6 +1013,7 @@ pcf_I_JOPxAT_(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
@@ -985,7 +1025,7 @@ pcf_I_JOPxAT_(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1, t_2, t_3);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
@@ -999,6 +1039,7 @@ pcf_I_JOIPxAT_(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     INTVAL return_data;
 
     PMC * t_1;
@@ -1011,7 +1052,7 @@ pcf_I_JOIPxAT_(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (INTVAL)(*fn_pointer)(interp, t_1, t_2, t_3, t_4);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "I", return_data);
     
 
 
@@ -1026,6 +1067,7 @@ pcf_P_JO(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
     PMC * t_1;
@@ -1035,7 +1077,7 @@ pcf_P_JO(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 }
@@ -1047,6 +1089,7 @@ pcf_v_JOP(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     void * return_data;
 
     PMC * t_1;
@@ -1070,6 +1113,7 @@ pcf_P_Ji(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     void *orig_func;
     const PMC * const ctx   = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     PMC * return_data;
 
     INTVAL t_1;
@@ -1079,7 +1123,7 @@ pcf_P_Ji(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     return_data =  (PMC *)(*fn_pointer)(interp, t_1);
-    Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
+    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "P", return_data);
     
 
 }
