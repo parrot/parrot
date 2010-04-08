@@ -17,6 +17,9 @@
 
 typedef void (*nci_thunk_t)(PARROT_INTERP, PMC *, PMC *);
 
+void Parrot_nci_load_core_thunks(PARROT_INTERP);
+void Parrot_nci_load_extra_thunks(PARROT_INTERP);
+
 /* HEADERIZER BEGIN: src/nci/api.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -30,10 +33,6 @@ PMC * build_call_func(PARROT_INTERP, ARGIN(STRING *signature))
     , PARROT_ASSERT_ARG(signature))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/nci/api.c */
-
-void Parrot_nci_load_core_thunks(PARROT_INTERP);
-
-void Parrot_nci_load_extra_thunks(PARROT_INTERP);
 
 #endif /* PARROT_NCI_H_GUARD */
 
