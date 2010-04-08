@@ -21,7 +21,7 @@
    C function we want to call and returns a PMC with a pointer to a function
    that can call it. */
 
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC *
 build_call_func(PARROT_INTERP, ARGIN(STRING *signature))
 {
