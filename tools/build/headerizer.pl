@@ -2,11 +2,6 @@
 # Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
-use strict;
-use warnings;
-use Carp qw( confess );
-
-
 =head1 NAME
 
 tools/build/headerizer.pl - Generates the function header parts of .h
@@ -59,14 +54,15 @@ One or more object file names.
 
 =cut
 
+use strict;
+use warnings;
+
 use Getopt::Long;
 use lib qw( lib );
 use Parrot::Config;
 use Parrot::Headerizer;
 
 my $headerizer = Parrot::Headerizer->new;
-
-my %opt;
 
 main();
 
