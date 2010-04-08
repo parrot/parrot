@@ -1,6 +1,8 @@
 # Copyright (C) 2004-2010, Parrot Foundation.
 # $Id$
 
+package Parrot::Headerizer;
+
 =head1 NAME
 
 Parrot::Headerizer - Parrot Header Generation functionality
@@ -13,16 +15,14 @@ Parrot::Headerizer - Parrot Header Generation functionality
 
 =head1 DESCRIPTION
 
-C<Parrot::Headerizer> knows how to strip all kinds of information out of
-C-language files.
+C<Parrot::Headerizer> knows how to extract all kinds of information out
+of C-language files.
 
 =head2 Class Methods
 
 =over 4
 
 =cut
-
-package Parrot::Headerizer;
 
 use strict;
 use warnings;
@@ -38,7 +38,9 @@ Contructor of headerizer objects
 sub new {
     my ($class) = @_;
 
-    my $self = bless {}, $class;
+    my $self = bless {
+        warnings => {},
+    }, $class;
 
     $self->{valid_macros} = { map { ( $_, 1 ) } qw(
         PARROT_EXPORT
@@ -66,8 +68,6 @@ sub new {
 
     return $self;
 }
-
-my %warnings;
 
 =item $headerizer->valid_macro( $macro )
 
@@ -171,7 +171,7 @@ $proto => the function declaration
 
 Returns an anonymous hash of function components:
 
-        file        => $file,
+        file         => $file,
         name         => $name,
         args         => \@args,
         macros       => \@macros,
@@ -343,7 +343,7 @@ sub squawk {
     my $func  = shift;
     my $error = shift;
 
-    push( @{ $warnings{$file}->{$func} }, $error );
+    push( @{ $self->{warnings}{$file}{$func} }, $error );
 
     return;
 }

@@ -66,7 +66,6 @@ use Parrot::Headerizer;
 
 my $headerizer = Parrot::Headerizer->new;
 
-my %warnings;
 my %opt;
 
 main();
@@ -131,10 +130,10 @@ sub attrs_from_args {
             push( @attrs, "__attribute__nonnull__($n)" );
         }
         if ( ( $arg =~ m{\*} ) && ( $arg !~ /\b(SHIM|((ARGIN|ARGOUT|ARGMOD)(_NULLOK)?)|ARGFREE)\b/ ) ) {
-            squawk( $file, $name, qq{"$arg" isn't protected with an ARGIN, ARGOUT or ARGMOD (or a _NULLOK variant), or ARGFREE} );
+            $headerizer->squawk( $file, $name, qq{"$arg" isn't protected with an ARGIN, ARGOUT or ARGMOD (or a _NULLOK variant), or ARGFREE} );
         }
         if ( ($arg =~ /\bconst\b/) && ($arg =~ /\*/) && ($arg !~ /\*\*/) && ($arg =~ /\b(ARG(MOD|OUT))\b/) ) {
-            squawk( $file, $name, qq{"$arg" is const, but that $1 conflicts with const} );
+            $headerizer->squawk( $file, $name, qq{"$arg" is const, but that $1 conflicts with const} );
         }
     }
 
@@ -249,14 +248,6 @@ sub make_function_decls {
     }
 
     return @decls;
-}
-
-sub squawk {
-    my $file  = shift;
-    my $func  = shift;
-    my $error = shift;
-
-    push( @{ $warnings{$file}->{$func} }, $error );
 }
 
 sub read_file {
@@ -425,6 +416,7 @@ sub main {
         print "Headerization complete.\n";
     }
 
+    my %warnings = %{$headerizer->{warnings}};
     if ( keys %warnings ) {
         my $nwarnings     = 0;
         my $nwarningfuncs = 0;
