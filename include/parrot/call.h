@@ -158,6 +158,7 @@ void runops(PARROT_INTERP, size_t offs)
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 PMC* Parrot_pcc_build_call_from_c_args(PARROT_INTERP,
     ARGIN_NULLOK(PMC *signature),
     ARGIN(const char *sig),
@@ -250,7 +251,6 @@ void Parrot_pcc_parse_signature_string(PARROT_INTERP,
         FUNC_MODIFIES(*arg_flags)
         FUNC_MODIFIES(*return_flags);
 
-PARROT_CAN_RETURN_NULL
 void Parrot_pcc_split_signature_string(PARROT_INTERP,
     ARGIN(const char *signature),
     ARGMOD(const char **arg_sig),
