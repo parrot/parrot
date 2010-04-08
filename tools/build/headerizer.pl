@@ -69,23 +69,6 @@ my $headerizer = Parrot::Headerizer->new;
 my %warnings;
 my %opt;
 
-my %valid_macros = map { ( $_, 1 ) } qw(
-    PARROT_EXPORT
-    PARROT_INLINE
-    PARROT_CAN_RETURN_NULL
-    PARROT_CANNOT_RETURN_NULL
-    PARROT_IGNORABLE_RESULT
-    PARROT_WARN_UNUSED_RESULT
-    PARROT_PURE_FUNCTION
-    PARROT_CONST_FUNCTION
-    PARROT_DOES_NOT_RETURN
-    PARROT_DOES_NOT_RETURN_WHEN_FALSE
-    PARROT_MALLOC
-    PARROT_OBSERVER
-    PARROT_HOT
-    PARROT_COLD
-);
-
 main();
 
 =head1 FUNCTIONS
@@ -249,7 +232,7 @@ sub function_components_from_declaration {
     my %macros;
     for my $macro (@macros) {
         $macros{$macro} = 1;
-        if ( not $valid_macros{$macro} ) {
+        if ( not $headerizer->valid_macro($macro) ) {
             squawk( $file, $name, "Invalid macro $macro" );
         }
         if ( $macro eq 'PARROT_IGNORABLE_RESULT' ) {

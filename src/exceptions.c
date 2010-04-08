@@ -515,8 +515,8 @@ Parrot_ex_mark_unhandled(PARROT_INTERP, ARGIN(PMC *exception))
 
 =over 4
 
-=item C<PARROT_DOES_NOT_RETURN_WHEN_FALSE void Parrot_assert(INTVAL condition,
-const char *condition_string, const char *file, unsigned int line)>
+=item C<void Parrot_assert(INTVAL condition, const char *condition_string, const
+char *file, unsigned int line)>
 
 A better version of assert() that gives a backtrace.
 

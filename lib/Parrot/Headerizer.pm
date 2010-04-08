@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2007, Parrot Foundation.
+# Copyright (C) 2004-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -33,39 +33,66 @@ TODO
 
 Contructor of headerizer objects
 
-Don't blame me too much, I've never done OO in Perl before.
-
 =cut
-
-## i'm a singleton
-my $headerizer;
 
 sub new {
     my ($class) = @_;
 
-    return $headerizer if defined $headerizer;
-
     my $self = bless {}, $class;
+
+    $self->{valid_macros} = { map { ( $_, 1 ) } qw(
+        PARROT_EXPORT
+        PARROT_INLINE
+
+        PARROT_CAN_RETURN_NULL
+        PARROT_CANNOT_RETURN_NULL
+
+        PARROT_IGNORABLE_RESULT
+        PARROT_WARN_UNUSED_RESULT
+
+        PARROT_PURE_FUNCTION
+        PARROT_CONST_FUNCTION
+
+        PARROT_DOES_NOT_RETURN
+        PARROT_DOES_NOT_RETURN_WHEN_FALSE
+
+        PARROT_MALLOC
+        PARROT_OBSERVER
+
+        PARROT_HOT
+        PARROT_COLD
+        )
+    };
 
     return $self;
 }
 
 my %warnings;
-my %valid_macros = map { ( $_, 1 ) } qw(
-    PARROT_EXPORT
-    PARROT_INLINE
-    PARROT_CAN_RETURN_NULL
-    PARROT_CANNOT_RETURN_NULL
-    PARROT_IGNORABLE_RESULT
-    PARROT_WARN_UNUSED_RESULT
-    PARROT_PURE_FUNCTION
-    PARROT_CONST_FUNCTION
-    PARROT_DOES_NOT_RETURN
-    PARROT_MALLOC
-    PARROT_OBSERVER
-    PARROT_HOT
-    PARROT_COLD
-);
+
+=item $headerizer->valid_macro( $macro )
+
+Returns a boolean saying wither I<$macro> is a valid PARROT_XXX macro.
+
+=cut
+
+sub valid_macro {
+    my $self = shift;
+    my $macro = shift;
+
+    return exists $self->{valid_macros}{$macro};
+}
+
+=item $headerizer->valid_macros()
+
+Returns a list of all the valid PARROT_XXX macros.
+
+=cut
+
+sub valid_macros {
+    my $self = shift;
+
+    return sort keys %{$self->{valid_macros}};
+}
 
 =item C<extract_function_declarations($text)>
 
@@ -200,7 +227,7 @@ sub function_components_from_declaration {
     my %macros;
     for my $macro (@macros) {
         $macros{$macro} = 1;
-        if ( not $valid_macros{$macro} ) {
+        if (not $self->valid_macro($macro)) {
             $self->squawk( $file, $name, "Invalid macro $macro" );
         }
     }
@@ -239,7 +266,7 @@ sub generate_documentation_signature {
     my $function_decl = shift;
 
     # strip out any PARROT_* function modifiers
-    foreach my $key (keys %valid_macros) {
+    foreach my $key ($self->valid_macros) {
         $function_decl =~ s/^$key$//m;
     }
 
