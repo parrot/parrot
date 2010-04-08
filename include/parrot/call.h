@@ -157,8 +157,8 @@ void runops(PARROT_INTERP, size_t offs)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PARROT_IGNORABLE_RESULT
 PMC* Parrot_pcc_build_call_from_c_args(PARROT_INTERP,
     ARGIN_NULLOK(PMC *signature),
     ARGIN(const char *sig),
