@@ -25,6 +25,8 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 build_call_func(PARROT_INTERP, ARGIN(STRING *signature))
 {
+    ASSERT_ARGS(build_call_func)
+
     PMC * const iglobals = interp->iglobals;
     PMC *nci_funcs;
     PMC *thunk;

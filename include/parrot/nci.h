@@ -23,7 +23,7 @@ void Parrot_nci_load_extra_thunks(PARROT_INTERP);
 /* HEADERIZER BEGIN: src/nci/api.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC * build_call_func(PARROT_INTERP, ARGIN(STRING *signature))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

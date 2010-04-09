@@ -49,7 +49,7 @@ PARROT_CAN_RETURN_NULL
 static char * char_offset_int(PARROT_INTERP,
     ARGIN(PMC *pmc),
     INTVAL ix,
-    ARGMOD(int *type))
+    ARGOUT(int *type))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
@@ -60,7 +60,7 @@ PARROT_CAN_RETURN_NULL
 static char * char_offset_key(PARROT_INTERP,
     ARGIN(PMC *pmc),
     ARGIN(PMC *key),
-    ARGMOD(int *type))
+    ARGOUT(int *type))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
