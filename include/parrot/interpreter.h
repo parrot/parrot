@@ -315,6 +315,8 @@ typedef enum {
     IGLOBALS_COMPREG_HASH,
     IGLOBALS_ARGV_LIST,
     IGLOBALS_NCI_FUNCS,
+    IGLOBALS_NCI_FB_CB,
+    IGLOBALS_NCI_FB_UD,
     IGLOBALS_INTERPRETER,       /* this interpreter as ParrotInterpreter PMC */
     IGLOBALS_DYN_LIBS,          /* Hash of ParrotLibrary loaded dynamic ext */
     IGLOBALS_CONFIG_HASH,

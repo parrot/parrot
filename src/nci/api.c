@@ -60,6 +60,19 @@ build_call_func(PARROT_INTERP, ARGIN(STRING *signature))
 
     thunk = VTABLE_get_pmc_keyed_str(interp, nci_funcs, signature);
 
+    if (PMC_IS_NULL(thunk)) {
+        /* try to dynamically build a thunk */
+        PMC *nci_fb_cb = VTABLE_get_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FB_CB);
+        if (!PMC_IS_NULL(nci_fb_cb)) {
+            void *cb_ptr = VTABLE_get_pointer(interp, nci_fb_cb);
+            nci_fb_func_t cb = (nci_fb_func_t)D2FPTR(cb_ptr);
+            if (cb_ptr) {
+                PMC *nci_fb_ud = VTABLE_get_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FB_UD);
+                thunk = cb(signature, nci_fb_ud);
+            }
+        }
+    }
+
     if (!PMC_IS_NULL(thunk)) {
         PARROT_ASSERT(thunk->vtable);
         PARROT_ASSERT(thunk->vtable->base_type == enum_class_UnManagedStruct);
