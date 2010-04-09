@@ -357,11 +357,6 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         }
 
         got = Parrot_io_fill_readbuf(interp, filehandle);
-
-        /* got is never < 0, but C's type system can't tell */
-        if (got < 0)
-            got = 0;
-
         len = (len < got) ? len : got;
     }
 
