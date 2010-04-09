@@ -835,11 +835,11 @@ gc_ms_allocate_buffer_storage(PARROT_INTERP,
 {
     ASSERT_ARGS(gc_ms_allocate_buffer_storage)
     const size_t new_size   = aligned_string_size(size);
-    const char * const mem  = aligned_mem(buffer,
+
+    Buffer_bufstart(buffer) = (void *)aligned_mem(buffer,
         (char *)mem_allocate(interp,
         interp->mem_pools, new_size, interp->mem_pools->memory_pool));
 
-    Buffer_bufstart(buffer) = (void *)mem;
     Buffer_buflen(buffer)   = new_size - sizeof (void *);
 }
 
