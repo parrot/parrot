@@ -782,14 +782,16 @@ Creates a clone of the object.
         STRING * const meth_name = CONST_STRING(interp, "clone");
         PMC * const meth =
                 Parrot_oo_find_vtable_override(interp, obj->_class, meth_name);
+        PMC *result;
+
         if (!PMC_IS_NULL(meth)) {
-            PMC *result;
-            Parrot_pcc_invoke_sub_from_c_args(interp, meth, "Pi->P",
-                    pmc, &result);
-            return result;
+            Parrot_pcc_invoke_sub_from_c_args(interp, meth, "Pi->P", pmc, &result);
         }
-        else
-            return Parrot_oo_clone_object(interp, SELF, obj->_class, NULL);
+        else {
+            result = Parrot_oo_clone_object(interp, SELF, NULL);
+        }
+
+        return result;
     }
 
 /*
