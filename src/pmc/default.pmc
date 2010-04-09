@@ -303,8 +303,7 @@ check_get_std_props(PARROT_INTERP, ARGIN(const PMC *self), ARGIN(const STRING *k
 =item C<static PMC* make_prop_hash(PARROT_INTERP, PMC *self)>
 
 Create a property hash for C<self>. Returns the created hash. Inferred
-properties will be added to the hash and it will be set as
-C<PMC_metadata(self)>.
+properties will be added to the hash.
 
 =cut
 
@@ -318,8 +317,6 @@ make_prop_hash(PARROT_INTERP, ARGMOD(PMC *self))
     ASSERT_ARGS(make_prop_hash)
 
     PMC * const prop = Parrot_pmc_new(interp, enum_class_Hash);
-
-    PMC_metadata(self) = prop;
     propagate_std_props(interp, self, prop);
     return prop;
 }
@@ -450,7 +447,7 @@ Sets the property for C<*key> to C<*value>.
             return;
 
         if (PMC_IS_NULL(PMC_metadata(SELF)))
-            make_prop_hash(INTERP, SELF);
+            PMC_metadata(SELF) = make_prop_hash(INTERP, SELF);
 
         VTABLE_set_pmc_keyed_str(INTERP, PMC_metadata(SELF), key, value);
     }
@@ -483,7 +480,7 @@ Returns the PMC's properties or the NULL PMC if no properties exist.
     VTABLE PMC *getprops() {
         if (PMC_IS_NULL(PMC_metadata(SELF))) {
             if (has_pending_std_props(SELF))
-                return make_prop_hash(INTERP, SELF);
+                PMC_metadata(SELF) = make_prop_hash(INTERP, SELF);
             else
                 return PMCNULL;
         }
