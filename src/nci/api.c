@@ -17,9 +17,19 @@
 
 /* HEADERIZER HFILE: include/parrot/nci.h */
 
-/* This function serves a single purpose. It takes the function signature for a
-   C function we want to call and returns a PMC with a pointer to a function
-   that can call it. */
+/*
+
+=pod
+
+=item C<PMC * build_call_func(PARROT_INTERP, STRING *signature)>
+
+This function serves a single purpose. It takes the function signature for a
+C function we want to call and returns a PMC with a pointer to a function
+that can call it.
+
+=cut
+
+*/
 
 PARROT_CANNOT_RETURN_NULL
 PMC *
