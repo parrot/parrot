@@ -1314,8 +1314,9 @@ PDB_cond(PARROT_INTERP, ARGIN(const char *command))
     cond_argleft = condition_regtype(command);
 
     /* get the register number */
-    auxcmd = ++command;
-    get_uint(&command, 0);
+    auxcmd     = ++command;
+    reg_number = get_uint(&command, 0);
+
     if (auxcmd == command) {
         Parrot_io_eprintf(interp->pdb->debugger, "Invalid register\n");
             return NULL;
