@@ -268,7 +268,7 @@ Parrot_mmd_multi_dispatch_from_c_args(PARROT_INTERP,
     va_list args;
     const char *arg_sig, *ret_sig;
 
-    Parrot_pcc_split_signature_string(interp, sig, &arg_sig, &ret_sig);
+    Parrot_pcc_split_signature_string(sig, &arg_sig, &ret_sig);
 
     va_start(args, sig);
     call_obj = Parrot_pcc_build_call_from_varargs(interp, PMCNULL, arg_sig, &args);

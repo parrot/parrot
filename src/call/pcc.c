@@ -53,9 +53,6 @@ static void Parrot_pcc_add_invocant(PARROT_INTERP,
 /* HEADERIZER END: static */
 
 
-/* Make sure we don't conflict with any other MAX() macros defined elsewhere */
-#define PARROT_MAX(a, b) (((a)) > (b) ? (a) : (b))
-
 /*
 
 =item C<void Parrot_pcc_invoke_sub_from_c_args(PARROT_INTERP, PMC *sub_obj,
@@ -78,9 +75,10 @@ Parrot_pcc_invoke_sub_from_c_args(PARROT_INTERP, ARGIN(PMC *sub_obj),
     PMC         *call_obj;
     va_list      args;
     const char  *arg_sig, *ret_sig;
-    PMC         *old_call_obj = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
+    PMC         * const old_call_obj =
+        Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
-    Parrot_pcc_split_signature_string(interp, sig, &arg_sig, &ret_sig);
+    Parrot_pcc_split_signature_string(sig, &arg_sig, &ret_sig);
 
     va_start(args, sig);
     call_obj = Parrot_pcc_build_call_from_varargs(interp, PMCNULL,
@@ -228,9 +226,10 @@ Parrot_pcc_invoke_method_from_c_args(PARROT_INTERP, ARGIN(PMC* pmc),
     PMC        *sub_obj;
     va_list     args;
     const char *arg_sig, *ret_sig;
-    PMC        *old_call_obj = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
+    PMC        * const old_call_obj =
+        Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
-    Parrot_pcc_split_signature_string(interp, signature, &arg_sig, &ret_sig);
+    Parrot_pcc_split_signature_string(signature, &arg_sig, &ret_sig);
 
     va_start(args, signature);
     call_obj = Parrot_pcc_build_call_from_varargs(interp, PMCNULL, arg_sig, &args);
