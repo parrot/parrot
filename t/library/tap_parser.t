@@ -557,3 +557,9 @@ END_TAP
     $I0 = agg.'all_passed'()
     nok($I0, "all_passed")
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
