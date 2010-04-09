@@ -1,15 +1,23 @@
 /* nci.c
- *  Copyright (C) 2001-2009, Parrot Foundation.
- *  SVN Info
- *     $Id$
- *  Overview:
- *     Native Call Interface routines. The code needed to build a
- *     parrot to C call frame is in here
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
- */
+Copyright (C) 2001-2009, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/nci/api.c - Native Call Interface routines
+
+=head1 DESCRIPTION
+
+This file implements the interface to the Parrot Native Call Interface system,
+which builds parrot to C call frames.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 
 #include "parrot/parrot.h"
 #include "parrot/nci.h"
@@ -18,8 +26,6 @@
 /* HEADERIZER HFILE: include/parrot/nci.h */
 
 /*
-
-=pod
 
 =item C<PMC * build_call_func(PARROT_INTERP, STRING *signature)>
 
@@ -64,6 +70,14 @@ build_call_func(PARROT_INTERP, ARGIN(STRING *signature))
         EXCEPTION_UNIMPLEMENTED,
         "No NCI thunk available for signature '%S'", signature);
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:
