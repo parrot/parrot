@@ -321,12 +321,6 @@ STRING * Parrot_sprintf_format(PARROT_INTERP,
 
 #endif /* IN_SPF_SYSTEM */
 
-
-/*
- * generated src/revision.c
- */
-PARROT_EXPORT int Parrot_config_revision(void);
-
 #endif /* PARROT_MISC_H_GUARD */
 
 /*
