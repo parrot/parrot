@@ -1142,16 +1142,16 @@ Used to unarchive the hash.
 
                 switch (k_type) {
                   case Hash_key_type_int:
-                    key_fn = key_hash_int;
-                    cmp_fn = int_compare;
+                    key_fn = (hash_hash_key_fn)key_hash_int;
+                    cmp_fn = (hash_comp_fn)int_compare;
                     break;
                   case Hash_key_type_STRING:
-                    key_fn = key_hash_STRING;
-                    cmp_fn = STRING_compare;
+                    key_fn = (hash_hash_key_fn)key_hash_STRING;
+                    cmp_fn = (hash_comp_fn)STRING_compare;
                     break;
                   case Hash_key_type_PMC:
-                    key_fn = key_hash_PMC;
-                    cmp_fn = PMC_compare;
+                    key_fn = (hash_hash_key_fn)key_hash_PMC;
+                    cmp_fn = (hash_comp_fn)PMC_compare;
                     break;
                   default:
                     Parrot_ex_throw_from_c_args(interp, NULL, 1,
@@ -1159,7 +1159,7 @@ Used to unarchive the hash.
                     break;
                 }
 
-                SELF.set_pointer(parrot_create_hash(INTERP, v_type, k_type, cmp_fn, key_fn));
+                SELF.set_pointer(parrot_create_hash(INTERP, (PARROT_DATA_TYPE)v_type, (Hash_key_type)k_type, cmp_fn, key_fn));
             }
 
             hash = (Hash *)SELF.get_pointer();
