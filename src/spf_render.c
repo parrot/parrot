@@ -328,7 +328,7 @@ Parrot_sprintf_format(PARROT_INTERP,
     INTVAL i;
     INTVAL len     = 0;
     INTVAL old     = 0;
-    INTVAL pat_len = (INTVAL)Parrot_str_byte_length(interp, pat);
+    const INTVAL pat_len = (INTVAL)Parrot_str_byte_length(interp, pat);
     HUGEINTVAL num;
 
     /* start with a buffer; double the pattern length to avoid realloc #1 */
