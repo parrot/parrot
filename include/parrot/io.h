@@ -912,25 +912,6 @@ INTVAL Parrot_io_socket_is_closed(ARGMOD(PMC *socket))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/socket_api.c */
 
-/* Put platform specific macros here if you must */
-#ifdef PIO_OS_WIN32
-extern STRING          *PIO_sockaddr_in(PARROT_INTERP, unsigned short, STRING *);
-extern INTVAL           PIO_win32_getblksize(PIOHANDLE fd);
-#  define PIO_getblksize(x)   PIO_win32_getblksize(x)
-#endif
-
-#ifdef PIO_OS_UNIX
-extern STRING          *PIO_sockaddr_in(PARROT_INTERP, unsigned short, STRING *);
-extern INTVAL           PIO_unix_getblksize(PIOHANDLE fd);
-#  define PIO_getblksize(x)   PIO_unix_getblksize(x)
-#endif
-
-#ifdef PIO_OS_STDIO
-extern INTVAL           PIO_stdio_getblksize(PIOHANDLE fd);
-#  define PIO_sockaddr_in(i, p, a)
-#  define PIO_getblksize(x)   PIO_stdio_getblksize(x)
-#endif
-
 /*
  * pioctl argument constants. These don't have to
  * be unique across io commands.
