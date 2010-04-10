@@ -1,4 +1,7 @@
 #!perl -w
+# Copyright (C) 2010, Parrot Foundation.
+# $Id$
+#
 # perl script that deliver all filenames and the associated chapters
 #
 
