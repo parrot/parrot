@@ -1661,7 +1661,7 @@ hash_key_from_pmc(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN(PMC *key)
       case Hash_key_type_STRING:
         {
             STRING * const tmp = VTABLE_get_string(interp, key);
-            if (!tmp)
+            if (STRING_IS_NULL(tmp))
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
                             "hash: can't use null as key");
             ret = (void *)tmp;
