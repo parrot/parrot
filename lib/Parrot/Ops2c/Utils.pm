@@ -479,6 +479,7 @@ sub _print_preamble_header {
     print $fh <<END_C;
 #include "parrot/parrot.h"
 #include "parrot/oplib.h"
+#include "parrot/runcore_api.h"
 
 $self->{sym_export} op_lib_t *$self->{init_func}(PARROT_INTERP, long init);
 

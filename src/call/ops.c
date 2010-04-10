@@ -22,6 +22,7 @@ B<Calling Ops>:  Various functions that call the run loop.
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 #include "pmc/pmc_continuation.h"
+#include "parrot/runcore_api.h"
 
 /* HEADERIZER HFILE: include/parrot/call.h */
 
