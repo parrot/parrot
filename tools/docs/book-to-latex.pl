@@ -1,8 +1,10 @@
-#!perl -w
+#! perl
 # Copyright (C) 2010, Parrot Foundation.
 # $Id$
 
 use strict;
+use warnings;
+
 use Pod::PseudoPod::LaTeX;
 
 print <<'HEADER';
@@ -23,3 +25,10 @@ for (@ARGV) {
 print <<'FOOTER';
 \end{document}
 FOOTER
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
