@@ -459,6 +459,7 @@ Register a dynamic oplib.
 
 */
 
+PARROT_EXPORT
 void
 dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
 {
