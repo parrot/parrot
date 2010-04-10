@@ -56,10 +56,6 @@ PARROT_EXPORT void Parrot_pbc_load(Parrot_Interp, Parrot_PackFile);
 
 PARROT_EXPORT void Parrot_pbc_fixup_loaded(Parrot_Interp);
 
-PARROT_EXPORT void Parrot_setup_argv(Parrot_Interp, int argc, const char **argv);
-
-PARROT_EXPORT void Parrot_setup_opt(Parrot_Interp, int n, char *argv);
-
 PARROT_EXPORT void Parrot_runcode(Parrot_Interp, int argc, char **argv);
 
 PARROT_EXPORT Parrot_PMC Parrot_compile_string(Parrot_Interp,
@@ -81,8 +77,6 @@ PARROT_EXPORT void Parrot_run_native(PARROT_INTERP, native_func_t func);
    so if you make this call then you will need to link with it in
    addition to libparrot */
 void Parrot_set_config_hash(void);
-
-int Parrot_revision(void);
 
 #endif /* PARROT_EMBED_H_GUARD */
 
