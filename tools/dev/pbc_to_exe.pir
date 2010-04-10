@@ -687,19 +687,14 @@ END_OF_FUNCTION
 .sub 'prepend_installable'
     .param string file
 
-    $P0   = '_config'()
-
-    .local string slash
-    slash = $P0['slash']
-
     .local pmc path
-    path = split slash, file
+    path     = split '/', file
 
     file     = path[-1]
     file     = concat 'installable_', file
     path[-1] = file
 
-    file     = join slash, path
+    file     = join '/', path
 
     .return( file )
 .end
