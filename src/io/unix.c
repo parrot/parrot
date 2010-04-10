@@ -388,7 +388,7 @@ Parrot_io_close_piohandle_unix(SHIM_INTERP, PIOHANDLE handle)
 
 /*
 
-=item C<INTVAL Parrot_io_is_closed_unix(PARROT_INTERP, PMC *filehandle)>
+=item C<INTVAL Parrot_io_is_closed_unix(PARROT_INTERP, const PMC *filehandle)>
 
 Test whether the filehandle has been closed.
 
@@ -397,7 +397,7 @@ Test whether the filehandle has been closed.
 */
 
 INTVAL
-Parrot_io_is_closed_unix(PARROT_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_is_closed_unix(PARROT_INTERP, ARGIN(const PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_is_closed_unix)
     if (Parrot_io_get_os_handle(interp, filehandle) == -1)

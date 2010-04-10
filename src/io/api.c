@@ -179,9 +179,8 @@ Parrot_io_fdopen(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), PIOHANDLE fd,
 {
     ASSERT_ARGS(Parrot_io_fdopen)
     PMC *new_filehandle;
-    INTVAL flags;
+    const INTVAL flags = Parrot_io_parse_open_flags(interp, sflags);
 
-    flags = Parrot_io_parse_open_flags(interp, sflags);
     if (!flags)
         return PMCNULL;
 

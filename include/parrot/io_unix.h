@@ -55,7 +55,7 @@ INTVAL Parrot_io_getblksize_unix(PIOHANDLE fd);
 INTVAL Parrot_io_init_unix(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-INTVAL Parrot_io_is_closed_unix(PARROT_INTERP, ARGIN(PMC *filehandle))
+INTVAL Parrot_io_is_closed_unix(PARROT_INTERP, ARGIN(const PMC *filehandle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
