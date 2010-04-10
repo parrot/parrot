@@ -1759,11 +1759,11 @@ do { \
     restype     *dp; \
     size_t       _index; \
  \
-    if (s1) { \
+    if (!STRING_IS_NULL(s1)) { \
         curr1   = (type1 *)(s1)->strstart; \
         length1 = (s1)->strlen; \
     } \
-    if (s2) { \
+    if (!STRING_IS_NULL(s2)) { \
         curr2   = (type2 *)(s2)->strstart; \
         length2 = (s2)->strlen; \
     } \
@@ -1794,11 +1794,11 @@ do { \
     restype     *dp; \
     size_t       _index; \
  \
-    if (s1) { \
+    if (!STRING_IS_NULL(s1)) { \
         curr1   = (type1 *)(s1)->strstart; \
         length1 = (s1)->strlen; \
     } \
-    if (s2) { \
+    if (!STRING_IS_NULL(s2)) { \
         curr2   = (type2 *)(s2)->strstart; \
         length2 = (s2)->strlen; \
     } \
@@ -1843,7 +1843,7 @@ Parrot_str_bitwise_or(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
     STRING *res;
     size_t  maxlen = 0;
 
-    if (s1) {
+    if (!STRING_IS_NULL(s1)) {
         if (s1->encoding != Parrot_fixed_8_encoding_ptr)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
                 "string bitwise_or (%s/%s) unsupported",
@@ -1852,7 +1852,7 @@ Parrot_str_bitwise_or(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
         maxlen = s1->bufused;
     }
 
-    if (s2) {
+    if (!STRING_IS_NULL(s2)) {
         if (s2->encoding != Parrot_fixed_8_encoding_ptr)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
                 "string bitwise_or (%s/%s) unsupported",
@@ -1862,7 +1862,7 @@ Parrot_str_bitwise_or(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
             maxlen = s2->bufused;
     }
 
-    if (dest && *dest) {
+    if (dest && !STRING_IS_NULL(*dest)) {
         res           = *dest;
         res->encoding = Parrot_fixed_8_encoding_ptr;
         res->charset  = Parrot_binary_charset_ptr;
@@ -1919,7 +1919,7 @@ Parrot_str_bitwise_xor(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
     STRING *res;
     size_t  maxlen = 0;
 
-    if (s1) {
+    if (!STRING_IS_NULL(s1)) {
         if (s1->encoding != Parrot_fixed_8_encoding_ptr)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
                 "string bitwise_xor (%s/%s) unsupported",
@@ -1928,7 +1928,7 @@ Parrot_str_bitwise_xor(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
         maxlen = s1->bufused;
     }
 
-    if (s2) {
+    if (!STRING_IS_NULL(s2)) {
         if (s2->encoding != Parrot_fixed_8_encoding_ptr)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
                 "string bitwise_xor (%s/%s) unsupported",
@@ -1938,7 +1938,7 @@ Parrot_str_bitwise_xor(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
             maxlen = s2->bufused;
     }
 
-    if (dest && *dest) {
+    if (dest && !STRING_IS_NULL(*dest)) {
         res           = *dest;
         res->encoding = Parrot_fixed_8_encoding_ptr;
         res->charset  = Parrot_binary_charset_ptr;

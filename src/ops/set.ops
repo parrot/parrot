@@ -560,7 +560,7 @@ Set register $1 to PMCNULL.
 =cut
 
 inline op null(out STR) :base_core {
-    $1 = NULL;
+    $1 = STRINGNULL;
 }
 
 inline op null(out INT) :base_core {
