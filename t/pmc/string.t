@@ -20,7 +20,7 @@ Tests the C<String> PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(171)
+    plan(172)
 
     set_or_get_strings()
     setting_integers()
@@ -1036,6 +1036,7 @@ check:
 
     # Set
     s = new ['String']
+    s = ''
 
     $S0 = 'f'
     s[0] = $S0
@@ -1049,6 +1050,16 @@ check:
     $P0 = 'o'
     s[2] = $P0
     is(s, 'foo', 'Set PMC keyed')
+
+    push_eh null_replace
+    s = new ['String']
+    s[0] = 'f'
+    nok('Replace on null string throws')
+    goto done_null_replace
+
+  null_replace:
+    ok(1, 'Replace on null string throws')
+  done_null_replace:
 .end
 
 # Local Variables:

@@ -1339,6 +1339,10 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(STRING *src),
     UINTVAL         true_offset = (UINTVAL)offset;
     UINTVAL         true_length = (UINTVAL)length;
 
+    if (STRING_IS_NULL(src))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Cannot replace on a null string");
+
     /* special case */
     if (d             == NULL
     &&  src->encoding == Parrot_fixed_8_encoding_ptr
