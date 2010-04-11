@@ -808,10 +808,9 @@ PMC * PackFile_Annotations_lookup(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-opcode_t * PackFile_Annotations_pack(PARROT_INTERP,
+opcode_t * PackFile_Annotations_pack(SHIM_INTERP,
     ARGIN(PackFile_Segment *seg),
     ARGMOD(opcode_t *cursor))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*cursor);
@@ -976,8 +975,7 @@ void Parrot_trace_eprintf(ARGIN(const char *s), ...)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_PackFile_Annotations_pack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(seg) \
+       PARROT_ASSERT_ARG(seg) \
     , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_PackFile_Annotations_packed_size \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
