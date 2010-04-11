@@ -1309,19 +1309,28 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
 {
     ASSERT_ARGS(PF_fetch_string)
     STRING   *s;
-    UINTVAL   flags      = PF_fetch_opcode(pf, cursor);
-    opcode_t  charset_nr = PF_fetch_opcode(pf, cursor);
-    size_t    size       = (size_t)PF_fetch_opcode(pf, cursor);
-    const int wordsize   = pf ? pf->header->wordsize : sizeof (opcode_t);
+    UINTVAL   flags;
+    opcode_t  charset_nr;
+    size_t    size;
+    const int wordsize = pf ? pf->header->wordsize : sizeof (opcode_t);
+
+    flags      = PF_fetch_opcode(pf, cursor);
+    charset_nr = PF_fetch_opcode(pf, cursor);
+
+    if (charset_nr < 0) {
+        return STRINGNULL;
+    }
+
+    size = (size_t)PF_fetch_opcode(pf, cursor);
 
     /* don't let PBC mess our internals - only constant or not */
-    flags      &= (PObj_constant_FLAG | PObj_private7_FLAG);
+    flags &= (PObj_constant_FLAG | PObj_private7_FLAG);
 
     TRACE_PRINTF(("PF_fetch_string(): flags=0x%04x, ", flags));
     TRACE_PRINTF(("charset_nr=%ld, ", charset_nr));
     TRACE_PRINTF(("size=%ld.\n", size));
 
-    s            = string_make_from_charset(interp, (const char *)*cursor,
+    s = string_make_from_charset(interp, (const char *)*cursor,
                         size, charset_nr, flags);
 
     /* print only printable characters */
@@ -1369,6 +1378,17 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
     }
 
     *cursor++ = PObj_get_FLAGS(s); /* only constant_FLAG and private7 */
+
+    if (STRING_IS_NULL(s)) {
+        /* preserve NULL-ness of strings
+         * ideally we'd null strings would take only a single opcode_t,
+         * but PObj flags uses a whole word
+         * charset number, OTOH, can't be negative
+         */
+        *cursor++ = -1;
+        return cursor;
+    }
+
     /*
      * TODO as soon as we have dynamically loadable charsets
      *      we have to store the charset name, not the number
