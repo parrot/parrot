@@ -258,7 +258,7 @@ Parrot_str_set(PARROT_INTERP, ARGIN_NULLOK(STRING *dest), ARGMOD(STRING *src))
     ASSERT_ARGS(Parrot_str_set)
     if (dest == src)
         return dest;
-    if (dest) { /* && dest != src */
+    if (!STRING_IS_NULL(dest)) { /* && dest != src */
         /* they are different, dest is not an external string */
         dest = Parrot_str_reuse_COW(interp, src, dest);
     }
@@ -567,7 +567,7 @@ Parrot_str_append(PARROT_INTERP, ARGMOD_NULLOK(STRING *a), ARGIN_NULLOK(STRING *
         return a;
 
     /* Is A real? */
-    if (a == NULL || Buffer_bufstart(a) == NULL)
+    if (STRING_IS_NULL(a) || Buffer_bufstart(a) == NULL)
         return Parrot_str_copy(interp, b);
 
     saneify_string(a);
@@ -966,7 +966,7 @@ Parrot_str_byte_length(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_byte_length)
 
-    return s ? s->strlen : 0;
+    return !STRING_IS_NULL(s) ? s->strlen : 0;
 }
 
 
@@ -1245,7 +1245,7 @@ Parrot_str_substr(PARROT_INTERP,
         ARGOUT_NULLOK(STRING **d), int replace_dest)
 {
     ASSERT_ARGS(Parrot_str_substr)
-    if (src == NULL)
+    if (STRING_IS_NULL(src))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_SUBSTR_OUT_OF_STRING,
             "Cannot substr on a null string");
     else {
@@ -1272,7 +1272,7 @@ Parrot_str_substr(PARROT_INTERP,
             true_length = (UINTVAL)(src->strlen - true_offset);
 
         /* do in-place i.e. reuse existing header if one */
-        if (replace_dest && d && *d) {
+        if (replace_dest && d && !STRING_IS_NULL(*d)) {
             PARROT_ASSERT(src->encoding == Parrot_fixed_8_encoding_ptr);
             dest           = *d;
 
@@ -1352,7 +1352,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(STRING *src),
 
         ((char *)src->strstart)[offset] = ((char *)rep->strstart)[0];
 
-        return NULL;
+        return STRINGNULL;
     }
 
     /* abs(-offset) may not be > strlen-1 */
@@ -1555,10 +1555,10 @@ INTVAL
 Parrot_str_compare(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(const STRING *s2))
 {
     ASSERT_ARGS(Parrot_str_compare)
-    if (!s2)
+    if (STRING_IS_NULL(s2))
         return s1 && (s1->strlen != 0);
 
-    if (!s1)
+    if (STRING_IS_NULL(s1))
         return -(s2->strlen != 0);
 
     saneify_string(s1);
@@ -1609,13 +1609,13 @@ INTVAL
 Parrot_str_equal(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(const STRING *s2))
 {
     ASSERT_ARGS(Parrot_str_equal)
-    if ((s1 == s2) || (!s1 && !s2)) {
+    if ((s1 == s2) || (STRING_IS_NULL(s1) && STRING_IS_NULL(s2))) {
         return 1;
     }
-    else if (!s2) {
+    else if (STRING_IS_NULL(s2)) {
         return s1->strlen == 0;
     }
-    else if (!s1) {
+    else if (STRING_IS_NULL(s1)) {
         return s2->strlen == 0;
     }
     else if (s1->strlen != s2->strlen) {
@@ -1659,7 +1659,7 @@ make_writable(PARROT_INTERP, ARGMOD(STRING **s),
     const size_t len, parrot_string_representation_t representation)
 {
     ASSERT_ARGS(make_writable)
-    if (!*s)
+    if (STRING_IS_NULL(*s))
         *s = Parrot_str_new_noinit(interp, representation, len);
     else if ((*s)->strlen < len)
         Parrot_str_resize(interp, *s, (UINTVAL)(len - (*s)->strlen));
@@ -1703,12 +1703,12 @@ Parrot_str_bitwise_and(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
             nonnull_encoding_name(s1), s2->encoding->name);
 
     /* think about case of dest string is one of the operands */
-    if (s1 && s2)
+    if (!STRING_IS_NULL(s1) && !STRING_IS_NULL(s2))
         minlen = s1->strlen > s2->strlen ? s2->strlen : s1->strlen;
     else
         minlen = 0;
 
-    if (dest && *dest) {
+    if (dest && !STRING_IS_NULL(*dest)) {
         res           = *dest;
         res->encoding = Parrot_fixed_8_encoding_ptr;
         res->charset  = Parrot_binary_charset_ptr;
@@ -1717,7 +1717,7 @@ Parrot_str_bitwise_and(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
         res = Parrot_str_new_init(interp, NULL, minlen,
                 Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
 
-    if (!s1 || !s2) {
+    if (STRING_IS_NULL(s1) || STRING_IS_NULL(s2)) {
         res->bufused = 0;
         res->strlen  = 0;
 
@@ -1974,7 +1974,7 @@ Parrot_str_bitwise_xor(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
 
 #define BITWISE_NOT_STRING(type, s, res) \
 do { \
-    if ((s) && (res)) { \
+    if (!STRING_IS_NULL(s) && !STRING_IS_NULL(res)) { \
         const type   *curr   = (type *)(s)->strstart; \
         size_t        length = (s)->strlen; \
         Parrot_UInt1 *dp     = (Parrot_UInt1 *)(res)->strstart; \
@@ -2006,7 +2006,7 @@ Parrot_str_bitwise_not(PARROT_INTERP, ARGIN_NULLOK(const STRING *s),
     STRING *res;
     size_t  len;
 
-    if (s) {
+    if (!STRING_IS_NULL(s)) {
         if (s->encoding != Parrot_fixed_8_encoding_ptr)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
                 "string bitwise_not (%s/%s) unsupported",
@@ -2017,7 +2017,7 @@ Parrot_str_bitwise_not(PARROT_INTERP, ARGIN_NULLOK(const STRING *s),
     else
         len = 0;
 
-    if (dest && *dest) {
+    if (dest && !STRING_IS_NULL(*dest)) {
         res           = *dest;
         res->encoding = Parrot_fixed_8_encoding_ptr;
         res->charset  = Parrot_binary_charset_ptr;
@@ -2067,7 +2067,7 @@ INTVAL
 Parrot_str_boolean(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_boolean)
-    const INTVAL len = s ? Parrot_str_byte_length(interp, s) : 0;
+    const INTVAL len = !STRING_IS_NULL(s) ? Parrot_str_byte_length(interp, s) : 0;
 
     if (len == 0)
         return 0;
@@ -2158,7 +2158,7 @@ INTVAL
 Parrot_str_to_int(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_to_int)
-    if (s == NULL)
+    if (STRING_IS_NULL(s))
         return 0;
     {
         const INTVAL        max_safe  = PARROT_INTVAL_MAX / 10;
@@ -2260,7 +2260,7 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
     UINTVAL     offs;
     number_parse_state state = parse_start;
 
-    if (!s)
+    if (STRING_IS_NULL(s))
         return 0.0;
 
     ENCODING_ITER_INIT(interp, s, &iter);
@@ -2478,7 +2478,7 @@ char *
 Parrot_str_to_cstring(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_to_cstring)
-    if (! s) {
+    if (STRING_IS_NULL(s)) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Can't convert NULL string");
     }
@@ -2506,7 +2506,7 @@ char *
 string_to_cstring_nullable(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(string_to_cstring_nullable)
-    if (!s)
+    if (STRING_IS_NULL(s))
         return NULL;
     else {
         char * const p = (char*)mem_internal_allocate(s->bufused + 1);
@@ -2645,7 +2645,7 @@ Parrot_str_to_hashval(PARROT_INTERP, ARGMOD_NULLOK(STRING *s))
     UINTVAL     offs;
     size_t      hashval = interp->hash_seed;
 
-    if (!s || !s->strlen)
+    if (STRING_IS_NULL(s) || !s->strlen)
         return hashval;
 
     /* ZZZZZ workaround for something not setting up encodings right */
@@ -2713,8 +2713,8 @@ Parrot_str_escape_truncate(PARROT_INTERP,
     String_iter iter;
     unsigned char *dp;
 
-    if (!src)
-        return NULL;
+    if (STRING_IS_NULL(src))
+        return STRINGNULL;
 
     len = src->strlen;
 
@@ -3215,7 +3215,7 @@ Parrot_str_find_cclass(PARROT_INTERP, INTVAL flags, ARGIN_NULLOK(STRING *s),
                           UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(Parrot_str_find_cclass)
-    if (!s)
+    if (STRING_IS_NULL(s))
         return -1;
 
     return CHARSET_FIND_CCLASS(interp, flags, s, offset, count);
@@ -3242,7 +3242,7 @@ Parrot_str_find_not_cclass(PARROT_INTERP, INTVAL flags,
     ARGIN_NULLOK(STRING *s), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(Parrot_str_find_not_cclass)
-    if (!s)
+    if (STRING_IS_NULL(s))
         return -1;
 
     return CHARSET_FIND_NOT_CCLASS(interp, flags, s, offset, count);
@@ -3271,8 +3271,8 @@ Parrot_str_change_charset(PARROT_INTERP, ARGMOD_NULLOK(STRING *src),
     ASSERT_ARGS(Parrot_str_change_charset)
     const CHARSET *new_charset;
 
-    if (!src)
-        return NULL;
+    if (STRING_IS_NULL(src))
+        return STRINGNULL;
 
     new_charset = Parrot_get_charset(interp, charset_nr);
 
@@ -3284,7 +3284,7 @@ Parrot_str_change_charset(PARROT_INTERP, ARGMOD_NULLOK(STRING *src),
      * dest is an empty string header or NULL, if an inplace
      * operation is desired
      */
-    if (dest) {
+    if (!STRING_IS_NULL(dest)) {
         if (new_charset == src->charset) {
             dest          = Parrot_str_reuse_COW(interp, src, dest);
             dest->charset = new_charset;
@@ -3330,8 +3330,8 @@ Parrot_str_change_encoding(PARROT_INTERP, ARGIN_NULLOK(STRING *src),
     ASSERT_ARGS(Parrot_str_change_encoding)
     const ENCODING *new_encoding;
 
-    if (!src)
-        return NULL;
+    if (STRING_IS_NULL(src))
+        return STRINGNULL;
 
     new_encoding = Parrot_get_encoding(interp, encoding_nr);
 
@@ -3343,7 +3343,7 @@ Parrot_str_change_encoding(PARROT_INTERP, ARGIN_NULLOK(STRING *src),
      * dest is an empty string header or NULL, if an inplace
      * operation is desired
      */
-    if (dest) {
+    if (!STRING_IS_NULL(dest)) {
         dest->encoding = new_encoding;
         if (new_encoding == src->encoding) {
             dest = Parrot_str_reuse_COW(interp, src, dest);
@@ -3378,7 +3378,7 @@ STRING *
 Parrot_str_compose(PARROT_INTERP, ARGIN_NULLOK(STRING *src))
 {
     ASSERT_ARGS(Parrot_str_compose)
-    if (!src)
+    if (STRING_IS_NULL(src))
         return NULL;
 
     if (!src->strlen)
@@ -3415,7 +3415,7 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
         return Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
 
     s   = VTABLE_get_string_keyed_int(interp, ar, 0);
-    res = s ? Parrot_str_copy(interp, s) : NULL;
+    res = !STRING_IS_NULL(s) ? Parrot_str_copy(interp, s) : NULL;
 
     for (i = 1; i < ar_len; ++i) {
         STRING * const next = VTABLE_get_string_keyed_int(interp, ar, i);
