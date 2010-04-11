@@ -20,7 +20,7 @@ Tests the C<String> PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(172)
+    plan(173)
 
     set_or_get_strings()
     setting_integers()
@@ -102,6 +102,12 @@ Tests the C<String> PMC.
         set $P0, "0xFFFFFF"
         set $S0, $P0
         is( $S0, "0xFFFFFF", 'String obj set with literal hex string' )
+
+        null $S0
+        set $P0, $S0
+        set $S1, $P0
+        isnull $I0, $S1
+        ok( $I0, 'String obj is null-in null-out' )
 .end
 
 .sub setting_integers

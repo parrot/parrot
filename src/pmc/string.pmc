@@ -126,7 +126,7 @@ Returns the string itself.
         STRING *str_val;
         GET_ATTR_str_val(INTERP, SELF, str_val);
 
-        return str_val ? Parrot_str_copy(INTERP, str_val) : NULL;
+        return STRING_IS_NULL(str_val) ? STRINGNULL : Parrot_str_copy(INTERP, str_val);
     }
 
 /*
