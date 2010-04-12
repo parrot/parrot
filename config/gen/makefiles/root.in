@@ -323,6 +323,8 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/Stream/Sub.pbc \
     $(LIBRARY_DIR)/Stream/Writer.pbc \
     $(LIBRARY_DIR)/String/Utils.pbc \
+    $(LIBRARY_DIR)/TAP/Formatter.pbc \
+    $(LIBRARY_DIR)/TAP/Harness.pbc \
     $(LIBRARY_DIR)/TAP/Parser.pbc \
     $(LIBRARY_DIR)/Test/Builder/Output.pbc \
     $(LIBRARY_DIR)/Test/Builder/Test.pbc \

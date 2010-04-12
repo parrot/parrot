@@ -71,6 +71,11 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $P0 = subclass ['TAP';'Parser';'Result'], ['TAP';'Parser';'Result';'Bailout']
 .end
 
+.sub 'bailout' :method
+    $P0 = getattribute self, 'explanation'
+    .return ($P0)
+.end
+
 
 .namespace ['TAP';'Parser';'Result';'Comment']
 
@@ -97,6 +102,33 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $P0.'add_attribute'('test_num')
     $P0.'add_attribute'('description')
     $P0.'add_attribute'('unplanned')
+.end
+
+.sub 'get_string' :vtable :method
+    $P0 = getattribute self, 'ok'
+    $S0 = $P0
+    $S0 .= ' '
+    $P0 = getattribute self, 'test_num'
+    $S1 = $P0
+    $S0 .= $S1
+    $P0 = getattribute self, 'description'
+    if null $P0 goto L1
+    $S1 = $P0
+    if $S1 == '' goto L1
+    $S0 .= ' '
+    $S0 .= $S1
+  L1:
+    $P0 = getattribute self, 'directive'
+    if null $P0 goto L2
+    $S1 = $P0
+    if $S1 == '' goto L2
+    $S0 .= ' # '
+    $S0 .= $S1
+    $P0 = getattribute self, 'explanation'
+    $S1 = $P0
+    $S0 .= $S1
+  L2:
+    .return ($S0)
 .end
 
 .sub 'is_ok' :method
@@ -614,6 +646,13 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
 .sub 'spool' :method
     .param pmc spool
     setattribute self, 'spool', spool
+.end
+
+.sub 'delete_spool' :method
+    $P0 = getattribute self, 'spool'
+    null $P1
+    setattribute self, 'spool', $P1
+    .return ($P0)
 .end
 
 .sub 'pragma' :method
@@ -1163,14 +1202,19 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
   L3:
 .end
 
-.sub 'parsers' :method :multi(_,string)
-    .param string desc
-    $P0 = getattribute self, 'parser_for'
-    $P1 = $P0[desc]
-    .return ($P1)
+.sub 'total' :method
+    $P0 = getattribute self, 'total'
+    $I0 = $P0
+    .return ($I0)
 .end
 
-.sub 'parsers' :method :multi()
+.sub 'passed' :method
+    $P0 = getattribute self, 'passed'
+    $I0 = $P0
+    .return ($I0)
+.end
+
+.sub 'descriptions' :method
     $P0 = getattribute self, 'parse_order'
     .return ($P0)
 .end
@@ -1198,6 +1242,15 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .return ($N0)
   L1:
     die "Can't call elapsed without first calling start and then stop"
+.end
+
+.sub 'elapsed_timestr' :method
+    $N0 = self.'elapsed'()
+    $P0 = new 'FixedPMCArray'
+    $P0 = 1
+    $P0[0] = $N0
+    $S0 = sprintf "%.3f wallclock secs", $P0
+    .return ($S0)
 .end
 
 .sub 'has_problems' :method

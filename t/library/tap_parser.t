@@ -527,9 +527,9 @@ END_TAP
     agg.'add'('tap1', parser1)
     agg.'add'('tap2', parser2)
 
-    $P0 = agg.'parsers'()
+    $P0 = agg.'descriptions'()
     $I0 = elements $P0
-    is($I0, 2, "parsers")
+    is($I0, 2, "descriptions")
 
     $P0 = getattribute agg, 'passed'
     is($P0, 10, "passed")
