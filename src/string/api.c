@@ -28,7 +28,9 @@ members, beside setting C<bufstart>/C<buflen> for external strings.
 #include "api.str"
 
 /* for parrot/interpreter.h */
+#if PARROT_CATCH_NULL
 STRING *STRINGNULL;
+#endif
 
 #define nonnull_encoding_name(s) (s) ? (s)->encoding->name : "null string"
 #define saneify_string(s) \
@@ -88,7 +90,7 @@ INTVAL
 Parrot_str_is_null(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_is_null)
-    return !s || s == STRINGNULL;
+    return STRING_IS_NULL(s);
 }
 
 
@@ -109,7 +111,7 @@ INTVAL
 STRING_is_null(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(STRING_is_null)
-    return !s || s == STRINGNULL;
+    return STRING_IS_NULL(s);
 }
 
 
@@ -319,10 +321,12 @@ Parrot_str_init(PARROT_INTERP)
     interp->const_cstring_hash  = const_cstring_hash;
     Parrot_charsets_encodings_init(interp);
 
+#if PARROT_CATCH_NULL
     /* initialize STRINGNULL, but not in the constant table */
     STRINGNULL = Parrot_str_new_init(interp, NULL, 0,
                        PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
                        PObj_constant_FLAG);
+#endif
 
     interp->const_cstring_table =
         mem_gc_allocate_n_zeroed_typed(interp, n_parrot_cstrings, STRING *);

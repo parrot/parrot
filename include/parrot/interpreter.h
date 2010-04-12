@@ -340,21 +340,22 @@ typedef enum {
 #endif
 
 #if PARROT_CATCH_NULL
-PARROT_DATA PMC    *PMCNULL;    /* Holds single Null PMC */
 #else
-#  define PMCNULL         ((PMC *)NULL)
 #endif /* PARROT_CATCH_NULL */
 
-/* Maybe PMC_IS_NULL(interp, pmc) ? */
 #if PARROT_CATCH_NULL
-#  define PMC_IS_NULL(pmc) ((pmc) == PMCNULL || (pmc) == NULL)
+PARROT_DATA PMC    *PMCNULL;    /* Holds single Null PMC */
+PARROT_DATA STRING *STRINGNULL; /* a single Null STRING */
+#  define PMC_IS_NULL(pmc)  ((pmc) == PMCNULL || (pmc) == NULL)
+#  define STRING_IS_NULL(s) ((s) == STRINGNULL || (s) == NULL)
 #else
-#  define PMC_IS_NULL(pmc) (pmc) == NULL
+#  define PMCNULL ((PMC *)NULL)
+#  define PMCNULL ((PMC *)NULL)
+#  define PMC_IS_NULL(pmc)       ((pmc) == NULL)
+#  define STRING_IS_NULL(string) ((string) == NULL)
 #endif
 
-PARROT_DATA STRING *STRINGNULL; /* a single Null STRING */
 
-#define STRING_IS_NULL(s) ((s) == STRINGNULL || (s) == NULL)
 #define STRING_IS_EMPTY(s) !(int)(s)->strlen
 
 /* &gen_from_def(sysinfo.pasm) prefix(SYSINFO_) */
