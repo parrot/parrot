@@ -349,7 +349,7 @@ PARROT_DATA PMC    *PMCNULL;    /* Holds single Null PMC */
 #if PARROT_CATCH_NULL
 #  define PMC_IS_NULL(pmc) ((pmc) == PMCNULL || (pmc) == NULL)
 #else
-#  define PMC_IS_NULL(pmc) (pmc) == NULL
+#  define PMC_IS_NULL(pmc) ((pmc) == NULL)
 #endif
 
 PARROT_DATA STRING *STRINGNULL; /* a single Null STRING */
