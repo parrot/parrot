@@ -126,7 +126,7 @@ Returns the string itself.
         STRING *str_val;
         GET_ATTR_str_val(INTERP, SELF, str_val);
 
-        return str_val ? Parrot_str_copy(INTERP, str_val) : NULL;
+        return STRING_IS_NULL(str_val) ? STRINGNULL : Parrot_str_copy(INTERP, str_val);
     }
 
 /*
@@ -478,7 +478,7 @@ Replace the string at C<key> with the chr of C<value>.
         STRING      *str_val;
         const INTVAL len = Parrot_str_byte_length(INTERP, value);
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        Parrot_str_replace(INTERP, str_val, pos, len, value, &str_val);
+        Parrot_str_replace(INTERP, str_val, pos, len, value, NULL);
     }
 
     VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
@@ -489,7 +489,7 @@ Replace the string at C<key> with the chr of C<value>.
         STRING      *str_val;
         STRING * const c = string_chr(INTERP, (UINTVAL) value);
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        Parrot_str_replace(INTERP, str_val, pos, 1, c, &str_val);
+        Parrot_str_replace(INTERP, str_val, pos, 1, c, NULL);
     }
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {

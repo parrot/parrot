@@ -332,30 +332,28 @@ typedef enum {
 #define PNCONST   PF_NCONST(interp->code)
 
 /* TODO - Make this a config option */
-/* Splint complains about PMCNULL's storage, so don't use it. */
-#ifdef S_SPLINT_S
-#  define PARROT_CATCH_NULL 0
-#else
-#  define PARROT_CATCH_NULL 1
+#ifndef PARROT_CATCH_NULL
+#  ifdef S_SPLINT_S
+#    define PARROT_CATCH_NULL 0
+#  else
+#    define PARROT_CATCH_NULL 1
+#  endif
 #endif
-
-#if PARROT_CATCH_NULL
-PARROT_DATA PMC    *PMCNULL;    /* Holds single Null PMC */
-#else
-#  define PMCNULL         ((PMC *)NULL)
-#endif /* PARROT_CATCH_NULL */
 
 /* Maybe PMC_IS_NULL(interp, pmc) ? */
 #if PARROT_CATCH_NULL
-#  define PMC_IS_NULL(pmc) ((pmc) == PMCNULL || (pmc) == NULL)
-#else
-#  define PMC_IS_NULL(pmc) ((pmc) == NULL)
-#endif
-
+PARROT_DATA PMC    *PMCNULL;    /* Holds single Null PMC */
 PARROT_DATA STRING *STRINGNULL; /* a single Null STRING */
+#  define PMC_IS_NULL(pmc)  ((pmc) == PMCNULL || (pmc) == NULL)
+#  define STRING_IS_NULL(s) ((s) == STRINGNULL || (s) == NULL)
+#else
+#  define PMCNULL ((PMC *)NULL)
+#  define STRINGNULL ((STRING *)NULL)
+#  define PMC_IS_NULL(pmc)       ((pmc) == NULL)
+#  define STRING_IS_NULL(string) ((string) == NULL)
+#endif /* PARROT_CATCH_NULL */
 
-#define STRING_IS_NULL(s) ((s) == STRINGNULL || (s) == NULL)
-#define STRING_IS_EMPTY(s) !(int)(s)->strlen
+#define STRING_IS_EMPTY(s) ((s)->strlen == 0)
 
 /* &gen_from_def(sysinfo.pasm) prefix(SYSINFO_) */
 
