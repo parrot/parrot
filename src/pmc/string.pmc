@@ -703,7 +703,7 @@ Translate ascii string C<src> with entries from C<trans_table>.
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
                 "Can't translate non-ascii");
 
-        p = (unsigned char *)Buffer_bufstart(src);
+        p = (unsigned char *)(src->strstart);
         /* TODO verify trans table */
 
         GETATTR_FixedIntegerArray_int_array(INTERP, table, tr_data);
