@@ -115,14 +115,14 @@ END
                     if ( $type ) {
                         die "type of '$k' is not supported : $type\n";
                     }
-                    # Scalar
+                    # String
                     $v =~ s/(["\\])/\\$1/g;
                     $v =~ s/\n/\\n/g;
                     printf {$OUT} qq(    set \$P0["$k"], "$v"\n);
                 }
                 else {
-                    # Undef
-                    printf {$OUT} qq(    set \$P0["$k"], \$P1\n);
+                    # Null
+                    printf {$OUT} qq(    set \$P0["$k"], \$S2\n);
                 }
             }
         }

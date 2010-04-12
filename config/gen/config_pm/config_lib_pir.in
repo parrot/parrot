@@ -1,6 +1,8 @@
 # Copyright (C) 2004-2009, Parrot Foundation.
 # $Id$
 
+.include 'datatypes.pasm'
+
 .sub 'main'
     get_params "(0)", $P5
     set $I10, $P5     # argv
@@ -11,7 +13,8 @@
     set $I11, 1      # install flag
 no_arg:
     new $P0, 'Hash'
-    new $P1, 'Undef'
+    $P0.'set_value_type'(.DATATYPE_STRING)
+    $S2 = null
 
     @PCONFIG@
 

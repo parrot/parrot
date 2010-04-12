@@ -823,7 +823,7 @@ runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.pir $(PAR
 	$(PARROT) -o $@ runtime/parrot/library/parrotlib.pir
 
 runtime/parrot/include/config.fpmc : myconfig config_lib.pir $(MINIPARROT)
-	$(MINIPARROT) config_lib.pir > $@
+	$(MINIPARROT) -Iruntime/parrot/include config_lib.pir > $@
 
 $(PARROT) : src/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     lib/Parrot/OpLib/core.pm src/parrot_config$(O) \
