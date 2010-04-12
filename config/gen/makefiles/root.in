@@ -2152,7 +2152,7 @@ SPLINT_TMP = $(TEMPDIR)/splint
 # The dashes in the names don't make any difference to Splint, but I've
 # made them match how they are in the manual.  Otherwise, you might be
 # looking for "declundef", except that it's "decl-undef" in the docs.
-SPLINTFLAGS = \
+SPLINTFLAGS_BASE = \
     +standard \
     -hints \
     \
@@ -2174,14 +2174,16 @@ SPLINTFLAGS = \
     +show-scan \
     +time-dist \
     \
+    +cpp-names \
     +ansi-reserved \
     +ansi-reserved-internal \
     -iso-reserved \
     -iso-reserved-internal \
-    -include-nest 10
+    -include-nest 10 \
 
 # Memory safety checks
-SPLINTFLAGS = $(SPLINTFLAGS) \
+# Transfer errors (-mem-trans) are too tough for us right now
+SPLINTFLAGS_MEMORY_SAFETY = \
     +bufferoverflow \
     +bufferoverflowhigh \
     +read-only-strings \
@@ -2189,36 +2191,6 @@ SPLINTFLAGS = $(SPLINTFLAGS) \
     +strict-destroy \
     +strict-use-released \
     +use-released \
-
-# Macro safety checks
-SPLINTFLAGS = $(SPLINTFLAGS) \
-    +macro-assign \
-    +macro-empty \
-    +macro-parens \
-    +macro-redef \
-    +macro-stmt \
-    +macro-unrecog \
-
-# Watch for unsafe comparisons
-SPLINTFLAGS = $(SPLINTFLAGS) \
-    +bool-compare \
-    +ptr-compare \
-    +real-compare \
-    +unsigned-compare
-
-# But allow us some slop in boolean comparisons
-SPLINTFLAGS = $(SPLINTFLAGS) \
-    -pred-bool-int \
-    -pred-bool-ptr \
-    -pred-bool-others \
-    -boolops \
-
-# Report qualifier mismatches only if dangerous
-SPLINTFLAGS = $(SPLINTFLAGS) \
-    +relax-quals
-
-# Memory checking
-SPLINTFLAGS = $(SPLINTFLAGS) \
     -must-free \
     -mustfreefresh \
     -mustfreeonly \
@@ -2228,35 +2200,56 @@ SPLINTFLAGS = $(SPLINTFLAGS) \
     -ptr-arith \
     +ptr-negate \
     -zero-ptr \
-
-# Transfer errors are too tough for us right now
-SPLINTFLAGS = $(SPLINTFLAGS) \
     -mem-trans
 
+# Macro safety checks
+SPLINTFLAGS_MACRO_SAFETY = \
+    +macro-assign \
+    +macro-empty \
+    +macro-parens \
+    +macro-redef \
+    +macro-stmt \
+    +macro-unrecog \
+
+# Watch for unsafe comparisons
+SPLINTFLAGS_UNSAFE_COMPARISONS = \
+    +bool-compare \
+    +ptr-compare \
+    +real-compare \
+    +unsigned-compare
+
+# But allow us some slop in boolean comparisons
+SPLINTFLAGS_BOOLEAN_SLOP = \
+    -pred-bool-int \
+    -pred-bool-ptr \
+    -pred-bool-others \
+    -boolops \
+
+# const and other qualifiers
+# Report qualifier mismatches only if dangerous (+relax-quals)
+SPLINTFLAGS_QUALIFIERS = \
+    +relax-quals
+
 # Symbol definitions
-SPLINTFLAGS = $(SPLINTFLAGS) \
+SPLINTFLAGS_SYMBOL_DEFINITIONS = \
     +decl-undef \
     +incon-defs \
     +incon-defs-lib \
 
-# Check for conflicts with C++ compilers
-SPLINTFLAGS = $(SPLINTFLAGS) \
-    +cpp-names \
-
 # Format codes
-SPLINTFLAGS = $(SPLINTFLAGS) \
+SPLINTFLAGS_FORMAT = \
     +format-code \
     +format-type \
 
 # Problems with evaluation and control structions
-SPLINTFLAGS = $(SPLINTFLAGS) \
+SPLINTFLAGS_EVALUATION = \
     +controlnestdepth 15 \
     +duplicate-case \
     +eval-order \
     +eval-order-uncon \
 
 # Types and stuff
-SPLINTFLAGS = $(SPLINTFLAGS) \
+SPLINTFLAGS_TYPES = \
     +char-index \
     +char-int \
     +enum-members \
@@ -2275,13 +2268,27 @@ SPLINTFLAGS = $(SPLINTFLAGS) \
 # added to splint target to simplify experimentation,
 # example: make SPLINTFLAGS_TEST='-posixstrictlib +posixlib' splint
 
+SPLINTFLAGS_TEST =
+
+SPLINTFLAGS = \
+	$(SPLINTFLAGS_BASE) \
+	$(SPLINTFLAGS_MEMORY_SAFETY) \
+	$(SPLINTFLAGS_MACRO_SAFETY) \
+	$(SPLINTFLAGS_UNSAFE_COMPARISONS) \
+	$(SPLINTFLAGS_BOOLEAN_SLOP) \
+	$(SPLINTFLAGS_QUALIFIERS) \
+	$(SPLINTFLAGS_SYMBOL_DEFINITIONS) \
+	$(SPLINTFLAGS_FORMAT) \
+	$(SPLINTFLAGS_EVALUATION) \
+	$(SPLINTFLAGS_TYPES) \
+
 SPLINT_SOURCE = `echo $(O_FILES) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@`
 
 splint-all : $(PARROT)
 	$(MKPATH) $(SPLINT_TMP)
-	$(SPLINT) $(CC_INC) "-Iinclude/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
+	$(SPLINT) $(CC_INC) "-Iinclude/pmc" "-Icompilers/ast" $(SPLINTFLAGS) \
 	$(SPLINT_SOURCE) \
-	$(SPLINT) $(CC_INC) $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) compilers/imcc/main.c
+	$(SPLINT) $(CC_INC) $(SPLINTFLAGS) compilers/imcc/main.c
 
 # "splint" is the less-thorough splint target.  For cage cleaning work,
 # you'll probably want to specify SPLINT_SOURCE rather than work on the
@@ -2290,7 +2297,7 @@ splint-all : $(PARROT)
 
 splint : all
 	$(MKPATH) $(SPLINT_TMP)
-	$(SPLINT) $(CC_INC) "-Iinclude/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
+	$(SPLINT) $(CC_INC) "-Iinclude/pmc" "-Icompilers/ast" $(SPLINTFLAGS) \
 	+partial -DNDEBUG \
 	$(SPLINT_SOURCE) \
 		| grep -v 'Source code error generation point'
