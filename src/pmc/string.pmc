@@ -38,7 +38,7 @@ Initializes the string.
 */
 
     VTABLE void init() {
-        STRING *str_val = STRINGNULL;
+        STRING * const str_val = STRINGNULL;
         SET_ATTR_str_val(INTERP, SELF, str_val);
 
         PObj_custom_mark_SET(SELF);
@@ -191,7 +191,7 @@ Sets the value of the string to that of the specified C<string>.
 */
 
     VTABLE void set_string_native(STRING *value) {
-        if (!value)
+        if (value == NULL)
             value = STRINGNULL;
 
         /* Only allow constant PMCs to embed constant strings */
@@ -540,7 +540,7 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
 */
 
     METHOD to_int(INTVAL base) {
-        PMC *result = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(interp,
+        PMC * const result = Parrot_pmc_new(INTERP, Parrot_get_ctx_HLL_type(interp,
                         enum_class_Integer));
 
         /* TODO verify encoding */
@@ -575,7 +575,7 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
         }
 
         if (j < len) {
-            char ch = str[j];
+            const char ch = str[j];
             Parrot_str_free_cstring(str);
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "invalid conversion to int - bad char %c", ch);
