@@ -53,7 +53,7 @@ clean:
 html: all
 	$(PERL) -I../lib ../tools/docs/write_docs.pl --silent --version=$(VERSION)
 
-# The pdf target is to generate a parrot PDF document. 
+# The pdf target is to generate a parrot PDF document.
 # It will not work on Windows. It call a script which use a specific Unix
 # command. May be that will be changed.
 pdf: ../tools/docs/book-to-latex.pl ../tools/docs/filename_and_chapter.pl
@@ -66,7 +66,7 @@ pdf: ../tools/docs/book-to-latex.pl ../tools/docs/filename_and_chapter.pl
 #	cp build/parrot-book.pdf build/parrot-book-$$(date +"%Y.%m").pdf
 
 pdf-clean:
-	$(RM_RF) build	
+	$(RM_RF) build
 
 html-clean:
 	$(RM_RF) html
