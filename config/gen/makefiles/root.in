@@ -182,7 +182,7 @@ GEN_CONFIGS = \
 #IF(has_crypto):    t/dynpmc/sha1.t \
 #IF(has_crypto):    t/dynpmc/sha256.t \
 #IF(has_crypto):    t/dynpmc/sha512.t \
-    config_lib.pasm \
+    config_lib.pir \
     parrot.pc \
     compilers/imcc/imcc.y.flag \
     compilers/imcc/imcc.l.flag \
@@ -557,7 +557,7 @@ LIBPARROT_STATIC    = @blib_dir@/@libparrot_static@
 
 # This line controls whether a static or shared library is built
 # by Parrot's make.  It is not useful otherwise (e.g., in
-# lib/Parrot/Config/Generated.pm or config_lib.pasm).
+# lib/Parrot/Config/Generated.pm or config_lib.pir).
 LIBPARROT           = @libparrot_for_makefile_only@
 
 #IF(has_icu):ICU_SHARED  = @icu_shared@
@@ -820,8 +820,8 @@ installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(IN
 runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.pir $(PARROT) $(GEN_PASM_INCLUDES)
 	$(PARROT) -o $@ runtime/parrot/library/parrotlib.pir
 
-runtime/parrot/include/config.fpmc : myconfig config_lib.pasm $(MINIPARROT)
-	$(MINIPARROT) config_lib.pasm > $@
+runtime/parrot/include/config.fpmc : myconfig config_lib.pir $(MINIPARROT)
+	$(MINIPARROT) config_lib.pir > $@
 
 $(PARROT) : src/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     lib/Parrot/OpLib/core.pm src/parrot_config$(O) \
@@ -878,9 +878,9 @@ src/null_config.c : myconfig $(BUILD_TOOLS_DIR)/parrot_config_c.pl
 	$(PERL) $(BUILD_TOOLS_DIR)/parrot_config_c.pl --mini > \
     src/null_config.c
 
-install_config.fpmc : myconfig config_lib.pasm $(PARROT)
+install_config.fpmc : myconfig config_lib.pir $(PARROT)
 	@echo "Invoking Parrot to generate install_config.fpmc"
-	$(PARROT) config_lib.pasm --install > $@
+	$(PARROT) config_lib.pir --install > $@
 
 src/parrot_config$(O) : $(PARROT_H_HEADERS)
 
