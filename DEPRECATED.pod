@@ -82,6 +82,45 @@ with parrot after 2.3.
 
 L<https://trac.parrot.org/parrot/ticket/1469>
 
+=item NCI without signature ("raw" pointers) [eligible in 2.4]
+
+No equivalent functionality is promised. You shouldn't be using this. Here be
+segfaults.
+
+L<https://trac.parrot.org/parrot/ticket/1549>
+
+=item UnManagedStruct handling nested structure [eligible in 2.4]
+
+UnManagedStruct will be simplified to only support flat structures. This means
+that elements which themselves have structure - struct pointers and function
+pointers will be stored as C<void *> and C<void (*)(void)> respectively. To use
+these, they will need to be cast to the appropriate signature on access.
+
+L<https://trac.parrot.org/parrot/ticket/1551>
+
+=item UnManagedStruct initializer structure [eligible in 2.4]
+
+The initializer structure will cease to be an array of triples. In stead, an
+array of flags (no counts or offsets), or a string representation of the same
+information may be used.
+
+L<https://trac.parrot.org/parrot/ticket/1552>
+
+=item UnManagedStruct get_integer, set_integer_native [eligible in 2.4]
+
+These will no longer refer to the byte length of the buffer, but to the number
+of times the struct is repeated; emulating an array of structs.
+
+L<https://trac.parrot.org/parrot/ticket/1553>
+
+=item ManagedStruct reallocations based on shape changes [eligible in 2.4]
+
+Since shape changes may simply be used for re-interpreting data, and may also
+occur in several steps, re-allocating after any one shape change may be
+undesirable. In stead, an explicit allocate/reallocate method will be provided.
+
+L<https://trac.parrot.org/parrot/ticket/1554>
+
 =back
 
 =head1 Opcodes
@@ -142,6 +181,12 @@ Ability to use non-default dynamic loading behaviour.
 =item pushaction, pushmark, popmark [eligible in 2.4]
 
 L<https://trac.parrot.org/parrot/ticket/876>
+
+=item new_callback_p_p_p_s [eligible in 2.4]
+
+To be replaced with new_callback_p_p_p_p_s.
+
+L<https://trac.parrot.org/parrot/ticket/1548>
 
 =back
 
