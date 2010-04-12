@@ -2249,7 +2249,7 @@ SPLINTFLAGS_FORMAT = \
 # Problems with evaluation and control structions
 SPLINTFLAGS_EVALUATION = \
     +controlnestdepth 15 \
-    +duplicate-case \
+    +duplicate-quals \
     +eval-order \
     +eval-order-uncon \
 
