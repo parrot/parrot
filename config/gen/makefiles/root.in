@@ -2144,7 +2144,8 @@ bsdlint : $(PARROT)
 	rm -f *.ln
 	$(LINT) $(CC_INC) "-Iinclude/pmc" $(BSD_LINT_FLAGS) $(BSD_LINT_EXCLUSIONS) $(LINTABLE_CFILES)
 
-# For checking with splint see also http:////www.perlfoundation.org//parrot//index.cgi?splint
+# For checking with splint see also
+# http:////trac.parrot.org/parrot/wiki/splint
 # Splint: http:////splint.org
 SPLINT = splint
 
