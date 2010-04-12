@@ -332,16 +332,13 @@ typedef enum {
 #define PNCONST   PF_NCONST(interp->code)
 
 /* TODO - Make this a config option */
-/* Splint complains about PMCNULL's storage, so don't use it. */
-#ifdef S_SPLINT_S
-#  define PARROT_CATCH_NULL 0
-#else
-#  define PARROT_CATCH_NULL 1
+#ifndef PARROT_CATCH_NULL
+#  ifdef S_SPLINT_S
+#    define PARROT_CATCH_NULL 0
+#  else
+#    define PARROT_CATCH_NULL 1
+#  endif
 #endif
-
-#if PARROT_CATCH_NULL
-#else
-#endif /* PARROT_CATCH_NULL */
 
 #if PARROT_CATCH_NULL
 PARROT_DATA PMC    *PMCNULL;    /* Holds single Null PMC */
@@ -353,10 +350,9 @@ PARROT_DATA STRING *STRINGNULL; /* a single Null STRING */
 #  define PMCNULL ((PMC *)NULL)
 #  define PMC_IS_NULL(pmc)       ((pmc) == NULL)
 #  define STRING_IS_NULL(string) ((string) == NULL)
-#endif
+#endif /* PARROT_CATCH_NULL */
 
-
-#define STRING_IS_EMPTY(s) !(int)(s)->strlen
+#define STRING_IS_EMPTY(s) ((s)->strlen == 0)
 
 /* &gen_from_def(sysinfo.pasm) prefix(SYSINFO_) */
 
