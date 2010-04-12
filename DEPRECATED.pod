@@ -174,6 +174,10 @@ L<https://trac.parrot.org/parrot/ticket/1406>
 Ability to get the string name of the current GC core from the interpinfo_s_i.
 See r43900 and r43904 for details.
 
+=item NCI_FB_CB and NCI_FB_UD in iglobals [experimental]
+
+Hooks allowing a runtime-loadable dynamic frame builder.
+
 =item loadlib_p_s_p [experimental]
 
 Ability to use non-default dynamic loading behaviour.
