@@ -184,9 +184,10 @@ void parrot_hash_visit(PARROT_INTERP,
         FUNC_MODIFIES(*pinfo);
 
 PARROT_EXPORT
-void parrot_mark_hash(PARROT_INTERP, ARGIN(Hash *hash))
+void parrot_mark_hash(PARROT_INTERP, ARGMOD(Hash *hash))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*hash);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -371,9 +372,10 @@ Hash * parrot_create_hash(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-int PMC_compare(PARROT_INTERP, ARGIN(PMC *a), ARGIN_NULLOK(PMC *b))
+int PMC_compare(PARROT_INTERP, ARGIN(PMC *a), ARGIN(PMC *b))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 int STRING_compare(PARROT_INTERP,
@@ -502,7 +504,8 @@ int STRING_compare(PARROT_INTERP,
     , PARROT_ASSERT_ARG(keyhash))
 #define ASSERT_ARGS_PMC_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(a))
+    , PARROT_ASSERT_ARG(a) \
+    , PARROT_ASSERT_ARG(b))
 #define ASSERT_ARGS_STRING_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(search_key))
