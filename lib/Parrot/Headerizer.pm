@@ -287,7 +287,7 @@ sub generate_documentation_signature {
     $function_decl =~ s/\s+/ /g;
 
     # strip out any ARG* modifiers
-    $function_decl =~ s/ARG(?:IN|IN_NULLOK|OUT|OUT_NULLOK|MOD|MOD_NULLOK|FREE)\((.*?)\)/$1/g;
+    $function_decl =~ s/ARG(?:IN|IN_NULLOK|OUT|OUT_NULLOK|MOD|MOD_NULLOK|FREE|FREE_NOTNULL)\((.*?)\)/$1/g;
 
     # strip out the SHIM modifier
     $function_decl =~ s/SHIM\((.*?)\)/$1/g;

@@ -1027,13 +1027,15 @@ parrot_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_
 Frees the memory allocated to the specified hash and its bucket store.  Used by
 parrot_chash_destroy.
 
+Unlike the C library function free(), the hash function must not be NULL.
+
 =cut
 
 */
 
 PARROT_EXPORT
 void
-parrot_hash_destroy(PARROT_INTERP, ARGFREE(Hash *hash))
+parrot_hash_destroy(PARROT_INTERP, ARGFREE_NOTNULL(Hash *hash))
 {
     ASSERT_ARGS(parrot_hash_destroy)
     HashBucket * const bp = (HashBucket*)((char*)hash + sizeof (Hash));

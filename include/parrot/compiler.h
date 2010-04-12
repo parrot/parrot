@@ -216,6 +216,7 @@
     /* may not pass in a reference to a shared object.  There is nothing */
     /* special about malloc and free --  their behavior can be described */
     /* entirely in terms of the provided annotations. */
+#define ARGFREE_NOTNULL(x)                  /*@only@*/ /*@out@*/ /*@notnull@*/ x
 
 #endif /* PARROT_COMPILER_H_GUARD */
 

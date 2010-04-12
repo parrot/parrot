@@ -91,14 +91,14 @@ Destroys C<*vtable>.
 
 PARROT_EXPORT
 void
-Parrot_destroy_vtable(PARROT_INTERP, ARGMOD(VTABLE *vtable))
+Parrot_destroy_vtable(PARROT_INTERP, ARGFREE_NOTNULL(VTABLE *vtable))
 {
     ASSERT_ARGS(Parrot_destroy_vtable)
     /* We sometimes get a type number allocated without any corresponding
      * vtable. E.g. if you load perl_group, perlscalar is this way.  */
 
     if (vtable->ro_variant_vtable) {
-        VTABLE *ro_vtable = vtable->ro_variant_vtable;
+        VTABLE * const ro_vtable = vtable->ro_variant_vtable;
 
         if (ro_vtable->isa_hash) {
             parrot_hash_destroy(interp, ro_vtable->isa_hash);
