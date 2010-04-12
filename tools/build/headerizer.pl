@@ -173,7 +173,11 @@ sub make_function_decls {
 
         my $return = $func->{return_type};
         my $alt_void = ' ';
-        if ( $func->{is_ignorable} && ($return ne 'void') && ($return !~ /\*/) ) {
+
+        # Splint can't handle /*@alt void@*/ on pointers, although this page
+        # http://www.mail-archive.com/lclint-interest@virginia.edu/msg00139.html
+        # seems to say that we can.
+        if ( $func->{is_ignorable} && ($return !~ /\*/) ) {
             $alt_void = " /*\@alt void@*/\n";
         }
 
