@@ -263,9 +263,8 @@ STRING* Parrot_str_join(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-PARROT_IGNORABLE_RESULT
-INTVAL /*@alt void@*/
-Parrot_str_length(PARROT_INTERP, ARGMOD(STRING *s))
+PARROT_WARN_UNUSED_RESULT
+INTVAL Parrot_str_length(PARROT_INTERP, ARGMOD(STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*s);

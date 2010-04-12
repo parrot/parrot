@@ -895,7 +895,7 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
         if (encoding == Parrot_fixed_8_encoding_ptr)
             s->strlen = len;
         else
-            Parrot_str_length(interp, s);
+            (void)Parrot_str_length(interp, s);
 
         return s;
     }
@@ -908,7 +908,7 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
         if (encoding == Parrot_fixed_8_encoding_ptr)
             s->strlen = len;
         else
-            Parrot_str_length(interp, s);
+            (void)Parrot_str_length(interp, s);
     }
     else {
         s->strlen = s->bufused = 0;
@@ -1153,7 +1153,7 @@ Calculates and returns the number of characters in the specified Parrot string.
 */
 
 PARROT_EXPORT
-PARROT_IGNORABLE_RESULT
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_str_length(PARROT_INTERP, ARGMOD(STRING *s))
 {
@@ -2920,9 +2920,9 @@ Parrot_str_unescape(PARROT_INTERP,
     result->strlen  = d;
     result->bufused = iter.bytepos;
 
-    /* this also validates the string */
+    /* Force validating the string */
     if (encoding != result->encoding)
-        Parrot_str_length(interp, result);
+        (void)Parrot_str_length(interp, result);
 
     if (!CHARSET_VALIDATE(interp, result))
         Parrot_ex_throw_from_c_args(interp, NULL,
