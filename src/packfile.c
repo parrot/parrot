@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 This program is free software. It is subject to the same license as
 Parrot itself.
 $Id$
@@ -93,10 +93,10 @@ static PackFile_Segment * create_seg(PARROT_INTERP,
         __attribute__nonnull__(5)
         FUNC_MODIFIES(*dir);
 
-static void default_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
+static void default_destroy(PARROT_INTERP,
+    ARGFREE_NOTNULL(PackFile_Segment *self))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*self);
+        __attribute__nonnull__(2);
 
 static void default_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
         __attribute__nonnull__(1)
@@ -534,13 +534,9 @@ Deletes a C<PackFile>.
 
 PARROT_EXPORT
 void
-PackFile_destroy(PARROT_INTERP, ARGMOD_NULLOK(PackFile *pf))
+PackFile_destroy(PARROT_INTERP, ARGMOD(PackFile *pf))
 {
     ASSERT_ARGS(PackFile_destroy)
-    if (!pf) {
-        Parrot_io_eprintf(NULL, "PackFile_destroy: pf == NULL!\n");
-        return;
-    }
 
 #ifdef PARROT_HAS_HEADER_SYSMMAN
     if (pf->is_mmap_ped) {
@@ -2390,7 +2386,8 @@ directory_pack(PARROT_INTERP, ARGIN(PackFile_Segment *self), ARGOUT(opcode_t *cu
 
     for (i = 0; i < num_segs; i++) {
         const PackFile_Segment * const seg = dir->segments[i];
-        char *name = Parrot_str_to_cstring(interp, seg->name);
+        char * const name = Parrot_str_to_cstring(interp, seg->name);
+
         *cursor++ = seg->type;
         cursor = PF_store_cstring(cursor, name);
         *cursor++ = seg->file_offset;
@@ -2500,7 +2497,7 @@ The default destroy function.  Destroys a PackFile_Segment.
 */
 
 static void
-default_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
+default_destroy(PARROT_INTERP, ARGFREE_NOTNULL(PackFile_Segment *self))
 {
     ASSERT_ARGS(default_destroy)
     if (!self->pf->is_mmap_ped && self->data) {

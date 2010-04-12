@@ -562,8 +562,9 @@ const opcode_t * PackFile_ConstTable_unpack(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-void PackFile_destroy(PARROT_INTERP, ARGMOD_NULLOK(PackFile *pf))
+void PackFile_destroy(PARROT_INTERP, ARGMOD(PackFile *pf))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         FUNC_MODIFIES(*pf);
 
 PARROT_EXPORT
@@ -879,7 +880,8 @@ void Parrot_trace_eprintf(ARGIN(const char *s), ...)
     , PARROT_ASSERT_ARG(seg) \
     , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_PackFile_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pf))
 #define ASSERT_ARGS_PackFile_find_fixup_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))
