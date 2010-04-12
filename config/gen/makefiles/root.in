@@ -1622,6 +1622,12 @@ htmlhelp.dummy :
 htmlhelp-clean :
 	$(MAKE) docs htmlhelp-clean
 
+#UNLESS(win32):pdf:
+#UNLESS(win32):	$(MAKE) docs pdf
+
+pdf-clean:
+	$(MAKE) docs pdf-clean
+
 ###############################################################################
 #
 # dynamic PMC targets:
