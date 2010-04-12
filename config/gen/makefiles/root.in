@@ -587,10 +587,8 @@ MAKE = @make_c@
 .c$(O) : # suffix rule (limited support)
 	$(CC) $(CFLAGS) @optimize@ $(CC_WARN) -I$(@D) @cc_o_out@$@ -c $<
 
-.s$(O) : # suffix rule (limited support)
-	$(CC) $(CFLAGS) @optimize@ $(CC_WARN) -I$(@D) @cc_o_out@$@ -c $<
-#UNLESS(win32).S$(O) : # suffix rule (limited support)
-#UNLESS(win32)	$(CC) $(CFLAGS) @optimize@ $(CC_WARN) -I$(@D) @cc_o_out@$@ -c $<
+#UNLESS(win32):.s$(O) : # suffix rule (limited support)
+#UNLESS(win32):	$(CC) $(CFLAGS) @optimize@ $(CC_WARN) -I$(@D) @cc_o_out@$@ -c $<
 
 .pir.pbc : # suffix rule (limited support)
 	$(PARROT) -o $@ $<
