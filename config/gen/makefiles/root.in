@@ -846,8 +846,10 @@ parrot_nci_thunk_gen.pbc : tools/dev/nci_thunk_gen.pir $(DATA_JSON_LIB_PBCS) $(P
 $(NCI_THUNK_GEN) : parrot_nci_thunk_gen.pbc $(PBC_TO_EXE)
 	$(PBC_TO_EXE) parrot_nci_thunk_gen.pbc
 
-$(TAPIR) : tools/dev/tapir.pir $(PARROT) $(PBC_TO_EXE)
+tapir.pbc : tools/dev/tapir.pir $(PARROT)
 	$(PARROT) -o tapir.pbc tools/dev/tapir.pir
+
+$(TAPIR) : tapir.pbc $(PARROT) $(PBC_TO_EXE)
 	$(PBC_TO_EXE) tapir.pbc
 
 $(PARROT_CONFIG) : tools/util/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
