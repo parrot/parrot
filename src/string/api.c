@@ -1452,7 +1452,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(STRING *src),
         mem_sys_memcopy((char *)src->strstart + start_byte, rep->strstart,
                 rep->bufused);
         src->bufused += diff;
-        (void)Parrot_str_length(interp, src);
+        src->strlen = CHARSET_CODEPOINTS(interp, src);
     }
 
     /* src is modified, now return the original substring */
