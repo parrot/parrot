@@ -204,6 +204,16 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     # nothing
 .end
 
+.sub '_should_show_count' :method
+    $P0 = getattribute self, 'formatter'
+    $I0 = $P0.'verbose'()
+    unless $I0 goto L1
+    .return (0)
+  L1:
+    # work in progress
+    .return (1)
+.end
+
 .sub '_format_for_output' :method
     .param pmc result
     $P0 = getattribute self, 'formatter'
@@ -306,6 +316,11 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     setattribute $P0, 'name', $P1
     setattribute $P0, 'formatter', self
     setattribute $P0, 'parser', parser
+    $P1 = getattribute $P0, 'show_count'
+    unless $P1 goto L1
+    $I0 = $P0.'_should_show_count'()
+    set $P1, $I0
+  L1:
     $P0.'header'()
     .return ($P0)
 .end
@@ -335,12 +350,16 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
 .sub '' :init :load :anon
     $P0 = subclass ['TAP';'Formatter';'Session'], ['TAP';'Formatter';'Console';'Session']
     $P0.'add_attribute'('plan')
+    $P0.'add_attribute'('newline_printed')
     $P0.'add_attribute'('last_status_printed')
 .end
 
 .sub 'init' :vtable :method
     $P0 = box ''
     setattribute self, 'plan', $P0
+    $P0 = new 'Boolean'
+    set $P0, 0
+    setattribute self, 'newline_printed', $P0
     $P0 = box 0
     setattribute self, 'last_status_printed', $P0
     $P0 = get_hll_global ['TAP';'Formatter';'Session'], 'init'
@@ -427,7 +446,13 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
 
     # work in progress
 
+    goto L2
   L6:
+    $P0 = getattribute self, 'newline_printed'
+    if $P0 goto L7
+    formatter.'_output'("\n")
+    set $P0, 1
+  L7:
     self.'_get_output_result'(result)
     formatter.'_output'("\n")
   L2:
