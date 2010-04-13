@@ -228,14 +228,13 @@ size_t
 Parrot_io_fill_readbuf(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_fill_readbuf)
-    size_t   got;
-    STRING   fake;
-    STRING  *s    = &fake;
     PIOOFF_T pos  = Parrot_io_get_file_position(interp, filehandle);
-
-    Buffer_bufstart(s) = Parrot_io_get_buffer_start(interp, filehandle);
-    fake.bufused       = Parrot_io_get_buffer_size(interp, filehandle);
-    got                = PIO_READ(interp, filehandle, &s);
+    char    *buf  = (char *) Parrot_io_get_buffer_start(interp, filehandle);
+    size_t   size = Parrot_io_get_buffer_size(interp, filehandle);
+    STRING  *s    = Parrot_str_new_init(interp, buf, size,
+                        PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+                        PObj_external_FLAG);
+    size_t   got  = PIO_READ(interp, filehandle, &s);
 
     /* buffer-filling does not change fileposition */
     Parrot_io_set_file_position(interp, filehandle, pos);
