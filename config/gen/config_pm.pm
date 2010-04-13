@@ -118,11 +118,11 @@ END
                     # String
                     $v =~ s/(["\\])/\\$1/g;
                     $v =~ s/\n/\\n/g;
-                    printf {$OUT} qq(    set \$P0["$k"], "$v"\n);
+                    print {$OUT} qq(    set \$P0["$k"], "$v"\n);
                 }
                 else {
                     # Null
-                    printf {$OUT} qq(    set \$P0["$k"], \$S2\n);
+                    print {$OUT} qq(    set \$P0["$k"], \$S2\n);
                 }
             }
         }

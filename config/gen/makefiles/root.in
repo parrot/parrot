@@ -822,7 +822,8 @@ installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(IN
 runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.pir $(PARROT) $(GEN_PASM_INCLUDES)
 	$(PARROT) -o $@ runtime/parrot/library/parrotlib.pir
 
-runtime/parrot/include/config.fpmc : myconfig config_lib.pir $(MINIPARROT)
+runtime/parrot/include/config.fpmc : myconfig config_lib.pir \
+    runtime/parrot/include/datatypes.pasm $(MINIPARROT)
 	$(MINIPARROT) -Iruntime/parrot/include config_lib.pir > $@
 
 $(PARROT) : src/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
