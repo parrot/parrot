@@ -86,7 +86,12 @@ INTVAL
 Parrot_pmc_is_null(SHIM_INTERP, ARGIN_NULLOK(const PMC *pmc))
 {
     ASSERT_ARGS(Parrot_pmc_is_null)
-    return PMC_IS_NULL(pmc);
+    /* We can't use PMC_IS_NULL() because that calls us here in some cases */
+#if PARROT_CATCH_NULL
+    return pmc == PMCNULL || pmc == NULL;
+#else
+    return pmc == NULL;
+#endif
 }
 
 /*
