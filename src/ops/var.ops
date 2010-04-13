@@ -99,7 +99,7 @@ op find_lex(out PMC, in STR) {
         PMC_IS_NULL(lex_pad)
             ? NULL
             : VTABLE_get_pmc_keyed_str(interp, lex_pad, lex_name);
-    if (!result) {
+    if (PMC_IS_NULL(result)) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
                 EXCEPTION_LEX_NOT_FOUND,
                 "Lexical '%Ss' not found", lex_name);
