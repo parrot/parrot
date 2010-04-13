@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -74,7 +74,7 @@ Parrot_io_read_utf8(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
                 /* need len - 1 more chars */
                 len2--;
-                s2 = Parrot_str_new_init(interp, NULL, len2, Parrot_utf8_encoding_ptr, 
+                s2 = Parrot_str_new_init(interp, NULL, len2, Parrot_utf8_encoding_ptr,
                                          Parrot_unicode_charset_ptr, 0);
                 s2->bufused  = len2;
 
