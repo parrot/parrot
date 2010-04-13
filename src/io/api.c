@@ -348,7 +348,7 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Cannot read from a closed or non-readable filehandle");
 
-        result = Parrot_io_make_string(interp, &result, length);
+        result = Parrot_str_new_noinit(interp, enum_stringrep_one, length);
         result->bufused = length;
 
         if (Parrot_io_is_encoding(interp, pmc, CONST_STRING(interp, "utf8")))
