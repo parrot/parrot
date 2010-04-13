@@ -164,6 +164,12 @@ static void ucs2_encode_and_advance(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*i);
 
+static size_t ucs2_hash(PARROT_INTERP,
+    ARGIN(const STRING *s),
+    size_t hashval)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static void ucs2_set_position(SHIM_INTERP,
     ARGMOD(String_iter *i),
     UINTVAL n)
@@ -219,6 +225,9 @@ static void ucs2_set_position(SHIM_INTERP,
 #define ASSERT_ARGS_ucs2_encode_and_advance __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(i))
+#define ASSERT_ARGS_ucs2_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_ucs2_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(i))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -642,6 +651,40 @@ ucs2_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
 
 /*
 
+=item C<static size_t ucs2_hash(PARROT_INTERP, const STRING *s, size_t hashval)>
+
+Returns the hashed value of the string, given a seed in hashval.
+
+=cut
+
+*/
+
+static size_t
+ucs2_hash(PARROT_INTERP, ARGIN(const STRING *s), size_t hashval)
+{
+    ASSERT_ARGS(ucs2_hash)
+#if PARROT_HAS_ICU
+    UChar  *pos = (UChar*) s->strstart;
+    UINTVAL len = s->strlen;
+
+    while (len--) {
+        hashval += hashval << 5;
+        hashval += *(pos++);
+    }
+
+    return hashval;
+
+#else
+    UNUSED(s);
+    UNUSED(hashval);
+
+    no_ICU_lib(interp);
+#endif
+}
+
+
+/*
+
 =item C<static void ucs2_set_position(PARROT_INTERP, String_iter *i, UINTVAL n)>
 
 Moves the string iterator C<i> to the position C<n> in the string.
@@ -730,7 +773,7 @@ Parrot_encoding_ucs2_init(PARROT_INTERP)
         bytes,
         iter_init,
         find_cclass,
-        NULL
+        ucs2_hash
     };
     STRUCT_COPY_FROM_STRUCT(return_encoding, base_encoding);
     Parrot_register_encoding(interp, "ucs2", return_encoding);
