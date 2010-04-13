@@ -685,7 +685,7 @@ static size_t
 fixed_8_hash(PARROT_INTERP, ARGIN(const STRING *s), size_t hashval)
 {
     ASSERT_ARGS(fixed_8_hash)
-    unsigned char *pos = s->strstart;
+    unsigned char *pos = (unsigned char *)s->strstart;
     UINTVAL        len = s->strlen;
 
     while (len--) {
