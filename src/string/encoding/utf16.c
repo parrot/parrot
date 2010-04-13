@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -843,7 +843,8 @@ Parrot_encoding_utf16_init(PARROT_INTERP)
         codepoints,
         bytes,
         iter_init,
-        find_cclass
+        find_cclass,
+        NULL
     };
     STRUCT_COPY_FROM_STRUCT(return_encoding, base_encoding);
     Parrot_register_encoding(interp, "utf16", return_encoding);

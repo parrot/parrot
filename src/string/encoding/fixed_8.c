@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2009, Parrot Foundation.
+Copyright (C) 2004-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -62,6 +62,12 @@ static void fixed8_set_position(SHIM_INTERP,
     UINTVAL pos)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*iter);
+
+static size_t fixed_8_hash(PARROT_INTERP,
+    ARGIN(const STRING *s),
+    size_t hashval)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 static UINTVAL get_byte(PARROT_INTERP,
@@ -186,6 +192,9 @@ static STRING * to_encoding(PARROT_INTERP,
     , PARROT_ASSERT_ARG(iter))
 #define ASSERT_ARGS_fixed8_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(iter))
+#define ASSERT_ARGS_fixed_8_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_get_byte __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(source_string))
@@ -660,6 +669,34 @@ iter_init(SHIM_INTERP, ARGIN(const STRING *src), ARGOUT(String_iter *iter))
     iter->set_position    = fixed8_set_position;
 }
 
+
+/*
+
+=item C<static size_t fixed_8_hash(PARROT_INTERP, const STRING *s, size_t
+hashval)>
+
+Returns the hashed value of the string, given a seed in hashval.
+
+=cut
+
+*/
+
+static size_t
+fixed_8_hash(PARROT_INTERP, ARGIN(const STRING *s), size_t hashval)
+{
+    ASSERT_ARGS(fixed_8_hash)
+    unsigned char *pos = s->strstart;
+    UINTVAL        len = s->strlen;
+
+    while (len--) {
+        hashval += hashval << 5;
+        hashval += *(pos++);
+    }
+
+    return hashval;
+}
+
+
 /*
 
 =item C<ENCODING * Parrot_encoding_fixed_8_init(PARROT_INTERP)>
@@ -695,7 +732,8 @@ Parrot_encoding_fixed_8_init(PARROT_INTERP)
         codepoints,
         bytes,
         iter_init,
-        find_cclass
+        find_cclass,
+        fixed_8_hash
 
     };
     STRUCT_COPY_FROM_STRUCT(return_encoding, base_encoding);

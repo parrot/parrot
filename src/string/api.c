@@ -2656,15 +2656,19 @@ Parrot_str_to_hashval(PARROT_INTERP, ARGMOD_NULLOK(STRING *s))
     if (STRING_IS_NULL(s) || !s->strlen)
         return hashval;
 
-    /* ZZZZZ workaround for something not setting up encodings right */
-    saneify_string(s);
+    if (s->encoding->hash)
+        hashval = ENCODING_HASH(interp, s, hashval);
+    else {
+        /* ZZZZZ workaround for something not setting up encodings right */
+        saneify_string(s);
 
-    ENCODING_ITER_INIT(interp, s, &iter);
+        ENCODING_ITER_INIT(interp, s, &iter);
 
-    for (offs = 0; offs < s->strlen; ++offs) {
-        const UINTVAL c = iter.get_and_advance(interp, &iter);
-        hashval += hashval << 5;
-        hashval += c;
+        for (offs = 0; offs < s->strlen; ++offs) {
+            const UINTVAL c = iter.get_and_advance(interp, &iter);
+            hashval += hashval << 5;
+            hashval += c;
+        }
     }
 
     s->hashval = hashval;
