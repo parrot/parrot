@@ -22,6 +22,8 @@ end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
     load_bytecode 'TAP/Formatter.pir'
     $P0 = subclass ['TAP';'Base'], ['TAP';'Harness']
     $P0.'add_attribute'('formatter')
+    $P0.'add_attribute'('exec')
+    $P0.'add_attribute'('opts')
 
     $P0 = new 'Hash'
     $P1 = split ' ', 'parser_args made_parser before_runtests after_runtests after_test'
@@ -39,6 +41,17 @@ end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
     setattribute self, 'ok_callbacks', $P0
 .end
 
+.sub 'process_args' :method
+    .param pmc opts
+    setattribute self, 'opts', opts
+    $I0 = exists opts['exec']
+    unless $I0 goto L1
+    $S0 = opts['exec']
+    $P0 = box $S0
+    setattribute self, 'exec', $P0
+  L1:
+.end
+
 .sub 'formatter' :method
     .param pmc formatter
     setattribute self, 'formatter', formatter
@@ -50,6 +63,8 @@ end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
     unless null $P0 goto L1
     $P0 = new ['TAP';'Formatter';'Console']
     setattribute self, 'formatter', $P0
+    $P1 = getattribute self, 'opts'
+    $P0.'process_args'($P1)
   L1:
     .local pmc aggregate
     aggregate = new ['TAP';'Parser';'Aggregator']
@@ -67,13 +82,19 @@ end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
     .param pmc tests
     $P0 = getattribute self, 'formatter'
     $P0.'prepare'(tests)
+    .local string exec
+    exec = 'parrot'
+    $P0 = getattribute self, 'exec'
+    if null $P0 goto L0
+    exec = $P0
+  L0:
     $P0 = iter tests
   L1:
     unless $P0 goto L2
     $S0 = shift $P0
     .local pmc parser, session
     (parser, session) = self.'make_parser'($S0)
-    parser.'exec'('parrot', $S0)
+    parser.'exec'(exec, $S0)
     .local pmc next, coro, result
     next = get_hll_global ['TAP';'Parser'], 'next'
     coro = clone next

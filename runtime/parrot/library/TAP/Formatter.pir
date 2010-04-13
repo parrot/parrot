@@ -27,6 +27,31 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     setattribute self, 'verbosity', $P0
 .end
 
+.sub 'process_args' :method
+    .param pmc opts
+    $I0 = exists opts['verbose']
+    unless $I0 goto L1
+    $P0 = box 1
+    setattribute self, 'verbosity', $P0
+  L1:
+    $I0 = exists opts['quiet']
+    unless $I0 goto L2
+    $P0 = box -1
+    setattribute self, 'verbosity', $P0
+  L2:
+    $I0 = exists opts['QUIET']
+    unless $I0 goto L3
+    $P0 = box -2
+    setattribute self, 'verbosity', $P0
+  L3:
+    $I0 = exists opts['normalize']
+    unless $I0 goto L4
+    $P0 = new 'Boolean'
+    set $P0, 1
+    setattribute self, 'normalize', $P0
+  L4:
+.end
+
 .sub 'verbose' :method
     $P0 = getattribute self, 'verbosity'
     $I0 = $P0
@@ -114,6 +139,7 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     self.'_output'("\nTest Summary Report")
     self.'_output'("\n-------------------\n")
 
+    # work is progress
 
   L4:
     $I0 = elements tests
@@ -181,6 +207,7 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
 .sub '_format_for_output' :method
     .param pmc result
     $P0 = getattribute self, 'formatter'
+    $P0 = getattribute $P0, 'normalize'
     if null $P0 goto L1
     unless $P0 goto L1
     $S0 = result
@@ -320,6 +347,14 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $P0(self)
 .end
 
+.sub '_get_output_result' :method
+    .param pmc result
+    .local pmc formatter
+    formatter = getattribute self, 'formatter'
+    $S0 = self.'_format_for_output'(result)
+    formatter.'_output'($S0)
+.end
+
 .sub 'header' :method
     .local pmc formatter
     formatter = getattribute self, 'formatter'
@@ -385,6 +420,16 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     set last_status_printed, now
   L5:
 
+    $I0 = formatter.'quiet'()
+    if $I0 goto L2
+    $I0 = formatter.'verbose'()
+    if $I0 goto L6
+
+    # work in progress
+
+  L6:
+    self.'_get_output_result'(result)
+    formatter.'_output'("\n")
   L2:
 .end
 
