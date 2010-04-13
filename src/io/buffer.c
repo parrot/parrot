@@ -291,17 +291,11 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
     if (Parrot_io_get_flags(interp, filehandle) & PIO_F_LINEBUF)
         return Parrot_io_readline_buffer(interp, filehandle, buf);
 
-    if (*buf == NULL) {
-        *buf = Parrot_gc_new_string_header(interp, 0);
-        (*buf)->bufused = len = 2048;
-    }
+    if (*buf == NULL)
+        *buf = Parrot_str_new_noinit(interp, enum_stringrep_one, 2048);
 
-    s   = *buf;
-    len = s->bufused;
-
-    if (!s->strstart)
-        Parrot_gc_allocate_string_storage(interp, s, len);
-
+    s       = *buf;
+    len     = s->bufused;
     out_buf = (unsigned char *)s->strstart;
 
     /* read Data from buffer */
