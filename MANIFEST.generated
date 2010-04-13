@@ -66,6 +66,8 @@ installable_pbc_to_exe.exe                        [main]bin
 installable_pbc_to_exe                            [main]bin
 installable_parrot-nqp.exe                        [main]bin
 installable_parrot-nqp                            [main]bin
+installable_tapir.exe                             [main]bin
+installable_tapir                                 [main]bin
 lib/Parrot/Config/Generated.pm                    [devel]lib
 libparrot.dll                                     [main]bin
 libparrot.lib                                     [main]bin

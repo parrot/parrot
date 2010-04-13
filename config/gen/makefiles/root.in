@@ -539,6 +539,7 @@ PARROT_CONFIG       = .@slash@parrot_config$(EXE)
 PIRC                = .@slash@pirc$(EXE)
 NQP_RX              = .@slash@parrot-nqp$(EXE)
 NCI_THUNK_GEN       = .@slash@parrot_nci_thunk_gen$(EXE)
+TAPIR               = .@slash@tapir$(EXE)
 
 # Installable executables
 INSTALLABLEPARROT    = .@slash@installable_parrot$(EXE)
@@ -550,6 +551,7 @@ INSTALLABLEPDB       = .@slash@installable_parrot_debugger$(EXE)
 INSTALLABLECONFIG    = .@slash@installable_parrot_config$(EXE)
 INSTALLABLENQP       = .@slash@installable_parrot-nqp$(EXE)
 INSTALLABLENCITHUNKGEN = .@slash@installable_parrot_nci_thunk_gen$(EXE)
+INSTALLABLETAPIR    = .@slash@installable_tapir$(EXE)
 
 # Libraries
 LIBPARROT_STATIC    = @blib_dir@/@libparrot_static@
@@ -814,9 +816,9 @@ help :
 
 world : all parrot_utils
 
-parrot_utils : $(PDUMP) $(DIS) $(PDB) $(PBC_MERGE) $(PBC_TO_EXE) $(PARROT_CONFIG) src/install_config$(O)
+parrot_utils : $(PDUMP) $(DIS) $(PDB) $(PBC_MERGE) $(PBC_TO_EXE) $(PARROT_CONFIG) src/install_config$(O) $(TAPIR)
 
-installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPDB) $(INSTALLABLEPBC_MERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG) $(INSTALLABLENQP) $(INSTALLABLENCITHUNKGEN)
+installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPDB) $(INSTALLABLEPBC_MERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG) $(INSTALLABLENQP) $(INSTALLABLENCITHUNKGEN) $(INSTALLABLETAPIR)
 
 
 runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.pir $(PARROT) $(GEN_PASM_INCLUDES)
@@ -843,6 +845,10 @@ parrot_nci_thunk_gen.pbc : tools/dev/nci_thunk_gen.pir $(DATA_JSON_LIB_PBCS) $(P
 
 $(NCI_THUNK_GEN) : parrot_nci_thunk_gen.pbc $(PBC_TO_EXE)
 	$(PBC_TO_EXE) parrot_nci_thunk_gen.pbc
+
+$(TAPIR) : tools/dev/tapir.pir $(PARROT) $(PBC_TO_EXE)
+	$(PARROT) -o tapir.pbc tools/dev/tapir.pir
+	$(PBC_TO_EXE) tapir.pbc
 
 $(PARROT_CONFIG) : tools/util/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc tools/util/parrot-config.pir
@@ -958,6 +964,9 @@ $(INSTALLABLEPBCTOEXE) : $(PBC_TO_EXE) src/install_config$(O)
 
 $(INSTALLABLENCITHUNKGEN) : parrot_nci_thunk_gen.pbc $(PBC_TO_EXE) src/install_config$(O)
 	$(PBC_TO_EXE) parrot_nci_thunk_gen.pbc --install
+
+$(INSTALLABLETAPIR) : tapir.pbc $(PBC_TO_EXE)
+	$(PBC_TO_EXE) tapir.pbc --install
 
 #
 # Parrot Debugger
@@ -1910,8 +1919,10 @@ prog-clean :
     $(INSTALLABLECONFIG) \
     $(INSTALLABLENQP) \
     $(INSTALLABLENCITHUNKGEN) \
+    $(INSTALLABLETAPIR) \
     pbc_to_exe.pbc pbc_to_exe.c pbc_to_exe$(O) pbc_to_exe$(EXE) \
     $(NCI_THUNK_GEN) parrot_nci_thunk_gen.c parrot_nci_thunk_gen$(O) parrot_nci_thunk_gen.pbc \
+    tapir.pbc tapir.c tapir$(O) tapir$(EXE) \
     parrot_config$(EXE) parrot_config.c parrot_config$(O) parrot_config.pbc \
     compilers/imcc/main$(O) \
     $(PDUMP) src/pbc_dump$(O) src/packdump$(O) \
