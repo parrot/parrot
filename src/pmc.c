@@ -81,15 +81,12 @@ Tests if the given pmc is null.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PARROT_HOT
 INTVAL
 Parrot_pmc_is_null(SHIM_INTERP, ARGIN_NULLOK(const PMC *pmc))
 {
     ASSERT_ARGS(Parrot_pmc_is_null)
-#if PARROT_CATCH_NULL
-    return pmc == PMCNULL || pmc == NULL;
-#else
-    return pmc == NULL;
-#endif
+    return PMC_IS_NULL(pmc);
 }
 
 /*
@@ -1015,9 +1012,10 @@ Parrot_pmc_type_does(PARROT_INTERP, ARGIN(STRING *role), INTVAL type)
             continue;
         }
 
-        if (pos + len < length && Parrot_str_indexed(interp, what, pos + len) != 32) {
+        if (pos + len < length) {
             pos += len;
-            continue;
+            if (Parrot_str_indexed(interp, what, pos) != 32)
+                continue;
         }
 
         return 1;
