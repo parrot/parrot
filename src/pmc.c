@@ -387,7 +387,7 @@ static PMC *
 get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
 {
     ASSERT_ARGS(get_new_pmc_header)
-    PMC    *pmc;
+    PMC    *newpmc;
     VTABLE *vtable = interp->vtables[base_type];
     UINTVAL vtable_flags;
 
@@ -449,13 +449,13 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
     if (vtable_flags & VTABLE_IS_SHARED_FLAG)
         flags |= PObj_is_PMC_shared_FLAG;
 
-    pmc            = Parrot_gc_new_pmc_header(interp, flags);
-    pmc->vtable    = vtable;
+    newpmc         = Parrot_gc_new_pmc_header(interp, flags);
+    newpmc->vtable = vtable;
 
     if (vtable->attr_size)
-        Parrot_gc_allocate_pmc_attributes(interp, pmc);
+        Parrot_gc_allocate_pmc_attributes(interp, newpmc);
 
-    return pmc;
+    return newpmc;
 }
 
 
@@ -1004,17 +1004,13 @@ Parrot_pmc_type_does(PARROT_INTERP, ARGIN(STRING *role), INTVAL type)
         INTVAL len;
         const INTVAL idx = Parrot_str_find_index(interp, what, role, (INTVAL)pos);
 
-        if (idx < 0)
+        if ((idx < 0) || (idx >= length))
             return 0;
 
         pos = idx;
-
-        if (pos >= length)
-            return 0;
-
         len = Parrot_str_byte_length(interp, role);
 
-        if (pos && Parrot_str_indexed(interp, what, pos - 1) != 32) {
+        if (pos && (Parrot_str_indexed(interp, what, pos - 1) != 32)) {
             pos += len;
             continue;
         }
