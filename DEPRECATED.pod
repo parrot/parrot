@@ -188,6 +188,12 @@ To be replaced with new_callback_p_p_p_p_s.
 
 L<https://trac.parrot.org/parrot/ticket/1548>
 
+=item find_lex [eligible in 2.4]
+
+find_lex will not throw exception for non-existing lexicals.
+
+L<https://trac.parrot.org/parrot/ticket/1207>
+
 =back
 
 =head1 Bytecode
