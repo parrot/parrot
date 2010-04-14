@@ -1290,9 +1290,7 @@ Fetches a C<STRING> from bytecode and return a new C<STRING>.
 
 Opcode format is:
 
-    opcode_t flags
-    opcode_t encoding
-    opcode_t type
+    opcode_t flags8 | encoding
     opcode_t size
     * data
 
@@ -1309,22 +1307,25 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
 {
     ASSERT_ARGS(PF_fetch_string)
     STRING   *s;
+    opcode_t  flag_charset_word;
     UINTVAL   flags;
-    opcode_t  charset_nr;
+    UINTVAL   charset_nr;
     size_t    size;
     const int wordsize = pf ? pf->header->wordsize : sizeof (opcode_t);
 
-    flags      = PF_fetch_opcode(pf, cursor);
-    charset_nr = PF_fetch_opcode(pf, cursor);
+    flag_charset_word = PF_fetch_opcode(pf, cursor);
 
-    if (charset_nr < 0) {
+    if (flag_charset_word == -1) {
         return STRINGNULL;
     }
 
-    size = (size_t)PF_fetch_opcode(pf, cursor);
+    /* decode flags and charset */
+    flags         = (flag_charset_word & 0x1 ? PObj_constant_FLAG : 0) |
+                    (flag_charset_word & 0x2 ? PObj_private7_FLAG : 0) ;
+    charset_nr    = flag_charset_word >> 8;
 
-    /* don't let PBC mess our internals - only constant or not */
-    flags &= (PObj_constant_FLAG | PObj_private7_FLAG);
+
+    size = (size_t)PF_fetch_opcode(pf, cursor);
 
     TRACE_PRINTF(("PF_fetch_string(): flags=0x%04x, ", flags));
     TRACE_PRINTF(("charset_nr=%ld, ", charset_nr));
@@ -1377,14 +1378,8 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
         padded_size += sizeof (opcode_t) - (padded_size % sizeof (opcode_t));
     }
 
-    *cursor++ = PObj_get_FLAGS(s); /* only constant_FLAG and private7 */
-
     if (STRING_IS_NULL(s)) {
-        /* preserve NULL-ness of strings
-         * ideally we'd null strings would take only a single opcode_t,
-         * but PObj flags uses a whole word
-         * charset number, OTOH, can't be negative
-         */
+        /* preserve NULL-ness of strings */
         *cursor++ = -1;
         return cursor;
     }
@@ -1397,7 +1392,11 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
      *
      * see also PF_fetch_string
      */
-    *cursor++ = Parrot_charset_number_of_str(NULL, s);
+
+    /* encode charset_nr and flags into the same word for a 33% savings on constant overhead */
+    *cursor++ = (Parrot_charset_number_of_str(NULL, s) << 8)         | 
+                (PObj_get_FLAGS(s) & PObj_constant_FLAG ? 0x1 : 0x0) |
+                (PObj_get_FLAGS(s) & PObj_private7_FLAG ? 0x2 : 0x0) ;
     *cursor++ = s->bufused;
 
     /* Switch to char * since rest of string is addressed by
@@ -1435,7 +1434,10 @@ PF_size_string(ARGIN(const STRING *s))
     ASSERT_ARGS(PF_size_string)
     /* TODO: don't break encapsulation on strings */
     const UINTVAL len = s->bufused;
-    return PF_size_strlen(len);
+    if (STRING_IS_NULL(s))
+        return 1;
+    else
+        return PF_size_strlen(len);
 }
 
 /*
@@ -1460,7 +1462,7 @@ PF_size_strlen(const UINTVAL len)
     }
 
     /* Include space for flags, representation, and size fields.  */
-    return 3 + (size_t)padded_size / sizeof (opcode_t);
+    return 2 + (size_t)padded_size / sizeof (opcode_t);
 }
 
 /*
