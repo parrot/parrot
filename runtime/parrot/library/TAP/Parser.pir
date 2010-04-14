@@ -547,60 +547,60 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     setattribute self, 'ok_callbacks', $P0
 .end
 
-.sub 'skipped' :method :nsentry('skipped')
+.sub 'skipped' :method :nsentry
     $P0 = getattribute self, 'skipped'
     $I0 = elements $P0
     .return ($I0)
 .end
 
-.sub 'todo' :method :nsentry('todo')
+.sub 'todo' :method :nsentry
     $P0 = getattribute self, 'todo'
     $I0 = elements $P0
     .return ($I0)
 .end
 
-.sub 'passed' :method :nsentry('passed')
+.sub 'passed' :method :nsentry
     $P0 = getattribute self, 'passed'
     $I0 = elements $P0
     .return ($I0)
 .end
 
-.sub 'failed' :method :nsentry('failed')
+.sub 'failed' :method :nsentry
     $P0 = getattribute self, 'failed'
     $I0 = elements $P0
     .return ($I0)
 .end
 
-.sub 'todo_passed' :method :nsentry('todo_passed')
+.sub 'todo_passed' :method :nsentry
     $P0 = getattribute self, 'todo_passed'
     $I0 = elements $P0
     .return ($I0)
 .end
 
-.sub 'parse_errors' :method :nsentry('parse_errors')
+.sub 'parse_errors' :method :nsentry
     $P0 = getattribute self, 'parse_errors'
     $I0 = elements $P0
     .return ($I0)
 .end
 
-.sub 'tests_run' :method :nsentry('tests_run')
+.sub 'tests_run' :method :nsentry
     $P0 = getattribute self, 'tests_run'
     .return ($P0)
 .end
 
-.sub 'tests_planned' :method :nsentry('tests_planned')
+.sub 'tests_planned' :method :nsentry
     $P0 = getattribute self, 'tests_planned'
     .return ($P0)
 .end
 
-.sub 'ignore_exit' :method :nsentry('ignore_exit')
+.sub 'ignore_exit' :method :nsentry
     .param int ign
     $P0 = new 'Boolean'
     set $P0, ign
     setattribute self, 'ignore_exit', $P0
 .end
 
-.sub 'exit' :method :nsentry('exit')
+.sub 'exit' :method :nsentry
     $P0 = getattribute self, 'ignore_exit'
     if null $P0 goto L1
     unless $P0 goto L1
@@ -733,7 +733,7 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     unless null $P1 goto L1
 .end
 
-.sub 'next' :method
+.sub 'next' :method :nsentry
     .local pmc stream, spool
     stream = getattribute self, 'stream'
     if null stream goto L1
@@ -917,16 +917,16 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .return (states)
 .end
 
-.sub '_no_action' :method :nsentry('_no_action')
+.sub '_no_action' :method :nsentry
     # nothing
 .end
 
-.sub '_DEFAULT_version' :method :nsentry('_DEFAULT_version')
+.sub '_DEFAULT_version' :method :nsentry
     .param pmc result
     self.'_add_error'('If TAP version is present it must be the first line of output')
 .end
 
-.sub '_DEFAULT_unknown' :method :nsentry('_DEFAULT_unknown')
+.sub '_DEFAULT_unknown' :method :nsentry
     .param pmc result
     $I0 = self.'pragma'('strict')
     unless $I0 goto L1
@@ -938,7 +938,7 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
   L1:
 .end
 
-.sub '_DEFAULT_plan' :method :nsentry('_DEFAULT_plan')
+.sub '_DEFAULT_plan' :method :nsentry
     .param pmc result
     $P0 = getattribute result, 'tests_planned'
     setattribute self, 'tests_planned', $P0
@@ -956,7 +956,7 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
   L1:
 .end
 
-.sub '_DEFAULT_test' :method :nsentry('_DEFAULT_test')
+.sub '_DEFAULT_test' :method :nsentry
     .param pmc result
     $P0 = getattribute self, 'tests_run'
     inc $P0
@@ -1034,18 +1034,18 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
   L37:
 .end
 
-.sub '_INIT_version' :method :nsentry('_INIT_version')
+.sub '_INIT_version' :method :nsentry
     .param pmc result
     $P0 = getattribute result, 'version'
     setattribute self, 'version', $P0
 .end
 
-.sub '_PLANNED_plan' :method :nsentry('_PLANNED_plan')
+.sub '_PLANNED_plan' :method :nsentry
     .param pmc result
     self.'_add_error'('More than one plan found in TAP output')
 .end
 
-.sub '_GOT_PLAN_test' :method :nsentry('_GOT_PLAN_test')
+.sub '_GOT_PLAN_test' :method :nsentry
     .param pmc result
     $P0 = getattribute self, 'plan'
     $S0 = $P0
