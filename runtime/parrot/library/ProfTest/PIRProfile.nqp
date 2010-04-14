@@ -91,16 +91,8 @@ method build_pir_profile() {
     my $pprof_fh  := pir::new__p_sc('FileHandle');
     self<profile> := $pprof_fh.readall($tmp_pprof);
 
-#    pir::new__p_sc('OS').rm($tmp_pir);
-#    pir::new__p_sc('OS').rm($tmp_pprof);
-}
-
-method line_is_cs($line) {
-    return $line<variable_line> && $line<variable_line><line_type> eq 'CS';
-}
-
-method line_is_op($line) {
-    return $line<variable_line> && $line<variable_line><line_type> eq 'OP';
+    pir::new__p_sc('OS').rm($tmp_pir);
+    pir::new__p_sc('OS').rm($tmp_pprof);
 }
 
 method get_config() {
