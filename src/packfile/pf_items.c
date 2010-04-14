@@ -1394,7 +1394,7 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
      */
 
     /* encode charset_nr and flags into the same word for a 33% savings on constant overhead */
-    *cursor++ = (Parrot_charset_number_of_str(NULL, s) << 8)         | 
+    *cursor++ = (Parrot_charset_number_of_str(NULL, s) << 8)         |
                 (PObj_get_FLAGS(s) & PObj_constant_FLAG ? 0x1 : 0x0) |
                 (PObj_get_FLAGS(s) & PObj_private7_FLAG ? 0x2 : 0x0) ;
     *cursor++ = s->bufused;
