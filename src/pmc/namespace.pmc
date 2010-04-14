@@ -52,6 +52,7 @@ static void add_to_class(PARROT_INTERP,
         FUNC_MODIFIES(*nsinfo)
         FUNC_MODIFIES(*classobj);
 
+PARROT_WARN_UNUSED_RESULT
 static int maybe_add_sub_to_namespace(PARROT_INTERP,
     ARGIN(PMC *SELF),
     ARGIN(STRING *key),
@@ -125,7 +126,7 @@ ns_insert_sub_keyed_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *key),
     Parrot_NameSpace_attributes * const nsinfo   = PARROT_NAMESPACE(self);
     PMC              *       vtable   = nsinfo->vtable;
     PMC              * const classobj = VTABLE_get_class(interp, self);
-    STRING           * vtable_key     = NULL;
+    STRING           * vtable_key     = STRINGNULL;
     Parrot_Sub_attributes *sub;
 
     PMC_get_sub(interp, value, sub);
@@ -157,7 +158,7 @@ ns_insert_sub_keyed_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *key),
         STRING *method_name = key;
 
         if (Parrot_str_equal(interp, sub->method_name, CONST_STRING(interp, ""))) {
-            if (sub->vtable_index != -1 && vtable_key != NULL) {
+            if (sub->vtable_index != -1 && !STRING_IS_NULL(vtable_key)) {
                 method_name = Parrot_str_copy(interp, vtable_key);
             }
         }
@@ -170,6 +171,7 @@ ns_insert_sub_keyed_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *key),
     return 0;
 }
 
+PARROT_WARN_UNUSED_RESULT
 static int
 maybe_add_sub_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
         ARGIN(PMC *value))
@@ -513,7 +515,7 @@ really a public API.
             INTVAL i = 0;
             while (!PMC_IS_NULL(ns) && VTABLE_elements(INTERP, key)) {
                 STRING * const name = VTABLE_get_string_keyed_int(INTERP, key, i);
-                if (name == NULL || name == STRINGNULL) {
+                if (STRING_IS_NULL(name)) {
                     ns = PMCNULL;
                     /* What to do here? Throw an exception or something? */
                     break;
