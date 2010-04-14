@@ -1,16 +1,16 @@
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 PDD 0: Design Document Format
-
-=head2 Version
-
-$Revision$
 
 =head2 Abstract
 
 This document defines the content and format of Parrot Design Documents
 (PDDs).
+
+=head2 Version
+
+$Revision$
 
 =head2 Synopsis
 
@@ -99,13 +99,6 @@ topic (e.g. basic Parrot datatypes).
 Document version.  Since Parrot is currently kept in a Subversion repository,
 the $$-delimited keyword "Revision" will do nicely.
 
-=item Maintainer I<(optional)>:
-
-The name and current email address for the point of contact for the PDD. This
-is the person to whom questions, comments, and patches should generally be
-addressed. This need not be the author of the document.  By default, all PDDs
-are maintained by the Parrot Architect.
-
 =item Abstract:
 
 A quick blurb explaining the purpose of the PDD.
@@ -149,6 +142,7 @@ The PDD author may add any additional sections he or she wishes.
 Proposed PDDs should be submitted to the parrot-dev mailing list (located
 at parrot-dev@lists.parrot.org) for discussion, criticism and general
 kibitzing.
+
 Acceptance of a particular PDD is ultimately up to the Parrot Architect.
 
 =head3 PDD Translations
@@ -159,22 +153,14 @@ Translations of PDDs into other languages should meet these guidelines:
 
 =item *
 
-The C<Maintainer> section should record who made the translation.
-
-=item *
-
-The C<Version> section should include an additional note of the translation
+The C<Version> section should include an additional note of the translated
 version.
 
 =back
 
-=head2 Attachments
-
-(none)
-
 =head2 References
 
-(none)
+None.
 
 =cut
 

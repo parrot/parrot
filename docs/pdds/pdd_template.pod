@@ -1,15 +1,15 @@
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 Design Document Template
 
-=head2 Version
-
-$Revision$
-
 =head2 Abstract
 
 Summary of the contents of the PDD.
+
+=head2 Version
+
+$Revision$
 
 =head2 Synopsis I<(optional)>
 
@@ -33,11 +33,11 @@ Notes on application to high-level languages. (optional)
 
 =head2 Attachments
 
-Any associated documents.
+Any associated documents. (optional)
 
 =head2 Footnotes
 
-List of footnotes to the text.
+List of footnotes to the text. (optional)
 
 =head2 References
 

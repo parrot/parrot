@@ -1,4 +1,4 @@
-# Copyright (c) 2001-2009, Parrot Foundation.
+# Copyright (c) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 [DRAFT] PDD10: Embedding and Extending
@@ -244,17 +244,9 @@ It should be possible to register a compiler for an HLL with an interpreter
 such that it is possible to load source code written in that language or pass
 source code to an interpreter successfully.
 
-=head2 Attachments
-
-Any associated documents.
-
-=head2 Footnotes
-
-List of footnotes to the text.
-
 =head2 References
 
-List of references.
+None.
 
 =cut
 

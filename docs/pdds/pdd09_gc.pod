@@ -602,36 +602,28 @@ Mark the buffer as needing GC.
 
 =back
 
-=head2 Attachments
-
-None.
-
-=head2 Footnotes
-
-None.
-
 =head2 References
 
 "Uniprocessor Garbage Collection Techniques"
-http://www.cs.rice.edu/~javaplt/311/Readings/wilson92uniprocessor.pdf
+L<http://www.cs.rice.edu/~javaplt/311/Readings/wilson92uniprocessor.pdf>
 
 "A unified theory of garbage collection":
-http://portal.acm.org/citation.cfm?id=1028982
+L<http://portal.acm.org/citation.cfm?id=1028982>
 
 "Scalable Locality-Conscious Multithreaded Memory Allocation":
-http://people.cs.vt.edu/~scschnei/papers/ismm06.pdf
+L<http://people.cs.vt.edu/~scschnei/papers/ismm06.pdf>
 
 "Parallel and concurrent garbage collectors":
-http://chaoticjava.com/posts/parallel-and-concurrent-garbage-collectors/
+L<http://chaoticjava.com/posts/parallel-and-concurrent-garbage-collectors/>
 
 "Region-Based Memory Management":
-http://www.irisa.fr/prive/talpin/papers/ic97.pdf
+L<http://www.irisa.fr/prive/talpin/papers/ic97.pdf>
 
 Dan's first musings on the GC subsystem:
-http://www.mail-archive.com/perl6-all@perl.org/msg14072.html
+L<http://www.mail-archive.com/perl6-all@perl.org/msg14072.html>
 
 Semi-timely and ordered destruction:
-http://www.sidhe.org/~dan/blog/archives/000199.html
+L<http://www.sidhe.org/~dan/blog/archives/000199.html>
 
 =cut
 

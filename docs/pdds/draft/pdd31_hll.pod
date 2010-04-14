@@ -1,16 +1,16 @@
-# Copyright (C) 2009, Parrot Foundation.
+# Copyright (C) 2009-2010, Parrot Foundation.
 # $Id$
 
 =head1 [DRAFT] PDD 31: HLL Compilers and Libraries
-
-=head2 Version
-
-$Revision$
 
 =head2 Abstract
 
 This PDD describes the standard compiler API and support for
 cross-library communication between high-level languages (HLLs).
+
+=head2 Version
+
+$Revision$
 
 =head2 Description
 
@@ -299,7 +299,7 @@ simply binds the symbol using C<target>'s hash interface.
 
 =head2 References
 
-L<pdd21_namespaces.pod>
+F<pdd21_namespaces.pod>
 
 =cut
 

@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 [DRAFT] PDD 14: Numbers
@@ -573,10 +573,6 @@ Fill in the remaining functions from the EDA, verify that the test suite still
 passes, integrate the library into the rest of Parrot, provide PMC types and
 suitable opcodes.  Conversion to and from Parrot strings, conversion to and
 from floating point types, sprintf output of bignumbers.
-
-=head2 Attachments
-
-=head2 Footnotes
 
 =head2 References
 

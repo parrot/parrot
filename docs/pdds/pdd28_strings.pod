@@ -1,4 +1,4 @@
-# Copyright (C) 2008-2009, Parrot Foundation.
+# Copyright (C) 2008-2010, Parrot Foundation.
 # $Id$
 
 =head1 PDD 28: Strings
@@ -826,15 +826,15 @@ ASCII strings, fix or deprecate. }}
 
 =head2 References
 
-http://sirviente.9grid.es/sources/plan9/sys/doc/utf.ps - Plan 9's Runes are
+L<http://sirviente.9grid.es/sources/plan9/sys/doc/utf.ps> - Plan 9's Runes are
 not dissimilar to NFG strings, and this is a good introduction to the Unicode
 world.
 
-http://www.unicode.org/reports/tr15/ - The Unicode Consortium's
+L<http://www.unicode.org/reports/tr15/> - The Unicode Consortium's
 explanation of different normalization forms.
 
-http://unicode.org/reports/tr29/ - "grapheme clusters" in the Unicode Standard
-Annex
+L<http://unicode.org/reports/tr29/> - "grapheme clusters" in the Unicode
+Standard Annex
 
 "Unicode: A Primer", Tony Graham - Arguably the most readable book on
 how Unicode works.

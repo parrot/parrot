@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 PDD 24: Events
@@ -368,17 +368,9 @@ provides builtin timers for greater portability. Some platforms provide their
 own implementations of timers, which may be used when performance on a
 particular platform is more important than portability.
 
-=head2 Attachments
-
-None.
-
-=head2 Footnotes
-
-None.
-
 =head2 References
 
-src/events.c
+F<src/events.c>
 
 L<http://www.seas.upenn.edu/~lipeng/homepage/unify.html>
 

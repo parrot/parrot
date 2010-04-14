@@ -1,15 +1,15 @@
-# Copyright (C) 2005-2007, Parrot Foundation.
+# Copyright (C) 2005-2010, Parrot Foundation.
 # $Id$
 
 =head1 PDD 21: Namespaces
 
-=head2 Version
-
-$Revision$
-
 =head2 Abstract
 
 Description and implementation of Parrot namespaces.
+
+=head2 Version
+
+$Revision$
 
 =head2 Description
 
@@ -736,14 +736,6 @@ PIR (without error checking):
   .end
 
 =end PIR
-
-=head2 Attachments
-
-None.
-
-=head2 Footnotes
-
-None.
 
 =head2 References
 

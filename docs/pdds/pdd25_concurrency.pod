@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 PDD 25: Concurrency
@@ -422,40 +422,32 @@ Kill a task without waiting for it to complete.
 
 =back
 
-=head2 Attachments
-
-None.
-
-=head2 Footnotes
-
-None.
-
 =head2 References
 
 Dec 2003 - (Dan ponders threads based on POSIX and Perl 5 experience)
-<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/e64b22ab7de0a7a6/889b5d8c4cd267b7?lnk=gst&q=threads&rnum=3#889b5d8c4cd267b7>
+L<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/e64b22ab7de0a7a6/889b5d8c4cd267b7?lnk=gst&q=threads&rnum=3#889b5d8c4cd267b7>
 
 Dec. 2003 - "threads and shared interpreter data structures"
-<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/e64ea4ff287e04fd/b71333e282d3d187?lnk=gst&q=threads&rnum=9#b71333e282d3d187>
+L<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/e64ea4ff287e04fd/b71333e282d3d187?lnk=gst&q=threads&rnum=9#b71333e282d3d187>
 
 Jan. 2004 - "Threads Design. A Win32 perspective."
-<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/3209629b23306029/52ba9d37425ba015?lnk=gst&q=threads&rnum=8#52ba9d37425ba015>
+L<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/3209629b23306029/52ba9d37425ba015?lnk=gst&q=threads&rnum=8#52ba9d37425ba015>
 
 Jan. 2004 - "Start of threads proposal"
-<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/4c7de440da84d5c6/04cfb70b0d81dfba?tvc=1&q=threads#04cfb70b0d81dfba>
+L<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/4c7de440da84d5c6/04cfb70b0d81dfba?tvc=1&q=threads#04cfb70b0d81dfba>
 
 Sept. 2005 - "consider using OS threads"
-<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/40b50e3aa9255f8e/036a87b5d2b5ed2c?lnk=gst&q=threads&rnum=2#036a87b5d2b5ed2c>
+L<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/40b50e3aa9255f8e/036a87b5d2b5ed2c?lnk=gst&q=threads&rnum=2#036a87b5d2b5ed2c>
 
 Aug. 2007 - "multi-threading a work in progress"
-<http://perlmonks.org/?node_id=636466>
+L<http://perlmonks.org/?node_id=636466>
 
 Concurrency as Futures -
-<http://www.cincomsmalltalk.com/userblogs/mls/blogView?showComments=true&entry=3336838959>
+L<http://www.cincomsmalltalk.com/userblogs/mls/blogView?showComments=true&entry=3336838959>
 
-Io language - <http://www.iolanguage.com/about/>
+Io language - L<http://www.iolanguage.com/about/>
 
-Java memory and concurrency - http://www.cs.umd.edu/~pugh/java/memoryModel/
+Java memory and concurrency - L<http://www.cs.umd.edu/~pugh/java/memoryModel/>
 
 =cut
 
