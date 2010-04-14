@@ -84,9 +84,9 @@ if ($longopts->{archive}) {
             jobs             => $ENV{TEST_JOBS} || 1,
         }
     );
-    $harness->runtests(@tests);
+    my $results = $harness->runtests(@tests);
     send_archive_to_smolder(%env_data) if $longopts->{send_to_smolder};
-
+    exit ( $results->all_passed() ? 0 : 1 );
 }
 elsif ($longopts->{html}) {
     generate_html_smoke_report(
