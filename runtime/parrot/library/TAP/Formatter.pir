@@ -163,8 +163,8 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
 .end
 
 .sub '_output_success' :method
-    .param string msg
-    self.'_output'(msg)
+    .param pmc args :slurpy
+    self.'_output'(args :flat)
 .end
 
 
@@ -254,8 +254,8 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     exit = parser.'exit'()
 
     unless exit goto L4
-    $S0 = exit
-    formatter.'_failure_output'("Dubious, test returned ", $S0, "\n")
+    $S1 = exit
+    formatter.'_failure_output'("Dubious, test returned ", $S1, "\n")
   L4:
 
     unless failed == 0 goto L5
@@ -393,8 +393,8 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     formatter = getattribute self, 'formatter'
     $I0 = isa result, ['TAP';'Parser';'Result';'Bailout']
     unless $I0 goto L1
-    $S0 = result.'bailout'()
-    formatter.'_failure_output'("Bailout called.  Further testing stopped:  ", $S0, "\n")
+    $S1 = result.'bailout'()
+    formatter.'_failure_output'("Bailout called.  Further testing stopped:  ", $S1, "\n")
   L1:
 
     $I0 = formatter.'really_quiet'()
@@ -433,9 +433,9 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     pretty = formatter.'_format_name'(name)
     .local pmc number
     number = getattribute result, 'test_num'
-    $S0 = number
-    $S1 = plan
-    formatter.'_output'("\r", pretty, $S0, $S1)
+    $S1 = number
+    $S2 = plan
+    formatter.'_output'("\r", pretty, $S1, $S2)
     set last_status_printed, now
   L5:
 
@@ -480,8 +480,8 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     skip_all = getattribute parser, 'skip_all'
     if null skip_all goto L3
     unless skip_all goto L3
-    $S0 = skip_all
-    formatter.'_output'("skipped: ", $S0, "\n")
+    $S1 = skip_all
+    formatter.'_output'("skipped: ", $S1, "\n")
     goto L1
   L3:
     $I0 = parser.'has_problems'()
@@ -491,6 +491,7 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
   L4:
     .local string time_report
     time_report = ''
+    # work in progress
     formatter.'_output'("ok", time_report, "\n")
   L1:
 .end

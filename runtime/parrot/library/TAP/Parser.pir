@@ -632,9 +632,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
 .end
 
 .sub '_add_error' :method
-    .param string error
+    .param pmc args :slurpy
     $P0 = getattribute self, 'parse_errors'
-    $P1 = box error
+    $S0 = join '', args
+    $P1 = box $S0
     push $P0, $P1
 .end
 
@@ -931,10 +932,8 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $I0 = self.'pragma'('strict')
     unless $I0 goto L1
     $P0 = getattribute result, 'raw'
-    $S0 = $P0
-    $S0 = 'Unknown TAP token: "' . $S0
-    $S0 .= '"'
-    self.'_add_error'($S0)
+    $S1 = $P0
+    self.'_add_error'('Unknown TAP token: "', $S1, '"')
   L1:
 .end
 
@@ -977,14 +976,9 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .local int number
     number = $P0
     unless number != tests_run goto L22
-    $S0 = "Tests out of sequence.  Found ("
     $S1 = number
-    $S0 .= $S1
-    $S0 .= ") but expected ("
-    $S1 = tests_run
-    $S0 .= $S1
-    $S0 .= ")"
-    self.'_add_error'($S0)
+    $S2 = tests_run
+    self.'_add_error'("Tests out of sequence.  Found (", $S1, ") but expected (", $S2, ")")
     goto L22
   L21:
     number = tests_run
@@ -1048,10 +1042,8 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
 .sub '_GOT_PLAN_test' :method :nsentry
     .param pmc result
     $P0 = getattribute self, 'plan'
-    $S0 = $P0
-    $S0 = "Plan (" . $S0
-    $S0 .= ") must be at the beginning or end of the TAP output"
-    self.'_add_error'($S0)
+    $S1 = $P0
+    self.'_add_error'("Plan (", $S1, ") must be at the beginning or end of the TAP output")
     self.'is_good_plan'(0)
 .end
 
@@ -1083,14 +1075,9 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $P0 = box 0
     setattribute self, 'good_plan', $P0
     if tests_planned == 0 goto L4
-    $S0 = "Bad plan.  You planned "
     $S1 = tests_planned
-    $S0 .= $S1
-    $S0 .= " tests but ran "
-    $S1 = tests_run
-    $S0 .= $S1
-    $S0 .= "."
-    self.'_add_error'($S0)
+    $S2 = tests_run
+    self.'_add_error'("Bad plan.  You planned ", $S1, " tests but ran ", $S2, ".")
   L4:
 
     $P0 = getattribute self, 'good_plan'
