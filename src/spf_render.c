@@ -65,6 +65,7 @@ static void gen_sprintf_call(
         FUNC_MODIFIES(*out)
         FUNC_MODIFIES(*info);
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING * handle_flags(PARROT_INTERP,
     ARGIN(const SpfInfo *info),
@@ -123,6 +124,7 @@ Handles C<+>, C<->, C<0>, C<#>, space, width, and prec.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING *
 handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGMOD(STRING *str),
