@@ -171,6 +171,127 @@
      CONCAT = 376
    };
 #endif
+/* Tokens.  */
+#define LOW_PREC 258
+#define PARAM 259
+#define HLL 260
+#define TK_LINE 261
+#define TK_FILE 262
+#define GOTO 263
+#define ARG 264
+#define IF 265
+#define UNLESS 266
+#define PNULL 267
+#define SET_RETURN 268
+#define SET_YIELD 269
+#define ADV_FLAT 270
+#define ADV_SLURPY 271
+#define ADV_OPTIONAL 272
+#define ADV_OPT_FLAG 273
+#define ADV_NAMED 274
+#define ADV_ARROW 275
+#define NEW 276
+#define ADV_INVOCANT 277
+#define ADV_CALL_SIG 278
+#define NAMESPACE 279
+#define DOT_METHOD 280
+#define SUB 281
+#define SYM 282
+#define LOCAL 283
+#define LEXICAL 284
+#define CONST 285
+#define ANNOTATE 286
+#define INC 287
+#define DEC 288
+#define GLOBAL_CONST 289
+#define PLUS_ASSIGN 290
+#define MINUS_ASSIGN 291
+#define MUL_ASSIGN 292
+#define DIV_ASSIGN 293
+#define CONCAT_ASSIGN 294
+#define BAND_ASSIGN 295
+#define BOR_ASSIGN 296
+#define BXOR_ASSIGN 297
+#define FDIV 298
+#define FDIV_ASSIGN 299
+#define MOD_ASSIGN 300
+#define SHR_ASSIGN 301
+#define SHL_ASSIGN 302
+#define SHR_U_ASSIGN 303
+#define SHIFT_LEFT 304
+#define SHIFT_RIGHT 305
+#define INTV 306
+#define FLOATV 307
+#define STRINGV 308
+#define PMCV 309
+#define LOG_XOR 310
+#define RELOP_EQ 311
+#define RELOP_NE 312
+#define RELOP_GT 313
+#define RELOP_GTE 314
+#define RELOP_LT 315
+#define RELOP_LTE 316
+#define RESULT 317
+#define RETURN 318
+#define TAILCALL 319
+#define YIELDT 320
+#define GET_RESULTS 321
+#define POW 322
+#define SHIFT_RIGHT_U 323
+#define LOG_AND 324
+#define LOG_OR 325
+#define COMMA 326
+#define ESUB 327
+#define DOTDOT 328
+#define PCC_BEGIN 329
+#define PCC_END 330
+#define PCC_CALL 331
+#define PCC_SUB 332
+#define PCC_BEGIN_RETURN 333
+#define PCC_END_RETURN 334
+#define PCC_BEGIN_YIELD 335
+#define PCC_END_YIELD 336
+#define NCI_CALL 337
+#define METH_CALL 338
+#define INVOCANT 339
+#define MAIN 340
+#define LOAD 341
+#define INIT 342
+#define IMMEDIATE 343
+#define POSTCOMP 344
+#define METHOD 345
+#define ANON 346
+#define OUTER 347
+#define NEED_LEX 348
+#define MULTI 349
+#define VTABLE_METHOD 350
+#define LOADLIB 351
+#define SUB_INSTANCE_OF 352
+#define SUBID 353
+#define NS_ENTRY 354
+#define UNIQUE_REG 355
+#define LABEL 356
+#define EMIT 357
+#define EOM 358
+#define IREG 359
+#define NREG 360
+#define SREG 361
+#define PREG 362
+#define IDENTIFIER 363
+#define REG 364
+#define MACRO 365
+#define ENDM 366
+#define STRINGC 367
+#define INTC 368
+#define FLOATC 369
+#define USTRINGC 370
+#define PARROT_OP 371
+#define VAR 372
+#define LINECOMMENT 373
+#define FILECOMMENT 374
+#define DOT 375
+#define CONCAT 376
+
 
 
 
@@ -178,7 +299,7 @@
 typedef union YYSTYPE
 {
 
-/* Line 1740 of yacc.c  */
+/* Line 1676 of yacc.c  */
 #line 1075 "compilers/imcc/imcc.y"
 
     IdList * idlist;
@@ -189,8 +310,8 @@ typedef union YYSTYPE
 
 
 
-/* Line 1740 of yacc.c  */
-#line 183 "compilers/imcc/imcparser.h"
+/* Line 1676 of yacc.c  */
+#line 304 "compilers/imcc/imcparser.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

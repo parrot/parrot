@@ -1494,13 +1494,13 @@ method:
 ns_entry_name:
     NS_ENTRY
          {
-           $$ = 0;
+           $$ = P_NSENTRY;
            IMCC_INFO(interp)->cur_unit->ns_entry_name     = NULL;
            IMCC_INFO(interp)->cur_unit->has_ns_entry_name = 1;
          }
    | NS_ENTRY '(' any_string ')'
          {
-           $$ = 0;
+           $$ = P_NSENTRY;
            IMCC_INFO(interp)->cur_unit->ns_entry_name = $3;
            IMCC_INFO(interp)->cur_unit->has_ns_entry_name = 1;
          }
