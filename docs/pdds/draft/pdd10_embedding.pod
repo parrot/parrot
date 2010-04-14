@@ -219,8 +219,9 @@ compiler named explicitly.>
 Compiling source code generated or read from the host application is also
 possible:
 
-  Parrot_PMC Parrot_compile_string( Parrot_Interp, const char *compiler,
-                                                   const char *code );
+  Parrot_PMC Parrot_compile_string( Parrot_Interp, Parrot_String compiler,
+                                                   const char *code,
+                                                   Parrot_String error );
 
 The potential return values are the same as for loading code from disk.
 
