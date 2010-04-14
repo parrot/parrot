@@ -7,6 +7,7 @@ New in 2.3.0
   + loadlib opcode added
   + Merge of pcc_hackatron branch
   + Recursive make for src/dynpmc removed
+  + Datatype STRINGNULL for a single Null STRING added
 - Compilers
 - Deprecations
 - API
@@ -15,8 +16,10 @@ New in 2.3.0
 - Bugfix
 - Tests
 - Tools
+  + tapir executable added; tapir is a TAP test harness
 - Documentation
 - Miscellaneous
+  + 3 month cycle for supported releases
 
 New in 2.2.0
 - Core changes
