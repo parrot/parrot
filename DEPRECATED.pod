@@ -161,10 +161,6 @@ L<https://trac.parrot.org/parrot/ticket/1260>
 
 =item get_results opcode order and features [eligible in 2.1]
 
-Move get_results to follow invoke.
-
-L<https://trac.parrot.org/parrot/ticket/1405>
-
 get_results no longer used to fetch exception object.
 
 L<https://trac.parrot.org/parrot/ticket/1406>
