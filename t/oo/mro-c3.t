@@ -28,19 +28,19 @@ Tests the C3 Method Resolution order for the OO implementation.
     merge_two_pairs()
 .end
 
-.sub method_A :method
+.sub method_A :method :nsentry('method_A')
     .return('Method from A')
 .end
 
-.sub method_B :method
+.sub method_B :method :nsentry('method_B')
     .return('Method from B')
 .end
 
-.sub method_C :method
+.sub method_C :method :nsentry('method_C')
     .return('Method from C')
 .end
 
-.sub method_D :method
+.sub method_D :method :nsentry('method_D')
     .return('Method from D')
 .end
 

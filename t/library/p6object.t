@@ -437,7 +437,7 @@ diagnostic message).
 
 
 .namespace ['ABC']
-.sub 'foo' :method
+.sub 'foo' :method :nsentry('foo')
     .return ('ABC::foo')
 .end
 
