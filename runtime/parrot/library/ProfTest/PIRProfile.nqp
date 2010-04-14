@@ -21,28 +21,43 @@ method build_profile_array() {
     my @pprof_lines := pir::split("\n", self<profile>);
     self<profile_array> := ();
 
-    grammar pprof_line {
-        rule TOP { ^^ [ <variable_line> | <fixed_line> ] $$ }
-
-        rule line_type { [ 'VERSION' | 'CLI' | 'END_OF_RUNLOOP' | 'CS' | 'OP' ] }
-
-        rule fixed_line { <line_type> ':' <fixed_data> }
-        rule fixed_data { \N* }
-
-        rule variable_line { <line_type> ':' <variable_data>* }
-        rule variable_data { '{x{' <field_name> ':' <field_data> '}x}' }
-        rule field_name    { <.ident> }
-        #XXX(cotto): really need to find something better 
-        rule field_data    { <[a..zA..Z0..9_\-;\/.]>* }
-    }
-
     for @pprof_lines -> $line {
-        my $line_match := pprof_line.parse($line);
+        my $line_match := self.make_line_hash($line);
         #pir::say($line);
         #_dumper($line_match);
         self<profile_array>.push($line_match);
     }
 }
+
+method make_line_hash($line) {
+
+    my %line_hash := {};
+
+    my $colon_idx := pir::index($line, ":");
+    #if the line starts with "VERSION, CLI or END_OF_RUNLOOP, 
+    if ($colon_idx >= 3) {
+        my $type := pir::substr($line, 0, $colon_idx);
+        my $data := pir::substr($line, $colon_idx+1);
+        %line_hash<type> := $type;
+        %line_hash<data> := $data;
+    }
+    else {
+        my $type := pir::substr($line, 0, $colon_idx);
+        %line_hash<type> := $type;
+        $line := pir::substr($line, $colon_idx+1);
+        while ($line) {
+            $line := pir::substr($line, 3);
+            my $colon_idx := pir::index($line, ":");
+            my $split_idx := pir::index($line, "}x}");
+            my $name  := pir::substr($line, 0, $colon_idx);
+            my $value := pir::substr($line, $colon_idx+1, $split_idx-$colon_idx-1);
+            %line_hash{ $name } := $value;
+            $line := pir::substr($line, $split_idx+3);
+        }
+    }
+    %line_hash;
+}
+
 
 method build_pir_profile() {
 
@@ -76,8 +91,16 @@ method build_pir_profile() {
     my $pprof_fh  := pir::new__p_sc('FileHandle');
     self<profile> := $pprof_fh.readall($tmp_pprof);
 
-    pir::new__p_sc('OS').rm($tmp_pir);
-    pir::new__p_sc('OS').rm($tmp_pprof);
+#    pir::new__p_sc('OS').rm($tmp_pir);
+#    pir::new__p_sc('OS').rm($tmp_pprof);
+}
+
+method line_is_cs($line) {
+    return $line<variable_line> && $line<variable_line><line_type> eq 'CS';
+}
+
+method line_is_op($line) {
+    return $line<variable_line> && $line<variable_line><line_type> eq 'OP';
 }
 
 method get_config() {

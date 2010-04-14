@@ -24,21 +24,31 @@ method matches($profile) {
     my $start_line := 0;
     my $max_line   := +$profile.profile_array;
 
-    my $curr_line;
+    my %curr_line;
     my $curr_want;
 
     while ($line_idx < $max_line) {
 
-        $curr_line := $profile.profile_array[$line_idx];
+        %curr_line := $profile.profile_array[$line_idx];
         $curr_want := self<wants>[$want_idx];
         self.say("current want: "~$curr_want.get_str);
-        self.say("current line: "~ ~$curr_line);
+        my $line_desc;
+        if self<debugging> {
+            $line_desc := "current line: " ~ %curr_line<type> ~'(';
+            for %curr_line -> $k {
+                unless $k eq 'type' {
+                    $line_desc := "$line_desc :$k(" ~ %curr_line{$k} ~") ";
+                }
+            }
+            $line_desc := $line_desc ~ ")";
+        }
+        self.say($line_desc);
 
         if $curr_want.goal {
             self.say("SUCCESS\n");
             return 1;
         }
-        elsif ($curr_want.accepts($curr_line)) {
+        elsif ($curr_want.accepts(%curr_line)) {
 
             self.say("ACCEPTED");
             $line_idx++;
