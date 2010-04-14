@@ -7,7 +7,7 @@
 .namespace [ 'Sub' ]
 
 # implementation Sub.get_lexenv :method
-.sub get_lexenv :method
+.sub get_lexenv :method :nsentry
     .local pmc env, pad, interp
     env = new 'ResizablePMCArray'
     .local int level
