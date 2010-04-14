@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2009, Parrot Foundation.
+# Copyright (C) 2002-2010, Parrot Foundation.
 # $Id$
 
 This is a list of project roles, with a partial list of the folks who have
@@ -62,6 +62,7 @@ Platform Porter                 Allison Randal (Debian, Ubuntu)
                                 Reini Urban (cygwin)
                                 Will Coleda (MacPorts)
                                 Jerry Gay (Windows)
+                                Gerd Pokorra (Fedora)
 
 
 Patch Monster                   chromatic
