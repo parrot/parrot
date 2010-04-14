@@ -453,11 +453,12 @@ void do_sub_pragmas(PARROT_INTERP,
 PARROT_EXPORT
 void PackFile_add_segment(PARROT_INTERP,
     ARGMOD(PackFile_Directory *dir),
-    ARGIN(PackFile_Segment *seg))
+    ARGMOD(PackFile_Segment *seg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*dir);
+        FUNC_MODIFIES(*dir)
+        FUNC_MODIFIES(*seg);
 
 PARROT_EXPORT
 void PackFile_Annotations_add_entry(PARROT_INTERP,

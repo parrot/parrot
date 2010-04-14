@@ -1196,7 +1196,7 @@ owner of the segment; it gets destroyed when the PackFile does.
 PARROT_EXPORT
 void
 PackFile_add_segment(PARROT_INTERP, ARGMOD(PackFile_Directory *dir),
-        ARGIN(PackFile_Segment *seg))
+        ARGMOD(PackFile_Segment *seg))
 {
     ASSERT_ARGS(PackFile_add_segment)
     dir->segments = mem_gc_realloc_n_typed_zeroed(interp, dir->segments,
