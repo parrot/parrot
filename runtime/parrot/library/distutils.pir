@@ -96,10 +96,6 @@ Typical invocations are:
 
 =over 4
 
-=item prove (in step 'test')
-
-core module Test-Harness
-
 =item prove --archive (in step 'smoke')
 
 module TAP-Harness-Archive
@@ -121,8 +117,6 @@ core module ExtUtils::Command, see TT #1322
 =item glob (in step 'manifest' & 'sdist')
 
 PGE::Glob
-
-Limitation: currently, OS.'readdir' is dummy with MSVC.
 
 =back
 
@@ -2054,72 +2048,11 @@ The following Version Control System are handled :
 
 =head3 Step test
 
-If t/harness exists, run : t/harness
+=item prove_exec / test_exec
 
-If parrot-tapir exists, run it with t/*.t
+option --exec of prove / tapir
 
-Else run : prove t/*.t
-
-=cut
-
-.sub '_test' :anon
-    .param pmc kv :slurpy :named
-    run_step('build', kv :flat :named)
-    $I0 = file_exists('t/harness')
-    unless $I0 goto L1
-    .tailcall _test_harness(kv :flat :named)
-  L1:
-    $S0 = get_executable('parrot-tapir')
-    $I0 = file_exists($S0)
-    unless $I0 goto L2
-    .tailcall _test_tapir($S0, kv :flat :named)
-  L2:
-    .tailcall _test_prove(kv :flat :named)
-.end
-
-=over 4
-
-=item harness_exec
-
-the default value is with perl
-
-=item harness_options
-
-the default value is empty
-
-=item harness_files
-
-the default value is "t/*.t"
-
-=cut
-
-.sub '_test_harness' :anon
-    .param pmc kv :slurpy :named
-    .local string cmd
-    $I0 = exists kv['harness_exec']
-    unless $I0 goto L1
-    cmd = kv['harness_exec']
-    goto L2
-  L1:
-    cmd = "perl -I"
-    $S0 = get_libdir()
-    cmd .= $S0
-    cmd .= "/tools/lib"
-  L2:
-    cmd .= " t/harness "
-    $S0 = get_value('harness_options', '' :named('default'), kv :flat :named)
-    cmd .= $S0
-    cmd .= " "
-    $S0 = get_value('harness_files', "t/*.t" :named('default'), kv :flat :named)
-    cmd .= $S0
-    system(cmd, 1 :named('verbose'))
-.end
-
-=item prove_exec
-
-option --exec of prove
-
-=item prove_files
+=item prove_files / test_files
 
 the default value is "t/*.t"
 
@@ -2127,68 +2060,40 @@ the default value is "t/*.t"
 
 =cut
 
-.sub '_test_prove' :anon
+.sub '_test' :anon
     .param pmc kv :slurpy :named
-    .local string cmd
-    cmd = "prove"
+    run_step('build', kv :flat :named)
+
+    load_bytecode 'TAP/Harness.pbc'
+    .local pmc opts, files, harness, aggregate
+    opts = new 'Hash'
     $I0 = exists kv['prove_exec']
     unless $I0 goto L1
-    $S0 = get_prove_version()
-    $S0 = substr $S0, 0, 1
-    unless $S0 == "3" goto L3
-    cmd .= " --exec="
-    goto L4
+    $S0 = kv['prove_exec']
+    opts['exec'] = $S0
+  L1:
+    $I0 = exists kv['test_exec']
+    unless $I0 goto L2
+    $S0 = kv['test_exec']
+    opts['exec'] = $S0
+  L2:
+    $S0 = "t/*.t"
+    $I0 = exists kv['prove_files']
+    unless $I0 goto L3
+    $S0 = kv['prove_files']
   L3:
-    cmd .= " --perl="
+    $I0 = exists kv['test_files']
+    unless $I0 goto L4
+    $S0 = kv['test_files']
   L4:
-    $S0 = kv['prove_exec']
-    $I0 = index $S0, ' '
-    if $I0 < 0 goto L2
-    cmd .= "\""
-  L2:
-    cmd .= $S0
-    if $I0 < 0 goto L1
-    cmd .= "\""
-  L1:
-    cmd .= " "
-    $S0 = get_value('prove_files', "t/*.t" :named('default'), kv :flat :named)
-    cmd .= $S0
-    system(cmd, 1 :named('verbose'))
-.end
-
-.sub 'get_prove_version' :anon
-    $P0 = open 'prove --version', 'rp'
-    $S0 = $P0.'readline'()
-    $P0.'close'()
-    $I1 = index $S0, "Test::Harness v"
-    $I1 += 15
-    $I2 = index $S0, " ", $I1
-    $I3 = $I2 - $I1
-    $S0 = substr $S0, $I1, $I3
-    .return ($S0)
-.end
-
-.sub '_test_tapir' :anon
-    .param string tapir
-    .param pmc kv :slurpy :named
-    .local string cmd
-    cmd = tapir
-    $I0 = exists kv['prove_exec']
-    unless $I0 goto L1
-    cmd .= " --exec="
-    $S0 = kv['prove_exec']
-    $I0 = index $S0, ' '
-    if $I0 < 0 goto L2
-    cmd .= "\""
-  L2:
-    cmd .= $S0
-    if $I0 < 0 goto L1
-    cmd .= "\""
-  L1:
-    cmd .= " "
-    $S0 = get_value('prove_files', "t/*.t" :named('default'), kv :flat :named)
-    cmd .= $S0
-    system(cmd, 1 :named('verbose'))
+    files = glob($S0)
+    harness = new ['TAP';'Harness']
+    harness.'process_args'(opts)
+    aggregate = harness.'runtests'(files)
+    $I0 = aggregate.'has_errors'()
+    unless $I0 goto L5
+    die "test fails"
+  L5:
 .end
 
 =head3 Step smoke
@@ -2210,6 +2115,18 @@ Unless t/harness exists, run : prove --archive t/*.t
     die "Require Test::Harness v3.x (option --archive)."
   L1:
     .tailcall _smoke_harness(kv :flat :named)
+.end
+
+.sub 'get_prove_version' :anon
+    $P0 = open 'prove --version', 'rp'
+    $S0 = $P0.'readline'()
+    $P0.'close'()
+    $I1 = index $S0, "Test::Harness v"
+    $I1 += 15
+    $I2 = index $S0, " ", $I1
+    $I3 = $I2 - $I1
+    $S0 = substr $S0, $I1, $I3
+    .return ($S0)
 .end
 
 .sub '_clean_smoke' :anon
@@ -2922,7 +2839,7 @@ the default value is setup.pir
         "requires"     : {
             "fetch"    : ["%s"],
             "build"    : [],
-            "test"     : ["perl5"],
+            "test"     : [],
             "install"  : [],
             "runtime"  : []
         }
