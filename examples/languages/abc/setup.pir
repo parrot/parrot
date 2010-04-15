@@ -40,7 +40,7 @@ See F<runtime/library/distutils.pir>.
     $P1 = new 'Hash'
     $P1['src/gen_grammar.pir'] = 'src/parser/grammar.nqp'
     $P1['src/gen_actions.pir'] = 'src/parser/actions.nqp'
-    $P0['pir_nqp-rx'] = $P1
+    $P0['pir_nqprx'] = $P1
 
     $P2 = new 'Hash'
     $P3 = split "\n", <<'SOURCES'
@@ -57,6 +57,9 @@ SOURCES
     $P4['parrot-abc'] = 'abc.pbc'
     $P0['exe_pbc'] = $P4
     $P0['installable_pbc'] = $P4
+
+    # test
+    $P0['test_exec'] = 'perl'
 
     # dist
     $P4 = glob('t/abc_*')
