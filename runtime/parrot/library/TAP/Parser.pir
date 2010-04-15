@@ -919,6 +919,7 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
 .end
 
 .sub '_no_action' :method :nsentry
+    .param pmc result
     # nothing
 .end
 
