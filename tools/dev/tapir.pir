@@ -98,7 +98,6 @@ HELP
     harness.'process_args'(opts)
     aggregate = harness.'runtests'(files)
     $I0 = aggregate.'has_errors'()
-    $I0 = not $I0
     exit $I0
 .end
 
