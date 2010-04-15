@@ -283,7 +283,8 @@ rename Parrot_string_cstring to Parrot_str_cstring
 
 =item STRING COW [eligible in 2.4]
 
-COW strings to be removed as well all "inplace" string modification functions.
+COW strings are to be removed. All "inplace" string modification
+functions and all "inplace" string ops are deprecated.
 
 L<https://trac.parrot.org/parrot/ticket/1540>
 
