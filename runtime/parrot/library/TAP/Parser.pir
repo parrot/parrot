@@ -124,6 +124,7 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     if $S1 == '' goto L2
     $S0 .= ' # '
     $S0 .= $S1
+    $S0 .= ' '
     $P0 = getattribute self, 'explanation'
     $S1 = $P0
     $S0 .= $S1
@@ -485,7 +486,6 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
 .sub '' :init :load :anon
     $P0 = subclass ['TAP';'Base'], ['TAP';'Parser']
     $P0.'add_attribute'('stream')
-    $P0.'add_attribute'('results')
     $P0.'add_attribute'('skipped')
     $P0.'add_attribute'('todo')
     $P0.'add_attribute'('passed')
@@ -521,23 +521,21 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
 .end
 
 .sub 'init' :vtable :init
-    $P0 = new 'ResizablePMCArray'
-    setattribute self, 'results', $P0
-    $P0 = new 'ResizablePMCArray'
+    $P0 = new 'ResizableIntegerArray'
     setattribute self, 'skipped', $P0
-    $P0 = new 'ResizablePMCArray'
+    $P0 = new 'ResizableIntegerArray'
     setattribute self, 'todo', $P0
-    $P0 = new 'ResizablePMCArray'
+    $P0 = new 'ResizableIntegerArray'
     setattribute self, 'passed', $P0
-    $P0 = new 'ResizablePMCArray'
+    $P0 = new 'ResizableIntegerArray'
     setattribute self, 'failed', $P0
-    $P0 = new 'ResizablePMCArray'
+    $P0 = new 'ResizableIntegerArray'
     setattribute self, 'actual_failed', $P0
-    $P0 = new 'ResizablePMCArray'
+    $P0 = new 'ResizableIntegerArray'
     setattribute self, 'actual_passed', $P0
-    $P0 = new 'ResizablePMCArray'
+    $P0 = new 'ResizableIntegerArray'
     setattribute self, 'todo_passed', $P0
-    $P0 = new 'ResizablePMCArray'
+    $P0 = new 'ResizableStringArray'
     setattribute self, 'parse_errors', $P0
     $P0 = box 0
     setattribute self, 'tests_run', $P0
@@ -549,38 +547,32 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
 
 .sub 'skipped' :method :nsentry
     $P0 = getattribute self, 'skipped'
-    $I0 = elements $P0
-    .return ($I0)
+    .return ($P0)
 .end
 
 .sub 'todo' :method :nsentry
     $P0 = getattribute self, 'todo'
-    $I0 = elements $P0
-    .return ($I0)
+    .return ($P0)
 .end
 
 .sub 'passed' :method :nsentry
     $P0 = getattribute self, 'passed'
-    $I0 = elements $P0
-    .return ($I0)
+    .return ($P0)
 .end
 
 .sub 'failed' :method :nsentry
     $P0 = getattribute self, 'failed'
-    $I0 = elements $P0
-    .return ($I0)
+    .return ($P0)
 .end
 
 .sub 'todo_passed' :method :nsentry
     $P0 = getattribute self, 'todo_passed'
-    $I0 = elements $P0
-    .return ($I0)
+    .return ($P0)
 .end
 
 .sub 'parse_errors' :method :nsentry
     $P0 = getattribute self, 'parse_errors'
-    $I0 = elements $P0
-    .return ($I0)
+    .return ($P0)
 .end
 
 .sub 'tests_run' :method :nsentry
@@ -615,9 +607,11 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
 .end
 
 .sub 'has_problems' :method
-    $I0 = self.'failed'()
+    $P0 = getattribute self, 'failed'
+    $I0 = elements $P0
     if $I0 goto L1
-    $I0 = self.'parse_errors'()
+    $P0 = getattribute self, 'parse_errors'
+    $I0 = elements $P0
     if $I0 goto L1
     $P0 = getattribute self, 'ignore_exit'
     if null $P0 goto L2
@@ -990,42 +984,35 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $I0 = result.'has_todo'()
     unless $I0 goto L31
     $P0 = getattribute self, 'todo'
-    $P1 = box number
-    push $P0, $P1
+    push $P0, number
   L31:
     $I0 = result.'todo_passed'()
     unless $I0 goto L32
     $P0 = getattribute self, 'todo_passed'
-    $P1 = box number
-    push $P0, $P1
+    push $P0, number
   L32:
     $I0 = result.'has_skip'()
     unless $I0 goto L33
     $P0 = getattribute self, 'skipped'
-    $P1 = box number
-    push $P0, $P1
+    push $P0, number
   L33:
     $I0 = result.'is_ok'()
     unless $I0 goto L34
     $P0 = getattribute self, 'passed'
-    $P1 = box number
-    push $P0, $P1
+    push $P0, number
     goto L35
   L34:
     $P0 = getattribute self, 'failed'
-    $P1 = box number
-    push $P0, $P1
+    push $P0, number
   L35:
     $I0 = result.'is_actual_ok'()
     unless $I0 goto L36
     $P0 = getattribute self, 'actual_passed'
-    $P1 = box number
-    push $P0, $P1
+    push $P0, number
     goto L37
   L36:
     $P0 = getattribute self, 'actual_failed'
-    $P1 = box number
-    push $P0, $P1
+    push $P0, number
   L37:
 .end
 
@@ -1193,6 +1180,13 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     push $P1, description
     goto L2
   L3:
+.end
+
+.sub 'parsers' :method
+    .param string desc
+    $P0 = getattribute self, 'parser_for'
+    $P1 = $P0[desc]
+    .return ($P1)
 .end
 
 .sub 'total' :method

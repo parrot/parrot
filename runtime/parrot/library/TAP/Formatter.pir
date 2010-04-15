@@ -19,7 +19,11 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $P0 = newclass ['TAP';'Formatter';'Base']
     $P0.'add_attribute'('verbosity')
     $P0.'add_attribute'('normalize')
+    $P0.'add_attribute'('failures')
+    $P0.'add_attribute'('comments')
+    $P0.'add_attribute'('directives')
     $P0.'add_attribute'('_longest')
+    $P0.'add_attribute'('_printed_summary_header')
 .end
 
 .sub 'init' :vtable :method
@@ -50,6 +54,24 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     set $P0, 1
     setattribute self, 'normalize', $P0
   L4:
+    $I0 = exists opts['failures']
+    unless $I0 goto L5
+    $P0 = new 'Boolean'
+    set $P0, 1
+    setattribute self, 'failures', $P0
+  L5:
+    $I0 = exists opts['comments']
+    unless $I0 goto L6
+    $P0 = new 'Boolean'
+    set $P0, 1
+    setattribute self, 'comments', $P0
+  L6:
+    $I0 = exists opts['directives']
+    unless $I0 goto L7
+    $P0 = new 'Boolean'
+    set $P0, 1
+    setattribute self, 'directives', $P0
+  L7:
 .end
 
 .sub 'verbose' :method
@@ -138,8 +160,42 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
   L3:
     self.'_output'("\nTest Summary Report")
     self.'_output'("\n-------------------\n")
+    $P0 = iter tests
+  L5:
+    unless $P0 goto L4
+    .local string test
+    test = shift $P0
+    $P1 = box 0
+    setattribute self, '_printed_summary_header', $P1
+    .local pmc parser
+    parser = aggregate.'parsers'(test)
+    $P2 = parser.'failed'()
+    self.'_output_summary_failure'($P2, '  Failed test:  ', '  Failed tests:  ', test, parser)
+    $P2 = parser.'todo_passed'()
+    self.'_output_summary_failure'($P2, "  TODO passed:   ", "  TODO passed:   ", test, parser)
 
-    # work is progress
+    .local int _exit
+    _exit = parser.'exit'()
+    unless _exit goto L6
+    self.'_summary_test_header'(test, parser)
+    $S1 = _exit
+    self.'_failure_output'("  Non-zero exit status: ", $S1, "\n")
+  L6:
+
+    .local pmc errors
+    errors = parser.'parse_errors'()
+    $I0 = elements errors
+    unless $I0 goto L5
+    self.'_summary_test_header'(test, parser)
+    $P2 = iter errors
+    $S1 = shift $P2
+    self.'_failure_output'("  Parse errors: ", $S1, "\n")
+  L8:
+    unless $P2 goto L5
+    $S1 = repeat ' ', 16
+    $S2 = shift $P2
+    self.'_failure_output'($S1, $S2, "\n")
+    goto L8
 
   L4:
     $I0 = elements tests
@@ -148,6 +204,56 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     self.'_output'("Files=", $S1, ", Tests=", $S2, ",  ", runtime, "\n")
     $S1 = aggregate.'get_status'()
     self.'_output'("Result: ", $S1, "\n")
+  L1:
+.end
+
+.sub '_output_summary_failure' :method
+    .param pmc r
+    .param string singular
+    .param string plural
+    .param string test
+    .param pmc parser
+    $I0 = elements r
+    unless $I0 goto L1
+    self.'_summary_test_header'(test, parser)
+    unless $I0 == 1 goto L2
+    self.'_output'(singular)
+    goto L3
+  L2:
+    self.'_output'(plural)
+  L3:
+    .local pmc results
+    results = self.'_balanced_range'(40, r)
+    $S1 = shift results
+    self.'_output'($S1, "\n")
+  L4:
+    unless results goto L1
+    $S1 = repeat ' ', 16
+    $S2 = shift results
+    self.'_output'($S1, $S2, "\n")
+    goto L4
+  L1:
+.end
+
+.sub '_summary_test_header' :method
+    .param string test
+    .param pmc parser
+    .local pmc _printed_summary_header
+    _printed_summary_header = getattribute self, '_printed_summary_header'
+    if _printed_summary_header goto L1
+    .local string spaces, tests_run, failed
+    $P0 = getattribute self, '_longest'
+    $I0 = $P0
+    $I1 = length test
+    $I0 -= $I1
+    inc $I0
+    spaces = repeat ' ', $I0
+    tests_run = parser.'tests_run'()
+    $P0 = parser.'failed'()
+    $I0 = elements $P0
+    failed = $I0
+    self.'_output'(test, spaces, "(Tests: ", tests_run, " Failed: ", failed, ")\n")
+    set _printed_summary_header, 1
   L1:
 .end
 
@@ -165,6 +271,78 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
 .sub '_output_success' :method
     .param pmc args :slurpy
     self.'_output'(args :flat)
+.end
+
+.sub '_balanced_range' :method
+    .param int limit
+    .param pmc range
+    range = self.'_range'(range)
+    .local string line
+    line = ''
+    .local pmc lines
+    lines = new 'ResizableStringArray'
+    .local int curr
+    curr = 0
+  L1:
+    unless range goto L2
+    unless curr < limit goto L3
+    $S0 = shift range
+    $S0 .= ", "
+    line .= $S0
+    $I0 = length $S0
+    curr += $I0
+    goto L1
+  L3:
+    unless range goto L1
+    $I0 = length line
+    $I0 -= 2
+    line = substr line, 0, $I0
+    push lines, line
+    line = ''
+    curr = 0
+    goto L1
+  L2:
+    if line == '' goto L9
+    $I0 = length line
+    $I0 -= 2
+    line = substr line, 0, $I0
+    push lines, line
+  L9:
+    .return (lines)
+.end
+
+.sub '_range' :method
+    .param pmc numbers
+    .local int min, i, _num, next
+    .local pmc range
+    range = new 'ResizableStringArray'
+    push numbers, -1
+    min = -1
+  L1:
+    _num = shift numbers
+    if _num == -1 goto L2
+    next = shift numbers
+    unshift numbers, next
+    $I0 = _num + 1
+    unless next == $I0 goto L3
+    unless min == -1 goto L1
+    min = _num
+    goto L1
+  L3:
+    unless min != -1 goto L4
+    $S0 = min
+    $S0 .= '-'
+    $S1 = _num
+    $S0 .= $S1
+    push range, $S0
+    min = -1
+    goto L1
+  L4:
+    $S0 = _num
+    push range, $S0
+    goto L1
+  L2:
+    .return (range)
 .end
 
 
@@ -246,8 +424,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
   L3:
 
     .local int passed, failed, exit
-    passed = parser.'passed'()
-    failed = parser.'failed'()
+    $P0 = parser.'passed'()
+    passed = elements $P0
+    $P0 = parser.'failed'()
+    failed = elements $P0
     failed += total
     $I0 = tests_run
     failed -= $I0
@@ -275,7 +455,8 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
   L7:
 
     .local int skipped
-    skipped = parser.'skipped'()
+    $P0 = parser.'skipped'()
+    skipped = elements $P0
     unless skipped goto L8
     passed -= skipped
     $S1 = skipped
@@ -287,7 +468,8 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     formatter.'_output'("\n\t(less ", $S1, " skipped subtest", $S2, ": ", $S3, " okay)")
   L8:
 
-    failed = parser.'todo_passed'()
+    $P0 = parser.'todo_passed'()
+    failed = elements $P0
     unless failed goto L10
     $S1 = failed
     $S2 = ''
@@ -443,16 +625,28 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     if $I0 goto L2
     $I0 = formatter.'verbose'()
     if $I0 goto L6
-
-    # work in progress
-
-    goto L2
+    unless is_test goto L7
+    $P0 = getattribute formatter, 'failures'
+    if null $P0 goto L7
+    unless $P0 goto L7
+    $I0 = result.'is_ok'()
+    unless $I0 goto L6
+  L7:
+    $P0 = getattribute formatter, 'comments'
+    if null $P0 goto L8
+    $I0 = isa result, ['TAP';'Parser';'Result';'Comment']
+    if $I0 goto L6
+  L8:
+    $P0 = getattribute formatter, 'directives'
+    if null $P0 goto L2
+    $I0 = result.'has_directive'()
+    unless $I0 goto L2
   L6:
     $P0 = getattribute self, 'newline_printed'
-    if $P0 goto L7
+    if $P0 goto L9
     formatter.'_output'("\n")
     set $P0, 1
-  L7:
+  L9:
     self.'_get_output_result'(result)
     formatter.'_output'("\n")
   L2:

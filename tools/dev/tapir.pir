@@ -32,34 +32,26 @@
 .sub 'help' :anon
     say <<"HELP"
 
-Tapir is a TAP test harness, you can use Tapir like this:
+ tapir [options] [files]
 
-        ./tapir t/*.t
+Boolean options:
 
-Currently supported arguments:
-    -v                  Print the output of each test file
-    --verbose
+ -v,  --verbose         Print all test lines.
+ -f,  --failures        Show failed tests.
+ -o,  --comments        Show comments.
+      --ignore-exit     Ignore exit status from test scripts.
+ -q,  --quiet           Suppress some test output while running tests.
+ -Q,  --QUIET           Only print summary results.
+      --directives      Only show results with TODO or SKIP directives.
+      --normalize       Normalize TAP output in verbose output
+ -h,  --help            Display this help
+ -V,  --version         Display the version
 
-    -q
-    -quiet
+Options that take arguments:
 
-    -Q
-    -QUIET
-
-    -normalize
-
-    -a
-    --archive=file
-
-    -e
-    --exec=program      Use a given program to execute test scripts
-                        i.e. ./tapir --exec=perl t/*.t to run Perl tests
-
-    -V
-    --version           Print out the current Tapir version
-
-    -h
-    --help              This message
+ -e,  --exec            Interpreter to run the tests ('' for compiled
+                        tests.)
+ -a,  --archive         Store the resulting TAP in an archive file.
 HELP
 .end
 
@@ -75,6 +67,10 @@ HELP
     push getopts, 'quiet|q'
     push getopts, 'QUIET|Q'
     push getopts, 'normalize'
+    push getopts, 'failures|f'
+    push getopts, 'comments|o'
+    push getopts, 'directives'
+    push getopts, 'ignore-exit'
     push getopts, 'version|V'
     push getopts, 'help|h'
     opts = getopts.'get_options'(argv)
