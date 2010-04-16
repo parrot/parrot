@@ -234,13 +234,15 @@ end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
     .local string current_dir, cmd
     current_dir = cwd()
     chdir(dir)
+    $S0 = self.'_mk_meta'(aggregate)
+    spew('meta.yml', $S0)
     $I0 = length archive
     $I0 -= 3
     $S0 = substr archive, 0, $I0
-    cmd = "tar -cvf " . current_dir
+    cmd = "tar -cf " . current_dir
     cmd .= "/"
     cmd .= $S0
-    cmd .= " ."
+    cmd .= " *"
     system(cmd)
     chdir(current_dir)
     cmd = "gzip --best " . $S0
@@ -248,6 +250,68 @@ end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
     rmtree(dir)
     .return (aggregate)
 .end
+
+.sub '_mk_meta' :method
+    .param pmc aggregate
+    $S0 = "---"
+    $S0 .= "\nfile_attributes:"
+    $P0 = aggregate.'descriptions'()
+    $P1 = iter $P0
+  L1:
+    unless $P1 goto L2
+    $S1 = shift $P1
+    .local pmc parser
+    parser = aggregate.'parsers'($S1)
+    $S0 .= "\n  -"
+    $S0 .= "\n    description: "
+    $S0 .= $S1
+    $N0 = parser.'start_time'()
+    $S0 .= "\n    start_time: "
+    $S1 = $N0
+    $S0 .= $S1
+    $N0 = parser.'end_time'()
+    $S0 .= "\n    stop_time: "
+    $S1 = $N0
+    $S0 .= $S1
+    goto L1
+  L2:
+    $S0 .= "\nfile_order:"
+    $P1 = iter $P0
+  L3:
+    unless $P1 goto L4
+    $S1 = shift $P1
+    $S0 .= "\n  - "
+    $S0 .= $S1
+    goto L3
+  L4:
+    $I0 = aggregate.'start_time'()
+    $S0 .= "\nstart_time: "
+    $S1 = $I0
+    $S0 .= $S1
+    $I0 = aggregate.'end_time'()
+    $S0 .= "\nstop_time: "
+    $S1 = $I0
+    $S0 .= $S1
+    $P0 = getattribute self, 'archive_extra_props'
+    if null $P0 goto L5
+    $S0 .= "\nextra_properties:"
+    $P1 = iter $P0
+  L6:
+    unless $P1 goto L5
+    .local string key, value
+    key = shift $P1
+    value = $P0[key]
+    if value == '' goto L6
+    $S0 .= "\n  "
+    $S0 .= key
+    $S0 .= ": "
+    $S0 .= value
+    goto L6
+  L5:
+    $S0 .= "\n"
+    .return ($S0)
+.end
+
 
 =head1 AUTHOR
 

@@ -547,6 +547,16 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     setattribute self, 'ok_callbacks', $P0
 .end
 
+.sub 'start_time' :method
+    $P0 = getattribute self, 'start_time'
+    .return ($P0)
+.end
+
+.sub 'end_time' :method
+    $P0 = getattribute self, 'end_time'
+    .return ($P0)
+.end
+
 .sub 'skipped' :method :nsentry
     $P0 = getattribute self, 'skipped'
     .return ($P0)
@@ -1219,6 +1229,16 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $N0 = time
     $P0 = box $N0
     setattribute self, 'end_time', $P0
+.end
+
+.sub 'start_time' :method
+    $P0= getattribute self, 'start_time'
+    .return ($P0)
+.end
+
+.sub 'end_time' :method
+    $P0= getattribute self, 'end_time'
+    .return ($P0)
 .end
 
 .sub 'elapsed' :method
