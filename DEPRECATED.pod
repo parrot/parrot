@@ -7,8 +7,8 @@ All items in this list should have a corresponding Trac ticket[1].
 
 =head1 Experimental Status
 
-These features are not considered stable, even though they may
-have shipped in a stable release of parrot[2]. Use them at your own
+These features are not considered supported, even though they may
+have shipped in a supported release of parrot[2]. Use them at your own
 risk, as they can be removed or changed in any release. These
 items are marked below with C<[experimental]>.
 
@@ -411,7 +411,7 @@ L<Trac|http://trac.parrot.org/> is parrot's primary issue tracking system.
 =item 2
 
 For an item to be considered experimental, it can B<never> have shipped in
-a stable release without the C<[experimental]> tag; otherwise, it must be
+a supported release without the C<[experimental]> tag; otherwise, it must be
 deprecated normally before removal or incompatible change.
 
 =back
