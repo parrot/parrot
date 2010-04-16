@@ -213,10 +213,10 @@ F<~/ftp/releases/devel>.
 
  $ mkdir ~/ftp/releases/devel/a.b.c
 
-If the release is in the stable series (L<Appendix 1 - Upcoming releases>)
-create the new directory in F<~/ftp/releases/stable> instead.
+If the release is in the supported series (L<Appendix 1 - Upcoming releases>)
+create the new directory in F<~/ftp/releases/supported> instead.
 
- $ mkdir ~/ftp/releases/stable/a.b.c
+ $ mkdir ~/ftp/releases/supported/a.b.c
 
 Copy the different compressed tarballs from your machine into the new directory.
 
@@ -294,9 +294,9 @@ Update docs.parrot.org. Run "make html" in a release copy of parrot, and save
 the resources/ and html/ directories created in docs/.
 ssh into the parrotvm, and in the
 webroot for docs.parrot.org, expand these into a release directory (e.g.
-1.4.0). in <webroot>/parrot, there are symbolic links for latest, stable,
+1.4.0). in <webroot>/parrot, there are symbolic links for latest, supported,
 and devel. Update the latest symlink to point to your new directory.
-If this is a stable release, also update the stable symlink. Do not delete
+If this is a supported release, also update the supported symlink. Do not delete
 any old copies of the docs.
 
 =back
