@@ -283,10 +283,10 @@ are checked.
 =item e
 
 Under "Administer" -> "Site building" -> "URL Redirects", change the URL for
-"release/current" to the FTP directory for the new release (for example,
-F<ftp://ftp.parrot.org/pub/parrot/releases/devel/0.8.1>). Also update
-the URL for "release/developer" or "release/supported" depending on
-which type of release this is.
+"release/current" to the FTP file for the new release (for example,
+F<ftp://ftp.parrot.org/pub/parrot/releases/devel/0.8.1/parrot-0.8.1.tar.gz>).
+Also update the URL for "release/developer" or "release/supported" depending
+on which type of release this is.
 
 =item f
 
