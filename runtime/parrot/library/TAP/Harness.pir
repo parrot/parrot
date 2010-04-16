@@ -162,9 +162,10 @@ end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
     $P0 = new 'Env'
     $I0 = exists $P0['PARROT_TEST_HARNESS_DUMP_TAP']
     unless $I0 goto L1
-    $S0 = $P0['PARROT_TEST_HARNESS_DUMP_TAP']
     .local string spool
-    spool = $S0 . test
+    spool = $P0['PARROT_TEST_HARNESS_DUMP_TAP']
+    spool .= '/'
+    spool .= test
     $S0 = dirname(spool)
     mkpath($S0)
     $P0 = new 'FileHandle'
@@ -223,7 +224,7 @@ end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
   L1:
     .local string archive, dir
     archive = $P0
-    dir = './reports/'
+    dir = tempdir()
     .local pmc env
     env = new 'Env'
     env['PARROT_TEST_HARNESS_DUMP_TAP'] = dir
@@ -233,9 +234,18 @@ end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
     .local string current_dir, cmd
     current_dir = cwd()
     chdir(dir)
-    cmd = "tar cvf " . archive
+    $I0 = length archive
+    $I0 -= 3
+    $S0 = substr archive, 0, $I0
+    cmd = "tar -cvf " . current_dir
+    cmd .= "/"
+    cmd .= $S0
+    cmd .= " ."
     system(cmd)
     chdir(current_dir)
+    cmd = "gzip --best " . $S0
+    system(cmd)
+    rmtree(dir)
     .return (aggregate)
 .end
 
