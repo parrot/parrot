@@ -233,8 +233,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $I0 = is_cclass .CCLASS_NUMERIC, line, pos
     unless $I0 goto L5
     $I2 = find_not_cclass .CCLASS_NUMERIC, line, pos, lastpos
+    if $I2 == lastpos goto L_5
     $I0 = is_cclass .CCLASS_WHITESPACE, line, $I2
     unless $I0 goto L5
+  L_5:
     $I1 = $I2 - pos
     test_num = substr line, pos, $I1
     if $I2 == lastpos goto L4
@@ -759,6 +761,7 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     if null spool goto L6
     $S0 = token
     print spool, $S0
+    print spool, "\n"
   L6:
     .yield (token)
     goto L2

@@ -21,7 +21,7 @@ Test the TAP/Parser library
 
     load_bytecode 'TAP/Parser.pir'
 
-    plan(169)
+    plan(179)
     test_grammar_plan()
     test_grammar_bailout()
     test_grammar_comment()
@@ -148,6 +148,33 @@ Test the TAP/Parser library
     is($P0, 22, "test_num")
     $P0 = getattribute token, 'description'
     is($P0, 'this is a test \# TODO whee!', "description")
+
+    token = grammar.'tokenize'("not ok")
+    $P0 = get_class ['TAP';'Parser';'Result';'Test']
+    isa_ok(token, $P0)
+    $P0 = getattribute token, 'raw'
+    is($P0, "not ok")
+    $P0 = getattribute token, 'ok'
+    is($P0, 'not ok', "ok")
+    $P0 = getattribute token, 'test_num'
+    null $P1
+    is($P0, $P1, "test_num")
+    $P0 = getattribute token, 'description'
+    null $P1
+    is($P0, $P1, "description")
+
+    token = grammar.'tokenize'("ok 42")
+    $P0 = get_class ['TAP';'Parser';'Result';'Test']
+    isa_ok(token, $P0)
+    $P0 = getattribute token, 'raw'
+    is($P0, "ok 42")
+    $P0 = getattribute token, 'ok'
+    is($P0, 'ok', "ok")
+    $P0 = getattribute token, 'test_num'
+    is($P0, 42, "test_num")
+    $P0 = getattribute token, 'description'
+    null $P1
+    is($P0, $P1, "description")
 .end
 
 .sub 'test_grammar_version'

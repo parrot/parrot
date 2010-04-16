@@ -229,7 +229,7 @@ end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
     env['PARROT_TEST_HARNESS_DUMP_TAP'] = dir
     .local pmc aggregate
     $P0 = get_hll_global ['TAP';'Harness'], 'runtests'
-    aggregate = $P0(files)
+    aggregate = $P0(self, files)
     .local string current_dir, cmd
     current_dir = cwd()
     chdir(dir)
