@@ -96,10 +96,6 @@ Typical invocations are:
 
 =over 4
 
-=item prove --archive (in step 'smoke')
-
-module TAP-Harness-Archive
-
 =item pod2html
 
 core module Pod-Html
@@ -116,7 +112,11 @@ core module ExtUtils::Command, see TT #1322
 
 =item glob (in step 'manifest' & 'sdist')
 
-PGE::Glob
+PGE/Glob.pbc
+
+=item tempdir (in step 'smoke')
+
+Math/Rand.pbc
 
 =back
 
@@ -126,7 +126,7 @@ PGE::Glob
 
 =item smoke
 
-curl
+tar, gzip, curl
 
 =item sdist_gztar
 
@@ -2100,59 +2100,19 @@ the default value is "t/*.t"
 
 =head3 Step smoke
 
-Unless t/harness exists, run : prove --archive t/*.t
-
-=cut
-
-.sub '_smoke' :anon
-    .param pmc kv :slurpy :named
-    run_step('build', kv :flat :named)
-    $I0 = file_exists('t/harness')
-    if $I0 goto L1
-    $S0 = get_prove_version()
-    $S0 = substr $S0, 0, 1
-    unless $S0 == "3" goto L2
-    .tailcall _smoke_prove(kv :flat :named)
-  L2:
-    die "Require Test::Harness v3.x (option --archive)."
-  L1:
-    .tailcall _smoke_harness(kv :flat :named)
-.end
-
-.sub 'get_prove_version' :anon
-    $P0 = open 'prove --version', 'rp'
-    $S0 = $P0.'readline'()
-    $P0.'close'()
-    $I1 = index $S0, "Test::Harness v"
-    $I1 += 15
-    $I2 = index $S0, " ", $I1
-    $I3 = $I2 - $I1
-    $S0 = substr $S0, $I1, $I3
-    .return ($S0)
-.end
-
-.sub '_clean_smoke' :anon
-    .param pmc kv :slurpy :named
-    $S0 = get_value('prove_archive', "report.tar.gz" :named('default'), kv :flat :named)
-    unlink($S0, 1 :named('verbose'))
-    $S0 = get_value('harness_archive', "report.tar.gz" :named('default'), kv :flat :named)
-    unlink($S0, 1 :named('verbose'))
-    unlink('meta.yml', 1 :named('verbose'))
-.end
-
 =over 4
 
-=item prove_exec
+=item prove_exec / test_exec
 
 option --exec of prove
 
-=item prove_files
+=item prove_files / test_files
 
 the default value is "t/*.t"
 
-=item prove_archive
+=item prove_archive / smolder_archive
 
-option --archive of prove
+option --archive of prove / tapir
 
 the default value is report.tar.gz
 
@@ -2174,78 +2134,55 @@ a hash
 
 =cut
 
-.sub '_smoke_prove' :anon
+.sub '_smoke' :anon
     .param pmc kv :slurpy :named
-    .local string cmd
-    cmd = "prove"
+    run_step('build', kv :flat :named)
+
+    load_bytecode 'TAP/Harness.pbc'
+    .local pmc opts, files, harness, aggregate
+    opts = new 'Hash'
     $I0 = exists kv['prove_exec']
     unless $I0 goto L1
-    cmd .= " --exec="
     $S0 = kv['prove_exec']
-    $I0 = index $S0, ' '
-    if $I0 < 0 goto L2
-    cmd .= "\""
-  L2:
-    cmd .= $S0
-    if $I0 < 0 goto L1
-    cmd .= "\""
+    opts['exec'] = $S0
   L1:
-    cmd .= " "
-    $S0 = get_value('prove_files', "t/*.t" :named('default'), kv :flat :named)
-    cmd .= $S0
-    cmd .= " --archive="
+    $I0 = exists kv['test_exec']
+    unless $I0 goto L2
+    $S0 = kv['test_exec']
+    opts['exec'] = $S0
+  L2:
+    $S0 = "t/*.t"
+    $I0 = exists kv['prove_files']
+    unless $I0 goto L3
+    $S0 = kv['prove_files']
+  L3:
+    $I0 = exists kv['test_files']
+    unless $I0 goto L4
+    $S0 = kv['test_files']
+  L4:
+    files = glob($S0)
+    harness = new ['TAP';'Harness';'Archive']
+    harness.'process_args'(opts)
     .local string archive
+    archive = "report.tar.gz"
+    $I0 = exists kv['prove_archive']
+    unless $I0 goto L5
+    archive = kv['prove_archive']
+  L5:
+    $I0 = exists kv['smolder_archive']
+    unless $I0 goto L6
+    archive = kv['smolder_archive']
+  L6:
     archive = get_value('prove_archive', "report.tar.gz" :named('default'), kv :flat :named)
-    cmd .= archive
-    system(cmd, 1 :named('verbose'), 1 :named('ignore_error'))
-
-    add_extra_properties(archive, kv :flat :named)
-    smolder_post(archive, kv :flat :named)
-.end
-
-.sub 'add_extra_properties' :anon
-    .param string archive
-    .param pmc kv :slurpy :named
-    .local string cmd
+    harness.'archive'(archive)
     $I0 = exists kv['smolder_extra_properties']
-    unless $I0 goto L1
-    system('perl -MExtUtils::Command -e rm_rf tmp')
-    cmd = "mkdir tmp && cd tmp && tar xzf ../"
-    cmd .= archive
-    system(cmd, 1 :named('verbose'))
-
+    unless $I0 goto L7
     $P0 = kv['smolder_extra_properties']
-    $S0 = mk_extra_properties($P0)
-    say "append extra properties"
-    append('tmp/meta.yml', $S0)
+    harness.'extra_props'($P0)
+  L7:
+    aggregate = harness.'runtests'(files)
 
-    unlink(archive)
-    cmd = "cd tmp && tar czf ../"
-    cmd .= archive
-    cmd .= " *"
-    system(cmd, 1 :named('verbose'))
-    system('perl -MExtUtils::Command -e rm_rf tmp')
-  L1:
-.end
-
-.sub 'mk_extra_properties' :anon
-    .param pmc hash
-    $S0 = "extra_properties:\n"
-    $P0 = iter hash
-  L1:
-    unless $P0 goto L2
-    .local string key, value
-    key = shift $P0
-    value = hash[key]
-    if value == '' goto L1
-    $S0 .= "  "
-    $S0 .= key
-    $S0 .= ": "
-    $S0 .= value
-    $S0 .= "\n"
-    goto L1
-  L2:
-    .return ($S0)
+    smolder_post(archive, kv :flat :named)
 .end
 
 .sub 'smolder_post' :anon
@@ -2288,53 +2225,10 @@ a hash
   L1:
 .end
 
-=item harness_exec
-
-the default value is with perl
-
-=item harness_options
-
-the default value is empty
-
-=item harness_archive
-
-the default value is report.tar.gz
-
-=item harness_files
-
-the default value is "t/*.t"
-
-=back
-
-=cut
-
-.sub '_smoke_harness' :anon
+.sub '_clean_smoke' :anon
     .param pmc kv :slurpy :named
-    .local string cmd
-    $I0 = exists kv['harness_exec']
-    unless $I0 goto L1
-    cmd = kv['harness_exec']
-    goto L2
-  L1:
-    cmd = "perl -I"
-    $S0 = get_libdir()
-    cmd .= $S0
-    cmd .= "/tools/lib"
-  L2:
-    cmd .= " t/harness "
-    $S0 = get_value('harness_options', '' :named('default'), kv :flat :named)
-    cmd .= $S0
-    cmd .= " --archive="
-    .local string archive
-    archive = get_value('harness_archive', "report.tar.gz" :named('default'), kv :flat :named)
-    cmd .= archive
-    cmd .= " "
-    $S0 = get_value('harness_files', "t/*.t" :named('default'), kv :flat :named)
-    cmd .= $S0
-    system(cmd, 1 :named('verbose'), 1 :named('ignore_error'))
-
-    add_extra_properties(archive, kv :flat :named)
-    smolder_post(archive, kv :flat :named)
+    $S0 = get_value('prove_archive', "report.tar.gz" :named('default'), kv :flat :named)
+    unlink($S0, 1 :named('verbose'))
 .end
 
 =head3 Step install
