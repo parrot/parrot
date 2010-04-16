@@ -195,7 +195,7 @@ Test the TAP/Parser library
     result = new 'ResizablePMCArray'
     $P0 = get_hll_global ['TAP';'Parser'], 'next'
     .local pmc coro
-    coro = clone $P0
+    coro = newclosure $P0
   L1:
     $P0 = coro(parser)
     if null $P0 goto L2
