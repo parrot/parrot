@@ -68,10 +68,9 @@ static size_t fixed_8_hash(SHIM_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static UINTVAL get_byte(PARROT_INTERP,
+static UINTVAL get_byte(SHIM_INTERP,
     ARGIN(const STRING *source_string),
     UINTVAL offset)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -192,8 +191,7 @@ static STRING * to_encoding(PARROT_INTERP,
 #define ASSERT_ARGS_fixed_8_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_get_byte __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(source_string))
+       PARROT_ASSERT_ARG(source_string))
 #define ASSERT_ARGS_get_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(source_string))
