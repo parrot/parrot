@@ -398,11 +398,11 @@ parseflags_minimal(PARROT_INTERP, int argc, ARGIN(char *argv[]))
         }
         else if (!strncmp(arg, "--hash-seed", 11)) {
 
-            arg = strrchr(arg, '=')+1;
-            if (!arg) {
-                ++pos;
-                arg = argv[pos];
-            }
+            if ((arg = strrchr(arg, '=')))
+                arg++;
+            else
+                arg = argv[++pos];
+
             if (is_all_hex_digits(arg)) {
                 interp->hash_seed = strtoul(arg, NULL, 16);
             }
