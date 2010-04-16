@@ -421,6 +421,12 @@ static UINTVAL
 find_cclass(PARROT_INTERP, ARGIN(STRING *s), ARGIN(const INTVAL *typetable),
 INTVAL flags, UINTVAL pos, UINTVAL end)
 {
+    UNUSED(s);
+    UNUSED(typetable);
+    UNUSED(flags);
+    UNUSED(pos);
+    UNUSED(end);
+
     Parrot_ex_throw_from_c_args(interp, NULL,
         EXCEPTION_UNIMPLEMENTED,
         "No find_cclass support in unicode encoding plugins");

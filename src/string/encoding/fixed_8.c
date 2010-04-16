@@ -338,10 +338,10 @@ Returns the byte in string C<src> at position C<offset>.
 
 PARROT_WARN_UNUSED_RESULT
 static UINTVAL
-get_byte(PARROT_INTERP, ARGIN(const STRING *source_string), UINTVAL offset)
+get_byte(SHIM_INTERP, ARGIN(const STRING *source_string), UINTVAL offset)
 {
     ASSERT_ARGS(get_byte)
-    unsigned char *contents = (unsigned char *)source_string->strstart;
+    const unsigned char *contents = (const unsigned char *)source_string->strstart;
 
     if (offset >= source_string->bufused) {
 /*        Parrot_ex_throw_from_c_args(interp, NULL, 0,
