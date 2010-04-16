@@ -657,6 +657,108 @@ osutils - Parrot OS Utilities
     rethrow e
 .end
 
+=item tempdir
+
+=cut
+
+.sub 'tempdir'
+    .param string suffix        :named('SUFFIX') :optional
+    .param int has_suffix       :opt_flag
+    $S0 = tmpdir()
+    $S0 .= '/TEMPXXX'
+    unless has_suffix goto L1
+    $S0 .= suffix
+  L1:
+    .tailcall _gettemp($S0)
+.end
+
+.sub '_gettemp' :anon
+    .param string template
+    $P0 = split "/", template
+    $S0 = pop $P0
+    .const string TEMPCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+    $P1 = split '', TEMPCHARS
+    $I1 = elements $P1
+    load_bytecode 'Math/Rand.pbc'
+    .local pmc rand
+    rand = get_global [ 'Math'; 'Rand' ], 'rand'
+    .local pmc srand
+    srand = get_global [ 'Math'; 'Rand' ], 'srand'
+    $I0 = time
+    srand($I0)
+  REDO:
+    $S1 = ''
+    $P2 = split '', $S0
+  L1:
+    unless $P2 goto L2
+    $S2 = shift $P2
+    unless $S2 == 'X' goto L3
+    $I0 = rand()
+    $I0 = $I0 % $I1
+    $S2 = $P1[$I0]
+  L3:
+    $S1 .= $S2
+    goto L1
+  L2:
+    push $P0, $S1
+    $S0 = join "/", $P0
+    $I0 = stat $S0, .STAT_EXISTS
+    if $I0 goto REDO
+    .return ($S0)
+.end
+
+=item tmpdir
+
+=cut
+
+.sub 'tmpdir'
+    .local pmc env, dirlist
+    env = new 'Env'
+    dirlist = new 'ResizableStringArray'
+    $P0 = getinterp
+    $P0 = $P0[.IGLOBALS_CONFIG_HASH]
+    $I0 = $P0['win32']
+    unless $I0 goto L1
+    $I0 = exists env['TMPDIR']
+    unless $I0 goto L2
+    $S0 = env['TMPDIR']
+    push dirlist, $S0
+  L2:
+    $I0 = exists env['TEMP']
+    unless $I0 goto L3
+    $S0 = env['TEMP']
+    push dirlist, $S0
+  L3:
+    $I0 = exists env['TMP']
+    unless $I0 goto L4
+    $S0 = env['TMP']
+    push dirlist, $S0
+  L4:
+    push dirlist, 'c:/system/temp'
+    push dirlist, 'c:/temp'
+    push dirlist, '/tmp'
+    push dirlist, '/'
+    goto L5
+  L1:
+    $I0 = exists env['TMPDIR']
+    unless $I0 goto L6
+    $S0 = env['TMPDIR']
+    push dirlist, $S0
+  L6:
+    push dirlist, '/tmp'
+  L5:
+    unless dirlist goto L7
+    $S0 = shift dirlist
+    $I0 = stat $S0, .STAT_EXISTS
+    unless $I0 goto L5
+    $I0 = stat $S0, .STAT_ISDIR
+    unless $I0 goto L5
+    $P0 = split "\\", $S0
+    $S0 = join "/", $P0
+    .return ($S0)
+  L7:
+.end
+
 =back
 
 =head1 AUTHOR
