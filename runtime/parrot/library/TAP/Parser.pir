@@ -734,7 +734,7 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
 
 .sub 'run' :method
     .const 'Sub' next = 'next'
-    $P0 = clone next
+    $P0 = newclosure next
   L1:
     $P1 = $P0(self)
     unless null $P1 goto L1

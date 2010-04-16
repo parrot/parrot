@@ -97,7 +97,7 @@ end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
     parser.'exec'(exec, $S0)
     .local pmc next, coro, result
     next = get_hll_global ['TAP';'Parser'], 'next'
-    coro = clone next
+    coro = newclosure next
   L3:
     result = coro(parser)
     if null result goto L4
