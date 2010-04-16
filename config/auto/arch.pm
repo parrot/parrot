@@ -31,7 +31,7 @@ sub _init {
     $data{result}      = q{};
     my $unamep;
     eval {
-       chomp( $unamep  = `uname -p` );
+       chomp( $unamep  = `uname -p` ) unless ($^O eq 'MSWin32');
     };
     $data{unamep} = (! $@ and $unamep)
         ? $unamep
