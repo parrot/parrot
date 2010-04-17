@@ -194,6 +194,13 @@ find_lex will not throw exception for non-existing lexicals.
 
 L<https://trac.parrot.org/parrot/ticket/1207>
 
+=item substr_s_i_i_s [eligible in 2.4]
+
+This op will be replaced with replace_s_s_i_i_s op to clearly indicate
+semantic. Part of COW removal.
+
+L<https://trac.parrot.org/parrot/ticket/1540>
+
 =back
 
 =head1 Bytecode
