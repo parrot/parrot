@@ -2132,6 +2132,8 @@ a string
 
 a hash
 
+=back
+
 =cut
 
 .sub '_smoke' :anon
