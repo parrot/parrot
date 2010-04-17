@@ -95,10 +95,11 @@ end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
     .local pmc parser, session
     (parser, session) = self.'make_parser'($S0)
     parser.'exec'(exec, $S0)
-    .local pmc next, coro, result
-    next = get_hll_global ['TAP';'Parser'], 'next'
-    coro = newclosure next
+    .local pmc coro
+    $P1 = get_hll_global ['TAP';'Parser'], 'next'
+    coro = newclosure $P1
   L3:
+    .local pmc result
     result = coro(parser)
     if null result goto L4
     session.'result'(result)

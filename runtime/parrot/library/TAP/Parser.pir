@@ -733,31 +733,33 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
 .end
 
 .sub 'run' :method
-    .const 'Sub' next = 'next'
-    $P0 = newclosure next
+    .const 'Sub' $P0 = 'next'
+    $P0 = newclosure $P0
   L1:
     $P1 = $P0(self)
     unless null $P1 goto L1
 .end
 
-.sub 'next' :method :nsentry
+.sub 'next' :method :nsentry :lex
     .local pmc stream, spool
     stream = getattribute self, 'stream'
     if null stream goto L1
     $N0 = time
     $P0 = box $N0
     setattribute self, 'start_time', $P0
-    .local pmc grammar
+    .local pmc grammar, st
     grammar = new ['TAP';'Parser';'Grammar']
-    .local string st
-    st = 'INIT'
+    .const 'Sub' $P0 = 'next_state'
+    capture_lex $P0
+    st = box 'INIT'
+    .lex 'state', st
   L2:
     $S0 = readline stream
     if $S0 == '' goto L3
     $S0 = chomp($S0)
     .local pmc token
     token = grammar.'tokenize'($S0)
-    st = self.'next_state'(token, st)
+    self.'next_state'(token)
     $S0 = token.'type'()
     $P0 = self.'_callback_for'($S0)
     if null $P0 goto L4
@@ -792,17 +794,18 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     die "no stream"
 .end
 
-.sub 'next_state' :method
+.sub 'next_state' :method :lex :outer('next')
     .param pmc token
-    .param string st
-    .local pmc STATES
+    .local pmc STATES, st
     STATES = get_global ['TAP';'Parser'], 'STATES'
+    st = find_lex 'state'
     .local string type
     type = token.'type'()
   REDO:
     $I0 = STATES[st]
     if $I0 goto L1
-    $S0 = "Illegal state: " . st
+    $S0 = st
+    $S0 = "Illegal state: " . $S0
     die $S0
   L1:
     $P0 = STATES[st]
@@ -817,20 +820,19 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $I0 = exists $P1['continue']
     unless $I0 goto L4
     $S0 = $P1['continue']
-    st = $S0
+    set st, $S0
     goto REDO
   L4:
     $I0 = exists $P1['goto']
     unless $I0 goto L5
     $S0 = $P1['goto']
-    st = $S0
+    set st, $S0
     goto L5
   L2:
     printerr "Unhandled token type: "
     printerr type
     printerr "\n"
   L5:
-    .return (st)
 .end
 
 .sub '_make_state_table'
