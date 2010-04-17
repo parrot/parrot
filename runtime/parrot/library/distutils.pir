@@ -2088,7 +2088,8 @@ the default value is "t/*.t"
     unless $I0 goto L4
     $S0 = kv['test_files']
   L4:
-    files = glob($S0)
+    $P0 = glob($S0)
+    files = sort_strings($P0)
     harness = new ['TAP';'Harness']
     harness.'process_args'(opts)
     aggregate = harness.'runtests'(files)
@@ -2096,6 +2097,26 @@ the default value is "t/*.t"
     unless $I0 goto L5
     die "test fails"
   L5:
+.end
+
+.sub 'sort_strings'
+    .param pmc array
+    # currently, FixedStringArray hasn't the method sort.
+    # see TT #1356
+    $I0 = elements array
+    $P0 = new 'FixedPMCArray'
+    set $P0, $I0
+    $I0 = 0
+    $P1 = iter array
+  L1:
+    unless $P1 goto L2
+    $S0 = shift $P1
+    $P0[$I0] = $S0
+    inc $I0
+    goto L1
+  L2:
+    $P0.'sort'()
+    .return ($P0)
 .end
 
 =head3 Step smoke
@@ -2162,7 +2183,8 @@ a hash
     unless $I0 goto L4
     $S0 = kv['test_files']
   L4:
-    files = glob($S0)
+    $P0 = glob($S0)
+    files = sort_strings($P0)
     harness = new ['TAP';'Harness';'Archive']
     harness.'process_args'(opts)
     .local string archive
