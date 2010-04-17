@@ -119,13 +119,18 @@ osutils - Parrot OS Utilities
     inc $I1
     $I0 = stat $S0, .STAT_EXISTS
     if $I0 goto L1
+    $I0 = length $S0
+    if $I0 != 2 goto L3
+    $I0 = index $S0, ':'
+    if $I0 == 1 goto L1
+  L3:
     mkdir($S0, verbose :named('verbose'))
     goto L1
   L2:
     $I0 = stat pathname, .STAT_EXISTS
-    if $I0 goto L3
+    if $I0 goto L4
     mkdir(pathname, verbose :named('verbose'))
-  L3:
+  L4:
 .end
 
 =item mkdir
