@@ -2253,6 +2253,8 @@ a hash
     .param pmc kv :slurpy :named
     $S0 = get_value('prove_archive', "report.tar.gz" :named('default'), kv :flat :named)
     unlink($S0, 1 :named('verbose'))
+    $S0 = get_value('smolder_archive', "report.tar.gz" :named('default'), kv :flat :named)
+    unlink($S0, 1 :named('verbose'))
 .end
 
 =head3 Step install
