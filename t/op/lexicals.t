@@ -14,7 +14,7 @@ $ENV{TEST_PROG_ARGS} ||= '';
 plan( skip_all => 'lexicals not thawed properly from PBC, TT #1171' )
     if $ENV{TEST_PROG_ARGS} =~ /--run-pbc/;
 
-plan( tests => 58 );
+plan( tests => 57 );
 
 =head1 NAME
 
@@ -1610,29 +1610,6 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', 'store_lex should not accept $N#');
 .end
 CODE
 /error/
-OUTPUT
-
-pir_error_output_is( <<'CODE', <<'OUTPUT', "don't lost lexical when cloning", todo => "see TT#1550");
-.sub 'main' :main
-    .const 'Sub' f = 'func'
-    $P0 = clone f
-    $P0()
-.end
-
-.sub 'func' :lex
-    say "func"
-    $P0 = box 'STATE'
-    .lex 'VAR', $P0
-    inner()
-.end
-
-.sub 'inner' :lex :outer('func')
-    $P0 = find_lex 'VAR'
-    say $P0
-.end
-CODE
-func
-STATE
 OUTPUT
 
 # Local Variables:
