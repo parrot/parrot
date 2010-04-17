@@ -13,6 +13,9 @@ New in 2.3.0
 - API
 - Platforms
   + Improved handling of new compilers
+  + Cygwin packages will be updated again with Parrot releases
+  + Fedora packages add desktop files
+  + gzip and bzip2 compressed tar files for releases
 - Bugfix
 - Tests
 - Tools
@@ -20,6 +23,7 @@ New in 2.3.0
 - Documentation
 - Miscellaneous
   + 3 month cycle for supported releases
+  + Review and vote of GSoC applications
 
 New in 2.2.0
 - Core changes
