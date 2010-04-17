@@ -1336,8 +1336,10 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
         unit->subid = r;
     else {
         /* trim the quotes  */
+        char *oldname     = unit->subid->name;
         unit->subid->name = mem_sys_strdup(unit->subid->name + 1);
         unit->subid->name[strlen(unit->subid->name) - 1] = 0;
+        mem_sys_free(oldname);
 
         /* create string constant for it. */
         unit->subid->color = add_const_str(interp, unit->subid);
