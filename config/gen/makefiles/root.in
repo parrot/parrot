@@ -872,7 +872,7 @@ $(INSTALLABLEPARROT) : src/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 
 $(INC_DIR)/context.h : include/pmc/pmc_callcontext.h
 
-$(INC_DIR)/pbcversion.h :
+$(INC_DIR)/pbcversion.h : PBC_COMPAT
 	$(PERL) $(BUILD_TOOLS_DIR)/pbcversion_h.pl > $(INC_DIR)/pbcversion.h
 
 src/parrot_config.c :  runtime/parrot/include/config.fpmc \
