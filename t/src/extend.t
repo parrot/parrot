@@ -441,7 +441,7 @@ static opcode_t*
 the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
 {
     PackFile *pf = Parrot_pbc_read(interp, "$temp_pbc", 0);
-    STRING   *name = Parrot_str_new_constant(interp, "_sub1");
+    Parrot_String   *name = Parrot_str_new_constant(interp, "_sub1");
     PMC      *sub, *arg;
 
     Parrot_pbc_load(interp, pf);
@@ -499,7 +499,7 @@ static opcode_t*
 the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
 {
     PackFile *pf = Parrot_pbc_read(interp, "$temp_pbc", 0);
-    STRING   *name = Parrot_str_new_constant(interp, "_sub1");
+    Parrot_String   *name = Parrot_str_new_constant(interp, "_sub1");
     PMC      *sub, *arg;
 
     Parrot_pbc_load(interp, pf);
@@ -575,7 +575,7 @@ static opcode_t*
 the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
 {
     PackFile *pf = Parrot_pbc_read(interp, "$temp_pbc", 0);
-    STRING   *name = Parrot_str_new_constant(interp, "foo");
+    Parrot_String   *name = Parrot_str_new_constant(interp, "foo");
     PMC      *sub, *arg;
     Parrot_Int result;
 
@@ -642,7 +642,7 @@ static opcode_t*
 the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
 {
     PackFile         *pf   = Parrot_pbc_read(interp, "$temp_pbc", 0);
-    STRING           *name = Parrot_str_new_constant(interp, "_sub1");
+    Parrot_String           *name = Parrot_str_new_constant(interp, "_sub1");
     PMC              *sub;
     Parrot_runloop jump_point;
 
@@ -761,9 +761,9 @@ main(int argc, char* argv[])
     const char      *code      = ".sub foo\nprint\"Hello from foo!\\n\"\n.end\n";
     Parrot_PMC      retval;
     Parrot_PMC      sub;
-    STRING         *code_type;
-    STRING         *error;
-    STRING         *foo_name;
+    Parrot_String         *code_type;
+    Parrot_String         *error;
+    Parrot_String         *foo_name;
 
     if (!interp) {
         printf( "Hiss\n" );
