@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -440,9 +440,9 @@ main(int argc, char *argv[])
 static opcode_t*
 the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
 {
-    PackFile *pf = Parrot_pbc_read(interp, "$temp_pbc", 0);
-    Parrot_String   *name = Parrot_str_new_constant(interp, "_sub1");
-    PMC      *sub, *arg;
+    PackFile      *pf   = Parrot_pbc_read(interp, "$temp_pbc", 0);
+    Parrot_String  name = Parrot_str_new_constant(interp, "_sub1");
+    PMC           *sub, *arg;
 
     Parrot_pbc_load(interp, pf);
     sub = Parrot_find_global_cur(interp, name);
@@ -498,9 +498,9 @@ main(int argc, char *argv[])
 static opcode_t*
 the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
 {
-    PackFile *pf = Parrot_pbc_read(interp, "$temp_pbc", 0);
-    Parrot_String   *name = Parrot_str_new_constant(interp, "_sub1");
-    PMC      *sub, *arg;
+    PackFile      *pf   = Parrot_pbc_read(interp, "$temp_pbc", 0);
+    Parrot_String  name = Parrot_str_new_constant(interp, "_sub1");
+    PMC           *sub, *arg;
 
     Parrot_pbc_load(interp, pf);
     sub = Parrot_find_global_cur(interp, name);
@@ -574,10 +574,10 @@ main(int argc, char *argv[])
 static opcode_t*
 the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
 {
-    PackFile *pf = Parrot_pbc_read(interp, "$temp_pbc", 0);
-    Parrot_String   *name = Parrot_str_new_constant(interp, "foo");
-    PMC      *sub, *arg;
-    Parrot_Int result;
+    PackFile      *pf   = Parrot_pbc_read(interp, "$temp_pbc", 0);
+    Parrot_String  name = Parrot_str_new_constant(interp, "foo");
+    PMC           *sub, *arg;
+    Parrot_Int     result;
 
     Parrot_pbc_load(interp, pf);
     sub  = Parrot_find_global_cur(interp, name);
@@ -641,9 +641,9 @@ main(int argc, char *argv[])
 static opcode_t*
 the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
 {
-    PackFile         *pf   = Parrot_pbc_read(interp, "$temp_pbc", 0);
-    Parrot_String           *name = Parrot_str_new_constant(interp, "_sub1");
-    PMC              *sub;
+    PackFile      *pf   = Parrot_pbc_read(interp, "$temp_pbc", 0);
+    Parrot_String  name = Parrot_str_new_constant(interp, "_sub1");
+    PMC           *sub;
     Parrot_runloop jump_point;
 
     Parrot_pbc_load(interp, pf);
@@ -761,9 +761,7 @@ main(int argc, char* argv[])
     const char      *code      = ".sub foo\nprint\"Hello from foo!\\n\"\n.end\n";
     Parrot_PMC      retval;
     Parrot_PMC      sub;
-    Parrot_String         *code_type;
-    Parrot_String         *error;
-    Parrot_String         *foo_name;
+    Parrot_String   code_type, error, foo_name;
 
     if (!interp) {
         printf( "Hiss\n" );
