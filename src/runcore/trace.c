@@ -82,7 +82,7 @@ trace_class_name(PARROT_INTERP, ARGIN(const PMC* pmc))
     ASSERT_ARGS(trace_class_name)
 
     if (PObj_is_class_TEST(pmc)) {
-        SLOTTYPE * const class_array    = PMC_data_typed(pmc, SLOTTYPE);
+        SLOTTYPE * const class_array    = (SLOTTYPE *)PMC_data_typed(pmc, SLOTTYPE);
         PMC      * const class_name_pmc = get_attrib_num(class_array,
                                                     PCD_CLASS_NAME);
         return VTABLE_get_string(interp, class_name_pmc);
