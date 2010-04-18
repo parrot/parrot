@@ -323,30 +323,32 @@ Returns the TAP-compatible string representation of this test.
 
 .sub report :method
     .local pmc    passed
-    .local pmc    description
+    .local pmc    reason
     .local pmc    number
     .local string report
-    .local string number_string
-    .local string desc_string
 
     passed        = self.'passed'()
     number        = self.'number'()
-    description   = self.'description'()
     report        = ''
-    number_string = number
-    desc_string   = description
 
     if passed goto PASSED
     report      = 'not '
 
   PASSED:
     concat report, 'ok '
-    concat report, number_string
-    concat report, ' # TODO'
+    $S0 = number
+    concat report, $S0
+    concat report, ' # TODO '
 
-    unless description goto REPORT
-    concat report, ' '
-    concat report, desc_string
+    $S0 = self.'reason'()
+    concat report, $S0
+
+    if passed goto REPORT
+    # Build long explanation why
+    report .= "\n\tFailed (TODO) test '"
+    $S0     = self.'description'()
+    report .= $S0
+    report .= "'"
 
   REPORT:
     .return( report )
