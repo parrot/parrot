@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -78,6 +78,7 @@ const_dump(PARROT_INTERP, const PackFile_Segment *segp)
     Parrot_io_printf(interp, "],\n");
 }
 
+
 /*
 
 =item C<static void fixup_dump(PARROT_INTERP, const PackFile_Segment *segp)>
@@ -96,6 +97,7 @@ fixup_dump(PARROT_INTERP, const PackFile_Segment *segp)
     Parrot_io_printf(interp, "],\n");
 }
 
+
 /*
 
 =item C<static void disas_dump(PARROT_INTERP, const PackFile_Segment *self)>
@@ -109,27 +111,35 @@ Disassemble and dump.
 static void
 disas_dump(PARROT_INTERP, const PackFile_Segment *self)
 {
-    opcode_t *pc;
-    size_t i, n;
+    opcode_t *pc = self->data;
+
     Parrot_io_printf(interp, "%Ss => [ # %d ops at offs 0x%x\n",
             self->name, (int)self->size, (int)self->file_offset + 4);
-    pc = self->data;
+
     while (pc < self->data + self->size) {
+        /* n can't be const; the ADD_OP_VAR_PART macro increments it */
+        size_t n = (size_t)interp->op_info_table[*pc].op_count;
+        size_t i;
+
         /* trace_op_dump(interp, self->pf->src, pc); */
-        Parrot_io_printf(interp, " %04x:  ", (int) (pc - self->data));
-        n = (size_t)interp->op_info_table[*pc].op_count;
+        Parrot_io_printf(interp, " %04x:  ", (int)(pc - self->data));
+
         for (i = 0; i < 6; i++)
             if (i < n)
-                Parrot_io_printf(interp, "%08lx ", (unsigned long) pc[i]);
+                Parrot_io_printf(interp, "%08lx ", (unsigned long)pc[i]);
             else
                 Parrot_io_printf(interp, "         ");
+
         Parrot_io_printf(interp, "%s\n",
                 interp->op_info_table[*pc].full_name);
+
         ADD_OP_VAR_PART(interp, interp->code, pc, n);
         pc += n;
     }
+
     Parrot_io_printf(interp, "]\n");
 }
+
 
 /*
 
@@ -152,23 +162,29 @@ PackFile_header_dump(PARROT_INTERP, PackFile *pf)
     Parrot_io_printf(interp, "\t(interpreter's byteorder       = %d)\n",
             PARROT_BIGENDIAN);
     Parrot_io_printf(interp, "\tfloattype = %d", pf->header->floattype);
-    Parrot_io_printf(interp, "\t(interpreter's NUMVAL_SIZE     = %d)\n", NUMVAL_SIZE);
-    Parrot_io_printf(interp, "\tparrot-version %d.%d.%d, bytecode-version %d.%d\n",
-                     pf->header->major, pf->header->minor, pf->header->patch,
-                     pf->header->bc_major, pf->header->bc_minor);
+    Parrot_io_printf(interp, "\t(interpreter's NUMVAL_SIZE     = %d)\n",
+            NUMVAL_SIZE);
+    Parrot_io_printf(interp, "\tparrot-version %d.%d.%d, "
+            "bytecode-version %d.%d\n",
+            pf->header->major, pf->header->minor, pf->header->patch,
+            pf->header->bc_major, pf->header->bc_minor);
     Parrot_io_printf(interp, "\tUUID: type = %d, size = %d",
-                     pf->header->uuid_type, pf->header->uuid_size);
+            pf->header->uuid_type, pf->header->uuid_size);
+
     if (pf->header->uuid_size)
         Parrot_io_printf(interp, ", '%s'\n", pf->header->uuid_data);
     else
         Parrot_io_printf(interp, "\n");
+
     Parrot_io_printf(interp, "\t%s endianize, %s opcode, %s numval transform\n",
             pf->need_endianize ? "**need**" : "no",
-            pf->need_wordsize ? "**need**" : "no",
-            pf->fetch_nv ? "**need**" : "no");
+            pf->need_wordsize  ? "**need**" : "no",
+            pf->fetch_nv       ? "**need**" : "no");
+
     Parrot_io_printf(interp, "\tdirformat = %d\n", pf->header->dir_format);
     Parrot_io_printf(interp, "]\n");
 }
+
 
 /*
 
@@ -189,12 +205,14 @@ static void help(void)
     printf("\t-d ... disassemble bytecode segments\n");
     printf("\t-h ... dump header only\n");
     printf("\t-t ... terse output\n");
+
 #if TRACE_PACKFILE
     printf("\t-D<1-7> --debug debug output\n");
     printf("\t   1 general info\n");
     printf("\t   2 alignment\n");
     printf("\t   4 values\n");
 #endif
+
     printf("\t-o converted.pbc ... repacks a PBC file into "
            "the platform's native\n");
     printf("\t   binary format for better efficiency on reading "
@@ -204,14 +222,16 @@ static void help(void)
 
 static struct longopt_opt_decl opt_options[] = {
     { 'h', 'h', OPTION_optional_FLAG, { "--header-only" } },
-    { '?', '?', OPTION_optional_FLAG, { "--help" } },
-    { 't', 't', OPTION_optional_FLAG, { "--terse" } },
+    { '?', '?', OPTION_optional_FLAG, { "--help"        } },
+    { 't', 't', OPTION_optional_FLAG, { "--terse"       } },
     { 'd', 'd', OPTION_optional_FLAG, { "--disassemble" } },
+    { 'o', 'o', OPTION_required_FLAG, { "--output"      } }
+
 #if TRACE_PACKFILE
-    { 'D', 'D', OPTION_required_FLAG, { "--debug" } },
+    { 'D', 'D', OPTION_required_FLAG, { "--debug"       } },
 #endif
-    { 'o', 'o', OPTION_required_FLAG, { "--output" } }
 };
+
 
 /*
 
@@ -226,25 +246,34 @@ The run loop. Process the command-line arguments and dump accordingly.
 int
 main(int argc, const char **argv)
 {
-    PackFile *pf;
-    Interp *interp;
-    int terse = 0;
-    int disas = 0;
-    int convert = 0;
-    int options = PFOPT_UTILS;
-    const char *file = NULL;
-    struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
-    int status;
+    PackFile   *pf;
+    Interp     *interp;
 
-    if (argc < 2) {
+    const char *file            = NULL;
+    int         terse           = 0;
+    int         disas           = 0;
+    int         convert         = 0;
+    int         options         = PFOPT_UTILS;
+
+    struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
+
+    int         status;
+
+    if (argc < 2)
         help();
-    }
+
     interp = Parrot_new(NULL);
+
     /* init and set top of stack */
     Parrot_init_stacktop(interp, &status);
-    while ((status = longopt_get(interp,
-                    argc, argv, opt_options, &opt)) > 0) {
+
+    while ((status = longopt_get(interp, argc, argv, opt_options, &opt)) > 0) {
         switch (opt.opt_id) {
+#if TRACE_PACKFILE
+          case 'D':
+            options += atoi(opt.opt_arg) << 2;
+            break;
+#endif
           case 'h':
             options += PFOPT_HEADERONLY;
             break;
@@ -254,13 +283,8 @@ main(int argc, const char **argv)
           case 'd':
             disas = 1;
             break;
-#if TRACE_PACKFILE
-          case 'D':
-            options += atoi(opt.opt_arg) << 2;
-            break;
-#endif
           case 'o':
-            file = opt.opt_arg;
+            file    = opt.opt_arg;
             convert = 1;
             break;
           case '?':
@@ -269,12 +293,12 @@ main(int argc, const char **argv)
             break;
         }
     }
-    if (status == -1) {
+
+    if (status == -1)
         help();
-    }
+
     argc -= opt.opt_index;
     argv += opt.opt_index;
-
 
     pf = Parrot_pbc_read(interp, *argv, options);
 
@@ -282,20 +306,23 @@ main(int argc, const char **argv)
         printf("Can't read PBC\n");
         return 1;
     }
+
     Parrot_pbc_load(interp, pf);
+
     if (convert) {
-        size_t size;
-        opcode_t *pack;
+        size_t   size  = PackFile_pack_size(interp,
+                            interp->code->base.pf) * sizeof (opcode_t);
+        opcode_t *pack = (opcode_t *)Parrot_gc_allocate_memory_chunk(interp,
+                                        size);
         FILE *fp;
 
-        size = PackFile_pack_size(interp,
-                interp->code->base.pf) * sizeof (opcode_t);
-        pack = (opcode_t*) Parrot_gc_allocate_memory_chunk(interp, size);
         if (!pack) {
             printf("out of mem\n");
             exit(EXIT_FAILURE);
         }
+
         PackFile_pack(interp, interp->code->base.pf, pack);
+
         if (STREQ(file, "-"))
             fp = stdout;
         else if ((fp = fopen(file, "wb")) == 0) {
@@ -307,27 +334,32 @@ main(int argc, const char **argv)
             printf("Couldn't write %s\n", file);
             exit(EXIT_FAILURE);
         }
+
         fclose(fp);
         Parrot_gc_free_memory_chunk(interp, pack);
         Parrot_exit(interp, 0);
     }
 
     PackFile_header_dump(interp, pf);
-    if (options & PFOPT_HEADERONLY) {
+
+    if (options & PFOPT_HEADERONLY)
         Parrot_exit(interp, 0);
-    }
+
     /* install a dumper function */
     if (!terse) {
         pf->PackFuncs[PF_CONST_SEG].dump = const_dump;
         pf->PackFuncs[PF_FIXUP_SEG].dump = fixup_dump;
     }
+
     if (disas)
         pf->PackFuncs[PF_BYTEC_SEG].dump = disas_dump;
+
     /* do a directory dump, which dumps segs then */
     PackFile_Segment_dump(interp, &pf->directory.base);
 
     Parrot_exit(interp, 0);
 }
+
 
 /*
 
