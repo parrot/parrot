@@ -486,6 +486,8 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
 .namespace ['TAP';'Parser']
 
 .sub '' :init :load :anon
+    load_bytecode 'osutils.pbc'
+
     $P0 = subclass ['TAP';'Base'], ['TAP';'Parser']
     $P0.'add_attribute'('stream')
     $P0.'add_attribute'('skipped')
@@ -681,6 +683,14 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     push_eh _handler
     $P0.'open'(filename, 'r')
     pop_eh
+    $S0 = readline $P0
+    $I0 = index $S0, '#!'
+    unless $I0 == 0 goto L1
+    close $P0
+    $S0 = _get_exec($S0)
+    .tailcall self.'exec'($S0, filename)
+  L1:
+    seek $P0, 0, 0
     setattribute self, 'stream', $P0
     .return ()
   _handler:
@@ -694,6 +704,23 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $S0 .= ")\n"
     ex = $S0
     rethrow ex
+.end
+
+.include 'iglobals.pasm'
+
+.sub '_get_exec' :anon
+    .param string line
+    $S0 = chomp(line)
+    $I0 = length $S0
+    $I0 = find_not_cclass .CCLASS_WHITESPACE, $S0, 2, $I0
+    $S0 = substr $S0, $I0
+    .local string slash
+    $P0 = getinterp
+    $P1 = $P0[.IGLOBALS_CONFIG_HASH]
+    slash = $P1['slash']
+    $P0 = split "/", $S0
+    $S0 = join slash, $P0
+    .return ($S0)
 .end
 
 .sub 'exec' :method
@@ -717,19 +744,6 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $S0 .= ")\n"
     ex = $S0
     rethrow ex
-.end
-
-.sub 'chomp' :anon
-    .param string str
-    $I0 = index str, "\r"
-    if $I0 < 0 goto L1
-    str = substr str, 0, $I0
-  L1:
-    $I1 = index str, "\n"
-    if $I1 < 0 goto L2
-    str = substr str, 0, $I1
-  L2:
-    .return (str)
 .end
 
 .sub 'run' :method

@@ -84,7 +84,7 @@ HELP
 .sub 'do' :anon
     .param pmc opts
     .param pmc files
-    load_bytecode 'TAP/Harness.pir'
+    load_bytecode 'TAP/Harness.pbc'
     .local pmc harness, aggregate
     $I0 = exists opts['archive']
     if $I0 goto L1

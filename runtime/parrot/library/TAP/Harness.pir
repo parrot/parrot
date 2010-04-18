@@ -18,8 +18,8 @@ end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
 .namespace ['TAP';'Harness']
 
 .sub '' :init :load :anon
-    load_bytecode 'TAP/Parser.pir'
-    load_bytecode 'TAP/Formatter.pir'
+    load_bytecode 'TAP/Parser.pbc'
+    load_bytecode 'TAP/Formatter.pbc'
     $P0 = subclass ['TAP';'Base'], ['TAP';'Harness']
     $P0.'add_attribute'('formatter')
     $P0.'add_attribute'('exec')
@@ -83,34 +83,39 @@ end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
     $P0 = getattribute self, 'formatter'
     $P0.'prepare'(tests)
     .local string exec
-    exec = 'parrot'
+    exec = ''
     $P0 = getattribute self, 'exec'
-    if null $P0 goto L0
+    if null $P0 goto L1
     exec = $P0
-  L0:
-    $P0 = iter tests
   L1:
-    unless $P0 goto L2
+    $P0 = iter tests
+  L2:
+    unless $P0 goto L3
     $S0 = shift $P0
     .local pmc parser, session
     (parser, session) = self.'make_parser'($S0)
+    unless exec == '' goto L4
+    parser.'file'($S0)
+    goto L5
+  L4:
     parser.'exec'(exec, $S0)
+  L5:
     .local pmc coro
     $P1 = get_hll_global ['TAP';'Parser'], 'next'
     coro = newclosure $P1
-  L3:
+  L6:
     .local pmc result
     result = coro(parser)
-    if null result goto L4
+    if null result goto L7
     session.'result'(result)
     $I0 = isa result, ['TAP';'Parser';'Result';'Bailout']
-    unless $I0 goto L3
+    unless $I0 goto L6
     self.'_bailout'(result)
-  L4:
+  L7:
     self.'finish_parser'(parser, session)
     self.'_after_test'(aggregate, $S0, parser)
-    goto L1
-  L2:
+    goto L2
+  L3:
 .end
 
 .sub '_after_test' :method
