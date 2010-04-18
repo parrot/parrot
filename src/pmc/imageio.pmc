@@ -316,7 +316,7 @@ visit_todo_list_freeze(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc), ARGMOD(PMC* info))
 
         PARROT_ASSERT(pmc);
         VTABLE_push_integer(interp, info,
-                PObj_is_object_TEST(pmc) ? enum_class_Object : pmc->vtable->base_type);
+                PObj_is_object_TEST(pmc) ? (INTVAL) enum_class_Object : pmc->vtable->base_type);
         parrot_hash_put(interp, hash, pmc, (void *)id);
         VTABLE_push_pmc(interp, PARROT_IMAGEIO(info)->todo, pmc);
         VTABLE_freeze(interp, pmc, info);
@@ -531,8 +531,9 @@ Removes and returns an integer from the start of the image.
 
     VTABLE INTVAL shift_integer()
     {
-        opcode_t *pos  = GET_VISIT_CURSOR(SELF);
-        const INTVAL i = PF_fetch_integer(PARROT_IMAGEIO(SELF)->pf, (const opcode_t **)&pos);
+        const opcode_t *pos = GET_VISIT_CURSOR(SELF);
+        const INTVAL i      = PF_fetch_integer(PARROT_IMAGEIO(SELF)->pf,
+                (const opcode_t **)&pos);
         SET_VISIT_CURSOR(SELF, (char *)pos);
         BYTECODE_SHIFT_OK(SELF);
         return i;
@@ -550,8 +551,9 @@ Removes and returns an number from the start of the image.
 */
 
     VTABLE FLOATVAL shift_float() {
-        opcode_t *pos    = GET_VISIT_CURSOR(SELF);
-        const FLOATVAL f = PF_fetch_number(PARROT_IMAGEIO(SELF)->pf, (const opcode_t **)&pos);
+        const opcode_t *pos = GET_VISIT_CURSOR(SELF);
+        const FLOATVAL f    = PF_fetch_number(PARROT_IMAGEIO(SELF)->pf,
+                (const opcode_t **)&pos);
         SET_VISIT_CURSOR(SELF, (char *)pos);
         BYTECODE_SHIFT_OK(SELF);
         return f;
@@ -570,8 +572,8 @@ Removes and returns a string from the start of the image.
 
     VTABLE STRING *shift_string()
     {
-        opcode_t *pos    = GET_VISIT_CURSOR(SELF);
-        STRING * const s = PF_fetch_string(interp, PARROT_IMAGEIO(SELF)->pf,
+        const opcode_t *pos = GET_VISIT_CURSOR(SELF);
+        STRING * const s    = PF_fetch_string(interp, PARROT_IMAGEIO(SELF)->pf,
                                            (const opcode_t **)&pos);
         SET_VISIT_CURSOR(SELF, (char *)pos);
         BYTECODE_SHIFT_OK(SELF);
