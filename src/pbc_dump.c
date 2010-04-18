@@ -143,6 +143,78 @@ disas_dump(PARROT_INTERP, const PackFile_Segment *self)
 
 /*
 
+=item C<static void nums_dump(PARROT_INTERP, const PackFile_Segment *self)>
+
+Disassembles and dumps op names and line numbers only.
+
+=cut
+
+*/
+
+static void
+nums_dump(PARROT_INTERP, const PackFile_Segment *self)
+{
+    STRING                 *debug_name = Parrot_str_concat(interp, self->name,
+            Parrot_str_new_constant(interp, "_DB"), 0);
+    const PackFile_Segment *debug      = PackFile_find_segment(interp,
+                                            self->dir, debug_name, 1);
+
+    opcode_t               *pc         = self->data;
+    opcode_t               *debug_ops  = debug->data;
+    const op_info_t * const op_info    = interp->op_info_table;
+
+    while (pc < self->data + self->size) {
+        /* n can't be const; the ADD_OP_VAR_PART macro increments it */
+        size_t n = (size_t)op_info[*pc].op_count;
+        size_t i;
+
+        Parrot_io_printf(interp, " %04x:  %s\n",
+            *(debug_ops++), op_info[*pc].full_name);
+
+        ADD_OP_VAR_PART(interp, interp->code, pc, n);
+        pc += n;
+    }
+}
+
+
+/*
+
+=item C<static void null_dump(PARROT_INTERP, const PackFile_Segment *self)>
+
+Produces no output for the given segment type.
+
+=cut
+
+*/
+
+static void
+null_dump(PARROT_INTERP, const PackFile_Segment *self) {}
+
+
+/*
+
+=item C<static void null_dir_dump(PARROT_INTERP, const PackFile_Segment *self)>
+
+Dumps all of the segments of the given PackFile_Directory, but produces no
+output for the directory itself.
+
+=cut
+
+*/
+
+static void
+null_dir_dump(PARROT_INTERP, const PackFile_Segment *self)
+{
+    const PackFile_Directory * const dir = (const PackFile_Directory *)self;
+    size_t i;
+
+    for (i = 0; i < dir->num_segments; i++)
+        self->pf->PackFuncs[dir->segments[i]->type].dump(interp, dir->segments[i]);
+}
+
+
+/*
+
 =item C<static void PackFile_header_dump(PARROT_INTERP, PackFile *pf)>
 
 Dump the header.
@@ -200,11 +272,13 @@ static void help(void)
 {
     printf("pbc_dump - dump or convert parrot bytecode (PBC) files\n");
     printf("usage:\n");
-    printf("pbc_dump [-tdh] [--terse|--disassemble|--header-only] file.pbc\n");
+    printf("pbc_dump [-tdh] [--terse|--disassemble|--header-only|--line-nums]"
+           " file.pbc\n");
     printf("pbc_dump -o converted.pbc file.pbc\n\n");
     printf("\t-d ... disassemble bytecode segments\n");
     printf("\t-h ... dump header only\n");
     printf("\t-t ... terse output\n");
+    printf("\t-n ... show ops and line numbers only\n");
 
 #if TRACE_PACKFILE
     printf("\t-D<1-7> --debug debug output\n");
@@ -220,10 +294,12 @@ static void help(void)
     exit(EXIT_SUCCESS);
 }
 
+
 static struct longopt_opt_decl opt_options[] = {
     { 'h', 'h', OPTION_optional_FLAG, { "--header-only" } },
     { '?', '?', OPTION_optional_FLAG, { "--help"        } },
     { 't', 't', OPTION_optional_FLAG, { "--terse"       } },
+    { 'n', 'n', OPTION_optional_FLAG, { "--line-nums"   } },
     { 'd', 'd', OPTION_optional_FLAG, { "--disassemble" } },
     { 'o', 'o', OPTION_required_FLAG, { "--output"      } }
 
@@ -253,6 +329,7 @@ main(int argc, const char **argv)
     int         terse           = 0;
     int         disas           = 0;
     int         convert         = 0;
+    int         nums_only       = 0;
     int         options         = PFOPT_UTILS;
 
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
@@ -286,6 +363,9 @@ main(int argc, const char **argv)
           case 'o':
             file    = opt.opt_arg;
             convert = 1;
+            break;
+          case 'n':
+            nums_only = 1;
             break;
           case '?':
           default:
@@ -340,7 +420,8 @@ main(int argc, const char **argv)
         Parrot_exit(interp, 0);
     }
 
-    PackFile_header_dump(interp, pf);
+    if (!nums_only)
+        PackFile_header_dump(interp, pf);
 
     if (options & PFOPT_HEADERONLY)
         Parrot_exit(interp, 0);
@@ -353,6 +434,16 @@ main(int argc, const char **argv)
 
     if (disas)
         pf->PackFuncs[PF_BYTEC_SEG].dump = disas_dump;
+
+    if (nums_only) {
+        int i;
+
+        for (i = PF_DIR_SEG + 1; i < PF_MAX_SEG; i++)
+            pf->PackFuncs[i].dump = null_dump;
+
+        pf->PackFuncs[PF_DIR_SEG].dump   = null_dir_dump;
+        pf->PackFuncs[PF_BYTEC_SEG].dump = nums_dump;
+    }
 
     /* do a directory dump, which dumps segs then */
     PackFile_Segment_dump(interp, &pf->directory.base);
