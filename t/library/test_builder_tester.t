@@ -59,12 +59,12 @@
    test.'skip'( 3, 'three skips' )
    test_test( 'multiple skips' )
 
-   test_out( 'not ok 9 # TODO some todo test' )
+   test_out( "not ok 9 # TODO \n\tFailed (TODO) test 'some todo test'" )
    test.'todo'( 0, 'some todo test' )
    test_test( 'failing todo test' )
 
-   test_out( 'ok 10 # TODO another todo test' )
-   test.'todo'( 1, 'another todo test' )
+   test_out( "ok 10 # TODO another todo test" )
+   test.'todo'( 1, 'reason', 'another todo test' )
    test_test( 'passing todo test' )
 
    test_pass()
