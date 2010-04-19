@@ -134,6 +134,13 @@ will not auto-vivify nested hashes and return PMCNULL early.
 
 L<https://trac.parrot.org/parrot/ticket/1561>
 
+=item PMC must use manual_attrs or auto_attrs flag [eligible in 2.4]
+
+PMCs must no longer use default value for manual/auto attribute allocation,
+manual_attrs or auto_attrs must be specified.
+
+L<http://trac.parrot.org/parrot/ticket/1506>
+
 =back
 
 =head1 Opcodes
