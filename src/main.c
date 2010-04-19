@@ -46,7 +46,7 @@ static void Parrot_version(void);
 PARROT_CAN_RETURN_NULL
 static const char * parseflags(PARROT_INTERP,
     ARGMOD(int *argc),
-    ARGMOD(char **argv[]),
+    ARGMOD(const char **argv[]),
     ARGMOD(Parrot_Run_core_t *core),
     ARGMOD(Parrot_trace_flags *trace))
         __attribute__nonnull__(1)
@@ -59,7 +59,9 @@ static const char * parseflags(PARROT_INTERP,
         FUNC_MODIFIES(*core)
         FUNC_MODIFIES(*trace);
 
-static void parseflags_minimal(PARROT_INTERP, int argc, ARGIN(char *argv[]))
+static void parseflags_minimal(PARROT_INTERP,
+    int argc,
+    ARGIN(const char *argv[]))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -88,7 +90,7 @@ static void usage(ARGMOD(FILE *fp))
 
 /*
 
-=item C<int main(int argc, char * argv[])>
+=item C<int main(int argc, const char *argv[])>
 
 The entry point from the command line into Parrot.
 
@@ -97,7 +99,7 @@ The entry point from the command line into Parrot.
 */
 
 int
-main(int argc, char * argv[])
+main(int argc, const char *argv[])
 {
     int         stacktop;
     const char *sourcefile;
@@ -358,7 +360,8 @@ included in the Parrot source tree.\n\n");
 
 /*
 
-=item C<static void parseflags_minimal(PARROT_INTERP, int argc, char *argv[])>
+=item C<static void parseflags_minimal(PARROT_INTERP, int argc, const char
+*argv[])>
 
 Parse minimal subset of args required for initializing interpreter.
 
@@ -366,7 +369,7 @@ Parse minimal subset of args required for initializing interpreter.
 
 */
 static void
-parseflags_minimal(PARROT_INTERP, int argc, ARGIN(char *argv[]))
+parseflags_minimal(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
 {
     ASSERT_ARGS(parseflags_minimal)
 
@@ -420,8 +423,8 @@ parseflags_minimal(PARROT_INTERP, int argc, ARGIN(char *argv[]))
 
 /*
 
-=item C<static const char * parseflags(PARROT_INTERP, int *argc, char **argv[],
-Parrot_Run_core_t *core, Parrot_trace_flags *trace)>
+=item C<static const char * parseflags(PARROT_INTERP, int *argc, const char
+**argv[], Parrot_Run_core_t *core, Parrot_trace_flags *trace)>
 
 Parse Parrot's command line for options and set appropriate flags.
 
@@ -432,7 +435,7 @@ Parse Parrot's command line for options and set appropriate flags.
 PARROT_CAN_RETURN_NULL
 static const char *
 parseflags(PARROT_INTERP,
-        ARGMOD(int *argc), ARGMOD(char **argv[]),
+        ARGMOD(int *argc), ARGMOD(const char **argv[]),
         ARGMOD(Parrot_Run_core_t *core), ARGMOD(Parrot_trace_flags *trace))
 {
     ASSERT_ARGS(parseflags)

@@ -147,7 +147,7 @@ and C<debug_break> ops in F<ops/debug.ops>.
 #include "parrot/runcore_api.h"
 
 static void PDB_printwelcome(void);
-static void PDB_run_code(PARROT_INTERP, int argc, char *argv[]);
+static void PDB_run_code(PARROT_INTERP, int argc, const char *argv[]);
 
 /*
 
@@ -161,7 +161,7 @@ Parrot_debug().
 */
 
 int
-main(int argc, char *argv[])
+main(int argc, const char *argv[])
 {
     int nextarg;
     Parrot_Interp     interp;
@@ -280,7 +280,7 @@ Run the code, catching exceptions if they are left unhandled.
 */
 
 static void
-PDB_run_code(PARROT_INTERP, int argc, char *argv[])
+PDB_run_code(PARROT_INTERP, int argc, const char *argv[])
 {
     new_runloop_jump_point(interp);
     if (setjmp(interp->current_runloop->resume)) {

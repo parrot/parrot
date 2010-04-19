@@ -66,7 +66,7 @@ HEADER
     print outfh, codestring
 
     print outfh, <<'MAIN'
-        int main(int argc, char *argv[])
+        int main(int argc, const char *argv[])
         {
             PackFile     *pf;
             Parrot_Interp interp;

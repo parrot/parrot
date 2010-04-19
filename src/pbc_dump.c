@@ -166,7 +166,6 @@ nums_dump(PARROT_INTERP, const PackFile_Segment *self)
     while (pc < self->data + self->size) {
         /* n can't be const; the ADD_OP_VAR_PART macro increments it */
         size_t n = (size_t)op_info[*pc].op_count;
-        size_t i;
 
         Parrot_io_printf(interp, " %04x:  %s\n",
             *(debug_ops++), op_info[*pc].full_name);
@@ -188,7 +187,10 @@ Produces no output for the given segment type.
 */
 
 static void
-null_dump(PARROT_INTERP, const PackFile_Segment *self) {}
+null_dump(SHIM_INTERP, const PackFile_Segment *self)
+{
+    UNUSED(self);
+}
 
 
 /*
