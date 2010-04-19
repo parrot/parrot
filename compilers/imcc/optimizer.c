@@ -256,6 +256,10 @@ cfg_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 =item C<int optimize(PARROT_INTERP, IMC_Unit *unit)>
 
+Runs after the CFG is built and handles constant propogation.
+
+used_once ... deletes assignments, when LHS is unused
+
 =cut
 
 */
@@ -1225,6 +1229,11 @@ branch_reorg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 =item C<static int branch_cond_loop_swap(PARROT_INTERP, IMC_Unit *unit,
 Instruction *branch, Instruction *start, Instruction *cond)>
 
+Converts conditional loops to post-test
+
+Returns TRUE if any optimizations were performed. Otherwise, returns
+FALSE.
+
 =cut
 
 */
@@ -1461,6 +1470,10 @@ unused_label(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 =item C<static int dead_code_remove(PARROT_INTERP, IMC_Unit *unit)>
 
+dead code elimination
+... unreachable blocks
+... unreachable instructions
+
 =cut
 
 */
@@ -1540,6 +1553,8 @@ dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 /*
 
 =item C<static int used_once(PARROT_INTERP, IMC_Unit *unit)>
+
+used_once ... deletes assignments, when LHS is unused
 
 =cut
 
