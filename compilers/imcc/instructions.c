@@ -813,6 +813,8 @@ e_file_open(PARROT_INTERP, ARGIN(const char *param))
 
 =item C<static int e_file_close(PARROT_INTERP, void *param)>
 
+Close STDOUT
+
 =cut
 
 */
@@ -831,6 +833,8 @@ e_file_close(PARROT_INTERP, SHIM(void *param))
 
 =item C<static int e_file_emit(PARROT_INTERP, void *param, const IMC_Unit *unit,
 const Instruction *ins)>
+
+emit the Instruction C<ins> to the given IMC_Unit C<unit>, passing C<param>
 
 =cut
 
