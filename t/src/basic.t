@@ -27,7 +27,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "hello world" );
     #include <stdlib.h>
 
     int
-    main(int argc, char* argv[])
+    main(int argc, const char* argv[])
     {
         printf("Hello, World!\n");
         exit(0);
@@ -41,7 +41,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "direct exit_fatal call" );
     #include <parrot/exceptions.h>
 
     int
-    main(int argc, char* argv[])
+    main(int argc, const char* argv[])
     {
          exit_fatal(0, "Blow'd Up(tm)"); /* ' */
     }
@@ -59,7 +59,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot_run_native" );
 static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
 
 int
-main(int argc, char* argv[])
+main(int argc, const char* argv[])
 {
     Interp *interp;
 
