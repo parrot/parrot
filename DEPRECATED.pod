@@ -121,6 +121,19 @@ undesirable. In stead, an explicit allocate/reallocate method will be provided.
 
 L<https://trac.parrot.org/parrot/ticket/1554>
 
+=item Auto-vivification of nested aggregates [eligible in 2.4]
+
+Auto-vivifation of nested aggregated is deprecated.
+
+E.g.
+
+  $P0 = new ['Hash']
+  $S1 = $P0['foo';'bar';'baz']
+
+will not auto-vivify nested hashes and return PMCNULL early.
+
+L<https://trac.parrot.org/parrot/ticket/1561>
+
 =back
 
 =head1 Opcodes
