@@ -587,6 +587,8 @@ move_one_buffer(PARROT_INTERP, ARGMOD(Buffer *old_buf), ARGMOD(char *new_pool_pt
 #if RESOURCE_DEBUG
         if (Buffer_buflen(old_buf) >= RESOURCE_DEBUG_SIZE)
             debug_print_buf(interp, old_buf);
+#else
+        UNUSED(interp);
 #endif
 
         /* we can't perform the math all the time, because
