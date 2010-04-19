@@ -41,6 +41,7 @@ Boolean options:
  -f,  --failures        Show failed tests.
  -o,  --comments        Show comments.
       --ignore-exit     Ignore exit status from test scripts.
+ -m,  --merge           Merge test scripts' STDERR with their STDOUT.
       --reverse         Run the tests in reverse order.
  -q,  --quiet           Suppress some test output while running tests.
  -Q,  --QUIET           Only print summary results.
@@ -74,6 +75,7 @@ HELP
     push getopts, 'directives'
     push getopts, 'ignore-exit'
     push getopts, 'reverse'
+    push getopts, 'merge|m'
     push getopts, 'shuffle|s'
     push getopts, 'version|V'
     push getopts, 'help|h'

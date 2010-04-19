@@ -506,6 +506,7 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $P0.'add_attribute'('version')
     $P0.'add_attribute'('exit')
     $P0.'add_attribute'('ignore_exit')
+    $P0.'add_attribute'('merge')
     $P0.'add_attribute'('spool')
     $P0.'add_attribute'('start_time')
     $P0.'add_attribute'('end_time')
@@ -599,10 +600,17 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .return ($P0)
 .end
 
-.sub 'ignore_exit' :method :nsentry
-    .param int ign
+.sub 'merge' :method :nsentry
+    .param int val
     $P0 = new 'Boolean'
-    set $P0, ign
+    set $P0, val
+    setattribute self, 'merge', $P0
+.end
+
+.sub 'ignore_exit' :method :nsentry
+    .param int val
+    $P0 = new 'Boolean'
+    set $P0, val
     setattribute self, 'ignore_exit', $P0
 .end
 
@@ -727,6 +735,11 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .param pmc cmds :slurpy
     .local string cmd
     cmd = join ' ', cmds
+    $P0 = getattribute self, 'merge'
+    if null $P0 goto L1
+    unless $P0 goto L1
+    cmd .= ' 2>&1'
+  L1:
     $P0 = new 'FileHandle'
     push_eh _handler
     $P0.'open'(cmd, 'pr')
