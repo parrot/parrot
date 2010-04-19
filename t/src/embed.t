@@ -39,7 +39,7 @@ void fail(const char *msg)
     exit(EXIT_FAILURE);
 }
 
-int main(int argc, char **argv)
+int main(int argc, const char **argv)
 {
     Parrot_Interp interp;
     interp = Parrot_new(NULL);
@@ -308,7 +308,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Single call" );
 #include "parrot/embed.h"
 
 static opcode_t *
-run(PARROT_INTERP, int argc, char *argv[])
+run(PARROT_INTERP, int argc, cosnt char *argv[])
 {
     const char *c_src = ".sub main :main\n" "    print \"ok\\n\"\n" ".end\n";
 
@@ -357,7 +357,7 @@ run(PARROT_INTERP, int argc, char *argv[])
 }
 
 int
-main(int margc, char *margv[])
+main(int margc, const char *margv[])
 {
     Parrot_Interp interp;
     PackFile *pf;
@@ -389,7 +389,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple Calls" );
 
 static void
 compile_run(PARROT_INTERP, const char *src, Parrot_String *type, int argc,
-            char *argv[])
+            const char *argv[])
 {
     Parrot_String   *smain;
     PMC      *entry;
@@ -421,7 +421,7 @@ compile_run(PARROT_INTERP, const char *src, Parrot_String *type, int argc,
 }
 
 static opcode_t *
-run(PARROT_INTERP, int argc, char *argv[])
+run(PARROT_INTERP, int argc, const char *argv[])
 {
     const char *c_src  = ".sub main :main\n" "    print \"ok\\n\"\n" ".end\n";
 
@@ -447,7 +447,7 @@ run(PARROT_INTERP, int argc, char *argv[])
 }
 
 int
-main(int margc, char *margv[])
+main(int margc, const char *margv[])
 {
     Parrot_Interp interp;
     PackFile *pf;
@@ -480,7 +480,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple 1st bad PIR" );
 
 static void
 compile_run(PARROT_INTERP, const char *src, Parrot_String *type, int argc,
-            char *argv[])
+            const char *argv[])
 {
     Parrot_String   *smain;
     PMC      *entry;
@@ -512,7 +512,7 @@ compile_run(PARROT_INTERP, const char *src, Parrot_String *type, int argc,
 }
 
 static opcode_t *
-run(PARROT_INTERP, int argc, char *argv[])
+run(PARROT_INTERP, int argc, const char *argv[])
 {
     const char *c_src  = ".sub main :main\n" "    print ok\\n\"\n" ".end\n";
 
@@ -538,12 +538,12 @@ run(PARROT_INTERP, int argc, char *argv[])
 }
 
 int
-main(int margc, char *margv[])
+main(int margc, const char *margv[])
 {
     Parrot_Interp interp;
     PackFile *pf;
     int argc = 1;
-    char *argv[] = { "test", NULL };
+    const char *argv[] = { "test", NULL };
 
     PackFile_Segment *seg;
 
@@ -571,7 +571,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple 2nd bad PIR" );
 
 static void
 compile_run(PARROT_INTERP, const char *src, Parrot_String *type, int argc,
-            char *argv[])
+            const char *argv[])
 {
     Parrot_String   *smain;
     PMC      *entry;
@@ -603,7 +603,7 @@ compile_run(PARROT_INTERP, const char *src, Parrot_String *type, int argc,
 }
 
 static opcode_t *
-run(PARROT_INTERP, int argc, char *argv[])
+run(PARROT_INTERP, int argc, const char *argv[])
 {
     const char *c_src  = ".sub main :main\n" "    print ok\\n\"\n" ".end\n";
 
@@ -628,7 +628,7 @@ run(PARROT_INTERP, int argc, char *argv[])
 }
 
 int
-main(int margc, char *margv[])
+main(int margc, const char *margv[])
 {
     Parrot_Interp interp;
     PackFile *pf;
@@ -661,7 +661,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple bad PIR" );
 
 static void
 compile_run(PARROT_INTERP, const char *src, Parrot_String *type, int argc,
-            char *argv[])
+            const char *argv[])
 {
     Parrot_String   *smain;
     PMC      *entry;
@@ -693,7 +693,7 @@ compile_run(PARROT_INTERP, const char *src, Parrot_String *type, int argc,
 }
 
 static opcode_t *
-run(PARROT_INTERP, int argc, char *argv[])
+run(PARROT_INTERP, int argc, const char *argv[])
 {
     const char *c_src  = ".sub main :main\n" "    print ok\\n\"\n" ".end\n";
 
@@ -717,7 +717,7 @@ run(PARROT_INTERP, int argc, char *argv[])
 }
 
 int
-main(int margc, char *margv[])
+main(int margc, const char *margv[])
 {
     Parrot_Interp interp;
     PackFile *pf;
