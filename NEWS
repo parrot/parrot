@@ -8,6 +8,7 @@ New in 2.3.0
   + Merge of pcc_hackatron branch
   + Recursive make for src/dynpmc removed
   + Datatype STRINGNULL for a single Null STRING added
+  + config_lib.pasm replaced with config_lib.pir
 - Compilers
 - Deprecations
 - API
