@@ -266,6 +266,17 @@ end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
     chdir(dir)
     $S0 = self.'_mk_meta'(aggregate)
     spew('meta.yml', $S0)
+    $P0 = getattribute self, 'archive_extra_files'
+    if null $P0 goto L2
+    $P1 = iter $P0
+  L3:
+    unless $P1 goto L2
+    $S2 = shift $P1
+    $S1 = current_dir . '/'
+    $S1 .= $S2
+    cp($S1, $S2)
+    goto L3
+  L2:
     $I0 = length archive
     $I0 -= 3
     $S0 = substr archive, 0, $I0
