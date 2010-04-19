@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -151,7 +151,7 @@ static void PDB_run_code(PARROT_INTERP, int argc, const char *argv[]);
 
 /*
 
-=item C<int main(int argc, char *argv[])>
+=item C<int main(int argc, const char *argv[])>
 
 Reads the PIR, PASM or PBC file from argv[1], loads it, and then calls
 Parrot_debug().
@@ -271,7 +271,7 @@ main(int argc, const char *argv[])
 
 /*
 
-=item C<static void PDB_run_code(PARROT_INTERP, int argc, char *argv[])>
+=item C<static void PDB_run_code(PARROT_INTERP, int argc, const char *argv[])>
 
 Run the code, catching exceptions if they are left unhandled.
 
