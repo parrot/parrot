@@ -126,6 +126,7 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $S0 .= $S1
     $S0 .= ' '
     $P0 = getattribute self, 'explanation'
+    if null $P0 goto L2
     $S1 = $P0
     $S0 .= $S1
   L2:
