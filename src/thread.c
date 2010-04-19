@@ -60,13 +60,12 @@ static Parrot_Interp pt_check_tid(UINTVAL tid, ARGIN(const char *from))
         __attribute__nonnull__(2);
 
 static int pt_gc_count_threads(void);
-static void pt_gc_wait_for_stage(
+static void pt_gc_wait_for_stage(PARROT_INTERP,
     thread_gc_stage_enum from_stage,
-    thread_gc_stage_enum to_stage);
-
-static void pt_gc_wakeup_check(PARROT_INTERP)
+    thread_gc_stage_enum to_stage)
         __attribute__nonnull__(1);
 
+static void pt_gc_wakeup_check(void);
 static void pt_ns_clone(PARROT_INTERP,
     ARGOUT(Parrot_Interp d),
     ARGOUT(PMC *dest_ns),
@@ -86,8 +85,9 @@ static void pt_suspend_all_for_gc(PARROT_INTERP)
 static void pt_suspend_one_for_gc(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void pt_thread_signal(PARROT_INTERP)
-        __attribute__nonnull__(1);
+static void pt_thread_signal(ARGIN(Parrot_Interp self), PARROT_INTERP)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void pt_thread_wait(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -111,9 +111,9 @@ static void* thread_func(ARGIN_NULLOK(void *arg));
 #define ASSERT_ARGS_pt_check_tid __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(from))
 #define ASSERT_ARGS_pt_gc_count_threads __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_pt_gc_wait_for_stage __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_pt_gc_wakeup_check __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_pt_gc_wait_for_stage __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_pt_gc_wakeup_check __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_pt_ns_clone __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(d) \
@@ -125,7 +125,8 @@ static void* thread_func(ARGIN_NULLOK(void *arg));
 #define ASSERT_ARGS_pt_suspend_one_for_gc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_pt_thread_signal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_pt_thread_wait __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_thread_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -351,7 +352,7 @@ pt_shared_fixup(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<static void pt_thread_signal(PARROT_INTERP)>
+=item C<static void pt_thread_signal(Parrot_Interp self, PARROT_INTERP)>
 
 Wakes up an C<interp> which should have called pt_thread_wait().
 
@@ -360,7 +361,7 @@ Wakes up an C<interp> which should have called pt_thread_wait().
 */
 
 static void
-pt_thread_signal(PARROT_INTERP)
+pt_thread_signal(ARGIN(Parrot_Interp self), PARROT_INTERP)
 {
     ASSERT_ARGS(pt_thread_signal)
     COND_SIGNAL(interp->thread_data->interp_cond);
@@ -537,11 +538,11 @@ thread_func(ARGIN_NULLOK(void *arg))
         Parrot_really_destroy(interp, 0, NULL);
     }
     else if (interp->thread_data->state & THREAD_STATE_JOINED) {
-        pt_thread_signal(interp->thread_data->joiner);
+        pt_thread_signal(interp, interp->thread_data->joiner);
     }
 
     /* make sure we don't block a GC run */
-    pt_gc_wakeup_check(interp);
+    pt_gc_wakeup_check();
     PARROT_ASSERT(interp->thread_data->state & THREAD_STATE_FINISHED);
 
     UNLOCK(interpreter_array_mutex);
@@ -977,8 +978,8 @@ pt_gc_count_threads(void)
 
 /*
 
-=item C<static void pt_gc_wait_for_stage(thread_gc_stage_enum from_stage,
-thread_gc_stage_enum to_stage)>
+=item C<static void pt_gc_wait_for_stage(PARROT_INTERP, thread_gc_stage_enum
+from_stage, thread_gc_stage_enum to_stage)>
 
 Waits until all threads have reached the desired stage.  Takes an interpreter,
 starting stage and ending stage as arguments.  Updates the thread information.
@@ -989,7 +990,8 @@ Used in C<pt_gc_start_mark> and C<pt_gc_stop_mark>.
 */
 
 static void
-pt_gc_wait_for_stage(thread_gc_stage_enum from_stage, thread_gc_stage_enum to_stage)
+pt_gc_wait_for_stage(PARROT_INTERP, thread_gc_stage_enum from_stage,
+            thread_gc_stage_enum to_stage)
 {
     ASSERT_ARGS(pt_gc_wait_for_stage)
     Shared_gc_info * const info = shared_gc_info;
@@ -1032,7 +1034,7 @@ pt_gc_wait_for_stage(thread_gc_stage_enum from_stage, thread_gc_stage_enum to_st
 
 /*
 
-=item C<static void pt_gc_wakeup_check(PARROT_INTERP)>
+=item C<static void pt_gc_wakeup_check(void)>
 
 Checks if it's necessary to wake threads to perform garbage collection.  This
 is called after thread death.  Be sure to hold C<interpreter_array_mutex>.
@@ -1042,7 +1044,7 @@ is called after thread death.  Be sure to hold C<interpreter_array_mutex>.
 */
 
 static void
-pt_gc_wakeup_check(PARROT_INTERP)
+pt_gc_wakeup_check(void)
 {
     ASSERT_ARGS(pt_gc_wakeup_check)
     Shared_gc_info * const info = shared_gc_info;
@@ -1613,7 +1615,7 @@ pt_gc_start_mark(PARROT_INTERP)
     }
 
     DEBUG_ONLY(fprintf(stderr, "%p: wait for stage\n", interp));
-    pt_gc_wait_for_stage(THREAD_GC_STAGE_NONE, THREAD_GC_STAGE_MARK);
+    pt_gc_wait_for_stage(interp, THREAD_GC_STAGE_NONE, THREAD_GC_STAGE_MARK);
 
     DEBUG_ONLY(fprintf(stderr, "actually mark\n"));
     /*
@@ -1687,7 +1689,7 @@ pt_gc_stop_mark(PARROT_INTERP)
     UNLOCK(interpreter_array_mutex);
     DEBUG_ONLY(fprintf(stderr, "wait to sweep\n"));
 
-    pt_gc_wait_for_stage(THREAD_GC_STAGE_MARK, THREAD_GC_STAGE_SWEEP);
+    pt_gc_wait_for_stage(interp, THREAD_GC_STAGE_MARK, THREAD_GC_STAGE_SWEEP);
 }
 
 /*
