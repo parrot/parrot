@@ -4,7 +4,8 @@ New in 2.3.0
 - Core
   + Allow passing parameters to the dynamic linker ('dlopen' improved)
   + loadlib opcode added
-  + Merge of pcc_hackatron branch
+  + Calling conventions are now much more consistent, and follows natural
+    semantics of handling arguments and return values
   + Recursive make for src/dynpmc removed
   + Datatype STRINGNULL for a single Null STRING added
   + config_lib.pasm replaced with config_lib.pir
