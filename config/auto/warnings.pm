@@ -113,6 +113,7 @@ sub _init {
         -Wcomment
         -Wdisabled-optimization
         -Wdiv-by-zero
+        -Wenum-compare
         -Wendif-labels
         -Wextra
         -Wformat
@@ -125,6 +126,7 @@ sub _init {
         -Winit-self
         -Winline
         -Winvalid-pch
+        -Wjump-misses-init
         -Wlogical-op
         -Wmissing-braces
         -Wmissing-field-initializers
