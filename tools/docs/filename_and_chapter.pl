@@ -12,6 +12,7 @@ use Getopt::Long ();
 
 my $item_list_ref = [ ['intro.pod', 'Introduction to Parrot'],
                       ['overview.pod', 'Overview'],
+                      ['submissions.pod', 'Submitting bug reports and patches'],
                     ];
 
 my $lang = @$item_list_ref;
