@@ -208,6 +208,12 @@ To be replaced with new_callback_p_p_p_p_s.
 
 L<https://trac.parrot.org/parrot/ticket/1548>
 
+=item dlfunc and new_callback signature string format [eligible in 2.4]
+
+These will be changed to allow more flexibility in types.
+
+L<https://trac.parrot.org/parrot/ticket/1565>
+
 =item find_lex [eligible in 2.4]
 
 find_lex will not throw exception for non-existing lexicals.
