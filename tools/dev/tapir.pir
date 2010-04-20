@@ -1,6 +1,53 @@
 # Copyright (C) 2010, Parrot Foundation.
 # $Id$
 
+=head1 NAME
+
+Tapir
+
+=head1 DESCRIPTION
+
+Tapir is a PIR-based TAP (Test Anything Protocol) Harness
+
+It eats test output (i.e. is a TAP consumer) and tells humans if the
+test suite passed, and if not, which kind of pretty colors of smoke
+came out. It is mostly equivalent to 'prove' from Perl 5.
+
+=head1 SYNOPSIS
+
+  ./tapir t/*.t
+
+=head2 OPTIONS
+
+Usage:
+
+  tapir [OPTIONS] <files>
+
+=head3 Boolean options
+
+ -v,  --verbose         Print all test lines.
+ -s,  --shuffle         Run the tests in random order.
+ -f,  --failures        Show failed tests.
+ -o,  --comments        Show comments.
+      --ignore-exit     Ignore exit status from test scripts.
+ -m,  --merge           Merge test scripts' STDERR with their STDOUT.
+      --reverse         Run the tests in reverse order.
+ -q,  --quiet           Suppress some test output while running tests.
+ -Q,  --QUIET           Only print summary results.
+      --directives      Only show results with TODO or SKIP directives.
+      --normalize       Normalize TAP output in verbose output
+ -h,  --help            Display this help
+ -V,  --version         Display the version
+
+=head3 Options that take arguments
+
+ -e,  --exec            Interpreter to run the tests ('' for compiled
+                        tests.)
+ -a,  --archive         Store the resulting TAP in an archive file.
+
+=cut
+
+
 .sub 'main' :main
     .param pmc argv
     $S0  = shift argv
