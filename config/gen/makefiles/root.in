@@ -166,22 +166,6 @@ GEN_CONFIGS = \
 #IF(has_opengl):    src/glut_nci_thunks.nci \
 #IF(has_glut):    src/glut_callbacks.c \
     src/core_pmcs.c \
-#IF(has_crypto):    src/dynpmc/md2.pmc \
-#IF(has_crypto):    src/dynpmc/md4.pmc \
-#IF(has_crypto):    src/dynpmc/md5.pmc \
-#IF(has_crypto):    src/dynpmc/ripemd160.pmc \
-#IF(has_crypto):    src/dynpmc/sha.pmc \
-#IF(has_crypto):    src/dynpmc/sha1.pmc \
-#IF(has_crypto):    src/dynpmc/sha256.pmc \
-#IF(has_crypto):    src/dynpmc/sha512.pmc \
-#IF(has_crypto):    t/dynpmc/md2.t \
-#IF(has_crypto):    t/dynpmc/md4.t \
-#IF(has_crypto):    t/dynpmc/md5.t \
-#IF(has_crypto):    t/dynpmc/ripemd160.t \
-#IF(has_crypto):    t/dynpmc/sha.t \
-#IF(has_crypto):    t/dynpmc/sha1.t \
-#IF(has_crypto):    t/dynpmc/sha256.t \
-#IF(has_crypto):    t/dynpmc/sha512.t \
     config_lib.pir \
     parrot.pc \
     compilers/imcc/imcc.y.flag \

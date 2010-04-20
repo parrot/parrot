@@ -99,8 +99,6 @@ Parrot Options:
 
 External Library Options:
 
-   --without-crypto     Build parrot without crypto support (libssl)
-   --without-gdbm       Build parrot without GDBM support
    --without-gettext    Build parrot without gettext support
    --without-gmp        Build parrot without GMP support
    --without-opengl     Build parrot without OpenGL support (GL/GLU/GLUT)
