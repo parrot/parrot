@@ -277,11 +277,16 @@ end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
     cp($S1, $S2)
     goto L3
   L2:
+    $S0 = current_dir
+    $I0 = index $S0, ':'
+    unless $I0 == 1 goto L4
+    $S0 = substr $S0, 2         # remove Windows drive
+  L4:
+    cmd = "tar -cf " . $S0
+    cmd .= "/"
     $I0 = length archive
     $I0 -= 3
     $S0 = substr archive, 0, $I0
-    cmd = "tar -cf " . current_dir
-    cmd .= "/"
     cmd .= $S0
     cmd .= " *"
     system(cmd)
