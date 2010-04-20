@@ -21,7 +21,7 @@ Test the TAP/Parser library
 
     load_bytecode 'TAP/Parser.pir'
 
-    plan(179)
+    plan(203)
     test_grammar_plan()
     test_grammar_bailout()
     test_grammar_comment()
@@ -31,6 +31,7 @@ Test the TAP/Parser library
     test_tap_with_blank_lines()
     test_tap_has_problem()
     test_tap_version_wrong_place()
+    test_tap_trailing_plan()
     test_aggregator()
 .end
 
@@ -533,6 +534,73 @@ END_TAP
     $P0 = getattribute parser, 'parse_errors'
     $S0 = shift $P0
     is($S0, "If TAP version is present it must be the first line of output")
+.end
+
+.sub 'test_tap_trailing_plan'
+    .local pmc parser, result, token
+    parser = new ['TAP';'Parser']
+    parser.'tap'(<<'END_TAP')
+ok 1 - input file opened
+ok 2 - Gandalf wins
+1..2
+END_TAP
+    result = _get_results(parser)
+    $I0 = elements result
+    is($I0, 3, "elements")
+
+    token = shift result
+    $P0 = get_class ['TAP';'Parser';'Result';'Test']
+    isa_ok(token, $P0)
+    $P0 = getattribute token, 'ok'
+    is($P0, 'ok', "ok")
+    $P0 = getattribute token, 'test_num'
+    is($P0, 1, "test_num")
+    $P0 = getattribute token, 'description'
+    is($P0, '- input file opened', "description")
+    $I0 = token.'is_ok'()
+    ok($I0)
+    $I0 = token.'is_actual_ok'()
+    ok($I0)
+    $I0 = token.'is_unplanned'()
+    nok($I0, "unplanned")
+
+    token = shift result
+    $P0 = get_class ['TAP';'Parser';'Result';'Test']
+    isa_ok(token, $P0)
+    $P0 = getattribute token, 'ok'
+    is($P0, 'ok', "ok")
+    $P0 = getattribute token, 'test_num'
+    is($P0, 2, "test_num")
+    $P0 = getattribute token, 'description'
+    is($P0, '- Gandalf wins', "description")
+    $I0 = token.'is_ok'()
+    ok($I0)
+    $I0 = token.'is_actual_ok'()
+    ok($I0)
+    $I0 = token.'is_unplanned'()
+    nok($I0, "unplanned")
+
+    token = shift result
+    $P0 = get_class ['TAP';'Parser';'Result';'Plan']
+    isa_ok(token, $P0)
+    $P0 = getattribute token, 'plan'
+    is($P0, "1..2", "plan")
+    $P0 = getattribute token, 'tests_planned'
+    is($P0, 2, "tests_planned")
+
+    $I0 = parser.'passed'()
+    is($I0, 2, "passed")
+    $I0 = parser.'failed'()
+    is($I0, 0, "failed")
+    $I0 = parser.'parse_errors'()
+    is($I0, 0, "parse_errors")
+    $I0 = parser.'has_problems'()
+    is($I0, 0, "has_problems")
+
+    $P0 = getattribute parser, 'plan'
+    is($P0, "1..2", "plan")
+    $P0 = getattribute parser, 'tests_planned'
+    is($P0, 2, "tests_planned")
 .end
 
 .sub 'test_aggregator'

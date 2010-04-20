@@ -162,6 +162,15 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .return ($I0)
 .end
 
+.sub 'is_unplanned' :method
+    $I0 = 0
+    $P0 = getattribute self, 'unplanned'
+    if null $P0 goto L1
+    $I0 = $P0
+  L1:
+    .return ($I0)
+.end
+
 
 .namespace ['TAP';'Parser';'Result';'Unknown']
 
@@ -545,8 +554,6 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     setattribute self, 'parse_errors', $P0
     $P0 = box 0
     setattribute self, 'tests_run', $P0
-    $P0 = box 0
-    setattribute self, 'tests_planned', $P0
     $P0 = get_global ['TAP';'Parser'], 'LEGAL_CALLBACK'
     setattribute self, 'ok_callbacks', $P0
 .end
@@ -938,7 +945,7 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
 
     st = states['UNPLANNED']
     $P0 = st['test']
-    $P0['goto'] = 'PLANNED_AFTER_TEST'
+    $P0['goto'] = 'UNPLANNED_AFTER_TEST'
     $P0 = st['plan']
     $P0['goto'] = 'GOT_PLAN'
 
@@ -1005,7 +1012,8 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .local int tests_planned
     tests_planned = $P0
     unless tests_run > tests_planned goto L11
-    $P0 = box 1
+    $P0 = new 'Boolean'
+    set $P0, 1
     setattribute result, 'unplanned', $P0
   L11:
 
