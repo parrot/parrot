@@ -2199,7 +2199,14 @@ PDB_escape(PARROT_INTERP, ARGIN(const char *string), UINTVAL length)
             *(fill++) = '"';
             break;
           default:
-            *(fill++) = *string;
+            /* Hide non-ascii chars that may come from utf8 or latin-1
+             * strings in constant strings.
+             * Workaround for TT #1557
+             */
+            if ((unsigned char)*string > 127)
+                *(fill++) = '?';
+            else
+                *(fill++) = *string;
             break;
         }
     }
