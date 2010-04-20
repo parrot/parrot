@@ -237,6 +237,23 @@ L<https://trac.parrot.org/parrot/ticket/1540>
 
 =back
 
+=head1 Runcores
+
+=over 4
+
+=item Unused Runcores [eligible in 2.4]
+
+The following Runcores do not appear to be used.  Accordingly they will
+be eligible for removal.
+
+CGoto
+CGP
+Switch
+
+L<https://trac.parrot.org/parrot/ticket/1563>
+
+=back
+
 =head1 Bytecode
 
 =over 4
