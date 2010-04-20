@@ -1085,7 +1085,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %nonassoc '\n'
 %nonassoc <t> PARAM
 
-%token <t> HLL TK_LINE TK_FILE
+%token <t> SOL HLL TK_LINE TK_FILE
 %token <t> GOTO ARG IF UNLESS PNULL SET_RETURN SET_YIELD
 %token <t> ADV_FLAT ADV_SLURPY ADV_OPTIONAL ADV_OPT_FLAG ADV_NAMED ADV_ARROW
 %token <t> NEW ADV_INVOCANT ADV_CALL_SIG
@@ -2510,26 +2510,19 @@ int yyerror(void *yyscanner, PARROT_INTERP, const char *s)
      * before the newline, and thus, line is the line *after* the
      * error. Instead of duplicating code for both cases (the 'newline' and
      * non-newline case, do the test twice; efficiency is not important when
-     * we have an error anyway.
-     */
+     * we have an error anyway. */
     if (!at_eof(yyscanner)) {
-        if (*chr == '\n') {
-            IMCC_INFO(interp)->line--;
-        }
-
         IMCC_warning(interp, "error:imcc:%s", s);
+
         /* don't print the current token if it is a newline */
-        if (*chr != '\n') {
+        if (*chr != '\n')
             IMCC_warning(interp, " ('%s')", chr);
-        }
+
         IMCC_print_inc(interp);
-
-        if (*chr == '\n') {
-            IMCC_INFO(interp)->line++;
-        }
-
     }
-    else { /* scanner is at end of file; just to be sure, do not print "current" token. */
+
+    /* scanner is at EOF; just to be sure, don't print "current" token */
+    else {
         IMCC_warning(interp, "error:imcc:%s", s);
         IMCC_print_inc(interp);
     }

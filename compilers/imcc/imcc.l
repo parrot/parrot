@@ -87,6 +87,8 @@ static int expand_macro(PARROT_INTERP, ARGIN(const char *name), ARGMOD(void *yys
 
 static void include_file(PARROT_INTERP, char *file_name, ARGMOD(void *yyscanner));
 
+static int handle_identifier(PARROT_INTERP, YYSTYPE *valp, ARGIN(const char *id));
+
 #define YY_DECL int yylex(YYSTYPE *valp, yyscan_t yyscanner, PARROT_INTERP)
 
 #define YYCHOP() (yytext[--yyleng] = '\0')
@@ -133,7 +135,7 @@ UNICODE         {ENC}{ENC}?{DQ_STRING}
 STRINGCONSTANT  {SQ_STRING}|{DQ_STRING}
 SQ_STRING       \'[^'\n]*\'
 RANKSPEC        \[[,]*\]
-EOL        \r?\n
+EOL             \r?\n
 WS              [\t\f\r\x1a ]
 SP              [ ]
 
@@ -167,7 +169,10 @@ SP              [ ]
             return 0;
         }
 
+<*>^{WS}*            { IMCC_INFO(interp)->line++; }
+
 <heredoc1>.*{EOL} {
+            IMCC_INFO(interp)->line++;
             IMCC_INFO(interp)->frames->heredoc_rest = mem_sys_strdup(yytext);
             BEGIN(heredoc2);
     }
@@ -177,7 +182,6 @@ SP              [ ]
          * arrange them before all wildcard state matches */
 
         /* Newline in the heredoc. Realloc and cat on. */
-        IMCC_INFO(interp)->line++;
         IMCC_INFO(interp)->heredoc_content =
             (char*)mem_sys_realloc(IMCC_INFO(interp)->heredoc_content,
                             strlen(IMCC_INFO(interp)->heredoc_content) +
@@ -187,6 +191,7 @@ SP              [ ]
     }
 
 <heredoc2>.* {
+        IMCC_INFO(interp)->line++;
         /* Are we at the end of the heredoc? */
         if (STREQ(IMCC_INFO(interp)->heredoc_end, yytext)) {
             /* End of the heredoc. */
@@ -209,7 +214,7 @@ SP              [ ]
             yy_pop_state(yyscanner);
             yy_scan_string(IMCC_INFO(interp)->frames->heredoc_rest, yyscanner);
 
-            /* the EOF rule will increment the line number; decrement here */
+            /* not sure we need this decrement; more testing needed */
             IMCC_INFO(interp)->line--;
             return STRINGC;
         }
@@ -252,7 +257,6 @@ SP              [ ]
 
 <cmt4>.*{EOL} {
         yy_pop_state(yyscanner);
-        IMCC_INFO(interp)->line++;
     }
 
 <INITIAL,emit>{EOL} {
@@ -260,7 +264,6 @@ SP              [ ]
             BEGIN(INITIAL);
 
         IMCC_INFO(interp)->expect_pasm = 0;
-        IMCC_INFO(interp)->line++;
 
         return '\n';
     }
@@ -276,7 +279,6 @@ SP              [ ]
             yy_pop_state(yyscanner);
 
         IMCC_INFO(interp)->expect_pasm = 0;
-        IMCC_INFO(interp)->line++;
 
         return '\n';
     }
@@ -288,19 +290,20 @@ SP              [ ]
 }
 
 <INITIAL,emit,macro>^"=" {
+        IMCC_INFO(interp)->line++;
         IMCC_INFO(interp)->in_pod = 1;
         yy_push_state(pod, yyscanner);
     }
 
 <pod>^"=cut"{EOL} {
+        IMCC_INFO(interp)->line++;
         IMCC_INFO(interp)->in_pod = 0;
         yy_pop_state(yyscanner);
-        IMCC_INFO(interp)->line++;
     }
 
-<pod>.*         { /*ignore*/ }
+<pod>.* { IMCC_INFO(interp)->line++; }
 
-<pod>{EOL}      { IMCC_INFO(interp)->line++; }
+<pod>{EOL}      { /* ignore */ }
 
 <*>".line"               return TK_LINE;
 <*>".file"               return TK_FILE;
@@ -337,7 +340,7 @@ SP              [ ]
 ":instanceof"              return SUB_INSTANCE_OF;
 ":subid"                   return SUBID;
 
-".get_result"                  return RESULT;
+".get_result"              return RESULT;
 ".get_results"             return GET_RESULTS;
 ".yield"                   return YIELDT;
 ".set_yield"               return SET_YIELD;
@@ -447,6 +450,8 @@ SP              [ ]
     }
 
 <emit,INITIAL>".macro" {
+        /* the initial whitespace catcher misses this one */
+        IMCC_INFO(interp)->line++;
         return read_macro(valp, interp, yyscanner);
     }
 
@@ -485,7 +490,6 @@ SP              [ ]
     }
 
 <emit,INITIAL>{ID}"$" {
-
         if (valp) {
             char *label;
             size_t len;
@@ -635,34 +639,8 @@ SP              [ ]
         return REG;
     }
 
-<emit,INITIAL>{ID} {
-        if (!IMCC_INFO(interp)->is_def) {
-            SymReg *r = find_sym(interp, yytext);
 
-            if (r && (r->type & (VTIDENTIFIER|VT_CONSTP))) {
-                valp->sr = r;
-                return VAR;
-            }
-
-            if (IMCC_INFO(interp)->cur_unit
-            &&  IMCC_INFO(interp)->cur_unit->instructions
-            && (r = IMCC_INFO(interp)->cur_unit->instructions->symregs[0])
-            &&  r->pcc_sub)
-            {
-                if (((r->pcc_sub->pragma & P_METHOD)
-                ||   (IMCC_INFO(interp)->cur_unit->is_vtable_method))
-                &&   !strcmp(yytext, "self")) {
-                    valp->sr = mk_ident(interp, "self", 'P');
-                    IMCC_INFO(interp)->cur_unit->type |= IMC_HAS_SELF;
-                    return VAR;
-                }
-            }
-        }
-
-        valp->s = mem_sys_strdup(yytext);
-        return (!IMCC_INFO(interp)->is_def && is_op(interp, valp->s) ? PARROT_OP : IDENTIFIER);
-    }
-
+<emit,INITIAL>{ID} { return handle_identifier(interp, valp, yytext); }
 
 <emit,INITIAL>{WS}+ /* skip */;
 
@@ -684,10 +662,13 @@ SP              [ ]
 
 <INITIAL><<EOF>> yyterminate();
 
-<macro>".endm"         DUP_AND_RET(valp, ENDM);
+<macro>".endm"         {
+        /* the initial whitespace catcher misses this one */
+        IMCC_INFO(interp)->line++;
+        DUP_AND_RET(valp, ENDM);
+}
 
 <macro>{WS}*{EOL} {
-        IMCC_INFO(interp)->line++;
         DUP_AND_RET(valp, '\n');
     }
 
@@ -745,7 +726,6 @@ SP              [ ]
     return IDENTIFIER;
 }
 
-<macro>^{WS}+                       /* skip leading ws */;
 <macro>{WS}+                        DUP_AND_RET(valp, ' ');
 <macro>[SNIP]{DIGITS}               DUP_AND_RET(valp, REG);
 <macro>"$"[SNIP]{DIGITS}            DUP_AND_RET(valp, REG);
@@ -813,6 +793,9 @@ scan_string(macro_frame_t *frame, ARGIN(const char *expansion), void *yyscanner)
     frame->buffer             = YY_CURRENT_BUFFER;
     frame->s.next             = (parser_state_t *)IMCC_INFO(interp)->frames;
     IMCC_INFO(interp)->frames = frame;
+
+    /* start at the effective *starting line* of the macro */
+    IMCC_INFO(interp)->line   = frame->s.line - 2;
 
     yy_scan_string(expansion, yyscanner);
 }
@@ -1069,9 +1052,6 @@ read_macro(YYSTYPE *valp, PARROT_INTERP, void *yyscanner)
     IMCC_INFO(interp)->macro_buffer   = NULL;
     IMCC_INFO(interp)->cur_macro_name = NULL;
 
-    /* the ENDM rule doesn't set the line number */
-    IMCC_INFO(interp)->line--;
-
     return MACRO;
 }
 
@@ -1232,8 +1212,6 @@ expand_macro(PARROT_INTERP, ARGIN(const char *name), void *yyscanner)
             }
         }
 
-        /* let the normal EOF rules match line numbers */
-        IMCC_INFO(interp)->line = m->line - 1;
         scan_string(frame, m->expansion, yyscanner);
 
         return 1;
@@ -1288,7 +1266,8 @@ scan_file(PARROT_INTERP, macro_frame_t *frame, FILE *file, void *yyscanner)
     IMCC_INFO(interp)->frames = frame;
     IMCC_INFO(interp)->state  = (parser_state_t *)IMCC_INFO(interp)->frames;
 
-    IMCC_INFO(interp)->line   = 1;
+    /* let the start of line rule increment this to 1 */
+    IMCC_INFO(interp)->line   = 0;
 
     yy_switch_to_buffer(yy_create_buffer(file, YY_BUF_SIZE, yyscanner),
         yyscanner);
@@ -1467,6 +1446,36 @@ int at_eof(yyscan_t yyscanner)
 {
     yyguts_t * const yyg = (yyguts_t *)yyscanner;
     return yyg->yy_hold_char == '\0';
+}
+
+static int
+handle_identifier(PARROT_INTERP, YYSTYPE *valp, const char *text)
+{
+    if (!IMCC_INFO(interp)->is_def) {
+        SymReg *r = find_sym(interp, text);
+
+        if (r && (r->type & (VTIDENTIFIER|VT_CONSTP))) {
+            valp->sr = r;
+            return VAR;
+        }
+
+        if (IMCC_INFO(interp)->cur_unit
+        &&  IMCC_INFO(interp)->cur_unit->instructions
+        && (r = IMCC_INFO(interp)->cur_unit->instructions->symregs[0])
+        &&  r->pcc_sub)
+        {
+            if (((r->pcc_sub->pragma & P_METHOD)
+            ||   (IMCC_INFO(interp)->cur_unit->is_vtable_method))
+            &&   !strcmp(text, "self")) {
+                valp->sr = mk_ident(interp, "self", 'P');
+                IMCC_INFO(interp)->cur_unit->type |= IMC_HAS_SELF;
+                return VAR;
+            }
+        }
+    }
+
+    valp->s = mem_sys_strdup(text);
+    return (!IMCC_INFO(interp)->is_def && is_op(interp, valp->s) ? PARROT_OP : IDENTIFIER);
 }
 
 /*
