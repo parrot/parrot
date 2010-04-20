@@ -292,14 +292,6 @@ L<https://trac.parrot.org/parrot/ticket/1103>
 
 L<https://trac.parrot.org/parrot/ticket/907>
 
-=item Subs marked with C<:vtable>/C<:method> aren't in namespace [eligible in 1.1]
-
-Subs marked with C<:vtable> or C<:method> flags are no longer given a
-namespace entry by default.  Use the C<:nsentry> flag to cause this
-to happen.
-
-L<https://trac.parrot.org/parrot/ticket/389>
-
 =item C API coding standards cleanup [eligible in 1.1]
 
 All C API functions that aren't currently named according to the
