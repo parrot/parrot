@@ -1,9 +1,9 @@
 {
-    "release.version"  : "2.2.0",
-    "release.name"     : "Like Clockwork",
+    "release.version"  : "2.3.0",
+    "release.name"     : "Samoan Lory",
     "release.day"      : "Tuesday",
-    "release.date"     : "16 March 2010",
-    "release.nextdate" : "20 April 2010",
+    "release.date"     : "20 April 2010",
+    "release.nextdate" : "18 May 2010",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -11,13 +11,13 @@
     "web.repository"   : "https://svn.parrot.org/parrot/trunk/",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "13 March 2010",
+    "bugday.date"      : "17 April 2010",
 
     "wiki.root"        : "https://trac.parrot.org/parrot/wiki/",
-    "wiki.bugday"      : "bug_day_2010_03_13",
+    "wiki.bugday"      : "bug_day_2010_04_17",
 
     "cpan.search"      : "http://search.cpan.org/dist/parrot",
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/2.2.0/",
-    "subversion.root"  : "http://subversion.tigris.org/",
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/stable/2.3.0/",
+    "subversion.root"  : "http://subversion.apache.org/",
     "svk.root"         : "http://svk.bestpractical.com/"
 }
