@@ -69,7 +69,7 @@ test flags on PIR subs
     isa_ok($P30, 'Sub', ":method sub found w/.const")
     $P0 = get_global 'method1'
     $I0 = isnull $P0
-    todo($I0, ":method sub not found in namespace")
+    ok($I0, ":method sub not found in namespace")
 
     ## :subid subs
     .const 'Sub' $P40 = 'subid1'

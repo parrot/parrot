@@ -132,6 +132,7 @@ ns_insert_sub_keyed_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *key),
     PMC              * const classobj = VTABLE_get_class(interp, self);
     STRING           * vtable_key     = STRINGNULL;
     Parrot_Sub_attributes *sub;
+    INTVAL stored = 0;
 
     PMC_get_sub(interp, value, sub);
 
@@ -156,6 +157,8 @@ ns_insert_sub_keyed_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *key),
             /* Insert it. */
             VTABLE_set_pmc_keyed_int(interp, vtable, sub->vtable_index, value);
         }
+        if (!(sub->comp_flags & SUB_COMP_FLAG_NSENTRY))
+            stored = 1;
     }
 
     if (sub->comp_flags & SUB_COMP_FLAG_METHOD) {
@@ -170,9 +173,12 @@ ns_insert_sub_keyed_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *key),
             method_name = sub->method_name;
         }
         add_to_class(interp, nsinfo, classobj, method_name, value);
+
+        if (!(sub->comp_flags & SUB_COMP_FLAG_NSENTRY))
+            stored = 1;
     }
 
-    return 0;
+    return stored;
 }
 
 PARROT_WARN_UNUSED_RESULT

@@ -73,8 +73,7 @@ specified behavior for :method, :vtable, :nsentry, and :anon.
     is($I1, 75, "Invoked stored method")
 
     $P2 = get_hll_global ['MethodTest'], 'methodtest'
-    todo(0, "Method not stored in namespace", "see TT #389")
-#    is_null($P2, "Method not stored in namespace")
+    is_null($P2, "Method not stored in namespace")
 .end
 
 .sub 'store_nsentry'
