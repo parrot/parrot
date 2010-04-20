@@ -116,6 +116,7 @@ sub send_archive_to_smolder {
           . '/app/projects/process_add_report/'
           . $project_id;
     my $ua = LWP::UserAgent->new();
+    $ua->timeout(360);
     $ua->agent( 'Parrot::Harness::Smoke' );
     $ua->env_proxy();
 
