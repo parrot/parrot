@@ -1,4 +1,4 @@
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -27,9 +27,6 @@ sub _init {
     $data{description} = q{Generate Digest PMC files};
     $data{result}      = q{};
     $data{digest}      = {
-        MD2         => {
-            md_result => 'ab4f496bfb2a530b219ff33031fe06b0',
-        },
         MD4         => {
             md_result => 'd9130a8164549fe818874806e1c7014b',
         },

@@ -1,4 +1,4 @@
-# Copyright (C) 2003-2009, Parrot Foundation.
+# Copyright (C) 2003-2010, Parrot Foundation.
 # $Id$
 
 PERL          = @perl@
@@ -38,7 +38,6 @@ PMC_TARGETS = \
   subproxy$(LOAD_EXT)
 
 PMCS_DIGEST = \
-  md2.pmc \
   md4.pmc \
   md5.pmc \
   ripemd160.pmc \
@@ -48,7 +47,6 @@ PMCS_DIGEST = \
   sha512.pmc
 
 OBJS_DIGEST = \
-  md2$(O) \
   md4$(O) \
   md5$(O) \
   ripemd160$(O) \
@@ -200,15 +198,6 @@ lib-digest_group$(O): digest_group.c
 
 digest_group.c: $(OBJS_DIGEST)
 	$(PMC2C) --library digest_group --c $(PMCS_DIGEST)
-
-md2$(O): md2.c
-	$(CC) -c @cc_o_out@md2$(O) $(INCLUDES) $(CFLAGS) md2.c
-
-md2.c: md2.dump
-	$(PMC2CC) md2.pmc
-
-md2.dump: md2.pmc
-	$(PMC2CD) md2.pmc
 
 md4$(O): md4.c
 	$(CC) -c @cc_o_out@md4$(O) $(INCLUDES) $(CFLAGS) md4.c
