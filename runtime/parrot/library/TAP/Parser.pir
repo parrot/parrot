@@ -11,6 +11,12 @@ Simplified port of TAP::Parser (version 3.21)
 
 See L<http://search.cpan.org/~andya/Test-Harness/>
 
+=head3 Class TAP;Parser;Result
+
+Base class for TAP::Parser output objects
+
+=over 4
+
 =cut
 
 .namespace ['TAP';'Parser';'Result']
@@ -22,11 +28,19 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $P0.'add_attribute'('explanation')
 .end
 
+=item get_string
+
+=cut
+
 .sub 'get_string' :vtable :method
     $P0 = getattribute self, 'raw'
     $S0 = $P0
     .return ($S0)
 .end
+
+=item type
+
+=cut
 
 .sub 'type' :method
     $S0 = typeof self
@@ -35,6 +49,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $S0 = downcase $S0
     .return ($S0)
 .end
+
+=item has_todo
+
+=cut
 
 .sub 'has_todo' :method
     $P0 = getattribute self, 'directive'
@@ -46,6 +64,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .return ($I0)
 .end
 
+=item has_skip
+
+=cut
+
 .sub 'has_skip' :method
     $P0 = getattribute self, 'directive'
     unless null $P0 goto L1
@@ -56,6 +78,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .return ($I0)
 .end
 
+=item has_directive
+
+=cut
+
 .sub 'has_directive' :method
     $I0 = self.'has_todo'()
     if $I0 goto L1
@@ -64,6 +90,13 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .return ($I0)
 .end
 
+=back
+
+=head3 Class TAP;Parser;Result;Bailout
+
+=over 4
+
+=cut
 
 .namespace ['TAP';'Parser';'Result';'Bailout']
 
@@ -71,11 +104,20 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $P0 = subclass ['TAP';'Parser';'Result'], ['TAP';'Parser';'Result';'Bailout']
 .end
 
+=item bailout
+
+=cut
+
 .sub 'bailout' :method
     $P0 = getattribute self, 'explanation'
     .return ($P0)
 .end
 
+=back
+
+=head3 Class TAP;Parser;Result;Comment
+
+=cut
 
 .namespace ['TAP';'Parser';'Result';'Comment']
 
@@ -84,6 +126,9 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $P0.'add_attribute'('comment')
 .end
 
+=head3 Class TAP;Parser;Result;Plan
+
+=cut
 
 .namespace ['TAP';'Parser';'Result';'Plan']
 
@@ -93,6 +138,11 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $P0.'add_attribute'('tests_planned')
 .end
 
+=head3 Class TAP;Parser;Result;Test
+
+=over 4
+
+=cut
 
 .namespace ['TAP';'Parser';'Result';'Test']
 
@@ -103,6 +153,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $P0.'add_attribute'('description')
     $P0.'add_attribute'('unplanned')
 .end
+
+=item get_string
+
+=cut
 
 .sub 'get_string' :vtable :method
     $P0 = getattribute self, 'ok'
@@ -133,6 +187,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .return ($S0)
 .end
 
+=item is_ok
+
+=cut
+
 .sub 'is_ok' :method
     $P0 = getattribute self, 'unplanned'
     if null $P0 goto L1
@@ -146,6 +204,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .return ($I0)
 .end
 
+=item is_actual_ok
+
+=cut
+
 .sub 'is_actual_ok' :method
     $P0 = getattribute self, 'ok'
     $S0 = $P0
@@ -154,6 +216,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .return ($I0)
 .end
 
+=item todo_passed
+
+=cut
+
 .sub 'todo_passed' :method
     $I0 = self.'has_todo'()
     unless $I0 goto L1
@@ -161,6 +227,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
   L1:
     .return ($I0)
 .end
+
+=item is_unplanned
+
+=cut
 
 .sub 'is_unplanned' :method
     $I0 = 0
@@ -171,6 +241,11 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .return ($I0)
 .end
 
+=back
+
+=head3 Class TAP;Parser;Result;Unknown
+
+=cut
 
 .namespace ['TAP';'Parser';'Result';'Unknown']
 
@@ -178,6 +253,9 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $P0 = subclass ['TAP';'Parser';'Result'], ['TAP';'Parser';'Result';'Unknown']
 .end
 
+=head3 Class TAP;Parser;Result;Version
+
+=cut
 
 .namespace ['TAP';'Parser';'Result';'Version']
 
@@ -186,6 +264,14 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $P0.'add_attribute'('version')
 .end
 
+=head3 Class TAP;Parser;Grammar
+
+C<TAP;Parser;Grammar> tokenizes lines and constructs C<TAP;Parser;Result>
+subclasses to represent the tokens.
+
+=over 4
+
+=cut
 
 .namespace ['TAP';'Parser';'Grammar']
 
@@ -211,6 +297,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     str = substr str, 0, $I0
     .return (str)
 .end
+
+=item tokenize
+
+=cut
 
 .sub 'tokenize' :method
     .param string line
@@ -430,6 +520,16 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .return (result)
 .end
 
+=back
+
+=head3 Class TAP;Base
+
+Base class that provides common functionality to C<TAP;Parser>
+and C<TAP;Harness> ie. callback support.
+
+=over 4
+
+=cut
 
 .namespace ['TAP';'Base']
 
@@ -438,6 +538,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $P0.'add_attribute'('code_for')
     $P0.'add_attribute'('ok_callbacks')
 .end
+
+=item callback
+
+=cut
 
 .sub 'callback' :method
     .param string event
@@ -458,6 +562,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $P0[event] = callback
 .end
 
+=item _has_callback
+
+=cut
+
 .sub '_has_callback' :method
     $P0 = getattribute self, 'code_for'
     if null $P0 goto L1
@@ -465,6 +573,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
   L1:
     .return (0)
 .end
+
+=item _callback_for
+
+=cut
 
 .sub '_callback_for' :method
     .param string event
@@ -477,6 +589,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
   L1:
     .return ($P1)
 .end
+
+=item _make_callback
+
+=cut
 
 .sub '_make_callback' :method
     .param string event
@@ -492,6 +608,15 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .return ()
 .end
 
+=back
+
+=head3 Class TAP;Parser
+
+C<TAP;Parser> is designed to produce a proper parse of TAP output.
+
+=over 4
+
+=cut
 
 .namespace ['TAP';'Parser']
 
@@ -558,55 +683,99 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     setattribute self, 'ok_callbacks', $P0
 .end
 
+=item start_time
+
+=cut
+
 .sub 'start_time' :method
     $P0 = getattribute self, 'start_time'
     .return ($P0)
 .end
+
+=item end_time
+
+=cut
 
 .sub 'end_time' :method
     $P0 = getattribute self, 'end_time'
     .return ($P0)
 .end
 
+=item skipped
+
+=cut
+
 .sub 'skipped' :method :nsentry
     $P0 = getattribute self, 'skipped'
     .return ($P0)
 .end
+
+=item todo
+
+=cut
 
 .sub 'todo' :method :nsentry
     $P0 = getattribute self, 'todo'
     .return ($P0)
 .end
 
+=item passed
+
+=cut
+
 .sub 'passed' :method :nsentry
     $P0 = getattribute self, 'passed'
     .return ($P0)
 .end
+
+=item failed
+
+=cut
 
 .sub 'failed' :method :nsentry
     $P0 = getattribute self, 'failed'
     .return ($P0)
 .end
 
+=item todo_passed
+
+=cut
+
 .sub 'todo_passed' :method :nsentry
     $P0 = getattribute self, 'todo_passed'
     .return ($P0)
 .end
+
+=item parse_errors
+
+=cut
 
 .sub 'parse_errors' :method :nsentry
     $P0 = getattribute self, 'parse_errors'
     .return ($P0)
 .end
 
+=item tests_run
+
+=cut
+
 .sub 'tests_run' :method :nsentry
     $P0 = getattribute self, 'tests_run'
     .return ($P0)
 .end
 
+=item tests_planned
+
+=cut
+
 .sub 'tests_planned' :method :nsentry
     $P0 = getattribute self, 'tests_planned'
     .return ($P0)
 .end
+
+=item merge
+
+=cut
 
 .sub 'merge' :method :nsentry
     .param int val
@@ -615,12 +784,20 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     setattribute self, 'merge', $P0
 .end
 
+=item ignore_exit
+
+=cut
+
 .sub 'ignore_exit' :method :nsentry
     .param int val
     $P0 = new 'Boolean'
     set $P0, val
     setattribute self, 'ignore_exit', $P0
 .end
+
+=item exit
+
+=cut
 
 .sub 'exit' :method :nsentry
     $P0 = getattribute self, 'ignore_exit'
@@ -635,6 +812,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
   L2:
     .return ($I0)
 .end
+
+=item has_problems
+
+=cut
 
 .sub 'has_problems' :method
     $P0 = getattribute self, 'failed'
@@ -655,6 +836,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .return ($I0)
 .end
 
+=item _add_error
+
+=cut
+
 .sub '_add_error' :method
     .param pmc args :slurpy
     $P0 = getattribute self, 'parse_errors'
@@ -663,15 +848,27 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     push $P0, $P1
 .end
 
+=item is_good_plan
+
+=cut
+
 .sub 'is_good_plan' :method
     $P0 = getattribute self, 'good_plan'
     .return ($P0)
 .end
 
+=item spool
+
+=cut
+
 .sub 'spool' :method
     .param pmc spool
     setattribute self, 'spool', spool
 .end
+
+=item delete_spool
+
+=cut
 
 .sub 'delete_spool' :method
     $P0 = getattribute self, 'spool'
@@ -680,10 +877,18 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .return ($P0)
 .end
 
+=item pragma
+
+=cut
+
 .sub 'pragma' :method
     .param string name
     .return (1)
 .end
+
+=item tap
+
+=cut
 
 .sub 'tap' :method
     .param string tap
@@ -692,6 +897,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     print $P0, tap
     setattribute self, 'stream', $P0
 .end
+
+=item file
+
+=cut
 
 .sub 'file' :method
     .param string filename
@@ -739,6 +948,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .return ($S0)
 .end
 
+=item exec
+
+=cut
+
 .sub 'exec' :method
     .param pmc cmds :slurpy
     .local string cmd
@@ -767,6 +980,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     rethrow ex
 .end
 
+=item run
+
+=cut
+
 .sub 'run' :method
     .const 'Sub' $P0 = 'next'
     $P0 = newclosure $P0
@@ -774,6 +991,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $P1 = $P0(self)
     unless null $P1 goto L1
 .end
+
+=item next
+
+=cut
 
 .sub 'next' :method :nsentry :lex
     .local pmc stream, spool
@@ -1126,6 +1347,16 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
   L5:
 .end
 
+=back
+
+=head3 Class TAP;Parser;Aggregator
+
+C<TAP;Parser;Aggregator> collects parser objects and allows
+reporting/querying their aggregate results.
+
+=over 4
+
+=cut
 
 .namespace ['TAP';'Parser';'Aggregator']
 
@@ -1196,6 +1427,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
   L2:
 .end
 
+=item add
+
+=cut
+
 .sub 'add' :method
     .param string description
     .param pmc parser
@@ -1233,6 +1468,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
   L3:
 .end
 
+=item parsers
+
+=cut
+
 .sub 'parsers' :method
     .param string desc
     $P0 = getattribute self, 'parser_for'
@@ -1240,11 +1479,19 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .return ($P1)
 .end
 
+=item total
+
+=cut
+
 .sub 'total' :method
     $P0 = getattribute self, 'total'
     $I0 = $P0
     .return ($I0)
 .end
+
+=item passed
+
+=cut
 
 .sub 'passed' :method
     $P0 = getattribute self, 'passed'
@@ -1252,10 +1499,18 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .return ($I0)
 .end
 
+=item descriptions
+
+=cut
+
 .sub 'descriptions' :method
     $P0 = getattribute self, 'parse_order'
     .return ($P0)
 .end
+
+=item start
+
+=cut
 
 .sub 'start' :method
     $N0 = time
@@ -1263,21 +1518,37 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     setattribute self, 'start_time', $P0
 .end
 
+=item stop
+
+=cut
+
 .sub 'stop' :method
     $N0 = time
     $P0 = box $N0
     setattribute self, 'end_time', $P0
 .end
 
+=item start_time
+
+=cut
+
 .sub 'start_time' :method
     $P0= getattribute self, 'start_time'
     .return ($P0)
 .end
 
+=item en_time
+
+=cut
+
 .sub 'end_time' :method
     $P0= getattribute self, 'end_time'
     .return ($P0)
 .end
+
+=item elapsed
+
+=cut
 
 .sub 'elapsed' :method
     $P0 = getattribute self, 'end_time'
@@ -1292,6 +1563,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     die "Can't call elapsed without first calling start and then stop"
 .end
 
+=item elapsed_timestr
+
+=cut
+
 .sub 'elapsed_timestr' :method
     $N0 = self.'elapsed'()
     $P0 = new 'FixedPMCArray'
@@ -1301,6 +1576,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .return ($S0)
 .end
 
+=item has_problems
+
+=cut
+
 .sub 'has_problems' :method
     $P0 = getattribute self, 'todo_passed'
     $I0 = $P0
@@ -1309,6 +1588,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
   L1:
     .return ($I0)
 .end
+
+=item has_errors
+
+=cut
 
 .sub 'has_errors' :method
     $P0 = getattribute self, 'failed'
@@ -1322,6 +1605,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
   L1:
     .return ($I0)
 .end
+
+=item get_status
+
+=cut
 
 .sub 'get_status' :method
     .local int total, passed
@@ -1341,6 +1628,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .return ('NOTESTS')
 .end
 
+=item all_passed
+
+=cut
+
 .sub 'all_passed' :method
     .local int total
     $P0 = getattribute self, 'total'
@@ -1355,6 +1646,8 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
   L1:
     .return (0)
 .end
+
+=back
 
 =head1 AUTHOR
 

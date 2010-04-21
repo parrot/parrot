@@ -13,6 +13,13 @@ and TAP::Harness::Archive (version 0.14)
 See L<http://search.cpan.org/~andya/Test-Harness/>
 end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
 
+=head3 Class TAP;Harness
+
+This is a simple test harness which allows tests to be run and results
+automatically aggregated and output to STDOUT.
+
+=over 4
+
 =cut
 
 .namespace ['TAP';'Harness']
@@ -43,6 +50,10 @@ end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
     setattribute self, 'ok_callbacks', $P0
 .end
 
+=item process_args
+
+=cut
+
 .sub 'process_args' :method
     .param pmc opts
     setattribute self, 'opts', opts
@@ -68,10 +79,18 @@ end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
   L3:
 .end
 
+=item formatter
+
+=cut
+
 .sub 'formatter' :method
     .param pmc formatter
     setattribute self, 'formatter', formatter
 .end
+
+=item runtests
+
+=cut
 
 .sub 'runtests' :method :nsentry
     .param pmc tests
@@ -212,6 +231,19 @@ end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
   L1:
 .end
 
+=back
+
+=head3 Class TAP';Harness;Archive
+
+This module is a direct subclass of C<TAP;Harness> and behaves
+in exactly the same way except for one detail. In addition to
+outputting a running progress of the tests and an ending summary
+it can also capture all of the raw TAP from the individual test
+files or streams into an archive file (C<.tar.gz>).
+
+=over 4
+
+=cut
 
 .namespace ['TAP';'Harness';'Archive']
 
@@ -223,10 +255,18 @@ end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
     $P0.'add_attribute'('archive_extra_props')
 .end
 
+=item archive
+
+=cut
+
 .sub 'archive' :method
     .param pmc archive
     setattribute self, 'archive_file', archive
 .end
+
+=item extra_files
+
+=cut
 
 .sub 'extra_files' :method
     .param pmc extra_files
@@ -237,6 +277,10 @@ end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
     setattribute self, 'archive_extra_files', extra_files
 .end
 
+=item extra_props
+
+=cut
+
 .sub 'extra_props' :method
     .param pmc extra_props
     $I0 = does extra_props, 'hash'
@@ -245,6 +289,10 @@ end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
   L1:
     setattribute self, 'archive_extra_props', extra_props
 .end
+
+=item runtests
+
+=cut
 
 .sub 'runtests' :method
     .param pmc files
@@ -358,6 +406,7 @@ end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
     .return ($S0)
 .end
 
+=back
 
 =head1 AUTHOR
 
