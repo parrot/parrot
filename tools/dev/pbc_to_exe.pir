@@ -444,17 +444,16 @@ END_OF_DEFINES
     pbc_size = $P2[7]
 
 
-    .local string codestring
-    codestring  = ''
-    codestring .= '#include <windows.h>'
-    codestring .= "\n"
-    codestring .= rc_constant_defines
-    codestring .= "const unsigned int bytecode_size = "
+    .local pmc codestring
+    codestring  = new [ 'ResizableStringArray' ]
+    push codestring, "#include <windows.h>\n"
+    push codestring, rc_constant_defines
+    push codestring, "const unsigned int bytecode_size = "
     $S0 = pbc_size
-    codestring .= $S0
-    codestring .= ";\n"
+    push codestring, $S0
+    push codestring, ";\n"
 
-    codestring .= <<'END_OF_FUNCTION'
+    push codestring, <<'END_OF_FUNCTION'
         const void * get_program_code(void)
         {
             HRSRC   hResource;
@@ -496,9 +495,10 @@ END_OF_FUNCTION
     unless status goto rc_ok
 
     die "RC command failed"
-  rc_ok:
 
-    .return (codestring)
+  rc_ok:
+    $S0 = join '', codestring
+    .return ($S0)
 
   err_h_open:
     die "cannot open .h file"
