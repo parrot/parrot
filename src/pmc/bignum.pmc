@@ -723,7 +723,6 @@ bignum_get_string_size(PARROT_INTERP, ARGIN(PMC *self), int base, int digits) {
     ASSERT_ARGS(bignum_get_string_size)
 
     BIGNUM *bn;
-    size_t  n;
     char   *s;
     mp_exp_t exponent;
 
@@ -1760,7 +1759,6 @@ TODO: Only supports Integer values for now.
 */
 
     MULTI PMC *divide(BigNum value, PMC *dest) {
-        BIGNUM *bn;
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bignum_div_bignum(INTERP, SELF, value, dest);
