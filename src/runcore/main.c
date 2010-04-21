@@ -51,9 +51,6 @@ static void notify_func_table(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void stop_prederef(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 #define ASSERT_ARGS_dynop_register_switch __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_get_dynamic_op_lib_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -61,8 +58,6 @@ static void stop_prederef(PARROT_INTERP)
 #define ASSERT_ARGS_notify_func_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(table))
-#define ASSERT_ARGS_stop_prederef __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -187,33 +182,6 @@ get_dynamic_op_lib_init(SHIM_INTERP, ARGIN(const PMC *lib))
 
 /*
 
-=item C<static void stop_prederef(PARROT_INTERP)>
-
-Restore the interpreter's op function tables to their initial state.
-Also recreate the event function pointers. This is only necessary
-for run-core changes, but we don't know the old run core.
-
-=cut
-
-*/
-
-static void
-stop_prederef(PARROT_INTERP)
-{
-    ASSERT_ARGS(stop_prederef)
-    interp->op_func_table = PARROT_CORE_OPLIB_INIT(interp, 1)->op_func_table;
-
-    if (interp->evc_func_table) {
-        mem_gc_free(interp, interp->evc_func_table);
-        interp->evc_func_table = NULL;
-    }
-
-    Parrot_setup_event_func_ptrs(interp);
-}
-
-
-/*
-
 =item C<void prepare_for_run(PARROT_INTERP)>
 
 Prepares to run the interpreter's run core.
@@ -275,7 +243,6 @@ runops_int(PARROT_INTERP, size_t offset)
             if ((int)interp->resume_offset < 0)
                 Parrot_ex_throw_from_c_args(interp, NULL, 1,
                     "branch_cs: illegal resume offset");
-            stop_prederef(interp);
         }
     }
 }

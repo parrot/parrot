@@ -3093,10 +3093,6 @@ Parrot_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int really)
                                ? find_constants(interp, new_cs->const_table)
                                : new_cs->const_table->constants);
 
-    /* new_cs->const_table->constants; */
-    Parrot_pcc_set_pred_offset(interp, CURRENT_CONTEXT(interp),
-        new_cs->base.data - (opcode_t*) new_cs->prederef.code);
-
     if (really)
         prepare_for_run(interp);
 
