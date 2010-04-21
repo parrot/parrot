@@ -222,12 +222,12 @@ TT #1229: implement freeze/thaw and use that instead.
         for (i = 0; i < n; ++i) {
             PMC * const val = SELF.get_pmc_keyed_int(i);
             if (i > 0)
-                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, ", "));
+                res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, ", "));
 
-            res = Parrot_str_append(INTERP, res, VTABLE_get_repr(INTERP, val));
+            res = Parrot_str_concat(INTERP, res, VTABLE_get_repr(INTERP, val));
         }
 
-        res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, ")"));
+        res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, ")"));
 
         return res;
     }

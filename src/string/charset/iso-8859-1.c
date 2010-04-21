@@ -35,11 +35,14 @@ PARROT_CANNOT_RETURN_NULL
 static STRING* decompose(PARROT_INTERP, SHIM(STRING *src))
         __attribute__nonnull__(1);
 
-static void downcase(PARROT_INTERP, ARGIN(STRING *source_string))
+PARROT_CANNOT_RETURN_NULL
+static STRING* downcase(PARROT_INTERP, ARGIN(const STRING *source_string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void downcase_first(PARROT_INTERP, ARGIN(STRING *source_string))
+PARROT_CANNOT_RETURN_NULL
+static STRING* downcase_first(PARROT_INTERP,
+    ARGIN(const STRING *source_string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -66,57 +69,45 @@ static INTVAL is_cclass(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static void set_graphemes(PARROT_INTERP,
-    ARGIN(STRING *source_string),
-    UINTVAL offset,
-    UINTVAL replace_count,
-    ARGMOD(STRING *insert_string))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(5)
-        FUNC_MODIFIES(*insert_string);
-
 PARROT_CANNOT_RETURN_NULL
 static STRING * string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
         __attribute__nonnull__(1);
 
-static void titlecase(PARROT_INTERP, ARGIN(STRING *source_string))
+PARROT_CANNOT_RETURN_NULL
+static STRING* titlecase(PARROT_INTERP, ARGIN(const STRING *source_string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void titlecase_first(PARROT_INTERP, ARGIN(STRING *source_string))
+PARROT_CANNOT_RETURN_NULL
+static STRING* titlecase_first(PARROT_INTERP,
+    ARGIN(const STRING *source_string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static STRING * to_charset(PARROT_INTERP,
-    ARGIN(STRING *src),
-    ARGIN_NULLOK(STRING *dest))
+static STRING * to_charset(PARROT_INTERP, ARGIN(STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING * to_iso_8859_1(PARROT_INTERP,
-    ARGIN(STRING *src),
-    ARGMOD_NULLOK(STRING *dest))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*dest);
-
-PARROT_CANNOT_RETURN_NULL
-static STRING * to_unicode(PARROT_INTERP,
-    ARGIN(STRING *src),
-    ARGMOD_NULLOK(STRING *dest))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*dest);
-
-static void upcase(PARROT_INTERP, ARGIN(STRING *source_string))
+static STRING * to_iso_8859_1(PARROT_INTERP, ARGIN(STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void upcase_first(PARROT_INTERP, ARGIN(STRING *source_string))
+PARROT_CANNOT_RETURN_NULL
+static STRING * to_unicode(PARROT_INTERP, ARGIN(STRING *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_CANNOT_RETURN_NULL
+static STRING* upcase(PARROT_INTERP, ARGIN(const STRING *source_string))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_CANNOT_RETURN_NULL
+static STRING* upcase_first(PARROT_INTERP,
+    ARGIN(const STRING *source_string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -144,10 +135,6 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
 #define ASSERT_ARGS_is_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(source_string))
-#define ASSERT_ARGS_set_graphemes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(source_string) \
-    , PARROT_ASSERT_ARG(insert_string))
 #define ASSERT_ARGS_string_from_codepoint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_titlecase __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -181,28 +168,7 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<static void set_graphemes(PARROT_INTERP, STRING *source_string, UINTVAL
-offset, UINTVAL replace_count, STRING *insert_string)>
-
-Sets C<replace_count> graphemes in STRING C<source_string> starting at offset C<offset>.
-Gets the replacement graphemes from STRING C<insert_string>.
-
-=cut
-
-*/
-
-static void
-set_graphemes(PARROT_INTERP, ARGIN(STRING *source_string),
-        UINTVAL offset, UINTVAL replace_count, ARGMOD(STRING *insert_string))
-{
-    ASSERT_ARGS(set_graphemes)
-    ENCODING_SET_BYTES(interp, source_string, offset,
-            replace_count, insert_string);
-}
-
-/*
-
-=item C<static STRING * to_iso_8859_1(PARROT_INTERP, STRING *src, STRING *dest)>
+=item C<static STRING * to_iso_8859_1(PARROT_INTERP, STRING *src)>
 
 Converts STRING C<src> to iso-8859-1 in STRING C<dest>.
 
@@ -212,22 +178,16 @@ Converts STRING C<src> to iso-8859-1 in STRING C<dest>.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-to_iso_8859_1(PARROT_INTERP, ARGIN(STRING *src), ARGMOD_NULLOK(STRING *dest))
+to_iso_8859_1(PARROT_INTERP, ARGIN(STRING *src))
 {
     ASSERT_ARGS(to_iso_8859_1)
     UINTVAL offs, src_len;
     String_iter iter;
+    /* iso-8859-1 is never bigger then source */
+    STRING * dest = Parrot_str_clone(interp, src);
 
     ENCODING_ITER_INIT(interp, src, &iter);
     src_len = src->strlen;
-    if (dest) {
-        Parrot_gc_reallocate_string_storage(interp, dest, src_len);
-        dest->strlen  = src_len;
-    }
-    else {
-        /* iso-8859-1 is never bigger then source */
-        dest = src;
-    }
     dest->bufused = src_len;
     dest->charset = Parrot_iso_8859_1_charset_ptr;
     dest->encoding = Parrot_fixed_8_encoding_ptr;
@@ -244,7 +204,7 @@ to_iso_8859_1(PARROT_INTERP, ARGIN(STRING *src), ARGMOD_NULLOK(STRING *dest))
 
 /*
 
-=item C<static STRING * to_unicode(PARROT_INTERP, STRING *src, STRING *dest)>
+=item C<static STRING * to_unicode(PARROT_INTERP, STRING *src)>
 
 Converts STRING C<src> to unicode STRING C<dest>.
 
@@ -254,40 +214,37 @@ Converts STRING C<src> to unicode STRING C<dest>.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-to_unicode(PARROT_INTERP, ARGIN(STRING *src), ARGMOD_NULLOK(STRING *dest))
+to_unicode(PARROT_INTERP, ARGIN(STRING *src))
 {
     ASSERT_ARGS(to_unicode)
-    if (dest) {
-        UINTVAL offs;
-        String_iter iter;
+    STRING * dest = Parrot_str_clone(interp, src);
+    UINTVAL offs;
+    String_iter iter;
 
-        dest->charset = Parrot_unicode_charset_ptr;
-        dest->encoding = CHARSET_GET_PREFERRED_ENCODING(interp, dest);
-        Parrot_gc_reallocate_string_storage(interp, dest, src->strlen);
-        ENCODING_ITER_INIT(interp, dest, &iter);
-        for (offs = 0; offs < src->strlen; ++offs) {
-            const UINTVAL c = ENCODING_GET_BYTE(interp, src, offs);
+    dest->charset = Parrot_unicode_charset_ptr;
+    dest->encoding = CHARSET_GET_PREFERRED_ENCODING(interp, dest);
+    Parrot_gc_reallocate_string_storage(interp, dest, src->strlen);
+    ENCODING_ITER_INIT(interp, dest, &iter);
+    for (offs = 0; offs < src->strlen; ++offs) {
+        const UINTVAL c = ENCODING_GET_BYTE(interp, src, offs);
 
-            if (iter.bytepos >= Buffer_buflen(dest) - 4) {
-                UINTVAL need = (UINTVAL)((src->strlen - offs) * 1.5);
-                if (need < 16)
-                    need = 16;
-                Parrot_gc_reallocate_string_storage(interp, dest,
-                        Buffer_buflen(dest) + need);
-            }
-            iter.set_and_advance(interp, &iter, c);
+        if (iter.bytepos >= Buffer_buflen(dest) - 4) {
+            UINTVAL need = (UINTVAL)((src->strlen - offs) * 1.5);
+            if (need < 16)
+                need = 16;
+            Parrot_gc_reallocate_string_storage(interp, dest,
+                    Buffer_buflen(dest) + need);
         }
-        dest->bufused = iter.bytepos;
-        dest->strlen  = iter.charpos;
-        return dest;
+        iter.set_and_advance(interp, &iter, c);
     }
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-            "to_unicode inplace for iso-8859-1 not implemented");
+    dest->bufused = iter.bytepos;
+    dest->strlen  = iter.charpos;
+    return dest;
 }
 
 /*
 
-=item C<static STRING * to_charset(PARROT_INTERP, STRING *src, STRING *dest)>
+=item C<static STRING * to_charset(PARROT_INTERP, STRING *src)>
 
 Converts the STRING C<src> to an ISO-8859-1 STRING C<dest>.
 
@@ -298,16 +255,16 @@ Converts the STRING C<src> to an ISO-8859-1 STRING C<dest>.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static STRING *
-to_charset(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRING *dest))
+to_charset(PARROT_INTERP, ARGIN(STRING *src))
 {
     ASSERT_ARGS(to_charset)
     const charset_converter_t conversion_func =
         Parrot_find_charset_converter(interp, src->charset, Parrot_iso_8859_1_charset_ptr);
 
     if (conversion_func)
-        return conversion_func(interp, src, dest);
+        return conversion_func(interp, src);
     else
-        return to_iso_8859_1(interp, src, dest);
+        return to_iso_8859_1(interp, src);
 }
 
 
@@ -329,7 +286,7 @@ static STRING*
 compose(PARROT_INTERP, ARGIN(STRING *src))
 {
     ASSERT_ARGS(compose)
-    return Parrot_str_copy(interp, src);
+    return src;
 }
 
 /*
@@ -353,7 +310,7 @@ decompose(PARROT_INTERP, SHIM(STRING *src))
 
 /*
 
-=item C<static void upcase(PARROT_INTERP, STRING *source_string)>
+=item C<static STRING* upcase(PARROT_INTERP, const STRING *source_string)>
 
 Convert all graphemes in the STRING C<source_string> to upper case, for those
 graphemes that support cases.
@@ -362,19 +319,20 @@ graphemes that support cases.
 
 */
 
-static void
-upcase(PARROT_INTERP, ARGIN(STRING *source_string))
+PARROT_CANNOT_RETURN_NULL
+static STRING*
+upcase(PARROT_INTERP, ARGIN(const STRING *source_string))
 {
     ASSERT_ARGS(upcase)
     unsigned char *buffer;
-    UINTVAL offset = 0;
+    UINTVAL        offset = 0;
+    STRING        *result = Parrot_str_clone(interp, source_string);
 
-    if (!source_string->strlen)
-        return;
+    if (!result->strlen)
+        return result;
 
-    Parrot_str_write_COW(interp, source_string);
-    buffer = (unsigned char *)source_string->strstart;
-    for (offset = 0; offset < source_string->strlen; offset++) {
+    buffer = (unsigned char *)result->strstart;
+    for (offset = 0; offset < result->strlen; offset++) {
         unsigned int c = buffer[offset]; /* XXX use encoding ? */
         if (c >= 0xe0 && c != 0xf7)
             c &= ~0x20;
@@ -382,11 +340,13 @@ upcase(PARROT_INTERP, ARGIN(STRING *source_string))
             c = toupper((unsigned char)c);
         buffer[offset] = (unsigned char)c;
     }
+
+    return result;
 }
 
 /*
 
-=item C<static void downcase(PARROT_INTERP, STRING *source_string)>
+=item C<static STRING* downcase(PARROT_INTERP, const STRING *source_string)>
 
 Converts all graphemes in STRING C<source_string> to lower-case, for those graphemes
 that support cases.
@@ -395,30 +355,34 @@ that support cases.
 
 */
 
-static void
-downcase(PARROT_INTERP, ARGIN(STRING *source_string))
+PARROT_CANNOT_RETURN_NULL
+static STRING*
+downcase(PARROT_INTERP, ARGIN(const STRING *source_string))
 {
     ASSERT_ARGS(downcase)
-    if (source_string->strlen) {
-        UINTVAL offset;
-        unsigned char *buffer;
+    unsigned char *buffer;
+    UINTVAL        offset = 0;
+    STRING        *result = Parrot_str_clone(interp, source_string);
 
-        Parrot_str_write_COW(interp, source_string);
-        buffer = (unsigned char *)source_string->strstart;
-        for (offset = 0; offset < source_string->strlen; offset++) {
-            unsigned int c = buffer[offset];
-            if (c >= 0xc0 && c != 0xd7 && c <= 0xde)
-                c |= 0x20;
-            else
-                c = tolower((unsigned char)c);
-            buffer[offset] = (unsigned char)c;
-        }
+    if (!result->strlen)
+        return result;
+
+    buffer = (unsigned char *)result->strstart;
+    for (offset = 0; offset < result->strlen; offset++) {
+        unsigned int c = buffer[offset];
+        if (c >= 0xc0 && c != 0xd7 && c <= 0xde)
+            c |= 0x20;
+        else
+            c = tolower((unsigned char)c);
+        buffer[offset] = (unsigned char)c;
     }
+
+    return result;
 }
 
 /*
 
-=item C<static void titlecase(PARROT_INTERP, STRING *source_string)>
+=item C<static STRING* titlecase(PARROT_INTERP, const STRING *source_string)>
 
 Converts the graphemes in STRING C<source_string> to title case, for those graphemes
 that support cases.
@@ -427,19 +391,20 @@ that support cases.
 
 */
 
-static void
-titlecase(PARROT_INTERP, ARGIN(STRING *source_string))
+PARROT_CANNOT_RETURN_NULL
+static STRING*
+titlecase(PARROT_INTERP, ARGIN(const STRING *source_string))
 {
     ASSERT_ARGS(titlecase)
     unsigned char *buffer;
-    unsigned int c;
-    UINTVAL offset;
+    unsigned int   c;
+    UINTVAL        offset;
+    STRING        *result = Parrot_str_clone(interp, source_string);
 
-    if (!source_string->strlen)
-        return;
+    if (!result->strlen)
+        return result;
 
-    Parrot_str_write_COW(interp, source_string);
-    buffer = (unsigned char *)source_string->strstart;
+    buffer = (unsigned char *)result->strstart;
     c = buffer[0];
     if (c >= 0xe0 && c != 0xf7)
         c &= ~0x20;
@@ -447,7 +412,7 @@ titlecase(PARROT_INTERP, ARGIN(STRING *source_string))
         c = toupper((unsigned char)c);
     buffer[0] = (unsigned char)c;
 
-    for (offset = 1; offset < source_string->strlen; offset++) {
+    for (offset = 1; offset < result->strlen; offset++) {
         c = buffer[offset];
         if (c >= 0xc0 && c != 0xd7 && c <= 0xde)
             c |= 0x20;
@@ -455,11 +420,13 @@ titlecase(PARROT_INTERP, ARGIN(STRING *source_string))
             c = tolower((unsigned char)c);
         buffer[offset] = (unsigned char)c;
     }
+
+    return result;
 }
 
 /*
 
-=item C<static void upcase_first(PARROT_INTERP, STRING *source_string)>
+=item C<static STRING* upcase_first(PARROT_INTERP, const STRING *source_string)>
 
 Converts the first grapheme in STRING C<source_string> to upper case, if it
 supports cases.
@@ -468,28 +435,33 @@ supports cases.
 
 */
 
-static void
-upcase_first(PARROT_INTERP, ARGIN(STRING *source_string))
+PARROT_CANNOT_RETURN_NULL
+static STRING*
+upcase_first(PARROT_INTERP, ARGIN(const STRING *source_string))
 {
     ASSERT_ARGS(upcase_first)
-    if (source_string->strlen) {
-        unsigned char *buffer;
-        unsigned int c;
+    unsigned char *buffer;
+    unsigned int   c;
+    STRING        *result = Parrot_str_clone(interp, source_string);
 
-        Parrot_str_write_COW(interp, source_string);
-        buffer = (unsigned char *)source_string->strstart;
-        c = buffer[0];
-        if (c >= 0xe0 && c != 0xf7)
-            c &= ~0x20;
-        else
-            c = toupper((unsigned char)c);
-        buffer[0] = (unsigned char)c;
-    }
+    if (!result->strlen)
+        return result;
+
+    buffer = (unsigned char *)result->strstart;
+    c = buffer[0];
+    if (c >= 0xe0 && c != 0xf7)
+        c &= ~0x20;
+    else
+        c = toupper((unsigned char)c);
+    buffer[0] = (unsigned char)c;
+
+    return result;
 }
 
 /*
 
-=item C<static void downcase_first(PARROT_INTERP, STRING *source_string)>
+=item C<static STRING* downcase_first(PARROT_INTERP, const STRING
+*source_string)>
 
 Converts the first character of the STRING C<source_string> to lower case, if the
 grapheme supports lower case.
@@ -498,28 +470,33 @@ grapheme supports lower case.
 
 */
 
-static void
-downcase_first(PARROT_INTERP, ARGIN(STRING *source_string))
+PARROT_CANNOT_RETURN_NULL
+static STRING*
+downcase_first(PARROT_INTERP, ARGIN(const STRING *source_string))
 {
     ASSERT_ARGS(downcase_first)
-    if (source_string->strlen) {
-        unsigned char *buffer;
-        unsigned int c;
+    unsigned char *buffer;
+    unsigned int   c;
+    STRING        *result = Parrot_str_clone(interp, source_string);
 
-        Parrot_str_write_COW(interp, source_string);
-        buffer = (unsigned char *)source_string->strstart;
-        c = buffer[0];
-        if (c >= 0xc0 && c != 0xd7 && c <= 0xde)
-            c &= ~0x20;
-        else
-            c = tolower((unsigned char)c);
-        buffer[0] = (unsigned char)c;
-    }
+    if (!result->strlen)
+        return result;
+
+    buffer = (unsigned char *)result->strstart;
+    c = buffer[0];
+    if (c >= 0xc0 && c != 0xd7 && c <= 0xde)
+        c &= ~0x20;
+    else
+        c = tolower((unsigned char)c);
+    buffer[0] = (unsigned char)c;
+
+    return result;
 }
 
 /*
 
-=item C<static void titlecase_first(PARROT_INTERP, STRING *source_string)>
+=item C<static STRING* titlecase_first(PARROT_INTERP, const STRING
+*source_string)>
 
 Converts the first grapheme in STRING C<source_string> to title case, if the grapheme
 supports case.
@@ -528,11 +505,12 @@ supports case.
 
 */
 
-static void
-titlecase_first(PARROT_INTERP, ARGIN(STRING *source_string))
+PARROT_CANNOT_RETURN_NULL
+static STRING*
+titlecase_first(PARROT_INTERP, ARGIN(const STRING *source_string))
 {
     ASSERT_ARGS(titlecase_first)
-    upcase_first(interp, source_string);
+    return upcase_first(interp, source_string);
 }
 
 
@@ -662,7 +640,7 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 
 /*
 
-=item C<const CHARSET * Parrot_charset_iso_8859_1_init(PARROT_INTERP)>
+=item C<void Parrot_charset_iso_8859_1_init(PARROT_INTERP)>
 
 Initializes the ISO-8859-1 charset by installing all the necessary function pointers.
 
@@ -670,8 +648,7 @@ Initializes the ISO-8859-1 charset by installing all the necessary function poin
 
 */
 
-PARROT_CANNOT_RETURN_NULL
-const CHARSET *
+void
 Parrot_charset_iso_8859_1_init(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_charset_iso_8859_1_init)
@@ -679,8 +656,6 @@ Parrot_charset_iso_8859_1_init(PARROT_INTERP)
     static const CHARSET base_set = {
         "iso-8859-1",
         ascii_get_graphemes,
-        ascii_get_graphemes_inplace,
-        set_graphemes,
         to_charset,
         compose,
         decompose,
@@ -705,13 +680,13 @@ Parrot_charset_iso_8859_1_init(PARROT_INTERP)
     STRUCT_COPY_FROM_STRUCT(return_set, base_set);
     return_set->preferred_encoding = Parrot_fixed_8_encoding_ptr;
     Parrot_register_charset(interp, "iso-8859-1", return_set);
-    return return_set;
+
+    return;
 }
 
 /*
 
-=item C<STRING * charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP, STRING *src,
-STRING *dest)>
+=item C<STRING * charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP, STRING *src)>
 
 Converts STRING C<src> in ISO-8859-1 to ASCII STRING C<dest>.
 
@@ -722,29 +697,21 @@ Converts STRING C<src> in ISO-8859-1 to ASCII STRING C<dest>.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP, ARGIN(STRING *src),
-        ARGMOD_NULLOK(STRING *dest))
+charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP, ARGIN(STRING *src))
 {
     ASSERT_ARGS(charset_cvt_iso_8859_1_to_ascii)
     UINTVAL offs;
-    if (dest) {
-        Parrot_gc_reallocate_string_storage(interp, dest, src->strlen);
-        dest->bufused = src->bufused;
-        dest->strlen  = src->strlen;
-    }
+    STRING *dest = Parrot_str_clone(interp, src);
+
     for (offs = 0; offs < src->strlen; ++offs) {
         UINTVAL c = ENCODING_GET_BYTE(interp, src, offs);
         if (c >= 0x80)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LOSSY_CONVERSION,
                 "lossy conversion to ascii");
 
-        if (dest)
-            ENCODING_SET_BYTE(interp, dest, offs, c);
+        ENCODING_SET_BYTE(interp, dest, offs, c);
     }
-    if (dest)
-        return dest;
-    src->charset = Parrot_ascii_charset_ptr;
-    return src;
+    return dest;
 }
 
 /*

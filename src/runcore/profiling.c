@@ -387,12 +387,12 @@ ARGIN(opcode_t *pc))
                 i++;
                 i++; /* the root namespace has an empty name, so ignore it */
                 for (;i < MAX_NS_DEPTH; i++) {
-                    full_ns = Parrot_str_concat(interp, full_ns, ns_names[i], 0);
-                    full_ns = Parrot_str_concat(interp, full_ns, ns_separator, 0);
+                    full_ns = Parrot_str_concat(interp, full_ns, ns_names[i]);
+                    full_ns = Parrot_str_concat(interp, full_ns, ns_separator);
                 }
 
                 GETATTR_Sub_name(interp, preop_ctx->current_sub, sub_name);
-                full_ns = Parrot_str_concat(interp, full_ns, sub_name, 0);
+                full_ns = Parrot_str_concat(interp, full_ns, sub_name);
                 full_ns_cstr = Parrot_str_to_cstring(interp, full_ns);
 
                 pprof_data[PPROF_DATA_NAMESPACE] = (PPROF_DATA) full_ns_cstr;

@@ -20,14 +20,13 @@ Tests the C<String> PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(173)
+    plan(171)
 
     set_or_get_strings()
     setting_integers()
     setting_numbers()
     ensure_that_concat_ppp_copies_strings()
     ensure_that_concat_pps_copies_strings()
-    setting_string_references()
     assigning_string_copies()
     test_repeat()
     test_repeat_without_creating_dest_pmc()
@@ -201,16 +200,6 @@ Tests the C<String> PMC.
     is( $S0, 'Grunties', 'original untouched' )
     is( $P1, 'fnargh', 'original untouched' )
     is( $P0, 'fnarghGrunties', 'concat success' )
-.end
-
-.sub setting_string_references
-    new $P0, ['String']
-    set $S0, "C2H5OH + 10H20"
-    set $P0, $S0
-    chopn $S0, 8
-
-    is( $S0, 'C2H5OH', 'removed last 8 from string' )
-    is( $P0, 'C2H5OH', '...and the PMC still reference $S0' )
 .end
 
 .sub assigning_string_copies

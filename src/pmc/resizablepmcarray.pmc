@@ -391,9 +391,14 @@ the array.
     }
 
     VTABLE void push_pmc(PMC *value) {
+        const INTVAL size   = PMC_size(SELF);
+        const INTVAL thresh = PMC_threshold(SELF);
 
-        const INTVAL size = PMC_size(SELF);
-        SELF.set_integer_native(size + 1);
+        if (PMC_array(SELF) && size < thresh)
+            PMC_size(SELF) = size + 1;
+        else {
+            SELF.set_integer_native(size + 1);
+        }
         ((PMC **)PMC_array(SELF))[size] = value;
 
         return;
@@ -655,13 +660,13 @@ Returns the Parrot string representation C<ResizablePMCArray>.
 
         for (j = 0; j < n; ++j) {
             PMC * const val = SELF.get_pmc_keyed_int(j);
-            res      = Parrot_str_append(INTERP, res, VTABLE_get_repr(INTERP, val));
+            res      = Parrot_str_concat(INTERP, res, VTABLE_get_repr(INTERP, val));
 
             if (j < n - 1)
-                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, ", "));
+                res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, ", "));
         }
 
-        return Parrot_str_append(INTERP, res, CONST_STRING(INTERP, " ]"));
+        return Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, " ]"));
     }
 
 /*

@@ -679,16 +679,16 @@ Returns the short signature for the CallContext.
         for (i = 0; i < num_positionals; ++i) {
             switch (c[i].type) {
               case INTCELL:
-                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "I"));
+                res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, "I"));
                 break;
               case FLOATCELL:
-                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "N"));
+                res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, "N"));
                 break;
               case STRINGCELL:
-                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "S"));
+                res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, "S"));
                 break;
               case PMCCELL:
-                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "P"));
+                res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, "P"));
                 break;
               default:
                 PARROT_FAILURE("Impossible flag");
@@ -1429,7 +1429,7 @@ Creates and returns a clone of the signature.
             SET_ATTR_type_tuple(INTERP, dest, VTABLE_clone(INTERP, type_tuple));
 
         if (short_sig)
-            SET_ATTR_short_sig(INTERP, dest, Parrot_str_copy(INTERP, short_sig));
+            SET_ATTR_short_sig(INTERP, dest, short_sig);
 
         if (!PMC_IS_NULL(arg_flags))
             SET_ATTR_arg_flags(INTERP, dest, VTABLE_clone(INTERP, arg_flags));

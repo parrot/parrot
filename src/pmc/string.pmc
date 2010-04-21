@@ -125,8 +125,7 @@ Returns the string itself.
     VTABLE STRING *get_string() {
         STRING *str_val;
         GET_ATTR_str_val(INTERP, SELF, str_val);
-
-        return STRING_IS_NULL(str_val) ? STRINGNULL : Parrot_str_copy(INTERP, str_val);
+        return str_val;
     }
 
 /*
@@ -217,12 +216,7 @@ Sets the value of the string to a copy of the specified C<string>.
 */
 
     VTABLE void assign_string_native(STRING *value) {
-        if (!STRING_IS_NULL(value)) {
-            SET_ATTR_str_val(INTERP, SELF,
-                Parrot_str_set(INTERP, SELF.get_string(), value));
-        }
-        else
-            SET_ATTR_str_val(INTERP, SELF, NULL);
+        SET_ATTR_str_val(INTERP, SELF, value);
     }
 
 /*
@@ -375,7 +369,7 @@ C<length>, and places it in C<dest>.
     VTABLE void substr(INTVAL offset, INTVAL length, PMC *dest) {
         STRING *str_val, *s2;
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        s2 = Parrot_str_substr(INTERP, str_val, offset, length, NULL, 0);
+        s2 = Parrot_str_substr(INTERP, str_val, offset, length);
         VTABLE_set_string_native(INTERP, dest, s2);
     }
 
@@ -392,7 +386,7 @@ C<length>, and returns it.
     VTABLE STRING *substr_str(INTVAL offset, INTVAL length) {
         STRING *str_val;
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        return Parrot_str_substr(INTERP, str_val, offset, length, NULL, 0);
+        return Parrot_str_substr(INTERP, str_val, offset, length);
     }
 
 /*
@@ -447,7 +441,7 @@ Replace the string at C<key> with the chr of C<value>.
     VTABLE STRING *get_string_keyed_int(INTVAL pos) {
         STRING      *str_val;
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        return Parrot_str_substr(INTERP, str_val, pos, 1, NULL, 0);
+        return Parrot_str_substr(INTERP, str_val, pos, 1);
     }
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
@@ -478,7 +472,8 @@ Replace the string at C<key> with the chr of C<value>.
         STRING      *str_val;
         const INTVAL len = Parrot_str_byte_length(INTERP, value);
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        Parrot_str_replace(INTERP, str_val, pos, len, value, NULL);
+        str_val = Parrot_str_replace(INTERP, str_val, pos, len, value);
+        SET_ATTR_str_val(INTERP, SELF, str_val);
     }
 
     VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
@@ -489,7 +484,8 @@ Replace the string at C<key> with the chr of C<value>.
         STRING      *str_val;
         STRING * const c = string_chr(INTERP, (UINTVAL) value);
         GET_ATTR_str_val(INTERP, SELF, str_val);
-        Parrot_str_replace(INTERP, str_val, pos, 1, c, NULL);
+        str_val = Parrot_str_replace(INTERP, str_val, pos, 1, c);
+        SET_ATTR_str_val(INTERP, SELF, str_val);
     }
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
@@ -512,11 +508,11 @@ Replace every occurrence of C<orig> with C<_new>.
     METHOD replace(STRING *orig, STRING *_new) {
         const INTVAL   old_len = Parrot_str_byte_length(INTERP, orig);
         const INTVAL   new_len = Parrot_str_byte_length(INTERP, _new);
-        STRING * const s       = VTABLE_get_string(INTERP, SELF);
+        STRING       * s       = VTABLE_get_string(INTERP, SELF);
         INTVAL         i       = 0;
 
         while (-1 != (i = Parrot_str_find_index(INTERP, s, orig, i))) {
-            (void)Parrot_str_replace(INTERP, s, i, old_len, _new, NULL);
+            s = Parrot_str_replace(INTERP, s, i, old_len, _new);
             i += new_len;
         }
 

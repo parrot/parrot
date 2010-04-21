@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -395,7 +395,7 @@ Parrot_find_pad(PARROT_INTERP, ARGIN(STRING *lex_name), ARGIN(PMC *ctx))
         PMC * const lex_pad = Parrot_pcc_get_lex_pad(interp, ctx);
         PMC * outer         = Parrot_pcc_get_outer_ctx(interp, ctx);
 
-        if (!outer)
+        if (PMC_IS_NULL(outer))
             return lex_pad;
 
         if (!PMC_IS_NULL(lex_pad))
@@ -428,7 +428,7 @@ Parrot_find_dynamic_pad(PARROT_INTERP, ARGIN(STRING *lex_name), ARGIN(PMC *ctx))
         PMC * const lex_pad = Parrot_pcc_get_lex_pad(interp, ctx);
         PMC * caller        = Parrot_pcc_get_caller_ctx(interp, ctx);
 
-        if (!caller)
+        if (PMC_IS_NULL(caller))
             return lex_pad;
 
         if (!PMC_IS_NULL(lex_pad))
@@ -632,10 +632,6 @@ Parrot_get_sub_pmc_from_subclass(PARROT_INTERP, ARGIN(PMC *subclass)) {
 =head1 SEE ALSO
 
 F<include/parrot/sub.h>.
-
-=head1 HISTORY
-
-Initial version by Melvin on 2002/06/6.
 
 =cut
 

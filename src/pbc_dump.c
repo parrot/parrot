@@ -155,7 +155,7 @@ static void
 nums_dump(PARROT_INTERP, const PackFile_Segment *self)
 {
     STRING                 *debug_name = Parrot_str_concat(interp, self->name,
-            Parrot_str_new_constant(interp, "_DB"), 0);
+            Parrot_str_new_constant(interp, "_DB"));
     const PackFile_Segment *debug      = PackFile_find_segment(interp,
                                             self->dir, debug_name, 1);
 

@@ -307,10 +307,13 @@ END_OF_FUNCTION
     .local pmc encoding_table
     encoding_table = 'generate_encoding_table'()
 
-    .local string codestring
+    .local pmc codestring
     .local int size
-    codestring = "const char * program_code =\n"
-    codestring .= '"'
+
+    codestring = new ['ResizableStringArray']
+
+    push codestring, "const char * program_code =\n"
+    push codestring, '"'
     size = 0
 
   read_loop:
@@ -327,14 +330,14 @@ END_OF_FUNCTION
     unless pos < pbclength goto code_done
     $I0 = ord pbcstring, pos
     $S0 = encoding_table[$I0]
-    codestring .= $S0
+    push codestring, $S0
     inc pos
     inc size
     $I0 = size % 32
     unless $I0 == 0 goto code_loop
-    codestring .= '"'
-    codestring .= "\n"
-    codestring .= '"'
+    push codestring, '"'
+    push codestring, "\n"
+    push codestring, '"'
     goto code_loop
   code_done:
     goto read_loop
@@ -342,21 +345,22 @@ END_OF_FUNCTION
   read_done:
     close ifh
 
-    codestring .= '"'
-    codestring .= "\n;\n\n"
-    codestring .= "const int bytecode_size = "
+    push codestring, '"'
+    push codestring, "\n;\n\n"
+    push codestring, "const int bytecode_size = "
     $S0 = size
-    codestring .= $S0
-    codestring .= ";\n"
+    push codestring, $S0
+    push codestring, ";\n"
 
-    codestring .= <<'END_OF_FUNCTION'
+    push codestring, <<'END_OF_FUNCTION'
         const void * get_program_code(void)
         {
             return program_code;
         }
 END_OF_FUNCTION
 
-    .return (codestring)
+    $S0 = join '', codestring
+    .return ($S0)
 
   err_infile:
     die "cannot open infile"

@@ -342,23 +342,23 @@ Return a representation of the hash contents.
             Parrot_str_free_cstring(key_str);
 
             if (all_digit) {
-                res = Parrot_str_append(INTERP, res, key);
+                res = Parrot_str_concat(INTERP, res, key);
             }
             else {
-                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "'"));
-                res = Parrot_str_append(INTERP, res, key);
-                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "'"));
+                res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, "'"));
+                res = Parrot_str_concat(INTERP, res, key);
+                res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, "'"));
             }
 
-            res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, ": "));
+            res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, ": "));
             val = SELF.get_pmc_keyed_str(key);
-            res = Parrot_str_append(INTERP, res, VTABLE_get_string(INTERP, val));
+            res = Parrot_str_concat(INTERP, res, VTABLE_get_string(INTERP, val));
 
             if (j < n - 1)
-                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, ", "));
+                res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, ", "));
         }
 
-        res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "}"));
+        res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, "}"));
 
         return res;
     }

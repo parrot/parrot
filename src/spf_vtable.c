@@ -453,7 +453,7 @@ getchr_pmc(PARROT_INTERP, SHIM(INTVAL size), ARGMOD(SPRINTF_OBJ *obj))
     obj->index++;
     s = VTABLE_get_string(interp, tmp);
     /* XXX Parrot_str_copy like below? + adjusting bufused */
-    return Parrot_str_substr(interp, s, 0, 1, NULL, 0);
+    return Parrot_str_substr(interp, s, 0, 1);
 }
 
 /*

@@ -660,8 +660,8 @@ Parrot_io_open_pipe_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
     if (comspec == NULL)
         comspec = "cmd";
     auxcomm = Parrot_str_new(interp, comspec, 0);
-    auxcomm = Parrot_str_append(interp, auxcomm, Parrot_str_new(interp, " /c ", 0));
-    auxcomm = Parrot_str_append(interp, auxcomm, command);
+    auxcomm = Parrot_str_concat(interp, auxcomm, Parrot_str_new(interp, " /c ", 0));
+    auxcomm = Parrot_str_concat(interp, auxcomm, command);
     cmd = Parrot_str_to_cstring(interp, auxcomm);
     start.cb = sizeof start;
     GetStartupInfo(&start);

@@ -183,7 +183,8 @@ STRING_compare(PARROT_INTERP, ARGIN(const void *search_key), ARGIN_NULLOK(const 
         return 1;
 
     /* COWed strings */
-    if (Buffer_bufstart(s1) == Buffer_bufstart(s2) && s1->bufused == s2->bufused)
+    if (Buffer_bufstart(s1) == Buffer_bufstart(s2)
+    &&  s1->bufused == s2->bufused)
         return 0;
 
     return CHARSET_COMPARE(interp, s1, s2);
@@ -1323,13 +1324,14 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash),
     /* When the hash is constant, check that the key and value are also
      * constant. */
     if (!PMC_IS_NULL(hash->container)
-            && PObj_constant_TEST(hash->container)) {
+    &&   PObj_constant_TEST(hash->container)) {
         if (hash->key_type == Hash_key_type_STRING
-                && !PObj_constant_TEST((PObj *)key))
+        && !PObj_constant_TEST((PObj *)key))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Used non-constant key in constant hash.");
-        if (((hash->entry_type == enum_type_PMC) || (hash->entry_type == enum_type_STRING))
-                && !PObj_constant_TEST((PObj *)value))
+            if (((hash->entry_type == enum_type_PMC)
+            ||   (hash->entry_type == enum_type_STRING))
+            &&   !PObj_constant_TEST((PObj *)value))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Used non-constant value in constant hash.");
     }
@@ -1434,7 +1436,7 @@ parrot_hash_clone(PARROT_INTERP, ARGIN(const Hash *hash), ARGOUT(Hash *dest))
             break;
 
           case enum_type_STRING:
-            valtmp = (void *)Parrot_str_copy(interp, (STRING *)b->value);
+            valtmp = b->value;
             break;
 
           case enum_type_PMC:
@@ -1450,9 +1452,8 @@ parrot_hash_clone(PARROT_INTERP, ARGIN(const Hash *hash), ARGOUT(Hash *dest))
                     "hash corruption: type = %d\n", hash->entry_type);
         };
 
-        if (key){
+        if (key)
             parrot_hash_put(interp, dest, key, valtmp);
-        }
     }
 }
 

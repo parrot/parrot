@@ -65,8 +65,8 @@
 ^all_cstring\.str/
 ^blib$
 ^blib/
-^config_lib\.pir$
-^config_lib\.pir/
+^config_lib\.pasm$
+^config_lib\.pasm/
 ^cover_db$
 ^cover_db/
 ^install_config\.fpmc$
@@ -616,9 +616,6 @@
 # generated from svn:ignore of 'runtime/parrot/library/String/'
 ^runtime/parrot/library/String/Utils\.pbc$
 ^runtime/parrot/library/String/Utils\.pbc/
-# generated from svn:ignore of 'runtime/parrot/library/TAP/'
-^runtime/parrot/library/TAP/.*\.pbc$
-^runtime/parrot/library/TAP/.*\.pbc/
 # generated from svn:ignore of 'runtime/parrot/library/Tcl/'
 ^runtime/parrot/library/Tcl/.*\.pbc$
 ^runtime/parrot/library/Tcl/.*\.pbc/

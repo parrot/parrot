@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2009, Parrot Foundation.
+# Copyright (C) 2004-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -248,13 +248,13 @@ BEGIN {
                 # and make a hash out of the directories
                 my %dirs =
                     map { ( ( File::Spec->splitpath($_) )[1] => 1 ) }
-                    grep { m|(?i)(?:$filter_ext)| } $self->_dist_files;
+                    grep { m/(?i)(?:$filter_ext)/ } $self->_dist_files;
 
                 # Filter out ignored directories
                 # and return the results
                 my @dirs = sort
                     map  { $self->directory_with_name($_) }
-                    grep { !m|(?:$filter_dir)| }
+                    grep { !m/(?:$filter_dir)/ }
                     keys %dirs;
                 return @dirs;
             };
@@ -293,7 +293,7 @@ BEGIN {
                 # and return a sorted list of filenames
                 my @files = sort
                     map  { $self->file_with_name($_) }
-                    grep { m|(?i)(?:$filter_ext)| }
+                    grep { m/(?i)(?:$filter_ext)/ }
                     $self->_dist_files;
                 return @files;
             };
@@ -334,7 +334,7 @@ sub get_make_language_files {
     # and return a sorted list of filenames
     my @files = sort
         map  { $self->file_with_name($_) }
-        grep { m|[/\\]makefiles[/\\][a-z]+\.in$| }
+        grep { m{[/\\]makefiles[/\\][a-z]+\.in$} }
         $self->_dist_files;
     return @files;
 }

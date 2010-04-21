@@ -19,7 +19,7 @@ Tests Parrot string registers and operations.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(412)
+    plan(399)
 
     set_s_s_sc()
     test_clone()
@@ -27,7 +27,6 @@ Tests Parrot string registers and operations.
     test_length_i_s()
     zero_length_substr()
     chopn_with_clone()
-    chopn_with_set()
     chopn_oob_values()
     three_argument_chopn()
     three_argument_chopn__oob_values()
@@ -40,6 +39,7 @@ Tests Parrot string registers and operations.
     five_arg_substr_w_rep_eq_length()
     five_arg_substr_w_replacement_gt_length()
     five_arg_substr_w_replacement_lt_length()
+    five_arg_substr_vs_hash()
     five_arg_substr__offset_at_end_of_string()
     exception_five_arg_substr__offset_past_end_of_string()
     five_arg_substr_neg_offset_repl_eq_length()
@@ -122,10 +122,8 @@ Tests Parrot string registers and operations.
     correct_precision_for_sprintf_x()
     test_exchange()
     test_find_encoding()
-    test_string_encoding()
     test_assign()
     assign_and_globber()
-    assign_and_globber_2()
     bands_null_string()
     bands_2()
     bands_3()
@@ -141,8 +139,6 @@ Tests Parrot string registers and operations.
     bnots_null_string()
     bnots_2()
     bnots_cow()
-    transcode_to_utf8()
-    string_chartype()
     split_on_empty_string()
     split_on_non_empty_string()
     test_join()
@@ -237,20 +233,6 @@ Tests Parrot string registers and operations.
     is( $S3, "JAPHxyzw", '' )
 .end
 
-.sub chopn_with_set
-    set $S4, "JAPHxyzw"
-    set $S5, "japhXYZW"
-    set     $S3, $S4
-    set $I1, 4
-    chopn   $S4, 3
-    chopn   $S4, 1
-    chopn   $S5, $I1
-
-    is( $S4, "JAPH", '' )
-    is( $S5, "japh", '' )
-    is( $S3, "JAPH", '' )
-.end
-
 .sub chopn_oob_values
     set $S1, "A string of length 21"
     chopn   $S1, 0
@@ -292,10 +274,6 @@ Tests Parrot string registers and operations.
     set     $S3, $S1
     chopn   $S2, $S1, 3
     is( $S3, "Parrot", '' )
-
-    set     $S3, $S1
-    chopn   $S1, 3
-    is( $S3, "Par", '' )
 .end
 #
 .sub three_argument_chopn__oob_values
@@ -427,6 +405,18 @@ handler:
     is( $S2, "", '' )
 .end
 
+.sub five_arg_substr_vs_hash
+    # Check that string hashval properly updated.
+    .local pmc hash
+    hash = new ['Hash']
+    $S0 = "fooo"
+    hash[$S0]   = 1
+    hash["foo"] = 42
+    $S0 = replace $S0, 1, 1, ''
+    $S1 = hash[$S0]
+    is( $S1, '42', 'substr behave it self')
+.end
+
 .sub exception_five_arg_substr__offset_past_end_of_string
     set $S0, "abcdefghijk"
     set $S1, "xyz"
@@ -434,7 +424,7 @@ handler:
     substr $S2, $S0, 12, 3, $S1
     ok(0,"no exception")
 handler:
-    .exception_is( "Can only replace inside string or index after end of string" )
+    .exception_is( "Cannot take substr outside string" )
 .end
 
 .sub five_arg_substr_neg_offset_repl_eq_length
@@ -471,7 +461,7 @@ handler:
     substr $S2, $S0, -12, 4, $S1
     ok(0,"no exception")
 handler:
-    .exception_is( "Can only replace inside string or index after end of string" )
+    .exception_is( "Cannot take substr outside string" )
 .end
 
 .sub five_arg_substr_length_gt_strlen
@@ -495,9 +485,10 @@ handler:
 .sub four_arg_replacement_only_substr
     set $S0, "abcdefghijk"
     set $S1, "xyz"
-    substr $S0, 3, 3, $S1
-    is( $S0, "abcxyzghijk", '' )
+    $S2 = replace $S0, 3, 3, $S1
+    is( $S0, "abcdefghijk", '' )
     is( $S1, "xyz", '' )
+    is( $S2, "abcxyzghijk", '' )
 .end
 
 .sub three_arg_substr
@@ -1477,34 +1468,6 @@ WHILE:
     # is( $I0, "3", 'find_encoding' )
 .end
 
-.sub test_string_encoding
-    skip(4, "no more visible encoding" )
-    # set $I0, 0
-    # new $S0, 0, $I0
-    # string_encoding $I1, $S0
-    # eq $I0, $I1, OK1
-    # print "not "
-    # OK1:  print "ok 1\n"
-    # set $I0, 1
-    # new $S0, 0, $I0
-    # string_encoding $I1, $S0
-    # eq $I0, $I1, OK2
-    # print "not "
-    # OK2:  print "ok 2\n"
-    # set $I0, 2
-    # new $S0, 0, $I0
-    # string_encoding $I1, $S0
-    # eq $I0, $I1, OK3
-    # print "not "
-    # OK3:  print "ok 3\n"
-    # set $I0, 3
-    # new $S0, 0, $I0
-    # string_encoding $I1, $S0
-    # eq $I0, $I1, OK4
-    # print "not "
-    # OK4:  print "ok 4\n"
-.end
-
 .sub test_assign
     set $S4, "JAPH"
     assign  $S5, $S4
@@ -1518,14 +1481,6 @@ WHILE:
     assign  $S4, "Parrot"
     is( $S4, "Parrot", 'assign & globber' )
     is( $S5, "JAPH", 'assign & globber' )
-.end
-
-.sub assign_and_globber_2
-    set $S4, "JAPH"
-    set     $S5, $S4
-    assign  $S4, "Parrot"
-    is( $S4, "Parrot", 'assign & globber 2' )
-    is( $S5, "Parrot", 'assign & globber 2' )
 .end
 
 .sub bands_null_string
@@ -1768,25 +1723,6 @@ WHILE:
     is( $S2, "foo", 'bnots COW' )
 .end
 
-.sub transcode_to_utf8
-    skip( 2, "no more transcode" )
-    # set $S1, "ASCII is the same as UTF8\n"
-    # find_encoding $I1, "utf8"
-    # transcode $S2, $S1, $I1
-    # is( $S1, "ASCII is the same as UTF8", 'transcode to utf8' )
-    # is( $S2, "ASCII is the same as UTF8", 'transcode to utf8' )
-.end
-
-.sub string_chartype
-    skip( 1, "no more chartype" )
-
-    # set $S0, "Test String"
-    # find_chartype $I0, "usascii"
-    # set_chartype $S0, $I0
-    # string_chartype $I1, $S0
-    # is( $I0, $I1, 'string_chartype' )
-.end
-
 .sub split_on_empty_string
     split $P1, "", ""
     set $I1, $P1
@@ -1863,19 +1799,6 @@ WHILE:
     eq_addr $S1, $S0, OK1
       set $I99, 0
   OK1:
-    ok($I99, 'eq_addr/ne_addr')
-
-    set $S1, "Test"
-    set $I99, 0
-    eq_addr $S1, $S0, BAD2
-      set $I99, 1
-  BAD2:
-    ok($I99, 'eq_addr/ne_addr')
-
-    set $I99, 1
-    ne_addr $S1, $S0, OK3
-      set $I99, 0
-  OK3:
     ok($I99, 'eq_addr/ne_addr')
 
     set $S0, $S1

@@ -167,9 +167,9 @@ Retrieves the C<type> attribute of this event handler.
         Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
 
         if (e)
-            return Parrot_str_copy(INTERP, e->type);
+            return e->type;
 
-        return string_from_literal(INTERP, "");
+        return CONST_STRING(INTERP, "");
     }
 
 /*

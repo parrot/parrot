@@ -2559,11 +2559,11 @@ tags.emacs.dummy:
 tags-vi: tags.vi.dummy
 	$(RM_F) tags
 	@ctags@ \
-    --links=no --totals \
-    -R --exclude=blib --exclude=.svn  \
-    --languages=c,perl --langmap=c:+.h,c:+.pmc,c:+.ops \
-    -I NOTNULL,NULLOK,ARGIN,ARGMOD,ARGOUT,ARGINOUT,ARGIN_NULLOK,ARGOUT_NULLOK,ARGMOD_NULLOK,ARGFREE,ARGFREE_NOTNULL \
-    .
+	--links=no --totals \
+	-R --exclude=blib --exclude=.svn  \
+	--languages=c,perl --langmap=c:+.h,c:+.pmc,c:+.ops \
+	-I NOTNULL,NULLOK,ARGIN,ARGMOD,ARGOUT,ARGINOUT,ARGIN_NULLOK,ARGOUT_NULLOK,ARGMOD_NULLOK,ARGFREE,ARGFREE_NOTNULL \
+	.
 	$(PERL) $(BUILD_TOOLS_DIR)/addopstags.pl $(OPS_FILES)
 
 tags.vi.dummy:
@@ -2575,6 +2575,7 @@ perlcritic:
 
 # Andy's extra-cranky Perl::Critic checking for cage cleaners
 cagecritic:
+	@perl -MPerl::Critic::Bangs -e'$$min=q{1.04};die qq{You need Bangs $$min} unless $$Perl::Critic::Bangs::VERSION ge $$min'
 	perlcritic -1 --profile tools/util/perlcritic-cage.conf $(CRITIC_FILES)
 
 # This target will eventually create all the headers automatically.  If you

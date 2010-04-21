@@ -1509,7 +1509,7 @@ appended.
 
     VTABLE STRING *get_repr() {
         STRING *s = SELF.get_string();
-        return Parrot_str_append(INTERP, s, Parrot_str_new(interp, "N", 1));
+        return Parrot_str_concat(INTERP, s, Parrot_str_new(interp, "N", 1));
     }
 /*
 
