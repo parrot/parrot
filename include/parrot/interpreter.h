@@ -149,18 +149,6 @@ struct _imc_info_t;
 struct _Thread_data;    /* in thread.h */
 struct _Caches;         /* caches .h */
 
-typedef struct _Prederef_branch {       /* item for recording branches */
-    size_t offs;                        /* offset in code */
-    void  *op;                          /* opcode at that position */
-} Prederef_branch;
-
-typedef struct _Prederef {
-    void **code;                        /* prederefed code */
-    Prederef_branch *branches;          /* list of branches in code */
-    size_t n_branches;                  /* entries in that list */
-    size_t n_allocated;                 /* allocated size of it */
-} Prederef;
-
 /* Get Context from interpreter */
 #define CONTEXT(interp)         Parrot_pcc_get_context_struct((interp), (interp)->ctx)
 
