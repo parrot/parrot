@@ -356,7 +356,7 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $P0.'add_attribute'('show_count')
 .end
 
-.sub 'init' :vtable
+.sub 'init' :vtable :nsentry
     $P0 = getattribute self, 'show_count'
     unless null $P0 goto L1
     $P0 = new 'Boolean'

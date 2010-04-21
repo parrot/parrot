@@ -73,7 +73,7 @@ end L<http://search.cpan.org/~wonko/TAP-Harness-Archive/>.
     setattribute self, 'formatter', formatter
 .end
 
-.sub 'runtests' :method
+.sub 'runtests' :method :nsentry
     .param pmc tests
     $P0 = getattribute self, 'formatter'
     unless null $P0 goto L1
