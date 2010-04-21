@@ -79,7 +79,7 @@ static size_t calculate_registers_size(SHIM_INTERP,
     ARGIN(const UINTVAL *number_regs_used))
         __attribute__nonnull__(2);
 
-static void clear_regs(PARROT_INTERP, ARGMOD(PMC *pmcctx))
+static void clear_regs(PARROT_INTERP, ARGMOD(Parrot_Context *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmcctx);
@@ -253,11 +253,10 @@ values, for debugging purposes.
 */
 
 static void
-clear_regs(PARROT_INTERP, ARGMOD(PMC *pmcctx))
+clear_regs(PARROT_INTERP, ARGMOD(Parrot_Context *ctx))
 {
     ASSERT_ARGS(clear_regs)
     UINTVAL i;
-    Parrot_Context *ctx = get_context_struct_fast(interp, pmcctx);
 
     /* NULL out registers - P/S have to be NULL for GC
      *
@@ -350,7 +349,7 @@ init_context(PARROT_INTERP, ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
     }
 
     /* other stuff is set inside Sub.invoke */
-    clear_regs(interp, pmcctx);
+    clear_regs(interp, ctx);
 }
 
 
@@ -488,7 +487,7 @@ allocate_registers(PARROT_INTERP, ARGIN(PMC *pmcctx), ARGIN(const UINTVAL *numbe
     /* ctx.bp_ps points to S0, which has Px on the left */
     ctx->bp_ps.regs_s = (STRING **)((char *)ctx->registers + size_nip);
 
-    clear_regs(interp, pmcctx);
+    clear_regs(interp, ctx);
 }
 
 
