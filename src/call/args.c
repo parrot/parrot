@@ -804,8 +804,6 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
     }
 
     /* First iterate over positional args and positional parameters. */
-    arg_index       = 0;
-    param_index     = 0;
     GETATTR_CallContext_num_positionals(interp, call_object, positional_args);
 
     while (1) {
