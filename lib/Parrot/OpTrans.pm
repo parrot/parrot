@@ -85,11 +85,6 @@ sub core_type {
     die ref($self) . " doesn't have core_type()";
 }
 
-=item C<core_prefix()>
-
-Implemented in subclasses to return a short prefix indicating the core
-type used to individuate core function names.
-
 =item C<run_core_func_decl($base)>
 
 Optionally implemented in subclasses to return the C code for the run

@@ -407,12 +407,6 @@ imcc_get_optimization_description(const PARROT_INTERP, int opt_level, ARGMOD(cha
     if (opt_level & OPT_SUB)
         opt_desc[i++] = 'c';
 
-    if (PARROT_RUNCORE_JIT_OPS_TEST(interp->run_core))
-        opt_desc[i++] = 'j';
-
-    if (PARROT_RUNCORE_PREDEREF_OPS_TEST(interp->run_core))
-        opt_desc[i++] = 't';
-
     opt_desc[i] = '\0';
     return;
 }

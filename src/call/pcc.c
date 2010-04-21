@@ -356,9 +356,6 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
         Parrot_runcore_t *old_core = interp->run_core;
         const opcode_t offset = dest - interp->code->base.data;
 
-        if (PARROT_RUNCORE_PREDEREF_OPS_TEST(interp->run_core))
-            Parrot_runcore_switch(interp, CONST_STRING(interp, "slow"));
-
         runops(interp, offset);
         Interp_core_SET(interp, old_core);
     }

@@ -684,12 +684,6 @@ run_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
     Parrot_runcore_t *old_core = interp->run_core;
     PMC              *retval   = PMCNULL;
 
-    /* turn off JIT and prederef - both would act on the whole
-     * PackFile which probably isn't worth the effort */
-    if (PARROT_RUNCORE_JIT_OPS_TEST(interp->run_core)
-    ||  PARROT_RUNCORE_PREDEREF_OPS_TEST(interp->run_core))
-        Parrot_runcore_switch(interp, CONST_STRING(interp, "fast"));
-
     Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp),
             interp->code->const_table->constants);
 

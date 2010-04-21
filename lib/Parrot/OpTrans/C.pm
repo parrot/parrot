@@ -33,16 +33,6 @@ sub core_type {
     return 'PARROT_FUNCTION_CORE';
 }
 
-=item C<core_prefix()>
-
-Returns an empty string.
-
-=cut
-
-sub core_prefix {
-    return "";
-}
-
 =item C<defines()>
 
 Returns the C C<#define> macros for register access etc.

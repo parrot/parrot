@@ -39,9 +39,6 @@ typedef enum Parrot_runcore_flags {
     RUNCORE_REENTRANT_FLAG    = 1 << 0,
     RUNCORE_FUNC_TABLE_FLAG   = 1 << 1,
     RUNCORE_EVENT_CHECK_FLAG  = 1 << 2,
-    RUNCORE_PREDEREF_OPS_FLAG = 1 << 3,
-    RUNCORE_CGOTO_OPS_FLAG    = 1 << 4,
-    RUNCORE_JIT_OPS_FLAG      = 1 << 5
 } Parrot_runcore_flags;
 
 
@@ -59,21 +56,6 @@ typedef enum Parrot_runcore_flags {
     Runcore_flag_TEST(runcore, RUNCORE_EVENT_CHECK_FLAG)
 #define PARROT_RUNCORE_EVENT_CHECK_SET(runcore) \
     Runcore_flag_SET(runcore, RUNCORE_EVENT_CHECK_FLAG)
-
-#define PARROT_RUNCORE_PREDEREF_OPS_TEST(runcore) \
-    Runcore_flag_TEST(runcore, RUNCORE_PREDEREF_OPS_FLAG)
-#define PARROT_RUNCORE_PREDEREF_OPS_SET(runcore) \
-    Runcore_flag_SET(runcore, RUNCORE_PREDEREF_OPS_FLAG)
-
-#define PARROT_RUNCORE_CGOTO_OPS_TEST(runcore) \
-    Runcore_flag_TEST(runcore, RUNCORE_CGOTO_OPS_FLAG)
-#define PARROT_RUNCORE_CGOTO_OPS_SET(runcore) \
-    Runcore_flag_SET(runcore, RUNCORE_CGOTO_OPS_FLAG)
-
-#define PARROT_RUNCORE_JIT_OPS_TEST(runcore) \
-    Runcore_flag_TEST(runcore, RUNCORE_JIT_OPS_FLAG)
-#define PARROT_RUNCORE_JIT_OPS_SET(runcore) \
-    Runcore_flag_SET(runcore, RUNCORE_JIT_OPS_FLAG)
 
 /* HEADERIZER BEGIN: src/runcore/main.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
