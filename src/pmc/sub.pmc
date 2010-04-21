@@ -392,8 +392,10 @@ Invokes the subroutine.
         pc                   = sub->seg->base.data + sub->start_offs;
         INTERP->current_cont = NULL;
 
-        if (ccont == NEED_CONTINUATION)
-            ccont = new_ret_continuation_pmc(interp, (opcode_t *)next);
+        if (ccont == NEED_CONTINUATION) {
+            ccont = pmc_new(interp, enum_class_Continuation);
+            VTABLE_set_pointer(interp, ccont, next);
+        }
 
         PARROT_ASSERT(!PMC_IS_NULL(ccont));
 
@@ -421,12 +423,9 @@ Invokes the subroutine.
         PARROT_CONTINUATION(ccont)->from_ctx = context;
 
         /* if this is an outer sub, then we need to set sub->ctx
-         * to the new context (refcounted) and convert the
-         * retcontinuation to a normal continuation.  */
+         * to the new context (refcounted) */
         if (PObj_get_FLAGS(SELF) & SUB_FLAG_IS_OUTER) {
             sub->ctx = context;
-            /* convert retcontinuation to a continuation */
-            ccont->vtable = interp->vtables[enum_class_Continuation];
         }
 
         /* create pad if needed

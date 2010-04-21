@@ -508,7 +508,6 @@ lp:
 
 # coro context and invalid return continuations
 # this is a stripped down version of imcc/t/syn/pcc_16
-# s. also src/pmc/retcontinuation.pmc
 
 .sub coro_context_ret_continuation
     .const 'Sub' $P0 = "co1"

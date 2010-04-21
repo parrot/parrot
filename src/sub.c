@@ -49,60 +49,6 @@ mark_context_start(void)
 
 /*
 
-=item C<PMC * new_ret_continuation_pmc(PARROT_INTERP, opcode_t *address)>
-
-Returns a new C<RetContinuation> PMC, and sets address field to C<address>
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-PMC *
-new_ret_continuation_pmc(PARROT_INTERP, ARGIN_NULLOK(opcode_t *address))
-{
-    ASSERT_ARGS(new_ret_continuation_pmc)
-    PMC* const continuation = Parrot_pmc_new(interp, enum_class_RetContinuation);
-    VTABLE_set_pointer(interp, continuation, address);
-    return continuation;
-}
-
-/*
-
-=item C<void invalidate_retc_context(PARROT_INTERP, PMC *cont)>
-
-Make true Continuations from all RetContinuations up the call chain.
-
-=cut
-
-*/
-
-void
-invalidate_retc_context(PARROT_INTERP, ARGMOD(PMC *cont))
-{
-    ASSERT_ARGS(invalidate_retc_context)
-
-    PMC *ctx = PARROT_CONTINUATION(cont)->from_ctx;
-    cont = Parrot_pcc_get_continuation(interp, ctx);
-
-    while (1) {
-        /*
-         * We  stop if we encounter a true continuation, because
-         * if one were created, everything up the chain would have been
-         * invalidated earlier.
-         */
-        if (!cont || cont->vtable != interp->vtables[enum_class_RetContinuation])
-            break;
-        cont->vtable = interp->vtables[enum_class_Continuation];
-        ctx  = Parrot_pcc_get_caller_ctx(interp, ctx);
-        cont = Parrot_pcc_get_continuation(interp, ctx);
-    }
-}
-
-/*
-
 =item C<STRING* Parrot_full_sub_name(PARROT_INTERP, PMC* sub_pmc)>
 
 Return namespace, name, and location of subroutine.

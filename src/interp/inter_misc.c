@@ -283,9 +283,6 @@ interpinfo_p(PARROT_INTERP, INTVAL what)
       case CURRENT_CONT:
         {
             PMC * const cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
-            if (!PMC_IS_NULL(cont) && cont->vtable->base_type ==
-                    enum_class_RetContinuation)
-                return VTABLE_clone(interp, cont);
             return cont;
         }
       case CURRENT_OBJECT:
