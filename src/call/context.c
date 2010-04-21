@@ -269,7 +269,7 @@ clear_regs(PARROT_INTERP, ARGMOD(PMC *pmcctx))
     }
 
     for (i = 0; i < ctx->n_regs_used[REGNO_STR]; i++) {
-        ctx->bp_ps.regs_s[i] = NULL;
+        ctx->bp_ps.regs_s[i] = STRINGNULL;
     }
 
     if (Interp_debug_TEST(interp, PARROT_REG_DEBUG_FLAG)) {
