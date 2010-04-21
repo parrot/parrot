@@ -61,6 +61,10 @@ pmclass Hash provides hash auto_attrs {
 
 Initializes the instance.
 
+=item C<void init_int(INTVAL value_type)>
+
+Initializes the instance with the value_type provided.
+
 =item C<void destroy()>
 
 Free hash structure.
@@ -74,6 +78,19 @@ Free hash structure.
             (Parrot_Hash_attributes *) PMC_data(SELF);
 
         attr->hash            = parrot_new_hash(INTERP);
+        attr->hash->container = SELF;
+        PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+    VTABLE void init_int(INTVAL value_type) {
+        Parrot_Hash_attributes * const attr =
+            (Parrot_Hash_attributes *) PMC_data(SELF);
+
+        attr->hash = parrot_create_hash(INTERP,
+                (PARROT_DATA_TYPE)value_type,
+                Hash_key_type_STRING,
+                STRING_compare,
+                (hash_hash_key_fn)key_hash_STRING);
         attr->hash->container = SELF;
         PObj_custom_mark_destroy_SETALL(SELF);
     }

@@ -64,7 +64,7 @@ subroutine.
         PARROT_ASSERT(PObj_constant_TEST(SELF));
 
         /* Set value type to INTVAL */
-        Parrot_pcc_invoke_method_from_c_args(interp, SELF, CONST_STRING(INTERP, "set_value_type"), "I->", (INTVAL)enum_type_INTVAL);
+        SELF.init_int((INTVAL)enum_type_INTVAL);
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
