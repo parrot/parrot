@@ -19,7 +19,7 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 19;
+use Test::More tests => 15;
 use Carp;
 use Cwd;
 use File::Copy;

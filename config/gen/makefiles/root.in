@@ -170,7 +170,7 @@ GEN_CONFIGS = \
     parrot.pc \
     compilers/imcc/imcc.y.flag \
     compilers/imcc/imcc.l.flag \
-    src/ops/core_ops.c 
+    src/ops/core_ops.c
 
 GEN_PASM_INCLUDES = \
 	runtime/parrot/include/cclass.pasm \
@@ -1703,13 +1703,12 @@ coretest : corevm
 check : test
 
 # Test various run cores and other stuff
-# 'testC', 'testg' and 'testj' are tested only
+# 'testg' and 'testj' are tested only
 # when the needed runcores are available
 fulltest :
 	-@make@ testb \
 	testf \
 	testr \
-	testS \
 	src_tests \
 	run_tests \
 	buildtools_tests \
@@ -1725,10 +1724,6 @@ fulltest :
 # bounds checking, slow core
 testb : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -b $(RUNCORE_TEST_FILES)
-
-# CGP core
-testC : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) -C $(RUNCORE_TEST_FILES)
 
 # fast core
 testf : test_prep
@@ -1749,18 +1744,6 @@ testj : test_prep
 # normal core, write and run Parrot Byte Code
 testr : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -r $(RUNCORE_TEST_FILES)
-
-# switched core
-testS : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) -S $(RUNCORE_TEST_FILES)
-
-# Computed goto jitted core - target retained, but falls back to standard core
-testCj : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(RUNCORE_TEST_FILES)
-
-# switched jitted core - target retained, but falls back to standard core
-testSj : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(RUNCORE_TEST_FILES)
 
 # test the EXEC stuff
 testexec: test_prep
@@ -2287,7 +2270,6 @@ cover: \
     cover-testb \
     cover-testf \
     cover-testr \
-    cover-testS \
     cover-src \
     cover-run \
     cover-perl \
@@ -2315,9 +2297,6 @@ cover.dummy:
 cover-testb: cover.dummy
 	-@make@ testb
 
-cover-testC: cover.dummy
-	-@make@ testC
-
 cover-testf: cover.dummy
 	-@make@ testf
 
@@ -2329,9 +2308,6 @@ cover-testj: cover.dummy
 
 cover-testr: cover.dummy
 	-@make@ testr
-
-cover-testS: cover.dummy
-	-@make@ testS
 
 cover-src: cover.dummy
 	-@make@ src_tests

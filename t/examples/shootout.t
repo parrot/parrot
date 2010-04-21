@@ -74,15 +74,13 @@ foreach my $script (@shootouts) {
         $args =~ s/-j/-C/;
         $args =~ s/-Cj/-C/;
     }
-    unless ( $PConfig{cg_flag} =~ /HAVE/ ) {
-        $args =~ s/-Cj/-j/;
+    $args =~ s/-Cj/-j/;
 
-        # Remove any plain -C option.
-        $args =~ s/(^|\s)-C(\s|$)/$1$2/;
+    # Remove any plain -C option.
+    $args =~ s/(^|\s)-C(\s|$)/$1$2/;
 
-        # Remove any extra Cs still floating around
-        $args =~ s/C//;
-    }
+    # Remove any extra Cs still floating around
+    $args =~ s/C//;
 
     # look for input files
     my $input = "$file$INPUT_EXT";

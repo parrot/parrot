@@ -4281,9 +4281,6 @@ Return the whole config
     flags .= " "
     $S0 = $P0['cc_hasjit']
     flags .= $S0
-    flags .= " "
-    $S0 = $P0['cg_flag']
-    flags .= $S0
     .return (flags)
 .end
 

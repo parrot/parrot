@@ -38,7 +38,6 @@ struct runcore_t {
 typedef enum Parrot_runcore_flags {
     RUNCORE_REENTRANT_FLAG    = 1 << 0,
     RUNCORE_FUNC_TABLE_FLAG   = 1 << 1,
-    RUNCORE_EVENT_CHECK_FLAG  = 1 << 2,
 } Parrot_runcore_flags;
 
 
@@ -51,11 +50,6 @@ typedef enum Parrot_runcore_flags {
     Runcore_flag_TEST(runcore, RUNCORE_FUNC_TABLE_FLAG)
 #define PARROT_RUNCORE_FUNC_TABLE_SET(runcore) \
     Runcore_flag_SET(runcore, RUNCORE_FUNC_TABLE_FLAG)
-
-#define PARROT_RUNCORE_EVENT_CHECK_TEST(runcore) \
-    Runcore_flag_TEST(runcore, RUNCORE_EVENT_CHECK_FLAG)
-#define PARROT_RUNCORE_EVENT_CHECK_SET(runcore) \
-    Runcore_flag_SET(runcore, RUNCORE_EVENT_CHECK_FLAG)
 
 /* HEADERIZER BEGIN: src/runcore/main.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

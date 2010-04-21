@@ -54,9 +54,6 @@ static void notify_func_table(PARROT_INTERP,
 static void stop_prederef(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void turn_ev_check(PARROT_INTERP, int on)
-        __attribute__nonnull__(1);
-
 #define ASSERT_ARGS_dynop_register_switch __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_get_dynamic_op_lib_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -65,8 +62,6 @@ static void turn_ev_check(PARROT_INTERP, int on)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(table))
 #define ASSERT_ARGS_stop_prederef __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_turn_ev_check __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -163,44 +158,6 @@ Parrot_runcore_switch(PARROT_INTERP, ARGIN(STRING *name))
 
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
         "Invalid runcore %Ss requested\n", name);
-}
-
-
-/*
-
-=item C<static void turn_ev_check(PARROT_INTERP, int on)>
-
-Turn on or off event checking for prederefed cores.
-
-Fills in the C<event_checker> opcode, or restores original ops in all
-branch locations of the opcode stream.
-
-Note that when C<on> is true, this is being called from the event
-handler thread.
-
-=cut
-
-*/
-
-static void
-turn_ev_check(PARROT_INTERP, int on)
-{
-    ASSERT_ARGS(turn_ev_check)
-    const Prederef * const pi = &interp->code->prederef;
-    size_t i;
-
-    if (!pi->branches)
-        return;
-
-    for (i = 0; i < pi->n_branches; ++i) {
-        const size_t offs = pi->branches[i].offs;
-        if (on)
-            interp->code->prederef.code[offs] =
-                ((void **)interp->op_lib->op_func_table)
-                            [CORE_OPS_check_events__];
-        else
-            interp->code->prederef.code[offs] = pi->branches[i].op;
-    }
 }
 
 
@@ -575,9 +532,6 @@ notify_func_table(PARROT_INTERP, ARGIN(op_func_t *table), int on)
         PARROT_ASSERT(table);
         interp->op_func_table = table;
     }
-
-    if (PARROT_RUNCORE_EVENT_CHECK_TEST(interp->run_core))
-        turn_ev_check(interp, on);
 }
 
 
