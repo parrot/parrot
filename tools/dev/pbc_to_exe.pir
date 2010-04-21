@@ -217,9 +217,12 @@ MAIN
     .local pmc ifh
     ifh = open infile, 'r'
     unless ifh goto err_infile
-    .local string codestring
+
+    .local pmc codestring
     .local int size
-    codestring = "const Parrot_UInt1 program_code[] = {"
+
+    codestring = new [ 'ResizableStringArray' ]
+    push codestring, "const Parrot_UInt1 program_code[] = {"
     size = 0
 
   read_loop:
@@ -236,13 +239,13 @@ MAIN
     unless pos < pbclength goto code_done
     $I0 = ord pbcstring, pos
     $S0 = $I0
-    codestring .= $S0
-    codestring .= ','
+    push codestring, $S0
+    push codestring, ','
     inc pos
     inc size
     $I0 = size % 32
     unless $I0 == 0 goto code_loop
-    codestring .= "\n"
+    push codestring, "\n"
     goto code_loop
   code_done:
     goto read_loop
@@ -250,19 +253,19 @@ MAIN
   read_done:
     close ifh
 
-    codestring .= "\n};\n\n"
-    codestring .= "const int bytecode_size = "
+    push codestring, "\n};\n\nconst int bytecode_size = "
     $S0 = size
-    codestring .= $S0
-    codestring .= ";\n"
-    codestring .= <<'END_OF_FUNCTION'
+    push codestring, $S0
+    push codestring, ";\n"
+    push codestring, <<'END_OF_FUNCTION'
         const void * get_program_code(void)
         {
             return program_code;
         }
 END_OF_FUNCTION
 
-    .return (codestring)
+    $S0 = join '', codestring
+    .return ($S0)
 
   err_infile:
     die "cannot open infile"
