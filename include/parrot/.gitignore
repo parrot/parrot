@@ -1,0 +1,12 @@
+/*.tmp
+/config.h
+/core_pmcs.h
+/extend_vtable.h
+/feature.h
+/has_header.h
+/platform.h
+/platform_interface.h
+/vtable.h
+/pbcversion.h
+/platform_limits.h
+/opsenum.h

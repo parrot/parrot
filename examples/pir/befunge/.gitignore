@@ -1,0 +1,9 @@
+/MANIFEST
+/*.pbc
+/*.c
+/*.o
+/*.obj
+/*.exe
+/*.iss
+/befunge
+/installable_befunge

@@ -1,0 +1,13 @@
+/*.dylib
+/libnci.*
+/*.bundle
+/*.so
+/*.exe
+/*.pdb
+/*.ilk
+/*.def
+/*.lib
+/*.obj
+/*.exp
+/*.dll
+/*.manifest

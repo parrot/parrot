@@ -1,0 +1,17 @@
+/*.bundle
+/*.c
+/*.dump
+/*.dylib
+/*.h
+/*.so
+/Makefile
+/*.o
+/*.exe
+/*.pdb
+/*.ilk
+/*.def
+/*.lib
+/*.obj
+/*.exp
+/*.dll
+/*.manifest

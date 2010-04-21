@@ -1,0 +1,10 @@
+/*.flag
+/*.o
+/*.tmp
+/imcc
+/imclexer.c
+/imcparser.c
+/imcparser.h
+/imcparser.output
+/*.obj
+/Rules.mak

@@ -1,0 +1,10 @@
+/MANIFEST
+/*.pbc
+/*.c
+/*.o
+/*.obj
+/*.exe
+/*.iss
+/abc
+/installable_abc
+/man
