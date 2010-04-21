@@ -2575,16 +2575,6 @@ byte_code_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
     ASSERT_ARGS(byte_code_destroy)
     PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
 
-    if (byte_code->prederef.code) {
-        Parrot_free_memalign(byte_code->prederef.code);
-        byte_code->prederef.code = NULL;
-
-        if (byte_code->prederef.branches) {
-            mem_gc_free(interp, byte_code->prederef.branches);
-            byte_code->prederef.branches = NULL;
-        }
-    }
-
     byte_code->fixups      = NULL;
     byte_code->const_table = NULL;
     byte_code->debugs      = NULL;
