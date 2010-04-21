@@ -56,16 +56,16 @@ subroutine.
     }
 
     VTABLE void init() {
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                "Cannot create a LexInfo PMC without an initializer");
-    }
-
-    VTABLE void init_pmc(PMC *sub) {
         PARROT_ASSERT(PObj_constant_TEST(SELF));
 
         /* Set value type to INTVAL */
         Parrot_pcc_invoke_method_from_c_args(interp, SELF, CONST_STRING(INTERP, "set_value_type"), "I->", (INTVAL)enum_type_INTVAL);
         PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+    VTABLE void init_pmc(PMC *sub) {
+        UNUSED(sub);
+        SELF.init();
     }
 
 /*
@@ -125,41 +125,6 @@ C<symbols>, which gets an array of the names of the symbols in this lexpad.
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Unknown introspection value '%S'", what);
     }
-
-/*
-
-=item C<void visit(PMC *info)>
-
-=item C<void freeze(PMC *info)>
-
-=item C<void thaw(PMC *info)>
-
-Freeze/thaw interface used during freeze/thaw of the Sub PMC.
-The implementation of the Hash PMC is called.
-
-=cut
-
-*/
-
-
-    VTABLE void thaw(PMC *info) {
-        const INTVAL elems  = VTABLE_shift_integer(INTERP, info);
-        const INTVAL k_type = VTABLE_shift_integer(INTERP, info);
-        const INTVAL v_type = VTABLE_shift_integer(INTERP, info);
-        Hash        *hash;
-
-        UNUSED(k_type);
-        UNUSED(v_type);
-
-        PARROT_ASSERT(v_type == enum_hash_int);
-        /* TODO make a better interface for hash creation
-         * TODO create hash with needed types in the first place
-         */
-
-        SELF.init_pmc(NULL);
-        hash          = (Hash *)SELF.get_pointer();
-        hash->entries = elems;
-    }
 }
 
 
@@ -169,7 +134,7 @@ The implementation of the Hash PMC is called.
 
 =head1 SEE ALSO
 
-F<docs/pdds/pdd20_lexical_vars.pod>, F<src/classes/lexpad.pmc>.
+F<docs/pdds/pdd20_lexical_vars.pod>, F<src/pmc/lexpad.pmc>.
 
 =cut
 
