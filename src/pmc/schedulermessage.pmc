@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -114,7 +114,10 @@ Retrieve the message ID.
 */
 
     VTABLE INTVAL get_integer() {
-        Parrot_SchedulerMessage_attributes * core_struct = PARROT_SCHEDULERMESSAGE(SELF);
+        const Parrot_SchedulerMessage_attributes * const
+            core_struct = PARROT_SCHEDULERMESSAGE(SELF);
+        UNUSED(interp);
+
         return core_struct->id;
     }
 
@@ -129,7 +132,8 @@ Set the message ID.
 */
 
     VTABLE void set_integer_native(INTVAL value) {
-        Parrot_SchedulerMessage_attributes * core_struct = PARROT_SCHEDULERMESSAGE(SELF);
+        Parrot_SchedulerMessage_attributes * const core_struct = PARROT_SCHEDULERMESSAGE(SELF);
+        UNUSED(interp);
         core_struct->id = value;
     }
 
@@ -145,7 +149,9 @@ Retrieve the message type.
 */
 
     STRING *  get_string() {
-        Parrot_SchedulerMessage_attributes * core_struct = PARROT_SCHEDULERMESSAGE(SELF);
+        const Parrot_SchedulerMessage_attributes * const core_struct =
+            PARROT_SCHEDULERMESSAGE(SELF);
+        UNUSED(interp);
         return core_struct->type;
     }
 
@@ -160,7 +166,8 @@ Set the message type.
 */
 
     VTABLE void set_string_native(STRING *value) {
-        Parrot_SchedulerMessage_attributes * core_struct = PARROT_SCHEDULERMESSAGE(SELF);
+        Parrot_SchedulerMessage_attributes * const core_struct = PARROT_SCHEDULERMESSAGE(SELF);
+        UNUSED(interp);
         core_struct->type = value;
     }
 
