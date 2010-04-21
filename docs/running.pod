@@ -135,12 +135,8 @@ Select the runcore. The following cores are available in Parrot, but not all
 may be available on your system:
 
   slow, bounds  bounds checking core (default)
-  cgoto         computed goto core
-  cgp           computed goto-predereferenced core
-  fast          fast core (no bounds checking, profiling, or tracing)
   gcdebug       performs a full GC run before every op dispatch (good for
                 debugging GC problems)
-  switch        switch core
   trace         bounds checking core w/ trace info (see 'parrot --help-debug')
   profiling     see F<docs/dev/profilling.pod>
 
@@ -248,28 +244,6 @@ for more information.
 
 The trace and profile cores are also based on the "slow" core, doing
 full bounds checking, and also printing runtime information to stderr.
-
-The switched core eschews these tiny op functions in favor of cases in a large
-switch statement:
-
-    switch_runcore( op ):
-        while ( op ):
-            switch *op:
-                case NOP:
-                    ...
-                case STORE:
-                    ...
-                ...
-
-Depending on the C compiler implementation, this may be faster than function
-calling.  On older systems, it may fail to compile altogether.
-
-The computed-goto ("cgoto") runcore avoids the overhead of function
-calls by jumping directly to the address where each opcode's function
-starts.  The computed-goto-prederef ("CGP") core takes this one step
-further by replacing opcode numbers in the bytecode with those opfunc
-addresses.  See "Predereferencing" in F<docs/glossary.pod> for a
-fuller explanation.
 
 =head1 Operation table
 

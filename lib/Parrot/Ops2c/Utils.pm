@@ -89,10 +89,10 @@ sub new {
         return;
     }
     my $class_name = shift @argv;
-    my %is_allowed = map { $_ => 1 } qw(C CGoto CGP CSwitch CPrederef);
+    my %is_allowed = map { $_ => 1 } qw( C );
     unless ( $is_allowed{$class_name} ) {
         print STDERR
-            "Parrot::Ops2c::Utils::new() requires C, CGoto, CGP, CSwitch and/or  CPrederef: $!";
+            "Parrot::Ops2c::Utils::new() requires C: $!";
         return;
     }
 

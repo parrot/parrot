@@ -52,10 +52,7 @@ my $cwd = cwd();
     }
     chdir "src/dynoplibs" or croak "Unable to change to src/dynoplibs: $!";
 
-    test_dynops_nolines( [qw( CGoto    obscure.ops )] );
-    test_dynops_nolines( [qw( CGP      obscure.ops )] );
     test_dynops_nolines( [qw( C        obscure.ops )] );
-    test_dynops_nolines( [qw( CSwitch  obscure.ops )] );
 
     ok( chdir($cwd), "returned to starting directory" );
 }

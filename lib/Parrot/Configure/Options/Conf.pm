@@ -91,7 +91,6 @@ Parrot Options:
    --opcode=(type)      Use the given type for opcodes
    --ops=(files)        Use the given ops files
 
-   --cgoto=0            Don't build cgoto core - recommended when short of mem
    --jitcapable         Use JIT
    --execcapable        Use JIT to emit a native executable
    --without-threads    Build parrot without thread support

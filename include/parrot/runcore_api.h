@@ -152,21 +152,6 @@ oplib_init_f get_core_op_lib_init(SHIM_INTERP,
     ARGIN(Parrot_runcore_t *runcore))
         __attribute__nonnull__(2);
 
-PARROT_CAN_RETURN_NULL
-void * init_prederef(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-void load_prederef(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-void Parrot_runcore_cgoto_init(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-void Parrot_runcore_cgp_init(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 void Parrot_runcore_debugger_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -182,21 +167,8 @@ void Parrot_runcore_gc_debug_init(PARROT_INTERP)
 void Parrot_runcore_slow_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void Parrot_runcore_switch_init(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 #define ASSERT_ARGS_get_core_op_lib_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(runcore))
-#define ASSERT_ARGS_init_prederef __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(runcore))
-#define ASSERT_ARGS_load_prederef __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(runcore))
-#define ASSERT_ARGS_Parrot_runcore_cgoto_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_runcore_cgp_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_runcore_debugger_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_runcore_exec_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -206,8 +178,6 @@ void Parrot_runcore_switch_init(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_runcore_gc_debug_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_runcore_slow_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_runcore_switch_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/runcore/cores.c */

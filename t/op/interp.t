@@ -154,9 +154,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "interpinfo & getinterp: current runcore" )
     $I0 = interpinfo .INTERPINFO_CURRENT_RUNCORE
     if $I0 == .PARROT_FUNCTION_CORE   goto ok1
     if $I0 == .PARROT_FAST_CORE       goto ok1
-    if $I0 == .PARROT_SWITCH_CORE     goto ok1
-    if $I0 == .PARROT_CGOTO_CORE      goto ok1
-    if $I0 == .PARROT_CGP_CORE        goto ok1
     if $I0 == .PARROT_EXEC_CORE       goto ok1
     if $I0 == .PARROT_GC_DEBUG_CORE   goto ok1
     print 'not '

@@ -47,12 +47,9 @@ my $cwd = cwd();
     require Parrot::Ops2c::Utils;
 
     test_single_trans_and_source(q{C});
-    test_single_trans_and_source(q{CGoto});
-    test_single_trans_and_source(q{CGP});
-    test_single_trans_and_source(q{CSwitch});
 
     {
-        local @ARGV = qw( C CGoto CGP CSwitch );
+        local @ARGV = qw( C );
         my $self = Parrot::Ops2c::Utils->new(
             {
                 argv => [@ARGV],
@@ -72,7 +69,7 @@ pass("Completed all tests in $0");
 
 sub test_single_trans_and_source {
     my $trans = shift;
-    my %available = map { $_, 1 } qw( C CGoto CGP CSwitch CPrederef );
+    my %available = map { $_, 1 } qw( C );
     croak "Bad argument $trans to test_single_trans()"
         unless $available{$trans};
 

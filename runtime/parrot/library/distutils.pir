@@ -1276,9 +1276,6 @@ the value is the OPS pathname
 .sub 'get_cores'
     $P0 = new 'Hash'
     $P0['C'] = ''
-#    $P0['CGP'] = '_cgp'
-#    $P0['CGoto'] = '_cg'
-    $P0['CSwitch'] = '_switch'
     .return ($P0)
 .end
 

@@ -74,17 +74,6 @@ sub runstep {
     $conf->data->set( cc_debug => '' );
     $conf->data->add( ' ', ccflags => "-DDISABLE_GC_DEBUG=1 -DNDEBUG" );
 
-    # per file overrides - not every compiler can optimize every file.
-
-    # The src/ops/core_ops*.c files are challenging to optimize.
-    # gcc can usually handle it, but don't assume any other compilers can,
-    # until there is specific evidence otherwise.
-    if ( ! defined($gccversion)) {
-        $conf->data->set('optimize::src/ops/core_ops_cg.c','');
-        $conf->data->set('optimize::src/ops/core_ops_cgp.c','');
-        $conf->data->set('optimize::src/ops/core_ops_switch.c','');
-    }
-
     # TT #405
     if ($conf->data->get('cpuarch') eq 'amd64') {
         $conf->data->set('optimize::src/gc/system.c','');

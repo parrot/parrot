@@ -173,14 +173,6 @@ sub restart_address {
 
 =item C<Parrot::OpTrans>
 
-=item C<Parrot::OpTrans::CGP>
-
-=item C<Parrot::OpTrans::CGoto>
-
-=item C<Parrot::OpTrans::CPrederef>
-
-=item C<Parrot::OpTrans::CSwitch>
-
 =back
 
 =cut

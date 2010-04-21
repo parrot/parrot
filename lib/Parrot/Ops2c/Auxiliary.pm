@@ -12,7 +12,7 @@ sub Usage {
     my $usage_msg = <<USAGE;
     % perl tools/build/ops2c.pl trans [--help] [--no-lines] [--dynamic]
                                       [--core | input.ops [input2.ops ...]]
-       trans := C | CGoto | CGP | CSwitch | CPrederef
+       trans := C
 
 For example:
 

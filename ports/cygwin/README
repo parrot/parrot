@@ -892,7 +892,6 @@ Files included in the =parrot-docs= package:
  /usr/share/doc/parrot/1.0.0/html/config/auto/attributes.pm.html
  /usr/share/doc/parrot/1.0.0/html/config/auto/backtrace.pm.html
  /usr/share/doc/parrot/1.0.0/html/config/auto/byteorder.pm.html
- /usr/share/doc/parrot/1.0.0/html/config/auto/cgoto.pm.html
  /usr/share/doc/parrot/1.0.0/html/config/auto/cpu.pm.html
  /usr/share/doc/parrot/1.0.0/html/config/auto/cpu/i386/auto.pm.html
  /usr/share/doc/parrot/1.0.0/html/config/auto/cpu/ppc/auto.pm.html

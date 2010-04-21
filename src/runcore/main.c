@@ -22,14 +22,9 @@ The runcore API handles running the operations.
 #include "parrot/runcore_api.h"
 #include "parrot/runcore_profiling.h"
 #include "parrot/oplib/core_ops.h"
-#include "parrot/oplib/core_ops_switch.h"
 #include "parrot/oplib/ops.h"
 #include "main.str"
 
-#ifdef HAVE_COMPUTED_GOTO
-#  include "parrot/oplib/core_ops_cg.h"
-#  include "parrot/oplib/core_ops_cgp.h"
-#endif
 #include "parrot/dynext.h"
 #include "pmc/pmc_parrotlibrary.h"
 #include "pmc/pmc_callcontext.h"
@@ -42,12 +37,6 @@ The runcore API handles running the operations.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void dynop_register_switch(PARROT_INTERP, size_t n_old, size_t n_new)
-        __attribute__nonnull__(1);
-
-static void dynop_register_xx(PARROT_INTERP,
-    size_t n_old,
-    size_t n_new,
-    oplib_init_f init_func)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
@@ -69,8 +58,6 @@ static void turn_ev_check(PARROT_INTERP, int on)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_dynop_register_switch __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_dynop_register_xx __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_get_dynamic_op_lib_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lib))
@@ -105,7 +92,6 @@ Parrot_runcore_init(PARROT_INTERP)
 
     Parrot_runcore_slow_init(interp);
     Parrot_runcore_fast_init(interp);
-    Parrot_runcore_switch_init(interp);
 
     Parrot_runcore_exec_init(interp);
     Parrot_runcore_gc_debug_init(interp);
@@ -115,11 +101,6 @@ Parrot_runcore_init(PARROT_INTERP)
 
     /* set the default runcore */
     Parrot_runcore_switch(interp, default_core);
-
-#ifdef HAVE_COMPUTED_GOTO
-    Parrot_runcore_cgp_init(interp);
-    Parrot_runcore_cgoto_init(interp);
-#endif
 }
 
 
@@ -397,9 +378,6 @@ void
 Parrot_runcore_destroy(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_runcore_destroy)
-#ifdef HAVE_COMPUTED_GOTO
-    op_lib_t         *cg_lib;
-#endif
     size_t            num_cores = interp->num_cores;
     size_t            i;
 
@@ -422,19 +400,6 @@ Parrot_runcore_destroy(PARROT_INTERP)
     /* dynop libs */
     if (interp->n_libs <= 0)
         return;
-
-#ifdef HAVE_COMPUTED_GOTO
-    cg_lib = PARROT_CORE_CGP_OPLIB_INIT(interp, 1);
-
-    if (cg_lib->op_func_table)
-        mem_gc_free(interp, cg_lib->op_func_table);
-    cg_lib->op_func_table = NULL;
-
-    cg_lib = PARROT_CORE_CG_OPLIB_INIT(interp, 1);
-    if (cg_lib->op_func_table)
-        mem_gc_free(interp, cg_lib->op_func_table);
-    cg_lib->op_func_table = NULL;
-#endif
 
     mem_gc_free(interp, interp->op_info_table);
     mem_gc_free(interp, interp->op_func_table);
@@ -560,129 +525,10 @@ dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
     core->flags         = OP_FUNC_IS_ALLOCATED | OP_INFO_IS_ALLOCATED;
 
     /* done for plain core */
-#ifdef HAVE_COMPUTED_GOTO
-    dynop_register_xx(interp, n_old, n_new, PARROT_CORE_CGP_OPLIB_INIT);
-    dynop_register_xx(interp, n_old, n_new, PARROT_CORE_CG_OPLIB_INIT);
-#endif
-
     dynop_register_switch(interp, n_old, n_new);
 }
 
 
-/*
-
-=item C<static void dynop_register_xx(PARROT_INTERP, size_t n_old, size_t n_new,
-oplib_init_f init_func)>
-
-Register C<op_lib> with other cores.
-
-=cut
-
-*/
-
-#ifdef HAVE_COMPUTED_GOTO
-
-static void
-dynop_register_xx(PARROT_INTERP,
-        size_t n_old, size_t n_new, oplib_init_f init_func)
-{
-    ASSERT_ARGS(dynop_register_xx)
-    const size_t n_tot    = n_old + n_new;
-    op_func_t   *ops_addr = NULL;
-    op_lib_t    *cg_lib   = init_func(interp, 1);
-
-#  if 0
-    /* related to CG and CGP ops issue below */
-    op_lib_t    *new_lib;
-    STRING *op_variant;
-    oplib_init_f new_init_func;
-    PMC *lib_variant;
-#  endif
-
-    if (cg_lib->flags & OP_FUNC_IS_ALLOCATED) {
-        ops_addr = mem_gc_realloc_n_typed_zeroed(interp,
-                cg_lib->op_func_table, n_tot, n_old, op_func_t);
-    }
-    else {
-        size_t i;
-
-        ops_addr      = mem_gc_allocate_n_zeroed_typed(interp, n_tot, op_func_t);
-        cg_lib->flags = OP_FUNC_IS_ALLOCATED;
-
-        for (i = 0; i < n_old; ++i)
-            ops_addr[i] = cg_lib->op_func_table[i];
-    }
-
-    /*
-     * XXX running CG and CGP ops currently works only via the wrapper
-     *
-     * the problem is:
-     *  The actual runcores cg_core and cgp_core are very big functions.
-     *  The C compiler usually addresses "spilled" registers in the C stack.
-     *  The loaded opcode lib is another possibly big function, but with
-     *  a likely different stack layout. Directly jumping around between
-     *  code locations in these two opcode functions works, but access
-     *  to stack-ed (or spilled) variables fails badly.
-     *
-     *  We would need to prepare the assembly source of the opcode
-     *  lib so that all variable access on the stack has the same
-     *  layout and compile the prepared assembly to ops_cgp?.o
-     *
-     *  The switched core is different anyway, as we can't extend the
-     *  compiled big switch statement with the new cases. We have
-     *  always to use the wrapper__ opcode called from the default case.
-     */
-#  if 0
-    /* check if the lib_pmc exists with a _xx flavor */
-    new_init_func = get_op_lib_init(0, 0, lib_pmc);
-    new_lib       = new_init_func(1);
-    op_variant    = Parrot_sprintf_c(interp, "%s_ops%s",
-                        new_lib->name, cg_lib->suffix);
-    lib_variant   = Parrot_load_lib(interp, op_variant, NULL);
-
-    /* XXX running CG and CGP ops currently works only via the wrapper */
-    if (0 /*lib_variant */) {
-        size_t i;
-
-        new_init_func = get_dynamic_op_lib_init(interp, lib_variant);
-        new_lib       = new_init_func(1);
-
-        for (i = n_old; i < n_tot; ++i)
-            ops_addr[i] = (new_lib->op_func_table)[i - n_old];
-
-        new_lib->op_func_table = ops_addr;
-        new_lib->op_count      = n_tot;
-
-        new_init_func((long) ops_addr);
-    }
-    else
-#  endif
-    {
-        size_t i;
-
-        /* if not install wrappers */
-        /* fill new entries with the wrapper op */
-        for (i = n_old; i < n_tot; ++i)
-            ops_addr[i] = ops_addr[CORE_OPS_wrapper__];
-    }
-
-    /* if we are running this core, update event check ops */
-    if (interp->run_core->id == cg_lib->core_type) {
-        size_t i;
-
-        for (i = n_old; i < n_tot; ++i)
-            interp->evc_func_table[i] =
-                (op_func_t)ops_addr[CORE_OPS_check_events__];
-        interp->save_func_table = ops_addr;
-    }
-
-    /* tell the cg_core about the new jump table */
-    cg_lib->op_func_table = ops_addr;
-    cg_lib->op_count      = n_tot;
-    init_func(interp, (long) ops_addr);
-}
-
-#endif
 
 
 /*
@@ -702,7 +548,7 @@ static void
 dynop_register_switch(PARROT_INTERP, size_t n_old, size_t n_new)
 {
     ASSERT_ARGS(dynop_register_switch)
-    op_lib_t * const lib = PARROT_CORE_SWITCH_OPLIB_INIT(interp, 1);
+    op_lib_t * const lib = PARROT_CORE_OPLIB_INIT(interp, 1);
     lib->op_count        = n_old + n_new;
 }
 

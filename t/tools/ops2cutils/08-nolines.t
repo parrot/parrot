@@ -47,7 +47,7 @@ my $cwd = cwd();
     require Parrot::Ops2c::Utils;
 
     {
-        local @ARGV = qw( C CGoto CGP CSwitch CPrederef );
+        local @ARGV = qw( C );
         my $self = Parrot::Ops2c::Utils->new(
             {
                 argv => [@ARGV],

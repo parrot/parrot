@@ -1,12 +1,6 @@
 DYNOPLIBS_TARGETS = \
-#IF(cg_flag):    $(DYNEXT_DIR)/obscure_ops_cg$(LOAD_EXT) \
-#IF(cg_flag):    $(DYNEXT_DIR)/obscure_ops_cgp$(LOAD_EXT) \
     $(DYNEXT_DIR)/obscure_ops$(LOAD_EXT) \
-    $(DYNEXT_DIR)/obscure_ops_switch$(LOAD_EXT) \
-#IF(cg_flag):    $(DYNEXT_DIR)/math_ops_cg$(LOAD_EXT) \
-#IF(cg_flag):    $(DYNEXT_DIR)/math_ops_cgp$(LOAD_EXT) \
     $(DYNEXT_DIR)/math_ops$(LOAD_EXT) \
-    $(DYNEXT_DIR)/math_ops_switch$(LOAD_EXT)
 
 DYNOPLIBS_CLEANUPS = \
     src/dynoplibs/*.c \

@@ -16,15 +16,9 @@ to all transforms.
 The subclass hierarchy is as follows:
 
     OpTrans
-       |___________
-       |           |
-       C         CGoto
-       |           |
-    CPrederef      |
-       | |         |
-       | |_________|
-       |           |
-    CSwitch       CGP
+       |
+       |
+       C
 
 =head2 Class Methods
 
@@ -221,14 +215,6 @@ Called by C<goto_address()>.
 =over 4
 
 =item C<Parrot::OpTrans::C>
-
-=item C<Parrot::OpTrans::CGP>
-
-=item C<Parrot::OpTrans::CGoto>
-
-=item C<Parrot::OpTrans::CPrederef>
-
-=item C<Parrot::OpTrans::CSwitch>
 
 =back
 

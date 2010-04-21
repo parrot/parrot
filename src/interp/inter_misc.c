@@ -237,12 +237,6 @@ interpinfo(PARROT_INTERP, INTVAL what)
             else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "fast")))
                 return PARROT_FAST_CORE;
             else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "switch")))
-                return PARROT_SWITCH_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "cgp")))
-                return PARROT_CGP_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "cgoto")))
-                return PARROT_CGOTO_CORE;
-            else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "exec")))
                 return PARROT_EXEC_CORE;
             else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "gc_debug")))
                 return PARROT_GC_DEBUG_CORE;

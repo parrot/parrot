@@ -55,10 +55,7 @@ my ( $msg, $tie );
     }
     chdir "src/dynoplibs" or croak "Unable to change to src/dynoplibs: $!";
 
-    test_dynops( [qw( CGoto    obscure.ops )] );
-    test_dynops( [qw( CGP      obscure.ops )] );
     test_dynops( [qw( C        obscure.ops )] );
-    test_dynops( [qw( CSwitch  obscure.ops )] );
 
     {
         my ($self, $stdout, $stderr);
