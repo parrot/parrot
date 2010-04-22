@@ -582,7 +582,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PackFile_Segment * PackFile_find_segment(PARROT_INTERP,
     ARGIN_NULLOK(PackFile_Directory *dir),
-    ARGIN(STRING *name),
+    ARGIN(const STRING *name),
     int sub_dir)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);

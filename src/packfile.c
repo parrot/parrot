@@ -1212,7 +1212,7 @@ PackFile_add_segment(PARROT_INTERP, ARGMOD(PackFile_Directory *dir),
 /*
 
 =item C<PackFile_Segment * PackFile_find_segment(PARROT_INTERP,
-PackFile_Directory *dir, STRING *name, int sub_dir)>
+PackFile_Directory *dir, const STRING *name, int sub_dir)>
 
 Finds the segment with the name C<name> in the C<PackFile_Directory> if
 C<sub_dir> is true, searches directories recursively.  The returned segment is
@@ -1227,7 +1227,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PackFile_Segment *
 PackFile_find_segment(PARROT_INTERP, ARGIN_NULLOK(PackFile_Directory *dir),
-    ARGIN(STRING *name), int sub_dir)
+    ARGIN(const STRING *name), int sub_dir)
 {
     ASSERT_ARGS(PackFile_find_segment)
     if (dir) {
