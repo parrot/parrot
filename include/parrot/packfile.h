@@ -270,7 +270,7 @@ typedef struct PackFile_DebugFilenameMapping {
 typedef struct PackFile_Debug {
     PackFile_Segment        base;
     opcode_t                num_mappings;
-    PackFile_DebugFilenameMapping **mappings;
+    PackFile_DebugFilenameMapping *mappings;
     PackFile_ByteCode      *code;   /* where this segment belongs to */
 } PackFile_Debug;
 

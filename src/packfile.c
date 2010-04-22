@@ -2641,11 +2641,6 @@ pf_debug_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
 {
     ASSERT_ARGS(pf_debug_destroy)
     PackFile_Debug * const debug = (PackFile_Debug *) self;
-    int i;
-
-    /* Free each mapping. */
-    for (i = 0; i < debug->num_mappings; i++)
-        mem_gc_free(interp, debug->mappings[i]);
 
     /* Free mappings pointer array. */
     mem_gc_free(interp, debug->mappings);
@@ -2729,8 +2724,8 @@ pf_debug_pack(SHIM_INTERP, ARGMOD(PackFile_Segment *self), ARGOUT(opcode_t *curs
     /* Now store each mapping. */
     for (i = 0; i < n; i++) {
         /* Bytecode offset and filename. */
-        *cursor++ = debug->mappings[i]->offset;
-        *cursor++ = debug->mappings[i]->filename;
+        *cursor++ = debug->mappings[i].offset;
+        *cursor++ = debug->mappings[i].filename;
     }
 
     return cursor;
@@ -2770,15 +2765,13 @@ pf_debug_unpack(PARROT_INTERP, ARGOUT(PackFile_Segment *self), ARGIN(const opcod
 
     /* Allocate space for mappings vector. */
     debug->mappings = mem_gc_allocate_n_zeroed_typed(interp,
-            debug->num_mappings + 1, PackFile_DebugFilenameMapping *);
+            debug->num_mappings + 1, PackFile_DebugFilenameMapping);
 
     /* Read in each mapping. */
     for (i = 0; i < debug->num_mappings; i++) {
-        /* Allocate struct and get offset and filename type. */
-        debug->mappings[i]           =
-                mem_gc_allocate_zeroed_typed(interp, PackFile_DebugFilenameMapping);
-        debug->mappings[i]->offset   = PF_fetch_opcode(self->pf, &cursor);
-        debug->mappings[i]->filename = PF_fetch_opcode(self->pf, &cursor);
+        /* Get offset and filename type. */
+        debug->mappings[i].offset   = PF_fetch_opcode(self->pf, &cursor);
+        debug->mappings[i].filename = PF_fetch_opcode(self->pf, &cursor);
     }
 
     /* find seg e.g. CODE_DB => CODE and attach it */
@@ -2823,9 +2816,9 @@ pf_debug_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
     for (i = 0; i < debug->num_mappings; i++) {
         Parrot_io_printf(interp, "    #%d\n    [\n", i);
         Parrot_io_printf(interp, "        OFFSET => %d,\n",
-                   debug->mappings[i]->offset);
+                   debug->mappings[i].offset);
         Parrot_io_printf(interp, "        FILENAME => %Ss\n",
-                PF_CONST(debug->code, debug->mappings[i]->filename)->u.string);
+                PF_CONST(debug->code, debug->mappings[i].filename)->u.string);
         Parrot_io_printf(interp, "    ],\n");
     }
 
@@ -2908,7 +2901,7 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
 
     /* If the previous mapping has the same filename, don't record it. */
     if (debug->num_mappings) {
-        prev_filename_n = debug->mappings[debug->num_mappings-1]->filename;
+        prev_filename_n = debug->mappings[debug->num_mappings-1].filename;
         filename_pstr = Parrot_str_new(interp, filename, 0);
         if (ct->constants[prev_filename_n]->type == PFC_STRING &&
                 Parrot_str_equal(interp, filename_pstr,
@@ -2920,18 +2913,18 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
     /* Allocate space for the extra entry. */
     debug->mappings = mem_gc_realloc_n_typed(interp,
             debug->mappings, debug->num_mappings + 1,
-            PackFile_DebugFilenameMapping *);
+            PackFile_DebugFilenameMapping);
 
     /* Can it just go on the end? */
     if (debug->num_mappings == 0
-    ||  offset              >= debug->mappings[debug->num_mappings - 1]->offset)
+    ||  offset              >= debug->mappings[debug->num_mappings - 1].offset)
         insert_pos = debug->num_mappings;
     else {
         /* Find the right place and shift stuff that's after it. */
         int i;
 
         for (i = 0; i < debug->num_mappings; i++) {
-            if (debug->mappings[i]->offset > offset) {
+            if (debug->mappings[i].offset > offset) {
                 insert_pos = i;
                 memmove(debug->mappings + i + 1, debug->mappings + i,
                     debug->num_mappings - i);
@@ -2943,14 +2936,13 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
     /* Need to put filename in constants table. */
     {
         /* Set up new entry and insert it. */
-        PackFile_DebugFilenameMapping *mapping =
-                mem_gc_allocate_zeroed_typed(interp, PackFile_DebugFilenameMapping);
+        PackFile_DebugFilenameMapping *mapping = debug->mappings + insert_pos;
         STRING *namestr = Parrot_str_new_init(interp, filename, strlen(filename),
                 PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET, 0);
         size_t count = ct->const_count;
         size_t i;
 
-        mapping->offset       = offset;
+        mapping->offset = offset;
 
         /* Check if there is already a constant with this filename */
         for (i= 0; i < count; ++i) {
@@ -2978,8 +2970,7 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
         }
 
         /* Set the mapped value */
-        mapping->filename     = count;
-        debug->mappings[insert_pos] = mapping;
+        mapping->filename = count;
         debug->num_mappings         = debug->num_mappings + 1;
     }
 }
@@ -3012,10 +3003,10 @@ Parrot_debug_pc_to_filename(PARROT_INTERP, ARGIN(const PackFile_Debug *debug),
         /* If this is the last mapping or the current position is
            between this mapping and the next one, return a filename. */
        if (i + 1                          == debug->num_mappings
-       || (debug->mappings[i]->offset     <= pc
-       &&  debug->mappings[i + 1]->offset >  pc))
+       || (debug->mappings[i].offset     <= pc
+       &&  debug->mappings[i + 1].offset >  pc))
             return PF_CONST(debug->code,
-                    debug->mappings[i]->filename)->u.string;
+                    debug->mappings[i].filename)->u.string;
     }
 
     /* Otherwise, no mappings == no filename. */

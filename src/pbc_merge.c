@@ -566,8 +566,8 @@ pbc_merge_debugs(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     PackFile_Debug                 *debug_seg;
     opcode_t                       *lines    = mem_gc_allocate_typed(interp,
                                                 opcode_t);
-    PackFile_DebugFilenameMapping **mappings =
-        mem_gc_allocate_typed(interp, PackFile_DebugFilenameMapping *);
+    PackFile_DebugFilenameMapping *mappings =
+        mem_gc_allocate_typed(interp, PackFile_DebugFilenameMapping);
 
     opcode_t num_mappings = 0;
     opcode_t num_lines    = 0;
@@ -591,16 +591,14 @@ pbc_merge_debugs(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         /* Concatenate mappings. */
         mappings = mem_gc_realloc_n_typed(interp, mappings,
                 num_mappings + in_seg->num_mappings,
-                PackFile_DebugFilenameMapping*);
+                PackFile_DebugFilenameMapping);
 
         for (j = 0; j < in_seg->num_mappings; j++) {
-            PackFile_DebugFilenameMapping * const mapping =
-                mem_gc_allocate_typed(interp, PackFile_DebugFilenameMapping);
+            PackFile_DebugFilenameMapping *mapping = mappings + num_mappings + j;
 
-            STRUCT_COPY(mapping, in_seg->mappings[j]);
+            STRUCT_COPY_FROM_STRUCT(mapping, in_seg->mappings[j]);
             mapping->offset   += num_lines;
             mapping->filename += inputs[i]->const_start;
-            mappings[num_mappings + j] = mapping;
         }
 
         num_lines    += in_seg->base.size - 1;

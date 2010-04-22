@@ -1001,12 +1001,12 @@ Parrot_disassemble(PARROT_INTERP, ARGIN(const char *outfile), Parrot_disassemble
 
         /* Parrot_io_fprintf(interp, output, "%i < %i %i == %i \n", curr_mapping,
          * num_mappings, op_code_seq_num,
-         * interp->code->debugs->mappings[curr_mapping]->offset); */
+         * interp->code->debugs->mappings[curr_mapping].offset); */
 
         if (debugs && curr_mapping < num_mappings) {
-            if (op_code_seq_num == interp->code->debugs->mappings[curr_mapping]->offset) {
+            if (op_code_seq_num == interp->code->debugs->mappings[curr_mapping].offset) {
                 const int filename_const_offset =
-                    interp->code->debugs->mappings[curr_mapping]->filename;
+                    interp->code->debugs->mappings[curr_mapping].filename;
                 Parrot_io_fprintf(interp, output, "# Current Source Filename '%Ss'\n",
                         interp->code->const_table->constants[filename_const_offset]->u.string);
                 curr_mapping++;
