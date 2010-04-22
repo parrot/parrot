@@ -918,7 +918,7 @@ JSON
 
     # decode table
     .local pmc compiler
-    load_language 'data_json'
+    load_bytecode 'data_json.pbc'
     compiler = compreg 'data_json'
 
     .local pmc table
