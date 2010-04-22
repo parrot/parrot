@@ -295,7 +295,7 @@ provided, then the new cursor has the same type as lang.
     parrotclass = getattribute $P0, 'parrotclass'
     cur = new parrotclass
 
-    .local pmc from, pos, target, debug
+    .local pmc from, target, debug
 
     from = getattribute self, '$!pos'
     setattribute cur, '$!from', from
@@ -1893,7 +1893,7 @@ An alternate dump output for a Match object and all of its subcaptures.
 # vim: expandtab shiftwidth=4 ft=pir:
 
 ### .include 'src/PAST/Regex.pir'
-# $Id$
+# $Id: Regex.pir 41578 2009-09-30 14:45:23Z pmichaud $
 
 =head1 NAME
 
