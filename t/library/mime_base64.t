@@ -23,7 +23,7 @@ Test cases taken from base64.t of MIME::Base64.
     load_bytecode 'MIME/Base64.pbc'
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Util.pbc'
-    load_bytecode 'data_json.pbc'
+    load_language 'data_json'
 
     .local pmc plan, is, ok
     plan = get_hll_global [ 'Test'; 'More' ], 'plan'
