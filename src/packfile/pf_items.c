@@ -1307,9 +1307,10 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
 {
     ASSERT_ARGS(PF_fetch_string)
     STRING   *s;
-    UINTVAL   flags      = PF_fetch_opcode(pf, cursor);
-    opcode_t  charset_nr = PF_fetch_opcode(pf, cursor);
-    size_t    size       = (size_t)PF_fetch_opcode(pf, cursor);
+    opcode_t  flag_charset_word;
+    UINTVAL   flags;
+    UINTVAL   charset_nr;
+    size_t    size;
     const int wordsize   = pf ? pf->header->wordsize : sizeof (opcode_t);
     const CHARSET *charset;
 
