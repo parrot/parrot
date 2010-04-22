@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -166,7 +166,7 @@ Removes and returns the last element in the array.
 */
 
     VTABLE INTVAL pop_integer() {
-        PMC *pmcval = SELF.pop_pmc();
+        PMC * const pmcval = SELF.pop_pmc();
         return VTABLE_get_integer(INTERP, pmcval);
     }
 
@@ -181,7 +181,7 @@ Removes and returns the last element in the array.
 */
 
     VTABLE FLOATVAL pop_float() {
-        PMC *pmcval = SELF.pop_pmc();
+        PMC * const pmcval = SELF.pop_pmc();
         return VTABLE_get_number(INTERP, pmcval);
     }
 
@@ -238,7 +238,7 @@ Resizes the array to C<size> elements.
             INTVAL cur = i;
 
             if (cur < 8192)
-                cur = new_size < 2 * cur ? 2 * cur : new_size;
+                cur = (new_size < 2 * cur) ? (2 * cur) : new_size;
             else {
                 cur = new_size + 4096;
                 cur &= ~0xfff;
@@ -268,7 +268,7 @@ Creates and returns a copy of the array.
 */
 
     VTABLE PMC *clone() {
-        PMC *copy = SUPER();
+        PMC * const copy = SUPER();
         INTVAL size;
         GET_ATTR_size(interp, SELF, size);
         /* copy trimmed extra space */
@@ -311,8 +311,8 @@ Removes and returns the first element in the array.
 */
 
     VTABLE PMC *shift_pmc() {
-        STRING *strval = SELF.shift_string();
-        PMC    *value  = Parrot_pmc_new(INTERP, enum_class_String);
+        STRING * const strval = SELF.shift_string();
+        PMC    * const value  = Parrot_pmc_new(INTERP, enum_class_String);
 
         VTABLE_set_string_native(INTERP, value, strval);
 
@@ -330,7 +330,7 @@ Removes and returns the first element in the array.
 */
 
     VTABLE INTVAL shift_integer() {
-        PMC *pmcval = SELF.shift_pmc();
+        PMC * const pmcval = SELF.shift_pmc();
         return VTABLE_get_integer(INTERP, pmcval);
     }
 
@@ -345,7 +345,7 @@ Removes and returns the first element in the array.
 */
 
     VTABLE FLOATVAL shift_float() {
-        PMC *pmcval = SELF.shift_pmc();
+        PMC * const pmcval = SELF.shift_pmc();
         return VTABLE_get_number(INTERP, pmcval);
     }
 
@@ -362,7 +362,7 @@ the array.
 */
 
     VTABLE void push_pmc(PMC *value) {
-        STRING *strvalue = VTABLE_get_string(INTERP, value);
+        STRING * const strvalue = VTABLE_get_string(INTERP, value);
         SELF.push_string(strvalue);
     }
 
@@ -378,7 +378,7 @@ the array.
 */
 
     VTABLE void push_integer(INTVAL value) {
-        PMC    *ret = Parrot_pmc_new(INTERP, enum_class_String);
+        PMC    * const ret = Parrot_pmc_new(INTERP, enum_class_String);
         STRING *val;
 
         VTABLE_set_integer_native(INTERP, ret, value);
@@ -398,7 +398,7 @@ the array.
 */
 
     VTABLE void push_float(FLOATVAL value) {
-        PMC    *ret = Parrot_pmc_new(INTERP, enum_class_String);
+        PMC    * const ret = Parrot_pmc_new(INTERP, enum_class_String);
         STRING *val;
 
         VTABLE_set_number_native(INTERP, ret, value);
@@ -474,7 +474,7 @@ the array.
 */
 
     VTABLE void unshift_pmc(PMC *value) {
-        STRING *strvalue = VTABLE_get_string(INTERP, value);
+        STRING * const strvalue = VTABLE_get_string(INTERP, value);
         SELF.unshift_string(strvalue);
     }
 
@@ -490,7 +490,7 @@ the array.
 */
 
     VTABLE void unshift_integer(INTVAL value) {
-        PMC    *ret = Parrot_pmc_new(INTERP, enum_class_String);
+        PMC    * const ret = Parrot_pmc_new(INTERP, enum_class_String);
         STRING *val;
 
         VTABLE_set_integer_native(INTERP, ret, value);
@@ -510,7 +510,7 @@ the array.
 */
 
     VTABLE void unshift_float(FLOATVAL value) {
-        PMC    *ret = Parrot_pmc_new(INTERP, enum_class_String);
+        PMC    * const ret = Parrot_pmc_new(INTERP, enum_class_String);
         STRING *val;
 
         VTABLE_set_number_native(INTERP, ret, value);
@@ -552,7 +552,7 @@ Removes the element at C<*key>.
 */
 
     VTABLE void delete_keyed(PMC *key) {
-        INTVAL    idx  = VTABLE_get_integer(INTERP, key);
+        const INTVAL idx = VTABLE_get_integer(INTERP, key);
         STRING  **str_array;
         UINTVAL   size, i;
 
@@ -642,12 +642,12 @@ end of the array.
 */
 
     METHOD shift() {
-        PMC *value = SELF.shift_pmc();
+        PMC * const value = SELF.shift_pmc();
         RETURN(PMC *value);
     }
 
     METHOD pop() {
-        PMC *value = SELF.pop_pmc();
+        PMC * const value = SELF.pop_pmc();
         RETURN(PMC *value);
     }
 
@@ -680,13 +680,6 @@ Method forms to add a PMC to the beginning or end of the array.
 =head1 SEE ALSO
 
 F<docs/pdds/pdd17_basic_types.pod>.
-
-=head1 HISTORY
-
-Initial version                  - Matt Fowles 2004-06-11
-Changed allocator to double size - Matt Fowles 2004-06-15
-Added push_string                - Bernhard Schmalhofer 2004-10-17
-moved available size to int_val2 - Matt Fowles 2005-07-22
 
 =cut
 

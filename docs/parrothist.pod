@@ -105,4 +105,6 @@ Starred release numbers indicate supported releases.
  chromatic   2.0.0 *        2010-Jan-19     "Inevitable"
  darbelo     2.1.0          2010-Feb-16     "As Scheduled"
  cotto       2.2.0          2010-Mar-16     "Like Clockwork"
+
+ Gerd        2.3.0 *        2010-Apr-20     "Samoan Lory"
 =cut

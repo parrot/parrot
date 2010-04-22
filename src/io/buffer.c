@@ -228,14 +228,13 @@ size_t
 Parrot_io_fill_readbuf(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_fill_readbuf)
-    size_t   got;
-    STRING   fake;
-    STRING  *s    = &fake;
     PIOOFF_T pos  = Parrot_io_get_file_position(interp, filehandle);
-
-    Buffer_bufstart(s) = Parrot_io_get_buffer_start(interp, filehandle);
-    fake.bufused       = Parrot_io_get_buffer_size(interp, filehandle);
-    got                = PIO_READ(interp, filehandle, &s);
+    char    *buf  = (char *) Parrot_io_get_buffer_start(interp, filehandle);
+    size_t   size = Parrot_io_get_buffer_size(interp, filehandle);
+    STRING  *s    = Parrot_str_new_init(interp, buf, size,
+                        PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+                        PObj_external_FLAG);
+    size_t   got  = PIO_READ(interp, filehandle, &s);
 
     /* buffer-filling does not change fileposition */
     Parrot_io_set_file_position(interp, filehandle, pos);
@@ -267,9 +266,10 @@ The buffer layer's C<Read> function.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 size_t
 Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
-              ARGIN(STRING **buf))
+              ARGMOD(STRING **buf))
 {
     ASSERT_ARGS(Parrot_io_read_buffer)
     unsigned char *out_buf, *buffer_start, *buffer_next, *buffer_end;
@@ -292,17 +292,11 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
     if (Parrot_io_get_flags(interp, filehandle) & PIO_F_LINEBUF)
         return Parrot_io_readline_buffer(interp, filehandle, buf);
 
-    if (*buf == NULL) {
-        *buf = Parrot_gc_new_string_header(interp, 0);
-        (*buf)->bufused = len = 2048;
-    }
+    if (*buf == NULL)
+        *buf = Parrot_str_new_noinit(interp, enum_stringrep_one, 2048);
 
-    s   = *buf;
-    len = s->bufused;
-
-    if (!s->strstart)
-        Parrot_gc_allocate_string_storage(interp, s, len);
-
+    s       = *buf;
+    len     = s->bufused;
     out_buf = (unsigned char *)s->strstart;
 
     /* read Data from buffer */
@@ -357,11 +351,6 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         }
 
         got = Parrot_io_fill_readbuf(interp, filehandle);
-
-        /* got is never < 0, but C's type system can't tell */
-        if (got < 0)
-            got = 0;
-
         len = (len < got) ? len : got;
     }
 
@@ -461,6 +450,7 @@ that is what is required.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 size_t
 Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING **buf))
 {

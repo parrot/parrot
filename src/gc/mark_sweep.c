@@ -862,7 +862,7 @@ header_pools_iterate_callback(PARROT_INTERP,
     ASSERT_ARGS(header_pools_iterate_callback)
 
     if (flag & POOL_PMC) {
-        Fixed_Size_Pool *pool = flag & POOL_CONST
+        Fixed_Size_Pool * const pool = flag & POOL_CONST
             ? mem_pools->constant_pmc_pool
             : mem_pools->pmc_pool;
 

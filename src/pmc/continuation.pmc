@@ -78,15 +78,6 @@ Initializes the continuation.
         SET_ATTR_address(INTERP, SELF, NULL);
 
         PObj_custom_mark_SET(SELF);
-
-        /* PANIC("don't do that"); */
-        /*
-         * Whenever we create a continuation, all return continuations
-         * up the call chain may be reused due to invoking the
-         * continuation. To avoid that all return continuations are
-         * converted to true continuations.
-         */
-        invalidate_retc_context(INTERP, SELF);
     }
 
     /*if they pass in a PMC to initialize with*/
@@ -109,15 +100,6 @@ Initializes the continuation.
         SET_ATTR_address(INTERP, SELF, address);
 
         PObj_custom_mark_SET(SELF);
-
-        /* PANIC("don't do that"); */
-        /*
-         * Whenever we create a continuation, all return continuations
-         * up the call chain may be reused due to invoking the
-         * continuation. To avoid that all return continuations are
-         * converted to true continuations.
-         */
-        invalidate_retc_context(INTERP, SELF);
     }
 
 

@@ -220,7 +220,7 @@ END_EXPECTED
 ok 1 - first test
 ok 2 - second test
 ok 3 #skip skipped test
-ok 4 # TODO 42
+ok 4 # TODO todo test
 END_EXPECTED
 
 );

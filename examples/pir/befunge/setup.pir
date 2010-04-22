@@ -55,6 +55,9 @@ SOURCES
     $P0['exe_pbc'] = $P3
     $P0['installable_pbc'] = $P3
 
+    # test
+    $P0['test_exec'] = 'perl'
+
     # dist
     $P4 = glob('*.bef')
     $P0['manifest_includes'] = $P4

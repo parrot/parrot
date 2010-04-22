@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -74,18 +74,19 @@ Parrot_io_read_utf8(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
                 /* need len - 1 more chars */
                 len2--;
-                s2           = NULL;
-                s2           = Parrot_io_make_string(interp, &s2, len2);
+                s2 = Parrot_str_new_init(interp, NULL, len2, Parrot_utf8_encoding_ptr,
+                                         Parrot_unicode_charset_ptr, 0);
                 s2->bufused  = len2;
-                s2->charset  = Parrot_unicode_charset_ptr;
-                s2->encoding = Parrot_utf8_encoding_ptr;
 
                 /* TT #1257: need to check the amount read here? */
                 read = Parrot_io_read_buffer(interp, filehandle, &s2);
                 UNUSED(read);
 
                 s->strlen    = iter.charpos;
-                s            = Parrot_str_append(interp, s, s2);
+                s            = Parrot_str_concat(interp, s, s2);
+                /* String is updated. Poke into iterator to replace old string */
+                iter.str     = s;
+                *buf         = s;
                 len         += len2 + 1;
 
                 /* check last char */
@@ -118,8 +119,7 @@ Parrot_io_write_utf8(PARROT_INTERP, ARGMOD(PMC *filehandle),
     if (s->encoding == Parrot_utf8_encoding_ptr)
         return Parrot_io_write_buffer(interp, filehandle, s);
 
-    dest = Parrot_utf8_encoding_ptr->to_encoding(interp, s,
-            Parrot_gc_new_string_header(interp, 0));
+    dest = Parrot_utf8_encoding_ptr->to_encoding(interp, s);
     return Parrot_io_write_buffer(interp, filehandle, dest);
 }
 

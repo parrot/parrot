@@ -311,8 +311,7 @@ Create PackFile_Annotations* from self.
             PMC * key_array = VTABLE_get_pmc_keyed_str(interp, keys, entity_attrs->name);
             if (PMC_IS_NULL(key_array)) {
                 /* Never see this name before. Create new FIA and add to keys. */
-                key_array = Parrot_pmc_new(interp, enum_class_FixedIntegerArray);
-                VTABLE_set_integer_native(interp, key_array, 3);
+                key_array = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, 3);
                 VTABLE_set_integer_keyed_int(interp, key_array, 0, -1);
                 VTABLE_set_integer_keyed_int(interp, key_array, 1, -1);
                 VTABLE_set_integer_keyed_int(interp, key_array, 2, -1);

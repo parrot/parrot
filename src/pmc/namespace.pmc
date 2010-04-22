@@ -52,6 +52,7 @@ static void add_to_class(PARROT_INTERP,
         FUNC_MODIFIES(*nsinfo)
         FUNC_MODIFIES(*classobj);
 
+PARROT_WARN_UNUSED_RESULT
 static int maybe_add_sub_to_namespace(PARROT_INTERP,
     ARGIN(PMC *SELF),
     ARGIN(STRING *key),
@@ -61,13 +62,15 @@ static int maybe_add_sub_to_namespace(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
+PARROT_WARN_UNUSED_RESULT
 static int ns_insert_sub_keyed_str(PARROT_INTERP,
     ARGIN(PMC *self),
     ARGIN(STRING *key),
-    ARGIN_NULLOK(PMC *value))
+    ARGIN(PMC *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 #define ASSERT_ARGS_add_multi_to_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -90,7 +93,8 @@ static int ns_insert_sub_keyed_str(PARROT_INTERP,
 #define ASSERT_ARGS_ns_insert_sub_keyed_str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
-    , PARROT_ASSERT_ARG(key))
+    , PARROT_ASSERT_ARG(key) \
+    , PARROT_ASSERT_ARG(value))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -116,17 +120,19 @@ add_to_class(PARROT_INTERP, ARGMOD(Parrot_NameSpace_attributes *nsinfo),
     }
 }
 
+PARROT_WARN_UNUSED_RESULT
 static int
 ns_insert_sub_keyed_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *key),
-        ARGIN_NULLOK(PMC *value))
+        ARGIN(PMC *value))
 {
     ASSERT_ARGS(ns_insert_sub_keyed_str)
 
     Parrot_NameSpace_attributes * const nsinfo   = PARROT_NAMESPACE(self);
     PMC              *       vtable   = nsinfo->vtable;
     PMC              * const classobj = VTABLE_get_class(interp, self);
-    STRING           * vtable_key     = NULL;
+    STRING           * vtable_key     = STRINGNULL;
     Parrot_Sub_attributes *sub;
+    INTVAL stored = 0;
 
     PMC_get_sub(interp, value, sub);
 
@@ -151,25 +157,31 @@ ns_insert_sub_keyed_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *key),
             /* Insert it. */
             VTABLE_set_pmc_keyed_int(interp, vtable, sub->vtable_index, value);
         }
+        if (!(sub->comp_flags & SUB_COMP_FLAG_NSENTRY))
+            stored = 1;
     }
 
     if (sub->comp_flags & SUB_COMP_FLAG_METHOD) {
         STRING *method_name = key;
 
         if (Parrot_str_equal(interp, sub->method_name, CONST_STRING(interp, ""))) {
-            if (sub->vtable_index != -1 && vtable_key != NULL) {
-                method_name = Parrot_str_copy(interp, vtable_key);
+            if (sub->vtable_index != -1 && !STRING_IS_NULL(vtable_key)) {
+                method_name = vtable_key;
             }
         }
         else {
             method_name = sub->method_name;
         }
         add_to_class(interp, nsinfo, classobj, method_name, value);
+
+        if (!(sub->comp_flags & SUB_COMP_FLAG_NSENTRY))
+            stored = 1;
     }
 
-    return 0;
+    return stored;
 }
 
+PARROT_WARN_UNUSED_RESULT
 static int
 maybe_add_sub_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
         ARGIN(PMC *value))
@@ -397,13 +409,12 @@ really a public API.
             }
             else {
                 /* create new tuple */
-                new_tuple = Parrot_pmc_new(INTERP, enum_class_FixedPMCArray);
+                /* for a fully typed namespace, we'd need 3 or 4 */
+                new_tuple = Parrot_pmc_new_init_int(INTERP,
+                        enum_class_FixedPMCArray, NS_max_slots);
 
                 /* flag it as special */
                 PObj_get_FLAGS(new_tuple) |= FPA_is_ns_ext;
-
-                /* for a fully typed namespace, we'd need 3 or 4 */
-                VTABLE_set_integer_native(INTERP, new_tuple, NS_max_slots);
             }
         }
 
@@ -514,7 +525,7 @@ really a public API.
             INTVAL i = 0;
             while (!PMC_IS_NULL(ns) && VTABLE_elements(INTERP, key)) {
                 STRING * const name = VTABLE_get_string_keyed_int(INTERP, key, i);
-                if (name == NULL || name == STRINGNULL) {
+                if (STRING_IS_NULL(name)) {
                     ns = PMCNULL;
                     /* What to do here? Throw an exception or something? */
                     break;

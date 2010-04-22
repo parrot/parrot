@@ -219,8 +219,7 @@ Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
 
 /*
 
-=item C<PMC * Parrot_oo_clone_object(PARROT_INTERP, PMC *pmc, PMC *class_, PMC
-*dest)>
+=item C<PMC * Parrot_oo_clone_object(PARROT_INTERP, PMC *pmc, PMC *dest)>
 
 Clone an Object PMC. If an existing PMC C<dest> is provided, reuse that
 PMC to store copies of the data. Otherwise, create a new PMC and populate
@@ -232,11 +231,10 @@ that with the data.
 
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_oo_clone_object(PARROT_INTERP, ARGIN(PMC *pmc),
-    ARGMOD_NULLOK(PMC *class_), ARGMOD_NULLOK(PMC *dest))
+Parrot_oo_clone_object(PARROT_INTERP, ARGIN(PMC *pmc), ARGMOD_NULLOK(PMC *dest))
 {
     ASSERT_ARGS(Parrot_oo_clone_object)
-    Parrot_Object_attributes *obj;
+    Parrot_Object_attributes *obj = PARROT_OBJECT(pmc);
     Parrot_Object_attributes *cloned_guts;
     Parrot_Class_attributes  *_class;
     PMC                      *cloned;
@@ -244,13 +242,9 @@ Parrot_oo_clone_object(PARROT_INTERP, ARGIN(PMC *pmc),
     INTVAL                    i, num_attrs;
 
     if (!PMC_IS_NULL(dest)) {
-        PARROT_ASSERT(!PMC_IS_NULL(class_));
-        PARROT_ASSERT(class_->vtable->base_type == enum_class_Class);
-        obj    = PARROT_OBJECT(pmc);
         cloned = dest;
     }
     else {
-        obj    = PARROT_OBJECT(pmc);
         cloned = Parrot_pmc_new_noinit(interp, enum_class_Object);
     }
 
@@ -268,7 +262,7 @@ Parrot_oo_clone_object(PARROT_INTERP, ARGIN(PMC *pmc),
     /* Now clone attributes list.class. */
     cloned_guts               = (Parrot_Object_attributes *) PMC_data(cloned);
     cloned_guts->_class       = obj->_class;
-    cloned_guts->attrib_store = NULL;
+    cloned_guts->attrib_store = NULL; /* XXX Do we need to set ->attrib_store twice? */
     cloned_guts->attrib_store = VTABLE_clone(interp, obj->attrib_store);
     num_attrs                 = VTABLE_elements(interp, cloned_guts->attrib_store);
     for (i = 0; i < num_attrs; i++) {
@@ -282,9 +276,10 @@ Parrot_oo_clone_object(PARROT_INTERP, ARGIN(PMC *pmc),
     /* Some of the attributes may have been the PMCs providing storage for any
      * PMCs we inherited from; also need to clone those. */
     if (CLASS_has_alien_parents_TEST(obj->_class)) {
+        int j;
         /* Locate any PMC parents. */
-        for (i = 0; i < num_classes; i++) {
-            PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
+        for (j = 0; j < num_classes; j++) {
+            PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp, _class->all_parents, j);
             if (cur_class->vtable->base_type == enum_class_PMCProxy) {
                 /* Clone this PMC too. */
                 STRING * const proxy = CONST_STRING(interp, "proxy");

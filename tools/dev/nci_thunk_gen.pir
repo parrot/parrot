@@ -381,8 +381,7 @@ HEAD
 
     $S0 = 'get_loader_decl'(sigs)
     $S1 = 'get_loader_body'(sigs)
-    $S2 = 'sprintf'(<<'LOADER', $S0, $S0, $S1)
-%s;
+    $S2 = 'sprintf'(<<'LOADER', $S0, $S1)
 %s {
 %s
 }
@@ -406,8 +405,7 @@ DECL
 
     $S0 = 'get_dynext_loader_decl'(sigs)
     $S1 = 'get_loader_body'(sigs)
-    $S2 = 'sprintf'(<<'LOADER', $S0, $S0, $S1)
-%s;
+    $S2 = 'sprintf'(<<'LOADER', $S0, $S1)
 %s {
 %s
 }
@@ -431,15 +429,13 @@ DECL
     .param pmc sigs
     .local string code
     code = 'sprintf'(<<'HEADER', $S0, $S1)
-    PMC *iglobals;
+    PMC * const iglobals = interp->iglobals;
     PMC *nci_funcs;
     PMC *temp_pmc;
 
-    iglobals = interp->iglobals;
     PARROT_ASSERT(!(PMC_IS_NULL(iglobals)));
 
-    nci_funcs = VTABLE_get_pmc_keyed_int(interp, iglobals,
-            IGLOBALS_NCI_FUNCS);
+    nci_funcs = VTABLE_get_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FUNCS);
     PARROT_ASSERT(!(PMC_IS_NULL(nci_funcs)));
 
 HEADER
@@ -640,10 +636,12 @@ TEMPLATE
     typedef %s(* func_t)(%s);
     func_t fn_pointer;
     void *orig_func;
-    PMC *ctx         = CURRENT_CONTEXT(interp);
-    PMC *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC *       ret_object  = PMCNULL;
     %s
     %s;
+    UNUSED(return_data); /* Potentially unused, at least */
 TEMPLATE
 
     .return (var_decls)
@@ -835,7 +833,7 @@ ERROR
                              final_destination = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
                              VTABLE_set_pointer(interp, final_destination, return_data);
                           }
-                          Parrot_pcc_build_call_from_c_args(interp, call_object, \"P\", final_destination);" },
+                          ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, \"P\", final_destination);" },
     "i": { "as_proto": "int", "sig_char": "I",
            "return_type": "INTVAL" },
     "l": { "as_proto": "long",   "sig_char": "I", "return_type": "INTVAL" },
@@ -846,7 +844,7 @@ ERROR
     "t": { "as_proto": "char *",
            "final_dest": "STRING *final_destination;",
            "ret_assign": "final_destination = Parrot_str_new(interp, return_data, 0);
-           Parrot_pcc_build_call_from_c_args(interp, call_object, \"S\", final_destination);",
+           ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, \"S\", final_destination);",
            "sig_char": "S",
            "temp_tmpl": "char *t_%i; STRING *ts_%i",
            "fill_params_tmpl": ", &ts_%i",
@@ -884,7 +882,7 @@ ERROR
     "2": { "as_proto": "short *",
            "sig_char": "P",
            "return_type": "short",
-           "ret_assign": "Parrot_pcc_build_call_from_c_args(interp, call_object, \"I\", return_data);",
+           "ret_assign": "ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, \"I\", return_data);",
            "temp_tmpl": "PMC *t_%i; short i_%i",
            "preamble_tmpl": "i_%i = VTABLE_get_integer(interp, t_%i);",
            "call_param_tmpl": "&i_%i",
@@ -892,7 +890,7 @@ ERROR
     "3": { "as_proto": "int *",
            "sig_char": "P",
            "return_type": "int",
-           "ret_assign": "Parrot_pcc_build_call_from_c_args(interp, call_object, \"I\", return_data);",
+           "ret_assign": "ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, \"I\", return_data);",
            "temp_tmpl": "PMC *t_%i; int i_%i",
            "preamble_tmpl": "i_%i = VTABLE_get_integer(interp, t_%i);",
            "call_param_tmpl": "&i_%i",
@@ -900,7 +898,7 @@ ERROR
     "4": { "as_proto": "long *",
            "sig_char": "P",
            "return_type": "long",
-           "ret_assign": "Parrot_pcc_build_call_from_c_args(interp, call_object, \"I\", return_data);",
+           "ret_assign": "ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, \"I\", return_data);",
            "temp_tmpl": "PMC *t_%i; long i_%i",
            "preamble_tmpl": "i_%i = VTABLE_get_integer(interp, t_%i);",
            "call_param_tmpl": "&i_%i",
@@ -960,7 +958,7 @@ JSON
     $I1 = !$I1
     $I0 = $I0 || $I1 # not (not exists v[ret_assign] and exists v[sig_char])
     if $I0 goto has_ret_assign
-        $S0 = 'Parrot_pcc_build_call_from_c_args(interp, call_object, "'
+        $S0 = 'ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "'
         $S1 = v['sig_char']
         $S0 = concat $S0, $S1
         $S0 = concat $S0, '", return_data);'

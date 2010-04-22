@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2009, Parrot Foundation.
+Copyright (C) 2009-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -79,10 +79,10 @@ static size_t calculate_registers_size(SHIM_INTERP,
     ARGIN(const UINTVAL *number_regs_used))
         __attribute__nonnull__(2);
 
-static void clear_regs(PARROT_INTERP, ARGMOD(PMC *pmcctx))
+static void clear_regs(PARROT_INTERP, ARGMOD(Parrot_Context *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pmcctx);
+        FUNC_MODIFIES(*ctx);
 
 PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
@@ -111,7 +111,7 @@ static size_t Parrot_pcc_calculate_registers_size(PARROT_INTERP,
        PARROT_ASSERT_ARG(number_regs_used))
 #define ASSERT_ARGS_clear_regs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmcctx))
+    , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_get_context_struct_fast __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
@@ -242,7 +242,7 @@ get_context_struct_fast(PARROT_INTERP, ARGIN(PMC *ctx))
 
 /*
 
-=item C<static void clear_regs(PARROT_INTERP, PMC *pmcctx)>
+=item C<static void clear_regs(PARROT_INTERP, Parrot_Context *ctx)>
 
 Clears all registers in a context.  PMC and STRING registers contain PMCNULL
 and NULL, respectively.  Integer and float registers contain negative flag
@@ -253,11 +253,10 @@ values, for debugging purposes.
 */
 
 static void
-clear_regs(PARROT_INTERP, ARGMOD(PMC *pmcctx))
+clear_regs(PARROT_INTERP, ARGMOD(Parrot_Context *ctx))
 {
     ASSERT_ARGS(clear_regs)
     UINTVAL i;
-    Parrot_Context *ctx = get_context_struct_fast(interp, pmcctx);
 
     /* NULL out registers - P/S have to be NULL for GC
      *
@@ -269,7 +268,7 @@ clear_regs(PARROT_INTERP, ARGMOD(PMC *pmcctx))
     }
 
     for (i = 0; i < ctx->n_regs_used[REGNO_STR]; i++) {
-        ctx->bp_ps.regs_s[i] = NULL;
+        ctx->bp_ps.regs_s[i] = STRINGNULL;
     }
 
     if (Interp_debug_TEST(interp, PARROT_REG_DEBUG_FLAG)) {
@@ -350,7 +349,7 @@ init_context(PARROT_INTERP, ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
     }
 
     /* other stuff is set inside Sub.invoke */
-    clear_regs(interp, pmcctx);
+    clear_regs(interp, ctx);
 }
 
 
@@ -488,7 +487,7 @@ allocate_registers(PARROT_INTERP, ARGIN(PMC *pmcctx), ARGIN(const UINTVAL *numbe
     /* ctx.bp_ps points to S0, which has Px on the left */
     ctx->bp_ps.regs_s = (STRING **)((char *)ctx->registers + size_nip);
 
-    clear_regs(interp, pmcctx);
+    clear_regs(interp, ctx);
 }
 
 

@@ -8,14 +8,6 @@ method new() { die('...'); }
 
 method accepts() { 1; }
 
-method hashify_profile_data($data) {
-    my %h := {};
-    for $data -> $match {
-        %h{ $match<field_name> } := $match<field_data>;
-    }
-    %h;
-}
-
 method goal() { 0; }
 
 
@@ -36,13 +28,9 @@ method new(@except?) {
     self;
 }
 
-method accepts($prof_line) {
-    my $line_type := $prof_line<variable_line> ?? 
-        $prof_line<variable_line><line_type> !! 
-        $prof_line<variable_line><line_type> ;
-
+method accepts(%prof_line) {
     for self<except> -> $except_type {
-        if $except_type eq $line_type {
+        if $except_type eq %prof_line<type>{
             return 0;
         }
     }
@@ -63,13 +51,12 @@ method get_str() {
 class ProfTest::Want::Version is ProfTest::Want;
 
 method new($version?) {
-    self<version>   := $version;
+    self<version> := $version;
     self;
 }
 
-method accepts($prof_line) {
-    if $prof_line<fixed_line> &&
-        $prof_line<fixed_line><line_type> eq 'VERSION' {
+method accepts(%prof_line) {
+    if %prof_line<type> eq 'VERSION' {
         return 1;
     }
 }
@@ -87,13 +74,10 @@ method get_str() {
 
 class ProfTest::Want::CLI is ProfTest::Want;
 
-method new() { 
-    self;
-}
+method new() { self }
 
-method accepts($prof_line) {
-    if $prof_line<fixed_line> &&
-        $prof_line<fixed_line><line_type> eq 'CLI' {
+method accepts(%prof_line) {
+    if %prof_line<type> eq 'CLI' {
         return 1;
     }
 }
@@ -106,9 +90,8 @@ class ProfTest::Want::EndOfRunloop is ProfTest::Want;
 
 method new() { self; }
 
-method accepts($prof_line) {
-    if $prof_line<fixed_line> &&
-        $prof_line<fixed_line><line_type> eq 'END_OF_RUNLOOP' {
+method accepts(%prof_line) {
+    if %prof_line<type> eq 'END_OF_RUNLOOP' {
         return 1;
     }
 }
@@ -127,13 +110,12 @@ method new($name, $line?) {
     self;
 }
 
-method accepts($prof_line) {
-    if $prof_line<variable_line> && $prof_line<variable_line><line_type> eq 'OP' {
-        my %variable_data := self.hashify_profile_data($prof_line<variable_line><variable_data>);
-        if self<name> ne %variable_data<op> {
+method accepts(%prof_line) {
+    if %prof_line<type> eq 'OP' {
+        if self<name> ne %prof_line<op> {
             return 0;
         }
-        if self<line> && self<line> != %variable_data<line> {
+        if self<line> && self<line> != %prof_line<line> {
             return 0;
         }
         return 1;
@@ -163,20 +145,19 @@ method new(:$ns?, :$slurp_until?) {
     self;
 }
 
-method accepts($prof_line) {
+method accepts(%prof_line) {
     if self<found_cs> && self<slurp_until> {
-        if pir::downcase($prof_line<variable_line><line_type>) ne self<slurp_until> {
+        if pir::downcase(%prof_line<type>) ne self<slurp_until> {
             return 1;
         }
         return 0;
     }
-    elsif $prof_line<variable_line> && $prof_line<variable_line><line_type> eq 'CS' {
+    elsif %prof_line<type> eq 'CS' {
         if !self<ns> {
             self<found_cs> := 1;
             return 1;
         }
-        my %h := self.hashify_profile_data($prof_line<variable_line><variable_data>);
-        if %h<ns> eq self<ns> {
+        if %prof_line<ns> eq self<ns> {
             self<found_cs> := 1;
             return 1;
         }

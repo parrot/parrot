@@ -484,7 +484,7 @@ inline op find_sub_not_null(out PMC, in STR) :base_core {
     if (PMC_IS_NULL(sub)) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, dest,
                        EXCEPTION_GLOBAL_NOT_FOUND,
-                       "Could not find non-existent sub %Ss", $2);
+                       "Could not find sub %Ss", $2);
         goto ADDRESS(handler);
     }
 

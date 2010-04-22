@@ -1,4 +1,4 @@
-# Copyright (c) 2001-2009, Parrot Foundation.
+# Copyright (c) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 [DRAFT] PDD10: Embedding and Extending
@@ -219,8 +219,9 @@ compiler named explicitly.>
 Compiling source code generated or read from the host application is also
 possible:
 
-  Parrot_PMC Parrot_compile_string( Parrot_Interp, const char *compiler,
-                                                   const char *code );
+  Parrot_PMC Parrot_compile_string( Parrot_Interp, Parrot_String compiler,
+                                                   const char *code,
+                                                   Parrot_String error );
 
 The potential return values are the same as for loading code from disk.
 
@@ -244,17 +245,9 @@ It should be possible to register a compiler for an HLL with an interpreter
 such that it is possible to load source code written in that language or pass
 source code to an interpreter successfully.
 
-=head2 Attachments
-
-Any associated documents.
-
-=head2 Footnotes
-
-List of footnotes to the text.
-
 =head2 References
 
-List of references.
+None.
 
 =cut
 

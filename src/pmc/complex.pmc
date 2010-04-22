@@ -80,8 +80,11 @@ use C<j> instead of C<i>.
 */
 
 static void
-complex_parse_string(PARROT_INTERP, ARGOUT(FLOATVAL *re), ARGOUT(FLOATVAL *im), ARGIN(STRING *value))
+complex_parse_string(PARROT_INTERP,
+                     ARGOUT(FLOATVAL *re), ARGOUT(FLOATVAL *im), ARGIN(STRING *value))
 {
+    ASSERT_ARGS(complex_parse_string)
+
     char   * const str        = Parrot_str_to_cstring(interp, value);
     char   *t                 = str;
     char   *first_num_offset  = str;
@@ -238,6 +241,8 @@ complex_parse_string(PARROT_INTERP, ARGOUT(FLOATVAL *re), ARGOUT(FLOATVAL *im), 
 static void
 int_check_divide_zero(PARROT_INTERP, INTVAL value)
 {
+    ASSERT_ARGS(int_check_divide_zero)
+
     if (value == 0)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");

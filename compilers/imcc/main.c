@@ -78,7 +78,7 @@ static void imcc_run_pbc(PARROT_INTERP,
     int obj_file,
     ARGIN_NULLOK(const char *output_file),
     int argc,
-    ARGIN(char **argv))
+    ARGIN(const char **argv))
         __attribute__nonnull__(1)
         __attribute__nonnull__(5);
 
@@ -462,7 +462,7 @@ imcc_initialize(PARROT_INTERP)
 /*
 
 =item C<static void imcc_run_pbc(PARROT_INTERP, int obj_file, const char
-*output_file, int argc, char **argv)>
+*output_file, int argc, const char **argv)>
 
 Write out or run Parrot bytecode.
 
@@ -472,7 +472,7 @@ Write out or run Parrot bytecode.
 
 static void
 imcc_run_pbc(PARROT_INTERP, int obj_file, ARGIN_NULLOK(const char *output_file),
-        int argc, ARGIN(char **argv))
+        int argc, ARGIN(const char **argv))
 {
     ASSERT_ARGS(imcc_run_pbc)
     if (IMCC_INFO(interp)->imcc_warn)
@@ -692,7 +692,7 @@ compile_to_bytecode(PARROT_INTERP,
 
 /*
 
-=item C<int imcc_run(PARROT_INTERP, const char *sourcefile, int argc, char
+=item C<int imcc_run(PARROT_INTERP, const char *sourcefile, int argc, const char
 **argv)>
 
 Entry point of IMCC, as invoked by Parrot's main function.
@@ -705,7 +705,7 @@ and run. This function always returns 0.
 
 int
 imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
-        ARGIN(char **argv))
+        ARGIN(const char **argv))
 {
     int                obj_file;
     yyscan_t           yyscanner   = IMCC_INFO(interp)->yyscanner;

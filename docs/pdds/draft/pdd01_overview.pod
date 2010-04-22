@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 [DRAFT] PDD 1: Overview
@@ -190,7 +190,7 @@ One straightforward use of the Parrot system is to precompile a program into
 bytecode and save it for later use. Essentially, we would compile a program as
 normal, but then simply freeze the bytecode to disk for later loading.
 
-=head3 Your HLL in, Java, CLI, or whatever out
+=head3 Your HLL in; Java, CLI, or whatever out
 
 The previous section assumes that we will be emitting Parrot bytecode.
 However, there are other possibilities: we could translate the bytecode
@@ -200,7 +200,7 @@ compilers such as gcc or HP's GEM compiler system.
 
 =head2 References
 
-To come.
+None.
 
 =cut
 

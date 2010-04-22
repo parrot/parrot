@@ -17,6 +17,13 @@
 #include "parrot/config.h"
 #include "parrot/interpreter.h"
 
+void Parrot_register_core_pmcs(PARROT_INTERP, ARGIN(PMC *registry))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void Parrot_initialize_core_pmcs(PARROT_INTERP, int pass)
+        __attribute__nonnull__(1);
+
 /* HEADERIZER BEGIN: src/global_setup.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 

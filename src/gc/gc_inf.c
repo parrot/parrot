@@ -42,21 +42,19 @@ to activate this core.
 PARROT_DOES_NOT_RETURN
 static void failed_allocation(unsigned int line, unsigned long size);
 
-static void gc_inf_allocate_buffer_storage(PARROT_INTERP,
+static void gc_inf_allocate_buffer_storage(SHIM_INTERP,
     ARGMOD(Buffer *buffer),
     size_t size)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*buffer);
 
+PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static Buffer* gc_inf_allocate_bufferlike_header(PARROT_INTERP,
-    SHIM(size_t size))
-        __attribute__nonnull__(1);
+static Buffer* gc_inf_allocate_bufferlike_header(SHIM_INTERP,
+    SHIM(size_t size));
 
 PARROT_CAN_RETURN_NULL
-static void* gc_inf_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
-        __attribute__nonnull__(1);
+static void* gc_inf_allocate_fixed_size_storage(SHIM_INTERP, size_t size);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
@@ -66,64 +64,50 @@ PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static void * gc_inf_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size);
 
+PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static void* gc_inf_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
-        __attribute__nonnull__(1)
+static void* gc_inf_allocate_pmc_attributes(SHIM_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
 
+PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static PMC* gc_inf_allocate_pmc_header(PARROT_INTERP, SHIM(UINTVAL flags))
-        __attribute__nonnull__(1);
+static PMC* gc_inf_allocate_pmc_header(SHIM_INTERP, SHIM(UINTVAL flags));
 
+PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static STRING* gc_inf_allocate_string_header(PARROT_INTERP,
-    SHIM(UINTVAL flags))
-        __attribute__nonnull__(1);
+static STRING* gc_inf_allocate_string_header(SHIM_INTERP,
+    SHIM(UINTVAL flags));
 
-static void gc_inf_allocate_string_storage(PARROT_INTERP,
+static void gc_inf_allocate_string_storage(SHIM_INTERP,
     ARGMOD(STRING *str),
     size_t size)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*str);
 
-static void gc_inf_compact_memory_pool(PARROT_INTERP)
-        __attribute__nonnull__(1);
+static void gc_inf_compact_memory_pool(SHIM_INTERP);
+static void gc_inf_free_bufferlike_header(SHIM_INTERP,
+    ARGFREE(Buffer *b),
+    SHIM(size_t size));
 
-static void gc_inf_free_bufferlike_header(PARROT_INTERP,
-    ARGIN_NULLOK(Buffer *b),
-    SHIM(size_t size))
-        __attribute__nonnull__(1);
-
-static void gc_inf_free_fixed_size_storage(PARROT_INTERP,
+static void gc_inf_free_fixed_size_storage(SHIM_INTERP,
     SHIM(size_t size),
     ARGMOD(void *data))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*data);
 
 static void gc_inf_free_memory_chunk(SHIM_INTERP, ARGFREE(void *data));
-static void gc_inf_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
-        __attribute__nonnull__(1)
+static void gc_inf_free_pmc_attributes(SHIM_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
 
-static void gc_inf_free_pmc_header(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
-        __attribute__nonnull__(1);
-
-static void gc_inf_free_string_header(PARROT_INTERP,
-    ARGIN_NULLOK(STRING *s))
-        __attribute__nonnull__(1);
-
-static size_t gc_inf_get_gc_info(PARROT_INTERP, SHIM(Interpinfo_enum what))
-        __attribute__nonnull__(1);
-
+static void gc_inf_free_pmc_header(SHIM_INTERP, ARGFREE(PMC *pmc));
+static void gc_inf_free_string_header(SHIM_INTERP, ARGFREE(STRING *s));
+static size_t gc_inf_get_gc_info(SHIM_INTERP, SHIM(Interpinfo_enum what));
 static void gc_inf_mark_and_sweep(SHIM_INTERP, UINTVAL flags);
-static void gc_inf_reallocate_buffer_storage(PARROT_INTERP,
+static void gc_inf_reallocate_buffer_storage(SHIM_INTERP,
     ARGMOD(Buffer *buffer),
     size_t size)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*buffer);
 
@@ -140,70 +124,53 @@ static void * gc_inf_reallocate_memory_chunk_zeroed(SHIM_INTERP,
     size_t newsize,
     size_t oldsize);
 
-static void gc_inf_reallocate_string_storage(PARROT_INTERP,
+static void gc_inf_reallocate_string_storage(SHIM_INTERP,
     ARGMOD(STRING *str),
     size_t size)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*str);
 
 #define ASSERT_ARGS_failed_allocation __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_inf_allocate_buffer_storage \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(buffer))
+       PARROT_ASSERT_ARG(buffer))
 #define ASSERT_ARGS_gc_inf_allocate_bufferlike_header \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_inf_allocate_fixed_size_storage \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_inf_allocate_memory_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_inf_allocate_memory_chunk_zeroed \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_inf_allocate_pmc_attributes \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
-#define ASSERT_ARGS_gc_inf_allocate_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_gc_inf_allocate_string_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_gc_inf_allocate_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_gc_inf_allocate_string_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_inf_allocate_string_storage \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(str))
-#define ASSERT_ARGS_gc_inf_compact_memory_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_gc_inf_free_bufferlike_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(str))
+#define ASSERT_ARGS_gc_inf_compact_memory_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_gc_inf_free_bufferlike_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_inf_free_fixed_size_storage \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(data))
+       PARROT_ASSERT_ARG(data))
 #define ASSERT_ARGS_gc_inf_free_memory_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_inf_free_pmc_attributes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
-#define ASSERT_ARGS_gc_inf_free_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_gc_inf_free_string_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_gc_inf_get_gc_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_gc_inf_free_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_gc_inf_free_string_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_gc_inf_get_gc_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_inf_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_inf_reallocate_buffer_storage \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(buffer))
+       PARROT_ASSERT_ARG(buffer))
 #define ASSERT_ARGS_gc_inf_reallocate_memory_chunk \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_inf_reallocate_memory_chunk_zeroed \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_inf_reallocate_string_storage \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(str))
+       PARROT_ASSERT_ARG(str))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -247,7 +214,7 @@ Stub for compacting memory pools.
 
 */
 static void
-gc_inf_compact_memory_pool(PARROT_INTERP)
+gc_inf_compact_memory_pool(SHIM_INTERP)
 {
     ASSERT_ARGS(gc_inf_compact_memory_pool)
 }
@@ -295,57 +262,61 @@ Functions for allocating/deallocating various objects.
 
 */
 
+PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 static PMC*
-gc_inf_allocate_pmc_header(PARROT_INTERP, SHIM(UINTVAL flags))
+gc_inf_allocate_pmc_header(SHIM_INTERP, SHIM(UINTVAL flags))
 {
     ASSERT_ARGS(gc_inf_allocate_pmc_header)
     return (PMC*)calloc(sizeof (PMC), 1);
 }
 
 static void
-gc_inf_free_pmc_header(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
+gc_inf_free_pmc_header(SHIM_INTERP, ARGFREE(PMC *pmc))
 {
     ASSERT_ARGS(gc_inf_free_pmc_header)
     if (pmc)
         free(pmc);
 }
 
+PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 static STRING*
-gc_inf_allocate_string_header(PARROT_INTERP, SHIM(UINTVAL flags))
+gc_inf_allocate_string_header(SHIM_INTERP, SHIM(UINTVAL flags))
 {
     ASSERT_ARGS(gc_inf_allocate_string_header)
     return (STRING*)calloc(sizeof (STRING), 1);
 }
 
 static void
-gc_inf_free_string_header(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
+gc_inf_free_string_header(SHIM_INTERP, ARGFREE(STRING *s))
 {
     ASSERT_ARGS(gc_inf_free_string_header)
     if (s)
         free(s);
 }
 
+PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 static Buffer*
-gc_inf_allocate_bufferlike_header(PARROT_INTERP, SHIM(size_t size))
+gc_inf_allocate_bufferlike_header(SHIM_INTERP, SHIM(size_t size))
 {
     ASSERT_ARGS(gc_inf_allocate_bufferlike_header)
     return (Buffer*)calloc(sizeof (Buffer), 1);
 }
 
 static void
-gc_inf_free_bufferlike_header(PARROT_INTERP, ARGIN_NULLOK(Buffer *b), SHIM(size_t size))
+gc_inf_free_bufferlike_header(SHIM_INTERP, ARGFREE(Buffer *b), SHIM(size_t size))
 {
     ASSERT_ARGS(gc_inf_free_bufferlike_header)
     if (b)
         free(b);
 }
 
+PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 static void*
-gc_inf_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
+gc_inf_allocate_pmc_attributes(SHIM_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(gc_inf_allocate_pmc_attributes)
     const size_t attr_size = pmc->vtable->attr_size;
@@ -354,7 +325,7 @@ gc_inf_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 }
 
 static void
-gc_inf_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
+gc_inf_free_pmc_attributes(SHIM_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(gc_inf_free_pmc_attributes)
     if (PMC_data(pmc))
@@ -363,30 +334,27 @@ gc_inf_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 
 static void
-gc_inf_allocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str), size_t size)
+gc_inf_allocate_string_storage(SHIM_INTERP, ARGMOD(STRING *str), size_t size)
 {
     ASSERT_ARGS(gc_inf_allocate_string_storage)
-    char *mem;
 
-    Buffer_buflen(str)   = 0;
-    Buffer_bufstart(str) = NULL;
-
-    if (size == 0)
-        return;
-
-    mem      = (char *)mem_internal_allocate(size);
-
-    Buffer_bufstart(str) = str->strstart = mem;
     Buffer_buflen(str)   = size;
+
+    if (size > 0) {
+        char * const mem = (char *)mem_internal_allocate(size);
+
+        Buffer_bufstart(str) = str->strstart = mem;
+    }
+    else {
+        Buffer_bufstart(str) = NULL;
+    }
 }
 
 static void
-gc_inf_reallocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str), size_t size)
+gc_inf_reallocate_string_storage(SHIM_INTERP, ARGMOD(STRING *str), size_t size)
 {
     ASSERT_ARGS(gc_inf_reallocate_string_storage)
-    char *mem;
-
-    mem      = (char *)mem_internal_realloc(Buffer_bufstart(str), size);
+    char * const mem     = (char *)mem_internal_realloc(Buffer_bufstart(str), size);
 
     Buffer_bufstart(str) = str->strstart = mem;
     Buffer_buflen(str)   = size;
@@ -394,7 +362,7 @@ gc_inf_reallocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str), size_t size
 
 
 static void
-gc_inf_allocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t size)
+gc_inf_allocate_buffer_storage(SHIM_INTERP, ARGMOD(Buffer *buffer), size_t size)
 {
     ASSERT_ARGS(gc_inf_allocate_buffer_storage)
     char *mem;
@@ -412,12 +380,10 @@ gc_inf_allocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t siz
 }
 
 static void
-gc_inf_reallocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t size)
+gc_inf_reallocate_buffer_storage(SHIM_INTERP, ARGMOD(Buffer *buffer), size_t size)
 {
     ASSERT_ARGS(gc_inf_reallocate_buffer_storage)
-    char *mem;
-
-    mem = (char *)mem_internal_realloc(Buffer_bufstart(buffer), size);
+    char * const mem = (char *)mem_internal_realloc(Buffer_bufstart(buffer), size);
 
     Buffer_bufstart(buffer) = mem;
     Buffer_buflen(buffer)   = size;
@@ -425,14 +391,14 @@ gc_inf_reallocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t s
 
 PARROT_CAN_RETURN_NULL
 static void*
-gc_inf_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
+gc_inf_allocate_fixed_size_storage(SHIM_INTERP, size_t size)
 {
     ASSERT_ARGS(gc_inf_allocate_fixed_size_storage)
     return calloc(size, 1);
 }
 
 static void
-gc_inf_free_fixed_size_storage(PARROT_INTERP, SHIM(size_t size), ARGMOD(void *data))
+gc_inf_free_fixed_size_storage(SHIM_INTERP, SHIM(size_t size), ARGMOD(void *data))
 {
     ASSERT_ARGS(gc_inf_free_fixed_size_storage)
     if (data)
@@ -449,7 +415,7 @@ Stub for GC introspection function.
 
 */
 static size_t
-gc_inf_get_gc_info(PARROT_INTERP, SHIM(Interpinfo_enum what))
+gc_inf_get_gc_info(SHIM_INTERP, SHIM(Interpinfo_enum what))
 {
     ASSERT_ARGS(gc_inf_get_gc_info)
     return 0;

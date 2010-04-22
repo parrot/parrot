@@ -46,7 +46,7 @@ static void Parrot_version(void);
 PARROT_CAN_RETURN_NULL
 static const char * parseflags(PARROT_INTERP,
     ARGMOD(int *argc),
-    ARGMOD(char **argv[]),
+    ARGMOD(const char **argv[]),
     ARGMOD(Parrot_Run_core_t *core),
     ARGMOD(Parrot_trace_flags *trace))
         __attribute__nonnull__(1)
@@ -59,7 +59,9 @@ static const char * parseflags(PARROT_INTERP,
         FUNC_MODIFIES(*core)
         FUNC_MODIFIES(*trace);
 
-static void parseflags_minimal(PARROT_INTERP, int argc, ARGIN(char *argv[]))
+static void parseflags_minimal(PARROT_INTERP,
+    int argc,
+    ARGIN(const char *argv[]))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -88,7 +90,7 @@ static void usage(ARGMOD(FILE *fp))
 
 /*
 
-=item C<int main(int argc, char * argv[])>
+=item C<int main(int argc, const char *argv[])>
 
 The entry point from the command line into Parrot.
 
@@ -97,7 +99,7 @@ The entry point from the command line into Parrot.
 */
 
 int
-main(int argc, char * argv[])
+main(int argc, const char *argv[])
 {
     int         stacktop;
     const char *sourcefile;
@@ -128,18 +130,6 @@ main(int argc, char * argv[])
     /* Now initialize interpreter */
     initialize_interpreter(interp, (void*)&stacktop);
     imcc_initialize(interp);
-
-    { /* EXPERIMENTAL: add library and include paths from environment */
-        PMC *env = Parrot_pmc_new(interp, enum_class_Env);
-        STRING *path = VTABLE_get_string_keyed_str(interp, env,
-                Parrot_str_new_constant(interp, "PARROT_LIBRARY"));
-        if (!Parrot_str_is_null(interp, path) && Parrot_str_length(interp, path) > 0)
-            Parrot_lib_add_path(interp, path, PARROT_LIB_PATH_LIBRARY);
-        path = VTABLE_get_string_keyed_str(interp, env,
-                Parrot_str_new_constant(interp, "PARROT_INCLUDE"));
-        if (!Parrot_str_is_null(interp, path) && Parrot_str_length(interp, path) > 0)
-            Parrot_lib_add_path(interp, path, PARROT_LIB_PATH_INCLUDE);
-    }
 
     /* Parse flags */
     sourcefile = parseflags(interp, &argc, &argv, &core, &trace);
@@ -370,7 +360,8 @@ included in the Parrot source tree.\n\n");
 
 /*
 
-=item C<static void parseflags_minimal(PARROT_INTERP, int argc, char *argv[])>
+=item C<static void parseflags_minimal(PARROT_INTERP, int argc, const char
+*argv[])>
 
 Parse minimal subset of args required for initializing interpreter.
 
@@ -378,7 +369,7 @@ Parse minimal subset of args required for initializing interpreter.
 
 */
 static void
-parseflags_minimal(PARROT_INTERP, int argc, ARGIN(char *argv[]))
+parseflags_minimal(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
 {
     ASSERT_ARGS(parseflags_minimal)
 
@@ -410,11 +401,11 @@ parseflags_minimal(PARROT_INTERP, int argc, ARGIN(char *argv[]))
         }
         else if (!strncmp(arg, "--hash-seed", 11)) {
 
-            arg = strrchr(arg, '=')+1;
-            if (!arg) {
-                ++pos;
-                arg = argv[pos];
-            }
+            if ((arg = strrchr(arg, '=')))
+                arg++;
+            else
+                arg = argv[++pos];
+
             if (is_all_hex_digits(arg)) {
                 interp->hash_seed = strtoul(arg, NULL, 16);
             }
@@ -432,8 +423,8 @@ parseflags_minimal(PARROT_INTERP, int argc, ARGIN(char *argv[]))
 
 /*
 
-=item C<static const char * parseflags(PARROT_INTERP, int *argc, char **argv[],
-Parrot_Run_core_t *core, Parrot_trace_flags *trace)>
+=item C<static const char * parseflags(PARROT_INTERP, int *argc, const char
+**argv[], Parrot_Run_core_t *core, Parrot_trace_flags *trace)>
 
 Parse Parrot's command line for options and set appropriate flags.
 
@@ -444,7 +435,7 @@ Parse Parrot's command line for options and set appropriate flags.
 PARROT_CAN_RETURN_NULL
 static const char *
 parseflags(PARROT_INTERP,
-        ARGMOD(int *argc), ARGMOD(char **argv[]),
+        ARGMOD(int *argc), ARGMOD(const char **argv[]),
         ARGMOD(Parrot_Run_core_t *core), ARGMOD(Parrot_trace_flags *trace))
 {
     ASSERT_ARGS(parseflags)

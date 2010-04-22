@@ -1,4 +1,4 @@
-# Copyright (C) 2003-2009, Parrot Foundation.
+# Copyright (C) 2003-2010, Parrot Foundation.
 # $Id$
 
 PERL          = @perl@
@@ -32,30 +32,8 @@ PMC_TARGETS = \
   foo_group$(LOAD_EXT) \
   pccmethod_test$(LOAD_EXT) \
   rotest$(LOAD_EXT) \
-#IF(has_gdbm):  gdbmhash$(LOAD_EXT) \
   rational$(LOAD_EXT) \
-#IF(has_crypto):  digest_group$(LOAD_EXT) \
   subproxy$(LOAD_EXT)
-
-PMCS_DIGEST = \
-  md2.pmc \
-  md4.pmc \
-  md5.pmc \
-  ripemd160.pmc \
-  sha.pmc \
-  sha1.pmc \
-  sha256.pmc \
-  sha512.pmc
-
-OBJS_DIGEST = \
-  md2$(O) \
-  md4$(O) \
-  md5$(O) \
-  ripemd160$(O) \
-  sha$(O) \
-  sha1$(O) \
-  sha256$(O) \
-  sha512$(O)
 
 PMCS_FOO = \
   foo.pmc \
@@ -64,14 +42,6 @@ PMCS_FOO = \
 OBJS_FOO = \
   foo$(O) \
   foo2$(O)
-
-#IF(win32 and cc==gcc):LIB_GDBM = -llibgdbm
-#ELSIF(win32):LIB_GDBM = libgdbm.lib
-#ELSE:LIB_GDBM = -lgdbm
-
-#IF(win32 and cc==gcc):LIB_CRYPTO = -lcrypto
-#ELSIF(win32):LIB_CRYPTO = libcrypto.lib
-#ELSE:LIB_CRYPTO = -lcrypto
 
 CLEANUPS = \
   "*.c" \
@@ -165,19 +135,6 @@ rotest.c: rotest.dump
 rotest.dump: rotest.pmc
 	$(PMC2CD) rotest.pmc
 
-gdbmhash$(LOAD_EXT): gdbmhash$(O)
-	$(LD) @ld_out@gdbmhash$(LOAD_EXT) gdbmhash$(O) $(LINKARGS) $(LIB_GDBM)
-#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
-
-gdbmhash$(O): gdbmhash.c
-	$(CC) -c @cc_o_out@gdbmhash$(O) $(INCLUDES) $(CFLAGS) gdbmhash.c
-
-gdbmhash.c: gdbmhash.dump
-	$(PMC2CC) gdbmhash.pmc
-
-gdbmhash.dump: gdbmhash.pmc
-	$(PMC2CD) gdbmhash.pmc
-
 rational$(LOAD_EXT): rational$(O)
 	$(LD) @ld_out@rational$(LOAD_EXT) rational$(O) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
@@ -190,88 +147,6 @@ rational.c: rational.dump
 
 rational.dump: rational.pmc
 	$(PMC2CD) rational.pmc
-
-digest_group$(LOAD_EXT): $(OBJS_DIGEST) lib-digest_group$(O)
-	$(LD) @ld_out@digest_group$(LOAD_EXT) lib-digest_group$(O) $(OBJS_DIGEST) $(LINKARGS) $(LIB_CRYPTO)
-#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
-
-lib-digest_group$(O): digest_group.c
-	$(CC) -c @cc_o_out@lib-digest_group$(O) $(INCLUDES) $(CFLAGS) digest_group.c
-
-digest_group.c: $(OBJS_DIGEST)
-	$(PMC2C) --library digest_group --c $(PMCS_DIGEST)
-
-md2$(O): md2.c
-	$(CC) -c @cc_o_out@md2$(O) $(INCLUDES) $(CFLAGS) md2.c
-
-md2.c: md2.dump
-	$(PMC2CC) md2.pmc
-
-md2.dump: md2.pmc
-	$(PMC2CD) md2.pmc
-
-md4$(O): md4.c
-	$(CC) -c @cc_o_out@md4$(O) $(INCLUDES) $(CFLAGS) md4.c
-
-md4.c: md4.dump
-	$(PMC2CC) md4.pmc
-
-md4.dump: md4.pmc
-	$(PMC2CD) md4.pmc
-
-md5$(O): md5.c
-	$(CC) -c @cc_o_out@md5$(O) $(INCLUDES) $(CFLAGS) md5.c
-
-md5.c: md5.dump
-	$(PMC2CC) md5.pmc
-
-md5.dump: md5.pmc
-	$(PMC2CD) md5.pmc
-
-ripemd160$(O): ripemd160.c
-	$(CC) -c @cc_o_out@ripemd160$(O) $(INCLUDES) $(CFLAGS) ripemd160.c
-
-ripemd160.c: ripemd160.dump
-	$(PMC2CC) ripemd160.pmc
-
-ripemd160.dump: ripemd160.pmc
-	$(PMC2CD) ripemd160.pmc
-
-sha$(O): sha.c
-	$(CC) -c @cc_o_out@sha$(O) $(INCLUDES) $(CFLAGS) sha.c
-
-sha.c: sha.dump
-	$(PMC2CC) sha.pmc
-
-sha.dump: sha.pmc
-	$(PMC2CD) sha.pmc
-
-sha1$(O): sha1.c
-	$(CC) -c @cc_o_out@sha1$(O) $(INCLUDES) $(CFLAGS) sha1.c
-
-sha1.c: sha1.dump
-	$(PMC2CC) sha1.pmc
-
-sha1.dump: sha1.pmc
-	$(PMC2CD) sha1.pmc
-
-sha256$(O): sha256.c
-	$(CC) -c @cc_o_out@sha256$(O) $(INCLUDES) $(CFLAGS) sha256.c
-
-sha256.c: sha256.dump
-	$(PMC2CC) sha256.pmc
-
-sha256.dump: sha256.pmc
-	$(PMC2CD) sha256.pmc
-
-sha512$(O): sha512.c
-	$(CC) -c @cc_o_out@sha512$(O) $(INCLUDES) $(CFLAGS) sha512.c
-
-sha512.c: sha512.dump
-	$(PMC2CC) sha512.pmc
-
-sha512.dump: sha512.pmc
-	$(PMC2CD) sha512.pmc
 
 subproxy$(LOAD_EXT): subproxy$(O)
 	$(LD) @ld_out@subproxy$(LOAD_EXT) subproxy$(O) $(LINKARGS)

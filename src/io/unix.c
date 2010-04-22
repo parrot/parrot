@@ -305,7 +305,7 @@ Returns a new C<FileHandle> PMC with the file descriptor passed in.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_io_fdopen_unix(PARROT_INTERP, ARGMOD(PMC *filehandle), PIOHANDLE fd, INTVAL flags)
+Parrot_io_fdopen_unix(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle), PIOHANDLE fd, INTVAL flags)
 {
     ASSERT_ARGS(Parrot_io_fdopen_unix)
     if (io_is_tty_unix(fd))
@@ -388,7 +388,7 @@ Parrot_io_close_piohandle_unix(SHIM_INTERP, PIOHANDLE handle)
 
 /*
 
-=item C<INTVAL Parrot_io_is_closed_unix(PARROT_INTERP, PMC *filehandle)>
+=item C<INTVAL Parrot_io_is_closed_unix(PARROT_INTERP, const PMC *filehandle)>
 
 Test whether the filehandle has been closed.
 
@@ -397,7 +397,7 @@ Test whether the filehandle has been closed.
 */
 
 INTVAL
-Parrot_io_is_closed_unix(PARROT_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_is_closed_unix(PARROT_INTERP, ARGIN(const PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_is_closed_unix)
     if (Parrot_io_get_os_handle(interp, filehandle) == -1)
@@ -815,8 +815,9 @@ INTVAL
 Parrot_io_pipe_unix(SHIM_INTERP, ARGMOD(PIOHANDLE *reader), ARGMOD(PIOHANDLE *writer))
 {
     ASSERT_ARGS(Parrot_io_pipe_unix)
-    int fds[2], rv;
-    rv = pipe(fds);
+    int fds[2];
+    const int rv = pipe(fds);
+
     if (rv >= 0) {
         *reader = fds[0];
         *writer = fds[1];

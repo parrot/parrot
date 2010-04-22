@@ -21,8 +21,7 @@
 /* HEADERIZER BEGIN: src/string/charset/unicode.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_CANNOT_RETURN_NULL
-const CHARSET * Parrot_charset_unicode_init(PARROT_INTERP)
+void Parrot_charset_unicode_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_Parrot_charset_unicode_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

@@ -1,16 +1,15 @@
-# Copyright (C) 2008-2009, Parrot Foundation.
+# Copyright (C) 2008-2010, Parrot Foundation.
 # $Id$
 
 =head1 [DRAFT] PDD 29: Compiler Tools
 
+=head2 Abstract
+
+This PDD specifies the Parrot Compiler Tools (PCT).
+
 =head2 Version
 
 $Revision$
-
-=head2 Maintainer
-
-Will "Coke" Coleda
-Klaas-Jan Stol
 
 =head2 Definitions
 
@@ -22,10 +21,6 @@ PCT-based compilers.
 =head3 HLL
 
 A High-Level Language. Examples are: Perl, Ruby, Python, Lua, Tcl, etc.
-
-=head2 Abstract
-
-This PDD specifies the Parrot Compiler Tools (PCT).
 
 =head2 Synopsis
 
@@ -356,15 +351,9 @@ information.
 
 =back
 
-=head2 Attachments
-
-None.
-
 =head2 References
 
-docs/pdd26_ast.pod
-
-http://dev.perl.org/perl6/doc/design/syn/S05.html
+F<docs/pdd26_ast.pod>, L<http://dev.perl.org/perl6/doc/design/syn/S05.html>
 
 =cut
 

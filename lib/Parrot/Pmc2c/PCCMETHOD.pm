@@ -258,8 +258,8 @@ END
     /*BEGIN RETURN $returns */
 END
         $e->emit( <<"END", __FILE__, __LINE__ + 1 );
-    Parrot_pcc_build_call_from_c_args(interp, _call_object, "$returns_signature",
-            $returns_varargs);
+    _ret_object = Parrot_pcc_build_call_from_c_args(interp, _call_object,
+        "$returns_signature", $returns_varargs);
     return;
     /*END RETURN $returns */
     }
@@ -415,6 +415,7 @@ sub rewrite_pccmethod {
     PMC * const _ctx         = CURRENT_CONTEXT(interp);
     PMC * const _ccont       = Parrot_pcc_get_continuation(interp, _ctx);
     PMC * const _call_object = Parrot_pcc_get_signature(interp, _ctx);
+    PMC * _ret_object        = PMCNULL;
 
     { /* BEGIN PARMS SCOPE */
 END
@@ -427,11 +428,11 @@ END
             $params_varargs);
 END
     }
-    $e->emit( <<"END", __FILE__, __LINE__ + 1 );
+    $e->emit( <<'END', __FILE__, __LINE__ + 1 );
     { /* BEGIN PMETHOD BODY */
 END
 
-    $e_post->emit( <<"END", __FILE__, __LINE__ + 1 );
+    $e_post->emit( <<'END', __FILE__, __LINE__ + 1 );
 
     } /* END PMETHOD BODY */
     } /* END PARAMS SCOPE */
@@ -447,10 +448,6 @@ END
     $self->{PCCMETHOD} = 1;
 
     return 1;
-}
-
-sub isquoted {
-    1;
 }
 
 sub rewrite_pccinvoke {

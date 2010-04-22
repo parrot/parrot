@@ -95,7 +95,7 @@ Return the C<P6metaclass> of the invocant.
 
 =cut
 
-.sub 'HOW' :method
+.sub 'HOW' :method :nsentry
     $P0 = typeof self
     $P1 = getprop 'metaclass', $P0
     .return ($P1)
@@ -108,7 +108,7 @@ Return the C<P6protoobject> for the invocant.
 
 =cut
 
-.sub 'WHAT' :method
+.sub 'WHAT' :method :nsentry
     .local pmc how, what
     how = self.'HOW'()
     .tailcall how.'WHAT'()
@@ -121,7 +121,7 @@ Return the memory address for the invocant.
 
 =cut
 
-.sub 'WHERE' :method
+.sub 'WHERE' :method :nsentry
     $I0 = get_addr self
     .return ($I0)
 .end
@@ -133,7 +133,7 @@ Return the package for the object.
 
 =cut
 
-.sub 'WHO' :method
+.sub 'WHO' :method :nsentry
     $P0 = typeof self
     $P0 = getprop 'metaclass', $P0
     $P0 = getattribute $P0, 'parrotclass'
@@ -170,7 +170,7 @@ Return the protoobject for this metaclass.
 
 .namespace ['P6metaclass']
 
-.sub 'WHAT' :method
+.sub 'WHAT' :method :nsentry
     $P0 = getattribute self, 'protoobject'
     .return ($P0)
 .end

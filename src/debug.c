@@ -1314,8 +1314,9 @@ PDB_cond(PARROT_INTERP, ARGIN(const char *command))
     cond_argleft = condition_regtype(command);
 
     /* get the register number */
-    auxcmd = ++command;
-    get_uint(&command, 0);
+    auxcmd     = ++command;
+    reg_number = get_uint(&command, 0);
+
     if (auxcmd == command) {
         Parrot_io_eprintf(interp->pdb->debugger, "Invalid register\n");
             return NULL;
@@ -2198,7 +2199,14 @@ PDB_escape(PARROT_INTERP, ARGIN(const char *string), UINTVAL length)
             *(fill++) = '"';
             break;
           default:
-            *(fill++) = *string;
+            /* Hide non-ascii chars that may come from utf8 or latin-1
+             * strings in constant strings.
+             * Workaround for TT #1557
+             */
+            if ((unsigned char)*string > 127)
+                *(fill++) = '?';
+            else
+                *(fill++) = *string;
             break;
         }
     }

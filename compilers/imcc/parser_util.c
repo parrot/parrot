@@ -708,7 +708,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
         sub_data->seg        = new_cs;
         sub_data->start_offs = 0;
         sub_data->end_offs   = new_cs->base.size;
-        sub_data->name       = Parrot_str_copy(interp, name);
+        sub_data->name       = name;
 
         *error_message = NULL;
     }
@@ -935,11 +935,13 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
     IMCC_push_parser_state(interp);
     {
         /* Store a copy, in order to know how to free it later */
-        char *copyname = mem_sys_strdup(fullname);
+        char *copyname                 = mem_sys_strdup(fullname);
         IMCC_INFO(interp)->state->file = copyname;
         ext                            = strrchr(copyname, '.');
     }
-    IMCC_INFO(interp)->line        = 1;
+
+    /* start over; let the start of line rule increment this to 1 */
+    IMCC_INFO(interp)->line = 0;
 
     /*
      * the Parrot_str_compare() called from pmc_type() triggers GC

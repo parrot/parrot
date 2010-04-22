@@ -37,7 +37,7 @@ Match an identifier.
 
 =cut
 
-.sub 'ident' :method
+.sub 'ident' :method :nsentry('ident')
     .param pmc adverbs         :slurpy :named
     .local string target
     .local pmc mob, mfrom, mpos

@@ -205,7 +205,7 @@ A type safe wrapper of Parrot_gc_mark_PObj_alive for STRING.
 
 PARROT_EXPORT
 void
-Parrot_gc_mark_STRING_alive_fun(PARROT_INTERP, ARGMOD_NULLOK(STRING *obj))
+Parrot_gc_mark_STRING_alive_fun(SHIM_INTERP, ARGMOD_NULLOK(STRING *obj))
 {
     ASSERT_ARGS(Parrot_gc_mark_STRING_alive_fun)
     if (!STRING_IS_NULL(obj)) {

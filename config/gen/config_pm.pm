@@ -33,7 +33,7 @@ sub _init {
         myconfig        => 'config/gen/config_pm/myconfig.in',
         config_pir      => 'config/gen/config_pm/config_pir.in',
         Config_pm       => 'config/gen/config_pm/Config_pm.in',
-        config_lib      => 'config/gen/config_pm/config_lib_pasm.in',
+        config_lib      => 'config/gen/config_pm/config_lib_pir.in',
     };
     return \%data;
 }
@@ -84,9 +84,9 @@ END
 
     $template = $self->{templates}->{config_lib};
     open( $IN,  "<", $template ) or die "Can't open '$template': $!";
-    my $c_l_pasm = q{config_lib.pasm};
-    $conf->append_configure_log($c_l_pasm);
-    open( $OUT, ">", $c_l_pasm ) or die "Can't open $c_l_pasm: $!";
+    my $c_l_pir = q{config_lib.pir};
+    $conf->append_configure_log($c_l_pir);
+    open( $OUT, ">", $c_l_pir ) or die "Can't open $c_l_pir: $!";
 
     print {$OUT} <<"END";
 # ex: set ro:
@@ -115,14 +115,14 @@ END
                     if ( $type ) {
                         die "type of '$k' is not supported : $type\n";
                     }
-                    # Scalar
+                    # String
                     $v =~ s/(["\\])/\\$1/g;
                     $v =~ s/\n/\\n/g;
-                    print {$OUT} qq(    set P0["$k"], "$v"\n);
+                    print {$OUT} qq(    set \$P0["$k"], "$v"\n);
                 }
                 else {
-                    # Undef
-                    print {$OUT} qq(    set P0["$k"], P1\n);
+                    # Null
+                    print {$OUT} qq(    set \$P0["$k"], \$S2\n);
                 }
             }
         }
@@ -135,7 +135,7 @@ END
     }
 
     close $IN  or die "Can't close $template: $!";
-    close $OUT or die "Can't close $c_l_pasm: $!";
+    close $OUT or die "Can't close $c_l_pir: $!";
 
     return 1;
 }

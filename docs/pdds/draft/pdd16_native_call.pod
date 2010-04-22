@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 [DRAFT] PDD 16: Native Call Interface (NCI)
@@ -7,6 +7,10 @@
 
 This PDD describes the native call interface, and the function signatures used
 to describe those functions.
+
+=head2 Version
+
+$Revision$
 
 =head2 Description
 
@@ -313,50 +317,15 @@ to be known.
   }
 
 The file containing this C code should be compiled as a shared library
-(specifying the C<include> directory so C<<parrot/parrot.h>> can be found.)
+(specifying the C<include> directory so F<parrot/parrot.h> can be found.)
 
 =head2 References
 
-L<pdd06_pasm.pod>
+F<pdd06_pasm.pod>
 
 =head2 See Also
 
-L<t/pmc/nci.t>, L<src/nci_test.c>
-
-=head2 Version
-
-=head3 Current
-
-    Maintainer: Dan Sugalski
-    Class: Internals
-    PDD Number: 16
-    Version: 1.3
-    Status: Developing
-    Last Modified: Feb 26, 2007
-    PDD Format: 1
-    Language: English
-
-=head3 History
-
-=over 4
-
-=item version 1.3
-
-Updated with example for callbacks
-
-=item version 1.2
-
-Updated with basic example for NCI.
-
-=item version 1.1
-
-Changed callback section to reflect current status.
-
-=item version 1
-
-None. First version
-
-=back
+F<t/pmc/nci.t>, F<src/nci_test.c>
 
 =cut
 

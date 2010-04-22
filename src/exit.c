@@ -62,6 +62,7 @@ Exit, calling any registered exit handlers.
 
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
+PARROT_COLD
 void
 Parrot_exit(PARROT_INTERP, int status)
 {
@@ -102,10 +103,6 @@ Parrot_exit(PARROT_INTERP, int status)
 =head1 SEE ALSO
 
 F<include/parrot/exit.h> and F<t/src/exit.t>.
-
-=head1 HISTORY
-
-Initial version by Josh Wilmes.
 
 =cut
 

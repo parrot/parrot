@@ -797,23 +797,23 @@ CODE
     .local pmc test
     test = new [ 'Test'; 'Builder' ]
 
-    test_out( 'ok 8 # TODO passing test' )
+    test_out( 'ok 8 # TODO todo reason' )
     test.'todo'( 1, 'passing test', 'todo reason' )
     test_test( 'todo test should pass, marked as TODO' )
 
-    test_out( 'not ok 9 # TODO failing test' )
+    test_out( "not ok 9 # TODO todo reason\n\tFailed (TODO) test 'failing test'" )
     test.'todo'( 0, 'failing test', 'todo reason' )
     test_test( 'todo test should fail, marked as TODO' )
 
-    test_out( 'ok 10 # TODO passing test' )
+    test_out( 'ok 10 # TODO todo reason' )
     todo( 1, 'passing test', 'todo reason' )
     test_test( 'todo test should pass, marked as TODO' )
 
-    test_out( 'not ok 11 # TODO failing test' )
+    test_out( "not ok 11 # TODO todo reason\n\tFailed (TODO) test 'failing test'" )
     todo( 0, 'failing test', 'todo reason' )
     test_test( 'todo test should fail, marked as TODO' )
 
-    test_out( 'not ok 12 # TODO' )
+    test_out( "not ok 12 # TODO \n\tFailed (TODO) test ''" )
     todo( 0 )
     test_test( 'todo test with no description or reason' )
 

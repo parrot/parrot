@@ -1,17 +1,17 @@
-# Copyright (C) 2008-2009, Parrot Foundation.
+# Copyright (C) 2008-2010, Parrot Foundation.
 # $Id$
 
 =head1 [DRAFT] PDD 31: Inter-Language Calling
-
-=head2 Version
-
-$Revision$
 
 =head2 Abstract
 
 This PDD describes Parrot's conventions and support for communication between
 high-level languages (HLLs).  It is focused mostly on what implementors should
 do in order to provide this capability to their users.
+
+=head2 Version
+
+$Revision$
 
 =head2 Description
 

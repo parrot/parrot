@@ -29,6 +29,13 @@ sub _init {
     my %data;
     $data{description} = q{Determine CPU architecture and OS};
     $data{result}      = q{};
+    my $unamep;
+    eval {
+       chomp( $unamep  = `uname -p` ) unless ($^O eq 'MSWin32');
+    };
+    $data{unamep} = (! $@ and $unamep)
+        ? $unamep
+        : undef;
     return \%data;
 }
 
@@ -60,12 +67,9 @@ sub runstep {
     # the above split fails because archname is "darwin-thread-multi-2level".
     if ( $cpuarch =~ /darwin/ ) {
         $osname = 'darwin';
-         if ( $conf->data->get('byteorder') =~ /^1234/ ) {
-            $cpuarch = 'i386';
-        }
-        else {
-            $cpuarch = 'ppc';
-        }
+        $cpuarch = ( $self->{unamep} eq 'powerpc' )
+            ? 'ppc'
+            : 'i386';
     }
 
     # cpuarch and osname are reversed in archname on windows

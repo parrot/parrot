@@ -1,5 +1,5 @@
 /* compiler.h
- *  Copyright (C) 2007-2008, Parrot Foundation.
+ *  Copyright (C) 2007-2010, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -25,7 +25,7 @@
 #  endif
 #endif
 #ifdef HASATTRIBUTE_FORMAT
-#  define __attribute__format__(x, y, z)    __attribute__((__format__((x), (y), (z))))
+#  define __attribute__format__(x, y, z)    __attribute__((format((x), (y), (z))))
 #endif
 #ifdef HASATTRIBUTE_MALLOC
 #  define __attribute__malloc__             __attribute__((__malloc__))
@@ -59,6 +59,12 @@
 #ifdef HASATTRIBUTE_WARN_UNUSED_RESULT
 #  define __attribute__warn_unused_result__ __attribute__((__warn_unused_result__))
 #endif
+#ifdef HASATTRIBUTE_HOT
+#  define __attribute__hot__                __attribute__((__hot__))
+#endif
+#ifdef HASATTRIBUTE_COLD
+#  define __attribute__cold__               __attribute__((__cold__))
+#endif
 
 /* If we haven't defined the attributes yet, define them to blank. */
 #ifndef __attribute__deprecated__
@@ -87,6 +93,12 @@
 #endif
 #ifndef __attribute__warn_unused_result__
 #  define __attribute__warn_unused_result__
+#endif
+#ifndef __attribute__hot__
+#  define __attribute__hot__
+#endif
+#ifndef __attribute__cold__
+#  define __attribute__cold__
 #endif
 
 
@@ -133,6 +145,10 @@
 #define PARROT_DOES_NOT_RETURN              /*@noreturn@*/ __attribute__noreturn__
 #define PARROT_DOES_NOT_RETURN_WHEN_FALSE   /*@noreturnwhenfalse@*/
 #define PARROT_MALLOC                       /*@only@*/ __attribute__malloc__ __attribute__warn_unused_result__
+
+/* Hot functions can be optimized by the compiler. */
+#define PARROT_HOT                          __attribute__hot__
+#define PARROT_COLD                         __attribute__cold__
 
 /* Macros for exposure tracking for splint. */
 /* See http://www.splint.org/manual/html/all.html section 6.2 */
@@ -200,6 +216,7 @@
     /* may not pass in a reference to a shared object.  There is nothing */
     /* special about malloc and free --  their behavior can be described */
     /* entirely in terms of the provided annotations. */
+#define ARGFREE_NOTNULL(x)                  /*@only@*/ /*@out@*/ /*@notnull@*/ x
 
 #endif /* PARROT_COMPILER_H_GUARD */
 

@@ -632,10 +632,8 @@ configuration file.
     auto::env
     auto::gmp
     auto::readline
-    auto::gdbm
     auto::pcre
     auto::opengl
-    auto::crypto
     auto::gettext
     auto::snprintf
     # auto::perldoc
@@ -644,7 +642,6 @@ configuration file.
     auto::icu
     gen::config_h
     gen::core_pmcs
-    gen::crypto
     gen::opengl
     gen::makefiles
     gen::platform

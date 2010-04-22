@@ -93,7 +93,7 @@ Tests OO features related to creating and using class proxies.
 .end
 
 .namespace ['Complex']
-.sub 'Complex' :method
+.sub 'Complex' :method :nsentry('Complex')
     .return (self)
 .end
 

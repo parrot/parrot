@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2006, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -34,7 +34,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "print_pbc_location" );
 #include <parrot/embed.h>
 
 int
-main(int argc, char* argv[])
+main(int argc, const char* argv[])
 {
     Parrot_Interp interp = Parrot_new(NULL);
     int error_val;
@@ -57,7 +57,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot_warn" );
 #include <parrot/embed.h>
 
 int
-main(int argc, char* argv[])
+main(int argc, const char* argv[])
 {
     Parrot_Interp interp = Parrot_new(NULL);
     int error_val;

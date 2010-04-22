@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 [DRAFT] PDD 5: Opcodes
@@ -12,6 +12,10 @@ called by the Parrot interpreter.
 Parrot. }}
 
 {{ NOTE: standardize on underscores or no underscores? }}
+
+=head2 Version
+
+$Revision$
 
 =head2 Description
 
@@ -169,34 +173,7 @@ is a simple opcode function that corresponds to the C<addI> opcode.
 
 =head2 References
 
-Oploop PDD, PDD 4 (Internal types)
-
-=head2 Footnotes
-
-None.
-
-=head2 Version
-
-1.0
-
-=head3 Current
-
-    Maintainer: Dan Sugalski <dan@sidhe.org>
-    Class: Internals
-    PDD Number: 5
-    Version: 1.0
-    Status: Developing
-    Last Modified: 16 Jul 2001
-    PDD Format: 1
-    Language: English
-
-=head3 History
-
-None. First version
-
-=head2 Changes
-
-None. First version
+Oploop PDD, PDD 4 (Internal types).
 
 =cut
 

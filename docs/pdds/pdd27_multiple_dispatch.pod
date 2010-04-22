@@ -1,4 +1,4 @@
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 
 =head1 PDD 27: Multiple Dispatch
@@ -256,15 +256,9 @@ on each element of two arrays from the 'is_equal' vtable function.
 Multiple dispatch calls from within vtable functions call the
 C<Parrot_mmd_invoke> routine from the public MMD API.
 
-=head2 Attachments
-
-None.
-
 =head2 References
 
-docs/mmd.pod
-src/multidispatch.c
-src/pmc/multisub.pmc
+F<docs/mmd.pod>, F<src/multidispatch.c>, F<src/pmc/multisub.pmc>
 
 =cut
 

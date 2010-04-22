@@ -179,9 +179,8 @@ Parrot_io_fdopen(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), PIOHANDLE fd,
 {
     ASSERT_ARGS(Parrot_io_fdopen)
     PMC *new_filehandle;
-    INTVAL flags;
+    const INTVAL flags = Parrot_io_parse_open_flags(interp, sflags);
 
-    flags = Parrot_io_parse_open_flags(interp, sflags);
     if (!flags)
         return PMCNULL;
 
@@ -349,7 +348,7 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Cannot read from a closed or non-readable filehandle");
 
-        result = Parrot_io_make_string(interp, &result, length);
+        result = Parrot_str_new_noinit(interp, enum_stringrep_one, length);
         result->bufused = length;
 
         if (Parrot_io_is_encoding(interp, pmc, CONST_STRING(interp, "utf8")))
@@ -367,7 +366,7 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
                 "Cannot read from a closed filehandle");
 
         if (length == 0)
-            result = Parrot_str_copy(interp, string_orig);
+            result = string_orig;
         else {
             INTVAL read_length = length;
             const INTVAL orig_length = Parrot_str_byte_length(interp, string_orig);
@@ -378,8 +377,7 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
             if (offset + read_length > orig_length)
                 read_length = orig_length - offset;
 
-            result = Parrot_str_substr(interp, string_orig, offset,
-                    read_length, NULL, 0);
+            result = Parrot_str_substr(interp, string_orig, offset, read_length);
             SETATTR_StringHandle_read_offset(interp, pmc, offset + read_length);
         }
     }
@@ -437,8 +435,7 @@ Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *pmc))
         else
             read_length = newline_pos - offset + 1; /* +1 to include the newline */
 
-        result = Parrot_str_substr(interp, result, offset,
-                read_length, NULL, 0);
+        result = Parrot_str_substr(interp, result, offset, read_length);
         SETATTR_StringHandle_read_offset(interp, pmc, newline_pos + 1);
     }
     else

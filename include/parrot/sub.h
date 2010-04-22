@@ -64,6 +64,7 @@ typedef enum {
 typedef enum {
     SUB_COMP_FLAG_BIT_0     = SUB_FLAG(0),
     SUB_COMP_FLAG_BIT_1     = SUB_FLAG(1),
+    SUB_COMP_FLAG_VTABLE    = SUB_COMP_FLAG_BIT_1,
     SUB_COMP_FLAG_BIT_2     = SUB_FLAG(2),
     SUB_COMP_FLAG_METHOD    = SUB_COMP_FLAG_BIT_2,
     SUB_COMP_FLAG_BIT_3     = SUB_FLAG(3),
@@ -76,6 +77,7 @@ typedef enum {
     SUB_COMP_FLAG_BIT_10    = SUB_FLAG(10),
     SUB_COMP_FLAG_PF_INIT   = SUB_COMP_FLAG_BIT_10,
     SUB_COMP_FLAG_BIT_11    = SUB_FLAG(11),
+    SUB_COMP_FLAG_NSENTRY   = SUB_COMP_FLAG_BIT_11,
     SUB_COMP_FLAG_BIT_12    = SUB_FLAG(12),
     SUB_COMP_FLAG_BIT_13    = SUB_FLAG(13),
     SUB_COMP_FLAG_BIT_14    = SUB_FLAG(14),
@@ -95,7 +97,7 @@ typedef enum {
     SUB_COMP_FLAG_BIT_28    = SUB_FLAG(28),
     SUB_COMP_FLAG_BIT_29    = SUB_FLAG(29),
     SUB_COMP_FLAG_BIT_30    = SUB_FLAG(30),
-    SUB_COMP_FLAG_MASK      = 0x00000404
+    SUB_COMP_FLAG_MASK      = SUB_COMP_FLAG_VTABLE | SUB_COMP_FLAG_METHOD | SUB_COMP_FLAG_NSENTRY | SUB_COMP_FLAG_PF_INIT
 } sub_comp_flags_enum;
 #undef SUB_FLAG
 
@@ -170,13 +172,6 @@ typedef struct Parrot_Context_info {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-PMC * new_ret_continuation_pmc(PARROT_INTERP,
-    ARGIN_NULLOK(opcode_t *address))
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
 void Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -217,11 +212,6 @@ PMC* parrot_new_closure(PARROT_INTERP, ARGIN(PMC *sub_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void invalidate_retc_context(PARROT_INTERP, ARGMOD(PMC *cont))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*cont);
-
 void mark_context_start(void);
 void Parrot_continuation_check(PARROT_INTERP, ARGIN(const PMC *pmc))
         __attribute__nonnull__(1)
@@ -260,8 +250,6 @@ INTVAL Parrot_Sub_get_line_from_pc(PARROT_INTERP,
     ARGIN_NULLOK(opcode_t *pc))
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_new_ret_continuation_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_capture_lex __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sub_pmc))
@@ -281,9 +269,6 @@ INTVAL Parrot_Sub_get_line_from_pc(PARROT_INTERP,
 #define ASSERT_ARGS_parrot_new_closure __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sub_pmc))
-#define ASSERT_ARGS_invalidate_retc_context __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(cont))
 #define ASSERT_ARGS_mark_context_start __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_continuation_check __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

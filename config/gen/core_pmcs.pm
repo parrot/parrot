@@ -103,21 +103,14 @@ sub generate_c {
 /* HEADERIZER STOP */
 
 #include "parrot/parrot.h"
+#include "parrot/global_setup.h"
+
 
 END_C
 
     print {$OUT} "extern void Parrot_${_}_class_init(PARROT_INTERP, int, int);\n" foreach (@pmcs);
 
     print {$OUT} <<'END_C';
-
-/* This isn't strictly true, but the headerizer should not bother */
-
-void Parrot_register_core_pmcs(PARROT_INTERP, ARGIN(PMC *registry))
-    __attribute__nonnull__(1)
-    __attribute__nonnull__(2);
-
-extern void Parrot_initialize_core_pmcs(PARROT_INTERP, int pass)
-    __attribute__nonnull__(1);
 
 void Parrot_initialize_core_pmcs(PARROT_INTERP, int pass)
 {

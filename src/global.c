@@ -648,7 +648,7 @@ Parrot_find_global_op(PARROT_INTERP, ARGIN(PMC *ns),
     ASSERT_ARGS(Parrot_find_global_op)
     PMC *res;
 
-    if (!globalname)
+    if (STRING_IS_NULL(globalname))
         Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_GLOBAL_NOT_FOUND,
             "Tried to get null global");
 

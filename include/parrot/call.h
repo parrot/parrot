@@ -157,6 +157,7 @@ void runops(PARROT_INTERP, size_t offs)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC* Parrot_pcc_build_call_from_c_args(PARROT_INTERP,
     ARGIN_NULLOK(PMC *signature),
@@ -182,8 +183,8 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC* Parrot_pcc_build_sig_object_from_op(PARROT_INTERP,
     ARGIN_NULLOK(PMC *signature),
-    ARGIN(PMC * const raw_sig),
-    ARGIN(opcode_t * const raw_args))
+    ARGIN(PMC *raw_sig),
+    ARGIN(opcode_t *raw_args))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
@@ -250,15 +251,13 @@ void Parrot_pcc_parse_signature_string(PARROT_INTERP,
         FUNC_MODIFIES(*arg_flags)
         FUNC_MODIFIES(*return_flags);
 
-PARROT_CAN_RETURN_NULL
-void Parrot_pcc_split_signature_string(PARROT_INTERP,
+void Parrot_pcc_split_signature_string(
     ARGIN(const char *signature),
     ARGMOD(const char **arg_sig),
     ARGMOD(const char **return_sig))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
         FUNC_MODIFIES(*arg_sig)
         FUNC_MODIFIES(*return_sig);
 
@@ -306,8 +305,7 @@ void Parrot_pcc_split_signature_string(PARROT_INTERP,
     , PARROT_ASSERT_ARG(return_flags))
 #define ASSERT_ARGS_Parrot_pcc_split_signature_string \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(signature) \
+       PARROT_ASSERT_ARG(signature) \
     , PARROT_ASSERT_ARG(arg_sig) \
     , PARROT_ASSERT_ARG(return_sig))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -321,10 +319,10 @@ void Parrot_pcc_split_signature_string(PARROT_INTERP,
 
 /* XXX Remove interp from this */
 #define ADD_OP_VAR_PART(interp, seg, pc, n) do { \
-    if (*(pc) == PARROT_OP_set_args_pc || \
-            *(pc) == PARROT_OP_get_results_pc || \
-            *(pc) == PARROT_OP_get_params_pc || \
-            *(pc) == PARROT_OP_set_returns_pc) { \
+    if (*(pc) == PARROT_OP_set_args_pc       \
+    ||  *(pc) == PARROT_OP_get_results_pc    \
+    ||  *(pc) == PARROT_OP_get_params_pc     \
+    ||  *(pc) == PARROT_OP_set_returns_pc) { \
         PMC * const sig = (seg)->const_table->constants[(pc)[1]]->u.key; \
         (n) += VTABLE_elements((interp), sig); \
     } \

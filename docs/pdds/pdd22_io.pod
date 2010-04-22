@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 PDD 22: I/O
@@ -1038,14 +1038,6 @@ See the relevant IETF RFCs: "Application Aspects of IPv6 Transition"
 (http://www.ietf.org/rfc/rfc4038.txt) and "Basic Socket Interface
 Extensions for IPv6" (http://www.ietf.org/rfc/rfc3493.txt).
 
-=head2 Attachments
-
-None.
-
-=head2 Footnotes
-
-None.
-
 =head2 Links
 
 L<http://en.wikipedia.org/wiki/Asynchronous_I/O> for a relatively
@@ -1053,14 +1045,9 @@ comprehensive list of asynchronous I/O implementation options.
 
 =head2 References
 
-  F<src/io/core.c>
-  F<src/ops/io.ops>
-  F<include/parrot/io.h>
-  F<runtime/parrot/library/Stream/*>
-  F<src/io/unix.c>
-  F<src/io/win32.c>
-  Perl 5's IO::AIO
-  Perl 5's POE
+F<src/io/core.c>, F<src/ops/io.ops>, F<include/parrot/io.h>, 
+F<runtime/parrot/library/Stream/*>, F<src/io/unix.c>, F<src/io/win32.c>,
+Perl 5's IO::AIO, and POE
 
 =cut
 

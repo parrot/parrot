@@ -283,9 +283,9 @@ Returns the Parrot string representation of the array.
 
         for (i = 0; i < elems; i++) {
             if (SELF.get_integer_keyed_int((INTVAL)i))
-                str = Parrot_str_concat(INTERP, str, one, 0);
+                str = Parrot_str_concat(INTERP, str, one);
             else
-                str = Parrot_str_concat(INTERP, str, zero, 0);
+                str = Parrot_str_concat(INTERP, str, zero);
         }
 
         return str;

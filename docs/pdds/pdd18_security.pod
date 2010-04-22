@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 # $Id$
 
 =head1 PDD 18: Security Model
@@ -217,19 +217,13 @@ OST phase, and inserting an additional phase to scan the OST. Because the OST
 form is standard across high-level languages running on Parrot, the tools can
 be written once and applied to many languages.
 
-=head2 Attachments
-
-
-=head2 Footnotes
-
-
 =head2 References
 
-"Exploring the Broken Web": http://talks.php.net/show/osdc07
+"Exploring the Broken Web": L<http://talks.php.net/show/osdc07>
 
-"Safe ERB": http://agilewebdevelopment.com/plugins/safe_erb
+"Safe ERB": L<http://agilewebdevelopment.com/plugins/safe_erb>
 
-pecl/filter: http://us2.php.net/filter
+pecl/filter: L<http://us2.php.net/filter>
 
 Rasmus Lerdorf for the term "data firewall".
 

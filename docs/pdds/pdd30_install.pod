@@ -160,14 +160,6 @@ and a cross-platform build infrastructure (the 'make' variants are a
 good choice, and can be combined with Autoconf, CMake, Perl, Python,
 etc. for more complex conditional builds).
 
-=head2 Attachments
-
-None.
-
-=head2 Footnotes
-
-None.
-
 =head2 References
 
 None.

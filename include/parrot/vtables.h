@@ -26,10 +26,9 @@ VTABLE * Parrot_clone_vtable(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_destroy_vtable(PARROT_INTERP, ARGMOD(VTABLE *vtable))
+void Parrot_destroy_vtable(PARROT_INTERP, ARGFREE_NOTNULL(VTABLE *vtable))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*vtable);
+        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 void Parrot_initialize_core_vtables(PARROT_INTERP)

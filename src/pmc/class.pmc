@@ -203,7 +203,7 @@ cache_class_attribs(PARROT_INTERP,
         STRING * const attrib_name = VTABLE_get_string_keyed_str(
             interp, cur_attrib, name_str);
 
-        STRING * const full_key    = Parrot_str_append(interp, fq_class, attrib_name);
+        STRING * const full_key    = Parrot_str_concat(interp, fq_class, attrib_name);
 
         /* Insert into hash, along with index. */
         VTABLE_set_integer_keyed_str(interp, attrib_index, full_key, cur_index);
@@ -668,7 +668,7 @@ Returns the name of the class (without the HLL namespace).
 */
 
     VTABLE STRING *get_string() {
-        return Parrot_str_copy(interp, make_class_name(interp, SELF));
+        return make_class_name(interp, SELF);
     }
 
 /*

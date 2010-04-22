@@ -338,8 +338,8 @@ Main set function.
         }
 
         /* Create new entry */
-        list_entry = Parrot_pmc_new(INTERP, enum_class_FixedPMCArray);
-        VTABLE_set_integer_native(INTERP, list_entry, ORDERED_HASH_ITEM_MAX);
+        list_entry = Parrot_pmc_new_init_int(INTERP,
+                enum_class_FixedPMCArray, ORDERED_HASH_ITEM_MAX);
         VTABLE_set_pmc_keyed_int(INTERP, list_entry, ORDERED_HASH_ITEM_VALUE, value);
         VTABLE_set_pmc_keyed_int(INTERP, list_entry, ORDERED_HASH_ITEM_KEY, key);
 

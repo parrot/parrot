@@ -516,6 +516,7 @@ sub runstep {
 #         "$ENV{HOME}/src/osx-insane/usr/X11/include/GL/*.h",
 #         "$ENV{HOME}/src/osx-insane/usr/X11/include/GL/internal/*.h",
 #         "$ENV{HOME}/src/osx-insane/usr/X11R6 1/include/GL/*.h",
+#         "$ENV{HOME}/src/osx-10.6.3/Headers/*.h",
     );
 
     # X freeglut only if DISPLAY is set, otherwise use native w32api GLUT
@@ -662,6 +663,9 @@ sub gen_opengl_wrappers {
             next unless /API/ or /\bextern\b/ or /\bmui[A-Z]/;
             next if     /^#/;
             next if     /\btypedef\b/;
+
+            # Work around bug in Mac OS X headers (glext.h as of 10.6.3, at least)
+            next if /^\s*extern\s+\w+\s+\(\*\s+/;
 
             # Skip where we are explicitly told to do so
             next if /\bFGUNUSED\b/;

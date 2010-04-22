@@ -2,11 +2,6 @@
 # Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
-use strict;
-use warnings;
-use Carp qw( confess );
-
-
 =head1 NAME
 
 tools/build/headerizer.pl - Generates the function header parts of .h
@@ -59,6 +54,9 @@ One or more object file names.
 
 =cut
 
+use strict;
+use warnings;
+
 use Getopt::Long;
 use lib qw( lib );
 use Parrot::Config;
@@ -66,95 +64,9 @@ use Parrot::Headerizer;
 
 my $headerizer = Parrot::Headerizer->new;
 
-my %warnings;
-my %opt;
-
-my %valid_macros = map { ( $_, 1 ) } qw(
-    PARROT_EXPORT
-    PARROT_INLINE
-    PARROT_CAN_RETURN_NULL
-    PARROT_CANNOT_RETURN_NULL
-    PARROT_IGNORABLE_RESULT
-    PARROT_WARN_UNUSED_RESULT
-    PARROT_PURE_FUNCTION
-    PARROT_CONST_FUNCTION
-    PARROT_DOES_NOT_RETURN
-    PARROT_DOES_NOT_RETURN_WHEN_FALSE
-    PARROT_MALLOC
-    PARROT_OBSERVER
-);
-
 main();
 
 =head1 FUNCTIONS
-
-=head2 extract_function_declarations( $sourcefile_text )
-
-Rips apart a C file to get the function declarations.
-
-=cut
-
-sub extract_function_declarations {
-    my $text = shift;
-
-    # Only check the YACC C code if we find what looks like YACC file
-    $text =~ s[%\{(.*)%\}.*][$1]sm;
-
-    # Drop all text after HEADERIZER STOP
-    $text =~ s[/\*\s*HEADERIZER STOP.+][]s;
-
-    # Strip blocks of comments
-    $text =~ s[^/\*.*?\*/][]mxsg;
-
-    # Strip # compiler directives (Thanks, Audrey!)
-    $text =~ s[^#(\\\n|.)*][]mg;
-
-    # Strip code blocks
-    $text =~ s[^{.+?^}][]msg;
-
-    # Split on paragraphs
-    my @funcs = split /\n{2,}/, $text;
-
-    # If it doesn't start in the left column, it's not a func
-    @funcs = grep /^\S/, @funcs;
-
-    # Typedefs, enums and externs are no good
-    @funcs = grep { !/^(typedef|enum|extern)\b/ } @funcs;
-
-    # Structs are OK if they're not alone on the line
-    @funcs = grep { !/^struct.+;\n/ } @funcs;
-
-    # Structs are OK if they're not being defined
-    @funcs = grep { !/^(static\s+)?struct.+{\n/ } @funcs;
-
-    # Ignore magic function name YY_DECL
-    @funcs = grep { !/YY_DECL/ } @funcs;
-
-    # Ignore anything with magic words HEADERIZER SKIP
-    @funcs = grep { !m{/\*\s*HEADERIZER SKIP\s*\*/} } @funcs;
-
-    # pmclass declarations in PMC files are no good
-    @funcs = grep { !m{^pmclass } } @funcs;
-
-    # Variables are of no use to us
-    @funcs = grep !/=/, @funcs;
-
-    # Get rid of any blocks at the end
-    s/\s*{.*//s for @funcs;
-
-    # Toast anything non-whitespace
-    @funcs = grep /\S/, @funcs;
-
-    # If it's got a semicolon, it's not a function header
-    @funcs = grep !/;/, @funcs;
-
-    # remove any remaining }'s
-    @funcs = grep {! /^}/} @funcs;
-
-    chomp @funcs;
-
-    return @funcs;
-}
 
 =head2 extract_function_declaration_and_update_source( $cfile_name )
 
@@ -170,9 +82,9 @@ sub extract_function_declarations_and_update_source {
     my $text = join( '', <$fhin> );
     close $fhin;
 
-    my @func_declarations = extract_function_declarations( $text );
+    my @func_declarations = $headerizer->extract_function_declarations( $text );
     for my $decl ( @func_declarations ) {
-        my $specs = function_components_from_declaration( $cfile_name, $decl );
+        my $specs = $headerizer->function_components_from_declaration( $cfile_name, $decl );
         my $name = $specs->{name};
 
         my $heading = $headerizer->generate_documentation_signature($decl);
@@ -187,96 +99,6 @@ sub extract_function_declarations_and_update_source {
     return @func_declarations;
 }
 
-=head2 function_components_from_declaration( $file, $proto )
-
-Takes a declaration of a function and returns an ad-hoc hashref of
-properties for use elsewhere.
-
-=cut
-
-sub function_components_from_declaration {
-    my $file  = shift;
-    my $proto = shift;
-
-    my @lines = split( /\n/, $proto );
-    chomp @lines;
-
-    my @macros;
-    my $parrot_api;
-    my $parrot_inline;
-
-    while ( @lines && ( $lines[0] =~ /^PARROT_/ ) ) {
-        my $macro = shift @lines;
-        if ( $macro eq 'PARROT_EXPORT' ) {
-            $parrot_api = 1;
-        }
-        elsif ( $macro eq 'PARROT_INLINE' ) {
-            $parrot_inline = 1;
-        }
-        push( @macros, $macro );
-    }
-
-    my $return_type = shift @lines;
-    my $args = join( ' ', @lines );
-
-    $args =~ s/\s+/ /g;
-
-    $args =~ s{([^(]+)\s*\((.+)\);?}{$2}
-        or die qq{Couldn't handle "$proto" in $file\n};
-
-    my $name = $1;
-    $args = $2;
-
-    die "Can't have both PARROT_EXPORT and PARROT_INLINE on $name\n" if $parrot_inline && $parrot_api;
-
-    my @args = split( /\s*,\s*/, $args );
-    for (@args) {
-        /\S+\s+\S+/
-            || ( $_ eq '...' )
-            || ( $_ eq 'void' )
-            || ( $_ =~ /(PARROT|NULLOK|SHIM)_INTERP/ )
-            or die "Bad args in $proto";
-    }
-
-    my $is_ignorable = 0;
-    my $is_static = 0;
-    $is_static = $2 if $return_type =~ s/^((static)\s+)?//i;
-
-    die "$file $name: Impossible to have both static and PARROT_EXPORT" if $parrot_api && $is_static;
-
-    my %macros;
-    for my $macro (@macros) {
-        $macros{$macro} = 1;
-        if ( not $valid_macros{$macro} ) {
-            squawk( $file, $name, "Invalid macro $macro" );
-        }
-        if ( $macro eq 'PARROT_IGNORABLE_RESULT' ) {
-            $is_ignorable = 1;
-        }
-    }
-    if ( $return_type =~ /\*/ ) {
-        if ( !$macros{PARROT_CAN_RETURN_NULL} && !$macros{PARROT_CANNOT_RETURN_NULL} ) {
-            squawk( $file, $name,
-                "Returns a pointer, but no PARROT_CAN(NOT)_RETURN_NULL macro found." );
-        }
-        elsif ( $macros{PARROT_CAN_RETURN_NULL} && $macros{PARROT_CANNOT_RETURN_NULL} ) {
-            squawk( $file, $name,
-                "Can't have both PARROT_CAN_RETURN_NULL and PARROT_CANNOT_RETURN_NULL together." );
-        }
-    }
-
-    return {
-        file         => $file,
-        name         => $name,
-        args         => \@args,
-        macros       => \@macros,
-        is_static    => $is_static,
-        is_inline    => $parrot_inline,
-        is_api       => $parrot_api,
-        is_ignorable => $is_ignorable,
-        return_type  => $return_type,
-    };
-}
 
 sub attrs_from_args {
     my $func = shift;
@@ -300,14 +122,14 @@ sub attrs_from_args {
             }
             push( @mods, "FUNC_MODIFIES($modified)" );
         }
-        if ( $arg =~ m{(ARGIN|ARGOUT|ARGMOD|NOTNULL)\(} || $arg eq 'PARROT_INTERP' ) {
+        if ( $arg =~ m{(ARGIN|ARGOUT|ARGMOD|ARGFREE_NOTNULL|NOTNULL)\(} || $arg eq 'PARROT_INTERP' ) {
             push( @attrs, "__attribute__nonnull__($n)" );
         }
-        if ( ( $arg =~ m{\*} ) && ( $arg !~ /\b(SHIM|((ARGIN|ARGOUT|ARGMOD)(_NULLOK)?)|ARGFREE)\b/ ) ) {
-            squawk( $file, $name, qq{"$arg" isn't protected with an ARGIN, ARGOUT or ARGMOD (or a _NULLOK variant), or ARGFREE} );
+        if ( ( $arg =~ m{\*} ) && ( $arg !~ /\b(SHIM|((ARGIN|ARGOUT|ARGMOD)(_NULLOK)?)|ARGFREE(_NOTNULL)?)\b/ ) ) {
+            $headerizer->squawk( $file, $name, qq{"$arg" isn't protected with an ARGIN, ARGOUT or ARGMOD (or a _NULLOK variant), or ARGFREE} );
         }
         if ( ($arg =~ /\bconst\b/) && ($arg =~ /\*/) && ($arg !~ /\*\*/) && ($arg =~ /\b(ARG(MOD|OUT))\b/) ) {
-            squawk( $file, $name, qq{"$arg" is const, but that $1 conflicts with const} );
+            $headerizer->squawk( $file, $name, qq{"$arg" is const, but that $1 conflicts with const} );
         }
     }
 
@@ -319,7 +141,7 @@ sub asserts_from_args {
     my @asserts;
 
     for my $arg (@args) {
-        if ( $arg =~ m{(ARGIN|ARGOUT|ARGMOD|NOTNULL)\((.+)\)} ) {
+        if ( $arg =~ m{(ARGIN|ARGOUT|ARGMOD|ARGFREE_NOTNULL|NOTNULL)\((.+)\)} ) {
             my $var = $2;
             if($var =~ /\(*\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\)\s*\(/) {
                 # argument is a function pointer
@@ -351,7 +173,11 @@ sub make_function_decls {
 
         my $return = $func->{return_type};
         my $alt_void = ' ';
-        if ( $func->{is_ignorable} && ($return ne 'void') && ($return !~ /\*/) ) {
+
+        # Splint can't handle /*@alt void@*/ on pointers, although this page
+        # http://www.mail-archive.com/lclint-interest@virginia.edu/msg00139.html
+        # seems to say that we can.
+        if ( $func->{is_ignorable} && ($return !~ /\*/) ) {
             $alt_void = " /*\@alt void@*/\n";
         }
 
@@ -422,14 +248,6 @@ sub make_function_decls {
     }
 
     return @decls;
-}
-
-sub squawk {
-    my $file  = shift;
-    my $func  = shift;
-    my $error = shift;
-
-    push( @{ $warnings{$file}->{$func} }, $error );
 }
 
 sub read_file {
@@ -537,14 +355,14 @@ sub main {
 
         my @decls;
         if ( $macro_match ) {
-            @decls = extract_function_declarations( $source_code );
+            @decls = $headerizer->extract_function_declarations( $source_code );
         }
         else {
             @decls = extract_function_declarations_and_update_source( $sourcefile );
         }
 
         for my $decl (@decls) {
-            my $components = function_components_from_declaration( $sourcefile, $decl );
+            my $components = $headerizer->function_components_from_declaration( $sourcefile, $decl );
             push( @{ $sourcefiles{$hfile}->{$sourcefile} }, $components ) unless $hfile eq 'none';
             push( @{ $sourcefiles_with_statics{$sourcefile} }, $components ) if $components->{is_static};
             if ( $macro_match ) {
@@ -598,6 +416,7 @@ sub main {
         print "Headerization complete.\n";
     }
 
+    my %warnings = %{$headerizer->{warnings}};
     if ( keys %warnings ) {
         my $nwarnings     = 0;
         my $nwarningfuncs = 0;

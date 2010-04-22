@@ -253,10 +253,10 @@ filehandle, rather than modifying the invocant).
                                 "Cannot reopen already open filehandle");
 
         if (got_mode && !STRING_IS_NULL(mode))
-            SET_ATTR_mode(INTERP, SELF, Parrot_str_copy(INTERP, mode));
+            SET_ATTR_mode(INTERP, SELF, mode);
 
         if (got_filename && !STRING_IS_NULL(filename))
-            SET_ATTR_filename(INTERP, SELF, Parrot_str_copy(INTERP, filename));
+            SET_ATTR_filename(INTERP, SELF, filename);
 
         /* Open the file. With no options, reopen the same file as before */
         GET_ATTR_filename(INTERP, SELF, open_filename);
@@ -475,7 +475,7 @@ filehandle when finished.
 
             do {
                 STRING * const part = Parrot_io_reads(INTERP, SELF, 0);
-                result = Parrot_str_append(INTERP, result, part);
+                result = Parrot_str_concat(INTERP, result, part);
 
                 if (Parrot_io_eof(INTERP, SELF))
                     break;
@@ -618,12 +618,9 @@ Retrieve the read mode string for the filehandle.
 */
 
     METHOD mode() {
-        STRING *mode, *mode_copy;
-
+        STRING *mode;
         GET_ATTR_mode(INTERP, SELF, mode);
-        mode_copy = Parrot_str_copy(INTERP, mode);
-
-        RETURN(STRING *mode_copy);
+        RETURN(STRING *mode);
     }
 
 
@@ -640,20 +637,14 @@ scheme) for the filehandle.
 
     METHOD encoding(STRING *new_encoding :optional, INTVAL got_encoding :opt_flag) {
         STRING *encoding;
-        STRING *encoding_copy = NULL;
 
         if (got_encoding) {
-            if (!STRING_IS_NULL(new_encoding))
-                encoding_copy = Parrot_str_copy(INTERP, new_encoding);
-            SET_ATTR_encoding(INTERP, SELF, encoding_copy);
+            SET_ATTR_encoding(INTERP, SELF, new_encoding);
             RETURN(STRING *new_encoding);
         }
 
         GET_ATTR_encoding(INTERP, SELF, encoding);
-        if (!STRING_IS_NULL(encoding))
-            encoding_copy = Parrot_str_copy(INTERP, encoding);
-
-        RETURN(STRING *encoding_copy);
+        RETURN(STRING *encoding);
     }
 
 

@@ -239,6 +239,8 @@ Set pending standard properties in C<prop_hash>.
 static void
 propagate_std_props(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *prop_hash))
 {
+    ASSERT_ARGS(propagate_std_props)
+
     if (self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG)){
         PMC * const pmc_true  = Parrot_pmc_new(interp, enum_class_Integer);
         VTABLE_set_integer_native(interp, pmc_true, 1);
@@ -284,6 +286,8 @@ PARROT_CAN_RETURN_NULL
 static PMC*
 check_get_std_props(PARROT_INTERP, ARGIN(const PMC *self), ARGIN(const STRING *key))
 {
+    ASSERT_ARGS(check_get_std_props)
+
     if ((self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG))
        && Parrot_str_equal(interp, key, CONST_STRING(interp, "_ro"))) {
         PMC * const ret_val  = Parrot_pmc_new(interp, enum_class_Integer);
@@ -299,8 +303,7 @@ check_get_std_props(PARROT_INTERP, ARGIN(const PMC *self), ARGIN(const STRING *k
 =item C<static PMC* make_prop_hash(PARROT_INTERP, PMC *self)>
 
 Create a property hash for C<self>. Returns the created hash. Inferred
-properties will be added to the hash and it will be set as
-C<PMC_metadata(self)>.
+properties will be added to the hash.
 
 =cut
 
@@ -311,9 +314,9 @@ PARROT_WARN_UNUSED_RESULT
 static PMC*
 make_prop_hash(PARROT_INTERP, ARGMOD(PMC *self))
 {
-    PMC * const prop = Parrot_pmc_new(interp, enum_class_Hash);
+    ASSERT_ARGS(make_prop_hash)
 
-    PMC_metadata(self) = prop;
+    PMC * const prop = Parrot_pmc_new(interp, enum_class_Hash);
     propagate_std_props(interp, self, prop);
     return prop;
 }
@@ -444,7 +447,7 @@ Sets the property for C<*key> to C<*value>.
             return;
 
         if (PMC_IS_NULL(PMC_metadata(SELF)))
-            make_prop_hash(INTERP, SELF);
+            PMC_metadata(SELF) = make_prop_hash(INTERP, SELF);
 
         VTABLE_set_pmc_keyed_str(INTERP, PMC_metadata(SELF), key, value);
     }
@@ -477,7 +480,7 @@ Returns the PMC's properties or the NULL PMC if no properties exist.
     VTABLE PMC *getprops() {
         if (PMC_IS_NULL(PMC_metadata(SELF))) {
             if (has_pending_std_props(SELF))
-                return make_prop_hash(INTERP, SELF);
+                PMC_metadata(SELF) = make_prop_hash(INTERP, SELF);
             else
                 return PMCNULL;
         }

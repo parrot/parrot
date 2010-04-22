@@ -453,11 +453,12 @@ void do_sub_pragmas(PARROT_INTERP,
 PARROT_EXPORT
 void PackFile_add_segment(PARROT_INTERP,
     ARGMOD(PackFile_Directory *dir),
-    ARGIN(PackFile_Segment *seg))
+    ARGMOD(PackFile_Segment *seg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*dir);
+        FUNC_MODIFIES(*dir)
+        FUNC_MODIFIES(*seg);
 
 PARROT_EXPORT
 void PackFile_Annotations_add_entry(PARROT_INTERP,
@@ -562,8 +563,9 @@ const opcode_t * PackFile_ConstTable_unpack(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-void PackFile_destroy(PARROT_INTERP, ARGMOD_NULLOK(PackFile *pf))
+void PackFile_destroy(PARROT_INTERP, ARGMOD(PackFile *pf))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         FUNC_MODIFIES(*pf);
 
 PARROT_EXPORT
@@ -580,7 +582,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PackFile_Segment * PackFile_find_segment(PARROT_INTERP,
     ARGIN_NULLOK(PackFile_Directory *dir),
-    ARGIN(STRING *name),
+    ARGIN(const STRING *name),
     int sub_dir)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -808,10 +810,9 @@ PMC * PackFile_Annotations_lookup(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-opcode_t * PackFile_Annotations_pack(PARROT_INTERP,
+opcode_t * PackFile_Annotations_pack(SHIM_INTERP,
     ARGIN(PackFile_Segment *seg),
     ARGMOD(opcode_t *cursor))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*cursor);
@@ -880,7 +881,8 @@ void Parrot_trace_eprintf(ARGIN(const char *s), ...)
     , PARROT_ASSERT_ARG(seg) \
     , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_PackFile_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pf))
 #define ASSERT_ARGS_PackFile_find_fixup_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))
@@ -976,8 +978,7 @@ void Parrot_trace_eprintf(ARGIN(const char *s), ...)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_PackFile_Annotations_pack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(seg) \
+       PARROT_ASSERT_ARG(seg) \
     , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_PackFile_Annotations_packed_size \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

@@ -3,14 +3,14 @@
 
 =head1 PDD 17: Polymorphic Containers
 
-=head2 Version
-
-$Revision$
-
 =head2 Abstract
 
 This PDD describes the internal structure and behavior of the Polymorphic
 Container (PMC) data type.
+
+=head2 Version
+
+$Revision$
 
 =head2 Description
 
@@ -1809,17 +1809,9 @@ A subroutine implementing a language compiler. (Derived from NCI.)
 
 =back
 
-=head2 Attachments
-
-None.
-
-=head2 Footnotes
-
-None.
-
 =head2 References
 
-  docs/pmc2c.pod
+F<docs/pmc2c.pod>
 
 =cut
 

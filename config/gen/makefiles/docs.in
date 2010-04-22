@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2006, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 # Setup of some commands
@@ -10,6 +10,9 @@ RM_F    = @rm_f@
 RM_RF   = @rm_rf@
 PERLDOC_BIN = @perldoc@
 VERSION = @VERSION@@DEVEL@
+
+# chapters in the generated PDF parrot book
+CHAPTERS = $(PERL) ../tools/docs/filename_and_chapter.pl --b_out
 
 # long list of .pod files
 POD = @TEMP_pod@
@@ -49,6 +52,21 @@ clean:
 
 html: all
 	$(PERL) -I../lib ../tools/docs/write_docs.pl --silent --version=$(VERSION)
+
+# The pdf target is to generate a parrot PDF document.
+# It will not work on Windows. It call a script which use a specific Unix
+# command. May be that will be changed.
+pdf: ../tools/docs/book-to-latex.pl ../tools/docs/filename_and_chapter.pl
+	$(MKPATH) build/modified_pod
+	$(PERL) ../tools/docs/filename_and_chapter.pl
+	$(PERL) ../tools/docs/book-to-latex.pl `$(CHAPTERS)` > build/parrot-book.tex
+	cd build && pdflatex parrot-book.tex && pdflatex parrot-book.tex
+
+#pdf-release: build/parrot-book.pdf
+#	cp build/parrot-book.pdf build/parrot-book-$$(date +"%Y.%m").pdf
+
+pdf-clean:
+	$(RM_RF) build
 
 html-clean:
 	$(RM_RF) html

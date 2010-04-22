@@ -1,16 +1,16 @@
-# Copyright (C) 2001-2006, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 PDD 20: Lexical Variables
-
-=head2 Version
-
-$Revision$
 
 =head2 Abstract
 
 This document defines the requirements and implementation strategy for
 lexically scoped variables.
+
+=head2 Version
+
+$Revision$
 
 =head2 Synopsis
 
@@ -402,23 +402,9 @@ frames become visible as PMCs.
 
 TK.
 
-=head2 Attachments
-
-None.
-
-=head2 Footnotes
-
-None.
-
 =head2 References
 
-=over 4
-
-=item [1]
-
-t/op/lexicals.t
-
-=back
+F<t/op/lexicals.t>
 
 =cut
 

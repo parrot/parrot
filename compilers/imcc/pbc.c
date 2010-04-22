@@ -1064,8 +1064,7 @@ mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
     if (!pcc_sub->multi[0])
         return Parrot_pmc_new(interp, enum_class_FixedIntegerArray);
 
-    multi_sig = Parrot_pmc_new(interp, enum_class_FixedPMCArray);
-    VTABLE_set_integer_native(interp, multi_sig, n);
+    multi_sig = Parrot_pmc_new_init_int(interp, enum_class_FixedPMCArray, n);
     ct        = interp->code->const_table;
 
     for (i = 0; i < n; ++i) {
@@ -1337,8 +1336,10 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
         unit->subid = r;
     else {
         /* trim the quotes  */
+        char *oldname     = unit->subid->name;
         unit->subid->name = mem_sys_strdup(unit->subid->name + 1);
         unit->subid->name[strlen(unit->subid->name) - 1] = 0;
+        mem_sys_free(oldname);
 
         /* create string constant for it. */
         unit->subid->color = add_const_str(interp, unit->subid);
@@ -1541,7 +1542,7 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
     SymReg   *reg;
 
     char      s_key[KEYLEN * 10];
-    opcode_t  key[KEYLEN];
+    opcode_t  key[KEYLEN + 1]; /* [0] -> length, [1..] -> keys */
     opcode_t  size;
     int       key_length;     /* P0["hi;there"; S0; 2] has length 3 */
     int       k;

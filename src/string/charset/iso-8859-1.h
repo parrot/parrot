@@ -18,15 +18,11 @@
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-STRING * charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP,
-    ARGIN(STRING *src),
-    ARGMOD_NULLOK(STRING *dest))
+STRING * charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP, ARGIN(STRING *src))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*dest);
+        __attribute__nonnull__(2);
 
-PARROT_CANNOT_RETURN_NULL
-const CHARSET * Parrot_charset_iso_8859_1_init(PARROT_INTERP)
+void Parrot_charset_iso_8859_1_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_charset_cvt_iso_8859_1_to_ascii \

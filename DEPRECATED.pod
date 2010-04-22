@@ -7,8 +7,8 @@ All items in this list should have a corresponding Trac ticket[1].
 
 =head1 Experimental Status
 
-These features are not considered stable, even though they may
-have shipped in a stable release of parrot[2]. Use them at your own
+These features are not considered supported, even though they may
+have shipped in a supported release of parrot[2]. Use them at your own
 risk, as they can be removed or changed in any release. These
 items are marked below with C<[experimental]>.
 
@@ -66,21 +66,64 @@ not already here. This allows the usage of $P0() instead of $P0($P0).
 
 L<https://trac.parrot.org/parrot/ticket/103>
 
-=item Digest dynpmcs [eligible in 2.4]
+=item NCI without signature ("raw" pointers) [eligible in 2.4]
 
-The digest dynpmcs are, since the posting of this notice, available on
-http://gitorious.org/digest-dynpmcs and will no longer be distributed
-with parrot after 2.3.
+No equivalent functionality is promised. You shouldn't be using this. Here be
+segfaults.
 
-L<https://trac.parrot.org/parrot/ticket/1467>
+L<https://trac.parrot.org/parrot/ticket/1549>
 
-=item gdbmhash dynpmc [eligible in 2.4]
+=item UnManagedStruct handling nested structure [eligible in 2.4]
 
-The gdbmhash dynpmc is, since the posting of this notice, available on
-http://gitorious.org/dbm-dynpmcs and will no longer be distributed
-with parrot after 2.3.
+UnManagedStruct will be simplified to only support flat structures. This means
+that elements which themselves have structure - struct pointers and function
+pointers will be stored as C<void *> and C<void (*)(void)> respectively. To use
+these, they will need to be cast to the appropriate signature on access.
 
-L<https://trac.parrot.org/parrot/ticket/1469>
+L<https://trac.parrot.org/parrot/ticket/1551>
+
+=item UnManagedStruct initializer structure [eligible in 2.4]
+
+The initializer structure will cease to be an array of triples. In stead, an
+array of flags (no counts or offsets), or a string representation of the same
+information may be used.
+
+L<https://trac.parrot.org/parrot/ticket/1552>
+
+=item UnManagedStruct get_integer, set_integer_native [eligible in 2.4]
+
+These will no longer refer to the byte length of the buffer, but to the number
+of times the struct is repeated; emulating an array of structs.
+
+L<https://trac.parrot.org/parrot/ticket/1553>
+
+=item ManagedStruct reallocations based on shape changes [eligible in 2.4]
+
+Since shape changes may simply be used for re-interpreting data, and may also
+occur in several steps, re-allocating after any one shape change may be
+undesirable. In stead, an explicit allocate/reallocate method will be provided.
+
+L<https://trac.parrot.org/parrot/ticket/1554>
+
+=item Auto-vivification of nested aggregates [eligible in 2.4]
+
+Auto-vivifation of nested aggregated is deprecated.
+
+E.g.
+
+  $P0 = new ['Hash']
+  $S1 = $P0['foo';'bar';'baz']
+
+will not auto-vivify nested hashes and return PMCNULL early.
+
+L<https://trac.parrot.org/parrot/ticket/1561>
+
+=item PMC must use manual_attrs or auto_attrs flag [eligible in 2.4]
+
+PMCs must no longer use default value for manual/auto attribute allocation,
+manual_attrs or auto_attrs must be specified.
+
+L<http://trac.parrot.org/parrot/ticket/1506>
 
 =back
 
@@ -122,10 +165,6 @@ L<https://trac.parrot.org/parrot/ticket/1260>
 
 =item get_results opcode order and features [eligible in 2.1]
 
-Move get_results to follow invoke.
-
-L<https://trac.parrot.org/parrot/ticket/1405>
-
 get_results no longer used to fetch exception object.
 
 L<https://trac.parrot.org/parrot/ticket/1406>
@@ -135,6 +174,10 @@ L<https://trac.parrot.org/parrot/ticket/1406>
 Ability to get the string name of the current GC core from the interpinfo_s_i.
 See r43900 and r43904 for details.
 
+=item NCI_FB_CB and NCI_FB_UD in iglobals [experimental]
+
+Hooks allowing a runtime-loadable dynamic frame builder.
+
 =item loadlib_p_s_p [experimental]
 
 Ability to use non-default dynamic loading behaviour.
@@ -142,6 +185,62 @@ Ability to use non-default dynamic loading behaviour.
 =item pushaction, pushmark, popmark [eligible in 2.4]
 
 L<https://trac.parrot.org/parrot/ticket/876>
+
+=item new_callback_p_p_p_s [eligible in 2.4]
+
+To be replaced with new_callback_p_p_p_p_s.
+
+L<https://trac.parrot.org/parrot/ticket/1548>
+
+=item dlfunc and new_callback signature string format [eligible in 2.4]
+
+These will be changed to allow more flexibility in types.
+
+L<https://trac.parrot.org/parrot/ticket/1565>
+
+=item find_lex [eligible in 2.4]
+
+find_lex will not throw exception for non-existing lexicals.
+
+L<https://trac.parrot.org/parrot/ticket/1207>
+
+=item substr_s_i_i_s [eligible in 2.4]
+
+This op will be replaced with replace_s_s_i_i_s op to clearly indicate
+semantic. Part of COW removal.
+
+L<https://trac.parrot.org/parrot/ticket/1540>
+
+=item substr_s_s_i_i_s [eligible in 2.4]
+
+This op is deprecated. Use replace_s_s_i_i_s or substr_s_s_i_i (or both)
+instead. Part of COW removal.
+
+L<https://trac.parrot.org/parrot/ticket/1540>
+
+=item inplace string updates. [eligible in 2.4]
+
+All "inplace" string update ops are deprecated. E.g. "chopn_s", etc.
+Part of COW removal.
+
+L<https://trac.parrot.org/parrot/ticket/1540>
+
+=back
+
+=head1 Runcores
+
+=over 4
+
+=item Unused Runcores [eligible in 2.4]
+
+The following Runcores do not appear to be used.  Accordingly they will
+be eligible for removal.
+
+CGoto
+CGP
+Switch
+
+L<https://trac.parrot.org/parrot/ticket/1563>
 
 =back
 
@@ -193,14 +292,6 @@ L<https://trac.parrot.org/parrot/ticket/1103>
 
 L<https://trac.parrot.org/parrot/ticket/907>
 
-=item Subs marked with C<:vtable>/C<:method> aren't in namespace [eligible in 1.1]
-
-Subs marked with C<:vtable> or C<:method> flags are no longer given a
-namespace entry by default.  Use the C<:nsentry> flag to cause this
-to happen.
-
-L<https://trac.parrot.org/parrot/ticket/389>
-
 =item C API coding standards cleanup [eligible in 1.1]
 
 All C API functions that aren't currently named according to the
@@ -229,6 +320,13 @@ renamed to Parrot_str_is_null
 =item Parrot_string_* [eligible in 2.4]
 
 rename Parrot_string_cstring to Parrot_str_cstring
+
+=item STRING COW [eligible in 2.4]
+
+COW strings are to be removed. All "inplace" string modification
+functions and all "inplace" string ops are deprecated.
+
+L<https://trac.parrot.org/parrot/ticket/1540>
 
 =item Parrot_PMC_* in src/extend.c [eligible in 2.4]
 
@@ -353,7 +451,7 @@ L<Trac|http://trac.parrot.org/> is parrot's primary issue tracking system.
 =item 2
 
 For an item to be considered experimental, it can B<never> have shipped in
-a stable release without the C<[experimental]> tag; otherwise, it must be
+a supported release without the C<[experimental]> tag; otherwise, it must be
 deprecated normally before removal or incompatible change.
 
 =back

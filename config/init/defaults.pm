@@ -94,9 +94,9 @@ sub runstep {
         # Compiler -- used to turn .c files into object files.
         # (Usually cc or cl, or something like that.)
         cc      => $cc_option ? $cc_option : $Config{cc},
-        # If we specify a compiler, we can't use existing ccflags and ccwarn.
+        # If we specify a compiler, we can't use existing ccflags.
         ccflags => $cc_option ? ''         : $Config{ccflags},
-        ccwarn  => $cc_option ? ''         : $Config{ccwarn},
+        ccwarn  => '',
 
         # Flags used to indicate this object file is to be compiled
         # with position-independent code suitable for dynamic loading.

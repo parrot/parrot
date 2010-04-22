@@ -1,22 +1,25 @@
 # $Id$
 
 New in 2.3.0
-- Features
 - Core
   + Allow passing parameters to the dynamic linker ('dlopen' improved)
   + loadlib opcode added
-  + Merge of pcc_hackatron branch
+  + Calling conventions are now much more consistent, and follows natural
+    semantics of handling arguments and return values
   + Recursive make for src/dynpmc removed
-- Compilers
-- Deprecations
-- API
+  + Datatype STRINGNULL for a single Null STRING added
+  + config_lib.pasm replaced with config_lib.pir
 - Platforms
   + Improved handling of new compilers
-- Bugfix
-- Tests
+  + Cygwin packages will be updated again with Parrot releases
+  + Fedora packages add desktop files
+  + gzip and bzip2 compressed tar files for releases
 - Tools
-- Documentation
+  + tapir executable added; tapir is a TAP test harness
+  + Added TAP options --merge --ignore-exit
 - Miscellaneous
+  + 3 month cycle for supported releases
+  + Review and vote of GSoC applications
 
 New in 2.2.0
 - Core changes

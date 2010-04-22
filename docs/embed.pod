@@ -1551,8 +1551,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_store_sub_in_namespace>
 
-=item C<Parrot_str_append>
-
 =item C<Parrot_str_boolean>
 
 =item C<Parrot_str_byte_length>

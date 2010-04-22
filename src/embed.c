@@ -44,7 +44,7 @@ static PMC* set_current_sub(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
-static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
+static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -618,7 +618,7 @@ Parrot_pbc_fixup_loaded(PARROT_INTERP)
 
 /*
 
-=item C<static PMC* setup_argv(PARROT_INTERP, int argc, char **argv)>
+=item C<static PMC* setup_argv(PARROT_INTERP, int argc, const char **argv)>
 
 Creates and returns C<ARGS> array PMC.
 
@@ -628,7 +628,7 @@ Creates and returns C<ARGS> array PMC.
 
 PARROT_CANNOT_RETURN_NULL
 static PMC*
-setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
+setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
 {
     ASSERT_ARGS(setup_argv)
     PMC   * const userargv = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
@@ -748,7 +748,7 @@ set_current_sub(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_runcode(PARROT_INTERP, int argc, char **argv)>
+=item C<void Parrot_runcode(PARROT_INTERP, int argc, const char **argv)>
 
 Sets up C<ARGV> and runs the ops.
 
@@ -758,7 +758,7 @@ Sets up C<ARGV> and runs the ops.
 
 PARROT_EXPORT
 void
-Parrot_runcode(PARROT_INTERP, int argc, ARGIN(char **argv))
+Parrot_runcode(PARROT_INTERP, int argc, ARGIN(const char **argv))
 {
     PMC *userargv, *main_sub;
 

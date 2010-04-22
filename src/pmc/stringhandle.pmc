@@ -110,11 +110,11 @@ Create a copy of the stringhandle.
         Parrot_StringHandle_attributes * const data_struct = PARROT_STRINGHANDLE(copy);
 
         if (old_struct->stringhandle != NULL)
-            data_struct->stringhandle = Parrot_str_copy(INTERP, old_struct->stringhandle);
+            data_struct->stringhandle = old_struct->stringhandle;
         if (old_struct->mode != NULL)
-            data_struct->mode     = Parrot_str_copy(INTERP, old_struct->mode);
+            data_struct->mode     = old_struct->mode;
         if (old_struct->encoding != NULL)
-            data_struct->encoding = Parrot_str_copy(INTERP, old_struct->encoding);
+            data_struct->encoding = old_struct->encoding;
         data_struct->flags    = old_struct->flags;
 
         return copy;
@@ -182,10 +182,10 @@ stored for mocking.
         INTVAL flags;
 
         if (got_mode && !STRING_IS_NULL(mode))
-            SET_ATTR_mode(INTERP, SELF, Parrot_str_copy(INTERP, mode));
+            SET_ATTR_mode(INTERP, SELF, mode);
 
         if (got_filename && !STRING_IS_NULL(filename))
-            SET_ATTR_filename(INTERP, SELF, Parrot_str_copy(INTERP, filename));
+            SET_ATTR_filename(INTERP, SELF, filename);
 
 
         /* If StringHandle hasn't already been initialized, create a new string. */
@@ -317,8 +317,6 @@ StringHandle object that isn't opened yet, returns an empty string.
             else
                 string_result = Parrot_str_new_constant(INTERP, "");
         }
-        else
-            string_result = Parrot_str_copy(INTERP, string_result);
 
         RETURN(STRING *string_result);
     }
@@ -378,7 +376,7 @@ Print the string to the stringhandle.
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Cannot write to a filehandle not opened for write");
 
-        new_string = Parrot_str_append(interp, old_string, to_print);
+        new_string = Parrot_str_concat(interp, old_string, to_print);
 
         SET_ATTR_stringhandle(INTERP, SELF, new_string);
 
@@ -464,13 +462,9 @@ Retrieve the read mode string for the stringhandle.
 */
 
     METHOD mode() {
-        STRING *mode, *mode_copy;
-
+        STRING *mode;
         GET_ATTR_mode(INTERP, SELF, mode);
-        mode_copy = Parrot_str_copy(INTERP, mode);
-
-        RETURN(STRING *mode_copy);
-
+        RETURN(STRING *mode);
     }
 
 /*
@@ -486,21 +480,14 @@ scheme) for the stringhandle.
 
     METHOD encoding(STRING *new_encoding :optional, INTVAL got_encoding :opt_flag) {
         STRING *encoding;
-        STRING *encoding_copy = NULL;
 
         if (got_encoding) {
-            if (!STRING_IS_NULL(new_encoding))
-                encoding_copy = Parrot_str_copy(INTERP, new_encoding);
-            SET_ATTR_encoding(INTERP, SELF, encoding_copy);
+            SET_ATTR_encoding(INTERP, SELF, new_encoding);
             RETURN(STRING *new_encoding);
         }
 
         GET_ATTR_encoding(INTERP, SELF, encoding);
-        if (!STRING_IS_NULL(encoding))
-            encoding_copy = Parrot_str_copy(INTERP, encoding);
-
-        RETURN(STRING *encoding_copy);
-
+        RETURN(STRING *encoding);
     }
 
 /*

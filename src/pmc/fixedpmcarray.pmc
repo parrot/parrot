@@ -91,20 +91,13 @@ Initializes the array.
 */
 
     VTABLE void init_int(INTVAL size) {
-        PMC **data;
-        int i;
-
         if (size < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     _("FixedPMCArray: Cannot set array size to a negative number (%d)"), size);
 
-        SET_ATTR_size(INTERP, SELF, size);
-        data           = mem_gc_allocate_n_typed(INTERP, size, PMC *);
+        SELF.set_integer_native(size);
 
-        for (i = 0; i < size; i++)
-            data[i] = PMCNULL;
-
-        PObj_custom_destroy_SET(SELF);
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 
 /*
@@ -138,7 +131,7 @@ Creates and returns a copy of the array.
 
         if (size) {
             PMC_size(dest)  = size;
-            PMC_array(dest) = mem_gc_allocate_n_zeroed_typed(INTERP, size, PMC *);
+            PMC_array(dest) = mem_gc_allocate_n_typed(INTERP, size, PMC *);
             mem_copy_n_typed(PMC_array(dest), PMC_array(SELF), size, PMC *);
             PObj_custom_mark_destroy_SETALL(dest);
         }
@@ -229,12 +222,12 @@ TT #1229: implement freeze/thaw and use that instead.
         for (i = 0; i < n; ++i) {
             PMC * const val = SELF.get_pmc_keyed_int(i);
             if (i > 0)
-                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, ", "));
+                res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, ", "));
 
-            res = Parrot_str_append(INTERP, res, VTABLE_get_repr(INTERP, val));
+            res = Parrot_str_concat(INTERP, res, VTABLE_get_repr(INTERP, val));
         }
 
-        res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, ")"));
+        res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, ")"));
 
         return res;
     }
@@ -408,7 +401,7 @@ array.
                     _("FixedPMCArray: Cannot set array size to a negative number"));
 
         PMC_size(SELF) = size;
-        data           = mem_gc_allocate_n_zeroed_typed(INTERP, size, PMC *);
+        data           = mem_gc_allocate_n_typed(INTERP, size, PMC *);
 
         for (i = 0; i < size; i++)
             data[i] = PMCNULL;
@@ -431,7 +424,7 @@ array.
             mem_gc_free(INTERP, PMC_array(SELF));
 
         size            = PMC_size(SELF) = VTABLE_elements(INTERP, value);
-        PMC_array(SELF) = mem_gc_allocate_n_zeroed_typed(INTERP, size, PMC *);
+        PMC_array(SELF) = mem_gc_allocate_n_typed(INTERP, size, PMC *);
 
         for (i = 0; i < size; i++)
             (PMC_array(SELF))[i] = VTABLE_get_pmc_keyed_int(INTERP, value, i);

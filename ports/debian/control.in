@@ -3,7 +3,7 @@ Section: interpreters
 Priority: optional
 Maintainer: Debian Parrot Maintainers <pkg-parrot-devel@lists.alioth.debian.org>
 Uploaders: Allison Randal <allison@parrot.org>, Nuno Carvalho <mestre.smash@gmail.com>, Patrick Michaud <pmichaud@pobox.com>
-Build-Depends: debhelper (>= 5.0.0), perl, perl-doc, libgdbm-dev, libreadline-dev, quilt
+Build-Depends: debhelper (>= 5.0.0), perl, perl-doc, libreadline-dev, quilt
 Standards-Version: 3.8.4
 
 Package: parrot
