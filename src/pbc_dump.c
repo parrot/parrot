@@ -111,7 +111,7 @@ Disassemble and dump.
 static void
 disas_dump(PARROT_INTERP, const PackFile_Segment *self)
 {
-    opcode_t *pc = self->data;
+    const opcode_t *pc = self->data;
 
     Parrot_io_printf(interp, "%Ss => [ # %d ops at offs 0x%x\n",
             self->name, (int)self->size, (int)self->file_offset + 4);
@@ -154,14 +154,14 @@ Disassembles and dumps op names and line numbers only.
 static void
 nums_dump(PARROT_INTERP, const PackFile_Segment *self)
 {
-    STRING                 *debug_name = Parrot_str_concat(interp, self->name,
+    const STRING           *debug_name = Parrot_str_concat(interp, self->name,
             Parrot_str_new_constant(interp, "_DB"));
     const PackFile_Segment *debug      = PackFile_find_segment(interp,
                                             self->dir, debug_name, 1);
 
-    opcode_t               *pc         = self->data;
-    opcode_t               *debug_ops  = debug->data;
-    const op_info_t * const op_info    = interp->op_info_table;
+    const opcode_t  * pc            = self->data;
+    const opcode_t  * debug_ops     = debug->data;
+    const op_info_t * const op_info = interp->op_info_table;
 
     while (pc < self->data + self->size) {
         /* n can't be const; the ADD_OP_VAR_PART macro increments it */
