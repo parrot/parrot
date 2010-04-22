@@ -37,6 +37,8 @@ specifically by including this C<PIR> code:
 
 =over 4
 
+=item gziphandle [experimental]
+
 =item RetContinuation [eligible in 2.4]
 
 In future, just use Continuation.
