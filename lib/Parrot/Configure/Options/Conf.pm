@@ -103,6 +103,7 @@ External Library Options:
    --without-gmp        Build parrot without GMP support
    --without-opengl     Build parrot without OpenGL support (GL/GLU/GLUT)
    --without-pcre       Build parrot without pcre support
+   --without-zlib       Build parrot without zlib support
 
 ICU Options:
 

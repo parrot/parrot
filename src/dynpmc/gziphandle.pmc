@@ -1,0 +1,87 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/dynpmc/gziphandle.pmc - GzipHandle PMC
+
+=head1 DESCRIPTION
+
+The GzipHandle PMC performs I/O operations on a source or destination file.
+
+This PMC wraps the zlib.
+
+=head2 Vtable Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include <zlib.h>
+#include "parrot/extend.h"
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+pmclass GzipHandle extends Handle dynpmc auto_attrs {
+
+/*
+
+=item C<void init()>
+
+Initializes a newly created FileHandle object.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+    }
+
+/*
+
+=back
+
+=head2 Stream-Oriented Methods
+
+=over 4
+
+*/
+
+
+/*
+
+=back
+
+=head2 Basic Methods
+
+=over 4
+
+*/
+
+    METHOD version() {
+        STRING *version = Parrot_str_new_constant(INTERP, zlibVersion());
+        RETURN(STRING *version);
+    }
+
+/*
+
+=back
+
+=cut
+
+*/
+
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+

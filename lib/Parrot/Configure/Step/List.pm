@@ -54,6 +54,7 @@ my @steps = qw(
     auto::readline
     auto::pcre
     auto::opengl
+    auto::zlib
     auto::gettext
     auto::snprintf
     auto::perldoc
