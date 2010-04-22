@@ -33,7 +33,7 @@ STRING *STRINGNULL;
 #endif
 
 #define nonnull_encoding_name(s) (s) ? (s)->encoding->name : "null string"
-#define saneify_string(s) \
+#define ASSERT_STRING_SANITY(s) \
     PARROT_ASSERT((s)->encoding); \
     PARROT_ASSERT((s)->charset); \
     PARROT_ASSERT(!PObj_on_free_list_TEST(s))
@@ -44,7 +44,7 @@ STRING *STRINGNULL;
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_INLINE
-PARROT_WARN_UNUSED_RESULT
+PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 static const CHARSET * string_rep_compatible(SHIM_INTERP,
     ARGIN(const STRING *a),
@@ -258,7 +258,7 @@ Returs NULL, if no compatible string representation can be found.
 */
 
 PARROT_INLINE
-PARROT_WARN_UNUSED_RESULT
+PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 static const CHARSET *
 string_rep_compatible(SHIM_INTERP,
@@ -434,8 +434,8 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(STRING *a),
     if (STRING_IS_NULL(a) || Buffer_bufstart(a) == NULL)
         return b;
 
-    saneify_string(a);
-    saneify_string(b);
+    ASSERT_STRING_SANITY(a);
+    ASSERT_STRING_SANITY(b);
 
     cs = string_rep_compatible(interp, a, b, &enc);
 
@@ -828,7 +828,7 @@ INTVAL
 Parrot_str_indexed(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_str_indexed)
-    saneify_string(s);
+    ASSERT_STRING_SANITY(s);
     return (INTVAL)CHARSET_GET_CODEPOINT(interp, s, idx);
 }
 
@@ -1068,7 +1068,7 @@ Parrot_str_substr(PARROT_INTERP,
         Parrot_ex_throw_from_c_args(interp, NULL,
             EXCEPTION_SUBSTR_OUT_OF_STRING, "Cannot substr on a null string");
 
-    saneify_string(src);
+    ASSERT_STRING_SANITY(src);
 
     /* Allow regexes to return $' easily for "aaa" =~ /aaa/ */
     if (offset == (INTVAL)Parrot_str_byte_length(interp, src) || length < 1)
@@ -1307,8 +1307,8 @@ Parrot_str_compare(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(c
     if (STRING_IS_NULL(s1))
         return -(s2->strlen != 0);
 
-    saneify_string(s1);
-    saneify_string(s2);
+    ASSERT_STRING_SANITY(s1);
+    ASSERT_STRING_SANITY(s2);
 
     return CHARSET_COMPARE(interp, s1, s2);
 }
@@ -2329,7 +2329,7 @@ Parrot_str_to_hashval(PARROT_INTERP, ARGMOD_NULLOK(STRING *s))
         hashval = ENCODING_HASH(interp, s, hashval);
     else {
         /* ZZZZZ workaround for something not setting up encodings right */
-        saneify_string(s);
+        ASSERT_STRING_SANITY(s);
 
         ENCODING_ITER_INIT(interp, s, &iter);
 
@@ -2996,7 +2996,8 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
 
         if (next->encoding != j->encoding) {
             const ENCODING *e = j->encoding;
-            const CHARSET  *c = string_rep_compatible(interp, next, j, &e);
+
+            string_rep_compatible(interp, next, j, &e);
             if (e == Parrot_fixed_8_encoding_ptr)
                 e = Parrot_utf8_encoding_ptr;
             j           = e->to_encoding(interp, j);
