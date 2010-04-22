@@ -1,6 +1,6 @@
 /*
+ * Copyright (C) 2004-2010, Parrot Foundation.
  * $Id$
- * Copyright (C) 2004-2009, Parrot Foundation.
  */
 
 /*
@@ -77,7 +77,7 @@ given timer handle.
 */
 
 int
-get_sys_timer_ms(void *handle)
+get_sys_timer_ms(SHIM(void *handle))
 {
     struct itimerval ots;
     getitimer(ITIMER_REAL, &ots);
