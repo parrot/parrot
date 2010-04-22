@@ -1094,8 +1094,8 @@ Parrot_str_substr(PARROT_INTERP,
 
 /*
 
-=item C<STRING * Parrot_str_replace(PARROT_INTERP, STRING *src, INTVAL offset,
-INTVAL length, STRING *rep)>
+=item C<STRING * Parrot_str_replace(PARROT_INTERP, const STRING *src, INTVAL
+offset, INTVAL length, const STRING *rep)>
 
 Replaces a sequence of C<length> characters from C<offset> in the first
 Parrot string with the second Parrot string, returning what was
@@ -1121,8 +1121,8 @@ PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-Parrot_str_replace(PARROT_INTERP, ARGIN(STRING *src),
-    INTVAL offset, INTVAL length, ARGIN(STRING *rep))
+Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
+    INTVAL offset, INTVAL length, ARGIN(const STRING *rep))
 {
     ASSERT_ARGS(Parrot_str_replace)
     String_iter     iter;
@@ -1162,10 +1162,9 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(STRING *src),
     if (!cs) {
         src = Parrot_utf16_encoding_ptr->to_encoding(interp, src);
         rep = Parrot_utf16_encoding_ptr->to_encoding(interp, rep);
-    }
-    else {
-        src->charset  = cs;
-        src->encoding = enc;
+        /* Remember selected charset and encoding */
+        enc = src->encoding;
+        cs  = src->charset;
     }
 
     /* get byte position of the part that will be replaced */
@@ -1186,8 +1185,9 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(STRING *src),
     /* Now do the replacement */
     dest = Parrot_gc_new_string_header(interp, 0);
 
-    /* Copy encoding/charset/etc */
-    STRUCT_COPY(dest, src);
+    /* Set encoding and charset to compatible */
+    dest->encoding = enc;
+    dest->charset  = cs;
 
     /* Clear COW flag. We own buffer */
     PObj_get_FLAGS(dest) = PObj_is_string_FLAG

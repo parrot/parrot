@@ -305,10 +305,10 @@ PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING * Parrot_str_replace(PARROT_INTERP,
-    ARGIN(STRING *src),
+    ARGIN(const STRING *src),
     INTVAL offset,
     INTVAL length,
-    ARGIN(STRING *rep))
+    ARGIN(const STRING *rep))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(5);
