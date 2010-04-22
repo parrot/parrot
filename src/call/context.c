@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2009, Parrot Foundation.
+Copyright (C) 2009-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -82,7 +82,7 @@ static size_t calculate_registers_size(SHIM_INTERP,
 static void clear_regs(PARROT_INTERP, ARGMOD(Parrot_Context *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pmcctx);
+        FUNC_MODIFIES(*ctx);
 
 PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
@@ -111,7 +111,7 @@ static size_t Parrot_pcc_calculate_registers_size(PARROT_INTERP,
        PARROT_ASSERT_ARG(number_regs_used))
 #define ASSERT_ARGS_clear_regs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmcctx))
+    , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_get_context_struct_fast __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
@@ -242,7 +242,7 @@ get_context_struct_fast(PARROT_INTERP, ARGIN(PMC *ctx))
 
 /*
 
-=item C<static void clear_regs(PARROT_INTERP, PMC *pmcctx)>
+=item C<static void clear_regs(PARROT_INTERP, Parrot_Context *ctx)>
 
 Clears all registers in a context.  PMC and STRING registers contain PMCNULL
 and NULL, respectively.  Integer and float registers contain negative flag
