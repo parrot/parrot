@@ -221,6 +221,7 @@ get_codepoint(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset)
     ASSERT_ARGS(get_codepoint)
 #if PARROT_HAS_ICU
     const UChar * const s = (const UChar*) src->strstart;
+    UNUSED(interp);
     return s[offset];
 #else
     UNUSED(offset);
@@ -483,7 +484,8 @@ ucs2_hash(PARROT_INTERP, ARGIN(const STRING *s), size_t hashval)
 {
     ASSERT_ARGS(ucs2_hash)
 #if PARROT_HAS_ICU
-    UChar  *pos = (UChar*) s->strstart;
+    UNUSED(interp);
+    const UChar *pos = (const UChar*) s->strstart;
     UINTVAL len = s->strlen;
 
     while (len--) {
