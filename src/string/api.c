@@ -251,7 +251,7 @@ Find the "lowest" possible charset and encoding for the given string. E.g.
   ascii <op> utf8 => utf8
                   => ascii, B<if> C<STRING *b> has ascii chars only.
 
-Returs NULL, if no compatible string representation can be found.
+Returns NULL, if no compatible string representation can be found.
 
 =cut
 
@@ -501,14 +501,15 @@ STRING *
 Parrot_str_new(PARROT_INTERP, ARGIN_NULLOK(const char * const buffer), const UINTVAL len)
 {
     ASSERT_ARGS(Parrot_str_new)
-    return Parrot_str_new_init(interp, buffer,
-           len
-             ? len
-             : buffer
-                 ? strlen(buffer)
-                 : 0,
-           /* Force an 8-bit encoding at some point? */
-           PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET, 0);
+    /* Force an 8-bit encoding at some point? */
+    if (len)
+        return Parrot_str_new_init(interp, buffer, len,
+            PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET, 0);
+    else {
+        const UINTVAL buff_length = buffer ? strlen(buffer) : 0;
+        return Parrot_str_new_init(interp, buffer, buff_length,
+            PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET, 0);
+    }
 }
 
 
@@ -535,7 +536,7 @@ Parrot_str_new_from_buffer(PARROT_INTERP, ARGMOD(Buffer *buffer), const UINTVAL 
 {
     ASSERT_ARGS(Parrot_str_new_from_buffer)
 
-    STRING *result          = Parrot_gc_new_string_header(interp, 0);
+    STRING * const result   = Parrot_gc_new_string_header(interp, 0);
     Buffer_bufstart(result) = Buffer_bufstart(buffer);
     Buffer_buflen(result)   = Buffer_buflen(buffer);
     result->strstart        = (char *)Buffer_bufstart(result);
@@ -803,7 +804,7 @@ Parrot_str_byte_length(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_byte_length)
 
-    return !STRING_IS_NULL(s) ? s->strlen : 0;
+    return STRING_IS_NULL(s) ? 0 : s->strlen;
 }
 
 
@@ -1357,15 +1358,12 @@ Parrot_str_equal(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(con
 {
     ASSERT_ARGS(Parrot_str_equal)
 
-    if ((s1 == s2) || (STRING_IS_NULL(s1) && STRING_IS_NULL(s2))) {
+    if ((s1 == s2) || (STRING_IS_NULL(s1) && STRING_IS_NULL(s2)))
         return 1;
-    }
-    else if (STRING_IS_NULL(s2)) {
+    else if (STRING_IS_NULL(s2))
         return s1->strlen == 0;
-    }
-    else if (STRING_IS_NULL(s1)) {
+    else if (STRING_IS_NULL(s1))
         return s2->strlen == 0;
-    }
 
    /* we don't care which is bigger */
     else if (s1->strlen != s2->strlen)
@@ -1802,6 +1800,7 @@ State of FSM during number value parsing.
 Integer uses only parse_start, parse_before_dot and parse_end.
 
 */
+
 typedef enum number_parse_state {
     parse_start,
     parse_before_dot,
@@ -2635,7 +2634,7 @@ Parrot_str_upcase(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Can't upcase NULL string");
     else {
-        STRING * res = CHARSET_UPCASE(interp, s);
+        STRING * const res = CHARSET_UPCASE(interp, s);
         res->hashval = 0;
         return res;
     }
@@ -2665,7 +2664,7 @@ Parrot_str_downcase(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Can't downcase NULL string");
     else {
-        STRING * res = CHARSET_DOWNCASE(interp, s);
+        STRING * const res = CHARSET_DOWNCASE(interp, s);
         res->hashval = 0;
         return res;
     }
@@ -2695,7 +2694,7 @@ Parrot_str_titlecase(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Can't titlecase NULL string");
     else {
-        STRING * res = CHARSET_TITLECASE(interp, s);
+        STRING * const res = CHARSET_TITLECASE(interp, s);
         res->hashval = 0;
         return res;
     }
