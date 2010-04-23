@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -58,7 +58,7 @@ Marks the object as live.
 */
 
     VTABLE void mark() {
-        Parrot_PackfileFixupEntry_attributes * attrs =
+        Parrot_PackfileFixupEntry_attributes * const attrs =
                 PARROT_PACKFILEFIXUPENTRY(SELF);
 
         Parrot_gc_mark_STRING_alive(interp, attrs->name);
@@ -75,7 +75,7 @@ Initialize from PackFile_FixupEntry pointer.
 */
 
     VTABLE void set_pointer(void * pointer) {
-        Parrot_PackfileFixupEntry_attributes * attrs =
+        Parrot_PackfileFixupEntry_attributes * const attrs =
                 PARROT_PACKFILEFIXUPENTRY(SELF);
         PackFile_FixupEntry *entry = (PackFile_FixupEntry*)pointer;
 
@@ -96,9 +96,9 @@ Create PackFile_FixupEntry* from self.
 
 */
     VTABLE void *get_pointer() {
-        Parrot_PackfileFixupEntry_attributes * attrs =
+        Parrot_PackfileFixupEntry_attributes * const attrs =
                 PARROT_PACKFILEFIXUPENTRY(SELF);
-        PackFile_FixupEntry                  * entry =
+        PackFile_FixupEntry                  * const entry =
                 mem_gc_allocate_zeroed_typed(INTERP, PackFile_FixupEntry);
 
         entry->type     = attrs->type;
@@ -173,7 +173,7 @@ Fetch the type field of the fixup entry.
 
 */
     METHOD get_type() {
-        INTVAL rv = PARROT_PACKFILEFIXUPENTRY(SELF)->type;
+        const INTVAL rv = PARROT_PACKFILEFIXUPENTRY(SELF)->type;
         RETURN(INTVAL rv);
     }
 
