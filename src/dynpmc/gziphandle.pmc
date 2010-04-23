@@ -158,8 +158,8 @@ Print the passed in integer, number, string, or PMC to the gziphandle.
     METHOD print(PMC *value) {
         gzFile file;
         STRING * const str = VTABLE_get_string(INTERP, value);
-        CHAR *buf = Parrot_str_to_cstring(INTERP, str);
-        INTVAL len =  Parrot_str_byte_length(INTERP, str);
+        char *buf = Parrot_str_to_cstring(INTERP, str);
+        UINTVAL len =  Parrot_str_byte_length(INTERP, str);
         GET_ATTR_file(INTERP, SELF, file);
         (void)gzwrite(file, buf, len);
         Parrot_str_free_cstring(buf);
@@ -178,8 +178,8 @@ Print the string to the gziphandle.
     METHOD puts(STRING *value) {
         INTVAL status;
         gzFile file;
-        CHAR *buf = Parrot_str_to_cstring(INTERP, value);
-        INTVAL len =  Parrot_str_byte_length(INTERP, value);
+        char *buf = Parrot_str_to_cstring(INTERP, value);
+        UINTVAL len =  Parrot_str_byte_length(INTERP, value);
         GET_ATTR_file(INTERP, SELF, file);
         status =  gzwrite(file, buf, len);
         Parrot_str_free_cstring(buf);
@@ -196,10 +196,10 @@ Read the given number of bytes from the gziphandle and return them in a string.
 
 */
     METHOD read(INTVAL length) {
-        INTVAL result;
+        int result;
         gzFile file;
         STRING *str = STRINGNULL;
-        CHAR * const buf = mem_sys_allocate_zeroed(length);
+        char * const buf = mem_allocate_n_zeroed_typed(length, char);
         GET_ATTR_file(INTERP, SELF, file);
         result = gzread(file, buf, length);
         if (result > 0) {
@@ -241,24 +241,24 @@ Returns a string with the zlib version.
     }
 
     METHOD compress(STRING *str) {
-        INTVAL rc;
-        UCHAR *buf;
+        int rc;
+        char *buf;
         STRING *dst = NULL;
         UINTVAL srcLen, bufSize, dstLen;
-        CHAR *src = Parrot_str_to_cstring(INTERP, str);
+        char *src = Parrot_str_to_cstring(INTERP, str);
         if (NULL == src) {
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "failed to allocate");
         }
         srcLen = Parrot_str_byte_length(INTERP, str);
         bufSize = 12 + srcLen + srcLen / 1000;
-        buf = mem_sys_allocate_zeroed(bufSize);
+        buf = mem_allocate_n_zeroed_typed(bufSize, char);
         if (NULL == buf) {
             Parrot_str_free_cstring(src);
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "failed to allocate");
         }
-        rc = compress(buf, &dstLen, src, srcLen);
+        rc = compress((Bytef *)buf, &dstLen, (const Bytef *)src, srcLen);
         Parrot_str_free_cstring(src);
         switch (rc) {
           case Z_OK:
