@@ -764,6 +764,48 @@ osutils - Parrot OS Utilities
   L7:
 .end
 
+=item gzip
+
+=cut
+
+.sub 'gzip'
+    .param string filename
+    .local pmc fh, gh
+    fh = new 'FileHandle'
+    push_eh _handler1
+    $S0 = fh.'readall'(filename)
+    $I0 = length $S0
+    pop_eh
+    $P0 = loadlib 'gziphandle'
+    push_eh _handler2
+    gh = new 'GzipHandle'
+    $S1 = filename . '.gz'
+    gh.'open'($S1, 'wb')
+    gh.'puts'($S0)
+    gh.'close'()
+    unlink(filename)
+    .return ()
+  _handler1:
+    .local pmc e
+    .get_results (e)
+    $S0 = "Can't open '"
+    $S0 .= filename
+    $S0 .= "' ("
+    $S1 = err
+    $S0 .= $S1
+    $S0 .= ")\n"
+    e = $S0
+    rethrow e
+  _handler2:
+    .local pmc e
+    .get_results (e)
+    $S0 = "Can't gzip '"
+    $S0 .= filename
+    $S0 .= "'\n"
+    e = $S0
+    rethrow e
+.end
+
 =back
 
 =head1 AUTHOR

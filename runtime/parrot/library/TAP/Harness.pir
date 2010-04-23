@@ -339,8 +339,7 @@ files or streams into an archive file (C<.tar.gz>).
     cmd .= " *"
     system(cmd)
     chdir(current_dir)
-    cmd = "gzip --best " . $S0
-    system(cmd)
+    gzip($S0)
     rmtree(dir)
     .return (aggregate)
 .end
