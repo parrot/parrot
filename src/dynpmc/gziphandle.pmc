@@ -27,7 +27,8 @@ This PMC wraps the zlib.
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
-pmclass GzipHandle extends Handle dynpmc auto_attrs {
+pmclass GzipHandle provides Handle dynpmc auto_attrs {
+    ATTR void *file;
 
 /*
 
@@ -38,8 +39,23 @@ Initializes a newly created FileHandle object.
 =cut
 
 */
-
     VTABLE void init() {
+        PARROT_GZIPHANDLE(SELF)->file = NULL;
+    }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns whether the GzipHandle has reached the end of the file.
+
+=cut
+
+*/
+    VTABLE INTVAL get_bool() {
+        gzFile file;
+        GET_ATTR_file(INTERP, SELF, file);
+        return !gzeof(file);
     }
 
 /*
@@ -50,8 +66,161 @@ Initializes a newly created FileHandle object.
 
 =over 4
 
-*/
+=item C<METHOD open(STRING *filename, STRING *mode :optional)>
 
+Opens the file at the given filename (including path) with the given mode. The
+invocant is modified and becomes an open filehandle.
+
+=cut
+
+*/
+    METHOD open(STRING *filename, STRING *mode :optional,
+                               INTVAL has_mode :opt_flag) {
+        gzFile file;
+        char *path;
+        char *mod = (char *)"rb";
+        path = Parrot_str_to_cstring(INTERP, filename);
+        if (has_mode)
+            mod = Parrot_str_to_cstring(INTERP, mode);
+        file = gzopen (path, mod);
+        Parrot_str_free_cstring(path);
+        if (has_mode)
+            Parrot_str_free_cstring(mod);
+        if (NULL == file) {
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+                "gzopen fails");
+        }
+        SET_ATTR_file(INTERP, SELF, file);
+        RETURN(PMC SELF);
+    }
+
+/*
+
+=item C<METHOD close()>
+
+Close the gziphandle.
+
+=cut
+
+*/
+    METHOD close() {
+        INTVAL status;
+        gzFile file;
+        GET_ATTR_file(INTERP, SELF, file);
+        status = gzclose(file);
+        RETURN(INTVAL status);
+    }
+
+/*
+
+=item C<METHOD eof()>
+
+Returns true if the filehandle is at end-of-file, returns false otherwise.
+
+=cut
+
+*/
+    METHOD eof() {
+        INTVAL status;
+        gzFile file;
+        GET_ATTR_file(INTERP, SELF, file);
+        status = gzeof(file);
+        RETURN(INTVAL status);
+    }
+
+/*
+
+=item C<METHOD flush()>
+
+Flushes the gziphandle.
+
+=cut
+
+*/
+    METHOD flush() {
+        INTVAL status;
+        gzFile file;
+        GET_ATTR_file(INTERP, SELF, file);
+        status = gzflush(file, Z_SYNC_FLUSH);
+        RETURN(INTVAL status);
+    }
+
+/*
+
+=item C<METHOD print([INTVAL|FLOATVAL|STRING *|PMC*] value)>
+
+Print the passed in integer, number, string, or PMC to the gziphandle.
+(Integers, numbers, and strings are auto-boxed as PMCs.)
+
+=cut
+
+*/
+    METHOD print(PMC *value) {
+        gzFile file;
+        STRING * const str = VTABLE_get_string(INTERP, value);
+        CHAR *buf = Parrot_str_to_cstring(INTERP, str);
+        INTVAL len =  Parrot_str_byte_length(INTERP, str);
+        GET_ATTR_file(INTERP, SELF, file);
+        (void)gzwrite(file, buf, len);
+        Parrot_str_free_cstring(buf);
+    }
+
+
+/*
+
+=item C<METHOD puts(STRING *value)>
+
+Print the string to the gziphandle.
+
+=cut
+
+*/
+    METHOD puts(STRING *value) {
+        INTVAL status;
+        gzFile file;
+        CHAR *buf = Parrot_str_to_cstring(INTERP, value);
+        INTVAL len =  Parrot_str_byte_length(INTERP, value);
+        GET_ATTR_file(INTERP, SELF, file);
+        status =  gzwrite(file, buf, len);
+        Parrot_str_free_cstring(buf);
+        RETURN(INTVAL status);
+    }
+
+/*
+
+=item C<METHOD read(INTVAL bytes)>
+
+Read the given number of bytes from the gziphandle and return them in a string.
+
+=cut
+
+*/
+    METHOD read(INTVAL length) {
+        INTVAL result;
+        gzFile file;
+        STRING *str = STRINGNULL;
+        CHAR * const buf = mem_sys_allocate_zeroed(length);
+        GET_ATTR_file(INTERP, SELF, file);
+        result = gzread(file, buf, length);
+        if (result > 0) {
+            str = Parrot_str_new(INTERP, buf, result);
+        }
+        mem_sys_free(buf);
+        RETURN(STRING *str);
+    }
+
+/*
+
+=item C<METHOD is_tty()>
+
+GzipHandles are never tty's, returns false.
+
+=cut
+
+*/
+    METHOD is_tty() {
+        RETURN(INTVAL 0);
+    }
 
 /*
 
@@ -61,11 +230,55 @@ Initializes a newly created FileHandle object.
 
 =over 4
 
-*/
+=item C<METHOD version()>
 
+Returns a string with the zlib version.
+
+*/
     METHOD version() {
         STRING *version = Parrot_str_new_constant(INTERP, zlibVersion());
         RETURN(STRING *version);
+    }
+
+    METHOD compress(STRING *str) {
+        INTVAL rc;
+        UCHAR *buf;
+        STRING *dst = NULL;
+        UINTVAL srcLen, bufSize, dstLen;
+        CHAR *src = Parrot_str_to_cstring(INTERP, str);
+        if (NULL == src) {
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+                "failed to allocate");
+        }
+        srcLen = Parrot_str_byte_length(INTERP, str);
+        bufSize = 12 + srcLen + srcLen / 1000;
+        buf = mem_sys_allocate_zeroed(bufSize);
+        if (NULL == buf) {
+            Parrot_str_free_cstring(src);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+                "failed to allocate");
+        }
+        rc = compress(buf, &dstLen, src, srcLen);
+        Parrot_str_free_cstring(src);
+        switch (rc) {
+          case Z_OK:
+            dst = Parrot_str_new(INTERP, buf, dstLen);
+            mem_sys_free(buf);
+            break;
+
+          case Z_MEM_ERROR:
+            mem_sys_free(buf);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+                "not enough memory");
+            break;
+
+          case Z_BUF_ERROR:
+            mem_sys_free(buf);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+                "output buffer error");
+            break;
+        }
+        RETURN(STRING *dst);
     }
 
 /*

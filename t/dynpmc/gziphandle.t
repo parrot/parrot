@@ -21,13 +21,14 @@ Tests the C<GzipHandle> PMC, a zlib wrapper.
     .include 'iglobals.pasm'
     .local pmc config_hash, interp
 
-    plan(2)
+    plan(3)
     interp = getinterp
     config_hash = interp[.IGLOBALS_CONFIG_HASH]
     $S0 = config_hash['has_zlib']
     unless $S0 goto no_zlib
 
     $P0 = loadlib 'gziphandle'
+    test_handle()
     test_version()
     .return()
 
@@ -37,10 +38,16 @@ Tests the C<GzipHandle> PMC, a zlib wrapper.
 .end
 
 
-.sub 'test_version'
+.sub 'test_handle'
     $P0 = new 'GzipHandle'
     $S0 = typeof $P0
     is($S0, 'GzipHandle', 'GzipHandle typeof')
+    $I0 = does $P0, 'Handle'
+    ok($I0, 'does Handle')
+.end
+
+.sub 'test_version'
+    $P0 = new 'GzipHandle'
     $S0 =$P0.'version'()
     diag($S0)
     $I0 = index $S0, '1.'
