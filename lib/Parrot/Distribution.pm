@@ -281,7 +281,7 @@ BEGIN {
                     }
                 }
 
-                print 'WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found: ' . $name . "\n";
+                print '# WARNING: ' . __FILE__ . ':' . __LINE__ . ' File not found: ' . $name . "\n";
                 return;
             };
 

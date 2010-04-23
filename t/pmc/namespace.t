@@ -282,7 +282,7 @@ CODE
     $I0 = isnull $P0
     is($I0, 0, "Find Sub in an ISO-8859-1 NameSpace looked up by a Unicode name")
     $S0 = $P0()
-    say $S0
+    diag($S0)
     is($S0, iso-8859-1:"Fran\x{E7}ois", "ISO-8859 NameSpace with Unicode name")
     goto end_test8
   eh8:

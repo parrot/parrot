@@ -26,7 +26,7 @@ the installed PCRE library, and matches patterns successfully.
 
 # if we keep pcre, we need a config test
 my $cmd = ( $^O =~ /MSWin32/ ) ? "pcregrep --version" : "pcre-config --version";
-my $has_pcre = !Parrot::Test::run_command( $cmd, STDERR => File::Spec->devnull, );
+my $has_pcre = !Parrot::Test::run_command( $cmd, STDOUT => File::Spec->devnull ,STDERR => File::Spec->devnull, );
 my $pcre_libpath = '';
 
 # It's possible that libpcre is installed in some non-standard path...
