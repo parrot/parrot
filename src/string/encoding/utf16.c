@@ -264,9 +264,9 @@ get_codepoint(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset)
 {
     ASSERT_ARGS(get_codepoint)
 #if PARROT_HAS_ICU
-    UNUSED(interp);
     const UChar * const s = (UChar*) src->strstart;
     UINTVAL c, pos;
+    UNUSED(interp);
 
     pos = 0;
     U16_FWD_N_UNSAFE(s, pos, offset);

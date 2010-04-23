@@ -484,9 +484,9 @@ ucs2_hash(PARROT_INTERP, ARGIN(const STRING *s), size_t hashval)
 {
     ASSERT_ARGS(ucs2_hash)
 #if PARROT_HAS_ICU
-    UNUSED(interp);
     const UChar *pos = (const UChar*) s->strstart;
     UINTVAL len = s->strlen;
+    UNUSED(interp);
 
     while (len--) {
         hashval += hashval << 5;
