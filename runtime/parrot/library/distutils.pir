@@ -62,7 +62,7 @@ Update from the repository.
 
 Output a skeleton for Plumage
 
-=item sdist, sdist_gztar, sdist_bztar, sdist_zip, sdist_rpm, manifest
+=item sdist, sdist_gztar, sdist_zip, sdist_rpm, manifest
 
 Create a source distribution or a source RPM package
 
@@ -126,15 +126,11 @@ Math/Rand.pbc
 
 =item smoke
 
-tar, gzip, curl
+tar, curl
 
 =item sdist_gztar
 
-Some coreutils : tar, gzip
-
-=item sdist_bztar
-
-bzip2
+Some coreutils : tar
 
 =item sdist_zip
 
@@ -254,8 +250,6 @@ L<http://gitorious.org/kakapo/kakapo/blobs/master/setup.nqp>
     register_step_after('clean', _clean_html_pod)
     .const 'Sub' _clean_gztar = '_clean_gztar'
     register_step_after('clean', _clean_gztar)
-    .const 'Sub' _clean_bztar = '_clean_bztar'
-    register_step_after('clean', _clean_bztar)
     .const 'Sub' _clean_zip = '_clean_zip'
     register_step_after('clean', _clean_zip)
     .const 'Sub' _clean_smoke = '_clean_smoke'
@@ -289,8 +283,6 @@ L<http://gitorious.org/kakapo/kakapo/blobs/master/setup.nqp>
     register_step('sdist', _sdist)
     .const 'Sub' _sdist_gztar = '_sdist_gztar'
     register_step('sdist_gztar', _sdist_gztar)
-    .const 'Sub' _sdist_bztar = '_sdist_bztar'
-    register_step('sdist_bztar', _sdist_bztar)
     .const 'Sub' _sdist_zip = '_sdist_zip'
     register_step('sdist_zip', _sdist_zip)
     .const 'Sub' _manifest = '_manifest'
@@ -3058,9 +3050,8 @@ On Windows calls sdist_zip, otherwise sdist_gztar
 
     rmtree($S0)
 
-    cmd = 'gzip --best ' . $S0
-    cmd .= '.tar'
-    system(cmd, 1 :named('verbose'))
+    $S1 = $S0 . '.tar'
+    gzip($S1)
   L1:
 .end
 
@@ -3099,45 +3090,6 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     $S0 .= $S1
     $S0 .= ext
     .return ($S0)
-.end
-
-=head3 Step sdist_bztar
-
-=cut
-
-.sub '_sdist_bztar' :anon
-    .param pmc kv :slurpy :named
-    run_step('manifest', kv :flat :named)
-
-    $S0 = slurp('MANIFEST')
-    $P0 = split "\n", $S0
-    $S0 = pop $P0
-    $S0 = get_tarname('.tar.bz2', kv :flat :named)
-    $I0 = newer($S0, $P0)
-    if $I0 goto L1
-    $S0 = get_tarname('', kv :flat :named)
-    copy_sdist($S0, $P0)
-
-    .local string cmd
-    cmd = 'tar -cvf ' . $S0
-    cmd .= '.tar '
-    cmd .= $S0
-    system(cmd, 1 :named('verbose'))
-
-    rmtree($S0)
-
-    cmd = 'bzip2 ' . $S0
-    cmd .= '.tar'
-    system(cmd, 1 :named('verbose'))
-  L1:
-.end
-
-.sub '_clean_bztar' :anon
-    .param pmc kv :slurpy :named
-
-    $S0 = get_tarname('.tar.bz2', kv :flat :named)
-    unlink($S0, 1 :named('verbose'))
-    unlink('MANIFEST', 1 :named('verbose'))
 .end
 
 =head3 Step sdist_zip
