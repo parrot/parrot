@@ -1843,10 +1843,10 @@ Parrot_str_to_int(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
     if (STRING_IS_NULL(s))
         return 0;
     {
-        const INTVAL        max_safe  = PARROT_INTVAL_MAX / 10;
-        const INTVAL        last_dig  = PARROT_INTVAL_MAX % 10;
+        const UINTVAL       max_safe  = -(UINTVAL)PARROT_INTVAL_MIN / 10;
+        const UINTVAL       last_dig  = (-(UINTVAL)PARROT_INTVAL_MIN) % 10;
         int                 sign      = 1;
-        INTVAL              i         = 0;
+        UINTVAL             i         = 0;
         String_iter         iter;
         UINTVAL             offs;
         number_parse_state  state = parse_start;
@@ -1862,7 +1862,7 @@ Parrot_str_to_int(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
             switch (state) {
               case parse_start:
                 if (isdigit((unsigned char)c)) {
-                    const INTVAL nextval = c - '0';
+                    const UINTVAL nextval = c - '0';
                     if (i < max_safe || (i == max_safe && nextval <= last_dig))
                         i = i * 10 + nextval;
                     else
@@ -1886,7 +1886,7 @@ Parrot_str_to_int(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 
               case parse_before_dot:
                 if (isdigit((unsigned char)c)) {
-                    const INTVAL nextval = c - '0';
+                    const UINTVAL nextval = c - '0';
                     if (i < max_safe || (i == max_safe && nextval <= last_dig))
                         i = i * 10 + nextval;
                     else
@@ -1904,9 +1904,11 @@ Parrot_str_to_int(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
             }
         }
 
-        i *= sign;
-
-        return i;
+        if (sign == 1 && i > (UINTVAL)PARROT_INTVAL_MAX)
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_ERR_OVERFLOW,
+                    "Integer value of String '%S' too big", s);
+        return sign == -1 ? -i : i;
     }
 }
 
