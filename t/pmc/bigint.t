@@ -70,20 +70,16 @@ Tests the BigInt PMC.
     lt $I2, 4, OldLibGMP
 
 Config2:
-    print '# Suitable GMP version ['
-    print $S3
-    say '] available'
+    diag( 'Suitable GMP version [', $S3, '] available' )
     goto ret
 
 NoLibGMP:
-    say '# No BigInt Lib configured'
+    diag( 'No BigInt Lib configured' )
     skip(34)
     exit 0
 
 OldLibGMP:
-    print '# Buggy GMP version ['
-    print $S3
-    say '] with huge digit multiply - please upgrade'
+    diag( 'Buggy GMP version [', $S3, '] with huge digit multiply - please upgrade' )
     skip(34)
     exit 0
 
