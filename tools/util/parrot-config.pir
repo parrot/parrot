@@ -46,17 +46,31 @@ loop:
     if key == '--help' goto usage
     if key == '--dump' goto dump
     $I0 = defined conf_hash[key]
-    if $I0 goto ok2
-    print " no such key: '"
-    print key
-    print "'\n"
-    end
-ok2:
+    unless $I0 goto failkey
+    dec argc
+    if i < argc goto dumpsome
     $S0 = conf_hash[key]
     print $S0
     inc i
     if i < argc goto loop
     print "\n"
+    end
+dumpsome:
+    key = argv[i]
+    $I0 = defined conf_hash[key]
+    unless $I0 goto failkey
+    print key
+    print " => '"
+    $S1 = conf_hash[key]
+    print $S1
+    say "'"
+    inc i
+    if i <= argc goto dumpsome
+    end
+failkey:
+    print " no such key: '"
+    print key
+    print "'\n"
     end
 dump:
    .local pmc iterator
