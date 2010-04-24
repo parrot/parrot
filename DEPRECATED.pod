@@ -39,11 +39,7 @@ specifically by including this C<PIR> code:
 
 =item gziphandle [experimental]
 
-=item RetContinuation [eligible in 2.4]
-
-In future, just use Continuation.
-
-L<https://trac.parrot.org/parrot/ticket/1427>
+L<https://trac.parrot.org/parrot/ticket/1580>
 
 =item moved to dynpmc [eligible in 1.1]
 
@@ -176,13 +172,19 @@ L<https://trac.parrot.org/parrot/ticket/1406>
 Ability to get the string name of the current GC core from the interpinfo_s_i.
 See r43900 and r43904 for details.
 
+L<https://trac.parrot.org/parrot/ticket/1581>
+
 =item NCI_FB_CB and NCI_FB_UD in iglobals [experimental]
 
 Hooks allowing a runtime-loadable dynamic frame builder.
 
+L<https://trac.parrot.org/parrot/ticket/1582>
+
 =item loadlib_p_s_p [experimental]
 
 Ability to use non-default dynamic loading behaviour.
+
+L<https://trac.parrot.org/parrot/ticket/1583>
 
 =item pushaction, pushmark, popmark [eligible in 2.4]
 
@@ -226,23 +228,6 @@ All "inplace" string update ops are deprecated. E.g. "chopn_s", etc.
 Part of COW removal.
 
 L<https://trac.parrot.org/parrot/ticket/1540>
-
-=back
-
-=head1 Runcores
-
-=over 4
-
-=item Unused Runcores [eligible in 2.4]
-
-The following Runcores do not appear to be used.  Accordingly they will
-be eligible for removal.
-
-CGoto
-CGP
-Switch
-
-L<https://trac.parrot.org/parrot/ticket/1563>
 
 =back
 
@@ -308,20 +293,26 @@ L<https://trac.parrot.org/parrot/ticket/443>
  Parrot_gc_free_pmc_attributes
 
 These items and related helper functions are added as experimental support
-for L<https://trac.parrot.org/parrot/ticket/895>
+for L<https://trac.parrot.org/parrot/ticket/1506>
 
 =item STRING Out parameters in Parrot_str_* functions [eligible in 2.1]
 
 All STRING modification functions will return a STRING pointer; capture and use
 this rather than relying on in-place modification of an existing pointer.
 
+L<https://trac.parrot.org/parrot/ticket/1584>
+
 =item STRING_is_null function [eligible in 2.4]
 
 renamed to Parrot_str_is_null
 
+L<https://trac.parrot.org/parrot/ticket/1585>
+
 =item Parrot_string_* [eligible in 2.4]
 
 rename Parrot_string_cstring to Parrot_str_cstring
+
+L<https://trac.parrot.org/parrot/ticket/1586>
 
 =item STRING COW [eligible in 2.4]
 
@@ -340,6 +331,8 @@ These are duplicates of functions in src/extend_vtable.c. Exceptions:
   Parrot_PMC_set_vtable
   Parrot_PMC_newclass
 
+L<https://trac.parrot.org/parrot/ticket/1587>
+
 =item Parrot_VTABLE, Parrot_get_vtable, Parrot_PMC_set_vtable [eligible in 2.4]
 
 These do not expose any functionality that should be available to code outside
@@ -347,6 +340,8 @@ of parrot core.
 
 These might get revived in some form to allow for creating new types and adding
 vtable-overrides, if that functionality becomes desired.
+
+L<https://trac.parrot.org/parrot/ticket/1588>
 
 =back
 
@@ -400,17 +395,6 @@ L<https://trac.parrot.org/parrot/ticket/868>
 
 =back
 
-=head1 Compilers
-
-=over 4
-
-=item json [eligible in 2.4]
-
-The json compiler was dupicated into data_json some time ago. If you're
-using json, just use data_json instead, it's the same code. See TT #1461.
-
-=back
-
 =head1 Parrot library
 
 =over 4
@@ -422,7 +406,7 @@ L<https://trac.parrot.org/parrot/ticket/1429>
 A way to provide an equivalent of -L and -I parrot command line options
 to language that doesn't support it.
 
-=item JSON, JSON, and Config;JSON [eligible in 1.5]
+=item JSON, and Config;JSON [eligible in 1.5]
 
 L<https://trac.parrot.org/parrot/ticket/508>
 
