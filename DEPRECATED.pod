@@ -409,12 +409,6 @@ L<https://trac.parrot.org/parrot/ticket/868>
 The json compiler was dupicated into data_json some time ago. If you're
 using json, just use data_json instead, it's the same code. See TT #1461.
 
-=item nqp [eligible in 2.4]
-
-Replaced by ext/nqp-rx and parrot-nqp.
-
-L<http://trac.parrot.org/parrot/ticket/1462>
-
 =back
 
 =head1 Parrot library
