@@ -82,7 +82,7 @@ invocant is modified and becomes an open filehandle.
         path = Parrot_str_to_cstring(INTERP, filename);
         if (has_mode)
             mod = Parrot_str_to_cstring(INTERP, mode);
-        file = gzopen (path, mod);
+        file = gzopen(path, mod);
         Parrot_str_free_cstring(path);
         if (has_mode)
             Parrot_str_free_cstring(mod);
