@@ -36,7 +36,7 @@ unsigned int getuintval(const char *s);
 Parrot_Run_core_t getruncore(const char *name);
 
 Parrot_String create_string(Parrot_Interp interp, const char *name);
-int cotorra_main(Parrot_Interp interp, int argc, char **argv);
+int cotorra_main(Parrot_Interp interp, int argc, const char **argv);
 
 /**********************************************************************/
 
@@ -152,12 +152,13 @@ Auxiliary function to minimize the size of main.
 
 */
 
-int cotorra_main(Parrot_Interp interp, int argc, char **argv)
+int cotorra_main(Parrot_Interp interp, int argc, const char * * argv)
 {
-    char *source;
+    const char *source;
     Parrot_PackFile pf;
     const char *stname = NULL;
     const char *exec = NULL;
+    const char *module = NULL;
     int i;
 
     /* Incompatible options are not checked yet */
@@ -186,6 +187,12 @@ int cotorra_main(Parrot_Interp interp, int argc, char **argv)
                 fail("Option needs argument");
             stname = argv[i];
         }
+        else if (strcmp(argv[i], "--load") == 0) {
+            ++i;
+            if (i >= argc)
+                fail("Option needs argument");
+            module = argv[i];
+        }
         else if (strcmp(argv[i], "--runcore") == 0) {
             ++i;
             if (i >= argc)
@@ -195,6 +202,8 @@ int cotorra_main(Parrot_Interp interp, int argc, char **argv)
         else
             break;
     }
+    if (module)
+        Parrot_load_bytecode(interp, create_string(interp, module));
 
     if (exec) {
         Parrot_String compiler = create_string(interp, "PIR");
@@ -204,16 +213,16 @@ int cotorra_main(Parrot_Interp interp, int argc, char **argv)
         return 0;
     }
 
-    if (i >= argc)
+    if (i >= argc && ! module)
         fail("No file to load");
     source = argv[i];
-
-    pf = Parrot_pbc_read(interp, source, 0);
-    if (! pf)
-        fail("Cannot load file");
-
-    Parrot_pbc_load(interp, pf);
-    Parrot_pbc_fixup_loaded(interp);
+    if (source) {
+        pf = Parrot_pbc_read(interp, source, 0);
+        if (! pf)
+            fail("Cannot load file");
+        Parrot_pbc_load(interp, pf);
+        Parrot_pbc_fixup_loaded(interp);
+    }
 
     if (stname) {
         Parrot_PMC rootns = Parrot_get_root_namespace(interp);
@@ -221,6 +230,8 @@ int cotorra_main(Parrot_Interp interp, int argc, char **argv)
         Parrot_PMC parrotns = Parrot_PMC_get_pmc_strkey(interp, rootns, parrotname);
         Parrot_String name = create_string(interp, stname);
         Parrot_PMC start = Parrot_PMC_get_pmc_strkey(interp, parrotns, name);
+        if (Parrot_pmc_is_null(interp, start))
+            fail("start sub not found");
         Parrot_ext_call(interp, start, "->");
     }
     else {
@@ -240,7 +251,7 @@ Main function. Create the parrot interpreter and call cotorra_main.
 
 */
 
-int main(int argc, char **argv)
+int main(int argc, const char **argv)
 {
     Parrot_Interp interp;
     int r;
