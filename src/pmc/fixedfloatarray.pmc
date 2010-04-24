@@ -80,24 +80,22 @@ Creates and returns a copy of the array.
 */
 
     VTABLE PMC *clone() {
-        INTVAL    size;
-        FLOATVAL *self_float_array, *dest_float_array;
-        size_t mem_size;
-        PMC   * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
+        FLOATVAL *self_float_array;
+        PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         GET_ATTR_float_array(INTERP, SELF, self_float_array);
-
-        if (!self_float_array)
-            return dest;
-
-        GET_ATTR_size(INTERP, SELF, size);
-        SET_ATTR_size(INTERP, dest, size);
-        mem_size          = size * sizeof (FLOATVAL);
-
-        dest_float_array  = (FLOATVAL*)Parrot_gc_allocate_memory_chunk(INTERP, mem_size);
-        mem_sys_memcopy(dest_float_array, self_float_array, mem_size);
-        SET_ATTR_float_array(INTERP, dest, dest_float_array);
-        PObj_custom_destroy_SET(dest);
-
+        if (self_float_array) {
+            INTVAL size;
+            GET_ATTR_size(INTERP, SELF, size);
+            {
+                FLOATVAL * const dest_float_array = mem_gc_allocate_n_typed(INTERP,
+                        size, FLOATVAL);
+                mem_copy_n_typed(dest_float_array, self_float_array,
+                        size, FLOATVAL);
+                SET_ATTR_float_array(INTERP, dest, dest_float_array);
+            }
+            SET_ATTR_size(INTERP, dest, size);
+            PObj_custom_destroy_SET(dest);
+        }
         return dest;
     }
 
