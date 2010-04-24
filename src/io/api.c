@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -122,7 +122,8 @@ Parrot_io_open(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
     ASSERT_ARGS(Parrot_io_open)
     PMC *new_filehandle, *filehandle;
     INTVAL flags;
-    const INTVAL typenum = Parrot_get_ctx_HLL_type(interp, Parrot_PMC_typenum(interp, "FileHandle"));
+    const INTVAL typenum = Parrot_get_ctx_HLL_type(interp,
+                                                   Parrot_PMC_typenum(interp, "FileHandle"));
     if (PMC_IS_NULL(pmc)) {
         new_filehandle = Parrot_pmc_new(interp, typenum);
         PARROT_ASSERT(new_filehandle->vtable->base_type == typenum);
