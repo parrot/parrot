@@ -230,7 +230,7 @@ to pass arguments to the bytecode.
 Creates a "dummy" packfile in lieu of actually creating one from a bytecode
 file on disk.
 
-=item C<void Parrot_load_bytecode(PARROT_INTERP, const char *path)>
+=item C<void Parrot_load_bytecode(PARROT_INTERP, STRING *path)>
 
 Reads and load Parrot bytecode or PIR from the file referenced by C<path>.
 You should create a dummy packfile beforehand; see C<PackFile_new_dummy> for
