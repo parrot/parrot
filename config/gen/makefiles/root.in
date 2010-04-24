@@ -118,7 +118,6 @@ include src/dynoplibs/Defines.mak
 include compilers/imcc/Defines.mak
 include compilers/pirc/Defines.mak
 include compilers/tge/Defines.mak
-include compilers/nqp/Defines.mak
 include compilers/pge/Defines.mak
 include compilers/pct/Defines.mak
 include ext/nqp-rx/Defines.mak
@@ -1676,15 +1675,11 @@ test_prep : all
 # integrating them in a single run is difficult.
 
 # Normal test package
-test : test_core nqp_test
+test : test_core
 
 # Test Parrot core.
 test_core: test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS)
-
-# Test the NQP compiler
-nqp_test : test_prep compilers/nqp/nqp.pbc
-	$(PERL) compilers/nqp/t/harness
 
 # run the test suite, create a TAP archive and send it off to smolder
 smolder_test : test_prep
@@ -1714,7 +1709,6 @@ fulltest :
 	buildtools_tests \
 	perl_tests \
 	library_tests \
-	nqp_test \
 	codetest \
 	benchmark_tests \
 	manifest_tests \
@@ -2274,7 +2268,6 @@ cover: \
     cover-run \
     cover-perl \
     cover-extra \
-    cover-nqp \
     cover-codingstd \
     cover-benchmark \
     cover-manifest \
@@ -2320,9 +2313,6 @@ cover-perl: cover.dummy
 
 cover-extra: cover.dummy
 	-@make@ library_tests
-
-cover-nqp: cover.dummy
-	-@make@ nqp_test
 
 cover-codingstd: cover.dummy
 	-@make@ codingstd_tests
@@ -2531,7 +2521,6 @@ include src/dynoplibs/Rules.mak
 include runtime/parrot/library/Rules.mak
 include compilers/imcc/Rules.mak
 include compilers/pirc/Rules.mak
-include compilers/nqp/Rules.mak
 include compilers/pge/Rules.mak
 include compilers/pct/Rules.mak
 include compilers/tge/Rules.mak
