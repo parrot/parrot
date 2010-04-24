@@ -275,15 +275,13 @@ for details.
 
 Buffer memory layout:
 
-                    +-----------------+
-                    |  ref_count   |f |    # GC header
-  obj->bufstart  -> +-----------------+
-                    |  data           |
-                    v                 v
+                    +-------------------+
+                    | flags # GC header |
+  obj->bufstart  -> +-------------------+
+                    |  data             |
+                    v                   v
 
- * if PObj_is_COWable is set, then we have
-   - a ref_count, {inc, dec}remented by 2 always
-   - the lo bit 'f' means 'is being forwarded" - what TAIL_flag was
+ * if PObj_is_COWable is set, then we have space for flags.
 
  * if PObj_align_FLAG is set, obj->bufstart is aligned like discussed above
  * obj->buflen is the usable length excluding the optional GC part.
@@ -582,7 +580,7 @@ move_one_buffer(PARROT_INTERP, ARGMOD(Buffer *old_buf), ARGMOD(char *new_pool_pt
     ASSERT_ARGS(move_one_buffer)
     /* ! (on_free_list | constant | external | sysmem) */
     if (Buffer_buflen(old_buf) && PObj_is_movable_TESTALL(old_buf)) {
-        INTVAL *ref_count = NULL;
+        INTVAL *flags = NULL;
         ptrdiff_t offset = 0;
 #if RESOURCE_DEBUG
         if (Buffer_buflen(old_buf) >= RESOURCE_DEBUG_SIZE)
@@ -594,7 +592,7 @@ move_one_buffer(PARROT_INTERP, ARGMOD(Buffer *old_buf), ARGMOD(char *new_pool_pt
         /* we can't perform the math all the time, because
          * strstart might be in unallocated memory */
         if (PObj_is_COWable_TEST(old_buf)) {
-            ref_count = Buffer_bufrefcountptr(old_buf);
+            flags = Buffer_bufrefcountptr(old_buf);
 
             if (PObj_is_string_TEST(old_buf)) {
                 offset = (ptrdiff_t)((STRING *)old_buf)->strstart -
@@ -604,7 +602,7 @@ move_one_buffer(PARROT_INTERP, ARGMOD(Buffer *old_buf), ARGMOD(char *new_pool_pt
 
         /* buffer has already been moved; just change the header */
         if (PObj_COW_TEST(old_buf)
-        && (ref_count && *ref_count & Buffer_moved_FLAG)) {
+        && (flags && *flags & Buffer_moved_FLAG)) {
             /* Find out who else references our data */
             Buffer * const hdr = *((Buffer **)Buffer_bufstart(old_buf));
 
@@ -613,8 +611,7 @@ move_one_buffer(PARROT_INTERP, ARGMOD(Buffer *old_buf), ARGMOD(char *new_pool_pt
             /* Make sure they know that we own it too */
             PObj_COW_SET(hdr);
 
-            /* TODO incr ref_count, after fixing string too
-             * Now make sure we point to where the other guy does */
+            /* Now make sure we point to where the other guy does */
             Buffer_bufstart(old_buf) = Buffer_bufstart(hdr);
 
             /* And if we're a string, update strstart */
@@ -626,11 +623,6 @@ move_one_buffer(PARROT_INTERP, ARGMOD(Buffer *old_buf), ARGMOD(char *new_pool_pt
         }
         else {
             new_pool_ptr = aligned_mem(old_buf, new_pool_ptr);
-
-            if (PObj_is_COWable_TEST(old_buf)) {
-                INTVAL * const new_ref_count = ((INTVAL*) new_pool_ptr) - 1;
-                *new_ref_count        = 2;
-            }
 
             /* Copy our memory to the new pool */
             memcpy(new_pool_ptr, Buffer_bufstart(old_buf),
@@ -650,8 +642,8 @@ move_one_buffer(PARROT_INTERP, ARGMOD(Buffer *old_buf), ARGMOD(char *new_pool_pt
                 /* Finally, let the tail know that we've moved, so
                  * that any other references can know to look for
                  * us and not re-copy */
-                if (ref_count)
-                    *ref_count |= Buffer_moved_FLAG;
+                if (flags)
+                    *flags |= Buffer_moved_FLAG;
             }
 
             Buffer_bufstart(old_buf) = new_pool_ptr;
