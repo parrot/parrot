@@ -28,7 +28,7 @@ Tests the behavior of VTABLE interfaces that have been overriden from PIR.
 .end
 
 .sub invalid_vtable
-    throws_like(<<'CODE',':s but was used with \:vtable', 'invalid :vtable throws an exception')
+    throws_substring(<<'CODE',' but was used with ', 'invalid :vtable throws an exception')
     .namespace [ "Test" ]
     .sub monkey :method :vtable("not_in_the_vtable")
         .param int key
