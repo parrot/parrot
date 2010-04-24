@@ -74,13 +74,13 @@ clear_fixups(PARROT_INTERP, ARGIN(const Parrot_Sub_attributes *sub_data))
         return;
 
     for (i = 0; i < ft->fixup_count; i++) {
-        const PackFile_FixupEntry * const e = ft->fixups[i];
+        PackFile_FixupEntry * const e = ft->fixups + i;
 
         if (e->type == enum_fixup_sub) {
             opcode_t  ci             = e->offset;
 
             ct->constants[ci]->u.key = NULL;
-            ft->fixups[i]->type      = 0;
+            e->type                  = 0;
         }
     }
 }
@@ -113,7 +113,7 @@ get_sub(PARROT_INTERP, ARGIN(PMC *self), int idx)
         return PMCNULL;
 
     for (i = n = 0; i < ft->fixup_count; i++) {
-        PackFile_FixupEntry *e = ft->fixups[i];
+        const PackFile_FixupEntry * const e = ft->fixups + i;
 
         if (e->type == enum_fixup_sub) {
             opcode_t ci = e->offset;
@@ -152,7 +152,7 @@ mark_subs(PARROT_INTERP, ARGIN(PMC *self))
         return;
 
     for (i = 0; i < ft->fixup_count; i++) {
-        PackFile_FixupEntry *e = ft->fixups[i];
+        const PackFile_FixupEntry * const e = ft->fixups + i;
 
         if (e->type == enum_fixup_sub) {
             opcode_t  ci  = e->offset;
@@ -427,7 +427,7 @@ Unarchives the code.
             return 0;
 
         for (i = n = 0; i < ft->fixup_count; i++) {
-            PackFile_FixupEntry *e = ft->fixups[i];
+            const PackFile_FixupEntry * const e = ft->fixups + i;
 
             if (e->type == enum_fixup_sub)
                 n++;

@@ -229,7 +229,7 @@ typedef enum {
 typedef struct PackFile_FixupTable {
     PackFile_Segment             base;
     opcode_t                     fixup_count;
-    PackFile_FixupEntry        **fixups;
+    PackFile_FixupEntry         *fixups;
     PackFile_ByteCode           *code;   /* where this segment belongs to */
 } PackFile_FixupTable;
 

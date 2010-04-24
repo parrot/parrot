@@ -919,13 +919,13 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
     TRACE_PRINTF(("PackFile: do_sub_pragmas (action=%d)\n", action));
 
     for (i = 0; i < ft->fixup_count; i++) {
-        switch (ft->fixups[i]->type) {
+        switch (ft->fixups[i].type) {
             case enum_fixup_sub:
             {
                 /* offset is an index into const_table holding the Sub PMC */
                 PMC           *sub_pmc;
                 Parrot_Sub_attributes    *sub;
-                const opcode_t ci = ft->fixups[i]->offset;
+                const opcode_t ci = ft->fixups[i].offset;
 
                 if (ci < 0 || ci >= ct->const_count)
                     Parrot_ex_throw_from_c_args(interp, NULL, 1,
@@ -943,7 +943,7 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
 
                     /* replace Sub PMC with computation results */
                     if (action == PBC_IMMEDIATE && !PMC_IS_NULL(result)) {
-                        ft->fixups[i]->type      = enum_fixup_none;
+                        ft->fixups[i].type      = enum_fixup_none;
                         ct->constants[ci]->u.key = result;
                     }
                 }
@@ -3258,26 +3258,20 @@ void
 PackFile_FixupTable_clear(PARROT_INTERP, ARGMOD(PackFile_FixupTable *self))
 {
     ASSERT_ARGS(PackFile_FixupTable_clear)
-    opcode_t i;
 
     if (!self) {
         Parrot_io_eprintf(interp, "PackFile_FixupTable_clear: self == NULL!\n");
         return;
     }
 
-    for (i = 0; i < self->fixup_count; i++) {
-        mem_gc_free(interp, self->fixups[i]->name);
-        self->fixups[i]->name = NULL;
-
-        mem_gc_free(interp, self->fixups[i]);
-        self->fixups[i] = NULL;
-    }
-
     if (self->fixup_count) {
+        opcode_t i;
+        for (i = 0; i < self->fixup_count; i++) {
+            mem_gc_free(interp, self->fixups[i].name);
+            self->fixups[i].name = NULL;
+        }
         mem_gc_free(interp, self->fixups);
-        self->fixups = NULL;
     }
-
     self->fixups      = NULL;
     self->fixup_count = 0;
 
@@ -3325,10 +3319,10 @@ fixup_packed_size(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
     for (i = 0; i < ft->fixup_count; i++) {
         /* fixup_entry type */
         size++;
-        switch (ft->fixups[i]->type) {
+        switch (ft->fixups[i].type) {
           case enum_fixup_label:
           case enum_fixup_sub:
-            size += PF_size_cstring(ft->fixups[i]->name);
+            size += PF_size_cstring(ft->fixups[i].name);
             size ++; /* offset */
             break;
           case enum_fixup_none:
@@ -3366,12 +3360,12 @@ fixup_pack(PARROT_INTERP, ARGIN(PackFile_Segment *self), ARGOUT(opcode_t *cursor
     *cursor++ = ft->fixup_count;
 
     for (i = 0; i < ft->fixup_count; i++) {
-        *cursor++ = (opcode_t) ft->fixups[i]->type;
-        switch (ft->fixups[i]->type) {
+        *cursor++ = (opcode_t) ft->fixups[i].type;
+        switch (ft->fixups[i].type) {
           case enum_fixup_label:
           case enum_fixup_sub:
-            cursor    = PF_store_cstring(cursor, ft->fixups[i]->name);
-            *cursor++ = ft->fixups[i]->offset;
+            cursor    = PF_store_cstring(cursor, ft->fixups[i].name);
+            *cursor++ = ft->fixups[i].offset;
             break;
           case enum_fixup_none:
             break;
@@ -3448,7 +3442,7 @@ fixup_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg), ARGIN(const opcode_t *
 
     if (self->fixup_count) {
         self->fixups = mem_gc_allocate_n_zeroed_typed(interp,
-            self->fixup_count, PackFile_FixupEntry *);
+            self->fixup_count, PackFile_FixupEntry);
 
         if (!self->fixups) {
             Parrot_io_eprintf(interp,
@@ -3460,9 +3454,7 @@ fixup_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg), ARGIN(const opcode_t *
     }
 
     for (i = 0; i < self->fixup_count; i++) {
-        PackFile_FixupEntry * const entry           =
-                                    self->fixups[i] =
-                                    mem_gc_allocate_zeroed_typed(interp, PackFile_FixupEntry);
+        PackFile_FixupEntry * const entry = self->fixups + i;
 
         entry->type = PF_fetch_opcode(pf, &cursor);
 
@@ -3521,12 +3513,11 @@ PackFile_FixupTable_new_entry(PARROT_INTERP,
 
     i = self->fixup_count++;
     self->fixups = mem_gc_realloc_n_typed_zeroed(interp,
-            self->fixups, self->fixup_count, i, PackFile_FixupEntry *);
+            self->fixups, self->fixup_count, i, PackFile_FixupEntry);
 
-    self->fixups[i]         = mem_gc_allocate_zeroed_typed(interp, PackFile_FixupEntry);
-    self->fixups[i]->type   = type;
-    self->fixups[i]->name   = mem_sys_strdup(label);
-    self->fixups[i]->offset = offs;
+    self->fixups[i].type   = type;
+    self->fixups[i].name   = mem_sys_strdup(label);
+    self->fixups[i].offset = offs;
 }
 
 
@@ -3553,9 +3544,9 @@ find_fixup(ARGMOD(PackFile_FixupTable *ft), INTVAL type, ARGIN(const char *name)
     ASSERT_ARGS(find_fixup)
     opcode_t i;
     for (i = 0; i < ft->fixup_count; i++) {
-        if ((INTVAL)((enum_fixup_t)ft->fixups[i]->type) == type
-        &&  STREQ(ft->fixups[i]->name, name)) {
-            return ft->fixups[i];
+        if ((INTVAL)((enum_fixup_t)ft->fixups[i].type) == type
+        &&  STREQ(ft->fixups[i].name, name)) {
+            return ft->fixups + i;
         }
     }
 

@@ -707,8 +707,8 @@ set_current_sub(PARROT_INTERP)
      */
 
     for (i = 0; i < ft->fixup_count; i++) {
-        if (ft->fixups[i]->type == enum_fixup_sub) {
-            const opcode_t ci      = ft->fixups[i]->offset;
+        if (ft->fixups[i].type == enum_fixup_sub) {
+            const opcode_t ci      = ft->fixups[i].offset;
             PMC    * const sub_pmc = ct->constants[ci]->u.key;
             Parrot_Sub_attributes *sub;
 

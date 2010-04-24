@@ -92,7 +92,7 @@ Initialize from PackFile_FixupTable pointer.
         VTABLE_set_integer_native(interp, attrs->entries, table->fixup_count);
 
         for (i = 0; i < table->fixup_count; ++i) {
-            val = table->fixups[i];
+            val = table->fixups + i;
             entry = Parrot_pmc_new(interp, enum_class_PackfileFixupEntry);
             VTABLE_set_pointer(interp, entry, (void*)val);
             VTABLE_set_pmc_keyed_int(interp, attrs->entries, i, entry);
@@ -120,13 +120,14 @@ Create PackFile_FixupTable* from self.
         pftable->base.type   = PF_FIXUP_SEG;
         pftable->fixup_count = VTABLE_elements(interp, attrs->entries);
         pftable->fixups      = mem_gc_allocate_n_typed(INTERP,
-                pftable->fixup_count, PackFile_FixupEntry*);
+                pftable->fixup_count, PackFile_FixupEntry);
 
         /* Copy all entries */
         for (i = 0; i < pftable->fixup_count; ++i) {
             entry = VTABLE_get_pmc_keyed_int(interp, attrs->entries, i);
             val   = (PackFile_FixupEntry*)VTABLE_get_pointer(interp, entry);
-            pftable->fixups[i] = val;
+            pftable->fixups[i] = *val;
+	    mem_gc_free(INTERP, val);
         }
 
         return pftable;
