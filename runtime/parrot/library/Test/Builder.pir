@@ -312,22 +312,18 @@ declared a plan or if you pass an invalid argument.
     .return()
 .end
 
-=item C<diag( diagnostic_message )>
+=item C<diag( diagnostic_message, ... )>
 
 Records a diagnostic message for output.
 
 =cut
 
 .sub 'diag' :method
-    .param string diagnostic
+    .param pmc args :slurpy
 
-    if diagnostic goto DIAGNOSTIC_SET
-    .return()
-
-  DIAGNOSTIC_SET:
     .local pmc output
     output = self.'output'()
-    output.'diag'( diagnostic )
+    .tailcall output.'diag'( args :flat )
 .end
 
 =item C<ok( passed, description )>
