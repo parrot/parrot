@@ -692,9 +692,10 @@ EOC
 
 
     if ( @$multi_funcs ) {
+        # Don't const the list, breaks some older C compilers
         $cout .= $multi_strings . <<"EOC";
 
-            $const multi_func_list _temp_multi_func_list[] = {
+            multi_func_list _temp_multi_func_list[] = {
                 $multi_list
             };
 #define N_MULTI_LIST (sizeof(_temp_multi_func_list)/sizeof(_temp_multi_func_list[0]))
