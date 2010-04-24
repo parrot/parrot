@@ -28,6 +28,7 @@ src/io/io_string.c.
 */
 
 #include "parrot/parrot.h"
+#include "parrot/extend.h"
 #include "io_private.h"
 #include "api.str"
 #include "pmc/pmc_filehandle.h"
