@@ -1,5 +1,5 @@
 # $Id$
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -201,7 +201,8 @@ sub print_manifest {
 #
 # See below for documentation on the format of this file.
 #
-# See docs/submissions.pod on how to recreate this file after SVN
+# See docs/submissions.pod and the documentation in
+# $self->{script} on how to recreate this file after SVN
 # has been told about new or deleted files.
 END_HEADER
 
