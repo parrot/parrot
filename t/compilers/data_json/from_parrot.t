@@ -89,7 +89,7 @@ Tests JSON->Parrot conversions.
     is($S0, 2147483647, 'Create JSON of some integers (2147483647)')
     i = -2147483648
     $S0 = _json( i, 0 )
-    is($S0, -2147483648, 'Create JSON of some integers (-2147483647)')
+    is($S0, -2147483648, 'Create JSON of some integers (-2147483648)')
 .end
 
 
