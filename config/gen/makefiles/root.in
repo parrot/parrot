@@ -139,7 +139,6 @@ include compilers/json/Defines.mak
 GEN_MAKEFILES = \
     Makefile \
     docs/Makefile \
-    compilers/ncigen/Makefile \
     editor/Makefile \
     ext/Makefile \
     src/dynoplibs/Rules.mak \

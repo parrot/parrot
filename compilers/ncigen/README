@@ -1,9 +1,0 @@
-./nci_gen.pl is currently written to run on Linux, feel free to add portability if you wish
-
-./nci_gen.pl also requires the perl module IPC::Run3
-
-EXAMPLES:
-perl ./nci_gen.pl postgres/spi.h              - PARSE SUCCESSFUL
-perl ./nci_gen.pl /usr/include/sqlite3.h      - PARSE SUCCESSFUL
-perl ./nci_gen.pl /usr/include/X11/Xlib.h     - PARSE SUCCESSFUL
-perl ./nci_gen.pl /usr/include/mysql/mysql.h  - PARSE SUCCESSFUL
