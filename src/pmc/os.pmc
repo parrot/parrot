@@ -563,6 +563,32 @@ thrown.
         }
     }
 
+/*
+
+=item C<chmod(STRING *path, INTVAL mode)>
+
+=cut
+
+*/
+
+    METHOD chmod(STRING *path, INTVAL mode) {
+        char * const cpath = Parrot_str_to_cstring(INTERP, path);
+
+#ifndef WIN32
+        const int    error = chmod(cpath, mode);
+#else
+        const int    error = _chmod(cpath, mode);
+#endif
+
+        Parrot_str_free_cstring(cpath);
+
+        if (error) {
+            const char * const errmsg = strerror(errno);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
+                errmsg);
+        }
+    }
+
 }
 
 /*
