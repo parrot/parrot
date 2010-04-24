@@ -239,7 +239,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_str_new(PARROT_INTERP,
-    ARGIN_NULLOK(const char * const buffer),
+    ARGIN_NULLOK(const char *buffer),
     const UINTVAL len)
         __attribute__nonnull__(1);
 

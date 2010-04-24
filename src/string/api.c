@@ -484,8 +484,8 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(STRING *a),
 
 /*
 
-=item C<STRING * Parrot_str_new(PARROT_INTERP, const char * const buffer, const
-UINTVAL len)>
+=item C<STRING * Parrot_str_new(PARROT_INTERP, const char *buffer, const UINTVAL
+len)>
 
 Makes a Parrot string from a specified C string.
 
@@ -498,7 +498,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_str_new(PARROT_INTERP, ARGIN_NULLOK(const char * const buffer), const UINTVAL len)
+Parrot_str_new(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), const UINTVAL len)
 {
     ASSERT_ARGS(Parrot_str_new)
     /* Force an 8-bit encoding at some point? */
