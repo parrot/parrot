@@ -62,7 +62,7 @@ current dir.
 
 Specify which runcore to use when running Parrot.  The default is the C<slow>
 core.  This option corresponds directly to Parrot's C<--runcore> option.  Other
-runcores include C<fast>, C<jit>, C<cgoto>, C<cgp>, C<cgp-jit>, and C<switch>.
+runcores include C<fast>.
 See Parrot's help for more details.
 
 =item C<--ignore_blacklist>

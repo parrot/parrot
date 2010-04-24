@@ -214,11 +214,6 @@ PMC* Parrot_pcc_get_pmc_constant_func(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-size_t Parrot_pcc_get_pred_offset_func(PARROT_INTERP, ARGIN(PMC *ctx))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 UINTVAL Parrot_pcc_get_recursion_depth_func(PARROT_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -312,13 +307,6 @@ PARROT_EXPORT
 void Parrot_pcc_set_pc_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN_NULLOK(opcode_t *pc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-void Parrot_pcc_set_pred_offset_func(PARROT_INTERP,
-    ARGIN(PMC *ctx),
-    size_t pred_offset)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -431,10 +419,6 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_pred_offset_func \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_get_recursion_depth_func \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -486,10 +470,6 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_pcc_set_pc_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_set_pred_offset_func \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_set_signature_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
@@ -532,9 +512,6 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
 
 #  define Parrot_pcc_get_namespace(i, c) (__C(c)->current_namespace)
 #  define Parrot_pcc_set_namespace(i, c, value) (__C(c)->current_namespace = (value))
-
-#  define Parrot_pcc_get_pred_offset(i, c) (__C(c)->pred_offset)
-#  define Parrot_pcc_set_pred_offset(i, c, value) (__C(c)->pred_offset = (value))
 
 #  define Parrot_pcc_get_pc(i, c) (__C(c)->current_pc)
 #  define Parrot_pcc_set_pc(i, c, value) (__C(c)->current_pc = (value))
@@ -593,9 +570,6 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
 
 #  define Parrot_pcc_get_namespace(i, c) Parrot_pcc_get_namespace_func((i), (c))
 #  define Parrot_pcc_set_namespace(i, c, value) Parrot_pcc_set_namespace_func((i), (c), (value))
-
-#  define Parrot_pcc_get_pred_offset(i, c) Parrot_pcc_get_pred_offset_func((i), (c))
-#  define Parrot_pcc_set_pred_offset(i, c, value) Parrot_pcc_set_pred_offset_func((i), (c), (value))
 
 #  define Parrot_pcc_get_pc(i, c) Parrot_pcc_get_pc_func((i), (c))
 #  define Parrot_pcc_set_pc(i, c, value) Parrot_pcc_set_pc_func((i), (c), (value))

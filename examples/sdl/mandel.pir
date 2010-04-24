@@ -556,9 +556,7 @@ Plain runcore and unoptimized parrot:
 Optimized build
 
   [2] plain  runcore 64 bit                  3.0s
-  [2] -R cgp runcore 64 bit                  1.5s
   [2] plain  runcore 32 bit                  3.6s
-  [2] -R cgp runcore 32 bit                  1.6s
   [1] -R jit                                 1.1s
   [2] -R jit                                 0.8s
   [3] -R jit                                 0.5s

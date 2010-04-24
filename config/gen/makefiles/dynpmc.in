@@ -14,7 +14,7 @@ CC            = @cc@
 LD            = @ld@
 LDFLAGS       = @ldflags@ @ld_debug@ @rpath_blib@
 LD_LOAD_FLAGS = @ld_load_flags@
-CFLAGS        = @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@ @optimize@
+CFLAGS        = @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @gc_flag@ @optimize@
 LIBPARROT     = @libparrot_ldflags@
 
 BUILD_TOOLS_DIR = $(BUILD_DIR)/tools/build

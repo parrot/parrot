@@ -249,16 +249,10 @@ next opcode, or examine and manipulate data from the executing program.
 
 #include "parrot/oplib/ops.h"
 #include "parrot/oplib/core_ops.h"
-#include "parrot/oplib/core_ops_switch.h"
 #include "parrot/dynext.h"
 
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
-
-#ifdef HAVE_COMPUTED_GOTO
-#  include "parrot/oplib/core_ops_cg.h"
-#  include "parrot/oplib/core_ops_cgp.h"
-#endif
 
 #ifdef WIN32
 #  define getpid _getpid
@@ -268,23 +262,6 @@ next opcode, or examine and manipulate data from the executing program.
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static opcode_t * runops_cgoto_core(PARROT_INTERP,
-    SHIM(Parrot_runcore_t *runcore),
-    ARGIN(opcode_t *pc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static opcode_t * runops_cgp_core(PARROT_INTERP,
-    ARGIN(Parrot_runcore_t *runcore),
-    ARGIN(opcode_t *pc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -328,27 +305,11 @@ static opcode_t * runops_slow_core(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static opcode_t * runops_switch_core(PARROT_INTERP,
-    ARGIN(Parrot_runcore_t *runcore),
-    ARGIN(opcode_t *pc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t * runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_runops_cgoto_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pc))
-#define ASSERT_ARGS_runops_cgp_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(runcore) \
-    , PARROT_ASSERT_ARG(pc))
 #define ASSERT_ARGS_runops_debugger_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pc))
@@ -364,10 +325,6 @@ static opcode_t * runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
     , PARROT_ASSERT_ARG(pc))
 #define ASSERT_ARGS_runops_slow_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pc))
-#define ASSERT_ARGS_runops_switch_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(runcore) \
     , PARROT_ASSERT_ARG(pc))
 #define ASSERT_ARGS_runops_trace_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -431,36 +388,6 @@ Parrot_runcore_fast_init(PARROT_INTERP)
     coredata->flags            = 0;
 
     PARROT_RUNCORE_FUNC_TABLE_SET(coredata);
-
-    Parrot_runcore_register(interp, coredata);
-}
-
-
-/*
-
-=item C<void Parrot_runcore_switch_init(PARROT_INTERP)>
-
-Registers the switch runcore with Parrot.
-
-=cut
-
-*/
-
-void
-Parrot_runcore_switch_init(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_runcore_switch_init)
-
-    Parrot_runcore_t * const coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_runcore_t);
-    coredata->name             = CONST_STRING(interp, "switch");
-    coredata->id               = PARROT_SWITCH_CORE;
-    coredata->opinit           = PARROT_CORE_SWITCH_OPLIB_INIT;
-    coredata->runops           = runops_switch_core;
-    coredata->prepare_run      = init_prederef;
-    coredata->destroy          = NULL;
-    coredata->flags            = 0;
-
-    PARROT_RUNCORE_PREDEREF_OPS_SET(coredata);
 
     Parrot_runcore_register(interp, coredata);
 }
@@ -543,7 +470,7 @@ Parrot_runcore_debugger_init(PARROT_INTERP)
     coredata->name             = CONST_STRING(interp, "debugger");
     coredata->id               = PARROT_DEBUGGER_CORE;
     coredata->opinit           = PARROT_CORE_OPLIB_INIT;
-    coredata->prepare_run      = init_prederef;
+    coredata->prepare_run      = NULL;
     coredata->runops           = runops_debugger_core;
     coredata->destroy          = NULL;
     coredata->flags            = 0;
@@ -552,75 +479,6 @@ Parrot_runcore_debugger_init(PARROT_INTERP)
 
     Parrot_runcore_register(interp, coredata);
 }
-
-
-/*
-
-=item C<void Parrot_runcore_cgp_init(PARROT_INTERP)>
-
-Registers the CGP runcore with Parrot.
-
-=cut
-
-*/
-
-#ifdef HAVE_COMPUTED_GOTO
-
-void
-Parrot_runcore_cgp_init(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_runcore_cgp_init)
-
-    Parrot_runcore_t * const coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_runcore_t);
-    coredata->name             = CONST_STRING(interp, "cgp");
-    coredata->id               = PARROT_CGP_CORE;
-    coredata->opinit           = PARROT_CORE_CGP_OPLIB_INIT;
-    coredata->prepare_run      = init_prederef;
-    coredata->runops           = runops_cgp_core;
-    coredata->flags            = 0;
-
-    coredata->destroy          = NULL;
-
-    PARROT_RUNCORE_CGOTO_OPS_SET(coredata);
-    PARROT_RUNCORE_EVENT_CHECK_SET(coredata);
-    PARROT_RUNCORE_PREDEREF_OPS_SET(coredata);
-
-    Parrot_runcore_register(interp, coredata);
-}
-
-
-/*
-
-=item C<void Parrot_runcore_cgoto_init(PARROT_INTERP)>
-
-Registers the cgoto runcore with Parrot.
-
-=cut
-
-*/
-
-void
-Parrot_runcore_cgoto_init(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_runcore_cgoto_init)
-
-    Parrot_runcore_t * const coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_runcore_t);
-    coredata->name             = CONST_STRING(interp, "cgoto");
-    coredata->id               = PARROT_CGOTO_CORE;
-    coredata->opinit           = PARROT_CORE_CG_OPLIB_INIT;
-    coredata->runops           = runops_cgoto_core;
-    coredata->destroy          = NULL;
-    coredata->prepare_run      = NULL;
-    coredata->flags            = 0;
-
-    PARROT_RUNCORE_FUNC_TABLE_SET(coredata);
-    PARROT_RUNCORE_CGOTO_OPS_SET(coredata);
-
-    Parrot_runcore_register(interp, coredata);
-}
-
-
-#endif /* #ifdef HAVE_COMPUTED_GOTO */
 
 
 /*
@@ -659,42 +517,6 @@ runops_fast_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcode_t 
     return pc;
 }
 
-
-/*
-
-=item C<static opcode_t * runops_cgoto_core(PARROT_INTERP, Parrot_runcore_t
-*runcore, opcode_t *pc)>
-
-Runs the Parrot operations starting at C<pc> until there are no more
-operations, using the computed C<goto> core, performing no bounds checking,
-profiling, or tracing.
-
-If computed C<goto> is not available then Parrot exits with exit code 1.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static opcode_t *
-runops_cgoto_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcode_t *pc))
-{
-    ASSERT_ARGS(runops_cgoto_core)
-
-    /* disable pc */
-    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), NULL);
-
-#ifdef HAVE_COMPUTED_GOTO
-    pc = cg_core(pc, interp);
-    return pc;
-#else
-    UNUSED(pc);
-    Parrot_io_eprintf(interp,
-            "Computed goto unavailable in this configuration.\n");
-    Parrot_exit(interp, 1);
-#endif
-}
 
 #ifdef code_start
 #  undef code_start
@@ -935,120 +757,6 @@ runops_debugger_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcod
 }
 
 
-/*
-
-=item C<static opcode_t * runops_switch_core(PARROT_INTERP, Parrot_runcore_t
-*runcore, opcode_t *pc)>
-
-Runs the C<switch> core.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static opcode_t *
-runops_switch_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(opcode_t *pc))
-{
-    ASSERT_ARGS(runops_switch_core)
-    opcode_t * const code_start = (opcode_t *)interp->code->base.data;
-    opcode_t        *pc_prederef;
-
-    init_prederef(interp, runcore);
-    pc_prederef = (opcode_t*)interp->code->prederef.code + (pc - code_start);
-
-    return switch_core(pc_prederef, interp);
-}
-
-
-/*
-
-=item C<void * init_prederef(PARROT_INTERP, Parrot_runcore_t *runcore)>
-
-Initialize: load prederef C<func_table>, file prederef.code.
-
-=cut
-
-*/
-
-PARROT_CAN_RETURN_NULL
-void *
-init_prederef(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore))
-{
-    ASSERT_ARGS(init_prederef)
-    load_prederef(interp, runcore);
-
-    if (!interp->code->prederef.code) {
-        void        *pred_func;
-        opcode_t    *pc = interp->code->base.data;
-        const size_t N  = interp->code->base.size;
-        size_t       i;
-
-        void ** const temp =
-            (void **)Parrot_memalign_if_possible(256, N * sizeof (void *));
-        /* calc and remember pred_offset */
-        CONTEXT(interp)->pred_offset = pc - (opcode_t *)temp;
-
-        /* fill with the prederef__ opcode function */
-        if (PARROT_RUNCORE_PREDEREF_OPS_TEST(runcore)
-        && !PARROT_RUNCORE_CGOTO_OPS_TEST(runcore))
-            pred_func = (void *)CORE_OPS_prederef__;
-        else {
-            PARROT_ASSERT(interp->op_lib->op_func_table);
-            pred_func = ((void **)
-                    interp->op_lib->op_func_table)[CORE_OPS_prederef__];
-        }
-
-        for (i = 0; i < N;) {
-            const op_info_t * const opinfo = &interp->op_info_table[*pc];
-            size_t n = opinfo->op_count;
-
-            temp[i] = pred_func;
-
-            ADD_OP_VAR_PART(interp, interp->code, pc, n);
-
-            pc += n;
-            i  += n;
-        }
-
-        interp->code->prederef.code = temp;
-    }
-
-    return NULL;
-}
-
-
-/*
-
-=item C<void load_prederef(PARROT_INTERP, Parrot_runcore_t *runcore)>
-
-C<< interp->op_lib >> = prederefed oplib.
-
-=cut
-
-*/
-
-void
-load_prederef(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore))
-{
-    ASSERT_ARGS(load_prederef)
-    const oplib_init_f init_func = get_core_op_lib_init(interp, runcore);
-
-    int (*get_op)(PARROT_INTERP, const char * name, int full);
-
-    get_op          = interp->op_lib->op_code;
-    interp->op_lib  = init_func(interp, 1);
-
-    /* preserve the get_op function */
-    interp->op_lib->op_code = get_op;
-
-    if (interp->op_lib->op_count != interp->op_count)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PREDEREF_LOAD_ERROR,
-            "Illegal op count (%d) in prederef oplib\n",
-            (int)interp->op_lib->op_count);
-}
-
 
 /*
 
@@ -1096,41 +804,6 @@ runops_exec_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(opcode_t
     return NULL;
 }
 
-
-/*
-
-=item C<static opcode_t * runops_cgp_core(PARROT_INTERP, Parrot_runcore_t
-*runcore, opcode_t *pc)>
-
-Runs the computed goto and predereferenced core.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static opcode_t *
-runops_cgp_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(opcode_t *pc))
-{
-    ASSERT_ARGS(runops_cgp_core)
-#ifdef HAVE_COMPUTED_GOTO
-    opcode_t * const code_start = (opcode_t *)interp->code->base.data;
-    opcode_t        *pc_prederef;
-
-    init_prederef(interp, runcore);
-
-    pc_prederef = (opcode_t *)interp->code->prederef.code + (pc - code_start);
-    return cgp_core(pc_prederef, interp);
-
-#else
-    UNUSED(pc);
-    Parrot_io_eprintf(interp,
-            "Computed goto unavailable in this configuration.\n");
-    Parrot_exit(interp, 1);
-#endif
-
-}
 
 /*
 

@@ -434,10 +434,6 @@ pmclass CallContext provides array provides hash auto_attrs {
     ATTR UINTVAL                trace_flags;
     ATTR UINTVAL                recursion_depth; /* Sub call recursion depth */
 
-    /* code->prederefed.code - code->base.data in opcodes
-     * to simplify conversion between code ptrs in e.g. invoke */
-    ATTR size_t pred_offset;
-
     /* Storage for arguments */
     ATTR struct Pcc_cell *positionals; /* array of positionals */
     ATTR INTVAL  num_positionals;      /* count of used positionals */

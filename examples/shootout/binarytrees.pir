@@ -1,4 +1,4 @@
-#!./parrot -R cgp
+#!./parrot
 # Copyright (C) 2005-2009, Parrot Foundation.
 # $Id$
 #

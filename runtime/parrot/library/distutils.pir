@@ -1268,9 +1268,6 @@ the value is the OPS pathname
 .sub 'get_cores'
     $P0 = new 'Hash'
     $P0['C'] = ''
-#    $P0['CGP'] = '_cgp'
-#    $P0['CGoto'] = '_cg'
-    $P0['CSwitch'] = '_switch'
     .return ($P0)
 .end
 
@@ -4227,9 +4224,6 @@ Return the whole config
     flags .= $S0
     flags .= " "
     $S0 = $P0['cc_hasjit']
-    flags .= $S0
-    flags .= " "
-    $S0 = $P0['cg_flag']
     flags .= $S0
     .return (flags)
 .end

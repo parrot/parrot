@@ -37,10 +37,7 @@ include/parrot/exec_dep.h                         [main]include
 include/parrot/extend_vtable.h                    [main]include
 include/parrot/feature.h                          [main]include
 include/parrot/has_header.h                       [main]include
-include/parrot/oplib/core_ops_cg.h                [main]include
-include/parrot/oplib/core_ops_cgp.h               [main]include
 include/parrot/oplib/core_ops.h                   [main]include
-include/parrot/oplib/core_ops_switch.h            [main]include
 include/parrot/oplib/ops.h                        [main]include
 include/parrot/pbcversion.h                       [devel]include
 include/parrot/platform.h                         [main]include
@@ -225,8 +222,6 @@ src/glut_callbacks.c                              []
 src/jit_emit.h                                    []
 src/nci.c                                         []
 src/null_config.c                                 []
-src/ops/core_ops_cgp.c                            []
-src/ops/core_ops_switch.c                         []
 src/parrot_config.c                               []
 src/pmc/boolean.dump                              [devel]src
 src/pmc/continuation.dump                         [devel]src

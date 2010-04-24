@@ -51,7 +51,6 @@ auto::arch
 auto::jit
 auto::cpu
 auto::funcptr
-auto::cgoto
 auto::inline
 auto::gc
 auto::memalign

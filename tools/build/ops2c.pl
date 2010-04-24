@@ -47,7 +47,7 @@ tools/build/ops2c.pl - Parser for .ops files
 
     % perl tools/build/ops2c.pl trans [--help] [--no-lines] [--dynamic]
                                       [--core | input.ops [input2.ops ...]]
-       trans := C | CGoto | CGP | CSwitch | CPrederef
+       trans := C
 
 For example:
 
@@ -74,22 +74,6 @@ code. Each creates a different type of run loop.
 =item C<C>
 
 Create the function-based (slow or fast core) run loop.
-
-=item C<CGoto>
-
-Create the C<goto> run loop.
-
-=item C<CGP>
-
-Create the C<goto> and predereferenced run loop.
-
-=item C<CSwitch>
-
-Create the C<switch>ed and predereferenced run loop.
-
-=item C<CPrederef>
-
-Create the predereferenced run loop.
 
 =back
 
@@ -152,14 +136,6 @@ contributed to this program:
 =item C<Parrot::OpTrans>
 
 =item C<Parrot::OpTrans::C>
-
-=item C<Parrot::OpTrans::CGoto>
-
-=item C<Parrot::OpTrans::CGP>
-
-=item C<Parrot::OpTrans::CSwitch>
-
-=item C<Parrot::OpTrans::CPrederef>
 
 =item C<Parrot::Ops2c::Utils>
 

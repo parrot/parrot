@@ -260,18 +260,6 @@ side effect.
 
 Run with the I<fast core>.
 
-=item -R cgoto
-
-Run the I<computed goto core> (CGoto).
-
-=item -R cgp
-
-Run with the I<CGoto-Prederefed> core.
-
-=item -R switch
-
-Run with the I<Switched core>.
-
 =item -R gcdebug
 
 Performs a full GC run before every op dispatch

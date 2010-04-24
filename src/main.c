@@ -301,8 +301,8 @@ help(void)
     "       --hash-seed F00F  specify hex value to use as hash seed\n"
     "    -X --dynext add path to dynamic extension search\n"
     "   <Run core options>\n"
-    "    -R --runcore slow|bounds|fast|cgoto|cgp\n"
-    "    -R --runcore switch|trace|profiling|gcdebug\n"
+    "    -R --runcore slow|bounds|fast\n"
+    "    -R --runcore trace|profiling|gcdebug\n"
     "    -t --trace [flags]\n"
     "   <VM options>\n"
     "    -D --parrot-debug[=HEXFLAGS]\n"
@@ -461,18 +461,8 @@ parseflags(PARROT_INTERP,
                 *core = PARROT_SLOW_CORE;
             else if (STREQ(opt.opt_arg, "fast") || STREQ(opt.opt_arg, "function"))
                 *core = PARROT_FAST_CORE;
-            else if (STREQ(opt.opt_arg, "switch"))
-                *core = PARROT_SWITCH_CORE;
-            else if (STREQ(opt.opt_arg, "cgp"))
-                *core = PARROT_CGP_CORE;
-            else if (STREQ(opt.opt_arg, "cgoto"))
-                *core = PARROT_CGOTO_CORE;
             else if (STREQ(opt.opt_arg, "jit"))
                 *core = PARROT_FAST_CORE;
-            else if (STREQ(opt.opt_arg, "cgp-jit"))
-                *core = PARROT_CGP_CORE;
-            else if (STREQ(opt.opt_arg, "switch-jit"))
-                *core = PARROT_SWITCH_CORE;
             else if (STREQ(opt.opt_arg, "exec"))
                 *core = PARROT_EXEC_CORE;
             else if (STREQ(opt.opt_arg, "trace"))

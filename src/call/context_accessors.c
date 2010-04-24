@@ -471,38 +471,6 @@ Parrot_pcc_set_pc_func(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(opcode_t *pc
 
 /*
 
-=item C<size_t Parrot_pcc_get_pred_offset_func(PARROT_INTERP, PMC *ctx)>
-
-=item C<void Parrot_pcc_set_pred_offset_func(PARROT_INTERP, PMC *ctx, size_t
-pred_offset)>
-
-Get/set pred_offset
-
-=cut
-
-*/
-
-PARROT_EXPORT
-size_t
-Parrot_pcc_get_pred_offset_func(PARROT_INTERP, ARGIN(PMC *ctx))
-{
-    ASSERT_ARGS(Parrot_pcc_get_pred_offset_func)
-    Parrot_Context const *c = get_context_struct_fast(interp, ctx);
-    return c->pred_offset;
-}
-
-PARROT_EXPORT
-void
-Parrot_pcc_set_pred_offset_func(PARROT_INTERP, ARGIN(PMC *ctx), size_t pred_offset)
-{
-    ASSERT_ARGS(Parrot_pcc_set_pred_offset_func)
-    Parrot_Context *c = get_context_struct_fast(interp, ctx);
-    c->pred_offset = pred_offset;
-}
-
-
-/*
-
 =item C<UINTVAL Parrot_pcc_warnings_on_func(PARROT_INTERP, PMC *ctx, UINTVAL
 flags)>
 

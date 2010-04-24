@@ -684,12 +684,6 @@ run_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
     Parrot_runcore_t *old_core = interp->run_core;
     PMC              *retval   = PMCNULL;
 
-    /* turn off JIT and prederef - both would act on the whole
-     * PackFile which probably isn't worth the effort */
-    if (PARROT_RUNCORE_JIT_OPS_TEST(interp->run_core)
-    ||  PARROT_RUNCORE_PREDEREF_OPS_TEST(interp->run_core))
-        Parrot_runcore_switch(interp, CONST_STRING(interp, "fast"));
-
     Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp),
             interp->code->const_table->constants);
 
@@ -2581,16 +2575,6 @@ byte_code_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
     ASSERT_ARGS(byte_code_destroy)
     PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
 
-    if (byte_code->prederef.code) {
-        Parrot_free_memalign(byte_code->prederef.code);
-        byte_code->prederef.code = NULL;
-
-        if (byte_code->prederef.branches) {
-            mem_gc_free(interp, byte_code->prederef.branches);
-            byte_code->prederef.branches = NULL;
-        }
-    }
-
     byte_code->fixups      = NULL;
     byte_code->const_table = NULL;
     byte_code->debugs      = NULL;
@@ -3089,10 +3073,6 @@ Parrot_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int really)
     Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp), really
                                ? find_constants(interp, new_cs->const_table)
                                : new_cs->const_table->constants);
-
-    /* new_cs->const_table->constants; */
-    Parrot_pcc_set_pred_offset(interp, CURRENT_CONTEXT(interp),
-        new_cs->base.data - (opcode_t*) new_cs->prederef.code);
 
     if (really)
         prepare_for_run(interp);

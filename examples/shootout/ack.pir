@@ -3,7 +3,7 @@
 # $Id$
 # OUTPUT="Ack(3, 9) = 4093\n"
 #
-# ./parrot -Oc -R cgp-jit
+# ./parrot -Oc
 # RQ (Karl)
 # Seems to be an old benchmark, now deprecated by the shootout
 #

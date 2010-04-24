@@ -89,10 +89,10 @@ sub new {
         return;
     }
     my $class_name = shift @argv;
-    my %is_allowed = map { $_ => 1 } qw(C CGoto CGP CSwitch CPrederef);
+    my %is_allowed = map { $_ => 1 } qw( C );
     unless ( $is_allowed{$class_name} ) {
         print STDERR
-            "Parrot::Ops2c::Utils::new() requires C, CGoto, CGP, CSwitch and/or  CPrederef: $!";
+            "Parrot::Ops2c::Utils::new() requires C: $!";
         return;
     }
 
@@ -372,10 +372,6 @@ sub print_c_source_top {
 
     $self->_print_run_core_func_decl_source($SOURCE);
 
-    $self->_print_cg_jump_table($SOURCE);
-
-    $self->_print_goto_opcode($SOURCE);
-
     $self->_print_op_function_definitions($SOURCE);
 }
 
@@ -650,7 +646,6 @@ sub _iterate_over_ops {
             $one_op .= "$definition $comment {\n$src}\n\n";
             push @op_funcs,  $one_op;
             push @op_protos, $prototype;
-            $prev_src = $src if ( $self->{suffix} eq '_cgp' || $self->{suffix} eq '_switch' );
             $prev_index = $index;
         }
         $index++;
@@ -660,47 +655,6 @@ sub _iterate_over_ops {
     $self->{op_protos}     = \@op_protos;
     $self->{op_func_table} = \@op_func_table;
     $self->{cg_jump_table} = \@cg_jump_table;
-}
-
-sub _print_cg_jump_table {
-    my ( $self, $fh ) = @_;
-
-    my @cg_jump_table = @{ $self->{cg_jump_table} };
-
-    if ( $self->{suffix} =~ /cg/ ) {
-        print $fh @cg_jump_table;
-        print $fh <<END_C;
-        NULL
-    };
-END_C
-        print $fh $self->{trans}->run_core_after_addr_table( $self->{bs} );
-    }
-    return 1;
-}
-
-sub _print_goto_opcode {
-    my ( $self, $fh ) = @_;
-
-    if ( $self->{suffix} =~ /cgp/ ) {
-        print $fh <<END_C;
-#ifdef __GNUC__
-# ifdef I386
-    else if (cur_opcode == (opcode_t *)(void **) 1)
-    __asm__ ("jmp *4(%ebp)");  /* jump to ret addr, used by JIT */
-# endif
-#endif
-    _reg_base = (char*)Parrot_pcc_get_regs_ni(interp, CURRENT_CONTEXT(interp))->regs_i;
-    goto **(void **)cur_opcode;
-
-END_C
-    }
-    elsif ( $self->{suffix} =~ /cg/ ) {
-        print $fh <<END_C;
-goto *$self->{bs}ops_addr[*cur_opcode];
-
-END_C
-    }
-    return 1;
 }
 
 sub _print_op_function_definitions {

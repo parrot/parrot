@@ -15,7 +15,6 @@ our @shared_valid_options = qw{
     cc
     ccflags
     ccwarn
-    cgoto
     configure_trace
     cxx
     darwin_no_fink

@@ -51,7 +51,6 @@ typedef enum {
     CORE_OPS_check_events__,    /* inserted into op dispatch when an event
                                    got scheduled */
     CORE_OPS_wrapper__,         /* inserted by dynop_register for new ops */
-    CORE_OPS_prederef__         /* inserted by dynop_register for new ops */
         /* 2 more reserved */
 } special_core_ops_enum;
 

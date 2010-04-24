@@ -123,10 +123,6 @@ Some example descriptions:
 
 =over 4
 
-=item F<config/auto/cgoto.pm>
-
-    Does your compiler support computed goto...
-
 =item F<gen/config_h.pm>
 
     Generate C headers...
@@ -136,7 +132,7 @@ Some example descriptions:
 Note that on non-interactive steps, the text I<done> will be printed after the
 description when the step finishes executing; for example, the user will see:
 
-    Does your compiler support computed goto..............done.
+    Determine flags for building shared libraries.....-fPIC
 
 =item C<result>
 

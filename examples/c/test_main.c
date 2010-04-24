@@ -209,13 +209,6 @@ Returns the user help.
 static void
 usage(void)
 {
-#ifdef HAVE_COMPUTED_GOTO
-    const char* cgoto_info = "Deactivate computed goto";
-#else
-    const char* cgoto_info =
-        "Deactivate computed goto (not available on this platform)";
-#endif
-
     fprintf(stderr,
 "Usage: parrot [switches] [--] programfile [arguments]\n\
   -b  --bounds-checks           Activate bounds checks\n\
@@ -223,9 +216,6 @@ usage(void)
   -h  --help                    Display this message\n\
   -j  --jit                     Activate Just-In-Time compiler\n\
   -p  --profile                 Activate profiling\n\
-  -P  --predereferenced_core    Activate predereferencing\n\
-  -S  --switched_core           Activate switched core\n\
-  -g  --no-computed-goto        %s\n\
   -t  --trace                   Activate tracing\n\
   -v  --version                 Display version information\n\
   -.  --wait                    Wait for a keypress (gives Windows users\n\
@@ -233,8 +223,7 @@ usage(void)
       --gc-debug\n\
         Enable garbage collection debugging mode. This may also be enabled\n\
         by setting the environment variable $PARROT_GC_DEBUG to 1.\n\
-\n",
-            cgoto_info);
+\n");
 
     Parrot_exit(interp, 0);
 }

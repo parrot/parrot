@@ -11,17 +11,11 @@
 # python oo2.py                               2.9 (first time)
 # python oo2.py                               2.4
 
-# parrot -R cgp oo2.pasm            -g           -O3
-#   with reuse regsave mem                    6.15
-# anchor P1                                   6.7
-# Dan's new object layout                     5.1
-
 # parrot -R jit oo2.pasm            -g           -O3
 #   with reuse regsave mem                    6.1
 # anchor P1                                   6.5
 # Dan's new object layout                     4.9
 
-# parrot -R cgp oo2-prop.pasm                     2.8
 # parrot -R jit oo2-prop.pasm                     2.6
 
 .namespace [ "Foo" ]

@@ -134,10 +134,6 @@ The short command line options are:
 
 Turn warnings on.
 
-=item C<-g>
-
-Run the C<CGoto> core.
-
 =item C<-G>
 
 Run the C<GCDebug> core.
@@ -145,14 +141,6 @@ Run the C<GCDebug> core.
 =item C<-j>
 
 Alias for running with the fast core.
-
-=item C<-C>
-
-Run the C<CGP> core.
-
-=item C<-S>
-
-Run Switched.
 
 =item C<-b>
 

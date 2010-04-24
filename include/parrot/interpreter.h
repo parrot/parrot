@@ -64,9 +64,6 @@ typedef enum {
     PARROT_SLOW_CORE,                       /* slow bounds/trace/profile core */
     PARROT_FUNCTION_CORE    = PARROT_SLOW_CORE,
     PARROT_FAST_CORE        = 0x01,         /* fast DO_OP core */
-    PARROT_SWITCH_CORE      = 0x02,         /*   P   = prederef   */
-    PARROT_CGP_CORE         = 0x06,         /*  CP                */
-    PARROT_CGOTO_CORE       = 0x04,         /*  C    = cgoto      */
     PARROT_EXEC_CORE        = 0x20,         /* TODO Parrot_exec_run variants */
     PARROT_GC_DEBUG_CORE    = 0x40,         /* run GC before each op */
     PARROT_DEBUGGER_CORE    = 0x80,         /* used by parrot debugger */
@@ -151,18 +148,6 @@ struct _imc_info_t;
 
 struct _Thread_data;    /* in thread.h */
 struct _Caches;         /* caches .h */
-
-typedef struct _Prederef_branch {       /* item for recording branches */
-    size_t offs;                        /* offset in code */
-    void  *op;                          /* opcode at that position */
-} Prederef_branch;
-
-typedef struct _Prederef {
-    void **code;                        /* prederefed code */
-    Prederef_branch *branches;          /* list of branches in code */
-    size_t n_branches;                  /* entries in that list */
-    size_t n_allocated;                 /* allocated size of it */
-} Prederef;
 
 /* Get Context from interpreter */
 #define CONTEXT(interp)         Parrot_pcc_get_context_struct((interp), (interp)->ctx)

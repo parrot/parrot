@@ -251,13 +251,6 @@ imcc_handle_flag(PARROT_INTERP, struct longopt_opt_info *opt,
         if (strchr(opt->opt_arg, '2')) {
             IMCC_INFO(interp)->optimizer_level |= (OPT_PRE | OPT_CFG);
         }
-        if (strchr(opt->opt_arg, 't')) {
-#ifdef HAVE_COMPUTED_GOTO
-            *core = PARROT_CGP_CORE;
-#else
-            *core = PARROT_SWITCH_CORE;
-#endif
-        }
         break;
 
       default:
@@ -413,12 +406,6 @@ imcc_get_optimization_description(const PARROT_INTERP, int opt_level, ARGMOD(cha
         opt_desc[i++] = 'p';
     if (opt_level & OPT_SUB)
         opt_desc[i++] = 'c';
-
-    if (PARROT_RUNCORE_JIT_OPS_TEST(interp->run_core))
-        opt_desc[i++] = 'j';
-
-    if (PARROT_RUNCORE_PREDEREF_OPS_TEST(interp->run_core))
-        opt_desc[i++] = 't';
 
     opt_desc[i] = '\0';
     return;

@@ -11,8 +11,6 @@
 # python oo1.py                 1.2 (first time)
 # python oo1.py                 0.51
 
-# parrot -R cgp oo1.pasm            -g           -O3
-
 # original list fixed           4.9     (leaks mem ~ 110 M used)
 # don't clone vtable            4.4
 # Dan's vtable cache            4.3           3.8
@@ -31,9 +29,6 @@
 # Dan's new object layout                     1.00
 
 
-# parrot -R cgp oo1-prop.pasm
-#   invokecc                                  0.75
-#   RetCont out of loop                       0.57
 # parrot -R jit oo1-prop.pasm                     0.54
 
 .namespace [ "Foo" ]

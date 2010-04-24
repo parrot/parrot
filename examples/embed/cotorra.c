@@ -108,10 +108,7 @@ Parrot_Run_core_t getruncore(const char *name)
 {
     static const struct runcoreinfo cores [] = {
         { PARROT_SLOW_CORE,     "slow" },
-        { PARROT_FAST_CORE,     "fast" },
-        { PARROT_CGOTO_CORE,    "cgoto" },
         { PARROT_GC_DEBUG_CORE, "gcdebug" },
-        { PARROT_SWITCH_CORE,   "switch" }
     };
     static const unsigned int n = sizeof (cores)/sizeof (struct runcoreinfo);
     unsigned int i;

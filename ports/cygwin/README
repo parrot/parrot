@@ -682,9 +682,6 @@ Files included in the =parrot-devel= package:
  /usr/include/parrot/1.0.0/parrot/op.h
  /usr/include/parrot/1.0.0/parrot/oplib.h
  /usr/include/parrot/1.0.0/parrot/oplib/core_ops.h
- /usr/include/parrot/1.0.0/parrot/oplib/core_ops_cg.h
- /usr/include/parrot/1.0.0/parrot/oplib/core_ops_cgp.h
- /usr/include/parrot/1.0.0/parrot/oplib/core_ops_switch.h
  /usr/include/parrot/1.0.0/parrot/oplib/ops.h
  /usr/include/parrot/1.0.0/parrot/packfile.h
  /usr/include/parrot/1.0.0/parrot/parrot.h
@@ -748,8 +745,6 @@ Files included in the =parrot-devel= package:
  /usr/lib/parrot/1.0.0/src/install_config.o
  /usr/lib/parrot/1.0.0/src/nci.c
  /usr/lib/parrot/1.0.0/src/null_config.o
- /usr/lib/parrot/1.0.0/src/ops/core_ops_cgp.c
- /usr/lib/parrot/1.0.0/src/ops/core_ops_switch.c
  /usr/lib/parrot/1.0.0/src/parrot_config.o
  /usr/lib/parrot/1.0.0/tools/build/ops2c.pl
  /usr/lib/parrot/1.0.0/tools/build/pmc2c.pl
@@ -892,7 +887,6 @@ Files included in the =parrot-docs= package:
  /usr/share/doc/parrot/1.0.0/html/config/auto/attributes.pm.html
  /usr/share/doc/parrot/1.0.0/html/config/auto/backtrace.pm.html
  /usr/share/doc/parrot/1.0.0/html/config/auto/byteorder.pm.html
- /usr/share/doc/parrot/1.0.0/html/config/auto/cgoto.pm.html
  /usr/share/doc/parrot/1.0.0/html/config/auto/cpu.pm.html
  /usr/share/doc/parrot/1.0.0/html/config/auto/cpu/i386/auto.pm.html
  /usr/share/doc/parrot/1.0.0/html/config/auto/cpu/ppc/auto.pm.html

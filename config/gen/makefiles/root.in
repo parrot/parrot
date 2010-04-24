@@ -84,7 +84,7 @@ C_LIBS           = @libs@
 CC_SHARED        = @cc_shared@
 CC_O_OUT         = @cc_o_out@
 CC_WARN          = @ccwarn@
-CFLAGS           = $(CC_INC) @ccflags@ @cc_build_call_frames@ @cc_debug@ @cg_flag@ @gc_flag@ @clock_best@ $(CC_SHARED)
+CFLAGS           = $(CC_INC) @ccflags@ @cc_build_call_frames@ @cc_debug@ @gc_flag@ @clock_best@ $(CC_SHARED)
 LINK_DYNAMIC     = @link_dynamic@
 LINK             = @link@
 LINKFLAGS        = @linkflags@ @link_debug@ @ld_debug@
@@ -170,8 +170,7 @@ GEN_CONFIGS = \
     parrot.pc \
     compilers/imcc/imcc.y.flag \
     compilers/imcc/imcc.l.flag \
-    src/ops/core_ops.c \
-    src/ops/core_ops_switch.c
+    src/ops/core_ops.c
 
 GEN_PASM_INCLUDES = \
 	runtime/parrot/include/cclass.pasm \
@@ -237,7 +236,6 @@ GEN_HEADERS = \
     $(INC_DIR)/vtable.h \
     $(INC_DIR)/oplib/core_ops.h \
     $(INC_DIR)/oplib/ops.h \
-    $(INC_DIR)/oplib/core_ops_switch.h \
     $(INC_DIR)/extend_vtable.h \
     $(INC_DIR)/pbcversion.h
 
@@ -245,7 +243,6 @@ GEN_SOURCES = \
     src/core_ops.c \
     src/nci.c \
     src/glut_nci_thunks.c \
-    src/core_ops_switch.c \
     src/parrot_config.c \
     src/null_config.c \
     src/install_config.c \
@@ -409,7 +406,6 @@ PARROT_H_HEADERS = \
 
 # generated list of header files
 GENERAL_H_FILES   = $(NONGEN_HEADERS) $(GEN_HEADERS) \
-#IF(cg_flag): $(INC_DIR)/oplib/core_ops_cg.h $(INC_DIR)/oplib/core_ops_cgp.h
 
 
 CHARSET_O_FILES   = @TEMP_charset_o@
@@ -433,10 +429,7 @@ IO_O_FILES = \
 
 INTERP_O_FILES = \
     src/string/api$(O) \
-    \
     src/ops/core_ops$(O) \
-    src/ops/core_ops_switch$(O) \
-    \
 #IF(i386_has_gcc_cmpxchg):    src/atomic/gcc_x86$(O) \
     src/byteorder$(O) \
     src/string/charset$(O) \
@@ -500,7 +493,6 @@ INTERP_O_FILES = \
     @TEMP_atomic_o@ \
     @TEMP_gc_o@ \
 #IF(platform_asm):    src/platform_asm$(O) \
-#IF(cg_flag):     src/ops/core_ops_cg$(O) src/ops/core_ops_cgp$(O) \
 
 
 OPS_FILES = @ops@ $(GEN_OPSFILES)
@@ -1313,7 +1305,7 @@ src/runcore/main$(O) : \
 	src/runcore/main.str \
 	include/pmc/pmc_parrotlibrary.h \
         $(INC_DIR)/dynext.h $(INC_DIR)/oplib/core_ops.h \
-        $(INC_DIR)/oplib/core_ops_switch.h $(INC_DIR)/oplib/ops.h \
+        $(INC_DIR)/oplib/ops.h \
         $(PARROT_H_HEADERS) $(INC_DIR)/runcore_api.h \
         $(INC_DIR)/runcore_profiling.h
 
@@ -1418,7 +1410,7 @@ src/parrot$(O) : $(GENERAL_H_FILES)
 src/runcore/cores$(O) : src/runcore/cores.str \
 	include/pmc/pmc_sub.h \
         $(INC_DIR)/dynext.h $(INC_DIR)/embed.h $(INC_DIR)/oplib/core_ops.h \
-        $(INC_DIR)/oplib/core_ops_switch.h $(INC_DIR)/oplib/ops.h \
+        $(INC_DIR)/oplib/ops.h \
         $(INC_DIR)/runcore_api.h $(INC_DIR)/runcore_trace.h \
         $(PARROT_H_HEADERS)
 
@@ -1527,41 +1519,6 @@ src/ops/core_ops.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl \
 	lib/Parrot/OpLib/core.pm lib/Parrot/OpTrans/C.pm \
 	include/pmc/pmc_continuation.h
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --core @no_lines_flag@
-
-## SUFFIX OVERRIDE
-src/ops/core_ops_switch$(O) : $(GENERAL_H_FILES) src/ops/core_ops_switch.c \
-	include/pmc/pmc_parrotlibrary.h
-	$(CC) $(CFLAGS) @optimize::src/ops/core_ops_switch.c@ @ccwarn::src/ops/core_ops_switch.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/ops/core_ops_switch.c
-
-$(INC_DIR)/oplib/core_ops_switch.h : src/ops/core_ops_switch.c
-
-src/ops/core_ops_switch.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl \
-	lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC_DIR)/config.h \
-	lib/Parrot/OpLib/core.pm lib/Parrot/OpTrans/CSwitch.pm \
-	lib/Parrot/OpTrans/CPrederef.pm
-	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl CSwitch --core @no_lines_flag@
-
-## SUFFIX OVERRIDE
-src/ops/core_ops_cg$(O): $(GENERAL_H_FILES) src/ops/core_ops_cg.c \
-        include/pmc/pmc_parrotlibrary.h
-	$(CC) $(CFLAGS) @optimize::src/ops/core_ops_cg.c@ @ccwarn::src/ops/core_ops_cg.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/ops/core_ops_cg.c
-
-## SUFFIX OVERRIDE
-src/ops/core_ops_cgp$(O): $(GENERAL_H_FILES) src/ops/core_ops_cgp.c \
-        include/pmc/pmc_parrotlibrary.h
-	$(CC) $(CFLAGS) @optimize::src/ops/core_ops_cgp.c@ @ccwarn::src/ops/core_ops_cgp.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/ops/core_ops_cgp.c
-
-src/runcore/cores.c: $(INC_DIR)/oplib/core_ops_cgp.h
-
-$(INC_DIR)/oplib/core_ops_cg.h: src/ops/core_ops_cg.c
-
-src/ops/core_ops_cg.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm lib/Parrot/OpTrans/CGoto.pm lib/Parrot/OpLib/core.pm
-	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl CGoto --core
-
-$(INC_DIR)/oplib/core_ops_cgp.h: src/ops/core_ops_cgp.c
-
-src/ops/core_ops_cgp.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm lib/Parrot/OpTrans/CGP.pm lib/Parrot/OpLib/core.pm lib/Parrot/OpTrans/CPrederef.pm
-	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl CGP --core
 
 @TEMP_gc_c@
 
@@ -1746,15 +1703,12 @@ coretest : corevm
 check : test
 
 # Test various run cores and other stuff
-# 'testC', 'testg' and 'testj' are tested only
+# 'testg' and 'testj' are tested only
 # when the needed runcores are available
 fulltest :
 	-@make@ testb \
-#IF(cg_flag):	testC \
 	testf \
-#IF(cg_flag):	testg \
 	testr \
-	testS \
 	src_tests \
 	run_tests \
 	buildtools_tests \
@@ -1770,10 +1724,6 @@ fulltest :
 # bounds checking, slow core
 testb : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -b $(RUNCORE_TEST_FILES)
-
-# CGP core
-testC : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) -C $(RUNCORE_TEST_FILES)
 
 # fast core
 testf : test_prep
@@ -1794,18 +1744,6 @@ testj : test_prep
 # normal core, write and run Parrot Byte Code
 testr : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -r $(RUNCORE_TEST_FILES)
-
-# switched core
-testS : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) -S $(RUNCORE_TEST_FILES)
-
-# Computed goto jitted core - target retained, but falls back to standard core
-testCj : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(RUNCORE_TEST_FILES)
-
-# switched jitted core - target retained, but falls back to standard core
-testSj : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(RUNCORE_TEST_FILES)
 
 # test the EXEC stuff
 testexec: test_prep
@@ -1881,7 +1819,6 @@ clean : \
 #UNLESS(win32):    cover-clean \
     editor-clean
 	$(RM_F) $(INC_DIR)/oplib/core_ops_cg.h src/ops/core_ops_cg.c \
-    $(INC_DIR)/oplib/core_ops_cgp.h src/ops/core_ops_cgp.c
 	$(RM_F) chartypes "*.s" "*~"
 	$(RM_F) $(FLUID_FILES_1)
 	$(RM_F) $(FLUID_FILES_2)
@@ -2331,11 +2268,8 @@ COVER_DIRS = \
 cover: \
     cover.dummy \
     cover-testb \
-#IF(cg_flag):    cover-testC \
     cover-testf \
-#IF(cg_flag):    cover-testg \
     cover-testr \
-    cover-testS \
     cover-src \
     cover-run \
     cover-perl \
@@ -2363,9 +2297,6 @@ cover.dummy:
 cover-testb: cover.dummy
 	-@make@ testb
 
-cover-testC: cover.dummy
-	-@make@ testC
-
 cover-testf: cover.dummy
 	-@make@ testf
 
@@ -2377,9 +2308,6 @@ cover-testj: cover.dummy
 
 cover-testr: cover.dummy
 	-@make@ testr
-
-cover-testS: cover.dummy
-	-@make@ testS
 
 cover-src: cover.dummy
 	-@make@ src_tests

@@ -5,7 +5,7 @@
 # Ack by Leopold Toetsch
 # Fib and Tak by Joshua Isom
 # modified default value to n=3. Karl Forner
-# ./parrot -Oc -R cgp-jit recursive.pir N
+# ./parrot -Oc recursive.pir N
 
 .sub main :main
 	.param pmc argv

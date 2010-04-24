@@ -19,7 +19,7 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 27;
+use Test::More tests => 15;
 use Carp;
 use Cwd;
 use File::Copy;
@@ -55,16 +55,13 @@ my ( $msg, $tie );
     }
     chdir "src/dynoplibs" or croak "Unable to change to src/dynoplibs: $!";
 
-    test_dynops( [qw( CGoto    obscure.ops )] );
-    test_dynops( [qw( CGP      obscure.ops )] );
-    test_dynops( [qw( C        obscure.ops )] );
-    test_dynops( [qw( CSwitch  obscure.ops )] );
+    test_dynops( [qw( C obscure.ops )] );
 
     {
         my ($self, $stdout, $stderr);
         capture(
             sub { $self = Parrot::Ops2c::Utils->new( {
-                        argv => [qw( CSwitch  obscure.ops obscure.ops )],
+                        argv => [qw( C obscure.ops obscure.ops )],
                         flag => { dynamic => 1 },
                 } ); },
             \$stdout,
