@@ -110,16 +110,16 @@ Creates and returns a copy of the array.
         GET_ATTR_int_array(INTERP, SELF, int_array);
 
         if (int_array) {
-            INTVAL      *dest_int_array;
-            INTVAL       size;
-
+            INTVAL size;
             GET_ATTR_size(INTERP, SELF, size);
-
-            dest_int_array = mem_gc_allocate_n_typed(INTERP, size, INTVAL);
+            {
+                INTVAL * const dest_int_array = mem_gc_allocate_n_typed(INTERP,
+                        size, INTVAL);
+                mem_copy_n_typed(dest_int_array, int_array,
+                        size, INTVAL);
+                SET_ATTR_int_array(INTERP, dest, dest_int_array);
+            }
             SET_ATTR_size(INTERP, dest, size);
-            SET_ATTR_int_array(INTERP, dest, dest_int_array);
-
-            mem_sys_memcopy(dest_int_array, int_array, size * sizeof (INTVAL));
             PObj_custom_destroy_SET(dest);
         }
 
