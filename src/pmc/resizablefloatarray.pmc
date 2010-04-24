@@ -156,7 +156,7 @@ Creates and returns a copy of the array.
 
         /* copy trimmed extra space */
         GET_ATTR_size(INTERP, SELF, size);
-        SET_ATTR_resize_threshold(INTERP, SELF, size);
+        SET_ATTR_resize_threshold(INTERP, copy, size);
 
         return copy;
     }
