@@ -38,9 +38,12 @@ tools/dev/mk_manifest_and_skip.pl - Recreate MANIFEST and MANIFEST.SKIP
 
 =head1 DESCRIPTION
 
-Recreates MANIFEST and MANIFEST.SKIP from the subversion properties
-and the output of C<svn status>. .
-So far tested with svn 1.2.0 and svn 1.4.2.
+Recreates MANIFEST and MANIFEST.SKIP from the output of C<svn status> and the subversion properties. Run this script after SVN has been told about new or deleted files and before you commit to the repository. So far tested with svn 1.2.0, 1.4.2 and 1.6.6.
+
+    svn add PATH...
+    svn delete PATH...
+    perl tools/dev/mk_manifest_and_skip.pl
+    svn commit -m ... [PATH...]
 
 This won't work for git-svn.
 

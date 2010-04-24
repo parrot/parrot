@@ -538,15 +538,15 @@ Returns the Parrot string representation C<key>.
 
         for (j = 0; j < n; ++j) {
             STRING * const val = SELF.get_string_keyed_int(j);
-            res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "\""));
-            res = Parrot_str_append(INTERP, res, val);
-            res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "\""));
+            res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, "\""));
+            res = Parrot_str_concat(INTERP, res, val);
+            res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, "\""));
 
             if (j < n - 1)
-                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, ", "));
+                res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, ", "));
         }
 
-        res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, " ]"));
+        res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, " ]"));
         return res;
     }
 

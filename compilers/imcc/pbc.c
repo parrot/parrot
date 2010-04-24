@@ -1538,13 +1538,14 @@ static opcode_t
 build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
 {
     ASSERT_ARGS(build_key)
-#define KEYLEN 21
-    SymReg   *reg;
+#define MAX_KEY_LEN 10
+#define MAX_KEYNAME_LEN 20
+    SymReg   *reg = key_reg->set == 'K' ? key_reg->nextkey : key_reg;
 
-    char      s_key[KEYLEN * 10];
-    opcode_t  key[KEYLEN + 1]; /* [0] -> length, [1..] -> keys */
+    char      s_key[MAX_KEY_LEN * MAX_KEYNAME_LEN];
+    opcode_t  key[MAX_KEY_LEN * 2 + 1];
     opcode_t  size;
-    int       key_length;     /* P0["hi;there"; S0; 2] has length 3 */
+    int       key_length = 0;     /* P0["hi;there"; S0; 2] has length 3 */
     int       k;
 
     /* 0 is length */
@@ -1554,15 +1555,14 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
     char     *s  = s_key;
 
     *s           = 0;
-    reg          = key_reg->set == 'K' ? key_reg->nextkey : key_reg;
 
     for (key_length = 0; reg ; reg = reg->nextkey, key_length++) {
         SymReg *r = reg;
         int     type;
 
-        if ((pc - key - 2) >= KEYLEN)
+        if (key_length >= MAX_KEY_LEN)
             IMCC_fatal(interp, 1, "build_key:"
-                    "key too complex increase KEYLEN\n");
+                    "Key too long, increase MAX_KEY_LEN.\n");
 
         /* if key is a register, the original sym is in r->reg */
         type = r->type;

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -267,7 +267,6 @@ Create PackFile_Annotations* from self.
         PackFile_Annotations *res = mem_gc_allocate_zeroed_typed(INTERP,
                 PackFile_Annotations);
         INTVAL                i, num;
-        INTVAL                key_type;
         PMC                  *keys;             /* Temporary representation of Keys */
         PMC                  *names;            /* Constants for Key's names */
         PMC                  *types;            /* Types of Keys */
@@ -304,8 +303,9 @@ Create PackFile_Annotations* from self.
         res->num_entries = num;
         res->entries = mem_gc_allocate_n_typed(INTERP, num, PackFile_Annotations_Entry*);
         for (i = 0; i < num; ++i) {
-            PMC  *entity = VTABLE_get_pmc_keyed_int(interp, attrs->annotations, i);
-            Parrot_PackfileAnnotation_attributes *entity_attrs = PARROT_PACKFILEANNOTATION(entity);
+            PMC  * const entity = VTABLE_get_pmc_keyed_int(interp, attrs->annotations, i);
+            const Parrot_PackfileAnnotation_attributes * const entity_attrs =
+                PARROT_PACKFILEANNOTATION(entity);
 
             /* Handle creating of Key */
             PMC * key_array = VTABLE_get_pmc_keyed_str(interp, keys, entity_attrs->name);

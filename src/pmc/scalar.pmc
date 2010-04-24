@@ -632,7 +632,7 @@ Concatenate the string C<value> in place.
 
     VTABLE PMC *concatenate(PMC *value, PMC *dest) {
         STRING * const s = Parrot_str_concat(INTERP, SELF.get_string(),
-            VTABLE_get_string(INTERP, value), 0);
+            VTABLE_get_string(INTERP, value));
 
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
@@ -642,7 +642,7 @@ Concatenate the string C<value> in place.
 
     VTABLE PMC *concatenate_str(STRING *value, PMC *dest) {
         STRING * const s = Parrot_str_concat(INTERP,
-            SELF.get_string(), value, 0);
+            SELF.get_string(), value);
 
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
@@ -653,12 +653,12 @@ Concatenate the string C<value> in place.
     VTABLE void i_concatenate(PMC *value) {
         STRING * const s = SELF.get_string();
         STRING * const v = VTABLE_get_string(INTERP, value);
-        SELF.set_string_native(Parrot_str_append(INTERP, s, v));
+        SELF.set_string_native(Parrot_str_concat(INTERP, s, v));
     }
 
     VTABLE void i_concatenate_str(STRING *value) {
         STRING * const s = SELF.get_string();
-        SELF.set_string_native(Parrot_str_append(INTERP, s, value));
+        SELF.set_string_native(Parrot_str_concat(INTERP, s, value));
     }
 
 /*
@@ -924,7 +924,7 @@ C<offset>.
 
     VTABLE STRING *substr_str(INTVAL offset, INTVAL length) {
         return Parrot_str_substr(INTERP, VTABLE_get_string(INTERP, SELF),
-            offset, length, NULL, 0);
+                offset, length);
     }
 
 /*

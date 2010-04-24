@@ -79,6 +79,7 @@ our @shared_valid_options = qw{
     without-opengl
     without-pcre
     without-threads
+    without-zlib
     yacc
 };
 

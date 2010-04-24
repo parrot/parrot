@@ -61,6 +61,10 @@ pmclass Hash provides hash auto_attrs {
 
 Initializes the instance.
 
+=item C<void init_int(INTVAL value_type)>
+
+Initializes the instance with the value_type provided.
+
 =item C<void destroy()>
 
 Free hash structure.
@@ -74,6 +78,19 @@ Free hash structure.
             (Parrot_Hash_attributes *) PMC_data(SELF);
 
         attr->hash            = parrot_new_hash(INTERP);
+        attr->hash->container = SELF;
+        PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+    VTABLE void init_int(INTVAL value_type) {
+        Parrot_Hash_attributes * const attr =
+            (Parrot_Hash_attributes *) PMC_data(SELF);
+
+        attr->hash = parrot_create_hash(INTERP,
+                (PARROT_DATA_TYPE)value_type,
+                Hash_key_type_STRING,
+                STRING_compare,
+                (hash_hash_key_fn)key_hash_STRING);
         attr->hash->container = SELF;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
@@ -236,18 +253,15 @@ NB: this method will destroy all old data!
         if (old_hash && old_hash->entry_type == type)
             return;
 
-        if (!old_hash)
-            old_hash = parrot_new_hash(INTERP);
-
         switch (type) {
           case enum_type_INTVAL:
           case enum_type_STRING:
           case enum_type_PMC:
             new_hash = parrot_create_hash(interp,
                         (PARROT_DATA_TYPE)type,
-                        old_hash->key_type,
-                        old_hash->compare,
-                        old_hash->hash_val);
+                        old_hash ? old_hash->key_type : Hash_key_type_STRING,
+                        old_hash ? old_hash->compare : STRING_compare,
+                        old_hash ? old_hash->hash_val : (hash_hash_key_fn)key_hash_STRING);
             break;
           default:
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
@@ -257,7 +271,8 @@ NB: this method will destroy all old data!
         PARROT_HASH(SELF)->hash = new_hash;
         new_hash->container     = SELF;
 
-        parrot_hash_destroy(INTERP, old_hash);
+        if (old_hash)
+            parrot_hash_destroy(INTERP, old_hash);
     }
 
     METHOD get_value_type() {
@@ -342,23 +357,23 @@ Return a representation of the hash contents.
             Parrot_str_free_cstring(key_str);
 
             if (all_digit) {
-                res = Parrot_str_append(INTERP, res, key);
+                res = Parrot_str_concat(INTERP, res, key);
             }
             else {
-                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "'"));
-                res = Parrot_str_append(INTERP, res, key);
-                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "'"));
+                res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, "'"));
+                res = Parrot_str_concat(INTERP, res, key);
+                res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, "'"));
             }
 
-            res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, ": "));
+            res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, ": "));
             val = SELF.get_pmc_keyed_str(key);
-            res = Parrot_str_append(INTERP, res, VTABLE_get_string(INTERP, val));
+            res = Parrot_str_concat(INTERP, res, VTABLE_get_string(INTERP, val));
 
             if (j < n - 1)
-                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, ", "));
+                res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, ", "));
         }
 
-        res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "}"));
+        res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, "}"));
 
         return res;
     }

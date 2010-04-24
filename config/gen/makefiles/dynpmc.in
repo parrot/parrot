@@ -33,6 +33,7 @@ PMC_TARGETS = \
   pccmethod_test$(LOAD_EXT) \
   rotest$(LOAD_EXT) \
   rational$(LOAD_EXT) \
+#IF(has_zlib):  gziphandle$(LOAD_EXT) \
   subproxy$(LOAD_EXT)
 
 PMCS_FOO = \
@@ -42,6 +43,10 @@ PMCS_FOO = \
 OBJS_FOO = \
   foo$(O) \
   foo2$(O)
+
+#IF(win32 and cc==gcc):LIB_ZLIB = -lz
+#ELSIF(win32):LIB_ZLIB = zlib.lib
+#ELSE:LIB_ZLIB = -lz
 
 CLEANUPS = \
   "*.c" \
@@ -160,6 +165,19 @@ subproxy.c: subproxy.dump
 
 subproxy.dump: subproxy.pmc
 	$(PMC2CD) subproxy.pmc
+
+gziphandle$(LOAD_EXT): gziphandle$(O)
+	$(LD) @ld_out@gziphandle$(LOAD_EXT) gziphandle$(O) $(LINKARGS) $(LIB_ZLIB)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+
+gziphandle$(O): gziphandle.c
+	$(CC) -c @cc_o_out@gziphandle$(O) $(INCLUDES) $(CFLAGS) gziphandle.c
+
+gziphandle.c: gziphandle.dump
+	$(PMC2CC) gziphandle.pmc
+
+gziphandle.dump: gziphandle.pmc
+	$(PMC2CD) gziphandle.pmc
 
 
 test : all

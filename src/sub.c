@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -46,60 +46,6 @@ mark_context_start(void)
     if (++context_gc_mark == 0) context_gc_mark = 1;
 }
 
-
-/*
-
-=item C<PMC * new_ret_continuation_pmc(PARROT_INTERP, opcode_t *address)>
-
-Returns a new C<RetContinuation> PMC, and sets address field to C<address>
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-PMC *
-new_ret_continuation_pmc(PARROT_INTERP, ARGIN_NULLOK(opcode_t *address))
-{
-    ASSERT_ARGS(new_ret_continuation_pmc)
-    PMC* const continuation = Parrot_pmc_new(interp, enum_class_RetContinuation);
-    VTABLE_set_pointer(interp, continuation, address);
-    return continuation;
-}
-
-/*
-
-=item C<void invalidate_retc_context(PARROT_INTERP, PMC *cont)>
-
-Make true Continuations from all RetContinuations up the call chain.
-
-=cut
-
-*/
-
-void
-invalidate_retc_context(PARROT_INTERP, ARGMOD(PMC *cont))
-{
-    ASSERT_ARGS(invalidate_retc_context)
-
-    PMC *ctx = PARROT_CONTINUATION(cont)->from_ctx;
-    cont = Parrot_pcc_get_continuation(interp, ctx);
-
-    while (1) {
-        /*
-         * We  stop if we encounter a true continuation, because
-         * if one were created, everything up the chain would have been
-         * invalidated earlier.
-         */
-        if (!cont || cont->vtable != interp->vtables[enum_class_RetContinuation])
-            break;
-        cont->vtable = interp->vtables[enum_class_Continuation];
-        ctx  = Parrot_pcc_get_caller_ctx(interp, ctx);
-        cont = Parrot_pcc_get_continuation(interp, ctx);
-    }
-}
 
 /*
 
@@ -395,7 +341,7 @@ Parrot_find_pad(PARROT_INTERP, ARGIN(STRING *lex_name), ARGIN(PMC *ctx))
         PMC * const lex_pad = Parrot_pcc_get_lex_pad(interp, ctx);
         PMC * outer         = Parrot_pcc_get_outer_ctx(interp, ctx);
 
-        if (!outer)
+        if (PMC_IS_NULL(outer))
             return lex_pad;
 
         if (!PMC_IS_NULL(lex_pad))
@@ -428,7 +374,7 @@ Parrot_find_dynamic_pad(PARROT_INTERP, ARGIN(STRING *lex_name), ARGIN(PMC *ctx))
         PMC * const lex_pad = Parrot_pcc_get_lex_pad(interp, ctx);
         PMC * caller        = Parrot_pcc_get_caller_ctx(interp, ctx);
 
-        if (!caller)
+        if (PMC_IS_NULL(caller))
             return lex_pad;
 
         if (!PMC_IS_NULL(lex_pad))
@@ -632,10 +578,6 @@ Parrot_get_sub_pmc_from_subclass(PARROT_INTERP, ARGIN(PMC *subclass)) {
 =head1 SEE ALSO
 
 F<include/parrot/sub.h>.
-
-=head1 HISTORY
-
-Initial version by Melvin on 2002/06/6.
 
 =cut
 

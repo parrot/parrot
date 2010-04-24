@@ -252,20 +252,14 @@ Sets the name of the subroutine.
 */
 
     VTABLE STRING *get_string() {
-        Parrot_Sub_attributes *sub;
-        PMC_get_sub(INTERP, SELF, sub);
-
-        if (sub->name)
-            return Parrot_str_copy(INTERP, sub->name);
-
-        return NULL;
+        STRING *name;
+        GET_ATTR_name(INTERP, SELF, name);
+        return name;
     }
 
 
     VTABLE void set_string_native(STRING *subname) {
-        Parrot_Sub_attributes *sub;
-        PMC_get_sub(INTERP, SELF, sub);
-        sub->name = Parrot_str_copy(INTERP, subname);
+        SET_ATTR_name(INTERP, SELF, subname);
     }
 
 
@@ -398,8 +392,10 @@ Invokes the subroutine.
         pc                   = sub->seg->base.data + sub->start_offs;
         INTERP->current_cont = NULL;
 
-        if (ccont == NEED_CONTINUATION)
-            ccont = new_ret_continuation_pmc(interp, (opcode_t *)next);
+        if (ccont == NEED_CONTINUATION) {
+            ccont = pmc_new(interp, enum_class_Continuation);
+            VTABLE_set_pointer(interp, ccont, next);
+        }
 
         PARROT_ASSERT(!PMC_IS_NULL(ccont));
 
@@ -427,12 +423,9 @@ Invokes the subroutine.
         PARROT_CONTINUATION(ccont)->from_ctx = context;
 
         /* if this is an outer sub, then we need to set sub->ctx
-         * to the new context (refcounted) and convert the
-         * retcontinuation to a normal continuation.  */
+         * to the new context (refcounted) */
         if (PObj_get_FLAGS(SELF) & SUB_FLAG_IS_OUTER) {
             sub->ctx = context;
-            /* convert retcontinuation to a continuation */
-            ccont->vtable = interp->vtables[enum_class_Continuation];
         }
 
         /* create pad if needed
@@ -528,9 +521,6 @@ Creates and returns a clone of the subroutine.
         /* first set the sub struct, Parrot_str_copy may cause GC */
         *sub = *dest_sub;
 
-        if (sub->name)
-            sub->name = Parrot_str_copy(INTERP, sub->name);
-
         /* Be sure not to share arg_info. */
         dest_sub->arg_info = NULL;
 
@@ -563,10 +553,6 @@ Set SELF to the data in other.
 
             /* copy the sub struct */
             memmove(my_sub, other_sub, sizeof (Parrot_Sub_attributes));
-
-            /* copy the name so it's a different string in memory */
-            if (my_sub->name)
-                my_sub->name = Parrot_str_copy(INTERP, my_sub->name);
         }
         else
             Parrot_ex_throw_from_c_args(INTERP, NULL,

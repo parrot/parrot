@@ -166,7 +166,7 @@ ns_insert_sub_keyed_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *key),
 
         if (Parrot_str_equal(interp, sub->method_name, CONST_STRING(interp, ""))) {
             if (sub->vtable_index != -1 && !STRING_IS_NULL(vtable_key)) {
-                method_name = Parrot_str_copy(interp, vtable_key);
+                method_name = vtable_key;
             }
         }
         else {

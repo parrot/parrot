@@ -1,0 +1,26 @@
+/*
+  Copyright (C) 2010, Parrot Foundation.
+  $Id$
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <zlib.h>
+
+int
+main(int argc, char *argv[])
+{
+    if (0 == strcmp(ZLIB_VERSION, zlibVersion())) {
+        printf("%s\n", ZLIB_VERSION);
+        return EXIT_SUCCESS;
+    }
+    printf("not same version between include and library\n");
+    return EXIT_FAILURE;
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

@@ -1,5 +1,9 @@
 # $Id$
 
+New in 2.4.0
+- Deprecations
+  + Tools to distribute on CPAN removed
+
 New in 2.3.0
 - Core
   + Allow passing parameters to the dynamic linker ('dlopen' improved)

@@ -48,7 +48,7 @@ TT1465 - http://trac.parrot.org/parrot/ticket/1465 .
         if counter > 1e6 goto done
         goto loop
     done:
-        say ""
+        diag("")
         $I1 = interpinfo.INTERPINFO_GC_COLLECT_RUNS
         $I2 = interpinfo.INTERPINFO_GC_MARK_RUNS
 

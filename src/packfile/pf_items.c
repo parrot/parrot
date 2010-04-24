@@ -1332,7 +1332,7 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
     TRACE_PRINTF(("size=%ld.\n", size));
 
     s = string_make_from_charset(interp, (const char *)*cursor,
-                        size, charset_nr, flags);
+                        size, charset_nr, flags | PObj_external_FLAG);
 
     /* print only printable characters */
     TRACE_PRINTF_VAL(("PF_fetch_string(): string is '%s' at 0x%x\n",

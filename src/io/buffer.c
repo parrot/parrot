@@ -266,9 +266,10 @@ The buffer layer's C<Read> function.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 size_t
 Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
-              ARGIN(STRING **buf))
+              ARGMOD(STRING **buf))
 {
     ASSERT_ARGS(Parrot_io_read_buffer)
     unsigned char *out_buf, *buffer_start, *buffer_next, *buffer_end;
@@ -449,6 +450,7 @@ that is what is required.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 size_t
 Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING **buf))
 {

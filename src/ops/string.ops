@@ -70,8 +70,8 @@ If $3 is negative, cut the string after -$3 characters.
 
 =cut
 
-inline op chopn(inout STR, in INT) :base_core {
-    Parrot_str_chopn_inplace(interp, $1, $2);
+inline op chopn(inout STR, in INT) :base_core :deprecated {
+    $1 = Parrot_str_chopn(interp, $1, $2);
 }
 
 inline op chopn(out STR, in STR, in INT) :base_core {
@@ -97,8 +97,8 @@ Append string $3 to string $2 and place the result into string $1.
 
 =cut
 
-inline op concat(inout STR, in STR) :base_mem {
-    $1 = Parrot_str_append(interp, $1, $2);
+inline op concat(inout STR, in STR) :base_mem :deprecated {
+    $1 = Parrot_str_concat(interp, $1, $2);
 }
 
 inline op concat(invar PMC, invar PMC) :base_core {
@@ -110,7 +110,7 @@ inline op concat(invar PMC, in STR) :base_core {
 }
 
 inline op concat(out STR, in STR, in STR) :base_mem {
-    $1 = Parrot_str_concat(interp, $2, $3, 1);
+    $1 = Parrot_str_concat(interp, $2, $3);
 }
 
 inline op concat(invar PMC, invar PMC, in STR) :base_core {
@@ -198,8 +198,8 @@ inline op length(out INT, in STR) :base_mem {
 
 inline op bytelength(out INT, in STR) :base_mem {
     UINTVAL n;
-    STRING * const s = $2;
-    if (!s)
+    const STRING * const s = $2;
+    if (STRING_IS_NULL(s))
         n = 0;
     else {
         n = s->bufused;
@@ -244,6 +244,8 @@ op unpin(inout STR) :base_mem {
 
 =item B<substr>(inout STR, in INT, in INT, in STR)
 
+=item B<replace>(out STR, in STR, in INT, in INT, in STR)
+
 =item B<substr>(out STR, invar PMC, in INT, in INT)
 
 Set $1 to the portion of $2 starting at (zero-based) character position
@@ -269,23 +271,28 @@ substring and does not waste a register to do the string replace.
 
 inline op substr(out STR, in STR, in INT) :base_core {
     const INTVAL len = Parrot_str_byte_length(interp, $2);
-    $1 = Parrot_str_substr(interp, $2, $3, len, &$1, 0);
+    $1 = Parrot_str_substr(interp, $2, $3, len);
 }
 
 inline op substr(out STR, in STR, in INT, in INT) :base_core {
-    $1 = Parrot_str_substr(interp, $2, $3, $4, &$1, 0);
+    $1 = Parrot_str_substr(interp, $2, $3, $4);
 }
 
-inline op substr(out STR, inout STR, in INT, in INT, in STR) :base_core {
-    $1 = Parrot_str_replace(interp, $2, $3, $4, $5, &$1);
+inline op substr(out STR, inout STR, in INT, in INT, in STR) :base_core :deprecated {
+    $1 = Parrot_str_substr(interp, $2, $3, $4);
+    $2 = Parrot_str_replace(interp, $2, $3, $4, $5);
 }
 
-inline op substr(inout STR, in INT, in INT, in STR) :base_core {
-    (void)Parrot_str_replace(interp, $1, $2, $3, $4, NULL);
+inline op substr(inout STR, in INT, in INT, in STR) :base_core :deprecated {
+    $1 = Parrot_str_replace(interp, $1, $2, $3, $4);
 }
 
 inline op substr(out STR, invar PMC, in INT, in INT) :base_core {
     $1 = VTABLE_substr_str(interp, $2, $3, $4);
+}
+
+inline op replace(out STR, in STR, in INT, in INT, in STR) :base_core {
+    $1 = Parrot_str_replace(interp, $2, $3, $4, $5);
 }
 
 
@@ -429,8 +436,8 @@ inline op upcase(out STR, in STR) :base_core {
     $1 = Parrot_str_upcase(interp, $2);
 }
 
-inline op upcase(inout STR) :base_core {
-    Parrot_str_upcase_inplace(interp, $1);
+inline op upcase(inout STR) :base_core :deprecated {
+    $1 = Parrot_str_upcase(interp, $1);
 }
 
 
@@ -448,8 +455,8 @@ inline op downcase(out STR, in STR) :base_core {
     $1 = Parrot_str_downcase(interp, $2);
 }
 
-inline op downcase(inout STR) :base_core {
-    Parrot_str_downcase_inplace(interp, $1);
+inline op downcase(inout STR) :base_core :deprecated {
+    $1 = Parrot_str_downcase(interp, $1);
 }
 
 
@@ -467,8 +474,8 @@ inline op titlecase(out STR, in STR) :base_core {
     $1 = Parrot_str_titlecase(interp, $2);
 }
 
-inline op titlecase(inout STR) :base_core {
-    Parrot_str_titlecase_inplace(interp, $1);
+inline op titlecase(inout STR) :base_core :deprecated {
+    $1 = Parrot_str_titlecase(interp, $1);
 }
 
 
@@ -529,8 +536,7 @@ op charset(out INT, in STR) :base_core {
 }
 
 op charsetname(out STR, in INT) :base_core {
-    STRING * const name = Parrot_charset_name(interp, $2);
-    $1 = name ? Parrot_str_copy(interp, name) : NULL;
+    $1 = Parrot_charset_name(interp, $2);
 }
 
 op find_charset(out INT, in STR) :base_core {
@@ -544,13 +550,12 @@ op find_charset(out INT, in STR) :base_core {
     $1 = n;
 }
 
-op trans_charset(inout STR, in INT) {
-    $1 = Parrot_str_change_charset(interp, $1, $2, NULL);
+op trans_charset(inout STR, in INT) :deprecated {
+    $1 = Parrot_str_change_charset(interp, $1, $2);
 }
 
 op trans_charset(out STR, in STR, in INT) {
-    STRING *dest = Parrot_gc_new_string_header(interp, 0);
-    $1 = Parrot_str_change_charset(interp, $2, $3, dest);
+    $1 = Parrot_str_change_charset(interp, $2, $3);
 }
 
 
@@ -585,8 +590,7 @@ op encoding(out INT, in STR) :base_core {
 }
 
 op encodingname(out STR, in INT) :base_core {
-    STRING * const name = Parrot_encoding_name(interp, $2);
-    $1 = name ? Parrot_str_copy(interp, name) : NULL;
+    $1 = Parrot_encoding_name(interp, $2);
 }
 
 op find_encoding(out INT, in STR) :base_core {
@@ -600,13 +604,12 @@ op find_encoding(out INT, in STR) :base_core {
     $1 = n;
 }
 
-op trans_encoding(inout STR, in INT) {
-    $1 = Parrot_str_change_encoding(interp, $1, $2, NULL);
+op trans_encoding(inout STR, in INT) :deprecated {
+    $1 = Parrot_str_change_encoding(interp, $1, $2);
 }
 
 op trans_encoding(out STR, in STR, in INT) {
-    STRING * const dest = Parrot_gc_new_string_header(interp, 0);
-    $1 = Parrot_str_change_encoding(interp, $2, $3, dest);
+    $1 = Parrot_str_change_encoding(interp, $2, $3);
 }
 
 
@@ -674,7 +677,7 @@ op compose(out STR, in STR) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 LICENSE
 

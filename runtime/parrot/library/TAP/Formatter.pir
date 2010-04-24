@@ -11,6 +11,12 @@ Simplified port of TAP::Harness (version 3.21)
 
 See L<http://search.cpan.org/~andya/Test-Harness/>
 
+=head3 Class TAP;Formatter;Base
+
+Base class for harness output delegates
+
+=over 4
+
 =cut
 
 .namespace ['TAP';'Formatter';'Base']
@@ -30,6 +36,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $P0 = box 0
     setattribute self, 'verbosity', $P0
 .end
+
+=item process_args
+
+=cut
 
 .sub 'process_args' :method
     .param pmc opts
@@ -74,12 +84,20 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
   L7:
 .end
 
+=item verbose
+
+=cut
+
 .sub 'verbose' :method
     $P0 = getattribute self, 'verbosity'
     $I0 = $P0
     $I0 = $I0 >= 1
     .return ($I0)
 .end
+
+=item quiet
+
+=cut
 
 .sub 'quiet' :method
     $P0 = getattribute self, 'verbosity'
@@ -88,6 +106,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .return ($I0)
 .end
 
+=item really_quiet
+
+=cut
+
 .sub 'really_quiet' :method
     $P0 = getattribute self, 'verbosity'
     $I0 = $P0
@@ -95,12 +117,20 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .return ($I0)
 .end
 
+=item silent
+
+=cut
+
 .sub 'silent' :method
     $P0 = getattribute self, 'verbosity'
     $I0 = $P0
     $I0 = $I0 <= -3
     .return ($I0)
 .end
+
+=item prepare
+
+=cut
 
 .sub 'prepare' :method
     .param pmc tests
@@ -119,6 +149,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     setattribute self, '_longest', $P0
 .end
 
+=item _format_name
+
+=cut
+
 .sub '_format_name' :method
     .param string name
     $P0 = getattribute self, '_longest'
@@ -136,6 +170,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
 .sub 'open_test' :method
     die "Unimplemented."
 .end
+
+=item summary
+
+=cut
 
 .sub 'summary' :method
     .param pmc aggregate
@@ -257,11 +295,19 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
   L1:
 .end
 
+=item _output
+
+=cut
+
 .sub '_output' :method
     .param pmc args :slurpy
     $S0 = join '', args
     print $S0
 .end
+
+=item _failure_output
+
+=cut
 
 .sub '_failure_output' :method
     .param pmc args :slurpy
@@ -345,6 +391,15 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .return (range)
 .end
 
+=back
+
+=head3 Class TAP;Formatter;Session
+
+Abstract base class for harness output delegate
+
+=over 4
+
+=cut
 
 .namespace ['TAP';'Formatter';'Session']
 
@@ -356,7 +411,7 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $P0.'add_attribute'('show_count')
 .end
 
-.sub 'init' :vtable
+.sub 'init' :vtable :nsentry
     $P0 = getattribute self, 'show_count'
     unless null $P0 goto L1
     $P0 = new 'Boolean'
@@ -365,18 +420,34 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
   L1:
 .end
 
+=item header
+
+=cut
+
 .sub 'header' :method
     # nothing
 .end
+
+=item result
+
+=cut
 
 .sub 'result' :method
     .param pmc result
     # nothing
 .end
 
+=item close_test
+
+=cut
+
 .sub 'close_test' :method
     # nothing
 .end
+
+=item clear_for_close
+
+=cut
 
 .sub 'clear_for_close' :method
     # nothing
@@ -483,12 +554,25 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
   L1:
 .end
 
+=back
+
+=head3 Class TAP;Formatter;Console
+
+Harness output delegate for default console output
+
+=over 4
+
+=cut
 
 .namespace ['TAP';'Formatter';'Console']
 
 .sub '' :init :load :anon
     $P0 = subclass ['TAP';'Formatter';'Base'], ['TAP';'Formatter';'Console']
 .end
+
+=item open_test
+
+=cut
 
 .sub 'open_test' :method
     .param string test
@@ -507,9 +591,17 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     .return ($P0)
 .end
 
+=item _set_colors
+
+=cut
+
 .sub '_set_colors' :method
     .param pmc colors :slurpy
 .end
+
+=item _output_success
+
+=cut
 
 .sub '_output_success' :method
     .param string msg
@@ -517,6 +609,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     self.'_output'(msg)
     self.'_set_colors'('reset')
 .end
+
+=item _failure_output
+
+=cut
 
 .sub '_failure_output' :method
     .param pmc args :slurpy
@@ -526,6 +622,15 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     self.'_set_colors'('reset')
 .end
 
+=back
+
+=head3 Class TAP;Formatter;Console;Session
+
+Harness output delegate for default console output
+
+=over 4
+
+=cut
 
 .namespace ['TAP';'Formatter';'Console';'Session']
 
@@ -548,6 +653,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $P0(self)
 .end
 
+=item _get_output_result
+
+=cut
+
 .sub '_get_output_result' :method
     .param pmc result
     .local pmc formatter
@@ -555,6 +664,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $S0 = self.'_format_for_output'(result)
     formatter.'_output'($S0)
 .end
+
+=item header
+
+=cut
 
 .sub 'header' :method
     .local pmc formatter
@@ -568,6 +681,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     formatter.'_output'(pretty)
   L1:
 .end
+
+=item result
+
+=cut
 
 .sub 'result' :method
     .param pmc result
@@ -652,6 +769,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
   L2:
 .end
 
+=item close_test
+
+=cut
+
 .sub 'close_test' :method
     .local pmc formatter
     formatter = getattribute self, 'formatter'
@@ -690,6 +811,10 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
   L1:
 .end
 
+=item clear_for_close
+
+=cut
+
 .sub 'clear_for_close' :method
     .local pmc parser, formatter, name, plan, output
     .local string tests_run, pretty
@@ -710,6 +835,8 @@ See L<http://search.cpan.org/~andya/Test-Harness/>
     $S0 = repeat ' ', $I0
     formatter.'_output'("\r", $S0)
 .end
+
+=back
 
 =head1 AUTHOR
 

@@ -15,20 +15,14 @@
 
 #include "parrot/parrot.h"
 
-typedef STRING * (*encoding_to_encoding_t)(PARROT_INTERP, NOTNULL(STRING *src), NULLOK(STRING *dest));
+typedef STRING * (*encoding_to_encoding_t)(PARROT_INTERP, NOTNULL(const STRING *src));
 typedef UINTVAL (*encoding_get_codepoint_t)(PARROT_INTERP, const STRING *src, UINTVAL offset);
-typedef void (*encoding_set_codepoint_t)(PARROT_INTERP, STRING *src, UINTVAL offset, UINTVAL codepoint);
 typedef UINTVAL (*encoding_get_byte_t)(PARROT_INTERP, const STRING *src, UINTVAL offset);
 typedef void (*encoding_set_byte_t)(PARROT_INTERP, const STRING *src, UINTVAL offset, UINTVAL count);
 typedef STRING *(*encoding_get_codepoints_t)(PARROT_INTERP, STRING *src, UINTVAL offset, UINTVAL count);
 typedef STRING *(*encoding_get_bytes_t)(PARROT_INTERP, STRING *src, UINTVAL offset, UINTVAL count);
-typedef STRING *(*encoding_get_codepoints_inplace_t)(PARROT_INTERP, STRING *src, UINTVAL offset, UINTVAL count, STRING *dest_string);
-typedef STRING *(*encoding_get_bytes_inplace_t)(PARROT_INTERP, STRING *src, UINTVAL offset, UINTVAL count, STRING *dest_string);
-typedef void (*encoding_set_codepoints_t)(PARROT_INTERP, STRING *src, UINTVAL offset, UINTVAL count, STRING *new_bytes);
-typedef void (*encoding_set_bytes_t)(PARROT_INTERP, STRING *src, UINTVAL offset, UINTVAL count, STRING *new_bytes);
-typedef void (*encoding_become_encoding_t)(PARROT_INTERP, STRING *src);
-typedef UINTVAL (*encoding_codepoints_t)(PARROT_INTERP, STRING *src);
-typedef UINTVAL (*encoding_bytes_t)(PARROT_INTERP, STRING *src);
+typedef UINTVAL (*encoding_codepoints_t)(PARROT_INTERP, ARGIN(const STRING *src));
+typedef UINTVAL (*encoding_bytes_t)(PARROT_INTERP, ARGIN(const STRING *src));
 typedef UINTVAL (*encoding_find_cclass_t)(PARROT_INTERP, STRING *s, const INTVAL *typetable, INTVAL flags, UINTVAL offset, UINTVAL count);
 typedef size_t (*encoding_hash_t)(PARROT_INTERP, const STRING *s, size_t hashval);
 
@@ -44,16 +38,10 @@ struct _encoding {
     UINTVAL max_bytes_per_codepoint;
     encoding_to_encoding_t              to_encoding;
     encoding_get_codepoint_t            get_codepoint;
-    encoding_set_codepoint_t            set_codepoint;
     encoding_get_byte_t                 get_byte;
     encoding_set_byte_t                 set_byte;
     encoding_get_codepoints_t           get_codepoints;
-    encoding_get_codepoints_inplace_t   get_codepoints_inplace;
     encoding_get_bytes_t                get_bytes;
-    encoding_get_bytes_inplace_t        get_bytes_inplace;
-    encoding_set_codepoints_t           set_codepoints;
-    encoding_set_bytes_t                set_bytes;
-    encoding_become_encoding_t          become_encoding;
     encoding_codepoints_t               codepoints;
     encoding_bytes_t                    bytes;
     encoding_iter_init_t                iter_init;
@@ -208,26 +196,14 @@ void Parrot_str_internal_register_encoding_names(PARROT_INTERP)
     ((src)->encoding)->max_bytes_per_codepoint
 #define ENCODING_GET_CODEPOINT(i, src, offset) \
     ((src)->encoding)->get_codepoint((i), (src), (offset))
-#define ENCODING_SET_CODEPOINT(i, src, offset, codepoint) \
-    ((src)->encoding)->set_codepoint((i), (src), (offset), (codepoint))
 #define ENCODING_GET_BYTE(i, src, offset) \
     ((src)->encoding)->get_byte((i), (src), (offset))
 #define ENCODING_SET_BYTE(i, src, offset, value) \
     ((src)->encoding)->set_byte((i), (src), (offset), (value))
 #define ENCODING_GET_CODEPOINTS(i, src, offset, count) \
     ((src)->encoding)->get_codepoints((i), (src), (offset), (count))
-#define ENCODING_GET_CODEPOINTS_INPLACE(i, src, offset, count, dest) \
-    ((src)->encoding)->get_codepoints_inplace((i), (src), (offset), (count), (dest))
 #define ENCODING_GET_BYTES(i, src, offset, count) \
     ((src)->encoding)->get_bytes((i), (src), (offset), (count))
-#define ENCODING_GET_BYTES_INPLACE(i, src, offset, count, dest) \
-    ((src)->encoding)->get_bytes_inplace((i), (src), (offset), (count), (dest))
-#define ENCODING_SET_CODEPOINTS(i, src, offset, count, newdata) \
-    ((src)->encoding)->set_codepoints((i), (src), (offset), (count), (newdata))
-#define ENCODING_SET_BYTES(i, src, offset, count, newdata) \
-    ((src)->encoding)->set_bytes((i), (src), (offset), (count), (newdata))
-#define ENCODING_BECOME_ENCODING(i, src) \
-    ((src)->encoding)->become_encoding((i), (src))
 #define ENCODING_CODEPOINTS(i, src) \
     ((src)->encoding)->codepoints((i), (src))
 #define ENCODING_BYTES(i, src) \

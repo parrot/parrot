@@ -51,7 +51,7 @@ Tests the BigInt PMC.
     $P2 = $P1['gmp']
     $I1 = isnull $P2
     if $I1, NoLibGMP
-    say 'This Parrot uses GMP'
+    say '# This Parrot uses GMP'
 
     # check version is >= 4.1.4
     $P0 = new ['BigInt']
@@ -70,18 +70,18 @@ Tests the BigInt PMC.
     lt $I2, 4, OldLibGMP
 
 Config2:
-    print 'Suitable GMP version ['
+    print '# Suitable GMP version ['
     print $S3
     say '] available'
     goto ret
 
 NoLibGMP:
-    say 'No BigInt Lib configured'
+    say '# No BigInt Lib configured'
     skip(34)
     exit 0
 
 OldLibGMP:
-    print 'Buggy GMP version ['
+    print '# Buggy GMP version ['
     print $S3
     say '] with huge digit multiply - please upgrade'
     skip(34)
@@ -567,7 +567,7 @@ sz4:
     goto esz
 
 esz:
-    print 'Using '
+    print '# Using '
     $I0 = mul $I0, 8
     print $I0
     print '-bit Integers ['

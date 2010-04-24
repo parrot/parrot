@@ -453,14 +453,17 @@ size_t Parrot_io_peek_buffer(PARROT_INTERP,
         FUNC_MODIFIES(*filehandle)
         FUNC_MODIFIES(*buf);
 
+PARROT_WARN_UNUSED_RESULT
 size_t Parrot_io_read_buffer(PARROT_INTERP,
     ARGMOD(PMC *filehandle),
-    ARGIN(STRING **buf))
+    ARGMOD(STRING **buf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*filehandle);
+        FUNC_MODIFIES(*filehandle)
+        FUNC_MODIFIES(*buf);
 
+PARROT_WARN_UNUSED_RESULT
 size_t Parrot_io_readline_buffer(PARROT_INTERP,
     ARGMOD(PMC *filehandle),
     ARGOUT(STRING **buf))
@@ -646,7 +649,7 @@ INTVAL Parrot_io_is_encoding(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_io_parse_open_flags(PARROT_INTERP,
-    ARGIN_NULLOK(STRING *mode_str))
+    ARGIN_NULLOK(const STRING *mode_str))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT

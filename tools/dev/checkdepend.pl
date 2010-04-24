@@ -85,6 +85,11 @@ foreach my $file (sort grep /\.[hc]$/, @incfiles) {
 
         diag "couldn't find $include, included from $file";
     }
+    # always require an explicit .o -> .c dep. This is lazy and not always
+    # needed. However, missing it when it is needed causes pain.
+    if ($file =~ /\.c$/) {
+        push @{$deps{$file}}, $file;
+    }
 }
 
 foreach my $file (sort grep /\.pir$/, @incfiles) {
@@ -267,7 +272,7 @@ sub check_files {
         $rule_deps        = join "\n", sort split /\s+/, $rule_deps;
         my $expected_deps = join "\n", sort (get_deps($file));
 
-        eq_or_diff_text($rule_deps, $expected_deps, "$file has correct dependencies $extra_info.", {context => 0});
+        eq_or_diff_text($rule_deps, $expected_deps, "$file $extra_info.", {context => 0});
     }
 }
 

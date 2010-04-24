@@ -109,37 +109,37 @@ from $2 and $3.
 
 =cut
 
-inline op bands(inout STR, in STR) :base_core {
-    Parrot_str_bitwise_and(interp, $1, $2, &$1);
+inline op bands(inout STR, in STR) :base_core :deprecated {
+    $1 = Parrot_str_bitwise_and(interp, $1, $2);
 }
 
 inline op bands(invar PMC, in STR) :base_core {
     STRING * const a = VTABLE_get_string(interp, $1);
-    STRING * const b = Parrot_str_bitwise_and(interp, a, $2, NULL);
+    STRING * const b = Parrot_str_bitwise_and(interp, a, $2);
     VTABLE_set_string_native(interp, $1, b);
 }
 
 inline op bands(invar PMC, invar PMC) :base_core {
     STRING * a = VTABLE_get_string(interp, $1);
     STRING * const b = VTABLE_get_string(interp, $2);
-    a = Parrot_str_bitwise_and(interp, a, b, NULL);
+    a = Parrot_str_bitwise_and(interp, a, b);
     VTABLE_set_string_native(interp, $1, a);
 }
 
 inline op bands(out STR, in STR, in STR) :base_core {
-    $1 = Parrot_str_bitwise_and(interp, $2, $3, NULL);
+    $1 = Parrot_str_bitwise_and(interp, $2, $3);
 }
 
 inline op bands(invar PMC, invar PMC, in STR) :base_core {
     STRING * const a = VTABLE_get_string(interp, $2);
-    STRING * const b = Parrot_str_bitwise_and(interp, a, $3, NULL);
+    STRING * const b = Parrot_str_bitwise_and(interp, a, $3);
     VTABLE_set_string_native(interp, $1, b);
 }
 
 inline op bands(invar PMC, invar PMC, invar PMC) :base_core {
     STRING * const a = VTABLE_get_string(interp, $2);
     STRING * const b = VTABLE_get_string(interp, $3);
-    STRING * const c = Parrot_str_bitwise_and(interp, a, b, NULL);
+    STRING * const c = Parrot_str_bitwise_and(interp, a, b);
     VTABLE_set_string_native(interp, $1, c);
 }
 
@@ -187,23 +187,23 @@ inline op bnot(out PMC, invar PMC) :base_core {
 
 =cut
 
-inline op bnots(inout STR) :base_core {
-    Parrot_str_bitwise_not(interp, $1, &$1);
+inline op bnots(inout STR) :base_core :deprecated {
+    $1 = Parrot_str_bitwise_not(interp, $1);
 }
 
 inline op bnots(out STR, in STR) :base_core {
-    Parrot_str_bitwise_not(interp, $2, &$1);
+    $1 = Parrot_str_bitwise_not(interp, $2);
 }
 
 inline op bnots(invar PMC) :base_core {
     STRING * const a = VTABLE_get_string(interp, $1);
-    STRING * const b = Parrot_str_bitwise_not(interp, a, NULL);
+    STRING * const b = Parrot_str_bitwise_not(interp, a);
     VTABLE_set_string_native(interp, $1, b);
 }
 
 inline op bnots(out PMC, invar PMC) :base_core {
     STRING * const a = VTABLE_get_string(interp, $2);
-    STRING * const b = Parrot_str_bitwise_not(interp, a, NULL);
+    STRING * const b = Parrot_str_bitwise_not(interp, a);
     VTABLE_set_string_native(interp, $1, b);
 }
 
@@ -279,37 +279,37 @@ from $2 and $3.
 
 =cut
 
-inline op bors(inout STR, in STR) :base_core {
-    Parrot_str_bitwise_or(interp, $1, $2, &$1);
+inline op bors(inout STR, in STR) :base_core :deprecated {
+    $1 = Parrot_str_bitwise_or(interp, $1, $2);
 }
 
 inline op bors(invar PMC, in STR) :base_core {
     STRING * const a = VTABLE_get_string(interp, $1);
-    STRING * const b = Parrot_str_bitwise_or(interp, a, $2, NULL);
+    STRING * const b = Parrot_str_bitwise_or(interp, a, $2);
     VTABLE_set_string_native(interp, $1, b);
 }
 
 inline op bors(invar PMC, invar PMC) :base_core {
     STRING * const a = VTABLE_get_string(interp, $1);
     STRING * const b = VTABLE_get_string(interp, $2);
-    STRING * const c = Parrot_str_bitwise_or(interp, a, b, NULL);
+    STRING * const c = Parrot_str_bitwise_or(interp, a, b);
     VTABLE_set_string_native(interp, $1, c);
 }
 
 inline op bors(out STR, in STR, in STR) :base_core {
-    $1 = Parrot_str_bitwise_or(interp, $2, $3, NULL);
+    $1 = Parrot_str_bitwise_or(interp, $2, $3);
 }
 
 inline op bors(invar PMC, invar PMC, in STR) :base_core {
     STRING * const b = VTABLE_get_string(interp, $2);
-    STRING * const c = Parrot_str_bitwise_or(interp, b, $3, NULL);
+    STRING * const c = Parrot_str_bitwise_or(interp, b, $3);
     VTABLE_set_string_native(interp, $1, c);
 }
 
 inline op bors(invar PMC, invar PMC, invar PMC) :base_core {
     STRING * const a = VTABLE_get_string(interp, $2);
     STRING * const b = VTABLE_get_string(interp, $3);
-    STRING * const c = Parrot_str_bitwise_or(interp, a, b, NULL);
+    STRING * const c = Parrot_str_bitwise_or(interp, a, b);
     VTABLE_set_string_native(interp, $1, c);
 }
 
@@ -579,37 +579,37 @@ from $2 and $3.
 
 =cut
 
-inline op bxors(inout STR, in STR) :base_core {
-    Parrot_str_bitwise_xor(interp, $1, $2, &$1);
+inline op bxors(inout STR, in STR) :base_core :deprecated {
+    $1 = Parrot_str_bitwise_xor(interp, $1, $2);
 }
 
 inline op bxors(invar PMC, in STR) :base_core {
     STRING * const a = VTABLE_get_string(interp, $1);
-    STRING * const b = Parrot_str_bitwise_xor(interp, a, $2, NULL);
+    STRING * const b = Parrot_str_bitwise_xor(interp, a, $2);
     VTABLE_set_string_native(interp, $1, b);
 }
 
 inline op bxors(invar PMC, invar PMC) :base_core {
     STRING * const a = VTABLE_get_string(interp, $1);
     STRING * const b = VTABLE_get_string(interp, $2);
-    STRING * const c = Parrot_str_bitwise_xor(interp, a, b, NULL);
+    STRING * const c = Parrot_str_bitwise_xor(interp, a, b);
     VTABLE_set_string_native(interp, $1, c);
 }
 
 inline op bxors(out STR, in STR, in STR) :base_core {
-    $1 = Parrot_str_bitwise_xor(interp, $2, $3, NULL);
+    $1 = Parrot_str_bitwise_xor(interp, $2, $3);
 }
 
 inline op bxors(invar PMC, invar PMC, in STR) :base_core {
     STRING * const a = VTABLE_get_string(interp, $2);
-    STRING * const b = Parrot_str_bitwise_xor(interp, a, $3, NULL);
+    STRING * const b = Parrot_str_bitwise_xor(interp, a, $3);
     VTABLE_set_string_native(interp, $1, b);
 }
 
 inline op bxors(invar PMC, invar PMC, invar PMC) :base_core {
     STRING * const a = VTABLE_get_string(interp, $2);
     STRING * const b = VTABLE_get_string(interp, $3);
-    STRING * const c = Parrot_str_bitwise_xor(interp, a, b, NULL);
+    STRING * const c = Parrot_str_bitwise_xor(interp, a, b);
     VTABLE_set_string_native(interp, $1, c);
 }
 

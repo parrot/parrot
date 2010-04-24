@@ -299,10 +299,10 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                     switch (sub->namespace_name->vtable->base_type) {
                       case enum_class_String:
                         namespace_description = Parrot_str_new(interp, "'", 1);
-                        namespace_description = Parrot_str_append(interp,
+                        namespace_description = Parrot_str_concat(interp,
                                         namespace_description,
                                         VTABLE_get_string(interp, sub->namespace_name));
-                        namespace_description = Parrot_str_append(interp,
+                        namespace_description = Parrot_str_concat(interp,
                                         namespace_description,
                                         Parrot_str_new(interp, "'", 1));
                         break;

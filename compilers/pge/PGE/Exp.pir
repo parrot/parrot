@@ -718,7 +718,7 @@ tree as a PIR code object that can be compiled.
 
 .namespace [ 'PGE';'Exp';'CGroup' ]
 
-.sub 'pir' :method
+.sub 'pir' :method :nsentry
     .param pmc code
     .param string label
     .param string next

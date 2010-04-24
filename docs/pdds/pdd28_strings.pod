@@ -379,13 +379,6 @@ Concatenate two strings. Takes three arguments: two strings, and one integer
 value of flags. If both string arguments are null, return a new string created
 according to the integer flags.
 
-=head4 Parrot_str_append (was string_append)
-
-Append one string to another and return the result. In the default case, the
-return value is the same as the first string argument (modifying that argument
-in place). If the first argument is COW or read-only, then the return value is
-a new string.
-
 =head4 Parrot_str_new (was string_from_cstring)
 
 Return a new string with the default encoding and character set. Accepts two

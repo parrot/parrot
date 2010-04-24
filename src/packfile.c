@@ -1206,7 +1206,7 @@ PackFile_add_segment(PARROT_INTERP, ARGMOD(PackFile_Directory *dir),
 /*
 
 =item C<PackFile_Segment * PackFile_find_segment(PARROT_INTERP,
-PackFile_Directory *dir, STRING *name, int sub_dir)>
+PackFile_Directory *dir, const STRING *name, int sub_dir)>
 
 Finds the segment with the name C<name> in the C<PackFile_Directory> if
 C<sub_dir> is true, searches directories recursively.  The returned segment is
@@ -1221,7 +1221,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PackFile_Segment *
 PackFile_find_segment(PARROT_INTERP, ARGIN_NULLOK(PackFile_Directory *dir),
-    ARGIN(STRING *name), int sub_dir)
+    ARGIN(const STRING *name), int sub_dir)
 {
     ASSERT_ARGS(PackFile_find_segment)
     if (dir) {
@@ -2443,7 +2443,7 @@ segment_init(PARROT_INTERP, ARGOUT(PackFile_Segment *self), ARGIN(PackFile *pf),
     self->size        = 0;
     self->data        = NULL;
     self->id          = 0;
-    self->name        = Parrot_str_copy(interp, name);
+    self->name        = name;
 }
 
 
@@ -2625,11 +2625,6 @@ pf_debug_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
 {
     ASSERT_ARGS(pf_debug_destroy)
     PackFile_Debug * const debug = (PackFile_Debug *) self;
-    int i;
-
-    /* Free each mapping. */
-    for (i = 0; i < debug->num_mappings; i++)
-        mem_gc_free(interp, debug->mappings[i]);
 
     /* Free mappings pointer array. */
     mem_gc_free(interp, debug->mappings);
@@ -2713,8 +2708,8 @@ pf_debug_pack(SHIM_INTERP, ARGMOD(PackFile_Segment *self), ARGOUT(opcode_t *curs
     /* Now store each mapping. */
     for (i = 0; i < n; i++) {
         /* Bytecode offset and filename. */
-        *cursor++ = debug->mappings[i]->offset;
-        *cursor++ = debug->mappings[i]->filename;
+        *cursor++ = debug->mappings[i].offset;
+        *cursor++ = debug->mappings[i].filename;
     }
 
     return cursor;
@@ -2754,20 +2749,18 @@ pf_debug_unpack(PARROT_INTERP, ARGOUT(PackFile_Segment *self), ARGIN(const opcod
 
     /* Allocate space for mappings vector. */
     debug->mappings = mem_gc_allocate_n_zeroed_typed(interp,
-            debug->num_mappings + 1, PackFile_DebugFilenameMapping *);
+            debug->num_mappings + 1, PackFile_DebugFilenameMapping);
 
     /* Read in each mapping. */
     for (i = 0; i < debug->num_mappings; i++) {
-        /* Allocate struct and get offset and filename type. */
-        debug->mappings[i]           =
-                mem_gc_allocate_zeroed_typed(interp, PackFile_DebugFilenameMapping);
-        debug->mappings[i]->offset   = PF_fetch_opcode(self->pf, &cursor);
-        debug->mappings[i]->filename = PF_fetch_opcode(self->pf, &cursor);
+        /* Get offset and filename type. */
+        debug->mappings[i].offset   = PF_fetch_opcode(self->pf, &cursor);
+        debug->mappings[i].filename = PF_fetch_opcode(self->pf, &cursor);
     }
 
     /* find seg e.g. CODE_DB => CODE and attach it */
     str_len     = Parrot_str_length(interp, debug->base.name);
-    code_name   = Parrot_str_substr(interp, debug->base.name, 0, str_len - 3, NULL, 1);
+    code_name   = Parrot_str_substr(interp, debug->base.name, 0, str_len - 3);
     code        = (PackFile_ByteCode *)PackFile_find_segment(interp, self->dir, code_name, 0);
 
     if (!code || code->base.type != PF_BYTEC_SEG) {
@@ -2807,9 +2800,9 @@ pf_debug_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
     for (i = 0; i < debug->num_mappings; i++) {
         Parrot_io_printf(interp, "    #%d\n    [\n", i);
         Parrot_io_printf(interp, "        OFFSET => %d,\n",
-                   debug->mappings[i]->offset);
+                   debug->mappings[i].offset);
         Parrot_io_printf(interp, "        FILENAME => %Ss\n",
-                PF_CONST(debug->code, debug->mappings[i]->filename)->u.string);
+                PF_CONST(debug->code, debug->mappings[i].filename)->u.string);
         Parrot_io_printf(interp, "    ],\n");
     }
 
@@ -2892,7 +2885,7 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
 
     /* If the previous mapping has the same filename, don't record it. */
     if (debug->num_mappings) {
-        prev_filename_n = debug->mappings[debug->num_mappings-1]->filename;
+        prev_filename_n = debug->mappings[debug->num_mappings-1].filename;
         filename_pstr = Parrot_str_new(interp, filename, 0);
         if (ct->constants[prev_filename_n]->type == PFC_STRING &&
                 Parrot_str_equal(interp, filename_pstr,
@@ -2904,18 +2897,18 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
     /* Allocate space for the extra entry. */
     debug->mappings = mem_gc_realloc_n_typed(interp,
             debug->mappings, debug->num_mappings + 1,
-            PackFile_DebugFilenameMapping *);
+            PackFile_DebugFilenameMapping);
 
     /* Can it just go on the end? */
     if (debug->num_mappings == 0
-    ||  offset              >= debug->mappings[debug->num_mappings - 1]->offset)
+    ||  offset              >= debug->mappings[debug->num_mappings - 1].offset)
         insert_pos = debug->num_mappings;
     else {
         /* Find the right place and shift stuff that's after it. */
         int i;
 
         for (i = 0; i < debug->num_mappings; i++) {
-            if (debug->mappings[i]->offset > offset) {
+            if (debug->mappings[i].offset > offset) {
                 insert_pos = i;
                 memmove(debug->mappings + i + 1, debug->mappings + i,
                     debug->num_mappings - i);
@@ -2927,14 +2920,13 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
     /* Need to put filename in constants table. */
     {
         /* Set up new entry and insert it. */
-        PackFile_DebugFilenameMapping *mapping =
-                mem_gc_allocate_zeroed_typed(interp, PackFile_DebugFilenameMapping);
+        PackFile_DebugFilenameMapping *mapping = debug->mappings + insert_pos;
         STRING *namestr = Parrot_str_new_init(interp, filename, strlen(filename),
                 PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET, 0);
         size_t count = ct->const_count;
         size_t i;
 
-        mapping->offset       = offset;
+        mapping->offset = offset;
 
         /* Check if there is already a constant with this filename */
         for (i= 0; i < count; ++i) {
@@ -2962,8 +2954,7 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
         }
 
         /* Set the mapped value */
-        mapping->filename     = count;
-        debug->mappings[insert_pos] = mapping;
+        mapping->filename = count;
         debug->num_mappings         = debug->num_mappings + 1;
     }
 }
@@ -2996,10 +2987,10 @@ Parrot_debug_pc_to_filename(PARROT_INTERP, ARGIN(const PackFile_Debug *debug),
         /* If this is the last mapping or the current position is
            between this mapping and the next one, return a filename. */
        if (i + 1                          == debug->num_mappings
-       || (debug->mappings[i]->offset     <= pc
-       &&  debug->mappings[i + 1]->offset >  pc))
+       || (debug->mappings[i].offset     <= pc
+       &&  debug->mappings[i + 1].offset >  pc))
             return PF_CONST(debug->code,
-                    debug->mappings[i]->filename)->u.string;
+                    debug->mappings[i].filename)->u.string;
     }
 
     /* Otherwise, no mappings == no filename. */
@@ -4304,7 +4295,7 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
 
     /* Need to associate this segment with the applicable code segment. */
     str_len     = Parrot_str_length(interp, self->base.name);
-    code_name   = Parrot_str_substr(interp, self->base.name, 0, str_len - 4, NULL, 1);
+    code_name   = Parrot_str_substr(interp, self->base.name, 0, str_len - 4);
     code        = (PackFile_ByteCode *)PackFile_find_segment(interp,
                                 self->base.dir, code_name, 0);
 
@@ -4739,10 +4730,10 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
 
     /* Full path to language library is "abc/abc.pbc". */
     pbc = CONST_STRING(interp, "pbc");
-    wo_ext   = Parrot_str_concat(interp, lang_name, CONST_STRING(interp, "/"), 0);
-    wo_ext   = Parrot_str_append(interp, wo_ext, lang_name);
-    file_str = Parrot_str_concat(interp, wo_ext, CONST_STRING(interp, "."), 0);
-    file_str = Parrot_str_append(interp, file_str, pbc);
+    wo_ext   = Parrot_str_concat(interp, lang_name, CONST_STRING(interp, "/"));
+    wo_ext   = Parrot_str_concat(interp, wo_ext, lang_name);
+    file_str = Parrot_str_concat(interp, wo_ext, CONST_STRING(interp, "."));
+    file_str = Parrot_str_concat(interp, file_str, pbc);
 
     /* Check if the language is already loaded */
     is_loaded_hash = VTABLE_get_pmc_keyed_int(interp,
@@ -4767,13 +4758,13 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
     parrot_split_path_ext(interp, path, &found_path, &found_ext);
     name_length = Parrot_str_length(interp, lang_name);
     found_path = Parrot_str_substr(interp, found_path, 0,
-            Parrot_str_length(interp, found_path)-name_length, NULL, 0);
+            Parrot_str_length(interp, found_path)-name_length);
 
-    Parrot_lib_add_path(interp, Parrot_str_append(interp, found_path, CONST_STRING(interp, "include/")),
+    Parrot_lib_add_path(interp, Parrot_str_concat(interp, found_path, CONST_STRING(interp, "include/")),
             PARROT_LIB_PATH_INCLUDE);
-    Parrot_lib_add_path(interp, Parrot_str_append(interp, found_path, CONST_STRING(interp, "dynext/")),
+    Parrot_lib_add_path(interp, Parrot_str_concat(interp, found_path, CONST_STRING(interp, "dynext/")),
             PARROT_LIB_PATH_DYNEXT);
-    Parrot_lib_add_path(interp, Parrot_str_append(interp, found_path, CONST_STRING(interp, "library/")),
+    Parrot_lib_add_path(interp, Parrot_str_concat(interp, found_path, CONST_STRING(interp, "library/")),
             PARROT_LIB_PATH_LIBRARY);
 
 

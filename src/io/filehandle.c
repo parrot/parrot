@@ -27,7 +27,8 @@ operating systems. For the primary public I/O API, see F<src/io/api.c>.
 
 =over 4
 
-=item C<INTVAL Parrot_io_parse_open_flags(PARROT_INTERP, STRING *mode_str)>
+=item C<INTVAL Parrot_io_parse_open_flags(PARROT_INTERP, const STRING
+*mode_str)>
 
 Parses a Parrot string for file open mode flags (C<r> for read, C<w> for write,
 C<a> for append, and C<p> for pipe) and returns the combined generic bit flags.
@@ -39,7 +40,7 @@ C<a> for append, and C<p> for pipe) and returns the combined generic bit flags.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_io_parse_open_flags(PARROT_INTERP, ARGIN_NULLOK(STRING *mode_str))
+Parrot_io_parse_open_flags(PARROT_INTERP, ARGIN_NULLOK(const STRING *mode_str))
 {
     ASSERT_ARGS(Parrot_io_parse_open_flags)
     INTVAL i, mode_len;

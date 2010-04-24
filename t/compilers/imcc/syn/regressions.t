@@ -230,10 +230,10 @@ OUT
 
 pir_error_output_like( <<'CODE', <<'OUT', 'over long keys should not segfault (TT #641)');
 .sub main
- $P0 = new [0;0;0;0;0;0;0;0;0;0;0;0] # more than KEYLEN.
+ $P0 = new [0;0;0;0;0;0;0;0;0;0;0;0] # more than MAX_KEY_LEN.
 .end
 CODE
-/key too complex/
+/Key too long/
 OUT
 
 # This test probably belongs in subflags.t

@@ -107,27 +107,26 @@ HELP
 
 .sub '_parse_opts' :anon
     .param pmc argv
-    .local pmc getopts, opts
     load_bytecode 'Getopt/Obj.pbc'
-    getopts = new ['Getopt';'Obj']
-    getopts.'notOptStop'(1)
-    push getopts, 'exec|e:s'
-    push getopts, 'archive|a:s'
-    push getopts, 'verbose|v'
-    push getopts, 'quiet|q'
-    push getopts, 'QUIET|Q'
-    push getopts, 'normalize'
-    push getopts, 'failures|f'
-    push getopts, 'comments|o'
-    push getopts, 'directives'
-    push getopts, 'ignore-exit'
-    push getopts, 'reverse'
-    push getopts, 'merge|m'
-    push getopts, 'shuffle|s'
-    push getopts, 'version|V'
-    push getopts, 'help|h'
-    opts = getopts.'get_options'(argv)
-    .return(opts)
+    $P0 = new ['Getopt';'Obj']
+    $P0.'notOptStop'(1)
+    push $P0, 'exec|e:s'
+    push $P0, 'archive|a:s'
+    push $P0, 'verbose|v'
+    push $P0, 'quiet|q'
+    push $P0, 'QUIET|Q'
+    push $P0, 'normalize'
+    push $P0, 'failures|f'
+    push $P0, 'comments|o'
+    push $P0, 'directives'
+    push $P0, 'ignore-exit'
+    push $P0, 'reverse'
+    push $P0, 'merge|m'
+    push $P0, 'shuffle|s'
+    push $P0, 'version|V'
+    push $P0, 'help|h'
+    $P1 = $P0.'get_options'(argv)
+    .return ($P1)
 .end
 
 .sub 'do' :anon

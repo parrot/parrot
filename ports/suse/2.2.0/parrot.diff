@@ -1,0 +1,47 @@
+--- ./src/packfile.c.orig	2010-03-16 05:15:34.000000000 +0000
++++ ./src/packfile.c	2010-03-17 13:44:10.000000000 +0000
+@@ -4442,8 +4442,7 @@ PackFile_Annotations_add_group(PARROT_IN
+ 
+     /* Allocate extra space for the group in the groups array. */
+     if (self->groups)
+-        self->groups =
+-            self->groups = mem_gc_realloc_n_typed_zeroed(interp, self->groups,
++	self->groups = mem_gc_realloc_n_typed_zeroed(interp, self->groups,
+                 1 + self->num_groups, self->num_groups, PackFile_Annotations_Group *);
+     else
+         self->groups = mem_gc_allocate_n_typed(interp,
+--- ./src/pmc.c.orig	2010-03-16 05:15:34.000000000 +0000
++++ ./src/pmc.c	2010-03-17 13:32:50.000000000 +0000
+@@ -584,7 +584,7 @@ Parrot_pmc_new_init_int(PARROT_INTERP, I
+     if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj)) {
+         PMC *initial = Parrot_pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
+         VTABLE_set_integer_native(interp, initial, init);
+-        VTABLE_instantiate(interp, classobj, initial);
++        return VTABLE_instantiate(interp, classobj, initial);
+     }
+     else {
+         PMC * const pmc = get_new_pmc_header(interp, base_type, 0);
+--- ./tools/dev/pbc_to_exe.pir.orig	2010-03-17 14:04:34.000000000 +0000
++++ ./tools/dev/pbc_to_exe.pir	2010-03-17 14:05:34.000000000 +0000
+@@ -510,10 +510,11 @@ END_OF_FUNCTION
+     .param int install :optional
+ 
+     $P0 = '_config'()
+-    .local string cc, ccflags, cc_o_out, osname, build_dir, slash
++    .local string cc, ccflags, optimize, cc_o_out, osname, build_dir, slash
+     .local string installed, includepath, versiondir
+     cc        = $P0['cc']
+     ccflags   = $P0['ccflags']
++    optimize  = $P0['optimize']
+     cc_o_out  = $P0['cc_o_out']
+     osname    = $P0['osname']
+     build_dir = $P0['build_dir']
+@@ -547,6 +548,8 @@ END_OF_FUNCTION
+     compile .= pathquote
+     compile .= ' '
+     compile .= ccflags
++    compile .= ' '
++    compile .= optimize
+     compile .= ' -c '
+     compile .= cfile
+ 

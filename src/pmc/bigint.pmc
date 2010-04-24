@@ -1143,7 +1143,7 @@ appended.
 
     VTABLE STRING *get_repr() {
         STRING * const s = SELF.get_string();
-        return Parrot_str_append(INTERP, s, CONST_STRING(INTERP, "L"));
+        return Parrot_str_concat(INTERP, s, CONST_STRING(INTERP, "L"));
     }
 /*
 

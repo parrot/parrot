@@ -521,11 +521,11 @@ Parrot_regenerate_HLL_namespaces(PARROT_INTERP)
         if (PMC_IS_NULL(ns_hash) ||
                 ns_hash->vtable->base_type == enum_class_Undef)
         {
-            STRING * const hll_name = Parrot_get_HLL_name(interp, hll_id);
+            STRING * hll_name = Parrot_get_HLL_name(interp, hll_id);
             if (!hll_name)
                 continue;
 
-            Parrot_str_downcase_inplace(interp, hll_name);
+            hll_name = Parrot_str_downcase(interp, hll_name);
 
             /* XXX as in Parrot_register_HLL() this needs to be fixed to use
              * the correct type of namespace. It's relatively easy to do that

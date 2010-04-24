@@ -340,7 +340,7 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
     opcode_t    *dest;
     UINTVAL      n_regs_used[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
     PMC         *ctx  = Parrot_push_context(interp, n_regs_used);
-    PMC * const  ret_cont = new_ret_continuation_pmc(interp, NULL);
+    PMC * const  ret_cont = pmc_new(interp, enum_class_Continuation);
 
     Parrot_pcc_set_signature(interp, ctx, call_object);
     Parrot_pcc_set_continuation(interp, ctx, ret_cont);
