@@ -100,10 +100,6 @@ Typical invocations are:
 
 core module Pod-Html
 
-=item chmod (in step 'install')
-
-core module ExtUtils::Command, see TT #1322
-
 =back
 
 =head2 PARROT DEPENDENCIES

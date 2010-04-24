@@ -260,19 +260,8 @@ osutils - Parrot OS Utilities
     .param string filename
     .param int mode
     .param int verbose          :named('verbose') :optional
-    # see TT #1322
-    $P0 = get_config()
-    .local string cmd
-    cmd = $P0['perl']
-    cmd .= " -MExtUtils::Command -e ExtUtils::Command::chmod "
-    $P1 = new 'FixedIntegerArray'
-    set $P1, 1
-    $P1[0] = mode
-    $S0 = sprintf '0%o', $P1
-    cmd .= $S0
-    cmd .= " "
-    cmd .= filename
-    system(cmd, verbose :named('verbose'))
+    $P0 = new 'OS'
+    $P0.'chmod'(filename, mode)
 .end
 
 =item unlink
