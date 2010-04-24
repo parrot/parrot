@@ -73,7 +73,7 @@ static UINTVAL get_byte(SHIM_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING * get_bytes(PARROT_INTERP,
-    ARGIN(STRING *source_string),
+    ARGIN(STRING *src),
     UINTVAL offset,
     UINTVAL count)
         __attribute__nonnull__(1)
@@ -136,7 +136,7 @@ static STRING * to_encoding(PARROT_INTERP, SHIM(const STRING *src))
        PARROT_ASSERT_ARG(source_string))
 #define ASSERT_ARGS_get_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(source_string))
+    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_get_codepoint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(source_string))
@@ -308,8 +308,8 @@ get_codepoints(PARROT_INTERP, ARGIN(STRING *source_string),
 
 /*
 
-=item C<static STRING * get_bytes(PARROT_INTERP, STRING *source_string, UINTVAL
-offset, UINTVAL count)>
+=item C<static STRING * get_bytes(PARROT_INTERP, STRING *src, UINTVAL offset,
+UINTVAL count)>
 
 Returns the bytes in string C<src> at position C<offset> and length C<count>.
 
@@ -320,13 +320,13 @@ Returns the bytes in string C<src> at position C<offset> and length C<count>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-get_bytes(PARROT_INTERP, ARGIN(STRING *source_string), UINTVAL offset, UINTVAL count)
+get_bytes(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(get_bytes)
-    STRING * const return_string = Parrot_str_copy(interp, source_string);
+    STRING * const return_string = Parrot_str_copy(interp, src);
 
-    return_string->encoding = source_string->encoding;
-    return_string->charset = source_string->charset;
+    return_string->encoding = src->encoding;
+    return_string->charset = src->charset;
 
     return_string->strstart = (char *)return_string->strstart + offset ;
     return_string->bufused = count;
