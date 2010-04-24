@@ -4800,6 +4800,12 @@ PackFile_append_pbc(PARROT_INTERP, ARGIN_NULLOK(const char *filename))
     PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
 
     if (pf) {
+        /* An embedder can try to load_bytecode without having an initial_pf */
+        if (!interp->initial_pf) {
+            interp->initial_pf = PackFile_new_dummy(interp, CONST_STRING(interp, "dummy"));
+            /* PackFile_new_dummy must never fail */
+            PARROT_ASSERT(interp->initial_pf);
+        }
         PackFile_add_segment(interp, &interp->initial_pf->directory,
                 &pf->directory.base);
 
