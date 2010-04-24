@@ -142,9 +142,9 @@ typedef enum PObj_enum {
     PObj_sysmem_FLAG            = POBJ_FLAG(15),
 
 /* PObj usage FLAGs, COW & GC */
-    /* Mark the contents as Copy on write */
+    /* Mark the contents as Copy On Write, that we are piggybacking on another string. */
     PObj_COW_FLAG               = POBJ_FLAG(16),
-    /* the Buffer may have COW copies */
+    /* The Buffer allows COW copies, and may have some. */
     PObj_is_COWable_FLAG        = POBJ_FLAG(17),
     /* Private flag for the GC system. Set if the PObj's in use as
      * far as the GC's concerned */
