@@ -145,12 +145,6 @@ bytecode.  Valid runcores include:
 
 =item PARROT_FAST_CORE
 
-=item PARROT_SWITCH_CORE
-
-=item PARROT_CGP_CORE
-
-=item PARROT_CGOTO_CORE
-
 =item PARROT_EXEC_CORE
 
 =item PARROT_GC_DEBUG_CORE
