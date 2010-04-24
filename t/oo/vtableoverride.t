@@ -18,12 +18,23 @@ Tests the behavior of VTABLE interfaces that have been overriden from PIR.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(13)
+    plan(14)
 
     newclass_tests()
     subclass_tests()
     vtable_implies_self_tests()
     anon_vtable_tests()
+    invalid_vtable()
+.end
+
+.sub invalid_vtable
+    throws_like(<<'CODE',':s but was used with \:vtable', 'invalid :vtable throws an exception')
+    .namespace [ "Test" ]
+    .sub monkey :method :vtable("not_in_the_vtable")
+        .param int key
+        .return("monkey")
+    .end
+CODE
 .end
 
 .sub 'newclass_tests'
