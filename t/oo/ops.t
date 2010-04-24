@@ -20,7 +20,7 @@ Tests opcodes related to the OO implementation.
     .include 'except_types.pasm'
     .include 'test_more.pir'
 
-    plan(18)
+    plan(20)
 
     op_addrole_p_p()
     op_inspect_p_p()
@@ -89,6 +89,10 @@ Tests opcodes related to the OO implementation.
     $P3 = $P2.'inspect'('name')
     is ($P3, 'Monkey', 'got name of found class')
 
+    null $S0
+    $P5 = get_class $S0
+    $I2 = isnull $P5
+    is ($I2, 1, 'null p gives null p')
 .end
 
 .sub op_get_class_p_p
@@ -113,6 +117,11 @@ Tests opcodes related to the OO implementation.
     $I1 = isa $P2 , 'Class'
     ok ($I1, 'get_class with a namespace found a class')
     is ($P3, 'Monkey', 'got name of found class')
+
+    null $P5
+    $P6 = get_class $P5
+    $I2 = isnull $P6
+    is ($I2, 1, 'null s gives null p')
 .end
 
 .sub op_addattribute_p_s
