@@ -8,9 +8,6 @@ blib/lib/libparrot.dylib                          [main]lib
 blib/lib/libparrot.so.2.3.0                       [main]lib
 blib/lib/libparrot.so                             [main]lib
 compilers/data_json/data_json.pbc                 [data_json]
-compilers/json/JSON.pbc                           [json]
-compilers/json/JSON/grammar.pbc                   [json]
-compilers/json/JSON/pge2pir.pbc                   [json]
 config/gen/call_list/opengl.in                    []
 docs/ops/bit.pod                                  [doc]
 docs/ops/cmp.pod                                  [doc]

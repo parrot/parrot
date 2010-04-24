@@ -12,7 +12,7 @@ Use the C<_json> method to generate a JSON representation of a PMC.
  load_bytecode 'JSON.pir'
  $S0 = _json( $P0 )
 
-To generate a PMC from a JSON string, see L<compilers/json/JSON.pir>.
+To generate a PMC from a JSON string, see L<compilers/data_json>.
 
 =cut
 

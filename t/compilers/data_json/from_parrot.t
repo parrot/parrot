@@ -4,11 +4,11 @@
 
 =head1 NAME
 
-t/compilers/json/from_parrot.t - test parrot to JSON conversion.
+t/compilers/data_json/from_parrot.t - test parrot to JSON conversion.
 
 =head1 SYNOPSIS
 
-    % prove t/compilers/json/from_parrot.t
+    % prove t/compilers/data_json/from_parrot.t
 
 =head1 DESCRIPTION
 
@@ -20,6 +20,7 @@ Tests JSON->Parrot conversions.
     .include 'test_more.pir'
     plan(39)
 
+    load_bytecode 'JSON.pbc'
     test_create_json_of_an_empty_string()
     test_create_json_of_a_non_empty_string()
     test_create_json_of_a_string_with_simple_escapes()
@@ -46,7 +47,6 @@ Tests JSON->Parrot conversions.
     .local string s
     s = ''
 
-    load_bytecode 'JSON.pbc'
     $S0 = _json( s, 0 )
     is($S0, '""', 'Create JSON of an empty string')
 .end
@@ -57,7 +57,6 @@ Tests JSON->Parrot conversions.
     .local string s
     s = 'abcdeABCDE01234$%^&*'
 
-    load_bytecode 'JSON.pbc'
     $S0 = _json( s, 0 )
     is($S0, '"abcdeABCDE01234$%^&*"', 'Create JSON of a non-empty string')
 .end
@@ -68,7 +67,6 @@ Tests JSON->Parrot conversions.
     .local string s
     s = "abcde\\ABCDE\"01234\n$%^&*"
     # XXX more escapes need to be tested; see http://www.json.org/
-    load_bytecode 'JSON.pbc'
     $S0 = _json( s, 0 )
     is($S0, '"abcde\\ABCDE\"01234\n$%^&*"', 'Create JSON of a string with simple escapes')
 .end
@@ -78,7 +76,6 @@ Tests JSON->Parrot conversions.
 .sub test_create_json_of_some_integers
     .local int i
     i = 0
-    load_bytecode 'JSON.pbc'
     $S0 = _json( i, 0 )
     is($S0, 0, 'Create JSON of some integers (0)')
     i = 35
@@ -100,7 +97,6 @@ Tests JSON->Parrot conversions.
 .sub test_create_json_of_some_numbers
     .local num n
     n = 0.0
-    load_bytecode 'JSON.pbc'
     $S0 = _json( n )
     is($S0, 0, 'Create JSON of some numbers (0)')
     n = 2.50
@@ -119,7 +115,6 @@ Tests JSON->Parrot conversions.
 .sub test_create_json_of_various_scalars_with_pretty_option
     .local string s
     s = "abcde\\ABCDE\"01234\n$%^&*"
-    load_bytecode 'JSON.pbc'
     $S0 = _json( s, 1 )
     is($S0, "\"abcde\\\\ABCDE\\\"01234\\n\$\%\^\&\*\"\n", 'Create JSON of various scalars with pretty option (string)')
 
@@ -152,7 +147,6 @@ Tests JSON->Parrot conversions.
     array[8] = 8
     array[9] = 9
 
-    load_bytecode 'JSON.pbc'
     $S0 = _json( array, 0 )
     is($S0, '[0,1,2,3,4,5,6,7,8,9]', 'Create JSON of an array')
 .end
@@ -175,7 +169,6 @@ Tests JSON->Parrot conversions.
     array[8] = 8
     array[9] = 9
 
-    load_bytecode 'JSON.pbc'
     $S0 = _json( array, 1 )
     is($S0, <<'OUTPUT', 'Create pretty JSON of an array')
 [
@@ -207,7 +200,6 @@ OUTPUT
     array[4] = -2147483648
     array[5] = 2147483647
 
-    load_bytecode 'JSON.pbc'
     $S0 = _json( array, 1 )
     is($S0, <<'OUTPUT', 'Create JSON of an array, keep element ordering')
 [
@@ -235,7 +227,6 @@ OUTPUT
     array[4] = "json"
     array[5] = 0.0
 
-    load_bytecode 'JSON.pbc'
     $S0 = _json( array, 1 )
     is($S0, <<'OUTPUT', 'Create JSON of a mixed array')
 [
@@ -260,7 +251,6 @@ OUTPUT
     hash["gamma"] = 3.1
     hash["delta"] = "DELTA"
 
-    load_bytecode 'JSON.pbc'
     $S0 = _json( hash, 1 )
     is($S0, <<'OUTPUT', 'Create JSON of hash')
 {
@@ -283,7 +273,6 @@ OUTPUT
     hash["gamma"] = 3.1
     hash["delta"] = "DELTA"
 
-    load_bytecode 'JSON.pbc'
     $S0 = _json( hash, 0 )
     is($S0, '{"alpha":29,"beta":"B","delta":"DELTA","gamma":3.1}', 'Create non-pretty JSON of hash')
 .end
@@ -304,9 +293,9 @@ OUTPUT
     push city1, street1
     push city1, street2
 
-    city2 = new 'Array'  # empty
+    city2 = new 'FixedPMCArray'  # empty
 
-    country = new 'Array'
+    country = new 'FixedPMCArray'
     country = 2
     country[0] = city1
     country[1] = city2
@@ -315,7 +304,6 @@ OUTPUT
     world["population"] = 1234567890
     world["some_country"] = country
 
-    load_bytecode 'JSON.pbc'
     $S0 = _json( world, 1 )
     is($S0, <<'OUTPUT', 'Create JSON of nested structure including ResizablePMCArray and empties')
 {
@@ -353,9 +341,9 @@ OUTPUT
     push city1, street1
     push city1, street2
 
-    city2 = new 'Array'  # empty
+    city2 = new 'FixedPMCArray'  # empty
 
-    country = new 'Array'
+    country = new 'FixedPMCArray'
     country = 2
     country[0] = city1
     country[1] = city2
@@ -364,7 +352,6 @@ OUTPUT
     world["population"] = 1234567890
     world["some_country"] = country
 
-    load_bytecode 'JSON.pbc'
     $S0 = _json( world, 0 )
     is($S0, '{"population":1234567890,"some_country":[[{"Perl":"Highway","Python":"Grove","Ruby":"Lane"},{}],[]]}', 'Create non-pretty JSON of nested structure')
 .end
@@ -376,7 +363,6 @@ OUTPUT
 
     s = new 'String'
     s = ''
-    load_bytecode 'JSON.pbc'
     $S0 = _json( s, 0 )
     is($S0, '""', 'Create JSON of String PMCs')
     $S0 = _json( s, 1 )
@@ -397,7 +383,6 @@ OUTPUT
 
     i = new 'Integer'
     i = 0
-    load_bytecode 'JSON.pbc'
     $S0 = _json( i, 0 )
     is($S0, 0, 'Create JSON of String PMCs')
     $S0 = _json( i, 1 )
@@ -418,7 +403,6 @@ OUTPUT
 
     b = new 'Boolean'
     b = 0
-    load_bytecode 'JSON.pbc'
     $S0 = _json( b, 0 )
     is($S0, 'false', 'Create JSON of Boolean PMCs')
     $S0 = _json( b, 1 )
@@ -438,7 +422,6 @@ OUTPUT
     .local pmc n
     null n
 
-    load_bytecode 'JSON.pbc'
     $S0 = _json( n, 0 )
     is($S0, 'null', 'Create JSON of null and .Undef')
     $S0 = _json( n, 1 )

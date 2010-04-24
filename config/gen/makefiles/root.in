@@ -122,7 +122,6 @@ include compilers/pge/Defines.mak
 include compilers/pct/Defines.mak
 include ext/nqp-rx/Defines.mak
 include compilers/data_json/Defines.mak
-include compilers/json/Defines.mak
 
 ###############################################################################
 #
@@ -604,7 +603,6 @@ all : \
     $(TGE_LIB_PBCS) \
     $(PGE_LIB_PBCS) \
     $(PCT_LIB_PBCS) \
-    $(JSON_LIB_PBCS) \
     $(DATA_JSON_LIB_PBCS) \
     $(NQP_LIB_PBCS) \
     $(GEN_LIBRARY) \
@@ -1844,7 +1842,7 @@ clean : \
 	$(RM_F) $(FLUID_FILES_1)
 	$(RM_F) $(FLUID_FILES_2)
 	$(RM_RF) lib/Parrot/OpLib
-	$(RM_F) $(NQP_CLEANUPS) $(PGE_CLEANUPS) $(TGE_CLEANUPS) $(JSON_CLEANUPS)
+	$(RM_F) $(NQP_CLEANUPS) $(PGE_CLEANUPS) $(TGE_CLEANUPS)
 	$(RM_F) $(PIRC_CLEANUPS) $(PCT_CLEANUPS) $(DATA_JSON_CLEANUPS)
 	$(RM_F) $(GEN_PASM_INCLUDES) $(GEN_PM_INCLUDES) $(DYNOPLIBS_CLEANUPS)
 
@@ -2556,7 +2554,6 @@ include compilers/pge/Rules.mak
 include compilers/pct/Rules.mak
 include compilers/tge/Rules.mak
 include compilers/data_json/Rules.mak
-include compilers/json/Rules.mak
 include ext/nqp-rx/Rules.mak
 
 # Local variables:

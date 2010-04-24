@@ -11,11 +11,11 @@ use Parrot::Test tests => 60;
 
 =head1 NAME
 
-t/compilers/json/to_parrot.t - test JSON to parrot conversions
+t/compilers/data_json/to_parrot.t - test JSON to parrot conversions
 
 =head1 SYNOPSIS
 
-    % prove t/compilers/json/to_parrot.t
+    % prove t/compilers/data_json/to_parrot.t
 
 =head1 DESCRIPTION
 
@@ -689,12 +689,13 @@ sub json_dump_is {
     return pir_output_is( <<"END_PIR", $dumped, $reason, %args );
 
 .sub test :main
-    load_bytecode 'compilers/json/JSON.pbc'
+    load_language 'data_json'
     load_bytecode 'dumper.pbc'
 
-    .local pmc JSON, result
-    JSON = compreg "JSON"
-    result = JSON("$code")
+    .local pmc JSON, eval, result
+    JSON = compreg 'data_json'
+    eval = JSON.'compile'("$code")
+    result = eval()
     _dumper(result, "JSON")
 .end
 END_PIR
@@ -710,11 +711,13 @@ sub json_isnt {
     return pir_error_output_like( <<"END_PIR", qr/not a valid JSON value/, $reason, %args );
 
 .sub test :main
-    load_bytecode 'compilers/json/JSON.pbc'
+    load_language 'data_json'
 
-    .local pmc JSON, result
-    JSON = compreg "JSON"
-    result = JSON("$code")
+    .local pmc JSON, eval, result
+
+    JSON = compreg 'data_json'
+    eval = JSON.'compile'("$code")
+    result = eval()
 .end
 END_PIR
 
