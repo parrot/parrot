@@ -400,8 +400,7 @@ PARROT_H_HEADERS = \
         $(INC_DIR)/core_pmcs.h \
         $(INC_DIR)/compiler.h \
         $(INC_DIR)/cclass.h \
-        include/pmc/pmc_callcontext.h \
-        include/pmc/pmc_parrotinterpreter.h
+        include/pmc/pmc_callcontext.h
 
 # generated list of header files
 GENERAL_H_FILES   = $(NONGEN_HEADERS) $(GEN_HEADERS) \
@@ -868,28 +867,33 @@ install_config.fpmc : myconfig config_lib.pir $(PARROT)
 	@echo "Invoking Parrot to generate install_config.fpmc"
 	$(PARROT) config_lib.pir --install > $@
 
-src/parrot_config$(O) : $(PARROT_H_HEADERS)
+src/parrot_config$(O) : $(PARROT_H_HEADERS) src/parrot_config.c
 
-src/install_config$(O) : $(PARROT_H_HEADERS)
+src/install_config$(O) : $(PARROT_H_HEADERS) src/install_config.c
 
-src/null_config$(O) : $(PARROT_H_HEADERS)
+src/null_config$(O) : $(PARROT_H_HEADERS) src/null_config.c
 
-src/oo$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_class.h include/pmc/pmc_object.h src/oo.str $(INC_DIR)/oo_private.h
+src/oo$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_class.h src/oo.c \
+    include/pmc/pmc_object.h src/oo.str $(INC_DIR)/oo_private.h
 
-src/scheduler$(O) : $(PARROT_H_HEADERS) src/scheduler.str \
+src/scheduler$(O) : $(PARROT_H_HEADERS) src/scheduler.str src/scheduler.c \
         include/pmc/pmc_scheduler.h include/pmc/pmc_task.h \
         include/pmc/pmc_timer.h \
-        $(INC_DIR)/scheduler_private.h
+        $(INC_DIR)/scheduler_private.h \
+        $(INC_DIR)/runcore_api.h
 
-src/io/core$(O) : $(PARROT_H_HEADERS) src/io/io_private.h
+src/io/core$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/core.c
 
-src/io/socket_api$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/api.str include/pmc/pmc_socket.h
+src/io/socket_api$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
+    src/io/api.str include/pmc/pmc_socket.h src/io/socket_api.c
 
-src/io/socket_unix$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_socket.h src/io/io_private.h
+src/io/socket_unix$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_socket.h \
+    src/io/io_private.h src/io/socket_unix.c
 
 src/io/socket_win32$(O) : $(PARROT_H_HEADERS) \
         src/io/io_private.h \
-        include/pmc/pmc_socket.h
+        include/pmc/pmc_socket.h \
+        src/io/socket_win32.c
 
 O_FILES = \
     $(INTERP_O_FILES) \
@@ -950,6 +954,7 @@ $(INSTALLABLETAPIR) : tapir.pbc $(PBC_TO_EXE)
 #
 
 src/parrot_debugger$(O) : $(INC_DIR)/embed.h \
+        src/parrot_debugger.c \
         $(INC_DIR)/runcore_api.h \
         compilers/imcc/imc.h $(PARROT_H_HEADERS) compilers/imcc/parser.h \
         compilers/imcc/cfg.h \
@@ -979,7 +984,8 @@ $(INSTALLABLEPDB) : src/parrot_debugger$(O) $(LIBPARROT) src/parrot_config$(O)
 # Parrot Disassembler
 #
 
-src/pbc_disassemble$(O) : $(INC_DIR)/embed.h $(PARROT_H_HEADERS)
+src/pbc_disassemble$(O) : $(INC_DIR)/embed.h $(PARROT_H_HEADERS) \
+    src/pbc_disassemble.c
 
 $(DIS) : src/pbc_disassemble$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
@@ -997,7 +1003,8 @@ $(INSTALLABLEDIS) : src/pbc_disassemble$(O) \
 #
 # Parrot Dump
 #
-src/packdump$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_sub.h include/pmc/pmc_key.h
+src/packdump$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_sub.h \
+    include/pmc/pmc_key.h src/packdump.c
 
 $(PDUMP) : src/pbc_dump$(O) src/packdump$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
@@ -1006,7 +1013,7 @@ $(PDUMP) : src/pbc_dump$(O) src/packdump$(O) $(LIBPARROT)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 src/pbc_dump$(O) : $(INC_DIR)/embed.h  $(INC_DIR)/oplib/ops.h \
-        $(PARROT_H_HEADERS)
+        $(PARROT_H_HEADERS) src/pbc_dump.c
 
 $(INSTALLABLEPDUMP) : src/pbc_dump$(O) src/packdump$(O) \
 	src/install_config$(O) $(LIBPARROT)
@@ -1214,59 +1221,59 @@ examples/pasm/hello$(EXE): examples/pasm/hello.pbc $(PBC_TO_EXE)
 #
 ###############################################################################
 
-src/byteorder$(O) : $(PARROT_H_HEADERS)
+src/byteorder$(O) : $(PARROT_H_HEADERS) src/byteorder.c
 
-src/datatypes$(O) : $(PARROT_H_HEADERS)
+src/datatypes$(O) : $(PARROT_H_HEADERS) src/datatypes.c
 
 src/extend_vtable$(O) : $(PARROT_H_HEADERS) \
-        $(INC_DIR)/extend.h $(INC_DIR)/extend_vtable.h
+        $(INC_DIR)/extend.h $(INC_DIR)/extend_vtable.h src/extend_vtable.c
 
-src/global_setup$(O) : $(PARROT_H_HEADERS) src/global_setup.str
+src/global_setup$(O) : $(PARROT_H_HEADERS) src/global_setup.str src/global_setup.c
 
-src/global$(O) : $(PARROT_H_HEADERS) src/global.str \
+src/global$(O) : $(PARROT_H_HEADERS) src/global.str src/global.c \
 	include/pmc/pmc_sub.h
 
-src/pmc$(O) : include/pmc/pmc_class.h \
+src/pmc$(O) : include/pmc/pmc_class.h src/pmc.c \
 	src/pmc.str $(PARROT_H_HEADERS)
 
-src/pmc_freeze$(O) : $(PARROT_H_HEADERS) src/pmc_freeze.str
+src/pmc_freeze$(O) : $(PARROT_H_HEADERS) src/pmc_freeze.str src/pmc_freeze.c
 
-src/hash$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_key.h
+src/hash$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_key.h src/hash.c
 
-src/library$(O) : $(PARROT_H_HEADERS) src/library.str \
+src/library$(O) : $(PARROT_H_HEADERS) src/library.str src/library.c\
         $(INC_DIR)/dynext.h
 
 $(INC_DIR)/extend_vtable.h src/extend_vtable.c src/vtable.h : src/vtable.tbl $(BUILD_TOOLS_DIR)/vtable_extend.pl lib/Parrot/Vtable.pm
 	$(PERL) $(BUILD_TOOLS_DIR)/vtable_extend.pl
 
-src/key$(O) : $(PARROT_H_HEADERS) src/key.str \
+src/key$(O) : $(PARROT_H_HEADERS) src/key.str src/key.c \
         include/pmc/pmc_key.h
 
-src/gc/mark_sweep$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h
+src/gc/mark_sweep$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h src/gc/mark_sweep.c
 
-src/gc/gc_ms$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h
+src/gc/gc_ms$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h src/gc/gc_ms.c
 
-src/gc/gc_inf$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h
+src/gc/gc_inf$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h src/gc/gc_inf.c
 
-src/gc/api$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h
+src/gc/api$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h src/gc/api.c
 
 src/gc/alloc_resources$(O) : $(PARROT_H_HEADERS) \
-        src/gc/gc_private.h
+        src/gc/gc_private.h src/gc/alloc_resources.c
 
-src/hll$(O) : $(PARROT_H_HEADERS) src/hll.str $(INC_DIR)/dynext.h
+src/hll$(O) : $(PARROT_H_HEADERS) src/hll.str $(INC_DIR)/dynext.h src/hll.c
 
-src/platform$(O) : $(PARROT_H_HEADERS)
+src/platform$(O) : $(PARROT_H_HEADERS) src/platform.c
 
 #IF(platform_asm):src/platform_asm$(O) : $(PARROT_H_HEADERS)
 #IF(platform_asm):
-src/core_pmcs$(O) : $(PARROT_H_HEADERS)
+src/core_pmcs$(O) : $(PARROT_H_HEADERS) src/core_pmcs.c
 
-src/runcore/trace$(O) : include/pmc/pmc_sub.h \
+src/runcore/trace$(O) : include/pmc/pmc_sub.h src/runcore/trace.c \
         $(INC_DIR)/oplib/ops.h $(INC_DIR)/runcore_trace.h \
         $(PARROT_H_HEADERS)
 
 src/debug$(O) : $(INC_DIR)/embed.h $(INC_DIR)/extend.h \
-        $(PARROT_H_HEADERS) \
+        $(PARROT_H_HEADERS) src/debug.c \
         $(INC_DIR)/oplib/ops.h \
         $(INC_DIR)/runcore_api.h $(INC_DIR)/runcore_trace.h \
         src/debug.str include/pmc/pmc_key.h \
@@ -1274,26 +1281,27 @@ src/debug$(O) : $(INC_DIR)/embed.h $(INC_DIR)/extend.h \
         $(INC_DIR)/extend_vtable.h
 
 src/sub$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/oplib/ops.h \
-        src/sub.str \
+        src/sub.str src/sub.c \
 	include/pmc/pmc_sub.h include/pmc/pmc_continuation.h
 
 src/string/api$(O) : $(PARROT_H_HEADERS) src/string/api.str \
-        src/string/private_cstring.h
+        src/string/private_cstring.h src/string/api.c
 
-src/string/primitives$(O) : $(PARROT_H_HEADERS)
+src/string/primitives$(O) : $(PARROT_H_HEADERS) src/string/primitives.c
 
-src/longopt$(O) : $(PARROT_H_HEADERS)
+src/longopt$(O) : $(PARROT_H_HEADERS) src/longopt.c
 
 src/dynext$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/dynext.h \
-        src/dynext.str include/pmc/pmc_parrotlibrary.h
+        src/dynext.str include/pmc/pmc_parrotlibrary.h src/dynext.c
 
 src/exceptions$(O) : $(PARROT_H_HEADERS) \
-        src/exceptions.str \
+        src/exceptions.str src/exceptions.c \
 	include/pmc/pmc_continuation.h
 
-src/thread$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/atomic.h \
+src/thread$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/atomic.h src/thread.c \
         include/pmc/pmc_sub.h \
-	include/pmc/pmc_parrotinterpreter.h
+	include/pmc/pmc_parrotinterpreter.h \
+	$(INC_DIR)/runcore_api.h
 
 ## SUFFIX OVERRIDE - dynloaded files need cc_shared
 src/extend$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/extend.h \
@@ -1301,6 +1309,7 @@ src/extend$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/extend.h \
 	$(CC) $(CFLAGS) @optimize::src/extend.c@ @ccwarn::src/extend.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/extend.c
 
 src/runcore/main$(O) : \
+	src/runcore/main.c \
 	src/runcore/main.str \
 	include/pmc/pmc_parrotlibrary.h \
         $(INC_DIR)/dynext.h $(INC_DIR)/oplib/core_ops.h \
@@ -1308,7 +1317,7 @@ src/runcore/main$(O) : \
         $(PARROT_H_HEADERS) $(INC_DIR)/runcore_api.h \
         $(INC_DIR)/runcore_profiling.h
 
-src/runcore/profiling$(O) : src/runcore/profiling.str \
+src/runcore/profiling$(O) : src/runcore/profiling.str src/runcore/profiling.c \
 	include/pmc/pmc_sub.h \
 	include/pmc/pmc_namespace.h \
         $(INC_DIR)/oplib/core_ops.h $(INC_DIR)/runcore_api.h \
@@ -1317,25 +1326,30 @@ src/runcore/profiling$(O) : src/runcore/profiling.str \
 
 src/call/args$(O) : \
         $(PARROT_H_HEADERS) $(INC_DIR)/oplib/ops.h \
+	src/call/args.c \
 	src/call/args.str \
 	include/pmc/pmc_key.h \
 	include/pmc/pmc_fixedintegerarray.h
 
-src/call/context_accessors$(O): $(PARROT_H_HEADERS)
+src/call/context_accessors$(O): $(PARROT_H_HEADERS) \
+        src/call/context_accessors.c
 
 src/call/pcc$(O) : $(INC_DIR)/oplib/ops.h \
         $(PARROT_H_HEADERS) \
         $(INC_DIR)/runcore_api.h \
+	src/call/pcc.c \
 	src/call/pcc.str \
 	include/pmc/pmc_key.h include/pmc/pmc_continuation.h
 
 src/call/context$(O) : $(PARROT_H_HEADERS) \
-	include/pmc/pmc_sub.h
+	include/pmc/pmc_sub.h src/call/context.c
 
 src/interp/inter_cb$(O) : $(PARROT_H_HEADERS) \
-	src/interp/inter_cb.str
+        include/pmc/pmc_parrotinterpreter.h \
+	src/interp/inter_cb.str src/interp/inter_cb.c
 
 src/interp/inter_misc$(O) : $(PARROT_H_HEADERS) \
+        src/interp/inter_misc.c \
         src/interp/inter_misc.str \
 	compilers/imcc/imc.h \
 	compilers/imcc/cfg.h \
@@ -1349,6 +1363,8 @@ src/interp/inter_misc$(O) : $(PARROT_H_HEADERS) \
 
 src/interp/inter_create$(O) : $(PARROT_H_HEADERS) \
 	$(INC_DIR)/oplib/core_ops.h \
+	src/gc/gc_private.h \
+        src/interp/inter_create.c \
         src/interp/inter_create.str \
 	compilers/imcc/imc.h \
 	compilers/imcc/cfg.h \
@@ -1361,33 +1377,41 @@ src/interp/inter_create$(O) : $(PARROT_H_HEADERS) \
         $(INC_DIR)/runcore_api.h
 
 src/call/ops$(O) : $(INC_DIR)/oplib/ops.h \
-	$(PARROT_H_HEADERS) include/pmc/pmc_continuation.h
+	$(PARROT_H_HEADERS) include/pmc/pmc_continuation.h \
+        $(INC_DIR)/runcore_api.h src/call/ops.c
 
 src/io/api$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
+        src/io/api.c \
         src/io/api.str include/pmc/pmc_filehandle.h \
         include/pmc/pmc_stringhandle.h
 
-src/io/buffer$(O) : $(PARROT_H_HEADERS) src/io/io_private.h
+src/io/buffer$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/buffer.c
 
-src/io/portable$(O) : $(PARROT_H_HEADERS) src/io/io_private.h
+src/io/portable$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/portable.c
 
-src/io/unix$(O) : $(PARROT_H_HEADERS) src/io/io_private.h include/pmc/pmc_filehandle.h
+src/io/unix$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
+    include/pmc/pmc_filehandle.h src/io/unix.c
 
-src/io/utf8$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/string/unicode.h
+src/io/utf8$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/string/unicode.h \
+    src/io/utf8.c
 
-src/io/win32$(O) : $(PARROT_H_HEADERS) src/io/io_private.h include/pmc/pmc_filehandle.h
+src/io/win32$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
+    include/pmc/pmc_filehandle.h src/io/win32.c
 
-src/gc/alloc_memory$(O) : $(PARROT_H_HEADERS)
+src/gc/alloc_memory$(O) : $(PARROT_H_HEADERS) src/gc/alloc_memory.c
 
 src/main$(O) : $(INC_DIR)/imcc.h $(PARROT_H_HEADERS) \
-        $(INC_DIR)/embed.h
+        $(INC_DIR)/embed.h $(INC_DIR)/runcore_api.h src/gc/gc_private.h \
+        src/main.c
 
 src/multidispatch$(O) : \
+        src/multidispatch.c \
         src/multidispatch.str \
         $(INC_DIR)/oplib/ops.h $(PARROT_H_HEADERS) \
 	include/pmc/pmc_nci.h include/pmc/pmc_sub.h
 
 src/packfile$(O) : src/packfile.str \
+        src/packfile.c \
 	include/pmc/pmc_sub.h include/pmc/pmc_key.h \
         compilers/imcc/imc.h \
 	compilers/imcc/cfg.h \
@@ -1400,13 +1424,14 @@ src/packfile$(O) : src/packfile.str \
         $(INC_DIR)/embed.h $(INC_DIR)/extend.h $(INC_DIR)/extend_vtable.h \
         $(PARROT_H_HEADERS) $(INC_DIR)/runcore_api.h
 
-src/packfile/pf_items$(O) : $(PARROT_H_HEADERS)
+src/packfile/pf_items$(O) : $(PARROT_H_HEADERS) src/packfile/pf_items.c
 
-src/packout$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_key.h
+src/packout$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_key.h src/packout.c
 
 src/parrot$(O) : $(GENERAL_H_FILES)
 
 src/runcore/cores$(O) : src/runcore/cores.str \
+        src/runcore/cores.c \
 	include/pmc/pmc_sub.h \
         $(INC_DIR)/dynext.h $(INC_DIR)/embed.h $(INC_DIR)/oplib/core_ops.h \
         $(INC_DIR)/oplib/ops.h \
@@ -1414,6 +1439,7 @@ src/runcore/cores$(O) : src/runcore/cores.str \
         $(PARROT_H_HEADERS)
 
 src/embed$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/embed.h \
+        src/embed.c \
         $(INC_DIR)/oplib/ops.h $(INC_DIR)/runcore_api.h \
         compilers/imcc/imc.h \
         compilers/imcc/cfg.h \
@@ -1426,55 +1452,55 @@ src/embed$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/embed.h \
 
 src/dataypes$(O) : $(GENERAL_H_FILES) src/dataypes.c
 
-src/exit$(O) : $(PARROT_H_HEADERS)
+src/exit$(O) : $(PARROT_H_HEADERS) src/exit.c
 
 src/nci/api$(O) : src/nci/api.str \
-        $(PARROT_H_HEADERS) \
-        include/pmc/pmc_unmanagedstruct.h \
-        include/pmc/pmc_nci.h
+        src/nci/api.c \
+        $(PARROT_H_HEADERS)
 
-src/nci/core_thunks$(O) : src/nci/core_thunks.str \
+src/nci/core_thunks$(O) : src/nci/core_thunks.c \
         $(PARROT_H_HEADERS) \
-        include/pmc/pmc_unmanagedstruct.h \
         include/pmc/pmc_nci.h
 
 ## SUFFIX OVERRIDE
-src/nci/extra_thunks$(O) : src/nci/extra_thunks.str \
+src/nci/extra_thunks$(O) : \
     $(PARROT_H_HEADERS) \
-    include/pmc/pmc_unmanagedstruct.h \
     include/pmc/pmc_nci.h \
     src/nci/extra_thunks.c
 	$(CC) $(CFLAGS) @optimize::src/nci/extra_thunks.c@ @ccwarn::src/nci/extra_thunks.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/nci/extra_thunks.c
 
 src/frame_builder$(O) : $(PARROT_H_HEADERS) src/frame_builder.h \
+        src/frame_builder.c \
         include/pmc/pmc_fixedintegerarray.h \
         include/pmc/pmc_unmanagedstruct.h \
         include/pmc/pmc_managedstruct.h \
         $(INC_DIR)/oplib/ops.h
 
-src/vtables$(O) : $(PARROT_H_HEADERS)
+src/vtables$(O) : $(PARROT_H_HEADERS) src/vtables.c
 
 ## SUFFIX OVERRIDE
-src/gc/system$(O) : $(PARROT_H_HEADERS)  src/gc/gc_private.h
+src/gc/system$(O) : $(PARROT_H_HEADERS)  src/gc/gc_private.h src/gc/system.c
 	$(CC) $(CFLAGS) @optimize::src/gc/system.c@ @ccwarn::src/gc/system.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/gc/system.c
 
 src/gc/gc_private.h : $(INC_DIR)/settings.h
 
-src/warnings$(O) : $(PARROT_H_HEADERS)
+src/gc/malloc$(O) : src/gc/malloc.c
 
-src/misc$(O) : $(PARROT_H_HEADERS)
+src/warnings$(O) : $(PARROT_H_HEADERS) src/warnings.c
 
-src/utils$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_nci.h
+src/misc$(O) : $(PARROT_H_HEADERS) src/misc.c
+
+src/utils$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_nci.h src/utils.c
 
 ## SUFFIX OVERRIDE
-src/spf_render$(O) : $(PARROT_H_HEADERS) src/spf_render.str
+src/spf_render$(O) : $(PARROT_H_HEADERS) src/spf_render.str src/spf_render.c
 	$(CC) $(CFLAGS) @optimize::src/spf_render.c@ @ccwarn::src/spf_render.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/spf_render.c
 
-src/spf_vtable$(O) : $(PARROT_H_HEADERS) src/spf_vtable.str
+src/spf_vtable$(O) : $(PARROT_H_HEADERS) src/spf_vtable.str src/spf_vtable.c
 
-src/string/encoding$(O) : $(PARROT_H_HEADERS)
+src/string/encoding$(O) : $(PARROT_H_HEADERS) src/string/encoding.c
 
-src/string/charset$(O) : $(PARROT_H_HEADERS) \
+src/string/charset$(O) : $(PARROT_H_HEADERS) src/string/charset.c \
         src/string/encoding/fixed_8.h \
         src/string/encoding/utf8.h \
         src/string/encoding/utf16.h \
@@ -1484,10 +1510,11 @@ src/string/charset$(O) : $(PARROT_H_HEADERS) \
         src/string/charset/iso-8859-1.h \
         src/string/charset/unicode.h
 
-src/pbc_merge$(O) : $(INC_DIR)/embed.h \
+src/pbc_merge$(O) : $(INC_DIR)/embed.h src/pbc_merge.c \
 	include/pmc/pmc_sub.h $(INC_DIR)/oplib/ops.h $(PARROT_H_HEADERS)
 
-src/io/filehandle$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_filehandle.h src/io/io_private.h
+src/io/filehandle$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_filehandle.h \
+    src/io/io_private.h src/io/filehandle.c
 
 src/dynpmc/subproxy$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/extend.h \
   $(INC_DIR)/dynext.h include/pmc/pmc_subproxy.h \
@@ -1495,11 +1522,12 @@ src/dynpmc/subproxy$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/extend.h \
   include/pmc/pmc_continuation.h include/pmc/pmc_callcontext.h \
   include/pmc/pmc_default.h
 
-src/gc/malloc_trace$(O) : src/gc/malloc.c
+src/gc/malloc_trace$(O) : src/gc/malloc.c src/gc/malloc_trace.c
 
-src/packfile/pf_items$(O) : $(PARROT_H_HEADERS)
+src/packfile/pf_items$(O) : $(PARROT_H_HEADERS) src/packfile/pf_items.c
 
-src/atomic/gcc_x86$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/atomic/gcc_x86.h
+src/atomic/gcc_x86$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/atomic/gcc_x86.h \
+    src/atomic/gcc_x86.c
 
 # core_ops depends upon config.h so that it gets updated along with
 # updates to config.h's version numbers
@@ -2422,7 +2450,8 @@ $(LIBNCI_TEST_SO): src/nci_test$(O) $(LIBPARROT)
     @ld_out@$@ src/nci_test$(O) $(C_LIBS)
 
 # for use by runtime/parrot/library/OpenGL.pir
-src/glut_callbacks$(O): $(GENERAL_H_FILES)
+src/glut_callbacks$(O): $(PARROT_H_HEADERS) \
+    $(INC_DIR)/extend.h $(INC_DIR)/extend_vtable.h src/glut_callbacks.c
 
 src/glut_nci_thunks.c: $(NCI_THUNK_GEN)
 	$(NCI_THUNK_GEN) \
@@ -2431,19 +2460,22 @@ src/glut_nci_thunks.c: $(NCI_THUNK_GEN)
 	    --output=src/glut_nci_thunks.c \
 	    <src/glut_nci_thunks.nci
 
-src/glut_nci_thunks$(O): $(GENERAL_H_FILES)
+src/glut_nci_thunks$(O) : $(PARROT_H_HEADERS) \
+    src/glut_nci_thunks.c \
+    include/pmc/pmc_nci.h
 
 $(LIBGLUTCB_SO): $(LIBPARROT) src/glut_callbacks$(O) src/glut_nci_thunks$(O)
 	$(LD) $(LD_LOAD_FLAGS) $(LDFLAGS) \
     @ld_out@$@ src/glut_callbacks$(O) src/glut_nci_thunks$(O) \
     $(ALL_PARROT_LIBS) @opengl_lib@
 
-src/extra_nci_thunks.c : src/nci/extra_thunks.nci $(NCI_THUNK_GEN)
+src/extra_nci_thunks.c : src/nci/extra_thunks.nci $(NCI_THUNK_GEN) 
 	$(NCI_THUNK_GEN) --dynext --no-warn-dups \
 	    --output=src/extra_nci_thunks.c <src/nci/extra_thunks.nci
 
 ## SUFFIX OVERRIDE
-src/extra_nci_thunks$(O) : $(GENERAL_H_FILES) src/extra_nci_thunks.c
+src/extra_nci_thunks$(O) : $(PARROT_H_HEADERS) src/extra_nci_thunks.c \
+    include/pmc/pmc_nci.h
 	$(CC) $(CFLAGS) @optimize::src/extra_nci_thunks.c@ @ccwarn::src/extra_nci_thunks.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/extra_nci_thunks.c
 
 $(EXTRANCITHUNKS_SO) : $(LIBPARROT) src/extra_nci_thunks$(O)
