@@ -752,6 +752,7 @@ u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
 {
     ASSERT_ARGS(u_iscclass)
 #if PARROT_HAS_ICU
+    UNUSED(interp);
             /* XXX which one
                return u_charDigitValue(codepoint);
                */
