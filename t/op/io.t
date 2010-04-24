@@ -16,17 +16,38 @@ Tests various io opcodes.
 
 =cut
 
-.const int TESTS = 4
+.const int TESTS = 5
 
 .sub 'main' :main
     .include 'test_more.pir'
 
     plan(TESTS)
 
+    open_delegates_to_filehandle_pmc()
     open_null_filename()
     open_null_mode()
     open_pipe_for_reading()
     open_pipe_for_writing()
+.end
+
+.sub open_delegates_to_filehandle_pmc
+    load_bytecode 'P6object.pbc'
+
+    .local pmc p6meta, interp, classes, classid
+    p6meta = get_root_global ["parrot"], "P6metaclass"
+    p6meta.'new_class'('Testing')
+
+    interp = getinterp
+    classes = interp[0]
+    classid = classes['Testing']
+    $I0 = classes['FileHandle']
+    set classes['FileHandle'], classid
+
+    $P1 = open '/foo'
+
+    # replace the original, so we don't break other tests
+    set classes['FileHandle'], $I0
+
 .end
 
 .sub 'open_null_filename'
@@ -127,7 +148,8 @@ Tests various io opcodes.
     .local pmc pipe
     pipe = open command, 'wp'
     unless pipe goto open_pipe_for_writing_failed
-    pipe.'puts'("ok - open pipe for writing\n")
+
+    pipe.'puts'("ok 5 - open pipe for writing\n")
     close pipe
     .return ()
 
@@ -139,6 +161,14 @@ Tests various io opcodes.
     todo(0, 'Unimplemented in this platform, TT #661')
 
 .end
+
+.namespace ["Testing"]
+
+.sub open :method
+    .param pmc args :slurpy
+    ok(1,'open opcode delegates to the FileHandle PMC')
+.end
+
 
 # Local Variables:
 #   mode: pir

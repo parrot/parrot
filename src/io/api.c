@@ -122,25 +122,24 @@ Parrot_io_open(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
     ASSERT_ARGS(Parrot_io_open)
     PMC *new_filehandle, *filehandle;
     INTVAL flags;
+    const INTVAL typenum = Parrot_get_ctx_HLL_type(interp, Parrot_PMC_typenum(interp, "FileHandle"));
     if (PMC_IS_NULL(pmc)) {
-        /* TODO: We should look up the HLL mapped type, instead of always
-           using FileHandle here */
-        new_filehandle = Parrot_pmc_new(interp, enum_class_FileHandle);
-        PARROT_ASSERT(new_filehandle->vtable->base_type == enum_class_FileHandle);
+        new_filehandle = Parrot_pmc_new(interp, typenum);
+        PARROT_ASSERT(new_filehandle->vtable->base_type == typenum);
     }
     else
         new_filehandle = pmc;
 
     flags = Parrot_io_parse_open_flags(interp, mode);
-    if (new_filehandle->vtable->base_type == enum_class_FileHandle) {
+    if (new_filehandle->vtable->base_type == typenum) {
         /* TODO: StringHandle may have a null path, but a filehandle really
            shouldn't allow that. */
-        PARROT_ASSERT(new_filehandle->vtable->base_type == enum_class_FileHandle);
+        PARROT_ASSERT(new_filehandle->vtable->base_type == typenum);
         filehandle = PIO_OPEN(interp, new_filehandle, path, flags);
         if (PMC_IS_NULL(filehandle))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Unable to open filehandle from path '%S'", path);
-        PARROT_ASSERT(filehandle->vtable->base_type == enum_class_FileHandle);
+        PARROT_ASSERT(filehandle->vtable->base_type == typenum);
         SETATTR_FileHandle_flags(interp, new_filehandle, flags);
         SETATTR_FileHandle_filename(interp, new_filehandle, path);
         SETATTR_FileHandle_mode(interp, new_filehandle, mode);
