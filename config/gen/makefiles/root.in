@@ -1380,7 +1380,9 @@ src/call/ops$(O) : $(INC_DIR)/oplib/ops.h \
 src/io/api$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
         src/io/api.c \
         src/io/api.str include/pmc/pmc_filehandle.h \
-        include/pmc/pmc_stringhandle.h
+        include/pmc/pmc_stringhandle.h \
+        $(INC_DIR)/extend.h \
+        $(INC_DIR)/extend_vtable.h
 
 src/io/buffer$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/buffer.c
 
