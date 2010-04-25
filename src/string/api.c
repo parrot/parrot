@@ -1368,15 +1368,15 @@ Parrot_str_equal(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(con
    /* we don't care which is bigger */
     else if (s1->strlen != s2->strlen)
         return 0;
-    else if (s1->hashval != s2->hashval && s1->hashval && s2->hashval)
+    else if ((s1->hashval != s2->hashval) && s1->hashval && s2->hashval)
         return 0;
 
     /* s2->strlen is the same here */
-    else if (!s1->strlen)
+    else if (s1->strlen == 0)
         return 1;
 
     /* COWed strings */
-    else if (s1->strstart == s2->strstart && s1->bufused == s2->bufused)
+    else if ((s1->strstart == s2->strstart) && (s1->bufused == s2->bufused))
         return 1;
 
     /*
@@ -1384,7 +1384,7 @@ Parrot_str_equal(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(con
      * both strings are non-null
      * both strings have same length
      */
-    return !CHARSET_COMPARE(interp, s1, s2);
+    return CHARSET_COMPARE(interp, s1, s2) == 0;
 }
 
 
