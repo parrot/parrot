@@ -1,4 +1,4 @@
-#! parrot
+#!./parrot
 # Copyright (C) 2008-2010, Parrot Foundation.
 # $Id$
 
