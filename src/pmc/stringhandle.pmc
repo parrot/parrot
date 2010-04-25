@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008, Parrot Foundation.
+Copyright (C) 2008-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -22,7 +22,7 @@ than an external file. Commonly used as a mock FileHandle for testing.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_INLINE
-static int encoding_is_utf8(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
+static int encoding_is_utf8(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_encoding_is_utf8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -36,7 +36,7 @@ static int encoding_is_utf8(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
 
 =over 4
 
-=item C<static int encoding_is_utf8(PARROT_INTERP, STRING *s)>
+=item C<static int encoding_is_utf8(PARROT_INTERP, const STRING *s)>
 
 Helper function for internal usage. Return 1 if the string argument is
 not null and has utf8 encoding, 0 otherwise.
@@ -49,7 +49,7 @@ not null and has utf8 encoding, 0 otherwise.
 
 PARROT_INLINE
 static int
-encoding_is_utf8(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
+encoding_is_utf8(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(encoding_is_utf8)
     if (STRING_IS_NULL(s))
@@ -81,7 +81,7 @@ Initializes a newly created StringHandle object.
 */
 
     VTABLE void init() {
-        Parrot_StringHandle_attributes *data_struct =
+        Parrot_StringHandle_attributes * const data_struct =
                 (Parrot_StringHandle_attributes *) PMC_data(SELF);
 
         data_struct->flags        = 0;
@@ -255,8 +255,7 @@ Check if the StringHandle is open.
 */
 
     METHOD is_closed() {
-        INTVAL status;
-        status = Parrot_io_is_closed(INTERP, SELF);
+        const INTVAL status = Parrot_io_is_closed(INTERP, SELF);
         RETURN(INTVAL status);
     }
 
@@ -272,8 +271,7 @@ C<bytes> argument is currently ignored.
 */
 
     METHOD read(INTVAL length) {
-        STRING *string_result;
-        string_result = Parrot_io_reads(INTERP, SELF, length);
+        STRING * const string_result = Parrot_io_reads(INTERP, SELF, length);
         RETURN(STRING *string_result);
     }
 
@@ -289,8 +287,7 @@ responds to "\n" newlines.)
 */
 
     METHOD readline() {
-        STRING *string_result;
-        string_result = Parrot_io_readline(INTERP, SELF);
+        STRING * const string_result = Parrot_io_readline(INTERP, SELF);
         RETURN(STRING *string_result);
     }
 
@@ -526,6 +523,7 @@ value.
 */
 
     METHOD get_fd() {
+        UNUSED(interp);
         RETURN(INTVAL -1);
     }
 
