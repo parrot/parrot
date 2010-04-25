@@ -476,6 +476,7 @@ sub init_func {
     my $multi_strings = '';
     my $cache         = {};
 
+    my $i = 0;
     for my $multi (@$multi_funcs) {
         my ($name, $ssig, $fsig, $ns, $func) = @$multi;
         my ($name_str, $ssig_str, $fsig_str, $ns_name)     =
@@ -487,21 +488,23 @@ sub init_func {
                    [$ns,   $ns_name ]) {
             my ($raw_string, $name) = @$s;
             next if $strings_seen{$name}++;
-            $multi_strings .=  "        STRING * const $name = "
+            $multi_strings .=  "            STRING * const $name = "
                            . qq|CONST_STRING_GEN(interp, "$raw_string");\n|;
         }
 
         push @multi_list, <<END_MULTI_LIST;
-        { $name_str,
-          $ssig_str,
-          $fsig_str,
-          $ns_name,
-          (funcptr_t) $func }
+            _temp_multi_func_list[$i].multi_name = $name_str;
+            _temp_multi_func_list[$i].short_sig = $ssig_str;
+            _temp_multi_func_list[$i].full_sig = $fsig_str;
+            _temp_multi_func_list[$i].ns_name = $ns_name;
+            _temp_multi_func_list[$i].func_ptr = (funcptr_t) $func;
 END_MULTI_LIST
+        $i++;
 
     }
 
-    my $multi_list = join( ",\n", @multi_list);
+    my $multi_list_size = @multi_list;
+    my $multi_list = join( "\n", @multi_list);
 
     my @isa = grep { $_ ne 'default' } @{ $self->parents };
 
@@ -695,12 +698,10 @@ EOC
         # Don't const the list, breaks some older C compilers
         $cout .= $multi_strings . <<"EOC";
 
-            multi_func_list _temp_multi_func_list[] = {
-                $multi_list
-            };
-#define N_MULTI_LIST (sizeof(_temp_multi_func_list)/sizeof(_temp_multi_func_list[0]))
+            multi_func_list _temp_multi_func_list[$multi_list_size];
+$multi_list
             Parrot_mmd_add_multi_list_from_c_args(interp,
-                _temp_multi_func_list, N_MULTI_LIST);
+                _temp_multi_func_list, $multi_list_size);
 EOC
     }
 
