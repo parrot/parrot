@@ -127,7 +127,6 @@ Parrot_io_open(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
                                                    Parrot_PMC_typenum(interp, "FileHandle"));
     if (PMC_IS_NULL(pmc)) {
         new_filehandle = Parrot_pmc_new(interp, typenum);
-        PARROT_ASSERT(new_filehandle->vtable->base_type == typenum);
     }
     else
         new_filehandle = pmc;
