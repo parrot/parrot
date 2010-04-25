@@ -52,7 +52,7 @@ sub pre_method_gen {
         $superargs       =~ s/^,//;
 
         my $method_body_text = <<"EOC";
-    Parrot_Object_attributes * const obj       = PARROT_OBJECT(pmc);
+    Parrot_Object_attributes * const obj       = PARROT_OBJECT(_self);
     Parrot_Class_attributes  * const _class    = PARROT_CLASS(obj->_class);
     STRING        * const meth_name = CONST_STRING_GEN(interp, "$vt_method_name");
 
@@ -66,7 +66,7 @@ sub pre_method_gen {
         PMC * const meth = Parrot_oo_find_vtable_override_for_class(interp, cur_class, meth_name);
         if (!PMC_IS_NULL(meth)) {
             $pcc_result_decl
-            Parrot_pcc_invoke_sub_from_c_args(interp, meth, "Pi$pcc_sig", pmc$pcc_args);
+            Parrot_pcc_invoke_sub_from_c_args(interp, meth, "Pi$pcc_sig", _self$pcc_args);
             $pcc_return_stmt
         }
         /* method name is $vt_method_name */

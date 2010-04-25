@@ -107,7 +107,7 @@ sub decl {
         $newl   = "\n";
         $semi   = '';
     }
-    my $pmcarg = 'PMC *pmc';
+    my $pmcarg = 'PMC *_self';
     $pmcarg    = "SHIM($pmcarg)" if $self->pmc_unused;
 
     return <<"EOC";
@@ -134,7 +134,7 @@ sub rewrite_nci_method {
       \.(\w+)        # other_method
       \(\s*(.*?)\)   # capture argument list
       }x,
-        sub { "pmc->vtable->$1(" . full_arguments($2) . ')' }
+        sub { "_self->vtable->$1(" . full_arguments($2) . ')' }
     );
 
     # Rewrite STATICSELF.other_method(args...)
@@ -151,8 +151,8 @@ sub rewrite_nci_method {
         }
     );
 
-    # Rewrite SELF -> pmc, INTERP -> interp
-    $body->subst( qr{\bSELF\b},   sub { 'pmc' } );
+    # Rewrite SELF -> _self, INTERP -> interp
+    $body->subst( qr{\bSELF\b},   sub { '_self' } );
     $body->subst( qr{\bINTERP\b}, sub { 'interp' } );
 
     # Rewrite GET_ATTR, SET_ATTR with typename
@@ -219,7 +219,7 @@ sub rewrite_vtable_method {
         \.(\w+)        # other_method
         \(\s*(.*?)\)   # capture argument list
       }x,
-        sub { "pmc->vtable->$1(" . full_arguments($2) . ')' }
+        sub { "_self->vtable->$1(" . full_arguments($2) . ')' }
     );
 
     # Rewrite SELF(args...). See comments above.
@@ -228,7 +228,7 @@ sub rewrite_vtable_method {
         \bSELF\b       # Macro: SELF
         \(\s*(.*?)\)   # capture argument list
       }x,
-        sub { "pmc->vtable->$name(" . full_arguments($1) . ')' }
+        sub { "_self->vtable->$name(" . full_arguments($1) . ')' }
     );
 
     # Rewrite OtherClass.SELF.other_method(args...)
@@ -304,8 +304,8 @@ sub rewrite_vtable_method {
         }
     );
 
-    # Rewrite SELF -> pmc, INTERP -> interp
-    $body->subst( qr{\bSELF\b},   sub { 'pmc' } );
+    # Rewrite SELF -> _self, INTERP -> interp
+    $body->subst( qr{\bSELF\b},   sub { '_self' } );
     $body->subst( qr{\bINTERP\b}, sub { 'interp' } );
 
     # Rewrite GET_ATTR, SET_ATTR with typename

@@ -44,7 +44,7 @@ sub pre_method_gen {
         # to avoid compiler warnings
         my $body = <<"EOC";
     UNUSED(interp)
-    UNUSED(pmc)
+    UNUSED(_self)
 EOC
 
         foreach my $param (split /,\s*/, $method->parameters) {

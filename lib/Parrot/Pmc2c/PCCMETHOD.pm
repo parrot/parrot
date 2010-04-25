@@ -399,7 +399,7 @@ sub rewrite_pccmethod {
     unshift @$linear_args,
         {
         type  => convert_type_string_to_reg_type('PMC'),
-        name  => 'pmc',
+        name  => '_self',
         attrs => parse_adverb_attributes(':invocant')
         };
 
