@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2009, Parrot Foundation.
+Copyright (C) 2009-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -144,7 +144,7 @@ Parrot_String create_string(Parrot_Interp interp, const char *name)
 
 /*
 
-=item C<int cotorra_main(Parrot_Interp interp, int argc, char **argv)>
+=item C<int cotorra_main(Parrot_Interp interp, int argc, const char **argv)>
 
 Auxiliary function to minimize the size of main.
 
@@ -152,7 +152,7 @@ Auxiliary function to minimize the size of main.
 
 */
 
-int cotorra_main(Parrot_Interp interp, int argc, const char * * argv)
+int cotorra_main(Parrot_Interp interp, int argc, const char **argv)
 {
     const char *source;
     Parrot_PackFile pf;
@@ -243,7 +243,7 @@ int cotorra_main(Parrot_Interp interp, int argc, const char * * argv)
 
 /*
 
-=item C<int main(int argc, char **argv)>
+=item C<int main(int argc, const char **argv)>
 
 Main function. Create the parrot interpreter and call cotorra_main.
 
