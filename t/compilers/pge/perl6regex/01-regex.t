@@ -276,6 +276,7 @@ Description of the test.
     .local string message
     get_results '0', exception
     message = exception
+    print '# '
     say message
     # remove /'s
     $S0 = substr result, 0, 1
