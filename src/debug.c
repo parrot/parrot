@@ -863,7 +863,7 @@ Start debugger.
 
 PARROT_EXPORT
 void
-Parrot_debugger_start(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
+Parrot_debugger_start(PARROT_INTERP, ARGIN_NULLOK(opcode_t * cur_opcode))
 {
     ASSERT_ARGS(Parrot_debugger_start)
     TRACEDEB_MSG("Parrot_debugger_start");

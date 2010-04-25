@@ -200,9 +200,9 @@ void Parrot_debugger_load(PARROT_INTERP, ARGIN_NULLOK(STRING *filename))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_debugger_start(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+void Parrot_debugger_start(PARROT_INTERP,
+    ARGIN_NULLOK(opcode_t * cur_opcode))
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 void PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
@@ -371,8 +371,7 @@ void PDB_watchpoint(PARROT_INTERP, ARGIN(const char *command))
 #define ASSERT_ARGS_Parrot_debugger_load __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_debugger_start __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(cur_opcode))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PDB_load_source __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(command))
