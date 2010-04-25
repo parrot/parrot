@@ -2,14 +2,9 @@
  *  Copyright (C) 2001-2008, Parrot Foundation.
  *  SVN Info
  *     $Id$
- *  Overview:
  *  Data Structure and Algorithms:
  *     Subroutine, coroutine, closure and continuation structures
  *     and related routines.
- *  History:
- *     Initial version by Melvin on on 2002/06/6
- *  Notes:
- *  References:
  */
 
 #ifndef PARROT_SUB_H_GUARD

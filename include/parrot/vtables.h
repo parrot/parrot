@@ -1,13 +1,9 @@
 /* vtables.h
- *  Copyright (C) 2001-2003, Parrot Foundation.
+ *  Copyright (C) 2001-2010, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
  *     Vtable manipulation code. Not to be confused with vtable.h
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
  */
 
 #ifndef PARROT_VTABLES_H_GUARD

@@ -1,13 +1,9 @@
 /* hash.h
- *  Copyright (C) 2001-2003, Parrot Foundation.
+ *  Copyright (C) 2001-2010, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
  *     Hashtable implementation
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
  */
 
 #ifndef PARROT_HASH_H_GUARD
