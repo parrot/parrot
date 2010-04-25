@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -127,7 +127,7 @@ Create PackFile_FixupTable* from self.
             entry = VTABLE_get_pmc_keyed_int(interp, attrs->entries, i);
             val   = (PackFile_FixupEntry*)VTABLE_get_pointer(interp, entry);
             pftable->fixups[i] = *val;
-	    mem_gc_free(INTERP, val);
+            mem_gc_free(INTERP, val);
         }
 
         return pftable;
