@@ -541,7 +541,7 @@ Returns the floating-point value for the element at C<*key>.
     VTABLE FLOATVAL get_number_keyed(PMC *key) {
         PMC               *nextkey;
         PMC               *valpmc;
-        const Hash * const hash   = (Hash *)VTABLE_get_pointer(interp, pmc);
+        const Hash * const hash   = (Hash *)SELF.get_pointer();
         void       * const keystr = hash_key_from_pmc(INTERP, hash, key);
         HashBucket * const b      = parrot_hash_get_bucket(INTERP, hash, keystr);
 

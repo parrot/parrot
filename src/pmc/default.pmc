@@ -358,7 +358,7 @@ With a null C<initializer>, calls C<init()>, else throws an exception.
         else
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ILL_INHERIT,
                 "init_pmc() not implemented in class '%Ss'",
-                caller(interp, pmc));
+                caller(interp, SELF));
     }
 
 /*

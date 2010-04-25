@@ -957,7 +957,7 @@ Returns the integer value at index C<ix>.
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL ix) {
         int   type;
-        const char * const p = char_offset_int(INTERP, pmc, ix, &type);
+        const char * const p = char_offset_int(INTERP, SELF, ix, &type);
         return ret_int(INTERP, p, type);
     }
 
@@ -973,7 +973,7 @@ Returns the integer value associated with C<*key>.
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
         int   type;
-        char * const p = char_offset_key(INTERP, pmc, key, &type);
+        char * const p = char_offset_key(INTERP, SELF, key, &type);
         return ret_int(INTERP, p, type);
     }
 
@@ -989,7 +989,7 @@ Returns the floating-point value at index C<ix>.
 
     VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
         int   type;
-        char * const p = char_offset_int(INTERP, pmc, key, &type);
+        char * const p = char_offset_int(INTERP, SELF, key, &type);
         return ret_float(INTERP, p, type);
     }
 
@@ -1005,7 +1005,7 @@ Returns the floating-point value associated with C<*key>.
 
     VTABLE FLOATVAL get_number_keyed(PMC *key) {
         int   type;
-        char * const p = char_offset_key(INTERP, pmc, key, &type);
+        char * const p = char_offset_key(INTERP, SELF, key, &type);
         return ret_float(INTERP, p, type);
     }
 
@@ -1021,7 +1021,7 @@ Returns the Parrot string value at index C<ix>.
 
     VTABLE STRING *get_string_keyed_int(INTVAL key) {
         int   type;
-        char * const p = char_offset_int(INTERP, pmc, key, &type);
+        char * const p = char_offset_int(INTERP, SELF, key, &type);
         return ret_string(INTERP, p, type);
     }
 
@@ -1037,7 +1037,7 @@ Returns the Parrot string value associated with C<*key>.
 
     VTABLE STRING *get_string_keyed(PMC *key) {
         int   type;
-        char * const p = char_offset_key(INTERP, pmc, key, &type);
+        char * const p = char_offset_key(INTERP, SELF, key, &type);
         return ret_string(INTERP, p, type);
     }
 
@@ -1053,8 +1053,8 @@ Returns the PMC value at index C<ix>.
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
         int   type;
-        char * const p = char_offset_int(INTERP, pmc, key, &type);
-        return ret_pmc(INTERP, pmc, p, type, key);
+        char * const p = char_offset_int(INTERP, SELF, key, &type);
+        return ret_pmc(INTERP, SELF, p, type, key);
     }
 
 /*
@@ -1069,8 +1069,8 @@ Returns the PMC value associated with C<*key>.
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
         int   type;
-        char * const p = char_offset_key(INTERP, pmc, key, &type);
-        return ret_pmc(INTERP, pmc, p, type, key_2_idx(INTERP, pmc, key));
+        char * const p = char_offset_key(INTERP, SELF, key, &type);
+        return ret_pmc(INTERP, SELF, p, type, key_2_idx(INTERP, SELF, key));
     }
 
 /*
@@ -1113,7 +1113,7 @@ Sets the value of the element at index C<ix> to C<value>.
 
     VTABLE void set_integer_keyed_int(INTVAL ix, INTVAL value) {
         int   type;
-        char * const p = char_offset_int(INTERP, pmc, ix, &type);
+        char * const p = char_offset_int(INTERP, SELF, ix, &type);
         set_int(INTERP, p, type, value);
     }
 
@@ -1131,7 +1131,7 @@ May cause segfaults if value is out of bounds.
 
     VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
         int   type;
-        char * const p = char_offset_key(INTERP, pmc, key, &type);
+        char * const p = char_offset_key(INTERP, SELF, key, &type);
         set_int(INTERP, p, type, value);
     }
 
@@ -1147,7 +1147,7 @@ Sets the value of the element at index C<ix> to C<value>.
 
     VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
         int   type;
-        char * const p = char_offset_int(INTERP, pmc, key, &type);
+        char * const p = char_offset_int(INTERP, SELF, key, &type);
         set_float(INTERP, p, type, value);
     }
 
@@ -1163,7 +1163,7 @@ Sets the value of the element associated with key C<*key> to C<value>.
 
     VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
         int type;
-        char * const p = char_offset_key(INTERP, pmc, key, &type);
+        char * const p = char_offset_key(INTERP, SELF, key, &type);
         set_float(INTERP, p, type, value);
     }
 
@@ -1179,7 +1179,7 @@ Sets the value of the element at index C<key> to C<*value>.
 
     VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
         int   type;
-        char * const p = char_offset_int(INTERP, pmc, key, &type);
+        char * const p = char_offset_int(INTERP, SELF, key, &type);
         set_string(INTERP, p, type, value);
     }
 
@@ -1195,7 +1195,7 @@ Sets the value of the element associated with key C<*key> to C<*value>.
 
     VTABLE void set_string_keyed(PMC *key, STRING *value) {
         int   type;
-        char * const p = char_offset_key(INTERP, pmc, key, &type);
+        char * const p = char_offset_key(INTERP, SELF, key, &type);
         set_string(INTERP, p, type, value);
     }
 

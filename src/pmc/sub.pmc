@@ -675,7 +675,7 @@ Archives the subroutine.
         VTABLE_push_integer(INTERP, info, (INTVAL) sub->start_offs);
         VTABLE_push_integer(INTERP, info, (INTVAL) sub->end_offs);
         VTABLE_push_integer(INTERP, info,
-            (INTVAL)(PObj_get_FLAGS(pmc) & SUB_FLAG_PF_MASK));
+            (INTVAL)(PObj_get_FLAGS(SELF) & SUB_FLAG_PF_MASK));
 
         VTABLE_push_string(INTERP, info, sub->name);
 

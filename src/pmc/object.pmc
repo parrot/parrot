@@ -496,7 +496,7 @@ Invoke the PIR-defined vtable override, or call the default get_integer.
 
 */
     VTABLE INTVAL get_integer() {
-        Parrot_Object_attributes * const obj       = PARROT_OBJECT(pmc);
+        Parrot_Object_attributes * const obj       = PARROT_OBJECT(SELF);
         Parrot_Class_attributes  * const _class    = PARROT_CLASS(obj->_class);
         STRING * const meth_name = CONST_STRING(interp, "get_integer");
 
@@ -511,7 +511,7 @@ Invoke the PIR-defined vtable override, or call the default get_integer.
                     cur_class, meth_name);
             if (!PMC_IS_NULL(meth)) {
                 INTVAL result;
-                Parrot_pcc_invoke_sub_from_c_args(interp, meth, "Pi->I", pmc, &result);
+                Parrot_pcc_invoke_sub_from_c_args(interp, meth, "Pi->I", SELF, &result);
                 return result;
 
             }
@@ -519,7 +519,7 @@ Invoke the PIR-defined vtable override, or call the default get_integer.
             if (cur_class->vtable->base_type == enum_class_PMCProxy) {
                 /* Get the PMC instance and call the vtable function on that. */
                 STRING * const proxy      = CONST_STRING(interp, "proxy");
-                PMC    * const del_object = VTABLE_get_attr_str(interp, pmc, proxy);
+                PMC    * const del_object = VTABLE_get_attr_str(interp, SELF, proxy);
 
                 if (!PMC_IS_NULL(del_object)) {
                     return (INTVAL)VTABLE_get_integer(interp, del_object);
@@ -527,7 +527,7 @@ Invoke the PIR-defined vtable override, or call the default get_integer.
                 }
             }
         }
-        return interp->vtables[enum_class_default]->get_integer(interp, pmc);
+        return interp->vtables[enum_class_default]->get_integer(interp, SELF);
     }
 
 /*
@@ -710,7 +710,7 @@ Invokes the object (if this vtable function is overridden).
 */
 
     opcode_t * invoke(void *next) {
-        Parrot_Object_attributes * const obj    = PARROT_OBJECT(pmc);
+        Parrot_Object_attributes * const obj    = PARROT_OBJECT(SELF);
         Parrot_Class_attributes  * const _class = PARROT_CLASS(obj->_class);
 
         /* Walk and search for the vtable. */
@@ -740,14 +740,14 @@ Invokes the object (if this vtable function is overridden).
             if (cur_class->vtable->base_type == enum_class_PMCProxy) {
                 /* Get the PMC instance and call the vtable function on that. */
                 PMC * const del_object =
-                    VTABLE_get_attr_keyed(interp, pmc, cur_class, proxy);
+                    VTABLE_get_attr_keyed(interp, SELF, cur_class, proxy);
 
                 if (!PMC_IS_NULL(del_object))
                     return VTABLE_invoke(interp, del_object, next);
             }
         }
 
-        return (opcode_t *)interp->vtables[enum_class_default]->invoke(interp, pmc, next);
+        return (opcode_t *)interp->vtables[enum_class_default]->invoke(interp, SELF, next);
     }
 
 /*
@@ -776,7 +776,7 @@ Creates a clone of the object.
 */
 
     VTABLE PMC * clone() {
-        Parrot_Object_attributes * const obj = PARROT_OBJECT(pmc);
+        Parrot_Object_attributes * const obj = PARROT_OBJECT(SELF);
         /* If we have a custom override, invoke it.
          * If not, use the oo function. */
         STRING * const meth_name = CONST_STRING(interp, "clone");
@@ -785,7 +785,7 @@ Creates a clone of the object.
         PMC *result;
 
         if (!PMC_IS_NULL(meth)) {
-            Parrot_pcc_invoke_sub_from_c_args(interp, meth, "Pi->P", pmc, &result);
+            Parrot_pcc_invoke_sub_from_c_args(interp, meth, "Pi->P", SELF, &result);
         }
         else {
             result = Parrot_oo_clone_object(interp, SELF, NULL);
@@ -873,8 +873,8 @@ Used to mark a PMC as read-only shared.
         type_num = SELF->vtable->base_type;
 
         /* make sure metadata doesn't go away unexpectedly */
-        if (PMC_metadata(pmc))
-            PMC_metadata(pmc) = pt_shared_fixup(interp, PMC_metadata(pmc));
+        if (PMC_metadata(SELF))
+            PMC_metadata(SELF) = pt_shared_fixup(interp, PMC_metadata(SELF));
 
         PARROT_ASSERT(master->vtables[type_num]->pmc_class);
         /* don't want the referenced class disappearing on us */
