@@ -44,6 +44,7 @@ Tests various io opcodes.
     set classes['FileHandle'], classid
 
     $P1 = open '/foo'
+    is($P1,42,'open opcode delegates to the open method on the FileHandle PMC')
 
     # replace the original, so we don't break other tests
     set classes['FileHandle'], $I0
@@ -166,7 +167,7 @@ Tests various io opcodes.
 
 .sub open :method
     .param pmc args :slurpy
-    ok(1,'open opcode delegates to the FileHandle PMC')
+    .return(42)
 .end
 
 
