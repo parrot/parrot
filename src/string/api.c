@@ -2901,7 +2901,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING*
-Parrot_str_change_encoding(PARROT_INTERP, ARGIN_NULLOK(STRING *src),
+Parrot_str_change_encoding(PARROT_INTERP, ARGMOD_NULLOK(STRING *src),
         INTVAL encoding_nr)
 {
     ASSERT_ARGS(Parrot_str_change_encoding)

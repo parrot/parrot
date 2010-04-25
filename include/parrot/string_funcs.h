@@ -75,9 +75,10 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING* Parrot_str_change_encoding(PARROT_INTERP,
-    ARGIN_NULLOK(STRING *src),
+    ARGMOD_NULLOK(STRING *src),
     INTVAL encoding_nr)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*src);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
