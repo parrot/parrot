@@ -749,7 +749,7 @@ CallContext.
                     case STRINGCELL: type = enum_type_STRING;   break;
                     case PMCCELL:
                         type = PMC_IS_NULL(c[i].u.p)
-                             ? enum_type_PMC
+                             ? (INTVAL) enum_type_PMC
                              : VTABLE_type(interp, c[i].u.p);
                         break;
                     default:
