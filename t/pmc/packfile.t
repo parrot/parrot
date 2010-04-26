@@ -100,7 +100,6 @@ Tests the Packfile PMC.
 # Packfile.set_string_native, Packfile.get_integer_keyed_str
 .sub 'test_get_integer'
     .local pmc pf
-    push_eh unknown_key
     pf  = _pbc()
     $I0 = pf["version_major"]
     ok(1, "get_integer_keyed_str(version_major)")
@@ -112,6 +111,7 @@ Tests the Packfile PMC.
     ok(1, "get_integer_keyed_str(version_patch)")
 
     # Requesting unknown key should throw exception
+    push_eh unknown_key
     $I3 = pf["foo"]
     ok(0, "get_integer_keyed_str return unknown key")
     .return ()
