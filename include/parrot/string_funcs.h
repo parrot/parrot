@@ -110,10 +110,9 @@ STRING * Parrot_str_concat(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-STRING * Parrot_str_copy(PARROT_INTERP, ARGMOD(STRING *s))
+STRING * Parrot_str_copy(PARROT_INTERP, ARGIN(const STRING *s))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*s);
+        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL

@@ -355,7 +355,7 @@ Parrot_str_clone(PARROT_INTERP, ARGIN(const STRING *s))
 
 /*
 
-=item C<STRING * Parrot_str_copy(PARROT_INTERP, STRING *s)>
+=item C<STRING * Parrot_str_copy(PARROT_INTERP, const STRING *s)>
 
 Creates and returns a shallow copy of the specified Parrot string.
 
@@ -367,7 +367,7 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-Parrot_str_copy(PARROT_INTERP, ARGMOD(STRING *s))
+Parrot_str_copy(PARROT_INTERP, ARGIN(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_copy)
     STRING *d;
