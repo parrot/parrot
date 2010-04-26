@@ -93,6 +93,8 @@ static int handle_identifier(PARROT_INTERP, YYSTYPE *valp, ARGIN(const char *id)
 
 #define YYCHOP() (yytext[--yyleng] = '\0')
 
+#define SET_LINE_NUMBER (IMCC_INFO(interp)->line = yylineno)
+
 #define DUP_AND_RET(valp, token)             \
   do {                                       \
       if (valp) (valp)->s = mem_sys_strdup(yytext); \
@@ -113,6 +115,7 @@ static int handle_identifier(PARROT_INTERP, YYSTYPE *valp, ARGIN(const char *id)
 %option reentrant
 %option never-interactive
 %option stack
+%option yylineno
 
 LETTER          [a-zA-Z_@]
 DIGIT           [0-9]
@@ -169,10 +172,10 @@ SP              [ ]
             return 0;
         }
 
-<*>^{WS}*            { IMCC_INFO(interp)->line++; }
+<*>^{WS}*            { SET_LINE_NUMBER; }
 
 <heredoc1>.*{EOL} {
-            IMCC_INFO(interp)->line++;
+            SET_LINE_NUMBER;
             IMCC_INFO(interp)->frames->heredoc_rest = mem_sys_strdup(yytext);
             BEGIN(heredoc2);
     }
@@ -191,7 +194,7 @@ SP              [ ]
     }
 
 <heredoc2>.* {
-        IMCC_INFO(interp)->line++;
+        SET_LINE_NUMBER;
         /* Are we at the end of the heredoc? */
         if (STREQ(IMCC_INFO(interp)->heredoc_end, yytext)) {
             /* End of the heredoc. */
@@ -249,7 +252,7 @@ SP              [ ]
 <*>setline{SP}+ { yy_push_state(cmt1, yyscanner);  }
 
 <cmt1>{DIGITS} {
-        IMCC_INFO(interp)->line = atoi(yytext);
+        yylineno = IMCC_INFO(interp)->line = atoi(yytext);
         yy_pop_state(yyscanner);
         yy_push_state(cmt4, yyscanner);
         return LINECOMMENT;
@@ -286,22 +289,22 @@ SP              [ ]
 
 <INITIAL,emit,macro>^"=cut"{EOL} {
     /* this is a stand-alone =cut, but we're not in POD mode, so ignore.  */
-    IMCC_INFO(interp)->line++;
+    SET_LINE_NUMBER;
 }
 
-<INITIAL,emit,macro>^"=" {
-        IMCC_INFO(interp)->line++;
+<INITIAL,emit,macro>^"=".*{EOL} {
+        SET_LINE_NUMBER;
         IMCC_INFO(interp)->in_pod = 1;
         yy_push_state(pod, yyscanner);
     }
 
 <pod>^"=cut"{EOL} {
-        IMCC_INFO(interp)->line++;
+        SET_LINE_NUMBER;
         IMCC_INFO(interp)->in_pod = 0;
         yy_pop_state(yyscanner);
     }
 
-<pod>.* { IMCC_INFO(interp)->line++; }
+<pod>.* { SET_LINE_NUMBER; }
 
 <pod>{EOL}      { /* ignore */ }
 
@@ -451,7 +454,7 @@ SP              [ ]
 
 <emit,INITIAL>".macro" {
         /* the initial whitespace catcher misses this one */
-        IMCC_INFO(interp)->line++;
+        SET_LINE_NUMBER;
         return read_macro(valp, interp, yyscanner);
     }
 
@@ -664,7 +667,7 @@ SP              [ ]
 
 <macro>".endm"         {
         /* the initial whitespace catcher misses this one */
-        IMCC_INFO(interp)->line++;
+        SET_LINE_NUMBER;
         DUP_AND_RET(valp, ENDM);
 }
 
