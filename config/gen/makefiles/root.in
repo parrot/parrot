@@ -1839,7 +1839,7 @@ clean : \
     ext-clean \
 #UNLESS(win32):    cover-clean \
     editor-clean
-	$(RM_F) $(INC_DIR)/oplib/core_ops_cg.h src/ops/core_ops_cg.c \
+	$(RM_F) $(INC_DIR)/oplib/core_ops_cg.h src/ops/core_ops_cg.c
 	$(RM_F) chartypes "*.s" "*~"
 	$(RM_F) $(FLUID_FILES_1)
 	$(RM_F) $(FLUID_FILES_2)
