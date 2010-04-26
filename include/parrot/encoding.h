@@ -15,16 +15,16 @@
 
 #include "parrot/parrot.h"
 
-typedef STRING * (*encoding_to_encoding_t)(PARROT_INTERP, NOTNULL(const STRING *src));
-typedef UINTVAL (*encoding_get_codepoint_t)(PARROT_INTERP, const STRING *src, UINTVAL offset);
-typedef UINTVAL (*encoding_get_byte_t)(PARROT_INTERP, const STRING *src, UINTVAL offset);
-typedef void (*encoding_set_byte_t)(PARROT_INTERP, const STRING *src, UINTVAL offset, UINTVAL count);
-typedef STRING *(*encoding_get_codepoints_t)(PARROT_INTERP, STRING *src, UINTVAL offset, UINTVAL count);
-typedef STRING *(*encoding_get_bytes_t)(PARROT_INTERP, STRING *src, UINTVAL offset, UINTVAL count);
-typedef UINTVAL (*encoding_codepoints_t)(PARROT_INTERP, ARGIN(const STRING *src));
-typedef UINTVAL (*encoding_bytes_t)(PARROT_INTERP, ARGIN(const STRING *src));
-typedef UINTVAL (*encoding_find_cclass_t)(PARROT_INTERP, STRING *s, const INTVAL *typetable, INTVAL flags, UINTVAL offset, UINTVAL count);
-typedef size_t (*encoding_hash_t)(PARROT_INTERP, const STRING *s, size_t hashval);
+typedef STRING * (*encoding_to_encoding_t)(PARROT_INTERP, ARGIN(const STRING *src));
+typedef UINTVAL  (*encoding_get_codepoint_t)(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset);
+typedef UINTVAL  (*encoding_get_byte_t)(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset);
+typedef void     (*encoding_set_byte_t)(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count);
+typedef STRING * (*encoding_get_codepoints_t)(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count);
+typedef STRING * (*encoding_get_bytes_t)(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count);
+typedef UINTVAL  (*encoding_codepoints_t)(PARROT_INTERP, ARGIN(const STRING *src));
+typedef UINTVAL  (*encoding_bytes_t)(PARROT_INTERP, ARGIN(const STRING *src));
+typedef UINTVAL  (*encoding_find_cclass_t)(PARROT_INTERP, ARGIN(const STRING *s), ARGIN(const INTVAL *typetable), INTVAL flags, UINTVAL offset, UINTVAL count);
+typedef size_t   (*encoding_hash_t)(PARROT_INTERP, ARGIN(const STRING *s), size_t hashval);
 
 /* iterator support */
 
