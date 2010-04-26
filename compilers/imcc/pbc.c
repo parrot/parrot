@@ -983,31 +983,32 @@ add_const_str(PARROT_INTERP, ARGIN(const SymReg *r))
     ASSERT_ARGS(add_const_str)
 
     PackFile_ConstTable *table = interp->code->const_table;
-    STRING * const s = IMCC_string_from_reg(interp, r);
-    int k = -1;
+    STRING * const       s     = IMCC_string_from_reg(interp, r);
     int i;
+
     for (i = 0; i < table->const_count; ++i) {
         PackFile_Constant * const constant = table->constants[i];
         if (constant->type == PFC_STRING) {
             STRING * const sc = constant->u.string;
-            if (Parrot_charset_number_of_str(interp, s) ==
-                    Parrot_charset_number_of_str(interp, sc) &&
-                    Parrot_encoding_number_of_str(interp, s) ==
-                    Parrot_encoding_number_of_str(interp, sc) &&
-                    Parrot_str_equal(interp, s, sc)) {
-                k = i;
-                break;
+            if (Parrot_charset_number_of_str(interp, s)
+            ==  Parrot_charset_number_of_str(interp, sc)
+            &&  Parrot_encoding_number_of_str(interp, s)
+            ==  Parrot_encoding_number_of_str(interp, sc)
+            &&  Parrot_str_equal(interp, s, sc)) {
+                return i;
             }
         }
     }
-    if (k < 0) {
-        PackFile_Constant * constant;
-        k = add_const_table(interp);
-        constant = table->constants[k];
-        constant->type     = PFC_STRING;
-        constant->u.string = s;
+
+    /* otherwise... */
+    {
+        int                k        = add_const_table(interp);
+        PackFile_Constant *constant = table->constants[k];
+        constant->type              = PFC_STRING;
+        constant->u.string          = s;
+
+        return k;
     }
-    return k;
 }
 
 

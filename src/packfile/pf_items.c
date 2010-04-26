@@ -1307,17 +1307,14 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
 {
     ASSERT_ARGS(PF_fetch_string)
     STRING   *s;
-    opcode_t  flag_charset_word;
     UINTVAL   flags;
     UINTVAL   charset_nr;
     size_t    size;
-    const int wordsize = pf ? pf->header->wordsize : sizeof (opcode_t);
+    const int wordsize          = pf ? pf->header->wordsize : sizeof (opcode_t);
+    opcode_t  flag_charset_word = PF_fetch_opcode(pf, cursor);
 
-    flag_charset_word = PF_fetch_opcode(pf, cursor);
-
-    if (flag_charset_word == -1) {
+    if (flag_charset_word == -1)
         return STRINGNULL;
-    }
 
     /* decode flags and charset */
     flags         = (flag_charset_word & 0x1 ? PObj_constant_FLAG : 0) |
