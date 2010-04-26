@@ -43,20 +43,19 @@ static STRING* decompose(PARROT_INTERP, ARGMOD(STRING *src))
         FUNC_MODIFIES(*src);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* downcase(PARROT_INTERP, ARGIN(const STRING *source_string))
+static STRING* downcase(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* downcase_first(PARROT_INTERP,
-    ARGIN(const STRING *source_string))
+static STRING* downcase_first(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 static INTVAL find_cclass(PARROT_INTERP,
     INTVAL flags,
-    ARGIN(STRING *source_string),
+    ARGIN(STRING *src),
     UINTVAL offset,
     UINTVAL count)
         __attribute__nonnull__(1)
@@ -64,7 +63,7 @@ static INTVAL find_cclass(PARROT_INTERP,
 
 static INTVAL find_not_cclass(PARROT_INTERP,
     INTVAL flags,
-    ARGIN(STRING *source_string),
+    ARGIN(STRING *src),
     UINTVAL offset,
     UINTVAL count)
         __attribute__nonnull__(1)
@@ -73,7 +72,7 @@ static INTVAL find_not_cclass(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 static INTVAL is_cclass(PARROT_INTERP,
     INTVAL flags,
-    ARGIN(const STRING *source_string),
+    ARGIN(const STRING *src),
     UINTVAL offset)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -84,13 +83,12 @@ static STRING * string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* titlecase(PARROT_INTERP, ARGIN(const STRING *source_string))
+static STRING* titlecase(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* titlecase_first(PARROT_INTERP,
-    ARGIN(const STRING *source_string))
+static STRING* titlecase_first(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -105,13 +103,12 @@ static STRING * to_charset(PARROT_INTERP, ARGIN(STRING *src))
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* upcase(PARROT_INTERP, ARGIN(const STRING *source_string))
+static STRING* upcase(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* upcase_first(PARROT_INTERP,
-    ARGIN(const STRING *source_string))
+static STRING* upcase_first(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -128,27 +125,27 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_downcase __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(source_string))
+    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_downcase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(source_string))
+    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_find_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(source_string))
+    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_find_not_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(source_string))
+    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_is_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(source_string))
+    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_string_from_codepoint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_titlecase __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(source_string))
+    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_titlecase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(source_string))
+    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_to_ascii __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
@@ -157,10 +154,10 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_upcase __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(source_string))
+    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_upcase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(source_string))
+    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_validate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
@@ -169,10 +166,10 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<STRING * ascii_get_graphemes(PARROT_INTERP, STRING *source_string,
-UINTVAL offset, UINTVAL count)>
+=item C<STRING * ascii_get_graphemes(PARROT_INTERP, STRING *src, UINTVAL offset,
+UINTVAL count)>
 
-Retrieves the graphemes for the STRING C<source_string>, starting at
+Retrieves the graphemes for the STRING C<src>, starting at
 C<offset> and ending at C<offset + count>.
 
 =cut
@@ -182,11 +179,10 @@ C<offset> and ending at C<offset + count>.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-ascii_get_graphemes(PARROT_INTERP, ARGIN(STRING *source_string),
-        UINTVAL offset, UINTVAL count)
+ascii_get_graphemes(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(ascii_get_graphemes)
-    return ENCODING_GET_BYTES(interp, source_string, offset, count);
+    return ENCODING_GET_BYTES(interp, src, offset, count);
 }
 
 /*
@@ -297,9 +293,9 @@ decompose(PARROT_INTERP, ARGMOD(STRING *src))
 
 /*
 
-=item C<static STRING* upcase(PARROT_INTERP, const STRING *source_string)>
+=item C<static STRING* upcase(PARROT_INTERP, const STRING *src)>
 
-Converts the STRING C<source_string> to all uppercase.
+Converts the STRING C<src> to all uppercase.
 
 =cut
 
@@ -307,11 +303,11 @@ Converts the STRING C<source_string> to all uppercase.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-upcase(PARROT_INTERP, ARGIN(const STRING *source_string))
+upcase(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(upcase)
-    STRING * const result = Parrot_str_clone(interp, source_string);
-    const UINTVAL n = source_string->strlen;
+    STRING * const result = Parrot_str_clone(interp, src);
+    const UINTVAL n = src->strlen;
 
     if (n) {
         char * const buffer = result->strstart;
@@ -327,9 +323,9 @@ upcase(PARROT_INTERP, ARGIN(const STRING *source_string))
 
 /*
 
-=item C<static STRING* downcase(PARROT_INTERP, const STRING *source_string)>
+=item C<static STRING* downcase(PARROT_INTERP, const STRING *src)>
 
-Converts the STRING C<source_string> to all lower-case.
+Converts the STRING C<src> to all lower-case.
 
 =cut
 
@@ -337,11 +333,11 @@ Converts the STRING C<source_string> to all lower-case.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-downcase(PARROT_INTERP, ARGIN(const STRING *source_string))
+downcase(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(downcase)
-    STRING       *result = Parrot_str_clone(interp, source_string);
-    const UINTVAL n      = source_string->strlen;
+    STRING       *result = Parrot_str_clone(interp, src);
+    const UINTVAL n      = src->strlen;
 
     if (n) {
         char * const buffer = result->strstart;
@@ -357,9 +353,9 @@ downcase(PARROT_INTERP, ARGIN(const STRING *source_string))
 
 /*
 
-=item C<static STRING* titlecase(PARROT_INTERP, const STRING *source_string)>
+=item C<static STRING* titlecase(PARROT_INTERP, const STRING *src)>
 
-Converts the STRING given by C<source_string> to title case, where
+Converts the STRING given by C<src> to title case, where
 the first character is upper case and all the rest of the characters
 are lower-case.
 
@@ -369,11 +365,11 @@ are lower-case.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-titlecase(PARROT_INTERP, ARGIN(const STRING *source_string))
+titlecase(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(titlecase)
-    STRING       *result = Parrot_str_clone(interp, source_string);
-    const UINTVAL n      = source_string->strlen;
+    STRING       *result = Parrot_str_clone(interp, src);
+    const UINTVAL n      = src->strlen;
 
     if (n) {
         char * const buffer = result->strstart;
@@ -390,9 +386,9 @@ titlecase(PARROT_INTERP, ARGIN(const STRING *source_string))
 
 /*
 
-=item C<static STRING* upcase_first(PARROT_INTERP, const STRING *source_string)>
+=item C<static STRING* upcase_first(PARROT_INTERP, const STRING *src)>
 
-Sets the first character in the STRING C<source_string> to upper case,
+Sets the first character in the STRING C<src> to upper case,
 but doesn't modify the rest of the string.
 
 =cut
@@ -401,10 +397,10 @@ but doesn't modify the rest of the string.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-upcase_first(PARROT_INTERP, ARGIN(const STRING *source_string))
+upcase_first(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(upcase_first)
-    STRING *result = Parrot_str_clone(interp, source_string);
+    STRING *result = Parrot_str_clone(interp, src);
 
     if (result->strlen) {
         char * const buffer = result->strstart;
@@ -416,10 +412,9 @@ upcase_first(PARROT_INTERP, ARGIN(const STRING *source_string))
 
 /*
 
-=item C<static STRING* downcase_first(PARROT_INTERP, const STRING
-*source_string)>
+=item C<static STRING* downcase_first(PARROT_INTERP, const STRING *src)>
 
-Sets the first character of the STRING C<source_string> to lowercase,
+Sets the first character of the STRING C<src> to lowercase,
 but doesn't modify the rest of the characters.
 
 =cut
@@ -428,10 +423,10 @@ but doesn't modify the rest of the characters.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-downcase_first(PARROT_INTERP, ARGIN(const STRING *source_string))
+downcase_first(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(downcase_first)
-    STRING *result = Parrot_str_clone(interp, source_string);
+    STRING *result = Parrot_str_clone(interp, src);
 
     if (result->strlen) {
         char * const buffer = result->strstart;
@@ -443,10 +438,9 @@ downcase_first(PARROT_INTERP, ARGIN(const STRING *source_string))
 
 /*
 
-=item C<static STRING* titlecase_first(PARROT_INTERP, const STRING
-*source_string)>
+=item C<static STRING* titlecase_first(PARROT_INTERP, const STRING *src)>
 
-Converts the first letter of STRING C<source_string> to upper case,
+Converts the first letter of STRING C<src> to upper case,
 but doesn't modify the rest of the string.
 
 =cut
@@ -455,10 +449,10 @@ but doesn't modify the rest of the string.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-titlecase_first(PARROT_INTERP, ARGIN(const STRING *source_string))
+titlecase_first(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(titlecase_first)
-    STRING *result = Parrot_str_clone(interp, source_string);
+    STRING * const result = Parrot_str_clone(interp, src);
 
     if (result->strlen) {
         char * const buffer = result->strstart;
@@ -576,8 +570,8 @@ mixed_cs_index(PARROT_INTERP, ARGIN(STRING *src), ARGIN(STRING *search),
 
 /*
 
-=item C<INTVAL ascii_cs_index(PARROT_INTERP, STRING *source_string, STRING
-*search_string, UINTVAL offset)>
+=item C<INTVAL ascii_cs_index(PARROT_INTERP, STRING *src, STRING *search_string,
+UINTVAL offset)>
 
 Searches for the first instance of STRING C<search> in STRING C<src>.
 returns the position where the substring is found if it is indeed found.
@@ -589,28 +583,28 @@ Returns -1 otherwise.
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-ascii_cs_index(PARROT_INTERP, ARGIN(STRING *source_string),
+ascii_cs_index(PARROT_INTERP, ARGIN(STRING *src),
         ARGIN(STRING *search_string), UINTVAL offset)
 {
     ASSERT_ARGS(ascii_cs_index)
     INTVAL retval;
-    if (source_string->charset != search_string->charset) {
-        return mixed_cs_index(interp, source_string, search_string, offset);
+    if (src->charset != search_string->charset) {
+        return mixed_cs_index(interp, src, search_string, offset);
     }
 
-    PARROT_ASSERT(source_string->encoding == Parrot_fixed_8_encoding_ptr);
-    retval = Parrot_byte_index(interp, source_string,
+    PARROT_ASSERT(src->encoding == Parrot_fixed_8_encoding_ptr);
+    retval = Parrot_byte_index(interp, src,
             search_string, offset);
     return retval;
 }
 
 /*
 
-=item C<INTVAL ascii_cs_rindex(PARROT_INTERP, STRING *source_string, STRING
+=item C<INTVAL ascii_cs_rindex(PARROT_INTERP, STRING *src, STRING
 *search_string, UINTVAL offset)>
 
 Searches for the last instance of STRING C<search_string> in STRING
-C<source_string>. Starts searching at C<offset>.
+C<src>. Starts searching at C<offset>.
 
 =cut
 
@@ -618,18 +612,18 @@ C<source_string>. Starts searching at C<offset>.
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-ascii_cs_rindex(PARROT_INTERP, ARGIN(STRING *source_string),
+ascii_cs_rindex(PARROT_INTERP, ARGIN(STRING *src),
         ARGIN(STRING *search_string), UINTVAL offset)
 {
     ASSERT_ARGS(ascii_cs_rindex)
     INTVAL retval;
 
-    if (source_string->charset != search_string->charset)
+    if (src->charset != search_string->charset)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
             "Cross-charset index not supported");
 
-    PARROT_ASSERT(source_string->encoding == Parrot_fixed_8_encoding_ptr);
-    retval = Parrot_byte_rindex(interp, source_string,
+    PARROT_ASSERT(src->encoding == Parrot_fixed_8_encoding_ptr);
+    retval = Parrot_byte_rindex(interp, src,
             search_string, offset);
     return retval;
 }
@@ -686,8 +680,8 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 
 /*
 
-=item C<static INTVAL is_cclass(PARROT_INTERP, INTVAL flags, const STRING
-*source_string, UINTVAL offset)>
+=item C<static INTVAL is_cclass(PARROT_INTERP, INTVAL flags, const STRING *src,
+UINTVAL offset)>
 
 =cut
 
@@ -695,14 +689,14 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 
 PARROT_WARN_UNUSED_RESULT
 static INTVAL
-is_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *source_string), UINTVAL offset)
+is_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src), UINTVAL offset)
 {
     ASSERT_ARGS(is_cclass)
     UINTVAL codepoint;
 
-    if (offset >= source_string->strlen)
+    if (offset >= src->strlen)
         return 0;
-    codepoint = ENCODING_GET_CODEPOINT(interp, source_string, offset);
+    codepoint = ENCODING_GET_CODEPOINT(interp, src, offset);
 
     if (codepoint >= sizeof (Parrot_ascii_typetable) /
             sizeof (Parrot_ascii_typetable[0])) {
@@ -713,8 +707,8 @@ is_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *source_string), UINTV
 
 /*
 
-=item C<static INTVAL find_cclass(PARROT_INTERP, INTVAL flags, STRING
-*source_string, UINTVAL offset, UINTVAL count)>
+=item C<static INTVAL find_cclass(PARROT_INTERP, INTVAL flags, STRING *src,
+UINTVAL offset, UINTVAL count)>
 
 Find a character in the given character class.  Delegates to the find_cclass
 method of the encoding plugin.
@@ -725,38 +719,37 @@ method of the encoding plugin.
 
 PARROT_WARN_UNUSED_RESULT
 static INTVAL
-find_cclass(PARROT_INTERP, INTVAL flags, ARGIN(STRING *source_string),
+find_cclass(PARROT_INTERP, INTVAL flags, ARGIN(STRING *src),
             UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(find_cclass)
     UINTVAL pos = offset;
     UINTVAL end = offset + count;
 
-    end = source_string->strlen < end ? source_string->strlen : end;
-    return ENCODING_FIND_CCLASS(interp, source_string, Parrot_ascii_typetable,
+    end = src->strlen < end ? src->strlen : end;
+    return ENCODING_FIND_CCLASS(interp, src, Parrot_ascii_typetable,
             flags, pos, end);
 }
 
 /*
 
-=item C<static INTVAL find_not_cclass(PARROT_INTERP, INTVAL flags, STRING
-*source_string, UINTVAL offset, UINTVAL count)>
+=item C<static INTVAL find_not_cclass(PARROT_INTERP, INTVAL flags, STRING *src,
+UINTVAL offset, UINTVAL count)>
 
 =cut
 
 */
 
 static INTVAL
-find_not_cclass(PARROT_INTERP, INTVAL flags, ARGIN(STRING *source_string),
-                UINTVAL offset, UINTVAL count)
+find_not_cclass(PARROT_INTERP, INTVAL flags, ARGIN(STRING *src), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(find_not_cclass)
     UINTVAL pos = offset;
     UINTVAL end = offset + count;
 
-    end = source_string->strlen < end ? source_string->strlen : end;
+    end = src->strlen < end ? src->strlen : end;
     for (; pos < end; ++pos) {
-        const UINTVAL codepoint = ENCODING_GET_CODEPOINT(interp, source_string, pos);
+        const UINTVAL codepoint = ENCODING_GET_CODEPOINT(interp, src, pos);
         if ((Parrot_ascii_typetable[codepoint] & flags) == 0) {
             return pos;
         }
@@ -766,10 +759,10 @@ find_not_cclass(PARROT_INTERP, INTVAL flags, ARGIN(STRING *source_string),
 
 /*
 
-=item C<size_t ascii_compute_hash(PARROT_INTERP, const STRING *source_string,
-size_t seed)>
+=item C<size_t ascii_compute_hash(PARROT_INTERP, const STRING *src, size_t
+seed)>
 
-Computes the hash of STRING C<source_string> starting with seed value
+Computes the hash of STRING C<src> starting with seed value
 C<seed>.
 
 =cut
@@ -778,14 +771,14 @@ C<seed>.
 
 PARROT_PURE_FUNCTION
 size_t
-ascii_compute_hash(SHIM_INTERP, ARGIN(const STRING *source_string), size_t seed)
+ascii_compute_hash(SHIM_INTERP, ARGIN(const STRING *src), size_t seed)
 {
     ASSERT_ARGS(ascii_compute_hash)
     size_t hashval = seed;
-    const char *buffptr = (const char *)source_string->strstart;
-    UINTVAL len = source_string->strlen;
+    const char *buffptr = (const char *)src->strstart;
+    UINTVAL len = src->strlen;
 
-    PARROT_ASSERT(source_string->encoding == Parrot_fixed_8_encoding_ptr);
+    PARROT_ASSERT(src->encoding == Parrot_fixed_8_encoding_ptr);
     while (len--) {
         hashval += hashval << 5;
         hashval += *buffptr++;
@@ -855,7 +848,7 @@ STRING *
 charset_cvt_ascii_to_binary(PARROT_INTERP, ARGIN(STRING *src))
 {
     ASSERT_ARGS(charset_cvt_ascii_to_binary)
-    STRING *dest = Parrot_str_clone(interp, src);
+    STRING * const dest = Parrot_str_clone(interp, src);
     UINTVAL offs;
 
     for (offs = 0; offs < src->strlen; ++offs) {
@@ -882,7 +875,7 @@ STRING *
 charset_cvt_ascii_to_iso_8859_1(PARROT_INTERP, ARGIN(STRING *src))
 {
     ASSERT_ARGS(charset_cvt_ascii_to_iso_8859_1)
-    STRING * dest = Parrot_str_clone(interp, src);
+    STRING * const dest = Parrot_str_clone(interp, src);
     UINTVAL offs;
 
     for (offs = 0; offs < src->strlen; ++offs) {

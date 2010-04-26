@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2009, Parrot Foundation.
+Copyright (C) 2004-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -34,47 +34,46 @@ static INTVAL compare(SHIM_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* compose(PARROT_INTERP, SHIM(STRING *source_string))
+static STRING* compose(PARROT_INTERP, SHIM(STRING *src))
         __attribute__nonnull__(1);
 
 static INTVAL cs_index(SHIM_INTERP,
-    SHIM(STRING *source_string),
+    SHIM(STRING *src),
     SHIM(STRING *search_string),
     SHIM(UINTVAL offset));
 
 static INTVAL cs_rindex(SHIM_INTERP,
-    SHIM(STRING *source_string),
+    SHIM(STRING *src),
     SHIM(STRING *search_string),
     SHIM(UINTVAL offset));
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* decompose(PARROT_INTERP, SHIM(STRING *source_string))
+static STRING* decompose(PARROT_INTERP, SHIM(STRING *src))
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* downcase(PARROT_INTERP, SHIM(const STRING *source_string))
+static STRING* downcase(PARROT_INTERP, SHIM(const STRING *src))
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* downcase_first(PARROT_INTERP,
-    SHIM(const STRING *source_string))
+static STRING* downcase_first(PARROT_INTERP, SHIM(const STRING *src))
         __attribute__nonnull__(1);
 
 static INTVAL find_cclass(SHIM_INTERP,
     SHIM(INTVAL flags),
-    SHIM(STRING *source_string),
+    SHIM(STRING *src),
     UINTVAL offset,
     UINTVAL count);
 
 static INTVAL find_not_cclass(SHIM_INTERP,
     SHIM(INTVAL flags),
-    SHIM(STRING *source_string),
+    SHIM(STRING *src),
     UINTVAL offset,
     UINTVAL count);
 
 static INTVAL is_cclass(SHIM_INTERP,
     SHIM(INTVAL flags),
-    SHIM(const STRING *source_string),
+    SHIM(const STRING *src),
     SHIM(UINTVAL offset));
 
 PARROT_CANNOT_RETURN_NULL
@@ -82,12 +81,11 @@ static STRING * string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* titlecase(PARROT_INTERP, SHIM(const STRING *source_string))
+static STRING* titlecase(PARROT_INTERP, SHIM(const STRING *src))
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* titlecase_first(PARROT_INTERP,
-    SHIM(const STRING *source_string))
+static STRING* titlecase_first(PARROT_INTERP, SHIM(const STRING *src))
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
@@ -96,15 +94,14 @@ static STRING* to_charset(PARROT_INTERP, ARGIN(STRING *src))
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* upcase(PARROT_INTERP, SHIM(const STRING *source_string))
+static STRING* upcase(PARROT_INTERP, SHIM(const STRING *src))
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* upcase_first(PARROT_INTERP,
-    SHIM(const STRING *source_string))
+static STRING* upcase_first(PARROT_INTERP, SHIM(const STRING *src))
         __attribute__nonnull__(1);
 
-static UINTVAL validate(SHIM_INTERP, SHIM(STRING *source_string));
+static UINTVAL validate(SHIM_INTERP, SHIM(STRING *src));
 #define ASSERT_ARGS_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lhs) \
     , PARROT_ASSERT_ARG(rhs))
@@ -174,7 +171,7 @@ to_charset(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<static STRING* compose(PARROT_INTERP, STRING *source_string)>
+=item C<static STRING* compose(PARROT_INTERP, STRING *src)>
 
 Throws an exception because we cannot compose a binary string.
 
@@ -185,7 +182,7 @@ Throws an exception because we cannot compose a binary string.
 /* A err. can't compose binary */
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-compose(PARROT_INTERP, SHIM(STRING *source_string))
+compose(PARROT_INTERP, SHIM(STRING *src))
 {
     ASSERT_ARGS(compose)
     EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't compose binary data");
@@ -193,7 +190,7 @@ compose(PARROT_INTERP, SHIM(STRING *source_string))
 
 /*
 
-=item C<static STRING* decompose(PARROT_INTERP, STRING *source_string)>
+=item C<static STRING* decompose(PARROT_INTERP, STRING *src)>
 
 Throws an exception because we cannot decompose a binary string.
 
@@ -204,7 +201,7 @@ Throws an exception because we cannot decompose a binary string.
 /* A err. can't decompose binary */
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-decompose(PARROT_INTERP, SHIM(STRING *source_string))
+decompose(PARROT_INTERP, SHIM(STRING *src))
 {
     ASSERT_ARGS(decompose)
     EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't decompose binary data");
@@ -212,7 +209,7 @@ decompose(PARROT_INTERP, SHIM(STRING *source_string))
 
 /*
 
-=item C<static STRING* upcase(PARROT_INTERP, const STRING *source_string)>
+=item C<static STRING* upcase(PARROT_INTERP, const STRING *src)>
 
 Throws an exception because we cannot convert a binary string to
 upper case.
@@ -223,7 +220,7 @@ upper case.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-upcase(PARROT_INTERP, SHIM(const STRING *source_string))
+upcase(PARROT_INTERP, SHIM(const STRING *src))
 {
     ASSERT_ARGS(upcase)
     EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't upcase binary data");
@@ -231,7 +228,7 @@ upcase(PARROT_INTERP, SHIM(const STRING *source_string))
 
 /*
 
-=item C<static STRING* downcase(PARROT_INTERP, const STRING *source_string)>
+=item C<static STRING* downcase(PARROT_INTERP, const STRING *src)>
 
 Throws an exception because we cannot convert a binary string to
 lower-case.
@@ -242,7 +239,7 @@ lower-case.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-downcase(PARROT_INTERP, SHIM(const STRING *source_string))
+downcase(PARROT_INTERP, SHIM(const STRING *src))
 {
     ASSERT_ARGS(downcase)
     EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't downcase binary data");
@@ -250,7 +247,7 @@ downcase(PARROT_INTERP, SHIM(const STRING *source_string))
 
 /*
 
-=item C<static STRING* titlecase(PARROT_INTERP, const STRING *source_string)>
+=item C<static STRING* titlecase(PARROT_INTERP, const STRING *src)>
 
 Throws an exception because we cannot convert a binary string to
 title case.
@@ -261,7 +258,7 @@ title case.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-titlecase(PARROT_INTERP, SHIM(const STRING *source_string))
+titlecase(PARROT_INTERP, SHIM(const STRING *src))
 {
     ASSERT_ARGS(titlecase)
     EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't titlecase binary data");
@@ -269,7 +266,7 @@ titlecase(PARROT_INTERP, SHIM(const STRING *source_string))
 
 /*
 
-=item C<static STRING* upcase_first(PARROT_INTERP, const STRING *source_string)>
+=item C<static STRING* upcase_first(PARROT_INTERP, const STRING *src)>
 
 Throws an exception because we cannot set the first "character" of the
 binary string to uppercase.
@@ -280,7 +277,7 @@ binary string to uppercase.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-upcase_first(PARROT_INTERP, SHIM(const STRING *source_string))
+upcase_first(PARROT_INTERP, SHIM(const STRING *src))
 {
     ASSERT_ARGS(upcase_first)
     EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't upcase binary data");
@@ -288,8 +285,7 @@ upcase_first(PARROT_INTERP, SHIM(const STRING *source_string))
 
 /*
 
-=item C<static STRING* downcase_first(PARROT_INTERP, const STRING
-*source_string)>
+=item C<static STRING* downcase_first(PARROT_INTERP, const STRING *src)>
 
 Throws an exception because we cannot set the first "character"
 of the binary string to lowercase.
@@ -300,7 +296,7 @@ of the binary string to lowercase.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-downcase_first(PARROT_INTERP, SHIM(const STRING *source_string))
+downcase_first(PARROT_INTERP, SHIM(const STRING *src))
 {
     ASSERT_ARGS(downcase_first)
     EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't downcase binary data");
@@ -308,8 +304,7 @@ downcase_first(PARROT_INTERP, SHIM(const STRING *source_string))
 
 /*
 
-=item C<static STRING* titlecase_first(PARROT_INTERP, const STRING
-*source_string)>
+=item C<static STRING* titlecase_first(PARROT_INTERP, const STRING *src)>
 
 Throws an exception because we can't convert the first "character"
 of binary data to title case.
@@ -320,7 +315,7 @@ of binary data to title case.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-titlecase_first(PARROT_INTERP, SHIM(const STRING *source_string))
+titlecase_first(PARROT_INTERP, SHIM(const STRING *src))
 {
     ASSERT_ARGS(titlecase_first)
     EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't titlecase binary data");
@@ -351,7 +346,7 @@ compare(SHIM_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
 
 /*
 
-=item C<static INTVAL cs_index(PARROT_INTERP, STRING *source_string, STRING
+=item C<static INTVAL cs_index(PARROT_INTERP, STRING *src, STRING
 *search_string, UINTVAL offset)>
 
 Returns -1. It makes no sense to try and search for a substring in
@@ -362,7 +357,7 @@ raw binary data.
 */
 
 static INTVAL
-cs_index(SHIM_INTERP, SHIM(STRING *source_string),
+cs_index(SHIM_INTERP, SHIM(STRING *src),
         SHIM(STRING *search_string), SHIM(UINTVAL offset))
 {
     ASSERT_ARGS(cs_index)
@@ -371,7 +366,7 @@ cs_index(SHIM_INTERP, SHIM(STRING *source_string),
 
 /*
 
-=item C<static INTVAL cs_rindex(PARROT_INTERP, STRING *source_string, STRING
+=item C<static INTVAL cs_rindex(PARROT_INTERP, STRING *src, STRING
 *search_string, UINTVAL offset)>
 
 Returns -1. It makes no sense to search for the last substring match
@@ -382,7 +377,7 @@ in raw binary data.
 */
 
 static INTVAL
-cs_rindex(SHIM_INTERP, SHIM(STRING *source_string),
+cs_rindex(SHIM_INTERP, SHIM(STRING *src),
         SHIM(STRING *search_string), SHIM(UINTVAL offset))
 {
     ASSERT_ARGS(cs_rindex)
@@ -391,7 +386,7 @@ cs_rindex(SHIM_INTERP, SHIM(STRING *source_string),
 
 /*
 
-=item C<static UINTVAL validate(PARROT_INTERP, STRING *source_string)>
+=item C<static UINTVAL validate(PARROT_INTERP, STRING *src)>
 
 Returns 1. All sequential data is valid binary data.
 
@@ -401,7 +396,7 @@ Returns 1. All sequential data is valid binary data.
 
 /* Binary's always valid */
 static UINTVAL
-validate(SHIM_INTERP, SHIM(STRING *source_string))
+validate(SHIM_INTERP, SHIM(STRING *src))
 {
     ASSERT_ARGS(validate)
     return 1;
@@ -409,16 +404,15 @@ validate(SHIM_INTERP, SHIM(STRING *source_string))
 
 /*
 
-=item C<static INTVAL is_cclass(PARROT_INTERP, INTVAL flags, const STRING
-*source_string, UINTVAL offset)>
+=item C<static INTVAL is_cclass(PARROT_INTERP, INTVAL flags, const STRING *src,
+UINTVAL offset)>
 
 =cut
 
 */
 
 static INTVAL
-is_cclass(SHIM_INTERP, SHIM(INTVAL flags), SHIM(const STRING *source_string),
-        SHIM(UINTVAL offset))
+is_cclass(SHIM_INTERP, SHIM(INTVAL flags), SHIM(const STRING *src), SHIM(UINTVAL offset))
 {
     ASSERT_ARGS(is_cclass)
     return 0;
@@ -426,8 +420,8 @@ is_cclass(SHIM_INTERP, SHIM(INTVAL flags), SHIM(const STRING *source_string),
 
 /*
 
-=item C<static INTVAL find_cclass(PARROT_INTERP, INTVAL flags, STRING
-*source_string, UINTVAL offset, UINTVAL count)>
+=item C<static INTVAL find_cclass(PARROT_INTERP, INTVAL flags, STRING *src,
+UINTVAL offset, UINTVAL count)>
 
 =cut
 
@@ -435,7 +429,7 @@ is_cclass(SHIM_INTERP, SHIM(INTVAL flags), SHIM(const STRING *source_string),
 
 static INTVAL
 find_cclass(SHIM_INTERP, SHIM(INTVAL flags),
-            SHIM(STRING *source_string), UINTVAL offset, UINTVAL count)
+            SHIM(STRING *src), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(find_cclass)
     return offset + count;
@@ -443,8 +437,8 @@ find_cclass(SHIM_INTERP, SHIM(INTVAL flags),
 
 /*
 
-=item C<static INTVAL find_not_cclass(PARROT_INTERP, INTVAL flags, STRING
-*source_string, UINTVAL offset, UINTVAL count)>
+=item C<static INTVAL find_not_cclass(PARROT_INTERP, INTVAL flags, STRING *src,
+UINTVAL offset, UINTVAL count)>
 
 =cut
 
@@ -452,7 +446,7 @@ find_cclass(SHIM_INTERP, SHIM(INTVAL flags),
 
 static INTVAL
 find_not_cclass(SHIM_INTERP, SHIM(INTVAL flags),
-               SHIM(STRING *source_string), UINTVAL offset, UINTVAL count)
+               SHIM(STRING *src), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(find_not_cclass)
     return offset + count;
