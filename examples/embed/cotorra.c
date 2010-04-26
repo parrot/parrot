@@ -169,7 +169,7 @@ int cotorra_main(Parrot_Interp interp, int argc, const char **argv)
                 fail("Option needs argument");
             Parrot_set_trace(interp, getuintval(argv[i]));
         }
-        if (strcmp(argv[i], "--warnings") == 0) {
+        else if (strcmp(argv[i], "--warnings") == 0) {
             ++i;
             if (i >= argc)
                 fail("Option needs argument");
@@ -213,10 +213,10 @@ int cotorra_main(Parrot_Interp interp, int argc, const char **argv)
         return 0;
     }
 
-    if (i >= argc && ! module)
+    if (i >= argc && ! (module && stname))
         fail("No file to load");
     source = argv[i];
-    if (source) {
+    if (source && ! stname) {
         pf = Parrot_pbc_read(interp, source, 0);
         if (! pf)
             fail("Cannot load file");
@@ -232,7 +232,18 @@ int cotorra_main(Parrot_Interp interp, int argc, const char **argv)
         Parrot_PMC start = Parrot_PMC_get_pmc_strkey(interp, parrotns, name);
         if (Parrot_pmc_is_null(interp, start))
             fail("start sub not found");
-        Parrot_ext_call(interp, start, "->");
+        if (i < argc) {
+            int pos;
+            Parrot_PMC arg = Parrot_PMC_new(interp,
+                    Parrot_PMC_typenum(interp, "FixedStringArray"));
+            Parrot_PMC_set_intval(interp, arg, argc - i);
+            for (pos = 0; i < argc; ++i, ++pos) {
+                Parrot_PMC_set_string_intkey(interp, arg, pos, create_string(interp, argv[i]));
+            }
+            Parrot_ext_call(interp, start, "P->", arg);
+        }
+        else
+            Parrot_ext_call(interp, start, "->");
     }
     else {
         Parrot_runcode(interp, argc - i, argv + i);

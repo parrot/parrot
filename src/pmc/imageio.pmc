@@ -261,8 +261,10 @@ visit_todo_list_thaw(PARROT_INTERP, ARGIN(PMC* info))
       case enum_PackID_normal:
         {
             const INTVAL type = VTABLE_shift_integer(interp, info);
-            if (type <= 0 || type > interp->n_vtable_max)
+            if (type <= 0 || type > interp->n_vtable_max) {
+	        abort();
                 Parrot_ex_throw_from_c_args(interp, NULL, 1, "Unknown PMC type to thaw %d", type);
+            }
 
             pmc = Parrot_pmc_new_noinit(interp, type);
             VTABLE_thaw(interp, pmc, info);
@@ -274,6 +276,7 @@ visit_todo_list_thaw(PARROT_INTERP, ARGIN(PMC* info))
         }
         break;
       default:
+        abort();
         Parrot_ex_throw_from_c_args(interp, NULL, 1, "Unknown PMC id args thaw %d", packid_flags);
         break;
     }
