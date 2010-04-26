@@ -2749,7 +2749,7 @@ pf_debug_unpack(PARROT_INTERP, ARGOUT(PackFile_Segment *self), ARGIN(const opcod
 
     /* Allocate space for mappings vector. */
     debug->mappings = mem_gc_allocate_n_zeroed_typed(interp,
-            debug->num_mappings + 1, PackFile_DebugFilenameMapping);
+            debug->num_mappings, PackFile_DebugFilenameMapping);
 
     /* Read in each mapping. */
     for (i = 0; i < debug->num_mappings; i++) {
