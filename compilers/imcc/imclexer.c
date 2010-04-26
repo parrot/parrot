@@ -5702,6 +5702,7 @@ static void
 scan_file(PARROT_INTERP, macro_frame_t *frame, FILE *file, void *yyscanner)
 {
     yyguts_t * const yyg      = (yyguts_t *)yyscanner;
+    const      int   oldline  = IMCC_INFO(interp)->line;
     frame->buffer             = YY_CURRENT_BUFFER;
     frame->s.next             = (parser_state_t *)IMCC_INFO(interp)->frames;
     IMCC_INFO(interp)->frames = frame;
@@ -5711,6 +5712,8 @@ scan_file(PARROT_INTERP, macro_frame_t *frame, FILE *file, void *yyscanner)
     IMCC_INFO(interp)->line   = 0;
 
     yy_switch_to_buffer(yy_create_buffer(file,YY_BUF_SIZE,yyscanner),yyscanner);
+
+    IMCC_INFO(interp)->line   = oldline;
 }
 
 void
