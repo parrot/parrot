@@ -943,7 +943,7 @@ $(INSTALLABLEPBCTOEXE) : $(PBC_TO_EXE) src/install_config$(O)
 $(INSTALLABLENCITHUNKGEN) : parrot_nci_thunk_gen.pbc $(PBC_TO_EXE) src/install_config$(O)
 	$(PBC_TO_EXE) parrot_nci_thunk_gen.pbc --install
 
-$(INSTALLABLETAPIR) : tapir.pbc $(PBC_TO_EXE)
+$(INSTALLABLETAPIR) : tapir.pbc $(PBC_TO_EXE) src/install_config$(O)
 	$(PBC_TO_EXE) tapir.pbc --install
 
 #
