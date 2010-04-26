@@ -139,7 +139,6 @@ sub _init {
         -Wpointer-sign
         -Wreturn-type
         -Wsequence-point
-        -Wno-shadow
         -Wsign-compare
         -Wstrict-aliasing
         -Wstrict-aliasing=2
