@@ -704,15 +704,6 @@ free_buffer(SHIM_INTERP,
     ASSERT_ARGS(free_buffer)
     Variable_Size_Pool * const mem_pool = (Variable_Size_Pool *)pool->mem_pool;
 
-    /* XXX Jarkko reported that on irix pool->mem_pool was NULL, which really
-     * shouldn't happen */
-    if (mem_pool) {
-        if (!PObj_COW_TEST(b))
-            mem_pool->guaranteed_reclaimable += Buffer_buflen(b);
-        else
-            mem_pool->possibly_reclaimable   += Buffer_buflen(b);
-    }
-
     Buffer_buflen(b) = 0;
 }
 

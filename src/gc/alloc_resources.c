@@ -601,15 +601,16 @@ move_one_buffer(PARROT_INTERP, ARGMOD(Buffer *old_buf), ARGMOD(char *new_pool_pt
         }
 
         /* buffer has already been moved; just change the header */
-        if (PObj_COW_TEST(old_buf)
-        && (flags && *flags & Buffer_moved_FLAG)) {
+        if (flags && (*flags & Buffer_shared_FLAG)
+                  && (*flags & Buffer_moved_FLAG)) {
             /* Find out who else references our data */
             Buffer * const hdr = *((Buffer **)Buffer_bufstart(old_buf));
 
             PARROT_ASSERT(PObj_is_COWable_TEST(old_buf));
 
             /* Make sure they know that we own it too */
-            PObj_COW_SET(hdr);
+            /* Set Buffer_shared_FLAG in new buffer */
+            *Buffer_bufrefcountptr(hdr) |= Buffer_shared_FLAG;
 
             /* Now make sure we point to where the other guy does */
             Buffer_bufstart(old_buf) = Buffer_bufstart(hdr);
@@ -628,25 +629,26 @@ move_one_buffer(PARROT_INTERP, ARGMOD(Buffer *old_buf), ARGMOD(char *new_pool_pt
             memcpy(new_pool_ptr, Buffer_bufstart(old_buf),
                                  Buffer_buflen(old_buf));
 
-            /* If we're COW */
-            if (PObj_COW_TEST(old_buf)) {
+            /* If we're shared */
+            if (flags && (*flags & Buffer_shared_FLAG)) {
                 PARROT_ASSERT(PObj_is_COWable_TEST(old_buf));
 
                 /* Let the old buffer know how to find us */
                 *((Buffer **)Buffer_bufstart(old_buf)) = old_buf;
 
-                /* No guarantees that our data is still COW, so
-                 * assume not, and let the above code fix-up */
-                PObj_COW_CLEAR(old_buf);
-
                 /* Finally, let the tail know that we've moved, so
                  * that any other references can know to look for
                  * us and not re-copy */
-                if (flags)
-                    *flags |= Buffer_moved_FLAG;
+                *flags |= Buffer_moved_FLAG;
             }
 
             Buffer_bufstart(old_buf) = new_pool_ptr;
+
+            /* No guarantees that our data is still shared, so
+                * assume not, and let the above code fix-up */
+            /* Drop shared FLAG in new buffer */
+            *Buffer_bufrefcountptr(old_buf) &= ~Buffer_shared_FLAG;
+
 
             if (PObj_is_string_TEST(old_buf))
                 ((STRING *)old_buf)->strstart =

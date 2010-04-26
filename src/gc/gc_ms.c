@@ -894,11 +894,6 @@ gc_ms_reallocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer),
 
     copysize = Buffer_buflen(buffer);
 
-    if (!PObj_COW_TEST(buffer))
-        pool->guaranteed_reclaimable += copysize;
-    else
-        pool->possibly_reclaimable   += copysize;
-
     mem = (char *)mem_allocate(interp, interp->mem_pools, new_size, pool);
     mem = aligned_mem(buffer, mem);
 
@@ -1007,11 +1002,6 @@ gc_ms_reallocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str),
 
     /* only copy used memory, not total string buffer */
     copysize = str->bufused;
-
-    if (!PObj_COW_TEST(str))
-        pool->guaranteed_reclaimable += Buffer_buflen(str);
-    else
-        pool->possibly_reclaimable   += Buffer_buflen(str);
 
     mem = (char *)mem_allocate(interp, interp->mem_pools, new_size, pool);
     mem += sizeof (void *);

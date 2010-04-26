@@ -142,8 +142,6 @@ typedef enum PObj_enum {
     PObj_sysmem_FLAG            = POBJ_FLAG(15),
 
 /* PObj usage FLAGs, COW & GC */
-    /* Mark the contents as Copy On Write, that we are piggybacking on another string. */
-    PObj_COW_FLAG               = POBJ_FLAG(16),
     /* The Buffer allows COW copies, and may have some. */
     PObj_is_COWable_FLAG        = POBJ_FLAG(17),
     /* Private flag for the GC system. Set if the PObj's in use as
@@ -207,10 +205,6 @@ typedef enum PObj_enum {
 
 #define PObj_flags_SETTO(o, f) PObj_get_FLAGS(o) = (f)
 #define PObj_flags_CLEARALL(o) PObj_flags_SETTO((o), 0)
-
-#define PObj_COW_TEST(o) PObj_flag_TEST(COW, o)
-#define PObj_COW_SET(o) PObj_flag_SET(COW, o)
-#define PObj_COW_CLEAR(o) PObj_flag_CLEAR(COW, o)
 
 #define PObj_is_COWable_TEST(o) PObj_flag_TEST(is_COWable, o)
 #define PObj_is_COWable_SET(o) PObj_flag_SET(is_COWable, o)
@@ -302,17 +296,11 @@ typedef enum PObj_enum {
 #define PObj_is_shared_CLEAR(o) PObj_flag_CLEAR(is_shared, o)
 
 /* some combinations */
-#define PObj_is_cowed_TESTALL(o) (PObj_get_FLAGS(o) & \
-            (PObj_COW_FLAG|PObj_constant_FLAG|PObj_external_FLAG))
-#define PObj_is_cowed_SETALL(o) (PObj_get_FLAGS(o) |= \
-            (PObj_COW_FLAG|PObj_constant_FLAG|PObj_external_FLAG))
-
 #define PObj_is_external_or_free_TESTALL(o) (PObj_get_FLAGS(o) & \
             (UINTVAL)(PObj_external_FLAG|PObj_on_free_list_FLAG))
 
 #define PObj_is_external_CLEARALL(o) (PObj_get_FLAGS(o) &= \
-            ~(UINTVAL)(PObj_COW_FLAG| \
-                       PObj_external_FLAG|PObj_sysmem_FLAG))
+            ~(UINTVAL)(PObj_external_FLAG|PObj_sysmem_FLAG))
 
 #define PObj_is_live_or_free_TESTALL(o) (PObj_get_FLAGS(o) & \
         (PObj_live_FLAG | PObj_on_free_list_FLAG))

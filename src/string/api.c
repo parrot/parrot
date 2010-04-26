@@ -374,24 +374,18 @@ Parrot_str_copy(PARROT_INTERP, ARGMOD(STRING *s))
 
     /* We set COW flag to avoid cloning buffer in compact_pool */
 
-    if (PObj_constant_TEST(s)) {
-        d = Parrot_gc_new_string_header(interp,
-            PObj_get_FLAGS(s) & ~PObj_constant_FLAG);
-        PObj_COW_SET(s);
-        STRUCT_COPY(d, s);
-        /* we can't move the memory, because constants aren't
-         * scanned in compact_pool, therefore the other end
-         * would point to garbage.
-         */
-        PObj_constant_CLEAR(d);
-        PObj_external_SET(d);
+    d = Parrot_gc_new_string_header(interp,
+        PObj_get_FLAGS(s) & ~PObj_constant_FLAG);
+    STRUCT_COPY(d, s);
+
+    /* Now check that buffer allocated from pool and affected by compacting */
+    if (PObj_is_movable_TESTALL(s)) {
+        /* If so, mark it as shared */
+        INTVAL *buffer_flags = Buffer_bufrefcountptr(d);
+        *buffer_flags |= Buffer_shared_FLAG;
     }
-    else {
-        d = Parrot_gc_new_string_header(interp, PObj_get_FLAGS(s));
-        PObj_COW_SET(s);
-        STRUCT_COPY(d, s);
-        PObj_sysmem_CLEAR(d);
-    }
+
+    PARROT_ASSERT(PObj_is_movable_TESTALL(s) == PObj_is_movable_TESTALL(d));
 
     return d;
 }
