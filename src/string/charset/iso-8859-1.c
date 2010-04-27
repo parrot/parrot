@@ -47,7 +47,7 @@ static STRING* downcase_first(PARROT_INTERP, ARGIN(const STRING *src))
 
 static INTVAL find_cclass(PARROT_INTERP,
     INTVAL flags,
-    ARGIN(STRING *src),
+    ARGIN(const STRING *src),
     UINTVAL offset,
     UINTVAL count)
         __attribute__nonnull__(1)
@@ -55,7 +55,7 @@ static INTVAL find_cclass(PARROT_INTERP,
 
 static INTVAL find_not_cclass(PARROT_INTERP,
     INTVAL flags,
-    ARGIN(STRING *src),
+    ARGIN(const STRING *src),
     UINTVAL offset,
     UINTVAL count)
         __attribute__nonnull__(1)
@@ -84,17 +84,17 @@ static STRING* titlecase_first(PARROT_INTERP, ARGIN(const STRING *src))
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static STRING * to_charset(PARROT_INTERP, ARGIN(STRING *src))
+static STRING * to_charset(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING * to_iso_8859_1(PARROT_INTERP, ARGIN(STRING *src))
+static STRING * to_iso_8859_1(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING * to_unicode(PARROT_INTERP, ARGIN(STRING *src))
+static STRING * to_unicode(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -108,7 +108,7 @@ static STRING* upcase_first(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
+static UINTVAL validate(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -165,7 +165,7 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<static STRING * to_iso_8859_1(PARROT_INTERP, STRING *src)>
+=item C<static STRING * to_iso_8859_1(PARROT_INTERP, const STRING *src)>
 
 Converts STRING C<src> to iso-8859-1 in STRING C<dest>.
 
@@ -175,7 +175,7 @@ Converts STRING C<src> to iso-8859-1 in STRING C<dest>.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-to_iso_8859_1(PARROT_INTERP, ARGIN(STRING *src))
+to_iso_8859_1(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(to_iso_8859_1)
     UINTVAL offs, src_len;
@@ -201,7 +201,7 @@ to_iso_8859_1(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<static STRING * to_unicode(PARROT_INTERP, STRING *src)>
+=item C<static STRING * to_unicode(PARROT_INTERP, const STRING *src)>
 
 Converts STRING C<src> to unicode STRING C<dest>.
 
@@ -211,7 +211,7 @@ Converts STRING C<src> to unicode STRING C<dest>.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-to_unicode(PARROT_INTERP, ARGIN(STRING *src))
+to_unicode(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(to_unicode)
     STRING * dest = Parrot_str_clone(interp, src);
@@ -241,7 +241,7 @@ to_unicode(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<static STRING * to_charset(PARROT_INTERP, STRING *src)>
+=item C<static STRING * to_charset(PARROT_INTERP, const STRING *src)>
 
 Converts the STRING C<src> to an ISO-8859-1 STRING C<dest>.
 
@@ -252,7 +252,7 @@ Converts the STRING C<src> to an ISO-8859-1 STRING C<dest>.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static STRING *
-to_charset(PARROT_INTERP, ARGIN(STRING *src))
+to_charset(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(to_charset)
     const charset_converter_t conversion_func =
@@ -513,7 +513,7 @@ titlecase_first(PARROT_INTERP, ARGIN(const STRING *src))
 
 /*
 
-=item C<static UINTVAL validate(PARROT_INTERP, STRING *src)>
+=item C<static UINTVAL validate(PARROT_INTERP, const STRING *src)>
 
 Returns 1 if the STRING C<src> is a valid ISO-8859-1 STRING. Returns 0 otherwise.
 
@@ -522,7 +522,7 @@ Returns 1 if the STRING C<src> is a valid ISO-8859-1 STRING. Returns 0 otherwise
 */
 
 static UINTVAL
-validate(PARROT_INTERP, ARGIN(STRING *src))
+validate(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(validate)
     UINTVAL offset;
@@ -562,8 +562,8 @@ is_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src), UINTVAL offset)
 
 /*
 
-=item C<static INTVAL find_cclass(PARROT_INTERP, INTVAL flags, STRING *src,
-UINTVAL offset, UINTVAL count)>
+=item C<static INTVAL find_cclass(PARROT_INTERP, INTVAL flags, const STRING
+*src, UINTVAL offset, UINTVAL count)>
 
 Find a character in the given character class.  Delegates to the find_cclass
 method of the encoding plugin.
@@ -574,10 +574,10 @@ method of the encoding plugin.
 
 static INTVAL
 find_cclass(PARROT_INTERP, INTVAL flags,
-            ARGIN(STRING *src), UINTVAL offset, UINTVAL count)
+                ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(find_cclass)
-    UINTVAL pos = offset;
+    const UINTVAL pos = offset;
     UINTVAL end = offset + count;
 
     end = src->strlen < end ? src->strlen : end;
@@ -587,8 +587,8 @@ find_cclass(PARROT_INTERP, INTVAL flags,
 
 /*
 
-=item C<static INTVAL find_not_cclass(PARROT_INTERP, INTVAL flags, STRING *src,
-UINTVAL offset, UINTVAL count)>
+=item C<static INTVAL find_not_cclass(PARROT_INTERP, INTVAL flags, const STRING
+*src, UINTVAL offset, UINTVAL count)>
 
 =cut
 
@@ -596,7 +596,7 @@ UINTVAL offset, UINTVAL count)>
 
 static INTVAL
 find_not_cclass(PARROT_INTERP, INTVAL flags,
-                ARGIN(STRING *src), UINTVAL offset, UINTVAL count)
+                ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(find_not_cclass)
     UINTVAL pos = offset;
@@ -682,7 +682,8 @@ Parrot_charset_iso_8859_1_init(PARROT_INTERP)
 
 /*
 
-=item C<STRING * charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP, STRING *src)>
+=item C<STRING * charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP, const STRING
+*src)>
 
 Converts STRING C<src> in ISO-8859-1 to ASCII STRING C<dest>.
 
@@ -693,7 +694,7 @@ Converts STRING C<src> in ISO-8859-1 to ASCII STRING C<dest>.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP, ARGIN(STRING *src))
+charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(charset_cvt_iso_8859_1_to_ascii)
     UINTVAL offs;

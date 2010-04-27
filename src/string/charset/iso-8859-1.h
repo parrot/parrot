@@ -18,7 +18,8 @@
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-STRING * charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP, ARGIN(STRING *src))
+STRING * charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP,
+    ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

@@ -45,8 +45,8 @@ static size_t compute_hash(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 static INTVAL cs_rindex(PARROT_INTERP,
-    SHIM(STRING *src),
-    SHIM(STRING *search_string),
+    SHIM(const STRING *src),
+    SHIM(const STRING *search_string),
     SHIM(UINTVAL offset))
         __attribute__nonnull__(1);
 
@@ -65,7 +65,7 @@ static STRING* downcase_first(PARROT_INTERP, SHIM(const STRING *src))
 
 static INTVAL find_cclass(PARROT_INTERP,
     INTVAL flags,
-    ARGIN(STRING *src),
+    ARGIN(const STRING *src),
     UINTVAL offset,
     UINTVAL count)
         __attribute__nonnull__(1)
@@ -73,7 +73,7 @@ static INTVAL find_cclass(PARROT_INTERP,
 
 static INTVAL find_not_cclass(PARROT_INTERP,
     INTVAL flags,
-    ARGIN(STRING *src),
+    ARGIN(const STRING *src),
     UINTVAL offset,
     UINTVAL count)
         __attribute__nonnull__(1)
@@ -108,7 +108,7 @@ static STRING* titlecase_first(PARROT_INTERP, SHIM(const STRING *src))
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* to_charset(PARROT_INTERP, ARGIN(STRING *src))
+static STRING* to_charset(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -124,7 +124,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING* upcase_first(PARROT_INTERP, SHIM(const STRING *src))
         __attribute__nonnull__(1);
 
-static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
+static UINTVAL validate(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -222,7 +222,7 @@ get_graphemes(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL c
 
 /*
 
-=item C<static STRING* to_charset(PARROT_INTERP, STRING *src)>
+=item C<static STRING* to_charset(PARROT_INTERP, const STRING *src)>
 
 Converts input STRING C<src> to unicode STRING C<dest>.
 
@@ -232,7 +232,7 @@ Converts input STRING C<src> to unicode STRING C<dest>.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-to_charset(PARROT_INTERP, ARGIN(STRING *src))
+to_charset(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(to_charset)
     const charset_converter_t conversion_func =
@@ -682,7 +682,7 @@ compare(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
 
 /*
 
-=item C<static INTVAL cs_rindex(PARROT_INTERP, STRING *src, STRING
+=item C<static INTVAL cs_rindex(PARROT_INTERP, const STRING *src, const STRING
 *search_string, UINTVAL offset)>
 
 Finds the last index of substring C<search_string> in STRING C<src>,
@@ -693,7 +693,8 @@ starting from C<offset>. Not implemented.
 */
 
 static INTVAL
-cs_rindex(PARROT_INTERP, SHIM(STRING *src), SHIM(STRING *search_string), SHIM(UINTVAL offset))
+cs_rindex(PARROT_INTERP, SHIM(const STRING *src),
+        SHIM(const STRING *search_string), SHIM(UINTVAL offset))
 {
     ASSERT_ARGS(cs_rindex)
     /* TODO: https://trac.parrot.org/parrot/wiki/StringsTasklist Implement this. */
@@ -703,7 +704,7 @@ cs_rindex(PARROT_INTERP, SHIM(STRING *src), SHIM(STRING *search_string), SHIM(UI
 
 /*
 
-=item C<static UINTVAL validate(PARROT_INTERP, STRING *src)>
+=item C<static UINTVAL validate(PARROT_INTERP, const STRING *src)>
 
 Returns 1 if the STRING C<src> is a valid unicode string, returns 0 otherwise.
 
@@ -712,7 +713,7 @@ Returns 1 if the STRING C<src> is a valid unicode string, returns 0 otherwise.
 */
 
 static UINTVAL
-validate(PARROT_INTERP, ARGIN(STRING *src))
+validate(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(validate)
     UINTVAL     offset;
@@ -856,15 +857,15 @@ is_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src), UINTVAL offset)
 
 /*
 
-=item C<static INTVAL find_cclass(PARROT_INTERP, INTVAL flags, STRING *src,
-UINTVAL offset, UINTVAL count)>
+=item C<static INTVAL find_cclass(PARROT_INTERP, INTVAL flags, const STRING
+*src, UINTVAL offset, UINTVAL count)>
 
 =cut
 
 */
 
 static INTVAL
-find_cclass(PARROT_INTERP, INTVAL flags, ARGIN(STRING *src), UINTVAL offset, UINTVAL count)
+find_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(find_cclass)
     String_iter iter;
@@ -896,15 +897,16 @@ find_cclass(PARROT_INTERP, INTVAL flags, ARGIN(STRING *src), UINTVAL offset, UIN
 
 /*
 
-=item C<static INTVAL find_not_cclass(PARROT_INTERP, INTVAL flags, STRING *src,
-UINTVAL offset, UINTVAL count)>
+=item C<static INTVAL find_not_cclass(PARROT_INTERP, INTVAL flags, const STRING
+*src, UINTVAL offset, UINTVAL count)>
 
 =cut
 
 */
 
 static INTVAL
-find_not_cclass(PARROT_INTERP, INTVAL flags, ARGIN(STRING *src), UINTVAL offset, UINTVAL count)
+find_not_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src),
+        UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(find_not_cclass)
     String_iter iter;
