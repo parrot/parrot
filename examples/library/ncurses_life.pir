@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -478,7 +478,7 @@ check_alive:
     if count > 3 goto space
 
 star:
-    substr new_world, pos, 1, "*"
+    new_world = replace new_world, pos, 1, "*"
 
 space:    # is space already
     inc pos
@@ -608,10 +608,10 @@ loop:
     unless len goto out
     $S0 = substr line, 0,1
     eq $S0, "#", check_format
-    chopn line, 1        # \n
+    line = chopn line, 1        # \n
     dec len
     if format != PICTURE goto not_pic
-    substr world, pos, len, line
+    world = replace world, pos, len, line
     pos = pos + size
     goto loop
 
@@ -777,7 +777,7 @@ lp2:
 
     # TODO abs/rel and bounds checking
     #world[c] = "*"
-    substr world, c, 1, "*"
+    world = replace world, c, 1, "*"
     if s < len goto lp2
 done:
 nok:
