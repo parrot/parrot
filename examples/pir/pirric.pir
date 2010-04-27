@@ -262,7 +262,8 @@ start:
     func = get_global ['Runner'], funcname
     $I0 = defined func
     if $I0 goto good
-    say 'No func!'
+    print funcname
+    die ': No func!'
     exit 1
 good:
     keywords [key] = func
@@ -416,7 +417,7 @@ done:
 
     .local pmc vars, var
     vars = getattribute self, 'vars'
-    upcase varname
+    varname = upcase varname
     var = vars[varname]
     .return(var)
 .end
@@ -428,7 +429,7 @@ done:
 
     .local pmc vars, var
     vars = getattribute self, 'vars'
-    upcase varname
+    varname = upcase varname
     vars[varname] = value
 .end
 
@@ -595,7 +596,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_NEW :method
+.sub predef_NEW :method :nsentry
     .param pmc tokenizer
 
     .local pmc args
@@ -630,7 +631,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_ISA :method
+.sub predef_ISA :method :nsentry
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -646,7 +647,7 @@ fail:
 
 #-----------------------------------------------------------------------
 
-.sub predef_GETPARROTINTERP :method
+.sub predef_GETPARROTINTERP :method :nsentry
     .param pmc tokenizer
 
     $P0 = getinterp
@@ -654,7 +655,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_CHR_S :method
+.sub predef_CHR_S :method :nsentry
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -664,7 +665,7 @@ fail:
     $I0 = $P2
     $S0 = chr $I0
     $I1 = find_encoding 'utf8'
-    trans_encoding $S0, $I1
+    $S0 = trans_encoding $S0, $I1
     $P3 = new 'String'
     $P3 = $S0
     .return($P3)
@@ -673,7 +674,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_ASC :method
+.sub predef_ASC :method :nsentry
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -690,7 +691,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_LEN :method
+.sub predef_LEN :method :nsentry
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -708,7 +709,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_LEFT_S :method
+.sub predef_LEFT_S :method :nsentry
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -728,7 +729,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_RIGHT_S :method
+.sub predef_RIGHT_S :method :nsentry
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -750,7 +751,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_MID_S :method
+.sub predef_MID_S :method :nsentry
     .param pmc tokenizer
 
     $P0 = tokenizer.'get'()
@@ -777,7 +778,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_COMPLEX :method
+.sub predef_COMPLEX :method :nsentry
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -796,7 +797,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_COMPREG :method
+.sub predef_COMPREG :method :nsentry
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -810,7 +811,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_EXP :method
+.sub predef_EXP :method :nsentry
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -823,7 +824,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_LN :method
+.sub predef_LN :method :nsentry
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -836,7 +837,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_SIN :method
+.sub predef_SIN :method :nsentry
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -849,7 +850,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_SINH :method
+.sub predef_SINH :method :nsentry
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -862,7 +863,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_COS :method
+.sub predef_COS :method :nsentry
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -875,7 +876,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_COSH :method
+.sub predef_COSH :method :nsentry
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -888,7 +889,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_TAN :method
+.sub predef_TAN :method :nsentry
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -901,7 +902,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_TANH :method
+.sub predef_TANH :method :nsentry
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -914,7 +915,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_ASIN :method
+.sub predef_ASIN :method :nsentry
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -927,7 +928,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_ACOS :method
+.sub predef_ACOS :method :nsentry
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -940,7 +941,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_ATAN :method
+.sub predef_ATAN :method :nsentry
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -953,7 +954,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_SQR :method
+.sub predef_SQR :method :nsentry
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -966,7 +967,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub get_args_and_call :method
+.sub get_args_and_call :method :nsentry
     .param pmc tokenizer
     .param pmc fun
 
@@ -1010,7 +1011,7 @@ check:
     unless $I0 goto fail
 
     $S0 = token
-    upcase $S0
+    $S0 = upcase $S0
     #print $S0
 
 # Some predefined functions:
@@ -1668,7 +1669,7 @@ check:
     key = 'PRINT'
 
 findkey:
-    upcase key
+    key = upcase key
     .local pmc keywords
     keywords = get_hll_global 'keywords'
     $I0 = keywords
@@ -1750,13 +1751,13 @@ setattrs:
 .end
 
 #-----------------------------------------------------------------------
-.sub func_CLEAR :method
+.sub func_CLEAR :method :nsentry
     .param pmc tokenizer
 
     self.'clear_all'()
 .end
 
-.sub func_CONT :method
+.sub func_CONT :method :nsentry
     .param pmc tokenizer
 
     .local pmc cont
@@ -1764,7 +1765,7 @@ setattrs:
     throw_typed(cont)
 .end
 
-.sub func_END :method
+.sub func_END :method :nsentry
     .param pmc tokenizer
 
     .local pmc end
@@ -1772,7 +1773,7 @@ setattrs:
     throw_typed(end)
 .end
 
-.sub func_EXIT :method
+.sub func_EXIT :method :nsentry
     .param pmc tokenizer
 
     .local pmc ex_exit
@@ -1780,7 +1781,7 @@ setattrs:
     throw_typed(ex_exit)
 .end
 
-.sub func_ERROR :method
+.sub func_ERROR :method :nsentry
     .param pmc tokenizer
 
     .local pmc arg
@@ -1790,21 +1791,21 @@ setattrs:
     UserError(msg)
 .end
 
-.sub func_FOR :method
+.sub func_FOR :method :nsentry
     .param pmc tokenizer
 
     .local pmc pvar
     pvar = tokenizer.'get'()
     .local string var
     var = pvar
-    upcase var
+    var = upcase var
     $P0 = tokenizer.'get'()
     ne $P0, '=', fail
     .local pmc value
     value = self.'evaluate'(tokenizer)
     $P0 = tokenizer.'get'()
     $S0 = $P0
-    upcase $S0
+    $S0 = upcase $S0
     ne $S0, 'TO', fail
 
     .local pmc limit
@@ -1815,7 +1816,7 @@ setattrs:
     $I0 = defined $P0
     unless $I0 goto default_step
     $S0 = $P0
-    upcase $S0
+    $S0 = upcase $S0
     ne $S0, 'STEP', fail
     increment = self.'evaluate'(tokenizer)
     goto prepare
@@ -1848,7 +1849,7 @@ fail:
     SyntaxError()
 .end
 
-.sub func_GOTO :method
+.sub func_GOTO :method :nsentry
     .param pmc tokenizer
 
     .local pmc arg
@@ -1865,7 +1866,7 @@ fail:
     SyntaxError()
 .end
 
-.sub func_GOSUB :method
+.sub func_GOSUB :method :nsentry
     .param pmc tokenizer
 
     .local pmc arg
@@ -1885,7 +1886,7 @@ fail:
     SyntaxError()
 .end
 
-.sub func_IF :method
+.sub func_IF :method :nsentry
     .param pmc tokenizer
 
     .local pmc arg
@@ -1896,7 +1897,7 @@ fail:
     $I0 = defined token
     unless $I0 goto fail
     $S0 = token
-    upcase $S0
+    $S0 = upcase $S0
     ne $S0, 'THEN', fail
 
     $I0 = defined arg
@@ -1917,7 +1918,7 @@ nextitem:
     $I0 = isa $P0, 'String'
     unless $I0 goto nextitem
     $S0 = $P0
-    upcase $S0
+    $S0 = upcase $S0
     eq $S0, 'ELSE', is_else
     eq $S0, 'IF', is_if
     goto nextitem
@@ -1935,7 +1936,7 @@ fail:
     SyntaxError()
 .end
 
-.sub func_LIST :method
+.sub func_LIST :method :nsentry
     .param pmc tokenizer
 
     .local pmc program
@@ -1944,7 +1945,7 @@ fail:
 
 .end
 
-.sub func_LOAD :method
+.sub func_LOAD :method :nsentry
     .param pmc tokenizer
 
     .local pmc arg
@@ -1959,7 +1960,7 @@ fail:
     $I1 = defined $P1
     unless $I1 goto fail
     $S1 = $P1
-    upcase $S1
+    $S1 = upcase $S1
     ne $S1, 'B', fail
     $S1 = arg
     pirric_aux_loadbytecode($S1)
@@ -1980,7 +1981,7 @@ fail:
     SyntaxError()
 .end
 
-.sub func_NEXT :method
+.sub func_NEXT :method :nsentry
     .param pmc tokenizer
 
     .local pmc stack
@@ -2017,7 +2018,7 @@ endloop:
     $P0 = pop stack
 .end
 
-.sub func_NEW :method
+.sub func_NEW :method :nsentry
     .param pmc tokenizer
 
     .local pmc newprogram
@@ -2031,19 +2032,19 @@ endloop:
     throw_typed(end)
 .end
 
-.sub func_ON :method
+.sub func_ON :method :nsentry
     .param pmc tokenizer
 
     .local pmc token
     token = tokenizer.'get'()
     $S0 = token
-    upcase $S0
+    $S0 = upcase $S0
     if $S0 == 'ERROR' goto on_error
     goto fail
 on_error:
     token = tokenizer.'get'()
     $S0 = token
-    upcase $S0
+    $S0 = upcase $S0
     if $S0 == 'GOTO' goto on_error_goto
     if $S0 == 'EXIT' goto on_error_exit
     goto fail
@@ -2064,7 +2065,7 @@ fail:
 finish:
 .end
 
-.sub func_PRINT :method
+.sub func_PRINT :method :nsentry
     .param pmc tokenizer
 
     .local pmc arg
@@ -2075,7 +2076,7 @@ finish:
 
 item:
     $S0 = arg
-    upcase $S0
+    $S0 = upcase $S0
     eq $S0, 'ELSE', endline
     arg = self.'evaluate'(tokenizer, arg)
 print_it:
@@ -2086,7 +2087,7 @@ print_it:
     eq arg, ';', nextitem
     eq arg, ',', comma
     $S0 = arg
-    upcase $S0
+    $S0 = upcase $S0
     eq $S0, 'ELSE', endline
     SyntaxError()
 comma:
@@ -2103,19 +2104,19 @@ nextitem:
     $I0 = defined arg
     unless $I0 goto finish
     $S0 = arg
-    upcase $S0
+    $S0 = upcase $S0
     eq $S0, 'ELSE', finish
     goto item
 finish:
 .end
 
-.sub func_REM :method
+.sub func_REM :method :nsentry
     .param pmc tokenizer
 
     # Do nothing
 .end
 
-.sub func_RETURN :method
+.sub func_RETURN :method :nsentry
     .param pmc tokenizer
 
     .local pmc line
@@ -2126,7 +2127,7 @@ fail:
     SyntaxError()
 .end
 
-.sub func_RUN :method
+.sub func_RUN :method :nsentry
     .param pmc tokenizer
 
     self.'clear_all'()
@@ -2143,7 +2144,7 @@ doit:
     throw_jump(line, numline)
 .end
 
-.sub func_SAVE :method
+.sub func_SAVE :method :nsentry
     .param pmc tokenizer
 
     .local pmc arg
@@ -2164,7 +2165,7 @@ fail:
     SyntaxError()
 .end
 
-.sub func_STOP :method
+.sub func_STOP :method :nsentry
     .param pmc tokenizer
 
     .local pmc line
@@ -2172,13 +2173,13 @@ fail:
     throw_typed(line)
 .end
 
-.sub func_TROFF :method
+.sub func_TROFF :method :nsentry
     .param pmc tokenizer
 
     self.'trace'(0)
 .end
 
-.sub func_TRON :method
+.sub func_TRON :method :nsentry
     .param pmc tokenizer
 
     self.'trace'(1)
