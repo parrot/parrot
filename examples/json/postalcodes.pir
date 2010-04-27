@@ -1,5 +1,5 @@
 #!../../parrot
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -64,11 +64,11 @@ END:
     close sock
 
     $I1 = find_charset 'unicode'
-    trans_charset json_result, $I1
+    json_result = trans_charset json_result, $I1
 
     # Strip off http headers.
     $I0 = index json_result, "\r\n\r\n"
-    substr json_result, 0, $I0, ""
+    json_result = replace json_result, 0, $I0, ""
 
     load_language 'data_json'
     $P1 = compreg 'data_json'
