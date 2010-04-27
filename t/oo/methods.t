@@ -21,11 +21,13 @@ Tests features related to the creation, addition, and execution of OO methods.
 
     create_library()
 
-    plan(5)
+    plan(6)
 
     loading_methods_from_file()
     loading_methods_from_eval()
     overridden_find_method()
+
+    overridden_core_pmc()
 
     delete_library()
 
@@ -125,6 +127,26 @@ END
 .end
 
 .namespace []
+
+.sub 'overridden_core_pmc'
+    .local string msg
+    msg = "able to invoke overridden method on core PMC (TT #1596)"
+    $P0 = new 'ResizablePMCArray'
+    push_eh jic
+        $I0 = $P0.'foo'()
+        is($I0, 1, msg) 
+        .return()
+  jic:
+    pop_eh
+    # remove the exception handler and the todo when this test passes
+    # so that future regressions are noisy.
+    todo('','cannot find method', msg)
+.end
+
+.namespace ['ResizablePMCArray']
+.sub 'foo' :method
+    .return(1)
+.end
 
 # Local Variables:
 #   mode: pir
