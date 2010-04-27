@@ -825,27 +825,27 @@ Column 6, if present, contains a description of what is being tested.
   target1:
     $I0 = index target, '\n'
     if $I0 == -1 goto target2
-    substr target, $I0, 2, "\n"
+    target = replace target, $I0, 2, "\n"
     goto target1
   target2:
     $I0 = index target, '\r'
     if $I0 == -1 goto target3
-    substr target, $I0, 2, "\r"
+    target = replace target, $I0, 2, "\r"
     goto target2
   target3:
     $I0 = index target, '\e'
     if $I0 == -1 goto target4
-    substr target, $I0, 2, "\e"
+    target = replace target, $I0, 2, "\e"
     goto target3
   target4:
     $I0 = index target, '\t'
     if $I0 == -1 goto target5
-    substr target, $I0, 2, "\t"
+    target = replace target, $I0, 2, "\t"
     goto target4
   target5:
     $I0 = index target, '\f'
     if $I0 == -1 goto target6
-    substr target, $I0, 2, "\f"
+    target = replace target, $I0, 2, "\f"
     goto target5
   target6:
     # handle \xHH, hex escape.
@@ -859,7 +859,7 @@ Column 6, if present, contains a description of what is being tested.
     if $I2 > $I1 goto target7
     $S0 = substr target, $I2, 2
     $S1 = hex_chr($S0)
-    substr target, $I0, 4, $S1
+    target = replace target, $I0, 4, $S1
 
     inc x_pos
     goto target6
