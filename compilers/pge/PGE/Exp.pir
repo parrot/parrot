@@ -362,7 +362,7 @@ tree as a PIR code object that can be compiled.
     args['I'] = ''
     $I0 = self['ignorecase']
     if $I0 == 0 goto ignorecase_end
-    args['I'] = 'downcase $S0'
+    args['I'] = '$S0 = downcase $S0'
     literal = downcase literal
   ignorecase_end:
 
