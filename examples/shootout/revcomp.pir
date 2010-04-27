@@ -1,5 +1,5 @@
 #!parrot
-# Copyright (C) 2005-2009, Parrot Foundation.
+# Copyright (C) 2005-2010, Parrot Foundation.
 # $Id$
 # Reads from stdin a file in the format made by fasta.pir
 # ./parrot -R jit
@@ -54,7 +54,7 @@ beginwhile:
 		print line
 		goto endif
 	else:
-		chopn line, 1
+		line = chopn line, 1
 		seq .= line
 	endif:
 	goto beginwhile
