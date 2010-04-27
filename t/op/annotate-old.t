@@ -25,7 +25,7 @@ be covered with pir based tests.
 
 TODO: {
     local $TODO = q|fails in fast runcore - TT #1135|
-        if $ENV{TEST_PROG_ARGS} =~ /--runcore=fast/;
+        if ($ENV{TEST_PROG_ARGS} || '') =~ /--runcore=fast/;
 
 pir_error_output_like( <<CODE, <<OUTPUT, 'unhandled exception from loaded function');
 .sub main :main
