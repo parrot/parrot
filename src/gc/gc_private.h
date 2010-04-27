@@ -171,6 +171,9 @@ typedef struct Memory_Block {
     struct Memory_Block *next;
     char *start;
     char *top;
+
+    /* Amount of freed memory. Used in compact_pool */
+    size_t freed;
 } Memory_Block;
 
 typedef struct Variable_Size_Pool {
@@ -393,26 +396,6 @@ void Parrot_gc_clear_live_bits(SHIM_INTERP,
     ARGIN(const Fixed_Size_Pool *pool))
         __attribute__nonnull__(2);
 
-PARROT_CANNOT_RETURN_NULL
-PMC_Attribute_Pool * Parrot_gc_get_attribute_pool(SHIM_INTERP,
-    ARGMOD(Memory_Pools *mem_pools),
-    size_t attrib_size)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*mem_pools);
-
-PARROT_CANNOT_RETURN_NULL
-void * Parrot_gc_get_attributes_from_pool(PARROT_INTERP,
-    ARGMOD(PMC_Attribute_Pool * pool))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(* pool);
-
-void Parrot_gc_initialize_fixed_size_pools(SHIM_INTERP,
-    ARGMOD(Memory_Pools *mem_pools),
-    size_t init_num_pools)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*mem_pools);
-
 void Parrot_gc_run_init(SHIM_INTERP, ARGMOD(Memory_Pools *mem_pools))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*mem_pools);
@@ -459,15 +442,6 @@ int Parrot_gc_trace_root(PARROT_INTERP,
     , PARROT_ASSERT_ARG(new_arena))
 #define ASSERT_ARGS_Parrot_gc_clear_live_bits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pool))
-#define ASSERT_ARGS_Parrot_gc_get_attribute_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(mem_pools))
-#define ASSERT_ARGS_Parrot_gc_get_attributes_from_pool \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pool))
-#define ASSERT_ARGS_Parrot_gc_initialize_fixed_size_pools \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(mem_pools))
 #define ASSERT_ARGS_Parrot_gc_run_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(mem_pools))
 #define ASSERT_ARGS_Parrot_gc_sweep_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -488,10 +462,6 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 char * aligned_mem(SHIM(const Buffer *buffer), ARGIN(char *mem))
         __attribute__nonnull__(2);
-
-PARROT_CONST_FUNCTION
-PARROT_WARN_UNUSED_RESULT
-size_t aligned_string_size(size_t len);
 
 void check_buffer_ptr(
     ARGMOD(Buffer * pobj),
@@ -557,7 +527,6 @@ void Parrot_gc_merge_memory_pools(
 
 #define ASSERT_ARGS_aligned_mem __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(mem))
-#define ASSERT_ARGS_aligned_string_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_check_buffer_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pobj) \
     , PARROT_ASSERT_ARG(pool))
@@ -596,12 +565,6 @@ PARROT_CANNOT_RETURN_NULL
 void * gc_ms_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
         __attribute__nonnull__(1);
 
-PARROT_CANNOT_RETURN_NULL
-void * gc_ms_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pmc);
-
 void gc_ms_allocate_string_storage(PARROT_INTERP,
     ARGOUT(STRING *str),
     size_t size)
@@ -635,9 +598,6 @@ void Parrot_gc_ms_init(PARROT_INTERP)
 #define ASSERT_ARGS_gc_ms_allocate_fixed_size_storage \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_gc_ms_allocate_pmc_attributes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_ms_allocate_string_storage __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str))

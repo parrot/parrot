@@ -383,14 +383,9 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     int emit)
 {
     ASSERT_ARGS(INS)
-    int i, op, len;
-    int dirs = 0;
-    Instruction *ins;
-    op_info_t   *op_info;
-    char fullname[64] = "", format[128] = "";
 
     if (STREQ(name, ".annotate")) {
-        ins = _mk_instruction(name, "", n, r, 0);
+        Instruction *ins = _mk_instruction(name, "", n, r, 0);
         if (emit)
             return emitb(interp, unit, ins);
         else
@@ -402,176 +397,183 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     ||  (STREQ(name, "get_params"))
     ||  (STREQ(name, "set_returns")))
         return var_arg_ins(interp, unit, name, r, n, emit);
+    else {
+        Instruction *ins;
+        int i, op, len;
+        int dirs = 0;
+        op_info_t   *op_info;
+        char fullname[64] = "", format[128] = "";
 
-    op_fullname(fullname, name, r, n, keyvec);
-    op = interp->op_lib->op_code(interp, fullname, 1);
+        op_fullname(fullname, name, r, n, keyvec);
+        op = interp->op_lib->op_code(interp, fullname, 1);
 
-    /* maybe we have a fullname */
-    if (op < 0)
-        op = interp->op_lib->op_code(interp, name, 1);
+        /* maybe we have a fullname */
+        if (op < 0)
+            op = interp->op_lib->op_code(interp, name, 1);
 
-    /* still wrong, try reverse compare */
-    if (op < 0) {
-        const char * const n_name = try_rev_cmp(name, r);
-        if (n_name) {
-            name = n_name;
-            op_fullname(fullname, name, r, n, keyvec);
-            op   = interp->op_lib->op_code(interp, fullname, 1);
+        /* still wrong, try reverse compare */
+        if (op < 0) {
+            const char * const n_name = try_rev_cmp(name, r);
+            if (n_name) {
+                name = n_name;
+                op_fullname(fullname, name, r, n, keyvec);
+                op   = interp->op_lib->op_code(interp, fullname, 1);
+            }
         }
-    }
 
-    /* still wrong, try to find an existing op */
-    if (op < 0)
-        op = try_find_op(interp, unit, name, r, n, keyvec, emit);
+        /* still wrong, try to find an existing op */
+        if (op < 0)
+            op = try_find_op(interp, unit, name, r, n, keyvec, emit);
 
-    if (op < 0) {
-        int ok = 0;
+        if (op < 0) {
+            int ok = 0;
 
-        /* check mixed constants */
-        ins = IMCC_subst_constants_umix(interp, unit, name, r, n + 1);
-        if (ins)
-            goto found_ins;
-
-        /* and finally multiple constants */
-        ins = IMCC_subst_constants(interp, unit, name, r, n + 1, &ok);
-
-        if (ok) {
+            /* check mixed constants */
+            ins = IMCC_subst_constants_umix(interp, unit, name, r, n + 1);
             if (ins)
                 goto found_ins;
-            else
-                return NULL;
+
+            /* and finally multiple constants */
+            ins = IMCC_subst_constants(interp, unit, name, r, n + 1, &ok);
+
+            if (ok) {
+                if (ins)
+                    goto found_ins;
+                else
+                    return NULL;
+            }
         }
-    }
-    else
-        strcpy(fullname, name);
-
-    if (op < 0)
-        IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
-                    "The opcode '%s' (%s<%d>) was not found. "
-                    "Check the type and number of the arguments",
-                    fullname, name, n);
-
-    op_info = &interp->op_info_table[op];
-    *format = '\0';
-
-    /* info->op_count is args + 1
-     * build instruction format
-     * set LV_in / out flags */
-    if (n != op_info->op_count - 1)
-        IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
-                "arg count mismatch: op #%d '%s' needs %d given %d",
-                op, fullname, op_info->op_count-1, n);
-
-    /* XXX Speed up some by keep track of the end of format ourselves */
-    for (i = 0; i < n; i++) {
-        switch (op_info->dirs[i]) {
-          case PARROT_ARGDIR_INOUT:
-            dirs |= 1 << (16 + i);
-            /* go on */
-          case PARROT_ARGDIR_IN:
-            dirs |= 1 << i ;
-            break;
-
-          case PARROT_ARGDIR_OUT:
-            dirs |= 1 << (16 + i);
-            break;
-
-          default:
-            PARROT_ASSERT(0);
-        };
-
-        if (keyvec & KEY_BIT(i)) {
-            /* XXX Assert that len > 2 */
-            len          = strlen(format) - 2;
-            PARROT_ASSERT(len >= 0);
-            format[len]  = '\0';
-            strcat(format, "[%s], ");
-        }
-        else if (r[i]->set == 'K')
-            strcat(format, "[%s], ");
         else
-            strcat(format, "%s, ");
-    }
+            strcpy(fullname, name);
 
-    len = strlen(format);
-    if (len >= 2)
-        len -= 2;
-
-    format[len] = '\0';
-
-    if (fmt && *fmt) {
-        strncpy(format, fmt, sizeof (format) - 1);
-        format[sizeof (format) - 1] = '\0';
-    }
-
-    IMCC_debug(interp, DEBUG_PARSER, "%s %s\t%s\n", name, format, fullname);
-
-    /* make the instruction */
-    ins         = _mk_instruction(name, format, n, r, dirs);
-    ins->keys  |= keyvec;
-
-    /* fill in oplib's info */
-    ins->opnum  = op;
-    ins->opsize = n + 1;
-
-    /* mark end as absolute branch */
-    if (STREQ(name, "end") || STREQ(name, "ret")) {
-        ins->type |= ITBRANCH | IF_goto;
-    }
-    else if (STREQ(name, "warningson")) {
-        /* emit a debug seg, if this op is seen */
-        PARROT_WARNINGS_on(interp, PARROT_WARNINGS_ALL_FLAG);
-    }
-    else if (STREQ(name, "yield")) {
-        if (!IMCC_INFO(interp)->cur_unit->instructions->symregs[0])
+        if (op < 0)
             IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
-                "Cannot yield from non-continuation\n");
+                        "The opcode '%s' (%s<%d>) was not found. "
+                        "Check the type and number of the arguments",
+                        fullname, name, n);
 
-        IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->pcc_sub->calls_a_sub
-            |= 1 | ITPCCYIELD;
-    }
-    else if ((strncmp(name, "invoke", 6) == 0) ||
-             (strncmp(name, "callmethod", 10) == 0)) {
-        if (IMCC_INFO(interp)->cur_unit->type & IMC_PCCSUB)
-            IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->pcc_sub->calls_a_sub |= 1;
-    }
+        op_info = &interp->op_info_table[op];
+        *format = '\0';
 
-    /* set up branch flags
-     * mark registers that are labels */
-    for (i = 0; i < op_info->op_count - 1; i++) {
-        if (op_info->labels[i])
-            ins->type |= ITBRANCH | (1 << i);
-        else {
-            if (r[i]->type == VTADDRESS)
-                IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
-                        "undefined identifier '%s'\n", r[i]->name);
+        /* info->op_count is args + 1
+         * build instruction format
+         * set LV_in / out flags */
+        if (n != op_info->op_count - 1)
+            IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
+                    "arg count mismatch: op #%d '%s' needs %d given %d",
+                    op, fullname, op_info->op_count-1, n);
+
+        /* XXX Speed up some by keep track of the end of format ourselves */
+        for (i = 0; i < n; i++) {
+            switch (op_info->dirs[i]) {
+              case PARROT_ARGDIR_INOUT:
+                dirs |= 1 << (16 + i);
+                /* go on */
+              case PARROT_ARGDIR_IN:
+                dirs |= 1 << i ;
+                break;
+
+              case PARROT_ARGDIR_OUT:
+                dirs |= 1 << (16 + i);
+                break;
+
+              default:
+                PARROT_ASSERT(0);
+            };
+
+            if (keyvec & KEY_BIT(i)) {
+                /* XXX Assert that len > 2 */
+                len          = strlen(format) - 2;
+                PARROT_ASSERT(len >= 0);
+                format[len]  = '\0';
+                strcat(format, "[%s], ");
+            }
+            else if (r[i]->set == 'K')
+                strcat(format, "[%s], ");
+            else
+                strcat(format, "%s, ");
         }
-    }
 
-    if (op_info->jump) {
-        ins->type |= ITBRANCH;
-        /* TODO use opnum constants */
-        if (STREQ(name, "branch")
-        ||  STREQ(name, "tailcall")
-        ||  STREQ(name, "returncc"))
-            ins->type |= IF_goto;
-        else if (STREQ(fullname, "jump_i")
-             ||  STREQ(fullname, "branch_i"))
-            IMCC_INFO(interp)->dont_optimize = 1;
-    }
-    else if (STREQ(name, "set") && n == 2) {
-        /* set Px, Py: both PMCs have the same address */
-        if (r[0]->set == r[1]->set && REG_NEEDS_ALLOC(r[1]))
-            ins->type |= ITALIAS;
-    }
-    else if (STREQ(name, "compile"))
-        ++IMCC_INFO(interp)->has_compile;
+        len = strlen(format);
+        if (len >= 2)
+            len -= 2;
 
-  found_ins:
-    if (emit)
-        emitb(interp, unit, ins);
+        format[len] = '\0';
 
-    return ins;
+        if (fmt && *fmt) {
+            strncpy(format, fmt, sizeof (format) - 1);
+            format[sizeof (format) - 1] = '\0';
+        }
+
+        IMCC_debug(interp, DEBUG_PARSER, "%s %s\t%s\n", name, format, fullname);
+
+        /* make the instruction */
+        ins         = _mk_instruction(name, format, n, r, dirs);
+        ins->keys  |= keyvec;
+
+        /* fill in oplib's info */
+        ins->opnum  = op;
+        ins->opsize = n + 1;
+
+        /* mark end as absolute branch */
+        if (STREQ(name, "end") || STREQ(name, "ret")) {
+            ins->type |= ITBRANCH | IF_goto;
+        }
+        else if (STREQ(name, "warningson")) {
+            /* emit a debug seg, if this op is seen */
+            PARROT_WARNINGS_on(interp, PARROT_WARNINGS_ALL_FLAG);
+        }
+        else if (STREQ(name, "yield")) {
+            if (!IMCC_INFO(interp)->cur_unit->instructions->symregs[0])
+                IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
+                    "Cannot yield from non-continuation\n");
+
+            IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->pcc_sub->calls_a_sub
+                |= 1 | ITPCCYIELD;
+        }
+        else if ((strncmp(name, "invoke", 6) == 0) ||
+                 (strncmp(name, "callmethod", 10) == 0)) {
+            if (IMCC_INFO(interp)->cur_unit->type & IMC_PCCSUB)
+                IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->pcc_sub->calls_a_sub |= 1;
+        }
+
+        /* set up branch flags
+         * mark registers that are labels */
+        for (i = 0; i < op_info->op_count - 1; i++) {
+            if (op_info->labels[i])
+                ins->type |= ITBRANCH | (1 << i);
+            else {
+                if (r[i]->type == VTADDRESS)
+                    IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
+                            "undefined identifier '%s'\n", r[i]->name);
+            }
+        }
+
+        if (op_info->jump) {
+            ins->type |= ITBRANCH;
+            /* TODO use opnum constants */
+            if (STREQ(name, "branch")
+            ||  STREQ(name, "tailcall")
+            ||  STREQ(name, "returncc"))
+                ins->type |= IF_goto;
+            else if (STREQ(fullname, "jump_i")
+                 ||  STREQ(fullname, "branch_i"))
+                IMCC_INFO(interp)->dont_optimize = 1;
+        }
+        else if (STREQ(name, "set") && n == 2) {
+            /* set Px, Py: both PMCs have the same address */
+            if (r[0]->set == r[1]->set && REG_NEEDS_ALLOC(r[1]))
+                ins->type |= ITALIAS;
+        }
+        else if (STREQ(name, "compile"))
+            ++IMCC_INFO(interp)->has_compile;
+
+      found_ins:
+        if (emit)
+            emitb(interp, unit, ins);
+
+        return ins;
+    }
 }
 
 extern void* yy_scan_string(const char *);

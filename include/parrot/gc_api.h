@@ -31,6 +31,8 @@
 #define WORD_ALIGN_1 (sizeof (void *) - 1)
 #define WORD_ALIGN_MASK ~WORD_ALIGN_1
 
+#define ALIGNED_STRING_SIZE(len) (((len) + sizeof (void*) + WORD_ALIGN_1) & WORD_ALIGN_MASK)
+
 /* pool iteration */
 typedef enum {
     POOL_PMC    = 0x01,

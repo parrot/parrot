@@ -652,18 +652,17 @@ string_make(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
     ASSERT_ARGS(string_make)
     const CHARSET *charset;
 
-    if (!charset_name)
-        charset_name = "ascii";
-
-    charset = Parrot_find_charset(interp, charset_name);
-
-    if (!charset)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-            "Can't make '%s' charset strings", charset_name);
+    if (charset_name) {
+        charset = Parrot_find_charset(interp, charset_name);
+        if (!charset)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+                "Can't make '%s' charset strings", charset_name);
+    }
+    else
+        charset = Parrot_get_charset(interp, 0);
 
     return Parrot_str_new_init(interp, buffer, len,
         charset->preferred_encoding, charset, flags);
-
 }
 
 
@@ -768,9 +767,8 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
         else
             s->strlen = CHARSET_CODEPOINTS(interp, s);
     }
-    else {
+    else
         s->strlen = s->bufused = 0;
-    }
 
     return s;
 }
@@ -3187,7 +3185,7 @@ Parrot_str_from_uint(PARROT_INTERP, ARGOUT(char *tc), UHUGEINTVAL num,
     if (minus)
         *--p = '-';
 
-    return string_make(interp, p, (UINTVAL)(tail - p), "ascii", 0);
+    return string_make(interp, p, (UINTVAL)(tail - p), NULL, 0);
 }
 
 

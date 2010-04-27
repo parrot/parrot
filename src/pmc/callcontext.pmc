@@ -929,10 +929,13 @@ return current Namespace
 
     VTABLE void push_integer(INTVAL value) {
         Pcc_cell *cells;
-        INTVAL    num_pos;
+        INTVAL    num_pos, allocated_positionals;
 
         GET_ATTR_num_positionals(INTERP, SELF, num_pos);
-        ensure_positionals_storage(INTERP, SELF, num_pos + 1);
+        GET_ATTR_allocated_positionals(interp, SELF, allocated_positionals);
+
+        if (num_pos + 1 > allocated_positionals)
+            ensure_positionals_storage(INTERP, SELF, num_pos + 1);
 
         GET_ATTR_positionals(INTERP, SELF, cells);
         cells[num_pos].u.i      = value;
@@ -968,10 +971,13 @@ return current Namespace
 
     VTABLE void push_pmc(PMC *value) {
         Pcc_cell *cells;
-        INTVAL    num_pos;
+        INTVAL    num_pos, allocated_positionals;
 
         GET_ATTR_num_positionals(INTERP, SELF, num_pos);
-        ensure_positionals_storage(INTERP, SELF, num_pos + 1);
+        GET_ATTR_allocated_positionals(interp, SELF, allocated_positionals);
+
+        if (num_pos + 1 > allocated_positionals)
+            ensure_positionals_storage(INTERP, SELF, num_pos + 1);
 
         GET_ATTR_positionals(INTERP, SELF, cells);
         cells[num_pos].u.p      = value;

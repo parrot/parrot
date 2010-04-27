@@ -342,6 +342,7 @@ Parrot_gc_new_pmc_header(PARROT_INTERP, UINTVAL flags)
     PObj_get_FLAGS(pmc) = PObj_is_PMC_FLAG|flags;
     pmc->vtable         = NULL;
     PMC_data(pmc)       = NULL;
+    PMC_metadata(pmc)   = PMCNULL;
 
     return pmc;
 }
