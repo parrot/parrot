@@ -742,7 +742,8 @@ find_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src), UINTVAL offse
 */
 
 static INTVAL
-find_not_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
+find_not_cclass(PARROT_INTERP,
+                INTVAL flags, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(find_not_cclass)
     UINTVAL pos = offset;
