@@ -948,7 +948,7 @@ void
 Parrot_disassemble(PARROT_INTERP, ARGIN(const char *outfile), Parrot_disassemble_options options)
 {
     PDB_line_t *line;
-    PDB_t * const pdb   = mem_gc_allocate_typed(interp, PDB_t);
+    PDB_t * const pdb   = mem_gc_allocate_zeroed_typed(interp, PDB_t);
     int num_mappings    = 0;
     int curr_mapping    = 0;
     int op_code_seq_num = 0;
