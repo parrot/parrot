@@ -29,11 +29,11 @@ PARROT_DATA CHARSET *Parrot_ascii_charset_ptr;
 #define PARROT_BINARY_CHARSET Parrot_binary_charset_ptr
 #define PARROT_UNICODE_CHARSET Parrot_unicode_charset_ptr
 
-typedef STRING * (*charset_get_graphemes_t)(PARROT_INTERP, STRING *src, UINTVAL offset, UINTVAL count);
+typedef STRING * (*charset_get_graphemes_t)(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count);
 typedef STRING * (*charset_to_charset_t)(PARROT_INTERP, STRING *src);
 typedef STRING * (*charset_from_unicode_t)(PARROT_INTERP, STRING *src);
-typedef STRING * (*charset_compose_t)(PARROT_INTERP, STRING *src);
-typedef STRING * (*charset_decompose_t)(PARROT_INTERP, STRING *src);
+typedef STRING * (*charset_compose_t)(PARROT_INTERP, ARGIN(const STRING *src));
+typedef STRING * (*charset_decompose_t)(PARROT_INTERP, ARGIN(const STRING *src));
 typedef STRING * (*charset_upcase_t)(PARROT_INTERP, const STRING *src);
 typedef STRING * (*charset_downcase_t)(PARROT_INTERP, const STRING *src);
 typedef STRING * (*charset_titlecase_t)(PARROT_INTERP, const STRING *src);

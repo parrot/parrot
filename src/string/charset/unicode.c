@@ -34,7 +34,7 @@ static INTVAL compare(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* compose(PARROT_INTERP, ARGIN(STRING *src))
+static STRING* compose(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -51,7 +51,7 @@ static INTVAL cs_rindex(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* decompose(PARROT_INTERP, SHIM(STRING *src))
+static STRING* decompose(PARROT_INTERP, SHIM(const STRING *src))
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
@@ -81,7 +81,7 @@ static INTVAL find_not_cclass(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 static STRING * get_graphemes(PARROT_INTERP,
-    ARGIN(STRING *src),
+    ARGIN(const STRING *src),
     UINTVAL offset,
     UINTVAL count)
         __attribute__nonnull__(1)
@@ -201,7 +201,7 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<static STRING * get_graphemes(PARROT_INTERP, STRING *src, UINTVAL
+=item C<static STRING * get_graphemes(PARROT_INTERP, const STRING *src, UINTVAL
 offset, UINTVAL count)>
 
 Gets the graphemes from STRING C<src> starting at C<offset>. Gets
@@ -213,8 +213,7 @@ C<count> graphemes total.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-get_graphemes(PARROT_INTERP, ARGIN(STRING *src),
-        UINTVAL offset, UINTVAL count)
+get_graphemes(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(get_graphemes)
     return ENCODING_GET_CODEPOINTS(interp, src, offset, count);
@@ -249,7 +248,7 @@ to_charset(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<static STRING* compose(PARROT_INTERP, STRING *src)>
+=item C<static STRING* compose(PARROT_INTERP, const STRING *src)>
 
 If Parrot is built with ICU, composes the STRING C<src>. Attempts to
 denormalize the STRING into the ICU default, NFC.
@@ -262,7 +261,7 @@ If Parrot does not have ICU included, throws an exception.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-compose(PARROT_INTERP, ARGIN(STRING *src))
+compose(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(compose)
 #if PARROT_HAS_ICU
@@ -312,7 +311,7 @@ compose(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<static STRING* decompose(PARROT_INTERP, STRING *src)>
+=item C<static STRING* decompose(PARROT_INTERP, const STRING *src)>
 
 Decompose function for unicode charset. This function is not yet implemented.
 
@@ -322,7 +321,7 @@ Decompose function for unicode charset. This function is not yet implemented.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-decompose(PARROT_INTERP, SHIM(STRING *src))
+decompose(PARROT_INTERP, SHIM(const STRING *src))
 {
     ASSERT_ARGS(decompose)
     /* TODO: https://trac.parrot.org/parrot/wiki/StringsTasklist Implement this. */

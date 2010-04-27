@@ -55,7 +55,7 @@ INTVAL ascii_cs_rindex(PARROT_INTERP,
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING * ascii_get_graphemes(PARROT_INTERP,
-    ARGIN(STRING *src),
+    ARGIN(const STRING *src),
     UINTVAL offset,
     UINTVAL count)
         __attribute__nonnull__(1)

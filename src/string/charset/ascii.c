@@ -32,15 +32,14 @@ charset functionality for similar charsets like iso-8859-1.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* compose(PARROT_INTERP, ARGIN(STRING *src))
+static STRING* compose(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* decompose(PARROT_INTERP, ARGMOD(STRING *src))
+static STRING* decompose(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*src);
+        __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 static STRING* downcase(PARROT_INTERP, ARGIN(const STRING *src))
@@ -166,8 +165,8 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<STRING * ascii_get_graphemes(PARROT_INTERP, STRING *src, UINTVAL offset,
-UINTVAL count)>
+=item C<STRING * ascii_get_graphemes(PARROT_INTERP, const STRING *src, UINTVAL
+offset, UINTVAL count)>
 
 Retrieves the graphemes for the STRING C<src>, starting at
 C<offset> and ending at C<offset + count>.
@@ -179,7 +178,7 @@ C<offset> and ending at C<offset + count>.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-ascii_get_graphemes(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL count)
+ascii_get_graphemes(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(ascii_get_graphemes)
     return ENCODING_GET_BYTES(interp, src, offset, count);
@@ -251,10 +250,9 @@ to_charset(PARROT_INTERP, ARGIN(STRING *src))
     }
 }
 
-/* A noop. can't compose ascii */
 /*
 
-=item C<static STRING* compose(PARROT_INTERP, STRING *src)>
+=item C<static STRING* compose(PARROT_INTERP, const STRING *src)>
 
 Can't compose ASCII strings, so performs a string copy on it and
 returns the new string.
@@ -265,16 +263,18 @@ returns the new string.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-compose(PARROT_INTERP, ARGIN(STRING *src))
+compose(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(compose)
-    return src;
+
+    STRING * const dest = Parrot_str_copy(interp, src);
+
+    return dest;
 }
 
-/* A noop. can't decompose ascii */
 /*
 
-=item C<static STRING* decompose(PARROT_INTERP, STRING *src)>
+=item C<static STRING* decompose(PARROT_INTERP, const STRING *src)>
 
 Can't decompose ASCII, so we perform a string copy instead and return
 a pointer to the new string.
@@ -285,10 +285,13 @@ a pointer to the new string.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-decompose(PARROT_INTERP, ARGMOD(STRING *src))
+decompose(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(decompose)
-    return src;
+
+    STRING * const dest = Parrot_str_copy(interp, src);
+
+    return dest;
 }
 
 /*

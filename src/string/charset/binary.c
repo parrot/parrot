@@ -34,7 +34,7 @@ static INTVAL compare(SHIM_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* compose(PARROT_INTERP, SHIM(STRING *src))
+static STRING* compose(PARROT_INTERP, SHIM(const STRING *src))
         __attribute__nonnull__(1);
 
 static INTVAL cs_index(SHIM_INTERP,
@@ -48,7 +48,7 @@ static INTVAL cs_rindex(SHIM_INTERP,
     SHIM(UINTVAL offset));
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* decompose(PARROT_INTERP, SHIM(STRING *src))
+static STRING* decompose(PARROT_INTERP, SHIM(const STRING *src))
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
@@ -171,7 +171,7 @@ to_charset(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<static STRING* compose(PARROT_INTERP, STRING *src)>
+=item C<static STRING* compose(PARROT_INTERP, const STRING *src)>
 
 Throws an exception because we cannot compose a binary string.
 
@@ -182,7 +182,7 @@ Throws an exception because we cannot compose a binary string.
 /* A err. can't compose binary */
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-compose(PARROT_INTERP, SHIM(STRING *src))
+compose(PARROT_INTERP, SHIM(const STRING *src))
 {
     ASSERT_ARGS(compose)
     EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't compose binary data");
@@ -190,7 +190,7 @@ compose(PARROT_INTERP, SHIM(STRING *src))
 
 /*
 
-=item C<static STRING* decompose(PARROT_INTERP, STRING *src)>
+=item C<static STRING* decompose(PARROT_INTERP, const STRING *src)>
 
 Throws an exception because we cannot decompose a binary string.
 
@@ -201,7 +201,7 @@ Throws an exception because we cannot decompose a binary string.
 /* A err. can't decompose binary */
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-decompose(PARROT_INTERP, SHIM(STRING *src))
+decompose(PARROT_INTERP, SHIM(const STRING *src))
 {
     ASSERT_ARGS(decompose)
     EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't decompose binary data");

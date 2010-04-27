@@ -27,12 +27,12 @@ This file implements the charset functions for iso-8859-1 data
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static STRING* compose(PARROT_INTERP, ARGIN(STRING *src))
+static STRING* compose(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* decompose(PARROT_INTERP, SHIM(STRING *src))
+static STRING* decompose(PARROT_INTERP, SHIM(const STRING *src))
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
@@ -267,7 +267,7 @@ to_charset(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<static STRING* compose(PARROT_INTERP, STRING *src)>
+=item C<static STRING* compose(PARROT_INTERP, const STRING *src)>
 
 ISO-8859-1 does not support composing, so we just copy the STRING C<src> and return the
 copy.
@@ -276,19 +276,21 @@ copy.
 
 */
 
-/* A noop. can't compose iso-8859-1 */
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static STRING*
-compose(PARROT_INTERP, ARGIN(STRING *src))
+compose(PARROT_INTERP, ARGIN(const STRING *src))
 {
     ASSERT_ARGS(compose)
-    return src;
+
+    STRING * const dest = Parrot_str_copy(interp, src);
+
+    return dest;
 }
 
 /*
 
-=item C<static STRING* decompose(PARROT_INTERP, STRING *src)>
+=item C<static STRING* decompose(PARROT_INTERP, const STRING *src)>
 
 SO-8859-1 does not support decomposing, so we throw an exception.
 
@@ -298,7 +300,7 @@ SO-8859-1 does not support decomposing, so we throw an exception.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-decompose(PARROT_INTERP, SHIM(STRING *src))
+decompose(PARROT_INTERP, SHIM(const STRING *src))
 {
     ASSERT_ARGS(decompose)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
