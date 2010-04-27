@@ -17,8 +17,9 @@ method profile_array() {
 }
 
 method build_profile_array() {
-
-    my @pprof_lines := pir::split("\n", self<profile>);
+    my %config := self.get_config();
+    my $newline := %config<win32> ?? "\r\n" !! "\n";
+    my @pprof_lines := pir::split($newline, self<profile>);
     self<profile_array> := ();
 
     for @pprof_lines -> $line {
@@ -34,7 +35,7 @@ method make_line_hash($line) {
     my %line_hash := {};
 
     my $colon_idx := pir::index($line, ":");
-    #if the line starts with "VERSION, CLI or END_OF_RUNLOOP, 
+    #if the line starts with "VERSION, CLI or END_OF_RUNLOOP,
     if ($colon_idx >= 3) {
         my $type := pir::substr($line, 0, $colon_idx);
         my $data := pir::substr($line, $colon_idx+1);
