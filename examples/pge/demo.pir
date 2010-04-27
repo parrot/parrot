@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2009, Parrot Foundation.
+# Copyright (C) 2005-2010, Parrot Foundation.
 # $Id$
 
 .include "errors.pasm"
@@ -43,7 +43,7 @@
     $I0 = index x, "\n"
   get_cmd:
     $S0 = substr x, 0, $I0
-    chopn x, 1
+    x = chopn x, 1
     if $S0 == "next" goto match_next
     if $S0 == "regex" goto make_p6rule
     if $S0 == "glob" goto make_glob
