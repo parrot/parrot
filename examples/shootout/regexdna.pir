@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2009, Parrot Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 # $Id$
 
 .sub main :main
@@ -65,7 +65,7 @@ beginwhile:
 	chunklen = length chunk
 	unless chunklen goto endwhile
 	# They don't say you have to match case insenitive...
-	downcase chunk
+	chunk = downcase chunk
 	seq .= chunk
 	goto beginwhile
 endwhile:
@@ -84,7 +84,7 @@ stripfind:
 	$I0 = $P0."from"()
 	$I1 = $P0."to"()
 	$I1 -= $I0
-	substr seq, $I0, $I1, ''
+	seq = replace seq, $I0, $I1, ''
 	goto stripfind
 endstripfind:
 	seqlen = length seq
@@ -140,7 +140,7 @@ iter_loop:
 #	$I0 = $P0."from"()
 #	$I1 = $P0."to"()
 #	$I1 -= $I0
-#	substr seq, $I0, $I1, replacement
+#	seq = replace seq, $I0, $I1, replacement
 #	goto switchfind
 #endswitchfind:
 
@@ -164,7 +164,7 @@ switchloop:
 	$P0 = pop matches
 	$I0 = $P0[0]
 	$I1 = $P0[1]
-	substr seq, $I0, $I1, replacement
+	seq = replace seq, $I0, $I1, replacement
 	goto switchloop
 endswitchloop:
 #############################################
