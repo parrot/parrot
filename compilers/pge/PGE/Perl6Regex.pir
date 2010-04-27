@@ -1021,7 +1021,7 @@ Extract an enumerated character list.
     ##   by converting to <, <+, <-, or <!
     $S0 = substr op, -1, 1
     if $S0 != '[' goto parse_loop
-    chopn op, 1
+    op = chopn op, 1
     goto enum
 
   parse_loop:

@@ -19,7 +19,7 @@ Tests Parrot string registers and operations.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(373)
+    plan(369)
 
     set_s_s_sc()
     test_clone()
@@ -193,9 +193,6 @@ Tests Parrot string registers and operations.
 
     clone $S1, "Bar1"
     is( $S1, "Bar1", '' )
-
-    chopn $S1, 1
-    is( $S1, "Bar", 'the contents of $S1 are no longer constant' )
 .end
 
 .sub clone_null
@@ -224,9 +221,9 @@ Tests Parrot string registers and operations.
     set $S5, "japhXYZW"
     clone $S3, $S4
     set $I1, 4
-    chopn $S4, 3
-    chopn $S4, 1
-    chopn $S5, $I1
+    $S4 = chopn $S4, 3
+    $S4 = chopn $S4, 1
+    $S5 = chopn $S5, $I1
 
     is( $S4, "JAPH", '' )
     is( $S5, "japh", '' )
@@ -235,17 +232,17 @@ Tests Parrot string registers and operations.
 
 .sub chopn_oob_values
     set $S1, "A string of length 21"
-    chopn   $S1, 0
+    $S1 = chopn $S1, 0
     is( $S1, "A string of length 21", '' )
 
-    chopn   $S1, 4
+    $S1 = chopn $S1, 4
     is( $S1, "A string of lengt", '' )
 
     # -length cuts now
-    chopn   $S1, -4
+    $S1 = chopn $S1, -4
     is( $S1, "A st", '' )
 
-    chopn   $S1, 1000
+    $S1 = chopn $S1, 1000
     is( $S1, "", '' )
 .end
 
@@ -603,8 +600,8 @@ WHILE:
     set $S2, "JAPH"
     concat $S0, $S2, ""
     concat $S1, "", $S2
-    chopn $S0, 1
-    chopn $S1, 1
+    $S0 = chopn $S0, 1
+    $S1 = chopn $S1, 1
     is( $S2, "JAPH", '' )
 .end
 
@@ -1160,7 +1157,7 @@ WHILE:
 .sub cow_with_chopn_leaving_original_untouched
     set $S0, "ABCD"
     clone $S1, $S0
-    chopn $S0, 1
+    $S0 = chopn $S0, 1
     is( $S0, "ABC", 'COW with chopn leaving original untouched' )
     is( $S1, "ABCD", 'COW with chopn leaving original untouched' )
 .end
@@ -1460,29 +1457,29 @@ WHILE:
 .sub bands_null_string
     null $S1
     set $S2, "abc"
-    bands $S1, $S2
+    $S1 = bands $S1, $S2
     null $S3
     is( $S1, $S3, 'ok1' )
 
     set $S1, ""
-    bands $S1, $S2
+    $S1 = bands $S1, $S2
     nok( $S1, 'ok2' )
 
     null $S2
     set $S1, "abc"
-    bands $S1, $S2
+    $S1 = bands $S1, $S2
     null $S3
     is( $S1, $S3, 'ok3' )
 
     set $S2, ""
-    bands $S1, $S2
+    $S1 = bands $S1, $S2
     nok( $S1, 'ok4' )
 .end
 
 .sub bands_2
     set $S1, "abc"
     set $S2, "EE"
-    bands $S1, $S2
+    $S1 = bands $S1, $S2
     is( $S1, "A@", 'bands 2' )
     is( $S2, "EE", 'bands 2' )
 .end
@@ -1499,33 +1496,33 @@ WHILE:
 .sub bands_cow
     set $S1, "foo"
     substr $S2, $S1, 0, 3
-    bands $S1, "bar"
+    $S1 = bands $S1, "bar"
     is( $S2, "foo", 'bands COW' )
 .end
 
 .sub bors_null_string
     null $S1
     null $S2
-    bors $S1, $S2
+    $S1 = bors $S1, $S2
     null $S3
     is( $S1, $S3, 'bors NULL string' )
 
     null $S1
     set $S2, ""
-    bors $S1, $S2
+    $S1 = bors $S1, $S2
     null $S3
     is( $S1, $S3, 'bors NULL string' )
 
-    bors $S2, $S1
+    $S2 = bors $S2, $S1
     is( $S2, $S3, 'bors NULL string' )
 
     null $S1
     set $S2, "def"
-    bors $S1, $S2
+    $S1 = bors $S1, $S2
     is( $S1, "def", 'bors NULL string' )
 
     null $S2
-    bors $S1, $S2
+    $S1 = bors $S1, $S2
     is( $S1, "def", 'bors NULL string' )
 
     null $S1
@@ -1552,7 +1549,7 @@ WHILE:
 .sub bors_2
     set $S1, "abc"
     set $S2, "EE"
-    bors $S1, $S2
+    $S1 = bors $S1, $S2
     is( $S1, "egc", 'bors 2' )
     is( $S2, "EE", 'bors 2' )
 .end
@@ -1569,33 +1566,33 @@ WHILE:
 .sub bors_cow
     set $S1, "foo"
     substr $S2, $S1, 0, 3
-    bors $S1, "bar"
+    $S1 = bors $S1, "bar"
     is( $S2, "foo", 'bors COW' )
 .end
 
 .sub bxors_null_string
     null $S1
     null $S2
-    bxors $S1, $S2
+    $S1 = bxors $S1, $S2
     null $S3
     is( $S1, $S3, 'bxors NULL string' )
 
     null $S1
     set $S2, ""
-    bxors $S1, $S2
+    $S1 = bxors $S1, $S2
     null $S3
     is( $S1, $S3, 'bxors NULL string' )
 
-    bxors $S2, $S1
+    $S2 = bxors $S2, $S1
     is( $S2, $S3, 'bxors NULL string' )
 
     null $S1
     set $S2, "abc"
-    bxors $S1, $S2
+    $S1 = bxors $S1, $S2
     is( $S1, "abc", 'bxors NULL string' )
 
     null $S2
-    bxors $S1, $S2
+    $S1 = bxors $S1, $S2
     is( $S1, "abc", 'bxors NULL string' )
 
     null $S1
@@ -1622,13 +1619,13 @@ WHILE:
 .sub bxors_2
     set $S1, "a2c"
     set $S2, "Dw"
-    bxors $S1, $S2
+    $S1 = bxors $S1, $S2
     is( $S1, "%Ec", 'bxors 2' )
     is( $S2, "Dw", 'bxors 2' )
 
     set $S1, "abc"
     set $S2, "   X"
-    bxors $S1, $S2
+    $S1 = bxors $S1, $S2
     is( $S1, "ABCX", 'bxors 2' )
     is( $S2, "   X", 'bxors 2' )
 .end
@@ -1652,7 +1649,7 @@ WHILE:
 .sub bxors_cow
     set $S1, "foo"
     substr $S2, $S1, 0, 3
-    bxors $S1, "bar"
+    $S1 = bxors $S1, "bar"
     is( $S2, "foo", 'bxors COW' )
 .end
 
@@ -1804,9 +1801,6 @@ WHILE:
     upcase $S1, $S0
     is( $S1, "ABCD012YZ", 'upcase' )
 
-    upcase $S0
-    is( $S0, "ABCD012YZ", 'upcase inplace' )
-
     push_eh catch1
     null $S9
     null $S0
@@ -1823,7 +1817,7 @@ null1:
     push_eh catch2
     null $S9
     null $S0
-    upcase $S0
+    $S0 = upcase $S0
     pop_eh
     goto null2
 catch2:
@@ -1838,9 +1832,6 @@ null2:
     set $S0, "ABcd012YZ"
     downcase $S1, $S0
     is( $S1, "abcd012yz", 'downcase' )
-
-    downcase $S0
-    is( $S0, "abcd012yz", 'downcase inplace' )
 
     push_eh catch1
     null $S9
@@ -1858,7 +1849,7 @@ null1:
     push_eh catch2
     null $S9
     null $S0
-    downcase $S0
+    $S0 = downcase $S0
     pop_eh
     goto null2
 catch2:
@@ -1873,9 +1864,6 @@ null2:
     set $S0, "aBcd012YZ"
     titlecase $S1, $S0
     is( $S1, "Abcd012yz", 'titlecase' )
-
-    titlecase $S0
-    is( $S0, "Abcd012yz", 'titlecase inplace' )
 
     push_eh catch1
     null $S9
@@ -1893,7 +1881,7 @@ null1:
     push_eh catch2
     null $S9
     null $S0
-    titlecase $S0
+    $S0 = titlecase $S0
     pop_eh
     goto null2
 catch2:

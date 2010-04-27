@@ -1036,7 +1036,7 @@ Perform a match for protoregex C<name>.
   cand_done:
   token_next:
     unless token > '' goto fail
-    chopn token, 1
+    token = chopn token, 1
     goto token_loop
 
   done:

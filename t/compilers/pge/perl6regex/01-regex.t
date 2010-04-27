@@ -314,7 +314,7 @@ Description of the test.
     # NOTE: there can be multiple tabs between entries, so skip until
     # we have something.
     # remove the trailing newline from record
-    chopn test_line, 1
+    test_line = chopn test_line, 1
 
     $P1 = split "\t", test_line
     $I0 = elements $P1 # length of array

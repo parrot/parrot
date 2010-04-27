@@ -260,9 +260,9 @@ then a warning is generated if perl is running under -w.
     # cut padded '='
     if len_mod_4 == 0 goto END_3
         if len_mod_4 == 1 goto END_3
-	    chopn plain, 1
+	    plain = chopn plain, 1
             if len_mod_4 == 3 goto END_3
-	        chopn plain, 1
+	        plain = chopn plain, 1
     END_3:
 
     .return( plain )

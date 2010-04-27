@@ -89,8 +89,6 @@ inline op band(invar PMC, invar PMC, invar PMC) :base_core {
     VTABLE_set_integer_native(interp, $1, a & b);
 }
 
-=item B<bands>(inout STR, in STR)
-
 =item B<bands>(invar PMC, in STR)
 
 =item B<bands>(invar PMC, invar PMC)
@@ -108,10 +106,6 @@ Set the bits of $1 according to the B<and> of the corresponding bits
 from $2 and $3.
 
 =cut
-
-inline op bands(inout STR, in STR) :base_core :deprecated {
-    $1 = Parrot_str_bitwise_and(interp, $1, $2);
-}
 
 inline op bands(invar PMC, in STR) :base_core {
     STRING * const a = VTABLE_get_string(interp, $1);
@@ -177,8 +171,6 @@ inline op bnot(out PMC, invar PMC) :base_core {
     $1 = b;
 }
 
-=item B<bnots>(inout STR)
-
 =item B<bnots>(invar PMC)
 
 =item B<bnots>(out STR, in STR)
@@ -186,10 +178,6 @@ inline op bnot(out PMC, invar PMC) :base_core {
 =item B<bnots>(out PMC, invar PMC)
 
 =cut
-
-inline op bnots(inout STR) :base_core :deprecated {
-    $1 = Parrot_str_bitwise_not(interp, $1);
-}
 
 inline op bnots(out STR, in STR) :base_core {
     $1 = Parrot_str_bitwise_not(interp, $2);
@@ -259,8 +247,6 @@ inline op bor(invar PMC, invar PMC, invar PMC) :base_core {
     VTABLE_set_integer_native(interp, $1, a | b);
 }
 
-=item B<bors>(inout STR, in STR)
-
 =item B<bors>(invar PMC, in STR)
 
 =item B<bors>(invar PMC, invar PMC)
@@ -278,10 +264,6 @@ Set the bits of $1 according to the B<or> of the corresponding bits
 from $2 and $3.
 
 =cut
-
-inline op bors(inout STR, in STR) :base_core :deprecated {
-    $1 = Parrot_str_bitwise_or(interp, $1, $2);
-}
 
 inline op bors(invar PMC, in STR) :base_core {
     STRING * const a = VTABLE_get_string(interp, $1);
@@ -559,8 +541,6 @@ inline op bxor(invar PMC, invar PMC, invar PMC) :base_core {
     VTABLE_set_integer_native(interp, $1, (INTVAL)c);
 }
 
-=item B<bxors>(inout STR, in STR)
-
 =item B<bxors>(invar PMC, in STR)
 
 =item B<bxors>(invar PMC, invar PMC)
@@ -578,10 +558,6 @@ Set the bits of $1 according to the B<xor> of the corresponding bits
 from $2 and $3.
 
 =cut
-
-inline op bxors(inout STR, in STR) :base_core :deprecated {
-    $1 = Parrot_str_bitwise_xor(interp, $1, $2);
-}
 
 inline op bxors(invar PMC, in STR) :base_core {
     STRING * const a = VTABLE_get_string(interp, $1);

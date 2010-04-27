@@ -377,7 +377,7 @@ Adds (or replaces) a syntactic category's defaults.
     goto key_array_1
   key_next:
     if key == '' goto token_nows
-    chopn key, 1
+    key = chopn key, 1
     goto key_loop
   token_nows:
     if pos == wspos goto oper_not_found

@@ -49,7 +49,7 @@ pir_output_is( <<'CODE', ($^O eq 'MSWin32' ? lc(cwd) : cwd), "prefix" );
     cfg = _config()
     $S1 = cfg['osname']
     if $S1 != 'MSWin32' goto sayit
-    downcase $S0
+    $S0 = downcase $S0
   sayit:
     print $S0
 .end

@@ -407,7 +407,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', 'I/O buffering' );
   LINE:
     \$S1 = readline \$P1
     unless \$S1 goto SUCCESS
-    chopn \$S1, 1
+    \$S1 = chopn \$S1, 1
 
   NEXT_NR:
     \$I1 = length \$S1

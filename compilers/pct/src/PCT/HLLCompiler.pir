@@ -928,7 +928,7 @@ Dump C<obj> with C<name> according to C<options>.
 
   load_dumper:
     load_bytecode 'PCT/Dumper.pbc'
-    downcase $S0
+    $S0 = downcase $S0
     $P0 = get_hll_global ['PCT';'Dumper'], $S0
     .tailcall $P0(obj, name)
 .end

@@ -147,7 +147,7 @@ method new(:$ns?, :$slurp_until?) {
 
 method accepts(%prof_line) {
     if self<found_cs> && self<slurp_until> {
-        if pir::downcase(%prof_line<type>) ne self<slurp_until> {
+        if pir::downcase__SS(%prof_line<type>) ne self<slurp_until> {
             return 1;
         }
         return 0;

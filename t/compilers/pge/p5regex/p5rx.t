@@ -696,7 +696,7 @@ Column 6, if present, contains a description of what is being tested.
     # NOTE: there can be multiple tabs between entries, so skip until
     # we have something.
     # remove the trailing newline from record
-    chopn test_line, 1
+    test_line = chopn test_line, 1
 
     $P1 = split "\t", test_line
 

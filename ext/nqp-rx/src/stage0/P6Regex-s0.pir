@@ -11285,7 +11285,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
             $I0 = index $S0, ':sym<'
             add $I0, 5
             $S0 = substr $S0, $I0
-            chopn $S0, 1
+            $S0 = chopn $S0, 1
             $P1353 = box $S0
         
     store_lex "$regexsym", $P1353

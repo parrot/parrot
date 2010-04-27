@@ -57,11 +57,6 @@ inline op chr(out STR, in INT) :base_core {
 }
 
 
-=item B<chopn>(inout STR, in INT)
-
-Remove n characters specified by integer $2 from the tail of string $1.
-If $2 is negative, cut the string after -$2 characters.
-
 =item B<chopn>(out STR, in STR, in INT)
 
 Remove n characters specified by integer $3 from the tail of string $2,
@@ -69,10 +64,6 @@ and returns the characters not chopped in string $1.
 If $3 is negative, cut the string after -$3 characters.
 
 =cut
-
-inline op chopn(inout STR, in INT) :base_core :deprecated {
-    $1 = Parrot_str_chopn(interp, $1, $2);
-}
 
 inline op chopn(out STR, in STR, in INT) :base_core {
     $1 = Parrot_str_chopn(interp, $2, $3);
@@ -412,28 +403,15 @@ inline op stringinfo(out INT, in STR, in INT) :base_core {
 
 Uppercase $2 and put the result in $1
 
-=item B<upcase>(inout STR)
-
-Uppercase $1 in place
-
 =cut
 
 inline op upcase(out STR, in STR) :base_core {
     $1 = Parrot_str_upcase(interp, $2);
 }
 
-inline op upcase(inout STR) :base_core :deprecated {
-    $1 = Parrot_str_upcase(interp, $1);
-}
-
-
 =item B<downcase>(out STR, in STR)
 
 Downcase $2 and put the result in $1
-
-=item B<downcase>(inout STR)
-
-Downcase $1 in place
 
 =cut
 
@@ -441,27 +419,14 @@ inline op downcase(out STR, in STR) :base_core {
     $1 = Parrot_str_downcase(interp, $2);
 }
 
-inline op downcase(inout STR) :base_core :deprecated {
-    $1 = Parrot_str_downcase(interp, $1);
-}
-
-
 =item B<titlecase>(out STR, in STR)
 
 Titlecase $2 and put the result in $1
-
-=item B<titlecase>(inout STR)
-
-Titlecase $1 in place
 
 =cut
 
 inline op titlecase(out STR, in STR) :base_core {
     $1 = Parrot_str_titlecase(interp, $2);
-}
-
-inline op titlecase(inout STR) :base_core :deprecated {
-    $1 = Parrot_str_titlecase(interp, $1);
 }
 
 
@@ -505,10 +470,6 @@ If charset number $2 is not found, name $1 is set to null.
 Return the charset number of the charset named $2. If the charset doesn't
 exist, throw an exception.
 
-=item B<trans_charset>(inout STR, in INT)
-
-Change the string to have the specified charset.
-
 =item B<trans_charset>(out STR, in STR, in INT)
 
 Create a string $1 from $2 with the specified charset.
@@ -536,10 +497,6 @@ op find_charset(out INT, in STR) :base_core {
     $1 = n;
 }
 
-op trans_charset(inout STR, in INT) :deprecated {
-    $1 = Parrot_str_change_charset(interp, $1, $2);
-}
-
 op trans_charset(out STR, in STR, in INT) {
     $1 = Parrot_str_change_charset(interp, $2, $3);
 }
@@ -558,10 +515,6 @@ If encoding number $2 is not found, name $1 is set to null.
 
 Return the encoding number of the encoding named $2. If the encoding doesn't
 exist, throw an exception.
-
-=item B<trans_encoding>(inout STR, in INT)
-
-Change the string to have the specified encoding.
 
 =item B<trans_encoding>(out STR, in STR, in INT)
 
@@ -588,10 +541,6 @@ op find_encoding(out INT, in STR) :base_core {
         goto ADDRESS(handler);
     }
     $1 = n;
-}
-
-op trans_encoding(inout STR, in INT) :deprecated {
-    $1 = Parrot_str_change_encoding(interp, $1, $2);
 }
 
 op trans_encoding(out STR, in STR, in INT) {
