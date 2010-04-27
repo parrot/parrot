@@ -409,6 +409,8 @@ inline op upcase(out STR, in STR) :base_core {
     $1 = Parrot_str_upcase(interp, $2);
 }
 
+=item B<downcase>(inout STR)
+
 =item B<downcase>(out STR, in STR)
 
 Downcase $2 and put the result in $1
@@ -418,6 +420,11 @@ Downcase $2 and put the result in $1
 inline op downcase(out STR, in STR) :base_core {
     $1 = Parrot_str_downcase(interp, $2);
 }
+
+inline op downcase(inout STR) :base_core :deprecated {
+    $1 = Parrot_str_downcase(interp, $1);
+}
+
 
 =item B<titlecase>(out STR, in STR)
 
