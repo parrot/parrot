@@ -129,7 +129,7 @@ iterate:
 loop:
   unless iterator goto end
   elem = shift iterator
-  $S0 = substr elem, 0, 1, ''
+  $S0 = replace elem, 0, 1, ''
   goto loop
 end:
   .return('')

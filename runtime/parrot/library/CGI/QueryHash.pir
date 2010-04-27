@@ -143,7 +143,7 @@ set_val:
         # TODO: This should be an array
         v_array = new 'Hash'
         v_array[0] = v
-        substr k, -2, 2, ''
+        k = replace k, -2, 2, ''
         query_hash[k] = v_array
         branch next_item
 v_isnt_array:

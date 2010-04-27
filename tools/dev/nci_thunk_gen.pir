@@ -776,7 +776,7 @@ ERROR
         inner_whitespace_loop:
             $I0 = index line, $S0
             if $I0 < 0 goto end_inner_whitespace_loop
-            substr line, $I0, 1, ' '
+            line = replace line, $I0, 1, ' '
             goto inner_whitespace_loop
         end_inner_whitespace_loop:
 
@@ -787,14 +787,16 @@ ERROR
     multispace_loop:
         $I0 = index line, '  '
         if $I0 < 0 goto end_multispace_loop
-        $S0 = substr line, $I0, 2, ' '
+        $S0  = substr line, $I0, 2
+        line = replace line, $I0, 2, ' '
         goto multispace_loop
     end_multispace_loop:
 
     # remove leading whitespace
     $S0 = substr line, 0, 1
     unless $S0 == ' ' goto end_leading
-        $S0 = substr line, 0, 1, ''
+        $S0  = substr line, 0, 1
+        line = replace line, 0, 1, ' '
     end_leading:
 
     # handle empty (or whitespace only) lines
@@ -804,7 +806,8 @@ ERROR
     # remove trailing whitespace
     $S0 = substr line, -1, 1
     unless $S0 == ' ' goto end_trailing
-        $S0 = substr line, -1, 1, ''
+        $S0  = substr line, -1, 1
+        line = replace line, -1, 1, ''
     end_trailing:
 
     # read the signature
@@ -1111,7 +1114,7 @@ JSON
         $S1 = substr file, $I1, $I0
         unless $S1 == $S0 goto extn_loop
         extn = $S1
-        substr file, $I1, $I0, ''
+        file = replace file, $I1, $I0, ''
     end_extn_loop:
 
     .return (dir, file, extn)

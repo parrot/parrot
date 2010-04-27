@@ -124,7 +124,7 @@ END_HELP
         $I0 = index template, symbol
         if -1 == $I0 goto repl_done
         $I1 = length symbol
-        substr template, $I0, $I1, value
+        template = replace template, $I0, $I1, value
         goto repl_loop
       repl_done:
     goto it_loop

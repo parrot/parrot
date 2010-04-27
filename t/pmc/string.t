@@ -900,7 +900,7 @@ loop:
   $P0 = "Foo44"
 
   $S0 = $P0
-  substr $S0, 0, 1, "B"
+  $S0 = replace $S0, 0, 1, "B"
   is( $S0, "Boo44", 'substr replace' )
   is( $P0, "Foo44", '... no change to original' )
 .end

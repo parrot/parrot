@@ -155,7 +155,7 @@ Adds (or replaces) a syntactic category's defaults.
     unless $S0 goto with_looser
     $S0 = tokentable[$S0;'precedence']
     $S0 = clone $S0
-    substr $S0, -1, 0, '<'
+    $S0 = replace $S0, -1, 0, '<'
     token['precedence'] = $S0
   with_looser:
 
@@ -163,7 +163,7 @@ Adds (or replaces) a syntactic category's defaults.
     unless $S0 goto with_tighter
     $S0 = tokentable[$S0;'precedence']
     $S0 = clone $S0
-    substr $S0, -1, 0, '>'
+    $S0 = replace $S0, -1, 0, '>'
     token['precedence'] = $S0
   with_tighter:
 

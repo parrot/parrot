@@ -164,9 +164,9 @@ then a warning is generated if perl is running under -w.
 
     # padding with '='
     if len_mod_3 == 0 goto END_2
-        substr base64, -1, 1, ascii:"="
+        base64 = replace base64, -1, 1, ascii:"="
         if len_mod_3 == 2 goto END_2
-            substr base64, -2, 1, ascii:"="
+            base64 = replace base64, -2, 1, ascii:"="
     END_2:
 
     .return( base64 )

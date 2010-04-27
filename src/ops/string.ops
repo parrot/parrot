@@ -240,19 +240,15 @@ op unpin(inout STR) :base_mem {
 
 =item B<substr>(out STR, in STR, in INT, in INT)
 
-=item B<substr>(out STR, inout STR, in INT, in INT, in STR)
-
-=item B<substr>(inout STR, in INT, in INT, in STR)
-
-=item B<replace>(out STR, in STR, in INT, in INT, in STR)
-
 =item B<substr>(out STR, invar PMC, in INT, in INT)
 
 Set $1 to the portion of $2 starting at (zero-based) character position
 $3 and having length $4. If no length ($4) is provided, it is equivalent to
-passing in the length of $2. This creates a COW copy of $2.
+passing in the length of $2.
 
-Optionally pass in string $5 for replacement. If the length of $5 is
+=item B<replace>(out STR, in STR, in INT, in INT, in STR)
+
+Replace part of $2 starting from $3 of length $4 with $5. If the length of $5 is
 different from the length specified in $4, then $2 will grow or shrink
 accordingly. If $3 is one character position larger than the length of
 $2, then $5 is appended to $2 (and the empty string is returned);
@@ -264,8 +260,7 @@ Finally, if $3 is negative, then it is taken to count backwards from
 the end of the string (ie an offset of -1 corresponds to the last
 character).
 
-The third form is optimized for replace only, ignoring the replaced
-substring and does not waste a register to do the string replace.
+New $1 string returned.
 
 =cut
 
@@ -276,15 +271,6 @@ inline op substr(out STR, in STR, in INT) :base_core {
 
 inline op substr(out STR, in STR, in INT, in INT) :base_core {
     $1 = Parrot_str_substr(interp, $2, $3, $4);
-}
-
-inline op substr(out STR, inout STR, in INT, in INT, in STR) :base_core :deprecated {
-    $1 = Parrot_str_substr(interp, $2, $3, $4);
-    $2 = Parrot_str_replace(interp, $2, $3, $4, $5);
-}
-
-inline op substr(inout STR, in INT, in INT, in STR) :base_core :deprecated {
-    $1 = Parrot_str_replace(interp, $1, $2, $3, $4);
 }
 
 inline op substr(out STR, invar PMC, in INT, in INT) :base_core {

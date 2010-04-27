@@ -99,7 +99,7 @@ and HLL::Grammar.
     sigil = substr $S0, 0, 1
     $I0 = index '$@%&', sigil
     if $I0 < 0 goto sigil_done
-    substr $S0, 0, 1, ''
+    $S0 = replace $S0, 0, 1, ''
     ns[0] = $S0
     $S0 = ns[-1]
     $S0 = concat sigil, $S0

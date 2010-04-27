@@ -653,7 +653,8 @@ OUTPUT
     trans_charset S1, S0, I0
     find_encoding I0, "utf16"
     trans_encoding S1, S1, I0
-    substr S2, S1, 1, 1, "oe"
+    substr  S2, S1, 1, 1
+    replace S1, S1, 1, 1, "oe"
     find_encoding I0, "utf8"
     trans_encoding S2, S2, I0
     trans_encoding S1, S1, I0

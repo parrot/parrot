@@ -415,7 +415,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', 'I/O buffering' );
     \$S2 = ""
   SPLIT:
     \$S3 = substr \$S1, 0, 1
-    \$S1 = substr 0, 1, ""
+    \$S1 = replace \$S1, 0, 1, ""
     if \$S3 == " " goto GOT_NR
     \$S2 = concat \$S2, \$S3
     goto SPLIT
@@ -615,7 +615,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "substr after reading from file" );
 
     # Extract part of the read in file
     .local string head_from_file
-    substr head_from_file, from_file, 0, 5, ''
+    head_from_file = substr from_file, 0, 5
     say head_from_file
 
     end
@@ -646,23 +646,20 @@ pir_output_is( <<"CODE", <<'OUTPUT', "multiple substr after reading from file" )
     .local string sub_3
     sub_3 = ''
     substr sub_1, line, 0, 3
-    substr sub_2, line, 0, 3, ''
-    substr sub_3, line, 0, 3, ''
+    substr sub_2, line, 3, 3
+    line = replace line, 0, 6, ''
     print "line: "
     print line
     print "sub_1: "
     say sub_1
     print "sub_2: "
     say sub_2
-    print "sub_3: "
-    say sub_3
   end
 .end
 CODE
 line: 6789ABCDEFGHIJKLMNOPQRSTUVWXYZ
 sub_1: 012
-sub_2: 012
-sub_3: 345
+sub_2: 345
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUT', 'read on null PMC throws exception');
