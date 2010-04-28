@@ -393,8 +393,8 @@ Parrot_io_read_portable(PARROT_INTERP, SHIM(PMC *filehandle),
 
 /*
 
-=item C<size_t Parrot_io_write_portable(PARROT_INTERP, PMC *filehandle, STRING
-*s)>
+=item C<size_t Parrot_io_write_portable(PARROT_INTERP, PMC *filehandle, const
+STRING *s)>
 
 Writes the given STRING to the provided IO PMC.
 
@@ -403,10 +403,10 @@ Writes the given STRING to the provided IO PMC.
 */
 
 size_t
-Parrot_io_write_portable(PARROT_INTERP, ARGIN(PMC *filehandle), ARGMOD(STRING *s))
+Parrot_io_write_portable(PARROT_INTERP, ARGIN(PMC *filehandle), ARGIN(const STRING *s))
 {
     ASSERT_ARGS(Parrot_io_write_portable)
-    void * const buffer = s->strstart;
+    const void * const buffer = s->strstart;
     return fwrite(buffer, 1, s->bufused,
                   (FILE *)Parrot_io_get_os_handle(interp, filehandle));
 }

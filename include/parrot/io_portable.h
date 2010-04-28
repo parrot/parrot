@@ -91,11 +91,10 @@ PIOOFF_T Parrot_io_tell_portable(PARROT_INTERP, ARGIN(PMC *filehandle))
 
 size_t Parrot_io_write_portable(PARROT_INTERP,
     ARGIN(PMC *filehandle),
-    ARGMOD(STRING *s))
+    ARGIN(const STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*s);
+        __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_Parrot_io_close_portable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

@@ -543,8 +543,8 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
 
 /*
 
-=item C<size_t Parrot_io_write_buffer(PARROT_INTERP, PMC *filehandle, STRING
-*s)>
+=item C<size_t Parrot_io_write_buffer(PARROT_INTERP, PMC *filehandle, const
+STRING *s)>
 
 The buffer layer's C<Write> function.
 
@@ -553,7 +553,7 @@ The buffer layer's C<Write> function.
 */
 
 size_t
-Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(STRING *s))
+Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(const STRING *s))
 {
     ASSERT_ARGS(Parrot_io_write_buffer)
     unsigned char * const buffer_start = Parrot_io_get_buffer_start(interp, filehandle);

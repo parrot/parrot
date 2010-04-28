@@ -495,7 +495,7 @@ INTVAL Parrot_io_setlinebuf(PARROT_INTERP, ARGMOD(PMC *filehandle))
 
 size_t Parrot_io_write_buffer(PARROT_INTERP,
     ARGMOD(PMC *filehandle),
-    ARGIN(STRING *s))
+    ARGIN(const STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -552,12 +552,11 @@ size_t Parrot_io_read_utf8(PARROT_INTERP,
 
 size_t Parrot_io_write_utf8(PARROT_INTERP,
     ARGMOD(PMC *filehandle),
-    ARGMOD(STRING *s))
+    ARGIN(const STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*filehandle)
-        FUNC_MODIFIES(*s);
+        FUNC_MODIFIES(*filehandle);
 
 #define ASSERT_ARGS_Parrot_io_read_utf8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

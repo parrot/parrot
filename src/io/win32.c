@@ -472,7 +472,8 @@ Parrot_io_read_win32(PARROT_INTERP,
 
 /*
 
-=item C<size_t Parrot_io_write_win32(PARROT_INTERP, PMC *filehandle, STRING *s)>
+=item C<size_t Parrot_io_write_win32(PARROT_INTERP, PMC *filehandle, const
+STRING *s)>
 
 Calls C<WriteFile()> to write C<len> bytes from the memory starting at
 C<buffer> to C<*io>'s file descriptor. Returns C<(size_t)-1> on
@@ -483,9 +484,7 @@ failure.
 */
 
 size_t
-Parrot_io_write_win32(PARROT_INTERP,
-        ARGIN(PMC *filehandle),
-        ARGIN(STRING *s))
+Parrot_io_write_win32(PARROT_INTERP, ARGIN(PMC *filehandle), ARGIN(const STRING *s))
 {
     ASSERT_ARGS(Parrot_io_write_win32)
     DWORD countwrote = 0;
