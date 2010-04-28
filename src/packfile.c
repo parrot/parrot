@@ -481,6 +481,15 @@ static int sub_pragma(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+/* Segment header:
+  1 op - Segment size
+  1 op - Internal type
+  1 op - Internal id
+  1 op - Size of theop array
+  See pdd13_bytecode: Packfile Segment Header
+*/
+#define SEGMENT_HEADER_SIZE 4
+
 /* offset not in ptr diff, but in byte */
 #define OFFS(pf, cursor) ((pf) ? ((const char *)(cursor) - (const char *)((pf)->src)) : 0)
 /**
@@ -1573,7 +1582,7 @@ static void
 default_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 {
     ASSERT_ARGS(default_dump)
-    size_t i = self->data ? 0: self->file_offset + 4;
+    size_t i = self->data ? 0: self->file_offset + SEGMENT_HEADER_SIZE;
 
     default_dump_header(interp, self);
 
@@ -2517,10 +2526,7 @@ static size_t
 default_packed_size(ARGIN(const PackFile_Segment *self))
 {
     ASSERT_ARGS(default_packed_size)
-    /* op_count, itype, id, size */
-    /* XXX There should be a constant defining this 4, and why */
-    /* This is the 2nd place in the file that has this */
-    return 4 + self->size;
+    return SEGMENT_HEADER_SIZE + self->size;
 }
 
 
