@@ -90,6 +90,29 @@ Parrot_freeze_size(PARROT_INTERP, ARGIN(PMC *pmc))
 
 /*
 
+=item C<PMC *Parrot_freeze_strings(PARROT_INTERP, PMC *pmc)>
+
+Get the strings of a PMC to be frozen.
+
+Used in C<???>.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_freeze_strings(PARROT_INTERP, PMC *pmc) {
+    PMC *visitor = Parrot_pmc_new(interp, enum_class_ImageIOStrings);
+    VTABLE_set_pmc(interp, visitor, pmc);
+    return VTABLE_get_pmc(interp, visitor);
+}
+
+
+/*
+
 =item C<PMC* Parrot_thaw(PARROT_INTERP, STRING *image)>
 
 Thaws a PMC.  Called from the C<thaw> opcode.
