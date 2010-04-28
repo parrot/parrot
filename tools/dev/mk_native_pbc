@@ -177,4 +177,4 @@ fi
 
 echo ""
 echo "cd t/native_pbc"
-echo svn commit -m'native_pbc platform updates'
+echo "svn commit -m 'native_pbc platform updates'"
