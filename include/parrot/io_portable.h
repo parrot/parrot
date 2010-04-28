@@ -36,7 +36,9 @@ PMC * Parrot_io_fdopen_portable(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*filehandle);
 
-INTVAL Parrot_io_flush_portable(SHIM_INTERP, SHIM(PMC *filehandle));
+INTVAL Parrot_io_flush_portable(SHIM_INTERP, ARGIN(PMC *filehandle))
+        __attribute__nonnull__(2);
+
 INTVAL Parrot_io_getblksize_portable(PIOHANDLE fptr);
 INTVAL Parrot_io_init_portable(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -72,9 +74,10 @@ size_t Parrot_io_peek_portable(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 size_t Parrot_io_read_portable(PARROT_INTERP,
-    SHIM(PMC *filehandle),
+    ARGIN(PMC *filehandle),
     ARGIN(STRING **buf))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PIOOFF_T Parrot_io_seek_portable(PARROT_INTERP,
@@ -102,7 +105,8 @@ size_t Parrot_io_write_portable(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_io_fdopen_portable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(filehandle))
-#define ASSERT_ARGS_Parrot_io_flush_portable __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_io_flush_portable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(filehandle))
 #define ASSERT_ARGS_Parrot_io_getblksize_portable __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_io_init_portable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -121,6 +125,7 @@ size_t Parrot_io_write_portable(PARROT_INTERP,
     , PARROT_ASSERT_ARG(buf))
 #define ASSERT_ARGS_Parrot_io_read_portable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(filehandle) \
     , PARROT_ASSERT_ARG(buf))
 #define ASSERT_ARGS_Parrot_io_seek_portable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
