@@ -10,9 +10,6 @@ the string between the starting and ending positions. If the ending
 position is left out, C<substr> returns all the characters until the
 end of the string.
 
-An optional fourth argument is a string that will be used to
-replace the characters between the start and end positions.
-
 =cut
 
 .sub main :main
@@ -24,11 +21,6 @@ replace the characters between the start and end positions.
     $S0 = substr $S1, 1, 2
     say $S0                   # "bc"
     say $S1                   # "abcde"
-
-    set $S1, "abcde"
-    $S0 = substr $S1, 1, 2, "XYZ"
-    say $S0                       # "bc"
-    say $S1                       # "aXYZde"
 
 .end
 

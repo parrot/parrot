@@ -44,7 +44,7 @@
     chopn $S0, 1
 
   _IO__INPUT_CHAR__SUBSTR:
-    $S1 = substr $S0, 0, 1, ""
+    $S1 = replace $S0, 0, 1, ""
     $P0 = $S0
     set_global "user_input", $P0
 
@@ -90,7 +90,7 @@
     if i < len goto _IO__INPUT_INT__NEXT_CHAR
 
   _IO__INPUT_INT__NAN:
-    substr $S0, 0, i, ""
+    $S = replace $S0, 0, i, ""
     $P0 = $S0
     set_global "user_input", $P0
 

@@ -86,7 +86,7 @@
     concat str, $S0
 
     # truncate to 80 chars
-    substr str, 80, -1, ''
+    str = replace str, 80, -1, ''
 
     .return(str)
 .end
