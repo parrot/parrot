@@ -489,34 +489,35 @@ It generates a new string, "bc", in the destination register C<$S0>.
 When the offset position is negative, it counts backward from the end of the
 string. Thus an offset of -1 starts at the last character of the string.
 
-C<substr> also has a four-argument form, where the fourth argument is a string
-used to replace the substring. This variant modifies the source string and
-returns the removed substring.
+C<substr> no longer has a four-argument form, as in-place string operations
+have been removed.  There is a C<replace> operator which will perform the
+replacement and return a new_string without modifying the old_string.
+The arguments are new_string, old_string, offset, count and
+replacement_string.  The old_string is copied to the new_string with the
+replacement_string inserted from offset replacing the content for count
+characters.
 
-This example above replaces the substring "bc" in C<$S1> with the string "XYZ",
-and returns "bc" in C<$S0>:
+This example replaces the substring "bc" in C<$S1> with the string "XYZ",
+and returns "aXYZde" in C<$S0>, C<$S1> is not changed:
 
 =begin PIR_FRAGMENT
 
   $S1 = "abcde"
-  $S0 = substr $S1, 1, 2, "XYZ"
-  say $S0                        # prints "bc"
-  say $S1                        # prints "aXYZde"
+  $S0 = replace $S1, 1, 2, "XYZ"
+  say $S0                        # prints "aXYZde"
+  say $S1                        # prints "abcde"
 
 =end PIR_FRAGMENT
 
-When the offset position in a replacing C<substr> is one character beyond the
-original string length, C<substr> appends the replacement string just like the
+When the offset position in a C<replace> is one character beyond the original
+string length, C<replace> appends the replacement string just like the
 concatenation operator. If the replacement string is an empty string, the
-opcode removes the characters from the original string.
-
-If you don't need to capture the replaced string, an optimized version of
-C<substr> performs a replace without returning the removed substring:
+opcode removes the characters from the original string in the new string.
 
 =begin PIR_FRAGMENT
 
   $S1 = "abcde"
-  $S1 = substr 1, 2, "XYZ"
+  $S1 = replace $S1, 1, 2, "XYZ"
   say $S1                        # prints "aXYZde"
 
 =end PIR_FRAGMENT
@@ -897,10 +898,11 @@ The numeric bitwise opcodes also have string variants for AND, OR, and XOR:
 C<bors>X<bors opcode>, C<bands>X<bands opcode>, and C<bxors>X<bxors opcode>.
 These take string or string-like PMC arguments and perform the logical
 operation on each byte of the strings to produce the result string.
+Remember that in-place sting operations are no longer acailable.
 
 =begin PIR_FRAGMENT
 
-  $S0 = bors $S1
+  $P0 = bors $P1
   $P0 = bands $P1
   $S0 = bors $S1, $S2
   $P0 = bxors $P1, $S2
