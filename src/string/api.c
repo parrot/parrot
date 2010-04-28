@@ -1036,8 +1036,8 @@ Parrot_str_repeat(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL num)
 
 /*
 
-=item C<STRING * Parrot_str_substr(PARROT_INTERP, STRING *src, INTVAL offset,
-INTVAL length)>
+=item C<STRING * Parrot_str_substr(PARROT_INTERP, const STRING *src, INTVAL
+offset, INTVAL length)>
 
 Returns substring of length C<length> from C<offset> from the specified
 Parrot string.
@@ -1051,7 +1051,7 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
 Parrot_str_substr(PARROT_INTERP,
-        ARGIN_NULLOK(STRING *src), INTVAL offset, INTVAL length)
+        ARGIN_NULLOK(const STRING *src), INTVAL offset, INTVAL length)
 {
     ASSERT_ARGS(Parrot_str_substr)
 
@@ -1216,7 +1216,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
 
 /*
 
-=item C<STRING * Parrot_str_chopn(PARROT_INTERP, STRING *s, INTVAL n)>
+=item C<STRING * Parrot_str_chopn(PARROT_INTERP, const STRING *s, INTVAL n)>
 
 Removes the last C<n> characters of the specified Parrot string and returns the
 modified string. If C<n> is negative, cuts the string after C<+n> characters.
@@ -1228,7 +1228,7 @@ modified string. If C<n> is negative, cuts the string after C<+n> characters.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_str_chopn(PARROT_INTERP, ARGMOD(STRING *s), INTVAL n)
+Parrot_str_chopn(PARROT_INTERP, ARGIN(const STRING *s), INTVAL n)
 {
     ASSERT_ARGS(Parrot_str_chopn)
 
@@ -1835,7 +1835,7 @@ Parrot_str_to_int(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
     ASSERT_ARGS(Parrot_str_to_int)
     if (STRING_IS_NULL(s))
         return 0;
-    {
+    else {
         const UINTVAL       max_safe  = -(UINTVAL)PARROT_INTVAL_MIN / 10;
         const UINTVAL       last_dig  = (-(UINTVAL)PARROT_INTVAL_MIN) % 10;
         int                 sign      = 1;
@@ -2786,8 +2786,8 @@ Parrot_str_is_cclass(PARROT_INTERP, INTVAL flags,
 
 /*
 
-=item C<INTVAL Parrot_str_find_cclass(PARROT_INTERP, INTVAL flags, STRING *s,
-UINTVAL offset, UINTVAL count)>
+=item C<INTVAL Parrot_str_find_cclass(PARROT_INTERP, INTVAL flags, const STRING
+*s, UINTVAL offset, UINTVAL count)>
 
 Finds the first occurrence of the given character class in C<flags> in the
 string, and returns its glyph-wise index.
@@ -2799,7 +2799,7 @@ string, and returns its glyph-wise index.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_str_find_cclass(PARROT_INTERP, INTVAL flags, ARGIN_NULLOK(STRING *s),
+Parrot_str_find_cclass(PARROT_INTERP, INTVAL flags, ARGIN_NULLOK(const STRING *s),
                           UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(Parrot_str_find_cclass)
@@ -2813,8 +2813,8 @@ Parrot_str_find_cclass(PARROT_INTERP, INTVAL flags, ARGIN_NULLOK(STRING *s),
 
 /*
 
-=item C<INTVAL Parrot_str_find_not_cclass(PARROT_INTERP, INTVAL flags, STRING
-*s, UINTVAL offset, UINTVAL count)>
+=item C<INTVAL Parrot_str_find_not_cclass(PARROT_INTERP, INTVAL flags, const
+STRING *s, UINTVAL offset, UINTVAL count)>
 
 Finds the first occurrence of the a character I<not> in the given character
 class in C<flags> in the string starting from C<offset> and looking at C<count>
@@ -2829,7 +2829,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_str_find_not_cclass(PARROT_INTERP, INTVAL flags,
-    ARGIN_NULLOK(STRING *s), UINTVAL offset, UINTVAL count)
+    ARGIN_NULLOK(const STRING *s), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(Parrot_str_find_not_cclass)
 
@@ -2918,7 +2918,7 @@ Parrot_str_change_encoding(PARROT_INTERP, ARGMOD_NULLOK(STRING *src),
 
 /*
 
-=item C<STRING * Parrot_str_compose(PARROT_INTERP, STRING *src)>
+=item C<STRING * Parrot_str_compose(PARROT_INTERP, const STRING *src)>
 
 Normalizes the string.
 
@@ -2930,7 +2930,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING *
-Parrot_str_compose(PARROT_INTERP, ARGIN_NULLOK(STRING *src))
+Parrot_str_compose(PARROT_INTERP, ARGIN_NULLOK(const STRING *src))
 {
     ASSERT_ARGS(Parrot_str_compose)
 
