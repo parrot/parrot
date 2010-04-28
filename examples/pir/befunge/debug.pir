@@ -181,7 +181,7 @@
     print "bef> "
     $P0 = getstdin
     $S0 = readline $P0
-    chopn $S0, 1
+    $S0 = chopn $S0, 1
     $I0 = length $S0
 
     if $I0 == 0 goto DEBUG__INTERACT__NEXT
