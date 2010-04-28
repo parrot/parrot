@@ -132,15 +132,9 @@ END
     .local string msg
     msg = "able to invoke overridden method on core PMC (TT #1596)"
     $P0 = new 'ResizablePMCArray'
-    push_eh jic
-        $I0 = $P0.'foo'()
-        is($I0, 1, msg)
-        .return()
-  jic:
-    pop_eh
-    # remove the exception handler and the todo when this test passes
-    # so that future regressions are noisy.
-    todo('','cannot find method', msg)
+    $I0 = $P0.'foo'()
+    is($I0, 1, msg)
+    .return()
 .end
 
 .namespace ['ResizablePMCArray']

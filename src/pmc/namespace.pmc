@@ -299,8 +299,9 @@ Initialize a C<NameSpace> PMC.
 */
 
     VTABLE void init() {
-        PARROT_NAMESPACE(SELF)->vtable = PMCNULL;
-        PARROT_NAMESPACE(SELF)->_class = PMCNULL;
+        PARROT_NAMESPACE(SELF)->vtable  = PMCNULL;
+        PARROT_NAMESPACE(SELF)->methods = PMCNULL;
+        PARROT_NAMESPACE(SELF)->_class  = PMCNULL;
         SELF.set_pointer(parrot_new_hash(INTERP));
         PObj_custom_mark_destroy_SETALL(SELF);
     }
@@ -647,6 +648,61 @@ Return the name of this namespace part.
     VTABLE STRING *get_string() {
         const Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
         return nsinfo->name;
+    }
+
+/*
+
+=item C<PMC *inspect_str(STRING *what)>
+
+Provides introspection of a specific piece of information about the
+namespace. The available information is:
+
+=over 8
+
+=item class
+
+The class object associated with the namespace, if any.
+
+=item methods
+
+A temporary cache of methods (destroyed when class object is created).
+Hash keyed on method name, value is an invokable PMC. Includes methods
+composed in from roles.
+
+=item vtable_overrides
+
+A temporary cache of vtable overrides (destroyed when class object is
+created). Hash keyed on vtable name, value is an invokable PMC.
+Includes vtable overrides composed in from roles.
+
+=back
+
+=cut
+
+*/
+
+    VTABLE PMC *inspect_str(STRING *what) {
+        const Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
+        PMC *found;
+
+        if (Parrot_str_equal(interp, what, CONST_STRING(interp, "methods"))) {
+            found = nsinfo->methods;
+        }
+        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "vtable_overrides"))) {
+            found = nsinfo->vtable;
+        }
+        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "class"))) {
+            found = nsinfo->_class;
+        }
+        else
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Unknown introspection value '%S'", what);
+
+        /* return found value */
+        if (PMC_IS_NULL(found))
+            return PMCNULL;
+
+	return found;
     }
 
 /*
