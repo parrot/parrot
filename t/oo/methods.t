@@ -134,7 +134,7 @@ END
     $P0 = new 'ResizablePMCArray'
     push_eh jic
         $I0 = $P0.'foo'()
-        is($I0, 1, msg) 
+        is($I0, 1, msg)
         .return()
   jic:
     pop_eh
