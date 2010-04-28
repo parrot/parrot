@@ -1265,9 +1265,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
     PMC                   *sub_pmc;
     Parrot_Sub_attributes *sub, *outer_sub;
 
-    const int            k            = add_const_table(interp);
     PackFile_ConstTable * const ct    = interp->code->const_table;
-    PackFile_Constant   * const pfc   = ct->constants[k];
     IMC_Unit            * const unit  =
         IMCC_INFO(interp)->globals->cs->subs->unit;
 
@@ -1277,8 +1275,6 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
 
     int                  i;
     int                  ns_const = -1;
-
-    IMCC_INFO(interp)->globals->cs->subs->pmc_const = k;
 
     if (unit->_namespace) {
         /* strip namespace off from front */
@@ -1445,29 +1441,36 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
 
     Parrot_store_sub_in_namespace(interp, sub_pmc);
 
-    pfc->type     = PFC_PMC;
-    pfc->u.key    = sub_pmc;
-    unit->sub_pmc = sub_pmc;
-
     if (sub->outer_sub)
         PMC_get_sub(interp, sub->outer_sub, outer_sub);
 
-    IMCC_debug(interp, DEBUG_PBC_CONST,
-            "add_const_pmc_sub '%s' flags %x color %d (%Ss) "
-            "lex_info %s :outer(%Ss)\n",
-            r->name, r->pcc_sub->pragma, k,
-            sub_pmc->vtable->whoami,
-            sub->lex_info ? "yes" : "no",
-            sub->outer_sub? outer_sub->name :
-            Parrot_str_new(interp, "*none*", 0));
+    {
+        const int            k            = add_const_table(interp);
+        PackFile_Constant   * const pfc   = ct->constants[k];
 
-    /*
-     * create entry in our fixup (=symbol) table
-     * the offset is the index in the constant table of this Sub
-     */
-    PackFile_FixupTable_new_entry(interp, r->name, enum_fixup_sub, k);
+        pfc->type     = PFC_PMC;
+        pfc->u.key    = sub_pmc;
+        unit->sub_pmc = sub_pmc;
 
-    return k;
+        IMCC_INFO(interp)->globals->cs->subs->pmc_const = k;
+
+        IMCC_debug(interp, DEBUG_PBC_CONST,
+                "add_const_pmc_sub '%s' flags %x color %d (%Ss) "
+                "lex_info %s :outer(%Ss)\n",
+                r->name, r->pcc_sub->pragma, k,
+                sub_pmc->vtable->whoami,
+                sub->lex_info ? "yes" : "no",
+                sub->outer_sub? outer_sub->name :
+                Parrot_str_new(interp, "*none*", 0));
+
+        /*
+         * create entry in our fixup (=symbol) table
+         * the offset is the index in the constant table of this Sub
+         */
+        PackFile_FixupTable_new_entry(interp, r->name, enum_fixup_sub, k);
+
+        return k;
+    }
 }
 
 
