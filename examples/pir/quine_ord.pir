@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2008, Parrot Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 # ATT no autoexpanding svn markers please
 
 .sub quine :main
@@ -838,8 +838,8 @@ push code_as_data, 54
 push code_as_data, 45
 push code_as_data, 50
 push code_as_data, 48
+push code_as_data, 49
 push code_as_data, 48
-push code_as_data, 56
 push code_as_data, 44
 push code_as_data, 32
 push code_as_data, 80
@@ -1712,12 +1712,20 @@ push code_as_data, 32
 push code_as_data, 32
 push code_as_data, 32
 push code_as_data, 32
-push code_as_data, 115
-push code_as_data, 117
-push code_as_data, 98
-push code_as_data, 115
-push code_as_data, 116
+push code_as_data, 99
+push code_as_data, 111
+push code_as_data, 100
+push code_as_data, 101
+push code_as_data, 32
+push code_as_data, 61
+push code_as_data, 32
 push code_as_data, 114
+push code_as_data, 101
+push code_as_data, 112
+push code_as_data, 108
+push code_as_data, 97
+push code_as_data, 99
+push code_as_data, 101
 push code_as_data, 32
 push code_as_data, 99
 push code_as_data, 111
@@ -1895,6 +1903,40 @@ push code_as_data, 98
 push code_as_data, 115
 push code_as_data, 116
 push code_as_data, 114
+push code_as_data, 32
+push code_as_data, 99
+push code_as_data, 111
+push code_as_data, 100
+push code_as_data, 101
+push code_as_data, 44
+push code_as_data, 32
+push code_as_data, 48
+push code_as_data, 44
+push code_as_data, 32
+push code_as_data, 49
+push code_as_data, 10
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 32
+push code_as_data, 99
+push code_as_data, 111
+push code_as_data, 100
+push code_as_data, 101
+push code_as_data, 32
+push code_as_data, 61
+push code_as_data, 32
+push code_as_data, 114
+push code_as_data, 101
+push code_as_data, 112
+push code_as_data, 108
+push code_as_data, 97
+push code_as_data, 99
+push code_as_data, 101
 push code_as_data, 32
 push code_as_data, 99
 push code_as_data, 111
@@ -3530,7 +3572,7 @@ push code_as_data, 10
 
 DO_QUINE:
     # First print the stuff data section
-    print "# Copyright (C) 2006-2008, Parrot Foundation.\n"
+    print "# Copyright (C) 2006-2010, Parrot Foundation.\n"
     print "# ATT no autoexpanding svn markers please\n"
     print "\n"
     print ".sub quine :main\n"
@@ -3562,13 +3604,14 @@ DO_QUINE:
     # Ignore everything up to end of data section
     .local int end_of_data_pos
     end_of_data_pos = index code, "# ------ End of data section ------"
-    substr code, 0, end_of_data_pos, ''
+    code = replace code, 0, end_of_data_pos, ''
 
     .local string char_string
     .local int    char_int
     SHIFT_NEXT_CHAR:
     unless code goto FINISH_SHIFT_CHARS
-        char_string = substr code, 0, 1, ''
+        char_string = substr code, 0, 1
+        code = replace code, 0, 1, ''
         char_int = ord char_string
         print 'push code_as_data, '
         print char_int
