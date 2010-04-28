@@ -159,7 +159,8 @@ Checks new pmcs for strings.
 
     VTABLE void push_pmc(PMC *v) {
         if (!PMC_IS_NULL(v)) {
-            Hash * const hash    = (Hash *)VTABLE_get_pointer(INTERP, PARROT_IMAGEIOSTRINGS(SELF)->seen);
+            Hash * const hash    = (Hash *)VTABLE_get_pointer(INTERP,
+                                                PARROT_IMAGEIOSTRINGS(SELF)->seen);
             HashBucket * const b = parrot_hash_get_bucket(INTERP, hash, v);
             if (!b) {
                 /* not yet seen */
