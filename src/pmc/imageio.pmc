@@ -322,14 +322,14 @@ visit_todo_list_freeze(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc), ARGMOD(PMC* info))
         Hash * const hash = (Hash *)VTABLE_get_pointer(interp, PARROT_IMAGEIO(info)->seen);
 
         PARROT_ASSERT(pmc);
-        
+
         /* workaround to keep ParrotInterpreter PBC hack working */
         if (pmc->vtable->base_type == enum_class_ParrotInterpreter)
             PObj_flag_CLEAR(private1, info);
 
         VTABLE_push_integer(interp, info,
                 PObj_is_object_TEST(pmc) ? (INTVAL) enum_class_Object : pmc->vtable->base_type);
-                
+
         parrot_hash_put(interp, hash, pmc, (void *)id);
         VTABLE_push_pmc(interp, PARROT_IMAGEIO(info)->todo, pmc);
         VTABLE_freeze(interp, pmc, info);
@@ -634,7 +634,8 @@ Removes and returns a string from the start of the image.
         if (PObj_flag_TEST(private1, SELF)) {
             PackFile_ConstTable *table = PARROT_IMAGEIO(SELF)->pf_ct;
             opcode_t *pos              = GET_VISIT_CURSOR(SELF);
-            INTVAL i                   = PF_fetch_integer(PARROT_IMAGEIO(SELF)->pf, (const opcode_t **)&pos);
+            INTVAL i                   = PF_fetch_integer(PARROT_IMAGEIO(SELF)->pf,
+                                                (const opcode_t **)&pos);
             SET_VISIT_CURSOR(SELF, (char *)pos);
             BYTECODE_SHIFT_OK(SELF);
             return table->constants[i]->u.string;

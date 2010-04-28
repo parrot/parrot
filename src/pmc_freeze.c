@@ -157,6 +157,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_freeze_strings(PARROT_INTERP, PMC *pmc)
 {
+    ASSERT_ARGS(Parrot_freeze_strings)
     PMC *visitor = Parrot_pmc_new(interp, enum_class_ImageIOStrings);
     VTABLE_set_pmc(interp, visitor, pmc);
     return VTABLE_get_pmc(interp, visitor);
@@ -225,6 +226,8 @@ Parrot_thaw(PARROT_INTERP, ARGIN(STRING *image))
 =item C<PMC* Parrot_thaw_pbc(PARROT_INTERP, STRING *image, PackFile_ConstTable
 *pf)>
 
+Thaw a pmc frozen by Parrot_freeze_pbc.
+
 =cut
 
 */
@@ -235,7 +238,7 @@ PARROT_CAN_RETURN_NULL
 PMC*
 Parrot_thaw_pbc(PARROT_INTERP, ARGIN(STRING *image), ARGIN(PackFile_ConstTable *pf))
 {
-    ASSERT_ARGS(Parrot_thaw)
+    ASSERT_ARGS(Parrot_thaw_pbc)
     PMC *info, *pf_pmc, *result;
 
     pf_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
