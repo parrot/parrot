@@ -14,6 +14,10 @@ Get a list of strings in an object graph. Used in packfile creation.
 
 */
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass ImageIOStrings auto_attrs {
     ATTR PMC *seen; /* seen hash */
     ATTR PMC *todo; /* todo list */

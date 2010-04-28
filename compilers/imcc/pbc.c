@@ -78,7 +78,7 @@ add_const_pmc_sub(PARROT_INTERP,
         FUNC_MODIFIES(*r);
 
 PARROT_WARN_UNUSED_RESULT
-static int add_const_str(PARROT_INTERP, ARGIN(const SymReg *r))
+static int add_const_str(PARROT_INTERP, ARGIN(STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -222,7 +222,7 @@ static void verify_signature(PARROT_INTERP,
     , PARROT_ASSERT_ARG(r))
 #define ASSERT_ARGS_add_const_str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(r))
+    , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_add_const_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_add_const_table_key __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -832,7 +832,7 @@ fixup_globals(PARROT_INTERP)
                     interp->code->base.data[addr] = op;
 
                     if (nam->color < 0)
-                        nam->color = add_const_str(interp, nam);
+                        nam->color = add_const_str(interp, IMCC_string_from_reg(interp, nam));
 
                     interp->code->base.data[addr+2] = nam->color;
 
@@ -968,7 +968,7 @@ IMCC_string_from__STRINGC(PARROT_INTERP, ARGIN(char *buf))
 
 /*
 
-=item C<static int add_const_str(PARROT_INTERP, const SymReg *r)>
+=item C<static int add_const_str(PARROT_INTERP, STRING *s)>
 
 Adds a constant string to constant_table.
 
@@ -978,12 +978,11 @@ Adds a constant string to constant_table.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-add_const_str(PARROT_INTERP, ARGIN(const SymReg *r))
+add_const_str(PARROT_INTERP, ARGIN(STRING *s))
 {
     ASSERT_ARGS(add_const_str)
 
     PackFile_ConstTable *table = interp->code->const_table;
-    STRING * const       s     = IMCC_string_from_reg(interp, r);
     int i;
 
     for (i = 0; i < table->const_count; ++i) {
@@ -1325,7 +1324,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
     PMC_get_sub(interp, sub_pmc, sub);
     Sub_comp_get_FLAGS(sub) |= (r->pcc_sub->pragma & SUB_COMP_FLAG_MASK);
 
-    r->color  = add_const_str(interp, r);
+    r->color  = add_const_str(interp, IMCC_string_from_reg(interp, r));
     sub->name = ct->constants[r->color]->u.string;
 
     /* If the unit has no subid, set the subid to match the name. */
@@ -1339,7 +1338,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
         mem_sys_free(oldname);
 
         /* create string constant for it. */
-        unit->subid->color = add_const_str(interp, unit->subid);
+        unit->subid->color = add_const_str(interp, IMCC_string_from_reg(interp, unit->subid));
     }
 
     sub->subid = ct->constants[unit->subid->color]->u.string;
@@ -1444,6 +1443,20 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
     if (sub->outer_sub)
         PMC_get_sub(interp, sub->outer_sub, outer_sub);
 
+    /*
+     * store the sub's strings
+     * XXX these need to occur before the sub to support thawing properly
+     */
+    {
+        PMC *strings = Parrot_freeze_strings(interp, sub_pmc);
+        int n = VTABLE_elements(interp, strings);
+        for (i = 0; i < n; i++) {
+            int unused = add_const_str(interp, VTABLE_get_string_keyed_int(interp, strings, i));
+            UNUSED(unused);
+        }
+    }
+
+    /* store the sub */
     {
         const int            k            = add_const_table(interp);
         PackFile_Constant   * const pfc   = ct->constants[k];
@@ -1878,7 +1891,7 @@ add_1_const(PARROT_INTERP, ARGMOD(SymReg *r))
       case 'S':
         if (r->type & VT_CONSTP)
             r = r->reg;
-        r->color = add_const_str(interp, r);
+        r->color = add_const_str(interp, IMCC_string_from_reg(interp, r));
         break;
       case 'N':
         r->color = add_const_num(interp, r->name);
