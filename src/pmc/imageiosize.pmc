@@ -52,6 +52,11 @@ visit_todo_list_freeze(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(PMC* info))
         Hash * const hash = (Hash *)VTABLE_get_pointer(interp, PARROT_IMAGEIOSIZE(info)->seen);
 
         parrot_hash_put(interp, hash, pmc, pmc);
+
+        /* workaround to keep ParrotInterpreter PBC hack working */
+        if (pmc->vtable->base_type == enum_class_ParrotInterpreter)
+            PObj_flag_CLEAR(private1, info);
+
         VTABLE_push_integer(interp, info, pmc->vtable->base_type);
         VTABLE_push_pmc(interp, PARROT_IMAGEIOSIZE(info)->todo, pmc);
         VTABLE_freeze(interp, pmc, info);
@@ -91,6 +96,33 @@ Initializes the PMC.
         PARROT_IMAGEIOSIZE(SELF)->seen = Parrot_pmc_new(INTERP, enum_class_Hash);
         VTABLE_set_pointer(INTERP, PARROT_IMAGEIOSIZE(SELF)->seen,
             parrot_new_intval_hash(INTERP));
+
+        PObj_flag_CLEAR(private1, SELF);
+
+        PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+/*
+
+=item C<void init_pmc()>
+
+Initializes the PMC with a pre-existing C<PackFile_ConstTable>.
+
+=cut
+
+*/
+    VTABLE void init_pmc(PMC *pmc) {
+        UNUSED(pmc);
+
+        PARROT_IMAGEIOSIZE(SELF)->todo = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        PARROT_IMAGEIOSIZE(SELF)->pf   = PackFile_new(INTERP, 0);
+        PARROT_IMAGEIOSIZE(SELF)->size = 0;
+
+        PARROT_IMAGEIOSIZE(SELF)->seen = Parrot_pmc_new(INTERP, enum_class_Hash);
+        VTABLE_set_pointer(INTERP, PARROT_IMAGEIOSIZE(SELF)->seen,
+            parrot_new_intval_hash(INTERP));
+
+        PObj_flag_SET(private1, SELF);
 
         PObj_custom_mark_destroy_SETALL(SELF);
     }
@@ -210,10 +242,14 @@ Pushes the string C<*v> onto the end of the image.
 
 */
 
-    VTABLE void push_string(STRING *v)
-    {
-        const size_t len = PF_size_string(v) * sizeof (opcode_t);
-        PARROT_IMAGEIOSIZE(SELF)->size += len;
+    VTABLE void push_string(STRING *v) {
+        if (PObj_flag_TEST(private1, SELF)) {
+            STATICSELF.push_integer(0);
+        }
+        else {
+            const size_t len = PF_size_string(v) * sizeof (opcode_t);
+            PARROT_IMAGEIOSIZE(SELF)->size += len;
+        }
     }
 
 /*

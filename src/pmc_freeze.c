@@ -61,11 +61,37 @@ Parrot_freeze(PARROT_INTERP, ARGIN(PMC *pmc))
 
 /*
 
+=item C<STRING * Parrot_freeze_pbc(PARROT_INTERP, PMC *pmc, const
+PackFile_ConstTable *pf)>
+
+Freeze to a PackFile.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+STRING *
+Parrot_freeze_pbc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTable *pf)) {
+    ASSERT_ARGS(Parrot_freeze_pbc)
+    PMC *pf_pmc, *visitor;
+
+    pf_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+    VTABLE_set_pointer(interp, pf_pmc, (void *)pf);
+
+    visitor  = Parrot_pmc_new_init(interp, enum_class_ImageIO, pf_pmc);
+    VTABLE_set_pmc(interp, visitor, pmc);
+
+    return VTABLE_get_string(interp, visitor);
+}
+
+
+/*
+
 =item C<UINTVAL Parrot_freeze_size(PARROT_INTERP, PMC *pmc)>
 
 Get the size of an image to be frozen without allocating a large buffer.
-
-Used in C<Packfile_Constant_pack_size>.
 
 =cut
 
@@ -87,10 +113,35 @@ Parrot_freeze_size(PARROT_INTERP, ARGIN(PMC *pmc))
     return int_result;
 }
 
+/*
+
+=item C<UINTVAL Parrot_freeze_pbc_size(PARROT_INTERP, PMC *pmc)>
+
+Get the size of an image if it were created using C<Parrot_freeze_pbc>.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+UINTVAL
+Parrot_freeze_pbc_size(PARROT_INTERP, ARGIN(PMC *pmc))
+{
+    ASSERT_ARGS(Parrot_freeze_pbc_size)
+    UINTVAL  int_result;
+    PMC     *pmc_result;
+    PMC     *visitor = Parrot_pmc_new_init(interp, enum_class_ImageIOSize, PMCNULL);
+    VTABLE_set_pmc(interp, visitor, pmc);
+    pmc_result = VTABLE_get_pmc(interp, visitor);
+    int_result = VTABLE_get_integer(interp, pmc_result);
+    return int_result;
+}
+
 
 /*
 
-=item C<PMC *Parrot_freeze_strings(PARROT_INTERP, PMC *pmc)>
+=item C<PMC * Parrot_freeze_strings(PARROT_INTERP, PMC *pmc)>
 
 Get the strings of a PMC to be frozen.
 
@@ -104,7 +155,8 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_freeze_strings(PARROT_INTERP, PMC *pmc) {
+Parrot_freeze_strings(PARROT_INTERP, PMC *pmc)
+{
     PMC *visitor = Parrot_pmc_new(interp, enum_class_ImageIOStrings);
     VTABLE_set_pmc(interp, visitor, pmc);
     return VTABLE_get_pmc(interp, visitor);
@@ -167,6 +219,45 @@ Parrot_thaw(PARROT_INTERP, ARGIN(STRING *image))
     return result;
 }
 
+
+/*
+
+=item C<PMC* Parrot_thaw_pbc(PARROT_INTERP, STRING *image, PackFile_ConstTable
+*pf)>
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+PMC*
+Parrot_thaw_pbc(PARROT_INTERP, ARGIN(STRING *image), ARGIN(PackFile_ConstTable *pf))
+{
+    ASSERT_ARGS(Parrot_thaw)
+    PMC *info, *pf_pmc, *result;
+
+    pf_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+    VTABLE_set_pointer(interp, pf_pmc, pf);
+
+    info = Parrot_pmc_new_init(interp, enum_class_ImageIO, pf_pmc);
+
+    /* TODO
+     * Find out what broken code depends on blocking GC here and fix it, regardless of performance
+     * wins.
+     */
+    Parrot_block_GC_mark(interp);
+    Parrot_block_GC_sweep(interp);
+
+    VTABLE_set_string_native(interp, info, image);
+    result = VTABLE_get_pmc(interp, info);
+
+    Parrot_unblock_GC_mark(interp);
+    Parrot_unblock_GC_sweep(interp);
+
+    return result;
+}
 
 /*
 

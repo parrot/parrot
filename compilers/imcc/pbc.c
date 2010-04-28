@@ -6,6 +6,7 @@
 #include "imc.h"
 #include "pbc.h"
 #include "parrot/packfile.h"
+#include "parrot/pmc_freeze.h"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
 
@@ -1452,7 +1453,6 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
         int n = VTABLE_elements(interp, strings);
         for (i = 0; i < n; i++) {
             int unused = add_const_str(interp, VTABLE_get_string_keyed_int(interp, strings, i));
-            UNUSED(unused);
         }
     }
 
