@@ -45,7 +45,7 @@ automatically aggregated and output to STDOUT.
     set_global ['TAP';'Harness'], 'LEGAL_CALLBACK', $P0
 .end
 
-.sub 'init' :vtable :init
+.sub 'init' :vtable :method
     $P0 = get_global ['TAP';'Harness'], 'LEGAL_CALLBACK'
     setattribute self, 'ok_callbacks', $P0
 .end

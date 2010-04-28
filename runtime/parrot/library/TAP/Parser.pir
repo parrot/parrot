@@ -660,7 +660,7 @@ C<TAP;Parser> is designed to produce a proper parse of TAP output.
     set_global ['TAP';'Parser'], 'LEGAL_CALLBACK', $P0
 .end
 
-.sub 'init' :vtable :init
+.sub 'init' :vtable :method
     $P0 = new 'ResizableIntegerArray'
     setattribute self, 'skipped', $P0
     $P0 = new 'ResizableIntegerArray'
