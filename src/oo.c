@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007-2009, Parrot Foundation.
+Copyright (C) 2007-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -1051,19 +1051,16 @@ find_method_direct_1(PARROT_INTERP, ARGIN(PMC *_class),
         _class = VTABLE_get_pmc_keyed_int(interp, mro, i);
         ns     = VTABLE_get_namespace(interp, _class);
 
-	class_obj = VTABLE_inspect_str(interp, ns, class_str);
-	if (PMC_IS_NULL(class_obj))
-	    method_hash = VTABLE_inspect_str(interp, ns,
-		    methods_str);
-	else
-	    method_hash = VTABLE_inspect_str(interp, class_obj,
-		    methods_str);
+        class_obj = VTABLE_inspect_str(interp, ns, class_str);
+        if (PMC_IS_NULL(class_obj))
+            method_hash = VTABLE_inspect_str(interp, ns, methods_str);
+        else
+            method_hash = VTABLE_inspect_str(interp, class_obj, methods_str);
 
-	if (!PMC_IS_NULL(method_hash))
-            method = VTABLE_get_pmc_keyed_str(interp, method_hash,
-			method_name);
+        if (!PMC_IS_NULL(method_hash))
+            method = VTABLE_get_pmc_keyed_str(interp, method_hash, method_name);
 
-	if (PMC_IS_NULL(method))
+        if (PMC_IS_NULL(method))
             method = VTABLE_get_pmc_keyed_str(interp, ns, method_name);
 
         TRACE_FM(interp, _class, method_name, method);
