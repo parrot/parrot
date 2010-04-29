@@ -145,6 +145,9 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
 .sub '_prefix_and_file' :anon
     .param string path
     $S0 = dirname(path)
+    unless $S0 == '.' goto L1
+    $S0 = ''
+  L1:
     $S1 = basename(path)
     .return ($S0, $S1)
 .end
