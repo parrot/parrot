@@ -2712,7 +2712,7 @@ pf_debug_pack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGOUT(opcode_t *cu
 
     if (n > 0 && debug->mappings == NULL)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-	    "No mappings but non zero num mappings(%I)", n);
+                                    "No mappings but non zero num mappings(%I)", n);
 
     /* Store number of mappings. */
     *cursor++ = n;
