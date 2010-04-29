@@ -3030,19 +3030,26 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     archive_file = get_tarname('.tar.gz', kv :flat :named)
     $I0 = newer(archive_file, $P0)
     if $I0 goto L1
-    $S0 = get_tarname('', kv :flat :named)
-    copy_sdist($S0, $P0)
-    chdir($S0)
+    .local string prefix
+    prefix = get_tarname('', kv :flat :named)
+    copy_sdist(prefix, $P0)
     .local pmc archive
     archive = new ['Archive';'TAR']
-    archive.'add_files'($P0 :flat)
-    chdir('..')
+    $P1 = iter $P0
+  L2:
+    unless $P1 goto L3
+    $S1 = shift $P1
+    $S0 = prefix . '/'
+    $S0 .= $S1
+    archive.'add_files'($S0)
+    goto L2
+  L3:
     $P0 = loadlib 'gziphandle'
     $P0 = new 'GzipHandle'
     $P0.'open'(archive_file, 'wb')
     archive.'write'($P0)
     $P0.'close'()
-    rmtree($S0)
+    rmtree(prefix)
   L1:
 .end
 
