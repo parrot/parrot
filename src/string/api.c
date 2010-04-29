@@ -882,12 +882,17 @@ treated as counting from the end of the string.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-string_ord(PARROT_INTERP, ARGIN_NULLOK(const STRING *s), INTVAL idx)
+string_ord(PARROT_INTERP, ARGIN(const STRING *s), INTVAL idx)
 {
     ASSERT_ARGS(string_ord)
-    const UINTVAL len        = s ? Parrot_str_byte_length(interp, s) : 0;
+    UINTVAL len;
     UINTVAL       true_index = (UINTVAL)idx;
 
+    if (STRING_IS_NULL(s))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ORD_OUT_OF_STRING,
+            "Cannot get character of NULL string");
+
+    len = Parrot_str_byte_length(interp, s);
     if (len == 0)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ORD_OUT_OF_STRING,
             "Cannot get character of empty string");

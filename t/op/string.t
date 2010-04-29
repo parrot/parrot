@@ -695,7 +695,7 @@ WHILE:
    ord $I0,$S0
    ok( 0, 'no exception: 2-param ord, empty string register' )
  handler:
-   .exception_is( 'Cannot get character of empty string' )
+   .exception_is( 'Cannot get character of NULL string' )
 .end
 
 .sub exception_three_param_ord_empty_string
@@ -711,7 +711,7 @@ WHILE:
    ord $I0,$S0,0
    ok( 0, 'no exception: 3-param ord, empty string register' )
  handler:
-   .exception_is( 'Cannot get character of empty string' )
+   .exception_is( 'Cannot get character of NULL string' )
 .end
 
 .sub two_param_ord_one_character_string

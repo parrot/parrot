@@ -309,8 +309,8 @@ gen_sprintf_call(ARGOUT(char *out), ARGMOD(SpfInfo *info), int thingy)
 
 /*
 
-=item C<STRING * Parrot_sprintf_format(PARROT_INTERP, STRING *pat, SPRINTF_OBJ
-*obj)>
+=item C<STRING * Parrot_sprintf_format(PARROT_INTERP, const STRING *pat,
+SPRINTF_OBJ *obj)>
 
 This is the engine that does all the formatting.
 
@@ -321,8 +321,7 @@ This is the engine that does all the formatting.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_sprintf_format(PARROT_INTERP,
-        ARGIN(STRING *pat), ARGIN(SPRINTF_OBJ *obj))
+Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OBJ *obj))
 {
     ASSERT_ARGS(Parrot_sprintf_format)
     INTVAL i;
