@@ -497,14 +497,10 @@ Parrot_str_new(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), const UINTVAL le
 {
     ASSERT_ARGS(Parrot_str_new)
     /* Force an 8-bit encoding at some point? */
-    if (len)
-        return Parrot_str_new_init(interp, buffer, len,
-            PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET, 0);
-    else {
-        const UINTVAL buff_length = buffer ? strlen(buffer) : 0;
-        return Parrot_str_new_init(interp, buffer, buff_length,
-            PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET, 0);
-    }
+    const UINTVAL buff_length = (len > 0) ? len : buffer ? strlen(buffer) : 0;
+
+    return Parrot_str_new_init(interp, buffer, buff_length,
+        PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET, 0);
 }
 
 
