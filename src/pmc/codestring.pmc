@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007-2009, Parrot Foundation.
+Copyright (C) 2007-2010, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -108,6 +108,7 @@ A newline is automatically added to the end of the fmt.
     STRING * const comma       = CONST_STRING(INTERP, ",");
     STRING * const comma_space = CONST_STRING(INTERP, ", ");
     STRING * const newline     = CONST_STRING(INTERP, "\n");
+    PMC           *parts       = PMCNULL;
     STRING *key, *repl, *S1;
     INTVAL pos          = 0;
     INTVAL replen       = 0;
@@ -128,19 +129,7 @@ A newline is automatically added to the end of the fmt.
             repl = VTABLE_get_string_keyed_int(INTERP, args, I0);
         }
         else if (Parrot_str_equal(INTERP, key, comma)) {
-            INTVAL I0;
-            INTVAL I1;
-
-            repl = VTABLE_get_string_keyed_int(INTERP, args, 0);
-            I1   = VTABLE_elements(INTERP, args);
-            I0   = 1;
-
-            while (I0 < I1) {
-                STRING * const S0 = VTABLE_get_string_keyed_int(INTERP, args, I0);
-                repl = Parrot_str_concat(INTERP, repl, comma_space);
-                repl = Parrot_str_concat(INTERP, repl, S0);
-                I0++;
-            }
+            repl = Parrot_str_join(INTERP, comma_space, args);
         }
         else if (Parrot_str_equal(INTERP, key, percent)) {
             repl = percent;
@@ -155,13 +144,20 @@ A newline is automatically added to the end of the fmt.
         replen = Parrot_str_byte_length(INTERP, repl);
     }
 
+    GET_ATTR_str_val(INTERP, SELF, S1);
+
+    parts = Parrot_pmc_new_temporary(INTERP, enum_class_ResizableStringArray);
+    VTABLE_set_integer_native(INTERP, parts, 3);
+    VTABLE_set_string_keyed_int(INTERP, parts, 0, S1);
+    VTABLE_set_string_keyed_int(INTERP, parts, 1, fmt);
+
     /* Add a newline if necessary */
     if ('\n' != Parrot_str_indexed(INTERP, fmt, Parrot_str_byte_length(INTERP, fmt) - 1))
-        fmt = Parrot_str_concat(INTERP, fmt, newline);
+        VTABLE_set_string_keyed_int(INTERP, parts, 2, newline);
 
-    GET_ATTR_str_val(INTERP, SELF, S1);
-    S1 = Parrot_str_concat(INTERP, S1, fmt);
+    S1 = Parrot_str_join(INTERP, STRINGNULL, parts);
     VTABLE_set_string_native(INTERP, SELF, S1);
+    Parrot_pmc_free_temporary(INTERP, parts);
 
     RETURN(PMC *SELF);
   }

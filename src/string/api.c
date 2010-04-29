@@ -3003,7 +3003,7 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
         total_length += next->bufused;
     }
 
-    /* with the right charset, transcode any strings if necessary*/
+    /* with the right charset, transcode any strings if necessary */
     if (transcoded) {
         const CHARSET  *c = j->charset;
         const ENCODING *e = j->encoding;
