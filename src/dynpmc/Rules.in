@@ -8,7 +8,7 @@ src/dynpmc/dynlexpad$(O): src/dynpmc/dynlexpad.c $(DYNPMC_H_FILES)
 src/dynpmc/dynlexpad.c: src/dynpmc/dynlexpad.dump
 	$(PMC2CC) src/dynpmc/dynlexpad.pmc
 
-src/dynpmc/dynlexpad.dump: src/dynpmc/dynlexpad.pmc vtable.dump
+src/dynpmc/dynlexpad.dump: src/dynpmc/dynlexpad.pmc vtable.dump $(CLASS_O_FILES)
 	$(PMC2CD) src/dynpmc/dynlexpad.pmc
 
 $(DYNEXT_DIR)/foo_group$(LOAD_EXT): $(DYNPMC_FOO_OBJS) src/dynpmc/foo_group$(O)
@@ -27,7 +27,7 @@ src/dynpmc/foo$(O): src/dynpmc/foo.c $(DYNPMC_H_FILES)
 src/dynpmc/foo.c: src/dynpmc/foo.dump
 	$(PMC2CC) src/dynpmc/foo.pmc
 
-src/dynpmc/foo.dump: src/dynpmc/foo.pmc vtable.dump
+src/dynpmc/foo.dump: src/dynpmc/foo.pmc vtable.dump $(CLASS_O_FILES)
 	$(PMC2CD) src/dynpmc/foo.pmc
 
 src/dynpmc/foo2$(O): src/dynpmc/foo2.c $(DYNPMC_H_FILES)
@@ -35,7 +35,7 @@ src/dynpmc/foo2$(O): src/dynpmc/foo2.c $(DYNPMC_H_FILES)
 src/dynpmc/foo2.c: src/dynpmc/foo2.dump src/dynpmc/foo.pmc
 	$(PMC2CC) src/dynpmc/foo2.pmc
 
-src/dynpmc/foo2.dump: src/dynpmc/foo2.pmc src/dynpmc/foo.dump vtable.dump
+src/dynpmc/foo2.dump: src/dynpmc/foo2.pmc src/dynpmc/foo.dump vtable.dump $(CLASS_O_FILES)
 	$(PMC2CD) src/dynpmc/foo2.pmc
 
 $(DYNEXT_DIR)/pccmethod_test$(LOAD_EXT): src/dynpmc/pccmethod_test$(O)
@@ -47,7 +47,7 @@ src/dynpmc/pccmethod_test$(O): src/dynpmc/pccmethod_test.c $(DYNPMC_H_FILES)
 src/dynpmc/pccmethod_test.c: src/dynpmc/pccmethod_test.dump
 	$(PMC2CC) src/dynpmc/pccmethod_test.pmc
 
-src/dynpmc/pccmethod_test.dump: src/dynpmc/pccmethod_test.pmc vtable.dump
+src/dynpmc/pccmethod_test.dump: src/dynpmc/pccmethod_test.pmc vtable.dump $(CLASS_O_FILES)
 	$(PMC2CD) src/dynpmc/pccmethod_test.pmc
 
 $(DYNEXT_DIR)/rotest$(LOAD_EXT): src/dynpmc/rotest$(O)
@@ -60,7 +60,7 @@ src/dynpmc/rotest$(O): src/dynpmc/rotest.c $(DYNPMC_H_FILES)
 src/dynpmc/rotest.c: src/dynpmc/rotest.dump
 	$(PMC2CC) src/dynpmc/rotest.pmc
 
-src/dynpmc/rotest.dump: src/dynpmc/rotest.pmc vtable.dump
+src/dynpmc/rotest.dump: src/dynpmc/rotest.pmc vtable.dump $(CLASS_O_FILES)
 	$(PMC2CD) src/dynpmc/rotest.pmc
 
 $(DYNEXT_DIR)/rational$(LOAD_EXT): src/dynpmc/rational$(O)
@@ -73,7 +73,7 @@ src/dynpmc/rational$(O): src/dynpmc/rational.c $(DYNPMC_H_FILES)
 src/dynpmc/rational.c: src/dynpmc/rational.dump
 	$(PMC2CC) src/dynpmc/rational.pmc
 
-src/dynpmc/rational.dump: src/dynpmc/rational.pmc vtable.dump
+src/dynpmc/rational.dump: src/dynpmc/rational.pmc vtable.dump $(CLASS_O_FILES)
 	$(PMC2CD) src/dynpmc/rational.pmc
 
 $(DYNEXT_DIR)/subproxy$(LOAD_EXT): src/dynpmc/subproxy$(O)
@@ -86,7 +86,7 @@ src/dynpmc/subproxy$(O): src/dynpmc/subproxy.c $(DYNPMC_H_FILES)
 src/dynpmc/subproxy.c: src/dynpmc/subproxy.dump
 	$(PMC2CC) src/dynpmc/subproxy.pmc
 
-src/dynpmc/subproxy.dump: src/dynpmc/subproxy.pmc vtable.dump
+src/dynpmc/subproxy.dump: src/dynpmc/subproxy.pmc vtable.dump $(CLASS_O_FILES)
 	$(PMC2CD) src/dynpmc/subproxy.pmc
 
 $(DYNEXT_DIR)/gziphandle$(LOAD_EXT): src/dynpmc/gziphandle$(O)
@@ -99,6 +99,6 @@ src/dynpmc/gziphandle$(O): src/dynpmc/gziphandle.c $(DYNPMC_H_FILES)
 src/dynpmc/gziphandle.c: src/dynpmc/gziphandle.dump
 	$(PMC2CC) src/dynpmc/gziphandle.pmc
 
-src/dynpmc/gziphandle.dump: src/dynpmc/gziphandle.pmc vtable.dump
+src/dynpmc/gziphandle.dump: src/dynpmc/gziphandle.pmc vtable.dump $(CLASS_O_FILES)
 	$(PMC2CD) src/dynpmc/gziphandle.pmc
 
