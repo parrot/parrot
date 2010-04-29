@@ -187,8 +187,7 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     $S0 = sprintf f2, $P1
     $S0 = pad_string_with_null($S0, 12)
     push $P0, $S0
-    $S0 = pad_string_with_null("      ", 8) # checksum
-    push $P0, $S0
+    push $P0, "        " # checksum
     $P2 = getattribute self, 'type'
     $S0 = pad_string_with_null($P2, 1)
     push $P0, $S0
@@ -221,6 +220,10 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     $S0 = pad_string_with_null($P2, 155)
     push $P0, $S0
     $S0 = join '', $P0
+    $I0 = compute_checksum($S0)
+    $P1[0] = $I0
+    $S1 = sprintf "%6o\0\0", $P1
+    $S0 = replace $S0, 148, 8, $S1
     $S0 = pad_string_with_null($S0, BLOCK)
     .return ($S0)
 .end
@@ -236,6 +239,21 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     $S0 .= $S1
   L1:
     .return ($S0)
+.end
+
+.sub 'compute_checksum' :anon
+    .param string str
+    .local int chk
+    chk = 0
+    $P0 = split '', str
+  L1:
+    unless $P0 goto L2
+    $S0 = shift $P0
+    $I0 = ord $S0
+    chk += $I0
+    goto L1
+  L2:
+    .return (chk)
 .end
 
 =back
