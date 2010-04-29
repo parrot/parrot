@@ -379,8 +379,6 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
 
 =back
 
-=back
-
 =head1 AUTHOR
 
 Francois Perrad
