@@ -406,7 +406,11 @@ L<https://trac.parrot.org/parrot/ticket/1429>
 A way to provide an equivalent of -L and -I parrot command line options
 to language that doesn't support it.
 
-=item JSON, and Config;JSON [eligible in 1.5]
+=item Archive::Tar [experimental]
+
+L<https://trac.parrot.org/parrot/ticket/1598>
+
+=item JSON and Config;JSON [eligible in 1.5]
 
 L<https://trac.parrot.org/parrot/ticket/508>
 
