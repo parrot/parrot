@@ -122,11 +122,7 @@ Math/Rand.pbc
 
 =item smoke
 
-tar, curl
-
-=item sdist_gztar
-
-Some coreutils : tar
+curl
 
 =item sdist_zip
 
@@ -3026,25 +3022,27 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     .param pmc kv :slurpy :named
     run_step('manifest', kv :flat :named)
 
+    load_bytecode 'Archive/TAR.pbc'
     $S0 = slurp('MANIFEST')
     $P0 = split "\n", $S0
     $S0 = pop $P0
-    $S0 = get_tarname('.tar.gz', kv :flat :named)
-    $I0 = newer($S0, $P0)
+    .local string archive_file
+    archive_file = get_tarname('.tar.gz', kv :flat :named)
+    $I0 = newer(archive_file, $P0)
     if $I0 goto L1
     $S0 = get_tarname('', kv :flat :named)
     copy_sdist($S0, $P0)
-
-    .local string cmd
-    cmd = 'tar -cvf ' . $S0
-    cmd .= '.tar '
-    cmd .= $S0
-    system(cmd, 1 :named('verbose'))
-
+    chdir($S0)
+    .local pmc archive
+    archive = new ['Archive';'TAR']
+    archive.'add_files'($P0 :flat)
+    chdir('..')
+    $P0 = loadlib 'gziphandle'
+    $P0 = new 'GzipHandle'
+    $P0.'open'(archive_file, 'wb')
+    archive.'write'($P0)
+    $P0.'close'()
     rmtree($S0)
-
-    $S1 = $S0 . '.tar'
-    gzip($S1)
   L1:
 .end
 
