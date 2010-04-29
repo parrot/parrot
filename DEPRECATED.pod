@@ -41,6 +41,10 @@ specifically by including this C<PIR> code:
 
 L<https://trac.parrot.org/parrot/ticket/1580>
 
+=item packfiledebug [experimental]
+
+L<https://trac.parrot.org/parrot/ticket/1599>
+
 =item moved to dynpmc [eligible in 1.1]
 
 AddrRegistry, CodeString, Env, Eval, File, OS, PCCMETHOD_Test, StringHandle,
