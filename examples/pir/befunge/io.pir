@@ -90,7 +90,7 @@
     if i < len goto _IO__INPUT_INT__NEXT_CHAR
 
   _IO__INPUT_INT__NAN:
-    $S = replace $S0, 0, i, ""
+    $S0 = replace $S0, 0, i, ""
     $P0 = $S0
     set_global "user_input", $P0
 
