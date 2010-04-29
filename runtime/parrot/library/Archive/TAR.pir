@@ -87,29 +87,64 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
 .sub 'new_from_data'
     .param string path
     .param string data
+    .param int mode             :named('mode') :optional
+    .param int has_mode         :opt_flag
     .param int uid              :named('uid') :optional
     .param int has_uid          :opt_flag
     .param int gid              :named('gid') :optional
     .param int has_gid          :opt_flag
     .param int mtime            :named('mtime') :optional
     .param int has_mtime        :opt_flag
+    .param string type          :named('type') :optional
+    .param int has_type         :opt_flag
+    .param string linkname      :named('linkname') :optional
+    .param int has_linkname     :opt_flag
+    .param string uname         :named('uname') :optional
+    .param int has_uname        :opt_flag
+    .param string gname         :named('gname') :optional
+    .param int has_gname        :opt_flag
+    .param int devmajor         :named('devmajor') :optional
+    .param int has_devmajor     :opt_flag
+    .param int devminor         :named('devminor') :optional
+    .param int has_devminor     :opt_flag
     $P0 = new ['Archive';'TAR';'File']
     .local string prefix, name
     (prefix, name) = _prefix_and_file(path)
-    unless has_uid goto L1
-    uid = 0
+    if has_mode goto L1
+    mode = MODE
   L1:
-    unless has_uid goto L2
-    gid = 0
+    if has_uid goto L2
+    uid = 0
   L2:
-    unless has_mtime goto L3
-    mtime = time
+    if has_gid goto L3
+    gid = 0
   L3:
+    if has_mtime goto L4
+    mtime = time
+  L4:
+    if has_type goto L5
+    type = FILE
+  L5:
+    if has_linkname goto L6
+    linkname = ''
+  L6:
+    if has_uname goto L7
+    uname = 'unknown'
+  L7:
+    if has_gname goto L8
+    gname = 'unknown'
+  L8:
+    if has_devmajor goto L9
+    devmajor = 0
+  L9:
+    if has_devminor goto L10
+    devminor = 0
+  L10:
     $P1 = box data
     setattribute $P0, 'data', $P1
     $P1 = box name
     setattribute $P0, 'name', $P1
-    $P1 = box MODE
+    $P1 = box mode
     setattribute $P0, 'mode', $P1
     $P1 = box uid
     setattribute $P0, 'uid', $P1
@@ -121,21 +156,21 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     $I0 = mtime
     $P1 = box $I0
     setattribute $P0, 'mtime', $P1
-    $P1 = box FILE
+    $P1 = box type
     setattribute $P0, 'type', $P1
-    $P1 = box ''
+    $P1 = box linkname
     setattribute $P0, 'linkname', $P1
     $P1 = box MAGIC
     setattribute $P0, 'magic', $P1
     $P1 = box TAR_VERSION
     setattribute $P0, 'version', $P1
-    $P1 = box 'unknown'
+    $P1 = box uname
     setattribute $P0, 'uname', $P1
-    $P1 = box 'unknown'
+    $P1 = box gname
     setattribute $P0, 'gname', $P1
-    $P1 = box 0
+    $P1 = box devminor
     setattribute $P0, 'devminor', $P1
-    $P1 = box 0
+    $P1 = box devmajor
     setattribute $P0, 'devmajor', $P1
     $P1 = box prefix
     setattribute $P0, 'prefix', $P1
