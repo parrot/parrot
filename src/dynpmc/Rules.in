@@ -1,3 +1,6 @@
+# Copyright (C) 2010, Parrot Foundation.
+# $Id$
+
 $(DYNEXT_DIR)/dynlexpad$(LOAD_EXT): src/dynpmc/dynlexpad$(O)
 	$(LD)  @ld_out@$(DYNEXT_DIR)/dynlexpad$(LOAD_EXT) src/dynpmc/dynlexpad$(O) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2

@@ -1,3 +1,6 @@
+# Copyright (C) 2010, Parrot Foundation.
+# $Id$
+
 DYNPMC_TARGETS = \
 #IF(has_zlib):    $(DYNEXT_DIR)/gziphandle$(LOAD_EXT) \
     $(DYNEXT_DIR)/dynlexpad$(LOAD_EXT) \
@@ -77,7 +80,7 @@ DYNPMC_H_FILES = \
     include/pmc/pmc_continuation.h \
     include/pmc/pmc_default.h
 
-#IF(win32 and cc==gcc):LIB_ZLIB = -lz                                           
+#IF(win32 and cc==gcc):LIB_ZLIB = -lz
 #ELSIF(win32):LIB_ZLIB = zlib.lib
 #ELSE:LIB_ZLIB = -lz
 
