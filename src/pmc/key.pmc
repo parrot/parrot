@@ -156,7 +156,7 @@ Returns the Parrot string value of the key.
         if (PObj_get_FLAGS(SELF) & KEY_type_FLAGS)
             return key_string(INTERP, SELF);
 
-        return string_from_literal(INTERP, "");
+        return CONST_STRING(INTERP, "");
     }
 
 /*

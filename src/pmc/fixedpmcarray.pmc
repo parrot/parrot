@@ -308,7 +308,7 @@ Returns the Parrot string value of the element at index C<key>.
         PMC * const retval = SELF.get_pmc_keyed_int(key);
 
         if (PMC_IS_NULL(retval))
-            return string_from_literal(interp, "");
+            return CONST_STRING(interp, "");
 
         return VTABLE_get_string(INTERP, retval);
     }

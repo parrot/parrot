@@ -54,7 +54,7 @@ Returns the Parrot string value of the element at index C<key>.
         }
 
         if (key >= size)
-            return string_from_literal(INTERP, "");
+            return CONST_STRING(INTERP, "");
 
         GET_ATTR_str_array(INTERP, SELF, str_array);
 
