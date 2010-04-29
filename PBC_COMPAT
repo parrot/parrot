@@ -27,6 +27,7 @@
 
 # please insert tab separated entries at the top of the list
 
+6.10	2010.04.29	NotFound	packfiledebug.pmc
 6.9	2010.04.27	bacek	remove deprecated in-place string ops (bitwise, charset, case change)
 6.8	2010.04.27	bacek	remove deprecated in-place substr ops
 6.7	2010.04.22	coke	remove RetContinuation PMC
