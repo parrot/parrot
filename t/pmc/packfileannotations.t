@@ -42,6 +42,7 @@ Tests the PackfileAnnotations PMC.
 
     push_eh load_error
     $P0 = open 't/native_pbc/annotations.pbc'
+    $P0.'encoding'('binary')
     $S0 = $P0.'readall'()
     pf = new 'Packfile'
     pf = $S0
@@ -50,7 +51,7 @@ Tests the PackfileAnnotations PMC.
 load_error:
     .get_results($P0)
     pop_eh
-    nok(1, "PackfileAnnotations unpack failed to load test file")
+    report_load_error($P0, "PackfileAnnotations unpack failed to load test file")
     skip(7, "PackfileAnnotations unpack tests failed")
     .return()
 .end
