@@ -23,7 +23,6 @@ This PMC wraps the zlib.
 #include <zlib.h>
 #include "parrot/extend.h"
 
-#define CHAR char
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
