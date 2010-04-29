@@ -36,14 +36,21 @@ Tests the PackfileConstantTable PMC.
 .end
 
 
-
 # sanity check we have a PackfileConstantTable
 .sub 'test_sanity'
     .local pmc pbc, pftable
     .local string name
+    push_eh load_error
     pbc     = _pbc()
+    pop_eh
     pftable = _get_consttable(pbc)
     isa_ok(pftable, "PackfileConstantTable")
+    .return ()
+load_error:
+    .get_results($P0)
+    pop_eh
+    report_load_error($P0, "PackfileConstantTable")
+    .return()
 .end
 
 
@@ -51,10 +58,18 @@ Tests the PackfileConstantTable PMC.
 .sub 'test_elements'
     .local pmc pf, pftable
     .local int size
+    push_eh load_error
     pf      = _pbc()
+    pop_eh
     pftable = _get_consttable(pf)
     size    = elements pftable
     ok(size, "PackfileConstantTable.elements returns non-zero")
+    .return ()
+load_error:
+    .get_results($P0)
+    pop_eh
+    report_load_error($P0, "PackfileConstantTable.elements returns non-zero")
+    .return()
 .end
 
 
@@ -62,7 +77,9 @@ Tests the PackfileConstantTable PMC.
 .sub 'test_get'
     .local pmc pf, pftable
     .local int size, this, type
+    push_eh load_error
     pf      = _pbc()
+    pop_eh
     pftable = _get_consttable(pf)
     size    = elements pftable
     this    = 0
@@ -102,6 +119,11 @@ Tests the PackfileConstantTable PMC.
     .return()
   bad:
     ok(0, 'Unknown constant type')
+    .return()
+load_error:
+    .get_results($P0)
+    pop_eh
+    report_load_error($P0, 'PackfileConstantTable.get_*_int works')
     .return()
 .end
 

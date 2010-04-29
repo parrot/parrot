@@ -39,18 +39,6 @@ Tests the Packfile PMC.
 .end
 
 
-# Report no ok for loading packfile failures
-.sub report_load_error
-    .param pmc except
-    .param string desc
-    .local string msg, aux
-    msg = concat desc, ' - error loading packfile: '
-    aux = except['message']
-    msg = concat msg, aux
-    ok(0, msg)
-.end
-
-
 # Packfile constructor
 .sub 'test_new'
     .local pmc pf
@@ -188,6 +176,7 @@ load_error:
     .return()
 load_error:
     .get_results($P0)
+    pop_eh
     report_load_error($P0, 'get_directory')
     .return()
 .end
@@ -204,6 +193,7 @@ load_error:
     .tailcall _check_header(pf)
 load_error:
     .get_results($P0)
+    pop_eh
     report_load_error($P0, "Wordsize set")
     report_load_error($P0, "version_major set")
     report_load_error($P0, "bytecode_major set")
@@ -328,6 +318,7 @@ load_error:
     .return()
 load_error:
     .get_results($P0)
+    pop_eh
     report_load_error($P0, 'pack produced same result twice')
     .return()
 .end
@@ -357,6 +348,7 @@ load_error:
     .return()
 load_error:
     .get_results($P0)
+    pop_eh
     report_load_error($P0, "pack and get_string are synonyms")
     report_load_error($P0, "unpack and set_string are synonyms")
     .return()

@@ -28,12 +28,27 @@ Tests the PackfileFixupTable PMC.
     test_unpack()
 .end
 
+
+# Report no ok for loading packfile failures
+.sub report_load_error
+    .param pmc except
+    .param string desc
+    .local string msg, aux
+    msg = concat desc, ' - error loading packfile: '
+    aux = except['message']
+    msg = concat msg, aux
+    ok(0, msg)
+.end
+
+
 # Check unpackging FixupTable
 .sub 'test_unpack'
     .local pmc pf, pfdir, pftable, pfentry
     .local int size, this, data
     .local string name
+    push_eh load_error
     pf      = _pbc()
+    pop_eh
     pftable = _get_fixup_table(pf)
     isa_ok(pftable, 'PackfileFixupTable')
 
@@ -59,6 +74,13 @@ Tests the PackfileFixupTable PMC.
     gt size, 0, done
   done:
     ok(1, "All elements of Table are Entries")
+    .return()
+load_error:
+    .get_results($P0)
+    pop_eh
+    report_load_error($P0, "All elements of Table are Entries")
+    skip(2, "All elements of Table are Entries")
+    .return()
 .end
 
 # Local Variables:
