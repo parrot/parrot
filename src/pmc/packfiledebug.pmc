@@ -64,10 +64,10 @@ Marks the object as live.
     VTABLE void mark() {
         PMC *mapping_offset;
         PMC *mapping_filename;
-	GET_ATTR_mapping_offset(INTERP, SELF, mapping_offset);
-	GET_ATTR_mapping_filename(INTERP, SELF, mapping_filename);
-	Parrot_gc_mark_PMC_alive(INTERP, mapping_offset);
-	Parrot_gc_mark_PMC_alive(INTERP, mapping_filename);
+        GET_ATTR_mapping_offset(INTERP, SELF, mapping_offset);
+        GET_ATTR_mapping_filename(INTERP, SELF, mapping_filename);
+        Parrot_gc_mark_PMC_alive(INTERP, mapping_offset);
+        Parrot_gc_mark_PMC_alive(INTERP, mapping_filename);
 
         SUPER();
     }
@@ -85,20 +85,18 @@ Set pointer to underlying PackFile_ConstTable
 
     VTABLE void set_pointer(void * pointer) {
         PackFile_Debug *p = (PackFile_Debug *) pointer;
-	INTVAL num_mappings = p->num_mappings;
-	PMC *mapping_offset = Parrot_pmc_new_init_int(INTERP,
-                                                  enum_class_FixedIntegerArray, num_mappings);
-	PMC *mapping_filename = Parrot_pmc_new_init_int(INTERP,
-                                                    enum_class_FixedIntegerArray, num_mappings);
-	INTVAL i;
+        INTVAL num_mappings = p->num_mappings;
+        PMC *mapping_offset = Parrot_pmc_new_init_int(INTERP,
+                                                      enum_class_FixedIntegerArray, num_mappings);
+        PMC *mapping_filename = Parrot_pmc_new_init_int(INTERP,
+                                                      enum_class_FixedIntegerArray, num_mappings);
+        INTVAL i;
         STRING *t = CONST_STRING(INTERP, "test");
 
         SUPER(pointer);
-	for (i = 0; i < num_mappings; ++i) {
-	    VTABLE_set_integer_keyed_int(INTERP, mapping_offset, i,
-	            p->mappings[i].offset);
-	    VTABLE_set_integer_keyed_int(INTERP, mapping_filename, i,
-	            p->mappings[i].filename);
+        for (i = 0; i < num_mappings; ++i) {
+            VTABLE_set_integer_keyed_int(INTERP, mapping_offset, i, p->mappings[i].offset);
+            VTABLE_set_integer_keyed_int(INTERP, mapping_filename, i, p->mappings[i].filename);
         }
         SET_ATTR_num_mappings(INTERP, SELF, p->num_mappings);
         SET_ATTR_mapping_offset(INTERP, SELF, mapping_offset);
@@ -114,17 +112,17 @@ Set pointer to underlying PackFile_ConstTable
 
     VTABLE void *get_pointer() {
         PackFile_Debug *p = (PackFile_Debug *) mem_gc_realloc_n_typed(INTERP,
-	        SUPER(), sizeof (PackFile_Debug), char);
+                                                           SUPER(), sizeof (PackFile_Debug), char);
         INTVAL num_mappings;
-	PMC *mapping_offset;
-	PMC *mapping_filename;
-	INTVAL i;
-	GET_ATTR_num_mappings(INTERP, SELF, num_mappings);
+        PMC *mapping_offset;
+        PMC *mapping_filename;
+        INTVAL i;
+        GET_ATTR_num_mappings(INTERP, SELF, num_mappings);
         GET_ATTR_mapping_offset(INTERP, SELF, mapping_offset);
         GET_ATTR_mapping_filename(INTERP, SELF, mapping_filename);
         p->num_mappings = num_mappings;
-	p->mappings = mem_gc_allocate_n_typed(INTERP, num_mappings, PackFile_DebugFilenameMapping);
-	for (i = 0; i < num_mappings; ++i) {
+        p->mappings = mem_gc_allocate_n_typed(INTERP, num_mappings, PackFile_DebugFilenameMapping);
+        for (i = 0; i < num_mappings; ++i) {
             p->mappings[i].offset = VTABLE_get_integer_keyed_int(INTERP, mapping_offset, i);
             p->mappings[i].filename = VTABLE_get_integer_keyed_int(INTERP, mapping_filename, i);
         }
@@ -160,17 +158,17 @@ Get the filename mapping n.
     VTABLE PMC *get_pmc_keyed_int(INTVAL n) {
         INTVAL num_mappings;
         GET_ATTR_num_mappings(INTERP, SELF, num_mappings);
-	if (n < num_mappings) {
-	    PMC *mapping_offset;
-	    INTVAL offset;
-	    PMC *result;
-	    GET_ATTR_mapping_offset(INTERP, SELF, mapping_offset);
+        if (n < num_mappings) {
+            PMC *mapping_offset;
+            INTVAL offset;
+            PMC *result;
+            GET_ATTR_mapping_offset(INTERP, SELF, mapping_offset);
             offset = VTABLE_get_integer_keyed_int(INTERP, mapping_offset, n);
-	    result = Parrot_pmc_new(INTERP, enum_class_Integer);
-	    VTABLE_set_integer_native(INTERP, result, offset);
+            result = Parrot_pmc_new(INTERP, enum_class_Integer);
+            VTABLE_set_integer_native(INTERP, result, offset);
             return result;
-	}
-	    else return PMCNULL;
+        }
+        else return PMCNULL;
     }
 
 /*
@@ -186,12 +184,12 @@ Get the filename mapping n.
     VTABLE STRING *get_string_keyed_int(INTVAL n) {
         INTVAL num_mappings;
         GET_ATTR_num_mappings(INTERP, SELF, num_mappings);
-	if (n < num_mappings) {
-	    PMC *mapping_filename;
-	    GET_ATTR_mapping_filename(INTERP, SELF, mapping_filename);
+        if (n < num_mappings) {
+            PMC *mapping_filename;
+            GET_ATTR_mapping_filename(INTERP, SELF, mapping_filename);
             return VTABLE_get_string_keyed_int(INTERP, mapping_filename, n);
-	}
-	    else return STRINGNULL;
+        }
+        else return STRINGNULL;
     }
 
 }
