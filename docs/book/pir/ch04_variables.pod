@@ -898,7 +898,7 @@ The numeric bitwise opcodes also have string variants for AND, OR, and XOR:
 C<bors>X<bors opcode>, C<bands>X<bands opcode>, and C<bxors>X<bxors opcode>.
 These take string or string-like PMC arguments and perform the logical
 operation on each byte of the strings to produce the result string.
-Remember that in-place sting operations are no longer acailable.
+Remember that in-place string operations are no longer available.
 
 =begin PIR_FRAGMENT
 
