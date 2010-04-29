@@ -86,8 +86,10 @@ Set pointer to underlying PackFile_ConstTable
     VTABLE void set_pointer(void * pointer) {
         PackFile_Debug *p = (PackFile_Debug *) pointer;
 	INTVAL num_mappings = p->num_mappings;
-	PMC *mapping_offset = Parrot_pmc_new_init_int(INTERP, enum_class_FixedIntegerArray, num_mappings);
-	PMC *mapping_filename = Parrot_pmc_new_init_int(INTERP, enum_class_FixedIntegerArray, num_mappings);
+	PMC *mapping_offset = Parrot_pmc_new_init_int(INTERP,
+                                                  enum_class_FixedIntegerArray, num_mappings);
+	PMC *mapping_filename = Parrot_pmc_new_init_int(INTERP,
+                                                    enum_class_FixedIntegerArray, num_mappings);
 	INTVAL i;
         STRING *t = CONST_STRING(INTERP, "test");
 
